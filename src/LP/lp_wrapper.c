@@ -621,8 +621,6 @@ int is_feasible_u(lp_prob *p, char branching)
 	 feasible = IP_FEASIBLE;
       }
    }
-#else
-   feasible = IP_FEASIBLE;
 #endif
    
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE){

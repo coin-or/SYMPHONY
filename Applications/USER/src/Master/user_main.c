@@ -40,6 +40,9 @@ int main(int argc, char **argv)
    //si.setSymParam(OsiSymNodeLimit, 10);
 
 #ifdef MULTI_CRITERIA
+
+   si.setObj2Coeff(0, 200);
+   
    /* Solve the multi-criteria problem */
    si.MCBranchAndBound();
 #else
