@@ -150,10 +150,10 @@ typedef struct VRP_PARAMS{
    int           tours_to_keep;
    time_out_par  time_out;
    int           do_heuristics;
+#endif
 
    int           test;   
    char          test_dir[MAX_FILE_NAME_LENGTH +1]; /* Test files directory */ 
-#endif
 }vrp_params;
 
 /*---------------------------------------------------------------------------*\
