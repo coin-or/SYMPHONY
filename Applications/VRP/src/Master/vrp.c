@@ -786,15 +786,11 @@ int user_process_own_messages(void *user, int msgtag)
 
 int user_display_solution(void *user)
 {
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-   vrp_spec *vrp = (vrp_spec *)user;
-   _node *tour = vrp->cur_sol;
-   int window = vrp->window;
-#else
+   /*FIXME: This won't work for printing out from LP in sequential mode */
+   
    vrp_problem *vrp = (vrp_problem *)user;
    _node *tour = vrp->cur_tour->tour;
    int window = vrp->dg_id;
-#endif
    
    int prev_node = 0, node, count = 0;
 

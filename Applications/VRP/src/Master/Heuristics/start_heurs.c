@@ -146,7 +146,7 @@ void start_heurs(vrp_problem *vrp, heur_params *heur_par, lb_params *lb_par,
   vrp->lb->lower_bound = (double) 0;
   ub_pos = -1;
   
-  if (vrp->tournum>=0 && !*ub){
+  if (vrp->tournum>=0 && *ub <= 0){
      if (!vrp->numroutes){
 	vrp->numroutes = tours[tourorder[0]].numroutes;
 	*ub = (double) tours[tourorder[0]].cost;

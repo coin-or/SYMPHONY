@@ -355,10 +355,11 @@ void display_solution_u(problem *p, int thread_num)
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    if (p->tm && p->tm->lpp[thread_num] && p->tm->lpp[thread_num]->user){
       user_display_solution(p->tm->lpp[thread_num]->user);
+      printf("Solution Cost: %.3f\n\n", p->tm->ub);
    }else if (p->user){
       user_display_solution(p->user);
+      printf("Solution Cost: %.3f\n\n", p->ub);
    }
-   printf("Solution Cost: %.3f\n\n", p->tm->ub);
 #else
    if (p->user)
       user_display_solution(p->user);

@@ -171,7 +171,7 @@ int main(int argc, char **argv)
       total_time += p->comp_times.ub_overhead + p->comp_times.ub_heurtime;
       total_time += p->comp_times.lb_overhead + p->comp_times.lb_heurtime;
 #ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
-     printf( "  Problem IO     %.3f\n", p->comp_times.readtime);
+      printf( "  Problem IO     %.3f\n", p->comp_times.readtime);
       printf( "  Overhead: UB   %.3f\n", p->comp_times.ub_overhead);
       printf( "            LB   %.3f\n", p->comp_times.lb_overhead);
       printf( "  Runtime:  UB   %.3f\n", p->comp_times.ub_heurtime);
@@ -180,12 +180,7 @@ int main(int argc, char **argv)
 #endif
       printf( "  Total Real Time    %.3f\n\n", wall_clock(NULL) - start_time);
       printf( "Cost of best solution: %.3f\n", p->ub);
-#ifdef COMPILE_IN_TM
-      if (p->tm)
-	 display_solution_u(p, p->tm->opt_thread_num);
-#else
       display_solution_u(p, 0);
-#endif
       free_master_u(p); /* free the problem data structures */
       if (p->par.tm_par.lp_machs)
 	 FREE(p->par.tm_par.lp_machs[0]);
