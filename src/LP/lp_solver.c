@@ -1406,24 +1406,24 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 				   &defit, &minit, &maxit);
       CPX_check_error("dual_simplex - CPXinfointparam, ITLIM");
       cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, defit);
-      CPX_check_error("refactorize - CPXsetintparam, ITLIM");
+      CPX_check_error("dual_simplex - CPXsetintparam, ITLIM");
       cpx_status = CPXgetdblparam(lp_data->cpxenv, CPX_PARAM_OBJULIM,&objulim);
-      CPX_check_error("refactorize - CPXgetdblparam, OBJULIM");
+      CPX_check_error("dual_simplex - CPXgetdblparam, OBJULIM");
       cpx_status = CPXgetdblparam(lp_data->cpxenv, CPX_PARAM_OBJULIM,&objllim);
-      CPX_check_error("refactorize - CPXgetdblparam, OBJULIM");
+      CPX_check_error("dual_simplex - CPXgetdblparam, OBJULIM");
       defobj = 1e75;
       cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_OBJULIM, defobj);
-      CPX_check_error("refactorize - CPXsetdblparam, OBJULIM");
+      CPX_check_error("dual_simplex - CPXsetdblparam, OBJULIM");
       defobj = -1e75;
       cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_OBJLLIM, defobj);
-      CPX_check_error("refactorize - CPXsetdblparam, OBJLLIM");
+      CPX_check_error("dual_simplex - CPXsetdblparam, OBJLLIM");
       term = CPXdualopt(lp_data->cpxenv, lp_data->lp);
       cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_OBJULIM, objulim);
-      CPX_check_error("refactorize - CPXsetdblparam, OBJULIM");
+      CPX_check_error("dual_simplex - CPXsetdblparam, OBJULIM");
       cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_OBJLLIM, objllim);
-      CPX_check_error("refactorize - CPXsetdblparam, OBJLLIM");
+      CPX_check_error("dual_simplex - CPXsetdblparam, OBJLLIM");
       cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, itlim);
-      CPX_check_error("refactorize - CPXsetintparam, ITLIM");
+      CPX_check_error("dual_simplex - CPXsetintparam, ITLIM");
    }
 
 #if CPX_VERSION >= 800
