@@ -21,10 +21,10 @@
 
 /* VRP include files */
 #include "vrp_types.h"
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_HEURS
 #include "heur_types.h"
 #include "lb_types.h"
-/*___END_EXPERIMENTAL_SECTION___*/
+#endif
 
 int is_same_edge PROTO((const void *ed0, const void *ed1));
 void delete_dup_edges PROTO((small_graph *g));

@@ -1083,7 +1083,7 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
 	 memcpy((char *)&num_arcs, cpt, ISIZE);
 	 cpt += ISIZE;
 	 arcs = (int *) malloc(num_arcs * ISIZE);
-	 indicators = malloc(num_arcs);  
+	 indicators = (char *) malloc(num_arcs);  
 	 memcpy((char *)arcs, cpt, num_arcs * ISIZE);
 	 cpt += num_arcs * ISIZE;
 	 memcpy(indicators, cpt, num_arcs);
@@ -1121,7 +1121,7 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
 	 memcpy((char *)&num_arcs, cpt, ISIZE);
 	 cpt += ISIZE;
 	 arcs = (int *) malloc(num_arcs * ISIZE);
-	 indicators = malloc(num_arcs);
+	 indicators = (char *) malloc(num_arcs);
 	 memcpy((char *)arcs, cpt, num_arcs * ISIZE);
 	 cpt += num_arcs * ISIZE;
 	 memcpy(indicators, cpt, num_arcs);

@@ -34,9 +34,9 @@
 #include "vrp_types.h"
 #include "vrp_io.h"
 #include "compute_cost.h"
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_HEURS
 #include "start_heurs.h"
-/*___END_EXPERIMENTAL_SECTION___*/
+#endif
 #include "vrp_master_functions.h"
 #include "vrp_dg_functions.h"
 #include "vrp_macros.h"
@@ -180,17 +180,13 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
       *ub = 1;
    /*___END_EXPERIMENTAL_SECTION___*/
    
-   /* For now, I am not including any actual upper-bounding in the
-      publicly available distribution. That may change in a future
-      release */
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   
+#ifdef COMPILE_HEURS
    if (vrp->par.do_heuristics || vrp->lb_par.lower_bound)
       start_heurs(vrp, &vrp->heur_par, &vrp->lb_par, ub, FALSE);
    else
       vrp->tournum = -1;
-
-   /*___END_EXPERIMENTAL_SECTION___*/
+#endif
+   
    if (!vrp->numroutes){
       printf("\nError: Number of trucks not specified or computed "
 	     "for VRP\n\n");
@@ -671,6 +667,7 @@ int user_send_cp_data(void *user, void **user_cp)
 
 int user_send_sp_data(void *user)
 {
+#ifdef COMPILE_HEURS
    vrp_problem *vrp = (vrp_problem *) user;
    int i, j;
    int size;
@@ -728,6 +725,7 @@ int user_send_sp_data(void *user)
       send_int_array(&size, 1);
       send_char_array((char *)coef, size);
    }
+#endif
 
    return(USER_SUCCESS);
 }
@@ -896,7 +894,7 @@ int user_free_master(void **user)
    FREE(vrp->edges);
    FREE(vrp->demand);
 #endif
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_HEURS
    if (vrp->tours){
       FREE(vrp->tours[0].tour);
       if (vrp->tourorder)
@@ -911,7 +909,7 @@ int user_free_master(void **user)
       FREE(vrp->lb);
    }
    FREE(vrp->par.rand_seed);
-   /*___END_EXPERIMENTAL_SECTION___*/
+#endif
    if (vrp->g){
       FREE(vrp->g->edges);
       FREE(vrp->g);

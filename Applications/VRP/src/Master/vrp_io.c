@@ -473,10 +473,10 @@ void vrp_io(vrp_problem *vrp, char *infile)
   
   vrp->cur_tour = (best_tours *) calloc(1, sizeof(best_tours));
   vrp->cur_tour->tour = (_node *) calloc(vertnum, sizeof(_node));
-  /*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_HEURS
   vrp->tours = (best_tours *) calloc(vrp->par.tours_to_keep,
 				     sizeof(best_tours));
-  /*___END_EXPERIMENTAL_SECTION___*/
+#endif
   
   /*calculate all the distances explcitly and then use distance type EXPLICIT*/
   
@@ -555,10 +555,10 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
    str_int colgen_str[COLGEN_STR_SIZE] = COLGEN_STR_ARRAY;
    
    vrp_params *par = &vrp->par;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_HEURS
    heur_params *heur_par = &vrp->heur_par;
    lb_params *lb_par = &vrp->lb_par;
-   /*___END_EXPERIMENTAL_SECTION___*/
+#endif
    vrp_lp_params *lp_par = &vrp->lp_par;
    vrp_cg_params *cg_par = &vrp->cg_par;
 
@@ -568,11 +568,11 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
    vrp->feas_sol = NULL;
 #endif
    par->tsp_prob = FALSE;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_HEURS
    par->rand_seed = NULL;
    par->tours_to_keep = 15;
    par->do_heuristics = FALSE;
-   /*___END_EXPERIMENTAL_SECTION___*/
+#endif
    par->k_closest = -1;
    par->min_closest = 4;
    par->max_closest = 10;
@@ -584,6 +584,8 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
    par->verbosity = 9;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    par->debug.winprog = 0;
+   /*___END_EXPERIMENTAL_SECTION___*/
+#ifdef COMPILE_HEURS
    par->debug.heuristics = 0;
    par->time_out.ub = 60;
    par->time_out.lb = 60;
@@ -617,8 +619,8 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
    lb_par->lb_penalty_mult = 100;
    vrp->lb = (low_bd *) calloc (1, sizeof(low_bd));
    strcpy(par->executables.heuristics, "vrp_heuristics");
-   /*___END_EXPERIMENTAL_SECTION___*/
-
+#endif
+   
    lp_par->verbosity = 0;
    lp_par->branching_rule = 2;
    lp_par->branch_on_cuts = FALSE;
@@ -678,7 +680,7 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
 	 par->infile[MAX_FILE_NAME_LENGTH] = 0;
 	 strncpy(par->infile, value, MAX_FILE_NAME_LENGTH);
       }
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_HEURS
       else if (strcmp(key, "rand_seed") == 0){
 	 par->rand_seed = (int *) calloc (NUM_RANDS, sizeof(int));
 	 if (sscanf(line, "%*s%i%i%i%i%i%i", &par->rand_seed[0],
@@ -699,7 +701,7 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       else if (strcmp(key, "lb_time_out") == 0){
 	 READ_INT_PAR(par->time_out.lb);
       }
-      /*___END_EXPERIMENTAL_SECTION___*/
+#endif
       else if (strcmp(key, "k_closest") == 0){
 	 READ_INT_PAR(par->k_closest);
       }
@@ -729,10 +731,10 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
 	       exit(1);
 	    }
 	    strcpy(par->small_graph_file, value);
-	    /*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_HEURS
 	    if (par->use_small_graph == LOAD_SMALL_GRAPH)
 	       par->do_heuristics = FALSE;
-	    /*___END_EXPERIMENTAL_SECTION___*/
+#endif
 	 }
       }
       else if (strcmp(key, "colgen_in_first_phase") == 0 ||
@@ -758,7 +760,7 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
 	 vrp->numroutes = j;
       }
 
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_HEURS
       /******************** heuristics parameters ****************************/
       
       else if (strcmp(key, "sweep_trials") == 0){
@@ -842,28 +844,36 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       else if (strcmp(key, "lb_penalty_mult") == 0){
 	 READ_INT_PAR(lb_par->lb_penalty_mult);
       }
-
+#endif
+      
       /********************** executable names *******************************/
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
       else if (strcmp(key, "winprog_executable_name") == 0){
 	 strcpy(par->executables.winprog, value);
       }
+/*___END_EXPERIMENTAL_SECTION___*/
+#ifdef COMPILE_HEURS
       else if (strcmp(key, "heuristics_executable_name") == 0){
 	 strcpy(par->executables.heuristics, value);
       }
-
+#endif
+      
       /******************** debugging parameters *****************************/
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
       else if (strcmp(key, "winprog_debug") == 0){
 	 READ_INT_PAR(par->debug.winprog);
 	 CHECK_DEBUG_PAR(par->debug.winprog, key);
       }
+/*___END_EXPERIMENTAL_SECTION___*/
+#ifdef COMPILE_HEURS
       else if (strcmp(key, "heuristics_debug") == 0){
 	 READ_INT_PAR(par->debug.heuristics);
 	 CHECK_DEBUG_PAR(par->debug.heuristics, key);
       }
+#endif
 
-      /*___END_EXPERIMENTAL_SECTION___*/
       /************************ lp parameters *******************************/
       else if (strcmp(key, "branching_rule") == 0){
 	 READ_INT_PAR(lp_par->branching_rule);
@@ -1136,8 +1146,7 @@ EXIT:
    if (f)
       fclose(f);
    
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-
+#ifdef COMPILE_HEURS
    if (!par->rand_seed){
       par->rand_seed = (int *) calloc (NUM_RANDS, sizeof(int));
       for (k = 0; k<NUM_RANDS; k++)
@@ -1154,5 +1163,5 @@ EXIT:
       heur_par->exchange = par->tours_to_keep;
    if (heur_par->exchange2 < 0)
       heur_par->exchange2 = par->tours_to_keep;
-/*___END_EXPERIMENTAL_SECTION___*/
+#endif
 }

@@ -188,6 +188,10 @@ TSP_OBJS = $(addprefix $(USER_OBJDIR)/,$(notdir $(TSP_SRC:.c=.o)))
 # This section is for the VRP heuristic source file names
 ##############################################################################
 
+COMPILE_HEURS = FALSE
+
+ifeq ($(COMPILE_HEURS),TRUE)
+USER_BB_DEFINES += -DCOMPILE_HEURS
 USER_MASTER_SRC  += start_heurs.c lower_bound.c route_heur.c
 USER_MASTER_SRC  += exchange_heur.c cluster_heur.c
 USER_MASTER_SRC  += receive_rout.c collect_solutions.c heur_routines.c
@@ -204,12 +208,13 @@ HEURS_SRC    += $(TIME_SRC) $(PVMERR_SRC) heur_main.c
 HEURS_OBJS    = $(addprefix $(USER_OBJDIR)/,$(notdir $(HEURS_SRC:.c=.o)))
 HEURS_DEP     = $(addprefix $(USER_DEPDIR)/,$(notdir $(HEURS_SRC:.c=.d)))
 
-USER_SRCDIR   = $(USERROOT)/src/Heuristics
+USER_SRCDIR   = $(USERROOT)/Heuristics
 USER_SRCDIR  += $(USERROOT)/src/Master/Heuristics
 
 USER_INCDIR  += -I$(USERROOT)/include/heurs
 
 ALL_USER_SRC += $(ALL_HEURS_SRC)
+endif
 
 ##############################################################################
 # This section is for DECOMP source file names
