@@ -39,10 +39,10 @@ First, download SYMPHONY-4.0.zip and unzip the archive. This will create a
 subdirectory called SYMPHONY-4.0\ containing all the source files. Now
 download and unpack SYMPHONY-MPP-4.0.zip in the SYMPHONY-4.0\ subdirectory. It
 is important that the MPP source code be unpacked in the SYMPHONY-4.0\
-subdirectory or the project files will not work. 
+subdirectory or the project files will not work.
 
-You now have two options. You can either compile on the command-line, using the
-MSVC++ makefile SYMPHONY-4.0\WIN32\mpp.mak or you can use the provided
+You now have two options. You can either compile on the command-line, using
+the MSVC++ makefile SYMPHONY-4.0\WIN32\mpp.mak or you can use the provided
 projects and workspaces. Compiling on the command-line is somewhat easier
 since it requires only editing the makefile and typing a single command.
 
@@ -69,7 +69,7 @@ SYMPHONY-4.0\MPP\WIN32\mpp.mak.
 SYMPHONY-4.0\MPP\WIN32 directory. The executable "symphony.exe" will be
 created in the SYMPHONY-4.0\MPP\WIN32\Debug directory.
 
-5. To test the executable, type "symphony.exe -F ..\..\test.mps" at a command 
+5. To test the executable, type "symphony.exe -F ..\..\test.mps" at a command
 prompt from the SYMPHONY-4.0\MPP\WIN32\Debug directory.
 
 ******** Using the MSVC++ Workspace ********
@@ -77,12 +77,12 @@ prompt from the SYMPHONY-4.0\MPP\WIN32\Debug directory.
 1. In MS Visual C++ 6.0, open the workspace SYMPHONY-4.0\MPP\WIN32\mpp.dsw.
 Note that there are two projects, one called "symphony" and one called "mpp".
 The symphony project compiles the source of the internal library. The mpp
-project compiles a separate library containing the mpp-defined functions
-that can be used to customize the solver. 
+project compiles a separate library containing the mpp-defined functions that
+can be used to customize the solver.
 
 2. To use many of the new capabilities of SYMPHONY, you must have installed
 the COIN libraries. Specifically, you should install OSI, CGL, and the Coin
-utilities (in the COIN/Coin cirectory). If you want to use the COIN LP solver,
+utilities (in the COIN/Coin directory). If you want to use the COIN LP solver,
 you should also download CLP. These can be downloaded from www.coin-or.org.
 The default location for COIN is C:\COIN\.
 
@@ -96,7 +96,7 @@ drop-down menu).
 
 -- Paths to the include files of COIN utilities (Coin), OSI, OSI_CPLEX, and
 CPLEX are specified in the same settings window as for the preprocessor
-definitons. Note that the Coin, OSI, and OSI_CPLEX include directories are
+definitions. Note that the Coin, OSI, and OSI_CPLEX include directories are
 assumed to be in C:\COIN\Coin, C:\COIN\Osi, C:\COIN\Osi\OsiCpx and
 C:\ILOG\cplex81\include\ilcplex directories, respectively. If they are not,
 make sure that you have set the correct paths in both projects before
@@ -107,7 +107,7 @@ dependencies in Project --> Dependencies) and it includes the necessary
 libraries: "mpp", "osiCpxLib", "osiLib", "coinLib" and "cplex81" (solver
 library).
 
-If you want to use the native CPLEX interface (without dowloading COIN) or a
+If you want to use the native CPLEX interface (without downloading COIN) or a
 solver other than CPLEX:
 
 -- If you want to use another OSI interface, change the preprocessor
@@ -118,26 +118,26 @@ have two options: "__CPLEX__" and "__OSL__") in both projects.
 -- Change the path definitions of the include files: for instance, if you want
 to use "__OSI_OSL__", define C:\COIN\OSi\OsiOsl and C:\Program
 Files\IbmOslV3Lib\osllib (assuming it is installed there) instead of OsiCpx
-and CPLEX path definitons. If you want to use the native OSL interface, delete
-all the path definitions (you are not required to have COIN or OSI), and just
-add the path definiton for the OSL include files.
+and CPLEX path definitions. If you want to use the native OSL interface,
+delete all the path definitions (you are not required to have COIN or OSI),
+and just add the path definition for the OSL include files.
 
 -- Add the appropriate libraries to the "symphony" project. For instance, if
 you want to use "__OSI_OSL__" then add the osiOslLib and oslmd6030 (OSL solver
 lib file) library files after deleting osiCpxLib and cplex81 libraries from
 the "symphony" project (you can do that by right_clicking on the "symphony"
 project and then --> Add files to project with "library files" selected as the
-file type). If you want to use the mative OSL interface, then delete all
-the libraries (except the "mpp" library ) from the "symphony" project and
-just add the "oslmd6030" library file for it is the unique solver library file
-we need now.
+file type). If you want to use the mative OSL interface, then delete all the
+libraries (except the "mpp" library ) from the "symphony" project and just add
+the "oslmd6030" library file for it is the unique solver library file we need
+now.
 
 4. By default, SYMPHONY is also set up to use the COIN CGL library for
 generating cuts. To use CGL, the "symphony" project has the "ADD_CGL_CUTS"
-preprocessor definiton, the path to C:\COIN\Cgl\ (be sure that this path
+preprocessor definition, the path to C:\COIN\Cgl\ (be sure that this path
 directs SYMPHONY to the include directory of CGL) and a dependence on the
 "cgllib" library. If you also don't want to use the CGL library, simply delete
-the "ADD_CGL_CUTS" preprocessor definiton, the CGL path definitons and the
+the "ADD_CGL_CUTS" preprocessor definition, the CGL path definitions and the
 "cglLib" library from the "symphony" project.
 
 5. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important note
@@ -178,8 +178,8 @@ Windows. Let me know if you are interested.
 *                      USING THE SOLVER                                       *
 *******************************************************************************
 
-The mixed postman problem (MPP) can be defined as finding a minimum cost path 
-by traversing all edges at least once on the graph that may contain both 
+The mixed postman problem (MPP) can be defined as finding a minimum cost path
+by traversing all edges at least once on the graph that may contain both
 undirected and directed edges.
 
 
@@ -193,10 +193,10 @@ parameters are the following:
 		-H: help (user switches)
 		-F file: problem instance data is in 'file'
 
-You can also obtain the above list by tying the executable name followed by 
-"-H". There are a number of other (for now) undocumented parameters that can 
-be used to fine-tune the performance of the solver. These must be set in a 
-parameter file. The SYMPHONY User's Manual explains the use of the parameter 
+You can also obtain the above list by tying the executable name followed by
+"-H". There are a number of other (for now) undocumented parameters that can
+be used to fine-tune the performance of the solver. These must be set in a
+parameter file. The SYMPHONY User's Manual explains the use of the parameter
 file.
 
 Some of SYMPHONY's native parameters can also be set on the command
