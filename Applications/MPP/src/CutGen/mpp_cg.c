@@ -42,13 +42,7 @@
  * FALSE.
 \*===========================================================================*/
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-int user_receive_cg_data(void **user, int dg_id, int *varnum)
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
 int user_receive_cg_data(void **user, int dg_id)
-#endif
 {
    return(USER_NO_PP);
 }
