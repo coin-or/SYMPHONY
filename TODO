@@ -11,9 +11,17 @@ compile out of the box (include GLPK code directly in SYMPHONY)
 --Explain how to use FlopC++ (Explain example).
 --Explain how to compile Osi
 --Include a sample AMPL file.
+--State the most of SYMPHONY's callbacks return either USER_SUCCESS,
+USER_ERROR, or USER_DEFAULT. 
+3. Add an examples directory with short sample codes and makefiles for 
+--Standard MILP
+--Bicriteria Solve
+--Warm Starting
+--Sensitivity Analysis
+--Parallel
+4. Fix the fact that the directory is CVS is called "Template" instead of "USER"
 
-
-
+==========================OLD STUFF??================================
 Before release:
 
 1. Update references (make Bibtex file).
