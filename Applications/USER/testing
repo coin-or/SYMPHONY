@@ -3,17 +3,20 @@
 limit memoryuse 1500m
 
 #Solved
-foreach file (egout lseu mod010 mod008.mps flugpl p0033 rgn p0201 misc06 air03 misc07 enigma khb05250 mitre l152lav mod008.mps pk1 stein27 bell3a fixnet6 markshare1 stein45 flugpl blend2 gen qiu cap6000 mas76 qnet1_o vpm1 10teams mkc fiber)
+foreach file (egout lseu mod010 mod008.mps misc03 dcmulti flugpl rentacar p0033 rgn p0201 misc06 air03 enigma khb05250 mitre l152lav mod008.mps stein27 fixnet6 gesa3_o blend2 gen gesa3 nw04 markshare1 bell3a misc07 qnet1_o mas76 pk1 stein45)
 
-#Untried
-#foreach file (gesa3 miplib.cat nw04 references dcmulti gesa3_o misc03 rentacar)
+#Difficult, but solved
+#foreach file (cap6000 qiu vpm1 10teams mkc fiber)
 
 #Unsolved
 #foreach (air04 air05 modglob gt2 p0282 p0548 p2756 harp2 rout set1ch qnet1 gesa2 mas74 swath pp08aCUTS mod011 markshare2 bell5 pp08a arki001 fast0507 vpm2 dano3mip gesa2_o noswot danoint dsbmip seymour)
 
 echo ========================= $file ========================== 
-/home/tkr/SYMPHONY/Template/bin.LINUX/OSI_CPLEX/mip -F ~/miplib3/$file
-/home/tkr/SYMPHONY/Template/bin.LINUX/OSI_OSL/mip -F ~/miplib3/$file
-/home/tkr/SYMPHONY/Template/bin.LINUX/OSI_CLP/mip -F ~/miplib3/$file
+$1/SYMPHONY/Template/bin.LINUX/CPLEX/mip -F $1/miplib3/$file
+$1/SYMPHONY/Template/bin.LINUX/OSL/mip -F $1/miplib3/$file
+$1/SYMPHONY/Template/bin.LINUX/OSI_CPLEX/mip -F $1/miplib3/$file
+$1/SYMPHONY/Template/bin.LINUX/OSI_OSL/mip -F $1/miplib3/$file
+$1/SYMPHONY/Template/bin.LINUX/OSI_CLP/mip -F $1/miplib3/$file
+$1/SYMPHONY/Template/bin.LINUX/OSI_GLPK/mip -F $1/miplib3/$file
 
 end
