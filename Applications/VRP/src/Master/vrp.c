@@ -510,12 +510,14 @@ int user_send_lp_data(void *user, void **user_lp)
 
    vrp_lp->cur_sol = (_node *) calloc (vrp_lp->vertnum, sizeof(_node));
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
+
    if (vrp_lp->window){
       copy_node_set(vrp_lp->window, TRUE, (char *)"Original solution");
+#if 0
       copy_node_set(vrp_lp->window, TRUE, (char *)"Compressed solution");
-   }
 #endif
+   }
+
 /*___END_EXPERIMENTAL_SECTION___*/
    
 #else
