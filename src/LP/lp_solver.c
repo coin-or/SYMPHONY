@@ -3059,6 +3059,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    double *matval;
    cgl_params *par = &(lp_data->cgl);
    int cut_num = 0;
+
+#ifndef COMPILE_IN_LP
+   par->probing_generated_in_root =
+   par->gomory_generated_in_root =
+   par->oddhole_generated_in_root =
+   par->mir_generated_in_root = 
+   par->clique_generated_in_root = 
+   par->flow_and_cover_generated_in_root =
+   par->rounding_generated_in_root =
+   par->lift_and_project_generated_in_root = TRUE;
+#endif
+      
    
    /* Set proper variables to be integer */
    for (i = 0; i < lp_data->n; i++) {
@@ -3168,7 +3180,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
      }
    }
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    /* create CGL flow cover cuts */
    if(par->generate_cgl_flow_and_cover_cuts){
      if(is_rootnode || par->flow_and_cover_generated_in_root){
@@ -3185,7 +3196,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
      }
    }
 
-   /*___END_EXPERIMENTAL_SECTION___*/
    /* create CGL simple rounding cuts */
    if(par->generate_cgl_rounding_cuts){
      if(is_rootnode || par->rounding_generated_in_root){

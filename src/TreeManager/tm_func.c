@@ -1035,6 +1035,9 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       child = node->children[i] = (bc_node *) calloc(1, sizeof(bc_node));
       child->bc_index = tm->stat.tree_size++;
       child->bc_level = node->bc_level + 1;
+      if (tm->par.verbosity > 10){
+	 printf("Generating node %i...\n", child->bc_index);
+      }
       if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
 	 FILE *f;
 #pragma omp critical(write_vbc_emulation_file)
@@ -1120,6 +1123,11 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 	 child->sp = node->sp;
 	 /*___END_EXPERIMENTAL_SECTION___*/
+#ifdef DO_TESTS
+	 if (child->lower_bound < child->paret->lower_bound){
+	    printf("#######Error: Child's lower bound isless than parent's\n");
+	 }
+#endif
       }
       child->lower_bound = objval[i];
       child->parent = node;
