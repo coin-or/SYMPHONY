@@ -251,10 +251,10 @@ module in a sequential environment.
 \label{master-process}
 
 The {\em master module} includes functions that perform problem initialization
-and I/O. This module is the only persisten module and stores all static
+and I/O. This module is the only persistent module and stores all static
 problem data. The other modules are created only during a solve call and
-destroyed afterwards. All calls to the API are processed through the master
-module. These functions of the master modeul implement the following tasks:
+destroyed afterward. All calls to the API are processed through the master
+module. These functions of the master module implement the following tasks:
 %\underbar{Overall Function:} Handle input/output, maintain the data
 %for the problem instance and serve requests to send out that
 %data. Keep track of the best solution found so far.\\
@@ -379,7 +379,7 @@ The user begins by initializing the SYMPHONY environment and can then invoke
 subroutines for reading in parameters and problem data, finding an initial
 upper bound, and designating the initial set of active cuts and variables in
 the root node. Once the user invokes a solve routine, a tree manager is
-created to manage the solution process. The tree manager modeul in turn sets
+created to manage the solution process. The tree manager module in turn sets
 up the cut pool module(s), the linear programming module(s), and the cut
 generator module(s). Currently, there are three solve calls supported by the
 API. The first call is the \emph{initial solve} (see Section
@@ -434,7 +434,7 @@ the treatment of cuts and variables, see Section \ref{lp-relaxation}.
 \label{master}
 
 The primary functions performed by the master module were listed in
-Section \ref{master-process}. Here, we describe the implmentational details of
+Section \ref{master-process}. Here, we describe the implementational details of
 the various solve calls.  
 %If needed, the user must provide a
 %routine to read problem-specific parameters in from the parameter

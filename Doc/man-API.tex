@@ -4,7 +4,7 @@ This change markedly improves SYMPHONY's usability and flexibility. Below, we
 briefly describe the new API, the C++ interface, and the use of the user
 callback functions.
 
-\subsection{The Callable Library}\label{callable_library}
+\section{The Callable Library}\label{callable_library}
 
 SYMPHONY's callable library consists of a complete set of subroutines for
 loading and modifying problem data, setting parameters, and invoking solution
@@ -91,7 +91,7 @@ sequential and parallel execution modes is made at compile-time through
 modification of the makefile or the project settings, depending on the
 operating system.
 
-To start the solution proces from a warm start, the \texttt{sym\_warm\_solve()}
+To start the solution process from a warm start, the \texttt{sym\_warm\_solve()}
 command is used. SYMPHONY automatically records the warm start information
 resulting from the last solve call and restarts from that checkpoint if a call
 to \texttt{sym\_warm\_solve()} is made. Alternatively, external warm start
@@ -184,7 +184,7 @@ parameters. These can be used between calls to the solver to change the
 behavior of the algorithm or to modify the instance being solved. These
 modifications are discussed in more detail in Section \ref{warm_solve}.
 
-\subsection{The OSI Interface}\label{OSI}
+\section{The OSI Interface}\label{OSI}
 
 The Open Solver Interface (OSI) is a C++ class that provides a standard API
 for accessing a variety of solvers for mathematical programs. It is provided
@@ -243,7 +243,7 @@ interface supports warm starting and sensitivity analysis. The implementations
 of this functionality is straightforward at the moment, but will be improved
 in future versions.
 
-\subsection{User Callback Functions}\label{callback}
+\section{User Callback Functions}\label{callback}
 
 The user's main avenues for customization of SYMPHONY are the tuning of
 parameters and the implementation of one or more of over 50 user callback

@@ -632,7 +632,7 @@ int is_feasible_u(lp_prob *p, char branching)
    }
 
    /* try rounding */
-   if (feasible == IP_INFEASIBLE){
+   if (feasible == IP_INFEASIBLE && 0){
      true_objval = SYM_INFINITY;
      if (p->has_ub){
        true_objval = p->ub;      

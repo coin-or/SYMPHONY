@@ -8,7 +8,7 @@ call SYMPHONY as a subroutine, as described in Section
 prefix {\tt sym\_}. To call these function from an application, include the
 header file {\tt symphony\_api.h} and then link with the SYMPHONY library as
 described \hyperref{here}{in Section}{}{getting_started}. In general, if an
-array is requested, such as the aray of lower bounds on the variables, for
+array is requested, such as the array of lower bounds on the variables, for
 instance, the user is responsible for allocating an array of appropriate size
 and passing it to SYMPHONY. SYMPHONY will then fill up the array.
 
@@ -31,7 +31,7 @@ sym_environment *sym_open_environment()
 \describe
 
 This routine is used to get a new SYMPHONY environment to be passed as an 
-argument to all other API subroutines. This routne also invokes the callback
+argument to all other API subroutines. This routine also invokes the callback
 function \hyperref{{\tt user\_initialize()}} {{\tt user\_initialize()} (see
 Section }{)}{user_initialize}.
 
@@ -111,7 +111,7 @@ user\_readparams()} (see Section }{)}{user_readparams}.
 {\tt ERROR\_\_USER} & Error. User error detected in {\tt user\_readparams()} \\ 
 function.\\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully. \\
 \et
 \ed
 \vspace{1ex}
@@ -143,7 +143,7 @@ priori bound for the problem.
 {\tt ERROR\_\_USER} & Error. User error detected in {\tt user\_start\_heurs()} \\
 function.\\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -189,7 +189,7 @@ built-in parsers (as is typically done in other callable libraries), then the
 {\tt ERROR\_\_READING\_GMPL\_FILE} & Error. Error detected in the given 
 GMPL/AMPL file. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully. \\
 \et
 \ed
 \vspace{1ex}
@@ -498,7 +498,7 @@ Section }{)}{user_initialize}.
 \bt{lp{317pt}}
 {\tt ERROR\_\_USER} & Error in the passed in {\tt user} structure.\\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully \\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully. \\
 \et
 \ed
 \vspace{1ex}
@@ -568,7 +568,7 @@ be modified.
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully. \\
 \et
 \ed
 \vspace{1ex}
@@ -1578,7 +1578,7 @@ This routine is used to get the post-solution column values.
 {\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
 {\tt double *colsol} & OUT & Pointer to a double type array to be filled by 
 the solution vector. Note that, the size of this array has to be at least 
-the number of colums.
+the number of columns.
 \et
 
 \returns
@@ -2147,7 +2147,7 @@ This routine is used to set the column names.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt char **colname} & IN &  Ponter to a string array including the column 
+{\tt char **colname} & IN &  Pointer to a string array including the column 
 names. Note that, the size of this array has to be at least the number of 
 columns.\\ 
 \et
@@ -2187,7 +2187,7 @@ the column. \\
 {\tt int *indices} & IN & Pointer to an integer type array indicating the row 
 indices of the non zero elements of the column and having a size of at least
 {\tt numelems}. \\
-{\tt double *elements} & IN & Ponter to a double type array indicating the 
+{\tt double *elements} & IN & Pinter to a double type array indicating the 
 values of the non zero elements of the column and having a size of at least 
 {\tt numelems}. \\
 {\tt double collb} & IN & A double indicating the lower bound of the column. \\
@@ -2221,7 +2221,7 @@ int sym_add_row(sym_environment *env, int numelems, int *indices,
 \bd
 \describe
 
-This routine is used to add a new row to the original constrint matrix.
+This routine is used to add a new row to the original constraint matrix.
 
 \args
 
@@ -2707,7 +2707,7 @@ upper bound obtained for the new problem. This value will be set to
 % END
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{C++ Interface}
+\section{Callable Library C++ API}
 \label{C++_Interface}
 
 SYMPHONY's C++ interface is derived from COIN-OR's Open Solver Interface
@@ -2762,7 +2762,7 @@ find the initial bounds via the user defined heuristics.\\ \hline \hline
 createPermanentCutPools & sym\_create\_permanent\_cut\_pools & 
 save the global cuts. \\ \hline \hline
 loadProblem & sym\_explicit\_load\_problem & 
-load the probkem through a set of arrays. \\ \hline \hline
+load the problem through a set of arrays. \\ \hline \hline
 getWarmStart & sym\_get\_warm\_start & 
 get the warm start description.\\ \hline \hline
 setWarmStart & sym\_set\_warm\_start & 
@@ -2849,7 +2849,7 @@ get the objective function vector. \\ \hline
 {\bf C++ Interface} & {\bf C Interface} & {\bf Description}\\ \hline \hline
 getObjSense & sym\_get\_obj\_sense & 
 get the objective sense. \\ \hline \hline
-isContinuous & sym\_is\_continuos & 
+isContinuous & sym\_is\_continuous & 
 query the variable type.\\ \hline \hline
 isBinary & sym\_is\_binary &
 query the variable type.\\ \hline \hline
@@ -2864,7 +2864,7 @@ get the constraint matrix by row oriented. \\ \hline \hline
 getMatrixByCol & - &
 get the constraint matrix by column oriented. \\ \hline \hline
 getInfinity & - & 
-get the infinity definiton of SYMPHONY. \\ \hline \hline
+get the infinity definition of SYMPHONY. \\ \hline \hline
 getColSolution & sym\_get\_col\_solution & 
 get the current best column solution. \\ \hline \hline
 getRowActivity & sym\_get\_row\_activity & 
@@ -2893,7 +2893,7 @@ setObjSense & sym\_set\_obj\_sense &
 set the objective sense. \\ \hline \hline
 setColSolution & sym\_set\_col\_solution & 
 set the current solution. \\ \hline \hline
-setContinuous & sym\_set\_continuos & 
+setContinuous & sym\_set\_continuous & 
 set the variable type. \\ \hline \hline
 setInteger & sym\_set\_integer & 
 set the variable type. \\ \hline \hline
@@ -2904,7 +2904,7 @@ add columns to the constraint matrix. \\ \hline \hline
 addRow & sym\_add\_row & 
 add rows to the constraint matrix. \\ \hline \hline
 deleteCols & sym\_delete\_cols & 
-delete some columns from the contraint matrix. \\ \hline \hline
+delete some columns from the constraint matrix. \\ \hline \hline
 deleteRows & sym\_delete\_rows &
 delete some rows from the constraint matrix. \\ \hline \hline
 writeMps & - & 

@@ -12,7 +12,7 @@
 \usepackage{amssymb}
 
 \newtheorem{theorem}{Theorem}
-\newtheorem{acknowledgement}[theorem]{Acknowledgement}
+\newtheorem{acknowledgement}[theorem]{Acknowledgment}
 \newtheorem{algorithm}[theorem]{Algorithm}
 \newtheorem{axiom}[theorem]{Axiom}
 \newtheorem{case}[theorem]{Case}
@@ -186,7 +186,7 @@ int match_load_problem(sym_environment *env, user_problem *prob){
    for (i = 0; i < prob->numnodes; i++) {
       for (j = i+1; j < prob->numnodes; j++) {
 	 prob->match1[index] = i; /*The first component of assignment 'index'*/
-	 prob->match2[index] = j; /*The second componet of assignment 'index'*/
+	 prob->match2[index] = j; /*The second component of assignment 'index'*/
 	 /* So we can recover the index later */
 	 prob->index[i][j] = prob->index[j][i] = index;
 	 obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */

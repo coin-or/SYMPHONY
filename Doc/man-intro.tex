@@ -3,7 +3,7 @@
 
 Welcome to the SYMPHONY user's manual. Whether you are a new user or simply
 upgrading to version 5.0, this manual will help you get started with what we
-hope you will find to be a very useful framework for solving mixed-integr
+hope you will find to be a very useful framework for solving mixed-integer
 linear programs either using the generic tools provided or by developing a
 custom branch, cut, and price algorithm. There have been some very significant
 developments since the last version of SYMPHONY was released. IN particular,
@@ -35,7 +35,7 @@ environments to be opened within a single executable.
 
 \item It is now possible to stop SYMPHONY during the solution process and then
 restart the computation later, even after modifying the problem data. The user
-can also save warm start inforation outside the solver environment and then
+can also save warm start information outside the solver environment and then
 reload it later into a different environment, in much the same way as can be
 done with a simplex-based linear programming solver. This allows the user to
 efficiently implement procedures, such as those for multi-criteria
@@ -62,28 +62,27 @@ present in version 5.0.
 The manual is divided into seven chapters. The first is the introduction,
 which you are reading now. Chapter \ref{SYMPHONY-background} contains
 background information. Those not familiar with the basic methodology of
-branch, cut, and price should read these sections, especially Section
+branch, cut, and price may want to read these sections, especially Section
 \ref{B&C-intro}, where we briefly describe the techniques involved. Chapter
 \ref{API-overview} contains an overview of the API, both for the callable
 library and for the user callback functions. Chapter \ref{SYMPHONY-design}
 contains further depth and a more complete description of the design and
 implementation of SYMPHONY. In Section \ref{design}, we describe the overall
-design of without reference to the implementational details and with only
-passing reference to parallelism. In Section \ref{modules}, we discuss the
-details of the implementation. In Section \ref{parallelizing}, we briefly
+design of SYMPHONY without reference to the implementational details and with
+only passing reference to parallelism. In Section \ref{modules}, we discuss
+the details of the implementation. In Section \ref{parallelizing}, we briefly
 discuss issues involved in parallel execution of SYMPHONY. It is not necessary
 to read Chapters \ref{SYMPHONY-background} and \ref{SYMPHONY-design} before
 undertaking development of a SYMPHONY application. Chapter
 \ref{getting_started} describes how to install and compile SYMPHONY. Many
-users will want to go straight to this section of the manusal to get started
+users will want to go straight to this section of the manual to get started
 quickly. Chapter \ref{SYMPHONY-development} describes in detail how to develop
-a custom application using SYMPHONY. For those who are familiar with branch
-and cut and want to get started quickly, proceed directly to to Section
-\ref{getting_started} for information on getting started. Chapter
+a custom application using SYMPHONY. Chapter
 \ref{SYMPHONY-reference} contains reference material. Section
-\ref{callable-library} contains a description of the interface for the
-callable library, both for C and C++ environments. Section \ref{API} contains
-a description of the user callback functions. SYMPHONY's parameters are
-described in Section \ref{params}. Please note that for reference use, the
-HTML version of this manual may be more practical, as the embedded hyperlinks
-make it easier to navigate.
+\ref{C_Interface} contains a description of the native C interface for the
+callable library. Section \ref{C++_Interface} contains a description of the
+interface for C++ environments. Section \ref{API} contains a description of
+the user callback functions. SYMPHONY's parameters are described in Section
+\ref{params}. Please note that for reference use, the HTML version of this
+manual may be more practical, as the embedded hyperlinks make it easier to
+navigate.
