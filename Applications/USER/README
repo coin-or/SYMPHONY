@@ -3,9 +3,8 @@
 ******************************************************************************
 
 To use SYMPHONY's callbacks to develop a customized solver, fill in the stub
-functions provided in the files in the SYMPHONY-5.0/USER directory, as
-described in the quick start guide below, or in the user's manual. Follow
-the instructions below to compile your application.
+functions provided in the files in this directory, as described in the user's
+manual. Follow the instructions below to compile your application.
 
 DOCUMENTATION
 =============
@@ -36,7 +35,7 @@ Otherwise, you must also set the path to the application's files.
 *******************************************************************************
 
 This version of the SYMPHONY USER application is intended to work with
-SYMPHONY-5.0. Here is a sketch outline of how to compile the SYMPHONY USER
+SYMPHONY-5.0. Here is a sketch outline of how to compile a customized SYMPHONY
 application in Microsoft Windows. Direct support is provided for compilation
 under MS Visual Studio 6.0. Compilation for other compilers should also be
 possible. Note that the Windows version has some limitations. Detailed timing
@@ -186,83 +185,10 @@ easy to get it running in parallel if you can get PVM working under
 Windows. Let me know if you are interested.
 
 *******************************************************************************
-*                 QUICK START DEVELOPMENT GUIDE (UNIX)                        *
-*******************************************************************************
-
-Developing a simple branch and bound solver that can read in instance data in
-a custom format is straightforward using the template provided in the
-USER directory. The simplest approach is to develop a sequential application, 
-sharing a single user data structure among all the modules. Using
-this approach, an application can be developed by filling in only a few simple
-functions. Here are some steps to make the most common custom modifications.
-
-1. Decide what run-time parameters you might need and what data has to be
-stored to describe your instance. Edit the file USER/include/user.h, adding 
-the appropriate fields to the user_parameter and user_problem structures to 
-store the relevant values.
-
-2. Now edit the file USER/Master/user_master.c. Only two functions need to be 
-filled out initially in order to read in your data files
-in a custom format. The function user_io() is where you can read in the
-instance data, if it is in something other than MPS format (a TSPLIB file, for
-example). Note that the name of the file to read the instance data from can be
-specified on the command line using the "-F" option by default. Also, you'll
-probably need to modify the user_initialize_root_node() function to set up the
-root node.
-
-3. Edit the file USER/LP/user_lp.c. The function user_create_subproblem() must 
-be filled out. This is the most important function, as it sets up the initial 
-LP relaxation in each search node.
-
-4. You may also want to add some problem-specific cutting planes by modifying
-the user_find_cuts() function.
-
-Now compile by typing "make" again and that's it! You should now have a
-working branch and bound solver. Next you can work on filling in more advanced
-functions and adding cutting planes. See the documentation for more
-information on this.
-
-*******************************************************************************
-*               QUICK START DEVELOPMENT GUIDE (Microsoft Windows)             *
-*******************************************************************************
-
-Developing a simple branch and bound solver that can read in instance data in
-a custom format is straightforward using the template provided in the
-SYMPHONY-5.0\USER\ directory. The simplest approach is to develop a sequential
-application, sharing a single user data structure among all the modules. Using
-this approach, an application can be developed by filling in only a few simple
-functions. Here are some steps to make the most common custom modifications.
-
-1. Decide what run-time parameters you might need and what data has to be
-stored to describe your instance. Edit the file
-SYMPHONY-5.0\USER\include\user.h, adding the appropriate fields to the
-user_parameter and user_problem structures to store the relevant values.
-
-2. Now edit the file SYMPHONY-5.0\USER\Master\user_master.c. Only two
-functions need to be filled out initially in order to read in your data files
-in a custom format. The function user_io() is where you can read in the
-instance data, if it is in something other than MPS format (a TSPLIB file, for
-example). Note that the name of the file to read the instance data from can be
-specified on the command line using the "-F" option by default. Also, you'll
-probably need to modify the user_initialize_root_node() function to set up the
-root node.
-
-3. Edit the file SYMPHONY-5.0\USER\LP\user_lp.c. The function
-user_create_subproblem() must be filled out. This is the most important
-function, as it sets up the initial LP relaxation in each search node.
-
-4. You may also want to add some problem-specific cutting planes by modifying
-the user_find_cuts() function.
-
-Now build again and you have a working branch and bound solver! Next you can
-work on filling in more advanced functions and adding cutting planes. See the
-documentation for more information on this.
-
-*******************************************************************************
 *                           SAMPLE APPLICATIONS                               *
 *******************************************************************************
 
-There are now a number of sample applications available as examples of how to
+There are a number of sample applications available as examples of how to
 do development with SYMPHONY. These include solvers for the matching problem,
 the set partitioning problem (simple and advanced versions), the vehicle
 routing and traveling salesman problems, and the mixed postman problem. These

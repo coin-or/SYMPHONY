@@ -46,20 +46,20 @@ stubs. That is what the second section of this manual is about.
 
 \section{Writing the Callbacks}
 
-For each module, all user functions are invoked from so-called \emph{wrapper
+For each module, all callback functions are invoked from so-called \emph{wrapper
 functions} that provide the interface and also performs a default action if
 the user chooses not to override it. Although SYMPHONY is written in C, the
 wrapper functions provide a C++-style interface in which the user can either
 accept the default action or override it. Each wrapper function is named {\tt
-*\_u()} , where {\tt *} is the name of the corresponding user function, and is
+*\_u()} , where {\tt *} is the name of the corresponding callback function, and is
 defined in a file called {\tt *\_wrapper.c}. The wrapper function first
 collects the necessary data and hands it to the user by calling the user
 function. Based on the return value from the user, the wrapper then performs
-any necessary post-processing. All user functions have default options, so
+any necessary post-processing. All callback functions have default options, so
 that SYMPHONY now acts as a generic MILP solver out of the box.
 
-In Chapter \ref{SYMPHONY-reference}, the user functions are described in
-detail.  The name of every user written function starts with {\tt user\_}.
+In Section \ref{API}, the callback functions are described in
+detail.  The name of every callback function starts with {\tt user\_}.
 There are three kinds of arguments:
 \begin{description}
 \item[\rm IN:] An argument containing information that the user might need
@@ -107,7 +107,7 @@ the user {\em must not} set {\tt *array} because this is how \BB\ decides
 which optional arrays are filled up.
 
 \item Some built-in options are implemented so that the user can invoke them
-directly from the user function. This might be useful if, for example,
+directly from the callback function. This might be useful if, for example,
 the user wants to use different built-in options at different stages
 of the algorithm.
 \end{itemize}
@@ -215,7 +215,7 @@ planes are not available or not implemented yet.
 
 \subsection{Unix Operating Systems}
 
-Once the user functions are filled in, all that remains is to compile the
+Once the callback functions are filled in, all that remains is to compile the
 application. The distribution comes with two makefiles that facilitate this
 process. The primary makefile resides in the {\tt SYMPHONY-5.0/} directory.
 The user makefile resides in the user's subdirectory, initially called

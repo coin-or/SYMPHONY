@@ -292,9 +292,9 @@ testing, download the MIPLIB library.
 SYMPHONY callable library or solve MILP problems using the executable. See the
 user manual for help.
 
-*******************************************************************************
-*                 COMPILING SYMPHONY (Microsoft Windows)                      *
-*******************************************************************************
+******************************************************************************
+*      COMPILING The SYMPHONY Library and Executable (Microsoft Windows)     *
+******************************************************************************
 
 Here is a sketch outline of how to compile SYMPHONY in Microsoft Windows.
 These instructions will lead you through the steps required to compile
@@ -453,16 +453,17 @@ easy to get it running in parallel if you can get PVM working under
 Windows. Let me know if you are interested.
 
 *******************************************************************************
-*                             USING THE SOLVER                                *
+*                             USING SYMPHONY                                  *
 *******************************************************************************
+
+************************ Using the SYMPHONY executable ************************
 
 To use SYMPHONY as a generic solver, type the executable name followed by one
 or more of the command-line switches. There are two required switches. You
 must specify the location of the input file by using "-F 'filename'". This
 input file is assumed to be in MPS format, unless the "-D" switch is also
 present, in which case the file will be assumed to be in GMPL model file
-format with the data file specified after the "-D" switch. This list can also
-be obtained by typing the executable name followed by "-H".
+format with the data file specified after the "-D" switch. 
 
 	-H: help (solver-specific switches)
 	-F model: model should be read in from file 'model'
@@ -498,8 +499,16 @@ file. These parameters are listed in the SYMPHONY user's manual.
 	-j 0/1: whether or not to generate cgl cuts
 	-z n: set diving threshold to 'n'
 
+************************ Using the callable library **************************
+
+To use SYMPHONY as a generic callable library, compile SYMPHONY as described
+above. The library that is created along with the solver itself can be linked
+to using the API described in the user's manual. As an example of using the
+callable library in this way, see the multi-criteria knapsack application
+(MCKP). 
+
 *******************************************************************************
-*                      COMPILING CUSTOM APPLICATIONS                          *
+*                      DEVELOPING CUSTOM APPLICATIONS                         *
 *******************************************************************************
 
 To customize SYMPHONY by implementing the custom callback functions, simply
