@@ -33,6 +33,9 @@
 #include "lp_solver.h"
 #ifdef COMPILE_IN_TM
 #include "tm.h"
+#ifdef COMPILE_IN_LP
+#include "lp.h"
+#endif
 #endif
 
 #ifndef TEV_INIT_MASK
@@ -898,7 +901,7 @@ int sym_solve(problem *p)
       p->tm->lpp[p->tm->opt_thread_num]->best_sol.xind = NULL;
       p->tm->lpp[p->tm->opt_thread_num]->best_sol.xval = NULL;
    }
-#else
+#endif
 
    if (p->par.do_draw_graph){
       s_bufid = init_send(DataInPlace);
