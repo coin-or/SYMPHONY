@@ -2980,7 +2980,7 @@ void write_mps(LPdata *lp_data, char *fname)
       lp_data->si->setContinuous(i);
    }
 
-   lp_data->si->writeMps(fname,extension,ObjSense);
+   lp_data->si->writeMps(fname, extension, ObjSense);
 }
 
 /*===========================================================================*/

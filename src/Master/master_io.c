@@ -232,7 +232,7 @@ int parse_command_line(problem *p, int argc, char **argv)
       }
       else if (strcmp(key, "use_permanent_cut_pools") == 0 ||
 	       strcmp(key, "M_use_permanent_cut_pools") == 0){
-	 READ_INT_PAR(p->par.do_draw_graph);
+	 READ_INT_PAR(p->par.use_permanent_cut_pools);
       }
 
       /***********************************************************************

@@ -42,6 +42,8 @@ int initialize_u(problem *p)
    
    CALL_USER_FUNCTION( user_initialize(&p->user) );
 
+   p->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+
    return(FUNCTION_TERMINATED_NORMALLY);
 }
 
@@ -103,8 +105,6 @@ int readparams_u(problem *p, int argc, char **argv)
 int io_u(problem *p)
 {
    int err;
-
-   p->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
 
    switch( user_io(p->user) ){
 
