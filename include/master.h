@@ -111,7 +111,7 @@ typedef struct PROBLEM{
    double     lb;
 
    LPdesc    *desc;     /* For holding the description when read in from MPS */
-   char       probname[80];
+   char       probname[81];
 
    tm_stat    stat;
 }problem;

@@ -322,7 +322,12 @@ int user_display_lp_solution(void *user, int which_sol, int varnum,
 				       CTOI_WAIT_FOR_CLICK_AND_REPORT);
 #endif
    }
-   return(DISP_NZ_INT);
+   
+   if (which_sol == DISP_FINAL_RELAXED_SOLUTION){
+      return(DISP_NZ_INT);
+   }else{
+      return(USER_NO_PP);
+   }
 }
 
 /*===========================================================================*/
@@ -608,6 +613,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
       /*___END_EXPERIMENTAL_SECTION___*/
 	
       default:
+	 break;
 
      }
      

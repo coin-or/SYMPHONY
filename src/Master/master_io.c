@@ -219,6 +219,8 @@ void bc_readparams(problem *p, int argc, char **argv)
    lp_par->fixed_to_ub_before_logical_fixing = 1;
    lp_par->fixed_to_ub_frac_before_logical_fixing = .01;
 
+   lp_par->generate_cgl_cuts = TRUE;
+
    lp_par->max_presolve_iter = 50;
 
    lp_par->is_feasible_default = TEST_INTEGRALITY;
@@ -1096,6 +1098,11 @@ void bc_readparams(problem *p, int argc, char **argv)
 	 READ_DBL_PAR(lp_par->fixed_to_ub_frac_before_logical_fixing);
       }
 
+      else if (strcmp(key, "generate_cgl_cuts") == 0 ||
+	       strcmp(key, "generate_cgl_cuts") == 0){
+	 READ_INT_PAR(cg_par->do_findcuts);
+      }
+
       else if (strcmp(key, "max_presolve_iter") == 0 ||
 	       strcmp(key, "LP_max_presolve_iter") == 0){
 	 READ_INT_PAR(lp_par->max_presolve_iter);
@@ -1343,6 +1350,9 @@ EXIT:
 	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 	 cg_par->decomp_dynamic_timeout = 6000;
 	 /*___END_EXPERIMENTAL_SECTION___*/
+	 break;
+       case 'j':
+	 sscanf(argv[++i], "%i", &lp_par->generate_cgl_cuts);
 	 break;
        case 'd':
 	 p->par.do_draw_graph = TRUE;

@@ -738,9 +738,8 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 printf(" User indices and values of nonzeros in the solution\n");
 	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < number; ){
-	    printf("%7d %10.7f ", xind[i], xval[i]);
-	    if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
+	 for (i = 0; i < number; i++){
+	    printf("%7d %10.7f\n", xind[i], xval[i]);
 	 }
 	 printf("\n");
       }
@@ -1416,6 +1415,8 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 if (l != i){
 	    cuts[l++] = cuts[i];
 	    cuts[i] = NULL;
+	 }else{
+	    l++;
 	 }
 	 break;
       }
@@ -1829,9 +1830,11 @@ void generate_cuts_in_lp_u(lp_prob *p)
 				       &new_row_num, &cuts);
    
 #ifdef USE_CGL_CUTS
-   
-   generate_cgl_cuts(lp_data, &new_row_num, &cuts);
 
+   if (p->par.generate_cgl_cuts){
+      generate_cgl_cuts(lp_data, &new_row_num, &cuts);
+   }
+   
 #endif
 
    if (new_row_num){

@@ -94,6 +94,9 @@ typedef struct LP_PARAMS{
    int               fixed_to_ub_before_logical_fixing; /* OK */
    double            fixed_to_ub_frac_before_logical_fixing; /* OK */
 
+   /* Cut generation in LP */
+   int               generate_cgl_cuts;
+
    /* Parameters affecting branching */
    int               max_presolve_iter;
 

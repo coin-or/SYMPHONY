@@ -149,6 +149,7 @@ void fix_variables(lp_prob *p)
    char *status = lp_data->status;
    var_desc **vars = lp_data->vars;
    int n = lp_data->n;
+   double lpetol = lp_data->lpetol;
 
    double gap = 0.0, max_change;
    int i, vars_recently_fixed_to_ub = 0;
@@ -195,6 +196,9 @@ void fix_variables(lp_prob *p)
 	 memset((char *)delstat, 0, n * ISIZE);
 	 lb_vars = perm_lb_vars = ub_vars = perm_ub_vars = 0;
 	 for (cnt = 0, i = n-1; i >= 0; i--){
+	    if (abs(dj[i]) < lpetol){
+	       continue;
+	    }
 	    max_change = gap/dj[i];
 	    if (max_change > 0 && max_change < vars[i]->ub - vars[i]->lb){
 	       if (lp_data->nf_status & NF_CHECK_NOTHING){
