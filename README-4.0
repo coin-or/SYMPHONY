@@ -74,15 +74,15 @@ bipartite matching, and the mixed postman problem.
 8. There is a white paper available that illustrates the use of SYMPHONY to
 build a simple matching solver.
 
-9. Restructuring of the make file now allow the user to build the code from
+9. Restructuring of the makefile now allow the user to build the code from
 the directory where the application is installed instead of the SYMPHONY
 directory. This allows compiling multiple applications without editing make
 files. Also, executables can have custom names and are built in different
 directories for different LP solvers so the object files don't have to be
 cleaned to switch LP solvers.
 
-10. There are make files available for Windows that can be configured in a
-fashion similar to Unix make files and work with the MSVC++ 6 compiler.
+10. There are makefiles available for Windows that can be configured in a
+fashion similar to Unix makefiles and work with the MSVC++ 6 compiler.
 
 CHANGES TO THE USER INTERFACE
 =============================
@@ -98,10 +98,10 @@ post-processing has been eliminated, so the old return codes "USER_NO_PP" and
 "USER_AND_PP" have been combined into a single return code "USER_SUCCESS" to
 indicate that the user function was executed successfully.
 
-2. Make files are set up a bit differently. The user make file is now the
-driver. Some variables that used to be set in SYMPHONY/Makefile must now be
-set in the user's make file. See the file SYMPHONY/USER/Makefile for an
-example of what the user's make file is now supposed to look like.
+2. The makefiles are set up a bit differently. The user makefile is now the
+driver. Some variables that used to be set in SYMPHONY-4.0/Makefile must now
+be set in the user's makefile. See the file SYMPHONY-4.0/USER/Makefile for an
+example of what the user's makefile is now supposed to look like.
 
 3. The mechanism for displaying a solution is now vastly improved.  SYMPHONY
 now passes the user the indices and values of the nonzero variables for the
@@ -168,10 +168,10 @@ to obtain a custom solver, a quick start guide is provided below and more
 detailed information is available in the user's manual. Because SYMPHONY is
 intended to run over nonhomogeneous networks of workstations, installation is
 not fully automated, but requires the user to make minor edits to the
-Makefile.  With this setup, compilation for multiple architectures and
+makefile.  With this setup, compilation for multiple architectures and
 configurations can be performed in a single directory without reconfiguring or
 "cleaning". This is convenient on nonhomogeneous networks, but it means that
-you might need to edit the Makefiles to get SYMPHONY to compile. For the
+you might need to edit the makefiles to get SYMPHONY to compile. For the
 casual user, this editing is limited to providing some path names.
 
 PREPARING FOR COMPILATION
@@ -182,11 +182,11 @@ PREPARING FOR COMPILATION
 2. Unpack the distribution with "tar -xzf SYMPHONY-4.0.tgz". This will create
 a subdirectory called SYMPHONY-4.0/ containing the distribution.
 
-3. Edit the the Makefile (SYMPHONY-4.0/Makefile) to reflect your
+3. Edit the the makefile (SYMPHONY-4.0/Makefile) to reflect your
 environment. This involves specifying the LP solver to be used and the paths
 to various libraries and include files. Only minor edits should be
 required. An explanation of what has to be set is contained in the comments in
-the Makefile.
+the makefile.
 
 4. To use many of the new capabilities of SYMPHONY, you must have installed
 the COIN libraries, available from www.coin-or.org. Specifically, you should
@@ -210,7 +210,7 @@ executable. The name of the executable is specified in the file
 SYMPHONY-4.0/USER/Makefile and is "mip" by default. The executable is
 installed in the directory SYMPHONY-4.0/USER/bin.$(ARCH)/$(LP_SOLVER), where
 ARCH is the current architecture and LPSOLVER is the current LP solver, as
-specified in the makefile. The makefile must be modified to enable parallel
+specified in the makefile. The makefile can be modified to enable parallel
 execution of the code (see below).
 
 2. After the SYMPHONY library is compiled, you are free to type "make clean"
@@ -240,7 +240,7 @@ such as Omni (free from http://phase.etl.go.jp/Omni). Other options are listed
 at http://www.openmp.org.
 
 2. Follow the instructions above for configuring the makefile. Set the
-variable CC to the compiler name in the Makefile and compile as above. Note
+variable CC to the compiler name in the makefile and compile as above. Note
 that if you have previously compiled the sequential version, then you should
 first type "make clean_all", as this version uses the same directories. With
 one thread allowed, it should run exactly the same as the sequential version
@@ -267,13 +267,13 @@ I WILL GET IT WORKING.
 1. If you wish to compile a distributed version of the code, obtain and
 install PVM from http://www.csm.ornl.gov/pvm/.
 
-2. In the Makefile, be sure to set the COMM_PROTOCOL variable to "PVM". Also,
+2. In the makefile, be sure to set the COMM_PROTOCOL variable to "PVM". Also,
 in SYMPHONY-4.0/USER/Makefile, you must change one or more of COMPILE_IN_TM,
 COMPILE_IN_LP, COMPILE_IN_CG, and COMPILE_IN_CP, to FALSE, or you will end up
 with the sequential version.  Various combinations of these variables will
 give you different configurations and different executables. See the manual
 for more information on setting them. Also, be sure to set the path variables
-in the Makefile appropriately so that make can find the PVM library.
+in the makefile appropriately so that make can find the PVM library.
 
 3. As above, type "make" in the SYMPHONY-4.0/USER/ directory to make the
 distributed libraries. As in Step 1 of the sequential version, you may type
@@ -315,16 +315,16 @@ is only provided for running in sequential mode at this time.
 First, download SYMPHONY-4.0.zip and unzip the archive. This will create a
 subdirectory called SYMPHONY-4.0\ containing all the source files. You now
 have two options. You can either compile on the command-line, using the MSVC++
-makefile SYMPHONY-4.0\WIN32\user.mak or you can use the provided projects and
-workspaces. Compiling on the command-line is somewhat easier since it requires
-only editing the makefile and typing a single command.
+makefile called SYMPHONY-4.0\WIN32\user.mak or you can use the provided
+projects and workspaces. Compiling on the command-line is somewhat easier
+since it requires only editing the makefile and typing a single command.
 
 ******** Using the NMAKE Utility ********
 
 1. Edit the file SYMPHONY-4.0\USER\WIN32\user.mak to reflect your
 environment. This involves specifying the LP solver to be used and various
 paths. Only minor edits should be required. An explanation of what has to be
-set is contained in the comments in the Makefile.
+set is contained in the comments in the makefile.
 
 2. To use many of the new capabilities of SYMPHONY, you must have installed
 the COIN libraries, available from www.coin-or.org. Specifically, you should
@@ -384,19 +384,20 @@ If you want to use the native CPLEX interface (without downloading COIN) or a
 solver other than CPLEX:
 
 -- If you want to use another OSI interface, change the preprocessor
-definition from "__OSI_CPLEX__" to "__OSI_XXX__" ("__OSI_CLP__",
-"__OSI_GLPK__", "__OSI_OSL__", etc.). Otherwise, change it to "__XXX__" (you
-have two options: "__CPLEX__" and "__OSL__") in both projects.
+definition from "__OSI_CPLEX__" to "__OSI_XXX__", where "XXX" is replaced by
+the desired solver's acronym ("__OSI_CLP__", "__OSI_GLPK__", "__OSI_OSL__",
+etc.). Otherwise, change it to either "__CPLEX__" or "__OSL__" in both
+projects.
 
 -- Change the path definitions of the include files: for instance, if you want
 to use "__OSI_OSL__", define C:\COIN\OSi\OsiOsl and C:\Program
-Files\IbmOslV3Lib\osllib (assuming it is installed there) instead of OsiCpx
-and CPLEX path definitions. If you want to use the native OSL interface,
-delete all the path definitions (you are not required to have COIN or OSI),
-and just add the path definitions for the OSL include files.
+Files\IbmOslV3Lib\osllib (assuming it is installed there) instead of the CPLEX
+path definitions. If you want to use the native OSL interface, delete all the
+path definitions (you are not required to have COIN or OSI), and just add the
+path definitions for the OSL include files.
 
 -- Add the appropriate libraries to the "symphony" project. For instance, if
-you want to use "__OSI_OSL__" then add the osiOslLib and oslmd6030 (OSL solver
+you want to use "__OSI_OSL__", then add the osiOslLib and oslmd6030 (OSL solver
 lib file) library files after deleting osiCpxLib and cplex81 libraries from
 the "symphony" project (you can do that by right-clicking on the "symphony"
 project and then --> Add files to project with "library files" selected as the
@@ -414,7 +415,7 @@ the "ADD_CGL_CUTS" preprocessor definition, the CGL path definitions and the
 "cglLib" library from the "symphony" project.
 
 5. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important note
-for OSL users: When using OSL in Windows, you must also add "OSLMSDLL" to the
+for OSL users: when using OSL in Windows, you must also add "OSLMSDLL" to the
 list of definitions.
 
 6. Note that there are a number of additional preprocessor definitions that
@@ -440,11 +441,11 @@ command-line switches are Unix-style.
 sample problem.
 
 Note that there is some functionality missing from the Windows version. Most
-prominently, the timing functions do not work. I suppose this functionality
-should be easy to add -- let me know if you are interested in doing it and I
-will give you all the help I can. In addition, the Windows version will only
-run in sequential mode for a variety of reasons. However, it should be
-relatively easy to get it running in parallel if you can get PVM working under
+prominently, the timing functions do not work. This functionality should be
+easy to add -- let me know if you are interested in doing it and I will give
+you all the help I can. In addition, the Windows version will only run in
+sequential mode for a variety of reasons. However, it should be relatively
+easy to get it running in parallel if you can get PVM working under
 Windows. Let me know if you are interested.
 
 *******************************************************************************
@@ -464,10 +465,10 @@ SYMPHONY-4.0/USER/include/user.h, adding the appropriate fields to the
 user_parameter and user_problem structures to store the relevant values.
 
 2. Now edit the file SYMPHONY-4.0/USER/Master/user_master.c. Only two
-functions need to be filled out initially in order to read in your files in a
-custom data format. The function user_io() is where you can read in the
+functions need to be filled out initially in order to read in your data files
+in a custom format. The function user_io() is where you can read in the
 instance data, if it is in something other than MPS format (a TSPLIB file, for
-example. Note that the name of the file to read the instance data from can be
+example). Note that the name of the file to read the instance data from can be
 specified on the command line using the "-F" option by default. Also, you'll
 probably need to modify the user_initialize_root_node() function to set up the
 root node.

@@ -1,31 +1,26 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{User-written functions of the LP module}
 \label{user-written-lp}
-\begin{latexonly}
-\paragraph{Data Structures}
-\end{latexonly}
-\begin{htmlonly}
+
 \subsubsection{Data Structures}
-\end{htmlonly}
-\noindent We first describe a few structures that are used to pass
+
+We first describe a few structures that are used to pass
 data into and out of the user functions of the LP module.
 
-%begin{latexonly}
 \begin{description}
-%end{latexonly}
 
 \begin{htmlonly}
 \paragraph{MIPdesc}
 \end{htmlonly}
-\begin{latexonly}
+%\begin{latexonly}
 \firstfuncdef{MIPdesc}
-\end{latexonly}
+%\end{latexonly}
 \label{MIPdesc}
 
 One of the few internally defined data structures that the user has to deal
 with frequently is the \texttt{MIPdesc} data structure, which holds the data
-needed to describe a MIP. This data structure is used by SYMPHONY for two
-purposes. First, it is used to store the description of a generic MIP that is
+needed to describe a MILP. This data structure is used by SYMPHONY for two
+purposes. First, it is used to store the description of a generic MILP that is
 either read in from an MPS or AMPL file. More importantly, it is the data
 structure the user must use to pass the subproblem descriptions back to
 SYMPHONY at the time a new search tree node is created in the function
@@ -76,7 +71,7 @@ fields that must be filled out to describe a subproblem.\\
 \item [\texttt{int m} --] The number of rows.
 \item [\texttt{int nz} --] The number of nonzeros.
 \item [\texttt{double obj\_offset} --] Constant to be added to the objective
-function value when printed out.
+function value when printed.
 \item [\texttt{char obj\_sense} --] Objective sense (set to \texttt{MAXIMIZE}
 or \texttt{MINIMIZE}).
 \item [\texttt{char *is\_int} --] Indicates which variables are required to be 
@@ -101,9 +96,9 @@ constraints.
 \begin{htmlonly}
 \paragraph{cut\_data}
 \end{htmlonly}
-\begin{latexonly}
+%\begin{latexonly}
 \functiondef{cut\_data}
-\end{latexonly}
+%\end{latexonly}
 \label{cut_data}
 
 Another of the internally defined data structures that the user has to
@@ -138,9 +133,9 @@ set this.
 \paragraph{waiting\_row}
 \label{waiting_row}
 \end{htmlonly}
-\begin{latexonly}
+%\begin{latexonly}
 \functiondef{waiting\_row}
-\end{latexonly}
+%\end{latexonly}
 
 A closely related data structure is the {\tt waiting\_row},
 essentially the ``unpacked'' form of a cut. There are six fields.
@@ -166,9 +161,9 @@ side). This value does not have to be set by the user.
 \begin{htmlonly}
 \paragraph{var\_desc}
 \end{htmlonly}
-\begin{latexonly}
+%\begin{latexonly}
 \functiondef{var\_desc}
-\end{latexonly}
+%\end{latexonly}
 
 The {\tt var\_desc} structure is used list the variables in the current
 relaxation. There are four fields.
@@ -181,19 +176,13 @@ current relaxation),
 \item[{\tt double ub} --] The upper bound of the variable.
 \end{description}
 
-%begin{latexonly}
 \end{description}
-%end{latexonly}
 
-\begin{latexonly}
 \newpage
-\paragraph{Function Descriptions}
+\subsubsection{Function Descriptions}
 \noindent Now we describe the functions themselves.
-\end{latexonly}
 
-%begin{latexonly}
 \bd
-%end{latexonly}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % user_receive_lp_data
@@ -213,8 +202,8 @@ either the TM or LP modules are configured as separate processes. Otherwise,
 data will have been copied into appropriate locations in the master function
 \hyperref{{\tt user\_send\_lp\_data()}} {{\tt user\_send\_lp\_data()} (see
 Section }{)}{user_send_lp_data}. The two cases can be handled by means of {\tt
-\#ifdef} statements. See comments in the source code stubs for more details.
-
+\#ifdef} statements. See comments in the source code stubs for more details. \\
+\\
 Here, the user must receive all problem-specific information sent from
 the master, set up necessary data structures, etc. Note that the data must be
 received in exactly the same order as it was sent in \hyperref{{\tt
@@ -287,7 +276,7 @@ Section}{)}{user_initialize_root_node}. Setting them here will have no
 effect.\\
 \\
 Note that, the user should return ``USER\_DEFAULT'' if an MPS or GMPL/AMPL 
-file was read in to describe the original MIP. \BB\ will allocate the 
+file was read in to describe the original MILP. \BB\ will allocate the 
 corresponding arrays and specify the constraint matrix automatically in this 
 case.
 
@@ -342,10 +331,8 @@ int user_is_feasible(void *user, double lpetol, int varnum, int
 \bd
 \describe
 
-User tests the feasibility of the solution to the current LP
-relaxation.
-
-There is no post-processing. Possible defaults are testing integrality ({\tt
+User tests the feasibility of the solution to the current LP relaxation. There
+is no post-processing. Possible defaults are testing integrality ({\tt
 TEST\_INTEGRALITY}) and testing whether the solution is binary ({\tt
 TEST\_ZERO\_ONE}).
 
@@ -862,6 +849,7 @@ the pre-solved LP relaxations are compared.
 above. \\
 \et
 
+\newpage
 \returns
 
 \bt{lp{290pt}}
@@ -885,7 +873,7 @@ objective function value .\\
 number of fractional variables. The minimum is taken over the number of
 fractional variables in all the children. Fractional branching options are 
 only available if the fractional branching compile-time option is set in the
-make file.\\ 
+makefile.\\ 
 {\tt HIGHEST\_LOW\_FRAC} & Prefer the candidate with the highest minimum
 number of fractional variables. \\
 {\tt LOWEST\_HIGH\_FRAC} & Prefer the candidate with the lowest maximum
@@ -961,7 +949,7 @@ objective value.\\
 {\tt PREFER\_MORE\_FRACTIONAL} & Choose child with the most fractional
 variables. Fractional branching options are 
 only available if the fractional branching compile-time option is set in the
-make file.\\
+makefile.\\
 {\tt PREFER\_LESS\_FRACTIONAL} & Choose child with the lowest number of
 fractional variables.\\
 \et
@@ -1146,8 +1134,8 @@ interpreted as constraints for the current LP relaxation, i.e., the user must
 decode the compact representation of the cuts (see the {\tt
 \htmlref{cut\_data}{cut_data}} structure) into rows for the matrix. A pointer
 to the array of generated rows must be returned in {\tt ***new\_rows} (the
-user has to allocate this array) and their number in {\tt *new\_row\_num}.
-
+user has to allocate this array) and their number in {\tt *new\_row\_num}. \\
+\\
 Note that SYMPHONY has built-in support for cuts generated explicitly as
 matrix rows with no user-defined packed form, i.e., cuts whose indices and
 coefficients are given explicitly (see the function
@@ -1199,6 +1187,7 @@ cuts. Also, the pointers to each cut are transferred to the
 \texttt{waiting\_rows} data structure (in previous version, this was done by
 the user).   
 
+\newpage
 \item[Notes:] \hfill
 
 \begin{itemize}
@@ -1399,6 +1388,7 @@ generate\_what} flag is used for making a distinction between the two
 cases: in the former case it is set to {\tt GENERATE\_REAL\_NEXTIND}
 and in the latter it is set to {\tt GENERATE\_NEXTIND}.
 
+\newpage
 \args
 
 \bt{llp{260pt}}

@@ -27,10 +27,10 @@ parameter file. The function {\tt user\_usage()} can optionally print out
 usage information for the user-defined command line switches. The command line
 switch {\tt -H} automatically calls the user's usage subroutine. The switch
 {\tt -h} prints \BB's own usage information. In its default configuration, the
-command-line switch ``-F'' is used to specify the file in which the instance
-data is contained (either an MPS file or an GMPL/AMPL file). The ``-D'' switch
-is used to specify the data file if an GMPL/AMPL file is being read in (see
-the README file).
+command-line switch \texttt{-F} is used to specify the file in which the
+instance data is contained (either an MPS file or an GMPL/AMPL file). The
+\texttt{-D} switch is used to specify the data file if an GMPL/AMPL file is
+being read in (see the README file).
 
 \ed
 
@@ -86,14 +86,14 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 \describe
 
 The user can optionally read in parameter settings from the file named 
-\texttt{filename}, specified on the command line using the ``-f'' switch. The 
-parameter file \texttt{filename} can contain both SYMPHONY's built-in
+\texttt{filename}, specified on the command line using the \texttt{-f} switch. 
+The parameter file \texttt{filename} can contain both SYMPHONY's built-in
 parameters and user-defined parameters. If desired, the user can open this
 file for reading, scan the file for lines that contain user parameter settings
-and then read the parameter settings. A shell for doing this is set up in the 
+and then read the parameter settings. A shell for doing this is set up in the
 in the file \texttt{SYMPHONY-4.0/USER/user\_master.c}. Also, see the file
-\texttt{Master/master\_io.c} to see how \BB\ does this. 
-
+\texttt{Master/master\_io.c} to see how \BB\ does this. \\
+\\
 The user can also parse the command line arguments for user
 settings. A shell for doing this is also set up in the file
 \texttt{SYMPHONY-4.0/USER/user\_master.c}. Upper case letters are reserved for
@@ -280,8 +280,8 @@ will put all variables indexed from 0 to \texttt{extravarnum} in the set of
 extra variables by default. If an MPS or GMPL/AMPL file was read in using
 SYMPHONY's built-in parser, i.e., the default behavior of
 \hyperref{\texttt{user\_io}}{\texttt{user\_io()}}{}{user_io} was not modified,
-then \texttt{extravarnum} need not be set. 
-
+then \texttt{extravarnum} need not be set. \\
+\\
 In this function, the user may also specify column names for display
 purposes. If the \texttt{colnames} array is allocated, then SYMPHONY will use
 for displaying solutions. If the data was read in from either an MPS or
@@ -302,7 +302,7 @@ user indices of the extra variables to be active in the root. \\
 {\tt char *obj\_sense} & INOUT & Whether to negate the objective function value
 when printing the solution, set to either \texttt{MAXIMIZE} or
 \texttt{MINIMIZE}. Note that SYMPHONY always minimizes---\textbf{this only
-effects the printing of the solution}. The default is \texttt{MINIMIZE} \\
+effects the printing of the solution}. The default is \texttt{MINIMIZE}. \\
 {\tt double *obj\_offset} & INOUT & A specified constant to be added to the
 objective function value when printing out the solution. \\
 {\tt int ***colnames} & OUT & Pointer to an array containing a list of
@@ -358,8 +358,8 @@ user indices and values. The user has only to interpret and store the
 solution. Otherwise, when {\tt msgtag} is {\tt FEASIBLE\_SOLUTION\_USER}, \BB\
 will send and receive the solution value only and the user has to unpack
 exactly what she has packed in the LP module. In this case the contents of
-the last three arguments are undefined.
-
+the last three arguments are undefined. \\
+\\
 In most cases, SYMPHONY's default routines for sending and receiving feasible
 solutions, as well as displaying them, will suffice. These routines simply
 display all nonzeros by either index or name, depending on whether the user
@@ -526,8 +526,8 @@ copied through shared memory. The easiest solution, which is set up by default
 is to simply copy over a pointer to a single user data structure where
 instance data is stored. The code for the two cases is put in the same source
 file by use of {\tt \#ifdef} statements. See the comments in the code stub for
-this function for more details.
-
+this function for more details. \\
+\\
 Note that there is support for cuts generated and stored as explicit matrix
 rows. The cut pool module is already configured to deal with such cuts, so no
 user implementation is required. Only the use of user-defined cuts requires
@@ -633,8 +633,6 @@ an invalid cut of an invalid branching. Note that this feature only
 works when branching on binary variables. See Section \ref{debugging}
 for more on how to use this feature.
 
-\returns
-
 \args
 
 \bt{llp{245pt}}
@@ -646,7 +644,9 @@ containing the feasible solution. This array is simply copied by the tree
 manager and must be freed by the user. \\
 \et
 
-\bt{lp{260pt}}
+\returns
+
+\args\bt{lp{260pt}}
 {\tt USER\_ERROR} & Solution tracing is not enabled. \\
 {\tt USER\_SUCCESS} & Tracing of the given solution is enabled. \\
 {\tt USER\_DEFAULT} & No feasible solution given. \\

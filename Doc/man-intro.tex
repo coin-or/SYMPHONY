@@ -33,7 +33,7 @@ for cut generation, file I/O, and solver interface. For example,
 \begin{itemize}
 
     \item SYMPHONY is now capable of reading both MPS files (through the COIN
-MPS reader) and GnuMath (a subset of AMPL) files (using the parser available
+MPS reader) and GMPL (a subset of AMPL) files (using the parser available
 from GLPK).
 
     \item SYMPHONY now uses the COIN Open Solver Interface (OSI), allowing it
@@ -66,15 +66,15 @@ bipartite matching, and the mixed postman problem.
 \item There is now a white paper available that illustrates the use of SYMPHONY
 to build a simple matching solver.
 
-\item Restructuring of the make file now allow the user to build the code from
+\item Restructuring of the makefile now allow the user to build the code from
 the directory where the application is installed instead of the SYMPHONY
 directory. This allows compiling multiple applications without editing make
 files. Also, executables can have custom names and are built in different
 directories for different LP solvers so the object files don't have to be
 cleaned to switch LP solvers.
 
-\item There are make files available for Windows that can be configured in a
-fashion similar to Unix make files and work with the MSVC++ 6 compiler.
+\item There are makefiles available for Windows that can be configured in a
+fashion similar to Unix makefiles and work with the MSVC++ 6 compiler.
 
 \end{itemize}
 
@@ -103,19 +103,6 @@ SYMPHONY's parameters are described in Section \ref{params}. Please note that
 for reference use, the HTML version of this manual may be more practical, as
 the embedded hyperlinks make it easier to navigate.
 
-%\newpage
-
-%\thispagestyle{empty}
-
-%\ \\
-%%begin{latexonly}
-%\vspace*{3in}
-%\begin{center}
-%{\large PART I: Background}
-%\end{center}
-%%end{latexonly}
-
-%\newpage
 \chapter{Background}
 \label{SYMPHONY-background}
 
@@ -425,20 +412,6 @@ Since the subproblems correspond to the nodes of this graph, they are
 sometimes be referred to as {\em nodes in the search tree} or simply
 as {\em nodes}. The {\em root node} or {\em root} of the tree is the
 node representing the initial subproblem.
-
-%\newpage
-
-%\thispagestyle{empty}
-
-%\ \\
-%%begin{latexonly}
-%\vspace*{3in}
-%\begin{center}
-%{\large PART II: Design of SYMPHONY}
-%\end{center}
-%%end{latexonly}
-
-%\newpage
 
 \chapter{Design}
 \label{SYMPHONY-design}

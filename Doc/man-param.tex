@@ -66,7 +66,7 @@ BEST\_ESTIMATE}{diving_strategy}.
 The name of the executable files of the TM and DG modules. Note that
 the TM executable name may have extensions that depend on the
 configuration of the modules, but the default is always set to the
-file name produced by the make file. If you change the name of the
+file name produced by the makefile. If you change the name of the
 treemanager executable from the default, you must set this parameter
 to the new name.
 
@@ -138,7 +138,7 @@ parallel using PVM, these executables (or links to them) must reside
 in the {\tt PVM\_ROOT/bin/PVM\_ARCH/} directory. Also, be sure to note
 that the executable names may have extensions that depend on the
 configuration of the modules, but the defaults will always be set to
-the name that the make file produce.
+the name that the makefile produces.
 
 \item[{\tt lp\_debug, cg\_debug, cp\_debug} -- boolean (all {\tt
 FALSE}).]
@@ -219,7 +219,7 @@ or the fraction of total variables that are fractional is less than {\tt
 fractional\_diving\_ratio}. This overrides the other diving rules.
 Note that in order for this option to work, the code must be compiled
 with {\tt FRACTIONAL\_BRANCHING} defined. This is the default. See the
-Makefile for more details.
+makefile for more details.
 
 \item[{\tt node\_selection\_rule} -- integer ({\tt LOWEST\_LP\_FIRST}\{0\}).]
 The rule for selecting the next search tree node to be processed. This rule

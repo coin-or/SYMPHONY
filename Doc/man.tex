@@ -102,9 +102,13 @@
 
 \begin{rawhtml} <H1 ALIGN="CENTER"> 
 \end{rawhtml}
-\title{\huge {\bf \BB\ 4.0 User's Manual}
-\thanks{This research was partially supported by NSF Grant
-DMS-9527124 and Texas ATP Grant 97-3604-010}
+\title{\huge {\bf \BB\ 4.0 User's Manual} \thanks{This research was partially
+supported by NSF Grant DMS-9527124 and Texas ATP Grant 97-3604-010. A
+revised version of Chapters \ref{SYMPHONY-background} and
+\ref{SYMPHONY-design} of this manual now appears in the Springer-Verlag book
+{\em Computational Combinatorial Optimization} edited by M. J\"unger and
+D. Naddef, see
+http://link.springer.de/link/service/series/0558/tocs/t2241.htm}
 %begin{latexonly}
 \vskip 1.7in
 \LARGE 
@@ -116,14 +120,14 @@ tkralphs@lehigh.edu}, {\tt http://www.lehigh.edu/\~{ }tkr2}} \\
 L. Lad\'anyi\thanks{Department of Mathematical Sciences, 
 IBM T.J. Watson Research Center, Yorktown Heights,
 NY 10598} \\
-\vskip .5in
-Interactive Graph Drawing \\
-Software By \\
-\vskip .2in
-M. Es\"o\thanks{Department of Mathematical Sciences, 
-IBM T.J. Watson Research Center, Yorktown Heights,
-NY 10598}
-\vskip .5in
+%\vskip .5in
+%Interactive Graph Drawing \\
+%Software By \\
+%\vskip .2in
+%M. Es\"o\thanks{Department of Mathematical Sciences, 
+%IBM T.J. Watson Research Center, Yorktown Heights,
+%NY 10598}
+%\vskip .5in
 %end{latexonly}
 }
 \maketitle
@@ -141,15 +145,15 @@ T.K. Ralphs \\
 L. Lad\'anyi \\
 \begin{rawhtml} </P> </FONT> </STRONG> 
 \end{rawhtml}
-\vskip .5in
-\begin{rawhtml} <P ALIGN="CENTER"> <STRONG> <FONT SIZE="4">
-\end{rawhtml}
-Interactive Graph Drawing \\
-Software By \\
-\vskip .2in
-M. Es\"o}
-\begin{rawhtml} </P> </FONT> </STRONG> 
-\end{rawhtml}
+%\vskip .5in
+%\begin{rawhtml} <P ALIGN="CENTER"> <STRONG> <FONT SIZE="4">
+%\end{rawhtml}
+%Interactive Graph Drawing \\
+%Software By \\
+%\vskip .2in
+%M. Es\"o}
+%\begin{rawhtml} </P> </FONT> </STRONG> 
+%\end{rawhtml}
 \begin{rawhtml} <P ALIGN="CENTER"> <STRONG> <FONT SIZE="3">
 PDF version available <A
 HREF="ftp://branchandcut.org/pub/reference/SYMPHONY-4.0-Manual.pdf">here</A>
@@ -158,13 +162,12 @@ HREF="ftp://branchandcut.org/pub/reference/SYMPHONY-4.0-Manual.pdf">here</A>
 \begin{rawhtml} </P> </FONT> </STRONG> 
 \end{rawhtml}
 \begin{rawhtml} <P ALIGN="CENTER"> <STRONG> <FONT SIZE="3">
-A revised version of 
-Sections 3-8 of this manual
-now appears in the Springer-Verlag book <br>
-<i><a href="http://link.springer.de/link/service/series/0558/tocs/t2241.htm">
-Computational Combinatorial Optimization </i></a>
-edited by M. Juenger and D. Naddef.
-</FONT></STRONG></P>
+A revised version of Chapters \ref{SYMPHONY-background} and
+\ref{SYMPHONY-design} of this manual now appears in the Springer-Verlag book
+<br> <i><a
+href="http://link.springer.de/link/service/series/0558/tocs/t2241.htm">
+Computational Combinatorial Optimization </i></a> edited by M. Juenger and
+D. Naddef.  </FONT></STRONG></P>
 \end{rawhtml}
 
 \end{center}
@@ -181,12 +184,7 @@ edited by M. Juenger and D. Naddef.
 \begin{rawhtml} <P ALIGN="CENTER"> <STRONG> 
 \end{rawhtml}
 \begin{center}
-{\copyright 2000-2003 Ted Ralphs\footnote{A revised version of 
-Sections 3-8 of this manual
-now appears in the Springer-Verlag book {\em Computational Combinatorial 
-Optimization} 
-edited by M. J\"unger and D. Naddef, see 
-http://link.springer.de/link/service/series/0558/tocs/t2241.htm}.}
+{\copyright 2000-2003 Ted Ralphs}
 \end{center}
 \begin{rawhtml} </P> </STRONG> 
 \end{rawhtml}
@@ -201,21 +199,8 @@ http://link.springer.de/link/service/series/0558/tocs/t2241.htm}.}
 
 \input{man-intro}
 
-%\newpage
-
-%\thispagestyle{empty}
-
-%\ \\
-%%begin{latexonly}
-%\vspace*{3in}
-%\begin{center}
-%{\large PART II: Development}
-%\end{center}
-%%end{latexonly}
-
-%\newpage
-
 \chapter{Development}
+\label{SYMPHONY-development}
 
 \section{Quick Start Guide}
 \label{getting_started}
@@ -225,15 +210,10 @@ http://link.springer.de/link/service/series/0558/tocs/t2241.htm}.}
 \label{development}
 \input{man-SYMPHONY}
 
-%\newpage
-
-%\section{Data Structures}
-
-%\input{man-data-structures}
-
 \chapter{Reference}
+\label{SYMPHONY-reference}
 
-\section{The User API Specification}
+\section{User API}
 \label{API}
 \sloppy
 \input{man-tm}
@@ -250,37 +230,19 @@ http://link.springer.de/link/service/series/0558/tocs/t2241.htm}.}
 
 \input{man-cp}
 
-%\newpage
+\newpage
 
 \input{man-dg}
 
-%\newpage
-
-%\section{Data Structures}
-
-%\input{man-data-BB}
-
-%\input{man-data-lp}
-
-%\input{man-data-cg}
-
-%\input{man-data-cp}
-
-%\input{man-data-tm}
-
-%\input{man-data-dg}
-
-%\newpage
-
 \newpage
 
-\section{\BB\ Parameters}
+\section{Run-time Parameters}
 \label{params}
 \input{man-param}
 
-\newpage
+%\newpage
 
-\section{Bibliography}
+%\section{Bibliography}
 
 \input{biblio}
 

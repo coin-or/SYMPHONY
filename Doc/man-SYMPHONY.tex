@@ -36,7 +36,7 @@ subdirectory called \texttt{SYMPHONY-4.0/USER}, which contains the files
 needed for customizing the behaviors of the modules. Before beginning
 customization, it is recommended to make a copy of the directory
 \texttt{SYMPHONY-4.0/USER} that will be used as a template for creating your
-customizesd solver. In this directory and its subdirectories, which mirror the
+customized solver. In this directory and its subdirectories, which mirror the
 subdirectories of SYMPHONY itself, each file contains function stubs that can
 be filled in to create a new custom application. There is one file for each
 module, initially called \texttt{SYMPHONY-4.0/USER/*/user\_*.c}, where
@@ -56,10 +56,10 @@ defined in a file called {\tt *\_wrapper.c}. The wrapper function first
 collects the necessary data and hands it to the user by calling the user
 function. Based on the return value from the user, the wrapper then performs
 any necessary post-processing. All user functions have default options, so
-that SYMPHONY now acts as a generic MIP solver out of the box.
+that SYMPHONY now acts as a generic MILP solver out of the box.
 
-In the next section, the user functions are described in detail.
-The name of every user written function starts with {\tt user\_}.
+In Chapter \ref{SYMPHONY-reference}, the user functions are described in
+detail.  The name of every user written function starts with {\tt user\_}.
 There are three kinds of arguments:
 \begin{description}
 \item[\rm IN:] An argument containing information that the user might need
@@ -100,11 +100,11 @@ nothing, if execution of the subroutine is optional. \\
 function descriptions.
 
 \item If an array has to be returned (i.e., the argument is {\tt type
-**array}) then (unless otherwise noted) the user has to allocate space
-for the array itself and set {\tt *array} to be the array allocated.
-If an output array is optional then the user {\em must not} set {\tt
-*array} for the array she is not going to fill up because this is how
-\BB\ decides which optional arrays are filled up.
+**array}) then (unless otherwise noted) the user has to allocate space for the
+array itself and set {\tt *array} to be the array allocated.  If an output
+array is optional and the user is not returning any values in that array, then
+the user {\em must not} set {\tt *array} because this is how \BB\ decides
+which optional arrays are filled up.
 
 \item Some built-in options are implemented so that the user can invoke them
 directly from the user function. This might be useful if, for example,
@@ -167,9 +167,9 @@ place.
 
 All data are sent in the form of arrays of either type {\tt char}, {\tt int},
 or {\tt double}, or as strings. To send an array, the user has simply to
-invoke the function {\tt send\_?\_array(? *array, int length)} where ?  is one
-of the previously listed types. To receive that array, there is a
-corresponding function called {\tt receive\_?\_array(?  *array, int
+invoke the function {\tt send\_XXX\_array(XXX *array, int length)} where
+\texttt{XXX} is one of the previously listed types. To receive that array,
+there is a corresponding function called {\tt receive\_?\_array(?  *array, int
 length)}. When receiving an array, the user must first allocate the
 appropriate amount of memory. In cases where variable length arrays need to be
 passed, the user must first pass the length of the array (as a separate array
@@ -185,7 +185,7 @@ between the receive function calls.
 \subsection{The LP Engine}
 
 \BB\ requires the use of a third-party callable library to solve the LP 
-relaxations once they are formulated. Legacy interfaces to ILOG's
+relaxations once they are formulated. Native interfaces to ILOG's
 \htmladdnormallink{CPLEX}{http://www.cplex.com}$^{\copyright}$
 and IBM's
 \htmladdnormallink{OSL}{http://www-4.ibm.com/software/data/bi/osl/index.html}
@@ -194,10 +194,10 @@ are available. As of Version 4.0, the Open Solver Interface, available from
 \begin{latexonly} 
 (\texttt{http://www.coin-or.org})
 \end{latexonly}.
-Through the OSI, most commonly available LP solvers can be used. The list of
+can be used to interface with most commonly available LP solvers. The list of
 solvers with OSI interfaces currently numbers eight and includes both
 commercial and open source alternatives. If the COIN libraries are used, make
-sure to set the proper paths in the SYMPHONY make file.
+sure to set the proper paths in the SYMPHONY makefile.
 
 \subsection{Cut Generation}
 
@@ -210,17 +210,18 @@ COIN (\texttt{http://www.coin-or.org})
 The CGL can be used to generate cuts in cases where problem-specific cutting
 planes are not available or not implemented yet. 
 
-\subsection{Compiling Your Application}
+\subsection{Advanced Compilation}
+\label{advanced-compilation}
 
 \subsubsection{Unix Operating Systems}
 
 Once the user functions are filled in, all that remains is to compile the
-application. The distribution comes with two make files that facilitate this
-process. The primary make file resides in the {\tt SYMPHONY-4.0/} directory.
-The user make file resides in the user's subdirectory, initially called
+application. The distribution comes with two makefiles that facilitate this
+process. The primary makefile resides in the {\tt SYMPHONY-4.0/} directory.
+The user makefile resides in the user's subdirectory, initially called
 \texttt{SYMPHONY-4.0/USER/}. This subdirectory can be moved, as well as
 renamed. There are a number of variables that must be set in the primary make
-file. To modify the make files appropriately, see the instructions in Section
+file. To modify the makefiles appropriately, see the instructions in Section
 \ref{getting_started_unix}.
 
 \paragraph{Working with PVM.}
@@ -298,7 +299,7 @@ the function stubs. See also Section \ref{shared}.
 In order to keep track of the various possible configurations, executable and
 their corresponding libraries are named as follows. The name of the master
 module, along with all other modules compiled in with the master, is set in
-the make file. For the other modules, default names are typically used, since
+the makefile. For the other modules, default names are typically used, since
 these names have to be hard-coded in order for PVM to correctly spawn the
 corresponding processes.  In the fully distributed version, the default names
 are \texttt{tm}, \texttt{lp}, \texttt{cg}, and \texttt{cp}. For other
@@ -340,7 +341,7 @@ serially even if you eventually intend to run in a fully distributed
 environment. This does make the coding marginally more complex, but
 believe me, it's worth the effort. The vast majority of your code will
 be the same for either case. Make sure to set the compile flag to
-``{\tt -g}'' in the make file.
+``{\tt -g}'' in the makefile.
 
 \subsubsection{Debugging with PVM}
 \label{debugging-PVM}
@@ -371,7 +372,7 @@ You still have to be careful, but this should make things easier.
 
 \subsubsection{Using {\tt Purify} and {\tt Quantify}}
 
-The make file is already set up for compiling applications using {\tt
+The makefile is already set up for compiling applications using {\tt
 purify} and {\tt quantify}. Simply set the paths to the executables
 and type ``{\tt make pall}'' or ``{\tt p*}'' where * is the module you
 want to purify. The executable name is the same as described in
@@ -398,10 +399,9 @@ independent verifier. To do this, the user must pass (through her own
 data structures) a known feasible solution. Then for each cut passed
 into the function, the user can check whether the cut is satisfied
 by the feasible solution. If not, then there is a problem! Of course,
-the problem could also be with the checking routine. To see how this is
-done, check out the sample application file {\tt Vrp/cg\_user.c}.
+the problem could also be with the checking routine. 
 After filling in this function, the user must recompile everything
-(including the libraries) after uncommenting the line in the make file
+(including the libraries) after uncommenting the line in the makefile
 that contains ``{\tt BB\_DEFINES += -DCHECK\_CUT\_VALIDITY}.'' Type
 ``{\tt make clean\_all}'' and then ``{\tt make}.''
 
@@ -452,26 +452,21 @@ feel free to contact me.
 
 \subsubsection{Other Debugging Techniques}
 
-Another useful built-in function is MakeMPS, which will write the
-current LP relaxation to a file in MPS format. This file can then be
-read into the LP solver interactively or examined by hand for errors.
-Many times, CPLEX gives much more explicit error messages
-interactively than through the callable library. The form of the
-function is 
+Another useful built-in function is \texttt{write\_mps()}, which will write the
+current LP relaxation to a file in MPS format. This file can then be read into
+the LP solver interactively or examined by hand for errors.  Many times, CPLEX
+gives much more explicit error messages interactively than through the
+callable library. The form of the function is
 \begin{verbatim}
-void MakeMPS(LPData *lp_data, int bc_index, int iter_num)
+void write_mps(LPdata *lp_data, char *fname)
 \end{verbatim}
-The matrix is written to the file ``{\tt
-matrix.[bc\_index].[iter\_num].mps}'' where {\em bc\_index} is the
-usually passed as the index of the current subproblem and {\em
-iter\_num} is the current iteration number. These can, however, be any
-numbers the user chooses. If \BB\ is forced to abandon solution
-of an LP because the LP solver returns an error code, the current LP
-relaxation is automatically written to the file ``{\tt
-matrix.[bc\_index].[iter\_num].mps}'' where {\em bc\_index} is the
-index of the current subproblem and {\em iter\_num} is the current
-iteration number. MakeMPS can be called using breakpoint code to
-examine the status of the matrix at any point during execution.
+where \texttt{fname} is the name of the file to be written. If \BB\ is forced
+to abandon solution of an LP because the LP solver returns an error code, the
+current LP relaxation is automatically written to the file ``{\tt
+matrix.[bc\_index].[iter\_num].mps}'' where {\em bc\_index} is the index of
+the current subproblem and {\em iter\_num} is the current iteration
+number. The \texttt{write\_mps()} function can be called using breakpoint code
+to examine the status of the matrix at any point during execution.
 
 Logging is another useful feature. Logging the state of the search tree can
 help isolate some problems more easily. See Section \ref{tm_params}

@@ -13,7 +13,7 @@ options and no post-processing.
 % user_dg_process_message
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{user\_dg\_process\_message}
+\firstfuncdef{user\_dg\_process\_message}
 \begin{verbatim}
 void user_dg_process_message(void *user, window *win, FILE *write_to)
 			     
@@ -38,8 +38,8 @@ user can directly issue commands there.
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. Message ignored. \\
-{\tt USER\_NO\_PP} & The user processed the message. \\
+{\tt USER\_ERROR} & Error. Message ignored. \\
+{\tt USER\_SUCCESS} & The user processed the message. \\
 \et
 
 \ed
@@ -74,8 +74,8 @@ data structure for receiving and storing display data.
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. Ignored. \\
-{\tt USER\_NO\_PP} & The user successfully performed initialization. \\
+{\tt USER\_ERROR} & Error. Ignored. \\
+{\tt USER\_SUCCESS} & The user successfully performed initialization. \\
 \et
 
 \ed
@@ -108,8 +108,8 @@ The user must free any data structures allocated.
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. Ignored. \\
-{\tt USER\_NO\_PP} & The user successfully freed the data structures. \\
+{\tt USER\_ERROR} & Error. Ignored. \\
+{\tt USER\_SUCCESS} & The user successfully freed the data structures. \\
 \et
 
 \ed
@@ -145,8 +145,8 @@ The user can interpret text input from the window.
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. Ignored. \\
-{\tt USER\_NO\_PP} & The user successfully interpreted the text. \\
+{\tt USER\_ERROR} & Error. Ignored. \\
+{\tt USER\_SUCCESS} & The user successfully interpreted the text. \\
 \et
 
 \ed

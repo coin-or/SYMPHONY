@@ -51,7 +51,7 @@ since it requires only editing the makefile and typing a single command.
 1. Edit the file SYMPHONY-4.0\MPP\WIN32\mpp.mak to reflect your
 environment. This involves specifying the LP solver to be used and various
 paths. Only minor edits should be required. An explanation of what has to be
-set is contained in the comments in the Makefile.
+set is contained in the comments in the makefile.
 
 2. To use many of the new capabilities of SYMPHONY, you must have installed
 the COIN libraries, available from www.coin-or.org. Specifically, you should
@@ -127,7 +127,7 @@ you want to use "__OSI_OSL__" then add the osiOslLib and oslmd6030 (OSL solver
 lib file) library files after deleting osiCpxLib and cplex81 libraries from
 the "symphony" project (you can do that by right_clicking on the "symphony"
 project and then --> Add files to project with "library files" selected as the
-file type). If you want to use the mative OSL interface, then delete all the
+file type). If you want to use the native OSL interface, then delete all the
 libraries (except the "mpp" library ) from the "symphony" project and just add
 the "oslmd6030" library file for it is the unique solver library file we need
 now.

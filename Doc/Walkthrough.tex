@@ -131,7 +131,7 @@ to $i$ in the matching.
 We define the IP in \texttt{user\_create\_subproblem()} in
 \texttt{user\_lp.c}. This routine needs to be sure the arrays are big enough,
 and I suspect easiest would be to simply allocate them. Note that the arrays
-are the members of \texttt{LPdesc} structure which carries the user defined
+are the members of \texttt{MIPdesc} structure which carries the user defined
 problem description. This code checks current allocation and reallocates as
 needed.
 \newpage
