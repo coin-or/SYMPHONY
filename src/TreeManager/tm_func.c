@@ -2884,6 +2884,7 @@ int tm_close(tm_prob *tm, int termcode)
    for (i = 0; i < tm->par.max_cp_num; i++){
       tm->comp_times.cut_pool += tm->cpp[i]->cut_pool_time;
       tm->stat.cuts_in_pool += tm->cpp[i]->cut_num;
+      tm->cpp[i]->msgtag = YOU_CAN_DIE;
       cp_close(tm->cpp[i]);
    }
 #else
@@ -2911,7 +2912,7 @@ int tm_close(tm_prob *tm, int termcode)
       lp_close(lp[i]);
    }
 #endif
-
+   
 #ifndef COMPILE_IN_TM
    /*------------------------------------------------------------------------*\
     * Send back the statistics to the master

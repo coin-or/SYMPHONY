@@ -213,15 +213,15 @@ int create_lp_u(lp_prob *p)
       if (MAX(maxn, bvarnum) < lp_data->n){
 	 lp_data->vars = (var_desc **)
 	    realloc(lp_data->vars, lp_data->n * sizeof(var_desc *));
-	 vars = lp_data->vars + MAX(maxn, bvarnum);
-	 for (i = lp_data->n - MAX(maxn, bvarnum) - 1; i >= 0; i--)
+	 vars = lp_data->vars;
+	 for (i = lp_data->n - 1; i >= MAX(maxn, bvarnum); i--)
 	    vars[i] = (var_desc *) malloc( sizeof(var_desc) );
       }
-      vars = lp_data->vars + bvarnum;
+      vars = lp_data->vars;
       d_uind = desc->uind.list;
       for (i = desc->uind.size - 1; i >= 0; i--){
-	 vars[i]->userind = d_uind[i];
-	 vars[i]->colind = bvarnum + i;
+	 vars[i + bvarnum]->userind = d_uind[i];
+	 vars[i + bvarnum]->colind = bvarnum + i;
       }
    }
    lp_data->ordering = COLIND_AND_USERIND_ORDERED;
@@ -1444,6 +1444,8 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 
 	 FREE(*new_rows);
 	 *new_rows = row_list;
+      }else{
+	 FREE(row_list);
       }
       
       break;

@@ -820,6 +820,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 	    if (!(cur_route_start = cur_route_start->next_edge)) break;
 	 }
       }
+      free_net(n);
    }
 
    node = tour[0].next;
@@ -855,9 +856,6 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 		    CTOI_WAIT_FOR_CLICK_AND_REPORT);
    }
 #endif
-
-
-   FREE(n);
    
    return(USER_NO_PP);
 }

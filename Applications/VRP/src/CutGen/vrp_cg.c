@@ -250,16 +250,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 /*___END_EXPERIMENTAL_SECTION___*/
    
    /* This creates a fractional graph representing the LP solution */
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   n = status ? createnet2(indices, values, varnum, etol, vrp->edges, demand,
-			   vertnum, status) :
-                createnet(indices, values, varnum, etol, vrp->edges, demand,
-			  vertnum);
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
    n = createnet(indices, values, varnum, etol, vrp->edges, demand, vertnum);
-#endif
    if (n->is_integral){
       /* if the network is integral, check for connectivity */
       num_cuts = check_connectivity(n, etol, capacity, num_routes);

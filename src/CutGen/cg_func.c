@@ -143,13 +143,14 @@ int cg_send_cut(cut_data *new_cut)
 
 #ifdef COMPILE_IN_CG
 
+   int i;
    cut_data *tmp_cut;
 
    for (i = 0; i < p->cuts_to_add_num; i++){
       if (new_cut->size != p->cuts_to_add[i]->size){
 	 continue;
       }
-      if (memcmp(new_cut->coef, p->cuts_to_add[i], new_cut->size == 0)){
+      if (memcmp(new_cut->coef, p->cuts_to_add[i]->coef, new_cut->size) == 0){
 	 return(0);
       }
    }

@@ -107,12 +107,15 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
 					  lp_data->maxn * DSIZE);
 #endif
       }
-      /* vers is realloc'd in either case just to keep the base vars */
+
+#if 0
+      /* vars is realloc'd in either case just to keep the base vars */
       lp_data->vars = (var_desc **) realloc((char *)lp_data->vars,
                                             lp_data->maxn*sizeof(var_desc *));
       vars = lp_data->vars + oldmaxn;
       for (i = lp_data->maxn - oldmaxn - 1; i >= 0; i--)
 	 vars[i] = (var_desc *) malloc( sizeof(var_desc) );
+#endif
    }
    if (maxnz > lp_data->maxnz){
       lp_data->maxnz = maxnz + (set_max ? 0 : 20 * BB_BUNCH);
@@ -543,6 +546,8 @@ void unload_lp_prob(LPdata *lp_data)
    osllib_status = ekk_deleteModel(lp_data->lp);
    OSL_check_error("unload_lp - ekk_deleteModel");
    lp_data->lp = NULL;
+
+   lp_data->m = lp_data->n = lp_data->nz = 0;
 }
 
 /*===========================================================================*/
@@ -1423,6 +1428,8 @@ void unload_lp_prob(LPdata *lp_data)
    cpx_status = CPXfreeprob(lp_data->cpxenv, &lp_data->lp);
    CPX_check_error("unload_lp - CPXfreeprob");
    lp_data->lp = NULL;
+
+   lp_data->m = lp_data->n = lp_data->nz = 0;
 }
 
 /*===========================================================================*/
@@ -2125,7 +2132,6 @@ void unload_lp_prob(LPdata *lp_data)
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
 
-   lp_data->maxn = lp_data->maxm = lp_data->maxnz = 0;
    lp_data->m = lp_data->n = lp_data->nz = 0;
 }
 
@@ -2181,10 +2187,9 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
       }
    }
 
-   delete warmstart;
-   
    retval = lp_data->si->setWarmStart(warmstart);
 
+   delete warmstart;
 }
 
 /*===========================================================================*/
@@ -2192,20 +2197,16 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
 {
-   CoinPackedVector *rows[rcnt];
    //  CoinPackedVector * rows = new CoinPackedVector[rcnt];
 
-   double * rowrng = new double[rcnt];
-   
    int i, j, m = lp_data->m;
    
    for (i = 0; i < rcnt; i++){
-      rows[i] = new CoinPackedVector;
+      CoinPackedVector new_row;
       for (j = rmatbeg[i]; j < rmatbeg[i+1]; j++){
-	 rows[i]->insert(rmatind[j], rmatval[j]);
-	 rowrng[i]=0;
+	 new_row.insert(rmatind[j], rmatval[j]);
       }
-      lp_data->si->addRow(*(rows[i]),sense[i],rhs[i],rowrng[i]);
+      lp_data->si->addRow(new_row, sense[i], rhs[i], 0);
    }
 
    //  lp_data->si->addRows(rcnt,rows,sense,rhs,rowrng);
@@ -2328,8 +2329,7 @@ void get_binvrow(LPdata *lp_data, int i, double *row)
 
 void get_basis(LPdata *lp_data, int *cstat, int *rstat)
 {
-   CoinWarmStart * warmstart = new CoinWarmStartBasis;
-   warmstart=lp_data->si->getWarmStart();
+   CoinWarmStart * warmstart = lp_data->si->getWarmStart();
    
    CoinWarmStartBasis * ws = dynamic_cast<CoinWarmStartBasis*>(warmstart);
    
@@ -2378,6 +2378,8 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
 	 }
       }
    }
+
+   delete ws;
 }
 
 /*===========================================================================*/
