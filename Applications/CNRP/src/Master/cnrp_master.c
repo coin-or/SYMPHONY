@@ -747,6 +747,19 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    cnrp_spec *cnrp_lp = (cnrp_spec *) p->tm->lpp[0]->user;
 #endif
       
+   cnrp->fixed_cost = cnrp_lp->fixed_cost;
+   cnrp->variable_cost = cnrp_lp->variable_cost;
+   
+   printf("\nSolution Found:\n");
+#ifdef ADD_FLOW_VARS
+   printf("Solution Fixed Cost: %.1f\n", cnrp->fixed_cost);
+   printf("Solution Variable Cost: %.1f\n", cnrp->variable_cost);
+#else
+   printf("Solution Cost: %.0f\n", cnrp->fixed_cost);
+#endif
+
+   return(USER_SUCCESS);
+
 #if 0
    if (tour && cnrp->cur_tour->cost > (int) objval){
       node = tour[0].next;
@@ -798,6 +811,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 
    /*Otherwise, construct the solution from scratch*/
 
+#if 0
 #ifdef ADD_FLOW_VARS
    n = create_flow_net(indices, values, varnum, lpetol, cnrp->edges,
 		       cnrp->demand, vertnum);
@@ -806,7 +820,6 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 		  vertnum);
 #endif
 
-#if 0
    for (i = 0; i < n->edgenum; i++){
       if (n->edges[i].weight > 1 - lpetol){
 	 fixed_cost += cnrp->dist.cost[INDEX(n->edges[i].v0, n->edges[i].v1)];
@@ -825,19 +838,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 #else
    printf("Solution Cost: %.0f\n", fixed_cost);
 #endif
-#endif
 
-   cnrp->fixed_cost = cnrp_lp->fixed_cost;
-   cnrp->variable_cost = cnrp_lp->variable_cost;
-   
-   printf("\nSolution Found:\n");
-#ifdef ADD_FLOW_VARS
-   printf("Solution Fixed Cost: %.1f\n", cnrp->fixed_cost);
-   printf("Solution Variable Cost: %.1f\n", cnrp->variable_cost);
-#else
-   printf("Solution Cost: %.0f\n", cnrp->fixed_cost);
-#endif
-   
    if (cnrp->par.prob_type == TSP || cnrp->par.prob_type == VRP ||
        cnrp->par.prob_type == BPP){ 
 
@@ -912,8 +913,9 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
       printf("\n");
    }
    free_net(n);
-   
+
    return(USER_SUCCESS);
+#endif
 }
    
 /*===========================================================================*/
