@@ -1036,7 +1036,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       child->bc_index = tm->stat.tree_size++;
       child->bc_level = node->bc_level + 1;
       if (tm->par.verbosity > 10){
-	 printf("Generating node %i...\n", child->bc_index);
+	 printf("Generating node %i from %i...\n", child->bc_index, node->bc_index);
       }
       if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
 	 FILE *f;
