@@ -117,7 +117,7 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
       if (verbosity > 3)
 	 printf("Found %2d segment cuts\n", cutnum);
       if (!rval && cutnum > 0){
-	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob
+	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob,
 				    cuts, num_cuts, alloc_cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
@@ -309,8 +309,8 @@ int add_tsp_cuts(CCtsp_lpcut_in **tsp_cuts, int *cutnum, int vertnum,
       cut.sense = 'L';
       cut.rhs = (cliquecount == 1 ? 0.0 : -((double)cliquecount)/2.0 + 1.0);
       cut.size = ISIZE + cliquecount * size;
-      cut.coef = coef = calloc(cut.size, sizeof(char));
-      memcpy(cut.coef, (char *)(&cliquecount), ISIZE);
+      cut.coef = coef = (char *) calloc(cut.size, sizeof(char));
+      memcpy(cut.coef, (char *) (&cliquecount), ISIZE);
       clique_array = cut.coef + ISIZE;
       for (i = 0; i < cliquecount; i++, clique_array += size){
 	 valid = TRUE;
