@@ -530,7 +530,12 @@ int main(int argc, char **argv)
    }
 
 #ifdef COMPILE_IN_TM
+   FREE(root->desc);
+   FREE(root->uind.list);
+   FREE(root->not_fixed.list);
+   FREE(root->cutind.list);
    FREE(root);
+   FREE(base->userind);
    FREE(base);
    free_tm(tm);
 #else

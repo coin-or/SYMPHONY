@@ -914,11 +914,9 @@ int user_free_master(void **user)
    FREE(cnrp->dist.coordx);
    FREE(cnrp->dist.coordy);
    FREE(cnrp->dist.coordz);
-#if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
    FREE(cnrp->dist.cost);
    FREE(cnrp->edges);
    FREE(cnrp->demand);
-#endif
    if (cnrp->g){
       FREE(cnrp->g->edges);
       FREE(cnrp->g);

@@ -52,8 +52,7 @@ typedef struct SOLUTION_PAIRS{
 
 /*===========================================================================*/
 
-void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau,
-		double ub);
+void cnrp_solve(problem *p, base_desc *base, node_desc *root);
 
 /*===========================================================================*/
 
@@ -66,6 +65,7 @@ int main(int argc, char **argv)
    int i;
    problem *p;
    double gamma, tau;
+   double start_time, t = 0;
 
    solution_data utopia1;
    solution_data utopia2;
@@ -75,9 +75,13 @@ int main(int argc, char **argv)
    int numpairs = 0;
    int *tree;
    int solution1, solution2;
-   double utopia_fixed, utopia_variable, ub = 0.0, tmp;
+   double utopia_fixed, utopia_variable, ub = 0.0;
    cnrp_problem *cnrp;
+   node_desc *root= NULL;
+   base_desc *base = NULL;
    
+   start_time = wall_clock(NULL);
+
    setvbuf(stdout, (char *)NULL, _IOLBF, 0);
 
    printf("\n");
@@ -89,30 +93,54 @@ int main(int argc, char **argv)
    printf("*******************************************************\n");
    printf("\n");
 
-#if 0
-   for (i = 0; i < 100; i++){
-      solutions[i] = (solution_data *) calloc(1, sizeof(solution_data));
-   }
-#endif
-   
-   /* First, calculate the utopia point */
-   
+   /* Initialize */
+
+   (void) used_time(&t);
+
    p = get_problem_ptr(TRUE);
 
-   gamma = 1.0;
-   tau = 1 - gamma;
+   initialize_u(p);
+
+   cnrp = (cnrp_problem *)(p->user);
+   
+   /* Set the parameters */
+   readparams_u(p, argc, argv);
+   
+   /* Get the problem data */
+   io_u(p);
+   
+   /* Start up the graphics window*/
+   init_draw_graph_u(p);
+   
+   p->comp_times.readtime += used_time(&t);
+   
+   /* Finds the upper and lower bounds for the problem */
+   start_heurs_u(p);
+
+   /*---------------------------------------------------------------------*\
+    * Generate the base and root description
+   \*---------------------------------------------------------------------*/
+   
+   base = (base_desc *) calloc(1, sizeof(base_desc));
+   root = (node_desc *) calloc(1, sizeof(node_desc));
+   
+   initialize_root_node_u(p, base, root);
+
+   /* First, calculate the utopia point */
+   
+   cnrp->lp_par.gamma = 1.0;
+   cnrp->cg_par.tau = cnrp->lp_par.tau = 0.0;
       
    printf("***************************************************\n");
    printf("***************************************************\n");
-   printf("Now solving with gamma = %.2f tau = %.2f \n", gamma, tau);  
+   printf("Now solving with gamma = 1.0 tau = 0.0 \n", gamma, tau);  
    printf("***************************************************\n");
    printf("***************************************************\n\n");
 
    /* Solve */
-   cnrp_solve(p, argc, argv,  gamma, tau, 0.0);
+   cnrp_solve(p, base, root);
 
    /* Store the solution */
-   cnrp = (cnrp_problem *)(p->user);
    tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
    memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
    solutions[numsolutions].gamma = gamma;
@@ -121,24 +149,19 @@ int main(int argc, char **argv)
    solutions[numsolutions++].variable_cost = (int) cnrp->variable_cost;
    utopia_fixed = cnrp->fixed_cost;
       
-   free_master_u(p);      
-  
-   p = get_problem_ptr(TRUE);
-
-   gamma = 0.0;
-   tau = 1 - gamma;
+   cnrp->lp_par.gamma = 0.0;
+   cnrp->cg_par.tau = cnrp->lp_par.tau = 1.0;
       
    printf("***************************************************\n");
    printf("***************************************************\n");
-   printf("Now solving with gamma = %.2f tau = %.2f \n", gamma, tau);  
+   printf("Now solving with gamma = 0.0 tau = 1.0 \n", gamma, tau);  
    printf("***************************************************\n");
    printf("***************************************************\n\n");
 
    /* Solve */
-   cnrp_solve(p, argc, argv,  gamma, tau, 0.0);
+   cnrp_solve(p, base, root);
       
    /* Store the solution */
-   cnrp = (cnrp_problem *)(p->user);
    tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
    memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
    solutions[numsolutions].gamma = gamma;
@@ -154,8 +177,6 @@ int main(int argc, char **argv)
    printf("***************************************************\n");
    printf("***************************************************\n\n");
    
-   free_master_u(p);
-
    /* Add the first pair to the list */
    pairs[numpairs].solution1 = 0;
    pairs[numpairs++].solution2 = 1;
@@ -164,22 +185,27 @@ int main(int argc, char **argv)
 
       if (!numpairs) break;
       
-      p = get_problem_ptr(TRUE);
-
       solution1 = pairs[--numpairs].solution1;
       solution2 = pairs[numpairs].solution2;
 	 
       gamma = (utopia_variable - solutions[solution1].variable_cost)/
 	 (utopia_fixed - solutions[solution2].fixed_cost +
 	  utopia_variable - solutions[solution1].variable_cost);
-      
       tau = 1 - gamma;
       
+      cnrp->lp_par.gamma = gamma;
+      cnrp->cg_par.tau = cnrp->lp_par.tau = tau;
+
       /* Find upper bound */
 
-      for (ub = 0, i = 0; i < numsolutions; i++){
-	 tmp = gamma*solutions[i].fixed_cost + tau*solutions[i].variable_cost;
-	 if (tmp < ub || ub == 0) ub = tmp; 
+      p->has_ub = FALSE;
+      p->ub = MAXDOUBLE;
+      for (i = 0; i < numsolutions; i++){
+	 ub = gamma*solutions[i].fixed_cost + tau*solutions[i].variable_cost;
+	 if (ub < p->ub){
+	    p->has_ub = TRUE;
+	    p->ub = ub;
+	 }
       }
       
       printf("***************************************************\n");
@@ -188,10 +214,8 @@ int main(int argc, char **argv)
       printf("***************************************************\n");
       printf("***************************************************\n\n");
 
-      cnrp_solve(p, argc, argv,  gamma, tau, ub);
+      cnrp_solve(p, base, root);
 
-      cnrp = (cnrp_problem *)(p->user);
-      
       if ((int) cnrp->fixed_cost > solutions[solution1].fixed_cost &&
 	  (int) cnrp->variable_cost < solutions[solution1].variable_cost &&
 	  (int) cnrp->fixed_cost < solutions[solution2].fixed_cost &&
@@ -221,13 +245,19 @@ int main(int argc, char **argv)
 	 pairs[numpairs].solution1 = solution2;
 	 pairs[numpairs++].solution2 = solution2+1;
       }
-	 
-      free_master_u(p);      
    }
+
+   printf("\n****************************************************\n");
+   printf(  "* Found all non-dominated solutions!!!!!!!         *\n");
+   printf(  "* Now displaying stats...                          *\n");
+   printf(  "****************************************************\n\n");
+      
+   print_statistics(&(p->comp_times.bc_time), &(p->stat), 0.0, 0.0, 0,
+		    start_time);
 
    printf("***************************************************\n");
    printf("***************************************************\n");
-   printf("Now printing non-dominated solution values\n");  
+   printf("Displaying non-dominated solution values\n");  
    printf("***************************************************\n");
    printf("***************************************************\n\n");
    
@@ -236,80 +266,42 @@ int main(int argc, char **argv)
 	     solutions[i].variable_cost);
    }
    
+   FREE(root->desc);
+   FREE(root->uind.list);
+   FREE(root->not_fixed.list);
+   FREE(root->cutind.list);
+   FREE(root);
+   FREE(base->userind);
+   FREE(base);
+
    return(0);
 }
 
-void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau,
-		double ub)
+void cnrp_solve(problem *p, base_desc *base, node_desc *root)
 {
    int termcode;
-   double t = 0, total_time=0;
-   double start_time;
-
-   node_desc *root= NULL;
-   base_desc *base = NULL;
+   double t = 0, start_time;
 
    tm_prob *tm;
 
    /*---------------------------------------------------------------------*\
-    *                         program starts                              
+    * Initialize
    \*---------------------------------------------------------------------*/
 
-   (void) used_time(&t);
-   
    start_time = wall_clock(NULL);
-   
-   initialize_u(p);
-   
-   /* Set the parameters */
-   readparams_u(p, argc, argv);
-   
-   /* Get the problem data */
-   io_u(p);
-   
-   /* Start up the graphics window*/
-   init_draw_graph_u(p);
-   
-   p->comp_times.readtime = used_time(&t);
-   
-   /* Finds the upper and lower bounds for the problem */
-   start_heurs_u(p);
-
-   if (ub > 0){
-      p->has_ub = TRUE;
-      p->ub = ub;
-   }
-   
-   (void) used_time(&t);
-   
-   /*---------------------------------------------------------------------*\
-    * Have the user generate the base and root description
-   \*---------------------------------------------------------------------*/
-   
-   base = (base_desc *) calloc(1, sizeof(base_desc));
-   root = (node_desc *) calloc(1, sizeof(node_desc));
-   
-   initialize_root_node_u(p, base, root);
-   
-   /*---------------------------------------------------------------------*\
-    * Send out problem data if needed
-   \*---------------------------------------------------------------------*/
-   
-   cnrp_problem *cnrp = (cnrp_problem *)(p->user);
-   cnrp->lp_par.gamma = gamma;
-   cnrp->cg_par.tau = cnrp->lp_par.tau = tau;
    
    send_lp_data_u(p, 0, base);
    send_cg_data_u(p, 0);
    send_cp_data_u(p, 0);
-   
+
    tm = tm_initialize(base, root, 0);
    
    /*---------------------------------------------------------------------*\
     * Solve the problem and receive solutions                         
    \*---------------------------------------------------------------------*/
    
-   tm->start_time += start_time;
+   tm->start_time = start_time;
+
    termcode = solve(tm);
    
    tm_close(tm, termcode);
@@ -318,40 +310,55 @@ void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau,
     * Display the the results and solution data                               
    \*---------------------------------------------------------------------*/
    
-   if (termcode == TM_FINISHED){
-      printf("\n****************************************************\n");
-      printf(  "* Branch and Cut Finished!!!!!!!                   *\n");
-      printf(  "* Now displaying stats and optimal solution...     *\n");
-      printf(  "****************************************************\n\n");
-   }else if (termcode == TIME_LIMIT_EXCEEDED){
-      printf("\n****************************************************\n");
-      printf(  "* Time Limit Exceeded :(                           *\n");
-      printf(  "* Now displaying stats and best solution...        *\n");
-      printf(  "****************************************************\n\n");
-   }else{
-      printf(
-	     "***********Something has died -- halting the machine\n\n");
-      printf(
-	     "***********Printing out partial data\n\n");
+   if (p->par.verbosity > 0){
+      if (termcode == TM_FINISHED){
+	 printf("\n****************************************************\n");
+	 printf(  "* Branch and Cut Finished!!!!!!!                   *\n");
+	 printf(  "* Now displaying stats and optimal solution...     *\n");
+	 printf(  "****************************************************\n\n");
+      }else{
+	 printf("\n****************************************************\n");
+	 printf(  "* Time Limit Exceeded :(                           *\n");
+	 printf(  "* Now displaying stats and best solution...        *\n");
+	 printf(  "****************************************************\n\n");
+      }
+      
+      print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, tm->lb, 0,
+		       start_time);
    }
-   
-   total_time  = p->comp_times.readtime;
-   total_time += p->comp_times.ub_overhead + p->comp_times.ub_heurtime;
-   total_time += p->comp_times.lb_overhead + p->comp_times.lb_heurtime;
-   
-   printf( "====================== Misc Timing ========================\n");
-   printf( "  Problem IO        %.3f\n", p->comp_times.readtime);
-   printf( "  UB overhead:      %.3f\n", p->comp_times.ub_overhead);
-   printf( "  UB runtime:       %.3f\n", p->comp_times.ub_heurtime);
-   printf( "  LB overhead:      %.3f\n", p->comp_times.lb_overhead);
-   printf( "  LB runtime:       %.3f\n", p->comp_times.lb_heurtime);
-   
-   if (tm->lb > p->lb) p->lb = tm->lb;
-
-   print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, p->lb,
-		    total_time, start_time);
 
    display_solution_u(p, 0);
+
+   /* Keep cumulative statistics */
+   if (tm->stat.max_depth > p->stat.max_depth){
+      p->stat.max_depth = tm->stat.max_depth;
+   }
+   p->stat.cuts_in_pool += tm->stat.cuts_in_pool;
+   p->stat.chains += tm->stat.chains;
+   p->stat.diving_halts += tm->stat.diving_halts;
+   p->stat.tree_size += tm->stat.tree_size;
+   p->stat.created += tm->stat.created;
+   p->stat.analyzed += tm->stat.analyzed;
+   p->stat.leaves_before_trimming += tm->stat.leaves_before_trimming;
+   p->stat.leaves_after_trimming += tm->stat.leaves_after_trimming;
+   p->stat.vars_not_priced += tm->stat.vars_not_priced;
+
+   p->comp_times.bc_time.communication += tm->comp_times.communication;
+   p->comp_times.bc_time.lp += tm->comp_times.lp;
+   p->comp_times.bc_time.separation += tm->comp_times.separation;
+   p->comp_times.bc_time.fixing += tm->comp_times.fixing;
+   p->comp_times.bc_time.pricing += tm->comp_times.pricing;
+   p->comp_times.bc_time.strong_branching += tm->comp_times.strong_branching;
+   p->comp_times.bc_time.wall_clock_lp += tm->comp_times.wall_clock_lp;
+   p->comp_times.bc_time.ramp_up_tm += tm->comp_times.ramp_up_tm;
+   p->comp_times.bc_time.ramp_up_lp += tm->comp_times.ramp_up_lp;
+   p->comp_times.bc_time.ramp_down_time += tm->comp_times.ramp_down_time;
+   p->comp_times.bc_time.idle_diving += tm->comp_times.idle_diving;
+   p->comp_times.bc_time.idle_node += tm->comp_times.idle_node;
+   p->comp_times.bc_time.idle_names += tm->comp_times.idle_names;
+   p->comp_times.bc_time.idle_cuts += tm->comp_times.idle_cuts;
+   p->comp_times.bc_time.start_node += tm->comp_times.start_node;
+   p->comp_times.bc_time.cut_pool += tm->comp_times.cut_pool;
 
 #if 0
    if (p->par.do_draw_graph){
@@ -361,8 +368,6 @@ void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau,
    }
 #endif
    
-   FREE(root);
-   FREE(base);
    free_tm(tm);
 }
 

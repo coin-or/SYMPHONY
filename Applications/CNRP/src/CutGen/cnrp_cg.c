@@ -129,7 +129,11 @@ int user_free_cg(void **user)
       FREE(cnrp->feas_sol);
 #endif
 #pragma omp master
+#ifndef COMPILE_IN_CG
+#endif
+#if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined(COMPILE_IN_CG))
    FREE(cnrp->demand);
+#endif
    FREE(cnrp->edges);
    FREE(cnrp->in_set);
    FREE(cnrp->ref);

@@ -124,11 +124,11 @@ int user_free_lp(void **user)
 {
    cnrp_spec *cnrp = (cnrp_spec *)(*user);
 
-#ifndef COMPILE_IN_CG
+#if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
    FREE(cnrp->demand);
-#endif
    FREE(cnrp->costs);
    FREE(cnrp->edges);
+#endif
    FREE(cnrp->cur_sol);
    FREE(cnrp->cur_sol_tree);
    FREE(cnrp);

@@ -281,9 +281,11 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
       root->node_status = NODE_STATUS__ROOT;
    }else{
 #ifdef COMPILE_IN_TM
-      /* Again, here we can just get the data directly instead of
-	 receiving it through message passing. */
       (tm->rootnode = root)->desc = *root_desc;
+      /* Copy the root description in case it is still needed */
+      root->desc.uind.list = (int *) malloc(root_desc->uind.size*ISIZE);
+      memcpy((char *)root->desc.uind.list, (char *)root_desc->uind.list,
+	     root_desc->uind.size*ISIZE);
       root->bc_index = tm->stat.created++;
       tm->stat.tree_size++;
       insert_new_node(tm, root);

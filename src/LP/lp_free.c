@@ -225,8 +225,8 @@ void free_lp(lp_prob *p)
 #if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
    free_mip_desc(p->mip);
    FREE(p->mip);
-#endif
    FREE(p->base.userind);
+#endif
    FREE(p->best_sol.xind);
    FREE(p->best_sol.xval);
    if (p->par.branch_on_cuts){
