@@ -96,7 +96,8 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
       if (verbosity > 3)
 	 printf("Found %2d connect cuts\n", cutnum);
       if (!rval && cutnum > 0){
-	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob);
+	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob,
+				    cuts, num_cuts, alloc_cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
 	       printf("%i connect cuts added\n", cuts_added);
@@ -116,7 +117,8 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
       if (verbosity > 3)
 	 printf("Found %2d segment cuts\n", cutnum);
       if (!rval && cutnum > 0){
-	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob);
+	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob
+				    cuts, num_cuts, alloc_cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
 	       printf("%i segment cuts added\n", cuts_added);
@@ -136,7 +138,8 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
       if (verbosity > 3)
 	 printf("Found %2d fastblossom cuts\n", cutnum);
       if (!rval && cutnum > 0){
-	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob);
+	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob,
+				    cuts, num_cuts, alloc_cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
 	       printf("%i fastblossom cuts added\n", cuts_added);
@@ -156,7 +159,8 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
       if (verbosity > 3)
 	 printf("Found %2d ghfastblossom cuts\n", cutnum);
       if (!rval && cutnum > 0){
-	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob);
+	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob,
+				    cuts, num_cuts, alloc_cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
 	       printf("%i ghfastblossom cuts added\n", cuts_added);
@@ -176,7 +180,8 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
       if (verbosity > 3)
 	 printf("Found %2d block combs\n", cutnum);
       if (!rval && cutnum > 0){
-	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob);
+	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob,
+				    cuts, num_cuts, alloc_cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
 	       printf("%i block combs added\n", cuts_added);
@@ -196,7 +201,8 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
       if (verbosity > 3)
 	 printf("Found %2d grown combs\n", cutnum);
       if (!rval && cutnum > 0){
-	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob);
+	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob,
+				    cuts, num_cuts, alloc_cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
 	       printf("%i grown combs added\n", cuts_added);
@@ -216,7 +222,8 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
       if (verbosity > 3)
 	 printf("Found %2d PR cliquetrees\n", cutnum);
       if (!rval && cutnum > 0){
-	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob);
+	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob,
+				    cuts, num_cuts, alloc_cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
 	       printf("%i PR cliquetrees added\n", cuts_added);
@@ -236,7 +243,8 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
       if (verbosity > 3)
 	 printf("Found %2d exact subtours\n", cutnum);
       if (!rval && cutnum > 0){
-	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob);
+	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob,
+				    cuts, num_cuts, alloc_cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
 	       printf("%i exactsubtours added\n", cuts_added);

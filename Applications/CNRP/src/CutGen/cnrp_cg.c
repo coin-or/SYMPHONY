@@ -470,7 +470,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #ifdef DO_TSP_CUTS
    if (cnrp->par.which_tsp_cuts && prob_type == TSP){
       tsp_cuts(n, cnrp->par.verbosity, TRUE, cnrp->par.which_tsp_cuts,
-	       alloc_cuts, num_cuts, cuts);
+	       	       cuts, num_cuts, alloc_cuts);
       free_net(n);
       FREE(new_cut);
       return(USER_SUCCESS);
@@ -772,7 +772,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #ifdef DO_TSP_CUTS
    if (!cuts_found && cnrp->par.which_tsp_cuts){
       tsp_cuts(n, cnrp->par.verbosity, FALSE, cnrp->par.which_tsp_cuts,
-	       alloc_cuts, num_cuts, cuts);
+	       cuts, num_cuts, alloc_cuts);
    }
 #endif
 
