@@ -1849,6 +1849,10 @@ int set_param(sym_environment *env, char *line)
 	 cp_par->verbosity = env->par.verbosity;
       return(0);
    }
+   else if (strcmp(key, "test") == 0){
+     READ_INT_PAR(env->par.test);
+     return(0);
+   }
    else if (strcmp(key, "random_seed") == 0){
       READ_INT_PAR(env->par.random_seed);
       tm_par->random_seed = env->par.random_seed;
