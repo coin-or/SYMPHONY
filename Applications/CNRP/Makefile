@@ -23,7 +23,7 @@
 # SYMPHONY's home directory
 ##############################################################################
 
-SYMPHONYROOT = ${HOME}/SYMPHONY
+SYMPHONYROOT = ${HOME}/COIN/SYMPHONY
 
 ##############################################################################
 # The home directory of the user files (must be an absolute path)
