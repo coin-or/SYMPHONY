@@ -608,12 +608,14 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    printf("Number of Chains:               %i\n", stat->chains);
    printf("Number of Diving Halts:         %i\n", stat->diving_halts);
    printf("Number of cuts in cut pool:     %i\n", stat->cuts_in_pool);
-   if (obj_sense == SYM_MAXIMIZE){
-      printf("Upper Bound in Root:            %.3f\n",
-	     -stat->root_lb + obj_offset);
-   }else{
-      printf("Lower Bound in Root:            %.3f\n",
-	     stat->root_lb + obj_offset);
+   if(stat->root_lb > -MAXDOUBLE){
+      if (obj_sense == SYM_MAXIMIZE){
+	 printf("Upper Bound in Root:            %.3f\n",
+		-stat->root_lb + obj_offset);
+      }else{
+	 printf("Lower Bound in Root:            %.3f\n",
+		stat->root_lb + obj_offset);
+      }
    }
    if (lb > 0){
       if (obj_sense == SYM_MAXIMIZE){
