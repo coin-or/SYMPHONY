@@ -96,7 +96,7 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
 	 index++;
       }
    }
-   desc->matbeg)[varnum] = 2*varnum;
+   desc->matbeg[desc->n] = 2 * desc->n;
    
    /* set the initial right hand side */
    for (i = 0; i < prob->nnodes; i++) {

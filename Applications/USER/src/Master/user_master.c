@@ -217,50 +217,56 @@ int user_init_draw_graph(void *user, int dg_id)
 /*===========================================================================*/
 
 /*===========================================================================*\
- * This is the subroutine where the user specifies what variables are to be in
- * the base set. To begin with, a good bet is just to put all the variables in
- * the base set. In this case, this function need not be modified.
+ * This is the subroutine where the user specifies which variables are to be
+ * in the base set and which variables are to be active in the root node but
+ * not in the base set (these are called the "extra variables"). This is done
+ * by listing the indices of the corresponding variables in arrays named
+ * "basevars" and extravars below.
+ *
+ * The base set of variables form the core that is never removed from the LP
+ * relaxation. Extra variables, on the other hand, can be removed if they are
+ * fixed by reduced cost or by logic-based rules. Allowing the removal of
+ * variables from the relaxation can lead to efficiencies, but there is a
+ * price to pay in terms of extra bookkeeping. If possible, it is a good idea
+ * to form a base set of variables consisting of those that are "likely" to be
+ * present in some optimal solution. If this is not possible, the simplest
+ * approach is just to put all the variables in the extra set, which allows
+ * them all to be fixed by reduced cost if possible. This is implemented below
+ * as an example.
+ *
+ * Note that each variable must have a unique user index by which the variable
+ * can be identified later. Note also that it is possible to have variables
+ * that are neither in the base set or active in the root node by using column
+ * generation and filling out the function user_generate_column().
 \*===========================================================================*/
 
-int user_set_base(void *user, int *basevarnum, int **basevars,
-		  int *basecutnum, int *colgen_strat)
+int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
+			      int *basecutnum, int *extravarnum, int **extravars,
+			      int *colgen_strat)
 {
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
    int i;
    int *vars, varnum;
 
-   /* Set the number of variables*/
-   varnum = *basevarnum = prob->colnum;
+   /* Since we don't know how to form a good set of base variables, we'll put all
+      the variables in the extra set */
+
+   /* Set the number of extra variables*/
+   varnum = *extravarnum = prob->colnum;
  
-   /* This puts all the variable in the base set */
-   vars = *basevars = (int *) malloc(varnum * ISIZE);
+   /* Put all the variables in the extra set */
+   vars = *extravars = (int *) malloc(varnum * ISIZE);
    for (i = 0; i < varnum; i++){
      vars[i] = i;
    }
 
-   /* Set the number of rows in the base */
+   /* Set the number of rows in the initial formulation */
    *basecutnum = prob->rownum;
 
-   return(USER_NO_PP);
-}
-
-/*===========================================================================*/
-
-/*===========================================================================*\
- * This is the second step in the process, where the user specifies
- * which variables should be active in the root in addition to the base
- * set specified above. The set of extra variable would be empty if all
- * variables are in the base, as above.
-\*===========================================================================*/
-
-int user_create_root(void *user, int *extravarnum, int **extravars)
-{
-   /* This gives you access to the user data structure. */
-   user_problem *prob = (user_problem *) user;
-
-   *extravarnum = 0;
-   *extravars  = NULL;
+   /* The set of base variables will be empty */
+   *basevarnum = 0;
+   *basevars  = NULL;
 
    return(USER_NO_PP);
 }

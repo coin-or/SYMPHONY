@@ -314,8 +314,9 @@ int user_init_draw_graph(void *user, int dg_id)
  * number of them given.
 \*===========================================================================*/
 
-int user_set_base(void *user, int *basevarnum, int **basevars,
-		  int *basecutnum, int *colgen_strat)
+int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
+			      int *basecutnum, int *extravarnum, int **extravars,
+			      int *colgen_strat)
 {
    vrp_problem *vrp = (vrp_problem *)user;
    int cap_check, total_demand = 0, base_varnum = 0, v1, v0;
@@ -323,7 +324,8 @@ int user_set_base(void *user, int *basevarnum, int **basevars,
    int zero_varnum, *zero_vars;
    int vertnum = vrp->vertnum;
    int *edges;
-   
+
+   /* Form the set of base variables */
    switch(vrp->par.base_variable_selection){
     case SOME_ARE_BASE:
       if (vrp->par.add_all_edges == FALSE)
@@ -401,22 +403,8 @@ int user_set_base(void *user, int *basevarnum, int **basevars,
       }
    }
 /*___END_EXPERIMENTAL_SECTION___*/
-   
-   return(USER_NO_PP);
-}
 
-/*===========================================================================*\
- * This is the second step in the process where the user specifies
- * which variables should be active in the root in addition to the base
- * set specified above
-\*===========================================================================*/
-
-/*===========================================================================*/
-
-int user_create_root(void *user, int *extravarnum, int **extravars)
-{
-   vrp_problem *vrp = (vrp_problem *)user;
-
+   /* Form the set of extra variables */
    switch(vrp->par.base_variable_selection){
     case EVERYTHING_IS_EXTRA:
 

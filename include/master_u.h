@@ -28,9 +28,9 @@ int user_readparams PROTO((void *user, char *filename, int argc, char **argv));
 int user_io PROTO((void *user));
 int user_init_draw_graph PROTO((void *user, int dg_id));
 int user_start_heurs PROTO((void *user, double *ub, double *ub_estimate));
-int user_set_base PROTO((void *user, int *basevarnum, int **basevars,
-			 int *basecutnum, int *colgen_strat));
-int user_create_root PROTO((void *user, int *extravarnum, int **extravars));
+int user_initialize_root_node PROTO((void *user, int *basevarnum, int **basevars,
+				     int *basecutnum, int *extravarnum,
+				     int **extravars, int *colgen_strat));
 int user_receive_feasible_solution PROTO((void *user, int msgtag, double cost,
 					  int numvars, int *indices,
 					  double *values));

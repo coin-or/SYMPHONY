@@ -137,8 +137,8 @@ void io_u PROTO((problem *p));
 void init_draw_graph_u PROTO((problem *p));
 void start_heurs_u PROTO((problem *p));
 void display_solution_u PROTO((problem *p, int thread_num));
-node_desc *create_root_u PROTO((problem *p));
-base_desc *set_base_u PROTO((problem *p));
+void initialize_root_node_u PROTO((problem *p, base_desc *base,
+					 node_desc *root));
 void receive_feasible_solution_u PROTO((problem *p, int msgtag));
 void send_lp_data_u PROTO((problem *p, int sender, base_desc *base));
 void send_cg_data_u PROTO((problem *p, int sender));

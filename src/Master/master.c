@@ -199,10 +199,10 @@ int main(int argc, char **argv)
     * Have the user generate the base and root description
    \*------------------------------------------------------------------------*/
 
-   base = set_base_u(p);
-   if (!p->par.warm_start){
-      root = create_root_u(p);
-   }
+   base = (base_desc *) calloc(1, sizeof(base_desc));
+   root = (node_desc *) calloc(1, sizeof(node_desc));
+   
+   initialize_root_node_u(p, base, root);
 
 #ifndef COMPILE_IN_TM
    /*------------------------------------------------------------------------*\

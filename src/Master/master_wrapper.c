@@ -121,54 +121,41 @@ void start_heurs_u(problem *p)
 
 /*===========================================================================*/
 
-base_desc *set_base_u(problem *p)
+void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
 {
-   base_desc *base = (base_desc *) calloc(1, sizeof(base_desc));
+   /* set some defaults for root first */
 
-   switch (user_set_base(p->user, &base->varnum, &base->userind,
-			 &base->cutnum, p->par.tm_par.colgen_strat)){
+   switch (user_initialize_root_node(p->user, &base->varnum, &base->userind,
+				     &base->cutnum, &root->uind.size,
+				     &root->uind.list,
+				     p->par.tm_par.colgen_strat)){
     case ERROR:
       printf("\n\n*********User error detected -- aborting***********\n\n");
       exit(1000);
     case USER_NO_PP:
       if (base->varnum)
 	 qsortucb_i(base->userind, base->varnum);
-    case USER_AND_PP:
-    default:
-      break;
-   }
-      
-   return(base);
-}
-
-/*===========================================================================*/
-
-node_desc *create_root_u(problem *p)
-{
-   node_desc *root = (node_desc *) calloc(1, sizeof(node_desc));
-   
-   /* set some defaults for root first */
-   root->uind.type = EXPLICIT_LIST;
-   root->cutind.type = EXPLICIT_LIST;
-   root->not_fixed.type = EXPLICIT_LIST;
-   root->basis.basis_exists = FALSE;
-   root->nf_status = NF_CHECK_NOTHING;
-
-   switch (user_create_root(p->user, &root->uind.size, &root->uind.list)){
-    case ERROR:
-      printf("\n\n*********User error detected -- aborting***********\n\n");
-      exit(1000);
-    case USER_NO_PP:
-      if (root->uind.size)
+      if (root->uind.size && !p->par.warm_start)
 	 qsortucb_i(root->uind.list, root->uind.size);
     case USER_AND_PP:
     default:
       break;
    }
+
+   if (p->par.warm_start){
+      root->uind.size = 0;
+      FREE(root->uind.list);
+      return;
+   }
+   
+   root->uind.type = EXPLICIT_LIST;
+   root->cutind.type = EXPLICIT_LIST;
+   root->not_fixed.type = EXPLICIT_LIST;
+   root->basis.basis_exists = FALSE;
+   root->nf_status = NF_CHECK_NOTHING;
    root->nf_status = (p->par.tm_par.colgen_strat[0] & COLGEN__FATHOM) ?
                       NF_CHECK_ALL : NF_CHECK_NOTHING;
-      
-   return(root);
+   return;
 }
 
 /*===========================================================================*/

@@ -190,7 +190,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 int user_generate_column(void *user, int generate_what, int cutnum,
 			 cut_data **cuts, int prevind, int nextind,
 			 int *real_nextind, double *colval, int *colind,
-			 int *collen, double *obj)
+			 int *collen, double *obj, double *lb, double *ub)
 {
    switch (generate_what){
     case GENERATE_NEXTIND:
