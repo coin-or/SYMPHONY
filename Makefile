@@ -38,7 +38,7 @@
 # library. 
 ##############################################################################
 
-ARCH = CYGWIN
+ARCH = LINUX
 
 ##############################################################################
 # If you have PVM installed, this will set the variable ARCH automatically.
@@ -335,7 +335,7 @@ OPT = -O
 
 SYM_COMPILE_IN_CG = TRUE
 SYM_COMPILE_IN_CP = TRUE
-SYM_COMPILE_IN_LP = FALSE
+SYM_COMPILE_IN_LP = TRUE
 SYM_COMPILE_IN_TM = TRUE
 
 ##############################################################################
