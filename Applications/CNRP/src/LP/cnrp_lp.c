@@ -788,10 +788,8 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 #endif
 	      v0 = edges[edgeind << 1];
 	      v1 = edges[(edgeind << 1) + 1];
-	      if (coef[v0 >> DELETE_POWER] &
-		  (1 << (v0 & DELETE_AND)) &&
-		  (coef[v1 >> DELETE_POWER]) &
-		  (1 << (v1 & DELETE_AND))){
+	      if (coef[v0 >> DELETE_POWER] & (1 << (v0 & DELETE_AND)) &&
+		  (coef[v1 >> DELETE_POWER]) & (1 << (v1 & DELETE_AND))){
 		 matind[nzcnt++] = i;
 	      }
 	   }

@@ -248,7 +248,7 @@ int main(int argc, char **argv)
 	    exit(0);
 	 }
 	 pairs[numpairs].solution1 = numsolutions-2;
-	 pairs[numpairs++].solution2 = numsolutions-11;
+	 pairs[numpairs++].solution2 = numsolutions-1;
       }else{
 	 for (i = numsolutions; i > solution2; i--){
 	    solutions[i] = solutions[i-1];

@@ -358,7 +358,7 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
    int max_size, numarcs, *arcs;
    
    max_size = DSIZE + 2*ISIZE + (vertnum >> DELETE_POWER) + 1
-      + vertnum^2*ISIZE/4;
+      + vertnum*vertnum*ISIZE/4;
    new_cut->coef = (char *) (calloc(max_size, sizeof(char)));
    coef = new_cut->coef + DSIZE + 2 * ISIZE;
    arcs = (int *) (coef + (vertnum >> DELETE_POWER) + 1);
@@ -431,6 +431,7 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 		  + 1 + 2 * numarcs * ISIZE;
 	       new_cut->type = MIXED_DICUT;
 	       new_cut->rhs = set_demand* BINS(set_demand, capacity);
+	       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
 	       num_cuts += cg_send_cut(new_cut);
 	       if (num_cuts > max_num_cuts){
 		  FREE(new_cut->coef);
@@ -544,6 +545,7 @@ int greedy_shrinking6(network *n, double capacity, double etol,
 	 memset(cut_val+ begin, 0, compnodes[cur_comp] * sizeof(double));
 	 set_size = 0;
 	 set_demand = 0;
+	 set_weight = 0;
          for (i = begin; i < end; i++ ){
 	    if (compmembers[i] == 0) continue;
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
