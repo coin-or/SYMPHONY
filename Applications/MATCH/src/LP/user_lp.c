@@ -207,12 +207,11 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		     int *new_row_num, waiting_row ***new_rows)
 {
    user_problem *prob = (user_problem *) user;
-
-   int i, j, index;
-   int index1, k1, k2;
+   
+   int i, j, nzcnt;
    int *cutval;
    waiting_row **row_list;
- 
+   
    *new_row_num = cutnum;
    if (cutnum > 0)
       *new_rows =
@@ -221,28 +220,23 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
    for (j = 0; j < cutnum; j++){
       row_list[j] = (waiting_row *) malloc(sizeof(waiting_row));
       switch (cuts[j]->type){
-
-       case 1:
+	 
+      case TRIANGLE:
 	 cutval = (int *) (cuts[j]->coef);
 	 row_list[j]->cut = cuts[j];
 	 row_list[j]->matind = (int *) malloc(varnum * ISIZE);
-	 row_list[j]->matval = (double *) malloc(varnum*DSIZE);
+	 row_list[j]->matval = (double *) malloc(varnum * DSIZE);
 	 row_list[j]->nzcnt = 0;
-	 index = 0;
-	 index1 = 0;
-	 for (k1 = 0; k1 < prob->nnodes; k1++){
-	    for (k2 = k1+1; k2 < prob->nnodes; k2++){
-	       if (cutval[k1]+cutval[k2] == 1){
-		  row_list[j]->matval[index] = 1.0;
-		  row_list[j]->matind[index] = index1;
-		  (row_list[j]->nzcnt)++;
-		  index++;
-	       }
-	       index1++;
+	 for (nzcnt = 0, i = 0; i < varnum; i++){
+	    if (cutval[prob->node1[vars[i]->userind]] &&
+		cutval[prob->node2[vars[i]->userind]]){
+	       row_list[j]->matval[nzcnt] = 1.0;
+	       row_list[j]->matind[nzcnt++] = vars[i]->userind;
 	    }
 	 }
-	 
+	 row_list[j]->nzcnt = nzcnt;
 	 break;
+
        default:
 	 printf("Unrecognized cut type!\n");
       }

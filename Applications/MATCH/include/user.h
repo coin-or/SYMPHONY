@@ -15,6 +15,10 @@
 #ifndef _USER_H
 #define _USER_H
 
+/* Cut types */
+
+#define TRIANGLE 1
+
 /*---------------------------------------------------------------------------*\
  * Use this data structure to store the value of any run-time parameters.
 \*---------------------------------------------------------------------------*/

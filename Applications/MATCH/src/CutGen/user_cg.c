@@ -77,19 +77,17 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #endif
 {
    user_problem *prob = (user_problem *) user;
-   double edge_val[200][200];
+   double edge_val[200][200]; /* Matrix of edge values */
    int i, j, k, index;
    int *cuts;
    cut_data cut;
    
    *cutnum = 0;
 
-   cuts = malloc(prob->nnodes*ISIZE);
-   for (i = 0; i < prob->nnodes; i++) {
-      for (j = 0; j < prob->nnodes; j++){
-	 edge_val[i][j] = 0.0;
-      }
-   }
+   cuts = malloc(prob->nnodes * ISIZE);
+
+   /* Allocate the edge_val matrix to zero (we could also just calloc it) */
+   memset(edge_val, 0, 200*200*ISIZE);
    
    for (index = 0; index < varnum; index++) {
       edge_val[prob->node1[indices[index]]][prob->node2[indices[index]]] 
@@ -99,9 +97,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       for (j = i+1; j < prob->nnodes; j++){
 	 for (k = j+1; k < prob->nnodes; k++) {
 	    if (edge_val[i][j]+edge_val[j][k]+edge_val[i][k] > 1.0 + etol) {
-	       for (index = 0; index < prob->nnodes; index++) {
-		  cuts[index] = 0;
-	       }
+	       memset(cuts, 0, prob->nnodes * ISIZE);
 	       cuts[i] = 1; 
 	       cuts[j] = 1;
 	       cuts[k] = 1;
@@ -109,8 +105,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	       cut.coef = (char *) cuts;
 	       cut.rhs = 1.0;
 	       cut.range = 0.0;
-	       cut.type = 1;
-	       cut.sense = 'G';
+	       cut.type = TRIANGLE;
+	       cut.sense = 'L';
 	       cut.deletable = TRUE;
 	       cut.branch = ALLOWED_TO_BRANCH_ON;
 	       cg_send_cut(&cut);
@@ -121,6 +117,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       }
    }
    
+   FREE(cuts);
+
    return(USER_NO_PP);
 
 }
