@@ -62,7 +62,9 @@ typedef struct CNRP_PARAMS{
 #ifdef MULTI_CRITERIA
    double        binary_search_tolerance;
    double        compare_solution_tolerance;
-#endif
+#endif   
+   int           test;
+   char          test_dir[MAX_FILE_NAME_LENGTH +1];  /* Test files directory */
 }cnrp_params;
 
 /*---------------------------------------------------------------------------*\

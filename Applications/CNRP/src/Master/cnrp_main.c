@@ -33,6 +33,8 @@
 
 void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp);
 
+int cnrp_test(sym_environment *env);
+
 /*===========================================================================*\
  * This is main() for the CNRP application
 \*===========================================================================*/
@@ -58,85 +60,92 @@ int main(int argc, char **argv)
    sym_get_str_param(env, "param_file", &pf);
    cnrp_readparams(cnrp, pf, argc, argv);
    cnrp->par.base_variable_selection = SOME_ARE_BASE;
-
+   
    sym_set_dbl_param(env, "granularity", .999999);
-		     
-   /* Read in the data */
-   cnrp_io(cnrp, cnrp->par.infile);
-
-   /* Read in a sparse graph representation of the network from a file */
-   if (cnrp->par.use_small_graph == LOAD_SMALL_GRAPH){
-      read_small_graph(cnrp);
-   }
-
-   if (!cnrp->numroutes && cnrp->par.prob_type == VRP){
-      printf("\nError: Number of trucks not specified or computed "
-	     "for VRP\n\n");
-      exit(1);
-   }
    
-   if (cnrp->numroutes > 1){
-      printf("NUMBER OF TRUCKS: \t%i\n", cnrp->numroutes);
-      printf("TIGHTNESS: \t\t%.2f\n",
-	     cnrp->demand[0]/(cnrp->capacity*(double)cnrp->numroutes));
-   }
-   
-   /* Select the cheapest edges adjacent to each node for the base set */
-   if (cnrp->par.use_small_graph == SAVE_SMALL_GRAPH){
-      if (!cnrp->g) make_small_graph(cnrp, 0);
-      save_small_graph(cnrp);
-   }else if (!cnrp->g){
-      make_small_graph(cnrp, 0);
-   }
-
-   /* Check the a priori upper bound and set it if needed */
-   sym_get_primal_bound(env, &ub);
-
-   printf("ub is: %f", ub);
-   if (ub < SYM_INFINITY){
-      cnrp->cur_tour->cost = (int) ub;
-   }else{
-      cnrp->cur_tour->cost = MAXINT;
-   }
-   cnrp->cur_tour->numroutes = cnrp->numroutes;
-   
-   if (cnrp->par.use_small_graph == LOAD_SMALL_GRAPH){
-      if (ub == SYM_INFINITY && cnrp->cur_tour->cost > 0){
+   if(cnrp->par.test){
+     
+     cnrp_test(env);
+     
+   } else {
+     
+     /* Read in the data */
+     cnrp_io(cnrp, cnrp->par.infile);
+     
+     /* Read in a sparse graph representation of the network from a file */
+     if (cnrp->par.use_small_graph == LOAD_SMALL_GRAPH){
+       read_small_graph(cnrp);
+     }
+     
+     if (!cnrp->numroutes && cnrp->par.prob_type == VRP){
+       printf("\nError: Number of trucks not specified or computed "
+	      "for VRP\n\n");
+       exit(1);
+     }
+     
+     if (cnrp->numroutes > 1){
+       printf("NUMBER OF TRUCKS: \t%i\n", cnrp->numroutes);
+       printf("TIGHTNESS: \t\t%.2f\n",
+	      cnrp->demand[0]/(cnrp->capacity*(double)cnrp->numroutes));
+     }
+     
+     /* Select the cheapest edges adjacent to each node for the base set */
+     if (cnrp->par.use_small_graph == SAVE_SMALL_GRAPH){
+       if (!cnrp->g) make_small_graph(cnrp, 0);
+       save_small_graph(cnrp);
+     }else if (!cnrp->g){
+       make_small_graph(cnrp, 0);
+     }
+     
+     /* Check the a priori upper bound and set it if needed */
+     sym_get_primal_bound(env, &ub);
+     
+     printf("ub is: %f", ub);
+     if (ub < SYM_INFINITY){
+       cnrp->cur_tour->cost = (int) ub;
+     }else{
+       cnrp->cur_tour->cost = MAXINT;
+     }
+     cnrp->cur_tour->numroutes = cnrp->numroutes;
+     
+     if (cnrp->par.use_small_graph == LOAD_SMALL_GRAPH){
+       if (ub == SYM_INFINITY && cnrp->cur_tour->cost > 0){
 	 ub = sym_set_primal_bound(env, cnrp->cur_tour->cost);
-      }
-      cnrp->numroutes = cnrp->cur_tour->numroutes;
-   }
-
+       }
+       cnrp->numroutes = cnrp->cur_tour->numroutes;
+     }
+     
 #if 0
-   if(cnrp->par.prob_type == BPP)
-      sym_set_primal_bound(env, 1);
+     if(cnrp->par.prob_type == BPP)
+       sym_set_primal_bound(env, 1);
 #endif
-   
-   if (ub < SYM_INFINITY && !(cnrp->par.prob_type == BPP)){
-      printf("INITIAL UPPER BOUND: \t%i\n\n", (int)(ub));
-   }else if (!(cnrp->par.prob_type == BPP)){
-      printf("INITIAL UPPER BOUND: \tNone\n\n");
-   }else{
-      printf("\n\n");
-   }
-
-   /* Create the variable set and decide which variables are in the base set */
-   cnrp_create_variables(cnrp);
-   
-   /* Construct the problem instance and load it into SYMPHONY */
-   cnrp_load_problem(env, cnrp);
-
-   /* Solve the problem */ 
-
+     
+     if (ub < SYM_INFINITY && !(cnrp->par.prob_type == BPP)){
+       printf("INITIAL UPPER BOUND: \t%i\n\n", (int)(ub));
+     }else if (!(cnrp->par.prob_type == BPP)){
+       printf("INITIAL UPPER BOUND: \tNone\n\n");
+     }else{
+       printf("\n\n");
+     }
+     
+     /* Create the variable set and decide which variables are in the base set */
+     cnrp_create_variables(cnrp);
+     
+     /* Construct the problem instance and load it into SYMPHONY */
+     cnrp_load_problem(env, cnrp);
+     
+     /* Solve the problem */ 
+     
 #ifdef MULTI_CRITERIA
-   sym_mc_solve(env);
+     sym_mc_solve(env);
 #else
-   sym_solve(env);
+     sym_solve(env);
 #endif
-   
+   } 
+
    /* Close the SYMPHONY environment */
    sym_close_environment(env);
-
+   
    return(0);
 }
 
@@ -441,3 +450,120 @@ void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp)
 #endif   
 }      
 
+/*===========================================================================*\
+\*===========================================================================*/
+
+int cnrp_test(sym_environment *env)
+{
+
+   int termcode, i, file_num = 34;
+   char input_files[34][MAX_FILE_NAME_LENGTH +1] = {"A/A-n34-k5.vrp",
+						   "A/A-n32-k5.vrp",
+						   "A/A-n33-k5.vrp",
+						   "E/E-n13-k4.vrp",
+						   "E/E-n22-k4.vrp",
+						   "E/E-n23-k3.vrp",
+						   "E/E-n30-k3.vrp",
+						   "E/E-n33-k4.vrp",
+						   "V/att-n48-k4.vrp",
+						   "E/E-n51-k5.vrp",
+						   "A/A-n33-k6.vrp",
+						   "A/A-n36-k5.vrp",
+						   "A/A-n37-k5.vrp",
+						   "A/A-n38-k5.vrp",
+						   "A/A-n39-k5.vrp",
+						   "A/A-n39-k6.vrp",
+						   "A/A-n45-k6.vrp",
+						   "A/A-n46-k7.vrp",
+						   "B/B-n31-k5.vrp",
+						   "B/B-n34-k5.vrp",
+						   "B/B-n35-k5.vrp",
+						   "B/B-n38-k6.vrp",
+						   "B/B-n39-k5.vrp",
+						   "B/B-n41-k6.vrp",
+						   "B/B-n43-k6.vrp",
+						   "B/B-n44-k7.vrp",
+						   "B/B-n45-k5.vrp",
+						   "B/B-n50-k7.vrp",
+						   "B/B-n51-k7.vrp",
+						   "B/B-n52-k7.vrp",
+						   "B/B-n56-k7.vrp",
+						   "B/B-n64-k9.vrp",
+						   "A/A-n48-k7.vrp",
+						   "A/A-n53-k7.vrp"};   
+
+   double sol[34] = {403, 403, 403,403, 403, 403, 403, 403, 403, 403, 403,
+		     403, 403, 403, 403, 403, 403, 403, 403, 403, 403,
+		     403, 403, 403, 403, 403, 403, 403, 403, 403, 403,
+		     403, 403, 403};
+   
+   char *input_dir = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
+   char *infile = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
+   double *obj_val = (double *)calloc(DSIZE,file_num);
+   double tol = 1e-06, ub;
+   cnrp_problem *cnrp = (cnrp_problem *) env->user;
+ 
+   if (strcmp(cnrp->par.test_dir, "") == 0){ 
+     strcpy(input_dir, "../../../VRPLIB");
+   } else{
+     strcpy(input_dir, cnrp->par.test_dir);
+   }
+  
+   sym_set_int_param(env, "verbosity", -10);
+
+   for(i = 0; i<file_num; i++){
+
+     strcpy(infile, "");
+     sprintf(infile, "%s%s%s", input_dir, "/", input_files[i]);
+     
+     cnrp_io(cnrp, infile);
+     
+     if (!cnrp->g){
+       make_small_graph(cnrp, 0);
+     }
+     sym_get_primal_bound(env, &ub);
+     
+     if (ub < SYM_INFINITY){
+       cnrp->cur_tour->cost = (int) ub;
+     }else{
+       cnrp->cur_tour->cost = MAXINT;
+     }
+     cnrp->cur_tour->numroutes = cnrp->numroutes;
+     
+     cnrp_create_variables(cnrp);
+     
+     cnrp_load_problem(env, cnrp);
+     
+     printf("Solving %s...\n", input_files[i]); 
+     
+     sym_solve(env);
+     
+     sym_get_obj_val(env, &obj_val[i]);
+     
+     if((obj_val[i] < sol[i] + tol) && 
+	(obj_val[i] > sol[i] - tol)){
+       printf("Success!\n");
+     } else {
+       printf("Failure!(%f, %f) \n", obj_val[i], sol[i]);
+     }
+     
+     if(env->mip->n && i + 1 < file_num ){
+       free_master_u(env);
+       strcpy(env->par.infile, "");
+       
+       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+       cnrp_problem *cnrp = (cnrp_problem *) calloc(1, sizeof(cnrp_problem));
+       env->user = (void *) cnrp;
+       cnrp_readparams(cnrp, NULL, 0, NULL);
+       cnrp->par.prob_type = cnrp->cg_par.prob_type = 
+	 cnrp->lp_par.prob_type = CTP;
+       cnrp->par.base_variable_selection = SOME_ARE_BASE;
+     }
+   }
+   
+   FREE(input_dir);
+   FREE(infile);
+   FREE(obj_val);
+   
+   return (0);  
+}

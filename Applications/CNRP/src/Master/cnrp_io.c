@@ -1000,7 +1000,7 @@ EXIT:
 	 sscanf(argv[++i], "%lf", &par->binary_search_tolerance);
 	 break;
 #endif
-       case 'T':
+       case 'P':
 	 i++;
 	 if (strcmp("VRP", argv[i]) == 0){
 	    par->prob_type = cg_par->prob_type = 
@@ -1025,6 +1025,15 @@ EXIT:
 
        case 'C':
 	 sscanf(argv[++i], "%f", &cnrp->capacity);
+	 break;
+       case 'T':
+	 par->test = TRUE;
+	 if(i+1 < argc){
+	   sscanf(argv[i+1], "%c", &tmp);
+	   if(tmp != '-'){
+	     strncpy(par->test_dir, argv[++i],MAX_FILE_NAME_LENGTH);
+	   }
+	 }
 	 break;
       };
    }
