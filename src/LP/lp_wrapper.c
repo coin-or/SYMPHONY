@@ -302,7 +302,7 @@ int create_subproblem_u(lp_prob *p)
 						 p->mip->obj2[userind[i]]);
 	 lp_data->mip->matval[j] = p->par.gamma * p->mip->obj[userind[i]];
 	 lp_data->mip->matind[j++] = bcutnum - 2;
-	 lp_data->mip->matval[j] = p->par.tau * p->mip->obj[userind[i]];
+	 lp_data->mip->matval[j] = p->par.tau * p->mip->obj2[userind[i]];
 	 lp_data->mip->matind[j++] = bcutnum - 1;
 #else
 	 lp_data->mip->obj[i]        = p->par.gamma * p->mip->obj[userind[i]] +
