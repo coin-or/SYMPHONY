@@ -192,7 +192,10 @@ solver, the user simply has to type "make" in the SYMPHONY-5.0 subdirectory.
 This will first make the SYMPHONY library (sequential version) in the
 SYMPHONY-5.0/lib.$(ARCH)/$(LP_ SOLVER)/libsym.so (or 'libsym.a' if library
 type is set to be static) where ARCH is the current architecture and LP_SOLVER
-is the current LP solver, as specified in the makefile. This library, together
+is the current LP solver, as specified in the makefile. In addition, in order 
+to have the flexibility in using different LP solvers, a symbolic link to the 
+latest created callable library with the same name (libsym.so or libsym.a) 
+will be created in the SYMPHONY-5.0/lib subdirectory. This library, together
 with the header files in the subdirectory SYMPHONY-5.0/include, can then be 
 used to call SYMPHONY from any C code. The API for this is described in the 
 user's manual. After compiling the SYMPHONY library, the default main() 
@@ -562,6 +565,10 @@ MATCH (matching): Tested, but not very extensively.
 MPP (mixed postman problem): Tested, but not very extensively.
 
 VRP (vehicle routing problem): Well tested.
+
+CNRP (capacitates network routing problem): Well tested.
+
+MCKP (multi criteria knapsack problem): Well tested.
 
 SPP (set partitioning problem): Tested, but not very extensively.
 
