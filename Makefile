@@ -283,7 +283,7 @@ endif
 ##############################################################################
 ##############################################################################
 
-CC = g++
+CC = /usr/local/bin/g++
 
 ##############################################################################
 # Set the optimization level
@@ -1131,20 +1131,30 @@ DEPENDANTS = $(USER_MASTER_DEP)
 OBJECTS = $(USER_MASTER_OBJS) $(MAIN_OBJ) 
 
 LIBNAME = sym$(MASTEREXT)
-ifneq ($(USE_SYM_APPL),TRUE)
+ifeq ($(SYM_COMPILE_IN_CG),TRUE)
+ifeq ($(SYM_COMPILE_IN_CP),TRUE)
+ifeq ($(SYM_COMPILE_IN_LP),TRUE)
+ifeq ($(SYM_COMPILE_IN_TM),TRUE)
+ifeq ($(USE_SYM_APPL),TRUE)
+LIBNAME = sym_app
+else
+LIBNAME = sym
+endif
+endif
+endif
+endif
+endif
+
+SYMLIBDIR  = $(SYMBUILDDIR)/lib
 ifeq ($(LIBTYPE),SHARED)
 LIBNAME_TYPE      = $(addsuffix .so, $(addprefix lib, $(LIBNAME)))
 LD = $(CC) $(OPT) 
 LIBLDFLAGS = -shared -Wl,-soname,$(LIBNAME_TYPE) -o
 MAKELIB        = 
-endif
-LIBNAME_TYPE   = $(addsuffix .a, $(addprefix lib, $(LIBNAME)))
-SYMLIBDIR  = $(SYMBUILDDIR)/lib
-MKSYMLIBDIR    = mkdir -p $(SYMLIBDIR)
-LN_S = ln -fs $(LIBDIR)/$(LIBNAME_TYPE) $(SYMLIBDIR)
 else
 LIBNAME_TYPE   = $(addsuffix .a, $(addprefix lib, $(LIBNAME)))
-MAKELIB        = $(RANLIB) $(LIBDIR)/$(LIBNAME_TYPE)
+MKSYMLIBDIR    = mkdir -p $(SYMLIBDIR)
+LN_S = ln -fs $(LIBDIR)/$(LIBNAME_TYPE) $(SYMLIBDIR)
 endif
 
 master : $(BINDIR)/$(MASTERNAME)
