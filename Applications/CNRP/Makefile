@@ -3,7 +3,7 @@
 #                                                                            #
 # This file is part of a demonstration application for use with the          #
 # SYMPHONY Branch, Cut, and Price Library. This application is a solver for  #
-# the Vehicle Routing Problem and the Traveling Salesman Problem.            #
+# Capacitated Network Routing Problems.                                      #
 #                                                                            #
 # (c) Copyright 2000-2003  Ted Ralphs. All Rights Reserved.                  #
 #                                                                            #
@@ -60,12 +60,50 @@ USE_OSI_INTERFACE = TRUE
 # Other variables to be set by the user
 ##############################################################################
 
+##############################################################################
+#Whether to solve problem as a multi-criteria (fixed vs. variable cost)
+#or single-criteria problem
+##############################################################################
+
 MULTI_CRITERIA = TRUE
+
+##############################################################################
+#Whether to use cuts from the CONCORDE TSP solver that are valid for this model
+##############################################################################
+
 DO_CONCORDE_CUTS = FALSE
+
+##############################################################################
+#Whether to use the model with two oppositely oriented copies of each 
+#fixed-chrage variable (one for each direction) or just a single undirected 
+#copy. 
+##############################################################################
+
 DIRECTED_X_VARS = TRUE
+
+##############################################################################
+#Whether to add the flow variables (these are needed to model the variable costs)
+##############################################################################
+
 ADD_FLOW_VARS = TRUE
+
+##############################################################################
+#Whether to add capacity cuts to the model 
+##############################################################################
+
 ADD_CAP_CUTS = FALSE
+
+##############################################################################
+#Whether to add "X" cuts to the model 
+##############################################################################
+
 ADD_X_CUTS = FALSE
+
+##############################################################################
+#Whether to save the global cut pool between iterations when using warm 
+#starting 
+##############################################################################
+
 SAVE_CUT_POOL = TRUE
 
 ifeq ($(MULTI_CRITERIA),TRUE)

@@ -183,8 +183,9 @@ built-in parsers (as is typically done in other callable libraries), then the
 \returns
 
 \bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_io()},
-{\tt user\_init\_draw()} functions.\\
+{\tt ERROR\_\_USER} & Error. User error detected in one of \\
+&{\tt user\_io()}, \\
+&{\tt user\_init\_draw()} functions.\\
 {\tt ERROR\_\_READING\_GMPL\_FILE} & Error. Error detected in the given 
 GMPL/AMPL file. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
@@ -249,9 +250,9 @@ them.\\
 
 \returns
 
-\bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in 
-{user\_initialize\_root\_node} function. \\
+\bt{lp{280pt}}
+{\tt ERROR\_\_USER} & Error. User error detected in \\
+& {\tt user\_initialize\_root\_node} function. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully. \\
 \et
@@ -284,12 +285,14 @@ before will be deleted from the environment!
 
 \returns
 
-\bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt
-user\_send\_lp\_data()}, {\tt user\_send\_cg\_data()}, {\tt
-user\_send\_cp\_data()}, {\tt user\_receive\_feasible\_solution()}, 
-{\tt user\_display\_solution()}, 
-{\tt user\_process\_own\_messages()} functions. \\ 
+\bt{lp{250pt}}
+{\tt ERROR\_\_USER} & Error. User error detected in one of \\
+&{\tt user\_send\_lp\_data()}, \\
+&{\tt user\_send\_cg\_data()}, \\
+&{\tt user\_send\_cp\_data()}, \\ 
+&{\tt user\_receive\_feasible\_solution()}, \\
+&{\tt user\_display\_solution()}, \\
+&{\tt user\_process\_own\_messages()} functions. \\ 
 {\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & Tree Manager (TM) found the optimal solution and stopped.\\ 
 {\tt TM\_TIME\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
 time limit.\\
@@ -340,11 +343,14 @@ during the solve procedure.
 
 \returns
 
-\bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_send\_
-lp\_data}, {\tt user\_send\_cg\_data}, {\tt user\_send\_cp\_data}, 
-{\tt user\_receive\_feasible\_solution}, {\tt user\_display\_solution}, 
-{\tt user\_process\_own\_messages} functions. \\ 
+\bt{lp{250pt}}
+{\tt ERROR\_\_USER} & Error. User error detected in one of \\
+&{\tt user\_send\_lp\_data}, \\
+&{\tt user\_send\_cg\_data}, \\
+&{\tt user\_send\_cp\_data}, \\
+&{\tt user\_receive\_feasible\_solution}, \\
+&{\tt user\_display\_solution}, \\
+&{\tt user\_process\_own\_messages} functions. \\ 
 {\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & Tree Manager (TM) found the optimal 
 solution and stopped.\\ 
 {\tt TM\_TIME\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
@@ -395,13 +401,15 @@ the {\tt sym\_set\_obj2\_coeff()} function or by passing it directly using the
 
 \returns
 
-\bt{lp{317pt}}
+\bt{lp{250pt}}
 {\tt } 
-{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt
-user\_send\_lp\_data()}, {\tt user\_send\_cg\_data()}, 
-{\tt user\_send\_cp\_data()}, 
-{\tt user\_receive\_feasible\_solution()}, {\tt user\_display\_solution()}, 
-{\tt user\_process\_own\_messages()} functions. \\ 
+{\tt ERROR\_\_USER} & Error. User error detected in one of \\
+&{\tt user\_send\_lp\_data()}, \\
+&{\tt user\_send\_cg\_data()}, \\
+&{\tt user\_send\_cp\_data()}, \\
+&{\tt user\_receive\_feasible\_solution()}, \\
+&{\tt user\_display\_solution()}, \\
+&{\tt user\_process\_own\_messages()} functions. \\ 
 {\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & The set of supported or nondominated 
 solutions have been found. \\
 {\tt TM\_ERROR\_\_NO\_BRANCHING\_CANDIDATE} & Error. TM stopped. User didn't 
@@ -517,7 +525,7 @@ This routine closes the environment and returns the allocated memory.
 
 \returns
 
-\bt{lp{317pt}}
+\bt{lp{270pt}}
 {\tt ERROR\_\_USER} & Error. User error detected in {\tt user\_free\_master()} 
 function.\\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
@@ -754,10 +762,14 @@ status of the solution procedure.
 
 \returns
 
-\bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_send\_lp\_data()}, {\tt user\_send\_cg\_data()}, {\tt user\_send\_cp\_data()}, 
-{\tt user\_receive\_feasible\_solution()}, {\tt user\_display\_solution()}, 
-{\tt user\_process\_own\_messages()} functions. \\ 
+\bt{lp{250pt}}
+{\tt ERROR\_\_USER} & Error. User error detected in one of \\
+&{\tt user\_send\_lp\_data()}, \\
+&{\tt user\_send\_cg\_data()}, \\
+&{\tt user\_send\_cp\_data()}, \\
+&{\tt user\_receive\_feasible\_solution()}, \\
+&{\tt user\_display\_solution()}, \\
+&{\tt user\_process\_own\_messages()} functions. \\ 
 {\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & Tree Manager (TM) found the optimal solution and stopped.\\ 
 {\tt TM\_TIME\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
 time limit.\\
@@ -838,36 +850,6 @@ was proven to be infeasible.
 \bt{lp{317pt}}
 {\tt TRUE} & The problem was proven to be infeasible. \\
 {\tt FALSE} & The problem was not proven to be infeasible.\\
-\et
-\ed
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_is_primal_objective_limit_reached
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_is\_primal\_objective\_limit\_reached}
-\begin{verbatim}
-int sym_is_primal_objective_limit_reached(sym_environment *env)
-\end{verbatim}
-
-\bd
-\describe
-
-This post-solution query routine is used to learn whether the target gap was
-reached. 
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{\tt TRUE} & The goal was achieved. \\
-{\tt FALSE} & The goal was not achieved.\\
 \et
 \ed
 \vspace{1ex}
@@ -1025,7 +1007,7 @@ This routine is used to copy the problem description loaded to the environment.
 \returns
 
 \bt{lp{317pt}}
-{tt NULL} & An empty environment is passed in or there is no problem
+{\tt NULL} & An empty environment is passed in or there is no problem
 description loaded to the environment. \\
 {\tt MIPdesc *} & Pointer to the copy of the problem description. \\
 \et  
@@ -1037,7 +1019,7 @@ description loaded to the environment. \\
 % sym_get_num_cols
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\firstfuncdef{sym\_get\_num\_cols}
+\functiondef{sym\_get\_num\_cols}
 \begin{verbatim}
 int sym_get_num_cols(sym_environment *env, int *numcols)
 \end{verbatim}
@@ -2212,7 +2194,7 @@ values of the non zero elements of the column and having a size of at least
 {\tt double colub} & IN & A double indicating the upper bound of the column.\\
 {\tt double obj} & IN & A double indicating the objective coefficient value
 of the column. \\
-{\tt char *name} Pointer to a string of the name of the column.  
+{\tt char *name} & IN & Pointer to a string of the name of the column.  
 \et
 
 \returns
@@ -2299,8 +2281,9 @@ at least {\tt num}.
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or one 
-of the {\tt indices} is out of the range of [0, number of variables-1] \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or 
+one of the {\tt indices} \\
+&is out of the range of [0, number of variables-1] \\
 \et  
 \ed
 \vspace{1ex}
@@ -2333,7 +2316,8 @@ be deleted and having a size of at least {\tt num}.
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or
-one of the {\tt indices} is out of the range of [0, number of variables-1] \\
+one of the \\
+&{\tt indices} is out of the range of [0, number of variables-1] \\
 \et  
 \ed
 \vspace{1ex}
@@ -2825,7 +2809,7 @@ isProvenOptimal & sym\_is\_proven\_optimal &
 query the problem status. \\ \hline \hline
 isProvenPrimalInfeasible & sym\_is\_proven\_primal\_infeasible & 
 query the problem status. \\ \hline \hline
-isPrimalObjectiveLimitReached & sym\_is\_primal\_objective\_limit\_reached & 
+isPrimalObjectiveLimitReached & sym\_is\_target\_gap\_achieved & 
 query the problem status. \\ \hline \hline
 isIterationLimitReached & sym\_is\_iteration\_limit\_reached & 
 query the problem status. \\ \hline \hline

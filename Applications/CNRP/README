@@ -2,8 +2,21 @@
 *                    SYMPHONY CNRP Application                               * 
 ******************************************************************************
 
-The SYMPHONY CNRP application is a solver for the standard Capacitated Node
-Routing Problems.
+The SYMPHONY CNRP application is a solver for Capacitated Node
+Routing Problems as described in the following technical report:
+
+T.K.R., M.J. Saltzman, and M.M. Wiecek, An Improved Algorithm for Biobjective
+Integer Programming and Its Application to Network Routing Problems, Lehigh
+University Industrial and Systems Engineering Technical Report 04T-004,
+available for download from
+
+http://www.lehigh.edu/~tkr2/research/papers/BICRIT.pdf.
+
+The CNRP application takes advantage of SYMPHONY's ability to solve bicriteria
+optimization problems and can analyze the tradeoff between fixed and variable
+cost in a class of network routing applications that include variants of the
+Traveling Salesman Problem, Vehicle Routing Problem, Capacitated Minimum
+Spanning Tree Problem, and Cable Trench Problem.
 
 *******************************************************************************
 *              COMPILING THE SYMPHONY CNRP APPLICATION (Unix)                 *

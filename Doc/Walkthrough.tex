@@ -37,26 +37,27 @@
 
 \begin{document}
 
-\title{Simple Walkthrough for Using SYMPHONY}
-\author{Michael Trick\thanks{Graduate School of Industrial Administration,
-Carnegie Mellon University, Pittsburgh, PA 15213 \texttt{trick@cmu.edu}, 
-\texttt{http://mat.gsia.cmu.edu/trick}}}
+\title{Simple Walkthrough for Using SYMPHONY} \author{Michael
+Trick\thanks{Graduate School of Industrial Administration, Carnegie Mellon
+University, Pittsburgh, PA 15213 \texttt{trick@cmu.edu},
+\texttt{http://mat.gsia.cmu.edu/trick}} and Menal Guzelsoy\thanks{Department
+of Industrial and Systems Engineering, Lehigh University, Bethlehem, PA 18017,
+{\tt megb@lehigh.edu}}
 
 \date{June 24, 2003}
 \maketitle
 \thispagestyle{empty}
 
-SYMPHONY is a callable library including a set of user callback routines to 
-allow to solve generic MIP problems and the easy creation of a branch-cut-price 
-code using a third party solver for the LP subproblems. Having been fully 
-integrated with COIN, SYMPHONY is capable to use CPLEX, OSL, CLP, GLPK, DYLP, 
-SOPLEX, VOL and XPRESS-MP through the COIN-OSI interface (first two can also be 
-used through the built-in APIs without using COIN-OSI). The SYMPHONY system 
-includes numerous applications: Vehicle Routing Problem (VRP), Capacitated 
-Node Routing Problem (CNRP), Multi-Criteria Knapsack Problem (MCKP), Mixed 
-Postman Problem (MPP), Set Partitioning Problems (SPP-basic and advanced). 
-These applications are extremely well done, but, in generality, are difficult 
-to understand.
+SYMPHONY is a callable library including a set of user callback routines to
+allow it to solve generic MIPs, as well as easily create custom
+branch-cut-price solvers. Having been fully integrated with COIN, SYMPHONY is
+capable to use CPLEX, OSL, CLP, GLPK, DYLP, SOPLEX, VOL and XPRESS-MP through
+the COIN/OSI interface (first two can also be used through the built-in APIs
+without using COIN/OSI). The SYMPHONY system includes numerous applications:
+Vehicle Routing Problem (VRP), Capacitated Node Routing Problem (CNRP),
+Multi-Criteria Knapsack Problem (MCKP), Mixed Postman Problem (MPP), Set
+Partitioning Problems (SPP-basic and advanced).  These applications are
+extremely well done, but, in generality, are difficult to understand.
 
 Here is a walkthrough for a very simple application that uses SYMPHONY. Rather
 than presenting the code in its final version, I will go through the steps 
@@ -97,18 +98,17 @@ int match_read_data PROTO((sym_environment *env, void *user, char *infile));
 int match_load_problem PROTO((sym_environment *env, void *user));
 \end{verbatim}
 
-Next, read in the data. We could easily use the \texttt{user\_io()} 
-user-callback for this (see this routine in \texttt{user\_master.c} 
-for an illustration) however, in order to guide how it can be done 
-explicitly, we will define our own function
-\texttt{match\_read\_data()} in \texttt{user\_main.c} to fill in the 
-user data structure and then use \texttt{sym\_set\_user\_data()} to pass 
-this structure to SYMPHONY. The template already has a lot of 
-flags set up. The ``-F'' flag defines the data file, so we will use that to 
-put in the data. The datafile contains first the number of nodes in the 
-graph (\texttt{nnodes}) followed by the pairwise cost matrix (nnode by nnode). 
-Read this in with the \texttt{match\_read\_data()} routine in 
-\texttt{user\_main.c}:
+Next, read in the data. We could easily use the \texttt{user\_io()}
+user-callback for this (see this routine in \texttt{user\_master.c} for an
+illustration). However, in order to show how it can be done explicitly, we
+will define our own function \texttt{match\_read\_data()} in
+\texttt{user\_main.c} to fill in the user data structure and then use
+\texttt{sym\_set\_user\_data()} to pass this structure to SYMPHONY. The
+template already has command-line options set up for the user. The ``-F'' flag
+defines the data file, so we will use that to put in the data. The datafile
+contains first the number of nodes in the graph (\texttt{nnodes}) followed by
+the pairwise cost matrix (nnode by nnode).  Read this in with the
+\texttt{match\_read\_data()} routine in \texttt{user\_main.c}:
 
 \begin{verbatim}
 int match_read_data(sym_environment *env, void *user, char *infile)
@@ -147,7 +147,7 @@ to $i$ in the matching.
 We define the IP in our other helper function 
 \texttt{match\_load\_problem()} in \texttt{user\_main.c}. In the 
 first part of this routine, we will represent the IP with a set of arrays, 
-and then in the second part, will load this represantation to SYMPHONY through 
+and then in the second part, will load this representation to SYMPHONY through 
 \texttt{sym\_explicit\_load\_problem()}. Note that, we could also create the 
 same IP model in \texttt{user\_create\_subproblem()} callback (see 
 this routine in \texttt{user\_lp.c} for an illustration).
@@ -222,7 +222,7 @@ int match_load_problem(sym_environment *env, void *user){
 \end{verbatim}
 
 Now, we are ready to gather everything in the \texttt{main()} routine in 
-\texttt{user\_main()}. This will involve to create a SYMPHONY envrionment and 
+\texttt{user\_main()}. This will involve to create a SYMPHONY environment and 
 a user data structure, read in the data, create the corresponding IP, 
 load it to the environment and ask SYMPHONY to solve it 
 (\texttt{CALL\_FUNCTION} is just a macro to take care of the return values):  

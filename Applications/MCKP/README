@@ -3,9 +3,10 @@
 ******************************************************************************
 
 The SYMPHONY MCKP application solves the multi-criteria knapsack problem. This
-application is intended as an illustration of how to use the multi criteria 
-solver of SYMPHONY. For a more sophisticated instance, please download the 
-SYMPHONY CNRP application
+application is intended as a basic illustration of how to use the
+multicriteria solver of SYMPHONY. For another solver that uses the
+multicriteria capability in a more sophisticated fashion, please download the
+SYMPHONY CNRP application.
 
 ******************************************************************************
 *              COMPILING THE SYMPHONY MCKP APPLICATION (Unix)               *
@@ -93,16 +94,19 @@ Windows. Let me know if you are interested.
 *                      USING THE SOLVER                                       *
 *******************************************************************************
 
-To execute the MCKP application, just specify the location of the data file
-by typing "-F 'filename' -T 'format'" as an argument after the executable 
-name. The last argument is the file format and there are three different 
-formats that the parser can read. There is a sample file called "sample.mckp" 
-that you can try to make sure the solver is working. More data files may 
-become available. Please check http://www.branchandcut.org/MCKP/ for more 
-information. The other user defined parameters are the following:
+To execute the MCKP application, just specify the location of the data file by
+typing "-F 'filename' -T 'format'" as an argument after the executable
+name. The last argument is the file format and there are three different
+formats that the parser can read. There is a sample file called "sample.mckp"
+that you can try to make sure the solver is working. The sample file is in
+format 3. More data files may become available. Please check
+http://www.branchandcut.org/MCKP/data for more information. The user-defined
+parameters are the following:
 
 		-H: help (user switches)
 		-F file: problem instance data is in 'file'
+                -T format: a number between 1 and 3 that specifies the 
+                           file format.
 
 You can also obtain the above list by tying the executable name followed by
 "-H". There are a number of other (for now) undocumented parameters that can
