@@ -248,6 +248,14 @@ endif
 TSP_OBJS = $(addprefix $(USER_OBJDIR)/,$(notdir $(TSP_SRC:.c=.o)))
 
 ##############################################################################
+# This is the flag for the SYMPHONY Makefile to determine whether
+# an application is to be used. You shouldn't need to modify this
+# variable. 
+##############################################################################
+
+USE_SYM_APPL = TRUE
+
+##############################################################################
 # Include the SYMPHONY makefile after all the source file names (and before
 # any used-defined targets!)
 ##############################################################################

@@ -141,7 +141,7 @@ endif
 
 #Uncomment the line below if you want to use an OSI interface.
 LP_SOLVER = OSI
-OSI_INTERFACE = CPLEX
+OSI_INTERFACE = OSL
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
@@ -330,10 +330,10 @@ OPT = -g
 # !!!These variables will be overriden if user's or one of the application's 
 # Makefile is called!!!                                                    
 
-COMPILE_IN_CG = TRUE
-COMPILE_IN_CP = TRUE
-COMPILE_IN_LP = TRUE
-COMPILE_IN_TM = TRUE
+SYM_COMPILE_IN_CG = TRUE
+SYM_COMPILE_IN_CP = TRUE
+SYM_COMPILE_IN_LP = TRUE
+SYM_COMPILE_IN_TM = TRUE
 
 ##############################################################################
 ##############################################################################
@@ -529,30 +529,30 @@ endif
 ##############################################################################
 
 ifeq ($(USE_SYM_APPL),TRUE)
-COMPILE_IN_CG = $(APPL_COMPILE_IN_CG)
-COMPILE_IN_CP = $(APPL_COMPILE_IN_CP)
-COMPILE_IN_LP = $(APPL_COMPILE_IN_LP)
-COMPILE_IN_TM = $(APPL_COMPILE_IN_TM)
+SYM_COMPILE_IN_CG = $(COMPILE_IN_CG)
+SYM_COMPILE_IN_CP = $(COMPILE_IN_CP)
+SYM_COMPILE_IN_LP = $(COMPILE_IN_LP)
+SYM_COMPILE_IN_TM = $(COMPILE_IN_TM)
 else
 SYMPHONYROOT = $(PWD)
 endif
 
-ifeq ($(COMPILE_IN_TM),TRUE)
+ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 	CONFIG:=1
 else
 	CONFIG:=0
 endif 
-ifeq ($(COMPILE_IN_LP),TRUE)
+ifeq ($(SYM_COMPILE_IN_LP),TRUE)
 	CONFIG:=1$(CONFIG)
 else
 	CONFIG:=0$(CONFIG)
 endif 
-ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(SYM_COMPILE_IN_CG),TRUE)
 	CONFIG:=1$(CONFIG)
 else
 	CONFIG:=0$(CONFIG)
 endif 
-ifeq ($(COMPILE_IN_CP),TRUE)
+ifeq ($(SYM_COMPILE_IN_CP),TRUE)
 	CONFIG:=1$(CONFIG)
 else
 	CONFIG:=0$(CONFIG)
@@ -717,24 +717,24 @@ QUANTIFY = $(QUANTIFYBIN) $(QFLAGS)
 ##############################################################################
 ##############################################################################
 
-ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(SYM_COMPILE_IN_CG),TRUE)
 LPEXT = _cg
 endif
-ifeq ($(COMPILE_IN_CP),TRUE)
+ifeq ($(SYM_COMPILE_IN_CP),TRUE)
 CPEXT = _cp
 endif
-ifeq ($(COMPILE_IN_LP),TRUE)
+ifeq ($(SYM_COMPILE_IN_LP),TRUE)
 TMEXT = _lp$(LPEXT)$(CPEXT)
 endif
-ifeq ($(COMPILE_IN_TM),TRUE)
+ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 MASTEREXT = _tm$(TMEXT)
 endif
 ifeq ($(MASTERNAME),)
 MASTERNAME = symphony$(MASTEREXT)
-ifeq ($(COMPILE_IN_CG),TRUE)
-ifeq ($(COMPILE_IN_CP),TRUE)
-ifeq ($(COMPILE_IN_LP),TRUE)
-ifeq ($(COMPILE_IN_TM),TRUE)
+ifeq ($(SYM_COMPILE_IN_CG),TRUE)
+ifeq ($(SYM_COMPILE_IN_CP),TRUE)
+ifeq ($(SYM_COMPILE_IN_LP),TRUE)
+ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 MASTERNAME = symphony
 endif
 endif
@@ -791,16 +791,16 @@ ifeq ($(CHECK_LP),TRUE)
 BB_DEFINES += -DCOMPILE_CHECK_LP
 endif
 
-ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(SYM_COMPILE_IN_CG),TRUE)
 BB_DEFINES += -DCOMPILE_IN_CG
 endif
-ifeq ($(COMPILE_IN_CP),TRUE)
+ifeq ($(SYM_COMPILE_IN_CP),TRUE)
 BB_DEFINES += -DCOMPILE_IN_CP
 endif
-ifeq ($(COMPILE_IN_LP),TRUE)
+ifeq ($(SYM_COMPILE_IN_LP),TRUE)
 BB_DEFINES+= -DCOMPILE_IN_LP
 endif
-ifeq ($(COMPILE_IN_TM), TRUE)
+ifeq ($(SYM_COMPILE_IN_TM), TRUE)
 BB_DEFINES += -DCOMPILE_IN_TM
 endif
 ifeq ($(COMPILE_FRAC_BRANCHING),TRUE)
@@ -888,13 +888,13 @@ endif
 
 DG_SRC		= draw_graph.c
 
-ifeq ($(COMPILE_IN_TM), TRUE)
+ifeq ($(SYM_COMPILE_IN_TM), TRUE)
 TM_SRC		= tm_func.c tm_proccomm.c
 else
 TM_SRC          = treemanager.c tm_func.c tm_proccomm.c
 endif
 
-ifeq ($(COMPILE_IN_LP),TRUE)
+ifeq ($(SYM_COMPILE_IN_LP),TRUE)
 TM_SRC         += lp_solver.c lp_varfunc.c lp_rowfunc.c lp_genfunc.c
 TM_SRC         += lp_proccomm.c lp_wrapper.c lp_free.c
 ifeq ($(PSEUDO_COSTS),TRUE)
@@ -902,7 +902,7 @@ TM_SRC         += lp_pseudo_branch.c
 else
 TM_SRC         += lp_branch.c
 endif
-ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(SYM_COMPILE_IN_CG),TRUE)
 TM_SRC         += cg_func.c cg_wrapper.c
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ifeq ($(DECOMP),TRUE)
@@ -914,10 +914,10 @@ else
 MASTER_SRC += lp_solver.c
 endif
 
-ifeq ($(COMPILE_IN_CP),TRUE)
+ifeq ($(SYM_COMPILE_IN_CP),TRUE)
 TM_SRC	       += cp_proccomm.c cp_func.c cp_wrapper.c
 endif
-ifeq ($(COMPILE_IN_TM),TRUE)
+ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 MASTER_SRC     += $(TM_SRC)
 endif
 
@@ -929,7 +929,7 @@ else
 LP_SRC         += lp_branch.c
 endif
 
-ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(SYM_COMPILE_IN_CG),TRUE)
 LP_SRC         += cg_func.c cg_wrapper.c
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ifeq ($(DECOMP),TRUE)
@@ -1006,25 +1006,25 @@ WHATTOMAKE =
 PWHATTOMAKE = 
 QWHATTOMAKE = 
 
-ifeq ($(COMPILE_IN_LP),FALSE)
+ifeq ($(SYM_COMPILE_IN_LP),FALSE)
 WHATTOMAKE  += lplib lp
 PWHATTOMAKE += plp
 QWHATTOMAKE += qlp
 endif
 
-ifeq ($(COMPILE_IN_CP),FALSE)
+ifeq ($(SYM_COMPILE_IN_CP),FALSE)
 WHATTOMAKE += cplib cp
 PWHATTOMAKE += pcp
 QWHATTOMAKE += qcp
 endif
 
-ifeq ($(COMPILE_IN_CG),FALSE)
+ifeq ($(SYM_COMPILE_IN_CG),FALSE)
 WHATTOMAKE += cglib cg
 PWHATTOMAKE += pcg
 QWHATTOMAKE += qcg
 endif
 
-ifeq ($(COMPILE_IN_TM),FALSE)
+ifeq ($(SYM_COMPILE_IN_TM),FALSE)
 WHATTOMAKE += tmlib tm
 PWHATTOMAKE += ptm
 QWHATTOMAKE += qtm
@@ -1236,7 +1236,7 @@ ALL_TM 	+= $(TIME_SRC)
 ALL_TM 	+= $(PROCCOMM_SRC)
 ALL_TM 	+= $(PACKCUT_SRC)
 ALL_TM 	+= $(PACKARRAY_SRC)
-ifeq ($(COMPILE_IN_LP),TRUE)
+ifeq ($(SYM_COMPILE_IN_LP),TRUE)
 ALL_TM  += $(QSORT_SRC)
 endif
 

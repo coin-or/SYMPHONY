@@ -38,11 +38,12 @@ int sym_initial_solve PROTO((sym_environment *env));
 int sym_mc_solve PROTO((sym_environment *env));
 int sym_create_permanent_cut_pools PROTO((sym_environment *env));
 int sym_close_environment PROTO((sym_environment *env));
-int sym_load_problem_user PROTO((sym_environment *env, int numcols, 
-				 int numrows, int *start, int *index, 
-				 double *value, double *collb, double *colub, 
-				 double *obj, char *rowsen, double *rowrhs, 
-				 double *rowrng));   
+int sym_explicit_load_problem PROTO((sym_environment *env, int numcols, 
+				     int numrows, int *start, int *index, 
+				     double *value, double *collb, double *colub, 
+				     double *obj, double *obj2, char *rowsen,
+				     double *rowrhs, double *rowrng,
+				     char make_copy));   
 int sym_is_abandoned PROTO((sym_environment *env));
 int sym_is_proven_optimal PROTO((sym_environment *env));
 int sym_is_proven_primal_infeasible PROTO((sym_environment *env));	 

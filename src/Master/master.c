@@ -53,7 +53,7 @@
 /*===========================================================================*/
 /*===========================================================================*/
 
-void sym_environment *sym_open_environment()
+sym_environment *sym_open_environment()
 {
    sym_environment *env;
 #if (!defined(COMPILE_IN_LP) || !defined(COMPILE_IN_CG) || \
@@ -830,7 +830,7 @@ int sym_solve(sym_environment *env)
 	   msgtag != TM_TARGET_GAP_ACHIEVED &&
 	   msgtag != TM_FOUND_FIRST_FEASIBLE &&
 	   msgtag != TM_ERROR__NO_BRANCHING_CANDIDATE &&
-	   msgatg != TM_ERROR__ILLEGAL_RETURN_CODE &&
+	   msgtag != TM_ERROR__ILLEGAL_RETURN_CODE &&
 	   msgtag != TM_ERROR__NUMERICAL_INSTABLITY &&
 	   msgtag != TM_ERROR__COMM_ERROR &&
 	   msgtag != TM_ERROR__USER);
@@ -1667,61 +1667,84 @@ int sym_close_environment(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_load_problem_user(sym_environment * env, int numcols, int numrows, int *start, 
-			  int *index, double *value, double *collb,
-			  double *colub, double *obj, char *rowsen, 
-			  double *rowrhs, double *rowrng)
+int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
+			      int *start, int *index, double *value,
+			      double *collb, double *colub, double *obj,
+			      double *obj2, char *rowsen, double *rowrhs,
+			      double *rowrng, char make_copy)
 {
    int termcode = 0;   
+   double t =0;
+   int j;
 
    if (numcols == 0){
       printf("sym_load_problem_user():The given problem is empty!\n");
       return (0);
    }
 
-   //Assuming all the pointers are always given NOT null, except rowrng!
-   char free_range = FALSE;
-   double t =0;
-   int j;
    (void)used_time(&t);
    
-   if (!rowrng){
-      rowrng = (double*)calloc(numrows, DSIZE);
-      free_range = TRUE;
-   }
    env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
  
    env->mip->m  = numrows;
    env->mip->n  = numcols;
    env->mip->nz = start[numcols];
-   
-   env->mip->obj    = (double *) malloc(DSIZE * numcols);
-   env->mip->rhs    = (double *) malloc(DSIZE * numrows);
-   env->mip->sense  = (char *)   malloc(CSIZE * numrows);
-   env->mip->rngval = (double *) malloc(DSIZE * numrows);
-   env->mip->ub     = (double *) malloc(DSIZE * numcols);
-   env->mip->lb     = (double *) malloc(DSIZE * numcols);
-   env->mip->is_int = (char *)   calloc(CSIZE, numcols);
 
-   memcpy(env->mip->obj, obj, DSIZE * numcols); 
-   memcpy(env->mip->sense, rowsen, CSIZE * numrows); 
-   memcpy(env->mip->rhs, rowrhs, DSIZE * numrows); 
-   memcpy(env->mip->rngval, rowrng, DSIZE * numrows); 	  
-   memcpy(env->mip->ub, colub, DSIZE * numcols); 
-   memcpy(env->mip->lb, collb, DSIZE * numcols); 
-
-   //user defined matind, matval, matbeg--fill as column ordered
+   if (make_copy){
+      env->mip->obj    = (double *) malloc(DSIZE * numcols);
+      env->mip->obj1   = (double *) calloc(numcols, DSIZE);
+      env->mip->obj2   = (double *) calloc(numcols, DSIZE);
+      env->mip->rhs    = (double *) malloc(DSIZE * numrows);
+      env->mip->sense  = (char *)   malloc(CSIZE * numrows);
+      env->mip->rngval = (double *) malloc(DSIZE * numrows);
+      env->mip->ub     = (double *) malloc(DSIZE * numcols);
+      env->mip->lb     = (double *) malloc(DSIZE * numcols);
+      env->mip->is_int = (char *)   calloc(CSIZE, numcols);
+      
+      memcpy(env->mip->obj,  obj,  DSIZE * numcols);
+      if (obj2){
+	 memcpy(env->mip->obj2, obj2, DSIZE * numcols);
+      }
+      memcpy(env->mip->sense, rowsen, CSIZE * numrows); 
+      memcpy(env->mip->rhs, rowrhs, DSIZE * numrows);
+      if (rowrng){
+	 memcpy(env->mip->rngval, rowrng, DSIZE * numrows);
+      }
+      memcpy(env->mip->ub, colub, DSIZE * numcols); 
+      memcpy(env->mip->lb, collb, DSIZE * numcols); 
    
-   env->mip->matbeg = (int *) malloc(ISIZE * (numcols + 1));
-   env->mip->matval = (double *) malloc(DSIZE*start[numcols]);
-   env->mip->matind = (int *)    malloc(ISIZE*start[numcols]);
-   
-   memcpy(env->mip->matbeg, start, ISIZE * (numcols + 1));
-   memcpy(env->mip->matval, value, DSIZE * 
-	  start[numcols]);  
-   memcpy(env->mip->matind, index, ISIZE * 
-	  start[numcols]);  
-
+      //user defined matind, matval, matbeg--fill as column ordered
+      
+      env->mip->matbeg = (int *) malloc(ISIZE * (numcols + 1));
+      env->mip->matval = (double *) malloc(DSIZE*start[numcols]);
+      env->mip->matind = (int *)    malloc(ISIZE*start[numcols]);
+      
+      memcpy(env->mip->matbeg, start, ISIZE * (numcols + 1));
+      memcpy(env->mip->matval, value, DSIZE * 
+	     start[numcols]);  
+      memcpy(env->mip->matind, index, ISIZE * 
+	     start[numcols]);  
+   }else{
+      env->mip->obj  = obj;
+      if (obj2){
+	 env->mip->obj2 = obj2;
+      }else{
+	 env->mip->obj2   = (double *) calloc(numcols, DSIZE);
+      }
+      env->mip->sense = rowsen;
+      env->mip->rhs = rowrhs;
+      if (rowrng){
+	 env->mip->rngval = rowrng;
+      }else{
+	 env->mip->rngval = (double *) calloc(numrows, DSIZE);
+      }
+      env->mip->ub = colub; 
+      env->mip->lb =  collb; 
+      env->mip->matbeg = start;
+      env->mip->matval = value;
+      env->mip->matind = index;
+   }
+      
    /* Start up the graphics window*/
 #ifndef WIN32
    CALL_WRAPPER_FUNCTION( init_draw_graph_u(env) );   
@@ -1737,12 +1760,7 @@ int sym_load_problem_user(sym_environment * env, int numcols, int numrows, int *
  
    env->termcode = TM_NO_SOLUTION;
 
-   if (free_range){
-      FREE(rowrng);
-   }
-   
    return termcode;
-
 }
 
 /*===========================================================================*/

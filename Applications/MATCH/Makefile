@@ -43,10 +43,10 @@ MASTERNAME = match
 # explanation of these variables in SYMPHONY's Makefile.
 ##############################################################################
 
-APPL_COMPILE_IN_TM = TRUE
-APPL_COMPILE_IN_LP = TRUE
-APPL_COMPILE_IN_CG = TRUE
-APPL_COMPILE_IN_CP = TRUE
+COMPILE_IN_TM = TRUE
+COMPILE_IN_LP = TRUE
+COMPILE_IN_CG = TRUE
+COMPILE_IN_CP = TRUE
 
 ##############################################################################
 # This section is for listing MATCH source file names
