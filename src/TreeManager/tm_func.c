@@ -548,7 +548,7 @@ void print_tree_status(tm_prob *tm)
    
    calculate_widths(tm->rootnode, widths);
    
-   for (i = tm->stat.max_depth; i > 0; i--){
+   for (i = tm->stat.max_depth - 1; i >= 0; i--){
       if ((double)(widths[i])/(double)(widths[i - 1]) < 2){
 	 last_full_level = i - 1;
       }
