@@ -296,9 +296,21 @@ int sym_set_defaults(sym_environment *env)
    lp_par->generate_cgl_oddhole_cuts = TRUE;
    lp_par->generate_cgl_clique_cuts = FALSE;
    lp_par->generate_cgl_probing_cuts = TRUE;
+   lp_par->generate_cgl_mir_cuts = FALSE;
    lp_par->generate_cgl_flow_and_cover_cuts = FALSE;
    lp_par->generate_cgl_rounding_cuts = FALSE;
    lp_par->generate_cgl_lift_and_project_cuts = FALSE;
+
+
+   lp_par->gomory_generated_in_root = FALSE;
+   lp_par->knapsack_generated_in_root = FALSE;
+   lp_par->oddhole_generated_in_root = FALSE;
+   lp_par->probing_generated_in_root = FALSE;
+   lp_par->mir_generated_in_root = FALSE;
+   lp_par->clique_generated_in_root = FALSE;
+   lp_par->flow_and_cover_generated_in_root = FALSE;
+   lp_par->rounding_generated_in_root = FALSE;
+   lp_par->lift_and_project_generated_in_root = FALSE;
 
    lp_par->multi_criteria = FALSE;
    lp_par->mc_find_supported_solutions = FALSE;
@@ -1044,7 +1056,8 @@ int sym_solve(sym_environment *env)
 /*===========================================================================*/
 int sym_warm_solve(sym_environment *env)
 {
-   int i, change_type;
+
+  int i, change_type, node_limit, analyzed, index, rated, level;
 
    /* first check for the updates! */
 
@@ -1058,22 +1071,51 @@ int sym_warm_solve(sym_environment *env)
 	 env->par.tm_par.warm_start = TRUE;
       }
 
-      env->warm_start->has_ub = FALSE;
-      env->warm_start->ub = 0.0;
+      analyzed = env->warm_start->stat.analyzed;
+      rated = (int)(env->par.tm_par.warm_start_node_ratio * analyzed);
+      level = env->par.tm_par.warm_start_node_level; 
+      node_limit = env->par.tm_par.warm_start_node_limit;      
       
+      if (level < SYM_INFINITY && level > 0 && 
+	 level < env->warm_start->stat.max_depth){
+	 cut_ws_tree_level(env->warm_start->rootnode, level);	 
+	 /* FIXME: what to do with stats? */
+	 //	 memset(&(env->warm_start->stat), 0, sizeof(problem_stat));
+      } else {
+	 index = node_limit <= rated ? node_limit : rated ;
+	 if (index < analyzed) {	    
+	    if (!index) index = 1 ;
+	    env->warm_start->stat.analyzed = env->warm_start->stat.created =
+	       env->warm_start->stat.tree_size = index;
+	    cut_ws_tree_index(env->warm_start->rootnode, index, index,
+			      &(env->warm_start->stat));
+	 }
+      }
+      if(!env->par.multi_criteria){
+	 env->has_ub = FALSE;
+	 env->ub = 0.0;
+      }	 
+
+      env->warm_start->has_ub = env->best_sol.has_sol = 
+	 env->warm_start->best_sol.has_sol = FALSE;
+      env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+
       for(i = 0; i < env->mip->change_num; i++){
 	 change_type = env->mip->change_type[i];
 	 if (change_type == RHS_CHANGED){
 	    
-#ifdef USE_CGL_CUTS
-	    printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
-	    printf("rhs change when cuts exist, for now!\n"); 
-	    return(FUNCTION_TERMINATED_ABNORMALLY);	    
-#else	    
-	    env->mip->change_num = 0;
-	    update_tree_bound(env, env->warm_start->rootnode, RHS_CHANGED);
-	    return(sym_solve(env));
-#endif
+	    //#ifdef USE_CGL_CUTS
+	    if(env->par.lp_par.generate_cgl_cuts){
+	       printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
+	       printf("rhs change when cuts exist, for now!\n"); 
+	       return(FUNCTION_TERMINATED_ABNORMALLY);	    
+	       //#else
+	    }else{	    
+	       env->mip->change_num = 0;
+	       update_tree_bound(env, env->warm_start->rootnode, RHS_CHANGED);
+	       return(sym_solve(env));
+	       //#endif
+	    }
 	 }
       }
       
@@ -1081,7 +1123,7 @@ int sym_warm_solve(sym_environment *env)
 	 change_type = env->mip->change_type[i];
 	 switch(change_type){
 	  case OBJ_COEFF_CHANGED:
-
+#if 0
 	     if(env->par.lp_par.do_reduced_cost_fixing &&
 		!env->par.mc_warm_start){
 		printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
@@ -1089,7 +1131,7 @@ int sym_warm_solve(sym_environment *env)
 		printf("for now!\n"); 
 		return(FUNCTION_TERMINATED_ABNORMALLY);   
 	     }
-
+#endif
 	     update_tree_bound(env, env->warm_start->rootnode, 
 			       OBJ_COEFF_CHANGED);
 	     break;
@@ -1101,6 +1143,7 @@ int sym_warm_solve(sym_environment *env)
       }      
    }  
 
+
    /* Uncommented for now! */
 #if 0 
    if (env->par.trim_warm_tree) {
@@ -1110,7 +1153,6 @@ int sym_warm_solve(sym_environment *env)
    
    env->mip->change_num = 0;
    return(sym_solve(env));
-   
 }
 
 /*===========================================================================*/
@@ -4475,6 +4517,16 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
 	    strcmp(key, "LP_generate_cgl_probing_cuts") == 0){
       *value = lp_par->generate_cgl_probing_cuts;
       return(0);
+   }
+   else if (strcmp(key, "generate_cgl_clique_cuts") == 0 ||
+            strcmp(key, "LP_generate_cgl_clique_cuts") == 0){
+     *value = lp_par->generate_cgl_clique_cuts;
+     return(0);
+   }
+   else if (strcmp(key, "generate_cgl_mir_cuts") == 0 ||
+            strcmp(key, "LP_generate_cgl_mir_cuts") == 0){
+     *value = lp_par->generate_cgl_mir_cuts;
+     return(0);
    }
    else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts") == 0){
