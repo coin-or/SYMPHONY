@@ -251,8 +251,11 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
       switch (can->type){
        case CANDIDATE_VARIABLE:
 	 branch_var = can->position;
+#if 0
 	 if (lp_data->status[branch_var] & PERM_FIXED_TO_LB ||
 	     lp_data->status[branch_var] & PERM_FIXED_TO_UB){
+#endif
+	 if (vars[branch_var]->lb == vars[branch_var]->ub){
 	    printf("Error -- candidate is fixed. Discarding.\n\n");
 	    continue;
 	 }

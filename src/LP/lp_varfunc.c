@@ -150,6 +150,174 @@ void fix_variables(lp_prob *p)
    var_desc **vars = lp_data->vars;
    int n = lp_data->n;
 
+   double gap = 0.0, max_change;
+   int i, vars_recently_fixed_to_ub = 0;
+   int did_logical_fixing = FALSE,  did_reduced_cost_fixing = FALSE;
+   int lb_vars, perm_lb_vars, ub_vars, perm_ub_vars, del_vars, *delstat;
+
+   char not_fixed__lb__switch, not_fixed__ub__switch;
+   int *ind;
+   char *lu;
+   double *bd;
+   int cnt = 0;
+
+   colind_sort_extra(p);
+
+   check_ub(p);
+   if (p->has_ub){
+      gap = p->ub - lp_data->objval - p->par.granularity;
+   }
+
+   /*========================================================================*\
+    *                   Here is the reduced cost fixing.
+    *
+    * If the gap is negative that means that we are above the limit, so don't
+    * do anything.
+    * Otherwise we do regular rc fixing if one of the following holds:
+    * -- if we have done rc fixing before then the gap must have decreased
+    *    significantly
+    * -- if we haven't done rc fixing before then the gap must be relatively
+    * small compared to the upper bound
+    \*=======================================================================*/
+
+   if (p->par.do_reduced_cost_fixing && p->has_ub && gap > 0){
+      if (p->last_gap == 0.0 ?
+	  (gap < p->par.gap_as_ub_frac * p->ub) :
+	  (gap < p->par.gap_as_last_gap_frac * p->last_gap)){
+	 /* Tighten the upper/lower bounds on the variables,
+	    prepare to delete them and do some statistics. */
+	 delstat = lp_data->tmp.i1;   /* 2*n */
+	 ind = lp_data->tmp.i1 + n;
+	 lu = lp_data->tmp.c;         /* n */
+	 bd = lp_data->tmp.d;         /* n */
+	 
+	 p->vars_deletable = 0;
+	 memset((char *)delstat, 0, n * ISIZE);
+	 lb_vars = perm_lb_vars = ub_vars = perm_ub_vars = 0;
+	 for (cnt = 0, i = n-1; i >= 0; i--){
+	    max_change = gap/dj[i];
+	    if (max_change > 0 && max_change < vars[i]->ub - vars[i]->lb){
+	       if (lp_data->nf_status & NF_CHECK_NOTHING){
+		  status[i] ^= NOT_FIXED__PERM_LB__SWITCH;
+		  perm_lb_vars++;
+	       }else{
+		  status[i] ^= NOT_FIXED__TEMP_LB__SWITCH;
+		  lb_vars++;
+	       }
+	       ind[cnt] = i;
+	       lu[cnt] = 'U';
+	       bd[cnt++] = vars[i]->is_int ? floor(vars[i]->lb + max_change) :
+		  vars[i]->lb + max_change;
+	       if (! (status[i] & NOT_REMOVABLE) && vars[i]->lb == 0 &&
+		   vars[i]->lb == vars[i]->ub){
+		  p->vars_deletable++;
+		  delstat[i] = 1;
+	       }
+	    }else if (max_change < 0 && max_change > vars[i]->lb - vars[i]->ub){
+	       if (lp_data->nf_status & NF_CHECK_NOTHING){
+		  status[i] ^= NOT_FIXED__PERM_UB__SWITCH;
+		  perm_ub_vars++;
+	       }else{
+		  status[i] ^= NOT_FIXED__TEMP_UB__SWITCH;
+		  ub_vars++;
+	       }
+	       ind[cnt] = i;
+	       lu[cnt] = 'L';
+	       bd[cnt++] = vars[i]->is_int ? floor(vars[i]->ub + max_change) :
+		  vars[i]->ub + max_change;
+	       if (! (status[i] & NOT_REMOVABLE) && vars[i]->ub == 0 &&
+		   vars[i]->lb == vars[i]->ub){
+		  p->vars_deletable++;
+		  delstat[i] = 1;
+	       }
+	       vars_recently_fixed_to_ub++;
+	    }
+	    did_reduced_cost_fixing = TRUE;
+	 }
+	 p->vars_recently_fixed_to_ub += vars_recently_fixed_to_ub;
+      }
+   }
+   if (cnt > 0){
+      change_bounds(lp_data, cnt, ind, lu, bd);
+   }
+
+   /*========================================================================*\
+    * Logical fixing is done only if the number of variables recently fixed
+    * to upper bound reaches a given constant AND is at least a certain
+    * fraction of the total number of variables. 
+    \*=======================================================================*/
+
+   if ((p->par.do_logical_fixing) &&
+       (p->vars_recently_fixed_to_ub >
+	p->par.fixed_to_ub_before_logical_fixing) &&
+       (p->vars_recently_fixed_to_ub >
+	p->par.fixed_to_ub_frac_before_logical_fixing * n)){
+      logical_fixing_u(p);
+      did_logical_fixing = TRUE;
+   }
+   
+   if (! did_reduced_cost_fixing && ! did_logical_fixing)
+      return;
+   
+   if (did_reduced_cost_fixing)
+      p->last_gap = gap;
+   if (did_logical_fixing)
+      p->vars_recently_fixed_to_ub = 0;
+   
+   if (p->par.verbosity > 3){
+      if (ub_vars)
+	 printf("total of %i variables with temp adjusted UB ...\n",ub_vars);
+      if (perm_ub_vars)
+	 printf("total of %i variables with perm adjusted UB ...\n",perm_ub_vars);
+      if (lb_vars)
+	 printf("total of %i variables with temp adjusted LB ...\n",lb_vars);
+      if (perm_lb_vars)
+	 printf("total of %i variables with perm adjusted LB ...\n",perm_lb_vars);
+   }
+   p->vars_at_lb = lb_vars;
+   p->vars_at_ub = ub_vars;
+   
+   /* if enough variables have been fixed, then physically compress the matrix,
+    * eliminating the columns that are fixed to zero */
+   if (p->vars_deletable > p->par.mat_col_compress_num &&
+       p->vars_deletable > n * p->par.mat_col_compress_ratio){
+      
+      PRINT(p->par.verbosity,3, ("Compressing constraint matrix (col) ...\n"));
+      del_vars = delete_cols(lp_data, p->vars_deletable, delstat);
+      if (del_vars > 0){
+	 lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
+	 lp_data->col_set_changed = TRUE;
+      }
+      if (p->vars_deletable > del_vars){
+	 PRINT(p->par.verbosity, 3,
+	       ("%i vars were not removed because they were basic ...\n",
+		p->vars_deletable - del_vars));
+      }
+      if (del_vars > 0){
+	 p->vars_deletable -= del_vars;
+	 PRINT(p->par.verbosity, 3,
+	       ("%i vars successfully removed from the problem ...\n",
+		del_vars));
+	 for (i = p->base.varnum; i < n; i++){
+	    if (delstat[i] != -1){
+	       *(vars[delstat[i]]) = *(vars[i]);
+	       vars[delstat[i]]->colind = delstat[i];
+	    }
+	 }
+      }
+   }
+}
+
+#if 0
+void fix_variables(lp_prob *p)
+{
+   LPdata *lp_data = p->lp_data;
+   double *dj = lp_data->dj;
+   double *x = lp_data->x;
+   char *status = lp_data->status;
+   var_desc **vars = lp_data->vars;
+   int n = lp_data->n;
+
    double gap = 0.0;
    int i, vars_recently_fixed_to_ub = 0;
    int did_logical_fixing = FALSE,  did_reduced_cost_fixing = FALSE;
@@ -382,6 +550,7 @@ void fix_variables(lp_prob *p)
       }
    }
 }
+#endif
 
 /*===========================================================================*\
  *===========================================================================*
