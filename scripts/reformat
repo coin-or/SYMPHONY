@@ -1,14 +1,8 @@
 #!/bin/tcsh -f
+
 mkdir $1
 awk -f reformat.awk Makefile.dist > $1/Makefile
-foreach file (LICENSE README*)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/WIN32
-foreach file (WIN32/*.dsp)
-awk -f reformat.awk $file > $1/$file
-end
-foreach file (WIN32/*.dsw)
+foreach file (LICENSE README-4.0)
 awk -f reformat.awk $file > $1/$file
 end
 mkdir $1/Common
@@ -60,148 +54,50 @@ end
 foreach file (DrawGraph/IGD_1.0/Simple_version/*.c)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/Vrp
-foreach file (Vrp/Makefile Vrp/sample.vrp Vrp/README)
+
+foreach app (Vrp MATCH MPP SPP SPP+CUTS Template)
+mkdir $1/$app
+foreach file ($app/Makefile $app/LICENSE $app/README $app/sample.*)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/Vrp/Common
-foreach file (Vrp/Common/*.c)
+mkdir $1/$app/WIN32
+foreach file ($app/WIN32/*.dsp)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/Vrp/LP
-foreach file (Vrp/LP/*.c)
+foreach file ($app/WIN32/*.dsw)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/Vrp/Master
-foreach file (Vrp/Master/*.c)
+foreach file ($app/WIN32/*.mak)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/Vrp/CutPool
-foreach file (Vrp/CutPool/*.c)
+mkdir $1/$app/Common
+foreach file ($app/Common/*.c)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/Vrp/CutGen
-foreach file (Vrp/CutGen/*.c)
+mkdir $1/$app/LP
+foreach file ($app/LP/*.c)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/Vrp/include
-foreach file (Vrp/include/*.h)
+mkdir $1/$app/Master
+foreach file ($app/Master/*.c)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/Vrp/DrawGraph
-foreach file (Vrp/DrawGraph/*.c)
+mkdir $1/$app/CutPool
+foreach file ($app/CutPool/*.c)
 awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/$app/CutGen
+foreach file ($app/CutGen/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/$app/include
+foreach file ($app/include/*.h)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/$app/DrawGraph
+foreach file ($app/DrawGraph/*.c)
+awk -f reformat.awk $file > $1/$file
+end
 end
 mv $1/Vrp $1/VRP
-mkdir $1/Template
-foreach file (Template/Makefile)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/Template/LP
-foreach file (Template/LP/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/Template/Master
-foreach file (Template/Master/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/Template/CutPool
-foreach file (Template/CutPool/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/Template/CutGen
-foreach file (Template/CutGen/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/Template/include
-foreach file (Template/include/*.h)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/Template/DrawGraph
-foreach file (Template/DrawGraph/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/SPP
-foreach file (SPP/Makefile)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/SPP/LP
-foreach file (SPP/LP/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/SPP/Master
-foreach file (SPP/Master/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/SPP/CutPool
-foreach file (SPP/CutPool/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/SPP/CutGen
-foreach file (SPP/CutGen/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/SPP/include
-foreach file (SPP/include/*.h)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/SPP/DrawGraph
-foreach file (SPP/DrawGraph/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MPP
-foreach file (MPP/Makefile)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MPP/LP
-foreach file (MPP/LP/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MPP/Master
-foreach file (MPP/Master/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MPP/CutPool
-foreach file (MPP/CutPool/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MPP/CutGen
-foreach file (MPP/CutGen/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MPP/include
-foreach file (MPP/include/*.h)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MPP/DrawGraph
-foreach file (MPP/DrawGraph/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MATCH
-foreach file (MATCH/Makefile)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MATCH/LP
-foreach file (MATCH/LP/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MATCH/Master
-foreach file (MATCH/Master/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MATCH/CutPool
-foreach file (MATCH/CutPool/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MATCH/CutGen
-foreach file (MATCH/CutGen/*.c)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MATCH/include
-foreach file (MATCH/include/*.h)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/MATCH/DrawGraph
-foreach file (MATCH/DrawGraph/*.c)
-awk -f reformat.awk $file > $1/$file
-end
+mv $1/Template $1/USER

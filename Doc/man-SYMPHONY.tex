@@ -259,10 +259,9 @@ shared parallel.
 
 \paragraph{Configuring the Modules.}
 \label{configuration}
-In the make file, there are
-four variables that control which modules run as separate executables
-and which are called directly in serial fashion. The variables are as
-follows:
+In the application makefile, e.g., \texttt{SYMPHONY-4.0/USER/Makefile},there
+are four variables that control which modules run as separate executables and
+which are called directly in serial fashion. The variables are as follows:
 \begin{description}
         \item [COMPILE\_IN\_CG:] If set to {\tt TRUE}, then the cut generator
         function will be called directly from the LP in serial
