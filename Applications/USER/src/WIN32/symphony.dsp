@@ -283,7 +283,7 @@ SOURCE=C:\COIN\Win\osiCpxLib\Debug\osiCpxLib.lib
 # End Source File
 # Begin Source File
 
-SOURCE=C:\ILOG\cplex81\lib\msvc6\stat_mda\cplex81.lib
+SOURCE=C:\ILOG\cplex81\lib\msvc6\stat_sta\cplex81.lib
 # End Source File
 # End Target
 # End Project

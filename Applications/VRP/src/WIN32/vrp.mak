@@ -242,7 +242,7 @@ DEFINITIONS= $(DEFINITIONS) /D "USE_CGL_CUTS"
 .SILENT:
 
 CPP=cl.exe
-CPPFLAGS= /nologo /MLd /W3 /GR /Gm /YX /GX /ZI /Od \
+CPPFLAGS= /nologo /MLd /W2 /GR /Gm /YX /GX /ZI /Od \
 	/I $(LPINCDIR) /I "$(SYMPHONYROOT)\include" \
 	/I "..\include" /I "..\include\heurs" \
 	/D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" \
@@ -254,7 +254,7 @@ CPPFLAGS= /nologo /MLd /W3 /GR /Gm /YX /GX /ZI /Od \
 .c.obj: 
 	$(CPP) $(CPPFLAGS) "$*.c"
 	 
-ALL : "APPL_MESSAGE" vrp.lib "SYMPHONY_MESSAGE" "OBJECTS" symphony.exe 
+ALL : "$(OUTDIR)" "APPL_MESSAGE" vrp.lib "SYMPHONY_MESSAGE" "OBJECTS" symphony.exe 
 
 CLEAN:
 	del /Q $(OUTDIR)\*.obj

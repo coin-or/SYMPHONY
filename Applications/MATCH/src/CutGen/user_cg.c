@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* bipartite matching.                                                       */
 /*                                                                           */
-/* (c) Copyright 2003 Michael Trick and Ted Ralphs. All Rights Reserved.                   */
+/* (c) Copyright 2003 Michael Trick and Ted Ralphs. All Rights Reserved.     */
 /*                                                                           */
 /* This application was originally written by Michael Trick and was modified */
 /* by Ted Ralphs (tkralphs@lehigh.edu).                                      */
@@ -17,6 +17,7 @@
 /* system include files */
 #include <malloc.h>
 #include <memory.h>
+#include <stdio.h>
 
 /* SYMPHONY include files */
 #include "BB_constants.h"

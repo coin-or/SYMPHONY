@@ -19,6 +19,15 @@
 #include "BB_types.h"
 #include "lp_solver.h"
 
+/*----------- Generic selection rules to be used by the user ----------------*/
+
+void branch_close_to_half PROTO((int max_cand_num, int *cand_num,
+				 branch_obj ***candidates));
+void branch_close_to_half_and_expensive PROTO((int max_cand_num, int *cand_num,
+					       branch_obj ***candidates));
+void branch_close_to_one_and_cheap PROTO((int max_cand_num, int *cand_num,
+					  branch_obj ***candidates));
+
 /*===========================================================================*/
 /*========================= User supplied functions =========================*/
 /*===========================================================================*/
