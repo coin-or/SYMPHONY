@@ -28,6 +28,7 @@
 #ifdef COMPILE_IN_TM
 #ifdef COMPILE_IN_LP
 #include "spp_lp.h"
+#include "spp_lp_functions.h"
 #ifdef COMPILE_IN_CG
 #include "spp_cg.h"
 #endif
@@ -276,7 +277,10 @@ int user_send_lp_data(void *user, void **user_lp)
 
    spp_lp->par = spp->lp_par;
    spp_lp->cmatrix = m;
-   
+
+   /* initialize some data structures in spp */
+   spp_init_lp(spp_lp);
+
 #else
    /* Here, we send that data using message passing and the rest is
       done in user_receive_lp_data() in the LP process */
@@ -321,6 +325,33 @@ int user_send_cg_data(void *user, void **user_cg)
 
    spp_cg->par = spp->cg_par;
    spp_cg->cmatrix = m;
+   
+   /* allocate space for tmp arrays */
+   spp_cg->tmp = (spp_cg_tmp *) calloc(1, sizeof(spp_cg_tmp));
+   spp_cg->tmp->itmp_m = (int *) malloc(m->rownum * ISIZE);
+   spp_cg->tmp->istartmp_m = (int **) malloc(m->rownum * sizeof(int *));
+   spp_cg->tmp->cuttmp = (cut_data *) calloc(1, sizeof(cut_data));
+
+   /* initialize cg data structures */
+   spp_cg->fgraph = (frac_graph *) calloc(1, sizeof(frac_graph));
+   spp_cg->cfgraph = (frac_graph *) calloc(1, sizeof(frac_graph));
+   spp_cg->cm_frac = (col_ordered *) calloc(1, sizeof(col_ordered));
+   spp_cg->rm_frac = (row_ordered *) calloc(1, sizeof(row_ordered));
+   spp_cg->rm_frac->rmatbeg = (int *) malloc((m->rownum+1) * ISIZE);
+   spp_cg->lgraph = (level_graph *) calloc(1, sizeof(level_graph));
+
+   allocate_var_length_structures(spp_cg, spp_cg->max_sol_length);
+   
+   /* cut collection is a local cut pool that contains the cuts that have
+      been sent back to the lp */
+   spp_cg->cut_coll = (cut_collection *) calloc(1, sizeof(cut_collection));
+   spp_cg->cut_coll->max_size = 1000;
+   spp_cg->cut_coll->cuts = (cut_data **) calloc(spp_cg->cut_coll->max_size,
+						 sizeof(cut_data *));
+   spp_cg->cut_coll->violation = (double *)
+      malloc(spp_cg->cut_coll->max_size * DSIZE);
+   spp_cg->cut_coll->mult = (int *)
+      malloc(spp_cg->cut_coll->max_size * ISIZE);
    
 #else
 

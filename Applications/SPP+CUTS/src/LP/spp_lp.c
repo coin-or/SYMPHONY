@@ -82,12 +82,8 @@ int user_receive_lp_data(void **user)
 int user_create_lp(void *user, LPdesc *desc, int *indices, 
 		   int *maxn, int *maxm, int *maxnz)
 {
-   spp_problem *spp = (spp_problem *) user;
+   spp_lp_problem *spp = (spp_lp_problem *) user;
    col_ordered *cm = spp->cmatrix;
-   int *cmbeg, *cmind;
-   double *cmval, *cmobj, *cmrhs;
-   char *cmsense;
-   char resize = FALSE;
    int i;
 
    desc->nz = cm->nzcnt;
@@ -95,31 +91,32 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
    *maxm = 2 * desc->m;
    *maxnz = desc->nz + ((*maxm) * (*maxn) / 100);
 
-   desc->matbeg = (int *) malloc(desc->n * ISIZE);
+   desc->matbeg = (int *) malloc((desc->n + 1) * ISIZE);
    desc->matind = (int *) malloc(desc->nz * ISIZE);
    desc->matval = (double *) malloc(desc->nz * DSIZE);
    desc->obj    = (double *) malloc(desc->n * DSIZE);
+   desc->lb     = (double *) calloc(desc->n, DSIZE);
+   desc->ub     = (double *) malloc(desc->n * DSIZE);
    desc->rhs    = (double *) malloc(desc->m * DSIZE);
    desc->sense  = (char *) malloc(desc->m * CSIZE);
    desc->rngval = (double *) malloc(desc->m * DSIZE);
 
-   cmbeg = desc->matbeg;
-   cmind = desc->matind;
-   cmval = desc->matval;
-   cmobj = desc->obj;
-   cmrhs = desc->rhs;
-   cmsense = desc->sense;
-
-   memcpy((char *) cmbeg, (char *) cm->matbeg, (cm->colnum + 1) * ISIZE);   
-   memcpy((char *) cmobj, (char *) cm->obj, cm->colnum * DSIZE);      
+   memcpy((char *) desc->matbeg, (char *) cm->matbeg, (cm->colnum+1) * ISIZE);   
+   memcpy((char *) desc->obj, (char *) cm->obj, cm->colnum * DSIZE);      
 
    for (i = cm->nzcnt - 1; i >= 0; i--) {
-      cmind[i] = cm->matind[i];   /* cannot memcpy b/c int vs. short */
-      cmval[i] = 1.0;
+      desc->matind[i] = cm->matind[i];   /* cannot memcpy b/c int vs. short */
+      desc->matval[i] = 1.0;
    }
-   for (i = desc->m - 1; i >= 0; i--) {
-      cmrhs[i] = 1.0;
-      cmsense[i] = 'E';
+
+   for (i = desc->n - 1; i >= 0; --i){
+      desc->ub[i] = 1.0;
+      /* desc->lb[i] = 0.0; */ /* Set by calloc */
+   }
+   
+   for (i = desc->m - 1; i >= 0; --i) {
+      desc->rhs[i] = 1.0;
+      desc->sense[i] = 'E';
    }
 
    return(USER_NO_PP);

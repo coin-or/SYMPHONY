@@ -61,21 +61,23 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
  
    /* Estimate the maximum number of nonzeros */
    *maxm = 2 * desc->m;
-   *maxn = varnum;
+   *maxn = desc->n;
    *maxnz = desc->nz + ((*maxm) * (*maxn) / 10);
 
    /* Allocate the arrays. These are owned by SYMPHONY after returning. */
-   desc->matbeg  = (int *) malloc((varnum + 1) * ISIZE);
+   desc->matbeg  = (int *) malloc((desc->n + 1) * ISIZE);
    desc->matind  = (int *) malloc((desc->nz) * ISIZE);
    desc->matval  = (double *) malloc((desc->nz) * DSIZE);
-   desc->obj     = (double *) malloc(varnum * DSIZE);
+   desc->obj     = (double *) malloc(desc->n * DSIZE);
+   desc->lb     = (double *) calloc(desc->n * DSIZE);
+   desc->ub     = (double *) malloc(desc->n * DSIZE);
    desc->rhs     = (double *) malloc(desc->m * DSIZE);
    desc->sense   = (char *) malloc(desc->m * CSIZE);
    desc->rngval  = (double *) calloc(desc->m, DSIZE);
 
-   /* indegree equals outdegree constraint */
-   for (i = 0, ind = 0; i <= 2 * (mpp->numedges) + (mpp->numarcs) - 1; i++){
-      (desc->matbeg)[i] = ind;
+   for (i = 0, ind = 0; i < desc->n; i++){
+      desc->matbeg[i] = ind;
+      /* indegree equals outdegree constraint */
       for (j = 0; j <= mpp->numnodes - 1; j++){
 	 /* checks to see if node i is the start node of every edge arc */
 	 if (mpp->head[i] == j){
@@ -87,31 +89,30 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
 	 }
       }
       
-      /* Now I need to form the constraint that each edge must be traversed at
-	 least once */
-
+      /* Now the constraint that each edge must be traversed at least once */
       if (i >= mpp->numarcs){ /* Check to see if it is an edge */
 	 if (i < mpp->numarcs + mpp->numedges){
 	    desc->matind[ind] = mpp->numnodes + i - mpp->numarcs;
 	 }else{
 	    desc->matind[ind] = mpp->numnodes + i - (mpp->numarcs +
-						       mpp->numedges);
+						     mpp->numedges);
 	 }
 	 desc->matval[ind++] = 1;
+	 /* desc->lb[i] = 0; */ /* Already set to zero from calloc */
+	 desc->ub[i] = (double) (mpp->numarcs + mpp->numedges);
+      }else{
+	 desc->lb[i] = 1;
+	 desc->ub[i] = (double) (mpp->numarcs + mpp->numedges);
       }
+      desc->obj[i] = (double) (mpp->cost[i]);
    }
-   desc->matbeg[2*(mpp->numedges)+(mpp->numarcs)] = ind;
-
-   for (i = 0; i <= varnum; i++){
-      desc->obj[i] = mpp->cost[i];
-   }
-
+   desc->matbeg[i] = ind;
+   
    /* set the initial right hand side */
    for (i = 0; i <= mpp->numnodes-1 ; i++){
       desc->rhs[i]   = 0;
       desc->sense[i] = 'E';
    }
-
    for (i = mpp->numnodes; i <= mpp->numnodes+mpp->numedges-1 ; i++){
       desc->rhs[i]   = 1;
       desc->sense[i] = 'G';

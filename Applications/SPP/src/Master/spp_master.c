@@ -23,6 +23,8 @@
 #include "BB_macros.h"
 #include "master_u.h"
 #include "spp.h"
+#include "spp_common.h"
+#include "spp_master_functions.h"
 #ifdef COMPILE_IN_TM
 #ifdef COMPILE_IN_LP
 /* fill these in for sequential compilation if needed. */
@@ -182,8 +184,8 @@ int user_init_draw_graph(void *user, int dg_id)
  * the base set. In this case, this function need not be modified.
 \*===========================================================================*/
 
-int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
-		  double **ub, int *basecutnum, int *colgen_strat)
+int user_set_base(void *user, int *basevarnum, int **basevars,
+		  int *basecutnum, int *colgen_strat)
 {
    /* This gives you access to the user data structure. */
    spp_problem *spp = (spp_problem *) user;
@@ -240,7 +242,7 @@ int user_receive_feasible_solution(void *user, int msgtag, double cost,
       choose PACK_NONZEROS in user_pack_feasible_solution in LP. */
 
    if (spp->feasibility == FEASIBLE && cost >= spp->feas_value)
-      return;
+      return(USER_NO_PP);
 
    spp->feasibility = FEASIBLE;
    spp->feas_value = cost;
@@ -314,9 +316,7 @@ int user_send_lp_data(void *user, void **user_lp)
 
 int user_send_cg_data(void *user, void **user_cg)
 {
-
-   /* No cut generation */
-   
+   return(USER_NO_PP);   
 }
 
 /*===========================================================================*/
@@ -334,9 +334,7 @@ int user_send_cg_data(void *user, void **user_cg)
 
 int user_send_cp_data(void *user, void **user_cp)
 {
-
-   /* No cut generation */
-
+   return(USER_NO_PP);
 }
 
 /*===========================================================================*/

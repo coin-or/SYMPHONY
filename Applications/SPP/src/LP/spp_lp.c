@@ -18,6 +18,7 @@
 
 #include "BB_constants.h"
 #include "BB_macros.h"
+#include "proccomm.h"
 #include "lp_u.h"
 #include "spp.h"
 #include "spp_common.h"
@@ -79,10 +80,6 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
 {
    spp_problem *spp = (spp_problem *) user;
    col_ordered *cm = spp->cmatrix;
-   int *cmbeg, *cmind;
-   double *cmval, *cmobj, *cmrhs;
-   char *cmsense;
-   char resize = FALSE;
    int i;
 
    desc->nz = cm->nzcnt;
@@ -90,31 +87,32 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
    *maxm = 2 * desc->m;
    *maxnz = desc->nz + ((*maxm) * (*maxn) / 100);
 
-   desc->matbeg = (int *) malloc(desc->n * ISIZE);
+   desc->matbeg = (int *) malloc((desc->n + 1) * ISIZE);
    desc->matind = (int *) malloc(desc->nz * ISIZE);
    desc->matval = (double *) malloc(desc->nz * DSIZE);
-   desc->obj    = (double *) malloc(desc->nn * DSIZE);
+   desc->obj    = (double *) malloc(desc->n * DSIZE);
+   desc->lb     = (double *) calloc(desc->n, DSIZE);
+   desc->ub     = (double *) malloc(desc->n * DSIZE);
    desc->rhs    = (double *) malloc(desc->m * DSIZE);
    desc->sense  = (char *) malloc(desc->m * CSIZE);
    desc->rngval = (double *) malloc(desc->m * DSIZE);
 
-   cmbeg = desc->matbeg;
-   cmind = desc->matind;
-   cmval = desc->matval;
-   cmobj = desc->obj;
-   cmrhs = desc->rhs;
-   cmsense = desc->sense;
-
-   memcpy((char *) cmbeg, (char *) cm->matbeg, (cm->colnum + 1) * ISIZE);   
-   memcpy((char *) cmobj, (char *) cm->obj, cm->colnum * DSIZE);      
+   memcpy((char *) desc->matbeg, (char *) cm->matbeg, (cm->colnum+1) * ISIZE);   
+   memcpy((char *) desc->obj, (char *) cm->obj, cm->colnum * DSIZE);      
 
    for (i = cm->nzcnt - 1; i >= 0; i--) {
-      cmind[i] = cm->matind[i];   /* cannot memcpy b/c int vs. short */
-      cmval[i] = 1.0;
+      desc->matind[i] = cm->matind[i];   /* cannot memcpy b/c int vs. short */
+      desc->matval[i] = 1.0;
    }
-   for (i = cm->desc->m - 1; i >= 0; i--) {
-      cmrhs[i] = 1.0;
-      cmsense[i] = 'E';
+
+   for (i = desc->n - 1; i >= 0; --i){
+      desc->ub[i] = 1.0;
+      /* desc->lb[i] = 0.0; */ /* Set by calloc */
+   }
+
+   for (i = desc->m - 1; i >= 0; i--) {
+      desc->rhs[i] = 1.0;
+      desc->sense[i] = 'E';
    }
 
    return(USER_NO_PP);
@@ -201,8 +199,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		     var_desc **vars, int cutnum, cut_data **cuts,
 		     int *new_row_num, waiting_row ***new_rows)
 {
-
-   /* No cutting planes*/
+   /* No cutting planes */
 
    return(USER_NO_PP);
 }
@@ -245,7 +242,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 int user_generate_column(void *user, int generate_what, int cutnum,
 			 cut_data **cuts, int prevind, int nextind,
 			 int *real_nextind, double *colval, int *colind,
-			 int *collen, double *obj)
+			 int *collen, double *obj, double *lb, double *ub)
 {
    switch (generate_what){
     case GENERATE_NEXTIND:
@@ -279,7 +276,7 @@ int user_print_stat_on_cuts_added(void *user, int rownum, waiting_row **rows)
 \*===========================================================================*/
 
 int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
-			    char *delete)
+			    char *delete_rows)
 {
    return(DEFAULT);
 }

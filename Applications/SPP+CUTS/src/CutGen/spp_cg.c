@@ -206,7 +206,7 @@ int user_free_cg(void **user)
       FREE(spp->tmp->istartmp_m);
       FREE(spp->tmp);
    }
-#if defined(COMPILE_IN_LP) && defined(COMPILE_IN_CG)
+#if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_CG)
    FREE(spp->par);
    spp_free_cmatrix(spp->cmatrix);
    FREE(spp->cmatrix);

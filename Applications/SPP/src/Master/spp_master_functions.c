@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <string.h>
 
 /* BB include files */
 #include "timemeas.h"
