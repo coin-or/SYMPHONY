@@ -89,15 +89,83 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
    int new_row_num;
    int *userind;
    int sim_cand_num = 0, sc_cand_num = 0;
-   /* numbers of slacks_in_matrix, slack_cuts and variables, that are used
-      as branching cands */
-#if 0   
-#ifdef DIRECTED_X_VARS
+   int total_edgenum = cnrp->vertnum*(cnrp->vertnum - 1)/2;
+   int j, cnt = 0;
+   double lim[7] = {.1, .15, .20, .233333, .266667, .3, 1};
+   branch_obj *cand;
+   
    int *xind = (int *) malloc(varnum * ISIZE);
    double *xval = (double *) calloc(varnum, DSIZE);
-   int total_edgenum = cnrp->vertnum*(cnrp->vertnum - 1)/2;
-   int i, j, nz, cnt;
+   
+#if 0
+   if (!cnrp->par.branch_on_cuts && cnrp->par.branching_rule == 2)
+      /* use the built-in rule */
+      return(USER_DEFAULT);
+#endif
+   
+   /* first try the fixed-charge variables */
+   for (i = varnum - 1; i >= 0; i--){
+      if (vars[i]->is_int){
+	 fracx = x[i] - floor(x[i]);
+	 if (fracx > lpetol && fracx < lpetol1){
+	    xind[cnt] = i;
+	    xval[cnt++] = fabs(fracx - .5);
+	 }
+      }
+   }
 
+#ifdef ADD_FLOW_VARS
+   if (cnt == 0){
+      /* Now try the flow variables */
+      for (i = varnum - 1; i >= 0; i--){
+	 if (!vars[i]->is_int){
+	    fracx = x[i] - floor(x[i]);
+	    if (fracx > lpetol && fracx < lpetol1){
+	       xind[cnt] = i;
+	       xval[cnt++] = fabs(fracx - .5);
+	    }
+	 }
+      }
+   }
+#endif
+   
+   qsortucb_di(xval, xind, cnt);
+
+   for (j = 0, i = 0; i < cnt;){
+      if (xval[i] > lim[j]){
+	 if (i == 0){
+	    j++; continue;
+	 }else{
+	    break;
+	 }
+      }else{
+	 i++;
+      }
+   }
+   cnt = i;
+
+   *cand_num = cnrp->par.strong_branching_cand_num_max;
+   *cand_num = MAX(*cand_num, cnrp->par.strong_branching_cand_num_min);
+   *cand_num = MIN(*cand_num, cnt);
+
+   if (!*candidates)
+      *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
+   for (i=*cand_num-1; i>=0; i--){
+      cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj) );
+      cand->type = CANDIDATE_VARIABLE;
+      cand->child_num = 2;
+      cand->position = xind[i];
+      cand->sense[0] = 'L';
+      cand->sense[1] = 'G';
+      cand->rhs[0] = floor(x[xind[i]]);
+      cand->rhs[1] = cand->rhs[0] + 1;
+      cand->range[0] = cand->range[1] = 0;
+   }
+   
+   return(USER_SUCCESS);
+   
+#if 0
+#ifdef DIRECTED_X_VARS
    nz = collect_nonzeros(p, x, xind, xval, status);
 
    for (j = 0; j < nz && xind[j] < total_edgenum; j++);
@@ -118,21 +186,16 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
       }
    }
    qsortucb_di(xval, xind, nz);
-
+   
    candnum = cnrp->par.strong_branching_cand_num_max;
    candnum = MAX(candnum, cnrp->par.strong_branching_cand_num_min);
    candnum = MIN(candnum, cnt);
    
    FREE(xind);
-   FREE(xval;
-
+   FREE(xval);
 #endif
 #endif
    
-   if (!cnrp->par.branch_on_cuts && cnrp->par.branching_rule == 2)
-      /* use the built-in rule */
-      return(USER_DEFAULT);
-
    *cand_num = 0;
    candnum = 0;
    /* allocate also memory for the basic vars */

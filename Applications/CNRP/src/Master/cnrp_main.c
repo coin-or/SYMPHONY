@@ -214,6 +214,8 @@ int main(int argc, char **argv)
       printf("***************************************************\n");
       printf("***************************************************\n\n");
 
+      cnrp->fixed_cost = cnrp->variable_cost = 0.0;
+      
       cnrp_solve(p, base, root);
 
       if ((int) cnrp->fixed_cost > solutions[solution1].fixed_cost &&
