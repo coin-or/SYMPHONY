@@ -76,6 +76,7 @@ int lp_initialize(lp_prob *p, int master_tid)
 
    p->lp_data = (LPdata *) calloc(1, sizeof(LPdata));
    p->lp_data->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+   p->lp_data->par = p->par;
    
 #pragma omp critical (lp_solver)
 /*__BEGIN_EXPERIMENTAL_SECTION__*/

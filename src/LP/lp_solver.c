@@ -3028,41 +3028,61 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
    
    /* create CGL gomory cuts */
-   CglGomory *gomory = new CglGomory;
-   gomory->generateCuts(*(lp_data->si), cutlist);
    
+   if(lp_data->par.generate_cgl_gomory_cuts){
+      CglGomory *gomory = new CglGomory;
+      gomory->generateCuts(*(lp_data->si), cutlist);
+      delete gomory;
+   }
+
    /* create CGL knapsack cuts */
-   CglKnapsackCover *knapsack = new CglKnapsackCover;
-   knapsack->generateCuts(*(lp_data->si), cutlist);
-   
+   if(lp_data->par.generate_cgl_knapsack_cuts){
+      CglKnapsackCover *knapsack = new CglKnapsackCover;
+      knapsack->generateCuts(*(lp_data->si), cutlist);
+      delete knapsack;
+   }
+
    /* create CGL odd hole cuts */
-   CglOddHole *oddhole = new CglOddHole;
-   oddhole->generateCuts(*(lp_data->si), cutlist);
-   
+   if(lp_data->par.generate_cgl_oddhole_cuts){
+      CglOddHole *oddhole = new CglOddHole;
+      oddhole->generateCuts(*(lp_data->si), cutlist);
+      delete oddhole;
+   }
+
    /* create CGL probing cuts */
-   CglProbing *probe = new CglProbing;
-   probe->generateCuts(*(lp_data->si), cutlist);
+   if(lp_data->par.generate_cgl_probing_cuts){
+      CglProbing *probe = new CglProbing;
+      probe->generateCuts(*(lp_data->si), cutlist);
+      delete probe;
+   }
 
 #if 0
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    /* create CGL flow cover cuts */
-   CglFlowCover *flow = new CglFlowCover;
-   flow->generateCuts(*(lp_data->si), cutlist);
-   //printf("%i\n", cutlist.sizeRowCuts());
+   if(lp_data->par.generate_cgl_flow_and_cover_cuts){
+      CglFlowCover *flow = new CglFlowCover;
+      flow->generateCuts(*(lp_data->si), cutlist);
+      delete flow;
+      //printf("%i\n", cutlist.sizeRowCuts());
+   }
 
    /*___END_EXPERIMENTAL_SECTION___*/
    /* create CGL simple rounding cuts */
-   CglSimpleRounding * rounding = new CglSimpleRounding;
-   rounding->generateCuts(*(lp_data->si), cutlist);
-   //printf("%i\n", cutlist.sizeRowCuts());
-   
+   if(lp_data->par.generate_cgl_rounding_cuts){
+      CglSimpleRounding * rounding = new CglSimpleRounding;
+      rounding->generateCuts(*(lp_data->si), cutlist);
+      delete rounding;
+      //printf("%i\n", cutlist.sizeRowCuts());
+   }
+
    /* create CGL liftandproject cuts (currently buggy) */     
-   CglLiftAndProject *liftandproject = new CglLiftAndProject;
-   liftandproject->generateCuts(*(lp_data->si), cutlist);
+   if(lp_data->par.generate_cgl_lift_and_project_cuts){
+      CglLiftAndProject *liftandproject = new CglLiftAndProject;
+      liftandproject->generateCuts(*(lp_data->si), cutlist);
+      delete liftandproject;
+   }
 #endif
    
-   //lp_data->si->applyCuts(cutlist);
-
    if (cutlist.sizeRowCuts() > 0){
       if (*cuts){
 	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+cutlist.sizeRowCuts())
@@ -3107,10 +3127,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       *num_cuts = j;
    }
    
-   delete gomory;
-   delete knapsack;
-   delete oddhole;
-   delete probe;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    // delete flow;
    /*___END_EXPERIMENTAL_SECTION___*/

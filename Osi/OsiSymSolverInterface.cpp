@@ -274,6 +274,27 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
     case OsiSymTrimWarmTree:
        keyVal = "trim_warm_tree";
        break;
+    case OsiSymGenerateCglGomoryCuts:
+       keyVal = "generate_cgl_gomory_cuts";
+       break;
+   case OsiSymGenerateCglKnapsackCuts:
+       keyVal = "generate_cgl_knapsack_cuts";
+       break;
+   case OsiSymGenerateCglOddHoleCuts:
+       keyVal = "generate_cgl_oddhole_cuts";
+       break;
+   case OsiSymGenerateCglProbingCuts:
+       keyVal = "generate_cgl_probing_cuts";
+       break;
+   case OsiSymGenerateCglFlowAndCoverCuts:
+       keyVal = "generate_cgl_flow_and_cover_cuts";
+       break;
+   case OsiSymGenerateCglRoundingCuts:
+       keyVal = "generate_cgl_rounding_cuts";
+       break;
+   case OsiSymGenerateCglLiftAndProjectCuts:
+       keyVal = "generate_cgl_lift_and_project_cuts";
+       break;
     default: 
        return false;
    }

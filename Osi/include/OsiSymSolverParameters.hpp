@@ -34,7 +34,14 @@ enum OsiSymIntParam {
    OsiSymDivingStrategy,
    OsiSymDivingK,
    OsiSymDivingThreshold,
-   OsiSymTrimWarmTree
+   OsiSymTrimWarmTree,
+   OsiSymGenerateCglGomoryCuts,
+   OsiSymGenerateCglKnapsackCuts,
+   OsiSymGenerateCglOddHoleCuts,
+   OsiSymGenerateCglProbingCuts,
+   OsiSymGenerateCglFlowAndCoverCuts,
+   OsiSymGenerateCglRoundingCuts,
+   OsiSymGenerateCglLiftAndProjectCuts
 };
 
 enum OsiSymDblParam {

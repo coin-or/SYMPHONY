@@ -287,6 +287,13 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fixed_to_ub_frac_before_logical_fixing = .01;
 
    lp_par->generate_cgl_cuts = TRUE;
+   lp_par->generate_cgl_gomory_cuts = TRUE;
+   lp_par->generate_cgl_knapsack_cuts = TRUE;
+   lp_par->generate_cgl_oddhole_cuts = TRUE;
+   lp_par->generate_cgl_probing_cuts = TRUE;
+   lp_par->generate_cgl_flow_and_cover_cuts = FALSE;
+   lp_par->generate_cgl_rounding_cuts = FALSE;
+   lp_par->generate_cgl_lift_and_projects_cuts = FALSE;
 
    lp_par->multi_criteria = FALSE;
    lp_par->mc_find_supported_solutions = FALSE;
@@ -4446,7 +4453,41 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = cg_par->do_findcuts;
       return(0);
    }
-   
+   else if (strcmp(key, "generate_cgl_gomory_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_gomory_cuts") == 0){
+      *value = lp_par->generate_cgl_gomory_cuts;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_knapsack_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_knapsack_cuts") == 0){
+      *value = lp_par->generate_cgl_knapsack_cuts;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_oddhole_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_oddhole_cuts") == 0){
+      *value = lp_par->generate_cgl_oddhole_cuts;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_probing_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_probing_cuts") == 0){
+      *value = lp_par->generate_cgl_probing_cuts;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts") == 0){
+      *value = lp_par->generate_cgl_flow_and_cover_cuts;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_rounding_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_rounding_cuts") == 0){
+      *value = lp_par->generate_cgl_rounding_cuts;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_lift_and_project_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts") == 0){
+      *value = lp_par->generate_cgl_lift_and_project_cuts;
+      return(0);
+   }
    else if (strcmp(key, "max_presolve_iter") == 0 ||
 	    strcmp(key, "LP_max_presolve_iter") == 0){
       *value = lp_par->max_presolve_iter;

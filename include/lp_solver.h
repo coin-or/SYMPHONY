@@ -17,6 +17,7 @@
 
 #include "proto.h"
 #include "BB_types.h"
+#include "lp_params.h"
 
 #define LP_MAX_ITER 9999999
 
@@ -198,6 +199,9 @@ typedef struct LPDATA{
    double     *pseudo_costs_one;
    double     *pseudo_costs_zero;
 #endif
+
+   lp_params  par;
+
 }LPdata;
 
 /*****************************************************************************/

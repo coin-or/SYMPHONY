@@ -2481,11 +2481,54 @@ int set_param(sym_environment *env, char *line)
    }
    
    else if (strcmp(key, "generate_cgl_cuts") == 0 ||
-	    strcmp(key, "generate_cgl_cuts") == 0){
+	    strcmp(key, "CG_generate_cgl_cuts") == 0){
+      //      READ_INT_PAR(lp_par->generate_cgl_cuts);
       READ_INT_PAR(cg_par->do_findcuts);
       return(0);
    }
+
+   else if (strcmp(key, "generate_cgl_gomory_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_gomory_cuts") == 0){
+      READ_INT_PAR(lp_par->generate_cgl_gomory_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_knapsack_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_knapsack_cuts") == 0){
+      READ_INT_PAR(lp_par->generate_cgl_knapsack_cuts);
+      return(0);
+   }
    
+   else if (strcmp(key, "generate_cgl_oddhole_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_oddhole_cuts") == 0){
+      READ_INT_PAR(lp_par->generate_cgl_oddhole_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_probing_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_probing_cuts") == 0){
+      READ_INT_PAR(lp_par->generate_cgl_probing_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts") == 0){
+      READ_INT_PAR(lp_par->generate_cgl_flow_and_cover_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_rounding_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_rounding_cuts") == 0){
+      READ_INT_PAR(lp_par->generate_cgl_rounding_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_lift_and_project_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts") == 0){
+      READ_INT_PAR(lp_par->generate_cgl_lift_and_project_cuts);
+      return(0);
+   }
+
    else if (strcmp(key, "max_presolve_iter") == 0 ||
 	    strcmp(key, "LP_max_presolve_iter") == 0){
       READ_INT_PAR(lp_par->max_presolve_iter);
