@@ -1002,17 +1002,14 @@ int sym_mc_solve(problem *p)
 
 #ifdef MULTI_CRITERIA
    for (i = 0; i < p->mip->n; i++){
-      if (p->mip->obj2 != 0){
+      if (p->mip->obj2[i] != 0){
 	 break;
       }
    }
    if (i == p->mip->n){
-      printf("Second objective function is zero.\n");
-      printf("Solving as a single criteria MIP. \n\n");
+      printf("Warning: second objective function is identically zero.\n");
       return(sym_solve(p));
    }
-#else
-
 #endif
    
    start_time = wall_clock(NULL);

@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 
 #ifdef MULTI_CRITERIA
 
-   si.setObj2Coeff(0, 200);
+   //si.setObj2Coeff(0, 1000);
    
    /* Solve the multi-criteria problem */
    si.MCBranchAndBound();
