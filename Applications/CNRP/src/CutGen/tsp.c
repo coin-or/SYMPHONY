@@ -267,7 +267,7 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
 	 printf("Found %2d exactblossoms\n", cutnum);
       if (!rval && cutnum > 0){
 	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob,
-				    num_cuts, alloc_cuts, cuts);
+				    cuts, num_cuts, alloc_cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
 	       printf("%i exact blossoms added\n", cuts_added);
