@@ -34,7 +34,7 @@
 #include "cnrp_const.h"
 #include "cnrp_macros.h"
 
-#define NUMNODES 15
+#define NUMNODES -1
 
 /*===========================================================================*/
 
@@ -462,8 +462,9 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 		 exit(1);
 	      }
 	   }
-	   if (NUMNODES > 0 && i % vertnum/NUMNODES != 0)
+	   if (NUMNODES > 0 && i % vertnum/NUMNODES != 0){
 	      continue;
+	   }
 	   dist->coordx[adj_vertnum] = coord_x;
 	   dist->coordy[adj_vertnum] = coord_y;
 	   /*since position is an integer and coord is a double, I must
@@ -540,7 +541,11 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 	   fprintf(stderr, "\nCNRP I/O: too much data in DEMAND_SECTION\n\n");
 	   exit(1);
 	}
+#if 0
 	demand_scale_factor = (double)(vertnum)/cnrp->demand[0];
+#else
+	demand_scale_factor = 1;
+#endif
 	for (i = 0; i < vertnum; i++){
 	   cnrp->demand[i] *= demand_scale_factor;
 	}

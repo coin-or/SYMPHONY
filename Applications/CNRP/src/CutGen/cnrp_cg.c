@@ -149,12 +149,14 @@ int user_free_cg(void **user)
 /*===========================================================================*/
 
 #define SEND_DIR_SUBTOUR_CONSTRAINT(num_nodes, total_demand)                 \
-new_cut->type = (num_nodes < vertnum/2 ?                                     \
-		 SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);                     \
-new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                         \
-		RHS(num_nodes, total_demand, capacity) :                     \
-		mult*BINS(total_demand, capacity));                          \
-		num_cuts += cg_send_cut(new_cut);                            \
+if (num_nodes > 2){                                                          \
+   new_cut->type = (num_nodes < vertnum/2 ?                                  \
+		    SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);                  \
+   new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                      \
+		   RHS(num_nodes, total_demand, capacity) :                  \
+		   mult*BINS(total_demand, capacity));                       \
+   num_cuts += cg_send_cut(new_cut);                                         \
+}                                                                            \
 
 #define SEND_SUBTOUR_CONSTRAINT(num_nodes, total_demand)                     \
 if (mult - 1 && num_nodes > 2){                                              \
@@ -231,7 +233,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #elif defined(ADD_FLOW_VARS)
    char d_x_vars = FALSE;
 #endif
-   
+
    if (iter_num == 1) srandom(1);
 
    if (prob_type == TSP || prob_type == VRP || prob_type == BPP){
@@ -251,11 +253,13 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    if (n->is_integral){
       /* if the network is integral, check for connectivity */
 #ifdef ADD_FLOW_VARS      
-      num_cuts = check_flow_connectivity(n, etol, capacity, num_routes, mult);
-      if (num_cuts){
-	 free_net(n);
-	 *cutnum = num_cuts;
-	 return(USER_SUCCESS);
+      if (prob_type == CTP || prob_type == CSTP){
+	 num_cuts = check_flow_connectivity(n, etol, capacity, num_routes, mult);
+	 if (num_cuts){
+	    free_net(n);
+	    *cutnum = num_cuts;
+	    return(USER_SUCCESS);
+	 }
       }
 #else
       num_cuts = check_connectivity(n, etol, capacity, num_routes, mult);
@@ -447,6 +451,19 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
 #endif
 
+#ifdef ADD_FLOW_VARS      
+   if ((prob_type == VRP || prob_type == TSP || prob_type == BPP) &&
+       n->is_integral){
+      /* if the network is integral, check for connectivity */
+      num_cuts = check_flow_connectivity(n, etol, capacity, num_routes, mult);
+      if (num_cuts){
+	 free_net(n);
+	 *cutnum = num_cuts;
+	 return(USER_SUCCESS);
+      }
+   }
+#endif
+   
 #ifdef DO_TSP_CUTS
    if (cnrp->par.which_tsp_cuts && prob_type == TSP){
       num_cuts += tsp_cuts(n, cnrp->par.verbosity, TRUE,
@@ -544,7 +561,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 					-cur_edge->data->weight :
 					cur_edge->data->weight);
 			}
-			if (node_cut > max_node_cut){/*check whether the
+			if (node_cut > max_node_cut + etol){/*check whether the
 						       value of the cut
 						       decrease is the best
 						       seen so far*/
@@ -594,6 +611,11 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }while((!num_cuts || cnrp->par.which_connected_routine == BOTH)
 	  && which_connected_routine < 2);
 
+   free_net(n);
+   FREE(new_cut);
+   *cutnum = num_cuts;
+   return(USER_SUCCESS);
+   
 #if 0
    if (num_cuts < 10 && cnrp->par.do_mincut){
       num_cuts += min_cut(cnrp, n, etol, mult);

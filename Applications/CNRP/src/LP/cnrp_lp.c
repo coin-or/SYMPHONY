@@ -153,11 +153,11 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    int vertnum = cnrp->vertnum;
    int total_edgenum = vertnum*(vertnum-1)/2;
    char prob_type = cnrp->par.prob_type, od_const = FALSE, d_x_vars = FALSE;
+   int v0, v1;
+   double flow_capacity;
 #if defined(DIRECTED_X_VARS) && !defined(ADD_FLOW_VARS)
    int edgenum = (mip->n)/2;
 #elif defined(ADD_FLOW_VARS)
-   double flow_capacity;
-   int v0, v1;
 #ifdef DIRECTED_X_VARS
    int edgenum = (mip->n)/4;
 
@@ -216,10 +216,6 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    d_x_vars = TRUE;
 #endif
    
-   /* Fill out the appropriate data structures -- each column has
-      exactly two entries*/
-   /*DIFF: Here, we need to add some new core constraints for the
-     flows and some new columns also*/
    for (i = 0, j = 0; i < mip->n; i++){
       if (indices[i] < total_edgenum){
 	 mip->obj[i]       = cnrp->par.gamma*((double) costs[indices[i]]);
@@ -235,7 +231,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 mip->matval[j]    = 1.0;
 	 mip->matind[j++]  = edges[2*indices[i]+1];
 #ifdef DIRECTED_X_VARS
-	 /*out-degree constraint (VRP only)*/
+	 /*out-degree constraint*/
 	 if (od_const){
 	    mip->matval[j]   = 1.0;
 	    mip->matind[j++] = vertnum + edges[2*indices[i]];
@@ -805,32 +801,29 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	matind = (int *) malloc(varnum * ISIZE);
 	for (i = 0, nzcnt = 0; i < varnum; i++){
 	   edgeind = vars[i]->userind;
+#ifdef ADD_FLOW_VARS
 #ifdef DIRECTED_X_VARS
-#ifdef ADD_FLOW_VARS
-	   if (edgeind < 2*total_edgenum){
-#else
-	   {
-#endif
-	      v0 = edges[edgeind >= total_edgenum ?
-			(edgeind - total_edgenum) << 1 :
-			edgeind << 1];
-	      v1 = edges[edgeind >= total_edgenum ?
-			((edgeind - total_edgenum) << 1) + 1 :
-			(edgeind << 1) + 1];
-	      if ((edgeind >= total_edgenum &&
-		   (coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1) && 
-		   !(coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1)) ||
-		  (edgeind < total_edgenum &&
-		  (coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1) &&
-		   !(coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1))){
-		 matind[nzcnt++] = i;
+	   if (vars[i]->userind < 2*total_edgenum){
+	      if (vars[i]->userind >= total_edgenum){
+		 edgeind = vars[i]->userind - total_edgenum;
+	      }else{
+		 edgeind = vars[i]->userind;
 	      }
-	   }
 #else
-#ifdef ADD_FLOW_VARS
-	   if (edgeind < total_edgenum){   
+	   if ((edgeind = vars[i]->userind) < total_edgenum){   
+#endif
+#else
+#ifdef DIRECTED_X_VARS
+	   {
+	      if (vars[i]->userind >= total_edgenum){
+		 edgeind = vars[i]->userind - total_edgenum;
+	      }else{
+		 edgeind = vars[i]->userind;
+	      }
 #else	      
            {
+	      edgeind = vars[i]->userind;
+#endif
 #endif
 	      v0 = edges[edgeind << 1];
 	      v1 = edges[(edgeind << 1) + 1];
@@ -841,7 +834,6 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		 matind[nzcnt++] = i;
 	      }
 	   }
-#endif
 	}
 	cut->sense = 'G';
 	cut->deletable = TRUE;

@@ -145,9 +145,9 @@ int main(int argc, char **argv)
    memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
    solutions[numsolutions].gamma = gamma;
    solutions[numsolutions].tau = tau;
-   solutions[numsolutions].fixed_cost = (int) cnrp->fixed_cost;
-   solutions[numsolutions++].variable_cost = (int) cnrp->variable_cost;
-   utopia_fixed = cnrp->fixed_cost;
+   solutions[numsolutions].fixed_cost = cnrp->fixed_cost;
+   solutions[numsolutions++].variable_cost = cnrp->variable_cost;
+   utopia_fixed = (double) cnrp->fixed_cost;
       
    cnrp->lp_par.gamma = 0.0;
    cnrp->cg_par.tau = cnrp->lp_par.tau = 1.0;
@@ -166,9 +166,9 @@ int main(int argc, char **argv)
    memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
    solutions[numsolutions].gamma = gamma;
    solutions[numsolutions].tau = tau;
-   solutions[numsolutions].fixed_cost = (int) cnrp->fixed_cost;
-   solutions[numsolutions++].variable_cost = (int) cnrp->variable_cost;
-   utopia_variable = cnrp->variable_cost;
+   solutions[numsolutions].fixed_cost = cnrp->fixed_cost;
+   solutions[numsolutions++].variable_cost = cnrp->variable_cost;
+   utopia_variable = (double) cnrp->variable_cost;
 
    printf("***************************************************\n");
    printf("***************************************************\n");
@@ -214,14 +214,14 @@ int main(int argc, char **argv)
       printf("***************************************************\n");
       printf("***************************************************\n\n");
 
-      cnrp->fixed_cost = cnrp->variable_cost = 0.0;
+      cnrp->fixed_cost = cnrp->variable_cost = 0;
       
       cnrp_solve(p, base, root);
 
-      if ((int) cnrp->fixed_cost > solutions[solution1].fixed_cost &&
-	  (int) cnrp->variable_cost < solutions[solution1].variable_cost &&
-	  (int) cnrp->fixed_cost < solutions[solution2].fixed_cost &&
-	  (int) cnrp->variable_cost > solutions[solution2].variable_cost ){
+      if (cnrp->fixed_cost > solutions[solution1].fixed_cost &&
+	  cnrp->variable_cost < solutions[solution1].variable_cost &&
+	  cnrp->fixed_cost < solutions[solution2].fixed_cost &&
+	  cnrp->variable_cost > solutions[solution2].variable_cost ){
 	 if (numsolutions == 100){
 	    printf("Maximum number of solutions exceeded\n\n");
 	    exit(0);
