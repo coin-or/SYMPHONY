@@ -24,10 +24,12 @@ int main(int argc, char **argv)
    si.parseCommandLine(argc, argv);
    si.loadProblem();
 
-   si.setSymParam(OsiSymTimeLimit, 7200);
+   si.setSymParam(OsiSymTimeLimit, 10);
+   si.setSymParam(OsiKeepWarmStart, 1);
    termcode = si.initialSolve();
 
    while (termcode != TM_OPTIMAL_SOLUTION_FOUND){
+      printf("Starting problem again from warm start...\n");
       termcode = si.resolve();
    }
 
@@ -47,9 +49,11 @@ int main(int argc, char **argv)
    sym_load_problem(env);
 
    sym_set_int_param(env, "time_limit", 10);
+   sym_set_int_param(env, "keep_warm_start", 1);
    termcode = sym_solve(env);
 
    while (termcode != TM_OPTIMAL_SOLUTION_FOUND){
+      printf("Starting problem again from warm start...\n");
       termcode = sym_warm_solve(env);
    }
 
