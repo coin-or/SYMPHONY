@@ -623,11 +623,14 @@ int is_feasible_u(lp_prob *p, char branching)
       break;
    }
 
-   if (feasible == IP_FEASIBLE && p->par.multi_criteria &&
-       p->par.mc_add_optimality_cuts){
+   if (feasible == IP_FEASIBLE && p->par.multi_criteria){
       if (analyze_multicriteria_solution(p, indices, values, cnt,
 					 &true_objval, lpetol, branching) > 0){
-	 feasible = IP_FEASIBLE_BUT_CONTINUE;
+	 if (p->par.mc_add_optimality_cuts){
+	    feasible = IP_FEASIBLE_BUT_CONTINUE;
+	 }else{
+	    feasible = IP_FEASIBLE;
+	 }
       }else{
 	 feasible = IP_FEASIBLE;
       }
