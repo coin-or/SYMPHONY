@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "user"=".\user.dsp" - Package Owner=<4>
+Project: "template"=".\template.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -24,7 +24,7 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
-    Project_Dep_Name user
+    Project_Dep_Name template
     End Project Dependency
 }}}
 
