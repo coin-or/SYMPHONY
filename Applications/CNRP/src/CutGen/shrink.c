@@ -348,16 +348,17 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
    double set_demand, set_cut_val;
    vertex *verts = n->verts;
    elist *e;
-   int num_cuts = 0, i, j, k;
+   int num_cuts = 0, i, j;
    char *pt;
    int vertnum = n->vertnum;
   
    int min_vert = 0, set_size, begin = 1, cur_comp, end = 1;
    char *coef;
    double min_val, tmp_cut_val;
-   int max_size, max_vert, numarcs, *arcs;
+   int max_size, numarcs, *arcs;
    
-   max_size = DSIZE + 2*ISIZE + (vertnum >> DELETE_POWER) + 1 + vertnum^2*ISIZE/4;
+   max_size = DSIZE + 2*ISIZE + (vertnum >> DELETE_POWER) + 1
+      + vertnum^2*ISIZE/4;
    new_cut->coef = (char *) (calloc(max_size, sizeof(char)));
    coef = new_cut->coef + DSIZE + 2 * ISIZE;
    arcs = (int *) (coef + (vertnum >> DELETE_POWER) + 1);
@@ -402,11 +403,11 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 		  if (in_set[j]){
 		     (coef[(compmembers[j]) >> DELETE_POWER]) |=
 			(1 << ((compmembers[j]) & DELETE_AND));
-		     for (e = verts[compmembers[j]].first; e; e = e->next_edge){
+		     for (e = verts[compmembers[j]].first; e; e=e->next_edge){
 			if (e->other_end < compmembers[j]){
 			   if (!in_set[ref[e->other_end]] &&
 			       set_demand*e->data->weight1 >
-			       BINS(set_demand, capacity)*e->data->flow1 + etol){
+			       BINS(set_demand, capacity)*e->data->flow1+etol){
 			      arcs[numarcs << 1] = e->other_end;
 			      arcs[(numarcs << 1) + 1] = compmembers[j];
 			      numarcs++;
@@ -414,9 +415,9 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 			}else{
 			   if (!in_set[ref[e->other_end]] &&
 			       set_demand*e->data->weight2 >
-			       BINS(set_demand, capacity)*e->data->flow2 + etol){
-			      arcs[numarcs << 1] = compmembers[j];
-			      arcs[(numarcs << 1) + 1] = e->other_end;
+			       BINS(set_demand, capacity)*e->data->flow2+etol){
+			      arcs[numarcs << 1] = e->other_end;
+			      arcs[(numarcs << 1) + 1] = compmembers[j];
 			      numarcs++;
 			   }
 			}
@@ -426,19 +427,18 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 	       ((double *)(new_cut->coef))[0] = set_demand;
 	       ((int *)(new_cut->coef+DSIZE))[0] = BINS(set_demand, capacity);
 	       ((int *)(new_cut->coef+DSIZE))[1] = numarcs;
-	       new_cut->size = DSIZE + 2*ISIZE + (vertnum >> DELETE_POWER) + 1 +
-		  numarcs * ISIZE;
-	       if (k >= num_cuts){
-		  new_cut->type = MIXED_DICUT;
-		  new_cut->rhs = set_demand* BINS(set_demand, capacity);
-		  num_cuts += cg_send_cut(new_cut);
-	       }
+	       new_cut->size = DSIZE + 2*ISIZE + (vertnum >> DELETE_POWER)
+		  + 1 + 2 * numarcs * ISIZE;
+	       new_cut->type = MIXED_DICUT;
+	       new_cut->rhs = set_demand* BINS(set_demand, capacity);
+	       num_cuts += cg_send_cut(new_cut);
 	       if (num_cuts > max_num_cuts){
 		  FREE(new_cut->coef);
 		  return(num_cuts);
 	       }
 	    } 
-	    for (min_val = 0, pt = in_set + begin, j = begin; j < end; pt++, j++){
+	    for (min_val = 0, pt = in_set + begin, j = begin; j < end;
+		 pt++, j++){
 	       if (!in_set[j]){
 		  for (tmp_cut_val = 0, e = verts[compmembers[j]].first;
 		       e; e = e->next_edge){
@@ -464,15 +464,17 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 			}
 		     }
 		  }
-		  if (tmp_cut_val < min_val){
+		  if (tmp_cut_val < min_val - etol){
 		     min_vert = j;
+		     min_val = tmp_cut_val;
 		  }
 	       }
 	    }
 	    if (min_val < 0){    /* add the vertex to the set */
-	       in_set[max_vert]=1;
-	       set_size += 1+ verts[compmembers[max_vert]].orig_node_list_size;
-	       set_demand += demand[compmembers[max_vert]];
+	       in_set[min_vert] = 1;
+	       set_size += 1 +
+		  verts[compmembers[min_vert]].orig_node_list_size;
+	       set_demand += demand[compmembers[min_vert]];
 	       set_cut_val += min_val;
 	    }
 	    else{ /* can't add anything to the set */
