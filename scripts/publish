@@ -1,10 +1,10 @@
 #!/bin/tcsh -ef
 
-set VER=4.0
+set VER=5.0
 set DIR=$HOME/SYMPHONY-$VER
 mkdir $DIR
 awk -f scripts/reformat.awk Makefile > $DIR/Makefile
-foreach file (LICENSE README-$VER)
+foreach file (LICENSE README-$VER sample.*)
 awk -f scripts/reformat.awk $file > $DIR/$file
 end
 mkdir $DIR/Common
@@ -57,11 +57,21 @@ foreach file (DrawGraph/IGD_1.0/Simple_version/*.c)
 awk -f scripts/reformat.awk $file > $DIR/$file
 end
 
-foreach app (Vrp MATCH MPP SPP SPP+CUTS Template)
+foreach app (Vrp CNRP MCKP MATCH MPP SPP SPP+CUTS Template)
 mkdir $DIR/$app
 foreach file ($app/Makefile $app/sample.*)
 awk -f scripts/reformat.awk $file > $DIR/$file
 end
+end
+
+foreach app (FLOPC++)
+mkdir $DIR/$app
+foreach file ($app/Makefile $app/tap.*)
+awk -f scripts/reformat.awk $file > $DIR/$file
+end
+end
+
+foreach app (Vrp CNRP MATCH MPP SPP SPP+CUTS Template)
 mkdir $DIR/$app/LP
 foreach file ($app/LP/*.c)
 awk -f scripts/reformat.awk $file > $DIR/$file
@@ -86,6 +96,9 @@ mkdir $DIR/$app/DrawGraph
 foreach file ($app/DrawGraph/*.c)
 awk -f scripts/reformat.awk $file > $DIR/$file
 end
+end
+
+foreach app (Vrp CNRP MCKP MATCH MPP SPP SPP+CUTS Template)
 mkdir $DIR/$app/WIN32
 foreach file ($app/WIN32/*.dsp)
 awk -f scripts/reformat.awk $file > $DIR/$file
@@ -98,20 +111,32 @@ awk -f scripts/reformat.awk $file > $DIR/$file
 end
 end
 
-foreach app (Vrp MATCH MPP SPP SPP+CUTS)
-foreach file ($app/LICENSE $app/README)
+foreach app (Vrp CNRP FLOPC++ MCKP MATCH MPP SPP SPP+CUTS Template)
+foreach file ($app/README)
 awk -f scripts/reformat.awk $file > $DIR/$file
 end
 end
 
-foreach app (Vrp SPP SPP+CUTS)
+foreach app (Vrp CNRP MCKP MATCH MPP SPP SPP+CUTS)
+foreach file ($app/LICENSE)
+awk -f scripts/reformat.awk $file > $DIR/$file
+end
+end
+
+foreach app (Vrp CNRP SPP SPP+CUTS)
 mkdir $DIR/$app/Common
 foreach file ($app/Common/*.c)
 awk -f scripts/reformat.awk $file > $DIR/$file
 end
 end
 
-foreach app (Vrp MATCH MPP SPP SPP+CUTS)
+foreach app (MCKP)
+foreach file ($app/*.c)
+awk -f scripts/reformat.awk $file > $DIR/$file
+end
+end
+
+foreach app (Vrp CNRP MCKP MATCH MPP SPP SPP+CUTS)
 mv $DIR/$app $DIR/$app-$VER
 end
 mv $DIR/Vrp-$VER $DIR/VRP-$VER
@@ -121,7 +146,7 @@ mv $DIR/README* $DIR/README
 mkdir $DIR/Doc
 cd Doc
 latex man
-dvipdfm man
+dvipdf man
 mv man.pdf $DIR/Doc/SYMPHONY-$VER-Manual.pdf 
 dvips -o man.ps man
 mv man.ps $DIR/Doc/SYMPHONY-$VER-Manual.ps
@@ -134,10 +159,10 @@ tar -czvf SYMPHONY-$VER-Manual-HTML.tgz man-$VER/*
 zip -r SYMPHONY-$VER-Manual-HTML.zip man-$VER/*
 mv SYMPHONY-$VER-Manual-HTML.* $DIR/Doc/
 latex Walkthrough
-dvipdfm Walkthrough
+dvipdf Walkthrough
 mv Walkthrough.pdf $DIR/Doc/SYMPHONY-Walkthrough.pdf
 cd $HOME
-foreach app (VRP MATCH MPP SPP SPP+CUTS)
+foreach app (VRP CNRP MCKP MATCH MPP SPP SPP+CUTS)
 mv $DIR/$app-$VER .
 tar -czvf SYMPHONY-$app-$VER.tgz $app-$VER/*
 zip -r SYMPHONY-$app-$VER.zip $app-$VER/* 
@@ -145,7 +170,7 @@ end
 tar --exclude '$DIR/Doc/*.zip' -czvf SYMPHONY-$VER.tgz SYMPHONY-$VER/*
 zip -r SYMPHONY-$VER.zip SYMPHONY-$VER/* -x \*.tgz
 mv SYMPHONY-$VER.* $DIR
-foreach app (VRP MATCH MPP SPP SPP+CUTS)
+foreach app (VRP CNRP MCKP MATCH MPP SPP SPP+CUTS)
 mv $app-$VER $DIR
 mv SYMPHONY-$app-$VER.* $DIR
 end

@@ -1,6 +1,6 @@
 #! /bin/tcsh -f
 
-foreach dir (Template Vrp MATCH MPP SPP SPP+CUTS)
+foreach dir (Template CNRP Vrp MCKP MATCH MPP SPP SPP+CUTS)
 cd $HOME/SYMPHONY/$dir
 foreach solver (CPLEX OSL)
 echo ================= Compiling $dir with $solver ===============
