@@ -50,7 +50,6 @@ int sym_explicit_load_problem PROTO((sym_environment *env, int numcols,
 int sym_is_abandoned PROTO((sym_environment *env));
 int sym_is_proven_optimal PROTO((sym_environment *env));
 int sym_is_proven_primal_infeasible PROTO((sym_environment *env));	 
-int sym_is_primal_objective_limit_reached PROTO((sym_environment *env));
 int sym_is_iteration_limit_reached PROTO((sym_environment *env)); 
 int sym_is_time_limit_reached PROTO((sym_environment *env));
 int sym_is_target_gap_achieved PROTO((sym_environment *env));
