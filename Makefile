@@ -59,6 +59,20 @@ OSISYM_LIB        += -lCoin -lOsi
 endif
 endif
 
+
+##############################################################################
+##############################################################################
+# Determine if COIN is using lapack
+##############################################################################
+##############################################################################
+
+include $(COINROOT)/Makefiles/Makefile.location
+ifneq ($(filter COIN_lapack,$(CoinLibsDefined)),)
+	LPINCDIR += lapackIncDir
+	LPLIBPATHS += lapackLibDir
+	LPLIB += -llapack -lblas -lg2c
+endif
+
 ##############################################################################
 ##############################################################################
 # OS dependent flags, paths, libraries
