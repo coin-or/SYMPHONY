@@ -1738,7 +1738,11 @@ void generate_cuts_in_lp_u(lp_prob *p)
       /* Add to the user's list of cuts */
 #ifdef USE_CGL_CUTS
       if (p->par.generate_cgl_cuts){
-	 generate_cgl_cuts(lp_data, &new_row_num, &cuts);
+	 if (p->bc_index == 0){
+	    generate_cgl_cuts(lp_data, &new_row_num, &cuts, TRUE);
+	 }else{
+	    generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE);
+	 }
       }
 #endif
       /* Fall through to next case */

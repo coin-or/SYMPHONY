@@ -280,7 +280,8 @@ int read_mps PROTO((MIPdesc *mip, char *infile, char *probname));
 void write_mps PROTO((LPdata *lp_data, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
 #ifdef USE_CGL_CUTS
-void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts, cut_data ***cuts));
+void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts, cut_data ***cuts,
+			      char send_to_pool));
 #endif
 #ifdef USE_GLPMPL
 int read_gmpl PROTO((MIPdesc *mip, char *modelfile, char *datafile,

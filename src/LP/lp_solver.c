@@ -1354,7 +1354,8 @@ void write_sav(LPdata *lp_data, char *fname)
 /*===========================================================================*/
 
 #ifdef USE_CGL_CUTS
-void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts)
+void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
+		       char send_to_pool)
 {
    return;
 }
@@ -2115,7 +2116,8 @@ void write_sav(LPdata *lp_data, char *fname)
 /*===========================================================================*/
 
 #ifdef USE_CGL_CUTS
-void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts)
+void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
+		       char send_to_pool)
 {
    return;
 }
@@ -2980,7 +2982,8 @@ void write_sav(LPdata *lp_data, char *fname)
 
 #ifdef USE_CGL_CUTS
 
-void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
+void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
+		       char send_to_pool){
 
    OsiCuts cutlist;
    OsiRowCut cut;
@@ -3067,7 +3070,11 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 		(char *)elements, num_elements * DSIZE);
 	 (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	 (*cuts)[j]->deletable = TRUE;
-	 (*cuts)[j++]->name = CUT__SEND_TO_CP;
+	 if (send_to_pool){
+	    (*cuts)[j++]->name = CUT__SEND_TO_CP;
+	 }else{
+	    (*cuts)[j++]->name = CUT__SEND_TO_CP;
+	 }	    
       }
       *num_cuts += j;
    }
