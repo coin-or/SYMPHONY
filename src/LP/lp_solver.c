@@ -2479,7 +2479,7 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
 
 void set_obj_upper_lim(LPdata *lp_data, double lim)
 {
-   OsiDblParam key = OsiPrimalObjectiveLimit;
+   OsiDblParam key = OsiDualObjectiveLimit;
    
    retval = lp_data->si->setDblParam(key, lim);
 }
