@@ -2012,6 +2012,7 @@ void get_objcoef(LPdata *lp_data, int j, double *objcoef)
 
 void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 {
+#if 0 
    int i, m = lp_data->m, *bhead = lp_data->bhead;
    for (i = 0; i < m; ){
       if (bhead[i] < 0 && free_rows[-bhead[i]-1]){
@@ -2022,9 +2023,10 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
    }
    if (m + deletable != lp_data->m)
       lp_data->bhead_is_valid = FALSE;
+#endif
    cpx_status = CPXdelsetrows(lp_data->cpxenv, lp_data->lp, free_rows);
    CPX_check_error("delete_rows");
-   lp_data->m = m;
+   lp_data->m -= deletable;
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 
 }

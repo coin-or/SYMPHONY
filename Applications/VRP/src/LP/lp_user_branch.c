@@ -57,10 +57,12 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
 
    if (!vrp->par.detect_tailoff){
       *action = USER__BRANCH_IF_MUST;
-      return(USER_NO_PP);
+   }else{
+      *action = USER__BRANCH_IF_TAILOFF;
    }
 
-   return(USER__BRANCH_IF_TAILOFF);
+   return(USER_NO_PP);
+
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #if 0
    for (i = MIN(p->iter_num-1, backsteps) - 1; i >= 0; i--)

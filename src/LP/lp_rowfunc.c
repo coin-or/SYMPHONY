@@ -33,6 +33,7 @@ int check_row_effectiveness(lp_prob *p)
    int ineff_cnt_to_delete = p->par.ineff_cnt_to_delete;
    char orig_eff = p->par.base_constraints_always_effective;
    LPdata *lp_data = p->lp_data;
+   double *dualsol = lp_data->dualsol;
    double lpetol = lp_data->lpetol;
    constraint *row, *rows = lp_data->rows;
    int m = lp_data->m;
@@ -159,11 +160,38 @@ int check_row_effectiveness(lp_prob *p)
 	 break;
        case ZERO_DUAL_VALUES_ARE_INEFFECTIVE:
 	 for (i = orig_eff ? bcutnum : 0; i < m; i++){
-	    if (fabs(lp_data->dualsol[i]) < lpetol && stat[i] != VIOLATED_ROW){
-	       now_ineff[ineffective++] = i;
-	    }else{
-	       rows[i].eff_cnt++;
+ 	    if (fabs(lp_data->dualsol[i]) < lpetol && stat[i] != VIOLATED_ROW){
+ 	       now_ineff[ineffective++] = i;
+ 	    }else{
+ 	       rows[i].eff_cnt++;
 	    }
+#if 0
+	    switch (rows[i].cut->sense){
+	     case 'E':
+	       if (dualsol[i] > -lpetol && dualsol[i] < lpetol){ 
+		  now_ineff[ineffective++] = i;
+	       }else{
+		  rows[i].eff_cnt++;
+	       }
+	       break;
+	     case 'L':
+	       if (dualsol[i] > -lpetol){ 
+		  now_ineff[ineffective++] = i;
+	       }else{
+		  rows[i].eff_cnt++;
+	       }
+	       break;
+	     case 'G':
+	       if (dualsol[i] < lpetol){ 
+		  now_ineff[ineffective++] = i;
+	       }else{
+		  rows[i].eff_cnt++;
+	       }
+	       break;
+	     case 'R':
+	       break;
+	    }
+#endif
 	 }
 	 break;
       }
