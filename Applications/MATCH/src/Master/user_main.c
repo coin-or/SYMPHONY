@@ -34,6 +34,9 @@ if ((termcode = f) < 0){                                                    \
 
 #include <stdlib.h>
 
+
+int match_test(sym_environment *env);
+
 int main(int argc, char **argv)
 {
 
@@ -50,26 +53,37 @@ int main(int argc, char **argv)
 
    CALL_FUNCTION( sym_parse_command_line(env, argc, argv) );
 
-   CALL_FUNCTION( sym_get_str_param(env, "infile_name", &infile));
+   if(prob->par.test){
 
-   CALL_FUNCTION( match_read_data(prob, infile) );
+     match_test (env);
 
-   CALL_FUNCTION( match_load_problem(env, prob) );
-   int colsNum=-1;
-   sym_get_num_cols(env, &colsNum);
-   for(int j=0; j<=colsNum; ++j) {
-      int isInt=666;
-      int code=sym_is_integer(env, j, &isInt);
-      printf("j=%d  code=%d  isInt=%d\n", j, code, isInt);
-   }  // j
+   } else {
+    
+     CALL_FUNCTION( match_read_data(prob, prob->par.infile) );
+     
+     CALL_FUNCTION( match_load_problem(env, prob) );
 
-   CALL_FUNCTION( sym_solve(env) );
-
+# if 0
+     int colsNum=-1;
+     sym_get_num_cols(env, &colsNum);
+     for(int j=0; j<=colsNum; ++j) {
+       int isInt=666;
+       int code=sym_is_integer(env, j, &isInt);
+       printf("j=%d  code=%d  isInt=%d\n", j, code, isInt);
+     }  // j
+#endif
+     
+     CALL_FUNCTION( sym_solve(env) );
+   }
+     
    CALL_FUNCTION( sym_close_environment(env) );
-
+   
    return(0);
-
+   
 }
+
+/*===========================================================================*\
+\*===========================================================================*/
 
 int match_read_data(user_problem *prob, char *infile)
 {
@@ -90,6 +104,8 @@ int match_read_data(user_problem *prob, char *infile)
    return (FUNCTION_TERMINATED_NORMALLY);
 }
 
+/*===========================================================================*\
+\*===========================================================================*/
 
 int match_load_problem(sym_environment *env, user_problem *prob){
    
@@ -159,6 +175,68 @@ int match_load_problem(sym_environment *env, user_problem *prob){
    FREE(is_int);
 
    return (FUNCTION_TERMINATED_NORMALLY);
+
+}
+
+/*===========================================================================*\
+\*===========================================================================*/
+
+int match_test(sym_environment *env)
+{
+
+   int termcode, i, file_num = 1;
+   char input_files[1][MAX_FILE_NAME_LENGTH +1] = {"sample.mat"};
+   
+   double sol[1] = {5.00};
+   
+   char *input_dir = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
+   char *infile = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
+   double *obj_val = (double *)calloc(DSIZE,file_num);
+   double tol = 1e-03;
+   user_problem *prob = (user_problem *) env->user;
+  
+   if (strcmp(env->par.test_dir, "") == 0){ 
+     strcpy(input_dir, ".");
+   } else{
+     strcpy(input_dir, env->par.test_dir);
+   }
+  
+   sym_set_int_param(env, "verbosity", -10);
+
+  for(i = 0; i<file_num; i++){
+
+    strcpy(infile, "");
+    sprintf(infile, "%s%s%s", input_dir, "/", input_files[i]);
+   
+    CALL_FUNCTION( match_read_data(prob, infile) );
+    
+    CALL_FUNCTION( match_load_problem(env, prob) );
+
+    printf("Solving %s...\n", input_files[i]); 
+
+    CALL_FUNCTION( sym_solve(env) );
+
+    sym_get_obj_val(env, &obj_val[i]);
+
+    if((obj_val[i] < sol[i] + tol) && 
+       (obj_val[i] > sol[i] - tol)){
+      printf("Success!\n");
+    } else {
+      printf("Failure!(%f, %f) \n", obj_val[i], sol[i]);
+    }
+
+    if(env->mip->n && i + 1 < file_num){
+      free_master_u(env);
+      strcpy(env->par.infile, "");
+      env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+    }
+  }
+
+  FREE(input_dir);
+  FREE(infile);
+  FREE(obj_val);
+  
+  return(0);
 
 }
 

@@ -23,10 +23,21 @@
 #define MAXNODES 200
 
 /*---------------------------------------------------------------------------*\
+ * Use this data structure to store the value of any run-time parameters.
+\*---------------------------------------------------------------------------*/
+
+typedef struct USER_PARAMETERS{
+   /* Name of file containingthe instance data */
+   char             infile[MAX_FILE_NAME_LENGTH + 1];
+   int              test;
+   char             test_dir[MAX_FILE_NAME_LENGTH +1]; /* Test files directory */
+}user_parameters;
+/*---------------------------------------------------------------------------*\
  * Use this data structure to store the instance data after it is read in.
 \*---------------------------------------------------------------------------*/
 
 typedef struct USER_PROBLEM{
+   user_parameters  par;        /* the parameters */
    /* Number of nodes */
    int		    numnodes;
    /* Cost of matching i and j */
