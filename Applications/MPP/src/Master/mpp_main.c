@@ -141,7 +141,7 @@ int mpp_test(sym_environment *env)
     }
   }
 
-  mpp->par->test = FALSE;
+  mpp->par.test = FALSE;
 
   FREE(input_dir);
   FREE(infile);
