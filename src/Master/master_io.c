@@ -570,42 +570,45 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    initial_time += tim->strong_branching;
    initial_time += tim->cut_pool;
 #ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
-   printf("====================== CP Timing =========================\n");
+   printf("======================= CP Timing ===========================\n");
    printf("  Cut Pool                  %.3f\n", tim->cut_pool);
 #endif
    printf("====================== LP/CG Timing =========================\n");
 #ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
-   printf("  LP: Solution Time         %.3f\n", tim->lp);
-   printf("      Variable Fixing       %.3f\n", tim->fixing);
-   printf("      Pricing               %.3f\n", tim->pricing);
-   printf("      Strong Branching      %.3f\n", tim->strong_branching);
-   printf("      Communication         %.3f\n", tim->communication);
-#ifndef COMPILE_IN_LP
-   printf("      Ramp Up Time (TM)     %.3f\n", tim->ramp_up_tm);
-   printf("      Ramp Up Time (LP)     %.3f\n", tim->ramp_up_lp);
-   printf("      Ramp Down Time        %.3f\n", tim->ramp_down_time);
-#endif
-   printf("      Idle Time (Node Pack) %.3f\n", tim->start_node);
-   printf("      Idle Time (Nodes)     %.3f\n", tim->idle_node);
-   printf("      Idle Time (Names)     %.3f\n", tim->idle_names);
-   printf("      Idle Time (Diving)    %.3f\n", tim->idle_diving);
-   printf("      Idle Time (Cuts)      %.3f\n", tim->idle_cuts);
+   printf("  LP Solution Time          %.3f\n", tim->lp);
+   printf("  Variable Fixing           %.3f\n", tim->fixing);
+   printf("  Pricing                   %.3f\n", tim->pricing);
+   printf("  Strong Branching          %.3f\n", tim->strong_branching);
    printf("  Separation                %.3f\n", tim->separation); 
+#ifndef COMPILE_IN_LP
+   printf("=================== Parallel Overhead ======================\n");
+   printf("  Communication         %.3f\n", tim->communication);
+   printf("  Ramp Up Time (TM)     %.3f\n", tim->ramp_up_tm);
+   printf("  Ramp Up Time (LP)     %.3f\n", tim->ramp_up_lp);
+   printf("  Ramp Down Time        %.3f\n", tim->ramp_down_time);
+   printf("  Idle Time (Node Pack) %.3f\n", tim->start_node);
+   printf("  Idle Time (Nodes)     %.3f\n", tim->idle_node);
+   printf("  Idle Time (Names)     %.3f\n", tim->idle_names);
+   printf("  Idle Time (Diving)    %.3f\n", tim->idle_diving);
+   printf("  Idle Time (Cuts)      %.3f\n", tim->idle_cuts);
+#endif
    printf("  Total User Time              %.3f\n", initial_time);
 #endif
-   printf("  Total Real Time              %.3f\n\n", finish_time -
+   printf("  Total Wallclock Time         %.3f\n\n", finish_time -
 	  start_time);
    printf("====================== Statistics =========================\n");
    printf("Number of created nodes :       %i\n", stat->created);
    printf("Number of analyzed nodes:       %i\n", stat->analyzed);
    printf("Depth of tree:                  %i\n", stat->max_depth);
    printf("Size of the tree:               %i\n", stat->tree_size);
+#if 0
    printf("Leaves before trimming:         %i\n",
 	  stat->leaves_before_trimming);
    printf("Leaves after trimming:          %i\n", stat->leaves_after_trimming);
    printf("Repriced root's nf_status:      %s\n",
 	  nfstatus[(int)stat->nf_status].str);
    printf("Not fixed variable num:         %i\n", stat->vars_not_priced);
+#endif
    printf("Number of Chains:               %i\n", stat->chains);
    printf("Number of Diving Halts:         %i\n", stat->diving_halts);
    printf("Number of cuts in cut pool:     %i\n", stat->cuts_in_pool);

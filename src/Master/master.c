@@ -1041,10 +1041,12 @@ int sym_solve(sym_environment *env)
 #ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
       printf( "====================== Misc Timing =========================\n");
       printf( "  Problem IO        %.3f\n", env->comp_times.readtime);
+#if 0
       printf( "  UB overhead:      %.3f\n", env->comp_times.ub_overhead);
       printf( "  UB runtime:       %.3f\n", env->comp_times.ub_heurtime);
       printf( "  LB overhead:      %.3f\n", env->comp_times.lb_overhead);
       printf( "  LB runtime:       %.3f\n", env->comp_times.lb_heurtime);
+#endif
 #endif
    }
    
