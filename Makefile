@@ -299,7 +299,7 @@ ifeq ($(ARCH),LINUX)
 	   LPSOLVER_DEFS = -DSYSFREEUNIX
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
-	SYSLIBS = -lpthread # -lefence
+	SYSLIBS = -lpthread #-lefence
 	CC = gcc
 	OPT = -g
 	COMPILE_IN_CG = TRUE

@@ -311,11 +311,11 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       
       new_cut = (cut_data *) calloc(1, sizeof(cut_data));
       new_cut->size = cut_size;
-      compnodes_copy = (int *) malloc(vertnum * sizeof(int));
-      compmembers = (int *) malloc(vertnum * sizeof(int));
+      compnodes_copy = (int *) malloc((vertnum + 1) * sizeof(int));
+      compmembers = (int *) malloc((vertnum + 1) * sizeof(int));
       /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      compdemands_copy = (int *) calloc(vertnum, sizeof(int));
-      compcuts_copy = (double *) calloc(vertnum, sizeof(double));
+      compdemands_copy = (int *) calloc(vertnum + 1, sizeof(int));
+      compcuts_copy = (double *) calloc(vertnum + 1, sizeof(double));
 #ifdef COMPILE_OUR_DECOMP
       compdensity = vrp->par.do_our_decomp ?
 	 (double *) calloc(vertnum+1, sizeof(double)) : NULL;
@@ -323,9 +323,9 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       /*___END_EXPERIMENTAL_SECTION___*/
       
       do{
-	 compnodes = (int *) calloc(vertnum, sizeof(int));
-	 compdemands = (int *) calloc(vertnum, sizeof(int));
-	 compcuts = (double *) calloc(vertnum, sizeof(double));
+	 compnodes = (int *) calloc(vertnum + 1, sizeof(int));
+	 compdemands = (int *) calloc(vertnum + 1, sizeof(int));
+	 compcuts = (double *) calloc(vertnum + 1, sizeof(double));
 	 
          /*------------------------------------------------------------------*\
           * Get the connected components of the solution graph without the
@@ -352,12 +352,12 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	    vrp->par.do_greedy){
 #endif
 	    compnodes_copy = memcpy((char *)compnodes_copy, (char*)compnodes,
-				    vertnum*sizeof(int));
+				    (vertnum+1)*sizeof(int));
 	    /*__BEGIN_EXPERIMENTAL_SECTION__*/
 	    compdemands_copy = memcpy((char *)compdemands_copy,
-				      (char *)compdemands, vertnum*ISIZE);
+				      (char *)compdemands, (vertnum+1)*ISIZE);
 	    compcuts_copy = memcpy((char *)compcuts_copy,
-				   (char *)compcuts, vertnum*DSIZE);
+				   (char *)compcuts, (vertnum+1)*DSIZE);
 	    /*___END_EXPERIMENTAL_SECTION___*/
 	    n->compnodes = compnodes_copy;
 	    comp_num = rcnt;
@@ -699,9 +699,9 @@ int user_find_cuts(void *user, int xlength, int *xind,
       new_cut = (cut_data *) calloc(1, sizeof(cut_data));
       new_cut->size = cut_size;
       do{
-	 compnodes = (int *) calloc(vertnum, sizeof(int));
-	 compdemands = (int *) calloc(vertnum, sizeof(int));
-	 compcuts = (double *) calloc(vertnum, sizeof(double));
+	 compnodes = (int *) calloc(vertnum + 1, sizeof(int));
+	 compdemands = (int *) calloc(vertnum + 1, sizeof(int));
+	 compcuts = (double *) calloc(vertnum + 1, sizeof(double));
 	 
 	 /*------------------------------------------------------------------*\
          | Get the connected components of the solution graph without the     |
@@ -852,9 +852,9 @@ int check_connectivity(network *n, double etol, int capacity, int numroutes)
   if (!n->is_integral) return(NOT_INTEGRAL);
 
   verts = n->verts;
-  compnodes = (int *) calloc((vertnum/2) +1, sizeof(int));
-  compdemands = (int *) calloc((vertnum/2) +1, sizeof(int));
-  compcuts = (double *) calloc((vertnum/2) +1, sizeof(double));
+  compnodes = (int *) calloc(vertnum + 1, sizeof(int));
+  compdemands = (int *) calloc(vertnum + 1, sizeof(int));
+  compcuts = (double *) calloc(vertnum + 1, sizeof(double));
   /*get the components of the solution graph without the depot to check if the
     graph is connected or not*/
   rcnt = connected(n, compnodes, compdemands, NULL, compcuts, NULL);

@@ -246,9 +246,9 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    }
    
    verts = n->verts;
-   compnodes = (int *) calloc ((vertnum/2) +1, sizeof(int));
-   compdemands = (int *) calloc ((vertnum/2) +1, sizeof(int));
-   compcuts = (double *) calloc ((vertnum/2) +1, sizeof(double));
+   compnodes = (int *) calloc (vertnum + 1, sizeof(int));
+   compdemands = (int *) calloc (vertnum + 1, sizeof(int));
+   compcuts = (double *) calloc (vertnum + 1, sizeof(double));
    /*get the components of the solution graph without the depot to check if the
      graph is connected or not*/
    rcnt = connected(n, compnodes, compdemands, NULL, compcuts, NULL);
