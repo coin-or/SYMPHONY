@@ -18,7 +18,7 @@
 SYMPHONYROOT = ..
 SYM_EXAMPLE = TRUE
 
-EXAMPLES = milp bicriteria sensitivity warm_start1 warm_start2
+EXAMPLES = milp bicriteria sensitivity warm_start1 warm_start2 warm_start3
 
 examples: $(EXAMPLES)
 	true

@@ -24,10 +24,12 @@
 #-----------------------------------------------------------------------------
 ##############################################################################
 
+CONFIG_FILE_DIR = $(PWD)
 ifeq ($(USE_SYM_APPL), TRUE)
 CONFIG_FILE_DIR = $(SYMPHONYROOT)
-else
-CONFIG_FILE_DIR = $(PWD)
+endif
+ifeq ($(SYM_EXAMPLE), TRUE)
+CONFIG_FILE_DIR = $(SYMPHONYROOT)
 endif
 
 CONFIG_FILE = config
@@ -830,7 +832,7 @@ ifeq ($(SYM_COMPILE_IN_CP),TRUE)
 ifeq ($(SYM_COMPILE_IN_LP),TRUE)
 ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 ifeq ($(USE_SYM_APPL),TRUE)
-MASTERLLIBNAME = $(LIBNAME)
+MASTERLIBNAME = $(LIBNAME)
 else
 MASTERLIBNAME = $(LIBNAME)
 endif
@@ -1424,6 +1426,14 @@ warm_start2 : masterlib $(EXAMPLE_OBJDIR)/warm_start2.o
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/warm_start2.o \
+	$(LIBS) $(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB)
+	@echo ""
+
+warm_start3 : masterlib $(EXAMPLE_OBJDIR)/warm_start3.o
+	@echo ""
+	@echo "Linking $(notdir $@) ..."
+	@echo ""
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/warm_start3.o \
 	$(LIBS) $(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB)
 	@echo ""
 

@@ -72,7 +72,7 @@ int main(int argc, char **argv)
        printf("j=%d  code=%d  isInt=%d\n", j, code, isInt);
      }  // j
 #endif
-     
+
      CALL_FUNCTION( sym_solve(env) );
    }
      
