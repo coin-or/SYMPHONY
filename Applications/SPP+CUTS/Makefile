@@ -1,0 +1,93 @@
+##############################################################################
+##############################################################################
+#                                                                            #
+# This file is part of a demonstration application for use with the          #
+# SYMPHONY Branch, Cut, and Price Library. This application is a solver for  #
+# the Vehicle Routing Problem and the Traveling Salesman Problem.            #
+#                                                                            #
+# (c) Copyright 2000, 2001, 2002  Ted Ralphs. All Rights Reserved.           #
+#                                                                            #
+# This application was developed by Ted Ralphs (tkralphs@lehigh.edu)         #
+#                                                                            #
+# This software is licensed under the Common Public License. Please see      #
+# accompanying file for terms.                                               #
+#                                                                            #
+##############################################################################
+##############################################################################
+
+##############################################################################
+# First, we have to define some variables that will be used
+##############################################################################
+
+##############################################################################
+# SYMPHONY's home directory
+##############################################################################
+
+SYMPHONYROOT = ${HOME}/SYMPHONY
+
+##############################################################################
+# The home directory of the user files (must be an absolute path)
+##############################################################################
+
+USERROOT = ${SYMPHONYROOT}/SPP+CUTS
+
+##############################################################################
+# The customized name of the master program (if desired)
+##############################################################################
+
+MASTERNAME = spp
+
+##############################################################################
+# These are only needed if parallel computation is used. Please see the
+# explanation of these variables in SYMPHONY's Makefile.
+##############################################################################
+
+COMPILE_IN_TM = TRUE
+COMPILE_IN_LP = TRUE
+COMPILE_IN_CG = TRUE
+COMPILE_IN_CP = TRUE
+
+##############################################################################
+# This section is for listing SPP source file names
+##############################################################################
+
+USER_COMMON_SRC   = spp_common.c
+
+USER_CP_SRC       = spp_cp.c 
+
+USER_DG_SRC       = spp_dg.c 
+
+USER_CG_SRC       = spp_cg.c spp_cg_functions.c spp_cg_clique.c
+
+USER_LP_SRC       = spp_lp.c spp_lp_branch.c spp_lp_functions.c
+ifeq ($(COMPILE_IN_CG),TRUE)
+USER_LP_SRC      += $(USER_CG_SRC)
+endif
+
+USER_TM_SRC       =
+ifeq ($(COMPILE_IN_LP),TRUE)
+USER_TM_SRC      += $(USER_LP_SRC)
+endif
+ifeq ($(COMPILE_IN_CP),TRUE)
+USER_TM_SRC      += $(USER_CP_SRC)
+endif
+
+USER_MASTER_SRC   = spp_master.c spp_master_functions.c $(USER_COMMON_SRC)
+
+ifeq ($(COMPILE_IN_TM),TRUE)
+USER_MASTER_SRC  += $(USER_TM_SRC)
+endif
+
+ALL_USER_SRC      = spp_common.c spp_lp_branch.c spp_lp.c
+ALL_USER_SRC     += spp_master.c app_master_functions.c 
+ALL_USER_SRC     += spp_cg.c spp_cg_functions.c spp_cg_clique.c
+ALL_USER_SRC     += spp_cp.c spp_dg.c
+
+USER_SRCDIR      += 
+
+##############################################################################
+# Include the SYMPHONY makefile after all the source file names (and before
+# any used-defined targets!)
+##############################################################################
+
+include $(SYMPHONYROOT)/Makefile
