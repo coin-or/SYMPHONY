@@ -440,7 +440,7 @@ ifeq ($(ARCH),LINUX)
 	   LPSOLVER_DEFS = -DSYSFREEUNIX
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
-	SYSLIBS = -lpthread #-lefence
+	SYSLIBS = -lpthread -lreadline -ltermcap #-lefence
 endif
 
 ##############################################################################
