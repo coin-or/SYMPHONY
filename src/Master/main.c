@@ -60,12 +60,19 @@ int main(int argc, char **argv)
    if (argc > 1){
    
      sym_parse_command_line(env, argc, argv);
+
+     if (env->par.test){
+
+       sym_test(env);
+
+     } else {
      
-     sym_load_problem(env);
+       sym_load_problem(env);
+       
+       sym_find_initial_bounds(env);
      
-     sym_find_initial_bounds(env);
-     
-     sym_solve(env);
+       sym_solve(env);
+     }
    
    } else{
      FILE *f = NULL;
