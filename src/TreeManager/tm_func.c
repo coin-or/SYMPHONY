@@ -2222,7 +2222,7 @@ int tasks_before_phase_two(tm_prob *tm)
       printf( "**********************************************\n\n");
       
       print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, tm->lb, 0,
-		       tm->start_time, tm->lpp[0]->mip->obj_offset,
+		       tm->start_time, wall_clock(NULL), tm->lpp[0]->mip->obj_offset,
 		       tm->lpp[0]->mip->obj_sense, tm->has_ub);
    }
 #else

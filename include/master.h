@@ -78,7 +78,7 @@ int parse_command_line PROTO((sym_environment *env, int argc, char **argv));
 void read_string PROTO((char *target, char *line, int maxlen));
 void print_statistics PROTO((node_times *tim, problem_stat *stat, double ub,
 			     double lb, double initial_time,
-			     double start_time, double obj_offset,
+			     double start_time, double finish_time, double obj_offset,
 			     char obj_sense, char has_ub));
 
 /*===========================================================================*/
