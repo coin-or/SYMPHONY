@@ -34,7 +34,7 @@
 #include "cnrp_const.h"
 #include "cnrp_macros.h"
 
-#define NUMNODES 10
+#define NUMNODES -1
 
 /*===========================================================================*/
 
@@ -198,19 +198,19 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 	if (!cnrp->par.prob_type){
 	   if (strcmp("CVRP", tmp) == 0){
 	      cnrp->par.prob_type = cnrp->cg_par.prob_type =
-		 cnrp->lp_par.prob_type = VRP;
+		 cnrp->lp_par.prob_type = cnrp->cp_par.prob_type = VRP;
 	   }else if (strcmp("TSP", tmp) == 0){
 	      cnrp->par.prob_type = cnrp->cg_par.prob_type = 
-		 cnrp->lp_par.prob_type = TSP;
+		 cnrp->lp_par.prob_type = cnrp->cp_par.prob_type = TSP;
 	   }else if (strcmp("BPP", tmp) == 0){
 	      cnrp->par.prob_type = cnrp->cg_par.prob_type = 
-		 cnrp->lp_par.prob_type = BPP;
+		 cnrp->lp_par.prob_type = cnrp->cp_par.prob_type = BPP;
 	   }else if (strcmp("CSTP", tmp) == 0){
 	      cnrp->par.prob_type = cnrp->cg_par.prob_type = 
-		 cnrp->lp_par.prob_type = CSTP;
+		 cnrp->lp_par.prob_type = cnrp->cp_par.prob_type = CSTP;
 	   }else if (strcmp("CTP", tmp) == 0){
 	      cnrp->par.prob_type = cnrp->cg_par.prob_type = 
-		 cnrp->lp_par.prob_type = CTP;
+		 cnrp->lp_par.prob_type = cnrp->cp_par.prob_type = CTP;
 	   }else{
 	      fprintf(stderr, "This is not a recognized problem type!\n");
 	      exit(1);

@@ -172,11 +172,13 @@ void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp)
 #endif
    int varnum = cnrp->basevarnum + cnrp->extravarnum;
 
+#if 0
    if (varnum != 4*total_edgenum){
       printf("Error: Variables missing from problem description.\n");
       printf("Exiting...\n");
       exit(0);
    }
+#endif
    
 #if defined(ADD_FLOW_VARS)
 #ifdef DIRECTED_X_VARS

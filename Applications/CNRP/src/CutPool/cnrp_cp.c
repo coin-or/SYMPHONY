@@ -360,7 +360,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
 #ifdef DIRECTED_X_VARS
 	   lhs += -values[matind[0]] * (vcp->capacity - demand);
 #else
-	   if (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == CTP){
+	   if (vcp->par.prob_type == CSTP || vcp->par.prob_type == CTP){
 	      lhs += -values[matind[0]]*vcp->capacity;
 	   }else{
 	      lhs += -values[matind[0]]*vcp->capacity/2;

@@ -165,7 +165,7 @@ if (mult - 1 && num_nodes > 2){                                              \
    new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                      \
 		   RHS(num_nodes, total_demand, capacity) :                  \
 		   mult*BINS(total_demand, capacity));                       \
-   cut_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);            \
+   cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);            \
 }else{                                                                       \
    new_cut->type = SUBTOUR_ELIM_ACROSS;                                      \
    new_cut->rhs = mult*BINS(total_demand, capacity);                         \
@@ -265,7 +265,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 }
       }
 #else
-      check_connectivity(n, etol, capacity, num_routes, mult);
+      check_connectivity(n, etol, capacity, num_routes, mult, num_cuts,
+			 alloc_cuts, cuts);
       free_net(n);
       FREE(new_cut);
       return(USER_SUCCESS);

@@ -23,6 +23,7 @@
 #include "cnrp_common_types.h"
 #include "cnrp_cg_params.h"
 #include "cnrp_lp_params.h"
+#include "cnrp_cp_params.h"
 
 /*---------------------------------------------------------------------------*\
  * The "small_graph" data structure is used to store the subset of the
@@ -74,6 +75,7 @@ typedef struct CNRP_PROBLEM{
    cnrp_params      par;
    cnrp_cg_params  cg_par;
    cnrp_lp_params  lp_par;
+   cnrp_cp_params  cp_par;
    int             dg_id;     /* drawgraph process id */
    int             vertnum;   /* the number of nodes in the problem, including
 				 the depot */

@@ -72,7 +72,8 @@ typedef struct CG_CNRP_SPEC{
 /*===========================================================================*/
 
 int check_connectivity PROTO((network *n, double etol, double capacity,
-			      int numroutes, char mult));
+			      int numroutes, char mult, int *num_cuts,
+			      int *alloc_cuts, cut_data ***cuts));
 
 int check_flow_connectivity PROTO((network *n, double etol, double capacity,
 				   int numroutes, char mult, int *num_cuts,

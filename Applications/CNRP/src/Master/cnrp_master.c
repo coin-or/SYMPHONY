@@ -539,6 +539,7 @@ int user_send_cp_data(void *user, void **user_cp)
    cnrp_spec_cp *cnrp_cp = (cnrp_spec_cp *) malloc (sizeof(cnrp_spec_cp));
    int i, j, k;
 
+   cnrp_cp->par = cnrp->cp_par;
    cnrp_cp->vertnum = cnrp->vertnum;
    cnrp_cp->capacity = cnrp->capacity;
    cnrp_cp->demand = (double *) malloc(cnrp->vertnum * DSIZE);

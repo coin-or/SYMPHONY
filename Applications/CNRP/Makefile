@@ -65,7 +65,7 @@ USE_OSI_INTERFACE = TRUE
 #or single-criteria problem
 ##############################################################################
 
-MULTI_CRITERIA = TRUE
+MULTI_CRITERIA = FALSE
 
 ##############################################################################
 #Whether to use cuts from the CONCORDE TSP solver that are valid for this model

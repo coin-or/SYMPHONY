@@ -19,7 +19,12 @@
 /* SYMPHONY include files */
 #include "proto.h"
 
+/* CNRP include files */
+#include "cnrp_cp_params.h"
+
+
 typedef struct CNRP_SPEC_CP{
+   cnrp_cp_params par;
    int vertnum;         /*number of vertices in the problem*/
    int edgenum;         /*number of edges in the problem*/
    double capacity;
