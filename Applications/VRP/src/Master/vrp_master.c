@@ -115,7 +115,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 {
    vrp_problem *vrp = (vrp_problem *)user;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   problem *p = get_problem_ptr();
+   problem *p = get_problem_ptr(FALSE);
 
    p->par.tm_par.granularity = p->par.lp_par.granularity = .9999;
    p->par.lp_par.problem_type = INTEGER_PROBLEM;

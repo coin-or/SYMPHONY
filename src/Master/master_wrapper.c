@@ -322,7 +322,7 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
 {
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    int i;
-   tm_prob *tm = p->tm = get_tm_ptr();
+   tm_prob *tm = p->tm = get_tm_ptr(TRUE);
 
    tm->par.max_active_nodes = p->par.tm_par.max_active_nodes;
 

@@ -43,11 +43,13 @@
 
 /*===========================================================================*/
 
-problem *get_problem_ptr()
+problem *get_problem_ptr(char reset)
 {
    static problem* p;
 
-   if (!p) p = (problem *) calloc(1, sizeof(problem));
+   if (!p || reset){
+      p = (problem *) calloc(1, sizeof(problem));
+   }
 
    return(p);
 }
@@ -114,7 +116,7 @@ int main(int argc, char **argv)
 #endif
 #endif
    
-   p = get_problem_ptr();
+   p = get_problem_ptr(TRUE);
 
    initialize_u(p);
 

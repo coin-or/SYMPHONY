@@ -49,17 +49,13 @@
  * a pointer. 
 \*===========================================================================*/
 
-tm_prob *get_tm_ptr()
+tm_prob *get_tm_ptr(char reset)
 {
    static tm_prob *tm;
-   static int count = 0;
    
-   if (!tm || count == 2){
+   if (!tm || reset){
       tm = (tm_prob *) calloc(1, sizeof(tm_prob));
-      count = 0;
    }
-
-   count++;
 
    return(tm);
 }
@@ -76,7 +72,7 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
 #ifdef COMPILE_IN_TM
    /* If the TM function is being compiled into the master, then we
       need access to the problem data. */
-   problem *p = get_problem_ptr();
+   problem *p = get_problem_ptr(FALSE);
 #else
    int r_bufid, bytes, msgtag, i;
 #endif
@@ -96,7 +92,7 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
    int s_bufid;
 #endif
 
-   tm = get_tm_ptr();
+   tm = get_tm_ptr(FALSE);
 
    par = &tm->par;
 

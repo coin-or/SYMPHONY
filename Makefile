@@ -133,7 +133,7 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use an OSI interface.
-LP_SOLVER = OSI
+#LP_SOLVER = OSI
 OSI_INTERFACE = OSL
 
 #Set the paths and the name of the library

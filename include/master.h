@@ -124,7 +124,7 @@ typedef struct PROBLEM{
 /*==================== Master basic functions (master.c) ====================*/
 /*===========================================================================*/
 
-problem *get_problem_ptr PROTO((void));
+problem *get_problem_ptr PROTO((char reset));
 void print_statistics PROTO((node_times *tim, tm_stat *stat, double ub,
 			     double lb, double initial_time,
 			     double start_time));

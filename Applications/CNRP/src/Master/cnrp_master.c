@@ -109,7 +109,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 {
    vrp_problem *vrp = (vrp_problem *)user;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   problem *p = get_problem_ptr();
+   problem *p = get_problem_ptr(FALSE);
 
    p->par.tm_par.granularity = p->par.lp_par.granularity = .00001;
    p->par.lp_par.problem_type = INTEGER_PROBLEM;
@@ -880,7 +880,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 	 prev_vert = cur_vert;
 	 cur_vert = tour[cur_vert].next;
       }
-      printf("\n\n");
+      printf("\n");
    }else{
       
       for (i = 0; i < n->edgenum; i++){
@@ -892,6 +892,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
       for (i = 0; i < n->edgenum; i++){
 	 printf("%i %i\n", n->edges[i].v0, n->edges[i].v1);
       }
+      printf("\n");
    }
 
    return(USER_SUCCESS);
@@ -953,6 +954,7 @@ int user_free_master(void **user)
 
    return(USER_SUCCESS);
 }
+
 
 
 

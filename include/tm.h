@@ -159,7 +159,7 @@ typedef struct TM_PROB{
 /*==================== TM basic functions (tm_func.c) =======================*/
 /*===========================================================================*/
 
-tm_prob *get_tm_ptr PROTO((void));
+tm_prob *get_tm_ptr PROTO((char reset));
 tm_prob *tm_initialize PROTO((base_desc *base, node_desc *root_desc,
 			      int master_tid));
 int solve PROTO((tm_prob *tm));

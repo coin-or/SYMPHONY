@@ -563,9 +563,11 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 				 total_edgenum,CTOI_WAIT_FOR_CLICK_AND_REPORT);
 #endif
    }
-   
-   construct_feasible_solution(vrp, n, true_objval);
 
+#if 0
+   construct_feasible_solution(vrp, n, true_objval);
+#endif
+   
    free_net(n);
    
    return(USER_SUCCESS);
