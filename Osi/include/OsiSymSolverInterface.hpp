@@ -19,6 +19,7 @@
 #include "OsiSolverInterface.hpp"
 #include "OsiSymSolverParameters.hpp"
 #include "SymWarmStart.hpp"
+#include "CoinPackedMatrix.hpp"
 #include "symphony_api.h"
 #include <iostream>
 #include <string>
@@ -248,7 +249,7 @@ public:
    */
    //@{
    /// Get pointer to SYMPHONY environment (eventually we won't need this)
-   problem* getSymphonyEnvironment() const {return env_;}
+   sym_environment *getSymphonyEnvironment() const {return env_;}
    
    /// Get number of columns
    virtual int getNumCols() const;
@@ -637,10 +638,10 @@ public:
    virtual OsiSolverInterface * clone(bool copyData = true) const;
   
     /// Copy constructor 
-    OsiSymSolverInterface(const OsiSolverInterface &);
+    OsiSymSolverInterface(const OsiSymSolverInterface &);
   
     /// Assignment operator 
-    OsiSymSolverInterface & operator=(const OsiSolverInterface& rhs);
+    OsiSymSolverInterface & operator=(const OsiSymSolverInterface& rhs);
   
     /// Destructor 
     virtual ~OsiSymSolverInterface ();
@@ -684,7 +685,7 @@ private:
   /**@name Private member data */
   //@{
    /// The pointer to the SYMPHONY problem environment
-   problem* env_;
+   sym_environment *env_;
   //@}
 };
 

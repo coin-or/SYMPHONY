@@ -153,16 +153,16 @@ void reduce_graph(network *n, double etol, int *demand)
 /*===========================================================================*/
 
 int greedy_shrinking1(network *n, double truck_cap, double etol,
-		      int max_num_cuts, cut_data *new_cut,
+		      int max_shrink_cuts, cut_data *new_cut,
 		      int *compnodes, int *compmembers, int compnum,
 		      char *in_set, double *cut_val, int *ref, char *cut_list,
-		      int *demand, cut_data **cuts, int *num_cuts,
+		      int *demand, cut_data ***cuts, int *num_cuts,
 		      int *alloc_cuts)
 {
    double set_cut_val, set_demand;
    vertex *verts = n->verts;
    elist *e;
-   int num_cuts = 0, i, j, k;
+   int shrink_cuts = 0, i, j, k;
    char *pt, *cutpt;
    int *ipt; 
    double  *dpt;
@@ -175,7 +175,7 @@ int greedy_shrinking1(network *n, double truck_cap, double etol,
    
    new_cut->size = (vertnum >> DELETE_POWER) + 1;
    new_cut->coef = coef = (char *) (calloc(new_cut->size, sizeof(char)));
-   memset(cut_list, 0, new_cut->size * (max_num_cuts + 1));
+   memset(cut_list, 0, new_cut->size * (max_shrink_cuts + 1));
    
    *in_set = 0;
    
@@ -209,7 +209,7 @@ int greedy_shrinking1(network *n, double truck_cap, double etol,
 	    if (set_cut_val < 2*(ceil(set_demand/truck_cap)) - etol &&
 		set_size > 2){
 	       memset(coef, 0, new_cut->size*sizeof(char));
-	       for (j = begin, ipt = compmembers + begin; j < end; j++, ipt++)
+	       for (j = begin, ipt = compmembers + begin; j < end; j++, ipt++){
 		  if (in_set[j]){
 		     cur_nodept = verts + (*ipt);
 		     if (cur_nodept->orig_node_list_size)
@@ -221,22 +221,25 @@ int greedy_shrinking1(network *n, double truck_cap, double etol,
 		     (coef[(*ipt) >> DELETE_POWER]) |=
 			(1 << ((*ipt) & DELETE_AND));
 		  }  
+	       }
 	       new_cut->type = (set_size < vertnum/2 ?
 				SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
 	       new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
-			       RHS((int)set_size,(int)set_demand,(int)truck_cap):
-			       2*BINS((int)set_demand, (int)truck_cap));
-	       for (k = 0, cutpt = cut_list; k < num_cuts; k++,
+				RHS((int)set_size,(int)set_demand,
+				    (int)truck_cap):
+				2*BINS((int)set_demand, (int)truck_cap));
+	       for (k = 0, cutpt = cut_list; k < shrink_cuts; k++,
 		       cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char)))
 		     break;/* same cuts */ 
-	       if (k >= num_cuts){ 
-		  cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	       if (k >= shrink_cuts){ 
+		  shrink_cuts +=
+		     cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 		  memcpy(cutpt, coef, new_cut->size);
 	       }
-	       if (num_cuts > max_num_cuts){
+	       if (shrink_cuts > max_shrink_cuts){
 		  FREE(new_cut->coef);
-		  return(num_cuts);
+		  return(shrink_cuts);
 	       }
 	    } 
 	    for (maxval = -1, pt = in_set + begin, dpt = cut_val + begin,
@@ -265,7 +268,7 @@ int greedy_shrinking1(network *n, double truck_cap, double etol,
 	 }   
       }
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(shrink_cuts);
 }
 
 /*===========================================================================*/
@@ -274,14 +277,14 @@ int greedy_shrinking6(network *n, double truck_cap, double etol,
 		      cut_data *new_cut, int *compnodes,
 		      int *compmembers, int compnum,char *in_set,
 		      double *cut_val, int *ref, char *cut_list,
-		      int max_num_cuts, int *demand, int trial_num,
-		      double prob, cut_data **cuts, int *num_cuts,
+		      int max_shrink_cuts, int *demand, int trial_num,
+		      double prob, cut_data ***cuts, int *num_cuts,
 		      int *alloc_cuts)
 {
    double set_cut_val, set_demand;
    vertex  *verts = n->verts;
    elist *e;
-   int i, j, k, num_cuts = 0;
+   int i, j, k, shrink_cuts = 0;
    char *pt, *cutpt;
    double *dpt;
    int vertnum = n->vertnum;
@@ -299,7 +302,7 @@ int greedy_shrinking6(network *n, double truck_cap, double etol,
   
    new_cut->size = (vertnum >> DELETE_POWER) + 1;
    new_cut->coef =coef= (char *) (calloc(new_cut->size,sizeof(char)));
-   memset(cut_list, 0, new_cut->size * (max_num_cuts +1));
+   memset(cut_list, 0, new_cut->size * (max_shrink_cuts +1));
    
    
    *in_set=0;
@@ -370,17 +373,18 @@ int greedy_shrinking6(network *n, double truck_cap, double etol,
 	       new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
 			       RHS((int)set_size,(int)set_demand,(int)truck_cap):
 			       2*BINS((int)set_demand, (int)truck_cap));
-	       for (k = 0, cutpt = cut_list; k < num_cuts; k++,
+	       for (k = 0, cutpt = cut_list; k < shrink_cuts; k++,
 		       cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
-	       if ( k >= num_cuts){
-		  cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	       if ( k >= shrink_cuts){
+		  shrink_cuts +=
+		     cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 		  memcpy(cutpt, coef, new_cut->size);
 	       }
 	 
-	       if ( num_cuts > max_num_cuts){
+	       if ( shrink_cuts > max_shrink_cuts){
 		  FREE(new_cut->coef);
-		  return(num_cuts);
+		  return(shrink_cuts);
 	       }
 	    } 
 	    for (maxval = -1, pt = in_set+begin, dpt = cut_val+begin,
@@ -411,22 +415,22 @@ int greedy_shrinking6(network *n, double truck_cap, double etol,
    }
    
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(shrink_cuts);
 }
 
 /*===========================================================================*/
 
 int greedy_shrinking1_one(network *n, double truck_cap, double etol,
-			  int max_num_cuts, cut_data *new_cut,char *in_set,
+			  int max_shrink_cuts, cut_data *new_cut,char *in_set,
 			  double *cut_val, char *cut_list, int num_routes,
-			  int *demand, cut_data **cuts, int *num_cuts,
+			  int *demand, cut_data ***cuts, int *num_cuts,
 			  int *alloc_cuts)
 {
  
    double set_cut_val, set_demand;
    vertex  *verts = n->verts;
    elist *e;
-   int i, j, k, num_cuts = 0;
+   int i, j, k, shrink_cuts = 0;
    char *pt, *cutpt;
    double  *dpt;
    int vertnum = n->vertnum;
@@ -445,7 +449,7 @@ int greedy_shrinking1_one(network *n, double truck_cap, double etol,
    
    new_cut->size = (vertnum >> DELETE_POWER) + 1;
    new_cut->coef = coef = (char *) (calloc(new_cut->size,sizeof(char)));
-   memset(cut_list, 0, new_cut->size * (max_num_cuts + 1));
+   memset(cut_list, 0, new_cut->size * (max_shrink_cuts + 1));
    
    for (i = 1; i < vertnum; i++ ){
       if (verts[i].deleted) continue;/* for every node as a starting one */
@@ -486,18 +490,19 @@ int greedy_shrinking1_one(network *n, double truck_cap, double etol,
 	    new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
 			     RHS((int)set_size,(int)set_demand,(int)truck_cap):
 			     2*BINS((int)set_demand,(int)truck_cap));
-	    for (k = 0, cutpt = cut_list; k < num_cuts; k++,
+	    for (k = 0, cutpt = cut_list; k < shrink_cuts; k++,
 		    cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char)))
 		     break; /* same cuts */
-	    if ( k >= num_cuts){
-	       cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	    if ( k >= shrink_cuts){
+	       shrink_cuts +=
+		  cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
 	    
-	    if ( num_cuts > max_num_cuts){
+	    if ( shrink_cuts > max_shrink_cuts){
 	       FREE(new_cut->coef);
-	       return(num_cuts);
+	       return(shrink_cuts);
 	    }
 	 }
 	 /* check the complement */
@@ -525,17 +530,18 @@ int greedy_shrinking1_one(network *n, double truck_cap, double etol,
 			     RHS((int)complement_size,(int)complement_demand,
 				 (int)truck_cap):
 			     2*BINS((int)complement_demand,(int)truck_cap));
-	    for (k=0, cutpt = cut_list; k < num_cuts; k++,
+	    for (k=0, cutpt = cut_list; k < shrink_cuts; k++,
 		    cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
-	    if ( k >= num_cuts){
-	       cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	    if ( k >= shrink_cuts){
+	       shrink_cuts +=
+		  cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
 	 
-	    if (num_cuts > max_num_cuts){
+	    if (shrink_cuts > max_shrink_cuts){
 	       FREE(new_cut->coef);
-	       return(num_cuts);
+	       return(shrink_cuts);
 	    }
 	 }
 
@@ -565,7 +571,7 @@ int greedy_shrinking1_one(network *n, double truck_cap, double etol,
       }   
    }
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(shrink_cuts);
 }
 
 /*===========================================================================*/
@@ -573,15 +579,15 @@ int greedy_shrinking1_one(network *n, double truck_cap, double etol,
 int greedy_shrinking6_one(network *n, double truck_cap,
 			  double etol, cut_data *new_cut,
 			  char *in_set, double *cut_val, int num_routes,
-			  char *cut_list, int max_num_cuts, int *demand,
-			  int trial_num, double prob, cut_data **cuts,
+			  char *cut_list, int max_shrink_cuts, int *demand,
+			  int trial_num, double prob, cut_data ***cuts,
 			  int *num_cuts, int *alloc_cuts)
 {
   
    double set_cut_val, set_demand;
    vertex  *verts=n->verts;
    elist *e;
-   int i, j, k, num_cuts = 0;
+   int i, j, k, shrink_cuts = 0;
    char *pt, *cutpt;
    double  *dpt;
    int vertnum = n->vertnum;
@@ -602,7 +608,7 @@ int greedy_shrinking6_one(network *n, double truck_cap,
    
    new_cut->size = (vertnum >> DELETE_POWER) + 1;
    new_cut->coef = coef = (char *) (calloc(new_cut->size,sizeof(char)));
-     memset(cut_list, 0, new_cut->size * (max_num_cuts +1));
+     memset(cut_list, 0, new_cut->size * (max_shrink_cuts +1));
   
    *in_set = 0;
  
@@ -651,16 +657,17 @@ int greedy_shrinking6_one(network *n, double truck_cap,
 	    new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
 			     RHS((int)set_size, (int)set_demand, (int)truck_cap):
 			     2*BINS((int)set_demand, (int)truck_cap));
-	    for (k = 0, cutpt = cut_list; k < num_cuts; k++,
+	    for (k = 0, cutpt = cut_list; k < shrink_cuts; k++,
 		    cutpt += new_cut->size)
 	       if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
-	    if ( k >= num_cuts){
-	       cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	    if ( k >= shrink_cuts){
+	       shrink_cuts +=
+		  cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
-	    if (num_cuts > max_num_cuts){
+	    if (shrink_cuts > max_shrink_cuts){
 	       FREE(new_cut->coef);
-	       return(num_cuts);
+	       return(shrink_cuts);
 	    }
 	 }
 	 
@@ -689,17 +696,18 @@ int greedy_shrinking6_one(network *n, double truck_cap,
 			     RHS((int)complement_size,(int)complement_demand,
 				 (int)truck_cap):
 			     2*BINS((int)complement_demand,(int)truck_cap));
-	    for (k = 0, cutpt = cut_list; k < num_cuts; k++,
+	    for (k = 0, cutpt = cut_list; k < shrink_cuts; k++,
 		    cutpt += new_cut->size)
 	       if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
-	    if ( k >= num_cuts){
-	       cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	    if ( k >= shrink_cuts){
+	       shrink_cuts +=
+		  cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
 	    
-	    if (num_cuts > max_num_cuts){
+	    if (shrink_cuts > max_shrink_cuts){
 	       FREE(new_cut->coef);
-	       return(num_cuts);
+	       return(shrink_cuts);
 	    }
 	 }
 	 
@@ -729,7 +737,7 @@ int greedy_shrinking6_one(network *n, double truck_cap,
    }
 
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(shrink_cuts);
 }
 
 /*===========================================================================*/
@@ -737,14 +745,14 @@ int greedy_shrinking6_one(network *n, double truck_cap,
 int greedy_shrinking2_one(network *n, double truck_cap,
 			  double etol, cut_data *new_cut,
 			  char *in_set, double *cut_val, int num_routes,
-			  int *demand, cut_data **cuts, int *num_cuts,
+			  int *demand, cut_data ***cuts, int *num_cuts,
 			  int *alloc_cuts)
 {
   
    double set_cut_val, set_demand;
    vertex *verts = n->verts;
    elist *e, *cur_edge1, *cur_edge2;
-   int j, k, num_cuts = 0;
+   int j, k, shrink_cuts = 0;
    char *pt;
    double  *dpt;
    int vertnum = n->vertnum;
@@ -813,7 +821,8 @@ int greedy_shrinking2_one(network *n, double truck_cap,
 	    new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
 			     RHS((int)set_size, (int)set_demand, (int)truck_cap):
 			     2*BINS((int)set_demand, (int)truck_cap));
-	    cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	    shrink_cuts +=
+	       cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	 }
 
 	 /* check the complement */
@@ -841,7 +850,8 @@ int greedy_shrinking2_one(network *n, double truck_cap,
 			     RHS((int)complement_size,(int)complement_demand,
 				 (int)truck_cap):
 			     2*BINS((int)complement_demand,(int)truck_cap));
-	    cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	    shrink_cuts +=
+	       cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	 }
 	 
 	 for (maxval = -1, pt = in_set+begin, dpt = cut_val+begin,
@@ -870,5 +880,5 @@ int greedy_shrinking2_one(network *n, double truck_cap,
    }
    }
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(shrink_cuts);
 }

@@ -244,11 +244,12 @@ int initialize_root_node_u(sym_environment *env)
    int i, user_res;
 
    base_desc *base = env->base = (base_desc *) calloc(1, sizeof(base_desc));
-   node_desc *root = env->rootdesc = (node_desc *) calloc(1, sizeof(node_desc));
+   node_desc *root = env->rootdesc = (node_desc *) calloc(1,sizeof(node_desc));
    
 
 #ifdef USE_SYM_APPLICATION
-   user_res = user_initialize_root_node(env->user, &base->varnum, &base->userind,
+   user_res = user_initialize_root_node(env->user, &base->varnum,
+					&base->userind,
 					&base->cutnum, &root->uind.size,
 					&root->uind.list, &env->mip->obj_sense,
 					&env->mip->obj_offset, 
@@ -286,7 +287,8 @@ int initialize_root_node_u(sym_environment *env)
       memcpy((char *)(userind + base->varnum), (char *)root->uind.list,
 	     root->uind.size * ISIZE); 
       
-      user_create_subproble(env->user, userind, env->mip, &maxn, &maxm, &maxnz);
+      user_create_subproble(env->user, userind, env->mip, &maxn, &maxm,
+			    &maxnz);
 #endif
       break;
       

@@ -4,20 +4,15 @@ LibType := SHARED
 # Select optimization (-O or -g). -O will be automatically bumped up to the 
 # highest level of optimization the compiler supports. If want something in
 # between then specify the exact level you want, e.g., -O1 or -O2
-#OptLevel := -O
-OptLevel := -g
+#OptLevel := -O1
+OptLevel := -g -w
 
 LIBNAME := OsiSym
 
 LIBSRC :=
-LIBSRC += OsiSymSolverInterface.cpp
+LIBSRC += OsiSymSolverInterface.cpp SymWarmStart.cpp
 
-SymDir := ${HOME}/SYMPHONY
-SymUserDir := ${SymDir}/CNRP
-SymIncDir := ${SymDir}/include
-SymUserIncDir := ${SymUserDir}/include
-SymLibDir := ${SymDir}/lib
-SymUserLibDir := ${SymUserDir}/lib
+SYMROOT := $(HOME)/SYMPHONY
 
 ##############################################################################
 # You should not need to edit below this line.
@@ -48,13 +43,11 @@ export LibType OptLevel LIBNAME LIBSRC
 default: install
 
 install library : % :
-	(cd $(CoinDir)/Clp && $(MAKE) install)
 	(cd $(CoinDir)/Osi && $(MAKE) -f Makefile.Osi install)
 	$(MAKE) -f ${MakefileDir}/Makefile.lib $*
-
-libOsiClp :
-	(cd $(CoinDir)/Osi && $(MAKE) libOsi)
-	$(MAKE) -f ${MakefileDir}/Makefile.lib $*
+#	(cd $(SYMROOT) && $(MAKE))
 
 clean doc : % :
 	$(MAKE) -f ${MakefileDir}/Makefile.lib $*
+
+

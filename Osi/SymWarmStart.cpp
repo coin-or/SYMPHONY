@@ -21,12 +21,11 @@ SymWarmStart::SymWarmStart(char * fileName)
 
 SymWarmStart::SymWarmStart(const SymWarmStart & symWS)
 {
-   int i, num;
    warm_start_desc * wsCopy;
    SymWarmStart * sWS = const_cast<SymWarmStart *>(&symWS);
-   wsCopy = const_cast<warm_start_desc *>(sWS->getWarmStartDesc());
+   wsCopy = const_cast<warm_start_desc *>(sWS->getCopyOfWarmStartDesc());
 
-   warmStart_ = sym_create_copy_warm_start(wsCopy);
+   warmStart_ = wsCopy;
 
 }
 
@@ -49,7 +48,7 @@ CoinWarmStart * SymWarmStart::clone () const
 /*===========================================================================*/
 /*===========================================================================*/
 
-const warm_start_desc * SymWarmStart::getWarmStartDesc()
+warm_start_desc * SymWarmStart::getCopyOfWarmStartDesc()
 {
 
    if(warmStart_){
@@ -72,7 +71,7 @@ void SymWarmStart::trimTree(bc_node * node)
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool SymWarmStart::writeToFile(char * fileName)
+int SymWarmStart::writeToFile(char * fileName)
 {
    return(sym_write_warm_start_desc(warmStart_, fileName));
 }

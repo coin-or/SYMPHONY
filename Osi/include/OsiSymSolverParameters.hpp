@@ -25,7 +25,9 @@ enum OsiSymIntParam {
    OsiSymSearchStrategy,
    OsiSymUsePermanentCutPools,
    OsiSymKeepDescOfPruned,
+   OsiSymDoReducedCostFixing,
    OsiSymMultiCriteriaFindNondominatedSolutions,
+   OsiSymSensitivityAnalysis
 };
 
 enum OsiSymDblParam {

@@ -53,7 +53,7 @@
 /*===========================================================================*/
 /*===========================================================================*/
 
-sym_environment *sym_open_environment()
+void sym_environment *sym_open_environment()
 {
    sym_environment *env;
 #if (!defined(COMPILE_IN_LP) || !defined(COMPILE_IN_CG) || \
@@ -396,6 +396,20 @@ int sym_parse_command_line(sym_environment *env, int argc, char **argv)
 /*===========================================================================*/
 /*===========================================================================*/
 
+int sym_set_user_data(sym_environment *env, void *user)
+{
+   if (user == NULL){
+      return(ERROR__USER);
+   }
+   
+   env->user = user;
+
+   return(0);
+}
+   
+/*===========================================================================*/
+/*===========================================================================*/
+
 int sym_load_problem(sym_environment *env)
 {
    double t = 0;
@@ -415,21 +429,6 @@ int sym_load_problem(sym_environment *env)
    CALL_WRAPPER_FUNCTION( init_draw_graph_u(env) );
 #endif
 
-   /*------------------------------------------------------------------------*\
-    * Have the user generate the base and root description
-   \*------------------------------------------------------------------------*/
-
-   CALL_WRAPPER_FUNCTION( initialize_root_node_u(env) );
-
-   if (env->par.tm_par.node_selection_rule == BEST_FIRST_SEARCH){
-      switch (env->mip->obj_sense){
-       case SYM_MAXIMIZE:
-	  env->par.tm_par.node_selection_rule = HIGHEST_LP_FIRST;
-       case SYM_MINIMIZE:
-	  env->par.tm_par.node_selection_rule = LOWEST_LP_FIRST;
-      }
-   }
-   
    env->comp_times.readtime = used_time(&t);
 
    env->termcode = TM_NO_SOLUTION;
@@ -502,6 +501,12 @@ int sym_solve(sym_environment *env)
    base_desc *base = env->base;
 
    start_time = wall_clock(NULL);
+
+   /*------------------------------------------------------------------------*\
+    * Have the user generate the base and root description
+   \*------------------------------------------------------------------------*/
+
+   CALL_WRAPPER_FUNCTION( initialize_root_node_u(env) );
 
 #ifndef COMPILE_IN_TM
    /*------------------------------------------------------------------------*\
@@ -589,6 +594,15 @@ int sym_solve(sym_environment *env)
     * Create the treemanager and copy the problem data
    \*------------------------------------------------------------------------*/
 
+   if (env->par.tm_par.node_selection_rule == BEST_FIRST_SEARCH){
+      switch (env->mip->obj_sense){
+       case SYM_MAXIMIZE:
+	  env->par.tm_par.node_selection_rule = HIGHEST_LP_FIRST;
+       case SYM_MINIMIZE:
+	  env->par.tm_par.node_selection_rule = LOWEST_LP_FIRST;
+      }
+   }
+   
    env->tm = tm = (tm_prob *) calloc(1, sizeof(tm_prob));
 
    tm->par = env->par.tm_par;
@@ -1779,10 +1793,10 @@ int sym_is_proven_optimal(sym_environment *env)
    }
    else{
       printf("sym_is_proven_optimal():The env. is empty!\n");
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    
-   return FALSE;
+   return(FALSE);
 }
 
 /*===========================================================================*/

@@ -28,468 +28,445 @@
 /* CNRP include files */
 #include "cnrp_types.h"
 
-/*===========================================================================*/
-
-typedef struct SOLUTION_DATA{
-   double fixed_cost;
-   double variable_cost;
-   double gamma;
-   double tau;
-   int *tree;
-}solution_data;
-
-/*===========================================================================*/
-
-typedef struct SOLUTION_PAIRS{
-   int solution1;
-   int solution2;
-#ifdef BINARY_SEARCH
-   double gamma1;
-   double gamma2;
-#endif
-}solution_pairs;
-
-/*===========================================================================*/
-
-#define MAX_NUM_PAIRS 100
-#define MAX_NUM_SOLUTIONS 100
-#define MAX_NUM_INFEASIBLE 100
-
-/*===========================================================================*/
-
 /*===========================================================================*\
- * This file contains the main() for two different CNRP applications.
-\*===========================================================================*/
-
-#ifdef MULTI_CRITERIA
-
-/*===========================================================================*\
- * This is main() for the multicriteria version of CNRP
+ * This is main() for the CNRP
 \*===========================================================================*/
 
 int main(int argc, char **argv)
 {
-   int i;
-   problem *env;
-   double gamma, gamma0, gamma1, tau, slope;
-   double start_time;
+   cnrp_problem *cnrp = (cnrp_problem *) calloc(1, sizeof(cnrp_problem));
 
-   solution_data utopia1;
-   solution_data utopia2;
-   solution_data solutions[MAX_NUM_PAIRS];
-   int numsolutions = 0, numprobs = 0, numinfeasible = 0;
-   solution_pairs pairs[MAX_NUM_PAIRS];
-   int numpairs = 0, cur_position = 0, first = 0, last = 0, previous = 0;
-   int *tree;
-   int solution1, solution2;
-   double utopia_fixed, utopia_variable;
-   cnrp_problem *cnrp;
-   node_desc *root= NULL;
-   base_desc *base = NULL;
-   double compare_sol_tol, ub = 0.0;
+   sym_environment *env = sym_open_environment();
 
-   start_time = wall_clock(NULL);
+   sym_parse_command_line(env, argc, argv);
 
-   /* Initialize the SYMPHONY environment */
-   OsiSymSolverInterface si;
-   
-   /* Get pointer to the SYMPHONY environment */
-   env = si.getSymphonyEnvironment();
+   sym_set_user_data(p, (void *) cnrp);
 
-   /* Parse the command line */
-   si.parseCommandLine(argc, argv);
-   
-   /* Read in the problem */
-   si.loadProblem();
+   /* FIXME: Get rid of env->par.param_file argument */
+   cnrp_readparams(cnrp, env->par.param_file, argc, argv);
 
-   /* Find a priori problem bounds */
-   si.findInitialBounds();
-   
-   /* Get the pointer to the user data */
-   cnrp = static_cast<cnrp_problem *>(si.getApplicationData());
+   cnrp_io(cnrp, cnrp->par.infile);
 
-   /* Set some parameters */
-   compare_sol_tol = cnrp->par.compare_solution_tolerance;
-   si.setSymParam(OsiSymGranularity,-MAX(cnrp->lp_par.rho,compare_sol_tol));
-
-#ifdef BINARY_SEARCH
-   printf("Using binary search with tolerance = %f...\n",
-	  cnrp->par.binary_search_tolerance);
-#endif
-#ifdef LIFO
-   printf("Using LIFO search order...\n");
-#endif
-   if (cnrp->lp_par.rho > 0){
-      printf("Using secondary objective weight %.8f\n", cnrp->lp_par.rho);
-   }
-   printf("\n");
-
-   /* FIXME: Saving the cut pool currently doesn't work */
-#ifdef SAVE_CUT_POOL
-   printf("Saving the global cut pool between iterations...\n");
-   si.createPermanentCutPools();
-   si.setSymParam(OsiSymUsePermanentCutPools, TRUE);
-#endif
-   
-   /* First, calculate the utopia point */
-   cnrp->lp_par.gamma = 1.0;
-   cnrp->cg_par.tau = cnrp->lp_par.tau = 0.0;
-      
-   printf("***************************************************\n");
-   printf("***************************************************\n");
-   printf("Now solving with gamma = 1.0 tau = 0.0 \n", gamma, tau);  
-   printf("***************************************************\n");
-   printf("***************************************************\n\n");
-
-   /* Solve */
-   si.branchAndBound();
-   numprobs++;
-   
-   /* Store the solution */
-   tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
-   memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
-   solutions[numsolutions].gamma = 1.0;
-   solutions[numsolutions].tau = 0.0;
-   solutions[numsolutions].fixed_cost = cnrp->fixed_cost;
-   solutions[numsolutions++].variable_cost = cnrp->variable_cost;
-   utopia_fixed = cnrp->fixed_cost;
-      
-   cnrp->lp_par.gamma = 0.0;
-   cnrp->cg_par.tau = cnrp->lp_par.tau = 1.0;
-      
-   printf("***************************************************\n");
-   printf("***************************************************\n");
-   printf("Now solving with gamma = 0.0 tau = 1.0 \n", gamma, tau);  
-   printf("***************************************************\n");
-   printf("***************************************************\n\n");
-
-   /* Solve */
-   si.branchAndBound();
-   numprobs++;
-   
-   /* Store the solution */
-   tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
-   memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
-   solutions[numsolutions].gamma = 0.0;
-   solutions[numsolutions].tau = 1.0;
-   solutions[numsolutions].fixed_cost = cnrp->fixed_cost;
-   solutions[numsolutions++].variable_cost = cnrp->variable_cost;
-   utopia_variable = cnrp->variable_cost;
-   
-   cnrp->utopia_variable = utopia_variable;
-   cnrp->utopia_fixed = utopia_fixed;
-   
-   printf("***************************************************\n");
-   printf("***************************************************\n");
-   printf("Utopia point has fixed cost %.3f and variable cost %.3f \n",
-	  utopia_fixed, utopia_variable);
-   printf("***************************************************\n");
-   printf("***************************************************\n\n");
-   
-   /* Add the first pair to the list */
-#ifdef BINARY_SEARCH
-   pairs[first].gamma1 = 1.0;
-   pairs[first].gamma2 = 0.0;
-#endif
-   pairs[first].solution1 = 0;
-   pairs[first].solution2 = 1;
-
-   first = last = 0;
-   numpairs = 1;
-
-   /* Keep taking pairs off the list and processing them until there are none
-      left */
-   while (numpairs > 0 && numpairs < MAX_NUM_PAIRS &&
-	  numsolutions < MAX_NUM_SOLUTIONS &&
-	  numinfeasible < MAX_NUM_INFEASIBLE){
-
-#ifdef LIFO
-      solution1 = pairs[last].solution1;
-      solution2 = pairs[last].solution2;
-      cur_position = last;
-      if (--last < 0){
-	 last = MAX_NUM_PAIRS - 1;
-      }
-      numpairs--;
-#else
-      solution1 = pairs[first].solution1;
-      solution2 = pairs[first].solution2;
-      cur_position = first;
-      if (++first > MAX_NUM_PAIRS-1)
-	 first = 0;
-      numpairs--;
-#endif
-
-#ifdef BINARY_SEARCH
-      gamma = (pairs[cur_position].gamma1 + pairs[cur_position].gamma2)/2;
-#elif defined(FIND_NONDOMINATED_SOLUTIONS)
-      gamma = (utopia_variable - solutions[solution1].variable_cost)/
-	 (utopia_fixed - solutions[solution2].fixed_cost +
-	  utopia_variable - solutions[solution1].variable_cost);
-#else
-      slope = (solutions[solution1].variable_cost -
-	       solutions[solution2].variable_cost)/
-	      (solutions[solution2].fixed_cost -
-	       solutions[solution1].fixed_cost);
-      gamma = slope/(1+slope);
-#endif
-      tau = 1 - gamma;
-      
-      cnrp->lp_par.gamma = gamma;
-      cnrp->cg_par.tau = cnrp->lp_par.tau = tau;
-
-      /* Find upper bound */
-
-      env->has_ub = FALSE;
-      env->ub = MAXDOUBLE;
-#ifndef BINARY_SEARCH
-      for (i = 0; i < numsolutions; i++){
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-	 ub = MAX(gamma*(solutions[i].fixed_cost - utopia_fixed),
-		  tau*(solutions[i].variable_cost - utopia_variable));
-#else
-	 ub = gamma*solutions[i].fixed_cost + tau*solutions[i].variable_cost;
-#endif 
-	 if (ub < env->ub){
-	    env->has_ub = TRUE;
-	    env->ub = ub - compare_sol_tol;
-	 }
-      }
-#endif
-      cnrp->ub = env->ub;
-      
-      printf("***************************************************\n");
-      printf("***************************************************\n");
-      printf("Now solving with gamma = %.6f tau = %.6f \n", gamma, tau);  
-      printf("***************************************************\n");
-      printf("***************************************************\n\n");
-      
-      cnrp->fixed_cost = cnrp->variable_cost = 0.0;
-      
-      si.branchAndBound();
-      numprobs++;
-      
-#ifdef BINARY_SEARCH
-      if (cnrp->fixed_cost - solutions[solution1].fixed_cost <
-	  compare_sol_tol &&
-	  solutions[solution1].variable_cost - cnrp->variable_cost <
-	  compare_sol_tol){
-	 if (pairs[cur_position].gamma1 - gamma >
-	     cnrp->par.binary_search_tolerance){
-	    if (++last > MAX_NUM_PAIRS - 1)
-	       last = 0;
-	    pairs[last].solution1 = solution1;
-	    pairs[last].solution2 = solution2;
-	    pairs[last].gamma1 = gamma;
-	    pairs[last].gamma2 = pairs[cur_position].gamma2;
-	    numpairs++;
-	 }
-	 continue;
-      }
-      if (solutions[solution2].fixed_cost - cnrp->fixed_cost < compare_sol_tol
-	  && cnrp->variable_cost - solutions[solution2].variable_cost <
-	  compare_sol_tol){
-	 if (gamma - pairs[cur_position].gamma2 >
-	     cnrp->par.binary_search_tolerance){
-	    if (++last > MAX_NUM_PAIRS - 1)
-	       last = 0;
-	    pairs[last].solution1 = solution1;
-	    pairs[last].solution2 = solution2;
-	    pairs[last].gamma1 = pairs[cur_position].gamma1;
-	    pairs[last].gamma2 = gamma;
-	    numpairs++;
-	 }
-	 continue;
-      }
-#else
-      if (cnrp->fixed_cost == 0.0 && cnrp->variable_cost == 0.0){
-	 numinfeasible++;
-	 continue;
-      }else if (cnrp->fixed_cost - solutions[solution1].fixed_cost <
-		compare_sol_tol &&
-		solutions[solution1].variable_cost - cnrp->variable_cost <
-		compare_sol_tol){
-	 numinfeasible++;
-	 continue;
-      }else if (solutions[solution2].fixed_cost - cnrp->fixed_cost <
-		compare_sol_tol &&
-		cnrp->variable_cost - solutions[solution2].variable_cost <
-		compare_sol_tol){
-	 numinfeasible++;
-	 continue;
-      }
-#endif
-      
-      /* Insert new solution */
-      numinfeasible = 0;
-      if (last + 2 == MAX_NUM_PAIRS){
-	 last = 0;
-	 previous = MAX_NUM_PAIRS - 1;
-      }else if (last + 2 == MAX_NUM_PAIRS + 1){
-	 last = 1;
-	 previous = 0;
-      }else{
-	 last += 2;
-	 previous = last - 1;
-      }
-#ifdef BINARY_SEARCH
-      pairs[previous].gamma1 = pairs[cur_position].gamma1;
-      pairs[previous].gamma2 = gamma;
-      pairs[last].gamma1 = gamma;
-      pairs[last].gamma2 = pairs[cur_position].gamma2;
-#endif
-      pairs[previous].solution1 = solution1;
-      pairs[previous].solution2 = solution2;
-      pairs[last].solution1 = solution2;
-      pairs[last].solution2 = solution2+1;
-      numpairs += 2;
-      for (i = numsolutions; i > solution2; i--){
-	 solutions[i] = solutions[i-1];
-      }
-      numsolutions++;
-#ifndef LIFO
-      if (first < last){
-	 for (i = first; i < last - 1; i++){
-	    if (pairs[i].solution1 >= solution2){
-	       pairs[i].solution1++;
-	    }
-	    if (pairs[i].solution2 >= solution2){
-	       pairs[i].solution2++;
-	    }
-	 }
-      }else{
-	 for (i = first; i < MAX_NUM_PAIRS - (last == 0 ? 1 : 0); i++){
-	    if (pairs[i].solution1 >= solution2){
-	       pairs[i].solution1++;
-	    }
-	    if (pairs[i].solution2 >= solution2){
-	       pairs[i].solution2++;
-	    }
-	 }
-	 for (i = 0; i < last - 1; i++){
-	    if (pairs[i].solution1 >= solution2){
-	       pairs[i].solution1++;
-	    }
-	    if (pairs[i].solution2 >= solution2){
-	       pairs[i].solution2++;
-	    }
-	 }
-      }
-	 
-#endif
-      tree = solutions[solution2].tree =
-	 (int *) calloc(cnrp->vertnum-1, ISIZE);
-      memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
-      solutions[solution2].gamma = gamma;
-      solutions[solution2].tau = tau;
-      solutions[solution2].fixed_cost = cnrp->fixed_cost;
-      solutions[solution2].variable_cost = cnrp->variable_cost;
+   if (cnrp->par.use_small_graph == LOAD_SMALL_GRAPH){
+      read_small_graph(cnrp);
    }
 
-   printf("\n********************************************************\n");
-
-   if (numsolutions >= MAX_NUM_SOLUTIONS){
-      printf("Maximum number of solutions (%i) reached\n\n",
-	     MAX_NUM_SOLUTIONS);
-   }
-
-   if (numinfeasible >= MAX_NUM_INFEASIBLE){
-      printf("Maximum number of infeasible subproblems (%i) reached\n\n",
-	     MAX_NUM_INFEASIBLE);
+   if (!cnrp->numroutes && cnrp->par.prob_type == VRP){
+      printf("\nError: Number of trucks not specified or computed "
+	     "for VRP\n\n");
+      exit(1);
    }
    
-   if (numpairs >= MAX_NUM_PAIRS){
-      printf("Maximum number of solution pairs (%i) reached\n\n",
-	     MAX_NUM_PAIRS);
-      printf("\n********************************************************\n");
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-      printf(  "* Found set of non-dominated solutions!!!!!!! *\n");
-#else
-      printf(  "* Found set of supported solutions!!!!!!!     *\n");
-#endif
+   if (cnrp->numroutes > 1){
+      printf("NUMBER OF TRUCKS: \t%i\n", cnrp->numroutes);
+      printf("TIGHTNESS: \t\t%.2f\n",
+	     cnrp->demand[0]/(cnrp->capacity*(double)cnrp->numroutes));
+   }
+   
+   /* Selects the cheapest edges adjacent to each node for the base set */
+
+   if (cnrp->par.use_small_graph == SAVE_SMALL_GRAPH){
+      if (!cnrp->g) make_small_graph(cnrp, 0);
+      save_small_graph(cnrp);
+   }else if (!cnrp->g){
+      make_small_graph(cnrp, 0);
+   }
+   
+   if (*ub > 0){
+      cnrp->cur_tour->cost = (int) (*ub);
    }else{
-      printf("\n********************************************************\n");
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-      printf(  "* Found complete set of non-dominated solutions!!!!!!! *\n");
-#else
-      printf(  "* Found complete set of supported solutions!!!!!!!     *\n");
-#endif
+      cnrp->cur_tour->cost = MAXINT;
    }
-   printf(  "* Now displaying stats...                              *\n");
-   printf(  "********************************************************\n\n");
+   cnrp->cur_tour->numroutes = cnrp->numroutes;
+   
+   if (cnrp->par.use_small_graph == LOAD_SMALL_GRAPH){
+      if (*ub <= 0 && cnrp->cur_tour->cost > 0)
+	 *ub = (int)(cnrp->cur_tour->cost);
+      cnrp->numroutes = cnrp->cur_tour->numroutes;
+   }
 
-#ifdef SAVE_CUT_POOL
-   for (i = 0; i < env->par.tm_par.max_cp_num; i++){
-      env->comp_times.bc_time.cut_pool += env->cp[i]->cut_pool_time;
-      env->warm_start->stat.cuts_in_pool += env->cp[i]->cut_num;
-   }
+#if 0
+   if(cnrp->par.prob_tpye == BPP)
+      *ub = 1;
 #endif
    
-   print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 0.0,
-		    0.0, 0, start_time);
-
-   printf("\nNumber of subproblems solved: %i\n", numprobs);
-   printf("Number of solutions found: %i\n\n", numsolutions);
-   
-   printf("***************************************************\n");
-   printf("***************************************************\n");
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-   printf("Displaying non-dominated solution values and breakpoints\n");  
-#else
-   printf("Displaying supported solution values and breakpoints\n");  
-#endif
-   printf("***************************************************\n");
-   printf("***************************************************\n\n");
-
-   gamma0 = 1.0;
-   for (i = 0; i < numsolutions - 1; i++){
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-      gamma1 = (utopia_variable - solutions[i].variable_cost)/
-	 (utopia_fixed - solutions[i+1].fixed_cost +
-	  utopia_variable - solutions[i].variable_cost);
-#else
-      slope = (solutions[i].variable_cost -
-	       solutions[i+1].variable_cost)/
-	      (solutions[i+1].fixed_cost -
-	       solutions[i].fixed_cost);
-      gamma1 = slope/(1+slope);
-#endif
-      printf("Fixed Cost: %.3f Variable Cost: %.3f ",
-	     solutions[i].fixed_cost, solutions[i].variable_cost);
-      printf("Range: %.6f - %.6f\n", gamma1, gamma0);
-      gamma0 = gamma1;
+   if (*ub > 0 && !(cnrp->par.prob_type == BPP)){
+      printf("INITIAL UPPER BOUND: \t%i\n\n", (int)(*ub));
+   }else if (!(cnrp->par.prob_type == BPP)){
+      printf("INITIAL UPPER BOUND: \tNone\n\n");
+   }else{
+      printf("\n\n");
    }
-   printf("Fixed Cost: %.3f Variable Cost: %.3f ",
-	  solutions[i].fixed_cost, solutions[i].variable_cost);
-   printf("Range: %.6f - %.6f\n", 0.0, gamma0);
+
+   cnrp_load_problem(cnrp)
    
-   for (i = 0 ; i < numsolutions; i++){
-      FREE(solutions[i].tree);
-   }
-   
-   return(0);
-}   
+   sym_solve(env);
 
-#else
+   sym_close_environment(env);
 
-/*===========================================================================*\
- * This is main() for the single criteria version of CNRP
-\*===========================================================================*/
-
-int main(int argc, char **argv)
-{
-   OsiSymSolverInterface si;
-
-   si.loadProblem(argc, argv);
-
-   si.setSymDblParam(OsiSymGranularity, 0.999999);
-
-   si.branchAndBound();
-   
    return(0);
 }
 
+/*===========================================================================*\
+ * This is the function that creates the formulation
+\*===========================================================================*/
+
+int cnrp_load_problem(cnrp_problem *cnrp)
+{
+   int *costs = cnrp->costs;
+   int *edges = cnrp->edges;
+   int i, j, maxvars = 0;
+   char resize = FALSE;
+   int vertnum = cnrp->vertnum;
+   int total_edgenum = vertnum*(vertnum-1)/2;
+   char prob_type = cnrp->par.prob_type, od_const = FALSE, d_x_vars = FALSE;
+   int v0, v1;
+   double flow_capacity;
+#ifdef ADD_CAP_CUTS 
+   int basecutnum = (2 + od_const)*vertnum - 1 + 2*total_edgenum;
+#elif defined(ADD_FLOW_VARS)
+   int basecutnum = (2 + od_const)*vertnum - 1;
+#else
+   int basecutnum = (1 + od_const)*vertnum;
+#endif
+#ifdef ADD_X_CUTS
+   basecutnum += total_edgenum;
+#endif
+#if defined(DIRECTED_X_VARS) && !defined(ADD_FLOW_VARS)
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   int edgenum = (mip->n - 1)/2;
+#else
+   int edgenum = (mip->n)/2;
+#endif
+#elif defined(ADD_FLOW_VARS)
+#ifdef DIRECTED_X_VARS
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   int edgenum = (mip->n - 1)/4;
+#else
+   int edgenum = (mip->n)/4;
 #endif
 
-/*===========================================================================*/
+   flow_capacity = cnrp->capacity;
+#else
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   int edgenum = (mip->n-1)/3;
+#else
+   int edgenum = (mip->n)/3;
+#endif
 
+   if (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == CTP)
+      flow_capacity = cnrp->capacity;
+   else
+      flow_capacity = cnrp->capacity/2;
+#endif
+#else
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   int edgenum = mip->n - 1;
+#else
+   int edgenum = mip->n;
+#endif
+#endif
+   
+   /* set up the inital LP data */
+
+   /*Estimate the number of nonzeros*/
+#ifdef ADD_CAP_CUTS
+   mip->nz = 12*edgenum;
+#elif defined(ADD_FLOW_VARS)
+   mip->nz = 8*edgenum;
+#else
+   mip->nz = 3*edgenum;
+#endif
+#ifdef ADD_X_CUTS
+   mip->nz += 2*edgenum;
+#endif
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   mip->nz += mip->n + 1;
+#endif
+   *maxm = MAX(100, 3 * mip->m);
+#ifdef ADD_FLOW_VARS
+   *maxn = 3*total_edgenum;
+#else
+   *maxn = total_edgenum;
+#endif
+#ifdef DIRECTED_X_VARS
+   *maxn += total_edgenum;
+#endif
+   *maxnz = mip->nz + ((*maxm) * (*maxn) / 10);
+
+   /* Allocate the arrays. These are owned by SYMPHONY after returning. */
+   mip->matbeg  = (int *) malloc((mip->n + 1) * ISIZE);
+   mip->matind  = (int *) malloc((mip->nz) * ISIZE);
+   mip->matval  = (double *) malloc((mip->nz) * DSIZE);
+   mip->obj     = (double *) malloc(mip->n * DSIZE);
+   mip->ub      = (double *) malloc(mip->n * DSIZE);
+   mip->lb      = (double *) calloc(mip->n, DSIZE); /* zero lower bounds */
+   mip->rhs     = (double *) malloc(mip->m * DSIZE);
+   mip->sense   = (char *) malloc(mip->m * CSIZE);
+   mip->rngval  = (double *) calloc(mip->m, DSIZE);
+   mip->is_int  = (char *) calloc(mip->n, CSIZE);
+
+#ifdef DIRECTED_X_VARS
+   /*whether or not we will have out-degree constraints*/
+   od_const = (prob_type == VRP || prob_type == TSP || prob_type == BPP);
+   d_x_vars = TRUE;
+#endif
+   
+   for (i = 0, j = 0; i < mip->n; i++){
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+      if (indices[i] == mip->n - 1){
+	 mip->is_int[i]    = FALSE;
+	 mip->ub[i]        = MAXINT;
+	 mip->matbeg[i]    = j;
+	 mip->obj[i]       = 1.0;
+	 mip->matval[j]    = -1.0;
+	 mip->matind[j++]  = basecutnum;
+	 mip->matval[j]    = -1.0;
+	 mip->matind[j++]  = basecutnum + 1;
+	 continue;
+      }
+#endif
+      if (indices[i] < total_edgenum){
+	 mip->is_int[i]    = TRUE;
+	 mip->ub[i]        = 1.0;
+	 mip->matbeg[i]    = j;
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+	 mip->obj[i]       = cnrp->par.rho*((double) costs[indices[i]]);
+	 mip->matval[j]    = cnrp->par.gamma*((double) costs[indices[i]]);
+	 mip->matind[j++]  = basecutnum;
+#else
+	 mip->obj[i]       = cnrp->par.gamma*((double) costs[indices[i]]);
+#endif
+	 if (prob_type == CSTP || prob_type == CTP){
+	    /*cardinality constraint*/
+	    mip->matind[j] = 0;
+	    mip->matval[j++] = 1.0;
+	 }
+	 /*in-degree constraint*/
+	 mip->matval[j]    = 1.0;
+	 mip->matind[j++]  = edges[2*indices[i]+1];
+#ifdef DIRECTED_X_VARS
+	 /*out-degree constraint*/
+	 if (od_const){
+	    mip->matval[j]   = 1.0;
+	    mip->matind[j++] = vertnum + edges[2*indices[i]];
+	 }
+#else
+	 if (prob_type == VRP || prob_type == TSP ||
+	     prob_type == BPP || edges[2*indices[i]]){
+	    mip->matval[j]   = 1.0;
+	    mip->matind[j++] = edges[2*indices[i]];
+	 }
+#endif	 
+#ifdef ADD_CAP_CUTS
+	 v0 = edges[2*indices[i]];
+	 mip->matval[j]    = -flow_capacity + (v0 ? cnrp->demand[v0] : 0);
+	 mip->matind[j++]  = (2 + od_const)*vertnum - 1 + indices[i];
+#ifndef DIRECTED_X_VARS
+	 mip->matval[j]    = -flow_capacity +
+	    cnrp->demand[edges[2*indices[i] + 1]];
+	 mip->matind[j++]  = 2*cnrp->vertnum - 1 + total_edgenum +
+	    indices[i];
+#endif
+#endif
+#ifdef ADD_X_CUTS
+	 mip->matval[j]    = 1.0;
+	 mip->matind[j++]  = (2 + od_const)*vertnum-1 + 2*total_edgenum +
+	    indices[i];
+#endif
+#ifdef DIRECTED_X_VARS
+      }else if (indices[i] < 2*total_edgenum){
+	 mip->is_int[i]    = TRUE;
+	 mip->ub[i]        = 1.0;
+	 mip->matbeg[i]    = j;
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+	 mip->obj[i]       = cnrp->par.rho*((double) costs[indices[i] -
+							  total_edgenum]);
+	 mip->matval[j]    = cnrp->par.gamma*((double) costs[indices[i] -
+							    total_edgenum]);
+	 mip->matind[j++]  = basecutnum;
+#else
+	 mip->obj[i]       = cnrp->par.gamma*((double)costs[indices[i] -
+							  total_edgenum]);
+#endif
+	 if (prob_type == CSTP || prob_type == CTP){
+	    /*cardinality constraint*/
+	    mip->matind[j] = 0;
+	    mip->matval[j++] = 1.0;
+	 }
+	 /*in-degree constraint*/
+	 if (od_const || edges[2*(indices[i] - total_edgenum)]){
+	    mip->matval[j]   = 1.0;
+	    mip->matind[j++] = edges[2*(indices[i] - total_edgenum)];
+	 }
+	 /*out-degree constraint*/
+	 if (od_const){
+	    mip->matval[j]    = 1.0;
+	    mip->matind[j++]  = vertnum + edges[2*(indices[i] -
+						   total_edgenum)+1];
+	 }
+#ifdef ADD_CAP_CUTS
+	 mip->matval[j]    = -flow_capacity +
+	    cnrp->demand[edges[2*(indices[i] - total_edgenum) + 1]];
+	 mip->matind[j++]  = (2 + od_const)*vertnum - 1 + indices[i];
+#endif
+#ifdef ADD_X_CUTS
+	 mip->matval[j]    = 1.0;
+	 mip->matind[j++]  = (2 + od_const)*vertnum-1 + 2*total_edgenum +
+	    indices[i] - total_edgenum;
+#endif
+#endif
+      }else if (indices[i] < (2+d_x_vars)*total_edgenum){
+	 mip->is_int[i] = FALSE;
+	 v0 = edges[2*(indices[i]-(1+d_x_vars)*total_edgenum)];
+	 mip->ub[i] = flow_capacity - (v0 ? cnrp->demand[v0] : 0);
+	 mip->matbeg[i]    = j;
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+	 mip->obj[i]       = cnrp->par.rho*((double) costs[indices[i] -
+					(1+d_x_vars)*total_edgenum]);
+	 mip->matval[j]    = cnrp->par.tau*((double) costs[indices[i]-
+					(1+d_x_vars)*total_edgenum]);
+	 mip->matind[j++]  = basecutnum + 1;
+#else
+	 mip->obj[i]       =
+	    cnrp->par.tau*((double) costs[indices[i]-
+					(1+d_x_vars)*total_edgenum]);
+#endif
+#ifdef ADD_CAP_CUTS
+	 mip->matval[j]    = 1.0;
+	 mip->matval[j+1]  = 1.0;
+	 if (edges[2*(indices[i]-(1+d_x_vars)*total_edgenum)])
+	    mip->matval[j+2] = -1.0;
+	 mip->matind[j++]  = (2 + od_const)*vertnum - 1 + indices[i] -
+	    (1+d_x_vars)*total_edgenum;
+	 mip->matind[j++]  = (1+od_const)*vertnum + edges[2*(indices[i] -
+				(1+d_x_vars)*total_edgenum) + 1] - 1;
+	 if (edges[2*(indices[i] - (1+d_x_vars)*total_edgenum)])
+	    mip->matind[j++] = (1+od_const)*vertnum + edges[2*(indices[i] -
+				(1+d_x_vars)*total_edgenum)] - 1;
+#else
+	 mip->matval[j]  = 1.0;
+	 if (edges[2*(indices[i]-(1+d_x_vars)*total_edgenum)])
+	    mip->matval[j+1] = -1.0;
+	 mip->matind[j++]  = (1+od_const)*vertnum + edges[2*(indices[i] -
+				(1+d_x_vars)*total_edgenum) + 1] - 1;
+	 if (edges[2*(indices[i] - (1+d_x_vars)*total_edgenum)])
+	    mip->matind[j++] = (1+od_const)*vertnum + edges[2*(indices[i] -
+				(1+d_x_vars)*total_edgenum)] - 1;
+#endif	 
+      }else{
+	 mip->is_int[i] = FALSE;
+	 v1 = edges[2*(indices[i]-(2+d_x_vars)*total_edgenum) + 1];
+	 mip->ub[i] = flow_capacity - cnrp->demand[v1];
+	 mip->matbeg[i]    = j;
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+	 mip->obj[i]       = cnrp->par.rho*((double) costs[indices[i] -
+					(2+d_x_vars)*total_edgenum]);
+	 mip->matval[j]    = cnrp->par.tau*((double) costs[indices[i]-
+					(2+d_x_vars)*total_edgenum]);
+	 mip->matind[j++]  = basecutnum + 1;
+#else
+	 mip->obj[i]       =
+	    cnrp->par.tau*((double) costs[indices[i]-
+					(2+d_x_vars)*total_edgenum]);
+#endif
+#ifdef ADD_CAP_CUTS
+	 mip->matval[j]    = 1.0;
+	 mip->matval[j+1]  = -1.0;
+	 if (edges[2*(indices[i] - (2+d_x_vars)*total_edgenum)])
+	    mip->matval[j+2] = 1.0;
+	 mip->matind[j++]  = (2+od_const)*vertnum - 1 + indices[i] -
+	    (1+d_x_vars)*total_edgenum;
+	 mip->matind[j++]  = (1+od_const)*vertnum + edges[2*(indices[i] -
+				(2+d_x_vars)*total_edgenum)+1] - 1;
+	 if (edges[2*(indices[i] - (2+d_x_vars)*total_edgenum)])
+	    mip->matind[j++] = (1+od_const)*vertnum + edges[2*(indices[i] -
+				(2+d_x_vars)*total_edgenum)] - 1;
+#else
+	 mip->matval[j]  = -1.0;
+	 if (edges[2*(indices[i] - (2+d_x_vars)*total_edgenum)])
+	    mip->matval[j+1] = 1.0;
+	 mip->matind[j++]  = (1+od_const)*vertnum + edges[2*(indices[i] -
+				(2+d_x_vars)*total_edgenum)+1] - 1;
+	 if (edges[2*(indices[i] - (2+d_x_vars)*total_edgenum)])
+	    mip->matind[j++] = (1+od_const)*vertnum + edges[2*(indices[i] -
+				(2+d_x_vars)*total_edgenum)] - 1;
+#endif
+      }
+   }
+   mip->matbeg[i] = j;
+   
+   /* set the initial right hand side */
+   if (od_const){
+      /*degree constraints for the depot*/
+#if 0
+      mip->rhs[0] = cnrp->numroutes;
+      mip->sense[0] = 'E';
+      mip->rhs[vertnum] = cnrp->numroutes;
+      mip->sense[vertnum] = 'E';
+#else
+      mip->rhs[0] = 1.0;
+      mip->sense[0] = 'G';
+      mip->rhs[vertnum] = 1.0;
+      mip->sense[vertnum] = 'G';
+#endif      
+   }else if (prob_type == VRP || prob_type == TSP || prob_type == BPP){
+      (mip->rhs[0]) = 2*cnrp->numroutes;
+      mip->sense[0] = 'E';
+   }else{
+      /*cardinality constraint*/
+      mip->rhs[0] = vertnum - 1;
+      mip->sense[0] = 'E';
+   }
+   for (i = vertnum - 1; i > 0; i--){
+      switch (prob_type){
+       case VRP:
+       case TSP:
+       case BPP:
+	 if (od_const){
+	    mip->rhs[i] = 1.0;
+	    mip->sense[i] = 'E';
+	    mip->rhs[i+vertnum] = 1.0;
+	    mip->sense[i+vertnum] = 'E';
+	 }else{
+	    mip->rhs[i] = 2.0;
+	    mip->sense[i] = 'E';
+	 }
+	 break;
+       case CSTP:
+       case CTP:
+	 mip->rhs[i] = 1.0;
+#ifdef DIRECTED_X_VARS
+	 mip->sense[i] = 'E';
+#else
+	 mip->sense[i] = 'G';
+#endif
+	 break;
+      }
+#ifdef ADD_FLOW_VARS
+      mip->rhs[(1+od_const)*vertnum + i - 1] = cnrp->demand[i];
+      mip->sense[(1+od_const)*vertnum + i - 1] = 'E';
+#endif
+   }
+#ifdef ADD_CAP_CUTS
+   for (i = (2+od_const)*vertnum - 1;
+	i < (2+od_const)*vertnum - 1 + 2*total_edgenum; i++){
+      mip->rhs[i] = 0.0;
+      mip->sense[i] = 'L';
+   }
+#endif
+#ifdef ADD_X_CUTS
+   for (i = (2+od_const)*vertnum-1+2*total_edgenum;
+	i < (2+od_const)*vertnum-1+3*total_edgenum; i++){
+      mip->rhs[i] = 1;
+      mip->sense[i] = 'L';
+   }
+#endif
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   mip->rhs[basecutnum] = cnrp->par.gamma*cnrp->utopia_fixed;   
+   mip->sense[basecutnum] = 'L';
+   mip->rhs[basecutnum+1] = cnrp->par.tau*cnrp->utopia_variable;   
+   mip->sense[basecutnum+1] = 'L';
+#endif
+   return(USER_SUCCESS);
+}      

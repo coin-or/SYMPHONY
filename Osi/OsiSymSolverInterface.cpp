@@ -14,6 +14,7 @@
 /*===========================================================================*/
 
 #include "OsiSymSolverInterface.hpp"
+#include "CoinMpsIO.hpp"
 #include "symphony_api.h"
 
 /*===========================================================================*/
@@ -127,6 +128,7 @@ bool OsiSymSolverInterface::setIntParam(OsiIntParam key, int value)
 
 bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
 {
+
    switch(key){
       
     case OsiSymVerbosity:
@@ -156,11 +158,16 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
     case OsiSymKeepDescOfPruned:
        sym_set_int_param(env_, "keep_description_of_pruned", value);
        return true;
-
+       
+    case OsiSymDoReducedCostFixing:
+       sym_set_int_param(env_, "do_reduced_cost_fixing", value);
+       return true;
     case OsiSymMultiCriteriaFindNondominatedSolutions:
        sym_set_int_param(env_, "mc_find_nondominated_solutions", value);
        return true;
-
+    case OsiSymSensitivityAnalysis:
+       sym_set_int_param(env_, "sensitivity_analysis", value);
+       return true;
     default: 
        return false;
    }
@@ -243,7 +250,7 @@ bool OsiSymSolverInterface::setSymParam(OsiSymStrParam key,
 					   const std::string & value)
 {
    switch(key){
-
+   case ' ':
    default: 
       return false;
    }
@@ -265,8 +272,9 @@ bool OsiSymSolverInterface::getIntParam(OsiIntParam key, int& value) const
     case OsiLastIntParam:
        return false;
     default:
-       return false;
+       break;
    }
+   return false;
 }
 
 /*===========================================================================*/
@@ -380,7 +388,7 @@ bool OsiSymSolverInterface::getSymParam(OsiSymStrParam key,
 					   std::string& value) const
 {
    switch(key){
-
+   case ' ':
    default:
       return false;
    }
@@ -429,9 +437,13 @@ int OsiSymSolverInterface::createPermanentCutPools()
 /*===========================================================================*/
 /*===========================================================================*/
 
-void OsiSymSolverInterface::initialSolve() //FIX_ME
+void OsiSymSolverInterface::initialSolve() //FIXME
 {
 
+   
+   sym_initial_solve(env_);
+
+#if 0
    assert(env_->mip != 0);
    int j;
 
@@ -448,6 +460,8 @@ void OsiSymSolverInterface::initialSolve() //FIX_ME
    memcpy(env_->mip->is_int, copyVarTypes, CSIZE * env_->mip->n); 
    
    delete [] copyVarTypes;
+#endif
+
 }   
 
 /*===========================================================================*/
@@ -897,7 +911,7 @@ bool OsiSymSolverInterface::isIntegerNonBinary(int colIndex) const
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::isFreeBinary(int colIndex) const //FIX_ME
+bool OsiSymSolverInterface::isFreeBinary(int colIndex) const
 {
 
    if(isBinary(colIndex)){
@@ -928,8 +942,6 @@ const CoinPackedMatrix * OsiSymSolverInterface::getMatrixByRow() const
 const CoinPackedMatrix * OsiSymSolverInterface::getMatrixByCol() const
 {
 
-   assert(env_->mip);
-   
    CoinPackedMatrix * colMatrix = 
       new CoinPackedMatrix(true, env_->mip->m, env_->mip->n, env_->mip->nz,
 			   env_->mip->matval, env_->mip->matind, 
@@ -957,9 +969,6 @@ const double * OsiSymSolverInterface::getColSolution() const
 /*===========================================================================*/
 /*===========================================================================*/
 
- /* FIX_ME, will return the rowAct of the root_ rows all of which may not be 
-    binding
- */					 
 const double * OsiSymSolverInterface::getRowActivity() const
 {
    return (sym_get_row_activity(env_));         
@@ -1126,7 +1135,6 @@ void OsiSymSolverInterface::addRow(const CoinPackedVectorBase& vec,
 				   const char rowsen, const double rowrhs,   
 				   const double rowrng)
 {
-   int i, j, m, n, nz;
    int numElements = vec.getNumElements();
    int * indices = const_cast<int*>(vec.getIndices());
    double * elements = const_cast<double*>(vec.getElements());
@@ -1163,7 +1171,7 @@ void OsiSymSolverInterface::writeMps(const char *filename,
    mps.setMpsData(*colMat, INFINITY, env_->mip->lb, env_->mip->ub, 
 		 env_->mip->obj, env_->mip->is_int, 
 		 env_->mip->sense, env_->mip->rhs,
-		 env_->mip->rngval, NULL, NULL);
+		  env_->mip->rngval, 0, 0);//NULL, NULL);
 
    string f(filename);
    string e(extension);
@@ -1194,7 +1202,7 @@ void OsiSymSolverInterface::applyRowCut( const OsiRowCut & rc)
 void OsiSymSolverInterface::applyColCut( const OsiColCut & cc) 
 {
 
-   /* assuming the given bounds are feasible */ //FIX_ME
+   /* assuming the given bounds are feasible */ //FIXME
 
    int i;
    const CoinPackedVector & lbs = cc.lbs();
@@ -1222,19 +1230,18 @@ void OsiSymSolverInterface::applyColCut( const OsiColCut & cc)
 CoinWarmStart * OsiSymSolverInterface::getWarmStart() const
 {
 
-#ifdef COMPILE_IN_TM
-
-   /* FIX_ME! Add a SymIntParam to determine whether keep the tree
+   /* FIXME! Add a SymIntParam to determine whether keep the tree
       in case a getWarmStart() is called or not!
    */
 
-   SymWarmStart * symWS = 
-      new SymWarmStart(sym_get_warm_start(env_, false));
+   warm_start_desc * ws = sym_get_warm_start(env_, false);
+
+   SymWarmStart * symWS = new SymWarmStart(ws);
+
+   // FIXME!
+   sym_delete_warm_start(ws);
+
    return symWS;
-   
-#else
-   return 0;
-#endif
 }   
 
 /*===========================================================================*/
@@ -1246,8 +1253,7 @@ bool OsiSymSolverInterface::setWarmStart(const CoinWarmStart* warmstart)
    CoinWarmStart * wsC = const_cast<CoinWarmStart*> (warmstart);
    SymWarmStart *symWS = dynamic_cast<SymWarmStart*>(wsC);
    
-   warm_start_desc * ws  = 
-      const_cast<warm_start_desc*>(symWS->getWarmStartDesc());
+   warm_start_desc * ws  = symWS->getCopyOfWarmStartDesc();
    
    if(!ws){
       cout<<"setWarmStart(): An empty warmstart was given!"<<endl;
@@ -1255,21 +1261,22 @@ bool OsiSymSolverInterface::setWarmStart(const CoinWarmStart* warmstart)
    }
    
    sym_set_warm_start(env_, ws);
+   sym_delete_warm_start(ws);
+
    return true;   
 }
 
 /*===========================================================================*/
-/* copy constructor, clone and assignment operator
+/* copy constructor, clone and assignment operator                           */
 /*===========================================================================*/
 
-
-OsiSymSolverInterface::OsiSymSolverInterface(const OsiSolverInterface & si)
+OsiSymSolverInterface::OsiSymSolverInterface(const OsiSymSolverInterface & si)
 {
 
-   OsiSolverInterface * si_copy = const_cast<OsiSolverInterface *>(&si);
-   OsiSymSolverInterface * sym = dynamic_cast<OsiSymSolverInterface*>(si_copy);
+   //   OsiSolverInterface * si_copy = const_cast<OsiSolverInterface *>(&si);
+   //   OsiSymSolverInterface * sym = dynamic_cast<OsiSymSolverInterface*>(si_copy);
 
-   env_= sym_create_copy_problem(sym->getSymphonyEnvironment());
+   env_= sym_create_copy_environment(si.getSymphonyEnvironment());
 }
 
 /*===========================================================================*/
@@ -1283,13 +1290,13 @@ OsiSolverInterface * OsiSymSolverInterface::clone(bool copyData) const
 /*===========================================================================*/
 /*===========================================================================*/
 
-OsiSymSolverInterface & OsiSymSolverInterface::operator=(const OsiSolverInterface& rhs)
+OsiSymSolverInterface & OsiSymSolverInterface::operator=(const OsiSymSolverInterface& rhs)
 {
-   OsiSolverInterface * si_copy = const_cast<OsiSolverInterface *>(&rhs);
-   OsiSymSolverInterface * sym = dynamic_cast<OsiSymSolverInterface*>(si_copy);
+   //   OsiSolverInterface * si_copy = const_cast<OsiSolverInterface *>(&rhs);
+   //   OsiSymSolverInterface * sym = dynamic_cast<OsiSymSolverInterface*>(si_copy);
 
    if(this != &rhs){
-      env_= sym_create_copy_problem(sym->getSymphonyEnvironment());
+      env_= sym_create_copy_environment(rhs.getSymphonyEnvironment());
    }
 
    return *this;

@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 {
    OsiSymSolverInterface si;
 
-   si.setSymParam(OsiSymVerbosity, 3);
+   //si.setSymParam(OsiSymVerbosity, 3);
    si.setSymParam(OsiSymGranularity, 0.9999); 
    //si.setSymParam(OsiSymGenerateMipCuts, false);
    

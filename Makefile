@@ -141,7 +141,7 @@ endif
 
 #Uncomment the line below if you want to use an OSI interface.
 LP_SOLVER = OSI
-OSI_INTERFACE = CLP
+OSI_INTERFACE = CPLEX
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
@@ -605,8 +605,7 @@ SRCDIR  = \
 	$(SYMPHONYROOT)/TreeManager 
 
 
-ifeq ($(USER_SRCDIR),)
-USER_SRCDIR = \
+USER_SRCDIR += \
 	$(USERROOT)/Common    :\
 	$(USERROOT)/LP        :\
 	$(USERROOT)/CutGen    :\
@@ -616,7 +615,6 @@ USER_SRCDIR = \
 	$(USERROOT)/Master    :\
 	$(USERROOT)/include   :\
 	$(USERROOT)           
-endif
 
 VPATH  = $(SRCDIR):$(USER_SRCDIR)
 

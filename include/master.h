@@ -17,6 +17,8 @@
 
 #define COMPILING_FOR_MASTER
 
+#include <stdio.h>
+
 #include "BB_types.h"
 #include "master_params.h"
 #ifdef COMPILE_IN_TM

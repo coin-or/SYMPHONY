@@ -29,8 +29,8 @@
 #include "network.h"
 
 int add_tsp_cuts PROTO((CCtsp_lpcut_in **tsp_cuts, int *cutnum, int vertnum,
-			char tsp_prob, int *num_cuts, int *alloc_cuts,
-			cut_data **cuts));
+			char tsp_prob, cut_data ***cuts, int *num_cuts,
+			int *alloc_cuts));
 
 /*===========================================================================*/
 
@@ -41,7 +41,7 @@ int add_tsp_cuts PROTO((CCtsp_lpcut_in **tsp_cuts, int *cutnum, int vertnum,
 /*===========================================================================*/
 
 int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
-	     int *num_cuts, int *alloc_cuts, cut_data **cuts)
+	     cut_data ***cuts, int *num_cuts, int *alloc_cuts)
 {
    edge *edges = n->edges;
    CCtsp_lpcut_in *tsp_cuts = NULL;
@@ -280,8 +280,8 @@ CLEANUP:
 /*===========================================================================*/
 
 int add_tsp_cuts(CCtsp_lpcut_in **tsp_cuts, int *cutnum, int vertnum,
-		 char tsp_prob, int *num_cuts, int *alloc_cuts,
-		 cut_data **cuts)
+		 char tsp_prob, cut_data ***cuts, int *num_cuts,
+		 int *alloc_cuts)
 {
    cut_data cut;
    int i, j, k, cliquecount, cuts_added = 0;

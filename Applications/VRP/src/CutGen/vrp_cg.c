@@ -254,7 +254,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    n = createnet(indices, values, varnum, etol, vrp->edges, demand, vertnum);
    if (n->is_integral){
       /* if the network is integral, check for connectivity */
-      check_connectivity(n, etol, capacity, num_routes);
+      check_connectivity(n, etol, capacity, num_routes, cuts, num_cuts,
+			 alloc_cuts);
       free_net(n);
       return(USER_SUCCESS);
    }
@@ -502,14 +503,14 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 			   vrp->par.max_num_cuts_in_shrink,
 			   new_cut, compnodes_copy, compmembers,
 			   comp_num, in_set, cut_val,
-			   ref, cut_list, new_demand,
-			   num_cuts, alloc_cuts, cuts);
+			   ref, cut_list, new_demand, cuts,
+			   num_cuts, alloc_cuts);
       }else{
 	 greedy_shrinking1_one(n, capacity, etol,
 			       vrp->par.max_num_cuts_in_shrink,
 			       new_cut, in_set, cut_val, cut_list,
-			       num_routes, new_demand,
-			       num_cuts, alloc_cuts, cuts);
+			       num_routes, new_demand, cuts,
+			       num_cuts, alloc_cuts);
       }
    }
 
@@ -525,23 +526,23 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 			   in_set, cut_val, ref, cut_list,
 			   vrp->par.max_num_cuts_in_shrink,
 			   new_demand, num_cuts ? num_trials :
-			   2 * num_trials, 10.5,
-			   num_cuts, alloc_cuts, cuts);
+			   2 * num_trials, 10.5, cuts,
+			   num_cuts, alloc_cuts);
       }else{
 	 greedy_shrinking6_one(n, capacity, etol, new_cut, in_set,
 			       cut_val, num_routes, cut_list,
 			       vrp->par.max_num_cuts_in_shrink,
 			       new_demand, num_cuts ? num_trials :
-			       2 * num_trials, 10.5,
-			       num_cuts, alloc_cuts, cuts); 
+			       2 * num_trials, 10.5, cuts,
+			       num_cuts, alloc_cuts); 
       }
    }
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #if 0    
    if (!(*num_cuts) && comp_num==1){
       greedy_shrinking2_one(n, capacity, etol, new_cut, in_set,
-			    cut_val, num_routes, new_demand,
-			    num_cuts, alloc_cuts, cuts);
+			    cut_val, num_routes, new_demand, cuts
+			    num_cuts, alloc_cuts);
    }
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
@@ -549,7 +550,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #ifdef DO_TSP_CUTS
    if (!(*num_cuts) && vrp->par.which_tsp_cuts){
       tsp_cuts(n, vrp->par.verbosity, vrp->par.tsp_prob,
-	       vrp->par.which_tsp_cuts, num_cuts, alloc_cuts, cuts);
+	       vrp->par.which_tsp_cuts, cuts, num_cuts, alloc_cuts);
    }
 #endif
    
@@ -810,7 +811,8 @@ int user_find_cuts(void *user, int xlength, int *xind,
  * sure each route obeys the capacity constraints.
 \*===========================================================================*/
 
-int check_connectivity(network *n, double etol, int capacity, int numroutes)
+void check_connectivity(network *n, double etol, int capacity, int numroutes,
+		       cut_data ***cuts, int *num_cuts, int *alloc_cuts)
 {
   vertex *verts;
   elist *cur_route_start;
@@ -819,12 +821,12 @@ int check_connectivity(network *n, double etol, int capacity, int numroutes)
   int cur_vert = 0, prev_vert, cust_num = 0, cur_route, rcnt, *compnodes;
   cut_data *new_cut;
   char **coef_list;
-  int num_cuts = 0, i, reduced_cust_num;
+  int i, reduced_cust_num;
   int vertnum = n->vertnum, vert1, vert2;
   int cut_size = (vertnum >> DELETE_POWER) +1;
   double *compcuts;
   
-  if (!n->is_integral) return(NOT_INTEGRAL);
+  if (!n->is_integral) return;
 
   verts = n->verts;
   compnodes = (int *) calloc(vertnum + 1, sizeof(int));
@@ -956,8 +958,6 @@ int check_connectivity(network *n, double etol, int capacity, int numroutes)
   for (cur_route_start = verts[0].first; cur_route_start;
        cur_route_start = cur_route_start->next_edge)
     cur_route_start->data->scanned = FALSE;
-  
-  return(num_cuts);
 }
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/

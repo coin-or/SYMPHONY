@@ -38,7 +38,7 @@ public:
    virtual CoinWarmStart * clone() const; 
 
    /* Get the pointer to the loaded warmStart_ */
-   virtual const warm_start_desc * getWarmStartDesc();
+   virtual warm_start_desc * getCopyOfWarmStartDesc();
 
    /* Trim the sub tree rooted at node */
    virtual void trimTree(bc_node * node);
@@ -49,7 +49,7 @@ public:
    virtual void setRoot(bc_node *root) {} //FIX_ME! Ask Prof. Ralphs.
 
    /* Write the current warm start info to a file */
-   virtual bool writeToFile(char * f);
+   virtual int writeToFile(char * f);
 
 private:
 

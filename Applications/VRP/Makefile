@@ -42,19 +42,10 @@ MASTERNAME = vrp
 # explanation of these variables in SYMPHONY's Makefile.
 ##############################################################################
 
-COMPILE_IN_TM = TRUE
-COMPILE_IN_LP = TRUE
-COMPILE_IN_CG = TRUE
-COMPILE_IN_CP = TRUE
-
-##############################################################################
-# If you wish to compile and use the SYMPHONY callable library therough the 
-# SYMPHONY OSI interface, set USE_OSI_INTERFACE to TRUE below. Note that
-# you must have COIN installed to use this capability. See the main SYMPHONY
-# Makefile to set the path to the COIN directories.
-##############################################################################
-
-USE_OSI_INTERFACE = TRUE
+APPL_COMPILE_IN_TM = TRUE
+APPL_COMPILE_IN_LP = TRUE
+APPL_COMPILE_IN_CG = TRUE
+APPL_COMPILE_IN_CP = TRUE
 
 ##############################################################################
 # This section is for listing VRP source file names
@@ -68,25 +59,25 @@ DG_FUNC_SRC       = vrp_dg_functions.c
 USER_MASTER_SRC   = vrp_main.c vrp_master.c vrp_io.c vrp_master_functions.c 
 USER_MASTER_SRC  += small_graph.c
 USER_MASTER_SRC  += $(COST_SRC)
-ifeq ($(COMPILE_IN_TM),TRUE)
+ifeq ($(APPL_COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)
-ifeq ($(COMPILE_IN_LP),FALSE)
+ifeq ($(APPL_COMPILE_IN_LP),FALSE)
 USER_MASTER_SRC  += $(MACROS_SRC) $(DG_FUNC_SRC)
 endif
 else
 USER_MASTER_SRC  += $(MACROS_SRC) $(DG_FUNC_SRC)
 endif
 
-ifeq ($(COMPILE_IN_LP),TRUE)
+ifeq ($(APPL_COMPILE_IN_LP),TRUE)
 USER_TM_SRC       = $(USER_LP_SRC) 
 endif
-ifeq ($(COMPILE_IN_CP),TRUE)
+ifeq ($(APPL_COMPILE_IN_CP),TRUE)
 USER_TM_SRC      += vrp_cp.c 
 endif
 
 USER_LP_SRC       = vrp_lp_branch.c vrp_lp.c 
 USER_LP_SRC      += $(MACROS_SRC) $(NET_SRC) $(DG_FUNC_SRC)
-ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(APPL_COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += vrp_cg.c biconnected.c shrink.c 
 endif
 
@@ -136,7 +127,7 @@ USERLIBS = -lconcorde -lcplex
 USERLIBPATHS  = ${HOME}/lib
 USER_INCDIR += -I$(CONCORDE_ROOT)/INCLUDE
 
-ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(APPL_COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += tsp.c # $(TSP_SRC)
 endif
 
@@ -335,7 +326,7 @@ ifeq ($(FARKAS_LIFTING_METHOD),NONE)
 USER_BB_DEFINES += -DNO_LIFTING
 endif
 
-ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(APPL_COMPILE_IN_CG),TRUE)
 ifeq ($(DECOMP),TRUE)
 ifeq ($(COMPILE_OUR_DECOMP),TRUE)
 USER_LP_SRC      += my_decomp_user.c decomp_lower_bound.c
@@ -357,6 +348,14 @@ ifeq ($(COMPILE_OUR_DECOP),TRUE)
 USER_INCDIR      += -I$(USER_ROOT)/include/decomp
 endif
 #___END_EXPERIMENTAL_SECTION___#
+
+##############################################################################
+# This is the flag for the SYMPHONY Makefile to determine whether
+# an application is to be used. You shouldn't need to modify this
+# variable. 
+##############################################################################
+
+USE_SYM_APPL = TRUE
 
 ##############################################################################
 # Include the SYMPHONY makefile after all the source file names (and before

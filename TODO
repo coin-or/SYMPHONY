@@ -6,6 +6,7 @@ Before release:
 4. Add BEST_FIRST_SEARCH, DEPTH_FIRST_SEARCH methods
 5. Make sure setting the node limit to -1 works.
 6. Add description of new parameteres to manual.
+7. Change name of USE_SYM_APPL?
 
 Notes from addition of sensitivity analysis:
 

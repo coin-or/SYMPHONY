@@ -29,6 +29,7 @@ sym_environment *sym_open_environment PROTO((void));
 int sym_set_defaults PROTO((sym_environment *env));
 int sym_parse_command_line PROTO((sym_environment *env, int argc, 
 				  char **argv));
+int sym_set_user_data PROTO((sym_environment *env, void *user));
 int sym_load_problem PROTO((sym_environment *env));
 int sym_find_initial_bounds PROTO((sym_environment *env));
 int sym_solve PROTO((sym_environment *env));

@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 #ifdef TEST_MULTI_CRITERIA
 
    /* Test for mc.mps */
-   si.setObj2Coeff(1, -1);
+   si.setObj2Coeff(1, 1);
 
    si.setSymParam(OsiSymMultiCriteriaFindNondominatedSolutions, FALSE);
    

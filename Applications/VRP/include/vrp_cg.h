@@ -71,8 +71,9 @@ typedef struct VRP_CG_PROBLEM{
 /*========================= Other user subroutines =========================*/
 /*===========================================================================*/
 
-int check_connectivity PROTO((network *n, double etol, int capacity,
-			      int numroutes));
+void check_connectivity PROTO((network *n, double etol, int capacity,
+			      int numroutes, cut_data ***cuts,
+			      int *num_cuts, int *alloc_cuts));
 
 /*===========================================================================*/
 /*=============================== shrink.c ==================================*/
@@ -83,7 +84,7 @@ int greedy_shrinking1 PROTO((network *n, double truck_cap, double etol,
 			     int max_num_cuts, cut_data *new_cut,
 			     int *compnodes, int *compmembers, int compnum,
 			     char *in_set, double *cut_val,int *ref,
-			     char *cut_list, int *demand, cut_data **cuts,
+			     char *cut_list, int *demand, cut_data ***cuts,
 			     int *num_cuts, int *alloc_cuts));
 int greedy_shrinking6 PROTO((network *n, double truck_cap,
 			     double etol, cut_data *new_cut,
@@ -91,25 +92,25 @@ int greedy_shrinking6 PROTO((network *n, double truck_cap,
 			     int *compmembers, int compnum, char *in_set,
 			     double *cut_val,int *ref, char *cut_list,
 			     int max_num_cuts, int *demand, int trial_num,
-			     double prob, cut_data **cuts, int *num_cuts,
+			     double prob, cut_data ***cuts, int *num_cuts,
 			     int *alloc_cuts));
 int greedy_shrinking1_one PROTO((network *n, double truck_cap,
 				 double etol, int max_num_cuts,
 				 cut_data *new_cut, char *in_set,
 				 double *cut_val, char *cut_list,
-				 int num_routes, int *demand, cut_data **cuts,
+				 int num_routes, int *demand, cut_data ***cuts,
 				 int *num_cuts, int *alloc_cuts));
 int greedy_shrinking6_one PROTO((network *n, double truck_cap,
 				 double etol, cut_data *new_cut,
 				 char *in_set, double *cut_val, int num_routes,
 				 char *cut_list, int max_num_cuts,
 				 int *demand,int trial_num, double prob,
-				 cut_data **cuts, int *num_cuts,
+				 cut_data ***cuts, int *num_cuts,
 				 int *alloc_cuts));
 int greedy_shrinking2_one PROTO((network *n, double truck_cap,
 				 double etol, cut_data *new_cut,
 				 char *in_set, double *cut_val, int num_routes,
-				 int *demand, cut_data **cuts, int *num_cuts,
+				 int *demand, cut_data ***cuts, int *num_cuts,
 				 int *alloc_cuts));
 
 /*===========================================================================*/
@@ -127,6 +128,6 @@ void compute_comp_nums PROTO((vertex *v, int parent_comp, int *num_comps,
 /*===========================================================================*/
 
 int tsp_cuts PROTO((network *n, int verbosity, char tsp_prob, int which_cuts,
-		    cut_data **cuts, int *num_cuts));
+		    cut_data ***cuts, int *num_cuts, int *alloc_cuts));
 
 #endif
