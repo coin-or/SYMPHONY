@@ -15,6 +15,7 @@
 #include <memory.h>
 #include <math.h>
 #include <malloc.h>
+#include <string.h>
 
 #include "lp.h"
 #include "qsortucb.h"

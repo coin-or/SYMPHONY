@@ -107,21 +107,21 @@ char processes_alive(tm_prob *tm)
 
 #ifndef COMPILE_IN_LP
    for (i = tm->lp.procnum-1; i>=0; i--){
-      if (pstat(tm->lp.procs[i]) != OK){
+      if (pstat(tm->lp.procs[i]) != PROCESS_OK){
 	 printf("LP has died -- halting machine\n\n");
 	 return(FALSE);
       }
    }
 #endif
    for (i = tm->cg.procnum-1; i>=0; i--){
-      if (pstat(tm->cg.procs[i]) != OK){
+      if (pstat(tm->cg.procs[i]) != PROCESS_OK){
 	 printf("CG has died -- halting machine\n\n");
 	 return(FALSE);
       }
    }
 #ifndef COMPILE_IN_CP
    for (i = tm->cp.procnum-1; i>=0; i--){
-      if (pstat(tm->cp.procs[i]) != OK){
+      if (pstat(tm->cp.procs[i]) != PROCESS_OK){
 	 printf("CP has died -- halting machine\n\n");
 	 return(FALSE);
       }
@@ -129,7 +129,7 @@ char processes_alive(tm_prob *tm)
 #endif
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    for (i = tm->sp.procnum-1; i>=0; i--){
-      if (pstat(tm->sp.procs[i]) != OK){
+      if (pstat(tm->sp.procs[i]) != PROCESS_OK){
 	 printf("SP has died -- halting machine\n\n");
 	 return(FALSE);
       }
@@ -964,7 +964,7 @@ void receive_lp_timing(tm_prob *tm)
          tm->comp_times.idle_cuts        += tim.idle_cuts;
 	 tm->comp_times.cut_pool         += tim.cut_pool;
       }else{
-	 if (pstat(tm->lp.procs[i]) != OK){
+	 if (pstat(tm->lp.procs[i]) != PROCESS_OK){
 	    printf("LP has died -- halting machine\n\n");
 	    stop_processes(&tm->lp);
 	    stop_processes(&tm->cg);

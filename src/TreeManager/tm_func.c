@@ -832,7 +832,7 @@ int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
    do{
       r_bufid = treceive_msg(pool, POOL_USELESSNESS_ACKNOWLEDGED, &timeout);
       if (r_bufid == 0)
-	 if (pstat(pool) != OK) return(NEW_NODE__ERROR);
+	 if (pstat(pool) != PROCESS_OK) return(NEW_NODE__ERROR);
    }while (r_bufid == 0);
    freebuf(r_bufid);
 #endif
@@ -2897,7 +2897,7 @@ int tm_close(tm_prob *tm, int termcode)
 	 tm->stat.cuts_in_pool += new_cuts;
 	 i++;
       }else{
-	 if (pstat(tm->cp.procs[i]) != OK)
+	 if (pstat(tm->cp.procs[i]) != PROCESS_OK)
 	    i++;
       }
    }

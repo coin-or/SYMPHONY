@@ -35,6 +35,9 @@
 #ifdef COMPILE_IN_LP
 #include "lp.h"
 #endif
+#ifdef COMPILE_IN_CP
+#include "cp.h"
+#endif
 #endif
 
 /*===========================================================================*\

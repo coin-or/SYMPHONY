@@ -1,6 +1,7 @@
 #!/bin/tcsh -f
 
 limit memoryuse 1500m
+limit cputime 1
 
 #Solved
 foreach file (egout lseu mod010 mod008.mps misc03 dcmulti flugpl rentacar p0033 rgn p0201 misc06 air03 enigma khb05250 mitre l152lav mod008.mps stein27 fixnet6 gesa3_o blend2 gen gesa3 nw04 markshare1 bell3a misc07 qnet1_o mas76 pk1 stein45)
@@ -12,8 +13,6 @@ foreach file (egout lseu mod010 mod008.mps misc03 dcmulti flugpl rentacar p0033 
 #foreach (air04 air05 modglob gt2 p0282 p0548 p2756 harp2 rout set1ch qnet1 gesa2 mas74 swath pp08aCUTS mod011 markshare2 bell5 pp08a arki001 fast0507 vpm2 dano3mip gesa2_o noswot danoint dsbmip seymour)
 
 echo ========================= $file ========================== 
-$1/SYMPHONY/Template/bin.LINUX/CPLEX/mip -F $1/miplib3/$file
-$1/SYMPHONY/Template/bin.LINUX/OSL/mip -F $1/miplib3/$file
 $1/SYMPHONY/Template/bin.LINUX/OSI_CPLEX/mip -F $1/miplib3/$file
 $1/SYMPHONY/Template/bin.LINUX/OSI_OSL/mip -F $1/miplib3/$file
 $1/SYMPHONY/Template/bin.LINUX/OSI_CLP/mip -F $1/miplib3/$file

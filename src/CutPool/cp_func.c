@@ -101,7 +101,7 @@ void cp_initialize(cut_pool *cp, int master_tid)
    send_msg(cp->master, REQUEST_FOR_CP_DATA);
    freebuf(s_bufid);
    
-   receive_cp_data_u(p);
+   receive_cp_data_u(cp);
    
 #endif
 

@@ -58,7 +58,6 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 {
    user_problem *prob = (user_problem *) user;
    int i, j, index;
-   int resize;
 
    /* set up the inital LP data */
 

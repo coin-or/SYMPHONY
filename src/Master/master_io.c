@@ -869,7 +869,7 @@ void bc_readparams(problem *p, int argc, char **argv)
       /***********************************************************************
        ***                      LP parameters                              ***
        ***********************************************************************/
-      else if (strcmp(key, "LP_verbosity") == 0){
+      if (strcmp(key, "LP_verbosity") == 0){
 	 READ_INT_PAR(lp_par->verbosity);
       }
       else if (strcmp(key, "LP_granularity") == 0){

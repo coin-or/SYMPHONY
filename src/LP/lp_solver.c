@@ -40,6 +40,58 @@ double dot_product(double *val, int *ind, int collen, double *col)
 
 /*===========================================================================*/
 
+void free_lp_arrays(LPdata *lp_data)
+{
+   int i;
+   
+   FREE(lp_data->not_fixed);
+   FREE(lp_data->status);
+   FREE(lp_data->x);
+   FREE(lp_data->dj);
+   FREE(lp_data->dualsol);
+   FREE(lp_data->slacks);
+#ifdef __CPLEX__
+   FREE(lp_data->lb);
+   FREE(lp_data->ub);
+#endif
+   FREE(lp_data->vars);
+   FREE(lp_data->tmp.c);
+   FREE(lp_data->tmp.i1);
+   FREE(lp_data->tmp.i2);
+   FREE(lp_data->tmp.d);
+   FREE(lp_data->tmp.p1);
+   FREE(lp_data->tmp.p2);
+   FREE(lp_data->tmp.cv);
+   FREE(lp_data->tmp.iv);
+   FREE(lp_data->tmp.dv);
+}
+
+/*===========================================================================*/
+
+void free_mip_desc(MIPdesc *mip)
+{
+   int j;
+   
+   FREE(mip->matbeg);
+   FREE(mip->matind);
+   FREE(mip->matval);
+   FREE(mip->obj);
+   FREE(mip->rhs);
+   FREE(mip->rngval);
+   FREE(mip->sense);
+   FREE(mip->lb);
+   FREE(mip->ub);
+   FREE(mip->is_int);
+   if (mip->colname){
+      for (j = 0; j < mip->n; j++){
+	 FREE(mip->colname[j]);
+      }
+      FREE(mip->colname);
+   }
+}
+
+/*===========================================================================*/
+
 void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
 		    int row_num, int col_num, int nzcnt)
 {
@@ -269,14 +321,14 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	 switch(type)                                           
 	    {
 	    case MPL_FR:  /* free */
-	       row_lb[k] = -INFINITY;
-	       row_ub[k] =  INFINITY;
+	       row_lb[k] = -inf;
+	       row_ub[k] =  inf;
 	       break;
 	    case MPL_LO:  /* has lower bound */
-	       row_ub[k] =  INFINITY;
+	       row_ub[k] =  inf;
 	       break;	 
 	    case MPL_UP:  /* has upper bound */
-	       row_lb[k] = -INFINITY;
+	       row_lb[k] = -inf;
 	       break;
 	    default: /* is bounded from both sides or is an equality */
 	       break;
@@ -302,14 +354,14 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
       type = mpl_get_col_bnds(mpl, j+1, &mip->lb[j], &mip->ub[j]);
       switch(type){
       case  MPL_FR: /* free */
-	    mip->lb[j] = -INFINITY;
-	    mip->ub[j] =  INFINITY;
+	    mip->lb[j] = -inf;
+	    mip->ub[j] =  inf;
 	    break;
       case MPL_LO:  /* has lower bound */
-	    mip->ub[j] =  INFINITY;
+	    mip->ub[j] =  inf;
 	    break;
       case MPL_UP:  /* has upper bound */
-	    mip->lb[j] = -INFINITY;
+	    mip->lb[j] = -inf;
 	    break;
       default:  /* has both lower and upper bound or is a fixed variable */
 	    break;
@@ -2197,8 +2249,6 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
 {
-   //  CoinPackedVector * rows = new CoinPackedVector[rcnt];
-
    int i, j, m = lp_data->m;
    
    for (i = 0; i < rcnt; i++){
@@ -2222,14 +2272,12 @@ void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
 	      int *cmatbeg, int *cmatind, double *cmatval,
 	      double *lb, double *ub, char *where_to_move)
 {
-   CoinPackedVector * cols[ccnt];
-   
    int i, j;
    for (i = 0; i < ccnt; i++){
-      cols[i] = new CoinPackedVector;
+      CoinPackedVector col;
       for (j = cmatbeg[i]; j < cmatbeg[i+1]; j++)
-	 cols[i]->insert(cmatind[j], cmatval[j]);
-      lp_data->si->addCol(*(cols[i]), lb[i], ub[i], obj[i]);
+	 col.insert(cmatind[j], cmatval[j]);
+      lp_data->si->addCol(col, lb[i], ub[i], obj[i]);
    }
    
    lp_data->n += ccnt;
@@ -2419,7 +2467,7 @@ void get_column(LPdata *lp_data, int j,
 {
    const CoinPackedMatrix *matrixByCol = lp_data->si->getMatrixByCol();
    
-   int nc = matrixByCol->getNumCols();
+   int nc = matrixByCol->getNumCols(), i;
    
    const double *matval = matrixByCol->getElements();
    const int *matind = matrixByCol->getIndices(); 
@@ -2428,11 +2476,11 @@ void get_column(LPdata *lp_data, int j,
    
    int matbeg = 0;
    
-   for (int i = 0; i < j; i++)
+   for (i = 0; i < j; i++)
       matbeg += matrixByCol->getVectorSize(i);
    
    
-   for (int i = 0; i < (*collen); i++){
+   for (i = 0; i < (*collen); i++){
       colval[i] = matval[matbeg + i];
       colind[i] = matind[matbeg + i];
    }
@@ -2596,7 +2644,6 @@ void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
 {
    int i;
-   double ub, lb;
  
    for (i = 0; i < cnt; i++){
       switch (lu[i]){
@@ -2609,12 +2656,6 @@ void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
        default:
 	 /* default: can't happen */
 	 break;
-      }
-      get_ub(lp_data, index[i], &ub);
-      get_lb(lp_data, index[i], &lb);
-      if (lb > ub){
-	 printf("Error in changin bounds!!!!!!!!!!!!!!!!!");
-	 sleep(600);
       }
    }
    
@@ -2937,9 +2978,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 
    OsiCuts cutlist;
    OsiRowCut cut;
-   int i, j = 0, num_elements;
-   int *indices;
-   double *elements;
+   int i, j = 0, 
 
    /* Set proper variables to be integer */
    for (i = 0; i < lp_data->n; i++) {
@@ -3008,6 +3047,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
       *num_cuts += j;
 #else
       for (i = 0, j = 0; i < cutlist.sizeRowCuts(); i++){
+	 int num_elements;
+	 int *indices;
+	 double *elements;
 	 cut = cutlist.rowCut(i);
 	 (*cuts)[j] =  (cut_data *) calloc(1, sizeof(cut_data));
 	 num_elements = cut.row().getNumElements();

@@ -71,7 +71,7 @@ int find_violated_odd_holes(spp_cg_problem *spp, double etol)
    prob = .2 + .3 * spp->fgraph->density;
    for (i = 0, num_roots = 0; i < nodenum; i++){
       /* choose each node with probability prob */
-      choose = (double)random()/MAXINT;
+      choose = (double)RANDOM()/MAXINT;
       if (choose < prob)
 	 roots[num_roots++] = i;
    }
@@ -355,7 +355,7 @@ double lift_nonviolated_odd_hole(spp_cg_problem *spp, int oh_len, int *oh,
    /* order the hubs randomly, this will make sure that ties are broken
       more or less randomly when comparing which hubs improves the most */
    for (i = hub_len-1; i > 0; i--) {
-      j = (int) (floor((double)random()/MAXINT * (i+1)));
+      j = (int) (floor((double)RANDOM()/MAXINT * (i+1)));
       tmp = hubs[i];
       hubs[i] = hubs[j];
       hubs[j] = tmp;
@@ -680,7 +680,7 @@ int find_violated_odd_antiholes(spp_cg_problem *spp, double etol)
       return(numcuts);    /* all nodes isolated */
    /* order roots randomly: swap ith with one randomly chosen bw 0 and i */
    for (i = num_roots-1; i > 0; i--) {
-      random_num = (int) (floor((double)random()/MAXINT * (i+1)));
+      random_num = (int) (floor((double)RANDOM()/MAXINT * (i+1)));
       tmp = roots[i];
       roots[i] = roots[random_num];
       roots[random_num] = tmp;
@@ -816,7 +816,7 @@ double lift_nonviolated_odd_antihole(spp_cg_problem *spp, int oah_len,
    /* order the hubs randomly, this will make sure that ties are broken
       more or less randomly when comparing which hubs improves the most */
    for (i = hub_len-1; i > 0; i--) {
-      j = (int) (floor((double)random()/MAXINT * (i+1)));
+      j = (int) (floor((double)RANDOM()/MAXINT * (i+1)));
       tmp = hubs[i];
       hubs[i] = hubs[j];
       hubs[j] = tmp;

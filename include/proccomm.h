@@ -22,10 +22,10 @@
 #include <pvm3.h>
 #define DataInPlace PvmDataRaw
 #define TaskHost PvmTaskHost
-#define OK PvmOk
+#define PROCESS_OK PvmOk
 #define PVM_FUNC(info, func)   if ((info = func) < 0) PVM_ERROR(info);
 #else
-#define OK 1
+#define PROCESS_OK 1
 #define DataInPlace 0
 #define TaskHost 0
 #endif

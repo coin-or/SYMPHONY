@@ -133,7 +133,7 @@ void cp_process_message(cut_pool *cp, int r_bufid)
       do{
 	 treceive_msg(new_tid, CUTPOOL_COPY, &tout);
 	 if (! r_bufid){
-	    if (pstat(new_tid) != OK){
+	    if (pstat(new_tid) != PROCESS_OK){
 	       printf("Other CP has died -- CP exiting\n\n");
 	       exit(-602);
 	    }

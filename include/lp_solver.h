@@ -222,6 +222,8 @@ typedef struct LPDATA{
 /*****************************************************************************/
 
 double dot_product PROTO((double *val, int *ind, int collen, double *col));
+void free_lp_arrays PROTO((LPdata *lp_data));
+void free_mip_desc PROTO((MIPdesc *mip));
 void size_lp_arrays PROTO((LPdata *lp_data, char do_realloc, char set_max,
 			     int row_num, int col_num, int nzcnt));
 void open_lp_solver PROTO((LPdata *lp_data));

@@ -917,7 +917,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
       do{
 	 r_bufid = treceive_msg(p->tree_manager, LP__CUT_NAMES_SERVED, &tout);
 	 if (! r_bufid){
-	    if (pstat(p->tree_manager) != OK){
+	    if (pstat(p->tree_manager) != PROCESS_OK){
 	       printf("TM has died -- LP exiting\n\n");
 	       exit(-301);
 	    }

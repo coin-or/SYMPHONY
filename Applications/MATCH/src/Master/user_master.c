@@ -59,7 +59,11 @@ void user_usage(void){
 
 int user_initialize(void **user)
 {
-   return(USER_DEFAULT);
+   user_problem *prob = (user_problem *) calloc(1, sizeof(user_problem));
+   
+   *user = prob;
+   
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/

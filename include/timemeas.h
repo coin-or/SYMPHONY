@@ -21,6 +21,8 @@
 #include <sys/time.h>
 #endif
 
+#include "proto.h"
+
 #define PRINT_TIME(tm, f) { /* Print the elapsed time in vbctool format*/    \
    double elapsed = wall_clock(NULL) - tm->start_time;                       \
    int hours, minutes, seconds, msec;                                        \
@@ -89,15 +91,8 @@
      (tvp)->tv_sec = (int) floor(x);					\
      (tvp)->tv_usec = (int) floor(1000000 * (x - (tvp)->tv_sec));
 
-
-#ifdef __GNUC__
-#define TIMEPROTO(x) x
-#else
-#define TIMEPROTO(x) ()
-#endif
-
-void start_time TIMEPROTO((void));
-double used_time TIMEPROTO((double *T));
-double wall_clock TIMEPROTO((double *T));
+void start_time PROTO((void));
+double used_time PROTO((double *T));
+double wall_clock PROTO((double *T));
 
 #endif

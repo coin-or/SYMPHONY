@@ -341,7 +341,7 @@ int main(int argc, char **argv)
       r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
       if (r_bufid == 0){
 #ifndef COMPILE_IN_TM
-	 if (pstat(p->tm_tid) != OK){
+	 if (pstat(p->tm_tid) != PROCESS_OK){
 	    printf("\nThe treemanager has died :-(\n\n");
 #else
 	 if (!processes_alive(p->tm)){
@@ -359,7 +359,7 @@ int main(int argc, char **argv)
        case FEASIBLE_SOLUTION_USER:
 	 receive_feasible_solution_u(p, msgtag);
 	 if (p->par.verbosity > 0){
-#ifdef COMPILE_IN_TM
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
 	    display_solution_u(p, p->tm->opt_thread_num);
 #else
 	    display_solution_u(p, 0);
@@ -407,7 +407,7 @@ int main(int argc, char **argv)
 
 	 print_statistics(&(p->comp_times.bc_time), &(p->stat), p->ub, p->lb,
 			  0, start_time);
-#ifdef COMPILE_IN_TM
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
 	 display_solution_u(p, p->tm->opt_thread_num);
 #else
 	 display_solution_u(p, 0);
@@ -504,7 +504,11 @@ int main(int argc, char **argv)
    if (tm->lb > p->lb) p->lb = tm->lb;
    print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, p->lb, total_time,
 		    start_time);
+#ifdef COMPILE_IN_LP
    display_solution_u(p, p->tm->opt_thread_num);
+#else
+   display_solution_u(p, 0);
+#endif
 #else
    print_statistics(&(p->comp_times.bc_time), &(p->stat), p->ub, p->lb, 0,
 		    start_time);

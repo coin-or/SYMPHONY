@@ -106,6 +106,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    mip->rhs    = (double *) malloc(mip->m * DSIZE);
    mip->sense  = (char *) malloc(mip->m * CSIZE);
    mip->rngval = (double *) malloc(mip->m * DSIZE);
+   mip->is_int = (char *) calloc (mip->n, CSIZE);
 
    memcpy((char *) mip->matbeg, (char *) cm->matbeg, (cm->colnum+1) * ISIZE);  
    memcpy((char *) mip->obj, (char *) cm->obj, cm->colnum * DSIZE);      
@@ -118,6 +119,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    for (i = mip->n - 1; i >= 0; --i){
       mip->ub[i] = 1.0;
       /* mip->lb[i] = 0.0; */ /* Set by calloc */
+      mip->is_int[i] = TRUE;
    }
    
    for (i = mip->m - 1; i >= 0; --i) {

@@ -18,6 +18,7 @@
 #include <malloc.h>
 #include <memory.h>
 #include <math.h>
+#include <string.h>
 
 /* SYMPHONY include files */
 #include "proccomm.h"

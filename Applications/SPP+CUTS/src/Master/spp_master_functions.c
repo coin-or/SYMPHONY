@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
+#include <string.h>
 
 /* SYMPHONY include files */
 #include "timemeas.h"

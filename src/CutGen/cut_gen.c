@@ -55,20 +55,20 @@ int main(void)
       do{
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &tout);
 	 if (!r_bufid){
-	    if (pstat(p->tree_manager) != OK){
+	    if (pstat(p->tree_manager) != PROCESS_OK){
 	       printf("TM has died -- CG exiting\n\n");
 	       exit(-401);
 	    }
 	 }
       }while (!r_bufid);
-      if (cg_process_message(p, r_bufid) == ERROR)
-	 p->msgtag = ERROR;
+      if (cg_process_message(p, r_bufid) == USER_ERROR)
+	 p->msgtag = USER_ERROR;
       /* If there is still something in the queue, process it */
       do{
 	 r_bufid = nreceive_msg(ANYONE, ANYTHING);
 	 if (r_bufid > 0)
-	    if (cg_process_message(p, r_bufid) == ERROR)
-	       p->msgtag = ERROR;
+	    if (cg_process_message(p, r_bufid) == USER_ERROR)
+	       p->msgtag = USER_ERROR;
       }while (r_bufid != 0);
 
       /*---------------------------------------------------------------------

@@ -75,8 +75,8 @@ int process_message(lp_prob *p, int r_bufid, int *pindex, int *pitnum)
    waiting_row **wrows = p->waiting_rows, **new_rows;
 
    if (! r_bufid){
-      if (pstat(p->tree_manager) == OK)
-	 /* OK, it's a long wait, but carry on */
+      if (pstat(p->tree_manager) == PROCESS_OK)
+	 /* PROCESS_OK, it's a long wait, but carry on */
 	 return(FALSE);
       /* Oops, TM died. We should comit harakiri. */
       printf("TM has died -- LP exiting\n\n");
@@ -387,7 +387,7 @@ int receive_cuts(lp_prob *p, int first_lp, int no_more_cuts_count)
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, ptimeout);
 	 if (! r_bufid){
 	    /* Check that TM is still alive */
-	    if (pstat(p->tree_manager) != OK){
+	    if (pstat(p->tree_manager) != PROCESS_OK){
 	       printf("TM has died -- LP exiting\n\n");
 	       exit(-302);
 	    }
@@ -433,7 +433,7 @@ int receive_cuts(lp_prob *p, int first_lp, int no_more_cuts_count)
       }
       p->comp_times.idle_cuts += wall_clock(NULL) - start;
 
-      if (p->cut_gen && (pstat(p->cut_gen) != OK)){
+      if (p->cut_gen && (pstat(p->cut_gen) != PROCESS_OK)){
 	 /* Before declaring death check that maybe we have to die! Wait for
 	    that message a few seconds, though */
 	 tvtimeout.tv_sec = 15; tvtimeout.tv_usec = 0;
@@ -447,7 +447,7 @@ int receive_cuts(lp_prob *p, int first_lp, int no_more_cuts_count)
 	    /* Hah! we got to die. process the message. */
 	    process_message(p, r_bufid, NULL, NULL);
 	 }
-      }else if (p->cut_pool && (pstat(p->cut_pool) != OK)){
+      }else if (p->cut_pool && (pstat(p->cut_pool) != PROCESS_OK)){
 	 /* Before declaring death check that maybe we have to die! Wait for
 	    that message a few seconds, though */
 	 tvtimeout.tv_sec = 15; tvtimeout.tv_usec = 0;
@@ -768,7 +768,7 @@ void send_node_desc(lp_prob *p, char node_type)
 	 }
       }
       
-      /* OK, now every new thingy is in n->desc.not_fixed */
+      /* PROCESS_OK, now every new thingy is in n->desc.not_fixed */
       nsize = n->desc.not_fixed.size;
       if (nsize == 0){
 	 /* Field day! Proved optimality!
@@ -1363,7 +1363,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
       do{
 	 r_bufid = treceive_msg(p->tree_manager, LP__DIVING_INFO, &timeout);
 	 if (! r_bufid){
-	    if (pstat(p->tree_manager) != OK){
+	    if (pstat(p->tree_manager) != PROCESS_OK){
 	       printf("TM has died -- LP exiting\n\n");
 	       exit(-301);
 	    }

@@ -54,7 +54,7 @@ int main(void)
       do{
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &tout);
 	 if (!r_bufid){
-	    if (pstat(cp->tree_manager) != OK){
+	    if (pstat(cp->tree_manager) != PROCESS_OK){
 	       printf("TM has died -- CP exiting\n\n");
 	       exit(-601);
 	    }

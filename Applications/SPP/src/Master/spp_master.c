@@ -79,8 +79,7 @@ int user_initialize(void **user)
 
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
-   FILE *f;
-   char line[50], key[50], value[50], c, tmp;
+   char c, tmp;
    int i;
    /* This gives you access to the user data structure*/
    spp_problem *spp = (spp_problem *) user;

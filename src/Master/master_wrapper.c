@@ -23,7 +23,6 @@
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "master.h"
-#include "lp_solver.h"
 
 /*===========================================================================*/
 
@@ -368,6 +367,7 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
    }
    send_int_array(&base->cutnum, 1);
    if (p->mip){
+      MIPdesc *mip = p->mip;
       char has_desc = TRUE;
       char has_colnames = FALSE;
       send_char_array(&has_desc, 1);
@@ -383,8 +383,9 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
       send_dbl_array(mip->rngval, mip->m);
       send_dbl_array(mip->ub, mip->n);
       send_dbl_array(mip->lb, mip->n);
-      send_int_array(mip->is_int, mip->n);
+      send_char_array(mip->is_int, mip->n);
       if (mip->colname){
+	 int i;
 	 has_colnames = TRUE;
 	 send_char_array(&has_colnames, 1);
 	 for (i = 0; i < mip->n; i++){
@@ -394,7 +395,7 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
 	 send_char_array(&has_colnames, 1);
       }	 
    }else{
-      int has_desc = FALSE;
+      char has_desc = FALSE;
       send_char_array(&has_desc, 1);
    }
    CALL_USER_FUNCTION( user_send_lp_data(p->user, NULL) );

@@ -525,7 +525,7 @@ char lift_clique(spp_lp_problem *spp, int n, var_desc **vars, double *dj,
    
    /* generate a random permutation of the indices */
    for (i = 0; i < length - 1; i++) {
-      k = random() % (length - i);
+      k = RANDOM() % (length - i);
       ind = indices[i];
       indices[i] = indices[i + k];
       indices[i + k] = ind;
