@@ -128,7 +128,7 @@ int user_receive_cg_data(void **user, int dg_id)
 
    vrp->dg_id = dg_id;
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -136,7 +136,7 @@ int user_receive_cg_data(void **user, int dg_id)
 int user_receive_lp_solution_cg(void *user)
 {
    /* Leave this job to SYMPHONY. We don't need anything special */
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -175,7 +175,7 @@ int user_free_cg(void **user)
    
    FREE(*user);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -256,7 +256,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       num_cuts = check_connectivity(n, etol, capacity, num_routes);
       free_net(n);
       *cutnum = num_cuts;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
 
 #ifdef DO_TSP_CUTS
@@ -265,7 +265,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 			   vrp->par.which_tsp_cuts);
       free_net(n);
       *cutnum = num_cuts;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }      
 #endif
    
@@ -455,7 +455,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #endif
       free_net(n);
       *cutnum = num_cuts;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
 
    if (num_cuts < 10 && vrp->par.do_greedy){
@@ -616,7 +616,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    FREE(compnodes_copy);
    
    *cutnum = num_cuts;
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -661,7 +661,7 @@ int user_find_cuts(void *user, int xlength, int *xind,
 				   numroutes);
       free_net(n);
       *pnumcuts = num_cuts;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
    
    if (!vrp->par.always_do_mincut){/*user_par.always_do_mincut indicates
@@ -791,13 +791,13 @@ int user_find_cuts(void *user, int xlength, int *xind,
    if (num_cuts){/*if we found some cuts using the above routines, then exit*/
       free_net(n);
       *pnumcuts = num_cuts;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
    else{/*if we still haven't found any cuts, then try the min cut routine*/
       num_cuts = min_cut(vrp, n, etol);/*find cuts using min cut routine*/
       free_net(n);
       *pnumcuts = num_cuts;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
 }
 #endif
@@ -1194,6 +1194,6 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
       }
    }
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 #endif

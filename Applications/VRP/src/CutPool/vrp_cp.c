@@ -72,7 +72,7 @@ int user_receive_cp_data(void **user)
       vcp->edges[2*k+1] = i;
       k++;
    }
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -89,7 +89,7 @@ int user_free_cp(void **user)
    FREE(vcp);
    *user = NULL;
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -97,7 +97,7 @@ int user_free_cp(void **user)
 int user_receive_lp_solution_cp(void *user)
 {
    /* We leave this to SYMPHONY */
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -116,7 +116,7 @@ int user_prepare_to_check_cuts(void *user, int varnum, int *indices,
    vrp_cp_problem *vcp = (vrp_cp_problem *)user;
    vcp->n = create_pool_net(vcp, varnum, indices, values);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 
@@ -180,7 +180,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
       *is_violated = (lhs/2 > (double)(cut->rhs)+etol);
       *quality   = lhs/2 - (double)cut->rhs;
       if (*quality < etol && *quality > -etol) *quality = 0;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
 
     case SUBTOUR_ELIM_ACROSS:
       coef = cut->coef;
@@ -194,7 +194,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
       *is_violated = (lhs < (double)(cut->rhs)-etol);
       *quality   = (double)cut->rhs - lhs;
       if (*quality < etol && *quality > -etol) *quality = 0;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
 
     case CLIQUE:
       coef = cut->coef;
@@ -217,7 +217,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
       *is_violated = (lhs < cut->rhs - etol); 
       *quality   = (double)cut->rhs - lhs;
       if (*quality < etol && *quality > -etol) *quality = 0;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
       
     /*__BEGIN_EXPERIMENTAL_SECTION__*/
     case FARKAS:
@@ -265,7 +265,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
       *is_violated = (lhs < cut->rhs - etol); 
       *quality   = (double)cut->rhs - lhs;
       if (*quality < etol && *quality > -etol) *quality = 0;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
       
     case NO_COLUMNS:
       coef = cut->coef;
@@ -298,7 +298,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
       *is_violated = (lhs > cut->rhs + etol); 
       *quality   = lhs - (double)cut->rhs;
       if (*quality < etol && *quality > -etol) *quality = 0;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
       
     case GENERAL_NONZEROS:
       cpt = cut->coef;
@@ -324,13 +324,13 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
       *quality   = (cut->sense == 'G' ? (double)cut->rhs - lhs :
 		                           lhs - (double)cut->rhs);
       if (*quality < etol && *quality > -etol) *quality = 0;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
       
     /*___END_EXPERIMENTAL_SECTION___*/
     default:
       printf("Cut types not recognized! \n\n");
       *is_violated = FALSE;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
 }
 
@@ -347,7 +347,7 @@ int user_finished_checking_cuts(void *user)
    vrp_cp_problem *vcp = (vrp_cp_problem *)user;
    free_pool_net(vcp);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/

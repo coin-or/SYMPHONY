@@ -100,7 +100,7 @@ int user_initialize(void **user)
 
    *user = vrp;
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -124,7 +124,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
    vrp_readparams(vrp, filename, argc, argv);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -140,7 +140,7 @@ int user_io(void *user)
 
    vrp_io(vrp, vrp->par.infile);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
    
 /*===========================================================================*/
@@ -226,7 +226,7 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
       make_small_graph(vrp, 0);
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -293,7 +293,7 @@ int user_init_draw_graph(void *user, int dg_id)
    }
 #endif
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -427,7 +427,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
       break;
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -448,7 +448,7 @@ int user_receive_feasible_solution(void *user, int msgtag, double cost,
 
    receive_char_array((char *)vrp->cur_tour->tour, vrp->vertnum*sizeof(_node));
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -517,7 +517,7 @@ int user_send_lp_data(void *user, void **user_lp)
    }
 #endif
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -610,7 +610,7 @@ int user_send_cg_data(void *user, void **user_cg)
 #endif
 #endif
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -667,7 +667,7 @@ int user_send_cp_data(void *user, void **user_cp)
    send_int_array(&vrp->vertnum, 1);
 #endif
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -694,7 +694,7 @@ int user_send_sp_data(void *user)
    send_int_array(&tournum, 1);
 
    if (tournum <= 0){
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
 
    for (i = 0; i<=vrp->tournum; i++){
@@ -733,7 +733,7 @@ int user_send_sp_data(void *user)
       send_char_array((char *)coef, size);
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*___END_EXPERIMENTAL_SECTION___*/
@@ -746,13 +746,7 @@ int user_send_sp_data(void *user)
 
 int user_process_own_messages(void *user, int msgtag)
 {
-   switch (msgtag){
-    default:
-      fprintf(stderr, "\nMaster: unknown message type %i!!!\n\n", msgtag);
-      exit(1);
-   }
-
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -857,7 +851,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    }
 #endif
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
    
 /*===========================================================================*/
@@ -875,7 +869,7 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
    *feas_sol_size = vrp->feas_sol_size;
    *feas_sol = vrp->feas_sol;
 #endif
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }   
 
 /*===========================================================================*/
@@ -932,7 +926,7 @@ int user_free_master(void **user)
    FREE(vrp->zero_vars);
    FREE(vrp);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 

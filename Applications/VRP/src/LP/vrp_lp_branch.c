@@ -72,7 +72,7 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
       *action = USER__BRANCH_IF_TAILOFF;
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #if 0
@@ -90,7 +90,7 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
    if (i >= varnum){
       /* solution is integral , yet infeasible*/
       *action = USER__DO_NOT_BRANCH;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
 #endif
    
@@ -102,12 +102,12 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
    if  (i < backsteps){
       /* no tailoff */
       *action = USER__BRANCH_IF_MUST;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }else{
       *action = USER__DO_BRANCH;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
-   return(DEFAULT);
+   return(USER_DEFAULT);
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
 }
@@ -144,7 +144,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 
    if (!vrp->par.branch_on_cuts && vrp->par.branching_rule == 2)
       /* use the built-in rule */
-      return(DEFAULT);
+      return(USER_DEFAULT);
 
    *cand_num = 0;
    candnum = 0;
@@ -205,7 +205,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 	 *cand_num = candnum;
 	 FREE(pwl);
 	 *action = USER__DO_NOT_BRANCH;
-	 return(USER_NO_PP);
+	 return(USER_SUCCESS);
       }
       
       /* now go through the slack rows in the matrix and add the potential
@@ -392,7 +392,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
       *cand_num += candnum;
       *action = USER__DO_BRANCH;
    }
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -714,7 +714,7 @@ int user_select_candidates(lp_prob *p, void *user, double lpetol, int cutnum,
    FREE(sorted_cand_list);
    FREE(sorted_diffs);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 #endif
 
@@ -746,16 +746,16 @@ int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
 	 break;
 
    if (i < 0 && j < 0)
-      return(DEFAULT);
+      return(USER_DEFAULT);
       
    if (i < 0 && j > 0){
       *which_is_better = SECOND_CANDIDATE_BETTER;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
 
    if (i > 0 && j < 0){
       *which_is_better = FIRST_CANDIDATE_BETTER;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
 
    low1 = i ? can1->objval[0] : can1->objval[1];
@@ -764,7 +764,7 @@ int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
    *which_is_better = low1 > low2 ? FIRST_CANDIDATE_BETTER :
                                     SECOND_CANDIDATE_BETTER;
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -776,7 +776,7 @@ int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
 
 int user_select_child(void *user, double ub, branch_obj *can, char *action)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -818,5 +818,5 @@ int user_print_branch_stat(void *user, branch_obj *can, cut_data *cut,
       printf("Edge (%i, %i)\n", v0, v1);
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }

@@ -1110,8 +1110,8 @@ void get_lb(LPdata *lp_data, int j, double *lb)
 
 void get_bounds(LPdata *lp_data)
 {
-   lp_data->ub = ekk_colupper(lp_data->lp);
-   lp_data->lb = ekk_collower(lp_data->lp);
+   lp_data->ub = const_cast<double *>(ekk_colupper(lp_data->lp));
+   lp_data->lb = const_cast<double *>(ekk_collower(lp_data->lp));
 }
 
 /*===========================================================================*/
@@ -1615,7 +1615,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 
    lp_data->termcode = term;
 
-   if (term != ABANDONED){
+   if (term != LP_ABANDONED){
       *iterd = CPXgetitcnt(lp_data->cpxenv, lp_data->lp);
       cpx_status = CPXgetobjval(lp_data->cpxenv,lp_data->lp, &lp_data->objval);
       CPX_check_error("dual_simplex - CPXgetobjval");

@@ -104,27 +104,7 @@ int user_receive_lp_data(void **user)
       copy_node_set(vrp->window, TRUE, (char *)"Compressed solution");
 #endif
    }
-   return(USER_NO_PP);
-}
-
-/*===========================================================================*/
-
-/*===========================================================================*\
- * Free all the user data structures
-\*===========================================================================*/
-
-int user_free_lp(void **user)
-{
-   vrp_lp_problem *vrp = (vrp_lp_problem *)(*user);
-
-#ifndef COMPILE_IN_CG
-   FREE(vrp->demand);
-#endif
-   FREE(vrp->costs);
-   FREE(vrp->edges);
-   FREE(vrp->cur_sol);
-   FREE(vrp);
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -206,7 +186,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
       mip->sense[i] = 'E';
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }      
 
 
@@ -234,7 +214,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    if (!n->is_integral){
       *feasible = IP_INFEASIBLE;
       free_net(n);
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
    
    verts = n->verts;
@@ -257,7 +237,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 	 FREE(compdemands);
 	 FREE(compcuts);
 	 free_net(n);
-	 return(USER_NO_PP);
+	 return(USER_SUCCESS);
       }
    }
    
@@ -271,7 +251,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    
    free_net(n);
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -291,7 +271,8 @@ int user_send_feasible_solution(void *user, double lpetol, int varnum,
    vrp_lp_problem *vrp = (vrp_lp_problem *)user;
 
    send_char_array((char *)vrp->cur_sol, vrp->vertnum*sizeof(_node));
-   return(USER_NO_PP);
+
+   return(USER_SUCCESS);
 }
 
 
@@ -325,7 +306,7 @@ int user_display_lp_solution(void *user, int which_sol, int varnum,
    if (which_sol == DISP_FINAL_RELAXED_SOLUTION){
       return(DISP_NZ_INT);
    }else{
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
 }
 
@@ -338,7 +319,7 @@ int user_display_lp_solution(void *user, int which_sol, int varnum,
 
 int user_add_to_desc(void *user, int *desc_size, char **desc)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -352,7 +333,7 @@ int user_same_cuts(void *user, cut_data *cut1, cut_data *cut2, int *same_cuts)
 {
    /*for now, we just compare byte by byte, as in the previous version of the
      code. Later, we might want to change this to be more efficient*/
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -636,7 +617,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
      }
   }
 
-  return(USER_NO_PP);
+  return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -719,7 +700,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 
    free((char *)compdemands);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -749,7 +730,7 @@ int user_generate_column(void *user, int generate_what, int cutnum,
       *real_nextind = nextind;
       if (prevind >= total_edgenum-1){
 	 *real_nextind = -1;
-	 return(USER_NO_PP);
+	 return(USER_SUCCESS);
       }else{
 	 if (nextind == -1) nextind = total_edgenum;
 	 /*first, cycle through the edges that were eliminated in the root*/
@@ -759,7 +740,7 @@ int user_generate_column(void *user, int generate_what, int cutnum,
 	 vh = vrp->edges[(i << 1) + 1];
       }
       if (i == nextind)
-	 return(USER_NO_PP);
+	 return(USER_SUCCESS);
 
       *real_nextind = i;
       break;
@@ -904,7 +885,7 @@ int user_generate_column(void *user, int generate_what, int cutnum,
       /*___END_EXPERIMENTAL_SECTION___*/
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -916,7 +897,7 @@ int user_generate_column(void *user, int generate_what, int cutnum,
 
 int user_print_stat_on_cuts_added(void *user, int rownum, waiting_row **rows)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -929,7 +910,7 @@ int user_print_stat_on_cuts_added(void *user, int rownum, waiting_row **rows)
 int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
 			    char *delete_rows)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -964,7 +945,7 @@ int user_get_upper_bounds(void *user, int varnum, int *indices, double *ub)
       }
    }
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 #endif
 
@@ -979,7 +960,27 @@ int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
 			     var_desc **vars, double *x,
 			     int *new_row_num, cut_data ***cuts)
 {
-   return(USER_AND_PP);
+   return(DO_NOT_GENERATE_CGL_CUTS);
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Free all the user data structures
+\*===========================================================================*/
+
+int user_free_lp(void **user)
+{
+   vrp_lp_problem *vrp = (vrp_lp_problem *)(*user);
+
+#ifndef COMPILE_IN_CG
+   FREE(vrp->demand);
+#endif
+   FREE(vrp->costs);
+   FREE(vrp->edges);
+   FREE(vrp->cur_sol);
+   FREE(vrp);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
