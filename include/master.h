@@ -23,6 +23,7 @@
 #include "master_params.h"
 #ifdef COMPILE_IN_TM
 #include "tm.h"
+#include "lp.h"
 #endif
 
 /*===========================================================================*\
@@ -58,6 +59,8 @@ typedef struct SYM_ENVIRONMENT{
    int              termcode;
 
    warm_start_desc *warm_start;
+   
+   double          mc_time;
 
 #ifdef COMPILE_IN_TM
    tm_prob         *tm;
@@ -104,6 +107,9 @@ int process_own_messages_u PROTO((sym_environment *env, int msgtag));
 int resolve_node PROTO((sym_environment *env, bc_node * node));
 void update_tree_bound PROTO((sym_environment *env, bc_node *root, 
 			      int change_type));
+void cut_ws_tree_index PROTO((bc_node *root, int index, int ind_num, 
+			      problem_stat * stat));
+void cut_ws_tree_level PROTO((bc_node *root, int level));
 int copy_node PROTO((bc_node * n_to, bc_node *n_from));
 int copy_tree PROTO((bc_node *root_to, bc_node *root_from));
 int read_node PROTO((bc_node * node, FILE *f));
@@ -129,4 +135,8 @@ int check_feasibility_new_rhs PROTO((bc_node * node, MIPdesc * mip,
 					int cnt, int *ind, double *val));
 int trim_warm_tree PROTO((sym_environment *env, bc_node *n));
 
+int round_solution PROTO((lp_prob *p, double *solution_value, 
+			  double **betterSolution));
+int local_search PROTO((lp_prob *p, double * solution_value, 
+			double * col_solution, double ** better_solution));
 #endif

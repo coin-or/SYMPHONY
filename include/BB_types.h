@@ -322,6 +322,8 @@ typedef struct BC_NODE{
    char       node_status;
 
    int          feasibility_status;  
+   int          sol_size;
+   int          dual_size;
    double       *sol;
    double       *duals;
    double       C_LP;
@@ -371,6 +373,11 @@ typedef struct MIPDESC{
    int       *matbeg;      /* n */
    int       *matind;      /* nz */
    double    *matval;      /* nz */
+   int       *col_lengths;   
+   int       *row_matbeg;      /* m */  /* a row ordered description for heuristics */
+   int       *row_matind;      /* nz */
+   double    *row_matval;      /* nz */
+   int       *row_lengths;  
    double    *obj;         /* n */
    double    *obj1;        /* n */ /* for bicriteria problems */
    double    *obj2;        /* n */ /* for bicriteria problems */
