@@ -80,7 +80,8 @@ int find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
 				      p->cur_sol.xindex, p->cur_sol.objval,
 				      p->cur_sol.xind, p->cur_sol.xval,
 				      p->ub, p->cur_sol.lpetol,
-				      &p->cuts_to_add_num, &p->cuts_to_add_size,
+				      &p->cuts_to_add_num,
+				      &p->cuts_to_add_size,
 				      &p->cuts_to_add) );
 
    *num_cuts += p->cuts_to_add_num - tmp;

@@ -586,10 +586,11 @@ int is_feasible_u(lp_prob *p, char branching)
 
    switch (user_res){
     case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
-      for (i=cnt-1; i>=0; i--)
+      for (i=cnt-1; i>=0; i--){
 	 if (!lp_data->vars[i]->is_int)
 	    continue; /* Not an integer variable */
 	 if (values[i] < lpetol1) break;
+      }
       feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
       break;
     case TEST_INTEGRALITY:

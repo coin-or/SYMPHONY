@@ -1,3 +1,12 @@
+Before release:
+
+1. Update references (make Bibtex file).
+2. Update Walkthrough document.
+3. Update Web page.
+4. Add BEST_FIRST_SEARCH, DEPTH_FIRST_SEARCH methods
+5. Make sure setting the node limit to -1 works.
+6. Add description of new parameteres to manual.
+
 Notes from addition of sensitivity analysis:
 
 2. Switch how changes to the description are tracked to a bit array in

@@ -1,4 +1,4 @@
-\subsection{Orienting Yourself}
+\section{Orienting Yourself}
 
 The easiest way to get oriented is to examine the organization of the source
 files (note that file names will be given Unix-style). When you unpack the
@@ -44,7 +44,7 @@ module, initially called \texttt{SYMPHONY-4.0/USER/*/user\_*.c}, where
 need to understand to build a custom application is how to fill in these
 stubs. That is what the second section of this manual is about.
 
-\subsection{Writing the User Functions}
+\section{Writing the User Functions}
 
 For each module, all user functions are invoked from so-called \emph{wrapper
 functions} that provide the interface and also performs a default action if
@@ -114,9 +114,9 @@ of the algorithm.
 
 \end{description}
 
-\subsection{Data Structures}
+\section{Data Structures}
 
-\subsubsection{Internal Data Structures}
+\subsection{Internal Data Structures}
 
 With few exceptions, the data structures used internally by \BB\
 are undocumented and most users will not need to access them
@@ -127,7 +127,7 @@ header files). This function will return a pointer to the data
 structure for the appropriate module. Casual users are advised against
 modifying \BB's internal data structures directly.
 
-\subsubsection{User-defined Data Structures}
+\subsection{User-defined Data Structures}
 
 The user can define her own data structure for each module to maintain problem
 data and any other information the user needs access to in order to implement
@@ -147,7 +147,7 @@ between modules and data must be explicitly passed. IN this case, it is
 sometimes more efficient to maintain in each module only the data necessary to
 perform the functions of that module.
 
-\subsection{Inter-process Communication for Distributed Computing}
+\section{Inter-process Communication for Distributed Computing}
 \label{communication}
 While the implementation of \BB\ strives to shield the user from having to
 know anything about communications protocols or the specifics of inter-process
@@ -182,7 +182,7 @@ to simply copy the send statements into the receive function and change the
 function names. It may then be necessary to add some allocation statements in
 between the receive function calls.
 
-\subsection{The LP Engine}
+\section{The LP Engine}
 
 \BB\ requires the use of a third-party callable library to solve the LP 
 relaxations once they are formulated. Native interfaces to ILOG's
@@ -199,7 +199,7 @@ solvers with OSI interfaces currently numbers eight and includes both
 commercial and open source alternatives. If the COIN libraries are used, make
 sure to set the proper paths in the SYMPHONY makefile.
 
-\subsection{Cut Generation}
+\section{Cut Generation}
 
 SYMPHONY now generates generic cutting planes using the Cut Generator Library,
 also available from 
@@ -210,10 +210,10 @@ COIN (\texttt{http://www.coin-or.org})
 The CGL can be used to generate cuts in cases where problem-specific cutting
 planes are not available or not implemented yet. 
 
-\subsection{Advanced Compilation}
+\section{Advanced Compilation}
 \label{advanced-compilation}
 
-\subsubsection{Unix Operating Systems}
+\subsection{Unix Operating Systems}
 
 Once the user functions are filled in, all that remains is to compile the
 application. The distribution comes with two makefiles that facilitate this
@@ -313,7 +313,7 @@ modules, as in the fully distributed version, you must set the parameters {\tt
 *\_exe} in the parameter file to the new executable names. See Section
 \ref{tm_params} for information on setting parameters in the parameter file.
 
-\subsubsection{Microsoft Windows}
+\subsection{Microsoft Windows}
 
 First, follow the instructions for compiling SYMPHONY in Section
 \ref{getting_started_windows} to ensure you have the proper settings. Once the
@@ -321,12 +321,12 @@ stub files in the {\tt SYMPHONY-4.0$\backslash$USER} hierarchy are
 filled in, you should be able to compile the new application and run it
 successfully. 
 
-\subsection{Debugging Your Application}
+\section{Debugging Your Application}
 
 Much of this section applies to Unix operating systems. However, it may
 also be useful for Windows users.
 
-\subsubsection{The First Rule}
+\subsection{The First Rule}
 
 \BB\ has many built-in options to make debugging easier. The most
 important one, however, is the following rule. {\bf It is easier to
@@ -343,7 +343,7 @@ believe me, it's worth the effort. The vast majority of your code will
 be the same for either case. Make sure to set the compile flag to
 ``{\tt -g}'' in the makefile.
 
-\subsubsection{Debugging with PVM}
+\subsection{Debugging with PVM}
 \label{debugging-PVM}
 If you wish to venture into debugging your distributed application,
 then you simply need to set the parameter {\tt *\_debug}, where * is
@@ -370,7 +370,7 @@ max\_active\_nodes} to ``1''). This will keep the tree search from
 becoming random. These two steps should allow runs to be reproduced.
 You still have to be careful, but this should make things easier.
 
-\subsubsection{Using {\tt Purify} and {\tt Quantify}}
+\subsection{Using {\tt Purify} and {\tt Quantify}}
 
 The makefile is already set up for compiling applications using {\tt
 purify} and {\tt quantify}. Simply set the paths to the executables
@@ -382,7 +382,7 @@ parameters {\tt *\_exe} in the parameter file to the purified
 executable names. See Section \ref{tm_params} for information on
 setting parameters in the parameter file.
 
-\subsubsection{Checking the Validity of Cuts and Tracing the Optimal Path}
+\subsection{Checking the Validity of Cuts and Tracing the Optimal Path}
 \label{debugging}
 Sometimes the only evidence of a bug is the fact that the optimal
 solution to a particular problem is never found. This is usually
@@ -419,7 +419,7 @@ branched on, the branch that continues to admit the solution is
 marked. When one of these marked subproblems is pruned, the user is
 notified.
 
-\subsubsection{Using the {\tt Interactive Graph Drawing} Software}
+\subsection{Using the {\tt Interactive Graph Drawing} Software}
 \label{IGD}
 The Interactive Graph Drawing (IGD) software package is included with
 \BB\ and \BB\ facilitates its use through interfaces with the
@@ -450,7 +450,7 @@ parameter file or use the {\tt -d} command line option. It can be difficult to
 get IGD to work. If you are interested in using it and cannot get it to work,
 feel free to contact me.
 
-\subsubsection{Other Debugging Techniques}
+\subsection{Other Debugging Techniques}
 
 Another useful built-in function is \texttt{write\_mps()}, which will write the
 current LP relaxation to a file in MPS format. This file can then be read into
@@ -472,7 +472,7 @@ Logging is another useful feature. Logging the state of the search tree can
 help isolate some problems more easily. See Section \ref{tm_params}
 for the appropriate parameter settings to use logging.
 
-\subsection{Controlling Execution and Output}
+\section{Controlling Execution and Output}
 \label{output}
 Calling \BB\ with no arguments simply lists all command-line options.  Most of
 the common parameters can be set on the command line. Sometimes, however, it
@@ -504,7 +504,7 @@ with SYMPHONY. Binaries for VBCTOOL can be obtained at \\
 {http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}}.
 
 
-\subsection{Other Resources}
+\section{Other Resources}
 \label{resources}
 There is a \BB\ user's list serve for posting questions/comments.
 To subscribe, send ``{\tt subscribe symphony-users}'' to

@@ -984,8 +984,7 @@ int sym_resolve(problem *p)
    if (p->warm_start && p->par.tm_par.warm_start){
       if (!p->mip->change_num){
 	 return sym_solve(p);
-      }
-      else{
+      }else{
 	 if (!p->warm_start){
 	    printf("sym_solve():");
 	    printf("Unable to process an empty warm start description!\n");

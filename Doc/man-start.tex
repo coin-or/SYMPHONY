@@ -54,7 +54,7 @@ and the overall design and use of \BB.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Compiling the Sample Application with Unix Operating Systems}
+\section{Compiling the Sample Application with Unix Operating Systems}
 \label{getting_started_unix}
 
 Here is a sketch outline of how to get started with SYMPHONY in Unix. This is
@@ -71,7 +71,7 @@ on nonhomogeneous networks, but it means that you might need to edit the
 makefiles to get SYMPHONY to compile. For the casual user, this editing is
 limited to providing some path names.
 
-\subsubsection{Preparing for Sample Compilation.}
+\subsection{Preparing for Sample Compilation.}
 
 \begin{itemize}
 
@@ -105,7 +105,7 @@ limited to providing some path names.
 
 \end{itemize}
         
-\subsubsection{Compiling the Sequential Version.}
+\subsection{Compiling the Sequential Version.}
 
 \begin{itemize}
         \item Change to the \texttt{SYMPHONY-4.0/USER} directory and type
@@ -136,7 +136,7 @@ subdirectories. See Section \ref{development} for more information.
 
 \end{itemize}
 
-\subsubsection{Compiling the Shared Memory Version.}
+\subsection{Compiling the Shared Memory Version.}
 
 Please note that the shared-memory parallel version has not been tested in
 Version 4.0 and may be broken. Please let me know if you want to use it and I
@@ -175,7 +175,7 @@ subdirectories. See Section \ref{development} for more information.
 
 \end{itemize}
 
-\subsubsection{Compiling the Distributed Version.}
+\subsection{Compiling the Distributed Version.}
 
 Please note that the distributed-memory parallel version has not been tested
 in Version 4.0 and may be broken. Please let me know if you want to use it and
@@ -242,7 +242,7 @@ from Oak Ridge National Laboratories
 %get lost, consult the source code for the sample application to see
 %how it's done.
 
-\subsection{Compiling the Sample Application with Microsoft Windows}
+\section{Compiling the Sample Application with Microsoft Windows}
 \label{getting_started_windows}
 
 Here is a sketch outline of how to compile SYMPHONY in MS Windows. Direct
@@ -260,7 +260,7 @@ can use the provided projects and workspaces. Compiling on the command-line is
 somewhat easier since it requires only editing the makefile and typing a
 single command.
 
-\subsubsection{Using the NMAKE Utility}
+\subsection{Using the NMAKE Utility}
 
 \begin{itemize}
 
@@ -301,7 +301,7 @@ directory.
 
 \end{itemize}
 
-\subsubsection{Using the MSVC++ Workspace}
+\subsection{Using the MSVC++ Workspace}
 
 \begin{itemize}
 
@@ -430,9 +430,9 @@ run in sequential mode for a variety of reasons. However, it should be
 relatively easy to get it running in parallel if you can get PVM working under
 Windows. Let me know if you are interested.
 
-\subsection{Customizing SYMPHONY}
+\section{Customizing SYMPHONY}
 
-\subsubsection{Unix}
+\subsection{Unix}
 
 Developing a simple branch and bound solver that can read in instance data in
 a custom format is straightforward using the template provided in the
@@ -475,7 +475,7 @@ file has already been modified appropriately). That's it! You should now have
 a working branch and bound solver. Next you can work on filling in more
 advanced functions and adding cutting planes.
 
-\subsubsection{Microsoft Windows}
+\subsection{Microsoft Windows}
 Developing a simple branch and bound solver that can read in instance data in
 a custom format is straightforward using the template provided in the
 \texttt{SYMPHONY-4.0$\backslash$USER$\backslash$} directory. The simplest approach is to develop a
@@ -517,7 +517,7 @@ Now build again and you have a working branch and bound solver! Next you can
 work on filling in more advanced functions and adding cutting planes. See the
 documentation for more information on this.
 
-\subsection{Sample Applications}
+\section{Sample Applications}
 
 There are now a number of sample applications available as examples of how
 to do development with SYMPHONY. These include solvers for the matching
