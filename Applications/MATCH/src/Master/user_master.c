@@ -59,7 +59,7 @@ void user_usage(void){
 
 int user_initialize(void **user)
 {
-
+   /* Don't need this */
 #if 0
    user_problem *prob = (user_problem *) calloc(1, sizeof(user_problem));
    
@@ -78,7 +78,7 @@ int user_initialize(void **user)
 
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
-
+   /* This code is just a template for customization. Uncomment to use.*/
 #if 0
 
    FILE *f;
@@ -143,6 +143,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
 int user_io(void *user)
 {
+   /* This code is just a template for customization. Uncomment to use.*/
  # if 0
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;

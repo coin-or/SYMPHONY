@@ -73,15 +73,59 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   double ub, double etol, int *num_cuts, int *alloc_cuts, 
 		   cut_data ***cuts)
 {
+
+#if 1
+   
+   /* Here, we demonstrate how to add an explicit cut that doesn't have a
+      special packed form. This is the easiest way to add cuts, but may be
+      inefficient in parallel. */
+
+   user_problem *prob = (user_problem *) user;
+   double edge_val[200][200]; /* Matrix of edge values */
+   int i, j, k, cutind[3];
+   double cutval[3];
+   
+   int cutnum = 0;
+
+   /* Allocate the edge_val matrix to zero (we could also just calloc it) */
+   memset((char *)edge_val, 0, 200*200*ISIZE);
+   
+   for (i = 0; i < varnum; i++) {
+      edge_val[prob->node1[indices[i]]][prob->node2[indices[i]]] = values[i];
+   }
+   
+   for (i = 0; i < prob->nnodes; i++){
+      for (j = i+1; j < prob->nnodes; j++){
+	 for (k = j+1; k < prob->nnodes; k++) {
+	    if (edge_val[i][j]+edge_val[j][k]+edge_val[i][k] > 1.0 + etol) {
+	       /* Found violated triangle cut */
+	       /* Form the cut as a sparse vector */
+	       cutind[0] = prob->index[i][j];
+	       cutind[1] = prob->index[j][k];
+	       cutind[2] = prob->index[i][k];
+	       cutval[0] = cutval[1] = cutval[2] = 1.0;
+	       cg_add_explicit_cut(3, cutind, cutval, 1.0, 0, 'L',
+				   TRUE, num_cuts, alloc_cuts, cuts);
+	       cutnum++;
+	       
+	    }
+	 }
+      }
+   }
+   
+#else
+   /* Here, we show how to use a user-defined cut class with a packed form. IN
+      this case, the packed form is just to store the three nodes that form
+      the triangle. See the function user_unpack_cuts() for the code to unpack
+      the cut. */
    user_problem *prob = (user_problem *) user;
    double edge_val[200][200]; /* Matrix of edge values */
    int i, j, k;
    int *new_cuts;
    cut_data cut;
+   int coef[3];
    
    int cutnum = 0;
-
-   new_cuts = (int *) malloc(prob->nnodes * ISIZE);
 
    /* Allocate the edge_val matrix to zero (we could also just calloc it) */
    memset((char *)edge_val, 0, 200*200*ISIZE);
@@ -95,18 +139,18 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 for (k = j+1; k < prob->nnodes; k++) {
 	    if (edge_val[i][j]+edge_val[j][k]+edge_val[i][k] > 1.0 + etol) {
 	       memset(new_cuts, 0, prob->nnodes * ISIZE);
-	       new_cuts[i] = 1; 
-	       new_cuts[j] = 1;
-	       new_cuts[k] = 1;
-	       cut.size = (prob->nnodes)*ISIZE;
-	       cut.coef = (char *) new_cuts;
+	       coef[1] = i; 
+	       coef[2] = j;
+	       coef[3] = k;
+	       cut.size = 3*ISIZE;
+	       cut.coef = (char *) coef;
 	       cut.rhs = 1.0;
 	       cut.range = 0.0;
 	       cut.type = TRIANGLE;
 	       cut.sense = 'L';
 	       cut.deletable = TRUE;
 	       cut.branch = ALLOWED_TO_BRANCH_ON;
-	       cg_send_cut(&cut, num_cuts, alloc_cuts, cuts);
+	       cg_add_user_cut(&cut, num_cuts, alloc_cuts, cuts);
 	       cutnum++;
 	       
 	    }
@@ -115,7 +159,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
    
    FREE(new_cuts);
-
+#endif
+   
    return(USER_SUCCESS);
 }
 

@@ -37,78 +37,92 @@
 
 \begin{document}
 
-\title{Simple Walkthrough for Using SYMPHONY} \author{Michael
-Trick\thanks{Graduate School of Industrial Administration, Carnegie Mellon
-University, Pittsburgh, PA 15213 \texttt{trick@cmu.edu},
+\title{Simple Walkthrough of Building a Solver with SYMPHONY \thanks{The
+original version of this document was submitted by Michael Trick, but it has
+since been updated by Menal Guzelsoy to correspond to version 5.0 of
+SYMPHONY.}}
+
+\author{Michael Trick\thanks{Graduate School of Industrial Administration,
+Carnegie Mellon University, Pittsburgh, PA 15213 \texttt{trick@cmu.edu},
 \texttt{http://mat.gsia.cmu.edu/trick}} and Menal Guzelsoy\thanks{Department
 of Industrial and Systems Engineering, Lehigh University, Bethlehem, PA 18017,
 {\tt megb@lehigh.edu}}}
 
-\date{October 14, 2004}
+\date{November 3, 2004}
 \maketitle
 \thispagestyle{empty}
 
-SYMPHONY is a callable library including a set of user callback routines to
-allow it to solve generic MIPs, as well as easily create custom
+SYMPHONY is a callable library that includes a set of user callback routines
+to allow it to solve generic MIPs, as well as easily create custom
 branch-cut-price solvers. Having been fully integrated with COIN, SYMPHONY is
 capable to use CPLEX, OSL, CLP, GLPK, DYLP, SOPLEX, VOL and XPRESS-MP through
 the COIN/OSI interface (first two can also be used through the built-in APIs
-without using COIN/OSI). The SYMPHONY system includes numerous applications:
-Vehicle Routing Problem (VRP), Capacitated Node Routing Problem (CNRP),
-Multi-Criteria Knapsack Problem (MCKP), Mixed Postman Problem (MPP), Set
-Partitioning Problems (SPP-basic and advanced).  These applications are
-extremely well done, but, in generality, are difficult to understand.
+without using COIN/OSI). The SYMPHONY system includes sample solvers for
+numerous applications: Vehicle Routing Problem (VRP), Capacitated Node Routing
+Problem (CNRP), Multi-Criteria Knapsack Problem (MCKP), Mixed Postman Problem
+(MPP), Set Partitioning Problem (basic and advanced solvers).  These
+applications are extremely well done, but can be difficult to
+understand because of their complexity.
 
-Here is a walkthrough for a very simple application that uses SYMPHONY. Rather
-than presenting the code in its final version, I will go through the steps 
-that I went through. Note that some of the code is lifted from the vehicle 
-routing application. This code is designed to be a sequential code. The MATCH application itself is available for download at 
-\texttt{http://www.branchandcut.org/MATCH}. 
+Here is a walkthrough for a very simple application built using
+SYMPHONY. Rather than presenting the code in its final version, I will go
+through the steps that I went through. Note that some of the code is lifted
+from the vehicle routing application. This code is designed to be a sequential
+code. The MATCH application itself is available for download at
+\texttt{http://www.branchandcut.org/MATCH}.
 
-Our goal is to create a minimum one-matching code on a complete graph.
-Initially we will just formulate this as an integer program. Then we will
-include a set of constraints that can be added by cut generation.
+Our goal is to create a minimum matching on a complete graph.  Initially we
+will just formulate this as an integer program with one variable for each
+possible pair that can be matched. Then we will include a set of constraints
+that can be added by cut generation.
 
-I begin with the template file in the \texttt{USER} subdirectory included in
-SYMPHONY. This gives stubs for each user routine. First I need to define the
-data needed for one-matching. This data will be included in the structure
-\texttt{USER\_PROBLEM} in the file \texttt{user.h}.  Initially, the data will
-be the number of nodes and the cost matrix, so change \texttt{USER\_PROBLEM}
-in \texttt{user.h} to be
+I begin with the template code in the \texttt{USER} subdirectory included with
+SYMPHONY. This gives stubs for each user callback routine. First, I need to
+define a data structure for describing an instance of the matching problem. We
+use the template structure \texttt{USER\_PROBLEM} in the file
+\texttt{include/user.h} for this purpose.  To describe an instance, we just
+need the number of nodes and the cost matrix. In addition, we also need a way
+of assigning an index to each possible assignment. Here is the data
+structure: 
+\newpage
 \begin{verbatim}
 typedef struct USER_PROBLEM{
    int              colnum;         /* Number of rows in base matrix */
    int              rownum;         /* Number of columns in base matrix */
-   user_parameters  par;            /* Parameters */
-   int              nnodes;         /* Number of nodes */
-   int              cost[200][200]; /* Cost of assigning i to j */ 
-   int              node1[20000];   /* First index of each variable */
-   int              node2[20000];   /* Second index of each variable */
+   int		    nnodes;         /* Number of nodes */
+   int		    cost[200][200]; /* Cost of assigning i to j */ 
+   int		    node1[20000];   /* node1[i] is the first component of
+				       the assignment with index 'i' */
+   int		    node2[20000];   /* node2[i] is the second component of
+				       the assignment with index 'i' */
+   int              index[200][200];/* index[j][k] is the index of the variable
+				       associated with assigning 'j' to 'k'*/
 }user_problem;
 \end{verbatim}
 
 A ``real programmer'' would not hard-code problem sizes like that, but I am
-trying to get a minimal code. The fields \texttt{node1} and \texttt{node2} will
-be used later in the code in order to map constraints back to the
-corresponding nodes. Additionally, add the declarations of two functions which 
-will be needed later: 
+trying to get a minimal code. The fields \texttt{node1}, \texttt{node2}, and
+\texttt{index} will be used later in the code in order to map variables to the
+corresponding assignment and vice versa. Additionally, we need the
+declarations of two functions that will be needed later:
 
 \begin{verbatim}
 int match_read_data PROTO((sym_environment *env, void *user, char *infile));
 int match_load_problem PROTO((sym_environment *env, void *user));
 \end{verbatim}
 
-Next, read in the data. We could easily use the \texttt{user\_io()}
-user-callback for this (see this routine in \texttt{user\_master.c} for an
-illustration). However, in order to show how it can be done explicitly, we
-will define our own function \texttt{match\_read\_data()} in
+Next, we read in the data. We could implement this within the
+\texttt{user\_io()} callback function (see the file
+\texttt{user\_master.c}). However, in order to show how it can be done
+explicitly, we will define our own function \texttt{match\_read\_data()} in
 \texttt{user\_main.c} to fill in the user data structure and then use
 \texttt{sym\_set\_user\_data()} to pass this structure to SYMPHONY. The
-template already has command-line options set up for the user. The ``-F'' flag
-defines the data file, so we will use that to put in the data. The datafile
-contains first the number of nodes in the graph (\texttt{nnodes}) followed by
-the pairwise cost matrix (nnode by nnode).  Read this in with the
-\texttt{match\_read\_data()} routine in \texttt{user\_main.c}:
+template code already provides basic command-line options for the user. The
+``-F'' flag is used to specify the location of a data file, from which we will
+read in the data. The datafile contains first the number of nodes in the graph
+(\texttt{nnodes}) followed by the pairwise cost matrix (nnode by nnode).  We
+read the file in with the \texttt{match\_read\_data()} routine in
+\texttt{user\_main.c}:
 
 \begin{verbatim}
 int match_read_data(sym_environment *env, void *user, char *infile)
@@ -139,18 +153,20 @@ int match_read_data(sym_environment *env, void *user, char *infile)
 }
 \end{verbatim}   
 
-Note that we set the number of rows and columns in this routine. We can now
-define the integer program. We will have a variable for each edge $(i,j)$ with
-$i<j$. We have a constraint for each node $i$ forcing one edge to be incident
-to $i$ in the matching.
+Note that we set the number of rows and columns in this routine. We can
+construct the integer program itself. This is done by specifying the
+constraint matrix and the rim vectors in sparse format. We will have a
+variable for each possible assignment $(i,j)$ with $i<j$. We have a constraint
+for each node $i$, so it can only me matched to one other node.
 
-We define the IP in our other helper function 
-\texttt{match\_load\_problem()} in \texttt{user\_main.c}. In the 
-first part of this routine, we will represent the IP with a set of arrays, 
-and then in the second part, will load this representation to SYMPHONY through 
-\texttt{sym\_explicit\_load\_problem()}. Note that, we could also create the 
-same IP model in \texttt{user\_create\_subproblem()} callback (see 
-this routine in \texttt{user\_lp.c} for an illustration).
+We define the IP in our other helper function \texttt{match\_load\_problem()}
+in \texttt{user\_main.c}. In the first part of this routine, we will build a
+description of the IP, and then in the second part, we will load this
+representation to SYMPHONY through
+\texttt{sym\_explicit\_load\_problem()}. Note that we could instead create a
+description of each subproblem dynamically using the
+\texttt{user\_create\_subproblem()} callback (see \texttt{user\_lp.c}), but
+this is more complicated and unnecessary here.
 
 \begin{verbatim}
 int match_load_problem(sym_environment *env, void *user){
@@ -182,8 +198,10 @@ int match_load_problem(sym_environment *env, void *user){
    index = 0;
    for (i = 0; i < prob->nnodes; i++) {
       for (j = i+1; j < prob->nnodes; j++) {
-         prob->node1[index] = i; /* The first node of assignment 'index' */
-         prob->node2[index] = j; /* The second node of assignment 'index' */
+         prob->node1[index] = i; /* The first component of assignment 'index' */
+         prob->node2[index] = j; /* The second componet of assignment 'index' */
+         /* So we can recover the index later */
+         prob->index[i][j] = prob->index[j][i] = index;
          obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
          is_int[index] = TRUE;
          matbeg[index] = 2*index;
@@ -207,15 +225,8 @@ int match_load_problem(sym_environment *env, void *user){
    sym_explicit_load_problem(env, n, m, matbeg, matind, matval, lb, ub, 
                              is_int, obj, 0, sense, rhs, rngval, true);
 			     
-   FREE(matbeg);
-   FREE(matind);
-   FREE(matval);
-   FREE(lb);
-   FREE(ub);
-   FREE(obj);
-   FREE(sense);
-   FREE(rhs);
-   FREE(rngval);
+   free(matbeg); free(matind); free(matval); free(lb); free(ub);
+   free(obj); free(sense); free(rhs); free(rngval);
 
    return (FUNCTION_TERMINATED_NORMALLY);
 }
@@ -299,19 +310,12 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 }
 \end{verbatim}
 
-We will now update the code to include a crude cut generation. Of course, I am
-eventually aiming for a Gomory-Hu type odd-set separation (ala Groetschel and
+We will now update the code to include a crude cut generator. Of course, I am
+eventually aiming for a Gomory-Hu type odd-set separation (ala Gr\"otschel and
 Padberg) but for the moment, let's just check for sets of size three with more
 than value 1 among them (such a set defines a cut that requires at least one
-edge out of any odd set). We can do this by brute force checking of triples.
-
-This is done in two steps: first, we find cuts and store them as we wish. Then
-we ``unpack'' the cuts and create the violated inequalities. Finding the cuts
-is in the routine \texttt{user\_find\_cuts()} in \texttt{user\_cg.c}. In the
-following, ``new\_cuts'' is an array which is zero except for 
-\texttt{new\_cuts[i]}, \texttt{new\_cuts[j]} and \texttt{new\_cuts[k]} 
-(where \texttt{i}, \texttt{j}, and \texttt{k} represents the violating triple) 
-which are ``1.''
+edge out of any odd set). We can do this by brute force checking of triples,
+as follows: 
 
 \begin{verbatim}
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
@@ -321,103 +325,46 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 {
    user_problem *prob = (user_problem *) user;
    double edge_val[200][200]; /* Matrix of edge values */
-   int i, j, k;
-   int *new_cuts;
-   cut_data cut;
+   int i, j, k, cutind[3];
+   double cutval[3];
    
-   new_cuts = (int *) malloc(prob->nnodes * ISIZE);
+   int cutnum = 0;
 
    /* Allocate the edge_val matrix to zero (we could also just calloc it) */
    memset((char *)edge_val, 0, 200*200*ISIZE);
    
    for (i = 0; i < varnum; i++) {
-      edge_val[prob->node1[indices[i]]][prob->node2[indices[i]]] 
-         = values[i];
+      edge_val[prob->node1[indices[i]]][prob->node2[indices[i]]] = values[i];
    }
+   
    for (i = 0; i < prob->nnodes; i++){
       for (j = i+1; j < prob->nnodes; j++){
-          for (k = j+1; k < prob->nnodes; k++) {
-            if (edge_val[i][j]+edge_val[j][k]+edge_val[i][k] > 1.0 + etol) {
-               memset(new_cuts, 0, prob->nnodes * ISIZE);
-               new_cuts[i] = 1; 
-               new_cuts[j] = 1;
-               new_cuts[k] = 1;
-               cut.size = (prob->nnodes)*ISIZE;
-               cut.coef = (char *) new_cuts;
-               cut.rhs = 1.0;
-               cut.range = 0.0;
-               cut.type = TRIANGLE;
-               cut.sense = 'L';
-               cut.deletable = TRUE;
-               cut.branch = ALLOWED_TO_BRANCH_ON;
-               cg_send_cut(&cut, num_cuts, alloc_cuts, cuts);
-            }
-         }
+	 for (k = j+1; k < prob->nnodes; k++) {
+	    if (edge_val[i][j]+edge_val[j][k]+edge_val[i][k] > 1.0 + etol) {
+	       /* Found violated triangle cut */
+	       /* Form the cut as a sparse vector */
+	       cutind[0] = prob->index[i][j];
+	       cutind[1] = prob->index[j][k];
+	       cutind[2] = prob->index[i][k];
+	       cutval[0] = cutval[1] = cutval[2] = 1.0;
+	       cg_add_explicit_cut(3, cutind, cutval, 1.0, 0, 'L',
+				   TRUE, num_cuts, alloc_cuts, cuts);
+	       cutnum++;
+	       
+	    }
+	 }
       }
    }
-   
-   FREE(new_cuts);
-   
+
    return(USER_SUCCESS);
 }
 
 \end{verbatim}
 
-Note the call of \texttt{cg\_send\_cut()}, which tells the system about any
-cuts found.
-
-The final step is to give a routine that creates cuts from the structure
-defined in \texttt{user\_find\_cuts()}. This is the routine
-\texttt{user\_unpack\_cuts()} in \texttt{user\_lp.c}. The levels of
-indirection here are somewhat confusing (I don't think I have seen a ***
-variable before), but the mallocs in the following create things in the right
-order:
-\begin{verbatim}
-int user_unpack_cuts(void *user, int from, int type, int varnum,
-                     var_desc **vars, int cutnum, cut_data **cuts,
-                     int *new_row_num, waiting_row ***new_rows)
-{
-   user_problem *prob = (user_problem *) user;
-   
-   int i, j, nzcnt;
-   int *cutval;
-   waiting_row **row_list;
-   
-   *new_row_num = cutnum;
-   if (cutnum > 0)
-      *new_rows =
-          row_list = (waiting_row **) calloc (cutnum, sizeof(waiting_row *));
-   
-   for (j = 0; j < cutnum; j++){
-      row_list[j] = (waiting_row *) malloc(sizeof(waiting_row));
-      switch (cuts[j]->type){
-	 
-      case TRIANGLE:
-         cutval = (int *) (cuts[j]->coef);
-         row_list[j]->matind = (int *) malloc(varnum * ISIZE);
-         row_list[j]->matval = (double *) malloc(varnum * DSIZE);
-         row_list[j]->nzcnt = 0;
-         for (nzcnt = 0, i = 0; i < varnum; i++){
-            if (cutval[prob->node1[vars[i]->userind]] &&
-                cutval[prob->node2[vars[i]->userind]]){
-               row_list[j]->matval[nzcnt] = 1.0;
-               row_list[j]->matind[nzcnt++] = vars[i]->userind;
-            }
-         }
-         row_list[j]->nzcnt = nzcnt;
-         break;
-
-       default:
-           printf("Unrecognized cut type!\n");
-      }
-   }
-   
-   return(USER_SUCCESS);
-}
-\end{verbatim}
-
-If you now solve the matching problem on the sample data set, the number of
-nodes in the branch and bound tree should just be 1 (rather than 3 without cut
-generation).
+Note the call of \texttt{cg\_add\_explicit\_cut()}, which tells SYMPHONY about
+any cuts found. If we now solve the matching problem on the sample data set,
+the number of nodes in the branch and bound tree should just be 1 (rather than
+3 without cut generation).
 
 \end{document}
+ 

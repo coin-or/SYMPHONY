@@ -56,7 +56,8 @@ int user_receive_lp_data(void **user)
 int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
 			   int *maxn, int *maxm, int *maxnz)
 {
-
+   /* This code isn't needed anymore, since the model is fed in as a generic
+      IP. It's been left here as an example of how to use this function. */
 #if 0
    user_problem *prob = (user_problem *) user;
    int i, j, index;
@@ -192,10 +193,14 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		     var_desc **vars, int cutnum, cut_data **cuts,
 		     int *new_row_num, waiting_row ***new_rows)
 {
+   /* This code isn't needed anymore, since the model is fed in as a generic
+      IP. It's been left here as an example of how to use this function. */
+#if 0
    user_problem *prob = (user_problem *) user;
    
    int i, j, nzcnt;
-   int *cutval;
+   int *nodes;
+   int indices[3]; /* The indices of the variables in the cut */
    waiting_row **row_list;
    
    *new_row_num = cutnum;
@@ -208,24 +213,30 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
       switch (cuts[j]->type){
 	 
       case TRIANGLE:
-	 cutval = (int *) (cuts[j]->coef);
-	 row_list[j]->matind = (int *) malloc(varnum * ISIZE);
-	 row_list[j]->matval = (double *) malloc(varnum * DSIZE);
-	 row_list[j]->nzcnt = 0;
+	 nodes = (int *) (cuts[j]->coef);
+	 /* Compute the indices of the variables in the cut */
+	 indices[0] = prob->index[nodes[0]][nodes[1]];
+	 indices[1] = prob->index[nodes[1]][nodes[2]];
+	 indices[2] = prob->index[nodes[0]][nodes[2]];
+	 row_list[j]->matind = (int *) malloc(3 * ISIZE);
+	 row_list[j]->matval = (double *) malloc(3 * DSIZE);
+	 /* Check to se which variables in the cut are present */
 	 for (nzcnt = 0, i = 0; i < varnum; i++){
-	    if (cutval[prob->node1[vars[i]->userind]] &&
-		cutval[prob->node2[vars[i]->userind]]){
+	    if (vars[i]->userind == indices[0] ||
+		vars[i]->userind == indices[1] ||
+		vars[i]->userind == indices[2]){
 	       row_list[j]->matval[nzcnt] = 1.0;
 	       row_list[j]->matind[nzcnt++] = vars[i]->userind;
 	    }
 	 }
-	 row_list[j]->nzcnt = nzcnt;
+	 row_list[j]->nzcnt = 3;
 	 break;
 
        default:
 	 printf("Unrecognized cut type!\n");
       }
    }
+#endif
    
    return(USER_SUCCESS);
 }

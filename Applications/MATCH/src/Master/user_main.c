@@ -97,7 +97,7 @@ int match_load_problem(sym_environment *env, void *user){
    double *matval, *lb, *ub, *obj, *rhs, *rngval;
    char *sense, *is_int;
    user_problem *prob = (user_problem *) user;
-
+   
    /* set up the inital LP data */
    n = prob->colnum;
    m = prob->rownum;
@@ -120,8 +120,10 @@ int match_load_problem(sym_environment *env, void *user){
    index = 0;
    for (i = 0; i < prob->nnodes; i++) {
       for (j = i+1; j < prob->nnodes; j++) {
-	 prob->node1[index] = i; /* The first node of assignment 'index' */
-	 prob->node2[index] = j; /* The second node of assignment 'index' */
+	 prob->node1[index] = i; /* The first component of assignment 'index' */
+	 prob->node2[index] = j; /* The second componet of assignment 'index' */
+	 /* So we can recover the index later */
+	 prob->index[i][j] = prob->index[j][i] = index;
 	 obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
 	 is_int[index] = TRUE;
 	 matbeg[index] = 2*index;
