@@ -1,8 +1,9 @@
 #!/bin/tcsh -f
 
+VER=4.0
 mkdir $1
 awk -f scripts/reformat.awk Makefile.dist > $1/Makefile
-foreach file (LICENSE README-4.0)
+foreach file (LICENSE README-$VER)
 awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/Common
@@ -108,8 +109,8 @@ awk -f scripts/reformat.awk $file > $1/$file
 end
 
 foreach app (Vrp MATCH MPP SPP SPP+CUTS)
-mv $1/$app $1/$app-4.0
+mv $1/$app $1/$app-$VER
 end
-mv $1/Vrp-4.0 $1/VRP-4.0
+mv $1/Vrp-$VER $1/VRP-$VER
 mv $1/Template $1/USER
 mv $1/README* $1/README

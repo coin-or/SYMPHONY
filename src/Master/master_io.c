@@ -200,6 +200,7 @@ void bc_readparams(problem *p, int argc, char **argv)
    lp_par->tailoff_gap_frac = .99;
    lp_par->tailoff_obj_backsteps = 3;
    lp_par->tailoff_obj_frac = .75;
+   lp_par->tailoff_absolute = 0.0001;
    lp_par->ineff_cnt_to_delete = 0;
    lp_par->eff_cnt_before_cutpool = 3;
    lp_par->ineffective_constraints = BASIC_SLACKS_ARE_INEFFECTIVE;
@@ -984,6 +985,10 @@ void bc_readparams(problem *p, int argc, char **argv)
       else if (strcmp(key, "tailoff_obj_frac") == 0 ||
 	       strcmp(key, "LP_tailoff_obj_frac") == 0){
 	 READ_DBL_PAR(lp_par->tailoff_obj_frac);
+      }
+      else if (strcmp(key, "tailoff_absolute") == 0 ||
+	       strcmp(key, "LP_tailoff_absolute") == 0){
+	 READ_DBL_PAR(lp_par->tailoff_absolute);
       }
 
      else if (strcmp(key, "ineff_cnt_to_delete") == 0 ||

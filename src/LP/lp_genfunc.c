@@ -1016,15 +1016,22 @@ int check_tailoff(lp_prob *p)
       tailoff_obj is false if the average of the objective difference ratios
       is greater than obj_frac */
    if (obj_backsteps > 1){
-      for (i = 2, sum = 0; i <= obj_backsteps; i++)
-	 if (obj_hist[i-1] - obj_hist[i] > 0)
+      for (i = 2, sum = 0; i <= obj_backsteps; i++){
+	 if (obj_hist[i-1] - obj_hist[i] > 0){
 	    sum += (obj_hist[i-2]-obj_hist[i-1]) / (obj_hist[i-1]-obj_hist[i]);
-	 else
+	 }else{
 	    sum += 1;
-      if (sum / (obj_backsteps - 1) > p->par.tailoff_obj_frac)
+	 }
+      }
+      if (sum / (obj_backsteps - 1) < p->par.tailoff_obj_frac){
 	 return(FALSE); /* no tailoff */
+      }
    }
 
+   if (obj_hist[0] - obj_hist[1] > p->par.tailoff_absolute){
+      return(FALSE);
+   }
+   
    PRINT(p->par.verbosity, 3, ("Branching because of tailoff!\n"));
 
    return(TRUE); /* gone thru everything ==> tailoff */

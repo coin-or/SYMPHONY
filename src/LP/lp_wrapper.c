@@ -529,6 +529,8 @@ int is_feasible_u(lp_prob *p)
    switch (user_res){
     case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
       for (i=cnt-1; i>=0; i--)
+	 if (!lp_data->vars[i]->is_int)
+	    continue; /* Not an integer variable */
 	 if (values[i] < lpetol1) break;
       feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
       break;
@@ -537,8 +539,11 @@ int is_feasible_u(lp_prob *p)
 	 if (!lp_data->vars[i]->is_int)
 	    continue; /* Not an integer variable */
 	 valuesi = lp_data->x[i];
-	 if (valuesi-floor(valuesi) > lpetol && ceil(valuesi)-valuesi > lpetol)
+	 if (valuesi > lp_data->vars[i]->lb && valuesi < lp_data->vars[i]->ub
+	     && valuesi-floor(valuesi) > lpetol &&
+	     ceil(valuesi)-valuesi > lpetol){
 	    break;
+	 }
       }
       feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
       break;

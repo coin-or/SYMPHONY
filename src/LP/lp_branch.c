@@ -255,12 +255,12 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 #if 0
 	 if (lp_data->status[branch_var] & PERM_FIXED_TO_LB ||
 	     lp_data->status[branch_var] & PERM_FIXED_TO_UB){
-#endif
 	 if (vars[branch_var]->lb == vars[branch_var]->ub){
 	    printf("Warning -- branching candidate is already fixed. \n");
 	    printf("SYMPHONY has encountered numerical difficulties \n");
 	    printf("With the LP solver. Exiting...\n\n");
 	 }
+#endif
 	 lb = vars[branch_var]->lb;
 	 ub = vars[branch_var]->ub;
 	 for (j = 0; j < can->child_num; j++){
@@ -430,6 +430,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	 break;
    }
 
+#if 0
    if (best_can->type == CANDIDATE_VARIABLE &&
        vars[best_can->position]->lb == vars[best_can->position]->ub){
       printf("Error -- branching variable is already fixed. \n");
@@ -444,6 +445,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
       printf("SYMPHONY has encountered possible numerical difficulties \n");
       printf("with the LP solver. Exiting...\n\n");
    }
+#endif
    
 #ifndef MAX_CHILDREN_NUM
    FREE(pobj); FREE(pterm); FREE(pfeas); FREE(piter);
@@ -689,10 +691,12 @@ void branch_close_to_half(int max_cand_num, int *cand_num,
       /* Not sure what I meant with this */
       /* if (lp_data->vars[i]->ub < 2.0){ */
       if (vars[i]->is_int){
-	 fracx = x[i] - floor(x[i]);
-	 if (fracx > lpetol && fracx < lpetol1){
-	    xind[cnt] = i;
-	    xval[cnt++] = fabs(fracx - .5);
+	 if (x[i] > vars[i]->lb && x[i] < vars[i]->ub){
+	    fracx = x[i] - floor(x[i]);
+	    if (fracx > lpetol && fracx < lpetol1){
+	       xind[cnt] = i;
+	       xval[cnt++] = fabs(fracx - .5);
+	    }
 	 }
       }
       /*}*/
