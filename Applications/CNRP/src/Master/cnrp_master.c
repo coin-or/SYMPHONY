@@ -717,7 +717,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    }
    cnrp->fixed_cost = fixed_cost;
    cnrp->variable_cost = variable_cost;
-#ifdef ADD_FLOW_VARS
+#if defined(ADD_FLOW_VARS) && defined(MULTI_CRITERIA)
    printf("Solution Fixed Cost: %.1f\n", fixed_cost);
    printf("Solution Variable Cost: %.1f\n", variable_cost);
 #else

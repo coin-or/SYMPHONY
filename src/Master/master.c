@@ -429,6 +429,12 @@ int sym_load_problem(sym_environment *env)
    CALL_WRAPPER_FUNCTION( init_draw_graph_u(env) );
 #endif
 
+   /*------------------------------------------------------------------------*\
+    * Have the user generate the base and root description
+   \*------------------------------------------------------------------------*/
+
+   CALL_WRAPPER_FUNCTION( initialize_root_node_u(env) );
+
    env->comp_times.readtime = used_time(&t);
 
    env->termcode = TM_NO_SOLUTION;
@@ -496,17 +502,12 @@ int sym_solve(sym_environment *env)
    double start_time, lb;
    struct timeval timeout = {10, 0};
    double t = 0, total_time = 0;
-
+   int thread_num;
+   
    node_desc *rootdesc = env->rootdesc;
    base_desc *base = env->base;
 
    start_time = wall_clock(NULL);
-
-   /*------------------------------------------------------------------------*\
-    * Have the user generate the base and root description
-   \*------------------------------------------------------------------------*/
-
-   CALL_WRAPPER_FUNCTION( initialize_root_node_u(env) );
 
 #ifndef COMPILE_IN_TM
    /*------------------------------------------------------------------------*\
@@ -744,7 +745,8 @@ int sym_solve(sym_environment *env)
 	 CALL_WRAPPER_FUNCTION( receive_feasible_solution_u(env, msgtag) );
 	 if (env->par.verbosity > 0){
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-	    CALL_WRAPPER_FUNCTION( display_solution_u(env, env->tm->opt_thread_num) );
+	    CALL_WRAPPER_FUNCTION( display_solution_u(env,
+						env->tm->opt_thread_num) );
 #else
 	    CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
 #endif
@@ -782,7 +784,8 @@ int sym_solve(sym_environment *env)
 			     sizeof(node_times));
 	 receive_dbl_array(&lb, 1);
 	 if (lb > env->lb) env->lb = lb;
-	 receive_char_array((char *)&env->warm_start->stat,sizeof(problem_stat));
+	 receive_char_array((char *)&env->warm_start->stat,
+			    sizeof(problem_stat));
 	 printf( "\n");
 	 printf( "****************************************************\n");
 	 printf( "* Branch and Cut First Phase Finished!!!!          *\n");
@@ -790,10 +793,12 @@ int sym_solve(sym_environment *env)
 	 printf( "****************************************************\n\n");
 
 	 print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat),
-			  env->ub, env->lb, 0, start_time, env->mip->obj_offset,
-			  env->mip->obj_sense, env->has_ub);
+			  env->ub, env->lb, 0, start_time,
+			  env->mip->obj_offset, env->mip->obj_sense,
+			  env->has_ub);
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-	 CALL_WRAPPER_FUNCTION( display_solution_u(env, env->tm->opt_thread_num) );
+	 CALL_WRAPPER_FUNCTION( display_solution_u(env,
+						   env->tm->opt_thread_num) );
 #else
 	 CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
 #endif
@@ -814,7 +819,8 @@ int sym_solve(sym_environment *env)
 			    sizeof(node_times));
 	 receive_dbl_array(&lb, 1);
 	 if (lb > env->lb) env->lb = lb;
-	 receive_char_array((char *)&env->warm_start->stat,sizeof(problem_stat));
+	 receive_char_array((char *)&env->warm_start->stat,
+			    sizeof(problem_stat));
 	 break;
 
        default:
@@ -860,15 +866,13 @@ int sym_solve(sym_environment *env)
       env->warm_start->ub = tm->ub;
    }
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-   if (env->tm){
-      int thread_num = env->tm->opt_thread_num;
-      if (env->tm->lpp[thread_num]){
-	 if (env->tm->lpp[thread_num]->best_sol.xlength){
-	    env->best_sol = env->warm_start->best_sol = 
-	       env->tm->lpp[thread_num]->best_sol;
-	 }else if (!env->par.multi_criteria){
-	    env->tm->lpp[thread_num]->best_sol = env->best_sol;
-	 }
+   thread_num = env->tm->opt_thread_num;
+   if (env->tm->lpp[thread_num]){
+      if (env->tm->lpp[thread_num]->best_sol.xlength){
+	 env->best_sol = env->warm_start->best_sol = 
+	    env->tm->lpp[thread_num]->best_sol;
+      }else if (!env->par.multi_criteria){
+	 env->tm->lpp[thread_num]->best_sol = env->best_sol;
       }
    }
 #else
@@ -882,6 +886,19 @@ int sym_solve(sym_environment *env)
    }
    tm_close(tm, termcode);
 
+   /* FIXEM: Set the correct termcode. This can't be done in the treemanager
+      because it doesn't know whether a solution was found. This should be
+      changed. */
+   if (termcode == TM_FINISHED){
+      if (tm->par.find_first_feasible && env->best_sol.xlength){
+	 termcode = TM_FOUND_FIRST_FEASIBLE;
+      }else if (env->best_sol.xlength){
+	 termcode = TM_OPTIMAL_SOLUTION_FOUND;
+      }else{
+	 termcode = TM_NO_SOLUTION;
+      }
+   }
+   
 #ifndef COMPILE_IN_LP
    if (termcode != SOMETHING_DIED){
       do{
@@ -1165,7 +1182,7 @@ int sym_mc_solve(sym_environment *env)
       env->base->cutnum += 2;
       env->rootdesc->uind.size++;
       env->rootdesc->uind.list = (int *) realloc(env->rootdesc->uind.list,
-					       env->rootdesc->uind.size*ISIZE);
+					 env->rootdesc->uind.size*ISIZE);
       env->rootdesc->uind.list[env->rootdesc->uind.size-1] = env->mip->n;
    }else{
       sym_set_int_param(env, "keep_description_of_pruned", KEEP_IN_MEMORY);
@@ -1177,7 +1194,6 @@ int sym_mc_solve(sym_environment *env)
    compare_sol_tol = env->par.mc_compare_solution_tolerance;
    env->par.tm_par.granularity = env->par.lp_par.granularity =
       -MAX(env->par.lp_par.mc_rho, compare_sol_tol);
-   env->utopia[0] = env->utopia[1] = -MAXINT;   
    
    if (env->par.verbosity >= 0){
       if (env->par.mc_binary_search_tolerance > 0){
@@ -1217,6 +1233,8 @@ int sym_mc_solve(sym_environment *env)
    }
 
    /* Solve */
+   env->utopia[0] = 0;
+   env->utopia[1] = -MAXDOUBLE;
    if (termcode = sym_solve(env) < 0){
       env->base->cutnum -=2;
       env->rootdesc->uind.size--;
@@ -1250,6 +1268,8 @@ int sym_mc_solve(sym_environment *env)
    printf("***************************************************\n\n");
 
    /* Resolve */
+   env->utopia[0] = -MAXDOUBLE;
+   env->utopia[1] = 0;
    if (!env->par.lp_par.mc_find_nondominated_solutions){
       sym_set_warm_start(env, ws);
       for (i = 0; i < env->mip->n; i++){
@@ -1678,7 +1698,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
    int j;
 
    if (numcols == 0){
-      printf("sym_load_problem_user():The given problem is empty!\n");
+      printf("sym_explicit_load_problem():The given problem is empty!\n");
       return (0);
    }
 
@@ -1729,6 +1749,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 	     start[numcols]);  
    }else{
       env->mip->obj  = obj;
+      env->mip->obj1   = (double *) calloc(numcols, DSIZE);
       if (obj2){
 	 env->mip->obj2 = obj2;
       }else{

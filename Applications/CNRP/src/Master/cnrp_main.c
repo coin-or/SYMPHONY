@@ -177,6 +177,10 @@ void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp)
       flow_capacity = cnrp->capacity/2;
 #endif
 #endif
+
+#ifdef MULTI_CRITERIA
+   cnrp->lp_par.tau = cnrp->lp_par.gamma = 1.0;
+#endif
    
    /* set up the inital LP data */
 
@@ -200,8 +204,8 @@ void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp)
    matbeg  = (int *) malloc((n + 1) * ISIZE);
    matind  = (int *) malloc(nz * ISIZE);
    matval  = (double *) malloc(nz * DSIZE);
-   obj     = (double *) malloc(n * DSIZE);
-   obj2    = (double *) malloc(n * DSIZE);
+   obj     = (double *) calloc(n, DSIZE);
+   obj2    = (double *) calloc(n, DSIZE);
    ub      = (double *) malloc(n * DSIZE);
    lb      = (double *) calloc(n, DSIZE); /* zero lower bounds */
    rhs     = (double *) malloc(m * DSIZE);
@@ -426,8 +430,12 @@ void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp)
 #endif
    
    /* Load in the problem */
+#ifdef MULTI_CRITERIA
+   sym_explicit_load_problem(env, n, m, matbeg, matind, matval, lb, ub, is_int,
+			     obj, obj2, sense, rhs, NULL, TRUE);
+#else
    sym_explicit_load_problem(env, n, m, matbeg, matind, matval, lb, ub, is_int,
 			     obj, obj2, sense, rhs, NULL, FALSE);
-   
+#endif   
 }      
 

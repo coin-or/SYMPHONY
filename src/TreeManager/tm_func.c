@@ -306,12 +306,12 @@ int solve(tm_prob *tm)
 
    no_work_start = wall_clock(NULL);
 
-   termcode = TM_OPTIMAL_SOLUTION_FOUND;
+   termcode = TM_FINISHED;
    for (; tm->phase <= 1; tm->phase++){
       if (tm->phase == 1 && !tm->par.warm_start){
 	 if ((termcode = tasks_before_phase_two(tm)) ==
 	     FUNCTION_TERMINATED_NORMALLY){
-	    termcode = TM_OPTIMAL_SOLUTION_FOUND; /* Continue normally */
+	    termcode = TM_FINISHED; /* Continue normally */
 	 }
       }
       then  = wall_clock(NULL);
@@ -425,7 +425,6 @@ int solve(tm_prob *tm)
 	    break;
 	 }
 	 if (tm->par.find_first_feasible && tm->has_ub){
-	    termcode = TM_FOUND_FIRST_FEASIBLE;
 	    break;
 	 }
 	 if (i == NEW_NODE__ERROR){
@@ -434,7 +433,7 @@ int solve(tm_prob *tm)
 	 }
 	 if (tm->has_ub && tm->par.gap_limit){
 	    if (fabs(100*(tm->ub-tm->lb)/tm->ub) <= tm->par.gap_limit){
-	       termcode = TM_NODE_LIMIT_EXCEEDED;
+	       termcode = TM_TARGET_GAP_ACHIEVED;
 	       break;
 	    }
 	 }
@@ -480,7 +479,7 @@ int solve(tm_prob *tm)
 }
       if (tm->nextphase_candnum == 0)
 	 break;
-      if (termcode != TM_OPTIMAL_SOLUTION_FOUND)
+      if (termcode != TM_FINISHED)
 	 break;
    }
    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
@@ -495,8 +494,9 @@ int solve(tm_prob *tm)
    tm->comp_times.ramp_down_time = ramp_down_time;
    write_log_files(tm);
 
-   if (termcode == TM_OPTIMAL_SOLUTION_FOUND)
+   if (termcode == TM_FINISHED){
       tm->lb = 0;
+   }
       
    return(termcode);
 }

@@ -618,12 +618,11 @@ int display_solution_u(sym_environment *env, int thread_num)
 #endif
 
    if (!sol.xlength){
-      if(env->termcode != TM_OPTIMAL_SOLUTION_FOUND){
-	 printf("\nNo Solution Found\n\n");
-	 return(FUNCTION_TERMINATED_NORMALLY);
-      }
+      printf("\nNo Solution Found\n\n");
+      return(FUNCTION_TERMINATED_NORMALLY);
    }
-   if(env->par.verbosity >=0){
+   
+   if (env->par.verbosity >= 0){
       printf("\nSolution Found: Node %i, Level %i\n", sol.xindex, sol.xlevel);
       if (env->par.multi_criteria){
 	 printf("First Objective: %.3f\n", env->tm->lpp[thread_num]->obj[0]);
@@ -635,8 +634,8 @@ int display_solution_u(sym_environment *env, int thread_num)
    qsortucb_id(sol.xind, sol.xval, sol.xlength);
 
 #ifdef USE_SYM_APPLICATION   
-   user_res = user_display_solution(env->user, sol.lpetol, sol.xlength, sol.xind,
-				    sol.xval, sol.objval);
+   user_res = user_display_solution(env->user, sol.lpetol, sol.xlength,
+				    sol.xind, sol.xval, sol.objval);
    
 #else
    user_res = USER_DEFAULT;
@@ -646,31 +645,31 @@ int display_solution_u(sym_environment *env, int thread_num)
     case USER_SUCCESS:
       return(FUNCTION_TERMINATED_NORMALLY);
     case USER_DEFAULT:
-       if(env->par.verbosity >=0){
+       if(env->par.verbosity >= 0){
 	  if (sol.xlength){
 	     if (env->mip->colname){ 
-		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-		printf(" Column names and values of nonzeros in the solution\n");
-		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-		for (i = 0; i < sol.xlength; i++){
-		   if (sol.xind[i] == env->mip->n){
-		      continue;
-		   }
-		   printf("%8s %10.3f\n", env->mip->colname[sol.xind[i]],
-			  sol.xval[i]);
-		}
-		printf("\n");
+	       printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	       printf("Column names and values of nonzeros in the solution\n");
+	       printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	       for (i = 0; i < sol.xlength; i++){
+		  if (sol.xind[i] == env->mip->n){
+		     continue;
+		  }
+		  printf("%8s %10.3f\n", env->mip->colname[sol.xind[i]],
+			 sol.xval[i]);
+	       }
+	       printf("\n");
 	     }else{
-		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-		printf(" User indices and values of nonzeros in the solution\n");
-		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-		for (i = 0; i < sol.xlength; i++){
-		   if (sol.xind[i] == env->mip->n){
-		      continue;
-		   }
-		   printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
-		}
-		printf("\n");
+	       printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	       printf("User indices and values of nonzeros in the solution\n");
+	       printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	       for (i = 0; i < sol.xlength; i++){
+		  if (sol.xind[i] == env->mip->n){
+		     continue;
+		  }
+		  printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+	       }
+	       printf("\n");
 	     }
 	     
 	     return(FUNCTION_TERMINATED_NORMALLY);

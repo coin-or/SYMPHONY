@@ -75,7 +75,7 @@ int main(int argc, char **argv)
    si.branchAndBound();
 
    if(si.isIterationLimitReached()){
-      cout<<"Solution Limit Reached!"<<endl;
+      cout<<"Node Limit Reached!"<<endl;
    }
    if(si.isProvenOptimal()){
       cout<<"Optimal Found!"<<endl;

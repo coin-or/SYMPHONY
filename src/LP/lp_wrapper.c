@@ -621,8 +621,7 @@ int is_feasible_u(lp_prob *p, char branching)
       break;
    }
 
-   if ((user_res == TEST_ZERO_ONE || user_res == TEST_INTEGRALITY) &&
-       feasible == IP_FEASIBLE && p->par.multi_criteria){
+   if (feasible == IP_FEASIBLE && p->par.multi_criteria){
       if (analyze_multicriteria_solution(p, indices, values, cnt,
 					 &true_objval, lpetol, branching) > 0){
 	 feasible = IP_FEASIBLE_BUT_CONTINUE;

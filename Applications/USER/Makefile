@@ -52,21 +52,21 @@ COMPILE_IN_CP = TRUE
 ##############################################################################
 
 USER_LP_SRC       = user_lp_branch.c user_lp.c 
-ifeq ($(APPL_COMPILE_IN_CG),TRUE)
+ifeq ($(COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += user_cg.c
 endif
 
 USER_TM_SRC       =
-ifeq ($(APPL_COMPILE_IN_LP),TRUE)
+ifeq ($(COMPILE_IN_LP),TRUE)
 USER_TM_SRC      += $(USER_LP_SRC)
 endif
-ifeq ($(APPL_COMPILE_IN_CP),TRUE)
+ifeq ($(COMPILE_IN_CP),TRUE)
 USER_TM_SRC      += user_cp.c 
 endif
 
 USER_MASTER_SRC   = user_main.c user_master.c
 
-ifeq ($(APPL_COMPILE_IN_TM),TRUE)
+ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)
 endif
 
