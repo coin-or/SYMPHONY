@@ -221,8 +221,12 @@ void bc_readparams(problem *p, int argc, char **argv)
 
    lp_par->generate_cgl_cuts = TRUE;
 
+#ifdef __OSI_GLPK__
+   lp_par->max_presolve_iter = -1;
+#else
    lp_par->max_presolve_iter = 50;
-
+#endif
+   
    lp_par->is_feasible_default = TEST_INTEGRALITY;
    lp_par->send_feasible_solution_default = SEND_NONZEROS;
    lp_par->display_solution_default = DISP_NOTHING;

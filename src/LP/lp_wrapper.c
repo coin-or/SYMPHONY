@@ -28,11 +28,6 @@
 #ifdef USE_CGL_CUTS
 #include "cg.h"
 #endif
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if defined (COMPILE_IN_CG) && defined (COMPILE_DECOMP)
-#include "decomp.h"
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 #if defined (COMPILE_IN_LP) && defined (COMPILE_IN_TM)
 #include "master_u.h"
 #endif
