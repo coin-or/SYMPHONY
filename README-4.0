@@ -23,15 +23,15 @@ application.
 WHAT'S NEW
 ==========
 
-There has been a significant amount on new development over the last few
-months that we hope will make version 4.0 significantly easier to use, as well
-as significantly more powerful. Unfortunately, this also means that there have
-been a number of changes to the API. Code written for previous versions of
-SYMPHONY will be broken and will have to be ported. All this change has also
-undoubtedly introduced bugs. There are now a VERY large number of
-configurations in which SYMPHONY can be used and we have tested many of them,
-but it is not possible to test them all. Please keep this is mind and report
-all bugs that you find.
+There has been a significant amount on new development since the last version
+of SYMPHONY was released. We hope this will make version 4.0 significantly
+easier to use, as well as significantly more powerful. Unfortunately, this
+also means that there have been a number of changes to the API. Code written
+for previous versions of SYMPHONY will be broken and will have to be
+ported. All this change has also undoubtedly introduced bugs. There are now a
+VERY large number of configurations in which SYMPHONY can be used and we have
+tested many of them, but it is not possible to test them all. Please keep this
+is mind and report all bugs that you find.
 
 1. All reported bugs have been fixed. A few memory leaks have also been
 eradicated.
@@ -40,14 +40,16 @@ eradicated.
 with a wide variety of options for developing custom solvers.
 
 3. SYMPHONY now makes full use of the libraries available from COIN
-(www.coin-or.org) for cut generation, file I/O, and solver interface.
+(www.coin-or.org) for cut generation, file I/O, and solver interface. For
+example, 
 
     a. SYMPHONY is now capable of reading both MPS files (through the COIN MPS
 reader) and basic AMPL files (using the parser available from GLPK).
 
     b. SYMPHONY now uses the COIN Open Solver Interface (OSI), allowing it to
 be used with almost any commonly available LP solver, including a number of
-open source solvers. This makes SYMPHONY an end-to-end open source solution.
+open source alternatives. This makes SYMPHONY an end-to-end open source
+solution.
 
     c. SYMPHONY can now use COIN's Cut Generator Library (CGL) to generate
 generic cutting planes.
@@ -56,27 +58,31 @@ generic cutting planes.
 helper functions, and more automation of basic functions. The parallelism is
 now more hidden, especially for sequential users.
 
-5. There is now automated support for user cuts generated and stored as
-explicit matrix rows. The user no longer has to derive a packed form and does
-not have to implement user_unpack_cuts() in order to use cuts expressed as
-explicit matrix rows.
+5. There is automated support for user cuts generated and stored as explicit
+matrix rows. The user no longer has to derive a packed form and does not have
+to implement user_unpack_cuts() in order to use cuts expressed as explicit
+matrix rows.
 
 6. Improvements have been made to the mechanism for accessing and displaying
-solutions.
+solutions, including built-in support for column names, objective sense, and
+objective offset. 
 
-7. There is now built-in support for column names.
+7. More sample codes are now available to aid in development, including
+solvers for vehicle routing, set partitioning (basic and advanced versions),
+bipartite matching, and the mixed postman problem.
 
-8. More sample codes are now available, including solvers for vehicle routing,
-set partitioning (basic and advanced versions), bipartite matching, and the
-mixed postman problem.
+8. There is a white paper available that illustrates the use of SYMPHONY to
+build a simple matching solver.
 
-9. Improvements to the makefile now allow the user to make the code from the
-User directory instead of the SYMPHONY directory. Also, executables can have
-custom names and are built in different directories for different LP solvers
-so the object files don't have to be cleaned to switch LP solvers.
+9. Restructuring of the make file now allow the user to build the code from
+the directory where the application is installed instead of the SYMPHONY
+directory. This allows compiling multiple applications without editing make
+files. Also, executables can have custom names and are built in different
+directories for different LP solvers so the object files don't have to be
+cleaned to switch LP solvers.
 
-10. There is now a white paper available that illustrates the use of SYMPHONY
-to build a simple matching solver.
+10. There are make files available for Windows that can be configured in a
+fashion similar to Unix make files and work with the MSVC++ 6 compiler.
 
 CHANGES TO THE USER INTERFACE
 =============================

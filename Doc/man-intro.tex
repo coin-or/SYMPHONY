@@ -1,29 +1,34 @@
+\chapter{Introduction}
+
 \section{Introducing SYMPHONY 4.0}
 \label{whats-new}
 
-There has been a significant amount on new development over the last few
-months that we hope will make version 4.0 significantly easier to use, as well
-as significantly more powerful. Unfortunately, this also means that there have
-been a number of changes to the API. Code written for previous versions of
-SYMPHONY will be broken and will have to be ported. Instructions for porting
-from previous version are contained in the file
+Welcome to the SYMPHONY user's manual. Whether you are a new user or simply
+upgrading to version 4.0, we hope you will find this manual useful in
+getting started with what we hope you will find to be a very useful and
+powerful framework for developing custom branch, cut, and price
+algorithms. There has been a significant amount of new development since the
+last version of SYMPHONY was released. We hope this will make version 4.0
+significantly easier to use, as well as significantly more
+powerful. Unfortunately, this also means that there have been a number of
+changes to the API. Code written for previous versions of SYMPHONY will be
+broken and will have to be ported. Instructions for porting from previous
+version are contained in the file
 \texttt{SYMPHONY-4.0/README-4.0}. All this change has also
-undoubtedly introduced bugs. There are now a VERY large number of
+undoubtedly introduced bugs. There are now a \emph{very} large number of
 configurations in which SYMPHONY can be used and we have tested many of them,
 but it is not possible to test them all. Please keep this is mind and report
-all bugs that you find.Among the new enhancements and features are:
+all bugs that you find. Among the new enhancements and features are:
 
 \begin{itemize}
 
-\item SYMPHONY now works out of the box as a full-featured, parallel MILP solver,
-with a wide variety of options for developing custom solvers.
+\item SYMPHONY now works out of the box as a full-featured, parallel
+mixed-integer linear program (MILP) solver, with a wide variety of options for
+customization and enhancement.
 
 \item SYMPHONY now makes full use of the libraries available from 
-\emph{\htmladdnormallink{COIN}{http://www.coin-or.org}}
-\begin{latexonly} 
-COIN
-\end{latexonly}.
-for cut generation, file I/O, and solver interface.
+\htmladdnormallink{COIN}{http://www.coin-or.org}
+for cut generation, file I/O, and solver interface. For example,
 
 \begin{itemize}
 
@@ -31,9 +36,10 @@ for cut generation, file I/O, and solver interface.
 MPS reader) and GnuMath (a subset of AMPL) files (using the parser available
 from GLPK).
 
-    \item SYMPHONY now uses the COIN Open Solver Interface (OSI), allowing it to
-be used with almost any commonly available LP solver, including a number of
-open source solvers. This makes SYMPHONY an end-to-end open source solution.
+    \item SYMPHONY now uses the COIN Open Solver Interface (OSI), allowing it
+to be used with almost any commonly available LP solver, including a number of
+open source alternatives. This makes SYMPHONY an end-to-end open source
+solution.
 
     \item SYMPHONY can now use COIN's Cut Generator Library (CGL) to generate
 generic cutting planes.
@@ -44,54 +50,74 @@ generic cutting planes.
 helper functions, and more automation of basic functions. The parallelism is
 now more hidden, especially for sequential users.
 
-\item Automated support for user cuts generated and stored as explicit matrix
-rows. The user no longer has to derive a packed form and does not have to
-implement user\_unpack\_cuts() in order to use cuts expressed as explicit matrix
-rows. 
+\item There is automated support for user cuts generated and stored as
+explicit matrix rows. The user no longer has to derive a packed form and does
+not have to implement user\_unpack\_cuts() in order to use cuts expressed as
+explicit matrix rows.
 
 \item Improvements have been made to the mechanism for accessing and displaying
-solutions.
+solutions, including built-in support for column names, objective sense, and
+objective offset. 
 
-\item There is now built-in support for column names.
-
-\item More sample codes are now available, including solvers for vehicle routing,
-set partitioning (basic and advanced versions), bipartite matching, and the
-mixed postman problem.
-
-\item Improvements to the makefile now allow the user to make the code from the 
-User directory instead of the SYMPHONY directory. Also, executables can have
-custom names and are built in different directories for different LP solvers
-so the object files don't have to be cleaned to switch LP solvers.
+\item More sample codes are now available to aid in development, including
+solvers for vehicle routing, set partitioning (basic and advanced versions),
+bipartite matching, and the mixed postman problem.
 
 \item There is now a white paper available that illustrates the use of SYMPHONY
 to build a simple matching solver.
+
+\item Restructuring of the make file now allow the user to build the code from
+the directory where the application is installed instead of the SYMPHONY
+directory. This allows compiling multiple applications without editing make
+files. Also, executables can have custom names and are built in different
+directories for different LP solvers so the object files don't have to be
+cleaned to switch LP solvers.
+
+\item There are make files available for Windows that can be configured in a
+fashion similar to Unix make files and work with the MSVC++ 6 compiler.
 
 \end{itemize}
 
 \section{How to Use This Manual}
 
-The manual is divided into roughly three parts. The first part consists of
-Sections \ref{history}--\ref{B&C-intro} and contains background
-information. Those not familiar with the basic methodology of branch, cut, and
-price should read these sections, especially Section \ref{B&C-intro}, where we
-briefly describe the techniques involved at a high level.  The second part of
-the manual consists of Sections \ref{design}--\ref{parallelizing} and is
-intended for further background and a more complete understanding of the
-design and implementation of SYMPHONY. However, it is not really necessary to
-to read these sections before undertaking development of a SYMPHONY
-application. In Section \ref{design}, we describe the overall design of
-without reference to the implementational details and with only passing
-reference to parallelism.  In Section \ref{modules}, we then move on to
-discuss the details of the implementation. In Section \ref{parallelizing}, we
-briefly discuss issues involved in parallel execution of SYMPHONY. The
-remainder of the manual, including Sections \ref{getting_started}--\ref{params}
-describes in detail how to develop an application using SYMPHONY. For those
-who are familiar with branch and cut and want to get started quickly, proceed
-directly to to Section \ref{getting_started} for information on getting
-started. Section \ref{API} contains a description of the API, and finally,
+The manual is divided into five chapters. The first is the
+introduction, which you are reading now. Chapter \ref{SYMPHONY-background}
+contains background information. Those not familiar with the basic methodology
+of branch, cut, and price should read these sections, especially Section
+\ref{B&C-intro}, where we briefly describe the techniques involved.  Chapter
+\ref{SYMPHONY-design} contains further depth and a more complete description
+of the design and implementation of SYMPHONY. In Section
+\ref{design}, we describe the overall design of without reference to the
+implementational details and with only passing reference to parallelism.  In
+Section \ref{modules}, we discuss the details of the implementation. In
+Section \ref{parallelizing}, we briefly discuss issues involved in parallel
+execution of SYMPHONY. It is not necessary to read Chapters
+\ref{SYMPHONY-background} and \ref{SYMPHONY-design} before undertaking
+development of a SYMPHONY application. Chapter
+\ref{SYMPHONY-development} describes in detail how to develop an application
+using SYMPHONY. For those who are familiar with branch and cut and want to get
+started quickly, proceed directly to to Section \ref{getting_started} for
+information on getting started. Chapter \ref{SYMPHONY-reference} contains
+reference material. Section \ref{API} contains a description of the API, while
 SYMPHONY's parameters are described in Section \ref{params}. Please note that
 for reference use, the HTML version of this manual may be more practical, as
 the embedded hyperlinks make it easier to navigate.
+
+%\newpage
+
+%\thispagestyle{empty}
+
+%\ \\
+%%begin{latexonly}
+%\vspace*{3in}
+%\begin{center}
+%{\large PART I: Background}
+%\end{center}
+%%end{latexonly}
+
+%\newpage
+\chapter{Background}
+\label{SYMPHONY-background}
 
 \section{A Brief History}
 \label{history}
@@ -243,8 +269,8 @@ implementations (including ours) have been fashioned around the
 framework they described for solving the Traveling Salesman Problem.
 
 \begin{figure}
-\framebox[5.75in]{
-\begin{minipage}{5.25in}
+\framebox[6.5in]{
+\begin{minipage}{6.0in}
 \vskip .1in
 {\rm
 {\bf Bounding Operation}\\
@@ -304,8 +330,8 @@ separation algorithms and heuristics to generate these inequalities
 when they are violated. In Figure \ref{proc-bound}, we describe more
 precisely how the bounding operation is carried out in branch and cut.
 \begin{figure}
-\framebox[5.75in]{
-\begin{minipage}{5.25in}
+\framebox[6.5in]{
+\begin{minipage}{6.0in}
 \vskip .1in
 {\rm
 {\bf Branching Operation} \\
@@ -338,8 +364,8 @@ in the other. The procedure is described more formally in Figure
 \ref{branching-fig}. Figure \ref{gb&c} gives a high level description
 of the generic branch and cut algorithm.
 \begin{figure}
-\framebox[5.75in]{
-\begin{minipage}{5.25in}
+\framebox[6.5in]{
+\begin{minipage}{6.0in}
 \vskip .1in
 {\rm
 {\bf Generic Branch and Cut Algorithm}\\
@@ -400,7 +426,24 @@ sometimes be referred to as {\em nodes in the search tree} or simply
 as {\em nodes}. The {\em root node} or {\em root} of the tree is the
 node representing the initial subproblem.
 
-\section{Design of \BB}
+%\newpage
+
+%\thispagestyle{empty}
+
+%\ \\
+%%begin{latexonly}
+%\vspace*{3in}
+%\begin{center}
+%{\large PART II: Design of SYMPHONY}
+%\end{center}
+%%end{latexonly}
+
+%\newpage
+
+\chapter{Design}
+\label{SYMPHONY-design}
+
+\section{Design Overview}
 \label{design}
 
 \BB\ was designed with two major goals in mind---portability and
@@ -763,7 +806,7 @@ set of cuts which this solution violates.
 to control its size.
 \end{itemize}
 
-\subsection{\BB\ Overview}
+\subsection{Algorithm Summary}
 \label{symphony}
 
 Currently, \BB\ is what is known as a single-pool BCP algorithm.
@@ -1184,9 +1227,9 @@ easy to parallelize. Unfortunately, this approach does have limited
 scalability. For further discussions on the scalability of BCP algorithms and
 approaches to improving it, see \cite{symphony1} and \cite{ALPS}.
 
-\subsection{Details of the Parallel Implementation}
+%\subsection{Details of the Parallel Implementation}
 
-\subsubsection{Parallel Configurations}
+\subsection{Parallel Configurations}
 
 SYMPHONY supports numerous configurations, ranging from completely
 sequential to fully parallel, allowing efficient execution in many
@@ -1209,7 +1252,7 @@ overhead without much potential benefit. In this case, the cut
 generator functions can be called directly from the LP solver,
 creating a single, more efficient executable.
 
-\subsubsection{Inter-process Communication}
+\subsection{Inter-process Communication}
 
 SYMPHONY can utilize any third-party communication protocol supporting
 basic message-passing functions. All communication subroutines
@@ -1225,7 +1268,7 @@ functions. Compiling the code with an OpenMP compliant compiler will
 result in a shared-memory parallel executable. For a list of OpenMP
 compliant compilers and other resources, visit {\tt http://www.openmp.org}.
 
-\subsubsection{Fault Tolerance}
+\subsection{Fault Tolerance}
 \label{fault-tolerance} 
 
 Fault tolerance is an important consideration for solving large

@@ -1,4 +1,4 @@
-\documentclass[twoside,11pt]{article}
+\documentclass[twoside,11pt]{book}
 
 \oddsidemargin 0in
 \evensidemargin 0in
@@ -159,7 +159,7 @@ HREF="ftp://branchandcut.org/pub/reference/SYMPHONY-4.0-Manual.pdf">here</A>
 \end{rawhtml}
 \begin{rawhtml} <P ALIGN="CENTER"> <STRONG> <FONT SIZE="3">
 A revised version of 
-Sections 2-7 of this manual
+Sections 3-8 of this manual
 now appears in the Springer-Verlag book <br>
 <i><a href="http://link.springer.de/link/service/series/0558/tocs/t2241.htm">
 Computational Combinatorial Optimization </i></a>
@@ -182,7 +182,7 @@ edited by M. Juenger and D. Naddef.
 \end{rawhtml}
 \begin{center}
 {\copyright 2000-2003 Ted Ralphs\footnote{A revised version of 
-Sections 2-7 of this manual
+Sections 3-8 of this manual
 now appears in the Springer-Verlag book {\em Computational Combinatorial 
 Optimization} 
 edited by M. J\"unger and D. Naddef, see 
@@ -201,6 +201,22 @@ http://link.springer.de/link/service/series/0558/tocs/t2241.htm}.}
 
 \input{man-intro}
 
+%\newpage
+
+%\thispagestyle{empty}
+
+%\ \\
+%%begin{latexonly}
+%\vspace*{3in}
+%\begin{center}
+%{\large PART II: Development}
+%\end{center}
+%%end{latexonly}
+
+%\newpage
+
+\chapter{Development}
+
 \section{Quick Start Guide}
 \label{getting_started}
 \input{man-start}
@@ -209,11 +225,13 @@ http://link.springer.de/link/service/series/0558/tocs/t2241.htm}.}
 \label{development}
 \input{man-SYMPHONY}
 
-\newpage
+%\newpage
 
 %\section{Data Structures}
 
 %\input{man-data-structures}
+
+\chapter{Reference}
 
 \section{The User API Specification}
 \label{API}
