@@ -30,6 +30,7 @@ int sym_set_defaults PROTO((sym_environment *env));
 int sym_parse_command_line PROTO((sym_environment *env, int argc, 
 				  char **argv));
 int sym_set_user_data PROTO((sym_environment *env, void *user));
+int sym_get_user_data PROTO((sym_environment *env, void **user));
 int sym_read_mps PROTO((sym_environment *env, char *infile));
 int sym_read_gmpl PROTO((sym_environment *env, char *modelfile, 
 			 char *datafile));
@@ -140,5 +141,7 @@ int sym_get_ub_for_new_obj PROTO((sym_environment *env, int cnt,
 warm_start_desc *sym_create_copy_warm_start PROTO((warm_start_desc * ws));
 MIPdesc *sym_create_copy_mip_desc PROTO((sym_environment *env));
 sym_environment * sym_create_copy_environment PROTO((sym_environment *env));
+
+int sym_test PROTO((sym_environment *env));
 
 #endif
