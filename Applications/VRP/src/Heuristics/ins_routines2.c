@@ -1,13 +1,13 @@
-#include <pvm3.h>
 #include <math.h>
 #include <malloc.h>
 
+#include "BB_constants.h"
 #include "ins_routines2.h"
 #include "sweep.h"
 #include "qsort.h"
 #include "messages.h"
 #include "vrp_const.h"
-#include "pvm_error.h"
+#include "proccomm.h"
 #include "compute_cost.h"
 #include "heur_routines.h"
 

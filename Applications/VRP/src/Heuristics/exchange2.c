@@ -1,5 +1,4 @@
 #include <math.h>
-#include <pvm3.h>
 #include <malloc.h>
 
 #include "vrp_const.h"
@@ -8,7 +7,7 @@
 #include "compute_cost.h"
 #include "timemeas.h"
 #include "messages.h"
-#include "pvm_error.h"
+#include "proccomm.h"
 
 void main(void)
 {

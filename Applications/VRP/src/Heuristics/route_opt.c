@@ -1,7 +1,8 @@
 #include <math.h>
-#include <pvm3.h>
 #include <malloc.h>
 
+#include "BB_constants.h"
+#include "BB_macros.h"
 #include "messages.h"
 #include "vrp_const.h"
 #include "vrp_common_types.h"
@@ -10,7 +11,7 @@
 #include "compute_cost.h"
 #include "receive_rout.h"
 #include "timemeas.h"
-#include "pvm_error.h"
+#include "proccomm.h"
 #include "vrp_macros.h"
 
 /*----------------------------------------------------------------------*\
@@ -63,14 +64,14 @@ void main(void)
   PVM_FUNC(info, pvm_upkint(p->demand, p->vertnum, 1));
   p->edgenum = p->vertnum*(p->vertnum-1)/2;
   if (p->dist.wtype){ /* not EXPLICIT */
-    p->dist.coordx = (float *) calloc(p->vertnum, sizeof(float));
-    p->dist.coordy = (float *) calloc(p->vertnum, sizeof(float));
-    PVM_FUNC(info, pvm_upkfloat(p->dist.coordx, (int)p->vertnum, 1));
-    PVM_FUNC(info, pvm_upkfloat(p->dist.coordy, (int)p->vertnum, 1));
+    p->dist.coordx = (double *) calloc(p->vertnum, sizeof(double));
+    p->dist.coordy = (double *) calloc(p->vertnum, sizeof(double));
+    PVM_FUNC(info, pvm_upkdouble(p->dist.coordx, (int)p->vertnum, 1));
+    PVM_FUNC(info, pvm_upkdouble(p->dist.coordy, (int)p->vertnum, 1));
     if ((p->dist.wtype == _EUC_3D) || (p->dist.wtype == _MAX_3D) || 
 		    (p->dist.wtype == _MAN_3D)){
-      p->dist.coordz = (float *) calloc(p->vertnum, sizeof(float));
-      PVM_FUNC(info, pvm_upkfloat(p->dist.coordz, (int)p->vertnum, 1));
+      p->dist.coordz = (double *) calloc(p->vertnum, sizeof(double));
+      PVM_FUNC(info, pvm_upkdouble(p->dist.coordz, (int)p->vertnum, 1));
     }
   }
   else{ /* EXPLICIT */

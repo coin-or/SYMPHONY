@@ -327,11 +327,13 @@ USER_INCDIR    += -I$(USERROOT)/include/heurs
 
 ALL_USER_SRC     += $(ALL_HEURS_SRC)
 
+HEUR_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(ALL_HEURS_SRC:.c=.o)))
+
 ##############################################################################
 # Targets for the heuristics
 ##############################################################################
 
-heurs : 
+heuristics : 
 	$(MAKE) $(HEUR_BINS)
 
 clean_heurs:
@@ -346,7 +348,8 @@ $(BINDIR)/sweep : $(SWEEP_DEP) $(SWEEP_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SWEEP_OBJS) $(LIBS) -lmaster$(MASTEREXT)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SWEEP_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 savings : $(BINDIR)/savings
@@ -357,7 +360,8 @@ $(BINDIR)/savings : $(SAVINGS_DEP) $(SAVINGS_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SAVINGS_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SAVINGS_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 savings2 : $(BINDIR)/savings2
@@ -368,7 +372,8 @@ $(BINDIR)/savings2 : $(SAVINGS2_DEP) $(SAVINGS2_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SAVINGS2_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SAVINGS2_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 savings3 : $(BINDIR)/savings3
@@ -379,7 +384,8 @@ $(BINDIR)/savings3 : $(SAVINGS3_DEP) $(SAVINGS3_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SAVINGS3_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SAVINGS3_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 route_opt : $(BINDIR)/route_opt
@@ -390,7 +396,8 @@ $(BINDIR)/route_opt : $(ROUTE_OPT_DEP) $(ROUTE_OPT_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ROUTE_OPT_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ROUTE_OPT_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 nearest_ins : $(BINDIR)/nearest_ins
@@ -401,7 +408,8 @@ $(BINDIR)/nearest_ins : $(NEAREST_INS_DEP) $(NEAREST_INS_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(NEAREST_INS_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(NEAREST_INS_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 farthest_ins : $(BINDIR)/farthest_ins
@@ -412,7 +420,8 @@ $(BINDIR)/farthest_ins : $(FARTHEST_INS_DEP) $(FARTHEST_INS_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(FARTHEST_INS_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(FARTHEST_INS_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 farnear_ins : $(BINDIR)/farnear_ins
@@ -423,7 +432,8 @@ $(BINDIR)/farnear_ins : $(FARNEAR_INS_DEP) $(FARNEAR_INS_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(FARNEAR_INS_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(FARNEAR_INS_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 near_cluster : $(BINDIR)/near_cluster
@@ -434,7 +444,8 @@ $(BINDIR)/near_cluster : $(NEAR_CLUSTER_DEP) $(NEAR_CLUSTER_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(NEAR_CLUSTER_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(NEAR_CLUSTER_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 tsp_ni : $(BINDIR)/tsp_ni
@@ -445,7 +456,8 @@ $(BINDIR)/tsp_ni : $(TSP_NI_DEP) $(TSP_NI_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TSP_NI_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TSP_NI_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 tsp_fi : $(BINDIR)/tsp_fi
@@ -456,7 +468,8 @@ $(BINDIR)/tsp_fi : $(TSP_FI_DEP) $(TSP_FI_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TSP_FI_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TSP_FI_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 tsp_fini : $(BINDIR)/tsp_fini
@@ -467,7 +480,8 @@ $(BINDIR)/tsp_fini : $(TSP_FINI_DEP) $(TSP_FINI_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TSP_FINI_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TSP_FINI_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 exchange : $(BINDIR)/exchange
@@ -478,7 +492,8 @@ $(BINDIR)/exchange : $(EXCHANGE_DEP) $(EXCHANGE_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXCHANGE_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXCHANGE_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 exchange2 : $(BINDIR)/exchange2
@@ -489,7 +504,8 @@ $(BINDIR)/exchange2 : $(EXCHANGE2_DEP) $(EXCHANGE2_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXCHANGE2_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXCHANGE2_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 mst : $(BINDIR)/mst
@@ -500,7 +516,8 @@ $(BINDIR)/mst : $(MST_DEP) $(MST_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MST_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MST_OBJS) $(LIBS) \
+	-lmaster$(MASTEREXT)
 	@echo ""
 
 #___END_EXPERIMENTAL_SECTION___#

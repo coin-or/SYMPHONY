@@ -1,6 +1,5 @@
 #include <malloc.h>
 #include <stdlib.h>
-#include <pvm3.h>
 
 #include "savings2.h"
 #include "timemeas.h"
@@ -9,7 +8,7 @@
 #include "heur_routines.h"
 #include "compute_cost.h"
 #include "vrp_const.h"
-#include "pvm_error.h"
+#include "proccomm.h"
 
 void main(void)
 {

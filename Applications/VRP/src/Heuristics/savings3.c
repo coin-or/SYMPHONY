@@ -1,15 +1,14 @@
 #include <malloc.h>
-#include <pvm3.h>
 
+#include "BB_macros.h"
 #include "savings3.h"
 #include "timemeas.h"
 #include "messages.h"
-#include "pvm3.h"
 #include "BB_constants.h"
 #include "heur_routines.h"
 #include "compute_cost.h"
 #include "ins_routines2.h"
-#include "pvm_error.h"
+#include "proccomm.h"
 #include "vrp_const.h"
 
 void main(void)
@@ -47,10 +46,10 @@ void main(void)
    PVM_FUNC(info, pvm_upkint(&p->numroutes, 1, 1));
    if (!p->numroutes){
       PVM_FUNC(info, pvm_recv(-1, COORD_DATA));
-      p->dist.coordx = (float *) calloc (p->vertnum, sizeof(float));
-      p->dist.coordy = (float *) calloc (p->vertnum, sizeof(float));
-      PVM_FUNC(info, pvm_upkfloat(p->dist.coordx, p->vertnum, 1));
-      PVM_FUNC(info, pvm_upkfloat(p->dist.coordy, p->vertnum, 1));
+      p->dist.coordx = (double *) calloc (p->vertnum, sizeof(double));
+      p->dist.coordy = (double *) calloc (p->vertnum, sizeof(double));
+      PVM_FUNC(info, pvm_upkdouble(p->dist.coordx, p->vertnum, 1));
+      PVM_FUNC(info, pvm_upkdouble(p->dist.coordy, p->vertnum, 1));
    }
    PVM_FUNC(r_bufid, pvm_recv(-1, SAVINGS_DATA));
    PVM_FUNC(info, pvm_upkfloat(&p->par.savings_par.mu, 1, 1));

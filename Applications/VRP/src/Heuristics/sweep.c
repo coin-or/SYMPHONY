@@ -1,6 +1,5 @@
 #include <math.h>
 #include <malloc.h>
-#include <pvm3.h>
 
 #include "BB_constants.h"
 #include "sweep.h"

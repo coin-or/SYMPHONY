@@ -1,11 +1,10 @@
-#include <pvm3.h>
 #include <malloc.h>
 #include <stdlib.h>
 
 #include "ins_routines.h"
 #include "timemeas.h"
 #include "messages.h"
-#include "pvm_error.h"
+#include "proccomm.h"
 #include "compute_cost.h"
 #include "vrp_macros.h"
 #include "vrp_const.h"

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "BB_constants.h"
 #include "savings.h"
 #include "vrp_const.h"
 #include "compute_cost.h"

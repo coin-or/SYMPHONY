@@ -613,7 +613,7 @@ endif
 # Compiler flags
 ##############################################################################
 
-STRICT_CHECKING = TRUE
+STRICT_CHECKING = FALSE
 
 DEFAULT_FLAGS = $(OPT) $(SYSDEFINES) $(BB_DEFINES) $(INCDIR)
 
