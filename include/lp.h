@@ -161,6 +161,10 @@ int collect_nonzeros PROTO((lp_prob *p, double *x, int *tind, double *tx));
 int collect_fractions PROTO((lp_prob *p, double *x, int *tind, double *tx));
 node_desc *create_explicit_node_desc PROTO((lp_prob *p));
 int check_tailoff PROTO((lp_prob *p));
+int round_solution PROTO((lp_prob *p, double *solution_value, 
+			  double **betterSolution));
+int local_search PROTO((lp_prob *p, double * solution_value, 
+			double * col_solution, double ** better_solution));
 void lp_exit PROTO((lp_prob *p));
 void lp_close PROTO((lp_prob *p));
 

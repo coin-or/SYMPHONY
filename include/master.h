@@ -135,8 +135,4 @@ int check_feasibility_new_rhs PROTO((bc_node * node, MIPdesc * mip,
 					int cnt, int *ind, double *val));
 int trim_warm_tree PROTO((sym_environment *env, bc_node *n));
 
-int round_solution PROTO((lp_prob *p, double *solution_value, 
-			  double **betterSolution));
-int local_search PROTO((lp_prob *p, double * solution_value, 
-			double * col_solution, double ** better_solution));
 #endif
