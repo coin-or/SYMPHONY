@@ -346,7 +346,7 @@ $(BINDIR)/sweep : $(SWEEP_DEP) $(SWEEP_OBJS)
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SWEEP_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SWEEP_OBJS) $(LIBS) -lmaster$(MASTEREXT)
 	@echo ""
 
 savings : $(BINDIR)/savings

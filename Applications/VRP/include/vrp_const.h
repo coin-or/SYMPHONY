@@ -25,6 +25,9 @@
 #define RRR 6378.388
 #define MY_PI 3.141592
 #define LINE_LEN 80
+#ifndef M_PI
+#define M_PI 3.141592
+#endif
 
 /*---------------- distance types -------------------------------------------*/
 #define _EXPLICIT 0

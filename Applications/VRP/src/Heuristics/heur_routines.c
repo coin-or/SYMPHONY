@@ -1,8 +1,9 @@
 #include <malloc.h>
 #include <pvm3.h>
 
+#include "BB_macros.h"
 #include "vrp_const.h"
-#include "pvm_error.h"
+#include "proccomm.h"
 #include "heur_routines.h"
 
 /*===========================================================================*/
@@ -26,14 +27,14 @@ int receive(heur_prob *p)
    PVM_FUNC(info, pvm_upkint(p->demand, p->vertnum, 1));
    p->edgenum = p->vertnum*(p->vertnum-1)/2;
    if (p->dist.wtype){ /* not EXPLICIT */
-      p->dist.coordx = (float *) calloc(p->vertnum, sizeof(float));
-      p->dist.coordy = (float *) calloc(p->vertnum, sizeof(float));
-      PVM_FUNC(info, pvm_upkfloat(p->dist.coordx, (int)p->vertnum, 1));
-      PVM_FUNC(info, pvm_upkfloat(p->dist.coordy, (int)p->vertnum, 1));
+      p->dist.coordx = (double *) calloc(p->vertnum, sizeof(double));
+      p->dist.coordy = (double *) calloc(p->vertnum, sizeof(double));
+      PVM_FUNC(info, pvm_upkdouble(p->dist.coordx, p->vertnum, 1));
+      PVM_FUNC(info, pvm_upkdouble(p->dist.coordy, p->vertnum, 1));
       if ((p->dist.wtype == _EUC_3D) || (p->dist.wtype == _MAX_3D) || 
 	  (p->dist.wtype == _MAN_3D)){
-	 p->dist.coordz = (float *) calloc(p->vertnum, sizeof(float));
-	 PVM_FUNC(info, pvm_upkfloat(p->dist.coordz, (int)p->vertnum, 1));
+	 p->dist.coordz = (double *) calloc(p->vertnum, sizeof(double));
+	 PVM_FUNC(info, pvm_upkdouble(p->dist.coordz, p->vertnum, 1));
       }
    }
    else{ /* EXPLICIT */
