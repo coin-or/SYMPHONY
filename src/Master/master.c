@@ -243,6 +243,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->granularity = tm_par->granularity;
    lp_par->use_cg = tm_par->use_cg;
    lp_par->set_obj_upper_lim = FALSE;
+   lp_par->do_primal_heuristic = FALSE;
    lp_par->scaling = -1; /* CPLEX'ism ... don't scale */
    lp_par->fastmip = 1; /* CPLEX'ism ... set it to 1 */
    lp_par->try_to_recover_from_error = TRUE;
@@ -2413,10 +2414,12 @@ int sym_is_continuous(sym_environment *env, int index, int *value)
 
 int sym_is_binary(sym_environment *env, int index, int *value)
 {
-   if (!env->mip || index < 0 || index > env->mip->n || !env->mip->n ||
-       !env->mip->is_int || !env->mip->ub || !env->mip->lb){
-      printf("sym_is_binary():There is no loaded mip description or!\n");
-      printf("index is out of range or no column description!\n");
+   if (!env->mip || index < 0 || index >= env->mip->n){
+      printf("sym_is_binary(): Index out of range\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+   if (!env->mip->n || !env->mip->is_int || !env->mip->ub || !env->mip->lb){
+      printf("sym_is_binary(): There is no loaded mip description\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2435,9 +2438,12 @@ int sym_is_binary(sym_environment *env, int index, int *value)
 
 int sym_is_integer(sym_environment *env, int index, int *value)
 {
-   if (!env->mip || index < 0 || index > env->mip->n || !env->mip->n){
-      printf("sym_is_integer():There is no loaded mip description or!\n");
-      printf("index is out of range or no column description!\n");
+   if (!env->mip || index < 0 || index >= env->mip->n){
+      printf("sym_is_binary(): Index out of range\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+   if (!env->mip->n || !env->mip->is_int){
+      printf("sym_is_binary(): There is no loaded mip description\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -4395,7 +4401,11 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = lp_par->set_obj_upper_lim;
       return(0);
    }
-   
+   else if (strcmp(key, "do_primal_heuristic") == 0 ||
+	    strcmp(key, "LP_do_primal_heuristic") == 0){
+      *value = lp_par->do_primal_heuristic;
+      return(0);
+   }
    else if (strcmp(key, "scaling") == 0 ||
 	    strcmp(key, "LP_scaling") == 0){
       *value = lp_par->scaling;

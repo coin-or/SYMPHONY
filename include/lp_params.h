@@ -33,6 +33,7 @@ typedef struct LP_PARAMS{
    double            granularity;
    int               use_cg;
    int               set_obj_upper_lim;
+   int               do_primal_heuristic;
 
    /* these two are passed directly to the lp solver */
    int               scaling;

@@ -408,6 +408,7 @@
 #define IP_FEASIBLE_BUT_CONTINUE    2
 #define IP_ALMOST_FEASIBLE          3
 #define IP_FEASIBILITY_NOT_KNOWN    4
+#define IP_HEUR_FEASIBLE            5
 
 /*------------------------- display_solution --------------------------------*/
 #define DISP_NOTHING             0

@@ -1069,8 +1069,8 @@ int check_tailoff(lp_prob *p)
 // At present only works with integers 
 // Fix values if asked for
 // Returns 1 if solution, 0 if not
-int round_solution(lp_prob *p, double * solutionValue, 
-		   double ** betterSolution)
+
+int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
 {
 
   /* FIXME! Make it free of COIN! OsiSolverInterface, CoinPackedMatrix, etc */
@@ -1100,7 +1100,6 @@ int round_solution(lp_prob *p, double * solutionValue,
      
   /* FIX_ME! Shouldn't do the following each time! */
 
-
   for(i = 0; i<numberColumns; i++){
     if(p->lp_data->vars[i]->is_int){
       numberIntegers++;
@@ -1116,7 +1115,6 @@ int round_solution(lp_prob *p, double * solutionValue,
       }
     }
   }
-
 
   // Column copy
   const double * element = p->mip->matval;
@@ -1342,7 +1340,7 @@ int round_solution(lp_prob *p, double * solutionValue,
 	}
       }
     }
-    if (newSolutionValue<*solutionValue) {
+    if (newSolutionValue < *solutionValue) {
       // paranoid check
       memset(rowActivity,0,numberRows*sizeof(double));
       for (i=0;i<numberColumns;i++) {
@@ -1369,9 +1367,7 @@ int round_solution(lp_prob *p, double * solutionValue,
       }
       if (feasible) {
 	// new solution
-	FREE(*betterSolution);
-	*betterSolution = (double *) malloc (DSIZE *numberColumns);
-	memcpy(*betterSolution,newSolution,numberColumns*sizeof(double));
+	memcpy(betterSolution, newSolution, numberColumns*DSIZE);
 	*solutionValue = newSolutionValue;
 	//printf("** Solution of %g found by rounding\n",newSolutionValue);
 	returnCode=1;
@@ -1395,8 +1391,8 @@ int round_solution(lp_prob *p, double * solutionValue,
   tries setting others.  If not feasible then tries swaps
   Returns 1 if solution, 0 if not */
 
-int local_search(lp_prob *p, double * solutionValue, double * colSolution,
-		 double ** betterSolution)
+int local_search(lp_prob *p, double *solutionValue, double *colSolution,
+		 double *betterSolution)
 {
   
   OsiSolverInterface * solver = p->lp_data->si;
@@ -1728,9 +1724,7 @@ int local_search(lp_prob *p, double * solutionValue, double * colSolution,
     }
     if (bestChange+newSolutionValue<*solutionValue) {
       // new solution
-      FREE(*betterSolution);
-      *betterSolution = (double *) malloc (DSIZE *numberColumns);
-      memcpy(*betterSolution,newSolution,numberColumns*sizeof(double));
+      memcpy(betterSolution, newSolution, numberColumns*DSIZE);
       returnCode=1;
       *solutionValue = newSolutionValue + bestChange;
       if (bestChange>1.0e-12)

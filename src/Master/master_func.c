@@ -2350,7 +2350,11 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->set_obj_upper_lim);
       return(0);
    }
-   
+   else if (strcmp(key, "do_primal_heuristic") == 0 ||
+	    strcmp(key, "LP_do_primal_heuristic") == 0){
+      READ_INT_PAR(lp_par->do_primal_heuristic);
+      return(0);
+   }
    else if (strcmp(key, "scaling") == 0 ||
 	    strcmp(key, "LP_scaling") == 0){
       READ_INT_PAR(lp_par->scaling);

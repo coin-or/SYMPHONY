@@ -586,7 +586,8 @@ int is_feasible_u(lp_prob *p, char branching)
 
 #ifdef USE_SYM_APPLICATION
    user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
-			       &feasible, &true_objval, branching);
+			       &feasible, &true_objval, branching,
+			       heur_solution);
 #else
    user_res = USER_DEFAULT;
 #endif
@@ -632,49 +633,55 @@ int is_feasible_u(lp_prob *p, char branching)
    }
 
    /* try rounding */
-   if (feasible == IP_INFEASIBLE && 0){
-     true_objval = SYM_INFINITY;
-     if (p->has_ub){
-       true_objval = p->ub;      
-       heur_feasible = round_solution(p, &true_objval, &heur_solution);
-       col_sol = (double *)calloc(DSIZE, lp_data->n);
-       if (heur_feasible){
-	 memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-       } else {
-	 for(i = 0; i< p->best_sol.xlength; i++) {
-	   col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
+   if (feasible != IP_FEASIBLE && p->par.do_primal_heuristic &&
+       !p->par.multi_criteria){
+      if (feasible == IP_INFEASIBLE){ 
+	 true_objval = SYM_INFINITY;
+      }
+      if (p->has_ub){
+	 true_objval = p->ub;      
+	 if (round_solution(p, &true_objval, heur_solution)){
+	    feasible = IP_HEUR_FEASIBLE;
 	 }
-       }
-       if(local_search(p, &true_objval, col_sol, &heur_solution)){
-	 heur_feasible = TRUE;
-       }
-     } else {
-       heur_feasible = round_solution(p, &true_objval, &heur_solution);
-     }
-
-     if (heur_feasible){
-       cnt = collect_nonzeros(p, heur_solution, indices, values);        
-     }
-   }     
-  
-   if ((feasible == IP_FEASIBLE || heur_feasible) && p->par.multi_criteria){
-     if (analyze_multicriteria_solution(p, indices, values, cnt,
-					&true_objval, lpetol, branching) > 0){
-       if(feasible == IP_FEASIBLE){
-	 if (p->par.mc_add_optimality_cuts || branching){
-	   feasible = IP_FEASIBLE_BUT_CONTINUE;
+	 col_sol = (double *)calloc(DSIZE, lp_data->n);
+	 if (feasible == IP_HEUR_FEASIBLE){
+	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
 	 }else{
-	   feasible = IP_FEASIBLE;
+	    for(i = 0; i< p->best_sol.xlength; i++) {
+	       col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
+	    }
 	 }
-       }else{
-	 feasible = IP_FEASIBLE;
-       }
-     }
+	 if (local_search(p, &true_objval, col_sol, heur_solution)){
+	    feasible = IP_HEUR_FEASIBLE;
+	 }
+      }else{
+	 if (round_solution(p, &true_objval, heur_solution)){
+	    feasible = IP_HEUR_FEASIBLE;
+	 }
+      }
+   }     
+   
+   if (feasible == IP_FEASIBLE && p->par.multi_criteria){
+      if (analyze_multicriteria_solution(p, indices, values, cnt,
+					 &true_objval, lpetol, branching) > 0){
+	 if(feasible == IP_FEASIBLE){
+	    if (p->par.mc_add_optimality_cuts || branching){
+	       feasible = IP_FEASIBLE_BUT_CONTINUE;
+	    }else{
+	       feasible = IP_FEASIBLE;
+	    }
+	 }else{
+	    feasible = IP_FEASIBLE;
+	 }
+      }
    }
    
-
+   if (feasible == IP_HEUR_FEASIBLE){
+      cnt = collect_nonzeros(p, heur_solution, indices, values);        
+   }
+   
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE ||
-       heur_feasible){
+       feasible == IP_HEUR_FEASIBLE){
       /* Send the solution value to the treemanager */
       if (!p->has_ub || true_objval < p->ub - p->par.granularity){
 	 p->has_ub = TRUE;
@@ -699,7 +706,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	    PRINT(p->par.verbosity, -1,
 		  ("\n****** Found Better Feasible Solution !\n"));
 #if 0
-	    if(heur_feasible){
+	    if (feasible == IP_HEUR_FEASIBLE){
 	      PRINT(p->par.verbosity, -1,
 		    ("****** After Calling Heuristics !\n"));
 	    }

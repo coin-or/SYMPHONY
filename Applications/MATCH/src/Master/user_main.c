@@ -55,6 +55,13 @@ int main(int argc, char **argv)
    CALL_FUNCTION( match_read_data(prob, infile) );
 
    CALL_FUNCTION( match_load_problem(env, prob) );
+   int colsNum=-1;
+   sym_get_num_cols(env, &colsNum);
+   for(int j=0; j<=colsNum; ++j) {
+      int isInt=666;
+      int code=sym_is_integer(env, j, &isInt);
+      printf("j=%d  code=%d  isInt=%d\n", j, code, isInt);
+   }  // j
 
    CALL_FUNCTION( sym_solve(env) );
 
