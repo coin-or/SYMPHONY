@@ -37,14 +37,14 @@
 # variable to the correct path.
 ##############################################################################
 
-SYMPHONYROOT=..\..\..\
+SYMPHONYROOT=..\..\..\..
 
 ##############################################################################
 # COINROOT is the path to the root directory of the COIN libraries. Many of
 # the new features of COIN require the COIN libraries to be installed.
 ##############################################################################
 
-COINROOT = C:\COIN
+COINROOT = ..\$(SYMPHONYROOT)
 
 ##############################################################################
 # OUTDIR variable specifies where to create the executable file, 
@@ -307,12 +307,12 @@ APPL_OBJECTS : \
 	..\LP\vrp_lp.obj \
 	..\LP\vrp_lp_branch.obj \
 	..\Master\small_graph.obj \
-	..\Master\Heuristics\start_heurs.obj \
-	..\Master\Heuristics\lower_bound.obj \
-	..\Master\Heuristics\exchange_heur.obj \
-	..\Master\Heuristics\receive_rout.obj \
-	..\Master\Heuristics\route_heur.obj \
-	..\Master\Heuristics\cluster_heur.obj \
+#	..\Master\Heuristics\start_heurs.obj \
+#	..\Master\Heuristics\lower_bound.obj \
+#	..\Master\Heuristics\exchange_heur.obj \
+#	..\Master\Heuristics\receive_rout.obj \
+#	..\Master\Heuristics\route_heur.obj \
+#	..\Master\Heuristics\cluster_heur.obj \
 	..\Master\vrp_io.obj \
 	..\Master\vrp_master.obj \
 	..\Master\vrp_master_functions.obj \
@@ -332,12 +332,12 @@ LINK_OBJECTS= \
 	$(OUTDIR)\vrp_lp.obj \
 	$(OUTDIR)\vrp_lp_branch.obj \
 	$(OUTDIR)\small_graph.obj \
-	$(OUTDIR)\start_heurs.obj \
-	$(OUTDIR)\lower_bound.obj \
-	$(OUTDIR)\exchange_heur.obj \
-	$(OUTDIR)\receive_rout.obj \
-	$(OUTDIR)\route_heur.obj \
-	$(OUTDIR)\cluster_heur.obj \
+#	$(OUTDIR)\start_heurs.obj \
+#	$(OUTDIR)\lower_bound.obj \
+#	$(OUTDIR)\exchange_heur.obj \
+#	$(OUTDIR)\receive_rout.obj \
+#	$(OUTDIR)\route_heur.obj \
+#	$(OUTDIR)\cluster_heur.obj \
 	$(OUTDIR)\vrp_io.obj \
 	$(OUTDIR)\vrp_master.obj \
 	$(OUTDIR)\vrp_master_functions.obj \

@@ -37,14 +37,14 @@
 # variable to the correct path.
 ##############################################################################
 
-SYMPHONYROOT=..\..\..
+SYMPHONYROOT=..\..\..\..
 
 ##############################################################################
 # COINROOT is the path to the root directory of the COIN libraries. Many of
 # the new features of COIN require the COIN libraries to be installed.
 ##############################################################################
 
-COINROOT = C:\COIN
+COINROOT = ..\$(SYMPHONYROOT)
 
 ##############################################################################
 # OUTDIR variable specifies where to create the executable file, 
@@ -206,12 +206,10 @@ DEFINITIONS ="__$(LP_SOLVER)__"
 # specify the paths for "glpk" files if she wants to read in glpmpl files.  
 ##############################################################################
 
-USE_GLPMPL = FALSE
+USE_GLPMPL = TRUE
 
 !IF "$(USE_GLPMPL)" == "TRUE"
-LPINCDIR = $LPINCDIR) C:\GLPK\glpk-4.0\include
-LPLIB = $(LPLIB) C:\GLPK\glpk-4.0\glpk.lib
-DEFINITIONs = $(DEFINITIONS) /D "USE_GLPMPL"
+DEFINITIONS = $(DEFINITIONS) /D "USE_GLPMPL"
 !ENDIF
 
 ##############################################################################
@@ -261,7 +259,9 @@ DEFINITIONS = $(DEFINITIONS) /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" \
 	/D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" \
 	/D "COMPILE_IN_TM" /D "USE_SYM_APPLICATION" 
 
-ALL_INCDIR =$(ALL_INCDIR) /I "$(SYMPHONYROOT)\include" /I "..\..\include"
+GMPL_INCDIR = "$(SYMPHONYROOT)\src\GMPL"
+ALL_INCDIR =$(ALL_INCDIR) /I $(GMPL_INCDIR) /I "$(SYMPHONYROOT)\include" \
+	/I "..\..\include"
 
 .SILENT:
 
@@ -271,9 +271,17 @@ CPPFLAGS= /nologo /MLd /W2 /GR /Gm /YX /GX /ZI /Od \
 	/Fp"$(OUTDIR)\user.pch" /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\user.pdb" \
 	/FD /GZ /c /Tp
 
+CFLAGS= /nologo /MLd /W2 /GR /Gm /YX /GX /ZI /Od \
+	/I $(GMPL_INCDIR) /D $(DEFINITIONS) \
+	/Fp"$(OUTDIR)\sym.pch" /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\sym.pdb" \
+	/FD /GZ /c
+
 .c.obj: 
 	$(CPP) $(CPPFLAGS) "$*.c"
-	 
+
+.c.cobj: 
+	$(CPP) $(CFLAGS) "$*.c"
+ 
 ALL : "$(OUTDIR)" "LIB_MESSAGE" sym_lib "APPL_MESSAGE" "APPL_OBJECTS" user_exe 
 
 CLEAN:
@@ -348,7 +356,17 @@ sym_lib : \
 	$(SYMPHONYROOT)\src\Master\master_wrapper.obj \
 	$(SYMPHONYROOT)\src\TreeManager\tm_func.obj \
 	$(SYMPHONYROOT)\src\TreeManager\tm_proccomm.obj \
-	$(SYMPHONYROOT)\src\TreeManager\treemanager.obj
+	$(SYMPHONYROOT)\src\TreeManager\treemanager.obj \
+	$(SYMPHONYROOT)\src\GMPL\glpavl.cobj \
+	$(SYMPHONYROOT)\src\GMPL\glpdmp.cobj \
+	$(SYMPHONYROOT)\src\GMPL\glplib1a.cobj \
+	$(SYMPHONYROOT)\src\GMPL\glplib2.cobj \
+	$(SYMPHONYROOT)\src\GMPL\glplib3.cobj \
+	$(SYMPHONYROOT)\src\GMPL\glpmpl1.cobj \
+	$(SYMPHONYROOT)\src\GMPL\glpmpl2.cobj \
+	$(SYMPHONYROOT)\src\GMPL\glpmpl3.cobj \
+	$(SYMPHONYROOT)\src\GMPL\glpmpl4.cobj \
+	$(SYMPHONYROOT)\src\GMPL\glprng.cobj
 	lib.exe /nologo /out:$(OUTDIR)\symphonyLib.lib $(OUTDIR)\*.obj
 	echo "symphonyLib.lib" created successfully...
 	echo ...

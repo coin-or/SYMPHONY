@@ -64,7 +64,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "C:\COIN\Osi\include" /I "C:\COIN\Osi\OsiClp\include" /I "C:\COIN\Osi\OsiSym\include" /I "C:\COIN\Clp\include" /I "C:\COIN\Coin\include" /I "C:\COIN\Cgl\include" /I "..\..\..\include" /I "..\..\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /FD /GZ /c /Tp
+# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\..\..\include" /I "..\..\include" /I "..\..\..\..\..\Osi\include" /I "..\..\..\..\..\Coin\include" /I "..\..\..\..\..\Clp\include" /I "..\..\..\..\..\Osi\OsiClp\include" /I "..\..\..\..\..\Cgl\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /FD /GZ /c /Tp
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -156,29 +156,5 @@ SOURCE=..\Master\spp_master_functions.c
 # End Source File
 # End Group
 # End Group
-# Begin Source File
-
-SOURCE=..\..\..\COIN\Win\osiClpLib\Debug\osiClpLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\COIN\Win\osiLib\Debug\osiLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\COIN\Win\cglLib\Debug\cglLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\COIN\Win\coinLib\Debug\coinLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\COIN\Win\clpLib\Debug\clpLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\Debug\symphonyLib.lib
-# End Source File
 # End Target
 # End Project

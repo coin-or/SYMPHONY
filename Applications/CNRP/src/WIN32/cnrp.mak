@@ -37,14 +37,14 @@
 # variable to the correct path.
 ##############################################################################
 
-SYMPHONYROOT=..\..\..
+SYMPHONYROOT=..\..\..\..
 
 ##############################################################################
 # COINROOT is the path to the root directory of the COIN libraries. Many of
 # the new features of COIN require the COIN libraries to be installed.
 ##############################################################################
 
-COINROOT = C:\COIN
+COINROOT = ..\$(SYMPHONYROOT)
 
 ##############################################################################
 # OUTDIR variable specifies where to create the executable file, 

@@ -64,7 +64,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\..\include" /I "..\..\include" /I "..\include\heurs" /I "C:\COIN\Osi\include" /I "C:\Coin\Coin\include" /I "C:\Coin\Clp\include" /I "C:\Coin\Osi\OsiClp\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /Fp"Debug/vrp2.pch" /YX /FD /GZ /c /Tp
+# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\..\..\include" /I "..\..\include" /I "..\..\include\heurs" /I "..\..\..\..\..\Osi\include" /I "..\..\..\..\..\Coin\include" /I "..\..\..\..\..\Clp\include" /I "..\..\..\..\..\Osi\OsiClp\include" /I "..\..\..\..\..\Cgl\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /Fp"Debug/vrp2.pch" /YX /FD /GZ /c /Tp
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -165,26 +165,80 @@ SOURCE=..\LP\vrp_lp_branch.c
 # Begin Source File
 
 SOURCE=..\Master\Heuristics\cluster_heur.c
+
+!IF  "$(CFG)" == "vrp - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "vrp - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\Master\Heuristics\exchange_heur.c
+
+!IF  "$(CFG)" == "vrp - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "vrp - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\Master\Heuristics\lower_bound.c
+
+!IF  "$(CFG)" == "vrp - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "vrp - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\Master\Heuristics\receive_rout.c
+
+!IF  "$(CFG)" == "vrp - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "vrp - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\Master\Heuristics\route_heur.c
+
+!IF  "$(CFG)" == "vrp - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "vrp - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\Master\Heuristics\start_heurs.c
+
+!IF  "$(CFG)" == "vrp - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "vrp - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
@@ -209,29 +263,5 @@ SOURCE=..\Master\vrp_master_functions.c
 # End Source File
 # End Group
 # End Group
-# Begin Source File
-
-SOURCE=..\..\..\..\COIN\Win\osiClpLib\Debug\osiClpLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\COIN\Win\osiLib\Debug\osiLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\COIN\Win\cglLib\Debug\cglLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\COIN\Win\coinLib\Debug\coinLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\COIN\Win\clpLib\Debug\clpLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\Debug\symphonyLib.lib
-# End Source File
 # End Target
 # End Project

@@ -3,6 +3,30 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
+Project: "cglLib"=..\..\..\..\..\Win\cglLib\cglLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "clpLib"=..\..\..\..\..\Win\clpLib\clpLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "cnrp"=.\cnrp.dsp - Package Owner=<4>
 
 Package=<5>
@@ -14,6 +38,57 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name symphonyLib
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name cglLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiClpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "coinLib"=..\..\..\..\..\Win\coinLib\coinLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiClpLib"=..\..\..\..\..\Win\osiClpLib\osiClpLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiLib"=..\..\..\..\..\Win\osiLib\osiLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
