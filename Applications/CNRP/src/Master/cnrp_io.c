@@ -631,6 +631,7 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
    cg_par->update_contr_above = 0;
    cg_par->shrink_one_edges = FALSE;
    cg_par->do_extra_checking = FALSE;
+   cg_par->tau = 0;
    
    if (!strcmp(filename, ""))
       goto EXIT;

@@ -13,8 +13,8 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _DG_USER_H
-#define _DG_USER_H
+#ifndef _VRP_DG_H
+#define _VRP_DG_H
 
 /* SYMPHONY include files */
 #include "proto.h"

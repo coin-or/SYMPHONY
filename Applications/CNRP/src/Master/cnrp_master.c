@@ -768,7 +768,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
       }
    }
       
-   return(USER_SUCCESS);
+   return(USER_DEFAULT);
 }
    
 /*===========================================================================*/

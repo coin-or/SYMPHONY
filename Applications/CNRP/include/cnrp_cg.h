@@ -46,6 +46,8 @@ typedef struct CG_VRP_SPEC{
    int          *new_demand;
    double       *cut_val;
    char         *cut_list;
+
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
    int          *dec_data;
    int           last_decomp_index;
    double        last_objval;
@@ -57,6 +59,7 @@ typedef struct CG_VRP_SPEC{
    int          *ones;
    int          *size;
    int           num_nocolscuts;
+/*___END_EXPERIMENTAL_SECTION___*/
 
 #ifdef CHECK_CUT_VALIDITY
    int           feas_sol_size;

@@ -151,6 +151,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    mip->sense   = (char *) malloc(mip->m * CSIZE);
    mip->rngval  = (double *) calloc(mip->m, DSIZE);
    mip->is_int  = (char *) calloc(mip->n, CSIZE);
+
    /* Fill out the appropriate data structures -- each column has
       exactly two entries */
    for (i = 0; i < mip->n; i++){
@@ -289,8 +290,7 @@ int user_display_lp_solution(void *user, int which_sol, int varnum,
    vrp_lp_problem *vrp = (vrp_lp_problem *)user;
 
    if (vrp->par.verbosity > 10 ||
-       (vrp->par.verbosity > 8 && (which_sol == DISP_FINAL_RELAXED_SOLUTION ||
-			     which_sol == DISP_FEAS_SOLUTION)) ||
+       (vrp->par.verbosity > 8 && (which_sol == DISP_FINAL_RELAXED_SOLUTION)) ||
        (vrp->par.verbosity > 6 && (which_sol == DISP_FEAS_SOLUTION))){
       display_support_graph(vrp->window, FALSE, (char *)"Original solution",
 			    varnum, indices, values, .000001,

@@ -48,12 +48,12 @@ COMPILE_IN_CG = TRUE
 COMPILE_IN_CP = TRUE
 
 ##############################################################################
-# This section is for listing VRP source file names
+# This section is for listing CNRP source file names
 ##############################################################################
 
 DO_CONCORDE_CUTS = FALSE
-DIRECTED_X_VARS = FALSE
-ADD_FLOW_VARS = FALSE
+DIRECTED_X_VARS = TRUE
+ADD_FLOW_VARS = TRUE
 ADD_CAP_CUTS = FALSE
 ADD_X_CUTS = FALSE
 

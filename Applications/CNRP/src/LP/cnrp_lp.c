@@ -154,7 +154,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    int total_edgenum = vertnum*(vertnum-1)/2;
    char prob_type = vrp->par.prob_type, od_const = FALSE, d_x_vars = FALSE;
 #if defined(DIRECTED_X_VARS) && !defined(ADD_FLOW_VARS)
-   int edgenum = varnum/2;
+   int edgenum = (mip->n)/2;
 #elif defined(ADD_FLOW_VARS)
    double flow_capacity;
    int v0, v1;
@@ -163,7 +163,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 
    flow_capacity = (double) vrp->capacity;
 #else
-   int edgenum = varnum/3;
+   int edgenum = (mip->n)/3;
 
    if (vrp->par.prob_type == CSTP || vrp->par.prob_type == CTP)
       flow_capacity = (double) vrp->capacity;
@@ -296,7 +296,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 mip->matind[j++]  = (2 + od_const)*vertnum-1 + 2*total_edgenum +
 	    indices[i] - total_edgenum;
 #endif
-#elif defined(ADD_FLOW_VARS)
+#endif
       }else if (indices[i] < (2+d_x_vars)*total_edgenum){
 	 mip->obj[i]       =
 	    vrp->par.tau*((double) costs[indices[i]-
@@ -333,7 +333,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	    vrp->par.tau*((double) costs[indices[i]-
 					(2+d_x_vars)*total_edgenum]);
 	 mip->is_int[i] = FALSE;
-	 v1 = edges[2*(indices[i]-(1+d_x_vars)*total_edgenum) + 1];
+	 v1 = edges[2*(indices[i]-(2+d_x_vars)*total_edgenum) + 1];
 	 mip->ub[i] = flow_capacity - vrp->demand[v1];
 #ifdef ADD_CAP_CUTS
 	 mip->matbeg[i]    = j;
@@ -359,14 +359,9 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	    mip->matind[j++] = (1+od_const)*vertnum + edges[2*(indices[i] -
 				(2+d_x_vars)*total_edgenum)] - 1;
 #endif
-#endif
       }
    }
    mip->matbeg[i] = j;
-   
-   /*Someday, I should add in all the cuts in here too, but for now,
-     they get added in during post-processing in create_lp_u(), which
-     is less efficient but easier for me :)*/
    
    /* set the initial right hand side */
    if (od_const){
@@ -517,7 +512,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
       }
 #else
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
-	 if (flow_cap*edge1->weight < edge1->flow1 + edge1->flow2 - lpetol){
+	 if (capacity*edge1->weight < edge1->flow1 + edge1->flow2 - lpetol){
 	    *feasible = IP_INFEASIBLE;
 	    free_net(n);
 	    return(USER_SUCCESS);
@@ -620,8 +615,7 @@ int user_display_lp_solution(void *user, int which_sol, int varnum,
 #endif   
    
    if (vrp->par.verbosity > 10 ||
-       (vrp->par.verbosity > 8 && (which_sol == DISP_FINAL_RELAXED_SOLUTION ||
-			     which_sol == DISP_FEAS_SOLUTION)) ||
+       (vrp->par.verbosity > 8 && (which_sol == DISP_FINAL_RELAXED_SOLUTION)) ||
        (vrp->par.verbosity > 6 && (which_sol == DISP_FEAS_SOLUTION))){
       display_support_graph(vrp->window, FALSE, (char *)"Weighted solution",
 			    i, indices, values, .000001, total_edgenum, FALSE);
@@ -629,7 +623,12 @@ int user_display_lp_solution(void *user, int which_sol, int varnum,
 				 varnum, i, indices, values, .000001,
 				 total_edgenum,CTOI_WAIT_FOR_CLICK_AND_REPORT);
    }
-   return(DISP_NOTHING);
+   
+   if (which_sol == DISP_FINAL_RELAXED_SOLUTION){
+      return(DISP_NZ_INT);
+   }else{
+      return(USER_SUCCESS);
+   }
 }
 
 /*===========================================================================*/
@@ -1539,19 +1538,37 @@ void free_lp_net(lp_net *n)
 
 /*===========================================================================*/
 
-void construct_feasible_solution(vrp_spec *vrp, network *n, double *objval)
+void construct_feasible_solution(vrp_spec *vrp, network *n, double *true_objval)
 {
   _node *tour = vrp->cur_sol;
-  int cur_vert = 0, prev_vert = 0, cur_route, i;
+  int cur_vert = 0, prev_vert = 0, cur_route, i, count;
   elist *cur_route_start = NULL;
   edge *edge_data;
   vertex *verts = n->verts;
-  double cost = 0;
+  double fixed_cost = 0.0, variable_cost = 0.0;
 
+  for (i = 0; i < n->edgenum; i++){
+     fixed_cost += vrp->par.gamma*
+	vrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
+#ifdef ADD_FLOW_VARS
+     variable_cost += vrp->par.tau*(n->edges[i].flow1+n->edges[i].flow2)*
+	vrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
+#endif
+  }
+  *true_objval = fixed_cost + variable_cost;
+     
+  printf("\nSolution Found:\n");
+#ifdef ADD_FLOW_VARS
+  printf("Solution Fixed Cost: %.1f\n", fixed_cost);
+  printf("Solution Variable Cost: %.1f\n", variable_cost);
+#else
+  printf("Solution Cost: %.0f\n", fixed_cost);
+#endif
+     
   if (vrp->par.prob_type == TSP || vrp->par.prob_type == VRP ||
       vrp->par.prob_type == BPP){ 
      /*construct the tour corresponding to this solution vector*/
-     for (cur_route_start = verts[0].first, cur_route = 1, cost = 0,
+     for (cur_route_start = verts[0].first, cur_route = 1,
 	     edge_data = cur_route_start->data; cur_route <= vrp->numroutes;
 	  cur_route++){
 	edge_data = cur_route_start->data;
@@ -1560,7 +1577,6 @@ void construct_feasible_solution(vrp_spec *vrp, network *n, double *objval)
 	tour[prev_vert].next = cur_vert;
 	tour[cur_vert].route = cur_route;
 	prev_vert = 0;
-	cost += vrp->costs[INDEX(prev_vert, cur_vert)];
 	while (cur_vert){
 	   if (verts[cur_vert].first->other_end != prev_vert){
 	      prev_vert = cur_vert;
@@ -1577,7 +1593,6 @@ void construct_feasible_solution(vrp_spec *vrp, network *n, double *objval)
 	   }
 	   tour[prev_vert].next = cur_vert;
 	   tour[cur_vert].route = cur_route;
-	   cost += vrp->costs[INDEX(prev_vert, cur_vert)];
 	}
 	edge_data->scanned = TRUE;
 	
@@ -1585,13 +1600,38 @@ void construct_feasible_solution(vrp_spec *vrp, network *n, double *objval)
 	   if (!(cur_route_start = cur_route_start->next_edge)) break;
 	}
      }
-     *objval = 0;
+
+     /* Display the solution */
+   
+     cur_vert = tour[0].next;
+     
+     if (tour[0].route == 1)
+	printf("\n0 ");
+     while (cur_vert != 0){
+	if (tour[prev_vert].route != tour[cur_vert].route){
+	   printf("\nRoute #%i: ", tour[cur_vert].route);
+	   count = 0;
+	}
+	printf("%i ", cur_vert);
+	count++;
+	if (count > 15){
+	   printf("\n");
+	   count = 0;
+	}
+	prev_vert = cur_vert;
+	cur_vert = tour[cur_vert].next;
+     }
+     printf("\n\n");
   }else{
      for (i = 0; i < n->edgenum; i++){
 	vrp->cur_sol_tree[i] = INDEX(n->edges[i].v0, n->edges[i].v1);
-	cost += vrp->costs[vrp->cur_sol_tree[i]];
      }
-     *objval = 0;
+
+     /* Display the solution */
+   
+     for (i = 0; i < n->edgenum; i++){
+	printf("%i %i\n", n->edges[i].v0, n->edges[i].v1);
+     }
   }
 }
 

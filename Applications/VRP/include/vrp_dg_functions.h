@@ -13,13 +13,13 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _VRP_DG_H
-#define _VRP_DG_H
+#ifndef _VRP_DG_FUNCTIONS_H
+#define _VRP_DG_FUNCTIONS_H
 
 /* SYMPHONY include files */
 #include "proto.h"
 
-/* VRP include files */
+/* CNRP include files */
 #include "vrp_common_types.h"
 
 void init_window PROTO((int dg_id, char *name, int width, int height));

@@ -262,14 +262,14 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 
    verts = n->verts;
 
-#if 0
    /*First look for violated flow capacity constraints We are checking
      to see if there are any nonzero flow variables whose
      corresponding edge variable is zero. Recall, 'i' already equals the
      index of the first flow var*/
+#if 1
 #ifdef DIRECTED_X_VARS
    if (vrp->par.generate_x_cuts){
-      new_cut->coef  = malloc(ISIZE);
+      new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
 	 if (edge1->weight > 1 + etol){
@@ -286,7 +286,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) 
    if (vrp->par.generate_cap_cuts){
-      new_cut->coef  = malloc(ISIZE);
+      new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
 	 if ((flow_value = edge1->flow1) > etol){
@@ -314,7 +314,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
 #elif defined(ADD_FLOW_VARS)
    if (vrp->par.generate_cap_cuts){
-      new_cut->coef  = malloc(ISIZE);
+      new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
 	 if (flow_cap*edge1->weight < edge1->flow1 + edge1->flow2 - etol){
@@ -338,7 +338,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) 
    if (vrp->par.generate_tight_cap_cuts){
-      new_cut->coef  = malloc(ISIZE);
+      new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
 	 if ((flow_value = edge1->flow1) > etol){
@@ -388,7 +388,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
 #elif defined(ADD_FLOW_VARS)
    if (vrp->par.generate_tight_cap_cuts){
-      new_cut->coef  = malloc(ISIZE);
+      new_cut->coef  = (char *)malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
 	 for (cur_edge = verts[edge1->v1].first; cur_edge;
@@ -714,6 +714,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
      to see if there are any nonzero flow variables whose
      corresponding edge variable is zero. Recall, 'i' already equals the
      index of the first flow var*/
+   
+#if 0
 #ifdef DIRECTED_X_VARS
    if (vrp->par.generate_x_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
@@ -761,7 +763,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
 #elif defined(ADD_FLOW_VARS)
    if (vrp->par.generate_cap_cuts){
-      new_cut->coef  = malloc(ISIZE);
+      new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
 	 if (flow_cap*edge1->weight < edge1->flow1 + edge1->flow2 - etol){
@@ -835,7 +837,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
 #elif defined(ADD_FLOW_VARS)
    if (vrp->par.generate_tight_cap_cuts){
-      new_cut->coef  = malloc(ISIZE);
+      new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
 	 for (cur_edge = verts[edge1->v1].first; cur_edge;
@@ -880,7 +882,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(new_cut->coef);
    }
 #endif   
-
+#endif
    
    FREE(new_cut);
    free_net(n);
