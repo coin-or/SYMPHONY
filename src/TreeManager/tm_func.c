@@ -1155,12 +1155,11 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       /*SensAnalysis*/
       child->sol = 
 	 (double *) malloc (DSIZE * tm->rootnode->desc.uind.size);
-      memcpy(child->sol, solution[i], sizeof(double)*
-	     tm->rootnode->desc.uind.size);
+      memcpy(child->sol, solution[i], DSIZE*tm->rootnode->desc.uind.size);
 
       child->duals = 
-	 (double *) malloc (DSIZE * tm->rootnode->desc.uind.size);
-      memcpy(child->duals, duals[i], DSIZE*tm->rootnode->desc.uind.size);
+	 (double *) malloc (DSIZE * tm->bcutnum);
+      memcpy(child->duals, duals[i], DSIZE*tm->bcutnum);
 
       if (child->node_status == NODE_STATUS__PRUNED){
 	 if(feasible[i] || action[i]==PRUNE_THIS_CHILD_FATHOMABLE){

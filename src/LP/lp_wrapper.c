@@ -305,9 +305,9 @@ int create_subproblem_u(lp_prob *p)
 	 if (p->par.multi_criteria && p->par.mc_find_nondominated_solutions){
 	    lp_data->mip->obj[i] = p->par.mc_rho*(p->mip->obj1[userind[i]] +
 						  p->mip->obj2[userind[i]]);
-	    lp_data->mip->matval[j] = p->par.mc_gamma*p->mip->obj[userind[i]];
+	    lp_data->mip->matval[j] = p->par.mc_gamma*p->mip->obj1[userind[i]];
 	    lp_data->mip->matind[j++] = bcutnum - 2;
-	    lp_data->mip->matval[j] = p->par.mc_tau*p->mip->obj[userind[i]];
+	    lp_data->mip->matval[j] = p->par.mc_tau*p->mip->obj2[userind[i]];
 	    lp_data->mip->matind[j++] = bcutnum - 1;
 	 }else{
 	    lp_data->mip->obj[i] = p->mip->obj[userind[i]];
