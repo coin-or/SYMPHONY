@@ -1,103 +1,115 @@
 #!/bin/tcsh -f
 
 mkdir $1
-awk -f reformat.awk Makefile.dist > $1/Makefile
+awk -f scripts/reformat.awk Makefile.dist > $1/Makefile
 foreach file (LICENSE README-4.0)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/Common
 foreach file (Common/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/LP
 foreach file (LP/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/Master
 foreach file (Master/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/TreeManager
 foreach file (TreeManager/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/CutPool
 foreach file (CutPool/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/CutGen
 foreach file (CutGen/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/include
 foreach file (include/*.h)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/DrawGraph
 foreach file (DrawGraph/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/DrawGraph/IGD_1.0
 foreach file (DrawGraph/IGD_1.0/*.txt)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 foreach file (DrawGraph/IGD_1.0/*.tcl)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 foreach file (DrawGraph/IGD_1.0/*.g)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/DrawGraph/IGD_1.0/Simple_version
 foreach file (DrawGraph/IGD_1.0/Simple_version/*.txt)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 foreach file (DrawGraph/IGD_1.0/Simple_version/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 
 foreach app (Vrp MATCH MPP SPP SPP+CUTS Template)
 mkdir $1/$app
-foreach file ($app/Makefile $app/LICENSE $app/README $app/sample.*)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/$app/WIN32
-foreach file ($app/WIN32/*.dsp)
-awk -f reformat.awk $file > $1/$file
-end
-foreach file ($app/WIN32/*.dsw)
-awk -f reformat.awk $file > $1/$file
-end
-foreach file ($app/WIN32/*.mak)
-awk -f reformat.awk $file > $1/$file
-end
-mkdir $1/$app/Common
-foreach file ($app/Common/*.c)
-awk -f reformat.awk $file > $1/$file
+foreach file ($app/Makefile $app/sample.*)
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/$app/LP
 foreach file ($app/LP/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/$app/Master
 foreach file ($app/Master/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/$app/CutPool
 foreach file ($app/CutPool/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/$app/CutGen
 foreach file ($app/CutGen/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/$app/include
 foreach file ($app/include/*.h)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 mkdir $1/$app/DrawGraph
 foreach file ($app/DrawGraph/*.c)
-awk -f reformat.awk $file > $1/$file
+awk -f scripts/reformat.awk $file > $1/$file
 end
 end
-mv $1/Vrp $1/VRP
+
+foreach app (Vrp MATCH MPP SPP SPP+CUTS)
+mkdir $1/$app/WIN32
+foreach file ($app/WIN32/*.dsp)
+awk -f scripts/reformat.awk $file > $1/$file
+end
+foreach file ($app/WIN32/*.dsw)
+awk -f scripts/reformat.awk $file > $1/$file
+end
+foreach file ($app/WIN32/*.mak)
+awk -f scripts/reformat.awk $file > $1/$file
+end
+
+foreach app (Vrp SPP SPP+CUTS)
+foreach file ($app/LICENSE $app/README)
+awk -f scripts/reformat.awk $file > $1/$file
+end
+mkdir $1/$app/Common
+foreach file ($app/Common/*.c)
+awk -f scripts/reformat.awk $file > $1/$file
+end
+
+foreach app (Vrp MATCH MPP SPP SPP+CUTS)
+mv $1/$app $1/$app-4.0
+end
+mv $1/Vrp-4.0 $1/VRP-4.0
 mv $1/Template $1/USER
+mv $1/README* $1/README
