@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony_api.h"
-#ifndef WIN32
+#ifdef HAS_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -170,7 +170,7 @@ int main(int argc, char **argv)
 
      env->par.verbosity = -1;
 
-#ifndef WIN32
+#ifdef HAS_READLINE
      sym_initialize_readline();
 #endif
 
@@ -371,8 +371,7 @@ int main(int argc, char **argv)
 	       if (strcmp(args[2], "") == 0){
 		 main_level = 3;
 		 sym_read_line("SYMPHONY\\Display\\Parameter: ", &line);
-		 sscanf(line, "%s", args[2]);
-		 //		 strcpy(args[2], line);	
+		 strcpy(args[2], line);	
 		 if (last_level != 0)
 		   last_level = 2;
 	       }
@@ -381,7 +380,7 @@ int main(int argc, char **argv)
 		 sym_help("display_param_help");
 	       } else if (strcmp(args[2], "back") == 0){
 		 break;
-	       } else if ((strcmp(args[0], "quit") == 0) ||
+	       } else if ((strcmp(args[2], "quit") == 0) ||
 			  (strcmp(args[2], "exit") == 0)){ 
 		 terminate = TRUE;
 		 break;
@@ -401,7 +400,7 @@ int main(int argc, char **argv)
 	     if (terminate) break;	        	   
 	   } else if (strcmp(args[1], "back") == 0){
 	     break;
-	   } else if ((strcmp(args[0], "quit") == 0) ||
+	   } else if ((strcmp(args[1], "quit") == 0) ||
 		      (strcmp(args[1], "exit") == 0)){
 	     terminate = TRUE;
 	     break;
@@ -431,7 +430,7 @@ int main(int argc, char **argv)
 	     sym_help("set_help");
 	   } else if (strcmp(args[1], "back") == 0){
 	     break;
-	   } else if ((strcmp(args[0], "quit") == 0) ||
+	   } else if ((strcmp(args[1], "quit") == 0) ||
 		      (strcmp(args[1], "exit") == 0)){
 	     terminate = TRUE;
 	     break;
@@ -580,9 +579,10 @@ int sym_help(char *line)
 /*===========================================================================*\
 \*===========================================================================*/
 
-int sym_read_line(char *prompt, char **input){
+int sym_read_line(char *prompt, char **input)
+{
 
-#ifdef WIN32
+#ifndef HAS_READLINE
 
   if (*input) FREE(*input);
   *input = (char *)malloc(CSIZE* MAX_LINE_LENGTH +1);
@@ -596,8 +596,11 @@ int sym_read_line(char *prompt, char **input){
 
   while(true) {
     *input = readline(prompt);
-    if (**input) {
+    if (**input) {      
       add_history(*input);
+      if((*input)[strlen(*input)-1] == ' '){
+	(*input)[strlen(*input)-1] = 0;
+      }
       break;
     } else continue;
   }
@@ -609,7 +612,7 @@ int sym_read_line(char *prompt, char **input){
  
 /*===========================================================================*\
 \*===========================================================================*/
-#ifndef WIN32
+#ifdef HAS_READLINE
 
 void sym_initialize_readline()
 {
@@ -652,7 +655,8 @@ char **sym_completion(const char *text, int start, int end)
     comp_level = main_level;
   }
 
-  if(!(strcmp(key[0], "load") == 0 || strcmp(key[0], "param_file") == 0 )){
+  if(!(strcmp(key[0], "load") == 0 || strcmp(key[0], "param_file") == 0 ||
+       strcmp(key[1], "param_file") == 0 )){
     matches = rl_completion_matches (text, command_generator);
   }
   return (matches);
