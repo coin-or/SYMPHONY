@@ -117,7 +117,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
    cnrp_readparams(cnrp, filename, argc, argv);
 
-   p->par.tm_par.granularity = p->par.lp_par.granularity = -0.1; 
+   p->par.tm_par.granularity = p->par.lp_par.granularity = -0.001; 
 
    return(USER_SUCCESS);
 }

@@ -34,7 +34,7 @@
 #include "cnrp_const.h"
 #include "cnrp_macros.h"
 
-#define NUMNODES 10
+#define NUMNODES 20
 
 /*===========================================================================*/
 
@@ -538,8 +538,8 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 	      fprintf(stderr, "\nCNRP I/O: error reading DEMAND_SECTION\n\n");
 	      exit(1);
 	   }
-	   cnrp->demand[k-1] = (double) l;
-	   cnrp->demand[0] += (double) l;
+	   cnrp->demand[k-1] = MIN((double) l, 0.5*cnrp->capacity);
+	   cnrp->demand[0] += cnrp->demand[k-1];
 	}
 	if (fscanf(f, "%i%i", &k, &l)){
 	   fprintf(stderr, "\nCNRP I/O: too much data in DEMAND_SECTION\n\n");
@@ -657,7 +657,7 @@ void cnrp_readparams(cnrp_problem *cnrp, char *filename, int argc, char **argv)
    par->colgen_strat[1] = 0;
    par->verbosity = 0;
 #ifdef MULTI_CRITERIA
-   par->binary_search_tolerance = .1;
+   par->binary_search_tolerance = .01;
    par->compare_solution_tolerance = .001;
 #endif
    
@@ -997,6 +997,9 @@ EXIT:
        case 'G':
 	 sscanf(argv[++i], "%lf", &lp_par->tau);
 	 cg_par->tau = lp_par->tau;
+	 break;
+       case 'I':
+	 sscanf(argv[++i], "%lf", &par->binary_search_tolerance);
 	 break;
        case 'T':
 	 i++;

@@ -261,7 +261,7 @@ int receive_lp_data_u PROTO((lp_prob *p));
 void free_prob_dependent_u PROTO((lp_prob *p));
 int comp_cut_name PROTO((const void *c0, const void *c1));
 int create_subproblem_u PROTO((lp_prob *p));
-int is_feasible_u PROTO((lp_prob *p));
+int is_feasible_u PROTO((lp_prob *p, char branching));
 void send_feasible_solution_u PROTO((lp_prob *p, int xlevel, int xindex,
 				     int xiter_num, double lpetol,
 				     double new_ub, int cnt, int *xind,

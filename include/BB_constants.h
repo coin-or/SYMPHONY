@@ -168,13 +168,14 @@
 #  define SLACK_FIXED  4   /* OSLLIB uses this for 'E' rows */
 
 /*----------------- LP Solver return codes (dual simplex) -------------------*/
-#define LP_OPTIMAL                  0
-#define LP_D_INFEASIBLE             1
-#define LP_D_UNBOUNDED              2
-#define LP_D_ITLIM                  3
-#define LP_D_OBJLIM                 4
-#define LP_OPT_FEASIBLE             5
-#define LP_ABANDONED                6
+#define LP_OPTIMAL                   0
+#define LP_D_INFEASIBLE              1
+#define LP_D_UNBOUNDED               2
+#define LP_D_ITLIM                   3
+#define LP_D_OBJLIM                  4
+#define LP_OPT_FEASIBLE              5
+#define LP_OPT_FEASIBLE_BUT_CONTINUE 6
+#define LP_ABANDONED                 7
 
 #define MOVE_TO_LB               0
 #define MOVE_TO_UB               1

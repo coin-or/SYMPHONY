@@ -341,7 +341,7 @@ void fathom_branch(lp_prob *p)
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
-      if (is_feasible_u(p) == IP_FEASIBLE){
+      if (is_feasible_u(p, FALSE) == IP_FEASIBLE){
 	 cuts = -1;
       }else{
 	 /*------------------------------------------------------------------*\
@@ -643,7 +643,7 @@ void repricing(lp_prob *p)
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
-      if (is_feasible_u(p) == IP_FEASIBLE){
+      if (is_feasible_u(p, FALSE) == IP_FEASIBLE){
 	 if (p->par.verbosity > 2){
 	    printf ("Now displaying the feasible solution ...\n");
 	    display_lp_solution_u(p, DISP_FEAS_SOLUTION);

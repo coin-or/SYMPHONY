@@ -833,7 +833,8 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       OSL_check_error("osllib_status-ekk_dualSimplex lack of dstorage file"
 			 "space!");
       exit(-1);
-    default: term = LP_ABANDONED;break;
+    default: term = LP_ABANDONED;
+      break;
    }
    
    lp_data->termcode = term;
@@ -2325,8 +2326,9 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       retval = lp_data->si->setHintParam(OsiDoPresolveInResolve, false);
       TURN OFF PRESOLVE MEN! */
    
+   //int term = LP_ABANDONED;
    int term;
-   
+    
    lp_data->si->resolve();
    
    if (lp_data->si->isProvenDualInfeasible())

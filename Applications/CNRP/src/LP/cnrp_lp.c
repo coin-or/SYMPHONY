@@ -525,7 +525,8 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 \*===========================================================================*/
 
 int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
-		     double *values, int *feasible, double *true_objval)
+		     double *values, int *feasible, double *true_objval,
+		     char branching)
 {
    cnrp_spec *cnrp = (cnrp_spec *)user;
    vertex *verts;
@@ -650,11 +651,14 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    }
 
 #if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
-   if (construct_feasible_solution(cnrp, n, true_objval, lpetol) > 0){
+   if (construct_feasible_solution(cnrp, n, true_objval, lpetol,
+				   branching) > 0){
       *feasible = IP_FEASIBLE_BUT_CONTINUE;
    }else{
       *feasible = IP_FEASIBLE;
    }
+#else
+   *feasible = IP_FEASIBLE;
 #endif
    
    free_net(n);
@@ -1663,8 +1667,9 @@ void free_lp_net(lp_net *n)
 
 /*===========================================================================*/
 
-int construct_feasible_solution(cnrp_spec *cnrp, network *n,
-				 double *true_objval, double etol)
+char construct_feasible_solution(cnrp_spec *cnrp, network *n,
+				 double *true_objval, double etol,
+				char branching)
 {
   _node *tour = cnrp->cur_sol;
   int cur_vert = 0, prev_vert = 0, cur_route, i, count;
@@ -1673,6 +1678,8 @@ int construct_feasible_solution(cnrp_spec *cnrp, network *n,
   vertex *verts = n->verts;
   double fixed_cost = 0.0, variable_cost = 0.0;
   int cuts = 0;
+  char print_solution = FALSE;
+  char continue_with_node = FALSE;
   
   if (cnrp->ub > 0 && *true_objval > cnrp->ub + etol){
      return(0);
@@ -1687,101 +1694,123 @@ int construct_feasible_solution(cnrp_spec *cnrp, network *n,
 #endif
   }
 
-  if (*true_objval > cnrp->ub - etol &&
-      variable_cost > cnrp->variable_cost - etol &&
-      fixed_cost > cnrp->fixed_cost - etol){
-     return(0);
-  }
-  
   if (cnrp->par.gamma == 1.0){
-     if (fixed_cost < cnrp->fixed_cost - etol ||
-	 (fixed_cost >= cnrp->fixed_cost - etol
-	  && variable_cost < cnrp->variable_cost - etol)){
-	printf("\nBetter Solution Found:\n");
+     if (fixed_cost < cnrp->fixed_cost + etol){
+	 if (fixed_cost < cnrp->fixed_cost - etol ||
+	     (fixed_cost >= cnrp->fixed_cost - etol
+	      && variable_cost < cnrp->variable_cost - etol)){
+	    printf("\nBetter Solution Found:\n");
 #ifdef ADD_FLOW_VARS
-	printf("Solution Fixed Cost: %.1f\n", fixed_cost);
-	printf("Solution Variable Cost: %.1f\n", variable_cost);
+	    printf("Solution Fixed Cost: %.1f\n", fixed_cost);
+	    printf("Solution Variable Cost: %.1f\n", variable_cost);
 #else
-	printf("Solution Cost: %.0f\n", fixed_cost);
+	    printf("Solution Cost: %.0f\n", fixed_cost);
 #endif
-	cnrp->variable_cost = variable_cost;
-	cnrp->fixed_cost = fixed_cost;
-	cnrp->ub = *true_objval;
+	    cnrp->variable_cost = variable_cost;
+	    cnrp->fixed_cost = fixed_cost;
+	    cnrp->ub = *true_objval;
+	    print_solution = TRUE;
+	 }
 	/* Add an optimality cut for the second objective */
-	cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
-	new_cut->coef = NULL;
-	new_cut->rhs = (int) (variable_cost + etol) - 1;
-	new_cut->size = 0;
-	new_cut->type = OPTIMALITY_CUT_VARIABLE;
-	new_cut->name = CUT__DO_NOT_SEND_TO_CP;
-	cuts += cg_send_cut(new_cut);
-	FREE(new_cut);
+	 if (!branching){
+	    cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	    new_cut->coef = NULL;
+	    new_cut->rhs = (int) (variable_cost + etol) - 1;
+	    new_cut->size = 0;
+	    new_cut->type = OPTIMALITY_CUT_VARIABLE;
+	    new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	    continue_with_node = cg_send_cut(new_cut);
+	    FREE(new_cut);
+	 }else{
+	    continue_with_node = TRUE;
+	 }
      }
   }else if (cnrp->par.tau == 1.0){
-     if (variable_cost < cnrp->variable_cost - etol ||
-	 (variable_cost >= cnrp->variable_cost - etol
-	  && fixed_cost < cnrp->fixed_cost - etol)){
-	printf("\nBetter Solution Found:\n");
+     if (variable_cost < cnrp->variable_cost + etol){
+	if (variable_cost < cnrp->variable_cost - etol ||
+	    (variable_cost >= cnrp->variable_cost - etol
+	     && fixed_cost < cnrp->fixed_cost - etol)){
+	   printf("\nBetter Solution Found:\n");
 #ifdef ADD_FLOW_VARS
-	printf("Solution Fixed Cost: %.1f\n", fixed_cost);
-	printf("Solution Variable Cost: %.1f\n", variable_cost);
+	   printf("Solution Fixed Cost: %.1f\n", fixed_cost);
+	   printf("Solution Variable Cost: %.1f\n", variable_cost);
 #else
-	printf("Solution Cost: %.0f\n", fixed_cost);
+	   printf("Solution Cost: %.0f\n", fixed_cost);
 #endif
-	cnrp->variable_cost = variable_cost;
-	cnrp->fixed_cost = fixed_cost;
-	cnrp->ub = *true_objval;
+	   cnrp->variable_cost = variable_cost;
+	   cnrp->fixed_cost = fixed_cost;
+	   cnrp->ub = *true_objval;
+	   print_solution = TRUE;
+	}
 	/* Add an optimality cut for the second objective */
-	cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
-	new_cut->coef = NULL;
-	new_cut->rhs = (int) (fixed_cost + etol) - 1;
-	new_cut->size = 0;
-	new_cut->type = OPTIMALITY_CUT_FIXED;
-	new_cut->name = CUT__DO_NOT_SEND_TO_CP;
-	cuts += cg_send_cut(new_cut);
-	FREE(new_cut);
+	if (!branching){
+	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	   new_cut->coef = NULL;
+	   new_cut->rhs = (int) (fixed_cost + etol) - 1;
+	   new_cut->size = 0;
+	   new_cut->type = OPTIMALITY_CUT_FIXED;
+	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	   continue_with_node = cg_send_cut(new_cut);
+	   FREE(new_cut);
+	}else{
+	   continue_with_node = TRUE;
+	}
      }
   }else if ((*true_objval < cnrp->ub - etol) ||
 	    ((cnrp->par.gamma*(fixed_cost - cnrp->utopia_fixed) >
-			       *true_objval-etol)
+	      *true_objval-etol)
 	     && (variable_cost < cnrp->variable_cost + etol)) ||
 	    ((cnrp->par.tau*(variable_cost - cnrp->utopia_variable) >
 	      *true_objval - etol) && (fixed_cost <
 				       cnrp->fixed_cost + etol))){
-     printf("\nBetter Solution Found:\n");
+     if (!(*true_objval > cnrp->ub - etol &&
+	   variable_cost > cnrp->variable_cost - etol &&
+	   fixed_cost > cnrp->fixed_cost - etol)){
+	printf("\nBetter Solution Found:\n");
 #ifdef ADD_FLOW_VARS
-     printf("Solution Fixed Cost: %.1f\n", fixed_cost);
-     printf("Solution Variable Cost: %.1f\n", variable_cost);
+	printf("Solution Fixed Cost: %.1f\n", fixed_cost);
+	printf("Solution Variable Cost: %.1f\n", variable_cost);
 #else
-     printf("Solution Cost: %.0f\n", fixed_cost);
+	printf("Solution Cost: %.0f\n", fixed_cost);
 #endif
-     cnrp->variable_cost = variable_cost;
-     cnrp->fixed_cost = fixed_cost;
-     cnrp->ub = *true_objval;
-     if (cnrp->par.gamma*(fixed_cost - cnrp->utopia_fixed) >
-	 *true_objval-etol){
-	/* Add an optimality cut for the second objective */
-	cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
-	new_cut->coef = NULL;
-	new_cut->rhs = (int) (fixed_cost + etol) - 1;
-	new_cut->size = 0;
-	new_cut->type = OPTIMALITY_CUT_FIXED;
-	new_cut->name = CUT__DO_NOT_SEND_TO_CP;
-	cuts += cg_send_cut(new_cut);
-	FREE(new_cut);
+	cnrp->variable_cost = variable_cost;
+	cnrp->fixed_cost = fixed_cost;
+	cnrp->ub = *true_objval;
+	print_solution = TRUE;
+     }
+     if (!branching){
+	if (cnrp->par.gamma*(fixed_cost - cnrp->utopia_fixed) >
+	    *true_objval-etol){
+	   /* Add an optimality cut for the second objective */
+	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	   new_cut->coef = NULL;
+	   new_cut->rhs = (int) (fixed_cost + etol) - 1;
+	   new_cut->size = 0;
+	   new_cut->type = OPTIMALITY_CUT_FIXED;
+	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	   continue_with_node = cg_send_cut(new_cut);
+	   FREE(new_cut);
+	}else{
+	   /* Add an optimality cut for the second objective */
+	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	   new_cut->coef = NULL;
+	   new_cut->rhs = (int) (variable_cost + etol) - 1;
+	   new_cut->size = 0;
+	   new_cut->type = OPTIMALITY_CUT_VARIABLE;
+	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	   continue_with_node = cg_send_cut(new_cut);
+	   FREE(new_cut);
+	}
      }else{
-	/* Add an optimality cut for the second objective */
-	cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
-	new_cut->coef = NULL;
-	new_cut->rhs = (int) (variable_cost + etol) - 1;
-	new_cut->size = 0;
-	new_cut->type = OPTIMALITY_CUT_VARIABLE;
-	new_cut->name = CUT__DO_NOT_SEND_TO_CP;
-	cuts += cg_send_cut(new_cut);
-	FREE(new_cut);
+	continue_with_node = TRUE;
      }
   }
 #endif
+
+  if (!print_solution){
+     return(continue_with_node);
+  }
+     
   
   if (cnrp->par.prob_type == TSP || cnrp->par.prob_type == VRP ||
       cnrp->par.prob_type == BPP){ 
@@ -1852,7 +1881,7 @@ int construct_feasible_solution(cnrp_spec *cnrp, network *n,
      }
   }
 
-  return(cuts);
+  return(continue_with_node);
 }
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/

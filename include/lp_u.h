@@ -38,7 +38,7 @@ int user_create_subproblem PROTO((void *user, int *indices, MIPdesc *mip,
 				  int *maxn, int *maxm, int *maxnz));
 int user_is_feasible PROTO((void *user, double lpetol, int varnum,
 			    int *indices, double *values, int *feasible,
-			    double *true_objval));
+			    double *true_objval, char branching));
 int user_send_feasible_solution PROTO((void *user, double lpetol, int varnum,
 				       int *indices, double *values));
 int user_display_lp_solution PROTO((void *user, int which_sol, int varnum,

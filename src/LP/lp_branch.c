@@ -285,8 +285,14 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	    can->objval[j] = lp_data->objval;
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
-	       if (is_feasible_u(p) == IP_FEASIBLE){
+	       switch (is_feasible_u(p, TRUE)){
+
+		case IP_FEASIBLE:
 		  can->termcode[j] = LP_OPT_FEASIBLE;
+		  /* Fall through */
+		  
+		case IP_FEASIBLE_BUT_CONTINUE:
+		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
 		  /*NOTE: This is confusing but not all that citical...*/
 		  /*The "feasible" field is only filled out for the
 		    purposes of display (in vbctool) to keep track of
@@ -295,16 +301,23 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 		    branched on, we need to pass this info on to whatever
 		    candidate does get branched on so the that the fact that
 		    a feasible solution was found in presolve can be recorded*/
-		  if (best_can)
+		  if (best_can){
 		     best_can->feasible[j] = TRUE;
-		  else
+		  }else{
 		     can->feasible[j] = TRUE;
+		  }
+		  break;
+
+		default:
+		  break;
 	       }
 	    }
 #ifdef COMPILE_FRAC_BRANCHING
-	    else
-	       if (can->termcode[j] != LP_ABANDONED)
+	    else{
+	       if (can->termcode[j] != LP_ABANDONED){
 		  get_x(lp_data);
+	       }
+	    }
 	    if (can->termcode[j] != LP_ABANDONED){
 	       xind = lp_data->tmp.i1; /* n */
 	       xval = lp_data->tmp.d; /* n */
@@ -338,8 +351,13 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	    can->objval[j] = lp_data->objval;
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
-	       if (is_feasible_u(p) == IP_FEASIBLE){
+	       switch (is_feasible_u(p, TRUE)){
+		case IP_FEASIBLE:
 		  can->termcode[j] = LP_OPT_FEASIBLE;
+		  /* Fall through */
+		  
+		case IP_FEASIBLE_BUT_CONTINUE:
+		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
 		  /*NOTE: This is confusing but not all that citical...*/
 		  /*The "feasible" field is only filled out for the
 		    purposes of display (in vbctool) to keep track of
@@ -348,10 +366,15 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 		    branched on, we need to pass this info on to whatever
 		    candidate does get branched on so the that the fact that
 		    a feasible solution was found in presolve can be recorded*/
-		  if (best_can)
+		  if (best_can){
 		     best_can->feasible[j] = TRUE;
-		  else
+		  }else{
 		     can->feasible[j] = TRUE;
+		  }
+		  break;
+		  
+		default:
+		  break;
 	       }
 	    }
 #ifdef COMPILE_FRAC_BRANCHING
@@ -417,8 +440,9 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	    for (k = can->child_num - 1; k >= 0; k--){
 	       /* Again, this is only for tracking that there was a feasible
 		  solution discovered in presolve for display purposes */
-	       if (best_can->feasible[k])
+	       if (best_can->feasible[k]){
 		  can->feasible[k] = TRUE;
+	       }
 	    }
 	    free_candidate(&best_can);
 	 }
@@ -426,8 +450,9 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	 candidates[i] = NULL;
 	 break;
       }
-      if ((j & BRANCH_ON_IT))
+      if ((j & BRANCH_ON_IT)){
 	 break;
+      }
    }
 
 #if 0

@@ -86,7 +86,7 @@ int main(int argc, char **argv)
    solution_data solutions[MAX_NUM_PAIRS];
    int numsolutions = 0, numprobs = 0, numinfeasible = 0;
    solution_pairs pairs[MAX_NUM_PAIRS];
-   int numpairs = 0, cur_position = 0, first = 0, last = 0;
+   int numpairs = 0, cur_position = 0, first = 0, last = 0, previous = 0;
    int *tree;
    int solution1, solution2;
    double utopia_fixed, utopia_variable;
@@ -144,11 +144,19 @@ int main(int argc, char **argv)
    compare_sol_tol = cnrp->par.compare_solution_tolerance;
 
 #ifdef BINARY_SEARCH
-   printf("Using binary search with tolerance = %f\n\n",
+   printf("Using binary search with tolerance = %f...\n",
 	  cnrp->par.binary_search_tolerance);
 #endif
-
+#ifdef LIFO
+   printf("Using LIFO search order...\n");
+#endif
+   if (cnrp->lp_par.rho > 0){
+      printf("Using secondary objective weight %f...\n", cnrp->lp_par.rho);
+   }
+   printf("\n");
+   
 #ifdef SAVE_CUT_POOL
+   printf("Saving the global cut pool between iterations...\n");
    if (p->par.tm_par.max_cp_num){
       cp = (cut_pool **) malloc(p->par.tm_par.max_cp_num*sizeof(cut_pool *));
       for (i = 0; i < p->par.tm_par.max_cp_num; i++){
@@ -347,19 +355,24 @@ int main(int argc, char **argv)
 #endif
       
       /* Insert new solution */
-      if (last + 2 > MAX_NUM_PAIRS - 1){
+      if (last + 2 == MAX_NUM_PAIRS){
+	 last = 0;
+	 previous = MAX_NUM_PAIRS - 1;
+      }else if (last + 2 == MAX_NUM_PAIRS + 1){
 	 last = 1;
+	 previous = 0;
       }else{
 	 last += 2;
+	 previous = last - 1;
       }
 #ifdef BINARY_SEARCH
-      pairs[last - 1].gamma1 = pairs[cur_position].gamma1;
-      pairs[last - 1].gamma2 = gamma;
+      pairs[previous].gamma1 = pairs[cur_position].gamma1;
+      pairs[previous].gamma2 = gamma;
       pairs[last].gamma1 = gamma;
       pairs[last].gamma2 = pairs[cur_position].gamma2;
 #endif
-      pairs[last - 1].solution1 = solution1;
-      pairs[last - 1].solution2 = solution2;
+      pairs[previous].solution1 = solution1;
+      pairs[previous].solution2 = solution2;
       pairs[last].solution1 = solution2;
       pairs[last].solution2 = solution2+1;
       numpairs += 2;
@@ -386,24 +399,35 @@ int main(int argc, char **argv)
       solutions[solution2].variable_cost = cnrp->variable_cost;
    }
 
-   if (numpairs >= MAX_NUM_PAIRS){
-      printf("Maximum number of solution pairs exceeded\n\n");
-   }
-   
-   if (numpairs >= MAX_NUM_SOLUTIONS){
-      printf("Maximum number of solutions exceeded\n\n");
+   printf("\n********************************************************\n");
+
+   if (numsolutions >= MAX_NUM_SOLUTIONS){
+      printf("Maximum number of solutions (%i) reached\n\n",
+	     MAX_NUM_SOLUTIONS);
    }
 
-   if (numpairs >= MAX_NUM_INFEASIBLE){
-      printf("Maximum number of infeasible subproblems exceeded\n\n");
+   if (numinfeasible >= MAX_NUM_INFEASIBLE){
+      printf("Maximum number of infeasible subproblems (%i) reached\n\n",
+	     MAX_NUM_INFEASIBLE);
    }
    
-   printf("\n********************************************************\n");
+   if (numpairs >= MAX_NUM_PAIRS){
+      printf("Maximum number of solution pairs (%i) reached\n\n",
+	     MAX_NUM_PAIRS);
+      printf("\n********************************************************\n");
 #ifdef FIND_NONDOMINATED_SOLUTIONS
-   printf(  "* Found complete set of non-dominated solutions!!!!!!! *\n");
+      printf(  "* Found set of non-dominated solutions!!!!!!! *\n");
 #else
-   printf(  "* Found complete set of supported solutions!!!!!!!     *\n");
+      printf(  "* Found set of supported solutions!!!!!!!     *\n");
 #endif
+   }else{
+      printf("\n********************************************************\n");
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+      printf(  "* Found complete set of non-dominated solutions!!!!!!! *\n");
+#else
+      printf(  "* Found complete set of supported solutions!!!!!!!     *\n");
+#endif
+   }
    printf(  "* Now displaying stats...                              *\n");
    printf(  "********************************************************\n\n");
 
@@ -419,7 +443,7 @@ int main(int argc, char **argv)
    print_statistics(&(p->comp_times.bc_time), &(p->stat), 0.0, 0.0, 0,
 		    start_time);
 
-   printf("\nNumber of subproblem solved: %i\n", numprobs);
+   printf("\nNumber of subproblems solved: %i\n", numprobs);
    printf("Number of solutions found: %i\n\n", numsolutions);
    
    printf("***************************************************\n");
@@ -447,12 +471,12 @@ int main(int argc, char **argv)
 #endif
       printf("Fixed Cost: %.3f Variable Cost: %.3f ",
 	     solutions[i].fixed_cost, solutions[i].variable_cost);
-      printf("Range: %.2f - %.2f\n", gamma1, gamma0);
+      printf("Range: %.6f - %.6f\n", gamma1, gamma0);
       gamma0 = gamma1;
    }
    printf("Fixed Cost: %.3f Variable Cost: %.3f ",
 	  solutions[i].fixed_cost, solutions[i].variable_cost);
-   printf("Range: %.2f - %.2f\n", 0.0, gamma0);
+   printf("Range: %.6f - %.6f\n", 0.0, gamma0);
    
    FREE(root->desc);
    FREE(root->uind.list);

@@ -497,7 +497,7 @@ int create_subproblem_u(lp_prob *p)
 
 /*===========================================================================*/
 
-int is_feasible_u(lp_prob *p)
+int is_feasible_u(lp_prob *p, char branching)
 {
 #ifndef COMPILE_IN_LP
    int s_bufid;
@@ -519,7 +519,7 @@ int is_feasible_u(lp_prob *p)
    cnt = collect_nonzeros(p, lp_data->x, indices, values);
 
    user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
-			       &feasible, &true_objval);
+			       &feasible, &true_objval, branching);
    switch (user_res){
     case USER_ERROR: /* Error. Consider as feasibility not recognized. */
       return(FALSE);
@@ -998,6 +998,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
    for (i = can->child_num-1; i >= 0; i--){
       switch (can->termcode[i]){
        case LP_OPTIMAL:
+       case LP_OPT_FEASIBLE_BUT_CONTINUE:
 	 break;
        case LP_OPT_FEASIBLE:
        case LP_D_UNBOUNDED:
@@ -1022,13 +1023,17 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
     * MAYBE THIS SHOULD BE LEFT TO THE USER ?????????????????
    \*------------------------------------------------------------------------*/
 
-   for (i = can->child_num-1; i >= 0; i--)
+   for (i = can->child_num-1; i >= 0; i--){
       if (! (can->termcode[i] == LP_D_UNBOUNDED ||
 	     can->termcode[i] == LP_D_OBJLIM ||
 	     can->termcode[i] == LP_OPT_FEASIBLE ||
+	     can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE ||
 	     (can->termcode[i] == LP_OPTIMAL && p->has_ub &&
-	      can->objval[i] > p->ub - p->par.granularity))) break;
-
+	      can->objval[i] > p->ub - p->par.granularity))){
+	 break;
+      }
+   }
+   
    if (i < 0){
       /* i.e., we did not break, i.e., we'll select this cand */
       return(SECOND_CANDIDATE_BETTER_AND_BRANCH_ON_IT);
@@ -1147,6 +1152,14 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
    }
 #endif
 
+   for (ind = -1, i = 0; i < can->child_num; i++){
+      action[i] = RETURN_THIS_CHILD;
+      if (p->lp_data->nf_status == NF_CHECK_NOTHING && p->has_ub){
+ 	    if (can->objval[i] > p->ub - p->par.granularity)
+	       action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
+      }
+   }
+
    user_res = user_select_child(p->user, p->ub, can, action);
 
    switch(user_res){
@@ -1165,8 +1178,6 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
 
    switch(user_res){
     case PREFER_LOWER_OBJ_VALUE:
-      for (i = can->child_num-1; i >= 0; i--)
-	 action[i] = RETURN_THIS_CHILD;
       for (ind = 0, i = can->child_num-1; i; i--){
 	 if (can->objval[i] < can->objval[ind])
 	    ind = i;
@@ -1178,8 +1189,6 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
       break;
 
     case PREFER_HIGHER_OBJ_VALUE:
-      for (i = can->child_num-1; i >= 0; i--)
-	 action[i] = RETURN_THIS_CHILD;
       for (ind = 0, i = can->child_num-1; i; i--){
 	 if ((can->objval[i] > can->objval[ind]) &&
 	     (! p->has_ub ||
@@ -1195,8 +1204,6 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
       
 #ifdef COMPILE_FRAC_BRANCHING
     case PREFER_MORE_FRACTIONAL:
-      for (i = can->child_num-1; i >= 0; i--)
-	 action[i] = RETURN_THIS_CHILD;
       for (ind = 0, i = can->child_num-1; i; i--){
 	 if ((can->frac_num[i] > can->frac_num[ind]) &&
 	     (! p->has_ub ||
@@ -1211,8 +1218,6 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
       break;
 
     case PREFER_LESS_FRACTIONAL:
-      for (i = can->child_num-1; i >= 0; i--)
-	 action[i] = RETURN_THIS_CHILD;
       for (ind = 0, i = can->child_num-1; i; i--){
 	 if ((can->frac_num[i] < can->frac_num[ind]) &&
 	     (! p->has_ub ||
@@ -1234,13 +1239,6 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
     default:
       /* Unexpected return value. Do something!! */
       break;
-   }
-
-   /* Throw out the fathomable ones. */
-   if (p->lp_data->nf_status == NF_CHECK_NOTHING && p->has_ub){
-      for (ind = 0, i = can->child_num-1; i >= 0; i--)
-	 if (can->objval[i] > p->ub - p->par.granularity)
-	    action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
    }
 }
 
