@@ -374,6 +374,7 @@ int receive_feasible_solution_u(sym_environment *env, int msgtag)
       env->has_ub = TRUE;
       env->ub = env->best_sol.objval;
    }
+   env->best_sol.has_sol = TRUE;
    
    switch (msgtag){
     case FEASIBLE_SOLUTION_NONZEROS:

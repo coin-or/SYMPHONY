@@ -821,7 +821,26 @@ char process_messages(tm_prob *tm, int r_bufid)
 #ifdef COMPILE_IN_TM
        case FEASIBLE_SOLUTION_NONZEROS:
        case FEASIBLE_SOLUTION_USER:
+	 receive_int_array(&(tm->best_sol.xlevel), 1);
+	 receive_int_array(&(tm->best_sol.xindex), 1);
+	 receive_int_array(&(tm->best_sol.xiter_num), 1);
+	 receive_dbl_array(&(tm->best_sol.lpetol), 1);
+	 receive_dbl_array(&(tm->best_sol.objval), 1);
+	 receive_int_array(&(tm->best_sol.xlength), 1);
+	 if (tm->best_sol.xlength > 0){
+	    FREE(tm->best_sol.xind);
+	    FREE(tm->best_sol.xval);
+	    tm->best_sol.xind = (int *) malloc(tm->best_sol.xlength*ISIZE);
+	    tm->best_sol.xval = (double *) malloc(tm->best_sol.xlength*DSIZE);
+	    receive_int_array(tm->best_sol.xind, tm->best_sol.xlength);
+	    receive_dbl_array(tm->best_sol.xval, tm->best_sol.xlength);
+	 }
+	 if (!tm->has_ub || tm->best_sol.objval < tm->ub){
+	    tm->has_ub = TRUE;
+	    tm->ub = tm->best_sol.objval;
+	 }
 	 break;
+	 tm->best_sol.has_sol = TRUE;
 #endif
 	 
        case UPPER_BOUND:

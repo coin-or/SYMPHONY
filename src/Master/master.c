@@ -930,6 +930,13 @@ int sym_solve(sym_environment *env)
 	 env->tm->lpp[thread_num]->best_sol = env->best_sol;
       }
    }
+#elif defined(COMPILE_IN_TM)
+   if (env->tm->best_sol.has_sol){
+      FREE(env->best_sol.xind);
+      FREE(env->best_sol.xval);
+      env->best_sol = env->warm_start->best_sol = 
+	 env->tm->best_sol;
+   }
 #else
    env->warm_start->best_sol = env->best_sol;
 #endif

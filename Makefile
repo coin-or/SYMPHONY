@@ -38,7 +38,7 @@
 # library. 
 ##############################################################################
 
-ARCH = LINUX
+ARCH = CYGWIN
 
 ##############################################################################
 # If you have PVM installed, this will set the variable ARCH automatically.
@@ -335,7 +335,7 @@ OPT = -O
 
 SYM_COMPILE_IN_CG = TRUE
 SYM_COMPILE_IN_CP = TRUE
-SYM_COMPILE_IN_LP = TRUE
+SYM_COMPILE_IN_LP = FALSE
 SYM_COMPILE_IN_TM = TRUE
 
 ##############################################################################
@@ -1448,8 +1448,9 @@ $(BINDIR)/symphony_lp$(LPEXT) : $(USER_LP_DEP) $(USER_LP_OBJS) $(LIBDIR)/libsym_
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_LP_OBJS) -lsym_lp$(LPEXT) \
-	$(LPLIB) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ \
+	$(USER_LP_OBJS) -lsym_lp$(LPEXT) $(LPLIB) $(LIBS) \
+	$(USER_LP_OBJS) -lsym_lp$(LPEXT) $(LPLIB) $(LIBS)
 	@echo ""
 
 $(LIBDIR)/libsym_lp$(LPEXT).a : $(LP_DEP) $(LP_OBJS) $(GMPL_OBJ) 
