@@ -243,7 +243,7 @@ void fathom_branch(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    node_times *comp_times = &p->comp_times;
    char first_in_loop = TRUE;
-   int iterd, termcode;
+   int iterd, termcode, i;
    int cuts, no_more_cuts_count;
    int num_errors = 0;
 
@@ -1143,7 +1143,10 @@ int check_tailoff(lp_prob *p)
       is greater than obj_frac */
    if (obj_backsteps > 1){
       for (i = 2, sum = 0; i <= obj_backsteps; i++)
-	 sum += (obj_hist[i-2]-obj_hist[i-1]) / (obj_hist[i-1]-obj_hist[i]);
+	 if (obj_hist[i-1] - obj_hist[i] > 0)
+	    sum += (obj_hist[i-2]-obj_hist[i-1]) / (obj_hist[i-1]-obj_hist[i]);
+	 else
+	    sum += 1;
       if (sum / (obj_backsteps - 1) > p->par.tailoff_obj_frac)
 	 return(FALSE); /* no tailoff */
    }

@@ -93,7 +93,7 @@ LP_SOLVER = NONE
 ##############################################################################
 
 #Uncomment the line below if you want to use OSL.
-#LP_SOLVER = OSL
+LP_SOLVER = OSL
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSL)
@@ -107,7 +107,7 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use CPLEX.
-LP_SOLVER = CPLEX
+#LP_SOLVER = CPLEX
 
 ifeq ($(LP_SOLVER),CPLEX)
 	LPINCDIR = -I/usr/local/include/

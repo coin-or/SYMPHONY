@@ -165,33 +165,6 @@ int check_row_effectiveness(lp_prob *p)
  	    }else{
  	       rows[i].eff_cnt++;
 	    }
-#if 0
-	    switch (rows[i].cut->sense){
-	     case 'E':
-	       if (dualsol[i] > -lpetol && dualsol[i] < lpetol){ 
-		  now_ineff[ineffective++] = i;
-	       }else{
-		  rows[i].eff_cnt++;
-	       }
-	       break;
-	     case 'L':
-	       if (dualsol[i] > -lpetol){ 
-		  now_ineff[ineffective++] = i;
-	       }else{
-		  rows[i].eff_cnt++;
-	       }
-	       break;
-	     case 'G':
-	       if (dualsol[i] < lpetol){ 
-		  now_ineff[ineffective++] = i;
-	       }else{
-		  rows[i].eff_cnt++;
-	       }
-	       break;
-	     case 'R':
-	       break;
-	    }
-#endif
 	 }
 	 break;
       }
