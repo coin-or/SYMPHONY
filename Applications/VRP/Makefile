@@ -92,11 +92,13 @@ USER_DG_SRC       = vrp_dg.c vrp_dg_network.c $(MACROS_SRC)
 ALL_USER_SRC      = $(MACROS_SRC) $(COST_SRC) $(NET_SRC) $(DG_FUNC_SRC)
 ALL_USER_SRC     += vrp_main.c vrp_lp_branch.c vrp_lp.c
 ALL_USER_SRC     += vrp_master.c vrp_io.c vrp_master_functions.c
-ALL_USER_SRC     += start_heurs.c lower_bound.c route_heur.c exchange_heur.c
-ALL_USER_SRC     += cluster_heur.c receive_rout.c small_graph.c
 ALL_USER_SRC     += vrp_cg.c biconnected.c
 ALL_USER_SRC     += compute_cost.c decomp_user.c vrp_dg.c heur_routines.c
 ALL_USER_SRC     += vrp_cp.c vrp_dg.c vrp_dg_network.c 
+#__BEGIN_EXPERIMENTAL_SECTION__#
+ALL_USER_SRC     += start_heurs.c lower_bound.c route_heur.c exchange_heur.c
+ALL_USER_SRC     += cluster_heur.c receive_rout.c small_graph.c
+#__END_EXPERIMENTAL_SECTION__#
 
 USER_INCDIR       =
 
@@ -347,7 +349,7 @@ endif
 ifeq ($(COMPILE_OUR_DECOP),TRUE)
 USER_INCDIR      += -I$(USER_ROOT)/include/decomp
 endif
-#___END_EXPERIMENTAL_SECTION___#
+#__END_EXPERIMENTAL_SECTION__#
 
 ##############################################################################
 # This is the flag for the SYMPHONY Makefile to determine whether
@@ -582,6 +584,6 @@ clean_decomp:
 	rm -f $(USER_OBJDIR)/my_decomp_user.o 
 	$(USER_OBJDIR)/decomp_lower_bound.o
 
-#___END_EXPERIMENTAL_SECTION___#
+#__END_EXPERIMENTAL_SECTION__#
 
 
