@@ -1,0 +1,47 @@
+#!/bin/tcsh -f
+#cd ~/BlackBox/Vrp/tsp_par
+#foreach file (*.par)
+#foreach file (A-n36-k5 A-n37-k5 A-n37-k6 A-n38-k5 A-n44-k7 A-n46-k7 A-n53-k7 A-n55-k9)
+#foreach file (B-n57-k9 B-n67-k10 B-n50-k8 B-n63-k10 B-n68-k9 B-n66-k9 B-n78-k10)
+
+#Difficult, but solved problems
+#foreach file (B-n67-k10 A-n37-k6 A-n65-k9 B-n57-k9 F-n135-k7 B-n63-k10 A-n45-k7 A-n54-k7 A-n61-k9)
+
+#Unsolved problems
+#foreach file (A-n60-k9 A-n62-k8 A-n63-k10 A-n63-k9 A-n64-k9 A-n69-k9 A-n80-k10B-n50-k8 B-n66-k9 B-n68-k9 B-n78-k10)
+
+#foreach file (eil13 eil22 eil23 eil30 eil31 eil33 bayg29 bays29 ulysses16 ulysses22 gr17 gr21 gr24 fri26 swiss42 gr48 hk48 att48 eil51)
+#foreach file (eil13 eil22 eil23 eil30 eil31 eil33 bayg29 bays29 ulysses16 ulysses22 gr17 gr21 gr24 fri26)
+#foreach file (swiss42 gr48 hk48 att48 eil51 dantzig42)
+
+#Standard test set
+#dantzig42 B/B-n45-k6
+foreach file (eil13 eil22 eil23 eil30 eil31 eil33 bayg29 bays29 ulysses16 ulysses22 gr17 gr21 gr24 fri26 swiss42 gr48 hk48 att48 eil51 A/A-n32-k5 A/A-n33-k5 A/A-n33-k6 A/A-n34-k5 A/A-n36-k5 A/A-n37-k5 A/A-n38-k5 A/A-n39-k5 A/A-n39-k6 A/A-n45-k6 A/A-n46-k7 B/B-n31-k5 B/B-n34-k5 B/B-n35-k5 B/B-n38-k6 B/B-n39-k5 B/B-n41-k6 B/B-n43-k6 B/B-n44-k7 B/B-n45-k5 B/B-n50-k7 B/B-n51-k7 B/B-n52-k7 B/B-n56-k7 B/B-n64-k9 A/A-n48-k7 A/A-n53-k7)# A/A-n44-k6 A/A-n55-k9 B/B-n57-k7) 
+
+#foreach file (eil13 eil22 eil33 bayg29 bays29 ulysses16 ulysses22 gr17 gr21 gr24 fri26 swiss42 gr48 hk48 att48 eil51 A/A-n32-k5 A/A-n33-k5 A/A-n34-k5 A/A-n36-k5 A/A-n37-k5 A/A-n38-k5 A/A-n39-k5 A/A-n45-k6 A/A-n46-k7 B/B-n31-k5 B/B-n35-k5 B/B-n38-k6 B/B-n39-k5 B/B-n41-k6 B/B-n43-k6 B/B-n45-k5 B/B-n51-k7 B/B-n52-k7 B/B-n56-k7 A/A-n44-k6 A/A-n48-k7 A/A-n53-k7) 
+
+#foreach file (M/M-n101-k10 F/F-n45-k4 F/F-n72-k4 F/F-n45-k4)
+
+#foreach file (B/B-n67-k10 A/A-n37-k6 A/A-n65-k9 B/B-n57-k9 B/B-n63-k10 A/A-n45-k7 A/A-n54-k7 A/A-n61-k9)
+
+#M-n101-k10 F-n45-k4 F-n72-k4 F-n135-k7
+
+#foreach file (burma14 ulysses16 gr17 gr21 ulysses22 gr24 fri26 bayg29 bays29 dantzig42 swiss42 att48 gr48 hk48 eil51 berlin52 brazil58 st70 eil76 pr76 gr96 rat99 kroA100 kroB100 kroC100 kroD100 kroE100 rd100 eil101 lin105 pr107 gr120 pr124 bier127 ch130 pr136 gr137 pr144 ch150 kroA150 kroB150 pr152 u159 si175 brg180 rat195 d198 kroA200 kroB200 gr202 pr226 gr229 gil262 pr264 a280 pr299 lin318 linhp318 rd400) #fl417 gr431 pr439 pcb442 d493)
+
+#foreach file (st70 pr76 kroB100 kroC100 kroE100 gr120 pr124 ch130 pr136 gr137 pr144 ch150 kroA150 kroB150 pr152 pr226 a280)
+
+#foreach file (B-n31-k5 B-n35-k5 B-n38-k6 B-n39-k5 B-n41-k6 B-n44-k7 B-n45-k5 B-n50-k7 B-n51-k7 B-n52-k7 B-n56-k7 B-n64-k9)
+
+#foreach file (A-n32-k5 A-n33-k5 A-n33-k6 A-n34-k5 A-n36-k5 A-n37-k5)
+
+echo ====================== $file:r ======================= 
+echo
+/home/tkr/SYMPHONY/Vrp/bin.LINUX/CPLEX/vrp -F /home/tkr/vrplib/$file.vrp -S /home/tkr/small_graph/$file.sg 
+/home/tkr/SYMPHONY/Vrp/bin.LINUX/OSI_CPLEX/vrp -F /home/tkr/vrplib/$file.vrp -S /home/tkr/small_graph/$file.sg 
+/home/tkr/SYMPHONY/Vrp/bin.LINUX/OSI_OSL/vrp -F /home/tkr/vrplib/$file.vrp -S /home/tkr/small_graph/$file.sg 
+/home/tkr/SYMPHONY/Vrp/bin.LINUX/OSI_CLP/vrp -F /home/tkr/vrplib/$file.vrp -S /home/tkr/small_graph/$file.sg 
+/home/tkr/SYMPHONY/Vrp/bin.LINUX/OSI_GLPK/vrp -F /home/tkr/vrplib/$file.vrp -S /home/tkr/small_graph/$file.sg 
+echo
+
+end
+
