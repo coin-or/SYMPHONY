@@ -95,6 +95,8 @@ int main(int argc, char **argv)
        } else if (strcmp(key, "load") == 0){ 
 	 if(env->mip->n){
 	   free_master_u(env);
+	   strcpy(env->par.infile, "");
+	   strcpy(env->par.datafile, "");
 	   env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
 	 }
 	 printf("Name of the file: ");
