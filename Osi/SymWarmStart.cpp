@@ -74,7 +74,7 @@ void SymWarmStart::trimTree(bc_node * node)
 
 bool SymWarmStart::writeToFile(char * fileName)
 {
-   sym_write_warm_start_desc(warmStart_, fileName);
+   return(sym_write_warm_start_desc(warmStart_, fileName));
 }
 
 /*===========================================================================*/
