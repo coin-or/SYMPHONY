@@ -944,7 +944,6 @@ int sym_create_permanent_cut_pools(problem *p)
 	 p->cp[i]->par = p->par.cp_par;
 	 CALL_USER_FUNCTION( user_send_cp_data(p->user, &p->cp[i]->user) );
       }
-      get_cp_ptr(p->cp, 0);
       return(p->par.tm_par.max_cp_num);
    }else{
       return(0);

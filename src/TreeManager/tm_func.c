@@ -204,7 +204,6 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #endif
 	 cp_initialize(tm->cpp[i], tm->master);
       }
-      get_cp_ptr(tm->cpp, 0);
       tm->cp.free_num = par->max_cp_num;
       tm->cp.procnum = par->max_cp_num;
       tm->cp.free_ind = (int *) malloc(par->max_cp_num * ISIZE);

@@ -48,6 +48,15 @@ COMPILE_IN_CG = TRUE
 COMPILE_IN_CP = TRUE
 
 ##############################################################################
+# If you wish to compile and use the SYMPHONY callable library therough the 
+# SYMPHONY OSI interface, set USE_OSI_INTERFACE to TRUE below. Note that
+# you must have COIN installed to use this capability. See the main SYMPHONY
+# Makefile to set the path to the COIN directories.
+##############################################################################
+
+USE_OSI_INTERFACE = TRUE
+
+##############################################################################
 # This section is for listing VRP source file names
 ##############################################################################
 
@@ -56,7 +65,8 @@ COST_SRC          = compute_cost.c
 NET_SRC           = network.c
 DG_FUNC_SRC       = vrp_dg_functions.c 
 
-USER_MASTER_SRC   = vrp_master.c vrp_io.c vrp_master_functions.c small_graph.c
+USER_MASTER_SRC   = vrp_main.c vrp_master.c vrp_io.c vrp_master_functions.c 
+USER_MASTER_SRC  += small_graph.c
 USER_MASTER_SRC  += $(COST_SRC)
 ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)
@@ -89,7 +99,7 @@ USER_CP_SRC       = vrp_cp.c $(MACROS_SRC)
 USER_DG_SRC       = vrp_dg.c vrp_dg_network.c $(MACROS_SRC)
 
 ALL_USER_SRC      = $(MACROS_SRC) $(COST_SRC) $(NET_SRC) $(DG_FUNC_SRC)
-ALL_USER_SRC     += vrp_lp_branch.c vrp_lp.c
+ALL_USER_SRC     += vrp_main.c vrp_lp_branch.c vrp_lp.c
 ALL_USER_SRC     += vrp_master.c vrp_io.c vrp_master_functions.c
 ALL_USER_SRC     += start_heurs.c lower_bound.c route_heur.c exchange_heur.c
 ALL_USER_SRC     += cluster_heur.c receive_rout.c small_graph.c

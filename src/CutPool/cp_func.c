@@ -38,25 +38,6 @@
  * This file contains general functions used by the cut pool process.
 \*===========================================================================*/
 
-/*===========================================================================*\
- * This small function simply returns a pointer to the current cut pool 
- * so that it can be accessed from anywhere within the CP  
- * without explicitly passing a pointer. This is essentially only uselful    
- * to the more advanced user sho wishes to have access to the internal data  
- * structures                                                                
-\*===========================================================================*/
-
-cut_pool *get_cp_ptr(cut_pool **cp_list, int index)
-{
-   static cut_pool **cp;
-
-   if (cp_list){
-      cp = cp_list;
-   }
-   
-   return(cp[index]);
-}
-
 /*===========================================================================*/
 
 void cp_initialize(cut_pool *cp, int master_tid)

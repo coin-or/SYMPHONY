@@ -126,6 +126,20 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
    vrp_readparams(vrp, filename, argc, argv);
 
+   if (vrp->par.use_small_graph == LOAD_SMALL_GRAPH){
+      read_small_graph(vrp);
+      vrp->numroutes = vrp->cur_tour->numroutes;
+   }
+
+   /* Selects the cheapest edges adjacent to each node for the base set */
+
+   if (vrp->par.use_small_graph == SAVE_SMALL_GRAPH){
+      if (!vrp->g) make_small_graph(vrp, 0);
+      save_small_graph(vrp);
+   }else if (!vrp->g){
+      make_small_graph(vrp, 0);
+   }
+
    return(USER_SUCCESS);
 }
 
@@ -161,19 +175,14 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
 
    if (*ub > 0){
       vrp->cur_tour->cost = (int) (*ub);
+   }else if (vrp->cur_tour->cost > 0){
+      *ub = (int)(vrp->cur_tour->cost);
    }else{
       vrp->cur_tour->cost = MAXINT;
    }
 
    vrp->cur_tour->numroutes = vrp->numroutes;
    
-   if (vrp->par.use_small_graph == LOAD_SMALL_GRAPH){
-      read_small_graph(vrp);
-      if (*ub <= 0 && vrp->cur_tour->cost > 0)
-	 *ub = (int)(vrp->cur_tour->cost);
-      vrp->numroutes = vrp->cur_tour->numroutes;
-   }
-
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    if(vrp->par.bpp_prob)
       *ub = 1;
@@ -219,15 +228,6 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
       printf("INITIAL UPPER BOUND: \tNone\n\n");
 #endif
    
-   /* Selects the cheapest edges adjacent to each node for the base set */
-
-   if (vrp->par.use_small_graph == SAVE_SMALL_GRAPH){
-      if (!vrp->g) make_small_graph(vrp, 0);
-      save_small_graph(vrp);
-   }else if (!vrp->g){
-      make_small_graph(vrp, 0);
-   }
-
    return(USER_SUCCESS);
 }
 

@@ -496,8 +496,6 @@ int send_cp_data_u(problem *p, int sender)
       tm->cpp[i]->par = p->par.cp_par;
       CALL_USER_FUNCTION( user_send_cp_data(p->user, &p->tm->cpp[i]->user) );
    }
-   if (p->par.tm_par.max_cp_num)
-      get_cp_ptr(tm->cpp, 0);
 #else
    int s_bufid;
 
