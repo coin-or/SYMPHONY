@@ -146,4 +146,4 @@ foreach app (VRP MATCH MPP SPP SPP+CUTS)
 mv $app-$VER $DIR
 end
 scp $DIR/*.zip $DIR/*.tgz branchandcut@branchandcut.org:www/SYMPHONY/Download/
-scp $DIR/Doc/*.zip $DIR/Doc/*.tgz branchandcut@branchandcut.org:anonftp/pub/reference/
+scp $DIR/Doc/*.zip $DIR/Doc/*.tgz $DIR/Doc/*.pdf $DIR/Doc/*.ps branchandcut@branchandcut.org:anonftp/pub/reference/
