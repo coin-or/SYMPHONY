@@ -31,6 +31,9 @@
  * SUCH DAMAGE.
  */
 
+
+
+
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)qsort.c	5.9 (Berkeley) 2/23/91";
 #endif /* LIBC_SCCS and not lint */
@@ -40,11 +43,11 @@ static char sccsid[] = "@(#)qsort.c	5.9 (Berkeley) 2/23/91";
 
 #include "qsortucb.h"
 
-void qsortucb(bot, nmemb, size, compar)
-	char *bot;
-	unsigned int nmemb;
-	int size;
-	int (*compar)(const void *, const void *);
+
+void qsortucb(	char *bot,
+		unsigned int nmemb,
+		int size,
+	int (*compar)(const void *, const void *))
 {
 	if (nmemb <= 1)
 		return;
@@ -97,10 +100,8 @@ void qsortucb(bot, nmemb, size, compar)
 }
 
 void
-quick_sort(bot, nmemb, size, compar)
-	register char *bot;
-	register unsigned int nmemb;
-	int size, (*compar)(const void *, const void *);
+quick_sort(register char *bot, register unsigned int nmemb,
+	   int size, int (*compar)(const void *, const void *))
 {
 	register int cnt;
 	register unsigned char ch;
@@ -231,11 +232,11 @@ swap:		SWAP(bot, replace);
 }
 
 void
-insertion_sort(bot, nmemb, size, compar)
-	char *bot;
-	register unsigned int nmemb;
-	int size;
-        int (*compar)(const void *, const void *);
+insertion_sort(
+	       char *bot,
+	       register unsigned int nmemb,
+	       int size,
+	       int (*compar)(const void *, const void *))
 {
 	register int cnt;
 	register unsigned char ch;
@@ -262,3 +263,4 @@ insertion_sort(bot, nmemb, size, compar)
 			t1 += size;
 	}
 }
+

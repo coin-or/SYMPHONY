@@ -66,7 +66,7 @@ int user_receive_cg_data(void **user, int dg_id)
    /* This is the user-defined data structure, a pointer to which will
       be passed to each user function. It must contain all the
       problem-specific data needed for computations within the CG */
-   cg_vrp_spec *vrp = (void *) malloc(sizeof(cg_vrp_spec));
+   cg_vrp_spec *vrp = (cg_vrp_spec *) malloc(sizeof(cg_vrp_spec));
    int edgenum;
 
    *user = vrp;
@@ -351,13 +351,14 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #if 0
 	    vrp->par.do_greedy){
 #endif
-	    compnodes_copy = memcpy((char *)compnodes_copy, (char*)compnodes,
-				    (vertnum+1)*sizeof(int));
+	    compnodes_copy = (int *) memcpy((char *)compnodes_copy, 
+					    (char*)compnodes,
+					    (vertnum+1)*sizeof(int));
 	    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	    compdemands_copy = memcpy((char *)compdemands_copy,
-				      (char *)compdemands, (vertnum+1)*ISIZE);
-	    compcuts_copy = memcpy((char *)compcuts_copy,
-				   (char *)compcuts, (vertnum+1)*DSIZE);
+	    compdemands_copy = (int *) memcpy((char *)compdemands_copy,
+				       (char *)compdemands, (vertnum+1)*ISIZE);
+	    compcuts_copy = (int *) memcpy((char *)compcuts_copy,
+				    (char *)compcuts, (vertnum+1)*DSIZE);
 	    /*___END_EXPERIMENTAL_SECTION___*/
 	    n->compnodes = compnodes_copy;
 	    comp_num = rcnt;
@@ -400,8 +401,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		      the component but decrease the value of the cut*/
 		  cur_bins = BINS(compdemands[i+1], capacity);/*the current
 						    number of trucks required*/
-		  cur_slack = compcuts[i+1] - 2*cur_bins;/*current slack in the
-							   constraint*/
+		  /*current slack in the constraint*/
+		  cur_slack = (int) (compcuts[i+1] - 2*cur_bins);
 		  while (compnodes[i+1]){/*while there are still nodes in the
 					   component*/
 		     for (max_node = 0, max_node_cut = 0, k = 1;
@@ -434,7 +435,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		     compnodes[i+1]--;
 		     compdemands[i+1] -= verts[max_node].demand;
 		     compcuts[i+1] -= max_node_cut;
-		     cur_slack -= max_node_cut;
+		     cur_slack -= (int) max_node_cut;
 		     verts[max_node].comp = 0;
 		     coef_list[i][max_node >> DELETE_POWER] ^=
 			(1 << (max_node & DELETE_AND));
@@ -483,7 +484,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
 
    if (num_cuts < 10 && vrp->par.do_greedy){
-      coef = malloc(cut_size * sizeof(char)); 
+      coef = (char *) malloc(cut_size * sizeof(char)); 
       for (cur_edge=verts[0].first; cur_edge; cur_edge=cur_edge->next_edge){
 	 for (cur_edge1 = cur_edge->other->first; cur_edge1;
 	      cur_edge1 = cur_edge1->next_edge){

@@ -144,7 +144,7 @@ int cut_quality_cmp(const void *cut0ptr, const void *cut1ptr)
    cp_cut_data *cut0 = *((cp_cut_data **)cut0ptr);
    cp_cut_data *cut1 = *((cp_cut_data **)cut1ptr);
 
-   return(1000*(cut1->quality - cut0->quality));
+   return((int)(1000*(cut1->quality - cut0->quality)));
 }
 
 /*===========================================================================*/
@@ -243,7 +243,7 @@ int delete_ineffective_cuts(cut_pool *cp)
    int min_to_delete = cp->par.min_to_delete;
 
    if (min_to_delete > cp->cut_num)
-      min_to_delete = 0.2*cp->cut_num;
+      min_to_delete = (int)(0.2*cp->cut_num);
    
    switch (cp->par.delete_which){
 
@@ -538,7 +538,7 @@ int read_cp_cut_list(cut_pool *cp, char *file)
       cp->cuts[i]->cut.type = (char) tmp1;
       cp->cuts[i]->cut.branch = (char) tmp2;
       cp->cuts[i]->cut.coef =
-	 malloc(cp->cuts[i]->cut.size*sizeof(char));
+	 (char *) malloc(cp->cuts[i]->cut.size*sizeof(char));
       for (j = 0; j < cp->cuts[i]->cut.size; j++){
 	 fscanf(f, "%i ", &tmp1);
 	 cp->cuts[i]->cut.coef[j] = (char) tmp1;
@@ -574,7 +574,8 @@ int cp_read_tm_cut_list(cut_pool *cp, char *file)
 	     &tmp2, &cp->cuts[i]->cut.rhs, &cp->cuts[i]->cut.range);
       cp->cuts[i]->cut.type = (char)tmp1;
       cp->cuts[i]->cut.branch = (char)tmp2;
-      cp->cuts[i]->cut.coef = malloc(cp->cuts[i]->cut.size*sizeof(char));
+      cp->cuts[i]->cut.coef = 
+	(char *) malloc(cp->cuts[i]->cut.size*sizeof(char));
       cp->size += cp->cuts[i]->cut.size + sizeof(cp_cut_data);
       for (j = 0; j < cp->cuts[i]->cut.size; j++){
 	 fscanf(f, "%i ", &tmp1);

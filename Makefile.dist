@@ -116,6 +116,61 @@ ifeq ($(LP_SOLVER),CPLEX)
 endif
 
 ##############################################################################
+# OSI definitions
+##############################################################################
+
+#Uncomment the line below if you want to use an OSI interface.
+#LP_SOLVER = OSI
+#OSI_INTERFACE = CPLEX
+
+#Set the paths and the name of the library
+ifeq ($(LP_SOLVER),OSI)
+       LPINCDIR = -I${HOME}/COIN/include
+       LPLDFLAGS = -L${HOME}/COIN/lib
+       LPLIB = -lCoin -lOsi
+ifeq ($(OSI_INTERFACE),CPLEX)
+       LPINCDIR += -I/usr/local/include/
+       LPLDFLAGS += -L/usr/local/lib/
+       LPLIB += -lOsiCpx -lcplex
+endif
+ifeq ($(OSI_INTERFACE),OSL)
+       LPINCDIR += -I${HOME}/include
+       LPLDFLAGS += -L${HOME}/lib
+       LPLIB += -lOsiOsl -losl
+endif
+ifeq ($(OSI_INTERFACE),CLP)
+       LPINCDIR += 
+       LPLDFLAGS +=
+       LPLIB += -lOsiClp -lClp
+endif
+ifeq ($(OSI_INTERFACE),XPRESS)
+       LPINCDIR += 
+       LPLDFLAGS +=
+       LPLIB += -lOsiXpr
+endif
+ifeq ($(OSI_INTERFACE),SOPLEX)
+       LPINCDIR += 
+       LPLDFLAGS +=
+       LPLIB += -lOsiSpx
+endif
+ifeq ($(OSI_INTERFACE),VOL)
+       LPINCDIR += 
+       LPLDFLAGS +=
+       LPLIB += -lOsiVol
+endif
+ifeq ($(OSI_INTERFACE),DYLP)
+       LPINCDIR += 
+       LPLDFLAGS +=
+       LPLIB += -lOsiDylp
+endif
+ifeq ($(OSI_INTERFACE),GLPK)
+       LPINCDIR += 
+       LPLDFLAGS +=
+       LPLIB += -lOsiGlpk
+endif
+endif
+
+##############################################################################
 ##############################################################################
 # COMM Protocol definitions
 ##############################################################################
@@ -548,8 +603,13 @@ endif
 ##############################################################################
 ##############################################################################
 
-SYSDEFINES  = -D__$(LP_SOLVER)__ -D__$(COMM_PROTOCOL)__ $(LPSOLVER_DEFS) 
+SYSDEFINES  = -D__$(COMM_PROTOCOL)__ $(LPSOLVER_DEFS) 
 SYSDEFINES += $(MACH_DEP)
+ifeq ($(LP_SOLVER), OSI)
+SYSDEFINES += -D__OSI_$(OSI_INTERFACE)__
+else
+SYSDEFINES += -D__$(LP_SOLVER)__
+endif
 
 BB_DEFINES  = $(USER_BB_DEFINES)
 ifeq ($(ROOT_NODE_ONLY),TRUE)

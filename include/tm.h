@@ -180,7 +180,7 @@ int add_cut_to_list PROTO((tm_prob *tm, cut_data *cut));
 
 /*--------------- Function related to merging descriptions ------------------*/
 
-void merge_descriptions PROTO((node_desc *old, node_desc *new));
+void merge_descriptions PROTO((node_desc *old_node, node_desc *new_node));
 void merge_base_stat PROTO((double_array_desc *dad,
 			    double_array_desc *moddad));
 void merge_extra_array_and_stat PROTO((array_desc *ad, double_array_desc *dad,

@@ -1341,29 +1341,29 @@ int add_cut_to_list(tm_prob *tm, cut_data *cut)
  * related to this one.
 \*===========================================================================*/
 
-void merge_descriptions(node_desc *old, node_desc *new)
+void merge_descriptions(node_desc *old_node, node_desc *new_node)
 {
-   if (old->basis.basis_exists && new->basis.basis_exists){
-      merge_base_stat(&old->basis.basevars, &new->basis.basevars);
-      merge_extra_array_and_stat(&old->uind, &old->basis.extravars,
-				 &new->uind, &new->basis.extravars);
-      merge_base_stat(&old->basis.baserows, &new->basis.baserows);
-      merge_extra_array_and_stat(&old->cutind, &old->basis.extrarows,
-				 &new->cutind, &new->basis.extrarows);
+   if (old_node->basis.basis_exists && new_node->basis.basis_exists){
+      merge_base_stat(&old_node->basis.basevars, &new_node->basis.basevars);
+      merge_extra_array_and_stat(&old_node->uind, &old_node->basis.extravars,
+				 &new_node->uind, &new_node->basis.extravars);
+      merge_base_stat(&old_node->basis.baserows, &new_node->basis.baserows);
+      merge_extra_array_and_stat(&old_node->cutind,&old_node->basis.extrarows,
+				 &new_node->cutind,&new_node->basis.extrarows);
    }else{
-      old->basis = new->basis;
-      merge_arrays(&old->uind, &new->uind);
-      merge_arrays(&old->cutind, &new->cutind);
+      old_node->basis = new_node->basis;
+      merge_arrays(&old_node->uind, &new_node->uind);
+      merge_arrays(&old_node->cutind, &new_node->cutind);
 #ifdef COMPILE_IN_LP
-      memset((char *)&(new->basis), 0, sizeof(basis_desc));
+      memset((char *)&(new_node->basis), 0, sizeof(basis_desc));
 #endif
    }
-   old->nf_status = new->nf_status;
-   if (new->nf_status == NF_CHECK_AFTER_LAST ||
-       new->nf_status == NF_CHECK_UNTIL_LAST){
-      merge_arrays(&old->not_fixed, &new->not_fixed);
+   old_node->nf_status = new_node->nf_status;
+   if (new_node->nf_status == NF_CHECK_AFTER_LAST ||
+       new_node->nf_status == NF_CHECK_UNTIL_LAST){
+      merge_arrays(&old_node->not_fixed, &new_node->not_fixed);
    }else{
-      FREE(old->not_fixed.list);
+      FREE(old_node->not_fixed.list);
    }
 }
 
@@ -2523,7 +2523,7 @@ int read_tm_cut_list(tm_prob *tm, char *file)
 	     &tmp2, &tm->cuts[i]->rhs, &tm->cuts[i]->range);
       tm->cuts[i]->type = (char)tmp1;
       tm->cuts[i]->branch = (char)tmp2;
-      tm->cuts[i]->coef = malloc(tm->cuts[i]->size*sizeof(char));
+      tm->cuts[i]->coef = (char *) malloc(tm->cuts[i]->size*sizeof(char));
       for (j = 0; j < tm->cuts[i]->size; j++){
 	 fscanf(f, "%i ", &tmp1);
 	 tm->cuts[i]->coef[j] = (char)tmp1;

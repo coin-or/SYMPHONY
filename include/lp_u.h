@@ -78,7 +78,7 @@ int user_generate_column PROTO((void *user, int generate_what, int cutnum,
 int user_print_stat_on_cuts_added PROTO((void *user, int rownum,
 					 waiting_row **rows));
 int user_purge_waiting_rows PROTO((void *user, int rownum,
-				   waiting_row **rows, char *delete));
+				   waiting_row **rows, char *deleten));
 int user_generate_cuts_in_lp PROTO((void *user, int varnum, var_desc **vars,
 				    double *x, int *new_row_num,
 				    waiting_row ***new_rows));

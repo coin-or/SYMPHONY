@@ -258,12 +258,12 @@ int user_init_draw_graph(void *user, int dg_id)
       }
       xx = maxx - minx;
       yy = maxy - miny;
-      mult = MIN((width - 20.0)/xx, (height-20.0)/yy);
-      width = xx * mult + 30;
-      height = yy * mult + 30;
+      mult = (int) MIN((width - 20.0)/xx, (height-20.0)/yy);
+      width = (int) (xx * mult + 30);
+      height = (int) (yy * mult + 30);
       for (i=vrp->vertnum-1; i>=0; i--){
-	 posx[i] = (posx[i] - minx) * mult + 10;
-	 posy[i] = (maxy - posy[i]) * mult + 10;
+	 posx[i] = (int) (posx[i] - minx) * mult + 10;
+	 posy[i] = (int) (maxy - posy[i]) * mult + 10;
       }
 
       init_window(dg_id, node_place, width, height);
@@ -570,7 +570,7 @@ int user_send_cg_data(void *user, void **user_cg)
       the CG is not running separately. This code should be virtually
       identical to that of user_receive_cg_data() in the CG process.*/
    
-   cg_vrp_spec *vrp_cg = (void *) malloc (sizeof(cg_vrp_spec));
+   cg_vrp_spec *vrp_cg = (cg_vrp_spec *) malloc (sizeof(cg_vrp_spec));
    int edgenum, vertnum, i, j, k;
    
    *user_cg = (void *)vrp_cg;
@@ -663,7 +663,7 @@ int user_send_cp_data(void *user, void **user_cp)
       the LP is not running separately. This code should be virtually
       identical to that of user_receive_cp_data() in the CP process.*/
    
-   vrp_spec_cp *vrp_cp = (void *) malloc (sizeof(vrp_spec_cp));
+   vrp_spec_cp *vrp_cp = (vrp_spec_cp *) malloc (sizeof(vrp_spec_cp));
    int i, j, k;
 
    vrp_cp->vertnum = vrp->vertnum;

@@ -21,8 +21,7 @@
 
 extern int getrusage(int who, struct rusage *x);
 
-double used_time(T)
-   double *T;
+double used_time(double *T)
 {
 #ifdef _OPENMP
    double t, oldT =  T ? *T : 0;

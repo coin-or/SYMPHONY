@@ -1000,23 +1000,23 @@ lp_net *create_lp_net(vrp_spec *vrp, char *status, int edgenum,
       nv1 = edges[(vars[i]->userind << 1) +1];
       if (!verts[nv0].first){
 	 verts[nv0].first = adjlist;
-	 verts[nv0].degree+=vars[i]->ub;
+	 verts[nv0].degree += (int) vars[i]->ub;
       }
       else{
 	 adjlist->next = verts[nv0].first;
 	 verts[nv0].first = adjlist;
-	 verts[nv0].degree+=vars[i]->ub;
+	 verts[nv0].degree += (int) vars[i]->ub;
       }
       adjlist->other_end = nv1;
       adjlist++;
       if (!verts[nv1].first){
 	 verts[nv1].first = adjlist;
-	 verts[nv1].degree+=vars[i]->ub;
+	 verts[nv1].degree += (int) vars[i]->ub;
       }
       else{
 	 adjlist->next = verts[nv1].first;
 	 verts[nv1].first = adjlist;
-	 verts[nv1].degree+=vars[i]->ub;
+	 verts[nv1].degree += (int) vars[i]->ub;
       }
       adjlist->other_end = nv0;
       adjlist++;

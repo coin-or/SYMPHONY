@@ -1,9 +1,8 @@
 #include "qsortucb.h"
 
-void qsortucb_di(botd, boti, nmemb)
-   double *botd;
-   int *boti;
-   int nmemb;
+void qsortucb_di(double *botd,
+		 int *boti,
+		 int nmemb)
 {
    if (nmemb <= 1)
       return;
@@ -33,10 +32,9 @@ void qsortucb_di(botd, boti, nmemb)
    } \
 }
 
-void quick_sort_di(botd, boti, nmemb)
-   double *botd;
-   int *boti;
-   int nmemb;
+void quick_sort_di(double *botd,
+		   int *boti,
+		   int nmemb)
 {
    int tmp, n1, n2;
    double tmpd;
@@ -134,10 +132,10 @@ partition_di:
    goto partition_di;
 }
 
-void insertion_sort_di(botd, boti, nmemb)
-   double *botd;
-   int *boti;
-   int nmemb;
+void insertion_sort_di(
+		       double *botd,
+		       int *boti,
+		       int nmemb)
 {
    int tmp;
    double tmpd;

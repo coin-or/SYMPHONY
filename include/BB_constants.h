@@ -146,7 +146,9 @@
 /*******         Constants related to solving of an lp                 *******/
 /*****************************************************************************/
 
+#ifndef INFINITY
 #define INFINITY                 100000000
+#endif
 #define BIG_DBL                  1e40
 
 /*--------------------- Constants related to the basis ----------------------*/

@@ -216,9 +216,8 @@ int check_row_effectiveness(lp_prob *p)
        deletable > p->par.mat_row_compress_num){
       PRINT(p->par.verbosity, 3, ("   Removing deletable rows ...\n"));
       if (p->par.branch_on_cuts)
-	 p->slack_cuts =
-	    realloc(p->slack_cuts,
-		    (p->slack_cut_num + deletable) * sizeof(cut_data *));
+	 p->slack_cuts = (cut_data **) realloc(p->slack_cuts,
+			 (p->slack_cut_num + deletable) * sizeof(cut_data *));
 
       free_rows = lp_data->tmp.i1;
       if (bcutnum > 0)

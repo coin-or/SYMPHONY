@@ -338,8 +338,8 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
    double *lr, *ur;
    /* double *lr = lp_data->tmp.d, *ur = lp_data->tmp.d + lp_data->n; */
 
-   lr = malloc(rcnt * DSIZE);
-   ur = malloc(rcnt * DSIZE);
+   lr = (double *) malloc(rcnt * DSIZE);
+   ur = (double *) malloc(rcnt * DSIZE);
    for (i = rcnt - 1; i >= 0; i--) {
       switch (sense[i]) {
        case 'E': lr[i] = ur[i] = rhs[i]; break;
@@ -940,7 +940,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 {
    int i, j, n = lp_data->n, *which;
    
-   which = calloc(delnum, ISIZE);
+   which = (int *) calloc(delnum, ISIZE);
    for (i = n - 1, j = 0; i >= 0; i--) {
       if (delstat[i]) {
 	 which[j++] = i;
@@ -2184,4 +2184,1222 @@ void write_sav(LPdata *lp_data, char *fname)
    CPX_check_error("write_sav");
 }
 
-#endif /* CPLEX_xx */
+#endif /* __CPLEX__ */
+
+#if defined(__OSI_CPX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
+|| defined(__OSI_XPRESS__) || defined(__OSI_SOPLEX__) || defined(__OSI_VOL__) \
+|| defined(__OSI_DYLP__) || defined (__OSI_GLPK__)
+
+/*
+   lp_data->bhead and lp_data->xbzero are never used
+   in the other code, so I don't load and maintain them
+   anywhere in the lp_solver.c
+*/
+
+static bool retval = false;
+
+void open_lp_solver(LPdata *lp_data)
+{
+
+ std::cout<<std::endl<<"1   ";
+
+  OsiXSolverInterface * si = new OsiXSolverInterface();
+
+  lp_data->si=si;
+
+  retval=lp_data->si->getDblParam(OsiPrimalTolerance,lp_data->lpetol);
+
+}
+
+/*===========================================================================*/
+
+//ASKISK? MEN
+
+void close_lp_solver(LPdata *lp_data)
+{
+
+ std::cout<<std::endl<<"2   ";
+
+  lp_data->si->~OsiSolverInterface();
+
+   /* Free up the lp_data parts */
+   FREE(lp_data->matbeg);
+   FREE(lp_data->matcnt);
+   FREE(lp_data->matind);
+   FREE(lp_data->matval);
+   FREE(lp_data->obj);
+   FREE(lp_data->rhs);
+   FREE(lp_data->rngval);
+   FREE(lp_data->sense);
+   FREE(lp_data->lb);
+   FREE(lp_data->ub);
+
+   FREE(lp_data->not_fixed);
+   FREE(lp_data->status);
+   FREE(lp_data->x);
+   FREE(lp_data->dj);
+   FREE(lp_data->dualsol);
+   FREE(lp_data->slacks);
+   FREE(lp_data->bhead);
+   FREE(lp_data->xbzero);
+   FREE(lp_data->tmp.c);
+   FREE(lp_data->tmp.i1);
+   FREE(lp_data->tmp.i2);
+   FREE(lp_data->tmp.d);
+   FREE(lp_data->tmp.p1);
+   FREE(lp_data->tmp.p2);
+   FREE(lp_data->tmp.cv);
+   FREE(lp_data->tmp.iv);
+   FREE(lp_data->tmp.dv);
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * This function loads the data of an lp into the lp solver. This involves
+ * transforming the data into CPLEX format and calling the CPLEX function
+ * 'loadlp'.
+\*===========================================================================*/
+
+void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
+{
+
+
+  int i, *matcnt, *matbeg;
+
+  matcnt=lp_data->matcnt;
+  matbeg=lp_data->matbeg;
+
+   for (i=lp_data->n-1; i>=0; i--)
+      matcnt[i] = matbeg[i+1] - matbeg[i];
+
+  //cannot set the necessary parameters, check OsiCpxSolverInterface-MEN
+  //what about the alloc params?MEN
+
+ std::cout<<std::endl<<"4   ";
+ lp_data->si->loadProblem(lp_data->n,lp_data->m,lp_data->matbeg,lp_data->matind,lp_data->matval,lp_data->lb,lp_data->ub,lp_data->obj,lp_data->sense,lp_data->rhs,lp_data->rngval);
+
+ //WHAT TO DO WITH THE PART ABOVE MEN!
+
+}
+
+/*===========================================================================*/
+
+void unload_lp_prob(LPdata *lp_data)
+{
+
+ 
+std::cout<<std::endl<<"5   ";
+
+  lp_data->si->~OsiSolverInterface();
+
+  //really need the following? MEN after unloading, do we use it again?
+
+  lp_data->si=new OsiXSolverInterface();
+
+}
+
+/*===========================================================================*/
+
+void load_basis(LPdata *lp_data, int *cstat, int *rstat)
+{
+
+ std::cout<<std::endl<<"6   ";
+
+
+  //COULD BE WARMSTARTBASIS CONSTRUCTOR OR ASSIGN BASIS? MEN
+
+  CoinWarmStartBasis * warmstart = new CoinWarmStartBasis;
+  int numcols = lp_data->n;
+  int numrows = lp_data->m;
+  int i;
+
+  warmstart->setSize(numcols, numrows);
+  
+  for(i=0; i<numrows; i++)
+    {
+      switch(rstat[i])
+	{
+	case SLACK_AT_LB:
+	  warmstart->setArtifStatus(i,CoinWarmStartBasis::atLowerBound);
+	  break;
+	case SLACK_BASIC:
+	  warmstart->setArtifStatus(i,CoinWarmStartBasis::basic);
+	  break;
+	case SLACK_AT_UB:
+	  warmstart->setArtifStatus(i,CoinWarmStartBasis::atUpperBound);
+	  break;
+	case SLACK_FREE:
+	  warmstart->setArtifStatus(i,CoinWarmStartBasis::isFree);
+	  break;
+	default:
+	  break;
+	}
+    }
+
+  for(i = 0;i<numcols; i++)
+    {
+      switch(cstat[i])
+	{
+	case VAR_AT_LB:
+	  warmstart->setStructStatus(i,CoinWarmStartBasis::atLowerBound);
+	  break;
+	case VAR_BASIC:
+	  warmstart->setStructStatus(i,CoinWarmStartBasis::basic);
+	  break;
+	case VAR_AT_UB:
+	  warmstart->setStructStatus(i,CoinWarmStartBasis::atUpperBound);
+	  break;
+	case VAR_FREE:
+	  warmstart->setStructStatus(i,CoinWarmStartBasis::isFree);
+	  break;
+	default:
+	  break;
+	}
+    }
+
+ retval=lp_data->si->setWarmStart(warmstart);
+
+
+}
+
+/*===========================================================================*/
+
+void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
+	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
+{
+
+ std::cout<<std::endl<<"7   ";
+ std::cout<<std::endl; 
+
+   CoinPackedVector * rows[rcnt];
+//  CoinPackedVector * rows = new CoinPackedVector[rcnt];
+
+   double * rowrng = new double[rcnt];
+
+   int i,j, m=lp_data->m;
+
+  for(i=0; i<rcnt;i++){
+      rows[i]=new CoinPackedVector;
+      for(j=rmatbeg[i];j<rmatbeg[i+1];j++){
+	rows[i]->insert(rmatind[j],rmatval[j]);
+	rowrng[i]=0;
+      }
+      // std::cout<<std::endl<<"BURDA MI?   ";
+    lp_data->si->addRow(*(rows[i]),sense[i],rhs[i],rowrng[i]);
+  }
+
+  //  lp_data->si->addRows(rcnt,rows,sense,rhs,rowrng);
+
+
+  int *bhead=lp_data->bhead+lp_data->m;
+
+   lp_data->m += rcnt;
+   lp_data->nz += nzcnt;
+   lp_data->lp_is_modified=LP_HAS_BEEN_MODIFIED;
+
+   /* modify bhead */
+   for (i = lp_data->m-1; i >= m; i--)
+      bhead[i] = -i-1;
+
+}
+
+/*===========================================================================*/
+
+void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
+	      int *cmatbeg, int *cmatind, double *cmatval,
+	      double *lb, double *ub, char *where_to_move)
+{
+
+ std::cout<<std::endl<<"8   "; 
+  CoinPackedVector * cols[ccnt];
+
+  int i,j;
+  for(i=0; i<ccnt;i++){
+    cols[i]=new CoinPackedVector;
+    for(j=cmatbeg[i];j<cmatbeg[i+1];j++)
+      cols[i]->insert(cmatind[j],cmatval[j]);
+    lp_data->si->addCol(*(cols[i]),lb[i],ub[i],obj[i]);
+  }
+
+   lp_data->n += ccnt;
+   lp_data->nz += nzcnt;
+}
+
+/*===========================================================================*/
+
+void change_row(LPdata *lp_data, int row_ind,
+		char sense, double rhs, double range)
+{
+ std::cout<<std::endl<<"9   ";
+  lp_data->si->setRowType(row_ind,sense,rhs,range);
+
+
+
+}
+
+/*===========================================================================*/
+
+void change_col(LPdata *lp_data, int col_ind,
+		char sense, double lb, double ub)
+{ std::cout<<std::endl<<"10   ";
+   switch (sense){
+    case 'E': change_lbub(lp_data, col_ind, lb, ub); break;
+    case 'R': change_lbub(lp_data, col_ind, lb, ub); break;
+    case 'G': change_lb(lp_data, col_ind, lb); break;
+    case 'L': change_ub(lp_data, col_ind, ub); break;
+   }
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Solve the lp specified in lp_data->lp with dual simplex. The number of
+ * iterations is returned in 'iterd'. The return value of the function is
+ * the termination code of the dual simplex method.
+\*===========================================================================*/
+
+int dual_simplex(LPdata *lp_data, int *iterd)
+{
+
+  std::cout<<std::endl<<"11   ";
+  std::cout<<std::endl;
+
+  //THERE ARE PROBLEMS HERE -- NEED TO ADD ITER NUMBER AS AN ARGUMENT??? MEN!
+
+  //   if(lp_data->si->isAbandoned()) no advanced setting for Osi MEN
+
+  // no setting to reach presolve status! so can not determine to close presolve! MEN!
+
+  //  retval = lp_data->si->setHintParam(OsiDoPresolveInResolve, false); TURN OFF PRESOLVE MEN!
+
+  int term;
+
+  //  std::cout<<std::endl<<"I am here_ dual_simplex";
+  // std::cout<<std::endl;
+
+  lp_data->si->resolve();
+
+  if(lp_data->si->isProvenDualInfeasible())
+    term = D_INFEASIBLE;
+  else if (lp_data->si->isProvenPrimalInfeasible())
+    term = D_UNBOUNDED;
+  else if (lp_data->si->isProvenOptimal())
+    term = OPTIMAL;
+  else if (lp_data->si->isDualObjectiveLimitReached())
+    term = D_OBJLIM;
+  else if (lp_data->si->isIterationLimitReached())
+    term = D_ITLIM;
+  else if (lp_data->si->isAbandoned())
+    term = ABANDONED;
+
+  //   if(term == D_UNBOUNDED){
+  //   retval=lp_data->si->getIntParam(OsiMaxNumIteration, itlim); 
+  //CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam()
+
+  lp_data->termcode = term;
+
+  if(term!=ABANDONED){
+
+     *iterd = lp_data->si->getIterationCount();
+
+     //BHEAD???? IT IS USED I GUESS! MEN! ??
+
+     lp_data->objval = lp_data->si->getObjValue();
+
+     //     std::cout<<std::endl<<"lp_data->obj= "<<lp_data->objval;
+
+     lp_data->lp_is_modified=LP_HAS_NOT_BEEN_MODIFIED;
+  }   
+   else{
+     lp_data->lp_is_modified=LP_HAS_BEEN_ABANDONED;
+      printf("CPLEX Abandoned calculation: Code %i \n\n", term);
+   }
+
+  /*
+   int real_term, term, itlim, defit, minit, maxit;
+   double objulim, objllim, defobj;
+
+   if (lp_data->lp_is_modified == LP_HAS_BEEN_ABANDONED){
+      cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ADVIND, CPX_OFF);
+      CPX_check_error("dual_simplex - CPXsetintparam, ADVIND");
+   }
+
+   term = CPXdualopt(lp_data->cpxenv, lp_data->lp);
+
+   if (term == CPXERR_PRESLV_INForUNBD){
+      cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_PREIND, CPX_OFF);
+      CPX_check_error("dual_simplex - CPXsetintparam");
+
+      term = CPXdualopt(lp_data->cpxenv, lp_data->lp);
+
+      CPX_check_error("dual_simplex - CPXdualopt");
+      cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_PREIND, CPX_ON);
+      CPX_check_error("dual_simplex - CPXsetintparam");
+   }
+
+   term = CPXgetstat(lp_data->cpxenv,lp_data->lp);
+
+#if CPX_VERSION >= 800
+   if (term == CPX_STAT_INFEASIBLE){
+#else
+   if (term == CPX_INFEASIBLE){
+#endif
+      // Dual infeas. This is impossible, so we must have had iteration
+       // limit AND bound shifting AND dual feasibility not restored within
+       // the given iteration limit.
+      cpx_status = CPXgetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, &itlim);
+      CPX_check_error("dual_simplex - CPXgetintparam, ITLIM");
+      cpx_status = CPXinfointparam(lp_data->cpxenv, CPX_PARAM_ITLIM,
+				   &defit, &minit, &maxit);
+      CPX_check_error("dual_simplex - CPXinfointparam, ITLIM");
+      cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, defit);
+      CPX_check_error("refactorize - CPXsetintparam, ITLIM");
+      cpx_status = CPXgetdblparam(lp_data->cpxenv, CPX_PARAM_OBJULIM,&objulim);
+      CPX_check_error("refactorize - CPXgetdblparam, OBJULIM");
+      cpx_status = CPXgetdblparam(lp_data->cpxenv, CPX_PARAM_OBJULIM,&objllim);
+      CPX_check_error("refactorize - CPXgetdblparam, OBJULIM");
+      defobj = 1e75;
+      cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_OBJULIM, defobj);
+      CPX_check_error("refactorize - CPXsetdblparam, OBJULIM");
+      defobj = -1e75;
+      cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_OBJLLIM, defobj);
+      CPX_check_error("refactorize - CPXsetdblparam, OBJLLIM");
+      term = CPXdualopt(lp_data->cpxenv, lp_data->lp);
+      cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_OBJULIM, objulim);
+      CPX_check_error("refactorize - CPXsetdblparam, OBJULIM");
+      cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_OBJLLIM, objllim);
+      CPX_check_error("refactorize - CPXsetdblparam, OBJLLIM");
+      cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, itlim);
+      CPX_check_error("refactorize - CPXsetintparam, ITLIM");
+   }
+
+#if CPX_VERSION >= 800
+   switch (real_term = CPXgetstat(lp_data->cpxenv,lp_data->lp)){
+    case CPX_STAT_OPTIMAL:                        term = OPTIMAL; break;
+    case CPX_STAT_INFEASIBLE:                     term = D_UNBOUNDED; break;
+    case CPX_STAT_UNBOUNDED:                      term = D_INFEASIBLE; break;
+    case CPX_STAT_ABORT_OBJ_LIM:                  term = D_OBJLIM; break;
+    case CPX_STAT_ABORT_IT_LIM:                   term = D_ITLIM; break;
+    default:                                      term = ABANDONED; break;
+   }
+#else
+   switch (real_term = CPXgetstat(lp_data->cpxenv,lp_data->lp)){
+    case CPX_OPTIMAL:                             term = OPTIMAL; break;
+    case CPX_INFEASIBLE:                          term = D_INFEASIBLE; break;
+    case CPX_UNBOUNDED:                           term = D_UNBOUNDED; break;
+    case CPX_OBJ_LIM:                             term = D_OBJLIM; break;
+    case CPX_IT_LIM_FEAS: case CPX_IT_LIM_INFEAS: term = D_ITLIM; break;
+    default:                                      term = ABANDONED; break;
+   }
+
+   lp_data->termcode = term;
+
+   if (term != ABANDONED){
+      cpx_status = CPXgetbhead(lp_data->cpxenv, lp_data->lp,
+			       lp_data->bhead, lp_data->xbzero);
+      lp_data->bhead_is_valid = TRUE;
+      CPX_check_error("dual_simplex - CPXgetbhead");
+#if CPX_VERSION <= 600 
+      *iterd = CPXgetitc(lp_data->cpxenv, lp_data->lp);
+#else
+      *iterd = CPXgetitcnt(lp_data->cpxenv, lp_data->lp);
+#endif
+      cpx_status = CPXgetobjval(lp_data->cpxenv,lp_data->lp, &lp_data->objval);
+      CPX_check_error("dual_simplex - CPXgetobjval");
+      cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ADVIND, CPX_ON);
+      CPX_check_error("dual_simplex - CPXsetintparam, ADVIND");
+      lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
+
+   }else{
+      lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
+      printf("CPLEX Abandoned calculation: Code %i \n\n", real_term);
+   }
+
+*/
+   return(term);
+}
+
+
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* This function is used only together with get_proof_of_infeasibility...    */
+
+void get_binvrow(LPdata *lp_data, int i, double *row)
+{
+   fprintf(stderr, "Function not implemented yet.");
+   exit(-1);
+}
+
+/*===========================================================================*/
+
+void get_basis(LPdata *lp_data, int *cstat, int *rstat)
+{
+
+  std::cout<<std::endl<<"13   ";
+  std::cout<<std::endl;
+
+  CoinWarmStart * warmstart = new CoinWarmStartBasis;
+  warmstart=lp_data->si->getWarmStart();
+  
+  CoinWarmStartBasis * ws = dynamic_cast<CoinWarmStartBasis*>(warmstart);
+
+  
+  int numcols = ws->getNumStructural();   //has to be equal to or less than lp_data->n MEN
+  int numrows = ws->getNumArtificial();   //has to be equal to or less than lp_data->m MEN
+  int i;                                  //hence an assert? MEN  
+
+
+  //  std::cout<<std::endl<<"numcols ve numrows "<<numcols<<"  "<<numrows;
+  //  std::cout<<std::endl;
+
+  if(rstat!=NULL){
+  for(i=0; i<numrows; i++)
+    {
+      switch(ws->getArtifStatus(i))
+	{
+	case CoinWarmStartBasis::basic:
+	  rstat[i]=SLACK_BASIC;
+	  break;
+	case CoinWarmStartBasis::atLowerBound:
+  	  rstat[i]=SLACK_AT_LB;
+	  break;
+	case CoinWarmStartBasis::atUpperBound:
+	  rstat[i]=SLACK_AT_UB;
+	  break;
+	case CoinWarmStartBasis::isFree:     //can it happen? MEN
+	  rstat[i]=SLACK_FREE;
+	  break;
+	default:
+	  break;                            //can it happen? MEN
+	}
+    }
+  }
+
+
+  if(cstat!=NULL){
+  for(i = 0;i<numcols; i++)
+    {
+      switch(ws->getStructStatus(i))
+	{
+	case CoinWarmStartBasis::basic:
+	  cstat[i]=VAR_BASIC;
+	  break;
+	case CoinWarmStartBasis::atLowerBound:
+	  cstat[i]=VAR_AT_LB;
+	  break;
+	case CoinWarmStartBasis::atUpperBound:
+	  cstat[i]=VAR_AT_UB;
+	  break;
+	case CoinWarmStartBasis::isFree:  
+	  cstat[i]=VAR_FREE;
+	  break;
+	default:
+	  break;                            //can it happen? MEN
+	}
+    }
+  }
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Set an upper limit on the objective function value. Call the 'setobjulim'
+ * CPLEX function.
+\*===========================================================================*/
+
+void set_obj_upper_lim(LPdata *lp_data, double lim)
+{
+ std::cout<<std::endl<<"14   ";
+
+  //IS OBJ ALWAYS MIN? MEN
+
+  OsiDblParam key = OsiPrimalObjectiveLimit;
+  
+  retval=lp_data->si->setDblParam(key,lim);
+
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Set an upper limit on the number of iterations. If itlim < 0 then set
+ * it to the maximum.
+\*===========================================================================*/
+
+void set_itlim(LPdata *lp_data, int itlim)
+{
+ std::cout<<std::endl<<"15   ";
+
+  OsiIntParam key = OsiMaxNumIteration;
+
+  retval = lp_data->si->setIntParam(key,itlim);
+
+ //if(itlim<0) doesn't seem to be appear in setIntParam of Osi???MEN
+
+}
+
+/*===========================================================================*/
+
+void match_lp_solver_arrays_to_user(LPdata *lp_data,
+				    int allocm, int allocn, int allocnz)
+{ std::cout<<std::endl<<"16   ";
+   if (allocm  != lp_data->alloc_m){
+      FREE(lp_data->slacks);
+      lp_data->slacks = (double *) malloc(allocm * DSIZE);
+      lp_data->alloc_m = allocm;
+   }
+
+   if (allocn != lp_data->alloc_mplusn){
+      FREE(lp_data->matcnt);
+      FREE(lp_data->lb);
+      FREE(lp_data->ub);
+      lp_data->matcnt = (int *) malloc(allocn * ISIZE);
+      lp_data->lb = (double *) malloc(allocn * DSIZE);
+      lp_data->ub = (double *) malloc(allocn * DSIZE);
+      lp_data->alloc_mplusn = allocn;
+   }
+
+   if (allocnz != lp_data->alloc_mplusnz)
+      lp_data->alloc_mplusnz = allocnz;
+}
+
+/*===========================================================================*/
+
+void resize_lp_solver_arrays(LPdata *lp_data)
+{
+ std::cout<<std::endl<<"17   ";
+   char resize = FALSE;
+
+   OsiXSolverInterface* si_dy = dynamic_cast<OsiXSolverInterface*>(lp_data->si);
+
+
+   //DO SOMETHING HERE MEN! CORRECT IT!!! THE FOLLOWING NEEDS MORE JOB TO WORK ON! MEN! 
+
+      if (lp_data->maxm > lp_data->alloc_m){
+	 lp_data->alloc_m = lp_data->maxm;
+	 lp_data->rhs = (double *) realloc((void *)lp_data->rhs,
+					   lp_data->alloc_m * DSIZE);
+	 lp_data->rngval = (double *) realloc((void *)lp_data->rngval,
+					      lp_data->alloc_m * DSIZE);
+	 lp_data->sense = (char *) realloc((void *)lp_data->sense,
+					   lp_data->alloc_m * CSIZE);
+	 /*slacks must be allocated for cplex (for XMP it only points into x)*/
+	 lp_data->slacks = (double *) realloc((void *)lp_data->slacks,
+					      lp_data->alloc_m * DSIZE);
+
+	 if (si_dy->getModelPtr()!=NULL) resize =TRUE;    //this is just for OsiClp! MEN
+     
+      }
+      if (lp_data->maxm + lp_data->maxn + 1 > lp_data->alloc_mplusn){
+	 lp_data->alloc_mplusn = lp_data->maxm + lp_data->maxn + 1;
+	 lp_data->matbeg = (int *) realloc((void *)lp_data->matbeg,
+					   lp_data->alloc_mplusn * ISIZE);
+	 lp_data->matcnt = (int *) realloc((void *)lp_data->matcnt,
+					   lp_data->alloc_mplusn * ISIZE);
+	 lp_data->obj = (double *) realloc((void *)lp_data->obj,
+					   lp_data->alloc_mplusn * DSIZE);
+	 lp_data->lb = (double *) realloc((void *)lp_data->lb,
+					  lp_data->alloc_mplusn * DSIZE);
+	 lp_data->ub = (double *) realloc((void *)lp_data->ub,
+					  lp_data->alloc_mplusn * DSIZE);
+
+	 if (si_dy->getModelPtr()!=NULL) resize = TRUE;    //this is just for OsiClp! MEN
+
+      }
+      if (lp_data->maxnz + lp_data->maxm > lp_data->alloc_mplusnz){
+	 lp_data->alloc_mplusnz = lp_data->maxm + lp_data->maxnz;
+	 lp_data->matind = (int *) realloc((void *)lp_data->matind,
+					   lp_data->alloc_mplusnz * ISIZE);
+	 lp_data->matval = (double *) realloc((void *)lp_data->matval,
+					      lp_data->alloc_mplusnz * DSIZE);
+      
+	 if (si_dy->getModelPtr()!=NULL) resize = TRUE;    //this is just for OsiClp! MEN
+
+      }
+
+     if(resize){
+
+      if (lp_data->maxm > lp_data->alloc_m){
+	 lp_data->alloc_m = lp_data->maxm;
+	 lp_data->slacks =
+	    (double *) realloc(lp_data->slacks, lp_data->alloc_m * DSIZE);
+	 resize = TRUE;
+      }
+      if (lp_data->maxm + lp_data->maxn + 1 > lp_data->alloc_mplusn){
+	 lp_data->alloc_mplusn = lp_data->maxm + lp_data->maxn + 1;
+	 resize = TRUE;
+      }
+      if (lp_data->maxnz + lp_data->maxm > lp_data->alloc_mplusnz){
+	 lp_data->alloc_mplusnz = lp_data->maxm + lp_data->maxnz;
+	 resize = TRUE;
+      }
+      if (resize){
+
+      }
+     }
+
+//si_dy=NULL;     
+
+
+}
+
+/*===========================================================================*/
+
+void get_column(LPdata *lp_data, int j,
+		double *colval, int *colind, int *collen, double *cj)
+{
+
+ std::cout<<std::endl<<"18   ";
+  const CoinPackedMatrix * matrixByCol = lp_data->si->getMatrixByCol();
+  
+  //  matrixByCol = lp_data->si->getMatrixByCol();
+  
+  int nc=matrixByCol->getNumCols();
+  // const double * matval = new double[nc];  
+  //const int * matind = new int[nc]; 
+
+  const double * matval = matrixByCol->getElements();
+  const int * matind = matrixByCol->getIndices(); 
+
+  
+  //  matval=matrixByCol->getElements();
+  //  matind=matixByCol->getIndices();
+
+  *collen=matrixByCol->getVectorSize(j);
+
+  int matbeg = 0;
+  
+  for (int i=0;i<j;i++)
+    matbeg+= matrixByCol->getVectorSize(j);
+
+
+  for(int i=0;i<(*collen);i++){
+    colval[i]=matval[matbeg+i];
+    colind[i]=matind[matbeg+i];
+  }
+
+  // double * objval= new double [nc];
+  // objval=lp_data->si->getObjCoefficients();
+  
+  const double * objval= lp_data->si->getObjCoefficients();
+
+  *cj=objval[j];
+
+}
+
+/*===========================================================================*/
+
+void get_row(LPdata *lp_data, int i,
+	     double *rowval, int *rowind, int *rowlen)
+{
+
+ std::cout<<std::endl<<"19   ";
+  //  CoinPackedMatrix * matrixByRow = new CoinPackedMatrix;
+  
+  //matrixByRow = lp_data->si->getMatrixByRow();
+
+
+  const CoinPackedMatrix * matrixByRow = lp_data->si->getMatrixByRow();
+  
+  int nr = matrixByRow->getNumRows();
+  //  double * matval = new double[nr];  
+  //  int * matind = new int[nr]; 
+  //  matval=matrixByRow->getElements();
+  //  matind=matrixByRow->getIndices();
+
+
+  const double * matval = matrixByRow->getElements();  
+  const int * matind = matrixByRow->getIndices(); 
+
+  *rowlen=matrixByRow->getVectorSize(i);
+
+  int matbeg = 0;
+  
+  for (int j=0;j<i;j++)
+    matbeg+= matrixByRow->getVectorSize(i);
+
+
+  for(int j=0; j<(*rowlen); j++){
+    rowval[j]=matval[matbeg+j];
+    rowind[j]=matind[matbeg+j];
+  }
+
+}
+
+/*===========================================================================*/
+
+/* This routine returns the index of a row which proves the lp to be primal
+ * infeasible. There must be one, or this function wouldn't be called. */
+/* There MUST be something better than this...
+ * A function call perhaps... Ask CPLEX... */
+
+
+int get_proof_of_infeas(LPdata *lp_data, int *infind)
+{
+
+ std::cout<<std::endl<<"20   ";
+
+ //NOT IMPLEMENTED YET. MEN!
+
+  /*
+  double * pi = new double[lp_data->si->getNumRows()];
+  
+   //the passed argument makes no sense. FIX it in Osi! MEN!
+
+  pi = lp_data->si->getDualRays(1)[0];    
+
+
+   int idiv, jdiv;
+   double bd;
+
+#if 0
+   // something like this should work...
+   CPXdualfarkas(lp_data->cpxenv, lp_data->lp, ...);
+   CPX_check_error("get_proof_of_infeas - CPXdualfarkas");
+#endif
+
+   CPXgetijdiv(lp_data->cpxenv, lp_data->lp, &idiv, &jdiv);
+   CPX_check_error("get_proof_of_infeas - CPXgetijdiv");
+   cpx_status = CPXgetijrow(lp_data->cpxenv, lp_data->lp, idiv, jdiv, infind);
+   CPX_check_error("get_proof_of_infeas - CPXgetijrow");
+   if (cpx_status)
+      return(0);
+   if (jdiv < 0){ // the diverging variable is a slack/range 
+      if (lp_data->slacks)
+	 return(lp_data->slacks[idiv] < 0 ? LOWER_THAN_LB : HIGHER_THAN_UB);
+   }else{ // the diverging variable is structural 
+      cpx_status = CPXgetlb(lp_data->cpxenv, lp_data->lp, &bd, jdiv, jdiv);
+      CPX_check_error("get_proof_of_infeas - CPXgetlb");
+      if(lp_data->x)
+	 return(bd < lp_data->x[jdiv] ? LOWER_THAN_LB : HIGHER_THAN_UB);
+   }
+*/
+   return(0); /* fake return */
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Get the solution (values of the structural variables in an optimal
+ * solution) to the lp (specified by lp_data->lp) into the vector
+ * lp_data->x. This can be done by calling the 'getx' CPLEX function.
+\*===========================================================================*/
+
+void get_x(LPdata *lp_data)
+{
+
+ std::cout<<std::endl<<"21   ";
+
+  lp_data->x=const_cast<double *>(lp_data->si->getColSolution());
+}
+
+/*===========================================================================*/
+
+void get_dj_pi(LPdata *lp_data)
+{
+  std::cout<<std::endl<<"22   ";
+
+   lp_data->dualsol=const_cast<double *>(lp_data->si->getRowPrice());
+   lp_data->dj=const_cast<double *>(lp_data->si->getReducedCost());
+
+   //  std::cout<<std::endl<<"get_dj_pi "<<lp_data->dualsol[0]<<" "<<lp_data->dj[0]<<"--";
+   //  std::cout<<std::endl<<"get_dj_pi "<<lp_data->dualsol[1]<<" "<<lp_data->dj[1]<<"--";
+
+}
+
+/*===========================================================================*/
+
+void get_slacks(LPdata *lp_data)
+{
+
+  std::cout<<std::endl<<"23   ";
+  int m= lp_data->m;
+  double * slacks = new double[m];
+  constraint *rows=lp_data->rows;
+
+
+
+  const double * rowActivity = lp_data->si->getRowActivity();
+  const double * rhs = lp_data->si->getRightHandSide();
+
+  rowActivity=lp_data->si->getRowActivity();
+  
+  for(int i = 0; i < m; i++)
+    slacks[i]=rhs[i]-rowActivity[i];
+
+  lp_data->slacks=slacks;
+
+}
+
+/*===========================================================================*/
+
+void change_range(LPdata *lp_data, int rowind, double value)
+{
+
+  std::cout<<std::endl<<"24   ";
+  double rhs=lp_data->si->getRightHandSide()[rowind]; //IS THIS VALID FOR RANGES? MEN
+
+  lp_data->si->setRowType(rowind,'R',rhs,value);
+ 
+}
+
+/*===========================================================================*/
+
+void change_rhs(LPdata *lp_data, int rownum, int *rhsind, double *rhsval)
+{
+
+  std::cout<<std::endl<<"25   ";
+  const int * indexFirst = rhsind; 
+  const int * indexLast = rhsind + rownum;
+  char * senseList = new char[rownum]; 
+  double * rangeList = NULL; 
+
+  for(int i=0; i<rownum;i++){
+    senseList[i]=lp_data->si->getRowSense()[rhsind[i]];
+    if (senseList[i]=='R')
+      rangeList[i]=lp_data->si->getRowRange()[rhsind[i]];
+  }
+
+  lp_data->si->setRowSetTypes(indexFirst,indexLast,senseList,rhsval,rangeList);
+  
+
+}
+
+/*===========================================================================*/
+
+void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
+{
+  std::cout<<std::endl<<"26   ";
+
+  const int * indexFirst = index; 
+  const int * indexLast = index + cnt;
+  double * rhsList = new double[cnt]; 
+  double * rangeList = NULL; 
+
+  for(int i=0; i<cnt;i++){
+    rhsList[i]=lp_data->si->getRightHandSide()[index[i]];
+    if (sense[i]=='R')
+      rangeList[i]=lp_data->si->getRowRange()[index[i]];
+  }
+
+  lp_data->si->setRowSetTypes(indexFirst,indexLast,sense,rhsList,rangeList);
+
+
+}
+
+/*===========================================================================*/
+
+void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
+{
+
+  std::cout<<std::endl<<"27   ";
+
+  for(int i=0; i<cnt;i++){
+    switch(lu[i])
+      {
+      case 'L': lp_data->si->setColLower(index[i],bd[i]); 
+	break;
+      case 'U': lp_data->si->setColUpper(index[i],bd[i]); 
+	break;
+      default:
+	std::cout<<std::endl<<"defualt'da var!";
+	//default: can it happen? MEN
+      }
+  }
+
+  lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
+
+}
+
+/*===========================================================================*/
+
+void change_lbub(LPdata *lp_data, int j, double lb, double ub)
+{
+
+  std::cout<<std::endl<<"28   ";
+  lp_data->si->setColBounds(j,lb,ub);
+
+
+}
+
+/*===========================================================================*/
+
+void change_ub(LPdata *lp_data, int j, double ub)
+{
+  std::cout<<std::endl<<"29   ";
+  lp_data->si->setColUpper(j,ub);
+
+}
+
+/*===========================================================================*/
+
+void change_lb(LPdata *lp_data, int j, double lb)
+{
+  std::cout<<std::endl<<"30   ";
+  lp_data->si->setColLower(j,lb);
+
+
+}
+
+/*===========================================================================*/
+
+void get_ub(LPdata *lp_data, int j, double *ub)
+{
+  std::cout<<std::endl<<"31   ";
+  *ub=lp_data->si->getColUpper()[j];
+
+}
+
+/*===========================================================================*/
+
+void get_lb(LPdata *lp_data, int j, double *lb)
+{
+
+  std::cout<<std::endl<<"32   ";
+  *lb=lp_data->si->getColUpper()[j];
+
+}
+
+/*===========================================================================*/
+
+void get_objcoef(LPdata *lp_data, int j, double *objcoef)
+{
+  std::cout<<std::endl<<"33   ";
+  *objcoef=lp_data->si->getObjCoefficients()[j];
+
+}
+
+/*===========================================================================*/
+
+void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
+{
+  std::cout<<std::endl<<"34   ";
+  //What to do with all of these stuff? MEN! what is deletable? # of rows to be deleted?
+
+
+   int i, m = lp_data->m, *bhead = lp_data->bhead;
+   for (i = 0; i < m; ){
+      if (bhead[i] < 0 && free_rows[-bhead[i]-1]){
+	 bhead[i] = bhead[--m];
+      }else{
+	 i++;
+      }
+   }
+   if (m + deletable != lp_data->m)
+      lp_data->bhead_is_valid = FALSE;
+   //till here! MEN
+
+
+   int * rowIndices = new int[deletable];    //dimension?
+   int delnum=0;
+   CoinFillN(rowIndices,deletable,0);
+
+   for(i = 0; i < deletable; i++){
+     if(free_rows[i]){
+       rowIndices[delnum]=i;
+       delnum++;
+     }
+   }
+
+   lp_data->si->deleteRows(delnum,rowIndices);
+
+   //   lp_data->m = m;
+   lp_data->m=lp_data->si->getNumRows();
+
+
+   //MAY NOT BE CORRECT! COPY FROM delete_cols routine. MEN!
+
+}
+
+/*===========================================================================*/
+
+int delete_cols(LPdata *lp_data, int delnum, int *delstat)
+{
+
+  std::cout<<std::endl<<"35   ";
+
+  //WHAT TO DO WITH>? MEN
+
+   int i, *bhead = lp_data->bhead;
+   int m=lp_data->m;
+
+   /* this test can be made similar to the one in delete_cols if we pivot
+      in the slacks corresponding to the colums to be deleted */
+   for (i = lp_data->m-1; i >= 0; i--){
+      if (bhead[i] >= 0)
+	 if (delstat[bhead[i]]){
+	    lp_data->bhead_is_valid = FALSE;
+	    break;
+	 }
+   }
+   //TILL HERE MEN
+
+   int * rowIndices = new int[delnum];    //dimension?
+   int j, num=0;
+   int n = lp_data->n;
+   int retnum;
+
+   //   CoinFillN(rowIndices,delnum,0);
+  
+   for(i = n-1; i >=0; i--){
+     if(delstat[i]){
+       rowIndices[num++]=i;
+     }
+   }
+
+   //   std::cout<<std::endl<<"num is: "<<num;
+
+   for (i = 0, retnum = 0; i < lp_data->n; i++){
+     if (delstat[i]){
+	delstat[i] = -1;}
+      else
+	 delstat[i] = retnum++;
+   }
+
+   lp_data->si->deleteCols(num,rowIndices);
+   lp_data->nz=lp_data->si->getNumElements();
+
+   lp_data->n = retnum;
+
+
+   //   std::cout<<std::endl<<"retnum ve delnum: " <<n-retnum<<" -- "<<delnum;
+
+   return(retnum);
+}
+
+/*===========================================================================*/
+
+void release_var(LPdata *lp_data, int j, int where_to_move)
+{
+  fprintf(stderr, "Function not implemented yet.");
+  exit(-1);
+}
+
+/*===========================================================================*/
+
+void free_row_set(LPdata *lp_data, int length, int *index)
+{
+
+  std::cout<<std::endl<<"37";
+  std::cout<<std::endl;
+
+  const int * indexFirst = index; 
+  const int * indexLast = index + length;
+  char * senseList = new char[length]; 
+  double * rhsList = new double[length]; 
+  double * rangeList = new double[length]; 
+
+  for(int i=0; i<length;i++){
+    rhsList[i]=lp_data->si->getRightHandSide()[index[i]];
+    senseList[i]=lp_data->si->getRowSense()[index[i]];
+    if (senseList[i]=='R')
+      rangeList[i]=lp_data->si->getRowRange()[index[i]];
+  }
+
+  for(int i =0; i<length; i++) {
+    switch (senseList[i]){
+    case 'E':rhsList[i] = lp_data->si->getInfinity();
+      senseList[i]='L';
+      break;
+    case 'L':rhsList[i] = lp_data->si->getInfinity(); 
+      break;
+    case 'R':rangeList[i] = 2*lp_data->si->getInfinity();
+      break;
+      case'G':rhsList[i] = -lp_data->si->getInfinity();
+    }
+  }
+  lp_data->si->setRowSetTypes(indexFirst,indexLast,senseList,rhsList,rangeList);
+
+
+}
+
+/*===========================================================================*/
+
+void constrain_row_set(LPdata *lp_data, int length, int *index)
+{
+
+  printf("38 ");
+  int i;
+  const int * indexFirst = index; 
+  const int * indexLast = index + length;
+  char * senseList = new char[length]; 
+  double * rhsList = new double[length]; 
+  double * rangeList = NULL; 
+  constraint * rows = lp_data->rows;
+  cut_data*cut;
+
+
+   for (i = length-1; i >= 0; i--){
+      cut = rows[index[i]].cut;
+      rhsList[i] = cut->rhs;  
+      if ((senseList[i] = cut->sense) == 'R'){
+	rangeList[i]=cut->range;
+      }
+   }
+
+  lp_data->si->setRowSetTypes(indexFirst,indexLast,senseList,rhsList,rangeList);
+
+
+}
+
+/*===========================================================================*/
+
+void free_lp_solver_data(LPdata *lp_data, char arrays_too)
+{
+
+
+  //IS THAT CORRECT? we just need gutsOfDestructur... MEN
+
+
+  lp_data->si->~OsiSolverInterface();
+
+
+  //really need the following? MEN. after unloading, do we use it again?
+
+  lp_data->si=new OsiXSolverInterface();
+
+
+  if(lp_data){
+    if(arrays_too){
+	 FREE(lp_data->matbeg);
+	 FREE(lp_data->matcnt);
+	 FREE(lp_data->matind);
+	 FREE(lp_data->matval);
+	 FREE(lp_data->obj);
+	 FREE(lp_data->rhs);
+	 FREE(lp_data->rngval);
+	 FREE(lp_data->sense);
+	 FREE(lp_data->lb);
+	 FREE(lp_data->ub);
+	 FREE(lp_data->slacks);
+      }
+  }
+
+}
+
+/*===========================================================================*/
+
+void write_mps(LPdata *lp_data, char *fname)
+{
+
+  char * extension = "MPS";
+  double ObjSense = lp_data->si->getObjSense();
+
+  lp_data->si->writeMps(fname,extension,ObjSense);
+
+}
+
+
+//write_sav commented out MEN!
+
+/*
+void write_sav(LPdata *lp_data, char *fname)
+{
+   cpx_status = CPXsavwrite(lp_data->cpxenv, lp_data->lp, fname);
+   CPX_check_error("write_sav");
+}
+*/
+
+#endif /* __OSI_xxx__ */

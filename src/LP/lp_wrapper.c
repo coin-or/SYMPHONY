@@ -364,7 +364,7 @@ int create_lp_u(lp_prob *p)
 	    cut = (cut_data *) malloc(sizeof(cut_data));
 	    memcpy((char *)cut, (char *)rows[j].cut, sizeof(cut_data));
 	    if (cut->size){
-	       cut->coef = malloc(cut->size);
+	       cut->coef = (char *) malloc(cut->size);
 	       memcpy((char *)cut->coef, (char *)rows[j].cut->coef,
 		      cut->size);
 	    }
@@ -857,8 +857,8 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
       break;
    }
 
-   i = p->par.strong_branching_cand_num_max -
-      p->par.strong_branching_red_ratio * p->bc_level;
+   i = (int) (p->par.strong_branching_cand_num_max -
+      p->par.strong_branching_red_ratio * p->bc_level);
    i = MAX(i, p->par.strong_branching_cand_num_min);
 
    switch(user_res){
@@ -1439,15 +1439,15 @@ void purge_waiting_rows_u(lp_prob *p)
    int user_res, i, j;
    waiting_row **wrows = p->waiting_rows;
    int wrow_num = p->waiting_row_num;
-   char *delete;
+   char *delete_rows;
 
    REMALLOC(p->lp_data->tmp.cv, char, p->lp_data->tmp.cv_size, wrow_num,
 	    BB_BUNCH);
-   delete = p->lp_data->tmp.cv; /* wrow_num */
+   delete_rows = p->lp_data->tmp.cv; /* wrow_num */
 
-   memset(delete, 0, wrow_num);
+   memset(delete_rows, 0, wrow_num);
    
-   user_res = user_purge_waiting_rows(p->user, wrow_num, wrows, delete);
+   user_res = user_purge_waiting_rows(p->user, wrow_num, wrows, delete_rows);
    switch (user_res){
     case ERROR: /* purge all */
       free_waiting_rows(wrows, wrow_num);
@@ -1464,7 +1464,7 @@ void purge_waiting_rows_u(lp_prob *p)
       break;
     case USER_NO_PP:
       for (i = j = 0; i < wrow_num; i++){
-	 if (delete[i]){
+	 if (delete_rows[i]){
 	    free_waiting_row(wrows + i);
 	 }else{
 	    wrows[j++] = wrows[i];

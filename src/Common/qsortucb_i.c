@@ -1,8 +1,7 @@
 #include "qsortucb.h"
 
-void qsortucb_i(bot, nmemb)
-   int *bot;
-   int nmemb;
+void qsortucb_i(   int *bot,
+		   int nmemb)
 {
    if (nmemb <= 1)
       return;
@@ -27,9 +26,9 @@ void qsortucb_i(bot, nmemb)
    } \
 }
 
-void quick_sort_i(bot, nmemb)
-   int *bot;
-   int nmemb;
+void quick_sort_i(
+		  int *bot,
+		  int nmemb)
 {
    int tmp, n1, n2;
    int *top, *mid, *t1, *t2, *bsv;
@@ -126,9 +125,8 @@ partition_i:
    goto partition_i;
 }
 
-void insertion_sort_i(bot, nmemb)
-   int *bot;
-   int nmemb;
+void insertion_sort_i(   int *bot,
+			 int nmemb)
 {
    int tmp;
    int *s1, *s2, *t1, *t2, *top;

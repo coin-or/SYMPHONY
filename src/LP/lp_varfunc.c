@@ -479,7 +479,7 @@ our_col_set *price_all_vars(lp_prob *p)
    /* Compute how many non-dual-feasible cols we are willing to add.
     * Also compute how many non-fixable cols we are willing to add.
     * Then, to start with, set max_new_vars to be the latter. */
-   max_ndf_vars = n * p->par.max_non_dual_feas_to_add_frac;
+   max_ndf_vars = (int) (n * p->par.max_non_dual_feas_to_add_frac);
    if (max_ndf_vars < p->par.max_non_dual_feas_to_add_min)
       max_ndf_vars = p->par.max_non_dual_feas_to_add_min;
    if (max_ndf_vars > p->par.max_non_dual_feas_to_add_max)
@@ -488,7 +488,7 @@ our_col_set *price_all_vars(lp_prob *p)
    if (termcode != D_UNBOUNDED){
       max_nfix_vars = 0;
    }else{
-      max_nfix_vars = n * p->par.max_not_fixable_to_add_frac;
+      max_nfix_vars = (int) (n * p->par.max_not_fixable_to_add_frac);
       if (max_nfix_vars < p->par.max_not_fixable_to_add_min)
 	 max_nfix_vars = p->par.max_not_fixable_to_add_min;
       if (max_nfix_vars > p->par.max_not_fixable_to_add_max)

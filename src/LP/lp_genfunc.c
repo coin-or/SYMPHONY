@@ -812,8 +812,8 @@ void resize_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
 	 FREE(tmp->p1);
 	 FREE(tmp->p2);
 	 tmp->i2 = (int *) malloc(maxm * ISIZE);
-	 tmp->p1 = (void *) malloc(maxm * sizeof(void *));
-	 tmp->p2 = (void *) malloc(maxm * sizeof(void *));
+	 tmp->p1 = (void **) malloc(maxm * sizeof(void *));
+	 tmp->p2 = (void **) malloc(maxm * sizeof(void *));
       }
    }
 
@@ -1026,7 +1026,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
       desc->not_fixed.type = EXPLICIT_LIST;
       desc->not_fixed.added = 0;
       if ((desc->not_fixed.size = lp_data->not_fixed_num) > 0){
-	 desc->not_fixed.list = malloc(desc->not_fixed.size * ISIZE);
+	 desc->not_fixed.list = (int *) malloc(desc->not_fixed.size * ISIZE);
 	 memcpy(desc->not_fixed.list, lp_data->not_fixed,
 		lp_data->not_fixed_num * ISIZE);
       }else{

@@ -12,6 +12,7 @@
 /*                                                                           */
 /*===========================================================================*/
 
+#include <malloc.h>
 #include <stdio.h>
 
 #include "BB_constants.h"
@@ -215,7 +216,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
    *new_row_num = cutnum;
    if (cutnum > 0)
       *new_rows =
-	 row_list = (waiting_row **) calloc (cutnum*sizeof(waiting_row *));
+	 row_list = (waiting_row **) calloc (cutnum, sizeof(waiting_row *));
    
    for (j = 0; j < cutnum; j++){
       row_list[j] = (waiting_row *) malloc(sizeof(waiting_row));
@@ -316,7 +317,7 @@ int user_print_stat_on_cuts_added(void *user, int rownum, waiting_row **rows)
 \*===========================================================================*/
 
 int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
-			    char *delete)
+			    char *delete_rows)
 {
    return(DEFAULT);
 }

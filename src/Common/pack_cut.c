@@ -39,7 +39,7 @@ cut_data *unpack_cut(cut_data *pcut)
    cut->coef = coef;
    if (cut->size > 0){
       if (!cut->coef)
-	 cut->coef = malloc(cut->size);
+	 cut->coef = (char *) malloc(cut->size);
       receive_char_array(cut->coef, cut->size);
    }
    return(cut);

@@ -102,9 +102,11 @@ typedef struct LPdata{
 void CPX_check_error PROTO((const char *erring_func));
 
 #elif defined(__OSL__)
+
 /*****************************************************************************/
 /*******              here are the definitions for OSL                 *******/
 /*****************************************************************************/
+
 #include <ekk_c_api.h>
 
 void OSL_check_error PROTO((const char *erring_func));
@@ -132,6 +134,132 @@ typedef struct LPdata{
    EKKContext *env;
    double     lpetol;
    EKKModel   *lp;
+   char       lp_is_modified;
+   char       col_set_changed;
+   double     objval;
+   int        termcode;
+   int        alloc_m;
+   int        alloc_mplusn;
+   int        alloc_mplusnz;
+   int        n;           /* number of columns without slacks */
+   int        maxn;
+   int        m;           /* number of rows */
+   int        maxm;
+   int        nz;          /* number of nonzeros */
+   int        maxnz;       /* space is allocated for this many nonzeros */
+   int       *matbeg;      /* maxn + maxm + 1 */
+   int       *matcnt;      /* maxn + maxm */
+   int       *matind;      /* maxnz + maxm */
+   double    *matval;      /* maxnz + maxm*/
+   double    *obj;         /* maxn + maxm */
+   double    *rhs;         /* maxm */
+   double    *rngval;      /* maxm */
+   char      *sense;       /* maxm */
+   double    *lb;          /* maxn + maxm */
+   double    *ub;          /* maxn + maxm */
+
+   char       ordering;    /* COLIND_AND_USERIND_ORDERED, COLIND_ORDERED or
+			      USERIND_ORDERED */
+   var_desc **vars;        /* maxn */ /* BB */
+
+   int        not_fixed_num;
+   int       *not_fixed;
+   int        nf_status;
+
+   char      *status;      /* maxn */ /* BB */
+   double    *x;           /* maxn */ /* BB */
+   double    *dj;          /* maxn */ /* BB */
+   double    *dualsol;     /* maxm */ /* BB */
+   double    *slacks;      /* maxm */
+
+   int       *bhead;       /* maxm */ /* BB */
+   int        bhead_is_valid;
+   double    *xbzero;      /* maxm */ /* BB */
+
+   constraint  *rows;      /* maxm */
+
+   temporary   tmp;
+#ifdef PSEUDO_COSTS
+   double     *pseudo_costs_one;
+   double     *pseudo_costs_zero;
+#endif
+}LPdata;
+
+#elif defined(__OSI_CPX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
+|| defined(__OSI_XPRESS__) || defined(__OSI_SOPLEX__) || defined(__OSI_VOL__) \
+|| defined(__OSI_DYLP__) || defined (__OSI_GLPK__)
+
+/*****************************************************************************/
+/*******              here are the definitions for OSI                 *******/
+/*****************************************************************************/
+
+#include "OsiSolverInterface.hpp"
+#include "CoinHelperFunctions.hpp"
+#include "CoinPackedVector.hpp"
+
+#ifdef __OSI_CPX__
+#include "OsiCpxSolverInterface.hpp"
+typedef OsiCpxSolverInterface OsiXSolverInterface;
+#endif
+
+#ifdef __OSI_OSL__
+#include "OsiOslSolverInterface.hpp"
+typedef OsiOslSolverInterface OsiXSolverInterface;
+#endif
+
+#ifdef __OSI_CLP__
+#include "OsiClpSolverInterface.hpp"
+typedef OsiClpSolverInterface OsiXSolverInterface;
+#endif
+
+#ifdef __OSI_XPRESS__
+#include "OsiXprSolverInterface.hpp"
+typedef OsiXprSolverInterface OsiXSolverInterface;
+#endif
+
+#ifdef __OSI_SOPLEX__
+#include "OsiSpxSolverInterface.hpp"
+typedef OsiSpxSolverInterface OsiXSolverInterface;
+#endif
+
+#ifdef __OSI_VOL__
+#include "OsiVolSolverInterface.hpp"
+typedef OsiVolSolverInterface OsiXSolverInterface;
+#endif
+
+#ifdef __OSI_DYLP__
+#include "OsiDylpSolverInterface.hpp"
+typedef OsiDylpSolverInterface OsiXSolverInterface;
+#endif
+
+#ifdef __OSI_GLPK__
+#include "OsiCpxSolverInterface.hpp"
+typedef OsiGlpkSolverInterface OsiXSolverInterface;
+#endif
+
+/* The second comment indicates where the arrays are resized: BB or LP,
+ * BB is BlackBox, LP is the lp solver specific part */
+
+typedef struct TEMPORARY{
+   char      *c;           /* max(2m,n) */
+   int       *i1;          /* 3m+2n */
+   int       *i2;          /* m */
+   double    *d;           /* max(2m,2n) */
+   void     **p1;          /* m */
+   void     **p2;          /* m */
+
+   char      *cv;          /* variable */
+   int        cv_size;
+   int       *iv;          /* variable (>= */
+   int        iv_size;
+   double    *dv;          /* variable */
+   int        dv_size;
+}temporary;
+
+typedef struct LPdata{
+
+   OsiSolverInterface * si;
+   double     lpetol;
    char       lp_is_modified;
    char       col_set_changed;
    double     objval;

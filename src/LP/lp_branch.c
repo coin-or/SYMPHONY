@@ -14,6 +14,7 @@
 
 #include <math.h>
 #include <malloc.h>
+#include <memory.h>
 
 #include "lp.h"
 #include "qsortucb.h"
@@ -533,7 +534,7 @@ int branch(lp_prob *p, int cuts)
 	 memcpy((char *)cut, (char *)lp_data->rows[branch_row].cut,
 		sizeof(cut_data));
 	 if (cut->size){
-	    cut->coef = malloc(cut->size);
+	    cut->coef = (char *) malloc(cut->size);
 	    memcpy((char *)cut->coef,
 		   (char *)lp_data->rows[branch_row].cut->coef, cut->size);
 	 }

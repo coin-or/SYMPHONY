@@ -17,6 +17,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #ifdef __PVM__
 #include <pvmtev.h>
 #endif

@@ -1,9 +1,8 @@
 #include "qsortucb.h"
 
-void qsortucb_ic(bot, botd, nmemb)
-   int *bot;
-   char *botd;
-   int nmemb;
+void qsortucb_ic(int *bot,
+		 char *botd,
+		 int nmemb)
 {
    if (nmemb <= 1)
       return;
@@ -33,10 +32,9 @@ void qsortucb_ic(bot, botd, nmemb)
    } \
 }
 
-void quick_sort_ic(bot, botd, nmemb)
-   int *bot;
-   char *botd;
-   int nmemb;
+void quick_sort_ic(int *bot,
+		   char *botd,
+		   int nmemb)
 {
    int tmp, n1, n2;
    char tmpd;
@@ -134,10 +132,9 @@ partition_ic:
    goto partition_ic;
 }
 
-void insertion_sort_ic(bot, botd, nmemb)
-   int *bot;
-   char *botd;
-   int nmemb;
+void insertion_sort_ic(int *bot,
+		       char *botd,
+		       int nmemb)
 {
    int tmp;
    char tmpd;
