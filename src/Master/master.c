@@ -40,6 +40,8 @@
 #endif
 #endif
 
+#include "qsortucb.h"
+
 #ifndef TEV_INIT_MASK
 /* We must have pvm3.4 where it is called TEV_MASK_INIT */
 #  define TEV_INIT_MASK(m)  TEV_MASK_INIT(m)
@@ -111,7 +113,7 @@ sym_environment *sym_open_environment()
    printf("*   Distributed under the Common Public License 1.0   *\n");
    printf("*******************************************************\n");
    printf("\n");
-   
+
    env = (sym_environment *) calloc(1, sizeof(sym_environment));
 
    if (initialize_u(env) == FUNCTION_TERMINATED_NORMALLY){
@@ -170,7 +172,8 @@ int sym_set_defaults(sym_environment *env)
    env->par.mc_binary_search_tolerance = 0; 
    env->par.mc_compare_solution_tolerance = .001;
    env->par.mc_search_order = MC_FIFO;
-   env->par.mc_warm_start = TRUE;
+   env->par.mc_warm_start = FALSE;
+   env->par.trim_warm_tree = FALSE;
 
    /************************** treemanager defaults **************************/
    tm_par->verbosity = 0;
@@ -225,9 +228,9 @@ int sym_set_defaults(sym_environment *env)
    tm_par->colgen_strat[1] = (FATHOM__DO_NOT_GENERATE_COLS__DISCARD  |
 			      BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
    tm_par->not_fixed_storage_size = 2048;
-   tm_par->time_limit = 0;
-   tm_par->node_limit = 0;
-   tm_par->gap_limit = 0;
+   tm_par->time_limit = -1.0;
+   tm_par->node_limit = -1;
+   tm_par->gap_limit = -1.0;
    tm_par->find_first_feasible = FALSE;
    tm_par->sensitivity_analysis = FALSE;
    
@@ -286,7 +289,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->generate_cgl_cuts = TRUE;
 
    lp_par->multi_criteria = FALSE;
-   lp_par->mc_find_nondominated_solutions = TRUE;
+   lp_par->mc_find_supported_solutions = FALSE;
    lp_par->mc_gamma = 1;       /* Determines the weight on objective 1 */
    lp_par->mc_tau   = 0;       /* Determines the weight on objective 2 */
    lp_par->mc_rho   = 0.00001; /* For augmented Chebyshev norm */
@@ -404,7 +407,7 @@ int sym_set_user_data(sym_environment *env, void *user)
    
    env->user = user;
 
-   return(0);
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
    
 /*===========================================================================*/
@@ -489,6 +492,7 @@ int sym_find_initial_bounds(sym_environment *env)
 
 int sym_solve(sym_environment *env)
 {
+
    int s_bufid, r_bufid, bytes, msgtag = 0, sender, termcode = 0, temp, i;
    char lp_data_sent = FALSE, cg_data_sent = FALSE, cp_data_sent = FALSE;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -629,6 +633,8 @@ int sym_solve(sym_environment *env)
    }
    cp_data_sent = TRUE;
 #endif
+
+   memset(&(env->best_sol), 0, sizeof(lp_sol));
 
    if (env->warm_start && env->par.tm_par.warm_start){
       /* Load warm start info */
@@ -865,10 +871,14 @@ int sym_solve(sym_environment *env)
    if (env->warm_start->has_ub = tm->has_ub){
       env->warm_start->ub = tm->ub;
    }
+   env->par.tm_par.warm_start = FALSE;
+   
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    thread_num = env->tm->opt_thread_num;
    if (env->tm->lpp[thread_num]){
       if (env->tm->lpp[thread_num]->best_sol.xlength){
+	 FREE(env->best_sol.xind);
+	 FREE(env->best_sol.xval);
 	 env->best_sol = env->warm_start->best_sol = 
 	    env->tm->lpp[thread_num]->best_sol;
       }else if (!env->par.multi_criteria){
@@ -898,6 +908,12 @@ int sym_solve(sym_environment *env)
 	 termcode = TM_NO_SOLUTION;
       }
    }
+   else if((termcode == TM_ERROR__NUMERICAL_INSTABILITY ||
+	    termcode == SOMETHING_DIED) && 
+	   env->best_sol.xlength ){
+     termcode = TM_OPTIMAL_SOLUTION_FOUND;
+   }
+
    
 #ifndef COMPILE_IN_LP
    if (termcode != SOMETHING_DIED){
@@ -987,7 +1003,6 @@ int sym_solve(sym_environment *env)
    termcode = temp;
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    if (env->tm && env->tm->lpp[env->tm->opt_thread_num]){
-      env->best_sol = env->tm->lpp[env->tm->opt_thread_num]->best_sol;
       env->tm->lpp[env->tm->opt_thread_num]->best_sol.xlength = 0;
       env->tm->lpp[env->tm->opt_thread_num]->best_sol.xind = NULL;
       env->tm->lpp[env->tm->opt_thread_num]->best_sol.xval = NULL;
@@ -1019,96 +1034,74 @@ int sym_solve(sym_environment *env)
 
 /*===========================================================================*/
 /*===========================================================================*/
-int sym_initial_solve(sym_environment *env)
-{
-
-   int termcode;
-   
-
-   if (env){
-      if (env->par.tm_par.warm_start){
-	 env->par.tm_par.warm_start = FALSE;
-	 termcode = sym_solve(env);
-	 env->par.tm_par.warm_start = TRUE;
-      } 
-      else {
-	 termcode = sym_solve(env);
-      }
-      
-      return termcode;
-   }
-   else{
-      printf("sym_is_proven_primal_infeasible():The env. is empty!\n");
-      return FALSE;
-   }
-
-}
-/*===========================================================================*/
-/*===========================================================================*/
-int sym_resolve(sym_environment *env)
+int sym_warm_solve(sym_environment *env)
 {
    int i, change_type;
 
    /* first check for the updates! */
 
-   if (env->warm_start && env->par.tm_par.warm_start){
-      if (!env->mip->change_num){
-	 return sym_solve(env);
-      }
-      else{
-	 if (!env->warm_start){
-	    printf("sym_solve():");
-	    printf("Unable to process an empty warm start description!\n");
-	    return(TM_NO_SOLUTION);
-	 }
-	 
-	 env->warm_start->has_ub = FALSE;
-	 env->warm_start->ub = 0.0;
-
-	 for(i = 0; i < env->mip->change_num; i++){
-	    change_type = env->mip->change_type[i];
-	    if (change_type == RHS_CHANGED){
-
-#ifdef USE_CGL_CUTS
-	       printf("sym_resolve(): SYMPHONY can not resolve for the\n");
-	       printf("rhs change when cuts exist, for now!\n"); 
-	       return(TM_NO_SOLUTION);
-	       
-#else
-
-	       env->mip->change_num = 0;
-	       update_tree_bound(env, env->warm_start->rootnode, RHS_CHANGED);
-	       return sym_solve(env);
-#endif
-	    }
-	 }
-
-	 for(i = 0; i < env->mip->change_num; i++){
-	    change_type = env->mip->change_type[i];
-	    switch(change_type){
-	     case OBJ_COEFF_CHANGED:
-		
-		if(env->par.lp_par.do_reduced_cost_fixing){
-		   printf("sym_resolve(): SYMPHONY can not resolve for the\n");
-		   printf("obj coeff change when reduced cost fixing is on,"); 
-		   printf("for now!\n"); 
-		   return(TM_NO_SOLUTION);		   
-		}
-
-		update_tree_bound(env, env->warm_start->rootnode, 
-				  OBJ_COEFF_CHANGED);
-		break;
-	     default:
-		printf("sum_resolve():");
-		printf("Unable to re-solve this change,for now!\n");
-		return(TM_NO_SOLUTION); 
-	    }
-	 }      
-      }   
+   if (!env->mip->change_num || !env->warm_start ||
+       (env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY)){
+      return(sym_solve(env));
    }
+   else{
+
+      if (env->warm_start){
+	 env->par.tm_par.warm_start = TRUE;
+      }
+
+      env->warm_start->has_ub = FALSE;
+      env->warm_start->ub = 0.0;
+      
+      for(i = 0; i < env->mip->change_num; i++){
+	 change_type = env->mip->change_type[i];
+	 if (change_type == RHS_CHANGED){
+	    
+#ifdef USE_CGL_CUTS
+	    printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
+	    printf("rhs change when cuts exist, for now!\n"); 
+	    return(FUNCTION_TERMINATED_ABNORMALLY);	    
+#else	    
+	    env->mip->change_num = 0;
+	    update_tree_bound(env, env->warm_start->rootnode, RHS_CHANGED);
+	    return(sym_solve(env));
+#endif
+	 }
+      }
+      
+      for(i = 0; i < env->mip->change_num; i++){
+	 change_type = env->mip->change_type[i];
+	 switch(change_type){
+	  case OBJ_COEFF_CHANGED:
+
+	     if(env->par.lp_par.do_reduced_cost_fixing &&
+		!env->par.mc_warm_start){
+		printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
+		printf("obj coeff change when reduced cost fixing is on,"); 
+		printf("for now!\n"); 
+		return(FUNCTION_TERMINATED_ABNORMALLY);   
+	     }
+
+	     update_tree_bound(env, env->warm_start->rootnode, 
+			       OBJ_COEFF_CHANGED);
+	     break;
+	  default:
+	     printf("sym_warm_solve():");
+	     printf("Unable to re-solve this change,for now!\n");
+	     return(FUNCTION_TERMINATED_ABNORMALLY); 
+	 }
+      }      
+   }  
+
+   /* Uncommented for now! */
+#if 0 
+   if (env->par.trim_warm_tree) {
+      trim_warm_tree(env, env->warm_start->rootnode);
+   }
+#endif
    
    env->mip->change_num = 0;
-   return sym_solve(env);
+   return(sym_solve(env));
    
 }
 
@@ -1141,10 +1134,11 @@ typedef struct SOLUTION_PAIRS{
 #define MAX_NUM_INFEASIBLE 10000
 
 /*===========================================================================*/
+/*===========================================================================*/
 
 int sym_mc_solve(sym_environment *env)
 {
-   int i;
+   int i, cp_num;
    double gamma, gamma0, gamma1, tau, slope;
    double start_time;
    warm_start_desc *ws;
@@ -1178,21 +1172,19 @@ int sym_mc_solve(sym_environment *env)
 
    sym_set_int_param(env, "multi_criteria", TRUE);
    memcpy((char *)env->mip->obj1, (char *)env->mip->obj, DSIZE*env->mip->n);
-   if (env->par.lp_par.mc_find_nondominated_solutions){
+   if (!env->par.lp_par.mc_find_supported_solutions){
       env->base->cutnum += 2;
       env->rootdesc->uind.size++;
       env->rootdesc->uind.list = (int *) realloc(env->rootdesc->uind.list,
 					 env->rootdesc->uind.size*ISIZE);
       env->rootdesc->uind.list[env->rootdesc->uind.size-1] = env->mip->n;
-   }else{
-      sym_set_int_param(env, "keep_description_of_pruned", KEEP_IN_MEMORY);
    }
    
    start_time = wall_clock(NULL);
 
    /* Set some parameters */
    compare_sol_tol = env->par.mc_compare_solution_tolerance;
-   if (!env->par.lp_par.mc_find_nondominated_solutions){
+   if (env->par.lp_par.mc_find_supported_solutions){
       env->par.lp_par.mc_rho = 0;
    }
    env->par.tm_par.granularity = env->par.lp_par.granularity =
@@ -1215,7 +1207,7 @@ int sym_mc_solve(sym_environment *env)
       }
       if (env->par.use_permanent_cut_pools){
 	 printf("Saving the global cut pool between iterations...\n");
-	 sym_create_permanent_cut_pools(env);
+	 sym_create_permanent_cut_pools(env, &cp_num);
       }
       printf("\n");
    }
@@ -1230,9 +1222,14 @@ int sym_mc_solve(sym_environment *env)
    printf("***************************************************\n");
    printf("***************************************************\n\n");
 
-   /* FIXME! For now, close reduced cost fixing...*/
-   if (!env->par.lp_par.mc_find_nondominated_solutions){
-      env->par.lp_par.do_reduced_cost_fixing = FALSE;      
+   /* For now, close reduced cost fixing and keep_warm_start param if 
+      warm starting is to be used...
+   */
+   if (env->par.lp_par.mc_find_supported_solutions && 
+       env->par.mc_warm_start){
+      // env->par.lp_par.do_reduced_cost_fixing = FALSE;      
+      sym_set_int_param(env, "do_reduced_cost_fixing", FALSE);      
+      sym_set_int_param(env, "keep_warm_start", TRUE);
    }
 
    /* Solve */
@@ -1245,7 +1242,8 @@ int sym_mc_solve(sym_environment *env)
    }
    numprobs++;
    
-   if (!env->par.lp_par.mc_find_nondominated_solutions){
+   if (env->par.lp_par.mc_find_supported_solutions && 
+       env->par.mc_warm_start){
       ws = sym_get_warm_start(env, TRUE);
    }
    
@@ -1270,21 +1268,38 @@ int sym_mc_solve(sym_environment *env)
    printf("***************************************************\n");
    printf("***************************************************\n\n");
 
+   /* Now, we can turn on reduced cost fixing and turn off keeping 
+      warm start data
+   */
+   if(env->par.lp_par.mc_find_supported_solutions && 
+      env->par.mc_warm_start){
+      sym_set_int_param(env, "do_reduced_cost_fixing", TRUE);      
+      sym_set_int_param(env, "keep_warm_start", FALSE);
+   }
+
    /* Resolve */
    env->utopia[0] = -MAXDOUBLE;
    env->utopia[1] = 0;
-   if (!env->par.lp_par.mc_find_nondominated_solutions){
-      sym_set_warm_start(env, ws);
+   if (env->par.lp_par.mc_find_supported_solutions){
+      if (env->par.mc_warm_start){      
+	 sym_set_warm_start(env, ws);
+      }
+      
       for (i = 0; i < env->mip->n; i++){
 	 sym_set_obj_coeff(env, i, env->mip->obj2[i] +
 			   env->par.lp_par.mc_rho*(env->mip->obj1[i] +
-					      env->mip->obj2[i]));
+						   env->mip->obj2[i]));
       }
-      if (termcode = sym_resolve(env) < 0){
-	 sym_delete_warm_start(ws);
-	 env->base->cutnum -=2;
-	 env->rootdesc->uind.size--;
-	 return(termcode);
+
+      if (env->par.mc_warm_start){      
+	 if (termcode = sym_warm_solve(env) < 0){
+	    sym_delete_warm_start(ws);
+	    return(termcode);
+	 }
+      }else{
+	 if (termcode = sym_solve(env) < 0){
+	    return(termcode);
+	 }
       }
    }else{
       if (termcode = sym_solve(env) < 0){
@@ -1356,7 +1371,7 @@ int sym_mc_solve(sym_environment *env)
 
       if (binary_search){
 	 gamma = (pairs[cur_position].gamma1 + pairs[cur_position].gamma2)/2;
-      }else if (env->par.lp_par.mc_find_nondominated_solutions){
+      }else if (!env->par.lp_par.mc_find_supported_solutions){
 	 gamma = (utopia[1] - solutions[solution1].obj[1])/
 	    (utopia[0] - solutions[solution2].obj[0] +
 	     utopia[1] - solutions[solution1].obj[1]);
@@ -1378,7 +1393,7 @@ int sym_mc_solve(sym_environment *env)
       env->mc_ub = env->ub = MAXDOUBLE;
       if (!binary_search){
 	 for (i = 0; i < numsolutions; i++){
-	    if (env->par.lp_par.mc_find_nondominated_solutions){
+	    if (!env->par.lp_par.mc_find_supported_solutions){
 	       ub = MAX(gamma*(solutions[i].obj[0] - utopia[0]),
 			tau*(solutions[i].obj[1] - utopia[1]));
 	    }else{
@@ -1406,18 +1421,26 @@ int sym_mc_solve(sym_environment *env)
       
       env->obj[0] = env->obj[1] = 0.0;
       
-      if (!env->par.lp_par.mc_find_nondominated_solutions){
-	 sym_set_warm_start(env, ws);
-	 for (i = 0; i < env->mip->n; i++){
-	    sym_set_obj_coeff(env, i, gamma*env->mip->obj1[i]+tau*env->mip->obj2[i]
-			      + env->par.lp_par.mc_rho*(env->mip->obj1[i] +
-						      env->mip->obj2[i]));
+      if (env->par.lp_par.mc_find_supported_solutions){
+	 if(env->par.mc_warm_start){
+	    sym_set_warm_start(env, ws);
 	 }
-	 if (termcode = sym_resolve(env) < 0){
-	    sym_delete_warm_start(ws);
-	    env->base->cutnum -=2;
-	    env->rootdesc->uind.size--;
-	    return(termcode);
+
+	 for (i = 0; i < env->mip->n; i++){
+	    sym_set_obj_coeff(env, i, gamma*env->mip->obj1[i]
+			      + tau*env->mip->obj2[i]
+			      + env->par.lp_par.mc_rho*(env->mip->obj1[i]
+							+ env->mip->obj2[i]));
+	 }
+	 if(env->par.mc_warm_start){
+	    if (termcode = sym_warm_solve(env) < 0){
+	       sym_delete_warm_start(ws);
+	       return(termcode);
+	    }
+	 }else{
+	    if (termcode = sym_solve(env) < 0){
+	       return(termcode);
+	    }
 	 }
       }else{
 	 if (termcode = sym_solve(env) < 0){
@@ -1563,14 +1586,14 @@ int sym_mc_solve(sym_environment *env)
       printf("Maximum number of solution pairs (%i) reached\n\n",
 	     MAX_NUM_PAIRS);
       printf("\n********************************************************\n");
-      if (env->par.lp_par.mc_find_nondominated_solutions){
+      if (!env->par.lp_par.mc_find_supported_solutions){
 	 printf(  "* Found set of non-dominated solutions!!!!!!! *\n");
       }else{
 	 printf(  "* Found set of supported solutions!!!!!!!     *\n");
       }
    }else{
       printf("\n********************************************************\n");
-      if (env->par.lp_par.mc_find_nondominated_solutions){
+      if (!env->par.lp_par.mc_find_supported_solutions){
 	 printf(  "* Found complete set of non-dominated solutions!!!!!!! *\n");
       }else{
 	 printf(  "* Found complete set of supported solutions!!!!!!!     *\n");
@@ -1595,7 +1618,7 @@ int sym_mc_solve(sym_environment *env)
    
    printf("***************************************************\n");
    printf("***************************************************\n");
-   if (env->par.lp_par.mc_find_nondominated_solutions){
+   if (!env->par.lp_par.mc_find_supported_solutions){
       printf("Displaying non-dominated solution values and breakpoints\n");  
    }else{
       printf("Displaying supported solution values and breakpoints\n");  
@@ -1605,7 +1628,7 @@ int sym_mc_solve(sym_environment *env)
 
    gamma0 = 1.0;
    for (i = 0; i < numsolutions - 1; i++){
-      if (env->par.lp_par.mc_find_nondominated_solutions){
+      if (!env->par.lp_par.mc_find_supported_solutions){
 	 gamma1 = (utopia[1] - solutions[i].obj[1])/
 	    (utopia[0] - solutions[i+1].obj[0] +
 	     utopia[1] - solutions[i].obj[1]);
@@ -1629,11 +1652,14 @@ int sym_mc_solve(sym_environment *env)
       FREE(solutions[i].values);
       FREE(solutions[i].indices);
    }
-   if (!env->par.lp_par.mc_find_nondominated_solutions){
-      sym_delete_warm_start(ws);
+   if (env->par.lp_par.mc_find_supported_solutions){
+       if(env->par.mc_warm_start){
+	  sym_delete_warm_start(ws);
+       }
+   }else {       
+      env->base->cutnum -=2;
+      env->rootdesc->uind.size--;
    }
-   env->base->cutnum -=2;
-   env->rootdesc->uind.size--;
 
    return(TM_OPTIMAL_SOLUTION_FOUND);
 }
@@ -1641,10 +1667,13 @@ int sym_mc_solve(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_create_permanent_cut_pools(sym_environment *env)
+int sym_create_permanent_cut_pools(sym_environment *env, int * cp_num)
 {
+
+   *cp_num = 0;
+   
 #if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP))
-   return(0);
+   return(FUNCTION_TERMINATED_ABNORMALLY);
 #else
    int i;
    
@@ -1660,9 +1689,11 @@ int sym_create_permanent_cut_pools(sym_environment *env)
 	 env->cp[i]->user = env->user;
 #endif
       }
-      return(env->par.tm_par.max_cp_num);
+      *cp_num = env->par.tm_par.max_cp_num;
+      return(FUNCTION_TERMINATED_NORMALLY);
    }else{
-      return(0);
+      printf("sym_create_permanent_cut_pools(): \"max_cp_num\" param was not set!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 #endif
 }
@@ -1691,97 +1722,158 @@ int sym_close_environment(sym_environment *env)
 /*===========================================================================*/
 
 int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
-			      int *start, int *index, double *value,
-			      double *collb, double *colub, char *is_int,
-			      double *obj, double *obj2, char *rowsen,
+			      int *start, int *index, double *value,         
+			      double *collb, double *colub, char *is_int,    
+			      double *obj, double *obj2, char *rowsen,       
 			      double *rowrhs, double *rowrng, char make_copy)
 {
    int termcode = 0;   
-   double t =0;
+   double t = 0, inf = SYM_INFINITY;
    int j;
 
-   if (numcols == 0){
-      printf("sym_explicit_load_problem():The given problem is empty!\n");
-      return (0);
+   if ((!numcols && !numrows) || numcols < 0 || numrows <0){
+      printf("sym_load_problem_user():The given problem is empty or incorrect");
+      printf("problem description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    (void)used_time(&t);
    
-   env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
- 
    env->mip->m  = numrows;
    env->mip->n  = numcols;
-   env->mip->nz = start[numcols];
 
    if (make_copy){
-      env->mip->obj    = (double *) malloc(DSIZE * numcols);
+      env->mip->obj    = (double *) calloc(numcols, DSIZE);
       env->mip->obj1   = (double *) calloc(numcols, DSIZE);
       env->mip->obj2   = (double *) calloc(numcols, DSIZE);
-      env->mip->rhs    = (double *) malloc(DSIZE * numrows);
+      env->mip->rhs    = (double *) calloc(numrows, DSIZE);
       env->mip->sense  = (char *)   malloc(CSIZE * numrows);
-      env->mip->rngval = (double *) malloc(DSIZE * numrows);
-      env->mip->ub     = (double *) malloc(DSIZE * numcols);
-      env->mip->lb     = (double *) malloc(DSIZE * numcols);
+      env->mip->rngval = (double *) calloc(numrows, DSIZE);
+      env->mip->ub     = (double *) calloc(numcols, DSIZE);
+      env->mip->lb     = (double *) calloc(numcols, DSIZE);
       env->mip->is_int = (char *)   calloc(CSIZE, numcols);
       
-      memcpy(env->mip->obj,  obj,  DSIZE * numcols);
+      if (obj){
+	 memcpy(env->mip->obj,  obj,  DSIZE * numcols);
+      }
+
       if (obj2){
 	 memcpy(env->mip->obj2, obj2, DSIZE * numcols);
       }
-      memcpy(env->mip->sense, rowsen, CSIZE * numrows); 
-      memcpy(env->mip->rhs, rowrhs, DSIZE * numrows);
+
+      if (rowsen){
+	 memcpy(env->mip->sense, rowsen, CSIZE * numrows); 
+      }else{
+	 memset(env->mip->sense, 'N', CSIZE *numrows);
+      }
+
+      if(rowrhs){
+	 memcpy(env->mip->rhs, rowrhs, DSIZE * numrows);
+      }
+
       if (rowrng){
 	 memcpy(env->mip->rngval, rowrng, DSIZE * numrows);
       }
-      memcpy(env->mip->ub, colub, DSIZE * numcols); 
-      memcpy(env->mip->lb, collb, DSIZE * numcols);
+
+      if (colub){
+	 memcpy(env->mip->ub, colub, DSIZE * numcols); 
+      }else{
+	 for(j = 0; j<env->mip->n; j++){
+	    env->mip->ub[j] = inf;
+	 }
+      }
+
+      if(collb){
+	 memcpy(env->mip->lb, collb, DSIZE * numcols);
+      }
+
       if (is_int){
 	 memcpy(env->mip->is_int, is_int, CSIZE * numcols);
       }
       
       //user defined matind, matval, matbeg--fill as column ordered
+
+      if(start){      
+
+	 env->mip->nz = start[numcols];
+	 env->mip->matbeg = (int *) calloc(ISIZE, (numcols + 1));
+	 env->mip->matval = (double *) calloc(DSIZE,start[numcols]);
+	 env->mip->matind = (int *)    calloc(ISIZE,start[numcols]);
+	 
+	 memcpy(env->mip->matbeg, start, ISIZE *(numcols + 1));
+	 memcpy(env->mip->matval, value, DSIZE *start[numcols]);  
+	 memcpy(env->mip->matind, index, ISIZE *start[numcols]);  
+      }
       
-      env->mip->matbeg = (int *) malloc(ISIZE * (numcols + 1));
-      env->mip->matval = (double *) malloc(DSIZE*start[numcols]);
-      env->mip->matind = (int *)    malloc(ISIZE*start[numcols]);
-      
-      memcpy(env->mip->matbeg, start, ISIZE * (numcols + 1));
-      memcpy(env->mip->matval, value, DSIZE * 
-	     start[numcols]);  
-      memcpy(env->mip->matind, index, ISIZE * 
-	     start[numcols]);  
    }else{
-      env->mip->obj  = obj;
+      
+      if (obj){
+	 env->mip->obj = obj;
+      }else{
+	 env->mip->obj    = (double *) calloc(numcols, DSIZE);	 
+      }
+
       env->mip->obj1   = (double *) calloc(numcols, DSIZE);
+
       if (obj2){
 	 env->mip->obj2 = obj2;
       }else{
-	 env->mip->obj2   = (double *) calloc(numcols, DSIZE);
+	 env->mip->obj2   = (double *) calloc(numcols, DSIZE);	 
       }
-      env->mip->sense = rowsen;
-      env->mip->rhs = rowrhs;
+
+      if (rowsen){
+	 env->mip->sense = rowsen;
+      }else{
+	 env->mip->sense  = (char *) malloc(CSIZE * numrows);
+	 memset(env->mip->sense, 'N', CSIZE *numrows);
+      }
+
+      if(rowrhs){
+	 env->mip->rhs = rowrhs;
+      }else{
+	 env->mip->rhs = (double *) calloc(numrows, DSIZE);	 
+      }
+
       if (rowrng){
 	 env->mip->rngval = rowrng;
       }else{
 	 env->mip->rngval = (double *) calloc(numrows, DSIZE);
       }
-      env->mip->ub = colub; 
-      env->mip->lb =  collb;
+
+      if (colub){
+	 env->mip->ub = colub;
+      }else{
+	 env->mip->ub = (double *) calloc(numcols, DSIZE);
+	 for(j = 0; j<env->mip->n; j++){
+	    env->mip->ub[j] = inf;
+	 }
+      }
+
+      if (collb){
+	 env->mip->lb = collb;
+      }else{
+	 env->mip->lb = (double *) calloc(numcols, DSIZE);	 
+      }
+
       if (is_int){
 	 env->mip->is_int = is_int;
       }else{
-	 env->mip->is_int = (char *) calloc(numcols, CSIZE);
+	 env->mip->is_int = (char *)   calloc(CSIZE, numcols);
       }
-      env->mip->matbeg = start;
-      env->mip->matval = value;
-      env->mip->matind = index;
+
+      if(start){
+	 env->mip->nz = start[numcols];
+	 env->mip->matbeg = start;
+	 env->mip->matval = value;
+	 env->mip->matind = index;
+      }
    }
       
    /* Start up the graphics window*/
 #ifndef WIN32
    CALL_WRAPPER_FUNCTION( init_draw_graph_u(env) );   
 #endif
-
+   
    /*------------------------------------------------------------------------*\
     * Have the user generate the base and root description
    \*------------------------------------------------------------------------*/
@@ -1801,22 +1893,15 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 int sym_is_abandoned(sym_environment *env)
 {
 
-   if (env){
-      switch(env->termcode){
-	 
-       case SOMETHING_DIED:
-       case TM_ERROR__NUMERICAL_INSTABILITY:    
-	  return TRUE;
-       default:
-	  break;
-      }
+   switch(env->termcode){
+    case SOMETHING_DIED:
+    case TM_ERROR__NUMERICAL_INSTABILITY:    
+       return(TRUE);
+    default:
+       break;
    }
-   else{
-      printf("sym_is_abandoned():The env. is empty!\n");
-      return FALSE;
-   }
- 
-   return FALSE;
+
+   return(FALSE);
 }
 
 /*===========================================================================*/
@@ -1825,27 +1910,13 @@ int sym_is_abandoned(sym_environment *env)
 int sym_is_proven_optimal(sym_environment *env)
 {
 
-   if (env){
-      switch(env->termcode){
-	 
-       case TM_OPTIMAL_SOLUTION_FOUND:
-	  return TRUE;
-       default:
-#if 0
-	  if(env->par.tm_par.warm_start){
-	     if(env->best_sol.xlength){
-		return TRUE;
-	     }
-	  }
-#endif
-	  break;
-      }
+   switch(env->termcode){
+    case TM_OPTIMAL_SOLUTION_FOUND:
+       return(TRUE);
+    default:
+       break;
    }
-   else{
-      printf("sym_is_proven_optimal():The env. is empty!\n");
-      return(FUNCTION_TERMINATED_ABNORMALLY);
-   }
-   
+
    return(FALSE);
 }
 
@@ -1855,66 +1926,45 @@ int sym_is_proven_optimal(sym_environment *env)
 int sym_is_proven_primal_infeasible(sym_environment *env)
 {
 
-   if (env){
-      switch(env->termcode){
-	 
-       case TM_NO_SOLUTION:
-	  return TRUE;
-       default:
-	  break;
-      }
+   switch(env->termcode){
+    case TM_NO_SOLUTION:
+       return(TRUE);
+    default:
+       break;
    }
-   else{
-      printf("sym_is_proven_primal_infeasible():The env. is empty!\n");
-      return FALSE;
-   }
-   
-   return FALSE;
+
+   return(FALSE);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 int sym_is_primal_objective_limit_reached(sym_environment *env)
 {
-   if (env){
-      switch(env->termcode){
-	 
-       case TM_TARGET_GAP_ACHIEVED:
-	  return TRUE;
-       default:
-	  break;
-      }
-   }
-   else{
-      printf("sym_is_primal_objective_limit_reached():");
-      printf("The env. is empty!\n");
-      return FALSE;
+
+   switch(env->termcode){
+    case TM_TARGET_GAP_ACHIEVED:
+       return(TRUE);
+    default:
+       break;
    }
    
-   return FALSE;
+   return(FALSE);
 }
 /*===========================================================================*/
 /*===========================================================================*/
 
 int sym_is_iteration_limit_reached(sym_environment *env)
 {
-      if (env){
-      switch(env->termcode){
-	 
-       case TM_NODE_LIMIT_EXCEEDED:
-	  return TRUE;
-       case TM_FOUND_FIRST_FEASIBLE: 
-	  return TRUE;
-       default:
-	  break;
-      }
+
+   switch(env->termcode){
+    case TM_NODE_LIMIT_EXCEEDED:
+    case TM_FOUND_FIRST_FEASIBLE: 
+       return(TRUE);
+    default:
+       break;
    }
-   else{
-      printf("sym_is_iteration_limit_reached():The env. is empty!\n");
-      return FALSE;
-   }
-   
-   return FALSE;
+
+   return(FALSE);
 }
 
 /*===========================================================================*/
@@ -1922,21 +1972,15 @@ int sym_is_iteration_limit_reached(sym_environment *env)
 
 int sym_is_time_limit_reached(sym_environment *env)
 {
-      if (env){
-      switch(env->termcode){
-	 
-       case TM_TIME_LIMIT_EXCEEDED:
-	  return TRUE;
-       default:
-	  break;
-      }
-   }
-   else{
-      printf("sym_is_time_limit_reached():The env. is empty!\n");
-      return FALSE;
+
+   switch(env->termcode){  
+    case TM_TIME_LIMIT_EXCEEDED:
+       return(TRUE);
+    default:
+       break;
    }
    
-   return FALSE;
+   return(FALSE);
 }
 
 /*===========================================================================*/
@@ -1944,145 +1988,172 @@ int sym_is_time_limit_reached(sym_environment *env)
 
 int sym_is_target_gap_achieved(sym_environment *env)
 {
-   if (env){
-      switch(env->termcode){
-	 
-       case TM_TARGET_GAP_ACHIEVED:
-	  return TRUE;
-       default:
-	  break;
-      }
-   }
-   else{
-      printf("sym_is_time_limit_reached():The env. is empty!\n");
-      return FALSE;
+ 
+   switch(env->termcode){
+    case TM_TARGET_GAP_ACHIEVED:
+       return(TRUE);
+    default:
+       break;
    }
    
-   return FALSE;
+   return(FALSE);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_num_cols(sym_environment *env)
+int sym_get_status(sym_environment *env)
 {
-   if (!env->mip){
-      printf("sym_get_num_cols():The env. description is empty!\n");
-      return (0);
-   }
-   
-   return env->mip->n;
+   return (env->termcode);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_num_rows(sym_environment *env)
+int sym_get_num_cols(sym_environment *env, int *numcols)
 {
+
    if (!env->mip){
-      printf("sym_get_num_rows():The env. description is empty!\n");
-      return (0);
+      printf("sym_get_num_cols():There is no loaded mip description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
+
+   *numcols = env->mip->n;
    
-   return env->mip->m;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_num_elements(sym_environment *env)
+int sym_get_num_rows(sym_environment *env, int *numrows)
 {
    if (!env->mip){
-      printf("sym_get_num_elements():The env. description is empty!\n");
-      return (0);
+      printf("sym_get_num_rows():There is no loaded mip description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
+
+   *numrows = env->mip->m;
    
-   return env->mip->nz;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-double *sym_get_col_lower(sym_environment *env)
+int sym_get_num_elements(sym_environment *env, int *numelems)
 {
    if (!env->mip){
-      printf("sym_get_col_lower():The env. description is empty!\n");
-      return (0);
+      printf("sym_get_num_elements():There is no loaded mip description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    
-   return env->mip->lb;
+   *numelems = env->mip->nz;
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-double *sym_get_col_upper(sym_environment *env)
+int sym_get_col_lower(sym_environment *env, double *collb)
 {
-   if (!env->mip){
-      printf("sym_get_col_upper():The env. description is empty!\n");
-      return (0);
+   int i;
+   if (!env->mip || !env->mip->n || !env->mip->lb){
+      printf("sym_get_col_lower():There is no loaded mip description or\n");
+      printf("there is no loaded column description!\n");
+     return(FUNCTION_TERMINATED_ABNORMALLY);
    }
-   
-   return env->mip->ub;
+
+   memcpy(collb, env->mip->lb, DSIZE * env->mip->n);
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-char *sym_get_row_sense(sym_environment *env)
+int sym_get_col_upper(sym_environment *env, double *colub)
 {
-   if (!env->mip){
-      printf("sym_get_row_sense():The env. description is empty!\n");
-      return (0);
+   if (!env->mip || !env->mip->n || !env->mip->ub){
+      printf("sym_get_col_upper():There is no loaded mip description or\n");
+      printf("there is no loaded column description!\n");  
+    return(FUNCTION_TERMINATED_ABNORMALLY);
    }
+
+   memcpy(colub, env->mip->ub, DSIZE * env->mip->n);
    
-   return env->mip->sense;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-double *sym_get_rhs(sym_environment *env)
+int sym_get_row_sense(sym_environment *env, char *rowsen)
 {
-   if (!env->mip){
-      printf("sym_get_rhs():The env. description is empty!\n");
-      return (0);
+   if (!env->mip || !env->mip->m || !env->mip->sense){
+      printf("sym_get_row_sense():There is no loaded mip description or\n");
+      printf("there is no loaded row description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
+
+   memcpy(rowsen, env->mip->sense, CSIZE * env->mip->m);
    
-   return env->mip->rhs;
+   return(FUNCTION_TERMINATED_NORMALLY);
+
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-double *sym_get_row_range(sym_environment *env)
+int sym_get_rhs(sym_environment *env, double *rowrhs)
 {
-   if (!env->mip){
-      printf("sym_get_row_range():The env. description is empty!\n");
-      return (0);
+   if (!env->mip || !env->mip->m || !env->mip->rhs){
+      printf("sym_get_rhs():There is no loaded mip description or\n");
+      printf("there is no loaded row description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
+
+   memcpy(rowrhs, env->mip->rhs, DSIZE * env->mip->m);
    
-   return env->mip->rngval;
+   return(FUNCTION_TERMINATED_NORMALLY);
+
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-double *sym_get_row_lower(sym_environment *env)
+int sym_get_row_range(sym_environment *env, double *rowrng)
 {
-   if (!env->mip){
-      printf("sym_get_row_lower():The env. description is empty!\n");
-      return (0);
+   if (!env->mip || !env->mip->m || !env->mip->rngval){
+      printf("sym_get_row_range():There is no loaded mip description or\n");
+      printf("there is no loaded row description!\n"); 
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+
+   memcpy(rowrng, env->mip->rngval, DSIZE * env->mip->m);
+   
+   return(FUNCTION_TERMINATED_NORMALLY);
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_row_lower(sym_environment *env, double *rowlb)
+{
+   if (!env->mip || !env->mip->m || !env->mip->rhs){
+      printf("sym_get_row_lower():There is no loaded mip description or\n");
+      printf("there is no loaded row description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    
-   double * lower = (double *)malloc(DSIZE*env->mip->m);
    double upper;
    int i;
-   double rhs, range, inf = INFINITY;
+   double rhs, range, inf = SYM_INFINITY;
    char sense;
 
-   for ( i = env->mip->m - 1; i >= 0; --i )
-      {
+   for ( i = env->mip->m - 1; i >= 0; --i ){
 
 	 rhs   = env->mip->rhs[i];
 	 range = env->mip->rngval[i];
@@ -2090,44 +2161,44 @@ double *sym_get_row_lower(sym_environment *env)
 	 
 	 switch (sense) {
 	  case 'E':
-	     lower[i] = upper = rhs;
+	     rowlb[i] = upper = rhs;
 	     break;
 	  case 'L':
-	     lower[i] = -inf;
+	     rowlb[i] = -inf;
 	     upper = rhs;
 	     break;
 	  case 'G':
-	     lower[i] = rhs;
+	     rowlb[i] = rhs;
 	     upper = inf;
 	     break;
 	  case 'R':
-	     lower[i] = rhs - range;
+	     rowlb[i] = rhs - range;
 	     upper = rhs;
 	     break;
 	  case 'N':
-	     lower[i] = -inf;
+	     rowlb[i] = -inf;
 	     upper = inf;
 	     break;
 	 }
       }
 
-   return lower;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-double *sym_get_row_upper(sym_environment *env)
+int sym_get_row_upper(sym_environment *env, double *rowub)
 {
-   if (!env->mip){
-      printf("sym_get_row_upper():The env. description is empty!\n");
-      return (0);
+   if (!env->mip || !env->mip->m || !env->mip->rhs){
+      printf("sym_get_row_upper():There is no loaded mip description or\n");
+      printf("there is no loaded row description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   double * upper = (double *)malloc(DSIZE*env->mip->m);
    double lower;
    int i;
-   double rhs, range, inf = INFINITY;
+   double rhs, range, inf = SYM_INFINITY;
    char sense;
    
    for ( i = env->mip->m - 1; i >= 0; --i )
@@ -2139,102 +2210,139 @@ double *sym_get_row_upper(sym_environment *env)
 	 
 	 switch (sense) {
 	  case 'E':
-	     lower = upper[i] = rhs;
+	     lower = rowub[i] = rhs;
 	     break;
 	  case 'L':
 	     lower = -inf;
-	     upper[i] = rhs;
+	     rowub[i] = rhs;
 	     break;
 	  case 'G':
 	     lower = rhs;
-	     upper[i] = inf;
+	     rowub[i] = inf;
 	     break;
 	  case 'R':
 	     lower = rhs - range;
-	     upper[i] = rhs;
+	     rowub[i] = rhs;
 	     break;
 	  case 'N':
 	     lower = -inf;
-	     upper[i] = inf;
+	     rowub[i] = inf;
 	     break;
 	 }
       }
 
-   return upper;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-double *sym_get_obj_coeff(sym_environment *env)
+int sym_get_obj_coeff(sym_environment *env, double *obj)
 {
-   if (!env->mip){
-      printf("sym_get_obj_coeff():The env. description is empty!\n");
-      return (0);
+   if (!env->mip || !env->mip->n || !env->mip->obj){
+      printf("sym_get_obj_coeff():There is no loaded mip description or\n");
+      printf("there is no loaded obj vector description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   return env->mip->obj;
+   memcpy(obj, env->mip->obj, DSIZE*env->mip->n);
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_obj_sense(sym_environment *env)
+int sym_get_obj2_coeff(sym_environment *env, double *obj2)
+{
+   if (!env->mip || !env->mip->n || !env->mip->obj2){
+      printf("sym_get_obj2_coeff():There is no loaded mip description or\n");
+      printf("or there is no loaded second obj vector description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+  
+   memcpy(obj2, env->mip->obj2, DSIZE*env->mip->n);
+
+   return(FUNCTION_TERMINATED_NORMALLY);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_obj_sense(sym_environment *env, int *sense)
 {
    if (!env->mip){
-      printf("sym_get_obj_sense():The env. description is empty!\n");
-      return (0);
+      printf("sym_get_obj_sense():There is no loaded mip description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   if (env->mip->obj_sense == SYM_MINIMIZE)
-      return 1;
-   else if (env->mip->obj_sense == SYM_MAXIMIZE)
-      return -1;
-   else
-      return 1; 
+   *sense = 1;
+   
+   if (env->mip->obj_sense == SYM_MAXIMIZE) {
+      *sense = -1;
+   }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }   
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_continuous(sym_environment *env, int index)
+int sym_is_continuous(sym_environment *env, int index, int *value)
 {
-   if (!env->mip){
-      printf("sym_is_continuous():The env. description is empty!\n");
-      return (-1);
+   if (!env->mip || index < 0 || index > env->mip->n || !env->mip->n ||
+       !env->mip->is_int){
+      printf("sym_is_continuous():There is no loaded mip description or\n");
+      printf("index is out of range or no column description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   return(env->mip->is_int[index]);
+   *value = FALSE;
+
+   if (!env->mip->is_int[index]){
+      *value = TRUE;
+   }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
+
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_binary(sym_environment *env, int index)
+int sym_is_binary(sym_environment *env, int index, int *value)
 {
-   if (!env->mip){
-      printf("sym_is_binary():The env. description is empty!\n");
-      return (-1);
+   if (!env->mip || index < 0 || index > env->mip->n || !env->mip->n ||
+       !env->mip->is_int || !env->mip->ub || !env->mip->lb){
+      printf("sym_is_binary():There is no loaded mip description or!\n");
+      printf("index is out of range or no column description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
+   *value = FALSE;
+   
    if (env->mip->is_int[index] && env->mip->lb[index] == 0.0 &&
-      env->mip->ub[index] == 1.0) {
-      return TRUE;
+       env->mip->ub[index] == 1.0) {
+      *value = TRUE;
    }
-   else{
-      return FALSE;
-   }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
+
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_integer(sym_environment *env, int index)
+int sym_is_integer(sym_environment *env, int index, int *value)
 {
-   if (!env->mip){
-      printf("sym_is_integer():The env. description is empty!\n");
-      return (-1);
+   if (!env->mip || index < 0 || index > env->mip->n || !env->mip->n){
+      printf("sym_is_integer():There is no loaded mip description or!\n");
+      printf("index is out of range or no column description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   return(env->mip->is_int[index]);
+   *value = env->mip->is_int[index];
+   
+   return(FUNCTION_TERMINATED_NORMALLY);   
+
 }
 
 /*===========================================================================*/
@@ -2242,114 +2350,134 @@ int sym_is_integer(sym_environment *env, int index)
 
 double sym_get_infinity()
 {
-   return INFINITY;
+   return(SYM_INFINITY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-double *sym_get_col_solution(sym_environment *env)
+int sym_get_col_solution(sym_environment *env, double *colsol)
 {
    int i;
-   double * colSol;
    lp_sol sol;
 
    sol = env->best_sol;
 
-   if (!sol.xlength){
-      //      if(env->par.verbosity >= 0) {
-	 printf("\nNo Solution Found Here\n\n");
-	 //      }
-      return 0;
+   if (!sol.xlength || (sol.xlength && (!sol.xind || !sol.xval))){
+      printf("sym_get_col_solution(): There is no solution!\n");
+      if(env->mip->n){
+	 memcpy(colsol, env->mip->lb, DSIZE*env->mip->n);
+      }
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    else{
-      colSol = (double*)calloc(DSIZE, env->mip->n);
+      memset(colsol, 0, DSIZE*env->mip->n);
       for( i = 0; i<sol.xlength; i++){
-	 colSol[sol.xind[i]] = sol.xval[i];
+	 colsol[sol.xind[i]] = sol.xval[i];
       }
-      return (colSol);
    }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-double *sym_get_row_activity(sym_environment *env)
+int sym_get_row_activity(sym_environment *env, double *rowact)
 {
-   double * rowAct;
-   double * colSol;  
+   double * colsol;  
    int i, j;
 
-   const int * matBeg;
-   const double * matVal;
-   const int * matInd;
+   int * matbeg;
+   double * matval;
+   int * matind;
 
-   colSol = sym_get_col_solution(env);
+
+   if (!env->mip || !env->mip->n){
+      printf("sym_get_row_activity():There is no loaded mip description or\n");
+      printf("no column description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+
+   colsol = (double *)malloc(DSIZE*env->mip->n);
+
+   sym_get_col_solution(env, colsol);
+   
+   matbeg = env->mip->matbeg;
+   matval = env->mip->matval;
+   matind = env->mip->matind;
+
+   memset(rowact, 0, DSIZE*env->mip->m);
+   
+   for(i = 0; i<env->mip->n; i++){
+      for(j = matbeg[i]; j<matbeg[i+1]; j++){
+	 rowact[matind[j]] += matval[j] * colsol[i];
+      }
+   }
+
+   return (FUNCTION_TERMINATED_NORMALLY);
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_obj_val(sym_environment *env, double *objval)
+{
+   int i;
+
+   if (env->best_sol.xlength){
+      *objval = (env->mip->obj_sense == SYM_MINIMIZE ? env->best_sol.objval :
+		 -env->best_sol.objval) + env->mip->obj_offset;
+   }else{ 
+      printf("sym_get_obj_val(): There is no solution!\n");
+      /* return collb * objcoeff! */
+      *objval = 0;
+      for(i = 0; i<env->mip->n; i++){
+	 *objval += env->mip->obj[i] * env->mip->lb[i];
+      }
+      *objval = env->mip->obj_sense == 
+	 SYM_MINIMIZE ? *objval : -(*objval) ;
+      return (FUNCTION_TERMINATED_ABNORMALLY);
+   }
+
+   return (FUNCTION_TERMINATED_NORMALLY);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_primal_bound(sym_environment *env, double *ub)
+{
 
    if (!env->mip){
-      printf("sym_get_row_activity():The env. description is empty!\n");
-      return (0);
-   }
+      printf("sym_get_primal_bound():There is no loaded mip description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   } 
 
-   rowAct = (double*)calloc(DSIZE, env->mip->m);
-
-   if (colSol){
-
-      matBeg = env->mip->matbeg;
-      matVal = env->mip->matval;
-      matInd = env->mip->matind;
-
-      for(i = 0; i<env->mip->n; i++){
-	 for(j = matBeg[i]; j<matBeg[i+1]; j++){
-	    rowAct[matInd[j]] += matVal[j] * colSol[i];
-	 }
-      }
-      return rowAct;
-   }
-   else
-      return 0;         
-}
-
-/*===========================================================================*/
-/*===========================================================================*/
-
-double sym_get_obj_val(sym_environment *env)
-{
-   if (env->best_sol.xlength)
-      return (env->best_sol.objval);
-   else if(env->termcode == TM_OPTIMAL_SOLUTION_FOUND){
-      return env->mip->obj_offset;
-   }
-   else {      
-      printf("\nNo Solution Found\n\n");
-      return INFINITY;
-   }
-}
-
-/*===========================================================================*/
-/*===========================================================================*/
-
-double sym_get_primal_bound(sym_environment *env)
-{
    if (env->has_ub){
-      return (env->mip->obj_sense == SYM_MINIMIZE ? env->ub : -env->ub);
+      *ub = env->mip->obj_sense == SYM_MINIMIZE ? env->ub : -env->ub ;
    }else{
-      return (env->mip->obj_sense == SYM_MINIMIZE ? INFINITY : -INFINITY);
+      *ub = env->mip->obj_sense == SYM_MINIMIZE ? SYM_INFINITY : -SYM_INFINITY;
    }
+
+   return (FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_iteration_count(sym_environment *env)
+int sym_get_iteration_count(sym_environment *env, int *numnodes)
 {
    if (!env->warm_start){
       printf("sym_get_iteration_count():");
-      printf("The env. warm start description is empty!\n");
-      return (0);
+      printf("There is no post-solution information available!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
+   
+   *numnodes = env->warm_start->stat.analyzed;  
 
-   return env->warm_start->stat.analyzed;  
+   return (FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -2360,11 +2488,23 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
 
    int i;
 
-   if (!env->mip){
-      printf("sym_set_obj_coeff():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
+       !env->mip->obj){
+      printf("sym_set_obj_coeff():There is no loaded mip description or\n");
+      printf("index is out of range or no column description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
-   
+
+   /* this is done in create_subproblem_u()!*/
+
+#if 0   
+   if (env->mip->obj_sense == SYM_MAXIMIZE){
+      env->mip->obj[index] = -value;
+   }else{
+      env->mip->obj[index] = value;
+   }
+#endif
+
    env->mip->obj[index] = value;
 
    if (env->mip->change_num){
@@ -2381,9 +2521,7 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
       env->mip->change_type[env->mip->change_num++] = OBJ_COEFF_CHANGED;
    }
    
-   
-   
-   return TRUE;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -2394,14 +2532,20 @@ int sym_set_obj2_coeff(sym_environment *env, int index, double value)
 
    int i;
 
-   if (!env->mip){
-      printf("sym_set_obj_coeff():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
+       !env->mip->obj2){
+      printf("sym_set_obj_coeff():There is no loaded mip description or\n");
+      printf("index is out of range or no column description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
-   
-   env->mip->obj2[index] = value;
 
-   return TRUE;
+   if (env->mip->obj_sense == SYM_MAXIMIZE){
+      env->mip->obj2[index] = -value;
+   }else{
+      env->mip->obj2[index] = value;
+   }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -2409,13 +2553,16 @@ int sym_set_obj2_coeff(sym_environment *env, int index, double value)
 
 int sym_set_col_lower(sym_environment *env, int index, double value)
 {
-   if (!env->mip){
-      printf("sym_set_col_lower():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 ||
+       !env->mip->lb){
+      printf("sym_set_col_lower():There is no loaded mip description or\n");
+      printf("index is out of range or no column description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    env->mip->lb[index] = value;
-   return TRUE;
+
+   return(FUNCTION_TERMINATED_ABNORMALLY);
 }
 
 /*===========================================================================*/
@@ -2423,13 +2570,16 @@ int sym_set_col_lower(sym_environment *env, int index, double value)
 
 int sym_set_col_upper(sym_environment *env, int index, double value)
 {
-   if (!env->mip){
-      printf("sym_set_col_upper():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 ||
+       !env->mip->ub){
+      printf("sym_set_col_upper():There is no loaded mip description!\n");
+      printf("index is out of range or no column description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    env->mip->ub[index] = value;
-   return TRUE;
+ 
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -2437,13 +2587,15 @@ int sym_set_col_upper(sym_environment *env, int index, double value)
 
 int sym_set_row_lower(sym_environment *env, int index, double value)
 {
-   double rhs, range, lower, upper, inf = INFINITY;
+   double rhs, range, lower, upper, inf = SYM_INFINITY;
    char   sense;
    int i;
 
-   if (!env->mip){
-      printf("sym_set_row_lower():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
+       !env->mip->rhs){
+      printf("sym_set_row_lower():There is no loaded mip description or\n");
+      printf("index is out of range or no row description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    rhs   = env->mip->rhs[index];
@@ -2480,19 +2632,19 @@ int sym_set_row_lower(sym_environment *env, int index, double value)
 	    rhs = upper;
 	    if (upper==lower) {
 	       sense = 'E';
-	    } else {
+	    }else{
 	       sense = 'R';
 	       range = upper - lower;
 	    }
-	 } else {
+	 }else{
 	    sense = 'G';
 	    rhs = lower;
 	 }
-      } else {
+      }else{
 	 if (upper < inf) {
 	    sense = 'L';
 	    rhs = upper;
-	 } else {
+	 }else{
 	    sense = 'N';
 	    rhs = 0.0;
 	 }
@@ -2519,7 +2671,7 @@ int sym_set_row_lower(sym_environment *env, int index, double value)
       env->mip->change_num++;
    }
    
-   return TRUE;      
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
 
 /*===========================================================================*/
@@ -2527,13 +2679,15 @@ int sym_set_row_lower(sym_environment *env, int index, double value)
 
 int sym_set_row_upper(sym_environment *env, int index, double value)
 {
-   double rhs, range, lower, upper, inf = INFINITY;
+   double rhs, range, lower, upper, inf = SYM_INFINITY;
    char   sense;
    int i;
 
-   if (!env->mip){
-      printf("sym_set_row_upper():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
+       !env->mip->rhs){
+      printf("sym_set_row_upper():There is no loaded mip description or\n");
+      printf("index is out of range or no row description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    rhs   = env->mip->rhs[index];
@@ -2573,19 +2727,19 @@ int sym_set_row_upper(sym_environment *env, int index, double value)
 	    rhs = upper;
 	    if (upper==lower) {
 	       sense = 'E';
-	    } else {
+	    }else{
 	       sense = 'R';
 	       range = upper - lower;
 	    }
-	 } else {
+	 }else{
 	    sense = 'G';
 	    rhs = lower;
 	 }
-      } else {
+      }else{
 	 if (upper < inf) {
 	    sense = 'L';
 	    rhs = upper;
-	 } else {
+	 }else{
 	    sense = 'N';
 	    rhs = 0.0;
 	 }
@@ -2614,21 +2768,24 @@ int sym_set_row_upper(sym_environment *env, int index, double value)
 
    }
 
-   return TRUE;      
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_row_type(sym_environment *env, int index, char rowsense, double rowrhs, 
-		      double rowrng)
+int sym_set_row_type(sym_environment *env, int index, char rowsense, 
+		     double rowrhs, double rowrng)
+		     
 {
 
    int i;
 
-   if (!env->mip){
-      printf("sym_set_row_type():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
+       !env->mip->rhs){
+      printf("sym_set_row_type():There is no loaded mip description or\n");
+      printf("index is out of range or no row description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    env->mip->sense[index] = rowsense;   
@@ -2654,7 +2811,7 @@ int sym_set_row_type(sym_environment *env, int index, char rowsense, double rowr
 
    }
    
-   return TRUE;      
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
 
 /*===========================================================================*/
@@ -2662,22 +2819,26 @@ int sym_set_row_type(sym_environment *env, int index, char rowsense, double rowr
 
 int sym_set_obj_sense(sym_environment *env, int sense)
 {
+
+   int j;
+   double *obj;
+
    if (!env->mip){
-      printf("sym_set_obj_type():The env. description is empty!\n");
-      return FALSE;
+      printf("sym_set_obj_type():There is no loaded mip description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   if (sense == 1){
-      env->mip->obj_sense = SYM_MINIMIZE;
-   }
-   else if (sense==-1){
+   if (sense==-1 && env->mip->obj_sense != SYM_MAXIMIZE ){
       env->mip->obj_sense = SYM_MAXIMIZE;
    }
-   else{
+   else if (sense != -1 && env->mip->obj_sense != SYM_MINIMIZE ){
       /* assume it to be min problem */
       env->mip->obj_sense = SYM_MINIMIZE;
    }
-   return TRUE;      
+
+   //else - do nothing!
+
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
 
 /*===========================================================================*/
@@ -2685,14 +2846,15 @@ int sym_set_obj_sense(sym_environment *env, int sense)
 
 int sym_set_col_solution(sym_environment *env, double * colsol)
 {
-   int i, j, nz =0, *matBeg, *matInd;
-   double value, *rowAct, *matVal; 
+   int i, j, nz = 0,*matBeg, *matInd;
+   double value, *rowAct = NULL, *matVal; 
    char feasible;
+   double granularity = env->par.lp_par.granularity;
    lp_sol * sol;
 
-   if (!env->mip){
-      printf("sym_set_col_solution():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->n){
+      printf("sym_set_col_solution():There is no loaded mip description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    /* Feasibility Check*/
@@ -2701,8 +2863,6 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    for (i = env->mip->n - 1; i >= 0; i--){
       if (colsol[i] < env->mip->lb[i] || colsol[i] > env->mip->ub[i])
 	 break;
-      if (colsol[i] !=0.0)
-	 nz++;
       if (!env->mip->is_int[i])
 	 continue; /* Not an integer variable */
       value = colsol[i];
@@ -2758,24 +2918,32 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       }
    }
 
+   for(i = 0; i<env->mip->n; i++){
+      if (fabs(colsol[i]) >= 0.0 + granularity){
+	 nz++;
+      }
+   }
+
+   sol = (lp_sol*) calloc(1,sizeof(lp_sol));      
+   sol->xind = (int*)malloc(ISIZE*nz);
+   sol->xval = (double*)calloc(nz,DSIZE);
+   sol->xlength = nz;
+   
+   for(i = 0, j =0 ; i<env->mip->n; i++){
+      if (colsol[i] != 0.0){
+	 sol->xind[j] = i;
+	 sol->xval[j] = colsol[i];
+	 sol->objval += colsol[i] * env->mip->obj[i];	   
+	 j++;
+      }      
+   }  
+   
+   env->best_sol = *sol;           
+
    if (feasible){
       /* now, it is feasible, set the best_sol to colsol */
       //FIXME
       
-      sol = (lp_sol*) calloc(1,sizeof(lp_sol));      
-      sol->xlength = nz;
-      sol->xind = (int*)malloc(ISIZE*nz);
-      sol->xval = (double*)calloc(nz,DSIZE);
-      
-      for(i = 0, j =0 ; i<env->mip->n; i++){
-	 if (colsol[i] != 0.0){
-	    sol->xind[j] = i;
-	    sol->xval[j] = colsol[i];
-	    sol->objval += colsol[i] * env->mip->obj[i];	   
-	    j++;
-	 }      
-      }
-
       if (env->has_ub_estimate){
 	 if (env->ub_estimate > sol->objval)
 	    env->ub_estimate = sol->objval; //no need for this, I guess.
@@ -2794,29 +2962,16 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
 	 env->ub = sol->objval;
       }
 
-      if (env->best_sol.xlength){
-	 if (env->best_sol.objval > sol->objval){
-	    FREE(env->best_sol.xind);
-	    FREE(env->best_sol.xval);
-	    env->best_sol = *sol;
-	 }
-	 else{
-	    printf("sym_set_col_solution(): The col.solution was not set:\n");
-	    printf("the current solution is better!\n");
-	 }
-      }
-      else{
-	 env->best_sol = *sol;           
-      }      
    }
    else{
-      printf("sym_set_col_solution(): The col.solution was not set:\n");
-      printf("the given solution is not feasible!\n");
+      //      env->best_sol.objval = SYM_INFINITY;
+      env->best_sol.objval = 0.0;
    }  
 
    if (rowAct)
       FREE(rowAct);
-   return TRUE;      
+   
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
 
 /*===========================================================================*/
@@ -2824,13 +2979,20 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
 
 int sym_set_primal_bound(sym_environment *env, double bound)
 {
+
+   if (!env->mip){
+      printf("sym_set_primal_bound():There is no loaded mip description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+
    bound = env->mip->obj_sense == SYM_MINIMIZE ? bound : -bound;
 
    if (!env->has_ub || bound < env->ub){
+      env->has_ub = TRUE;
       env->ub = bound;
    }
 
-   return TRUE;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -2838,13 +3000,16 @@ int sym_set_primal_bound(sym_environment *env, double bound)
 
 int sym_set_continuous(sym_environment *env, int index)
 {
-   if (!env->mip){
-      printf("sym_set_continuous():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
+       !env->mip->is_int){
+      printf("sym_set_continuous():There is no loaded mip description or\n");
+      printf("index is out of range or no row description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    env->mip->is_int[index] = FALSE;
-   return TRUE;      
+
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
 
 /*===========================================================================*/
@@ -2852,13 +3017,16 @@ int sym_set_continuous(sym_environment *env, int index)
 
 int sym_set_integer(sym_environment *env, int index)
 {
-   if (!env->mip){
-      printf("sym_set_integer():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
+       !env->mip->is_int){
+      printf("sym_set_integer():There is no loaded mip description or\n");
+      printf("index is out of range or no row description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    env->mip->is_int[index] = TRUE;
-   return TRUE;      
+
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
 /*===========================================================================*/
 /*===========================================================================*/
@@ -2867,191 +3035,326 @@ int sym_set_col_names(sym_environment * env, char **colname)
 {
    int j;
 
-   if (!env->mip){
-      printf("sym_set_col_names():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->n || !colname){
+      printf("sym_set_col_names():There is no loaded mip description or");
+      printf("an empty name array given!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   env->mip->colname = (char **)  malloc(sizeof(char *) * env->mip->n);
+   if(env->mip->colname){
+      for (j = 0; j < env->mip->n; j++){
+	 if(env->mip->colname[j]){
+	    FREE(env->mip->colname[j]);
+	 }
+      }
+      FREE(env->mip->colname);
+   }
+   
+   env->mip->colname = (char **)  calloc(sizeof(char *), env->mip->n);
    
    for (j = 0; j < env->mip->n; j++){
-      /* FIXME! Restricting col names to 20 characters! */
-      env->mip->colname[j] = (char *) malloc(CSIZE * 20); 
-      strncpy(env->mip->colname[j], colname[j], 20);
-      env->mip->colname[j][19] = 0;  /* ??? */
+      if(colname[j]){
+	 env->mip->colname[j] = (char *) malloc(CSIZE * 21); 
+	 strncpy(env->mip->colname[j], colname[j], 20);
+	 env->mip->colname[j][20] = 0;
+      }
    }      
-   return TRUE;      
+
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_add_col(sym_environment *env, int num_elements, int *indices, 
+int sym_add_col(sym_environment *env, int numelems, int *indices, 
 			double *elements, double collb, double colub,
-			double obj, char *name)
+			double obj, char is_int, char *name)
 {
-   int i, n, nz, *matBeg, *matInd;
-   double *matVal, *colLb, *colUb, *objN;
+   int i, k, n, m, nz, *matBeg, *matInd;
+   double *matVal, *colLb, *colUb, *objN, *obj1N, *obj2N;
    char *isInt, **colName;
+   int * user_indices, *user_size;
 
-   if (!env->mip){
-      printf("sym_add_col():The env. description is empty!\n");
-      return FALSE;
+   if ((numelems && !indices) || numelems < 0){
+      printf("sym_add_col(): Incorrect column description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   n = env->mip->n;
-   nz = env->mip->nz;
-
-   //FIXME!  //Adding to extra variables?
-   int * user_indices = env->rootdesc->uind.list;
-   int *user_size = &env->rootdesc->uind.size;
-   (*user_size) += 1; 
-   env->rootdesc->uind.list = (int *) malloc(ISIZE * (*user_size));
-   memcpy(env->rootdesc->uind.list, user_indices, ISIZE * (*user_size - 1));
-   env->rootdesc->uind.list[*user_size] = n;
-
-   matBeg = (int*) malloc(ISIZE*(n+2));
-   matInd = (int*) malloc(ISIZE*(nz+num_elements));
-   matVal = (double*) malloc(DSIZE*(nz+num_elements));
-   colLb = (double*) malloc(DSIZE*(n+1));
-   colUb = (double*) malloc(DSIZE*(n+1));
-   objN = (double*) malloc(DSIZE*(n+1));
-   isInt = (char*) calloc(CSIZE, (n+1));
-   colName = (char**) malloc(sizeof(char*)*(n+1));
-
-   memcpy(matBeg, env->mip->matbeg, ISIZE*(n+1));
-   memcpy(matInd, env->mip->matind, ISIZE*nz);
-   memcpy(matVal, env->mip->matval, DSIZE*nz);
-   memcpy(colLb, env->mip->lb, DSIZE*n);
-   memcpy(colUb, env->mip->ub, DSIZE*n);
-   memcpy(objN, env->mip->obj, DSIZE*n);
-   memcpy(isInt, env->mip->is_int, CSIZE*n);
-
-   for (i = 0; i < n; i++){
-      colName[i] = (char *) malloc(CSIZE * 20); 
-      strncpy(colName[i], env->mip->colname[i],20);
-      colName[i][19] = 0;
+   /* order the indices! */
+   if(numelems){
+      qsortucb_id(indices, elements, numelems);
    }
-
-   matBeg[n+1] = matBeg[n] + num_elements;
-   memcpy(matInd + nz, indices, ISIZE*num_elements);
-   memcpy(matVal + nz, elements, DSIZE*num_elements); 
-   colLb[n] = collb;
-   colUb[n] = colub;
-   objN[n] = obj;
    
-   colName[n] = (char *) malloc(CSIZE * 20); 
-   strncpy(colName[n], name,20);
-   colName[n][19] = 0;
+   if(!env->mip->n && !env->mip->m){
+      n = 1;
+      if(numelems){
+	 m = indices[numelems - 1];
+	 matBeg = (int*) calloc(ISIZE, n+1);
+	 matBeg[n] = numelems;
+      }
+      else{
+	 m = 0;
+	 matBeg = NULL;
+      }
+      return(sym_explicit_load_problem(env, n, m, matBeg, indices, elements,
+				       &collb, &colub, NULL, &obj, NULL, NULL, 
+				       NULL, NULL, TRUE));
+   } else{
 
-   FREE(env->mip->matbeg);
-   FREE(env->mip->matind);
-   FREE(env->mip->matval);
-   FREE(env->mip->lb);
-   FREE(env->mip->ub);
-   FREE(env->mip->obj);
-   FREE(env->mip->is_int);
-   for (i = 0; i < n; i++){
-      FREE(env->mip->colname[i]);
-   }
-   FREE(env->mip->colname);
+      n = env->mip->n;
+      nz = env->mip->nz;
+      
+      user_indices = env->rootdesc->uind.list;
+      user_size = &env->rootdesc->uind.size;
+      (*user_size) += 1; 
+      env->rootdesc->uind.list = (int *) malloc(ISIZE*(*user_size));
+      memcpy(env->rootdesc->uind.list, user_indices, ISIZE*(*user_size - 1));
+      env->rootdesc->uind.list[*user_size - 1] = n;
 
-   env->mip->n = n+1;
-   env->mip->nz = nz + num_elements;
-   env->mip->matbeg = matBeg;
-   env->mip->matind = matInd;
-   env->mip->matval = matVal;
-   env->mip->lb =  colLb;
-   env->mip->ub = colUb;
-   env->mip->obj = objN;
-   env->mip->is_int = isInt;   
-   env->mip->colname = colName;
+      colLb = (double*) malloc(DSIZE*(n+1));
+      colUb = (double*) malloc(DSIZE*(n+1));
+      objN = (double*) malloc(DSIZE*(n+1));
+      obj1N = (double*) calloc(DSIZE, (n+1));
+      obj2N = (double*) calloc(DSIZE, (n+1));
+      isInt = (char*) calloc(CSIZE, (n+1));
 
-   return TRUE;      
-}
+      if(n){
+	 memcpy(colLb, env->mip->lb, DSIZE*n);
+	 memcpy(colUb, env->mip->ub, DSIZE*n);
+	 memcpy(objN, env->mip->obj, DSIZE*n);
+	 memcpy(obj1N, env->mip->obj1, DSIZE*n);
+	 memcpy(obj2N, env->mip->obj2, DSIZE*n);
+	 memcpy(isInt, env->mip->is_int, CSIZE*n);
+      }
 
-/*===========================================================================*/
-/*===========================================================================*/
-int sym_add_row(sym_environment *env, int num_elements, int *indices, 
-			double *elements, char rowsen, double rowrhs,
-			double rowrng)
-{
-   int i, j, m, n, nz, *matBeg, *matInd, *lengths;
-   double *matVal, *rhs, *range;
-   char *sense;
-   
-   if (!env->mip){
-      printf("sym_add_row():The env. description is empty!\n");
-      return FALSE;
-   }
+      matBeg = (int*) calloc(ISIZE,(n+2));
 
+      if(numelems){
+	 
+	 /* if it is out of row size? need additional rows!*/
+	 k = indices[numelems-1] + 1 - env->mip->m;
+	 if( k > 0){
+	    for(i=0; i<k; i++){
+	       sym_add_row(env, 0, NULL, NULL, 'N', 0.0, 0.0);
+	    }
+	 }	 	 
+	 
+	 matInd = (int*) malloc(ISIZE*(nz+numelems));
+	 matVal = (double*) malloc(DSIZE*(nz+numelems));
 
-   //FIXME! Add 1 to bcutnum?
+	 if(nz){
+	    memcpy(matInd, env->mip->matind, ISIZE*nz);
+	    memcpy(matVal, env->mip->matval, DSIZE*nz);
+	 }	    
 
-   env->base->cutnum +=1;
+	 memcpy(matInd + nz, indices, ISIZE*numelems);
+	 memcpy(matVal + nz, elements, DSIZE*numelems); 
+	    
+	 FREE(env->mip->matind);
+	 FREE(env->mip->matval);
+	 env->mip->matind = matInd;
+	 env->mip->matval = matVal;
+      }
 
-   /*FIXME! Put sym_add_row(numelem, indices, elements, rowsen, 
-     rowrhs, rowrng) here! */
+      if(nz){
+	 memcpy(matBeg, env->mip->matbeg, ISIZE*(n+1));
+      }
 
-   m = env->mip->m;
-   n = env->mip->n;
-   nz = env->mip->nz;
+      matBeg[n+1] = matBeg[n] + numelems;
+      colLb[n] = collb;
+      colUb[n] = colub;
+      objN[n] = obj;
+      isInt[n] = is_int;
 
-   matBeg = (int*) calloc (n, ISIZE);
-   matInd = (int*) malloc(ISIZE*(nz+num_elements));
-   matVal = (double*) malloc(DSIZE*(nz+num_elements));  
-   lengths = (int*) malloc (ISIZE*n);
-   sense = (char*) malloc(CSIZE*(m+1));
-   rhs = (double*) malloc(DSIZE*(m+1));
-   range = (double*) malloc(DSIZE*(m+1));
-   
-   memcpy(sense, env->mip->sense, CSIZE*m);
-   memcpy(range, env->mip->rngval, DSIZE*m);
-   memcpy(rhs, env->mip->rhs, DSIZE*m);
+      if(n){
+	 FREE(env->mip->matbeg);
+	 FREE(env->mip->lb);
+	 FREE(env->mip->ub);
+	 FREE(env->mip->obj);
+	 FREE(env->mip->obj1);
+	 FREE(env->mip->obj2);
+	 FREE(env->mip->is_int);
+	 FREE(user_indices);
+      }
 
-   for(i = 0; i<n; i++){     
-      lengths[i] = env->mip->matbeg[i+1] - env->mip->matbeg[i];
-   }
+      env->mip->n = n+1;
+      env->mip->nz = nz + numelems;
+      env->mip->matbeg = matBeg;
+      env->mip->lb =  colLb;
+      env->mip->ub = colUb;
+      env->mip->obj = objN;
+      env->mip->obj1 = obj1N;
+      env->mip->obj2 = obj2N;
+      env->mip->is_int = isInt;   
 
-   for(i = 0; i<num_elements; i++){
-      lengths[indices[i]]++;
-   }
+      /* take care of the name */
+      
+      if(name){
+	 colName = (char**) calloc(sizeof(char*),(n+1));
+	 
+	 if(env->mip->colname){
+	    for (i = 0; i < n; i++){
+	       if(env->mip->colname[i]){
+		  colName[i] = (char *) malloc(CSIZE * 21); 
+		  strncpy(colName[i], env->mip->colname[i],21);
+		  colName[i][20] = 0;
+	       }
+	    }
+	 }
 
-   for(i = 0, j = 0; i<n; i++){
-      matBeg[i+1] = matBeg[i] + lengths[i];
-      memcpy(matInd + matBeg[i], env->mip->matind + env->mip->matbeg[i], 
-	     ISIZE * (env->mip->matbeg[i+1]-env->mip->matbeg[i])); 
-      memcpy(matVal + matBeg[i], env->mip->matval + env->mip->matbeg[i], 
-	     DSIZE * (env->mip->matbeg[i+1]-env->mip->matbeg[i])); 
-      if (indices[j] == i){
-	 matInd[matBeg[i+1]-1] = m;
-	 matVal[matBeg[i+1]-1] = elements[j];
-	 j++;
+	 colName[n] = (char *) malloc(CSIZE * 21); 
+	 strncpy(colName[n], name,21);
+	 colName[n][20] = 0;
+	 FREE(env->mip->colname);
+	 env->mip->colname = colName;      
       }
    }
 
-   sense[m] = rowsen;
-   rhs[m] = rowrhs;
-   range[m] = rowrng;
+   return(FUNCTION_TERMINATED_NORMALLY);      
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_add_row(sym_environment *env, int numelems, int *indices, 
+		double *elements, char rowsen, double rowrhs,
+		double rowrng)
+{
+   int i, j, k, m, n, nz, *matBeg, *matInd, *lengths;
+   double *matVal, *rhs, *range;
+   char *sense;
    
-   /*can use FREE_mip_desc???*/
-   FREE(env->mip->matbeg);
-   FREE(env->mip->matind);
-   FREE(env->mip->matval);
-   FREE(env->mip->sense);
-   FREE(env->mip->rhs);
-   FREE(env->mip->rngval);
-   FREE(lengths);
+   if ((numelems && !indices) || numelems < 0){
+      printf("sym_add_row():Incorrect row description!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
 
-   env->mip->m = m+1;
-   env->mip->nz = nz + num_elements;
-   env->mip->matbeg = matBeg;
-   env->mip->matind = matInd;
-   env->mip->matval = matVal;
-   env->mip->sense =  sense;
-   env->mip->rhs = rhs;
-   env->mip->rngval = range;
+   /* order the indices */
+   if(numelems){
+      qsortucb_id(indices, elements, numelems);
+   }
 
-   return TRUE;      
+
+   if(!env->mip->n && !env->mip->m){
+      m = 1;
+      if(numelems){
+	 n = indices[numelems - 1];
+	 matBeg = (int *) calloc(ISIZE, n+1);
+	 matInd = (int *)calloc(ISIZE, numelems);
+	 for(i = 0, j = 0; i<n; i++){
+	    if(j < numelems && indices[j] == i){
+	       matBeg[i+1] = matBeg[i] + 1;
+	       j++;
+	    }else{
+	       matBeg[i+1] = matBeg[i];	    
+	    }
+	 }
+	 if(j!=numelems){
+	    printf("sym_add_row(): Unknown Problem!\n");
+	    return(FUNCTION_TERMINATED_ABNORMALLY);	    
+	 }
+      }else{
+	 n = 0;
+	 matBeg = NULL;
+	 matInd = NULL;
+      }
+      return(sym_explicit_load_problem(env, n, m, matBeg, matInd, elements, 
+				       NULL, NULL, NULL, NULL, NULL, 
+				       &rowsen, &rowrhs, &rowrng, TRUE));
+   }else{
+      
+      m = env->mip->m;
+      nz = env->mip->nz;
+  
+      env->base->cutnum +=1;
+            
+      if(numelems){
+
+	 /* if it is out of row size? need additional rows!*/
+	 k = indices[numelems-1] + 1 - env->mip->n;
+	 if(k > 0){
+	    for(i = 0; i < k; i++){
+	       sym_add_col(env, 0, NULL, NULL, 0.0, SYM_INFINITY, 0.0, FALSE, 
+			   NULL);
+	    }
+	 } 
+
+	 n = env->mip->n;
+	 
+	 matBeg = (int*) calloc (n+1, ISIZE);
+	 matInd = (int*) malloc(ISIZE*(nz+numelems));
+	 matVal = (double*) malloc(DSIZE*(nz+numelems));  
+	 lengths = (int*) calloc (ISIZE,n);
+
+	 if(env->mip->matbeg){	 
+	    for(i = 0; i<n; i++){     
+	       lengths[i] = env->mip->matbeg[i+1] - env->mip->matbeg[i];
+	    }
+	 }
+
+	 for(i = 0; i<numelems; i++){
+	    lengths[indices[i]]++;
+	 }
+	 
+	 for(i = 0, j = 0; i<n; i++){
+	    matBeg[i+1] = matBeg[i] + lengths[i];
+	    if(env->mip->matbeg && env->mip->matind && env->mip->matval){
+	       memcpy(matInd + matBeg[i], env->mip->matind + 
+		      env->mip->matbeg[i], 
+		      ISIZE * (env->mip->matbeg[i+1]-env->mip->matbeg[i])); 
+	       memcpy(matVal + matBeg[i], env->mip->matval + 
+		      env->mip->matbeg[i], 
+		      DSIZE * (env->mip->matbeg[i+1]-env->mip->matbeg[i])); 
+		      
+	    }
+	    if (j < numelems && indices[j] == i){
+	       matInd[matBeg[i+1]-1] = m;
+	       matVal[matBeg[i+1]-1] = elements[j];
+	       j++;
+	    }
+	 }
+	 
+	 if(j!=numelems){
+	    printf("sym_add_row(): Unknown Problem!\n");
+	    return(FUNCTION_TERMINATED_ABNORMALLY);	    
+	 }
+	 
+	 /*can use FREE_mip_desc???*/
+	 FREE(env->mip->matbeg);
+	 FREE(env->mip->matind);
+	 FREE(env->mip->matval);
+	 FREE(lengths);
+	 
+	 env->mip->nz = nz + numelems;
+	 env->mip->matbeg = matBeg;
+	 env->mip->matind = matInd;
+	 env->mip->matval = matVal;
+      }
+   
+      sense = (char*) malloc(CSIZE*(m+1));
+      rhs = (double*) malloc(DSIZE*(m+1));
+      range = (double*) malloc(DSIZE*(m+1));
+
+      if(m){   
+	 memcpy(sense, env->mip->sense, CSIZE*m);
+	 memcpy(range, env->mip->rngval, DSIZE*m);
+	 memcpy(rhs, env->mip->rhs, DSIZE*m);
+      }
+
+      env->mip->m = m+1;
+      sense[m] = rowsen;
+      rhs[m] = rowrhs;
+      range[m] = rowrng;
+      
+      FREE(env->mip->sense);
+      FREE(env->mip->rhs);
+      FREE(env->mip->rngval);
+   
+      env->mip->sense =  sense;
+      env->mip->rhs = rhs;
+      env->mip->rngval = range;
+   }
+
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
 /*===========================================================================*/
 /*===========================================================================*/
@@ -3061,67 +3364,30 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
 
    int i, j, k, l,n, nz, temp = 0, numElements = 0, *matBeg, *matInd, *lengths;
    //FIXME! how about base varnum? If they are to be deleted???
-   int bvarnum = env->base->varnum, bvar_del = 0, bind = 0;
-   int user_size = env->rootdesc->uind.size, uind_del = 0, uind = 0;
-   int * bvar_ind = env->base->userind; 
-   int * user_ind = env->rootdesc->uind.list;
    int index = 0;
    double *matVal, *colLb, *colUb, *objN;
    char *isInt;
 
-   if (!env->mip){
-      printf("sym_delete_cols():The env. description is empty!\n");
-      return FALSE;
+
+   if (!env->mip || !env->mip->n || !env->base || !env->rootdesc || 
+       num > env->mip->n){
+      printf("sym_delete_cols():There is no loaded mip, base or \n"); 
+      printf("root description or num exceeds the real column number\n"); 
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-
+   int bvarnum = env->base->varnum, bvar_del = 0, bind = 0;
+   int user_size = env->rootdesc->uind.size, uind_del = 0, uind = 0;
+   int * bvar_ind = env->base->userind; 
+   int * user_ind = env->rootdesc->uind.list;
+   
    /* sort the indices in case they are not given sorted! */
 
-   for(i = 0; i < num; i++){
-     temp = indices[i];
-     for(j = i-1; j >= 0 && temp < indices[j]; j--){
-	indices[j+1] = indices[j];
-     }
-     indices[j+1] = temp;
-  }
-
+   qsortucb_i(indices, num);
+   
    n = env->mip->n;
    nz = env->mip->nz;
 
-   if (num>n){
-      printf("sym_delete_cols():The number of cols to be deleted exceeds the");
-      printf("real size!\n");
-      return FALSE;
-   }
-
-   //FIXME-Make it efficient!
-#if 0
-   if(bvarnum > 0) {
-      for(i = 0; i<bvarnum; i++){
-	 for(j = 0; j < num; j++){
-	    if(indices[j] == bvar_ind[i]){
-	       bvar_ind[i] = -1; //to be erased!  
-	       bvar_del++;
-	       break;
-	    }
-	    if(indices[j] > bvar_ind[i]) break;
-	 }
-      }
-   }
-
-   if(user_size > 0) {
-      for(i = 0; i<user_size; i++){
-	 for(j = 0; j < num; j++){
-	    if(indices[j] == user_ind[i]){
-	       user_ind[i] = -1; //to be erased!  
-	       uind_del++;
-	       break;
-	    }
-	    if(indices[j] > user_ind[i]) break;	    
-	 }
-      }
-   }
-#endif
    for(i = 0, j = 0, k = 0, l = 0, index = 0; i<n; i++){
 	 if(j < bvarnum){
 	    if(bvar_ind[j] == i){
@@ -3145,7 +3411,7 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
 		  if(indices[l] == i){
 		     l++;
 		  }
-		  else {
+		  else{
 		     user_ind[uind++] = index++;		     
 		  }
 	       }
@@ -3159,15 +3425,17 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
 
    if(j + k != n){
       printf("sym_delete_cols(): Unknown problem!\n");
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    if(bind){
+      FREE(env->base->userind);
       env->base->userind = (int *) malloc (ISIZE * bind);
       memcpy(env->base->userind, bvar_ind, ISIZE * bind);
       env->base->varnum = bind;
    }
    if(uind){
+      FREE(env->rootdesc->uind.list);
       env->rootdesc->uind.list = 
 	 (int *) malloc (ISIZE * uind);
       memcpy(env->rootdesc->uind.list, user_ind, ISIZE * uind);
@@ -3187,7 +3455,7 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
       else{
 	 /*FIXME*/
 	 printf("sym_delete_cols(): Column index is out of range!\n");
-	 return FALSE;
+	 return(FUNCTION_TERMINATED_ABNORMALLY);
       }
    }
 
@@ -3246,7 +3514,7 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
    env->mip->obj = objN;
    env->mip->is_int = isInt;   
 
-   return TRUE;      
+   return(FUNCTION_TERMINATED_NORMALLY);      
 
 }
 
@@ -3260,9 +3528,10 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    double *matVal, *rhs, *range;
    char *sense;
 
-   if (!env->mip){
-      printf("sym_delete_rows():The env. description is empty!\n");
-      return FALSE;
+   if (!env->mip || !env->mip->m || !env->base || num > env->mip->m){
+      printf("sym_delete_rows():There is no loaded mip or base description \n");
+      printf("or the number of rows or num exceeds the real row number!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    //FIXME!
@@ -3272,12 +3541,6 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    m = env->mip->m;
    nz = env->mip->nz;
 
-   if (num>m){
-      printf("sym_delete_rows():The number of rows to be deleted exceeds the");
-      printf("real row number!\n");
-      return FALSE;
-   }
-   
    matBeg = env->mip->matbeg;
    matInd = env->mip->matind;
    matVal = env->mip->matval;
@@ -3285,8 +3548,10 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    rhs = env->mip->rhs;
    range = env->mip->rngval;
 
-   /* assuming that the rowIndices may not be given in order! */
-   /* FIXME, ask to Prof. Ralphs. */
+   /* sort the indices in case they are not given sorted! */
+
+   qsortucb_i(indices, num);
+
    for(i = 0; i<n; i++){
       for(; j<matBeg[i+1]; j++){
 	 for( k = 0, deleted = 0, deletedRows = 0; k<num; k++){
@@ -3325,7 +3590,7 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
 
    if (numRows != m - num){
       printf("sym_delete_rows(): Unknown error!\n");
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
 
@@ -3354,11 +3619,8 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    FREE(rhs);
    FREE(range);
 
-   return TRUE;      
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
-
-/*===========================================================================*/
-/*===========================================================================*/
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -3377,7 +3639,7 @@ int sym_write_warm_start_desc(warm_start_desc *ws, char *file)
    if (!ws){
       printf("There is no loaded warmStart to write!\n");
       fclose(f);
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    else{
       fprintf(f, "########################################################\n");
@@ -3465,14 +3727,14 @@ int sym_write_warm_start_desc(warm_start_desc *ws, char *file)
 
       write_tree(ws->rootnode, f);
       fclose(f);
-      return TRUE;
+      return(FUNCTION_TERMINATED_NORMALLY);
    }   
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-warm_start_desc *sym_read_warm_start(char *file)
+warm_start_desc * sym_read_warm_start(char *file)
 {   
    FILE * f;
    char str[80], str2[80], str3[80], str4[80];
@@ -3481,16 +3743,17 @@ warm_start_desc *sym_read_warm_start(char *file)
    cut_data *cut;
    problem_stat stat;
    node_times compT;
-   warm_start_desc * ws;   
-  
+   warm_start_desc *ws;
+
    if (!(f = fopen(file, "r"))){
       printf("sym_read_warm_start():");
       printf("Can not open the warm start file to read!\n");
-      return (0);
+      return(NULL);
    }
    else{
-      ws = (warm_start_desc*)calloc(1,sizeof(warm_start_desc));     
-      
+
+      ws = (warm_start_desc *) calloc(1, sizeof(warm_start_desc));
+
       /* bound info */
       fscanf(f,"%s %s %s %s", str, str, str, str);
       fscanf(f,"%s %s %i", str, str, &ws->phase);
@@ -3579,7 +3842,7 @@ warm_start_desc *sym_read_warm_start(char *file)
    }
 
    fclose(f);
-   return ws;   
+   return(ws);   
 }
 
 /*===========================================================================*/
@@ -3606,8 +3869,8 @@ void sym_delete_warm_start(warm_start_desc *ws)
       }
 
       if(ws->best_sol.xlength){
-	 //	 FREE(ws->best_sol.xind);
-	 //	 FREE(ws->best_sol.xval);
+	 FREE(ws->best_sol.xind);
+	 FREE(ws->best_sol.xval);
       }
       FREE(ws);
    }
@@ -3618,24 +3881,19 @@ void sym_delete_warm_start(warm_start_desc *ws)
 /*===========================================================================*/
 /*===========================================================================*/
 
-warm_start_desc *sym_get_warm_start(sym_environment *env, int copy_warm_start)
+warm_start_desc * sym_get_warm_start(sym_environment *env, int copy_warm_start)
 {
-
+   
    int i, num=0, allocated_cut_num = 0;
    warm_start_desc * ws;
-   
-   if (env){
-      if (!env->warm_start){
-	 printf("sym_get_warm_start_desc():");
-	 printf("The env. warm start description is empty!\n");
-	 return (0);
-      }
+
+   if (!env->warm_start){
+      printf("sym_get_warm_start_desc():");
+      printf("The env. warm start description is empty!\n");
+      return(NULL);
    }
-   else{
-      	 printf("sym_get_warm_start_desc():");
-	 printf("The env. description is empty!\n");
-	 return (0);
-   }
+
+   ws = (warm_start_desc *) calloc(1, sizeof(warm_start_desc));
 
    if (copy_warm_start){
       ws = create_copy_warm_start(env->warm_start);
@@ -3645,7 +3903,7 @@ warm_start_desc *sym_get_warm_start(sym_environment *env, int copy_warm_start)
       env->warm_start = 0;
    }  
 
-   return ws;
+   return(ws);
 }
 
 /*===========================================================================*/
@@ -3656,62 +3914,62 @@ int sym_set_warm_start (sym_environment *env, warm_start_desc *ws)
 
    if (!ws){
       printf("sym_set_warm_start():The warm_start desc. is empty!\n");
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    
    warm_start_desc * ws_copy = create_copy_warm_start(ws);
    sym_delete_warm_start(env->warm_start);
    env->warm_start = ws_copy;
-   env->par.tm_par.warm_start = TRUE;
    
-   return TRUE;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-void sym_trim_tree(bc_node *node)
+int sym_set_int_param(sym_environment *env, char *key, int value)
 {
-   free_subtree(node);
-}
-
-/*===========================================================================*/
-/*===========================================================================*/
-
-void sym_set_int_param(sym_environment *env, char *key, int value)
-{
+   int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
    sprintf(line, "%s %d", key, value);  
-   set_param(env, line);
+   termcode = set_param(env, line);
    FREE(line);
+
+   return(termcode);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-void sym_set_dbl_param(sym_environment *env, char *key, double value)
+int sym_set_dbl_param(sym_environment *env, char *key, double value)
 {
+   int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
    sprintf(line, "%s %f", key, value);  
-   set_param(env, line);
+   termcode = set_param(env, line);
    FREE(line);
+
+   return(termcode);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-void sym_set_str_param(sym_environment *env, char *key, char *value)
+int sym_set_str_param(sym_environment *env, char *key, char *value)
 {
+   int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
    sprintf(line, "%s %s", key, value);  
-   set_param(env, line);
+   termcode = set_param(env, line);
    FREE(line);
+   
+   return(termcode);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_int_param(sym_environment *env,  char *key)
+int sym_get_int_param(sym_environment *env,  char *key, int *value)
 {
 
    tm_params *tm_par = &env->par.tm_par;
@@ -3725,18 +3983,21 @@ int sym_get_int_param(sym_environment *env,  char *key)
 #endif
    /*___END_EXPERIMENTAL_SECTION___*/
    dg_params *dg_par = &env->par.dg_par;
-   
+
    if (strcmp(key, "verbosity") == 0){
-      return (env->par.verbosity);
+      *value = env->par.verbosity;
+      return(0);
    }
    else if (strcmp(key, "random_seed") == 0){
-      return(env->par.random_seed);
+      *value = env->par.random_seed;
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    else if (strcmp(key, "do_decomp") == 0 ||
 	    strcmp(key, "CG_do_decomp") == 0 ||
 	    strcmp(key, "TM_do_decomp") == 0){
-      return(tm_par->do_decomp);
+      *value = tm_par->do_decomp;
+      return(0);
    }
    /*___END_EXPERIMENTAL_SECTION___*/
    
@@ -3744,36 +4005,57 @@ int sym_get_int_param(sym_environment *env,  char *key)
     ***                    Master params                            ***
     ***********************************************************************/
    else if (strcmp(key, "M_verbosity") == 0){
-      return(env->par.verbosity);
+      *value = env->par.verbosity;
+      return(0);
    }
    else if (strcmp(key, "M_random_seed") == 0){
-      return(env->par.random_seed);
+      *value = env->par.random_seed;
+      return(0);
    }
    else if (strcmp(key, "tm_debug") == 0 ||
 	    strcmp(key, "M_tm_debug") == 0){
-      return(env->par.tm_debug);
-      if (env->par.tm_debug) env->par.tm_debug = 4;
+      *value = env->par.tm_debug;
+      return(0);
    }
    else if (strcmp(key, "dg_debug") == 0 ||
 	    strcmp(key, "M_dg_debug") == 0){
-      return(env->par.dg_debug);
-      if (env->par.dg_debug) env->par.dg_debug = 4;
+      *value = env->par.dg_debug;
+      return(0);
    }
    else if (strcmp(key, "pvm_trace") == 0 ||
 	    strcmp(key, "M_pvm_trace") == 0){
-      return(env->par.pvm_trace);
+      *value = env->par.pvm_trace;
+      return(0);
    }
    else if (strcmp(key, "do_branch_and_cut") == 0 ||
 	    strcmp(key, "M_do_branch_and_cut") == 0){
-      return(env->par.do_branch_and_cut);
+      *value = env->par.do_branch_and_cut;
+      return(0);
    }
    else if (strcmp(key, "do_draw_graph") == 0 ||
 	    strcmp(key, "M_do_draw_graph") == 0){
-      return(env->par.do_draw_graph);
+      *value = env->par.do_draw_graph;
+      return(0);
    }
    else if (strcmp(key, "use_permanent_cut_pools") == 0 ||
 	    strcmp(key, "M_use_permanent_cut_pools") == 0){
-      return(env->par.use_permanent_cut_pools);
+      *value = env->par.use_permanent_cut_pools;
+      return(0);
+   }
+   else if (strcmp(key, "mc_search_order") == 0 ||
+	    strcmp(key, "M_mc_search_order") == 0){
+      *value = env->par.mc_search_order;
+      return(0);
+   }
+   else if (strcmp(key, "mc_warm_start") == 0 ||
+	     strcmp(key, "M_mc_warm_start") == 0){
+      *value = env->par.mc_warm_start;
+      return(0);
+   }
+   else if (strcmp(key, "trim_warm_tree") == 0 ||
+	     strcmp(key, "M_trim_warm_tree") == 0){
+      *value = env->par.trim_warm_tree;
+      return(0);
    }
    
    /***********************************************************************
@@ -3781,47 +4063,58 @@ int sym_get_int_param(sym_environment *env,  char *key)
     ***********************************************************************/
    else if (strcmp(key, "echo_commands") == 0 ||
 	    strcmp(key, "DG_echo_commands") == 0){
-      return(dg_par->echo_commands);
+      *value = dg_par->echo_commands;
+      return(0);
    }
    else if (strcmp(key, "canvas_width") == 0 ||
 	    strcmp(key, "DG_canvas_width") == 0){
-      return(dg_par->canvas_width);
+      *value = dg_par->canvas_width;
+      return(0);
    }
    else if (strcmp(key, "canvas_height") == 0 ||
 	    strcmp(key, "DG_canvas_height") == 0){
-      return(dg_par->canvas_height);
+      *value = dg_par->canvas_height;
+      return(0);
    }
    else if (strcmp(key, "viewable_width") == 0 ||
 	    strcmp(key, "DG_viewable_width") == 0){
-      return(dg_par->viewable_width);
+      *value = dg_par->viewable_width;
+      return(0);
    }
    else if (strcmp(key, "viewable_height") == 0 ||
 	    strcmp(key, "DG_viewable_height") == 0){
-      return(dg_par->viewable_width);
+      *value = dg_par->viewable_width;
+      return(0);
    }
    else if (strcmp(key, "disp_nodelabels") == 0 ||
 	    strcmp(key, "DG_disp_nodelabels") == 0){
-      return(dg_par->disp_nodelabels);
+      *value = dg_par->disp_nodelabels;
+      return(0);
    }
    else if (strcmp(key, "disp_nodeweights") == 0 ||
 	    strcmp(key, "DG_disp_nodeweights") == 0){
-      return(dg_par->disp_nodeweights);
+      *value = dg_par->disp_nodeweights;
+      return(0);
    }
    else if (strcmp(key, "disp_edgeweights") == 0 ||
 	    strcmp(key, "DG_disp_edgeweights") == 0){
-      return(dg_par->disp_edgeweights);
+      *value = dg_par->disp_edgeweights;
+      return(0);
    }
    else if (strcmp(key, "node_radius") == 0 ||
 	    strcmp(key, "DG_node_radius") == 0){
-      return(dg_par->node_radius);
+      *value = dg_par->node_radius;
+      return(0);
    }
    else if (strcmp(key, "interactive_mode") == 0 ||
 	    strcmp(key, "DG_interactive_mode") == 0){
-      return(dg_par->interactive_mode);
+      *value = dg_par->interactive_mode;
+      return(0);
    }
    else if (strcmp(key, "mouse_tracking") == 0 ||
 	    strcmp(key, "DG_mouse_tracking") == 0){
-      return(dg_par->mouse_tracking);
+      *value = dg_par->mouse_tracking;
+      return(0);
    }
 
    /***********************************************************************
@@ -3829,337 +4122,437 @@ int sym_get_int_param(sym_environment *env,  char *key)
     ***********************************************************************/
 
    else if (strcmp(key, "TM_verbosity") == 0){
-      return(tm_par->verbosity);
+      *value = tm_par->verbosity;
+      return(0);
    }
    else if (strcmp(key, "lp_debug") == 0 ||
 	    strcmp(key, "TM_lp_debug") == 0){
-      return(tm_par->lp_debug);
+      *value = tm_par->lp_debug;
+      return(0);
    }
    else if (strcmp(key, "cg_debug") == 0 ||
 	    strcmp(key, "TM_cg_debug") == 0){
-      return(tm_par->cg_debug);
+      *value = tm_par->cg_debug;
+      return(0);
    }
    else if (strcmp(key, "cp_debug") == 0 ||
 	    strcmp(key, "TM_cp_debug") == 0){
-      return(tm_par->cp_debug);
+      *value = tm_par->cp_debug;
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    else if (strcmp(key, "sp_debug") == 0 ||
 	    strcmp(key, "TM_sp_debug") == 0){
-      return(tm_par->sp_debug);
+      *value = tm_par->sp_debug;
+      return(0);
    }
    /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "max_active_nodes") == 0 ||
 	    strcmp(key, "TM_max_active_nodes") == 0){
-      return(tm_par->max_active_nodes);
+      *value = tm_par->max_active_nodes;
+      return(0);
    }
    else if (strcmp(key, "max_cp_num") == 0 ||
 	    strcmp(key, "TM_max_cp_num") == 0){
-      return(tm_par->max_cp_num);
+      *value = tm_par->max_cp_num;
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    else if (strcmp(key, "max_sp_num") == 0 ||
 	    strcmp(key, "TM_max_sp_num") == 0){
-      return(tm_par->max_sp_num);
+      *value = tm_par->max_sp_num;
+      return(0);
    }
    /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "lp_mach_num") == 0 ||
 	    strcmp(key, "TM_lp_mach_num") == 0){
-      return(tm_par->lp_mach_num);
+      *value = tm_par->lp_mach_num;
+      return(0);
    }
    else if (strcmp(key, "cg_mach_num") == 0 ||
 	    strcmp(key, "TM_cg_mach_num") == 0){
-      return(tm_par->cg_mach_num);
+      *value = tm_par->cg_mach_num;
+      return(0);
    }
    else if (strcmp(key, "cp_mach_num") == 0 ||
 	    strcmp(key, "TM_cp_mach_num") == 0){
-      return(tm_par->cp_mach_num);
+      *value = tm_par->cp_mach_num;
+      return(0);
    }
 #ifndef COMPILE_IN_CG
    else if (strcmp(key, "use_cg") == 0 ||
 	    strcmp(key, "TM_use_cg") == 0 ||
 	    strcmp(key, "LP_use_cg") == 0){
-      return(tm_par->use_cg);
+      *value = tm_par->use_cg;
+      return(0);
    }
 #endif
    else if (strcmp(key, "TM_random_seed") == 0){
-      return(tm_par->random_seed);
+      *value = tm_par->random_seed;
+      return(0);
    }
    else if (strcmp(key, "diving_strategy") == 0 ||
 	    strcmp(key, "TM_diving_strategy") == 0){
-      return(tm_par->diving_strategy);
+      *value = tm_par->diving_strategy;
+      return(0);
    }
    else if (strcmp(key, "diving_k") == 0 ||
 	    strcmp(key, "TM_diving_k") == 0){
-      return(tm_par->diving_k);
+      *value = tm_par->diving_k;
+      return(0);
    }
    else if (strcmp(key, "node_selection_rule") == 0 ||
 	    strcmp(key, "TM_node_selection_rule") == 0){
-      return(tm_par->node_selection_rule);
+      *value = tm_par->node_selection_rule;
+      return(0);
    }
    else if (strcmp(key, "keep_description_of_pruned") == 0 ||
 	    strcmp(key, "TM_keep_description_of_pruned") == 0){
-      return(tm_par->keep_description_of_pruned);
+      *value = tm_par->keep_description_of_pruned;
+      return(0);
+   }
+   else if (strcmp(key, "keep_warm_start") == 0){
+      if (tm_par->keep_description_of_pruned == KEEP_IN_MEMORY){
+	 *value = TRUE;
+      }else{
+	 *value = FALSE;
+      }
+      return(0);
    }
    else if (strcmp(key, "warm_start") == 0 ||
 	    strcmp(key, "TM_warm_start") == 0){
-      return(tm_par->warm_start);
+      *value = tm_par->warm_start;
+      return(0);
    }
    else if (strcmp(key, "vbc_emulation") == 0 ||
 	    strcmp(key, "TM_vbc_emulation") == 0){
-      return(tm_par->vbc_emulation);
+      *value = tm_par->vbc_emulation;
+      return(0);
    }
    else if (strcmp(key, "logging_interval") == 0 ||
 	    strcmp(key, "TM_logging_interval") == 0){
-      return(tm_par->logging_interval);
+      *value = tm_par->logging_interval;
+      return(0);
    }
    else if (strcmp(key, "logging") == 0 ||
 	    strcmp(key, "TM_logging") == 0){
-      return(tm_par->logging);
+      *value = tm_par->logging;
+      return(0);
    }
    else if (strcmp(key, "price_in_root") == 0 ||
 	    strcmp(key, "TM_price_in_root") == 0){
-      return(tm_par->price_in_root);
+      *value = tm_par->price_in_root;
+      return(0);
    }
    else if (strcmp(key, "trim_search_tree") == 0 ||
 	    strcmp(key, "TM_trim_search_tree") == 0){
-      return(tm_par->trim_search_tree);
+      *value = tm_par->trim_search_tree;
+      return(0);
    }
    else if (strcmp(key, "colgen_in_first_phase") == 0 ||
 	    strcmp(key, "TM_colgen_in_first_phase") == 0){
-      return(tm_par->colgen_strat[0]);
+      *value = tm_par->colgen_strat[0];
+      return(0);
    }
    
    else if (strcmp(key, "colgen_in_second_phase") == 0 ||
 	    strcmp(key, "TM_colgen_in_second_phase") == 0){
-      return(tm_par->colgen_strat[1]);
+      *value = tm_par->colgen_strat[1];
+      return(0);
    }
    else if (strcmp(key, "node_limit") == 0 ||
 	    strcmp(key, "TM_node_limit") == 0){
-      return(tm_par->node_limit);
+      *value = tm_par->node_limit;
+      return(0);
    }
    else if (strcmp(key, "find_first_feasible") == 0 ||
 	    strcmp(key, "TM_find_first_feasible") == 0){
-      return(tm_par->find_first_feasible);
+      *value = tm_par->find_first_feasible;
+      return(0);
    }
-   
+   else if (strcmp(key, "sensitivity_analysis") == 0 ||
+	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
+      *value = tm_par->sensitivity_analysis;
+      return(0);
+   }
+     
    /***********************************************************************
     ***                      LP params                              ***
     ***********************************************************************/
    if (strcmp(key, "LP_verbosity") == 0){
-      return(lp_par->verbosity);
+      *value = lp_par->verbosity;
    }
    else if (strcmp(key, "set_obj_upper_lim") == 0 ||
 	    strcmp(key, "LP_set_obj_upper_lim") == 0){
-      return(lp_par->set_obj_upper_lim);
+      *value = lp_par->set_obj_upper_lim;
+      return(0);
    }
    
    else if (strcmp(key, "scaling") == 0 ||
 	    strcmp(key, "LP_scaling") == 0){
-      return(lp_par->scaling);
+      *value = lp_par->scaling;
+      return(0);
    }
    else if (strcmp(key, "fastmip") == 0 ||
 	    strcmp(key, "LP_fastmip") == 0){
-      return(lp_par->fastmip);
+      *value = lp_par->fastmip;
+      return(0);
    }
    else if (strcmp(key, "try_to_recover_from_error") == 0 ||
 	    strcmp(key, "LP_try_to_recover_from_error") == 0){
-      return(lp_par->try_to_recover_from_error);
+      *value = lp_par->try_to_recover_from_error;
+      return(0);
    }
    else if (strcmp(key, "problem_type") == 0 ||
 	    strcmp(key, "LP_problem_type") == 0){
-      return(lp_par->problem_type);
+      *value = lp_par->problem_type;
+      return(0);
    }
    else if (strcmp(key, "not_fixed_storage_size") == 0 ||
 	    strcmp(key, "LP_not_fixed_storage_size") == 0 ||
 	    strcmp(key, "TM_not_fixed_storage_size") == 0 ){
-      return(lp_par->not_fixed_storage_size);
+      *value = lp_par->not_fixed_storage_size;
+      return(0);
    }
    else if (strcmp(key, "cut_pool_check_frequency") == 0 ||
 	    strcmp(key, "LP_cut_pool_check_frequency") == 0){
-      return(lp_par->cut_pool_check_freq);
+      *value = lp_par->cut_pool_check_freq;
+      return(0);
    }
    else if (strcmp(key, "load_balance_level") == 0 ||
 	    strcmp(key, "LP_load_balance_level") == 0){
-      return(lp_par->load_balance_level);
+      *value = lp_par->load_balance_level;
+      return(0);
    }
    else if (strcmp(key, "load_balance_iterations") == 0 ||
 	    strcmp(key, "LP_load_balance_iterations") == 0){
-      return(lp_par->load_balance_iterations);
+      *value = lp_par->load_balance_iterations;
+      return(0);
    }
    else if (strcmp(key, "load_balance_compare_candidates") == 0 ||
 	    strcmp(key, "LP_load_balance_compare_candidates") == 0){
-      return(lp_par->load_balance_compare_candidates);
+      *value = lp_par->load_balance_compare_candidates;
+      return(0);
    }
    else if (strcmp(key, "fractional_diving_num") == 0 ||
 	    strcmp(key, "LP_fractional_diving_num") == 0){
-      return(lp_par->fractional_diving_num);
+      *value = lp_par->fractional_diving_num;
+      return(0);
    }
    else if (strcmp(key, "max_cols_to_add_min") == 0 ||
 	    strcmp(key, "LP_max_non_dual_feas_to_add_min") == 0){
-      return(lp_par->max_non_dual_feas_to_add_min);
+      *value = lp_par->max_non_dual_feas_to_add_min;
+      return(0);
    }
    else if (strcmp(key, "max_non_dual_feas_to_add_max") == 0 ||
 	    strcmp(key, "LP_max_non_dual_feas_to_add_max") == 0){
-      return(lp_par->max_non_dual_feas_to_add_max);
+      *value = lp_par->max_non_dual_feas_to_add_max;
+      return(0);
    }
    else if (strcmp(key, "max_not_fixable_to_add_min") == 0 ||
 	    strcmp(key, "LP_max_not_fixable_to_add_min") == 0){
-      return(lp_par->max_not_fixable_to_add_min);
+      *value = lp_par->max_not_fixable_to_add_min;
+      return(0);
    }
    else if (strcmp(key, "max_not_fixable_to_add_max") == 0 ||
 	    strcmp(key, "LP_max_not_fixable_to_add_max") == 0){
-      return(lp_par->max_not_fixable_to_add_max);
+      *value = lp_par->max_not_fixable_to_add_max;
+      return(0);
    }
    
    else if (strcmp(key, "mat_col_compress_num") == 0 ||
 	    strcmp(key, "LP_mat_col_compress_num") == 0){
-      return(lp_par->mat_col_compress_num);
+      *value = lp_par->mat_col_compress_num;
+      return(0);
    }
    else if (strcmp(key, "mat_row_compress_num") == 0 ||
 	    strcmp(key, "LP_mat_row_compress_num") == 0){
-      return(lp_par->mat_row_compress_num);
+      *value = lp_par->mat_row_compress_num;
+      return(0);
    }
    else if (strcmp(key, "tailoff_gap_backsteps") == 0 ||
 	    strcmp(key, "LP_tailoff_gap_backsteps") == 0){
-      return(lp_par->tailoff_gap_backsteps);
+      *value = lp_par->tailoff_gap_backsteps;
+      return(0);
    }
    else if (strcmp(key, "tailoff_obj_backsteps") == 0 ||
 	    strcmp(key, "LP_tailoff_obj_backsteps") == 0){
-      return(lp_par->tailoff_obj_backsteps);
+      *value = lp_par->tailoff_obj_backsteps;
+      return(0);
    }
    else if (strcmp(key, "ineff_cnt_to_delete") == 0 ||
 	    strcmp(key, "LP_ineff_cnt_to_delete") == 0){
-      return(lp_par->ineff_cnt_to_delete);
+      *value = lp_par->ineff_cnt_to_delete;
+      return(0);
    }
    else if (strcmp(key, "eff_cnt_before_cutpool") == 0 ||
 	    strcmp(key, "LP_eff_cnt_before_cutpool") == 0){
-      return(lp_par->eff_cnt_before_cutpool);
+      *value = lp_par->eff_cnt_before_cutpool;
+      return(0);
    }
    else if (strcmp(key, "ineffective_constraints") == 0 ||
 	    strcmp(key, "LP_ineffective_constraints") == 0){
-      return(lp_par->ineffective_constraints);
+      *value = lp_par->ineffective_constraints;
+      return(0);
    }
    else if (strcmp(key, "base_constraints_always_effective") == 0 ||
 	    strcmp(key, "LP_base_constraints_always_effective") == 0){
-      return(lp_par->base_constraints_always_effective);
+      *value = lp_par->base_constraints_always_effective;
+      return(0);
    }
    else if (strcmp(key, "branch_on_cuts") == 0 ||
 	    strcmp(key, "LP_branch_on_cuts") == 0){
-      return(lp_par->branch_on_cuts);
-	     }
+      *value = lp_par->branch_on_cuts;
+      return(0);
+   }
    else if (strcmp(key, "discard_slack_cuts") == 0 ||
 	    strcmp(key, "LP_discard_slack_cuts") == 0){
-      return(lp_par->discard_slack_cuts);
+      *value = lp_par->discard_slack_cuts;
+      return(0);
    }
    else if (strcmp(key, "max_cut_num_per_iter") == 0 ||
 	    strcmp(key, "LP_max_cut_num_per_iter") == 0){
-      return(lp_par->max_cut_num_per_iter);
+      *value = lp_par->max_cut_num_per_iter;
+      return(0);
    }
    
    /* variable fixing params */
    else if (strcmp(key, "do_reduced_cost_fixing") == 0 ||
 	    strcmp(key, "LP_do_reduced_cost_fixing") == 0){
-      return(lp_par->do_reduced_cost_fixing);
+      *value = lp_par->do_reduced_cost_fixing;
+      return(0);
    }
    else if (strcmp(key, "do_logical_fixing") == 0 ||
 	    strcmp(key, "LP_do_logical_fixing") == 0){
-      return(lp_par->do_logical_fixing);
+      *value = lp_par->do_logical_fixing;
+      return(0);
    }
    else if (strcmp(key, "fixed_to_ub_before_logical_fixing") == 0 ||
 	    strcmp(key, "LP_fixed_to_ub_before_logical_fixing") == 0){
-      return(lp_par->fixed_to_ub_before_logical_fixing);
+      *value = lp_par->fixed_to_ub_before_logical_fixing;
+      return(0);
    }
    else if (strcmp(key, "generate_cgl_cuts") == 0 ||
 	    strcmp(key, "generate_cgl_cuts") == 0){
-      return(cg_par->do_findcuts);
+      *value = cg_par->do_findcuts;
+      return(0);
    }
    
    else if (strcmp(key, "max_presolve_iter") == 0 ||
 	    strcmp(key, "LP_max_presolve_iter") == 0){
-      return(lp_par->max_presolve_iter);
+      *value = lp_par->max_presolve_iter;
+      return(0);
    }
    
    /* user-defined function defaults */
    else if (strcmp(key, "is_feasible_default") == 0 ||
 	    strcmp(key, "LP_is_feasible_default") == 0){
-      return(lp_par->is_feasible_default);
+      *value = lp_par->is_feasible_default;
+      return(0);
    }
    else if (strcmp(key, "send_feasible_solution_default") == 0 ||
 	    strcmp(key, "LP_send_feasible_solution_default") == 0){
-      return(lp_par->send_feasible_solution_default);
+      *value = lp_par->send_feasible_solution_default;
+      return(0);
    }
    else if (strcmp(key, "display_solution_default") == 0 ||
 	    strcmp(key, "LP_display_solution_default") == 0){
-      return(lp_par->display_solution_default);
+      *value = lp_par->display_solution_default;
+      return(0);
    }
    else if (strcmp(key, "shall_we_branch_default") == 0 ||
 	    strcmp(key, "LP_shall_we_branch_default") == 0){
-      return(lp_par->shall_we_branch_default);
+      *value = lp_par->shall_we_branch_default;
+      return(0);
    }
    else if (strcmp(key, "select_candidates_default") == 0 ||
 	    strcmp(key, "LP_select_candidates_default") == 0){
-      return(lp_par->select_candidates_default);
+      *value = lp_par->select_candidates_default;
+      return(0);
    }
    else if (strcmp(key, "strong_branching_cand_num") == 0){
-      return(lp_par->strong_branching_cand_num_max);
+      *value = lp_par->strong_branching_cand_num_max;
+      return(0);
    }
    else if (strcmp(key, "strong_branching_cand_num_max") == 0 ||
 	    strcmp(key, "LP_strong_branching_cand_num_max") == 0){
-      return(lp_par->strong_branching_cand_num_max);
+      *value = lp_par->strong_branching_cand_num_max;
+      return(0);
    }
    else if (strcmp(key, "strong_branching_cand_num_min") == 0 ||
 	    strcmp(key, "LP_strong_branching_cand_num_min") == 0){
-      return(lp_par->strong_branching_cand_num_min);
+      *value = lp_par->strong_branching_cand_num_min;
+      return(0);
    }
    else if (strcmp(key, "compare_candidates_default") == 0 ||
 	    strcmp(key, "LP_compare_candidates_default") == 0){
-      return(lp_par->compare_candidates_default);
+      *value = lp_par->compare_candidates_default;
+      return(0);
    }
 
    else if (strcmp(key, "select_child_default") == 0 ||
 	    strcmp(key, "LP_select_child_default") == 0){
-      return(lp_par->select_child_default);
+      *value = lp_par->select_child_default;
+      return(0);
    }
    else if (strcmp(key, "pack_lp_solution_default") == 0 ||
 	       strcmp(key, "LP_pack_lp_solution_default") == 0){
-      return(lp_par->pack_lp_solution_default);
+      *value = lp_par->pack_lp_solution_default;
+      return(0);
+   }
+   else if (strcmp(key, "multi_criteria") == 0 ||
+	    strcmp(key, "LP_multi_criteria") == 0 ){
+      *value = lp_par->multi_criteria;
+      return(0);
+   }
+   else if (strcmp(key, "mc_find_supported_solutions") == 0 ||
+	    strcmp(key, "LP_mc_find_supported_solutions") == 0 ){
+      *value = lp_par->mc_find_supported_solutions;
+      return(0);
    }
    
    /***********************************************************************
     ***                     cut_gen params                          ***
     ***********************************************************************/
    else if (strcmp(key, "CG_verbosity") == 0){
-      return(cg_par->verbosity);
+      *value = cg_par->verbosity;
+      return(0);
    }
    else if (strcmp(key, "do_findcuts") == 0 ||
 	    strcmp(key, "CG_do_findcuts") == 0){
-      return(cg_par->do_findcuts);
+      *value = cg_par->do_findcuts;
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    else if (strcmp(key, "decomp_sol_pool_check_freq") == 0 ||
 	    strcmp(key, "CG_decomp_sol_pool_check_freq") == 0){
-      return(cg_par->decomp_sol_pool_check_freq);
+      *value = cg_par->decomp_sol_pool_check_freq;
+      return(0);
    }
    else if (strcmp(key, "decomp_wait_for_cols") == 0 ||
 	    strcmp(key, "CG_decomp_wait_for_cols") == 0){
-      return(cg_par->decomp_wait_for_cols);
+      *value = cg_par->decomp_wait_for_cols;
+      return(0);
    }
    else if (strcmp(key, "decomp_max_col_num_per_iter") == 0 ||
 	    strcmp(key, "CG_decomp_max_col_num_per_iter") == 0){
-     return( cg_par->decomp_max_col_num_per_iter);
+     *value =  cg_par->decomp_max_col_num_per_iter;
+      return(0);
    }
    else if (strcmp(key, "decomp_col_block_size") == 0 ||
 	    strcmp(key, "CG_decomp_col_block_size") == 0){
-      return(cg_par->decomp_col_block_size);
+      *value = cg_par->decomp_col_block_size;
+      return(0);
    }
    else if (strcmp(key, "decomp_mat_block_size") == 0 ||
 	    strcmp(key, "CG_decomp_mat_block_size") == 0){
-      return(cg_par->decomp_mat_block_size);
+      *value = cg_par->decomp_mat_block_size;
+      return(0);
    }
    else if (strcmp(key, "decomp_complete_enum") == 0 ||
 	    strcmp(key, "CG_decomp_complete_enum") == 0){
-	 return(cg_par->decomp_complete_enum);
+	 *value = cg_par->decomp_complete_enum;
+      return(0);
    }
    /*___END_EXPERIMENTAL_SECTION___*/
    
@@ -4167,47 +4560,57 @@ int sym_get_int_param(sym_environment *env,  char *key)
     ***                      cutpool params                         ***
     ***********************************************************************/
    else if (strcmp(key, "CP_verbosity") == 0){
-      return(cp_par->verbosity);
+      *value = cp_par->verbosity;
+      return(0);
    }
    else if (strcmp(key, "cp_warm_start") == 0 ||
 	    strcmp(key, "CP_warm_start") == 0){
-      return(cp_par->warm_start);
+      *value = cp_par->warm_start;
+      return(0);
    }
    else if (strcmp(key, "cp_logging") == 0 ||
 	    strcmp(key, "CP_logging") == 0){
-      return(cp_par->logging);
+      *value = cp_par->logging;
+      return(0);
    }
    else if (strcmp(key, "block_size") == 0 ||
 	    strcmp(key, "CP_block_size") == 0){
-      return(cp_par->block_size);
+      *value = cp_par->block_size;
+      return(0);
    }
    else if (strcmp(key, "max_size") == 0 ||
 	    strcmp(key, "CP_max_size") == 0){
-      return(cp_par->max_size);
+      *value = cp_par->max_size;
+      return(0);
    }
    else if (strcmp(key, "max_number_of_cuts") == 0 ||
 	    strcmp(key, "CP_max_number_of_cuts") == 0){
-      return(cp_par->max_number_of_cuts);
+      *value = cp_par->max_number_of_cuts;
+      return(0);
    }
    else if (strcmp(key, "cuts_to_check") == 0 ||
 	    strcmp(key, "cuts_to_check") == 0){
-      return(cp_par->cuts_to_check);
+      *value = cp_par->cuts_to_check;
+      return(0);
    }
    else if (strcmp(key, "delete_which") == 0 ||
 	    strcmp(key, "CP_delete_which") == 0){
-      return(cp_par->delete_which);
+      *value = cp_par->delete_which;
+      return(0);
    }
    else if (strcmp(key, "touches_until_deletion") == 0 ||
 	    strcmp(key, "CP_touches_until_deletion") == 0){
-      return(cp_par->touches_until_deletion);
+      *value = cp_par->touches_until_deletion;
+      return(0);
    }
    else if (strcmp(key, "min_to_delete") == 0 ||
 	    strcmp(key, "CP_min_to_delete") == 0){
-      return(cp_par->min_to_delete);
+      *value = cp_par->min_to_delete;
+      return(0);
    }
       else if (strcmp(key, "check_which") == 0 ||
 	    strcmp(key, "CP_check_which") == 0){
-	 return(cp_par->check_which);
+	 *value = cp_par->check_which;
 		}
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 
@@ -4216,44 +4619,53 @@ int sym_get_int_param(sym_environment *env,  char *key)
     ***********************************************************************/
 #ifdef COMPILE_DECOMP
    else if (strcmp(key, "SP_verbosity") == 0){
-	 return(sp_par->verbosity);
+	 *value = sp_par->verbosity;
+      return(0);
    }
    else if (strcmp(key, "SP_block_size") == 0){
-      return(sp_par->block_size);
+      *value = sp_par->block_size;
+      return(0);
    }
    else if (strcmp(key, "SP_max_size") == 0){
-      return(sp_par->max_size);
+      *value = sp_par->max_size;
+      return(0);
    }
    else if (strcmp(key, "max_number_of_sols") == 0 ||
 	    strcmp(key, "SP_max_number_of_sols") == 0){
-      return(sp_par->max_number_of_sols);
+      *value = sp_par->max_number_of_sols;
+      return(0);
    }
    else if (strcmp(key, "SP_delete_which") == 0){
-      return(sp_par->delete_which);
+      *value = sp_par->delete_which;
+      return(0);
    }
    else if (strcmp(key, "SP_touches_until_deletion") == 0){
-      return(sp_par->touches_until_deletion);
+      *value = sp_par->touches_until_deletion;
+      return(0);
    }
    else if (strcmp(key, "SP_min_to_delete") == 0){
-      return(sp_par->min_to_delete);
+      *value = sp_par->min_to_delete;
+      return(0);
    }
    else if (strcmp(key, "SP_compress_num") == 0){
-      return(sp_par->compress_num);
+      *value = sp_par->compress_num;
+      return(0);
    }
    else if (strcmp(key, "SP_check_which") == 0){
-      return(sp_par->check_which);
+      *value = sp_par->check_which;
+      return(0);
    }
 #endif
 
    /*___END_EXPERIMENTAL_SECTION___*/
 
-   return (0);
+   return (FUNCTION_TERMINATED_ABNORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-double sym_get_dbl_param(sym_environment *env, char *key)
+int sym_get_dbl_param(sym_environment *env, char *key, double *value)
 {
 
    double timeout;
@@ -4271,120 +4683,172 @@ double sym_get_dbl_param(sym_environment *env, char *key)
    dg_params *dg_par = &env->par.dg_par;
    
    if (strcmp(key, "granularity") == 0){
-      return(tm_par->granularity);
+      *value = tm_par->granularity;
+      return(0);
    }
    else if (strcmp(key, "upper_bound") == 0 ||
 	    strcmp(key, "M_upper_bound") == 0){
-      return(env->ub);
+      *value = env->ub;
+      return(0);
    }
    else if (strcmp(key, "upper_bound_estimate") == 0 ||
 	    strcmp(key, "M_upper_bound_estimate") == 0){
-      return(env->ub_estimate);
+      *value = env->ub_estimate;
+      return(0);
    }
    else if (strcmp(key, "lower_bound") == 0 ||
 	    strcmp(key, "M_lower_bound") == 0){
-      return(env->lb);
+      *value = env->lb;
+      return(0);
    }
    else if (strcmp(key, "scale_factor") == 0 ||
 	    strcmp(key, "DG_scale_factor") == 0){
-      return(dg_par->scale_factor);
+      *value = dg_par->scale_factor;
+      return(0);
+   }
+   else if (strcmp(key, "mc_compare_solution_tolerance") == 0 ||
+	    strcmp(key, "M_mc_compare_solution_tolerance") == 0){
+      *value = env->par.mc_compare_solution_tolerance;
+      return(0);
+   }
+   else if (strcmp(key, "mc_binary_search_tolerance") == 0 ||
+	    strcmp(key, "M_mc_binary_search_tolerance") == 0){
+      *value = env->par.mc_binary_search_tolerance;
+      return(0);
    }
    
    /***********************************************************************
     ***                  Treemanager params                         ***
     ***********************************************************************/
    else if (strcmp(key, "TM_granularity") == 0){
-      return(tm_par->granularity);
+      *value = tm_par->granularity;
+      return(0);
    }
    else if (strcmp(key, "unconditional_dive_frac") == 0 ||
 	    strcmp(key, "TM_unconditional_dive_frac") == 0){
-      return(tm_par->unconditional_dive_frac);
+      *value = tm_par->unconditional_dive_frac;
+      return(0);
    }
    else if (strcmp(key, "diving_threshold") == 0 ||
 	    strcmp(key, "TM_diving_threshold") == 0){
-     return( tm_par->diving_threshold);
+     *value =  tm_par->diving_threshold;
+      return(0);
    }
    else if (strcmp(key, "time_limit") == 0 ||
 	    strcmp(key, "TM_time_limit") == 0){
-     return( tm_par->time_limit);
+     *value =  tm_par->time_limit;
+      return(0);
    }
    else if (strcmp(key, "gap_limit") == 0 ||
 	    strcmp(key, "TM_gap_limit") == 0){
-      return(tm_par->gap_limit);
+      *value = tm_par->gap_limit;
+      return(0);
    }
    
    /***********************************************************************
     ***                      LP params                              ***
     ***********************************************************************/
    else if (strcmp(key, "LP_granularity") == 0){
-      return(lp_par->granularity);
+      *value = lp_par->granularity;
+      return(0);
    }
    else if (strcmp(key, "fractional_diving_ratio") == 0 ||
 	    strcmp(key, "LP_fractional_diving_ratio") == 0){
-      return(lp_par->fractional_diving_ratio);
+      *value = lp_par->fractional_diving_ratio;
+      return(0);
    }
    else if (strcmp(key, "max_non_dual_feas_to_add_frac") == 0 ||
 	    strcmp(key, "LP_max_non_dual_feas_to_add_frac") == 0){
-      return(lp_par->max_non_dual_feas_to_add_frac);
+      *value = lp_par->max_non_dual_feas_to_add_frac;
+      return(0);
    }
    else if (strcmp(key, "max_not_fixable_to_add_frac") == 0 ||
 	    strcmp(key, "LP_max_not_fixable_to_add_frac") == 0){
-      return(lp_par->max_not_fixable_to_add_frac);
+      *value = lp_par->max_not_fixable_to_add_frac;
+      return(0);
    }
    else if (strcmp(key, "mat_col_compress_ratio") == 0 ||
 	    strcmp(key, "LP_mat_col_compress_ratio") == 0){
-      return(lp_par->mat_col_compress_ratio);
+      *value = lp_par->mat_col_compress_ratio;
+      return(0);
    }
    else if (strcmp(key, "mat_row_compress_ratio") == 0 ||
 	    strcmp(key, "LP_mat_row_compress_ratio") == 0){
-      return(lp_par->mat_row_compress_ratio);
+      *value = lp_par->mat_row_compress_ratio;
+      return(0);
    }
    else if (strcmp(key, "tailoff_gap_frac") == 0 ||
 	    strcmp(key, "LP_tailoff_gap_frac") == 0){
-      return(lp_par->tailoff_gap_frac);
+      *value = lp_par->tailoff_gap_frac;
+      return(0);
    }
    else if (strcmp(key, "tailoff_obj_frac") == 0 ||
 	    strcmp(key, "LP_tailoff_obj_frac") == 0){
-      return(lp_par->tailoff_obj_frac);
+      *value = lp_par->tailoff_obj_frac;
+      return(0);
    }
    else if (strcmp(key, "tailoff_absolute") == 0 ||
 	    strcmp(key, "LP_tailoff_absolute") == 0){
-      return(lp_par->tailoff_absolute);
+      *value = lp_par->tailoff_absolute;
+      return(0);
    }
 
    /* timeouts on receiving cuts */
    else if (strcmp(key, "first_lp_first_cut_time_out") == 0 ||
 	    strcmp(key, "LP_first_lp_first_cut_time_out") == 0){
-      return(lp_par->first_lp.first_cut_time_out);
+      *value = lp_par->first_lp.first_cut_time_out;
+      return(0);
    }
    else if (strcmp(key, "first_lp_all_cuts_time_out") == 0 ||
 	    strcmp(key, "LP_first_lp_all_cuts_time_out") == 0){
-      return(lp_par->first_lp.all_cuts_time_out);
+      *value = lp_par->first_lp.all_cuts_time_out;
+      return(0);
    }
    else if (strcmp(key, "later_lp_first_cut_time_out") == 0 ||
 	    strcmp(key, "LP_later_lp_first_cut_time_out") == 0){
-      return(lp_par->later_lp.first_cut_time_out);
+      *value = lp_par->later_lp.first_cut_time_out;
+      return(0);
    }
    else if (strcmp(key, "later_lp_all_cuts_time_out") == 0 ||
 	    strcmp(key, "LP_later_lp_all_cuts_time_out") == 0){
-      return(lp_par->later_lp.all_cuts_time_out);
+      *value = lp_par->later_lp.all_cuts_time_out;
+      return(0);
    }
 
    else if (strcmp(key, "gap_as_ub_frac") == 0 ||
 	    strcmp(key, "LP_gap_as_ub_frac") == 0){
-      return(lp_par->gap_as_ub_frac);
+      *value = lp_par->gap_as_ub_frac;
+      return(0);
    }
    else if (strcmp(key, "gap_as_last_gap_frac") == 0 ||
 	    strcmp(key, "LP_gap_as_last_gap_frac") == 0){
-      return(lp_par->gap_as_last_gap_frac);
+      *value = lp_par->gap_as_last_gap_frac;
+      return(0);
    }
    else if (strcmp(key, "fixed_to_ub_frac_before_logical_fixing")==0 ||
 	    strcmp(key, "LP_fixed_to_ub_frac_before_logical_fixing")==0){
-      return(lp_par->fixed_to_ub_frac_before_logical_fixing);
+      *value = lp_par->fixed_to_ub_frac_before_logical_fixing;
+      return(0);
    }
    else if (strcmp(key,"strong_branching_red_ratio") == 0 ||
 	    strcmp(key,"LP_strong_branching_red_ratio") == 0){
-      return(lp_par->strong_branching_red_ratio);
+      *value = lp_par->strong_branching_red_ratio;
+      return(0);
+   }
+  else if (strcmp(key, "mc_gamma") == 0 ||
+	    strcmp(key, "LP_mc_gamma") == 0 ){
+      *value = lp_par->mc_gamma;
+      return(0);
+   }
+   else if (strcmp(key, "mc_tau") == 0 ||
+	    strcmp(key, "LP_mc_tau") == 0 ){
+      *value = lp_par->mc_tau;
+      return(0);
+   }
+   else if (strcmp(key, "mc_rho") == 0 ||
+	    strcmp(key, "LP_mc_rho") == 0 ){
+      *value = lp_par->mc_rho;
+      return(0);
    }
    
    /***********************************************************************
@@ -4392,11 +4856,13 @@ double sym_get_dbl_param(sym_environment *env, char *key)
     ***********************************************************************/
    else if (strcmp(key, "decomp_initial_timeout") == 0 ||
 	    strcmp(key, "CG_decomp_initial_timeout") == 0){
-      return(cg_par->decomp_initial_timeout);
+      *value = cg_par->decomp_initial_timeout;
+      return(0);
    }
    else if (strcmp(key, "decomp_dynamic_timeout") == 0 ||
 	    strcmp(key, "CG_decomp_dynamic_timeout") == 0){
-      return(cg_par->decomp_dynamic_timeout);
+      *value = cg_par->decomp_dynamic_timeout;
+      return(0);
    }
 
    /***********************************************************************
@@ -4404,20 +4870,22 @@ double sym_get_dbl_param(sym_environment *env, char *key)
     ***********************************************************************/
 #ifdef COMPILE_DECOMP
    else if (strcmp(key, "SP_etol") == 0){
-      return(sp_par->etol);
+      *value = sp_par->etol;
+      return(0);
    }
    else if (strcmp(key, "SP_compress_ratio") == 0){
-      return(sp_par->compress_ratio);
+      *value = sp_par->compress_ratio;
+      return(0);
    }
 #endif
 
-   return (0);
+   return (FUNCTION_TERMINATED_ABNORMALLY);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-char *sym_get_str_param(sym_environment *env, char *key)
+int sym_get_str_param(sym_environment *env, char *key, char **value)
 {
 
    int len, i;
@@ -4435,31 +4903,37 @@ char *sym_get_str_param(sym_environment *env, char *key)
    dg_params *dg_par = &env->par.dg_par;
    
    if (strcmp(key, "problem_name") == 0){      
-      return (env->probname);
+      *value = env->probname;
+      return(0);
    }  
    else if (strcmp(key, "tm_executable_name") == 0 ||
 	    strcmp(key, "tm_exe") == 0 ||
 	    strcmp(key, "M_tm_exe") == 0 ||
 	    strcmp(key, "M_tm_executable_name") == 0){
-      return(env->par.tm_exe);
+      *value = env->par.tm_exe;
+      return(0);
    }
    else if (strcmp(key, "dg_executable_name") == 0 ||
 	    strcmp(key, "dg_exe") == 0 ||
 	    strcmp(key, "M_dg_exe") == 0 ||
 	    strcmp(key, "M_dg_executable_name") == 0){
-      return(env->par.dg_exe); 
+      *value = env->par.dg_exe; 
+      return(0);
    }
    else if (strcmp(key, "tm_machine") == 0 ||
 	    strcmp(key, "M_tm_machine") == 0){
-      return(env->par.tm_machine);
+      *value = env->par.tm_machine;
+      return(0);
    }
    else if (strcmp(key, "dg_machine") == 0 ||
 	    strcmp(key, "M_dg_machine") == 0){
-      return(env->par.dg_machine);
+      *value = env->par.dg_machine;
+      return(0);
    }
    else if (strcmp(key, "param_file") == 0 ||
 	    strcmp(key, "M_param_file") == 0){
-      return(env->par.param_file);
+      *value = env->par.param_file;
+      return(0);
    }
 
    /***********************************************************************
@@ -4468,27 +4942,33 @@ char *sym_get_str_param(sym_environment *env, char *key)
    
    else if (strcmp(key, "source_path") == 0 ||
 	    strcmp(key, "DG_source_path") == 0){
-      return(dg_par->source_path);
+      *value = dg_par->source_path;
+      return(0);
    }
    else if (strcmp(key, "node_dash") == 0 ||
 	    strcmp(key, "DG_node_dash") == 0){
-      return(dg_par->node_dash);
+      *value = dg_par->node_dash;
+      return(0);
    }
    else if (strcmp(key, "edge_dash") == 0 ||
 	    strcmp(key, "DG_edge_dash") == 0){
-      return(dg_par->edge_dash);
+      *value = dg_par->edge_dash;
+      return(0);
    }
    else if (strcmp(key, "nodelabel_font") == 0 ||
 	    strcmp(key, "DG_nodelabel_font") == 0){
-      return(dg_par->nodelabel_font);
+      *value = dg_par->nodelabel_font;
+      return(0);
    }
    else if (strcmp(key, "nodeweight_font") == 0 ||
 	    strcmp(key, "DG_nodeweight_font") == 0){
-      return(dg_par->nodeweight_font);
+      *value = dg_par->nodeweight_font;
+      return(0);
    }
    else if (strcmp(key, "edgeweight_font") == 0 ||
 	    strcmp(key, "DG_edgeweight_font") == 0){
-      return(dg_par->edgeweight_font);
+      *value = dg_par->edgeweight_font;
+      return(0);
    }
    
    /***********************************************************************
@@ -4498,29 +4978,33 @@ char *sym_get_str_param(sym_environment *env, char *key)
 	    strcmp(key, "lp_exe") == 0 ||
 	    strcmp(key, "TM_lp_exe") == 0 ||
 	    strcmp(key, "TM_lp_executable_name") == 0){
-      return(tm_par->lp_exe);
+      *value = tm_par->lp_exe;
+      return(0);
    }
    else if (strcmp(key, "cg_executable_name") == 0 ||
 	    strcmp(key, "cg_exe") == 0 ||
 	    strcmp(key, "TM_cg_exe") == 0 ||
 	    strcmp(key, "TM_cg_executable_name") == 0){
-      return(tm_par->cg_exe);
+      *value = tm_par->cg_exe;
+      return(0);
    }
    else if (strcmp(key, "cp_executable_name") == 0 ||
 	    strcmp(key, "cp_exe") == 0 ||
 	    strcmp(key, "TM_cp_exe") == 0 ||
 	    strcmp(key, "TM_cp_executable_name") == 0){
-      return(tm_par->cp_exe);
+      *value = tm_par->cp_exe;
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    else if (strcmp(key, "sp_executable_name") == 0 ||
 	    strcmp(key, "sp_exe") == 0 ||
 	    strcmp(key, "TM_sp_exe") == 0 ||
 	    strcmp(key, "TM_sp_executable_name") == 0){
-      return(tm_par->sp_exe);
+      *value = tm_par->sp_exe;
+      return(0);
    }
 
-   return (0);
+   return (FUNCTION_TERMINATED_ABNORMALLY);
 }
 
 /*===========================================================================*/
@@ -4528,7 +5012,7 @@ char *sym_get_str_param(sym_environment *env, char *key)
 
 warm_start_desc *sym_create_copy_warm_start(warm_start_desc *ws)
 {
-   return create_copy_warm_start(ws);
+   return(create_copy_warm_start(ws));
 }
 
 /*===========================================================================*/
@@ -4536,14 +5020,7 @@ warm_start_desc *sym_create_copy_warm_start(warm_start_desc *ws)
 
 MIPdesc *sym_create_copy_mip_desc(sym_environment *env)
 {
-   if (env){
-      return create_copy_mip_desc(env->mip);
-   }
-   else{
-      printf("sym_create_copy_mip_desc():");
-      printf("An empty problem is given!\n");
-      return 0;
-   }
+   return(create_copy_mip_desc(env->mip));
 }
 
 /*===========================================================================*/
@@ -4551,38 +5028,180 @@ MIPdesc *sym_create_copy_mip_desc(sym_environment *env)
 
 sym_environment * sym_create_copy_environment (sym_environment *env)
 {
-   return create_copy_environment(env);
+   return(create_copy_environment(env));
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
-double sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
-			      double *new_rhs_val)
+
+int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
+			      double *new_rhs_val, double *lb_for_new_rhs)
 {
 #ifdef USE_CGL_CUTS
    printf("sym_get_lb_for_new_rhs():\n");
    printf("SYMPHONY can not analyse the warm start - rhs change when cuts exist, for now!\n"); 
-   return(0);
+   return(FUNCTION_TERMINATED_ABNORMALLY);
 #else
    if (!env || !env->mip || 
-      env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY){ 
+      !env->par.tm_par.sensitivity_analysis){ 
       printf("sym_get_lb_for_new_rhs():\n");
       printf("Trying to read an empty problem, an empty problem description"); 
       printf(" or tree nodes were not kept in memory!\n");
-      return 0;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    else{
       if (!env->warm_start){
 	 printf("sym_get_lb_for_new_rhs():\n");
-	 printf("No available tree to incur sens. analysis on. \n");
-	 return 0;
+	 printf("No available warm start data to do sens. analysis. \n");
+	 return(FUNCTION_TERMINATED_ABNORMALLY);
       }
       else{
-	 return get_lb_for_new_rhs(env->warm_start->rootnode, env->mip, cnt, 
-				   new_rhs_ind, new_rhs_val);
+	 *lb_for_new_rhs =  
+	    get_lb_for_new_rhs(env->warm_start->rootnode, env->mip, cnt, 
+			       new_rhs_ind, new_rhs_val);
+	 return(FUNCTION_TERMINATED_NORMALLY);
       }
    }
 #endif
 }
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_ub_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
+			   double *new_rhs_val, double *ub_for_new_rhs)
+{
+
+   int *matbeg = NULL, *matind = NULL, nz, i, j, k;
+   double *matval = NULL;
+
+   if (!env || !env->mip || 
+       !env->par.tm_par.sensitivity_analysis){ 
+      printf("sym_get_ub_for_new_rhs():\n");
+      printf("Trying to read an empty problem, an empty problem description"); 
+      printf(" or tree nodes were not kept in memory!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+   else{
+      if (!env->warm_start){
+	 printf("sym_get_ub_for_new_rhs():\n");
+	 printf("No available warm start data to do sens. analysis. \n");
+	 return(FUNCTION_TERMINATED_ABNORMALLY);
+      }
+      else{
+
+	 /* prepare to send a row oriented mip description in to 
+	    get_ub_for_new_rhs() */ 
+	 
+	 matbeg = env->mip->matbeg;
+	 matind = env->mip->matind;
+	 matval = env->mip->matval;
+	 
+	 env->mip->matbeg = (int *) calloc(ISIZE, (env->mip->m+1));
+	 env->mip->matind = (int *) malloc (ISIZE* env->mip->nz);
+	 env->mip->matval = (double *) malloc (DSIZE* env->mip->nz);
+	 
+	 nz = 0;
+	 for(j = 0; j < env->mip->n; j++){
+	    for(i = 0; i < env->mip->m; i++){
+	       for(k = matbeg[i]; k < matbeg[i+1]; k++){
+		  if(matind[k] == j){	   
+		     env->mip->matind[nz] = i;
+		     env->mip->matval[nz] = matval[k];
+		     nz++;	  
+		     break;
+		  }
+	       }
+	    } 
+	    env->mip->matbeg[j+1] = nz;
+	 }	      
+	 
+	 *ub_for_new_rhs =  
+	    get_ub_for_new_rhs(env->warm_start->rootnode, env->mip, cnt, 
+			       new_rhs_ind, new_rhs_val);
+	 
+	 FREE(env->mip->matbeg);
+	 FREE(env->mip->matind);
+	 FREE(env->mip->matval);
+	 env->mip->matbeg = matbeg;
+	 env->mip->matind = matind;
+	 env->mip->matval = matval;
+      }
+   }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_lb_for_new_obj(sym_environment *env, int cnt, 
+				 int *new_obj_ind, 
+				 double *new_obj_val, 
+				 double *lb_for_new_obj)
+{
+
+   double ub;
+
+   if (!env || !env->mip || 
+       !env->par.tm_par.sensitivity_analysis){ 
+      printf("sym_get_lb_for_new_obj():\n");
+      printf("Trying to read an empty problem, an empty problem description"); 
+      printf(" or tree nodes were not kept in memory!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+   else{
+      if (!env->warm_start){
+	 printf("sym_get_lb_for_new_obj():\n");
+	 printf("No available warm start data to do sens. analysis. \n");
+	 return(FUNCTION_TERMINATED_ABNORMALLY);
+      }
+      else{
+	 ub = get_ub_for_new_obj(env->warm_start->rootnode, env->mip, cnt, 
+				 new_obj_ind, new_obj_val);
+	 *lb_for_new_obj =  
+	    get_lb_for_new_obj(env->warm_start->rootnode, env->mip, cnt, 
+			       new_obj_ind, new_obj_val);
+	 if(*lb_for_new_obj > ub){
+	    *lb_for_new_obj = ub;
+	 }
+      }
+   }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_ub_for_new_obj(sym_environment *env, int cnt, 
+				 int *new_obj_ind, 
+				 double *new_obj_val, 
+				 double *ub_for_new_obj)
+{
+   if (!env || !env->mip || 
+       !env->par.tm_par.sensitivity_analysis){ 
+      printf("sym_get_ub_for_new_obj():\n");
+      printf("Trying to read an empty problem, an empty problem description"); 
+      printf(" or tree nodes were not kept in memory!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+   else{
+      if (!env->warm_start){
+	 printf("sym_get_ub_for_new_obj():\n");
+	 printf("No available warm start data to do sens. analysis. \n");
+	 return(FUNCTION_TERMINATED_ABNORMALLY);
+      }
+      else{
+	 *ub_for_new_obj =  
+	    get_ub_for_new_obj(env->warm_start->rootnode, env->mip, cnt, 
+			       new_obj_ind, new_obj_val);
+      }
+   }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
+}
+
 /*===========================================================================*/
 /*===========================================================================*/

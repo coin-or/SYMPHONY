@@ -167,9 +167,7 @@
 /*******         Constants related to solving of an lp                 *******/
 /*****************************************************************************/
 
-#ifndef INFINITY
-#define INFINITY                 100000000
-#endif
+#define SYM_INFINITY                 100000000
 #define BIG_DBL                  1e40
 
 #define SYM_MINIMIZE                 0

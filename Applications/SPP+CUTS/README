@@ -14,12 +14,12 @@ This version of the SYMPHONY SPP+CUTS application is intended to work with
 SYMPHONY-5.0. First, configure and compile SYMPHONY 5.0 as described in
 SYMPHONY-5.0/README-5.0.  Download and unpack the source code for the SPP
 application from the file SYMPHONY-SPP+CUTS-5.0.tgz. Modify the variables in 
-the SPP+CUTS/Makefile appropriately. In particular, you must set the path to 
+the SPP+CUTS-5.0/Makefile appropriately. In particular, you must set the path to 
 SYMPHONY itself. If the application is unpacked as a subdirectory of 
 SYMPHONY-5.0 subdirectory, no further modification should be necessary. 
 Typing "make" in the SPP+CUTS subdirectory should successfully make the 
-SPP+CUTS executable. It will be installed in the directory 
-SYMPHONY-5.0/SPP+CUTS/bin.$(ARCH)/$(LP\_SOLVER). Otherwise, you must also 
+executable "spp". It will be installed in the directory 
+SPP+CUTS-5.0/bin.$(ARCH)/$(LP\_SOLVER). Otherwise, you must also 
 set the path to the application's files. See usage below.
 
 ******************************************************************************
@@ -39,7 +39,7 @@ subdirectory called SYMPHONY-5.0 containing all the source files. Download
 and unpack SYMPHONY-SPP+CUTS-5.0.zip. 
 
 There are two options. You can either compile on the command-line, using
-the MSVC++ makefile, SPP+CUTS\WIN32\spp_with_cuts.mak, or you can use the 
+the MSVC++ makefile, SPP+CUTS-5.0\WIN32\spp_with_cuts.mak, or you can use the 
 provided projects and workspaces. However for the second option, it is 
 important the SPP+CUTS archive be unpacked in the SYMPHONY-5.0 subdirectory 
 or the project files will not work. Compiling on the command-line is somewhat 
@@ -47,7 +47,7 @@ easier since it requires only editing the makefile and typing a single command.
 
 ******************** Using the NMAKE Utility *********************************
 
-1. Edit the SPP+CUTS\WIN32\spp_with_cuts.mak makefile to reflect your 
+1. Edit the SPP+CUTS-5.0\WIN32\spp_with_cuts.mak makefile to reflect your 
 environment. This involves specifying the LP solver to be used, assigning some 
 variables and setting various paths. Only minor edits should be required. 
 An explanation of what has to be set is contained in the comments in the 
@@ -55,7 +55,7 @@ makefile.
 
 2. To use many of the new capabilities of SYMPHONY, you must have installed
 the COIN libraries, available from www.coin-or.org. By default, SYMPHONY is 
-set up to use COIN LP solver, CLP, COIN Open Solver Interface, OSI and
+set to use COIN LP solver, CLP, COIN Open Solver Interface, OSI and
 COIN Cut Generation Library, CGL. To keep this configuration, you should 
 install OSI, CGL, CLP and the Coin utilities (under COIN\Coin). The path to 
 the COIN libraries must be specified in the makefile.
@@ -65,33 +65,35 @@ Linear Programming Kit (GLPK), which contains a parser for GMPL/AMPL
 files. The path to the GLPK libraries must be specified in the makefile.
 
 4. Once configuration is done, type "nmake /f spp_with_cuts.mak" in the 
-SPP+CUTS\WIN32 directory. The executable "symphony.exe" will be created under 
-the SPP+CUTS\WIN32\Debug directory.
+SPP+CUTS-5.0\WIN32 directory. The executable "spp_with_cuts.exe" will be 
+created under SPP+CUTS-5.0\WIN32\Debug subdirectory.
 
-5. To test the executable, type "symphony.exe -F ..\..\sample.spp" at a command
-prompt from the SPP+CUTS\WIN32\Debug directory.
+5. To test the executable, type "spp_with_cuts.exe -F ..\..\sample.spp" at a
+command prompt from the SPP+CUTS-5.0\WIN32\Debug directory.
 
 ******************** Using the MSVC++ Workspace ******************************
 
-1. In MS Visual C++ 6.0, open the workspace SYMPHONY-5.0\SPP+CUTS\
-WIN32\spp_with_cuts.dsw. Note that there are two projects, one called 
-"symphony" and one called "spp_with_cuts". The symphony project compiles the 
-source of the internal library. The spp_with_cuts project compiles a separate 
-library containing the user-defined functions that can be used to customize 
-the solver.
-
+1. In MS Visual C++ 6.0, open the workspace SYMPHONY-5.0\SPP+CUTS-5.0\
+WIN32\spp_with_cuts.dsw.Note that there are two projects, one called 
+"spp_with_cuts" and the other called "symphonyLib". The "symphonyLib" project 
+compiles the source code, with the calls to the user-defined callbacks used to 
+customize the solver, to create the callable library: "symphonyLib.lib". 
+The "spp_with_cuts" project compiles those user callbacks together with the 
+main and the application functions, links them with the callable library and 
+creates the executable: "spp_with_cuts.exe".
+ 
 2. To use many of the new capabilities of SYMPHONY, you must have installed
 the COIN libraries. Specifically, you should install OSI, CGL, CLP and the Coin
 utilities (in the COIN/Coin directory). These can be downloaded from 
 www.coin-or.org. The default location for COIN is C:\COIN\.
 
-3. By default, SYMPHONY is set up to use the OSI CLP interface. To see this
+3. By default, SYMPHONY is set to use the OSI CLP interface. To see this
 check the following settings:
 
 -- "__OSI_CLP__" is defined in the preprocessor definitions of both
-"symphony" and "spp_with_cuts" projects (right-click on one of the projects, and 
-then choose Settings --> C/C++ --> Preprocessor in the category drop-down 
-menu).
+"symphonyLib" and "spp_with_cuts" projects (right-click on one of the 
+projects, and then choose Settings --> C/C++ --> Preprocessor in the category 
+drop-down menu).
 
 -- Paths to the include files of COIN utilities (Coin), OSI, OSI CLP, and
 CLP are specified in the same settings window as for the preprocessor
@@ -101,10 +103,10 @@ C:\COIN\Clp directories, respectively. If they are not,
 make sure that you have set the correct paths in both projects before
 compiling.
 
--- The "symphony" project is dependent on the "spp_with_cuts" project (see the
-dependencies in Project --> Dependencies) and it includes the necessary
-libraries: "spp_with_cuts", "coinLib", "osiLib", "osiClpLib", and "clpLib" (solver
-library).
+-- The "spp_with_cuts" project is dependent on the "symphonyLib" project 
+(see the dependencies in Project --> Dependencies) and it includes the 
+necessary libraries: "symphonyLib", "coinLib", "osiLib", "osiClpLib", and 
+"clpLib" (solver library).
 
 If you want to use another solver:
 
@@ -125,21 +127,20 @@ If you want to use the native CPLX or OSL interface directly, delete all the
 path definitions (you are not required to have COIN and OSI), and just add the
 path definitions for the CPLEX or OSL include files.
 
--- Add the appropriate libraries to the "symphony" project. For instance, if
-you want to use "__OSI_OSL__", then add the osiOslLib and oslmd6030 (OSL solver
-library) files after deleting osiClpLib and clpLib libraries from
-the "symphony" project. If you want to use the native OSL interface, 
-then delete all the libraries (except the "spp_with_cuts" library ) from the 
-"symphony" project and just add the "oslmd6030" library file for it is the 
-unique solver library file we need now.
+-- Add the appropriate libraries to the "spp_with_cuts" project. For instance, 
+if you want to use "__OSI_OSL__", then add the "osiOslLib" and "oslmd6030" 
+(OSL solver library) files after deleting "osiClpLib" and "clpLib" 
+dependencies from the project. If you want to use the native OSL interface, 
+then delete all the libraries (except the "symphonyLib") and just add the 
+"oslmd6030" library for it is the unique solver library we need now.
 
-4. By default, SYMPHONY is also set up to use the COIN CGL library for
-generating cuts. To use CGL, the "symphony" project has the "ADD_CGL_CUTS"
-preprocessor definition, the path to C:\COIN\Cgl\ (be sure that this path
-directs SYMPHONY to the include directory of CGL) and a dependence on the
-"cglLib" library. If you also don't want to use the CGL library, simply delete
-the "ADD_CGL_CUTS" preprocessor definition, the path definition for the CGL 
-include files and the "cglLib" library from the "symphony" project.
+4. By default, SYMPHONY is also set to use the COIN CGL library for
+generating cuts. To use CGL, the "symphonyLib" project has the "ADD_CGL_CUTS"
+preprocessor definition and the path to C:\COIN\Cgl\ (be sure that this path
+directs SYMPHONY to the include directory of CGL). If you also don't want to 
+use the CGL library, simply delete the "ADD_CGL_CUTS" preprocessor definition, 
+the path definition for the CGL include files and the "cglLib" library from 
+the "spp_with_cuts" project.
 
 5. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important note
 for OSL users: when using OSL in Windows, you must also add "OSLMSDLL" to the
@@ -153,15 +154,15 @@ definition, simply add it to the list of definitions, as above.
 
 7. You must also be sure to have any .dll files required for your LP solver to
 be in your search path. Either move the required .dll to the directory
-containing symphony.exe or add the path to the "PATH" Windows environment
-variable.
+containing "spp_with_cuts.exe" or add the path to the "PATH" Windows 
+environment variable.
 
 8. Once you have the proper settings for your LP solver, choose "Build
-symphony.exe" from the Build menu. This should successfully build the
+spp_with_cuts.exe" from the Build menu. This should successfully build the
 executable.
 
-9. To test the executable, right click on the symphony project, go to the
-"Debug" tab and set the program arguments to "-F sample.spp" Note that
+9. To test the executable, right click on the "spp_with_cuts" project, go to 
+the "Debug" tab and set the program arguments to "-F ..\sample.spp" Note that
 command-line switches are Unix-style.
 
 10. Now choose "Execute" from the build menu and the solver should solve the

@@ -62,6 +62,7 @@ void delete_dup_edges(small_graph *g)
 {
    edge_data *ed0, *ed1;
    int pos;
+   int alloc_old = g->allocated_edgenum;   
    
    qsort((char *)g->edges, g->edgenum, sizeof(edge_data), is_same_edge);
    for (pos=0, ed0=ed1=g->edges ; pos < g->edgenum; pos++, ed1++){
@@ -72,8 +73,12 @@ void delete_dup_edges(small_graph *g)
    }
    pos = ((int)ed0 - (int)g->edges)/sizeof(edge_data) + 1;
    g->allocated_edgenum -= g->edgenum - pos;
-   g->edges = (edge_data *) realloc
-      ((char *)(g->edges), g->allocated_edgenum * sizeof(edge_data));
+   if (alloc_old){
+      g->edges = (edge_data *) realloc
+		  ((char *)(g->edges), g->allocated_edgenum * sizeof(edge_data));
+   }else {
+	  g->edges = (edge_data *) calloc(g->allocated_edgenum, sizeof(edge_data));
+   }
    g->edgenum = pos;
 }
 

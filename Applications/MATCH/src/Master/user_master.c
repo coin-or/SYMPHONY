@@ -59,11 +59,14 @@ void user_usage(void){
 
 int user_initialize(void **user)
 {
+
+#if 0
    user_problem *prob = (user_problem *) calloc(1, sizeof(user_problem));
    
    *user = prob;
+#endif 
    
-   return(USER_SUCCESS);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -75,6 +78,9 @@ int user_initialize(void **user)
 
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
+
+#if 0
+
    FILE *f;
    char line[50], key[50], value[50], c, tmp;
    int i;
@@ -121,7 +127,8 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
       };
    }
 
-   return(USER_SUCCESS);
+#endif 
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -136,6 +143,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
 int user_io(void *user)
 {
+ # if 0
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
    user_parameters *par = &(prob->par);
@@ -157,6 +165,7 @@ int user_io(void *user)
    prob->colnum = (prob->nnodes)*(prob->nnodes-1)/2;
    prob->rownum = prob->nnodes;
 
+#endif
    return(USER_SUCCESS);
 }
    

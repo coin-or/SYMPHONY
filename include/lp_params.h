@@ -116,7 +116,7 @@ typedef struct LP_PARAMS{
 
    /* Multi-criteria parameters */
    int               multi_criteria;
-   int               mc_find_nondominated_solutions;
+   int               mc_find_supported_solutions;
    double            mc_rho;   /* For augmented Chebyshev norm */
    double            mc_gamma; /* Weight on first objective */
    double            mc_tau;   /* Weight on second objective */

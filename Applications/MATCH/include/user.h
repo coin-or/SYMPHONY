@@ -17,6 +17,8 @@
 #ifndef _USER_H
 #define _USER_H
 
+#include "master.h"
+#include "BB_macros.h"
 /* Cut types */
 
 #define TRIANGLE 1
@@ -43,5 +45,9 @@ typedef struct USER_PROBLEM{
    int		    node1[20000];   /* First index of each variable */
    int		    node2[20000];   /* Second index of each variable */
 }user_problem;
+
+
+int match_read_data PROTO((void *user, char *infile));
+int match_load_problem PROTO((sym_environment *env, void *user));
 
 #endif

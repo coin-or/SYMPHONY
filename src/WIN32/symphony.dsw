@@ -3,7 +3,22 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "symphony"=".\symphony.dsp" - Package Owner=<4>
+Project: "symphony"=.\symphony.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name symphonyLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "symphonyLib"=.\symphonyLib.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -214,16 +214,17 @@ int create_subproblem_u(lp_prob *p)
 	 vars = lp_data->vars = (var_desc **)
 	    realloc(lp_data->vars, lp_data->n * sizeof(var_desc *));
 	 for (i = lp_data->n - 1; i >= MAX(maxn, bvarnum); i--){
-	    vars[i] = (var_desc *) malloc( sizeof(var_desc) );
-	 }
-      }
+	    vars[i] = (var_desc *) malloc(sizeof(var_desc) );
+	 }	  
+	  }
       vars = lp_data->vars;
       d_uind = desc->uind.list;
       for (i = desc->uind.size - 1; i >= 0; i--){
 	 vars[i + bvarnum]->userind = d_uind[i];
 	 vars[i + bvarnum]->colind = bvarnum + i;
       }
-      if (p->par.multi_criteria && p->par.mc_find_nondominated_solutions){
+
+      if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
 	 vars[lp_data->n - 1]->userind = p->mip->n;
 	 vars[lp_data->n - 1]->colind  = lp_data->n - 1;
       }
@@ -264,7 +265,7 @@ int create_subproblem_u(lp_prob *p)
       }
 
       lp_data->mip->nz = p->mip->nz;
-      if (p->par.multi_criteria && p->par.mc_find_nondominated_solutions){
+      if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
 	 lp_data->mip->nz += 2 * lp_data->n;
       }
       
@@ -305,7 +306,7 @@ int create_subproblem_u(lp_prob *p)
 	    lp_data->mip->matind[j]   = p->mip->matind[k];
 	    lp_data->mip->matval[j++] = p->mip->matval[k];
 	 }
-	 if (p->par.multi_criteria && p->par.mc_find_nondominated_solutions){
+	 if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
 	    lp_data->mip->obj[i] = p->par.mc_rho*(p->mip->obj1[userind[i]] +
 						  p->mip->obj2[userind[i]]);
 	    lp_data->mip->matval[j] = p->par.mc_gamma*p->mip->obj1[userind[i]];
@@ -323,7 +324,7 @@ int create_subproblem_u(lp_prob *p)
 	 lp_data->mip->sense[i] = p->mip->sense[i];
 	 lp_data->mip->rngval[i] = p->mip->rngval[i];
       }
-      if (p->par.multi_criteria && p->par.mc_find_nondominated_solutions){
+      if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
 	 lp_data->mip->rhs[bcutnum - 2] = p->par.mc_gamma * p->utopia[0]; 
 	 lp_data->mip->sense[bcutnum - 2] = 'L';
 	 lp_data->mip->rhs[bcutnum - 1] = p->par.mc_tau * p->utopia[1]; 
@@ -2209,7 +2210,7 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	p->has_mc_ub = TRUE;
 	new_solution = TRUE;
      }
-     if (!branching && p->par.mc_find_nondominated_solutions){
+     if (!branching && !p->par.mc_find_supported_solutions){
 	if (p->par.mc_gamma*(obj[0] - p->utopia[0]) >
 	    *true_objval-p->par.mc_rho*(obj[0]+obj[1])-etol){
 	   /* Add an optimality cut for the second objective */
@@ -2224,7 +2225,7 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 						&p->cgp->cuts_to_add_size,
 						&p->cgp->cuts_to_add);
 	   FREE(new_cut);
-	}else if (p->par.mc_find_nondominated_solutions){
+	}else if (!p->par.mc_find_supported_solutions){
 	   /* Add an optimality cut for the second objective */
 	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	   new_cut->coef = NULL;

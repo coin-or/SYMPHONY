@@ -210,7 +210,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 
    int *indices;
    double *values;   
-   double inf = INFINITY;
+   double inf = SYM_INFINITY;
 
    mpl = mpl_initialize();  /* initialize the translator */
     
@@ -276,9 +276,11 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	 length = mpl_get_mat_row(mpl, i+1, indices, values);
 	 if (type == MPL_MAX){
 	    mip->obj_sense = SYM_MAXIMIZE; 
-	    for (j = 1; j <= length; j++){  
-	       mip->obj[indices[j]-1] = -values[j];
-	    }
+
+	    /* this is done in create_subproblem_u function! */
+	    //	    for (j = 1; j <= length; j++){  
+	    //   mip->obj[indices[j]-1] = -values[j];
+	    //	    }
 	 }else{   /* type == MPL_MIN */
 	    for( j = 1; j <= length; j++ ) 
 	       mip->obj[indices[j]-1] = values[j]; /* assign the obj coeff. */
@@ -1869,10 +1871,10 @@ void get_slacks(LPdata *lp_data)
    for (i=m-1; i>=0; i--){
       if (rows[i].free){
 	 switch (rows[i].cut->sense){
-	  case 'E': slacks[i] +=  rows[i].cut->rhs - INFINITY; break;
-	  case 'L': slacks[i] +=  rows[i].cut->rhs - INFINITY; break;
-	  case 'G': slacks[i] +=  rows[i].cut->rhs + INFINITY; break;
-	  case 'R': slacks[i] += -rows[i].cut->rhs - INFINITY; break;
+	  case 'E': slacks[i] +=  rows[i].cut->rhs - SYM_INFINITY; break;
+	  case 'L': slacks[i] +=  rows[i].cut->rhs - SYM_INFINITY; break;
+	  case 'G': slacks[i] +=  rows[i].cut->rhs + SYM_INFINITY; break;
+	  case 'R': slacks[i] += -rows[i].cut->rhs - SYM_INFINITY; break;
 	 }
       }
    }
@@ -2054,13 +2056,13 @@ void free_row_set(LPdata *lp_data, int length, int *index)
 
    for (j=0, i=length-1; i>=0; i--){
       switch (rows[index[i]].cut->sense){
-       case 'E': rhsval[i] = INFINITY; ind_e[j++] = index[i]; break;
-       case 'L': rhsval[i] = INFINITY; break;
+       case 'E': rhsval[i] = SYM_INFINITY; ind_e[j++] = index[i]; break;
+       case 'L': rhsval[i] = SYM_INFINITY; break;
        case 'R':
        cpx_status = CPXchgcoef(lp_data->cpxenv, lp_data->lp, index[i], -2,
-                               2*INFINITY);
+                               2*SYM_INFINITY);
        CPX_check_error("free_row_set - CPXchgcoef");
-       case 'G': rhsval[i] = -INFINITY; break;
+       case 'G': rhsval[i] = -SYM_INFINITY; break;
       }
    }
    cpx_status = CPXchgrhs(lp_data->cpxenv, lp_data->lp, length, index, rhsval);
@@ -2601,10 +2603,10 @@ void get_slacks(LPdata *lp_data)
    for (i =m - 1; i >= 0; i--){
       if (rows[i].free){
 	 switch (rows[i].cut->sense){
-	  case 'E': slacks[i] +=  rows[i].cut->rhs - INFINITY; break;
-	  case 'L': slacks[i] +=  rows[i].cut->rhs - INFINITY; break;
-	  case 'G': slacks[i] +=  rows[i].cut->rhs + INFINITY; break;
-	  case 'R': slacks[i] += -rows[i].cut->rhs - INFINITY; break;
+	  case 'E': slacks[i] +=  rows[i].cut->rhs - SYM_INFINITY; break;
+	  case 'L': slacks[i] +=  rows[i].cut->rhs - SYM_INFINITY; break;
+	  case 'G': slacks[i] +=  rows[i].cut->rhs + SYM_INFINITY; break;
+	  case 'R': slacks[i] += -rows[i].cut->rhs - SYM_INFINITY; break;
 	 }
       }
    }
@@ -2904,7 +2906,6 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    }
    
    if(last_dir < last_dot){
-	   printf("last_dir: last_dot   %i  %i\n", last_dir, last_dot);
 	   memcpy(fname, infile, CSIZE*last_dot);
 	   memcpy(ext, infile + last_dot + 1, CSIZE*(j - last_dot - 1)); 
    }
@@ -2967,6 +2968,8 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
    }
+   
+   mip->obj_offset = -mps.objectiveOffset();
 
    mip->colname = (char **) malloc(sizeof(char *) * mip->n);   
    

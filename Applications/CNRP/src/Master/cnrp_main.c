@@ -21,9 +21,9 @@
 #include <math.h>
 
 /* SYMPHONY include files */
-#include "OsiSymSolverInterface.hpp"
+//#include "OsiSymSolverInterface.hpp"
 #include "BB_macros.h"
-#include "master.h"
+#include "symphony_api.h"
 
 /* CNRP include files */
 #include "cnrp_const.h"
@@ -43,6 +43,7 @@ int main(int argc, char **argv)
    /* Allocate the data structure to store the problem-specific data */
    cnrp_problem *cnrp = (cnrp_problem *) calloc(1, sizeof(cnrp_problem));
    double ub;
+   char *pf;
 
    /* Open the SYMPHONY environemt */
    sym_environment *env = sym_open_environment();
@@ -55,7 +56,8 @@ int main(int argc, char **argv)
    sym_set_user_data(env, cnrp);
 
    /* Read parameters from a file if there is one */
-   cnrp_readparams(cnrp, sym_get_str_param(env, "param_file"), argc, argv);
+   sym_get_str_param(env, "param_file", &pf);
+   cnrp_readparams(cnrp, pf, argc, argv);
    cnrp->par.base_variable_selection = EVERYTHING_IS_EXTRA;
 
    sym_set_dbl_param(env, "granularity", .999999);
@@ -89,7 +91,10 @@ int main(int argc, char **argv)
    }
 
    /* Check the a priori upper bound and set it if needed */
-   if ((ub = sym_get_primal_bound(env)) < INFINITY){
+   sym_get_primal_bound(env, &ub);
+
+   printf("ub is: %f", ub);
+   if (ub < SYM_INFINITY){
       cnrp->cur_tour->cost = (int) ub;
    }else{
       cnrp->cur_tour->cost = MAXINT;
@@ -97,7 +102,7 @@ int main(int argc, char **argv)
    cnrp->cur_tour->numroutes = cnrp->numroutes;
    
    if (cnrp->par.use_small_graph == LOAD_SMALL_GRAPH){
-      if (ub == INFINITY && cnrp->cur_tour->cost > 0){
+      if (ub == SYM_INFINITY && cnrp->cur_tour->cost > 0){
 	 ub = sym_set_primal_bound(env, cnrp->cur_tour->cost);
       }
       cnrp->numroutes = cnrp->cur_tour->numroutes;
@@ -108,7 +113,7 @@ int main(int argc, char **argv)
       sym_set_primal_bound(env, 1);
 #endif
    
-   if (ub < INFINITY && !(cnrp->par.prob_type == BPP)){
+   if (ub < SYM_INFINITY && !(cnrp->par.prob_type == BPP)){
       printf("INITIAL UPPER BOUND: \t%i\n\n", (int)(ub));
    }else if (!(cnrp->par.prob_type == BPP)){
       printf("INITIAL UPPER BOUND: \tNone\n\n");
@@ -123,6 +128,7 @@ int main(int argc, char **argv)
    cnrp_load_problem(env, cnrp);
 
    /* Solve the problem */ 
+
 #ifdef MULTI_CRITERIA
    sym_mc_solve(env);
 #else

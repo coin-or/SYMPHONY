@@ -235,8 +235,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    char d_x_vars = FALSE;
 #endif
 
-   
-   if (iter_num == 1) srandom(1);
+   if (iter_num == 1) SRANDOM(1);
 
    if (prob_type == TSP || prob_type == VRP || prob_type == BPP){
       mult = 2;

@@ -141,7 +141,7 @@ endif
 
 #Uncomment the line below if you want to use an OSI interface.
 LP_SOLVER = OSI
-OSI_INTERFACE = CPLEX
+OSI_INTERFACE = CLP
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
@@ -184,8 +184,8 @@ ifeq ($(OSI_INTERFACE),DYLP)
        LPLIB += -lOsiDylp -lOsiDylpSolver -ldylpstd
 endif
 ifeq ($(OSI_INTERFACE),GLPK)
-       LPINCDIR += ${HOME}/GLPK/glpk-4.1/include
-       LPLIBPATHS += ${HOME}/GLPK/glpk-4.1
+       LPINCDIR += ${HOME}/GLPK/glpk-4.3/include
+       LPLIBPATHS += ${HOME}/GLPK/glpk-4.3/src
        LPLIB += -lOsiGlpk -lglpk
 endif
 endif
@@ -1122,7 +1122,7 @@ $(LIBDIR)/$(LIBNAME_TYPE)
 	@echo ""
 	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) $(MAIN_OBJ) \
-	$(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB) $(LIBS) 
+	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB) 
 	@echo ""
 
 $(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS)

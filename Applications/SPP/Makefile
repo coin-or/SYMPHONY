@@ -61,22 +61,22 @@ USER_CP_SRC       = spp_cp.c
 USER_DG_SRC       = spp_dg.c 
 
 USER_LP_SRC       = spp_lp_branch.c spp_lp.c
-ifeq ($(APPL_COMPILE_IN_CG),TRUE)
+ifeq ($(COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += $(USER_CG_SRC)
 endif
 
 USER_TM_SRC       =
-ifeq ($(APPL_COMPILE_IN_LP),TRUE)
+ifeq ($(COMPILE_IN_LP),TRUE)
 USER_TM_SRC      += $(USER_LP_SRC)
 endif
-ifeq ($(APPL_COMPILE_IN_CP),TRUE)
+ifeq ($(COMPILE_IN_CP),TRUE)
 USER_TM_SRC      += $(USER_CP_SRC)
 endif
 
 USER_MASTER_SRC   = spp_main.c spp_master.c spp_master_functions.c \
 $(USER_COMMON_SRC)
 
-ifeq ($(APPL_COMPILE_IN_TM),TRUE)
+ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)
 endif
 

@@ -78,9 +78,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    int i, j, k;
    int *new_cuts;
    cut_data cut;
-   int cutnum;
    
-   cutnum = 0;
+   int cutnum = 0;
 
    new_cuts = (int *) malloc(prob->nnodes * ISIZE);
 
@@ -107,8 +106,9 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	       cut.sense = 'L';
 	       cut.deletable = TRUE;
 	       cut.branch = ALLOWED_TO_BRANCH_ON;
-	       cg_add_user_cut(&cut, num_cuts, alloc_cuts, cuts);
-	       cutnum++; 
+	       cg_send_cut(&cut, num_cuts, alloc_cuts, cuts);
+	       cutnum++;
+	       
 	    }
 	 }
       }

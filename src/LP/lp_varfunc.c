@@ -446,7 +446,8 @@ our_col_set *price_all_vars(lp_prob *p)
    must_add = FALSE;
    dual_feas = TDF_HAS_ALL;
    check_ub(p);
-   gap = p->has_ub ? p->ub - p->par.granularity - lp_data->objval : INFINITY;
+   gap = p->has_ub ? p->ub - p->par.granularity - lp_data->objval : 
+      SYM_INFINITY;
 
    /*========================================================================*\
     * Now we loop through every single variable, and get those to be
@@ -805,7 +806,8 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
    get_binvrow(lp_data, infind, binvrow);
 
    check_ub(p);
-   gap = p->has_ub ? p->ub - p->par.granularity - lp_data->objval : INFINITY;
+   gap = p->has_ub ? p->ub - p->par.granularity - lp_data->objval : 
+      SYM_INFINITY;
 
    /* First check those released from their lower bound in price_all_vars(),
     * and see if they destroy the proof of infeas */

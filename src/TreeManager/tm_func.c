@@ -252,7 +252,8 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 	 }
       }
       tm->rootnode = root;
-      root->node_status = NODE_STATUS__ROOT;
+      if(root->node_status != NODE_STATUS__WARM_STARTED)
+	root->node_status = NODE_STATUS__ROOT;
    }else{
 #ifdef COMPILE_IN_TM
       (tm->rootnode = root)->desc = *rootdesc;
@@ -330,11 +331,11 @@ int solve(tm_prob *tm)
 	  * waiting to be processed, continue to execute this loop
 	 \*------------------------------------------------------------------*/
 	 i = NEW_NODE__STARTED;
-	 while (tm->lp.free_num > 0 && (tm->par.time_limit ?
+	 while (tm->lp.free_num > 0 && (tm->par.time_limit >= 0.0 ?
 		(wall_clock(NULL) - start_time < tm->par.time_limit) : TRUE) &&
-		(tm->par.node_limit ?
+		(tm->par.node_limit >= 0 ?
 		tm->stat.analyzed < tm->par.node_limit : TRUE) &&
-		((tm->has_ub && tm->par.gap_limit) ?
+		((tm->has_ub && (tm->par.gap_limit >= 0.0)) ?
 		 fabs(100*(tm->ub-tm->lb)/tm->ub) > tm->par.gap_limit : TRUE)
 		&& !(tm->par.find_first_feasible && tm->has_ub)){
 	    if (no_work == FALSE){
@@ -408,7 +409,7 @@ int solve(tm_prob *tm)
 	    }
 }
 	 }
-	 if (tm->par.time_limit &&
+	 if (tm->par.time_limit >= 0.0 &&
 	     wall_clock(NULL) - start_time > tm->par.time_limit){
 	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
 	       if (tm->samephase_cand[i]->lower_bound < tm->lb)
@@ -420,7 +421,8 @@ int solve(tm_prob *tm)
 	    termcode = TM_TIME_LIMIT_EXCEEDED;
 	    break;
 	 }
-	 if (tm->par.node_limit && tm->stat.analyzed >= tm->par.node_limit){
+	 if (tm->par.node_limit >= 0 && tm->stat.analyzed >= 
+	     tm->par.node_limit){
 	    termcode = TM_NODE_LIMIT_EXCEEDED;
 	    break;
 	 }
@@ -431,7 +433,7 @@ int solve(tm_prob *tm)
 	    termcode = SOMETHING_DIED;
 	    break;
 	 }
-	 if (tm->has_ub && tm->par.gap_limit){
+	 if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
 	    if (fabs(100*(tm->ub-tm->lb)/tm->ub) <= tm->par.gap_limit){
 	       termcode = TM_TARGET_GAP_ACHIEVED;
 	       break;
@@ -1290,16 +1292,16 @@ char shall_we_dive(tm_prob *tm, double objval)
       tm->lb = tm->ub;
    }
    
-   if (tm->par.time_limit &&
+   if (tm->par.time_limit >= 0.0 &&
 	wall_clock(NULL) - tm->start_time >= tm->par.time_limit){
       return(FALSE);
    }
 
-   if (tm->par.node_limit && tm->stat.analyzed >= tm->par.node_limit){
+   if (tm->par.node_limit >= 0 && tm->stat.analyzed >= tm->par.node_limit){
       return(FALSE);
    }
    
-   if (tm->has_ub && tm->par.gap_limit){
+   if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
       if (100*(tm->ub-tm->lb)/tm->ub <= tm->par.gap_limit){
 	 return(FALSE);
       }

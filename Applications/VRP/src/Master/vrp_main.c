@@ -21,7 +21,7 @@
  * This file contains the main() for the master process.
 \*===========================================================================*/
 
-#if 1
+#ifdef USE_OSI_INTERFACE
 
 #include "OsiSymSolverInterface.hpp"
 
@@ -50,21 +50,21 @@ int main(int argc, char **argv)
 
 #else
 
-#include "master.h"
+#include "symphony_api.h"
 
 int main(int argc, char **argv)
 {
-   problem *p = sym_open_environment();
+   sym_environment *env = sym_open_environment();
 
-   sym_parse_command_line(p, argc, argv);
+   sym_parse_command_line(env, argc, argv);
 
-   sym_load_problem(p);
+   sym_load_problem(env);
 
-   sym_find_initial_bounds(p);
+   sym_find_initial_bounds(env);
 
-   sym_solve(p);
+   sym_solve(env);
 
-   sym_close_environment(p);
+   sym_close_environment(env);
 
    return(0);
 }

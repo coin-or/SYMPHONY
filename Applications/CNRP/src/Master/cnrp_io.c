@@ -34,7 +34,7 @@
 #include "cnrp_const.h"
 #include "cnrp_macros.h"
 
-#define NUMNODES 15
+#define NUMNODES 10
 
 /*===========================================================================*/
 

@@ -69,6 +69,7 @@ typedef struct PARAMS{
    double     mc_compare_solution_tolerance;
    double     mc_binary_search_tolerance;
    int        mc_warm_start;
+   int        trim_warm_tree;
 }params;
 
 #endif

@@ -56,6 +56,8 @@ int user_receive_lp_data(void **user)
 int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
 			   int *maxn, int *maxm, int *maxnz)
 {
+
+#if 0
    user_problem *prob = (user_problem *) user;
    int i, j, index;
 
@@ -106,7 +108,8 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
       mip->sense[i] = 'E';
    }
 
-   return(USER_SUCCESS);
+#endif
+   return(USER_DEFAULT);
 }      
 
 

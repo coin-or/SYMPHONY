@@ -79,6 +79,8 @@ USER_DG_SRC       = user_dg.c
 ALL_USER_SRC      = user_lp_branch.c user_lp.c
 ALL_USER_SRC     += user_master.c user_cg.c user_cp.c user_dg.c
 
+USER_SRCDIR      = $(USERROOT)/source
+
 ##############################################################################
 # This is the flag for the SYMPHONY Makefile to determine whether
 # an application is to be used. You shouldn't need to modify this

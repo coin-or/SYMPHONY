@@ -57,9 +57,10 @@ typedef struct SYM_ENVIRONMENT{
 
    int              termcode;
 
+   warm_start_desc *warm_start;
+
 #ifdef COMPILE_IN_TM
    tm_prob         *tm;
-   warm_start_desc *warm_start;
 #ifdef COMPILE_IN_CP
    cut_pool       **cp;
 #endif
@@ -118,6 +119,14 @@ sym_environment *create_copy_environment PROTO((sym_environment *env));
 
 double get_lb_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt, 
 				 int *ind, double *val));
+double get_ub_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt, 
+				 int *ind, double *val));
+double get_lb_for_new_obj PROTO((bc_node *root, MIPdesc *mip, int cnt, 
+				 int *ind, double *val));
+double get_ub_for_new_obj PROTO((bc_node *root, MIPdesc *mip, int cnt, 
+				 int *ind, double *val));
 int check_feasibility_new_rhs PROTO((bc_node * node, MIPdesc * mip, 
 					int cnt, int *ind, double *val));
+int trim_warm_tree PROTO((sym_environment *env, bc_node *n));
+
 #endif

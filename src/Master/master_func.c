@@ -32,7 +32,599 @@
 
 /*===========================================================================*/
 /*===========================================================================*/
+/* not used now!  used for testing! */
+#if 0
+int mc_solve(sym_environment *env)
+{
+   int i, cp_num;
+   double gamma, gamma0, gamma1, tau, slope;
+   double start_time;
+   warm_start_desc **ws;
+   double *gamma_val;
+   int *gamma_ind;
+   int sub_prob_est = 75;
 
+   solution_data utopia1;
+   solution_data utopia2;
+   solution_data solutions[MAX_NUM_PAIRS];
+   int numsolutions = 0, numprobs = 0, numinfeasible = 0;
+   solution_pairs pairs[MAX_NUM_PAIRS];
+   int numpairs = 0, cur_position = 0, first = 0, last = 0, previous = 0;
+   int *indices;
+   double *values;
+   int length, termcode;
+   int solution1, solution2;
+   double utopia[2];
+   node_desc *root= NULL;
+   base_desc *base = NULL;
+   double compare_sol_tol, ub = 0.0;
+   int binary_search = FALSE;
+   
+   for (i = 0; i < env->mip->n; i++){
+      if (env->mip->obj2[i] != 0){
+	 break;
+      }
+   }
+   if (i == env->mip->n){
+      printf("Second objective function is identically zero.\n");
+      printf("Switching to standard branch and bound.\n\n");
+      return(sym_solve(env));
+   }
+
+   sym_set_int_param(env, "multi_criteria", TRUE);
+   memcpy((char *)env->mip->obj1, (char *)env->mip->obj, DSIZE*env->mip->n);
+   if (env->par.lp_par.mc_find_nondominated_solutions){
+      env->base->cutnum += 2;
+      env->rootdesc->uind.size++;
+      env->rootdesc->uind.list = (int *) realloc(env->rootdesc->uind.list,
+					 env->rootdesc->uind.size*ISIZE);
+      env->rootdesc->uind.list[env->rootdesc->uind.size-1] = env->mip->n;
+   }else{
+#ifdef USE_WARM_START
+      sym_set_int_param(env, "keep_description_of_pruned", KEEP_IN_MEMORY);
+      ws = (warm_start_desc **)malloc(sizeof(warm_start_desc*)*sub_prob_est);
+      gamma_val = (double *)malloc(DSIZE*sub_prob_est);
+      gamma_ind = (int *)malloc(ISIZE*sub_prob_est);
+#endif
+   }
+   
+   start_time = wall_clock(NULL);
+
+   /* Set some parameters */
+   compare_sol_tol = env->par.mc_compare_solution_tolerance;
+   if (!env->par.lp_par.mc_find_nondominated_solutions){
+      env->par.lp_par.mc_rho = 0;
+   }
+   env->par.tm_par.granularity = env->par.lp_par.granularity =
+      -MAX(env->par.lp_par.mc_rho, compare_sol_tol);
+   
+   if (env->par.verbosity >= 0){
+      if (env->par.mc_binary_search_tolerance > 0){
+	 binary_search = TRUE;
+	 printf("Using binary search with tolerance = %f...\n",
+		env->par.mc_binary_search_tolerance);
+      }
+      if (env->par.mc_search_order == MC_LIFO){
+	 printf("Using LIFO search order...\n");
+      }else{
+	 printf("Using FIFO search order...\n");
+      }
+      if (env->par.lp_par.mc_rho > 0){
+	 printf("Using augmented Chebyshev weight %.8f\n",
+		env->par.lp_par.mc_rho);
+      }
+      if (env->par.use_permanent_cut_pools){
+	 printf("Saving the global cut pool between iterations...\n");
+	 sym_create_permanent_cut_pools(env, &cp_num);
+      }
+      printf("\n");
+   }
+
+   /* First, calculate the utopia point */
+   env->par.lp_par.mc_gamma = 1.0;
+   env->par.lp_par.mc_tau = 0.0;
+      
+   printf("***************************************************\n");
+   printf("***************************************************\n");
+   printf("Now solving with gamma = 1.0 tau = 0.0 \n");  
+   printf("***************************************************\n");
+   printf("***************************************************\n\n");
+
+   /* FIXME! For now, close reduced cost fixing...*/
+   if (!env->par.lp_par.mc_find_nondominated_solutions){
+      env->par.lp_par.do_reduced_cost_fixing = FALSE;      
+   }
+
+   /* Solve */
+   env->utopia[0] = 0;
+   env->utopia[1] = -MAXDOUBLE;
+   if (termcode = sym_solve(env) < 0){
+      env->base->cutnum -=2;
+      env->rootdesc->uind.size--;
+      return(termcode);
+   }
+
+   if (!env->par.lp_par.mc_find_nondominated_solutions){
+#ifdef USE_WARM_START     
+      ws[numprobs] = sym_get_warm_start(env, TRUE);
+      gamma_val[numprobs] = 1.0;
+      gamma_ind[numprobs] = numprobs;
+#endif
+   }
+
+   numprobs++;
+
+   /* Store the solution */
+   length = solutions[numsolutions].length = env->best_sol.xlength;
+   indices = solutions[numsolutions].indices = (int *) calloc(length, ISIZE);
+   values = solutions[numsolutions].values = (double *) calloc(length, DSIZE);
+   memcpy((char *) indices, env->best_sol.xind, length * ISIZE);
+   memcpy((char *) values, env->best_sol.xval, length * DSIZE);
+   solutions[numsolutions].gamma = 1.0;
+   solutions[numsolutions].tau = 0.0;
+   solutions[numsolutions].obj[0] = env->obj[0];
+   solutions[numsolutions++].obj[1] = env->obj[1];
+   utopia[0] = env->obj[0];
+      
+   env->par.lp_par.mc_gamma = 0.0;
+   env->par.lp_par.mc_tau = 1.0;
+      
+   printf("***************************************************\n");
+   printf("***************************************************\n");
+   printf("Now solving with gamma = 0.0 tau = 1.0 \n");  
+   printf("***************************************************\n");
+   printf("***************************************************\n\n");
+
+#ifdef USE_WARM_START
+   /* Now, we can turn on reduced cost fixing*/
+   if (!env->par.lp_par.mc_find_nondominated_solutions){
+      //      env->par.lp_par.do_reduced_cost_fixing = TRUE; // OPT 1     
+      env->par.lp_par.do_reduced_cost_fixing = FALSE;  //OPT 2      
+   }
+#endif
+
+   /* Resolve */
+   env->utopia[0] = -MAXDOUBLE;
+   env->utopia[1] = 0;
+   if (!env->par.lp_par.mc_find_nondominated_solutions){
+#ifdef USE_WARM_START
+      // sym_set_warm_start(env, ws[0]);
+      for (i = 0; i < env->mip->n; i++){
+	 sym_set_obj_coeff(env, i, env->mip->obj2[i] +
+			   env->par.lp_par.mc_rho*(env->mip->obj1[i] +
+					      env->mip->obj2[i]));
+      }
+      if (termcode = sym_warm_solve(env) < 0){
+	 FREE(ws);
+	 env->base->cutnum -=2;
+	 env->rootdesc->uind.size--;
+	 return(termcode);
+      }
+#else
+      for (i = 0; i < env->mip->n; i++){
+	sym_set_obj_coeff(env, i, env->mip->obj2[i] +
+			  env->par.lp_par.mc_rho*(env->mip->obj1[i] +
+						  env->mip->obj2[i]));
+      }
+      if (termcode = sym_solve(env) < 0){
+	env->base->cutnum -=2;
+	env->rootdesc->uind.size--;
+	return(termcode);
+      }
+#endif      
+   }else{
+      if (termcode = sym_solve(env) < 0){
+	 env->base->cutnum -=2;
+	 env->rootdesc->uind.size--;
+	 return(termcode);
+      }
+   }      
+
+   if (!env->par.lp_par.mc_find_nondominated_solutions){
+#ifdef USE_WARM_START     
+      ws[numprobs] = sym_get_warm_start(env, TRUE);
+      gamma_val[numprobs] = 0.0;
+      gamma_ind[numprobs] = numprobs;
+#endif
+   }
+
+   numprobs++;
+   
+   /* Store the solution */
+   length = solutions[numsolutions].length = env->best_sol.xlength;
+   indices = solutions[numsolutions].indices = (int *) calloc(length, ISIZE);
+   values = solutions[numsolutions].values = (double *) calloc(length, DSIZE);
+   memcpy((char *) indices, env->best_sol.xind, length * ISIZE);
+   memcpy((char *) values, env->best_sol.xval, length * DSIZE);
+   solutions[numsolutions].gamma = 0.0;
+   solutions[numsolutions].tau = 1.0;
+   solutions[numsolutions].obj[0] = env->obj[0];
+   solutions[numsolutions++].obj[1] = env->obj[1];
+   utopia[1] = env->obj[1];
+   
+   env->utopia[1] = utopia[1];
+   env->utopia[0] = utopia[0];
+   
+   printf("***************************************************\n");
+   printf("***************************************************\n");
+   printf("Utopia point has first  objective value %.3f\n", utopia[0]);
+   printf("                 second objective value %.3f\n", utopia[1]);
+   printf("***************************************************\n");
+   printf("***************************************************\n\n");
+   
+   /* Add the first pair to the list */
+   if (solutions[0].obj[0] != solutions[1].obj[0]){
+      if (binary_search){
+	 pairs[first].gamma1 = 1.0;
+	 pairs[first].gamma2 = 0.0;
+      }
+      pairs[first].solution1 = 0;
+      pairs[first].solution2 = 1;
+      first = last = 0;
+      numpairs = 1;
+   }else{
+      numpairs = 0;
+   }
+
+   /* Keep taking pairs off the list and processing them until there are none
+      left */
+   while (numpairs > 0 && numpairs < MAX_NUM_PAIRS &&
+	  numsolutions < MAX_NUM_SOLUTIONS &&
+	  numinfeasible < MAX_NUM_INFEASIBLE){
+
+      if (env->par.mc_search_order == MC_LIFO){
+	 solution1 = pairs[last].solution1;
+	 solution2 = pairs[last].solution2;
+	 cur_position = last;
+	 if (--last < 0){
+	    last = MAX_NUM_PAIRS - 1;
+	 }
+	 numpairs--;
+      }else{
+	 solution1 = pairs[first].solution1;
+	 solution2 = pairs[first].solution2;
+	 cur_position = first;
+	 if (++first > MAX_NUM_PAIRS-1)
+	    first = 0;
+	 numpairs--;
+      }
+
+      if (binary_search){
+	 gamma = (pairs[cur_position].gamma1 + pairs[cur_position].gamma2)/2;
+      }else if (env->par.lp_par.mc_find_nondominated_solutions){
+	 gamma = (utopia[1] - solutions[solution1].obj[1])/
+	    (utopia[0] - solutions[solution2].obj[0] +
+	     utopia[1] - solutions[solution1].obj[1]);
+      }else{
+	 slope = (solutions[solution1].obj[1] -
+		  solutions[solution2].obj[1])/
+	    (solutions[solution2].obj[0] -
+	     solutions[solution1].obj[0]);
+	 gamma = slope/(1+slope);
+      }
+      tau = 1 - gamma;
+      
+      env->par.lp_par.mc_gamma = gamma;
+      env->par.lp_par.mc_tau = tau;
+
+      /* Find upper bound */
+
+      env->has_mc_ub = env->has_ub = FALSE;
+      env->mc_ub = env->ub = MAXDOUBLE;
+      if (!binary_search){
+	 for (i = 0; i < numsolutions; i++){
+	    if (env->par.lp_par.mc_find_nondominated_solutions){
+	       ub = MAX(gamma*(solutions[i].obj[0] - utopia[0]),
+			tau*(solutions[i].obj[1] - utopia[1]));
+	    }else{
+	       ub = gamma*solutions[i].obj[0] + tau*solutions[i].obj[1] +
+		  env->par.lp_par.mc_rho * (solutions[i].obj[0] +
+					  solutions[i].obj[1]);
+	    }
+	    if (ub + env->par.lp_par.mc_rho * (solutions[i].obj[0] +
+					     solutions[i].obj[1]) < env->ub){
+	       env->has_mc_ub = env->has_ub = TRUE;
+	       env->ub = ub + env->par.lp_par.mc_rho *
+		  (solutions[i].obj[0] + solutions[i].obj[1]) - compare_sol_tol;
+	       env->obj[0] = solutions[i].obj[0];
+	       env->obj[1] = solutions[i].obj[1];
+	       env->mc_ub = ub;
+	    }
+	 }
+      }
+      
+      printf("***************************************************\n");
+      printf("***************************************************\n");
+      printf("Now solving with gamma = %.6f tau = %.6f \n", gamma, tau);  
+      printf("***************************************************\n");
+      printf("***************************************************\n\n");
+      
+      env->obj[0] = env->obj[1] = 0.0;
+      
+      if (!env->par.lp_par.mc_find_nondominated_solutions){
+#ifdef USE_WARM_START
+	 qsortucb_di(gamma_val, gamma_ind, numprobs);
+
+	 if(gamma > 0.0 ) {
+	    for(i = 1; i<numprobs; i++){
+	       if (gamma_val[i] >= gamma){
+		  break;
+	       }
+	    }
+	    if((gamma_val[i] - gamma) <= (gamma - gamma_val[i-1])){
+	       sym_set_warm_start(env, ws[gamma_ind[i]]);
+	    }
+	    else {
+	       sym_set_warm_start(env, ws[gamma_ind[i-1]]);
+	    }
+	 }
+	 else{
+	    sym_set_warm_start(env, ws[gamma_ind[0]]);
+	 }
+	 
+	 for (i = 0; i < env->mip->n; i++){
+	    sym_set_obj_coeff(env, i, gamma*env->mip->obj1[i]
+			      + tau*env->mip->obj2[i] 
+			      + env->par.lp_par.mc_rho*(env->mip->obj1[i] 
+							+ env->mip->obj2[i]));
+	 }
+	 if (termcode = sym_warm_solve(env) < 0){
+	    for(i = 0; i<numprobs; i++)
+	       sym_delete_warm_start(ws[i]);
+	    FREE(ws);
+	    env->base->cutnum -=2;
+	    env->rootdesc->uind.size--;
+	    return(termcode);
+	 }
+#else
+	 for (i = 0; i < env->mip->n; i++){
+	    sym_set_obj_coeff(env, i, gamma*env->mip->obj1[i]
+			      + tau*env->mip->obj2[i]
+			      + env->par.lp_par.mc_rho*(env->mip->obj1[i] +
+							env->mip->obj2[i]));
+	 }
+	 if (termcode = sym_solve(env) < 0){
+	    env->base->cutnum -=2;
+	    env->rootdesc->uind.size--;
+	    return(termcode);
+	 }
+#endif
+      }else{
+	 if (termcode = sym_solve(env) < 0){
+	    env->base->cutnum -=2;
+	    env->rootdesc->uind.size--;
+	    return(termcode);
+	 }
+      }
+
+
+      if (!env->par.lp_par.mc_find_nondominated_solutions){
+#ifdef USE_WARM_START     
+	 ws[numprobs] = sym_get_warm_start(env, TRUE);
+	 gamma_val[numprobs] = gamma;
+	 gamma_ind[numprobs] = numprobs;
+#endif
+      }
+      
+      numprobs++;
+   
+      if (binary_search){
+	 if (env->obj[0] - solutions[solution1].obj[0] <
+	     compare_sol_tol &&
+	     solutions[solution1].obj[1] - env->obj[1] <
+	     compare_sol_tol){
+	    if (pairs[cur_position].gamma1 - gamma >
+		env->par.mc_binary_search_tolerance){
+	       if (++last > MAX_NUM_PAIRS - 1)
+		  last = 0;
+	       pairs[last].solution1 = solution1;
+	       pairs[last].solution2 = solution2;
+	       pairs[last].gamma1 = gamma;
+	       pairs[last].gamma2 = pairs[cur_position].gamma2;
+	       numpairs++;
+	    }
+	    continue;
+	 }
+	 if (solutions[solution2].obj[0] - env->obj[0] < compare_sol_tol
+	     && env->obj[1] - solutions[solution2].obj[1] <
+	     compare_sol_tol){
+	    if (gamma - pairs[cur_position].gamma2 >
+		env->par.mc_binary_search_tolerance){
+	       if (++last > MAX_NUM_PAIRS - 1)
+		  last = 0;
+	       pairs[last].solution1 = solution1;
+	       pairs[last].solution2 = solution2;
+	       pairs[last].gamma1 = pairs[cur_position].gamma1;
+	       pairs[last].gamma2 = gamma;
+	       numpairs++;
+	    }
+	    continue;
+	 }
+      }else{
+	 if (env->obj[0] == 0.0 && env->obj[1] == 0.0){
+	    numinfeasible++;
+	    continue;
+	 }else if (env->obj[0] - solutions[solution1].obj[0] <
+		   compare_sol_tol &&
+		   solutions[solution1].obj[1] - env->obj[1] <
+		   compare_sol_tol){
+	    numinfeasible++;
+	    continue;
+	 }else if (solutions[solution2].obj[0] - env->obj[0] <
+		   compare_sol_tol &&
+		   env->obj[1] - solutions[solution2].obj[1] <
+		   compare_sol_tol){
+	    numinfeasible++;
+	    continue;
+	 }
+      }
+      
+      /* Insert new solution */
+      numinfeasible = 0;
+      if (last + 2 == MAX_NUM_PAIRS){
+	 last = 0;
+	 previous = MAX_NUM_PAIRS - 1;
+      }else if (last + 2 == MAX_NUM_PAIRS + 1){
+	 last = 1;
+	 previous = 0;
+      }else{
+	 last += 2;
+	 previous = last - 1;
+      }
+      if (binary_search){
+	 pairs[previous].gamma1 = pairs[cur_position].gamma1;
+	 pairs[previous].gamma2 = gamma;
+	 pairs[last].gamma1 = gamma;
+	 pairs[last].gamma2 = pairs[cur_position].gamma2;
+      }
+      pairs[previous].solution1 = solution1;
+      pairs[previous].solution2 = solution2;
+      pairs[last].solution1 = solution2;
+      pairs[last].solution2 = solution2+1;
+      numpairs += 2;
+      for (i = numsolutions; i > solution2; i--){
+	 solutions[i] = solutions[i-1];
+      }
+      numsolutions++;
+      if (env->par.mc_search_order == MC_FIFO){
+	 if (first < last){
+	    for (i = first; i < last - 1; i++){
+	       if (pairs[i].solution1 >= solution2){
+		  pairs[i].solution1++;
+	       }
+	       if (pairs[i].solution2 >= solution2){
+		  pairs[i].solution2++;
+	       }
+	    }
+	 }else{
+	    for (i = first; i < MAX_NUM_PAIRS - (last == 0 ? 1 : 0); i++){
+	       if (pairs[i].solution1 >= solution2){
+		  pairs[i].solution1++;
+	       }
+	       if (pairs[i].solution2 >= solution2){
+		  pairs[i].solution2++;
+	       }
+	    }
+	    for (i = 0; i < last - 1; i++){
+	       if (pairs[i].solution1 >= solution2){
+		  pairs[i].solution1++;
+	       }
+	       if (pairs[i].solution2 >= solution2){
+		  pairs[i].solution2++;
+	       }
+	    }
+	 }
+      }
+
+      length = solutions[solution2].length = env->best_sol.xlength;
+      indices = solutions[solution2].indices = (int *) calloc(length, ISIZE);
+      values = solutions[solution2].values = (double *) calloc(length, DSIZE);
+      memcpy((char *) indices, env->best_sol.xind, length * ISIZE);
+      memcpy((char *) values, env->best_sol.xval, length * DSIZE);
+      solutions[solution2].gamma = gamma;
+      solutions[solution2].tau = tau;
+      solutions[solution2].obj[0] = env->obj[0];
+      solutions[solution2].obj[1] = env->obj[1];
+   }
+
+   printf("\n********************************************************\n");
+
+   if (numsolutions >= MAX_NUM_SOLUTIONS){
+      printf("Maximum number of solutions (%i) reached\n\n",
+	     MAX_NUM_SOLUTIONS);
+   }
+
+   if (numinfeasible >= MAX_NUM_INFEASIBLE){
+      printf("Maximum number of infeasible subproblems (%i) reached\n\n",
+	     MAX_NUM_INFEASIBLE);
+   }
+   
+   if (numpairs >= MAX_NUM_PAIRS){
+      printf("Maximum number of solution pairs (%i) reached\n\n",
+	     MAX_NUM_PAIRS);
+      printf("\n********************************************************\n");
+      if (env->par.lp_par.mc_find_nondominated_solutions){
+	 printf(  "* Found set of non-dominated solutions!!!!!!! *\n");
+      }else{
+	 printf(  "* Found set of supported solutions!!!!!!!     *\n");
+      }
+   }else{
+      printf("\n********************************************************\n");
+      if (env->par.lp_par.mc_find_nondominated_solutions){
+	 printf(  "* Found complete set of non-dominated solutions!!!!!!! *\n");
+      }else{
+	 printf(  "* Found complete set of supported solutions!!!!!!!     *\n");
+      }
+   }
+   printf(  "* Now displaying stats...                              *\n");
+   printf(  "********************************************************\n\n");
+
+   if (env->par.use_permanent_cut_pools){
+      for (i = 0; i < env->par.tm_par.max_cp_num; i++){
+	 env->comp_times.bc_time.cut_pool += env->cp[i]->cut_pool_time;
+	 env->warm_start->stat.cuts_in_pool += env->cp[i]->cut_num;
+      }
+   }
+   
+   print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 0.0,
+		    0.0, 0, start_time, env->mip->obj_offset,
+		    env->mip->obj_sense, env->has_ub);
+
+   printf("\nNumber of subproblems solved: %i\n", numprobs);
+   printf("Number of solutions found: %i\n\n", numsolutions);
+   
+   printf("***************************************************\n");
+   printf("***************************************************\n");
+   if (env->par.lp_par.mc_find_nondominated_solutions){
+      printf("Displaying non-dominated solution values and breakpoints\n");  
+   }else{
+      printf("Displaying supported solution values and breakpoints\n");  
+   }
+   printf("***************************************************\n");
+   printf("***************************************************\n\n");
+
+   gamma0 = 1.0;
+   for (i = 0; i < numsolutions - 1; i++){
+      if (env->par.lp_par.mc_find_nondominated_solutions){
+	 gamma1 = (utopia[1] - solutions[i].obj[1])/
+	    (utopia[0] - solutions[i+1].obj[0] +
+	     utopia[1] - solutions[i].obj[1]);
+      }else{
+	 slope = (solutions[i].obj[1] -
+		  solutions[i+1].obj[1])/
+	    (solutions[i+1].obj[0] -
+	     solutions[i].obj[0]);
+	 gamma1 = slope/(1+slope);
+      }
+      printf("First Objective: %.3f Second Objective: %.3f ",
+	     solutions[i].obj[0], solutions[i].obj[1]);
+      printf("Range: %.6f - %.6f\n", gamma1, gamma0);
+      gamma0 = gamma1;
+   }
+   printf("First Objective: %.3f Second Objective: %.3f ",
+	  solutions[i].obj[0], solutions[i].obj[1]);
+   printf("Range: %.6f - %.6f\n", 0.0, gamma0);
+   
+   for (i = 0 ; i < numsolutions; i++){
+      FREE(solutions[i].values);
+      FREE(solutions[i].indices);
+   }
+   if (!env->par.lp_par.mc_find_nondominated_solutions){
+#ifdef USE_WARM_START
+      for(i = 0; i<numprobs; i++)
+	 sym_delete_warm_start(ws[i]);
+      FREE(ws);
+#endif
+   }
+   env->base->cutnum -=2;
+   env->rootdesc->uind.size--;
+
+   return(TM_OPTIMAL_SOLUTION_FOUND);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+/* not used now! to be used later!*/
 int resolve_node(sym_environment *env, bc_node *node)
 {
    node_desc * desc = &node->desc;
@@ -448,7 +1040,7 @@ int resolve_node(sym_environment *env, bc_node *node)
 
    return(FUNCTION_TERMINATED_NORMALLY);
 }
-
+#endif
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -457,7 +1049,7 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 {
    int i, cnt = 0, *indices, set_sol = FALSE;
    MIPdesc * mip;
-   double upper_bound = 0.0, lpetol = 1e-09, *values;
+   double upper_bound = 0.0, lpetol = 9.9999999999999995e-07, *values;
    lp_sol * best_sol = &(env->warm_start->best_sol);
 
    if (root){
@@ -505,6 +1097,7 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 		  }
 	       }
 	    }
+	    FREE(root->sol);
 	    root->node_status = NODE_STATUS__WARM_STARTED;
 	 }
 	 else if(change_type == RHS_CHANGED){      
@@ -527,7 +1120,7 @@ int copy_node(bc_node * n_to, bc_node *n_from)
    
    if (!n_to || !n_from){
       printf("copy_node(): Empty node_structure(s)!\n");
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);;
    }
 
    n_to->bc_index = n_from->bc_index;
@@ -697,7 +1290,7 @@ int copy_node(bc_node * n_to, bc_node *n_from)
 	     n_to->desc.desc_size*CSIZE);   
    }
 
-   return TRUE;      
+   return(FUNCTION_TERMINATED_NORMALLY);      
 }
 
 /*===========================================================================*/
@@ -709,7 +1302,7 @@ int copy_tree(bc_node *root_to, bc_node *root_from)
 
    if (!root_to || !root_from){
       printf("copy_tree(): Empty root node(s)!\n");
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    
    if (root_from){
@@ -724,7 +1317,7 @@ int copy_tree(bc_node *root_to, bc_node *root_from)
 	 }
       }      
    }
-   return TRUE;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -736,7 +1329,7 @@ int write_node(bc_node *node, FILE*f)
 
    if (!node){
       printf("write_node(): Empty node!\n");
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    fprintf(f,"\n\n");
@@ -875,7 +1468,7 @@ int write_node(bc_node *node, FILE*f)
    
    fprintf(f,"\n");
 
-   return TRUE;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -886,7 +1479,7 @@ int write_tree(bc_node *root, FILE *f)
    int i;
    if (!root){
       printf("write_tree(): Empty root node!\n");
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    write_node(root, f);
@@ -895,7 +1488,7 @@ int write_tree(bc_node *root, FILE *f)
       write_tree(root->children[i], f);
    }
 
-   return TRUE;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }   
 
 /*===========================================================================*/
@@ -909,7 +1502,7 @@ int read_node(bc_node * node, FILE * f)
 
    if (!node || !f){
       printf("read_node(): Empty node or unable to read from file!\n");
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    fscanf(f,"%s %s %i", str, str, &node->bc_index);
@@ -1066,7 +1659,7 @@ int read_node(bc_node * node, FILE * f)
       }
    }
 
-   return TRUE;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -1076,7 +1669,7 @@ int read_tree(bc_node * root, FILE *f)
 {
    if (!root || !f){
       printf("read_tree(): Empty node or unable to write!\n");
-      return FALSE;
+      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
    read_node(root, f);
@@ -1092,7 +1685,7 @@ int read_tree(bc_node * root, FILE *f)
       }
    }
 
-   return TRUE;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -1131,14 +1724,17 @@ int set_param(sym_environment *env, char *line)
 #endif 
 	 /*___END_EXPERIMENTAL_SECTION___*/
 	 cp_par->verbosity = env->par.verbosity;
+      return(0);
    }
    else if (strcmp(key, "random_seed") == 0){
       READ_INT_PAR(env->par.random_seed);
       tm_par->random_seed = env->par.random_seed;
+      return(0);
    }
    else if (strcmp(key, "granularity") == 0){
       READ_DBL_PAR(tm_par->granularity);
       lp_par->granularity = tm_par->granularity;
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    else if (strcmp(key, "do_decomp") == 0 ||
@@ -1146,6 +1742,7 @@ int set_param(sym_environment *env, char *line)
 	    strcmp(key, "TM_do_decomp") == 0){
       READ_INT_PAR(tm_par->do_decomp);
       cg_par->do_decomp = tm_par->do_decomp;
+      return(0);
    }
    /*___END_EXPERIMENTAL_SECTION___*/
    
@@ -1156,22 +1753,27 @@ int set_param(sym_environment *env, char *line)
 	    strcmp(key, "M_upper_bound") == 0){
       READ_DBL_PAR(env->ub);
       env->has_ub = TRUE;
+      return(0);
    }
    else if (strcmp(key, "upper_bound_estimate") == 0 ||
 	    strcmp(key, "M_upper_bound_estimate") == 0){
       READ_DBL_PAR(env->ub_estimate);
       env->has_ub_estimate = TRUE;
+      return(0);
    }
    else if (strcmp(key, "lower_bound") == 0 ||
 	    strcmp(key, "M_lower_bound") == 0){
       READ_DBL_PAR(env->lb);
+      return(0);
    }
    
    else if (strcmp(key, "M_verbosity") == 0){
       READ_INT_PAR(env->par.verbosity);
+      return(0);
    }
    else if (strcmp(key, "M_random_seed") == 0){
       READ_INT_PAR(env->par.random_seed);
+      return(0);
    }
    
    else if (strcmp(key, "tm_executable_name") == 0 ||
@@ -1179,65 +1781,84 @@ int set_param(sym_environment *env, char *line)
 	    strcmp(key, "M_tm_exe") == 0 ||
 	    strcmp(key, "M_tm_executable_name") == 0){
       read_string(env->par.tm_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
    }
    else if (strcmp(key, "dg_executable_name") == 0 ||
 	    strcmp(key, "dg_exe") == 0 ||
 	    strcmp(key, "M_dg_exe") == 0 ||
 	    strcmp(key, "M_dg_executable_name") == 0){
       read_string(env->par.dg_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
    }
    else if (strcmp(key, "tm_debug") == 0 ||
 	    strcmp(key, "M_tm_debug") == 0){
       READ_INT_PAR(env->par.tm_debug);
       if (env->par.tm_debug) env->par.tm_debug = 4;
+      return(0);
    }
    else if (strcmp(key, "dg_debug") == 0 ||
 	    strcmp(key, "M_dg_debug") == 0){
       READ_INT_PAR(env->par.dg_debug);
       if (env->par.dg_debug) env->par.dg_debug = 4;
+      return(0);
    }
    else if (strcmp(key, "tm_machine") == 0 ||
 	    strcmp(key, "M_tm_machine") == 0){
 	 read_string(env->par.tm_machine, line, MACH_NAME_LENGTH);
 	 env->par.tm_machine_set = TRUE;
+      return(0);
    }
    else if (strcmp(key, "dg_machine") == 0 ||
 	    strcmp(key, "M_dg_machine") == 0){
       read_string(env->par.dg_machine, line, MACH_NAME_LENGTH);
       env->par.dg_machine_set = TRUE;
+      return(0);
    }
    
    else if (strcmp(key, "pvm_trace") == 0 ||
 	    strcmp(key, "M_pvm_trace") == 0){
       READ_INT_PAR(env->par.pvm_trace);
+      return(0);
    }
    else if (strcmp(key, "do_branch_and_cut") == 0 ||
 	    strcmp(key, "M_do_branch_and_cut") == 0){
       READ_INT_PAR(env->par.do_branch_and_cut);
+      return(0);
    }
    else if (strcmp(key, "do_draw_graph") == 0 ||
 	    strcmp(key, "M_do_draw_graph") == 0){
       READ_INT_PAR(env->par.do_draw_graph);
+      return(0);
    }
    else if (strcmp(key, "use_permanent_cut_pools") == 0 ||
 	    strcmp(key, "M_use_permanent_cut_pools") == 0){
       READ_INT_PAR(env->par.use_permanent_cut_pools);
+      return(0);
    }
    else if (strcmp(key, "mc_compare_solution_tolerance") == 0 ||
 	    strcmp(key, "M_mc_compare_solution_tolerance") == 0){
       READ_DBL_PAR(env->par.mc_compare_solution_tolerance);
+      return(0);
    }
    else if (strcmp(key, "mc_binary_search_tolerance") == 0 ||
 	    strcmp(key, "M_mc_binary_search_tolerance") == 0){
       READ_DBL_PAR(env->par.mc_binary_search_tolerance);
+      return(0);
    }
    else if (strcmp(key, "mc_search_order") == 0 ||
 	    strcmp(key, "M_mc_search_order") == 0){
-      READ_DBL_PAR(env->par.mc_search_order);
+      READ_INT_PAR(env->par.mc_search_order);
+      return(0);
    }
    else if (strcmp(key, "mc_warm_start") == 0 ||
-	    strcmp(key, "M_mc_warm_start") == 0){
-      READ_DBL_PAR(env->par.mc_warm_start);
+	     strcmp(key, "M_mc_warm_start") == 0){
+      READ_INT_PAR(env->par.mc_warm_start);
+      return(0);
+   }
+   else if (strcmp(key, "trim_warm_tree") == 0 ||
+	     strcmp(key, "M_trim_warm_tree") == 0){
+      READ_INT_PAR(env->par.trim_warm_tree);
+      return(0);
    }
    
    /***********************************************************************
@@ -1247,74 +1868,92 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "source_path") == 0 ||
 	    strcmp(key, "DG_source_path") == 0){
       read_string(dg_par->source_path, line, MAX_FILE_NAME_LENGTH);
+      return(0);
    }
    else if (strcmp(key, "echo_commands") == 0 ||
 	    strcmp(key, "DG_echo_commands") == 0){
       READ_INT_PAR(dg_par->echo_commands);
+      return(0);
    }
    else if (strcmp(key, "canvas_width") == 0 ||
 	    strcmp(key, "DG_canvas_width") == 0){
       READ_INT_PAR(dg_par->canvas_width);
+      return(0);
    }
    else if (strcmp(key, "canvas_height") == 0 ||
 	    strcmp(key, "DG_canvas_height") == 0){
       READ_INT_PAR(dg_par->canvas_height);
+      return(0);
    }
    else if (strcmp(key, "viewable_width") == 0 ||
 	    strcmp(key, "DG_viewable_width") == 0){
       READ_INT_PAR(dg_par->viewable_width);
+      return(0);
    }
    else if (strcmp(key, "viewable_height") == 0 ||
 	    strcmp(key, "DG_viewable_height") == 0){
       READ_INT_PAR(dg_par->viewable_width);
+      return(0);
    }
    else if (strcmp(key, "disp_nodelabels") == 0 ||
 	    strcmp(key, "DG_disp_nodelabels") == 0){
       READ_INT_PAR(dg_par->disp_nodelabels);
+      return(0);
    }
    else if (strcmp(key, "disp_nodeweights") == 0 ||
 	    strcmp(key, "DG_disp_nodeweights") == 0){
       READ_INT_PAR(dg_par->disp_nodeweights);
+      return(0);
    }
    else if (strcmp(key, "disp_edgeweights") == 0 ||
 	    strcmp(key, "DG_disp_edgeweights") == 0){
       READ_INT_PAR(dg_par->disp_edgeweights);
+      return(0);
    }
    else if (strcmp(key, "node_dash") == 0 ||
 	    strcmp(key, "DG_node_dash") == 0){
       read_string(dg_par->node_dash, line, MAX_DASH_PATTERN_LENGTH);
+      return(0);
    }
    else if (strcmp(key, "edge_dash") == 0 ||
 	    strcmp(key, "DG_edge_dash") == 0){
       read_string(dg_par->edge_dash, line, MAX_DASH_PATTERN_LENGTH);
+      return(0);
    }
    else if (strcmp(key, "node_radius") == 0 ||
 	    strcmp(key, "DG_node_radius") == 0){
       READ_INT_PAR(dg_par->node_radius);
+      return(0);
    }
    else if (strcmp(key, "interactive_mode") == 0 ||
 	    strcmp(key, "DG_interactive_mode") == 0){
       READ_INT_PAR(dg_par->interactive_mode);
+      return(0);
    }
    else if (strcmp(key, "mouse_tracking") == 0 ||
 	    strcmp(key, "DG_mouse_tracking") == 0){
       READ_INT_PAR(dg_par->mouse_tracking);
+      return(0);
    }
    else if (strcmp(key, "scale_factor") == 0 ||
 	    strcmp(key, "DG_scale_factor") == 0){
       READ_DBL_PAR(dg_par->scale_factor);
+      return(0);
    }
    else if (strcmp(key, "nodelabel_font") == 0 ||
 	    strcmp(key, "DG_nodelabel_font") == 0){
       read_string(dg_par->nodelabel_font, line, MAX_FONT_LENGTH);
+      return(0);
    }
    else if (strcmp(key, "nodeweight_font") == 0 ||
 	       strcmp(key, "DG_nodeweight_font") == 0){
       read_string(dg_par->nodeweight_font, line, MAX_FONT_LENGTH);
+      return(0);
    }
    else if (strcmp(key, "edgeweight_font") == 0 ||
 	    strcmp(key, "DG_edgeweight_font") == 0){
       read_string(dg_par->edgeweight_font, line, MAX_FONT_LENGTH);
+      return(0);
    }
 
    /***********************************************************************
@@ -1322,28 +1961,33 @@ int set_param(sym_environment *env, char *line)
     ***********************************************************************/
    else if (strcmp(key, "TM_verbosity") == 0){
       READ_INT_PAR(tm_par->verbosity);
+      return(0);
    }
    else if (strcmp(key, "TM_granularity") == 0){
       READ_DBL_PAR(tm_par->granularity);
       lp_par->granularity = tm_par->granularity;
+      return(0);
    }
    else if (strcmp(key, "lp_executable_name") == 0 ||
 	    strcmp(key, "lp_exe") == 0 ||
 	    strcmp(key, "TM_lp_exe") == 0 ||
 	    strcmp(key, "TM_lp_executable_name") == 0){
       read_string(tm_par->lp_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
    }
    else if (strcmp(key, "cg_executable_name") == 0 ||
 	    strcmp(key, "cg_exe") == 0 ||
 	    strcmp(key, "TM_cg_exe") == 0 ||
 	    strcmp(key, "TM_cg_executable_name") == 0){
       read_string(tm_par->cg_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
    }
    else if (strcmp(key, "cp_executable_name") == 0 ||
 	    strcmp(key, "cp_exe") == 0 ||
 	    strcmp(key, "TM_cp_exe") == 0 ||
 	    strcmp(key, "TM_cp_executable_name") == 0){
       read_string(tm_par->cp_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    else if (strcmp(key, "sp_executable_name") == 0 ||
@@ -1351,55 +1995,66 @@ int set_param(sym_environment *env, char *line)
 	    strcmp(key, "TM_sp_exe") == 0 ||
 	    strcmp(key, "TM_sp_executable_name") == 0){
       read_string(tm_par->sp_exe, line, MAX_FILE_NAME_LENGTH);
+      return(0);
    }
    /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "lp_debug") == 0 ||
 	    strcmp(key, "TM_lp_debug") == 0){
       READ_INT_PAR(tm_par->lp_debug);
       if (tm_par->lp_debug) tm_par->lp_debug = 4;
+      return(0);
    }
    else if (strcmp(key, "cg_debug") == 0 ||
 	    strcmp(key, "TM_cg_debug") == 0){
       READ_INT_PAR(tm_par->cg_debug);
       if (tm_par->cg_debug) tm_par->cg_debug = 4;
+      return(0);
    }
    else if (strcmp(key, "cp_debug") == 0 ||
 	    strcmp(key, "TM_cp_debug") == 0){
       READ_INT_PAR(tm_par->cp_debug);
       if (tm_par->cp_debug) tm_par->cp_debug = 4;
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    else if (strcmp(key, "sp_debug") == 0 ||
 	    strcmp(key, "TM_sp_debug") == 0){
       READ_INT_PAR(tm_par->sp_debug);
       if (tm_par->sp_debug) tm_par->sp_debug = 4;
+      return(0);
    }
    /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "max_active_nodes") == 0 ||
 	    strcmp(key, "TM_max_active_nodes") == 0){
       READ_INT_PAR(tm_par->max_active_nodes);
+      return(0);
    }
    else if (strcmp(key, "max_cp_num") == 0 ||
 	    strcmp(key, "TM_max_cp_num") == 0){
       READ_INT_PAR(tm_par->max_cp_num);
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    else if (strcmp(key, "max_sp_num") == 0 ||
 	    strcmp(key, "TM_max_sp_num") == 0){
       READ_INT_PAR(tm_par->max_sp_num);
+      return(0);
    }
    /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "lp_mach_num") == 0 ||
 	    strcmp(key, "TM_lp_mach_num") == 0){
       READ_INT_PAR(tm_par->lp_mach_num);
+      return(0);
    }
    else if (strcmp(key, "cg_mach_num") == 0 ||
 	    strcmp(key, "TM_cg_mach_num") == 0){
       READ_INT_PAR(tm_par->cg_mach_num);
+      return(0);
    }
    else if (strcmp(key, "cp_mach_num") == 0 ||
 	    strcmp(key, "TM_cp_mach_num") == 0){
       READ_INT_PAR(tm_par->cp_mach_num);
+      return(0);
    }
 #ifndef COMPILE_IN_CG
    else if (strcmp(key, "use_cg") == 0 ||
@@ -1407,96 +2062,132 @@ int set_param(sym_environment *env, char *line)
 	    strcmp(key, "LP_use_cg") == 0){
       READ_INT_PAR(tm_par->use_cg);
       lp_par->use_cg = tm_par->use_cg;
+      return(0);
    }
 #endif
    else if (strcmp(key, "TM_random_seed") == 0){
       READ_INT_PAR(tm_par->random_seed);
+      return(0);
    }
    else if (strcmp(key, "unconditional_dive_frac") == 0 ||
 	    strcmp(key, "TM_unconditional_dive_frac") == 0){
       READ_DBL_PAR(tm_par->unconditional_dive_frac);
+      return(0);
    }
    else if (strcmp(key, "diving_strategy") == 0 ||
 	    strcmp(key, "TM_diving_strategy") == 0){
       READ_INT_PAR(tm_par->diving_strategy);
+      return(0);
    }
    else if (strcmp(key, "diving_k") == 0 ||
 	    strcmp(key, "TM_diving_k") == 0){
       READ_INT_PAR(tm_par->diving_k);
+      return(0);
    }
    else if (strcmp(key, "diving_threshold") == 0 ||
 	    strcmp(key, "TM_diving_threshold") == 0){
       READ_DBL_PAR(tm_par->diving_threshold);
+      return(0);
    }
    else if (strcmp(key, "node_selection_rule") == 0 ||
 	    strcmp(key, "TM_node_selection_rule") == 0){
       READ_INT_PAR(tm_par->node_selection_rule);
+      return(0);
    }
    else if (strcmp(key, "keep_description_of_pruned") == 0 ||
 	    strcmp(key, "TM_keep_description_of_pruned") == 0){
       READ_INT_PAR(tm_par->keep_description_of_pruned);
+      return(0);
+   }
+   else if(strcmp(key, "keep_warm_start") == 0){
+      if (value){
+	 tm_par->keep_description_of_pruned = KEEP_IN_MEMORY;
+         return(0);
+   } else
+	 tm_par->keep_description_of_pruned = DISCARD;
+      return(0);
    }
    else if (strcmp(key, "warm_start") == 0 ||
 	    strcmp(key, "TM_warm_start") == 0){
       READ_INT_PAR(tm_par->warm_start);
+      return(0);
    }
    else if (strcmp(key, "vbc_emulation") == 0 ||
 	    strcmp(key, "TM_vbc_emulation") == 0){
       READ_INT_PAR(tm_par->vbc_emulation);
+      return(0);
    }
    else if (strcmp(key, "logging_interval") == 0 ||
 	    strcmp(key, "TM_logging_interval") == 0){
       READ_INT_PAR(tm_par->logging_interval);
+      return(0);
    }
    else if (strcmp(key, "logging") == 0 ||
 	    strcmp(key, "TM_logging") == 0){
       READ_INT_PAR(tm_par->logging);
+      return(0);
    }
    else if (strcmp(key, "price_in_root") == 0 ||
 	    strcmp(key, "TM_price_in_root") == 0){
       READ_INT_PAR(tm_par->price_in_root);
+      return(0);
    }
    else if (strcmp(key, "trim_search_tree") == 0 ||
 	    strcmp(key, "TM_trim_search_tree") == 0){
       READ_INT_PAR(tm_par->trim_search_tree);
+      return(0);
    }
    else if (strcmp(key, "colgen_in_first_phase") == 0 ||
 	    strcmp(key, "TM_colgen_in_first_phase") == 0){
       READ_INT_PAR(tm_par->colgen_strat[0]);
+      return(0);
    }
    else if (strcmp(key, "colgen_in_second_phase") == 0 ||
 	    strcmp(key, "TM_colgen_in_second_phase") == 0){
       READ_INT_PAR(tm_par->colgen_strat[1]);
+      return(0);
    }
    else if (strcmp(key, "colgen_in_first_phase_str") == 0 ||
 	    strcmp(key, "TM_colgen_in_first_phase_str") == 0){
       READ_STRINT_PAR(tm_par->colgen_strat[0],
 		      colgen_str, COLGEN_STR_SIZE, value);
+      return(0);
    }
    else if (strcmp(key, "colgen_in_second_phase_str") == 0 ||
 	    strcmp(key, "TM_colgen_in_second_phase_str") == 0){
       READ_STRINT_PAR(tm_par->colgen_strat[1],
 		      colgen_str, COLGEN_STR_SIZE, value);
+      return(0);
    }
    else if (strcmp(key, "time_limit") == 0 ||
 	    strcmp(key, "TM_time_limit") == 0){
       READ_DBL_PAR(tm_par->time_limit);
+      return(0);
    }
    else if (strcmp(key, "node_limit") == 0 ||
 	    strcmp(key, "TM_node_limit") == 0){
       READ_INT_PAR(tm_par->node_limit);
+      return(0);
    }
    else if (strcmp(key, "gap_limit") == 0 ||
 	    strcmp(key, "TM_gap_limit") == 0){
       READ_DBL_PAR(tm_par->gap_limit);
+      return(0);
    }
    else if (strcmp(key, "find_first_feasible") == 0 ||
 	    strcmp(key, "TM_find_first_feasible") == 0){
       READ_INT_PAR(tm_par->find_first_feasible);
+      return(0);
    }
    else if (strcmp(key, "sensitivity_analysis") == 0 ||
 	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
       READ_INT_PAR(tm_par->sensitivity_analysis);
+      if(tm_par->sensitivity_analysis){
+	 tm_par->keep_description_of_pruned = KEEP_IN_MEMORY;
+      }else{
+	 tm_par->keep_description_of_pruned = DISCARD;
+      }
+      return(0);
    }
    
    /***********************************************************************
@@ -1504,149 +2195,184 @@ int set_param(sym_environment *env, char *line)
     ***********************************************************************/
    if (strcmp(key, "LP_verbosity") == 0){
       READ_INT_PAR(lp_par->verbosity);
+      return(0);
    }
    else if (strcmp(key, "LP_granularity") == 0){
       READ_DBL_PAR(lp_par->granularity);
       tm_par->granularity = lp_par->granularity;
+      return(0);
    }
    else if (strcmp(key, "set_obj_upper_lim") == 0 ||
 	    strcmp(key, "LP_set_obj_upper_lim") == 0){
       READ_INT_PAR(lp_par->set_obj_upper_lim);
+      return(0);
    }
    
    else if (strcmp(key, "scaling") == 0 ||
 	    strcmp(key, "LP_scaling") == 0){
       READ_INT_PAR(lp_par->scaling);
+      return(0);
    }
    else if (strcmp(key, "fastmip") == 0 ||
 	    strcmp(key, "LP_fastmip") == 0){
       READ_INT_PAR(lp_par->fastmip);
+      return(0);
    }
    else if (strcmp(key, "try_to_recover_from_error") == 0 ||
 	    strcmp(key, "LP_try_to_recover_from_error") == 0){
       READ_INT_PAR(lp_par->try_to_recover_from_error);
+      return(0);
    }
    else if (strcmp(key, "problem_type") == 0 ||
 	    strcmp(key, "LP_problem_type") == 0){
       READ_INT_PAR(lp_par->problem_type);
+      return(0);
    }
    else if (strcmp(key, "not_fixed_storage_size") == 0 ||
 	    strcmp(key, "LP_not_fixed_storage_size") == 0 ||
 	    strcmp(key, "TM_not_fixed_storage_size") == 0 ){
       READ_INT_PAR(lp_par->not_fixed_storage_size);
       tm_par->not_fixed_storage_size = lp_par->not_fixed_storage_size;
+      return(0);
    }
    else if (strcmp(key, "cut_pool_check_frequency") == 0 ||
 	    strcmp(key, "LP_cut_pool_check_frequency") == 0){
       READ_INT_PAR(lp_par->cut_pool_check_freq);
+      return(0);
    }
    else if (strcmp(key, "load_balance_level") == 0 ||
 	    strcmp(key, "LP_load_balance_level") == 0){
       READ_INT_PAR(lp_par->load_balance_level);
+      return(0);
    }
    else if (strcmp(key, "load_balance_iterations") == 0 ||
 	    strcmp(key, "LP_load_balance_iterations") == 0){
       READ_INT_PAR(lp_par->load_balance_iterations);
+      return(0);
    }
    else if (strcmp(key, "load_balance_compare_candidates") == 0 ||
 	    strcmp(key, "LP_load_balance_compare_candidates") == 0){
       READ_INT_PAR(lp_par->load_balance_compare_candidates);
+      return(0);
    }
    else if (strcmp(key, "fractional_diving_ratio") == 0 ||
 	    strcmp(key, "LP_fractional_diving_ratio") == 0){
       READ_DBL_PAR(lp_par->fractional_diving_ratio);
+      return(0);
    }
    else if (strcmp(key, "fractional_diving_num") == 0 ||
 	    strcmp(key, "LP_fractional_diving_num") == 0){
       READ_INT_PAR(lp_par->fractional_diving_num);
+      return(0);
    }
    else if (strcmp(key, "max_non_dual_feas_to_add_frac") == 0 ||
 	    strcmp(key, "LP_max_non_dual_feas_to_add_frac") == 0){
       READ_DBL_PAR(lp_par->max_non_dual_feas_to_add_frac);
+      return(0);
    }
    else if (strcmp(key, "max_cols_to_add_min") == 0 ||
 	    strcmp(key, "LP_max_non_dual_feas_to_add_min") == 0){
       READ_INT_PAR(lp_par->max_non_dual_feas_to_add_min);
+      return(0);
    }
    else if (strcmp(key, "max_non_dual_feas_to_add_max") == 0 ||
 	    strcmp(key, "LP_max_non_dual_feas_to_add_max") == 0){
       READ_INT_PAR(lp_par->max_non_dual_feas_to_add_max);
+      return(0);
    }
    else if (strcmp(key, "max_not_fixable_to_add_frac") == 0 ||
 	    strcmp(key, "LP_max_not_fixable_to_add_frac") == 0){
       READ_DBL_PAR(lp_par->max_not_fixable_to_add_frac);
+      return(0);
    }
    else if (strcmp(key, "max_not_fixable_to_add_min") == 0 ||
 	    strcmp(key, "LP_max_not_fixable_to_add_min") == 0){
       READ_INT_PAR(lp_par->max_not_fixable_to_add_min);
+      return(0);
    }
    else if (strcmp(key, "max_not_fixable_to_add_max") == 0 ||
 	    strcmp(key, "LP_max_not_fixable_to_add_max") == 0){
       READ_INT_PAR(lp_par->max_not_fixable_to_add_max);
+      return(0);
    }
    
    else if (strcmp(key, "mat_col_compress_num") == 0 ||
 	    strcmp(key, "LP_mat_col_compress_num") == 0){
       READ_INT_PAR(lp_par->mat_col_compress_num);
+      return(0);
    }
    else if (strcmp(key, "mat_col_compress_ratio") == 0 ||
 	    strcmp(key, "LP_mat_col_compress_ratio") == 0){
       READ_DBL_PAR(lp_par->mat_col_compress_ratio);
+      return(0);
    }
    else if (strcmp(key, "mat_row_compress_num") == 0 ||
 	    strcmp(key, "LP_mat_row_compress_num") == 0){
       READ_INT_PAR(lp_par->mat_row_compress_num);
+      return(0);
    }
    else if (strcmp(key, "mat_row_compress_ratio") == 0 ||
 	    strcmp(key, "LP_mat_row_compress_ratio") == 0){
       READ_DBL_PAR(lp_par->mat_row_compress_ratio);
+      return(0);
    }
    
    else if (strcmp(key, "tailoff_gap_backsteps") == 0 ||
 	    strcmp(key, "LP_tailoff_gap_backsteps") == 0){
       READ_INT_PAR(lp_par->tailoff_gap_backsteps);
+      return(0);
    }
    else if (strcmp(key, "tailoff_obj_backsteps") == 0 ||
 	    strcmp(key, "LP_tailoff_obj_backsteps") == 0){
       READ_INT_PAR(lp_par->tailoff_obj_backsteps);
+      return(0);
    }
    else if (strcmp(key, "tailoff_gap_frac") == 0 ||
 	    strcmp(key, "LP_tailoff_gap_frac") == 0){
       READ_DBL_PAR(lp_par->tailoff_gap_frac);
+      return(0);
    }
    else if (strcmp(key, "tailoff_obj_frac") == 0 ||
 	    strcmp(key, "LP_tailoff_obj_frac") == 0){
       READ_DBL_PAR(lp_par->tailoff_obj_frac);
+      return(0);
    }
    else if (strcmp(key, "tailoff_absolute") == 0 ||
 	    strcmp(key, "LP_tailoff_absolute") == 0){
       READ_DBL_PAR(lp_par->tailoff_absolute);
+      return(0);
    }
    
    else if (strcmp(key, "ineff_cnt_to_delete") == 0 ||
 	    strcmp(key, "LP_ineff_cnt_to_delete") == 0){
       READ_INT_PAR(lp_par->ineff_cnt_to_delete);
+      return(0);
    }
    else if (strcmp(key, "eff_cnt_before_cutpool") == 0 ||
 	    strcmp(key, "LP_eff_cnt_before_cutpool") == 0){
       READ_INT_PAR(lp_par->eff_cnt_before_cutpool);
+      return(0);
    }
    else if (strcmp(key, "ineffective_constraints") == 0 ||
 	    strcmp(key, "LP_ineffective_constraints") == 0){
       READ_INT_PAR(lp_par->ineffective_constraints);
+      return(0);
    }
    else if (strcmp(key, "base_constraints_always_effective") == 0 ||
 	    strcmp(key, "LP_base_constraints_always_effective") == 0){
       READ_INT_PAR(lp_par->base_constraints_always_effective);
+      return(0);
    }
    
    else if (strcmp(key, "branch_on_cuts") == 0 ||
 	    strcmp(key, "LP_branch_on_cuts") == 0){
       READ_INT_PAR(lp_par->branch_on_cuts);
+      return(0);
    }
    else if (strcmp(key, "discard_slack_cuts") == 0 ||
 	    strcmp(key, "LP_discard_slack_cuts") == 0){
       READ_INT_PAR(lp_par->discard_slack_cuts);
+      return(0);
    }
    
    /* timeouts on receiving cuts */
@@ -1658,6 +2384,7 @@ int set_param(sym_environment *env, char *line)
       }else{
 	 lp_par->first_lp.first_cut_time_out = timeout;
       }
+      return(0);
    }
    else if (strcmp(key, "first_lp_all_cuts_time_out") == 0 ||
 	    strcmp(key, "LP_first_lp_all_cuts_time_out") == 0){
@@ -1667,6 +2394,7 @@ int set_param(sym_environment *env, char *line)
       }else{
 	 lp_par->first_lp.all_cuts_time_out = timeout;
       }
+      return(0);
    }
    else if (strcmp(key, "later_lp_first_cut_time_out") == 0 ||
 	    strcmp(key, "LP_later_lp_first_cut_time_out") == 0){
@@ -1676,6 +2404,7 @@ int set_param(sym_environment *env, char *line)
       }else{
 	 lp_par->later_lp.first_cut_time_out = timeout;
       }
+      return(0);
    }
    else if (strcmp(key, "later_lp_all_cuts_time_out") == 0 ||
 	    strcmp(key, "LP_later_lp_all_cuts_time_out") == 0){
@@ -1685,6 +2414,7 @@ int set_param(sym_environment *env, char *line)
       }else{
 	 lp_par->later_lp.all_cuts_time_out = timeout;
       }
+      return(0);
    }
    
    else if (strcmp(key, "no_cut_timeout") == 0 ||
@@ -1696,6 +2426,7 @@ int set_param(sym_environment *env, char *line)
       /*__BEGIN_EXPERIMENTAL_SECTION__*/
       cg_par->decomp_dynamic_timeout = 6000;
       /*___END_EXPERIMENTAL_SECTION___*/
+      return(0);
    }
    else if (strcmp(key, "all_cut_timeout") == 0 ||
 	    strcmp(key, "LP_all_cut_timeout") == 0){
@@ -1707,125 +2438,153 @@ int set_param(sym_environment *env, char *line)
       /*__BEGIN_EXPERIMENTAL_SECTION__*/
       cg_par->decomp_dynamic_timeout = timeout;
       /*___END_EXPERIMENTAL_SECTION___*/
+      return(0);
    }
    
    else if (strcmp(key, "max_cut_num_per_iter") == 0 ||
 	    strcmp(key, "LP_max_cut_num_per_iter") == 0){
       READ_INT_PAR(lp_par->max_cut_num_per_iter);
+      return(0);
    }
    
    /* variable fixing parameters */
    else if (strcmp(key, "do_reduced_cost_fixing") == 0 ||
 	    strcmp(key, "LP_do_reduced_cost_fixing") == 0){
       READ_INT_PAR(lp_par->do_reduced_cost_fixing);
+      return(0);
    }
    else if (strcmp(key, "gap_as_ub_frac") == 0 ||
 	    strcmp(key, "LP_gap_as_ub_frac") == 0){
       READ_DBL_PAR(lp_par->gap_as_ub_frac);
+      return(0);
    }
    else if (strcmp(key, "gap_as_last_gap_frac") == 0 ||
 	    strcmp(key, "LP_gap_as_last_gap_frac") == 0){
       READ_DBL_PAR(lp_par->gap_as_last_gap_frac);
+      return(0);
    }
    else if (strcmp(key, "do_logical_fixing") == 0 ||
 	    strcmp(key, "LP_do_logical_fixing") == 0){
       READ_INT_PAR(lp_par->do_logical_fixing);
+      return(0);
    }
    else if (strcmp(key, "fixed_to_ub_before_logical_fixing") == 0 ||
 	    strcmp(key, "LP_fixed_to_ub_before_logical_fixing") == 0){
       READ_INT_PAR(lp_par->fixed_to_ub_before_logical_fixing);
+      return(0);
    }
    else if (strcmp(key, "fixed_to_ub_frac_before_logical_fixing")==0 ||
 	    strcmp(key, "LP_fixed_to_ub_frac_before_logical_fixing")==0){
       READ_DBL_PAR(lp_par->fixed_to_ub_frac_before_logical_fixing);
+      return(0);
    }
    
    else if (strcmp(key, "generate_cgl_cuts") == 0 ||
 	    strcmp(key, "generate_cgl_cuts") == 0){
       READ_INT_PAR(cg_par->do_findcuts);
+      return(0);
    }
    
    else if (strcmp(key, "max_presolve_iter") == 0 ||
 	    strcmp(key, "LP_max_presolve_iter") == 0){
       READ_INT_PAR(lp_par->max_presolve_iter);
+      return(0);
    }
    
    /* user-defined function defaults */
    else if (strcmp(key, "is_feasible_default") == 0 ||
 	    strcmp(key, "LP_is_feasible_default") == 0){
       READ_INT_PAR(lp_par->is_feasible_default);
+      return(0);
    }
    else if (strcmp(key, "send_feasible_solution_default") == 0 ||
 	    strcmp(key, "LP_send_feasible_solution_default") == 0){
       READ_INT_PAR(lp_par->send_feasible_solution_default);
+      return(0);
    }
    else if (strcmp(key, "display_solution_default") == 0 ||
 	    strcmp(key, "LP_display_solution_default") == 0){
       READ_INT_PAR(lp_par->display_solution_default);
+      return(0);
    }
    else if (strcmp(key, "shall_we_branch_default") == 0 ||
 	    strcmp(key, "LP_shall_we_branch_default") == 0){
       READ_INT_PAR(lp_par->shall_we_branch_default);
+      return(0);
    }
    else if (strcmp(key, "select_candidates_default") == 0 ||
 	    strcmp(key, "LP_select_candidates_default") == 0){
       READ_INT_PAR(lp_par->select_candidates_default);
+      return(0);
    }
    else if (strcmp(key, "strong_branching_cand_num") == 0){
       READ_INT_PAR(lp_par->strong_branching_cand_num_max);
       lp_par->strong_branching_cand_num_min =
 	 lp_par->strong_branching_cand_num_max;
       lp_par->strong_branching_red_ratio = 0;
+      return(0);
    }
    else if (strcmp(key, "strong_branching_cand_num_max") == 0 ||
 	    strcmp(key, "LP_strong_branching_cand_num_max") == 0){
       READ_INT_PAR(lp_par->strong_branching_cand_num_max);
+      return(0);
    }
    else if (strcmp(key, "strong_branching_cand_num_min") == 0 ||
 	    strcmp(key, "LP_strong_branching_cand_num_min") == 0){
       READ_INT_PAR(lp_par->strong_branching_cand_num_min);
+      return(0);
    }
    else if (strcmp(key,"strong_branching_red_ratio") == 0 ||
 	    strcmp(key,"LP_strong_branching_red_ratio") == 0){
       READ_DBL_PAR(lp_par->strong_branching_red_ratio);
+      return(0);
    }
    else if (strcmp(key, "compare_candidates_default") == 0 ||
 	    strcmp(key, "LP_compare_candidates_default") == 0){
       READ_INT_PAR(lp_par->compare_candidates_default);
+      return(0);
    }
    else if (strcmp(key, "compare_candidates_default_str") == 0 ||
 	    strcmp(key, "LP_compare_candidates_default_str") == 0){
       READ_STRINT_PAR(lp_par->compare_candidates_default,
 		      compare_can_str, COMPARE_CAN_STR_SIZE, value);
+      return(0);
    }
    else if (strcmp(key, "select_child_default") == 0 ||
 	    strcmp(key, "LP_select_child_default") == 0){
       READ_INT_PAR(lp_par->select_child_default);
+      return(0);
    }
    else if (strcmp(key, "pack_lp_solution_default") == 0 ||
 	    strcmp(key, "LP_pack_lp_solution_default") == 0){
       READ_INT_PAR(lp_par->pack_lp_solution_default);
+      return(0);
    }
    else if (strcmp(key, "multi_criteria") == 0 ||
 	    strcmp(key, "LP_multi_criteria") == 0 ){
       READ_INT_PAR(lp_par->multi_criteria);
       env->par.multi_criteria = lp_par->multi_criteria;
+      return(0);
    }
-   else if (strcmp(key, "mc_find_nondominated_solutions") == 0 ||
-	    strcmp(key, "LP_mc_find_non_dominated_solutions") == 0 ){
-      READ_INT_PAR(lp_par->mc_find_nondominated_solutions);
+   else if (strcmp(key, "mc_find_supported_solutions") == 0 ||
+	    strcmp(key, "LP_mc_find_supported_solutions") == 0 ){
+      READ_INT_PAR(lp_par->mc_find_supported_solutions);
+      return(0);
    }
    else if (strcmp(key, "mc_gamma") == 0 ||
 	    strcmp(key, "LP_mc_gamma") == 0 ){
       READ_DBL_PAR(lp_par->mc_gamma);
+      return(0);
    }
    else if (strcmp(key, "mc_tau") == 0 ||
 	    strcmp(key, "LP_mc_tau") == 0 ){
       READ_DBL_PAR(lp_par->mc_tau);
+      return(0);
    }
    else if (strcmp(key, "mc_rho") == 0 ||
 	    strcmp(key, "LP_mc_rho") == 0 ){
       READ_DBL_PAR(lp_par->mc_rho);
+      return(0);
    }
 
    /***********************************************************************
@@ -1833,43 +2592,53 @@ int set_param(sym_environment *env, char *line)
     ***********************************************************************/
    else if (strcmp(key, "CG_verbosity") == 0){
       READ_INT_PAR(cg_par->verbosity);
+      return(0);
    }
    else if (strcmp(key, "do_findcuts") == 0 ||
 	    strcmp(key, "CG_do_findcuts") == 0){
       READ_INT_PAR(cg_par->do_findcuts);
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    else if (strcmp(key, "decomp_sol_pool_check_freq") == 0 ||
 	    strcmp(key, "CG_decomp_sol_pool_check_freq") == 0){
       READ_INT_PAR(cg_par->decomp_sol_pool_check_freq);
+      return(0);
    }
    else if (strcmp(key, "decomp_wait_for_cols") == 0 ||
 	    strcmp(key, "CG_decomp_wait_for_cols") == 0){
       READ_INT_PAR(cg_par->decomp_wait_for_cols);
+      return(0);
    }
    else if (strcmp(key, "decomp_max_col_num_per_iter") == 0 ||
 	    strcmp(key, "CG_decomp_max_col_num_per_iter") == 0){
       READ_INT_PAR(cg_par->decomp_max_col_num_per_iter);
+      return(0);
    }
    else if (strcmp(key, "decomp_col_block_size") == 0 ||
 	    strcmp(key, "CG_decomp_col_block_size") == 0){
       READ_INT_PAR(cg_par->decomp_col_block_size);
+      return(0);
    }
    else if (strcmp(key, "decomp_mat_block_size") == 0 ||
 	    strcmp(key, "CG_decomp_mat_block_size") == 0){
       READ_INT_PAR(cg_par->decomp_mat_block_size);
+      return(0);
    }
    else if (strcmp(key, "decomp_initial_timeout") == 0 ||
 	    strcmp(key, "CG_decomp_initial_timeout") == 0){
       READ_DBL_PAR(cg_par->decomp_initial_timeout);
+      return(0);
    }
    else if (strcmp(key, "decomp_dynamic_timeout") == 0 ||
 	    strcmp(key, "CG_decomp_dynamic_timeout") == 0){
       READ_DBL_PAR(cg_par->decomp_dynamic_timeout);
+      return(0);
    }
    else if (strcmp(key, "decomp_complete_enum") == 0 ||
 	    strcmp(key, "CG_decomp_complete_enum") == 0){
       READ_INT_PAR(cg_par->decomp_complete_enum);
+      return(0);
    }
    /*___END_EXPERIMENTAL_SECTION___*/
    
@@ -1878,46 +2647,57 @@ int set_param(sym_environment *env, char *line)
     ***********************************************************************/
    else if (strcmp(key, "CP_verbosity") == 0){
       READ_INT_PAR(cp_par->verbosity);
+      return(0);
    }
    else if (strcmp(key, "cp_warm_start") == 0 ||
 	    strcmp(key, "CP_warm_start") == 0){
       READ_INT_PAR(cp_par->warm_start);
+      return(0);
    }
    else if (strcmp(key, "cp_logging") == 0 ||
 	    strcmp(key, "CP_logging") == 0){
       READ_INT_PAR(cp_par->logging);
+      return(0);
    }
    else if (strcmp(key, "block_size") == 0 ||
 	    strcmp(key, "CP_block_size") == 0){
       READ_INT_PAR(cp_par->block_size);
+      return(0);
    }
    else if (strcmp(key, "max_size") == 0 ||
 	    strcmp(key, "CP_max_size") == 0){
       READ_INT_PAR(cp_par->max_size);
+      return(0);
    }
    else if (strcmp(key, "max_number_of_cuts") == 0 ||
 	    strcmp(key, "CP_max_number_of_cuts") == 0){
       READ_INT_PAR(cp_par->max_number_of_cuts);
+      return(0);
    }
    else if (strcmp(key, "cuts_to_check") == 0 ||
 	    strcmp(key, "cuts_to_check") == 0){
       READ_INT_PAR(cp_par->cuts_to_check);
+      return(0);
    }
    else if (strcmp(key, "delete_which") == 0 ||
 	    strcmp(key, "CP_delete_which") == 0){
       READ_INT_PAR(cp_par->delete_which);
+      return(0);
    }
    else if (strcmp(key, "touches_until_deletion") == 0 ||
 	    strcmp(key, "CP_touches_until_deletion") == 0){
       READ_INT_PAR(cp_par->touches_until_deletion);
+      return(0);
    }
    else if (strcmp(key, "min_to_delete") == 0 ||
 	    strcmp(key, "CP_min_to_delete") == 0){
       READ_INT_PAR(cp_par->min_to_delete);
+      return(0);
    }
    else if (strcmp(key, "check_which") == 0 ||
 	       strcmp(key, "CP_check_which") == 0){
       READ_INT_PAR(cp_par->check_which);
+      return(0);
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    
@@ -1927,43 +2707,54 @@ int set_param(sym_environment *env, char *line)
 #ifdef COMPILE_DECOMP
    else if (strcmp(key, "SP_verbosity") == 0){
       READ_INT_PAR(sp_par->verbosity);
+      return(0);
    }
    else if (strcmp(key, "SP_etol") == 0){
       READ_DBL_PAR(sp_par->etol);
+      return(0);
    }
    
    else if (strcmp(key, "SP_block_size") == 0){
       READ_INT_PAR(sp_par->block_size);
+      return(0);
    }
    else if (strcmp(key, "SP_max_size") == 0){
       READ_INT_PAR(sp_par->max_size);
+      return(0);
    }
    else if (strcmp(key, "max_number_of_sols") == 0 ||
 	    strcmp(key, "SP_max_number_of_sols") == 0){
       READ_INT_PAR(sp_par->max_number_of_sols);
+      return(0);
    }
    else if (strcmp(key, "SP_delete_which") == 0){
       READ_INT_PAR(sp_par->delete_which);
+      return(0);
    }
    else if (strcmp(key, "SP_touches_until_deletion") == 0){
       READ_INT_PAR(sp_par->touches_until_deletion);
+      return(0);
    }
    else if (strcmp(key, "SP_min_to_delete") == 0){
       READ_INT_PAR(sp_par->min_to_delete);
+      return(0);
    }
    else if (strcmp(key, "SP_compress_num") == 0){
       READ_INT_PAR(sp_par->compress_num);
+      return(0);
    }
    else if (strcmp(key, "SP_compress_ratio") == 0){
       READ_DBL_PAR(sp_par->compress_ratio);
+      return(0);
    }
    else if (strcmp(key, "SP_check_which") == 0){
       READ_INT_PAR(sp_par->check_which);
+      return(0);
    }
 #endif
    /*___END_EXPERIMENTAL_SECTION___*/
 
-   return(FUNCTION_TERMINATED_NORMALLY);
+   return(FUNCTION_TERMINATED_ABNORMALLY);
 }
 
 /*===========================================================================*/
@@ -1977,7 +2768,7 @@ warm_start_desc *create_copy_warm_start(warm_start_desc *ws)
    if (!ws){
       printf("create_copy_warm_start():");
       printf("The warm start description is empty!\n");
-      return (0);
+      return(NULL);
    }
 
    ws_copy = (warm_start_desc*)calloc(1,sizeof(warm_start_desc));     
@@ -2008,7 +2799,7 @@ warm_start_desc *create_copy_warm_start(warm_start_desc *ws)
 	     DSIZE * ws->best_sol.xlength);   
    }
 
-   return ws_copy;
+   return(ws_copy);
 }
 
 /*===========================================================================*/
@@ -2023,46 +2814,64 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
       mip_copy = (MIPdesc*) calloc(1, sizeof(MIPdesc));
       memcpy(mip_copy, mip, sizeof(MIPdesc));
       
-      mip_copy->obj    = (double *) malloc(DSIZE * mip_copy->n);
-      mip_copy->rhs    = (double *) malloc(DSIZE * mip_copy->m);
-      mip_copy->sense  = (char *)   malloc(CSIZE * mip_copy->m);
-      mip_copy->rngval = (double *) malloc(DSIZE * mip_copy->m);
-      mip_copy->ub     = (double *) malloc(DSIZE * mip_copy->n);
-      mip_copy->lb     = (double *) malloc(DSIZE * mip_copy->n);
-      mip_copy->is_int = (char *)   calloc(CSIZE, mip_copy->n);
-      mip_copy->matbeg = (int *) malloc(ISIZE * (mip_copy->n + 1));
-      mip_copy->matval = (double *) malloc(DSIZE*mip_copy->nz);
-      mip_copy->matind = (int *)    malloc(ISIZE*mip_copy->nz);
-      
+      if(mip->n){
+	 mip_copy->obj    = (double *) malloc(DSIZE * mip_copy->n);
+	 mip_copy->obj1    = (double *) calloc(DSIZE, mip_copy->n);
+	 mip_copy->obj2    = (double *) calloc(DSIZE, mip_copy->n);
+	 mip_copy->ub     = (double *) malloc(DSIZE * mip_copy->n);
+	 mip_copy->lb     = (double *) malloc(DSIZE * mip_copy->n);
+	 mip_copy->is_int = (char *)   calloc(CSIZE, mip_copy->n);
+
+	 memcpy(mip_copy->obj, mip->obj, DSIZE * mip_copy->n); 
+	 memcpy(mip_copy->obj1, mip->obj1, DSIZE * mip_copy->n); 
+	 memcpy(mip_copy->obj2, mip->obj2, DSIZE * mip_copy->n); 
+	 memcpy(mip_copy->ub, mip->ub, DSIZE * mip_copy->n); 
+	 memcpy(mip_copy->lb, mip->lb, DSIZE * mip_copy->n);    
+	 memcpy(mip_copy->is_int, mip->is_int, CSIZE * mip_copy->n);    
+      }
+
+      if(mip->m){
+	 mip_copy->rhs    = (double *) malloc(DSIZE * mip_copy->m);
+	 mip_copy->sense  = (char *)   malloc(CSIZE * mip_copy->m);
+	 mip_copy->rngval = (double *) malloc(DSIZE * mip_copy->m);
+
+	 memcpy(mip_copy->rhs, mip->rhs, DSIZE * mip_copy->m); 
+	 memcpy(mip_copy->sense, mip->sense, CSIZE * mip_copy->m); 
+	 memcpy(mip_copy-> rngval, mip->rngval, DSIZE * mip_copy->m); 	  
+      }
+
+
+      if(mip->nz){
+
+	 mip_copy->matbeg = (int *) malloc(ISIZE * (mip_copy->n + 1));
+	 mip_copy->matval = (double *) malloc(DSIZE*mip_copy->nz);
+	 mip_copy->matind = (int *)    malloc(ISIZE*mip_copy->nz);
+      	
+	 memcpy(mip_copy->matbeg, mip->matbeg, ISIZE * (mip_copy->n + 1));
+	 memcpy(mip_copy->matval, mip->matval, DSIZE * mip_copy->nz);  
+	 memcpy(mip_copy->matind, mip->matind, ISIZE * mip_copy->nz);  
+      }
+
       if (mip->colname){
-	 mip_copy->colname = (char**)malloc(sizeof(char*)*mip_copy->n);
+	 mip_copy->colname = (char**)calloc(sizeof(char*), mip_copy->n);
 	 
 	 for(i=0; i<mip_copy->n; i++){
 	    /* FIXME! Resctricting col_name to 20 chars! */
-	    mip_copy->colname[i] = (char*)malloc(CSIZE*20);
-	    strncpy(mip_copy->colname[i], mip->colname[i], 20); 
-	    mip_copy->colname[i][19] = 0;
+	    if(mip->colname[i]){
+	       mip_copy->colname[i] = (char*)malloc(CSIZE*20);
+	       strncpy(mip_copy->colname[i], mip->colname[i], 20); 
+	       mip_copy->colname[i][19] = 0;
+	    }
 	 }
-      }
-	 
-      memcpy(mip_copy->obj, mip->obj, DSIZE * mip_copy->n); 
-      memcpy(mip_copy->rhs, mip->rhs, DSIZE * mip_copy->m); 
-      memcpy(mip_copy->sense, mip->sense, CSIZE * mip_copy->m); 
-      memcpy(mip_copy-> rngval, mip->rngval, DSIZE * mip_copy->m); 	  
-      memcpy(mip_copy->ub, mip->ub, DSIZE * mip_copy->n); 
-      memcpy(mip_copy->lb, mip->lb, DSIZE * mip_copy->n);    
-      memcpy(mip_copy->is_int, mip->is_int, CSIZE * mip_copy->n);    
-      memcpy(mip_copy->matbeg, mip->matbeg, ISIZE * (mip_copy->n + 1));
-      memcpy(mip_copy->matval, mip->matval, DSIZE * mip_copy->nz);  
-      memcpy(mip_copy->matind, mip->matind, ISIZE * mip_copy->nz);  
+      }      
    }
    else{
       printf("create_copy_mip_desc():");
       printf("Trying to copy an empty mip desc!\n");
-      return 0;
+      return(NULL);
    }
    
-   return mip_copy;   
+   return(mip_copy);   
 }
 
 /*===========================================================================*/
@@ -2083,15 +2892,25 @@ sym_environment * create_copy_environment (sym_environment *env)
    if (!env){
       printf("create_copy_sym_environment(): The given problem is empty!\n");
       printf("Unable to copy.\n");
-      return (0);
+      return(NULL);
    }
    env_copy = (sym_environment*) calloc(1, sizeof(sym_environment));
    memcpy(env_copy, env, sizeof(sym_environment));
    
    par = &(env_copy->par);
 
-   /* FIXME! Ask to Prof. Ralphs */
+
    initialize_u(env_copy);
+
+   /* Note that, if some modifications on the user function have been done
+      after initialization, it will not be reflected here, since SYMPHONY
+      doesn't know anoything about the user structure! For a temporary 
+      solution, the user pointer will be directed to the original user
+      structure! So, be careful from now on that, further modifications 
+      on the user structure of either the original or the clone env will 
+      affect the both! */
+
+   env_copy->user = env->user;
 
    /*========================================================================*/
    /*   copy params */
@@ -2143,10 +2962,10 @@ sym_environment * create_copy_environment (sym_environment *env)
 
    sol = &(env_copy->best_sol);
    if(sol->xlength){   
-      sol->xind = (int *)malloc(ISIZE * sol->max_sol_length);
-      sol->xval = (double *)malloc(DSIZE * sol->max_sol_length);
-      memcpy(sol->xind, env->best_sol.xind, ISIZE*sol->max_sol_length);
-      memcpy(sol->xval, env->best_sol.xval, DSIZE*sol->max_sol_length);
+      sol->xind = (int *)malloc(ISIZE * sol->xlength);
+      sol->xval = (double *)malloc(DSIZE * sol->xlength);
+      memcpy(sol->xind, env->best_sol.xind, ISIZE*sol->xlength);
+      memcpy(sol->xval, env->best_sol.xval, DSIZE*sol->xlength);
    }
 
    /*========================================================================*/
@@ -2164,8 +2983,10 @@ sym_environment * create_copy_environment (sym_environment *env)
       base = (base_desc*) calloc(1, sizeof(base_desc));
       memcpy(base, env->base, sizeof(base_desc));
 
-      base->userind = (int *) malloc(ISIZE*base->varnum);
-      memcpy(base->userind, env->base->userind, ISIZE*base->varnum);
+      if(base->varnum){
+	 base->userind = (int *) malloc(ISIZE*base->varnum);
+	 memcpy(base->userind, env->base->userind, ISIZE*base->varnum);
+      }
    }
 
    /*========================================================================*/
@@ -2282,7 +3103,7 @@ sym_environment * create_copy_environment (sym_environment *env)
    env_copy->base = base;
    env_copy->rootdesc = desc;
 
-   return env_copy;
+   return(env_copy);
 }   
 
 /*===========================================================================*/
@@ -2291,7 +3112,7 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 			  double *val)
 {
    int i, j, retval;
-   double min = INFINITY;
+   double min = SYM_INFINITY;
    bc_node * child;
    double objval = 0.0;
 
@@ -2304,6 +3125,7 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
       for(i=0; i<cnt; i++){ 
 	 root->C_LP += root->duals[ind[i]]*(val[i] - mip->rhs[ind[i]]);
       }
+      //      printf("child C_LP: %f\n", root->C_LP);
       //      printf("objval: %f\n", objval);
 
       for(i = 0; i < root->bobj.child_num; i++){
@@ -2319,12 +3141,13 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 		  objval += mip->obj[j] * child->sol[j];
 	       }
 	       child->C_LP = objval;
-	       //	       printf("objval: %f\n", objval);
+	       //       printf("objval: %f\n", objval);
 
 	       for(j=0; j<cnt; j++){
 		  child->C_LP += child->duals[ind[j]] *
 		     (val[j]- mip->rhs[ind[j]]);
 	       }
+	       //	       printf("child C_LP: %f\n", child->C_LP);
 	       
 	       child->B_IP = child->C_LP; 
 	    }			    
@@ -2334,12 +3157,12 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 
 	       if(retval == LP_D_UNBOUNDED || retval == LP_ABANDONED || 
 		  retval == LP_D_INFEASIBLE){
-		  child->B_IP = INFINITY;
+		  child->B_IP = SYM_INFINITY;
 	       }
 
 	       if(retval == LP_OPTIMAL || retval == LP_D_OBJLIM || 
 		  retval == LP_D_ITLIM){
-		  child->B_IP = -INFINITY;
+		  child->B_IP = -SYM_INFINITY;
 	       }
 	       //	       printf("feas: %f\n", child->B_IP);
 
@@ -2356,7 +3179,7 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 	 if(child->B_IP < min)
 	    min = child->B_IP;
       }     
-            
+      //    printf("root->C_LP: %f\n", root->C_LP);            
       if(root->C_LP > min )
 	 return (root->C_LP);
       else
@@ -2364,6 +3187,254 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
    }
 
    return (min);
+} 
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+double get_lb_for_new_obj(bc_node *root, MIPdesc *mip, int cnt, 
+				int *ind, double *val)
+{
+   int i, j, n, retval;
+   double inf = SYM_INFINITY;
+   double min = inf;
+   bc_node * child;
+   double valuesi = 0.0, lpetol =  9.9999999999999995e-07;
+   double objval = 0.0;
+
+   if(root){   
+
+      for(n = 0; n < root->bobj.child_num; n++){
+
+	 child = root->children[n];
+	 objval = 0.0;
+	 
+	 if(child->node_status == NODE_STATUS__PRUNED){
+	    if(child->feasibility_status == OVER_UB_PRUNED){
+	       
+	       /* TEST_INTEGRALITY */
+	       for (i = mip->n - 1; i >= 0; i--){
+		  if (!mip->is_int[i])
+		     continue; /* Not an integer variable */
+		  valuesi = child->sol[i];
+		  if (valuesi > mip->lb[i] && valuesi < mip->ub[i] && 
+		      valuesi-floor(valuesi) > lpetol &&
+		      ceil(valuesi)-valuesi > lpetol){
+		     break;
+		  }
+	       }
+	       //feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
+	       if(i >= 0) {
+		  for(j = 0; j< mip->n; j++){
+		     objval += mip->obj[j] * child->sol[j];
+		  }
+		  
+		  for(j=0; j<cnt; j++){
+		     objval += child->sol[ind[j]] *
+			(val[j] - mip->obj[ind[j]]);
+		  }		  
+	       }else{
+		  objval = inf;
+	       }
+
+	       if(objval < min){
+		  min = objval;
+	       }
+	    }	   	    
+	 } else {
+	    objval = get_lb_for_new_obj(child, mip, cnt, ind, val);
+
+	    if(objval > -inf && objval < min){
+	       min = objval;
+	       
+	    }
+	 }
+      }
+   }
+
+   if (min < inf){
+      return (min);
+   } else {
+      return (-inf);
+   }
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+double get_ub_for_new_obj(bc_node *root, MIPdesc *mip, int cnt, 
+				int *ind, double *val)
+{
+   int i, j, n;
+   double inf = SYM_INFINITY;
+   double min = inf;
+   bc_node * child;
+   double valuesi = 0.0, lpetol =  9.9999999999999995e-07;
+   double objval = inf;
+
+   if(root){   
+
+      for(n = 0; n < root->bobj.child_num; n++){
+
+	 child = root->children[n];
+	 
+	 if(child->node_status == NODE_STATUS__PRUNED){
+	    if(child->feasibility_status == OVER_UB_PRUNED){
+	       
+	       /* TEST_INTEGRALITY */
+	       for (i = mip->n - 1; i >= 0; i--){
+		  if (!mip->is_int[i])
+		     continue; /* Not an integer variable */
+		  valuesi = child->sol[i];
+		  if (valuesi > mip->lb[i] && valuesi < mip->ub[i] && 
+		      valuesi-floor(valuesi) > lpetol &&
+		      ceil(valuesi)-valuesi > lpetol){
+		     break;
+		  }
+	       }
+	       //feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
+	       if(i < 0) {
+		  objval = 0.0;
+		  for(j = 0; j< mip->n; j++){
+		     objval += mip->obj[j] * child->sol[j];
+		  }
+		  
+		  for(j=0; j<cnt; j++){
+		     objval += child->sol[ind[j]] *
+			(val[j] - mip->obj[ind[j]]);
+		  }		  
+	       }
+	    } else if (child->feasibility_status == FEASIBLE_PRUNED){
+	       objval = 0.0;
+	       for(j = 0; j< mip->n; j++){
+		  objval += mip->obj[j] * child->sol[j];
+	       }
+	       
+	       for(j=0; j<cnt; j++){
+		  objval += child->sol[ind[j]] *
+		     (val[j] - mip->obj[ind[j]]);
+	       }		  
+	    }	        
+
+	 } else {	    
+	    objval = get_ub_for_new_obj(child, mip, cnt, ind, val);	    
+	 }
+	 
+	 if(objval < min){
+	    min = objval;
+	 }
+      }
+   }
+
+   return (min);
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+/* send in a row oriented mip description! */
+double get_ub_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, 
+			  int *ind, double *val)
+{
+   int i, j, k, n;
+   double inf = SYM_INFINITY;
+   double min = inf;
+   bc_node * child;
+   double valuesi = 0.0, lpetol =  9.9999999999999995e-07;
+   double objval = inf, row_val = 0.0;
+   int feasible = TRUE;
+   int nonzeros;
+
+   int *matbeg = mip->matbeg, *matind = mip->matind;
+   double *matval = mip->matval;
+
+   if(root){   
+
+      for(n = 0; n < root->bobj.child_num; n++){
+
+	 child = root->children[n];
+	 
+	 if(child->node_status == NODE_STATUS__PRUNED){
+	    if(child->feasibility_status == OVER_UB_PRUNED || 
+	       child->feasibility_status == FEASIBLE_PRUNED){
+	       /* see whether it is feasible for the new rhs! */
+
+	       for(i=0; i<cnt; i++){
+		  row_val = 0.0;
+		  for(j=matbeg[ind[i]]; j<matbeg[ind[i]+1]; j++){
+		     row_val += matval[j] * child->sol[matind[j]];
+		  }
+		  switch(mip->sense[ind[i]]){
+		   case 'L': 
+		      if(row_val > val[i]){
+			 feasible = FALSE;
+		      }
+		      break;
+		   case 'G':
+		      if(row_val < val[i]){
+			 feasible = FALSE;
+		      }
+		      break;
+		   case 'E':
+		      if(row_val != val[i]){
+			 feasible = FALSE;
+		      }
+		      break;
+		   case 'R':
+		      if(row_val > val[i] || row_val < val[i] - mip->rngval[i]){
+			 feasible = FALSE;
+		      }
+		      break;
+		   case 'N':
+		      break;
+		  }
+		  if(!feasible){
+		     break;
+		  }
+	       }
+
+	       if(feasible){
+		  if(child->feasibility_status == FEASIBLE_PRUNED){
+		     objval = 0.0;
+		     for(j = 0; j< mip->n; j++){
+			objval += mip->obj[j] * child->sol[j];
+		     }
+		  }
+		  if(child->feasibility_status == OVER_UB_PRUNED){
+		     /* TEST_INTEGRALITY */
+		     for (i = mip->n - 1; i >= 0; i--){
+			if (!mip->is_int[i])
+			   continue; /* Not an integer variable */
+			valuesi = child->sol[i];
+			if (valuesi > mip->lb[i] && valuesi < mip->ub[i] && 
+			    valuesi-floor(valuesi) > lpetol &&
+			    ceil(valuesi)-valuesi > lpetol){
+			   break;
+			}
+		     }
+		     if (i < 0){
+			objval = 0.0;	 
+			for(j = 0; j< mip->n; j++){
+			   objval += mip->obj[j] * child->sol[j];
+			}		     
+		     } else {
+			objval = inf;
+		     }
+		  }
+	       }
+	    }  
+	 } else {	    
+	    objval = get_ub_for_new_rhs(child, mip, cnt, ind, val);
+	 }
+
+	 if(objval < min){
+	    min = objval;
+	 }
+      }
+   }
+
+   return (min);  
 } 
 
 /*===========================================================================*/
@@ -2403,8 +3474,7 @@ int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip,
       bpath->type = bobj->type;
       bpath->name = bobj->name;
       bpath->sense = bobj->sense[j];
-      bpath->rhs = bobj->rhs[j];
-      bpath->range = bobj->range[j];
+      bpath->rhs = bobj->rhs[j];      bpath->range = bobj->range[j];
       bpath->branch = bobj->branch[j];
    }
 
@@ -2471,8 +3541,66 @@ int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip,
 
    FREE(path);
 
-   return retval;
+   return (retval);
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
+
+int trim_warm_tree(sym_environment *env, bc_node *n)
+{
+   int i, not_pruned = 0;
+
+   /* There isn't anything to do if this is a leaf. */
+   if (n->bobj.child_num == 0)
+      return(0);
+
+   /* There isn't anything to do if all children are pruned, and we are
+      better off to go down if only one is not pruned. */
+   for (i = n->bobj.child_num - 1; i >= 0; i--)
+      if (n->children[i]->node_status != NODE_STATUS__PRUNED)
+	 if (++not_pruned > 1)
+	    break;
+   if (not_pruned == 0)
+      return(0);
+   if (not_pruned == 1){
+      for (i = n->bobj.child_num - 1; i >= 0; i--)
+	 if (n->children[i]->node_status != NODE_STATUS__PRUNED){
+	    trim_warm_tree(env, n->children[i]);
+	    break;
+	 }
+      return(0);
+   }
+
+   /* So there are at least two not pruned. */
+   for (i = n->bobj.child_num - 1; i >= 0; i--)
+      if (n->children[i]->lower_bound + env->par.tm_par.granularity < 
+	  env->warm_start->ub)
+	 break;
+
+   /* if all children have high objval */
+   if (i < 0){
+      /* get rid of the children */
+      for (i = n->bobj.child_num - 1; i >= 0; i--)
+	 free_subtree(n->children[i]);
+      /* free the children description */
+      FREE(n->children);
+      n->bobj.child_num = 0;
+#ifndef MAX_CHILDREN_NUM
+      FREE(n->bobj.sense);
+      FREE(n->bobj.rhs);
+      FREE(n->bobj.range);
+      FREE(n->bobj.branch);
+#endif
+   }else{
+      /* try to trim every child */
+      for (i = n->bobj.child_num - 1; i >= 0; i--)
+	 trim_warm_tree(env, n->children[i]);
+   }
+   return(0);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+

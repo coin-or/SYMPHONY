@@ -287,26 +287,31 @@ int initialize_root_node_u(sym_environment *env)
       memcpy((char *)(userind + base->varnum), (char *)root->uind.list,
 	     root->uind.size * ISIZE); 
       
-      user_create_subproble(env->user, userind, env->mip, &maxn, &maxm,
+      user_create_subproblem(env->user, userind, env->mip, &maxn, &maxm,
 			    &maxnz);
 #endif
       break;
       
     case USER_DEFAULT: 
 
+       root->uind.size = env->mip->n;
+       base->cutnum = env->mip->m;
+
+#if 0
       if (env->mip->n && env->mip->m){
 	 root->uind.size = env->mip->n;
 	 base->cutnum = env->mip->m;
       }else if (!root->uind.size){
 	 printf("Error setting up the root node.\n");
 	 printf("User did not specify number of variables. Exiting.\n\n");
-	 exit(-999);
+	 return(FUNCTION_TERMINATED_ABNORMALLY);
       }else if (!base->varnum){
 	 printf("Error setting up the root node.\n");
 	 printf("User did not specify number of base constraints.",
 		"Exiting.\n\n");
-	 exit(-999);
+	 return(FUNCTION_TERMINATED_ABNORMALLY);
       }
+#endif
       root->uind.list = (int *) malloc(root->uind.size * ISIZE);
       for (i = 0; i < root->uind.size; i++){
 	 root->uind.list[i] = i;
@@ -628,7 +633,9 @@ int display_solution_u(sym_environment *env, int thread_num)
 	 printf("First Objective: %.3f\n", env->tm->lpp[thread_num]->obj[0]);
 	 printf("Second Objective: %.3f\n", env->tm->lpp[thread_num]->obj[1]);
       }else{
-	 printf("Solution Cost: %.3f\n", sol.objval);
+	 printf("Solution Cost: %.3f\n", env->mip->obj_sense == SYM_MINIMIZE ? 
+		sol.objval + env->mip->obj_offset : 
+		-sol.objval + env->mip->obj_offset);
       }
    }
    qsortucb_id(sol.xind, sol.xval, sol.xlength);
