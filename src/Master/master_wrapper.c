@@ -84,6 +84,15 @@ int readparams_u(sym_environment *env, int argc, char **argv)
 	    strncpy(env->par.datafile, argv[++i],MAX_FILE_NAME_LENGTH);
 	    foundD = TRUE;
 	    break;	     
+	 case 'T':
+	   env->par.test = TRUE;
+	   if(i+1 < argc){
+	     sscanf(argv[i+1], "%c", &tmp);
+	     if(tmp != '-'){
+	       strncpy(env->par.test_dir, argv[++i],MAX_FILE_NAME_LENGTH);
+	     }
+	   }
+	   break;	     
 	 default:
 	    break;
 	 }	 
@@ -130,7 +139,7 @@ int io_u(sym_environment *env)
 	 err = read_mps(env->mip, env->par.infile, env->probname);
 	 if (err != 0){
 	    printf("\nErrors in reading mps file\n");
-	    exit(1000);
+	    return (ERROR__READING_MPS_FILE);
 	 }
       }else{
 #ifdef USE_GLPMPL
@@ -768,3 +777,4 @@ int free_master_u(sym_environment *env)
 }
 
 /*===========================================================================*/
+
