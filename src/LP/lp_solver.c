@@ -2020,7 +2020,7 @@ void write_sav(LPdata *lp_data, char *fname)
 /*===========================================================================*/
 
 #ifdef USE_CGL_CUTS
-void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
+void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts)
 {
    return;
 }

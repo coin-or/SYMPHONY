@@ -16,6 +16,7 @@
 #include <memory.h>
 #include <string.h>
 #include <malloc.h>
+#include <math.h>
 
 #include "lp.h"
 #include "proccomm.h"
@@ -196,7 +197,7 @@ void fix_variables(lp_prob *p)
 	 memset((char *)delstat, 0, n * ISIZE);
 	 lb_vars = perm_lb_vars = ub_vars = perm_ub_vars = 0;
 	 for (cnt = 0, i = n-1; i >= 0; i--){
-	    if (abs(dj[i]) < lpetol){
+	    if (fabs(dj[i]) < lpetol){
 	       continue;
 	    }
 	    max_change = gap/dj[i];
