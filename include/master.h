@@ -47,7 +47,7 @@ typedef struct PROBLEM{
    double           ub_estimate;
    double           lb;
 
-   MIPdesc         *mip; /* for holding the description when read in from MPS */
+   MIPdesc         *mip; /*For holding the description when read in from MPS */
 
    char             probname[81];
 

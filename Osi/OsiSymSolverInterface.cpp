@@ -150,7 +150,12 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
  
     case OsiSymKeepDescOfPruned:
        sym_set_int_param(env_, "keep_description_of_pruned", value);
-      
+       return true;
+
+    case OsiSymMultiCriteriaFindNondominatedSolutions:
+       sym_set_int_param(env_, "mc_find_nondominated_solutions", value);
+       return true;
+
     default: 
        return false;
    }

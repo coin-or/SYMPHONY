@@ -266,17 +266,14 @@ int initialize_root_node_u(problem *p)
       if (p->mip->n && p->mip->m){
 	 root->uind.size = p->mip->n;
 	 base->cutnum = p->mip->m;
-	 if (p->par.multi_criteria &&
-	     p->par.lp_par.mc_find_nondominated_solutions){
-	    base->cutnum += 2;
-	 }
       }else if (!root->uind.size){
 	 printf("Error setting up the root node.\n");
 	 printf("User did not specify number of variables. Exiting.\n\n");
 	 exit(-999);
       }else if (!base->varnum){
 	 printf("Error setting up the root node.\n");
-	 printf("User did not specify number of base constraints. Exiting.\n\n");
+	 printf("User did not specify number of base constraints.",
+		"Exiting.\n\n");
 	 exit(-999);
       }
       root->uind.list = (int *) malloc(root->uind.size * ISIZE);

@@ -1086,8 +1086,13 @@ int sym_mc_solve(problem *p)
       return(sym_solve(p));
    }
 
-   p->par.multi_criteria = p->par.lp_par.multi_criteria = TRUE;
+   sym_set_int_param(p, "multi_criteria", TRUE);
    memcpy((char *)p->mip->obj1, (char *)p->mip->obj, DSIZE*p->mip->n);
+   if (p->par.lp_par.mc_find_nondominated_solutions){
+      p->base->cutnum += 2;
+   }else{
+      sym_set_int_param(p, "keep_description_of_pruned", KEEP_IN_MEMORY);
+   }
    
    start_time = wall_clock(NULL);
 
@@ -1102,19 +1107,20 @@ int sym_mc_solve(problem *p)
 	 printf("Using binary search with tolerance = %f...\n",
 		p->par.mc_binary_search_tolerance);
       }
-      if (p->par.mc_search_order = MC_LIFO){
+      if (p->par.mc_search_order == MC_LIFO){
 	 printf("Using LIFO search order...\n");
       }else{
 	 printf("Using FIFO search order...\n");
       }
       if (p->par.lp_par.mc_rho > 0){
-	 printf("Using augmented Chebyshev weight %.8f\n", p->par.lp_par.mc_rho);
+	 printf("Using augmented Chebyshev weight %.8f\n",
+		p->par.lp_par.mc_rho);
       }
-      printf("\n");
       if (p->par.use_permanent_cut_pools){
 	 printf("Saving the global cut pool between iterations...\n");
 	 sym_create_permanent_cut_pools(p);
       }
+      printf("\n");
    }
 
    /* First, calculate the utopia point */
@@ -1129,6 +1135,7 @@ int sym_mc_solve(problem *p)
 
    /* Solve */
    if (termcode = sym_solve(p) < 0){
+      p->base->cutnum -=2;
       return(termcode);
    }
    numprobs++;
@@ -1162,14 +1169,18 @@ int sym_mc_solve(problem *p)
    if (!p->par.lp_par.mc_find_nondominated_solutions){
       sym_set_warm_start(p, ws);
       for (i = 0; i < p->mip->n; i++){
-	 sym_set_obj_coeff(p, i, p->mip->obj2[i]);
+	 sym_set_obj_coeff(p, i, p->mip->obj2[i] +
+			   p->par.lp_par.mc_rho*(p->mip->obj1[i] +
+					      p->mip->obj2[i]));
       }
       if (termcode = sym_resolve(p) < 0){
 	 sym_delete_warm_start(ws);
+	 p->base->cutnum -=2;
 	 return(termcode);
       }
    }else{
       if (termcode = sym_solve(p) < 0){
+	 p->base->cutnum -=2;
 	 return(termcode);
       }
    }      
@@ -1282,14 +1293,18 @@ int sym_mc_solve(problem *p)
       if (!p->par.lp_par.mc_find_nondominated_solutions){
 	 sym_set_warm_start(p, ws);
 	 for (i = 0; i < p->mip->n; i++){
-	    sym_set_obj_coeff(p, i, gamma*p->mip->obj1[i] + tau*p->mip->obj2[i]);
+	    sym_set_obj_coeff(p, i, gamma*p->mip->obj1[i]+tau*p->mip->obj2[i]
+			      + p->par.lp_par.mc_rho*(p->mip->obj1[i] +
+						      p->mip->obj2[i]));
 	 }
 	 if (termcode = sym_resolve(p) < 0){
 	    sym_delete_warm_start(ws);
+	    p->base->cutnum -=2;
 	    return(termcode);
 	 }
       }else{
 	 if (termcode = sym_solve(p) < 0){
+	    p->base->cutnum -=2;
 	    return(termcode);
 	 }
       }
@@ -1497,7 +1512,8 @@ int sym_mc_solve(problem *p)
       FREE(solutions[i].indices);
    }
    sym_delete_warm_start(ws);
-   
+   p->base->cutnum -=2;
+
    return(TM_OPTIMAL_SOLUTION_FOUND);
 }
 

@@ -40,7 +40,10 @@ int main(int argc, char **argv)
    si.findInitialBounds();
 
 #ifdef TEST_MULTI_CRITERIA
+   /* Test for dc_multi */
    si.setObj2Coeff(76, 100);
+
+   si.setSymParam(OsiSymMultiCriteriaFindNondominatedSolutions, TRUE);
    
    /* Solve the multi-criteria problem */
    si.multiCriteriaBranchAndBound();
@@ -48,7 +51,7 @@ int main(int argc, char **argv)
    
 #if defined TEST_RESOLVE || defined TEST_SENS_ANALYSIS || \
    defined TEST_WARM_START
-   si.setSymParam(OsiSymKeepDescOfPruned, 3); //level 3: KEEP_IN_MEMORY
+   si.setSymParam(OsiSymKeepDescOfPruned, KEEP_IN_MEMORY); 
 #endif
 
 #if defined TEST_WARM_START
