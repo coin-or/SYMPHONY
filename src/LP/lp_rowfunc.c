@@ -239,7 +239,7 @@ int check_row_effectiveness(lp_prob *p)
 	       row->cut = NULL;
 	    }else{
 #ifdef COMPILE_IN_LP /*we don't want to free rows that have a name if we are
-		       using shared memory becasue they are still being used*/
+		       using shared memory because they are still being used*/
 	       if (row->cut->name < 0)
 #endif
 		  free_cut(&(row->cut));

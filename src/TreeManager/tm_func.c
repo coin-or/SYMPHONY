@@ -631,7 +631,7 @@ void print_tree_status(tm_prob *tm)
 	    tm->lb = tm->samephase_cand[i]->lower_bound;
       }
    }
-   if (tm->lb >= MAXDOUBLE / 2 || tm->lb > tm->ub){
+   if (tm->lb >= MAXDOUBLE / 2 || (tm->has_ub && tm->lb > tm->ub)){
       tm->lb = tm->ub;
    }
    if (tm->obj_sense == SYM_MAXIMIZE){
