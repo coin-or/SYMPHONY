@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
 /*                                                                           */
-/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2004 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
 /*                                                                           */

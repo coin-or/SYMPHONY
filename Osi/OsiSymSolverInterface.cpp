@@ -6,7 +6,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2003 Ted Ralphs and Lehigh University.                 */
+/* (c) Copyright 2004 Ted Ralphs and Lehigh University.                      */
 /* All Rights Reserved.                                                      */
 /*                                                                           */
 /* The authors of this file are Menal Guzelsoy and Ted Ralphs.               */

@@ -6,7 +6,7 @@
 # SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and     #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                         #
 #                                                                            #
-# (c) Copyright 2000-2003  Ted Ralphs. All Rights Reserved.                  #
+# (c) Copyright 2000-2004  Ted Ralphs. All Rights Reserved.                  #
 #                                                                            #
 # This software is licensed under the Common Public License. Please see      #
 # accompanying file for terms.                                               #
@@ -140,7 +140,7 @@ endif
 
 #Uncomment the line below if you want to use an OSI interface.
 LP_SOLVER = OSI
-OSI_INTERFACE = CPLEX
+OSI_INTERFACE = CLP
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
@@ -230,7 +230,7 @@ endif
 # capability. See above to set the path to the COIN root directory. 
 ##############################################################################
 
-USE_OSI_INTERFACE = TRUE
+USE_OSI_INTERFACE = FALSE
 
 ifeq ($(USE_OSI_INTERFACE),TRUE)
 OSISYM_INCDIR     = -I$(COINROOT)/Osi/OsiSym/include

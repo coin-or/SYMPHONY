@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Matching Problem.                                                     */
 /*                                                                           */
-/* (c) Copyright 2003 Michael Trick and Ted Ralphs. All Rights Reserved.     */
+/* (c) Copyright 2004 Michael Trick and Ted Ralphs. All Rights Reserved.     */
 /*                                                                           */
 /* This application was originally written by Michael Trick and was modified */
 /* by Ted Ralphs (tkralphs@lehigh.edu).                                      */

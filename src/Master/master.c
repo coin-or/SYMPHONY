@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2004 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -112,7 +112,7 @@ sym_environment *sym_open_environment()
    printf("\n");
    printf("*******************************************************\n");
    printf("*   This is SYMPHONY Version 4.0                      *\n");
-   printf("*   Copyright 2000-2003 Ted Ralphs                    *\n");
+   printf("*   Copyright 2000-2004 Ted Ralphs                    *\n");
    printf("*   All Rights Reserved.                              *\n");
    printf("*   Distributed under the Common Public License 1.0   *\n");
    printf("*******************************************************\n");
@@ -294,7 +294,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->generate_cgl_gomory_cuts = TRUE;
    lp_par->generate_cgl_knapsack_cuts = TRUE;
    lp_par->generate_cgl_oddhole_cuts = TRUE;
-   lp_par->generate_cgl_clique_cuts = TRUE;
+   lp_par->generate_cgl_clique_cuts = FALSE;
    lp_par->generate_cgl_probing_cuts = TRUE;
    lp_par->generate_cgl_flow_and_cover_cuts = FALSE;
    lp_par->generate_cgl_rounding_cuts = FALSE;
@@ -4914,6 +4914,7 @@ int sym_get_dbl_param(sym_environment *env, char *key, double *value)
       return(0);
    }
    
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    /***********************************************************************
     ***                     cut_gen params                          ***
     ***********************************************************************/
@@ -4941,6 +4942,7 @@ int sym_get_dbl_param(sym_environment *env, char *key, double *value)
       return(0);
    }
 #endif
+   /*___END_EXPERIMENTAL_SECTION___*/
 
    return (FUNCTION_TERMINATED_ABNORMALLY);
 }

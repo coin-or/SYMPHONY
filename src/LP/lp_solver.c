@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2004 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* The OSI interface in this file was written by Menal Guzelsoy.             */
 /* The OSL interface was written by Ondrej Medek.                            */
@@ -3062,7 +3062,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       delete clique;
    }
 
-#if 0
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    /* create CGL flow cover cuts */
    if(lp_data->par.generate_cgl_flow_and_cover_cuts){
@@ -3088,8 +3087,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       delete liftandproject;
    }
 
-#endif
-   
    if (cutlist.sizeRowCuts() > 0){
       if (*cuts){
 	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+cutlist.sizeRowCuts())
@@ -3134,12 +3131,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       *num_cuts = j;
    }
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   // delete flow;
-   /*___END_EXPERIMENTAL_SECTION___*/
-   /* delete rounding; */
-   /* delete liftandproject; */
-
    return;
 }
 #endif

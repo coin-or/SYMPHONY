@@ -146,7 +146,7 @@ mv $DIR/README* $DIR/README
 mkdir $DIR/Doc
 cd Doc
 latex man
-dvipdf man
+dvipdfm man
 mv man.pdf $DIR/Doc/SYMPHONY-$VER-Manual.pdf 
 dvips -o man.ps man
 mv man.ps $DIR/Doc/SYMPHONY-$VER-Manual.ps
@@ -159,7 +159,7 @@ tar -czvf SYMPHONY-$VER-Manual-HTML.tgz man-$VER/*
 zip -r SYMPHONY-$VER-Manual-HTML.zip man-$VER/*
 mv SYMPHONY-$VER-Manual-HTML.* $DIR/Doc/
 latex Walkthrough
-dvipdf Walkthrough
+dvipdfm Walkthrough
 mv Walkthrough.pdf $DIR/Doc/SYMPHONY-Walkthrough.pdf
 cd $HOME
 foreach app (VRP CNRP MCKP MATCH MPP SPP SPP+CUTS)
