@@ -2202,7 +2202,7 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
       what about the alloc params?MEN */
 
    /* Turn off scaling for CLP */
-   lp_data->si->setHintParam(OsiDoScale,false,OsiHintDo);
+   //lp_data->si->setHintParam(OsiDoScale,false,OsiHintDo);
 
    lp_data->si->loadProblem(lp_data->n, lp_data->m,
 			    lp_data->mip->matbeg, lp_data->mip->matind,

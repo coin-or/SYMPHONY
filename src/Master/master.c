@@ -215,7 +215,7 @@ int sym_set_defaults(sym_environment *env)
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    tm_par->do_decomp = FALSE;
    /*___END_EXPERIMENTAL_SECTION___*/
-   tm_par->unconditional_dive_frac = .1;
+   tm_par->unconditional_dive_frac = 0;
    tm_par->diving_strategy = BEST_ESTIMATE;
    tm_par->diving_k = 1;
    tm_par->diving_threshold = 0;

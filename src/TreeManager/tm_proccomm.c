@@ -480,7 +480,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
       lp[thread_num]->bdesc = branch_path;
 
    /* diving instructions */
-   lp[thread_num]->dive = shall_we_dive(tm, node->lower_bound);
+   //lp[thread_num]->dive = shall_we_dive(tm, node->lower_bound);
 
    /* User defined description */
    new_desc->desc_size = desc->desc_size;

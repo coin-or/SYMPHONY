@@ -1400,7 +1400,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
    /* the action for each descendant */
    send_char_array(action, can->child_num);
 
-   /* Our diving status an what we would keep */
+   /* Our diving status and what we would keep */
    send_char_array(&dive, 1);
    send_int_array(keep, 1);
    

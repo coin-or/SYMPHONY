@@ -1340,7 +1340,7 @@ char shall_we_dive(tm_prob *tm, double objval)
    
    rand_num = ((double)(RANDOM()))/((double)(MAXINT));
    if (tm->par.unconditional_dive_frac > 1 - rand_num){
-      dive = DO_DIVE;
+      dive = CHECK_BEFORE_DIVE;
    }else{
       switch(tm->par.diving_strategy){
        case BEST_ESTIMATE:
@@ -1364,7 +1364,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 	 if (k){
 	    average_lb /= k;
 	 }else{
-	    dive = DO_DIVE;
+	    dive = CHECK_BEFORE_DIVE;
 	    break;
 	 }
 	 if ((objval/average_lb)-1 > tm->par.diving_threshold){
@@ -1385,7 +1385,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 	 if (k){
 	    average_lb /= k;
 	 }else{
-	    dive = DO_DIVE;
+	    dive = CHECK_BEFORE_DIVE;
 	    break;
 	 }
 	 if (tm->has_ub)

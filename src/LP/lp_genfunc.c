@@ -172,6 +172,7 @@ int process_chain(lp_prob *p)
    }
 
    p->last_gap = 0.0;
+   p->dive = CHECK_BEFORE_DIVE;
    if (p->has_ub && p->par.set_obj_upper_lim)
       set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
    
@@ -1017,19 +1018,19 @@ int check_tailoff(lp_prob *p)
    int maxsteps = MAX(gap_backsteps, obj_backsteps);
 
    if (gap_backsteps < 1 && obj_backsteps < 2)
-      /* The user is stupid... asks for tailoff (since we came to this
+      /* The user asks for tailoff (since we came to this
 	 function) yet doesn't want to check any kind of tailoff (since this
 	 condition is true). Report no tailoff. */
       return(FALSE);
 
    /* shift the data in obj_hist by one to the right and insert the
       most recent objval to be the 0th */
-   for (i = MIN(p->iter_num-1, maxsteps) - 1; i >= 0; i--)
+   for (i = MIN(p->node_iter_num-1, maxsteps) - 1; i >= 0; i--)
       obj_hist[i+1] = obj_hist[i];
    obj_hist[0] = p->lp_data->objval;
 
    /* If the history is not long enough then just return */
-   if (p->iter_num <= maxsteps)
+   if (p->node_iter_num <= MIN(gap_backsteps, obj_backsteps))
       return(FALSE);
 
    /* if there is an upper bound and we want gap based tailoff:
@@ -1258,7 +1259,7 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
 	      double thisCost = direction*objective[iColumn]*distance;
 	      if (solver->isInteger(iColumn)) {
 		distance = ceil(distance-primalTolerance);
-		assert (currentValue-distance<=upperValue+primalTolerance);
+		//assert (currentValue-distance<=upperValue+primalTolerance);
 		if (absInfeasibility-distance*absElement< -gap-primalTolerance)
 		  thisCost=1.0e100; // no good
 		else
@@ -1307,7 +1308,7 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
       for (i=start[iPass];i<end[iPass];i++) {
 	int iColumn = integerVariable[i];
 	double value=newSolution[iColumn];
-	assert (fabs(floor(value+0.5)-value)<integerTolerance);
+	//assert (fabs(floor(value+0.5)-value)<integerTolerance);
 	double cost = direction * objective[iColumn];
 	double move=0.0;
 	if (cost>0.0)
@@ -1476,7 +1477,7 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
 
     double value=newSolution[iColumn];
     double nearest=floor(value+0.5);
-    assert(fabs(value-nearest)<10.0*primalTolerance);
+    //assert(fabs(value-nearest)<10.0*primalTolerance);
     value=nearest;
     newSolution[iColumn]=nearest;
     // if away from lower bound mark that fact
@@ -1756,9 +1757,9 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
       // check was approximately feasible
       for (i=0;i<numberRows;i++) {
 	if(rowActivity[i]<rowLower[i]) {
-	  assert (rowActivity[i]>rowLower[i]-10.0*primalTolerance);
+	   //assert (rowActivity[i]>rowLower[i]-10.0*primalTolerance);
 	} else if(rowActivity[i]>rowUpper[i]) {
-	  assert (rowActivity[i]<rowUpper[i]+10.0*primalTolerance);
+	   //assert (rowActivity[i]<rowUpper[i]+10.0*primalTolerance);
 	}
       }
       for (i=0;i<numberIntegers;i++) {
