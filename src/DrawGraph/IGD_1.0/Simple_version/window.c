@@ -8,7 +8,7 @@ int start_child(char *cmd, FILE **readpipe, FILE **writepipe);
 
 void main(int argc, char **argv)
 {
-   char *source_path = "/home/tkr/BlackBox/DrawGraph/IGD_1.0/";
+   char *source_path = "/home/tkr/SYMPHONY/DrawGraph/IGD_1.0/";
    char *graph_name = NULL;
    FILE *read_from, *write_to;
    int childpid;

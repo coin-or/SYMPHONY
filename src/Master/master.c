@@ -17,8 +17,10 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdio.h>
+#if 0
 #ifdef __PVM__
 #include <pvmtev.h>
+#endif
 #endif
 
 #include "proccomm.h"
