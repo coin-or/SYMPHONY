@@ -2151,6 +2151,8 @@ void get_slacks(LPdata *lp_data)
    double * slacks = lp_data->slacks;
    constraint *rows = lp_data->rows;
    
+#ifndef __OSI_CPLEX__
+   
    const double * rowActivity = lp_data->si->getRowActivity();
    
    for (i = m - 1; i >= 0; i--) {
@@ -2160,8 +2162,24 @@ void get_slacks(LPdata *lp_data)
 	 slacks[i] = rows[i].cut->rhs - rowActivity[i];
       }
    }
+
+#else
    
-   lp_data->slacks = slacks;
+   CPXgetslack(lp_data->si->getEnvironmentPtr, lp_data->si->getLpPtr,
+	       lp_data->slacks, 0, lp_data->m-1);
+   /* Compute the real slacks for the free rows */
+   for (i =m - 1; i >= 0; i--){
+      if (rows[i].free){
+	 switch (rows[i].cut->sense){
+	  case 'E': slacks[i] +=  rows[i].cut->rhs - INFINITY; break;
+	  case 'L': slacks[i] +=  rows[i].cut->rhs - INFINITY; break;
+	  case 'G': slacks[i] +=  rows[i].cut->rhs + INFINITY; break;
+	  case 'R': slacks[i] += -rows[i].cut->rhs - INFINITY; break;
+	 }
+      }
+   }
+
+#endif
 }
 
 /*===========================================================================*/
