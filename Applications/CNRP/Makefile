@@ -35,7 +35,7 @@ USERROOT = ${SYMPHONYROOT}/CNRP
 # The customized name of the master program (if desired)
 ##############################################################################
 
-MASTERNAME = cnrp
+MASTERNAME = cnrp-10
 
 ##############################################################################
 # These are only needed if parallel computation is used. Please see the
@@ -58,7 +58,7 @@ DIRECTED_X_VARS = TRUE
 ADD_FLOW_VARS = TRUE
 ADD_CAP_CUTS = FALSE
 ADD_X_CUTS = FALSE
-SAVE_CUT_POOL = FALSE
+SAVE_CUT_POOL = TRUE
 
 ifeq ($(FIND_NONDOMINATED_SOLUTIONS),TRUE)
 USER_BB_DEFINES += -DFIND_NONDOMINATED_SOLUTIONS

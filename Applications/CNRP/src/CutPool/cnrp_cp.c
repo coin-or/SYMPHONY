@@ -156,7 +156,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
    cnrp_spec_cp *vcp = (cnrp_spec_cp *)user;
    char *coef, *coef2;
    int index, v0, v1;
-   int vertnum;
+   int vertnum = vcp->vertnum;
    double lhs = 0;
    int i, j, k, cliquecount, size;
    char *clique_array;
