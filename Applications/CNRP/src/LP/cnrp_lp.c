@@ -78,11 +78,13 @@ int user_receive_lp_data(void **user)
    }
    receive_dbl_array(&cnrp->utopia_fixed, 1);
    receive_dbl_array(&cnrp->utopia_variable, 1);
-   
-   cnrp->edges = (int *) calloc (2*total_edgenum, sizeof(int));
+ 
+   /* The one additional edge allocated is for the extra variable when finding
+      nondominated solutions for multi-criteria problems */  
+   cnrp->edges = (int *) calloc (2*(total_edgenum+1), sizeof(int));
 
-   /*create the edge list (we assume a complete graph) The edge is set to
-     (0,0) in the edge list if it was eliminated in preprocessing*/
+   /* Create the edge list (we assume a complete graph) The edge is set to
+      (0,0) in the edge list if it was eliminated in preprocessing*/
    for (i = 1, k = 0, l = 0; i < vertnum; i++){
       for (j = 0; j < i; j++){
 	 if (l < zero_varnum && k == zero_vars[l]){
@@ -97,6 +99,7 @@ int user_receive_lp_data(void **user)
 	 k++;
       }
    }
+   cnrp->edges[2*total_edgenum] = cnrp->edges[2*total_edgenum + 1] = 0;
    FREE(zero_vars);
 
    if (cnrp->par.prob_type == VRP || cnrp->par.prob_type == TSP ||
@@ -165,7 +168,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    int basecutnum = (1 + od_const)*vertnum;
 #endif
 #ifdef ADD_X_CUTS
-   int basecutnum += total_edgenum;
+   basecutnum += total_edgenum;
 #endif
 #if defined(DIRECTED_X_VARS) && !defined(ADD_FLOW_VARS)
 #ifdef FIND_NONDOMINATED_SOLUTIONS
@@ -843,7 +846,6 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
       case SUBTOUR_ELIM_SIDE:
 	matind = (int *) malloc(varnum * ISIZE);
 	for (i = 0, nzcnt = 0; i < varnum; i++){
-#ifdef ADD_FLOW_VARS
 #ifdef DIRECTED_X_VARS
 	   if (vars[i]->userind < 2*total_edgenum){
 	      if (vars[i]->userind >= total_edgenum){
@@ -853,19 +855,6 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	      }
 #else
 	   if ((edgeind = vars[i]->userind) < total_edgenum){   
-#endif
-#else
-#ifdef DIRECTED_X_VARS
-	   {
-	      if (vars[i]->userind >= total_edgenum){
-		 edgeind = vars[i]->userind - total_edgenum;
-	      }else{
-		 edgeind = vars[i]->userind;
-	      }
-#else	      
-           {
-	      edgeind = vars[i]->userind;
-#endif
 #endif
 	      v0 = edges[edgeind << 1];
 	      v1 = edges[(edgeind << 1) + 1];
@@ -884,11 +873,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	matind = (int *) malloc(varnum * ISIZE);
 	for (i = 0, nzcnt = 0; i < varnum; i++){
 #ifdef DIRECTED_X_VARS
-#ifdef ADD_FLOW_VARS
 	   if (vars[i]->userind < 2*total_edgenum){
-#else
-	   {
-#endif
 	      if (vars[i]->userind >= total_edgenum){
 		 edgeind = vars[i]->userind - total_edgenum;
 		 v1 = edges[edgeind << 1];
@@ -904,11 +889,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	      }
 	   }
 #else
-#ifdef ADD_FLOW_VARS
 	   if (vars[i]->userind < total_edgenum){   
-#else	      
-           {
-#endif
 	      edgeind = vars[i]->userind;
 	      v0 = edges[edgeind << 1];
 	      v1 = edges[(edgeind << 1) + 1];

@@ -346,7 +346,7 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 			    char *in_set, double *cut_val, int *ref,
 			    char *cut_list, double *demand, int mult)
 {
-   double set_demand, set_cut_val;
+   double set_demand, set_cut_val, tmp_cut_val;
    vertex *verts = n->verts;
    elist *e;
    int num_cuts = 0, i, j;
@@ -355,12 +355,12 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
   
    int min_vert = 0, set_size, begin = 1, cur_comp, end = 1;
    char *coef;
-   double min_val, tmp_cut_val;
+   double min_val;
    int max_size, numarcs, *arcs;
    
    max_size = DSIZE + ISIZE + (vertnum >> DELETE_POWER) + 1
       + vertnum*vertnum*ISIZE/4;
-   new_cut->coef = (char *) (calloc(max_size, sizeof(char)));
+   new_cut->coef = (char *) calloc(max_size, sizeof(char));
    coef = new_cut->coef + DSIZE + ISIZE;
    arcs = (int *) (coef + (vertnum >> DELETE_POWER) + 1);
    
@@ -374,8 +374,8 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
    /* ref is a reference array for compmembers: gives a place
       in which a vertex is listed in  compmembers */
    
-   for (cur_comp = 1; cur_comp <= compnum;
-	begin += compnodes[cur_comp], cur_comp++){  /* for every component */
+   for (cur_comp = 1; cur_comp <= compnum; begin += compnodes[cur_comp],
+	   cur_comp++){  /* for every component */
       for (i = begin, end = begin + compnodes[cur_comp]; i < end; i++){
 	 if (compmembers[i] == 0) continue;
 	 /* for every node as a starting one */
@@ -652,7 +652,7 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
    double set_demand, set_cut_val, tmp_cut_val;
    vertex  *verts = n->verts;
    elist *e;
-   int i, j, k, num_cuts = 0;
+   int num_cuts = 0, i, j;
    char *pt, *cutpt;
    double *dpt;
    int vertnum = n->vertnum;
@@ -660,17 +660,13 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
    int min_vert = 0, set_size, begin = 1, cur_comp, end = 1, num_trials;
    char *coef;
    double min_val;
+   int max_size, numarcs, *arcs;
    double denominator=pow(2.0,31.0)-1.0;
    double r, q;
-   int max_size, numarcs, *arcs;
-
-   int other_end;
-   int *ipt; 
-   vertex *cur_nodept;
-  
+   
    max_size = DSIZE + ISIZE + (vertnum >> DELETE_POWER) + 1
       + vertnum*vertnum*ISIZE/4;
-   new_cut->coef = (char *) (calloc(max_size, sizeof(char)));
+   new_cut->coef = (char *) calloc(max_size, sizeof(char));
    coef = new_cut->coef + DSIZE + ISIZE;
    arcs = (int *) (coef + (vertnum >> DELETE_POWER) + 1);
    
@@ -696,6 +692,7 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
 	 memset(in_set + begin, 0, compnodes[cur_comp] * sizeof(char));
 	 set_size = 0;
 	 set_demand = 0;
+	 set_cut_val = 0;
          for (i = begin; i < end; i++ ){
 	    if (compmembers[i] == 0) continue;
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -736,8 +733,9 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
 	 }
 	 while(TRUE){ 
 	    if (set_cut_val + etol < set_demand){
-	       memset(coef, 0, new_cut->size*sizeof(char));
-	       for (j = begin, ipt = compmembers + begin; j < end; j++, ipt++){
+	       memset(coef, 0, ((vertnum >> DELETE_POWER) + 1)*sizeof(char));
+	       numarcs = 0;
+	       for (j = begin; j < end; j++){
 		  if (in_set[j]){
 		     (coef[(compmembers[j]) >> DELETE_POWER]) |=
 			(1 << ((compmembers[j]) & DELETE_AND));
@@ -1035,6 +1033,7 @@ int greedy_shrinking6_one(network *n, double capacity,
       set_cut_val = 0;
       set_size = 0;
       set_demand = 0;
+      set_weight = 0;
       for (i = 1 ; i < vertnum; i++ ){
 	 if (verts[i].deleted) continue;
 /*__BEGIN_EXPERIMENTAL_SECTION__*/

@@ -234,6 +234,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    char d_x_vars = FALSE;
 #endif
 
+   
    if (iter_num == 1) srandom(1);
 
    if (prob_type == TSP || prob_type == VRP || prob_type == BPP){
@@ -254,7 +255,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       /* if the network is integral, check for connectivity */
 #ifdef ADD_FLOW_VARS      
       if (prob_type == CTP || prob_type == CSTP){
-	 num_cuts = check_flow_connectivity(n, etol, capacity, num_routes, mult);
+	 num_cuts = check_flow_connectivity(n, etol, capacity, num_routes,
+					    mult);
 	 if (num_cuts){
 	    free_net(n);
 	    FREE(new_cut);
@@ -294,7 +296,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(new_cut->coef);
    }      
 #endif
-   
+
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
    if (cnrp->par.generate_cap_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
@@ -339,7 +341,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(new_cut->coef);
    }
 #endif   
-
+   
    if (num_cuts){
       free_net(n);
       FREE(new_cut);
@@ -444,7 +446,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(new_cut->coef);
    }
 #endif   
-
+   
    if (num_cuts){
       free_net(n);
       FREE(new_cut);
@@ -673,9 +675,9 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 printf("Found %d triangle cuts\n",triangle_cuts);
       num_cuts += triangle_cuts;
    }
-
-#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) && 0
-   if (num_cuts < 10 && cnrp->par.dp_greedy){
+   
+#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
+   if (num_cuts < 10 && cnrp->par.do_greedy){
       num_cuts += greedy_shrinking1_dicut(n, capacity, etol,
 					  cnrp->par.max_num_cuts_in_shrink,
 					  new_cut, compnodes_copy, compmembers,
@@ -683,12 +685,19 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 					  cut_list, demand, mult);
    }
 
-   if (num_cuts < 10 && cnrp->par.dp_greedy){
-      num_cuts += greedy_shrinking6_dicut(n, capacity, etol,
-					  cnrp->par.max_num_cuts_in_shrink,
-					  new_cut, compnodes_copy, compmembers,
+   if (num_cuts < 10 && cnrp->par.do_greedy){
+      if (cnrp->par.do_extra_in_root)
+	 num_trials = level ? cnrp->par.greedy_num_trials :
+	 2 * cnrp->par.greedy_num_trials;
+      else
+	 num_trials = cnrp->par.greedy_num_trials;
+      num_cuts += greedy_shrinking6_dicut(n, capacity, etol, new_cut,
+					  compnodes_copy, compmembers,
 					  comp_num, in_set, cut_val, ref,
-					  cut_list, demand, mult);
+					  cut_list,
+					  cnrp->par.max_num_cuts_in_shrink,
+					  demand, num_cuts ? num_trials :
+					  2 * num_trials, 10.5, mult);
    }
    if (prob_type == CTP){
       FREE(compmembers);

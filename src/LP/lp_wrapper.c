@@ -1455,6 +1455,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 }
 	 
 	 FREE(*new_rows);
+	 *new_row_num += explicit_row_num;
 	 *new_rows = row_list;
       }else{
 	 FREE(row_list);
@@ -1606,9 +1607,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
    waiting_row **new_rows = NULL;
    char deleted_cut;
    cut_data **cuts = NULL;
-   
    int i, j;
-   waiting_row **wrows = p->waiting_rows;
    
    colind_sort_extra(p);
    
@@ -1715,8 +1714,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 		  cp_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
 	       cp_new_rows[i]->source_pid = INTERNAL_CUT_POOL;
 	       for (j = p->waiting_row_num - 1; j >= 0; j--){
-		  if (same_cuts_u(p, p->waiting_rows[j],
-				  cp_new_rows[i]) !=
+		  if (same_cuts_u(p, p->waiting_rows[j], cp_new_rows[i]) !=
 		      DIFFERENT_CUTS){
 		     free_waiting_row(cp_new_rows+i);
 		     break;
@@ -1740,18 +1738,14 @@ void generate_cuts_in_lp_u(lp_prob *p)
    
    switch(user_res){
     case USER_ERROR:
-       FREE(cuts);
+      FREE(cuts);
       return;
     case GENERATE_CGL_CUTS:
     case USER_DEFAULT:
       /* Add to the user's list of cuts */
 #ifdef USE_CGL_CUTS
       if (p->par.generate_cgl_cuts){
-	 if (p->bc_index == 0){
-	    generate_cgl_cuts(lp_data, &new_row_num, &cuts, TRUE);
-	 }else{
-	    generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE);
-	 }
+	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE);
       }
 #endif
       /* Fall through to next case */
@@ -1776,7 +1770,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	 for (i = 0, deleted_cut = FALSE; i < new_row_num - 1;
 	      deleted_cut = FALSE){
 	    for (j = p->waiting_row_num - 1; j >= 0; j--){
-	       if (same_cuts_u(p, wrows[j], new_rows[i]) !=
+	       if (same_cuts_u(p, p->waiting_rows[j], new_rows[i]) !=
 		   DIFFERENT_CUTS){
 		  free_waiting_row(new_rows+i);
 		  new_rows[i] = new_rows[--new_row_num];

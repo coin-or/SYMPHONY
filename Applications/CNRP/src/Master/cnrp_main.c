@@ -85,7 +85,10 @@ int main(int argc, char **argv)
    cnrp_problem *cnrp;
    node_desc *root= NULL;
    base_desc *base = NULL;
-   double tolerance = .2;
+#ifdef BINARY_SEARCH
+   double tolerance = .1;
+   printf("Using binary search with tolerance = %f\n\n", tolerance);
+#endif
    
    start_time = wall_clock(NULL);
 
@@ -416,7 +419,9 @@ int main(int argc, char **argv)
       FREE(solutions[i].tree);
    }
    FREE(cp);
-
+   free_master_u(p);
+   FREE(p);
+   
    return(0);
 }
 

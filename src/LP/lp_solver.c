@@ -3079,7 +3079,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 if (send_to_pool){
 	    (*cuts)[j++]->name = CUT__SEND_TO_CP;
 	 }else{
-	    (*cuts)[j++]->name = CUT__SEND_TO_CP;
+	    (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
 	 }	    
       }
       *num_cuts += j;

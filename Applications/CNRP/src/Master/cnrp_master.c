@@ -400,9 +400,12 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    }
 #endif
        
-   /*create the edge list (we assume a complete graph) The edge is set to
-     (0,0) in the edge list if it was eliminated in preprocessing*/
-   edges = cnrp->edges = (int *) calloc (vertnum*(vertnum-1), sizeof(int));
+   /* The one additional edge allocated is for the extra variable when finding
+      nondominated solutions for multi-criteria problems */  
+   edges = cnrp->edges = (int *) calloc (vertnum*(vertnum-1) + 2, sizeof(int));
+
+   /* Create the edge list (we assume a complete graph) The edge is set to
+      (0,0) in the edge list if it was eliminated in preprocessing*/
    zero_varnum = cnrp->zero_varnum;
    zero_vars = cnrp->zero_vars;
    for (i = 1, k = 0, l = 0; i < vertnum; i++){
@@ -419,6 +422,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 	 k++;
       }
    }
+   edges[vertnum*(vertnum-1)] = edges[vertnum*(vertnum-1) + 1] = 0;
 
    switch(cnrp->par.base_variable_selection){
     case EVERYTHING_IS_EXTRA:
@@ -888,8 +892,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
       }
       printf("\n");
    }
-
-   FREE(n);
+   free_net(n);
    
    return(USER_SUCCESS);
 }
