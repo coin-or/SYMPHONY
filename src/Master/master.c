@@ -150,7 +150,7 @@ int sym_set_defaults(sym_environment *env)
    /************************* Global defaults ********************************/
    env->ub = 0;
    env->has_ub = FALSE;
-   env->lb = 0;
+   env->lb = -MAXDOUBLE;
    env->termcode = TM_NO_PROBLEM;
    env->par.verbosity = 0;
    env->par.random_seed = 17;
@@ -218,7 +218,7 @@ int sym_set_defaults(sym_environment *env)
    tm_par->unconditional_dive_frac = 0;
    tm_par->diving_strategy = BEST_ESTIMATE;
    tm_par->diving_k = 1;
-   tm_par->diving_threshold = 0;
+   tm_par->diving_threshold = 0.05;
    tm_par->node_selection_rule = LOWEST_LP_FIRST;
    tm_par->keep_description_of_pruned = DISCARD;
 
@@ -324,7 +324,7 @@ int sym_set_defaults(sym_environment *env)
 #ifdef __OSI_GLPK__
    lp_par->max_presolve_iter = -1;
 #else
-   lp_par->max_presolve_iter = 50;
+   lp_par->max_presolve_iter = 40;
 #endif
    
    lp_par->is_feasible_default = TEST_INTEGRALITY;
@@ -1016,7 +1016,7 @@ int sym_solve(sym_environment *env)
     * Display the the results and solution data                               
    \*------------------------------------------------------------------------*/
 
-   if(env->par.verbosity >=0 ){
+   if (env->par.verbosity >=0 ){
       printf("\n****************************************************\n");
       if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
 	 printf(  "* Optimal Solution Found                           *\n");
@@ -1062,9 +1062,10 @@ int sym_solve(sym_environment *env)
 #ifdef COMPILE_IN_TM
       if (tm->lb > env->lb) env->lb = tm->lb;
       if(env->par.verbosity >=0 ) {
-	 print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, env->lb, total_time,
-			  start_time, wall_clock(NULL), env->mip->obj_offset, 
-			  env->mip->obj_sense, tm->has_ub);
+	 print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, env->lb,
+			  total_time, start_time, wall_clock(NULL),
+			  env->mip->obj_offset, env->mip->obj_sense,
+			  tm->has_ub);
       }
       temp = termcode;
       if(env->par.verbosity >=-1 ) {
@@ -3013,7 +3014,7 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    lp_sol * sol;
 
    if (!env->mip || !env->mip->n){
-      printf("sym_set_col_solution():There is no loaded mip description!\n");
+      printf("sym_set_col_solution(): There is no loaded mip description!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3043,13 +3044,13 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       matVal = env->mip->matval;
       matInd = env->mip->matind;
 
-      for(i = 0; i<env->mip->n; i++){
+      for(i = 0; i < env->mip->n; i++){
 	 for(j = matBeg[i]; j<matBeg[i+1]; j++){
 	    rowAct[matInd[j]] += matVal[j] * colsol[i];
 	 }
       }	 
  
-      for(i = 0; i<env->mip->m; i++){
+      for(i = 0; i < env->mip->m; i++){
 	 switch(env->mip->sense[i]){
 	  case 'L': 
 	     if (rowAct[i] > env->mip->rhs[i])
@@ -3078,7 +3079,7 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       }
    }
 
-   for(i = 0; i<env->mip->n; i++){
+   for (i = 0; i < env->mip->n; i++){
       if (fabs(colsol[i]) >= 0.0 + granularity){
 	 nz++;
       }
@@ -3122,14 +3123,14 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
 	 env->ub = sol->objval;
       }
 
-   }
-   else{
+   }else{
       //      env->best_sol.objval = SYM_INFINITY;
       env->best_sol.objval = 0.0;
    }  
 
-   if (rowAct)
+   if (rowAct){
       FREE(rowAct);
+   }
    
    return(FUNCTION_TERMINATED_NORMALLY);      
 }

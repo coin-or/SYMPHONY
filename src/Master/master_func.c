@@ -3036,46 +3036,67 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
    MIPdesc * mip_copy;
    int i;
    
-   if(mip){
+   if (mip){
       mip_copy = (MIPdesc*) calloc(1, sizeof(MIPdesc));
       memcpy(mip_copy, mip, sizeof(MIPdesc));
       
-      if(mip->n){
-	 mip_copy->obj    = (double *) malloc(DSIZE * mip_copy->n);
-	 mip_copy->obj1    = (double *) calloc(DSIZE, mip_copy->n);
-	 mip_copy->obj2    = (double *) calloc(DSIZE, mip_copy->n);
-	 mip_copy->ub     = (double *) malloc(DSIZE * mip_copy->n);
-	 mip_copy->lb     = (double *) malloc(DSIZE * mip_copy->n);
-	 mip_copy->is_int = (char *)   calloc(CSIZE, mip_copy->n);
-
-	 memcpy(mip_copy->obj, mip->obj, DSIZE * mip_copy->n); 
-	 memcpy(mip_copy->obj1, mip->obj1, DSIZE * mip_copy->n); 
-	 memcpy(mip_copy->obj2, mip->obj2, DSIZE * mip_copy->n); 
-	 memcpy(mip_copy->ub, mip->ub, DSIZE * mip_copy->n); 
-	 memcpy(mip_copy->lb, mip->lb, DSIZE * mip_copy->n);    
+      if (mip->n){
+	 mip_copy->obj       = (double *) malloc(DSIZE * mip_copy->n);
+	 mip_copy->obj1      = (double *) malloc(DSIZE * mip_copy->n);
+	 mip_copy->obj2      = (double *) malloc(DSIZE * mip_copy->n);
+	 mip_copy->ub        = (double *) malloc(DSIZE * mip_copy->n);
+	 mip_copy->lb        = (double *) malloc(DSIZE * mip_copy->n);
+	 mip_copy->is_int    = (char *)   malloc(CSIZE * mip_copy->n);
+	 mip_copy->matbeg    = (int *)    malloc(ISIZE * (mip_copy->n + 1));
+	 if (mip->collen){
+	    mip_copy->collen    = (int *)    malloc(ISIZE * mip_copy->n);
+	 }
+	 
+	 memcpy(mip_copy->obj,    mip->obj,    DSIZE * mip_copy->n); 
+	 memcpy(mip_copy->obj1,   mip->obj1,   DSIZE * mip_copy->n); 
+	 memcpy(mip_copy->obj2,   mip->obj2,   DSIZE * mip_copy->n); 
+	 memcpy(mip_copy->ub,     mip->ub,     DSIZE * mip_copy->n); 
+	 memcpy(mip_copy->lb,     mip->lb,     DSIZE * mip_copy->n);    
 	 memcpy(mip_copy->is_int, mip->is_int, CSIZE * mip_copy->n);    
+	 memcpy(mip_copy->matbeg, mip->matbeg, ISIZE * (mip_copy->n + 1));
+	 if (mip->collen){
+	    memcpy(mip_copy->collen, mip->collen, ISIZE * mip_copy->n);
+	 }
       }
 
-      if(mip->m){
+      if (mip->m){
 	 mip_copy->rhs    = (double *) malloc(DSIZE * mip_copy->m);
 	 mip_copy->sense  = (char *)   malloc(CSIZE * mip_copy->m);
 	 mip_copy->rngval = (double *) malloc(DSIZE * mip_copy->m);
+	 if (mip->row_matbeg){
+	    mip_copy->row_matbeg  = (int *) malloc(ISIZE * (mip_copy->m + 1));
+	    mip_copy->row_lengths = (int *) malloc(ISIZE * mip_copy->m);
+	 }
 
-	 memcpy(mip_copy->rhs, mip->rhs, DSIZE * mip_copy->m); 
-	 memcpy(mip_copy->sense, mip->sense, CSIZE * mip_copy->m); 
-	 memcpy(mip_copy-> rngval, mip->rngval, DSIZE * mip_copy->m); 	  
+	 memcpy(mip_copy->rhs, mip->rhs,       DSIZE * mip_copy->m); 
+	 memcpy(mip_copy->sense, mip->sense,   CSIZE * mip_copy->m); 
+	 memcpy(mip_copy->rngval, mip->rngval, DSIZE * mip_copy->m);
+	 if (mip->row_matbeg){
+	    memcpy(mip_copy->row_matbeg, mip->row_matbeg,
+		   ISIZE*(mip_copy->m + 1));
+	    memcpy(mip_copy->row_lengths, mip->row_lengths, ISIZE*mip_copy->m);
+	 }
       }
 
-
-      if(mip->nz){
-
-	 mip_copy->matbeg = (int *) malloc(ISIZE * (mip_copy->n + 1));
-	 mip_copy->matval = (double *) malloc(DSIZE*mip_copy->nz);
-	 mip_copy->matind = (int *)    malloc(ISIZE*mip_copy->nz);
+      if (mip->nz){
+	 mip_copy->matval     = (double *) malloc(DSIZE*mip_copy->nz);
+	 mip_copy->matind     = (int *)    malloc(ISIZE*mip_copy->nz);
+	 if (mip->row_matind){
+	    mip_copy->row_matind = (int *)    malloc(ISIZE*mip_copy->nz);
+	    mip_copy->row_matval = (double *) malloc(DSIZE*mip_copy->nz);
+	 }
       	
-	 memcpy(mip_copy->matbeg, mip->matbeg, ISIZE * (mip_copy->n + 1));
 	 memcpy(mip_copy->matval, mip->matval, DSIZE * mip_copy->nz);  
 	 memcpy(mip_copy->matind, mip->matind, ISIZE * mip_copy->nz);  
+	 if (mip->row_matind){
+	    memcpy(mip_copy->row_matind, mip->row_matind, ISIZE*mip_copy->nz);
+	    memcpy(mip_copy->row_matval, mip->row_matval, DSIZE*mip_copy->nz);
+	 }
       }
 
       if (mip->colname){
@@ -3109,9 +3130,6 @@ sym_environment * create_copy_environment (sym_environment *env)
    sym_environment * env_copy;
    params * par;
    lp_sol * sol;
-   MIPdesc * mip = NULL; 
-   base_desc *base = NULL;
-   node_desc *desc = NULL; 
    cp_cut_data * cp_cut;
    cut_data * cut;
 
@@ -3200,21 +3218,22 @@ sym_environment * create_copy_environment (sym_environment *env)
    /*========================================================================*/
 
    /* copy mip */
-   if(env->mip){
-      mip = create_copy_mip_desc(env->mip);
+   if (env->mip){
+      env_copy->mip = create_copy_mip_desc(env->mip);
    }
 
    /*========================================================================*/
 
    /* copy base_desc */
 
-   if(env->base){
-      base = (base_desc*) calloc(1, sizeof(base_desc));
-      memcpy(base, env->base, sizeof(base_desc));
+   if (env->base){
+      env_copy->base = (base_desc*) calloc(1, sizeof(base_desc));
+      memcpy(env_copy->base, env->base, sizeof(base_desc));
 
-      if(base->varnum){
-	 base->userind = (int *) malloc(ISIZE*base->varnum);
-	 memcpy(base->userind, env->base->userind, ISIZE*base->varnum);
+      if (env->base->varnum){
+	 env_copy->base->userind = (int *) malloc(ISIZE*env->base->varnum);
+	 memcpy(env_copy->base->userind, env->base->userind,
+		ISIZE*env->base->varnum);
       }
    }
 
@@ -3222,8 +3241,9 @@ sym_environment * create_copy_environment (sym_environment *env)
 
    /* copy root_desc */
 
-   if(env->rootdesc){
-      desc = (node_desc *) calloc(1, sizeof(node_desc));
+   if (env->rootdesc){
+      node_desc *desc = env_copy->rootdesc =
+	 (node_desc *) calloc(1, sizeof(node_desc));
       memcpy(desc, env->rootdesc, sizeof(node_desc));
 
       if (desc->uind.size){
@@ -3259,7 +3279,7 @@ sym_environment * create_copy_environment (sym_environment *env)
    /*========================================================================*/
    /* copy the warm start */
 
-   if(env->warm_start){
+   if (env->warm_start){
       env_copy->warm_start = create_copy_warm_start(env->warm_start);
    }
    /*========================================================================*/
@@ -3325,12 +3345,6 @@ sym_environment * create_copy_environment (sym_environment *env)
 #endif
       }
    }
-
-
-   free_mip_desc(env_copy->mip);
-   env_copy->mip = mip;
-   env_copy->base = base;
-   env_copy->rootdesc = desc;
 
    return(env_copy);
 }   
