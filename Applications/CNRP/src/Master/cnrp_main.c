@@ -216,9 +216,6 @@ int main(int argc, char **argv)
 
 #ifdef BINARY_SEARCH
       gamma = (pairs[numpairs].gamma1 + pairs[numpairs].gamma2)/2;
-      printf("DEBUG: Processing interval [%.5f, %.5f] length = %.5f\n",
-	     pairs[numpairs].gamma1, pairs[numpairs].gamma2,
-	     fabs(pairs[numpairs].gamma1 - pairs[numpairs].gamma2));
 #elif defined(FIND_NONDOMINATED_SOLUTIONS)
       gamma = (utopia_variable - solutions[solution1].variable_cost)/
 	 (utopia_fixed - solutions[solution2].fixed_cost +
@@ -328,7 +325,6 @@ int main(int argc, char **argv)
 	 pairs[numpairs].solution1 = numsolutions-2;
 	 pairs[numpairs++].solution2 = numsolutions-1;
       }else{
-	 printf("DEBUG: Found new solution. \n");
 #ifdef BINARY_SEARCH
 	 pairs[numpairs+1].gamma2 = pairs[numpairs].gamma2;
 	 pairs[numpairs+1].gamma1 = gamma;

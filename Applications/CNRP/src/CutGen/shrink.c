@@ -381,7 +381,6 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 	 /* for every node as a starting one */
 	 /* initialize the data structures */
 	 memset(in_set  + begin, 0, compnodes[cur_comp] * sizeof(char));
-	 memset(cut_val + begin, 0, compnodes[cur_comp] * sizeof(double));
 	 in_set[i] = 1;
 	 set_size = 1 + verts[compmembers[i]].orig_node_list_size; 
 	 set_demand = demand[compmembers[i]];  
@@ -650,7 +649,7 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
 			    int max_num_cuts, double *demand, int trial_num,
 			    double prob, int mult)
 {
-   double set_weight, set_demand;
+   double set_demand, set_cut_val, tmp_cut_val;
    vertex  *verts = n->verts;
    elist *e;
    int i, j, k, num_cuts = 0;
@@ -658,21 +657,22 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
    double *dpt;
    int vertnum = n->vertnum;
   
-   int max_vert = 0, set_size, begin = 1, cur_comp, end = 1, num_trials;
+   int min_vert = 0, set_size, begin = 1, cur_comp, end = 1, num_trials;
    char *coef;
-   double maxval;
+   double min_val;
    double denominator=pow(2.0,31.0)-1.0;
    double r, q;
-   
+   int max_size, numarcs, *arcs;
+
    int other_end;
-   double weight;
    int *ipt; 
    vertex *cur_nodept;
   
-   new_cut->size = (vertnum >> DELETE_POWER) + 1;
-   new_cut->coef =coef= (char *) (calloc(new_cut->size,sizeof(char)));
-   memset(cut_list, 0, new_cut->size * (max_num_cuts +1));
-   
+   max_size = DSIZE + ISIZE + (vertnum >> DELETE_POWER) + 1
+      + vertnum*vertnum*ISIZE/4;
+   new_cut->coef = (char *) (calloc(max_size, sizeof(char)));
+   coef = new_cut->coef + DSIZE + ISIZE;
+   arcs = (int *) (coef + (vertnum >> DELETE_POWER) + 1);
    
    *in_set=0;
    
@@ -681,7 +681,6 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
       ref[compmembers[i]] = i;
    }
    *ref = 0;  
-   
    /* ref is a reference array for compmembers: gives a place
       in which a vertex is listed in  compmembers */
    
@@ -695,10 +694,8 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
 	 end = begin + compnodes[cur_comp];
 	 /*initialize the data structures */
 	 memset(in_set + begin, 0, compnodes[cur_comp] * sizeof(char));
-	 memset(cut_val+ begin, 0, compnodes[cur_comp] * sizeof(double));
 	 set_size = 0;
 	 set_demand = 0;
-	 set_weight = 0;
          for (i = begin; i < end; i++ ){
 	    if (compmembers[i] == 0) continue;
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -712,74 +709,111 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
 	       in_set[i] = 1;
 	       set_size += 1 + verts[compmembers[i]].orig_node_list_size;
 	       set_demand += demand[compmembers[i]];
-	       set_weight += verts[compmembers[i]].weight;
 	       for (e = verts[compmembers[i]].first; e; e = e-> next_edge){
-		  other_end = ref[e->other_end];
-		  weight = e->data->weight;
-		  set_weight += (in_set[other_end]) ? weight : -weight;
-		  cut_val[other_end] += (in_set[other_end]) ? 0 : weight;
+		  if (in_set[ref[e->other_end]]){
+		     if (compmembers[i] < e->other_end){
+			set_cut_val -=
+			   MIN(e->data->flow1,
+			       MIN(set_demand, capacity)*e->data->weight1);
+		     }else{
+			set_cut_val -=
+			   MIN(e->data->flow2,
+			       MIN(set_demand, capacity)*e->data->weight2);
+		     }
+		  }else{
+		     if (compmembers[i] < e->other_end){
+			set_cut_val +=
+			   MIN(e->data->flow2,
+			       MIN(set_demand, capacity)*e->data->weight2);
+		     }else{
+			set_cut_val +=
+			   MIN(e->data->flow1,
+			       MIN(set_demand, capacity)*e->data->weight1);
+		     }
+		  }
 	       }
 	    }
 	 }
-	 while(set_size){ 
-	    if (set_weight > RHS(set_size, set_demand, capacity) + etol &&
-		set_size > 2){
+	 while(TRUE){ 
+	    if (set_cut_val + etol < set_demand){
 	       memset(coef, 0, new_cut->size*sizeof(char));
 	       for (j = begin, ipt = compmembers + begin; j < end; j++, ipt++){
 		  if (in_set[j]){
-		     cur_nodept = verts + (*ipt);
-		     if (cur_nodept->orig_node_list_size)
-			for (k = 0; k < cur_nodept->orig_node_list_size; k++)
-			   (coef[(cur_nodept->orig_node_list)[k] >>
-				DELETE_POWER]) |=
-			      (1 << ((cur_nodept->orig_node_list)[k] &
-				     DELETE_AND));
-		     (coef[(*ipt) >> DELETE_POWER]) |= (1 << ((*ipt) &
-							      DELETE_AND));
+		     (coef[(compmembers[j]) >> DELETE_POWER]) |=
+			(1 << ((compmembers[j]) & DELETE_AND));
+		     for (e = verts[compmembers[j]].first; e; e=e->next_edge){
+			if (e->other_end < compmembers[j]){
+			   if (!in_set[ref[e->other_end]] &&
+			       set_demand*e->data->weight1 >
+			       e->data->flow1+etol){
+			      arcs[numarcs << 1] = e->other_end;
+			      arcs[(numarcs << 1) + 1] = compmembers[j];
+			      numarcs++;
+			   }
+			}else{
+			   if (!in_set[ref[e->other_end]] &&
+			       set_demand*e->data->weight2 >
+			       e->data->flow2+etol){
+			      arcs[numarcs << 1] = e->other_end;
+			      arcs[(numarcs << 1) + 1] = compmembers[j];
+			      numarcs++;
+			   }
+			}
+		     }
 		  }  
 	       }
-	       for (k = 0, cutpt = cut_list; k < num_cuts; k++,
-		       cutpt += new_cut->size)
-		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
-	       if ( k >= num_cuts){
-#if 0
-		  new_cut->type = SUBTOUR_ELIM_SIDE;
-		  new_cut->rhs =  RHS(set_size, set_demand, capacity);
-		  num_cuts += cg_send_cut(new_cut);
-#endif
-#ifdef DIRECTED_X_VARS
-		  SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
-#else
-		  SEND_SUBTOUR_CONSTRAINT(set_size, set_demand);
-#endif
-		  memcpy(cutpt, coef, new_cut->size);
-	       }
-	 
-	       if ( num_cuts > max_num_cuts){
+	       ((double *)(new_cut->coef))[0] = set_demand;
+	       ((int *)(new_cut->coef + DSIZE))[0] = numarcs;
+	       new_cut->size = DSIZE + ISIZE + (vertnum >> DELETE_POWER)
+		  + 1 + 2 * numarcs * ISIZE;
+	       new_cut->type = MIXED_DICUT;
+	       new_cut->rhs = set_demand;
+	       new_cut->name  = CUT__SEND_TO_CP;
+	       num_cuts += cg_send_cut(new_cut);
+	       if (num_cuts > max_num_cuts){
 		  FREE(new_cut->coef);
 		  return(num_cuts);
 	       }
 	    } 
-	    for (maxval = -1, pt = in_set+begin, dpt = cut_val+begin,
-		    j = begin; j < end; pt++, dpt++, j++){
-	       if (!(*pt) && *dpt > maxval){
-		  maxval = cut_val[j];
-		  max_vert = j; 
+	    for (min_val = 0, pt = in_set + begin, j = begin; j < end;
+		 pt++, j++){
+	       if (!in_set[j]){
+		  for (tmp_cut_val = 0, e = verts[compmembers[j]].first;
+		       e; e = e->next_edge){
+		     if (in_set[ref[e->other_end]]){
+			if (compmembers[j] < e->other_end){
+			   tmp_cut_val -=
+			      MIN(e->data->flow1,
+				  MIN(set_demand, capacity)*e->data->weight1);
+			}else{
+			   tmp_cut_val -=
+			      MIN(e->data->flow2,
+				  MIN(set_demand, capacity)*e->data->weight2);
+			}
+		     }else{
+			if (compmembers[j] < e->other_end){
+			   tmp_cut_val +=
+			      MIN(e->data->flow2,
+				  MIN(set_demand, capacity)*e->data->weight2);
+			}else{
+			   tmp_cut_val +=
+			      MIN(e->data->flow1,
+				  MIN(set_demand, capacity)*e->data->weight1);
+			}
+		     }
+		  }
+		  if (tmp_cut_val < min_val - etol){
+		     min_vert = j;
+		     min_val = tmp_cut_val;
+		  }
 	       }
 	    }
-	    if (maxval > 0){    /* add the vertex to the set */
-	       in_set[max_vert]=1;
-	       set_size+=1+ verts[compmembers[max_vert]].orig_node_list_size;
-	       set_demand += demand[compmembers[max_vert]];
-	       set_weight += verts[compmembers[max_vert]].weight;
-	       cut_val[max_vert]=0;
-	       for (e = verts[compmembers[max_vert]].first; e;
-		    e = e->next_edge){
-		  other_end = ref[e->other_end];
-		  weight = e->data->weight;
-		  set_weight += (in_set[other_end]) ? weight : -weight;
-		  cut_val[other_end]+=(in_set[other_end]) ? 0 : weight;
-	       }
+	    if (min_val < 0){    /* add the vertex to the set */
+	       in_set[min_vert] = 1;
+	       set_size += 1 +
+		  verts[compmembers[min_vert]].orig_node_list_size;
+	       set_demand += demand[compmembers[min_vert]];
+	       set_cut_val += min_val;
 	    }
 	    else{ /* can't add anything to the set */
 	       break;
@@ -787,7 +821,6 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
 	 }   
       }
    }
-   
    FREE(new_cut->coef);
    return(num_cuts);
 }

@@ -673,14 +673,36 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 printf("Found %d triangle cuts\n",triangle_cuts);
       num_cuts += triangle_cuts;
    }
+
+#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) && 0
+   if (num_cuts < 10 && cnrp->par.dp_greedy){
+      num_cuts += greedy_shrinking1_dicut(n, capacity, etol,
+					  cnrp->par.max_num_cuts_in_shrink,
+					  new_cut, compnodes_copy, compmembers,
+					  comp_num, in_set, cut_val, ref,
+					  cut_list, demand, mult);
+   }
+
+   if (num_cuts < 10 && cnrp->par.dp_greedy){
+      num_cuts += greedy_shrinking6_dicut(n, capacity, etol,
+					  cnrp->par.max_num_cuts_in_shrink,
+					  new_cut, compnodes_copy, compmembers,
+					  comp_num, in_set, cut_val, ref,
+					  cut_list, demand, mult);
+   }
+   if (prob_type == CTP){
+      FREE(compmembers);
+      FREE(compnodes_copy);
+      
+      FREE(new_cut);
+      free_net(n);
+      *cutnum = num_cuts;
+      return(USER_SUCCESS);
+   }
+#endif
    
    if (num_cuts < 10 && cnrp->par.do_greedy){
-#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) && 0
-      greedy_shrinking1_dicut(n, capacity, etol,
-			      cnrp->par.max_num_cuts_in_shrink,
-			      new_cut, compnodes_copy, compmembers, comp_num,
-			      in_set, cut_val, ref, cut_list, demand, mult);
-#endif
+
       memcpy((char *)new_demand, (char *)demand, vertnum*DSIZE);
 
 #ifndef DIRECTED_X_VARS
@@ -694,7 +716,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	    reduce_graph(n, etol, new_demand, cnrp->capacity, mult, new_cut);
       }
 
-      if (comp_num > 1 || prob_type == CTP || prob_type == CSTP){
+      if (comp_num > 1 || prob_type == CSTP){
 	 num_cuts += greedy_shrinking1(n, capacity, etol,
 				       cnrp->par.max_num_cuts_in_shrink,
 				       new_cut, compnodes_copy, compmembers,
@@ -716,7 +738,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 2 * cnrp->par.greedy_num_trials;
       else
 	 num_trials = cnrp->par.greedy_num_trials;
-      if (comp_num > 1 || prob_type == CTP || prob_type == CSTP){
+      if (comp_num > 1 || prob_type == CSTP){
 	 num_cuts += greedy_shrinking6(n, capacity, etol, new_cut,
 				       compnodes_copy, compmembers, comp_num,
 				       in_set, cut_val, ref, cut_list,

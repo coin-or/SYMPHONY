@@ -391,6 +391,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
 	*is_violated = (lhs > (double)(cut->rhs)+etol);
 	*quality   = lhs - (double)cut->rhs;
 	if (*quality < etol && *quality > -etol) *quality = 0;
+	FREE(matind);
 	return(USER_SUCCESS);
 	
       case TIGHT_FLOW:
