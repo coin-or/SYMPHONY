@@ -134,7 +134,9 @@ void cg_initialize(cg_prob *p, int master_tid)
 /*===========================================================================*/
 
 /*===========================================================================*\
- * This function is provided for the user to send cuts                       
+ * This function is provided for the user to send cuts. This function is
+ * retained for backwards compatibility, but is deprecated. See
+ * cg_add_user_cut() below.                       
 \*===========================================================================*/
 
 int cg_send_cut(cut_data *new_cut)
@@ -190,8 +192,8 @@ int cg_send_cut(cut_data *new_cut)
 /*===========================================================================*/
 
 cut_data *create_explicit_cut(int nzcnt, int *indices, double *values,
-			      double rhs, double range, char sense,
-			      char send_to_cp)
+				 double rhs, double range, char sense,
+				 char send_to_cp)
 {
    cut_data *cut = (cut_data *) calloc(1, sizeof(cut_data));
 
@@ -209,6 +211,82 @@ cut_data *create_explicit_cut(int nzcnt, int *indices, double *values,
    cut->name = send_to_cp ? CUT__SEND_TO_CP : CUT__DO_NOT_SEND_TO_CP;
 
    return(cut);
+}
+
+/*===========================================================================*/
+
+int cg_add_explicit_cut(int nzcnt, int *indices, double *values,
+			double rhs, double range, char sense,
+			char send_to_cp)
+{
+   cut_data *cut = (cut_data *) calloc(1, sizeof(cut_data));
+
+   cut->type = EXPLICIT_ROW;
+   cut->sense = sense;
+   cut->rhs = rhs;
+   cut->range = range;
+   cut->size = ISIZE + nzcnt * (ISIZE + DSIZE);
+   cut->coef = (char *) malloc (cut->size);
+   ((int *) cut->coef)[0] = nzcnt;
+   memcpy(cut->coef + ISIZE, (char *)indices, nzcnt*ISIZE);
+   memcpy(cut->coef + (nzcnt + 1) * ISIZE, (char *)values, nzcnt * DSIZE);
+   cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+   cut->deletable = TRUE;
+   cut->name = send_to_cp ? CUT__SEND_TO_CP : CUT__DO_NOT_SEND_TO_CP;
+
+   return(cg_add_user_cut(cut));
+}
+
+/*===========================================================================*/
+
+int cg_add_user_cut(cut_data *new_cut)
+{
+   cg_prob *p = get_cg_ptr(NULL);
+
+#ifdef COMPILE_IN_CG
+
+   int i;
+   cut_data *tmp_cut;
+
+   for (i = 0; i < p->cuts_to_add_num; i++){
+      if (new_cut->size != p->cuts_to_add[i]->size){
+	 continue;
+      }
+      if (memcmp(new_cut->coef, p->cuts_to_add[i]->coef, new_cut->size) == 0){
+	 return(0);
+      }
+   }
+   if (new_cut->name != CUT__DO_NOT_SEND_TO_CP)
+      new_cut->name = CUT__SEND_TO_CP;
+   tmp_cut = (cut_data *) malloc (sizeof(cut_data));
+   memcpy((char *)tmp_cut, (char *)new_cut, sizeof(cut_data));
+   if (new_cut->size >0){
+      tmp_cut->coef = (char *) malloc (new_cut->size * sizeof(char));
+      memcpy((char *)tmp_cut->coef, (char *)new_cut->coef,
+	     new_cut->size * sizeof(char));
+   }
+   REALLOC(p->cuts_to_add, cut_data *, p->cuts_to_add_size,
+	   p->cuts_to_add_num + 1, BB_BUNCH);
+   p->cuts_to_add[p->cuts_to_add_num++] = tmp_cut;
+
+#else
+
+   int s_bufid;
+   
+   if (new_cut->name != CUT__DO_NOT_SEND_TO_CP)
+      new_cut->name = CUT__SEND_TO_CP;
+   s_bufid = init_send(DataInPlace);
+   pack_cut(new_cut);
+   send_msg(p->cur_sol.lp, PACKED_CUT);
+   freebuf(s_bufid);
+   
+#endif
+
+#ifdef CHECK_CUT_VALIDITY
+   check_validity_of_cut_u(p->user, new_cut);
+#endif
+ 
+   return(1);
 }
 
 /*===========================================================================*/

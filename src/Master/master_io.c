@@ -1345,7 +1345,7 @@ EXIT:
 	 usage();
 	 exit(0);
        case 'H':
-	 CALL_USER_FUNCTION( user_usage() );
+	 user_usage();
 	 exit(0);
        case 'a':
 	 lp_par->first_lp.first_cut_time_out = 0;

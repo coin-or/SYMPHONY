@@ -2,8 +2,7 @@
 \subsection{User-written functions of the LP module}
 \label{user-written-lp}
 \begin{latexonly}
-{\large \bf Data Structures}\\
-\\
+\paragraph{Data Structures}
 \end{latexonly}
 \begin{htmlonly}
 \subsubsection{Data Structures}
@@ -19,7 +18,7 @@ data into and out of the user functions of the LP module.
 \paragraph{MIPdesc}
 \end{htmlonly}
 \begin{latexonly}
-\functiondef{MIPdesc}
+\firstfuncdef{MIPdesc}
 \end{latexonly}
 \label{MIPdesc}
 
@@ -183,8 +182,8 @@ current relaxation),
 %end{latexonly}
 
 \begin{latexonly}
-\noindent {\large \bf Function Descriptions}\\
-\\
+\newpage
+\paragraph{Function Descriptions}
 \noindent Now we describe the functions themselves.
 \end{latexonly}
 
@@ -195,7 +194,7 @@ current relaxation),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % user_receive_lp_data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\functiondef{user\_receive\_lp\_data} 
+\firstfuncdef{user\_receive\_lp\_data} 
 \label{user_receive_lp_data}
 \begin{verbatim}
 int user_receive_lp_data (void **user)
@@ -230,8 +229,8 @@ structure. \\
 
 \bt{lp{300pt}}
 {\tt USER\_ERROR} & Error. \BB\ aborts this LP module. \\
-{\tt USER\_SUCCESS} & User received the data. \\
-{\tt USER\_DEFAULT} & User function not implemented. \\
+{\tt USER\_SUCCESS} & User received the data successfully. \\
+{\tt USER\_DEFAULT} & User did not send any data. \\
 \et
 
 \item[Wrapper invoked from:] {\tt lp\_initialize()} at process start.
@@ -297,11 +296,11 @@ arrays and specify the constraint matrix automatically in this case.
 \bt{lp{330pt}}
 {\tt USER\_ERROR} & Error. The LP module is aborted. \\
 {\tt USER\_SUCCESS} & User created the constraint matrix with the base
-constraints. 
+constraints. \\
 {\tt USER\_DEFAULT} & This return code is used when the default routines for
 reading in an MPS or AMPL file were used and the user wants to let SYMPHONY
 set up the subproblem automatically. This return will cause an error if the
-default I/O routines were not used. 
+default I/O routines were not used. \\
 \et
 
 \postp
@@ -353,7 +352,7 @@ current solution.\\
 & & \\
 {\tt int *feasible} & OUT & Feasibility status of the solution ({\tt
 NOT\_FEASIBLE}, or {\tt FEASIBLE}). \\
-{\tt double *true_objval} & OUT & The user can return the ``true'' objective
+{\tt double *true\_objval} & OUT & The user can return the ``true'' objective
 function value of the solution in the case it is feasible, i.e., eliminating
 the round-off error.
 \et
@@ -873,6 +872,7 @@ fractional variables in all the children. Fractional branching options are
 only available if the fractional branching compile-time option is set in the
 make file.\\ 
 {\tt HIGHEST\_LOW\_FRAC} & Prefer the candidate with the highest minimum
+number of fractional variables. \\
 {\tt LOWEST\_HIGH\_FRAC} & Prefer the candidate with the lowest maximum
 number of fractional variables. \\
 {\tt HIGHEST\_HIGH\_FRAC} & Prefer the candidate with the highest maximum
@@ -1169,7 +1169,7 @@ pointers to the new rows. \\
 {\tt USER\_ERROR} & Error. The cuts are discarded.\\
 {\tt USER\_SUCCESS} & User unpacked the cuts. \\
 {\tt USER\_DEFAULT} & There are no user cut types defined. In this case,
-SYMPHONY deals with only exlicit cuts and internally generated cuts. 
+SYMPHONY deals with only exlicit cuts and internally generated cuts.  \\
 \et
 
 \item[Wrapper invoked from:] Wherever a cut needs to be unpacked
@@ -1339,7 +1339,7 @@ relaxation. \\
 {\tt USER\_ERROR} & Error. Ignored by \BB. \\
 {\tt USER\_SUCCESS} & User changed the stati of the variables she
 wanted. \\
-{\tt USER\_DEFAULT} & User function not implemented. \\
+{\tt USER\_DEFAULT} & No logical fixing rules are implemented. \\
 \et
 
 \item[Wrapper invoked from:] {\tt fix\_variables()} after doing reduced cost
@@ -1420,7 +1420,7 @@ next variable.\\
 {\tt USER\_ERROR} & Error. The LP process is aborted.\\
 {\tt USER\_SUCCESS} & User filled out {\tt *real\_nextind} and
 generated its column if needed.\\
-{\tt USER\_DEFAULT} & User function not implemented. \\
+{\tt USER\_DEFAULT} & No column generation is done. \\
 \et
 
 \item[Wrapper invoked from:] {\tt price\_all\_vars()} and {\tt
@@ -1465,8 +1465,8 @@ a cut in the local pool).
 \bt{llp{225pt}}
 {\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\
 & & \\
-{\tt LPdata *lp_data} & A pointer to SYMPHONY's internal data structure for
-storing the LP relaxation and related data.
+{\tt LPdata *lp\_data} & A pointer to SYMPHONY's internal data structure for
+storing the LP relaxation and related data. \\
 {\tt int varnum} & IN & The number of variables currently in the LP
 relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\
 {\tt var\_desc **vars} & IN & The variables currently in the LP relaxation.\\
@@ -1481,10 +1481,10 @@ relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\
 {\tt USER\_ERROR} & Error. Interpreted as if no cuts were generated. \\
 {\tt USER\_SUCCESS} & Cuts were generated. \\
 {\tt USER\_DEFAULT} & No cuts were generated. By default, SYMPHONY uses the
-CGL to generate generic cuts, according to parameter settings. 
-{\tt GENERATE_CGL_CUTS} & Generate generic CGL cuts, according to parameter
+CGL to generate generic cuts, according to parameter settings. \\
+{\tt GENERATE\_CGL\_CUTS} & Generate generic CGL cuts, according to parameter
 settings. \\
-{\tt DO_NOT_GENERATE_CGL_CUTS} & No additional cuts are generated. \\
+{\tt DO\_NOT\_GENERATE\_CGL\_CUTS} & No additional cuts are generated. \\
 \et
 
 \postp
@@ -1636,6 +1636,7 @@ the existence of a pointer before freeing it.
 \bt{lp{300pt}}
 {\tt USER\_ERROR} & Error. \BB\ ignores error message. \\
 {\tt USER\_SUCCESS} & User freed everything in the user space. \\
+{\tt USER\_DEFAULT} & There is no user memory to free. \\
 \et
 
 \item[Wrapper invoked from:] {\tt lp\_close()} at module shutdown.

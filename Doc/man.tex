@@ -72,8 +72,11 @@
 \newcommand{\bv}{\begin{verbatim}}
 \newcommand{\ev}{\end{verbatim}}
 \newcommand{\functiondef}[1]{\subsubsection{#1}}
+\newcommand{\firstfuncdef}[1]{\subsubsection{#1}}
 %begin{latexonly}
-\renewcommand{\functiondef}[1]{\item[\Large $\triangleright$] {\bf
+\renewcommand{\functiondef}[1]{\newpage \item[\Large $\triangleright$] {\bf
+\Large #1}}
+\renewcommand{\firstfuncdef}[1]{\item[\Large $\triangleright$] {\bf
 \Large #1}}
 %end{latexonly}
 \newcommand{\describe}{\item[Description:] \hfill}
@@ -250,6 +253,8 @@ http://link.springer.de/link/service/series/0558/tocs/t2241.htm}.}
 %\input{man-data-dg}
 
 %\newpage
+
+\newpage
 
 \section{\BB\ Parameters}
 \label{params}

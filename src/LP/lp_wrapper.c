@@ -512,7 +512,7 @@ int is_feasible_u(lp_prob *p)
     case USER_DEFAULT: /* set the default */
       user_res = p->par.is_feasible_default;
       break;
-    case default:
+    default:
       break;
    }
 
@@ -1400,6 +1400,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
     case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
+    case USER_DEFAULT:
 
       /* Combine the user's rows with SYMPHONY's rows */ 
       if (*new_row_num == 0 && explicit_row_num == 0){
@@ -1426,10 +1427,9 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
       
       break;
 
-    case USER_DEFAULT:
     case USER_ERROR: /* Error. ??? what will happen ??? */
       *new_row_num = 0;
-      FREE(new_rows);
+      FREE(*new_rows);
 
       break;
        

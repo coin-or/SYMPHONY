@@ -37,7 +37,7 @@
 
 int user_receive_cp_data(void **user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -50,7 +50,7 @@ int user_receive_cp_data(void **user)
 
 int user_receive_lp_solution_cp(void *user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -66,7 +66,7 @@ int user_prepare_to_check_cuts(void *user, int varnum, int *indices,
 {
    user_problem *prob = (user_problem *) user;
 
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 
@@ -90,6 +90,8 @@ int user_check_cut(void *user, double etol, int number, int *indices,
     * cut was useful
    \*------------------------------------------------------------------------*/
 
+   /* This code is just here as a template for customization. Uncomment to use.*/
+#if 0
    user_problem *prob = (user_problem *) user;
 
    switch (cut->type){
@@ -97,8 +99,11 @@ int user_check_cut(void *user, double etol, int number, int *indices,
     default:
       printf("Cut type not recognized! \n\n");
       *is_violated = FALSE;
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
    }
+#endif
+
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -111,7 +116,7 @@ int user_check_cut(void *user, double etol, int number, int *indices,
 
 int user_finished_checking_cuts(void *user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -123,7 +128,7 @@ int user_finished_checking_cuts(void *user)
 
 int user_free_cp(void **user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/

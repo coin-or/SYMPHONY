@@ -122,7 +122,7 @@ void io_u(problem *p)
       
       break;
 
-    case ERROR:
+    case USER_ERROR:
 
       printf("\n\n*********User error detected -- aborting***********\n\n");
       exit(1000);
@@ -210,24 +210,21 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
 				     &base->cutnum, &root->uind.size,
 				     &root->uind.list, &p->mip->colname,
 				     p->par.tm_par.colgen_strat)){
-    case ERROR:
+    case USER_ERROR:
       
       printf("\n\n*********User error detected -- aborting***********\n\n");
       exit(1000);
 
+    case USER_SUCCESS:
     case USER_NO_PP:
-      
+    case USER_AND_PP:  
       if (base->varnum)
 	 qsortucb_i(base->userind, base->varnum);
       if (root->uind.size && !p->par.warm_start)
 	 qsortucb_i(root->uind.list, root->uind.size);
       break;
       
-    case USER_AND_PP:
-      
-      break;
-
-    case DEFAULT: 
+    case USER_DEFAULT: 
 
       if (p->mip){
 	 root->uind.size = p->mip->n;

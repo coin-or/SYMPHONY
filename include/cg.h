@@ -79,6 +79,10 @@ void cg_close PROTO((cg_prob * p));
 cut_data *create_explicit_cut PROTO((int nzcnt, int *indices, double *values,
 				     double rhs, double range, char sense,
 				     char send_to_cp));
+int cg_add_explicit_cut PROTO((int nzcnt, int *indices, double *values,
+			       double rhs, double range, char sense,
+			       char send_to_cp));
+int cg_add_user_cut PROTO((cut_data *new_cut));
 
 /*===========================================================================*/
 /*=============== CG communication functions (cg_proccomm.c) ================*/

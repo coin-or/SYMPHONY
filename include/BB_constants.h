@@ -64,9 +64,9 @@
 #define	MAXDOUBLE 1.79769313486231570e+308
 
 /*--------------------- return values for user-written functions ------------*/
-#define USER_ERROR              -3
-#define USER_SUCCESS            -2
-#define USER_NO_PP              -2
+#define USER_ERROR              -5
+#define USER_SUCCESS            -4
+#define USER_NO_PP              -3
 #define USER_AND_PP             -2
 #define USER_DEFAULT            -1
 

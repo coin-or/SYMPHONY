@@ -44,17 +44,19 @@ int receive_cg_data_u(cg_prob *p)
    receive_char_array((char *)&p->par, sizeof(cg_params));
    receive_int_array(&p->draw_graph, 1);
    switch( user_receive_cg_data(&p->user, p->draw_graph) ){
+    case USER_SUCCESS:
+    case USER_AND_PP:
     case USER_NO_PP:
       /* User function terminated without problems. No post-processing. */
+    case USER_DEFAULT:
       freebuf(r_bufid);
-      break;
-    case ERROR:
+      return(TRUE);
+    case USER_ERROR:
     default:
       freebuf(r_bufid);
       /* Unexpected return value. Do something!! */
       return(FALSE);
    }
-   return(TRUE);
 }
 
 /*===========================================================================*/
@@ -62,20 +64,6 @@ int receive_cg_data_u(cg_prob *p)
 int receive_lp_solution_cg_u(cg_prob *p)
 {
    return(user_receive_lp_solution_cg(&p->user));
-}
-
-/*===========================================================================*/
-
-void free_cg_u(cg_prob *p)
-{
-#ifdef COMPILE_IN_CG
-   FREE(p->cuts_to_add);
-#else
-   FREE(p->cur_sol.xind);
-   FREE(p->cur_sol.xval);
-#endif   
-   CALL_USER_FUNCTION( user_free_cg(&p->user) );
-   FREE(p);
 }
 
 /*===========================================================================*/
@@ -92,6 +80,20 @@ void find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
 				      p->ub, p->cur_sol.lpetol, num_cuts) );
 
    return;
+}
+
+/*===========================================================================*/
+
+void free_cg_u(cg_prob *p)
+{
+#ifdef COMPILE_IN_CG
+   FREE(p->cuts_to_add);
+#else
+   FREE(p->cur_sol.xind);
+   FREE(p->cur_sol.xval);
+#endif   
+   CALL_USER_FUNCTION( user_free_cg(&p->user) );
+   FREE(p);
 }
 
 /*===========================================================================*/

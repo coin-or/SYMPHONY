@@ -36,7 +36,7 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
 			 int *cand_num, branch_obj ***candidates,
 			 int *action)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -56,7 +56,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 			   int bc_level)
 
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -65,7 +65,7 @@ int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
 			    double ub, double granularity,
 			    int *which_is_better)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -77,7 +77,7 @@ int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
 
 int user_select_child(void *user, double ub, branch_obj *can, char *action)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -90,5 +90,5 @@ int user_select_child(void *user, double ub, branch_obj *can, char *action)
 int user_print_branch_stat(void *user, branch_obj *can, cut_data *cut,
 			   int n, var_desc **vars, char *action)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }

@@ -13,7 +13,7 @@ options and no post-processing.
 % user_receive_cutpool_data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{user\_receive\_cp\_data}
+\firstfuncdef{user\_receive\_cp\_data}
 \label{user_receive_cp_data}
 \begin{verbatim}
 int user_receive_cp_data(void **user)
@@ -44,49 +44,12 @@ description of that function for more details.
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. Cut Pool exits. \\
-{\tt USER\_NO\_PP} & The user received data successfully. \\
+{\tt USER\_ERROR} & Error. Cut pool module exits. \\
+{\tt USER\_SUCCESS} & The user received data successfully. \\
+{\tt USER\_DEFAULT} & The user did not send any data to be received. \\
 \et
 
 \item[Invoked from:] {\tt cp\_initialize} at module start-up.
-
-\ed
-
-\vspace{1ex}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% user_free_cp
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{user\_free\_cp}
-\begin{verbatim}
-int user_free_cp(void **user)
-\end{verbatim}
-
-\bd
-
-\item[Description:] \hfill
-
-The user has to free all the data structures within {\tt user}, and also free
-{\tt user} itself. The user can use the built-in macro {\tt FREE} that checks
-the existence of a pointer before freeing it. 
-
-\item[Arguments:] \hfill
-
-\bt{llp{280pt}}
-{\tt void **user} & INOUT & Pointer to the user-defined data structure
-(should be {\tt NULL} on exit). \\
-\et
-
-\returns
-
-\bt{lp{300pt}}
-{\tt ERROR} & Ignored. \\
-{\tt USER\_NO\_PP} & The user freed all data structures. \\
-\et
-
-\item[Invoked from:] cp\_close() at module shutdown.
 
 \ed
 
@@ -105,11 +68,10 @@ void user_receive_lp_solution_cp(void *user)
 
 \item[Description:] \hfill
 
-This function is invoked only if in the {\tt 
-\htmlref{user\_send\_lp\_solution()}{user_send_lp_solution}}
-function of the LP module the user opted for packing the current LP
-solution herself. Here she must receive the very same data she sent
-there.
+This function is invoked only in the case parallel computation and only if in
+the {\tt \htmlref{user\_send\_lp\_solution()}{user_send_lp_solution}} function
+of the LP module, the user opted for packing the current LP solution in a
+custom format. Here she must receive the data she sent there.
 
 \item[Arguments:] \hfill
 
@@ -120,8 +82,9 @@ there.
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Cuts are not checked for this LP solution. \\
-{\tt USER\_NO\_PP} & The user function exited properly. \\
+{\tt USER\_ERROR} & Cuts are not checked for this LP solution. \\
+{\tt USER\_SUCESS} & The user function executed properly. \\
+{\tt USER\_DEFAULT} & SYMPHONY's default format should be used. \\
 \et
 
 \item[Invoked from:] Whenever an LP solution is received.
@@ -170,8 +133,9 @@ variables. \\
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Cuts are not checked for this LP solution. \\
-{\tt USER\_NO\_PP} & The user is prepared to check cuts. \\
+{\tt USER\_ERROR} & Cuts are not checked for this LP solution. \\
+{\tt USER\_SUCCESS} & The user is prepared to check cuts. \\
+{\tt USER\_DEFAULT} & There are no user-defined cuts in the pool. \\
 \et
 
 \item[Invoked from:] Whenever an LP solution is received.
@@ -220,9 +184,10 @@ strength of the cut.
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Cut is not sent to the LP, regardless of the value of
+{\tt USER\_ERROR} & Cut is not sent to the LP, regardless of the value of
 {\tt *is\_violated}. \\
-{\tt USER\_NO\_PP} & The user function exited properly. \\
+{\tt USER\_SUCCESS} & The user function exited properly. \\
+{\tt USER\_DEFAULT} & Same as error. \\
 \et
 
 \item[Invoked from:] Whenever a cut needs to be checked.
@@ -263,11 +228,50 @@ if he received and stored the LP solution himself he can delete it now.
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Ignored. \\
-{\tt USER\_NO\_PP} & The user function exited properly. \\
+{\tt USER\_ERROR} & Ignored. \\
+{\tt USER\_SUCCESS} & The user function exited properly. \\
+{\tt USER\_DEFAULT} & There are no user-defined cuts in the pool. \\
 \et
 
 \item[Invoked from:] After all cuts have been checked.
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_free_cp
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_free\_cp}
+\begin{verbatim}
+int user_free_cp(void **user)
+\end{verbatim}
+
+\bd
+
+\item[Description:] \hfill
+
+The user has to free all the data structures within {\tt user}, and also free
+{\tt user} itself. The user can use the built-in macro {\tt FREE} that checks
+the existence of a pointer before freeing it. 
+
+\item[Arguments:] \hfill
+
+\bt{llp{280pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined data structure
+(should be {\tt NULL} on exit). \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt USER\_ERROR} & Ignored. \\
+{\tt USER\_SUCCESS} & The user freed all data structures. \\
+{\tt USER\_DEFAULT} & There is nothing to be freed. \\
+\et
+
+\item[Invoked from:] cp\_close() at module shutdown.
 
 \ed
 

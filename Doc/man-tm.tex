@@ -10,7 +10,7 @@
 % user_usage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{user\_usage}
+\firstfuncdef{user\_usage}
 \label{user_usage}
 \begin{verbatim}
 void user_usage()
@@ -62,7 +62,9 @@ data structures for the master module.
 \bt{lp{300pt}}
 {\tt USER\_ERROR} & Error. \BB\ exits. \\
 {\tt USER\_SUCCESS} & Initialization is done. \\
-{\tt USER\_DEFAULT} & Use function not implemented. \\
+{\tt USER\_DEFAULT} & There is no user-defined data structure (this can be the
+case if the default parser is being used to read in either an MPS or GMPL/AMPL
+file. \\
 \et
 
 \ed
@@ -159,7 +161,7 @@ command-line switches to use to specify this behavior).
 \bt{lp{300pt}}
 {\tt USER\_ERROR} & Error. \BB\ stops. \\
 {\tt USER\_SUCCESS} & User I/O was completed successfully. \\
-{\tt USER\_DEFAULT} & Input will be read in from an MPS or GMPL/AMPL file.
+{\tt USER\_DEFAULT} & Input will be read in from an MPS or GMPL/AMPL file. \\
 \et
 
 \ed
@@ -196,7 +198,7 @@ graph, like in the TSP.)
 \bt{lp{300pt}}
 {\tt USER\_ERROR} & Error. \BB\ stops. \\
 {\tt USER\_SUCCESS} & The user completed initialization successfully. \\
-{\tt USER\_DEFAULT} & Function not implemented. \\
+{\tt USER\_DEFAULT} & No action. \\
 \et
 
 \ed
@@ -243,7 +245,7 @@ strategy is used (see the treemanager parameter
 \bt{lp{300pt}}
 {\tt USER\_ERROR} & Error. This error is probably not fatal. \\
 {\tt USER\_SUCCESS} & User executed function successfully. \\
-{\tt USER\_DEFAULT} & User function not implemented (someday, there may be a
+{\tt USER\_DEFAULT} & No action (someday, there may be a
 default MIP heuristic here). \\
 \et
 
@@ -311,7 +313,7 @@ parameters for details on how to set it.
 {\tt USER\_SUCCESS} & The required data are filled in. \\
 {\tt USER\_DEFAULT} & All variables indexed 0 to \texttt{extravarnum} are put 
 in the extra set (The user must set \texttt{extravarnum} unless an MPS or
-GMPL/AMPL file was read in by SYMPHONY. 
+GMPL/AMPL file was read in by SYMPHONY. \\
 \et
 
 \postp
@@ -608,7 +610,7 @@ default format.
 \functiondef{user\_send\_feas\_sol}
 \label{user_send_feas_sol}
 \begin{verbatim}
-int user_process_own_messages(void *user, int *feas_sol_size, int **feas_sol)
+int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 \end{verbatim}
 
 \bd
@@ -640,7 +642,7 @@ manager and must be freed by the user. \\
 \bt{lp{260pt}}
 {\tt USER\_ERROR} & Solution tracing is not enabled. \\
 {\tt USER\_SUCCESS} & Tracing of the given solution is enabled. \\
-{\tt USER\_DEFAULT} & User function not implemented. \\
+{\tt USER\_DEFAULT} & No feasible solution given. \\
 \et
 
 \ed
@@ -676,7 +678,7 @@ in \htmlref{\tt user\_start\_heurs()}{user_start_heurs}.
 \bt{lp{300pt}}
 {\tt USER\_ERROR} & Ignored. \\
 {\tt USER\_SUCCESS} & Message is processed. \\
-{\tt USER\_DEFAULT} & User function not implemented. \\
+{\tt USER\_DEFAULT} & No user message types defined. \\
 \et
 
 \ed
@@ -712,7 +714,7 @@ also free {\tt *user} itself. This can be done using the built-in macro
 \bt{lp{300pt}}
 {\tt USER\_ERROR} & Ignored. This is probably not a fatal error.\\
 {\tt USER\_SUCCESS} & Everything was freed successfully. \\
-{\tt USER\_DEFAULT} & User function not implemented.
+{\tt USER\_DEFAULT} & There is no user memory to free. \\
 \et
 
 \ed

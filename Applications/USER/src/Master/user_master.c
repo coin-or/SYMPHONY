@@ -72,7 +72,7 @@ int user_initialize(void **user)
 
    *user = prob;
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -84,13 +84,15 @@ int user_initialize(void **user)
 
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
+   /* This code is just here as a template for customization. Uncomment to use.*/
+#if 0
    FILE *f;
    char line[50], key[50], value[50], c, tmp;
    int i;
    /* This gives you access to the user data structure*/
    user_problem *prob = (user_problem *) user;
    user_parameters *par = &(prob->par);
-   
+
    if (strcmp(filename, "")){
       if ((f = fopen(filename, "r")) == NULL){
 	 printf("SYMPHONY: file %s can't be opened\n", filename);
@@ -129,8 +131,9 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 	 break;
       };
    }
-
-   return(DEFAULT);
+#endif
+   
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -145,6 +148,8 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
 int user_io(void *user)
 {
+   /* This code is just here as a template for customization. Uncomment to use.*/
+#if 0
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
    user_parameters *par = &(prob->par);
@@ -177,8 +182,9 @@ int user_io(void *user)
    }
 
    fclose(f);
-
-   return(DEFAULT);
+#endif
+   
+   return(USER_DEFAULT);
 }
    
 /*===========================================================================*/
@@ -191,7 +197,7 @@ int user_io(void *user)
 
 int user_start_heurs(void *user, double *ub, double *ub_estimate)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -206,7 +212,7 @@ int user_init_draw_graph(void *user, int dg_id)
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
 
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -239,8 +245,6 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 			      int *basecutnum, int *extravarnum, int **extravars,
 			      char ***colnames, int *colgen_strat)
 {
-
-
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
    int i;
@@ -251,13 +255,18 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 
    /* Set the number of extra variables*/
    varnum = *extravarnum = prob->colnum;
- 
+
+#if 0
+   /* This code is not really needed because this is the default, so it is 
+      commented out and left for illustration. */
+
    /* Put all the variables in the extra set */
    vars = *extravars = (int *) malloc(varnum * ISIZE);
    for (i = 0; i < varnum; i++){
      vars[i] = i;
    }
-
+#endif
+   
    /* Set the number of rows in the initial formulation */
    *basecutnum = prob->rownum;
 
@@ -265,7 +274,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    *basevarnum = 0;
    *basevars  = NULL;
 
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -277,7 +286,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 int user_receive_feasible_solution(void *user, int msgtag, double cost,
 				   int numvars, int *indices, double *values)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -314,7 +323,7 @@ int user_send_lp_data(void *user, void **user_lp)
    /* Here, we send that data using message passing and the rest is
       done in user_receive_lp_data() in the LP process */
 #endif
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -357,7 +366,7 @@ int user_send_cg_data(void *user, void **user_cg)
    /* Send the feasible solution here */
 #endif
 #endif
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -394,7 +403,7 @@ int user_send_cp_data(void *user, void **user_cp)
    /* Here, we send that data using message passing and the rest is
       done in user_receive_cp_data() in the CP process */
 #endif
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -412,7 +421,7 @@ int user_process_own_messages(void *user, int msgtag)
       exit(1);
    }
 
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -428,7 +437,7 @@ int user_process_own_messages(void *user, int msgtag)
 int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 			  double *values, double objval)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
    
 /*===========================================================================*/
@@ -443,7 +452,7 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 #ifdef TRACE_PATH
 
 #endif
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }   
 
 /*===========================================================================*/
@@ -458,7 +467,7 @@ int user_free_master(void **user)
 
    FREE(prob);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 

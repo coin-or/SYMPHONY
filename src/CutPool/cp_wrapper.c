@@ -43,17 +43,19 @@ int receive_cp_data_u(cut_pool *cp)
    r_bufid = receive_msg(cp->master, CP_DATA);
    receive_char_array((char *)&cp->par, sizeof(cp_params));
    switch( user_receive_cp_data(&cp->user) ){
+    case USER_SUCCESS:
     case USER_NO_PP:
+    case USER_AND_PP:
       /* User function terminated without problems. No post-processing. */
+    case USER_DEFAULT:
       freebuf(r_bufid);
-      break;
-    case ERROR:
+      return(TRUE);
+    case USER_ERROR:
     default:
       freebuf(r_bufid);
       /* Unexpected return value. Do something!! */
       return(FALSE);
    }
-   return(TRUE);
 }
 
 /*===========================================================================*/
@@ -73,7 +75,7 @@ int check_cuts_u(cut_pool *cp, lp_sol *cur_sol)
    int cuts_to_check = MIN(cp->cut_num, cp->par.cuts_to_check);
 
    if (user_prepare_to_check_cuts(cp->user, cur_sol->xlength, cur_sol->xind,
-				  cur_sol->xval) == ERROR){
+				  cur_sol->xval) == USER_ERROR){
       return(0);
    }
    
@@ -82,7 +84,7 @@ int check_cuts_u(cut_pool *cp, lp_sol *cur_sol)
     case CHECK_ALL_CUTS: /* check all cuts in the pool */
       for (i = 0, pcp_cut = cp->cuts; i < cuts_to_check; i++, pcp_cut++){
 	 if (check_cut_u(cp, cur_sol, &(*pcp_cut)->cut,
-			 &violated, &quality) == ERROR)
+			 &violated, &quality) == USER_ERROR)
 	    break;
 	 (*pcp_cut)->quality =
 	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
@@ -106,7 +108,7 @@ int check_cuts_u(cut_pool *cp, lp_sol *cur_sol)
 	 if ((*pcp_cut)->level >= cur_sol->xlevel)
 	    continue;
 	 if (check_cut_u(cp, cur_sol, &(*pcp_cut)->cut,
-			 &violated, &quality) == ERROR)
+			 &violated, &quality) == USER_ERROR)
 	    break;
 	 (*pcp_cut)->quality =
 	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
@@ -128,7 +130,7 @@ int check_cuts_u(cut_pool *cp, lp_sol *cur_sol)
 	 if ((*pcp_cut)->touches > cp->par.touches_until_deletion)
 	    continue;
 	 if (check_cut_u(cp, cur_sol, &(*pcp_cut)->cut,
-			 &violated, &quality) == ERROR)
+			 &violated, &quality) == USER_ERROR)
 	    break;
 	 (*pcp_cut)->quality =
 	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
@@ -151,7 +153,7 @@ int check_cuts_u(cut_pool *cp, lp_sol *cur_sol)
 	     (*pcp_cut)->level > cur_sol->xlevel)
 	    continue;
 	 if (check_cut_u(cp, cur_sol, &(*pcp_cut)->cut,
-			 &violated, &quality) == ERROR)
+			 &violated, &quality) == USER_ERROR)
 	    break;
 	 (*pcp_cut)->quality =
 	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/

@@ -75,19 +75,18 @@ The return values for most function are as follows:
 
 \begin{tabular}{lp{310pt}} 
 
-{\tt ERROR} & Error in the user function. Printing an error message is
+{\tt USER\_ERROR} & Error in the user function. Printing an error message is
 the user's responsibility. Depending on the work the user function was
 supposed to do, the error might be ignored (and some default option
 used), or the process aborts. \\
 
-{\tt USER\_AND\_PP} & The user implemented both the user function and
-post-processing (post-processing by \BB\ will be skipped).\\
+{\tt USER\_SUCCESS} & The user function was implemented and executed correctly. \\
 
-{\tt USER\_NO\_PP} & The user implemented the user function only. \\
-
-{\tt DEFAULT} & The default option is going to be used (the default is one of
-the built-in options, \BB\ decides which one to use based on initial parameter
-settings and the execution of the algorithm). \\
+{\tt USER\_DEFAULT} & This option means that the user function was not
+imlemented and that SYMPHONY should either execute a default subroutine (the
+default is one of the built-in options, \BB\ decides which one to use based on
+initial parameter settings and the execution of the algorithm) or else do
+nothing, if execution of the subroutine is optional. \\
 
 {\tt built\_in\_option1 } & \\
 {\tt built\_in\_option2 } ... & The specified built-in option will be used.\\
@@ -97,7 +96,7 @@ settings and the execution of the algorithm). \\
 \begin{itemize}
 \vspace{-3ex}
 
-\item Sometimes an output is optional. This is always be noted in the
+\item Sometimes an output is optional. This is always noted in the
 function descriptions.
 
 \item If an array has to be returned (i.e., the argument is {\tt type
