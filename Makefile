@@ -31,14 +31,14 @@
 ##############################################################################
 # !!!!!!!!! User must set this variable to the proper architecture !!!!!!!!!!!
 #
-# CURRENT OPTIONS: LINUX, RS6K, SUN4SOL2, SUNMP, X86SOL2, ALPHA
+# CURRENT OPTIONS: LINUX, CYGWIN, RS6K, SUN4SOL2, SUNMP, X86SOL2, ALPHA
 #
 # Note that these architecture variable names are the ones used to define
 # the various architectures recognized by the Parallel Virtual Machine (PVM)
 # library. 
 ##############################################################################
 
-ARCH = LINUX
+ARCH = CYGWIN
 
 ##############################################################################
 # If you have PVM installed, this will set the variable ARCH automatically.
@@ -425,6 +425,21 @@ ifeq ($(ARCH),LINUX)
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
 	SYSLIBS = -lpthread #-lefence
+endif
+
+##############################################################################
+# CYGWIN Definitions
+##############################################################################
+
+ifeq ($(ARCH),CYGWIN)
+	SHLINKPREFIX := -Wl,-rpath,
+	X11LIBPATHS = /usr/X11R6/lib
+	ifeq ($(LP_SOLVER),CPLEX)
+	   LPSOLVER_DEFS = -DSYSFREEUNIX
+	endif
+	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
+	SYSLIBS = -lpthread #-lefence
+	LIBTYPE = STATIC #SHARED is not supported on CYGWIN
 endif
 
 ##############################################################################
@@ -854,7 +869,9 @@ MOREFLAGS =
 endif
 
 ifneq ($(USE_SYM_APPL),TRUE)
+ifneq ($(ARCH),CYGWIN)
 MORECFLAGS += -fPIC
+endif
 endif
 
 CFLAGS = $(DEFAULT_FLAGS) $(MORECFLAGS) $(MOREFLAGS)
@@ -1137,7 +1154,7 @@ $(MAIN_OBJ) $(LIBDIR)/$(LIBNAME_TYPE)
 	@echo ""
 	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) $(MAIN_OBJ) \
-	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB)
+	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB) $(MASTERLPLIB)
 	@echo ""
 
 $(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS) $(GMPL_OBJ) 
@@ -1647,4 +1664,4 @@ clean_all : clean clean_gmpl clean_dep clean_user clean_user_dep clean_lib \
 	clean_bin
 	true
 
-.SILENT:
+#.SILENT:
