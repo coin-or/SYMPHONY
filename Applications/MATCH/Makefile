@@ -24,13 +24,13 @@
 # SYMPHONY's home directory
 ##############################################################################
 
-SYMPHONYROOT = ${HOME}/SYMPHONY
+SYMPHONYROOT = ..
 
 ##############################################################################
 # The home directory of the user files (must be an absolute path)
 ##############################################################################
 
-USERROOT = ${SYMPHONYROOT}/MATCH
+USERROOT = .
 
 ##############################################################################
 # The customized name of the master program (if desired)
