@@ -529,6 +529,13 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    network *n;
    double *compcuts;
    int total_edgenum = vertnum*(vertnum - 1)/2;
+   double fixed_cost, variable_cost;
+#ifdef DIRECTED_X_VARS
+   char d_x_vars = TRUE;
+#else
+   char d_x_vars = FALSE;
+#endif
+   
 #ifdef ADD_FLOW_VARS
    int tmp = varnum;
    edge* edge1;
@@ -637,9 +644,41 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 #endif
    }
 
-#if 0
-   construct_feasible_solution(cnrp, n, true_objval);
+   for (i = 0; i < varnum; i++){
+      if (indices[i] < total_edgenum){
+	 fixed_cost += cnrp->costs[indices[i]];
+	 cnrp->cur_sol_tree[i] = indices[i];
+      }
+#ifdef DIRECTED_X_VARS
+      if (indices[i] < 2 * total_edgenum){
+	 fixed_cost += cnrp->costs[indices[i] - total_edgenum];
+	 cnrp->cur_sol_tree[i] = indices[i] - total_edgenum;
+      }
 #endif
+#ifdef ADD_FLOW_VARS
+      if (indices[i] < (2 + d_x_vars) * total_edgenum){
+	 variable_cost +=
+	    cnrp->costs[indices[i] - (1 + d_x_vars) * total_edgenum] * values[i]; 
+      }else if (indices[i] < (3 + d_x_vars) * total_edgenum){
+	 variable_cost +=
+	    cnrp->costs[indices[i] - (2 + d_x_vars) * total_edgenum] * values[i];
+      }
+#endif
+   }
+   
+   if (fixed_cost < cnrp->fixed_cost - lpetol ||
+       variable_cost < cnrp->variable_cost - lpetol){
+      cnrp->variable_cost = variable_cost;
+      cnrp->fixed_cost = fixed_cost;
+      
+      printf("\nSolution Found:\n");
+#ifdef ADD_FLOW_VARS
+      printf("Solution Fixed Cost: %.1f\n", fixed_cost);
+      printf("Solution Variable Cost: %.1f\n", variable_cost);
+#else
+      printf("Solution Cost: %.0f\n", fixed_cost);
+#endif
+   }
    
    free_net(n);
    

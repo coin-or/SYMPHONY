@@ -111,12 +111,14 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    problem *p = get_problem_ptr(FALSE);
 
-   p->par.tm_par.granularity = p->par.lp_par.granularity = .00001;
    p->par.lp_par.problem_type = INTEGER_PROBLEM;
    strcpy(p->par.dg_par.source_path, "/home/tkr/BlackBox/DrawGraph/IGD_1.0/");
    /*___END_EXPERIMENTAL_SECTION___*/
 
    cnrp_readparams(cnrp, filename, argc, argv);
+
+   p->par.tm_par.granularity = p->par.lp_par.granularity =
+      -cnrp->lp_par.gamma + .0001; 
 
    return(USER_SUCCESS);
 }

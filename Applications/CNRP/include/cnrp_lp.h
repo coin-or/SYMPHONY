@@ -96,6 +96,8 @@ typedef struct CNRP_SPEC{
    int           *costs;     /*contains the objective function values*/
    _node         *cur_sol;
    int           *cur_sol_tree;
+   double         variable_cost;
+   double         fixed_cost;
 }cnrp_spec;
 
 /*---------------------------------------------------------------------------*\
