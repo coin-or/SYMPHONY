@@ -1989,11 +1989,11 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
       }
    }
 
-   env->mip->row_matbeg = (int *) malloc(ISIZE * (env->mip->m + 1));
-   env->mip->row_matval = (double *) malloc(DSIZE*env->mip->matbeg[env->mip->n]);
-   env->mip->row_matind = (int *)    malloc(ISIZE*env->mip->matbeg[env->mip->n]);
+   env->mip->collen = (int *) malloc(ISIZE * env->mip->n);
+   env->mip->row_matbeg =(int *) malloc(ISIZE * (env->mip->m + 1));
+   env->mip->row_matval =(double *)malloc(DSIZE*env->mip->matbeg[env->mip->n]);
+   env->mip->row_matind =(int *)   malloc(ISIZE*env->mip->matbeg[env->mip->n]);
    env->mip->row_lengths = (int *) malloc(ISIZE*env->mip->m);
-   env->mip->col_lengths = (int *) malloc(ISIZE * env->mip->n);
 
    nonzeros = 0;
    for(i = 0; i < env->mip->m; i++){
@@ -2013,7 +2013,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
    }
 
    for(j = 0; j < env->mip->n; j++){
-     env->mip->col_lengths[j] = env->mip->matbeg[j+1] - env->mip->matbeg[j];
+     env->mip->collen[j] = env->mip->matbeg[j+1] - env->mip->matbeg[j];
    }
       
    /* Start up the graphics window*/

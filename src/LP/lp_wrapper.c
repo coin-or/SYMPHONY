@@ -274,6 +274,9 @@ int create_subproblem_u(lp_prob *p)
       lp_data->mip->matbeg  = (int *) malloc((lp_data->mip->n + 1) * ISIZE);
       lp_data->mip->matind  = (int *) malloc((lp_data->mip->nz) * ISIZE);
       lp_data->mip->matval  = (double *) malloc((lp_data->mip->nz) * DSIZE);
+      if (p->par.do_primal_heuristic){
+	 lp_data->mip->collen  = (int *) malloc(lp_data->mip->n * ISIZE);
+      }
       lp_data->mip->obj     = (double *) malloc(lp_data->mip->n * DSIZE);
       lp_data->mip->ub      = (double *) malloc(lp_data->mip->n * DSIZE);
       lp_data->mip->lb      = (double *) calloc(lp_data->mip->n, DSIZE); 
@@ -319,6 +322,10 @@ int create_subproblem_u(lp_prob *p)
 	    lp_data->mip->obj[i] = p->mip->obj[userind[i]];
 	 }
 	 lp_data->mip->matbeg[i+1] = j;
+      }
+      for(j = 0; j < env->mip->n; j++){
+	 lp_data->mip->collen[j] = lp_data->mip->matbeg[j+1] -
+	    lp_data->mip->matbeg[j];
       }
       lp_data->mip->nz = j;
       for (i = 0; i < p->mip->m; i++){

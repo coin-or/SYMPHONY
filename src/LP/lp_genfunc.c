@@ -1130,7 +1130,7 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
   const double * element = p->mip->matval;
   const int * row = p->mip->matind;
   const CoinBigIndex * columnStart = p->mip->matbeg;
-  const int * columnLength = p->mip->col_lengths;
+  const int * columnLength = p->mip->collen;
 
   // Row copy
   const double * elementByRow = p->mip->row_matval;
@@ -1451,7 +1451,7 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
   const double * element = p->mip->matval;
   const int * row = p->mip->matind;
   const CoinBigIndex * columnStart = p->mip->matbeg;
-  int * columnLength = p->mip->col_lengths;
+  int * columnLength = p->mip->collen;
 
   // Get solution array for heuristic solution
   double * newSolution = new double [numberColumns];

@@ -76,7 +76,7 @@ void free_mip_desc(MIPdesc *mip)
    FREE(mip->matbeg);
    FREE(mip->matind);
    FREE(mip->matval);
-   FREE(mip->col_lengths);
+   FREE(mip->collen);
    FREE(mip->row_matbeg);
    FREE(mip->row_matind);
    FREE(mip->row_matval);
@@ -398,7 +398,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    mip->matbeg = (int *)    calloc(ISIZE, (mip->n + 1));
    mip->matval = (double *) malloc(DSIZE * mip->nz);
    mip->matind = (int *)    malloc(ISIZE * mip->nz);
-   mip->col_lengths = (int *) malloc(ISIZE * mip->n);
+   mip->collen = (int *) malloc(ISIZE * mip->n);
    mip->row_lengths = (int *) malloc(ISIZE * mip->m);
 
 #if 0
@@ -430,7 +430,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	 }
       } 
       mip->matbeg[j+1] = nonzeros;
-      mip->col_lengths[j] = mip->matbeg[j+1] - mip->matbeg[j];
+      mip->collen[j] = mip->matbeg[j+1] - mip->matbeg[j];
    }
 
    mip->row_matbeg = matbeg;
@@ -2974,7 +2974,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    
    mip->matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
    mip->matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
-   mip->col_lengths = (int *) malloc(ISIZE*mip->n);
+   mip->collen = (int *) malloc(ISIZE*mip->n);
    
    memcpy(mip->matval, const_cast<double *> (matrixByCol->getElements()),
 	  DSIZE * mip->matbeg[mip->n]);  
@@ -2983,7 +2983,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
-      mip->col_lengths[j] = mip->matbeg[j+1]-mip->matbeg[j];
+      mip->collen[j] = mip->matbeg[j+1]-mip->matbeg[j];
    }
 
 

@@ -378,8 +378,8 @@ typedef struct MIPDESC{
    int       *matbeg;      /* n */
    int       *matind;      /* nz */
    double    *matval;      /* nz */
-   int       *col_lengths;   
-   int       *row_matbeg;      /* m */  /* a row ordered description for heuristics */
+   int       *collen;   
+   int       *row_matbeg;      /* m */  /* a row ordered desc for heuristics */
    int       *row_matind;      /* nz */
    double    *row_matval;      /* nz */
    int       *row_lengths;  

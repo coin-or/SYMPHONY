@@ -908,11 +908,12 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
    double lim[8] = {.1, .2, .25, .3, .333333, .366667, .4, 1};
 
    /* first get the fractional values */
-   for (i = lp_data->n-1; i >= 0; i--)
+   for (i = lp_data->n-1; i >= 0; i--){
       if (x[i] > lpetol && x[i] < lpetol1){
 	 xind[cnt] = i;
 	 xval[cnt++] = 1 - x[i];
       }
+   }
    qsortucb_di(xval, xind, cnt);
 
    for (j=0, i=0; i<cnt; i++){
