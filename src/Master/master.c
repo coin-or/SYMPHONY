@@ -1989,7 +1989,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
       }
    }
 
-   if (p->par.do_primal_heuristic){
+   if (env->par.lp_par.do_primal_heuristic){
       env->mip->collen = (int *) malloc(ISIZE * env->mip->n);
       env->mip->row_matbeg = (int *) malloc(ISIZE * (env->mip->m + 1));
       env->mip->row_matval =
