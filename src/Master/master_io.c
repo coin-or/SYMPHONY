@@ -420,17 +420,53 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	 env->par.do_branch_and_cut = FALSE;
 	 break;
        case 'u':
-	 sscanf(argv[++i], "%lf", &env->ub);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%lf", &env->ub)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 env->has_ub = TRUE;
 	 break;
        case 'p':
-	 sscanf(argv[++i], "%i", &tm_par->max_active_nodes);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &tm_par->max_active_nodes)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'n':
-	 sscanf(argv[++i], "%i", &tm_par->node_selection_rule);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &tm_par->node_selection_rule)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'v':
-	 sscanf(argv[++i], "%i", &env->par.verbosity);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &env->par.verbosity)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
 	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
@@ -440,39 +476,141 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	    cp_par->verbosity = env->par.verbosity;
  	 break;
        case 's':
-	 sscanf(argv[++i], "%i",
-		&lp_par->strong_branching_cand_num_max);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i",
+		&lp_par->strong_branching_cand_num_max)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 lp_par->strong_branching_cand_num_min =
 	    lp_par->strong_branching_cand_num_max;
 	 lp_par->strong_branching_red_ratio = 0;
 	 break;
        case 'c':
-	 sscanf(argv[++i], "%i", &lp_par->compare_candidates_default);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &lp_par->compare_candidates_default)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'k':
-	 sscanf(argv[++i], "%i", &lp_par->select_child_default);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &lp_par->select_child_default)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'm':
-	 sscanf(argv[++i], "%i", &lp_par->max_cut_num_per_iter);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &lp_par->max_cut_num_per_iter)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'e':
-	 sscanf(argv[++i], "%i", &tm_par->max_cp_num);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &tm_par->max_cp_num)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'l':
-	 sscanf(argv[++i], "%i", &lp_par->load_balance_level);
-	 sscanf(argv[++i], "%i", &lp_par->load_balance_iterations);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &lp_par->load_balance_level)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &lp_par->load_balance_iterations)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'i':
-	 sscanf(argv[++i], "%i", &lp_par->max_presolve_iter);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &lp_par->max_presolve_iter)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'f':
-	 strncpy(env->par.param_file, argv[++i], MAX_FILE_NAME_LENGTH);
+	 if (i < argc - 1){
+	    if (!strncpy(env->par.param_file, argv[i], MAX_FILE_NAME_LENGTH)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'j':
-	 sscanf(argv[++i], "%i", &lp_par->cgl.generate_cgl_cuts);
+       if (i < argc - 1){
+	    if (!sscanf(argv[i], "%i", &lp_par->cgl.generate_cgl_cuts)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'z':
-	 sscanf(argv[++i], "%lf", &tm_par->diving_threshold);
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i], "%lf", &tm_par->diving_threshold)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 break;
+       default:
+	 printf("Warning: Ignoring unrecognized command-line switch -%c\n", c);
 	 break;
       };
    }
