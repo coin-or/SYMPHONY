@@ -126,7 +126,7 @@ LP_SOLVER = NONE
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSL)
-       LPINCDIR = /usr/local/include/
+       LPSINCDIR = /usr/local/include/
        LPLIBPATHS = /home/tkr/src/osllib/lib
        LPLIB = -losl
 endif
@@ -139,7 +139,7 @@ endif
 #LP_SOLVER = CPLEX
 
 ifeq ($(LP_SOLVER),CPLEX)
-       LPINCDIR = /usr/local/include/
+       LPSINCDIR = /usr/local/include/
        LPLIBPATHS = /usr/local/lib/
        LPLIB = -lcplex
 endif
@@ -158,42 +158,42 @@ ifeq ($(LP_SOLVER),OSI)
        LPLIBPATHS = $(COINROOT)/lib
        LPLIB = -lCoin -lOsi
 ifeq ($(OSI_INTERFACE),CPLEX)
-       LPINCDIR += /usr/local/include/
+       LPSINCDIR = /usr/local/include
        LPLIBPATHS += /usr/local/lib/
        LPLIB += -lOsiCpx -lcplex
 endif
 ifeq ($(OSI_INTERFACE),OSL)
-       LPINCDIR += $(HOME)/OSL/osllib/include
+       LPSINCDIR += $(HOME)/OSL/osllib/include
        LPLIBPATHS += $(HOME)/OSL/osllib/lib
        LPLIB += -lOsiOsl -losl
 endif
 ifeq ($(OSI_INTERFACE),CLP)
-       LPINCDIR += 
+       LPSINCDIR += 
        LPLIBPATHS +=
        LPLIB += -lOsiClp -lClp
 endif
 ifeq ($(OSI_INTERFACE),XPRESS)
-       LPINCDIR += 
+       LPSINCDIR += 
        LPLIBPATHS +=
        LPLIB += -lOsiXpr
 endif
 ifeq ($(OSI_INTERFACE),SOPLEX)
-       LPINCDIR += ${HOME}/include
+       LPSINCDIR += ${HOME}/include
        LPLIBPATHS += ${HOME}/lib
        LPLIB += -lOsiSpx -lsoplex.linux.x86.gnu.opt
 endif
 ifeq ($(OSI_INTERFACE),VOL)
-       LPINCDIR += 
+       LPSINCDIR += 
        LPLIBPATHS +=
        LPLIB += -lOsiVol
 endif
 ifeq ($(OSI_INTERFACE),DYLP)
-       LPINCDIR += ${HOME}/include
+       LPSINCDIR += ${HOME}/include
        LPLIBPATHS += ${HOME}/lib
        LPLIB += -lOsiDylp -lOsiDylpSolver -ldylpstd
 endif
 ifeq ($(OSI_INTERFACE),GLPK)
-       LPINCDIR += ${HOME}/src/glpk-4.7/include
+       LPSINCDIR += ${HOME}/src/glpk-4.7/include
        LPLIBPATHS += ${HOME}/src/glpk-4.7/src
        LPLIB += -lOsiGlpk -lglpk
 endif
@@ -558,7 +558,9 @@ SYM_COMPILE_IN_CP = $(COMPILE_IN_CP)
 SYM_COMPILE_IN_LP = $(COMPILE_IN_LP)
 SYM_COMPILE_IN_TM = $(COMPILE_IN_TM)
 else
+ifneq ($(SYM_EXAMPLE), TRUE)
 SYMPHONYROOT = $(PWD)
+endif
 endif
 
 ifneq ($(USE_SYM_APPL),TRUE)
@@ -600,6 +602,10 @@ endif
 USER_OBJDIR  = $(USERBUILDDIR)/objects/$(ARCH)/$(CONFIG)/
 DEPDIR       = $(SYMBUILDDIR)/dep/$(ARCH)
 USER_DEPDIR  = $(USERBUILDDIR)/dep/$(ARCH)
+
+ifeq ($(SYM_EXAMPLE), TRUE)
+EXAMPLE_OBJDIR = $(SYMPHONYROOT)/Examples/objects/$(ARCH)
+endif
 
 ifeq ($(USE_GLPMPL), TRUE)
 GMPLINCDIR   = $(SYMPHONYROOT)/src/GMPL
@@ -662,7 +668,8 @@ VPATH  = $(SRCDIR):$(USER_SRCDIR)
 LIBPATHS      = $(LIBDIR) $(X11LIBPATHS) $(COMMLIBPATHS) $(LPLIBPATHS) \
 		$(OSISYM_LIBPATH)
 LIBPATHS     += $(USERLIBPATHS)
-INCPATHS      = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR) $(OSISYM_INCDIR)
+INCPATHS      = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR) $(LPSINCDIR)\
+		$(OSISYM_INCDIR)
 
 EXTRAINCDIR   = $(addprefix -I,${INCPATHS})
 LDFLAGS       = $(addprefix -L,${LIBPATHS})
@@ -1011,6 +1018,11 @@ $(GMPL_OBJDIR)/%.o : %.c
 	@echo Compiling $*.c
 	gcc -DHAVE_LIBM=1 -DSTDC_HEADERS=1 -I$(GMPLINCDIR) -g -o2 -c $< -o $@
 
+$(EXAMPLE_OBJDIR)/%.o : %.c
+	mkdir -p $(EXAMPLE_OBJDIR)
+	@echo Compiling $*.c
+	$(CC) $(CFLAGS) $(EFENCE_LD_OPTIONS) -c $< -o $@
+
 $(DEPDIR)/%.d : %.c
 	mkdir -p $(DEPDIR)
 	@echo Creating dependency $*.d
@@ -1069,6 +1081,44 @@ WHATTOMAKE += tmlib tm
 PWHATTOMAKE += ptm
 QWHATTOMAKE += qtm
 endif
+
+
+ifeq ($(LP_SOLVER), OSI)
+WHATTOMAKE += coin
+
+ifeq ($(OSI_INTERFACE), CPLEX)
+LPSDIR = OsiCpx
+LPSINCDIR = CpxIncDir
+else 
+ifeq ($(OSI_INTERFACE), CLP)
+WHATTOMAKE += coin_clp
+LPSDIR = OsiClp
+LPSINCDIR = ClpIncDir
+endif
+ifeq ($(OSI_INTERFACE), OSL)
+LPSDIR = OsiOsl
+LPSINCDIR = OslIncDir
+endif
+ifeq ($(OSI_INTERFACE), GLPK)
+LPSDIR = OsiGlpk
+LPSINCDIR = GlpkIncDir
+endif
+ifeq ($(OSI_INTERFACE), XPRESS)
+LPSDIR = OsiXpr
+LPSINCDIR = XprIncDir
+endif
+endif
+
+endif
+
+ifeq ($(USE_CGL_CUTS), TRUE)
+WHATTOMAKE += cgl
+endif
+
+ifeq ($(USE_OSI_INTERFACE), TRUE)
+WHATTOMAKE += osisym
+endif
+
 
 WHATTOMAKE += masterlib master
 PWHATTOMAKE += pmaster
@@ -1670,6 +1720,74 @@ $(BINDIR)/ccg : $(USER_CG_DEP) $(USER_CG_OBJS) $(LIBDIR)/libcg.a
 
 ###############################################################################
 ##############################################################################
+# Example targets
+###############################################################################
+##############################################################################
+
+milp : masterlib $(EXAMPLE_OBJDIR)/milp.o
+	@echo ""
+	@echo "Linking $(notdir $@) ..."
+	@echo ""
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/milp.o \
+	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB)
+	@echo ""
+
+bicriteria : masterlib $(EXAMPLE_OBJDIR)/bicriteria.o
+	@echo ""
+	@echo "Linking $(notdir $@) ..."
+	@echo ""
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/bicriteria.o \
+	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB)
+	@echo ""
+
+sensitivity : masterlib $(EXAMPLE_OBJDIR)/sensitivity.o
+	@echo ""
+	@echo "Linking $(notdir $@) ..."
+	@echo ""
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/sensitivity.o \
+	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB)
+	@echo ""
+
+warm_start1 : masterlib $(EXAMPLE_OBJDIR)/warm_start1.o
+	@echo ""
+	@echo "Linking $(notdir $@) ..."
+	@echo ""
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/warm_start1.o \
+	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB)
+	@echo ""
+
+warm_start2 : masterlib $(EXAMPLE_OBJDIR)/warm_start2.o
+	@echo ""
+	@echo "Linking $(notdir $@) ..."
+	@echo ""
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/warm_start2.o \
+	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB)
+	@echo ""
+
+###############################################################################
+##############################################################################
+# COIN targets
+###############################################################################
+##############################################################################
+
+coin:
+	(cd $(COINROOT)/Coin && $(MAKE) && cd -)
+	(cd $(COINROOT)/Osi  && $(MAKE) SOLVERLIBS=  && cd -)
+	(cd $(COINROOT)/Osi/$(LPSDIR) && \
+	$(MAKE) $(LPSINCDIR)=$(LPSINCDIR) && cd -)
+
+coin_clp:
+	(cd $(COINROOT)/Clp && $(MAKE) && cd -)
+
+cgl:
+	(cd $(COINROOT)/Cgl && $(MAKE) && cd -)
+
+osisym:
+	(cd $(COINROOT)/Osi/OsiSym && \
+	$(MAKE) SymIncDir=$(SYMPHONYROOT)/include && cd -)
+
+###############################################################################
+##############################################################################
 # Special targets
 ##############################################################################
 ##############################################################################
@@ -1683,6 +1801,9 @@ clean :
 clean_gmpl :
 	rm -rf $(GMPL_OBJDIR)
 
+clean_example :
+	rm -rf $(EXAMPLE_OBJDIR)
+	rm -rf $(EXAMPLES)
 clean_user :
 	rm -rf $(USER_OBJDIR)
 
@@ -1699,8 +1820,8 @@ clean_lib :
 clean_bin :
 	rm -rf $(BINDIR)
 
-clean_all : clean clean_gmpl clean_dep clean_user clean_user_dep clean_lib \
-	clean_bin
+clean_all : clean clean_gmpl clean_example clean_dep clean_user clean_user_dep\
+	clean_lib clean_bin
 	true
 
 .SILENT:
