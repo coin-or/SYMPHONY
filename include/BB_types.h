@@ -32,6 +32,8 @@
 typedef struct LP_SOL{
    int            lp;          /* the tid of the lp process asssociated with
 				  the current solution */
+   int            has_sol;     /* indicates whether a feasible solution 
+				  found*/
    int            xlength;     /* the number of nonzeros in the lp solution
 				  currently being processed*/
    int            xlevel;      /* the level at which the current solution was
