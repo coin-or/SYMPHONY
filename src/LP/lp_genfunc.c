@@ -290,11 +290,17 @@ void fathom_branch(lp_prob *p)
        case D_ITLIM:      /* impossible, since itlim is set to infinity */
        case D_INFEASIBLE: /* this is impossible (?) as of now */
        case ABANDONED:
-	 printf("######## Unexpected termcode: %i ########\n\n", termcode);
+	 printf("######## Unexpected termcode: %i \n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
+	    printf("######## Trying to recover by resolving from scratch...\n",
+		   termcode);
+	    
 	    continue;
 	 }else{
+	    printf("######## Recovery failed. %s%s",
+		   "LP solver is having numerical difficulties :(.\n",
+		   "######## Dumping current LP to MPS file and exiting.\n\n");
 	    char name[50] = "";
 	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
 	    write_mps(lp_data, name);
@@ -304,6 +310,10 @@ void fathom_branch(lp_prob *p)
        case D_UNBOUNDED: /* the primal problem is infeasible */
        case D_OBJLIM:
        case OPTIMAL:
+	 if (num_errors == 1){
+	    printf("######## Recovery succeeded! Continuing with node...\n\n");
+	    num_errors = 0;
+	 }
 	 if (termcode == D_UNBOUNDED){
 	    PRINT(p->par.verbosity, 1, ("Feasibility lost -- "));
 	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity)

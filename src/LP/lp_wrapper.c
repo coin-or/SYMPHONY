@@ -287,21 +287,9 @@ int create_lp_u(lp_prob *p)
       maxn = p->lp_desc->n;
       maxnz = p->lp_desc->nz;
 
-      break;
+      /* Fall through to next case */
 
-    case ERROR:
-       
-      /* Error. The search tree node will not be processed. */
-      FREE(userind);
-      return(FALSE);
-      
     case USER_AND_PP:
-       
-      /* User function terminated without problems. User did everything
-	 that is done at case USER_NO_PP. (which is adding the constraints
-	 and setting maxm, maxn, maxnz) */
-      break;
-
     case USER_NO_PP:
        
       /* User function terminated without problems. In the post-processing
@@ -312,6 +300,12 @@ int create_lp_u(lp_prob *p)
       lp_data->m = p->base.cutnum;
       break;
 
+    case ERROR:
+       
+      /* Error. The search tree node will not be processed. */
+      FREE(userind);
+      return(FALSE);
+      
     default:
        
       /* Unexpected return value. Do something!! */
@@ -382,7 +376,7 @@ int create_lp_u(lp_prob *p)
    /* Free the user's description */
    free_lp_desc(lp_data->desc);
 
-   if (desc->cutind.size > 0 && user_res == USER_NO_PP){
+   if (desc->cutind.size > 0){
       unpack_cuts_u(p, CUT_FROM_TM, UNPACK_CUTS_SINGLE,
 		    desc->cutind.size, desc->cuts, &new_row_num, &new_rows);
       add_row_set(p, new_rows, new_row_num);

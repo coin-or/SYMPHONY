@@ -2594,11 +2594,11 @@ void write_sav(LPdata *lp_data, char *fname)
 /*===========================================================================*/
 
 #ifdef USE_CGL_CUTS
-int generate_cgl_cuts(LPdata * lp_data, cut_data ***cuts){
+int generate_cgl_cuts(LPdata *lp_data, cut_data ***cuts){
 
    OsiCuts cutlist;
    OsiRowCut cut;
-   int i, num_elements;
+   int i, j = 0, num_elements;
    int *indices;
    double *elements;
 
@@ -2610,28 +2610,33 @@ int generate_cgl_cuts(LPdata * lp_data, cut_data ***cuts){
    }
 
    /* create CGL gomory cuts */
-   CglGomory * gomory = new CglGomory;
+   CglGomory *gomory = new CglGomory;
    gomory->generateCuts(*(lp_data->si), cutlist);
+   printf("%i\n", cutlist.sizeRowCuts());
    
    /* create CGL knapsack cuts */
-   CglKnapsackCover * knapsack = new CglKnapsackCover;
+   CglKnapsackCover *knapsack = new CglKnapsackCover;
    knapsack->generateCuts(*(lp_data->si), cutlist);
+   printf("%i\n", cutlist.sizeRowCuts());
    
+   /* create CGL odd hole cuts */
+   CglOddHole *oddhole = new CglOddHole;
+   oddhole->generateCuts(*(lp_data->si), cutlist);
+   printf("%i\n", cutlist.sizeRowCuts());
+   
+   /* create CGL probing cuts */
+   CglProbing *probe = new CglProbing;
+   probe->generateCuts(*(lp_data->si), cutlist);
+   printf("%i\n", cutlist.sizeRowCuts());
+
+#if 0
    /* create CGL simple rounding cuts */
    CglSimpleRounding * rounding = new CglSimpleRounding;
    rounding->generateCuts(*(lp_data->si), cutlist);
+   printf("%i\n", cutlist.sizeRowCuts());
    
-   /* create CGL odd hole cuts */
-   CglOddHole * oddhole = new CglOddHole;
-   oddhole->generateCuts(*(lp_data->si), cutlist);
-   
-   /* create CGL probing cuts */
-   CglProbing * probe = new CglProbing;
-   probe->generateCuts(*(lp_data->si), cutlist);
-
-#if 0
    /* create CGL liftandproject cuts (currently buggy) */     
-   CglLiftAndProject * liftandproject = new CglLiftAndProject;
+   CglLiftAndProject *liftandproject = new CglLiftAndProject;
    liftandproject->generateCuts(*(lp_data->si), cutlist);
 #endif
    
@@ -2640,36 +2645,38 @@ int generate_cgl_cuts(LPdata * lp_data, cut_data ***cuts){
 
    if (cutlist.sizeRowCuts() > 0){
       *cuts = (cut_data **) malloc(cutlist.sizeRowCuts() * sizeof(cut_data));
-      for (i = 0; i < cutlist.sizeRowCuts(); i++){
+      for (i = 0, j = 0; i < cutlist.sizeRowCuts(); i++){
 	 cut = cutlist.rowCut(i);
-	 (*cuts)[i] = (cut_data *) calloc(1, sizeof(cut_data));
+	 (*cuts)[j] = (cut_data *) calloc(1, sizeof(cut_data));
 	 num_elements = cut.row().getNumElements();
 	 indices = const_cast<int *> (cut.row().getIndices());
 	 elements = const_cast<double *> (cut.row().getElements());
-	 (*cuts)[i]->type = EXPLICIT_ROW;
-	 (*cuts)[i]->sense = cut.sense();
-	 (*cuts)[i]->rhs = cut.rhs();
-	 (*cuts)[i]->range = cut.range();
-	 (*cuts)[i]->size = ISIZE + num_elements * (ISIZE + DSIZE);
-	 (*cuts)[i]->coef = (char *) malloc ((*cuts)[i]->size);
-	 ((int *) ((*cuts)[i]->coef))[0] = num_elements;
-	 memcpy((*cuts)[i]->coef + ISIZE, (char *)indices, num_elements*ISIZE);
-	 memcpy((*cuts)[i]->coef + (num_elements + 1) * ISIZE,
+	 (*cuts)[j]->type = EXPLICIT_ROW;
+	 if (((*cuts)[j]->sense = cut.sense()) == 'R'){
+	    continue; /* This must be a bug. */
+	 }
+	 (*cuts)[j]->rhs = cut.rhs();
+	 (*cuts)[j]->range = cut.range();
+	 (*cuts)[j]->size = ISIZE + num_elements * (ISIZE + DSIZE);
+	 (*cuts)[j]->coef = (char *) malloc ((*cuts)[j]->size);
+	 ((int *) ((*cuts)[j]->coef))[0] = num_elements;
+	 memcpy((*cuts)[j]->coef + ISIZE, (char *)indices, num_elements*ISIZE);
+	 memcpy((*cuts)[j]->coef + (num_elements + 1) * ISIZE,
 		(char *)elements, num_elements * DSIZE);
-	 (*cuts)[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
-	 (*cuts)[i]->deletable = TRUE;
-	 (*cuts)[i]->name = CUT__DO_NOT_SEND_TO_CP;
+	 (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+	 (*cuts)[j]->deletable = TRUE;
+	 (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
       }
    }
    
    delete gomory;
    delete knapsack;
-   delete rounding;
    delete oddhole;
    delete probe;
+   /* delete rounding; */
    /* delete liftandproject; */
 
-   return (cutlist.sizeRowCuts());
+   return (j);
 }
 #endif
 
