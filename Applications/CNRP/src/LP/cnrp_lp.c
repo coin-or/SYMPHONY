@@ -269,7 +269,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 mip->ub[i]        = 1.0;
 	 mip->matbeg[i]    = j;
 #ifdef FIND_NONDOMINATED_SOLUTIONS
-	 mip->obj[i]       = 0.0;
+	 mip->obj[i]       = cnrp->par.rho*((double) costs[indices[i]]);
 	 mip->matval[j]    = cnrp->par.gamma*((double) costs[indices[i]]);
 	 mip->matind[j++]  = basecutnum;
 #else
@@ -318,7 +318,8 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 mip->ub[i]        = 1.0;
 	 mip->matbeg[i]    = j;
 #ifdef FIND_NONDOMINATED_SOLUTIONS
-	 mip->obj[i]       = 0.0;
+	 mip->obj[i]       = cnrp->par.rho*((double) costs[indices[i] -
+							  total_edgenum]);
 	 mip->matval[j]    = cnrp->par.gamma*((double) costs[indices[i] -
 							    total_edgenum]);
 	 mip->matind[j++]  = basecutnum;
@@ -359,7 +360,8 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 mip->ub[i] = flow_capacity - (v0 ? cnrp->demand[v0] : 0);
 	 mip->matbeg[i]    = j;
 #ifdef FIND_NONDOMINATED_SOLUTIONS
-	 mip->obj[i]       = 0.0;
+	 mip->obj[i]       = cnrp->par.rho*((double) costs[indices[i] -
+					(1+d_x_vars)*total_edgenum]);
 	 mip->matval[j]    = cnrp->par.tau*((double) costs[indices[i]-
 					(1+d_x_vars)*total_edgenum]);
 	 mip->matind[j++]  = basecutnum + 1;
@@ -396,7 +398,8 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 mip->ub[i] = flow_capacity - cnrp->demand[v1];
 	 mip->matbeg[i]    = j;
 #ifdef FIND_NONDOMINATED_SOLUTIONS
-	 mip->obj[i]       = 0.0;
+	 mip->obj[i]       = cnrp->par.rho*((double) costs[indices[i] -
+					(2+d_x_vars)*total_edgenum]);
 	 mip->matval[j]    = cnrp->par.tau*((double) costs[indices[i]-
 					(2+d_x_vars)*total_edgenum]);
 	 mip->matind[j++]  = basecutnum + 1;

@@ -32,6 +32,7 @@ typedef struct CNRP_LP_PARAMS{
    int    strong_branching_red_ratio;
    double gamma; /*Determines the fixed cost*/
    double tau;   /*Determines the variable cost*/
+   double rho;
 }cnrp_lp_params;
 
 #endif

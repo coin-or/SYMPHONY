@@ -667,7 +667,7 @@ void cnrp_readparams(cnrp_problem *cnrp, char *filename, int argc, char **argv)
    lp_par->child_compar_obj_tol = .01;
    lp_par->gamma = 1; /*Determines the fixed cost*/
    lp_par->tau = 0;   /*Determines the variable cost*/
-
+   lp_par->rho = .001;
    cg_par->verbosity = 0;
    cg_par->do_greedy = TRUE;
    cg_par->greedy_num_trials = 5;
@@ -819,6 +819,9 @@ void cnrp_readparams(cnrp_problem *cnrp, char *filename, int argc, char **argv)
       else if (strcmp(key, "tau") == 0){
 	 READ_DBL_PAR(lp_par->tau);
 	 cg_par->tau = lp_par->tau;
+      }
+      else if (strcmp(key, "rho") == 0){
+	 READ_DBL_PAR(lp_par->rho);
       }
 
       /************************* cutgen parameters ***************************/
