@@ -147,3 +147,5 @@ mv $app-$VER $DIR
 end
 scp $DIR/*.zip $DIR/*.tgz branchandcut@branchandcut.org:www/SYMPHONY/Download/
 scp $DIR/Doc/*.zip $DIR/Doc/*.tgz $DIR/Doc/*.pdf $DIR/Doc/*.ps branchandcut@branchandcut.org:anonftp/pub/reference/
+ssh branchandcut@branchandcut.org chmod a+r www/SYMPHONY/Download/*
+ssh branchandcut@branchandcut.org chmod a+r anonftp/pub/reference/*
