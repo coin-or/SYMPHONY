@@ -997,6 +997,7 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 
 int receive_lp_timing(tm_prob *tm)
 {
+   char something_died = FALSE;
 #ifndef COMPILE_IN_LP
    int i, r_bufid = 0, msgtag, bytes, sender;
    node_times tim;
@@ -1006,7 +1007,6 @@ int receive_lp_timing(tm_prob *tm)
    double start_node = tm->comp_times.start_node;
    int lp, cp;
    bc_node *node;
-   char something_died = FALSE;
    
    memset(&tm->comp_times, 0, sizeof(node_times));
    tm->comp_times.ramp_up_tm = ramp_up_tm;
