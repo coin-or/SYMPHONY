@@ -86,8 +86,8 @@ int match_read_data(user_problem *prob, char *infile)
 
 int match_load_problem(sym_environment *env, user_problem *prob){
    
-   int i, j, index, n, m, nz, *matbeg, *matind;
-   double *matval, *lb, *ub, *obj, *rhs, *rngval;
+   int i, j, index, n, m, nz, *column_starts, *matrix_indices;
+   double *matrix_values, *lb, *ub, *obj, *rhs, *rngval;
    char *sense, *is_int;
    
    /* set up the inital LP data */
@@ -96,16 +96,16 @@ int match_load_problem(sym_environment *env, user_problem *prob){
    nz = 2 * n;
 
    /* Allocate the arrays */
-   matbeg  = (int *) malloc((n + 1) * ISIZE);
-   matind  = (int *) malloc((nz) * ISIZE);
-   matval  = (double *) malloc((nz) * DSIZE);
-   obj     = (double *) malloc(n * DSIZE);
-   lb      = (double *) calloc(n, DSIZE);
-   ub      = (double *) malloc(n * DSIZE);
-   rhs     = (double *) malloc(m * DSIZE);
-   sense   = (char *) malloc(m * CSIZE);
-   rngval  = (double *) calloc(m, DSIZE);
-   is_int  = (char *) malloc(n * CSIZE);
+   column_starts  = (int *) malloc((n + 1) * ISIZE);
+   matrix_indices = (int *) malloc((nz) * ISIZE);
+   matrix_values  = (double *) malloc((nz) * DSIZE);
+   obj            = (double *) malloc(n * DSIZE);
+   lb             = (double *) calloc(n, DSIZE);
+   ub             = (double *) malloc(n * DSIZE);
+   rhs            = (double *) malloc(m * DSIZE);
+   sense          = (char *) malloc(m * CSIZE);
+   rngval         = (double *) calloc(m, DSIZE);
+   is_int         = (char *) malloc(n * CSIZE);
    
    /* Fill out the appropriate data structures -- each column has
       exactly two entries */
@@ -118,16 +118,16 @@ int match_load_problem(sym_environment *env, user_problem *prob){
 	 prob->index[i][j] = prob->index[j][i] = index;
 	 obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
 	 is_int[index] = TRUE;
-	 matbeg[index] = 2*index;
-	 matval[2*index] = 1;
-	 matval[2*index+1] = 1;
-	 matind[2*index] = i;
-	 matind[2*index+1] = j;
+	 column_starts[index] = 2*index;
+	 matrix_values[2*index] = 1;
+	 matrix_values[2*index+1] = 1;
+	 matrix_indices[2*index] = i;
+	 matrix_indices[2*index+1] = j;
 	 ub[index] = 1.0;
 	 index++;
       }
    }
-   matbeg[n] = 2 * n;
+   column_starts[n] = 2 * n;
    
    /* set the initial right hand side */
    for (i = 0; i < m; i++) {
@@ -136,12 +136,13 @@ int match_load_problem(sym_environment *env, user_problem *prob){
    }
    
    /* Load the problem to SYMPHONY */   
-   sym_explicit_load_problem(env, n, m, matbeg, matind, matval, lb, ub, 
-			     is_int, obj, 0, sense, rhs, rngval, true);
+   sym_explicit_load_problem(env, n, m, column_starts, matrix_indices,
+			     matrix_values, lb, ub, is_int, obj, 0, sense, rhs,
+			     rngval, true);
 			     
-   FREE(matbeg);
-   FREE(matind);
-   FREE(matval);
+   FREE(column_starts);
+   FREE(matrix_indices);
+   FREE(matrix_values);
    FREE(lb);
    FREE(ub);
    FREE(obj);

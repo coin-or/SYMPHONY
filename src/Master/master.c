@@ -613,12 +613,7 @@ int sym_solve(sym_environment *env)
    \*------------------------------------------------------------------------*/
 
    if (env->par.tm_par.node_selection_rule == BEST_FIRST_SEARCH){
-      switch (env->mip->obj_sense){
-       case SYM_MAXIMIZE:
-	  env->par.tm_par.node_selection_rule = HIGHEST_LP_FIRST;
-       case SYM_MINIMIZE:
-	  env->par.tm_par.node_selection_rule = LOWEST_LP_FIRST;
-      }
+      env->par.tm_par.node_selection_rule = LOWEST_LP_FIRST;
    }
    
    env->tm = tm = (tm_prob *) calloc(1, sizeof(tm_prob));
