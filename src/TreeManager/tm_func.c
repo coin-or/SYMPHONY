@@ -1217,10 +1217,12 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 child->feasibility_status = OVER_UB_PRUNED;	   
 
 	 if (feasible[i]){
-	    if(!tm->par.sensitivity_analysis){ 
+	    if(!tm->par.sensitivity_analysis){
+#if 0
 	       child->sol_size = tm->rootnode->desc.uind.size;
 	       child->sol = bobj->solutions[i];
 	       bobj->solutions[i] = 0;
+#endif
 	    }
 	    child->feasibility_status = FEASIBLE_PRUNED;	   	    
 	 }

@@ -781,9 +781,11 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    bobj->solutions = (double **) calloc(bobj->child_num, sizeof(double *));
    for (i = 0; i < bobj->child_num; i++){
       if (feasible[i]){
+#if 0
 	 bobj->solutions[i] = (double *)
 	    malloc(DSIZE*tm->rootnode->desc.uind.size); 
 	 receive_dbl_array(bobj->solutions[i], tm->rootnode->desc.uind.size);
+#endif
       }
    }
    receive_char_array(action, bobj->child_num);
