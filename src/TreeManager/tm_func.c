@@ -297,7 +297,7 @@ int solve(tm_prob *tm)
    int termcode = 0, i;
    double start_time = tm->start_time;
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
-   char no_work = TRUE, ramp_up = TRUE;
+   char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
    double timeout2 = 600, timeout3 = tm->par.logging_interval, timeout4 = 10;
    struct timeval timeout = {5, 0};
@@ -339,10 +339,6 @@ int solve(tm_prob *tm)
 		((tm->has_ub && (tm->par.gap_limit >= 0.0)) ?
 		 fabs(100*(tm->ub-tm->lb)/tm->ub) > tm->par.gap_limit : TRUE)
 		&& !(tm->par.find_first_feasible && tm->has_ub)){
-	    if (no_work == FALSE){
-	       no_work       = TRUE;
-	       no_work_start = wall_clock(NULL);
-	    }
 #pragma omp critical (tree_update)
 	    i = tm->samephase_candnum > 0 ? start_node(tm, thread_num) :
 	                                    NEW_NODE__NONE;
@@ -352,15 +348,17 @@ int solve(tm_prob *tm)
 	    if (ramp_up){
 	       ramp_up_tm += (wall_clock(NULL) -
 				no_work_start) * (tm->lp.free_num + 1);
-	    }else{
+	    }
+	    if (ramp_down){
 	       ramp_down_time += (wall_clock(NULL) -
 				  no_work_start) * (tm->lp.free_num + 1);
 	    }
 	       
 	    if (!tm->lp.free_num){
-	       no_work = FALSE;
+	       ramp_down = FALSE;
 	       ramp_up = FALSE;
 	    }else{
+	       ramp_down = TRUE;
 	       no_work_start = wall_clock(NULL);
 	    }
 #ifdef COMPILE_IN_LP
