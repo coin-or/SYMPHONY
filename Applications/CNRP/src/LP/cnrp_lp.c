@@ -754,7 +754,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
   char *clique_array, first_coeff_found, second_coeff_found, third_coeff_found;
   char d_x_vars;
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
-  int  numroutes, numarcs, *arcs;
+  int  numarcs, *arcs;
   char *coef2;
 #endif
   *new_row_num = cutnum;
@@ -931,12 +931,11 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	matind = (int *) malloc(varnum * ISIZE);
 	matval = (double *) malloc(varnum*DSIZE);
 	demand = ((double *)coef)[0];
-	numroutes = ((int *)(coef + DSIZE))[0];
-	numarcs = ((int *)(coef + DSIZE + ISIZE))[0];
+	numarcs = ((int *)(coef + DSIZE))[0];
 	/* Array of the nodes in the set S */
-	coef2 = coef + DSIZE + 2*ISIZE;
+	coef2 = coef + DSIZE + ISIZE;
 	/* Array of the arcs in the set C */
-	arcs = (int *) (coef + DSIZE + 2*ISIZE + (vertnum >> DELETE_POWER)+1); 
+	arcs = (int *) (coef + DSIZE + ISIZE + (vertnum >> DELETE_POWER)+1); 
 	for (i = 0, nzcnt = 0; i < varnum; i++){
 	   if (vars[i]->userind < 2*total_edgenum){
 	      if (vars[i]->userind >= total_edgenum){
@@ -956,7 +955,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		 }
 		 if (k == numarcs){
 		    matind[nzcnt] = i;
-		    matval[nzcnt++] = demand;
+		    matval[nzcnt++] = MIN(cnrp->capacity, demand);
 		 }
 	      }
 	   }else{
@@ -977,7 +976,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		 }
 		 if (k < numarcs){
 		    matind[nzcnt] = i;
-		    matval[nzcnt++] = (double) numroutes;
+		    matval[nzcnt++] = 1.0;
 		 }
 	      }
 	   }
@@ -1478,7 +1477,7 @@ int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
 			     var_desc **vars, double *x,
 			     int *new_row_num, cut_data ***cuts)
 {
-   return(DO_NOT_GENERATE_CGL_CUTS);
+   return(GENERATE_CGL_CUTS);
 }
 
 /*===========================================================================*/

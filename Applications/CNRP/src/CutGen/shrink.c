@@ -358,10 +358,10 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
    double min_val, tmp_cut_val;
    int max_size, numarcs, *arcs;
    
-   max_size = DSIZE + 2*ISIZE + (vertnum >> DELETE_POWER) + 1
+   max_size = DSIZE + ISIZE + (vertnum >> DELETE_POWER) + 1
       + vertnum*vertnum*ISIZE/4;
    new_cut->coef = (char *) (calloc(max_size, sizeof(char)));
-   coef = new_cut->coef + DSIZE + 2 * ISIZE;
+   coef = new_cut->coef + DSIZE + ISIZE;
    arcs = (int *) (coef + (vertnum >> DELETE_POWER) + 1);
    
    *in_set = 0;
@@ -375,7 +375,7 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
       in which a vertex is listed in  compmembers */
    
    for (cur_comp = 1; cur_comp <= compnum;
-	begin += compnodes[cur_comp], cur_comp++)  /* for every component */
+	begin += compnodes[cur_comp], cur_comp++){  /* for every component */
       for (i = begin, end = begin + compnodes[cur_comp]; i < end; i++){
 	 if (compmembers[i] == 0) continue;
 	 /* for every node as a starting one */
@@ -388,16 +388,16 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 	 set_cut_val = 0;
 	 for (e = verts[compmembers[i]].first; e; e = e->next_edge){
 	    if (e->other_end < compmembers[i]){
-	       set_cut_val += MIN(BINS(set_demand, capacity)*e->data->flow1,
-				  set_demand*e->data->weight1);
+	       set_cut_val += MIN(e->data->flow1,
+				  MIN(set_demand, capacity)*e->data->weight1);
 	    }else{
-	       set_cut_val += MIN(BINS(set_demand, capacity)*e->data->flow2,
-				  set_demand*e->data->weight2);
+	       set_cut_val += MIN(e->data->flow2,
+				  MIN(set_demand, capacity)*e->data->weight2);
 	    }
 	 }
 	 
 	 while(TRUE){ 
-	    if (set_cut_val + etol < BINS(set_demand, capacity)*set_demand){
+	    if (set_cut_val + etol < set_demand){
 	       memset(coef, 0, ((vertnum >> DELETE_POWER) + 1)*sizeof(char));
 	       numarcs = 0;
 	       for (j = begin; j < end; j++){
@@ -408,7 +408,7 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 			if (e->other_end < compmembers[j]){
 			   if (!in_set[ref[e->other_end]] &&
 			       set_demand*e->data->weight1 >
-			       BINS(set_demand, capacity)*e->data->flow1+etol){
+			       e->data->flow1+etol){
 			      arcs[numarcs << 1] = e->other_end;
 			      arcs[(numarcs << 1) + 1] = compmembers[j];
 			      numarcs++;
@@ -416,7 +416,7 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 			}else{
 			   if (!in_set[ref[e->other_end]] &&
 			       set_demand*e->data->weight2 >
-			       BINS(set_demand, capacity)*e->data->flow2+etol){
+			       e->data->flow2+etol){
 			      arcs[numarcs << 1] = e->other_end;
 			      arcs[(numarcs << 1) + 1] = compmembers[j];
 			      numarcs++;
@@ -426,12 +426,11 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 		  }
 	       }
 	       ((double *)(new_cut->coef))[0] = set_demand;
-	       ((int *)(new_cut->coef+DSIZE))[0] = BINS(set_demand, capacity);
-	       ((int *)(new_cut->coef+DSIZE))[1] = numarcs;
-	       new_cut->size = DSIZE + 2*ISIZE + (vertnum >> DELETE_POWER)
+	       ((int *)(new_cut->coef + DSIZE))[0] = numarcs;
+	       new_cut->size = DSIZE + ISIZE + (vertnum >> DELETE_POWER)
 		  + 1 + 2 * numarcs * ISIZE;
 	       new_cut->type = MIXED_DICUT;
-	       new_cut->rhs = set_demand* BINS(set_demand, capacity);
+	       new_cut->rhs = set_demand;
 	       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
 	       num_cuts += cg_send_cut(new_cut);
 	       if (num_cuts > max_num_cuts){
@@ -447,22 +446,22 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 		     if (in_set[ref[e->other_end]]){
 			if (compmembers[j] < e->other_end){
 			   tmp_cut_val -=
-			      MIN(BINS(set_demand, capacity)*e->data->flow1,
-				  set_demand*e->data->weight1);
+			      MIN(e->data->flow1,
+				  MIN(set_demand, capacity)*e->data->weight1);
 			}else{
 			   tmp_cut_val -=
-			      MIN(BINS(set_demand, capacity)*e->data->flow2,
-				  set_demand*e->data->weight2);
+			      MIN(e->data->flow2,
+				  MIN(set_demand, capacity)*e->data->weight2);
 			}
 		     }else{
 			if (compmembers[j] < e->other_end){
 			   tmp_cut_val +=
-			      MIN(BINS(set_demand, capacity)*e->data->flow2,
-				  set_demand*e->data->weight2);
+			      MIN(e->data->flow2,
+				  MIN(set_demand, capacity)*e->data->weight2);
 			}else{
 			   tmp_cut_val +=
-			      MIN(BINS(set_demand, capacity)*e->data->flow1,
-				  set_demand*e->data->weight1);
+			      MIN(e->data->flow1,
+				  MIN(set_demand, capacity)*e->data->weight1);
 			}
 		     }
 		  }
@@ -484,6 +483,7 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 	    }
 	 }   
       }
+   }
    FREE(new_cut->coef);
    return(num_cuts);
 }

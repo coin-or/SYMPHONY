@@ -295,7 +295,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }      
 #endif
    
-#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) 
+#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
    if (cnrp->par.generate_cap_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
@@ -675,7 +675,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
    
    if (num_cuts < 10 && cnrp->par.do_greedy){
-#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
+#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) && 0
       greedy_shrinking1_dicut(n, capacity, etol,
 			      cnrp->par.max_num_cuts_in_shrink,
 			      new_cut, compnodes_copy, compmembers, comp_num,
