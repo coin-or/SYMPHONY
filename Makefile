@@ -78,8 +78,7 @@ USERROOT = $(ROOT)/Vrp
 ##############################################################################
 ##############################################################################
 #You must define an LP solver in order to use the software. However, by
-#default, this option is set to "NONE," which allows the software to be
-#compiled, but not run.
+#default, this option is set to "NONE," which results in an error.
 ##############################################################################
 ##############################################################################
 

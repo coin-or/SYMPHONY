@@ -57,21 +57,20 @@ None
 Here is a sketch outline of how to get started with SYMPHONY in Unix. These
 instructions will lead you through the steps required to compile the sample
 application, a VRP and TSP solver. For information on developing your own
-applications, please see the user's manual. Because SYMPHONY is intended to
+applications, a quick start guide is provided below and more detailed
+information is available in the user's manual. Because SYMPHONY is intended to
 run over nonhomogeneous networks of workstations, installation is not fully
 automated, but requires the user to make minor edits to the Makefile.  With
 this setup, compilation for multiple architectures and configurations can be
-done in a single directory without reconfiguring or "cleaning". This is
+performed in a single directory without reconfiguring or "cleaning". This is
 convenient on nonhomogeneous networks, but it means that you might need to
-know a little about your computing environment in order to make SYMPHONY
-compile. For the casual user, this is limited to editing providing some path
-names. There may be some complaints from the compiler because of missing
-function prototypes, etc.
+edit the Makefile to get SYMPHONY to compile. For the casual user, this
+editing is limited to providing some path names. 
 
-For more information about how to use the SYMPHONY VRP solver, see the file
-SYMPHONY-3.0.1/Vrp/README. 
+For more information about how to use the SYMPHONY VRP/TSP solver after
+compilation, see the file SYMPHONY-3.0.1/Vrp/README.
 
-GETTING STARTED
+PREPARING FOR COMPILATION
 
 1. Download the file SYMPHONY-3.0.1.tgz.
 
@@ -187,14 +186,14 @@ user manual for help.
 *         COMPILING THE SAMPLE APPLICATION (Microsoft Windows)                *
 *******************************************************************************
 
-Here is a sketch outline of how to get started with \BB\ in Windows. These
-instructions will lead you through the steps required to compile the sample
-application, a VRP and TSP solver. For information on developing your own
-applications, please see the user's manual. Direct support is provided for
-compilation under MS Visual Studio 6.0. Compilation for other compilers should
-also be possible. Note that the windows version has some limitations. Detailed
-timing information is not currently provided.  Support is only provided for
-running in sequential mode at this time.
+Here is a sketch outline of how to compile the sample application, a VRP and
+TSP solver, in Microsoft Windows. For information on developing your own
+applications, please see the quick strat guide below or the detailed
+explanation in the user's manual. Direct support is provided for compilation
+under MS Visual Studio 6.0. Compilation for other compilers should also be
+possible. Note that the Windows version has some limitations. Detailed timing
+information is not currently provided.  Support is only provided for running
+in sequential mode at this time.
 
 1. Download SYMPHONY-3.0.1.zip and unzip the archive. This will create a
 subdirectory called SYMPHONY-3.0.1/ containing all the source files.
@@ -204,7 +203,8 @@ Note that there are two projects, one called "symphony" and one called "vrp".
 The symphony project compiles the source of the internal library. The vrp
 project compiles a separate library containing the user-defined functions
 needed for the VRP solver. Note that to develop a solver of your own, you
-would replace the VRP library with one of your own.
+would replace the VRP library with one of your own. A template for doing so is
+provided (see the quick start guide below).
 
 3. By default, SYMPHONY is set up to use CPLEX 8.1 installed in a folder
 called "C:\ILOG\CPLEX81". To use a different LP solver or to specify a
