@@ -23,7 +23,7 @@
 # SYMPHONY's home directory
 ##############################################################################
 
-SYMPHONYROOT = ..
+SYMPHONYROOT = ../..
 
 ##############################################################################
 # The home directory of the user files (must be an absolute path)
@@ -204,8 +204,8 @@ HEURS_SRC    += $(TIME_SRC) $(PVMERR_SRC) heur_main.c
 HEURS_OBJS    = $(addprefix $(USER_OBJDIR)/,$(notdir $(HEURS_SRC:.c=.o)))
 HEURS_DEP     = $(addprefix $(USER_DEPDIR)/,$(notdir $(HEURS_SRC:.c=.d)))
 
-USER_SRCDIR   = $(USERROOT)/Heuristics
-USER_SRCDIR  += $(USERROOT)/Master/Heuristics
+USER_SRCDIR   = $(USERROOT)/src/Heuristics
+USER_SRCDIR  += $(USERROOT)/src/Master/Heuristics
 
 USER_INCDIR  += -I$(USERROOT)/include/heurs
 
@@ -264,6 +264,18 @@ endif
 ##############################################################################
 
 USE_SYM_APPL = TRUE
+
+##############################################################################
+# If you want to build SYMPHONY in a directory outside the source tree, 
+# uncomment this and fill in the directory here. Setting these variables will 
+# cause object, library, and binary files associated with SYMPHONY and the 
+# user's application to be built and installed in the corresponding 
+# directories. This is helpful if the user doesn't have write access to the 
+# directory where SYMPHONY is installed.
+##############################################################################
+
+SYMBUILDDIR = $(SYMPHONYROOT)
+USERBUILDDIR = $(USERROOT)
 
 ##############################################################################
 # Include the SYMPHONY makefile after all the source file names (and before

@@ -23,7 +23,7 @@
 # SYMPHONY's home directory
 ##############################################################################
 
-SYMPHONYROOT = ..
+SYMPHONYROOT = ../..
 
 ##############################################################################
 # The home directory of the user files (must be an absolute path)
@@ -98,7 +98,7 @@ USE_SYM_APPL = TRUE
 # directory where SYMPHONY is installed.
 ##############################################################################
 
-SYMBUILDDIR = $(SYMPHONYROOT) 
+SYMBUILDDIR = $(SYMPHONYROOT)
 USERBUILDDIR = $(USERROOT)
 
 ##############################################################################

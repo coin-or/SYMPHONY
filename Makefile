@@ -555,8 +555,10 @@ else
 SYMPHONYROOT = $(PWD)
 endif
 
+ifneq ($(USE_SYM_APPL),TRUE)
 ifeq ($(SYMBUILDDIR),)
 SYMBUILDDIR = $(SYMPHONYROOT)
+endif
 endif
 
 ifeq ($(SYM_COMPILE_IN_TM),TRUE)
@@ -594,9 +596,9 @@ DEPDIR       = $(SYMBUILDDIR)/dep/$(ARCH)
 USER_DEPDIR  = $(USERBUILDDIR)/dep/$(ARCH)
 
 ifeq ($(USE_GLPMPL), TRUE)
-GMPLINCDIR   = $(SYMPHONYROOT)/GMPL
+GMPLINCDIR   = $(SYMPHONYROOT)/src/GMPL
 LPINCDIR    += $(GMPLINCDIR)
-GMPL_OBJDIR  = $(SYMBUILDDIR)/GMPL/objects/$(ARCH)
+GMPL_OBJDIR  = $(SYMBUILDDIR)/src/GMPL/objects/$(ARCH)
 endif
 
 ifeq ($(LP_SOLVER),OSI)
@@ -622,26 +624,26 @@ endif
 endif
 
 SRCDIR  = \
-	$(SYMPHONYROOT)/Common      :\
-	$(SYMPHONYROOT)/LP          :\
-	$(SYMPHONYROOT)/CutGen      :\
-	$(SYMPHONYROOT)/CutPool     :\
-	$(SYMPHONYROOT)/SolPool     :\
-	$(SYMPHONYROOT)/DrawGraph   :\
-	$(SYMPHONYROOT)/Master      :\
+	$(SYMPHONYROOT)/src/Common      :\
+	$(SYMPHONYROOT)/src/LP          :\
+	$(SYMPHONYROOT)/src/CutGen      :\
+	$(SYMPHONYROOT)/src/CutPool     :\
+	$(SYMPHONYROOT)/src/SolPool     :\
+	$(SYMPHONYROOT)/src/DrawGraph   :\
+	$(SYMPHONYROOT)/src/Master      :\
 	$(SYMPHONYROOT)/include     :\
 	$(SYMPHONYROOT)             :\
-	$(SYMPHONYROOT)/TreeManager :\
-	$(SYMPHONYROOT)/GMPL
+	$(SYMPHONYROOT)/src/TreeManager :\
+	$(SYMPHONYROOT)/src/GMPL
 
 USER_SRCDIR += \
-	$(USERROOT)/Common    :\
-	$(USERROOT)/LP        :\
-	$(USERROOT)/CutGen    :\
-	$(USERROOT)/CutPool   :\
-	$(USERROOT)/SolPool   :\
-	$(USERROOT)/DrawGraph :\
-	$(USERROOT)/Master    :\
+	$(USERROOT)/src/Common    :\
+	$(USERROOT)/src/LP        :\
+	$(USERROOT)/src/CutGen    :\
+	$(USERROOT)/src/CutPool   :\
+	$(USERROOT)/src/SolPool   :\
+	$(USERROOT)/src/DrawGraph :\
+	$(USERROOT)/src/Master    :\
 	$(USERROOT)/include   :\
 	$(USERROOT)           
 

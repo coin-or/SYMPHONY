@@ -19,12 +19,12 @@ CC = g++
 OPT = -g
 ARCH = LINUX
 
-SYMPHONYROOT = ..
-COINROOT = ../..
+SYMPHONYROOT = ../..
+COINROOT = ../../..
 MCKPROOT = .
 
 LP_SOLVER = OSI
-OSI_INTERFACE = CPLEX
+OSI_INTERFACE = CLP
 
 LPINCDIR = $(SYMPHONYROOT)/include
 LPLIB = -lsym
@@ -32,21 +32,21 @@ LPLIB = -lsym
 ifeq ($(LP_SOLVER),CPLEX)
        LPINCDIR += /usr/local/include/
        LPLIBPATHS = /usr/local/lib/ 
-       LPLIBPATHS += $(SYMPHONYROOT)/lib.${ARCH}/$(LP_SOLVER)
+       LPLIBPATHS += $(SYMPHONYROOT)/lib/${ARCH}/$(LP_SOLVER)
        LPLIB += -lcplex -lpthread
 endif
 
 ifeq ($(LP_SOLVER),OSL)
        LPINCDIR +=  $(HOME)/OSL/osllib/include/
        LPLIBPATHS = $(HOME)/OSL/osllib/lib
-       LPLIBPATHS += $(SYMPHONYROOT)/lib.${ARCH}/$(LP_SOLVER)
+       LPLIBPATHS += $(SYMPHONYROOT)/lib/${ARCH}/$(LP_SOLVER)
        LPLIB += -losl
 endif
 
 ifeq ($(LP_SOLVER),OSI)
        LPINCDIR += $(COINROOT)/include
        LPLIBPATHS += $(COINROOT)/lib
-       LPLIBPATHS += $(SYMPHONYROOT)/lib.${ARCH}/$(LP_SOLVER)_$(OSI_INTERFACE)
+       LPLIBPATHS += $(SYMPHONYROOT)/lib/${ARCH}/$(LP_SOLVER)_$(OSI_INTERFACE)
        LPLIB += -lCoin -lOsi -lCgl
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPINCDIR += /usr/local/include/

@@ -23,13 +23,13 @@
 # SYMPHONY's home directory
 ##############################################################################
 
-SYMPHONYROOT = ${HOME}/COIN/SYMPHONY
+SYMPHONYROOT = ../..
 
 ##############################################################################
 # The home directory of the user files (must be an absolute path)
 ##############################################################################
 
-USERROOT = ${SYMPHONYROOT}/CNRP
+USERROOT = .
 
 ##############################################################################
 # The customized name of the master program (if desired)
@@ -222,6 +222,18 @@ endif
 ##############################################################################
 
 USE_SYM_APPL = TRUE
+
+##############################################################################
+# If you want to build SYMPHONY in a directory outside the source tree, 
+# uncomment this and fill in the directory here. Setting these variables will 
+# cause object, library, and binary files associated with SYMPHONY and the 
+# user's application to be built and installed in the corresponding 
+# directories. This is helpful if the user doesn't have write access to the 
+# directory where SYMPHONY is installed.
+##############################################################################
+
+SYMBUILDDIR = $(SYMPHONYROOT)
+USERBUILDDIR = $(USERROOT)
 
 ##############################################################################
 # Include the SYMPHONY makefile after all the source file names (and before
