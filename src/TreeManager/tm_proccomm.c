@@ -839,8 +839,8 @@ char process_messages(tm_prob *tm, int r_bufid)
 	    tm->has_ub = TRUE;
 	    tm->ub = tm->best_sol.objval;
 	 }
-	 break;
 	 tm->best_sol.has_sol = TRUE;
+	 break;
 #endif
 	 
        case UPPER_BOUND:

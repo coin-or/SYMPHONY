@@ -160,7 +160,8 @@ int process_message(lp_prob *p, int r_bufid, int *pindex, int *pitnum)
       return(FALSE);
 
     case YOU_CAN_DIE:
-#if defined(COMPILE_IN_TM) && !defined(COMPILE_IN_LP)     
+#if defined(COMPILE_IN_TM) && !defined(COMPILE_IN_LP) && 0
+      /* This is not needed anymore */
       send_feasible_solution_u(p, p->best_sol.xlevel, p->best_sol.xindex,
 			       p->best_sol.xiter_num, p->best_sol.lpetol,
 			       p->best_sol.objval, p->best_sol.xlength,

@@ -85,7 +85,7 @@ sym_environment *sym_open_environment()
    
    printf("\n");
    printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 5.0                      *\n");
+   printf("*   This is SYMPHONY Version 5.1alpha                 *\n");
    printf("*   Copyright 2000-2005 Ted Ralphs                    *\n");
    printf("*   All Rights Reserved.                              *\n");
    printf("*   Distributed under the Common Public License 1.0   *\n");
@@ -985,7 +985,8 @@ int sym_solve(sym_environment *env)
    }
 
    
-#ifndef COMPILE_IN_LP
+#if !defined(COMPILE_IN_LP) && 0
+   /* This is not needed anymore */
    if (termcode != SOMETHING_DIED){
       do{
 	 r_bufid = receive_msg(ANYONE, ANYTHING);
