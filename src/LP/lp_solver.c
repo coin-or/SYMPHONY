@@ -1407,7 +1407,11 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }
 
    term = CPXgetstat(lp_data->cpxenv,lp_data->lp);
+#if defined (__CPLEX80__) || defined (__CPLEX81__)
+   if (term == CPX_STAT_INFEASIBLE){
+#else
    if (term == CPX_INFEASIBLE){
+#endif
       /* Dual infeas. This is impossible, so we must have had iteration
        * limit AND bound shifting AND dual feasibility not restored within
        * the given iteration limit. */
@@ -1437,6 +1441,16 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       CPX_check_error("refactorize - CPXsetintparam, ITLIM");
    }
 
+#if defined (__CPLEX80__) || defined (__CPLEX81__)
+   switch (real_term = CPXgetstat(lp_data->cpxenv,lp_data->lp)){
+    case CPX_STAT_OPTIMAL:                        term = OPTIMAL; break;
+    case CPX_STAT_INFEASIBLE:                     term = D_INFEASIBLE; break;
+    case CPX_STAT_UNBOUNDED:                      term = D_UNBOUNDED; break;
+    case CPX_ABORT_OBJ_LIM:                       term = D_OBJLIM; break;
+    case CPX_ABORT_IT_LIM:                        term = D_ITLIM; break;
+    default:                                      term = ABANDONED; break;
+   }
+#else
    switch (real_term = CPXgetstat(lp_data->cpxenv,lp_data->lp)){
     case CPX_OPTIMAL:                             term = OPTIMAL; break;
     case CPX_INFEASIBLE:                          term = D_INFEASIBLE; break;
@@ -1445,6 +1459,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
     case CPX_IT_LIM_FEAS: case CPX_IT_LIM_INFEAS: term = D_ITLIM; break;
     default:                                      term = ABANDONED; break;
    }
+#endif
 
    lp_data->termcode = term;
 
