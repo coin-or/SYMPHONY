@@ -110,13 +110,6 @@ ifeq ($(MULTI_CRITERIA),TRUE)
 USER_BB_DEFINES += -DMULTI_CRITERIA
 endif
 
-ifeq ($(DO_CONCORDE_CUTS),TRUE)
-USER_BB_DEFINES += -DDO_TSP_CUTS
-CONCORDE_ROOT = $(USERROOT)/Tsp
-USERLIBS = -lconcorde
-USERLDFLAGS = -L${HOME}/lib
-endif
-
 ifeq ($(ADD_FLOW_VARS),TRUE)
 USER_BB_DEFINES += -DADD_FLOW_VARS
 ifeq ($(ADD_CAP_CUTS),TRUE)
@@ -167,7 +160,7 @@ endif
 USER_LP_SRC       = cnrp_lp_branch.c cnrp_lp.c 
 USER_LP_SRC      += $(MACROS_SRC) $(NET_SRC) $(DG_FUNC_SRC)
 ifeq ($(COMPILE_IN_CG),TRUE)
-USER_LP_SRC      += cnrp_cg.c biconnected.c shrink.c 
+USER_LP_SRC      += cnrp_cg.c biconnected.c shrink.c
 endif
 
 USER_CG_SRC       = cnrp_cg.c biconnected.c 
@@ -206,13 +199,12 @@ USER_INCDIR       =
 ##############################################################################
 
 ifeq ($(DO_CONCORDE_CUTS),TRUE)
-
 USER_BB_DEFINES += -DDO_TSP_CUTS
 #USER_BB_DEFINES += -DCC_ONE_ENV
 CONCORDE_ROOT = $(HOME)/concorde/
-USERLIBS = -lconcorde -lcplex
-USERLIBPATHS  = ${HOME}/lib /usr/local/cplex81/lib/i86_linux2_glibc2.2_gcc3.0/static_pic_mt/
-USER_INCDIR += -I$(CONCORDE_ROOT)/INCLUDE -I/usr/local/cplex81/include/ilcplex/
+USERLIBS = -lconcorde -lqsopt
+USERLIBPATHS  = ${HOME}/lib
+USER_INCDIR += -I${HOME}/include 
 
 ifeq ($(COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += tsp.c # $(TSP_SRC)

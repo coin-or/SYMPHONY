@@ -25,8 +25,10 @@
 
 /* CNRP include files */
 #include "cnrp_cg.h"
-#include "tsp.h"
 #include "network.h"
+extern "C"{
+#include "concorde.h"
+}
 
 int add_tsp_cuts PROTO((CCtsp_lpcut_in **tsp_cuts, int *cutnum, int vertnum,
 			char tsp_prob, cut_data ***cuts, int *num_cuts,
