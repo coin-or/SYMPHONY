@@ -23,8 +23,10 @@
 #include "messages.h"
 #include "cg.h"
 #include "cg_u.h"
+#ifdef USE_CGL_CUTS
 #include "lp_solver.h" /* For CGL cut generation */
 #include "lp.h" /* for free_cuts() */
+#endif
 
 /*===========================================================================*/
 
@@ -110,9 +112,9 @@ void find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
 				      p->ub, p->cur_sol.lpetol, num_cuts) );
 #endif
 
-#ifdef GENERIC_CUTS
+#ifdef USE_CGL_CUTS
    
-   if ((explicit_num_cuts = generate_cuts(lp_data, &cuts)) > 0){
+   if ((explicit_num_cuts = generate_cgl_cuts(lp_data, &cuts)) > 0){
       for (i = 0; i < explicit_num_cuts; i++){
 	 cg_send_cut(cuts[i]);
       }

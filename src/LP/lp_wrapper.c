@@ -1377,7 +1377,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 {
    LPdata *lp_data = p->lp_data;
    int user_res;
-   int i, j, k, l, nzcnt, explicit_row_num = 0;
+   int i, j, k, l, nzcnt, real_nzcnt, explicit_row_num = 0;
    int *matbeg, *matind;
    double *matval;
    waiting_row **row_list;
@@ -1393,23 +1393,24 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
       switch (cuts[i]->type){
 	 
       case EXPLICIT_ROW:
-	 row_list[explicit_row_num] = (waiting_row *) malloc(sizeof(waiting_row));
+	 row_list[explicit_row_num] =
+	    (waiting_row *) malloc(sizeof(waiting_row));
 	 row_list[explicit_row_num]->cut = cuts[i];
 	 nzcnt = ((int *) (cuts[i]->coef))[0];
 	 matind = ((int *) (cuts[i]->coef)) + 1;
 	 matval = ((double *) (cuts[i]->coef)) + 1 + nzcnt * ISIZE;
 	 row_list[explicit_row_num]->matind = (int *) malloc(nzcnt * ISIZE);
 	 row_list[explicit_row_num]->matval = (double *) malloc(nzcnt * DSIZE);
-	 nzcnt = 0;
+	 real_nzcnt = 0;
 	 for (j = 0; j < lp_data->n; j++){
 	    for (k = 0; k < nzcnt; k++){
 	       if (matind[k] == lp_data->vars[j]->userind){
-		  row_list[explicit_row_num]->matind[nzcnt] = j;
-		  row_list[explicit_row_num]->matval[nzcnt++] = matval[k];
+		  row_list[explicit_row_num]->matind[real_nzcnt] = j;
+		  row_list[explicit_row_num]->matval[real_nzcnt++] = matval[k];
 	       }
 	    }
 	 }
-	 row_list[explicit_row_num++]->nzcnt = nzcnt;
+	 row_list[explicit_row_num++]->nzcnt = real_nzcnt;
 	 break;
 
       default: /* A user cut type */
@@ -1451,12 +1452,17 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
       break;
 
     case ERROR: /* Error. ??? what will happen ??? */
+      *new_row_num = 0;
+      FREE(new_rows);
+
+      break;
        
     default: /* No builtin possibility. Counts as ERROR. */
-      return;
+      break;
    }
 
    free_cuts(cuts, cut_num);
+
 }
 
 /*===========================================================================*/
@@ -1739,13 +1745,9 @@ void generate_cuts_in_lp_u(lp_prob *p)
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
       if (cg_new_row_num){
-	 if (user_unpack_cuts(p->user, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
-			      lp_data->n, lp_data->vars,
-			      p->cgp->cuts_to_add_num, p->cgp->cuts_to_add,
-			      &cg_new_row_num, &cg_new_rows) == ERROR){
-	    cg_new_row_num = 0;
-	    FREE(cg_new_rows);
-	 }
+	 unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
+		       p->cgp->cuts_to_add_num, p->cgp->cuts_to_add,
+		       &cg_new_row_num, &cg_new_rows);
 	 p->cgp->cuts_to_add_num = 0;
 	 if (cg_new_row_num){
 	    for (i = 0; i < cg_new_row_num; i++){
@@ -1785,13 +1787,9 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	       cp->reorder_count = 0;
 	    }
 	    if (cp_new_row_num){
-	       if (user_unpack_cuts(p->user, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
-				    lp_data->n, lp_data->vars,
-				    cp->cuts_to_add_num, cp->cuts_to_add,
-				    &cp_new_row_num, &cp_new_rows) == ERROR){
-		  cp_new_row_num = 0;
-		  FREE(cp_new_rows);
-	       }
+	       unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
+			     cp->cuts_to_add_num, cp->cuts_to_add,
+			     &cp_new_row_num, &cp_new_rows);
 	       cp->cuts_to_add_num = 0;
 	    }
 	 }

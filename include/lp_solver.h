@@ -52,7 +52,7 @@ void OSL_check_error PROTO((const char *erring_func));
 #include "CoinHelperFunctions.hpp"
 #include "CoinPackedVector.hpp"
 #include "CoinMpsIO.hpp"
-#ifdef GENERIC_CUTS
+#ifdef USE_CGL_CUTS
 #include "OsiCuts.hpp"
 #include "CglCutGenerator.hpp"
 #include "CglLiftAndProject.hpp"
@@ -264,8 +264,8 @@ void constrain_row_set PROTO((LPdata *lp_data, int length, int *index));
 int read_mps PROTO((LPdesc *desc, char *infile, char *probname));
 void write_mps PROTO((LPdata *lp_data, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
-#ifdef GENERIC_CUTS
-int generate_cuts PROTO((LPdata * lp_data, cut_data ***cuts));
+#ifdef USE_CGL_CUTS
+int generate_cgl_cuts PROTO((LPdata * lp_data, cut_data ***cuts));
 #endif
 
 #endif

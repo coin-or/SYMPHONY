@@ -190,12 +190,12 @@ endif
 ##############################################################################
 ##############################################################################
 
-ADD_GENERIC_CUTS = TRUE
+USE_CGL_CUTS = TRUE
 
-ifeq ($(ADD_GENERIC_CUTS),TRUE))
+ifeq ($(USE_CGL_CUTS),TRUE)
 LPINCDIR += ${HOME}/COIN/include
 LPLIBPATHS += ${HOME}/COIN/lib
-LPLIB += -lCgl
+LPLIB += -lCgl 
 endif
 
 ##############################################################################
@@ -664,8 +664,8 @@ endif
 
 SYSDEFINES  = -D__$(COMM_PROTOCOL)__ $(LPSOLVER_DEFS) 
 SYSDEFINES += $(MACH_DEP)
-ifeq ($(ADD_GENERIC_CUTS),TRUE)
-SYSDEFINES += -DGENERIC_CUTS
+ifeq ($(USE_CGL_CUTS),TRUE)
+SYSDEFINES += -DUSE_CGL_CUTS
 endif
 ifeq ($(LP_SOLVER), OSI)
 SYSDEFINES += -D__OSI_$(OSI_INTERFACE)__
