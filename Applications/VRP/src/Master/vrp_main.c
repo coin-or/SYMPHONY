@@ -79,6 +79,7 @@ int main(int argc, char **argv)
      sym_find_initial_bounds(env);
      
      sym_set_str_param(env, "lp_executable_name", "vrp_lp_cg");
+     sym_set_int_param(env, "generate_cgl_cuts", FALSE);
      
      sym_solve(env);
 
