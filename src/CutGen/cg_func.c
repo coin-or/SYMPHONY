@@ -168,7 +168,8 @@ int cg_send_cut(cut_data *new_cut)
    REALLOC(p->cuts_to_add, cut_data *, p->cuts_to_add_size,
 	   p->cuts_to_add_num + 1, BB_BUNCH);
    p->cuts_to_add[p->cuts_to_add_num++] = tmp_cut;
-
+   printf("Sending cut of type %i\n", new_cut->type);
+   
 #else
 
    int s_bufid;

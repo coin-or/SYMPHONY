@@ -1,6 +1,6 @@
-*******************************************************************************
-*                     SYMPHONY SPP Application                                * 
-*******************************************************************************
+******************************************************************************
+*                    SYMPHONY SPP Application                                * 
+******************************************************************************
 
 The SYMPHONY SPP application solves the standard Set Partitioning
 Problem. This application is a pure branch and bound solver and does not

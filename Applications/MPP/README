@@ -1,6 +1,6 @@
-*******************************************************************************
-*                     SYMPHONY MPP Application                                * 
-*******************************************************************************
+******************************************************************************
+*                    SYMPHONY MPP Application                                * 
+******************************************************************************
 
 The SYMPHONY MPP application is a branch and cut solver for the standard Mixed
 Postman Problem, with the generation of odd cut inequalities. See below for

@@ -1,6 +1,6 @@
-*******************************************************************************
-*                     SYMPHONY VRP Application                                * 
-*******************************************************************************
+******************************************************************************
+*                    SYMPHONY VRP Application                                * 
+******************************************************************************
 
 The SYMPHONY VRP application is a solver for the standard Capacitated Vehicle
 Routing Problem. It can also solve Traveling Salesman Problem instances and

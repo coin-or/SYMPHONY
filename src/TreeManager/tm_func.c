@@ -607,10 +607,11 @@ int start_node(tm_prob *tm, int thread_num)
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 }
 	 if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL ||
-	     tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL)
+	     tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL){
 #pragma omp critical (write_pruned_node_file)
 	    write_pruned_nodes(tm, best_node);
-	 purge_pruned_nodes(tm, best_node, VBC_PRUNED);
+	    purge_pruned_nodes(tm, best_node, VBC_PRUNED);
+	 }
 	 break;
 
        case (NF_CHECK_ALL            << 8) + 1: /* work on these */

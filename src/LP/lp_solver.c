@@ -3013,12 +3013,12 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
    probe->generateCuts(*(lp_data->si), cutlist);
    //printf("%i\n", cutlist.sizeRowCuts());
 
+#if 0
    /* create CGL flow cover cuts */
    CglFlowCover *flow = new CglFlowCover;
    probe->generateCuts(*(lp_data->si), cutlist);
    //printf("%i\n", cutlist.sizeRowCuts());
 
-#if 0
    /* create CGL simple rounding cuts */
    CglSimpleRounding * rounding = new CglSimpleRounding;
    rounding->generateCuts(*(lp_data->si), cutlist);
@@ -3033,12 +3033,11 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 
    if (cutlist.sizeRowCuts() > 0){
       if (*num_cuts > 0){
-	 *cuts = (cut_data **) realloc(*cuts, (*num_cuts + cutlist.sizeRowCuts())
-				       * sizeof(cut_data *));
+	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+cutlist.sizeRowCuts())
+				      * sizeof(cut_data *));
       }else{
-	 *cuts = (cut_data **) malloc(cutlist.sizeRowCuts() * sizeof(cut_data *));
+	 *cuts = (cut_data **)malloc(cutlist.sizeRowCuts()*sizeof(cut_data *));
       }
-
       for (i = 0, j = 0; i < cutlist.sizeRowCuts(); i++){
 	 int num_elements;
 	 int *indices;
@@ -3064,13 +3063,14 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 	 (*cuts)[j]->deletable = TRUE;
 	 (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
       }
+      *num_cuts += j;
    }
    
    delete gomory;
    delete knapsack;
    delete oddhole;
    delete probe;
-   delete flow;
+   /* delete flow; */
    /* delete rounding; */
    /* delete liftandproject; */
 

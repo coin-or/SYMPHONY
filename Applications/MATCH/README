@@ -1,15 +1,15 @@
-*******************************************************************************
-*                     SYMPHONY MATCH Application                              * 
-*******************************************************************************
+******************************************************************************
+*                     SYMPHONY MATCH Application                             * 
+******************************************************************************
 
 The SYMPHONY MATCH application solves the standard matching problem. This
 application is intended as an illustration of how to develop an application
 with SYMPHONY. For a more detailed walkthrough of the development of this
 solver, please see SYMPHONY-4.0/Doc/Walkthrough.pdf. See below for usage.
 
-*******************************************************************************
-*              COMPILING THE SYMPHONY MATCH APPLICATION (Unix)                  *
-*******************************************************************************
+******************************************************************************
+*              COMPILING THE SYMPHONY MATCH APPLICATION (Unix)               *
+******************************************************************************
 
 This version of the SYMPHONY MATCH application is intended to work with
 SYMPHONY-4.0. First, configure and compile SYMPHONY 4.0 as described in
@@ -22,9 +22,9 @@ the MATCH subdirectory should successfully make the MATCH executable. It will
 be installed in the directory
 SYMPHONY-4.0/MATCH/bin.$(ARCH)/$(LP\_SOLVER). See usage below.
 
-*******************************************************************************
-*            COMPILING THE SYMPHONY MATCH APPLICATION (Windows)                 *
-*******************************************************************************
+******************************************************************************
+*            COMPILING THE SYMPHONY MATCH APPLICATION (Windows)              *
+******************************************************************************
 
 This version of the SYMPHONY MATCH application is intended to work with
 SYMPHONY-4.0. Here is a sketch outline of how to compile the SYMPHONY MATCH

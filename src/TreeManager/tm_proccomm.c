@@ -409,8 +409,9 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
       bpath->range = bobj->range[j];
       bpath->branch = bobj->branch[j];
    }
-
+   
 #ifdef COMPILE_IN_LP
+   
    /* Again, here, we need to do some things directly if the LP
       function is being performed within the tree manager. Otherwise,
       we just send out the data below */
