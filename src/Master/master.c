@@ -1086,7 +1086,7 @@ int sym_mc_solve(problem *p)
       return(sym_solve(p));
    }
 
-   p->par.multi_criteria = TRUE;
+   p->par.multi_criteria = p->par.lp_par.multi_criteria = TRUE;
    memcpy((char *)p->mip->obj1, (char *)p->mip->obj, DSIZE*p->mip->n);
    
    start_time = wall_clock(NULL);

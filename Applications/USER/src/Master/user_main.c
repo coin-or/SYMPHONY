@@ -13,7 +13,7 @@
 /*===========================================================================*/
 
 #define COMPILING_FOR_MASTER
-#define TEST_RESOLVE
+#define TEST_MULTI_CRITERIA
 
 /*===========================================================================*/
 
@@ -39,11 +39,13 @@ int main(int argc, char **argv)
    /* Find a priori problem bounds */
    si.findInitialBounds();
 
+#ifdef TEST_MULTI_CRITERIA
    si.setObj2Coeff(76, 100);
    
    /* Solve the multi-criteria problem */
    si.multiCriteriaBranchAndBound();
-
+#endif
+   
 #if defined TEST_RESOLVE || defined TEST_SENS_ANALYSIS || \
    defined TEST_WARM_START
    si.setSymParam(OsiSymKeepDescOfPruned, 3); //level 3: KEEP_IN_MEMORY
