@@ -203,6 +203,7 @@ typedef struct LPDATA{
 #endif
 
    lp_params  par;
+   cgl_params cgl;
 
 }LPdata;
 
