@@ -552,7 +552,8 @@ void read_string(char *target, char *line, int maxlen)
 
 void print_statistics(node_times *tim, problem_stat *stat, double ub,
 		      double lb, double initial_time, double start_time,
-		      double obj_offset, char obj_sense, char has_ub)
+		      double finish_time, double obj_offset, char obj_sense, 
+		      char has_ub)
 {
    static str_int nfstatus[4] = {
       {"NF_CHECK_ALL"           , NF_CHECK_ALL }
@@ -592,7 +593,7 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    printf("  Separation                %.3f\n", tim->separation); 
    printf("  Total User Time              %.3f\n", initial_time);
 #endif
-   printf("  Total Real Time              %.3f\n\n", wall_clock(NULL)-
+   printf("  Total Real Time              %.3f\n\n", finish_time -
 	  start_time);
    printf("====================== Statistics =========================\n");
    printf("Number of created nodes :       %i\n", stat->created);

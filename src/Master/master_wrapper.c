@@ -144,7 +144,6 @@ int io_u(sym_environment *env)
 	 printf("ERROR: SYMPHONY can only read GMPL/AMPL files if GLPK is \n");
 	 printf("installed and the USE_GLMPL compiler define is set. \n");
 	 printf("Exiting.\n\n");
-	 return(ERROR__READING_GMPL_FILE);
 #endif
       }
       
@@ -628,7 +627,7 @@ int display_solution_u(sym_environment *env, int thread_num)
       return(FUNCTION_TERMINATED_NORMALLY);
    }
    
-   if (env->par.verbosity >= 0){
+   if (env->par.verbosity >= -1){
       printf("\nSolution Found: Node %i, Level %i\n", sol.xindex, sol.xlevel);
       if (env->par.multi_criteria){
 	 printf("First Objective: %.3f\n", env->tm->lpp[thread_num]->obj[0]);
