@@ -92,6 +92,8 @@ void start_heurs_u(problem *p)
       if (ub > -MAXDOUBLE){
 	 p->has_ub = TRUE;
 	 p->ub = ub;
+      }else{
+	 p->ub = MAXDOUBLE;
       }
    }else if (ub < p->ub){
       p->ub = ub;

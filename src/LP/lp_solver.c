@@ -448,12 +448,13 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       OSL_check_error("dual_simplex - ekk_allSlackBasis");
    }
    
-#if 0
-   term = ekk_dualSimplex(lp_data->lp); 
+#if 1
+   ekk_dualSimplex(lp_data->lp); 
 #else
-  term = ekk_simplex(lp_data->lp, 256 + 32); // no presolve and no scaling
+   ekk_simplex(lp_data->lp, 256 + 32); // no presolve and no scaling
 #endif
 
+   term = ekk_getIprobstat(lp_data->lp);
    /*Turn postSolve back on if we figure out preSolve problem */
 #if 0
    osllib_status = ekk_postSolve(lp_data->lp, NULL);*/
@@ -2172,7 +2173,7 @@ void get_slacks(LPdata *lp_data)
 
 #else
    
-   CPXgetslack(lp_data->si->getEnvironmentPtr(), lp_data->si)->getLpPtr(),
+   CPXgetslack(lp_data->si->getEnvironmentPtr(), lp_data->si->getLpPtr(),
 	       lp_data->slacks, 0, lp_data->m-1);
    /* Compute the real slacks for the free rows */
    for (i =m - 1; i >= 0; i--){

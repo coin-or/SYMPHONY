@@ -65,9 +65,13 @@ ROOT = .
 ##############################################################################
 # USERROOT is the name of the user's source directory. $(ROOT)/VRP is the
 # proper setting for the sample application, a VRP and TSP solver.
+# Set MASTERNAME if you want to give the master executable a custom name.
+# Otherwise, it will be named "symphony" if the executable is sequential 
+# and master (with some configuration specific extension) otherwise.
 ##############################################################################
 
 USERROOT = $(ROOT)/Vrp
+MASTERNAME = 
 
 ##############################################################################
 ##############################################################################
@@ -121,7 +125,7 @@ endif
 
 #Uncomment the line below if you want to use an OSI interface.
 LP_SOLVER = OSI
-OSI_INTERFACE = CLP
+OSI_INTERFACE = CPLEX
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
@@ -469,19 +473,27 @@ else
 	CONFIG:=0$(CONFIG)
 endif 
 
-INCDIR  	 = $(EXTRAINCDIR) -I$(ROOT)/include -I$(USERROOT)/include 
-INCDIR 		+= $(USER_INCDIR)
+INCDIR       = $(EXTRAINCDIR) -I$(ROOT)/include -I$(USERROOT)/include 
+INCDIR 	    += $(USER_INCDIR)
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ifeq ($(DECOMP),TRUE)
-INCDIR 		+= -I$(ROOT)/include/decomp
+INCDIR 	    += -I$(ROOT)/include/decomp
 endif
 #___END_EXPERIMENTAL_SECTION___#
-OBJDIR		 = $(ROOT)/objects.$(ARCH)/$(CONFIG)
-USER_OBJDIR  	 = $(USERROOT)/objects.$(ARCH)/$(CONFIG)
-DEPDIR  	 = $(ROOT)/dep.$(ARCH)
-USER_DEPDIR  	 = $(USERROOT)/dep.$(ARCH)
-LIBDIR		 = $(ROOT)/lib.$(ARCH)
-BINDIR  	 = $(USERROOT)/bin.$(ARCH)
+
+USER_OBJDIR  = $(USERROOT)/objects.$(ARCH)/$(CONFIG)/
+DEPDIR       = $(ROOT)/dep.$(ARCH)
+USER_DEPDIR  = $(USERROOT)/dep.$(ARCH)
+ifeq ($(LP_SOLVER),OSI)
+OBJDIR	     = $(ROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)_$(OSI_INTERFACE)
+LIBDIR	     = $(ROOT)/lib.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
+BINDIR       = $(USERROOT)/bin.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
+else
+OBJDIR	     = $(ROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)
+LIBDIR	     = $(ROOT)/lib.$(ARCH)/$(LP_SOLVER)
+BINDIR       = $(USERROOT)/bin.$(ARCH)/$(LP_SOLVER)
+endif
+
 SRCDIR  = \
 	$(ROOT)/Common     : $(USERROOT)/Common    :\
 	$(ROOT)/LP         : $(USERROOT)/LP        :\
@@ -501,11 +513,12 @@ VPATH  = $(SRCDIR):$(USER_SRCDIR)
 # Put it together
 ##############################################################################
 
-LIBPATHS = $(LIBDIR) $(X11LIBPATHS) $(COMMLIBPATHS) $(LPLIBPATHS) $(USERLIBPATHS)
-INCPATHS = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR)
+LIBPATHS      = $(LIBDIR) $(X11LIBPATHS) $(COMMLIBPATHS) $(LPLIBPATHS) 
+LIBPATHS     +=$(USERLIBPATHS)
+INCPATHS      = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR)
 
-EXTRAINCDIR = $(addprefix -I,${INCPATHS})
-LDFLAGS = $(addprefix -L,${LIBPATHS})
+EXTRAINCDIR   = $(addprefix -I,${INCPATHS})
+LDFLAGS       = $(addprefix -L,${LIBPATHS})
 ifneq (${SHLINKPREFIX},)
      LDFLAGS += $(addprefix ${SHLINKPREFIX},${LIBPATHS})
 endif
@@ -583,7 +596,7 @@ QUANTIFY = $(QUANTIFYBIN) $(QFLAGS)
 
 ##############################################################################
 ##############################################################################
-#  Extensions for filenames for various configurations
+#  Extensions and filenames for various configurations
 ##############################################################################
 ##############################################################################
 
@@ -601,6 +614,18 @@ ifeq ($(COMPILE_IN_TM),TRUE)
 MASTEREXT = _tm$(TMEXT)
 ifeq ($(COMPILE_IN_LP),TRUE)
 MASTERLPLIB = $(LPLIB)
+endif
+endif
+ifeq ($(MASTERNAME),)
+MASTERNAME = master$(MASTEREXT)
+ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(COMPILE_IN_CP),TRUE)
+ifeq ($(COMPILE_IN_LP),TRUE)
+ifeq ($(COMPILE_IN_TM),TRUE)
+MASTERNAME = symphony
+endif
+endif
+endif
 endif
 endif
 
@@ -869,19 +894,19 @@ MASTER_DEP 	  = $(addprefix $(DEPDIR)/,$(ALL_MASTER:.c=.d))
 USER_MASTER_OBJS  = $(addprefix $(USER_OBJDIR)/,$(notdir $(USER_MASTER_SRC:.c=.o)))
 USER_MASTER_DEP   = $(addprefix $(USER_DEPDIR)/,$(USER_MASTER_SRC:.c=.d))
 
-master : $(BINDIR)/master$(MASTEREXT)
+master : $(BINDIR)/$(MASTERNAME)
 	true
 
 masterlib : $(LIBDIR)/libmaster$(MASTEREXT).a
 	true
 
-pmaster : $(BINDIR)/pmaster$(MASTEREXT)
+pmaster : $(BINDIR)/p$(MASTERNAME)
 	true
 
-qmaster : $(BINDIR)/qmaster$(MASTEREXT)
+qmaster : $(BINDIR)/q$(MASTERNAME)
 	true
 
-cmaster : $(BINDIR)/cmaster$(MASTEREXT)
+cmaster : $(BINDIR)/c$(MASTERNAME)
 	true
 
 master_clean :
@@ -896,7 +921,7 @@ master_clean_user :
 	cd $(USER_DEPDIR)
 	rm -f $(USER_MASTER_DEP)
 
-$(BINDIR)/master$(MASTEREXT) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
+$(BINDIR)/$(MASTERNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
 $(LIBDIR)/libmaster$(MASTEREXT).a 
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
@@ -915,7 +940,7 @@ $(LIBDIR)/libmaster$(MASTEREXT).a : $(MASTER_DEP) $(MASTER_OBJS)
 	$(RANLIB) $(LIBDIR)/libmaster$(MASTEREXT).a
 	@echo ""
 
-$(BINDIR)/pmaster$(MASTEREXT) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
+$(BINDIR)/p$(MASTERNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
 $(LIBDIR)/libmaster$(MASTEREXT).a 
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
@@ -925,7 +950,7 @@ $(LIBDIR)/libmaster$(MASTEREXT).a
 	-lmaster$(MASTEREXT) $(MASTERLPLIB) $(LIBS) 
 	@echo ""
 
-$(BINDIR)/qmaster$(MASTEREXT) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
+$(BINDIR)/q$(MASTERNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
 $(LIBDIR)/libmaster$(MASTEREXT).a 
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
@@ -935,7 +960,7 @@ $(LIBDIR)/libmaster$(MASTEREXT).a
 	-lmaster$(MASTEREXT) $(MASTERLPLIB) $(LIBS) 
 	@echo ""
 
-$(BINDIR)/cmaster$(MASTEREXT) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
+$(BINDIR)/c$(MASTERNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
 $(LIBDIR)/libmaster$(MASTEREXT).a
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
@@ -1380,10 +1405,10 @@ $(BINDIR)/ccg : $(USER_CG_DEP) $(USER_CG_OBJS) $(LIBDIR)/libcg.a
 	dg_clean
 
 clean :
-	rm -rf $(ROOT)/objects.$(ARCH)
+	rm -rf $(OBJDIR)
 
 clean_user :
-	rm -rf $(USERROOT)/objects.$(ARCH)
+	rm -rf $(USER_OBJDIR)
 
 clean_dep :
 	rm -rf $(DEPDIR)/ 
