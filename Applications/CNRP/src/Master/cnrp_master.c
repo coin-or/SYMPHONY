@@ -117,8 +117,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
    cnrp_readparams(cnrp, filename, argc, argv);
 
-   p->par.tm_par.granularity = p->par.lp_par.granularity =
-      -cnrp->lp_par.gamma + .0001; 
+   p->par.tm_par.granularity = p->par.lp_par.granularity = -0.1; 
 
    return(USER_SUCCESS);
 }
@@ -742,7 +741,12 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    int vertnum = cnrp->vertnum, v0, v1;
    int total_edgenum =  vertnum*(vertnum-1)/2;
    network *n;
-   
+   /* FIXME: This is UGLY! */
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+   problem *p = get_problem_ptr(FALSE);
+   cnrp_spec *cnrp_lp = (cnrp_spec *) p->lpp[0]->user
+#endif
+      
 #if 0
    if (tour && cnrp->cur_tour->cost > (int) objval){
       node = tour[0].next;
@@ -802,6 +806,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 		  vertnum);
 #endif
 
+#if 0
    for (i = 0; i < n->edgenum; i++){
       if (n->edges[i].weight > 1 - lpetol){
 	 fixed_cost += cnrp->dist.cost[INDEX(n->edges[i].v0, n->edges[i].v1)];
@@ -813,13 +818,24 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    }
    cnrp->fixed_cost = fixed_cost;
    cnrp->variable_cost = variable_cost;
-   
    printf("\nSolution Found:\n");
 #ifdef ADD_FLOW_VARS
    printf("Solution Fixed Cost: %.1f\n", fixed_cost);
    printf("Solution Variable Cost: %.1f\n", variable_cost);
 #else
    printf("Solution Cost: %.0f\n", fixed_cost);
+#endif
+#endif
+
+   cnrp->fixed_cost = cnrp_lp->fixed_cost
+   cnrp->variable_cost = cnrp_lp->variable_cost
+   
+   printf("\nSolution Found:\n");
+#ifdef ADD_FLOW_VARS
+   printf("Solution Fixed Cost: %.1f\n", cnrp->fixed_cost);
+   printf("Solution Variable Cost: %.1f\n", cnrp->variable_cost);
+#else
+   printf("Solution Cost: %.0f\n", cnrp->fixed_cost);
 #endif
    
    if (cnrp->par.prob_type == TSP || cnrp->par.prob_type == VRP ||

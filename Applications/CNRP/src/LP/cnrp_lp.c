@@ -130,7 +130,7 @@ int user_receive_lp_data(void **user)
 int user_free_lp(void **user)
 {
    cnrp_spec *cnrp = (cnrp_spec *)(*user);
-
+   
 #if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
    FREE(cnrp->demand);
    FREE(cnrp->costs);
