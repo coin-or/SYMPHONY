@@ -244,7 +244,7 @@ int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
 			     var_desc **vars, double *x,
 			     int *new_row_num, cut_data ***cuts)
 {
-   return(DO_NOT_GENERATE_CGL_CUTS);
+   return(GENERATE_CGL_CUTS);
 }
 
 /*===========================================================================*/
