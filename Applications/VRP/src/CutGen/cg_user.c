@@ -932,7 +932,7 @@ int check_connectivity(network *n, double etol, int capacity, int numroutes)
 	     reduced_cust_num--;
 	     new_cut->coef[vert1 >> DELETE_POWER] &=
 		~(1 << (vert1 & DELETE_AND));
-	     new_cut->type = (cust_num < vertnum/2 ?
+	     new_cut->type = (reduced_cust_num < vertnum/2 ?
 			      SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
 	     new_cut->rhs = (new_cut->type ==SUBTOUR_ELIM_SIDE ?
 			     RHS(reduced_cust_num, reduced_weight, capacity):
