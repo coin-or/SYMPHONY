@@ -544,7 +544,10 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    char node_type, repricing;
    node_desc *desc = &n->desc;
    node_desc *newdesc;
-   
+#ifdef DO_TESTS
+   double old_lower_bound  = n->lower_bound;
+#endif
+
 #ifdef SENSITIVITY_ANALYSIS
    if (tm->par.sensitivity_analysis){
       if (n->sol){
@@ -599,7 +602,13 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       In the later case the LP sends explicit description (and this function
       is called with an empty 'n') so we can still use this function. */
    receive_dbl_array(&n->lower_bound, 1);
-
+#ifdef DO_TESTS
+   if (n->lower_bound < old_lower_bound - 10){
+      printf("#####Error: lower bound descrease in node from %.3f to %.3f\n",
+	     old_lower_bound, n->lower_bound);
+   }
+#endif
+   
    newdesc = (node_desc *) calloc(1, sizeof(node_desc));
    /* Unpack the new description */
    receive_int_array(&newdesc->nf_status, 1);

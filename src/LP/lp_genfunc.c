@@ -228,7 +228,10 @@ int fathom_branch(lp_prob *p)
    int cuts, no_more_cuts_count;
    int num_errors = 0;
    int cut_term = 0;
-
+#ifdef DO_TESTS
+   double oldobjval = lp_data->objval;
+#endif
+   
    check_ub(p);
    p->iter_num = p->node_iter_num = 0;
   
@@ -258,6 +261,13 @@ int fathom_branch(lp_prob *p)
 
       termcode = dual_simplex(lp_data, &iterd);
 
+#ifdef DO_TESTS
+      if (lp_data->objval < oldobjval - .01){
+	 printf ("#####Error: LP objective value decrease from %.3f to %.3f\n",
+		 oldobjval, lp_data->objval);
+      }
+#endif
+      
       /* Get relevant data */
       get_dj_pi(lp_data);
       get_slacks(lp_data);
@@ -278,18 +288,17 @@ int fathom_branch(lp_prob *p)
        case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
        case LP_ABANDONED:
-	 printf("######## Unexpected termcode: %i \n", termcode);
+	 printf("####### Unexpected termcode: %i \n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
-	    printf("######## Trying to recover by resolving from scratch...\n",
-		   termcode);
+	    printf("####### Trying to recover by resolving from scratch...\n");
 	    
 	    continue;
 	 }else{
 	    char name[50] = "";
-	    printf("######## Recovery failed. %s%s",
+	    printf("####### Recovery failed. %s%s",
 		   "LP solver is having numerical difficulties :(.\n",
-		   "######## Dumping current LP to MPS file and exiting.\n\n");
+		   "####### Dumping current LP to MPS file and exiting.\n\n");
 	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
 	    write_mps(lp_data, name);
 	    return(ERROR__NUMERICAL_INSTABILITY);
@@ -299,7 +308,7 @@ int fathom_branch(lp_prob *p)
        case LP_D_OBJLIM:
        case LP_OPTIMAL:
 	 if (num_errors == 1){
-	    printf("######## Recovery succeeded! Continuing with node...\n\n");
+	    printf("####### Recovery succeeded! Continuing with node...\n\n");
 	    num_errors = 0;
 	 }
 	 if (termcode == LP_D_UNBOUNDED){

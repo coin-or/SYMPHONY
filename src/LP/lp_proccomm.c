@@ -1471,7 +1471,7 @@ void send_lp_is_free(lp_prob *p)
    send_int_array(&p->cut_pool, 1);
    send_msg(p->tree_manager, LP__IS_FREE);
    freebuf(s_bufid);
-
+   
    /* clear out stuff here */
    free_node_dependent(p);
 }

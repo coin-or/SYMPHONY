@@ -1171,6 +1171,12 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
       switch (can->termcode[i]){
        case LP_OPTIMAL:
        case LP_OPT_FEASIBLE_BUT_CONTINUE:
+#ifdef DO_TESTS
+	 if (can->objval[i] < oldobjval - .01){
+	    printf("#####Error: Branching candidate has lower objval ");
+	    printf("(%.3f) than parent (%.3f)\n", can->objval[i],  oldobjval);
+	 }
+#endif
 	 break;
        case LP_OPT_FEASIBLE:
        case LP_D_UNBOUNDED:
