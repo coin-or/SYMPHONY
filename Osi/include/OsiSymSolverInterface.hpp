@@ -356,14 +356,16 @@ public:
   
       /// Get pointer to array[getNumRows()] of dual variable values
       virtual const double * getRowPrice() const{
-       throw CoinError("Error: Function not implemented",
-		       "getRowPrice", "OsiSymSolverInterface");
+	 //       throw CoinError("Error: Function not implemented",
+	 //       "getRowPrice", "OsiSymSolverInterface");
+	 return (0);
     };
   
       /// Get a pointer to array[getNumCols()] of reduced costs
       virtual const double * getReducedCost() const{
-       throw CoinError("Error: Function not implemented",
-		       "getReducedCost", "OsiSymSolverInterface");
+	 //       throw CoinError("Error: Function not implemented",
+	 //       "getReducedCost", "OsiSymSolverInterface");
+	 return (0);
     };
   
       /** Get pointer to array[getNumRows()] of row activity levels (constraint
