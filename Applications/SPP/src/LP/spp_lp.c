@@ -301,10 +301,12 @@ int user_free_lp(void **user)
 {
    spp_problem *spp = (spp_problem *)(*user);
 
+#ifndef COMPILE_IN_LP
    FREE(spp->par);
    spp_free_cmatrix(spp->cmatrix);
    FREE(*user);
-
+#endif
+   
    return(USER_SUCCESS);
 
 }

@@ -393,7 +393,7 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 
 int user_free_master(void **user)
 {
-   spp_problem *spp = (spp_problem *) calloc(1, sizeof(spp_problem));
+   spp_problem *spp = (spp_problem *) (*user);
 
    FREE(spp->par);
    FREE(spp->stat);
@@ -401,7 +401,7 @@ int user_free_master(void **user)
    spp_free_cmatrix(spp->cmatrix);
    FREE(spp->cmatrix);
    FREE(*user);
-
+   
    return(USER_SUCCESS);
 }
 
