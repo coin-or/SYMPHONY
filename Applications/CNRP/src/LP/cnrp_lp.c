@@ -378,7 +378,6 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	    mip->matind[j++] = (1+od_const)*vertnum + edges[2*(indices[i] -
 				(1+d_x_vars)*total_edgenum)] - 1;
 #else
-	 mip->matbeg[i]  = j;
 	 mip->matval[j]  = 1.0;
 	 if (edges[2*(indices[i]-(1+d_x_vars)*total_edgenum)])
 	    mip->matval[j+1] = -1.0;
@@ -878,6 +877,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	}
 	cut->sense = 'L';
 	cut->deletable = TRUE;
+	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	break;
 	
       case SUBTOUR_ELIM_ACROSS:
@@ -923,6 +923,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	}
 	cut->sense = 'G';
 	cut->deletable = TRUE;
+	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	break;
 
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
@@ -983,6 +984,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	}
 	cut->sense = 'G';
 	cut->deletable = TRUE;
+	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	break;
 #endif
 	
@@ -1065,12 +1067,9 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	}else{
 	   nzcnt = 0;
 	}
-	for (i = 0; i < nzcnt; i++){
-	   if (matind[i] >= 4*total_edgenum)
-	      printf("Error");
-	}
 	cut->sense = 'L';
 	cut->deletable = FALSE;
+	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	break;
 
       case TIGHT_FLOW:
@@ -1136,6 +1135,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	}
 	cut->sense = 'L';
 	cut->deletable = FALSE;
+	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	   
 	break;
 #endif
@@ -1165,6 +1165,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	}
 	cut->sense = 'L';
 	cut->deletable = FALSE;
+	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	break;
 #endif
 

@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 {
    int i;
    problem *p;
-   double gamma, tau, slope;
+   double gamma, gamma0, gamma1, tau, slope;
    double start_time, t = 0;
 
    solution_data utopia1;
@@ -148,6 +148,7 @@ int main(int argc, char **argv)
    solutions[numsolutions].tau = 0.0;
    solutions[numsolutions].fixed_cost = cnrp->fixed_cost;
    solutions[numsolutions++].variable_cost = cnrp->variable_cost;
+   utopia_fixed = cnrp->fixed_cost;
       
    cnrp->lp_par.gamma = 0.0;
    cnrp->cg_par.tau = cnrp->lp_par.tau = 1.0;
@@ -168,10 +169,11 @@ int main(int argc, char **argv)
    solutions[numsolutions].tau = 1.0;
    solutions[numsolutions].fixed_cost = cnrp->fixed_cost;
    solutions[numsolutions++].variable_cost = cnrp->variable_cost;
-
-   cnrp->utopia_fixed = utopia_fixed = cnrp->fixed_cost;
-   cnrp->utopia_variable = utopia_variable = cnrp->variable_cost;
-
+   utopia_variable = cnrp->variable_cost;
+   
+   cnrp->utopia_variable = utopia_variable;
+   cnrp->utopia_fixed = utopia_fixed;
+   
    printf("***************************************************\n");
    printf("***************************************************\n");
    printf("Utopia point has fixed cost %.3f and variable cost %.3f \n",
@@ -211,13 +213,18 @@ int main(int argc, char **argv)
       p->has_ub = FALSE;
       p->ub = MAXDOUBLE;
       for (i = 0; i < numsolutions; i++){
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+	 ub = MAX(gamma*(solutions[i].fixed_cost - utopia_fixed),
+		  tau*(solutions[i].variable_cost - utopia_variable));
+#else
 	 ub = gamma*solutions[i].fixed_cost + tau*solutions[i].variable_cost;
+#endif 
 	 if (ub < p->ub){
 	    p->has_ub = TRUE;
 	    p->ub = ub - .001;
 	 }
       }
-      
+
       printf("***************************************************\n");
       printf("***************************************************\n");
       printf("Now solving with gamma = %.2f tau = %.2f \n", gamma, tau);  
@@ -286,23 +293,45 @@ int main(int argc, char **argv)
       }
    }
    
-   printf("\n****************************************************\n");
-   printf(  "* Found all non-dominated solutions!!!!!!!         *\n");
-   printf(  "* Now displaying stats...                          *\n");
-   printf(  "****************************************************\n\n");
+   printf("\n********************************************************\n");
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   printf(  "* Found complete set of non-dominated solutions!!!!!!! *\n");
+#else
+   printf(  "* Found complete set of supported solutions!!!!!!!     *\n");
+#endif
+   printf(  "* Now displaying stats...                              *\n");
+   printf(  "********************************************************\n\n");
       
    print_statistics(&(p->comp_times.bc_time), &(p->stat), 0.0, 0.0, 0,
 		    start_time);
 
    printf("***************************************************\n");
    printf("***************************************************\n");
-   printf("Displaying non-dominated solution values\n");  
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   printf("Displaying non-dominated solution values and breakpoints\n");  
+#else
+   printf("Displaying supported solution values and breakpoints\n");  
+#endif
    printf("***************************************************\n");
    printf("***************************************************\n\n");
-   
-   for (i = 0; i < numsolutions; i++){
-      printf("Fixed Cost: %.3f Variable Cost: %.3f\n", solutions[i].fixed_cost,
-	     solutions[i].variable_cost);
+
+   gamma0 = 1.0;
+   for (i = 0; i < numsolutions - 1; i++){
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+      gamma1 = (utopia_variable - solutions[i].variable_cost)/
+	 (utopia_fixed - solutions[i+1].fixed_cost +
+	  utopia_variable - solutions[i].variable_cost);
+#else
+      slope = (solutions[i].variable_cost -
+	       solutions[i+1].variable_cost)/
+	      (solutions[i+1].fixed_cost -
+	       solutions[i].fixed_cost);
+      gamma1 = slope/(1+slope);
+#endif
+      printf("Fixed Cost: %.3f Variable Cost: %.3f ",
+	     solutions[i].fixed_cost, solutions[i].variable_cost);
+      printf("Optimal Range: %.2f - %.2f\n", gamma1, gamma0);
+      gamma0 = gamma1;
    }
    
    FREE(root->desc);
@@ -312,6 +341,9 @@ int main(int argc, char **argv)
    FREE(root);
    FREE(base->userind);
    FREE(base);
+   for (i = 0 ; i < numsolutions; i++){
+      FREE(solutions[i].tree);
+   }
 
    return(0);
 }

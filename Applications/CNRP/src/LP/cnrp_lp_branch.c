@@ -162,6 +162,9 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
       cand->range[0] = cand->range[1] = 0;
    }
    
+   FREE(xind);
+   FREE(xval);
+
    return(USER_SUCCESS);
    
 #if 0

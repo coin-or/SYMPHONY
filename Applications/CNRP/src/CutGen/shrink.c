@@ -212,6 +212,7 @@ int reduce_graph(network *n, double etol, double *demand, double capacity,
       }
       if (!edges_deleted) break;
    }
+   FREE(new_cut->coef);
    return(num_cuts);
 }
 

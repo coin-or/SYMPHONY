@@ -883,6 +883,8 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
       printf("\n");
    }
 
+   FREE(n);
+   
    return(USER_SUCCESS);
 }
    

@@ -257,6 +257,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 num_cuts = check_flow_connectivity(n, etol, capacity, num_routes, mult);
 	 if (num_cuts){
 	    free_net(n);
+	    FREE(new_cut);
 	    *cutnum = num_cuts;
 	    return(USER_SUCCESS);
 	 }
@@ -264,6 +265,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #else
       num_cuts = check_connectivity(n, etol, capacity, num_routes, mult);
       free_net(n);
+      FREE(new_cut);
       *cutnum = num_cuts;
       return(USER_SUCCESS);
 #endif
@@ -458,6 +460,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       num_cuts = check_flow_connectivity(n, etol, capacity, num_routes, mult);
       if (num_cuts){
 	 free_net(n);
+	 FREE(new_cut);
 	 *cutnum = num_cuts;
 	 return(USER_SUCCESS);
       }
@@ -672,7 +675,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
    
    if (num_cuts < 10 && cnrp->par.do_greedy){
-#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) && 0
+#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
       greedy_shrinking1_dicut(n, capacity, etol,
 			      cnrp->par.max_num_cuts_in_shrink,
 			      new_cut, compnodes_copy, compmembers, comp_num,
@@ -1169,8 +1172,10 @@ int check_flow_connectivity(network *n, double etol, double capacity,
   FREE(compdemands);
   FREE(compcuts);
 
-  if (mult == 1)
+  if (mult == 1){
+     FREE(new_cut);
      return(num_cuts);
+  }
   
   /*-------------------------------------------------------------------------*\
   | if the graph is connected, check each route to see if it obeys the        |
