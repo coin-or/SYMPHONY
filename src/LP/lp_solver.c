@@ -2992,7 +2992,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 	 lp_data->si->setInteger(i);
       }
    }
-
+   
+#if 0
    /* create CGL gomory cuts */
    CglGomory *gomory = new CglGomory;
    gomory->generateCuts(*(lp_data->si), cutlist);
@@ -3012,13 +3013,14 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
    CglProbing *probe = new CglProbing;
    probe->generateCuts(*(lp_data->si), cutlist);
    //printf("%i\n", cutlist.sizeRowCuts());
-
-#if 0
+#endif
+   
    /* create CGL flow cover cuts */
    CglFlowCover *flow = new CglFlowCover;
-   probe->generateCuts(*(lp_data->si), cutlist);
+   flow->generateCuts(*(lp_data->si), cutlist);
    //printf("%i\n", cutlist.sizeRowCuts());
 
+#if 0
    /* create CGL simple rounding cuts */
    CglSimpleRounding * rounding = new CglSimpleRounding;
    rounding->generateCuts(*(lp_data->si), cutlist);
@@ -3066,11 +3068,11 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
       *num_cuts += j;
    }
    
-   delete gomory;
-   delete knapsack;
-   delete oddhole;
-   delete probe;
-   /* delete flow; */
+   //delete gomory;
+   //delete knapsack;
+   //delete oddhole;
+   //delete probe;
+   delete flow;
    /* delete rounding; */
    /* delete liftandproject; */
 

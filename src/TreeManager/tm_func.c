@@ -2892,6 +2892,7 @@ int tm_close(tm_prob *tm, int termcode)
       tm->cpp[i]->msgtag = YOU_CAN_DIE;
       cp_close(tm->cpp[i]);
    }
+   FREE(tm->cpp);
 #else
    for (i = 0; i < tm->par.max_cp_num;){
       r_bufid = treceive_msg(tm->cp.procs[i], POOL_TIME, &timeout);
