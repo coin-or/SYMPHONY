@@ -30,7 +30,7 @@
 #include "lp_u.h"
 #include "dg_params.h"
 
-/* VRP include files */
+/* CNRP include files */
 #include "cnrp_lp.h"
 #include "cnrp_dg_functions.h"
 #include "cnrp_macros.h"
@@ -50,34 +50,34 @@
 
 int user_receive_lp_data(void **user)
 {
-   vrp_spec *vrp;
+   cnrp_spec *cnrp;
    int vertnum;
    int i, j, k, l;
    int total_edgenum;
    int zero_varnum, *zero_vars = NULL;
 
-   vrp = (vrp_spec *) calloc (1, sizeof(vrp_spec));
+   cnrp = (cnrp_spec *) calloc (1, sizeof(cnrp_spec));
 
-   *user = (void *)vrp;
+   *user = (void *)cnrp;
 
-   receive_char_array((char *)(&vrp->par), sizeof(lp_user_params));
-   receive_int_array(&vrp->window, 1);
-   receive_int_array(&vrp->numroutes, 1);
-   receive_int_array(&vrp->vertnum, 1);
-   vertnum = vrp->vertnum;
-   vrp->demand = (int *) calloc (vertnum, sizeof(int));
-   receive_int_array(vrp->demand, (int)vertnum);
-   receive_int_array(&vrp->capacity, 1);
+   receive_char_array((char *)(&cnrp->par), sizeof(cnrp_lp_params));
+   receive_int_array(&cnrp->window, 1);
+   receive_int_array(&cnrp->numroutes, 1);
+   receive_int_array(&cnrp->vertnum, 1);
+   vertnum = cnrp->vertnum;
+   cnrp->demand = (int *) calloc (vertnum, sizeof(int));
+   receive_int_array(cnrp->demand, (int)vertnum);
+   receive_int_array(&cnrp->capacity, 1);
    total_edgenum =  vertnum*(vertnum-1)/2;
-   vrp->costs = (int *) calloc (total_edgenum, sizeof(int));
-   receive_int_array(vrp->costs, total_edgenum);
+   cnrp->costs = (int *) calloc (total_edgenum, sizeof(int));
+   receive_int_array(cnrp->costs, total_edgenum);
    receive_int_array(&zero_varnum, 1);
    if (zero_varnum){
       zero_vars = (int *) malloc (zero_varnum*sizeof(int));
       receive_int_array(zero_vars, zero_varnum);
    }
    
-   vrp->edges = (int *) calloc (2*total_edgenum, sizeof(int));
+   cnrp->edges = (int *) calloc (2*total_edgenum, sizeof(int));
 
    /*create the edge list (we assume a complete graph) The edge is set to
      (0,0) in the edge list if it was eliminated in preprocessing*/
@@ -85,29 +85,29 @@ int user_receive_lp_data(void **user)
       for (j = 0; j < i; j++){
 	 if (l < zero_varnum && k == zero_vars[l]){
 	    /*This is one of the zero edges*/
-	    vrp->edges[2*k] = vrp->edges[2*k+1] = 0;
+	    cnrp->edges[2*k] = cnrp->edges[2*k+1] = 0;
 	    l++;
 	    k++;
 	    continue;
 	 }
-	 vrp->edges[2*k] = j;
-	 vrp->edges[2*k+1] = i;
+	 cnrp->edges[2*k] = j;
+	 cnrp->edges[2*k+1] = i;
 	 k++;
       }
    }
    FREE(zero_vars);
 
-   if (vrp->par.prob_type == VRP || vrp->par.prob_type == TSP ||
-       vrp->par.prob_type == BPP){
-      vrp->cur_sol = (_node *) calloc (vrp->vertnum, sizeof(_node));
+   if (cnrp->par.prob_type == VRP || cnrp->par.prob_type == TSP ||
+       cnrp->par.prob_type == BPP){
+      cnrp->cur_sol = (_node *) calloc (cnrp->vertnum, sizeof(_node));
    }else{
-      vrp->cur_sol_tree = (int *) calloc (vrp->vertnum - 1, ISIZE);
+      cnrp->cur_sol_tree = (int *) calloc (cnrp->vertnum - 1, ISIZE);
    }
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (vrp->window){
-      copy_node_set(vrp->window, TRUE, (char *)"Weighted solution");
-      copy_node_set(vrp->window, TRUE, (char *)"Flow solution");
+   if (cnrp->window){
+      copy_node_set(cnrp->window, TRUE, (char *)"Weighted solution");
+      copy_node_set(cnrp->window, TRUE, (char *)"Flow solution");
    }
 
 /*___END_EXPERIMENTAL_SECTION___*/
@@ -122,16 +122,16 @@ int user_receive_lp_data(void **user)
 
 int user_free_lp(void **user)
 {
-   vrp_spec *vrp = (vrp_spec *)(*user);
+   cnrp_spec *cnrp = (cnrp_spec *)(*user);
 
 #ifndef COMPILE_IN_CG
-   FREE(vrp->demand);
+   FREE(cnrp->demand);
 #endif
-   FREE(vrp->costs);
-   FREE(vrp->edges);
-   FREE(vrp->cur_sol);
-   FREE(vrp->cur_sol_tree);
-   FREE(vrp);
+   FREE(cnrp->costs);
+   FREE(cnrp->edges);
+   FREE(cnrp->cur_sol);
+   FREE(cnrp->cur_sol_tree);
+   FREE(cnrp);
    return(USER_SUCCESS);
 }
 
@@ -145,14 +145,14 @@ int user_free_lp(void **user)
 int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
 			   int *maxn, int *maxm, int *maxnz)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
-   int *costs = vrp->costs;
-   int *edges = vrp->edges;
+   cnrp_spec *cnrp = (cnrp_spec *)user;
+   int *costs = cnrp->costs;
+   int *edges = cnrp->edges;
    int i, j, maxvars = 0;
    char resize = FALSE;
-   int vertnum = vrp->vertnum;
+   int vertnum = cnrp->vertnum;
    int total_edgenum = vertnum*(vertnum-1)/2;
-   char prob_type = vrp->par.prob_type, od_const = FALSE, d_x_vars = FALSE;
+   char prob_type = cnrp->par.prob_type, od_const = FALSE, d_x_vars = FALSE;
 #if defined(DIRECTED_X_VARS) && !defined(ADD_FLOW_VARS)
    int edgenum = (mip->n)/2;
 #elif defined(ADD_FLOW_VARS)
@@ -161,14 +161,14 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #ifdef DIRECTED_X_VARS
    int edgenum = (mip->n)/4;
 
-   flow_capacity = (double) vrp->capacity;
+   flow_capacity = (double) cnrp->capacity;
 #else
    int edgenum = (mip->n)/3;
 
-   if (vrp->par.prob_type == CSTP || vrp->par.prob_type == CTP)
-      flow_capacity = (double) vrp->capacity;
+   if (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == CTP)
+      flow_capacity = (double) cnrp->capacity;
    else
-      flow_capacity = ((double)vrp->capacity)/2;
+      flow_capacity = ((double)cnrp->capacity)/2;
 #endif
 #else
    int edgenum = mip->n;
@@ -222,7 +222,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
      flows and some new columns also*/
    for (i = 0, j = 0; i < mip->n; i++){
       if (indices[i] < total_edgenum){
-	 mip->obj[i]       = vrp->par.gamma*((double) costs[indices[i]]);
+	 mip->obj[i]       = cnrp->par.gamma*((double) costs[indices[i]]);
 	 mip->is_int[i]    = TRUE;
 	 mip->ub[i]        = 1.0;
 	 mip->matbeg[i]    = j;
@@ -249,12 +249,12 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #endif	 
 #ifdef ADD_CAP_CUTS
 	 v0 = edges[2*indices[i]];
-	 mip->matval[j]    = -flow_capacity + (v0 ? vrp->demand[v0] : 0);
+	 mip->matval[j]    = -flow_capacity + (v0 ? cnrp->demand[v0] : 0);
 	 mip->matind[j++]  = (2 + od_const)*vertnum - 1 + indices[i];
 #ifndef DIRECTED_X_VARS
 	 mip->matval[j]    = -flow_capacity +
-	    vrp->demand[edges[2*indices[i] + 1]];
-	 mip->matind[j++]  = 2*vrp->vertnum - 1 + total_edgenum +
+	    cnrp->demand[edges[2*indices[i] + 1]];
+	 mip->matind[j++]  = 2*cnrp->vertnum - 1 + total_edgenum +
 	    indices[i];
 #endif
 #endif
@@ -265,7 +265,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #endif
 #ifdef DIRECTED_X_VARS
       }else if (indices[i] < 2*total_edgenum){
-	 mip->obj[i]       = vrp->par.gamma*((double)costs[indices[i] -
+	 mip->obj[i]       = cnrp->par.gamma*((double)costs[indices[i] -
 							  total_edgenum]);
 	 mip->is_int[i]    = TRUE;
 	 mip->ub[i]        = 1.0;
@@ -288,7 +288,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 }
 #ifdef ADD_CAP_CUTS
 	 mip->matval[j]    = -flow_capacity +
-	    vrp->demand[edges[2*(indices[i] - total_edgenum) + 1]];
+	    cnrp->demand[edges[2*(indices[i] - total_edgenum) + 1]];
 	 mip->matind[j++]  = (2 + od_const)*vertnum - 1 + indices[i];
 #endif
 #ifdef ADD_X_CUTS
@@ -299,11 +299,11 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #endif
       }else if (indices[i] < (2+d_x_vars)*total_edgenum){
 	 mip->obj[i]       =
-	    vrp->par.tau*((double) costs[indices[i]-
+	    cnrp->par.tau*((double) costs[indices[i]-
 					(1+d_x_vars)*total_edgenum]);
 	 mip->is_int[i] = FALSE;
 	 v0 = edges[2*(indices[i]-(1+d_x_vars)*total_edgenum)];
-	 mip->ub[i] = flow_capacity - (v0 ? vrp->demand[v0] : 0);
+	 mip->ub[i] = flow_capacity - (v0 ? cnrp->demand[v0] : 0);
 #ifdef ADD_CAP_CUTS
 	 mip->matbeg[i]    = j;
 	 mip->matval[j]    = 1.0;
@@ -330,11 +330,11 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #endif	 
       }else{
 	 mip->obj[i]       =
-	    vrp->par.tau*((double) costs[indices[i]-
+	    cnrp->par.tau*((double) costs[indices[i]-
 					(2+d_x_vars)*total_edgenum]);
 	 mip->is_int[i] = FALSE;
 	 v1 = edges[2*(indices[i]-(2+d_x_vars)*total_edgenum) + 1];
-	 mip->ub[i] = flow_capacity - vrp->demand[v1];
+	 mip->ub[i] = flow_capacity - cnrp->demand[v1];
 #ifdef ADD_CAP_CUTS
 	 mip->matbeg[i]    = j;
 	 mip->matval[j]    = 1.0;
@@ -366,12 +366,12 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    /* set the initial right hand side */
    if (od_const){
       /*degree constraints for the depot*/
-      mip->rhs[0] = vrp->numroutes;
+      mip->rhs[0] = cnrp->numroutes;
       mip->sense[0] = 'E';
-      mip->rhs[vertnum] = vrp->numroutes;
+      mip->rhs[vertnum] = cnrp->numroutes;
       mip->sense[vertnum] = 'E';
    }else if (prob_type == VRP || prob_type == TSP || prob_type == BPP){
-      (mip->rhs[0]) = 2*vrp->numroutes;
+      (mip->rhs[0]) = 2*cnrp->numroutes;
       mip->sense[0] = 'E';
    }else{
       /*cardinality constraint*/
@@ -404,7 +404,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 break;
       }
 #ifdef ADD_FLOW_VARS
-      mip->rhs[(1+od_const)*vertnum + i - 1] = vrp->demand[i];
+      mip->rhs[(1+od_const)*vertnum + i - 1] = cnrp->demand[i];
       mip->sense[(1+od_const)*vertnum + i - 1] = 'E';
 #endif
    }
@@ -438,11 +438,11 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 		     double *values, int *feasible, double *true_objval)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   cnrp_spec *cnrp = (cnrp_spec *)user;
    vertex *verts;
-   int *demand = vrp->demand, capacity = vrp->capacity;
+   int *demand = cnrp->demand, capacity = cnrp->capacity;
    int rcnt, *compnodes, *compdemands;
-   int vertnum = vrp->vertnum, i;
+   int vertnum = cnrp->vertnum, i;
    network *n;
    double *compcuts;
    int total_edgenum = vertnum*(vertnum - 1)/2;
@@ -452,7 +452,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    double flow_value;
    
 #ifndef ADD_CAP_CUTS
-      n = create_flow_net(indices, values, varnum, lpetol, vrp->edges, demand,
+      n = create_flow_net(indices, values, varnum, lpetol, cnrp->edges, demand,
 			  vertnum);
 #else
 #ifdef DIRECTED_X_VARS
@@ -462,11 +462,11 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 #endif   
    varnum = i;
    
-   n = create_net(indices, values, varnum, lpetol, vrp->edges, demand,
+   n = create_net(indices, values, varnum, lpetol, cnrp->edges, demand,
 		  vertnum);
 #endif   
 #else
-   n = create_net(indices, values, varnum, lpetol, vrp->edges, demand,
+   n = create_net(indices, values, varnum, lpetol, cnrp->edges, demand,
 		  vertnum);
 #endif
    
@@ -539,19 +539,19 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    
    *feasible = IP_FEASIBLE;
 
-   if (vrp->par.verbosity > 5){
-      display_support_graph(vrp->window, FALSE, (char *)"Weighted solution",
+   if (cnrp->par.verbosity > 5){
+      display_support_graph(cnrp->window, FALSE, (char *)"Weighted solution",
 			    varnum, indices, values, .000001, total_edgenum,
 			    FALSE);
 #ifdef ADD_FLOW_VARS
-      display_support_graph_flow(vrp->window, FALSE, (char *)"Flow solution",
+      display_support_graph_flow(cnrp->window, FALSE, (char *)"Flow solution",
 				 tmp, varnum, indices, values, .000001,
 				 total_edgenum,CTOI_WAIT_FOR_CLICK_AND_REPORT);
 #endif
    }
 
 #if 0
-   construct_feasible_solution(vrp, n, true_objval);
+   construct_feasible_solution(cnrp, n, true_objval);
 #endif
    
    free_net(n);
@@ -573,13 +573,13 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 int user_send_feasible_solution(void *user, double lpetol, int varnum,
 				int *indices, double *values)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   cnrp_spec *cnrp = (cnrp_spec *)user;
 
-   if (vrp->par.prob_type == TSP || vrp->par.prob_type == VRP ||
-       vrp->par.prob_type == BPP)
-      send_char_array((char *)vrp->cur_sol, vrp->vertnum*sizeof(_node));
+   if (cnrp->par.prob_type == TSP || cnrp->par.prob_type == VRP ||
+       cnrp->par.prob_type == BPP)
+      send_char_array((char *)cnrp->cur_sol, cnrp->vertnum*sizeof(_node));
    else
-      send_int_array(vrp->cur_sol_tree, (vrp->vertnum-1) * ISIZE);
+      send_int_array(cnrp->cur_sol_tree, (cnrp->vertnum-1) * ISIZE);
       
    return(USER_SUCCESS);
 }
@@ -595,19 +595,19 @@ int user_send_feasible_solution(void *user, double lpetol, int varnum,
 int user_display_lp_solution(void *user, int which_sol, int varnum,
 			     int *indices, double *values)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
-   int i, total_edgenum = vrp->vertnum*(vrp->vertnum -1)/2;
+   cnrp_spec *cnrp = (cnrp_spec *)user;
+   int i, total_edgenum = cnrp->vertnum*(cnrp->vertnum -1)/2;
    
 #ifdef ADD_FLOW_VARS
    for (i = 0; i < varnum && indices[i] < 2*total_edgenum; i++);
 #endif   
    
-   if (vrp->par.verbosity > 10 ||
-       (vrp->par.verbosity > 8 && (which_sol == DISP_FINAL_RELAXED_SOLUTION)) ||
-       (vrp->par.verbosity > 6 && (which_sol == DISP_FEAS_SOLUTION))){
-      display_support_graph(vrp->window, FALSE, (char *)"Weighted solution",
+   if (cnrp->par.verbosity > 10 ||
+       (cnrp->par.verbosity > 8 && (which_sol == DISP_FINAL_RELAXED_SOLUTION))
+       || (cnrp->par.verbosity > 6 && (which_sol == DISP_FEAS_SOLUTION))){
+      display_support_graph(cnrp->window, FALSE, (char *)"Weighted solution",
 			    i, indices, values, .000001, total_edgenum, FALSE);
-      display_support_graph_flow(vrp->window, FALSE, (char *)"Flow solution",
+      display_support_graph_flow(cnrp->window, FALSE, (char *)"Flow solution",
 				 varnum, i, indices, values, .000001,
 				 total_edgenum,CTOI_WAIT_FOR_CLICK_AND_REPORT);
    }
@@ -657,17 +657,17 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		     int *new_row_num, waiting_row ***new_rows)
 {
   int i, j, k, nzcnt = 0, nzcnt_side = 0, nzcnt_across = 0;
-  vrp_spec *vrp = (vrp_spec *)user;
-  int index, v0, v1, demand, *edges = vrp->edges;
+  cnrp_spec *cnrp = (cnrp_spec *)user;
+  int index, v0, v1, demand, *edges = cnrp->edges;
   waiting_row **row_list = NULL;
   int *matind = NULL, *matind_across, *matind_side;
   cut_data *cut;
   char *coef;
   double *matval = NULL;
 #if defined(ADD_FLOW_VARS) || defined(DIRECTED_X_VARS)
-  int total_edgenum = vrp->vertnum*(vrp->vertnum - 1)/2;
+  int total_edgenum = cnrp->vertnum*(cnrp->vertnum - 1)/2;
 #endif
-  int jj, size, vertnum = ((vrp_spec *)user)->vertnum; 
+  int jj, size, vertnum = ((cnrp_spec *)user)->vertnum; 
   int cliquecount = 0, val, edgeind;
   char *clique_array, first_coeff_found, second_coeff_found, third_coeff_found;
   char d_x_vars;
@@ -853,7 +853,8 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	v1 = index < total_edgenum ? edges[(index << 1) + 1] :
 	   edges[((index - total_edgenum) << 1) + 1];
 	if (v0){
-	   demand = index < total_edgenum ? vrp->demand[v0] : vrp->demand[v1];
+	   demand =
+	      index < total_edgenum ? cnrp->demand[v0] : cnrp->demand[v1];
 	}else{
 	   demand = 0;
 	}
@@ -880,12 +881,12 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 #endif
 	if (first_coeff_found){
 #ifdef DIRECTED_X_VARS
-	   matval[0] = -((double)vrp->capacity - demand);
+	   matval[0] = -((double)cnrp->capacity - demand);
 #else
-	   if (vrp->par.prob_type == CSTP || vrp->par.prob_type == CTP){
-	      matval[0] = -((double)vrp->capacity);
+	   if (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == CTP){
+	      matval[0] = -((double)cnrp->capacity);
 	   }else{
-	      matval[0] = -((double)vrp->capacity)/2;
+	      matval[0] = -((double)cnrp->capacity)/2;
 	   }
 #endif
 	   if (second_coeff_found){
@@ -946,7 +947,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	for (nzcnt = 0, k = 0; k < varnum; k++){
 	   if (vars[k]->userind == index){
 	      matind[nzcnt] = k;
-	      matval[nzcnt++] = v1 ? -vrp->demand[v1] : 0;
+	      matval[nzcnt++] = v1 ? -cnrp->demand[v1] : 0;
 	      break;
 	   }
 	}
@@ -956,7 +957,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	   if (vars[k]->userind == (index < total_edgenum ? index :
 				    index - total_edgenum)){
 	      matind[nzcnt] = k;
-	      matval[nzcnt++] = v1 ? -vrp->demand[v1] : 0;
+	      matval[nzcnt++] = v1 ? -cnrp->demand[v1] : 0;
 	      break;
 	   }
 	}
@@ -1114,16 +1115,16 @@ int user_send_lp_solution(void *user, int varnum, var_desc **vars, double *x,
 int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 			char *status, int *num_fixed)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   cnrp_spec *cnrp = (cnrp_spec *)user;
    lp_net *lp_net;
-   int *compdemands, capacity = vrp->capacity;
+   int *compdemands, capacity = cnrp->capacity;
    int numchains = 0, v0, v1;
    lp_net_node *verts;
    int i;
-   int *edges = vrp->edges;
+   int *edges = cnrp->edges;
    int fixed_num = 0;
 #ifdef ADD_FLOW_VARS
-   int total_edgenum = vrp->vertnum*(vrp->vertnum - 1)/2;
+   int total_edgenum = cnrp->vertnum*(cnrp->vertnum - 1)/2;
 #endif
 
    return(USER_SUCCESS); /*for now, don't do logical fixing*/
@@ -1132,14 +1133,14 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
      as in the min_cut routine */
 
    /*set up the graph induced by the edges fixed to one*/
-   lp_net = create_lp_net(vrp, status, varnum, vars);
+   lp_net = create_lp_net(cnrp, status, varnum, vars);
 
    verts = lp_net->verts;
 
    compdemands = (int *) calloc (varnum + 1, sizeof(int));
 
    /*get the connected components of the 1-edge graph*/
-   numchains = vrp_lp_connected(lp_net, compdemands);
+   numchains = cnrp_lp_connected(lp_net, compdemands);
 
 #ifdef ADD_FLOW_VARS
    for (i = 0; i < varnum && vars[i]->userind < total_edgenum; i++){
@@ -1151,7 +1152,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
       v0 = edges[(vars[i]->userind) << 1];
       v1 = edges[((vars[i]->userind) << 1) + 1];
       if (!v0){
-	 if (verts[0].degree == 2*(vrp->numroutes)){
+	 if (verts[0].degree == 2*(cnrp->numroutes)){
 	    /* if the depot has 2*numroutes edges adjacent to it fixed to one,
 	       then we can eliminate all other edges adjacent to the depot
 	       from the problem*/
@@ -1200,9 +1201,9 @@ int user_generate_column(void *user, int generate_what, int cutnum,
 			 int *real_nextind, double *colval, int *colind,
 			 int *collen, double *obj, double *lb, double *ub)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   cnrp_spec *cnrp = (cnrp_spec *)user;
    int vh, vl, i;
-   int total_edgenum = vrp->vertnum*(vrp->vertnum-1)/2;
+   int total_edgenum = cnrp->vertnum*(cnrp->vertnum-1)/2;
 
    switch (generate_what){
     case GENERATE_NEXTIND:
@@ -1220,10 +1221,10 @@ int user_generate_column(void *user, int generate_what, int cutnum,
       }else{
 	 if (nextind == -1) nextind = total_edgenum;
 	 /*first, cycle through the edges that were eliminated in the root*/
-	 for (i = prevind + 1; i < nextind && !vrp->edges[(i<<1)+1]; i++);
+	 for (i = prevind + 1; i < nextind && !cnrp->edges[(i<<1)+1]; i++);
 	 /*now we should have the next nonzero edge*/
-	 vl = vrp->edges[i << 1];
-	 vh = vrp->edges[(i << 1) + 1];
+	 vl = cnrp->edges[i << 1];
+	 vh = cnrp->edges[(i << 1) + 1];
       }
       if (i == nextind)
 	 return(USER_SUCCESS);
@@ -1235,7 +1236,7 @@ int user_generate_column(void *user, int generate_what, int cutnum,
    /* Now we just have to generate the column corresponding to (vh, vl) */
 
    {
-      int nzcnt = 0, vertnum = vrp->vertnum;
+      int nzcnt = 0, vertnum = cnrp->vertnum;
       char *coef;
       cut_data *cut;
       int j, size;
@@ -1290,7 +1291,7 @@ int user_generate_column(void *user, int generate_what, int cutnum,
 	 }
       }
       *collen = nzcnt;
-      *obj = vrp->costs[*real_nextind];
+      *obj = cnrp->costs[*real_nextind];
    }
 
    return(USER_SUCCESS);
@@ -1324,55 +1325,6 @@ int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
 /*===========================================================================*/
 
 /*===========================================================================*\
- * The user has to generate the ubber bounds for the specified
- * variables. Lower bounds are always assumed (w.l.o.g.) to be zero.
-\*===========================================================================*/
-
-int user_get_upper_bounds(void *user, int varnum, int *indices, double *ub)
-{
-   int i;
-#ifdef ADD_FLOW_VARS
-   vrp_spec *vrp = (vrp_spec *)user;
-   int *edges = vrp->edges;
-   int v0, total_edgenum = vrp->vertnum*(vrp->vertnum - 1)/2;
-   double flow_capacity;
-   char d_x_vars = FALSE;
-
-#ifdef DIRECTED_X_VARS
-   d_x_vars = TRUE;
-   flow_capacity = (double) vrp->capacity;
-#else
-   if (vrp->par.prob_type == CSTP || vrp->par.prob_type == CTP)
-      flow_capacity = (double) vrp->capacity;
-   else
-      flow_capacity = ((double)vrp->capacity)/2;
-#endif
-#endif
-
-   for (i = 0; i < varnum; i++){
-#ifdef ADD_FLOW_VARS
-      if (indices[i] < (1+d_x_vars)*total_edgenum){
-#else
-      {
-#endif
-	 ub[i] = 1;
-#ifdef ADD_FLOW_VARS
-      }else if (indices[i] < (2+d_x_vars)*total_edgenum){
-	 v0 = edges[2*(indices[i] - (1+d_x_vars)*total_edgenum)];
-	 ub[i] = flow_capacity - (v0 ? vrp->demand[v0] : 0);
-      }else{
-	 ub[i] = flow_capacity - vrp->demand[edges[2*(indices[i] -
-			(2+d_x_vars)*total_edgenum)]+1];
-#endif
-      }
-   }
-      
-   return(USER_SUCCESS);
-}
-
-/*===========================================================================*/
-
-/*===========================================================================*\
  * The user might want to generate cuts in the LP using information
  * about the current tableau, etc. This is for advanced users only.
 \*===========================================================================*/
@@ -1391,16 +1343,16 @@ int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
  * logical fixing routine 
 \*===========================================================================*/
 
-lp_net *create_lp_net(vrp_spec *vrp, char *status, int edgenum,
+lp_net *create_lp_net(cnrp_spec *cnrp, char *status, int edgenum,
 		      var_desc **vars)
 {
    lp_net *n;
    lp_net_node *verts;
    int nv0 = 0, nv1 = 0;
    lp_net_edge *adjlist;
-   int vertnum = vrp->vertnum, i;
-   int *demand = vrp->demand;
-   int *edges = vrp->edges;
+   int vertnum = cnrp->vertnum, i;
+   int *demand = cnrp->demand;
+   int *edges = cnrp->edges;
 #ifdef ADD_FLOW_VARS
    int total_edgenum = vertnum*(vertnum-1)/2;
 #endif
@@ -1459,7 +1411,7 @@ lp_net *create_lp_net(vrp_spec *vrp, char *status, int edgenum,
  * used in the logical fixing routine 
 \*===========================================================================*/
 
-int vrp_lp_connected(lp_net *n, int *compdemands)
+int cnrp_lp_connected(lp_net *n, int *compdemands)
 {
    int cur_node = 0, cur_comp = 0;
    lp_net_node *verts = n->verts;
@@ -1526,10 +1478,10 @@ void free_lp_net(lp_net *n)
 
 /*===========================================================================*/
 
-void construct_feasible_solution(vrp_spec *vrp, network *n,
+void construct_feasible_solution(cnrp_spec *cnrp, network *n,
 				 double *true_objval)
 {
-  _node *tour = vrp->cur_sol;
+  _node *tour = cnrp->cur_sol;
   int cur_vert = 0, prev_vert = 0, cur_route, i, count;
   elist *cur_route_start = NULL;
   edge *edge_data;
@@ -1537,13 +1489,13 @@ void construct_feasible_solution(vrp_spec *vrp, network *n,
   double fixed_cost = 0.0, variable_cost = 0.0;
 
   for (i = 0; i < n->edgenum; i++){
-     fixed_cost += vrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
+     fixed_cost += cnrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
 #ifdef ADD_FLOW_VARS
      variable_cost += (n->edges[i].flow1+n->edges[i].flow2)*
-	vrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
+	cnrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
 #endif
   }
-  *true_objval = vrp->par.gamma*fixed_cost + vrp->par.tau*variable_cost;
+  *true_objval = cnrp->par.gamma*fixed_cost + cnrp->par.tau*variable_cost;
      
   printf("\nSolution Found:\n");
 #ifdef ADD_FLOW_VARS
@@ -1553,11 +1505,11 @@ void construct_feasible_solution(vrp_spec *vrp, network *n,
   printf("Solution Cost: %.0f\n", fixed_cost);
 #endif
      
-  if (vrp->par.prob_type == TSP || vrp->par.prob_type == VRP ||
-      vrp->par.prob_type == BPP){ 
+  if (cnrp->par.prob_type == TSP || cnrp->par.prob_type == VRP ||
+      cnrp->par.prob_type == BPP){ 
      /*construct the tour corresponding to this solution vector*/
      for (cur_route_start = verts[0].first, cur_route = 1,
-	     edge_data = cur_route_start->data; cur_route <= vrp->numroutes;
+	     edge_data = cur_route_start->data; cur_route <= cnrp->numroutes;
 	  cur_route++){
 	edge_data = cur_route_start->data;
 	edge_data->scanned = TRUE;
@@ -1612,7 +1564,7 @@ void construct_feasible_solution(vrp_spec *vrp, network *n,
      printf("\n\n");
   }else{
      for (i = 0; i < n->edgenum; i++){
-	vrp->cur_sol_tree[i] = INDEX(n->edges[i].v0, n->edges[i].v1);
+	cnrp->cur_sol_tree[i] = INDEX(n->edges[i].v0, n->edges[i].v1);
      }
 
      /* Display the solution */

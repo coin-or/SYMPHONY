@@ -22,8 +22,8 @@
 /* CNRP include files */
 #include "cnrp_types.h"
 
-void make_small_graph PROTO((vrp_problem *p, int plus_edges));
-void save_small_graph PROTO((vrp_problem *tsp));
-void read_small_graph PROTO((vrp_problem *tsp));
+void make_small_graph PROTO((cnrp_problem *p, int plus_edges));
+void save_small_graph PROTO((cnrp_problem *tsp));
+void read_small_graph PROTO((cnrp_problem *tsp));
 
 #endif

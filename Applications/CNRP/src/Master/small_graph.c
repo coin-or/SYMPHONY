@@ -32,7 +32,7 @@
  * g->edges st. the lower numbered nodes are the first in every node pair.
 \*===========================================================================*/
 
-void make_small_graph(vrp_problem *p, int plus_edges)
+void make_small_graph(cnrp_problem *p, int plus_edges)
 {
    closenode *closenodes;
    int cost;
@@ -118,15 +118,15 @@ void make_small_graph(vrp_problem *p, int plus_edges)
 
 /*===========================================================================*/
 
-void save_small_graph(vrp_problem *vrp)
+void save_small_graph(cnrp_problem *cnrp)
 {
    FILE *sgfile;
-   small_graph *g = vrp->g;
+   small_graph *g = cnrp->g;
    edge_data *ed;
    int i, j;
    _node *tour;
 
-   if ((sgfile = fopen(vrp->par.small_graph_file, "w")) == NULL){
+   if ((sgfile = fopen(cnrp->par.small_graph_file, "w")) == NULL){
       printf(" **************** Couldn't open small_graph_file for save!!\n");
       return;
    }
@@ -134,9 +134,9 @@ void save_small_graph(vrp_problem *vrp)
    for (i=g->edgenum, ed=g->edges; i; i--, ed++)
       fprintf(sgfile, "a %5i %5i %i\n", ed->v0, ed->v1, ed->cost);
 
-   tour = vrp->cur_tour->tour;
-   fprintf(sgfile, "cost %i\n", vrp->cur_tour->cost);
-   fprintf(sgfile, "numroutes %i\n", vrp->cur_tour->numroutes);
+   tour = cnrp->cur_tour->tour;
+   fprintf(sgfile, "cost %i\n", cnrp->cur_tour->cost);
+   fprintf(sgfile, "numroutes %i\n", cnrp->cur_tour->numroutes);
    for (j = 0; j < g->vertnum; j++)
       fprintf(sgfile, "%i %i\n", tour[j].next, tour[j].route);
 
@@ -145,7 +145,7 @@ void save_small_graph(vrp_problem *vrp)
 
 /*===========================================================================*/
 
-void read_small_graph(vrp_problem *vrp)
+void read_small_graph(cnrp_problem *cnrp)
 {
    FILE *sgfile;
    small_graph *g;
@@ -153,11 +153,11 @@ void read_small_graph(vrp_problem *vrp)
    int i, j;
    _node *tour;
 
-   if ((sgfile = fopen(vrp->par.small_graph_file, "r")) == NULL){
+   if ((sgfile = fopen(cnrp->par.small_graph_file, "r")) == NULL){
       printf(" **************** Couldn't open small_graph_file for load!!\n");
       exit(-1);
    }
-   g = vrp->g = (small_graph *) calloc (1, sizeof(small_graph));
+   g = cnrp->g = (small_graph *) calloc (1, sizeof(small_graph));
    fscanf(sgfile, "p %5i %7i\n", &g->vertnum, &g->edgenum);
    g->allocated_edgenum = g->edgenum;
    g->del_edgenum = 0;
@@ -166,9 +166,9 @@ void read_small_graph(vrp_problem *vrp)
    for (i=g->edgenum, ed=g->edges; i; i--, ed++)
       fscanf(sgfile, "a %5i %5i %i\n", &ed->v0, &ed->v1, &ed->cost);
 
-   tour = vrp->cur_tour->tour;
-   fscanf(sgfile, "cost %i\n", &vrp->cur_tour->cost);
-   fscanf(sgfile, "numroutes %i\n", &vrp->cur_tour->numroutes);
+   tour = cnrp->cur_tour->tour;
+   fscanf(sgfile, "cost %i\n", &cnrp->cur_tour->cost);
+   fscanf(sgfile, "numroutes %i\n", &cnrp->cur_tour->numroutes);
    for (j=0; j<g->vertnum; j++)
       fscanf(sgfile, "%i %i\n", &tour[j].next, &tour[j].route);
    

@@ -77,11 +77,11 @@ typedef struct LP_NET{
 }lp_net;
 
 /*---------------------------------------------------------------------------*\
-| Here we store the vrp specific data needed to process each node of the tree |
+| Here we store the specific data needed to process each node of the tree     |
 \*---------------------------------------------------------------------------*/
 
-typedef struct VRP_SPEC{
-   lp_user_params par;
+typedef struct CNRP_SPEC{
+   cnrp_lp_params par;
    int            window;    /*contains the tid of the graphics window*/
    int            vertnum;   /*the number of nodes in the problem,
 			       including the depot                */
@@ -94,17 +94,17 @@ typedef struct VRP_SPEC{
    int           *costs;     /*contains the objective function values*/
    _node         *cur_sol;
    int           *cur_sol_tree;
-}vrp_spec;
+}cnrp_spec;
 
 /*---------------------------------------------------------------------------*\
 | Routines entirely specific to main_lp                                       |
 \*---------------------------------------------------------------------------*/
 
-lp_net *create_lp_net PROTO((vrp_spec *vrp, char *status, int edgenum,
+lp_net *create_lp_net PROTO((cnrp_spec *cnrp, char *status, int edgenum,
 			     var_desc **vars));
-int vrp_lp_connected PROTO((lp_net *n, int *compdemands));
+int cnrp_lp_connected PROTO((lp_net *n, int *compdemands));
 void free_lp_net  PROTO((lp_net *n));
-void construct_feasible_solution PROTO((vrp_spec *vrp, network *n,
+void construct_feasible_solution PROTO((cnrp_spec *cnrp, network *n,
 					double *objval));
 double compute_lhs PROTO((int number,  int *indices, double *values,
 			  cut_data *cut, int vertnum));

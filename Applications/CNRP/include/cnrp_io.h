@@ -22,8 +22,8 @@
 /* CNRP include files */
 #include "cnrp_types.h"
 
-void vrp_readparams PROTO((vrp_problem *vrp, char *filename, int argc,
+void cnrp_readparams PROTO((cnrp_problem *cnrp, char *filename, int argc,
 		       char **argv));
-void vrp_io PROTO((vrp_problem *vrp, char *infile));
+void cnrp_io PROTO((cnrp_problem *cnrp, char *infile));
 
 #endif

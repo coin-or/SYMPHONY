@@ -19,12 +19,12 @@
 /* SYMPHONY include files */
 #include "proto.h"
 
-typedef struct VRP_SPEC_CP{
+typedef struct CNRP_SPEC_CP{
    int vertnum;         /*number of vertices in the problem*/
    int edgenum;         /*number of edges in the problem*/
    int *edges;          /*a list of the edges (by index pairs)*/
    struct POOL_NET *n;
-}vrp_spec_cp;
+}cnrp_spec_cp;
 
 /*--------------------------------------------------------------------------*
  * The next three data structuires are used in the construction of the        
@@ -48,9 +48,9 @@ typedef struct POOL_EDGE{
    double weight;
 }pool_edge;
 
-pool_net *create_pool_net PROTO((vrp_spec_cp *vcp, int varnum, int *indices,
+pool_net *create_pool_net PROTO((cnrp_spec_cp *vcp, int varnum, int *indices,
 				 double *values));
-void free_pool_net PROTO((vrp_spec_cp *vcp));
+void free_pool_net PROTO((cnrp_spec_cp *vcp));
 
 
 #endif

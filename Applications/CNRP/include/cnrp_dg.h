@@ -68,9 +68,9 @@ typedef struct DG_NET_NETWORK{
 			     *supernodes)*/
 }dg_net_network;
 
-typedef struct VRP_DG{
+typedef struct CNRP_DG{
    dg_net_network *n;
-}vrp_dg;
+}cnrp_dg;
 
 
 dg_net_network *dg_createnet PROTO((int vertnum,

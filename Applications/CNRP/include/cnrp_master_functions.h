@@ -24,8 +24,9 @@
 
 int is_same_edge PROTO((const void *ed0, const void *ed1));
 void delete_dup_edges PROTO((small_graph *g));
-void broadcast PROTO((vrp_problem *vrp, int *tids, int jobs));
-int *create_edge_list PROTO((vrp_problem *vrp, int *varnum, char which_edges));
+void broadcast PROTO((cnrp_problem *cnrp, int *tids, int jobs));
+int *create_edge_list PROTO((cnrp_problem *cnrp, int *varnum,
+			     char which_edges));
 
 #endif
 

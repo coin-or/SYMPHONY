@@ -47,7 +47,7 @@
 #define _ATT      9
 
 /*---------------- message types --------------------------------------------*/
-#define VRP_DATA         1
+#define CNRP_DATA        1
 #define DISPLAY_DATA     2
 #define NUMROUTES        3
 #define COORD_DATA       4

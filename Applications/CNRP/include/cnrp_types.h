@@ -45,7 +45,7 @@ typedef struct CLOSENODE{ /*close node to a particular one */
    int cost;
 }closenode;
 
-typedef struct VRP_PARAMS{
+typedef struct CNRP_PARAMS{
    char          infile[MAX_FILE_NAME_LENGTH + 1];
    int           verbosity;
    char          prob_type;
@@ -58,18 +58,18 @@ typedef struct VRP_PARAMS{
    int           use_small_graph;
    char          small_graph_file[MAX_FILE_NAME_LENGTH];
    int           colgen_strat[2];
-}vrp_params;
+}cnrp_params;
 
 /*---------------------------------------------------------------------------*\
  * The problem data structure contains the data for a problem instance, as
  * well as some of the tours that have been generated.
 \*---------------------------------------------------------------------------*/
 
-typedef struct VRP_PROBLEM{
+typedef struct CNRP_PROBLEM{
    char            name[100];  /* the name of the problem instance */
-   vrp_params      par;
-   cg_user_params  cg_par;
-   lp_user_params  lp_par;
+   cnrp_params      par;
+   cnrp_cg_params  cg_par;
+   cnrp_lp_params  lp_par;
    int             dg_id;     /* drawgraph process id */
    int             vertnum;   /* the number of nodes in the problem, including
 				 the depot */
@@ -97,6 +97,6 @@ typedef struct VRP_PROBLEM{
 #endif
    int            *zero_vars;
    int             zero_varnum;
-}vrp_problem;
+}cnrp_problem;
 
 #endif

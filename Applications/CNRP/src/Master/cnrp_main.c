@@ -14,6 +14,7 @@
 /*===========================================================================*/
 
 #define COMPILING_FOR_MASTER
+#define USER_MAIN
 
 /* system include files */
 #include <malloc.h>
@@ -74,7 +75,7 @@ int main(int argc, char **argv)
    int *tree;
    int solution1, solution2;
    double utopia_fixed, utopia_variable;
-   vrp_problem *vrp;
+   cnrp_problem *cnrp;
    
    setvbuf(stdout, (char *)NULL, _IOLBF, 0);
 
@@ -82,7 +83,7 @@ int main(int argc, char **argv)
    printf("*******************************************************\n");
    printf("*   This is SYMPHONY Version 4.0                      *\n");
    printf("*   Copyright 2000-2003 Ted Ralphs                    *\n");
-   printf("*   All Rights Reserved.                                     *\n");
+   printf("*   All Rights Reserved.                              *\n");
    printf("*   Distributed under the Common Public License 1.0   *\n");
    printf("*******************************************************\n");
    printf("\n");
@@ -110,14 +111,14 @@ int main(int argc, char **argv)
    cnrp_solve(p, argc, argv,  gamma, tau);
 
    /* Store the solution */
-   vrp = (vrp_problem *)(p->user);
-   tree = solutions[numsolutions].tree = (int *) calloc(vrp->vertnum-1, ISIZE);
-   memcpy((char *)tree, vrp->cur_sol_tree, vrp->vertnum-1);
+   cnrp = (cnrp_problem *)(p->user);
+   tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
+   memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
    solutions[numsolutions].gamma = gamma;
    solutions[numsolutions].tau = tau;
-   solutions[numsolutions].fixed_cost = (int) vrp->fixed_cost;
-   solutions[numsolutions++].variable_cost = (int) vrp->variable_cost;
-   utopia_fixed = vrp->fixed_cost;
+   solutions[numsolutions].fixed_cost = (int) cnrp->fixed_cost;
+   solutions[numsolutions++].variable_cost = (int) cnrp->variable_cost;
+   utopia_fixed = cnrp->fixed_cost;
       
    free_master_u(p);      
   
@@ -136,14 +137,14 @@ int main(int argc, char **argv)
    cnrp_solve(p, argc, argv,  gamma, tau);
       
    /* Store the solution */
-   vrp = (vrp_problem *)(p->user);
-   tree = solutions[numsolutions].tree = (int *) calloc(vrp->vertnum-1, ISIZE);
-   memcpy((char *)tree, vrp->cur_sol_tree, vrp->vertnum-1);
+   cnrp = (cnrp_problem *)(p->user);
+   tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
+   memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
    solutions[numsolutions].gamma = gamma;
    solutions[numsolutions].tau = tau;
-   solutions[numsolutions].fixed_cost = (int) vrp->fixed_cost;
-   solutions[numsolutions++].variable_cost = (int) vrp->variable_cost;
-   utopia_variable = vrp->variable_cost;
+   solutions[numsolutions].fixed_cost = (int) cnrp->fixed_cost;
+   solutions[numsolutions++].variable_cost = (int) cnrp->variable_cost;
+   utopia_variable = cnrp->variable_cost;
 
    printf("***************************************************\n");
    printf("***************************************************\n");
@@ -181,12 +182,12 @@ int main(int argc, char **argv)
 
       cnrp_solve(p, argc, argv,  gamma, tau);
 
-      vrp = (vrp_problem *)(p->user);
+      cnrp = (cnrp_problem *)(p->user);
       
-      if ((int) vrp->fixed_cost > solutions[solution1].fixed_cost &&
-	  (int) vrp->variable_cost < solutions[solution1].variable_cost &&
-	  (int) vrp->fixed_cost < solutions[solution2].fixed_cost &&
-	  (int) vrp->variable_cost > solutions[solution2].variable_cost ){
+      if ((int) cnrp->fixed_cost > solutions[solution1].fixed_cost &&
+	  (int) cnrp->variable_cost < solutions[solution1].variable_cost &&
+	  (int) cnrp->fixed_cost < solutions[solution2].fixed_cost &&
+	  (int) cnrp->variable_cost > solutions[solution2].variable_cost ){
 	 if (numsolutions == 100){
 	    printf("Maximum number of solutions exceeded\n\n");
 	    exit(0);
@@ -197,12 +198,12 @@ int main(int argc, char **argv)
 	 }
 	 numsolutions++;
 	 tree = solutions[solution2].tree =
-	    (int *) calloc(vrp->vertnum-1, ISIZE);
-	 memcpy((char *)tree, vrp->cur_sol_tree, vrp->vertnum-1);
+	    (int *) calloc(cnrp->vertnum-1, ISIZE);
+	 memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
 	 solutions[solution2].gamma = gamma;
 	 solutions[solution2].tau = tau;
-	 solutions[solution2].fixed_cost = (int) vrp->fixed_cost;
-	 solutions[solution2].variable_cost = (int) vrp->variable_cost;
+	 solutions[solution2].fixed_cost = (int) cnrp->fixed_cost;
+	 solutions[solution2].variable_cost = (int) cnrp->variable_cost;
 	 if (numpairs + 2 > 100){
 	    printf("Maximum number of solution pairs exceeded\n\n");
 	    exit(0);
@@ -280,9 +281,9 @@ void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau)
     * Send out problem data if needed
    \*---------------------------------------------------------------------*/
    
-   vrp_problem *vrp = (vrp_problem *)(p->user);
-   vrp->lp_par.gamma = gamma;
-   vrp->cg_par.tau = vrp->lp_par.tau = tau;
+   cnrp_problem *cnrp = (cnrp_problem *)(p->user);
+   cnrp->lp_par.gamma = gamma;
+   cnrp->cg_par.tau = cnrp->lp_par.tau = tau;
    
    send_lp_data_u(p, 0, base);
    send_cg_data_u(p, 0);

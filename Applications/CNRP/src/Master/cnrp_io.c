@@ -34,6 +34,8 @@
 #include "cnrp_const.h"
 #include "cnrp_macros.h"
 
+#define NUMNODES 15
+
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -44,7 +46,7 @@
  * This first function reads in the data instance.
 \*===========================================================================*/
 
-void vrp_io(vrp_problem *vrp, char *infile)
+void cnrp_io(cnrp_problem *cnrp, char *infile)
 {
   static char keywords[KEY_NUM][22] = {
     "NAME", 
@@ -145,15 +147,16 @@ void vrp_io(vrp_problem *vrp, char *infile)
   int capacity_vol = FALSE;
   int k;
   register int vertnum = 0;
-  distances *dist = &vrp->dist;
+  distances *dist = &cnrp->dist;
+  int adj_vertnum = 0;
 
   if (!strcmp(infile, "")){
-     printf("\nVrp I/O: No problem data file specified\n\n");
+     printf("\nCNRP I/O: No problem data file specified\n\n");
      exit(1);
   }
   
   if ((f = fopen(infile, "r")) == NULL){
-     fprintf(stderr, "Vrp I/O: file '%s' can't be opened\n", infile);
+     fprintf(stderr, "CNRP I/O: file '%s' can't be opened\n", infile);
      exit(1);
   }
   
@@ -185,35 +188,35 @@ void vrp_io(vrp_problem *vrp, char *infile)
      switch (k){
 	
       case 0: /* NAME */
-	if (!sscanf(line, "%s", vrp->name))
-	   fprintf(stderr, "\nVrp I/O: error reading NAME\n\n");
-	printf("PROBLEM NAME: \t\t%s\n", vrp->name);
+	if (!sscanf(line, "%s", cnrp->name))
+	   fprintf(stderr, "\nCNRP I/O: error reading NAME\n\n");
+	printf("PROBLEM NAME: \t\t%s\n", cnrp->name);
 	break;
 
       case 1 : /*TYPE*/
 	sscanf(line, "%s", tmp);
-	if (!vrp->par.prob_type){
+	if (!cnrp->par.prob_type){
 	   if (strcmp("CVRP", tmp) == 0){
-	      vrp->par.prob_type = vrp->cg_par.prob_type =
-		 vrp->lp_par.prob_type = VRP;
+	      cnrp->par.prob_type = cnrp->cg_par.prob_type =
+		 cnrp->lp_par.prob_type = VRP;
 	   }else if (strcmp("TSP", tmp) == 0){
-	      vrp->par.prob_type = vrp->cg_par.prob_type = 
-		 vrp->lp_par.prob_type = TSP;
+	      cnrp->par.prob_type = cnrp->cg_par.prob_type = 
+		 cnrp->lp_par.prob_type = TSP;
 	   }else if (strcmp("BPP", tmp) == 0){
-	      vrp->par.prob_type = vrp->cg_par.prob_type = 
-		 vrp->lp_par.prob_type = BPP;
+	      cnrp->par.prob_type = cnrp->cg_par.prob_type = 
+		 cnrp->lp_par.prob_type = BPP;
 	   }else if (strcmp("CSTP", tmp) == 0){
-	      vrp->par.prob_type = vrp->cg_par.prob_type = 
-		 vrp->lp_par.prob_type = CSTP;
+	      cnrp->par.prob_type = cnrp->cg_par.prob_type = 
+		 cnrp->lp_par.prob_type = CSTP;
 	   }else if (strcmp("CTP", tmp) == 0){
-	      vrp->par.prob_type = vrp->cg_par.prob_type = 
-		 vrp->lp_par.prob_type = CTP;
+	      cnrp->par.prob_type = cnrp->cg_par.prob_type = 
+		 cnrp->lp_par.prob_type = CTP;
 	   }else{
 	      fprintf(stderr, "This is not a recognized problem type!\n");
 	      exit(1);
 	   }
 	}
-	switch(vrp->par.prob_type){
+	switch(cnrp->par.prob_type){
 	 case VRP:
 	   printf("TYPE: \t\t\tCVRP\n");
 	   break;
@@ -239,25 +242,25 @@ void vrp_io(vrp_problem *vrp, char *infile)
       case 2 : /*COMMENT*/
 #if 0
 	if (!strncpy(tmp, line, 80))
-	   fprintf(stderr, "\nVrp I/O: error reading COMMENT\n\n");
+	   fprintf(stderr, "\nCNRP I/O: error reading COMMENT\n\n");
 	printf("DESCRIPTION: \t\t%s\n", tmp);
 #endif
 	break;
       case 3 : /* DIMENSION */
 	if (!sscanf(line, "%i", &k)){
-	   fprintf(stderr, "Vrp I/O: error reading DIMENSION\n\n");
+	   fprintf(stderr, "CNRP I/O: error reading DIMENSION\n\n");
 	   exit(1);
 	}
-	vertnum = vrp->vertnum = (int) k;
-	vrp->edgenum = (int) vertnum * (vertnum - 1)/2;
+	vertnum = cnrp->vertnum = (int) k;
+	cnrp->edgenum = (int) vertnum * (vertnum - 1)/2;
 	printf("DIMENSION: \t\t%i\n", k);
 	break;
       case 4 : /*CAPACITY*/
 	if (!sscanf(line, "%i", &k)){
-	   fprintf(stderr, "Vrp I/O: error reading CAPACITY\n\n");
+	   fprintf(stderr, "CNRP I/O: error reading CAPACITY\n\n");
 	   exit(1);
 	}
-	vrp->capacity = (int) k;
+	cnrp->capacity = (int) k;
 	break;
       case 5 : /* EDGE_WEIGHT_TYPE */
 	sscanf(line, "%s", tmp);
@@ -289,7 +292,7 @@ void vrp_io(vrp_problem *vrp, char *infile)
       case 8: /* EDGE_WEIGHT_SECTION */
 	/*------------------------break if not EXPLICIT -*/
 	if (dist->wtype != _EXPLICIT) break; 
-	dist->cost = (int *) malloc (vrp->edgenum*sizeof(int));
+	dist->cost = (int *) malloc (cnrp->edgenum*sizeof(int));
 	switch (wformat){
 	 case 1 : /* LOWER_ROW */
 	 case 4 : /* UPPER_COL */
@@ -376,18 +379,18 @@ void vrp_io(vrp_problem *vrp, char *infile)
 	   exit(1);
 	}
 	/* posx, posy -*/
-	vrp->posx = (int *) malloc (vertnum*sizeof(int));
-	vrp->posy = (int *) malloc (vertnum*sizeof(int));
+	cnrp->posx = (int *) malloc (vertnum*sizeof(int));
+	cnrp->posy = (int *) malloc (vertnum*sizeof(int));
 	for (i=0; i<vertnum; i++){
 	   if ((k = fscanf(f,"%i%lf%lf", &node, &x, &y)) != 3){
-	      fprintf(stderr, "\nVrp I/O: error reading DISPLAY_DATA\n");
+	      fprintf(stderr, "\nCNRP I/O: error reading DISPLAY_DATA\n");
 	      break;
 	   }
-	   vrp->posx[node-1] = (int)(x + 0.5);
-	   vrp->posy[node-1] = (int)(y + 0.5);
+	   cnrp->posx[node-1] = (int)(x + 0.5);
+	   cnrp->posy[node-1] = (int)(y + 0.5);
 	}
 	if (fscanf(f,"%lf", &fdummy)){
-	   fprintf(stderr, "\nVrp I/O: too much display data\n");
+	   fprintf(stderr, "\nCNRP I/O: too much display data\n");
 	   break;
 	}
 	break;
@@ -398,23 +401,24 @@ void vrp_io(vrp_problem *vrp, char *infile)
 			    (dist->wtype == _MAN_2D)   ))/*&& can disp.*/
 	   dtype = 0;                               /* COORD_DISPLAY */
 	if (dtype == 0){
-	   vrp->posx = (int *) malloc (vertnum*sizeof(int));
-	   vrp->posy = (int *) malloc (vertnum*sizeof(int));
+	   cnrp->posx = (int *) malloc (vertnum*sizeof(int));
+	   cnrp->posy = (int *) malloc (vertnum*sizeof(int));
 	}
 	dist->coordx = (double *) malloc (vertnum*sizeof(double));
 	dist->coordy = (double *) malloc (vertnum*sizeof(double));
 	if (nctype == 1)
 	   dist->coordz = (double *) malloc (vertnum*sizeof(double));
-	for (i=0; i<vertnum; i++){
+#if 0
+	for (i = 0; i < vertnum; i++){
 	   if (nctype == 0)          /* TWOD_COORDS */
 	      if (fscanf(f,"%i%lf%lf", &node, &coord_x, &coord_y) != 3){
-		 fprintf(stderr, "\nVrp I/O: error reading NODE_COORD\n\n");
+		 fprintf(stderr, "\nCNRP I/O: error reading NODE_COORD\n\n");
 		 exit(1);
 	      }
 	   if (nctype == 1)          /* THREED_COORDS */
 	      if (fscanf(f,"%i%lf%lf%lf", &node, &coord_x, &coord_y,
 			 &coord_z) != 4){
-		 fprintf(stderr, "\nVrp I/O: error reading NODE_COORD\n\n");
+		 fprintf(stderr, "\nCNRP I/O: error reading NODE_COORD\n\n");
 		 exit(1);
 	      }
 	   dist->coordx[node-1] = coord_x;
@@ -422,8 +426,8 @@ void vrp_io(vrp_problem *vrp, char *infile)
 	   /*since position is an integer and coord is a double, I must
 	     round off here if dtype is EXPLICIT*/
 	   if (dtype == 0){
-	      vrp->posx[node-1] = (int)coord_x;
-	      vrp->posy[node-1] = (int)coord_y;
+	      cnrp->posx[node-1] = (int)coord_x;
+	      cnrp->posy[node-1] = (int)coord_y;
 	   }
 	   if (nctype == 1) dist->coordz[node-1] = coord_z;
 	   if (dist->wtype == 7){ /* GEO */
@@ -443,8 +447,54 @@ void vrp_io(vrp_problem *vrp, char *infile)
 	      dist->coordy[j] = MY_PI * (deg + 5.0*min/3.0 ) / 180.0;
 	   }
 	}
+#else
+	for (i = adj_vertnum = 0; i < vertnum; i++){
+	   if (nctype == 0){          /* TWOD_COORDS */
+	      if (fscanf(f,"%i%lf%lf", &node, &coord_x, &coord_y) != 3){
+		 fprintf(stderr, "\nCNRP I/O: error reading NODE_COORD\n\n");
+		 exit(1);
+	      }
+	   }
+	   if (nctype == 1){          /* THREED_COORDS */
+	      if (fscanf(f,"%i%lf%lf%lf", &node, &coord_x, &coord_y,
+			 &coord_z) != 4){
+		 fprintf(stderr, "\nCNRP I/O: error reading NODE_COORD\n\n");
+		 exit(1);
+	      }
+	   }
+	   if (NUMNODES > 0 && i % vertnum/NUMNODES != 0)
+	      continue;
+	   dist->coordx[adj_vertnum] = coord_x;
+	   dist->coordy[adj_vertnum] = coord_y;
+	   /*since position is an integer and coord is a double, I must
+	     round off here if dtype is EXPLICIT*/
+	   if (dtype == 0){
+	      cnrp->posx[adj_vertnum] = (int)coord_x;
+	      cnrp->posy[adj_vertnum] = (int)coord_y;
+	   }
+	   if (nctype == 1) dist->coordz[adj_vertnum-1] = coord_z;
+	   if (dist->wtype == 7){ /* GEO */
+	      /*--- latitude & longitude for i ------------*/
+	      deg = floor(dist->coordx[adj_vertnum]);
+	      min = dist->coordx[adj_vertnum] - deg;
+	      dist->coordx[adj_vertnum] = MY_PI * (deg + 5.0*min/3.0 ) / 180.0;
+	      deg = floor(dist->coordy[adj_vertnum]);
+	      min = dist->coordy[adj_vertnum] - deg;
+	      dist->coordy[adj_vertnum] = MY_PI * (deg + 5.0*min/3.0 ) / 180.0;
+	      /*--- latitude & longitude for j ------------*/
+	      deg = floor(dist->coordx[j]);
+	      min = dist->coordx[j] - deg;
+	      dist->coordx[j] = MY_PI * (deg + 5.0*min/3.0 ) / 180.0;
+	      deg = floor(dist->coordy[j]);
+	      min = dist->coordy[j] - deg;
+	      dist->coordy[j] = MY_PI * (deg + 5.0*min/3.0 ) / 180.0;
+	   }
+	   adj_vertnum++;
+	}
+	cnrp->vertnum = adj_vertnum;
+#endif
 	if (fscanf(f,"%i%lf%lf%lf", &node, &coord_x, &coord_y, &coord_z)){
-	   fprintf(stderr, "\nVrp I/O: too much data in NODE_COORD\n\n");
+	   fprintf(stderr, "\nCNRP I/O: too much data in NODE_COORD\n\n");
 	   exit(1);
 	}
 	break;
@@ -463,7 +513,7 @@ void vrp_io(vrp_problem *vrp, char *infile)
 	   fprintf(stderr, "Error in data: depot must be node 1");
 	   exit(1);
 	}
-	vrp->depot = k - 1;
+	cnrp->depot = k - 1;
 	while (-1 != k) fscanf(f, "%i", &k);
 	break;
       case 13: /*CAPACITY_VOL*/
@@ -471,23 +521,23 @@ void vrp_io(vrp_problem *vrp, char *infile)
 	capacity_vol = TRUE;
 	break;
       case 14: /*DEMAND_SECTION*/
-	vrp->demand = (int *) malloc(vertnum*sizeof(int));
+	cnrp->demand = (int *) malloc(vertnum*sizeof(int));
 	for (i = 0; i < vertnum; i++){
 	   if (capacity_vol){
 	      if (fscanf(f, "%i%i%i", &k, &l, &m) != 3){
-		 fprintf(stderr,"\nVrp I/O: error reading DEMAND_SECTION\n\n");
+		 fprintf(stderr,"\nCNRP I/O: error reading DEMAND_SECTION\n");
 		 exit(1);
 	      }
 	   }
 	   else if (fscanf(f, "%i%i", &k, &l) != 2){
-	      fprintf(stderr, "\nVrp I/O: error reading DEMAND_SECTION\n\n");
+	      fprintf(stderr, "\nCNRP I/O: error reading DEMAND_SECTION\n\n");
 	      exit(1);
 	   }
-	   vrp->demand[k-1] = l;
-	   vrp->demand[0] += l;
+	   cnrp->demand[k-1] = l;
+	   cnrp->demand[0] += l;
 	}
 	if (fscanf(f, "%i%i", &k, &l)){
-	   fprintf(stderr, "\nVrp I/O: too much data in DEMAND_SECTION\n\n");
+	   fprintf(stderr, "\nCNRP I/O: too much data in DEMAND_SECTION\n\n");
 	   exit(1);
 	}
 	break;
@@ -508,28 +558,28 @@ void vrp_io(vrp_problem *vrp, char *infile)
   if (f != stdin)
      fclose(f);
   
-  if (vrp->par.prob_type != VRP && vrp->par.prob_type != BPP &&
-      vrp->par.prob_type != TSP && vrp->par.prob_type != CSTP &&
-      vrp->par.prob_type != CTP){
+  if (cnrp->par.prob_type != VRP && cnrp->par.prob_type != BPP &&
+      cnrp->par.prob_type != TSP && cnrp->par.prob_type != CSTP &&
+      cnrp->par.prob_type != CTP){
      printf("Unknown problem type! Exiting...\n");
      exit(1);
   }
   
-  vrp->cur_tour = (best_tours *) calloc(1, sizeof(best_tours));
-  vrp->cur_tour->tour = (_node *) calloc(vertnum, sizeof(_node));
-  vrp->cur_sol_tree = (int *) calloc(vertnum, ISIZE);
+  cnrp->cur_tour = (best_tours *) calloc(1, sizeof(best_tours));
+  cnrp->cur_tour->tour = (_node *) calloc(vertnum, sizeof(_node));
+  cnrp->cur_sol_tree = (int *) calloc(vertnum, ISIZE);
   
   /*calculate all the distances explcitly and then use distance type EXPLICIT*/
 
-  if (vrp->par.prob_type == BPP){
-     dist->cost = (int *) calloc (vrp->edgenum, sizeof(int));
+  if (cnrp->par.prob_type == BPP){
+     dist->cost = (int *) calloc (cnrp->edgenum, sizeof(int));
      for (i = 1, k = 0; i < vertnum; i++){
 	for (j = 0; j < i; j++){
-	   dist->cost[k++] = vrp->demand[i]+vrp->demand[j];
+	   dist->cost[k++] = cnrp->demand[i]+cnrp->demand[j];
 	}
      }
   }else if (dist->wtype != _EXPLICIT){
-     dist->cost = (int *) calloc (vrp->edgenum, sizeof(int));
+     dist->cost = (int *) calloc (cnrp->edgenum, sizeof(int));
      for (i = 1, k = 0; i < vertnum; i++){
 	for (j = 0; j < i; j++){
 	   dist->cost[k++] = ICOST(dist, i, j);
@@ -538,29 +588,29 @@ void vrp_io(vrp_problem *vrp, char *infile)
   }
   dist->wtype = _EXPLICIT;
   
-  if (vrp->par.k_closest < 0){
-     vrp->par.k_closest = (int) ceil(0.1 * vrp->vertnum);
-     if (vrp->par.k_closest < vrp->par.min_closest ) 
-	vrp->par.k_closest = vrp->par.min_closest;
-     if (vrp->par.k_closest > vrp->par.max_closest) 
-	vrp->par.k_closest = vrp->par.max_closest;
-     if (vrp->par.k_closest > vertnum-1) 
-	vrp->par.k_closest = vertnum-1;
+  if (cnrp->par.k_closest < 0){
+     cnrp->par.k_closest = (int) ceil(0.1 * cnrp->vertnum);
+     if (cnrp->par.k_closest < cnrp->par.min_closest ) 
+	cnrp->par.k_closest = cnrp->par.min_closest;
+     if (cnrp->par.k_closest > cnrp->par.max_closest) 
+	cnrp->par.k_closest = cnrp->par.max_closest;
+     if (cnrp->par.k_closest > vertnum-1) 
+	cnrp->par.k_closest = vertnum-1;
   }
-  if (vrp->par.prob_type == TSP || vrp->par.prob_type == CTP){
-     vrp->numroutes = 1;
-     if (!vrp->demand)
-	vrp->demand = (int *) malloc (vertnum * ISIZE);
+  if (cnrp->par.prob_type == TSP || cnrp->par.prob_type == CTP){
+     cnrp->numroutes = 1;
+     if (!cnrp->demand)
+	cnrp->demand = (int *) malloc (vertnum * ISIZE);
      for (i = vertnum - 1; i > 0; i--)
-	vrp->demand[i] = 1;
-     if (!vrp->cg_par.which_tsp_cuts)
-	vrp->cg_par.which_tsp_cuts = ALL_TSP_CUTS;
+	cnrp->demand[i] = 1;
+     if (!cnrp->cg_par.which_tsp_cuts)
+	cnrp->cg_par.which_tsp_cuts = ALL_TSP_CUTS;
   }
   
-  if (vrp->par.prob_type == TSP)
-     vrp->capacity = vrp->demand[0] = vertnum;
-  else if (vrp->par.prob_type == CTP)
-     vrp->capacity = vrp->demand[0] = vertnum-1;
+  if (cnrp->par.prob_type == TSP)
+     cnrp->capacity = cnrp->demand[0] = vertnum;
+  else if (cnrp->par.prob_type == CTP)
+     cnrp->capacity = cnrp->demand[0] = vertnum-1;
 }
 
 /*===========================================================================*/
@@ -569,21 +619,21 @@ void vrp_io(vrp_problem *vrp, char *infile)
  * This second function reads in the parameters from the parameter file.
 \*===========================================================================*/
 
-void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
+void cnrp_readparams(cnrp_problem *cnrp, char *filename, int argc, char **argv)
 {
    int i, j;
    char line[LENGTH], key[50], value[50], c, tmp;
    FILE *f = NULL;
    str_int colgen_str[COLGEN_STR_SIZE] = COLGEN_STR_ARRAY;
    
-   vrp_params *par = &vrp->par;
-   lp_user_params *lp_par = &vrp->lp_par;
-   cg_user_params *cg_par = &vrp->cg_par;
+   cnrp_params *par = &cnrp->par;
+   cnrp_lp_params *lp_par = &cnrp->lp_par;
+   cnrp_cg_params *cg_par = &cnrp->cg_par;
 
-   vrp->numroutes = 0;
+   cnrp->numroutes = 0;
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
-   vrp->feas_sol_size = 0;
-   vrp->feas_sol = NULL;
+   cnrp->feas_sol_size = 0;
+   cnrp->feas_sol = NULL;
 #endif
    par->prob_type = NONE;
    par->k_closest = -1;
@@ -638,7 +688,7 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       goto EXIT;
    
    if ((f = fopen(filename, "r")) == NULL){
-      printf("VRP Readparams: file %s can't be opened\n", filename);
+      printf("CNRP Readparams: file %s can't be opened\n", filename);
       exit(1); /*error check for existence of parameter file*/
    }
 
@@ -653,19 +703,19 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       else if (strcmp(key, "prob_type") == 0){
 	 if (strcmp("VRP", value) == 0){
 	    par->prob_type = cg_par->prob_type = 
-		 vrp->lp_par.prob_type = VRP;
+		 cnrp->lp_par.prob_type = VRP;
 	 }else if (strcmp("TSP", value) == 0){
 	    par->prob_type = cg_par->prob_type = 
-		 vrp->lp_par.prob_type = TSP;
+		 cnrp->lp_par.prob_type = TSP;
 	 }else if (strcmp("BPP", value) == 0){
 	    par->prob_type = cg_par->prob_type = 
-		 vrp->lp_par.prob_type = BPP;
+		 cnrp->lp_par.prob_type = BPP;
 	 }else if (strcmp("CSTP", value) == 0){
 	    par->prob_type = cg_par->prob_type = 
-		 vrp->lp_par.prob_type = CSTP;
+		 cnrp->lp_par.prob_type = CSTP;
 	 }else if (strcmp("CTP", value) == 0){
 	    par->prob_type = cg_par->prob_type = 
-		 vrp->lp_par.prob_type = CTP;
+		 cnrp->lp_par.prob_type = CTP;
 	 }else{
 	    fprintf(stderr, "Unknown problem type!\n");
 	    exit(1);
@@ -722,7 +772,7 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       }
       else if (strcmp(key, "numroutes") == 0){
 	 READ_INT_PAR(j);
-	 vrp->numroutes = j;
+	 cnrp->numroutes = j;
       }
 
       /************************ lp parameters *******************************/
@@ -781,61 +831,61 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       }
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
       else if (strcmp(key, "feasible_solution_edges") == 0){
-	 READ_INT_PAR(vrp->feas_sol_size);
-	 if (vrp->feas_sol_size){
+	 READ_INT_PAR(cnrp->feas_sol_size);
+	 if (cnrp->feas_sol_size){
 	    int cur_node, prev_node = 0;
 	    char value1[10], value2[10];
 	    
-	    vrp->feas_sol = (int *)calloc(vrp->feas_sol_size, sizeof(int));
-	    for (i = 0; i < vrp->feas_sol_size; i++){
+	    cnrp->feas_sol = (int *)calloc(cnrp->feas_sol_size, sizeof(int));
+	    for (i = 0; i < cnrp->feas_sol_size; i++){
 	       if (!fgets( line, LENGTH, f)){
 		  fprintf(stderr,
-			  "\nVrp I/O: error reading in feasible solution\n\n");
+			  "\nCNRP I/O: error reading in feasible solution\n");
 		  exit(1);
 	       }
 	       strcpy(key, "");
 	       sscanf(line, "%s%s%s", key, value1, value2);
 	       if (strcmp(key, "edge")){
 		  fprintf(stderr,
-			  "\nVrp I/O: error reading in feasible solution\n\n");
+			  "\nCNRP I/O: error reading in feasible solution\n");
 		  exit(1);
 	       }
 	       if (sscanf(value1, "%i", &prev_node) != 1){
 		  fprintf(stderr,
-			  "\nVrp I/O: error reading in feasible solution %s\n\n",
-			  key);
+			 "\nCNRP I/O: error reading in feasible solution %s\n",
+			 key);
 		  exit(1);
 	       }
 	       if (sscanf(value2, "%i", &cur_node) != 1){
 		  fprintf(stderr,
-			  "\nVrp I/O: error reading in feasible solution %s\n\n",
-			  key);
+			 "\nCNRP I/O: error reading in feasible solution %s\n",
+			 key);
 		  exit(1);
 	       }
-	       vrp->feas_sol[i] = INDEX(prev_node, cur_node);
+	       cnrp->feas_sol[i] = INDEX(prev_node, cur_node);
 	    }
 	 }
       }
       else if (strcmp(key, "feasible_solution_nodes") == 0){
-	 READ_INT_PAR(vrp->feas_sol_size);
-	 if (vrp->feas_sol_size){
+	 READ_INT_PAR(cnrp->feas_sol_size);
+	 if (cnrp->feas_sol_size){
 	    int cur_node, prev_node = 0;
 	    
-	    vrp->feas_sol = (int *)calloc(vrp->feas_sol_size, sizeof(int));
-	    for (i=0; i<vrp->feas_sol_size; i++){
+	    cnrp->feas_sol = (int *)calloc(cnrp->feas_sol_size, sizeof(int));
+	    for (i=0; i<cnrp->feas_sol_size; i++){
 	       if (!fgets( line, LENGTH, f)){
 		  fprintf(stderr,
-			  "\nVrp I/O: error reading in feasible solution\n\n");
+			  "\nCNRP I/O: error reading in feasible solution\n");
 		  exit(1);
 	       }
 	       sscanf(line, "%s", value);
 	       if (sscanf(value, "%i", &cur_node) != 1){
 		  fprintf(stderr,
-			"\nVrp I/O: error reading in feasible solution %s\n\n",
+			"\nCNRP I/O: error reading in feasible solution %s\n",
 			  key);
 		  exit(1);
 	       }else{
-		  vrp->feas_sol[i] = INDEX(prev_node, cur_node);
+		  cnrp->feas_sol[i] = INDEX(prev_node, cur_node);
 		  prev_node = cur_node;
 	       }
 	    }
@@ -905,7 +955,7 @@ EXIT:
 	 sscanf(argv[++i], "%i", &par->k_closest);
 	 break;
        case 'N':
-	 sscanf(argv[++i], "%i", &vrp->numroutes);
+	 sscanf(argv[++i], "%i", &cnrp->numroutes);
 	 break;
        case 'M':
 	 cg_par->do_mincut = FALSE;
@@ -927,19 +977,19 @@ EXIT:
 	 i++;
 	 if (strcmp("VRP", argv[i]) == 0){
 	    par->prob_type = cg_par->prob_type = 
-		 vrp->lp_par.prob_type = VRP;
+		 cnrp->lp_par.prob_type = VRP;
 	 }else if (strcmp("TSP", argv[i]) == 0){
 	    par->prob_type = cg_par->prob_type = 
-		 vrp->lp_par.prob_type = TSP;
+		 cnrp->lp_par.prob_type = TSP;
 	 }else if (strcmp("BPP", argv[i]) == 0){
 	    par->prob_type = cg_par->prob_type = 
-		 vrp->lp_par.prob_type = BPP;
+		 cnrp->lp_par.prob_type = BPP;
 	 }else if (strcmp("CSTP", argv[i]) == 0){
 	    par->prob_type = cg_par->prob_type = 
-		 vrp->lp_par.prob_type = CSTP;
+		 cnrp->lp_par.prob_type = CSTP;
 	 }else if (strcmp("CTP", argv[i]) == 0){
 	    par->prob_type = cg_par->prob_type = 
-		 vrp->lp_par.prob_type = CTP;
+		 cnrp->lp_par.prob_type = CTP;
 	 }else{
 	    fprintf(stderr, "Unknown problem type!\n");
 	    exit(1);
@@ -947,7 +997,7 @@ EXIT:
 	 break;
 
        case 'C':
-	 sscanf(argv[++i], "%i", &vrp->capacity);
+	 sscanf(argv[++i], "%i", &cnrp->capacity);
 	 break;
       };
    }

@@ -55,8 +55,8 @@ USER_MAIN = TRUE
 DO_CONCORDE_CUTS = FALSE
 DIRECTED_X_VARS = TRUE
 ADD_FLOW_VARS = TRUE
-ADD_CAP_CUTS = TRUE
-ADD_X_CUTS = TRUE
+ADD_CAP_CUTS = FALSE
+ADD_X_CUTS = FALSE
 
 ifeq ($(DO_CONCORDE_CUTS),TRUE)
 USER_BB_DEFINES += -DDO_TSP_CUTS
@@ -88,7 +88,8 @@ COST_SRC          = compute_cost.c
 NET_SRC           = network.c
 DG_FUNC_SRC       = cnrp_dg_functions.c
 
-USER_MASTER_SRC   = cnrp_master.c cnrp_io.c cnrp_master_functions.c small_graph.c
+USER_MASTER_SRC   = cnrp_master.c cnrp_io.c cnrp_master_functions.c 
+USER_MASTER_SRC  += small_graph.c
 ifeq ($(USER_MAIN),TRUE)
 USER_MASTER_SRC  += cnrp_main.c
 endif

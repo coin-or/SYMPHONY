@@ -17,10 +17,10 @@
 #define _CNRP_LP_PARAMS_H
 
 /*---------------------------------------------------------------------------*\
- * Here we store the vrp specific data needed to process each node of the tree
+ * Here we store the specific data needed to process each node of the tree
 \*---------------------------------------------------------------------------*/
 
-typedef struct VRP_LP_PARAMS{
+typedef struct CNRP_LP_PARAMS{
    int    verbosity;
    char   prob_type;
    int    branching_rule;
@@ -32,6 +32,6 @@ typedef struct VRP_LP_PARAMS{
    int    strong_branching_red_ratio;
    double gamma; /*Determines the fixed cost*/
    double tau;   /*Determines the variable cost*/
-}lp_user_params;
+}cnrp_lp_params;
 
 #endif

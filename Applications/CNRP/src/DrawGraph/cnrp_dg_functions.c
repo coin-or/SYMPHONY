@@ -405,7 +405,7 @@ void display_compressed_support_graph(int dg_id, int clone, char *name,
       copy_node_set(dg_id, clone, name);
       s_bufid = init_send(DataInPlace);
       send_str(name);
-      i = VRP_CTOI_DRAW_FRAC_GRAPH;
+      i = CNRP_CTOI_DRAW_FRAC_GRAPH;
       send_int_array(&i, 1);
       send_int_array(&edgenum, 1);
       send_int_array(userind, edgenum);

@@ -46,7 +46,7 @@
 
 int user_receive_cp_data(void **user)
 {
-   vrp_spec_cp *vcp = (vrp_spec_cp *) calloc (1, sizeof(vrp_spec_cp));  
+   cnrp_spec_cp *vcp = (cnrp_spec_cp *) calloc (1, sizeof(cnrp_spec_cp));  
    int i, j, k;
 
    *user = (void *) vcp;
@@ -83,7 +83,7 @@ int user_receive_cp_data(void **user)
 
 int user_free_cp(void **user)
 {
-   vrp_spec_cp *vcp = (vrp_spec_cp *)(*user);
+   cnrp_spec_cp *vcp = (cnrp_spec_cp *)(*user);
 
    FREE(vcp->edges);
    FREE(vcp);
@@ -113,7 +113,7 @@ int user_receive_lp_solution_cp(void *user)
 int user_prepare_to_check_cuts(void *user, int varnum, int *indices,
 				double *values)
 {
-   vrp_spec_cp *vcp = (vrp_spec_cp *)user;
+   cnrp_spec_cp *vcp = (cnrp_spec_cp *)user;
 #ifdef ADD_FLOW_VARS
    int total_edgenum = vcp->vertnum*(vcp->vertnum - 1)/2;
    int i;
@@ -144,7 +144,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
 		   double *values, cut_data *cut, int *is_violated,
 		   double *quality)
 {
-   vrp_spec_cp *vcp = (vrp_spec_cp *)user;
+   cnrp_spec_cp *vcp = (cnrp_spec_cp *)user;
    pool_net *n;
    char *coef;
    int v0, v1;
@@ -263,7 +263,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
 
 int user_finished_checking_cuts(void *user)
 {
-   vrp_spec_cp *vcp = (vrp_spec_cp *)user;
+   cnrp_spec_cp *vcp = (cnrp_spec_cp *)user;
    free_pool_net(vcp);
 
    return(USER_SUCCESS);
@@ -275,7 +275,7 @@ int user_finished_checking_cuts(void *user)
  * This function creates the solution graph from the current LP solution
 \*===========================================================================*/
 
-pool_net *create_pool_net(vrp_spec_cp *vcp, int varnum, int *indices,
+pool_net *create_pool_net(cnrp_spec_cp *vcp, int varnum, int *indices,
 			  double *values)
 {
    register int *edges = vcp->edges;
@@ -358,7 +358,7 @@ pool_net *create_pool_net(vrp_spec_cp *vcp, int varnum, int *indices,
  * Frees the memory associated with a solution network
 \*===========================================================================*/
 
-void free_pool_net(vrp_spec_cp *vcp)
+void free_pool_net(cnrp_spec_cp *vcp)
 {
    if (vcp->n){
       FREE(vcp->n->adjlist);

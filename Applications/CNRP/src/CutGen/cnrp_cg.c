@@ -50,31 +50,31 @@ int user_receive_cg_data(void **user, int dg_id)
    /* This is the user-defined data structure, a pointer to which will
       be passed to each user function. It must contain all the
       problem-specific data needed for computations within the CG */
-   cg_vrp_spec *vrp = (cg_vrp_spec *) malloc(sizeof(cg_vrp_spec));
+   cg_cnrp_spec *cnrp = (cg_cnrp_spec *) malloc(sizeof(cg_cnrp_spec));
    int edgenum;
 
-   *user = vrp;
+   *user = cnrp;
 
-   vrp->n = NULL;
+   cnrp->n = NULL;
 
    /*------------------------------------------------------------------------*\
     * Receive the data
    \*------------------------------------------------------------------------*/
    
-   receive_char_array((char *)(&vrp->par), sizeof(cg_user_params));
+   receive_char_array((char *)(&cnrp->par), sizeof(cnrp_cg_params));
    
-   receive_int_array(&vrp->dg_id, 1);
-   receive_int_array(&vrp->numroutes, 1);
-   receive_int_array(&vrp->vertnum, 1);
-   vrp->demand = (int *) calloc(vrp->vertnum, sizeof(int));
-   receive_int_array(vrp->demand, vrp->vertnum);
-   receive_int_array(&vrp->capacity, 1);
-   edgenum = vrp->vertnum*(vrp->vertnum-1)/2;
+   receive_int_array(&cnrp->dg_id, 1);
+   receive_int_array(&cnrp->numroutes, 1);
+   receive_int_array(&cnrp->vertnum, 1);
+   cnrp->demand = (int *) calloc(cnrp->vertnum, sizeof(int));
+   receive_int_array(cnrp->demand, cnrp->vertnum);
+   receive_int_array(&cnrp->capacity, 1);
+   edgenum = cnrp->vertnum*(cnrp->vertnum-1)/2;
 #ifdef CHECK_CUT_VALIDITY
-   receive_int_array(&vrp->feas_sol_size, 1);
-   if (vrp->feas_sol_size){
-      vrp->feas_sol = (int *) calloc(vrp->feas_sol_size, sizeof(int));
-      receive_int_array(vrp->feas_sol, vrp->feas_sol_size);
+   receive_int_array(&cnrp->feas_sol_size, 1);
+   if (cnrp->feas_sol_size){
+      cnrp->feas_sol = (int *) calloc(cnrp->feas_sol_size, sizeof(int));
+      receive_int_array(cnrp->feas_sol, cnrp->feas_sol_size);
    }
 #endif
 
@@ -82,26 +82,26 @@ int user_receive_cg_data(void **user, int dg_id)
     * Set up some data structures
    \*------------------------------------------------------------------------*/
 
-   vrp->in_set = (char *) calloc(vrp->vertnum, sizeof(char));
-   vrp->ref = (int *) malloc(vrp->vertnum*sizeof(int));
-   vrp->new_demand = (int *) malloc(vrp->vertnum*sizeof(int));
-   vrp->cut_val = (double *) calloc(vrp->vertnum, sizeof(double));
-   vrp->cut_list = (char *) malloc(((vrp->vertnum >> DELETE_POWER)+1)*
-				   (vrp->par.max_num_cuts_in_shrink + 1)*
+   cnrp->in_set = (char *) calloc(cnrp->vertnum, sizeof(char));
+   cnrp->ref = (int *) malloc(cnrp->vertnum*sizeof(int));
+   cnrp->new_demand = (int *) malloc(cnrp->vertnum*sizeof(int));
+   cnrp->cut_val = (double *) calloc(cnrp->vertnum, sizeof(double));
+   cnrp->cut_list = (char *) malloc(((cnrp->vertnum >> DELETE_POWER)+1)*
+				   (cnrp->par.max_num_cuts_in_shrink + 1)*
 				   sizeof(char));
    
-   vrp->edges = (int *) calloc(2*edgenum, sizeof(int));
+   cnrp->edges = (int *) calloc(2*edgenum, sizeof(int));
 
    /*create the edge list (we assume a complete graph)*/
-   for (i = 1, k = 0; i < vrp->vertnum; i++){
+   for (i = 1, k = 0; i < cnrp->vertnum; i++){
       for (j = 0; j < i; j++){
-	 vrp->edges[k << 1] = j;
-	 vrp->edges[(k << 1) + 1] = i;
+	 cnrp->edges[k << 1] = j;
+	 cnrp->edges[(k << 1) + 1] = i;
 	 k++;
       }
    }
 
-   vrp->dg_id = dg_id;
+   cnrp->dg_id = dg_id;
 
    return(USER_SUCCESS);
 }
@@ -122,20 +122,20 @@ int user_receive_lp_solution_cg(void *user)
 
 int user_free_cg(void **user)
 {
-   cg_vrp_spec *vrp = (cg_vrp_spec *)(*user);
+   cg_cnrp_spec *cnrp = (cg_cnrp_spec *)(*user);
 
 #if defined(CHECK_CUT_VALIDITY) && !defined(COMPILE_IN_TM)
-   if (vrp->feas_sol_size)
-      FREE(vrp->feas_sol);
+   if (cnrp->feas_sol_size)
+      FREE(cnrp->feas_sol);
 #endif
 #pragma omp master
-   FREE(vrp->demand);
-   FREE(vrp->edges);
-   FREE(vrp->in_set);
-   FREE(vrp->ref);
-   FREE(vrp->new_demand);
-   FREE(vrp->cut_val);
-   FREE(vrp->cut_list);
+   FREE(cnrp->demand);
+   FREE(cnrp->edges);
+   FREE(cnrp->in_set);
+   FREE(cnrp->ref);
+   FREE(cnrp->new_demand);
+   FREE(cnrp->cut_val);
+   FREE(cnrp->cut_list);
    
    FREE(*user);
 
@@ -178,8 +178,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   int index, double objval, int *indices, double *values,
 		   double ub, double etol, int *cutnum)
 {
-   cg_vrp_spec *vrp = (cg_vrp_spec *)user;
-   int vertnum = vrp->vertnum;
+   cg_cnrp_spec *cnrp = (cg_cnrp_spec *)user;
+   int vertnum = cnrp->vertnum;
    network *n;
    vertex *verts = NULL;
    int *compdemands = NULL, *compnodes = NULL, *compnodes_copy = NULL;
@@ -190,26 +190,26 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    int i, k, max_node;
    int num_cuts = 0;
    double cur_slack = 0.0;
-   int capacity = vrp->capacity;
+   int capacity = cnrp->capacity;
    int cut_size = (vertnum >> DELETE_POWER) + 1;
    cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
    elist *cur_edge = NULL;
-   int which_connected_routine = vrp->par.which_connected_routine;
-   int *ref = vrp->ref;
-   double *cut_val = vrp->cut_val;
-   char *in_set = vrp->in_set;
-   char *cut_list = vrp->cut_list;
+   int which_connected_routine = cnrp->par.which_connected_routine;
+   int *ref = cnrp->ref;
+   double *cut_val = cnrp->cut_val;
+   char *in_set = cnrp->in_set;
+   char *cut_list = cnrp->cut_list;
 
    elist *cur_edge1 = NULL, *cur_edge2 = NULL;
    int node1 = 0, node2 = 0;
-   int *demand = vrp->demand;
-   int *new_demand = vrp->new_demand;
+   int *demand = cnrp->demand;
+   int *new_demand = cnrp->new_demand;
    int total_demand = demand[0]; 
-   int num_routes = vrp->numroutes, num_trials;
+   int num_routes = cnrp->numroutes, num_trials;
    int triangle_cuts = 0;
    char *coef;
    int mult;
-   char prob_type = vrp->par.prob_type;
+   char prob_type = cnrp->par.prob_type;
 #ifdef ADD_FLOW_VARS
    int total_edgenum = vertnum*(vertnum - 1)/2, l, real_demand;
    double flow_value;
@@ -236,10 +236,10 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       
    /* This creates a fractional graph representing the LP solution */
 #ifdef ADD_FLOW_VARS
-   n = create_flow_net(indices, values, varnum, etol, vrp->edges, demand,
+   n = create_flow_net(indices, values, varnum, etol, cnrp->edges, demand,
 		       vertnum);
 #else
-   n = create_net(indices, values, varnum, etol, vrp->edges, demand, vertnum);
+   n = create_net(indices, values, varnum, etol, cnrp->edges, demand, vertnum);
 #endif
    
    if (n->is_integral){
@@ -267,7 +267,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
      index of the first flow var*/
 #if 1
 #ifdef DIRECTED_X_VARS
-   if (vrp->par.generate_x_cuts){
+   if (cnrp->par.generate_x_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
@@ -284,7 +284,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #endif
    
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) 
-   if (vrp->par.generate_cap_cuts){
+   if (cnrp->par.generate_cap_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
@@ -312,7 +312,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(new_cut->coef);
    }
 #elif defined(ADD_FLOW_VARS)
-   if (vrp->par.generate_cap_cuts){
+   if (cnrp->par.generate_cap_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
@@ -336,7 +336,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
    
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) 
-   if (vrp->par.generate_tight_cap_cuts){
+   if (cnrp->par.generate_tight_cap_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
@@ -386,7 +386,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(new_cut->coef);
    }
 #elif defined(ADD_FLOW_VARS)
-   if (vrp->par.generate_tight_cap_cuts){
+   if (cnrp->par.generate_tight_cap_cuts){
       new_cut->coef  = (char *)malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
@@ -442,9 +442,9 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #endif
 
 #ifdef DO_TSP_CUTS
-   if (vrp->par.which_tsp_cuts && prob_type == TSP){
-      num_cuts += tsp_cuts(n, vrp->par.verbosity, TRUE,
-			   vrp->par.which_tsp_cuts);
+   if (cnrp->par.which_tsp_cuts && prob_type == TSP){
+      num_cuts += tsp_cuts(n, cnrp->par.verbosity, TRUE,
+			   cnrp->par.which_tsp_cuts);
       free_net(n);
       *cutnum = num_cuts;
       FREE(new_cut);
@@ -474,7 +474,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       
       /* copy the arrays as they will be needed later */
       if (!which_connected_routine &&
-	  vrp->par.do_greedy){
+	  cnrp->par.do_greedy){
 	 compnodes_copy = (int *) memcpy((char *)compnodes_copy, (char*)compnodes,
 					 vertnum*sizeof(int));
 	 n->compnodes = compnodes_copy;
@@ -497,7 +497,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       for (i = 0; i < rcnt; i++){
 	 if (compnodes[i+1] < 2) continue;
 	 /*check ith component to see if it violates a constraint*/
-	 if (vrp->par.which_connected_routine == BOTH &&
+	 if (cnrp->par.which_connected_routine == BOTH &&
 	     which_connected_routine == BICONNECTED && compcuts[i+1]==0)
 	    continue;
 	 if (compcuts[i+1] < mult*BINS(compdemands[i+1], capacity)-etol){
@@ -584,16 +584,16 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(compnodes);
       FREE(compdemands);
       FREE(compcuts);
-   }while((!num_cuts || vrp->par.which_connected_routine == BOTH)
+   }while((!num_cuts || cnrp->par.which_connected_routine == BOTH)
 	  && which_connected_routine < 2);
 
 #if 0
-   if (num_cuts < 10 && vrp->par.do_mincut){
-      num_cuts += min_cut(vrp, n, etol, mult);
+   if (num_cuts < 10 && cnrp->par.do_mincut){
+      num_cuts += min_cut(cnrp, n, etol, mult);
       free_net(n);
    }
    
-   if (!vrp->par.do_greedy || num_cuts >= 10){
+   if (!cnrp->par.do_greedy || num_cuts >= 10){
       *cutnum = num_cuts;
       FREE(new_cut);
       return(USER_SUCCESS);
@@ -601,14 +601,14 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    
 #ifdef ADD_FLOW_VARS
    for (i = 0; i < varnum && indices[i] < (1+d_x_vars)*total_edgenum; i++);
-   n = create_flow_net(indices, values, varnum, etol, vrp->edges, demand,
+   n = create_flow_net(indices, values, varnum, etol, cnrp->edges, demand,
 		       vertnum);
 #else
-   n = create_net(indices, values, varnum, etol, vrp->edges, demand, vertnum);
+   n = create_net(indices, values, varnum, etol, cnrp->edges, demand, vertnum);
 #endif
 #endif
 
-   if (num_cuts < 10 && vrp->par.do_greedy && (prob_type == VRP ||
+   if (num_cuts < 10 && cnrp->par.do_greedy && (prob_type == VRP ||
 			prob_type == TSP || prob_type == BPP)){
       coef = (char *) malloc(cut_size * sizeof(char)); 
       for (cur_edge=verts[0].first; cur_edge; cur_edge=cur_edge->next_edge){
@@ -642,12 +642,12 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 }
       }
       FREE(coef);
-      if (vrp->par.verbosity > 2)
+      if (cnrp->par.verbosity > 2)
 	 printf("Found %d triangle cuts\n",triangle_cuts);
       num_cuts += triangle_cuts;
    }
    
-   if (num_cuts < 10 && vrp->par.do_greedy){
+   if (num_cuts < 10 && cnrp->par.do_greedy){
       memcpy((char *)new_demand, (char *)demand, vertnum*ISIZE);
 #ifndef DIRECTED_X_VARS
       if (mult == 2){
@@ -657,52 +657,52 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       {
 #endif
 	 num_cuts +=
-	    reduce_graph(n, etol, new_demand, vrp->capacity, mult, new_cut);
+	    reduce_graph(n, etol, new_demand, cnrp->capacity, mult, new_cut);
       }
       if (comp_num > 1){
 	 num_cuts += greedy_shrinking1(n, capacity, etol,
-				       vrp->par.max_num_cuts_in_shrink,
+				       cnrp->par.max_num_cuts_in_shrink,
 				       new_cut, compnodes_copy, compmembers,
 				       comp_num, in_set, cut_val,
 				       ref, cut_list, new_demand, mult);
       }else{
 	 num_cuts += greedy_shrinking1_one(n, capacity, etol,
-					   vrp->par.max_num_cuts_in_shrink,
+					   cnrp->par.max_num_cuts_in_shrink,
 					   new_cut, in_set, cut_val, cut_list,
 					   num_routes, new_demand, mult);
       }
-      if (num_cuts && vrp->par.verbosity >2 )
+      if (num_cuts && cnrp->par.verbosity >2 )
 	 printf("Shrink1 found %d cuts \n", num_cuts);
    }
    
-   if (num_cuts < 10 && vrp->par.do_greedy){
-      if (vrp->par.do_extra_in_root)
-	 num_trials = level ? vrp->par.greedy_num_trials :
-	 2 * vrp->par.greedy_num_trials;
+   if (num_cuts < 10 && cnrp->par.do_greedy){
+      if (cnrp->par.do_extra_in_root)
+	 num_trials = level ? cnrp->par.greedy_num_trials :
+	 2 * cnrp->par.greedy_num_trials;
       else
-	 num_trials = vrp->par.greedy_num_trials;
+	 num_trials = cnrp->par.greedy_num_trials;
       if (comp_num){
 	 num_cuts += greedy_shrinking6(n, capacity, etol, new_cut,
 				       compnodes_copy, compmembers, comp_num,
 				       in_set, cut_val, ref, cut_list,
-				       vrp->par.max_num_cuts_in_shrink,
+				       cnrp->par.max_num_cuts_in_shrink,
 				       new_demand, num_cuts ? num_trials :
 				       2 * num_trials, 10.5, mult);
       }else{
 	 num_cuts += greedy_shrinking6_one(n, capacity, etol, new_cut, in_set,
 					   cut_val, num_routes, cut_list,
-					   vrp->par.max_num_cuts_in_shrink,
+					   cnrp->par.max_num_cuts_in_shrink,
 					   new_demand, num_cuts ? num_trials :
 					   2 * num_trials, 10.5, mult); 
       }
-      if (num_cuts && vrp->par.verbosity >2)
+      if (num_cuts && cnrp->par.verbosity >2)
 	 printf("Shrink6 found %d cuts \n", num_cuts);
    }
    
 #ifdef DO_TSP_CUTS
-   if (!num_cuts && vrp->par.which_tsp_cuts){
-      num_cuts += tsp_cuts(n, vrp->par.verbosity, FALSE,
-			   vrp->par.which_tsp_cuts);
+   if (!num_cuts && cnrp->par.which_tsp_cuts){
+      num_cuts += tsp_cuts(n, cnrp->par.verbosity, FALSE,
+			   cnrp->par.which_tsp_cuts);
    }
 #endif
 
@@ -716,7 +716,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    
 #if 0
 #ifdef DIRECTED_X_VARS
-   if (vrp->par.generate_x_cuts){
+   if (cnrp->par.generate_x_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
@@ -733,7 +733,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #endif
    
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) 
-   if (vrp->par.generate_cap_cuts){
+   if (cnrp->par.generate_cap_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
@@ -761,7 +761,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(new_cut->coef);
    }
 #elif defined(ADD_FLOW_VARS)
-   if (vrp->par.generate_cap_cuts){
+   if (cnrp->par.generate_cap_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
@@ -785,7 +785,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
    
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) 
-   if (vrp->par.generate_tight_cap_cuts){
+   if (cnrp->par.generate_tight_cap_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
@@ -835,7 +835,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(new_cut->coef);
    }
 #elif defined(ADD_FLOW_VARS)
-   if (vrp->par.generate_tight_cap_cuts){
+   if (cnrp->par.generate_tight_cap_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
       for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
@@ -1253,16 +1253,16 @@ int check_flow_connectivity(network *n, double etol, int capacity,
 
 int user_check_validity_of_cut(void *user, cut_data *new_cut)
 {
-   cg_vrp_spec *vrp = (cg_vrp_spec *)user;
-   int *edges = vrp->edges;
-   int *feas_sol = vrp->feas_sol;
+   cg_cnrp_spec *cnrp = (cg_cnrp_spec *)user;
+   int *edges = cnrp->edges;
+   int *feas_sol = cnrp->feas_sol;
    double lhs = 0;
    char *coef;
    int v0, v1;
    int i;
    
    
-   if (vrp->feas_sol_size){
+   if (cnrp->feas_sol_size){
       switch (new_cut->type){
 	 
 	 /*------------------------------------------------------------------*\
@@ -1275,7 +1275,7 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
 	   reallocate at the end istead of counting the number of entries in
 	   the row first*/
 	 coef = new_cut->coef;
-	 for (i = 0; i<vrp->feas_sol_size; i++){
+	 for (i = 0; i<cnrp->feas_sol_size; i++){
 	    v0 = edges[feas_sol[i] << 1];
 	    v1 = edges[(feas_sol[i] << 1) + 1];
 	    if ((coef[v0 >> DELETE_POWER] & (1 << (v0 & DELETE_AND))) &&
@@ -1290,7 +1290,7 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
 	 /*I could just allocate enough memory up front and then reallocate
 	   at the end instead of counting the number of entries first*/
 	 coef = new_cut->coef;
-	 for (i = 0; i < vrp->feas_sol_size; i++){
+	 for (i = 0; i < cnrp->feas_sol_size; i++){
 	    v0 = edges[feas_sol[i] << 1];
 	    v1 = edges[(feas_sol[i] << 1) + 1];
 	    if ((coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1) ^

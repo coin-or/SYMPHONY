@@ -51,9 +51,9 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
 			 int *cand_num, branch_obj ***candidates,
 			 int *action)
 {
-   vrp_spec *vrp = (vrp_spec *) user;
+   cnrp_spec *cnrp = (cnrp_spec *) user;
 
-   if (!vrp->par.detect_tailoff){
+   if (!cnrp->par.detect_tailoff){
       *action = USER__BRANCH_IF_MUST;
       return(USER_SUCCESS);
    }
@@ -79,7 +79,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 			   int bc_level)
 
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   cnrp_spec *cnrp = (cnrp_spec *)user;
    cut_data *cut;  
    branch_obj **cand_list, *can;
    int i, candnum, found_violated = FALSE;
@@ -95,7 +95,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 #ifdef DIRECTED_X_VARS
    int *xind = (int *) malloc(varnum * ISIZE);
    double *xval = (double *) calloc(varnum, DSIZE);
-   int total_edgenum = vrp->vertnum*(vrp->vertnum - 1)/2;
+   int total_edgenum = cnrp->vertnum*(cnrp->vertnum - 1)/2;
    int i, j, nz, cnt;
 
    nz = collect_nonzeros(p, x, xind, xval, status);
@@ -119,8 +119,8 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
    }
    qsortucb_di(xval, xind, nz);
 
-   candnum = vrp->par.strong_branching_cand_num_max;
-   candnum = MAX(candnum, vrp->par.strong_branching_cand_num_min);
+   candnum = cnrp->par.strong_branching_cand_num_max;
+   candnum = MAX(candnum, cnrp->par.strong_branching_cand_num_min);
    candnum = MIN(candnum, cnt);
    
    FREE(xind);
@@ -129,7 +129,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 #endif
 #endif
    
-   if (!vrp->par.branch_on_cuts && vrp->par.branching_rule == 2)
+   if (!cnrp->par.branch_on_cuts && cnrp->par.branching_rule == 2)
       /* use the built-in rule */
       return(USER_DEFAULT);
 
@@ -137,10 +137,10 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
    candnum = 0;
    /* allocate also memory for the basic vars */
    *candidates = cand_list = (branch_obj **)
-      malloc((varnum + (vrp->par.branch_on_cuts ?
+      malloc((varnum + (cnrp->par.branch_on_cuts ?
 		       (slacks_in_matrix_num + slack_cut_num) : 0)) *
       sizeof(branch_obj *));
-   switch (vrp->par.branch_on_cuts){
+   switch (cnrp->par.branch_on_cuts){
     case TRUE:
       pwl = (p_w_l *) malloc((slacks_in_matrix_num + slack_cut_num)*
 			     sizeof(p_w_l));
@@ -152,7 +152,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
       /* First go through the slack cuts and enlist the violated ones */
       for (i = 0; i < slack_cut_num; i++){
 	 left_hand_side = compute_lhs(varnum, userind, x, cut = slack_cuts[i],
-				      vrp->vertnum);
+				      cnrp->vertnum);
 	 switch (cut->type){
 	  case SUBTOUR_ELIM_SIDE:
 	    slack = cut->rhs - left_hand_side;
@@ -202,7 +202,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 	     (cut->type==SUBTOUR_ELIM_SIDE || cut->type== SUBTOUR_ELIM_ACROSS)
 	     && !(cut->sense=='R' || cut->sense=='E')){
 	    left_hand_side = compute_lhs(varnum, userind, x, cut,
-					 vrp->vertnum);
+					 cnrp->vertnum);
 	    switch (cut->type){
 	     case SUBTOUR_ELIM_SIDE:
 	       slack = cut->rhs - left_hand_side;
@@ -306,7 +306,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 
     case FALSE:
 
-      switch (((vrp_spec *)user)->par.branching_rule){
+      switch (((cnrp_spec *)user)->par.branching_rule){
        case 0:
 	 {
 	    int *xind = (int *) malloc(varnum*ISIZE);
@@ -322,9 +322,9 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 	    }
 	    qsortucb_di(xval, xind, cnt);
 
-	    candnum = vrp->par.strong_branching_cand_num_max -
-	       vrp->par.strong_branching_red_ratio * bc_level;
-	    candnum = MAX(candnum, vrp->par.strong_branching_cand_num_min);
+	    candnum = cnrp->par.strong_branching_cand_num_max -
+	       cnrp->par.strong_branching_red_ratio * bc_level;
+	    candnum = MAX(candnum, cnrp->par.strong_branching_cand_num_min);
 	    candnum = MIN(candnum, cnt);
 	    
 	    for (i = candnum-1; i >= 0; i--){
@@ -363,9 +363,9 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 	 break;
 	 
       case 2:
-	candnum = vrp->par.strong_branching_cand_num_max -
-	   vrp->par.strong_branching_red_ratio * bc_level;
-	candnum = MAX(candnum, vrp->par.strong_branching_cand_num_min);
+	candnum = cnrp->par.strong_branching_cand_num_max -
+	   cnrp->par.strong_branching_red_ratio * bc_level;
+	candnum = MAX(candnum, cnrp->par.strong_branching_cand_num_min);
 
 	branch_close_to_half(candnum, &candnum, &cand_list);
 	break;
@@ -490,10 +490,10 @@ int user_select_child(void *user, double ub, branch_obj *can, char *action)
 int user_print_branch_stat(void *user, branch_obj *can, cut_data *cut,
 			   int n, var_desc **vars, char *action)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   cnrp_spec *cnrp = (cnrp_spec *)user;
    int v0, v1, i;
    char *coef;
-   int total_edgenum = vrp->vertnum*(vrp->vertnum - 1)/2;
+   int total_edgenum = cnrp->vertnum*(cnrp->vertnum - 1)/2;
    
    if (cut){
       switch(cut->type){

@@ -39,6 +39,6 @@ typedef struct CG_USER_PARAMS{
    int            update_contr_above;
    int            shrink_one_edges;
    double         tau;
-}cg_user_params;
+}cnrp_cg_params;
 
 #endif

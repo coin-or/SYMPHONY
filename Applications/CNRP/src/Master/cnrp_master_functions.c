@@ -80,12 +80,12 @@ void delete_dup_edges(small_graph *g)
 
 /*===========================================================================*/
 
-int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
+int *create_edge_list(cnrp_problem *cnrp, int *varnum, char which_edges)
 {
    int i, j, k;
    int zero_varnum, edgenum, new_ind;
    int *zero_vars, *uind = NULL;
-   int total_edgenum = vrp->vertnum*(vrp->vertnum-1)/2;
+   int total_edgenum = cnrp->vertnum*(cnrp->vertnum-1)/2;
 #ifdef DIRECTED_X_VARS
    char d_x_vars = TRUE;
 #else
@@ -97,19 +97,19 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
    switch(which_edges){
     case CHEAP_EDGES:
 
-      vrp->zero_vars = zero_vars = (int *) calloc(total_edgenum, sizeof(int));
+      cnrp->zero_vars = zero_vars = (int *) calloc(total_edgenum, sizeof(int));
       
       /*first determine which variables can be fixed to zero permanently*/
-      for (zero_varnum=0, i=2; i<vrp->vertnum; i++){
+      for (zero_varnum=0, i=2; i<cnrp->vertnum; i++){
 	 for (j=1; j<i; j++){
-	    if (vrp->demand[i] + vrp->demand[j] > vrp->capacity){
+	    if (cnrp->demand[i] + cnrp->demand[j] > cnrp->capacity){
 	       zero_vars[zero_varnum++] = INDEX(i,j);
 	    }
 	 }
       }
       
-      edgenum = vrp->par.add_all_edges ?
-	 vrp->vertnum*(vrp->vertnum-1)/2 : vrp->g->edgenum;
+      edgenum = cnrp->par.add_all_edges ?
+	 cnrp->vertnum*(cnrp->vertnum-1)/2 : cnrp->g->edgenum;
       
       /*First, we construct the index lists*/
 #ifdef ADD_FLOW_VARS
@@ -119,10 +119,10 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
 #endif
       
       *varnum = 0;
-      switch(vrp->par.add_all_edges){
+      switch(cnrp->par.add_all_edges){
        case FALSE:
 	 for (i = 0, j = 0; i<edgenum && j<zero_varnum; i++){
-	    new_ind = INDEX(vrp->g->edges[i].v0, vrp->g->edges[i].v1);
+	    new_ind = INDEX(cnrp->g->edges[i].v0, cnrp->g->edges[i].v1);
 	    if (new_ind < zero_vars[j]){
 	       uind[(*varnum)++] = new_ind;                 /*edge var*/
 #ifdef DIRECTED_X_VARS
@@ -166,19 +166,19 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
 	 /*Now we have exhausted all the zero edges*/
 	 for (; i<edgenum; i++){
 	    uind[(*varnum)++] =
-	       INDEX(vrp->g->edges[i].v0, vrp->g->edges[i].v1);
+	       INDEX(cnrp->g->edges[i].v0, cnrp->g->edges[i].v1);
 #ifdef DIRECTED_X_VARS
 	    uind[(*varnum)++] =
 	       total_edgenum +
-	       INDEX(vrp->g->edges[i].v0, vrp->g->edges[i].v1);
+	       INDEX(cnrp->g->edges[i].v0, cnrp->g->edges[i].v1);
 #endif
 #ifdef ADD_FLOW_VARS
 	    uind[(*varnum)++] =
-	       (1+d_x_vars)*total_edgenum+INDEX(vrp->g->edges[i].v0,
-						vrp->g->edges[i].v1);
+	       (1+d_x_vars)*total_edgenum+INDEX(cnrp->g->edges[i].v0,
+						cnrp->g->edges[i].v1);
 	    uind[(*varnum)++] =
-	       (2+d_x_vars)*total_edgenum+INDEX(vrp->g->edges[i].v0,
-						vrp->g->edges[i].v1);
+	       (2+d_x_vars)*total_edgenum+INDEX(cnrp->g->edges[i].v0,
+						cnrp->g->edges[i].v1);
 #endif
 	 }
 	 break;
@@ -214,10 +214,10 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
 	 break;
       }
 
-      if (vrp->par.verbosity > 0)
+      if (cnrp->par.verbosity > 0)
 	 printf("Fixed %i edges in root creation\n\n", zero_varnum);
       
-      vrp->zero_varnum = zero_varnum;
+      cnrp->zero_varnum = zero_varnum;
 
       break;
       
@@ -226,22 +226,22 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
       /*In this case, we are adding all variables at the root, but the small
 	graph edges are base and the rest are extra*/
 
-      zero_varnum = vrp->zero_varnum;
-      zero_vars = vrp->zero_vars;
-      edgenum = vrp->g->edgenum;
+      zero_varnum = cnrp->zero_varnum;
+      zero_vars = cnrp->zero_vars;
+      edgenum = cnrp->g->edgenum;
 
 #ifdef ADD_FLOW_VARS
       uind = (int *) malloc((3 + d_x_vars) *
-			    (total_edgenum-edgenum+vrp->vertnum -1)* ISIZE);
+			    (total_edgenum-edgenum+cnrp->vertnum -1)* ISIZE);
 #else
       uind = (int *) malloc((1 + d_x_vars) *
-			    (total_edgenum-edgenum+vrp->vertnum-1) * ISIZE);
+			    (total_edgenum-edgenum+cnrp->vertnum-1) * ISIZE);
 #endif
       *varnum = 0;
       for (i = 0, j = 0, k = 0; i < edgenum; i++, k++){
 	 /*In this loop, we check each edge to se if it is in the small
 	   graph and whether it is a zero edge*/
-	 new_ind = INDEX(vrp->g->edges[i].v0, vrp->g->edges[i].v1);
+	 new_ind = INDEX(cnrp->g->edges[i].v0, cnrp->g->edges[i].v1);
 	 for (; k < new_ind; k++){
 	    if ((j < zero_varnum && k < zero_vars[j]) || j >= zero_varnum){
 	       uind[(*varnum)++] = k;                    /*edge variable*/

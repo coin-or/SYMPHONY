@@ -27,8 +27,8 @@
 #include "network.h"
 #include "cnrp_cg_params.h"
 
-typedef struct CG_VRP_SPEC{
-   cg_user_params par;
+typedef struct CG_CNRP_SPEC{
+   cnrp_cg_params par;
    int           dg_id;   /*contains the tid of the graphics window*/
    int           vertnum;  /*the number of nodes in the problem,
 			      including the depot                */
@@ -65,7 +65,7 @@ typedef struct CG_VRP_SPEC{
    int           feas_sol_size;
    int          *feas_sol;
 #endif
-}cg_vrp_spec;
+}cg_cnrp_spec;
 
 /*===========================================================================*/
 /*========================= Other user subroutines =========================*/
