@@ -55,8 +55,8 @@ LIB32=link.exe -lib
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Output_Dir "symphonyLib___Win32_Debug"
+# PROP BASE Intermediate_Dir "symphonyLib___Win32_Debug"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
@@ -167,26 +167,6 @@ SOURCE=..\CutPool\cp_wrapper.c
 SOURCE=..\CutPool\cut_pool.c
 # End Source File
 # End Group
-# Begin Group "Master"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\Master\master.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\master_func.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\master_io.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\master_wrapper.c
-# End Source File
-# End Group
 # Begin Group "LP"
 
 # PROP Default_Filter ""
@@ -212,19 +192,6 @@ SOURCE=..\LP\lp_proccomm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\LP\lp_pseudo_branch.c
-
-!IF  "$(CFG)" == "symphonyLib - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "symphonyLib - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\LP\lp_rowfunc.c
 # End Source File
 # Begin Source File
@@ -238,6 +205,26 @@ SOURCE=..\LP\lp_varfunc.c
 # Begin Source File
 
 SOURCE=..\LP\lp_wrapper.c
+# End Source File
+# End Group
+# Begin Group "Master"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\Master\master.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Master\master_func.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Master\master_io.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Master\master_wrapper.c
 # End Source File
 # End Group
 # Begin Group "TreeManager"
@@ -261,25 +248,5 @@ SOURCE=..\TreeManager\treemanager.c
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # End Group
-# Begin Source File
-
-SOURCE=..\..\COIN\Win\clpLib\Debug\clpLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\COIN\Win\osiClpLib\Debug\osiClpLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\COIN\Win\osiLib\Debug\osiLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\COIN\Win\coinLib\Debug\coinLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\COIN\Win\cglLib\Debug\cglLib.lib
-# End Source File
 # End Target
 # End Project
