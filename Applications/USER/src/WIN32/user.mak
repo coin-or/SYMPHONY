@@ -23,8 +23,8 @@
 # nmake /f user.mak 
 #
 # The executable "symphony.exe" for this application will be created in 
-# .\Debug directory. By default, SYMPHONY is set up to use the CPLEX
-# optimization solver via COIN_OSI's CPLEX interface and CGL cuts. 
+# .\Debug directory. By default, SYMPHONY is set up to use the CLP
+# optimization solver via COIN_OSI's CLP interface and to use the CGL cuts. 
 # However, you are free to  specify your own settings for the executable via 
 # the following variables.
 # (you can download nmake.exe from  "http://download.microsoft.com/download/
@@ -37,7 +37,7 @@
 # variable to the correct path.
 ##############################################################################
 
-SYMPHONYROOT=..\..\
+SYMPHONYROOT=..\..
 
 ##############################################################################
 # COINROOT is the path to the root directory of the COIN libraries. Many of
@@ -62,7 +62,7 @@ OUTDIR=.\Debug
 ##############################################################################
 ##############################################################################
 #You must define an LP solver in order to use the software. By default, this 
-# option is set to OsI_CPLEX. See the corresponding "LPINCDIR" and "LPLIB" 
+# option is set to OsI_CLP. See the corresponding "LPINCDIR" and "LPLIB" 
 # variables used to put the lp solver include files and the libraries on path
 # and make the necessary changes if you require.
 ##############################################################################
@@ -102,7 +102,7 @@ LPLIB = "C:\Program Files\IbmOslV3Lib\osllib\lib\oslmd6030.lib"
 # corresponding paths to the solver files and libraries. 
 
 LP_SOLVER = OSI
-OSI_INTERFACE = CPLEX
+OSI_INTERFACE = CLP
 
 !IF "$(LP_SOLVER)" == "OSI"
 LPINCDIR = \
@@ -232,6 +232,24 @@ DEFINITIONS= $(DEFINITIONS) /D "USE_CGL_CUTS"
 !ENDIF
 
 ##############################################################################
+# If you wish to compile and use the SYMPHONY callable library through the 
+# SYMPHONY OSI interface, set USE_OSI_INTERFACE to TRUE below. Note that
+# you must have COIN installed to use this capability. See above to set the 
+# path to the COIN directories. 
+##############################################################################
+
+USE_OSI_INTERFACE = FALSE
+
+!IF "$(USE_OSI_INTERFACE)" == "TRUE"
+ALL_INCDIR = $(LPINCDIR) /I "$(COINROOT)\Osi\OsiSym\include"
+ALL_LIB = $(LPLIB) "$(COINROOT)\Win\osiSymLib\Debug\osiSymLib.lib"
+!ELSE
+ALL_INCDIR = $(LPINCDIR)
+ALL_LIB = $(LPLIB)
+!ENDIF
+
+
+##############################################################################
 ##############################################################################
 #
 # Compiling and Linking...
@@ -239,26 +257,29 @@ DEFINITIONS= $(DEFINITIONS) /D "USE_CGL_CUTS"
 ##############################################################################
 ##############################################################################
 
+DEFINITIONS = $(DEFINITIONS) /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" \
+	/D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" \
+	/D "COMPILE_IN_TM" /D "USE_SYM_APPLICATION" 
+
+ALL_INCDIR =$(ALL_INCDIR) /I "$(SYMPHONYROOT)\include" /I "..\include"
+
 .SILENT:
 
 CPP=cl.exe
 CPPFLAGS= /nologo /MLd /W2 /GR /Gm /YX /GX /ZI /Od \
-	/I $(LPINCDIR) /I "$(SYMPHONYROOT)\include" /I "..\include" \
-	/D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" \
-	/D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" \
-	/D "COMPILE_IN_TM" /D $(DEFINITIONS) \
+	/I $(ALL_INCDIR) /D $(DEFINITIONS) \
 	/Fp"$(OUTDIR)\user.pch" /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\user.pdb" \
 	/FD /GZ /c /Tp
 
 .c.obj: 
 	$(CPP) $(CPPFLAGS) "$*.c"
 	 
-ALL : "$(OUTDIR)" "APPL_MESSAGE" user.lib "SYMPHONY_MESSAGE" "OBJECTS" symphony.exe 
+ALL : "$(OUTDIR)" "LIB_MESSAGE" sym_lib "APPL_MESSAGE" "APPL_OBJECTS" user_exe 
 
 CLEAN:
 	del /Q $(OUTDIR)\*.obj
-        del /Q $(OUTDIR)\symphony.exe 
-        del /Q $(OUTDIR)\user.lib
+        del /Q $(OUTDIR)\user.exe 
+        del /Q $(OUTDIR)\symphonyLib.lib
         del /Q $(OUTDIR)\user.idb
         del /Q $(OUTDIR)\user.pdb
 	del /Q $(OUTDIR)\user.pch
@@ -270,57 +291,30 @@ CLEAN:
 APPL_MESSAGE: 
 	echo Compiling application files...
 
-SYMPHONY_MESSAGE:
-	echo Compiling SYMPHONY files...	
+LIB_MESSAGE:
+	echo Creating SYMPHONY library...	
 
-user.lib : \
+APPL_OBJECTS : \
 	..\CutGen\user_cg.obj \
 	..\CutPool\user_cp.obj \
 	..\DrawGraph\user_dg.obj \
 	..\LP\user_lp.obj \
 	..\LP\user_lp_branch.obj \
-	..\Master\user_master.obj
-	lib.exe /nologo /out:$(OUTDIR)\user.lib $(OUTDIR)\*.obj
+	..\Master\user_master.obj \
+	..\Master\user_main.obj
 	echo Application files compiled successfully...
 	echo ...
 
-LINK_OBJS= \
-	$(OUTDIR)\pack_array.obj \
-	$(OUTDIR)\pack_cut.obj \
-	$(OUTDIR)\proccomm.obj \
-	$(OUTDIR)\qsortucb.obj \
-	$(OUTDIR)\qsortucb_di.obj \
-	$(OUTDIR)\qsortucb_i.obj \
-	$(OUTDIR)\qsortucb_ic.obj \
-	$(OUTDIR)\qsortucb_id.obj \
-	$(OUTDIR)\qsortucb_ii.obj \
-	$(OUTDIR)\timemeas.obj \
-	$(OUTDIR)\cg_func.obj \
-	$(OUTDIR)\cg_proccomm.obj \
-	$(OUTDIR)\cg_wrapper.obj \
-	$(OUTDIR)\cut_gen.obj \
-	$(OUTDIR)\cp_func.obj \
-	$(OUTDIR)\cp_proccomm.obj \
-	$(OUTDIR)\cp_wrapper.obj \
-	$(OUTDIR)\cut_pool.obj \
-	$(OUTDIR)\lp.obj \
-	$(OUTDIR)\lp_branch.obj \
-	$(OUTDIR)\lp_free.obj \
-	$(OUTDIR)\lp_genfunc.obj \
-	$(OUTDIR)\lp_proccomm.obj \
-	$(OUTDIR)\lp_rowfunc.obj \
-	$(OUTDIR)\lp_solver.obj \
-	$(OUTDIR)\lp_varfunc.obj \
-	$(OUTDIR)\lp_wrapper.obj \
-	$(OUTDIR)\master.obj \
-	$(OUTDIR)\master_io.obj \
-	$(OUTDIR)\master_wrapper.obj \
-	$(OUTDIR)\tm_func.obj \
-	$(OUTDIR)\tm_proccomm.obj \
-	$(OUTDIR)\treemanager.obj 
+LINK_OBJECTS= \
+	$(OUTDIR)\user_cg.obj \
+	$(OUTDIR)\user_cp.obj \
+	$(OUTDIR)\user_dg.obj \
+	$(OUTDIR)\user_lp.obj \
+	$(OUTDIR)\user_lp_branch.obj \
+	$(OUTDIR)\user_master.obj \
+	$(OUTDIR)\user_main.obj
 
-
-OBJECTS : \
+sym_lib : \
 	$(SYMPHONYROOT)\Common\pack_array.obj \
 	$(SYMPHONYROOT)\Common\pack_cut.obj \
 	$(SYMPHONYROOT)\Common\proccomm.obj \
@@ -349,14 +343,18 @@ OBJECTS : \
 	$(SYMPHONYROOT)\LP\lp_varfunc.obj \
 	$(SYMPHONYROOT)\LP\lp_wrapper.obj \
 	$(SYMPHONYROOT)\Master\master.obj \
+	$(SYMPHONYROOT)\Master\master_func.obj \
 	$(SYMPHONYROOT)\Master\master_io.obj \
 	$(SYMPHONYROOT)\Master\master_wrapper.obj \
 	$(SYMPHONYROOT)\TreeManager\tm_func.obj \
 	$(SYMPHONYROOT)\TreeManager\tm_proccomm.obj \
 	$(SYMPHONYROOT)\TreeManager\treemanager.obj
-	echo SYMPHONY files compiled successfully...	
-               	          
-symphony.exe : $(LINK_OBJS) $(OUTDIR)\user.lib
+	lib.exe /nologo /out:$(OUTDIR)\symphonyLib.lib $(OUTDIR)\*.obj
+	echo "symphonyLib.lib" created successfully...
+	echo ...
+
+              	          
+user_exe : $(LINK_OBJECTS) $(OUTDIR)\symphonyLib.lib
 	echo Linking...
-	$(CPP) /nologo /W3 /Fe"$(OUTDIR)\symphony.exe" $(LPLIB) $**
-	echo "symphony.exe" created successfully...
+	$(CPP) /nologo /W3 /Fe"$(OUTDIR)\user.exe" $(ALL_LIB) $**
+	echo "user.exe" created successfully...
