@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 
    printf("\n");
    printf("******************************************************\n");
-   printf("*     This is SYMPHONY Version 3.0                   *\n");
+   printf("*     This is SYMPHONY Version 3.0.1                 *\n");
    printf("*     Copyright 2000-2003 Ted Ralphs                 *\n");
    printf("*     All Rights Reserved                            *\n");
    printf("*     Distributed under the Common Public License    *\n");
