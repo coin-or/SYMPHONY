@@ -922,6 +922,8 @@ int sym_solve(sym_environment *env)
 
    termcode = solve(tm);
 
+   tm_close(tm, termcode);
+
    /* Save the warm start info */
    env->warm_start = (warm_start_desc *) calloc (1, sizeof(warm_start_desc));
    env->warm_start->rootnode = tm->rootnode;
@@ -958,15 +960,15 @@ int sym_solve(sym_environment *env)
 #else
    env->warm_start->best_sol = env->best_sol;
 #endif
+
    tm->rootnode = NULL;
    tm->cuts = NULL;
    tm->cut_num = tm->allocated_cut_num = 0;
    if (env->cp && env->par.use_permanent_cut_pools){
       tm->cpp = NULL;
    }
-   tm_close(tm, termcode);
 
-#if !defined(COMPILE_IN_LP) 
+#if !defined(COMPILE_IN_LP) && 0
    /* This is not needed anymore */
    if (termcode != SOMETHING_DIED){
       int old_termcode = termcode;

@@ -1397,6 +1397,11 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
    send_int_array(can->branch, can->child_num);
    send_dbl_array(can->objval, can->child_num);
    send_int_array(can->feasible, can->child_num);
+   for (i = 0; i < can->child_num; i++){
+      if (can->feasible[i]){
+	 send_dbl_array(can->solutions[i], lp_data->n);
+      }
+   }
    /* the action for each descendant */
    send_char_array(action, can->child_num);
 

@@ -593,8 +593,8 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	  tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
 	 purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
 			    VBC_FEAS_SOL_FOUND : VBC_PRUNED);
-	 return;
       }
+      return;
    }
 
    /* This function is called either when a a node was finished and we really
@@ -747,7 +747,7 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    double *objval;
    int oldkeep, keep;
    char olddive, dive;
-   int new_branching_cut = FALSE, lp;
+   int new_branching_cut = FALSE, lp, i;
 
    receive_char_array(&bobj->type, 1);
    receive_int_array(&bobj->name, 1);
@@ -778,6 +778,14 @@ void process_branching_info(tm_prob *tm, bc_node *node)
 
    receive_dbl_array(objval, bobj->child_num);
    receive_int_array(feasible, bobj->child_num);
+   bobj->solutions = (double **) calloc(bobj->child_num, sizeof(double *));
+   for (i = 0; i < bobj->child_num; i++){
+      if (feasible[i]){
+	 bobj->solutions[i] = (double *)
+	    malloc(DSIZE*tm->rootnode->desc.uind.size); 
+	 receive_dbl_array(bobj->solutions[i], tm->rootnode->desc.uind.size);
+      }
+   }
    receive_char_array(action, bobj->child_num);
 
    receive_char_array(&olddive, 1);
@@ -990,49 +998,141 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 int receive_lp_timing(tm_prob *tm)
 {
 #ifndef COMPILE_IN_LP
-   int i, r_bufid = 0;
+   int i, r_bufid = 0, msgtag, bytes, sender;
    node_times tim;
    struct timeval timeout = {5, 0};
    double ramp_up_tm = tm->comp_times.ramp_up_tm;
    double ramp_down_time = tm->comp_times.ramp_down_time;
    double start_node = tm->comp_times.start_node;
+   int lp, cp;
+   bc_node *node;
 
    memset(&tm->comp_times, 0, sizeof(node_times));
    tm->comp_times.ramp_up_tm = ramp_up_tm;
    tm->comp_times.ramp_down_time = ramp_down_time;
    tm->comp_times.start_node = start_node;
 
-   for (i=0; i<tm->lp.procnum; i++){
-      r_bufid = treceive_msg(tm->lp.procs[i], LP__TIMING, &timeout);
-      if (r_bufid > 0){
-	 receive_char_array((char *)&tim, sizeof(node_times));
-	 tm->comp_times.communication    += tim.communication;
-	 tm->comp_times.lp               += tim.lp;
-	 tm->comp_times.separation       += tim.separation;
-	 tm->comp_times.fixing           += tim.fixing;
-	 tm->comp_times.pricing          += tim.pricing;
-	 tm->comp_times.strong_branching += tim.strong_branching;
-         tm->comp_times.wall_clock_lp    += tim.wall_clock_lp;
-         tm->comp_times.ramp_up_lp       += tim.ramp_up_lp;
-         tm->comp_times.idle_diving      += tim.idle_diving;
-         tm->comp_times.idle_node        += tim.idle_node;
-         tm->comp_times.idle_names       += tim.idle_names;
-         tm->comp_times.idle_cuts        += tim.idle_cuts;
-	 tm->comp_times.cut_pool         += tim.cut_pool;
-      }else{
-	 if (pstat(tm->lp.procs[i]) != PROCESS_OK){
-	    printf("LP has died -- halting machine\n\n");
-	    stop_processes(&tm->lp);
-	    stop_processes(&tm->cg);
-	    stop_processes(&tm->cp);
-	    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	    stop_processes(&tm->sp);
-	    /*___END_EXPERIMENTAL_SECTION___*/
-	    return(SOMETHING_DIED);
+   for (i = 0; i < tm->lp.procnum; i++){
+      msgtag = 0;
+      while (msgtag != LP__TIMING){
+	 r_bufid = treceive_msg(tm->lp.procs[i], ANYTHING, &timeout);
+	 if (r_bufid > 0){
+	    bufinfo(r_bufid, &bytes, &msgtag, &sender);
+	    switch(msgtag){
+	       
+#ifdef COMPILE_IN_TM
+	     case FEASIBLE_SOLUTION_NONZEROS:
+	     case FEASIBLE_SOLUTION_USER:
+	       receive_int_array(&(tm->best_sol.xlevel), 1);
+	       receive_int_array(&(tm->best_sol.xindex), 1);
+	       receive_int_array(&(tm->best_sol.xiter_num), 1);
+	       receive_dbl_array(&(tm->best_sol.lpetol), 1);
+	       receive_dbl_array(&(tm->best_sol.objval), 1);
+	       receive_int_array(&(tm->best_sol.xlength), 1);
+	       if (tm->best_sol.xlength > 0){
+		  FREE(tm->best_sol.xind);
+		  FREE(tm->best_sol.xval);
+		  tm->best_sol.xind =
+		     (int *) malloc(tm->best_sol.xlength*ISIZE);
+		  tm->best_sol.xval =
+		     (double *) malloc(tm->best_sol.xlength*DSIZE);
+		  receive_int_array(tm->best_sol.xind, tm->best_sol.xlength);
+		  receive_dbl_array(tm->best_sol.xval, tm->best_sol.xlength);
+	       }
+	       if (!tm->has_ub || tm->best_sol.objval < tm->ub){
+		  tm->has_ub = TRUE;
+		  tm->ub = tm->best_sol.objval;
+	       }
+	       tm->best_sol.has_sol = TRUE;
+	       break;
+#endif
+	       
+	     case UPPER_BOUND:
+	       process_ub_message(tm);
+	       break;
+	       
+	     case LP__IS_FREE:
+	       receive_int_array(&cp, 1);
+	       tm->stat.chains++;
+	       mark_lp_process_free(tm,find_process_index(&tm->lp, sender),cp);
+	       break;
+	       
+	       
+	     case LP__NODE_DESCRIPTION:
+	       node = tm->active_nodes[find_process_index(&tm->lp, sender)];
+	       receive_node_desc(tm, node);
+	       break;
+	       
+	       
+	     case LP__BRANCHING_INFO:
+	       node = tm->active_nodes[find_process_index(&tm->lp, sender)];
+	       process_branching_info(tm, node);
+	       break;
+	       
+	       
+	     case LP__CUT_NAMES_REQUESTED:
+	       unpack_cut_set(tm, sender, 0, NULL);
+	       break;
+	       
+	       
+	     case LP__NODE_RESHELVED: /* implies LP__IS_FREE !! */
+	       lp = find_process_index(&tm->lp, sender);
+	       tm->active_nodes[lp]->node_status = NODE_STATUS__HELD;
+	       REALLOC(tm->nextphase_cand, bc_node *, tm->nextphase_cand_size,
+		       tm->nextphase_candnum+1, BB_BUNCH);
+	       tm->nextphase_cand[tm->nextphase_candnum++] =
+		  tm->active_nodes[lp];
+	       mark_lp_process_free(tm, lp, tm->active_nodes[lp]->cp);
+	       break;
+	       
+	       
+	     case LP__NODE_DISCARDED: /* implies LP__IS_FREE !! */
+	       lp = find_process_index(&tm->lp, sender);
+	       tm->active_nodes[lp]->node_status = NODE_STATUS__PRUNED;
+	       mark_lp_process_free(tm, lp, tm->active_nodes[lp]->cp);
+	       break;
+	       
+	       
+	     case SOMETHING_DIED:
+	       printf("Something has died... Halting the machine.\n\n");
+	       return(FALSE);
+
+	     case LP__TIMING:
+	       receive_char_array((char *)&tim, sizeof(node_times));
+	       tm->comp_times.communication    += tim.communication;
+	       tm->comp_times.lp               += tim.lp;
+	       tm->comp_times.separation       += tim.separation;
+	       tm->comp_times.fixing           += tim.fixing;
+	       tm->comp_times.pricing          += tim.pricing;
+	       tm->comp_times.strong_branching += tim.strong_branching;
+	       tm->comp_times.wall_clock_lp    += tim.wall_clock_lp;
+	       tm->comp_times.ramp_up_lp       += tim.ramp_up_lp;
+	       tm->comp_times.idle_diving      += tim.idle_diving;
+	       tm->comp_times.idle_node        += tim.idle_node;
+	       tm->comp_times.idle_names       += tim.idle_names;
+	       tm->comp_times.idle_cuts        += tim.idle_cuts;
+	       tm->comp_times.cut_pool         += tim.cut_pool;
+	       break;
+
+	     default:
+	       printf("Unknown message type %i\n\n", msgtag);
+	       break;
+	    }
+	    freebuf(r_bufid);
+	 }else{
+	    if (pstat(tm->lp.procs[i]) != PROCESS_OK){
+	       printf("LP has died -- halting machine\n\n");
+	       stop_processes(&tm->lp);
+	       stop_processes(&tm->cg);
+	       stop_processes(&tm->cp);
+	       /*__BEGIN_EXPERIMENTAL_SECTION__*/
+	       stop_processes(&tm->sp);
+	       /*___END_EXPERIMENTAL_SECTION___*/
+	       return(SOMETHING_DIED);
+	    }
 	 }
       }
    }
-   freebuf(r_bufid);
 #endif
 
    return(FUNCTION_TERMINATED_NORMALLY);

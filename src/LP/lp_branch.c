@@ -248,10 +248,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       can->termcode = pterm;
       can->feasible = pfeas;
       can->iterd = piter;
-      can->solutions = (double **)calloc(maxnum, sizeof(double *));
+      can->solutions = (double **) calloc(maxnum, sizeof(double *));
 #ifdef SENSITIVITY_ANALYSIS
       if (p->tm->par.sensitivity_analysis){      
-	 can->duals = (double **)calloc(maxnum, sizeof(double *));
+	 can->duals = (double **) calloc(maxnum, sizeof(double *));
       }else{
 	 can->duals = NULL;	 
       }
@@ -263,8 +263,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #endif
 
 #else
-      can->solutions = (double **) calloc 
-	 (MAX_CHILDREN_NUM, sizeof(double *));
+      can->solutions = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
 #ifdef SENSITIVITY_ANALYSIS
       if (p->par.sensitivity_analysis){      
 	 can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
@@ -316,8 +315,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    can->objval[j] = lp_data->objval;
 
 	    get_x(lp_data);
-	    can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
-	    memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 
 #ifdef SENSITIVITY_ANALYSIS
 	    if (p->par.sensitivity_analysis){      
@@ -333,7 +330,14 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
 		case IP_FEASIBLE:
 		  can->termcode[j] = LP_OPT_FEASIBLE;
-		  /* Fall through */
+		  can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+		  memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+		  if (best_can){
+		     best_can->feasible[j] = TRUE;
+		  }else{
+		     can->feasible[j] = TRUE;
+		  }
+		  break;
 		  
 		case IP_FEASIBLE_BUT_CONTINUE:
 		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
@@ -345,6 +349,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		    branched on, we need to pass this info on to whatever
 		    candidate does get branched on so the that the fact that
 		    a feasible solution was found in presolve can be recorded*/
+		  can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+		  memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 		  if (best_can){
 		     best_can->feasible[j] = TRUE;
 		  }else{
