@@ -48,20 +48,7 @@ typedef struct BD_TIMES{
 
  typedef struct DEBUGGING{
    int winprog;
-   int sweep;
-   int savings;
-   int savings3;
-   int near_cluster;
-   int tsp_ni;
-   int tsp_fi;
-   int tsp_fini;
-   int route_opt;
-   int nearest_ins;
-   int farthest_ins;
-   int farnear_ins;
-   int exchange;
-   int exchange2;
-   int lower_bound;
+   int heuristics; 
 }debugging;
 
 /*---------------------------------------------------------------------------*\
@@ -72,21 +59,7 @@ typedef struct BD_TIMES{
 
 typedef struct EXEC{
    char winprog[MAX_FILE_NAME_LENGTH];
-   char sweep[MAX_FILE_NAME_LENGTH];
-   char savings[MAX_FILE_NAME_LENGTH];
-   char savings2[MAX_FILE_NAME_LENGTH];
-   char savings3[MAX_FILE_NAME_LENGTH];
-   char near_cluster[MAX_FILE_NAME_LENGTH];
-   char tsp_ni[MAX_FILE_NAME_LENGTH];
-   char tsp_fi[MAX_FILE_NAME_LENGTH];
-   char tsp_fini[MAX_FILE_NAME_LENGTH];
-   char route_opt[MAX_FILE_NAME_LENGTH];
-   char nearest_ins[MAX_FILE_NAME_LENGTH];
-   char farthest_ins[MAX_FILE_NAME_LENGTH];
-   char farnear_ins[MAX_FILE_NAME_LENGTH];
-   char exchange[MAX_FILE_NAME_LENGTH];
-   char exchange2[MAX_FILE_NAME_LENGTH];
-   char lower_bound[MAX_FILE_NAME_LENGTH];
+   char heuristics[MAX_FILE_NAME_LENGTH];
 }exec;
 
 /*---------------------------------------------------------------------------*\

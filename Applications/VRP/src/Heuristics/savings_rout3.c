@@ -1,10 +1,25 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 #include <stddef.h>
 
 #include "BB_constants.h"
-#include "savings3.h"
 #include "binomial.h"
+#include "savings3.h"//lazimmi dene
 #include "ins_routines2.h"
-#include "sweep.h"
 #include "vrp_const.h"
 #include "compute_cost.h"
 
@@ -12,8 +27,17 @@
 | This function inserts cust_num into the current route between node1|
 | and node2.                                                         |
 \*------------------------------------------------------------------*/
+int find_new_ins_route3(heur_prob *p, int ins_node,
+		       _node *tour, int *node1, int *node2,
+			route_data *route_info);
+#ifndef _SAV
+#define _SAV
+#define SAV(d, a, b, c) (p->par.savings_par.lamda) * ICOST(d, 0, c) - \
+                       (ICOST(d,a,c) + ICOST(d,b,c) -  \
+			(p->par.savings_par.mu) * ICOST(d,a,b))
+#endif
 
-void insert_cust(int cust_num, _node *tour, int node1, int node2,
+void insert_cust3(int cust_num, _node *tour, int node1, int node2,
 		 int cur_route, int *demand, route_data *route_info)
 {
    if (node1 == 0){
@@ -43,7 +67,7 @@ void insert_cust(int cust_num, _node *tour, int node1, int node2,
 |  all possible insertion points.                                         |
 \*-----------------------------------------------------------------------*/
 
-int new_savings(heur_prob *p, tree_node *max_ptr, tree_node *head, _node *tour,
+int new_savings3(heur_prob *p, tree_node *max_ptr, tree_node *head, _node *tour,
 		int *node1, int *node2, route_data *route_info)
 {
    int savings, max_savings;
@@ -53,19 +77,19 @@ int new_savings(heur_prob *p, tree_node *max_ptr, tree_node *head, _node *tour,
    if (((head->node1 == max_ptr->node1) && (head->node2 == max_ptr->node2)) ||
        (route_info[ins_route].weight + p->demand[max_ptr->cust_num] >=
 	p->capacity)){
-      max_savings = find_new_ins_route(p, head->cust_num, tour, node1, node2,
+      max_savings = find_new_ins_route3(p, head->cust_num, tour, node1, node2,
 				       route_info);
       return(max_savings);
    }
    
-   if ((savings = SAV(&p->dist, max_ptr->node1, max_ptr->cust_num,
-		      head->cust_num)) > head->savings){
+   if ((savings = (int) (SAV(&p->dist, max_ptr->node1, max_ptr->cust_num,
+		      head->cust_num))) > head->savings){
       *node1 = max_ptr->node1;
       *node2 = max_ptr->cust_num;
       max_savings = savings;
    }
-   else if ((savings = SAV(&p->dist, max_ptr->cust_num, max_ptr->node2,
-			   head->cust_num)) > head->savings){
+   else if ((savings = (int) (SAV(&p->dist, max_ptr->cust_num, max_ptr->node2,
+			   head->cust_num))) > head->savings){
       *node1 = max_ptr->cust_num;
       *node2 = max_ptr->node2;
       max_savings = savings;
@@ -86,7 +110,7 @@ int new_savings(heur_prob *p, tree_node *max_ptr, tree_node *head, _node *tour,
 | numbers and merges each node into a new heap.                               |
 \*---------------------------------------------------------------------------*/
   
-tree_node *update_savings(heur_prob *p, tree_node *head, tree_node *max_ptr,
+tree_node *update_savings3(heur_prob *p, tree_node *head, tree_node *max_ptr,
 			  _node *tour, route_data *route_info)
 {
   tree_node *temp1, *temp2;
@@ -99,7 +123,7 @@ tree_node *update_savings(heur_prob *p, tree_node *head, tree_node *max_ptr,
 
   temp1 = head->child;
   temp2 = head->sibling;
-  savings = new_savings(p, max_ptr, head, tour, &node1, &node2, route_info);
+  savings = new_savings3(p, max_ptr, head, tour, &node1, &node2, route_info);
   if (savings == -MAXINT)
      return(NULL);
   new_head = make_heap(head->cust_num, savings, node1, node2);
@@ -107,14 +131,14 @@ tree_node *update_savings(heur_prob *p, tree_node *head, tree_node *max_ptr,
   free(head);
 
   if (degree >0){
-    temp1 = update_savings(p, temp1, max_ptr, tour, route_info);
+    temp1 = update_savings3(p, temp1, max_ptr, tour, route_info);
     if (!temp1)
        return(NULL);
     new_head = merge_heaps(temp1, new_head);
   }
 
   if (temp2!=NULL){
-    temp2 = update_savings(p, temp2, max_ptr, tour, route_info);
+    temp2 = update_savings3(p, temp2, max_ptr, tour, route_info);
     if (!temp2)
        return(NULL);
     new_head = merge_heaps(temp2, new_head);
@@ -125,7 +149,7 @@ tree_node *update_savings(heur_prob *p, tree_node *head, tree_node *max_ptr,
 
 /*===========================================================================*/
 
-int find_new_ins_route(heur_prob *p, int ins_node,
+int find_new_ins_route3(heur_prob *p, int ins_node,
 		       _node *tour, int *node1, int *node2,
 		       route_data *route_info)
 {
@@ -140,7 +164,7 @@ int find_new_ins_route(heur_prob *p, int ins_node,
       cur_node = route_info[cur_route].first;
       prev_node = 0;
       for (; cur_node; prev_node = cur_node, cur_node = tour[cur_node].next){
-	 if ((savings = SAV(&p->dist, prev_node, cur_node, ins_node))
+	if ((savings = (int) (SAV(&p->dist, prev_node, cur_node, ins_node)))
 	     > max_savings){
 	    max_savings = savings;
 	    *node1 = prev_node;

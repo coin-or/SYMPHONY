@@ -1,5 +1,21 @@
-#include <malloc.h>
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
 
+#include <malloc.h>
+#include <stdio.h>
 #include "BB_macros.h"
 #include "vrp_const.h"
 #include "proccomm.h"
@@ -16,7 +32,7 @@ int receive(heur_prob *p)
 {  
    int r_bufid, info, bytes, msgtag, parent;
    
-   PVM_FUNC(r_bufid, pvm_recv(-1, VRP_DATA));
+   PVM_FUNC(r_bufid, pvm_recv(-1, VRP_BROADCAST_DATA));
    PVM_FUNC(info, pvm_bufinfo(r_bufid, &bytes, &msgtag, &parent));
    PVM_FUNC(info, pvm_upkint(&(p->dist.wtype), 1, 1));
    PVM_FUNC(info, pvm_upkint(&(p->vertnum), 1, 1));
@@ -62,12 +78,18 @@ void send_tour(_node *tour, int cost, int numroutes, int algorithm,
    PVM_FUNC(info, pvm_pkint(&numroutes, 1, 1));
    PVM_FUNC(info, pvm_pkint(&algorithm, 1, 1));
    PVM_FUNC(info, pvm_pkdouble(&cpu_time, 1, 1));
-   if (routes)
+   if (routes){
       PVM_FUNC(info, pvm_pkbyte((char *)route_info, 
 				(numroutes+1)*sizeof(route_data), 1));
-   PVM_FUNC(info, pvm_send(parent, HEUR_TOUR));
+      PVM_FUNC(info, pvm_send(parent, HEUR_TOUR_WITH_ROUTES));
+      printf("\nSent HEUR_TOUR_WITH_ROUTES\n\n");
+   }
+   else{
+      PVM_FUNC(info, pvm_send(parent, HEUR_TOUR));
+      printf("\nSent HEUR_TOUR\n\n");
+   }
    PVM_FUNC(info, pvm_freebuf(s_bufid));
-   
+
    return;
 }
 
@@ -81,12 +103,14 @@ void free_heur_prob(heur_prob *p)
 	 FREE(p->cur_tour->route_info);
 	 FREE(p->cur_tour);
       }
+      /*
       FREE(p->demand);
       FREE(p->dist.coordx);
       FREE(p->dist.coordy);
       FREE(p->dist.coordz);
       FREE(p->dist.cost);
       FREE(p);
+      */
    }
 }
 

@@ -253,8 +253,8 @@ endif
 # compile a distributed version of the code.
 ##############################################################################
 
-COMM_PROTOCOL = NONE
-#COMM_PROTOCOL = PVM
+#COMM_PROTOCOL = NONE
+COMM_PROTOCOL = PVM
 
 #Set the paths for PVM
 ifeq ($(COMM_PROTOCOL),PVM)

@@ -190,120 +190,26 @@ TSP_OBJS = $(addprefix $(USER_OBJDIR)/,$(notdir $(TSP_SRC:.c=.o)))
 
 USER_MASTER_SRC  += start_heurs.c lower_bound.c route_heur.c
 USER_MASTER_SRC  += exchange_heur.c cluster_heur.c
-USER_MASTER_SRC  += receive_rout.c
+USER_MASTER_SRC  += receive_rout.c collect_solutions.c heur_routines.c
+USER_MASTER_SRC  += proccomm.c timemeas.c
 
-SWEEP_SRC         = $(MACROS_SRC) sweep.c qsort.c compute_cost.c 
-SWEEP_SRC        += heur_routines.c $(TIME_SRC) $(PVMERR_SRC)
+HEURS_SRC     = $(MACROS_SRC) sweep.c savings.c savings_rout.c savings2.c 
+HEURS_SRC    += savings_rout2.c binomial.c heur_routines.c nearest_ins.c 
+HEURS_SRC    += ins_routines.c farthest_ins.c farnear_ins.c compute_cost.c
+HEURS_SRC    += near_cluster.c ins_routines2.c tsp_ni.c tsp_ins_rout.c 
+HEURS_SRC    += s_path.c tsp_fi.c tsp_fini.c exchange.c exchange2.c mst.c 
+HEURS_SRC    += mst_ins_rout.c savings3.c savings_rout3.c qsort.c
+HEURS_SRC    += $(TIME_SRC) $(PVMERR_SRC) heur_main.c
 
-SAVINGS_SRC       = $(MACROS_SRC) savings.c compute_cost.c savings_rout.c 
-SAVINGS_SRC      += heur_routines.c $(TIME_SRC) $(PVMERR_SRC)
+HEURS_OBJS    = $(addprefix $(USER_OBJDIR)/,$(notdir $(HEURS_SRC:.c=.o)))
+HEURS_DEP     = $(addprefix $(USER_DEPDIR)/,$(notdir $(HEURS_SRC:.c=.d)))
 
-SAVINGS2_SRC      = $(MACROS_SRC) savings2.c compute_cost.c savings_rout2.c 
-SAVINGS2_SRC     += heur_routines.c binomial.c $(TIME_SRC) $(PVMERR_SRC)
+USER_SRCDIR   = $(USERROOT)/Heuristics
+USER_SRCDIR  += $(USERROOT)/Master/Heuristics
 
-SAVINGS3_SRC      = $(MACROS_SRC) savings3.c compute_cost.c savings_rout3.c 
-SAVINGS3_SRC     += heur_routines.c binomial.c ins_routines2.c qsort.c 
-SAVINGS3_SRC     += $(TIME_SRC) $(PVMERR_SRC)
+USER_INCDIR  += -I$(USERROOT)/include/heurs
 
-ROUTE_OPT_SRC     = $(MACROS_SRC) route_opt.c compute_cost.c heur_routines.c 
-ROUTE_OPT_SRC    += vrp_routines.c receive_rout.c $(TIME_SRC) $(PVMERR_SRC)
-
-NEAREST_INS_SRC   = $(MACROS_SRC) nearest_ins.c ins_routines.c compute_cost.c 
-NEAREST_INS_SRC  += heur_routines.c $(TIME_SRC) $(PVMERR_SRC)
-
-FARTHEST_INS_SRC  = $(MACROS_SRC) farthest_ins.c ins_routines.c compute_cost.c 
-FARTHEST_INS_SRC += heur_routines.c $(TIME_SRC) $(PVMERR_SRC)
-
-FARNEAR_INS_SRC   = $(MACROS_SRC) farnear_ins.c ins_routines.c compute_cost.c 
-FARNEAR_INS_SRC  += heur_routines.c $(TIME_SRC) $(PVMERR_SRC)
-
-NEAR_CLUSTER_SRC  = $(MACROS_SRC) near_cluster.c ins_routines2.c 
-NEAR_CLUSTER_SRC += compute_cost.c heur_routines.c qsort.c $(TIME_SRC) 
-NEAR_CLUSTER_SRC += $(PVMERR_SRC)
-
-TSP_NI_SRC        = $(MACROS_SRC) tsp_ni.c tsp_ins_rout.c heur_routines.c 
-TSP_NI_SRC       += compute_cost.c s_path.c $(TIME_SRC) $(PVMERR_SRC)
-
-TSP_FI_SRC        = $(MACROS_SRC) tsp_fi.c tsp_ins_rout.c heur_routines.c 
-TSP_FI_SRC       += compute_cost.c s_path.c $(TIME_SRC) $(PVMERR_SRC)
-
-TSP_FINI_SRC      = $(MACROS_SRC) tsp_fini.c tsp_ins_rout.c heur_routines.c 
-TSP_FINI_SRC     += compute_cost.c s_path.c $(TIME_SRC) $(PVMERR_SRC)
-
-EXCHANGE_SRC      = $(MACROS_SRC) exchange.c heur_routines.c compute_cost.c 
-EXCHANGE_SRC     += $(TIME_SRC) $(PVMERR_SRC)
-
-EXCHANGE2_SRC     = $(MACROS_SRC) exchange2.c heur_routines.c compute_cost.c 
-EXCHANGE2_SRC    += $(TIME_SRC) $(PVMERR_SRC)
-
-MST_SRC           = $(MACROS_SRC) mst.c compute_cost.c mst_ins_rout.c 
-MST_SRC          += heur_routines.c $(TIME_SRC) $(PVMERR_SRC)
-
-ALL_HEURS_SRC     = $(MACROS_SRC) sweep.c savings.c savings_rout.c savings2.c 
-ALL_HEURS_SRC    += savings_rout2.c binomial.c route_opt.c nearest_ins.c 
-ALL_HEURS_SRC    += ins_routines.c farthest_ins.c farnear_ins.c 
-ALL_HEURS_SRC    += near_cluster.c ins_routines2.c tsp_ni.c tsp_ins_rout.c 
-ALL_HEURS_SRC    += s_path.c tsp_fi.c tsp_fini.c exchange.c exchange2.c mst.c 
-ALL_HEURS_SRC    += mst_ins_rout.c savings3.c savings_rout3.c qsort.c
-ALL_HEURS_SRC    += $(TIME_SRC) $(PVMERR_SRC)
-
-HEUR_BINS         = sweep savings route_opt nearest_ins farthest_ins 
-HEUR_BINS        += farnear_ins savings2 near_cluster tsp_ni tsp_fi
-HEUR_BINS        += tsp_fini exchange exchange2 mst savings3
-
-SWEEP_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(SWEEP_SRC:.c=.o)))
-SWEEP_DEP 	  = $(addprefix $(DEPDIR)/,$(SWEEP_SRC:.c=.d))
-
-SAVINGS_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(SAVINGS_SRC:.c=.o)))
-SAVINGS_DEP 	  = $(addprefix $(DEPDIR)/,$(SAVINGS_SRC:.c=.d))
-
-SAVINGS2_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(SAVINGS2_SRC:.c=.o)))
-SAVINGS2_DEP 	  = $(addprefix $(DEPDIR)/,$(SAVINGS2_SRC:.c=.d))
-
-SAVINGS3_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(SAVINGS3_SRC:.c=.o)))
-SAVINGS3_DEP 	  = $(addprefix $(DEPDIR)/,$(SAVINGS3_SRC:.c=.d))
-
-ROUTE_OPT_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(ROUTE_OPT_SRC:.c=.o)))
-ROUTE_OPT_DEP 	  = $(addprefix $(DEPDIR)/,$(ROUTE_OPT_SRC:.c=.d))
-
-NEAREST_INS_OBJS  = $(addprefix $(USER_OBJDIR)/,$(notdir $(NEAREST_INS_SRC:.c=.o)))
-NEAREST_INS_DEP   = $(addprefix $(DEPDIR)/,$(NEAREST_INS_SRC:.c=.d))
-
-FARTHEST_INS_OBJS = $(addprefix $(USER_OBJDIR)/,$(notdir $(FARTHEST_INS_SRC:.c=.o)))
-FARTHEST_INS_DEP  = $(addprefix $(DEPDIR)/,$(FARTHEST_INS_SRC:.c=.d))
-
-FARNEAR_INS_OBJS  = $(addprefix $(USER_OBJDIR)/,$(notdir $(FARNEAR_INS_SRC:.c=.o)))
-FARNEAR_INS_DEP   = $(addprefix $(DEPDIR)/,$(FARNEAR_INS_SRC:.c=.d))
-
-NEAR_CLUSTER_OBJS = $(addprefix $(USER_OBJDIR)/,$(notdir $(NEAR_CLUSTER_SRC:.c=.o)))
-NEAR_CLUSTER_DEP  = $(addprefix $(DEPDIR)/,$(NEAR_CLUSTER_SRC:.c=.d))
-
-TSP_NI_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(TSP_NI_SRC:.c=.o)))
-TSP_NI_DEP 	  = $(addprefix $(DEPDIR)/,$(TSP_NI_SRC:.c=.d))
-
-TSP_FI_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(TSP_FI_SRC:.c=.o)))
-TSP_FI_DEP 	  = $(addprefix $(DEPDIR)/,$(TSP_FI_SRC:.c=.d))
-
-TSP_FINI_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(TSP_FINI_SRC:.c=.o)))
-TSP_FINI_DEP 	  = $(addprefix $(DEPDIR)/,$(TSP_FINI_SRC:.c=.d))
-
-EXCHANGE_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(EXCHANGE_SRC:.c=.o)))
-EXCHANGE_DEP 	  = $(addprefix $(DEPDIR)/,$(EXCHANGE_SRC:.c=.d))
-
-EXCHANGE2_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(EXCHANGE2_SRC:.c=.o)))
-EXCHANGE2_DEP 	  = $(addprefix $(DEPDIR)/,$(EXCHANGE2_SRC:.c=.d))
-
-MST_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(MST_SRC:.c=.o)))
-MST_DEP 	  = $(addprefix $(DEPDIR)/,$(MST_SRC:.c=.d))
-
-USER_SRCDIR 	= $(USERROOT)/Heuristics
-USER_SRCDIR    += $(USERROOT)/Master/Heuristics
-
-USER_INCDIR    += -I$(USERROOT)/include/heurs
-
-ALL_USER_SRC     += $(ALL_HEURS_SRC)
-
-HEUR_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(ALL_HEURS_SRC:.c=.o)))
+ALL_USER_SRC += $(ALL_HEURS_SRC)
 
 ##############################################################################
 # This section is for DECOMP source file names
@@ -389,190 +295,18 @@ concorde.a : concorde $(TSP_OBJS)
 # Targets for the heuristics
 ##############################################################################
 
-heuristics : 
-	$(MAKE) $(HEUR_BINS)
-
 clean_heurs:
-	rm -f $(addprefix $(USER_OBJDIR)/, $(notdir $(HEUR_OBJS)))
+	rm -f $(addprefix $(USER_OBJDIR)/, $(notdir $(HEURS_OBJS)))
 
-
-sweep : $(BINDIR)/sweep
+vrp_heuristics: $(BINDIR)/vrp_heuristics
 	true
 
-$(BINDIR)/sweep : $(SWEEP_DEP) $(SWEEP_OBJS)
+$(BINDIR)/vrp_heuristics: $(HEURS_DEP) $(HEURS_OBJS)
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SWEEP_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-savings : $(BINDIR)/savings
-	true
-
-$(BINDIR)/savings : $(SAVINGS_DEP) $(SAVINGS_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SAVINGS_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-savings2 : $(BINDIR)/savings2
-	true
-
-$(BINDIR)/savings2 : $(SAVINGS2_DEP) $(SAVINGS2_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SAVINGS2_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-savings3 : $(BINDIR)/savings3
-	true
-
-$(BINDIR)/savings3 : $(SAVINGS3_DEP) $(SAVINGS3_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SAVINGS3_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-route_opt : $(BINDIR)/route_opt
-	true
-
-$(BINDIR)/route_opt : $(ROUTE_OPT_DEP) $(ROUTE_OPT_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ROUTE_OPT_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-nearest_ins : $(BINDIR)/nearest_ins
-	true
-
-$(BINDIR)/nearest_ins : $(NEAREST_INS_DEP) $(NEAREST_INS_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(NEAREST_INS_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-farthest_ins : $(BINDIR)/farthest_ins
-	true
-
-$(BINDIR)/farthest_ins : $(FARTHEST_INS_DEP) $(FARTHEST_INS_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(FARTHEST_INS_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-farnear_ins : $(BINDIR)/farnear_ins
-	true
-
-$(BINDIR)/farnear_ins : $(FARNEAR_INS_DEP) $(FARNEAR_INS_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(FARNEAR_INS_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-near_cluster : $(BINDIR)/near_cluster
-	true
-
-$(BINDIR)/near_cluster : $(NEAR_CLUSTER_DEP) $(NEAR_CLUSTER_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(NEAR_CLUSTER_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-tsp_ni : $(BINDIR)/tsp_ni
-	true
-
-$(BINDIR)/tsp_ni : $(TSP_NI_DEP) $(TSP_NI_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TSP_NI_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-tsp_fi : $(BINDIR)/tsp_fi
-	true
-
-$(BINDIR)/tsp_fi : $(TSP_FI_DEP) $(TSP_FI_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TSP_FI_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-tsp_fini : $(BINDIR)/tsp_fini
-	true
-
-$(BINDIR)/tsp_fini : $(TSP_FINI_DEP) $(TSP_FINI_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TSP_FINI_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-exchange : $(BINDIR)/exchange
-	true
-
-$(BINDIR)/exchange : $(EXCHANGE_DEP) $(EXCHANGE_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXCHANGE_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-exchange2 : $(BINDIR)/exchange2
-	true
-
-$(BINDIR)/exchange2 : $(EXCHANGE2_DEP) $(EXCHANGE2_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXCHANGE2_OBJS) $(LIBS) \
-	-lmaster$(MASTEREXT)
-	@echo ""
-
-mst : $(BINDIR)/mst
-	true
-
-$(BINDIR)/mst : $(MST_DEP) $(MST_OBJS)
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MST_OBJS) $(LIBS) \
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(HEURS_OBJS) $(LIBS) \
 	-lmaster$(MASTEREXT)
 	@echo ""
 

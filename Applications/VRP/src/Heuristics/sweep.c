@@ -1,16 +1,23 @@
-#include <math.h>
-#include <malloc.h>
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
 
-#include "BB_constants.h"
 #include "sweep.h"
-#include "messages.h"
 #include "qsort.h"
-#include "timemeas.h"
-#include "compute_cost.h"
-#include "proccomm.h"
-#include "vrp_const.h"
-#include "heur_routines.h"
-
+#include <string.h>
+#include <stdio.h>
 /*-----------------------------------------------------------------------*\
 | Make_tour receives the nodes in sorted order and performs the algorithm |
 | described below, starting with a number of equally spaced nodes as      |
@@ -55,21 +62,12 @@ void make_tour(heur_prob *p, sweep_data *data, best_tours *final_tour)
       }
       else{
 	weight = demand[data[i].cust];
-	j++;
-	if (i != vertnum - 2)
-	  tour[data[i].cust].next = data[i+1].cust;
-	else
-	  tour[data[i].cust].next = data[0].cust;
-	tour[data[i].cust].route=j;
-      }
-    }
-    i = (k-1) + start;
-    if (i>vertnum-2) i-=(vertnum-1);
-    if (weight + demand[data[i].cust] <= capacity){
-      tour[data[i].cust].next = 0;
-      tour[data[i].cust].route = j;
-    }
-    else{
+	j++; if (i != vertnum - 2) tour[data[i].cust].next =
+	data[i+1].cust; else tour[data[i].cust].next = data[0].cust;
+	tour[data[i].cust].route=j; } } i = (k-1) + start; if
+	(i>vertnum-2) i-=(vertnum-1); if (weight +
+	demand[data[i].cust] <= capacity){ tour[data[i].cust].next =
+	0; tour[data[i].cust].route = j; } else{
       j++;
       tour[data[i].cust].next = 0;
       tour[data[i].cust].route = j;
@@ -77,7 +75,7 @@ void make_tour(heur_prob *p, sweep_data *data, best_tours *final_tour)
     
     cost = compute_tour_cost (&p->dist, tour);
     if (cost < final_tour->cost){
-      memcpy(final_tour->tour, tour, vertnum*sizeof(_node));
+      memcpy((char *)final_tour->tour,(char *)tour, vertnum*sizeof(_node));
       final_tour->cost = cost;
       final_tour->numroutes=j;
     }
@@ -100,81 +98,69 @@ void make_tour(heur_prob *p, sweep_data *data, best_tours *final_tour)
 | cyclic ordering, we get different solutions.                      |
 \*-----------------------------------------------------------------*/
 
-void main(void)
+void sweep(int parent, heur_prob *p)
 {
-  heur_prob *p;
-  int mytid, info, r_bufid, parent;
+  printf("\nIn sweep....\n\n");
+  int mytid, info, r_bufid;
   int i;
   int vertnum;
   sweep_data *data;
   float depotx, depoty;
   float tempx, tempy;
-  double t;
-
-  (void) used_time(&t);
+  double t=0;
 
   mytid = pvm_mytid();
 
-  p = (heur_prob *) calloc(1, sizeof(heur_prob));
+  (void) used_time(&t);
 
+  printf("mytid in sweep.c= %i", pvm_mytid());
   /*-----------------------------------------------------------------------*\
   |                     Receive the VRP data                                |
   \*-----------------------------------------------------------------------*/
 
-  parent = receive(p);
-
   PVM_FUNC(r_bufid, pvm_recv(-1, SWEEP_TRIALS));
   PVM_FUNC(info, pvm_upkint(&(p->par.sweep_trials), 1, 1));
-  PVM_FUNC(r_bufid, pvm_recv(-1, COORD_DATA));
-  p->dist.coordx = (double *) calloc(p->vertnum, sizeof(double));
-  p->dist.coordy = (double *) calloc(p->vertnum, sizeof(double));
-  PVM_FUNC(info, pvm_upkdouble(p->dist.coordx, p->vertnum, 1));
-  PVM_FUNC(info, pvm_upkdouble(p->dist.coordy, p->vertnum, 1));
-
+  printf("\nCheckpoint 1\n");
   /*-----------------------------------------------------------------------*/
 
   vertnum = p->vertnum;
   p->cur_tour = (best_tours *)calloc(1, sizeof(best_tours));
   p->cur_tour->tour = (_node *)calloc(vertnum, sizeof(_node));
-
+  printf("\nCheckpoint 2\n");
   data = (sweep_data *)calloc(vertnum-1, sizeof(sweep_data));
   if (p->dist.coordx && p->dist.coordy){
      depotx = p->dist.coordx[0];
      depoty = p->dist.coordy[0];
-  }else{
-     exit(1);
-  }
-
-  /*calculate angles for sorting*/
-  for (i=0; i<vertnum-1; i++){
-    tempx = p->dist.coordx[i+1] - depotx;
-    tempy = p->dist.coordy[i+1] - depoty;
-    data[i].angle = (float) atan2(tempy, tempx);
-    if (data[i].angle < 0) data[i].angle += 2*M_PI;
-    data[i].cust=i+1;
-  }
-
-  quicksort(data, vertnum-1);
-
-  make_tour(p, data, p->cur_tour);
-
+     printf("\nCheckpoint 3\n");
+     /*calculate angles for sorting*/
+     for (i=0; i<vertnum-1; i++){
+       tempx = p->dist.coordx[i+1] - depotx;
+       tempy = p->dist.coordy[i+1] - depoty;
+       data[i].angle = (float) atan2(tempy, tempx);
+       if (data[i].angle < 0) data[i].angle += 2*M_PI;
+       data[i].cust=i+1;
+     }
+     printf("\nCheckpoint 4\n");
+     quicksort(data, vertnum-1);
+     printf("\nCheckpoint 5\n");
+     make_tour(p, data, p->cur_tour);
+     printf("\nCheckpoint 6\n");
   /*-----------------------------------------------------------------------*\
   |               Transmit the tour back to the parent                      |
   \*-----------------------------------------------------------------------*/
 
-  send_tour(p->cur_tour->tour, p->cur_tour->cost, p->cur_tour->numroutes,
-	    SWEEP, used_time(&t), parent, vertnum, 0, NULL);
-
+     send_tour(p->cur_tour->tour, p->cur_tour->cost, p->cur_tour->numroutes,
+	       SWEEP, used_time(&t), parent, vertnum, 0, NULL);
+     printf("\nCheckpoint 7\n");
+  }
   if (data) free((char *) data);
-
+  printf("\nCheckpoint 8\n");    
   free_heur_prob(p);
-
-  PVM_FUNC(r_bufid, pvm_recv(parent, YOU_CAN_DIE));
-  PVM_FUNC(info, pvm_freebuf(r_bufid));
-  PVM_FUNC(info, pvm_exit());
+  
 }
 
   
 
     
+
 

@@ -581,25 +581,13 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
    par->use_small_graph = FALSE;
    par->colgen_strat[0] = 0;
    par->colgen_strat[1] = 0;
-   par->verbosity = 0;
+   par->verbosity = 9;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    par->debug.winprog = 0;
-   par->debug.sweep = 0;
-   par->debug.savings = 0;
-   par->debug.savings3 = 0;
-   par->debug.route_opt = 0;
-   par->debug.nearest_ins = 0;
-   par->debug.farthest_ins = 0;
-   par->debug.farnear_ins = 0;
-   par->debug.tsp_fi = 0;
-   par->debug.tsp_ni = 0;
-   par->debug.tsp_fini = 0;
-   par->debug.exchange = 0;
-   par->debug.exchange2 = 0;
-   par->debug.lower_bound = 0;
-   par->debug.near_cluster = 0;
+   par->debug.heuristics = 0;
    par->time_out.ub = 60;
    par->time_out.lb = 60;
+   heur_par->no_of_machines = 3;
    heur_par->sweep_trials = 1000;        /*default parameter settings*/
    heur_par->savings_par.savings_trials = 0;
    heur_par->savings_par.savings2_trials = 1;
@@ -628,21 +616,7 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
    lb_par->lb_max_iter = 200;
    lb_par->lb_penalty_mult = 100;
    vrp->lb = (low_bd *) calloc (1, sizeof(low_bd));
-   strcpy(par->executables.sweep, "sweep");
-   strcpy(par->executables.savings, "savings");
-   strcpy(par->executables.savings2, "savings2");
-   strcpy(par->executables.savings3, "savings3");
-   strcpy(par->executables.near_cluster, "near_cluster");
-   strcpy(par->executables.tsp_ni, "tsp_ni");
-   strcpy(par->executables.tsp_fi, "tsp_fi");
-   strcpy(par->executables.tsp_fini, "tsp_fini");
-   strcpy(par->executables.route_opt, "route_opt");
-   strcpy(par->executables.nearest_ins, "nearest_ins");
-   strcpy(par->executables.farthest_ins, "farthest_ins");
-   strcpy(par->executables.farnear_ins, "farnear_ins");
-   strcpy(par->executables.exchange, "exchange");
-   strcpy(par->executables.exchange2, "exchange2");
-   strcpy(par->executables.lower_bound, "mst");
+   strcpy(par->executables.heuristics, "vrp_heuristics");
    /*___END_EXPERIMENTAL_SECTION___*/
 
    lp_par->verbosity = 0;
@@ -874,50 +848,8 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       else if (strcmp(key, "winprog_executable_name") == 0){
 	 strcpy(par->executables.winprog, value);
       }
-      else if (strcmp(key, "sweep_executable_name") == 0){
-	 strcpy(par->executables.sweep, value);
-      }
-      else if (strcmp(key, "savings_executable_name") == 0){
-	 strcpy(par->executables.savings, value);
-      }
-      else if (strcmp(key, "savings2_executable_name") == 0){
-	 strcpy(par->executables.savings2, value);
-      }
-      else if (strcmp(key, "savings3_executable_name") == 0){
-	 strcpy(par->executables.savings3, value);
-      }
-      else if (strcmp(key, "route_opt_executable_name") == 0){
-	 strcpy(par->executables.route_opt, value);
-      }
-      else if (strcmp(key, "near_cluster_executable_name") == 0){
-	 strcpy(par->executables.near_cluster, value);
-      }
-      else if (strcmp(key, "nearest_ins_executable_name") == 0){
-	 strcpy(par->executables.nearest_ins, value);
-      }
-      else if (strcmp(key, "farthest_ins_executable_name") == 0){
-	 strcpy(par->executables.farthest_ins, value);
-      }
-      else if (strcmp(key, "farnear_ins_executable_name") == 0){
-	 strcpy(par->executables.farnear_ins, value);
-      }
-      else if (strcmp(key, "tsp_fi_executable_name") == 0){
-	 strcpy(par->executables.tsp_fi, value);
-      }
-      else if (strcmp(key, "tsp_ni_executable_name") == 0){
-	 strcpy(par->executables.tsp_ni, value);
-      }
-      else if (strcmp(key, "tsp_fini_executable_name") == 0){
-	 strcpy(par->executables.tsp_fini, value);
-      }
-      else if (strcmp(key, "exchange_executable_name") == 0){
-	 strcpy(par->executables.exchange, value);
-      }
-      else if (strcmp(key, "exchange2_executable_name") == 0){
-	 strcpy(par->executables.exchange2, value);
-      }
-      else if (strcmp(key, "lower_bound_executable_name") == 0){
-	 strcpy(par->executables.lower_bound, value);
+      else if (strcmp(key, "heuristics_executable_name") == 0){
+	 strcpy(par->executables.heuristics, value);
       }
 
       /******************** debugging parameters *****************************/
@@ -926,61 +858,9 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
 	 READ_INT_PAR(par->debug.winprog);
 	 CHECK_DEBUG_PAR(par->debug.winprog, key);
       }
-      else if (strcmp(key, "sweep_debug") == 0){
-	 READ_INT_PAR(par->debug.sweep);
-	 CHECK_DEBUG_PAR(par->debug.sweep, key);
-      }
-      else if (strcmp(key, "savings_debug") == 0){
-	 READ_INT_PAR(par->debug.savings);
-	 CHECK_DEBUG_PAR(par->debug.savings, key);
-      }
-      else if (strcmp(key, "savings3_debug") == 0){
-	 READ_INT_PAR(par->debug.savings);
-	 CHECK_DEBUG_PAR(par->debug.savings3, key);
-      }
-      else if (strcmp(key, "route_opt_debug") == 0){
-	 READ_INT_PAR(par->debug.route_opt);
-	 CHECK_DEBUG_PAR(par->debug.route_opt, key);
-      }
-      else if (strcmp(key, "near_cluster_debug") == 0){
-	 READ_INT_PAR(par->debug.near_cluster);
-	 CHECK_DEBUG_PAR(par->debug.near_cluster, key);
-      }
-      else if (strcmp(key, "nearest_ins_debug") == 0){
-	 READ_INT_PAR(par->debug.nearest_ins);
-	 CHECK_DEBUG_PAR(par->debug.nearest_ins, key);
-      }
-      else if (strcmp(key, "farthest_ins_debug") == 0){
-	 READ_INT_PAR(par->debug.farthest_ins);
-	 CHECK_DEBUG_PAR(par->debug.farthest_ins, key);
-      }
-      else if (strcmp(key, "farnear_ins_debug") == 0){
-	 READ_INT_PAR(par->debug.farnear_ins);
-	 CHECK_DEBUG_PAR(par->debug.farnear_ins, key);
-      }
-      else if (strcmp(key, "tsp_fi_debug") == 0){
-	 READ_INT_PAR(par->debug.tsp_fi);
-	 CHECK_DEBUG_PAR(par->debug.tsp_fi, key);
-      }
-      else if (strcmp(key, "tsp_ni_debug") == 0){
-	 READ_INT_PAR(par->debug.tsp_ni);
-	 CHECK_DEBUG_PAR(par->debug.tsp_ni, key);
-      }
-      else if (strcmp(key, "tsp_fini_debug") == 0){
-	 READ_INT_PAR(par->debug.tsp_fini);
-	 CHECK_DEBUG_PAR(par->debug.tsp_fini, key);
-      }
-      else if (strcmp(key, "exchange_debug") == 0){
-	 READ_INT_PAR(par->debug.exchange);
-	 CHECK_DEBUG_PAR(par->debug.exchange, key);
-      }
-      else if (strcmp(key, "exchange2_debug") == 0){
-	 READ_INT_PAR(par->debug.exchange2);
-	 CHECK_DEBUG_PAR(par->debug.exchange2, key);
-      }
-      else if (strcmp(key, "lower_bound_debug") == 0){
-	 READ_INT_PAR(par->debug.lower_bound);
-	 CHECK_DEBUG_PAR(par->debug.lower_bound, key);
+      else if (strcmp(key, "heuristics_debug") == 0){
+	 READ_INT_PAR(par->debug.heuristics);
+	 CHECK_DEBUG_PAR(par->debug.heuristics, key);
       }
 
       /*___END_EXPERIMENTAL_SECTION___*/

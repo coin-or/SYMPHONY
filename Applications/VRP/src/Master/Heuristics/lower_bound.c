@@ -1,3 +1,19 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 #include <malloc.h>
 #include <memory.h>
 #include <stdio.h>
@@ -30,9 +46,10 @@ static int sum(int *array, int lower_lim, int upper_lim)
 
 /*===========================================================================*/
 
-void lower_bound(vrp_problem *vrp, lb_params *lb_par, heurs *lh, int ub)
+void lower_bound(vrp_problem *vrp, lb_params *lb_par, heurs *lh, 
+		 int ub, int jobs, int *tids, int *sent)
 {
-   int *tids, jobs = 0, s_bufid;
+   int s_bufid, dummy;
    int y, i, alpha, interval;
    int *sorted_demand, trials;
    int m1, numroutes = vrp->numroutes, capacity = vrp->capacity;
@@ -57,10 +74,7 @@ void lower_bound(vrp_problem *vrp, lb_params *lb_par, heurs *lh, int ub)
    
    trials = (lb_par->lower_bound)*(numroutes-m1);
    
-   tids = lh->tids = (int *) calloc (trials, sizeof(int));
-   
-   jobs = spawn(vrp->par.executables.lower_bound, (char **)NULL,
-		vrp->par.debug.lower_bound, (char *)NULL, trials, tids);
+   lh->tids = tids;
    
    lh->jobs = jobs;
    
@@ -72,28 +86,30 @@ void lower_bound(vrp_problem *vrp, lb_params *lb_par, heurs *lh, int ub)
    else if (vrp->par.verbosity >2)
       printf("\n%i jobs started ...\n\n", jobs);
    
-   lh->finished = (char *) calloc (jobs, sizeof(char));
-   
    /*-----------------------------------------------------------------------*\
    |                  Broadcast data to the lower bounding procedure         |
    \*-----------------------------------------------------------------------*/
+   for(i=0; i<trials; i++){
+     s_bufid = init_send(DataInPlace);
+     send_int_array(&dummy, 1);
+     send_msg(tids[i%jobs], MST);   
+     sent[i%jobs]++;
+     broadcast(vrp, tids+(i%jobs), 1);
    
-   broadcast(vrp, tids, jobs);
-   
-   s_bufid = init_send(DataInPlace);
-   send_int_array(&numroutes, 1);
-   send_int_array(&ub, 1);
-   send_int_array(&lb_par->lb_max_iter, 1);
-   send_int_array(&m1, 1);
-   msend_msg(tids, trials, VRP_DATA);
-   
+     s_bufid = init_send(DataInPlace);
+     send_int_array(&numroutes, 1);
+     send_int_array(&ub, 1);
+     send_int_array(&lb_par->lb_max_iter, 1);
+     send_int_array(&m1, 1);
+     send_msg(tids[i%jobs],  VRP_LB_DATA);
+   }
    interval = lb_par->lb_penalty_mult/lb_par->lower_bound;
    
    for (i=trials-1, y = m1, alpha = lb_par->lb_penalty_mult; i>=0; i--, y++){
       s_bufid = init_send(DataInPlace);
       send_int_array(&y, 1);
       send_int_array(&alpha, 1);
-      send_msg(tids[i], VRP_DATA);
+      send_msg(tids[i%jobs], VRP_LB_DATA2);
       if (y == numroutes){
 	 y = m1-1;
 	 alpha -= interval;
@@ -103,7 +119,6 @@ void lower_bound(vrp_problem *vrp, lb_params *lb_par, heurs *lh, int ub)
    freebuf(s_bufid);
    FREE(sorted_demand);
 }
+
   
-
-
   

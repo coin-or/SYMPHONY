@@ -1,3 +1,19 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 #include <stdio.h>
 #include <malloc.h>
 #include <stdlib.h>
@@ -7,11 +23,10 @@
 #include "vrp_const.h"
 #include "proccomm.h"
 
-void exchange_heur(vrp_problem *vrp, heurs *eh, int trials, int which)
+void exchange_heur(vrp_problem *vrp, heurs *eh, int trials, int jobs, 
+		   int which, int *tids, int *sent)
 {
-  int *tids;
-  int jobs = 0;
-  int i;
+  int i, info, dummy;
   int s_bufid;
   _node *tour;
   best_tours tours;
@@ -23,16 +38,16 @@ void exchange_heur(vrp_problem *vrp, heurs *eh, int trials, int which)
 	printf("\nNow beginning second set of exchange heuristics ....\n\n");
   }
 
-  tids = eh->tids = (int *) calloc (trials, sizeof(int));
+  eh->tids = tids;
+  eh->jobs = trials;
 
-  if (trials)
-    jobs = spawn(which ? vrp->par.executables.exchange:
-		 vrp->par.executables.exchange2, (char **)NULL,
-		 which ? vrp->par.debug.exchange:
-		 vrp->par.debug.exchange2, (char *)NULL, trials,
-		 tids);
-
-  eh->jobs = jobs;
+  if (trials)    
+    for (i=0; i < eh->jobs; i++){
+    PVM_FUNC(s_bufid, pvm_initsend(PvmDataRaw));
+    PVM_FUNC(info, pvm_pkint(&dummy, 1, 1));
+    PVM_FUNC(info, pvm_send(tids[i%jobs], which ? S_EXCHANGE : S_EXCHANGE2));
+    sent[i%jobs]++;
+    }
 
   if (jobs == 0){
     fprintf(stderr, "\nNo jobs started... \n\n");
@@ -41,25 +56,25 @@ void exchange_heur(vrp_problem *vrp, heurs *eh, int trials, int which)
   else if (vrp->par.verbosity >2)
      printf("\n%i jobs started ....\n\n", jobs);
 
-  eh->finished = (char *) calloc (jobs, sizeof(char));
 
   /*-----------------------------------------------------------------------*\
   |                  Broadcast data to the processes                        |
   \*-----------------------------------------------------------------------*/
 
-  broadcast(vrp, tids, jobs);
+  //data is already sent by start_heurs.c
 
   /*-----------------------------------------------------------------------*\
   |                  Broadcast best tours to the processes                  |
   \*-----------------------------------------------------------------------*/
 
-  for (i=0; i<jobs; i++){
+  for (i=0; i<eh->jobs; i++){
     s_bufid = init_send(DataInPlace);
     tours = vrp->tours[vrp->tourorder[i%(vrp->tournum+1)]];
     tour = tours.tour;
     send_char_array((char *)&tours, sizeof(best_tours));
     send_char_array((char *)tour, (vrp->vertnum)*sizeof(_node));
-    send_msg(tids[i], HEUR_TOUR);
+    send_msg(tids[i%jobs],EXCHANGE_HEUR_TOUR);
   }
 }
+
 

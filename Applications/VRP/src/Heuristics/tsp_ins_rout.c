@@ -1,8 +1,24 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 #include "BB_constants.h"
 #include "tsp_ins_rout.h"
 #include "vrp_const.h"
 #include "compute_cost.h"
-
+#include <string.h>
 /*-------------------------------------------------------------------------*\
 | These subroutines are used to construct TSp tours usinf simple insertion  |
 | heuristics. The tours are then used in route first - cluster second       |
@@ -11,41 +27,41 @@
 	
 /*===========================================================================*/
 
-int farthest_ins_from_to(heur_prob *p, _node *tour, int cost, int from_size, 
+int tsp_farthest_ins_from_to(heur_prob *p, _node *tour, int cost, int from_size, 
 			 int to_size, int starter, neighbor *nbtree, 
 			 int *intour, int *last)
 {
   int farnode, size;
   
   for (size = from_size; size < to_size; size++){
-    farnode = farthest(nbtree, intour, last);
+    farnode = tsp_farthest(nbtree, intour, last);
     intour[farnode] = IN_TOUR;
-    cost += insert_into_tour(p, tour, starter, size, farnode);
-    fi_insert_edges(p, farnode, nbtree, intour, last);
+    cost += tsp_insert_into_tour(p, tour, starter, size, farnode);
+    tsp_fi_insert_edges(p, farnode, nbtree, intour, last);
   }
   return(cost);
 }
 
 /*===========================================================================*/
 
-int nearest_ins_from_to(heur_prob *p, _node *tour, int cost, int from_size, 
+int tsp_nearest_ins_from_to(heur_prob *p, _node *tour, int cost, int from_size, 
 			int to_size, int starter, neighbor *nbtree, 
 			int *intour, int *last)
 {
   int nearnode, size;
   
   for (size = from_size; size < to_size; size++){
-    nearnode = closest(nbtree, intour, last);
+    nearnode = tsp_closest(nbtree, intour, last);
     intour[nearnode] = IN_TOUR;
-    cost += insert_into_tour(p, tour, starter, size, nearnode);
-    ni_insert_edges(p, nearnode, nbtree, intour, last);
+    cost += tsp_insert_into_tour(p, tour, starter, size, nearnode);
+    tsp_ni_insert_edges(p, nearnode, nbtree, intour, last);
   }
   return(cost);
 }
 
 /*===========================================================================*/
 
-int closest(neighbor *nbtree, int *intour, int *last)
+int tsp_closest(neighbor *nbtree, int *intour, int *last)
 {
   int closest_node;
   int pos, ch;
@@ -87,7 +103,7 @@ int closest(neighbor *nbtree, int *intour, int *last)
 
 /*===========================================================================*/
 
-void ni_insert_edges(heur_prob *p, int new_node, neighbor *nbtree, int *intour, 
+void tsp_ni_insert_edges(heur_prob *p, int new_node, neighbor *nbtree, int *intour, 
 		     int *last)
      /*-----------------------------------------------------------------------*\
      |  Scan through the edges incident to 'new_node' - the new node in the set.    |
@@ -136,7 +152,7 @@ void ni_insert_edges(heur_prob *p, int new_node, neighbor *nbtree, int *intour,
 
 /*===========================================================================*/
 
-int farthest(neighbor *nbtree, int *intour, int *last)
+int tsp_farthest(neighbor *nbtree, int *intour, int *last)
 {
   int farthest_node;
   int pos, ch;
@@ -178,7 +194,7 @@ int farthest(neighbor *nbtree, int *intour, int *last)
 
 /*===========================================================================*/
 
-void fi_insert_edges(heur_prob *p, int new_node, neighbor *nbtree, int *intour,
+void tsp_fi_insert_edges(heur_prob *p, int new_node, neighbor *nbtree, int *intour,
 		     int *last)
      /*-----------------------------------------------------------------------*\
      |  Scan through the edges incident to 'new_node' - the new node in the set.    |
@@ -244,7 +260,7 @@ void fi_insert_edges(heur_prob *p, int new_node, neighbor *nbtree, int *intour,
 
 /*===========================================================================*/
 
-int insert_into_tour(heur_prob *p, _node *tour, int starter, int size, 
+int tsp_insert_into_tour(heur_prob *p, _node *tour, int starter, int size, 
 		     int new_node)
 {
   int change = 0, minchange = MAXINT;

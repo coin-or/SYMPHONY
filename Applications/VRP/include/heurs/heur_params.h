@@ -1,3 +1,19 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 #ifndef _HEUR_PARAMS_H
 #define _HEUR_PARAMS_H
 
@@ -43,20 +59,21 @@ typedef struct TSP_PAR{
 \*--------------------------------------------------------------------*/
 
 typedef struct HEUR_PARAMS{
-   int    sweep_trials;
-   savings_param   savings_par;
-   savings_param   savings3_par;
-   int    near_cluster_trials;
-   int    route_opt1;
-   int    route_opt2;
-   int    route_opt3;
-   int    exchange;
-   int    exchange2;
-   float  fini_ratio;
-   int    ni_trials;
-   int    fi_trials;
-   int    fini_trials;
-   tsp_par         tsp;
+  int    no_of_machines;
+  int    sweep_trials;
+  savings_param   savings_par;
+  savings_param   savings3_par;
+  int    near_cluster_trials;
+  int    route_opt1;
+  int    route_opt2;
+  int    route_opt3;
+  int    exchange;
+  int    exchange2;
+  float  fini_ratio;
+  int    ni_trials;
+  int    fi_trials;
+  int    fini_trials;
+  tsp_par         tsp;
 }heur_params;
 
 #endif

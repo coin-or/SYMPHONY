@@ -1,27 +1,31 @@
-#include <math.h>
-#include <malloc.h>
-#include <stdlib.h>
-
-#include "BB_macros.h"
-#include "ins_routines.h"
-#include "timemeas.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "vrp_const.h"
-#include "compute_cost.h"
-#include "heur_routines.h"
-
-static int compar(const void *elem1, const void *elem2)
-{
-   return(((neighbor *)elem1)->cost - ((neighbor *)elem2)->cost);
-}
-
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
 /*===========================================================================*/
 
-void main(void)
+#include "farnear_ins.h"
+#include <stdio.h>
+#ifndef COMPAR
+#define COMPAR
+static int compar(const void *elem1, const void *elem2){
+   return(((neighbor *)elem1)->cost - ((neighbor *)elem2)->cost);
+}
+#endif
+void farnear_ins(int parent, heur_prob *p)
 {
-   heur_prob *p;
-   int mytid, info, r_bufid, parent;
+  printf("\nIn farnear_ins....\n\n");
+   int mytid, info, r_bufid;
    int farnode, *starter;
    int *intour;
    int i, last, cost, numroutes;
@@ -30,22 +34,19 @@ void main(void)
    route_data *route_info;
    int cur_route, start;
    best_tours *tours;
-   double t;
-   
+   double t=0;
+
+   mytid = pvm_mytid();   
    (void) used_time(&t);
    
-   mytid = pvm_mytid();
-   
-   p = (heur_prob *) calloc ((int)1, sizeof(heur_prob));
    tours = p->cur_tour = (best_tours *) calloc (1, sizeof(best_tours));
+
    
    /*-----------------------------------------------------------------------*\
    |                    Receive the VRP data                                 |
-   \*-----------------------------------------------------------------------*/
-	
-   parent = receive(p);
-   
-   PVM_FUNC(r_bufid, pvm_recv(-1, VRP_DATA));
+   \*-----------------------------------------------------------------------*/	
+
+   PVM_FUNC(r_bufid, pvm_recv(-1, ROUTE_FNINS_VRP_DATA));
    PVM_FUNC(info, pvm_upkbyte((char *)tours, sizeof(best_tours), 1));
    tour = p->cur_tour->tour = (_node *) calloc (p->vertnum, sizeof(_node));
    PVM_FUNC(info, pvm_upkbyte((char *)tour, (p->vertnum)*sizeof(_node), 1));
@@ -54,11 +55,11 @@ void main(void)
    route_info = tours->route_info
       = (route_data *) calloc (numroutes+1, sizeof(route_data));
    
-   PVM_FUNC(r_bufid, pvm_recv(-1, VRP_DATA));
+   PVM_FUNC(r_bufid, pvm_recv(-1, ROUTE_FNINS_START_RULE));
    PVM_FUNC(info, pvm_upkint(&start, 1, 1));/*receive the start
 							    rule*/
 
-   PVM_FUNC(r_bufid, pvm_recv(parent, VRP_DATA));
+   PVM_FUNC(r_bufid, pvm_recv(parent, FINI_RATIO));
    PVM_FUNC(info, pvm_upkfloat(&p->par.fini_ratio, 1, 1));
    
    if (start != FAR_INS) srand(start); /*if the start rule is random, then*\
@@ -146,9 +147,5 @@ void main(void)
    if ( starter ) free ((char *) starter);
    
    free_heur_prob(p);
-   
-   PVM_FUNC(r_bufid, pvm_recv(parent, YOU_CAN_DIE));
-   PVM_FUNC(info, pvm_freebuf(r_bufid));
-   PVM_FUNC(info, pvm_exit());
    
 } 

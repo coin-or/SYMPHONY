@@ -1,22 +1,27 @@
-#include <math.h>
-#include <malloc.h>
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
 
-#include "BB_constants.h"
-#include "vrp_const.h"
-#include "heur_types.h"
-#include "heur_routines.h"
-#include "compute_cost.h"
-#include "timemeas.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "compute_cost.h"
+#include "exchange.h"
+#include <stdio.h>
 
-void main(void)
+void exchange (int parent, heur_prob *p)
 {
-  heur_prob *p;
   _node *tour;
   int numroutes;
-  int mytid, info, r_bufid, parent;
+  int mytid, info, r_bufid;
   int prev_node, cur_node, next_node;
   int v0, v1, insert0 = 0, insert1 = 0, delete0 = 0;
   int delete1 = 0, max_node = 0;
@@ -26,26 +31,19 @@ void main(void)
   route_data *route_info;
   int cont = TRUE, capacity;
   int *demand, count = 0;
-  double t;
+  double t = 0;
 
   (void) used_time(&t);
-
   mytid = pvm_mytid();
   
-  p = (heur_prob *) calloc (1, sizeof(heur_prob));
   tours = p->cur_tour = (best_tours *) calloc (1, sizeof(best_tours));
   
-  /*-----------------------------------------------------------------------*\
-  |                     Receive the VRP data                                |
-  \*-----------------------------------------------------------------------*/
-
-  parent = receive(p);
 
   /*-----------------------------------------------------------------------*\
   |                     Receive the starting tour                           |
   \*-----------------------------------------------------------------------*/
 
-  PVM_FUNC(r_bufid, pvm_recv(-1, HEUR_TOUR));
+  PVM_FUNC(r_bufid, pvm_recv(-1, EXCHANGE_HEUR_TOUR));
   PVM_FUNC(info, pvm_upkbyte((char *)tours, sizeof(best_tours), 1));
   tour = p->cur_tour->tour = (_node *) calloc (p->vertnum, sizeof(_node));
   PVM_FUNC(info, pvm_upkbyte((char *)tour, (p->vertnum)*sizeof(_node), 1));
@@ -274,9 +272,6 @@ void main(void)
 
   free_heur_prob(p);
 
-  PVM_FUNC(r_bufid, pvm_recv(parent, YOU_CAN_DIE));
-  PVM_FUNC(info, pvm_freebuf(r_bufid));
-  PVM_FUNC(info, pvm_exit());
 }		  
   
 	    

@@ -201,7 +201,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 
 int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 		     double *values, int *feasible, double *true_objval,
-		     char branching)
+		     char branching, double *heur_solution)
 {
    vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    vertex *verts;

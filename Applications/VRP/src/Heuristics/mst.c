@@ -1,24 +1,25 @@
-#include <malloc.h>
-#include <stdlib.h>
-
-#include "BB_constants.h"
-#include "mst_ins_rout.h"
-#include "timemeas.h"
-#include "messages.h"
-#include "vrp_const.h"
-#include "proccomm.h"
-#include "compute_cost.h"
-#include "heur_routines.h"
-
-static int edgecompar(const void *edge1, const void *edge2)
-{
-   return(((edge_data *)edge1)->cost - ((edge_data *)edge2)->cost);
-}
-
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
 /*===========================================================================*/
 
-void main(void)
+#include "mst.h"
+#include <string.h>
+#include <stdio.h>
+void mst(void)
 {
+  printf("\nIn mst....\n\n");
   lb_prob *p;
   int mytid, info, s_bufid, r_bufid, parent, bytes, msgtag;
   int *tree, *best_tree;
@@ -30,7 +31,7 @@ void main(void)
   int tree_cost, upper_bound;
   edge_data *cheapest_edges, *depot_costs, *best_edges, *cur_edges;
   char best = FALSE;
-  double t, cpu_time;
+  double t=0, cpu_time;
 
   (void) used_time(&t);
 
@@ -41,8 +42,8 @@ void main(void)
   /*------------------------------------------------------------------------*\
   |                      Receive the VRP data                                |
   \*------------------------------------------------------------------------*/
-  
-  PVM_FUNC(r_bufid, pvm_recv(-1, VRP_DATA));
+  //the block below is same as receive(P), except for freeing r_bufid
+  PVM_FUNC(r_bufid, pvm_recv(-1, VRP_BROADCAST_DATA));
   PVM_FUNC(info, pvm_bufinfo(r_bufid, &bytes, &msgtag, &parent));
   PVM_FUNC(info, pvm_upkint(&(p->dist.wtype), 1, 1));
   PVM_FUNC(info, pvm_upkint(&(p->vertnum), 1, 1));
@@ -57,7 +58,7 @@ void main(void)
     PVM_FUNC(info, pvm_upkdouble(p->dist.coordx, (int)p->vertnum, 1));
     PVM_FUNC(info, pvm_upkdouble(p->dist.coordy, (int)p->vertnum, 1));
     if ((p->dist.wtype == _EUC_3D) || (p->dist.wtype == _MAX_3D) || 
-		    (p->dist.wtype == _MAN_3D)){
+        (p->dist.wtype == _MAN_3D)){
       p->dist.coordz = (double *) calloc(p->vertnum, sizeof(double));
       PVM_FUNC(info, pvm_upkdouble(p->dist.coordz, (int)p->vertnum, 1));
     }
@@ -65,15 +66,15 @@ void main(void)
   else{ /* EXPLICIT */
     p->dist.cost = (int *) malloc ((int)p->edgenum*sizeof(int));
     PVM_FUNC(info, pvm_upkint(p->dist.cost, (int)p->edgenum, 1));
-  }
+  }//above mentioned block ends here
 
-  PVM_FUNC(r_bufid, pvm_recv(-1, VRP_DATA));
+  PVM_FUNC(r_bufid, pvm_recv(-1, VRP_LB_DATA));
   PVM_FUNC(info, pvm_upkint(&numroutes, 1, 1));
   PVM_FUNC(info, pvm_upkint(&upper_bound, 1, 1));
   PVM_FUNC(info, pvm_upkint(&max_iter, 1, 1));
   PVM_FUNC(info, pvm_upkint(&m1, 1, 1));
 
-  PVM_FUNC(r_bufid, pvm_recv(-1, VRP_DATA));
+  PVM_FUNC(r_bufid, pvm_recv(-1, VRP_LB_DATA2));
   PVM_FUNC(info, pvm_upkint(&y, 1, 1));
   PVM_FUNC(info, pvm_upkint(&alpha, 1, 1));
 
@@ -197,9 +198,4 @@ void main(void)
         
   free_lb_prob(p);
    
-  PVM_FUNC(r_bufid, pvm_recv(parent, YOU_CAN_DIE));
-  PVM_FUNC(info, pvm_freebuf(r_bufid));
-  PVM_FUNC(info, pvm_exit());
-   
 }
-

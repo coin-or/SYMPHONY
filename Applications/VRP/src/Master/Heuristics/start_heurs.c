@@ -1,3 +1,20 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
+
 #include <malloc.h>
 #include <memory.h>
 #include <stdio.h>
@@ -10,23 +27,43 @@
 #include "exchange_heur.h"
 #include "small_graph.h"
 #include "receive_rout.h"
+#include "collect_solutions.h"
 #include "lower_bound.h"
 #include "timemeas.h"
 #include "vrp_const.h"
 #include "dg_params.h"
 #include "vrp_dg.h"
+#include "proccomm.h"
+#include "vrp_master_functions.h"
 
 void start_heurs(vrp_problem *vrp, heur_params *heur_par, lb_params *lb_par,
 		 double *ub, char windows)
 {
-  int pos, last;
-  int trials = 0, i;
+  int pos, last, mytid;
+  int *tids, *sent, dummy;
+  int trials = 0, i, jobs = 0;
   best_tours *tours = NULL;
+  best_tours *solutions = NULL;
   int *tourorder = NULL, ub_pos;
   heurs *heur_out = NULL;
   double heurtime = 0, lbtime = 0, t = 0;
 
+  mytid = pvm_mytid();
   (void)used_time(&t);
+
+  tids = (int *) malloc((heur_par->no_of_machines)*sizeof(int));
+
+  /*-----------------------------------------------------------------------*\
+  |           start parallel processes & send common data                   |
+  \*-----------------------------------------------------------------------*/
+
+  jobs = spawn(vrp->par.executables.heuristics, (char **)NULL,
+	       vrp->par.debug.heuristics, (char *)NULL,
+	       heur_par->no_of_machines, tids);
+  sent = (int *) calloc(jobs, sizeof(int));  
+  printf("\nHello, jobs %i %i %i are spawned\n", tids[0],tids[1], tids[2]); 
+
+  broadcast(vrp, tids, jobs); 
 
   /*-----------------------------------------------------------------------*\
   |                   start the cluster heuristics                          |
@@ -57,10 +94,13 @@ void start_heurs(vrp_problem *vrp, heur_params *heur_par, lb_params *lb_par,
   }else{
      trials = 0;
   }
-     
-  if (trials)
-    cluster_heur(vrp, heur_par, heur_out, trials);
+  
+  printf("\nname of p_process = %s \n\n", vrp->par.executables.heuristics);   
+  if (trials){
 
+    cluster_heur(vrp, heur_par, heur_out, trials, jobs, tids, sent);
+
+    printf("\nNo jobs: %i \n\n", jobs);
   /*-----------------------------------------------------------------------*\
   |                     receive the heuristical tours                       |
   \*-----------------------------------------------------------------------*/
@@ -76,25 +116,27 @@ void start_heurs(vrp_problem *vrp, heur_params *heur_par, lb_params *lb_par,
     }
     tourorder = vrp->tourorder = (int *)
       calloc(vrp->par.tours_to_keep+1, sizeof(int));
-    vrp->tournum = -1;
-
+    vrp->tournum = -1;           /*status of
+				  heuristics*/
     heurtime += receive_tours(vrp, heur_out, &last, TRUE, FALSE, FALSE,
-			      windows);
+			      windows, jobs, sent);
                                              /*receives the tours output by *\
 				             | the clustering processes and  |
 				             | orders them , keeping the     |
-				             \*vrp->par.tours_to_keep best  */
+				             | best "vrp->par.tours_to_keep" |
+					     \*of them at hand.             */
   }
 
   /*-----------------------------------------------------------------------*\
   |       Start the route heuristics                                        |
   \*-----------------------------------------------------------------------*/
-  
-  trials = trials ? MIN(vrp->tournum+1, heur_par->route_opt1) : 0;
+
+  trials = trials ? MIN(vrp->tournum+1, heur_par->route_opt1) : 0; 
+  solutions = (best_tours *) malloc(trials*sizeof(best_tours));
   if (trials){
-    route_heur(vrp, heur_par, heur_out, trials);
-    heurtime += receive_tours(vrp, heur_out, &last, TRUE, FALSE, FALSE,
-			      windows);
+    route_heur(vrp, heur_par, heur_out, trials, jobs, tids, sent, solutions);
+    //    printf("\nTids after route_heur %i % i%i", tids[0], tids[1], tids[2]);
+    heurtime += collect_solutions(vrp, trials, &last, FALSE, solutions);
   }
 
   /*-----------------------------------------------------------------------*\
@@ -103,20 +145,19 @@ void start_heurs(vrp_problem *vrp, heur_params *heur_par, lb_params *lb_par,
 
   trials = trials ? MIN(vrp->tournum+1, heur_par->exchange) : 0;
   if (trials){
-    exchange_heur(vrp, heur_out, trials, FIRST_SET);
+    exchange_heur(vrp, heur_out, trials, jobs, FIRST_SET, tids, sent);
     heurtime += receive_tours(vrp, heur_out, &last, TRUE, FALSE, FALSE,
-			      windows);
+			      windows, jobs, sent);
   }
 
   /*-----------------------------------------------------------------------*\
   |       Run the route heuristics again                                    |
   \*-----------------------------------------------------------------------*/
-
   trials = trials ? MIN(vrp->tournum+1, heur_par->route_opt2) : 0;
   if (trials){
-    route_heur(vrp, heur_par, heur_out, trials);
-    heurtime += receive_tours(vrp, heur_out, &last, TRUE, FALSE, FALSE,
-			      windows);
+    solutions = (best_tours *) malloc(trials*sizeof(best_tours));
+    route_heur(vrp, heur_par, heur_out, trials, jobs, tids, sent, solutions);
+    heurtime += collect_solutions(vrp, trials, &last, FALSE, solutions);
   }
 
   /*-----------------------------------------------------------------------*\
@@ -125,20 +166,20 @@ void start_heurs(vrp_problem *vrp, heur_params *heur_par, lb_params *lb_par,
   
   trials = trials ? MIN(vrp->tournum+1, heur_par->exchange2) : 0;
   if (trials){
-    exchange_heur(vrp, heur_out, trials, SECOND_SET);
+    exchange_heur(vrp, heur_out, trials, jobs, SECOND_SET, tids, sent);
     heurtime += receive_tours(vrp, heur_out, &last, TRUE, FALSE, FALSE,
-			      windows);
+			      windows, jobs, sent);
   }
   /*-----------------------------------------------------------------------*\
   |       Run route heuristics once more                                    |
   \*-----------------------------------------------------------------------*/
 
   trials = trials ? MIN(vrp->tournum+1, heur_par->route_opt3) : 0;
+  solutions = (best_tours *) malloc(trials*sizeof(best_tours));
   if (trials){
-    route_heur(vrp, heur_par, heur_out, trials);
+    route_heur(vrp, heur_par, heur_out, trials, jobs, tids, sent, solutions);
     make_small_graph(vrp, 2*heur_out->jobs*vrp->vertnum); 
-    heurtime += receive_tours(vrp, heur_out, &last, TRUE, FALSE, TRUE,
-			      windows);
+    heurtime += collect_solutions(vrp, trials, &last, TRUE, solutions);
   }
 
   /*-----------------------------------------------------------------------*\
@@ -181,8 +222,8 @@ void start_heurs(vrp_problem *vrp, heur_params *heur_par, lb_params *lb_par,
   vrp->bd_time.ub_heurtime = heurtime;
 
   if (vrp->numroutes && lb_par->lower_bound){
-    lower_bound(vrp, lb_par, heur_out, (int)(*ub));
-    lbtime += receive_lbs(vrp, heur_out, 1, vrp->numroutes);
+    lower_bound(vrp, lb_par, heur_out, (int)(*ub), jobs, tids, sent);
+    lbtime += receive_lbs(vrp, heur_out, 1, vrp->numroutes, jobs, sent);
   }
 
   vrp->bd_time.lb_overhead += used_time(&t);
@@ -224,5 +265,9 @@ void start_heurs(vrp_problem *vrp, heur_params *heur_par, lb_params *lb_par,
   /*
      p->comp_times.bc_overhead = used_time(&t);
    */
+  init_send(DataInPlace);
+  send_int_array(&dummy, 1);
+  msend_msg(tids, jobs, STOP);
+  for(i=0; i<jobs; kill_proc(tids[i++]));
+  }
 }
-

@@ -1,16 +1,40 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "BB_constants.h"
-#include "savings.h"
+#include "savings.h"//lazimmi dene
 #include "vrp_const.h"
 #include "compute_cost.h"
+
+#ifndef _SAV
+#define _SAV
+#define SAV(d, a, b, c) (p->par.savings_par.lamda) * ICOST(d, 0, c) - \
+                       (ICOST(d,a,c) + ICOST(d,b,c) -  \
+			(p->par.savings_par.mu) * ICOST(d,a,b))
+#endif
 
 /*------------------------------------------------------------------*\  
 | This function inserts cust_num into the current route between node1|
 | and node2.                                                         |
 \*------------------------------------------------------------------*/
-
+#ifndef _INSERT_CUST
+#define _INSERT_CUST
 void insert_cust(int cust_num, _node *tour, int node1,
 		 int node2, int cur_route,
 		 int prev_route_end)
@@ -27,14 +51,15 @@ void insert_cust(int cust_num, _node *tour, int node1,
   }
   return;
 }
-
+#endif
 /*===========================================================================*/
 
 /*---------------------------------------------------------------------*\
 | This function prints the current routes to stdout. It is for debugging|
 | purposes only.                                                        |
 \*---------------------------------------------------------------------*/
-
+#ifndef _PRINT_ROUTES
+#define _PRINT_ROUTES
 void print_routes(_node *tour)
 {
   int prev_node = 0, node = tour[0].next;
@@ -49,7 +74,7 @@ void print_routes(_node *tour)
   printf("\n\n");
   return;
 }
-
+#endif
 /*===========================================================================*/
 
 /*--------------------------------------------------------------------*\
@@ -58,7 +83,8 @@ void print_routes(_node *tour)
 | returns a random node that is not yet on a route, depending on the   |
 | value of the variable start.                                         |
 \*--------------------------------------------------------------------*/
-
+#ifndef _NEW_START
+#define _NEW_START
 int new_start(int *intour, heur_prob *p, int start, int num_cust)
 {
   int starter = 0, start_pos, cust, count=0;
@@ -81,7 +107,7 @@ int new_start(int *intour, heur_prob *p, int start, int num_cust)
   }
   return(starter);
 }
-
+#endif
 /*===========================================================================*/
 
 /*---------------------------------------------------------------------*\

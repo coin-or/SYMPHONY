@@ -1,20 +1,53 @@
-#include <malloc.h>
-#include <stdlib.h>
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
 
+#include <stdlib.h>
+#include <stdio.h>
 #include "savings2.h"
-#include "timemeas.h"
-#include "messages.h"
+
 #include "BB_constants.h"
 #include "heur_routines.h"
-#include "compute_cost.h"
-#include "vrp_const.h"
-#include "proccomm.h"
+#include "binomial.h"
+#include "vrp_common_types.h"
 
-void main(void)
+#ifndef _SAV
+#define _SAV
+#define SAV(d, a, b, c) (p->par.savings_par.lamda) * ICOST(d, 0, c) - \
+                               (ICOST(d,a,c) + ICOST(d,b,c) -  \
+			        (p->par.savings_par.mu) * ICOST(d,a,b))
+#endif
+
+
+void insert_cust2 PROTO((int cust_num, _node *tour, int node1,
+			int node2, int cur_route,
+			int prev_route_end));
+tree_node *start_new_route2 PROTO((heur_prob *p, tree_node *head,
+				  int starter));
+tree_node *update_savings2 PROTO(( heur_prob *p, tree_node *head,
+				 tree_node *mav_ptr, _node *tour, 
+				 int prev_route_end));
+int new_start2 PROTO((int *intour, heur_prob *p,
+			 int start, int num_cust));
+void update PROTO((tree_node *cur_node, int savings, int node1,
+		   int node2));
+void savings2(int parent, heur_prob *p)
 {
-  heur_prob *p;
+  printf("\nIn savings2....\n\n");
   _node *tour;
-  int mytid, info, r_bufid, parent;
+  int mytid, info, r_bufid;
   int i, capacity;
   int vertnum;
   int cur_route=1;
@@ -24,24 +57,17 @@ void main(void)
   int savings, start, *intour;
   int node1, node2, cust_num, num_cust = 0;
   int cur_route_end = 0, prev_route_end = 0;
-  double t;
-
-  (void) used_time(&t);
+  double t=0;
 
   mytid = pvm_mytid();
 
-  p = (heur_prob *) calloc(1, sizeof(heur_prob));
+  (void) used_time(&t);
 
-  /*-----------------------------------------------------------------------*\
-  |                     Receive the VRP data                                |
-  \*-----------------------------------------------------------------------*/
-
-  parent = receive(p);
 
   /*-----------------------------------------------------------------------*\
   |                     Receive the parameters                              |
   \*-----------------------------------------------------------------------*/
-  PVM_FUNC(r_bufid, pvm_recv(-1, SAVINGS_DATA));
+  PVM_FUNC(r_bufid, pvm_recv(-1, SAVINGS2_DATA));
   PVM_FUNC(info, pvm_upkfloat(&p->par.savings_par.mu, 1, 1));
   PVM_FUNC(info, pvm_upkfloat(&p->par.savings_par.lamda, 1, 1));
   PVM_FUNC(info, pvm_upkint(&start, 1, 1));
@@ -60,7 +86,7 @@ void main(void)
   |  the farthest node from the depot of a random node) and the depot  |
   |  on the first route                                                |
   \*------------------------------------------------------------------*/
-  starter = new_start(intour, p, start, vertnum - 1);
+  starter = new_start2(intour, p, start, vertnum - 1);
   tour[0].next = starter;
   tour[starter].next = 0;
   tour[0].route = 0;
@@ -126,23 +152,23 @@ void main(void)
       head = extract_max(head, max_ptr);
       intour[max_ptr->cust_num] = IN_TOUR;
       weight += demand[max_ptr->cust_num];
-      insert_cust(max_ptr->cust_num, tour, max_ptr->node1,
+      insert_cust2(max_ptr->cust_num, tour, max_ptr->node1,
 		  max_ptr->node2, cur_route, prev_route_end);
       if (max_ptr->node2 == 0)
 	cur_route_end = max_ptr->cust_num;
-      head = update_savings(p, head, max_ptr, tour, prev_route_end);
+      head = update_savings2(p, head, max_ptr, tour, prev_route_end);
       free(max_ptr);
       num_cust++;
     }
     else{
       cur_route++;
-      tour[cur_route_end].next = new_start(intour, p, 
+      tour[cur_route_end].next = new_start2(intour, p, 
 					   start, vertnum-2-num_cust);
       prev_route_end = cur_route_end;
       cur_route_end = tour[prev_route_end].next;
       tour[cur_route_end].route = cur_route;
       intour[cur_route_end] = IN_TOUR;
-      head = start_new_route(p, head, cur_route_end);
+      head = start_new_route2(p, head, cur_route_end);
       weight = demand[cur_route_end];
       num_cust++;
     }
@@ -155,16 +181,12 @@ void main(void)
   |               Transmit the tour back to the parent                      |
   \*-----------------------------------------------------------------------*/
 
-  send_tour(tour, p->cur_tour->cost, p->cur_tour->numroutes, SAVINGS,
-	    used_time(&t),
-	    parent, vertnum, 0, NULL);
+  send_tour(tour, p->cur_tour->cost, p->cur_tour->numroutes, SAVINGS2,
+	    used_time(&t), parent, vertnum, 0, NULL);
 
   if (intour) free ((char *) intour);
 
   free_heur_prob(p);
 
-  PVM_FUNC(r_bufid, pvm_recv(parent, YOU_CAN_DIE));
-  PVM_FUNC(info, pvm_freebuf(r_bufid));
-  PVM_FUNC(info, pvm_exit());
 }
       

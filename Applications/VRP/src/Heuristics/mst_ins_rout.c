@@ -1,3 +1,19 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 #include <math.h>
 #include <malloc.h>
 #include <stddef.h>
@@ -6,7 +22,7 @@
 #include "mst_ins_rout.h"
 #include "vrp_const.h"
 #include "compute_cost.h"
-
+#include <string.h>
 /*--------------------------------------------------------------------------*\
 | This first routine creates a minimum k-degree-centre-tree based on the     |
 | penalized costs. It first dreates a regular spanning tree and then either  |

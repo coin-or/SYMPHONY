@@ -1,19 +1,27 @@
-#include <malloc.h>
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
 
-#include "ins_routines2.h"
-#include "timemeas.h"
-#include "messages.h"
-#include "vrp_const.h"
-#include "heur_routines.h"
-#include "proccomm.h"
-#include "compute_cost.h"
-
-void main(void)
+#include "near_cluster.h"
+#include <stdio.h>
+void near_cluster(int parent,  heur_prob *p)
 {
-  heur_prob *p;
+  printf("\nIn near_cluster....\n\n");
   int vertnum;
-  int mytid, info, r_bufid, parent;
-  int cost;
+  int mytid, info, r_bufid;
+  int cost, zero_cost = 0;
   int *intour, last = 0;
   int numroutes, i;
   neighbor *nbtree;
@@ -21,31 +29,21 @@ void main(void)
   route_data *route_info;
   int cur_route;
   best_tours *tours;
-  double t;
+  double t=0;
 
   (void) used_time(&t);
 
   mytid = pvm_mytid();
 	
-  p = (heur_prob *) calloc ((int)1, sizeof(heur_prob));
   tours = p->cur_tour = (best_tours *) calloc (1, sizeof(best_tours));
 	
   /*-----------------------------------------------------------------------*\
   |                    Receive the VRP data                                 |
   \*-----------------------------------------------------------------------*/
 
-  parent = receive(p);
-
-  PVM_FUNC(r_bufid, pvm_recv(-1, NUMROUTES));
+  PVM_FUNC(r_bufid, pvm_recv(-1, NC_NUMROUTES));
   PVM_FUNC(info, pvm_upkint(&p->numroutes, 1, 1));
-  if (!p->numroutes){
-     PVM_FUNC(info, pvm_recv(-1, COORD_DATA));
-     p->dist.coordx = (double *) calloc (p->vertnum, sizeof(double));
-     p->dist.coordy = (double *) calloc (p->vertnum, sizeof(double));
-     PVM_FUNC(info, pvm_upkdouble(p->dist.coordx, p->vertnum, 1));
-     PVM_FUNC(info, pvm_upkdouble(p->dist.coordy, p->vertnum, 1));
-  }
-
+ 
   vertnum = p->vertnum;
   numroutes = p->numroutes;
 
@@ -62,7 +60,7 @@ void main(void)
   | First we generate seed customers for all the routes                     |
   \*-----------------------------------------------------------------------*/
 
-  seeds(p, &numroutes, intour, nbtree);
+  seeds2(p, &numroutes, intour, nbtree);
 
   route_info = p->cur_tour->route_info;
 
@@ -90,14 +88,14 @@ void main(void)
   }
   
   for (cur_route = 1; cur_route<=numroutes; cur_route++)
-    ni_insert_edges(p, route_info[cur_route].first, nbtree, intour, &last,
+    ni_insert_edges2(p, route_info[cur_route].first, nbtree, intour, &last,
 		    tour, route_info);
   
   /* Form the routes by nearest insertion as described above */
     
-  nearest_ins(p, tour, route_info, numroutes+1, vertnum,
-		      nbtree, intour, &last);
-
+  nearest_ins2(p, tour, route_info, numroutes+1, vertnum,
+		      nbtree, intour, &last, &zero_cost);
+  if(!zero_cost){
   tour[0].next = route_info[1].first;
 
   
@@ -117,16 +115,11 @@ void main(void)
   \*-----------------------------------------------------------------------*/
   
   send_tour(tour, cost, numroutes, NEAR_CLUSTER, used_time(&t), parent,
-	    vertnum, 1, 
-	    route_info);
+	    vertnum, 1, route_info);
 	
   if ( nbtree ) free ((char *) nbtree);
   if ( intour ) free ((char *) intour);
 
   free_heur_prob(p);
-	
-  PVM_FUNC(r_bufid, pvm_recv(parent, YOU_CAN_DIE));
-  PVM_FUNC(info, pvm_freebuf(r_bufid));
-  PVM_FUNC(info, pvm_exit());
-	
+  }	
 }

@@ -1,3 +1,19 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 #include <math.h>
 #include <malloc.h>
 
@@ -10,15 +26,16 @@
 #include "proccomm.h"
 #include "compute_cost.h"
 #include "heur_routines.h"
-
+#include <string.h>
+#include <stdio.h>
 /*------------------------------------------------------------------------*\
 | These routines are associated with the near_cluster algorithm. They are  |
 | very similar to those used for the nearest insert heuristic for the TSP  |
 \*------------------------------------------------------------------------*/
 
-void nearest_ins(heur_prob *p, _node *tour, route_data *route_info, 
+void nearest_ins2(heur_prob *p, _node *tour, route_data *route_info, 
 		 int from_size, int to_size, neighbor *nbtree, 
-		 int *intour, int *last)
+		 int *intour, int *last, int *zero_cost)
 {
 	int nearnode, size, host;
 	int *demand = p->demand;
@@ -28,7 +45,7 @@ void nearest_ins(heur_prob *p, _node *tour, route_data *route_info,
 
 	  /* Get the node nearest to a particular route and its host */
 
-	  nearnode = closest(nbtree, intour, last, &host);
+	  nearnode = closest2(nbtree, intour, last, &host);
 
 	  /*--------------------------------------------------------------*\
 	  | Check the feasibility of inserting this node on its host route |
@@ -40,14 +57,14 @@ void nearest_ins(heur_prob *p, _node *tour, route_data *route_info,
 	      <= capacity){
 	    intour[nearnode] = IN_TOUR;
 	    tour[nearnode].route = tour[host].route;
-	    route_info[tour[nearnode].route].cost += insert_into_tour
+	    route_info[tour[nearnode].route].cost += insert_into_tour2
 	      (p, tour, nearnode, route_info);
-	    ni_insert_edges(p, nearnode, nbtree, intour, last, tour, route_info);
+	    ni_insert_edges2(p, nearnode, nbtree, intour, last, tour, route_info);
 	    size++;
 	  }
 	  else{
 	    intour[nearnode] = NOT_NEIGHBOR;
-	    new_host(p, nearnode, nbtree, intour, last, tour, route_info);
+	    new_host2(p, nearnode, nbtree, intour, last, tour, route_info, zero_cost);
 	  }
 	}
 	return;
@@ -55,7 +72,7 @@ void nearest_ins(heur_prob *p, _node *tour, route_data *route_info,
 
 /*===========================================================================*/
 
-int closest(neighbor *nbtree, int *intour, int *last, int *host)
+int closest2(neighbor *nbtree, int *intour, int *last, int *host)
 {
   int closest_node;
   int pos, ch;
@@ -98,7 +115,7 @@ int closest(neighbor *nbtree, int *intour, int *last, int *host)
 
 /*===========================================================================*/
 
-void ni_insert_edges(heur_prob *p, int new_node, neighbor *nbtree, int *intour, 
+void ni_insert_edges2(heur_prob *p, int new_node, neighbor *nbtree, int *intour, 
 		     int *last, _node *tour, route_data *route_info)
 
      /*-----------------------------------------------------------------------*\
@@ -151,7 +168,7 @@ void ni_insert_edges(heur_prob *p, int new_node, neighbor *nbtree, int *intour,
 	
 /*===========================================================================*/
 
-int insert_into_tour(heur_prob *p, _node *tour, int new_node, 
+int insert_into_tour2(heur_prob *p, _node *tour, int new_node, 
 		     route_data *route_info)
 {
   int change, minchange;
@@ -198,8 +215,8 @@ int insert_into_tour(heur_prob *p, _node *tour, int new_node,
 
 /*===========================================================================*/
 
-void new_host(heur_prob *p, int node, neighbor *nbtree, int *intour, 
-	      int *last, _node *tour, route_data *route_info)
+void new_host2(heur_prob *p, int node, neighbor *nbtree, int *intour, 
+	      int *last, _node *tour, route_data *route_info, int *zero_cost)
 {
   int cost = 0, prevcost;
   int pos, ch;
@@ -259,8 +276,8 @@ void new_host(heur_prob *p, int node, neighbor *nbtree, int *intour,
     \*-----------------------------------------------------------------------*/
     for (cur_route = 1; cur_route< numroutes; cur_route++)
       tour[route_info[cur_route].last].next = route_info[cur_route+1].first;
-    
     cost = 0;
+    *zero_cost = 1;
     
     parent = pvm_parent();
     
@@ -276,18 +293,13 @@ void new_host(heur_prob *p, int node, neighbor *nbtree, int *intour,
 
     free_heur_prob(p);
 	
-    PVM_FUNC(r_bufid, pvm_recv(parent, YOU_CAN_DIE));
-    PVM_FUNC(info, pvm_freebuf(r_bufid));
-    PVM_FUNC(info, pvm_exit());
-
-    exit(1);
   }
   return;
 }
 
 /*===========================================================================*/
 
-void seeds(heur_prob *p, int *numroutes, int *intour, neighbor *nbtree)
+void seeds2(heur_prob *p, int *numroutes, int *intour, neighbor *nbtree)
 {
   sweep_data *data;
   float depotx, depoty;
@@ -341,13 +353,13 @@ void seeds(heur_prob *p, int *numroutes, int *intour, neighbor *nbtree)
 
   last = 0;
   intour[0] = IN_TOUR;
-  fi_insert_edges(p, 0, nbtree, intour, &last);
-  farnode = farthest(nbtree, intour, &last);
+  fi_insert_edges2(p, 0, nbtree, intour, &last);
+  farnode = farthest2(nbtree, intour, &last);
   intour[farnode] = IN_TOUR;
-  fi_insert_edges (p, farnode, nbtree, intour, &last);
+  fi_insert_edges2 (p, farnode, nbtree, intour, &last);
   tour[farnode].next = 0;
   tour[0].next = farnode;
-  farthest_ins_from_to(p, tour, 2, *numroutes+1, nbtree, intour, &last);
+  farthest_ins_from_to2(p, tour, 2, *numroutes+1, nbtree, intour, &last);
 
   for (cur_route = 1, cur_node = tour[0].next;
        cur_route <= *numroutes; cur_route++, cur_node = tour[cur_node].next){
@@ -362,7 +374,7 @@ void seeds(heur_prob *p, int *numroutes, int *intour, neighbor *nbtree)
   
 /*===========================================================================*/
 
-void farthest_ins_from_to(heur_prob *p, _node *tour, int from_size, 
+void farthest_ins_from_to2(heur_prob *p, _node *tour, int from_size, 
 			 int to_size, neighbor *nbtree, 
 			 int *intour, int *last)
 {
@@ -372,7 +384,7 @@ void farthest_ins_from_to(heur_prob *p, _node *tour, int from_size,
   int v0, v1, iminchange = 0;
   
   for (size = from_size; size < to_size; size++){
-    farnode = farthest(nbtree, intour, last);
+    farnode = farthest2(nbtree, intour, last);
     intour[farnode] = IN_TOUR;
     for (i=0, minchange = MAXINT, v1=0; i<size; i++){
       v0 = v1;
@@ -387,13 +399,13 @@ void farthest_ins_from_to(heur_prob *p, _node *tour, int from_size,
     v1 = tour[v0 = iminchange].next;
     tour[farnode].next = v1;
     tour[v0].next = farnode;
-    fi_insert_edges(p, farnode, nbtree, intour, last);
+    fi_insert_edges2(p, farnode, nbtree, intour, last);
   }
 }
 
 /*===========================================================================*/
 
-int farthest(neighbor *nbtree, int *intour, int *last)
+int farthest2(neighbor *nbtree, int *intour, int *last)
 {
   int farthest_node;
   int pos, ch;
@@ -434,7 +446,7 @@ int farthest(neighbor *nbtree, int *intour, int *last)
 
 /*===========================================================================*/
 
-void fi_insert_edges(heur_prob *p, int new_node, neighbor *nbtree, int *intour,
+void fi_insert_edges2(heur_prob *p, int new_node, neighbor *nbtree, int *intour,
 		     int *last)
      /*-----------------------------------------------------------------------*\
      |  Scan through the edges incident to 'new_node' - the new node in the set.    |

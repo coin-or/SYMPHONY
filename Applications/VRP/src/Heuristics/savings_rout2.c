@@ -1,17 +1,41 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "BB_constants.h"
-#include "savings2.h"
-#include "compute_cost.h"
+#include "binomial.h"
+#include "savings2.h"//lazimmi dene
 #include "vrp_const.h"
+#include "compute_cost.h"
+
+#ifndef _SAV
+#define _SAV
+#define SAV(d, a, b, c) (p->par.savings_par.lamda) * ICOST(d, 0, c) - \
+                       (ICOST(d,a,c) + ICOST(d,b,c) -  \
+			(p->par.savings_par.mu) * ICOST(d,a,b))
+#endif
 
 /*------------------------------------------------------------------*\  
 | This function inserts cust_num into the current route between node1|
 | and node2.                                                         |
 \*------------------------------------------------------------------*/
 
-void insert_cust(int cust_num, _node *tour, int node1,
+void insert_cust2(int cust_num, _node *tour, int node1,
 		 int node2, int cur_route, int end_of_route)
 {
   if (node1 == 0){
@@ -35,7 +59,7 @@ void insert_cust(int cust_num, _node *tour, int node1,
 | customer encountered and inserting that customer in the new heap    |
 \*-------------------------------------------------------------------*/
 
-tree_node *start_new_route(heur_prob *p, tree_node *head, int starter)
+tree_node *start_new_route2(heur_prob *p, tree_node *head, int starter)
 {
   tree_node *temp1, *temp2;
   int savings;
@@ -58,7 +82,7 @@ tree_node *start_new_route(heur_prob *p, tree_node *head, int starter)
   }
 
   if (degree >0){
-    temp1 = start_new_route (p, temp1, starter);
+    temp1 = start_new_route2 (p, temp1, starter);
     if (!head)
       new_head = temp1;
     else
@@ -66,7 +90,7 @@ tree_node *start_new_route(heur_prob *p, tree_node *head, int starter)
   }
 
   if (temp2 != NULL){
-    temp2 = start_new_route (p, temp2, starter);
+    temp2 = start_new_route2 (p, temp2, starter);
     if (!head && !degree)
       new_head = temp2;
     else
@@ -88,7 +112,7 @@ tree_node *start_new_route(heur_prob *p, tree_node *head, int starter)
 |  all possible insertion points.                                         |
 \*-----------------------------------------------------------------------*/
 
-int new_savings(heur_prob *p, tree_node *max_ptr, tree_node *head, _node *tour,
+int new_savings2(heur_prob *p, tree_node *max_ptr, tree_node *head, _node *tour,
 		int prev_route_end, int *node1, int *node2)
 {
   int v0 = 0, v1;
@@ -143,7 +167,7 @@ int new_savings(heur_prob *p, tree_node *max_ptr, tree_node *head, _node *tour,
 | merges each node into a new heap.                                           |
 \*---------------------------------------------------------------------------*/
   
-tree_node *update_savings(heur_prob *p, tree_node *head, tree_node *max_ptr,
+tree_node *update_savings2(heur_prob *p, tree_node *head, tree_node *max_ptr,
 			  _node *tour, int prev_route_end)
 {
   tree_node *temp1, *temp2;
@@ -156,18 +180,18 @@ tree_node *update_savings(heur_prob *p, tree_node *head, tree_node *max_ptr,
 
   temp1 = head->child;
   temp2 = head->sibling;
-  savings = new_savings(p, max_ptr, head, tour, prev_route_end, &node1, &node2);
+  savings = new_savings2(p, max_ptr, head, tour, prev_route_end, &node1, &node2);
   new_head = make_heap(head->cust_num, savings, node1, node2);
   degree = head->degree;
   free(head);
 
   if (degree >0){
-    temp1 = update_savings(p, temp1, max_ptr, tour, prev_route_end);
+    temp1 = update_savings2(p, temp1, max_ptr, tour, prev_route_end);
     new_head = merge_heaps(temp1, new_head);
   }
 
   if (temp2!=NULL){
-    temp2 = update_savings(p, temp2, max_ptr, tour, prev_route_end);
+    temp2 = update_savings2(p, temp2, max_ptr, tour, prev_route_end);
     new_head = merge_heaps(temp2, new_head);
   }
   if(!degree && !temp2 &&!new_head) return(NULL);
@@ -181,7 +205,7 @@ tree_node *update_savings(heur_prob *p, tree_node *head, tree_node *max_ptr,
 | purposes only.                                                        |
 \*---------------------------------------------------------------------*/
 
-void print_routes(_node *tour)
+void print_routes2(_node *tour)
 {
   int prev_node = 0, node = tour[0].next;
 
@@ -205,7 +229,7 @@ void print_routes(_node *tour)
 | value of the variable start.                                         |
 \*--------------------------------------------------------------------*/
 
-int new_start(int *intour, heur_prob *p, int start,
+int new_start2(int *intour, heur_prob *p, int start,
 		  int num_cust)
 {
   int starter = 0, start_pos, count=0, i=0;
@@ -231,3 +255,4 @@ int new_start(int *intour, heur_prob *p, int start,
       
   return(starter);
 }
+

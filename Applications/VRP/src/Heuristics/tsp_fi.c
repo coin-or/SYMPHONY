@@ -1,19 +1,31 @@
-#include <malloc.h>
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
 
+#include <string.h>
+#include <stdio.h>
+#include "tsp_fi.h"
 #include "BB_constants.h"
 #include "tsp_ins_rout.h"
 #include "s_path.h"
 #include "heur_routines.h"
-#include "timemeas.h"
-#include "messages.h"
-#include "vrp_const.h"
-#include "proccomm.h"
-#include "compute_cost.h"
 
-void main(void)
+void tsp_fi(int parent, heur_prob *p)
 {
-   heur_prob *p;
-   int mytid, info, r_bufid, parent;
+  printf("\nIn tsp_fi....\n\n");
+   int mytid, info, r_bufid;
    int starter, farnode, v0, v1, cur_start;
    _node *tsp_tour, *tour, *opt_tour;
    int maxdist;
@@ -23,27 +35,25 @@ void main(void)
    neighbor *nbtree;
    int trials, interval;
    best_tours *opt_tours, *tours;
-   double t;
+   double t=0;
 
-   (void) used_time(&t);
-	
    mytid = pvm_mytid();
-	
-   p = (heur_prob *) calloc ((int)1, sizeof(heur_prob));
-	
+   printf("\nthis time, my tid in tsp_fi.c is %i", mytid);
+   (void) used_time(&t);
+		
    /*-----------------------------------------------------------------------*\
    |                     Receive the VRP data                                |
    \*-----------------------------------------------------------------------*/
 
-   parent = receive(p);
 
-   PVM_FUNC(r_bufid, pvm_recv(-1, TSP_TRIALS));
+
+   PVM_FUNC(r_bufid, pvm_recv(-1, TSP_FI_TRIALS));
    PVM_FUNC(info, pvm_upkint(&trials, 1, 1));
 	
    /*-----------------------------------------------------------------------*\
    |                     Receive the starting point                          |
    \*-----------------------------------------------------------------------*/
-   PVM_FUNC(r_bufid, pvm_recv(-1, HEUR_START_POINT));
+   PVM_FUNC(r_bufid, pvm_recv(-1, TSP_START_POINT));
    PVM_FUNC(info, pvm_upkint(&starter, 1, 1));
    vertnum = p->vertnum;
 	
@@ -80,15 +90,15 @@ void main(void)
    last = 0;
    intour[0] = IN_TOUR;
    intour[starter] = IN_TOUR;
-   fi_insert_edges(p, starter, nbtree, intour, &last);
-   farnode = farthest(nbtree, intour, &last);
+   tsp_fi_insert_edges(p, starter, nbtree, intour, &last);
+   farnode = tsp_farthest(nbtree, intour, &last);
    intour[farnode] = IN_TOUR;
-   fi_insert_edges(p, farnode, nbtree, intour, &last);
+   tsp_fi_insert_edges(p, farnode, nbtree, intour, &last);
    tsp_tour[starter].next = farnode;
    tsp_tour[farnode].next = starter;
 	
    cost = 2 * ICOST(&p->dist, starter, farnode);
-   cost = farthest_ins_from_to(p, tsp_tour, cost, 
+   cost = tsp_farthest_ins_from_to(p, tsp_tour, cost, 
 			       2, vertnum-1, starter, nbtree, intour, &last);
 
   /*------------------------------------------------------------------------*\
@@ -131,9 +141,5 @@ void main(void)
    if ( tsp_tour ) free ((char *) tsp_tour);
      
    free_heur_prob(p);
-	
-   PVM_FUNC(r_bufid, pvm_recv(parent, YOU_CAN_DIE));
-   PVM_FUNC(info, pvm_freebuf(r_bufid));
-   PVM_FUNC(info, pvm_exit());
 	
 }

@@ -14,13 +14,12 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _EXCHANGE_HEUR_H
-#define _EXCHANGE_HEUR_H
+#ifndef _COLLECT_SOLUTIONS_H
+#define _COLLECT_SOLUTIONS_H 
 
 #include "proto.h"
 #include "vrp_types.h"
 
-void exchange_heur PROTO((vrp_problem *vrp, heurs *eh, int trials, 
-			  int jobs, int which, int *tids, int *sent));
-
+double collect_solutions PROTO((vrp_problem *vrp, int trials, int *last, 
+				char add_edges, best_tours *solutions));
 #endif

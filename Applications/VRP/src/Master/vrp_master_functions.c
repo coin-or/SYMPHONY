@@ -112,7 +112,7 @@ void broadcast(vrp_problem *vrp, int *tids, int jobs)
    else{ /* EXPLICIT */	
       send_int_array(vrp->dist.cost, (int)vrp->edgenum);
    }
-   msend_msg(tids, jobs, VRP_DATA);
+   msend_msg(tids, jobs, VRP_BROADCAST_DATA);
    
    freebuf(s_bufid);
 }

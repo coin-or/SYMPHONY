@@ -1,25 +1,25 @@
-#ifndef _SAVINGS_3_H
-#define _SAVINGS_3_H
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
 
-#include "binomial.h"
-#include "proto.h"
-#include "vrp_common_types.h"
+#ifndef SAVINGS3_H
+#define SAVINGS3_H
+
 #include "heur_types.h"
+#include "heur_common.h"
 
-void insert_cust PROTO((int cust_num, _node *tour, int node1,
-			int node2, int cur_route, int *demand,
-			route_data *route_info));
-int new_savings PROTO((heur_prob *p, tree_node *max_ptr, tree_node *head,
-		       _node *tour, int *node1, int *node2,
-		       route_data *route_info));
-tree_node *update_savings PROTO((heur_prob *p, tree_node *head,
-				 tree_node *max_ptr, _node *tour,
-				 route_data *route_info));
-int find_new_ins_route PROTO((heur_prob *p, int ins_node, _node *tour,
-			      int *node1, int *node2,
-			      route_data *route_info));
+void savings3 PROTO((int parent, heur_prob *p));
 
 #endif
-
-
-

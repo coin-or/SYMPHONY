@@ -1,3 +1,19 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
+/*                                                                           */
+/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This file was modified by Ali Pilatin January, 2005 (alp8@lehigh.edu)     */
+/*                                                                           */
+/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 #ifndef _BINOMIAL_H
 #define _BINOMIAL_H
 
@@ -27,10 +43,6 @@ typedef struct TREE_NODE{
   struct TREE_NODE *child;
   struct TREE_NODE *sibling;
 }tree_node;
-
-#define SAV(d, a, b, c) (int)((p->par.savings_par.lamda) * ICOST(d, 0, c) - \
-                               (ICOST(d,a,c) + ICOST(d,b,c) -  \
-			        (p->par.savings_par.mu) * ICOST(d,a,b)))
 
 tree_node *find_max PROTO((tree_node *head));
 tree_node *make_heap PROTO((int custnum, int savings,

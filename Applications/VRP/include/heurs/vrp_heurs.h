@@ -14,13 +14,23 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _EXCHANGE_HEUR_H
-#define _EXCHANGE_HEUR_H
+#ifndef VRP_HEURS_H
+#define VRP_HEURS_H
 
-#include "proto.h"
-#include "vrp_types.h"
-
-void exchange_heur PROTO((vrp_problem *vrp, heurs *eh, int trials, 
-			  int jobs, int which, int *tids, int *sent));
+#include "vrp_const.h"
+#include "exchange.h"
+#include "exchange2.h"
+#include "farnear_ins.h"
+#include "farthest_ins.h"
+#include "nearest_ins.h"
+#include "mst.h"
+#include "near_cluster.h"
+#include "savings.h"
+#include "savings2.h"
+#include "savings3.h"
+#include "sweep.h"
+#include "tsp_fi.h"
+#include "tsp_fini.h"
+#include "tsp_ni.h"
 
 #endif
