@@ -1,0 +1,28 @@
+******************************************************************************
+*                         SYMPHONY Examples                                  * 
+******************************************************************************
+
+These examples are intended to illustrate the usage of SYMPHONY as a callable
+library and are taken from the mini-tutorial on the SYMPHONY Callable Library 
+for MILP which can be found here: 
+
+http://www.lehigh.edu/~tkr2/research/talks/SYMPHONY-TUTORIAL-ICS05.pdf
+
+Current examples repository includes: 
+
+milp         : implementation of a basic MILP solver
+warm_start1  : usage of warm starting capability on parameter modification
+warm_start2  : usage of warm starting capability on problem modification
+bicriteria   : implementation of SYMPHONY's ability to solve bicriteria 
+               optimization problems
+sensitivity  : usage of basic sensitivity analysis features
+
+******************************************************************************
+*                      INSTALLATION (Unix)                                   * 
+******************************************************************************
+
+First, modify the configuration file, SYMPHONY/config, to reflect your
+environment. Set the SYMPHONY root directory in the Makefile.  Typing "make" 
+should successfully make the executables. If you need to install a 
+specific example only, add the name of that example as a make command line 
+argument, i.e., for instance, type "make milp".

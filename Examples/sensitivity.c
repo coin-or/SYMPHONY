@@ -26,7 +26,7 @@ int main(int argc, char **argv)
   si.setSymParam(OsiSymSensitivityAnalysis, true);
 
   si.initialSolve();
-
+#ifdef SENSITIVITY_ANALYSIS
   int ind[2];
   double val[2];
   ind[0] = 4; val[0] = 7000;
@@ -36,7 +36,14 @@ int main(int argc, char **argv)
   double ub =  si.getUbForNewRhs(2, ind, val);
 
   printf("\nBounds for the new rhs:\n lb: %f\n ub: %f \n\n", lb, ub);
-  
+
+#else
+
+  printf("\nSensitivity analysis is disabled!" 
+	 "Please modify the configuration file to enable this feature");
+
+#endif
+
   return(0);
 
 }
@@ -56,6 +63,8 @@ int main(int argc, char **argv)
 
    sym_solve(env);
 
+#ifdef SENSITIVITY_ANALYSIS
+
    int ind[2];
    double val[2];
    ind[0] = 4; val[0] = 7000;
@@ -67,6 +76,13 @@ int main(int argc, char **argv)
 
    printf("\nBounds for the new rhs:\n lb: %f\n ub: %f \n\n", lb, ub);
 
+#else
+
+   printf("\nSensitivity analysis is disabled!" 
+	  "Please modify the configuration file to enable this feature");
+   
+#endif
+   
    sym_close_environment(env);
   
    return(0);
