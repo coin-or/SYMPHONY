@@ -98,27 +98,27 @@ SOURCE=..\Master\main.c
 # End Group
 # Begin Source File
 
-SOURCE=..\..\COIN\Win\clpLib\Debug\clpLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\COIN\Win\coinLib\Debug\coinLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\COIN\Win\cglLib\Debug\cglLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\COIN\Win\osiLib\Debug\osiLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\COIN\Win\osiClpLib\Debug\osiClpLib.lib
-# End Source File
-# Begin Source File
-
 SOURCE=.\Debug\symphonyLib.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Win\osiClpLib\Debug\osiClpLib.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Win\cglLib\Debug\cglLib.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Win\clpLib\Debug\clpLib.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Win\coinLib\Debug\coinLib.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Win\osiLib\Debug\osiLib.lib
 # End Source File
 # End Target
 # End Project
