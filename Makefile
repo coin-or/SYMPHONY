@@ -82,17 +82,6 @@ RANLIB = ranlib
 
 ##############################################################################
 ##############################################################################
-# Generate generic cutting planes. If you are using the OSI interface, you 
-# can now add generic cutting planes from the CGL by setting the flag below.
-# Which cutting planes are added can be controlled by SYMPHONY parameters (see
-# the user's manual
-##############################################################################
-##############################################################################
-
-ADD_GENERIC_CUTS = TRUE
-
-##############################################################################
-##############################################################################
 # LP solver dependent definitions
 ##############################################################################
 ##############################################################################
@@ -190,6 +179,23 @@ ifeq ($(OSI_INTERFACE),GLPK)
        LPLDFLAGS += ${HOME}/lib
        LPLIB += -lOsiGlpk -lglpk
 endif
+endif
+
+##############################################################################
+##############################################################################
+# Generate generic cutting planes. If you are using the OSI interface, you 
+# can now add generic cutting planes from the CGL by setting the flag below.
+# Which cutting planes are added can be controlled by SYMPHONY parameters (see
+# the user's manual
+##############################################################################
+##############################################################################
+
+ADD_GENERIC_CUTS = TRUE
+
+ifeq ($(ADD_GENERIC_CUTS),TRUE))
+LPINCDIR += ${HOME}/COIN/include
+LPLIBPATHS += ${HOME}/COIN/lib
+LPLIB += -lCgl
 endif
 
 ##############################################################################
