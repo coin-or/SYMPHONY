@@ -249,6 +249,7 @@ structure. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_create\_subproblem}
+\label{user_create_subproblem}
 \begin{verbatim}
 int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
                            int *maxn, int *maxm, int *maxnz)
@@ -390,6 +391,7 @@ pre-solving the LP relaxation of a child corresponding to a candidate and from
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_send\_feasible\_solution}
+\label{user_send_feasible_solution}
 \begin{verbatim}
 int user_send_feasible_solution(void *user, double lpetol,
                                 int varnum, int *indices, double *values)
@@ -1150,12 +1152,13 @@ Note that SYMPHONY has built-in support for cuts generated explicitly as
 matrix rows with no user-defined packed form, i.e., cuts whose indices and
 coefficients are given explicitly (see the function
 \hyperref{{\tt user\_find\_cuts()}} {{\tt user\_find\_cuts()} in Section
-}{}{user_find_cuts}. These cuts can be constructed using the helper function
-\hyperref{{\tt create\_explicit\_cut()}} {{\tt create\_explicit\_cut()} (see
-Section }{)}{create_explicit_cut} and are packed and unpacked automatically,
-so the user does not need to implement this function. In post processing,
-SYMPHONY unpacks explicitly defined cuts and internally generated generic
-cuts.
+}{}{user_find_cuts}. These cuts can be constructed and added using the helper
+function
+\hyperref{\texttt{cg\_add\_explicit\_cut()}} {\texttt{cg\_add\_explicit\_cut()} (see
+the description of \texttt{user\_find\_cuts()} in Section }{)}{user_find_cuts}
+and are packed and unpacked automatically, so the user does not need to
+implement this function. In post processing, SYMPHONY unpacks explicitly
+defined cuts and internally generated generic cuts.
 
 \args
 
@@ -1455,6 +1458,7 @@ generate\_what} is {\tt GENERATE\_REAL\_NEXTIND}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_generate\_cuts\_in\_lp}
+\label{user_generate_cuts_in_lp}
 \begin{verbatim}
 int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
                              var_desc **vars, double *x, int *new_row_num,
