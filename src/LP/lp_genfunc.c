@@ -98,8 +98,8 @@ void lp_initialize(lp_prob *p, int master_tid)
    freebuf(r_bufid);
 
 #endif
-   
-   p->lp_data = (LPdata *) calloc(1, sizeof(LPdata));
+
+   p->lp_data = (LPdata *) calloc(1, sizeof(LPdata));   
 #pragma omp critical (lp_solver)
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
    {
@@ -274,11 +274,9 @@ void fathom_branch(lp_prob *p)
       PRINT(p->par.verbosity, 2,
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
-      /* the following call fills up:
-       *    lp_data->basis, lp_data->xbzero, lp_data->objval
-       */
       termcode = dual_simplex(lp_data, &iterd);
-      /* Get all the data we will need */
+
+      /* Get relevant data */
       get_dj_pi(lp_data);
       get_slacks(lp_data);
 
@@ -584,11 +582,9 @@ void repricing(lp_prob *p)
       PRINT(p->par.verbosity, 2,
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
-      /* the following call fills up:
-       *    lp_data->bhead, lp_data->xbzero, lp_data->objval
-       */
       termcode = dual_simplex(lp_data, &iterd);
-      /* Get all the data we will need */
+
+      /* Get relevant data */
       get_dj_pi(lp_data);
       get_slacks(lp_data);
 

@@ -42,7 +42,7 @@ int check_row_effectiveness(lp_prob *p)
 
    double slack, *slacks = lp_data->slacks;
    int *free_rows;
-   int ineffective, deletable, violated,    i, j, k;
+   int ineffective, deletable, violated, i, j, k;
 
    char *stat;
    int  *now_ineff, *outrhsind, *inrhsind, *slackstat;
@@ -54,7 +54,7 @@ int check_row_effectiveness(lp_prob *p)
     * Now based on their slack values, mark each row whether it's
     * violated, loose or tight */
 
-   for (i=m-1; i>=0; i--){
+   for (i = m - 1; i >= 0; i--){
       slack = slacks[i];
       switch (rows[i].cut->sense){
        case 'E':
@@ -248,7 +248,6 @@ int check_row_effectiveness(lp_prob *p)
 	    rows[k++] = rows[i];
 	 }
       }
-
       delete_rows(lp_data, deletable, free_rows);
    }
    PRINT(p->par.verbosity, 3, ("\n"));

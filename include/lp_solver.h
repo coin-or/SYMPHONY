@@ -26,6 +26,8 @@
 
 #include <cplex.h>
 
+#define MAINTAIN_LP_ARRAYS
+
 void CPX_check_error PROTO((const char *erring_func));
 
 #elif defined(__OSL__)
@@ -35,6 +37,8 @@ void CPX_check_error PROTO((const char *erring_func));
 /*****************************************************************************/
 
 #include <ekk_c_api.h>
+
+#define MAINTAIN_LP_ARRAYS
 
 void OSL_check_error PROTO((const char *erring_func));
 
@@ -179,9 +183,6 @@ typedef struct LPdata{
    double    *dj;          /* maxn */ /* BB */
    double    *dualsol;     /* maxm */ /* BB */
    double    *slacks;      /* maxm */
-   int       *bhead;       /* maxm */ /* BB */
-   int        bhead_is_valid;
-   double    *xbzero;      /* maxm */ /* BB */
 
    constraint  *rows;      /* maxm */
 
@@ -199,7 +200,6 @@ typedef struct LPdata{
 double dot_product PROTO((double *val, int *ind, int collen, double *col));
 void size_lp_arrays PROTO((LPdata *lp_data, char do_realloc, char set_max,
 			     int row_num, int col_num, int nzcnt));
-void free_lp_desc PROTO((LPdesc desc));
 void open_lp_solver PROTO((LPdata *lp_data));
 void close_lp_solver PROTO((LPdata *lp_data));
 void load_lp_prob PROTO((LPdata *lp_data, int scaling, int fastmip));
@@ -219,7 +219,6 @@ int dual_simplex PROTO((LPdata *lp_data, int *iterd));
 void btran PROTO((LPdata *lp_data, double *col));
 void get_binvcol PROTO((LPdata *lp_data, int j, double *col));
 void get_binvrow PROTO((LPdata *lp_data, int i, double *row));
-void get_basis_header PROTO((LPdata *lp_data));
 void get_basis PROTO((LPdata *lp_data, int *cstat, int *rstat));
 void set_obj_upper_lim PROTO((LPdata *lp_data, double lim));
 void set_itlim PROTO((LPdata *lp_data, int itlim));
