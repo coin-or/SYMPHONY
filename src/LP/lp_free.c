@@ -251,11 +251,9 @@ void free_lp_arrays(LPdata *lp_data)
 {
   FREE(lp_data->not_fixed);
   FREE(lp_data->status);
-#ifdef MAINTAIN_LP_ARRAYS
   FREE(lp_data->x);
   FREE(lp_data->dj);
   FREE(lp_data->dualsol);
-#endif
   FREE(lp_data->slacks);
   FREE(lp_data->tmp.c);
   FREE(lp_data->tmp.i1);

@@ -28,8 +28,6 @@
 
 #include <cplex.h>
 
-#define MAINTAIN_LP_ARRAYS
-
 void CPX_check_error PROTO((const char *erring_func));
 
 #elif defined(__OSL__)
@@ -39,8 +37,6 @@ void CPX_check_error PROTO((const char *erring_func));
 /*****************************************************************************/
 
 #include <ekk_c_api.h>
-
-#define MAINTAIN_LP_ARRAYS
 
 void OSL_check_error PROTO((const char *erring_func));
 

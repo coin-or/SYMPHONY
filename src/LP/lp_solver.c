@@ -59,17 +59,13 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
       resize_m = TRUE;
       lp_data->maxm = maxm + (set_max ? 0 : BB_BUNCH);
       if (! do_realloc){
-#ifdef MAINTAIN_LP_ARRAYS
          FREE(lp_data->dualsol);
          lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
-#endif
 	 FREE(lp_data->slacks);
 	 lp_data->slacks  = (double *) malloc(lp_data->maxm * DSIZE);
      }else{
-#ifdef MAINTAIN_LP_ARRAYS
          lp_data->dualsol = (double *) realloc((char *)lp_data->dualsol,
                                                lp_data->maxm * DSIZE);
-#endif
 	 lp_data->slacks  = (double *) realloc((void *)lp_data->slacks,
 					       lp_data->maxm * DSIZE);
       }
@@ -83,21 +79,17 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
       resize_n = TRUE;
       lp_data->maxn = maxn + (set_max ? 0 : 5 * BB_BUNCH);
       if (! do_realloc){
-#ifdef MAINTAIN_LP_ARRAYS
          FREE(lp_data->x);
          lp_data->x = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->dj);
          lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
-#endif
          FREE(lp_data->status);
          lp_data->status = (char *) malloc(lp_data->maxn * CSIZE);
       }else{
-#ifdef MAINTAIN_LP_ARRAYS
          lp_data->x = (double *) realloc((char *)lp_data->x,
                                          lp_data->maxn * DSIZE);
          lp_data->dj = (double *) realloc((char *)lp_data->dj,
                                           lp_data->maxn * DSIZE);
-#endif
          lp_data->status = (char *) realloc((char *)lp_data->status,
                                             lp_data->maxn * CSIZE);
       }
@@ -631,8 +623,8 @@ void get_column(LPdata *lp_data, int j,
    EKKVector vec;
    vec = ekk_getColumn(lp_data->lp, j);
    *collen = vec.numNonZero;
-   memmove(colind, vec.index, *collen * ISIZE);
-   memmove(colval, vec.element, *collen * DSIZE);
+   memcpy(colind, vec.index, *collen * ISIZE);
+   memcpy(colval, vec.element, *collen * DSIZE);
    ekk_freeVector(&vec);
    get_objcoef(lp_data, j, cj);
 }
@@ -644,8 +636,8 @@ void get_row(LPdata *lp_data, int i,
    EKKVector vec;
    vec = ekk_getRow(lp_data->lp, i);
    *rowlen = vec.numNonZero;
-   memmove(rowind, vec.index, *rowlen * ISIZE);
-   memmove(rowval, vec.element, *rowlen * DSIZE);
+   memcpy(rowind, vec.index, *rowlen * ISIZE);
+   memcpy(rowval, vec.element, *rowlen * DSIZE);
    ekk_freeVector(&vec);
 }
 
@@ -667,7 +659,7 @@ int get_proof_of_infeas(LPdata *lp_data, int *infind)
 \*===========================================================================*/
 void get_x(LPdata *lp_data)
 {
-   memmove(lp_data->x, ekk_colsol(lp_data->lp), lp_data->n * DSIZE);
+   memcpy(lp_data->x, ekk_colsol(lp_data->lp), lp_data->n * DSIZE);
 }
 
 /*===========================================================================*/
@@ -676,7 +668,7 @@ void get_dj_pi(LPdata *lp_data)
    /*If scaling, fast integer or compress is used, maybe some changes will be
      needed */
    /* OSL returns changed sign - is it good or not? */
-   memmove(lp_data->dualsol, ekk_rowduals(lp_data->lp), lp_data->m * DSIZE);
+   memcpy(lp_data->dualsol, ekk_rowduals(lp_data->lp), lp_data->m * DSIZE);
 
 # if 0
    /* changing the sign */
@@ -685,7 +677,7 @@ void get_dj_pi(LPdata *lp_data)
    }
 #endif
    
-   memmove(lp_data->dj, ekk_colrcosts(lp_data->lp), lp_data->n * DSIZE);
+   memcpy(lp_data->dj, ekk_colrcosts(lp_data->lp), lp_data->n * DSIZE);
 
 #if 0
    for (i = lp_data->n - 1; i >= 0; i --) {
@@ -1610,13 +1602,14 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    double *dj = lp_data->dj;
    double *x = lp_data->x;
    char *status = lp_data->status;
+   int i, num_to_keep;
 
    cpx_status = CPXdelsetcols(lp_data->cpxenv, lp_data->lp, delstat);
    CPX_check_error("delete_cols - CPXdelsetcols");
    lp_data->nz = CPXgetnumnz(lp_data->cpxenv, lp_data->lp);
    CPX_check_error("delete_cols - CPXgetnumnz");
 
-   for (i = 0, num_remaining = 0; i < lp_data->n; i++){
+   for (i = 0, num_to_keep = 0; i < lp_data->n; i++){
       if (delstat[i] != -1){
 	 dj[delstat[i]] = dj[i];
 	 x[delstat[i]] = x[i];
@@ -1624,7 +1617,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
       }
    }
 
-   lp_data->n -= num_remaining;
+   lp_data->n = num_to_keep;
 
    return(delnum);
 }
@@ -2072,17 +2065,17 @@ void get_column(LPdata *lp_data, int j,
    const double *matval = matrixByCol->getElements();
    const int *matind = matrixByCol->getIndices(); 
    
-   *collen=matrixByCol->getVectorSize(j);
+   *collen = matrixByCol->getVectorSize(j);
    
    int matbeg = 0;
    
    for (int i = 0; i < j; i++)
-      matbeg+= matrixByCol->getVectorSize(j);
+      matbeg += matrixByCol->getVectorSize(j);
    
    
    for (int i = 0; i < (*collen); i++){
-      colval[i] = matval[matbeg+i];
-      colind[i] = matind[matbeg+i];
+      colval[i] = matval[matbeg + i];
+      colind[i] = matind[matbeg + i];
    }
    
    const double * objval = lp_data->si->getObjCoefficients();
@@ -2102,7 +2095,7 @@ void get_row(LPdata *lp_data, int i,
    const double * matval = matrixByRow->getElements();  
    const int * matind = matrixByRow->getIndices(); 
    
-   *rowlen=matrixByRow->getVectorSize(i);
+   *rowlen = matrixByRow->getVectorSize(i);
    
    int matbeg = 0, j = 0;
    
@@ -2110,8 +2103,8 @@ void get_row(LPdata *lp_data, int i,
       matbeg += matrixByRow->getVectorSize(i);
    
    for (j = 0; j < (*rowlen); j++){
-      rowval[j] = matval[matbeg+j];
-      rowind[j] = matind[matbeg+j];
+      rowval[j] = matval[matbeg + j];
+      rowind[j] = matind[matbeg + j];
    }
 }
 
@@ -2136,15 +2129,18 @@ int get_proof_of_infeas(LPdata *lp_data, int *infind)
 
 void get_x(LPdata *lp_data)
 {
-   lp_data->x = const_cast<double *>(lp_data->si->getColSolution());
+   memcpy(lp_data->x, const_cast<double *>(lp_data->si->getColSolution()),
+	  lp_data->n * DSIZE);
 }
 
 /*===========================================================================*/
 
 void get_dj_pi(LPdata *lp_data)
 {
-   lp_data->dualsol = const_cast<double *>(lp_data->si->getRowPrice());
-   lp_data->dj = const_cast<double *>(lp_data->si->getReducedCost());
+   memcpy(lp_data->dualsol, const_cast<double *>(lp_data->si->getRowPrice()),
+	  lp_data->m * DSIZE);
+   memcpy(lp_data->dj, const_cast<double *>(lp_data->si->getReducedCost()),
+	  lp_data->n * DSIZE);
 }
 
 /*===========================================================================*/
@@ -2334,6 +2330,8 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 	 delstat[i] = -1;
       }else{
 	 delstat[i] = num_to_keep++;
+	 dj[delstat[i]] = dj[i];
+	 x[delstat[i]] = x[i];
 	 status[delstat[i]] = status[i];
       }
    }
