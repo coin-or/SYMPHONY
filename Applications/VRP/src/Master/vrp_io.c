@@ -32,6 +32,7 @@
 #include "vrp_const.h"
 #include "vrp_macros.h"
 #include "compute_cost.h"
+#include "small_graph.h"
 
 /*===========================================================================*/
 
@@ -520,6 +521,20 @@ void vrp_io(vrp_problem *vrp, char *infile)
      if (!vrp->cg_par.which_tsp_cuts)
 	vrp->cg_par.which_tsp_cuts = ALL_TSP_CUTS;
   }
+
+  if (vrp->par.use_small_graph == LOAD_SMALL_GRAPH){
+     read_small_graph(vrp);
+     vrp->numroutes = vrp->cur_tour->numroutes;
+  }
+  
+  /* Selects the cheapest edges adjacent to each node for the base set */
+  
+  if (vrp->par.use_small_graph == SAVE_SMALL_GRAPH){
+     if (!vrp->g) make_small_graph(vrp, 0);
+     save_small_graph(vrp);
+  }else if (!vrp->g){
+     make_small_graph(vrp, 0);
+  }  
 }
 
 /*===========================================================================*/

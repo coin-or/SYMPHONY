@@ -117,6 +117,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
    vrp_readparams(vrp, filename, argc, argv);
 
+#if 0
    if (vrp->par.use_small_graph == LOAD_SMALL_GRAPH){
       read_small_graph(vrp);
       vrp->numroutes = vrp->cur_tour->numroutes;
@@ -130,7 +131,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
    }else if (!vrp->g){
       make_small_graph(vrp, 0);
    }
-
+#endif
    return(USER_SUCCESS);
 }
 
