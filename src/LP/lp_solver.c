@@ -3062,22 +3062,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       delete clique;
    }
 
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    /* create CGL flow cover cuts */
    if(lp_data->par.generate_cgl_flow_and_cover_cuts){
       CglFlowCover *flow = new CglFlowCover;
       flow->generateCuts(*(lp_data->si), cutlist);
       delete flow;
-      //printf("%i\n", cutlist.sizeRowCuts());
    }
 
-   /*___END_EXPERIMENTAL_SECTION___*/
    /* create CGL simple rounding cuts */
    if(lp_data->par.generate_cgl_rounding_cuts){
       CglSimpleRounding * rounding = new CglSimpleRounding;
       rounding->generateCuts(*(lp_data->si), cutlist);
       delete rounding;
-      //printf("%i\n", cutlist.sizeRowCuts());
    }
 
    /* create CGL liftandproject cuts (currently buggy) */     
