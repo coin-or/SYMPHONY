@@ -51,14 +51,36 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
 			 int *cand_num, branch_obj ***candidates,
 			 int *action)
 {
+   int i;
+   double fracx, lpetol1 = 1 - lpetol;
+
    cnrp_spec *cnrp = (cnrp_spec *) user;
 
-   if (!cnrp->par.detect_tailoff){
+
+   for (i = varnum - 1; i >= 0; i--){
+      if (vars[i]->is_int){
+	 fracx = x[i] - floor(x[i]);
+	 if (fracx > lpetol && fracx < lpetol1){
+	    break;
+	 }
+      }
+   }
+
+   if(i >= 0 ){
+      *action = USER__BRANCH_IF_TAILOFF;
+   } else{
+      *action = USER__BRANCH_IF_MUST;
+   }
+
+#if 0   
+   if (cnrp->par.detect_tailoff){
       *action = USER__BRANCH_IF_MUST;
       return(USER_SUCCESS);
    }
 
    *action = USER__BRANCH_IF_TAILOFF;
+#endif
+
    return(USER_SUCCESS);
 }
 

@@ -53,6 +53,26 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
 			 int *cand_num, branch_obj ***candidates,
 			 int *action)
 {
+
+   int i;
+   double fracx, lpetol1 = 1 - lpetol;
+
+   for (i = varnum - 1; i >= 0; i--){
+      if (vars[i]->is_int){
+	 fracx = x[i] - floor(x[i]);
+	 if (fracx > lpetol && fracx < lpetol1){
+	    break;
+	 }
+      }
+   }
+
+   if(i >= 0 ){
+      *action = USER__BRANCH_IF_TAILOFF;
+   } else{
+      *action = USER__BRANCH_IF_MUST;
+   }
+
+#if 0
    vrp_lp_problem *vrp = (vrp_lp_problem *) user;
 
    if (!vrp->par.detect_tailoff){
@@ -60,6 +80,7 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
    }else{
       *action = USER__BRANCH_IF_TAILOFF;
    }
+#endif
 
    return(USER_SUCCESS);
 }
