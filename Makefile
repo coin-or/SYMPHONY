@@ -28,9 +28,6 @@ CONFIG_FILE_DIR = $(PWD)
 ifeq ($(USE_SYM_APPL), TRUE)
 CONFIG_FILE_DIR = $(SYMPHONYROOT)
 endif
-ifeq ($(SYM_EXAMPLE), TRUE)
-CONFIG_FILE_DIR = $(SYMPHONYROOT)
-endif
 
 CONFIG_FILE = config
 
@@ -214,9 +211,7 @@ SYM_COMPILE_IN_CP = $(COMPILE_IN_CP)
 SYM_COMPILE_IN_LP = $(COMPILE_IN_LP)
 SYM_COMPILE_IN_TM = $(COMPILE_IN_TM)
 else
-ifneq ($(SYM_EXAMPLE), TRUE)
 SYMPHONYROOT = $(PWD)
-endif
 endif
 
 ifneq ($(USE_SYM_APPL),TRUE)
@@ -258,10 +253,6 @@ endif
 USER_OBJDIR  = $(USERBUILDDIR)/objects/$(ARCH)/$(CONFIG)/
 DEPDIR       = $(SYMBUILDDIR)/dep/$(ARCH)
 USER_DEPDIR  = $(USERBUILDDIR)/dep/$(ARCH)
-
-ifeq ($(SYM_EXAMPLE), TRUE)
-EXAMPLE_OBJDIR = $(SYMPHONYROOT)/Examples/objects/$(ARCH)
-endif
 
 ifeq ($(USE_GLPMPL), TRUE)
 GMPLINCDIR   = $(SYMPHONYROOT)/src/GMPL
@@ -658,11 +649,6 @@ $(GMPL_OBJDIR)/%.o : %.c
 	@echo Compiling $*.c
 	gcc -DHAVE_LIBM=1 -DSTDC_HEADERS=1 -I$(GMPLINCDIR) -g -o2 -c $< -o $@
 
-$(EXAMPLE_OBJDIR)/%.o : %.c
-	mkdir -p $(EXAMPLE_OBJDIR)
-	@echo Compiling $*.c
-	$(CC) $(CFLAGS) $(EFENCE_LD_OPTIONS) -c $< -o $@
-
 $(DEPDIR)/%.d : %.c
 	mkdir -p $(DEPDIR)
 	@echo Creating dependency $*.d
@@ -842,6 +828,7 @@ endif
 endif
 
 SYMLIBDIR  = $(SYMBUILDDIR)/lib
+LN_S = ln -fs $(LIBDIR)/$(LIBNAME_TYPE) $(SYMLIBDIR)
 ifeq ($(LIBTYPE),SHARED)
 LIBNAME_TYPE      = $(addsuffix .so, $(addprefix lib, $(MASTERLIBNAME)))
 LD = $(CC) $(OPT) 
@@ -850,7 +837,6 @@ MAKELIB        =
 else
 LIBNAME_TYPE   = $(addsuffix .a, $(addprefix lib, $(MASTERLIBNAME)))
 MKSYMLIBDIR    = mkdir -p $(SYMLIBDIR)
-LN_S = ln -fs $(LIBDIR)/$(LIBNAME_TYPE) $(SYMLIBDIR)
 endif
 
 MASTERBIN = $(MASTERNAME)$(MASTEREXT)
@@ -1385,60 +1371,6 @@ $(BINDIR)/ccg : $(USER_CG_DEP) $(USER_CG_OBJS) $(LIBDIR)/libcg.a
 
 ###############################################################################
 ##############################################################################
-# Example targets
-###############################################################################
-##############################################################################
-
-milp : masterlib $(EXAMPLE_OBJDIR)/milp.o
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/milp.o \
-	$(LIBS) $(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB)
-	@echo ""
-
-bicriteria : masterlib $(EXAMPLE_OBJDIR)/bicriteria.o
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/bicriteria.o \
-	$(LIBS) $(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB)
-	@echo ""
-
-sensitivity : masterlib $(EXAMPLE_OBJDIR)/sensitivity.o
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/sensitivity.o \
-	$(LIBS) $(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB)
-	@echo ""
-
-warm_start1 : masterlib $(EXAMPLE_OBJDIR)/warm_start1.o
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/warm_start1.o \
-	$(LIBS) $(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB)
-	@echo ""
-
-warm_start2 : masterlib $(EXAMPLE_OBJDIR)/warm_start2.o
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/warm_start2.o \
-	$(LIBS) $(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB)
-	@echo ""
-
-warm_start3 : masterlib $(EXAMPLE_OBJDIR)/warm_start3.o
-	@echo ""
-	@echo "Linking $(notdir $@) ..."
-	@echo ""
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(EXAMPLE_OBJDIR)/warm_start3.o \
-	$(LIBS) $(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB)
-	@echo ""
-
-###############################################################################
-##############################################################################
 # COIN targets
 ###############################################################################
 ##############################################################################
@@ -1484,9 +1416,6 @@ clean_coin :
 clean_gmpl :
 	rm -rf $(GMPL_OBJDIR)
 
-clean_example :
-	rm -rf $(EXAMPLE_OBJDIR)
-	rm -rf $(EXAMPLES)
 clean_user :
 	rm -rf $(USER_OBJDIR)
 
@@ -1503,7 +1432,7 @@ clean_lib :
 clean_bin :
 	rm -rf $(BINDIR)
 
-clean_all : clean clean_gmpl clean_example clean_dep clean_user clean_user_dep\
+clean_all : clean clean_gmpl clean_dep clean_user clean_user_dep\
 	clean_lib clean_bin
 	true
 

@@ -13,6 +13,9 @@ Current examples repository includes:
 milp         : implementation of a basic MILP solver
 warm_start1  : usage of warm starting capability on parameter modification
 warm_start2  : usage of warm starting capability on problem modification
+warm_start3  : usage of warm starting that the problem stops every ten
+               seconds and prints out the current status before starting to 
+               resolve again.
 bicriteria   : implementation of SYMPHONY's ability to solve bicriteria 
                optimization problems
 sensitivity  : usage of basic sensitivity analysis features
@@ -20,9 +23,10 @@ sensitivity  : usage of basic sensitivity analysis features
 ******************************************************************************
 *                      INSTALLATION (Unix)                                   * 
 ******************************************************************************
-
-First, modify the configuration file, SYMPHONY/config, to reflect your
-environment. Set the SYMPHONY root directory in the Makefile.  Typing "make" 
-should successfully make the executables. If you need to install a 
-specific example only, add the name of that example as a make command line 
-argument, i.e., for instance, type "make milp".
+First, configure and compile SYMPHONY as described in SYMPHONY/README. Modify
+the variables in the Examples/Makefile appropriately. In particular, you must
+set the path to SYMPHONY and COIN root directories and LP solver header 
+and library files directories. Typing "make" should successfully make the 
+executables. If you need to install a specific example only, add the name of 
+that example as a make command line argument, i.e., for instance, type 
+"make milp".
