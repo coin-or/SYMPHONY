@@ -196,7 +196,7 @@ int check_cut_u(cut_pool *cp, lp_sol *cur_sol, cut_data *cut, int *is_violated,
       matval = (double *) (cut->coef + (1 + nzcnt) * ISIZE);
       for (i = 0, j = 0; i < nzcnt && j < varnum; ){
 	 if (matind[i] == indices[j]){
-	    lhs += matval[i]*values[j];
+	    lhs += matval[i++]*values[j++];
 	 }else if (matind[i] < indices[j]){
 	    i++;
 	 }else if (matind[i] > indices[j]){

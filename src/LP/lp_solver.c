@@ -2665,7 +2665,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 	    create_explicit_cut(cut.row().getNumElements(),
 				const_cast<int *> (cut.row().getIndices()),
 				const_cast<double *> (cut.row().getElements()),
-				cut.rhs(), cut.range(), cut.sense(), FALSE);
+				cut.rhs(), cut.range(), cut.sense(), TRUE);
       }
       *num_cuts += j;
 #else

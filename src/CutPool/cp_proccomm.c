@@ -302,10 +302,11 @@ void cut_pool_receive_cuts(cut_pool *cp, int bc_level)
       cp_cut->level = level;
       cp_cut->touches = cp_cut->check_num = 0;
       cp_cut->quality = 0.0;
+#if 0
       if (cp_cut->cut.rhs <= cp->lpetol){
 	 printf("cut_pool: cut arrived with 0 rhs... \n\n");
       }
-
+#endif
       if (cp->size + cp_cut->cut.size + sizeof(cp_cut_data) >
 	  cp->par.max_size){
 	 /* If the maximum size of the cut pool is exceeded, then we attempt
