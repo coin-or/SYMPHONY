@@ -669,8 +669,10 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 #endif
    }
    
-   if (fixed_cost < cnrp->fixed_cost - lpetol ||
-       variable_cost < cnrp->variable_cost - lpetol){
+   if ((fixed_cost < cnrp->fixed_cost - lpetol &&
+	variable_cost < cnrp->variable_cost + lpetol) ||
+       (fixed_cost < cnrp->fixed_cost + lpetol &&
+	variable_cost < cnrp->variable_cost - lpetol)){
       cnrp->variable_cost = variable_cost;
       cnrp->fixed_cost = fixed_cost;
       
