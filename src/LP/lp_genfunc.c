@@ -262,9 +262,16 @@ int fathom_branch(lp_prob *p)
       get_slacks(lp_data);
 
       /* display the current solution */
-      PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
-				  lp_data->objval, termcode, iterd));
+      if (p->mip->obj_sense == MAXIMIZE){
+	 PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
+				     -lp_data->objval + p->mip->obj_offset,
+				     termcode, iterd));
 
+      }else{
+	 PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
+				     lp_data->objval+ p->mip->obj_offset,
+				     termcode, iterd));
+      }
       switch (termcode){
        case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
@@ -592,9 +599,16 @@ int repricing(lp_prob *p)
       get_slacks(lp_data);
 
       /* display the current solution */
-      PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
-				  lp_data->objval, termcode, iterd));
+      if (p->mip->obj_sense == MAXIMIZE){
+	 PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
+				     -lp_data->objval + p->mip->obj_offset,
+				     termcode, iterd));
 
+      }else{
+	 PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
+				     lp_data->objval+ p->mip->obj_offset,
+				     termcode, iterd));
+      }
       comp_times->lp += used_time(&p->tt);
 
       switch (termcode){
@@ -768,8 +782,8 @@ int collect_nonzeros(lp_prob *p, double *x, int *tind, double *tx)
    double lpetol = p->lp_data->lpetol;
 
    colind_sort_extra(p);
-   for (i=0; i<n; i++){
-      if (x[i] > lpetol){
+   for (i = 0; i < n; i++){
+      if (x[i] > lpetol || x[i] < -lpetol){
 	 tind[cnt] = vars[i]->userind;
 	 tx[cnt++] = x[i];
       }
@@ -789,7 +803,7 @@ int collect_fractions(lp_prob *p, double *x, int *tind, double *tx)
    double lpetol = p->lp_data->lpetol, xi;
 
    colind_sort_extra(p);
-   for (i=0; i<n; i++){
+   for (i = 0; i < n; i++){
       xi = x[i];
       if (xi - floor(xi) > lpetol && ceil(xi) - xi > lpetol){
 	 tind[cnt] = vars[i]->userind;

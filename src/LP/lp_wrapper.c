@@ -1293,10 +1293,15 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
    }
    for (i=0; i<can->child_num; i++){
       if (can->objval[i] != MAXDOUBLE / 2){
-	 printf("[%.3f, %i,%i]  ",
-		can->objval[i], can->termcode[i], can->iterd[i]);
+	 if (p->mip->obj_sense == MAXIMIZE){
+	    printf("[%.3f, %i,%i]  ", -can->objval[i] + p->mip->obj_offset,
+		   can->termcode[i], can->iterd[i]);
+	 }else{
+	    printf("[%.3f, %i,%i]  ", can->objval[i] + p->mip->obj_offset,
+		   can->termcode[i], can->iterd[i]);
+	 }
       }else{
-	 printf("[-1, %i,%i]  ", can->termcode[i], can->iterd[i]);
+	 printf("[*, %i,%i]  ", can->termcode[i], can->iterd[i]);
       }
    }
    printf("\n");

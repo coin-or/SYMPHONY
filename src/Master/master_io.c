@@ -1330,8 +1330,9 @@ void read_string(char *target, char *line, int maxlen)
 /*===========================================================================*/
 /*===========================================================================*/
 
-void print_statistics(node_times *tim, problem_stat *stat, double ub, double lb,
-		      double initial_time, double start_time)
+void print_statistics(node_times *tim, problem_stat *stat, double ub,
+		      double lb, double initial_time, double start_time,
+		      double obj_offset, char obj_sense, char has_ub)
 {
    static str_int nfstatus[4] = {
       {"NF_CHECK_ALL"           , NF_CHECK_ALL }
@@ -1378,7 +1379,8 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub, double lb,
    printf("Number of analyzed nodes:       %i\n", stat->analyzed);
    printf("Depth of tree:                  %i\n", stat->max_depth);
    printf("Size of the tree:               %i\n", stat->tree_size);
-   printf("Leaves before trimming:         %i\n", stat->leaves_before_trimming);
+   printf("Leaves before trimming:         %i\n",
+	  stat->leaves_before_trimming);
    printf("Leaves after trimming:          %i\n", stat->leaves_after_trimming);
    printf("Repriced root's nf_status:      %s\n",
 	  nfstatus[(int)stat->nf_status].str);
@@ -1386,13 +1388,25 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub, double lb,
    printf("Number of Chains:               %i\n", stat->chains);
    printf("Number of Diving Halts:         %i\n", stat->diving_halts);
    printf("Number of cuts in cut pool:     %i\n", stat->cuts_in_pool);
-   printf("Lower Bound in Root:            %.3f\n", stat->root_lb);
-   if (lb > 0){
-      printf("\nCurrent Upper Bound:         %.3f", ub);
-      printf("\nCurrent Lower Bound:         %.3f", lb);
-      printf("\nGap Percentage:              %.2f\n", 100*(ub-lb)/ub);
+   if (obj_sense == MAXIMIZE){
+      printf("Upper Bound in Root:            %.3f\n",
+	     -stat->root_lb + obj_offset);
    }else{
-      printf("\nUpper Bound:        %.3f\n", ub);
+      printf("Lower Bound in Root:            %.3f\n",
+	     stat->root_lb + obj_offset);
+   }
+   if (lb > 0){
+      if (obj_sense == MAXIMIZE){
+	 printf("\nCurrent Lower Bound:         %.3f", -ub + obj_offset);
+	 printf("\nCurrent Upper Bound:         %.3f", -lb + obj_offset);
+	 printf("\nGap Percentage:              %.2f\n", -100*(ub-lb)/ub);
+      }else{
+	 printf("\nCurrent Upper Bound:         %.3f", ub + obj_offset);
+	 printf("\nCurrent Lower Bound:         %.3f", lb + obj_offset);
+	 printf("\nGap Percentage:              %.2f\n", 100*(ub-lb)/ub);
+      }
+   }else if (has_ub){
+      printf("\nUpper Bound:        %.3f\n", ub + obj_offset);
    }
 }
 

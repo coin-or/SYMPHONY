@@ -101,7 +101,10 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
    switch(key){
 
     case OsiSymVerbosity:
-      env_->par.verbosity = value;
+      env_->par.verbosity =
+	 env_->par.tm_par.verbosity =
+	 env_->par.lp_par.verbosity =
+	 env_->par.cg_par.verbosity = value;
       return true;
 
     case OsiSymWarmStart:

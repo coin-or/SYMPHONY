@@ -449,11 +449,13 @@ int sym_find_initial_bounds(problem *p)
       printf( "            LB   %.3f\n", p->comp_times.lb_heurtime);
       printf( "  Total User Time    %.3f\n", total_time);
 #endif
-      if (p->mip->obj_sense == MAXIMIZE){
-	 printf( "Upper Bound: %.3f\n", -p->ub + p->mip->obj_offset);
-      }else{
- 	 printf( "Upper Bound: %.3f\n", p->ub + p->mip->obj_offset);
-      } 
+      if (p->has_ub){
+	 if (p->mip->obj_sense == MAXIMIZE){
+	    printf( "Lower Bound: %.3f\n", -p->ub + p->mip->obj_offset);
+	 }else{
+	    printf( "Upper Bound: %.3f\n", p->ub + p->mip->obj_offset);
+	 } 
+      }
       CALL_WRAPPER_FUNCTION( display_solution_u(p, 0) );
       if (p->par.tm_par.lp_machs)
 	 FREE(p->par.tm_par.lp_machs[0]);
@@ -752,7 +754,8 @@ int sym_solve(problem *p)
 	 printf( "****************************************************\n\n");
 
 	 print_statistics(&(p->comp_times.bc_time), &(p->warm_start->stat),
-			  p->ub, p->lb, 0, start_time);
+			  p->ub, p->lb, 0, start_time, p->mip->obj_offset,
+			  p->mip->obj_sense, p->has_ub);
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
 	 CALL_WRAPPER_FUNCTION( display_solution_u(p, p->tm->opt_thread_num) );
 #else
@@ -890,7 +893,8 @@ int sym_solve(problem *p)
 #ifdef COMPILE_IN_TM
    if (tm->lb > p->lb) p->lb = tm->lb;
    print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, p->lb, total_time,
-		    start_time);
+		    start_time, p->mip->obj_offset, p->mip->obj_sense,
+		    p->has_ub);
 
    temp = termcode;
 #ifdef COMPILE_IN_LP
@@ -900,7 +904,8 @@ int sym_solve(problem *p)
 #endif
 #else
    print_statistics(&(p->comp_times.bc_time), &(p->warm_start->stat), p->ub,
-		    p->lb, 0, start_time);
+		    p->lb, 0, start_time, p->mip->obj_offset,
+		    p->mip->obj_sense, p->has_ub);
    CALL_WRAPPER_FUNCTION( display_solution_u(p, 0) );
 #endif
    termcode = temp;

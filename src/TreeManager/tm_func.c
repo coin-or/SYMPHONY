@@ -334,8 +334,8 @@ int solve(tm_prob *tm)
 		(tm->par.node_limit ?
 		tm->stat.analyzed < tm->par.node_limit : TRUE) &&
 		((tm->has_ub && tm->par.gap_limit) ?
-		 100*(tm->ub-tm->lb)/tm->ub > tm->par.gap_limit : TRUE) &&
-		!(tm->par.find_first_feasible && tm->has_ub)){
+		 fabs(100*(tm->ub-tm->lb)/tm->ub) > tm->par.gap_limit : TRUE)
+		&& !(tm->par.find_first_feasible && tm->has_ub)){
 	    if (no_work == FALSE){
 	       no_work       = TRUE;
 	       no_work_start = wall_clock(NULL);
@@ -430,7 +430,7 @@ int solve(tm_prob *tm)
 	    break;
 	 }
 	 if (tm->has_ub && tm->par.gap_limit){
-	    if (100*(tm->ub-tm->lb)/tm->ub <= tm->par.gap_limit){
+	    if (fabs(100*(tm->ub-tm->lb)/tm->ub) <= tm->par.gap_limit){
 	       termcode = TM_NODE_LIMIT_EXCEEDED;
 	       break;
 	    }
@@ -604,10 +604,15 @@ void print_tree_status(tm_prob *tm)
    if (tm->lb >= MAXDOUBLE / 2){
       tm->lb = tm->ub;
    }
-   printf("Current lower bound:               %.2f\n", tm->lb);
+   if (tm->lpp[0]->mip->obj_sense == MAXIMIZE){
+      printf("Current lower bound:               %.2f\n", tm->lb);
+   }else{
+      printf("Current upper bound:               %.2f\n", -tm->lb);
+   }
+      
    if (tm->has_ub && tm->ub){
       printf("Current gap percentage:            %.2f\n",
-	     100*(tm->ub-tm->lb)/tm->ub);
+	     fabs(100*(tm->ub-tm->lb)/tm->ub));
    }
    printf("Elapsed time:                      %i\n", (int)(elapsed_time));
    printf("Estimated nodes remaining:         %i\n", num_nodes_estimate);
@@ -2139,7 +2144,8 @@ int tasks_before_phase_two(tm_prob *tm)
       printf( "**********************************************\n\n");
       
       print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, tm->lb, 0,
-		       tm->start_time);
+		       tm->start_time, tm->lpp[0]->mip->obj_offset,
+		       tm->lpp[0]->mip->obj_sense, tm->has_ub);
    }
 #else
    /* Report to the master all kind of statistics */

@@ -17,7 +17,7 @@
 /*===========================================================================*/
 
 /*===========================================================================*\
- * This file contains the main() for the master process.
+ * This file contains the main() for the SYMPHONY generic MIP solver.
 \*===========================================================================*/
 
 #if 1
@@ -28,8 +28,6 @@ int main(int argc, char **argv)
 {
    OsiSymSolverInterface si;
 
-   //si.setSymParam(OsiSymVerbosity, -1);
-
    /* Parse the command line */
    si.parseCommandLine(argc, argv);
    
@@ -38,6 +36,8 @@ int main(int argc, char **argv)
 
    /* Find a priori problem bounds */
    si.findInitialBounds();
+
+   si.setSymParam(OsiSymNodeLimit, 10);
 
    /* Solve the problem */
    si.branchAndBound();
