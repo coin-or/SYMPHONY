@@ -27,14 +27,10 @@
 ifeq ($(USE_SYM_APPL), TRUE)
 CONFIG_FILE_DIR = $(SYMPHONYROOT)
 else
-ifeq ($(SYM_EXAMPLE), TRUE)
-CONFIG_FILE_DIR = $(SYMPHONYROOT)
-else
 CONFIG_FILE_DIR = $(PWD)
 endif
-endif
 
-CONFIG_FILE = config.parallel
+CONFIG_FILE = config
 
 include $(CONFIG_FILE_DIR)/$(CONFIG_FILE)
 
@@ -55,7 +51,7 @@ endif
 
 ifeq ($(USE_OSI_INTERFACE),TRUE)
 OSISYM_INCDIR     = $(COINROOT)/Osi/OsiSym/include
-OSISYM_LIB        = -lOsiSym
+OSISYM_LIB        = OsiSym
 ifneq ($(LP_SOLVER),OSI)
 OSISYM_INCDIR     += $(COINROOT)/include
 OSISYM_LIBPATH    += $(COINROOT)/lib      
@@ -336,10 +332,10 @@ ifneq (${SHLINKPREFIX},)
 endif
 
 ifeq ($(CC),ompcc)
-	LIBS  = -lm -lompc -ltlog -lthread $(COMMLIBS) $(SYSLIBS) \
+	LIBS  = -lX11 -lm -lompc -ltlog -lthread $(COMMLIBS) $(SYSLIBS) \
 	$(USERLIBS)
 else
-	LIBS  = -lm $(SYSLIBS) $(USERLIBS) $(COMMLIBS) 
+	LIBS  = -lX11 -lm $(SYSLIBS) $(USERLIBS) $(COMMLIBS) 
 endif
 
 ifeq ($(OPT),-O)
