@@ -38,7 +38,7 @@
 # library. 
 ##############################################################################
 
-ARCH = CYGWIN
+ARCH = LINUX
 
 ##############################################################################
 # If you have PVM installed, this will set the variable ARCH automatically.
@@ -100,7 +100,7 @@ COINROOT = ${HOME}/COIN
 # (SHARED or STATIC) is to be created.
 ##############################################################################
 
-LIBTYPE = STATIC
+LIBTYPE = SHARED
 
 ##############################################################################
 ##############################################################################
@@ -343,6 +343,12 @@ SYM_COMPILE_IN_TM = TRUE
 # A bunch of other compile-time options
 ##############################################################################
 ##############################################################################
+
+##############################################################################
+# Compile in the sensitivity analysis features
+##############################################################################
+
+SENSITIVITY_ANALYSIS = FALSE
 
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ##############################################################################
@@ -658,12 +664,6 @@ LIBPATHS      = $(LIBDIR) $(X11LIBPATHS) $(COMMLIBPATHS) $(LPLIBPATHS) \
 LIBPATHS     += $(USERLIBPATHS)
 INCPATHS      = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR) $(OSISYM_INCDIR)
 
-ifeq ($(USE_SYM_APPL),TRUE)
-LIBNAME = sym_application
-else
-LIBNAME = sym
-endif
-
 EXTRAINCDIR   = $(addprefix -I,${INCPATHS})
 LDFLAGS       = $(addprefix -L,${LIBPATHS})
 ifneq (${SHLINKPREFIX},)
@@ -674,7 +674,7 @@ ifeq ($(CC),ompcc)
 	LIBS  = -lX11 -lm -lompc -ltlog -lthread $(COMMLIBS) $(SYSLIBS) \
 	$(USERLIBS)
 else
-	LIBS  = -lX11 -lm $(COMMLIBS) $(SYSLIBS) $(USERLIBS)
+	LIBS  = -lX11 -lm $(SYSLIBS) $(USERLIBS) $(COMMLIBS) 
 endif
 
 ifeq ($(OPT),-O)
@@ -748,17 +748,23 @@ QUANTIFY = $(QUANTIFYBIN) $(QFLAGS)
 ##############################################################################
 ##############################################################################
 
+ifeq ($(USE_SYM_APPL),TRUE)
+SYM_APPL = app_
+else
+SYM_APP = 
+endif
+
 ifeq ($(SYM_COMPILE_IN_CG),TRUE)
-LPEXT = _cg
+LPEXT = $(SYM_APP)_cg
 endif
 ifeq ($(SYM_COMPILE_IN_CP),TRUE)
-CPEXT = _cp
+CPEXT = $(SYM_APP)_cp
 endif
 ifeq ($(SYM_COMPILE_IN_LP),TRUE)
-TMEXT = _lp$(LPEXT)$(CPEXT)
+TMEXT = $(SYM_APP)_lp$(LPEXT)$(CPEXT)
 endif
 ifeq ($(SYM_COMPILE_IN_TM),TRUE)
-MASTEREXT = _tm$(TMEXT)
+MASTEREXT = $(SYM_APP)_m_tm$(TMEXT)
 endif
 ifeq ($(MASTERNAME),)
 MASTERNAME = symphony$(MASTEREXT)
@@ -809,6 +815,9 @@ SYSDEFINES += -DUSE_GLPMPL
 endif
 
 BB_DEFINES  = $(USER_BB_DEFINES)
+ifeq ($(SENSITIVITY_ANALYSIS),TRUE)
+BB_DEFINES += -DSENSITIVITY_ANALYSIS
+endif
 ifeq ($(ROOT_NODE_ONLY),TRUE)
 BB_DEFINES += -DROOT_NODE_ONLY
 endif
@@ -893,21 +902,7 @@ endif
 CFLAGS = $(DEFAULT_FLAGS) $(MORECFLAGS) $(MOREFLAGS)
 
 LD             = $(AR)
-LIBNAME_TYPE   = $(addsuffix .a, $(addprefix lib, $(LIBNAME)))
-RANLIB        += $(LIBDIR)/$(LIBNAME_TYPE)
 LIBLDFLAGS     =
-
-ifneq ($(USE_SYM_APPL),TRUE)
-ifeq ($(LIBTYPE),SHARED)
-LD = $(CC) $(OPT) 
-LIBNAME_TYPE      = $(addsuffix .so, $(addprefix lib, $(LIBNAME)))
-LIBLDFLAGS = -shared -Wl,-soname,$(LIBNAME_TYPE) -o
-RANLIB = 
-endif
-SYMLIBDIR  = $(SYMBUILDDIR)/lib
-MKSYMLIBDIR    = mkdir -p $(SYMLIBDIR)
-LN_S = ln -fs $(LIBDIR)/$(LIBNAME_TYPE) $(SYMLIBDIR)
-endif
 
 ##############################################################################
 ##############################################################################
@@ -1135,6 +1130,23 @@ USER_MASTER_DEP   = $(addprefix $(USER_DEPDIR)/,$(USER_MASTER_SRC:.c=.d))
 DEPENDANTS = $(USER_MASTER_DEP)
 OBJECTS = $(USER_MASTER_OBJS) $(MAIN_OBJ) 
 
+LIBNAME = sym$(MASTEREXT)
+ifneq ($(USE_SYM_APPL),TRUE)
+ifeq ($(LIBTYPE),SHARED)
+LIBNAME_TYPE      = $(addsuffix .so, $(addprefix lib, $(LIBNAME)))
+LD = $(CC) $(OPT) 
+LIBLDFLAGS = -shared -Wl,-soname,$(LIBNAME_TYPE) -o
+MAKELIB        = 
+endif
+LIBNAME_TYPE   = $(addsuffix .a, $(addprefix lib, $(LIBNAME)))
+SYMLIBDIR  = $(SYMBUILDDIR)/lib
+MKSYMLIBDIR    = mkdir -p $(SYMLIBDIR)
+LN_S = ln -fs $(LIBDIR)/$(LIBNAME_TYPE) $(SYMLIBDIR)
+else
+LIBNAME_TYPE   = $(addsuffix .a, $(addprefix lib, $(LIBNAME)))
+MAKELIB        = $(RANLIB) $(LIBDIR)/$(LIBNAME_TYPE)
+endif
+
 master : $(BINDIR)/$(MASTERNAME)
 	true
 
@@ -1170,7 +1182,7 @@ $(MAIN_OBJ) $(LIBDIR)/$(LIBNAME_TYPE)
 	@echo ""
 	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) $(MAIN_OBJ) \
-	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB) $(MASTERLPLIB)
+	$(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB) $(MASTERLPLIB) $(LIBS) 
 	@echo ""
 
 $(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS) $(GMPL_OBJ) 
@@ -1179,7 +1191,7 @@ $(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS) $(GMPL_OBJ)
 	@echo ""
 	mkdir -p $(LIBDIR)
 	$(LD) $(LIBLDFLAGS) $@ $(MASTER_OBJS) $(GMPL_OBJ)
-	$(RANLIB)
+	$(MAKELIB)
 	$(MKSYMLIBDIR)
 	$(LN_S)
 	@echo ""
@@ -1228,10 +1240,10 @@ DG_DEP  	= $(addprefix $(DEPDIR)/,$(ALL_DG:.c=.d))
 USER_DG_OBJS 	= $(addprefix $(USER_OBJDIR)/,$(notdir $(USER_DG_SRC:.c=.o)))
 USER_DG_DEP  	= $(addprefix $(USER_DEPDIR)/,$(USER_DG_SRC:.c=.d))
 
-dg : $(BINDIR)/dg
+dg : $(BINDIR)/symphony_dg
 	true
 
-dglib : $(LIBDIR)/libdg.a
+dglib : $(LIBDIR)/libsym_dg.a
 	true
 
 pdg : $(BINDIR)/pdg
@@ -1249,21 +1261,21 @@ dg_clean_user :
 	cd $(USER_DEPDIR)
 	rm -f $(USER_DG_DEP))
 
-$(BINDIR)/dg : $(USER_DG_DEP) $(USER_DG_OBJS) $(LIBDIR)/libdg.a
+$(BINDIR)/symphony_dg : $(USER_DG_DEP) $(USER_DG_OBJS) $(LIBDIR)/libsym_dg.a
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_DG_OBJS) -ldg $(LIBS) 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_DG_OBJS) -lsym_dg $(LIBS) 
 	@echo ""
 
-$(LIBDIR)/libdg.a : $(DG_DEP) $(DG_OBJS)
+$(LIBDIR)/libsym_dg.a : $(DG_DEP) $(DG_OBJS)
 	@echo ""
 	@echo "Making $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(LIBDIR)
-	$(AR) $(LIBDIR)/libdg.a $(DG_OBJS)
-	$(RANLIB) $(LIBDIR)/libdg.a
+	$(AR) $(LIBDIR)/libsym_dg.a $(DG_OBJS)
+	$(RANLIB) $(LIBDIR)/libsym_dg.a
 	@echo ""
 
 $(BINDIR)/pdg : $(USER_DG_DEP) $(USER_DG_OBJS) $(LIBDIR)/libdg.a
@@ -1295,10 +1307,10 @@ TM_DEP  	= $(addprefix $(DEPDIR)/,$(ALL_TM:.c=.d))
 USER_TM_OBJS 	= $(addprefix $(USER_OBJDIR)/,$(notdir $(USER_TM_SRC:.c=.o)))
 USER_TM_DEP  	= $(addprefix $(USER_DEPDIR)/,$(USER_TM_SRC:.c=.d))
 
-tm : $(BINDIR)/tm$(TMEXT)
+tm : $(BINDIR)/symphony_tm$(TMEXT)
 	true
 
-tmlib : $(LIBDIR)/libtm$(TMEXT).a
+tmlib : $(LIBDIR)/libsym_tm$(TMEXT).a
 	true
 
 ptm : $(BINDIR)/ptm$(TMEXT)
@@ -1322,22 +1334,22 @@ tm_clean_user :
 	cd $(USER_DEPDIR)
 	rm -f $(USER_TM_DEP))
 
-$(BINDIR)/tm$(TMEXT) : $(USER_TM_DEP) $(USER_TM_OBJS) $(LIBDIR)/libtm$(TMEXT).a
+$(BINDIR)/symphony_tm$(TMEXT) : $(USER_TM_DEP) $(USER_TM_OBJS) $(LIBDIR)/libsym_tm$(TMEXT).a
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_TM_OBJS) -ltm$(TMEXT) \
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_TM_OBJS) -lsym_tm$(TMEXT) \
 	$(TMLPLIB) $(LIBS)
 	@echo ""
 
-$(LIBDIR)/libtm$(TMEXT).a : $(TM_DEP) $(TM_OBJS)
+$(LIBDIR)/libsym_tm$(TMEXT).a : $(TM_DEP) $(TM_OBJS)
 	@echo ""
 	@echo "Making $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(LIBDIR)
-	$(AR) $(LIBDIR)/libtm$(TMEXT).a $(TM_OBJS)
-	$(RANLIB) $(LIBDIR)/libtm$(TMEXT).a
+	$(AR) $(LIBDIR)/libsym_tm$(TMEXT).a $(TM_OBJS)
+	$(RANLIB) $(LIBDIR)/libsym_tm$(TMEXT).a
 	@echo ""
 
 $(BINDIR)/ptm$(TMEXT) : $(USER_TM_DEP) $(USER_TM_OBJS) \
@@ -1388,10 +1400,10 @@ LP_DEP 		= $(addprefix $(DEPDIR)/,$(ALL_LP:.c=.d))
 USER_LP_OBJS 	= $(addprefix $(USER_OBJDIR)/,$(notdir $(USER_LP_SRC:.c=.o)))
 USER_LP_DEP 	= $(addprefix $(USER_DEPDIR)/,$(USER_LP_SRC:.c=.d))
 
-lp : $(BINDIR)/lp$(LPEXT)
+lp : $(BINDIR)/symphony_lp$(LPEXT)
 	true
 
-lplib : $(LIBDIR)/liblp$(LPEXT).a
+lplib : $(LIBDIR)/libsym_lp$(LPEXT).a
 	true
 
 plp : $(BINDIR)/plp$(LPEXT)
@@ -1421,22 +1433,22 @@ lp_clean_user :
 	cd $(USER_DEPDIR)
 	rm -f $(USER_LP_DEP))
 
-$(BINDIR)/lp$(LPEXT) : $(USER_LP_DEP) $(USER_LP_OBJS) $(LIBDIR)/liblp$(LPEXT).a
+$(BINDIR)/symphony_lp$(LPEXT) : $(USER_LP_DEP) $(USER_LP_OBJS) $(LIBDIR)/libsym_lp$(LPEXT).a
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_LP_OBJS) -llp$(LPEXT) \
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_LP_OBJS) -lsym_lp$(LPEXT) \
 	$(LPLIB) $(LIBS)
 	@echo ""
 
-$(LIBDIR)/liblp$(LPEXT).a : $(LP_DEP) $(LP_OBJS)
+$(LIBDIR)/libsym_lp$(LPEXT).a : $(LP_DEP) $(LP_OBJS) $(GMPL_OBJ) 
 	@echo ""
 	@echo "Making $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(LIBDIR)
-	$(AR) $(LIBDIR)/liblp$(LPEXT).a $(LP_OBJS)
-	$(RANLIB) $(LIBDIR)/liblp$(LPEXT).a
+	$(AR) $(LIBDIR)/libsym_lp$(LPEXT).a $(LP_OBJS) $(GMPL_OBJ) 
+	$(RANLIB) $(LIBDIR)/libsym_lp$(LPEXT).a
 	@echo ""
 
 $(BINDIR)/plp$(LPEXT) : $(USER_LP_DEP) $(USER_LP_OBJS) \
@@ -1486,10 +1498,10 @@ CP_DEP  	= $(addprefix $(DEPDIR)/,$(ALL_CP:.c=.d))
 USER_CP_OBJS 	= $(addprefix $(USER_OBJDIR)/,$(notdir $(USER_CP_SRC:.c=.o)))
 USER_CP_DEP  	= $(addprefix $(USER_DEPDIR)/,$(USER_CP_SRC:.c=.d))
 
-cp : $(BINDIR)/cp
+cp : $(BINDIR)/symphony_cp
 	true
 
-cplib : $(LIBDIR)/libcp.a
+cplib : $(LIBDIR)/libsym_cp.a
 	true
 
 pcp : $(BINDIR)/pcp
@@ -1513,12 +1525,12 @@ cp_clean_user :
 	cd $(USER_DEPDIR)
 	rm -f $(USER_CP_DEP))
 
-$(BINDIR)/cp : $(USER_CP_DEP) $(USER_CP_OBJS) $(LIBDIR)/libcp.a
+$(BINDIR)/symphony_cp : $(USER_CP_DEP) $(USER_CP_OBJS) $(LIBDIR)/libsym_cp.a
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_CP_OBJS) -lcp $(LIBS) 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_CP_OBJS) -lsym_cp $(LIBS) 
 	@echo ""
 
 $(LIBDIR)/libcp.a : $(CP_DEP) $(CP_OBJS)
@@ -1526,8 +1538,8 @@ $(LIBDIR)/libcp.a : $(CP_DEP) $(CP_OBJS)
 	@echo "Making $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(LIBDIR)
-	$(AR) $(LIBDIR)/libcp.a $(CP_OBJS)
-	$(RANLIB) $(LIBDIR)/libcp.a
+	$(AR) $(LIBDIR)/libsym_cp.a $(CP_OBJS)
+	$(RANLIB) $(LIBDIR)/libsym_cp.a
 	@echo ""
 
 $(BINDIR)/pcp : $(USER_CP_DEP) $(USER_CP_OBJS) $(LIBDIR)/libcp.a
@@ -1574,10 +1586,10 @@ CG_DEP  = $(addprefix $(DEPDIR)/,$(ALL_CG:.c=.d))
 USER_CG_OBJS = $(addprefix $(USER_OBJDIR)/,$(notdir $(USER_CG_SRC:.c=.o)))
 USER_CG_DEP  = $(addprefix $(USER_DEPDIR)/,$(USER_CG_SRC:.c=.d))
 
-cg : $(BINDIR)/cg
+cg : $(BINDIR)/symphony_cg
 	true
 
-cglib : $(LIBDIR)/libcg.a
+cglib : $(LIBDIR)/libsym_cg.a
 	true
 
 pcg : $(BINDIR)/pcg
@@ -1601,21 +1613,21 @@ cg_clean_user :
 	cd $(USER_DEPDIR)
 	rm -f $(USER_CG_DEP))
 
-$(BINDIR)/cg : $(USER_CG_DEP) $(USER_CG_OBJS) $(LIBDIR)/libcg.a
+$(BINDIR)/symphony_cg : $(USER_CG_DEP) $(USER_CG_OBJS) $(LIBDIR)/libsym_cg.a
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_CG_OBJS) -lcg $(LPLIB) $(LIBS) 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_CG_OBJS) -lsym_cg $(LPLIB) $(LIBS) 
 	@echo ""
 
-$(LIBDIR)/libcg.a : $(CG_DEP) $(CG_OBJS)
+$(LIBDIR)/libsym_cg.a : $(CG_DEP) $(CG_OBJS)
 	@echo ""
 	@echo "Making $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(LIBDIR)
-	$(AR) $(LIBDIR)/libcg.a $(CG_OBJS)
-	$(RANLIB) $(LIBDIR)/libcg.a
+	$(AR) $(LIBDIR)/libsym_cg.a $(CG_OBJS)
+	$(RANLIB) $(LIBDIR)/libsym_cg.a
 	@echo ""
 
 $(BINDIR)/pcg : $(USER_CG_DEP) $(USER_CG_OBJS) $(LIBDIR)/libcg.a
