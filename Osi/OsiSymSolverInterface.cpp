@@ -95,7 +95,7 @@ bool OsiSymSolverInterface::setIntParam(OsiIntParam key, int value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::setSymIntParam(OsiSymIntParam key, int value)
+bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
 {
    switch(key){
 
@@ -142,7 +142,7 @@ bool OsiSymSolverInterface::setDblParam(OsiDblParam key, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::setSymDblParam(OsiSymDblParam key, double value)
+bool OsiSymSolverInterface::setSymParam(OsiSymDblParam key, double value)
 {
    switch(key){
 
@@ -188,7 +188,7 @@ bool OsiSymSolverInterface::setStrParam(OsiStrParam key,
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::setSymStrParam(OsiSymStrParam key, 
+bool OsiSymSolverInterface::setSymParam(OsiSymStrParam key, 
 					   const std::string & value)
 {
    switch(key){
@@ -221,7 +221,7 @@ bool OsiSymSolverInterface::getIntParam(OsiIntParam key, int& value) const
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::getSymIntParam(OsiSymIntParam key, int& value)
+bool OsiSymSolverInterface::getSymParam(OsiSymIntParam key, int& value)
      const
 {
    switch(key){
@@ -270,7 +270,7 @@ bool OsiSymSolverInterface::getDblParam(OsiDblParam key, double& value) const
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::getSymDblParam(OsiSymDblParam key, 
+bool OsiSymSolverInterface::getSymParam(OsiSymDblParam key, 
 					   double& value) const
 {
    switch(key){
@@ -317,7 +317,7 @@ bool OsiSymSolverInterface::getStrParam(OsiStrParam key,
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::getSymStrParam(OsiSymStrParam key, 
+bool OsiSymSolverInterface::getSymParam(OsiSymStrParam key, 
 					   std::string& value) const
 {
    switch(key){
@@ -355,6 +355,16 @@ void OsiSymSolverInterface::findInitialBounds()
 
    sym_find_initial_bounds(env_);
 
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int OsiSymSolverInterface::createPermanentCutPools()
+{
+
+   return(sym_create_permanent_cut_pools(env_));
+   
 }
 
 /*===========================================================================*/
@@ -1693,7 +1703,7 @@ bool OsiSymSolverInterface::setWarmStart(const CoinWarmStart* warmstart)
 {
 
    CoinWarmStart * wsC = const_cast<CoinWarmStart*> (warmstart);
-   const SymWarmStart *symWS = dynamic_cast<SymWarmStart*>(wsC);
+   SymWarmStart *symWS = dynamic_cast<SymWarmStart*>(wsC);
    
    warm_start_desc * ws  = 
       const_cast<warm_start_desc*>(symWS->getWarmStartDesc());

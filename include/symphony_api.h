@@ -20,6 +20,7 @@
 #include "proto.h"
 #include "master.h"
 #include "lp_solver.h"
+#include "messages.h"
 
 /*===========================================================================*/
 /*===================== Interface functions (master.c) ======================*/

@@ -790,7 +790,7 @@ CFLAGS = $(DEFAULT_FLAGS) $(MORECFLAGS) $(MOREFLAGS)
 
 MASTER_SRC	= master.c master_wrapper.c master_io.c
 ifeq ($(USE_OSI_INTERFACE),TRUE)
-MASTER_SRC     += OsiSymSolverInterface.c
+MASTER_SRC     += OsiSymSolverInterface.c SymWarmStart.c
 endif
 DG_SRC		= draw_graph.c
 
