@@ -193,11 +193,11 @@ endif
 # GLPMPL definitions
 ##############################################################################
 
-USE_GLPMPL = TRUE
+USE_GLPMPL = FALSE
 
 ifeq ($(USE_GLPMPL),TRUE)
-        LPINCDIR += ${HOME}/src/glpk-4.7/include
-        LPLIBPATHS += ${HOME}/src/glpk-4.7/src
+        LPINCDIR += ${HOME}/glpk-4.7/include
+        LPLIBPATHS += ${HOME}/glpk-4.7/src
         LPLIB += -lglpk
 endif
 
