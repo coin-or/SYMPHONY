@@ -1129,7 +1129,7 @@ EXIT:
        case 'N':
 	 sscanf(argv[++i], "%i", &vrp->numroutes);
 	 break;
-       case 'T':
+       case 'R':
 	 par->tsp_prob = TRUE;
 	 break;
        case 'C':
@@ -1140,6 +1140,15 @@ EXIT:
 	 par->bpp_prob = TRUE;
 	 break;
 /*___END_EXPERIMENTAL_SECTION___*/
+       case 'T':
+	 par->test = TRUE;
+	 if(i+1 < argc){
+	   sscanf(argv[i+1], "%c", &tmp);
+	   if(tmp != '-'){
+	     strncpy(par->test_dir, argv[++i],MAX_FILE_NAME_LENGTH);
+	   }
+	 }
+	 break;
       };
    }
 
