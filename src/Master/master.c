@@ -418,6 +418,15 @@ int sym_load_problem(problem *p)
 
    CALL_WRAPPER_FUNCTION( initialize_root_node_u(p) );
 
+   if (p->par.tm_par.node_selection_rule == BEST_FIRST_SEARCH){
+      switch (p->mip->obj_sense){
+       case MAXIMIZE:
+	  p->par.tm_par.node_selection_rule = HIGHEST_LP_FIRST;
+       case MINIMIZE:
+	  p->par.tm_par.node_selection_rule = LOWEST_LP_FIRST;
+      }
+   }
+   
    p->comp_times.readtime = used_time(&t);
 
    p->termcode = TM_NO_SOLUTION;
@@ -1280,14 +1289,18 @@ int sym_mc_solve(problem *p)
 	       ub = MAX(gamma*(solutions[i].obj[0] - utopia[0]),
 			tau*(solutions[i].obj[1] - utopia[1]));
 	    }else{
-	       ub = gamma*solutions[i].obj[0] + tau*solutions[i].obj[1];
+	       ub = gamma*solutions[i].obj[0] + tau*solutions[i].obj[1] +
+		  p->par.lp_par.mc_rho * (solutions[i].obj[0] +
+					  solutions[i].obj[1]);
 	    }
-	    if (ub < p->ub){
+	    if (ub + p->par.lp_par.mc_rho * (solutions[i].obj[0] +
+					     solutions[i].obj[1]) < p->ub){
 	       p->has_mc_ub = p->has_ub = TRUE;
-	       p->ub = ub - compare_sol_tol;
+	       p->ub = ub + p->par.lp_par.mc_rho *
+		  (solutions[i].obj[0] + solutions[i].obj[1]) - compare_sol_tol;
 	       p->obj[0] = solutions[i].obj[0];
 	       p->obj[1] = solutions[i].obj[1];
-	       p->mc_ub = ub - p->par.lp_par.mc_rho * (p->obj[0] + p->obj[1]);
+	       p->mc_ub = ub;
 	    }
 	 }
       }

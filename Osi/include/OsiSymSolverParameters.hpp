@@ -22,6 +22,7 @@ enum OsiSymIntParam {
    OsiSymWarmStart,
    OsiSymNodeLimit,
    OsiSymFindFirstFeasible,
+   OsiSymSearchStrategy,
    OsiSymUsePermanentCutPools,
    OsiSymKeepDescOfPruned,
    OsiSymMultiCriteriaFindNondominatedSolutions,

@@ -3066,7 +3066,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       }else{
 	 *cuts = (cut_data **)malloc(cutlist.sizeRowCuts()*sizeof(cut_data *));
       }
-      for (i = 0, j = 0; i < cutlist.sizeRowCuts(); i++){
+      for (i = 0, j = *num_cuts; i < cutlist.sizeRowCuts(); i++){
 	 int num_elements;
 	 int *indices;
 	 double *elements;
@@ -3099,7 +3099,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	    (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
 	 }	    
       }
-      *num_cuts += j;
+      *num_cuts = j;
    }
    
    delete gomory;

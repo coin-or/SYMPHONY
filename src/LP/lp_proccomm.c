@@ -523,10 +523,10 @@ void send_node_desc(lp_prob *p, char node_type)
       FREE(n->duals);
    }
    n->sol = (double *) malloc (DSIZE * p->desc->uind.size);
-   memcpy(n->sol, lp_data->x, sizeof(double)*p->desc->uind.size);
+   memcpy(n->sol, lp_data->x, DSIZE*p->desc->uind.size);
    
    n->duals = (double *) malloc (DSIZE * p->base.cutnum);
-   memcpy(n->duals, lp_data->dualsol, sizeof(double)*p->base.cutnum);
+   memcpy(n->duals, lp_data->dualsol, DSIZE*p->base.cutnum);
    
    /* SensAnalysis */
    
@@ -1252,9 +1252,7 @@ char pack_extra_diff(array_desc *olddesc, int *oldstat,
    
 /*===========================================================================*/
 
-void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep, 
-			 double **solution, double **duals)   
-     /*SensAnalysis */
+void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep) 
 {
    LPdata *lp_data = p->lp_data;
 #ifndef COMPILE_IN_LP
@@ -1298,16 +1296,11 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep,
 #endif
       
    dive = generate_children(tm, node, bobj, can->objval, can->feasible,
-			    action, dive, keep, i, solution, duals); /* SensAnalysis */
-   for (i = 0; i < can->child_num; i++){
-      FREE(solution[i]);
-      FREE(duals[i]);
-   }
-   FREE(solution);
-   FREE(duals);
-   
+			    action, dive, keep, i);
+
    if (*keep >= 0 && (p->dive == CHECK_BEFORE_DIVE || p->dive == DO_DIVE)){
       *can = node->bobj;
+
 #ifndef MAX_CHILDREN_NUM
       can->sense = malloc(can->child_num);
       can->rhs = (double *) malloc(can->child_num * DSIZE);
@@ -1340,7 +1333,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep,
    if (*keep < 0){
       can->child_num = 0;
    }
-   
+
 #else
 
    s_bufid = init_send(DataInPlace);

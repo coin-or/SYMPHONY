@@ -132,6 +132,7 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
     case OsiSymVerbosity:
        sym_set_int_param(env_, "verbosity", value);
        return true;
+
     case OsiSymWarmStart:
        sym_set_int_param(env_, "warm_start", value);
        return true;
@@ -144,6 +145,10 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
        sym_set_int_param(env_, "find_first_feasible", value);
        return true;
        
+   case OsiSymSearchStrategy:
+      sym_set_int_param(env_, "node_selection_strategy");
+      return true;
+
     case OsiSymUsePermanentCutPools:
        sym_set_int_param(env_, "use_permanent_cut_pools", value);
        return true;

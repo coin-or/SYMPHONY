@@ -502,6 +502,7 @@
 #define HIGHEST_LP_FIRST      1
 #define BREADTH_FIRST_SEARCH  2
 #define DEPTH_FIRST_SEARCH    3
+#define BEST_FIRST_SEARCH     4
 
 /*-------------------------- diving_strategy --------------------------------*/
 #define BEST_ESTIMATE         0

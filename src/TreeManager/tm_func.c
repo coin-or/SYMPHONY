@@ -976,8 +976,7 @@ int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
 
 int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		      double *objval, int *feasible, char *action,
-		      char olddive, int *keep, int new_branching_cut,
-		      double **solution, double **duals) /* SensAnalysis */
+		      char olddive, int *keep, int new_branching_cut)
 {
    node_desc *desc;
    int np_cp = 0, np_sp = 0;
@@ -1055,6 +1054,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		   child->bc_index, child->bc_level);
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 }
+
 	 child->node_status = NODE_STATUS__PRUNED;
 #ifdef TRACE_PATH
 	 if (child->optimal_path){
@@ -1101,6 +1101,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       }
       child->lower_bound = objval[i];
       child->parent = node;
+
       /* child->children = NULL;   zeroed out by calloc */
       /* child->child_num = 0;   zeroed out by calloc */
       /* child->died = 0;   zeroed out by calloc */
@@ -1154,29 +1155,37 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       desc->desc = node->desc.desc;
       desc->nf_status = node->desc.nf_status;
 
+
       /*SensAnalysis*/
+
+      //      child->sol = bobj->solutions[i];
+      //      child->duals = bobj->duals[i];
+
+      /*SensAnalysis*/
+
       child->sol = 
-	 (double *) malloc (DSIZE * tm->rootnode->desc.uind.size);
-      memcpy(child->sol, solution[i], DSIZE*tm->rootnode->desc.uind.size);
+      	 (double *) malloc (DSIZE * tm->rootnode->desc.uind.size);
+      memcpy(child->sol, node->bobj.solutions[i], 
+	     DSIZE*tm->rootnode->desc.uind.size);
 
       child->duals = 
 	 (double *) malloc (DSIZE * tm->bcutnum);
-      memcpy(child->duals, duals[i], DSIZE*tm->bcutnum);
+      memcpy(child->duals,node->bobj.duals[i] , DSIZE*tm->bcutnum);
+
 
       if (child->node_status == NODE_STATUS__PRUNED){
-	 if(feasible[i] || action[i]==PRUNE_THIS_CHILD_FATHOMABLE){
-	    if(feasible[i]){
-	       child->feasibility_status = FEASIBLE_PRUNED;	   	    
-	    }
-	    else{
-	       child->feasibility_status = OVER_UB_PRUNED;
-	    }
-	 }	 
-	 if(action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
-	    child->feasibility_status = INFEASIBLE_PRUNED;	   
-	 }
-	 /*SensAnalysis*/
 
+	 child->feasibility_status = OVER_UB_PRUNED;	   
+
+	 if(feasible[i]){
+	    child->feasibility_status = FEASIBLE_PRUNED;	   	    
+	 }
+	 if(action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
+	    child->feasibility_status = INFEASIBLE_PRUNED;
+	 }
+	 
+	 /*SensAnalysis*/
+	 
 #ifdef TRACE_PATH
 	 if (child->optimal_path){
 	    printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
@@ -2972,10 +2981,12 @@ void free_subtree(bc_node *n)
 
 void free_tree_node(bc_node *n)
 {
-   /* SensAnalysis */
+
+   int i;
+  /* SensAnalysis */
    FREE(n->sol);
    FREE(n->duals);
-   /*SensAnalysis*/
+    /*SensAnalysis*/
 
    FREE(n->children);
 #ifndef MAX_CHILDREN_NUM

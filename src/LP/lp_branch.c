@@ -112,10 +112,8 @@ int add_violated_slacks(lp_prob *p, int cand_num, branch_obj **candidates)
 
 /*===========================================================================*/
 
-int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate, 
-			    double ***solution, double ***duals)
+int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 {
-   /* SensAnalysis*/
 
    LPdata *lp_data = p->lp_data;
    var_desc **vars;
@@ -241,32 +239,30 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate,
    /* Look at the candidates one-by-one and presolve them. */
    oldobjval = lp_data->objval;
 
-
-   /* SensAnalysis */
-#ifndef MAX_CHILDREN_NUM
-   *solution = (double **) malloc (maxnum * sizeof(double *));
-   *duals = (double **) malloc (maxnum * sizeof(double *));
-#else
-   *solution = (double **) malloc (MAX_CHILDREN_NUM * sizeof(double *));
-   *duals = (double **) malloc (MAX_CHILDREN_NUM * sizeof(double *));
-
-#endif
-   /* SensAnalysis */
-
    for (i=0; i<cand_num; i++){
 
       can = candidates[i];
+
 #ifndef MAX_CHILDREN_NUM
       can->objval = pobj;
       can->termcode = pterm;
       can->feasible = pfeas;
       can->iterd = piter;
+   /* SensAnalysis */
+      can->solutions = (double **)calloc(maxnum, sizeof(double *));
+      can->duals = (double **)calloc(maxnum, sizeof(double *));
 #ifdef COMPILE_FRAC_BRANCHING
       can->frac_num = pfrnum;
       can->frac_ind = pfrind;
       can->frac_val = pfrval;
 #endif
+   /* SensAnalysis */
+#else
+      can->solutions = (double **) calloc 
+	 (MAX_CHILDREN_NUM, sizeof(double *));
+      can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
 #endif
+
 #ifdef STATISTICS
       cnum += can->child_num;
 #endif
@@ -304,6 +300,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate,
 	    }
 	    check_ub(p);
 	    /* The original basis is in lp_data->lpbas */
+
 	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
 	    can->objval[j] = lp_data->objval;
 
@@ -311,11 +308,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate,
 	    get_x(lp_data);
 	    get_dj_pi(lp_data);
 
-	    (*solution)[j] = (double *)malloc(DSIZE*lp_data->n);
-	    (*duals)[j]=(double *)malloc(DSIZE*p->base.cutnum);
-
-	    memcpy((*solution)[j], lp_data->x, DSIZE*lp_data->n);
-	    memcpy((*duals)[j], lp_data->dualsol, DSIZE*p->base.cutnum);
+	    can->solutions[j] = (double *)calloc(DSIZE,lp_data->n);
+	    can->duals[j] = (double *)calloc(DSIZE,p->base.cutnum);
+	    
+	    memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+	    memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
 
 	    /* SensAnalysis */
 
@@ -391,11 +388,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate,
 	    get_x(lp_data);
 	    get_dj_pi(lp_data);
 
-	    (*solution)[j] = (double *)malloc(DSIZE*p->desc->uind.size);
-	    (*duals)[j]=(double *)malloc(DSIZE*p->base.cutnum);
-
-	    memcpy((*solution)[j], lp_data->x, DSIZE*p->desc->uind.size);
-	    memcpy((*duals)[j], lp_data->dualsol, DSIZE*p->base.cutnum);
+	    can->solutions[j] = (double *)malloc(DSIZE*lp_data->n);
+	    can->duals[j] = (double *)malloc(DSIZE*p->base.cutnum);
+	    
+	    memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+	    memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
 
 	    /* SensAnalysis */
 
@@ -561,12 +558,8 @@ int branch(lp_prob *p, int cuts)
    node_desc *desc;
    int termcode;
 
-   /* SensAnalysis */
-   double **solution;
-   double **duals;
- 
-   termcode = select_branching_object(p, &cuts, &can, &solution, &duals);
-  /* SensAnalysis */
+   termcode = select_branching_object(p, &cuts, &can);
+
    if (termcode == ERROR__NO_BRANCHING_CANDIDATE){
       return(termcode);
    }
@@ -596,9 +589,7 @@ int branch(lp_prob *p, int cuts)
    /* Send the branching information to the TM and inquire whether we
       should dive */
    p->comp_times.strong_branching += used_time(&p->tt);
-   /* SensAnalysis */
-   send_branching_info(p, can, action, &keep, solution, duals);
-   /* SensAnalysis */
+   send_branching_info(p, can, action, &keep);
    p->comp_times.communication += used_time(&p->tt);
 
    /* If we don't dive then return quickly */

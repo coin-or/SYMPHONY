@@ -764,10 +764,8 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    oldkeep = keep;
    lp = node->lp;
    
-   /*SensAnalysis */
    dive = generate_children(tm, node, bobj, objval, feasible, action, olddive,
-			    &keep, new_branching_cut, solution, duals); 
-   /*SensAnalysis */
+			    &keep, new_branching_cut); 
 
    if (oldkeep >= 0 && (olddive == CHECK_BEFORE_DIVE || olddive == DO_DIVE)){
       /* We have to reply */

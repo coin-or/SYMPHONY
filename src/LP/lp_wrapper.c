@@ -1903,7 +1903,7 @@ int generate_cuts_in_lp_u(lp_prob *p)
       /* Test whether any of the new cuts are identical to any of
          the old ones. */
       if (p->waiting_row_num && new_row_num){
-	 for (i = 0, deleted_cut = FALSE; i < new_row_num - 1;
+	 for (i = 0, deleted_cut = FALSE; i < new_row_num;
 	      deleted_cut = FALSE){
 	    for (j = p->waiting_row_num - 1; j >= 0; j--){
 	       if (same_cuts_u(p, p->waiting_rows[j], new_rows[i]) !=

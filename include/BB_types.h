@@ -228,12 +228,18 @@ typedef struct BRANCH_OBJ{
    int           termcode[MAX_CHILDREN_NUM];
    int           iterd[MAX_CHILDREN_NUM];
    int           feasible[MAX_CHILDREN_NUM];
+
 #else
    double       *objval;   /* arrays of size 'number' */
    int          *termcode;
    int          *iterd;
    int          *feasible;
+
 #endif
+
+   /* Sens Analysis */
+   double      **solutions;
+   double      **duals;
 
 #endif
 }branch_obj;
@@ -320,7 +326,6 @@ typedef struct BC_NODE{
    double       C_LP;
    double       B_IP;
    /*SensAnalysis*/
-
 
 #ifdef TRACE_PATH
    char       optimal_path;
