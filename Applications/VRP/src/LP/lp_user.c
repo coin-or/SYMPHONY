@@ -331,7 +331,7 @@ int user_display_lp_solution(void *user, int which_sol, int varnum,
 				       CTOI_WAIT_FOR_CLICK_AND_REPORT);
 #endif
    }
-   return(DISP_NOTHING);
+   return(DISP_NZ_INT);
 }
 
 /*===========================================================================*/

@@ -371,15 +371,16 @@ int user_process_own_messages(void *user, int msgtag)
  * manner desired. 
 \*===========================================================================*/
 
-int user_display_solution(void *user, int length, int *xind, double *xval)
+int user_display_solution(void *user, double lpetol, int varnum,
+			  int *indices, double *values, double objval)
 {
    spp_problem *spp = (spp_problem *)user;
    int *colnames = spp->cmatrix->colnames;
    int i;
 
    printf("\nBest Solution Found:\n");
-   for (i = 0; i < length; i++)
-      printf("%i \n", colnames[xind[i]]);
+   for (i = 0; i < varnum; i++)
+      printf("%i \n", colnames[indices[i]]);
    printf("\n\n\n");
    
    return(USER_NO_PP);
