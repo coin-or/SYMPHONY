@@ -53,8 +53,7 @@ and the overall design and use of \BB.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Compiling the SYMPHONY Library and Executable with Unix 
-Operating Systems}
+\section{Compiling the Library and Executable in Unix}
 
 \label{getting_started_unix}
 
@@ -166,9 +165,11 @@ can also be modified to enable parallel execution of the code (see below).
 \item To test \BB, a sample MPS file called \texttt{sample.mps} is 
 included with the distribution. To specify the file name, use the 
 \texttt{-F} command-line option, i.e., type 
-\texttt{bin.\$(ARCH)/\$(LP\_SOLVER)/symphony -F sample.mps} in the
-\texttt{SYMPHONY-5.0} subdirectory. To obtain more MPS data files for further
-testing, download the \texttt{MIPLIB} library.
+\begin{verbatim}
+bin.$(ARCH)/$(LP_SOLVER)/symphony -F sample.mps 
+\end{verbatim}
+in the \texttt{SYMPHONY-5.0} subdirectory. To obtain more MPS data files for
+further testing, download the \texttt{MIPLIB} library.
 
 \item That's it! Now you are ready to use \BB\ callable library or 
 solve generic MILP problems through the executable.
@@ -282,7 +283,7 @@ from Oak Ridge National Laboratories
 %get lost, consult the source code for the sample application to see
 %how it's done.
 
-\section{Compiling the SYMPHONY Library and Executable with Microsoft Windows}
+\section{Compiling the Library and Executable in Windows}
 \label{getting_started_windows}
 
 Here is a sketch outline of how to compile \BB\ in MS Windows. Direct
@@ -487,30 +488,30 @@ run in sequential mode for a variety of reasons. However, it should be
 relatively easy to get it running in parallel if you can get PVM working under
 Windows. Let me know if you are interested.
 
-\section{Using SYMPHONY}
+%\section{Using SYMPHONY}
 
-\subsection{Using the SYMPHONY executable}
+%\subsection{Using the SYMPHONY executable}
 
-To use SYMPHONY as a generic solver, type the executable name followed by one
-or more of the command-line switches. There are two required switches. You
-must specify the location of the input file by using ``-F 'filename'.'' This
-input file is assumed to be in MPS format, unless the ``-D'' switch is also
-present, in which case the file will be assumed to be in GMPL model file
-format with the data file specified after the ``-D'' switch. Some of
-SYMPHONY's native parameters can also be set on the command line. Below is a
-list of these parameters. This list can also be obtained by typing the
-executable name with no command-line arguments. Note that all SYMPHONY
-parameters are denoted by a lowercase letter. Note that there are dozens of
-other parameters that can be set with the use of a parameter file. These
-parameters are listed in the SYMPHONY user's manual.
+%To use SYMPHONY as a generic solver, type the executable name followed by one
+%or more of the command-line switches. There are two required switches. You
+%must specify the location of the input file by using ``-F 'filename'.'' This
+%input file is assumed to be in MPS format, unless the ``-D'' switch is also
+%present, in which case the file will be assumed to be in GMPL model file
+%format with the data file specified after the ``-D'' switch. Some of
+%SYMPHONY's native parameters can also be set on the command line. Below is a
+%list of these parameters. This list can also be obtained by typing the
+%executable name with no command-line arguments. Note that all SYMPHONY
+%parameters are denoted by a lowercase letter. Note that there are dozens of
+%other parameters that can be set with the use of a parameter file. These
+%parameters are listed in the SYMPHONY user's manual.
 
-\subsection{Using the SYMPHONY callable library}
+%\subsection{Using the SYMPHONY callable library}
 
-To use SYMPHONY as a generic callable library, compile SYMPHONY as described
-above. The library that is created along with the solver itself can be linked
-to using the API described Section \ref{callable-library}. As an example of
-using the callable library in this way, see the multi-criteria knapsack
-application (MCKP).
+%To use SYMPHONY as a generic callable library, compile SYMPHONY as described
+%above. The library that is created along with the solver itself can be linked
+%to using the API described Section \ref{callable-library}. As an example of
+%using the callable library in this way, see the multi-criteria knapsack
+%application (MCKP).
 
 \section{Compiling a Custom Application Using Callbacks}
 

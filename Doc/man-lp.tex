@@ -3,6 +3,7 @@
 \label{user-written-lp}
 
 \subsubsection{Data Structures}
+\label{data_structures}
 
 We first describe a few structures that are used to pass
 data into and out of the user functions of the LP module.
@@ -82,7 +83,8 @@ for each column.
 column. 
 \item [\texttt{double *matval} --] The array containing the matrix values for
 each column.
-\item [\texttt{double *obj} --] The objective function coefficients.
+\item [\texttt{double *obj} --] The objective function coefficients for the second objective (for multicriteria solve).
+\item [\texttt{double *obj2} --] The objective function coefficients.
 \item [\texttt{double *rhs} --] The right hand side values for the
 constraints. 
 \item [\texttt{double *rngval} --] The range values for the constraints

@@ -1,7 +1,20 @@
 
-\subsection{C Interface}
 \label{C_Interface}
 
+This chapter specifies the interface for using SYMPHONY's callable
+library. These function calls can be used to build custom applications that
+call SYMPHONY as a subroutine, as described in Section
+\ref{callable_library}. All callable library function begin with the
+prefix {\tt sym\_}. To call these function from an application, include the
+header file {\tt symphony\_api.h} and then link with the SYMPHONY library as
+described \hyperref{here}{in Section}{}{getting_started}. In general, if an
+array is requested, such as the aray of lower bounds on the variables, for
+instance, the user is responsible for allocating an array of appropriate size
+and passing it to SYMPHONY. SYMPHONY will then fill up the array.
+
+\newpage
+
+\subsection{Primary Interface Functions}
 %begin{description}
 \bd
 
@@ -18,7 +31,9 @@ sym_environment *sym_open_environment()
 \describe
 
 This routine is used to get a new SYMPHONY environment to be passed as an 
-argument to all other API subroutines. 
+argument to all other API subroutines. This routne also invokes the callback
+function \hyperref{{\tt user\_initialize()}} {{\tt user\_initialize()} (see
+Section }{)}{user_initialize}.
 
 \returns
 
@@ -32,34 +47,33 @@ other API subroutines can be called after this point.\\
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_set_defaults
+% sym_create_copy_environment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{sym\_set\_defaults}
+\functiondef{sym\_create\_copy\_environment}
 \begin{verbatim}
-int sym_set_defaults(sym_environment *env)
+sym\_environment *sym_create_copy_environment(sym_environment *env)
 \end{verbatim}
 
 \bd
 \describe
 
-This routine sets all the environment variables and parameters
-to their default values. 
+This routine is used to copy the given environment.
 
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment to 
-be modified. 
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
-\et
+{tt NULL} & An empty environment is passed in. \\
+{\tt SYM\_ENVIRONMENT *} & Pointer to the copy of the environment. \\
+\et  
 \ed
+
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -67,6 +81,7 @@ be modified.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_parse\_command\_line}
+\label{sym_parse_command_line}
 \begin{verbatim}
 int sym_parse_command_line(sym_environment *env, int argc, char **argv)
 \end{verbatim}
@@ -74,10 +89,13 @@ int sym_parse_command_line(sym_environment *env, int argc, char **argv)
 \bd
 \describe
 
-This routine reads in the command line arguments. It has to be called when 
-problem description is to be given in MPS, GMPL/AMPL or user defined format 
-or a parameter (parameter file) is desired to be set (read in) 
-by the command line.  
+This routine parses the command line arguments. It must be called whenever the
+user specifies any of SYMPHONY's built-in command-line switches. For instance,
+this is the case when the user specifies the location of an MPS or GMPL file
+using the \texttt{-F} switch or when the user specifies the location of a
+parameter file with the \texttt{-f} switch. This command also invokes the user
+callback function \hyperref{{\tt user\_readparams()}} {{\tt
+user\_readparams()} (see Section }{)}{user_readparams}.
 
 \args
 
@@ -90,79 +108,8 @@ by the command line.
 \returns
 
 \bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in {\tt user\_readparams} 
+{\tt ERROR\_\_USER} & Error. User error detected in {\tt user\_readparams()} \\ 
 function.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
-\et
-\ed
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_set_user_data
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_set\_user\_data}
-\begin{verbatim}
-int sym_set_user_data(sym_environment *env, void *user)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine is used to set the user problem structure of the environment.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment.\\
-{\tt void *user} & IN & Pointer to the user defined problem structure. 
-SYMPHONY, instead of making a copy or overriding, will directly use the 
-object itself, thus, any later modification on the object will be known unless
-its location is changed. 
-
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error in the passed in {\tt user} structure.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully \\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
-\et
-\ed
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_load_problem
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_load\_problem}
-\begin{verbatim}
-int sym_load_problem(sym_environment *env)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine loads the description of the problem given in MPS or GMPL/AMPL
-format or by the {\tt user\_io} callback. If the problem is to be loaded from 
-an MPS or a GMPL/AMPL file, then the {\tt sym\_parse\_command\_line} function 
-has to be invoked before.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment.
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_io}, 
-{\tt user\_init\_draw} functions.\\
-{\tt ERROR\_\_READING\_GMPL\_FILE} & Error. Error detected in the given 
-GMPL/AMPL file. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
 \et
@@ -180,8 +127,9 @@ int sym_find_initial_bounds(sym_environment *env)
 \bd
 \describe
 
-This routine attempts to find bounds for the problem through
-the user defined heuristics if loaded to {\tt start\_heurs\_u} user callback. 
+This routine invokes the user callback \hyperref{{\tt user\_start\_heurs()}}
+{{\tt user\_start\_heurs()} (see Section }{)}{user_start_heurs} to set the
+priori bound for the problem.
 
 \args
 
@@ -192,10 +140,120 @@ the user defined heuristics if loaded to {\tt start\_heurs\_u} user callback.
 \returns
 
 \bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in {\tt user\_start\_heurs}
+{\tt ERROR\_\_USER} & Error. User error detected in {\tt user\_start\_heurs()} \\
 function.\\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully.\\
+\et
+\ed
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_load_problem
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_load\_problem}
+\begin{verbatim}
+int sym_load_problem(sym_environment *env)
+\end{verbatim}
+
+\bd
+\describe
+
+This routine loads the description of the problem given in MPS or GMPL/AMPL
+format or in a file read by a custom file parser implemented in the 
+\hyperref{{\tt user\_io()}} {{\tt user\_io()} (see
+Section }{)}{user_io} callback. If the problem is to be loaded from an MPS or
+a GMPL/AMPL file whose location is specified on the command line, then the
+{\tt sym\_parse\_command\_line()} function has to be invoked
+beforehand. This function also invokes the user callback 
+\hyperref{{\tt user\_initialize\_root\_node()}} {{\tt
+user\_initialize\_root\_node()} (see Section
+}{)}{user_initialize_root_node}. Note that if the user wishes to load the
+problem manually without implementing a callback or using one of SYMPHONY's
+built-in parsers (as is typically done in other callable libraries), then the
+{\tt sym\_explicit\_load\_problem()} routine should be used.
+
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment.
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_io()},
+{\tt user\_init\_draw()} functions.\\
+{\tt ERROR\_\_READING\_GMPL\_FILE} & Error. Error detected in the given 
+GMPL/AMPL file. \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
+\et
+\ed
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%sym_explicit_load_problem
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_explicit\_load\_problem}
+\begin{verbatim}
+int sym_explicit_load_problem_user(sym_environment * env, int numcols, 
+                          int numrows, int *start, int *index, double *value, 
+                          double *collb, double *colub, char *is_int, 
+                          double *obj, double *obj2, char *rowsen, 
+                          double *rowrhs, double *rowrng, char make_copy)
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used to load a problem description into SYMPHONY manually. The
+constraint matrix is passed in a standard column-ordered format. The arguments
+here are the same as the fields in the \texttt{MIPdesc} data structure
+discussed in Section \ref{dat_structures}. Please see the discussion there for
+a more detailed description of the arguments here.
+
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment.\\
+{\tt int numcols} & IN & Number of the columns. \\
+{\tt int numrows} & IN & Number of the rows.\\
+{\tt int *start} & IN & Array of the starting positions of each of 
+column. \\
+{\tt int *index} & IN & Array of the row indices corresponding to 
+each entry of {\tt value}. \\ 
+{\tt int *value} & IN & Array of the values of nonzero entries of 
+the constraint matrix in \emph{column order}. \\
+{\tt double *collb} & IN & Array of the lower bounds of the columns. \\
+{\tt double *colub} & IN & Array of the upper bounds of the columns. \\
+{\tt double *obj} & IN & Array of the objective function coefficients. \\
+{\tt double *obj2} & IN & Array of the second objective function 
+coefficients when multi criteria solver is to be used. \\
+{\tt char *rowsen} & IN & Array of the senses of the constraints. \\
+&&'L': $\leq$ constraint \\
+&&  	'E': =  constraint \\
+&&  	'G': $\geq$ constraint \\
+&&  	'R': ranged constraint \\
+&&  	'N': free constraint \\
+{\tt double *rowrhs} & IN & Array of the right hand side values. \\
+{\tt double *rowrng} & IN & Array of the row ranges.\\
+&& ({\tt sym\_get\_row\_upper}) - ({\tt sym\_get\_row\_lower}) if the row 
+sense is {\tt 'R'}, 0 otherwise. \\
+{\tt char make\_copy} & IN & SYMPHONY will create the copies of these
+arrays for internal usage if this flag is set to true, otherwise, will own 
+them.\\ 
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{\tt ERROR\_\_USER} & Error. User error detected in 
+{user\_initialize\_root\_node} function. \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully. \\
 \et
 \ed
 \vspace{1ex}
@@ -205,6 +263,7 @@ function.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{sym\_solve}
+\label{sym_solve}
 \begin{verbatim}
 int sym_solve(sym_environment *env)
 \end{verbatim}
@@ -212,12 +271,9 @@ int sym_solve(sym_environment *env)
 \bd
 \describe
 
-This routine solves the corresponding MILP problem from scratch even in the 
-presence of a loaded warm start. Nonetheless, if any parameter or problem data
-has been changed, SYMPHONY will know about those modifications and hence, will
-solve the modified problem instead of the original one. However note that, 
-any warm start information loaded or kept before will be deleted from the 
-environment!
+This routine solves the currently loaded MILP problem from scratch even in the
+presence of a loaded warm start. Any warm start information loaded or kept
+before will be deleted from the environment!
 
 \args
 
@@ -229,10 +285,11 @@ environment!
 \returns
 
 \bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_send\_
-lp\_data}, {\tt user\_send\_cg\_data}, {\tt user\_send\_cp\_data}, 
-{\tt user\_receive\_feasible\_solution}, {\tt user\_display\_solution}, 
-{\tt user\_process\_own\_messages} functions. \\ 
+{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt
+user\_send\_lp\_data()}, {\tt user\_send\_cg\_data()}, {\tt
+user\_send\_cp\_data()}, {\tt user\_receive\_feasible\_solution()}, 
+{\tt user\_display\_solution()}, 
+{\tt user\_process\_own\_messages()} functions. \\ 
 {\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & Tree Manager (TM) found the optimal solution and stopped.\\ 
 {\tt TM\_TIME\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
 time limit.\\
@@ -243,7 +300,7 @@ target gap. \\
 {\tt TM\_FOUND\_FIRST\_FEASIBLE} & TM stopped after finding the first feasible 
 solution. \\
 {\tt TM\_ERROR\_\_NO\_BRANCHING\_CANDIDATE} & Error. TM stopped. User didn't 
-select branching candidate in {\tt user\_select\_candidates} callback\\ 
+select branching candidate in {\tt user\_select\_candidates()} callback. \\ 
 {\tt TM\_ERROR\_\_ILLEGAL\_RETURN\_CODE} & Error. TM stopped after getting a 
 non-valid return code. \\
 {\tt TM\_ERROR\_\_NUMERICAL\_INSTABILITY} & Error. TM stopped due to some 
@@ -268,12 +325,12 @@ int sym_warm_solve(sym_environment *env)
 \bd
 \describe
 
-This routine re-solves the corresponding problem after some of the parameters 
-have been changed or problem data has been modified on the loaded warm start.
-Note that, the user can keep a warm start by setting the ``keep\_warm\_start''
-evironment parameter before calling a solve routine. So that, SYMPHONY 
-will collect the necessary warm starting information through the 
-solve procedure.
+This routine re-solves the corresponding problem after some of the parameters
+have been changed or problem data has been modified from a warm start.  If the
+user plans to invoke this routine, the \texttt{keep\_warm\_start} parameter
+must be set to \texttt{TRUE} before the initial call to the {\tt sym\_solve()}
+routine, so that SYMPHONY will collect the necessary warm starting information
+during the solve procedure.
 
 \args
 
@@ -326,8 +383,9 @@ int sym_mc_solve(sym_environment *env)
 \describe
 
 This routine is used to solve the loaded problem as a multicriteria problem.
-The second objective function's coefficients can always be set or altered 
-by calling {\tt sym\_set\_obj2\_coeff} function.
+For this function, a second objective function must be set either by calling
+the {\tt sym\_set\_obj2\_coeff()} function or by passing it directly using the
+{\tt sym\_explict\_load\_problem()} function.
 
 \args
 
@@ -339,10 +397,11 @@ by calling {\tt sym\_set\_obj2\_coeff} function.
 
 \bt{lp{317pt}}
 {\tt } 
-{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_send\_
-lp\_data}, {\tt user\_send\_cg\_data}, {\tt user\_send\_cp\_data}, 
-{\tt user\_receive\_feasible\_solution}, {\tt user\_display\_solution}, 
-{\tt user\_process\_own\_messages} functions. \\ 
+{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt
+user\_send\_lp\_data()}, {\tt user\_send\_cg\_data()}, 
+{\tt user\_send\_cp\_data()}, 
+{\tt user\_receive\_feasible\_solution()}, {\tt user\_display\_solution()}, 
+{\tt user\_process\_own\_messages()} functions. \\ 
 {\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & The set of supported or nondominated 
 solutions have been found. \\
 {\tt TM\_ERROR\_\_NO\_BRANCHING\_CANDIDATE} & Error. TM stopped. User didn't 
@@ -372,8 +431,12 @@ int sym_create_permanent_cut_pools(sym_environment *env, int *cp_num)
 \bd
 \describe
 
-This routine is used to save the global cuts to the cut pool of 
-the environment.    
+This routine is used to create a global cut pool that will be saved even after
+the solve call exits and can be used to initialize the cut pool for later
+solve calls. This can be useful when solving a series of related MILPs that
+share classes of globally valid inequalities. For instance, if only the
+objective function is varied, as is the case with multicriteria integer
+programming, then cuts can be saved for use in later solve calls.
 
 \args
 
@@ -386,7 +449,48 @@ number of cut pools stored in the environment.
 \returns
 
 \bt{lp{317pt}}
-{\tt INT} & The number of the cut pools stored in. 
+{\tt INT} & The number of the cut pools created. 
+\et
+\ed
+\vspace{1ex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_set_user_data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_set\_user\_data}
+\begin{verbatim}
+int sym_set_user_data(sym_environment *env, void *user)
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used to give SYMPHONY a pointer to the user's problem data
+structure. This pointer will then be handed back to the user during subsequent
+calls to user callbacks. This allows the user to store static problem
+data. Note that this pointer can also be stored by filling out the callback
+function \hyperref{{\tt user\_initialize()}} {{\tt user\_initialize()} (see
+Section }{)}{user_initialize}.
+
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment.\\
+{\tt void *user} & IN & Pointer to the user defined problem structure. 
+%SYMPHONY, instead of making a copy or overriding, will directly use the 
+%object itself, thus, any later modification on the object will be known unless
+%its location is changed. 
+
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{\tt ERROR\_\_USER} & Error in the passed in {\tt user} structure.\\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully \\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
 \et
 \ed
 \vspace{1ex}
@@ -414,7 +518,7 @@ This routine closes the environment and returns the allocated memory.
 \returns
 
 \bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in {\tt user\_free\_master} 
+{\tt ERROR\_\_USER} & Error. User error detected in {\tt user\_free\_master()} 
 function.\\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
@@ -422,85 +526,228 @@ function.\\
 \ed
 \vspace{1ex}
 
+\ed
+
+\newpage
+
+\subsection{Parameter Query and Modification}
+
+\bd
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%sym_explicit_load_problem
+% sym_set_defaults
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{sym\_explicit\_load\_problem}
+\firstfuncdef{sym\_set\_defaults}
 \begin{verbatim}
-int sym_explicit_load_problem_user(sym_environment * env, int numcols, 
-                          int numrows, int *start, int *index, double *value, 
-                          double *collb, double *colub, char *is_int, 
-                          double *obj, double *obj2, char *rowsen, 
-                          double *rowrhs, double *rowrng, char make_copy)
+int sym_set_defaults(sym_environment *env)
 \end{verbatim}
 
 \bd
 \describe
 
-This routine is used to load the user defined problem description to SYMPHONY
-through a set of arrays.
+This routine sets all the environment variables and parameters
+to their default values. 
 
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment.\\
-{\tt int numcols} & IN & Number of the columns. \\
-{\tt int numrows} & IN & Number of the rows.\\
-{\tt int *start} & IN & Array of the starting positions of each of 
-column. \\
-{\tt int *index} & IN & Array of the row indices corresponding to 
-each entry of {\tt value}. \\ 
-{\tt int *value} & IN & Array of the values of nonzero entries of 
-the constraint matrix in \emph{column order}. \\
-{\tt double *collb} & IN & Array of the lower bounds of the columns. \\
-{\tt double *colub} & IN & Array of the upper bounds of the columns. \\
-{\tt double *obj} & IN & Array of the objective function coefficients. \\
-{\tt double *obj2} & IN & Array of the second objective function 
-coefficients when multi criteria solver is to be used. \\
-{\tt char *rowsen} & IN & Array of the senses of the constraints. \\
-&&'L': $\leq$ constraint \\
-&&  	'E': =  constraint \\
-&&  	'G': $\geq$ constraint \\
-&&  	'R': ranged constraint \\
-&&  	'N': free constraint \\
-{\tt double *rowrhs} & IN & Array of the right hand side values. \\
-{\tt double *rowrng} & IN & Array of the row ranges.\\
-&& ({\tt sym\_get\_row\_upper}) - ({\tt sym\_get\_row\_lower}) if the row 
-sense is {\tt 'R'}, 0 otherwise. \\
-{\tt char make\_copy} & IN & SYMPHONY will create the copies of these
-arrays for internal usage if this flag is set to true, otherwise, will own 
-them.\\ 
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment to 
+be modified. 
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in 
-{user\_initialize\_root\_node} function. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
-{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully. \\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked succesfully. \\
 \et
 \ed
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_is_abandoned
+% sym_set_int param
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{sym\_is\_abandoned}
+\functiondef{sym\_set\_int\_param}
 \begin{verbatim}
-int sym_is_abandoned(sym_environment *env)
+void sym_set_int_param(sym_environment *env, char *key, int value)
 \end{verbatim}
 
 \bd
 \describe
 
-This post-solution query routine is used to learn whether the problem 
-was abandoned for some reason.
+This routine is used to set an integer type parameter.
 
 \args
 
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
+{\tt char *key} & IN & The name of the parameter to be set. \\
+{\tt int value} & OUT & New value of the corresponding parameter.
+\et
+\ed
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_set_dbl param
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_set\_dbl\_param}
+\begin{verbatim}
+void sym_set_int_param(sym_environment *env, char *key, double value)
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used to set a double type parameter.
+
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
+{\tt char *key} & IN & The name of the parameter to be set. \\
+{\tt double value} & OUT & New value of the corresponding parameter.
+\et
+\ed
+\vspace{1ex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_set_str param
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_set\_str\_param}
+\begin{verbatim}
+void sym_set_str_param(sym_environment *env, char *key, char *value)
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used to set a string type parameter.
+
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
+{\tt char *key} & IN & The name of the parameter to be set. \\
+{\tt char *value} & OUT & New value of the corresponding parameter.
+\et
+\ed
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_get_int_param
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_get\_int\_param}
+\begin{verbatim}
+int sym_get_int_param(sym_environment *env, char *key)
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used to get the value of an integer type parameter. 
+
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
+{\tt char *key} & IN & The name of the parameter.
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{\tt INT} & An integer indicating the value of the parameter. \\
+\et  
+\ed
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_get_dbl_param
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_get\_dbl\_param}
+\begin{verbatim}
+double sym_get_int_param(sym_environment *env, char *key)
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used to get the value of a double type parameter.
+
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
+{\tt char *key} & IN & The name of the parameter.
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{\tt DOUBLE} & A double indicating the value of the parameter. \\
+\et  
+\ed
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_get_str_param
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_get\_str\_param}
+\begin{verbatim}
+char *sym_get_int_param(sym_environment *env, char *key)
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used to get the value of a string type parameter.
+
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
+{\tt char *key} & IN & The name of the parameter.
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{\tt CHAR*} & A character array indicating the value of the parameter. \\
+\et  
+\ed
+\vspace{1ex}
+
+\ed
+
+\newpage
+
+\subsection{Solver Status Query Functions}
+
+\bd
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_get_status
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\firstfuncdef{sym\_get\_status}
+\begin{verbatim}
+int sym_get_status(sym_environment *env)
+\end{verbatim}
+
+\bd
+\describe
+This post-solution query routine is used to learn the termination
+status of the solution procedure.
+
+\args
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
 \et
@@ -508,10 +755,31 @@ was abandoned for some reason.
 \returns
 
 \bt{lp{317pt}}
-{\tt TRUE} & The problem was abandoned. \\
-{\tt FALSE} & The problem was not abandoned.\\
+{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_send\_lp\_data()}, {\tt user\_send\_cg\_data()}, {\tt user\_send\_cp\_data()}, 
+{\tt user\_receive\_feasible\_solution()}, {\tt user\_display\_solution()}, 
+{\tt user\_process\_own\_messages()} functions. \\ 
+{\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & Tree Manager (TM) found the optimal solution and stopped.\\ 
+{\tt TM\_TIME\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
+time limit.\\
+{\tt TM\_NODE\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
+node limit. \\
+{\tt TM\_TARGET\_GAP\_ACHIEVED} & TM stopped after achieving the predefined 
+target gap. \\
+{\tt TM\_FOUND\_FIRST\_FEASIBLE} & TM stopped after finding the first feasible 
+solution. \\
+{\tt TM\_ERROR\_\_NO\_BRANCHING\_CANDIDATE} & Error. TM stopped. User didn't 
+select branching candidate in {\tt user\_select\_candidates()} callback\\ 
+{\tt TM\_ERROR\_\_ILLEGAL\_RETURN\_CODE} & Error. TM stopped after getting an
+invalid return code. \\
+{\tt TM\_ERROR\_\_NUMERICAL\_INSTABILITY} & Error. TM stopped due to some 
+numerical difficulties. \\
+{\tt TM\_ERROR\_\_COMM\_ERROR} & Error. TM stopped due to communication 
+error. \\
+{\tt TM\_ERROR\_\_USER} & Error. TM stopped. User error detected in one of 
+user callbacks called during TM processes. \\
 \et
 \ed
+
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -586,8 +854,8 @@ int sym_is_primal_objective_limit_reached(sym_environment *env)
 \bd
 \describe
 
-This post-solution query routine is used to learn whether the objective
-limit (target gap) was achieved.
+This post-solution query routine is used to learn whether the target gap was
+reached. 
 
 \args
 
@@ -618,7 +886,7 @@ int sym_is_iteration_limit_reached(sym_environment *env)
 
 This post-solution query routine is used to learn whether the iteration 
 (node limit) was reached. It can also be used if ``find\_first\_feasible'' 
-parameter wass set to true before solving the problem.
+parameter was set to true before solving the problem.
 
 \args
 
@@ -677,8 +945,8 @@ int sym_is_target_gap_achieved(sym_environment *env)
 \bd
 \describe
 
-This post-solution query routine is used to learn whether the time limit 
-was reached. 
+This post-solution query routine is used to learn whether the target gap was
+reached. 
 
 \args
 
@@ -697,20 +965,22 @@ was reached.
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_get_status
+% sym_is_abandoned
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{sym\_get\_status}
+\firstfuncdef{sym\_is\_abandoned}
 \begin{verbatim}
-int sym_get_status(sym_environment *env)
+int sym_is_abandoned(sym_environment *env)
 \end{verbatim}
 
 \bd
 \describe
-This post-solution query routine is used to learn the termination
-status of the solution procedure.
+
+This post-solution query routine is used to learn whether the problem 
+was abandoned for some reason.
 
 \args
+
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
 \et
@@ -718,30 +988,47 @@ status of the solution procedure.
 \returns
 
 \bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_send\_
-lp\_data}, {\tt user\_send\_cg\_data}, {\tt user\_send\_cp\_data}, 
-{\tt user\_receive\_feasible\_solution}, {\tt user\_display\_solution}, 
-{\tt user\_process\_own\_messages} functions. \\ 
-{\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & Tree Manager (TM) found the optimal solution and stopped.\\ 
-{\tt TM\_TIME\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
-time limit.\\
-{\tt TM\_NODE\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
-node limit. \\
-{\tt TM\_TARGET\_GAP\_ACHIEVED} & TM stopped after achieving the predefined 
-target gap. \\
-{\tt TM\_FOUND\_FIRST\_FEASIBLE} & TM stopped after finding the first feasible 
-solution. \\
-{\tt TM\_ERROR\_\_NO\_BRANCHING\_CANDIDATE} & Error. TM stopped. User didn't 
-select branching candidate in {\tt user\_select\_candidates} callback\\ 
-{\tt TM\_ERROR\_\_ILLEGAL\_RETURN\_CODE} & Error. TM stopped after getting a 
-non-valid return code. \\
-{\tt TM\_ERROR\_\_NUMERICAL\_INSTABILITY} & Error. TM stopped due to some 
-numerical difficulties. \\
-{\tt TM\_ERROR\_\_COMM\_ERROR} & Error. TM stopped due to communication 
-error. \\
-{\tt TM\_ERROR\_\_USER} & Error. TM stopped. User error detected in one of 
-user callbacks called during TM processes. \\
+{\tt TRUE} & The problem was abandoned. \\
+{\tt FALSE} & The problem was not abandoned.\\
 \et
+\ed
+\vspace{1ex}
+
+\ed
+
+\newpage
+
+\subsection{Data Query Functions}
+
+\bd
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_create_copy_mip_desc
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\firstfuncdef{sym\_create\_copy\_mip\_desc}
+\begin{verbatim}
+MIPdesc *sym_create_copy_mip_desc(sym_environment *env)
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used to copy the problem description loaded to the environment.
+
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{tt NULL} & An empty environment is passed in or there is no problem
+description loaded to the environment. \\
+{\tt MIPdesc *} & Pointer to the copy of the problem description. \\
+\et  
 \ed
 
 \vspace{1ex}
@@ -750,7 +1037,7 @@ user callbacks called during TM processes. \\
 % sym_get_num_cols
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{sym\_get\_num\_cols}
+\firstfuncdef{sym\_get\_num\_cols}
 \begin{verbatim}
 int sym_get_num_cols(sym_environment *env, int *numcols)
 \end{verbatim}
@@ -820,7 +1107,7 @@ int sym_get_num_elements(sym_environment *env, int *numelems)
 \describe
 
 This routine is used to get the number of non-zero entries of the 
-constraint matrix of the loaded problem.
+constraint matrix of the current problem.
 
 \args
 
@@ -1112,7 +1399,8 @@ int sym_get_obj2_coeff(sym_environment *env, double *obj2)
 \bd
 \describe
 
-This routine is used to get the second objective vector if loaded before.
+This routine is used to get the second objective vector if it exists. By
+default, it is set to the zero vector.
 
 \args
 
@@ -1396,10 +1684,7 @@ double *sym_get_primal_bound(sym_environment *env, double *ub)
 \bd
 \describe
 
-This routine is used to get the priori upper/lower bound for the problem via 
-the user defined heuristics if loaded to {\tt user\_start\_heurs } user 
-callback function. Note that, {\tt sym\_find\_initial\_bounds} function should
-be invoked before to activate those heuristics. 
+This routine is used to get the a priori upper/lower bound for the problem.
 
 \args
 
@@ -1453,11 +1738,19 @@ nodes analyzed so far.
 \ed
 \vspace{1ex}
 
+\ed
+
+\newpage
+
+\subsection{Data Modification Functions}
+
+\bd
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % sym_set_obj_coeff
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{sym\_set\_obj\_coeff}
+\firstfuncdef{sym\_set\_obj\_coeff}
 \begin{verbatim}
 double *sym_set_obj_coeff(sym_environment *env, int index, double value)
 \end{verbatim}
@@ -2045,11 +2338,19 @@ one of the {\tt indices} is out of the range of [0, number of variables-1] \\
 \ed
 \vspace{1ex}
 
+\ed
+
+\newpage
+
+\subsection{Warm Starting Functions}
+
+\bd
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % sym_write_warm_start_desc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{sym\_write\_warm\_start\_desc}
+\firstfuncdef{sym\_write\_warm\_start\_desc}
 \begin{verbatim}
 int sym_write_warm_start_desc(warm_start_desc *ws, char *file)
 \end{verbatim}
@@ -2201,167 +2502,6 @@ loaded to the environment.
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_set_int param
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_set\_int\_param}
-\begin{verbatim}
-void sym_set_int_param(sym_environment *env, char *key, int value)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine is used to set an integer type parameter.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt char *key} & IN & The name of the parameter to be set. \\
-{\tt int value} & New value of the corresponding parameter.
-\et
-\ed
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_set_dbl param
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_set\_dbl\_param}
-\begin{verbatim}
-void sym_set_int_param(sym_environment *env, char *key, double value)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine is used to set a double type parameter.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt char *key} & IN & The name of the parameter to be set. \\
-{\tt double value} & New value of the corresponding parameter.
-\et
-\ed
-\vspace{1ex}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_set_str param
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_set\_str\_param}
-\begin{verbatim}
-void sym_set_str_param(sym_environment *env, char *key, char *value)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine is used to set a string type parameter.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt char *key} & IN & The name of the parameter to be set. \\
-{\tt char *value} & New value of the corresponding parameter.
-\et
-\ed
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_get_int_param
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_get\_int\_param}
-\begin{verbatim}
-int sym_get_int_param(sym_environment *env, char *key)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine is used to get the value of an integer type parameter. 
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt char *key} & IN & The name of the parameter.
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{\tt INT} & An integer indicating the value of the parameter. \\
-\et  
-\ed
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_get_dbl_param
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_get\_dbl\_param}
-\begin{verbatim}
-double sym_get_int_param(sym_environment *env, char *key)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine is used to get the value of a double type parameter.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt char *key} & IN & The name of the parameter.
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{\tt DOUBLE} & A double indicating the value of the parameter. \\
-\et  
-\ed
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_get_str_param
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_get\_str\_param}
-\begin{verbatim}
-char *sym_get_int_param(sym_environment *env, char *key)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine is used to get the value of a string type parameter.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt char *key} & IN & The name of the parameter.
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{\tt CHAR*} & A character array indicating the value of the parameter. \\
-\et  
-\ed
-\vspace{1ex}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % sym_create_copy_warm_start
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2392,72 +2532,19 @@ be copied.
 
 \vspace{1ex}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_create_copy_mip_desc
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_create\_copy\_mip\_desc}
-\begin{verbatim}
-MIPdesc *sym_create_copy_mip_desc(sym_environment *env)
-\end{verbatim}
-
-\bd
-\describe
-
-This routine is used to copy the problem description loaded to the environment.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{tt NULL} & An empty environment is passed in or there is no problem
-description loaded to the environment. \\
-{\tt MIPdesc *} & Pointer to the copy of the problem description. \\
-\et  
 \ed
 
-\vspace{1ex}
+\newpage
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_create_copy_environment
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_create\_copy\_environment}
-\begin{verbatim}
-sym\_environment *sym_create_copy_environment(sym_environment *env)
-\end{verbatim}
+\subsection{Sensitivity Analysis Functions}
 
 \bd
-\describe
-
-This routine is used to copy the given environment.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{tt NULL} & An empty environment is passed in. \\
-{\tt SYM\_ENVIRONMENT *} & Pointer to the copy of the environment. \\
-\et  
-\ed
-
-\vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % sym_get_lb_for_new_rhs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{sym\_get\_lb\_for\_new\_rhs}
+\firstfuncdef{sym\_get\_lb\_for\_new\_rhs}
 \begin{verbatim}
 int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
                            double *new_rhs_val, double *lb_for_new_rhs)
@@ -2636,12 +2723,13 @@ upper bound obtained for the new problem. This value will be set to
 % END
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{C++ Interface}
+\section{C++ Interface}
 \label{C++_Interface}
 
-The OSI SYMPHONY methods are implemented simply as
-wrapped calls to the SYMPHONY callable library. For instance, when an instance 
-of the OSI interface class is constructed, a call is made to
+SYMPHONY's C++ interface is derived from COIN-OR's Open Solver Interface
+(OSI). The OSI methods are implemented simply as wrapped calls to the SYMPHONY
+C callable library just described. For instance, when an instance of the OSI
+interface class is constructed, a call is made to
 \texttt{sym\_open\_environment()} and a pointer to the environment is stored
 in the class and when the OSI object is destroyed,
 \texttt{sym\_close\_environment} is called to destroy the environment object. 
