@@ -3,7 +3,7 @@
 set VER=4.0
 set DIR=$HOME/SYMPHONY-$VER
 mkdir $DIR
-awk -f scripts/reformat.awk Makefile.dist > $DIR/Makefile
+awk -f scripts/reformat.awk Makefile > $DIR/Makefile
 foreach file (LICENSE README-$VER)
 awk -f scripts/reformat.awk $file > $DIR/$file
 end

@@ -6,7 +6,7 @@
 # SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and     #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                         #
 #                                                                            #
-# (c) Copyright 2000, 2001, 2002  Ted Ralphs. All Rights Reserved.           #
+# (c) Copyright 2000-2003  Ted Ralphs. All Rights Reserved.                  #
 #                                                                            #
 # This software is licensed under the Common Public License. Please see      #
 # accompanying file for terms.                                               #
@@ -66,7 +66,7 @@ RANLIB = ranlib
 ##############################################################################
 
 ### SYMPHONYROOT is now usually defined in the user's Makefile ###
-### See SYMPHONY/MIP/Makefile                                      ###
+### See SYMPHONY/USER/Makefile                                 ###
 
 ##############################################################################
 # USERROOT is the name of the user's source directory. $(SYMPHONYROOT)/VRP is 
@@ -77,7 +77,7 @@ RANLIB = ranlib
 ##############################################################################
 
 ### These variables are now usually defined in the user's Makefile ###
-### See SYMPHONY/MIP/Makefile                                      ###
+### See SYMPHONY/USER/Makefile                                     ###
 
 ##############################################################################
 # COINROOT is the path to the root directory of the COIN libraries. Many of
