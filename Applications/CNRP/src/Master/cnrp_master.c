@@ -109,15 +109,13 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 {
    cnrp_problem *cnrp = (cnrp_problem *)user;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   problem *p = get_problem_ptr(FALSE);
-
+#if 0
    p->par.lp_par.problem_type = INTEGER_PROBLEM;
    strcpy(p->par.dg_par.source_path, "/home/tkr/BlackBox/DrawGraph/IGD_1.0/");
+#endif
    /*___END_EXPERIMENTAL_SECTION___*/
 
    cnrp_readparams(cnrp, filename, argc, argv);
-
-   p->par.tm_par.granularity = p->par.lp_par.granularity = -0.001; 
 
    return(USER_SUCCESS);
 }
@@ -747,7 +745,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 
    /* FIXME: This is UGLY! */
 #if (defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)) && \
-   (defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
+   (defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)) && 0
       
    problem *p = get_problem_ptr(FALSE);
    cnrp_spec *cnrp_lp = (cnrp_spec *) p->tm->lpp[0]->user;
@@ -767,7 +765,8 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 #else
    printf("\nSolution Found:\n");
 #endif
-   
+
+#if 0
    if (tour){
       node = tour[0].next;
       if (tour[0].route == 1)
@@ -813,7 +812,8 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
       }
       return(USER_SUCCESS);
    }
-
+#endif
+   
    /*Otherwise, construct the solution from scratch*/
 
 #ifdef ADD_FLOW_VARS

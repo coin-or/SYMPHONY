@@ -201,10 +201,13 @@ void start_heurs_u(problem *p)
 
 /*===========================================================================*/
 
-void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
+void initialize_root_node_u(problem *p)
 {
    int i;
 
+   base_desc *base = p->base = (base_desc *) calloc(1, sizeof(base_desc));
+   node_desc *root = p->root = (node_desc *) calloc(1, sizeof(node_desc));
+   
    switch (user_initialize_root_node(p->user, &base->varnum, &base->userind,
 				     &base->cutnum, &root->uind.size,
 				     &root->uind.list, &p->mip->obj_sense,
@@ -318,14 +321,12 @@ void receive_feasible_solution_u(problem *p, int msgtag)
 
 /*===========================================================================*/
 
-void send_lp_data_u(problem *p, int sender, base_desc *base)
+void send_lp_data_u(problem *p, int sender)
 {
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    int i;
-   tm_prob *tm = p->tm = get_tm_ptr(TRUE);
-
+   tm_prob *tm = p->tm;
    tm->par.max_active_nodes = p->par.tm_par.max_active_nodes;
-
 #ifdef _OPENMP
    omp_set_dynamic(FALSE);
    omp_set_num_threads(tm->par.max_active_nodes);
@@ -347,7 +348,7 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
 	 p->ub = - (MAXDOUBLE / 2);
       
       tm->lpp[i]->draw_graph = p->dg_tid;
-      tm->lpp[i]->base = *base;
+      tm->lpp[i]->base = *(p->base);
       tm->lpp[i]->mip = p->mip;
 
       CALL_USER_FUNCTION( user_send_lp_data(p->user, &(tm->lpp[i]->user)) );
@@ -362,11 +363,11 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
    if (p->has_ub)
       send_dbl_array(&p->ub, 1);
    send_int_array(&p->dg_tid, 1);
-   send_int_array(&base->varnum, 1);
-   if (base->varnum){
-      send_int_array(base->userind, base->varnum);
+   send_int_array(&p->base->varnum, 1);
+   if (p->base->varnum){
+      send_int_array(p->base->userind, p->base->varnum);
    }
-   send_int_array(&base->cutnum, 1);
+   send_int_array(&p->base->cutnum, 1);
    if (p->mip){
       MIPdesc *mip = p->mip;
       char has_desc = TRUE;
@@ -563,6 +564,20 @@ void free_master_u(problem *p)
       free_mip_desc(p->mip);
       FREE(p->mip);
    }
+   
+   if (p->root){
+      FREE(p->root->desc);
+      FREE(p->root->uind.list);
+      FREE(p->root->not_fixed.list);
+      FREE(p->root->cutind.list);
+      FREE(p->root);
+   }
+
+   if (p->base){
+      FREE(p->base->userind);
+      FREE(p->base);
+   }
+   
 }
 
 /*===========================================================================*/

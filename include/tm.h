@@ -159,9 +159,8 @@ typedef struct TM_PROB{
 /*==================== TM basic functions (tm_func.c) =======================*/
 /*===========================================================================*/
 
-tm_prob *get_tm_ptr PROTO((char reset));
-tm_prob *tm_initialize PROTO((base_desc *base, node_desc *root_desc,
-			      int master_tid));
+void tm_initialize PROTO((tm_prob *tm, base_desc *base,
+			      node_desc *root_desc));
 int solve PROTO((tm_prob *tm));
 void print_tree_status PROTO((tm_prob *tm));
 int start_node PROTO((tm_prob *tm, int thread_num));

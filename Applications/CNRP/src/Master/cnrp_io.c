@@ -34,7 +34,7 @@
 #include "cnrp_const.h"
 #include "cnrp_macros.h"
 
-#define NUMNODES 15
+#define NUMNODES -1
 
 /*===========================================================================*/
 
@@ -671,7 +671,7 @@ void cnrp_readparams(cnrp_problem *cnrp, char *filename, int argc, char **argv)
    lp_par->child_compar_obj_tol = .01;
    lp_par->gamma = 1; /*Determines the fixed cost*/
    lp_par->tau = 0;   /*Determines the variable cost*/
-   lp_par->rho = 0;
+   lp_par->rho = 0.00001;
    cg_par->verbosity = 0;
    cg_par->do_greedy = TRUE;
    cg_par->greedy_num_trials = 5;
@@ -995,12 +995,14 @@ EXIT:
 	 sscanf(argv[++i], "%i", &cg_par->generate_tight_cap_cuts);
 	 break;
        case 'G':
-	 sscanf(argv[++i], "%lf", &lp_par->tau);
-	 cg_par->tau = lp_par->tau;
+	 sscanf(argv[++i], "%lf", &lp_par->gamma);
+	 lp_par->tau = cg_par->tau = 1 - lp_par->gamma;
 	 break;
+#ifdef MULTI_CRITERIA
        case 'I':
 	 sscanf(argv[++i], "%lf", &par->binary_search_tolerance);
 	 break;
+#endif
        case 'T':
 	 i++;
 	 if (strcmp("VRP", argv[i]) == 0){

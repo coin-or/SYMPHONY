@@ -13,9 +13,6 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#define COMPILING_FOR_MASTER
-#define USER_MAIN
-
 /* system include files */
 #include <malloc.h>
 #include <string.h>
@@ -24,13 +21,8 @@
 #include <math.h>
 
 /* SYMPHONY include files */
-#include "proccomm.h"
-#include "timemeas.h"
-#include "messages.h"
-#include "BB_types.h"
+#include "OsiSymSolverInterface.hpp"
 #include "BB_macros.h"
-#include "pack_cut.h"
-#include "pack_array.h"
 #include "master.h"
 
 /* CNRP include files */
@@ -65,21 +57,23 @@ typedef struct SOLUTION_PAIRS{
 
 /*===========================================================================*/
 
-void cnrp_solve(problem *p, cut_pool **cp, base_desc *base, node_desc *root);
+/*===========================================================================*\
+ * This file contains the main() for two different CNRP applications.
+\*===========================================================================*/
 
-/*===========================================================================*/
+#ifdef MULTI_CRITERIA
 
 /*===========================================================================*\
- * This file contains the main() for the CNRP application.
+ * This is main() for the multicriteria version of CNRP
 \*===========================================================================*/
 
 int main(int argc, char **argv)
 {
    int i;
-   problem *p;
+   problem *env;
    cut_pool **cp = NULL;
    double gamma, gamma0, gamma1, tau, slope;
-   double start_time, t = 0;
+   double start_time;
 
    solution_data utopia1;
    solution_data utopia2;
@@ -94,54 +88,24 @@ int main(int argc, char **argv)
    node_desc *root= NULL;
    base_desc *base = NULL;
    double compare_sol_tol, ub = 0.0;
-   
+
    start_time = wall_clock(NULL);
 
-   setvbuf(stdout, (char *)NULL, _IOLBF, 0);
-
-   printf("\n");
-   printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 4.0                      *\n");
-   printf("*   Copyright 2000-2003 Ted Ralphs                    *\n");
-   printf("*   All Rights Reserved.                              *\n");
-   printf("*   Distributed under the Common Public License 1.0   *\n");
-   printf("*******************************************************\n");
-   printf("\n");
-
-   /* Initialize */
-
-   (void) used_time(&t);
-
-   p = get_problem_ptr(TRUE);
-
-   initialize_u(p);
-
-   cnrp = (cnrp_problem *)(p->user);
+   /* Initialize the SYMPHONY environment */
+   OsiSymSolverInterface si;
    
-   /* Set the parameters */
-   readparams_u(p, argc, argv);
-   
-   /* Get the problem data */
-   io_u(p);
-   
-   /* Start up the graphics window*/
-   init_draw_graph_u(p);
-   
-   p->comp_times.readtime += used_time(&t);
-   
-   /* Finds the upper and lower bounds for the problem */
-   start_heurs_u(p);
+   /* Get pointer to the SYMPHONY environment */
+   env = si.getSymphonyEnvironment();
 
-   /*---------------------------------------------------------------------*\
-    * Generate the base and root description
-   \*---------------------------------------------------------------------*/
-   
-   base = (base_desc *) calloc(1, sizeof(base_desc));
-   root = (node_desc *) calloc(1, sizeof(node_desc));
-   
-   initialize_root_node_u(p, base, root);
+   /* Parse the command line and read in the problem */
+   si.loadProblem(argc, argv);
 
+   /* Get the pointer to the user data */
+   cnrp = static_cast<cnrp_problem *>(si.getApplicationData());
+
+   /* Set some parameters */
    compare_sol_tol = cnrp->par.compare_solution_tolerance;
+   si.setSymDblParam(OsiSymGranularity,-MAX(cnrp->lp_par.rho,compare_sol_tol));
 
 #ifdef BINARY_SEARCH
    printf("Using binary search with tolerance = %f...\n",
@@ -151,18 +115,19 @@ int main(int argc, char **argv)
    printf("Using LIFO search order...\n");
 #endif
    if (cnrp->lp_par.rho > 0){
-      printf("Using secondary objective weight %f...\n", cnrp->lp_par.rho);
+      printf("Using secondary objective weight %.8f\n", cnrp->lp_par.rho);
    }
    printf("\n");
-   
+
+   /* FIXME: Saving the cut pool currently doesn't work */
 #ifdef SAVE_CUT_POOL
    printf("Saving the global cut pool between iterations...\n");
-   if (p->par.tm_par.max_cp_num){
-      cp = (cut_pool **) malloc(p->par.tm_par.max_cp_num*sizeof(cut_pool *));
-      for (i = 0; i < p->par.tm_par.max_cp_num; i++){
+   if (env->par.tm_par.max_cp_num){
+      cp = (cut_pool **) malloc(env->par.tm_par.max_cp_num*sizeof(cut_pool *));
+      for (i = 0; i < env->par.tm_par.max_cp_num; i++){
 	 cp[i] = (cut_pool *) calloc(1, sizeof(cut_pool));
-	 cp[i]->par = p->par.cp_par;
-	 CALL_USER_FUNCTION( user_send_cp_data(p->user, &cp[i]->user) );
+	 cp[i]->par = env->par.cp_par;
+	 CALL_USER_FUNCTION( user_send_cp_data(env->user, &cp[i]->user) );
       }
       get_cp_ptr(cp, 0);
    }
@@ -180,7 +145,7 @@ int main(int argc, char **argv)
    printf("***************************************************\n\n");
 
    /* Solve */
-   cnrp_solve(p, cp, base, root);
+   si.branchAndBound();
    numprobs++;
    
    /* Store the solution */
@@ -202,7 +167,7 @@ int main(int argc, char **argv)
    printf("***************************************************\n\n");
 
    /* Solve */
-   cnrp_solve(p, cp, base, root);
+   si.branchAndBound();
    numprobs++;
    
    /* Store the solution */
@@ -235,6 +200,8 @@ int main(int argc, char **argv)
    first = last = 0;
    numpairs = 1;
 
+   /* Keep taking pairs off the list and processing them until there are none
+      left */
    while (numpairs > 0 && numpairs < MAX_NUM_PAIRS &&
 	  numsolutions < MAX_NUM_SOLUTIONS &&
 	  numinfeasible < MAX_NUM_INFEASIBLE){
@@ -276,8 +243,8 @@ int main(int argc, char **argv)
 
       /* Find upper bound */
 
-      p->has_ub = FALSE;
-      p->ub = MAXDOUBLE;
+      env->has_ub = FALSE;
+      env->ub = MAXDOUBLE;
 #ifndef BINARY_SEARCH
       for (i = 0; i < numsolutions; i++){
 #ifdef FIND_NONDOMINATED_SOLUTIONS
@@ -286,13 +253,13 @@ int main(int argc, char **argv)
 #else
 	 ub = gamma*solutions[i].fixed_cost + tau*solutions[i].variable_cost;
 #endif 
-	 if (ub < p->ub){
-	    p->has_ub = TRUE;
-	    p->ub = ub - compare_sol_tol;
+	 if (ub < env->ub){
+	    env->has_ub = TRUE;
+	    env->ub = ub - compare_sol_tol;
 	 }
       }
 #endif
-      cnrp->ub = p->ub;
+      cnrp->ub = env->ub;
       
       printf("***************************************************\n");
       printf("***************************************************\n");
@@ -302,7 +269,7 @@ int main(int argc, char **argv)
       
       cnrp->fixed_cost = cnrp->variable_cost = 0.0;
       
-      cnrp_solve(p, cp, base, root);
+      si.branchAndBound();
       numprobs++;
       
 #ifdef BINARY_SEARCH
@@ -317,6 +284,7 @@ int main(int argc, char **argv)
 	    pairs[last].solution1 = solution1;
 	    pairs[last].solution2 = solution2;
 	    pairs[last].gamma1 = gamma;
+	    pairs[last].gamma2 = pairs[cur_position].gamma2;
 	    numpairs++;
 	 }
 	 continue;
@@ -330,7 +298,8 @@ int main(int argc, char **argv)
 	       last = 0;
 	    pairs[last].solution1 = solution1;
 	    pairs[last].solution2 = solution2;
-	    pairs[last].gamma1 = gamma;
+	    pairs[last].gamma1 = pairs[cur_position].gamma1;
+	    pairs[last].gamma2 = gamma;
 	    numpairs++;
 	 }
 	 continue;
@@ -355,6 +324,7 @@ int main(int argc, char **argv)
 #endif
       
       /* Insert new solution */
+      numinfeasible = 0;
       if (last + 2 == MAX_NUM_PAIRS){
 	 last = 0;
 	 previous = MAX_NUM_PAIRS - 1;
@@ -452,15 +422,15 @@ int main(int argc, char **argv)
    printf(  "********************************************************\n\n");
 
 #ifdef SAVE_CUT_POOL
-   for (i = 0; i < p->par.tm_par.max_cp_num; i++){
-      p->comp_times.bc_time.cut_pool += cp[i]->cut_pool_time;
-      p->stat.cuts_in_pool += cp[i]->cut_num;
+   for (i = 0; i < env->par.tm_par.max_cp_num; i++){
+      env->comp_times.bc_time.cut_pool += cp[i]->cut_pool_time;
+      env->stat.cuts_in_pool += cp[i]->cut_num;
       cp[i]->msgtag = YOU_CAN_DIE;
       cp_close(cp[i]);
    }
 #endif
    
-   print_statistics(&(p->comp_times.bc_time), &(p->stat), 0.0, 0.0, 0,
+   print_statistics(&(env->comp_times.bc_time), &(env->stat), 0.0, 0.0, 0,
 		    start_time);
 
    printf("\nNumber of subproblems solved: %i\n", numprobs);
@@ -498,122 +468,36 @@ int main(int argc, char **argv)
 	  solutions[i].fixed_cost, solutions[i].variable_cost);
    printf("Range: %.6f - %.6f\n", 0.0, gamma0);
    
-   FREE(root->desc);
-   FREE(root->uind.list);
-   FREE(root->not_fixed.list);
-   FREE(root->cutind.list);
-   FREE(root);
-   FREE(base->userind);
-   FREE(base);
    for (i = 0 ; i < numsolutions; i++){
       FREE(solutions[i].tree);
    }
+#ifdef SAVE_CUT_POOL
    FREE(cp);
-   free_master_u(p);
-   FREE(p);
+#endif
    
    return(0);
 }   
 
-void cnrp_solve(problem *p, cut_pool **cp, base_desc *base, node_desc *root)
-{
-   int termcode;
-   double t = 0, start_time;
-
-   tm_prob *tm;
-
-   /*---------------------------------------------------------------------*\
-    * Initialize
-   \*---------------------------------------------------------------------*/
-
-   start_time = wall_clock(NULL);
-   
-   send_lp_data_u(p, 0, base);
-   send_cg_data_u(p, 0);
-   tm = get_tm_ptr(FALSE);
-#ifdef SAVE_CUT_POOL
-   tm->cpp = cp;
 #else
-   send_cp_data_u(p, 0);
-#endif
+
+/*===========================================================================*\
+ * This is main() for the single criteria version of CNRP
+\*===========================================================================*/
+
+int main(int argc, char **argv)
+{
+   OsiSymSolverInterface si;
+
+   si.loadProblem(argc, argv);
+
+   si.setSymDblParam(OsiSymGranularity, 0.999999);
+
+   si.branchAndBound();
    
-   tm_initialize(base, root, 0);
-
-   /*---------------------------------------------------------------------*\
-    * Solve the problem and receive solutions                         
-   \*---------------------------------------------------------------------*/
-   
-   tm->start_time = start_time;
-
-   termcode = solve(tm);
-
-#ifdef SAVE_CUT_POOL
-   /* Save the cut pool from being wiped out */
-   tm->cpp = NULL;
-#endif
-   
-   tm_close(tm, termcode);
-   
-   /*---------------------------------------------------------------------*\
-    * Display the the results and solution data                               
-   \*---------------------------------------------------------------------*/
-   
-   if (p->par.verbosity > 0){
-      if (termcode == TM_FINISHED){
-	 printf("\n****************************************************\n");
-	 printf(  "* Branch and Cut Finished!!!!!!!                   *\n");
-	 printf(  "* Now displaying stats and optimal solution...     *\n");
-	 printf(  "****************************************************\n\n");
-      }else{
-	 printf("\n****************************************************\n");
-	 printf(  "* Time Limit Exceeded :(                           *\n");
-	 printf(  "* Now displaying stats and best solution...        *\n");
-	 printf(  "****************************************************\n\n");
-      }
-      
-      print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, tm->lb, 0,
-		       start_time);
-   }
-
-   display_solution_u(p, 0);
-
-   /* Keep cumulative statistics */
-   if (tm->stat.max_depth > p->stat.max_depth){
-      p->stat.max_depth = tm->stat.max_depth;
-   }
-   p->stat.chains += tm->stat.chains;
-   p->stat.diving_halts += tm->stat.diving_halts;
-   p->stat.tree_size += tm->stat.tree_size;
-   p->stat.created += tm->stat.created;
-   p->stat.analyzed += tm->stat.analyzed;
-   p->stat.leaves_before_trimming += tm->stat.leaves_before_trimming;
-   p->stat.leaves_after_trimming += tm->stat.leaves_after_trimming;
-   p->stat.vars_not_priced += tm->stat.vars_not_priced;
-
-   p->comp_times.bc_time.communication += tm->comp_times.communication;
-   p->comp_times.bc_time.lp += tm->comp_times.lp;
-   p->comp_times.bc_time.separation += tm->comp_times.separation;
-   p->comp_times.bc_time.fixing += tm->comp_times.fixing;
-   p->comp_times.bc_time.pricing += tm->comp_times.pricing;
-   p->comp_times.bc_time.strong_branching += tm->comp_times.strong_branching;
-   p->comp_times.bc_time.wall_clock_lp += tm->comp_times.wall_clock_lp;
-   p->comp_times.bc_time.ramp_up_tm += tm->comp_times.ramp_up_tm;
-   p->comp_times.bc_time.ramp_up_lp += tm->comp_times.ramp_up_lp;
-   p->comp_times.bc_time.ramp_down_time += tm->comp_times.ramp_down_time;
-   p->comp_times.bc_time.idle_diving += tm->comp_times.idle_diving;
-   p->comp_times.bc_time.idle_node += tm->comp_times.idle_node;
-   p->comp_times.bc_time.idle_names += tm->comp_times.idle_names;
-   p->comp_times.bc_time.idle_cuts += tm->comp_times.idle_cuts;
-   p->comp_times.bc_time.start_node += tm->comp_times.start_node;
-
-#if 0
-   if (p->par.do_draw_graph){
-      s_bufid = init_send(DataInPlace);
-      send_msg(p->dg_tid, CTOI_YOU_CAN_DIE);
-      freebuf(s_bufid);
-   }
-#endif
-
-   free_tm(tm);
+   return(0);
 }
+
+#endif
+
+/*===========================================================================*/
 

@@ -35,7 +35,7 @@ USERROOT = ${SYMPHONYROOT}/CNRP
 # The customized name of the master program (if desired)
 ##############################################################################
 
-MASTERNAME = cnrp-binary-15
+MASTERNAME = cnrp
 
 ##############################################################################
 # These are only needed if parallel computation is used. Please see the
@@ -48,23 +48,33 @@ COMPILE_IN_CG = TRUE
 COMPILE_IN_CP = TRUE
 
 ##############################################################################
+# If you wish to compile and use the SYMPHONY callable library therough the 
+# SYMPHONY OSI interface, set USER_MAIN to TRUE here and see below. Note that
+# you must have COIN installed to use this capability. See the main SYMPHONY
+# Makefile to set the path to the COIN directories. Also, in this case, you 
+# may also be writing your own main(), so you may want to set USER_MAIN to 
+# TRUE also.
+##############################################################################
+
+USE_OSI_INTERFACE = TRUE
+
+##############################################################################
 # Other variables to be set by the user
 ##############################################################################
 
 MULTI_CRITERIA = TRUE
 LIFO = FALSE
 FIND_NONDOMINATED_SOLUTIONS = TRUE
-BINARY_SEARCH = TRUEE
+BINARY_SEARCH = FALSE
 DO_CONCORDE_CUTS = FALSE
 DIRECTED_X_VARS = TRUE
 ADD_FLOW_VARS = TRUE
 ADD_CAP_CUTS = FALSE
 ADD_X_CUTS = FALSE
-SAVE_CUT_POOL = TRUE
+SAVE_CUT_POOL = FALSE
 
 ifeq ($(MULTI_CRITERIA),TRUE)
 USER_BB_DEFINES += -DMULTI_CRITERIA
-USER_MAIN = TRUE
 endif
 
 ifeq ($(LIFO),TRUE)
@@ -113,11 +123,9 @@ COST_SRC          = compute_cost.c
 NET_SRC           = network.c
 DG_FUNC_SRC       = cnrp_dg_functions.c
 
-USER_MASTER_SRC   = cnrp_master.c cnrp_io.c cnrp_master_functions.c 
-USER_MASTER_SRC  += small_graph.c
-ifeq ($(MULTI_CRITERIA),TRUE)
-USER_MASTER_SRC  += cnrp_main.c
-endif
+USER_MASTER_SRC   = cnrp_main.c cnrp_master.c cnrp_io.c
+USER_MASTER_SRC  += cnrp_master_functions.c small_graph.c
+
 USER_MASTER_SRC  += $(COST_SRC)
 ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)

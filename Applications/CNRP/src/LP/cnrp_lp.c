@@ -772,9 +772,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
   cut_data *cut;
   char *coef;
   double *matval = NULL;
-#if defined(ADD_FLOW_VARS) || defined(DIRECTED_X_VARS)
   int total_edgenum = cnrp->vertnum*(cnrp->vertnum - 1)/2;
-#endif
   int size, vertnum = ((cnrp_spec *)user)->vertnum; 
   int cliquecount = 0, val, edgeind;
   char *clique_array, first_coeff_found, second_coeff_found, third_coeff_found;
@@ -1681,10 +1679,6 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
   char print_solution = FALSE;
   char continue_with_node = FALSE;
   
-  if (cnrp->ub > 0 && *true_objval > cnrp->ub + etol){
-     return(0);
-  }
-
 #ifdef MULTI_CRITERIA
   for (i = 0; i < n->edgenum; i++){
      fixed_cost += cnrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
@@ -1692,6 +1686,15 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
      variable_cost += (n->edges[i].flow1+n->edges[i].flow2)*
 	cnrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
 #endif
+  }
+
+#if 0
+  *true_objval -= cnrp->par.rho*(fixed_cost+variable_cost);
+#endif
+  
+  if (cnrp->ub > 0 &&
+      *true_objval-cnrp->par.rho*(fixed_cost+variable_cost) > cnrp->ub+etol){
+     return(FALSE);
   }
 
   if (cnrp->par.gamma == 1.0){
@@ -1708,7 +1711,7 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 #endif
 	    cnrp->variable_cost = variable_cost;
 	    cnrp->fixed_cost = fixed_cost;
-	    cnrp->ub = *true_objval;
+	    cnrp->ub = *true_objval-cnrp->par.rho*(fixed_cost+variable_cost);
 	    print_solution = TRUE;
 	 }
 	/* Add an optimality cut for the second objective */
@@ -1739,7 +1742,7 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 #endif
 	   cnrp->variable_cost = variable_cost;
 	   cnrp->fixed_cost = fixed_cost;
-	   cnrp->ub = *true_objval;
+	   cnrp->ub = *true_objval-cnrp->par.rho*(fixed_cost+variable_cost);
 	   print_solution = TRUE;
 	}
 	/* Add an optimality cut for the second objective */
@@ -1757,7 +1760,8 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 	}
      }
   }else{
-     if ((*true_objval < cnrp->ub - etol) ||
+     if ((*true_objval-cnrp->par.rho*(fixed_cost+variable_cost) <
+	  cnrp->ub - etol) ||
 	 (fixed_cost < cnrp->fixed_cost - etol &&
 	  variable_cost < cnrp->variable_cost + etol) ||
 	 (variable_cost < cnrp->variable_cost - etol &&
@@ -1771,12 +1775,12 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 #endif
 	cnrp->variable_cost = variable_cost;
 	cnrp->fixed_cost = fixed_cost;
-	cnrp->ub = *true_objval;
+	cnrp->ub = *true_objval-cnrp->par.rho*(fixed_cost+variable_cost);
 	print_solution = TRUE;
      }
      if (!branching){
 	if (cnrp->par.gamma*(fixed_cost - cnrp->utopia_fixed) >
-	    *true_objval-etol){
+	    *true_objval-cnrp->par.rho*(fixed_cost+variable_cost)-etol){
 	   /* Add an optimality cut for the second objective */
 	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	   new_cut->coef = NULL;

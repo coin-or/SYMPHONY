@@ -1,4 +1,3 @@
-
 ##############################################################################
 ##############################################################################
 #                                                                            #
@@ -82,7 +81,7 @@ RANLIB = ranlib
 
 ##############################################################################
 # COINROOT is the path to the root directory of the COIN libraries. Many of
-# the new features of COIN require the COIN libraries to be installed
+# the new features of SYMPHONY require the COIN libraries to be installed
 ##############################################################################
 
 COINROOT = ${HOME}/COIN
@@ -519,6 +518,11 @@ endif
 
 INCDIR       = $(EXTRAINCDIR) -I$(SYMPHONYROOT)/include -I$(USERROOT)/include 
 INCDIR 	    += $(USER_INCDIR)
+
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+INCDIR      += -I$(COINROOT)/include -I$(COINROOT)/Osi/OsiSym/include
+endif
+
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ifeq ($(DECOMP),TRUE)
 INCDIR 	    += -I$(SYMPHONYROOT)/include/decomp
@@ -537,6 +541,11 @@ OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)
 LIBDIR	     = $(SYMPHONYROOT)/lib.$(ARCH)/$(LP_SOLVER)
 BINDIR       = $(USERROOT)/bin.$(ARCH)/$(LP_SOLVER)
 endif
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+OSI_SRC_PATH = $(COINROOT)/Osi/OsiSym
+else
+OSI_SRC_PATH = 
+endif
 
 SRCDIR  = \
 	$(SYMPHONYROOT)/Common     : $(USERROOT)/Common    :\
@@ -549,9 +558,8 @@ SRCDIR  = \
 	$(SYMPHONYROOT)/include    : $(USERROOT)/include   :\
 	$(SYMPHONYROOT)            : $(USERROOT)           :\
 	$(SYMPHONYROOT)/TreeManager                        :\
-	$(USER_SRC_PATH)
 
-VPATH  = $(SRCDIR):$(USER_SRCDIR)
+VPATH  = $(SRCDIR):$(USER_SRCDIR):$(OSI_SRC_PATH)
 
 ##############################################################################
 # Put it together
@@ -573,6 +581,11 @@ ifeq ($(CC),ompcc)
 else
 	LIBS  = -lX11 -lm $(COMMLIBS) $(SYSLIBS) $(USERLIBS)
 endif
+
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+LIBS += -lOsi
+endif	
+
 ifeq ($(OPT),-O)
     ifeq ($(CC),gcc)
 	OPT = -O3 
@@ -704,9 +717,6 @@ endif
 ifeq ($(CHECK_LP),TRUE)
 BB_DEFINES += -DCOMPILE_CHECK_LP
 endif
-ifeq ($(USER_MAIN),TRUE)
-BB_DEFINES += -DUSER_MAIN
-endif
 
 ifeq ($(COMPILE_IN_CG),TRUE)
 BB_DEFINES += -DCOMPILE_IN_CG
@@ -779,6 +789,9 @@ CFLAGS = $(DEFAULT_FLAGS) $(MORECFLAGS) $(MOREFLAGS)
 ##############################################################################
 
 MASTER_SRC	= master.c master_wrapper.c master_io.c
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+MASTER_SRC     += OsiSymSolverInterface.c
+endif
 DG_SRC		= draw_graph.c
 
 ifeq ($(COMPILE_IN_TM), TRUE)

@@ -43,23 +43,6 @@
  * This file contains basic functions associated with the treemanager process
 \*===========================================================================*/
 
-/*===========================================================================*\
- * This small function simply returns a pointer to the current tree manager 
- * so that it can be accessed from anywhere without explicitly passing
- * a pointer. 
-\*===========================================================================*/
-
-tm_prob *get_tm_ptr(char reset)
-{
-   static tm_prob *tm;
-   
-   if (!tm || reset){
-      tm = (tm_prob *) calloc(1, sizeof(tm_prob));
-   }
-
-   return(tm);
-}
-
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -67,17 +50,12 @@ tm_prob *get_tm_ptr(char reset)
  * the tree manager data structures, etc.
 \*===========================================================================*/
 
-tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
+void tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
 {
-#ifdef COMPILE_IN_TM
-   /* If the TM function is being compiled into the master, then we
-      need access to the problem data. */
-   problem *p = get_problem_ptr(FALSE);
-#else
+#ifndef COMPILE_IN_TM
    int r_bufid, bytes, msgtag, i;
 #endif
    FILE *f;
-   tm_prob *tm;
    tm_params *par;
    bc_node *root = (bc_node *) calloc(1, sizeof(bc_node));
 #ifdef COMPILE_IN_LP
@@ -91,8 +69,6 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
 #endif
    int s_bufid;
 #endif
-
-   tm = get_tm_ptr(FALSE);
 
    par = &tm->par;
 
@@ -115,19 +91,8 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
    \*------------------------------------------------------------------------*/
 
 #ifdef COMPILE_IN_TM
-   /* If the TM is being compiled in, we can simply copy the data
-      instead of getting it through message passing. */
-   tm->par = p->par.tm_par;
-
-   if ((tm->has_ub = p->has_ub))
-      tm->ub = p->ub;
-   if ((tm->has_ub_estimate = p->has_ub_estimate))
-      tm->ub_estimate = p->ub_estimate;
-
    tm->bvarnum = base->varnum;
    tm->bcutnum = base->cutnum;
-
-   tm->master = master_tid;
 #else
    r_bufid = receive_msg(ANYONE, TM_DATA);
    bufinfo(r_bufid, &bytes, &msgtag, &tm->master);
@@ -303,8 +268,6 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
       root->optimal_path = TRUE;
 #endif
    }
-   
-   return(tm);
 }
    
 /*===========================================================================*/

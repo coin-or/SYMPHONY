@@ -42,7 +42,9 @@ int main(void)
    
    register_process();  /*Enroll this program in PVM*/
 
-   tm = tm_initialize(NULL, NULL, 0);
+   tm = (tm_prob *) calloc(1, sizeof(tm_prob));
+   
+   tm_initialize(tm, NULL, NULL);
    
    tm->start_time = wall_clock(NULL);
    
