@@ -210,7 +210,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #elif defined(ADD_FLOW_VARS)
    mip->nz = 8*edgenum;
 #else
-   mip->nz = 2*edgenum;
+   mip->nz = 3*edgenum;
 #endif
 #ifdef ADD_X_CUTS
    mip->nz += 2*edgenum;
@@ -898,10 +898,8 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		 v0 = edges[edgeind << 1];
 		 v1 = edges[(edgeind << 1) + 1];
 	      }
-	      if ((coef[v1 >> DELETE_POWER] >>
-		  (v1 & DELETE_AND) & 1) &&
-		  !(coef[v0 >> DELETE_POWER] >>
-		  (v0 & DELETE_AND) & 1)){
+	      if ((coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1) &&
+		  !(coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1)){
 		 matind[nzcnt++] = i;
 	      }
 	   }
@@ -914,8 +912,8 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	      edgeind = vars[i]->userind;
 	      v0 = edges[edgeind << 1];
 	      v1 = edges[(edgeind << 1) + 1];
-	      if ((coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1) &&
-		  !(coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1)){
+	      if ((coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1) ^
+		  (coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1)){
 		 matind[nzcnt++] = i;
 	      }
 	   }

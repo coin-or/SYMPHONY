@@ -682,6 +682,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 			      in_set, cut_val, ref, cut_list, demand, mult);
 #endif
       memcpy((char *)new_demand, (char *)demand, vertnum*DSIZE);
+
 #ifndef DIRECTED_X_VARS
       if (mult == 2){
 	 /*We can only do this for VRP and TSP problems without directed X
@@ -692,7 +693,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 num_cuts +=
 	    reduce_graph(n, etol, new_demand, cnrp->capacity, mult, new_cut);
       }
-      if (comp_num > 1){
+
+      if (comp_num > 1 || prob_type == CTP || prob_type == CSTP){
 	 num_cuts += greedy_shrinking1(n, capacity, etol,
 				       cnrp->par.max_num_cuts_in_shrink,
 				       new_cut, compnodes_copy, compmembers,
@@ -714,7 +716,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 2 * cnrp->par.greedy_num_trials;
       else
 	 num_trials = cnrp->par.greedy_num_trials;
-      if (comp_num){
+      if (comp_num > 1 || prob_type == CTP || prob_type == CSTP){
 	 num_cuts += greedy_shrinking6(n, capacity, etol, new_cut,
 				       compnodes_copy, compmembers, comp_num,
 				       in_set, cut_val, ref, cut_list,
@@ -742,180 +744,6 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    FREE(compmembers);
    FREE(compnodes_copy);
 
-   /*Now look for violated flow capacity constraints We are checking
-     to see if there are any nonzero flow variables whose
-     corresponding edge variable is zero. Recall, 'i' already equals the
-     index of the first flow var*/
-   
-#if 0
-#ifdef DIRECTED_X_VARS
-   if (cnrp->par.generate_x_cuts){
-      new_cut->coef  = (char *) malloc(ISIZE);
-      new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
-      for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
-	 if (edge1->weight > 1 + etol){
-	    new_cut->type  = X_CUT;
-	    new_cut->size  = ISIZE;
-	    new_cut->rhs   = 1.0;
-	    ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1);
-	    num_cuts += cg_send_cut(new_cut);
-	 }
-      }
-      FREE(new_cut->coef);
-   }      
-#endif
-   
-#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) 
-   if (cnrp->par.generate_cap_cuts){
-      new_cut->coef  = (char *) malloc(ISIZE);
-      new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
-      for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
-	 if ((flow_value = edge1->flow1) > etol){
-	    real_demand = edge1->v0 ? demand[edge1->v0] : 0;
-	    if ((capacity - real_demand)*edge1->weight1 < edge1->flow1 - etol){
-	       new_cut->type  = FLOW_CAP;
-	       new_cut->size  = ISIZE;
-	       new_cut->rhs   = 0.0;
-	       ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1);
-	       num_cuts += cg_send_cut(new_cut);
-	    }
-	 }
-	 if ((flow_value = edge1->flow2) > etol){
-	    if ((capacity-demand[edge1->v1])*edge1->weight2<edge1->flow2-etol){
-	       new_cut->type  = FLOW_CAP;
-	       new_cut->size  = ISIZE;
-	       new_cut->rhs   = 0.0;
-	       ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1) +
-		  total_edgenum;
-	       num_cuts += cg_send_cut(new_cut);
-	    }
-	 }
-      }
-      FREE(new_cut->coef);
-   }
-#elif defined(ADD_FLOW_VARS)
-   if (cnrp->par.generate_cap_cuts){
-      new_cut->coef  = (char *) malloc(ISIZE);
-      new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
-      for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
-	 if (flow_cap*edge1->weight < edge1->flow1 + edge1->flow2 - etol){
-	    new_cut->type  = FLOW_CAP;
-	    new_cut->size  = ISIZE;
-	    new_cut->rhs   = 0.0;
-	    ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1);
-	    num_cuts += cg_send_cut(new_cut);
-	 }
-      }
-      FREE(new_cut->coef);
-   }
-#endif   
-
-   if (num_cuts){
-      free_net(n);
-      FREE(new_cut);
-      *cutnum = num_cuts;
-      return(USER_SUCCESS);
-   }
-   
-#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) 
-   if (cnrp->par.generate_tight_cap_cuts){
-      new_cut->coef  = (char *) malloc(ISIZE);
-      new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
-      for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
-	 if ((flow_value = edge1->flow1) > etol){
-	    for (cur_edge = verts[edge1->v1].first; cur_edge;
-		 cur_edge = cur_edge->next_edge){
-	       if (cur_edge->other_end > edge1->v1){
-		  flow_value -= cur_edge->data->flow1;
-	       }else{
-		  flow_value -= cur_edge->data->flow2;
-	       }
-	       if (flow_value < edge1->weight1*demand[edge1->v1]){
-		  break;
-	       }
-	    }
-	    if (flow_value > edge1->weight1*demand[edge1->v1] + etol){
-	       new_cut->type  = TIGHT_FLOW;
-	       new_cut->size  = ISIZE;
-	       new_cut->rhs   = 0.0;
-	       ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1);
-	       num_cuts += cg_send_cut(new_cut);
-	    }
-	 }
-	 if ((flow_value = edge1->flow2) > etol){
-	    real_demand = edge1->v0 ? demand[edge1->v0] : 0;
-	    for (cur_edge = verts[edge1->v0].first; cur_edge;
-		 cur_edge = cur_edge->next_edge){
-	       if (cur_edge->other_end > edge1->v0){
-		  flow_value -= cur_edge->data->flow1;
-	       }else{
-		  flow_value -= cur_edge->data->flow2;
-	       }
-	       if (flow_value < edge1->weight2*real_demand){
-		  break;
-	       }
-	    }
-	    if (flow_value > edge1->weight2*real_demand + etol){
-	       new_cut->type  = TIGHT_FLOW;
-	       new_cut->size  = ISIZE;
-	       new_cut->rhs   = 0.0;
-	       ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1) +
-		  total_edgenum;
-	       num_cuts += cg_send_cut(new_cut);
-	    }
-	 }
-      }
-      FREE(new_cut->coef);
-   }
-#elif defined(ADD_FLOW_VARS)
-   if (cnrp->par.generate_tight_cap_cuts){
-      new_cut->coef  = (char *) malloc(ISIZE);
-      new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
-      for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
-	 for (cur_edge = verts[edge1->v1].first; cur_edge;
-	      cur_edge = cur_edge->next_edge){
-	    if (cur_edge->other_end > edge1->v1){
-	       flow_value -= cur_edge->data->flow1;
-	    }else{
-	       flow_value -= cur_edge->data->flow2;
-	    }
-	    if (flow_value < edge1->weight*demand[edge1->v1]){
-	       break;
-	    }
-	 }
-	 if (flow_value > edge1->weight*demand[edge1->v1] + etol){
-	    new_cut->type  = TIGHT_FLOW;
-	    new_cut->size  = ISIZE;
-	    new_cut->rhs   = 0.0;
-	    ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1);
-	    num_cuts += cg_send_cut(new_cut);
-	 }
-	 real_demand = edge1->v0 ? demand[edge1->v0] : 0;
-	 for (cur_edge = verts[edge1->v0].first; cur_edge;
-	      cur_edge = cur_edge->next_edge){
-	    if (cur_edge->other_end > edge1->v0){
-	       flow_value -= cur_edge->data->flow1;
-	    }else{
-	       flow_value -= cur_edge->data->flow2;
-	    }
-	    if (flow_value < edge1->weight*real_demand){
-	       break;
-	    }
-	 }
-	 if (flow_value > edge1->weight*real_demand + etol){
-	    new_cut->type  = TIGHT_FLOW;
-	    new_cut->size  = ISIZE;
-	    new_cut->rhs   = 0.0;
-	    ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1) +
-	       total_edgenum;
-	    num_cuts += cg_send_cut(new_cut);
-	 }
-      }
-      FREE(new_cut->coef);
-   }
-#endif   
-#endif
-   
    FREE(new_cut);
    free_net(n);
    *cutnum = num_cuts;

@@ -42,10 +42,10 @@ extern CCrandstate rand_state;
 
 #define SEND_DIR_SUBTOUR_CONSTRAINT(num_nodes, total_demand)                 \
 new_cut->type = (num_nodes < vertnum/2 ?                                     \
-		 SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);                     \
+		SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);                      \
 new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                         \
-		RHS(num_nodes, total_demand, capacity) :                     \
-		mult*BINS(total_demand, capacity));                          \
+               RHS(num_nodes, total_demand, capacity) :                      \
+	       BINS(total_demand, capacity));                                \
 num_cuts += cg_send_cut(new_cut);                                            \
 
 #define SEND_SUBTOUR_CONSTRAINT(num_nodes, total_demand)                     \

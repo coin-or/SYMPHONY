@@ -333,6 +333,9 @@ int main(int argc, char **argv)
       printf("Optimal Range: %.2f - %.2f\n", gamma1, gamma0);
       gamma0 = gamma1;
    }
+   printf("Fixed Cost: %.3f Variable Cost: %.3f ",
+	  solutions[i].fixed_cost, solutions[i].variable_cost);
+   printf("Optimal Range: %.2f - %.2f\n", 0.0, gamma0);
    
    FREE(root->desc);
    FREE(root->uind.list);

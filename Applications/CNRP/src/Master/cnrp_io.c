@@ -34,7 +34,7 @@
 #include "cnrp_const.h"
 #include "cnrp_macros.h"
 
-#define NUMNODES 20
+#define NUMNODES -1
 
 /*===========================================================================*/
 
@@ -261,8 +261,10 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 	   exit(1);
 	}
 	cnrp->capacity = ((double) k)*demand_scale_factor;
-	if (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == VRP)
-	   cnrp->capacity=1.2*ceil(cnrp->capacity*(NUMNODES/(double)vertnum));
+	if (NUMNODES > 0 &&
+	    (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == VRP)){
+	   cnrp->capacity=ceil(cnrp->capacity*(NUMNODES/(double)vertnum));
+	}
 	break;
       case 5 : /* EDGE_WEIGHT_TYPE */
 	sscanf(line, "%s", tmp);
