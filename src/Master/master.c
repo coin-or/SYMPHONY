@@ -293,7 +293,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->generate_cgl_probing_cuts = TRUE;
    lp_par->generate_cgl_flow_and_cover_cuts = FALSE;
    lp_par->generate_cgl_rounding_cuts = FALSE;
-   lp_par->generate_cgl_lift_and_projects_cuts = FALSE;
+   lp_par->generate_cgl_lift_and_project_cuts = FALSE;
 
    lp_par->multi_criteria = FALSE;
    lp_par->mc_find_supported_solutions = FALSE;
