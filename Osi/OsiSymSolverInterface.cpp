@@ -87,6 +87,7 @@ bool OsiSymSolverInterface::setIntParam(OsiIntParam key, int value)
 
     case OsiLastIntParam:
        return false;
+
     default:
        return false;
    }
@@ -111,6 +112,14 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
       env_->par.tm_par.node_limit = value;
       return true;
 
+    case OsiSymFindFirstFeasible:
+      env_->par.tm_par.find_first_feasible = value;
+      return true;
+
+    case OsiSymUsePermanentCutPools:
+      env_->par.use_permanent_cut_pools = value;
+      return true;
+      
     default: 
       return false;
    }
@@ -238,6 +247,14 @@ bool OsiSymSolverInterface::getSymParam(OsiSymIntParam key, int& value)
       value = env_->par.tm_par.node_limit;
       return true;
 
+    case OsiSymFindFirstFeasible:
+      value = env_->par.tm_par.find_first_feasible;
+      return true;
+      
+    case OsiSymUsePermanentCutPools:
+      env_->par.use_permanent_cut_pools = value;
+      return true;
+      
    default:
       return false;
    }
@@ -271,7 +288,7 @@ bool OsiSymSolverInterface::getDblParam(OsiDblParam key, double& value) const
 /*===========================================================================*/
 
 bool OsiSymSolverInterface::getSymParam(OsiSymDblParam key, 
-					   double& value) const
+					double& value) const
 {
    switch(key){
 
