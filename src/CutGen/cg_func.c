@@ -187,6 +187,7 @@ cut_data *create_explicit_cut(int nzcnt, int *indices, double *values,
    cut_data *cut = (cut_data *) calloc(1, sizeof(cut_data));
 
    cut->type = EXPLICIT_ROW;
+   cut->sense = sense;
    cut->rhs = rhs;
    cut->range = range;
    cut->size = ISIZE + nzcnt * (ISIZE + DSIZE);

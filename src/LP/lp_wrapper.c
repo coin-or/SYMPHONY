@@ -1669,24 +1669,6 @@ void generate_cuts_in_lp_u(lp_prob *p)
    
    colind_sort_extra(p);
    
-   user_res = user_generate_cuts_in_lp(p->user, lp_data, lp_data->n,
-				       lp_data->vars, x,
-				       &new_row_num, &cuts);
-   
-#ifdef USE_CGL_CUTS
-   
-   generate_cgl_cuts(lp_data, &new_row_num, &cuts);
-
-#endif
-
-   if (new_row_num > 0){
-      for (i = 0; i < new_row_num; i++){
-	 cg_send_cut(cuts[i]);
-      }
-      free_cuts(cuts, new_row_num);
-      FREE(cuts);
-   }
-
 #if defined(COMPILE_IN_CG) || defined(COMPILE_IN_CP) 
    {
 #ifdef COMPILE_IN_CP
@@ -1828,18 +1810,30 @@ void generate_cuts_in_lp_u(lp_prob *p)
    }
 #endif      
    
-   for (i = 0; i < new_row_num; i++){
-      if (new_rows[i]->cut->name != CUT__SEND_TO_CP)
-	 new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
-      new_rows[i]->source_pid = INTERNAL_CUT_GEN;
+   user_res = user_generate_cuts_in_lp(p->user, lp_data, lp_data->n,
+				       lp_data->vars, x,
+				       &new_row_num, &cuts);
+   
+#ifdef USE_CGL_CUTS
+   
+   generate_cgl_cuts(lp_data, &new_row_num, &cuts);
+
+#endif
+
+   if (new_row_num){
+      unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
+		    new_row_num, cuts, &new_row_num, &new_rows);
+      for (i = 0; i < new_row_num; i++){
+	 if (new_rows[i]->cut->name != CUT__SEND_TO_CP)
+	    new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
+	 new_rows[i]->source_pid = INTERNAL_CUT_GEN;
+      }
    }
    
    switch(user_res){
     case ERROR:
       return;
     case DEFAULT:
-      /* For now, nothing doing.
-       * Later on we could put Gomory cut generation here... */
     case USER_AND_PP:
     case USER_NO_PP:
       /* Test whether any of the new cuts are identical to any of

@@ -2650,10 +2650,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 
    if (cutlist.sizeRowCuts() > 0){
       if (*num_cuts > 0){
-	 *num_cuts += cutlist.sizeRowCuts();
-	 *cuts = (cut_data **) realloc(*cuts, (*num_cuts) * sizeof(cut_data));
+	 *cuts = (cut_data **) realloc(*cuts, (*num_cuts + cutlist.sizeRowCuts())
+				       * sizeof(cut_data *));
       }else{
-	 *cuts = (cut_data **) malloc(cutlist.sizeRowCuts() * sizeof(cut_data));
+	 *cuts = (cut_data **) malloc(cutlist.sizeRowCuts() * sizeof(cut_data *));
       }
 #if 1
       for (i = 0, j = 0; i < cutlist.sizeRowCuts(); i++){
@@ -2661,12 +2661,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 	 if (cut.sense() == 'R'){
 	    continue;
 	 }
-	 (*cuts)[j] =
+	 (*cuts)[j++] =
 	    create_explicit_cut(cut.row().getNumElements(),
 				const_cast<int *> (cut.row().getIndices()),
 				const_cast<double *> (cut.row().getElements()),
 				cut.rhs(), cut.range(), cut.sense(), FALSE);
       }
+      *num_cuts += j;
 #else
       for (i = 0, j = 0; i < cutlist.sizeRowCuts(); i++){
 	 cut = cutlist.rowCut(i);
