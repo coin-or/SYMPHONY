@@ -331,9 +331,11 @@ network *create_flow_net(int *xind, double *xval, int edgenum, double etol,
    }
    
    /*set the demand for each node*/
-   for (i = 0; i < vertnum; i++){
-      verts[i].demand = demand[i];
-      verts[i].orignodenum = i;
+   if (demand){
+      for (i = 0; i < vertnum; i++){
+	 verts[i].demand = demand[i];
+	 verts[i].orignodenum = i;
+      }
    }
 
    return(n);

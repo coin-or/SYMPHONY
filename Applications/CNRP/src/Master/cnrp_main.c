@@ -53,7 +53,7 @@ typedef struct SOLUTION_PAIRS{
 
 /*===========================================================================*/
 
-void cnrp_solve(problem *p, base_desc *base, node_desc *root);
+void cnrp_solve(problem *p, cut_pool **cp, base_desc *base, node_desc *root);
 
 /*===========================================================================*/
 
@@ -65,6 +65,7 @@ int main(int argc, char **argv)
 {
    int i;
    problem *p;
+   cut_pool **cp = NULL;
    double gamma, gamma0, gamma1, tau, slope;
    double start_time, t = 0;
 
@@ -127,6 +128,18 @@ int main(int argc, char **argv)
    
    initialize_root_node_u(p, base, root);
 
+#ifdef SAVE_CUT_POOL
+   if (p->par.tm_par.max_cp_num){
+      cp = (cut_pool **) malloc(p->par.tm_par.max_cp_num*sizeof(cut_pool *));
+      for (i = 0; i < p->par.tm_par.max_cp_num; i++){
+	 cp[i] = (cut_pool *) calloc(1, sizeof(cut_pool));
+	 cp[i]->par = p->par.cp_par;
+	 CALL_USER_FUNCTION( user_send_cp_data(p->user, &cp[i]->user) );
+      }
+      get_cp_ptr(cp, 0);
+   }
+#endif
+   
    /* First, calculate the utopia point */
    
    cnrp->lp_par.gamma = 1.0;
@@ -139,7 +152,7 @@ int main(int argc, char **argv)
    printf("***************************************************\n\n");
 
    /* Solve */
-   cnrp_solve(p, base, root);
+   cnrp_solve(p, cp, base, root);
 
    /* Store the solution */
    tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
@@ -160,7 +173,7 @@ int main(int argc, char **argv)
    printf("***************************************************\n\n");
 
    /* Solve */
-   cnrp_solve(p, base, root);
+   cnrp_solve(p, cp, base, root);
       
    /* Store the solution */
    tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
@@ -233,7 +246,7 @@ int main(int argc, char **argv)
 
       cnrp->fixed_cost = cnrp->variable_cost = 0.0;
       
-      cnrp_solve(p, base, root);
+      cnrp_solve(p, cp, base, root);
 
       if (cnrp->fixed_cost == 0.0 && cnrp->variable_cost == 0.0)
 	 continue;
@@ -301,7 +314,16 @@ int main(int argc, char **argv)
 #endif
    printf(  "* Now displaying stats...                              *\n");
    printf(  "********************************************************\n\n");
-      
+
+#ifdef SAVE_CUT_POOL
+   for (i = 0; i < p->par.tm_par.max_cp_num; i++){
+      p->comp_times.bc_time.cut_pool += cp[i]->cut_pool_time;
+      p->stat.cuts_in_pool += cp[i]->cut_num;
+      cp[i]->msgtag = YOU_CAN_DIE;
+      cp_close(cp[i]);
+   }
+#endif
+   
    print_statistics(&(p->comp_times.bc_time), &(p->stat), 0.0, 0.0, 0,
 		    start_time);
 
@@ -347,11 +369,12 @@ int main(int argc, char **argv)
    for (i = 0 ; i < numsolutions; i++){
       FREE(solutions[i].tree);
    }
+   FREE(cp);
 
    return(0);
 }
 
-void cnrp_solve(problem *p, base_desc *base, node_desc *root)
+void cnrp_solve(problem *p, cut_pool **cp, base_desc *base, node_desc *root)
 {
    int termcode;
    double t = 0, start_time;
@@ -366,10 +389,15 @@ void cnrp_solve(problem *p, base_desc *base, node_desc *root)
    
    send_lp_data_u(p, 0, base);
    send_cg_data_u(p, 0);
+   tm = get_tm_ptr(FALSE);
+#ifdef SAVE_CUT_POOL
+   tm->cpp = cp;
+#else
    send_cp_data_u(p, 0);
-
-   tm = tm_initialize(base, root, 0);
+#endif
    
+   tm_initialize(base, root, 0);
+
    /*---------------------------------------------------------------------*\
     * Solve the problem and receive solutions                         
    \*---------------------------------------------------------------------*/
@@ -377,6 +405,11 @@ void cnrp_solve(problem *p, base_desc *base, node_desc *root)
    tm->start_time = start_time;
 
    termcode = solve(tm);
+
+#ifdef SAVE_CUT_POOL
+   /* Save the cut pool from being wiped out */
+   tm->cpp = NULL;
+#endif
    
    tm_close(tm, termcode);
    
@@ -407,7 +440,6 @@ void cnrp_solve(problem *p, base_desc *base, node_desc *root)
    if (tm->stat.max_depth > p->stat.max_depth){
       p->stat.max_depth = tm->stat.max_depth;
    }
-   p->stat.cuts_in_pool += tm->stat.cuts_in_pool;
    p->stat.chains += tm->stat.chains;
    p->stat.diving_halts += tm->stat.diving_halts;
    p->stat.tree_size += tm->stat.tree_size;
@@ -432,7 +464,6 @@ void cnrp_solve(problem *p, base_desc *base, node_desc *root)
    p->comp_times.bc_time.idle_names += tm->comp_times.idle_names;
    p->comp_times.bc_time.idle_cuts += tm->comp_times.idle_cuts;
    p->comp_times.bc_time.start_node += tm->comp_times.start_node;
-   p->comp_times.bc_time.cut_pool += tm->comp_times.cut_pool;
 
 #if 0
    if (p->par.do_draw_graph){
@@ -441,7 +472,7 @@ void cnrp_solve(problem *p, base_desc *base, node_desc *root)
       freebuf(s_bufid);
    }
 #endif
-   
+
    free_tm(tm);
 }
 

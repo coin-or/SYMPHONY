@@ -22,6 +22,8 @@
 typedef struct CNRP_SPEC_CP{
    int vertnum;         /*number of vertices in the problem*/
    int edgenum;         /*number of edges in the problem*/
+   double capacity;
+   double *demand;
    int *edges;          /*a list of the edges (by index pairs)*/
    struct POOL_NET *n;
 }cnrp_spec_cp;

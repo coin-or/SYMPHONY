@@ -652,6 +652,9 @@ int user_send_cp_data(void *user, void **user_cp)
    int i, j, k;
 
    cnrp_cp->vertnum = cnrp->vertnum;
+   cnrp_cp->capacity = cnrp->capacity;
+   cnrp_cp->demand = (double *) malloc(cnrp->vertnum * DSIZE);
+   memcpy((char *)cnrp_cp->demand, (char *) cnrp->demand, cnrp->vertnum * DSIZE); 
 
    *user_cp = (void *)cnrp_cp;
 
@@ -680,6 +683,9 @@ int user_send_cp_data(void *user, void **user_cp)
       done in user_receive_cp_data() in the CP process */
    
    send_int_array(&cnrp->vertnum, 1);
+   send_dbl_array(&cnrp->capacity, 1);
+   send_dbl_array(cnrp->demand, cnrp->vertnum);
+   
 #endif
 
    return(USER_SUCCESS);

@@ -109,7 +109,7 @@ void cp_initialize(cut_pool *cp, int master_tid)
       read_cp_cut_list(cp, cp->par.warm_start_file_name);
    }else if (cp->par.warm_start == READ_TM_LIST){
       cp_read_tm_cut_list(cp, cp->par.warm_start_file_name);
-   }else{
+   }else if (!cp->cuts){
       cp->cuts = (cp_cut_data **) calloc (cp->par.block_size,
 					  sizeof(cp_cut_data *));
       cp->allocated_cut_num = cp->par.block_size;

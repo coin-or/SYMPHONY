@@ -2886,13 +2886,15 @@ int tm_close(tm_prob *tm, int termcode)
     * Receive statistics from the cutpools
    \*------------------------------------------------------------------------*/
 #ifdef COMPILE_IN_CP
-   for (i = 0; i < tm->par.max_cp_num; i++){
-      tm->comp_times.cut_pool += tm->cpp[i]->cut_pool_time;
-      tm->stat.cuts_in_pool += tm->cpp[i]->cut_num;
-      tm->cpp[i]->msgtag = YOU_CAN_DIE;
-      cp_close(tm->cpp[i]);
+   if (tm->cpp){
+      for (i = 0; i < tm->par.max_cp_num; i++){
+	 tm->comp_times.cut_pool += tm->cpp[i]->cut_pool_time;
+	 tm->stat.cuts_in_pool += tm->cpp[i]->cut_num;
+	 tm->cpp[i]->msgtag = YOU_CAN_DIE;
+	 cp_close(tm->cpp[i]);
+      }
+      FREE(tm->cpp);
    }
-   FREE(tm->cpp);
 #else
    for (i = 0; i < tm->par.max_cp_num;){
       r_bufid = treceive_msg(tm->cp.procs[i], POOL_TIME, &timeout);

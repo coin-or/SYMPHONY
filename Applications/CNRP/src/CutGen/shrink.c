@@ -431,7 +431,7 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 		  + 1 + 2 * numarcs * ISIZE;
 	       new_cut->type = MIXED_DICUT;
 	       new_cut->rhs = set_demand;
-	       new_cut->name  = CUT__DO_NOT_SEND_TO_CP;
+	       new_cut->name  = CUT__SEND_TO_CP;
 	       num_cuts += cg_send_cut(new_cut);
 	       if (num_cuts > max_num_cuts){
 		  FREE(new_cut->coef);
