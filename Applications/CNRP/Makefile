@@ -51,11 +51,11 @@ COMPILE_IN_CP = TRUE
 # Other variables to be set by the user
 ##############################################################################
 
-USER_MAIN = FALSE
+USER_MAIN = TRUE
 FIND_NONDOMINATED_SOLUTIONS = FALSE
 DO_CONCORDE_CUTS = FALSE
-DIRECTED_X_VARS = FALSE
-ADD_FLOW_VARS = FALSE
+DIRECTED_X_VARS = TRUE
+ADD_FLOW_VARS = TRUE
 ADD_CAP_CUTS = FALSE
 ADD_X_CUTS = FALSE
 

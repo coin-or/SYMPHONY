@@ -257,10 +257,9 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	     lp_data->status[branch_var] & PERM_FIXED_TO_UB){
 #endif
 	 if (vars[branch_var]->lb == vars[branch_var]->ub){
-	    printf("Error -- branching candidate is already fixed. \n");
+	    printf("Warning -- branching candidate is already fixed. \n");
 	    printf("SYMPHONY has encountered numerical difficulties \n");
 	    printf("With the LP solver. Exiting...\n\n");
-	    exit(3000);
 	 }
 	 lb = vars[branch_var]->lb;
 	 ub = vars[branch_var]->ub;
@@ -431,6 +430,21 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	 break;
    }
 
+   if (best_can->type == CANDIDATE_VARIABLE &&
+       vars[best_can->position]->lb == vars[best_can->position]->ub){
+      printf("Error -- branching variable is already fixed. \n");
+      printf("SYMPHONY has encountered numerical difficulties \n");
+      printf("with the LP solver. Exiting...\n\n");
+   }
+   
+   if (best_can->type == CANDIDATE_VARIABLE &&
+       best_can->rhs[0] < vars[best_can->position]->lb ||
+       best_can->rhs[1] > vars[best_can->position]->ub){
+      printf("Warning -- possible illegal branching. \n");
+      printf("SYMPHONY has encountered possible numerical difficulties \n");
+      printf("with the LP solver. Exiting...\n\n");
+   }
+   
 #ifndef MAX_CHILDREN_NUM
    FREE(pobj); FREE(pterm); FREE(pfeas); FREE(piter);
 #  ifdef COMPILE_FRAC_BRANCHING

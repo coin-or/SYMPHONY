@@ -102,7 +102,7 @@ int main(int argc, char **argv)
    printf("*******************************************************\n");
    printf("*   This is SYMPHONY Version 4.0                      *\n");
    printf("*   Copyright 2000-2003 Ted Ralphs                    *\n");
-   printf("*   All Rights Reserved.                                     *\n");
+   printf("*   All Rights Reserved.                              *\n");
    printf("*   Distributed under the Common Public License 1.0   *\n");
    printf("*******************************************************\n");
    printf("\n");

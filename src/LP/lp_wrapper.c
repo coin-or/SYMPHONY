@@ -285,6 +285,11 @@ int create_subproblem_u(lp_prob *p)
        * problem is loaded into the lp solver (for cplex it is not possible).
        * So for now just reset lp_data->m, do everything to load in the
        * stuff into the lp solver then come back to adding the cuts. */
+      if (p->mip->obj_sense == MAXIMIZE){
+         for (i = 0; i < lp_data->mip->n; i++){
+	    lp_data->mip->obj[i] *= -1.0;
+	 }
+      }
       lp_data->m = p->base.cutnum;
       break;
 
@@ -1366,6 +1371,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
       switch (cuts[i]->type){
 	 
       case EXPLICIT_ROW:
+	 real_nzcnt = 0;
 	 row_list[explicit_row_num] =
 	    (waiting_row *) malloc(sizeof(waiting_row));
 	 row_list[explicit_row_num]->cut = cuts[i];
@@ -1374,7 +1380,6 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 matval = (double *) (cuts[i]->coef + (1 + nzcnt) * ISIZE);
 	 row_list[explicit_row_num]->matind = (int *) malloc(nzcnt * ISIZE);
 	 row_list[explicit_row_num]->matval = (double *) malloc(nzcnt * DSIZE);
-	 real_nzcnt = 0;
 	 for (j = 0; j < lp_data->n; j++){
 	    for (k = 0; k < nzcnt; k++){
 	       if (matind[k] == lp_data->vars[j]->userind){

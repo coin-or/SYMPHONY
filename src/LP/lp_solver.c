@@ -2985,7 +2985,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
    OsiCuts cutlist;
    OsiRowCut cut;
    int i, j = 0; 
-
+   int *matind;
+   
    /* Set proper variables to be integer */
    for (i = 0; i < lp_data->n; i++) {
       if (lp_data->vars[i]->is_int) { // integer or binary
@@ -2993,7 +2994,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
       }
    }
    
-#if 0
    /* create CGL gomory cuts */
    CglGomory *gomory = new CglGomory;
    gomory->generateCuts(*(lp_data->si), cutlist);
@@ -3013,7 +3013,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
    CglProbing *probe = new CglProbing;
    probe->generateCuts(*(lp_data->si), cutlist);
    //printf("%i\n", cutlist.sizeRowCuts());
-#endif
    
    /* create CGL flow cover cuts */
    CglFlowCover *flow = new CglFlowCover;
@@ -3058,7 +3057,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 	 (*cuts)[j]->size = ISIZE + num_elements * (ISIZE + DSIZE);
 	 (*cuts)[j]->coef = (char *) malloc ((*cuts)[j]->size);
 	 ((int *) ((*cuts)[j]->coef))[0] = num_elements;
-	 memcpy((*cuts)[j]->coef + ISIZE, (char *)indices, num_elements*ISIZE);
+	 matind = (int *) ((*cuts)[i]->coef + ISIZE);
+	 for (i = 0; i < num_elements; i++){
+	    matind[i] = lp_data->vars[indices[i]]->userind;
+	 }
 	 memcpy((*cuts)[j]->coef + (num_elements + 1) * ISIZE,
 		(char *)elements, num_elements * DSIZE);
 	 (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
@@ -3068,10 +3070,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
       *num_cuts += j;
    }
    
-   //delete gomory;
-   //delete knapsack;
-   //delete oddhole;
-   //delete probe;
+   delete gomory;
+   delete knapsack;
+   delete oddhole;
+   delete probe;
    delete flow;
    /* delete rounding; */
    /* delete liftandproject; */
