@@ -149,6 +149,7 @@ int match_load_problem(sym_environment *env, user_problem *prob){
    FREE(sense);
    FREE(rhs);
    FREE(rngval);
+   FREE(is_int);
 
    return (FUNCTION_TERMINATED_NORMALLY);
 
