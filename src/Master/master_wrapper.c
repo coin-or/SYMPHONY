@@ -77,13 +77,33 @@ int readparams_u(sym_environment *env, int argc, char **argv)
 	    continue;
 	 switch (c) {
 	  case 'F':
-	    strncpy(env->par.infile, argv[++i],MAX_FILE_NAME_LENGTH);
-	    foundF = TRUE;
+	    if (i < argc - 1){
+	      sscanf(argv[i+1], "%c", &tmp); 
+	      if (tmp == '-'){
+		printf("Warning: Missing argument to command-line switch -%c\n",
+		       c);
+	      }else{
+		strncpy(env->par.infile, argv[++i],MAX_FILE_NAME_LENGTH);
+		foundF = TRUE;
+	      }
+	    }else{
+	      printf("Warning: Missing argument to command-line switch -%c\n",c);
+	    }
 	    break;	     
 	 case 'D':
-	    strncpy(env->par.datafile, argv[++i],MAX_FILE_NAME_LENGTH);
-	    foundD = TRUE;
-	    break;	     
+	   if (i < argc - 1){
+	     sscanf(argv[i+1], "%c", &tmp); 
+	     if (tmp == '-'){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	     }else{
+	       strncpy(env->par.datafile, argv[++i],MAX_FILE_NAME_LENGTH);
+	       foundD = TRUE;
+	     }
+	   }else{
+	     printf("Warning: Missing argument to command-line switch -%c\n",c);
+	   }
+	   break;	     
 	 case 'T':
 	   env->par.test = TRUE;
 	   if(i+1 < argc){
@@ -91,17 +111,21 @@ int readparams_u(sym_environment *env, int argc, char **argv)
 	     if(tmp != '-'){
 	       strncpy(env->par.test_dir, argv[++i],MAX_FILE_NAME_LENGTH);
 	     }
+	   }else{
+	     printf("Warning: Missing argument to command-line switch -%c\n",c);
 	   }
 	   break;	     
 	 default:
-	    break;
-	 }	 
+	   if (c < 'A'){
+	     printf("Warning: Ignoring unrecognized command-line switch -%c\n",
+		    c);
+	   }
+	   break;
+	 }	   
 	 if (foundF && foundD){
-	    break;
+	   break;
 	 }
       }
-      break;
-      
     case USER_SUCCESS:
     case USER_NO_PP:
     case USER_AND_PP:

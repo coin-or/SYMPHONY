@@ -462,7 +462,7 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	 break;
        case 'v':
 	 if (i < argc - 1){
-	    if (!sscanf(argv[i+1], "%i", &env->par.verbosity)){
+	    if (!sscanf(argv[i+1], "%i", &tmpi)){
 	       printf("Warning: Missing argument to command-line switch -%c\n",
 		      c);
 	    }else{
