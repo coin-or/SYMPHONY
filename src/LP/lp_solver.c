@@ -1772,13 +1772,7 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 void unload_lp_prob(LPdata *lp_data)
 {
 
-
-  //#ifndef __OSL_CLP__
    lp_data->si->reset();
-   //#else
-   //   close_lp_solver(LPdata * lp_data);
-   //   open_lp_solver(LP_data * lp_data);
-   //#endif
   
    /* Set parameters as in open_lp_solver() (do these persist?) */
    lp_data->si->setHintParam(OsiDoReducePrint);
@@ -2303,7 +2297,7 @@ void get_ub(LPdata *lp_data, int j, double *ub)
 
 void get_lb(LPdata *lp_data, int j, double *lb)
 {
-   *lb=lp_data->si->getColUpper()[j];
+   *lb=lp_data->si->getColLower()[j];
 }
 
 /*===========================================================================*/
