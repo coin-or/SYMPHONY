@@ -186,17 +186,9 @@ int user_free_cg(void **user)
  * and cuts go out.
 \*===========================================================================*/
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-int user_find_cuts(void *user, int varnum, int iter_num, int level,
-		   int index, double objval, int *indices, double *values,
-		   double ub, double etol, int *cutnum, char *status)
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   int index, double objval, int *indices, double *values,
 		   double ub, double etol, int *cutnum)
-#endif
 {
    vrp_cg_problem *vrp = (vrp_cg_problem *)user;
    int vertnum = vrp->vertnum;

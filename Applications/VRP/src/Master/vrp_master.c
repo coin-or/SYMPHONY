@@ -856,6 +856,9 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    }
 #endif
 
+
+   FREE(n);
+   
    return(USER_NO_PP);
 }
    

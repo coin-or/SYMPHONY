@@ -44,6 +44,7 @@ void free_master_u(problem *p)
 
    if (p->desc){
       free_lp_desc(p->desc);
+      FREE(p->desc);
    }
 }
 

@@ -535,13 +535,7 @@ int is_feasible_u(lp_prob *p)
    indices = lp_data->tmp.i1; /* n */
    values = lp_data->tmp.d; /* n */
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   cnt = collect_nonzeros(p, lp_data->x, indices, values, NULL);
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
    cnt = collect_nonzeros(p, lp_data->x, indices, values);
-#endif
 
    user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
 			       &feasible, &true_objval);
@@ -696,13 +690,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
    int i, *xind = lp_data->tmp.i1; /* n */
    double tmpd, *xval = lp_data->tmp.d; /* n */
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   number = collect_nonzeros(p, x, xind, xval, NULL);
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
    number = collect_nonzeros(p, x, xind, xval);
-#endif
 
    /* Invoke user written function. */
    user_res = user_display_lp_solution(p->user, which_sol, number, xind, xval);
@@ -1528,13 +1516,7 @@ int send_lp_solution_u(lp_prob *p, int tid)
 
    switch(user_res){
     case SEND_NONZEROS:
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-      nzcnt = collect_nonzeros(p, x, xind, xval, NULL);
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
       nzcnt = collect_nonzeros(p, x, xind, xval);
-#endif
       msgtag = LP_SOLUTION_NONZEROS;
       break;
     case SEND_FRACTIONS:
@@ -1693,9 +1675,6 @@ void generate_cuts_in_lp_u(lp_prob *p)
 #ifdef COMPILE_IN_CG
       int cg_new_row_num = 0;
       waiting_row **cg_new_rows = NULL;
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-      char *status = NULL;
-/*___END_EXPERIMENTAL_SECTION___*/
 #endif
       int user_res2, xlength = 0, *xind = NULL;
       lp_sol *cur_sol = &(p->cgp->cur_sol);
@@ -1715,11 +1694,6 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	 break;
        case SEND_NONZEROS:
        case SEND_FRACTIONS:
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if defined(COMPILE_DECOMP) && defined(COMPILE_IN_CG)
-	 status = lp_data->tmp.c;
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 	 cur_sol->xind = xind = lp_data->tmp.i1; /* n */
 	 cur_sol->xval = xval = lp_data->tmp.d; /* n */
 	 cur_sol->lpetol = lpetol = lp_data->lpetol;
@@ -1730,26 +1704,13 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	 if (p->has_ub)
 	    p->cgp->ub = p->ub;
 	 cur_sol->xlength = xlength = user_res2 == SEND_NONZEROS ?
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-	                             collect_nonzeros(p, x, xind, xval, status) :
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
 	                             collect_nonzeros(p, x, xind, xval) :
-#endif
 		                     collect_fractions(p, x, xind, xval);
 	 break;
       }
 #ifdef COMPILE_IN_CG      
       if (p->cgp->par.do_findcuts && !new_row_num)
 	 find_cuts_u(p->cgp, p->lp_data, &cg_new_row_num);
-
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-      if (!cg_new_row_num && p->cgp->par.do_decomp)
-	 cg_new_row_num = decomp(p->cgp);
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 #endif
 
       if (cg_new_row_num){

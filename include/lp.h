@@ -153,14 +153,7 @@ void fathom_branch PROTO((lp_prob *p));
 int fathom PROTO((lp_prob *p, int primal_feasible));
 void repricing PROTO((lp_prob *p));
 int bfind PROTO((int key, int *table, int size));
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-int collect_nonzeros PROTO((lp_prob *p, double *x, int *tind, double *tx,
-			    char *status));
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
 int collect_nonzeros PROTO((lp_prob *p, double *x, int *tind, double *tx));
-#endif
 int collect_fractions PROTO((lp_prob *p, double *x, int *tind, double *tx));
 node_desc *create_explicit_node_desc PROTO((lp_prob *p));
 int check_tailoff PROTO((lp_prob *p));

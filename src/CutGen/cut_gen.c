@@ -24,11 +24,6 @@
 #include "timemeas.h"
 #include "BB_constants.h"
 #include "BB_macros.h"
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-#   include "decomp.h"
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 
 /*===========================================================================*/
 
@@ -85,12 +80,6 @@ int main(void)
 	  p->msgtag == LP_SOLUTION_FRACTIONS){
 	 if (p->par.do_findcuts)
 	    find_cuts_u(p, NULL, &num_cuts);
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP 
-	 if (num_cuts == 0 && p->par.do_decomp)
-	    num_cuts = decomp(p);
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 	 /*-- send signal back to the LP that the cut generator is done -----*/
 	 s_bufid = init_send(DataInPlace);
 	 send_int_array(&num_cuts, 1);

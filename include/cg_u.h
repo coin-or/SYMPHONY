@@ -25,19 +25,10 @@ int cg_send_cut PROTO((cut_data *new_cut));
 
 int user_receive_cg_data PROTO((void **user, int dg_id));
 int user_free_cg PROTO((void **user));
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-int user_find_cuts PROTO((void *user, int varnum, int iter_num, int level,
-			  int index, double objval, int *indices,
-			  double *values, double ub, double lpetol,
-			  int *cutnum, char *status));
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
 int user_find_cuts PROTO((void *user, int varnum, int iter_num, int level,
 			  int index, double objval, int *indices,
 			  double *values, double ub, double lpetol,
 			  int *cutnum));
-#endif
 int user_receive_lp_solution_cg PROTO((void *user));
 #ifdef CHECK_CUT_VALIDITY
 int user_check_validity_of_cut PROTO((void *user, cut_data *new_cut));

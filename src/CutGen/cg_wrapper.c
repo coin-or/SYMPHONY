@@ -74,12 +74,6 @@ void free_cg_u(cg_prob *p)
    FREE(p->cur_sol.xind);
    FREE(p->cur_sol.xval);
 #endif   
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   if (p->par.do_decomp)
-      close_decomp_lp(p);
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
    CALL_USER_FUNCTION( user_free_cg(&p->user) );
    FREE(p);
 }
@@ -91,21 +85,11 @@ void find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
    cut_data **cuts;
    int i;
    
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   CALL_USER_FUNCTION( user_find_cuts(p->user, p->cur_sol.xlength,
-				      p->cur_sol.xiter_num, p->cur_sol.xlevel,
-				      p->cur_sol.xindex, p->cur_sol.objval,
-				      p->cur_sol.xind, p->cur_sol.xval, p->ub,
-				      p->cur_sol.lpetol, num_cuts, NULL) );
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
    CALL_USER_FUNCTION( user_find_cuts(p->user, p->cur_sol.xlength,
 				      p->cur_sol.xiter_num, p->cur_sol.xlevel,
 				      p->cur_sol.xindex, p->cur_sol.objval,
 				      p->cur_sol.xind, p->cur_sol.xval,
 				      p->ub, p->cur_sol.lpetol, num_cuts) );
-#endif
 
    return;
 }

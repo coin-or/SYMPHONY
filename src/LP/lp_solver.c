@@ -2180,6 +2180,8 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 	 break;
       }
    }
+
+   delete warmstart;
    
    retval = lp_data->si->setWarmStart(warmstart);
 

@@ -227,6 +227,8 @@ void free_lp(lp_prob *p)
    FREE(p->lp_desc);
 #endif
    FREE(p->base.userind);
+   FREE(p->best_sol.xind);
+   FREE(p->best_sol.xval);
    if (p->par.branch_on_cuts){
       FREE(p->slack_cuts);
    }

@@ -755,45 +755,6 @@ int bfind(int key, int *table, int size)
 
 /*===========================================================================*/
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-int collect_nonzeros(lp_prob *p, double *x, int *tind, double *tx,
-		     char *status)
-{
-   var_desc **vars = p->lp_data->vars;
-   int n = p->lp_data->n;
-   int i, cnt = 0;
-   double lpetol = p->lp_data->lpetol;
-
-   colind_sort_extra(p);
-   if (status){
-      int *temp_tind;
-      
-      for (i=0; i<n; i++){
-	 if (x[i] > lpetol){
-	    tind[cnt] = vars[i]->userind;
-	    tx[cnt] = x[i];
-	    status[cnt++] = p->lp_data->status[i];
-	 }
-      }
-      temp_tind = (int *) malloc(cnt * sizeof(int));
-      memcpy(temp_tind, tind, cnt * sizeof(int));
-      qsortucb_ic(temp_tind, status, cnt);
-      FREE(temp_tind);
-   }else{
-      for (i=0; i<n; i++){
-	 if (x[i] > lpetol){
-	    tind[cnt] = vars[i]->userind;
-	    tx[cnt++] = x[i];
-	 }
-      }
-   }
-   /* order indices and values according to indices */
-   qsortucb_id(tind, tx, cnt);
-   return(cnt);
-}
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
 int collect_nonzeros(lp_prob *p, double *x, int *tind, double *tx)
 {
    var_desc **vars = p->lp_data->vars;
@@ -812,7 +773,6 @@ int collect_nonzeros(lp_prob *p, double *x, int *tind, double *tx)
    qsortucb_id(tind, tx, cnt);
    return(cnt);
 }
-#endif
 
 /*===========================================================================*/
 
