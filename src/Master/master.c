@@ -924,7 +924,7 @@ int sym_solve(sym_environment *env)
 
    if(env->par.verbosity >=0 ){
       printf("\n****************************************************\n");
-      if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
+      if (termcode == TM_OPTIMAL_SOLUTION_FOUND || termcode == TM_NO_SOLUTION){
 	 printf(  "* Branch and Cut Finished                          *\n");
       }else if (termcode == TM_TIME_LIMIT_EXCEEDED){
 	 printf(  "* Time Limit Reached                               *\n");
