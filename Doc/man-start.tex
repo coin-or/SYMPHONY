@@ -374,9 +374,11 @@ simple steps to get up and running.
 \begin{enumerate}
 
 \item First open the workspace {\tt
-SYMPHONY-3.0.1$\backslash$WIN32$\backslash$template.dsw} and modify for your local
-setup, as described in Section \ref{getting_strated_windows}. It should
-build right away, although it won't run until modified as described below.
+SYMPHONY-3.0.1$\backslash$WIN32$\backslash$template.dsw} and modify for your
+local setup, as described in Section \ref{getting_strated_windows}. Note that
+you will also have to delete the file \texttt{vrp.lib} from the symphony
+project and add \texttt{template.lib}. It should build right away, although it
+won't run until modified as described below.
 
 \item First, decide what run-time parameters you might need and what data has 
 to be stored to describe your instance. Edit the file

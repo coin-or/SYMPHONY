@@ -313,8 +313,10 @@ can be developed by filling in only a few simple functions. Here are four
 simple steps to get up and running.
 
 1. First open the workspace SYMPHONY-3.0.1\WIN32\template.dsw and modify for
-your local setup, as described in the sample compilation section. It should
-build right away, although it won't run until modified as described below.
+your local setup, as described in the sample compilation section. Note that
+you will also have to delete the file "vrp.lib" from the symphony project and
+add "template.lib". It should build right away, although it won't run until
+modified as described below.
 
 2. Next, decide what run-time parameters you might need and what data has to
 be stored to describe your instance. Edit the file Template\include\user.h,
