@@ -183,8 +183,8 @@ ifeq ($(OSI_INTERFACE),DYLP)
        LPLIB += -lOsiDylp -lOsiDylpSolver -ldylpstd
 endif
 ifeq ($(OSI_INTERFACE),GLPK)
-       LPINCDIR += ${HOME}/GLPK/glpk-4.3/include
-       LPLIBPATHS += ${HOME}/GLPK/glpk-4.3/src
+       LPINCDIR += ${HOME}/src/glpk-4.7/include
+       LPLIBPATHS += ${HOME}/src/glpk-4.7/src
        LPLIB += -lOsiGlpk -lglpk
 endif
 endif
@@ -643,7 +643,7 @@ LIBPATHS     += $(USERLIBPATHS)
 INCPATHS      = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR) $(OSISYM_INCDIR)
 
 ifeq ($(USE_SYM_APPL),TRUE)
-LIBNAME = master$(MASTEREXT)
+LIBNAME = sym_application
 else
 LIBNAME = sym
 endif
