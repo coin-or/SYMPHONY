@@ -1063,7 +1063,7 @@ int check_tailoff(lp_prob *p)
 	    sum += 1;
 	 }
       }
-      if (sum / (obj_backsteps - 1) < p->par.tailoff_obj_frac){
+      if (sum / (obj_backsteps - 1) > p->par.tailoff_obj_frac){
 	 return(FALSE); /* no tailoff */
       }
    }
