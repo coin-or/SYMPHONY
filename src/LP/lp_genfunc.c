@@ -1038,7 +1038,7 @@ int check_tailoff(lp_prob *p)
       is greater than obj_frac */
    if (obj_backsteps > 1){
       for (i = 2, sum = 0; i <= obj_backsteps; i++){
-	 if (obj_hist[i-1] - obj_hist[i] > 0){
+	 if (obj_hist[i-1] - obj_hist[i] > p->lp_data->lpetol){
 	    sum += (obj_hist[i-2]-obj_hist[i-1]) / (obj_hist[i-1]-obj_hist[i]);
 	 }else{
 	    sum += 1;

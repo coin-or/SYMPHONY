@@ -93,17 +93,17 @@ some path names.
               is contained in the comments in the makefile. 
 
         \item To use many of the new capabilities of SYMPHONY, you must have
-	      installed the
-	      \htmladdnormallink{COIN}{http://www.coin-or.org/}
+	      installed the \htmladdnormallink{COIN}{http://www.coin-or.org/}
 	      optimization libraries \begin{latexonly} COIN optimization
 	      libraries, available from \texttt{http://www.coin-or.org}
-	      \end{latexonly}.  By default, SYMPHONY is 
-	      set up to use COIN LP solver, CLP, COIN Open Solver Interface, 
-	      OSI, and COIN Cut Generation Library, CGL. To keep this 
-	      configuration, you should install OSI, CGL, CLP and the Coin 
-	      utilities (in the \texttt{COIN/Coin directory}). The path to 
-	      the COIN libraries must be specified in 
-	      \texttt{SYMPHONY-5.0/Makefile}.
+	      \end{latexonly}.  By default, SYMPHONY is set up to use COIN LP
+	      solver, CLP, COIN Open Solver Interface, OSI, and COIN Cut
+	      Generation Library, CGL. To keep this configuration, you should
+	      install OSI, CGL, CLP and the Coin utilities (in the
+	      \texttt{COIN/Coin directory}). The path to the COIN libraries
+	      must be specified in \texttt{SYMPHONY-5.0/Makefile}. If you want
+	      to use the new OSI interface to SYMPHONY, you should be sure to
+	      compile itwhen you are installing the rest of the COIN packages.
 
         \item If you wish to read GMPL/AMPL files, you will have to install
 	      the Gnu Linear Programming Kit (GLPK), which contains a parser

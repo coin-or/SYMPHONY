@@ -78,7 +78,7 @@ int main(int argc, char **argv)
       cout<<"Node Limit Reached!"<<endl;
    }
    if(si.isProvenOptimal()){
-      cout<<"Optimal Found!"<<endl;
+      cout<<"Optimal Solution Found!"<<endl;
    }
 #endif
 
