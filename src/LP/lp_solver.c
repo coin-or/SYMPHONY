@@ -2978,7 +2978,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 
    OsiCuts cutlist;
    OsiRowCut cut;
-   int i, j = 0, 
+   int i, j = 0; 
 
    /* Set proper variables to be integer */
    for (i = 0; i < lp_data->n; i++) {
