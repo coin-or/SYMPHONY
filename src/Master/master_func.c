@@ -2571,6 +2571,11 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->mc_find_supported_solutions);
       return(0);
    }
+   else if (strcmp(key, "mc_add_optimality_cuts") == 0 ||
+	    strcmp(key, "LP_mc_add_optimality_cuts") == 0 ){
+      READ_INT_PAR(lp_par->mc_add_optimality_cuts);
+      return(0);
+   }
    else if (strcmp(key, "mc_gamma") == 0 ||
 	    strcmp(key, "LP_mc_gamma") == 0 ){
       READ_DBL_PAR(lp_par->mc_gamma);

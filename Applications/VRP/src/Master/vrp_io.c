@@ -47,8 +47,8 @@ void vrp_io(vrp_problem *vrp, char *infile)
 {
   static char keywords[KEY_NUM][22] = {
     "NAME", 
-    "NAME:",                 /*This section lists the names of the */
-    "TYPE",                  /*possible fields in the data file    */
+    "NAME:",                 /* This section lists the names of the */
+    "TYPE",                  /* possible fields in the data file    */
     "TYPE:",
     "COMMENT",
     "COMMENT:",

@@ -21,7 +21,6 @@
 #include <math.h>
 
 /* SYMPHONY include files */
-//#include "OsiSymSolverInterface.hpp"
 #include "BB_macros.h"
 #include "symphony_api.h"
 

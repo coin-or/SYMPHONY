@@ -4510,6 +4510,11 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = lp_par->mc_find_supported_solutions;
       return(0);
    }
+   else if (strcmp(key, "mc_add_optimality_cuts") == 0 ||
+	    strcmp(key, "LP_mc_add_optimality_cuts") == 0 ){
+      *value = lp_par->mc_add_optimality_cuts;
+      return(0);
+   }
    
    /***********************************************************************
     ***                     cut_gen params                          ***

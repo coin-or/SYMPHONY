@@ -622,7 +622,8 @@ int is_feasible_u(lp_prob *p, char branching)
       break;
    }
 
-   if (feasible == IP_FEASIBLE && p->par.multi_criteria){
+   if (feasible == IP_FEASIBLE && p->par.multi_criteria &&
+       p->par.mc_add_optimality_cuts){
       if (analyze_multicriteria_solution(p, indices, values, cnt,
 					 &true_objval, lpetol, branching) > 0){
 	 feasible = IP_FEASIBLE_BUT_CONTINUE;
@@ -2146,7 +2147,7 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	    new_solution = TRUE;
 	 }
 	/* Add an optimality cut for the second objective */
-	 if (!branching){
+	 if (!branching && p->par.mc_add_optimality_cuts){
 	    cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	    new_cut->coef = NULL;
 	    new_cut->rhs = obj[1] - 1 + etol;
@@ -2177,7 +2178,7 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	   new_solution = TRUE;
 	}
 	/* Add an optimality cut for the second objective */
-	if (!branching){
+	if (!branching && p->par.mc_add_optimality_cuts){
 	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	   new_cut->coef = NULL;
 	   new_cut->rhs = obj[0] - 1 + etol;
@@ -2210,7 +2211,8 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	p->has_mc_ub = TRUE;
 	new_solution = TRUE;
      }
-     if (!branching && !p->par.mc_find_supported_solutions){
+     if (!branching && !p->par.mc_find_supported_solutions &&
+	 p->par.mc_add_optimality_cuts){
 	if (p->par.mc_gamma*(obj[0] - p->utopia[0]) >
 	    *true_objval-p->par.mc_rho*(obj[0]+obj[1])-etol){
 	   /* Add an optimality cut for the second objective */
@@ -2225,7 +2227,8 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 						&p->cgp->cuts_to_add_size,
 						&p->cgp->cuts_to_add);
 	   FREE(new_cut);
-	}else if (!p->par.mc_find_supported_solutions){
+	}else if (!p->par.mc_find_supported_solutions &&
+		  p->par.mc_add_optimality_cuts){
 	   /* Add an optimality cut for the second objective */
 	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	   new_cut->coef = NULL;
