@@ -134,9 +134,30 @@ int receive_lp_data_u(lp_prob *p)
       }
    }
    if (p->par.do_primal_heuristic){
-      mip->collen = malloc (mip->n *ISIZE);
-      for (i = 0; i < mip->n; i++){
-	 mip->collen[i] = mip->matbeg[i+1] - mip->matbeg[i];
+      mip->collen = (int *) malloc(ISIZE * mip->n);
+      mip->row_matbeg = (int *) malloc(ISIZE * (mip->m + 1));
+      mip->row_matval = (double *)malloc(DSIZE*mip->matbeg[mip->n]);
+      mip->row_matind = (int *)   malloc(ISIZE*mip->matbeg[mip->n]);
+      mip->row_lengths = (int *) malloc(ISIZE*mip->m);
+
+      nonzeros = 0;
+      for(i = 0; i < mip->m; i++){
+	 for(j = 0; j < mip->n; j++){
+	    for(k = mip->matbeg[j]; k < mip->matbeg[j+1]; k++){
+	       if(mip->matind[k] == i){	   
+		  mip->row_matind[nonzeros] = j;
+		  mip->row_matval[nonzeros] = mip->matval[k];
+		  nonzeros++;	  
+		  break;
+	       }
+	    }
+	 } 
+	 mip->row_matbeg[i+1] = nonzeros;
+	 mip->row_lengths[i] = mip->row_matbeg[i+1] - mip->row_matbeg[i];
+      }
+
+      for (j = 0; j < mip->n; j++){
+	 mip->collen[j] = mip->matbeg[j+1] - mip->matbeg[j];
       }
    }
 #ifdef USE_SYM_APPLICATION   
