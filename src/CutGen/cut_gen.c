@@ -84,23 +84,13 @@ int main(void)
       if (p->msgtag == LP_SOLUTION_NONZEROS || p->msgtag == LP_SOLUTION_USER ||
 	  p->msgtag == LP_SOLUTION_FRACTIONS){
 	 if (p->par.do_findcuts)
+	    find_cuts_u(p, NULL, &num_cuts);
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	    user_find_cuts(p->user, p->cur_sol.xlength, p->cur_sol.xiter_num,
-			   p->cur_sol.xlevel, p->cur_sol.xindex,
-			   p->cur_sol.objval, p->cur_sol.xind, p->cur_sol.xval,
-			   p->ub, p->cur_sol.lpetol, &num_cuts, NULL);
 #ifdef COMPILE_DECOMP 
 	 if (num_cuts == 0 && p->par.do_decomp)
 	    num_cuts = decomp(p);
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
-	    user_find_cuts(p->user, p->cur_sol.xlength, p->cur_sol.xiter_num,
-			   p->cur_sol.xlevel, p->cur_sol.xindex,
-			   p->cur_sol.objval, p->cur_sol.xind, p->cur_sol.xval,
-			   p->ub, p->cur_sol.lpetol, &num_cuts);
-#endif
 	 /*-- send signal back to the LP that the cut generator is done -----*/
 	 s_bufid = init_send(DataInPlace);
 	 send_int_array(&num_cuts, 1);

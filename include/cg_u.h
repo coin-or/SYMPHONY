@@ -23,13 +23,7 @@ int cg_send_cut PROTO((cut_data *new_cut));
 /*======================= User supplied functions ===========================*/
 /*===========================================================================*/
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-int user_receive_cg_data PROTO((void **user, int dg_id, int *varnum));
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT THIS FOR PRODUCTION CODE*/
-#if 0
 int user_receive_cg_data PROTO((void **user, int dg_id));
-#endif
 int user_free_cg PROTO((void **user));
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 int user_find_cuts PROTO((void *user, int varnum, int iter_num, int level,

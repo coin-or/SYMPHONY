@@ -170,11 +170,6 @@ int user_io(void *user)
 
 int user_start_heurs(void *user, double *ub, double *ub_estimate)
 {
-   /* This gives you access to the user data structure. */
-   user_problem *prob = (user_problem *) user;
-
-   *ub = MAXINT;
-
    return(USER_NO_PP);
 }
 

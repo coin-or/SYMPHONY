@@ -82,6 +82,17 @@ RANLIB = ranlib
 
 ##############################################################################
 ##############################################################################
+# Generate generic cutting planes. If you are using the OSI interface, you 
+# can now add generic cutting planes from the CGL by setting the flag below.
+# Which cutting planes are added can be controlled by SYMPHONY parameters (see
+# the user's manual
+##############################################################################
+##############################################################################
+
+ADD_GENERIC_CUTS = TRUE
+
+##############################################################################
+##############################################################################
 # LP solver dependent definitions
 ##############################################################################
 ##############################################################################
@@ -647,6 +658,9 @@ endif
 
 SYSDEFINES  = -D__$(COMM_PROTOCOL)__ $(LPSOLVER_DEFS) 
 SYSDEFINES += $(MACH_DEP)
+ifeq ($(ADD_GENERIC_CUTS),TRUE)
+SYSDEFINES += -DGENERIC_CUTS
+endif
 ifeq ($(LP_SOLVER), OSI)
 SYSDEFINES += -D__OSI_$(OSI_INTERFACE)__
 else
@@ -754,7 +768,7 @@ else
 TM_SRC         += lp_branch.c
 endif
 ifeq ($(COMPILE_IN_CG),TRUE)
-TM_SRC         += cg_func.c 
+TM_SRC         += cg_func.c cg_wrapper.c
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ifeq ($(DECOMP),TRUE)
 TM_SRC		+= decomp.c decomp_lp.c
@@ -777,7 +791,7 @@ else
 LP_SRC         += lp_branch.c
 endif
 ifeq ($(COMPILE_IN_CG),TRUE)
-LP_SRC         += cg_func.c 
+LP_SRC         += cg_func.c cg_wrapper.c
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ifeq ($(DECOMP),TRUE)
 TM_SRC		+= decomp.c decomp_lp.c
@@ -787,7 +801,7 @@ endif
 
 CP_SRC		= cut_pool.c cp_proccomm.c cp_func.c
 
-CG_SRC		= cut_gen.c cg_proccomm.c cg_func.c
+CG_SRC		= cut_gen.c cg_proccomm.c cg_func.c cg_wrapper.c
 
 QSORT_SRC	= qsortucb.c qsortucb_i.c qsortucb_ii.c qsortucb_id.c \
 		  qsortucb_di.c qsortucb_ic.c

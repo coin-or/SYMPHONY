@@ -607,7 +607,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
       /*___END_EXPERIMENTAL_SECTION___*/
 	
       default:
-	printf("Unrecognized cut type %i!\n", cut->type);
+
      }
      
      row_list[j]->matind = matind =

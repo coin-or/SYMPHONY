@@ -1011,6 +1011,15 @@ void write_sav(LPdata *lp_data, char *fname)
    OSL_check_error("write_sav");
 }
 
+/*===========================================================================*/
+
+#ifdef GENERIC_CUTS
+int generate_cuts(LPdata * lp_data, cut_data **cuts)
+{
+   return(0);
+}
+#endif
+
 #endif /* __OSL__ */
 
 
@@ -1738,6 +1747,15 @@ void write_sav(LPdata *lp_data, char *fname)
    cpx_status = CPXsavwrite(lp_data->cpxenv, lp_data->lp, fname);
    CPX_check_error("write_sav");
 }
+
+/*===========================================================================*/
+
+#ifdef GENERIC_CUTS
+int generate_cuts(LPdata * lp_data, cut_data **cuts)
+{
+   return(0);
+}
+#endif
 
 #endif /* __CPLEX__ */
 
@@ -2575,11 +2593,14 @@ void write_sav(LPdata *lp_data, char *fname)
 
 /*===========================================================================*/
 
-#if 0
+#ifdef GENERIC_CUTS
+int generate_cuts(LPdata * lp_data, cut_data ***cuts){
 
-int generate_cuts_in_lp(LPdata * lp_data){
-   
    OsiCuts cutlist;
+   OsiRowCut cut;
+   int i, num_elements;
+   int *indices;
+   double *elements;
    
    //create CGL gomory cuts
    CglGomory * gomory = new CglGomory;
@@ -2605,8 +2626,28 @@ int generate_cuts_in_lp(LPdata * lp_data){
    CglLiftAndProject * liftandproject = new CglLiftAndProject;
    liftandproject->generateCuts(*(lp_data->si), cutlist);
 
-
-   lp_data->si->applyCuts(cutlist);
+   //lp_data->si->applyCuts(cutlist);
+   
+   *cuts = (cut_data **) malloc(cutlist.sizeRowCuts() * sizeof(cut_data));
+   for (i = 0; i < cutlist.sizeRowCuts(); i++){
+      cut = cutlist.rowCut(i);
+      (*cuts)[i] = (cut_data *) calloc(1, sizeof(cut_data));
+      num_elements = cut.row().getNumElements();
+      indices = const_cast<int *> (cut.row().getIndices());
+      elements = const_cast<double *> (cut.row().getElements());
+      (*cuts)[i]->type = EXPLICIT_ROW;
+      (*cuts)[i]->sense = cut.sense();
+      (*cuts)[i]->rhs = cut.rhs();
+      (*cuts)[i]->range = cut.range();
+      (*cuts)[i]->size = 1 + num_elements * (ISIZE + DSIZE);
+      (*cuts)[i]->coef = (char *) malloc ((*cuts)[i]->size);
+      ((int *) ((*cuts)[i]->coef))[0] = num_elements;
+      memcpy((*cuts)[i]->coef, (char *)indices, num_elements * ISIZE);
+      memcpy((*cuts)[i]->coef, (char *)elements, num_elements * DSIZE);
+      (*cuts)[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+      (*cuts)[i]->deletable = TRUE;
+      (*cuts)[i]->name = CUT__DO_NOT_SEND_TO_CP;
+   }
    
    delete gomory;
    delete knapsack;
@@ -2615,7 +2656,7 @@ int generate_cuts_in_lp(LPdata * lp_data){
    delete probe;
    delete liftandproject;
 
-   return (0);
+   return (cutlist.sizeRowCuts());
 }
 #endif
 

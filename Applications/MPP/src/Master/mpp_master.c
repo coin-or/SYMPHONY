@@ -254,8 +254,6 @@ int user_io(void *user)
 
 int user_start_heurs(void *user, double *ub, double *ub_estimate)
 {
-   *ub = MAXDOUBLE;
-
    return(USER_NO_PP);
 }
 

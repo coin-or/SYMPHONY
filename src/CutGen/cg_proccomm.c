@@ -78,7 +78,7 @@ int cg_process_message(cg_prob *p, int r_bufid)
       receive_char_array(&p->has_ub, 1);
       if (p->has_ub)
 	 receive_dbl_array(&p->ub, 1);
-      if (user_receive_lp_solution_cg(p->user) == ERROR)
+      if (receive_lp_solution_cg_u(p) == ERROR)
 	 return(ERROR);
       break;
       

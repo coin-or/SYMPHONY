@@ -281,6 +281,9 @@
 #define UNPACK_CUTS_MULTIPLE        0
 #define UNPACK_CUTS_SINGLE          1
 
+/*------------------------- built-in cut types ------------------------------*/
+#define EXPLICIT_ROW                100
+
 /*----------------- possible types of candidate objects ---------------------*/
 #define CANDIDATE_VARIABLE          0
 #define CANDIDATE_CUT_IN_MATRIX     1

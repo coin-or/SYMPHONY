@@ -58,13 +58,7 @@ CCrandstate rand_state;
  * FALSE.
 \*===========================================================================*/
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-int user_receive_cg_data(void **user, int dg_id, int *varnum)
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
 int user_receive_cg_data(void **user, int dg_id)
-#endif
 {
    int i, j, k;
    /* This is the user-defined data structure, a pointer to which will
@@ -123,13 +117,6 @@ int user_receive_cg_data(void **user, int dg_id)
    
    vrp->edges = (int *) calloc(2*edgenum, sizeof(int));
 
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   /*The number of variables in the original problem must be passed to the
-     decomp LP so that it knows how many rows to set up. If there is no
-     decomp, this does not need to be set*/
-   *varnum = edgenum;
-   
-   /*___END_EXPERIMENTAL_SECTION___*/
    /*create the edge list (we assume a complete graph)*/
    for (i = 1, k = 0; i < vrp->vertnum; i++){
       for (j = 0; j < i; j++){

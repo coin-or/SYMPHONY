@@ -80,9 +80,6 @@ void cg_initialize(cg_prob *p, int master_tid)
 #if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP)
    int r_bufid, s_bufid = 0;
 #endif
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int varnum = 0;
-/*___END_EXPERIMENTAL_SECTION___*/
 
    /*------------------------------------------------------------------------
     * Receive the problem data 
@@ -120,21 +117,13 @@ void cg_initialize(cg_prob *p, int master_tid)
    send_msg(p->master, REQUEST_FOR_CG_DATA);
    freebuf(s_bufid);
 
-   r_bufid = receive_msg(p->master, CG_DATA);
-   receive_char_array((char *)&p->par, sizeof(cg_params));
-   receive_int_array(&p->draw_graph, 1);
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   CALL_USER_FUNCTION( user_receive_cg_data(&p->user, p->draw_graph, &varnum));
-   /*___END_EXPERIMENTAL_SECTION___*/
-   /*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
-   CALL_USER_FUNCTION( user_receive_cg_data(&p->user, p->draw_graph) );
-#endif
-   freebuf(r_bufid);
+   receive_cg_data_u(p);
+   
 #endif
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
    if (p->par.do_decomp)
+      /* This doesn't work anymore because varnum is not defined */
       open_decomp_lp(p, varnum);
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
@@ -183,7 +172,7 @@ int cg_send_cut(cut_data *new_cut)
 #endif
 
 #ifdef CHECK_CUT_VALIDITY
-   user_check_validity_of_cut(p->user, new_cut);
+   check_validity_of_cut_u(p->user, new_cut);
 #endif
  
    return(1);
@@ -197,18 +186,5 @@ int cg_send_cut(cut_data *new_cut)
 
 void cg_close(cg_prob *p)
 {
-#ifdef COMPILE_IN_CG
-   FREE(p->cuts_to_add);
-#else
-   FREE(p->cur_sol.xind);
-   FREE(p->cur_sol.xval);
-#endif   
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   if (p->par.do_decomp)
-      close_decomp_lp(p);
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
-   user_free_cg(&p->user);
-   FREE(p);
+   free_cg_u(p);
 }

@@ -1377,17 +1377,81 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 {
    LPdata *lp_data = p->lp_data;
    int user_res;
-
+   int i, j, k, l, nzcnt, explicit_row_num = 0;
+   int *matbeg, *matind;
+   double *matval;
+   waiting_row **row_list;
+   
    colind_sort_extra(p);
+
+   if (cut_num > 0)
+      row_list = (waiting_row **) calloc (cut_num, sizeof(waiting_row *));
+
+   /* First SYMPHONY looks for cut types that it knows */
+   for (i = 0; i < cut_num; i++){
+
+      switch (cuts[i]->type){
+	 
+      case EXPLICIT_ROW:
+	 row_list[explicit_row_num] = (waiting_row *) malloc(sizeof(waiting_row));
+	 row_list[explicit_row_num]->cut = cuts[i];
+	 nzcnt = ((int *) (cuts[i]->coef))[0];
+	 matind = ((int *) (cuts[i]->coef)) + 1;
+	 matval = ((double *) (cuts[i]->coef)) + 1 + nzcnt * ISIZE;
+	 row_list[explicit_row_num]->matind = (int *) malloc(nzcnt * ISIZE);
+	 row_list[explicit_row_num]->matval = (double *) malloc(nzcnt * DSIZE);
+	 nzcnt = 0;
+	 for (j = 0; j < lp_data->n; j++){
+	    for (k = 0; k < nzcnt; k++){
+	       if (matind[k] == lp_data->vars[j]->userind){
+		  row_list[explicit_row_num]->matind[nzcnt] = j;
+		  row_list[explicit_row_num]->matval[nzcnt++] = matval[k];
+	       }
+	    }
+	 }
+	 row_list[explicit_row_num++]->nzcnt = nzcnt;
+	 break;
+
+      default: /* A user cut type */
+	 if (l != i){
+	    cuts[l++] = cuts[i];
+	    cuts[i] = NULL;
+	 }
+	 break;
+      }
+   }
 
    user_res = user_unpack_cuts(p->user, from, type,
 			       lp_data->n, lp_data->vars,
-			       cut_num, cuts, new_row_num, new_rows);
+			       l, cuts, new_row_num, new_rows);
    switch(user_res){
     case USER_NO_PP:
+
+      /* Combine the user's rows with SYMPHONY's rows */ 
+      if (*new_row_num == 0 && explicit_row_num == 0){
+	 FREE(row_list);
+	 *new_row_num = 0;
+	 *new_rows = NULL;
+      }else if (*new_row_num == 0 && explicit_row_num > 0){
+	 *new_row_num = explicit_row_num;
+	 *new_rows = row_list;
+      }else if (*new_row_num > 0 && explicit_row_num > 0){
+	 if (*new_row_num + explicit_row_num > cut_num){
+	    row_list = (waiting_row **) realloc(row_list, *new_row_num +
+						explicit_row_num);
+	 }
+	 for (i = explicit_row_num; i < *new_row_num + explicit_row_num; i++){
+	    row_list[i] = (*new_rows)[i - explicit_row_num];
+	 }
+	 
+	 FREE(*new_rows);
+	 *new_rows = row_list;
+      }
+      
       break;
 
     case ERROR: /* Error. ??? what will happen ??? */
+       
     default: /* No builtin possibility. Counts as ERROR. */
       return;
    }
@@ -1666,17 +1730,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
       }
 #ifdef COMPILE_IN_CG      
       if (p->cgp->par.do_findcuts && !new_row_num)
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 user_find_cuts(p->cgp->user, xlength, cur_sol->xiter_num,
-			cur_sol->xlevel, cur_sol->xindex, cur_sol->objval,
-			xind, xval, p->ub, lpetol, &cg_new_row_num, status);
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
-	 user_find_cuts(p->cgp->user, xlength, cur_sol->xiter_num,
-			cur_sol->xlevel, cur_sol->xindex, cur_sol->objval,
-			xind, xval, p->ub, lpetol, &cg_new_row_num);
-#endif
+	 find_cuts_u(p->cgp, p->lp_data, &cg_new_row_num);
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
