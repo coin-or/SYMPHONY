@@ -39,6 +39,7 @@
 #include "cp.h"
 #endif
 #endif
+#include "lp_solver.h" /* For MIPdesc */
 
 /*===========================================================================*\
  * Here we keep track of the computation time for each of the various

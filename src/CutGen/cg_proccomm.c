@@ -79,7 +79,7 @@ int cg_process_message(cg_prob *p, int r_bufid)
       if (p->has_ub)
 	 receive_dbl_array(&p->ub, 1);
       if (receive_lp_solution_cg_u(p) == USER_ERROR)
-	 return(ERROR);
+	 return(USER_ERROR);
       break;
       
     default:

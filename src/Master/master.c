@@ -526,8 +526,6 @@ int main(int argc, char **argv)
    FREE(base);
    free_tm(tm);
 #else
-   FREE(base->lb);
-   FREE(base->ub);
    FREE(base->userind);
    FREE(base);
 #endif   
