@@ -295,18 +295,11 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
    /* Set the number of variables */
    varnum = *basevarnum = 2 * mpp->numedges + mpp->numarcs;
  
-   /* Allocate memory for the upper and lower bounds. */
-   /* Lower bounds are (probably) all zero so calloc those. */
-   *lb = (double *) calloc (varnum, DSIZE);
-   *ub = (double *) malloc (varnum * DSIZE);
-
    /* This puts all the variable in the base set and fills out the 
       upper bounds */
    vars = *basevars = (int *) malloc(varnum * ISIZE);
    for (i = 0; i < varnum; i++){
      vars[i] = i;
-     (*lb)[i] = (i < mpp->numarcs) ? 1.0 : 0.0;
-     (*ub)[i] = (double) (mpp->numarcs + mpp->numedges);
    }
 
    /* Set the number of rows in the base matrix */

@@ -130,17 +130,16 @@ int user_free_lp(void **user)
  * each search node. See the comments below.
 \*===========================================================================*/
 
-int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
-		   int cutnum, cut_data **cuts, int *nz, int **matbeg,
-		   int **matind, double **matval, double **obj, double **rhs,
-		   char **sense, double **rngval, int *maxn, int *maxm,
-		   int *maxnz)
+int user_create_lp(void *user, LPdesc *desc, int *indices, 
+		   int *maxn, int *maxm, int *maxnz)
 {
    vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    int *costs = vrp->costs;
    int *edges = vrp->edges;
    int i;
    int total_edgenum = vrp->vertnum*(vrp->vertnum-1)/2;
+   int cap_check = vrp->capacity*(vrp->numroutes-1);
+   int total_demand = vrp->demand[0];
    
    /* set up the inital LP data */
 
@@ -149,44 +148,58 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
       that each column will have exactly two nonzeros, one in each of
       the rows corresponding to its end points. Hence the total
       nonzeros is 2*n (n is the number of active variables). */
-   *nz = 2 * varnum;
+   desc->nz = 2 * desc->n;
 
-   /* Estimate the maximum number of nonzeros */
-   *maxm = 2 * rownum;
+   /* Estimate the maximum number of nonzeros (not needed, but helpful for
+      efficiency*/
+   *maxm = 2 * desc->m;
    *maxn = total_edgenum;
-   *maxnz = *nz + ((*maxm) * (*maxn) / 10);
+   *maxnz = desc->nz + ((*maxm) * (*maxn) / 10);
 
    /* Allocate the arrays. These are owned by SYMPHONY after returning. */
-   *matbeg  = (int *) malloc((varnum + 1) * ISIZE);
-   *matind  = (int *) malloc((*nz) * ISIZE);
-   *matval  = (double *) malloc((*nz) * DSIZE);
-   *obj     = (double *) malloc(varnum * DSIZE);
-   *rhs     = (double *) malloc(rownum * DSIZE);
-   *sense   = (char *) malloc(rownum * CSIZE);
-   *rngval  = (double *) calloc(rownum, DSIZE);
+   desc->matbeg  = (int *) malloc((desc->n + 1) * ISIZE);
+   desc->matind  = (int *) malloc((desc->nz) * ISIZE);
+   desc->matval  = (double *) malloc((desc->nz) * DSIZE);
+   desc->obj     = (double *) malloc(desc->n * DSIZE);
+   desc->ub      = (double *) malloc(desc->n * DSIZE);
+   desc->lb      = (double *) calloc(desc->n, DSIZE); /* zero lower bounds */
+   desc->rhs     = (double *) malloc(desc->m * DSIZE);
+   desc->sense   = (char *) malloc(desc->m * CSIZE);
+   desc->rngval  = (double *) calloc(desc->m, DSIZE);
 
    /* Fill out the appropriate data structures -- each column has
       exactly two entries */
-   for (i = 0; i < varnum; i++){
-      (*obj)[i]        = (double) costs[vars[i]->userind];
-      (*matbeg)[i]     = 2*i;
-      (*matval)[2*i]   = 1.0;
-      (*matval)[2*i+1] = 1.0;
-      (*matind)[2*i]   = edges[2*vars[i]->userind];
-      (*matind)[2*i+1] = edges[2*vars[i]->userind+1];
+   for (i = 0; i < desc->n; i++){
+      
+      desc->obj[i]        = (double) costs[indices[i]];
+      desc->matbeg[i]     = 2*i;
+      desc->matval[2*i]   = 1.0;
+      desc->matval[2*i+1] = 1.0;
+      desc->matind[2*i]   = edges[2*indices[i]];
+      desc->matind[2*i+1] = edges[2*indices[i] + 1];
+
+      /* Set the upper and lower bounds */
+      if (edges[indices[i] << 1] == 0){
+	 /*This is a depot edge and we have to check what its ub should be*/
+	 /*Recall vrp->demand[0] == total_demand*/
+	 if (total_demand - vrp->demand[edges[(indices[i] << 1) + 1]] >
+	     cap_check)
+	    /*in this case, the node cannot be on its own route*/
+	    desc->ub[i] = 1;
+	 else
+	    desc->ub[i] = 2;
+      }else{
+	 desc->ub[i] = 1;
+      }
    }
-   (*matbeg)[varnum] = 2*varnum;
-   
-   /*Someday, I should add in all the cuts in here too, but for now, they get
-     added in during post-processing in create_lp_u(), which is less efficient
-     but easier for me :)*/
+   desc->matbeg[desc->n] = 2*desc->n;
    
    /* set the initial right hand side */
-   (*rhs)[0] = 2*vrp->numroutes;
-   (*sense)[0] = 'E';
-   for (i = rownum - cutnum - 1; i > 0 ; i--){
-      (*rhs)[i]   = (double) 2;
-      (*sense)[i] = 'E';
+   desc->rhs[0] = 2*vrp->numroutes;
+   desc->sense[0] = 'E';
+   for (i = vrp->vertnum - 1; i > 0; i--){
+      desc->rhs[i]   = (double) 2;
+      desc->sense[i] = 'E';
    }
 
    return(USER_NO_PP);
@@ -708,7 +721,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 int user_generate_column(void *user, int generate_what, int cutnum,
 			 cut_data **cuts, int prevind, int nextind,
 			 int *real_nextind, double *colval, int *colind,
-			 int *collen, double *obj)
+			 int *collen, double *obj, double *lb, double *ub)
 {
    vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    int vh, vl, i;
@@ -856,6 +869,21 @@ int user_generate_column(void *user, int generate_what, int cutnum,
 	  default:
 	    printf("Unrecognized cut type %i!\n", cut->type);
 	 }
+	 
+	 /* Set the upper and lower bounds */
+	 if (vrp->edges[i << 1] == 0){
+	    /*This is a depot edge and we have to check what its ub should be*/
+	    /*Recall vrp->demand[0] == total_demand*/
+	    if (vrp->demand[0] - vrp->demand[vrp->edges[(i << 1) + 1]] >
+		vrp->capacity*(vrp->numroutes-1))
+	       /*in this case, the node cannot be on its own route*/
+	       *ub = 1;
+	    else
+	       *ub = 2;
+	 }else{
+	    *ub = 1;
+	 }
+	 *lb = 0;
       }
       *collen = nzcnt;
       *obj = vrp->costs[*real_nextind];
@@ -901,6 +929,9 @@ int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
  * variables. Lower bounds are always assumed (w.l.o.g.) to be zero.
 \*===========================================================================*/
 
+/* Deprecated function */
+
+#if 0
 int user_get_upper_bounds(void *user, int varnum, int *indices, double *ub)
 {
    vrp_lp_problem *vrp = (vrp_lp_problem *)user;
@@ -925,6 +956,7 @@ int user_get_upper_bounds(void *user, int varnum, int *indices, double *ub)
    
    return(USER_NO_PP);
 }
+#endif
 
 /*===========================================================================*/
 

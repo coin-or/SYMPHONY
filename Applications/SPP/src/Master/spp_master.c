@@ -193,18 +193,11 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
    /* Set the number of variables*/
    varnum = *basevarnum = spp->cmatrix->colnum;
  
-   /* Allocate memory for the uper and lower bounds. */
-   /* Lower bounds are (probably) all zero so calloc those. */
-   *lb = (double *) calloc (varnum, DSIZE);
-   *ub = (double *) malloc (varnum * DSIZE);
-
    /* This puts all the variable in the base set and fills out the 
       upper bounds */
    vars = *basevars = (int *) malloc(varnum * ISIZE);
    for (i = 0; i < varnum; i++){
      vars[i] = i;
-     (*ub)[i] = 1;
-     /* (*lb)[i] = 0; */
    }
 
    /* Set the number of rows in the base */

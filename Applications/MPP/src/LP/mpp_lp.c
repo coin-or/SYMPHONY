@@ -47,11 +47,8 @@ int user_receive_lp_data(void **user)
  * fill out this function.
 \*===========================================================================*/
 
-int user_create_lp (void *user, int varnum, var_desc **vars,
-		    int rownum, int cutnum, cut_data **cuts, int *nz,
-		    int **matbeg, int **matind, double **matval,
-		    double **obj, double **rhs, char **sense,
-		    double **rngval, int *maxn, int *maxm, int *maxnz)
+int user_create_lp(void *user, LPdesc *desc, int *indices, 
+		   int *maxn, int *maxm, int *maxnz)
 {
    mpp_problem *mpp = (mpp_problem *) user;
 
@@ -60,33 +57,33 @@ int user_create_lp (void *user, int varnum, var_desc **vars,
 
    /* set up the inital LP data */
 
-   *nz = (6 * mpp->numedges)+ (2 * mpp->numarcs);
-
+   desc->nz = (6 * mpp->numedges)+ (2 * mpp->numarcs);
+ 
    /* Estimate the maximum number of nonzeros */
-   *maxm = 2 * rownum;
+   *maxm = 2 * desc->m;
    *maxn = varnum;
-   *maxnz = *nz + ((*maxm) * (*maxn) / 10);
+   *maxnz = desc->nz + ((*maxm) * (*maxn) / 10);
 
    /* Allocate the arrays. These are owned by SYMPHONY after returning. */
-   *matbeg  = (int *) malloc((varnum + 1) * ISIZE);
-   *matind  = (int *) malloc((*nz) * ISIZE);
-   *matval  = (double *) malloc((*nz) * DSIZE);
-   *obj     = (double *) malloc(varnum * DSIZE);
-   *rhs     = (double *) malloc(rownum * DSIZE);
-   *sense   = (char *) malloc(rownum * CSIZE);
-   *rngval  = (double *) calloc(rownum, DSIZE);
+   desc->matbeg  = (int *) malloc((varnum + 1) * ISIZE);
+   desc->matind  = (int *) malloc((desc->nz) * ISIZE);
+   desc->matval  = (double *) malloc((desc->nz) * DSIZE);
+   desc->obj     = (double *) malloc(varnum * DSIZE);
+   desc->rhs     = (double *) malloc(desc->m * DSIZE);
+   desc->sense   = (char *) malloc(desc->m * CSIZE);
+   desc->rngval  = (double *) calloc(desc->m, DSIZE);
 
    /* indegree equals outdegree constraint */
    for (i = 0, ind = 0; i <= 2 * (mpp->numedges) + (mpp->numarcs) - 1; i++){
-      (*matbeg)[i] = ind;
+      (desc->matbeg)[i] = ind;
       for (j = 0; j <= mpp->numnodes - 1; j++){
 	 /* checks to see if node i is the start node of every edge arc */
 	 if (mpp->head[i] == j){
-	    (*matind)[ind] = j;
-	    (*matval)[ind++] = 1;
+	    desc->matind[ind] = j;
+	    desc->matval[ind++] = 1;
 	 }else if (mpp->tail[i] == j){
-	    (*matind)[ind] = j;
-	    (*matval)[ind++] = -1;
+	    desc->matind[ind] = j;
+	    desc->matval[ind++] = -1;
 	 }
       }
       
@@ -95,28 +92,29 @@ int user_create_lp (void *user, int varnum, var_desc **vars,
 
       if (i >= mpp->numarcs){ /* Check to see if it is an edge */
 	 if (i < mpp->numarcs + mpp->numedges){
-	    (*matind)[ind] = mpp->numnodes + i - mpp->numarcs;
+	    desc->matind[ind] = mpp->numnodes + i - mpp->numarcs;
 	 }else{
-	    (*matind)[ind] = mpp->numnodes + i - (mpp->numarcs + mpp->numedges);
+	    desc->matind[ind] = mpp->numnodes + i - (mpp->numarcs +
+						       mpp->numedges);
 	 }
-	 (*matval)[ind++] = 1;
+	 desc->matval[ind++] = 1;
       }
    }
-   (*matbeg)[2*(mpp->numedges)+(mpp->numarcs)] = ind;
+   desc->matbeg[2*(mpp->numedges)+(mpp->numarcs)] = ind;
 
-   for (i = 0; i < varnum; i++){
-      (*obj)[i] = mpp->cost[i];
+   for (i = 0; i <= varnum; i++){
+      desc->obj[i] = mpp->cost[i];
    }
 
    /* set the initial right hand side */
-   for (i = 0; i < mpp->numnodes; i++){
-      (*rhs)[i]   = 0;
-      (*sense)[i] = 'E';
+   for (i = 0; i <= mpp->numnodes-1 ; i++){
+      desc->rhs[i]   = 0;
+      desc->sense[i] = 'E';
    }
 
-   for (i = mpp->numnodes; i < mpp->numnodes+mpp->numedges; i++){
-      (*rhs)[i]   = 1;
-      (*sense)[i] = 'G';
+   for (i = mpp->numnodes; i <= mpp->numnodes+mpp->numedges-1 ; i++){
+      desc->rhs[i]   = 1;
+      desc->sense[i] = 'G';
    }
    
    return(USER_NO_PP);
@@ -309,18 +307,6 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
    *num_fixed = 0;
 
    return(USER_NO_PP);
-}
-
-/*===========================================================================*/
-
-/*===========================================================================*\
- * This routine is used to obtain the upper and lower bounds of the extra
- * variables. It must be filled out to use extra variables.
-\*===========================================================================*/
-
-int user_get_upper_bounds(void *user, int varnum, int *indices, double *bd)
-{
-   return(DEFAULT);
 }
 
 /*===========================================================================*/

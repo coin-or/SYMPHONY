@@ -65,11 +65,7 @@ int receive_lp_data_u(lp_prob *p)
    receive_int_array(&p->base.varnum, 1);
    if (p->base.varnum > 0){
       p->base.userind = (int *) malloc(p->base.varnum * ISIZE);
-      p->base.lb = (double *) malloc(p->base.varnum * DSIZE);
-      p->base.ub = (double *) malloc(p->base.varnum * DSIZE);
       receive_int_array(p->base.userind, p->base.varnum);
-      receive_dbl_array(p->base.lb, p->base.varnum);
-      receive_dbl_array(p->base.ub, p->base.varnum);
    }
    receive_int_array(&p->base.cutnum, 1);
 
@@ -134,7 +130,6 @@ int create_lp_u(lp_prob *p)
 
    int bvarnum = p->base.varnum;
    int bcutnum = p->base.cutnum;
-   double *blb = p->base.lb, *bub = p->base.ub, *bd;
    var_desc **vars;
 
    int *d_uind = NULL, *d_cind = NULL; /* just to keep gcc quiet */
@@ -148,6 +143,9 @@ int create_lp_u(lp_prob *p)
    waiting_row **new_rows;
 
    int user_res;
+   int *userind;
+
+   double *lb, *ub;
 
    lp_data->n = bvarnum + desc->uind.size;
    lp_data->m = p->base.cutnum + desc->cutind.size;
@@ -155,15 +153,6 @@ int create_lp_u(lp_prob *p)
    maxm = lp_data->maxm;
    maxn = lp_data->maxn;
    maxnz = lp_data->maxnz;
-
-   /* Fill up lb/ub for base variables */
-   if (bvarnum){
-      vars = lp_data->vars;
-      for (i = bvarnum - 1; i >= 0; i--){
-	 vars[i]->lb = blb[i];
-	 vars[i]->ub = bub[i];
-      }
-   }
 
    lp_data->nf_status = desc->nf_status;
    if (desc->nf_status == NF_CHECK_AFTER_LAST ||
@@ -190,20 +179,26 @@ int create_lp_u(lp_prob *p)
    }
    lp_data->ordering = COLIND_AND_USERIND_ORDERED;
 
+   lp_data->desc->n = lp_data->n;
+   lp_data->desc->m = lp_data->m;
+
+   /* Create the list of indices to pass to the user */
+   userind = (int *) malloc(lp_data->n * ISIZE);
+   vars = lp_data->vars;
+   for (i = lp_data->n - 1; i >= 0; --i){
+      userind[i] = vars[i]->userind;
+   }
+   
    user_res = user_create_lp(p->user,
-       /* base and extra variables */
-       lp_data->n, lp_data->vars,
-       /* the number of constraints to be added and their description */
-       lp_data->m, desc->cutind.size, desc->cuts, &lp_data->nz,
-       /* matrix */
-       &lp_data->desc->matbeg, &lp_data->desc->matind, &lp_data->desc->matval,
-       /* variable obj coefs */
-       &lp_data->desc->obj,
-       /* description of the rows */
-       &lp_data->desc->rhs, &lp_data->desc->sense, &lp_data->desc->rngval,
-       /* max sizes */
+       /* description of the LP relaxation to be filled out by the user */
+       lp_data->desc, 
+       /* list of base and extra variables */
+       userind,
+       /* max sizes (estimated by the user) */
        &maxn, &maxm, &maxnz);
 
+   FREE(userind);
+   
    switch (user_res){
     case ERROR:
       /* Error. The search tree node will not be processed. */
@@ -267,27 +262,16 @@ int create_lp_u(lp_prob *p)
    }
 
    /*------------------------------------------------------------------------*\
-    * Fill out lp_data->lb/ub
+    * Set the upper and lower bounds
    \*----------------------------------------------------------------------- */
 
-   lp_data->desc->lb = (double *) malloc((bvarnum + desc->uind.size)*DSIZE);
-   lp_data->desc->ub = (double *) malloc((bvarnum + desc->uind.size)*DSIZE);
+   lb = lp_data->desc->lb;
+   ub = lp_data->desc->ub;
    
-   if (bvarnum){
-      memcpy(lp_data->desc->lb, blb, bvarnum * DSIZE);
-      memcpy(lp_data->desc->ub, bub, bvarnum * DSIZE);
-   }
-   if (desc->uind.size > 0){
-      /* LB of extra variables must be 0 */
-      memset(lp_data->desc->lb + bvarnum, 0, desc->uind.size * DSIZE);
-      /* Get the UB of extra variables */
-      bd = lp_data->desc->ub + bvarnum;
-      get_upper_bounds_u(p, desc->uind.size, desc->uind.list, bd);
-      vars = lp_data->vars + bvarnum;
-      for (i = desc->uind.size - 1; i >= 0; i--){
-	 vars[i]->lb = 0; /* LB of extra variables must be 0 */
-	 vars[i]->ub = bd[i];
-      }
+   vars = lp_data->vars;
+   for (i = lp_data->n - 1; i >= 0; i--){
+      vars[i]->lb = lb[i];
+      vars[i]->ub = ub[i];
    }
    
    /*------------------------------------------------------------------------*\
@@ -416,6 +400,9 @@ int create_lp_u(lp_prob *p)
 
 /*===========================================================================*/
 
+/* Deprecated function */
+
+#if 0
 void get_upper_bounds_u(lp_prob *p, int cnt, int *uindex, double *bd)
 {
    int i;
@@ -429,6 +416,7 @@ void get_upper_bounds_u(lp_prob *p, int cnt, int *uindex, double *bd)
       break;
    }
 }
+#endif
 
 /*===========================================================================*/
 
@@ -1396,13 +1384,15 @@ void logical_fixing_u(lp_prob *p)
 
 int generate_column_u(lp_prob *p, int lpcutnum, cut_data **cuts,
 		      int prevind, int nextind, int generate_what,
-		      double *colval, int *colind, int *collen, double *obj)
+		      double *colval, int *colind, int *collen, double *obj,
+		      double *lb, double *ub)
 {
    int real_nextind = nextind;
    CALL_USER_FUNCTION( user_generate_column(p->user, generate_what,
-					    p->lp_data->m - p->base.cutnum, cuts,
-					    prevind, nextind, &real_nextind,
-					    colval, colind, collen, obj) );
+					    p->lp_data->m - p->base.cutnum,
+					    cuts, prevind, nextind,
+					    &real_nextind, colval, colind,
+					    collen, obj, lb, ub) );
    return(real_nextind);
 }
 

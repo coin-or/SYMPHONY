@@ -74,11 +74,8 @@ int user_receive_lp_data(void **user)
  * fill out this function.
 \*===========================================================================*/
 
-int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
-		   int cutnum, cut_data **cuts, int *nz, int **matbeg,
-		   int **matind, double **matval, double **obj, double **rhs,
-		   char **sense, double **rngval, int *maxn, int *maxm,
-		   int *maxnz, int *allocn, int *allocm, int *allocnz)
+int user_create_lp(void *user, LPdesc *desc, int *indices, 
+		   int *maxn, int *maxm, int *maxnz)
 {
    spp_problem *spp = (spp_problem *) user;
    col_ordered *cm = spp->cmatrix;
@@ -88,43 +85,25 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
    char resize = FALSE;
    int i;
 
-   *nz = cm->nzcnt;
-   *maxn = varnum;   /* note that the number of columns cannot increase */
+   desc->nz = cm->nzcnt;
+   *maxn = desc->n;   /* note that the number of columns cannot increase */
+   *maxm = 2 * desc->m;
+   *maxnz = desc->nz + ((*maxm) * (*maxn) / 100);
 
-   /* we resize so that it doesn't have to be done later on */
-   if (2 * varnum > *maxm) {
-      *maxm = 2 * rownum;
-      resize = TRUE;
-   }
-   if (*nz + ((*maxm) * (*maxn) / 100) > *maxnz) {
-      *maxnz = *nz + ((*maxm) * (*maxn) / 100);
-      resize = TRUE;
-   }
-   if (resize) {
-      FREE(*matbeg);
-      FREE(*matind);
-      FREE(*matval);
-      FREE(*obj);
-      FREE(*rhs);
-      FREE(*sense);
-      FREE(*rngval);
-      *allocm = *maxm;
-      *allocn = *maxm + *maxn + 1;
-      *allocnz = *maxnz + *maxm;
-      *matbeg = (int *) malloc(*allocn * ISIZE);
-      *matind = (int *) malloc(*allocnz * ISIZE);
-      *matval = (double *) malloc(*allocnz * DSIZE);
-      *obj    = (double *) malloc(*allocn * DSIZE);
-      *rhs    = (double *) malloc(*allocm * DSIZE);
-      *sense  = (char *) malloc(*allocm * CSIZE);
-      *rngval = (double *) malloc(*allocm * DSIZE);
-   }
-   cmbeg = *matbeg;
-   cmind = *matind;
-   cmval = *matval;
-   cmobj = *obj;
-   cmrhs = *rhs;
-   cmsense = *sense;
+   desc->matbeg = (int *) malloc(desc->n * ISIZE);
+   desc->matind = (int *) malloc(desc->nz * ISIZE);
+   desc->matval = (double *) malloc(desc->nz * DSIZE);
+   desc->obj    = (double *) malloc(desc->nn * DSIZE);
+   desc->rhs    = (double *) malloc(desc->m * DSIZE);
+   desc->sense  = (char *) malloc(desc->m * CSIZE);
+   desc->rngval = (double *) malloc(desc->m * DSIZE);
+
+   cmbeg = desc->matbeg;
+   cmind = desc->matind;
+   cmval = desc->matval;
+   cmobj = desc->obj;
+   cmrhs = desc->rhs;
+   cmsense = desc->sense;
 
    memcpy((char *) cmbeg, (char *) cm->matbeg, (cm->colnum + 1) * ISIZE);   
    memcpy((char *) cmobj, (char *) cm->obj, cm->colnum * DSIZE);      
@@ -133,7 +112,7 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
       cmind[i] = cm->matind[i];   /* cannot memcpy b/c int vs. short */
       cmval[i] = 1.0;
    }
-   for (i = cm->rownum - 1; i >= 0; i--) {
+   for (i = cm->desc->m - 1; i >= 0; i--) {
       cmrhs[i] = 1.0;
       cmsense[i] = 'E';
    }

@@ -50,8 +50,10 @@ typedef struct LP_SOL{
 typedef struct BASE_DESC{
    int            varnum;
    int           *userind;
+#if 0
    double        *lb;          /* even if there are global lb and ub, we */
    double        *ub;          /* fill these arrays out */
+#endif
    int            cutnum;
 }base_desc;
 

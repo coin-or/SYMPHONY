@@ -127,15 +127,18 @@ typedef struct TEMPORARY{
 /* This structure stores the user's description of the model */
 
 typedef struct LPdesc{
-   int       *matbeg;      /* maxn + maxm + 1 */
-   int       *matind;      /* maxnz + maxm */
-   double    *matval;      /* maxnz + maxm*/
-   double    *obj;         /* maxn + maxm */
-   double    *rhs;         /* maxm */
-   double    *rngval;      /* maxm */
-   char      *sense;       /* maxm */
-   double    *lb;          /* maxn + maxm */
-   double    *ub;          /* maxn + maxm */
+   int        n;           /* number of columns */
+   int        m;           /* number of rows */
+   int        nz;          /* number of nonzeros */
+   int       *matbeg;      /* n + m + 1 */
+   int       *matind;      /* nz + m */
+   double    *matval;      /* nz + m */
+   double    *obj;         /* n + m */
+   double    *rhs;         /* m */
+   double    *rngval;      /* m */
+   char      *sense;       /* m */
+   double    *lb;          /* n + m */
+   double    *ub;          /* n + m */
 }LPdesc;
 
 /* The LP solver data */

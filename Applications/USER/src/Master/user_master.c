@@ -218,8 +218,8 @@ int user_init_draw_graph(void *user, int dg_id)
  * the base set. In this case, this function need not be modified.
 \*===========================================================================*/
 
-int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
-		  double **ub, int *basecutnum, int *colgen_strat)
+int user_set_base(void *user, int *basevarnum, int **basevars,
+		  int *basecutnum, int *colgen_strat)
 {
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
@@ -229,18 +229,10 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
    /* Set the number of variables*/
    varnum = *basevarnum = prob->colnum;
  
-   /* Allocate memory for the upper and lower bounds. */
-   /* Lower bounds are (probably) all zero so calloc those. */
-   *lb = (double *) calloc (varnum, DSIZE);
-   *ub = (double *) malloc (varnum * DSIZE);
-
-   /* This puts all the variable in the base set and fills out the 
-      upper bounds */
+   /* This puts all the variable in the base set */
    vars = *basevars = (int *) malloc(varnum * ISIZE);
    for (i = 0; i < varnum; i++){
      vars[i] = i;
-     (*ub)[i] = 1; /* If the upper bounds are not 1, change this line. */
-     /* (*lb)[i] = 0; /* If the lower bounds are not 0, uncomment this line. */
    }
 
    /* Set the number of rows in the base */

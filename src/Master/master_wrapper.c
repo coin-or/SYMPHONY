@@ -126,8 +126,7 @@ base_desc *set_base_u(problem *p)
    base_desc *base = (base_desc *) calloc(1, sizeof(base_desc));
 
    switch (user_set_base(p->user, &base->varnum, &base->userind,
-			 &base->lb, &base->ub, &base->cutnum,
-			 p->par.tm_par.colgen_strat)){
+			 &base->cutnum, p->par.tm_par.colgen_strat)){
     case ERROR:
       printf("\n\n*********User error detected -- aborting***********\n\n");
       exit(1000);
@@ -259,8 +258,6 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
    send_int_array(&base->varnum, 1);
    if (base->varnum){
       send_int_array(base->userind, base->varnum);
-      send_dbl_array(base->lb, base->varnum);
-      send_dbl_array(base->ub, base->varnum);
    }
    send_int_array(&base->cutnum, 1);
    CALL_USER_FUNCTION( user_send_lp_data(p->user, NULL) );

@@ -15,6 +15,42 @@
 ##############################################################################
 ##############################################################################
 
+##############################################################################
+# First, we have to define some variables that will be used
+##############################################################################
+
+##############################################################################
+# SYMPHONY's home directory
+##############################################################################
+
+SYMPHONYROOT = ${HOME}/SYMPHONY
+
+##############################################################################
+# The home directory of the user files (must be an absolute path)
+##############################################################################
+
+USERROOT = ${SYMPHONYROOT}/Vrp
+
+##############################################################################
+# The customized name of the master program (if desired)
+##############################################################################
+
+MASTERNAME = vrp
+
+##############################################################################
+# These are only needed if parallel computation is used. Please see the
+# explanation of these variables in SYMPHONY's Makefile.
+##############################################################################
+
+COMPILE_IN_TM = TRUE
+COMPILE_IN_LP = TRUE
+COMPILE_IN_CG = TRUE
+COMPILE_IN_CP = TRUE
+
+##############################################################################
+# This section is for listing VRP source file names
+##############################################################################
+
 MACROS_SRC        = vrp_macros.c
 COST_SRC          = compute_cost.c
 NET_SRC           = network.c
@@ -64,7 +100,7 @@ ALL_USER_SRC     += vrp_cp.c vrp_dg.c vrp_dg_network.c
 USER_INCDIR       =
 
 ##############################################################################
-# This section is for CONCORDE
+# This section is for CONCORDE source file names
 ##############################################################################
 
 ##############################################################################
@@ -144,72 +180,9 @@ endif
 
 TSP_OBJS = $(addprefix $(USER_OBJDIR)/,$(notdir $(TSP_SRC:.c=.o)))
 
-concorde:
-	mv ${USERROOT}/CutGen/shrink.c ${USERROOT}/CutGen/temp.c
-	rm $(USER_OBJDIR)/shrink.o
-
-concorde.a : concorde $(TSP_OBJS)
-	@echo ""
-	@echo "Making $(notdir $@) ..."
-	@echo ""
-	$(AR) $(HOME)/lib/libconcorde.a $(TSP_OBJS)
-	$(RANLIB) $(HOME)/lib/libconcorde.a
-	mv ${USERROOT}/CutGen/temp.c ${USERROOT}/CutGen/shrink.c
-	rm $(USER_OBJDIR)/shrink.o
-	@echo ""
-
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ##############################################################################
-# This section is for DECOMP stuff
-##############################################################################
-
-COMPILE_OUR_DECOMP = FALSE
-FARKAS_LIFTING_BOUND = TSP
-FARKAS_LIFTING_METHOD = NONE
-ifeq ($(COMPILE_OUR_DECOMP),TRUE)
-USER_BB_DEFINES += -DCOMPILE_OUR_DECOMP
-endif
-ifeq ($(FARKAS_LIFTING_BOUND),TSP)
-USER_BB_DEFINES += -DEXACT_LIFTING
-endif
-ifeq ($(FARKAS_LIFTING_METHOD),SEQUENTIAL)
-USER_BB_DEFINES += -DFARKAS_LIFT_SEQUENTIAL
-endif
-ifeq ($(FARKAS_LIFTING_METHOD),NAIVE)
-USER_BB_DEFINES += -DFARKAS_LIFT_NAIVE
-endif
-ifeq ($(FARKAS_LIFTING_METHOD),NONE)
-USER_BB_DEFINES += -DNO_LIFTING
-endif
-
-ifeq ($(COMPILE_IN_CG),TRUE)
-ifeq ($(DECOMP),TRUE)
-ifeq ($(COMPILE_OUR_DECOMP),TRUE)
-USER_LP_SRC      += my_decomp_user.c decomp_lower_bound.c
-else
-USER_LP_SRC      += decomp_user.c ind_sort.c
-endif
-endif
-endif
-
-ifeq ($(DECOMP),TRUE)
-ifeq ($(COMPILE_OUR_DECOMP),TRUE)
-USER_CG_SRC      += my_decomp_user.c decomp_lower_bound.c
-else
-USER_CG_SRC      += decomp_user.c ind_sort.c
-endif
-endif
-
-ifeq ($(COMPILE_OUR_DECOP),TRUE)
-USER_INCDIR      += -I$(USER_ROOT)/include/decomp
-endif
-
-clean_decomp:
-	rm -f $(USER_OBJDIR)/my_decomp_user.o 
-	$(USER_OBJDIR)/decomp_lower_bound.o
-
-##############################################################################
-# This section is for the VRP heuristics
+# This section is for the VRP heuristic source file names
 ##############################################################################
 
 USER_MASTER_SRC  += start_heurs.c lower_bound.c route_heur.c
@@ -329,6 +302,78 @@ ALL_USER_SRC     += $(ALL_HEURS_SRC)
 
 HEUR_OBJS 	  = $(addprefix $(USER_OBJDIR)/,$(notdir $(ALL_HEURS_SRC:.c=.o)))
 
+##############################################################################
+# This section is for DECOMP source file names
+##############################################################################
+
+COMPILE_OUR_DECOMP = FALSE
+FARKAS_LIFTING_BOUND = TSP
+FARKAS_LIFTING_METHOD = NONE
+ifeq ($(COMPILE_OUR_DECOMP),TRUE)
+USER_BB_DEFINES += -DCOMPILE_OUR_DECOMP
+endif
+ifeq ($(FARKAS_LIFTING_BOUND),TSP)
+USER_BB_DEFINES += -DEXACT_LIFTING
+endif
+ifeq ($(FARKAS_LIFTING_METHOD),SEQUENTIAL)
+USER_BB_DEFINES += -DFARKAS_LIFT_SEQUENTIAL
+endif
+ifeq ($(FARKAS_LIFTING_METHOD),NAIVE)
+USER_BB_DEFINES += -DFARKAS_LIFT_NAIVE
+endif
+ifeq ($(FARKAS_LIFTING_METHOD),NONE)
+USER_BB_DEFINES += -DNO_LIFTING
+endif
+
+ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(DECOMP),TRUE)
+ifeq ($(COMPILE_OUR_DECOMP),TRUE)
+USER_LP_SRC      += my_decomp_user.c decomp_lower_bound.c
+else
+USER_LP_SRC      += decomp_user.c ind_sort.c
+endif
+endif
+endif
+
+ifeq ($(DECOMP),TRUE)
+ifeq ($(COMPILE_OUR_DECOMP),TRUE)
+USER_CG_SRC      += my_decomp_user.c decomp_lower_bound.c
+else
+USER_CG_SRC      += decomp_user.c ind_sort.c
+endif
+endif
+
+ifeq ($(COMPILE_OUR_DECOP),TRUE)
+USER_INCDIR      += -I$(USER_ROOT)/include/decomp
+endif
+#___END_EXPERIMENTAL_SECTION___#
+
+##############################################################################
+# Include the SYMPHONY makefile after all the source file names (and before
+# any used-defined targets!)
+##############################################################################
+
+include $(SYMPHONYROOT)/Makefile
+
+##############################################################################
+# Targets for CONCORDE
+##############################################################################
+
+concorde:
+	mv ${USERROOT}/CutGen/shrink.c ${USERROOT}/CutGen/temp.c
+	rm $(USER_OBJDIR)/shrink.o
+
+concorde.a : concorde $(TSP_OBJS)
+	@echo ""
+	@echo "Making $(notdir $@) ..."
+	@echo ""
+	$(AR) $(HOME)/lib/libconcorde.a $(TSP_OBJS)
+	$(RANLIB) $(HOME)/lib/libconcorde.a
+	mv ${USERROOT}/CutGen/temp.c ${USERROOT}/CutGen/shrink.c
+	rm $(USER_OBJDIR)/shrink.o
+	@echo ""
+
+#__BEGIN_EXPERIMENTAL_SECTION__#
 ##############################################################################
 # Targets for the heuristics
 ##############################################################################
@@ -520,4 +565,14 @@ $(BINDIR)/mst : $(MST_DEP) $(MST_OBJS)
 	-lmaster$(MASTEREXT)
 	@echo ""
 
+##############################################################################
+# Targets for decomp
+##############################################################################
+
+clean_decomp:
+	rm -f $(USER_OBJDIR)/my_decomp_user.o 
+	$(USER_OBJDIR)/decomp_lower_bound.o
+
 #___END_EXPERIMENTAL_SECTION___#
+
+

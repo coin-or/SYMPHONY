@@ -29,8 +29,7 @@ int user_io PROTO((void *user));
 int user_init_draw_graph PROTO((void *user, int dg_id));
 int user_start_heurs PROTO((void *user, double *ub, double *ub_estimate));
 int user_set_base PROTO((void *user, int *basevarnum, int **basevars,
-			 double **lb, double **ub, int *basecutnum,
-			 int *colgen_strat));
+			 int *basecutnum, int *colgen_strat));
 int user_create_root PROTO((void *user, int *extravarnum, int **extravars));
 int user_receive_feasible_solution PROTO((void *user, int msgtag, double cost,
 					  int numvars, int *indices,

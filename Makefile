@@ -55,23 +55,25 @@ AR = ar -r
 RANLIB = ranlib
 
 ##############################################################################
-# The ROOT environement variable specifies the root directory for the source
-# code. If this file is not in the SYMPHONY root directory, change this
+# The SYMPHONYROOT environment variable specifies the root directory for the 
+# source code. If this file is not in the SYMPHONY root directory, change this
 # variable to the correct path.
 ##############################################################################
 
-ROOT = .
+### SYMPHONYROOT is now usually defined in the user's Makefile ###
+# SYMPHONYROOT = .
 
 ##############################################################################
-# USERROOT is the name of the user's source directory. $(ROOT)/VRP is the
-# proper setting for the sample application, a VRP and TSP solver.
+# USERROOT is the name of the user's source directory. $(SYMPHONYROOT)/VRP is 
+# the proper setting for the sample application, a VRP and TSP solver.
 # Set MASTERNAME if you want to give the master executable a custom name.
 # Otherwise, it will be named "symphony" if the executable is sequential 
 # and master (with some configuration specific extension) otherwise.
 ##############################################################################
 
-USERROOT = $(ROOT)/MPP
-MASTERNAME = 
+### These variables are now usually defined in the user's Makefile ###
+# USERROOT = $(SYMPHONYROOT)/Template
+# MASTERNAME = 
 
 ##############################################################################
 ##############################################################################
@@ -254,10 +256,11 @@ OPT = -g
 ##############################################################################
 ##############################################################################
 
-COMPILE_IN_CG = TRUE
-COMPILE_IN_CP = TRUE
-COMPILE_IN_LP = TRUE
-COMPILE_IN_TM = TRUE
+### These variables are now usually defined in the user's Makefile ###
+# COMPILE_IN_CG = TRUE
+# COMPILE_IN_CP = TRUE
+# COMPILE_IN_LP = TRUE
+# COMPILE_IN_TM = TRUE
 
 ##############################################################################
 ##############################################################################
@@ -473,38 +476,38 @@ else
 	CONFIG:=0$(CONFIG)
 endif 
 
-INCDIR       = $(EXTRAINCDIR) -I$(ROOT)/include -I$(USERROOT)/include 
+INCDIR       = $(EXTRAINCDIR) -I$(SYMPHONYROOT)/include -I$(USERROOT)/include 
 INCDIR 	    += $(USER_INCDIR)
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ifeq ($(DECOMP),TRUE)
-INCDIR 	    += -I$(ROOT)/include/decomp
+INCDIR 	    += -I$(SYMPHONYROOT)/include/decomp
 endif
 #___END_EXPERIMENTAL_SECTION___#
 
 USER_OBJDIR  = $(USERROOT)/objects.$(ARCH)/$(CONFIG)/
-DEPDIR       = $(ROOT)/dep.$(ARCH)
+DEPDIR       = $(SYMPHONYROOT)/dep.$(ARCH)
 USER_DEPDIR  = $(USERROOT)/dep.$(ARCH)
 ifeq ($(LP_SOLVER),OSI)
-OBJDIR	     = $(ROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)_$(OSI_INTERFACE)
-LIBDIR	     = $(ROOT)/lib.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
+OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)_$(OSI_INTERFACE)
+LIBDIR	     = $(SYMPHONYROOT)/lib.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
 BINDIR       = $(USERROOT)/bin.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
 else
-OBJDIR	     = $(ROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)
-LIBDIR	     = $(ROOT)/lib.$(ARCH)/$(LP_SOLVER)
+OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)
+LIBDIR	     = $(SYMPHONYROOT)/lib.$(ARCH)/$(LP_SOLVER)
 BINDIR       = $(USERROOT)/bin.$(ARCH)/$(LP_SOLVER)
 endif
 
 SRCDIR  = \
-	$(ROOT)/Common     : $(USERROOT)/Common    :\
-	$(ROOT)/LP         : $(USERROOT)/LP        :\
-	$(ROOT)/CutGen     : $(USERROOT)/CutGen    :\
-	$(ROOT)/CutPool    : $(USERROOT)/CutPool   :\
-	$(ROOT)/SolPool    : $(USERROOT)/SolPool   :\
-	$(ROOT)/DrawGraph  : $(USERROOT)/DrawGraph :\
-	$(ROOT)/Master     : $(USERROOT)/Master    :\
-	$(ROOT)/include    : $(USERROOT)/include   :\
-	$(ROOT)            : $(USERROOT)           :\
-	$(ROOT)/TreeManager                        :\
+	$(SYMPHONYROOT)/Common     : $(USERROOT)/Common    :\
+	$(SYMPHONYROOT)/LP         : $(USERROOT)/LP        :\
+	$(SYMPHONYROOT)/CutGen     : $(USERROOT)/CutGen    :\
+	$(SYMPHONYROOT)/CutPool    : $(USERROOT)/CutPool   :\
+	$(SYMPHONYROOT)/SolPool    : $(USERROOT)/SolPool   :\
+	$(SYMPHONYROOT)/DrawGraph  : $(USERROOT)/DrawGraph :\
+	$(SYMPHONYROOT)/Master     : $(USERROOT)/Master    :\
+	$(SYMPHONYROOT)/include    : $(USERROOT)/include   :\
+	$(SYMPHONYROOT)            : $(USERROOT)           :\
+	$(SYMPHONYROOT)/TreeManager                        :\
 	$(USER_SRC_PATH)
 
 VPATH  = $(SRCDIR):$(USER_SRCDIR)
@@ -514,7 +517,7 @@ VPATH  = $(SRCDIR):$(USER_SRCDIR)
 ##############################################################################
 
 LIBPATHS      = $(LIBDIR) $(X11LIBPATHS) $(COMMLIBPATHS) $(LPLIBPATHS) 
-LIBPATHS     +=$(USERLIBPATHS)
+LIBPATHS     += $(USERLIBPATHS)
 INCPATHS      = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR)
 
 EXTRAINCDIR   = $(addprefix -I,${INCPATHS})
@@ -591,7 +594,7 @@ ifeq ($(ARCH),X86SOL2)
 	QUANTIFYBIN = /opts/pure/quantify-2.1-solaris2/quantify
 endif
 QFLAGS   = -cache-dir=$(QUANTIFYCACHEDIR) 
-QFLAGS  += -user-path=$(ROOT)/$(USERROOT)/bin.$(ARCH)
+QFLAGS  += -user-path=$(SYMPHONYROOT)/$(USERROOT)/bin.$(ARCH)
 QUANTIFY = $(QUANTIFYBIN) $(QFLAGS)
 
 ##############################################################################
@@ -874,7 +877,7 @@ qall :
 ##############################################################################
 ##############################################################################
 
-include $(USERROOT)/Makefile
+#include $(USERROOT)/Makefile
 
 ##############################################################################
 ##############################################################################

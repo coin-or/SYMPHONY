@@ -17,6 +17,7 @@
 
 #include "proto.h"
 #include "BB_types.h"
+#include "lp_solver.h"
 
 /*===========================================================================*/
 /*========================= User supplied functions =========================*/
@@ -24,13 +25,8 @@
 
 int user_receive_lp_data PROTO((void **user));
 int user_free_lp PROTO((void **user));
-int user_create_lp PROTO((void *user, int varnum, var_desc **vars,
-			  int rownum, int cutnum, cut_data **cuts, int *nz,
-			  int **matbeg, int **matind, double **matval,
-			  double **obj, double **rhs, char **sense,
-			  double **rngval, int *maxn, int *maxm, int *maxnz));
-int user_get_upper_bounds PROTO((void *user, int varnum, int *indices,
-				 double *ub));
+int user_create_lp PROTO((void *user, LPdesc *desc, int *indices, 
+			  int *maxn, int *maxm, int *maxnz));
 int user_is_feasible PROTO((void *user, double lpetol, int varnum,
 			    int *indices, double *values, int *feasible,
 			    double *true_objval));
@@ -73,7 +69,8 @@ int user_logical_fixing PROTO((void *user, int varnum, var_desc **vars,
 int user_generate_column PROTO((void *user, int generate_what, int cutnum,
 				cut_data **cuts, int prevind, int nextind,
 				int *real_nextind, double *colval, int *colind,
-				int *collen, double *obj));
+				int *collen, double *obj, double *lb,
+				double *ub));
 int user_print_stat_on_cuts_added PROTO((void *user, int rownum,
 					 waiting_row **rows));
 int user_purge_waiting_rows PROTO((void *user, int rownum,

@@ -38,7 +38,6 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
    char *status = lp_data->status;
 
    int new_vars = new_cols->num_vars;
-   double *lb, *ub;
    int i, j, oldn;
    char *where_to_move;
 
@@ -103,11 +102,6 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
    if (! new_vars)
       return;
 
-   lb = lp_data->tmp.d; /* 2 * new_vars */
-   ub = lb + new_vars;
-   memset(lb, 0, new_vars * DSIZE);
-   get_upper_bounds_u(p, new_vars, new_cols->userind, ub);
-
    where_to_move = lp_data->tmp.c; /* new_vars */
    /* In the current implementation everything not in the matrix was at its
     * lower bound (0), therefore to restore dual feasibility they have to be
@@ -118,7 +112,7 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
 
    add_cols(lp_data, new_vars, new_cols->nzcnt, new_cols->objx,
 	    new_cols->matbeg, new_cols->matind, new_cols->matval,
-	    lb, ub, where_to_move);
+	    new_cols->lb, new_cols->ub, where_to_move);
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
    lp_data->col_set_changed = TRUE;
    p->colset_changed = TRUE;
@@ -131,8 +125,8 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
       evar = extra[i];
       evar->userind = new_cols->userind[i];
       evar->colind = oldn + i;
-      evar->lb = 0;
-      evar->ub = ub[i];
+      evar->lb = new_cols->lb[i];
+      evar->ub = new_cols->ub[i];
    }
 
    /* zero out x, i.e., set it to the LB */
@@ -458,7 +452,7 @@ our_col_set *price_all_vars(lp_prob *p)
    int new_vars=0, new_nzcnt=0, rel_lb=0, rel_ub=0;
 
    int collen, *colind;
-   double obj, *colval;
+   double obj, lb, ub, *colval;
 
    int i, j, k;
 
@@ -495,6 +489,8 @@ our_col_set *price_all_vars(lp_prob *p)
    new_cols->rel_ub_ind = p->vars_at_ub ?
       (int *) malloc(p->vars_at_ub * ISIZE) : NULL;
    new_cols->objx = (double *) malloc(max_new_vars * DSIZE);
+   new_cols->lb = (double *) malloc(max_new_vars * DSIZE);
+   new_cols->ub = (double *) malloc(max_new_vars * DSIZE);
    new_cols->matbeg = (int *) malloc((max_new_vars+1) * ISIZE);
    new_cols->matbeg[0] = 0;
    new_cols->matind = (int *) malloc(max_new_nzcnt * ISIZE);
@@ -575,7 +571,8 @@ our_col_set *price_all_vars(lp_prob *p)
 	       curind = generate_column_u(p, cutnum, cuts,
 					  prevind, next_not_fixed,
 					  GENERATE_NEXTIND,
-					  colval, colind, &collen, &obj);
+					  colval, colind, &collen, &obj,
+					  &lb, &ub);
 	       k++;
 	    }else{
 	       if (nextind == next_not_fixed)
@@ -590,7 +587,8 @@ our_col_set *price_all_vars(lp_prob *p)
 	       curind = generate_column_u(p, cutnum, cuts,
 					  prevind, nextind,
 					  GENERATE_REAL_NEXTIND,
-					  colval, colind, &collen, &obj);
+					  colval, colind, &collen, &obj,
+					  &lb, &ub);
 	    }
 	 }
       }else{
@@ -666,7 +664,9 @@ our_col_set *price_all_vars(lp_prob *p)
 	 }
 	 if (must_add){
 	    new_cols->objx[new_vars] = obj;
-	    new_cols->matbeg[new_vars+1] = new_cols->matbeg[new_vars]+collen;
+	    new_cols->lb[new_vars] = lb;
+	    new_cols->ub[new_vars] = ub;
+	    new_cols->matbeg[new_vars + 1] = new_cols->matbeg[new_vars]+collen;
 	    memcpy((char *)(new_cols->matind+new_cols->matbeg[new_vars]),
 		   (char *)colind, collen * ISIZE);
 	    memcpy((char *)(new_cols->matval+new_cols->matbeg[new_vars]),
@@ -837,7 +837,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
    int infind, violation;
 
    int collen, *colind;
-   double obj, *colval, *binvrow;
+   double obj, lb, ub, *colval, *binvrow;
 
    double gap, red_cost, prod;
 
@@ -926,6 +926,8 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
 	 if (i > 0){
 	    new_cols->userind[0] = new_cols->userind[i];
 	    new_cols->objx[0] = new_cols->objx[i];
+	    new_cols->lb[0] = lb;
+	    new_cols->ub[0] = ub;
 	    memmove(new_cols->matind, new_cols->matind + new_cols->matbeg[i], 
 		    new_cols->nzcnt * ISIZE);
 	    memmove(new_cols->matval, new_cols->matval + new_cols->matbeg[i], 
@@ -984,8 +986,8 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
 	 if (nextind == -1 || nextind > next_not_fixed){
 	    curind = generate_column_u(p, cutnum, cuts,
 				       prevind, next_not_fixed,
-				       GENERATE_NEXTIND,
-				       colval, colind, &collen, &obj);
+				       GENERATE_NEXTIND, colval, colind,
+				       &collen, &obj, &lb, &ub);
 	    k++;
 	 }else{
 	    if (nextind == next_not_fixed)
@@ -995,7 +997,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
       }else{ /* no we know that NF_CHECK_AFTER_LAST */
 	 curind = generate_column_u(p, cutnum, cuts,
 				    prevind, nextind, GENERATE_REAL_NEXTIND,
-				    colval, colind, &collen, &obj);
+				    colval, colind, &collen, &obj, &lb, &ub);
       }
 
       /* Now curind is the one we work with. If it's negative then there are

@@ -46,11 +46,8 @@ int user_receive_lp_data(void **user)
  * fill out this function.
 \*===========================================================================*/
 
-int user_create_lp (void *user, int varnum, var_desc **vars,
-		    int rownum, int cutnum, cut_data **cuts, int *nz,
-		    int **matbeg, int **matind, double **matval,
-		    double **obj, double **rhs, char **sense,
-		    double **rngval, int *maxn, int *maxm, int *maxnz)
+int user_create_lp(void *user, LPdesc *desc, int *indices, 
+		   int *maxn, int *maxm, int *maxnz)
 {
    user_problem *prob = (user_problem *) user;
 

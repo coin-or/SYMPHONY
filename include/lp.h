@@ -57,6 +57,8 @@ typedef struct OUR_COL_SET{
    int          *userind;
    
    double       *objx;
+   double       *lb;
+   double       *ub;
    int          *matbeg;
    int          *matind;
    double       *matval;
@@ -267,7 +269,6 @@ int receive_lp_data_u PROTO((lp_prob *p));
 void free_prob_dependent_u PROTO((lp_prob *p));
 int comp_cut_name PROTO((const void *c0, const void *c1));
 int create_lp_u PROTO((lp_prob *p));
-void get_upper_bounds_u PROTO((lp_prob *p, int cnt, int *uindex, double *bd));
 int is_feasible_u PROTO((lp_prob *p));
 void send_feasible_solution_u PROTO((lp_prob *p, int xlevel, int xindex,
 				     int xiter_num, double lpetol,
@@ -290,7 +291,7 @@ void logical_fixing_u PROTO((lp_prob *p));
 int generate_column_u PROTO((lp_prob *p, int lpcutnum, cut_data **cuts,
 			     int prevind, int nextind, int generate_what,
 			     double *colval, int *colind, int *collen,
-			     double *obj));
+			     double *obj, double *ub, double *lb));
 void print_stat_on_cuts_added_u PROTO((lp_prob *p, int added_rows));
 void purge_waiting_rows_u PROTO((lp_prob *p));
 void generate_cuts_in_lp_u PROTO((lp_prob *p));

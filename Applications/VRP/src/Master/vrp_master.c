@@ -310,8 +310,8 @@ int user_init_draw_graph(void *user, int dg_id)
  * number of them given.
 \*===========================================================================*/
 
-int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
-		  double **ub, int *basecutnum, int *colgen_strat)
+int user_set_base(void *user, int *basevarnum, int **basevars,
+		  int *basecutnum, int *colgen_strat)
 {
    vrp_problem *vrp = (vrp_problem *)user;
    int cap_check, total_demand = 0, base_varnum = 0, v1, v0;
@@ -335,28 +335,6 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
       
       *basevars = (int *) realloc((char *)(*basevars), base_varnum * ISIZE);
       *basevarnum = base_varnum;
-      
-      /*lower bounds are all zero so calloc those*/
-      *lb = (double *) calloc (base_varnum, DSIZE);
-      *ub = (double *) malloc (base_varnum * DSIZE);
-      
-      /*Now generate the upper bounds*/
-      cap_check = vrp->capacity*(vrp->numroutes-1);
-      for (i = 1; i < vertnum; i++)
-	 total_demand += vrp->demand[i];
-      for (i = 0; i < base_varnum; i++){
-	 BOTH_ENDS((*basevars)[i], &v1, &v0);
-	 if (v0 == 0){
-	    /*For depot edges, we have to check what the ub should be*/
-	    if (total_demand - vrp->demand[v1] > cap_check)
-	       /*in this case, the node cannot be on its own route*/
-	       (*ub)[i] = 1;
-	    else
-	       (*ub)[i] = 2;
-	 }else{
-	    (*ub)[i] = 1;
-	 }
-      }
       
       break;
 

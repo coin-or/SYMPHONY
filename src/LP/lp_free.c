@@ -58,6 +58,8 @@ void free_col_set(our_col_set **colset)
       FREE(cols->rel_ub_ind);
       FREE(cols->userind);
       FREE(cols->objx);
+      FREE(cols->lb);
+      FREE(cols->ub);
       FREE(cols->matbeg);
       FREE(cols->matind);
       FREE(cols->matval);
@@ -220,8 +222,6 @@ void free_lp(lp_prob *p)
    free_lp_desc(p->lp_data->desc);
    FREE(p->lp_data->desc);
    FREE(p->lp_data);
-   FREE(p->base.ub);
-   FREE(p->base.lb);
    FREE(p->base.userind);
    if (p->par.branch_on_cuts){
       FREE(p->slack_cuts);

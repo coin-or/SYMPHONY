@@ -2661,7 +2661,7 @@ int write_base(base_desc *base, char *file, FILE *f, char append)
 
    fprintf(f, "BASE DESCRIPTION: %i %i\n", base->varnum, base->cutnum);
    for (i = 0; i < base->varnum; i++)
-      fprintf(f, "%i %f %f\n", base->userind[i], base->ub[i], base->lb[i]);
+      fprintf(f, "%i\n", base->userind[i]);
 
    if (close)
       fclose(f);
@@ -2687,10 +2687,8 @@ int read_base(base_desc *base, char *file, FILE *f)
    
    fscanf(f, "%s %s %i %i", str1, str2, &base->varnum, &base->cutnum);
    base->userind = (int *) malloc(base->varnum*ISIZE);
-   base->ub = (double *) malloc(base->varnum*DSIZE);
-   base->lb = (double *) malloc(base->varnum*DSIZE);
    for (i = 0; i < base->varnum; i++)
-      fscanf(f, "%i %lf %lf", base->userind+i, base->ub+i, base->lb+i);
+      fscanf(f, "%i", base->userind+i);
 
    if (close)
       fclose(f);
