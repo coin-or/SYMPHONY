@@ -179,7 +179,7 @@ int sym_set_defaults(sym_environment *env)
    env->par.mc_search_order = MC_FIFO;
    env->par.mc_warm_start = FALSE;
    env->par.trim_warm_tree = FALSE;
-
+   env->par.test = FALSE;
    /************************** treemanager defaults **************************/
    tm_par->verbosity = 0;
    tm_par->granularity = 0.000001;
@@ -433,6 +433,20 @@ int sym_set_user_data(sym_environment *env, void *user)
    }
    
    env->user = user;
+
+   return(FUNCTION_TERMINATED_NORMALLY);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_user_data(sym_environment *env, void **user)
+{
+   if (env->user == NULL){
+      return(ERROR__USER);
+   }
+   
+   *user = env->user;
 
    return(FUNCTION_TERMINATED_NORMALLY);
 }
@@ -5419,5 +5433,69 @@ int sym_get_ub_for_new_obj(sym_environment *env, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
+int sym_test(sym_environment *env)
+{
 
+  int termcode = 0, verbosity;
   
+  verbosity = sym_get_int_param(env, "verbosity", &verbosity);
+
+  sym_set_int_param(env, "verbosity", -10);
+  
+  int i, file_num = 13;
+  char mps_files[13][MAX_FILE_NAME_LENGTH +1] = {
+    "air03", "dcmulti", "egout", "flugpl", "khb05250", "l152lav", 
+    "lseu", "mod008", "mod010", "p0033", "p0201", "stein27", "vpm1" };
+  
+  double sol[13] = {340160, 188182, 568.101, 1201500,
+			  106940226, 4722, 1120, 307, 6548, 
+			  3089, 7615, 18, 20};
+
+  char *mps_dir = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
+  char *infile = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
+  double *obj_val = (double *)calloc(DSIZE,file_num);
+  double tol = 1e-03;
+
+  if (strcmp(env->par.test_dir, "") == 0){ 
+    strcpy(mps_dir, "../../MIPLIB3");
+  } else{
+    strcpy(mps_dir, env->par.test_dir);
+  }
+
+  for(i = 0; i<file_num; i++){
+    if(env->mip->n){
+      free_master_u(env);
+      strcpy(env->par.infile, "");
+      env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+    }
+
+    strcpy(infile, "");
+    sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
+
+    if( termcode = sym_read_mps(env, infile) < 0)
+      return(termcode);
+
+    printf("Solving %s...", mps_files[i]);
+    
+    if(termcode = sym_solve(env) < 0 )
+      return(termcode);
+
+    sym_get_obj_val(env, &obj_val[i]);
+
+    if((obj_val[i] < sol[i] + tol) && 
+       (obj_val[i] > sol[i] - tol)){
+      printf("Success!\n");
+    } else {
+      printf("Failure!(%f, %f) \n", obj_val[i], sol[i]);
+    }
+  }
+
+  FREE(mps_dir);
+  FREE(infile);
+  FREE(obj_val);
+
+  sym_set_int_param(env, "verbosity", verbosity);
+
+  return(termcode);
+  
+}
