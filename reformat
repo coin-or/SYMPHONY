@@ -1,6 +1,6 @@
 #!/bin/tcsh -f
 mkdir $1
-foreach file (LICENSE Makefile README* sample.vrp)
+foreach file (LICENSE Makefile README*)
 awk -f reformat.awk $file > $1/$file
 end
 mkdir $1/Common
@@ -36,7 +36,7 @@ foreach file (DrawGraph/*.c)
 awk -f reformat.awk $file > $1/$file
 end
 mkdir $1/Vrp
-foreach file (Vrp/Makefile)
+foreach file (Vrp/Makefile Vrp/sample.vrp)
 awk -f reformat.awk $file > $1/$file
 end
 mkdir $1/Vrp/Common
