@@ -328,19 +328,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       /* is_feasible_u() fills up lp_data->x, too!! */
 	       switch (is_feasible_u(p, TRUE)){
 
-		case IP_FEASIBLE:
-		  can->termcode[j] = LP_OPT_FEASIBLE;
-		  can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
-		  memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-		  if (best_can){
-		     best_can->feasible[j] = TRUE;
-		  }else{
-		     can->feasible[j] = TRUE;
-		  }
-		  break;
-		  
-		case IP_FEASIBLE_BUT_CONTINUE:
-		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
 		  /*NOTE: This is confusing but not all that citical...*/
 		  /*The "feasible" field is only filled out for the
 		    purposes of display (in vbctool) to keep track of
@@ -349,12 +336,34 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		    branched on, we need to pass this info on to whatever
 		    candidate does get branched on so the that the fact that
 		    a feasible solution was found in presolve can be recorded*/
-		  can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
-		  memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+
+		case IP_FEASIBLE:
+		  can->termcode[j] = LP_OPT_FEASIBLE;
 		  if (best_can){
 		     best_can->feasible[j] = TRUE;
+		     best_can->solutions[j] =
+			(double *) malloc (DSIZE*lp_data->n);
+		     memcpy(best_can->solutions[j], lp_data->x,
+			    DSIZE*lp_data->n);
 		  }else{
 		     can->feasible[j] = TRUE;
+		     can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+		  }
+		  break;
+		  
+		case IP_FEASIBLE_BUT_CONTINUE:
+		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
+		  if (best_can){
+		     best_can->feasible[j] = TRUE;
+		     best_can->solutions[j] =
+			(double *) malloc (DSIZE*lp_data->n);
+		     memcpy(best_can->solutions[j], lp_data->x,
+			    DSIZE*lp_data->n);
+		  }else{
+		     can->feasible[j] = TRUE;
+		     can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 		  }
 		  break;
 
@@ -416,12 +425,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
 	       switch (is_feasible_u(p, TRUE)){
-		case IP_FEASIBLE:
-		  can->termcode[j] = LP_OPT_FEASIBLE;
-		  /* Fall through */
-		  
-		case IP_FEASIBLE_BUT_CONTINUE:
-		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
+
 		  /*NOTE: This is confusing but not all that citical...*/
 		  /*The "feasible" field is only filled out for the
 		    purposes of display (in vbctool) to keep track of
@@ -430,10 +434,34 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		    branched on, we need to pass this info on to whatever
 		    candidate does get branched on so the that the fact that
 		    a feasible solution was found in presolve can be recorded*/
+
+		case IP_FEASIBLE:
+		  can->termcode[j] = LP_OPT_FEASIBLE;
 		  if (best_can){
 		     best_can->feasible[j] = TRUE;
+		     best_can->solutions[j] =
+			(double *) malloc (DSIZE*lp_data->n);
+		     memcpy(best_can->solutions[j], lp_data->x,
+			    DSIZE*lp_data->n);
 		  }else{
 		     can->feasible[j] = TRUE;
+		     can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+		  }
+		  break;
+		  
+		case IP_FEASIBLE_BUT_CONTINUE:
+		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
+		  if (best_can){
+		     best_can->feasible[j] = TRUE;
+		     best_can->solutions[j] =
+			(double *) malloc (DSIZE*lp_data->n);
+		     memcpy(best_can->solutions[j], lp_data->x,
+			    DSIZE*lp_data->n);
+		  }else{
+		     can->feasible[j] = TRUE;
+		     can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 		  }
 		  break;
 		  
@@ -507,6 +535,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		  solution discovered in presolve for display purposes */
 	       if (best_can->feasible[k]){
 		  can->feasible[k] = TRUE;
+		  can->solutions[k] = best_can->solutions[k];
+		  best_can->solutions[k] = NULL;
 	       }
 	    }
 	    free_candidate(&best_can);
