@@ -569,13 +569,13 @@ int is_feasible_u(lp_prob *p, char branching)
    int s_bufid;
 #endif
    int user_res;
-   int feasible;
+   int feasible = IP_INFEASIBLE;
    double true_objval = p->lp_data->objval;
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
    int *indices;
    double *values, valuesi, ub, *heur_solution = NULL, *col_sol = NULL;
-   int cnt, i, heur_feasible = FALSE;
+   int cnt, i;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
@@ -602,7 +602,11 @@ int is_feasible_u(lp_prob *p, char branching)
     case USER_NO_PP:
       break;
     case USER_DEFAULT: /* set the default */
-      user_res = p->par.is_feasible_default;
+      user_res = TEST_INTEGRALITY;
+      if (feasible != IP_INFEASIBLE){
+	 printf("Warning: User set feasibility status of solution, but\n");
+	 printf("SYMPHONY to check feasibility. Ignoring request.");
+	 user_res = USER_SUCCESS;
       break;
     default:
       break;
@@ -748,10 +752,6 @@ int is_feasible_u(lp_prob *p, char branching)
 	 if (!p->par.multi_criteria){
 	    PRINT(p->par.verbosity, 0,
 		  ("\n* Found Another Feasible Solution.\n"));
-	    if(heur_feasible){
-	      PRINT(p->par.verbosity, 0,
-		    ("\n****** After Calling Heuristics !\n"));
-	    }	
 	    if (p->mip->obj_sense == SYM_MAXIMIZE){
 	       PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
 					   + p->mip->obj_offset));
@@ -768,8 +768,9 @@ int is_feasible_u(lp_prob *p, char branching)
       if (!p->par.multi_criteria){
 	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);
       }
-      if(!heur_feasible)
+      if (*feasile = IP_FEASIBLE){
 	lp_data->termcode = LP_OPT_FEASIBLE;
+      }
    }
    
    FREE(heur_solution);
