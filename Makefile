@@ -569,6 +569,7 @@ endif
 USER_OBJDIR  = $(USERROOT)/objects.$(ARCH)/$(CONFIG)/
 DEPDIR       = $(SYMPHONYROOT)/dep.$(ARCH)
 USER_DEPDIR  = $(USERROOT)/dep.$(ARCH)
+
 ifeq ($(LP_SOLVER),OSI)
 ifeq ($(USE_SYM_APPL), TRUE)
 OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/APPL_$(LP_SOLVER)_$(OSI_INTERFACE)
@@ -870,6 +871,9 @@ LIBNAME_TYPE      = $(addsuffix .so, $(addprefix lib, $(LIBNAME)))
 LIBLDFLAGS = -shared -Wl,-soname,$(LIBNAME_TYPE) -o
 RANLIB = 
 endif
+SYMLIBDIR  = $(SYMPHONYROOT)/lib
+MKSYMLIBDIR    = mkdir -p $(SYMLIBDIR)
+LN_S = ln -fs $(LIBDIR)/$(LIBNAME_TYPE) $(SYMLIBDIR)
 endif
 
 ##############################################################################
@@ -1131,6 +1135,8 @@ $(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS)
 	mkdir -p $(LIBDIR)
 	$(LD) $(LIBLDFLAGS) $@ $(MASTER_OBJS)
 	$(RANLIB)
+	$(MKSYMLIBDIR)
+	$(LN_S)
 	@echo ""
 
 $(BINDIR)/p$(MASTERNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
@@ -1617,6 +1623,7 @@ clean_user_dep :
 
 clean_lib :
 	rm -rf $(LIBDIR)
+	rm -rf $(SYMLIBDIR)
 
 clean_bin :
 	rm -rf $(BINDIR)
