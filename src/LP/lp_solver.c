@@ -469,7 +469,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	    mip->rhs[i] = 0.0;
 	 }
       }
-      mip->row_lengths[i] = mip->row_matbeg[i+1] - row_matbeg[i];
+      mip->row_lengths[i] = mip->row_matbeg[i+1] - mip->row_matbeg[i];
    }
 
    //   FREE(matind);

@@ -1,3 +1,19 @@
+NEW:
+
+1. Clean out old TODOS (below)
+2. Update manual:
+--Describe three modes of use.
+--Put installation chapter earlier.
+--Explain better how to use black box solver (explain how to read AMPL files)
+--Explain how to get command-line help.
+--Package COIN and GLPK software with the SYMPHONY distribution and make it
+compile out of the box (include GLPK code directly in SYMPHONY)  
+--Explain how to use FlopC++ (Explain example).
+--Explain how to compile Osi
+--Include a sample AMPL file.
+
+
+
 Before release:
 
 1. Update references (make Bibtex file).

@@ -144,6 +144,7 @@ int io_u(sym_environment *env)
 	 printf("ERROR: SYMPHONY can only read GMPL/AMPL files if GLPK is \n");
 	 printf("installed and the USE_GLMPL compiler define is set. \n");
 	 printf("Exiting.\n\n");
+	 return(ERROR__READING_GMPL_FILE);
 #endif
       }
       

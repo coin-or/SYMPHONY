@@ -90,7 +90,7 @@ COINROOT = ${HOME}/COIN
 # (SHARED or STATIC) is to be created.
 ##############################################################################
 
-LIBTYPE = STATIC
+LIBTYPE = SHARED
 
 ##############################################################################
 ##############################################################################
@@ -193,11 +193,11 @@ endif
 # GLPMPL definitions
 ##############################################################################
 
-USE_GLPMPL = FALSE
+USE_GLPMPL = TRUE
 
 ifeq ($(USE_GLPMPL),TRUE)
-        LPINCDIR += ${HOME}/GLPK/glpk-4.4/include
-        LPLIBPATHS += ${HOME}/GLPK/glpk-4.4/src
+        LPINCDIR += ${HOME}/src/glpk-4.7/include
+        LPLIBPATHS += ${HOME}/src/glpk-4.7/src
         LPLIB += -lglpk
 endif
 
@@ -288,7 +288,7 @@ CC = g++
 #       otherwise it'll left alone 
 ##############################################################################
 
-OPT = -O6
+OPT = -g
 
 ##############################################################################
 ##############################################################################
@@ -1631,4 +1631,4 @@ clean_bin :
 clean_all : clean clean_dep clean_user clean_user_dep clean_lib clean_bin
 	true
 
-.SILENT:
+#.SILENT:
