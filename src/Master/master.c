@@ -438,6 +438,26 @@ int sym_set_user_data(sym_environment *env, void *user)
 /*===========================================================================*/
 /*===========================================================================*/
 
+int sym_read_mps(sym_environment *env, char *infile)
+{  
+
+  strncpy(env->par.infile, infile,MAX_FILE_NAME_LENGTH);
+  return(sym_load_problem(env));
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_read_gmpl(sym_environment *env, char *modelfile, char *datafile)
+{  
+  strncpy(env->par.infile, modelfile, MAX_FILE_NAME_LENGTH);
+  strncpy(env->par.datafile, datafile, MAX_FILE_NAME_LENGTH);
+  return(sym_load_problem(env));
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 int sym_load_problem(sym_environment *env)
 {
    double t = 0;
@@ -819,7 +839,7 @@ int sym_solve(sym_environment *env)
 	 printf( "****************************************************\n\n");
 
 	 print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat),
-			  env->ub, env->lb, 0, start_time,
+			  env->ub, env->lb, 0, start_time, wall_clock(NULL),
 			  env->mip->obj_offset, env->mip->obj_sense,
 			  env->has_ub);
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
@@ -1001,11 +1021,11 @@ int sym_solve(sym_environment *env)
       if (tm->lb > env->lb) env->lb = tm->lb;
       if(env->par.verbosity >=0 ) {
 	 print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, env->lb, total_time,
-			  start_time, env->mip->obj_offset, env->mip->obj_sense,
-			  env->has_ub);
+			  start_time, wall_clock(NULL), env->mip->obj_offset, 
+			  env->mip->obj_sense, env->has_ub);
       }
       temp = termcode;
-      if(env->par.verbosity >=0 ) {
+      if(env->par.verbosity >=-1 ) {
 #ifdef COMPILE_IN_LP
 	 CALL_WRAPPER_FUNCTION( display_solution_u(env, env->tm->opt_thread_num) );
 #else
@@ -1015,8 +1035,8 @@ int sym_solve(sym_environment *env)
 #else
       if(env->par.verbosity >=0 ) {
 	 print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 
-			  env->ub, env->lb, 0, start_time, env->mip->obj_offset,
-			  env->mip->obj_sense, env->has_ub);
+			  env->ub, env->lb, 0, start_time, wall_clock(NULL), 
+			  env->mip->obj_offset, env->mip->obj_sense, env->has_ub);
 	 CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
       }
 #endif
@@ -1667,7 +1687,7 @@ int sym_mc_solve(sym_environment *env)
    }
    
    print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 0.0,
-		    0.0, 0, start_time, env->mip->obj_offset,
+		    0.0, 0, start_time, wall_clock(NULL), env->mip->obj_offset,
 		    env->mip->obj_sense, env->has_ub);
 
    printf("\nNumber of subproblems solved: %i\n", numprobs);
@@ -5321,3 +5341,6 @@ int sym_get_ub_for_new_obj(sym_environment *env, int cnt,
 
 /*===========================================================================*/
 /*===========================================================================*/
+
+
+  

@@ -339,7 +339,7 @@ bool OsiSymSolverInterface::setDblParam(OsiDblParam key, double value)
        return false;
 
     case OsiObjOffset:
-       env_->mip->obj_offset = value;
+       env_->mip->obj_offset = -value;
        return true;
        
     default:
@@ -560,7 +560,7 @@ bool OsiSymSolverInterface::getDblParam(OsiDblParam key, double& value) const
        return false;
        
     case OsiObjOffset:
-       value = env_->mip->obj_offset;
+       value = -env_->mip->obj_offset;
       return true;
 
     default:
@@ -695,6 +695,26 @@ void OsiSymSolverInterface::parseCommandLine(int argc, char **argv)
 {
 
    sym_parse_command_line(env_, argc, argv);
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void OsiSymSolverInterface::readMps(char * infile)
+{
+
+  sym_read_mps(env_, infile);
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void OsiSymSolverInterface::readGmpl(char * modelFile, char * dataFile)
+{
+
+  sym_read_gmpl(env_, modelFile, dataFile);
 
 }
 

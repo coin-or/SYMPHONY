@@ -30,6 +30,9 @@ int sym_set_defaults PROTO((sym_environment *env));
 int sym_parse_command_line PROTO((sym_environment *env, int argc, 
 				  char **argv));
 int sym_set_user_data PROTO((sym_environment *env, void *user));
+int sym_read_mps PROTO((sym_environment *env, char *infile));
+int sym_read_gmpl PROTO((sym_environment *env, char *modelfile, 
+			 char *datafile));
 int sym_load_problem PROTO((sym_environment *env));
 int sym_find_initial_bounds PROTO((sym_environment *env));
 

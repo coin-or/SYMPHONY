@@ -633,6 +633,10 @@ public:
 
    void parseCommandLine(int argc, char **argv);
 
+   void readMps(char * infile);
+
+   void readGmpl(char * modelFile, char * dataFile);
+
    void findInitialBounds();
 
    int createPermanentCutPools();
