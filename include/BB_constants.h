@@ -65,9 +65,12 @@
 
 /*--------------------- return values for user-written functions ------------*/
 #define ERROR                   -4
+#define USER_ERROR              -4
+#define USER_SUCCESS            -3
 #define USER_NO_PP              -3
 #define USER_AND_PP             -2
 #define DEFAULT                 -1
+#define USER_DEFAULT            -1
 
 /*---------------------------- type of the problem --------------------------*/
 
@@ -165,13 +168,13 @@
 #  define SLACK_FIXED  4   /* OSLLIB uses this for 'E' rows */
 
 /*----------------- LP Solver return codes (dual simplex) -------------------*/
-#define OPTIMAL                  0
-#define D_INFEASIBLE             1
-#define D_UNBOUNDED              2
-#define D_ITLIM                  3
-#define D_OBJLIM                 4
-#define OPT_FEASIBLE             5
-#define ABANDONED                6
+#define LP_OPTIMAL                  0
+#define LP_D_INFEASIBLE             1
+#define LP_D_UNBOUNDED              2
+#define LP_D_ITLIM                  3
+#define LP_D_OBJLIM                 4
+#define LP_OPT_FEASIBLE             5
+#define LP_ABANDONED                6
 
 #define MOVE_TO_LB               0
 #define MOVE_TO_UB               1
@@ -375,10 +378,10 @@
 #define TEST_ZERO_ONE            0
 #define TEST_INTEGRALITY         1
 
-#define NOT_FEASIBLE             0
-#define FEASIBLE                 1
-#define ALMOST_FEASIBLE          2
-#define FEASIBILITY_NOT_KNOWN    3
+#define IP_INFEASIBLE               0
+#define IP_FEASIBLE                 1
+#define IP_ALMOST_FEASIBLE          2
+#define IP_FEASIBILITY_NOT_KNOWN    3
 
 /*------------------------- display_solution --------------------------------*/
 #define DISP_NOTHING             0

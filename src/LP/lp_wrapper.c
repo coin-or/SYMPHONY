@@ -548,7 +548,7 @@ int is_feasible_u(lp_prob *p)
     case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
       for (i=cnt-1; i>=0; i--)
 	 if (values[i] < lpetol1) break;
-      feasible = i < 0 ? FEASIBLE : NOT_FEASIBLE;
+      feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
       break;
     case TEST_INTEGRALITY:
       for (i = lp_data->n - 1; i >= 0; i--){
@@ -558,13 +558,13 @@ int is_feasible_u(lp_prob *p)
 	 if (valuesi-floor(valuesi) > lpetol && ceil(valuesi)-valuesi > lpetol)
 	    break;
       }
-      feasible = i < 0 ? FEASIBLE : NOT_FEASIBLE;
+      feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
       break;
     default:
       break;
    }
 
-   if (feasible == FEASIBLE){
+   if (feasible == IP_FEASIBLE){
       /* Send the solution value to the treemanager */
       new_ub = true_objval > 0 ? true_objval : lp_data->objval;
       if (!p->has_ub || new_ub < p->ub){
@@ -620,7 +620,7 @@ int is_feasible_u(lp_prob *p)
 			       lpetol, new_ub, cnt, indices, values);
 #endif
       display_lp_solution_u(p, DISP_FEAS_SOLUTION);
-      lp_data->termcode = OPT_FEASIBLE;
+      lp_data->termcode = LP_OPT_FEASIBLE;
    }
 
    return(feasible);
@@ -986,18 +986,18 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
 #endif
    for (i = can->child_num-1; i >= 0; i--){
       switch (can->termcode[i]){
-       case OPTIMAL:
+       case LP_OPTIMAL:
 	 break;
-       case OPT_FEASIBLE:
-       case D_UNBOUNDED:
-       case D_OBJLIM:
+       case LP_OPT_FEASIBLE:
+       case LP_D_UNBOUNDED:
+       case LP_D_OBJLIM:
 	 can->objval[i] = MAXDOUBLE / 2;
 	 break;
-       case D_ITLIM:
+       case LP_D_ITLIM:
 	 can->objval[i] = MAX(can->objval[i], oldobjval);
 	 break;
-       case D_INFEASIBLE:
-       case ABANDONED:
+       case LP_D_INFEASIBLE:
+       case LP_ABANDONED:
 	 can->objval[i] = oldobjval;
 	 break;
       }
@@ -1012,10 +1012,10 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
    \*------------------------------------------------------------------------*/
 
    for (i = can->child_num-1; i >= 0; i--)
-      if (! (can->termcode[i] == D_UNBOUNDED ||
-	     can->termcode[i] == D_OBJLIM ||
-	     can->termcode[i] == OPT_FEASIBLE ||
-	     (can->termcode[i] == OPTIMAL && p->has_ub &&
+      if (! (can->termcode[i] == LP_D_UNBOUNDED ||
+	     can->termcode[i] == LP_D_OBJLIM ||
+	     can->termcode[i] == LP_OPT_FEASIBLE ||
+	     (can->termcode[i] == LP_OPTIMAL && p->has_ub &&
 	      can->objval[i] > p->ub - p->par.granularity))) break;
 
    if (i < 0){
@@ -1052,7 +1052,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
     * If something had gone wrong with at least one descendant in
     * can, then prefer to choose something else. */
    for (i = can->child_num-1; i >= 0; i--)
-      if (can->termcode[i] == ABANDONED)
+      if (can->termcode[i] == LP_ABANDONED)
 	 return(FIRST_CANDIDATE_BETTER);
 
    /* OK, so all descendants in can finished fine. Just do whatever

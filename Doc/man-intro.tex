@@ -3,7 +3,15 @@
 
 There has been a significant amount on new development over the last few
 months that we hope will make version 4.0 significantly easier to use, as well
-as significantly more powerful. Among the new enhancements and features are:
+as significantly more powerful. Unfortunately, this also means that there have
+been a number of changes to the API. Code written for previous versions of
+SYMPHONY will be broken and will have to be ported. Instructions for porting
+from previous version are contained in the file
+\texttt{SYMPHONY-4.0/README-4.0}. All this change has also
+undoubtedly introduced bugs. There are now a VERY large number of
+configurations in which SYMPHONY can be used and we have tested many of them,
+but it is not possible to test them all. Please keep this is mind and report
+all bugs that you find.Among the new enhancements and features are:
 
 \begin{itemize}
 
@@ -19,8 +27,9 @@ for cut generation, file I/O, and solver interface.
 
 \begin{itemize}
 
-    \item SYMPHONY is now capable of reading both MPS files (through the COIN MPS
-reader) and basic AMPL files (using the parser available from GLPK).
+    \item SYMPHONY is now capable of reading both MPS files (through the COIN
+MPS reader) and GnuMath (a subset of AMPL) files (using the parser available
+from GLPK).
 
     \item SYMPHONY now uses the COIN Open Solver Interface (OSI), allowing it to
 be used with almost any commonly available LP solver, including a number of
@@ -36,6 +45,8 @@ helper functions, and more automation of basic functions. The parallelism is
 now more hidden, especially for sequential users.
 
 \item Automated support for user cuts generated and stored as explicit matrix
+rows. The user no longer has to derive a packed form and does not have to
+implement user\_unpack\_cuts() in order to use cuts expressed as explicit matrix
 rows. 
 
 \item Improvements have been made to the mechanism for accessing and displaying

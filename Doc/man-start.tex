@@ -48,7 +48,11 @@ SYMPHONY now uses COIN's OSI to interface with most commonly available LP
 solvers. Generic cuts are now generated using COIN's Cut Generator Library
 (CGL) and the COIN LP Solver (CLP) can be used through the OSI to solve the LP
 relaxations. The COIN MPS reader is used to read in MIP instances in MPS
-format. For a summary of what else is new, see Section \ref{whats-new}.
+format. For a summary of what else is new, see Section \ref{whats-new}. The
+improvements have required a number of changes to the API. Code written for
+previous versions of SYMPHONY will be broken, but not too badly. Instructions
+for porting from previous version are contained in the file
+\texttt{SYMPHONY-4.0/README-4.0}.
 
 This section of the manual is concerned with the detailed
 specifications needed to develop an application using \BB. It is

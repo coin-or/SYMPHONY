@@ -771,28 +771,28 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 #endif
 
    switch (term) {
-    case 0: term = OPTIMAL; break;
-    case 1: term = D_UNBOUNDED;
+    case 0: term = LP_OPTIMAL; break;
+    case 1: term = LP_D_UNBOUNDED;
       ekk_infeasibilities(lp_data->lp, 1, 1, NULL, NULL);
       break;
-    case 2: term = D_INFEASIBLE; break;
-    case 3: term = D_ITLIM; break;
+    case 2: term = LP_D_INFEASIBLE; break;
+    case 3: term = LP_D_ITLIM; break;
     case 4:
       osllib_status = -1;
       OSL_check_error("osllib_status-ekk_dualSimplex found no solution!");
       exit(-1);
-    case 5: D_OBJLIM; break;
+    case 5: LP_D_OBJLIM; break;
     case 6:
       osllib_status = -1;
       OSL_check_error("osllib_status-ekk_dualSimplex lack of dstorage file"
 			 "space!");
       exit(-1);
-    default: term = ABANDONED;break;
+    default: term = LP_ABANDONED;break;
    }
    
    lp_data->termcode = term;
    
-   if (term != ABANDONED){
+   if (term != LP_ABANDONED){
       *iterd = ekk_getIiternum(lp_data->lp);
       lp_data->objval = ekk_getRobjvalue(lp_data->lp);
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
@@ -1595,21 +1595,21 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 
 #if CPX_VERSION >= 800
    switch (real_term = CPXgetstat(lp_data->cpxenv,lp_data->lp)){
-    case CPX_STAT_OPTIMAL:                        term = OPTIMAL; break;
-    case CPX_STAT_INFEASIBLE:                     term = D_UNBOUNDED; break;
-    case CPX_STAT_UNBOUNDED:                      term = D_INFEASIBLE; break;
-    case CPX_STAT_ABORT_OBJ_LIM:                  term = D_OBJLIM; break;
-    case CPX_STAT_ABORT_IT_LIM:                   term = D_ITLIM; break;
-    default:                                      term = ABANDONED; break;
+    case CPX_STAT_OPTIMAL:                        term = LP_OPTIMAL; break;
+    case CPX_STAT_INFEASIBLE:                     term = LP_D_UNBOUNDED; break;
+    case CPX_STAT_UNBOUNDED:                      term = LP_D_INFEASIBLE; break;
+    case CPX_STAT_ABORT_OBJ_LIM:                  term = LP_D_OBJLIM; break;
+    case CPX_STAT_ABORT_IT_LIM:                   term = LP_D_ITLIM; break;
+    default:                                      term = LP_ABANDONED; break;
    }
 #else
    switch (real_term = CPXgetstat(lp_data->cpxenv,lp_data->lp)){
-    case CPX_OPTIMAL:                             term = OPTIMAL; break;
-    case CPX_INFEASIBLE:                          term = D_INFEASIBLE; break;
-    case CPX_UNBOUNDED:                           term = D_UNBOUNDED; break;
-    case CPX_OBJ_LIM:                             term = D_OBJLIM; break;
-    case CPX_IT_LIM_FEAS: case CPX_IT_LIM_INFEAS: term = D_ITLIM; break;
-    default:                                      term = ABANDONED; break;
+    case CPX_OPTIMAL:                             term = LP_OPTIMAL; break;
+    case CPX_INFEASIBLE:                          term = LP_D_INFEASIBLE; break;
+    case CPX_UNBOUNDED:                           term = LP_D_UNBOUNDED; break;
+    case CPX_OBJ_LIM:                             term = LP_D_OBJLIM; break;
+    case CPX_IT_LIM_FEAS: case CPX_IT_LIM_INFEAS: term = LP_D_ITLIM; break;
+    default:                                      term = LP_ABANDONED; break;
    }
 #endif
 
@@ -2279,17 +2279,17 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    lp_data->si->resolve();
    
    if (lp_data->si->isProvenDualInfeasible())
-      term = D_INFEASIBLE;
+      term = LP_D_INFEASIBLE;
    else if (lp_data->si->isProvenPrimalInfeasible())
-      term = D_UNBOUNDED;
+      term = LP_D_UNBOUNDED;
    else if (lp_data->si->isProvenOptimal())
-      term = OPTIMAL;
+      term = LP_OPTIMAL;
    else if (lp_data->si->isDualObjectiveLimitReached())
-      term = D_OBJLIM;
+      term = LP_D_OBJLIM;
    else if (lp_data->si->isIterationLimitReached())
-      term = D_ITLIM;
+      term = LP_D_ITLIM;
    else if (lp_data->si->isAbandoned())
-      term = ABANDONED;
+      term = LP_ABANDONED;
    
    /* if(term == D_UNBOUNDED){
       retval=lp_data->si->getIntParam(OsiMaxNumIteration, itlim); 
@@ -2297,7 +2297,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    
    lp_data->termcode = term;
    
-   if (term != ABANDONED){
+   if (term != LP_ABANDONED){
       
       *iterd = lp_data->si->getIterationCount();
       

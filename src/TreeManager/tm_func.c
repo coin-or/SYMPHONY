@@ -1061,7 +1061,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       }
       if (tm->phase == 0 &&
 	  !(tm->par.colgen_strat[0] & FATHOM__GENERATE_COLS__RESOLVE) &&
-	  (feasible[i] == D_UNBOUNDED ||
+	  (feasible[i] == LP_D_UNBOUNDED ||
 	   (tm->has_ub && tm->ub - tm->par.granularity < child->lower_bound))){
 	 /* it is kept for the next phase  (==> do not dive) */
 	 if (*keep == i)

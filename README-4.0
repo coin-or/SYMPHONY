@@ -23,7 +23,18 @@ application.
 WHAT'S NEW
 ==========
 
-1. All reported bugs have been fixed.
+There has been a significant amount on new development over the last few
+months that we hope will make version 4.0 significantly easier to use, as well
+as significantly more powerful. Unfortunately, this also means that there have
+been a number of changes to the API. Code written for previous versions of
+SYMPHONY will be broken and will have to be ported. All this change has also
+undoubtedly introduced bugs. There are now a VERY large number of
+configurations in which SYMPHONY can be used and we have tested many of them,
+but it is not possible to test them all. Please keep this is mind and report
+all bugs that you find.
+
+1. All reported bugs have been fixed. A few memory leaks have also been
+eradicated. 
 
 2. SYMPHONY now works out of the box as a full-featured, parallel MIP solver,
 with a wide variety of options for developing custom solvers.
@@ -46,7 +57,9 @@ helper functions, and more autmation of basic functions. The parallelism is
 now more hidden, especially for sequential users.
 
 5. There is now automated support for user cuts generated and stored as
-explicit matrix rows. 
+explicit matrix rows. The user no longer has to derive a packed form and does
+not have to implement user_unpack_cuts() in order to use cuts expressed as
+explicit matrix rows.
 
 6. Improvements have been made to the mechanism for accessing and displaying
 solutions.
@@ -68,7 +81,24 @@ to build a simple matching solver.
 CHANGES TO THE USER INTERFACE
 =============================
 
-1. The mechanism for diplaying a solution is now vastly improved. 
+I'm sorry to say that there are quite a few changes to the user interface. Code 
+written for previous versions of SYMPHONY will be broken, but not too
+badly. Here is a quick guide to the changes.  
+
+1. Return codes for user functions have changed in order to avoid conflict
+with SYMBOLS defined in the many solvers SYMPHONY can now link with. Old
+return codes are appended with the prefix "USER_". Also, optional
+post-processing has been eliminated, so the old return codes "USER_NO_PP" and
+"USER_AND_PP" have been combined into a single return code "USER_SUCCESS" to
+indicate that the user function was executed successfully. 
+
+2. Make files are set up a bit differently. The user make file is now thw
+driver. Some variables that used to be set in \texttt{SYMPHONY/Makefile} must
+now be set in the user's make file. See the file
+\texttt{SYMPHONY/USER/Makefile} for an example of what the user's make file is
+now supposed to look like. 
+
+3. The mechanism for diplaying a solution is now vastly improved. 
 SYMPHONY now passes the user the indices and values of the nonzero
 variables for the best solution found. The function user_display_solution()
 now has six arguments, as follows:  
@@ -87,18 +117,18 @@ The user can interpret the solution and print it out in a custom format or
 simply return "DEFAULT", in which case the solution will be displayed by
 SYMPHONY as a column of indices and values.
 
-2. The functions user_readparams() and user_io() now have default
+4. The functions user_readparams() and user_io() now have default
 implementations that simply read in an MPS whose file name is given on the
-command line (see the file SYMPHONY-4.0/USER/README-1.1 for a
+command line (see the file SYMPHONY-4.0/USER/README-1.0 for a
 description). These functions no longer have to be modified by the user when
 using SYMPHONY as a generic MIP solver.
 
-3. Replaced user_set_base() and user_create_root() with a single function
+5. Replaced user_set_base() and user_create_root() with a single function
 called user_initialize_root_node(), in which the user simply has to specify
 the list of base and extra variables. This is greatly simplified from previous
 versions.
 
-4. Changed the name of user_create_lp() function to user_create_subproblem()
+6. Changed the name of user_create_lp() function to user_create_subproblem()
 to more accurately reflect its actual function. In addition, the interface to
 the user has been simplified significantly. The user now has only to construct
 a description of the subproblem by specifying the constraint matrix in
@@ -109,10 +139,10 @@ cuts and variables. The arrays allocated in user_create_subproblem() are owned
 by SYMPHONY after allocation and are freed as soon as the relaxation is loaded
 into the solver.
 
-5. Eliminated the user_get_upper_bounds(). The bounds are now set in either
+7. Eliminated the user_get_upper_bounds(). The bounds are now set in either
 user_create_subproblem() and user_generate_column().
 
-6. Simplified the interface for user_generate_cuts_in_lp(). The user now gets
+8. Simplified the interface for user_generate_cuts_in_lp(). The user now gets
 access to the data structures for the current LP relaxation and has
 only to return a list of cuts. The cuts are unpacked and added by
 SYMPHONY. The new interface is as follows:
@@ -120,8 +150,6 @@ SYMPHONY. The new interface is as follows:
 int user_generate_cuts_in_lp PROTO((void *user, LPdata *lp_data, int varnum,
 				    var_desc **vars, double *x, int *new_row_num,
 				    cut_data ***cuts));
-
-7. The user
 
 ******************************************************************************
 *                COMPILING SYMPHONY (UNIX Operating Systems)                 *

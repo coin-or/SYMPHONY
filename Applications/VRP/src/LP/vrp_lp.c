@@ -232,7 +232,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    n = createnet(indices, values, varnum, lpetol, vrp->edges, demand, vertnum);
    
    if (!n->is_integral){
-      *feasible = NOT_FEASIBLE;
+      *feasible = IP_INFEASIBLE;
       free_net(n);
       return(USER_NO_PP);
    }
@@ -252,7 +252,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    
    for (i = 0; i<rcnt; i++){
       if (compcuts[i+1] < lpetol || compdemands[i+1] > capacity){
-	 *feasible = NOT_FEASIBLE;
+	 *feasible = IP_INFEASIBLE;
 	 FREE(compnodes);
 	 FREE(compdemands);
 	 FREE(compcuts);
@@ -265,7 +265,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    FREE(compdemands);
    FREE(compcuts);
    
-   *feasible = FEASIBLE;
+   *feasible = IP_FEASIBLE;
    
    construct_feasible_solution(vrp, n, true_objval);
    

@@ -281,10 +281,10 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	    /* The original basis is in lp_data->lpbas */
 	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
 	    can->objval[j] = lp_data->objval;
-	    if (can->termcode[j] == OPTIMAL){
+	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
-	       if (is_feasible_u(p) == FEASIBLE){
-		  can->termcode[j] = OPT_FEASIBLE;
+	       if (is_feasible_u(p) == IP_FEASIBLE){
+		  can->termcode[j] = LP_OPT_FEASIBLE;
 		  /*NOTE: This is confusing but not all that citical...*/
 		  /*The "feasible" field is only filled out for the
 		    purposes of display (in vbctool) to keep track of
@@ -301,9 +301,9 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	    }
 #ifdef COMPILE_FRAC_BRANCHING
 	    else
-	       if (can->termcode[j] != ABANDONED)
+	       if (can->termcode[j] != LP_ABANDONED)
 		  get_x(lp_data);
-	    if (can->termcode[j] != ABANDONED){
+	    if (can->termcode[j] != LP_ABANDONED){
 	       xind = lp_data->tmp.i1; /* n */
 	       xval = lp_data->tmp.d; /* n */
 	       can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
@@ -318,7 +318,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	    }
 #endif
 #ifdef STATISTICS
-	    if (can->termcode[j] == D_ITLIM)
+	    if (can->termcode[j] == LP_D_ITLIM)
 	       itlim++;
 #endif
 	 }
@@ -334,10 +334,10 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	    /* The original basis is in lp_data->lpbas */
 	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
 	    can->objval[j] = lp_data->objval;
-	    if (can->termcode[j] == OPTIMAL){
+	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
-	       if (is_feasible_u(p) == FEASIBLE){
-		  can->termcode[j] = OPT_FEASIBLE;
+	       if (is_feasible_u(p) == IP_FEASIBLE){
+		  can->termcode[j] = LP_OPT_FEASIBLE;
 		  /*NOTE: This is confusing but not all that citical...*/
 		  /*The "feasible" field is only filled out for the
 		    purposes of display (in vbctool) to keep track of
@@ -354,9 +354,9 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	    }
 #ifdef COMPILE_FRAC_BRANCHING
 	    else
-	       if (can->termcode[j] != ABANDONED)
+	       if (can->termcode[j] != LP_ABANDONED)
 		  get_x(lp_data);
-	    if (can->termcode[j] != ABANDONED){
+	    if (can->termcode[j] != LP_ABANDONED){
 	       xind = lp_data->tmp.i1; /* n */
 	       xval = lp_data->tmp.d; /* n */
 	       can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
@@ -371,7 +371,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	    }
 #endif
 #ifdef STATISTICS
-	    if (can->termcode[j] == D_ITLIM)
+	    if (can->termcode[j] == LP_D_ITLIM)
 	       itlim++;
 #endif
 	 }
@@ -631,11 +631,11 @@ int col_gen_before_branch(lp_prob *p, int *new_vars)
       return(DO_NOT_BRANCH);
    }else{
       if (p->ub - p->par.granularity < p->lp_data->objval ||
-	  p->lp_data->termcode == D_OBJLIM ||
-	  p->lp_data->termcode == OPT_FEASIBLE){
+	  p->lp_data->termcode == LP_D_OBJLIM ||
+	  p->lp_data->termcode == LP_OPT_FEASIBLE){
 	 /* If total dual feas and high cost or feasibility ==> fathomable */
 	 PRINT(p->par.verbosity, 1, ("Managed to fathom the node.\n"));
-	 send_node_desc(p, p->lp_data->termcode == OPT_FEASIBLE ?
+	 send_node_desc(p, p->lp_data->termcode == LP_OPT_FEASIBLE ?
 			FEASIBLE_PRUNED : OVER_UB_PRUNED);
 	 p->comp_times.communication += used_time(&p->tt);
 	 return(DO_NOT_BRANCH__FATHOMED);

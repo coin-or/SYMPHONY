@@ -734,14 +734,14 @@ int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
    double low1, low2;
    
    for (i = 1; i >= 0; i--)
-      if (can1->termcode[i] == OPT_FEASIBLE || can1->termcode[i] == D_OBJLIM ||
-	  can1->termcode[i] == D_UNBOUNDED || can1->objval[i] > ub -
+      if (can1->termcode[i]==LP_OPT_FEASIBLE || can1->termcode[i]==LP_D_OBJLIM ||
+	  can1->termcode[i]==LP_D_UNBOUNDED || can1->objval[i] > ub -
 	  granularity)
 	 break;
 
    for (j = 1; j >= 0; j--)
-      if (can2->termcode[j] == OPT_FEASIBLE || can2->termcode[j] == D_OBJLIM ||
-	  can2->termcode[j] == D_UNBOUNDED || can2->objval[j] > ub -
+      if (can2->termcode[j]==LP_OPT_FEASIBLE || can2->termcode[j]==LP_D_OBJLIM ||
+	  can2->termcode[j] == LP_D_UNBOUNDED || can2->objval[j] > ub -
 	  granularity)
 	 break;
 

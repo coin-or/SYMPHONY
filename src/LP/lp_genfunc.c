@@ -287,9 +287,9 @@ void fathom_branch(lp_prob *p)
 				  lp_data->objval, termcode, iterd));
 
       switch (termcode){
-       case D_ITLIM:      /* impossible, since itlim is set to infinity */
-       case D_INFEASIBLE: /* this is impossible (?) as of now */
-       case ABANDONED:
+       case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
+       case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
+       case LP_ABANDONED:
 	 printf("######## Unexpected termcode: %i \n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
@@ -307,14 +307,14 @@ void fathom_branch(lp_prob *p)
 	    exit(-3);
 	 }
 
-       case D_UNBOUNDED: /* the primal problem is infeasible */
-       case D_OBJLIM:
-       case OPTIMAL:
+       case LP_D_UNBOUNDED: /* the primal problem is infeasible */
+       case LP_D_OBJLIM:
+       case LP_OPTIMAL:
 	 if (num_errors == 1){
 	    printf("######## Recovery succeeded! Continuing with node...\n\n");
 	    num_errors = 0;
 	 }
-	 if (termcode == D_UNBOUNDED){
+	 if (termcode == LP_D_UNBOUNDED){
 	    PRINT(p->par.verbosity, 1, ("Feasibility lost -- "));
 #if 0
 	    char name[50] = "";
@@ -322,13 +322,13 @@ void fathom_branch(lp_prob *p)
 	    write_mps(lp_data, name);
 #endif
 	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity)
-		   || termcode == D_OBJLIM){
+		   || termcode == LP_D_OBJLIM){
 	    PRINT(p->par.verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
 	    break;
 	 }
 	 comp_times->lp += used_time(&p->tt);
-	 if (fathom(p, (termcode != D_UNBOUNDED))){
+	 if (fathom(p, (termcode != LP_D_UNBOUNDED))){
 	    comp_times->communication += used_time(&p->tt);
 	    return;
 	 }else{
@@ -341,7 +341,7 @@ void fathom_branch(lp_prob *p)
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
-      if (is_feasible_u(p) == FEASIBLE){
+      if (is_feasible_u(p) == IP_FEASIBLE){
 	 cuts = -1;
       }else{
 	 /*------------------------------------------------------------------*\
@@ -369,7 +369,7 @@ void fathom_branch(lp_prob *p)
 
 	 comp_times->lp += used_time(&p->tt);
 
-	 fix_variables(p);
+	 tighten_bounds(p);
 
 	 comp_times->fixing += used_time(&p->tt);
 
@@ -461,7 +461,7 @@ int fathom(lp_prob *p, int primal_feasible)
    if (p->lp_data->nf_status == NF_CHECK_NOTHING){
       PRINT(p->par.verbosity, 1,
 	    ("fathoming node (no more cols to check)\n\n"));
-      send_node_desc(p, primal_feasible ? (termcode == OPT_FEASIBLE ?
+      send_node_desc(p, primal_feasible ? (termcode == LP_OPT_FEASIBLE ?
 					   FEASIBLE_PRUNED: OVER_UB_PRUNED) :
 		     INFEASIBLE_PRUNED);
       return(TRUE);
@@ -473,7 +473,7 @@ int fathom(lp_prob *p, int primal_feasible)
    switch (colgen){
     case FATHOM__DO_NOT_GENERATE_COLS__DISCARD:
       PRINT(p->par.verbosity, 1, ("Pruning node\n\n"));
-      send_node_desc(p, termcode == OPT_FEASIBLE ? FEASIBLE_PRUNED :
+      send_node_desc(p, termcode == LP_OPT_FEASIBLE ? FEASIBLE_PRUNED :
 		     DISCARDED_NODE);
       return(TRUE);
 
@@ -508,9 +508,9 @@ int fathom(lp_prob *p, int primal_feasible)
       }
       /* Now we know that we have total dual feasibility */
       if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity) ||
-	  termcode == D_OBJLIM || termcode == OPT_FEASIBLE){
+	  termcode == LP_D_OBJLIM || termcode == LP_OPT_FEASIBLE){
 	 /* fathomable */
-	 if (termcode == D_OBJLIM ||
+	 if (termcode == LP_D_OBJLIM ||
 	     (p->has_ub && lp_data->objval > p->ub - p->par.granularity)){
 	    PRINT(p->par.verbosity, 1,
 		  ("Fathoming node (discovered tdf & high cost)\n\n"));
@@ -518,7 +518,7 @@ int fathom(lp_prob *p, int primal_feasible)
 	    PRINT(p->par.verbosity, 1,
 		  ("Fathoming node (discovered tdf & feasible)\n\n"));
 	 }
-	 send_node_desc(p, termcode == OPT_FEASIBLE ? FEASIBLE_PRUNED :
+	 send_node_desc(p, termcode == LP_OPT_FEASIBLE ? FEASIBLE_PRUNED :
 			OVER_UB_PRUNED);
 	 free_col_set(&new_cols);
 	 return(TRUE);
@@ -609,9 +609,9 @@ void repricing(lp_prob *p)
       comp_times->lp += used_time(&p->tt);
 
       switch (termcode){
-       case D_ITLIM:      /* impossible, since itlim is set to infinity */
-       case D_INFEASIBLE: /* this is impossible (?) as of now */
-       case ABANDONED:
+       case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
+       case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
+       case LP_ABANDONED:
 	 printf("######## Unexpected termcode: %i ########\n\n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
@@ -619,19 +619,19 @@ void repricing(lp_prob *p)
 	 }
 	 exit(-2);
 
-       case D_UNBOUNDED: /* the primal problem is infeasible */
-       case D_OBJLIM:
-       case OPTIMAL:
-	 if (termcode == D_UNBOUNDED){
+       case LP_D_UNBOUNDED: /* the primal problem is infeasible */
+       case LP_D_OBJLIM:
+       case LP_OPTIMAL:
+	 if (termcode == LP_D_UNBOUNDED){
 	    PRINT(p->par.verbosity, 1, ("Feasibility lost -- "));
 	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity)
-		   || termcode == D_OBJLIM){
+		   || termcode == LP_D_OBJLIM){
 	    PRINT(p->par.verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
 	    break;
 	 }
 	 comp_times->lp += used_time(&p->tt);
-	 if (fathom(p, (termcode != D_UNBOUNDED))){
+	 if (fathom(p, (termcode != LP_D_UNBOUNDED))){
 	    comp_times->communication += used_time(&p->tt);
 	    return;
 	 }else{
@@ -643,7 +643,7 @@ void repricing(lp_prob *p)
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
-      if (is_feasible_u(p) == FEASIBLE){
+      if (is_feasible_u(p) == IP_FEASIBLE){
 	 if (p->par.verbosity > 2){
 	    printf ("Now displaying the feasible solution ...\n");
 	    display_lp_solution_u(p, DISP_FEAS_SOLUTION);
@@ -672,7 +672,7 @@ void repricing(lp_prob *p)
 
 	 comp_times->lp += used_time(&p->tt);
 
-	 fix_variables(p);
+	 tighten_bounds(p);
 
 	 comp_times->fixing += used_time(&p->tt);
 

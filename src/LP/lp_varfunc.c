@@ -139,10 +139,10 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
 /*===========================================================================*/
 
 /*===========================================================================*\
- * Try to do reduced cost fixing of variables and logical fixing               
+ * Try to tighten bounds based on reduced cost and logical fixing
 \*===========================================================================*/
 
-void fix_variables(lp_prob *p)
+void tighten_bounds(lp_prob *p)
 {
    LPdata *lp_data = p->lp_data;
    double *dj = lp_data->dj;
@@ -175,10 +175,10 @@ void fix_variables(lp_prob *p)
     *
     * If the gap is negative that means that we are above the limit, so don't
     * do anything.
-    * Otherwise we do regular rc fixing if one of the following holds:
+    * Otherwise we do regular rc tightening if one of the following holds:
     * -- if we have done rc fixing before then the gap must have decreased
     *    significantly
-    * -- if we haven't done rc fixing before then the gap must be relatively
+    * -- if we haven't done rc tightening before, then the gap must be relatively
     * small compared to the upper bound
     \*=======================================================================*/
 
@@ -201,7 +201,7 @@ void fix_variables(lp_prob *p)
 	 memset((char *)delstat, 0, n * ISIZE);
 	 lb_vars = perm_lb_vars = ub_vars = perm_ub_vars = 0;
 	 for (cnt = 0, i = n-1; i >= 0; i--){
-	    if (fabs(dj[i]) < lpetol){
+	    if (fabs(dj[i]) < lpetol || !vars[i]->is_int){
 	       continue;
 	    }
 	    max_change = gap/dj[i];
@@ -317,250 +317,6 @@ void fix_variables(lp_prob *p)
    }
 }
 
-#if 0
-void fix_variables(lp_prob *p)
-{
-   LPdata *lp_data = p->lp_data;
-   double *dj = lp_data->dj;
-   double *x = lp_data->x;
-   char *status = lp_data->status;
-   var_desc **vars = lp_data->vars;
-   int n = lp_data->n;
-
-   double gap = 0.0;
-   int i, vars_recently_fixed_to_ub = 0;
-   int did_logical_fixing = FALSE,  did_reduced_cost_fixing = FALSE;
-   int lb_vars, perm_lb_vars, ub_vars, perm_ub_vars, del_vars, *delstat;
-
-   char not_fixed__lb__switch, not_fixed__ub__switch;
-   int *ind;
-   char *lu;
-   double *bd;
-   int cnt;
-
-   colind_sort_extra(p);
-
-   check_ub(p);
-   if (p->has_ub){
-      gap = p->ub - lp_data->objval - p->par.granularity;
-   }
-
-   /*========================================================================*\
-    *                   Here is the reduced cost fixing.
-    *
-    * If the gap is negative that means that we are above the limit, so don't
-    * do anything.
-    * Otherwise we do regular rc fixing if one of the following holds:
-    * -- if we have done rc fixing before then the gap must have decreased
-    *    significantly
-    * -- if we haven't done rc fixing before then the gap must be relatively
-    * small compared to the upper bound
-    \*=======================================================================*/
-
-   if (p->par.do_reduced_cost_fixing && p->has_ub && gap > 0){
-      if (p->last_gap == 0.0 ?
-	  (gap < p->par.gap_as_ub_frac * p->ub) :
-	  (gap < p->par.gap_as_last_gap_frac * p->last_gap)){
-
-	 /*==================================================================*\
-	  * if the gap is positive then we do reduced cost fixing only if
-	  * -- if we have done rc fixing before then the gap must have
-	  *    decreased significantly
-	  * -- if we haven't done rc fixing before then the gap must be
-	  *    relatively small compared to the upper bound
-	 \================================================================== */
-
-	 if (lp_data->nf_status & NF_CHECK_NOTHING){
-	    not_fixed__lb__switch = NOT_FIXED__PERM_LB__SWITCH;
-	    not_fixed__ub__switch = NOT_FIXED__PERM_UB__SWITCH;
-	 }else{
-	    not_fixed__lb__switch = NOT_FIXED__TEMP_LB__SWITCH;
-	    not_fixed__ub__switch = NOT_FIXED__TEMP_UB__SWITCH;
-	 }
-
-	 switch (p->par.problem_type){
-	  case ZERO_ONE_PROBLEM:
-	  case INTEGER_PROBLEM:
-	    for (i = n-1; i >= 0; i--){
-	       if (status[i] & NOT_FIXED){
-		  if (dj[i] > gap){
-		     status[i] ^= not_fixed__lb__switch;
-#ifdef TRACE_PATH
-		     {
-			int j;
-			for (j = 0; j < p->tm->feas_sol_size; j++)
-			   if (p->tm->feas_sol[j] == vars[i]->userind){
-			      printf("Fixing optimal variable %i uind: %i"
-				     "gap: %f red cost: %f lb: %f ub: %f \n\n",
-				     j, vars[i]->userind, gap, dj[i],
-				     vars[i]->lb, vars[i]->ub);
-			   }
-		     }
-#endif 
-		  }else if (dj[i] < -gap){
-		     status[i] ^= not_fixed__ub__switch;
-		     vars_recently_fixed_to_ub++;
-		  }
-	       }
-	    }
-	    break;
-#if 0
-	  case INTEGER_PROBLEM:
-	    /*FIXME: It may be possible for non-binary variables to be fixed
-	      to a lower upper bound than the original one but not all the way
-	      to their real lower bound by doing something like the below.
-	      Right now, there is no way of handling this.*/
-	    for (i = n-1; i >= 0; i--){
-	       if (status[i] & NOT_FIXED){
-		  diff = vars[i]->ub - vars[i]->lb;
-		  if (dj[i] * diff > gap){
-		     status[i] ^= not_fixed__lb__switch;
-#ifdef TRACE_PATH
-		     {
-			int j;
-			for (j = 0; j < p->tm->feas_sol_size; j++)
-			   if (p->tm->feas_sol[j] == vars[i]->userind){
-			      printf("Fixing optimal variable %i uind: %i"
-				     "gap: %f red cost: %f lb: %f ub: %f \n\n",
-				     j, vars[i]->userind, gap, dj[i],
-				     vars[i]->lb, vars[i]->ub);
-			   }
-		     }
-#endif 
-		  }else if (dj[i] * diff < -gap){
-		     status[i] ^= not_fixed__ub__switch;
-		     vars_recently_fixed_to_ub++;
-		  }
-	       }
-	    }
-	    break;
-#endif
-	  case MIXED_INTEGER_PROBLEM:
-	    printf("I'm baffled, this is an MIP... need user supplied fn.\n");
-	    break;
-	 }
-	 did_reduced_cost_fixing = TRUE;
-      }
-      p->vars_recently_fixed_to_ub += vars_recently_fixed_to_ub;
-   }
-
-   /*========================================================================*\
-    * Logical fixing is done only if the number of variables recently fixed
-    * to upper bound reaches a given constant AND is at least a certain
-    * fraction of the total number of variables. 
-    \*=======================================================================*/
-
-   if ((p->par.do_logical_fixing) &&
-       (p->vars_recently_fixed_to_ub >
-	p->par.fixed_to_ub_before_logical_fixing) &&
-       (p->vars_recently_fixed_to_ub >
-	p->par.fixed_to_ub_frac_before_logical_fixing * n)){
-      logical_fixing_u(p);
-      did_logical_fixing = TRUE;
-   }
-
-   if (! did_reduced_cost_fixing && ! did_logical_fixing)
-      return;
-
-   if (did_reduced_cost_fixing)
-      p->last_gap = gap;
-   if (did_logical_fixing)
-      p->vars_recently_fixed_to_ub = 0;
-
-   /* Fix the upper/lower bounds on the newly fixed variables,
-      prepare to delete them and do some statistics. */
-   delstat = lp_data->tmp.i1;   /* 2*n */
-   ind = lp_data->tmp.i1 + n;
-   lu = lp_data->tmp.c;         /* n */
-   bd = lp_data->tmp.d;         /* n */
-
-   p->vars_deletable = 0;
-   memset((char *)delstat, 0, n * ISIZE);
-   lb_vars = perm_lb_vars = ub_vars = perm_ub_vars = 0;
-   for (cnt = 0, i = n-1; i >= 0; i--){
-      switch (status[i] & ~NOT_REMOVABLE){
-       case TEMP_FIXED_TO_LB:
-	 ind[cnt] = i;
-	 lu[cnt] = 'U';
-	 bd[cnt++] = vars[i]->lb;
-	 if (! (status[i] & NOT_REMOVABLE)){
-	    p->vars_deletable++;
-	    delstat[i] = 1;
-	 }
-	 lb_vars++;
-	 break;
-       case PERM_FIXED_TO_LB:
-	 ind[cnt] = i;
-	 lu[cnt] = 'U';
-	 bd[cnt++] = vars[i]->lb;
-	 if (! (status[i] & NOT_REMOVABLE)){
-	    p->vars_deletable++;
-	    delstat[i] = 1;
-	 }
-	 perm_lb_vars++;
-	 break;
-       case TEMP_FIXED_TO_UB:
-	 ind[cnt] = i;
-	 lu[cnt] = 'L';
-	 bd[cnt++] = vars[i]->ub;
-	 ub_vars++;
-	 break;
-       case PERM_FIXED_TO_UB:
-	 ind[cnt] = i;
-	 lu[cnt] = 'L';
-	 bd[cnt++] = vars[i]->ub;
-	 perm_ub_vars++;
-	 break;
-      }
-   }
-
-   change_bounds(lp_data, cnt, ind, lu, bd);
-
-   if (p->par.verbosity > 3){
-      if (ub_vars)
-	 printf("total of %i variables fixed temp to UB ...\n",ub_vars);
-      if (perm_ub_vars)
-	 printf("total of %i variables fixed perm to UB ...\n",perm_ub_vars);
-      if (lb_vars)
-	 printf("total of %i variables fixed temp to LB ...\n",lb_vars);
-      if (perm_lb_vars)
-	 printf("total of %i variables fixed perm to LB ...\n",perm_lb_vars);
-   }
-   p->vars_at_lb = lb_vars;
-   p->vars_at_ub = ub_vars;
-
-   /* if enough variables have been fixed, then physically compress the matrix,
-    * eliminating the columns that are fixed to zero */
-   if (p->vars_deletable > p->par.mat_col_compress_num &&
-       p->vars_deletable > n * p->par.mat_col_compress_ratio){
-      
-      PRINT(p->par.verbosity,3, ("Compressing constraint matrix (col) ...\n"));
-      del_vars = delete_cols(lp_data, p->vars_deletable, delstat);
-      if (del_vars > 0){
-	 lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
-	 lp_data->col_set_changed = TRUE;
-      }
-      if (p->vars_deletable > del_vars){
-	 PRINT(p->par.verbosity, 3,
-	       ("%i vars were not removed because they were basic ...\n",
-		p->vars_deletable - del_vars));
-      }
-      if (del_vars > 0){
-	 p->vars_deletable -= del_vars;
-	 PRINT(p->par.verbosity, 3,
-	       ("%i vars successfully removed from the problem ...\n",
-		del_vars));
-	 for (i = p->base.varnum; i < n; i++){
-	    if (delstat[i] != -1){
-	       *(vars[delstat[i]]) = *(vars[i]);
-	       vars[delstat[i]]->colind = delstat[i];
-	    }
-	 }
-      }
-   }
-}
-#endif
-
 /*===========================================================================*\
  *===========================================================================*
  *
@@ -647,7 +403,7 @@ our_col_set *price_all_vars(lp_prob *p)
    if (max_ndf_vars > p->par.max_non_dual_feas_to_add_max)
       max_ndf_vars = p->par.max_non_dual_feas_to_add_max;
 
-   if (termcode != D_UNBOUNDED){
+   if (termcode != LP_D_UNBOUNDED){
       max_nfix_vars = 0;
    }else{
       max_nfix_vars = (int) (n * p->par.max_not_fixable_to_add_frac);
