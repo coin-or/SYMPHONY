@@ -125,37 +125,37 @@ public:
     virtual bool setIntParam(OsiIntParam key, int value);
 
     // Set SYMPHONY int parameter
-    bool setSymIntParam(OsiSymIntParam key, int value);
+    bool setSymParam(OsiSymIntParam key, int value);
 
     // Set an double parameter
     virtual bool setDblParam(OsiDblParam key, double value);
 
     // Set SYMPHONY double parameter
-    bool setSymDblParam(OsiSymDblParam key, double value);
+    bool setSymParam(OsiSymDblParam key, double value);
 
     // Set an string parameter
     virtual bool setStrParam(OsiStrParam key, const std::string & value);
 
     // Set SYMPHONY string parameter
-    bool setSymStrParam(OsiSymStrParam key, const std::string & value);
+    bool setSymParam(OsiSymStrParam key, const std::string & value);
 
     // Get an integer parameter
     virtual bool getIntParam(OsiIntParam key, int& value) const;
 
     // Get SYMPHONY int parameter
-    bool getSymIntParam(OsiSymIntParam key, int& value) const;
+    bool getSymParam(OsiSymIntParam key, int& value) const;
 
     // Get an double parameter
     virtual bool getDblParam(OsiDblParam key, double& value) const;
 
     // Get SYMPHONY double parameter
-    bool getSymDblParam(OsiSymDblParam key, double& value) const;
+    bool getSymParam(OsiSymDblParam key, double& value) const;
 
     // Get a string parameter
     virtual bool getStrParam(OsiStrParam key, std::string& value) const;
 
     // Get SYMPHONY string parameter
-    bool getSymStrParam(OsiSymStrParam key, std::string & value) const;
+    bool getSymParam(OsiSymStrParam key, std::string & value) const;
 
   //@}
 

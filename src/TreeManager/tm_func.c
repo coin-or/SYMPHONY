@@ -297,7 +297,7 @@ int solve(tm_prob *tm)
 #ifndef COMPILE_IN_LP
    int r_bufid;
 #endif
-   int termcode = 0;
+   int termcode = 0, i;
    double start_time = tm->start_time;
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char no_work = TRUE, ramp_up = TRUE;
@@ -336,7 +336,12 @@ int solve(tm_prob *tm)
 	 \*------------------------------------------------------------------*/
 	 i = NEW_NODE__STARTED;
 	 while (tm->lp.free_num > 0 && (tm->par.time_limit ?
-		(wall_clock(NULL) - start_time < tm->par.time_limit) : TRUE)){
+		(wall_clock(NULL) - start_time < tm->par.time_limit) : TRUE) &&
+		(tm->par.node_limit ?
+		tm->stat.analyzed < tm->par.node_limit : TRUE) &&
+		((tm->has_ub && tm->par.gap_limit) ?
+		 100*(tm->ub-tm->lb)/tm->ub > tm->par.gap_limit : TRUE) &&
+		!(tm->par.find_first_feasible && tm->has_ub)){
 	    if (no_work == FALSE){
 	       no_work       = TRUE;
 	       no_work_start = wall_clock(NULL);
@@ -412,16 +417,29 @@ int solve(tm_prob *tm)
 	       if (tm->samephase_cand[i]->lower_bound < tm->lb)
 		  tm->lb = tm->samephase_cand[i]->lower_bound;
 	    }
+	    if (tm->lb >= MAXDOUBLE / 2){
+	       tm->lb = tm->ub;
+	    }
 	    termcode = TM_TIME_LIMIT_EXCEEDED;
 	    break;
 	 }
+	 if (tm->par.node_limit && tm->stat.analyzed >= tm->par.node_limit){
+	    termcode = TM_NODE_LIMIT_EXCEEDED;
+	    break;
+	 }
+	 if (tm->par.find_first_feasible && tm->has_ub){
+	    termcode = TM_FOUND_FIRST_FEASIBLE;
+	    break;
+	 }
 	 if (i == NEW_NODE__ERROR){
-	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-	       if (tm->samephase_cand[i]->lower_bound < tm->lb)
-		  tm->lb = tm->samephase_cand[i]->lower_bound;
-	    }
 	    termcode = SOMETHING_DIED;
 	    break;
+	 }
+	 if (tm->has_ub && tm->par.gap_limit){
+	    if (100*(tm->ub-tm->lb)/tm->ub <= tm->par.gap_limit){
+	       termcode = TM_NODE_LIMIT_EXCEEDED;
+	       break;
+	    }
 	 }
 	 if (i == NEW_NODE__NONE && tm->active_node_num == 0)
 	    break;
@@ -465,6 +483,13 @@ int solve(tm_prob *tm)
 	 break;
       if (termcode != TM_OPTIMAL_SOLUTION_FOUND)
 	 break;
+   }
+   for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
+      if (tm->samephase_cand[i]->lower_bound < tm->lb)
+	 tm->lb = tm->samephase_cand[i]->lower_bound;
+   }
+   if (tm->lb >= MAXDOUBLE / 2){
+      tm->lb = tm->ub;
    }
    tm->stat.root_lb = tm->rootnode->lower_bound;
    tm->comp_times.ramp_up_tm = ramp_up_tm;
@@ -519,18 +544,22 @@ void print_tree_status(tm_prob *tm)
    int i;
    
    printf("\nCurrent number of candidate nodes: %i\n", tm->samephase_candnum);
-   if (tm->has_ub)
+   if (tm->has_ub){
       printf("Current upper bound:               %.2f\n", tm->ub);
-   else
+   }else{
       printf("No upper bound found yet...\n");
-   if (tm->samephase_candnum == 0)
+   }
+   if (tm->samephase_candnum == 0){
       tm->lb = tm->ub;
-   else
+   }else{
       for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
 	 if (tm->samephase_cand[i]->lower_bound < tm->lb)
 	    tm->lb = tm->samephase_cand[i]->lower_bound;
       }
-   if (tm->lb >= MAXDOUBLE / 2) tm->lb = tm->ub;
+   }
+   if (tm->lb >= MAXDOUBLE / 2){
+      tm->lb = tm->ub;
+   }
    printf("Current lower bound:               %.2f\n", tm->lb);
    if (tm->has_ub && tm->ub){
       printf("Current gap percentage:            %.2f\n",
@@ -1120,6 +1149,29 @@ char shall_we_dive(tm_prob *tm, double objval)
    double rand_num, average_lb;
    double cutoff = 0;
 
+   for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
+      if (tm->samephase_cand[i]->lower_bound < tm->lb)
+	 tm->lb = tm->samephase_cand[i]->lower_bound;
+   }
+   if (tm->lb >= MAXDOUBLE / 2){
+      tm->lb = tm->ub;
+   }
+   
+   if (tm->par.time_limit &&
+	wall_clock(NULL) - tm->start_time >= tm->par.time_limit){
+      return(FALSE);
+   }
+
+   if (tm->par.node_limit && tm->stat.analyzed >= tm->par.node_limit){
+      return(FALSE);
+   }
+   
+   if (tm->has_ub && tm->par.gap_limit){
+      if (100*(tm->ub-tm->lb)/tm->ub <= tm->par.gap_limit){
+	 return(FALSE);
+      }
+   }
+   
    rand_num = ((double)(RANDOM()))/((double)(MAXINT));
    if (tm->par.unconditional_dive_frac > 1 - rand_num){
       dive = DO_DIVE;

@@ -28,6 +28,8 @@ int main(int argc, char **argv)
 {
    OsiSymSolverInterface si;
 
+   //si.setSymParam(OsiSymVerbosity, -1);
+
    /* Parse the command line */
    si.parseCommandLine(argc, argv);
    
@@ -37,13 +39,13 @@ int main(int argc, char **argv)
    /* Find a priori problem bounds */
    si.findInitialBounds();
 
-   si.setSymDblParam(OsiSymTimeLimit, 5.0);
+   si.setSymParam(OsiSymFindFirstFeasible, TRUE);
    
    /* Solve the problem */
    si.branchAndBound();
 
-   si.setSymIntParam(OsiSymWarmStart, TRUE);
-   si.setSymDblParam(OsiSymTimeLimit, 3600.0);
+   si.setSymParam(OsiSymFindFirstFeasible, FALSE);
+   si.setSymParam(OsiSymWarmStart, TRUE);
    
    /* Solve the problem */
    si.branchAndBound();

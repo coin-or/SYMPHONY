@@ -89,6 +89,7 @@ typedef struct TM_PARAMS{
    double      time_limit;
    double      gap_limit;
    int         node_limit;
+   int         find_first_feasible;
 }tm_params;
 
 #endif

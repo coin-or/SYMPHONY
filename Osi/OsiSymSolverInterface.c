@@ -85,7 +85,7 @@ bool OsiSymSolverInterface::setIntParam(OsiIntParam key, int value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::setSymIntParam(OsiSymIntParam key, int value)
+bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
 {
    switch(key){
 
@@ -101,6 +101,9 @@ bool OsiSymSolverInterface::setSymIntParam(OsiSymIntParam key, int value)
       env_->par.tm_par.node_limit = value;
       return true;
 
+   case OsiSymFindFirstFeasible:
+      env_->par.tm_par.find_first_feasible = value;
+      
     default: 
       return false;
    }
@@ -125,7 +128,7 @@ bool OsiSymSolverInterface::setDblParam(OsiDblParam key, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::setSymDblParam(OsiSymDblParam key, double value)
+bool OsiSymSolverInterface::setSymParam(OsiSymDblParam key, double value)
 {
    switch(key){
 
@@ -160,8 +163,8 @@ bool OsiSymSolverInterface::setStrParam(OsiStrParam key,
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::setSymStrParam(OsiSymStrParam key, 
-					   const std::string & value)
+bool OsiSymSolverInterface::setSymParam(OsiSymStrParam key, 
+					const std::string & value)
 {
    switch(key){
 
@@ -183,7 +186,7 @@ bool OsiSymSolverInterface::getIntParam(OsiIntParam key, int& value) const
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::getSymIntParam(OsiSymIntParam key, int& value)
+bool OsiSymSolverInterface::getSymParam(OsiSymIntParam key, int& value)
      const
 {
    switch(key){
@@ -200,6 +203,9 @@ bool OsiSymSolverInterface::getSymIntParam(OsiSymIntParam key, int& value)
       value = env_->par.tm_par.node_limit;
       return true;
 
+   case OsiSymFindFirstFeasible:
+      value = env_->par.tm_par.find_first_feasible;
+      
    default:
       return false;
    }
@@ -224,7 +230,7 @@ bool OsiSymSolverInterface::getDblParam(OsiDblParam key, double& value) const
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::getSymDblParam(OsiSymDblParam key, 
+bool OsiSymSolverInterface::getSymParam(OsiSymDblParam key, 
 					   double& value) const
 {
    switch(key){
@@ -260,7 +266,7 @@ bool OsiSymSolverInterface::getStrParam(OsiStrParam key,
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::getSymStrParam(OsiSymStrParam key, 
+bool OsiSymSolverInterface::getSymParam(OsiSymStrParam key, 
 					   std::string& value) const
 {
    switch(key){

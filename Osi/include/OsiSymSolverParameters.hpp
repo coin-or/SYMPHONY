@@ -20,7 +20,8 @@ enum OsiSymIntParam {
    /** This controls the level of output */
    OsiSymVerbosity,
    OsiSymWarmStart,
-   OsiSymNodeLimit
+   OsiSymNodeLimit,
+   OsiSymFindFirstFeasible
 };
 
 enum OsiSymDblParam {

@@ -648,6 +648,18 @@ int parse_command_line(problem *p, int argc, char **argv)
 	       strcmp(key, "TM_time_limit") == 0){
 	 READ_DBL_PAR(tm_par->time_limit);
       }
+      else if (strcmp(key, "node_limit") == 0 ||
+	       strcmp(key, "TM_node_limit") == 0){
+	 READ_INT_PAR(tm_par->node_limit);
+      }
+      else if (strcmp(key, "gap_limit") == 0 ||
+	       strcmp(key, "TM_gap_limit") == 0){
+	 READ_DBL_PAR(tm_par->gap_limit);
+      }
+      else if (strcmp(key, "find_first_feasible") == 0 ||
+	       strcmp(key, "TM_find_first_feasible") == 0){
+	 READ_INT_PAR(tm_par->find_first_feasible);
+      }
 
       /***********************************************************************
        ***                      LP parameters                              ***

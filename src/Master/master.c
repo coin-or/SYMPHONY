@@ -214,7 +214,10 @@ int sym_set_defaults(problem *p)
 			      BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
    tm_par->not_fixed_storage_size = 2048;
    tm_par->time_limit = 0;
-
+   tm_par->node_limit = 0;
+   tm_par->gap_limit = 0;
+   tm_par->find_first_feasible = FALSE;
+   
    /************************** lp defaults ***********************************/
    lp_par->verbosity = 0;
    lp_par->granularity = tm_par->granularity;
@@ -742,6 +745,7 @@ int sym_solve(problem *p)
        case TM_TIME_LIMIT_EXCEEDED:
        case TM_NODE_LIMIT_EXCEEDED:
        case TM_TARGET_GAP_ACHIEVED:
+       case TM_FOUND_FIRST_FEASIBLE:
        case TM_OPTIMAL_SOLUTION_FOUND:
        case TM_ERROR__NO_BRANCHING_CANDIDATE:
        case TM_ERROR__ILLEGAL_RETURN_CODE:
@@ -766,6 +770,7 @@ int sym_solve(problem *p)
 	   msgtag != TM_TIME_LIMIT_EXCEEDED &&
 	   msgtag != TM_NODE_LIMIT_EXCEEDED &&
 	   msgtag != TM_TARGET_GAP_ACHIEVED &&
+	   msgtag != TM_FOUND_FIRST_FEASIBLE &&
 	   msgtag != TM_ERROR__NO_BRANCHING_CANDIDATE &&
 	   msgatg != TM_ERROR__ILLEGAL_RETURN_CODE &&
 	   msgtag != TM_ERROR__NUMERICAL_INSTABLITY &&
@@ -825,42 +830,28 @@ int sym_solve(problem *p)
     * Display the the results and solution data                               
    \*------------------------------------------------------------------------*/
 
+   printf("\n****************************************************\n");
    if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
-      printf("\n****************************************************\n");
-      printf(  "* Branch and Cut Finished!!!!!!!                   *\n");
-      printf(  "* Now displaying stats and optimal solution...     *\n");
-      printf(  "****************************************************\n\n");
+      printf(  "* Branch and Cut Finished                          *\n");
    }else if (termcode == TM_TIME_LIMIT_EXCEEDED){
-      printf("\n****************************************************\n");
-      printf(  "* Time Limit Exceeded :(                           *\n");
-      printf(  "* Now displaying stats and best solution...        *\n");
-      printf(  "****************************************************\n\n");
+      printf(  "* Time Limit Reached                               *\n");
    }else if (termcode == TM_NODE_LIMIT_EXCEEDED){
-      printf("\n****************************************************\n");
-      printf(  "* Node Limit Exceeded :(                           *\n");
-      printf(  "* Now displaying stats and best solution...        *\n");
-      printf(  "****************************************************\n\n");
+      printf(  "* Node Limit Reached                               *\n");
    }else if (termcode == TM_TARGET_GAP_ACHIEVED){
-      printf("\n****************************************************\n");
-      printf(  "* Target Gap Achieved!                             *\n");
-      printf(  "* Now displaying stats and best solution...        *\n");
-      printf(  "****************************************************\n\n");
+      printf(  "* Target Gap Achieved                              *\n");
+   }else if (termcode == TM_FOUND_FIRST_FEASIBLE){
+      printf(  "* Stopping After Finding First Feasible Solution   *\n");
    }else if (termcode == TM_ERROR__NO_BRANCHING_CANDIDATE ||
 	     termcode == TM_ERROR__ILLEGAL_RETURN_CODE ||
 	     termcode == TM_ERROR__NUMERICAL_INSTABILITY ||
 	     termcode == TM_ERROR__COMM_ERROR ||
 	     termcode == TM_ERROR__USER){
-      printf("\n****************************************************\n");
-      printf(  "* Terminated early because of error message %i     *\n",termcode);
-      printf(  "* received from LP process :(                      *\n");
-      printf(  "* Now displaying stats and best solution...        *\n");
-      printf(  "****************************************************\n\n");
+      printf(  "* Terminated abnormally with error message %i      *\n",termcode);
    }else{
-      printf(
-	      "***********Something has died -- halting the machine\n\n");
-      printf(
-	      "***********Printing out partial data\n\n");
+      printf("* A process has died abnormally -- halting \n\n");
    }
+      printf(  "* Now displaying stats and best solution found...  *\n");
+      printf(  "****************************************************\n\n");
 
    total_time  = p->comp_times.readtime;
    total_time += p->comp_times.ub_overhead + p->comp_times.ub_heurtime;
