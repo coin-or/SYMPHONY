@@ -303,7 +303,6 @@ void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau)
     * Display the the results and solution data                               
    \*---------------------------------------------------------------------*/
    
-#if 0
    if (termcode == TM_FINISHED){
       printf("\n****************************************************\n");
       printf(  "* Branch and Cut Finished!!!!!!!                   *\n");
@@ -337,8 +336,6 @@ void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau)
    print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, p->lb,
 		    total_time, start_time);
 
-#endif
-   
    display_solution_u(p, 0);
 
 #if 0
