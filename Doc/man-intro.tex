@@ -1,4 +1,30 @@
+\section{How to Use This Manual}
+
+The manual is divided into roughly three parts. The first part consists of
+Sections \ref{history}--\ref{B&C-intro} and contains background
+information. Those not familiar with the basic methodology of branch, cut, and
+price should read these sections, especially Section \ref{B&C-intro}, where we
+briefly describe the techniques involved at a high level.  The second part of
+the manual consists of Sections \ref{design}--\ref{parallelizing} and is
+intended for further background and a more complete understanding of the
+design and implementation of SYMPHONY. However, it is not really necessary to
+to read these sections before undertaking development of a SYMPHONY
+application. In Section \ref{design}, we describe the overall design of
+without reference to the implementational details and with only passing
+reference to parallelism.  In Section \ref{modules}, we then move on to
+discuss the details of the implementation. In Section \ref{parallelizing}, we
+briefly discuss issues involved in parallel execution of SYMPHONY. The
+remainder of the manual, including Sections \ref{parallelizing}--\ref{params}
+describes in detail how to develop an application using SYMPHONY. For those
+who are familiar with branch and cut and want to get started quickly, proceed
+directly to to Section \ref{development} for information on getting
+started. Section \ref{API} contains a description of the API, and finally,
+SYMPHONY's parameters are described in Section \ref{params}. Please note that
+for reference use, the HTML version of this manual may be more practical, as
+the embedded hyperlinks make it easier to navigate.
+
 \section{A Brief History}
+\label{history}
 
 Since the inception of optimization as a recognized field of study in
 mathematics, researchers have been both intrigued and stymied by the
@@ -57,6 +83,7 @@ approach and has the same functionality as SYMPHONY, but has extended
 SYMPHONY's capabilities in some areas.
 
 \section{Related Work}
+\label{related}
 
 The 1990's witnessed a broad development of software for discrete
 optimization. Almost without exception, these new software packages
@@ -87,19 +114,6 @@ parallel branch and bound. Frameworks for general parallel branch and
 bound include PUBB \cite{PUBB}, BoB \cite{BoB}, PPBB-Lib
 \cite{PPBB-Lib}, and PICO \cite{PICO}. PARINO \cite{PARINO} and FATCOP
 \cite{FATCOP} are parallel MIP solvers.
-
-\section{Organization of the Manual}
-
-In Sections \ref{B&C-intro}, we briefly describe branch, cut, and price for
-those readers wishing to have a review of the basic methodology. In Section
-\ref{design}, we will describe the overall design of \BB\ without reference to
-the implementational details and with only passing reference to parallelism.
-In Section \ref{modules}, we will then move on to discuss the details of the
-implementation. In Section \ref{parallelizing}, we briefly discuss issues
-involved in parallel execution of SYMPHONY. In Section \ref{development}, we
-discuss how to develop applications using SYMPHONY. Section \ref{API} contains
-a description of the API, and finally, SYMPHONY's parameters are described in
-Section \ref{params}.
 
 \section{Introduction to Branch, Cut, and Price}
 \label{B&C-intro}
@@ -297,7 +311,7 @@ et al. provide a thorough review of these methods.
 When both variables and cutting planes are generated dynamically
 during LP-based branch and bound, the technique becomes known as {\em
 branch, cut, and price} (BCP). In such a scheme, there is a pleasing
-symmetry between the treatment of cuts and that of variables. We will
+symmetry between the treatment of cuts and that of variables. We
 further examine this symmetry later in the manual. For
 now, however, it is important to note that while branch, cut, and
 price does combine ideas from both branch and cut and branch and price
@@ -306,12 +320,12 @@ techniques requires much more sophisticated methods than either one
 requires on its own. This is an important idea that is at the core of
 our design.
 
-In the remainder of the manual, we will often use the term {\em search
+In the remainder of the manual, we often use the term {\em search
 tree}. This term derives from the common representation of the list of
 subproblems as the nodes of a graph in which each subproblem is
 connected only to its parent and its children. Storing the subproblems
 in such a form is an important aspect of our global data structures.
-Since the subproblems correspond to the nodes of this graph, they will
+Since the subproblems correspond to the nodes of this graph, they are
 sometimes be referred to as {\em nodes in the search tree} or simply
 as {\em nodes}. The {\em root node} or {\em root} of the tree is the
 node representing the initial subproblem.
@@ -399,7 +413,7 @@ the set can be extremely inefficient. In these cases, it is far better
 to define a method which operates on the whole set at once. In order
 to overcome these problems, we have also defined a set of {\em
 interface functions}, which are associated with the computational
-modules. These function will be described in detail in Section \ref{API}.
+modules. These function is described in detail in Section \ref{API}.
 
 \subsection{Data Structures and Storage}
 \label{data-structures}
@@ -714,7 +728,7 @@ shown in Figure \ref{overview}.
 The preference ordering for processing nodes is a run-time parameter.
 Typically, the node with the smallest lower bound is chosen to be
 processed next since this strategy minimizes the overall size of the
-search tree. However, at times, it will be advantageous to {\em dive}
+search tree. However, at times, it is advantageous to {\em dive}
 down in the tree. The concepts of {\em diving} and {\em search
 chains}, introduced in Section \ref{tree-management}, extend the basic
 ``best-first'' approach.
@@ -913,7 +927,7 @@ the smallest possible search tree. However, we need to consider the
 time required to process each search tree node as well. This is affected
 by both the quality of the current upper bound and by such factors as
 communication overhead and node set-up costs. When considering these
-additional factors, it will sometimes be more effective to deviate from the
+additional factors, it is sometimes be more effective to deviate from the
 best-first search order. We discuss the importance of such strategies
 below.
 

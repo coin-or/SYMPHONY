@@ -519,7 +519,7 @@ do nothing if the default behavior is acceptable. This is not possible
 in all cases and the user must provide certain functions, such as
 separation.
 
-In the next section, the user functions will be described in detail.
+In the next section, the user functions are described in detail.
 The name of every user written function starts with {\tt user\_}.
 There are three kinds of arguments:
 \begin{description}
@@ -558,7 +558,7 @@ settings and the execution of the algorithm). \\
 \begin{itemize}
 \vspace{-3ex}
 
-\item Sometimes an output is optional. This will always be noted in the
+\item Sometimes an output is optional. This is always be noted in the
 function descriptions.
 
 \item If an array has to be returned (i.e., the argument is {\tt type
@@ -871,7 +871,7 @@ IGD interface.
 To use IGD, you must have installed PVM since the drawing window runs
 as a separate application and communicates with the user's routines
 through message passing. To compile the graph drawing application,
-type ``{\tt make dglib dg}'' in the \BB\ root directory. The user
+type ``{\tt make dg}'' in the \BB\ root directory. The user
 routines in the file {\tt dg\_user.c} can be filled in, but it is not
 necessary to fill anything in for basic applications. 
 
@@ -879,9 +879,11 @@ After compiling {\tt dg}, the user must write some subroutines that
 communicate with {\tt dg} and cause the graph to be drawn.
 Regrettably, this is currently a little more complicated than it needs
 to be and is not well documented. However, by looking at the sample
-application, it is relatively easy to see how it should be done. To
+application, it should be possible to see how it is done. To
 enable graph drawing, put the line {\tt do\_draw\_graph 1} into the
-parameter file or use the {\tt -d} command line option.
+parameter file or use the {\tt -d} command line option. It can be difficult to
+get IGD to work. If you are interested in using it and cannot get it to work,
+feel free to contact me.
 
 \subsubsection{Other Debugging Techniques}
 
