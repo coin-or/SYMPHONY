@@ -75,10 +75,6 @@ mkdir $1/User
 foreach file (User/Makefile)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/User/Common
-foreach file (User/Common/*.c)
-awk -f reformat.awk $file > $1/$file
-end
 mkdir $1/User/LP
 foreach file (User/LP/*.c)
 awk -f reformat.awk $file > $1/$file

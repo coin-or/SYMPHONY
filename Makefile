@@ -94,7 +94,7 @@ LP_SOLVER = NONE
 ##############################################################################
 
 #Uncomment the line below if you want to use OSL.
-#LP_SOLVER = OSL
+LP_SOLVER = OSL
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSL)
@@ -1314,16 +1314,16 @@ $(BINDIR)/ccg : $(USER_CG_DEP) $(USER_CG_OBJS) $(LIBDIR)/libcg.a
 	dg_clean
 
 clean :
-	rm -f $(OBJDIR)/* 
+	rm -rf $(ROOT)/objects.$(ARCH)
 
 clean_user :
-	rm -f $(USER_OBJDIR)/*
+	rm -rf $(USERROOT)/objects.$(ARCH)
 
 clean_dep :
-	rm -f $(DEPDIR)/* 
+	rm -rf $(DEPDIR)/ 
 
 clean_user_dep :
-	rm -f $(USER_DEPDIR)/*
+	rm -rf $(USER_DEPDIR)/
 
 clean_lib :
 	rm -rf $(LIBDIR)

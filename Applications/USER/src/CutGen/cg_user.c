@@ -15,6 +15,7 @@
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "cg_u.h"
+#include "user.h"
 
 /*===========================================================================*/
 

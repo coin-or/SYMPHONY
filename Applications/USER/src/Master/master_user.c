@@ -13,6 +13,9 @@
 /*===========================================================================*/
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <string.h>
 
 #include "BB_constants.h"
 #include "BB_macros.h"
@@ -77,8 +80,8 @@ int user_initialize(void **user)
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
    FILE *f;
-   char line[50], key[50], value[50];
-   int c;
+   char line[50], key[50], value[50], c, tmp;
+   int i;
    /* This gives you access to the user data structure*/
    user_problem *prob = (user_problem *) user;
    user_parameters par = prob->par;
@@ -103,7 +106,10 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
    /* Here you can parse the command line for options. By convention, the
       users options should be capital letters */
 
-   while ((c = getopt(argc, argv, "H")) != -1){
+   for (i = 1; i < argc; i++){
+      sscanf(argv[i], "%c %c", &tmp, &c);
+      if (tmp != '-')
+	 continue;
       switch (c) {
        case 'H':
 	 user_usage();

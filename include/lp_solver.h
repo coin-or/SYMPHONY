@@ -185,7 +185,11 @@ typedef struct LPdata{
 
 #else
 
-#error Unknown LP solver
+#error ###################################
+#error # Undefined or unknown LP solver.
+#error # Please edit SYMPHONY/Makefile
+#error # and define LP_SOLVER properly.
+#error ###################################
 
 #endif 
 

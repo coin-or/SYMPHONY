@@ -17,6 +17,7 @@
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "lp_u.h"
+#include "user.h"
 
 /*===========================================================================*/
 
