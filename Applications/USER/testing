@@ -9,7 +9,8 @@ foreach file (egout lseu mod010 mod008.mps misc03 dcmulti flugpl rentacar p0033 
 #Unsolved
 #foreach (air04 air05 modglob gt2 p0282 p0548 p2756 harp2 rout set1ch qnet1 gesa2 mas74 swath pp08aCUTS mod011 markshare2 bell5 pp08a arki001 fast0507 vpm2 dano3mip gesa2_o noswot danoint dsbmip seymour)
 
-foreach solver (OSI_CPLEX OSI_OSL OSI_CLP OSI_GLPK)
+#foreach solver (OSI_CPLEX OSI_OSL OSI_CLP OSI_GLPK)
+foreach solver (OSI_CLP)
 echo ============ Solving MIPLIB instance $file:r with $solver ============= 
 echo
 $1/SYMPHONY/Template/bin.LINUX/$solver/mip -F $1/miplib3/$file

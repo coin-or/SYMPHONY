@@ -7,6 +7,9 @@
 /*                                                                           */
 /* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
+/* The OSI interface in this file was written by Menal Guzelsoy.             */
+/* The OSL interface was written by Ondrej Medek.                            */
+/*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
 /*                                                                           */

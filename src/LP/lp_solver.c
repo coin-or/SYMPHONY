@@ -2984,7 +2984,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 
    OsiCuts cutlist;
    OsiRowCut cut;
-   int i, j = 0; 
+   int i = 0, j = 0, k = 0; 
    int *matind;
    
    /* Set proper variables to be integer */
@@ -3057,9 +3057,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 	 (*cuts)[j]->size = ISIZE + num_elements * (ISIZE + DSIZE);
 	 (*cuts)[j]->coef = (char *) malloc ((*cuts)[j]->size);
 	 ((int *) ((*cuts)[j]->coef))[0] = num_elements;
-	 matind = (int *) ((*cuts)[i]->coef + ISIZE);
-	 for (i = 0; i < num_elements; i++){
-	    matind[i] = lp_data->vars[indices[i]]->userind;
+	 matind = (int *) ((*cuts)[j]->coef + ISIZE);
+	 for (k = 0; k < num_elements; k++){
+	    matind[k] = lp_data->vars[indices[k]]->userind;
 	 }
 	 memcpy((*cuts)[j]->coef + (num_elements + 1) * ISIZE,
 		(char *)elements, num_elements * DSIZE);
