@@ -1006,7 +1006,7 @@ int receive_lp_timing(tm_prob *tm)
    double start_node = tm->comp_times.start_node;
    int lp, cp;
    bc_node *node;
-   char SOMETHING_DIED = FALSE;
+   char something_died = FALSE;
    
    memset(&tm->comp_times, 0, sizeof(node_times));
    tm->comp_times.ramp_up_tm = ramp_up_tm;
@@ -1122,8 +1122,6 @@ int receive_lp_timing(tm_prob *tm)
 	    freebuf(r_bufid);
 	 }else{
 	    if (pstat(tm->lp.procs[i]) != PROCESS_OK){
-	       printf("\nLP process has died -- halting machine\n\n");
-	       
 #if 0
 	       /* Probably don't need this */
 	       stop_processes(&tm->lp);
@@ -1133,7 +1131,7 @@ int receive_lp_timing(tm_prob *tm)
 	       stop_processes(&tm->sp);
 	       /*___END_EXPERIMENTAL_SECTION___*/
 #endif
-	       something died = TRUE;
+	       something_died = TRUE;
 	       break;
 	    }
 	 }

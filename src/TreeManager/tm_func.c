@@ -299,7 +299,7 @@ int solve(tm_prob *tm)
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char no_work = TRUE, ramp_up = TRUE;
    double then, then2, then3, now;
-   double timeout2 = 600, timeout3 = tm->par.logging_interval, timeout4 = 300;
+   double timeout2 = 600, timeout3 = tm->par.logging_interval, timeout4 = 10;
    struct timeval timeout = {5, 0};
 
    /*------------------------------------------------------------------------*\

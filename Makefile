@@ -34,7 +34,7 @@ CONFIG_FILE_DIR = $(PWD)
 endif
 endif
 
-CONFIG_FILE = config
+CONFIG_FILE = config.parallel
 
 include $(CONFIG_FILE_DIR)/$(CONFIG_FILE)
 
@@ -336,10 +336,10 @@ ifneq (${SHLINKPREFIX},)
 endif
 
 ifeq ($(CC),ompcc)
-	LIBS  = -lX11 -lm -lompc -ltlog -lthread $(COMMLIBS) $(SYSLIBS) \
+	LIBS  = -lm -lompc -ltlog -lthread $(COMMLIBS) $(SYSLIBS) \
 	$(USERLIBS)
 else
-	LIBS  = -lX11 -lm $(SYSLIBS) $(USERLIBS) $(COMMLIBS) 
+	LIBS  = -lm $(SYSLIBS) $(USERLIBS) $(COMMLIBS) 
 endif
 
 ifeq ($(OPT),-O)
