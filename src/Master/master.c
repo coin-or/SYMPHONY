@@ -966,28 +966,10 @@ int sym_solve(sym_environment *env)
    }
    tm_close(tm, termcode);
 
-   /* FIXEM: Set the correct termcode. This can't be done in the treemanager
-      because it doesn't know whether a solution was found. This should be
-      changed. */
-   if (termcode == TM_FINISHED){
-      if (tm->par.find_first_feasible && env->best_sol.has_sol){
-	 termcode = TM_FOUND_FIRST_FEASIBLE;
-      }else if (env->best_sol.has_sol){
-	 termcode = TM_OPTIMAL_SOLUTION_FOUND;
-      }else{
-	 termcode = TM_NO_SOLUTION;
-      }
-   }
-   else if((termcode == TM_ERROR__NUMERICAL_INSTABILITY ||
-	    termcode == SOMETHING_DIED) && 
-	   env->best_sol.xlength ){
-     termcode = TM_OPTIMAL_SOLUTION_FOUND;
-   }
-
-   
-#if !defined(COMPILE_IN_LP) && 0
+#if !defined(COMPILE_IN_LP) 
    /* This is not needed anymore */
    if (termcode != SOMETHING_DIED){
+      int old_termcode = termcode;
       do{
 	 r_bufid = receive_msg(ANYONE, ANYTHING);
 	 if (r_bufid == 0){
@@ -1001,8 +983,31 @@ int sym_solve(sym_environment *env)
 	 }
       }while (msgtag != FEASIBLE_SOLUTION_NONZEROS &&
 	      msgtag != FEASIBLE_SOLUTION_USER);
+      termcode = old_termcode;
    }
 #endif
+
+   /* FIXEM: Set the correct termcode. This can't be done in the treemanager
+      because it doesn't know whether a solution was found. This should be
+      changed. */
+   if (termcode == TM_FINISHED){
+      if (tm->par.find_first_feasible && env->best_sol.has_sol){
+	 termcode = TM_FOUND_FIRST_FEASIBLE;
+      }else if (env->best_sol.has_sol){
+	 termcode = TM_OPTIMAL_SOLUTION_FOUND;
+      }else{
+	 termcode = TM_NO_SOLUTION;
+      }
+   }
+#if 0
+   /* Not sure of the reason for this */
+   else if((termcode == TM_ERROR__NUMERICAL_INSTABILITY ||
+	    termcode == SOMETHING_DIED) && 
+	   env->best_sol.xlength ){
+     termcode = TM_FEASIBLE_SOLUTION_FOUND;
+   }
+#endif
+   
 #endif
 
    /*------------------------------------------------------------------------*\
@@ -1011,7 +1016,9 @@ int sym_solve(sym_environment *env)
 
    if(env->par.verbosity >=0 ){
       printf("\n****************************************************\n");
-      if (termcode == TM_OPTIMAL_SOLUTION_FOUND || termcode == TM_NO_SOLUTION){
+      if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
+	 printf(  "* Optimal Solution Found                           *\n");
+      }else if (termcode == TM_NO_SOLUTION){
 	 printf(  "* Branch and Cut Finished                          *\n");
       }else if (termcode == TM_TIME_LIMIT_EXCEEDED){
 	 printf(  "* Time Limit Reached                               *\n");
@@ -1029,7 +1036,7 @@ int sym_solve(sym_environment *env)
 	 printf(  "* Terminated abnormally with error message %i      *\n",
 		  termcode);
       }else{
-	 printf("* A process has died abnormally -- halting \n\n");
+	 printf(  "* A process has died abnormally -- halting         *\n");
       }
       printf(  "* Now displaying stats and best solution found...  *\n");
       printf(  "****************************************************\n\n");

@@ -443,7 +443,11 @@ int solve(tm_prob *tm)
 	 }
 	 if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
 	    if (fabs(100*(tm->ub-tm->lb)/tm->ub) <= tm->par.gap_limit){
-	       termcode = TM_TARGET_GAP_ACHIEVED;
+	       if (tm->lb < tm->ub){
+		  termcode = TM_TARGET_GAP_ACHIEVED;
+	       }else{
+		  termcode = TM_FINISHED;
+	       }
 	       break;
 	    }
 	 }
@@ -631,7 +635,7 @@ void print_tree_status(tm_prob *tm)
 	    tm->lb = tm->samephase_cand[i]->lower_bound;
       }
    }
-   if (tm->lb >= MAXDOUBLE / 2){
+   if (tm->lb >= MAXDOUBLE / 2 || tm->lb > tm->ub){
       tm->lb = tm->ub;
    }
    if (tm->obj_sense == SYM_MAXIMIZE){
@@ -708,7 +712,7 @@ int start_node(tm_prob *tm, int thread_num)
       if ((best_node = del_best_node(tm)) == NULL)
 	 return(NEW_NODE__NONE);
 
-      if(best_node->node_status == NODE_STATUS__WARM_STARTED){
+      if (best_node->node_status == NODE_STATUS__WARM_STARTED){
 	 break;
       }
 
@@ -3080,7 +3084,7 @@ int tm_close(tm_prob *tm, int termcode)
 #endif
    int i;
    
-#ifdef DO_TESTS
+#if defined(DO_TESTS) && 0
    if (tm->cp.free_num != tm->cp.procnum)
       printf(" Something is fishy! tm->cp.freenum != tm->cp.procnum\n");
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
