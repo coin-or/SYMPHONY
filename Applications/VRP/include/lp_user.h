@@ -101,7 +101,7 @@ lp_net *create_lp_net PROTO((vrp_spec *vrp, char *status, int edgenum,
 int vrp_lp_connected PROTO((lp_net *n, int *compdemands));
 void free_lp_net  PROTO((lp_net *n));
 void construct_feasible_solution PROTO((vrp_spec *vrp, network *n,
-					double *objval));
+					double *true_objval));
 double compute_lhs PROTO((int number,  int *indices, double *values,
 			  cut_data *cut, int vertnum));
 

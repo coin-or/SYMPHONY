@@ -41,8 +41,8 @@ int user_send_cp_data PROTO((void *user, void **user_cp));
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 int user_send_sp_data PROTO((void *user));
 /*___END_EXPERIMENTAL_SECTION___*/
-int user_display_solution PROTO((void *user, int length, int *xind,
-				 double *xval));
+int user_display_solution PROTO((void *user, double lpetol, int varnum,
+				 int *indices, double *values, double objval));
 int user_process_own_messages PROTO((void *user, int msgtag));
 int user_send_feas_sol PROTO((void *user, int *feas_sol_size, int **feas_sol));
 

@@ -152,8 +152,11 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
 {
    vrp_problem *vrp = (vrp_problem *)user;
 
-   if (*ub > 0)
+   if (*ub > 0){
       vrp->cur_tour->cost = *ub;
+   }else{
+      vrp->cur_tour->cost = MAXINT;
+   }
 
    vrp->cur_tour->numroutes = vrp->numroutes;
    
@@ -311,8 +314,12 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
 		  double **ub, int *basecutnum, int *colgen_strat)
 {
    vrp_problem *vrp = (vrp_problem *)user;
-   int cap_check, total_demand = 0, base_varnum = 0, i, v1, v0;
-
+   int cap_check, total_demand = 0, base_varnum = 0, v1, v0;
+   int i, j, k, l;
+   int zero_varnum, *zero_vars;
+   int vertnum = vrp->vertnum;
+   int *edges;
+   
    switch(vrp->par.base_variable_selection){
     case SOME_ARE_BASE:
       if (vrp->par.add_all_edges == FALSE)
@@ -335,7 +342,7 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
       
       /*Now generate the upper bounds*/
       cap_check = vrp->capacity*(vrp->numroutes-1);
-      for (i = 1; i < vrp->vertnum; i++)
+      for (i = 1; i < vertnum; i++)
 	 total_demand += vrp->demand[i];
       for (i = 0; i < base_varnum; i++){
 	 BOTH_ENDS((*basevars)[i], &v1, &v0);
@@ -358,7 +365,7 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
       break;
    }
    
-   *basecutnum = vrp->vertnum;
+   *basecutnum = vertnum;
 
    if (!vrp->par.colgen_strat[0]){
       if (vrp->par.add_all_edges ||
@@ -385,6 +392,26 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
       colgen_strat[1] = vrp->par.colgen_strat[1];
    }
    
+   /*create the edge list (we assume a complete graph) The edge is set to
+     (0,0) in the edge list if it was eliminated in preprocessing*/
+   edges = vrp->edges = (int *) calloc (vertnum*(vertnum-1), sizeof(int));
+   zero_varnum = vrp->zero_varnum;
+   zero_vars = vrp->zero_vars;
+   for (i = 1, k = 0, l = 0; i < vertnum; i++){
+      for (j = 0; j < i; j++){
+	 if (l < zero_varnum && k == zero_vars[l]){
+	    /*This is one of the zero edges*/
+	    edges[2*k] = edges[2*k+1] = 0;
+	    l++;
+	    k++;
+	    continue;
+	 }
+	 edges[2*k] = j;
+	 edges[2*k+1] = i;
+	 k++;
+      }
+   }
+
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
    if (vrp->par.bpp_prob){
       for (i = 0; i < *basevarnum; i++){
@@ -485,28 +512,10 @@ int user_send_lp_data(void *user, void **user_lp)
    vrp_lp->window = vrp->dg_id;
    vrp_lp->numroutes = vrp->numroutes;
    vertnum = vrp_lp->vertnum = vrp->vertnum;
+   vrp_lp->edges = vrp->edges;
    vrp_lp->demand = vrp->demand;
    vrp_lp->capacity = vrp->capacity;
    vrp_lp->costs = vrp->dist.cost;
-
-   vrp_lp->edges = (int *) calloc (vertnum*(vertnum-1), sizeof(int));
-
-   /*create the edge list (we assume a complete graph) The edge is set to
-     (0,0) in the edge list if it was eliminated in preprocessing*/
-   for (i = 1, k = 0, l = 0; i < vertnum; i++){
-      for (j = 0; j < i; j++){
-	 if (l < zero_varnum && k == zero_vars[l]){
-	    /*This is one of the zero edges*/
-	    vrp_lp->edges[2*k] = vrp_lp->edges[2*k+1] = 0;
-	    l++;
-	    k++;
-	    continue;
-	 }
-	 vrp_lp->edges[2*k] = j;
-	 vrp_lp->edges[2*k+1] = i;
-	 k++;
-      }
-   }
 
    vrp_lp->cur_sol = (_node *) calloc (vrp_lp->vertnum, sizeof(_node));
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -784,10 +793,95 @@ int user_process_own_messages(void *user, int msgtag)
  * Graph Drawing application to graphically display the solution.
 \*===========================================================================*/
 
-int user_display_solution(void *user, int length, int *xind, double *xval)
+int user_display_solution(void *user, double lpetol, int varnum, int *indices,
+			  double *values, double objval)
 {
    /*FIXME: This won't work for printing out from LP in sequential mode */
 
+   vrp_problem *vrp = (vrp_problem *)user;
+   _node *tour = vrp->cur_tour->tour;
+   int window = vrp->dg_id;
+   
+   int prev_node = 0, node, count = 0;
+   
+   if (!tour || vrp->cur_tour->cost > (int) objval){ /* Construct the tour */
+      int cur_vert = 0, prev_vert = 0, cur_route;
+      elist *cur_route_start = NULL;
+      edge *edge_data;
+      double cost = 0;
+      network *n = createnet(indices, values, varnum, lpetol, vrp->edges,
+			     vrp->demand, vrp->vertnum);
+      vertex *verts = n->verts;
+
+      if (!tour)
+	 tour = vrp->cur_tour->tour = (_node *) calloc (vrp->vertnum,
+							sizeof(_node));
+
+      for (cur_route_start = verts[0].first, cur_route = 1, cost = 0,
+	      edge_data = cur_route_start->data; cur_route <= vrp->numroutes;
+	   cur_route++){
+	 edge_data = cur_route_start->data;
+	 edge_data->scanned = TRUE;
+	 cur_vert = edge_data->v1;
+	 tour[prev_vert].next = cur_vert;
+	 tour[cur_vert].route = cur_route;
+	 prev_vert = 0;
+	 cost += vrp->dist.cost[INDEX(prev_vert, cur_vert)];
+	 while (cur_vert){
+	    if (verts[cur_vert].first->other_end != prev_vert){
+	       prev_vert = cur_vert;
+	       edge_data = verts[cur_vert].first->data;
+	       cur_vert = verts[cur_vert].first->other_end;
+	    }
+	    else{
+	       prev_vert = cur_vert;
+	       edge_data = verts[cur_vert].last->data; /*This statement could
+							 possibly be taken out
+							 to speed things up a
+							 bit */
+	       cur_vert = verts[cur_vert].last->other_end;
+	    }
+	    tour[prev_vert].next = cur_vert;
+	    tour[cur_vert].route = cur_route;
+	    cost += vrp->dist.cost[INDEX(prev_vert, cur_vert)];
+	 }
+	 edge_data->scanned = TRUE;
+	 
+	 while (cur_route_start->data->scanned){
+	    if (!(cur_route_start = cur_route_start->next_edge)) break;
+	 }
+      }
+   }
+
+   node = tour[0].next;
+   
+   if (tour[0].route == 1)
+      printf("\n0 ");
+   while (node != 0){
+      if (tour[prev_node].route != tour[node].route){
+	 printf("\nRoute #%i: ", tour[node].route);
+	 count = 0;
+      }
+      printf("%i ", node);
+      count++;
+      if (count > 15){
+	 printf("\n");
+	 count = 0;
+      }
+      prev_node = node;
+      node = tour[node].next;
+   }
+   printf("\n\n");
+   
+   if (window){
+      char name[MAX_NAME_LENGTH] = {"feas_solution"};
+      disp_vrp_tour(window, TRUE, name, tour, vrp->vertnum, vrp->numroutes,
+		    CTOI_WAIT_FOR_CLICK_AND_REPORT);
+   }
+
+   return(USER_NO_PP);
+
+#if 0
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    vrp_spec *vrp = (vrp_spec *)user;
    _node *tour = vrp->cur_sol;
@@ -854,7 +948,7 @@ int user_display_solution(void *user, int length, int *xind, double *xval)
    }
 #endif
 #endif
-   
+#endif   
    return(DEFAULT);
 }
    
@@ -901,6 +995,7 @@ int user_free_master(void **user)
    FREE(vrp->dist.coordz);
 #if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
    FREE(vrp->dist.cost);
+   FREE(vrp->edges);
    FREE(vrp->demand);
 #endif
    /*__BEGIN_EXPERIMENTAL_SECTION__*/

@@ -229,7 +229,7 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
 \*===========================================================================*/
 
 int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
-		     double *values, int *feasible, double *objval)
+		     double *values, int *feasible, double *true_objval)
 {
    vrp_spec *vrp = (vrp_spec *)user;
    vertex *verts;
@@ -277,7 +277,8 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    
    *feasible = FEASIBLE;
    
-   construct_feasible_solution(vrp, n, objval);
+   construct_feasible_solution(vrp, n, true_objval);
+   
    free_net(n);
    
    return(USER_NO_PP);
@@ -1101,50 +1102,76 @@ void free_lp_net(lp_net *n)
 
 /*===========================================================================*/
 
-void construct_feasible_solution(vrp_spec *vrp, network *n, double *objval)
+void construct_feasible_solution(vrp_spec *vrp, network *n,
+				 double *true_objval)
 {
-  _node *tour = vrp->cur_sol;
-  int cur_vert = 0, prev_vert = 0, cur_route;
-  elist *cur_route_start = NULL;
-  edge *edge_data;
-  vertex *verts = n->verts;
-  double cost = 0;
-  
-  /*construct the tour corresponding to this solution vector*/
-  for (cur_route_start = verts[0].first, cur_route = 1, cost = 0,
-       edge_data = cur_route_start->data; cur_route <= vrp->numroutes;
-       cur_route++){
-     edge_data = cur_route_start->data;
-     edge_data->scanned = TRUE;
-     cur_vert = edge_data->v1;
-     tour[prev_vert].next = cur_vert;
-     tour[cur_vert].route = cur_route;
-     prev_vert = 0;
-     cost += vrp->costs[INDEX(prev_vert, cur_vert)];
-     while (cur_vert){
-	if (verts[cur_vert].first->other_end != prev_vert){
-	   prev_vert = cur_vert;
-	   edge_data = verts[cur_vert].first->data;
-	   cur_vert = verts[cur_vert].first->other_end;
-	}
-	else{
-	   prev_vert = cur_vert;
-	   edge_data = verts[cur_vert].last->data; /*This statement could
-						     possibly be taken out to
-						     speed things up a bit*/
-	   cur_vert = verts[cur_vert].last->other_end;
-	}
-	tour[prev_vert].next = cur_vert;
-	tour[cur_vert].route = cur_route;
-	cost += vrp->costs[INDEX(prev_vert, cur_vert)];
-     }
-     edge_data->scanned = TRUE;
-     
-     while (cur_route_start->data->scanned){
-	if (!(cur_route_start = cur_route_start->next_edge)) break;
-     }
-  }
-  *objval = cost;
+   _node *tour = vrp->cur_sol;
+   int cur_vert = 0, prev_vert = 0, cur_route, count;
+   elist *cur_route_start = NULL;
+   edge *edge_data;
+   vertex *verts = n->verts;
+   double cost = 0;
+   
+   /*construct the tour corresponding to this solution vector*/
+   for (cur_route_start = verts[0].first, cur_route = 1, cost = 0,
+	   edge_data = cur_route_start->data; cur_route <= vrp->numroutes;
+	cur_route++){
+      edge_data = cur_route_start->data;
+      edge_data->scanned = TRUE;
+      cur_vert = edge_data->v1;
+      tour[prev_vert].next = cur_vert;
+      tour[cur_vert].route = cur_route;
+      prev_vert = 0;
+      cost += vrp->costs[INDEX(prev_vert, cur_vert)];
+      while (cur_vert){
+	 if (verts[cur_vert].first->other_end != prev_vert){
+	    prev_vert = cur_vert;
+	    edge_data = verts[cur_vert].first->data;
+	    cur_vert = verts[cur_vert].first->other_end;
+	 }
+	 else{
+	    prev_vert = cur_vert;
+	    edge_data = verts[cur_vert].last->data; /*This statement could
+						      possibly be taken out to
+						      speed things up a bit*/
+	    cur_vert = verts[cur_vert].last->other_end;
+	 }
+	 tour[prev_vert].next = cur_vert;
+	 tour[cur_vert].route = cur_route;
+	 cost += vrp->costs[INDEX(prev_vert, cur_vert)];
+      }
+      edge_data->scanned = TRUE;
+      
+      while (cur_route_start->data->scanned){
+	 if (!(cur_route_start = cur_route_start->next_edge)) break;
+      }
+   }
+   *true_objval = cost;
+
+   /* Display the solution */
+   
+   printf("\nSolution Found:\n");
+   printf("Solution Cost: %.0f\n", cost);
+
+   cur_vert = tour[0].next;
+   
+   if (tour[0].route == 1)
+      printf("\n0 ");
+   while (cur_vert != 0){
+      if (tour[prev_vert].route != tour[cur_vert].route){
+	 printf("\nRoute #%i: ", tour[cur_vert].route);
+	 count = 0;
+      }
+      printf("%i ", cur_vert);
+      count++;
+      if (count > 15){
+	 printf("\n");
+	 count = 0;
+      }
+      prev_vert = cur_vert;
+      cur_vert = tour[cur_vert].next;
+   }
+   printf("\n\n");
 }
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/

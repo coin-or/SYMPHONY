@@ -535,10 +535,6 @@ int is_feasible_u(lp_prob *p)
 	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_LIVE){
 	    printf("$U %.2f\n", p->ub);
 	 }
-#ifdef COMPILE_IN_TM
-	 if (p->par.verbosity > 0)
-	    user_display_solution(p->user, cnt, xind, xval);
-#endif
 #else
 	 s_bufid = init_send(DataInPlace);
 	 send_dbl_array(&new_ub, 1);

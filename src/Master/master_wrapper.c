@@ -349,68 +349,44 @@ void send_sp_data_u(problem *p, int sender)
 void display_solution_u(problem *p, int thread_num)
 {
    int user_res, i;
+   lp_sol sol;
+
+   sol.xlength = 0;
+   
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-   if (p->tm && p->tm->lpp[thread_num] && p->tm->lpp[thread_num]->user){
-      lp_prob *lp = p->tm->lpp[thread_num];
-      if (lp->best_sol.xlength){
-	 printf("\nSolution Found: Node %i, Level %i\n", lp->best_sol.xindex,
-		lp->best_sol.xlevel);
-	 printf("Solution Cost: %.3f\n", p->tm->ub);
-	 qsortucb_id(lp->best_sol.xind, lp->best_sol.xval,
-		     lp->best_sol.xlength);
-      }
-      user_res = user_display_solution(lp->user, lp->best_sol.xlength,
-				       lp->best_sol.xind, lp->best_sol.xval);
-      switch(user_res){
-       case USER_NO_PP:
-	 return;
-       case USER_AND_PP:
-       case DEFAULT:
-	 if (lp->best_sol.xlength){
-	    printf("\nUser indices and values of nonzeros in the solution:\n");
-	    printf("\nINDEX     VALUE\n");
-	    printf("=====     =====\n");
-	    for (i = 0; i < lp->best_sol.xlength; i++)
-	       printf("%5d %10.3f\n", lp->best_sol.xind[i],
-		      lp->best_sol.xval[i]);
-	    return;
-	 }
-      }
-   }else if (p->user){
-      printf("Solution Cost: %.3f\n\n", p->ub);
-      CALL_USER_FUNCTION( user_display_solution(p->user, p->best_sol.xlength,
-						p->best_sol.xind,
-						p->best_sol.xval) );
+   if (p->tm && p->tm->lpp[thread_num]){
+      sol = p->tm->lpp[thread_num]->best_sol;
    }
 #else
-   if (p->user){
-      if (p->best_sol.xlength){
-	 printf("Solution found at node %i, level %i\n", p->best_sol.xindex,
-		p->best_sol.xlevel);
-	 printf("Solution Cost: %.3f\n\n", p->ub);
-	 qsortucb_id(p->best_sol.xind, p->best_sol.xval,
-		     p->best_sol.xlength);
-      }
-      user_res = user_display_solution(p->user, p->best_sol.xlength,
-				       p->best_sol.xind, p->best_sol.xval);
-      switch(user_res){
-       case USER_NO_PP:
+   sol = p->best_sol;
+#endif
+   
+   if (!sol.xlength){
+      printf("\nNo Solution Found");
+      return;
+   }
+
+   printf("\nSolution Found: Node %i, Level %i\n", sol.xindex, sol.xlevel);
+   printf("Solution Cost: %.3f\n", p->tm->ub);
+   qsortucb_id(sol.xind, sol.xval, sol.xlength);
+   
+   user_res = user_display_solution(p->user, sol.lpetol, sol.xlength, sol.xind,
+				    sol.xval, sol.objval);
+   
+   switch(user_res){
+    case USER_NO_PP:
+      return;
+    case USER_AND_PP:
+    case DEFAULT:
+      if (sol.xlength){
+	 printf("\nUser indices and values of nonzeros in the solution:\n");
+	 printf("\nINDEX     VALUE\n");
+	 printf("=====     =====\n");
+	 for (i = 0; i < sol.xlength; i++)
+	    printf("%5d %10.3f\n", sol.xind[i], sol.xval[i]);
 	 return;
-       case USER_AND_PP:
-       case DEFAULT:
-	 if (p->best_sol.xlength){
-	    printf("\nUser indices and values of nonzeros in the solution\n");
-	    printf("\nINDEX     VALUE\n");
-	    printf("=====     =====\n");
-	    for (i = 0; i < p->best_sol.xlength; i++){
-	       printf("%5d: %10.3f\n", p->best_sol.xind[i],
-		      p->best_sol.xval[i]);
-	    }
-	 }
-	 printf("\n");
       }
    }
-#endif
 }
 
 /*===========================================================================*/
