@@ -11,15 +11,12 @@ tutorials (http://www.mat.ua.pt/thh/flopc) and the SYMPHONY-5.0 manual.
 ******************************************************************************
 This version of the instance is intended to work with SYMPHONY-5.0. First, 
 configure and compile COIN, SYMPHONY 5.0 (as described in SYMPHONY-5.0/README),
-SYMPHONY OSI (located in COIN/Osi/OsiSym) and FLOPC++. Download and unpack 
-the source code for the sample application from the file SYMPHONY-FLOPC++.tgz. 
-Modify the variables in the FLOPC++/Makefile appropriately. In particular, 
-you must set the path to SYMPHONY, FLOPC++, COIN and the
-LP solver which was used to build the SYMPHONY callable library. By default, 
-note that, it is set to use CLP as the LP solver. 
-Typing "make" in the FLOPC++ subdirectory should successfully make the 
-executable "tap". To test the executable, simply type "./tap".
-
+SYMPHONY OSI (located in COIN/Osi/OsiSym) and FLOPC++. Modify the variables in 
+the FLOPC++/Makefile appropriately. In particular, you must set the path to 
+SYMPHONY, FLOPC++, COIN and the LP solver which was used to build the 
+SYMPHONY callable library. By default, note that, it is set to use CLP as the 
+LP solver. Typing "make" in the FLOPC++ subdirectory should successfully make 
+the executable "tap". To test the executable, simply type "./tap".
 
 AUTHORS 
 
