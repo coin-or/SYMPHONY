@@ -194,7 +194,7 @@ double receive_tours(vrp_problem *vrp, heurs *hh, int *last,
 #endif
 
 	 if (low_run < hh->jobs)
-	    if (pstat(hh->tids[low_run]) != OK){
+	    if (pstat(hh->tids[low_run]) != PROCESS_OK){
 	       if (vrp->par.verbosity >1){
 		  switch (low_run){
 		   case 0: 
@@ -361,7 +361,7 @@ double receive_lbs(vrp_problem *vrp, heurs *hh, char win, int numroutes)
 	            \*processes are killed and the function terminates     */
 #endif
 	 if (low_run < hh->jobs)
-	    if (pstat(hh->tids[low_run]) != OK){
+	    if (pstat(hh->tids[low_run]) != PROCESS_OK){
 	       if (vrp->par.verbosity >1){
 		  switch (low_run){
 		   case 0: 
