@@ -204,7 +204,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    int rcnt, cur_bins = 0, k;
    char **coef_list;
    int i, max_node;
-   int num_cuts = 0, cur_slack = 0;
+   int num_cuts = 0;
+   double cur_slack = 0.0;
    int capacity = vrp->capacity;
    int cut_size = (vertnum >> DELETE_POWER) + 1;
    cut_data *new_cut = NULL;
@@ -377,7 +378,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		  cur_bins = BINS(compdemands[i+1], capacity);/*the current
 						    number of trucks required*/
 		  /*current slack in the constraint*/
-		  cur_slack = (int) (compcuts[i+1] - 2*cur_bins);
+		  cur_slack = (compcuts[i+1] - 2*cur_bins);
 		  while (compnodes[i+1]){/*while there are still nodes in the
 					   component*/
 		     for (max_node = 0, max_node_cut = 0, k = 1;
@@ -410,7 +411,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		     compnodes[i+1]--;
 		     compdemands[i+1] -= verts[max_node].demand;
 		     compcuts[i+1] -= max_node_cut;
-		     cur_slack -= (int) max_node_cut;
+		     cur_slack -= max_node_cut;
 		     verts[max_node].comp = 0;
 		     coef_list[i][max_node >> DELETE_POWER] ^=
 			(1 << (max_node & DELETE_AND));
@@ -634,7 +635,8 @@ int user_find_cuts(void *user, int xlength, int *xind,
    int rcnt, cur_bins = 0, k;
    char **coef_list, name[20];
    int i, *compnodes = NULL, max_node;
-   int num_cuts = 0, cur_slack = 0;
+   int num_cuts = 0;
+   double cur_slack = 0.0;
    int capacity = vrp->capacity;
    int cut_size = (vrp->vertnum >> DELETE_POWER) + 1;
    cut_data *new_cut;
