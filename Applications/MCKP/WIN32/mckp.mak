@@ -39,7 +39,7 @@
 # subdirectory) before. See the README file of SYMPHONY for instructions.
 ##############################################################################
 
-SYMPHONYROOT=..\..
+SYMPHONYROOT=..\..\..
 
 ##############################################################################
 # OUTDIR variable specifies where to create the executable file, 
@@ -59,7 +59,7 @@ OUTDIR=.\Debug
 DEFINITIONS = "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB"
 
 ALL_INCDIR = "$(SYMPHONYROOT)\include" /I "..\include"
-ALL_LIB = $(SYMPHONYROOT)\WIN32\Debug\symphonyLib.lib
+ALL_LIB = $(SYMPHONYROOT)\src\WIN32\Debug\symphonyLib.lib
 
 .SILENT:
 

@@ -102,23 +102,23 @@ SOURCE=.\Debug\symphonyLib.lib
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Win\osiClpLib\Debug\osiClpLib.lib
+SOURCE=..\..\..\Win\osiClpLib\Debug\osiClpLib.lib
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Win\cglLib\Debug\cglLib.lib
+SOURCE=..\..\..\Win\cglLib\Debug\cglLib.lib
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Win\clpLib\Debug\clpLib.lib
+SOURCE=..\..\..\Win\clpLib\Debug\clpLib.lib
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Win\coinLib\Debug\coinLib.lib
+SOURCE=..\..\..\Win\coinLib\Debug\coinLib.lib
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Win\osiLib\Debug\osiLib.lib
+SOURCE=..\..\..\Win\osiLib\Debug\osiLib.lib
 # End Source File
 # End Target
 # End Project

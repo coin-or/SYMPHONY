@@ -12,44 +12,36 @@ download the SYMPHONY SPP+CUTS application. See below for usage.
 *              COMPILING THE SYMPHONY SPP APPLICATION (Unix)                  *
 *******************************************************************************
 
-This version of the SYMPHONY SPP application is intended to work with
-SYMPHONY-5.0. First, configure and compile SYMPHONY 5.0 as described in
-SYMPHONY-5.0/README-5.0.  Download and unpack the source code for the SPP
-application from the file SYMPHONY-SPP-5.0.tgz. Modify the variables in the
-SPP-5.0/Makefile appropriately. In particular, you must set the path to 
-SYMPHONY itself. If the application is unpacked as a subdirectory of 
-SYMPHONY-5.0 subdirectory, no further modification should be necessary. 
-Typing "make" in the SPP subdirectory should successfully make the
-executable "spp". It will be installed in the directory 
-SPP-5.0/bin.$(ARCH)/$(LP\_SOLVER). Otherwise, you must also set 
-the path to the application's files. See usage below.
+First, configure and compile SYMPHONY as described in SYMPHONY/README. Modify
+the variables in the SPP/Makefile appropriately. In particular, you must set
+the path to SYMPHONY itself. If the application is unpacked as a subdirectory
+of SYMPHONY root directory, no further modification should be necessary.
+Typing "make" in the SPP subdirectory should successfully make the executable
+"spp". It will be installed in the directory
+SPP/bin/$(ARCH)/$(LP\_SOLVER). Otherwise, you must also set the path to
+the application's files. See usage below.
 
 ******************************************************************************
 *            COMPILING THE SYMPHONY SPP APPLICATION (Windows)              *
 ******************************************************************************
 
-This version of the SYMPHONY SPP application is intended to work with
-SYMPHONY-5.0. Here is a sketch outline of how to compile the SYMPHONY SPP
-application in Microsoft Windows. Direct support is provided for compilation
-under MS Visual Studio 6.0. Compilation for other compilers should also be
-possible. Note that the Windows version has some limitations. Detailed timing
-information is not currently provided. Support is only provided for running
-in sequential mode at this time.
+Here is a sketch outline of how to compile the SYMPHONY SPP application in
+Microsoft Windows. Direct support is provided for compilation under MS Visual
+Studio 6.0. Compilation for other compilers should also be possible. Note that
+the Windows version has some limitations. Detailed timing information is not
+currently provided. Support is only provided for running in sequential mode at
+this time.
 
-First, download SYMPHONY-5.0.zip and unzip the archive. This will create a
-subdirectory called SYMPHONY-5.0 containing all the source files. Download 
-and unpack SYMPHONY-SPP-5.0.zip. 
-
-There are two options. You can either compile on the command-line, using
-the MSVC++ makefile, SPP-5.0\WIN32\spp.mak, or you can use the 
-provided projects and workspaces. However for the second option, it is 
-important the SPP archive be unpacked in the SYMPHONY-5.0 subdirectory 
-or the project files will not work. Compiling on the command-line is somewhat 
-easier since it requires only editing the makefile and typing a single command.
+There are two options. You can either compile on the command-line, using the
+MSVC++ makefile, SPP\src\WIN32\spp.mak, or you can use the provided projects
+and workspaces. However for the second option, it is important the SPP archive
+be unpacked in the SYMPHONY root directory or the project files will not work.
+Compiling on the command-line is somewhat easier since it requires only
+editing the makefile and typing a single command.
 
 ******************** Using the NMAKE Utility *********************************
 
-1. Edit the SPP-5.0\WIN32\spp.mak makefile to reflect your environment. This 
+1. Edit the SPP\src\WIN32\spp.mak makefile to reflect your environment. This 
 involves specifying the LP solver to be used, assigning some 
 variables and setting various paths. Only minor edits should be required. 
 An explanation of what has to be set is contained in the comments in the 
@@ -66,22 +58,23 @@ the COIN libraries must be specified in the makefile.
 Linear Programming Kit (GLPK), which contains a parser for GMPL/AMPL
 files. The path to the GLPK libraries must be specified in the makefile.
 
-4. Once configuration is done, type "nmake /f spp.mak" in the SPP-5.0\WIN32 
+4. Once configuration is done, type "nmake /f spp.mak" in the SPP\src\WIN32 
 directory. The executable "spp.exe" will be created under the 
-SPP-5.0\WIN32\Debug directory.
+SPP\src\WIN32\Debug directory.
 
-5. To test the executable, type "spp.exe -F ..\..\sample.spp" at a command
-prompt from the SPP-5.0\WIN32\Debug directory.
+5. To test the executable, type "spp.exe -F ..\..\..\sample.spp" at a command
+prompt from the SPP\src\WIN32\Debug directory.
 
 ******************** Using the MSVC++ Workspace ******************************
 
-1. In MS Visual C++ 6.0, open the workspace SYMPHONY-5.0\SPP-5.0\WIN32\spp.dsw.
-Note that there are two projects, one called "spp" and the other called 
-"symphonyLib". The "symphonyLib" project compiles the source code with the 
-calls to the user-defined callbacks used to customize the solver to create the 
-callable library: "symphonyLib.lib". The "spp" project compiles those 
-user callbacks together with the main and the application functions, links 
-them with the callable library and creates the executable: "spp.exe".
+1. In MS Visual C++ 6.0, open the workspace
+SYMPHONY\Applications\SPP\src\WIN32\spp.dsw. Note that there are two projects,
+one called "spp" and the other called "symphonyLib". The "symphonyLib" project
+compiles the source code with the calls to the user-defined callbacks used to
+customize the solver to create the callable library: "symphonyLib.lib". The
+"spp" project compiles those user callbacks together with the main and the
+application functions, links them with the callable library and creates the
+executable: "spp.exe".
 
 2. To use many of the new capabilities of SYMPHONY, you must have installed
 the COIN libraries. Specifically, you should install OSI, CGL, CLP and the Coin
@@ -149,7 +142,7 @@ list of definitions.
 
 6. Note that there are a number of additional preprocessor definitions that
 control the functionality of SYMPHONY. These definitions are described in
-SYMPHONY-5.0/Makefile, a Unix-style makefile included with the
+SYMPHONY/Makefile, a Unix-style makefile included with the
 distribution. To enable the functionality associated with a particular
 definition, simply add it to the list of definitions, as above.
 
@@ -162,8 +155,8 @@ variable.
 spp.exe" from the Build menu. This should successfully build the
 executable.
 
-9. To test the executable, right click on the "spp" project, go to the
-"Debug" tab and set the program arguments to "-F ..\sample.spp" Note that
+9. To test the executable, right click on the "spp" project, go to the "Debug"
+tab and set the program arguments to "-F ..\..\..\sample.spp" Note that
 command-line switches are Unix-style.
 
 10. Now choose "Execute" from the build menu and the solver should solve the

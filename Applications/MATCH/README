@@ -5,50 +5,42 @@
 The SYMPHONY MATCH application solves the standard matching problem. This
 application is intended as an illustration of how to develop an application
 with SYMPHONY. For a more detailed walkthrough of the development of this
-solver, please see SYMPHONY-5.0/Doc/Walkthrough.pdf. See below for usage.
+solver, please see SYMPHONY/Doc/Walkthrough.pdf. See below for usage.
 
 ******************************************************************************
 *              COMPILING THE SYMPHONY MATCH APPLICATION (Unix)               *
 ******************************************************************************
 
-This version of the SYMPHONY MATCH application is intended to work with
-SYMPHONY-5.0. First, configure and compile SYMPHONY 5.0 as described in
-SYMPHONY-5.0/README-5.0.  Download and unpack the source code for the MATCH
-application from the file SYMPHONY-MATCH-5.0.tgz. Modify the variables in the
-MATCH-5.0/Makefile appropriately. In particular, you must set the path to 
-SYMPHONY itself. If the application is unpacked as a subdirectory of 
-SYMPHONY-5.0 subdirectory, no further modification should be necessary. 
-Typing "make" in the MATCH subdirectory should successfully make the 
-executable "match". It will be installed in the directory 
-MATCH-5.0/bin.$(ARCH)/$(LP_SOLVER). Otherwise, you must also set the path to 
+First, configure and compile SYMPHONY 5.0 as described in SYMPHONY/README.
+Modify the variables in the MATCH/Makefile appropriately. In particular, you
+must set the path to SYMPHONY itself. If the application is unpacked as a
+subdirectory of SYMPHONY subdirectory, no further modification should be
+necessary. Typing "make" in the MATCH subdirectory should successfully make
+the executable "match". It will be installed in the directory
+MATCH/bin/$(ARCH)/$(LP_SOLVER). Otherwise, you must also set the path to
 the application's files. See usage below.
 
 ******************************************************************************
 *            COMPILING THE SYMPHONY MATCH APPLICATION (Windows)              *
 ******************************************************************************
 
-This version of the SYMPHONY MATCH application is intended to work with
-SYMPHONY-5.0. Here is a sketch outline of how to compile the SYMPHONY MATCH
-application in Microsoft Windows. Direct support is provided for compilation
-under MS Visual Studio 6.0. Compilation for other compilers should also be
-possible. Note that the Windows version has some limitations. Detailed timing
-information is not currently provided. Support is only provided for running
-in sequential mode at this time.
-
-First, download SYMPHONY-5.0.zip and unzip the archive. This will create a
-subdirectory called SYMPHONY-5.0 containing all the source files. Download 
-and unpack SYMPHONY-MATCH-5.0.zip. 
+Here is a sketch outline of how to compile the SYMPHONY MATCH application in
+Microsoft Windows. Direct support is provided for compilation under MS Visual
+Studio 6.0. Compilation for other compilers should also be possible. Note that
+the Windows version has some limitations. Detailed timing information is not
+currently provided. Support is only provided for running in sequential mode at
+this time.
 
 There are two options. You can either compile on the command-line, using
-the MSVC++ makefile, MATCH-5.0\WIN32\match.mak, or you can use the 
+the MSVC++ makefile, MATCH\src\WIN32\match.mak, or you can use the 
 provided projects and workspaces. However for the second option, it is 
-important the MATCH archive be unpacked in the SYMPHONY-5.0 subdirectory 
+important the MATCH archive be unpacked in the SYMPHONY subdirectory 
 or the project files will not work. Compiling on the command-line is somewhat 
 easier since it requires only editing the makefile and typing a single command.
 
 ******************** Using the NMAKE Utility *********************************
 
-1. Edit the MATCH-5.0\WIN32\match.mak makefile to reflect your environment. 
+1. Edit the MATCH\src\WIN32\match.mak makefile to reflect your environment. 
 This involves specifying the LP solver to be used, assigning some 
 variables and setting various paths. Only minor edits should be required. 
 An explanation of what has to be set is contained in the comments in the 
@@ -66,16 +58,16 @@ Linear Programming Kit (GLPK), which contains a parser for GMPL/AMPL
 files. The path to the GLPK libraries must be specified in the makefile.
 
 4. Once configuration is done, type "nmake /f match.mak" in the 
-MATCH-5.0\WIN32 directory. The executable "match.exe" will be created under 
-the MATCH-5.0\WIN32\Debug directory.
+MATCH\src\WIN32 directory. The executable "match.exe" will be created under 
+the MATCH\src\WIN32\Debug directory.
 
-5. To test the executable, type "match.exe -F ..\..\sample.mat" at a command
-prompt from the MATCH-5.0\WIN32\Debug directory.
+5. To test the executable, type "match.exe -F ..\..\..\sample.mat" at a command
+prompt from the MATCH\src\WIN32\Debug directory.
 
 ******************** Using the MSVC++ Workspace ******************************
 
 1. In MS Visual C++ 6.0, open the workspace 
-SYMPHONY-5.0\MATCH-5.0\WIN32\match.dsw.
+SYMPHONY\Applications\MATCH\src\WIN32\match.dsw.
 Note that there are two projects, one called "match" and the other called 
 "symphonyLib". The "symphonyLib" project compiles the source code with the 
 calls to the user-defined callbacks used to customize the solver to create the 
@@ -149,7 +141,7 @@ list of definitions.
 
 6. Note that there are a number of additional preprocessor definitions that
 control the functionality of SYMPHONY. These definitions are described in
-SYMPHONY-5.0/Makefile, a Unix-style makefile included with the
+SYMPHONY/Makefile, a Unix-style makefile included with the
 distribution. To enable the functionality associated with a particular
 definition, simply add it to the list of definitions, as above.
 
@@ -163,7 +155,7 @@ match.exe" from the Build menu. This should successfully build the
 executable.
 
 9. To test the executable, right click on the "match" project, go to the
-"Debug" tab and set the program arguments to "-F ..\sample.mat" Note that
+"Debug" tab and set the program arguments to "-F ..\..\..\sample.mat" Note that
 command-line switches are Unix-style.
 
 10. Now choose "Execute" from the build menu and the solver should solve the

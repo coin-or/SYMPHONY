@@ -37,7 +37,7 @@
 # variable to the correct path.
 ##############################################################################
 
-SYMPHONYROOT=..\..\
+SYMPHONYROOT=..\..\..\
 
 ##############################################################################
 # COINROOT is the path to the root directory of the COIN libraries. Many of
@@ -260,7 +260,7 @@ DEFINITIONS = $(DEFINITIONS) /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" \
 	/D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" \
 	/D "COMPILE_IN_TM" /D "USE_SYM_APPLICATION" 
 
-ALL_INCDIR =$(ALL_INCDIR) /I "$(SYMPHONYROOT)\include" /I "..\include" \
+ALL_INCDIR =$(ALL_INCDIR) /I "$(SYMPHONYROOT)\include" /I "..\..\include" \
 	/I "..\include\heurs"
 
 .SILENT:
@@ -344,40 +344,40 @@ LINK_OBJECTS= \
 	$(OUTDIR)\vrp_main.obj \
 
 sym_lib  : \
-	$(SYMPHONYROOT)\Common\pack_array.obj \
-	$(SYMPHONYROOT)\Common\pack_cut.obj \
-	$(SYMPHONYROOT)\Common\proccomm.obj \
-	$(SYMPHONYROOT)\Common\qsortucb.obj \
-	$(SYMPHONYROOT)\Common\qsortucb_di.obj \
-	$(SYMPHONYROOT)\Common\qsortucb_i.obj \
-	$(SYMPHONYROOT)\Common\qsortucb_ic.obj \
-	$(SYMPHONYROOT)\Common\qsortucb_id.obj \
-	$(SYMPHONYROOT)\Common\qsortucb_ii.obj \
-	$(SYMPHONYROOT)\Common\timemeas.obj \
-	$(SYMPHONYROOT)\CutGen\cg_func.obj \
-	$(SYMPHONYROOT)\CutGen\cg_proccomm.obj \
-	$(SYMPHONYROOT)\CutGen\cg_wrapper.obj \
-	$(SYMPHONYROOT)\CutGen\cut_gen.obj \
-	$(SYMPHONYROOT)\CutPool\cp_func.obj \
-	$(SYMPHONYROOT)\CutPool\cp_proccomm.obj \
-	$(SYMPHONYROOT)\CutPool\cp_wrapper.obj \
-	$(SYMPHONYROOT)\CutPool\cut_pool.obj \
-	$(SYMPHONYROOT)\LP\lp.obj \
-	$(SYMPHONYROOT)\LP\lp_branch.obj \
-	$(SYMPHONYROOT)\LP\lp_free.obj \
-	$(SYMPHONYROOT)\LP\lp_genfunc.obj \
-	$(SYMPHONYROOT)\LP\lp_proccomm.obj \
-	$(SYMPHONYROOT)\LP\lp_rowfunc.obj \
-	$(SYMPHONYROOT)\LP\lp_solver.obj \
-	$(SYMPHONYROOT)\LP\lp_varfunc.obj \
-	$(SYMPHONYROOT)\LP\lp_wrapper.obj \
-	$(SYMPHONYROOT)\Master\master.obj \
-	$(SYMPHONYROOT)\Master\master_func.obj \
-	$(SYMPHONYROOT)\Master\master_io.obj \
-	$(SYMPHONYROOT)\Master\master_wrapper.obj \
-	$(SYMPHONYROOT)\TreeManager\tm_func.obj \
-	$(SYMPHONYROOT)\TreeManager\tm_proccomm.obj \
-	$(SYMPHONYROOT)\TreeManager\treemanager.obj
+	$(SYMPHONYROOT)\src\Common\pack_array.obj \
+	$(SYMPHONYROOT)\src\Common\pack_cut.obj \
+	$(SYMPHONYROOT)\src\Common\proccomm.obj \
+	$(SYMPHONYROOT)\src\Common\qsortucb.obj \
+	$(SYMPHONYROOT)\src\Common\qsortucb_di.obj \
+	$(SYMPHONYROOT)\src\Common\qsortucb_i.obj \
+	$(SYMPHONYROOT)\src\Common\qsortucb_ic.obj \
+	$(SYMPHONYROOT)\src\Common\qsortucb_id.obj \
+	$(SYMPHONYROOT)\src\Common\qsortucb_ii.obj \
+	$(SYMPHONYROOT)\src\Common\timemeas.obj \
+	$(SYMPHONYROOT)\src\CutGen\cg_func.obj \
+	$(SYMPHONYROOT)\src\CutGen\cg_proccomm.obj \
+	$(SYMPHONYROOT)\src\CutGen\cg_wrapper.obj \
+	$(SYMPHONYROOT)\src\CutGen\cut_gen.obj \
+	$(SYMPHONYROOT)\src\CutPool\cp_func.obj \
+	$(SYMPHONYROOT)\src\CutPool\cp_proccomm.obj \
+	$(SYMPHONYROOT)\src\CutPool\cp_wrapper.obj \
+	$(SYMPHONYROOT)\src\CutPool\cut_pool.obj \
+	$(SYMPHONYROOT)\src\LP\lp.obj \
+	$(SYMPHONYROOT)\src\LP\lp_branch.obj \
+	$(SYMPHONYROOT)\src\LP\lp_free.obj \
+	$(SYMPHONYROOT)\src\LP\lp_genfunc.obj \
+	$(SYMPHONYROOT)\src\LP\lp_proccomm.obj \
+	$(SYMPHONYROOT)\src\LP\lp_rowfunc.obj \
+	$(SYMPHONYROOT)\src\LP\lp_solver.obj \
+	$(SYMPHONYROOT)\src\LP\lp_varfunc.obj \
+	$(SYMPHONYROOT)\src\LP\lp_wrapper.obj \
+	$(SYMPHONYROOT)\src\Master\master.obj \
+	$(SYMPHONYROOT)\src\Master\master_func.obj \
+	$(SYMPHONYROOT)\src\Master\master_io.obj \
+	$(SYMPHONYROOT)\src\Master\master_wrapper.obj \
+	$(SYMPHONYROOT)\src\TreeManager\tm_func.obj \
+	$(SYMPHONYROOT)\src\TreeManager\tm_proccomm.obj \
+	$(SYMPHONYROOT)\src\TreeManager\treemanager.obj
 	lib.exe /nologo /out:$(OUTDIR)\symphonyLib.lib $(OUTDIR)\*.obj
 	echo "symphonyLib.lib" created successfully...
 	echo ...

@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "C:\COIN\Osi\include" /I "C:\COIN\Osi\OsiClp\include" /I "C:\COIN\Osi\OsiSym\include" /I "C:\COIN\Clp\include" /I "C:\COIN\Coin\include" /I "C:\COIN\Cgl\include" /I "..\..\include" /I "..\..\Osi\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "USE_SYM_APPLICATION" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /FD /GZ /c /Tp
+# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "C:\COIN\Osi\include" /I "C:\COIN\Osi\OsiClp\include" /I "C:\COIN\Osi\OsiSym\include" /I "C:\COIN\Clp\include" /I "C:\COIN\Coin\include" /I "C:\COIN\Cgl\include" /I "..\..\..\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "USE_SYM_APPLICATION" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /FD /GZ /c /Tp
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -88,43 +88,43 @@ LIB32=link.exe -lib
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\Common\pack_array.c
+SOURCE=..\..\..\src\Common\pack_array.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Common\pack_cut.c
+SOURCE=..\..\..\src\Common\pack_cut.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Common\proccomm.c
+SOURCE=..\..\..\src\Common\proccomm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Common\qsortucb.c
+SOURCE=..\..\..\src\Common\qsortucb.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Common\qsortucb_di.c
+SOURCE=..\..\..\src\Common\qsortucb_di.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Common\qsortucb_i.c
+SOURCE=..\..\..\src\Common\qsortucb_i.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Common\qsortucb_ic.c
+SOURCE=..\..\..\src\Common\qsortucb_ic.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Common\qsortucb_id.c
+SOURCE=..\..\..\src\Common\qsortucb_id.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Common\qsortucb_ii.c
+SOURCE=..\..\..\src\Common\qsortucb_ii.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Common\timemeas.c
+SOURCE=..\..\..\src\Common\timemeas.c
 # End Source File
 # End Group
 # Begin Group "CutGen"
@@ -132,19 +132,19 @@ SOURCE=..\..\Common\timemeas.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\CutGen\cg_func.c
+SOURCE=..\..\..\src\CutGen\cg_func.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\CutGen\cg_proccomm.c
+SOURCE=..\..\..\src\CutGen\cg_proccomm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\CutGen\cg_wrapper.c
+SOURCE=..\..\..\src\CutGen\cg_wrapper.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\CutGen\cut_gen.c
+SOURCE=..\..\..\src\CutGen\cut_gen.c
 # End Source File
 # End Group
 # Begin Group "CutPool"
@@ -152,19 +152,19 @@ SOURCE=..\..\CutGen\cut_gen.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\CutPool\cp_func.c
+SOURCE=..\..\..\src\CutPool\cp_func.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\CutPool\cp_proccomm.c
+SOURCE=..\..\..\src\CutPool\cp_proccomm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\CutPool\cp_wrapper.c
+SOURCE=..\..\..\src\CutPool\cp_wrapper.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\CutPool\cut_pool.c
+SOURCE=..\..\..\src\CutPool\cut_pool.c
 # End Source File
 # End Group
 # Begin Group "LP"
@@ -172,39 +172,39 @@ SOURCE=..\..\CutPool\cut_pool.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\LP\lp.c
+SOURCE=..\..\..\src\LP\lp.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\LP\lp_branch.c
+SOURCE=..\..\..\src\LP\lp_branch.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\LP\lp_free.c
+SOURCE=..\..\..\src\LP\lp_free.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\LP\lp_genfunc.c
+SOURCE=..\..\..\src\LP\lp_genfunc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\LP\lp_proccomm.c
+SOURCE=..\..\..\src\LP\lp_proccomm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\LP\lp_rowfunc.c
+SOURCE=..\..\..\src\LP\lp_rowfunc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\LP\lp_solver.c
+SOURCE=..\..\..\src\LP\lp_solver.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\LP\lp_varfunc.c
+SOURCE=..\..\..\src\LP\lp_varfunc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\LP\lp_wrapper.c
+SOURCE=..\..\..\src\LP\lp_wrapper.c
 # End Source File
 # End Group
 # Begin Group "Master"
@@ -212,19 +212,19 @@ SOURCE=..\..\LP\lp_wrapper.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\Master\master.c
+SOURCE=..\..\..\src\Master\master.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Master\master_func.c
+SOURCE=..\..\..\src\Master\master_func.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Master\master_io.c
+SOURCE=..\..\..\src\Master\master_io.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Master\master_wrapper.c
+SOURCE=..\..\..\src\Master\master_wrapper.c
 # End Source File
 # End Group
 # Begin Group "TreeManager"
@@ -232,15 +232,15 @@ SOURCE=..\..\Master\master_wrapper.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\TreeManager\tm_func.c
+SOURCE=..\..\..\src\TreeManager\tm_func.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\TreeManager\tm_proccomm.c
+SOURCE=..\..\..\src\TreeManager\tm_proccomm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\TreeManager\treemanager.c
+SOURCE=..\..\..\src\TreeManager\treemanager.c
 # End Source File
 # End Group
 # End Group
