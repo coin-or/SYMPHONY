@@ -532,7 +532,7 @@ void send_node_desc(lp_prob *p, char node_type)
 			  TRUE, tm->par.logging);
 	    write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
 	 }
-	 exit();
+	 exit(-10);
       }
 #endif
       if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL)
@@ -815,7 +815,7 @@ void send_node_desc(lp_prob *p, char node_type)
 			  TRUE, tm->par.logging);
 	    write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
 	 }
-	 exit();
+	 exit(-10);
       }
 #endif
       if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL ||

@@ -320,6 +320,7 @@ int main(int argc, char **argv)
       
       if (user_send_feas_sol(p->user, &feas_sol_size, &feas_sol)==USER_NO_PP){
 	 tm->feas_sol_size = feas_sol_size;
+	 tm->feas_sol = (int *) calloc (tm->feas_sol_size, sizeof(int));
 	 memcpy((char *)tm->feas_sol, (char *)feas_sol, feas_sol_size * ISIZE);
       }
    }

@@ -664,7 +664,7 @@ void branch_close_to_half(int max_cand_num, int *cand_num,
    /* first get the fractional values */
    for (i = lp_data->n-1; i >= 0; i--){
       /*FIXME: This is a quick-fix to allow variables without upper bounds*/
-      if (lp_data->vars[i]->ub < MAXINT){
+      if (lp_data->vars[i]->ub < 2.0){
 	 fracx = x[i] - floor(x[i]);
 	 if (fracx > lpetol && fracx < lpetol1){
 	    xind[cnt] = i;
