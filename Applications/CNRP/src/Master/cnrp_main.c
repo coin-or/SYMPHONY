@@ -205,7 +205,7 @@ int main(int argc, char **argv)
 	 ub = gamma*solutions[i].fixed_cost + tau*solutions[i].variable_cost;
 	 if (ub < p->ub){
 	    p->has_ub = TRUE;
-	    p->ub = ub - .0000001;
+	    p->ub = ub - .001;
 	 }
       }
       
@@ -227,8 +227,9 @@ int main(int argc, char **argv)
 	 exit(0);
       }
       /* Insert new solution */
-      if ((fabs(utopia_fixed - cnrp->fixed_cost) < .000001) &&
-	  (fabs(utopia_variable - cnrp->variable_cost) > .000001)){
+      if ((fabs(solutions[0].fixed_cost - cnrp->fixed_cost) < .001) &&
+	  (fabs(solutions[0].variable_cost - cnrp->variable_cost) >
+	   .001)){
 	 tree = solutions[0].tree;
 	 memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);	 
 	 solutions[0].fixed_cost = cnrp->fixed_cost;
@@ -239,8 +240,10 @@ int main(int argc, char **argv)
 	 }
 	 pairs[numpairs].solution1 = 0;
 	 pairs[numpairs++].solution2 = 1;
-      }else if ((fabs(utopia_variable - cnrp->variable_cost) < .0000001) &&
-		(fabs(utopia_fixed_cost - cnrp->fixed_cost) > .0000001)){
+      }else if ((fabs(solutions[numsolutions-1].variable_cost -
+		      cnrp->variable_cost) < .001) &&
+		(fabs(solutions[numsolutions-1].fixed_cost -
+		      cnrp->fixed_cost) > .001)){
 	 tree = solutions[numsolutions-1].tree;
 	 memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);	 
 	 solutions[numsolutions-1].fixed_cost = cnrp->fixed_cost;

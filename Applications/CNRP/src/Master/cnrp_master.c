@@ -781,7 +781,9 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 #endif
 
    for (i = 0; i < n->edgenum; i++){
-      fixed_cost += cnrp->dist.cost[INDEX(n->edges[i].v0, n->edges[i].v1)];
+      if (n->edges[i].weight > 1 - lpetol){
+	 fixed_cost += cnrp->dist.cost[INDEX(n->edges[i].v0, n->edges[i].v1)];
+      }
 #ifdef ADD_FLOW_VARS
       variable_cost += (n->edges[i].flow1+n->edges[i].flow2)*
 	 cnrp->dist.cost[INDEX(n->edges[i].v0, n->edges[i].v1)];
