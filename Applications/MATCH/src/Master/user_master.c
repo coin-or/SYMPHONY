@@ -107,7 +107,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
       
       fclose(f);
    }
-
+   
    /* Here you can parse the command line for options. By convention, the
       users options should be capital letters */
 
@@ -146,25 +146,21 @@ int user_io(void *user)
    user_parameters *par = &(prob->par);
    char *infile = par->infile;
    FILE *f = NULL;
-   char line[MAX_LINE_LENGTH], key[50], value[50];
+   int i, j;
 
    if ((f = fopen(infile, "r")) == NULL){
       printf("Readparams: file %s can't be opened\n", infile);
       exit(1); /*error check for existence of parameter file*/
    }
 
-   /* Here you can read in the data for the problem instance. For the default
-      setup, the user should set the colnum and rownum here. */
-   while(NULL != fgets( line, MAX_LINE_LENGTH, f)){  /*read in problem data*/
-      strcpy(key, "");
-      sscanf(line, "%s%s", key, value);
-      if (strcmp(key, "colnum") == 0){ /* Read in the number of rows */
-	 READ_INT_PAR(prob->colnum);
-      }
-      else if (strcmp(key, "rownum") == 0){ /* Read in the number of columns */
-	 READ_INT_PAR(prob->rownum);
-      }
-   }
+   /* Read in the costs */
+   fscanf(f,"%d",&(prob->nnodes));
+   for (i = 0; i < prob->nnodes; i++)
+      for (j = 0; j < prob->nnodes; j++)
+	 fscanf(f, "%d", &(prob->cost[i][j]));
+   
+   prob->colnum = (prob->nnodes)*(prob->nnodes-1)/2;
+   prob->rownum = prob->nnodes;
 
    return(USER_NO_PP);
 }
@@ -421,7 +417,21 @@ int user_process_own_messages(void *user, int msgtag)
 int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 			  double *values, double objval)
 {
-   return(DEFAULT);
+   /* This gives you access to the user data structure. */
+   user_problem *prob = (user_problem *) user;
+   int index;
+ 
+   for (index = 0; index < varnum; index++){
+      if (values[index] > lpetol) {
+	 printf("%2d matched with %2d at cost %6d\n",
+		prob->node1[indices[index]],
+		prob->node2[indices[index]],
+		prob->cost[prob->node1[indices[index]]]
+		[prob->node2[indices[index]]]);
+      }	   
+   }
+   
+   return(USER_NO_PP);
 }
    
 /*===========================================================================*/
