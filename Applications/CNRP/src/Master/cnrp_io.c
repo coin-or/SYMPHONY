@@ -583,14 +583,14 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 
   if (cnrp->par.prob_type == BPP){
      dist->cost = (int *) calloc (cnrp->edgenum, sizeof(int));
-     for (i = 1, k = 0; i < vertnum; i++){
+     for (i = 1, k = 0; i < cnrp->vertnum; i++){
 	for (j = 0; j < i; j++){
 	   dist->cost[k++] = (int)cnrp->demand[i] + (int)cnrp->demand[j];
 	}
      }
   }else if (dist->wtype != _EXPLICIT){
      dist->cost = (int *) calloc (cnrp->edgenum, sizeof(int));
-     for (i = 1, k = 0; i < vertnum; i++){
+     for (i = 1, k = 0; i < cnrp->vertnum; i++){
 	for (j = 0; j < i; j++){
 	   dist->cost[k++] = ICOST(dist, i, j);
 	}
@@ -604,8 +604,8 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 	cnrp->par.k_closest = cnrp->par.min_closest;
      if (cnrp->par.k_closest > cnrp->par.max_closest) 
 	cnrp->par.k_closest = cnrp->par.max_closest;
-     if (cnrp->par.k_closest > vertnum-1) 
-	cnrp->par.k_closest = vertnum-1;
+     if (cnrp->par.k_closest > cnrp->vertnum-1) 
+	cnrp->par.k_closest = cnrp->vertnum-1;
   }
   if (cnrp->par.prob_type == TSP || cnrp->par.prob_type == CTP){
      cnrp->numroutes = 1;

@@ -49,6 +49,10 @@ typedef struct SOLUTION_DATA{
 typedef struct SOLUTION_PAIRS{
    int solution1;
    int solution2;
+#ifdef BINARY_SEARCH
+   double gamma1;
+   double gamma2;
+#endif
 }solution_pairs;
 
 /*===========================================================================*/
@@ -81,6 +85,7 @@ int main(int argc, char **argv)
    cnrp_problem *cnrp;
    node_desc *root= NULL;
    base_desc *base = NULL;
+   double tolerance = .2;
    
    start_time = wall_clock(NULL);
 
@@ -195,9 +200,13 @@ int main(int argc, char **argv)
    printf("***************************************************\n\n");
    
    /* Add the first pair to the list */
+#ifdef BINARY_SEARCH
+   pairs[numpairs].gamma1 = 1.0;
+   pairs[numpairs].gamma2 = 0.0;
+#endif
    pairs[numpairs].solution1 = 0;
    pairs[numpairs++].solution2 = 1;
-   
+
    while (TRUE){
 
       if (!numpairs) break;
@@ -205,7 +214,12 @@ int main(int argc, char **argv)
       solution1 = pairs[--numpairs].solution1;
       solution2 = pairs[numpairs].solution2;
 
-#ifdef FIND_NONDOMINATED_SOLUTIONS
+#ifdef BINARY_SEARCH
+      gamma = (pairs[numpairs].gamma1 + pairs[numpairs].gamma2)/2;
+      printf("DEBUG: Processing interval [%.5f, %.5f] length = %.5f\n",
+	     pairs[numpairs].gamma1, pairs[numpairs].gamma2,
+	     fabs(pairs[numpairs].gamma1 - pairs[numpairs].gamma2));
+#elif defined(FIND_NONDOMINATED_SOLUTIONS)
       gamma = (utopia_variable - solutions[solution1].variable_cost)/
 	 (utopia_fixed - solutions[solution2].fixed_cost +
 	  utopia_variable - solutions[solution1].variable_cost);
@@ -225,6 +239,7 @@ int main(int argc, char **argv)
 
       p->has_ub = FALSE;
       p->ub = MAXDOUBLE;
+#ifndef BINARY_SEARCH
       for (i = 0; i < numsolutions; i++){
 #ifdef FIND_NONDOMINATED_SOLUTIONS
 	 ub = MAX(gamma*(solutions[i].fixed_cost - utopia_fixed),
@@ -237,20 +252,43 @@ int main(int argc, char **argv)
 	    p->ub = ub - .001;
 	 }
       }
-
+#endif
+      
       printf("***************************************************\n");
       printf("***************************************************\n");
-      printf("Now solving with gamma = %.2f tau = %.2f \n", gamma, tau);  
+      printf("Now solving with gamma = %.6f tau = %.6f \n", gamma, tau);  
       printf("***************************************************\n");
       printf("***************************************************\n\n");
-
+      
       cnrp->fixed_cost = cnrp->variable_cost = 0.0;
       
       cnrp_solve(p, cp, base, root);
-
-      if (cnrp->fixed_cost == 0.0 && cnrp->variable_cost == 0.0)
+      
+#ifdef BINARY_SEARCH
+      if (cnrp->fixed_cost - solutions[solution1].fixed_cost < .001 &&
+	  solutions[solution1].variable_cost - cnrp->variable_cost < .001){
+	 if (pairs[numpairs].gamma1 - gamma > tolerance){
+	    pairs[numpairs].solution1 = solution1;
+	    pairs[numpairs].solution2 = solution2;
+	    pairs[numpairs++].gamma1 = gamma;
+	 }
 	 continue;
-
+      }
+      if (solutions[solution2].fixed_cost - cnrp->fixed_cost < .001 &&
+	  cnrp->variable_cost - solutions[solution2].variable_cost < .001){
+	 if (gamma - pairs[numpairs].gamma2 > tolerance){
+	    pairs[numpairs].solution1 = solution1;
+	    pairs[numpairs].solution2 = solution2;
+	    pairs[numpairs++].gamma2 = gamma;
+	 }
+	 continue;
+      }
+#else
+      if (cnrp->fixed_cost == 0.0 && cnrp->variable_cost == 0.0){
+	 continue;
+      }
+#endif
+      
       if (numsolutions == 100){
 	 printf("Maximum number of solutions exceeded\n\n");
 	 exit(0);
@@ -267,6 +305,9 @@ int main(int argc, char **argv)
 	    printf("Maximum number of solution pairs exceeded\n\n");
 	    exit(0);
 	 }
+#ifdef BINARY_SEARCH
+	 pairs[numpairs].gamma1 = gamma;
+#endif
 	 pairs[numpairs].solution1 = 0;
 	 pairs[numpairs++].solution2 = 1;
       }else if ((fabs(solutions[numsolutions-1].variable_cost -
@@ -281,9 +322,22 @@ int main(int argc, char **argv)
 	    printf("Maximum number of solution pairs exceeded\n\n");
 	    exit(0);
 	 }
+#ifdef BINARY_SEARCH
+	 pairs[numpairs].gamma2 = gamma;
+#endif
 	 pairs[numpairs].solution1 = numsolutions-2;
 	 pairs[numpairs++].solution2 = numsolutions-1;
       }else{
+	 printf("DEBUG: Found new solution. \n");
+#ifdef BINARY_SEARCH
+	 pairs[numpairs+1].gamma2 = pairs[numpairs].gamma2;
+	 pairs[numpairs+1].gamma1 = gamma;
+	 pairs[numpairs].gamma2 = gamma;
+#endif
+	 pairs[numpairs].solution1 = solution1;
+	 pairs[numpairs++].solution2 = solution2;
+	 pairs[numpairs].solution1 = solution2;
+	 pairs[numpairs++].solution2 = solution2+1;
 	 for (i = numsolutions; i > solution2; i--){
 	    solutions[i] = solutions[i-1];
 	 }
@@ -299,10 +353,6 @@ int main(int argc, char **argv)
 	    printf("Maximum number of solution pairs exceeded\n\n");
 	    exit(0);
 	 }
-	 pairs[numpairs].solution1 = solution1;
-	 pairs[numpairs++].solution2 = solution2;
-	 pairs[numpairs].solution1 = solution2;
-	 pairs[numpairs++].solution2 = solution2+1;
       }
    }
    

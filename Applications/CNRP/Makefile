@@ -35,7 +35,7 @@ USERROOT = ${SYMPHONYROOT}/CNRP
 # The customized name of the master program (if desired)
 ##############################################################################
 
-MASTERNAME = cnrp-10
+MASTERNAME = cnrp-binary
 
 ##############################################################################
 # These are only needed if parallel computation is used. Please see the
@@ -53,6 +53,7 @@ COMPILE_IN_CP = TRUE
 
 USER_MAIN = TRUE
 FIND_NONDOMINATED_SOLUTIONS = FALSE
+BINARY_SEARCH = TRUE
 DO_CONCORDE_CUTS = FALSE
 DIRECTED_X_VARS = TRUE
 ADD_FLOW_VARS = TRUE
@@ -62,6 +63,10 @@ SAVE_CUT_POOL = TRUE
 
 ifeq ($(FIND_NONDOMINATED_SOLUTIONS),TRUE)
 USER_BB_DEFINES += -DFIND_NONDOMINATED_SOLUTIONS
+endif
+
+ifeq ($(BINARY_SEARCH),TRUE)
+USER_BB_DEFINES += -DBINARY_SEARCH
 endif
 
 ifeq ($(DO_CONCORDE_CUTS),TRUE)
