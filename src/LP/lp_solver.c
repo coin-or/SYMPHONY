@@ -3055,7 +3055,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       delete probe;
    }
 
-#if 0
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    /* create CGL flow cover cuts */
    if(lp_data->par.generate_cgl_flow_and_cover_cuts){
@@ -3080,7 +3079,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       liftandproject->generateCuts(*(lp_data->si), cutlist);
       delete liftandproject;
    }
-#endif
    
    if (cutlist.sizeRowCuts() > 0){
       if (*cuts){
@@ -3126,19 +3124,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       *num_cuts = j;
    }
    
-<<<<<<< lp_solver.c
-   //delete gomory;
-   //delete knapsack;
-   //delete oddhole;
-   //delete probe;
-=======
->>>>>>> 1.92
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   // delete flow;
-   /*___END_EXPERIMENTAL_SECTION___*/
-   /* delete rounding; */
-   /* delete liftandproject; */
-
    return;
 }
 #endif

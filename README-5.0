@@ -575,6 +575,19 @@ SPP (set partitioning problem): Tested, but not very extensively.
 SPP+CUTS (set partitioning problem with cutting planes): Tested, but not very 
 extensively.
 
+CUT GENERATORS
+==============
+
+Cut generators are supplied by the Cut Generation Library (CGL). The cut
+generators that are turned on by default have been well tested. Two cut
+generators that are part ofthe CGL are turned off by default because of known
+issues. These are lift and project cuts and the simple rounding cuts. The
+generator for Gomory cuts works well, but has somenumerical issues. We found a
+few cases where the optimal solution was not found when using the Gomory cut
+generator, especially in combination with CPLEX. If the solver is not
+performing as it should, try turning off some of the cut generators to see if
+that fixes the problem. 
+
 *******************************************************************************
 *                                 SUPPORT                                     *
 *******************************************************************************
