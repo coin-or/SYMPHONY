@@ -642,9 +642,18 @@ int free_master_u(problem *p)
       FREE(p->warm_start->cuts);
       FREE(p->warm_start);
    }
+#ifdef COMPILE_IN_CP
+   if (p->cp){
+      for (i = 0; i < p->par.tm_par.max_cp_num; i++){
+	 p->cp[i]->msgtag = YOU_CAN_DIE;
+	 cp_close(p->cp[i]);
+      }
+      FREE(p->cp);
+   }
+#endif
 #endif
       
-   return(FUNCTION_TERMINATED_NORMALLY);
+   return(FUNCTION_TERMINATED_NORMALLY);   
 }
 
 /*===========================================================================*/

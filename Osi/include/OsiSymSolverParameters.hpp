@@ -21,7 +21,8 @@ enum OsiSymIntParam {
    OsiSymVerbosity,
    OsiSymWarmStart,
    OsiSymNodeLimit,
-   OsiSymFindFirstFeasible
+   OsiSymFindFirstFeasible,
+   OsiSymUsePermanentCutPools
 };
 
 enum OsiSymDblParam {

@@ -55,6 +55,9 @@ typedef struct PROBLEM{
 #ifdef COMPILE_IN_TM
    tm_prob         *tm;
    warm_start_desc *warm_start;
+#ifdef COMPILE_IN_CP
+   cut_pool       **cp;
+#endif
 #endif
 }problem;
 

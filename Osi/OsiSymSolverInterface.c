@@ -101,8 +101,13 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
       env_->par.tm_par.node_limit = value;
       return true;
 
-   case OsiSymFindFirstFeasible:
+    case OsiSymFindFirstFeasible:
       env_->par.tm_par.find_first_feasible = value;
+      return true;
+
+    case OsiSymUsePermanentCutPools:
+      env_->par.use_permanent_cut_pools = value;
+      return true;
       
     default: 
       return false;
@@ -203,8 +208,13 @@ bool OsiSymSolverInterface::getSymParam(OsiSymIntParam key, int& value)
       value = env_->par.tm_par.node_limit;
       return true;
 
-   case OsiSymFindFirstFeasible:
+    case OsiSymFindFirstFeasible:
       value = env_->par.tm_par.find_first_feasible;
+      return true;
+      
+    case OsiSymUsePermanentCutPools:
+      env_->par.use_permanent_cut_pools = value;
+      return true;
       
    default:
       return false;
@@ -304,4 +314,14 @@ void OsiSymSolverInterface::findInitialBounds()
 
    sym_find_initial_bounds(env_);
 
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int OsiSymSolverInterface::createPermanentCutPools()
+{
+
+   return(sym_create_permanent_cut_pools(env_));
+   
 }

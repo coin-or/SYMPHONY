@@ -20,6 +20,9 @@
 #include "tm_params.h"
 #include "BB_types.h"
 #include "lp_solver.h"
+#ifdef COMPILE_IN_CP
+#include "cp.h"
+#endif
 
 /*===========================================================================*/
 
@@ -46,7 +49,6 @@ typedef struct TM_TEMP{
 \*===========================================================================*/
 
 struct LP_PROB;
-struct CUT_POOL;
 
 typedef struct TM_PROB{
    tm_params       par;
@@ -69,7 +71,7 @@ typedef struct TM_PROB{
    int            opt_thread_num;
 #endif
 #ifdef COMPILE_IN_CP
-   struct CUT_POOL**cpp;
+   cut_pool     **cpp;
 #endif
    
    int            *nodes_per_cp;        /* for each cut_pool it contains how

@@ -745,6 +745,8 @@ public:
 
    void findInitialBounds();
 
+   int createPermanentCutPools();
+
   //@}
 
   //---------------------------------------------------------------------------

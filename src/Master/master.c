@@ -29,6 +29,7 @@
 #include "pack_cut.h"
 #include "pack_array.h"
 #include "master.h"
+#include "master_u.h"
 #include "lp_solver.h"
 #ifdef COMPILE_IN_TM
 #include "tm.h"
@@ -159,6 +160,7 @@ int sym_set_defaults(problem *p)
    p->par.pvm_trace = 0;
    p->par.do_branch_and_cut = 1;
    p->par.do_draw_graph = FALSE;
+   p->par.use_permanent_cut_pools = FALSE;
 
    /************************** treemanager defaults **************************/
    tm_par->verbosity = 0;
@@ -572,10 +574,14 @@ int sym_solve(problem *p)
    CALL_WRAPPER_FUNCTION( send_cg_data_u(p, 0) );
    cg_data_sent = TRUE;
 #endif
-#ifdef COMPILE_IN_CP
-   CALL_WRAPPER_FUNCTION( send_cp_data_u(p, 0) );
-   cp_data_sent = TRUE;
 #endif
+#ifdef COMPILE_IN_CP
+   if (p->cp && p->par.use_permanent_cut_pools){
+      tm->cpp = p->cp;
+   }else{
+      CALL_WRAPPER_FUNCTION( send_cp_data_u(p, 0) );
+   }
+   cp_data_sent = TRUE;
 #endif
 
    if (p->warm_start && p->par.tm_par.warm_start){
@@ -804,7 +810,9 @@ int sym_solve(problem *p)
    tm->rootnode = NULL;
    tm->cuts = NULL;
    tm->cut_num = tm->allocated_cut_num = 0;
-      
+   if (p->cp && p->par.use_permanent_cut_pools){
+      tm->cpp = NULL;
+   }
    tm_close(tm, termcode);
 
 #ifndef COMPILE_IN_LP
@@ -902,6 +910,32 @@ int sym_solve(problem *p)
    p->termcode = termcode;
    
    return(termcode);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_create_permanent_cut_pools(problem *p)
+{
+#if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP))
+   return(0);
+#else
+   int i;
+   
+   if (p->par.tm_par.max_cp_num){
+      p->cp =
+	 (cut_pool **) malloc(p->par.tm_par.max_cp_num*sizeof(cut_pool *));
+      for (i = 0; i < p->par.tm_par.max_cp_num; i++){
+	 p->cp[i] = (cut_pool *) calloc(1, sizeof(cut_pool));
+	 p->cp[i]->par = p->par.cp_par;
+	 CALL_USER_FUNCTION( user_send_cp_data(p->user, &p->cp[i]->user) );
+      }
+      get_cp_ptr(p->cp, 0);
+      return(p->par.tm_par.max_cp_num);
+   }else{
+      return(0);
+   }
+#endif
 }
 
 /*===========================================================================*/

@@ -87,9 +87,6 @@ int main(int argc, char **argv)
    node_desc *root= NULL;
    base_desc *base = NULL;
    double compare_sol_tol, ub = 0.0;
-#ifdef SAVE_CUT_POOL
-   cut_pool **cp = NULL;
-#endif
 
    start_time = wall_clock(NULL);
 
@@ -113,7 +110,7 @@ int main(int argc, char **argv)
 
    /* Set some parameters */
    compare_sol_tol = cnrp->par.compare_solution_tolerance;
-   si.setSymDblParam(OsiSymGranularity,-MAX(cnrp->lp_par.rho,compare_sol_tol));
+   si.setSymParam(OsiSymGranularity,-MAX(cnrp->lp_par.rho,compare_sol_tol));
 
 #ifdef BINARY_SEARCH
    printf("Using binary search with tolerance = %f...\n",
@@ -130,19 +127,11 @@ int main(int argc, char **argv)
    /* FIXME: Saving the cut pool currently doesn't work */
 #ifdef SAVE_CUT_POOL
    printf("Saving the global cut pool between iterations...\n");
-   if (env->par.tm_par.max_cp_num){
-      cp = (cut_pool **) malloc(env->par.tm_par.max_cp_num*sizeof(cut_pool *));
-      for (i = 0; i < env->par.tm_par.max_cp_num; i++){
-	 cp[i] = (cut_pool *) calloc(1, sizeof(cut_pool));
-	 cp[i]->par = env->par.cp_par;
-	 CALL_USER_FUNCTION( user_send_cp_data(env->user, &cp[i]->user) );
-      }
-      get_cp_ptr(cp, 0);
-   }
+   si.createPermanentCutPools();
+   si.setSymParam(OsiSymUsePermanentCutPools, TRUE);
 #endif
    
    /* First, calculate the utopia point */
-   
    cnrp->lp_par.gamma = 1.0;
    cnrp->cg_par.tau = cnrp->lp_par.tau = 0.0;
       
@@ -431,15 +420,13 @@ int main(int argc, char **argv)
 
 #ifdef SAVE_CUT_POOL
    for (i = 0; i < env->par.tm_par.max_cp_num; i++){
-      env->comp_times.bc_time.cut_pool += cp[i]->cut_pool_time;
-      env->stat.cuts_in_pool += cp[i]->cut_num;
-      cp[i]->msgtag = YOU_CAN_DIE;
-      cp_close(cp[i]);
+      env->comp_times.bc_time.cut_pool += env->cp[i]->cut_pool_time;
+      env->warm_start->stat.cuts_in_pool += env->cp[i]->cut_num;
    }
 #endif
    
-   print_statistics(&(env->comp_times.bc_time), &(env->stat), 0.0, 0.0, 0,
-		    start_time);
+   print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 0.0,
+		    0.0, 0, start_time);
 
    printf("\nNumber of subproblems solved: %i\n", numprobs);
    printf("Number of solutions found: %i\n\n", numsolutions);
@@ -479,9 +466,6 @@ int main(int argc, char **argv)
    for (i = 0 ; i < numsolutions; i++){
       FREE(solutions[i].tree);
    }
-#ifdef SAVE_CUT_POOL
-   FREE(cp);
-#endif
    
    return(0);
 }   
