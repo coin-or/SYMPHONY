@@ -447,7 +447,14 @@ int fathom_branch(lp_prob *p)
 
       check_ub(p);
       first_in_loop = FALSE;
+
+#ifdef COMPILE_IN_LP
+      if (p->tm->par.time_limit >= 0.0 &&
+	  wall_clock(NULL) - p->tm->start_time >= p->tm->par.time_limit){
+      return(FUNCTION_TERMINATED_NORMALLY);
+#endif
    }
+
    comp_times->lp += used_time(&p->tt);
 
    return(FUNCTION_TERMINATED_NORMALLY);
