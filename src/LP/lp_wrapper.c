@@ -1266,9 +1266,10 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
 	    printf("Branching on variable %s \n   children: ",
 		   p->lp_desc->colname[p->lp_data->vars[can->position]->userind]);
 	 }
+      }else{
+	 printf("Branching on variable %i ( %i )\n   children: ",
+		can->position, p->lp_data->vars[can->position]->userind);
       }
-      printf("Branching on variable %i ( %i )\n   children: ",
-	     can->position, p->lp_data->vars[can->position]->userind);
    }else{ /* must be CANDIDATE_CUT_IN_MATRIX */
       printf("Branching on a cut %i\n   children: ",
 	     p->lp_data->rows[can->position].cut->name);
