@@ -224,10 +224,11 @@ Edit the path in the "Additional include directories" window.
 
   --You must set the compiler defines so that the right LP solver interface
 will be used. Follow the procedure above to get to the preprocessor settings
-and make sure that __OSL__ is defined if you are using OSL or __CPLEX__
-is defined if you are using CPLEX. DO NOT CHANGE COMPILER DEFINES NOT RELATED 
-TO THE LP SOLVER. Important note for OSL users: When using OSL in Windows, 
-you must also define the symbol "OSLMSDLL".
+and edit the "Preprcoessor definitions". Make sure that __OSL__ is defined if
+you are using OSL or __CPLEX__ is defined if you are using CPLEX. DO NOT
+CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important note for OSL
+users: When using OSL in Windows, you must also add "OSLMSDLL" to the list of
+definitions. 
 
 4. Note that there are a number of additional compiler defines that control
 the functionality of SYMPHONY. These defines are described in

@@ -951,7 +951,6 @@ node_desc *create_explicit_node_desc(lp_prob *p)
 #ifndef COMPILE_IN_LP
    int s_bufid, r_bufid, *names;
 #endif
-   double start;
 
    get_basis(lp_data, cstat, rstat);
    if (extrarownum > 0)

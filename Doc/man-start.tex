@@ -47,15 +47,17 @@ and the overall design and use of \BB.
 Here is a sketch outline of how to get started with \BB\ in Unix. This is
 basically the same information contained in the README file that comes with
 the distribution and will lead you through the steps required to compile the
-sample application, a VRP and TSP solver. Because \BB\ is intended to run over
-nonhomogeneous networks of workstations, installation is not fully automated,
-but requires the user to make minor edits to the makefile.  With this setup,
-compilation for multiple architectures and configurations can be done in a
-single directory without reconfiguring or ``cleaning.'' This is convenient on
-nonhomogeneous networks, but it means that you might need to know a little
-about your computing environment in order to make \BB\ compile. For the casual
-user, this is limited to editing providing some path names. There may be some
-complaints from the compiler because of missing function prototypes, etc.
+sample application, a VRP and TSP solver. Because SYMPHONY is intended to run
+over nonhomogeneous networks of workstations, installation is not fully
+automated, but requires the user to make minor edits to the Makefile.  With
+this setup, compilation for multiple architectures and configurations can be
+performed in a single directory without reconfiguring or "cleaning". This is
+convenient on nonhomogeneous networks, but it means that you might need to
+edit the Makefile to get SYMPHONY to compile. For the casual user, this
+editing is limited to providing some path names.
+
+For more information about how to use the SYMPHONY VRP/TSP solver after
+compilation, see the file SYMPHONY-3.0.1/Vrp/README.
 
 \subsubsection{Preparing for Sample Compilation.}
 
@@ -230,14 +232,13 @@ how it's done.
 \subsection{Compiling the Sample Application with Microsoft Windows}
 \label{getting_strated_windows}
 
-Here is a sketch outline of how to get started with \BB\ in Windows. This is
-basically the same information contained in the README file that comes with
-the distribution and will lead you through the steps required to compile the
-sample application, a VRP and TSP solver. Direct support is provided for
-compilation under MS Visual Studio 6.0. Compilation for other compilers should
-also be possible. Note that the windows version has some limitations. Detailed
-timing information is not currently provided.  Support is only provided for
-running in sequential mode at this time.
+Here is a sketch outline of how to compile the sample application, a VRP and
+TSP solver, in Microsoft Windows. This is the same information contained in
+the README file that comes with the distribution. Direct support is provided
+for compilation under MS Visual Studio 6.0. Compilation for other compilers
+should also be possible. Note that the windows version has some
+limitations. Detailed timing information is not currently provided.  Support
+is only provided for running in sequential mode at this time.
 
 \begin{itemize}
 
@@ -246,13 +247,14 @@ create a subdirectory called {\tt SYMPHONY-3.0.1$\backslash$} containing all
 the source files.
 
 \item In MS Visual C++ 6.0, open the workspace 
-{\tt SYMPHONY-3.0.1$\backslash$WIN32$\backslash$vrp.dsw}.  Note that
-there are two projects, one called ``{\tt symphony}'' and one called ``{\tt
-vrp}''.  The symphony project contains the source code needed to build the
-internal library. The vrp project contains the source code for the
-user-defined functions needed to build the sample application, a VRP and TSP
-solver. Note that to develop a solver of your own, you would replace the VRP
-library with one of your own.
+{\tt SYMPHONY-3.0.1$\backslash$WIN32$\backslash$vrp.dsw}.  Note that there are
+two projects, one called ``{\tt symphony}'' and one called ``{\tt vrp}''.  The
+symphony project contains the source code needed to build the internal
+library. The vrp project contains the source code for the user-defined
+functions needed to build the sample application, a VRP and TSP solver. Note
+that to develop a solver of your own, you would replace the VRP library with
+one of your own. A template for doing so is provided (see the quick start
+guide in Section \ref{getting_started_windows}).
 
 \item By default, SYMPHONY is set up to use CPLEX 8.1 installed in a folder
 called ``{\tt C:$\backslash$ILOG$\backslash$CPLEX81}''. To use a different LP 
@@ -275,7 +277,7 @@ window.
 
 \item You must set the compiler defines so that the right LP solver interface
 will be used. Follow the procedure above to get to the preprocessor settings
-and make sure that {\tt \_\_OSLLIB\_\_} is defined if you are using OSL or
+and make sure that {\tt \_\_OSL\_\_} is defined if you are using OSL or
 {\tt \_\_CPLEX\_\_} is defined if you are using CPLEX. DO NOT CHANGE COMPILER
 DEFINES NOT RELATED TO THE LP SOLVER. Important note for OSL users: When using
 OSL in Windows, you must also define the symbol OSLMSDLL.

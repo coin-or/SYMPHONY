@@ -223,8 +223,6 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 {
    int i, *matcnt, *matbeg;
    double *lr = lp_data->tmp.d, *ur = lp_data->tmp.d + lp_data->n;
-   EKKVector debug;
-   const double *debug_obj;
    
    lp_data->lp = ekk_newModel(lp_data->env, NULL);
    osllib_status = (lp_data->env == NULL);
@@ -297,7 +295,7 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 	  case VAR_AT_UB: stat[i] |= 0x40000000; break;
 	  case VAR_AT_LB: stat[i] |= 0x20000000; break;
 	  case VAR_FIXED: stat[i] |= 0x00000000; break;
-	  default: /* should never happen */
+	  default: break; /* should never happen */
 	 }
       }
       osllib_status = ekk_setColstat(lp_data->lp, stat);
@@ -336,7 +334,7 @@ void refactorize(LPdata *lp_data)
 void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
 {
-   int i, j, m = lp_data->m;
+   int i;
    double *lr, *ur;
    /* double *lr = lp_data->tmp.d, *ur = lp_data->tmp.d + lp_data->n; */
 
@@ -349,7 +347,7 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
        case 'G': lr[i] = rhs[i]; ur[i] = OSL_INFINITY; break;
        case 'R': lr[i] = ur[i] = lp_data->rhs[i]; break;
 	 /* Range will be added later in change_range */
-       default: /*This shoul never happend ... */
+       default: /*This should never happen ... */
 	 osllib_status = -1;
 	 OSL_check_error("add_rows - unknown sense");
       }
@@ -403,7 +401,7 @@ void change_row(LPdata *lp_data, int row_ind,
 	 ur = rhs; lr = ur + range;
       }
       break;
-    default: /*This shoul never happend ... */
+    default: /*This should never happen ... */
       osllib_status = -1;
       OSL_check_error("change_row - default");
    }
@@ -424,7 +422,7 @@ void change_col(LPdata *lp_data, int col_ind,
     case 'R': change_lbub(lp_data, col_ind, lb, ub); break;
     case 'G': change_lb(lp_data, col_ind, lb); break;
     case 'L': change_ub(lp_data, col_ind, ub); break;
-    default: /*This shoul never happend ... */
+    default: /*This should never happen ... */
       osllib_status = -1;
       OSL_check_error("change_col - default");
    }
@@ -440,7 +438,7 @@ void change_col(LPdata *lp_data, int col_ind,
 /* Basis head in the end of this function not finished yet */
 int dual_simplex(LPdata *lp_data, int *iterd)
 {
-   int term, maxiter;
+   int term;
 
    /*PreSolve seems to cause some problems -- not sure exactly why, but we
      leave it turned off for now. */
@@ -748,7 +746,6 @@ void get_x(LPdata *lp_data)
 /*===========================================================================*/
 void get_dj_pi(LPdata *lp_data)
 {
-   int i;
    /*If scaling, fast integer or compress is used, maybe some changes will be
      needed */
    /* OSL returns changed sign - is it good or not? */
@@ -1033,7 +1030,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 	    ub[j] = cut->rhs; lb[j] = ub[j] + lp_data->rngval[j];
 	 }
 	 break;
-      default: /*This shoul never happend ... */
+      default: /*This should never happen ... */
 	 osllib_status = -1;
 	 OSL_check_error("load_lp - unknown type of constraint");
       }

@@ -71,31 +71,31 @@ mkdir $1/Vrp/DrawGraph
 foreach file (Vrp/DrawGraph/*.c)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/User
-foreach file (User/Makefile)
+mkdir $1/Template
+foreach file (Template/Makefile)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/User/LP
-foreach file (User/LP/*.c)
+mkdir $1/Template/LP
+foreach file (Template/LP/*.c)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/User/Master
-foreach file (User/Master/*.c)
+mkdir $1/Template/Master
+foreach file (Template/Master/*.c)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/User/CutPool
-foreach file (User/CutPool/*.c)
+mkdir $1/Template/CutPool
+foreach file (Template/CutPool/*.c)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/User/CutGen
-foreach file (User/CutGen/*.c)
+mkdir $1/Template/CutGen
+foreach file (Template/CutGen/*.c)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/User/include
-foreach file (User/include/*.h)
+mkdir $1/Template/include
+foreach file (Template/include/*.h)
 awk -f reformat.awk $file > $1/$file
 end
-mkdir $1/User/DrawGraph
-foreach file (User/DrawGraph/*.c)
+mkdir $1/Template/DrawGraph
+foreach file (Template/DrawGraph/*.c)
 awk -f reformat.awk $file > $1/$file
 end

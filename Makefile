@@ -662,7 +662,7 @@ endif
 # Compiler flags
 ##############################################################################
 
-STRICT_CHECKING = FALSE
+STRICT_CHECKING = TRUE
 
 DEFAULT_FLAGS = $(OPT) $(SYSDEFINES) $(BB_DEFINES) $(INCDIR)
 
