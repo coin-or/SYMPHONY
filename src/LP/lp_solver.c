@@ -20,6 +20,8 @@
 #include "BB_constants.h"
 #include "BB_macros.h"
 
+
+
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -1769,8 +1771,15 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 
 void unload_lp_prob(LPdata *lp_data)
 {
+
+
+  //#ifndef __OSL_CLP__
    lp_data->si->reset();
-   
+   //#else
+   //   close_lp_solver(LPdata * lp_data);
+   //   open_lp_solver(LP_data * lp_data);
+   //#endif
+  
    /* Set parameters as in open_lp_solver() (do these persist?) */
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
@@ -2074,7 +2083,7 @@ void get_column(LPdata *lp_data, int j,
    int matbeg = 0;
    
    for (int i = 0; i < j; i++)
-      matbeg += matrixByCol->getVectorSize(j);
+      matbeg += matrixByCol->getVectorSize(i);
    
    
    for (int i = 0; i < (*collen); i++){
@@ -2104,7 +2113,7 @@ void get_row(LPdata *lp_data, int i,
    int matbeg = 0, j = 0;
    
    for (j = 0; j < i; j++)
-      matbeg += matrixByRow->getVectorSize(i);
+      matbeg += matrixByRow->getVectorSize(j);
    
    for (j = 0; j < (*rowlen); j++){
       rowval[j] = matval[matbeg + j];
@@ -2392,25 +2401,26 @@ void free_row_set(LPdata *lp_data, int length, int *index)
    }
    
    for (i = 0; i < length; i++) {
-      switch (sense[i]){
-       case 'E':
-	 rhs[i] = lp_data->si->getInfinity();
-	 sense[i] = 'L';
-	 break;
-       case 'L':
-	 rhs[i] = lp_data->si->getInfinity(); 
-	 break;
-       case 'R':
-	 range[i] = 2*lp_data->si->getInfinity();
-	 range_used = TRUE;
-	 break;
-       case 'G':
-	 rhs[i] = -lp_data->si->getInfinity();
+     //     range[i]=0;
+     switch (sense[i]){
+     case 'E':
+       rhs[i] = lp_data->si->getInfinity();
+       sense[i] = 'L';
+       break;
+     case 'L':
+       rhs[i] = lp_data->si->getInfinity(); 
+       break;
+     case 'R':
+       range[i] = 2*lp_data->si->getInfinity();
+       range_used = TRUE;
+       break;
+     case 'G':
+       rhs[i] = -lp_data->si->getInfinity();
       }
    }
 
    if (!range_used){
-      FREE(range);
+     FREE(range);
    }
    
    lp_data->si->setRowSetTypes(index, index + length, sense, rhs, range);
@@ -2431,6 +2441,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    for (i = length - 1; i >= 0; i--){
       cut = rows[index[i]].cut;
       rhs[i] = cut->rhs;  
+      //      range[i]=0;
       if ((sense[i] = cut->sense) == 'R'){
 	 range[i] = cut->range;
 	 range_used = TRUE;
@@ -2461,5 +2472,109 @@ void write_sav(LPdata *lp_data, char *fname)
    fprintf(stderr, "Function not implemented yet.");
    exit(-1);
 }
+
+
+void read_mps(MPSinput * m_input, char *fname, char * ext)
+{
+  int j;
+  
+  CoinMpsIO mps;
+  mps.setInfinity(mps.getInfinity());
+  
+  int errors = mps.readMps(fname,ext);
+  
+  m_input->mname = const_cast<char *>(mps.getProblemName());
+  
+  m_input->mnr = mps.getNumRows();
+  m_input->mnc = mps.getNumCols();
+ 
+  m_input->mobj = const_cast <double *> (mps.getObjCoefficients()); 
+  m_input->mrhs = const_cast <double *> (mps.getRightHandSide());
+
+  m_input->msense= const_cast <char *> (mps.getRowSense());
+  m_input->mrngval = const_cast <double *> (mps.getRowRange());
+
+  m_input->mcolub = const_cast <double *> (mps.getColUpper());
+  m_input->mcollb = const_cast <double *> (mps.getColLower());
+
+  m_input->mrowub = const_cast <double *> (mps.getRowUpper());
+  m_input->mrowlb = const_cast<double *> (mps.getRowLower());
+
+
+   //user defined matind, matval, matbeg--fill column by column
+
+   const CoinPackedMatrix * matrixByCol= mps.getMatrixByCol();
+
+   m_input->mmatval = const_cast<double *> (matrixByCol->getElements());  
+   m_input->mmatind = const_cast<int *> (matrixByCol->getIndices()); 
+
+   m_input->mmatbeg[0]=0;
+
+   for (j = 0; j < m_input->mnc; j++)
+     m_input->mmatbeg[j+1] = m_input->mmatbeg[j] + matrixByCol->getVectorSize(j); 
+
+   //indices of integer variables
+
+   int len;
+
+   for( j=0, len=0; j<m_input->mnc; j++){
+     if (mps.isInteger(j))
+       m_input->mint[len++]=j;
+   }
+
+   m_input->mlength=len;    //length of min
+
+
+
+
+
+
+
+
+
+
+# if 0
+   open_lp_solver(LP_data * lp_data);
+   load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
+   lp_data->si->setInteger(indices,len);
+
+#ifdef COIN_USE_OSL
+   si->branchAndBound();
+#endif 
+
+#endif
+
+
+#if 0
+  lp_data->si->readMps(fname, ext);
+
+  lp_data->m=lp_data->si->getNumRows();
+  lp_data->n=lp_data->si->getNumCols();
+
+
+  CoinPackedMatrix * matrixByCol= new CoinPackedMatrix();
+
+  matrixByCol = const_cast<CoinPackedMatrix *>lp_data->si->getMatrixByCol();
+  
+   //user defined matbeg, matind, matval
+
+   lp_data->desc.matval = const_cast<double *> (matrixByCol->getElements());  
+   lp_data->desc.matind = const_cast<int *> (matrixByCol->getIndices()); 
+
+   lp_data->desc.matbeg[0]=0;
+
+   for (j = 0; j < lp_data->n; j++)
+     lp_data->desc.matbeg[j+1] = lp_data->desc.matbeg[j] + matrixByCol->getVectorSize(j); 
+   
+   //user defined obj coef, row sense, rhs, row rng.
+
+   lp_data->desc.obj = const_cast<double *> (lp_data->si->getObjCoefficients()); 
+   lp_data->desc.rhs = const_cast<double *> (lp_data->si->getRightHandSide());
+   lp_data->desc.sense = const_cast<char *> (lp_data->si->getRowSense());
+   lp_data->desc.rngval = const_cast<double *> (lp_data->si->getRowRange());
+#endif
+
+}
+
 
 #endif /* __OSI_xxx__ */
