@@ -63,7 +63,7 @@ int user_initialize(void **user)
   
    *user = mpp;
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -121,7 +121,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
       };
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -241,7 +241,7 @@ int user_io(void *user)
 
    fclose(f);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
    
 /*===========================================================================*/
@@ -254,7 +254,7 @@ int user_io(void *user)
 
 int user_start_heurs(void *user, double *ub, double *ub_estimate)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -266,7 +266,7 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
 
 int user_init_draw_graph(void *user, int dg_id)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -301,6 +301,8 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 {
    /* This gives you access to the user data structure. */
    mpp_problem *mpp = (mpp_problem *) user;
+   int i;
+   int *vars, varnum;
 
    /* Since we don't know how to form a good set of base variables, we'll put all
       the variables in the extra set */
@@ -321,24 +323,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    *basevarnum = 0;
    *basevars  = NULL;
 
-   return(USER_NO_PP);
-}
-
-/*===========================================================================*/
-
-/*===========================================================================*\
- * This is the second step in the process, where the user specifies
- * which variables should be active in the root in addition to the base
- * set specified above. The set of extra variable would be empty if all
- * variables are in the base, as above.
-\*===========================================================================*/
-
-int user_create_root(void *user, int *extravarnum, int **extravars)
-{
-   *extravarnum = 0;
-   *extravars  = NULL;
-
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -350,7 +335,7 @@ int user_create_root(void *user, int *extravarnum, int **extravars)
 int user_receive_feasible_solution(void *user, int msgtag, double cost,
 				   int numvars, int *indices, double *values)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -380,7 +365,7 @@ int user_send_lp_data(void *user, void **user_lp)
       done in user_receive_lp_data() in the LP process */
 #endif
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -416,7 +401,7 @@ int user_send_cg_data(void *user, void **user_cg)
 #endif
 #endif
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -446,7 +431,7 @@ int user_send_cp_data(void *user, void **user_cp)
       done in user_receive_cp_data() in the CP process */
 #endif
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -458,13 +443,7 @@ int user_send_cp_data(void *user, void **user_cp)
 
 int user_process_own_messages(void *user, int msgtag)
 {
-   switch (msgtag){
-    default:
-      fprintf(stderr, "\nMaster: unknown message type %i!!!\n\n", msgtag);
-      exit(1);
-   }
-
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -480,7 +459,7 @@ int user_process_own_messages(void *user, int msgtag)
 int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 			  double *values, double objval)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
    
 /*===========================================================================*/
@@ -495,7 +474,7 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 #ifdef TRACE_PATH
 
 #endif
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }   
 
 /*===========================================================================*/
@@ -515,7 +494,7 @@ int user_free_master(void **user)
    FREE(mpp->type);
    FREE(mpp);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 

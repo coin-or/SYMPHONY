@@ -133,7 +133,7 @@ int user_io(void *user)
    rownum = spp->cmatrix->rownum;
    spp->cmatrix->active_colnum = colnum;
    spp->cmatrix->col_deleted = (char *) calloc(colnum/BITSPERBYTE + 1, CSIZE);
-   spp->feasibility = FEASIBILITY_NOT_KNOWN;
+   spp->feasibility = SPP_FEASIBILITY_NOT_KNOWN;
    spp->feas_sol = (int *) malloc(rownum * ISIZE);
 
    /* order cols into lex ascending order */
@@ -241,8 +241,8 @@ int user_receive_feasible_solution(void *user, int msgtag, double cost,
    /* by default we are sent the user indices of nonzero variables.
       choose PACK_NONZEROS in user_pack_feasible_solution in LP. */
 
-   if (spp->feasibility == FEASIBLE && cost >= spp->feas_value)
-      return(USER_NO_PP);
+   if (spp->feasibility == SPP_FEASIBLE && cost >= spp->feas_value)
+      return(USER_SUCCESS);
 
    spp->feasibility = FEASIBLE;
    spp->feas_value = cost;
@@ -250,7 +250,7 @@ int user_receive_feasible_solution(void *user, int msgtag, double cost,
    for (i = 0; i < numvars; i++)
       spp->feas_sol[i] = colnames[indices[i]];
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/

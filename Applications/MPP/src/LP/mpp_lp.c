@@ -156,7 +156,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 int user_send_feasible_solution(void *user, double lpetol, int varnum,
 				int *indices, double *values)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 
