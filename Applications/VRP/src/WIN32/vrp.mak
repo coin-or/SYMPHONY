@@ -287,12 +287,6 @@ vrp.lib : \
 	..\DrawGraph\vrp_dg_network.obj \
 	..\LP\vrp_lp.obj \
 	..\LP\vrp_lp_branch.obj \
-	..\Master\Heuristics\exchange_heur.obj \
-	..\Master\Heuristics\cluster_heur.obj \
-	..\Master\Heuristics\lower_bound.obj \
-	..\Master\Heuristics\receive_rout.obj \
-	..\Master\Heuristics\route_heur.obj \
-	..\Master\Heuristics\start_heurs.obj \
 	..\Master\small_graph.obj \
 	..\Master\vrp_io.obj \
 	..\Master\vrp_master.obj \

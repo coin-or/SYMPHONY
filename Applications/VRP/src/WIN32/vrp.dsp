@@ -166,36 +166,6 @@ SOURCE=..\LP\vrp_lp_branch.c
 # End Source File
 # End Group
 # Begin Group "Master"
-
-# PROP Default_Filter ""
-# Begin Group "Heuristics"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\cluster_heur.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\exchange_heur.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\lower_bound.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\receive_rout.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\route_heur.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\start_heurs.c
-# End Source File
-# End Group
 # Begin Source File
 
 SOURCE=..\Master\small_graph.c
