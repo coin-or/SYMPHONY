@@ -1,17 +1,8 @@
 #! /bin/tcsh -f
 
-foreach dir (Template Vrp MATCH MPP SPP SPP+CUTS)
+foreach dir (Vrp Template MPP SPP+CUTS SPP MATCH)
 cd $1/SYMPHONY/$dir
-foreach solver (CPLEX OSL)
-echo ================= Testing $dir with $solver ===============
-if (-e test)
-./test
+if (-e testing)
+./testing
 endif
 end
-foreach solver (CPLEX OSL CLP GLPK)
-echo ================= Compiling $dir with OSI_$solver ===============
-make clean_all LP_SOLVER=OSI OSI_INTERFACE=$solver
-make LP_SOLVER=OSI OSI_INTERFACE=$solver
-end
-end
-
