@@ -3146,7 +3146,7 @@ int tm_close(tm_prob *tm, int termcode)
    /* Receive timing from the LPs */
 
    if (receive_lp_timing(tm) < 0){
-      printf("Warning: problem receiving LP timing. LP process is dead\n\n");
+      printf("\nWarning: problem receiving LP timing. LP process is dead\n\n");
    }
    
 #ifdef COMPILE_IN_LP
