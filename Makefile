@@ -69,8 +69,7 @@ RANLIB = ranlib
 ### application's Makefile.
 
 ##############################################################################
-# USERROOT is the name of the user's source directory. $(SYMPHONYROOT)/VRP is 
-# the proper setting for the sample application, a VRP and TSP solver.
+# USERROOT is the name of the user's source directory. 
 # Set MASTERNAME if you want to give the master executable a custom name.
 # Otherwise, it will be named "symphony" if the executable is sequential 
 # and master (with some configuration specific extension) otherwise.
