@@ -37,6 +37,17 @@ sed -e '/^D\//\!d' CVS/Entries.bak >src/CVS/Entries
 
 sed -e 's/SYMPHONY/SYMPHONY\/src/g' CVS/Repository.bak >src/CVS/Repository
 
+sed -e 's/SYMPHONY/SYMPHONY\/src\/CutGen\/Decomp/g' CVS/Repository.bak\
+>CutGen/Decomp/CVS/Repository
+
+sed -e 's/SYMPHONY/SYMPHONY\/src\/DrawGraph\/IGD_1.0/g' CVS/Repository.bak\
+>DrawGraph/IGD_1.0/CVS/Repository
+
+foreach dir(Doc Simple_version)
+sed -e "s/SYMPHONY/SYMPHONY\/src\/DrawGraph\/IGD_1.0\/$dir/g" CVS/Repository.bak\
+>DrawGraph/IGD_1.0/$dir/CVS/Repository
+end
+
 foreach dir(Common CutGen CutPool DrawGraph GMPL LP Master TreeManager WIN32)
 sed -e "s/SYMPHONY/SYMPHONY\/src\/$dir/g" CVS/Repository.bak\
 >$dir/CVS/Repository
