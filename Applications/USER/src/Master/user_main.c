@@ -40,16 +40,19 @@ int main(int argc, char **argv)
 
    CoinWarmStart * sWS = si.getWarmStart();
 
-   si.setSymParam(OsiSymNodeLimit, 10000);
+   si.setSymParam(OsiSymNodeLimit, 0);
+   
    si.branchAndBound();
 
-   si.setWarmStart(sWS);
+   //si.setWarmStart(sWS);
 
    /*test for p0201 */
    si.setObjCoeff(0, 100);
    si.setObjCoeff(200, 150);
 
-   si.resolve();
+   //si.resolve();
+
+   si.branchAndBound();
 
    return(0);
 }
@@ -108,12 +111,13 @@ int main(int argc, char **argv)
    //si.setObjCoeff(1, 8);
    si.setObj2Coeff(1, -1); 
    //   si.setObj2Coeff(30, 100);
-   
 
-   si.setSymParam(OsiSymMultiCriteriaFindNondominatedSolutions, TRUE);
+   si.branchAndBound();
+
+   si.setSymParam(OsiSymMultiCriteriaFindNondominatedSolutions, FALSE);
    
    /* Solve the multi-criteria problem */
-   si.multiCriteriaBranchAndBound();
+   //si.multiCriteriaBranchAndBound();
 #endif
    
 #if defined TEST_RESOLVE || defined TEST_SENS_ANALYSIS || \

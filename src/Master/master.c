@@ -164,7 +164,7 @@ int sym_set_defaults(problem *p)
    p->par.pvm_trace = 0;
    p->par.do_branch_and_cut = 1;
    p->par.do_draw_graph = FALSE;
-   p->par.use_permanent_cut_pools = TRUE;
+   p->par.use_permanent_cut_pools = FALSE;
    p->par.multi_criteria = FALSE;
    p->par.mc_binary_search_tolerance = 0; 
    p->par.mc_compare_solution_tolerance = .001;
