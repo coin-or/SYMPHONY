@@ -180,6 +180,29 @@ int cg_send_cut(cut_data *new_cut)
 
 /*===========================================================================*/
 
+cut_data *create_explicit_cut(int nzcnt, int *indices, double *values,
+			      double rhs, double range, char sense,
+			      char send_to_cp)
+{
+   cut_data *cut = (cut_data *) calloc(1, sizeof(cut_data));
+
+   cut->type = EXPLICIT_ROW;
+   cut->rhs = rhs;
+   cut->range = range;
+   cut->size = ISIZE + nzcnt * (ISIZE + DSIZE);
+   cut->coef = (char *) malloc (cut->size);
+   ((int *) cut->coef)[0] = nzcnt;
+   memcpy(cut->coef + ISIZE, (char *)indices, nzcnt*ISIZE);
+   memcpy(cut->coef + (nzcnt + 1) * ISIZE, (char *)values, nzcnt * DSIZE);
+   cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+   cut->deletable = TRUE;
+   cut->name = send_to_cp ? CUT__SEND_TO_CP : CUT__DO_NOT_SEND_TO_CP;
+
+   return(cut);
+}
+
+/*===========================================================================*/
+
 /*===========================================================================*\
  * This function frees data structures
 \*===========================================================================*/

@@ -76,6 +76,9 @@ typedef struct CG_PROB{
 cg_prob *get_cg_ptr PROTO((cg_prob **cg_list));
 void cg_initialize PROTO((cg_prob *p, int master_tid));
 void cg_close PROTO((cg_prob * p));
+cut_data *create_explicit_cut PROTO((int nzcnt, int *indices, double *values,
+				     double rhs, double range, char sense,
+				     char send_to_cp));
 
 /*===========================================================================*/
 /*=============== CG communication functions (cg_proccomm.c) ================*/

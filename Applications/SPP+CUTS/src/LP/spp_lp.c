@@ -349,9 +349,9 @@ int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
  * about the current tableau, etc. This is for advanced users only.
 \*===========================================================================*/
 
-int user_generate_cuts_in_lp(void *user, int varnum, var_desc **vars,
-			     double *x,
-			     int *new_row_num, waiting_row ***new_rows)
+int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
+			     var_desc **vars, double *x,
+			     int *new_row_num, cut_data ***cuts)
 {
    return(USER_NO_PP);
 }

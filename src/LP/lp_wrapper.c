@@ -25,6 +25,9 @@
 #include "BB_macros.h"
 #include "BB_types.h"
 #include "lp_solver.h"
+#ifdef USE_CGL_CUTS
+#include "cg.h"
+#endif
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #if defined (COMPILE_IN_CG) && defined (COMPILE_DECOMP)
 #include "decomp.h"
@@ -1659,15 +1662,31 @@ void generate_cuts_in_lp_u(lp_prob *p)
    int user_res, new_row_num = 0;
    waiting_row **new_rows = NULL;
    char deleted_cut;
+   cut_data **cuts;
    
    int i, j;
    waiting_row **wrows = p->waiting_rows;
    
    colind_sort_extra(p);
    
-   user_res = user_generate_cuts_in_lp(p->user, lp_data->n, lp_data->vars, x,
-				       &new_row_num, &new_rows);
+   user_res = user_generate_cuts_in_lp(p->user, lp_data, lp_data->n,
+				       lp_data->vars, x,
+				       &new_row_num, &cuts);
    
+#ifdef USE_CGL_CUTS
+   
+   generate_cgl_cuts(lp_data, &new_row_num, &cuts);
+
+#endif
+
+   if (new_row_num > 0){
+      for (i = 0; i < new_row_num; i++){
+	 cg_send_cut(cuts[i]);
+      }
+      free_cuts(cuts, new_row_num);
+      FREE(cuts);
+   }
+
 #if defined(COMPILE_IN_CG) || defined(COMPILE_IN_CP) 
    {
 #ifdef COMPILE_IN_CP
@@ -1734,6 +1753,8 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	 cg_new_row_num = decomp(p->cgp);
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
+#endif
+
       if (cg_new_row_num){
 	 unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
 		       p->cgp->cuts_to_add_num, p->cgp->cuts_to_add,
@@ -1759,7 +1780,6 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	    FREE(cg_new_rows);
 	 }
       }
-#endif
 #ifdef COMPILE_IN_CP
       
       if ((p->iter_num == 1 && (p->bc_level > 0 || p->phase==1)) ||
@@ -1822,7 +1842,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
        * Later on we could put Gomory cut generation here... */
     case USER_AND_PP:
     case USER_NO_PP:
-      /* Test whether the any of the new cuts are identical to any of
+      /* Test whether any of the new cuts are identical to any of
          the old ones. */
       if (p->waiting_row_num && new_row_num){
 	 for (i = 0, deleted_cut = FALSE; i < new_row_num - 1;

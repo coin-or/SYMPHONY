@@ -130,7 +130,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
       };
    }
 
-   return(USER_NO_PP);
+   return(DEFAULT);
 }
 
 /*===========================================================================*/
@@ -145,6 +145,8 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
 int user_io(void *user)
 {
+
+
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
    user_parameters *par = &(prob->par);
@@ -178,7 +180,7 @@ int user_io(void *user)
 
    fclose(f);
 
-   return(USER_NO_PP);
+   return(DEFAULT);
 }
    
 /*===========================================================================*/
@@ -239,6 +241,8 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 			      int *basecutnum, int *extravarnum, int **extravars,
 			      char ***colnames, int *colgen_strat)
 {
+
+
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
    int i;
@@ -263,7 +267,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    *basevarnum = 0;
    *basevars  = NULL;
 
-   return(USER_NO_PP);
+   return(DEFAULT);
 }
 
 /*===========================================================================*/

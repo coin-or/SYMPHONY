@@ -969,9 +969,9 @@ int user_get_upper_bounds(void *user, int varnum, int *indices, double *ub)
  * about the current tableau, etc. This is for advanced users only.
 \*===========================================================================*/
 
-int user_generate_cuts_in_lp(void *user, int varnum, var_desc **vars,
-			     double *x, int *new_row_num,
-			     waiting_row ***new_rows)
+int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
+			     var_desc **vars, double *x,
+			     int *new_row_num, cut_data ***cuts)
 {
    return(USER_AND_PP);
 }

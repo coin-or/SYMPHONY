@@ -265,7 +265,7 @@ int read_mps PROTO((LPdesc *desc, char *infile, char *probname));
 void write_mps PROTO((LPdata *lp_data, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
 #ifdef USE_CGL_CUTS
-int generate_cgl_cuts PROTO((LPdata * lp_data, cut_data ***cuts));
+void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts, cut_data ***cuts));
 #endif
 
 #endif

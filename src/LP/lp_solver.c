@@ -1014,9 +1014,9 @@ void write_sav(LPdata *lp_data, char *fname)
 /*===========================================================================*/
 
 #ifdef USE_CGL_CUTS
-int generate_cgl_cuts(LPdata * lp_data, cut_data **cuts)
+void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 {
-   return(0);
+   return;
 }
 #endif
 
@@ -1751,9 +1751,9 @@ void write_sav(LPdata *lp_data, char *fname)
 /*===========================================================================*/
 
 #ifdef USE_CGL_CUTS
-int generate_cgl_cuts(LPdata * lp_data, cut_data **cuts)
+void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 {
-   return(0);
+   return;
 }
 #endif
 
@@ -2596,7 +2596,10 @@ void write_sav(LPdata *lp_data, char *fname)
 /*===========================================================================*/
 
 #ifdef USE_CGL_CUTS
-int generate_cgl_cuts(LPdata *lp_data, cut_data ***cuts){
+
+#include "cg.h" /* For create_explicit_cut */
+
+void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 
    OsiCuts cutlist;
    OsiRowCut cut;
@@ -2646,10 +2649,28 @@ int generate_cgl_cuts(LPdata *lp_data, cut_data ***cuts){
    
 
    if (cutlist.sizeRowCuts() > 0){
-      *cuts = (cut_data **) malloc(cutlist.sizeRowCuts() * sizeof(cut_data));
+      if (*num_cuts > 0){
+	 *num_cuts += cutlist.sizeRowCuts();
+	 *cuts = (cut_data **) realloc(*cuts, (*num_cuts) * sizeof(cut_data));
+      }else{
+	 *cuts = (cut_data **) malloc(cutlist.sizeRowCuts() * sizeof(cut_data));
+      }
+#if 1
       for (i = 0, j = 0; i < cutlist.sizeRowCuts(); i++){
 	 cut = cutlist.rowCut(i);
-	 (*cuts)[j] = (cut_data *) calloc(1, sizeof(cut_data));
+	 if (cut.sense() == 'R'){
+	    continue;
+	 }
+	 (*cuts)[j] =
+	    create_explicit_cut(cut.row().getNumElements(),
+				const_cast<int *> (cut.row().getIndices()),
+				const_cast<double *> (cut.row().getElements()),
+				cut.rhs(), cut.range(), cut.sense(), FALSE);
+      }
+#else
+      for (i = 0, j = 0; i < cutlist.sizeRowCuts(); i++){
+	 cut = cutlist.rowCut(i);
+	 (*cuts)[j] =  (cut_data *) calloc(1, sizeof(cut_data));
 	 num_elements = cut.row().getNumElements();
 	 indices = const_cast<int *> (cut.row().getIndices());
 	 elements = const_cast<double *> (cut.row().getElements());
@@ -2669,6 +2690,7 @@ int generate_cgl_cuts(LPdata *lp_data, cut_data ***cuts){
 	 (*cuts)[j]->deletable = TRUE;
 	 (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
       }
+#endif
    }
    
    delete gomory;
@@ -2678,7 +2700,7 @@ int generate_cgl_cuts(LPdata *lp_data, cut_data ***cuts){
    /* delete rounding; */
    /* delete liftandproject; */
 
-   return (j);
+   return;
 }
 #endif
 
