@@ -522,9 +522,11 @@ void send_node_desc(lp_prob *p, char node_type)
 	 FREE(n->sol);
 	 FREE(n->duals);
       }
+      n->sol_size = p->desc->uind.size;
       n->sol = (double *) malloc (DSIZE * p->desc->uind.size);
       memcpy(n->sol, lp_data->x, DSIZE*p->desc->uind.size);
-      
+
+      n->dual_size = p->base.cutnum;      
       n->duals = (double *) malloc (DSIZE * p->base.cutnum);
       memcpy(n->duals, lp_data->dualsol, DSIZE*p->base.cutnum);
    }
@@ -543,6 +545,7 @@ void send_node_desc(lp_prob *p, char node_type)
       }
       if (node_type == FEASIBLE_PRUNED) {
 	 if (!tm->par.sensitivity_analysis){ 
+	    n->sol_size = p->desc->uind.size;
 	    n->sol = (double *) malloc (DSIZE * p->desc->uind.size);
 	    memcpy(n->sol, lp_data->x, DSIZE*p->desc->uind.size);
 	 }

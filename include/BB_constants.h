@@ -126,6 +126,7 @@
 #define OVER_UB_PRUNED                  6
 #define DISCARDED_NODE                  7
 #define REPRICED_NODE                   8
+#define MC_FEASIBLE_PRUNED              9
 
 /*------------------- possible node types for VBC Tool ----------------------*/
 #define VBC_INTERIOR_NODE       1 /*Dark Red*/ 
@@ -498,6 +499,7 @@
 #define BREADTH_FIRST_SEARCH  2
 #define DEPTH_FIRST_SEARCH    3
 #define BEST_FIRST_SEARCH     4
+#define DEPTH_FIRST_THEN_BEST_FIRST 5
 
 /*-------------------------- diving_strategy --------------------------------*/
 #define BEST_ESTIMATE         0

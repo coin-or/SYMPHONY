@@ -369,6 +369,12 @@ int solve(tm_prob *tm)
 	       printf("Thread %i now processing node %i\n", thread_num,
 		      tm->lpp[thread_num]->bc_index);
 #endif
+
+	    if(tm->par.node_selection_rule == DEPTH_FIRST_THEN_BEST_FIRST &&
+	       tm->has_ub){
+	      tm->par.node_selection_rule = LOWEST_LP_FIRST;
+	    }
+
 	    switch(process_chain(tm->lpp[thread_num])){
 
 	    case FUNCTION_TERMINATED_NORMALLY:
@@ -430,6 +436,7 @@ int solve(tm_prob *tm)
 	 if (tm->par.find_first_feasible && tm->has_ub){
 	    break;
 	 }
+
 	 if (i == NEW_NODE__ERROR){
 	    termcode = SOMETHING_DIED;
 	    break;
@@ -899,6 +906,7 @@ char node_compar(int rule, bc_node *node0, bc_node *node1)
     case BREADTH_FIRST_SEARCH:
       return(node1->bc_level < node0->bc_level ? 1:0);
     case DEPTH_FIRST_SEARCH:
+    case DEPTH_FIRST_THEN_BEST_FIRST:
       return(node1->bc_level > node0->bc_level ? 1:0);
    }
    return(0); /* fake return */
@@ -1191,6 +1199,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 
 	 if(feasible[i]){
 	    if(!tm->par.sensitivity_analysis){ 
+	       child->sol_size = tm->rootnode->desc.uind.size;
 	       child->sol = bobj->solutions[i];
 	       bobj->solutions[i] = 0;
 	    }
