@@ -76,7 +76,10 @@ USER_TM_SRC      += vrp_cp.c
 endif
 
 USER_LP_SRC       = vrp_lp_branch.c vrp_lp.c 
-USER_LP_SRC      += $(MACROS_SRC) $(NET_SRC) $(DG_FUNC_SRC)
+USER_LP_SRC      += $(MACROS_SRC) $(DG_FUNC_SRC)
+ifeq ($(COMPILE_IN_LP),FALSE)
+USER_LP_SRC      += $(NET_SRC)
+endif
 ifeq ($(COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += vrp_cg.c biconnected.c shrink.c 
 endif
