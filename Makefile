@@ -70,7 +70,7 @@ ROOT = .
 # and master (with some configuration specific extension) otherwise.
 ##############################################################################
 
-USERROOT = $(ROOT)/Vrp
+USERROOT = $(ROOT)/MPP
 MASTERNAME = 
 
 ##############################################################################
@@ -125,7 +125,7 @@ endif
 
 #Uncomment the line below if you want to use an OSI interface.
 LP_SOLVER = OSI
-OSI_INTERFACE = CPLEX
+OSI_INTERFACE = OSL
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)

@@ -148,6 +148,12 @@ int user_io(void *user)
    FILE *f = NULL;
    char line[MAX_LINE_LENGTH], key[50], value[50];
 
+   /* Make sure the file exists and can be opened */
+   if (!strcmp(infile, "")){
+      printf("\nMpp I/O: No problem data file specified\n\n");
+      exit(1);
+   }
+   
    if ((f = fopen(infile, "r")) == NULL){
       printf("Readparams: file %s can't be opened\n", infile);
       exit(1); /*error check for existence of parameter file*/
@@ -155,7 +161,7 @@ int user_io(void *user)
 
    /* Here you can read in the data for the problem instance. For the default
       setup, the user should set the colnum and rownum here. */
-   while(NULL != fgets( line, MAX_LINE_LENGTH, f)){  /*read in problem data*/
+   while(NULL != fgets(line, MAX_LINE_LENGTH, f)){  /*read in problem data*/
       strcpy(key, "");
       sscanf(line, "%s%s", key, value);
       if (strcmp(key, "colnum") == 0){ /* Read in the number of rows */
@@ -184,7 +190,7 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
 
-   *ub = MAXINT;
+   *ub = MAXDOUBLE;
 
    return(USER_NO_PP);
 }
@@ -223,7 +229,7 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
    /* Set the number of variables*/
    varnum = *basevarnum = prob->colnum;
  
-   /* Allocate memory for the uper and lower bounds. */
+   /* Allocate memory for the upper and lower bounds. */
    /* Lower bounds are (probably) all zero so calloc those. */
    *lb = (double *) calloc (varnum, DSIZE);
    *ub = (double *) malloc (varnum * DSIZE);
@@ -449,7 +455,7 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 
 int user_free_master(void **user)
 {
-   user_problem *prob = (user_problem *) calloc(1, sizeof(user_problem));
+   user_problem *prob = (user_problem *) (*user);
 
    FREE(prob);
 

@@ -93,17 +93,13 @@ int user_check_cut(void *user, double etol, int number, int *indices,
   switch (cut->type){
       
     default:
-    /*  printf("Cut type not recognized! \n\n");*/
-      *is_violated =TRUE; 
-	return(USER_NO_PP);
-	}
-/*
-*is_violated = TRUE; 
-  */
-	return(USER_NO_PP);
-	
-
+       printf("Cut type not recognized! \n\n");
+       *is_violated = FALSE; 
+       return(USER_NO_PP);
   }
+
+  return(USER_NO_PP);
+}
 
 /*===========================================================================*/
 

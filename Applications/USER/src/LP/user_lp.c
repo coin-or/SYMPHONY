@@ -231,18 +231,6 @@ int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
 /*===========================================================================*/
 
 /*===========================================================================*\
- * The user has to generate the ubber bounds for the specified
- * variables. Lower bounds are always assumed (w.l.o.g.) to be zero.
-\*===========================================================================*/
-
-int user_get_upper_bounds(void *user, int varnum, int *indices, double *bd)
-{
-   return(DEFAULT);
-}
-
-/*===========================================================================*/
-
-/*===========================================================================*\
  * The user might want to generate cuts in the LP using information
  * about the current tableau, etc. This is for advanced users only.
 \*===========================================================================*/

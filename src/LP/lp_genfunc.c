@@ -543,7 +543,8 @@ int fathom(lp_prob *p, int primal_feasible)
 	 PRINT(p->par.verbosity, 1,
 	       ("Fathoming node (discovered tdf & not restorable inf.)\n\n"));
 	 send_node_desc(p, INFEASIBLE_PRUNED);
-	 free_col_set(&new_cols); return(TRUE);
+	 free_col_set(&new_cols);
+	 return(TRUE);
       }
       /* So primal feasibility is restorable. Exactly one column has been
        * added (released or a new variable) to destroy the proof of

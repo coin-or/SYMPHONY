@@ -157,13 +157,13 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
    *maxnz = *nz + ((*maxm) * (*maxn) / 10);
 
    /* Allocate the arrays. These are owned by SYMPHONY after returning. */
-   *matbeg  = (int *) malloc((*maxn + 1) * ISIZE);
-   *matind  = (int *) malloc(*maxnz * ISIZE);
-   *matval  = (double *) malloc(*maxnz * DSIZE);
-   *obj     = (double *) malloc(*maxn * DSIZE);
-   *rhs     = (double *) malloc(*maxm * DSIZE);
-   *sense   = (char *) malloc(*maxm * CSIZE);
-   *rngval  = (double *) calloc(*maxm, DSIZE);
+   *matbeg  = (int *) malloc((varnum + 1) * ISIZE);
+   *matind  = (int *) malloc((*nz) * ISIZE);
+   *matval  = (double *) malloc((*nz) * DSIZE);
+   *obj     = (double *) malloc(varnum * DSIZE);
+   *rhs     = (double *) malloc(rownum * DSIZE);
+   *sense   = (char *) malloc(rownum * CSIZE);
+   *rngval  = (double *) calloc(rownum, DSIZE);
 
    /* Fill out the appropriate data structures -- each column has
       exactly two entries */
@@ -897,7 +897,7 @@ int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
 /*===========================================================================*/
 
 /*===========================================================================*\
- * The user has to generate the ubber bounds for the specified
+ * The user has to generate the ubber bounds for the specified (non-base)
  * variables. Lower bounds are always assumed (w.l.o.g.) to be zero.
 \*===========================================================================*/
 

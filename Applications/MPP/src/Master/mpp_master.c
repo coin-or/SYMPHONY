@@ -12,10 +12,10 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include <malloc.h>
+#include <string.h>
 
 #include "BB_constants.h"
 #include "BB_macros.h"
@@ -23,17 +23,30 @@
 #include "mpp.h"
 #ifdef COMPILE_IN_TM
 #ifdef COMPILE_IN_LP
-/* fill these in for sequentail compilation */
+/* fill these in for sequential compilation if needed. */
 #ifdef COMPILE_IN_CG
-/* fill these in for sequentail compilation */
+/* fill these in for sequential compilation if needed. */
 #endif
 #ifdef COMPILE_IN_CP
-/* fill these in for sequentail compilation */
+/* fill these in for sequential compilation if needed. */
 #endif
 #endif
 #endif
 
+/*===========================================================================*\
+ * This file contains stubs for the user-written functions for the master 
+ * process. The primary function that has to be filled in here is user_io(),
+ * where the data for the instance is read in and the user data structure
+ * that stores the instance data filled out (this data structure is defined 
+ * in user.h). Other than that, the default routines should work fine.
+\*===========================================================================*/
+
 /*===========================================================================*/
+
+/*===========================================================================*\
+ * This function gives help on command-line switches defined by the user.
+ * All user switches have capital letters by convention.
+\*===========================================================================*/
 
 void user_usage(void){
   printf("master [ -H ] [ -F file ] \n\t%s\n\t%s\n",
@@ -41,14 +54,12 @@ void user_usage(void){
 	 "-F file: problem instance data is in 'file'");
 }
 
-/*===========================================================================*\
- * This file contains the user-written functions for the master process.
-\*===========================================================================*/
+/*===========================================================================*/
 
 /*===========================================================================*\
- * Initialize user-defined data structures. In this case, I store all
- * problem-specific data such as the location of the customers, edge costs,
- * etc. in this data-structure.
+ * Initialize user-defined data structures. This basically consists of 
+ * allocating the memory. If you are using the default data structure,
+ * nothing needs to be changed here.
 \*===========================================================================*/
 
 int user_initialize(void **user)
@@ -70,30 +81,50 @@ int user_initialize(void **user)
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
    FILE *f;
-   mpp_problem *mpp=(mpp_problem *)user;
-  
-   char line[50], key[50], value[50];
-   int c;
-  
-   strcpy(mpp->infile,argv[1]);
- /*  if ((f = fopen(filename, "r")) == NULL){
-      printf("SYMPHONY: file %s can't be opened\n", filename);
-      exit(1); /*error check for existence of parameter file
-} 
+   char line[50], key[50], value[50], c, tmp;
+   int i;
+   /* This gives you access to the user data structure*/
+   mpp_problem *mpp = (mpp_problem *) user;
+   mpp_parameters *par = &(mpp->par);
    
-   while(NULL != fgets(line, 50, f)){  /*read in parameter settings
-      strcpy(key, "");
-      sscanf(line, "%s%s", key, value);
-   } */     
+   if (strcmp(filename, "")){
+      if ((f = fopen(filename, "r")) == NULL){
+	 printf("SYMPHONY: file %s can't be opened\n", filename);
+	 exit(1); /*error check for existence of parameter file*/
+      }
+      
+      /* Here you can read in the parameter settings from the file. See the 
+	 function bc_readparams() for an example of how this is done. */
+      while(NULL != fgets(line, MAX_LINE_LENGTH, f)){  /*read in parameters*/
+	 strcpy(key, "");
+	 sscanf(line, "%s%s", key, value);
+	 
+	 if (strcmp(key, "input_file") == 0){
+	    par->infile[MAX_FILE_NAME_LENGTH] = 0;
+	    strncpy(par->infile, value, MAX_FILE_NAME_LENGTH);
+	 }
+      }      
+      
+      fclose(f);
+   }
 
-  /* while ((c = getopt(argc, argv, "H")) != -1){
+   /* Here you can parse the command line for options. By convention, the
+      users options should be capital letters */
+
+   for (i = 1; i < argc; i++){
+      sscanf(argv[i], "%c %c", &tmp, &c);
+      if (tmp != '-')
+	 continue;
       switch (c) {
        case 'H':
 	 user_usage();
 	 exit(0);
 	 break;
-      }; 
-   }*/
+       case 'F':
+	 strncpy(par->infile, argv[++i], MAX_FILE_NAME_LENGTH);
+	 break;
+      };
+   }
 
    return(USER_NO_PP);
 }
@@ -102,114 +133,143 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
 /*===========================================================================*\
  * Read in the data file, whose name was given in the parameter file.
- * This file contains instance data.
+ * This file contains instance data. Right now, this function is set up to 
+ * read in just the number of columns and number of rows from the file.
+ * Add more data as needed to describe the instance and set up the LP
+ * relaxation.
 \*===========================================================================*/
 
-
-
-void mpp_io(mpp_problem *mpp, char *infile)
+int user_io(void *user)
 {
-	int i;
-    char line1[80]; 
-	int holder;
+   /* This gives you access to the user data structure. */
+   mpp_problem *mpp = (mpp_problem *) user;
+   mpp_parameters *par = &(mpp->par);
+   char *infile = par->infile;
+   FILE *f = NULL;
+   char line[MAX_LINE_LENGTH], key[50], value[50];
+   int numvars, i;
 
-  FILE *f;
-	/* input will be of the following format
-	//  number of nodes
-	//  number of arcs
-	//  number of edges
-	//  a "start node" "end node" "cost"
-	//    --this until all edges are declared
-	//  e "start node" "end node" "cost"
-	//    --this until all arcs are declared */
+   /* Make sure the file exists and can be opened */
+   if (!strcmp(infile, "")){
+      printf("\nMpp I/O: No problem data file specified\n\n");
+      exit(1);
+   }
+   
+   if ((f = fopen(infile, "r")) == NULL){
+      printf("Readparams: file %s can't be opened\n", infile);
+      exit(1); /*error check for existence of parameter file*/
+   }
 
+   /* The file format is to first list the number of nodes, arcs, and edges,
+      and then to specify the head, tail, and cost of each arc and edge */
 
-//sets aside memory for the number for variables
-//laid out in the following way:
-// ****changed the order to arcs before edges for simplicity
-//vars[0] to vars [arcs-1] is the weights from start to end on arcs
-//vars[arcs] to vars [arcs+edges-1] is the weights from start to end on edges
-//vars[arcs+edges] to vars [2*edges+ arcs-1] is the weights from end to start on edges
-//  */
+   /* Read in the number of nodes */
+   fgets(line, MAX_LINE_LENGTH, f);
+   sscanf(line, "%s%s", key, value);
+   if (strcmp(key, "NUMNODES") == 0){
+      READ_INT_PAR(mpp->numnodes);
+   }else{
+      printf("Error in input file: Expected number of nodes\n\n");
+      exit(1);
+   }
 
+   /* Read in the number of arcs */
+   fgets(line, MAX_LINE_LENGTH, f);
+   sscanf(line, "%s%s", key, value);
+   if (strcmp(key, "NUMARCS") == 0){
+      READ_INT_PAR(mpp->numarcs);
+   }else{
+      printf("Error in input file: Expected number of arcs\n\n");
+      exit(1);
+   }
 
-/*makes sure the file exists and can be opened*/
-  if (!strcmp(infile, "")){
-     printf("\nMpp I/O: No problem data file specified\n\n");
-     exit(1);
-  }
-  
-  if ((f = fopen(infile, "r")) == NULL){
-     fprintf(stderr, "Mpp I/O: file '%s' can't be opened\n", infile);
-     exit(1);
-  }
+   /* Read in the number of edges */
+   fgets(line, MAX_LINE_LENGTH, f);
+   sscanf(line, "%s%s", key, value);
+   if (strcmp(key, "NUMEDGES") == 0){
+      READ_INT_PAR(mpp->numedges);
+   }else{
+      printf("Error in input file: Expected number of edges\n\n");
+      exit(1);
+   }
 
-  /* input first 3 ints  as number of nodes,arcs and edges respectively */
+   numvars = 2 * mpp->numedges + mpp->numarcs;
+   
+   /* Allocate the arrays */
+   mpp->type = (char *) malloc (numvars * sizeof(char));
+   mpp->cost = (int *)  malloc (numvars * sizeof(int));
+   mpp->head = (int *)  malloc (numvars * sizeof(int));
+   mpp->tail = (int *)  malloc (numvars * sizeof(int));
 
-  fgets( line1, 80, f);
-  sscanf(line1,"%d",&(mpp->nodes)); /*read in number of nodes*/
+   /* Read in the arcs and their data first */
+   for(i = 0; i < mpp->numarcs; i++){
+      if (!fgets(line, MAX_LINE_LENGTH, f)){
+	 printf("Error in input file: Expected more data\n\n");
+	 exit(1);
+      }
+      sscanf(line, "%c %i %i %i", mpp->type + i, mpp->tail + i,
+	     mpp->head + i, mpp->cost + i);
+      if (strncmp(mpp->type + i, "A", 1) != 0 &&
+	  strncmp(mpp->type + i, "a", 1) != 0 ){
+	 printf("Error in input file: Expected an arc\n\n");
+	 exit(1);
+      }
+   }
 
+   /* Read in the edges and their data */
+   for(i = mpp->numarcs; i < mpp->numarcs + mpp->numedges; i++){
+      if (!fgets(line, MAX_LINE_LENGTH, f)){
+	 printf("Error in input file: Expected more data/n/n");
+	 exit(1);
+      }
+      /*We have two variables associated with each edge, one for each direction*/
+      /* First variable */
+      sscanf(line, "%c %i %i %i", mpp->type + i,
+	                          mpp->tail + i,
+	                          mpp->head + i,
+	                          mpp->cost + i);
+      /* Second variable (direction reversed) */
+      sscanf(line, "%c %i %i %i", mpp->type + i + mpp->numedges,
+	                          mpp->head + i + mpp->numedges,
+	                          mpp->tail + i + mpp->numedges,
+	                          mpp->cost + i + mpp->numedges);
+      if (strncmp(mpp->type + i, "E", 1) != 0 &&
+	  strncmp(mpp->type + i, "e", 1) != 0 ){
+	 printf("Error in input file: Expected an edge/n/n");
+	 exit(1);
+      }
+   }
+   
+   if (fgets(line, MAX_LINE_LENGTH, f)){
+      printf("Ignoring extra data in input file./n/n");
+   }
 
-  fgets( line1, 80, f);
-  sscanf(line1,"%d",&(mpp->arcs)); /*read in number of arcs*/
-  
+   fclose(f);
 
-  fgets( line1, 80, f);
-  sscanf(line1,"%d",&(mpp->edges)); /*read in number of edges*/
-  holder=(mpp->edges+mpp->arcs);
-
-  mpp->types= (char *) malloc (holder*sizeof(char));
-
-  mpp->cost=(int *) malloc (holder*sizeof(int));
-
-  mpp->start_node=(int *) malloc (holder*sizeof(int));
-
-  mpp->end_node=(int *) malloc (holder*sizeof(int));
-
-  mpp->odd_checker=0;
-
-for(i = 0; i< mpp->edges + mpp->arcs ;i++)
-	{ 
-	 fgets(line1, 80, f);
-	 sscanf(line1,"%c %d %d %d",&(mpp->types[i]),&(mpp->start_node[i]),&(mpp->end_node[i]),&(mpp->cost[i])); /*read in next type*/
-
-	/* sscanf(line1,"%d", &(mpp->start_node[i])); /*read in next startnode*/
-   holder=mpp->start_node[i];
- /* 	 sscanf(line1,"%d",&(mpp->end_node[i])); /*read in next endnode*/
-    holder=mpp->end_node[i];
-/* 	 sscanf(line1,"%d",&(mpp->cost[i])); /*read in next cost*/
- holder=mpp->cost[i]; 
-	}
- 
+   return(USER_NO_PP);
 }
    
 /*===========================================================================*/
 
 /*===========================================================================*\
  * Here is where the heuristics are performed and an upper bound is calculated.
- * An upper bound can also be specified in the parameter file. 
+ * An upper bound can also be specified in the parameter file. This function
+ * need not be filled in if no upper bounding is done.
 \*===========================================================================*/
 
 int user_start_heurs(void *user, double *ub, double *ub_estimate)
 {
+   *ub = MAXDOUBLE;
+
    return(USER_NO_PP);
 }
 
 /*===========================================================================*/
 
 /*===========================================================================*\
- * If graph drawing will be use, the user must initialize the drawing
- * window here.
+ * If graph drawing will be used, the user must initialize the drawing
+ * window here. This function need not be filled in.
 \*===========================================================================*/
-int user_io(void *user)
-{
-   mpp_problem *mpp = (mpp_problem *)user;
-   
-   mpp_io(mpp, mpp->infile);
-
-   return(USER_NO_PP);
-}
-   
 
 int user_init_draw_graph(void *user, int dg_id)
 {
@@ -219,99 +279,63 @@ int user_init_draw_graph(void *user, int dg_id)
 /*===========================================================================*/
 
 /*===========================================================================*\
- * In this routine, I build the initial edge set for the root. There are
- * several things going on here. First, there is a user-defined parameter
- * defining whether or not to just go ahead and add all variables to the
- * problem up front (vrp->par.add_all_edges). Currently, this seems to be the
- * best option since the problems are small anyway. Further, I am doing some
- * preprocessing here by eliminating edges for which the sum of the demands of
- * their endpoints is greater than the capacity since these edges cannot
- * be in any feasible solution.
- *
- * Notice that there are several options programmed for which set
- * of edges should be in the base set. The
- * base constraints are just the degree constraints from the IP
- * formulation. These do not have to be specified explicitly, just the
- * number of them given.
+ * This is the subroutine where the user specifies what variables are to be in
+ * the base set. To begin with, a good bet is just to put all the variables in
+ * the base set. In this case, this function need not be modified.
 \*===========================================================================*/
 
 int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
 		  double **ub, int *basecutnum, int *colgen_strat)
-	{
-	mpp_problem *mpp=(mpp_problem *)user;
-int i;
-int base_varnum=0;
-	/*
-	RALPHS stuff
-	*basevarnum = 0;
-	*basevars = NULL;
-	*basecutnum = 0;
-
-	return(USER_NO_PP);
-	*/
-    base_varnum=2*mpp->edges+mpp->arcs;
-	*lb = (double *) malloc (base_varnum*sizeof(double));
-    *ub = (double *) malloc (base_varnum*sizeof(double));
-   
-	/* i want to set the number of variables in the base*/ 
-    
-	*basevarnum=base_varnum;
-	*basevars = (int *) realloc((char *)(*basevars), base_varnum * ISIZE);
-	/* the cuts in the base go as follows: 
-	//    (nodes) for each node indegree=outdegree
-	//    (edges) for each edge the sum of weights in each direction >= 1
-	*/
-	*basecutnum=(mpp->nodes)+(mpp->edges);
-/*  nonzeros
-4 for each edge
-2 for each arc
-2 for each edge
-  */
-    for (i = 0; i <= *basevarnum-1; i++)
-		{
-		(*basevars)[i]=i;
-		}
-	for (i = 0; i <= mpp->arcs-1; i++)
-		{
-		(*lb)[i]=1;
-		(*ub)[i]=mpp->arcs+mpp->edges;
-		}
-
-	for (i = mpp->arcs; i <= mpp->arcs+mpp->edges-1; i++)
-		{
-		(*lb)[i]=0;
-		(*ub)[i]=mpp->arcs+mpp->edges;
-		(*lb)[i+mpp->edges]=0;
-		(*ub)[i+mpp->edges]=mpp->arcs+mpp->edges;
-		}
-    return(USER_NO_PP);
-	}
-
-			
-            
-
-
-/*===========================================================================*\
- * This is the second step in the process where the user specifies
- * which variables should be active in the root in addition to the base
- * set specified above
-\*===========================================================================*/
-
-/*===========================================================================*/
-
-int user_create_root(void *user, int *extravarnum, int **extravars)
 {
-   mpp_problem *mpp=(mpp_problem *)user;
-   *extravarnum = 0;
-   *extravars  = NULL;
+   /* This gives you access to the user data structure. */
+   mpp_problem *mpp = (mpp_problem *) user;
+   int i;
+   int *vars, varnum;
+
+   /* Set the number of variables */
+   varnum = *basevarnum = 2 * mpp->numedges + mpp->numarcs;
  
+   /* Allocate memory for the upper and lower bounds. */
+   /* Lower bounds are (probably) all zero so calloc those. */
+   *lb = (double *) calloc (varnum, DSIZE);
+   *ub = (double *) malloc (varnum * DSIZE);
+
+   /* This puts all the variable in the base set and fills out the 
+      upper bounds */
+   vars = *basevars = (int *) malloc(varnum * ISIZE);
+   for (i = 0; i < varnum; i++){
+     vars[i] = i;
+     (*lb)[i] = (i < mpp->numarcs) ? 1.0 : 0.0;
+     (*ub)[i] = (double) (mpp->numarcs + mpp->numedges);
+   }
+
+   /* Set the number of rows in the base matrix */
+   *basecutnum = mpp->numnodes + mpp->numedges;
+
    return(USER_NO_PP);
 }
 
 /*===========================================================================*/
 
 /*===========================================================================*\
- * Receive the feasible solution
+ * This is the second step in the process, where the user specifies
+ * which variables should be active in the root in addition to the base
+ * set specified above. The set of extra variable would be empty if all
+ * variables are in the base, as above.
+\*===========================================================================*/
+
+int user_create_root(void *user, int *extravarnum, int **extravars)
+{
+   *extravarnum = 0;
+   *extravars  = NULL;
+
+   return(USER_NO_PP);
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Receive the feasible solution. Doesn't need to be filled in.
 \*===========================================================================*/
 
 int user_receive_feasible_solution(void *user, int msgtag, double cost,
@@ -329,21 +353,24 @@ int user_receive_feasible_solution(void *user, int msgtag, double cost,
  * message-passing. Otherwise, we can allocate the user-defined LP data
  * structure here and simply copy the necessary information. This is the
  * only place the user has to sorry about this distinction between
- * configurations. 
+ * configurations. If running sequentially and using the default data
+ * structure, nothing needs to be modified in here.
 \*===========================================================================*/
 
 int user_send_lp_data(void *user, void **user_lp)
 {
-/*#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-   /* This is is the case when we are copying data directly because
-      the LP is not running separately. This code should be virtually
-      identical to that of user_receive_lp_data() in the LP process.
+   /* This gives you access to the user data structure. */
+   mpp_problem *mpp = (mpp_problem *) user;
+
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+
+   *user_lp = mpp;
+
 #else
    /* Here, we send that data using message passing and the rest is
-      done in user_receive_lp_data() in the LP process 
-#endif*/
-	mpp_problem *mpp=(mpp_problem *)user;
-	*user_lp = (void *)mpp;
+      done in user_receive_lp_data() in the LP process */
+#endif
+
    return(USER_NO_PP);
 }
 
@@ -356,13 +383,30 @@ int user_send_lp_data(void *user, void **user_lp)
  * message-passing. Otherwise, we can allocate the user-defined LP data
  * structure here and simply copy the necessary information. This is the
  * only place the user has to sorry about this distinction between
- * configurations. 
+ * configurations. If running sequentially and using the default data
+ * structure, nothing needs to be modified in here.
 \*===========================================================================*/
 
 int user_send_cg_data(void *user, void **user_cg)
 {
-mpp_problem *mpp=(mpp_problem *)user;
-	*user_cg = (void *)mpp;
+   /* This gives you access to the user data structure. */
+   mpp_problem *mpp = (mpp_problem *) user;
+
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CG)
+
+   *user_cg = mpp;
+   
+#ifdef CHECK_CUT_VALIDITY
+   /* Send the feasible solution here */
+#endif
+#else
+   /* Here, we send that data using message passing and the rest is
+      done in user_receive_cg_data() in the CG process */
+#ifdef CHECK_CUT_VALIDITY
+   /* Send the feasible solution here */
+#endif
+#endif
+
    return(USER_NO_PP);
 }
 
@@ -375,19 +419,24 @@ mpp_problem *mpp=(mpp_problem *)user;
  * message-passing. Otherwise, we can allocate the user-defined LP data
  * structure here and simply copy the necessary information. This is the
  * only place the user has to sorry about this distinction between
- * configurations. 
+ * configurations. If running sequentially and using the default data
+ * structure, nothing needs to be modified in here.
 \*===========================================================================*/
 
 int user_send_cp_data(void *user, void **user_cp)
 {
+   /* This gives you access to the user data structure. */
+   mpp_problem *mpp = (mpp_problem *) user;
+
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CP)
-   /* This is is the case when we are copying data directly because
-      the LP is not running separately. This code should be virtually
-      identical to that of user_receive_cp_data() in the CP process.*/
+
+   *user_cp = mpp;
+
 #else
    /* Here, we send that data using message passing and the rest is
       done in user_receive_cp_data() in the CP process */
 #endif
+
    return(USER_NO_PP);
 }
 
@@ -413,18 +462,16 @@ int user_process_own_messages(void *user, int msgtag)
 
 /*===========================================================================*\
  * This is the user's chance to display the solution in whatever
- * manner desired. 
+ * manner desired. Change the return value to USER_NO_PP if you want to
+ * display the solution yourself. A return value of USER_AND_PP will cause the
+ * default solution display routine to be executed, even if the user displays
+ * the solution as well.
 \*===========================================================================*/
 
 int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 			  double *values, double objval)
 {
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-   /* In this case, the LP user data structure is passed in */
-#else
-   /* In this case, it is the master user data structure */
-#endif
-	return(USER_NO_PP);
+   return(DEFAULT);
 }
    
 /*===========================================================================*/
@@ -450,12 +497,15 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 
 int user_free_master(void **user)
 {
-   mpp_problem *mpp=(mpp_problem *)user;
-   FREE(mpp->cost);   /* an array containing the cost for each edge*/
-   FREE(mpp->start_node);    /* an array containing the start for each edge*/
-   FREE(mpp->end_node);    /* an array containing the end for each edge*/
-   FREE(mpp->types);  /* an array containing the types for each edge */
-   
+   /* This gives you access to the user data structure. */
+   mpp_problem *mpp = (mpp_problem *) (*user);
+
+   FREE(mpp->cost);
+   FREE(mpp->head);
+   FREE(mpp->tail);
+   FREE(mpp->type);
+   FREE(mpp);
+
    return(USER_NO_PP);
 }
 

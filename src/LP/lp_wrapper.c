@@ -1399,10 +1399,10 @@ int generate_column_u(lp_prob *p, int lpcutnum, cut_data **cuts,
 		      double *colval, int *colind, int *collen, double *obj)
 {
    int real_nextind = nextind;
-   (void) user_generate_column(p->user, generate_what,
-			       p->lp_data->m - p->base.cutnum, cuts,
-			       prevind, nextind, &real_nextind,
-			       colval, colind, collen, obj);
+   CALL_USER_FUNCTION( user_generate_column(p->user, generate_what,
+					    p->lp_data->m - p->base.cutnum, cuts,
+					    prevind, nextind, &real_nextind,
+					    colval, colind, collen, obj) );
    return(real_nextind);
 }
 

@@ -13,31 +13,37 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _MPP_TYPES_H
-#define _MPP_TYPES_H
+#ifndef _MPP_H
+#define _MPP_H
 
-#include "proto.h"
+/* Cut types */
+
+#define ODD_CUT 1
 
 /*---------------------------------------------------------------------------*\
- * The problem data structure contains the data for a problem instance, as
- * well as some of the tours that have been generated.
+ * Use this data structure to store the value of any run-time parameters.
+\*---------------------------------------------------------------------------*/
+
+typedef struct MPP_PARAMETERS{
+   /* Name of file containingthe instance data */
+   char             infile[MAX_FILE_NAME_LENGTH + 1];
+}mpp_parameters;
+
+/*---------------------------------------------------------------------------*\
+ * Use this data structure to store the instance data after it is read in.
 \*---------------------------------------------------------------------------*/
 
 typedef struct MPP_PROBLEM{
-   char            name[100];  /* the name of the problem instance */
-   char infile[12];
- //  int             dg_id;     /* drawgraph process id */
-   
-   int nodes;   /* the number of nodes in the problem*/
-   int edges;   /* number of edges in the problem */
-   int arcs;    /* number of arcs in the problem */
-   int *cost;   /* an array containing the cost for each edge*/
-   int *start_node;    /* an array containing the start for each edge*/
-   int *end_node;    /* an array containing the end for each edge*/
-   char *types;  /* an array containing the types for each edge */
-   int *is_odd;  /* arrat containing for each node a 1 if odd 0 if not*/
-   int odd_checker; /*indicates if odds have been checked */
-
+   mpp_parameters  par;        /* the parameters */
+   int             numnodes;   /* the number of nodes in the graph */
+   int             numedges;   /* number of edges in the graph */
+   int             numarcs;    /* number of arcs in the graph */
+   int            *cost;       /* an array containing the costs */
+   int            *head;       /* an array containing the head of each arc/edge*/
+   int            *tail;       /* an array containing the tail of each arc/edge*/
+   char           *type;      /* an array containing the variable types */
+   int            *is_odd;     /* array containing a 1 if odd 0 if not*/
+   int             odd_checker;/*indicates if odds have been checked */
 }mpp_problem; 
 
 #endif
