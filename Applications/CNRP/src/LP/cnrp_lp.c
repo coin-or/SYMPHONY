@@ -514,7 +514,11 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    compcuts = (double *) calloc (vertnum + 1, sizeof(double));
    /*get the components of the solution graph without the depot to check if the
      graph is connected or not*/
+#if defined(ADD_FLOW_VARS) && !defined(ADD_CAP_CUTS)
+   rcnt = flow_connected(n, compnodes, compdemands, NULL, compcuts, NULL, lpetol);
+#else
    rcnt = connected(n, compnodes, compdemands, NULL, compcuts, NULL);
+#endif
    
    /*------------------------------------------------------------------------*\
     * For each component check to see if the cut it induces is nonzero.

@@ -257,21 +257,11 @@ network *create_flow_net(int *xind, double *xval, int edgenum, double etol,
 	      edge1 = edge1->next_edge){
 	    if (edge1->other_end == nv1){
 	       if (nv0 < nv1){
-		  if (fabs(floor(xval[i] + 0.5) - xval[i]) > etol){
-		     edge1->data->weight += xval[i];
-		     edge1->data->weight1 = xval[i];
-		  }else{
-		     edge1->data->weight += floor(xval[i] + 0.5);
-		     edge1->data->weight1 = floor(xval[i] + 0.5);
-		  }
+		  edge1->data->weight += xval[i];
+		  edge1->data->weight1 = xval[i];
 	       }else{
-		  if (fabs(floor(xval[i] + 0.5) - xval[i]) > etol){
-		     edge1->data->weight += xval[i];
-		     edge1->data->weight2 = xval[i];
-		  }else{
-		     edge1->data->weight += floor(xval[i] + 0.5);
-		     edge1->data->weight2 = floor(xval[i] + 0.5);
-		  }
+		  edge1->data->weight += xval[i];
+		  edge1->data->weight2 = xval[i];
 	       }
 	       edge_exists = TRUE;
 	       break;
@@ -281,37 +271,19 @@ network *create_flow_net(int *xind, double *xval, int edgenum, double etol,
 	    continue;
 	 }else{
 	    if (nv0 < nv1){
-	       if (fabs(floor(xval[i] + 0.5) - xval[i]) > etol){
-		  net_edges->weight += xval[i];
-		  net_edges->weight1 = xval[i];
-	       }else{
-		  net_edges->weight += floor(xval[i] + 0.5);
-		  net_edges->weight1 = floor(xval[i] + 0.5);
-	       }
+	       net_edges->weight += xval[i];
+	       net_edges->weight1 = xval[i];
 	    }else{
-	       if (fabs(floor(xval[i] + 0.5) - xval[i]) > etol){
-		  net_edges->weight += xval[i];
-		  net_edges->weight2 = xval[i];
-	       }else{
-		  net_edges->weight += floor(xval[i] + 0.5);
-		  net_edges->weight2 = floor(xval[i] + 0.5);
-	       }
+	       net_edges->weight += xval[i];
+	       net_edges->weight2 = xval[i];
 	    }
 	 }
 #else
-	 if (fabs(floor(xval[i] + 0.5) - xval[i]) > etol){
-	    net_edges->weight = xval[i];
-	 }else{
-	    net_edges->weight = floor(xval[i] + 0.5);
-	 }
+	 net_edges->weight = xval[i];
 #endif
       }
 #else
-      if (fabs(floor(xval[i] + 0.5) - xval[i]) > etol){
-	 net_edges->weight = xval[i];
-      }else{
-	 net_edges->weight = floor(xval[i] + 0.5);
-      }
+      net_edges->weight = xval[i];
 #endif
       
       net_edges->v0 = nv0 < nv1 ? nv0 : nv1;
