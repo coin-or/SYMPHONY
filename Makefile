@@ -21,8 +21,8 @@
 # add it below and then search for the places where there are
 # architecture-specific variables set and make sure to set them properly for
 # your specific architecture. For each architecture, there will be three
-# subdirectories created called $(USERROOT)/bin.$(ARCH),
-# $(USERROOT)/dep.$(ARCH) and ${USERROOT)/objects.$(ARCH) where the
+# subdirectories created called $(USERROOT)/bin/$(ARCH),
+# $(USERROOT)/dep/$(ARCH) and ${USERROOT)/objects/$(ARCH) where the
 # corresponding objects, binaries, and dependencies for each architecture type
 # will reside.
 ##############################################################################
@@ -45,6 +45,16 @@ ARCH = LINUX
 ##############################################################################
 
 #ARCH=${PVM_ARCH}
+
+##############################################################################
+# If you want to build SYMPHONY in a directory outside the source tree, 
+# uncomment this and fill in the directory here. Setting this variable will 
+# cause all object, library, and binary files to be built and installed in this
+# root directory. This is helpful if you don't have write access to the 
+# directory where SYMPHONY is installed.
+##############################################################################
+
+#SYMBUILDDIR = .
 
 ##############################################################################
 # If you are getting errors using make, try changing MAKE to "gmake" and also 
@@ -545,6 +555,10 @@ else
 SYMPHONYROOT = $(PWD)
 endif
 
+ifeq ($(SYMBUILDDIR),)
+SYMBUILDDIR = $(SYMPHONYROOT)
+endif
+
 ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 	CONFIG:=1
 else
@@ -575,35 +589,35 @@ INCDIR 	    += -I$(SYMPHONYROOT)/include/decomp
 endif
 #___END_EXPERIMENTAL_SECTION___#
 
-USER_OBJDIR  = $(USERROOT)/objects.$(ARCH)/$(CONFIG)/
-DEPDIR       = $(SYMPHONYROOT)/dep.$(ARCH)
-USER_DEPDIR  = $(USERROOT)/dep.$(ARCH)
+USER_OBJDIR  = $(USERBUILDDIR)/objects/$(ARCH)/$(CONFIG)/
+DEPDIR       = $(SYMBUILDDIR)/dep/$(ARCH)
+USER_DEPDIR  = $(USERBUILDDIR)/dep/$(ARCH)
 
 ifeq ($(USE_GLPMPL), TRUE)
 GMPLINCDIR   = $(SYMPHONYROOT)/GMPL
 LPINCDIR    += $(GMPLINCDIR)
-GMPL_OBJDIR  = $(SYMPHONYROOT)/GMPL/objects.$(ARCH)
+GMPL_OBJDIR  = $(SYMBUILDDIR)/GMPL/objects/$(ARCH)
 endif
 
 ifeq ($(LP_SOLVER),OSI)
 ifeq ($(USE_SYM_APPL), TRUE)
-OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/APPL_$(LP_SOLVER)_$(OSI_INTERFACE)
-LIBDIR	     = $(SYMPHONYROOT)/lib.$(ARCH)/APPL_$(LP_SOLVER)_$(OSI_INTERFACE)
-BINDIR       = $(USERROOT)/bin.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
+OBJDIR	     = $(SYMBUILDDIR)/objects/$(ARCH)/$(CONFIG)/APPL_$(LP_SOLVER)_$(OSI_INTERFACE)
+LIBDIR	     = $(SYMBUILDDIR)/lib/$(ARCH)/APPL_$(LP_SOLVER)_$(OSI_INTERFACE)
+BINDIR       = $(USERBUILDDIR)/bin/$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
 else
-OBJDIR   = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)_$(OSI_INTERFACE)
-LIBDIR   = $(SYMPHONYROOT)/lib.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
-BINDIR   = $(SYMPHONYROOT)/bin.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
+OBJDIR   = $(SYMBUILDDIR)/objects/$(ARCH)/$(CONFIG)/$(LP_SOLVER)_$(OSI_INTERFACE)
+LIBDIR   = $(SYMBUILDDIR)/lib/$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
+BINDIR   = $(SYMBUILDDIR)/bin/$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
 endif
 else
 ifeq ($(USE_SYM_APPL), TRUE)
-OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/APPL_$(LP_SOLVER)
-LIBDIR	     = $(SYMPHONYROOT)/lib.$(ARCH)/APPL_$(LP_SOLVER)
-BINDIR       = $(USERROOT)/bin.$(ARCH)/$(LP_SOLVER)
+OBJDIR	     = $(SYMBUILDDIR)/objects/$(ARCH)/$(CONFIG)/APPL_$(LP_SOLVER)
+LIBDIR	     = $(SYMBUILDDIR)/lib/$(ARCH)/APPL_$(LP_SOLVER)
+BINDIR       = $(USERBUILDDIR)/bin/$(ARCH)/$(LP_SOLVER)
 else
-OBJDIR   = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)
-LIBDIR   = $(SYMPHONYROOT)/lib.$(ARCH)/$(LP_SOLVER)
-BINDIR   = $(SYMPHONYROOT)/bin.$(ARCH)/$(LP_SOLVER)
+OBJDIR   = $(SYMBUILDDIR)/objects/$(ARCH)/$(CONFIG)/$(LP_SOLVER)
+LIBDIR   = $(SYMBUILDDIR)/lib/$(ARCH)/$(LP_SOLVER)
+BINDIR   = $(SYMBUILDDIR)/bin/$(ARCH)/$(LP_SOLVER)
 endif
 endif
 
@@ -703,7 +717,7 @@ ifeq ($(ARCH),X86SOL2)
 endif
 
 PFLAGS = -cache-dir=$(PURIFYCACHEDIR) -chain-length=10 \
-	 -user-path=$(USERROOT)/bin.$(ARCH) \
+	 -user-path=$(USERBUILDDIR)/bin/$(ARCH) \
          #-log-file=$(USERROOT)/purelog_%v.%p \
          #-mail-to-user=$(USER) # -copy-fd-output-to-logfile=1,2
 PURIFY = $(PUREBIN) $(PFLAGS)
@@ -723,7 +737,7 @@ ifeq ($(ARCH),X86SOL2)
 	QUANTIFYBIN = /opts/pure/quantify-2.1-solaris2/quantify
 endif
 QFLAGS   = -cache-dir=$(QUANTIFYCACHEDIR) 
-QFLAGS  += -user-path=$(SYMPHONYROOT)/$(USERROOT)/bin.$(ARCH)
+QFLAGS  += -user-path=$(USERROOT)/bin/$(ARCH)
 QUANTIFY = $(QUANTIFYBIN) $(QFLAGS)
 
 ##############################################################################
@@ -888,7 +902,7 @@ LIBNAME_TYPE      = $(addsuffix .so, $(addprefix lib, $(LIBNAME)))
 LIBLDFLAGS = -shared -Wl,-soname,$(LIBNAME_TYPE) -o
 RANLIB = 
 endif
-SYMLIBDIR  = $(SYMPHONYROOT)/lib
+SYMLIBDIR  = $(SYMBUILDDIR)/lib
 MKSYMLIBDIR    = mkdir -p $(SYMLIBDIR)
 LN_S = ln -fs $(LIBDIR)/$(LIBNAME_TYPE) $(SYMLIBDIR)
 endif
