@@ -249,11 +249,13 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       can->feasible = pfeas;
       can->iterd = piter;
       can->solutions = (double **)calloc(maxnum, sizeof(double *));
+#ifdef SENSITIVITY_ANALYSIS
       if (p->tm->par.sensitivity_analysis){      
 	 can->duals = (double **)calloc(maxnum, sizeof(double *));
       }else{
 	 can->duals = NULL;	 
       }
+#endif
 #ifdef COMPILE_FRAC_BRANCHING
       can->frac_num = pfrnum;
       can->frac_ind = pfrind;
@@ -263,11 +265,13 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #else
       can->solutions = (double **) calloc 
 	 (MAX_CHILDREN_NUM, sizeof(double *));
-      if (p->tm->par.sensitivity_analysis){      
+#ifdef SENSITIVITY_ANALYSIS
+      if (p->par.sensitivity_analysis){      
 	 can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
       }else{
 	 can->duals = NULL;	 
-      }	 
+      }
+#endif
 #endif
 
 #ifdef STATISTICS
@@ -315,11 +319,13 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
 	    memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 
-	    if (p->tm->par.sensitivity_analysis){      
+#ifdef SENSITIVITY_ANALYSIS
+	    if (p->par.sensitivity_analysis){      
 	       get_dj_pi(lp_data);
 	       can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
 	       memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
 	    }
+#endif
 
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
@@ -393,11 +399,13 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
 	    memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 
-	    if (p->tm->par.sensitivity_analysis){      
+#ifdef SENSITIVITY_ANALYSIS
+	    if (p->par.sensitivity_analysis){      
 	       get_dj_pi(lp_data);
 	       can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
 	       memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
 	    }
+#endif
 
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */

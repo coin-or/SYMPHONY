@@ -24,7 +24,6 @@
 #include "master_params.h"
 #ifdef COMPILE_IN_TM
 #include "tm.h"
-#include "lp.h"
 #endif
 
 /*===========================================================================*\
@@ -34,6 +33,7 @@
 
 typedef struct SYM_ENVIRONMENT{
    void            *user;
+   int              my_tid;
    int              tm_tid;
    int              dg_tid;
    params           par;         /* problem parameters */

@@ -607,13 +607,13 @@ void print_tree_status(tm_prob *tm)
    
    printf("\nCurrent number of candidate nodes: %i\n", tm->samephase_candnum);
    if (tm->has_ub){
-      if (tm->lpp[0]->mip->obj_sense == SYM_MAXIMIZE){
+      if (tm->obj_sense == SYM_MAXIMIZE){
 	 printf("Current lower bound:               %.2f\n", -tm->ub);
       }else{
 	 printf("Current upper bound:               %.2f\n", tm->ub);
       }
    }else{
-      if (tm->lpp[0]->mip->obj_sense == SYM_MAXIMIZE){
+      if (tm->obj_sense == SYM_MAXIMIZE){
 	 printf("No lower bound found yet...\n");
       }else{
 	 printf("No upper bound found yet...\n");
@@ -630,7 +630,7 @@ void print_tree_status(tm_prob *tm)
    if (tm->lb >= MAXDOUBLE / 2){
       tm->lb = tm->ub;
    }
-   if (tm->lpp[0]->mip->obj_sense == SYM_MAXIMIZE){
+   if (tm->obj_sense == SYM_MAXIMIZE){
       printf("Current upper bound:               %.2f\n", -tm->lb);
    }else{
       printf("Current lower bound:               %.2f\n", tm->lb);
@@ -1173,13 +1173,15 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       desc->desc = node->desc.desc;
       desc->nf_status = node->desc.nf_status;
 
-      if(tm->par.sensitivity_analysis){ 
+#ifdef SENSITIVITY_ANALYSIS
+      if (tm->par.sensitivity_analysis){ 
 	 child->sol = bobj->solutions[i];
 	 child->duals = bobj->duals[i];
 	 bobj->solutions[i] = 0;
 	 bobj->duals[i] = 0;
       }
-
+#endif
+      
 #if 0
 
 	 child->sol = 
@@ -2222,8 +2224,9 @@ int tasks_before_phase_two(tm_prob *tm)
       printf( "**********************************************\n\n");
       
       print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, tm->lb, 0,
-		       tm->start_time, wall_clock(NULL), tm->lpp[0]->mip->obj_offset,
-		       tm->lpp[0]->mip->obj_sense, tm->has_ub);
+		       tm->start_time, wall_clock(NULL),
+		       tm->obj_offset,
+		       tm->obj_sense, tm->has_ub);
    }
 #else
    /* Report to the master all kind of statistics */
@@ -3004,7 +3007,9 @@ void free_tree_node(bc_node *n)
 
    int i;
    FREE(n->sol);
+#ifdef SENSITIVITY_ANALYSIS
    FREE(n->duals);
+#endif
    FREE(n->children);
 #ifndef MAX_CHILDREN_NUM
    FREE(n->bobj.sense);

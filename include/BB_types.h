@@ -190,7 +190,7 @@ typedef struct BRANCH_OBJ{
 				  sense only for branching cuts */
 #endif
    int           child_num;    /* Number of kids */
-#if defined(COMPILING_FOR_TM) || defined(COMPILE_IN_LP) 
+#if defined(COMPILING_FOR_TM) || defined(COMPILING_FOR_MASTER) || defined(COMPILE_IN_LP) 
    int           name;         /* userind for VAR, the index for CUT */
 #endif
 
@@ -240,10 +240,13 @@ typedef struct BRANCH_OBJ{
 
 #endif
 
-   double      **solutions;
-   double      **duals;
-
 #endif
+
+   double      **solutions;
+#ifdef SENSITIVITY_ANALYSIS
+   double      **duals;
+#endif
+   
 }branch_obj;
 
 /*===========================================================================*/
@@ -323,11 +326,13 @@ typedef struct BC_NODE{
 
    int          feasibility_status;  
    int          sol_size;
+   double      *sol;
+#ifdef SENSITIVITY_ANALYSIS
    int          dual_size;
-   double       *sol;
-   double       *duals;
+   double      *duals;
    double       C_LP;
    double       B_IP;
+#endif
 
 #ifdef TRACE_PATH
    char       optimal_path;

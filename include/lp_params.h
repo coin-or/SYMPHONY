@@ -142,7 +142,6 @@ typedef struct LP_PARAMS{
    double            mc_gamma; /* Weight on first objective */
    double            mc_tau;   /* Weight on second objective */
 
-   /*Sens Analysis parameters */
    int               sensitivity_analysis;
 
 }lp_params;

@@ -517,6 +517,7 @@ void send_node_desc(lp_prob *p, char node_type)
       tm->active_nodes[p->proc_index];
    node_desc *tm_desc = &n->desc;
 
+#ifdef SENSITIVITY_ANALYSIS
    if (tm->par.sensitivity_analysis){ 
       if (n->sol){
 	 FREE(n->sol);
@@ -530,6 +531,7 @@ void send_node_desc(lp_prob *p, char node_type)
       n->duals = (double *) malloc (DSIZE * p->base.cutnum);
       memcpy(n->duals, lp_data->dualsol, DSIZE*p->base.cutnum);
    }
+#endif
    
 #else
    int s_bufid;
@@ -862,12 +864,26 @@ void send_node_desc(lp_prob *p, char node_type)
       }
    }
 #else
+#ifdef SENSITIVITY_ANALYSIS
+   if (p->par.sensitivity_analysis){
+      send_int_array(&p->desc->uind.size, 1);
+      send_dbl_array(lp_data->x, p->desc->uind.size);
+      send_int_array(&p->base.cutnum, 1);
+      send_dbl_array(lp_data->dualsol, p->base.cutnum);
+   }
+#endif
    if ((node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
 	node_type == DISCARDED_NODE || node_type == FEASIBLE_PRUNED) &&
        !p->par.keep_description_of_pruned){
       s_bufid = init_send(DataInPlace);
       send_char_array(&repricing, 1);
       send_char_array(&node_type, 1);
+      if (node_type == FEASIBLE_PRUNED) {
+	 if (!p->par.sensitivity_analysis){ 
+	    send_int_array(&p->desc->uind.size, 1);
+	    send_dbl_array(lp_data->x, p->desc->uind.size);
+	 }
+      }
       send_msg(p->tree_manager, LP__NODE_DESCRIPTION);
       freebuf(s_bufid);
       return;

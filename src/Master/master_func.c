@@ -14,6 +14,8 @@
 /*                                                                           */
 /*===========================================================================*/
 
+#define COMPILING_FOR_MASTER
+
 #include <malloc.h>
 #include <string.h>
 #include <stdio.h>
@@ -1317,7 +1319,9 @@ int copy_node(bc_node * n_to, bc_node *n_from)
 	  n_to->bobj.child_num*DSIZE); 
    memcpy(n_to->bobj.branch, n_from->bobj.branch, 
 	  n_to->bobj.child_num*ISIZE);     
-   
+
+#if 0
+   /* We shouldn't need to copy this. It's only used in the LP */
    memcpy(n_to->bobj.objval, n_from->bobj.objval, 
 	  n_to->bobj.child_num*DSIZE); 
    memcpy(n_to->bobj.termcode, n_from->bobj.termcode, 
@@ -1326,7 +1330,8 @@ int copy_node(bc_node * n_to, bc_node *n_from)
 	  n_to->bobj.child_num*ISIZE); 
    memcpy(n_to->bobj.feasible, n_from->bobj.feasible, 
 	  n_to->bobj.child_num*ISIZE);     
-
+#endif
+   
    n_to->desc = n_from->desc;
 
    if (n_to->desc.uind.size){
@@ -1481,16 +1486,12 @@ int write_node(bc_node *node, FILE*f)
       fprintf(f," PARENT_INDEX    : -1\n");
    }
 
-   fprintf(f," CHILDREN(Type,Name,Num,Position) : %i %i %i %i\n", 
-	   (int)node->bobj.type, node->bobj.name, node->bobj.child_num,
-	   node->bobj.position);           
+   fprintf(f, "CHILDREN:        %i %i %i\n", (int)node->bobj.type,
+           node->bobj.name, node->bobj.child_num);
    for (i = 0; i < node->bobj.child_num; i++){
-      fprintf(f," %i %c %.4f %.4f %i %.4f %i %i %i\n",
-	      node->children[i]->bc_index,
-	      node->bobj.sense[i], node->bobj.rhs[i],
-	      node->bobj.range[i], node->bobj.branch[i],
-	      node->bobj.objval[i], node->bobj.termcode[i],
-	      node->bobj.iterd[i], node->bobj.feasible[i]);
+      fprintf(f, "%i %c %f %f %i\n", node->children[i]->bc_index,
+              node->bobj.sense[i], node->bobj.rhs[i],
+              node->bobj.range[i], node->bobj.branch[i]);
    }
 
    fprintf(f," NODE_DESCRIPTION                 : %i\n",node->desc.nf_status);
@@ -1648,8 +1649,8 @@ int read_node(bc_node * node, FILE * f)
    fscanf(f,"%s %s %c", str, str, &node->optimal_path);
 #endif
    fscanf(f,"%s %s %i", str, str, &num);
-   fscanf(f,"%s %s %i %i %i %i", str, str, &ch, &node->bobj.name, &
-	  node->bobj.child_num, &node->bobj.position);
+   fscanf(f,"%s %s %i %i %i", str, str, &ch, &node->bobj.name,
+	  &node->bobj.child_num);
    node->bobj.type = (char)ch;
    if (node->bobj.child_num){
 #ifndef MAX_CHILDREN_NUM
@@ -1657,17 +1658,11 @@ int read_node(bc_node * node, FILE * f)
       node->bobj.rhs = (double *) malloc(node->bobj.child_num*DSIZE);
       node->bobj.range = (double *) malloc(node->bobj.child_num*DSIZE);
       node->bobj.branch = (int *) malloc(node->bobj.child_num*ISIZE);
-      node->bobj.objval = (double *) malloc(node->bobj.child_num*DSIZE);
-      node->bobj.termcode = (int *) malloc(node->bobj.child_num*ISIZE);
-      node->bobj.iterd = (int *) malloc(node->bobj.child_num*ISIZE);
-      node->bobj.feasible = (int *) malloc(node->bobj.child_num*ISIZE);
 #endif
-      for(i=0; i<node->bobj.child_num; i++){
-	 fscanf(f,"%i %c %lf %lf %i %lf %i %i %i", &num, &node->bobj.sense[i], 
+      for(i = 0; i < node->bobj.child_num; i++){
+	 fscanf(f,"%i %c %lf %lf %i", &num, &node->bobj.sense[i], 
 		&node->bobj.rhs[i], &node->bobj.range[i], 
-		&node->bobj.branch[i], &node->bobj.objval[i], 
-		&node->bobj.termcode[i], &node->bobj.iterd[i], 
-		&node->bobj.feasible[i]);
+		&node->bobj.branch[i]);
       }
    }
 
@@ -2327,12 +2322,19 @@ int set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "sensitivity_analysis") == 0 ||
 	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
+#ifdef SENSITIVITY_ANALYSIS
       READ_INT_PAR(tm_par->sensitivity_analysis);
       if(tm_par->sensitivity_analysis){
 	 tm_par->keep_description_of_pruned = KEEP_IN_MEMORY;
       }else{
 	 tm_par->keep_description_of_pruned = DISCARD;
       }
+      lp_par->sensitivity_analysis = tm_par->sensitivity_analysis;
+#else
+      printf("Warning: Sensitivity analysis features are not currently\n");
+      printf("         enabled. You must rebuild SYMPHONY with these\n");
+      printf("         features enabled in order to use them.\n\n");
+#endif
       return(0);
    }
    
@@ -3325,6 +3327,7 @@ sym_environment * create_copy_environment (sym_environment *env)
 double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind, 
 			  double *val)
 {
+#ifdef SENSITIVITY_ANALYSIS
    int i, j, retval;
    double min = SYM_INFINITY;
    bc_node * child;
@@ -3401,6 +3404,12 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
    }
 
    return (min);
+#else
+   printf("get_lb_for_new_rhs():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(-SYM_INFINITY);
+#endif
 } 
 
 /*===========================================================================*/
@@ -3409,6 +3418,7 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 double get_lb_for_new_obj(bc_node *root, MIPdesc *mip, int cnt, 
 				int *ind, double *val)
 {
+#ifdef SENSITIVITY_ANALYSIS
    int i, j, n, retval;
    double inf = SYM_INFINITY;
    double min = inf;
@@ -3471,6 +3481,12 @@ double get_lb_for_new_obj(bc_node *root, MIPdesc *mip, int cnt,
    } else {
       return (-inf);
    }
+#else
+   printf("get_lb_for_new_obj():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(-SYM_INFINITY);
+#endif
 }
 
 /*===========================================================================*/
@@ -3479,6 +3495,7 @@ double get_lb_for_new_obj(bc_node *root, MIPdesc *mip, int cnt,
 double get_ub_for_new_obj(bc_node *root, MIPdesc *mip, int cnt, 
 				int *ind, double *val)
 {
+#ifdef SENSITIVITY_ANALYSIS
    int i, j, n;
    double inf = SYM_INFINITY;
    double min = inf;
@@ -3541,7 +3558,12 @@ double get_ub_for_new_obj(bc_node *root, MIPdesc *mip, int cnt,
    }
 
    return (min);
-
+#else
+   printf("get_ub_for_new_obj():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(SYM_INFINITY);
+#endif
 }
 
 /*===========================================================================*/
@@ -3551,6 +3573,7 @@ double get_ub_for_new_obj(bc_node *root, MIPdesc *mip, int cnt,
 double get_ub_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, 
 			  int *ind, double *val)
 {
+#ifdef SENSITIVITY_ANALYSIS
    int i, j, k, n;
    double inf = SYM_INFINITY;
    double min = inf;
@@ -3649,6 +3672,12 @@ double get_ub_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt,
    }
 
    return (min);  
+#else
+   printf("get_ub_for_new_rhs():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(SYM_INFINITY);
+#endif
 } 
 
 /*===========================================================================*/
@@ -3657,6 +3686,7 @@ double get_ub_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt,
 int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip, 
 				 int cnt, int *ind, double *val)
 {
+#ifdef SENSITIVITY_ANALYSIS
    int i, j;
    int level = node->bc_level;
    bc_node **path, *n;
@@ -3756,6 +3786,12 @@ int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip,
    FREE(path);
 
    return (retval);
+#else
+   printf("check_feasibility_new_rhs():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(0);
+#endif
 }
 
 /*===========================================================================*/

@@ -75,8 +75,7 @@ void cp_initialize(cut_pool *cp, int master_tid)
 
 #endif
    
-#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) || \
-    !defined(COMPILE_IN_CP)
+#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_CP)
        
    s_bufid = init_send(DataInPlace);
    send_msg(cp->master, REQUEST_FOR_CP_DATA);

@@ -94,8 +94,8 @@ int receive_lp_data_u(lp_prob *p)
 
       /* Allocate memory */
       mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
-      mip->matval = (double *) malloc(DSIZE * mip->matbeg[mip->n]);
-      mip->matind = (int *)    malloc(ISIZE * mip->matbeg[mip->n]);
+      mip->matind = (int *)    malloc(ISIZE * mip->nz);
+      mip->matval = (double *) malloc(DSIZE * mip->nz);
       mip->obj    = (double *) malloc(DSIZE * mip->n);
       if (p->par.multi_criteria){
 	 mip->obj1    = (double *) malloc(DSIZE * mip->n);
@@ -109,7 +109,7 @@ int receive_lp_data_u(lp_prob *p)
       mip->is_int = (char *)   calloc(CSIZE, mip->n);
 
       /* Receive the problem description */
-      receive_int_array(mip->matbeg, mip->n);
+      receive_int_array(mip->matbeg, mip->n+1);
       receive_int_array(mip->matind, mip->nz);
       receive_dbl_array(mip->matval, mip->nz);
       receive_dbl_array(mip->obj, mip->n);
@@ -762,7 +762,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	    }
 	 }
       }
-#ifndef COMPILE_IN_TM
+#if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_TM)
       send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
 			       lpetol, true_objval, cnt, indices, values);
 #endif

@@ -42,6 +42,7 @@ int main(void)
    struct timeval timeout = {10, 0};
    double start_time;
    char first_node_rec = FALSE;
+   int termcode;
    
    start_time = wall_clock(NULL);
    

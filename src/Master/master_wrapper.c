@@ -451,7 +451,7 @@ int send_lp_data_u(sym_environment *env, int sender)
    send_char_array(&env->has_ub, 1);
    if (env->has_ub)
       send_dbl_array(&env->ub, 1);
-   if (env->par.multi_crtieria){
+   if (env->par.multi_criteria){
       send_char_array(&env->has_mc_ub, 1);
       if (env->has_mc_ub){
 	 send_dbl_array(&env->mc_ub, 1);
@@ -475,7 +475,7 @@ int send_lp_data_u(sym_environment *env, int sender)
       send_int_array(&(mip->nz), 1);
       send_char_array(&(mip->obj_sense), 1);
       send_dbl_array(&(mip->obj_offset), 1);
-      send_int_array(mip->matbeg, mip->n);
+      send_int_array(mip->matbeg, mip->n+1);
       send_int_array(mip->matind, mip->nz);
       send_dbl_array(mip->matval, mip->nz);
       send_dbl_array(mip->obj, mip->n);
@@ -630,8 +630,8 @@ int display_solution_u(sym_environment *env, int thread_num)
    if (env->par.verbosity >= -1){
       printf("\nSolution Found: Node %i, Level %i\n", sol.xindex, sol.xlevel);
       if (env->par.multi_criteria){
-	 printf("First Objective: %.3f\n", env->tm->lpp[thread_num]->obj[0]);
-	 printf("Second Objective: %.3f\n", env->tm->lpp[thread_num]->obj[1]);
+	 printf("First Objective: %.3f\n", env->obj[0]);
+	 printf("Second Objective: %.3f\n", env->obj[1]);
       }else{
 	 printf("Solution Cost: %.3f\n", env->mip->obj_sense == SYM_MINIMIZE ? 
 		sol.objval + env->mip->obj_offset : 

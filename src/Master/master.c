@@ -70,10 +70,12 @@ sym_environment *sym_open_environment()
 
    setvbuf(stdout, (char *)NULL, _IOLBF, 0);
    
+   env = (sym_environment *) calloc(1, sizeof(sym_environment));
+
 #if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \
     !defined(COMPILE_IN_CG) || !defined(COMPILE_IN_CP)
        
-   register_process();   /* Enroll this process */
+   env->my_tid = register_process();   /* Enroll this process */
 
 #ifdef __PVM__
    pvm_catchout(stdout); /* Tells PVM to treat all output from the children of
@@ -81,6 +83,22 @@ sym_environment *sym_open_environment()
 #endif
 #endif
    
+   printf("\n");
+   printf("*******************************************************\n");
+   printf("*   This is SYMPHONY Version 5.0                      *\n");
+   printf("*   Copyright 2000-2005 Ted Ralphs                    *\n");
+   printf("*   All Rights Reserved.                              *\n");
+   printf("*   Distributed under the Common Public License 1.0   *\n");
+   printf("*******************************************************\n");
+   printf("\n");
+
+   if (initialize_u(env) == FUNCTION_TERMINATED_NORMALLY){
+      return(env);
+   }else{
+      FREE(env);
+      return(NULL);
+   }
+
    /* This next set of commands has to be executed if we want to create a PVM
       trace file for viewing in xpvm (this is a very slow process) */
 
@@ -109,23 +127,6 @@ sym_environment *sym_open_environment()
    }
 #endif
 
-   printf("\n");
-   printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 5.0                      *\n");
-   printf("*   Copyright 2000-2005 Ted Ralphs                    *\n");
-   printf("*   All Rights Reserved.                              *\n");
-   printf("*   Distributed under the Common Public License 1.0   *\n");
-   printf("*******************************************************\n");
-   printf("\n");
-
-   env = (sym_environment *) calloc(1, sizeof(sym_environment));
-
-   if (initialize_u(env) == FUNCTION_TERMINATED_NORMALLY){
-      return(env);
-   }else{
-      FREE(env);
-      return(NULL);
-   }
 }   
 
 /*===========================================================================*/
@@ -155,7 +156,7 @@ int sym_set_defaults(sym_environment *env)
    env->par.random_seed = 17;
    env->par.tm_machine_set = FALSE;
    env->par.dg_machine_set = FALSE;
-   strcpy(env->par.tm_exe, "tm");
+   strcpy(env->par.tm_exe, "symphony_tm");
 #ifdef COMPILE_IN_LP
    strcat(env->par.tm_exe, "_lp");
 #ifdef COMPILE_IN_CG
@@ -165,7 +166,7 @@ int sym_set_defaults(sym_environment *env)
 #ifdef COMPILE_IN_CP
    strcat(env->par.tm_exe, "_cp");
 #endif   
-   strcpy(env->par.dg_exe, "dg");
+   strcpy(env->par.dg_exe, "symphony_dg");
    env->par.tm_debug = 0;
    env->par.dg_debug = 0;
    env->par.pvm_trace = 0;
@@ -182,14 +183,14 @@ int sym_set_defaults(sym_environment *env)
    /************************** treemanager defaults **************************/
    tm_par->verbosity = 0;
    tm_par->granularity = 0.000001;
-   strcpy(tm_par->lp_exe, "lp");
+   strcpy(tm_par->lp_exe, "symphony_lp");
 #ifdef COMPILE_IN_CG
    strcat(tm_par->lp_exe, "_cg");
 #endif
-   strcpy(tm_par->cg_exe, "cg");
-   strcpy(tm_par->cp_exe, "cp");
+   strcpy(tm_par->cg_exe, "symphony_cg");
+   strcpy(tm_par->cp_exe, "symphony_cp");
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   strcpy(tm_par->sp_exe, "sp");
+   strcpy(tm_par->sp_exe, "symphony_sp");
    /*___END_EXPERIMENTAL_SECTION___*/
    tm_par->lp_debug = 0;
    tm_par->cg_debug = 0;
@@ -657,7 +658,10 @@ int sym_solve(sym_environment *env)
       tm->ub = env->ub;
    if ((tm->has_ub_estimate = env->has_ub_estimate))
       tm->ub_estimate = env->ub_estimate;
-
+   tm->obj_offset = env->mip->obj_offset;
+   tm->obj_sense = env->mip->obj_sense;
+   tm->master = env->my_tid;
+   
 #ifdef COMPILE_IN_LP
    CALL_WRAPPER_FUNCTION( send_lp_data_u(env, 0) );
    lp_data_sent = TRUE;
@@ -5210,9 +5214,10 @@ sym_environment * sym_create_copy_environment (sym_environment *env)
 int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
 			      double *new_rhs_val, double *lb_for_new_rhs)
 {
+#ifdef SENSITIVITY_ANALYSIS
 #ifdef USE_CGL_CUTS
    printf("sym_get_lb_for_new_rhs():\n");
-   printf("SYMPHONY can not analyse the warm start - rhs change when cuts exist, for now!\n"); 
+   printf("SYMPHONY can not do sensitivity analysis when cuts are present, for now!\n"); 
    return(FUNCTION_TERMINATED_ABNORMALLY);
 #else
    if (!env || !env->mip || 
@@ -5236,7 +5241,13 @@ int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
       }
    }
 #endif
-}
+#else
+   printf("sym_get_lb_for_new_rhs():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(FUNCTION_TERMINATED_ABNORMALLY);
+#endif
+ }
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -5244,7 +5255,7 @@ int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
 int sym_get_ub_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
 			   double *new_rhs_val, double *ub_for_new_rhs)
 {
-
+#ifdef SENSITIVITY_ANALYSIS
    int *matbeg = NULL, *matind = NULL, nz, i, j, k;
    double *matval = NULL;
 
@@ -5303,7 +5314,12 @@ int sym_get_ub_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
    }
 
    return(FUNCTION_TERMINATED_NORMALLY);
-
+#else
+   printf("sym_get_ub_for_new_rhs():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(FUNCTION_TERMINATED_ABNORMALLY);
+#endif
 }
 
 /*===========================================================================*/
@@ -5314,7 +5330,7 @@ int sym_get_lb_for_new_obj(sym_environment *env, int cnt,
 				 double *new_obj_val, 
 				 double *lb_for_new_obj)
 {
-
+#ifdef SENSITIVITY_ANALYSIS
    double ub;
 
    if (!env || !env->mip || 
@@ -5343,6 +5359,12 @@ int sym_get_lb_for_new_obj(sym_environment *env, int cnt,
    }
 
    return(FUNCTION_TERMINATED_NORMALLY);
+#else
+   printf("sym_get_lb_for_new_obj():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(FUNCTION_TERMINATED_ABNORMALLY);
+#endif
 }
 
 /*===========================================================================*/
@@ -5353,6 +5375,7 @@ int sym_get_ub_for_new_obj(sym_environment *env, int cnt,
 				 double *new_obj_val, 
 				 double *ub_for_new_obj)
 {
+#ifdef SENSITIVITY_ANALYSIS
    if (!env || !env->mip || 
        !env->par.tm_par.sensitivity_analysis){ 
       printf("sym_get_ub_for_new_obj():\n");
@@ -5374,6 +5397,12 @@ int sym_get_ub_for_new_obj(sym_environment *env, int cnt,
    }
 
    return(FUNCTION_TERMINATED_NORMALLY);
+#else
+   printf("sym_get_ub_for_new_obj():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(FUNCTION_TERMINATED_ABNORMALLY);
+#endif
 }
 
 /*===========================================================================*/

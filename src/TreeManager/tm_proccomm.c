@@ -545,11 +545,32 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    node_desc *desc = &n->desc;
    node_desc *newdesc;
    
+#ifdef SENSITIVITY_ANALYSIS
+   if (tm->par.sensitivity_analysis){
+      if (n->sol){
+	 FREE(n->sol);
+	 FREE(n->duals);
+      }
+      receive_int_array(&n->sol_size, 1);
+      n->sol = (double *) malloc (DSIZE * n->sol_size);
+      receive_dbl_array(n->sol, p->desc->uind.size);
+      receive_int_array(&n->dual_size, 1);
+      n->duals = (double *) malloc (DSIZE * n->dual_size);
+      send_dbl_array(n->duals, n->dual_size);
+   }
+#endif
    receive_char_array(&repricing, 1);
    receive_char_array(&node_type, 1);
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
        node_type == DISCARDED_NODE || node_type == FEASIBLE_PRUNED){
       n->node_status = NODE_STATUS__PRUNED;
+      if (node_type == FEASIBLE_PRUNED) {
+	 if (!tm->par.sensitivity_analysis){ 
+	    receive_int_array(&n->sol_size, 1);
+	    n->sol = (double *) malloc (DSIZE * n->sol_size);
+	    receive_dbl_array(n->sol, n->sol_size);
+	 }
+      }
 #ifdef TRACE_PATH
       if (n->optimal_path){
 	 printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
@@ -797,12 +818,14 @@ char process_messages(tm_prob *tm, int r_bufid)
 
       switch(msgtag){
 
-       case UPPER_BOUND:
-	 process_ub_message(tm);
-	 break;
-
+#ifdef COMPILE_IN_TM
        case FEASIBLE_SOLUTION_NONZEROS:
        case FEASIBLE_SOLUTION_USER:
+	 break;
+#endif
+	 
+       case UPPER_BOUND:
+	 process_ub_message(tm);
 	 break;
 
        case LP__IS_FREE:

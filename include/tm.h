@@ -60,6 +60,8 @@ typedef struct TM_PROB{
    double          start_time;
    double          ub;       /* the best global upper bound found */
    double          lb;       /* the best global lower bound known */
+   double          obj_offset; /* constant to be added to the objective value*/
+   char            obj_sense;  /* objective sense*/
    double          ub_estimate;
    process_set     lp;
    process_set     cg;
