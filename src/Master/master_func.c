@@ -1903,7 +1903,10 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(env->par.random_seed);
       return(0);
    }
-   
+   else if (strcmp(key, "param_file") == 0){
+     read_string(env->par.param_file, line, MAX_FILE_NAME_LENGTH);
+     return(0);
+   }
    else if (strcmp(key, "tm_executable_name") == 0 ||
 	    strcmp(key, "tm_exe") == 0 ||
 	    strcmp(key, "M_tm_exe") == 0 ||
