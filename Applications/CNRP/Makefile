@@ -35,7 +35,7 @@ USERROOT = ${SYMPHONYROOT}/CNRP
 # The customized name of the master program (if desired)
 ##############################################################################
 
-MASTERNAME = cnrp
+MASTERNAME = cnrp-10
 
 ##############################################################################
 # These are only needed if parallel computation is used. Please see the
@@ -55,8 +55,8 @@ USER_MAIN = TRUE
 DO_CONCORDE_CUTS = FALSE
 DIRECTED_X_VARS = TRUE
 ADD_FLOW_VARS = TRUE
-ADD_CAP_CUTS = TRUE
-ADD_X_CUTS = TRUE
+ADD_CAP_CUTS = FALSE
+ADD_X_CUTS = FALSE
 
 ifeq ($(DO_CONCORDE_CUTS),TRUE)
 USER_BB_DEFINES += -DDO_TSP_CUTS

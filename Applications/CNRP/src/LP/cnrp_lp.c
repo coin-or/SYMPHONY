@@ -362,10 +362,17 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    /* set the initial right hand side */
    if (od_const){
       /*degree constraints for the depot*/
+#if 0
       mip->rhs[0] = cnrp->numroutes;
       mip->sense[0] = 'E';
       mip->rhs[vertnum] = cnrp->numroutes;
       mip->sense[vertnum] = 'E';
+#else
+      mip->rhs[0] = 1.0;
+      mip->sense[0] = 'G';
+      mip->rhs[vertnum] = 1.0;
+      mip->sense[vertnum] = 'G';
+#endif      
    }else if (prob_type == VRP || prob_type == TSP || prob_type == BPP){
       (mip->rhs[0]) = 2*cnrp->numroutes;
       mip->sense[0] = 'E';
