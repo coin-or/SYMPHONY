@@ -88,7 +88,7 @@ LIB32=link.exe -lib
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\source\user_cg.c
+SOURCE=..\CutGen\user_cg.c
 # End Source File
 # End Group
 # Begin Group "CutPool"
@@ -96,7 +96,7 @@ SOURCE=..\source\user_cg.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\source\user_cp.c
+SOURCE=..\CutPool\user_cp.c
 # End Source File
 # End Group
 # Begin Group "DrawGraph"
@@ -104,7 +104,7 @@ SOURCE=..\source\user_cp.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\source\user_dg.c
+SOURCE=..\DrawGraph\user_dg.c
 # End Source File
 # End Group
 # Begin Group "LP"
@@ -112,11 +112,11 @@ SOURCE=..\source\user_dg.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\source\user_lp.c
+SOURCE=..\LP\user_lp.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\source\user_lp_branch.c
+SOURCE=..\LP\user_lp_branch.c
 # End Source File
 # End Group
 # Begin Group "Master"
@@ -124,7 +124,7 @@ SOURCE=..\source\user_lp_branch.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\source\user_main.c
+SOURCE=..\Master\user_main.c
 # End Source File
 # Begin Source File
 

@@ -290,9 +290,5 @@ SOURCE=..\..\..\COIN\Win\clpLib\Debug\clpLib.lib
 
 SOURCE=..\..\..\COIN\Win\osiClpLib\Debug\osiClpLib.lib
 # End Source File
-# Begin Source File
-
-SOURCE=..\..\..\COIN\Win\osiSymLib\Debug\osiSymLib.lib
-# End Source File
 # End Target
 # End Project

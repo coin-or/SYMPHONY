@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="vrp" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="cnrp" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
-CFG=vrp - Win32 Debug
+CFG=cnrp - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "vrp.mak".
+!MESSAGE NMAKE /f "cnrp.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "vrp.mak" CFG="vrp - Win32 Debug"
+!MESSAGE NMAKE /f "cnrp.mak" CFG="cnrp - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "vrp - Win32 Release" (based on "Win32 (x86) Static Library")
-!MESSAGE "vrp - Win32 Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "cnrp - Win32 Release" (based on "Win32 (x86) Static Library")
+!MESSAGE "cnrp - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
@@ -28,7 +28,7 @@ CFG=vrp - Win32 Debug
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "vrp - Win32 Release"
+!IF  "$(CFG)" == "cnrp - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "..\..\include" /I "..\include" /I "..\include\heurs" /I "C:\ILOG\cplex81\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -51,7 +51,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
-!ELSEIF  "$(CFG)" == "vrp - Win32 Debug"
+!ELSEIF  "$(CFG)" == "cnrp - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\include" /I "..\include" /I "..\include\heurs" /I "C:\COIN\Osi\include" /I "C:\Coin\Coin\include" /I "C:\Coin\Clp\include" /I "C:\Coin\Osi\OsiClp\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /YX /FD /GZ /c /Tp
+# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\include" /I "..\include" /I "C:\COIN\Osi\include" /I "C:\Coin\Coin\include" /I "C:\Coin\Clp\include" /I "C:\Coin\Osi\OsiClp\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "MULTI_CRITERIA" /D "DIRECTED_X_VARS" /D "ADD_FLOW_VARS" /D "SAVE_CUT_POOL" /YX /FD /GZ /c /Tp
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -78,8 +78,8 @@ LIB32=link.exe -lib
 
 # Begin Target
 
-# Name "vrp - Win32 Release"
-# Name "vrp - Win32 Debug"
+# Name "cnrp - Win32 Release"
+# Name "cnrp - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -88,15 +88,39 @@ LIB32=link.exe -lib
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\Common\cnrp_macros.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\Common\compute_cost.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\Common\network.c
 # End Source File
+# End Group
+# Begin Group "TreeManager"
+
+# PROP Default_Filter ""
+# End Group
+# Begin Group "LP"
+
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\Common\vrp_macros.c
+SOURCE=..\LP\cnrp_lp.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\LP\cnrp_lp_branch.c
+# End Source File
+# End Group
+# Begin Group "CutPool"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\CutPool\cnrp_cp.c
 # End Source File
 # End Group
 # Begin Group "CutGen"
@@ -108,32 +132,35 @@ SOURCE=..\CutGen\biconnected.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\CutGen\cnrp_cg.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\CutGen\shrink.c
 # End Source File
-# Begin Source File
-
-SOURCE=..\CutGen\tsp.c
-
-!IF  "$(CFG)" == "vrp - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "vrp - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\CutGen\vrp_cg.c
-# End Source File
 # End Group
-# Begin Group "CutPool"
+# Begin Group "Master"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\CutPool\vrp_cp.c
+SOURCE=..\Master\cnrp_io.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Master\cnrp_main.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Master\cnrp_master.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Master\cnrp_master_functions.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\Master\small_graph.c
 # End Source File
 # End Group
 # Begin Group "DrawGraph"
@@ -141,71 +168,7 @@ SOURCE=..\CutPool\vrp_cp.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\DrawGraph\vrp_dg_functions.c
-# End Source File
-# End Group
-# Begin Group "LP"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\LP\vrp_lp.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\LP\vrp_lp_branch.c
-# End Source File
-# End Group
-# Begin Group "Master"
-
-# PROP Default_Filter ""
-# Begin Group "Heuristics"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\cluster_heur.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\exchange_heur.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\lower_bound.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\receive_rout.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\route_heur.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\Heuristics\start_heurs.c
-# End Source File
-# End Group
-# Begin Source File
-
-SOURCE=..\Master\small_graph.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\vrp_io.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\vrp_main.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\vrp_master.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\Master\vrp_master_functions.c
+SOURCE=..\DrawGraph\cnrp_dg_functions.c
 # End Source File
 # End Group
 # End Group

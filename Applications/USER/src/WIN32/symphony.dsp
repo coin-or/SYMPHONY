@@ -303,9 +303,5 @@ SOURCE=.\Debug\user.lib
 !ENDIF 
 
 # End Source File
-# Begin Source File
-
-SOURCE=..\..\..\COIN\Win\osiSymLib\Debug\osiSymLib.lib
-# End Source File
 # End Target
 # End Project

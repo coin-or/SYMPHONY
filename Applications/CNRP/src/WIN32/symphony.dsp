@@ -64,7 +64,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "C:\COIN\Osi\include" /I "C:\COIN\Coin\include" /I "C:\COIN\Cgl\include" /I "..\..\include" /I "C:\Coin\Clp\include" /I "C:\Coin\Osi\OsiClp\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "USE_SYM_APPLICATION" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /FD /GZ /c /Tp
+# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\include" /I "C:\COIN\Osi\include" /I "C:\Coin\Coin\include" /I "C:\Coin\Clp\include" /I "C:\Coin\Osi\OsiClp\include" /I "C:\COIN\Cgl\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "USE_SYM_APPLICATION" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /FD /GZ /c /Tp
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -267,19 +267,11 @@ SOURCE=..\..\TreeManager\treemanager.c
 # End Group
 # Begin Source File
 
-SOURCE=.\Debug\mpp.lib
+SOURCE=.\Debug\cnrp.lib
 # End Source File
 # Begin Source File
 
-SOURCE=C:\COIN\Win\cglLib\Debug\cglLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=C:\COIN\Win\coinLib\Debug\coinLib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=C:\COIN\Win\osiLib\Debug\osiLib.lib
+SOURCE=..\..\..\COIN\Win\cglLib\Debug\cglLib.lib
 # End Source File
 # Begin Source File
 
@@ -287,7 +279,15 @@ SOURCE=..\..\..\COIN\Win\clpLib\Debug\clpLib.lib
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\COIN\Win\coinLib\Debug\coinLib.lib
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\COIN\Win\osiClpLib\Debug\osiClpLib.lib
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\COIN\Win\osiLib\Debug\osiLib.lib
 # End Source File
 # End Target
 # End Project
