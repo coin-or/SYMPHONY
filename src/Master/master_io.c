@@ -776,18 +776,23 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
 		stat->root_lb + obj_offset);
       }
    }
-   if (lb > 0){
-      if (obj_sense == SYM_MAXIMIZE){
-	 printf("\nCurrent Lower Bound:         %.3f", -ub + obj_offset);
-	 printf("\nCurrent Upper Bound:         %.3f", -lb + obj_offset);
-	 printf("\nGap Percentage:              %.2f\n", -100*(ub-lb)/ub);
-      }else{
-	 printf("\nCurrent Upper Bound:         %.3f", ub + obj_offset);
-	 printf("\nCurrent Lower Bound:         %.3f", lb + obj_offset);
-	 printf("\nGap Percentage:              %.2f\n", 100*(ub-lb)/ub);
-      }
-   }else if (has_ub){
-      printf("\nUpper Bound:        %.3f\n", ub + obj_offset);
+
+   if (obj_sense == SYM_MAXIMIZE){
+     if (has_ub){
+       printf("\nCurrent Lower Bound:         %.3f", -ub + obj_offset);
+       printf("\nCurrent Upper Bound:         %.3f", -lb + obj_offset);
+       printf("\nGap Percentage:              %.2f\n", -100*(ub-lb)/ub);
+     } else {
+       printf("\nCurrent Upper Bound:         %.3f", -lb + obj_offset);
+     }
+   }else{
+     if (has_ub){
+       printf("\nCurrent Upper Bound:         %.3f", ub + obj_offset);
+       printf("\nCurrent Lower Bound:         %.3f", lb + obj_offset);
+       printf("\nGap Percentage:              %.2f\n", 100*(ub-lb)/ub);
+     } else {
+       printf("\nCurrent Lower Bound:         %.3f", lb + obj_offset);
+     }
    }
 }
 
