@@ -49,9 +49,86 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony_api.h"
-  
-int sym_help(char *key);
-   
+#ifndef WIN32
+#include <readline/readline.h>
+#include <readline/history.h>
+
+typedef struct {
+  char *name;			
+} COMMAND;
+
+COMMAND main_commands[] = {
+  { "load" },
+  { "solve" },
+  { "lpsolve" },
+  { "set" },
+  { "display" },
+  { "reset" },
+  { "help" },
+  { "quit" },
+  { "exit" },
+  { (char *)NULL}
+};
+
+COMMAND display_commands[] = {
+  { "solution" },
+  { "obj" },
+  { "stats" },
+  { "parameter" },
+  { "back" },
+  { "quit" },
+  { "exit" },
+  { (char *)NULL}
+};
+
+
+COMMAND parameter_commands[] = {
+  { "verbosity" },
+  { "upper_bound" },
+  { "find_first_feasible" },
+  { "generate_cgl_cuts" },
+  { "generate_cgl_gomory_cuts" },
+  { "generate_cgl_knapsack_cuts" },
+  { "generate_cgl_oddhole_cuts" },
+  { "generate_cgl_probing_cuts" },
+  { "generate_cgl_clique_cuts" },
+  { "generate_cgl_mir_cuts" },
+  { "generate_cgl_flow_and_cover_cuts" },
+  { "generate_cgl_rounding_cuts" },
+  { "generate_cgl_lift_and_project_cuts" },
+  { "node_selection_rule" },
+  { "strong_branching_candidate_num" },
+  { "compare_candidadates_dafult" },
+  { "select_child_default" },
+  { "diving_threshold" },
+  { "diving_strategy" },
+  { "do_reduced_cost_fixing" },
+  { "time_limit" },
+  { "node_limit" },
+  { "gap_limit" },
+  { "param_file" },
+  { "back" },
+  { "quit" },
+  { "exit" },
+  { (char *)NULL}
+};
+
+char **sym_completion(const char *text, int start, int end);   
+void sym_initialize_readline();
+char *command_generator (const char *text, int state);
+char *alloc_str (char *s);
+#endif
+
+int comp_level = 0;
+int main_level = 0; /* 0 - SYMPHONY:
+		       1 - SYMPHONY\Display:
+		       2 - SYMPHONY\Set:
+		       3 - SYMPHONY\Display\Parameter:
+		    */
+
+int sym_help(char *line);
+int sym_read_line(char *prompt, char **input);
+
 int main(int argc, char **argv)
 {    
      
@@ -75,44 +152,57 @@ int main(int argc, char **argv)
      }
    
    } else{
+
      FILE *f = NULL;
-     char key[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH +1];
-     char infile1[MAX_LINE_LENGTH +1], infile2[MAX_LINE_LENGTH +1];     
-     char ext[4], *line = NULL;     
+     char *line = NULL;
+     char *infile = NULL;     
+     char args[3][MAX_LINE_LENGTH + 1];
+     char param[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH+1];
+     char ext[4];     
      int last_dot = 0, j, terminate = FALSE, termcode = 0, int_value = 0;
+     int last_level = 0;
      char * is_int = NULL;
      double *colsol = NULL, objval = 0.0, initial_time = 0.0, start_time = 0.0;
      double finish_time = 0.0, dbl_value = 0;
 
-     strcpy(key, "");
-     strcpy(value, "");
-     strcpy(infile2, "");
-     
      printf("***** WELCOME TO SYMPHONY INTERACTIVE MIP SOLVER ******\n\n"
 	    "Please type 'help'/'?' to see the main commands!\n\n");
 
      env->par.verbosity = -1;
 
+#ifndef WIN32
+     sym_initialize_readline();
+#endif
+
      while(true){
-       printf("SYMPHONY: ");
-       scanf("%s", &key);
+       main_level = last_level = 0;
+       sym_read_line("SYMPHONY: ", &line);              
+       for(j = 0; j< 3; j++)
+	 strcpy(args[j], "");
+       sscanf(line, "%s%s%s", args[0], args[1], args[2]); 
        
-       if (strcmp(key, "help") == 0 || strcmp(key, "?") == 0) {
-	 sym_help("main_help");
-       } else if (strcmp(key, "load") == 0){ 
+       if (strcmp(args[0], "help") == 0 || strcmp(args[0], "?") == 0) {
+	 if ((strcmp(args[1], "set") == 0)){
+	   sym_help("set_help");
+	 } else if ((strcmp(args[1], "display") == 0)){
+	   sym_help("display_help");
+	 } else  sym_help("main_help");
+       } else if (strcmp(args[0], "load") == 0){ 
 	 if(env->mip->n){
 	   free_master_u(env);
 	   strcpy(env->par.infile, "");
 	   strcpy(env->par.datafile, "");
 	   env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
 	 }
-	 printf("Name of the file: ");
-	 strcpy(infile1, "");
-	 scanf("%s", &infile1);       
+
+	 if(strcmp(args[1], "") == 0){
+	   sym_read_line("Name of the file: ", &line);
+	   strcpy(args[1], line);
+	 }	 
 	 
-	 if (fopen(infile1, "r") == NULL){
-	    printf("Input file '%s' can't be opened\n",
-		  infile1);
+	 if (fopen(args[1], "r") == NULL){
+	   printf("Input file '%s' can't be opened\n",
+		  args[1]);
 	   continue;
 	 }
 
@@ -120,54 +210,60 @@ int main(int argc, char **argv)
 
 	 last_dot = 0;
 	 for (j = 0;; j++){
-	   if (infile1[j] == '\0')
+	   if (args[1][j] == '\0')
 	     break;
-	   if (infile1[j] == '.') {
+	   if (args[1][j] == '.') {
 	     last_dot = j;
 	   }
 	 } 
-	 strcpy(ext, infile1 + last_dot + 1);
-
+	 
+	 strcpy(ext, args[1] + last_dot + 1);
+	 
 	 if(!(strcmp(ext, "mod") == 0 || strcmp(ext, "mps") == 0)){
 	   while(true){
-	     printf("Type of the file ('mps'/'ampl'/'gmpl'): ");
-	     scanf("%s", &ext);
-	     if(!(strcmp(ext, "mps") == 0 || strcmp(ext, "ampl") == 0 ||
-		  strcmp(ext, "gmpl") == 0)){
+	     sym_read_line("Type of the file ('mps'/'ampl'/'gmpl'): ", &line);
+	     if(!(strcmp(line, "mps") == 0 || strcmp(line, "ampl") == 0 ||
+		  strcmp(line, "gmpl") == 0)){
 	       printf("Unknown type!\n");
 	       continue; 
 	     } else {
+	       strcpy(ext, line);
 	       break;
 	     }
 	   }
 	 }
 	 
 	 if (strcmp(ext, "mps") == 0){
-	   if(sym_read_mps(env, infile1)){
+
+	   if(sym_read_mps(env, args[1])){
 	     continue;
 	   }
+
 	 } else {
-	   printf("Name of the data file: ");
-	   strcpy(infile2, "");
-	   scanf("%s", &infile2); 
-	   
-	   if(strcmp(infile2, "") != 0 ) {
-	     if(fopen(infile2, "r") == NULL){
-	       printf("Data file '%s' can't be opened\n",
-		      infile2);
-	       continue;
-	     }
+
+	   if(strcmp(args[2], "") == 0){
+	     sym_read_line("Name of the data file: ", &line);
+	     strcpy(args[2], line);
 	   }
-	   if(sym_read_gmpl(env, infile1, infile2)){
+	 
+	   if(fopen(args[2], "r") == NULL){
+	     printf("Data file '%s' can't be opened\n",
+		    args[2]);
 	     continue;
 	   }
+
+	   if(sym_read_gmpl(env, args[1], args[2])){
+	     continue;
+	   }
+	   
 	 }
-       } else if(strcmp(key, "solve") == 0 || strcmp(key, "lpsolve") == 0){
+       } else if(strcmp(args[0], "solve") == 0 || 
+		 strcmp(args[0], "lpsolve") == 0){
 	 if(!env->mip->n){
 	   printf("No loaded problem. Use 'load' to read in a problem!\n");
 	   continue;
 	 } 
-	 if(strcmp(key, "solve") == 0){	  
+	 if(strcmp(args[0], "solve") == 0){
 	   start_time = wall_clock(NULL);
 	   termcode = sym_solve(env);
 	   finish_time = wall_clock(NULL);
@@ -180,26 +276,41 @@ int main(int argc, char **argv)
 	   env->mip->is_int = is_int;
 	   is_int = 0;
 	 }
-       } else if (strcmp(key, "display") == 0){
-	 printf("Please type 'help'/'?' to see the display options!\n");
+       } else if (strcmp(args[0], "display") == 0){
+
+	 if(strcmp(args[1], "") == 0){
+	   printf("Please type 'help'/'?' to see the display options!\n");
+	 }
+
 	 while (true){
-	   printf("SYMPHONY\\Display: ");	 
-	   scanf("%s", &key);
-	   if (strcmp(key, "help") == 0 || strcmp(key, "?") == 0) {
+
+	   if(strcmp(args[1], "") == 0){
+	     main_level = 1;
+	     sym_read_line("SYMPHONY\\Display: ", &line);	 
+	     sscanf(line, "%s%s", args[1], args[2]);
+	     last_level = 1;
+	   } else{
+	     last_level = 0;
+	   }
+	   
+	   if (strcmp(args[1], "help") == 0 || strcmp(args[1], "?") == 0) {
 	     sym_help("display_help");
-	   } else if (strcmp(key, "solution") == 0 || strcmp(key, "obj") == 0 
-		      || strcmp(key, "stats") == 0){
+	   } else if (strcmp(args[1], "solution") == 0 || 
+		      strcmp(args[1], "obj") == 0 
+		      || strcmp(args[1], "stats") == 0){
 	     if(!env->mip->n){
 	       printf("No loaded problem! "
 		      "Use 'load' in the main menu to read in a problem!\n");
+	       strcpy(args[1], "");
 	       continue;
 	     } 
-	     if(strcmp(key, "solution") == 0){
+	     if(strcmp(args[1], "solution") == 0){
 	       if(colsol) FREE(colsol);
 	       colsol = (double *) malloc(DSIZE * env->mip->n);
 	       if(sym_get_col_solution(env, colsol)){
 		 printf("Error in displaying solution! The problem is either "
 			"infeasible or has not been solved yet!\n");
+		 strcpy(args[1], "");
 		 continue;
 	       } else {
 		 if (env->mip->colname){ 
@@ -221,15 +332,18 @@ int main(int argc, char **argv)
 		   printf("\n");
 		 }
 	       }
-	     } else if (strcmp(key, "obj") == 0){
+	       strcpy(args[1], "");	       
+	     } else if (strcmp(args[1], "obj") == 0){
 	       if(sym_get_obj_val(env, &objval)){
 		 printf("Error in displaying objective value!" 
 			"The problem is either infeasible" 
 			"or has not been solved yet!\n");
+		 strcpy(args[1], "");
 		 continue;
 	       } else { 
 		 printf("Objective Value: %f\n", objval);
 	       }
+	       strcpy(args[1], "");	       
 	     } else {
 	       initial_time  = env->comp_times.readtime;
 	       initial_time += env->comp_times.ub_overhead + 
@@ -243,96 +357,145 @@ int main(int argc, char **argv)
 				start_time, finish_time,
 				env->mip->obj_offset, env->mip->obj_sense,
 				env->has_ub);
-	       printf("\n");
+	       printf("\n");	       
 	     }
-	   } else if (strcmp(key, "parameter") == 0){
-	     printf("Please type 'help'/'?' " 
-		    "to see the list of available parameters!\n");
+	     strcpy(args[1], "");	       
+	   } else if (strcmp(args[1], "parameter") == 0){
+
+	     if(strcmp(args[2], "") == 0){
+	       printf("Please type 'help'/'?' " 
+		      "to see the list of available parameters!\n");
+	     }
 	     while(true){
-	       printf("SYMPHONY\\Display\\Parameter: ");
-	       scanf("%s", &key);
-	       if (strcmp(key, "help") == 0 || strcmp(key, "?") == 0) {
+
+	       if (strcmp(args[2], "") == 0){
+		 main_level = 3;
+		 sym_read_line("SYMPHONY\\Display\\Parameter: ", &line);
+		 sscanf(line, "%s", args[2]);
+		 //		 strcpy(args[2], line);	
+		 if (last_level != 0)
+		   last_level = 2;
+	       }
+
+	       if (strcmp(args[2], "help") == 0 || strcmp(args[2], "?") == 0) {
 		 sym_help("display_param_help");
-	       } else if (strcmp(key, "back") == 0){
+	       } else if (strcmp(args[2], "back") == 0){
 		 break;
-	       } else if (strcmp(key, "quit") == 0){
+	       } else if ((strcmp(args[0], "quit") == 0) ||
+			  (strcmp(args[2], "exit") == 0)){ 
 		 terminate = TRUE;
 		 break;
 	       } else {
-		 if (sym_get_int_param(env, key, &int_value) == 0){
-		   printf("The value of %s: %i\n", key, int_value);
-		 } else if ( sym_get_dbl_param(env, key, &dbl_value) == 0){
-		   printf("The value of %s: %f\n", key, dbl_value);
+		 if (sym_get_int_param(env, args[2], &int_value) == 0){
+		   printf("The value of %s: %i\n", args[2], int_value);
+		 } else if ( sym_get_dbl_param(env, args[2], &dbl_value) == 0){
+		   printf("The value of %s: %f\n", args[2], dbl_value);
 		 }else {
-		   printf("Unknown parameter/command!\n");
-		   continue;
+		   printf("Unknown parameter/command!\n");		   
 		 }
 	       }
+	       strcpy(args[1], "");
+	       strcpy(args[2], "");
+	       if (last_level < 2) break; 
 	     }
-	   } else if (strcmp(key, "back") == 0){
+	     if (terminate) break;	        	   
+	   } else if (strcmp(args[1], "back") == 0){
 	     break;
-	   } else if (strcmp(key, "quit") == 0){
+	   } else if ((strcmp(args[0], "quit") == 0) ||
+		      (strcmp(args[1], "exit") == 0)){
 	     terminate = TRUE;
 	     break;
 	   } else {
 	     printf("Unknown command!\n");
-	     continue;	
 	   }     
-	   if(terminate) break;
+	   strcpy(args[1], "");
+	   strcpy(args[2], "");
+	   if(last_level < 1) break; 
 	 }
-       } else if (strcmp(key, "set") == 0){
-	 printf("Please type 'help'/'?' to see the list of parameters!\n");
-	 line = (char*) malloc(CSIZE*(MAX_LINE_LENGTH+1));	     
-	 while (true){
-	   printf("SYMPHONY\\Set: ");	 
-	   scanf("%s", &key);
+       } else if (strcmp(args[0], "set") == 0){
+	 if(strcmp(args[1], "") == 0){
+	   printf("Please type 'help'/'?' to see the list of parameters!\n");
+	 }
 
-	   if (strcmp(key, "help") == 0 || strcmp(key, "?") == 0) {
+	 while (true){
+	   if(strcmp(args[1], "") == 0){
+	     main_level = 2;
+	     sym_read_line("SYMPHONY\\Set: ", &line);	 
+	     sscanf(line, "%s%s", args[1], args[2]);
+	     last_level = 1;
+	   } else{
+	     last_level = 0;
+	   }
+
+	   if (strcmp(args[1], "help") == 0 || strcmp(args[1], "?") == 0) {
 	     sym_help("set_help");
-	   } else if (strcmp(key, "back") == 0){
+	   } else if (strcmp(args[1], "back") == 0){
 	     break;
-	   } else if (strcmp(key, "quit") == 0){
+	   } else if ((strcmp(args[0], "quit") == 0) ||
+		      (strcmp(args[1], "exit") == 0)){
 	     terminate = TRUE;
 	     break;
-	   } else if (strcmp(key, "param_file") == 0){
-	     printf("Name of the parameter file: ");
-	     scanf("%s", infile1);
-	     if ((f = fopen(infile1, "r")) == NULL){
-	       printf("Parameter file '%s' can't be opened\n",
-		      infile1);
-	       continue;
+	   } else if (strcmp(args[1], "param_file") == 0){
+
+	     if(strcmp(args[2], "") == 0){
+	       sym_read_line("Name of the parameter file: ", &line);
+	       strcpy(args[2], line);
 	     }
-	     while(NULL != fgets(line, MAX_LINE_LENGTH, f)){  /*read in parameters*/
-	       strcpy(key, "");
-	       strcpy(value, "");
-	       sscanf(line,"%s%s", key, value);
-	       if(set_param(env, line) == 0){
-		 printf("Setting %s to: %s\n", key, value); 
+
+	     if ((f = fopen(args[2], "r")) == NULL){
+	       printf("Parameter file '%s' can't be opened\n",
+		      args[2]);
+	       if(last_level == 1){
+		 strcpy(args[1], "");
+		 strcpy(args[2], "");
+		 continue;
+	       }
+	       else break;
+	     }
+
+	     /*read in parameter file*/
+	     while(NULL != fgets(args[2], MAX_LINE_LENGTH, f)){ 
+	       sscanf(args[2],"%s%s", param, value);
+	       if(set_param(env, args[2]) == 0){
+		 printf("Setting %s to: %s\n", param, value); 
 	       } else {
-		 printf("Unknown parameter %s: !\n", key);
+		 printf("Unknown parameter %s: !\n", param);
 		 continue;
 	       }	     
 	     }
 	     fclose(f);
+
 	   } else {
-	     printf("Value of the parameter: ");
-	     scanf("%s", value);
-	     sprintf(line, "%s %s", key, value);  
+	    
+	     if(strcmp(args[2], "") == 0){
+	       sym_read_line("Value of the parameter: ", &line);
+	       strcpy(args[2], line);
+	     }
+
+	     sprintf(line, "%s %s", args[1], args[2]);  
 	     if(set_param(env, line) == 0){
-	       printf("Setting %s to: %s\n", key, value); 
+	       printf("Setting %s to: %s\n", args[1], args[2]); 
 	     } else {
 	       printf("Unknown parameter/command!\n");
+	     }
+	     if(last_level <1) break;
+	     else{
+	       strcpy(args[1], "");
+	       strcpy(args[2], "");	       
 	       continue;
 	     }
 	   }
-         }
-         if(line) FREE(line);       
-       } else if (strcmp(key, "reset") == 0){
+	   if(last_level <1) break;
+	   strcpy(args[1], "");
+	   strcpy(args[2], "");	       
+	 }
+       } else if (strcmp(args[0], "reset") == 0){
 	 printf("Resetting...\n");
 	 sym_close_environment(env);
 	 env = sym_open_environment();
 	 env->par.verbosity = -1;
-       } else if (strcmp(key, "quit") == 0){
+       } else if ((strcmp(args[0], "quit") == 0) ||
+		  (strcmp(args[0], "exit") == 0)){
 	 break;
        } else {
 	 printf("Unknown command!\n");
@@ -343,15 +506,17 @@ int main(int argc, char **argv)
 
      }
    } 
-   
    sym_close_environment(env);
   
    return(0);
 }    
-     
-int sym_help(char *key)
+
+/*===========================================================================*\
+\*===========================================================================*/
+
+int sym_help(char *line)
 {    
-  if(strcmp(key, "main_help") == 0){
+  if(strcmp(line, "main_help") == 0){
 
     printf("\nList of main commands: \n\n");
     printf("load      : read a problem in mps or ampl format\n"
@@ -362,9 +527,9 @@ int sym_help(char *key)
 	   "reset     : restart the optimizer\n"
 	   "help      : show the available commands/params/options\n\n"
 
-	   "quit      : leave the optimizer\n\n");
+	   "quit/exit : leave the optimizer\n\n");
     
-  } else if (strcmp(key, "set_help") == 0 || strcmp(key, "display_param_help") == 0){
+  } else if (strcmp(line, "set_help") == 0 || strcmp(line, "display_param_help") == 0){
 
     printf("\n\nList of parameters: \n\n"); 
     printf("verbosity                          : set verbosity (default: 1)\n"
@@ -395,9 +560,9 @@ int sym_help(char *key)
            "param_file                         : read parameters from a parameter file\n\n"
 
 	   "back                               : leave this menu\n"
-	   "quit                               : leave the optimizer\n\n");
+	   "quit/exit                          : leave the optimizer\n\n");
 					    
-  } else if (strcmp(key, "display_help") == 0){
+  } else if (strcmp(line, "display_help") == 0){
 
     printf("\nList of display options: \n\n");
     printf("solution     : display the column values\n"
@@ -406,11 +571,158 @@ int sym_help(char *key)
 	   "parameter    : display the value of a parameter\n\n"
 
 	   "back         : leave this menu\n"
-	   "quit         : leave the optimizer\n\n");
+	   "quit/exit    : leave the optimizer\n\n");
   }
 
   return(0);
 }
 
+/*===========================================================================*\
+\*===========================================================================*/
+
+int sym_read_line(char *prompt, char **input){
+
+#ifdef WIN32
+
+  if (*input) FREE(*input);
+  *input = (char *)malloc(CSIZE* MAX_LINE_LENGTH +1);
+
+  printf(prompt);
+  scanf("%s", *input);
+
+#else
+
+  if (*input) FREE(*input);
+
+  while(true) {
+    *input = readline(prompt);
+    if (**input) {
+      add_history(*input);
+      break;
+    } else continue;
+  }
+
 #endif
+  
+  return (0);
+}
+ 
+/*===========================================================================*\
+\*===========================================================================*/
+#ifndef WIN32
+
+void sym_initialize_readline()
+{
+  //  rl_readline_name = "SYMPHONY";
+  rl_attempted_completion_function = sym_completion;
+}
+
+/*===========================================================================*\
+\*===========================================================================*/
+
+char **sym_completion(const char *text, int start, int end)
+{
+  char **matches;
+  char key[2][MAX_LINE_LENGTH+1];
+  matches = (char **)NULL;
+
+  strcpy(key[0], "");
+  strcpy(key[1], "");
+
+  sscanf(rl_line_buffer, "%s%s", key[0], key[1]);
+  comp_level = 0;
+ 
+  if(main_level == 0){
+    if(strcmp(key[0], "display") == 0){
+      comp_level = 1;
+      if(strcmp(key[1], "parameter") == 0){
+	comp_level = 3;
+      }
+    }else if(strcmp(key[0], "set") == 0){
+      comp_level = 2;
+    }else if(strcmp(key[0], "parameter") == 0){
+      comp_level = 3;
+    }	     
+  } else if(main_level == 1){
+    comp_level = 1;
+    if(strcmp(key[0], "parameter") == 0){    
+      comp_level = 3;
+    }
+  } else {
+    comp_level = main_level;
+  }
+
+  if(!(strcmp(key[0], "load") == 0 || strcmp(key[0], "param_file") == 0 )){
+    matches = rl_completion_matches (text, command_generator);
+  }
+  return (matches);
+}
+
+/*===========================================================================*\
+\*===========================================================================*/
+
+char *command_generator (const char *text, int state)
+{
+  static int list_index, len;
+  char *name;
+
+  if(!state){
+    list_index = 0;
+    len = strlen (text);
+  }
+  
+  if(comp_level == 0 ){
+    while (name = main_commands[list_index].name)
+      {
+	list_index++;
+	
+	if (strncmp (name, text, len) == 0)
+	  return (alloc_str(name));
+      }
+  } else if (comp_level == 1){
+        while (name = display_commands[list_index].name)
+      {
+	list_index++;
+	
+	if (strncmp (name, text, len) == 0)
+	  return (alloc_str(name));
+      }
+  } else{
+    //  printf("comp_level: %i\n", comp_level);
+        while (name = parameter_commands[list_index].name)
+      {
+	list_index++;
+	
+	if (strncmp (name, text, len) == 0)
+	  return (alloc_str(name));
+      }
+  }
+
+
+  /* If no names matched, then return NULL. */
+  return ((char *)NULL);
+}
+
+
+/*===========================================================================*\
+\*===========================================================================*/
+
+char *alloc_str(char *s)
+{
+  char *r = NULL;
+  int len = strlen(s);
+  if(len){
+    r = (char *)malloc(CSIZE*(len+1));
+    strcpy (r, s);
+  }
+  return (r);
+}
+
+/*===========================================================================*\
+\*===========================================================================*/
+  
+#endif
+#endif
+
+
 
