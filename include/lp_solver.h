@@ -153,7 +153,7 @@ typedef struct LPdata{
 #if defined(__OSI_CPLEX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
 || defined(__OSI_XPRESS__) || defined(__OSI_SOPLEX__) || defined(__OSI_VOL__) \
 || defined(__OSI_DYLP__) || defined (__OSI_GLPK__)
-   OsiSolverInterface * si;
+   OsiXSolverInterface * si;
 #endif
    double     lpetol;
    char       lp_is_modified;

@@ -1769,9 +1769,13 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 
 void unload_lp_prob(LPdata *lp_data)
 {
-   close_lp_solver(lp_data);
-   open_lp_solver(lp_data);
+   lp_data->si->reset();
    
+   /* Set parameters as in open_lp_solver() (do these persist?) */
+   lp_data->si->setHintParam(OsiDoReducePrint);
+   lp_data->si->messageHandler()->setLogLevel(0);
+   lp_data->si->getDblParam(OsiDualTolerance, lp_data->lpetol);   
+
    lp_data->maxn = lp_data->maxm = lp_data->maxnz = 0;
    lp_data->m = lp_data->n = lp_data->nz = 0;
 }
@@ -2165,8 +2169,7 @@ void get_slacks(LPdata *lp_data)
 
 #else
    
-   CPXgetslack(dynamic_cast<OsiCpxSolverInterface *>(lp_data->si)->getEnvironmentPtr(),
-	       dynamic_cast<OsiCpxSolverInterface *>(lp_data->si)->getLpPtr(),
+   CPXgetslack(lp_data->si->getEnvironmentPtr(), lp_data->si)->getLpPtr(),
 	       lp_data->slacks, 0, lp_data->m-1);
    /* Compute the real slacks for the free rows */
    for (i =m - 1; i >= 0; i--){

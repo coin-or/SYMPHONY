@@ -166,6 +166,8 @@ int user_io(void *user)
       }
    }
 
+   fclose(f);
+
    return(USER_NO_PP);
 }
    
