@@ -292,27 +292,27 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fixed_to_ub_before_logical_fixing = 1;
    lp_par->fixed_to_ub_frac_before_logical_fixing = .01;
 
-   lp_par->generate_cgl_cuts = TRUE;
-   lp_par->generate_cgl_gomory_cuts = TRUE;
-   lp_par->generate_cgl_knapsack_cuts = TRUE;
-   lp_par->generate_cgl_oddhole_cuts = TRUE;
-   lp_par->generate_cgl_clique_cuts = FALSE;
-   lp_par->generate_cgl_probing_cuts = TRUE;
-   lp_par->generate_cgl_mir_cuts = FALSE;
-   lp_par->generate_cgl_flow_and_cover_cuts = FALSE;
-   lp_par->generate_cgl_rounding_cuts = FALSE;
-   lp_par->generate_cgl_lift_and_project_cuts = FALSE;
+   lp_par->cgl.generate_cgl_cuts = TRUE;
+   lp_par->cgl.generate_cgl_gomory_cuts = TRUE;
+   lp_par->cgl.generate_cgl_knapsack_cuts = TRUE;
+   lp_par->cgl.generate_cgl_oddhole_cuts = TRUE;
+   lp_par->cgl.generate_cgl_clique_cuts = FALSE;
+   lp_par->cgl.generate_cgl_probing_cuts = TRUE;
+   lp_par->cgl.generate_cgl_mir_cuts = FALSE;
+   lp_par->cgl.generate_cgl_flow_and_cover_cuts = FALSE;
+   lp_par->cgl.generate_cgl_rounding_cuts = FALSE;
+   lp_par->cgl.generate_cgl_lift_and_project_cuts = FALSE;
 
 
-   lp_par->gomory_generated_in_root = FALSE;
-   lp_par->knapsack_generated_in_root = FALSE;
-   lp_par->oddhole_generated_in_root = FALSE;
-   lp_par->probing_generated_in_root = FALSE;
-   lp_par->mir_generated_in_root = FALSE;
-   lp_par->clique_generated_in_root = FALSE;
-   lp_par->flow_and_cover_generated_in_root = FALSE;
-   lp_par->rounding_generated_in_root = FALSE;
-   lp_par->lift_and_project_generated_in_root = FALSE;
+   lp_par->cgl.gomory_generated_in_root = FALSE;
+   lp_par->cgl.knapsack_generated_in_root = FALSE;
+   lp_par->cgl.oddhole_generated_in_root = FALSE;
+   lp_par->cgl.probing_generated_in_root = FALSE;
+   lp_par->cgl.mir_generated_in_root = FALSE;
+   lp_par->cgl.clique_generated_in_root = FALSE;
+   lp_par->cgl.flow_and_cover_generated_in_root = FALSE;
+   lp_par->cgl.rounding_generated_in_root = FALSE;
+   lp_par->cgl.lift_and_project_generated_in_root = FALSE;
 
    lp_par->multi_criteria = FALSE;
    lp_par->mc_find_supported_solutions = FALSE;
@@ -541,9 +541,9 @@ int sym_solve(sym_environment *env)
 {
 
    int s_bufid, r_bufid, bytes, msgtag = 0, sender, termcode = 0, temp, i;
-   char lp_data_sent = FALSE, cg_data_sent = FALSE, cp_data_sent = FALSE;
+   int lp_data_sent = 0, cg_data_sent = 0, cp_data_sent = 0;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   char sp_data_sent = TRUE; /*for now, we are not using this one*/
+   int sp_data_sent = 1; /*for now, we are not using this one*/
    /*___END_EXPERIMENTAL_SECTION___*/
 #ifndef COMPILE_IN_TM
    char repricing, node_type;
@@ -664,10 +664,10 @@ int sym_solve(sym_environment *env)
    
 #ifdef COMPILE_IN_LP
    CALL_WRAPPER_FUNCTION( send_lp_data_u(env, 0) );
-   lp_data_sent = TRUE;
+   lp_data_sent = 1;
 #ifdef COMPILE_IN_CG
    CALL_WRAPPER_FUNCTION( send_cg_data_u(env, 0) );
-   cg_data_sent = TRUE;
+   cg_data_sent = 1;
 #endif
 #endif
 #ifdef COMPILE_IN_CP
@@ -676,7 +676,7 @@ int sym_solve(sym_environment *env)
    }else{
       CALL_WRAPPER_FUNCTION( send_cp_data_u(env, 0) );
    }
-   cp_data_sent = TRUE;
+   cp_data_sent = 1;
 #endif
 
    memset(&(env->best_sol), 0, sizeof(lp_sol));
@@ -765,11 +765,15 @@ int sym_solve(sym_environment *env)
    
 #ifdef COMPILE_IN_TM
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   while (!lp_data_sent || !cg_data_sent || !cp_data_sent || !sp_data_sent){
+   while (!(lp_data_sent == env->par.tm_par.max_active_nodes) ||
+	  !(cg_data_sent == env->par.tm_par.max_active_nodes) ||
+	  !(cp_data_sent == env->par.tm_par.max_cp_num) || !sp_data_sent){
    /*___END_EXPERIMENTAL_SECTION___*/
    /*UNCOMMENT FOR PRODUCTION CODE*/
 #if 0
-   while (!lp_data_sent || !cg_data_sent || !cp_data_sent){
+   while (!(lp_data_sent == env->tm_par.max_active_nodes) ||
+	  !(cg_data_sent == env->tm_par.max_active_nodes) ||
+	  !(cp_data_sent == env->max_cp_num)){
 #endif
 #else
    do{
@@ -807,26 +811,26 @@ int sym_solve(sym_environment *env)
        case REQUEST_FOR_LP_DATA:
 	 /* An LP process has been started and asks for all necessary data */
 	 CALL_WRAPPER_FUNCTION( send_lp_data_u(env, sender) );
-	 lp_data_sent = TRUE;
+	 lp_data_sent++;
 	 break;
 
        case REQUEST_FOR_CG_DATA:
 	 /* A CG process has been started and asks for all necessary data */
 	 CALL_WRAPPER_FUNCTION( send_cg_data_u(env, sender) );
-	 cg_data_sent = TRUE;
+	 cg_data_sent++;
 	 break;
 
        case REQUEST_FOR_CP_DATA:
 	 /* A CP process has been started and asks for all necessary data */
 	 CALL_WRAPPER_FUNCTION( send_cp_data_u(env, sender) );
-	 cp_data_sent = TRUE;
+	 cp_data_sent++;
 	 break;
 
        /*__BEGIN_EXPERIMENTAL_SECTION__*/
        case REQUEST_FOR_SP_DATA:
 	 /* An SP process has been started and asks for all necessary data */
 	 CALL_WRAPPER_FUNCTION( send_sp_data_u(env, sender) );
-	 sp_data_sent = TRUE;
+	 sp_data_sent++;
 	 break;
 
        /*___END_EXPERIMENTAL_SECTION___*/
@@ -1137,7 +1141,7 @@ int sym_warm_solve(sym_environment *env)
 	 if (change_type == RHS_CHANGED){
 	    
 	    //#ifdef USE_CGL_CUTS
-	    if(env->par.lp_par.generate_cgl_cuts){
+	    if(env->par.lp_par.cgl.generate_cgl_cuts){
 	       printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
 	       printf("rhs change when cuts exist, for now!\n"); 
 	       return(FUNCTION_TERMINATED_ABNORMALLY);	    
@@ -4568,47 +4572,47 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
    }
    else if (strcmp(key, "generate_cgl_gomory_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_gomory_cuts") == 0){
-      *value = lp_par->generate_cgl_gomory_cuts;
+      *value = lp_par->cgl.generate_cgl_gomory_cuts;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_knapsack_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_knapsack_cuts") == 0){
-      *value = lp_par->generate_cgl_knapsack_cuts;
+      *value = lp_par->cgl.generate_cgl_knapsack_cuts;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_oddhole_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_oddhole_cuts") == 0){
-      *value = lp_par->generate_cgl_oddhole_cuts;
+      *value = lp_par->cgl.generate_cgl_oddhole_cuts;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_probing_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_probing_cuts") == 0){
-      *value = lp_par->generate_cgl_probing_cuts;
+      *value = lp_par->cgl.generate_cgl_probing_cuts;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_clique_cuts") == 0 ||
             strcmp(key, "LP_generate_cgl_clique_cuts") == 0){
-     *value = lp_par->generate_cgl_clique_cuts;
+     *value = lp_par->cgl.generate_cgl_clique_cuts;
      return(0);
    }
    else if (strcmp(key, "generate_cgl_mir_cuts") == 0 ||
             strcmp(key, "LP_generate_cgl_mir_cuts") == 0){
-     *value = lp_par->generate_cgl_mir_cuts;
+     *value = lp_par->cgl.generate_cgl_mir_cuts;
      return(0);
    }
    else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts") == 0){
-      *value = lp_par->generate_cgl_flow_and_cover_cuts;
+      *value = lp_par->cgl.generate_cgl_flow_and_cover_cuts;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_rounding_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_rounding_cuts") == 0){
-      *value = lp_par->generate_cgl_rounding_cuts;
+      *value = lp_par->cgl.generate_cgl_rounding_cuts;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_lift_and_project_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts") == 0){
-      *value = lp_par->generate_cgl_lift_and_project_cuts;
+      *value = lp_par->cgl.generate_cgl_lift_and_project_cuts;
       return(0);
    }
    else if (strcmp(key, "max_presolve_iter") == 0 ||

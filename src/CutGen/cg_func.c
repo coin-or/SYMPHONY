@@ -171,8 +171,9 @@ int cg_send_cut(cut_data *new_cut, int *num_cuts, int *alloc_cuts,
 
 /*===========================================================================*/
 
-cut_data *create_explicit_cut(int nzcnt, int *indices, double *values, double rhs,
-			      double range, char sense, char send_to_cp)
+cut_data *create_explicit_cut(int nzcnt, int *indices, double *values,
+			      double rhs, double range, char sense,
+			      char send_to_cp)
 {
    cut_data *cut = (cut_data *) calloc(1, sizeof(cut_data));
 

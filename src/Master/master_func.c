@@ -2633,63 +2633,62 @@ int set_param(sym_environment *env, char *line)
    
    else if (strcmp(key, "generate_cgl_cuts") == 0 ||
 	    strcmp(key, "CG_generate_cgl_cuts") == 0){
-      //      READ_INT_PAR(lp_par->generate_cgl_cuts);
-      READ_INT_PAR(cg_par->do_findcuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_cuts);
       return(0);
    }
 
    else if (strcmp(key, "generate_cgl_gomory_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_gomory_cuts") == 0){
-      READ_INT_PAR(lp_par->generate_cgl_gomory_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_gomory_cuts);
       return(0);
    }
 
    else if (strcmp(key, "generate_cgl_knapsack_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_knapsack_cuts") == 0){
-      READ_INT_PAR(lp_par->generate_cgl_knapsack_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_knapsack_cuts);
       return(0);
    }
    
    else if (strcmp(key, "generate_cgl_oddhole_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_oddhole_cuts") == 0){
-      READ_INT_PAR(lp_par->generate_cgl_oddhole_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_oddhole_cuts);
       return(0);
    }
 
    else if (strcmp(key, "generate_cgl_probing_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_probing_cuts") == 0){
-      READ_INT_PAR(lp_par->generate_cgl_probing_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_probing_cuts);
       return(0);
    }
 
    else if (strcmp(key, "generate_cgl_clique_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_clique_cuts") == 0){
-      READ_INT_PAR(lp_par->generate_cgl_clique_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_clique_cuts);
       return(0);
    }
 
    else if (strcmp(key, "generate_cgl_mir_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_mir_cuts") == 0){
-      READ_INT_PAR(lp_par->generate_cgl_mir_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts);
       return(0);
    }
 
 
    else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts") == 0){
-      READ_INT_PAR(lp_par->generate_cgl_flow_and_cover_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_flow_and_cover_cuts);
       return(0);
    }
 
    else if (strcmp(key, "generate_cgl_rounding_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_rounding_cuts") == 0){
-      READ_INT_PAR(lp_par->generate_cgl_rounding_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_rounding_cuts);
       return(0);
    }
 
    else if (strcmp(key, "generate_cgl_lift_and_project_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts") == 0){
-      READ_INT_PAR(lp_par->generate_cgl_lift_and_project_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_lift_and_project_cuts);
       return(0);
    }
 

@@ -3057,7 +3057,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    int i = 0, j = 0, k = 0; 
    int *matind;
    double *matval;
-   lp_params *par = &(lp_data->par);
+   cgl_params *par = &(lp_data->cgl);
    int cut_num = 0;
    
    /* Set proper variables to be integer */
@@ -3068,7 +3068,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }  
 
    /* create CGL probing cuts */
-   if(lp_data->par.generate_cgl_probing_cuts){
+   if(par->generate_cgl_probing_cuts){
      if(is_rootnode || par->probing_generated_in_root){
        CglProbing *probe = new CglProbing;
        //#if 0
@@ -3089,7 +3089,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
 
    /* create CGL gomory cuts */
-   if(lp_data->par.generate_cgl_gomory_cuts){
+   if(par->generate_cgl_gomory_cuts){
      if(is_rootnode || par->gomory_generated_in_root){
        CglGomory *gomory = new CglGomory;
        gomory->generateCuts(*(lp_data->si), cutlist);
@@ -3104,7 +3104,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
 
    /* create CGL knapsack cuts */
-   if(lp_data->par.generate_cgl_knapsack_cuts){
+   if(par->generate_cgl_knapsack_cuts){
      if(is_rootnode || par->knapsack_generated_in_root){
        CglKnapsackCover *knapsack = new CglKnapsackCover;
        knapsack->generateCuts(*(lp_data->si), cutlist);
@@ -3119,7 +3119,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
 
    /* create CGL odd hole cuts */
-   if(lp_data->par.generate_cgl_oddhole_cuts){
+   if(par->generate_cgl_oddhole_cuts){
      if(is_rootnode || par->oddhole_generated_in_root){
        CglOddHole *oddhole = new CglOddHole;
        //#if 0
@@ -3139,7 +3139,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
 
    /* create CGL mir cuts */
-   if(lp_data->par.generate_cgl_mir_cuts){
+   if(par->generate_cgl_mir_cuts){
      if(is_rootnode || par->mir_generated_in_root){
        CglMixedIntegerRounding *mir = new CglMixedIntegerRounding;
        mir->generateCuts(*(lp_data->si), cutlist);
@@ -3154,7 +3154,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
 
    /* create CGL clique cuts */
-   if(lp_data->par.generate_cgl_clique_cuts){
+   if(par->generate_cgl_clique_cuts){
      if(is_rootnode || par->clique_generated_in_root){
        CglClique *clique = new CglClique;
        clique->generateCuts(*(lp_data->si), cutlist);
@@ -3170,7 +3170,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    /* create CGL flow cover cuts */
-   if(lp_data->par.generate_cgl_flow_and_cover_cuts){
+   if(par->generate_cgl_flow_and_cover_cuts){
      if(is_rootnode || par->flow_and_cover_generated_in_root){
        CglFlowCover *flow = new CglFlowCover;
        flow->generateCuts(*(lp_data->si), cutlist);
@@ -3187,7 +3187,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
    /*___END_EXPERIMENTAL_SECTION___*/
    /* create CGL simple rounding cuts */
-   if(lp_data->par.generate_cgl_rounding_cuts){
+   if(par->generate_cgl_rounding_cuts){
      if(is_rootnode || par->rounding_generated_in_root){
        CglSimpleRounding * rounding = new CglSimpleRounding;
        rounding->generateCuts(*(lp_data->si), cutlist);
@@ -3203,7 +3203,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
    
    /* create CGL liftandproject cuts (currently buggy) */     
-   if(lp_data->par.generate_cgl_lift_and_project_cuts){
+   if(par->generate_cgl_lift_and_project_cuts){
      if(is_rootnode || par->lift_and_project_generated_in_root){
        CglLiftAndProject *liftandproject = new CglLiftAndProject;
        liftandproject->generateCuts(*(lp_data->si), cutlist);

@@ -469,7 +469,7 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	 strncpy(env->par.param_file, argv[++i], MAX_FILE_NAME_LENGTH);
 	 break;
        case 'j':
-	 sscanf(argv[++i], "%i", &lp_par->generate_cgl_cuts);
+	 sscanf(argv[++i], "%i", &lp_par->cgl.generate_cgl_cuts);
 	 break;
        case 'z':
 	 sscanf(argv[++i], "%lf", &tm_par->diving_threshold);
