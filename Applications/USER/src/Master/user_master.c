@@ -103,6 +103,8 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
       }
    }      
 
+   fclose(f);
+   
    /* Here you can parse the command line for options. By convention, the
       users options should be capital letters */
 
@@ -144,7 +146,7 @@ int user_io(void *user)
    char line[MAX_LINE_LENGTH], key[50], value[50];
 
    if ((f = fopen(infile, "r")) == NULL){
-      printf("VRP Readparams: file %s can't be opened\n", infile);
+      printf("Readparams: file %s can't be opened\n", infile);
       exit(1); /*error check for existence of parameter file*/
    }
 
@@ -415,9 +417,10 @@ int user_display_solution(void *user, int length, int *xind, double *xval)
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    /* In this case, the LP user data structure is passed in, along with the
       indices and values of the nonzeros for the best solution found.
-      Fill this one in if you want to interpret the solution and display it.
-      By default, SYMPHONY prints out the indices and values of nonzero
-      variables. */
+      In the template code, there is only one data structure, so these ifdefs
+      are not really necessary... Fill this function in if you want to
+      interpret the solution and display it. By default, SYMPHONY prints out
+      the indices and values of nonzero variables. */
 #else
    /* In this case, it is the Master user data structure that is passed in,
       along with the indices and values of the nonzeros for the best solution
