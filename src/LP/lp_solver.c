@@ -1123,12 +1123,6 @@ void open_lp_solver(LPdata *lp_data)
 {
    int i;
 
-   /* If we are on the SP2, first make sure that there are no stray
-      cplex licenses about */
-#ifdef SYSRS6000___________0
-   system("/bin/rm -f /local/license/cplex/.cpxlicense/.tko*");
-#endif
-
    i = CPX_OFF;
    lp_data->cpxenv = CPXopenCPLEX(&cpx_status);
    CPX_check_error("open_lp_solver - error opening environment");

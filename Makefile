@@ -345,7 +345,7 @@ GCCLIBDIR =
 ifeq ($(ARCH),LINUX)
 	X11LDFLAGS = -L/usr/X11R6/lib
 ########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX70)
+	ifeq ($(LP_SOLVER),CPLEX81)
 	   LPSOLVER_DEFS = -DSYSFREEUNIX
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
@@ -383,7 +383,7 @@ endif
 ifeq ($(ARCH),SUN4SOL2)
 	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
 ########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX70)
+	ifeq ($(LP_SOLVER),CPLEX81)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM 
@@ -403,7 +403,7 @@ endif
 ifeq ($(ARCH),SUNMP)
 	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
 ########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX70)
+	ifeq ($(LP_SOLVER),CPLEX81)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM 
@@ -423,7 +423,7 @@ endif
 ifeq ($(ARCH),X86SOL2)
 	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
 ########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX70)
+	ifeq ($(LP_SOLVER),CPLEX81)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
