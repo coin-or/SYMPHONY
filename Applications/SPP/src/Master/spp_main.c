@@ -11,9 +11,6 @@
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
-
-#define COMPILING_FOR_MASTER
-
 /*===========================================================================*/
 
 #define CALL_FUNCTION(f) \
@@ -32,7 +29,7 @@ if ((termcode = f) < 0){                                                    \
    default. See below for the usage.
 \*===========================================================================*/
 
-#if defined(USE_OSI_INTERFACE) && !defined(USER_MAIN) 
+#if defined(USE_OSI_INTERFACE)
 
 #include "OsiSymSolverInterface.hpp"
 
@@ -55,7 +52,7 @@ int main(int argc, char **argv)
    return(0);
 }
 
-#elif !defined(USER_MAIN)
+#else
 
 #include "symphony_api.h"
 #include <stdlib.h>
