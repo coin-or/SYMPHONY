@@ -622,7 +622,7 @@ int display_solution_u(sym_environment *env, int thread_num)
    sol = env->best_sol;
 #endif
 
-   if (!sol.xlength){
+   if (!sol.has_sol){
       printf("\nNo Solution Found\n\n");
       return(FUNCTION_TERMINATED_NORMALLY);
    }
@@ -679,6 +679,11 @@ int display_solution_u(sym_environment *env, int thread_num)
 	       printf("\n");
 	     }
 	     
+	     return(FUNCTION_TERMINATED_NORMALLY);
+	  }else{
+	     printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	     printf("All columns are zero in the solution!\n");
+	     printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	     return(FUNCTION_TERMINATED_NORMALLY);
 	  }
        }

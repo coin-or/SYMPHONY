@@ -876,7 +876,7 @@ int sym_solve(sym_environment *env)
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    thread_num = env->tm->opt_thread_num;
    if (env->tm->lpp[thread_num]){
-      if (env->tm->lpp[thread_num]->best_sol.xlength){
+      if (env->tm->lpp[thread_num]->best_sol.has_sol){
 	 FREE(env->best_sol.xind);
 	 FREE(env->best_sol.xval);
 	 env->best_sol = env->warm_start->best_sol = 
@@ -900,9 +900,9 @@ int sym_solve(sym_environment *env)
       because it doesn't know whether a solution was found. This should be
       changed. */
    if (termcode == TM_FINISHED){
-      if (tm->par.find_first_feasible && env->best_sol.xlength){
+      if (tm->par.find_first_feasible && env->best_sol.has_sol){
 	 termcode = TM_FOUND_FIRST_FEASIBLE;
-      }else if (env->best_sol.xlength){
+      }else if (env->best_sol.has_sol){
 	 termcode = TM_OPTIMAL_SOLUTION_FOUND;
       }else{
 	 termcode = TM_NO_SOLUTION;
@@ -1327,8 +1327,13 @@ int sym_mc_solve(sym_environment *env)
    
    printf("***************************************************\n");
    printf("***************************************************\n");
-   printf("Utopia point has first  objective value %.3f\n", utopia[0]);
-   printf("                 second objective value %.3f\n", utopia[1]);
+   if(env->mip->obj_sense == SYM_MAXIMIZE){
+      printf("Utopia point has first  objective value %.3f\n", -utopia[0]);
+      printf("                 second objective value %.3f\n", -utopia[1]);
+   }else{
+      printf("Utopia point has first  objective value %.3f\n", utopia[0]);
+      printf("                 second objective value %.3f\n", utopia[1]);
+   }
    printf("***************************************************\n");
    printf("***************************************************\n\n");
    
@@ -1639,13 +1644,25 @@ int sym_mc_solve(sym_environment *env)
 	     solutions[i].obj[0]);
 	 gamma1 = slope/(1+slope);
       }
-      printf("First Objective: %.3f Second Objective: %.3f ",
-	     solutions[i].obj[0], solutions[i].obj[1]);
+      if(env->mip->obj_sense == SYM_MAXIMIZE){
+	 printf("First Objective: %.3f Second Objective: %.3f ",
+		-solutions[i].obj[0], -solutions[i].obj[1]);
+      }else{
+	 printf("First Objective: %.3f Second Objective: %.3f ",
+		solutions[i].obj[0], solutions[i].obj[1]);
+      }
+
       printf("Range: %.6f - %.6f\n", gamma1, gamma0);
       gamma0 = gamma1;
    }
-   printf("First Objective: %.3f Second Objective: %.3f ",
-	  solutions[i].obj[0], solutions[i].obj[1]);
+   if(env->mip->obj_sense == SYM_MAXIMIZE){
+      printf("First Objective: %.3f Second Objective: %.3f ",
+	     -solutions[i].obj[0], -solutions[i].obj[1]);
+   }else{
+      printf("First Objective: %.3f Second Objective: %.3f ",
+	     solutions[i].obj[0], solutions[i].obj[1]);
+   }
+
    printf("Range: %.6f - %.6f\n", 0.0, gamma0);
    
    for (i = 0 ; i < numsolutions; i++){
@@ -2363,7 +2380,7 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
 
    sol = env->best_sol;
 
-   if (!sol.xlength || (sol.xlength && (!sol.xind || !sol.xval))){
+   if (!sol.has_sol || (sol.xlength && (!sol.xind || !sol.xval))){
       printf("sym_get_col_solution(): There is no solution!\n");
       if(env->mip->n){
 	 memcpy(colsol, env->mip->lb, DSIZE*env->mip->n);
@@ -2372,8 +2389,10 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
    }
    else{
       memset(colsol, 0, DSIZE*env->mip->n);
-      for( i = 0; i<sol.xlength; i++){
-	 colsol[sol.xind[i]] = sol.xval[i];
+      if(sol.xlength){
+	 for( i = 0; i<sol.xlength; i++){
+	    colsol[sol.xind[i]] = sol.xval[i];
+	 }
       }
    }
 
@@ -2426,7 +2445,7 @@ int sym_get_obj_val(sym_environment *env, double *objval)
 {
    int i;
 
-   if (env->best_sol.xlength){
+   if (env->best_sol.has_sol){
       *objval = (env->mip->obj_sense == SYM_MINIMIZE ? env->best_sol.objval :
 		 -env->best_sol.objval) + env->mip->obj_offset;
    }else{ 
@@ -2495,17 +2514,12 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   /* this is done in create_subproblem_u()!*/
 
-#if 0   
    if (env->mip->obj_sense == SYM_MAXIMIZE){
       env->mip->obj[index] = -value;
    }else{
       env->mip->obj[index] = value;
    }
-#endif
-
-   env->mip->obj[index] = value;
 
    if (env->mip->change_num){
       for(i = env->mip->change_num - 1 ; i >=0 ; i--){
@@ -2544,6 +2558,8 @@ int sym_set_obj2_coeff(sym_environment *env, int index, double value)
    }else{
       env->mip->obj2[index] = value;
    }
+
+   env->mip->obj2[index] = value;
 
    return(FUNCTION_TERMINATED_NORMALLY);
 }
@@ -2820,8 +2836,7 @@ int sym_set_row_type(sym_environment *env, int index, char rowsense,
 int sym_set_obj_sense(sym_environment *env, int sense)
 {
 
-   int j;
-   double *obj;
+   int i;
 
    if (!env->mip){
       printf("sym_set_obj_type():There is no loaded mip description!\n");
@@ -2829,10 +2844,18 @@ int sym_set_obj_sense(sym_environment *env, int sense)
    }
 
    if (sense==-1 && env->mip->obj_sense != SYM_MAXIMIZE ){
+      for (i = 0; i < env->mip->n; i++){
+	 env->mip->obj[i] *= -1.0;
+	 env->mip->obj2[i] *= -1.0;
+      }
       env->mip->obj_sense = SYM_MAXIMIZE;
    }
    else if (sense != -1 && env->mip->obj_sense != SYM_MINIMIZE ){
       /* assume it to be min problem */
+      for (i = 0; i < env->mip->n; i++){
+	 env->mip->obj[i] *= -1.0;
+	 env->mip->obj2[i] *= -1.0;
+      }
       env->mip->obj_sense = SYM_MINIMIZE;
    }
 

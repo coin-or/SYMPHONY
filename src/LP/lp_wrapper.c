@@ -335,9 +335,11 @@ int create_subproblem_u(lp_prob *p)
       maxn = lp_data->n;
       maxnz = lp_data->nz;
 
-      /* Fall through to next case */
+      lp_data->m = bcutnum;
 
+      break;
     case USER_SUCCESS:
+       /* Fall through to next case */
     case USER_AND_PP:
     case USER_NO_PP:
        
@@ -346,11 +348,16 @@ int create_subproblem_u(lp_prob *p)
        * problem is loaded into the lp solver (for cplex it is not possible).
        * So for now just reset lp_data->m, do everything to load in the
        * stuff into the lp solver then come back to adding the cuts. */
+
+       /* change obj coeff only if the obj funct. was created through 
+	  user_create_subproblem() */
+
       if (p->mip->obj_sense == SYM_MAXIMIZE){
          for (i = 0; i < lp_data->mip->n; i++){
 	    lp_data->mip->obj[i] *= -1.0;
 	 }
       }
+
       lp_data->m = bcutnum;
       break;
 
@@ -656,6 +663,8 @@ int is_feasible_u(lp_prob *p, char branching)
 	    p->best_sol.xval = (double *) malloc(cnt*DSIZE);
 	    memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
 	    memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
+	    if(!p->best_sol.has_sol)
+	       p->best_sol.has_sol = TRUE;
 	    PRINT(p->par.verbosity, -1,
 		  ("\n****** Found Better Feasible Solution !\n"));
 	    if (p->mip->obj_sense == SYM_MAXIMIZE){
@@ -2142,8 +2151,13 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 			      (obj[0] >= p->obj[0] - etol
 			       && obj[1] < p->obj[1] - etol))){
 	    printf("\nBetter Solution Found:\n");
-	    printf("First Objective Cost: %.1f\n", obj[0]);
-	    printf("Second Objective Cost: %.1f\n", obj[1]);
+	    if(p->mip->obj_sense == SYM_MAXIMIZE){
+	       printf("First Objective Cost: %.1f\n", -obj[0]);
+	       printf("Second Objective Cost: %.1f\n", -obj[1]);
+	    }else{
+	       printf("First Objective Cost: %.1f\n", obj[0]);
+	       printf("Second Objective Cost: %.1f\n", obj[1]);
+	    }
 	    p->obj[1] = obj[1];
 	    p->obj[0] = obj[0];
 	    p->mc_ub = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
@@ -2173,8 +2187,13 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 			      (obj[1] >= p->obj[1] - etol
 			       && obj[0] < p->obj[0] - etol))){
 	   printf("\nBetter Solution Found:\n");
-	   printf("First Objective Cost: %.1f\n", obj[0]);
-	   printf("Second Objective Cost: %.1f\n", obj[1]);
+	    if(p->mip->obj_sense == SYM_MAXIMIZE){
+	       printf("First Objective Cost: %.1f\n", -obj[0]);
+	       printf("Second Objective Cost: %.1f\n", -obj[1]);
+	    }else{
+	       printf("First Objective Cost: %.1f\n", obj[0]);
+	       printf("Second Objective Cost: %.1f\n", obj[1]);
+	    }
 	   p->obj[1] = obj[1];
 	   p->obj[0] = obj[0];
 	   p->mc_ub = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
@@ -2207,8 +2226,13 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	 (obj[1] < p->obj[1] - etol &&
 	  obj[0] < p->obj[0] + etol)){
 	printf("\nBetter Solution Found:\n");
-	printf("First Objective Cost: %.1f\n", obj[0]);
-	printf("Second Objective Cost: %.1f\n", obj[1]);
+	if(p->mip->obj_sense == SYM_MAXIMIZE){
+	   printf("First Objective Cost: %.1f\n", -obj[0]);
+	   printf("Second Objective Cost: %.1f\n", -obj[1]);
+	}else{
+	   printf("First Objective Cost: %.1f\n", obj[0]);
+	   printf("Second Objective Cost: %.1f\n", obj[1]);
+	}
 	p->obj[1] = obj[1];
 	p->obj[0] = obj[0];
 	p->mc_ub = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);

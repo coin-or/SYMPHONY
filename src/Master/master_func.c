@@ -1068,6 +1068,7 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 		     
 		     if(!env->warm_start->has_ub){
 			env->warm_start->has_ub = TRUE;
+			best_sol->has_sol = TRUE;
 		     }
 		     
 		     env->warm_start->ub = upper_bound;
@@ -1082,7 +1083,7 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 			   cnt++;
 			}
 		     }
-		     
+
 		     best_sol->xlevel = root->bc_level;
 		     best_sol->xindex = root->bc_index;
 		     best_sol->xlength = cnt;
