@@ -18,6 +18,8 @@
 #include "proto.h"
 #include "BB_types.h"
 
+#define LP_MAX_ITER 9999999
+
 #ifdef __CPLEX__
 
 /*****************************************************************************/
@@ -42,7 +44,7 @@ void CPX_check_error PROTO((const char *erring_func));
 
 void OSL_check_error PROTO((const char *erring_func));
 
-#elif defined(__OSI_CPX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
+#elif defined(__OSI_CPLEX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
 || defined(__OSI_XPRESS__) || defined(__OSI_SOPLEX__) || defined(__OSI_VOL__) \
 || defined(__OSI_DYLP__) || defined (__OSI_GLPK__)
 
@@ -54,7 +56,7 @@ void OSL_check_error PROTO((const char *erring_func));
 #include "CoinHelperFunctions.hpp"
 #include "CoinPackedVector.hpp"
 
-#ifdef __OSI_CPX__
+#ifdef __OSI_CPLEX__
 #include "OsiCpxSolverInterface.hpp"
 typedef OsiCpxSolverInterface OsiXSolverInterface;
 #endif
@@ -90,7 +92,7 @@ typedef OsiDylpSolverInterface OsiXSolverInterface;
 #endif
 
 #ifdef __OSI_GLPK__
-#include "OsiCpxSolverInterface.hpp"
+#include "OsiGlpkSolverInterface.hpp"
 typedef OsiGlpkSolverInterface OsiXSolverInterface;
 #endif
 
@@ -152,7 +154,7 @@ typedef struct LPdata{
    EKKContext *env;
    EKKModel   *lp;
 #endif
-#if defined(__OSI_CPX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
+#if defined(__OSI_CPLEX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
 || defined(__OSI_XPRESS__) || defined(__OSI_SOPLEX__) || defined(__OSI_VOL__) \
 || defined(__OSI_DYLP__) || defined (__OSI_GLPK__)
    OsiSolverInterface * si;

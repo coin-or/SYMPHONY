@@ -157,9 +157,6 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
  *============================================================================
 */
 
-/* Default value of OSL has set */
-#define LP_MAX_ITER 9999999
-
 static int osllib_status;
 
 #include <memory.h>
@@ -1694,7 +1691,7 @@ void write_sav(LPdata *lp_data, char *fname)
 
 #endif /* __CPLEX__ */
 
-#if defined(__OSI_CPX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
+#if defined(__OSI_CPLEX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
 || defined(__OSI_XPRESS__) || defined(__OSI_SOPLEX__) || defined(__OSI_VOL__) \
 || defined(__OSI_DYLP__) || defined (__OSI_GLPK__)
 
@@ -1709,6 +1706,7 @@ void open_lp_solver(LPdata *lp_data)
    /* Turn off the OSL messages (There are LOTS of them) */
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
+   lp_data->si->getDblParam(OsiDualTolerance, lp_data->lpetol);   
 }
 
 /*===========================================================================*/
@@ -2028,9 +2026,11 @@ void set_obj_upper_lim(LPdata *lp_data, double lim)
 
 void set_itlim(LPdata *lp_data, int itlim)
 {
+   if (itlim < 0) itlim = LP_MAX_ITER;
+
    OsiIntParam key = OsiMaxNumIteration;
    
-   retval = lp_data->si->setIntParam(key,itlim);
+   retval = lp_data->si->setIntParam(key, itlim);
    
    //if(itlim<0) doesn't seem to be appear in setIntParam of Osi???MEN
 }
@@ -2147,16 +2147,18 @@ void get_dj_pi(LPdata *lp_data)
 void get_slacks(LPdata *lp_data)
 {
   int m = lp_data->m, i = 0;
-  double * slacks = new double[m];
+  double * slacks = lp_data->slacks;
   constraint *rows = lp_data->rows;
 
   const double * rowActivity = lp_data->si->getRowActivity();
-  const double * rhs = lp_data->si->getRightHandSide();
-
-  rowActivity = lp_data->si->getRowActivity();
   
-  for(i = 0; i < m; i++)
-     slacks[i] = rhs[i] - rowActivity[i];
+  for (i = m - 1; i >= 0; i--) {
+     if ((rows[i].cut->sense == 'R') && (rows[i].cut->range < 0) ) {
+	slacks[i] = - rows[i].cut->rhs + rowActivity[i];
+     } else {
+	slacks[i] = rows[i].cut->rhs - rowActivity[i];
+     }
+  }
 
   lp_data->slacks = slacks;
 }
