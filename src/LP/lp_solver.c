@@ -2650,7 +2650,7 @@ int generate_cgl_cuts(LPdata * lp_data, cut_data ***cuts){
 	 (*cuts)[i]->sense = cut.sense();
 	 (*cuts)[i]->rhs = cut.rhs();
 	 (*cuts)[i]->range = cut.range();
-	 (*cuts)[i]->size = 1 + num_elements * (ISIZE + DSIZE);
+	 (*cuts)[i]->size = ISIZE + num_elements * (ISIZE + DSIZE);
 	 (*cuts)[i]->coef = (char *) malloc ((*cuts)[i]->size);
 	 ((int *) ((*cuts)[i]->coef))[0] = num_elements;
 	 memcpy((*cuts)[i]->coef + ISIZE, (char *)indices, num_elements*ISIZE);

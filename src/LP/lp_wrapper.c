@@ -1377,7 +1377,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 {
    LPdata *lp_data = p->lp_data;
    int user_res;
-   int i, j, k, l, nzcnt, real_nzcnt, explicit_row_num = 0;
+   int i, j, k, l = 0, nzcnt, real_nzcnt, explicit_row_num = 0;
    int *matbeg, *matind;
    double *matval;
    waiting_row **row_list;
@@ -1397,8 +1397,8 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	    (waiting_row *) malloc(sizeof(waiting_row));
 	 row_list[explicit_row_num]->cut = cuts[i];
 	 nzcnt = ((int *) (cuts[i]->coef))[0];
-	 matind = ((int *) (cuts[i]->coef)) + 1;
-	 matval = ((double *) (cuts[i]->coef)) + 1 + nzcnt * ISIZE;
+	 matind = (int *) (cuts[i]->coef + ISIZE);
+	 matval = (double *) (cuts[i]->coef + (1 + nzcnt) * ISIZE);
 	 row_list[explicit_row_num]->matind = (int *) malloc(nzcnt * ISIZE);
 	 row_list[explicit_row_num]->matval = (double *) malloc(nzcnt * DSIZE);
 	 real_nzcnt = 0;
