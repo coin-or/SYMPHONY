@@ -1127,8 +1127,15 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       child->lower_bound = objval[i];
       child->parent = node;
 #ifdef DO_TESTS
-      if (child->lower_bound < child->parent->lower_bound){
-	printf("#######Error: Child's lower bound isless than parent's\n");
+      if (child->lower_bound < child->parent->lower_bound - .01){
+	 printf("#######Error: Child's lower bound (%.3f) is less than ",
+		child->lower_bound);
+	 printf("parent's (%.3f)\n", child->parent->lower_bound);
+      }
+      if (child->lower_bound < tm->rootnode->lower_bound - .01){
+	 printf("#######Error: Node's lower bound (%.3f) is less than ",
+		child->lower_bound);
+	 printf("root's (%.3f)\n", tm->rootnode->lower_bound);
       }
 #endif
 
