@@ -84,7 +84,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
    int i;
    /* This gives you access to the user data structure*/
    user_problem *prob = (user_problem *) user;
-   user_parameters par = prob->par;
+   user_parameters *par = &(prob->par);
    
    if ((f = fopen(filename, "r")) == NULL){
       printf("SYMPHONY: file %s can't be opened\n", filename);
@@ -98,8 +98,8 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
       sscanf(line, "%s%s", key, value);
 
       if (strcmp(key, "input_file") == 0){
-	 par.infile[MAX_FILE_NAME_LENGTH] = 0;
-	 strncpy(par.infile, value, MAX_FILE_NAME_LENGTH);
+	 par->infile[MAX_FILE_NAME_LENGTH] = 0;
+	 strncpy(par->infile, value, MAX_FILE_NAME_LENGTH);
       }
    }      
 
@@ -116,7 +116,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 	 exit(0);
 	 break;
        case 'F':
-	 strncpy(par.infile, argv[++i], MAX_FILE_NAME_LENGTH);
+	 strncpy(par->infile, argv[++i], MAX_FILE_NAME_LENGTH);
 	 break;
       };
    }
@@ -138,8 +138,8 @@ int user_io(void *user)
 {
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
-   user_parameters par = prob->par;
-   char *infile = par.infile;
+   user_parameters *par = &(prob->par);
+   char *infile = par->infile;
    FILE *f = NULL;
    char line[MAX_LINE_LENGTH], key[50], value[50];
 
@@ -212,12 +212,22 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
    user_problem *prob = (user_problem *) user;
    int i;
    int *vars, varnum;
- 
-   /* This puts all the variable in the base set */
+
+   /* Set the number of variables*/
    varnum = *basevarnum = prob->colnum;
-   vars = *basevars = (int *) malloc(*basevarnum * ISIZE);
+ 
+   /* Allocate memory for the uper and lower bounds. */
+   /* Lower bounds are (probably) all zero so calloc those. */
+   *lb = (double *) calloc (varnum, DSIZE);
+   *ub = (double *) malloc (varnum * DSIZE);
+
+   /* This puts all the variable in the base set and fills out the 
+      upper bounds */
+   vars = *basevars = (int *) malloc(varnum * ISIZE);
    for (i = 0; i < varnum; i++){
      vars[i] = i;
+     (*ub)[i] = 1; /* If the upper bounds are not 1, change this line. */
+     /* (*lb)[i] = 0; /* If the lower bounds are not 0, uncomment this line. */
    }
 
    /* Set the number of rows in the base */

@@ -93,7 +93,7 @@ LP_SOLVER = NONE
 ##############################################################################
 
 #Uncomment the line below if you want to use OSL.
-#LP_SOLVER = OSL
+LP_SOLVER = OSL
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSL)
@@ -107,11 +107,11 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use CPLEX.
-LP_SOLVER = CPLEX
+#LP_SOLVER = CPLEX
 
 ifeq ($(LP_SOLVER),CPLEX)
-	LPINCDIR = -I/home/cplex/cplex75/include/ilcplex
-	LPLDFLAGS = -L/home/cplex/cplex75/lib/i86_linux2_glibc2.2_gcc3.0/static_mt
+	LPINCDIR = -I/usr/local/include/
+	LPLDFLAGS = -L/usr/local/lib/
 	LPLIB = -lcplex
 endif
 
