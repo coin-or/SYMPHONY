@@ -436,7 +436,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 FREE(compnodes);
 	 FREE(compdemands);
 	 FREE(compcuts);
-      }while((!num_cuts || vrp->par.which_connected_routine == BOTH)
+      }while((!num_cuts && vrp->par.which_connected_routine == BOTH)
 	     && which_connected_routine < 2);
    }
 
