@@ -18,7 +18,7 @@
 #include "proto.h"
 #include "BB_types.h"
 
-#if defined(__CPLEX81__) || defined(__CPLEX80__) || defined(__CPLEX75__) || defined(__CPLEX70__) || defined(__CPLEX66__) || defined(__CPLEX65__) || defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
+#ifdef __CPLEX__
 
 /*****************************************************************************/
 /*******              here are the definitions for CPLEX               *******/

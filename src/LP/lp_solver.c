@@ -35,7 +35,7 @@ double dot_product(double *val, int *ind, int collen, double *col)
    return(prod);
 }
 
-#if defined(__OSLLIB__)
+#ifdef __OSLLIB__
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -1093,7 +1093,7 @@ void write_sav(LPdata *lp_data, char *fname)
 #endif /* __OSLLIB__ */
 
 
-#if defined(__CPLEX81__) || defined(__CPLEX80__) || defined(__CPLEX75__) || defined(__CPLEX70__) || defined(__CPLEX66__) || defined(__CPLEX65__) || defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
+#ifdef (__CPLEX__)
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -1177,7 +1177,7 @@ void close_lp_solver(LPdata *lp_data)
 
 void check_lp(LPdata *lp_data)
 {
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
    cpx_status = CPXchecklp(lp_data->cpxenv,
 		(char *) "BB_prob", lp_data->n, lp_data->m, 1, lp_data->obj,
 		lp_data->rhs, lp_data->sense, lp_data->matbeg, lp_data->matcnt,
@@ -1224,19 +1224,8 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
       CPXsetintparam(lp_data->cpxenv, CPX_PARAM_BASINTERVAL, 2100000000);
    CPX_check_error("load_lp - CPXsetintparam - BASINTERVAL");
 
-#if 0 /* This is for the old memory model (user manages memory) */
-   lp_data->lp =
-      CPXloadlp(lp_data->cpxenv,
-		(char *) "BB_prob", lp_data->n, lp_data->m, 1, lp_data->obj,
-		lp_data->rhs, lp_data->sense, lp_data->matbeg, lp_data->matcnt,
-		lp_data->matind, lp_data->matval, lp_data->lb, lp_data->ub,
-		lp_data->rngval, lp_data->alloc_mplusn, lp_data->alloc_m,
-		lp_data->alloc_mplusnz);
-   CPX_check_error("load_lp - CPXloadlp");
-#endif
-
-#if 1 /* This is for the old memory model (user manages memory) */
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+/* This is for the old memory model (user manages memory) */
+#if CPX_VERSION <= 600 
    lp_data->lp =
       CPXloadlp(lp_data->cpxenv,
 		(char *) "BB_prob", lp_data->n, lp_data->m, 1, lp_data->obj,
@@ -1255,7 +1244,6 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 		lp_data->rngval);
    CPX_check_error("load_lp - CPXcopylp");
 #endif
-#endif
 }
 
 /*===========================================================================*/
@@ -1271,7 +1259,7 @@ void unload_lp_prob(LPdata *lp_data)
 
 void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 {
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
    cpx_status = CPXloadbase(lp_data->cpxenv, lp_data->lp, cstat, rstat);
 #else
    cpx_status = CPXcopybase(lp_data->cpxenv, lp_data->lp, cstat, rstat);
@@ -1292,7 +1280,7 @@ void refactorize(LPdata *lp_data)
    CPX_check_error("refactorize - CPXgetintparam");
    cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, 0);
    CPX_check_error("refactorize - CPXsetintparam");
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
    cpx_status = CPXoptimize(lp_data->cpxenv, lp_data->lp);
 #else
    cpx_status = CPXprimopt(lp_data->cpxenv, lp_data->lp);
@@ -1407,7 +1395,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }
 
    term = CPXgetstat(lp_data->cpxenv,lp_data->lp);
-#if defined (__CPLEX80__) || defined (__CPLEX81__)
+#if CPX_VERSION >= 800
    if (term == CPX_STAT_INFEASIBLE){
 #else
    if (term == CPX_INFEASIBLE){
@@ -1441,7 +1429,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       CPX_check_error("refactorize - CPXsetintparam, ITLIM");
    }
 
-#if defined (__CPLEX80__) || defined (__CPLEX81__)
+#if CPX_VERSION >= 800
    switch (real_term = CPXgetstat(lp_data->cpxenv,lp_data->lp)){
     case CPX_STAT_OPTIMAL:                        term = OPTIMAL; break;
     case CPX_STAT_INFEASIBLE:                     term = D_INFEASIBLE; break;
@@ -1468,7 +1456,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 			       lp_data->bhead, lp_data->xbzero);
       lp_data->bhead_is_valid = TRUE;
       CPX_check_error("dual_simplex - CPXgetbhead");
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
       *iterd = CPXgetitc(lp_data->cpxenv, lp_data->lp);
 #else
       *iterd = CPXgetitcnt(lp_data->cpxenv, lp_data->lp);
@@ -1639,7 +1627,7 @@ void resize_lp_solver_arrays(LPdata *lp_data)
 	 resize = TRUE;
       }
       if (resize){
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
 	 /* This is only needed in the old memory model */
 	 cpx_status =
 	    CPXreallocprob(lp_data->cpxenv, lp_data->lp, &lp_data->obj,
@@ -1815,7 +1803,7 @@ void get_x(LPdata *lp_data)
 
 void get_dj_pi(LPdata *lp_data)
 {
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
    /* This mess is only needed for old versions of CPLEX */
    int i;
    cpx_status = CPXgetintparam(lp_data->cpxenv, CPX_PARAM_FASTMIP, &i);
@@ -2049,7 +2037,7 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 {
    int i, *bhead = lp_data->bhead;
-#if defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
+#if CPX_VERSION <= 600
    int j;
 #endif
 
@@ -2066,7 +2054,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    CPX_check_error("delete_cols - CPXdelsetcols");
    lp_data->nz = CPXgetnumnz(lp_data->cpxenv, lp_data->lp);
    CPX_check_error("delete_cols - CPXgetnumnz");
-#if defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
+#if CPX_VERSION <= 600
    for (i = 0, j = 0; i < lp_data->n; i++){
       if (delstat[i])
 	 delstat[i] = -1;

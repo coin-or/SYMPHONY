@@ -104,65 +104,15 @@ ifeq ($(LP_SOLVER),OSLLIB)
 endif
 
 ##############################################################################
-# There are subtle differences between CPLEX versions
+# CPLEX definitions
 ##############################################################################
 
-#Uncomment your version of CPLEX if you want to use CPLEX
-#LP_SOLVER = CPLEX40
-#LP_SOLVER = CPLEX50
-#LP_SOLVER = CPLEX60
-#LP_SOLVER = CPLEX65
-#LP_SOLVER = CPLEX66
-#LP_SOLVER = CPLEX70
-#LP_SOLVER = CPLEX75
-#LP_SOLVER = CPLEX80
-LP_SOLVER = CPLEX81
+LP_SOLVER = CPLEX
 
-#Set the paths and the name of the library
-ifeq ($(LP_SOLVER),CPLEX40)
+ifeq ($(LP_SOLVER),CPLEX)
 	LPINCDIR = -I/usr/local/include
 	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex40 
-endif
-ifeq ($(LP_SOLVER),CPLEX50)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex50 
-endif
-ifeq ($(LP_SOLVER),CPLEX60)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex60
-endif
-ifeq ($(LP_SOLVER),CPLEX65)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex65
-endif
-ifeq ($(LP_SOLVER),CPLEX66)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex66
-endif
-ifeq ($(LP_SOLVER),CPLEX70)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex70
-endif
-ifeq ($(LP_SOLVER),CPLEX75)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex75
-endif
-ifeq ($(LP_SOLVER),CPLEX80)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex80
-endif
-ifeq ($(LP_SOLVER),CPLEX81)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex81
+	LPLIB = -lcplex
 endif
 
 ##############################################################################
@@ -344,8 +294,7 @@ GCCLIBDIR =
 
 ifeq ($(ARCH),LINUX)
 	X11LDFLAGS = -L/usr/X11R6/lib
-########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX81)
+	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSFREEUNIX
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
@@ -382,8 +331,7 @@ endif
 
 ifeq ($(ARCH),SUN4SOL2)
 	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
-########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX81)
+	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM 
@@ -402,8 +350,7 @@ endif
 
 ifeq ($(ARCH),SUNMP)
 	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
-########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX81)
+	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM 
@@ -422,8 +369,7 @@ endif
 
 ifeq ($(ARCH),X86SOL2)
 	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
-########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX81)
+	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
