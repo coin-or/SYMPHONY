@@ -64,6 +64,8 @@ int main(int argc, char **argv)
    mckp_parse_command_line(argc, argv, infile, &num_items, &num_constraints,
 			   &format);
 
+   sym_set_int_param(env, "do_reduced_cost_fixing", FALSE);
+
    if (format == 1){
       mckp_read_problem1(env, infile, &num_items, &objectives, &constraints,
 			 &capacity, &num_objectives, &num_constraints);

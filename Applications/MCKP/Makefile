@@ -15,24 +15,68 @@
 ##############################################################################
 ##############################################################################
 
-##############################################################################
-# First, we have to define some variables that will be used
-##############################################################################
+CC = g++
+OPT = -g
+ARCH = LINUX
 
 SYMPHONYROOT = ${HOME}/SYMPHONY
 COINROOT = ${HOME}/COIN
 MCKPROOT = ${SYMPHONYROOT}/MCKP
 
-##############################################################################
-# This section is for listing MATCH source file names
-##############################################################################
+LP_SOLVER = OSI
+OSI_INTERFACE = CPLEX
+
+LPINCDIR = $(SYMPHONYROOT)/include
+LPLIB = -lsym
+
+ifeq ($(LP_SOLVER),CPLEX)
+       LPINCDIR += /usr/local/include/
+       LPLIBPATHS = /usr/local/lib/ 
+       LPLIBPATHS += $(SYMPHONYROOT)/lib.${ARCH}/$(LP_SOLVER)
+       LPLIB += -lcplex -lpthread
+endif
+
+ifeq ($(LP_SOLVER),OSL)
+       LPINCDIR +=  $(HOME)/OSL/osllib/include/
+       LPLIBPATHS = $(HOME)/OSL/osllib/lib
+       LPLIBPATHS += $(SYMPHONYROOT)/lib.${ARCH}/$(LP_SOLVER)
+       LPLIB += -losl
+endif
+
+ifeq ($(LP_SOLVER),OSI)
+       LPINCDIR += $(COINROOT)/include
+       LPLIBPATHS += $(COINROOT)/lib
+       LPLIBPATHS += $(SYMPHONYROOT)/lib.${ARCH}/$(LP_SOLVER)_$(OSI_INTERFACE)
+       LPLIB += -lCoin -lOsi -lCgl
+ifeq ($(OSI_INTERFACE),CPLEX)
+       LPINCDIR += /usr/local/include/
+       LPLIBPATHS += /usr/local/lib/
+       LPLIB += -lOsiCpx -lcplex -lpthread
+endif
+ifeq ($(OSI_INTERFACE),OSL)
+       LPINCDIR += $(HOME)/OSL/osllib/include
+       LPLIBPATHS += $(HOME)/OSL/osllib/lib
+       LPLIB += -lOsiOsl -losl
+endif
+ifeq ($(OSI_INTERFACE),CLP)
+       LPINCDIR += 
+       LPLIBPATHS +=
+       LPLIB += -lOsiClp -lClp
+endif
+ifeq ($(OSI_INTERFACE),GLPK)
+       LPINCDIR += ${HOME}/GLPK/glpk-4.3/include
+       LPLIBPATHS += ${HOME}/GLPK/glpk-4.3/src
+       LPLIB += -lOsiGlpk -lglpk
+endif
+endif
+
+INCDIR        = $(addprefix -I,${LPINCDIR})
+LDFLAGS       = $(addprefix -L,${LPLIBPATHS})
 
 mckp : mckp_main.c
 
-	g++ -g -L$(SYMPHONYROOT)/lib.LINUX/OSI_CLP -L$(COINROOT)/lib \
-	-I$(SYMPHONYROOT)/include -I$(COINROOT)/include \
-	mckp_main.c -o mckp -lsym -lCoin -lOsi -lOsiClp -lClp -lCgl
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB)
 
 clean : 
 
-	rm mckp mckp_main.o
+	rm mckp
