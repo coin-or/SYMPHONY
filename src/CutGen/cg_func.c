@@ -162,10 +162,6 @@ int cg_send_cut(cut_data *new_cut, int *num_cuts, int *alloc_cuts,
    
 #endif
 
-#ifdef CHECK_CUT_VALIDITY
-   check_validity_of_cut_u(p->user, new_cut);
-#endif
- 
    return(1);
 }
 
@@ -261,10 +257,6 @@ int cg_add_user_cut(cut_data *new_cut, int *num_cuts, int *alloc_cuts,
    
 #endif
 
-#ifdef CHECK_CUT_VALIDITY
-   check_validity_of_cut_u(p->user, new_cut);
-#endif
- 
    return(1);
 }
 

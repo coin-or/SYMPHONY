@@ -1658,6 +1658,9 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 break;
 
        default: /* A user cut type */
+#if defined(COMPILE_IN_CG) && defined(CHECK_CUT_VALIDITY)
+	  check_validity_of_cut_u(p->cgp, cuts[i]);
+#endif
 	  if (l != i){
 	     cuts[l++] = cuts[i];
 	     cuts[i] = NULL;
