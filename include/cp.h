@@ -82,7 +82,6 @@ int which_cut_to_delete PROTO((cut_data *cut1, cut_data *cut2));
 
 int cut_quality_cmp PROTO((const void *cut0ptr, const void *cut1ptr));
 void order_cuts_by_quality PROTO((cut_pool *cp));
-int check_cuts PROTO((cut_pool *cp, lp_sol *cur_sol));
 
 /*--------------- Functions related to logging ------------------------------*/
 
@@ -90,9 +89,8 @@ int write_cp_cut_list PROTO((cut_pool *cp, char *file, char append));
 int read_cp_cut_list PROTO((cut_pool *cp, char *file));
 int cp_read_tm_cut_list PROTO((cut_pool *cp, char *file));
 
-/*---------------- Freeing and closing --------------------------------------*/
+/*---------------------------- Closing --------------------------------------*/
 
-void free_cut_pool PROTO((cut_pool *cp));
 void cp_close PROTO((cut_pool *cp));
 
 /*===========================================================================*/
@@ -102,5 +100,16 @@ void cp_close PROTO((cut_pool *cp));
 void cp_process_message PROTO((cut_pool *cp, int r_bufid));
 void cut_pool_send_cut PROTO((cut_pool *cp, cut_data *cut, int tid));
 void cut_pool_receive_cuts PROTO((cut_pool *cp, int bc_level));
+
+/*===========================================================================*/
+/*================= CP wrapper functions (cp_wrapper.c) =====================*/
+/*===========================================================================*/
+
+int receive_cp_data_u PROTO((cut_pool *cp));
+void receive_lp_solution_cp_u PROTO((cut_pool *cp));
+void free_cut_pool_u PROTO((cut_pool *cp));
+int check_cuts_u PROTO((cut_pool *cp, lp_sol *cur_sol));
+int check_cut_u PROTO((cut_pool *cp, lp_sol *cur_sol, cut_data *cut,
+		       int *is_violated, double *quality));
 
 #endif

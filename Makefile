@@ -783,7 +783,7 @@ endif
 endif
 endif
 ifeq ($(COMPILE_IN_CP),TRUE)
-TM_SRC	       += cp_proccomm.c cp_func.c
+TM_SRC	       += cp_proccomm.c cp_func.c cp_wrapper.c
 endif
 ifeq ($(COMPILE_IN_TM),TRUE)
 MASTER_SRC     += $(TM_SRC)
@@ -805,7 +805,7 @@ endif
 #___END_EXPERIMENTAL_SECTION___#
 endif
 
-CP_SRC		= cut_pool.c cp_proccomm.c cp_func.c
+CP_SRC		= cut_pool.c cp_proccomm.c cp_func.c cp_wrapper.c
 
 CG_SRC		= cut_gen.c cg_proccomm.c cg_func.c cg_wrapper.c
 

@@ -49,7 +49,7 @@ void cp_process_message(cut_pool *cp, int r_bufid)
       receive_int_array(&cp->cur_sol.xindex, 1);
       receive_int_array(&cp->cur_sol.xiter_num, 1);
       receive_dbl_array(&cp->cur_sol.lpetol, 1);
-      user_receive_lp_solution_cp(cp->user);
+      receive_lp_solution_cp_u(cp);
       break;
 
     case LP_SOLUTION_NONZEROS:

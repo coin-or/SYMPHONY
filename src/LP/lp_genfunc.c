@@ -316,6 +316,11 @@ void fathom_branch(lp_prob *p)
 	 }
 	 if (termcode == D_UNBOUNDED){
 	    PRINT(p->par.verbosity, 1, ("Feasibility lost -- "));
+#if 0
+	    char name[50] = "";
+	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
+	    write_mps(lp_data, name);
+#endif
 	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity)
 		   || termcode == D_OBJLIM){
 	    PRINT(p->par.verbosity, 1, ("Terminating due to high cost -- "));

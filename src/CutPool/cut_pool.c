@@ -64,7 +64,7 @@ int main(void)
       if (cp->msgtag==LP_SOLUTION_NONZEROS || cp->msgtag==LP_SOLUTION_USER ||
 	  cp->msgtag==LP_SOLUTION_FRACTIONS){
 
-	 num_cuts = check_cuts(cp, &cp->cur_sol);
+	 num_cuts = check_cuts_u(cp, &cp->cur_sol);
 	 
 	 if (cp->par.check_which == CHECK_ALL_CUTS ||
 	     cp->par.check_which == CHECK_LEVEL ||

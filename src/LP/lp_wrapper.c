@@ -266,7 +266,7 @@ int create_lp_u(lp_prob *p)
 	 lp_data->desc->ub[i]         = p->lp_desc->ub[userind[i]];
 	 lp_data->desc->lb[i]         = p->lp_desc->lb[userind[i]];
 	 lp_data->desc->is_int[i]     = p->lp_desc->is_int[userind[i]];
-	 lp_data->desc->matbeg[i+1]   = p->lp_desc->matbeg[i] + 
+	 lp_data->desc->matbeg[i+1]   = lp_data->desc->matbeg[i] + 
 	                                (p->lp_desc->matbeg[userind[i]+1] -
 	                                 p->lp_desc->matbeg[userind[i]]);
 	 for (j = 0; j < (lp_data->desc->matbeg[i+1]-lp_data->desc->matbeg[i]);
@@ -277,7 +277,7 @@ int create_lp_u(lp_prob *p)
 	       p->lp_desc->matval[p->lp_desc->matbeg[userind[i]]+j];
 	 }
       }
-      for (i = 0; i < lp_data->desc->m; i++){
+      for (i = 0; i < p->lp_desc->m; i++){
 	 lp_data->desc->rhs[i] = p->lp_desc->rhs[i];
 	 lp_data->desc->sense[i] = p->lp_desc->sense[i];
 	 lp_data->desc->rngval[i] = p->lp_desc->rngval[i];
@@ -513,12 +513,6 @@ void get_upper_bounds_u(lp_prob *p, int cnt, int *uindex, double *bd)
 
 /*===========================================================================*/
 
-/*===========================================================================*\
- * SYMPHONY cannot check feasibility, only integrality of the solution since
- * it doesn't know the original upper and lower bounds on the variables
- * (bounds are modified during branching).
-\*===========================================================================*/
-
 int is_feasible_u(lp_prob *p)
 {
 #ifndef COMPILE_IN_LP
@@ -543,7 +537,7 @@ int is_feasible_u(lp_prob *p)
 /*___END_EXPERIMENTAL_SECTION___*/
 /*UNCOMMENT FOR PRODUCTION CODE*/
 #if 0
-   cnt = collect_nonzeros(p, x, indices, values);
+   cnt = collect_nonzeros(p, lp_data->x, indices, values);
 #endif
 
    user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
@@ -565,10 +559,10 @@ int is_feasible_u(lp_prob *p)
       feasible = i < 0 ? FEASIBLE : NOT_FEASIBLE;
       break;
     case TEST_INTEGRALITY:
-      for (i = cnt - 1; i >= 0; i--){
-	 if (!lp_data->vars[indices[i]]->is_int)
+      for (i = lp_data->n - 1; i >= 0; i--){
+	 if (!lp_data->vars[i]->is_int)
 	    continue; /* Not an integer variable */
-	 valuesi = values[i];
+	 valuesi = lp_data->x[i];
 	 if (valuesi-floor(valuesi) > lpetol && ceil(valuesi)-valuesi > lpetol)
 	    break;
       }
@@ -1776,7 +1770,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	 cur_sol->lp = 0;
 #pragma omp critical(cut_pool)
 	 if (cp){
-	    cp_new_row_num = check_cuts(cp, cur_sol);
+	    cp_new_row_num = check_cuts_u(cp, cur_sol);
 	    if (++cp->reorder_count % 10 == 0){
 	       delete_duplicate_cuts(cp);
 	       order_cuts_by_quality(cp);

@@ -1826,6 +1826,7 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
    //COULD BE WARMSTARTBASIS CONSTRUCTOR OR ASSIGN BASIS? MEN
    
    CoinWarmStartBasis *warmstart = new CoinWarmStartBasis;
+
    int numcols = lp_data->n;
    int numrows = lp_data->m;
    int i;
@@ -1871,6 +1872,7 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
    }
    
    retval = lp_data->si->setWarmStart(warmstart);
+
 }
 
 /*===========================================================================*/
@@ -2566,7 +2568,7 @@ int read_mps(LPdesc *desc, char *infile, char *probname)
    
    for (j = 0; j < desc->n; j++){
       desc->colname[j] = (char *) malloc(CSIZE * 9);
-      memcpy(desc->colname[j], const_cast<char*>(mps.columnName(j)), CSIZE * 8);
+      strncpy(desc->colname[j], const_cast<char*>(mps.columnName(j)), 9);
       desc->colname[j][8] = 0;
    }
    
@@ -2612,28 +2614,28 @@ int generate_cgl_cuts(LPdata *lp_data, cut_data ***cuts){
    /* create CGL gomory cuts */
    CglGomory *gomory = new CglGomory;
    gomory->generateCuts(*(lp_data->si), cutlist);
-   printf("%i\n", cutlist.sizeRowCuts());
+   //printf("%i\n", cutlist.sizeRowCuts());
    
    /* create CGL knapsack cuts */
    CglKnapsackCover *knapsack = new CglKnapsackCover;
    knapsack->generateCuts(*(lp_data->si), cutlist);
-   printf("%i\n", cutlist.sizeRowCuts());
+   //printf("%i\n", cutlist.sizeRowCuts());
    
    /* create CGL odd hole cuts */
    CglOddHole *oddhole = new CglOddHole;
    oddhole->generateCuts(*(lp_data->si), cutlist);
-   printf("%i\n", cutlist.sizeRowCuts());
+   //printf("%i\n", cutlist.sizeRowCuts());
    
    /* create CGL probing cuts */
    CglProbing *probe = new CglProbing;
    probe->generateCuts(*(lp_data->si), cutlist);
-   printf("%i\n", cutlist.sizeRowCuts());
+   //printf("%i\n", cutlist.sizeRowCuts());
 
 #if 0
    /* create CGL simple rounding cuts */
    CglSimpleRounding * rounding = new CglSimpleRounding;
    rounding->generateCuts(*(lp_data->si), cutlist);
-   printf("%i\n", cutlist.sizeRowCuts());
+   //printf("%i\n", cutlist.sizeRowCuts());
    
    /* create CGL liftandproject cuts (currently buggy) */     
    CglLiftAndProject *liftandproject = new CglLiftAndProject;

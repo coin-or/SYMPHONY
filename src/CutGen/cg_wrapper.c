@@ -48,12 +48,11 @@ int receive_cg_data_u(cg_prob *p)
    receive_char_array((char *)&p->par, sizeof(cg_params));
    receive_int_array(&p->draw_graph, 1);
    switch( user_receive_cg_data(&p->user, p->draw_graph) ){
-    case ERROR:
-      freebuf(r_bufid);
-      return(FALSE);
     case USER_NO_PP:
       /* User function terminated without problems. No post-processing. */
+      freebuf(r_bufid);
       break;
+    case ERROR:
     default:
       freebuf(r_bufid);
       /* Unexpected return value. Do something!! */

@@ -101,10 +101,7 @@ void cp_initialize(cut_pool *cp, int master_tid)
    send_msg(cp->master, REQUEST_FOR_CP_DATA);
    freebuf(s_bufid);
    
-   r_bufid = receive_msg(cp->master, CP_DATA);
-   receive_char_array((char *)(&cp->par), sizeof(cp_params));
-   CALL_USER_FUNCTION( user_receive_cp_data(&cp->user) );
-   freebuf(r_bufid);
+   receive_cp_data_u(p);
    
 #endif
 
@@ -366,124 +363,6 @@ int which_cut_to_delete(cut_data *cut1, cut_data *cut2)
 
 /*===========================================================================*/
 
-int check_cuts(cut_pool *cp, lp_sol *cur_sol)
-{
-   int num_cuts = 0, i, violated;
-   cp_cut_data **pcp_cut;
-   double quality;
-   int cuts_to_check = MIN(cp->cut_num, cp->par.cuts_to_check);
-
-   if (user_prepare_to_check_cuts(cp->user, cur_sol->xlength, cur_sol->xind,
-				  cur_sol->xval) == ERROR){
-      return(0);
-   }
-   
-   switch(cp->par.check_which){ /* decide which cuts to check for violation */
-
-    case CHECK_ALL_CUTS: /* check all cuts in the pool */
-      for (i = 0, pcp_cut = cp->cuts; i < cuts_to_check; i++, pcp_cut++){
-	 if (user_check_cut(cp->user, cur_sol->lpetol, cur_sol->xlength,
-			    cur_sol->xind, cur_sol->xval, &(*pcp_cut)->cut,
-			    &violated, &quality) == ERROR)
-	    break;
-	 (*pcp_cut)->quality =
-	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
-	    (double)((*pcp_cut)->check_num+1);
-	 (*pcp_cut)->check_num++;
-	 if ( violated ){
-	    num_cuts++;
-	    (*pcp_cut)->touches = 0;
-	    cut_pool_send_cut(cp, &(*pcp_cut)->cut, cur_sol->lp);
-	 }else{
-	    (*pcp_cut)->touches++;
-	 }
-      }
-      break;
-      
-    case CHECK_LEVEL: /* only check cuts generated at a level higher
-			 than the current level. This prevents checking
-			 cuts generated in other parts of the tree which
-			 are not as likely to be violated */
-      for (i = 0, pcp_cut = cp->cuts; i < cuts_to_check; i++, pcp_cut++){
-	 if ((*pcp_cut)->level >= cur_sol->xlevel)
-	    continue;
-	 if (user_check_cut(cp->user, cur_sol->lpetol, cur_sol->xlength,
-			    cur_sol->xind, cur_sol->xval, &(*pcp_cut)->cut,
-			    &violated, &quality) == ERROR)
-	    break;
-	 (*pcp_cut)->quality =
-	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
-	    (double)((*pcp_cut)->check_num+1);
-	 (*pcp_cut)->check_num++;
-	 if ( violated ){
-	    num_cuts++;
-	    (*pcp_cut)->touches = 0;
-	    cut_pool_send_cut(cp, &(*pcp_cut)->cut, cur_sol->lp);
-	 }else{
-	    (*pcp_cut)->touches++;
-	 }
-      }
-      break;
-      
-    case CHECK_TOUCHES: /* only check cuts which have been recently
-			   violated */
-      for (i = 0, pcp_cut = cp->cuts; i < cuts_to_check; i++, pcp_cut++){
-	 if ((*pcp_cut)->touches > cp->par.touches_until_deletion)
-	    continue;
-	 if (user_check_cut(cp->user, cur_sol->lpetol, cur_sol->xlength,
-			    cur_sol->xind, cur_sol->xval, &(*pcp_cut)->cut,
-			    &violated, &quality) == ERROR)
-	    break;
-	 (*pcp_cut)->quality =
-	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
-	    (double)((*pcp_cut)->check_num+1);
-	 (*pcp_cut)->check_num++;
-	 if ( violated ){
-	    num_cuts++;
-	    (*pcp_cut)->touches = 0;
-	    cut_pool_send_cut(cp, &(*pcp_cut)->cut, cur_sol->lp);
-	 }else{
-	    (*pcp_cut)->touches++;
-	 }
-      }
-      break;
-      
-    case CHECK_LEVEL_AND_TOUCHES: /* a combination of the above two
-				     options */
-      for (i = 0, pcp_cut = cp->cuts; i < cuts_to_check; i++, pcp_cut++){
-	 if ((*pcp_cut)->touches > cp->par.touches_until_deletion ||
-	     (*pcp_cut)->level > cur_sol->xlevel)
-	    continue;
-	 if (user_check_cut(cp->user, cur_sol->lpetol, cur_sol->xlength,
-			    cur_sol->xind, cur_sol->xval, &(*pcp_cut)->cut,
-			    &violated, &quality) == ERROR)
-	    break;
-	 (*pcp_cut)->quality =
-	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
-	    (double)((*pcp_cut)->check_num+1);
-	 (*pcp_cut)->check_num++;
-	 if ( violated ){
-	    num_cuts++;
-	    (*pcp_cut)->touches = 0;
-	    cut_pool_send_cut(cp, &(*pcp_cut)->cut, cur_sol->lp);
-	 }else{
-	    (*pcp_cut)->touches++;
-	 }
-      }
-      break;
-      
-   default:
-      printf("Unknown rule for checking cuts \n\n");
-      break;
-   }
-   
-   user_finished_checking_cuts(cp->user);
-
-   return(num_cuts);
-}
-
-/*===========================================================================*/
-
 int write_cp_cut_list(cut_pool *cp, char *file, char append)
 {
    FILE *f;
@@ -590,27 +469,6 @@ int cp_read_tm_cut_list(cut_pool *cp, char *file)
 
 /*===========================================================================*/
 
-void free_cut_pool(cut_pool *cp)
-{
-   int i;
-   
-   user_free_cp(&cp->user);
-   
-   for (i = cp->cut_num - 1; i >= 0; i--){
-      FREE(cp->cuts[i]->cut.coef);
-      FREE(cp->cuts[i]);
-   }
-   FREE(cp->cuts);
-   FREE(cp->cur_sol.xind);
-   FREE(cp->cur_sol.xval);
-#ifdef COMPILE_IN_CP
-   FREE(cp->cuts_to_add);
-#endif
-   FREE(cp);
-}
-
-/*===========================================================================*/
-
 void cp_close(cut_pool *cp)
 {
 #ifndef COMPILE_IN_CP
@@ -622,9 +480,9 @@ void cp_close(cut_pool *cp)
    send_msg(cp->tree_manager, POOL_TIME);
    freebuf(s_bufid);
    if(cp->msgtag == YOU_CAN_DIE)
-      free_cut_pool(cp);
+      free_cut_pool_u(cp);
 #else
    FREE(cp->cuts_to_add);
-   free_cut_pool(cp);
+   free_cut_pool_u(cp);
 #endif
 }
