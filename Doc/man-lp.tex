@@ -16,6 +16,86 @@ data into and out of the user functions of the LP process.
 %end{latexonly}
 
 \begin{htmlonly}
+\paragraph{MIPdesc}
+\end{htmlonly}
+\begin{latexonly}
+\functiondef{MIPdesc}
+\end{latexonly}
+\label{MIPdesc}
+
+One of the few internally defined data structures that the user has to deal
+with frequently is the \texttt{MIPdesc} data structure, which holds the data
+needed to describe a MIP. This data structure is used by SYMPHONY for two
+purposes. First, it is used to store the description of a generic MIP that is
+either read in from an MPS or AMPL file. More importantly, it is the data
+structure the user must use to pass the subproblem descriptions back to
+SYMPHONY at the time a new search tree node is created in the function
+\hyperref{{\tt user\_create\_subproblem()}} {{\tt user\_create\_subproblem()} (see
+Section }{)}{user_create_subproblem}. The structure has 14 fields (listed
+below) that must be filled out to describe a subproblem (some fields are
+optional). \\
+\\
+A subproblem is a mixed-integer program defined by a matrix of constraints, an
+objective function, bounds on both the right hand side values of the
+constraints and the variables, an array indicating which variables are
+integer, and (optionally) an array of column names that allows SYMPHONY to
+report the solution back in terms of column names instead of user indices. If
+the subproblem has \texttt{n} variables and \texttt{m} constraints, the
+constraints are given by a constraint coefficient matrix of size \texttt{m}
+$\times$ \texttt{n} (described in the next paragraph). The sense of each
+constraint, the right hand side values and bounds on the right hand side
+(called {\em range}) are vectors are of size \texttt{m}. The objective
+function coefficients and the lower and upper bounds on the variables are
+vectors of length \texttt{n}. The sense of each constraint can be either 'L'
+($\leq$), 'E' ($=$), 'G' ($\geq$) or 'R' (ranged). For non-ranged rows the
+range value is {\tt 0}, for a ranged row the range value must be non-negative
+and the constraint means that the row activity level has to be between the
+right hand side value and the right hand side increased by the range value. \\
+\\
+Since the coefficient matrix is very often sparse, only the nonzero entries
+are stored. Each entry of the matrix has a column index, a row index and a
+coefficient value associated with it. A matrix is specified in the form of the
+three arrays \texttt{matval}, \texttt{matind}, and \texttt{matbeg}. The array
+\texttt{matval} contains the values of the nonzero entries of the matrix in
+\emph{column order}; that is, all the entries for the $0^th$ column come first,
+then the entries for the $1^st$ column, etc. The row index corresponding to
+each entry of \texttt{matval} is listed in \texttt{matind} (both of them are
+of length \texttt{nz}, the number of nonzero entries in the matrix).  Finally,
+\texttt{matbeg} contains the starting positions of each of the columns in 
+\texttt{matval} and \texttt{matind}. Thus, \texttt{matbeg[i]} is the position
+of the first entry of column \texttt{i} in both \texttt{matval} and
+\texttt{matind}). By convention \texttt{matbeg} is allocated to be of length
+\texttt{n+1}, with \texttt{matbeg[n]} containing the position after the very
+last entry in \texttt{matval} and \texttt{matind} (so it is very conveniently
+equal to \texttt{nz}). This representation of a matrix is known as a {\em
+column ordered} or {\em column major} representation. Below are listed the
+fields that must be filled out to describe a subproblem.\\
+\\
+
+\begin{description}
+\item [\texttt{int n} --] The number of columns.
+\item [\texttt{int m} --] The number of rows.
+\item [\texttt{int nz} --] The number of nonzeros.
+\item [\texttt{char *is\_int} --] Indicates which variables are required to be 
+integer.
+\item [\texttt{int *matbeg} -- ] The array containing the starting positions
+for each column.  
+\item [\texttt{int *matind} --] The array containing the indices for each
+column. 
+\item [\texttt{double *matval} --] The array containing the matrix values for
+each column.
+\item [\texttt{double *obj} --] The objective function coefficients.
+\item [\texttt{double *rhs} --] The right hand side values for the
+constraints. 
+\item [\texttt{double *rngval} --] The range values for the constraints
+(optional). 
+\item [\texttt{char *sense} --] The senses of the constraints. 
+\item [\texttt{double *lb} --] The lower bounds of the variables.
+\item [\texttt{double *ub} --] The upper bounds of the variables.
+\item [\texttt{char **colname} --] The column names.
+\end{description}
+
+\begin{htmlonly}
 \paragraph{cut\_data}
 \end{htmlonly}
 \begin{latexonly}
@@ -23,7 +103,7 @@ data into and out of the user functions of the LP process.
 \end{latexonly}
 \label{cut_data}
 
-One of the few internally defined data structures that the user has to
+Another of the internally defined data structures that the user has to
 deal with frequently is the {\tt cut\_data} data structure, used to
 store the packed form of cuts. This structure has 8 fields listed
 below.
@@ -194,83 +274,55 @@ the existence of a pointer before freeing it.
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% user_create_lp
+% user_create_subproblem
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{user\_create\_lp}
+\functiondef{user\_create\_subproblem}
 \begin{verbatim}
-int user_create_lp(void *user, LPdesc *desc, int *indices, 
-                   int *maxn, int *maxm, int *maxnz)
+int user_create_subproblem(void *user, MIPdesc *mip, int *indices, 
+                           int *maxn, int *maxm, int *maxnz)
 \end{verbatim}
 
 \bd
 
 \describe
 
-Based on the instance data contained in the user data structure and
-the list of base and extra variables that are active in the
-current subproblem, the user has to create the initial LP relaxation
-for the search node. The matrix of the LP problem must contain the
-variables whose user indices are listed in {\tt indices} (in the same
-order) and at least the base constraints. \\
+Based on the instance data contained in the user data structure and the list
+of base and extra variables that are active in the current subproblem, the
+user has to create the subproblem for the search node. The matrix describing
+the subproblem must contain those variables whose user indices are listed in
+the array \texttt{indices} (in the same order) and the base constraints. The
+extra (dynamically generated) constraints are added automatically by SYMPHONY
+after the initial subproblem description is created. \\
 \\
-An LP is defined by a matrix of constraints, an objective function,
-and bounds on both the right hand side values of the constraints and
-on the variables. If the problem has $n$ variables and $m$
-constraints, the constraints are given by a constraint coefficient
-matrix of size $m x n$ (described in the next paragraph). The sense of
-each constraint, the right hand side values and bounds on the right
-hand side (called {\em range}) are vectors are of size $m$. The
-objective function coefficients and the lower and upper bounds on the
-variables are vectors of length $n$. The sense of each constraint can
-be either 'L' ($\leq$), 'E' ($=$), 'G' ($\geq$) or 'R' (ranged). For
-non-ranged rows the range value is {\tt 0}, for a ranged row the range
-value must be non-negative and the constraint means that the row
-activity level has to be between the right hand side value and the
-right hand side increased by the range value. \\
+In this function, the user is required to construct a description of the
+subproblem in column-ordered format and pass it back to SYMPHONY by filling
+out the \texttt{MIPdesc} data structure, described \hyperref{here}{in Section
+}{}{MIPdesc}. The user is not responsible for allocating extra memory to allow
+for the addition of dynamically generated cuts and variables. The arrays
+allocated in \texttt{user\_create\_subproblem()} are owned by SYMPHONY after
+allocation and are freed as soon as the relaxation is loaded into the
+solver. However, if the user has an idea as to the maximum number of variables
+and constraints that are likely to be generated during processing of the
+subproblem, this information can be passed to SYMPHONY in the variables
+\texttt{*maxn}, \texttt{*maxm}, and \texttt{*maxnz}. These numbers are only
+estimates that SYMPHONY can use to perform memory allocation. They do not
+have to be exact numbers. In fact, these estimates need not be provided at
+all. \\
 \\
-Since the coefficient matrix is very often sparse, only the nonzero
-entries are stored. Each entry of the matrix has a column index, a row
-index and a coefficient value associated with it. An LP matrix is
-specified in the form of the three arrays {\tt *matval}, {\tt
-*matind}, and {\tt *matbeg}. The array {\tt *matval} contains the
-values of the nonzero entries of the matrix in {\em column order};
-that is, all the entries for the $0^th$ column come first, then the
-entries for the $1^st$ column, etc. The row index corresponding to
-each entry of {\tt *matval} is listed in {\tt *matind} (both of them
-are of length $nz$, the number of nonzero entries in the matrix).
-Finally, {\tt *matbeg} contains the starting positions of each of the
-columns in {\tt *matval} and {\tt *matind}. Thus, {\tt (*matbeg)[i]}
-is the position of the first entry of column $i$ in both {\tt *matval}
-and {\tt *matind}). By convention {\tt *matbeg} is allocated to be of
-length $n+1$, with {\tt (*matbeg)[n]} containing the position after
-the very last entry in {\tt *matval} and {\tt *matind} (so it is very
-conveniently equal to $nz$). This representation of a matrix is known
-as a {\em column ordered} or {\em column major} representation.\\
-\\
-The user is required to construct a description of the LP relaxation by
-specifying the constraint matrix in column-ordered format through the members
-of the LP description structure pointer passed to the function. The user is
-not responsible for allocating extra memory to allow for the addition of
-dynamically generated cuts and variables. The arrays allocated in
-\texttt{user\_create\_lp()} are owned by SYMPHONY after allocation and are
-freed as soon as the relaxation is loaded into the solver.
-
-Note that, the user should return ``DEFAULT'' value without any modification
-if an mps file is read in. \BB\ will allocate the corresponding arrays and 
-specify the constraint matrix by default in that case.
+Note that, the user should return ``DEFAULT'' if an MPS or GLPMPL/AMPL file
+was read in to describe the original MIP. \BB\ will allocate the corresponding
+arrays and specify the constraint matrix automatically in this case.
 
 \args
 
 \bt{llp{257pt}}
-{\tt void *user} & IN & Pointer to the user-defined LP data structure. \\
-& \\
-{\tt LPdesc *desc} & INOUT & Pointer to the LP description structure. \\
-{\tt int * indices} & IN & The list of the active variables (base and extra).\\
-
-{\tt int *maxn} & INOUT & The maximum number of variables.\\
-{\tt int *maxm} & INOUT & The maximum number of constraints.\\
-{\tt int *maxnz} & INOUT & The maximum number of nonzeros. \\
+{\tt void *user} & IN & Pointer to the user-defined LP data structure. \\ & \\
+{\tt int *indices} & IN & The list of the active variables (base and extra).\\
+{\tt MIPdesc *mip} & OUT & Pointer to the MIPdesc data structure. \\ 
+{\tt int *maxn} & OUT & Estimated maximum number of variables.\\
+{\tt int *maxm} & OUT & Estimated maximum number of constraints.\\
+{\tt int *maxnz} & OUT & Estimated maximum number of nonzeros. \\
 \et
 
 \returns

@@ -42,9 +42,9 @@ void free_master_u(problem *p)
 {
    CALL_USER_FUNCTION( user_free_master(&p->user) );
 
-   if (p->desc){
-      free_lp_desc(p->desc);
-      FREE(p->desc);
+   if (p->mip){
+      free_mip_desc(p->mip);
+      FREE(p->mip);
    }
 }
 
@@ -101,21 +101,21 @@ void io_u(problem *p)
 {
    int err;
 
-   p->desc = (LPdesc *) calloc(1, sizeof(LPdesc));
+   p->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
 
    switch( user_io(p->user) ){
 
     case DEFAULT: 
 
       if (strcmp(p->par.datafile, "") == 0){ 
-	 err = read_mps(p->desc, p->par.infile, p->probname);
+	 err = read_mps(p->mip, p->par.infile, p->probname);
 	 if (err != 0){
 	    printf("\nErrors in reading mps file\n");
 	    exit(1000);
 	 }
       }else{
 #ifdef USE_GLPMPL
-	 err = read_gmpl(p->desc, p->par.infile, 
+	 err = read_gmpl(p->mip, p->par.infile, 
 			 p->par.datafile, p->probname);
 	 if(!err){
 	    printf("\nErrors in reading gmpl file\n");
@@ -213,7 +213,7 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
 
    switch (user_initialize_root_node(p->user, &base->varnum, &base->userind,
 				     &base->cutnum, &root->uind.size,
-				     &root->uind.list, &p->desc->colname,
+				     &root->uind.list, &p->mip->colname,
 				     p->par.tm_par.colgen_strat)){
     case ERROR:
       
@@ -234,9 +234,9 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
 
     case DEFAULT: 
 
-      if (p->desc){
-	 root->uind.size = p->desc->n;
-	 base->cutnum = p->desc->m;
+      if (p->mip){
+	 root->uind.size = p->mip->n;
+	 base->cutnum = p->mip->m;
       }else if (!root->uind.size){
 	 printf("Error setting up the root node.\n");
 	 printf("User did not specify number of variables. Exiting.\n\n");
@@ -356,7 +356,7 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
       
       tm->lpp[i]->draw_graph = p->dg_tid;
       tm->lpp[i]->base = *base;
-      tm->lpp[i]->lp_desc = p->desc;
+      tm->lpp[i]->mip = p->mip;
 
       CALL_USER_FUNCTION( user_send_lp_data(p->user, &(tm->lpp[i]->user)) );
    }
@@ -375,28 +375,28 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
       send_int_array(base->userind, base->varnum);
    }
    send_int_array(&base->cutnum, 1);
-   if (p->desc){
+   if (p->mip){
       char has_desc = TRUE;
       char has_colnames = FALSE;
       send_char_array(&has_desc, 1);
-      send_int_array(&(desc->m), 1);
-      send_int_array(&(desc->n), 1);
-      send_int_array(&(desc->nz), 1);
-      send_int_array(desc->matbeg, desc->n);
-      send_int_array(desc->matind, desc->nz);
-      send_dbl_array(desc->matval, desc->nz);
-      send_dbl_array(desc->obj, desc->n);
-      send_dbl_array(desc->rhs, desc->m);
-      send_char_array(desc->sense, desc->m);
-      send_dbl_array(desc->rngval, desc->m);
-      send_dbl_array(desc->ub, desc->n);
-      send_dbl_array(desc->lb, desc->n);
-      send_int_array(desc->is_int, desc->n);
-      if (desc->colname){
+      send_int_array(&(mip->m), 1);
+      send_int_array(&(mip->n), 1);
+      send_int_array(&(mip->nz), 1);
+      send_int_array(mip->matbeg, mip->n);
+      send_int_array(mip->matind, mip->nz);
+      send_dbl_array(mip->matval, mip->nz);
+      send_dbl_array(mip->obj, mip->n);
+      send_dbl_array(mip->rhs, mip->m);
+      send_char_array(mip->sense, mip->m);
+      send_dbl_array(mip->rngval, mip->m);
+      send_dbl_array(mip->ub, mip->n);
+      send_dbl_array(mip->lb, mip->n);
+      send_int_array(mip->is_int, mip->n);
+      if (mip->colname){
 	 has_colnames = TRUE;
 	 send_char_array(&has_colnames, 1);
-	 for (i = 0; i < desc->n; i++){
-	    send_char_array(desc->colname[i], 8);
+	 for (i = 0; i < mip->n; i++){
+	    send_char_array(mip->colname[i], 8);
 	 }
       }else{
 	 send_char_array(&has_colnames, 1);
@@ -523,12 +523,12 @@ void display_solution_u(problem *p, int thread_num)
     case USER_AND_PP:
     case DEFAULT:
       if (sol.xlength){
-	 if (p->desc->colname){ 
+	 if (p->mip->colname){ 
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    printf(" Column names and values of nonzeros in the solution\n");
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for (i = 0; i < sol.xlength; i++){
-	       printf("%8s %10.3f\n", p->desc->colname[sol.xind[i]], sol.xval[i]);
+	       printf("%8s %10.3f\n", p->mip->colname[sol.xind[i]], sol.xval[i]);
 	    }
 	    printf("\n");
 	 }else{

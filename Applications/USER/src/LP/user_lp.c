@@ -50,8 +50,8 @@ int user_receive_lp_data(void **user)
  * fill out this function.
 \*===========================================================================*/
 
-int user_create_lp(void *user, LPdesc *desc, int *indices, 
-		   int *maxn, int *maxm, int *maxnz)
+int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
+			   int *maxn, int *maxm, int *maxnz)
 {
    user_problem *prob = (user_problem *) user;
 

@@ -76,41 +76,41 @@ int receive_lp_data_u(lp_prob *p)
    receive_int_array(&p->base.cutnum, 1);
    receive_char_array(&has_desc, 1);
    if (has_desc){
-      LPdesc *desc = p->lp_desc = (LPdesc *) calloc(1, sizeof(LPdesc));
-      receive_int_array(&(desc->m), 1);
-      receive_int_array(&(desc->n), 1);
-      receive_int_array(&(desc->nz), 1);
+      MIPdesc *mip = p->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+      receive_int_array(&(mip->m), 1);
+      receive_int_array(&(mip->n), 1);
+      receive_int_array(&(mip->nz), 1);
 
       /* Allocate memory */
-      desc->matbeg = (int *) malloc(ISIZE * (desc->n + 1));
-      desc->matval = (double *) malloc(DSIZE * desc->matbeg[desc->n]);
-      desc->matind = (int *)    malloc(ISIZE * desc->matbeg[desc->n]);
-      desc->obj    = (double *) malloc(DSIZE * desc->n);
-      desc->rhs    = (double *) malloc(DSIZE * desc->m);
-      desc->sense  = (char *)   malloc(CSIZE * desc->m);
-      desc->rngval = (double *) malloc(DSIZE * desc->m);
-      desc->ub     = (double *) malloc(DSIZE * desc->n);
-      desc->lb     = (double *) malloc(DSIZE * desc->n);
-      desc->is_int = (char *)   calloc(CSIZE, desc->n);
+      mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
+      mip->matval = (double *) malloc(DSIZE * mip->matbeg[mip->n]);
+      mip->matind = (int *)    malloc(ISIZE * mip->matbeg[mip->n]);
+      mip->obj    = (double *) malloc(DSIZE * mip->n);
+      mip->rhs    = (double *) malloc(DSIZE * mip->m);
+      mip->sense  = (char *)   malloc(CSIZE * mip->m);
+      mip->rngval = (double *) malloc(DSIZE * mip->m);
+      mip->ub     = (double *) malloc(DSIZE * mip->n);
+      mip->lb     = (double *) malloc(DSIZE * mip->n);
+      mip->is_int = (char *)   calloc(CSIZE, mip->n);
 
       /* Receive the problem description */
-      receive_int_array(desc->matbeg, desc->n);
-      receive_int_array(desc->matind, desc->nz);
-      receive_dbl_array(desc->matval, desc->nz);
-      receive_dbl_array(desc->obj, desc->n);
-      receive_dbl_array(desc->rhs, desc->m);
-      receive_char_array(desc->sense, desc->m);
-      receive_dbl_array(desc->rngval, desc->m);
-      receive_dbl_array(desc->ub, desc->n);
-      receive_dbl_array(desc->lb, desc->n);
-      receive_char_array(desc->is_int, desc->n);
+      receive_int_array(mip->matbeg, mip->n);
+      receive_int_array(mip->matind, mip->nz);
+      receive_dbl_array(mip->matval, mip->nz);
+      receive_dbl_array(mip->obj, mip->n);
+      receive_dbl_array(mip->rhs, mip->m);
+      receive_char_array(mip->sense, mip->m);
+      receive_dbl_array(mip->rngval, mip->m);
+      receive_dbl_array(mip->ub, mip->n);
+      receive_dbl_array(mip->lb, mip->n);
+      receive_char_array(mip->is_int, mip->n);
       receive_char_array(&has_colnames, 1);
       if (has_colnames){
-	 desc->colname = (char **) malloc(sizeof(char *) * desc->n);   
-	 for (i = 0; i < desc->n; i++){
-	    desc->colname[i] = (char *) malloc(CSIZE * 9);
-	    receive_char_array(desc->colname[i], 8);
-	    desc->colname[i][8] = 0;
+	 mip->colname = (char **) malloc(sizeof(char *) * mip->n);   
+	 for (i = 0; i < mip->n; i++){
+	    mip->colname[i] = (char *) malloc(CSIZE * 9);
+	    receive_char_array(mip->colname[i], 8);
+	    mip->colname[i][8] = 0;
 	 }
       }
    }
@@ -162,11 +162,11 @@ int comp_cut_name(const void *c0, const void *c1)
 /*===========================================================================*/
 
 /*===========================================================================*\
- * This function invokes the user written function user_create_lp that
+ * This function invokes the user written function user_create_subproblem that
  * creates the problem matrix.
 \*===========================================================================*/
 
-int create_lp_u(lp_prob *p)
+int create_subproblem_u(lp_prob *p)
 {
    node_desc *desc = p->desc;
 
@@ -226,8 +226,8 @@ int create_lp_u(lp_prob *p)
    }
    lp_data->ordering = COLIND_AND_USERIND_ORDERED;
 
-   lp_data->desc->n = lp_data->n;
-   lp_data->desc->m = lp_data->m;
+   lp_data->mip->n = lp_data->n;
+   lp_data->mip->m = lp_data->m;
 
 
    /* Create the list of indices to pass to the user */
@@ -237,11 +237,11 @@ int create_lp_u(lp_prob *p)
       userind[i] = vars[i]->userind;
    }
    
-   user_res = user_create_lp(p->user,
-       /* description of the LP relaxation to be filled out by the user */
-       lp_data->desc, 
+   user_res = user_create_subproblem(p->user,
        /* list of base and extra variables */
        userind,
+       /* description of the LP relaxation to be filled out by the user */
+       lp_data->mip, 
        /* max sizes (estimated by the user) */
        &maxn, &maxm, &maxnz);
    
@@ -249,46 +249,46 @@ int create_lp_u(lp_prob *p)
       
     case DEFAULT:
        
-      lp_data->desc->nz = p->lp_desc->nz;      
+      lp_data->mip->nz = p->mip->nz;      
       /* Allocate the arrays.*/
-      lp_data->desc->matbeg  = (int *) malloc((lp_data->desc->n + 1) * ISIZE);
-      lp_data->desc->matind  = (int *) malloc((lp_data->desc->nz) * ISIZE);
-      lp_data->desc->matval  = (double *) malloc((lp_data->desc->nz) * DSIZE);
-      lp_data->desc->obj     = (double *) malloc(lp_data->desc->n * DSIZE);
-      lp_data->desc->ub      = (double *) malloc(lp_data->desc->n * DSIZE);
-      lp_data->desc->lb      = (double *) calloc(lp_data->desc->n, DSIZE); 
-      lp_data->desc->rhs     = (double *) malloc(lp_data->desc->m * DSIZE);
-      lp_data->desc->sense   = (char *)   malloc(lp_data->desc->m * CSIZE);
-      lp_data->desc->rngval  = (double *) calloc(lp_data->desc->m, DSIZE);
-      lp_data->desc->is_int  = (char *)   calloc(lp_data->desc->n, CSIZE);
+      lp_data->mip->matbeg  = (int *) malloc((lp_data->mip->n + 1) * ISIZE);
+      lp_data->mip->matind  = (int *) malloc((lp_data->mip->nz) * ISIZE);
+      lp_data->mip->matval  = (double *) malloc((lp_data->mip->nz) * DSIZE);
+      lp_data->mip->obj     = (double *) malloc(lp_data->mip->n * DSIZE);
+      lp_data->mip->ub      = (double *) malloc(lp_data->mip->n * DSIZE);
+      lp_data->mip->lb      = (double *) calloc(lp_data->mip->n, DSIZE); 
+      lp_data->mip->rhs     = (double *) malloc(lp_data->mip->m * DSIZE);
+      lp_data->mip->sense   = (char *)   malloc(lp_data->mip->m * CSIZE);
+      lp_data->mip->rngval  = (double *) calloc(lp_data->mip->m, DSIZE);
+      lp_data->mip->is_int  = (char *)   calloc(lp_data->mip->n, CSIZE);
 
       /* Fill out the appropriate data structures*/
-      lp_data->desc->matbeg[0] = 0;
-      for (i = 0; i < lp_data->desc->n; i++){
-	 lp_data->desc->obj[i]        = p->lp_desc->obj[userind[i]];
-	 lp_data->desc->ub[i]         = p->lp_desc->ub[userind[i]];
-	 lp_data->desc->lb[i]         = p->lp_desc->lb[userind[i]];
-	 lp_data->desc->is_int[i]     = p->lp_desc->is_int[userind[i]];
-	 lp_data->desc->matbeg[i+1]   = lp_data->desc->matbeg[i] + 
-	                                (p->lp_desc->matbeg[userind[i]+1] -
-	                                 p->lp_desc->matbeg[userind[i]]);
-	 for (j = 0; j < (lp_data->desc->matbeg[i+1]-lp_data->desc->matbeg[i]);
+      lp_data->mip->matbeg[0] = 0;
+      for (i = 0; i < lp_data->mip->n; i++){
+	 lp_data->mip->obj[i]        = p->mip->obj[userind[i]];
+	 lp_data->mip->ub[i]         = p->mip->ub[userind[i]];
+	 lp_data->mip->lb[i]         = p->mip->lb[userind[i]];
+	 lp_data->mip->is_int[i]     = p->mip->is_int[userind[i]];
+	 lp_data->mip->matbeg[i+1]   = lp_data->mip->matbeg[i] + 
+	                                (p->mip->matbeg[userind[i]+1] -
+	                                 p->mip->matbeg[userind[i]]);
+	 for (j = 0; j < (lp_data->mip->matbeg[i+1]-lp_data->mip->matbeg[i]);
 	      j++){
-	    lp_data->desc->matind[lp_data->desc->matbeg[i]+j]=
-	       p->lp_desc->matind[p->lp_desc->matbeg[userind[i]]+j];
-	    lp_data->desc->matval[lp_data->desc->matbeg[i]+j]=
-	       p->lp_desc->matval[p->lp_desc->matbeg[userind[i]]+j];
+	    lp_data->mip->matind[lp_data->mip->matbeg[i]+j]=
+	       p->mip->matind[p->mip->matbeg[userind[i]]+j];
+	    lp_data->mip->matval[lp_data->mip->matbeg[i]+j]=
+	       p->mip->matval[p->mip->matbeg[userind[i]]+j];
 	 }
       }
-      for (i = 0; i < p->lp_desc->m; i++){
-	 lp_data->desc->rhs[i] = p->lp_desc->rhs[i];
-	 lp_data->desc->sense[i] = p->lp_desc->sense[i];
-	 lp_data->desc->rngval[i] = p->lp_desc->rngval[i];
+      for (i = 0; i < p->mip->m; i++){
+	 lp_data->mip->rhs[i] = p->mip->rhs[i];
+	 lp_data->mip->sense[i] = p->mip->sense[i];
+	 lp_data->mip->rngval[i] = p->mip->rngval[i];
       }
       
-      maxm = p->lp_desc->m;
-      maxn = p->lp_desc->n;
-      maxnz = p->lp_desc->nz;
+      maxm = p->mip->m;
+      maxn = p->mip->n;
+      maxnz = p->mip->nz;
 
       /* Fall through to next case */
 
@@ -339,9 +339,9 @@ int create_lp_u(lp_prob *p)
    \*----------------------------------------------------------------------- */
 
    rows = lp_data->rows;
-   rhs = lp_data->desc->rhs;
-   rngval = lp_data->desc->rngval;
-   sense = lp_data->desc->sense;
+   rhs = lp_data->mip->rhs;
+   rngval = lp_data->mip->rngval;
+   sense = lp_data->mip->sense;
    for (i = bcutnum - 1; i >= 0; i--){
       row = rows + i;
       cut = row->cut;
@@ -359,9 +359,9 @@ int create_lp_u(lp_prob *p)
     * Set the upper and lower bounds and integer status
    \*----------------------------------------------------------------------- */
 
-   lb = lp_data->desc->lb;
-   ub = lp_data->desc->ub;
-   is_int = lp_data->desc->is_int;
+   lb = lp_data->mip->lb;
+   ub = lp_data->mip->ub;
+   is_int = lp_data->mip->is_int;
 
    vars = lp_data->vars;
    for (i = lp_data->n - 1; i >= 0; i--){
@@ -377,7 +377,7 @@ int create_lp_u(lp_prob *p)
    load_lp_prob(lp_data, p->par.scaling, p->par.fastmip);
 
    /* Free the user's description */
-   free_lp_desc(lp_data->desc);
+   free_mip_desc(lp_data->mip);
 
    if (desc->cutind.size > 0){
       unpack_cuts_u(p, CUT_FROM_TM, UNPACK_CUTS_SINGLE,
@@ -714,12 +714,12 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
     case DISP_NOTHING:
       break;
     case DISP_NZ_INT:
-      if (p->lp_desc->colname){ 
+      if (p->mip->colname){ 
 	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 printf(" Column names and values of nonzeros in the solution\n");
 	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for (i = 0; i < number; i++){
-	    printf("%8s %10.7f\n", p->lp_desc->colname[xind[i]], xval[i]);
+	    printf("%8s %10.7f\n", p->mip->colname[xind[i]], xval[i]);
 	 }
 	 printf("\n");
       }else{
@@ -743,14 +743,14 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf("\n");
       break;
     case DISP_FRAC_INT:
-      if (p->lp_desc->colname){ 
+      if (p->mip->colname){ 
 	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 printf(" Column names and values of fractional vars in the solution\n");
 	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for (i = 0; i < number; i++){
 	    tmpd = xval[i];
 	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
-	       printf("%8s %10.7f\n", p->lp_desc->colname[xind[i]], tmpd);
+	       printf("%8s %10.7f\n", p->mip->colname[xind[i]], tmpd);
 	    }
 	 }
 	 printf("\n");
@@ -1248,10 +1248,10 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
    int i;
    
    if (can->type == CANDIDATE_VARIABLE){
-      if (p->lp_desc){
-	 if (p->lp_desc->colname){
+      if (p->mip){
+	 if (p->mip->colname){
 	    printf("Branching on variable %s \n   children: ",
-		   p->lp_desc->colname[p->lp_data->vars[can->position]->userind]);
+		   p->mip->colname[p->lp_data->vars[can->position]->userind]);
 	 }
       }else{
 	 printf("Branching on variable %i ( %i )\n   children: ",

@@ -100,7 +100,7 @@ void lp_initialize(lp_prob *p, int master_tid)
 #endif
 
    p->lp_data = (LPdata *) calloc(1, sizeof(LPdata));
-   p->lp_data->desc = (LPdesc *) calloc(1, sizeof(LPdesc));
+   p->lp_data->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
    
 #pragma omp critical (lp_solver)
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -187,7 +187,7 @@ void lp_initialize(lp_prob *p, int master_tid)
 int process_chain(lp_prob *p)
 {
    /* Create the LP */
-   if (! create_lp_u(p)){
+   if (! create_subproblem_u(p)){
       /* User had problems creating initial LP. Abandon node. */
       return(FALSE);
    }

@@ -118,7 +118,7 @@ typedef struct LP_PROB{
    int           node_iter_num;
    int           vars_recently_fixed_to_ub;
    LPdata       *lp_data;
-   LPdesc       *lp_desc; /* Holds the LP description when read in from MPS */
+   MIPdesc      *mip; /* Holds the MIP description when read in from MPS */
    
    double        last_gap;
    double       *obj_history;
@@ -252,7 +252,7 @@ void free_candidate_completely PROTO((branch_obj **cand));
 void free_node_dependent PROTO((lp_prob *p));
 void free_node_desc PROTO((node_desc **desc));
 void free_lp PROTO((lp_prob *p));
-void free_lp_desc PROTO((LPdesc *desc));
+void free_mip_desc PROTO((MIPdesc *mip));
 void free_lp_arrays PROTO((LPdata *lp_data));
 
 /*===========================================================================*/
@@ -262,7 +262,7 @@ void free_lp_arrays PROTO((LPdata *lp_data));
 int receive_lp_data_u PROTO((lp_prob *p));
 void free_prob_dependent_u PROTO((lp_prob *p));
 int comp_cut_name PROTO((const void *c0, const void *c1));
-int create_lp_u PROTO((lp_prob *p));
+int create_subproblem_u PROTO((lp_prob *p));
 int is_feasible_u PROTO((lp_prob *p));
 void send_feasible_solution_u PROTO((lp_prob *p, int xlevel, int xindex,
 				     int xiter_num, double lpetol,

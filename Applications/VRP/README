@@ -1,3 +1,21 @@
+*******************************************************************************
+*                COMPILING A SYMPHONY APPLICATION (Unix)                      *
+*******************************************************************************
+
+First configure and compile SYMPHONY as described above. Download and unpack
+the source code for the sample applications. If the application is unpacked in
+the SYMPHONY subdirectory. Modify the
+variables in the application make file appropriately. In particular, you must
+set the path to SYMPHONY
+
+*******************************************************************************
+*              COMPILING A SYMPHONY APPLICATION (Windows)                     *
+*******************************************************************************
+
+*******************************************************************************
+*                      USING THE SOLVER                                       *
+*******************************************************************************
+
 This file briefly introduces the use of the SYMPHONY VRP solver. To run the VRP
 solver, type the executable name followed by one or more of the command-line
 switches. There are two required switches. You must specify the location of

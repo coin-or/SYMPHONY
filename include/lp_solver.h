@@ -145,7 +145,7 @@ typedef struct TEMPORARY{
 
 /* This structure stores the user's description of the model */
 
-typedef struct LPdesc{
+typedef struct MIPDESC{
    int        n;           /* number of columns */
    int        m;           /* number of rows */
    int        nz;          /* number of nonzeros */
@@ -160,11 +160,11 @@ typedef struct LPdesc{
    double    *lb;          /* n */
    double    *ub;          /* n */
    char     **colname;     /* column names */
-}LPdesc;
+}MIPdesc;
 
 /* The LP solver data */
 
-typedef struct LPdata{
+typedef struct LPDATA{
    /* First, the problem pointers */
 #ifdef __CPLEX__
    CPXENVptr  cpxenv;
@@ -184,7 +184,7 @@ typedef struct LPdata{
    char       col_set_changed;
    double     objval;
    int        termcode;
-   LPdesc    *desc;
+   MIPdesc   *mip;
    int        n;           /* number of columns without slacks */
    int        maxn;
    int        m;           /* number of rows */
@@ -272,14 +272,14 @@ int delete_cols PROTO((LPdata *lp_data, int delnum, int *delstat));
 void release_var PROTO((LPdata *lp_data, int j, int where_to_move));
 void free_row_set PROTO((LPdata *lp_data, int length, int *index));
 void constrain_row_set PROTO((LPdata *lp_data, int length, int *index));
-int read_mps PROTO((LPdesc *desc, char *infile, char *probname));
+int read_mps PROTO((MIPdesc *mip, char *infile, char *probname));
 void write_mps PROTO((LPdata *lp_data, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
 #ifdef USE_CGL_CUTS
 void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts, cut_data ***cuts));
 #endif
 #ifdef USE_GLPMPL
-int read_gmpl PROTO((LPdesc * lp_data, char *modelfile, char *datafile,
+int read_gmpl PROTO((MIPdesc *mip, char *modelfile, char *datafile,
 		     char *probname));
 #endif
 #endif

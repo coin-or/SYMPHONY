@@ -83,44 +83,44 @@ int user_receive_lp_data(void **user)
  * fill out this function.
 \*===========================================================================*/
 
-int user_create_lp(void *user, LPdesc *desc, int *indices, 
-		   int *maxn, int *maxm, int *maxnz)
+int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
+			   int *maxn, int *maxm, int *maxnz)
 {
    spp_lp_problem *spp = (spp_lp_problem *) user;
    col_ordered *cm = spp->cmatrix;
    int i;
 
-   desc->nz = cm->nzcnt;
-   *maxn = desc->n;   /* note that the number of columns cannot increase */
-   *maxm = 2 * desc->m;
-   *maxnz = desc->nz + ((*maxm) * (*maxn) / 100);
+   mip->nz = cm->nzcnt;
+   *maxn = mip->n;   /* note that the number of columns cannot increase */
+   *maxm = 2 * mip->m;
+   *maxnz = mip->nz + ((*maxm) * (*maxn) / 100);
 
-   desc->matbeg = (int *) malloc((desc->n + 1) * ISIZE);
-   desc->matind = (int *) malloc(desc->nz * ISIZE);
-   desc->matval = (double *) malloc(desc->nz * DSIZE);
-   desc->obj    = (double *) malloc(desc->n * DSIZE);
-   desc->lb     = (double *) calloc(desc->n, DSIZE);
-   desc->ub     = (double *) malloc(desc->n * DSIZE);
-   desc->rhs    = (double *) malloc(desc->m * DSIZE);
-   desc->sense  = (char *) malloc(desc->m * CSIZE);
-   desc->rngval = (double *) malloc(desc->m * DSIZE);
+   mip->matbeg = (int *) malloc((mip->n + 1) * ISIZE);
+   mip->matind = (int *) malloc(mip->nz * ISIZE);
+   mip->matval = (double *) malloc(mip->nz * DSIZE);
+   mip->obj    = (double *) malloc(mip->n * DSIZE);
+   mip->lb     = (double *) calloc(mip->n, DSIZE);
+   mip->ub     = (double *) malloc(mip->n * DSIZE);
+   mip->rhs    = (double *) malloc(mip->m * DSIZE);
+   mip->sense  = (char *) malloc(mip->m * CSIZE);
+   mip->rngval = (double *) malloc(mip->m * DSIZE);
 
-   memcpy((char *) desc->matbeg, (char *) cm->matbeg, (cm->colnum+1) * ISIZE);   
-   memcpy((char *) desc->obj, (char *) cm->obj, cm->colnum * DSIZE);      
+   memcpy((char *) mip->matbeg, (char *) cm->matbeg, (cm->colnum+1) * ISIZE);   
+   memcpy((char *) mip->obj, (char *) cm->obj, cm->colnum * DSIZE);      
 
    for (i = cm->nzcnt - 1; i >= 0; i--) {
-      desc->matind[i] = cm->matind[i];   /* cannot memcpy b/c int vs. short */
-      desc->matval[i] = 1.0;
+      mip->matind[i] = cm->matind[i];   /* cannot memcpy b/c int vs. short */
+      mip->matval[i] = 1.0;
    }
 
-   for (i = desc->n - 1; i >= 0; --i){
-      desc->ub[i] = 1.0;
-      /* desc->lb[i] = 0.0; */ /* Set by calloc */
+   for (i = mip->n - 1; i >= 0; --i){
+      mip->ub[i] = 1.0;
+      /* mip->lb[i] = 0.0; */ /* Set by calloc */
    }
    
-   for (i = desc->m - 1; i >= 0; --i) {
-      desc->rhs[i] = 1.0;
-      desc->sense[i] = 'E';
+   for (i = mip->m - 1; i >= 0; --i) {
+      mip->rhs[i] = 1.0;
+      mip->sense[i] = 'E';
    }
 
    return(USER_NO_PP);

@@ -53,8 +53,8 @@ int user_receive_lp_data(void **user)
  * fill out this function.
 \*===========================================================================*/
 
-int user_create_lp(void *user, LPdesc *desc, int *indices, 
-		   int *maxn, int *maxm, int *maxnz)
+int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
+			   int *maxn, int *maxm, int *maxnz)
 {
    mpp_problem *mpp = (mpp_problem *) user;
 
@@ -63,67 +63,67 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
 
    /* set up the inital LP data */
 
-   desc->nz = (6 * mpp->numedges)+ (2 * mpp->numarcs);
+   mip->nz = (6 * mpp->numedges)+ (2 * mpp->numarcs);
  
    /* Estimate the maximum number of nonzeros */
-   *maxm = 2 * desc->m;
-   *maxn = desc->n;
-   *maxnz = desc->nz + ((*maxm) * (*maxn) / 10);
+   *maxm = 2 * mip->m;
+   *maxn = mip->n;
+   *maxnz = mip->nz + ((*maxm) * (*maxn) / 10);
 
    /* Allocate the arrays. These are owned by SYMPHONY after returning. */
-   desc->matbeg  = (int *) malloc((desc->n + 1) * ISIZE);
-   desc->matind  = (int *) malloc((desc->nz) * ISIZE);
-   desc->matval  = (double *) malloc((desc->nz) * DSIZE);
-   desc->obj     = (double *) malloc(desc->n * DSIZE);
-   desc->lb      = (double *) calloc(desc->n, DSIZE);
-   desc->ub      = (double *) malloc(desc->n * DSIZE);
-   desc->rhs     = (double *) malloc(desc->m * DSIZE);
-   desc->sense   = (char *) malloc(desc->m * CSIZE);
-   desc->rngval  = (double *) calloc(desc->m, DSIZE);
-   desc->is_int = (char *) calloc(desc->n, CSIZE);
+   mip->matbeg  = (int *) malloc((mip->n + 1) * ISIZE);
+   mip->matind  = (int *) malloc((mip->nz) * ISIZE);
+   mip->matval  = (double *) malloc((mip->nz) * DSIZE);
+   mip->obj     = (double *) malloc(mip->n * DSIZE);
+   mip->lb      = (double *) calloc(mip->n, DSIZE);
+   mip->ub      = (double *) malloc(mip->n * DSIZE);
+   mip->rhs     = (double *) malloc(mip->m * DSIZE);
+   mip->sense   = (char *) malloc(mip->m * CSIZE);
+   mip->rngval  = (double *) calloc(mip->m, DSIZE);
+   mip->is_int = (char *) calloc(mip->n, CSIZE);
    
-   for (i = 0, ind = 0; i < desc->n; i++){
-      desc->matbeg[i] = ind;
-      desc->is_int[i] = TRUE;
+   for (i = 0, ind = 0; i < mip->n; i++){
+      mip->matbeg[i] = ind;
+      mip->is_int[i] = TRUE;
       /* indegree equals outdegree constraint */
       for (j = 0; j <= mpp->numnodes - 1; j++){
 	 /* checks to see if node i is the start node of every edge arc */
 	 if (mpp->head[i] == j){
-	    desc->matind[ind] = j;
-	    desc->matval[ind++] = 1;
+	    mip->matind[ind] = j;
+	    mip->matval[ind++] = 1;
 	 }else if (mpp->tail[i] == j){
-	    desc->matind[ind] = j;
-	    desc->matval[ind++] = -1;
+	    mip->matind[ind] = j;
+	    mip->matval[ind++] = -1;
 	 }
       }
       
       /* Now the constraint that each edge must be traversed at least once */
       if (i >= mpp->numarcs){ /* Check to see if it is an edge */
 	 if (i < mpp->numarcs + mpp->numedges){
-	    desc->matind[ind] = mpp->numnodes + i - mpp->numarcs;
+	    mip->matind[ind] = mpp->numnodes + i - mpp->numarcs;
 	 }else{
-	    desc->matind[ind] = mpp->numnodes + i - (mpp->numarcs +
+	    mip->matind[ind] = mpp->numnodes + i - (mpp->numarcs +
 						     mpp->numedges);
 	 }
-	 desc->matval[ind++] = 1;
-	 /* desc->lb[i] = 0; */ /* Already set to zero from calloc */
-	 desc->ub[i] = (double) (mpp->numarcs + mpp->numedges);
+	 mip->matval[ind++] = 1;
+	 /* mip->lb[i] = 0; */ /* Already set to zero from calloc */
+	 mip->ub[i] = (double) (mpp->numarcs + mpp->numedges);
       }else{
-	 desc->lb[i] = 1.0;
-	 desc->ub[i] = (double) (mpp->numarcs + mpp->numedges);
+	 mip->lb[i] = 1.0;
+	 mip->ub[i] = (double) (mpp->numarcs + mpp->numedges);
       }
-      desc->obj[i] = (double) (mpp->cost[i]);
+      mip->obj[i] = (double) (mpp->cost[i]);
    }
-   desc->matbeg[i] = ind;
+   mip->matbeg[i] = ind;
    
    /* set the initial right hand side */
    for (i = 0; i <= mpp->numnodes-1 ; i++){
-      desc->rhs[i]   = 0;
-      desc->sense[i] = 'E';
+      mip->rhs[i]   = 0;
+      mip->sense[i] = 'E';
    }
    for (i = mpp->numnodes; i <= mpp->numnodes+mpp->numedges-1 ; i++){
-      desc->rhs[i]   = 1;
-      desc->sense[i] = 'G';
+      mip->rhs[i]   = 1;
+      mip->sense[i] = 'G';
    }
    
    return(USER_NO_PP);

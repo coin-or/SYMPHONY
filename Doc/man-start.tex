@@ -56,63 +56,6 @@ assumed that the user has already read the first part of the manual, which
 provides a high-level introduction to parallel branch, cut, and price
 and the overall design and use of \BB. 
 
-\subsection{What's New in SYMPHONY 4.0}
-\label{whats-new}
-
-SYMPHONY 4.0 contains many enhancements and new features. Among them are:
-
-\begin{itemize}
-
-\item SYMPHONY now works out of the box as a full-featured, parallel MIP solver,
-with a wide variety of options for developing custom solvers.
-
-\item SYMPHONY now makes full use of the libraries available from 
-\emph{\htmladdnormallink{COIN}{http://www.coin-or.org}}
-\begin{latexonly} 
-COIN
-\end{latexonly}.
-for cut generation, file I/O, and solver interface.
-
-\begin{itemize}
-
-    \item SYMPHONY is now capable of reading both MPS files (through the COIN MPS
-reader) and basic AMPL files (using the parser available from GLPK).
-
-    \item SYMPHONY now uses the COIN Open Solver Interface (OSI), allowing it to
-be used with almost any commonly available LP solver, including a number of
-open source solvers. This makes SYMPHONY an end-to-end open source solution.
-
-    \item SYMPHONY can now use COIN's Cut Generator Library (CGL) to generate
-generic cutting planes.
-
-\end{itemize}
-
-\item The API has been simplified SIGNIFICANTLY, with more default options,
-helper functions, and more automation of basic functions. The parallelism is
-now more hidden, especially for sequential users.
-
-\item Automated support for user cuts generated and stored as explicit matrix
-rows. 
-
-\item Improvements have been made to the mechanism for accessing and displaying
-solutions.
-
-\item There is now built-in support for column names.
-
-\item More sample codes are now available, including solvers for vehicle routing,
-set partitioning (basic and advanced versions), bipartite matching, and the
-mixed postman problem.
-
-\item Improvements to the makefile now allow the user to make the code from the 
-User directory instead of the SYMPHONY directory. Also, executables can have
-custom names and are built in different directories for different LP solvers
-so the object files don't have to be cleaned to switch LP solvers.
-
-\item There is now a white paper available that illustrates the use of SYMPHONY
-to build a simple matching solver.
-
-\end{itemize}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Compiling the Sample Application with Unix Operating Systems}
@@ -388,7 +331,7 @@ working under Windows.
 
 \end{itemize}
 
-\subsection{Developing a New Application}
+\subsection{Customizing SYMPHONY}
 
 \subsubsection{Unix}
 
@@ -418,8 +361,10 @@ modify the \texttt{user\_initialize\_root\_node()} function to set up the root
 node. 
 
 \item Edit the file \texttt{USER/LP/user\_lp.c}. The function
-\texttt{user\_create\_lp()} must be filled out. This is the most important
-function, as it sets up the initial LP relaxation in each search node.
+\hyperref{{\tt user\_create\_subproblem()}} {{\tt user\_create\_subproblem()} (see
+Section }{)}{user_create_subproblem} must be filled out. This is the most
+important function, as it sets up the initial LP relaxation in each search
+node.
 
 \item You may also want to add some problem-specific cutting planes by modifying
 the \texttt{user\_find\_cuts()} function.
@@ -459,9 +404,10 @@ modify the \texttt{user\_initialize\_root\_node()} function to set up the root
 node. 
 
 \item Edit the file \texttt{USER$\backslash$LP$\backslash$user\_lp.c}. The
-function \texttt{user\_create\_lp()} must be filled out. This is the most
-important function, as it sets up the initial LP relaxation in each search
-node.
+function \hyperref{{\tt user\_create\_subproblem()}} {{\tt
+user\_create\_subproblem()} (see Section }{)}{user_create_subproblem} must be
+filled out. This is the most important function, as it sets up the initial LP
+relaxation in each search node.
 
 \item You may also want to add some problem-specific cutting planes by modifying
 the \texttt{user\_find\_cuts()} function.

@@ -25,8 +25,8 @@
 
 int user_receive_lp_data PROTO((void **user));
 int user_free_lp PROTO((void **user));
-int user_create_lp PROTO((void *user, LPdesc *desc, int *indices, 
-			  int *maxn, int *maxm, int *maxnz));
+int user_create_subproblem PROTO((void *user, int *indices, MIPdesc *mip, 
+				  int *maxn, int *maxm, int *maxnz));
 int user_is_feasible PROTO((void *user, double lpetol, int varnum,
 			    int *indices, double *values, int *feasible,
 			    double *true_objval));

@@ -134,8 +134,8 @@ int user_free_lp(void **user)
  * each search node. See the comments below.
 \*===========================================================================*/
 
-int user_create_lp(void *user, LPdesc *desc, int *indices, 
-		   int *maxn, int *maxm, int *maxnz)
+int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
+			   int *maxn, int *maxm, int *maxnz)
 {
    vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    int *costs = vrp->costs;
@@ -152,36 +152,35 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
       that each column will have exactly two nonzeros, one in each of
       the rows corresponding to its end points. Hence the total
       nonzeros is 2*n (n is the number of active variables). */
-   desc->nz = 2 * desc->n;
+   mip->nz = 2 * mip->n;
 
    /* Estimate the maximum number of nonzeros (not needed, but helpful for
       efficiency*/
-   *maxm = 2 * desc->m;
+   *maxm = 2 * mip->m;
    *maxn = total_edgenum;
-   *maxnz = desc->nz + ((*maxm) * (*maxn) / 10);
+   *maxnz = mip->nz + ((*maxm) * (*maxn) / 10);
 
    /* Allocate the arrays. These are owned by SYMPHONY after returning. */
-   desc->matbeg  = (int *) malloc((desc->n + 1) * ISIZE);
-   desc->matind  = (int *) malloc((desc->nz) * ISIZE);
-   desc->matval  = (double *) malloc((desc->nz) * DSIZE);
-   desc->obj     = (double *) malloc(desc->n * DSIZE);
-   desc->ub      = (double *) malloc(desc->n * DSIZE);
-   desc->lb      = (double *) calloc(desc->n, DSIZE); /* zero lower bounds */
-   desc->rhs     = (double *) malloc(desc->m * DSIZE);
-   desc->sense   = (char *) malloc(desc->m * CSIZE);
-   desc->rngval  = (double *) calloc(desc->m, DSIZE);
-   desc->is_int  = (char *) calloc(desc->n, CSIZE);
+   mip->matbeg  = (int *) malloc((mip->n + 1) * ISIZE);
+   mip->matind  = (int *) malloc((mip->nz) * ISIZE);
+   mip->matval  = (double *) malloc((mip->nz) * DSIZE);
+   mip->obj     = (double *) malloc(mip->n * DSIZE);
+   mip->ub      = (double *) malloc(mip->n * DSIZE);
+   mip->lb      = (double *) calloc(mip->n, DSIZE); /* zero lower bounds */
+   mip->rhs     = (double *) malloc(mip->m * DSIZE);
+   mip->sense   = (char *) malloc(mip->m * CSIZE);
+   mip->rngval  = (double *) calloc(mip->m, DSIZE);
+   mip->is_int  = (char *) calloc(mip->n, CSIZE);
    /* Fill out the appropriate data structures -- each column has
       exactly two entries */
-   for (i = 0; i < desc->n; i++){
-      
-      desc->obj[i]        = (double) costs[indices[i]];
-      desc->matbeg[i]     = 2*i;
-      desc->matval[2*i]   = 1.0;
-      desc->matval[2*i+1] = 1.0;
-      desc->matind[2*i]   = edges[2*indices[i]];
-      desc->matind[2*i+1] = edges[2*indices[i] + 1];
-      desc->is_int[i]     = TRUE;
+   for (i = 0; i < mip->n; i++){
+      mip->obj[i]        = (double) costs[indices[i]];
+      mip->matbeg[i]     = 2*i;
+      mip->matval[2*i]   = 1.0;
+      mip->matval[2*i+1] = 1.0;
+      mip->matind[2*i]   = edges[2*indices[i]];
+      mip->matind[2*i+1] = edges[2*indices[i] + 1];
+      mip->is_int[i]     = TRUE;
       
       /* Set the upper and lower bounds */
       if (edges[indices[i] << 1] == 0){
@@ -190,21 +189,21 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
 	 if (total_demand - vrp->demand[edges[(indices[i] << 1) + 1]] >
 	     cap_check)
 	    /*in this case, the node cannot be on its own route*/
-	    desc->ub[i] = 1;
+	    mip->ub[i] = 1;
 	 else
-	    desc->ub[i] = 2;
+	    mip->ub[i] = 2;
       }else{
-	 desc->ub[i] = 1;
+	 mip->ub[i] = 1;
       }
    }
-   desc->matbeg[desc->n] = 2*desc->n;
+   mip->matbeg[mip->n] = 2*mip->n;
    
    /* set the initial right hand side */
-   desc->rhs[0] = 2*vrp->numroutes;
-   desc->sense[0] = 'E';
+   mip->rhs[0] = 2*vrp->numroutes;
+   mip->sense[0] = 'E';
    for (i = vrp->vertnum - 1; i > 0; i--){
-      desc->rhs[i]   = (double) 2;
-      desc->sense[i] = 'E';
+      mip->rhs[i]   = (double) 2;
+      mip->sense[i] = 'E';
    }
 
    return(USER_NO_PP);

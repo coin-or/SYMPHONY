@@ -219,12 +219,12 @@ void free_lp(lp_prob *p)
    FREE(p->lp_data->rows);
    close_lp_solver(p->lp_data);
    free_lp_arrays(p->lp_data);
-   free_lp_desc(p->lp_data->desc);
-   FREE(p->lp_data->desc);
+   free_mip_desc(p->lp_data->mip);
+   FREE(p->lp_data->mip);
    FREE(p->lp_data);
 #if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
-   free_lp_desc(p->lp_desc);
-   FREE(p->lp_desc);
+   free_mip_desc(p->mip);
+   FREE(p->mip);
 #endif
    FREE(p->base.userind);
    FREE(p->best_sol.xind);
@@ -238,25 +238,25 @@ void free_lp(lp_prob *p)
 
 /*===========================================================================*/
 
-void free_lp_desc(LPdesc *desc)
+void free_mip_desc(MIPdesc *mip)
 {
    int j;
    
-   FREE(desc->matbeg);
-   FREE(desc->matind);
-   FREE(desc->matval);
-   FREE(desc->obj);
-   FREE(desc->rhs);
-   FREE(desc->rngval);
-   FREE(desc->sense);
-   FREE(desc->lb);
-   FREE(desc->ub);
-   FREE(desc->is_int);
-   if (desc->colname){
-      for (j = 0; j < desc->n; j++){
-	 FREE(desc->colname[j]);
+   FREE(mip->matbeg);
+   FREE(mip->matind);
+   FREE(mip->matval);
+   FREE(mip->obj);
+   FREE(mip->rhs);
+   FREE(mip->rngval);
+   FREE(mip->sense);
+   FREE(mip->lb);
+   FREE(mip->ub);
+   FREE(mip->is_int);
+   if (mip->colname){
+      for (j = 0; j < mip->n; j++){
+	 FREE(mip->colname[j]);
       }
-      FREE(desc->colname);
+      FREE(mip->colname);
    }
 }
 
@@ -276,9 +276,6 @@ void free_lp_arrays(LPdata *lp_data)
    FREE(lp_data->lb);
    FREE(lp_data->ub);
 #endif
-   for (i = 0; i < lp_data->n; i++){
-      FREE(lp_data->vars[i]);
-   }
    FREE(lp_data->vars);
    FREE(lp_data->tmp.c);
    FREE(lp_data->tmp.i1);

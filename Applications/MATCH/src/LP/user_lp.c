@@ -53,8 +53,8 @@ int user_receive_lp_data(void **user)
  * fill out this function.
 \*===========================================================================*/
 
-int user_create_lp(void *user, LPdesc *desc, int *indices, 
-		   int *maxn, int *maxm, int *maxnz)
+int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
+			   int *maxn, int *maxm, int *maxnz)
 {
    user_problem *prob = (user_problem *) user;
    int i, j, index;
@@ -62,24 +62,24 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
 
    /* set up the inital LP data */
 
-   desc->nz = 2 * desc->n;
+   mip->nz = 2 * mip->n;
 
    /* Estimate the maximum number of nonzeros */
-   *maxm = 2 * desc->m;
-   *maxn = desc->n;
-   *maxnz = desc->nz + ((*maxm) * (*maxn) / 10);
+   *maxm = 2 * mip->m;
+   *maxn = mip->n;
+   *maxnz = mip->nz + ((*maxm) * (*maxn) / 10);
    
    /* Allocate the arrays. These are owned by SYMPHONY after returning. */
-   desc->matbeg  = (int *) malloc((desc->n + 1) * ISIZE);
-   desc->matind  = (int *) malloc((desc->nz) * ISIZE);
-   desc->matval  = (double *) malloc((desc->nz) * DSIZE);
-   desc->obj     = (double *) malloc(desc->n * DSIZE);
-   desc->lb      = (double *) calloc(desc->n, DSIZE);
-   desc->ub      = (double *) malloc(desc->n * DSIZE);
-   desc->rhs     = (double *) malloc(desc->m * DSIZE);
-   desc->sense   = (char *) malloc(desc->m * CSIZE);
-   desc->rngval  = (double *) calloc(desc->m, DSIZE);
-   desc->is_int  = (char *) malloc(desc->n * CSIZE);
+   mip->matbeg  = (int *) malloc((mip->n + 1) * ISIZE);
+   mip->matind  = (int *) malloc((mip->nz) * ISIZE);
+   mip->matval  = (double *) malloc((mip->nz) * DSIZE);
+   mip->obj     = (double *) malloc(mip->n * DSIZE);
+   mip->lb      = (double *) calloc(mip->n, DSIZE);
+   mip->ub      = (double *) malloc(mip->n * DSIZE);
+   mip->rhs     = (double *) malloc(mip->m * DSIZE);
+   mip->sense   = (char *) malloc(mip->m * CSIZE);
+   mip->rngval  = (double *) calloc(mip->m, DSIZE);
+   mip->is_int  = (char *) malloc(mip->n * CSIZE);
    
    /* Fill out the appropriate data structures -- each column has
       exactly two entried*/
@@ -88,23 +88,23 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
       for (j = i+1; j < prob->nnodes; j++) {
 	 prob->node1[index] = i; /* The first node of assignment 'index' */
 	 prob->node2[index] = j; /* The second node of assignment 'index' */
-	 desc->obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
-	 desc->is_int[index] = TRUE;
-	 desc->matbeg[index] = 2*index;
-	 desc->matval[2*index] = 1;
-	 desc->matval[2*index+1] = 1;
-	 desc->matind[2*index] = i;
-	 desc->matind[2*index+1] = j;
-	 desc->ub[index] = 1.0;
+	 mip->obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
+	 mip->is_int[index] = TRUE;
+	 mip->matbeg[index] = 2*index;
+	 mip->matval[2*index] = 1;
+	 mip->matval[2*index+1] = 1;
+	 mip->matind[2*index] = i;
+	 mip->matind[2*index+1] = j;
+	 mip->ub[index] = 1.0;
 	 index++;
       }
    }
-   desc->matbeg[desc->n] = 2 * desc->n;
+   mip->matbeg[mip->n] = 2 * mip->n;
    
    /* set the initial right hand side */
    for (i = 0; i < prob->nnodes; i++) {
-      desc->rhs[i] = 1;
-      desc->sense[i] = 'E';
+      mip->rhs[i] = 1;
+      mip->sense[i] = 'E';
    }
 
    return(USER_NO_PP);

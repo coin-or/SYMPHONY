@@ -1,4 +1,5 @@
 SYMPHONY Version 4.0 README
+===========================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Common Public License
 Version 1.0 and is freely redistributable. However, it is vital to the
@@ -11,6 +12,7 @@ the distribution. All source code and documentation is Copyright 2000-2003 by
 Ted Ralphs. This README may be distributed freely.
 
 DOCUMENTATION
+=============
 
 Full documentation comes with your distribution in the directory
 SYMPHONY-4.0/Doc and can also be downloaded at
@@ -19,6 +21,7 @@ ftp://branchandcut.org/pub/reference/. There is a user's guide
 application.
 
 WHAT'S NEW
+==========
 
 1. All reported bugs have been fixed.
 
@@ -42,8 +45,8 @@ generic cutting planes.
 helper functions, and more autmation of basic functions. The parallelism is
 now more hidden, especially for sequential users.
 
-5. Automated support for user cuts generated and stored as explicit matrix
-rows. 
+5. There is now automated support for user cuts generated and stored as
+explicit matrix rows. 
 
 6. Improvements have been made to the mechanism for accessing and displaying
 solutions.
@@ -63,8 +66,9 @@ so the object files don't have to be cleaned to switch LP solvers.
 to build a simple matching solver.
 
 CHANGES TO THE USER INTERFACE
+=============================
 
-1. The meachanism for diplaying a solution is now vastly improved. 
+1. The mechanism for diplaying a solution is now vastly improved. 
 SYMPHONY now passes the user the indices and values of the nonzero
 variables for the best solution found. The function user_display_solution()
 now has six arguments, as follows:  
@@ -94,16 +98,19 @@ called user_initialize_root_node(), in which the user simply has to specify
 the list of base and extra variables. This is greatly simplified from previous
 versions.
 
-4. Changed the user_create_lp() function so that the user has only to
-construct a description of the LP relaxation by specifying the constraint
-matrix in column-ordered format and the rim vectors. The user is no longer
-responsible for allocating extra memory to allow for the addition of
-dynamically generated cuts and variables. The arrays allocated in
-user_create_lp() are owned by SYMPHONY after allocation and are freed as soon
-as the relaxation is loaded into the solver.
+4. Changed the name of user_create_lp() function to user_create_subproblem()
+to more accurately reflect its actual function. In addition, the interface to
+the user has been simplified significantly. The user now has only to construct
+a description of the subproblem by specifying the constraint matrix in
+column-ordered format and the rim vectors, along with a list of which
+variables are required to be integer. The user is no longer responsible for
+allocating extra memory to allow for the addition of dynamically generated
+cuts and variables. The arrays allocated in user_create_subproblem() are owned
+by SYMPHONY after allocation and are freed as soon as the relaxation is loaded
+into the solver.
 
 5. Eliminated the user_get_upper_bounds(). The bounds are now set in either
-user_create_lp() and user_generate_column().
+user_create_subproblem() and user_generate_column().
 
 6. Simplified the interface for user_generate_cuts_in_lp(). The user now gets
 access to the data structures for the current LP relaxation and has
@@ -113,6 +120,8 @@ SYMPHONY. The new interface is as follows:
 int user_generate_cuts_in_lp PROTO((void *user, LPdata *lp_data, int varnum,
 				    var_desc **vars, double *x, int *new_row_num,
 				    cut_data ***cuts));
+
+7. The user
 
 ******************************************************************************
 *                COMPILING SYMPHONY (UNIX Operating Systems)                 *
@@ -133,6 +142,7 @@ you might need to edit the Makefiles to get SYMPHONY to compile. For the casual
 user, this editing is limited to providing some path names.
 
 PREPARING FOR COMPILATION
+=========================
 
 1. Download the file SYMPHONY-4.0.tgz.
 
@@ -157,6 +167,7 @@ Programming Kit (GLPK), which contains a parser for AMPL files. The path to
 the COIN libraries must be specified in SYMPHONY-4.0/Makefile.
 
 COMPILING THE SEQUENTIAL VERSION
+================================
 
 1. Change to the SYMPHONY-4.0/USER directory and type "make". This will first make
 the SYMPHONY library (sequential version). After making the SYMPHONY library,
@@ -184,6 +195,7 @@ MIPLIB library.
 the files in the MIP directory and it's subdirectories.
 
 COMPILING FOR SHARED MEMORY
+===========================
 
 1. To compile a shared memory version, obtain an OpenMP compliant compiler,
 such as Omni (free from http://phase.etl.go.jp/Omni). Other options are listed
@@ -207,6 +219,7 @@ the files in the SYMPHONY-4.0/USER directory and it's subdirectories. See the
 user manual for help.
 
 COMPILING FOR DISTRIBUTED NETWORKS
+==================================
 
 1. If you wish to compile a distributed version of the code, obtain and
 install PVM from http://www.csm.ornl.gov/pvm/.
@@ -245,7 +258,7 @@ the files in the MIP directory and it's subdirectories. See the user manual
 for help.
 
 *******************************************************************************
-*         COMPILING THE SAMPLE APPLICATION (Microsoft Windows)                *
+*                 COMPILING SYMPHONY (Microsoft Windows)                      *
 *******************************************************************************
 
 Here is a sketch outline of how to compile SYMPHONY in Microsoft Windows. For
@@ -355,9 +368,9 @@ data from can be specified on the command line using the "-F" option by
 default. Also, you'll probably need to modify the user_initialize_root_node()
 function to set up the root node.
 
-3. Edit the file USER/LP/user_lp.c. The function user_create_lp() must be
-filled out. This is the most important function, as it sets up the initial LP
-relaxation in each search node.
+3. Edit the file USER/LP/user_lp.c. The function user_create_subproblem() must
+be filled out. This is the most important function, as it sets up the initial
+LP relaxation in each search node.
 
 4. You may also want to add some problem-specific cutting planes by modifying
 the user_find_cuts() function.
@@ -391,9 +404,9 @@ the instance data from can be specified on the command line using the "-F"
 option by default. Also, you'll probably need to modify the
 user_initialize_root_node() function to set up the root node.
 
-3. Edit the file USER\LP\user_lp.c. The function user_create_lp() must be
-filled out. This is the most important function, as it sets up the initial LP
-relaxation in each search node.
+3. Edit the file USER\LP\user_lp.c. The function user_create_subproblem() must
+be filled out. This is the most important function, as it sets up the initial
+LP relaxation in each search node.
 
 4. You may also want to add some problem-specific cutting planes by modifying
 the user_find_cuts() function.
