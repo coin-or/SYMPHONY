@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <string.h>
 
 /* SYMPHONY include files */
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -292,12 +293,17 @@ int user_init_draw_graph(void *user, int dg_id)
 \*===========================================================================*/
 
 int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
-			      int *basecutnum, int *extravarnum, int **extravars,
-			      char *obj_sense, double *obj_offset,
-			      char ***colnames, int *colgen_strat)
+			      int *basecutnum, int *extravarnum,
+			      int **extravars, char *obj_sense,
+			      double *obj_offset, char ***colnames,
+			      int *colgen_strat)
 {
    vrp_problem *vrp = (vrp_problem *)user;
-   int base_varnum = 0, i;
+   int base_varnum = 0, i, j, k, l;
+   int zero_varnum, *zero_vars;
+   int *edges;
+   int vertnum = vrp->vertnum;
+   
 #ifdef DIRECTED_X_VARS
    /*whether or not we will have the out-degree constraints*/
    char od_const = (vrp->par.prob_type == TSP || vrp->par.prob_type == VRP ||
@@ -308,7 +314,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    char d_x_vars = FALSE;
 #endif
 #if defined(ADD_CAP_CUTS) || defined(ADD_X_CUTS) 
-   int total_edgenum = vrp->vertnum*(vrp->vertnum - 1)/2;
+   int total_edgenum = vertnum*(vertnum - 1)/2;
 #endif
 #ifdef ADD_FLOW_VARS
    int v0, v1;
@@ -324,11 +330,11 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 #endif
    
 #ifdef ADD_CAP_CUTS 
-   *basecutnum = (2 + od_const)*vrp->vertnum - 1 + 2*total_edgenum;
+   *basecutnum = (2 + od_const)*vertnum - 1 + 2*total_edgenum;
 #elif defined(ADD_FLOW_VARS)
-   *basecutnum = (2 + od_const)*vrp->vertnum - 1;
+   *basecutnum = (2 + od_const)*vertnum - 1;
 #else
-   *basecutnum = (1 + od_const)*vrp->vertnum;
+   *basecutnum = (1 + od_const)*vertnum;
 #endif
 #ifdef ADD_X_CUTS
    *basecutnum += total_edgenum;
@@ -389,13 +395,33 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    }
    
 #if 0
-   if (vrp->par.prob_tpye == BPP{
+   if (vrp->par.prob_tpye == BPP){
       for (i = 0; i < *basevarnum; i++){
 	 vrp->dist.cost[(*basevars)[i]] = 10;
       }
    }
 #endif
-   
+       
+   /*create the edge list (we assume a complete graph) The edge is set to
+     (0,0) in the edge list if it was eliminated in preprocessing*/
+   edges = vrp->edges = (int *) calloc (vertnum*(vertnum-1), sizeof(int));
+   zero_varnum = vrp->zero_varnum;
+   zero_vars = vrp->zero_vars;
+   for (i = 1, k = 0, l = 0; i < vertnum; i++){
+      for (j = 0; j < i; j++){
+	 if (l < zero_varnum && k == zero_vars[l]){
+	    /*This is one of the zero edges*/
+	    edges[2*k] = edges[2*k+1] = 0;
+	    l++;
+	    k++;
+	    continue;
+	 }
+	 edges[2*k] = j;
+	 edges[2*k+1] = i;
+	 k++;
+      }
+   }
+
    switch(vrp->par.base_variable_selection){
     case EVERYTHING_IS_EXTRA:
 
@@ -478,28 +504,10 @@ int user_send_lp_data(void *user, void **user_lp)
    vrp_lp->window = vrp->dg_id;
    vrp_lp->numroutes = vrp->numroutes;
    vertnum = vrp_lp->vertnum = vrp->vertnum;
+   vrp_lp->edges = vrp->edges;
    vrp_lp->demand = vrp->demand;
    vrp_lp->capacity = vrp->capacity;
    vrp_lp->costs = vrp->dist.cost;
-
-   vrp_lp->edges = (int *) calloc (vertnum*(vertnum-1), sizeof(int));
-
-   /*create the edge list (we assume a complete graph) The edge is set to
-     (0,0) in the edge list if it was eliminated in preprocessing*/
-   for (i = 1, k = 0, l = 0; i < vertnum; i++){
-      for (j = 0; j < i; j++){
-	 if (l < zero_varnum && k == zero_vars[l]){
-	    /*This is one of the zero edges*/
-	    vrp_lp->edges[2*k] = vrp_lp->edges[2*k+1] = 0;
-	    l++;
-	    k++;
-	    continue;
-	 }
-	 vrp_lp->edges[2*k] = j;
-	 vrp_lp->edges[2*k+1] = i;
-	 k++;
-      }
-   }
 
    if (vrp->par.prob_type == VRP || vrp->par.prob_type == TSP ||
        vrp->par.prob_type == BPP){
@@ -704,24 +712,20 @@ int user_process_own_messages(void *user, int msgtag)
 int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 			  double *values, double objval)
 {
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-   vrp_spec *vrp = (vrp_spec *)user;
-   _node *tour = vrp->cur_sol;
-   int *tree = vrp->cur_sol_tree;
-   int window = vrp->window;
-#else
    vrp_problem *vrp = (vrp_problem *)user;
    _node *tour = vrp->cur_tour->tour;
+   int cur_vert = 0, prev_vert = 0, cur_route, i, count;
+   elist *cur_route_start = NULL;
+   edge *edge_data;
+   vertex *verts;
+   double fixed_cost = 0.0, variable_cost = 0.0;
    int window = vrp->dg_id;
-#endif
-   int vertnum = vrp->vertnum, v0, v1, i;
+   int vertnum = vrp->vertnum, v0, v1;
+   int total_edgenum =  vertnum*(vertnum-1)/2;
+   network *n;
    
-   int prev_node = 0, node, count = 0;
-
-   if (!tour && !tree)
-      return(USER_SUCCESS);
-
-   if (tour){
+#if 0
+   if (tour && vrp->cur_tour->cost > (int) objval){
       node = tour[0].next;
       
       printf("\nSolution Found:\n");
@@ -767,8 +771,128 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 	 wait_for_click(window, name, CTOI_WAIT_FOR_CLICK_NO_REPORT);
       }
    }
+#endif
+
+   /*Otherwise, construct the solution from scratch*/
+
+#ifdef ADD_FLOW_VARS
+#ifndef ADD_CAP_CUTS
+   if (vrp->lp_par.tau > 0){
+      n = create_flow_net(indices, values, varnum, lpetol, vrp->edges,
+			  vrp->demand, vertnum);
+   }else{
+#ifdef DIRECTED_X_VARS
+      for (i = 0; i < varnum && indices[i] < 2*total_edgenum; i++);
+#else
+      for (i = 0; i < varnum && indices[i] < total_edgenum; i++);
+#endif   
+      varnum = i;
       
-   return(USER_DEFAULT);
+      n = create_net(indices, values, varnum, lpetol, vrp->edges, vrp->demand,
+		     vertnum);
+   }
+#else
+#ifdef DIRECTED_X_VARS
+   for (i = 0; i < varnum && indices[i] < 2*total_edgenum; i++);
+#else
+   for (i = 0; i < varnum && indices[i] < total_edgenum; i++);
+#endif   
+   varnum = i;
+   
+   n = create_net(indices, values, varnum, lpetol, vrp->edges, vrp->demand,
+		  vertnum);
+#endif   
+#else
+   n = create_net(indices, values, varnum, lpetol, vrp->edges, vrp->demand,
+		  vertnum);
+#endif
+
+   for (i = 0; i < n->edgenum; i++){
+      fixed_cost += vrp->dist.cost[INDEX(n->edges[i].v0, n->edges[i].v1)];
+#ifdef ADD_FLOW_VARS
+      variable_cost += (n->edges[i].flow1+n->edges[i].flow2)*
+	 vrp->dist.cost[INDEX(n->edges[i].v0, n->edges[i].v1)];
+#endif
+   }
+   
+   printf("\nSolution Found:\n");
+#ifdef ADD_FLOW_VARS
+   printf("Solution Fixed Cost: %.1f\n", fixed_cost);
+   printf("Solution Variable Cost: %.1f\n", variable_cost);
+#else
+   printf("Solution Cost: %.0f\n", fixed_cost);
+#endif
+   
+   if (vrp->par.prob_type == TSP || vrp->par.prob_type == VRP ||
+       vrp->par.prob_type == BPP){ 
+
+      verts = n->verts;
+   
+     /*construct the tour corresponding to this solution vector*/
+      for (cur_route_start = verts[0].first, cur_route = 1,
+	      edge_data = cur_route_start->data; cur_route <= vrp->numroutes;
+	   cur_route++){
+	 edge_data = cur_route_start->data;
+	 edge_data->scanned = TRUE;
+	 cur_vert = edge_data->v1;
+	 tour[prev_vert].next = cur_vert;
+	 tour[cur_vert].route = cur_route;
+	 prev_vert = 0;
+	 while (cur_vert){
+	    if (verts[cur_vert].first->other_end != prev_vert){
+	       prev_vert = cur_vert;
+	       edge_data = verts[cur_vert].first->data;
+	       cur_vert = verts[cur_vert].first->other_end;
+	    }
+	    else{
+	       prev_vert = cur_vert;
+	       edge_data = verts[cur_vert].last->data; /*This statement
+							 could possibly
+							 be taken out to speed
+							 things up a bit*/
+	       cur_vert = verts[cur_vert].last->other_end;
+	    }
+	    tour[prev_vert].next = cur_vert;
+	    tour[cur_vert].route = cur_route;
+	 }
+	 edge_data->scanned = TRUE;
+	 
+	 while (cur_route_start->data->scanned){
+	    if (!(cur_route_start = cur_route_start->next_edge)) break;
+	 }
+      }
+      
+      /* Display the solution */
+      
+      cur_vert = tour[0].next;
+      
+      if (tour[0].route == 1)
+	 printf("\n0 ");
+      while (cur_vert != 0){
+	 if (tour[prev_vert].route != tour[cur_vert].route){
+	    printf("\nRoute #%i: ", tour[cur_vert].route);
+	    count = 0;
+	 }
+	 printf("%i ", cur_vert);
+	 count++;
+	 if (count > 15){
+	    printf("\n");
+	    count = 0;
+	 }
+	 prev_vert = cur_vert;
+	 cur_vert = tour[cur_vert].next;
+      }
+      printf("\n\n");
+   }else{
+      
+      /* Display the solution */
+      
+      for (i = 0; i < n->edgenum; i++){
+	 printf("%i %i\n", n->edges[i].v0, n->edges[i].v1);
+      }
+   }
+
+   return(USER_SUCCESS);
 }
    
 /*===========================================================================*/
@@ -812,6 +936,7 @@ int user_free_master(void **user)
    FREE(vrp->dist.coordz);
 #if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
    FREE(vrp->dist.cost);
+   FREE(vrp->edges);
    FREE(vrp->demand);
 #endif
    if (vrp->g){

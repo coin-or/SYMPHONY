@@ -316,9 +316,10 @@ int user_init_draw_graph(void *user, int dg_id)
 \*===========================================================================*/
 
 int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
-			      int *basecutnum, int *extravarnum, int **extravars,
-			      char *obj_sense, double *obj_offset,
-			      char ***colnames, int *colgen_strat)
+			      int *basecutnum, int *extravarnum,
+			      int **extravars, char *obj_sense,
+			      double *obj_offset, char ***colnames,
+			      int *colgen_strat)
 {
    vrp_problem *vrp = (vrp_problem *)user;
    int cap_check, total_demand = 0, base_varnum = 0, v1, v0;

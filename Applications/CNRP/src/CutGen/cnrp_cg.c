@@ -236,7 +236,6 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       
    /* This creates a fractional graph representing the LP solution */
 #ifdef ADD_FLOW_VARS
-   for (i = 0; i < varnum && indices[i] < (1+d_x_vars)*total_edgenum; i++);
    n = create_flow_net(indices, values, varnum, etol, vrp->edges, demand,
 		       vertnum);
 #else

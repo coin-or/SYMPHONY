@@ -74,6 +74,7 @@ typedef struct VRP_PROBLEM{
    int             vertnum;   /* the number of nodes in the problem, including
 				 the depot */
    int             edgenum;   /* number of edges in the problem */
+   int            *edges;
    int             numroutes; /* contains the number of routes that the problem
 				 is to be solved with. can be prespecified. */
    int             depot;     /* the index of the depot, usually 1 */

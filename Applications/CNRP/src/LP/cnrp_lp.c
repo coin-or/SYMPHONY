@@ -1538,7 +1538,8 @@ void free_lp_net(lp_net *n)
 
 /*===========================================================================*/
 
-void construct_feasible_solution(vrp_spec *vrp, network *n, double *true_objval)
+void construct_feasible_solution(vrp_spec *vrp, network *n,
+				 double *true_objval)
 {
   _node *tour = vrp->cur_sol;
   int cur_vert = 0, prev_vert = 0, cur_route, i, count;
@@ -1548,14 +1549,13 @@ void construct_feasible_solution(vrp_spec *vrp, network *n, double *true_objval)
   double fixed_cost = 0.0, variable_cost = 0.0;
 
   for (i = 0; i < n->edgenum; i++){
-     fixed_cost += vrp->par.gamma*
-	vrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
+     fixed_cost += vrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
 #ifdef ADD_FLOW_VARS
-     variable_cost += vrp->par.tau*(n->edges[i].flow1+n->edges[i].flow2)*
+     variable_cost += (n->edges[i].flow1+n->edges[i].flow2)*
 	vrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
 #endif
   }
-  *true_objval = fixed_cost + variable_cost;
+  *true_objval = vrp->par.gamma*fixed_cost + vrp->par.tau*variable_cost;
      
   printf("\nSolution Found:\n");
 #ifdef ADD_FLOW_VARS

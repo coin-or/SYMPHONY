@@ -14,6 +14,7 @@
 /*===========================================================================*/
 
 /* system include files */
+#include <stdlib.h>
 #include <math.h>
 #include <malloc.h>
 #include <string.h>           /* memset() is defined here in LINUX */
