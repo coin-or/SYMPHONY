@@ -50,10 +50,10 @@ endif
 ##############################################################################
 
 ifeq ($(USE_OSI_INTERFACE),TRUE)
-OSISYM_INCDIR     = -I$(COINROOT)/Osi/OsiSym/include
-OSISYM_LIB        = -lOsiSym
+OSISYM_INCDIR     = $(COINROOT)/Osi/OsiSym/include
+OSISYM_LIB        = OsiSym
 ifneq ($(LP_SOLVER),OSI)
-OSISYM_INCDIR     += -I$(COINROOT)/include
+OSISYM_INCDIR     += $(COINROOT)/include
 OSISYM_LIBPATH    += $(COINROOT)/lib      
 OSISYM_LIB        += -lCoin -lOsi
 endif

@@ -176,10 +176,10 @@ int user_io(void *user)
    while(NULL != fgets(line, MAX_LINE_LENGTH, f)){  /*read in problem data*/
       strcpy(key, "");
       sscanf(line, "%s%s", key, value);
-      if (strcmp(key, "colnum") == 0){ /* Read in the number of rows */
+      if (strcmp(key, "colnum") == 0){ /* Read in the number of columns */
 	 READ_INT_PAR(prob->colnum);
       }
-      else if (strcmp(key, "rownum") == 0){ /* Read in the number of columns */
+      else if (strcmp(key, "rownum") == 0){ /* Read in the number of rows */
 	 READ_INT_PAR(prob->rownum);
       }
    }
