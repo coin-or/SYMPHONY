@@ -21,7 +21,7 @@ typedef struct LB_PROB{
   int         *demand;    /*an array containing the demands for *\
 			   | each node. node i's demand is        |
 			   \*p->demand[i-1]                      */
-  distance      dist;      /*contains the information for computing the costs*/
+  distances     dist;      /*contains the information for computing the costs*/
   int           window;    /*contains the tid of the graphics window*/
 
 }lb_prob;

@@ -149,8 +149,6 @@ int process_chain PROTO((lp_prob *p));
 void fathom_branch PROTO((lp_prob *p));
 int fathom PROTO((lp_prob *p, int primal_feasible));
 void repricing PROTO((lp_prob *p));
-void resize_lp_arrays PROTO((LPdata *lp_data, char do_realloc, char set_max,
-			     int row_num, int col_num, int nzcnt));
 int bfind PROTO((int key, int *table, int size));
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 int collect_nonzeros PROTO((lp_prob *p, double *x, int *tind, double *tx,
@@ -163,7 +161,6 @@ int collect_nonzeros PROTO((lp_prob *p, double *x, int *tind, double *tx));
 int collect_fractions PROTO((lp_prob *p, double *x, int *tind, double *tx));
 node_desc *create_explicit_node_desc PROTO((lp_prob *p));
 int check_tailoff PROTO((lp_prob *p));
-void MakeMPS PROTO((LPdata *lp_data, int bc_index, int iter_num));
 void lp_exit PROTO((lp_prob *p));
 void lp_close PROTO((lp_prob *p));
 

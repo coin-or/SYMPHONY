@@ -153,7 +153,7 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
    vrp_problem *vrp = (vrp_problem *)user;
 
    if (*ub > 0){
-      vrp->cur_tour->cost = *ub;
+      vrp->cur_tour->cost = (int) (*ub);
    }else{
       vrp->cur_tour->cost = MAXINT;
    }
@@ -262,8 +262,8 @@ int user_init_draw_graph(void *user, int dg_id)
       width = (int) (xx * mult + 30);
       height = (int) (yy * mult + 30);
       for (i=vrp->vertnum-1; i>=0; i--){
-	 posx[i] = (int) (posx[i] - minx) * mult + 10;
-	 posy[i] = (int) (maxy - posy[i]) * mult + 10;
+	 posx[i] = (int) ((posx[i] - minx) * mult + 10);
+	 posy[i] = (int) ((maxy - posy[i]) * mult + 10);
       }
 
       init_window(dg_id, node_place, width, height);

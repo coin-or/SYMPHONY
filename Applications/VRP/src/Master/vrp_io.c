@@ -142,7 +142,7 @@ void vrp_io(vrp_problem *vrp, char *infile)
   int capacity_vol = FALSE;
   int k;
   register int vertnum = 0;
-  distance *dist = &vrp->dist;
+  distances *dist = &vrp->dist;
 
   if (!strcmp(infile, "")){
      printf("\nVrp I/O: No problem data file specified\n\n");
@@ -497,7 +497,7 @@ void vrp_io(vrp_problem *vrp, char *infile)
   }
   
   if (vrp->par.k_closest < 0){
-     vrp->par.k_closest = ceil(0.1 * vrp->vertnum);
+     vrp->par.k_closest = (int) (ceil(0.1 * vrp->vertnum));
      if (vrp->par.k_closest < vrp->par.min_closest ) 
 	vrp->par.k_closest = vrp->par.min_closest;
      if (vrp->par.k_closest > vrp->par.max_closest) 

@@ -38,7 +38,7 @@ void make_small_graph(vrp_problem *p, int plus_edges)
    int v, w;
    edge_data *nextedge;
    small_graph *g;
-   distance *dist = &p->dist;
+   distances *dist = &p->dist;
    int k_closest = p->par.k_closest;
   
    /*------------------------------------------------------------------------*\

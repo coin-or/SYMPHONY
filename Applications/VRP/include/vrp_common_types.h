@@ -69,13 +69,13 @@ typedef struct BEST_TOURS{
 | Stores the method by which distances should be calculated            |
 \*--------------------------------------------------------------------*/
 
-typedef struct DISTANCE{
+typedef struct DISTANCES{
    int         wtype;
    int        *cost;
    double     *coordx;
    double     *coordy;
    double     *coordz;
-}distance;
+}distances;
 
 /*--------------------------------------------------------------------*\
 | This structure contains information about a particular edge          |

@@ -294,9 +294,12 @@ void fathom_branch(lp_prob *p)
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
 	    continue;
+	 }else{
+	    char name[50] = "";
+	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
+	    write_mps(lp_data, name);
+	    exit(-3);
 	 }
-	 MakeMPS(lp_data, p->bc_index, p->iter_num);
-	 exit(-3);
 
        case D_UNBOUNDED: /* the primal problem is infeasible */
        case D_OBJLIM:
@@ -723,105 +726,6 @@ void repricing(lp_prob *p)
 
 /*===========================================================================*/
 
-void resize_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
-		      int row_num, int col_num, int nzcnt)
-{
-   char resize_m = FALSE;
-   char resize_n = FALSE;
-   int maxm, maxn, maxnz, maxmax;
-
-   if (set_max){
-      maxm = row_num;
-      maxn = col_num;
-      maxnz = nzcnt;
-   }else{
-      maxm = lp_data->m + row_num;
-      maxn = lp_data->n + col_num;
-      maxnz = lp_data->nz + nzcnt;
-   }
-
-   if (maxm > lp_data->maxm){
-      resize_m = TRUE;
-      lp_data->maxm = maxm + (set_max ? 0 : BB_BUNCH);
-      if (! do_realloc){
-         FREE(lp_data->dualsol);
-         FREE(lp_data->bhead);
-         FREE(lp_data->xbzero);
-         lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
-         lp_data->xbzero = (double *) malloc(lp_data->maxm * DSIZE);
-         lp_data->bhead = (int *) malloc(lp_data->maxm * DSIZE);
-      }else{
-         lp_data->dualsol = (double *) realloc((char *)lp_data->dualsol,
-                                               lp_data->maxm * DSIZE);
-         lp_data->xbzero = (double *) realloc((char *)lp_data->xbzero,
-                                              lp_data->maxm * DSIZE);
-         lp_data->bhead = (int *) realloc((char *)lp_data->bhead,
-                                          lp_data->maxm * DSIZE);
-      }
-      /* rows is realloc'd in either case just to keep the base constr */
-      lp_data->rows = (constraint *) realloc((char *)lp_data->rows,
-                                             lp_data->maxm*sizeof(constraint));
-   }
-   if (maxn > lp_data->maxn){
-      int i, oldmaxn = MAX(lp_data->maxn, lp_data->n);
-      var_desc **vars;
-      resize_n = TRUE;
-      lp_data->maxn = maxn + (set_max ? 0 : 5 * BB_BUNCH);
-      if (! do_realloc){
-         FREE(lp_data->x);
-         FREE(lp_data->dj);
-         FREE(lp_data->status);
-         lp_data->x = (double *) malloc(lp_data->maxn * DSIZE);
-         lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
-         lp_data->status = (char *) malloc(lp_data->maxn * CSIZE);
-      }else{
-         lp_data->x = (double *) realloc((char *)lp_data->x,
-                                         lp_data->maxn * DSIZE);
-         lp_data->dj = (double *) realloc((char *)lp_data->dj,
-                                          lp_data->maxn * DSIZE);
-         lp_data->status = (char *) realloc((char *)lp_data->status,
-                                            lp_data->maxn * CSIZE);
-      }
-      /* vers is realloc'd in either case just to keep the base vars */
-      lp_data->vars = (var_desc **) realloc((char *)lp_data->vars,
-                                            lp_data->maxn*sizeof(var_desc *));
-      vars = lp_data->vars + oldmaxn;
-      for (i = lp_data->maxn - oldmaxn - 1; i >= 0; i--)
-	 vars[i] = (var_desc *) malloc( sizeof(var_desc) );
-   }
-   if (maxnz > lp_data->maxnz){
-      lp_data->maxnz = maxnz + (set_max ? 0 : 20 * BB_BUNCH);
-   }
-
-   /* re(m)alloc the tmp arrays */
-   if (resize_m || resize_n){
-      temporary *tmp = &lp_data->tmp;
-      maxm = lp_data->maxm;
-      maxn = lp_data->maxn;
-      maxmax = MAX(maxm, maxn);
-      /* anything with maxm and maxn in it has to be resized */
-      FREE(tmp->c);
-      FREE(tmp->i1);
-      FREE(tmp->d);
-      tmp->c = (char *) malloc(CSIZE * maxmax);
-      tmp->i1 = (int *) malloc(ISIZE * MAX(3*maxm, 2*maxn + 1));
-      tmp->d = (double *) malloc(DSIZE * 2 * maxmax);
-      /* These have to be resized only if maxm changes */
-      if (resize_m){
-	 FREE(tmp->i2);
-	 FREE(tmp->p1);
-	 FREE(tmp->p2);
-	 tmp->i2 = (int *) malloc(maxm * ISIZE);
-	 tmp->p1 = (void **) malloc(maxm * sizeof(void *));
-	 tmp->p2 = (void **) malloc(maxm * sizeof(void *));
-      }
-   }
-
-   resize_lp_solver_arrays(lp_data);
-}
-
-/*===========================================================================*/
-
 int bfind(int key, int *table, int size)
 {
    int i = 0, k = size;
@@ -1154,57 +1058,6 @@ int check_tailoff(lp_prob *p)
    PRINT(p->par.verbosity, 3, ("Branching because of tailoff!\n"));
 
    return(TRUE); /* gone thru everything ==> tailoff */
-}
-
-/*===========================================================================*/
-
-void MakeMPS(LPdata *lp_data, int bc_index, int iter_num)
-{
-   FILE *f;
-   int i, j;
-   char name1[50] = "";
-
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   sprintf(name1,"/home/tkr/tmp/matrices/test.%i.%i.mps", bc_index, iter_num);
-   /*___END_EXPERIMENTAL_SECTION___*/
-   /*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
-   sprintf(name1,"matrix.%i.%i.mps", bc_index, iter_num);
-#endif
-   
-   f = fopen(name1, "w");
-
-   fprintf(f, "NAME    %s\nROWS\n N      obj\n", name1);
-
-   for (i = 0; i < lp_data->m; i++)
-      fprintf(f, " %c  %6ir\n", lp_data->sense[i], i);
-
-   fprintf(f, "COLUMNS\n");
-
-   for (j = 0; j < lp_data->n; j++){
-      fprintf(f, " %6ix      obj  %f\n", j, lp_data->obj[j]);
-      for (i = 0; i < lp_data->matcnt[j]; i++){
-	 fprintf(f, " %6ix  %6ir  %f\n",
-		 j, lp_data->matind[lp_data->matbeg[j]+i],
-		 lp_data->matval[lp_data->matbeg[j]+i]);
-      }
-   }
-
-   fprintf(f, "RHS\n");
-
-   for (i = 0; i < lp_data->m; i++)
-      fprintf(f, "     rhs  %6ir  %f\n", i, lp_data->rhs[i]);
-   
-   fprintf(f, "BOUNDS\n");
-
-   for (j = 0; j < lp_data->n; j++){
-      fprintf(f, " LO  BOUND  %6ix      %f\n", j, lp_data->lb[j]);
-      fprintf(f, " UP  BOUND  %6ix      %f\n", j, lp_data->ub[j]);
-   }
-
-   fprintf(f, "ENDATA\n");
-
-   fclose(f);
 }
 
 /*===========================================================================*/

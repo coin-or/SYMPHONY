@@ -200,7 +200,7 @@ typedef struct VRP_PROBLEM{
    int            *posx;      /* x coordinate for display purposes */
    int            *posy;      /* y coordinate for display purposes */
   
-   distance        dist;      /* the data about the distances in the problem */
+   distances       dist;      /* the data about the distances in the problem */
 
    best_tours     *cur_tour;  /* temporary tour storage */
    /*__BEGIN_EXPERIMENTAL_SECTION__*/

@@ -67,7 +67,7 @@ ROOT = .
 # proper setting for the sample application, a VRP and TSP solver.
 ##############################################################################
 
-USERROOT = $(ROOT)/MATCH
+USERROOT = $(ROOT)/Vrp
 
 ##############################################################################
 ##############################################################################
@@ -107,7 +107,7 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use CPLEX.
-#LP_SOLVER = CPLEX
+LP_SOLVER = CPLEX
 
 ifeq ($(LP_SOLVER),CPLEX)
 	LPINCDIR = -I/usr/local/include/
@@ -120,8 +120,8 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use an OSI interface.
-LP_SOLVER = OSI
-OSI_INTERFACE = OSL
+#LP_SOLVER = OSI
+#OSI_INTERFACE = OSL
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
@@ -295,7 +295,6 @@ TM_BASIS_TESTS = FALSE
 
 TRACE_PATH = FALSE
 CHECK_CUT_VALIDITY = FALSE
-CHECK_LP = FALSE
 
 #######################################################################
 # Additional statistics

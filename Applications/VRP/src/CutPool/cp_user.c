@@ -222,7 +222,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
       memcpy((char *)&num_arcs, cpt, ISIZE);
       cpt += ISIZE;
       arcs = (int *) malloc(num_arcs * ISIZE);
-      indicators = malloc(num_arcs);  
+      indicators = (char *) malloc(num_arcs);  
       memcpy((char *)arcs, cpt, ISIZE*(num_arcs));
       cpt += num_arcs * ISIZE;
       memcpy(indicators, cpt, num_arcs);
@@ -268,7 +268,7 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
       cpt = coef+ ((vertnum >> DELETE_POWER) + 1); 
       memcpy((char *)&num_arcs, cpt, ISIZE);
       arcs = (int *) malloc(num_arcs * ISIZE);
-      indicators = malloc(num_arcs);
+      indicators = (char *) malloc(num_arcs);
       cpt += ISIZE;
       memcpy((char *)arcs, cpt, num_arcs * ISIZE);
       cpt += num_arcs * ISIZE;

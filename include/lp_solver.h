@@ -26,79 +26,6 @@
 
 #include <cplex.h>
 
-/* The second comment indicates where the arrays are resized: BB or LP,
- * BB is BlackBox, LP is the lp solver specific part */
-
-typedef struct TEMPORARY{
-   char      *c;           /* max(2m,n) */
-   int       *i1;          /* 3m+2n */
-   int       *i2;          /* m */
-   double    *d;           /* max(2m,2n) */
-   void     **p1;          /* m */
-   void     **p2;          /* m */
-
-   char      *cv;          /* variable */
-   int        cv_size;
-   int       *iv;          /* variable (>= */
-   int        iv_size;
-   double    *dv;          /* variable */
-   int        dv_size;
-}temporary;
-
-typedef struct LPdata{
-   CPXENVptr  cpxenv;
-   double     lpetol;
-   CPXLPptr   lp;
-   char       lp_is_modified;
-   char       col_set_changed;
-   double     objval;
-   int        termcode;
-   int        alloc_m;
-   int        alloc_mplusn;
-   int        alloc_mplusnz;
-   int        n;           /* number of columns without slacks */
-   int        maxn;
-   int        m;           /* number of rows */
-   int        maxm;
-   int        nz;          /* number of nonzeros */
-   int        maxnz;       /* space is allocated for this many nonzeros */
-   int       *matbeg;      /* maxn + maxm + 1 */
-   int       *matcnt;      /* maxn + maxm */
-   int       *matind;      /* maxnz + maxm */
-   double    *matval;      /* maxnz + maxm*/
-   double    *obj;         /* maxn + maxm */
-   double    *rhs;         /* maxm */
-   double    *rngval;      /* maxm */
-   char      *sense;       /* maxm */
-   double    *lb;          /* maxn + maxm */
-   double    *ub;          /* maxn + maxm */
-
-   char       ordering;    /* COLIND_AND_USERIND_ORDERED, COLIND_ORDERED or
-			      USERIND_ORDERED */
-   var_desc **vars;        /* maxn */ /* BB */
-
-   int        not_fixed_num;
-   int       *not_fixed;
-   int        nf_status;
-
-   char      *status;      /* maxn */ /* BB */
-   double    *x;           /* maxn */ /* BB */
-   double    *dj;          /* maxn */ /* BB */
-   double    *dualsol;     /* maxm */ /* BB */
-   double    *slacks;      /* maxm */
-   int       *bhead;       /* maxm */ /* BB */
-   int        bhead_is_valid;
-   double    *xbzero;      /* maxm */ /* BB */
-
-   constraint  *rows;      /* maxm */
-
-   temporary   tmp;
-#ifdef PSEUDO_COSTS
-   double     *pseudo_costs_one;
-   double     *pseudo_costs_zero;
-#endif
-}LPdata;
-
 void CPX_check_error PROTO((const char *erring_func));
 
 #elif defined(__OSL__)
@@ -110,80 +37,6 @@ void CPX_check_error PROTO((const char *erring_func));
 #include <ekk_c_api.h>
 
 void OSL_check_error PROTO((const char *erring_func));
-
-/* The second comment indicates where the arrays are resized: BB or LP,
- * BB is BlackBox, LP is the lp solver specific part */
-
-typedef struct TEMPORARY{
-   char      *c;           /* max(2m,n) */
-   int       *i1;          /* 3m+2n */
-   int       *i2;          /* m */
-   double    *d;           /* max(2m,2n) */
-   void     **p1;          /* m */
-   void     **p2;          /* m */
-
-   char      *cv;          /* variable */
-   int        cv_size;
-   int       *iv;          /* variable (>= */
-   int        iv_size;
-   double    *dv;          /* variable */
-   int        dv_size;
-}temporary;
-
-typedef struct LPdata{
-   EKKContext *env;
-   double     lpetol;
-   EKKModel   *lp;
-   char       lp_is_modified;
-   char       col_set_changed;
-   double     objval;
-   int        termcode;
-   int        alloc_m;
-   int        alloc_mplusn;
-   int        alloc_mplusnz;
-   int        n;           /* number of columns without slacks */
-   int        maxn;
-   int        m;           /* number of rows */
-   int        maxm;
-   int        nz;          /* number of nonzeros */
-   int        maxnz;       /* space is allocated for this many nonzeros */
-   int       *matbeg;      /* maxn + maxm + 1 */
-   int       *matcnt;      /* maxn + maxm */
-   int       *matind;      /* maxnz + maxm */
-   double    *matval;      /* maxnz + maxm*/
-   double    *obj;         /* maxn + maxm */
-   double    *rhs;         /* maxm */
-   double    *rngval;      /* maxm */
-   char      *sense;       /* maxm */
-   double    *lb;          /* maxn + maxm */
-   double    *ub;          /* maxn + maxm */
-
-   char       ordering;    /* COLIND_AND_USERIND_ORDERED, COLIND_ORDERED or
-			      USERIND_ORDERED */
-   var_desc **vars;        /* maxn */ /* BB */
-
-   int        not_fixed_num;
-   int       *not_fixed;
-   int        nf_status;
-
-   char      *status;      /* maxn */ /* BB */
-   double    *x;           /* maxn */ /* BB */
-   double    *dj;          /* maxn */ /* BB */
-   double    *dualsol;     /* maxm */ /* BB */
-   double    *slacks;      /* maxm */
-
-   int       *bhead;       /* maxm */ /* BB */
-   int        bhead_is_valid;
-   double    *xbzero;      /* maxm */ /* BB */
-
-   constraint  *rows;      /* maxm */
-
-   temporary   tmp;
-#ifdef PSEUDO_COSTS
-   double     *pseudo_costs_one;
-   double     *pseudo_costs_zero;
-#endif
-}LPdata;
 
 #elif defined(__OSI_CPX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
 || defined(__OSI_XPRESS__) || defined(__OSI_SOPLEX__) || defined(__OSI_VOL__) \
@@ -237,8 +90,21 @@ typedef OsiDylpSolverInterface OsiXSolverInterface;
 typedef OsiGlpkSolverInterface OsiXSolverInterface;
 #endif
 
-/* The second comment indicates where the arrays are resized: BB or LP,
- * BB is BlackBox, LP is the lp solver specific part */
+#else
+
+#error ###################################
+#error # Undefined or unknown LP solver.
+#error # Please edit SYMPHONY/Makefile
+#error # and define LP_SOLVER properly.
+#error ###################################
+
+#endif 
+
+/*****************************************************************************/
+/*******                  end LP solver definitions                    *******/
+/*****************************************************************************/
+
+/* Temporary storage */
 
 typedef struct TEMPORARY{
    char      *c;           /* max(2m,n) */
@@ -256,25 +122,10 @@ typedef struct TEMPORARY{
    int        dv_size;
 }temporary;
 
-typedef struct LPdata{
+/* This structure stores the user's description of the model */
 
-   OsiSolverInterface * si;
-   double     lpetol;
-   char       lp_is_modified;
-   char       col_set_changed;
-   double     objval;
-   int        termcode;
-   int        alloc_m;
-   int        alloc_mplusn;
-   int        alloc_mplusnz;
-   int        n;           /* number of columns without slacks */
-   int        maxn;
-   int        m;           /* number of rows */
-   int        maxm;
-   int        nz;          /* number of nonzeros */
-   int        maxnz;       /* space is allocated for this many nonzeros */
+typedef struct LPdesc{
    int       *matbeg;      /* maxn + maxm + 1 */
-   int       *matcnt;      /* maxn + maxm */
    int       *matind;      /* maxnz + maxm */
    double    *matval;      /* maxnz + maxm*/
    double    *obj;         /* maxn + maxm */
@@ -283,6 +134,37 @@ typedef struct LPdata{
    char      *sense;       /* maxm */
    double    *lb;          /* maxn + maxm */
    double    *ub;          /* maxn + maxm */
+}LPdesc;
+
+/* The LP solver data */
+
+typedef struct LPdata{
+   /* First, the problem pointers */
+#ifdef __CPLEX__
+   CPXENVptr  cpxenv;
+   CPXLPptr   lp;
+#endif
+#ifdef __OSL__
+   EKKContext *env;
+   EKKModel   *lp;
+#endif
+#if defined(__OSI_CPX__) || defined(__OSI_OSL__) || defined(__OSI_CLP__) \
+|| defined(__OSI_XPRESS__) || defined(__OSI_SOPLEX__) || defined(__OSI_VOL__) \
+|| defined(__OSI_DYLP__) || defined (__OSI_GLPK__)
+   OsiSolverInterface * si;
+#endif
+   double     lpetol;
+   char       lp_is_modified;
+   char       col_set_changed;
+   double     objval;
+   int        termcode;
+   LPdesc     desc;
+   int        n;           /* number of columns without slacks */
+   int        maxn;
+   int        m;           /* number of rows */
+   int        maxm;
+   int        nz;          /* number of nonzeros */
+   int        maxnz;       /* space is allocated for this many nonzeros */
 
    char       ordering;    /* COLIND_AND_USERIND_ORDERED, COLIND_ORDERED or
 			      USERIND_ORDERED */
@@ -297,7 +179,6 @@ typedef struct LPdata{
    double    *dj;          /* maxn */ /* BB */
    double    *dualsol;     /* maxm */ /* BB */
    double    *slacks;      /* maxm */
-
    int       *bhead;       /* maxm */ /* BB */
    int        bhead_is_valid;
    double    *xbzero;      /* maxm */ /* BB */
@@ -311,30 +192,16 @@ typedef struct LPdata{
 #endif
 }LPdata;
 
-#else
-
-#error ###################################
-#error # Undefined or unknown LP solver.
-#error # Please edit SYMPHONY/Makefile
-#error # and define LP_SOLVER properly.
-#error ###################################
-
-#endif 
-
-/*****************************************************************************/
-/*******                  end LP solver definitions                    *******/
-/*****************************************************************************/
-
 /*****************************************************************************/
 /*******                    common definitions                         *******/
 /*****************************************************************************/
 
 double dot_product PROTO((double *val, int *ind, int collen, double *col));
+void size_lp_arrays PROTO((LPdata *lp_data, char do_realloc, char set_max,
+			     int row_num, int col_num, int nzcnt));
+void free_lp_desc PROTO((LPdesc desc));
 void open_lp_solver PROTO((LPdata *lp_data));
 void close_lp_solver PROTO((LPdata *lp_data));
-#ifdef COMPILE_CHECK_LP
-void check_lp PROTO((LPdata *lp_data));
-#endif
 void load_lp_prob PROTO((LPdata *lp_data, int scaling, int fastmip));
 void unload_lp_prob PROTO((LPdata *lp_data));
 void load_basis PROTO((LPdata *lp_data, int *cstat, int *rstat));
@@ -356,9 +223,6 @@ void get_basis_header PROTO((LPdata *lp_data));
 void get_basis PROTO((LPdata *lp_data, int *cstat, int *rstat));
 void set_obj_upper_lim PROTO((LPdata *lp_data, double lim));
 void set_itlim PROTO((LPdata *lp_data, int itlim));
-void match_lp_solver_arrays_to_user PROTO((LPdata *lp_data, int allocm,
-					   int allocn, int allocnz));
-void resize_lp_solver_arrays PROTO((LPdata *lp_data));
 void get_column PROTO((LPdata *lp_data, int j,
 		       double *colval, int *colind, int *collen, double *cj));
 void get_row PROTO((LPdata *lp_data, int i,
@@ -366,10 +230,6 @@ void get_row PROTO((LPdata *lp_data, int i,
 int get_proof_of_infeas PROTO((LPdata *lp_data, int *infind));
 void get_x PROTO((LPdata *lp_data));
 void get_dj_pi PROTO((LPdata *lp_data));
-#if 0
-void get_dualsol PROTO((LPdata *lp_data));
-void get_reduced_costs PROTO((LPdata *lp_data));
-#endif
 void get_slacks PROTO((LPdata *lp_data));
 void change_range PROTO((LPdata *lp_data, int rowind, double value));
 void change_rhs PROTO((LPdata *lp_data,
@@ -388,7 +248,6 @@ int delete_cols PROTO((LPdata *lp_data, int delnum, int *delstat));
 void release_var PROTO((LPdata *lp_data, int j, int where_to_move));
 void free_row_set PROTO((LPdata *lp_data, int length, int *index));
 void constrain_row_set PROTO((LPdata *lp_data, int length, int *index));
-void free_lp_solver_data PROTO((LPdata *lp_data, char arrays_too));
 void write_mps PROTO((LPdata *lp_data, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
 

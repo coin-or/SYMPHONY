@@ -15,6 +15,7 @@
 
 #include <math.h>
 #include <malloc.h>
+#include <memory.h>
 #include <stddef.h>
 
 #include "BB_constants.h"

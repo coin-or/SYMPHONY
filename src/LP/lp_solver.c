@@ -24,7 +24,9 @@
 
 /*===========================================================================*\
  * This file contains the interface with the LP Solver.
+ * The first few routines are independent of what LP solver is being used.
 \*===========================================================================*/
+
 
 double dot_product(double *val, int *ind, int collen, double *col)
 {
@@ -33,6 +35,122 @@ double dot_product(double *val, int *ind, int collen, double *col)
    while (ind != lastind)
       prod += (*val++) * col[*ind++];
    return(prod);
+}
+
+/*===========================================================================*/
+
+void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
+		    int row_num, int col_num, int nzcnt)
+{
+   char resize_m = FALSE;
+   char resize_n = FALSE;
+   int maxm, maxn, maxnz, maxmax;
+
+   if (set_max){
+      maxm = row_num;
+      maxn = col_num;
+      maxnz = nzcnt;
+   }else{
+      maxm = lp_data->m + row_num;
+      maxn = lp_data->n + col_num;
+      maxnz = lp_data->nz + nzcnt;
+   }
+
+   if (maxm > lp_data->maxm){
+      resize_m = TRUE;
+      lp_data->maxm = maxm + (set_max ? 0 : BB_BUNCH);
+      if (! do_realloc){
+         FREE(lp_data->dualsol);
+         FREE(lp_data->bhead);
+	 FREE(lp_data->slacks);
+         FREE(lp_data->xbzero);
+         lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+         lp_data->xbzero  = (double *) malloc(lp_data->maxm * DSIZE);
+	 lp_data->slacks  = (double *) malloc(lp_data->maxm * DSIZE);
+         lp_data->bhead   = (int *)    malloc(lp_data->maxm * DSIZE);
+     }else{
+         lp_data->dualsol = (double *) realloc((char *)lp_data->dualsol,
+                                               lp_data->maxm * DSIZE);
+         lp_data->xbzero  = (double *) realloc((char *)lp_data->xbzero,
+					       lp_data->maxm * DSIZE);
+	 lp_data->slacks  = (double *) realloc((void *)lp_data->slacks,
+					       lp_data->maxm * DSIZE);
+         lp_data->bhead   = (int *)    realloc((char *)lp_data->bhead,
+					       lp_data->maxm * DSIZE);
+      }
+      /* rows is realloc'd in either case just to keep the base constr */
+      lp_data->rows = (constraint *) realloc((char *)lp_data->rows,
+                                             lp_data->maxm*sizeof(constraint));
+   }
+   if (maxn > lp_data->maxn){
+      int i, oldmaxn = MAX(lp_data->maxn, lp_data->n);
+      var_desc **vars;
+      resize_n = TRUE;
+      lp_data->maxn = maxn + (set_max ? 0 : 5 * BB_BUNCH);
+      if (! do_realloc){
+         FREE(lp_data->x);
+         FREE(lp_data->dj);
+         FREE(lp_data->status);
+         lp_data->x = (double *) malloc(lp_data->maxn * DSIZE);
+         lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
+         lp_data->status = (char *) malloc(lp_data->maxn * CSIZE);
+      }else{
+         lp_data->x = (double *) realloc((char *)lp_data->x,
+                                         lp_data->maxn * DSIZE);
+         lp_data->dj = (double *) realloc((char *)lp_data->dj,
+                                          lp_data->maxn * DSIZE);
+         lp_data->status = (char *) realloc((char *)lp_data->status,
+                                            lp_data->maxn * CSIZE);
+      }
+      /* vers is realloc'd in either case just to keep the base vars */
+      lp_data->vars = (var_desc **) realloc((char *)lp_data->vars,
+                                            lp_data->maxn*sizeof(var_desc *));
+      vars = lp_data->vars + oldmaxn;
+      for (i = lp_data->maxn - oldmaxn - 1; i >= 0; i--)
+	 vars[i] = (var_desc *) malloc( sizeof(var_desc) );
+   }
+   if (maxnz > lp_data->maxnz){
+      lp_data->maxnz = maxnz + (set_max ? 0 : 20 * BB_BUNCH);
+   }
+
+   /* re(m)alloc the tmp arrays */
+   if (resize_m || resize_n){
+      temporary *tmp = &lp_data->tmp;
+      maxm = lp_data->maxm;
+      maxn = lp_data->maxn;
+      maxmax = MAX(maxm, maxn);
+      /* anything with maxm and maxn in it has to be resized */
+      FREE(tmp->c);
+      FREE(tmp->i1);
+      FREE(tmp->d);
+      tmp->c = (char *) malloc(CSIZE * maxmax);
+      tmp->i1 = (int *) malloc(ISIZE * MAX(3*maxm, 2*maxn + 1));
+      tmp->d = (double *) malloc(DSIZE * 2 * maxmax);
+      /* These have to be resized only if maxm changes */
+      if (resize_m){
+	 FREE(tmp->i2);
+	 FREE(tmp->p1);
+	 FREE(tmp->p2);
+	 tmp->i2 = (int *) malloc(maxm * ISIZE);
+	 tmp->p1 = (void **) malloc(maxm * sizeof(void *));
+	 tmp->p2 = (void **) malloc(maxm * sizeof(void *));
+      }
+   }
+}
+
+/*===========================================================================*/
+
+void free_lp_desc(LPdesc desc)
+{
+   FREE(desc.matbeg);
+   FREE(desc.matind);
+   FREE(desc.matval);
+   FREE(desc.obj);
+   FREE(desc.rhs);
+   FREE(desc.rngval);
+   FREE(desc.sense);
+   FREE(desc.lb);
+   FREE(desc.ub);
 }
 
 #ifdef __OSL__
@@ -112,19 +230,12 @@ void open_lp_solver(LPdata *lp_data)
 /*===========================================================================*/
 void close_lp_solver(LPdata *lp_data)
 {
+  if (lp_data->lp != NULL) {
+    osllib_status = ekk_deleteModel(lp_data->lp);
+    OSL_check_error("close_lp_solver - ekk_deleteModel");
+    lp_data->lp = NULL;
+  }
   ekk_endContext(lp_data->env);
-
-  /* Free up the lp_data parts */
-  FREE(lp_data->matbeg);
-  FREE(lp_data->matcnt);
-  FREE(lp_data->matind);
-  FREE(lp_data->matval);
-  FREE(lp_data->obj);
-  FREE(lp_data->rhs);
-  FREE(lp_data->rngval);
-  FREE(lp_data->sense);
-  FREE(lp_data->lb);
-  FREE(lp_data->ub);
 
   FREE(lp_data->not_fixed);
   FREE(lp_data->status);
@@ -147,96 +258,17 @@ void close_lp_solver(LPdata *lp_data)
 
 /*===========================================================================*/
 
-#ifdef COMPILE_CHECK_LP
-/* This implementation does not checks elements of matrix yet. */
-void check_lp(LPdata *lp_data)
-{
-   int i;
-   const double *d1, *d2, *ub, *lb;
-   
-   /* Chcecking the structure, not content */
-   osllib_status =  ekk_validateModel(lp_data->lp);
-   if (osllib_status != 0) {
-      OSL_check_error("check_lp ekk_validateModel");
-      exit(-1);
-   }
-   /* Check coeficients of objective function */
-   osllib_status = memcmp(ekk_objective(lp_data->lp), lp_data->obj,
-			  lp_data->n * DSIZE);
-   OSL_check_error("check_lp objective");
-   /* Check upper bounds of (structural) variables */
-   osllib_status = memcmp(ekk_colupper(lp_data->lp), lp_data->ub,
-			  lp_data->n * DSIZE);
-   OSL_check_error("check_lp column upper bounds");
-   /* Check upper bounds of (structural) variables */
-   osllib_status = memcmp(ekk_collower(lp_data->lp), lp_data->lb,
-			  lp_data->n * DSIZE);
-   OSL_check_error("check_lp column lower bounds");
-   
-   osllib_status = -1;
-   
-   /* check the sense, upper bound and lower bound of rows*/
-   d1 = lp_data->rhs;
-   d2 = lp_data->rngval;
-   ub = ekk_rowupper(lp_data->lp);
-   lb = ekk_rowlower(lp_data->lp);
-   for (i = lp_data->m - 1; i >= 0; i--) {
-      switch (lp_data->sense[i]) {
-       case 'E':
-	 if ( (ub[i] != d1[i]) && (lb[i] != d1[i])) {
-	    OSL_check_error("check_lp not an 'E' row");
-	    return;
-	 }
-	 break;
-       case 'L':
-	 if ( (ub[i] != d1[i]) && (lb[i] != - OSL_INFINITY)) {
-	    OSL_check_error("check_lp not an 'L' row");
-	    return;
-	 }
-	 break;
-       case 'G':
-	 if ( (lb[i] != d1[i]) && (ub[i] != OSL_INFINITY)) {
-	    OSL_check_error("check_lp not an 'G' row");
-	    return;
-	 }
-	 break;
-       case 'R':
-	 if ( (ub[i] != d1[i]) && (ub[i] - lb[i] !=  d2[i]) ) {
-	    OSL_check_error("check_lp not an 'R' row");
-	    return;
-	 }
-	 break;
-       default:
-	 OSL_check_error("check_lp unknown sense");
-	 return;
-      }
-   }
-   osllib_status = 0;
-}
-
-#endif
-
 /*===========================================================================*\
  * This function loads the data of an lp into the lp solver. 
 \*===========================================================================*/
 void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 {
-   int i, *matcnt, *matbeg;
+   int i;
    double *lr = lp_data->tmp.d, *ur = lp_data->tmp.d + lp_data->n;
    
    lp_data->lp = ekk_newModel(lp_data->env, NULL);
    osllib_status = (lp_data->env == NULL);
    OSL_check_error("open_lp_solver - ekk_newModel");
-   
-   /* realloc_lp_arrays(lp_data); */
-   
-   matcnt = lp_data->matcnt;
-   matbeg = lp_data->matbeg;
-   
-   /* OSL doesn't need matcnt as CPLEX.
-      SYMPHONY need it only when writing MPS file. */
-   for (i=lp_data->n-1; i>=0; i--)
-      matcnt[i] = matbeg[i+1] - matbeg[i];
    
    for (i = 0; i < lp_data->m; i++) {
       switch (lp_data->sense[i]) {
@@ -260,14 +292,15 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 		       lp_data->n, lp_data->obj, lp_data->lb, lp_data->ub);
    OSL_check_error("load_lp - ekk_loadRimModel");
    osllib_status =
-      ekk_addColumnElementBlock(lp_data->lp, lp_data->n, lp_data->matind,
-				lp_data->matbeg, lp_data->matval);
+      ekk_addColumnElementBlock(lp_data->lp, lp_data->n, lp_data->desc.matind,
+				lp_data->desc.matbeg, lp_data->desc.matval);
    OSL_check_error("load_lp - ekk_addColumnElementBlock");
    /* Not sure we need this since there's only one block */
    osllib_status = ekk_mergeBlocks(lp_data->lp, 1);
    OSL_check_error("load_lp - ekk_mergeBlocks");
    
    /* lp_data->scaling = scaling; */
+
 }
 
 /*===========================================================================*/
@@ -625,80 +658,6 @@ void set_itlim(LPdata *lp_data, int itlim)
 }
 
 /*===========================================================================*/
-void match_lp_solver_arrays_to_user(LPdata *lp_data,
-				    int allocm, int allocn, int allocnz)
-{
-   if (allocm  != lp_data->alloc_m){
-      FREE(lp_data->slacks);
-      lp_data->slacks = (double *) malloc(allocm * DSIZE);
-      lp_data->alloc_m = allocm;
-   }
-   
-   if (allocn != lp_data->alloc_mplusn){
-      FREE(lp_data->matcnt);
-      FREE(lp_data->lb);
-      FREE(lp_data->ub);
-      lp_data->matcnt = (int *) malloc(allocn * ISIZE);
-      lp_data->lb = (double *) malloc(allocn * DSIZE);
-      lp_data->ub = (double *) malloc(allocn * DSIZE);
-      lp_data->alloc_mplusn = allocn;
-   }
-   
-   if (allocnz != lp_data->alloc_mplusnz)
-      lp_data->alloc_mplusnz = allocnz;
-}
-
-/*===========================================================================*/
-
-void resize_lp_solver_arrays(LPdata *lp_data)
-{
-   int resize = FALSE;
-   
-   if (lp_data->maxm > lp_data->alloc_m){
-      lp_data->alloc_m = lp_data->maxm;
-      lp_data->rhs = (double *) realloc((void *)lp_data->rhs,
-					lp_data->alloc_m * DSIZE);
-      lp_data->rngval = (double *) realloc((void *)lp_data->rngval,
-					   lp_data->alloc_m * DSIZE);
-      lp_data->sense = (char *) realloc((void *)lp_data->sense,
-					lp_data->alloc_m * CSIZE);
-      /*slacks must be allocated for cplex (for XMP it only points into x)*/
-      lp_data->slacks = (double *) realloc((void *)lp_data->slacks,
-					   lp_data->alloc_m * DSIZE);
-      if (lp_data->lp != NULL) resize = TRUE;
-   }
-   if (lp_data->maxm + lp_data->maxn + 1 > lp_data->alloc_mplusn){
-      lp_data->alloc_mplusn = lp_data->maxm + lp_data->maxn + 1;
-      lp_data->matbeg = (int *) realloc((void *)lp_data->matbeg,
-					lp_data->alloc_mplusn * ISIZE);
-      lp_data->matcnt = (int *) realloc((void *)lp_data->matcnt,
-					lp_data->alloc_mplusn * ISIZE);
-      lp_data->obj = (double *) realloc((void *)lp_data->obj,
-					lp_data->alloc_mplusn * DSIZE);
-      lp_data->lb = (double *) realloc((void *)lp_data->lb,
-				       lp_data->alloc_mplusn * DSIZE);
-      lp_data->ub = (double *) realloc((void *)lp_data->ub,
-				       lp_data->alloc_mplusn * DSIZE);
-      if (lp_data->lp != NULL) resize = TRUE;
-   }
-   if (lp_data->maxnz + lp_data->maxm > lp_data->alloc_mplusnz){
-      lp_data->alloc_mplusnz = lp_data->maxm + lp_data->maxnz;
-      lp_data->matind = (int *) realloc((void *)lp_data->matind,
-					lp_data->alloc_mplusnz * ISIZE);
-      lp_data->matval = (double *) realloc((void *)lp_data->matval,
-					   lp_data->alloc_mplusnz * DSIZE);
-      if (lp_data->lp != NULL) resize = TRUE;
-   }
-   
-   if (resize) {
-      osllib_status = ekk_resizeModelExact(lp_data->lp, lp_data->m, lp_data->n,
-					   lp_data->maxm, lp_data->maxn,
-					   FALSE);
-      OSL_check_error("resize_lp_solver_arrays ekk_resizeModelExact");
-   }
-}
-
-/*===========================================================================*/
 
 void get_column(LPdata *lp_data, int j,
 		double *colval, int *colind, int *collen, double *cj)
@@ -1050,36 +1009,14 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 }
 
 /*===========================================================================*/
-void free_lp_solver_data(LPdata *lp_data, char arrays_too)
-{
-   if (lp_data){
-      if (lp_data->lp != NULL) {
-	 osllib_status = ekk_deleteModel(lp_data->lp);
-	 OSL_check_error("free_lp_solver_data - ekk_deleteModel");
-	 lp_data->lp = NULL;
-      }
-      if (arrays_too){
-	 FREE(lp_data->matbeg);
-	 FREE(lp_data->matcnt);
-	 FREE(lp_data->matind);
-	 FREE(lp_data->matval);
-	 FREE(lp_data->obj);
-	 FREE(lp_data->rhs);
-	 FREE(lp_data->rngval);
-	 FREE(lp_data->sense);
-	 FREE(lp_data->lb);
-	 FREE(lp_data->ub);
-	 FREE(lp_data->slacks);
-      }
-   }
-}
 
-/*===========================================================================*/
 void write_mps(LPdata *lp_data, char *fname)
 {
    osllib_status = ekk_exportModel(lp_data->lp, fname, 1, 2);
    OSL_check_error("write_mps");
 }
+
+/*===========================================================================*/
 
 void write_sav(LPdata *lp_data, char *fname)
 {
@@ -1134,20 +1071,13 @@ void open_lp_solver(LPdata *lp_data)
 
 void close_lp_solver(LPdata *lp_data)
 {
+   if (lp_data->lp){
+      cpx_status = CPXfreeprob(lp_data->cpxenv, &(lp_data->lp));
+      CPX_check_error("close_lp_solver");
+      lp_data->lp = NULL;
+   }
    cpx_status = CPXcloseCPLEX(&lp_data->cpxenv);
    CPX_check_error("close_lp_solver");
-
-   /* Free up the lp_data parts */
-   FREE(lp_data->matbeg);
-   FREE(lp_data->matcnt);
-   FREE(lp_data->matind);
-   FREE(lp_data->matval);
-   FREE(lp_data->obj);
-   FREE(lp_data->rhs);
-   FREE(lp_data->rngval);
-   FREE(lp_data->sense);
-   FREE(lp_data->lb);
-   FREE(lp_data->ub);
 
    FREE(lp_data->not_fixed);
    FREE(lp_data->status);
@@ -1170,29 +1100,6 @@ void close_lp_solver(LPdata *lp_data)
 
 /*===========================================================================*/
 
-#ifdef COMPILE_CHECK_LP
-
-void check_lp(LPdata *lp_data)
-{
-#if CPX_VERSION <= 600 
-   cpx_status = CPXchecklp(lp_data->cpxenv,
-		(char *) "BB_prob", lp_data->n, lp_data->m, 1, lp_data->obj,
-		lp_data->rhs, lp_data->sense, lp_data->matbeg, lp_data->matcnt,
-		lp_data->matind, lp_data->matval, lp_data->lb, lp_data->ub,
-		lp_data->rngval, lp_data->alloc_mplusn, lp_data->alloc_m,
-		lp_data->alloc_mplusnz);
-#else
-   cpx_status = CPXcheckcopylp(lp_data->cpxenv, lp_data->lp,
-		lp_data->n, lp_data->m, 1, lp_data->obj,
-		lp_data->rhs, lp_data->sense, lp_data->matbeg, lp_data->matcnt,
-		lp_data->matind, lp_data->matval, lp_data->lb, lp_data->ub,
-		lp_data->rngval);
-#endif
-   CPX_check_error("load_lp");
-}
-
-#endif
-
 /*===========================================================================*\
  * This function loads the data of an lp into the lp solver. This involves
  * transforming the data into CPLEX format and calling the CPLEX function
@@ -1205,9 +1112,9 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 
    /* realloc_lp_arrays(lp_data); */
 
-   matcnt = lp_data->matcnt;
-   matbeg = lp_data->matbeg;
-   for (i=lp_data->n-1; i>=0; i--)
+   matcnt = (int *) malloc (lp_data->n*ISIZE);
+   matbeg = lp_data->desc.matbeg;
+   for (i = lp_data->n - 1; i >= 0; i--)
       matcnt[i] = matbeg[i+1] - matbeg[i];
 
    cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_SCAIND, -1);
@@ -1222,24 +1129,24 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
    CPX_check_error("load_lp - CPXsetintparam - BASINTERVAL");
 
 /* This is for the old memory model (user manages memory) */
-#if CPX_VERSION <= 600 
-   lp_data->lp =
-      CPXloadlp(lp_data->cpxenv,
-		(char *) "BB_prob", lp_data->n, lp_data->m, 1, lp_data->obj,
-		lp_data->rhs, lp_data->sense, lp_data->matbeg, lp_data->matcnt,
-		lp_data->matind, lp_data->matval, lp_data->lb, lp_data->ub,
-		lp_data->rngval, lp_data->alloc_mplusn, lp_data->alloc_m,
-		lp_data->alloc_mplusnz);
-   CPX_check_error("load_lp - CPXloadlp");
+#if CPX_VERSION <= 600
+   printf("\nSorry, CPLEX versions 6.0 and earlier are no longer supported");
+   printf("due to incompatibilities in memory management.");
+   printf("Please use SYMPHONY 3.0.1 or earlier.\n\n");
+   FREE(matcnt);
+   exit(-1);
+   /* legacy code left for posterity */
 #else /* This is for the new memory model (CPLEX manages memory) */
    lp_data->lp = CPXcreateprob(lp_data->cpxenv,&cpx_status,(char *) "BB_prob");
    CPX_check_error("load_lp - CPXcreateprob");
    cpx_status = CPXcopylp(lp_data->cpxenv, lp_data->lp,
-		lp_data->n, lp_data->m, 1, lp_data->obj,
-		lp_data->rhs, lp_data->sense, lp_data->matbeg, lp_data->matcnt,
-		lp_data->matind, lp_data->matval, lp_data->lb, lp_data->ub,
-		lp_data->rngval);
+		lp_data->n, lp_data->m, 1, lp_data->desc.obj,
+		lp_data->desc.rhs, lp_data->desc.sense, lp_data->desc.matbeg,
+                matcnt, lp_data->desc.matind,
+                lp_data->desc.matval, lp_data->desc.lb, lp_data->desc.ub,
+		lp_data->desc.rngval);
    CPX_check_error("load_lp - CPXcopylp");
+   FREE(matcnt);
 #endif
 }
 
@@ -1256,11 +1163,7 @@ void unload_lp_prob(LPdata *lp_data)
 
 void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 {
-#if CPX_VERSION <= 600 
-   cpx_status = CPXloadbase(lp_data->cpxenv, lp_data->lp, cstat, rstat);
-#else
    cpx_status = CPXcopybase(lp_data->cpxenv, lp_data->lp, cstat, rstat);
-#endif
    CPX_check_error("load_basis - CPXloadbase");
 
    lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
@@ -1277,11 +1180,7 @@ void refactorize(LPdata *lp_data)
    CPX_check_error("refactorize - CPXgetintparam");
    cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, 0);
    CPX_check_error("refactorize - CPXsetintparam");
-#if CPX_VERSION <= 600 
-   cpx_status = CPXoptimize(lp_data->cpxenv, lp_data->lp);
-#else
    cpx_status = CPXprimopt(lp_data->cpxenv, lp_data->lp);
-#endif
    CPX_check_error("refactorize - CPXoptimize");
    cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, itlim);
    CPX_check_error("refactorize - CPXsetintparam");
@@ -1453,11 +1352,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 			       lp_data->bhead, lp_data->xbzero);
       lp_data->bhead_is_valid = TRUE;
       CPX_check_error("dual_simplex - CPXgetbhead");
-#if CPX_VERSION <= 600 
-      *iterd = CPXgetitc(lp_data->cpxenv, lp_data->lp);
-#else
       *iterd = CPXgetitcnt(lp_data->cpxenv, lp_data->lp);
-#endif
       cpx_status = CPXgetobjval(lp_data->cpxenv,lp_data->lp, &lp_data->objval);
       CPX_check_error("dual_simplex - CPXgetobjval");
       cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ADVIND, CPX_ON);
@@ -1539,105 +1434,6 @@ void set_itlim(LPdata *lp_data, int itlim)
    CPX_check_error("set_itlim - CPXinfointparam");
    cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, itlim);
    CPX_check_error("set_itlim - CPXsetintparam");
-}
-
-/*===========================================================================*/
-
-void match_lp_solver_arrays_to_user(LPdata *lp_data,
-				    int allocm, int allocn, int allocnz)
-{
-   if (allocm  != lp_data->alloc_m){
-      FREE(lp_data->slacks);
-      lp_data->slacks = (double *) malloc(allocm * DSIZE);
-      lp_data->alloc_m = allocm;
-   }
-
-   if (allocn != lp_data->alloc_mplusn){
-      FREE(lp_data->matcnt);
-      FREE(lp_data->lb);
-      FREE(lp_data->ub);
-      lp_data->matcnt = (int *) malloc(allocn * ISIZE);
-      lp_data->lb = (double *) malloc(allocn * DSIZE);
-      lp_data->ub = (double *) malloc(allocn * DSIZE);
-      lp_data->alloc_mplusn = allocn;
-   }
-
-   if (allocnz != lp_data->alloc_mplusnz)
-      lp_data->alloc_mplusnz = allocnz;
-}
-
-/*===========================================================================*/
-
-void resize_lp_solver_arrays(LPdata *lp_data)
-{
-   char resize = FALSE;
-
-   if (! lp_data->lp){
-
-      if (lp_data->maxm > lp_data->alloc_m){
-	 lp_data->alloc_m = lp_data->maxm;
-	 lp_data->rhs = (double *) realloc((void *)lp_data->rhs,
-					   lp_data->alloc_m * DSIZE);
-	 lp_data->rngval = (double *) realloc((void *)lp_data->rngval,
-					      lp_data->alloc_m * DSIZE);
-	 lp_data->sense = (char *) realloc((void *)lp_data->sense,
-					   lp_data->alloc_m * CSIZE);
-	 /*slacks must be allocated for cplex (for XMP it only points into x)*/
-	 lp_data->slacks = (double *) realloc((void *)lp_data->slacks,
-					      lp_data->alloc_m * DSIZE);
-      }
-      if (lp_data->maxm + lp_data->maxn + 1 > lp_data->alloc_mplusn){
-	 lp_data->alloc_mplusn = lp_data->maxm + lp_data->maxn + 1;
-	 lp_data->matbeg = (int *) realloc((void *)lp_data->matbeg,
-					   lp_data->alloc_mplusn * ISIZE);
-	 lp_data->matcnt = (int *) realloc((void *)lp_data->matcnt,
-					   lp_data->alloc_mplusn * ISIZE);
-	 lp_data->obj = (double *) realloc((void *)lp_data->obj,
-					   lp_data->alloc_mplusn * DSIZE);
-	 lp_data->lb = (double *) realloc((void *)lp_data->lb,
-					  lp_data->alloc_mplusn * DSIZE);
-	 lp_data->ub = (double *) realloc((void *)lp_data->ub,
-					  lp_data->alloc_mplusn * DSIZE);
-      }
-      if (lp_data->maxnz + lp_data->maxm > lp_data->alloc_mplusnz){
-	 lp_data->alloc_mplusnz = lp_data->maxm + lp_data->maxnz;
-	 lp_data->matind = (int *) realloc((void *)lp_data->matind,
-					   lp_data->alloc_mplusnz * ISIZE);
-	 lp_data->matval = (double *) realloc((void *)lp_data->matval,
-					      lp_data->alloc_mplusnz * DSIZE);
-      }
-
-   }else{
-
-      if (lp_data->maxm > lp_data->alloc_m){
-	 lp_data->alloc_m = lp_data->maxm;
-	 lp_data->slacks =
-	    (double *) realloc(lp_data->slacks, lp_data->alloc_m * DSIZE);
-	 resize = TRUE;
-      }
-      if (lp_data->maxm + lp_data->maxn + 1 > lp_data->alloc_mplusn){
-	 lp_data->alloc_mplusn = lp_data->maxm + lp_data->maxn + 1;
-	 resize = TRUE;
-      }
-      if (lp_data->maxnz + lp_data->maxm > lp_data->alloc_mplusnz){
-	 lp_data->alloc_mplusnz = lp_data->maxm + lp_data->maxnz;
-	 resize = TRUE;
-      }
-      if (resize){
-#if CPX_VERSION <= 600 
-	 /* This is only needed in the old memory model */
-	 cpx_status =
-	    CPXreallocprob(lp_data->cpxenv, lp_data->lp, &lp_data->obj,
-			   &lp_data->rhs, &lp_data->sense, &lp_data->matbeg,
-			   &lp_data->matcnt, &lp_data->matind,&lp_data->matval,
-			   &lp_data->lb, &lp_data->ub, &lp_data->rngval,
-			   NULL, NULL, NULL, NULL, NULL,
-			   lp_data->alloc_mplusn, lp_data->alloc_m,
-			   lp_data->alloc_mplusnz, 0, 0);
-	 CPX_check_error("resize_lp");
-#endif
-      }
-   }
 }
 
 /*===========================================================================*/
@@ -1800,76 +1596,12 @@ void get_x(LPdata *lp_data)
 
 void get_dj_pi(LPdata *lp_data)
 {
-#if CPX_VERSION <= 600 
-   /* This mess is only needed for old versions of CPLEX */
-   int i;
-   cpx_status = CPXgetintparam(lp_data->cpxenv, CPX_PARAM_FASTMIP, &i);
-   CPX_check_error("get_dj_pi - CPXgetintparam, FASTMIP");
-   if (i == CPX_OFF) {
-      cpx_status = CPXgetpi(lp_data->cpxenv, lp_data->lp, lp_data->dualsol, 0,
-			    lp_data->m-1);
-      CPX_check_error("get_dj_pi - CPXgetpi");
-      cpx_status = CPXgetdj(lp_data->cpxenv, lp_data->lp, lp_data->dj, 0,
-			    lp_data->n-1);
-      CPX_check_error("get_dj_pi - CPXgetdj");
-   } else {
-      double *pi = lp_data->dualsol;
-      double *dj = lp_data->dj;
-      int *bhead = lp_data->bhead;
-      int scaling;
-      cpx_status = CPXgetintparam(lp_data->cpxenv, CPX_PARAM_SCAIND, &scaling);
-      CPX_check_error("get_dj_pi - CPXgetintparam, SCAIND");
-      if (scaling == -1) {
-	 /* No scaling. We can pick the data directly from obj and the matrix*/
-	 double *obj = lp_data->obj;
-	 int *matbeg = lp_data->matbeg;
-	 int *matind = lp_data->matind;
-	 int *matcnt = lp_data->matcnt;
-	 double *matval = lp_data->matval;
-	 /* Get the duals first */
-	 for (i = lp_data->m - 1; i >= 0; --i)
-	    pi[i] = bhead[i] >= 0 ? obj[bhead[i]] : 0;
-	 cpx_status = CPXbtran(lp_data->cpxenv, lp_data->lp, pi);
-	 CPX_check_error("get_dj_pi - CPXbtran");
-	 /* Now get the reduced costs */
-	 for (i = lp_data->n - 1; i >= 0; --i) {
-	    dj[i] = obj[i] - dot_product(matval+matbeg[i], matind+matbeg[i],
-					 matcnt[i], pi);
-	 }
-      } else {
-	 /* Scaling was done. We must get the data through cplex */
-	 /* Get the duals first */
-	 double *obj = (double *) malloc(lp_data->n * DSIZE);
-	 int collen;
-	 int matbeg, surplus; /* "dummy" variables */
-	 int *colind = (int *) malloc(lp_data->m * ISIZE);
-	 double *colval = (double *) malloc(lp_data->m * DSIZE);
-	 /* Get the duals first */
-	 cpx_status = CPXgetobj(lp_data->cpxenv, lp_data->lp, obj, 0,
-				lp_data->n - 1);
-	 CPX_check_error("get_dj_pi - CPXgetobj");
-	 for (i = lp_data->m - 1; i >= 0; --i)
-	    pi[i] = bhead[i] >= 0 ? obj[bhead[i]] : 0;
-	 cpx_status = CPXbtran(lp_data->cpxenv, lp_data->lp, pi);
-	 CPX_check_error("get_dj_pi - CPXbtran");
-	 /* Now get the reduced costs */
-	 for (i = lp_data->n - 1; i >= 0; --i) {
-	    cpx_status = CPXgetcols(lp_data->cpxenv, lp_data->lp, &collen,
-				    &matbeg, colind, colval, lp_data->m,
-				    &surplus, i, i);
-	    CPX_check_error("get_dj_pi - CPXgetcols");
-	    dj[i] = obj[i] - dot_product(colval, colind, collen, pi);
-	 }
-      }
-   }
-#else /* We have a newer version of CPLEX */
    cpx_status = CPXgetpi(lp_data->cpxenv, lp_data->lp, lp_data->dualsol, 0,
 			 lp_data->m-1);
    CPX_check_error("get_dj_pi - CPXgetpi");
    cpx_status = CPXgetdj(lp_data->cpxenv, lp_data->lp, lp_data->dj, 0,
 			 lp_data->n-1);
    CPX_check_error("get_dj_pi - CPXgetdj");
-#endif
 }
 
 /*===========================================================================*/
@@ -2036,9 +1768,6 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 {
    int i, *bhead = lp_data->bhead;
-#if CPX_VERSION <= 600
-   int j;
-#endif
 
    /* this test can be made similar to the one in delete_cols if we pivot
       in the slacks corresponding to the colums to be deleted */
@@ -2053,14 +1782,6 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    CPX_check_error("delete_cols - CPXdelsetcols");
    lp_data->nz = CPXgetnumnz(lp_data->cpxenv, lp_data->lp);
    CPX_check_error("delete_cols - CPXgetnumnz");
-#if CPX_VERSION <= 600
-   for (i = 0, j = 0; i < lp_data->n; i++){
-      if (delstat[i])
-	 delstat[i] = -1;
-      else
-	 delstat[i] = j++;
-   }
-#endif
    lp_data->n -= delnum;
 
    return(delnum);
@@ -2149,34 +1870,13 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 
 /*===========================================================================*/
 
-void free_lp_solver_data(LPdata *lp_data, char arrays_too)
-{
-   if (lp_data){
-      CPXfreeprob(lp_data->cpxenv, &(lp_data->lp));
-      lp_data->lp = NULL;
-      if (arrays_too){
-	 FREE(lp_data->matbeg);
-	 FREE(lp_data->matcnt);
-	 FREE(lp_data->matind);
-	 FREE(lp_data->matval);
-	 FREE(lp_data->obj);
-	 FREE(lp_data->rhs);
-	 FREE(lp_data->rngval);
-	 FREE(lp_data->sense);
-	 FREE(lp_data->lb);
-	 FREE(lp_data->ub);
-	 FREE(lp_data->slacks);
-      }
-   }
-}
-
-/*===========================================================================*/
-
 void write_mps(LPdata *lp_data, char *fname)
 {
    cpx_status = CPXmpswrite(lp_data->cpxenv, lp_data->lp, fname);
    CPX_check_error("write_mps");
 }
+
+/*===========================================================================*/
 
 void write_sav(LPdata *lp_data, char *fname)
 {
@@ -2218,21 +1918,9 @@ void open_lp_solver(LPdata *lp_data)
 void close_lp_solver(LPdata *lp_data)
 {
 
- std::cout<<std::endl<<"2   ";
-
-  lp_data->si->~OsiSolverInterface();
-
-   /* Free up the lp_data parts */
-   FREE(lp_data->matbeg);
-   FREE(lp_data->matcnt);
-   FREE(lp_data->matind);
-   FREE(lp_data->matval);
-   FREE(lp_data->obj);
-   FREE(lp_data->rhs);
-   FREE(lp_data->rngval);
-   FREE(lp_data->sense);
-   FREE(lp_data->lb);
-   FREE(lp_data->ub);
+   std::cout<<std::endl<<"2   ";
+   
+   delete lp_data->si;
 
    FREE(lp_data->not_fixed);
    FREE(lp_data->status);
@@ -2263,23 +1951,16 @@ void close_lp_solver(LPdata *lp_data)
 
 void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 {
-
-
-  int i, *matcnt, *matbeg;
-
-  matcnt=lp_data->matcnt;
-  matbeg=lp_data->matbeg;
-
-   for (i=lp_data->n-1; i>=0; i--)
-      matcnt[i] = matbeg[i+1] - matbeg[i];
-
   //cannot set the necessary parameters, check OsiCpxSolverInterface-MEN
   //what about the alloc params?MEN
 
  std::cout<<std::endl<<"4   ";
- lp_data->si->loadProblem(lp_data->n,lp_data->m,lp_data->matbeg,lp_data->matind,lp_data->matval,lp_data->lb,lp_data->ub,lp_data->obj,lp_data->sense,lp_data->rhs,lp_data->rngval);
-
- //WHAT TO DO WITH THE PART ABOVE MEN!
+ lp_data->si->loadProblem(lp_data->n, lp_data->m,
+			  lp_data->desc.matbeg, lp_data->desc.matind,
+			  lp_data->desc.matval, lp_data->desc.lb,
+			  lp_data->desc.ub, lp_data->desc.obj,
+			  lp_data->desc.sense, lp_data->desc.rhs,
+			  lp_data->desc.rngval);
 
 }
 
@@ -2737,111 +2418,6 @@ void set_itlim(LPdata *lp_data, int itlim)
   retval = lp_data->si->setIntParam(key,itlim);
 
  //if(itlim<0) doesn't seem to be appear in setIntParam of Osi???MEN
-
-}
-
-/*===========================================================================*/
-
-void match_lp_solver_arrays_to_user(LPdata *lp_data,
-				    int allocm, int allocn, int allocnz)
-{ std::cout<<std::endl<<"16   ";
-   if (allocm  != lp_data->alloc_m){
-      FREE(lp_data->slacks);
-      lp_data->slacks = (double *) malloc(allocm * DSIZE);
-      lp_data->alloc_m = allocm;
-   }
-
-   if (allocn != lp_data->alloc_mplusn){
-      FREE(lp_data->matcnt);
-      FREE(lp_data->lb);
-      FREE(lp_data->ub);
-      lp_data->matcnt = (int *) malloc(allocn * ISIZE);
-      lp_data->lb = (double *) malloc(allocn * DSIZE);
-      lp_data->ub = (double *) malloc(allocn * DSIZE);
-      lp_data->alloc_mplusn = allocn;
-   }
-
-   if (allocnz != lp_data->alloc_mplusnz)
-      lp_data->alloc_mplusnz = allocnz;
-}
-
-/*===========================================================================*/
-
-void resize_lp_solver_arrays(LPdata *lp_data)
-{
- std::cout<<std::endl<<"17   ";
-   char resize = FALSE;
-
-   OsiXSolverInterface* si_dy = dynamic_cast<OsiXSolverInterface*>(lp_data->si);
-
-
-   //DO SOMETHING HERE MEN! CORRECT IT!!! THE FOLLOWING NEEDS MORE JOB TO WORK ON! MEN! 
-
-      if (lp_data->maxm > lp_data->alloc_m){
-	 lp_data->alloc_m = lp_data->maxm;
-	 lp_data->rhs = (double *) realloc((void *)lp_data->rhs,
-					   lp_data->alloc_m * DSIZE);
-	 lp_data->rngval = (double *) realloc((void *)lp_data->rngval,
-					      lp_data->alloc_m * DSIZE);
-	 lp_data->sense = (char *) realloc((void *)lp_data->sense,
-					   lp_data->alloc_m * CSIZE);
-	 /*slacks must be allocated for cplex (for XMP it only points into x)*/
-	 lp_data->slacks = (double *) realloc((void *)lp_data->slacks,
-					      lp_data->alloc_m * DSIZE);
-
-	 if (si_dy->getModelPtr()!=NULL) resize =TRUE;    //this is just for OsiClp! MEN
-     
-      }
-      if (lp_data->maxm + lp_data->maxn + 1 > lp_data->alloc_mplusn){
-	 lp_data->alloc_mplusn = lp_data->maxm + lp_data->maxn + 1;
-	 lp_data->matbeg = (int *) realloc((void *)lp_data->matbeg,
-					   lp_data->alloc_mplusn * ISIZE);
-	 lp_data->matcnt = (int *) realloc((void *)lp_data->matcnt,
-					   lp_data->alloc_mplusn * ISIZE);
-	 lp_data->obj = (double *) realloc((void *)lp_data->obj,
-					   lp_data->alloc_mplusn * DSIZE);
-	 lp_data->lb = (double *) realloc((void *)lp_data->lb,
-					  lp_data->alloc_mplusn * DSIZE);
-	 lp_data->ub = (double *) realloc((void *)lp_data->ub,
-					  lp_data->alloc_mplusn * DSIZE);
-
-	 if (si_dy->getModelPtr()!=NULL) resize = TRUE;    //this is just for OsiClp! MEN
-
-      }
-      if (lp_data->maxnz + lp_data->maxm > lp_data->alloc_mplusnz){
-	 lp_data->alloc_mplusnz = lp_data->maxm + lp_data->maxnz;
-	 lp_data->matind = (int *) realloc((void *)lp_data->matind,
-					   lp_data->alloc_mplusnz * ISIZE);
-	 lp_data->matval = (double *) realloc((void *)lp_data->matval,
-					      lp_data->alloc_mplusnz * DSIZE);
-      
-	 if (si_dy->getModelPtr()!=NULL) resize = TRUE;    //this is just for OsiClp! MEN
-
-      }
-
-     if(resize){
-
-      if (lp_data->maxm > lp_data->alloc_m){
-	 lp_data->alloc_m = lp_data->maxm;
-	 lp_data->slacks =
-	    (double *) realloc(lp_data->slacks, lp_data->alloc_m * DSIZE);
-	 resize = TRUE;
-      }
-      if (lp_data->maxm + lp_data->maxn + 1 > lp_data->alloc_mplusn){
-	 lp_data->alloc_mplusn = lp_data->maxm + lp_data->maxn + 1;
-	 resize = TRUE;
-      }
-      if (lp_data->maxnz + lp_data->maxm > lp_data->alloc_mplusnz){
-	 lp_data->alloc_mplusnz = lp_data->maxm + lp_data->maxnz;
-	 resize = TRUE;
-      }
-      if (resize){
-
-      }
-     }
-
-//si_dy=NULL;     
-
 
 }
 
@@ -3346,60 +2922,24 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 
 /*===========================================================================*/
 
-void free_lp_solver_data(LPdata *lp_data, char arrays_too)
+void write_mps(LPdata *lp_data, char *fname)
 {
-
-
-  //IS THAT CORRECT? we just need gutsOfDestructur... MEN
-
-
-  lp_data->si->~OsiSolverInterface();
-
-
-  //really need the following? MEN. after unloading, do we use it again?
-
-  lp_data->si=new OsiXSolverInterface();
-
-
-  if(lp_data){
-    if(arrays_too){
-	 FREE(lp_data->matbeg);
-	 FREE(lp_data->matcnt);
-	 FREE(lp_data->matind);
-	 FREE(lp_data->matval);
-	 FREE(lp_data->obj);
-	 FREE(lp_data->rhs);
-	 FREE(lp_data->rngval);
-	 FREE(lp_data->sense);
-	 FREE(lp_data->lb);
-	 FREE(lp_data->ub);
-	 FREE(lp_data->slacks);
-      }
-  }
-
+   char * extension = "MPS";
+   double ObjSense = lp_data->si->getObjSense();
+   
+   lp_data->si->writeMps(fname,extension,ObjSense);
 }
 
 /*===========================================================================*/
 
-void write_mps(LPdata *lp_data, char *fname)
-{
+/* write_sav commented out MEN! */
 
-  char * extension = "MPS";
-  double ObjSense = lp_data->si->getObjSense();
-
-  lp_data->si->writeMps(fname,extension,ObjSense);
-
-}
-
-
-//write_sav commented out MEN!
-
-/*
+#if 0
 void write_sav(LPdata *lp_data, char *fname)
 {
    cpx_status = CPXsavwrite(lp_data->cpxenv, lp_data->lp, fname);
    CPX_check_error("write_sav");
 }
-*/
+#endif
 
 #endif /* __OSI_xxx__ */

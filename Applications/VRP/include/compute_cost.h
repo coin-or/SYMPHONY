@@ -19,15 +19,15 @@
 #include "proto.h"
 #include "vrp_common_types.h"
 
-int compute_icost PROTO((distance *dist, int v0, int v1));
-void canonical_tour PROTO((distance *dist, best_tours *cur_tour,
+int compute_icost PROTO((distances *dist, int v0, int v1));
+void canonical_tour PROTO((distances *dist, best_tours *cur_tour,
 			   int vertnum, int capacity, int *demand));
-int route_calc PROTO((distance *dist, _node *tour, int numroutes, 
+int route_calc PROTO((distances *dist, _node *tour, int numroutes, 
 		      route_data *route_info, int *demand));
-int compute_tour_cost PROTO((distance *dist, _node *tour));
+int compute_tour_cost PROTO((distances *dist, _node *tour));
 double ECOST PROTO((double *cost, int v0, int v1, int vertnum));
-int ICOST PROTO((distance *dist, int v0, int v1));
-int MCOST PROTO((distance *dist, int v0, int v1, int *lamda));
-int TCOST PROTO((distance *dist, int v0, int v1, int *lamda, int mu));
+int ICOST PROTO((distances *dist, int v0, int v1));
+int MCOST PROTO((distances *dist, int v0, int v1, int *lamda));
+int TCOST PROTO((distances *dist, int v0, int v1, int *lamda, int mu));
 
 #endif

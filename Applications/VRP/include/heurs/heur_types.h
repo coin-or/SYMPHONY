@@ -33,7 +33,7 @@ typedef struct HEUR_PROB{
 			   | each node. node i's demand is        |
 			   \*p->demand[i-1]                      */
    int           edgenum;  /*number of edges in the problem*/
-   distance      dist;     /*contains the information for computing the costs*/
+   distances     dist;     /*contains the information for computing the costs*/
 }heur_prob;
 
 #endif

@@ -98,7 +98,6 @@ int receive_lp_data_u(lp_prob *p)
 
 void free_prob_dependent_u(lp_prob *p)
 {
-   free_lp_solver_data(p->lp_data, TRUE);
    switch (user_free_lp(&p->user)){
     case ERROR:
       /* BlackBox ignores error message */
@@ -130,9 +129,8 @@ int create_lp_u(lp_prob *p)
    node_desc *desc = p->desc;
 
    LPdata *lp_data = p->lp_data;
-   int i, j;
+   int i, j, maxm, maxn, maxnz;
    constraint *row, *rows;
-   int maxn, maxm, maxnz, allocm, allocn, allocnz;
 
    int bvarnum = p->base.varnum;
    int bcutnum = p->base.cutnum;
@@ -154,13 +152,9 @@ int create_lp_u(lp_prob *p)
    lp_data->n = bvarnum + desc->uind.size;
    lp_data->m = p->base.cutnum + desc->cutind.size;
 
-   /* defaults (old array maxs/allocs) */
    maxm = lp_data->maxm;
    maxn = lp_data->maxn;
    maxnz = lp_data->maxnz;
-   allocm = lp_data->alloc_m;
-   allocn = lp_data->alloc_mplusn;
-   allocnz = lp_data->alloc_mplusnz;
 
    /* Fill up lb/ub for base variables */
    if (bvarnum){
@@ -200,17 +194,15 @@ int create_lp_u(lp_prob *p)
        /* base and extra variables */
        lp_data->n, lp_data->vars,
        /* the number of constraints to be added and their description */
-       lp_data->m, desc->cutind.size, desc->cuts, 
+       lp_data->m, desc->cutind.size, desc->cuts, &lp_data->nz,
        /* matrix */
-       &lp_data->nz, &lp_data->matbeg, &lp_data->matind, &lp_data->matval,
+       &lp_data->desc.matbeg, &lp_data->desc.matind, &lp_data->desc.matval,
        /* variable obj coefs */
-       &lp_data->obj,
+       &lp_data->desc.obj,
        /* description of the rows */
-       &lp_data->rhs, &lp_data->sense, &lp_data->rngval,
+       &lp_data->desc.rhs, &lp_data->desc.sense, &lp_data->desc.rngval,
        /* max sizes */
-       &maxn, &maxm, &maxnz,
-       /* allocated sizes */
-       &allocn, &allocm, &allocnz);
+       &maxn, &maxm, &maxnz);
 
    switch (user_res){
     case ERROR:
@@ -241,11 +233,11 @@ int create_lp_u(lp_prob *p)
     * Let's see about reallocing...
    \*----------------------------------------------------------------------- */
 
-   match_lp_solver_arrays_to_user(lp_data, allocm, allocn, allocnz);
    if (maxm  < lp_data->m)  maxm  = lp_data->m;
    if (maxn  < lp_data->n)  maxn  = lp_data->n;
    if (maxnz < lp_data->nz) maxnz = lp_data->nz;
-   resize_lp_arrays(lp_data, FALSE, TRUE, maxm, maxn, maxnz);
+
+   size_lp_arrays(lp_data, FALSE, TRUE, maxm, maxn, maxnz);
 
    /* Default status of every variable is NOT_FIXED */
    if (bvarnum > 0)
@@ -258,9 +250,9 @@ int create_lp_u(lp_prob *p)
    \*----------------------------------------------------------------------- */
 
    rows = lp_data->rows;
-   rhs = lp_data->rhs;
-   rngval = lp_data->rngval;
-   sense = lp_data->sense;
+   rhs = lp_data->desc.rhs;
+   rngval = lp_data->desc.rngval;
+   sense = lp_data->desc.sense;
    for (i = bcutnum - 1; i >= 0; i--){
       row = rows + i;
       cut = row->cut;
@@ -278,15 +270,18 @@ int create_lp_u(lp_prob *p)
     * Fill out lp_data->lb/ub
    \*----------------------------------------------------------------------- */
 
+   lp_data->desc.lb = (double *) malloc((bvarnum + desc->uind.size)*DSIZE);
+   lp_data->desc.ub = (double *) malloc((bvarnum + desc->uind.size)*DSIZE);
+   
    if (bvarnum){
-      memcpy(lp_data->lb, blb, bvarnum * DSIZE);
-      memcpy(lp_data->ub, bub, bvarnum * DSIZE);
+      memcpy(lp_data->desc.lb, blb, bvarnum * DSIZE);
+      memcpy(lp_data->desc.ub, bub, bvarnum * DSIZE);
    }
    if (desc->uind.size > 0){
       /* LB of extra variables must be 0 */
-      memset(lp_data->lb + bvarnum, 0, desc->uind.size * DSIZE);
+      memset(lp_data->desc.lb + bvarnum, 0, desc->uind.size * DSIZE);
       /* Get the UB of extra variables */
-      bd = lp_data->ub + bvarnum;
+      bd = lp_data->desc.ub + bvarnum;
       get_upper_bounds_u(p, desc->uind.size, desc->uind.list, bd);
       vars = lp_data->vars + bvarnum;
       for (i = desc->uind.size - 1; i >= 0; i--){
@@ -300,6 +295,9 @@ int create_lp_u(lp_prob *p)
    \*----------------------------------------------------------------------- */
 
    load_lp_prob(lp_data, p->par.scaling, p->par.fastmip);
+
+   /* Free the user's description */
+   free_lp_desc(lp_data->desc);   
 
    if (desc->cutind.size > 0 && user_res == USER_NO_PP){
       unpack_cuts_u(p, CUT_FROM_TM, UNPACK_CUTS_SINGLE,
@@ -449,27 +447,26 @@ int is_feasible_u(lp_prob *p)
    int feasible;
    double new_ub, true_objval = 0;
    LPdata *lp_data = p->lp_data;
-   double *x = lp_data->x;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
-   int *xind;
-   double *xval, xvali;
+   int *indices;
+   double *values, valuesi;
    int cnt, i;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
-   xind = lp_data->tmp.i1; /* n */
-   xval = lp_data->tmp.d; /* n */
+   indices = lp_data->tmp.i1; /* n */
+   values = lp_data->tmp.d; /* n */
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   cnt = collect_nonzeros(p, x, xind, xval, NULL);
+   cnt = collect_nonzeros(p, lp_data->x, indices, values, NULL);
 /*___END_EXPERIMENTAL_SECTION___*/
 /*UNCOMMENT FOR PRODUCTION CODE*/
 #if 0
-   cnt = collect_nonzeros(p, x, xind, xval);
+   cnt = collect_nonzeros(p, x, indices, values);
 #endif
 
-   user_res = user_is_feasible(p->user, lpetol, cnt, xind, xval, &feasible,
-			       &true_objval);
+   user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
+			       &feasible, &true_objval);
    switch (user_res){
     case ERROR: /* Error. Consider as feasibility not recognized. */
       return(FALSE);
@@ -483,13 +480,13 @@ int is_feasible_u(lp_prob *p)
    switch (user_res){
     case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
       for (i=cnt-1; i>=0; i--)
-	 if (xval[i] < lpetol1) break;
+	 if (values[i] < lpetol1) break;
       feasible = i < 0 ? FEASIBLE : NOT_FEASIBLE;
       break;
     case TEST_INTEGRALITY:
       for (i=cnt-1; i>=0; i--){
-	 xvali = xval[i];
-	 if (xvali - floor(xvali) > lpetol && ceil(xvali) - xvali > lpetol)
+	 valuesi = values[i];
+	 if (valuesi-floor(valuesi) > lpetol && ceil(valuesi)-valuesi > lpetol)
 	    break;
       }
       feasible = i < 0 ? FEASIBLE : NOT_FEASIBLE;
@@ -516,8 +513,8 @@ int is_feasible_u(lp_prob *p)
 	 FREE(p->best_sol.xval);
 	 p->best_sol.xind = (int *) malloc(cnt*ISIZE);
 	 p->best_sol.xval = (double *) malloc(cnt*DSIZE);
-	 memcpy((char *)p->best_sol.xind, (char *)xind, cnt*ISIZE);
-	 memcpy((char *)p->best_sol.xval, (char *)xval, cnt*DSIZE);
+	 memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
+	 memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
 #ifdef COMPILE_IN_LP
 	 p->tm->has_ub = TRUE;
 	 p->tm->ub = p->ub;
@@ -551,7 +548,7 @@ int is_feasible_u(lp_prob *p)
       }
 #ifndef COMPILE_IN_TM
       send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
-			       lpetol, new_ub, cnt, xind, xval);
+			       lpetol, new_ub, cnt, indices, values);
 #endif
       lp_data->termcode = OPT_FEASIBLE;
    }

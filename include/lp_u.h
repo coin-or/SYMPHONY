@@ -28,8 +28,7 @@ int user_create_lp PROTO((void *user, int varnum, var_desc **vars,
 			  int rownum, int cutnum, cut_data **cuts, int *nz,
 			  int **matbeg, int **matind, double **matval,
 			  double **obj, double **rhs, char **sense,
-			  double **rngval, int *maxn, int *maxm, int *maxnz,
-			  int *allocn, int *allocm, int *allocnz));
+			  double **rngval, int *maxn, int *maxm, int *maxnz));
 int user_get_upper_bounds PROTO((void *user, int varnum, int *indices,
 				 double *ub));
 int user_is_feasible PROTO((void *user, double lpetol, int varnum,

@@ -357,8 +357,9 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	    /*__BEGIN_EXPERIMENTAL_SECTION__*/
 	    compdemands_copy = (int *) memcpy((char *)compdemands_copy,
 				       (char *)compdemands, (vertnum+1)*ISIZE);
-	    compcuts_copy = (int *) memcpy((char *)compcuts_copy,
-				    (char *)compcuts, (vertnum+1)*DSIZE);
+	    compcuts_copy = (double *) memcpy((char *)compcuts_copy,
+					      (char *)compcuts,
+					      (vertnum+1)*DSIZE);
 	    /*___END_EXPERIMENTAL_SECTION___*/
 	    n->compnodes = compnodes_copy;
 	    comp_num = rcnt;

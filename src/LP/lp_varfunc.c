@@ -66,7 +66,7 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
    }
 
    if (new_vars){
-      resize_lp_arrays(lp_data, TRUE, FALSE, 0, new_vars, new_cols->nzcnt);
+      size_lp_arrays(lp_data, TRUE, FALSE, 0, new_vars, new_cols->nzcnt);
    }
 
    lu = lp_data->tmp.c; /* n (max(n, new_vars), but already resized) */

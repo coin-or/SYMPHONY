@@ -134,13 +134,12 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
 		   int cutnum, cut_data **cuts, int *nz, int **matbeg,
 		   int **matind, double **matval, double **obj, double **rhs,
 		   char **sense, double **rngval, int *maxn, int *maxm,
-		   int *maxnz, int *allocn, int *allocm, int *allocnz)
+		   int *maxnz)
 {
    vrp_spec *vrp = (vrp_spec *)user;
    int *costs = vrp->costs;
    int *edges = vrp->edges;
    int i;
-   char resize = FALSE;
    int total_edgenum = vrp->vertnum*(vrp->vertnum-1)/2;
    
    /* set up the inital LP data */
@@ -152,48 +151,22 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
       nonzeros is 2*n (n is the number of active variables). */
    *nz = 2 * varnum;
 
-   /* We have to check to make sure there is enough space allocated
-      for the matrix we are going to build */
-   if (2 * rownum > *maxm){
-      *maxm = 2 * rownum;
-      resize = TRUE;
-   }
-   
-   /* Allocate space for all edges up front since we have small problems */
-   if (total_edgenum != *maxn){
-      *maxn = total_edgenum;
-      resize = TRUE;
-   }
+   /* Estimate the maximum number of nonzeros */
+   *maxm = 2 * rownum;
+   *maxn = total_edgenum;
+   *maxnz = *nz + ((*maxm) * (*maxn) / 10);
 
-   if (*nz + ((*maxm) * (*maxn) / 10) > *maxnz){
-      *maxnz = *nz + ((*maxm) * (*maxn) / 10);
-      resize = TRUE;
-   }
-
-   /* If there was not enough space, the allocate more */
-   if (resize){
-      /*re-malloc all the arrays*/
-      FREE(*matbeg);
-      FREE(*matind);
-      FREE(*matval);
-      FREE(*obj);
-      FREE(*rhs);
-      FREE(*sense);
-      FREE(*rngval);
-      *allocm  = *maxm;
-      *allocn  = *maxm + *maxn + 1;
-      *allocnz = *maxnz + *maxm;
-      *matbeg  = (int *) malloc(*allocn * ISIZE);
-      *matind  = (int *) malloc(*allocnz * ISIZE);
-      *matval  = (double *) malloc(*allocnz * DSIZE);
-      *obj     = (double *) malloc(*allocn * DSIZE);
-      *rhs     = (double *) malloc(*allocm * DSIZE);
-      *sense   = (char *) malloc(*allocm * CSIZE);
-      *rngval  = (double *) calloc(*allocm, DSIZE);
-   }
+   /* Allocate the arrays. These are owned by SYMPHONY after returning. */
+   *matbeg  = (int *) malloc(*maxn * ISIZE);
+   *matind  = (int *) malloc(*maxnz * ISIZE);
+   *matval  = (double *) malloc(*maxnz * DSIZE);
+   *obj     = (double *) malloc(*maxn * DSIZE);
+   *rhs     = (double *) malloc(*maxm * DSIZE);
+   *sense   = (char *) malloc(*maxm * CSIZE);
+   *rngval  = (double *) calloc(*maxm, DSIZE);
 
    /* Fill out the appropriate data structures -- each column has
-      exactly two entried*/
+      exactly two entries */
    for (i = 0; i < varnum; i++){
       (*obj)[i]        = (double) costs[vars[i]->userind];
       (*matbeg)[i]     = 2*i;
@@ -517,7 +490,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	memcpy((char *)&num_arcs, cpt, ISIZE);
 	cpt += ISIZE;
 	arcs = (int *) malloc(num_arcs * ISIZE);
-	indicators = malloc(num_arcs);  
+	indicators = (char *) malloc(num_arcs);  
 	memcpy((char *)arcs, cpt, num_arcs * ISIZE);
 	cpt += num_arcs * ISIZE;
 	memcpy(indicators, cpt, num_arcs);
@@ -560,7 +533,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	memcpy((char *)&num_arcs, cpt, ISIZE);
 	cpt += ISIZE;
 	arcs = (int *) calloc(num_arcs, ISIZE);
-	indicators = malloc(num_arcs);  
+	indicators = (char *) malloc(num_arcs);  
 	memcpy((char *)arcs, cpt, num_arcs * ISIZE);
 	cpt += num_arcs * ISIZE;
 	memcpy(indicators, cpt, num_arcs);
@@ -916,7 +889,7 @@ int user_print_stat_on_cuts_added(void *user, int rownum, waiting_row **rows)
 \*===========================================================================*/
 
 int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
-			    char *delete)
+			    char *delete_rows)
 {
    return(DEFAULT);
 }

@@ -31,7 +31,7 @@
  * This function computes the cost of the edge from va to vb
 \*===========================================================================*/
 
-int compute_icost(distance *dist, int va, int vb)
+int compute_icost(distances *dist, int va, int vb)
 {
   double q1, q2, q3, dx, dy, dz;
   int cost = 0;
@@ -79,7 +79,7 @@ int compute_icost(distance *dist, int va, int vb)
  * exceeded, and then it starts a new route,
 \*===========================================================================*/
 
-void canonical_tour(distance *dist, best_tours *cur_tour, int vertnum,
+void canonical_tour(distances *dist, best_tours *cur_tour, int vertnum,
 		    int capacity, int *demand)
 {
   register int i, j = 1;
@@ -141,7 +141,7 @@ void canonical_tour(distance *dist, best_tours *cur_tour, int vertnum,
  * does.
 \*===========================================================================*/
 
-int route_calc(distance *dist, _node *tour, int numroutes, 
+int route_calc(distances *dist, _node *tour, int numroutes, 
 	       route_data *route_info, int *demand)
 {
   register int cur_node = 0;
@@ -174,7 +174,7 @@ int route_calc(distance *dist, _node *tour, int numroutes,
  * travelling back to the next customer.
 \*===========================================================================*/
 
-int compute_tour_cost(distance *dist, _node *tour)
+int compute_tour_cost(distances *dist, _node *tour)
 {
   int cost=0;
   int v0, v1;
@@ -203,20 +203,20 @@ double ECOST(double *cost, int v0, int v1, int vertnum)
 	   ((v1 < vertnum && v1 > 0) ? (cost[INDEX(0, v1)]): DEPOT_PENALTY)));
 }
 
-int ICOST(distance *dist, int v0, int v1)
+int ICOST(distances *dist, int v0, int v1)
 {
    return(dist->wtype==_EXPLICIT ? dist->cost[INDEX(v0,v1)] :
 	  compute_icost(dist,v0,v1));
 }
 
-int MCOST(distance *dist, int v0, int v1, int *lamda)
+int MCOST(distances *dist, int v0, int v1, int *lamda)
 {
    return(dist->wtype==_EXPLICIT ?
 	  dist->cost[INDEX(v0,v1)]+lamda[v0]+lamda[v1] :
 	  (compute_icost(dist,v0,v1)+lamda[v0]+lamda[v1]));
 }
 
-int TCOST(distance *dist, int v0, int v1, int *lamda, int mu)
+int TCOST(distances *dist, int v0, int v1, int *lamda, int mu)
 {
    return(v0 ? MCOST(dist, v0, v1, lamda) : MCOST(dist, v0, v1, lamda) - mu);
 }

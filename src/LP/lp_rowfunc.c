@@ -375,7 +375,7 @@ void add_waiting_rows(lp_prob *p, waiting_row **wrows, int add_row_num)
    for (nzcnt=0, i=add_row_num-1; i>=0; i--)
       nzcnt += wrows[i]->nzcnt;
 
-   resize_lp_arrays(lp_data, TRUE, FALSE, add_row_num, 0, nzcnt);
+   size_lp_arrays(lp_data, TRUE, FALSE, add_row_num, 0, nzcnt);
 
    sense = lp_data->tmp.c; /* m */
    rhs = lp_data->tmp.d; /* m */

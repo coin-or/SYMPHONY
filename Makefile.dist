@@ -307,7 +307,6 @@ TM_BASIS_TESTS = FALSE
 
 TRACE_PATH = FALSE
 CHECK_CUT_VALIDITY = FALSE
-CHECK_LP = FALSE
 
 #######################################################################
 # Additional statistics
