@@ -946,7 +946,8 @@ int sym_solve(sym_environment *env)
 	 env->best_sol = env->warm_start->best_sol = 
 	    env->tm->lpp[thread_num]->best_sol;
       }else if (!env->par.multi_criteria){
-	 env->tm->lpp[thread_num]->best_sol = env->best_sol;
+	env->tm->lpp[thread_num]->best_sol = env->warm_start->best_sol = 
+	  env->best_sol;
       }
    }
 #elif defined(COMPILE_IN_TM)
@@ -1141,24 +1142,26 @@ int sym_warm_solve(sym_environment *env)
 	 cut_ws_tree_level(env->warm_start->rootnode, level);	 
 	 /* FIXME: what to do with stats? */
 	 //	 memset(&(env->warm_start->stat), 0, sizeof(problem_stat));
-      } else {
-	 index = node_limit <= rated ? node_limit : rated ;
-	 if (index < analyzed) {	    
-	    if (!index) index = 1 ;
-	    env->warm_start->stat.analyzed = env->warm_start->stat.created =
-	       env->warm_start->stat.tree_size = index;
-	    cut_ws_tree_index(env->warm_start->rootnode, index, index,
-			      &(env->warm_start->stat));
-	 }
+      } else if(rated > 0 || node_limit > 0) {
+	index = node_limit <= rated ? node_limit : rated ;
+	if (index < analyzed) {
+	  env->warm_start->stat.analyzed = env->warm_start->stat.created =
+	    env->warm_start->stat.tree_size = index;
+	  cut_ws_tree_index(env->warm_start->rootnode, index, index,
+			    &(env->warm_start->stat));
+	}
       }
+
       if(!env->par.multi_criteria){
 	 env->has_ub = FALSE;
 	 env->ub = 0.0;
       }	 
 
-      env->warm_start->has_ub = env->best_sol.has_sol = 
-	 env->warm_start->best_sol.has_sol = FALSE;
-      env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+      if(env->mip->change_num){
+	env->warm_start->has_ub = env->best_sol.has_sol = 
+	  env->warm_start->best_sol.has_sol = FALSE;
+	env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+      }
 
       for(i = 0; i < env->mip->change_num; i++){
 	 change_type = env->mip->change_type[i];
