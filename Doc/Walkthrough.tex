@@ -111,7 +111,7 @@ Read this in with the \texttt{match\_read\_data()} routine in
 \texttt{user\_main.c}:
 
 \begin{verbatim}
-int match_read_data(void *user, char *infile)
+int match_read_data(sym_environment *env, void *user, char *infile)
 {
    int i, j;
    FILE *f = NULL;
