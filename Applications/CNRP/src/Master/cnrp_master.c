@@ -787,8 +787,8 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 	 cnrp->dist.cost[INDEX(n->edges[i].v0, n->edges[i].v1)];
 #endif
    }
-   cnrp->fixed_cost = (int) (fixed_cost+0.5);
-   cnrp->variable_cost = (int) (variable_cost+0.5);
+   cnrp->fixed_cost = fixed_cost;
+   cnrp->variable_cost = variable_cost;
    
    printf("\nSolution Found:\n");
 #ifdef ADD_FLOW_VARS

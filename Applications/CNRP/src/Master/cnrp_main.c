@@ -38,8 +38,8 @@
 /*===========================================================================*/
 
 typedef struct SOLUTION_DATA{
-   int fixed_cost;
-   int variable_cost;
+   double fixed_cost;
+   double variable_cost;
    double gamma;
    double tau;
    int *tree;
@@ -143,11 +143,11 @@ int main(int argc, char **argv)
    /* Store the solution */
    tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
    memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
-   solutions[numsolutions].gamma = gamma;
-   solutions[numsolutions].tau = tau;
+   solutions[numsolutions].gamma = 1.0;
+   solutions[numsolutions].tau = 0.0;
    solutions[numsolutions].fixed_cost = cnrp->fixed_cost;
    solutions[numsolutions++].variable_cost = cnrp->variable_cost;
-   utopia_fixed = (double) cnrp->fixed_cost;
+   utopia_fixed = cnrp->fixed_cost;
       
    cnrp->lp_par.gamma = 0.0;
    cnrp->cg_par.tau = cnrp->lp_par.tau = 1.0;
@@ -164,16 +164,16 @@ int main(int argc, char **argv)
    /* Store the solution */
    tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
    memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
-   solutions[numsolutions].gamma = gamma;
-   solutions[numsolutions].tau = tau;
+   solutions[numsolutions].gamma = 0.0;
+   solutions[numsolutions].tau = 1.0;
    solutions[numsolutions].fixed_cost = cnrp->fixed_cost;
    solutions[numsolutions++].variable_cost = cnrp->variable_cost;
-   utopia_variable = (double) cnrp->variable_cost;
+   utopia_variable = cnrp->variable_cost;
 
    printf("***************************************************\n");
    printf("***************************************************\n");
-   printf("Utopia point has fixed cost %i and variable cost %i \n",
-	  (int) utopia_fixed, (int) utopia_variable);
+   printf("Utopia point has fixed cost %.3f and variable cost %.3f \n",
+	  utopia_fixed, utopia_variable);
    printf("***************************************************\n");
    printf("***************************************************\n\n");
    
@@ -204,7 +204,7 @@ int main(int argc, char **argv)
 	 ub = gamma*solutions[i].fixed_cost + tau*solutions[i].variable_cost;
 	 if (ub < p->ub){
 	    p->has_ub = TRUE;
-	    p->ub = ub;
+	    p->ub = ub - .0000001;
 	 }
       }
       
@@ -214,19 +214,41 @@ int main(int argc, char **argv)
       printf("***************************************************\n");
       printf("***************************************************\n\n");
 
-      cnrp->fixed_cost = cnrp->variable_cost = 0;
+      cnrp->fixed_cost = cnrp->variable_cost = 0.0;
       
       cnrp_solve(p, base, root);
 
-      if (cnrp->fixed_cost > solutions[solution1].fixed_cost &&
-	  cnrp->variable_cost < solutions[solution1].variable_cost &&
-	  cnrp->fixed_cost < solutions[solution2].fixed_cost &&
-	  cnrp->variable_cost > solutions[solution2].variable_cost ){
-	 if (numsolutions == 100){
-	    printf("Maximum number of solutions exceeded\n\n");
+      if (cnrp->fixed_cost == 0.0 && cnrp->variable_cost == 0.0)
+	 continue;
+
+      if (numsolutions == 100){
+	 printf("Maximum number of solutions exceeded\n\n");
+	 exit(0);
+      }
+      /* Insert new solution */
+      if (fabs(utopia_fixed - cnrp->fixed_cost) < .0000001){
+	 tree = solutions[0].tree;
+	 memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);	 
+	 solutions[0].fixed_cost = cnrp->fixed_cost;
+	 solutions[0].variable_cost = cnrp->variable_cost;
+	 if (numpairs + 2 > 100){
+	    printf("Maximum number of solution pairs exceeded\n\n");
 	    exit(0);
 	 }
-	 /* Insert new solution */
+	 pairs[numpairs].solution1 = 0;
+	 pairs[numpairs++].solution2 = 1;
+      }else if (fabs(utopia_variable - cnrp->variable_cost) < .0000001){
+	 tree = solutions[numsolutions-1].tree;
+	 memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);	 
+	 solutions[numsolutions-1].fixed_cost = cnrp->fixed_cost;
+	 solutions[numsolutions-1].variable_cost = cnrp->variable_cost;
+	 if (numpairs + 2 > 100){
+	    printf("Maximum number of solution pairs exceeded\n\n");
+	    exit(0);
+	 }
+	 pairs[numpairs].solution1 = numsolutions-2;
+	 pairs[numpairs++].solution2 = numsolutions-11;
+      }else{
 	 for (i = numsolutions; i > solution2; i--){
 	    solutions[i] = solutions[i-1];
 	 }
@@ -236,8 +258,8 @@ int main(int argc, char **argv)
 	 memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
 	 solutions[solution2].gamma = gamma;
 	 solutions[solution2].tau = tau;
-	 solutions[solution2].fixed_cost = (int) cnrp->fixed_cost;
-	 solutions[solution2].variable_cost = (int) cnrp->variable_cost;
+	 solutions[solution2].fixed_cost = cnrp->fixed_cost;
+	 solutions[solution2].variable_cost = cnrp->variable_cost;
 	 if (numpairs + 2 > 100){
 	    printf("Maximum number of solution pairs exceeded\n\n");
 	    exit(0);
@@ -248,7 +270,7 @@ int main(int argc, char **argv)
 	 pairs[numpairs++].solution2 = solution2+1;
       }
    }
-
+   
    printf("\n****************************************************\n");
    printf(  "* Found all non-dominated solutions!!!!!!!         *\n");
    printf(  "* Now displaying stats...                          *\n");
@@ -264,7 +286,7 @@ int main(int argc, char **argv)
    printf("***************************************************\n\n");
    
    for (i = 0; i < numsolutions; i++){
-      printf("Fixed Cost: %5i Variable Cost: %5i\n", solutions[i].fixed_cost,
+      printf("Fixed Cost: %.3f Variable Cost: %.3f\n", solutions[i].fixed_cost,
 	     solutions[i].variable_cost);
    }
    
