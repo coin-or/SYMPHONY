@@ -379,20 +379,10 @@ void fix_variables(lp_prob *p)
 	 PRINT(p->par.verbosity, 3,
 	       ("%i vars successfully removed from the problem ...\n",
 		del_vars));
-	 /* move 'i' to the first deleted one */
 	 for (i = p->base.varnum; i < n; i++){
 	    if (delstat[i] != -1){
-	       /* we might not need to fix all of these. check it out */
-	       /* ??????????????????????????????????????????????????? */
-	       if (delstat[i] > i){
-		  printf("\nIncompatibility with LP solver detected...\n");
-		  exit(1);
-	       }
-	       dj[delstat[i]] = dj[i];
-	       x[delstat[i]] = x[i];
 	       *(vars[delstat[i]]) = *(vars[i]);
 	       vars[delstat[i]]->colind = delstat[i];
-	       status[delstat[i]] = status[i];
 	    }
 	 }
       }

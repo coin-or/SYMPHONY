@@ -157,7 +157,7 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
    *maxnz = *nz + ((*maxm) * (*maxn) / 10);
 
    /* Allocate the arrays. These are owned by SYMPHONY after returning. */
-   *matbeg  = (int *) malloc(*maxn * ISIZE);
+   *matbeg  = (int *) malloc((*maxn + 1) * ISIZE);
    *matind  = (int *) malloc(*maxnz * ISIZE);
    *matval  = (double *) malloc(*maxnz * DSIZE);
    *obj     = (double *) malloc(*maxn * DSIZE);

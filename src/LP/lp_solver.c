@@ -228,17 +228,17 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
    OSL_check_error("load_lp_prob - ekk_newModel");
    
    for (i = 0; i < lp_data->m; i++) {
-      switch (lp_data->desc.sense[i]) {
-       case 'E': lr[i] = ur[i] = lp_data->desc.rhs[i]; break;
-       case 'L': lr[i] = - OSL_INFINITY; ur[i] = lp_data->desc.rhs[i]; break;
-       case 'G': lr[i] = lp_data->desc.rhs[i]; ur[i] = OSL_INFINITY; break;
+      switch (lp_data->desc->sense[i]) {
+       case 'E': lr[i] = ur[i] = lp_data->desc->rhs[i]; break;
+       case 'L': lr[i] = - OSL_INFINITY; ur[i] = lp_data->desc->rhs[i]; break;
+       case 'G': lr[i] = lp_data->desc->rhs[i]; ur[i] = OSL_INFINITY; break;
        case 'R':
-	 if (lp_data->desc.rngval[i] >= 0) {
-	    ur[i] = lp_data->desc.rhs[i]; 
-	    lr[i] = ur[i] - lp_data->desc.rngval[i];
+	 if (lp_data->desc->rngval[i] >= 0) {
+	    ur[i] = lp_data->desc->rhs[i]; 
+	    lr[i] = ur[i] - lp_data->desc->rngval[i];
 	 } else {
-	    ur[i] = lp_data->desc.rhs[i]; 
-	    lr[i] = ur[i] + lp_data->desc.rngval[i];
+	    ur[i] = lp_data->desc->rhs[i]; 
+	    lr[i] = ur[i] + lp_data->desc->rngval[i];
 	 }
 	 break;
        default: /* This should never happen ... */
@@ -248,11 +248,12 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
    }
    osllib_status =
       ekk_loadRimModel(lp_data->lp, lp_data->m, lr, ur, lp_data->n, 
-		       lp_data->desc.obj, lp_data->desc.lb, lp_data->desc.ub);
+		       lp_data->desc->obj, lp_data->desc->lb,
+		       lp_data->desc->ub);
    OSL_check_error("load_lp - ekk_loadRimModel");
    osllib_status =
-      ekk_addColumnElementBlock(lp_data->lp, lp_data->n, lp_data->desc.matind,
-				lp_data->desc.matbeg, lp_data->desc.matval);
+      ekk_addColumnElementBlock(lp_data->lp, lp_data->n, lp_data->desc->matind,
+				lp_data->desc->matbeg, lp_data->desc->matval);
    OSL_check_error("load_lp - ekk_addColumnElementBlock");
    /* Not sure we need this since there's only one block */
    osllib_status = ekk_mergeBlocks(lp_data->lp, 1);
@@ -336,7 +337,7 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
        case 'E': lr[i] = ur[i] = rhs[i]; break;
        case 'L': lr[i] = - OSL_INFINITY; ur[i] = rhs[i]; break;
        case 'G': lr[i] = rhs[i]; ur[i] = OSL_INFINITY; break;
-       case 'R': lr[i] = ur[i] = lp_data->desc.rhs[i]; break;
+       case 'R': lr[i] = ur[i] = lp_data->desc->rhs[i]; break;
 	 /* Range will be added later in change_range */
        default: /*This should never happen ... */
 	 osllib_status = -1;
@@ -431,6 +432,9 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 {
    int term;
 
+   ekk_mergeBlocks(lp_data->lp, 1);
+   ekk_setIiternum(lp_data->lp, 0);
+
    /*PreSolve seems to cause some problems -- not sure exactly why, but we
      leave it turned off for now. */
 #if 0
@@ -450,7 +454,11 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       OSL_check_error("dual_simplex - ekk_allSlackBasis");
    }
    
-   term = ekk_dualSimplex(lp_data->lp);
+#if 0
+   term = ekk_dualSimplex(lp_data->lp); 
+#else
+  term = ekk_simplex(lp_data->lp, 256 + 32); // no presolve and no scaling
+#endif
 
    /*Turn postSolve back on if we figure out preSolve problem */
 #if 0
@@ -831,25 +839,30 @@ void get_objcoef(LPdata *lp_data, int j, double *objcoef)
 
 void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 {
-   int i, j, m = lp_data->m, *which = lp_data->tmp.i1 + lp_data->m;
+   int i, m = lp_data->m;
+   int *which = lp_data->tmp.i1 + lp_data->m;
+   int delnum = 0;
 
    /* which = calloc(delnum, ISIZE); */
-   for (i = m - 1, j = 0; i >= 0; i--) if (free_rows[i]) which[j++] = i;
-   osllib_status = ekk_deleteRows(lp_data->lp, j, which);
+   for (i = m - 1, delnum = 0; i >= 0; i--){
+      if (free_rows[i]){
+	 which[delnum++] = i;
+      }
+   }
+   osllib_status = ekk_deleteRows(lp_data->lp, delnum, which);
    OSL_check_error("delete_rows - ekk_deleteRows");
-   /* FREE(which); */
 
 #if 0
    /* Make result as CPLEX does*/
-   for (i = 0, j = 0; i < m; i++){
+   for (i = 0, delnum = 0; i < m; i++){
       if (free_rows[i])
 	 free_rows[i] = -1;
       else
-	 free_rows[i] = j++;
+	 free_rows[i] = delnum++;
    }
 #endif
 
-   lp_data->m -= j;
+   lp_data->m -= delnum;
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
 
@@ -857,31 +870,41 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 
 int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 {
-   int i, j, n = lp_data->n, *which;
-   
-   which = (int *) calloc(delnum, ISIZE);
-   for (i = n - 1, j = 0; i >= 0; i--) {
+   int i, n = lp_data->n;
+   int *which = (int *) calloc(delnum, ISIZE);
+   int num_to_delete = 0, num_to_keep = 0;
+   double *dj = lp_data->dj;
+   double *x = lp_data->x;
+   char *status = lp_data->status;
+
+   for (i = n - 1, num_to_delete = 0; i >= 0; i--) {
       if (delstat[i]) {
-	 which[j++] = i;
+	 which[num_to_delete++] = i;
       }
    }
-   osllib_status = ekk_deleteColumns(lp_data->lp, j, which);
+
+   if (!num_to_delete) return(0);
+
+   osllib_status = ekk_deleteColumns(lp_data->lp, num_to_delete, which);
    OSL_check_error("delete_cols - ekk_deleteCols");
    FREE(which);
    
    lp_data->nz = ekk_getInumels(lp_data->lp);
    OSL_check_error("delete_cols - ekk_getInumels");
    
-   /* make result as CPLEX does */
-   for (i = 0, j = 0; i < lp_data->n; i++){
-      if (delstat[i])
+   for (i = 0, num_to_keep = 0; i < lp_data->n; i++){
+      if (delstat[i]){
 	 delstat[i] = -1;
-      else
-	 delstat[i] = j++;
+      }else{
+	 delstat[i] = num_to_keep++;
+	 dj[delstat[i]] = dj[i];
+	 x[delstat[i]] = x[i];
+	 status[delstat[i]] = status[i];
+      }
    }
    
-   lp_data->n = j;
-   return j;
+   lp_data->n = num_to_keep;
+   return (num_to_delete);
 }
 
 /*===========================================================================*/
@@ -938,26 +961,27 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    for (i = length - 1; i >= 0; i--) {
       j = index[i];
       cut = rows[j].cut;
-      switch(cut->sense) {
-      case 'E': lb[j] = ub[j] = cut->rhs; break;
-      case 'L': lb[j] = - OSL_INFINITY; ub[j] = cut->rhs; break;
-      case 'G': lb[j] = cut->rhs; ub[j] = OSL_INFINITY; break;
-      case 'R':
-	 if (lp_data->desc.rngval[j] >= 0) {
-	    ub[j] = cut->rhs; lb[j] = ub[j] - lp_data->desc.rngval[j];
+      switch (cut->sense){
+       case 'E': lb[j] = ub[j] = cut->rhs; break;
+       case 'L': lb[j] = - OSL_INFINITY; ub[j] = cut->rhs; break;
+       case 'G': lb[j] = cut->rhs; ub[j] = OSL_INFINITY; break;
+       case 'R':
+	 if (lp_data->desc->rngval[j] >= 0) {
+	    ub[j] = cut->rhs; lb[j] = ub[j] - lp_data->desc->rngval[j];
 	 } else {
-	    ub[j] = cut->rhs; lb[j] = ub[j] + lp_data->desc.rngval[j];
+	    ub[j] = cut->rhs; lb[j] = ub[j] + lp_data->desc->rngval[j];
 	 }
 	 break;
-      default: /*This should never happen ... */
+       default: /*This should never happen ... */
 	 osllib_status = -1;
 	 OSL_check_error("load_lp - unknown type of constraint");
       }
    }
    
    j = 0;
-   if (j)
+   if (j){
       ekk_free(lb);
+   }
    
    osllib_status = ekk_setRowlower(lp_data->lp, lb);
    OSL_check_error("constrain_row_set ekk_setRowLower");
@@ -1056,7 +1080,7 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
    /* realloc_lp_arrays(lp_data); */
 
    matcnt = (int *) malloc (lp_data->n*ISIZE);
-   matbeg = lp_data->desc.matbeg;
+   matbeg = lp_data->desc->matbeg;
    for (i = lp_data->n - 1; i >= 0; i--)
       matcnt[i] = matbeg[i+1] - matbeg[i];
 
@@ -1083,11 +1107,10 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
    lp_data->lp = CPXcreateprob(lp_data->cpxenv,&cpx_status,(char *) "BB_prob");
    CPX_check_error("load_lp - CPXcreateprob");
    cpx_status = CPXcopylp(lp_data->cpxenv, lp_data->lp,
-		lp_data->n, lp_data->m, 1, lp_data->desc.obj,
-		lp_data->desc.rhs, lp_data->desc.sense, lp_data->desc.matbeg,
-                matcnt, lp_data->desc.matind,
-                lp_data->desc.matval, lp_data->desc.lb, lp_data->desc.ub,
-		lp_data->desc.rngval);
+		lp_data->n, lp_data->m, 1, lp_data->desc->obj,
+		lp_data->desc->rhs, lp_data->desc->sense,lp_data->desc->matbeg,
+                matcnt, lp_data->desc->matind, lp_data->desc->matval,
+		lp_data->desc->lb, lp_data->desc->ub, lp_data->desc->rngval);
    CPX_check_error("load_lp - CPXcopylp");
    FREE(matcnt);
 #endif
@@ -1418,8 +1441,9 @@ int get_proof_of_infeas(LPdata *lp_data, int *infind)
    }else{ /* the diverging variable is structural */
       cpx_status = CPXgetlb(lp_data->cpxenv, lp_data->lp, &bd, jdiv, jdiv);
       CPX_check_error("get_proof_of_infeas - CPXgetlb");
-      if(lp_data->x)
+      if (lp_data->x){
 	 return(bd < lp_data->x[jdiv] ? LOWER_THAN_LB : HIGHER_THAN_UB);
+      }
    }
    return(0); /* fake return */
 }
@@ -1583,11 +1607,24 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 
 int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 {
+   double *dj = lp_data->dj;
+   double *x = lp_data->x;
+   char *status = lp_data->status;
+
    cpx_status = CPXdelsetcols(lp_data->cpxenv, lp_data->lp, delstat);
    CPX_check_error("delete_cols - CPXdelsetcols");
    lp_data->nz = CPXgetnumnz(lp_data->cpxenv, lp_data->lp);
    CPX_check_error("delete_cols - CPXgetnumnz");
-   lp_data->n -= delnum;
+
+   for (i = 0, num_remaining = 0; i < lp_data->n; i++){
+      if (delstat[i] != -1){
+	 dj[delstat[i]] = dj[i];
+	 x[delstat[i]] = x[i];
+	 status[delstat[i]] = status[i];
+      }
+   }
+
+   lp_data->n -= num_remaining;
 
    return(delnum);
 }
@@ -1700,8 +1737,6 @@ static bool retval = false;
 void open_lp_solver(LPdata *lp_data)
 {
    lp_data->si = new OsiXSolverInterface();
-   
-   // retval = lp_data->si->getDblParam(OsiPrimalTolerance,lp_data->lpetol);
 
    /* Turn off the OSL messages (There are LOTS of them) */
    lp_data->si->setHintParam(OsiDoReducePrint);
@@ -1726,15 +1761,15 @@ void close_lp_solver(LPdata *lp_data)
 
 void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 {
-  //cannot set the necessary parameters, check OsiCpxSolverInterface-MEN
-  //what about the alloc params?MEN
-
-  lp_data->si->loadProblem(lp_data->n, lp_data->m,
-			   lp_data->desc->matbeg, lp_data->desc->matind,
-			   lp_data->desc->matval, lp_data->desc->lb,
-			   lp_data->desc->ub, lp_data->desc->obj,
-			   lp_data->desc->sense, lp_data->desc->rhs,
-			   lp_data->desc->rngval);
+   //cannot set the necessary parameters, check OsiCpxSolverInterface-MEN
+   //what about the alloc params?MEN
+   
+   lp_data->si->loadProblem(lp_data->n, lp_data->m,
+			    lp_data->desc->matbeg, lp_data->desc->matind,
+			    lp_data->desc->matval, lp_data->desc->lb,
+			    lp_data->desc->ub, lp_data->desc->obj,
+			    lp_data->desc->sense, lp_data->desc->rhs,
+			    lp_data->desc->rngval);
 }
 
 /*===========================================================================*/
@@ -1754,53 +1789,52 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 {
    //COULD BE WARMSTARTBASIS CONSTRUCTOR OR ASSIGN BASIS? MEN
    
-   CoinWarmStartBasis * warmstart = new CoinWarmStartBasis;
+   CoinWarmStartBasis *warmstart = new CoinWarmStartBasis;
    int numcols = lp_data->n;
    int numrows = lp_data->m;
    int i;
    
    warmstart->setSize(numcols, numrows);
    
-   for(i = 0; i < numrows; i++){
-      switch(rstat[i])
-	 {
-	 case SLACK_AT_LB:
-	    warmstart->setArtifStatus(i,CoinWarmStartBasis::atLowerBound);
-	    break;
-	 case SLACK_BASIC:
-	    warmstart->setArtifStatus(i,CoinWarmStartBasis::basic);
-	    break;
-	 case SLACK_AT_UB:
-	    warmstart->setArtifStatus(i,CoinWarmStartBasis::atUpperBound);
-	    break;
-	 case SLACK_FREE:
-	    warmstart->setArtifStatus(i,CoinWarmStartBasis::isFree);
-	    break;
-	 default:
-	    break;
-	 }
-   }
-   
-   for(i = 0;i<numcols; i++){
-      switch(cstat[i]){
-      case VAR_AT_LB:
-	 warmstart->setStructStatus(i,CoinWarmStartBasis::atLowerBound);
+   for (i = 0; i < numrows; i++){
+      switch (rstat[i]){
+       case SLACK_AT_LB:
+	 warmstart->setArtifStatus(i,CoinWarmStartBasis::atLowerBound);
 	 break;
-      case VAR_BASIC:
-	 warmstart->setStructStatus(i,CoinWarmStartBasis::basic);
+       case SLACK_BASIC:
+	 warmstart->setArtifStatus(i,CoinWarmStartBasis::basic);
 	 break;
-      case VAR_AT_UB:
-	 warmstart->setStructStatus(i,CoinWarmStartBasis::atUpperBound);
+       case SLACK_AT_UB:
+	 warmstart->setArtifStatus(i,CoinWarmStartBasis::atUpperBound);
 	 break;
-      case VAR_FREE:
-	 warmstart->setStructStatus(i,CoinWarmStartBasis::isFree);
+       case SLACK_FREE:
+	 warmstart->setArtifStatus(i,CoinWarmStartBasis::isFree);
 	 break;
-      default:
+       default:
 	 break;
       }
    }
    
-   retval=lp_data->si->setWarmStart(warmstart);
+   for (i = 0; i < numcols; i++){
+      switch (cstat[i]){
+       case VAR_AT_LB:
+	 warmstart->setStructStatus(i,CoinWarmStartBasis::atLowerBound);
+	 break;
+       case VAR_BASIC:
+	 warmstart->setStructStatus(i,CoinWarmStartBasis::basic);
+	 break;
+       case VAR_AT_UB:
+	 warmstart->setStructStatus(i,CoinWarmStartBasis::atUpperBound);
+	 break;
+       case VAR_FREE:
+	 warmstart->setStructStatus(i,CoinWarmStartBasis::isFree);
+	 break;
+       default:
+	 break;
+      }
+   }
+   
+   retval = lp_data->si->setWarmStart(warmstart);
 }
 
 /*===========================================================================*/
@@ -1808,16 +1842,16 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
 {
-   CoinPackedVector * rows[rcnt];
+   CoinPackedVector *rows[rcnt];
    //  CoinPackedVector * rows = new CoinPackedVector[rcnt];
 
    double * rowrng = new double[rcnt];
    
-   int i,j, m=lp_data->m;
+   int i, j, m = lp_data->m;
    
-   for(i = 0; i < rcnt; i++){
+   for (i = 0; i < rcnt; i++){
       rows[i] = new CoinPackedVector;
-      for(j = rmatbeg[i]; j < rmatbeg[i+1]; j++){
+      for (j = rmatbeg[i]; j < rmatbeg[i+1]; j++){
 	 rows[i]->insert(rmatind[j], rmatval[j]);
 	 rowrng[i]=0;
       }
@@ -1840,13 +1874,13 @@ void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
    CoinPackedVector * cols[ccnt];
    
    int i, j;
-   for(i = 0; i < ccnt; i++){
+   for (i = 0; i < ccnt; i++){
       cols[i] = new CoinPackedVector;
-      for(j = cmatbeg[i]; j < cmatbeg[i+1]; j++)
-      cols[i]->insert(cmatind[j], cmatval[j]);
+      for (j = cmatbeg[i]; j < cmatbeg[i+1]; j++)
+	 cols[i]->insert(cmatind[j], cmatval[j]);
       lp_data->si->addCol(*(cols[i]), lb[i], ub[i], obj[i]);
    }
-
+   
    lp_data->n += ccnt;
    lp_data->nz += nzcnt;
 }
@@ -1856,7 +1890,7 @@ void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
 void change_row(LPdata *lp_data, int row_ind,
 		char sense, double rhs, double range)
 {
-   lp_data->si->setRowType(row_ind,sense,rhs,range);
+   lp_data->si->setRowType(row_ind, sense, rhs, range);
 }
 
 /*===========================================================================*/
@@ -1865,10 +1899,10 @@ void change_col(LPdata *lp_data, int col_ind,
 		char sense, double lb, double ub)
 { 
    switch (sense){
-   case 'E': change_lbub(lp_data, col_ind, lb, ub); break;
-   case 'R': change_lbub(lp_data, col_ind, lb, ub); break;
-   case 'G': change_lb(lp_data, col_ind, lb); break;
-   case 'L': change_ub(lp_data, col_ind, ub); break;
+    case 'E': change_lbub(lp_data, col_ind, lb, ub); break;
+    case 'R': change_lbub(lp_data, col_ind, lb, ub); break;
+    case 'G': change_lb(lp_data, col_ind, lb); break;
+    case 'L': change_ub(lp_data, col_ind, ub); break;
    }
 }
 
@@ -1882,19 +1916,18 @@ void change_col(LPdata *lp_data, int col_ind,
 
 int dual_simplex(LPdata *lp_data, int *iterd)
 {
-   //THERE ARE PROBLEMS HERE -- NEED TO ADD ITER NUMBER AS AN ARGUMENT??? MEN!
-   
-   //   if(lp_data->si->isAbandoned()) no advanced setting for Osi MEN
-   
-   // no setting to reach presolve status! so can not determine to close presolve! MEN!
-   
-   //  retval = lp_data->si->setHintParam(OsiDoPresolveInResolve, false); TURN OFF PRESOLVE MEN!
+   /* THERE ARE PROBLEMS HERE -- NEED TO ADD ITER NUMBER AS AN ARGUMENT??? MEN!
+      if(lp_data->si->isAbandoned()) no advanced setting for Osi MEN
+      no setting to reach presolve status! so can not determine to close
+      presolve! MEN!
+      retval = lp_data->si->setHintParam(OsiDoPresolveInResolve, false);
+      TURN OFF PRESOLVE MEN! */
    
    int term;
    
    lp_data->si->resolve();
    
-   if(lp_data->si->isProvenDualInfeasible())
+   if (lp_data->si->isProvenDualInfeasible())
       term = D_INFEASIBLE;
    else if (lp_data->si->isProvenPrimalInfeasible())
       term = D_UNBOUNDED;
@@ -1907,9 +1940,9 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    else if (lp_data->si->isAbandoned())
       term = ABANDONED;
    
-   //   if(term == D_UNBOUNDED){
-   //   retval=lp_data->si->getIntParam(OsiMaxNumIteration, itlim); 
-   //CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam()
+   /* if(term == D_UNBOUNDED){
+      retval=lp_data->si->getIntParam(OsiMaxNumIteration, itlim); 
+      CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() */
    
    lp_data->termcode = term;
    
@@ -1950,51 +1983,47 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
    
    CoinWarmStartBasis * ws = dynamic_cast<CoinWarmStartBasis*>(warmstart);
    
-   int numcols = ws->getNumStructural();   //has to be equal to or less than lp_data->n MEN
-   int numrows = ws->getNumArtificial();   //has to be equal to or less than lp_data->m MEN
-   int i;                                  //hence an assert? MEN  
+   int numcols = ws->getNumStructural();   /* has to be <= lp_data->n */
+   int numrows = ws->getNumArtificial();   /* has to be <= lp_data->m */
+   int i;                                  /* hence an assert? MEN */  
    
-   
-   //  std::cout<<std::endl<<"numcols ve numrows "<<numcols<<"  "<<numrows;
-   //  std::cout<<std::endl;
-   
-   if(rstat){
-      for(i = 0; i < numrows; i++){
-	 switch(ws->getArtifStatus(i)){
-	 case CoinWarmStartBasis::basic:
+   if (rstat){
+      for (i = 0; i < numrows; i++){
+	 switch (ws->getArtifStatus(i)){
+	  case CoinWarmStartBasis::basic:
 	    rstat[i] = SLACK_BASIC;
 	    break;
-	 case CoinWarmStartBasis::atLowerBound:
+	  case CoinWarmStartBasis::atLowerBound:
 	    rstat[i] = SLACK_AT_LB;
 	    break;
-	 case CoinWarmStartBasis::atUpperBound:
+	  case CoinWarmStartBasis::atUpperBound:
 	    rstat[i] = SLACK_AT_UB;
 	    break;
-	 case CoinWarmStartBasis::isFree:     //can it happen? MEN
+	  case CoinWarmStartBasis::isFree:     //can it happen? MEN
 	    rstat[i] = SLACK_FREE;
 	    break;
-	 default:
+	  default:
 	    break;                            //can it happen? MEN
 	 }
       }
    }
    
-   if(cstat){
-      for(i = 0;i < numcols; i++){
-	 switch(ws->getStructStatus(i)){
-	 case CoinWarmStartBasis::basic:
+   if (cstat){
+      for (i = 0; i < numcols; i++){
+	 switch (ws->getStructStatus(i)){
+	  case CoinWarmStartBasis::basic:
 	    cstat[i] = VAR_BASIC;
 	    break;
-	 case CoinWarmStartBasis::atLowerBound:
+	  case CoinWarmStartBasis::atLowerBound:
 	    cstat[i] = VAR_AT_LB;
 	    break;
-	 case CoinWarmStartBasis::atUpperBound:
+	  case CoinWarmStartBasis::atUpperBound:
 	    cstat[i] = VAR_AT_UB;
 	    break;
-	 case CoinWarmStartBasis::isFree:  
+	  case CoinWarmStartBasis::isFree:  
 	    cstat[i] = VAR_FREE;
 	    break;
-	 default:
+	  default:
 	    break;                            //can it happen? MEN
 	 }
       }
@@ -2010,8 +2039,6 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
 
 void set_obj_upper_lim(LPdata *lp_data, double lim)
 {
-   //IS OBJ ALWAYS MIN? MEN
-   
    OsiDblParam key = OsiPrimalObjectiveLimit;
    
    retval = lp_data->si->setDblParam(key, lim);
@@ -2031,8 +2058,6 @@ void set_itlim(LPdata *lp_data, int itlim)
    OsiIntParam key = OsiMaxNumIteration;
    
    retval = lp_data->si->setIntParam(key, itlim);
-   
-   //if(itlim<0) doesn't seem to be appear in setIntParam of Osi???MEN
 }
 
 /*===========================================================================*/
@@ -2040,40 +2065,29 @@ void set_itlim(LPdata *lp_data, int itlim)
 void get_column(LPdata *lp_data, int j,
 		double *colval, int *colind, int *collen, double *cj)
 {
-   const CoinPackedMatrix * matrixByCol = lp_data->si->getMatrixByCol();
-   
-   //  matrixByCol = lp_data->si->getMatrixByCol();
+   const CoinPackedMatrix *matrixByCol = lp_data->si->getMatrixByCol();
    
    int nc = matrixByCol->getNumCols();
-   // const double * matval = new double[nc];  
-   //const int * matind = new int[nc]; 
    
-   const double * matval = matrixByCol->getElements();
-   const int * matind = matrixByCol->getIndices(); 
-   
-   
-   //  matval=matrixByCol->getElements();
-   //  matind=matixByCol->getIndices();
+   const double *matval = matrixByCol->getElements();
+   const int *matind = matrixByCol->getIndices(); 
    
    *collen=matrixByCol->getVectorSize(j);
    
    int matbeg = 0;
    
-   for (int i=0;i<j;i++)
+   for (int i = 0; i < j; i++)
       matbeg+= matrixByCol->getVectorSize(j);
    
    
-   for(int i = 0; i < (*collen); i++){
+   for (int i = 0; i < (*collen); i++){
       colval[i] = matval[matbeg+i];
       colind[i] = matind[matbeg+i];
    }
    
-   // double * objval= new double [nc];
-   // objval=lp_data->si->getObjCoefficients();
-   
    const double * objval = lp_data->si->getObjCoefficients();
    
-   *cj=objval[j];
+   *cj = objval[j];
 }
 
 /*===========================================================================*/
@@ -2081,18 +2095,9 @@ void get_column(LPdata *lp_data, int j,
 void get_row(LPdata *lp_data, int i,
 	     double *rowval, int *rowind, int *rowlen)
 {
-   //  CoinPackedMatrix * matrixByRow = new CoinPackedMatrix;
-   
-   //matrixByRow = lp_data->si->getMatrixByRow();
-
    const CoinPackedMatrix * matrixByRow = lp_data->si->getMatrixByRow();
   
    int nr = matrixByRow->getNumRows();
-   //  double * matval = new double[nr];  
-   //  int * matind = new int[nr]; 
-   //  matval=matrixByRow->getElements();
-   //  matind=matrixByRow->getIndices();
-   
    
    const double * matval = matrixByRow->getElements();  
    const int * matind = matrixByRow->getIndices(); 
@@ -2103,7 +2108,7 @@ void get_row(LPdata *lp_data, int i,
    
    for (j = 0; j < i; j++)
       matbeg += matrixByRow->getVectorSize(i);
-
+   
    for (j = 0; j < (*rowlen); j++){
       rowval[j] = matval[matbeg+j];
       rowind[j] = matind[matbeg+j];
@@ -2146,68 +2151,71 @@ void get_dj_pi(LPdata *lp_data)
 
 void get_slacks(LPdata *lp_data)
 {
-  int m = lp_data->m, i = 0;
-  double * slacks = lp_data->slacks;
-  constraint *rows = lp_data->rows;
-
-  const double * rowActivity = lp_data->si->getRowActivity();
-  
-  for (i = m - 1; i >= 0; i--) {
-     if ((rows[i].cut->sense == 'R') && (rows[i].cut->range < 0) ) {
-	slacks[i] = - rows[i].cut->rhs + rowActivity[i];
-     } else {
-	slacks[i] = rows[i].cut->rhs - rowActivity[i];
-     }
-  }
-
-  lp_data->slacks = slacks;
+   int m = lp_data->m, i = 0;
+   double * slacks = lp_data->slacks;
+   constraint *rows = lp_data->rows;
+   
+   const double * rowActivity = lp_data->si->getRowActivity();
+   
+   for (i = m - 1; i >= 0; i--) {
+      if ((rows[i].cut->sense == 'R') && (rows[i].cut->range < 0) ) {
+	 slacks[i] = - rows[i].cut->rhs + rowActivity[i];
+      } else {
+	 slacks[i] = rows[i].cut->rhs - rowActivity[i];
+      }
+   }
+   
+   lp_data->slacks = slacks;
 }
 
 /*===========================================================================*/
 
 void change_range(LPdata *lp_data, int rowind, double value)
 {
-   double rhs=lp_data->si->getRightHandSide()[rowind]; //IS THIS VALID FOR RANGES? MEN
+   /* IS THIS VALID FOR RANGES? MEN */
+   double rhs = lp_data->si->getRightHandSide()[rowind]; 
 
-  lp_data->si->setRowType(rowind,'R', rhs, value);
+   lp_data->si->setRowType(rowind,'R', rhs, value);
 }
 
 /*===========================================================================*/
 
 void change_rhs(LPdata *lp_data, int rownum, int *rhsind, double *rhsval)
 {
-   const int * indexFirst = rhsind; 
-   const int * indexLast = rhsind + rownum;
-   char * senseList = new char[rownum]; 
-   double * rangeList = NULL; 
+   char *sense = lp_data->tmp.c; 
+   double *range = lp_data->tmp.d; 
    int i;
 
-   for(i = 0; i < rownum; i++){
-      senseList[i]=lp_data->si->getRowSense()[rhsind[i]];
-      if (senseList[i]=='R')
-	 rangeList[i]=lp_data->si->getRowRange()[rhsind[i]];
+   for (i = 0; i < rownum; i++){
+      sense[i] = lp_data->si->getRowSense()[rhsind[i]];
+      if (sense[i] == 'R'){
+	 range[i] = lp_data->si->getRowRange()[rhsind[i]];
+      }
    }
    
-   lp_data->si->setRowSetTypes(indexFirst,indexLast,senseList,rhsval,rangeList);
+   lp_data->si->setRowSetTypes(rhsind, rhsind + rownum, sense, rhsval, range);
 }
 
 /*===========================================================================*/
 
 void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 {
-  const int * indexFirst = index; 
-  const int * indexLast = index + cnt;
-  double * rhsList = new double[cnt]; 
-  double * rangeList = NULL; 
+  double *rhs = lp_data->tmp.d; 
+  double *range = (double *) calloc(cnt, DSIZE);
+  char range_used = FALSE;
   int i; 
 
   for (i = 0; i < cnt; i++){
-     rhsList[i] = lp_data->si->getRightHandSide()[index[i]];
+     rhs[i] = lp_data->si->getRightHandSide()[index[i]];
      if (sense[i] == 'R')
-	rangeList[i] = lp_data->si->getRowRange()[index[i]];
+	range[i] = lp_data->si->getRowRange()[index[i]];
+  }
+
+  if (!range_used){
+     FREE(range);
   }
   
-  lp_data->si->setRowSetTypes(indexFirst, indexLast, sense, rhsList, rangeList);
+  lp_data->si->setRowSetTypes(index, index + cnt, sense, rhs, range);
 }
 
 /*===========================================================================*/
@@ -2217,20 +2225,20 @@ void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
    int i;
  
    for (i = 0; i < cnt; i++){
-      switch(lu[i])
-	 {
-	 case 'L': lp_data->si->setColLower(index[i],bd[i]); 
-	    break;
-	 case 'U': lp_data->si->setColUpper(index[i],bd[i]); 
-	    break;
-	 default:
-	    std::cout<<std::endl<<"defualt'da var!";
-	    //default: can it happen? MEN
-	 }
+      switch (lu[i]){
+       case 'L':
+	 lp_data->si->setColLower(index[i], bd[i]); 
+	 break;
+       case 'U':
+	 lp_data->si->setColUpper(index[i], bd[i]); 
+	 break;
+       default:
+	 /* default: can't happen */
+	 break;
+      }
    }
    
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
-
 }
 
 /*===========================================================================*/
@@ -2238,104 +2246,101 @@ void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
 void change_lbub(LPdata *lp_data, int j, double lb, double ub)
 {
    lp_data->si->setColBounds(j,lb,ub);
+   lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
 
 /*===========================================================================*/
 
 void change_ub(LPdata *lp_data, int j, double ub)
 {
-  lp_data->si->setColUpper(j,ub);
+   lp_data->si->setColUpper(j,ub);
+   lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
 
 /*===========================================================================*/
 
 void change_lb(LPdata *lp_data, int j, double lb)
 {
-  lp_data->si->setColLower(j,lb);
+   lp_data->si->setColLower(j,lb);
+   lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
 
 /*===========================================================================*/
 
 void get_ub(LPdata *lp_data, int j, double *ub)
 {
-  *ub=lp_data->si->getColUpper()[j];
+   *ub=lp_data->si->getColUpper()[j];
 }
 
 /*===========================================================================*/
 
 void get_lb(LPdata *lp_data, int j, double *lb)
 {
-  *lb=lp_data->si->getColUpper()[j];
+   *lb=lp_data->si->getColUpper()[j];
 }
 
 /*===========================================================================*/
 
 void get_objcoef(LPdata *lp_data, int j, double *objcoef)
 {
-  *objcoef=lp_data->si->getObjCoefficients()[j];
+   *objcoef=lp_data->si->getObjCoefficients()[j];
 }
 
 /*===========================================================================*/
 
 void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 {
-  //What to do with all of these stuff? MEN! what is deletable? # of rows to be deleted?
+   /* What to do with all of these stuff? MEN!
+      what is deletable? # of rows to be deleted? */
+   
    int i, m = lp_data->m;
-   
-   int * rowIndices = new int[deletable];    //dimension?
+   int *which = lp_data->tmp.i1 + lp_data->m;
    int delnum = 0;
-   CoinFillN(rowIndices, deletable, 0);
    
-   for(i = 0; i < m; i++){
-      if(free_rows[i]){
-	 rowIndices[delnum++] = i;
+   CoinFillN(which, deletable, 0);
+   
+   for (i = 0; i < m; i++){
+      if (free_rows[i]){
+	 which[delnum++] = i;
       }
    }
    
-   lp_data->si->deleteRows(delnum, rowIndices);
-   //   lp_data->m = m;
+   lp_data->si->deleteRows(delnum, which);
    lp_data->m -= delnum;
-   //MAY NOT BE CORRECT! COPY FROM delete_cols routine. MEN!
 }
 
 /*===========================================================================*/
 
 int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 {
-   //WHAT TO DO WITH>? MEN
-   
-   int i;
-   int m = lp_data->m;
-   
-   int * rowIndices = new int[delnum];    //dimension?
-   int j, num = 0;
-   int n = lp_data->n;
-   int retnum;
+   int i, m = lp_data->m, n = lp_data->n;
+   int *which = (int *) calloc(delnum, ISIZE);
+   int num_to_delete = 0, num_to_keep = 0;
+   char *status = lp_data->status;
 
-   //   CoinFillN(rowIndices,delnum,0);
-  
-   for (i = n-1; i >= 0; i--){
+   for (i = n - 1; i >= 0; i--){
       if (delstat[i]){
-	 rowIndices[num++]=i;
+	 which[num_to_delete++]=i;
       }
    }
 
-   //   std::cout<<std::endl<<"num is: "<<num;
+   lp_data->si->deleteCols(num_to_delete, which);
+   lp_data->nz = lp_data->si->getNumElements();
+   FREE(which);
 
-   for (i = 0, retnum = 0; i < lp_data->n; i++){
+   /* make result as CPLEX does */
+   for (i = 0, num_to_keep = 0; i < lp_data->n; i++){
       if (delstat[i]){
 	 delstat[i] = -1;
       }else{
-	 delstat[i] = retnum++;
+	 delstat[i] = num_to_keep++;
+	 status[delstat[i]] = status[i];
       }
    }
 
-   lp_data->si->deleteCols(num,rowIndices);
-   lp_data->nz=lp_data->si->getNumElements();
+   lp_data->n = num_to_keep;
 
-   lp_data->n = retnum;
-
-   return(retnum);
+   return(num_to_delete);
 }
 
 /*===========================================================================*/
@@ -2350,57 +2355,71 @@ void release_var(LPdata *lp_data, int j, int where_to_move)
 
 void free_row_set(LPdata *lp_data, int length, int *index)
 {
-  const int * indexFirst = index; 
-  const int * indexLast = index + length;
-  char * senseList = new char[length]; 
-  double * rhsList = new double[length]; 
-  double * rangeList = new double[length]; 
-  int i; 
+   char *sense = lp_data->tmp.c; /* m (now) */
+   double *rhs = lp_data->tmp.d; /* m */
+   double *range = (double *) calloc(length, DSIZE);
+   char range_used = FALSE;
+   int i; 
+   
+   for (i = 0; i < length; i++){
+      rhs[i] = lp_data->si->getRightHandSide()[index[i]];
+      sense[i] = lp_data->si->getRowSense()[index[i]];
+      if (sense[i] =='R'){
+	 range[i] = lp_data->si->getRowRange()[index[i]];
+      }
+   }
+   
+   for (i = 0; i < length; i++) {
+      switch (sense[i]){
+       case 'E':
+	 rhs[i] = lp_data->si->getInfinity();
+	 sense[i] = 'L';
+	 break;
+       case 'L':
+	 rhs[i] = lp_data->si->getInfinity(); 
+	 break;
+       case 'R':
+	 range[i] = 2*lp_data->si->getInfinity();
+	 range_used = TRUE;
+	 break;
+       case 'G':
+	 rhs[i] = -lp_data->si->getInfinity();
+      }
+   }
 
-  for (i = 0; i < length; i++){
-     rhsList[i] = lp_data->si->getRightHandSide()[index[i]];
-     senseList[i] = lp_data->si->getRowSense()[index[i]];
-     if (senseList[i] =='R')
-	rangeList[i] = lp_data->si->getRowRange()[index[i]];
-  }
-
-  for (i = 0; i < length; i++) {
-     switch (senseList[i]){
-     case 'E':rhsList[i] = lp_data->si->getInfinity();
-	senseList[i]='L';
-	break;
-     case 'L':rhsList[i] = lp_data->si->getInfinity(); 
-	break;
-     case 'R':rangeList[i] = 2*lp_data->si->getInfinity();
-	break;
-	case'G':rhsList[i] = -lp_data->si->getInfinity();
-     }
-  }
-  lp_data->si->setRowSetTypes(indexFirst,indexLast,senseList,rhsList,rangeList);
+   if (!range_used){
+      FREE(range);
+   }
+   
+   lp_data->si->setRowSetTypes(index, index + length, sense, rhs, range);
 }
 
 /*===========================================================================*/
 
 void constrain_row_set(LPdata *lp_data, int length, int *index)
 {
+   char *sense = lp_data->tmp.c; /* m (now) */
+   double *rhs = lp_data->tmp.d; /* m */
+   double *range = (double *) calloc(length, DSIZE);
+   constraint *rows = lp_data->rows;
+   cut_data *cut;
+   char range_used = FALSE;
    int i;
-   const int * indexFirst = index; 
-   const int * indexLast = index + length;
-   char * senseList = new char[length]; 
-   double * rhsList = new double[length]; 
-   double * rangeList = NULL; 
-   constraint * rows = lp_data->rows;
-   cut_data*cut;
    
    for (i = length - 1; i >= 0; i--){
       cut = rows[index[i]].cut;
-      rhsList[i] = cut->rhs;  
-      if ((senseList[i] = cut->sense) == 'R'){
-	 rangeList[i] = cut->range;
+      rhs[i] = cut->rhs;  
+      if ((sense[i] = cut->sense) == 'R'){
+	 range[i] = cut->range;
+	 range_used = TRUE;
       }
    }
+
+   if (!range_used){
+      FREE(range);
+   }
    
-  lp_data->si->setRowSetTypes(indexFirst,indexLast,senseList,rhsList,rangeList);
+   lp_data->si->setRowSetTypes(index, index + length, sense, rhs, range);
 }
 
 /*===========================================================================*/

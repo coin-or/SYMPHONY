@@ -297,7 +297,7 @@ int create_lp_u(lp_prob *p)
    load_lp_prob(lp_data, p->par.scaling, p->par.fastmip);
 
    /* Free the user's description */
-   /* free_lp_desc(lp_data->desc); */
+   free_lp_desc(lp_data->desc);
 
    if (desc->cutind.size > 0 && user_res == USER_NO_PP){
       unpack_cuts_u(p, CUT_FROM_TM, UNPACK_CUTS_SINGLE,

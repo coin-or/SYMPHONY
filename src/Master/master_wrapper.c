@@ -362,7 +362,7 @@ void display_solution_u(problem *p, int thread_num)
 #endif
    
    if (!sol.xlength){
-      printf("\nNo Solution Found");
+      printf("\nNo Solution Found\n\n");
       return;
    }
 
