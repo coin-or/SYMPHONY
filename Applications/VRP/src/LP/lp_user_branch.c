@@ -23,6 +23,9 @@
 #include "qsortucb.h"
 #include "lp_user.h"
 #include "lp_u.h"
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#include "lp.h"
+/*___END_EXPERIMENTAL_SECTION___*/
 #include "vrp_macros.h"
 #include "vrp_const.h"
 #include "timemeas.h"

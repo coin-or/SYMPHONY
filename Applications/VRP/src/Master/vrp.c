@@ -261,7 +261,7 @@ int user_init_draw_graph(void *user, int dg_id)
       mult = (int) MIN((width - 20.0)/xx, (height-20.0)/yy);
       width = (int) (xx * mult + 30);
       height = (int) (yy * mult + 30);
-      for (i=vrp->vertnum-1; i>=0; i--){
+      for (i = vrp->vertnum-1; i >= 0; i--){
 	 posx[i] = (int) ((posx[i] - minx) * mult + 10);
 	 posy[i] = (int) ((maxy - posy[i]) * mult + 10);
       }

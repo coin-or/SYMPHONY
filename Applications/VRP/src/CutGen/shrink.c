@@ -220,9 +220,8 @@ int greedy_shrinking1(network *n, double truck_cap, double etol,
 	       new_cut->type = (set_size < vertnum/2 ?
 				SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
 	       new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
-				RHS((int) set_size, (int) set_demand,
-				    (int) truck_cap):
-				2*BINS((int) set_demand, (int) truck_cap));
+			       RHS((int)set_size,(int)set_demand,(int)truck_cap):
+			       2*BINS((int)set_demand, (int)truck_cap));
 	       for (k = 0, cutpt = cut_list; k < num_cuts; k++,
 		       cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char)))
@@ -364,10 +363,8 @@ int greedy_shrinking6(network *n, double truck_cap, double etol,
 	       new_cut->type = (set_size < vertnum/2 ?
 				SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
 	       new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
-				RHS((int) set_size, (int) set_demand,
-				    (int) truck_cap):
-				2*BINS((int) set_demand, (int) truck_cap));
-	       
+			       RHS((int)set_size,(int)set_demand,(int)truck_cap):
+			       2*BINS((int)set_demand, (int)truck_cap));
 	       for (k = 0, cutpt = cut_list; k < num_cuts; k++,
 		       cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
@@ -481,9 +478,8 @@ int greedy_shrinking1_one(network *n, double truck_cap, double etol,
 	    new_cut->type = (set_size < vertnum/2 ?
 			     SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
 	    new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
-			     RHS((int) set_size, (int) set_demand,
-				 (int) truck_cap):
-			     2*BINS((int) set_demand, (int) truck_cap));
+			     RHS((int)set_size,(int)set_demand,(int)truck_cap):
+			     2*BINS((int)set_demand,(int)truck_cap));
 	    for (k = 0, cutpt = cut_list; k < num_cuts; k++,
 		    cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char)))
@@ -520,9 +516,9 @@ int greedy_shrinking1_one(network *n, double truck_cap, double etol,
 	    new_cut->type = (complement_size < vertnum/2 ?
 			     SUBTOUR_ELIM_SIDE : SUBTOUR_ELIM_ACROSS);
 	    new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
-			     RHS((int) complement_size, (int)complement_demand,
-				 (int) truck_cap):
-			     2*BINS((int) complement_demand, (int) truck_cap));
+			     RHS((int)complement_size,(int)complement_demand,
+				 (int)truck_cap):
+			     2*BINS((int)complement_demand,(int)truck_cap));
 	    for (k=0, cutpt = cut_list; k < num_cuts; k++,
 		    cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
@@ -646,10 +642,8 @@ int greedy_shrinking6_one(network *n, double truck_cap,
 	    new_cut->type = (set_size < vertnum/2 ?
 			     SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
 	    new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
-			     RHS((int) set_size, (int) set_demand,
-				 (int) truck_cap):
-			     2*BINS((int) set_demand, (int) truck_cap));
-	   
+			     RHS((int)set_size, (int)set_demand, (int)truck_cap):
+			     2*BINS((int)set_demand, (int)truck_cap));
 	    for (k = 0, cutpt = cut_list; k < num_cuts; k++,
 		    cutpt += new_cut->size)
 	       if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
@@ -685,9 +679,9 @@ int greedy_shrinking6_one(network *n, double truck_cap,
 	    new_cut->type = (complement_size  < vertnum/2 ?
 			     SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
 	    new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
-			     RHS((int) complement_size, (int)complement_demand,
-				 (int) truck_cap):
-			     2*BINS((int) complement_demand, (int) truck_cap));
+			     RHS((int)complement_size,(int)complement_demand,
+				 (int)truck_cap):
+			     2*BINS((int)complement_demand,(int)truck_cap));
 	    for (k = 0, cutpt = cut_list; k < num_cuts; k++,
 		    cutpt += new_cut->size)
 	       if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
@@ -809,9 +803,8 @@ int greedy_shrinking2_one(network *n, double truck_cap,
 	    new_cut->type = (set_size < vertnum/2 ?
 			     SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
 	    new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
-			     RHS((int) set_size, (int) set_demand,
-				 (int) truck_cap):
-			     2*BINS((int) set_demand, (int) truck_cap));
+			     RHS((int)set_size, (int)set_demand, (int)truck_cap):
+			     2*BINS((int)set_demand, (int)truck_cap));
 	    num_cuts += cg_send_cut(new_cut);
 	 }
 
@@ -837,10 +830,9 @@ int greedy_shrinking2_one(network *n, double truck_cap,
 	    new_cut->type = (complement_size  < vertnum/2 ?
 			     SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
 	    new_cut->rhs =  (new_cut->type == SUBTOUR_ELIM_SIDE ?
-			     RHS((int) complement_size, (int)complement_demand,
-				 (int) truck_cap):
-			     2*BINS((int) complement_demand, (int) truck_cap));
-	    
+			     RHS((int)complement_size,(int)complement_demand,
+				 (int)truck_cap):
+			     2*BINS((int)complement_demand,(int)truck_cap));
 	    num_cuts += cg_send_cut(new_cut);
 	 }
 	 
