@@ -38,7 +38,7 @@
 # library. 
 ##############################################################################
 
-ARCH = CYGWIN
+ARCH = LINUX
 
 ##############################################################################
 # If you have PVM installed, this will set the variable ARCH automatically.
