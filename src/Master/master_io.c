@@ -61,9 +61,9 @@ void usage(void)
 		"-e n: allow a max of 'n' cut pools",
 		"-l n k: load balance level 'n' and iterations 'k'",
    		"-i n: allow a max of 'n' iterations in presolve",
-		"-f file: read parameters from parameter file 'file'");
+		"-f file: read parameters from parameter file 'file'",
 		"-j 0/1: whether or not to generate cgl cuts",
-   		"-z n: set diving threshold to 'n'",
+   		"-z n: set diving threshold to 'n'");
 	 printf("Type 'master -H' to get help for user options\n\n");
 }
 

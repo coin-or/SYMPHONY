@@ -75,6 +75,10 @@ fields that must be filled out to describe a subproblem.\\
 \item [\texttt{int n} --] The number of columns.
 \item [\texttt{int m} --] The number of rows.
 \item [\texttt{int nz} --] The number of nonzeros.
+\item [\texttt{double obj_offset} --] Constant to be added to the objective
+function value when printed out.
+\item [\texttt{char obj_sense} --] Objective sense (set to \texttt{MAXIMIZE}
+or \texttt{MINIMIZE}).
 \item [\texttt{char *is\_int} --] Indicates which variables are required to be 
 integer.
 \item [\texttt{int *matbeg} -- ] The array containing the starting positions
@@ -211,7 +215,7 @@ data will have been copied into appropriate locations in the master function
 Section }{)}{user_send_lp_data}. The two cases can be handled by means of {\tt
 \#ifdef} statements. See comments in the source code stubs for more details.
 
-Here, the user must receive here all problem-specific information sent from
+Here, the user must receive all problem-specific information sent from
 the master, set up necessary data structures, etc. Note that the data must be
 received in exactly the same order as it was sent in \hyperref{{\tt
 user\_send\_lp\_data()}} {{\tt user\_send\_lp\_data()} (see Section
@@ -233,7 +237,8 @@ structure. \\
 {\tt USER\_DEFAULT} & User did not send any data. \\
 \et
 
-\item[Wrapper invoked from:] {\tt lp\_initialize()} at process start.
+\item[Wrapper invoked from:] 
+{\tt lp\_initialize()} at process start.
 
 \ed
 
@@ -245,7 +250,7 @@ structure. \\
 
 \functiondef{user\_create\_subproblem}
 \begin{verbatim}
-int user_create_subproblem(void *user, MIPdesc *mip, int *indices, 
+int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
                            int *maxn, int *maxm, int *maxnz)
 \end{verbatim}
 
@@ -272,13 +277,18 @@ solver. However, if the user has an idea as to the maximum number of variables
 and constraints that are likely to be generated during processing of the
 subproblem, this information can be passed to SYMPHONY in the variables
 \texttt{*maxn}, \texttt{*maxm}, and \texttt{*maxnz}. These numbers are only
-estimates that SYMPHONY can use to perform memory allocation. They do not
-have to be exact numbers. In fact, these estimates need not be provided at
-all. \\
+estimates that SYMPHONY can use to perform memory allocation. They do not have
+to be exact numbers. In fact, these estimates need not be provided at all. The
+\texttt{obj_sense} and \texttt{obj_offset} fields are set globally in the
+function \hyperref{{\tt user\_initialize\_root\_node()}} {{\tt
+user\_initialize\_root\_node()} (see
+Section}{)}{user_initialize_root_node}. Setting them here will have no
+effect.\\
 \\
-Note that, the user should return ``DEFAULT'' if an MPS or GLPMPL/AMPL file
-was read in to describe the original MIP. \BB\ will allocate the corresponding
-arrays and specify the constraint matrix automatically in this case.
+Note that, the user should return ``USER_DEFAULT'' if an MPS or GMPL/AMPL 
+file was read in to describe the original MIP. \BB\ will allocate the 
+corresponding arrays and specify the constraint matrix automatically in this 
+case.
 
 \args
 
@@ -325,7 +335,7 @@ invoked when setting up a the initial search node in a chain.
 \begin{verbatim}
 int user_is_feasible(void *user, double lpetol, int varnum, int
                      *indices, double *values, int *feasible, 
-		     double *true_objval)
+                     double *objval)
 \end{verbatim}
 
 \bd
@@ -352,7 +362,7 @@ current solution.\\
 & & \\
 {\tt int *feasible} & OUT & Feasibility status of the solution ({\tt
 NOT\_FEASIBLE}, or {\tt FEASIBLE}). \\
-{\tt double *true\_objval} & OUT & The user can return the ``true'' objective
+{\tt double *objval} & OUT & The user can return the ``true'' objective
 function value of the solution in the case it is feasible, i.e., eliminating
 the round-off error.
 \et
@@ -433,12 +443,12 @@ unless overridden by the user.\\
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% user_display_solution
+% user_display_lp_solution
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{user\_display\_solution}
+\functiondef{user\_display\_lp\_solution}
 \begin{verbatim}
-int user_display_solution(void *user, int which_sol,
+int user_display_lp_solution(void *user, int which_sol,
                           int varnum, int *indices, double *values)
 \end{verbatim}
 
@@ -612,7 +622,7 @@ valuesunless the return code is {\tt USER\_DEFAULT}.
 {\tt USER\_ERROR} & Error. {\tt DEFAULT} is used. \\
 {\tt USER\_SUCCESS} & The user filled out {\tt *action} (and possibly {\tt
 *cand\_num} and {\tt *candidates}). \\
-{\tt USER\_DEFAULT} & action is set to the value of the parameter {\tt
+{\tt USER\_DEFAULT} & Action taken is controlled by the parameter {\tt
 shall\_we\_branch\_default}, which is initially
 {\tt USER\_\_BRANCH\_IF\_MUST} unless overridden by the user. \\ 
 \et
@@ -804,6 +814,7 @@ values close to one and with low objective function coefficients.\\
 \label{user_compare_candidates}
 \begin{verbatim}
 int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
+                            double ub, double granularity, 
                             int *which_is_better)
 \end{verbatim}
 
@@ -843,6 +854,8 @@ the pre-solved LP relaxations are compared.
 & & \\
 {\tt branch\_obj *can1} & IN & One of the candidates to be compared.\\
 {\tt branch\_obj *can2} & IN & The other candidate to be compared. \\
+{\tt double ub} & IN & The current best upper bound. \\
+{\tt double granularity} & IN & Defined tolerance  \\
 {\tt int *which\_is\_better} & OUT & The user's choice. See the description
 above. \\
 \et
@@ -925,7 +938,6 @@ other prefers the child with the higher objective function value.
 {\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\
 & & \\
 {\tt int ub} & IN & The current best upper bound. \\
-{\tt double etol} & IN & Epsilon tolerance. \\
 {\tt branch\_obj *can} & IN & The branching candidate. \\
 & & \\
 {\tt char *action} & OUT & Array of actions for the children. The array is
@@ -970,7 +982,7 @@ objective value of their pre-solved LP relaxation.
 \functiondef{user\_print\_branch\_stat}
 \begin{verbatim}
 int user_print_branch_stat(void *user, branch_obj *can, cut_data *cut,
-                           char *action)
+                           int n, var_desc **vars, char *action)
 \end{verbatim}
 
 \bd
@@ -992,6 +1004,8 @@ printed out to the standard output by \BB.
 {\tt branch\_obj *can} & IN & The branching candidate. \\
 {\tt cut\_data *cut} & IN & The description of the cut if the
 branching object is a cut. \\
+{\tt int n} & IN & Number of variables. \\
+{\tt var_desc **vars} & IN & Array of variables in the current relaxation.\\
 {\tt char *action} & IN & Array of actions for the children. \\
 \et
 
@@ -1000,7 +1014,7 @@ branching object is a cut. \\
 \bt{lp{300pt}}
 {\tt USER\_ERROR} & Error. Ignored by \BB. \\
 {\tt USER\_SUCCESS} & The user printed out whatever she wanted to. \\
-{\tt USER\_DEFAULT} & SYMPHONY prints out is own branching information. \\
+{\tt USER\_DEFAULT} & SYMPHONY prints out its own branching information. \\
 \et
 
 \item[Wrapper invoked from:] {\tt branch()} after the best candidate has been
@@ -1117,7 +1131,7 @@ is different from all the old ones, then it is added to the local pool.
 \functiondef{user\_unpack\_cuts}
 \label{user_unpack_cuts}
 \begin{verbatim}
-int user_unpack_cuts(void *user, int from, int one_row_only, int varnum, 
+int user_unpack_cuts(void *user, int from, int type, int varnum, 
                      var_desc **vars, int cutnum, cut_data **cuts,
                      int *new_row_num, waiting_row ***new_rows)
 \end{verbatim}
@@ -1149,7 +1163,7 @@ cuts.
 {\tt void *user} & IN & Pointer to the user-defined LP data structure. \\
 & & \\
 {\tt int from} & IN & See below in ``Notes''. \\
-{\tt int one\_row\_only} & IN & {\tt UNPACK\_CUTS\_SINGLE} or {\tt
+{\tt int type} & IN & {\tt UNPACK\_CUTS\_SINGLE} or {\tt
 UNPACK\_CUTS\_MULTIPLE} (see notes below). \\
 {\tt int varnum} & IN & The number of variables. \\
 {\tt var\_desc **vars} & IN & The variables currently in the problem. \\
@@ -1303,7 +1317,7 @@ what he has packed here.
 \functiondef{user\_logical\_fixing}
 \begin{verbatim}
 int user_logical_fixing(void *user, int varnum, var_desc **vars, 
-                        double *x, char *status)
+                        double *x, char *status, int *num_fixed)
 \end{verbatim}
 
 \bd
@@ -1331,6 +1345,7 @@ relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\
 {\tt double *x} & IN & Values of the above variables.\\
 {\tt char *status} & INOUT & Stati of variables currently in the LP
 relaxation. \\
+{\tt int *num_fixed} & OUT & Number of fixed variables.\\
 \et
 
 \returns
@@ -1442,8 +1457,8 @@ generate\_what} is {\tt GENERATE\_REAL\_NEXTIND}.
 \functiondef{user\_generate\_cuts\_in\_lp}
 \begin{verbatim}
 int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
-			     var_desc **vars, double *x, int *new_cut_num,
-			     cut_data ***new_cuts)
+                             var_desc **vars, double *x, int *new_row_num,
+                             cut_data ***cuts)
 \end{verbatim}
 
 \bd
@@ -1456,7 +1471,7 @@ called directly from the LP solver. One example of when this might be done is
 when generating Gomory cuts or something else that requires knowledge of the
 current LP tableau. The user must return the list of generated cuts by
 allocating an array of \texttt{cut\_data} structures and setting
-\texttt{*new\_cuts} to point to this array. Post-processing consists of
+\texttt{*cuts} to point to this array. Post-processing consists of
 checking if any of the new cuts are already in the local pool (or dominated by
 a cut in the local pool).
 
@@ -1471,8 +1486,8 @@ storing the LP relaxation and related data. \\
 relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\
 {\tt var\_desc **vars} & IN & The variables currently in the LP relaxation.\\
 {\tt double *x} & IN & Values of the above variables.\\
-{\tt int *new\_cut\_num} & OUT & The number of cuts generated. \\
-{\tt cut\_data ***new\_cuts} & OUT & The cuts and the corresponding rows. \\
+{\tt int *new\_row\_num} & OUT & The number of cuts generated. \\
+{\tt cut\_data ***cuts} & OUT & The cuts and the corresponding rows. \\
 \et
 
 \returns
@@ -1558,7 +1573,7 @@ add and after the cuts have been selected from the local pool.
 \functiondef{user\_purge\_waiting\_rows}
 \begin{verbatim}
 int user_purge_waiting_rows(void *user, int rownum,
-                            waiting_row **rows, char *delete)
+                            waiting_row **rows, char *delete_rows)
 \end{verbatim}
 
 \bd
@@ -1568,7 +1583,7 @@ The local pool is purged from time to time to control its size. In
 this function the user has the power to decide which cuts to purge
 from this pool if desired. To mark the {\tt i$^{\tt th}$} waiting row
 (an element of the pre-pool) for removal she has to set {\tt
-delete[i]} to be {\tt TRUE} ({\tt delete} is allocated before the
+delete_rows[i]} to be {\tt TRUE} ({\tt delete_rows} is allocated before the
 function is called and its elements are set to {\tt FALSE} by
 default).\\
 \\
@@ -1585,8 +1600,8 @@ parameter).
 & & \\
 {\tt int rownum} & IN & The number of waiting rows. \\
 {\tt waiting\_row **rows} & IN & The array of waiting rows.\\
-{\tt char *delete} & OUT & An array of indicators (each of them is one {\tt
-char}) showing which waiting rows are to be deleted. \\ 
+{\tt char *delete_rows} & OUT & An array of indicators (each of them is one 
+{\tt char}) showing which waiting rows are to be deleted. \\ 
 \et
 
 \returns

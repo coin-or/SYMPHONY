@@ -47,27 +47,29 @@ Carnegie Mellon University, Pittsburgh, PA 15213 \texttt{trick@cmu.edu},
 \thispagestyle{empty}
 
 SYMPHONY is a set of routines to allow the easy creation of a branch-cut-price
-code using CPLEX or OSL underlying optimization engine directly or the COIN-OSI 
-interface to call the mathematical programming solvers such as CLP, CPLEX, DYLP, 
-GLPK, OSL, SOPLEX, VOL and XPRESS-MP. The SYMPHONY system includes a few sample 
-applications: Vehicle Routing Problem (VRP), Mixed Postman Problem (MPP), Set 
-Partitioning Problems (SPP-basic and advanced). These applications are extremely 
-well done, but, in generality, are difficult to understand.
+code using CPLEX or OSL underlying optimization engine directly or the 
+COIN-OSI interface to call the mathematical programming solvers such as CLP, 
+CPLEX, DYLP, GLPK, OSL, SOPLEX, VOL and XPRESS-MP. The SYMPHONY system 
+includes a few sample applications: Vehicle Routing Problem (VRP), Mixed 
+Postman Problem (MPP), Set Partitioning Problems (SPP-basic and advanced). 
+These applications are extremely well done, but, in generality, are difficult 
+to understand.
 
 Here is a walkthrough for a very simple application that uses SYMPHONY. Rather
-than presenting the code in its final version, I will go through the steps that I
-went through. Note that some of the code is lifted from the vehicle routine
-code. This code is designed to be a sequential code.
+than presenting the code in its final version, I will go through the steps 
+that I went through. Note that some of the code is lifted from the vehicle 
+routine code. This code is designed to be a sequential code.
 
 Our goal is to create a minimum one-matching code on a complete graph.
 Initially we will just formulate this as an integer program. Then we will
 include a set of constraints that can be added by cut generation.
 
-I begin with the "template" system included in SYMPHONY. This gives stubs for
-each user routine. First I need to define the data needed for
-one-matching. This data will be included in the structure \texttt{USER\_PROB}
-in the file \texttt{user.h}.  Initially, the data will be the number of nodes
-and the cost matrix, so change \texttt{USER\_PROB} in \texttt{user.h} to be
+I begin with the template file in the \texttt{USER} subdirectory included in
+SYMPHONY. This gives stubs for each user routine. First I need to define the
+data needed for one-matching. This data will be included in the structure
+\texttt{USER\_PROBLEM} in the file \texttt{user.h}.  Initially, the data will
+be the number of nodes and the cost matrix, so change \texttt{USER\_PROBLEM}
+in \texttt{user.h} to be
 
 \begin{verbatim}
 typedef struct USER_PROBLEM{
@@ -104,7 +106,7 @@ int user_io(void *user)
 
    if ((f = fopen(infile, "r")) == NULL){
       printf("Readparams: file %s can't be opened\n", infile);
-      exit(1); /*error check for existence of parameter file*/
+      return(USER_ERROR); /*error check for existence of parameter file*/
    }
 
    /* Read in the costs */
@@ -116,7 +118,7 @@ int user_io(void *user)
    prob->colnum = (prob->nnodes)*(prob->nnodes-1)/2;
    prob->rownum = prob->nnodes;
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 \end{verbatim}   
 
@@ -138,7 +140,6 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 {
    user_problem *prob = (user_problem *) user;
    int i, j, index;
-   int resize;
 
    /* set up the inital LP data */
 
@@ -159,20 +160,23 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    mip->rhs     = (double *) malloc(mip->m * DSIZE);
    mip->sense   = (char *) malloc(mip->m * CSIZE);
    mip->rngval  = (double *) calloc(mip->m, DSIZE);
+   mip->is_int  = (char *) malloc(mip->n * CSIZE);
    
    /* Fill out the appropriate data structures -- each column has
-      exactly two entried*/
+      exactly two entries*/
    index = 0;
    for (i = 0; i < prob->nnodes; i++) {
       for (j = i+1; j < prob->nnodes; j++) {
          prob->node1[index] = i; /* The first node of assignment 'index' */
          prob->node2[index] = j; /* The second node of assignment 'index' */
          mip->obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
+	 mip->is_int[index] = TRUE;
          mip->matbeg[index] = 2*index;
          mip->matval[2*index] = 1;
          mip->matval[2*index+1] = 1;
          mip->matind[2*index] = i;
          mip->matind[2*index+1] = j;
+	 mip->ub[index] = 1.0;
          index++;
       }
    }
@@ -184,7 +188,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
       mip->sense[i] = 'E';
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }      
 \end{verbatim}
 
@@ -203,7 +207,7 @@ Here is a data file to use:
 
 The optimal value is 5. To display the solution, we need to be able to map
 back from variables to the nodes. That was the use of the \texttt{node1} and
-\texttt{node2} parts of the \texttt{USER\_DATA}. We can now use
+\texttt{node2} parts of the \texttt{USER\_PROBLEM}. We can now use
 \texttt{user\_display\_solution()} to print out the solution:
 
 \begin{verbatim}
@@ -224,7 +228,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
       }	   
    }
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 \end{verbatim}
 
@@ -288,7 +292,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    
    FREE(cuts);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 \end{verbatim}
 
@@ -315,7 +319,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
    *new_row_num = cutnum;
    if (cutnum > 0)
       *new_rows =
-          row_list = (waiting_row **) calloc (cutnum*sizeof(waiting_row *));
+          row_list = (waiting_row **) calloc (cutnum, sizeof(waiting_row *));
    
    for (j = 0; j < cutnum; j++){
       row_list[j] = (waiting_row *) malloc(sizeof(waiting_row));
@@ -323,13 +327,12 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	 
       case TRIANGLE:
          cutval = (int *) (cuts[j]->coef);
-         row_list[j]->cut = cuts[j];
          row_list[j]->matind = (int *) malloc(varnum * ISIZE);
          row_list[j]->matval = (double *) malloc(varnum * DSIZE);
          row_list[j]->nzcnt = 0;
          for (nzcnt = 0, i = 0; i < varnum; i++){
             if (cutval[prob->node1[vars[i]->userind]] &&
-              cutval[prob->node2[vars[i]->userind]]){
+                cutval[prob->node2[vars[i]->userind]]){
                row_list[j]->matval[nzcnt] = 1.0;
                row_list[j]->matind[nzcnt++] = vars[i]->userind;
             }
@@ -342,7 +345,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
       }
    }
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 \end{verbatim}
 

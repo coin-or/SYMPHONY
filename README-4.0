@@ -388,7 +388,7 @@ be stored to describe your instance. Edit the file USER/include/user.h,
 adding the appropriate fields to the user_parameter and user_problem
 structures to store the relevant values.
 
-2. Now edit the file USER\Master\user_master.c. Only two function needs to be
+2. Now edit the file USER/Master/user_master.c. Only two function needs to be
 filled out initially in order to read in . The function user_io() is where you
 can read in the instance data, if it is in something other than MPS format (a
 TSPLIB file, for example. Note that the name of the file to read the instance

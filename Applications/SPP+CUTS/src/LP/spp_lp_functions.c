@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <math.h>
+#include <memory.h>
 
 /* SYMPHONY include files */
 #include "BB_types.h"
