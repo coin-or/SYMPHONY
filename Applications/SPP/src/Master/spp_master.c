@@ -104,6 +104,15 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
        case 'F':
 	 strncpy(par->infile, argv[++i], MAX_FILE_NAME_LENGTH);
 	 break;
+       case 'T':
+	 par->test = TRUE;
+	 if(i+1 < argc){
+	   sscanf(argv[i+1], "%c", &tmp);
+	   if(tmp != '-'){
+	     strncpy(par->test_dir, argv[++i],MAX_FILE_NAME_LENGTH);
+	   }
+	 }
+	 break;
       };
    }
 
@@ -370,39 +379,40 @@ int user_display_solution(void *user, double lpetol, int varnum,
    return(USER_NO_PP);
 }
    
-/*===========================================================================*/
+ /*===========================================================================*/
 
-/*===========================================================================*\
- * This is a debugging feature which might
- * allow you to find out why a known feasible solution is being cut off.
-\*===========================================================================*/
+ /*===========================================================================*\
+  * This is a debugging feature which might
+  * allow you to find out why a known feasible solution is being cut off.
+ \*===========================================================================*/
 
-int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
-{
-#ifdef TRACE_PATH
+ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
+ {
+ #ifdef TRACE_PATH
 
-#endif
-   return(USER_DEFAULT);
-}   
+ #endif
+    return(USER_DEFAULT);
+ }   
 
-/*===========================================================================*/
+ /*===========================================================================*/
 
-/*===========================================================================*\
- * This function frees everything.
-\*===========================================================================*/
+ /*===========================================================================*\
+  * This function frees everything.
+ \*===========================================================================*/
 
-int user_free_master(void **user)
-{
-   spp_problem *spp = (spp_problem *) (*user);
+ int user_free_master(void **user)
+ {
+    spp_problem *spp = (spp_problem *) (*user);
 
-   FREE(spp->par);
-   FREE(spp->stat);
-   FREE(spp->feas_sol);
-   spp_free_cmatrix(spp->cmatrix);
-   FREE(spp->cmatrix);
-   FREE(*user);
-   
-   return(USER_SUCCESS);
+    FREE(spp->feas_sol);
+    spp_free_cmatrix(spp->cmatrix);
+    FREE(spp->cmatrix);
+    if(!spp->par->test){
+      FREE(spp->par);
+      FREE(spp->stat);
+      FREE(*user);
+    }
+    return(USER_SUCCESS);
 }
 
 

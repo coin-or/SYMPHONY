@@ -113,7 +113,17 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 	 break;
        case 'F':
 	 strncpy(par->infile, argv[++i], MAX_FILE_NAME_LENGTH);
+	 break;     
+       case 'T':
+	 par->test = TRUE;
+	 if(i+1 < argc){
+	   sscanf(argv[i+1], "%c", &tmp);
+	   if(tmp != '-'){
+	     strncpy(par->test_dir, argv[++i],MAX_FILE_NAME_LENGTH);
+	   }
+	 }
 	 break;
+
       };
    }
 
@@ -457,15 +467,17 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 
 int user_free_master(void **user)
 {
-   spp_problem *spp = (spp_problem *) calloc(1, sizeof(spp_problem));
+   spp_problem *spp = (spp_problem *) (*user);
 
-   FREE(spp->par);
-   FREE(spp->stat);
    FREE(spp->feas_sol);
    spp_free_cmatrix(spp->cmatrix);
    FREE(spp->cmatrix);
-   FREE(*user);
 
+   if(!spp->par->test){
+     FREE(spp->par);
+     FREE(spp->stat);
+     FREE(*user);
+   }
    return(USER_SUCCESS);
 }
 

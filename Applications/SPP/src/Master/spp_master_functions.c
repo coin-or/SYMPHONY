@@ -92,19 +92,18 @@ void spp_print_params(spp_problem *spp)
 {
    spp_parameters *par = spp->par;
 
-   printf("###########################################################\n");
-   printf("Parameter settings:\n");
-   printf("   infile: %s\n", par->infile);
-   printf("   dupc_at_loadtime: %i\n", par->dupc_at_loadtime);
-   printf("   our_format_file: %s\n", par->our_format_file);
-   printf("   our_format_file_counter: %i\n",par->our_format_file_counter);
-   printf("   matlab_format_file: %s\n", par->matlab_format_file);
-   printf("   matlab_format_file_counter: %i\n",
-	  par->matlab_format_file_counter);
-   printf("   granularity: %f\n", par->granularity);
-   printf("\n\n");
+     printf("###########################################################\n");
+     printf("Parameter settings:\n");
+     printf("   infile: %s\n", par->infile);
+     printf("   dupc_at_loadtime: %i\n", par->dupc_at_loadtime);
+     printf("   our_format_file: %s\n", par->our_format_file);
+     printf("   our_format_file_counter: %i\n",par->our_format_file_counter);
+     printf("   matlab_format_file: %s\n", par->matlab_format_file);
+     printf("   matlab_format_file_counter: %i\n",
+	    par->matlab_format_file_counter);
+     printf("   granularity: %f\n", par->granularity);
+     printf("\n\n");
 }
-
 /*****************************************************************************/
 
 /*===========================================================================*
@@ -143,10 +142,10 @@ void spp_read_input(spp_problem *spp)
    
    if ((f = fopen(spp->par->infile, "r")) == NULL)
       OPEN_READ_ERROR(spp->par->infile);
-
-   printf("########################################################\n");
-   printf("Reading input file %s...\n", spp->par->infile);
-
+   if(spp->par->verbosity > -1){
+     printf("########################################################\n");
+     printf("Reading input file %s...\n", spp->par->infile);
+   }
    matrix = spp->cmatrix = (col_ordered *) calloc(1, sizeof(col_ordered));
    
    /* read in the type of the problem, rownum, colnum and nzcnt */
@@ -154,9 +153,10 @@ void spp_read_input(spp_problem *spp)
    if (fscanf(f, "%i%i%i", &matrix->rownum, &matrix->colnum,
 	      &matrix->nzcnt) != 3) IO_ERROR;
    colnum = matrix->colnum;
-   printf("      input type: %i, rownum: %i, colnum: %i, nzcnt: %i\n",
-	   spp->input_type, matrix->rownum, colnum, matrix->nzcnt);
-   
+   if(spp->par->verbosity > -1){
+     printf("      input type: %i, rownum: %i, colnum: %i, nzcnt: %i\n",
+	    spp->input_type, matrix->rownum, colnum, matrix->nzcnt);
+   }
    matrix->colnames = (int *) malloc(colnum * ISIZE);
    matrix->obj = (double *) malloc(colnum * DSIZE);
    matrix->matbeg = (int *) malloc((colnum+1) * ISIZE);

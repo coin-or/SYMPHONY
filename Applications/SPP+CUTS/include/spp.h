@@ -61,6 +61,9 @@ typedef struct SPP_PARAMETERS{
    int              matlab_format_file_counter;
 
    double           granularity;
+   int              test;
+   char             test_dir[MAX_FILE_NAME_LENGTH +1]; /* Test files directory */ 
+   int              verbosity;
 
    /* Pointers to CG and LP parameters */
    spp_lp_params   *lp_par;

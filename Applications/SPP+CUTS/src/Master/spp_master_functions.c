@@ -216,9 +216,10 @@ void spp_read_input(spp_problem *spp)
    if ((f = fopen(spp->par->infile, "r")) == NULL)
       OPEN_READ_ERROR(spp->par->infile);
 
-   printf("########################################################\n");
-   printf("Reading input file %s...\n", spp->par->infile);
-
+   if(spp->par->verbosity > -1){
+     printf("########################################################\n");
+     printf("Reading input file %s...\n", spp->par->infile);
+   }
    matrix = spp->cmatrix = (col_ordered *) calloc(1, sizeof(col_ordered));
    
    /* read in the type of the problem, rownum, colnum and nzcnt */
