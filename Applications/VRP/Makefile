@@ -57,7 +57,7 @@ NET_SRC           = network.c
 DG_FUNC_SRC       = vrp_dg_functions.c 
 
 USER_MASTER_SRC   = vrp_main.c vrp_master.c vrp_io.c vrp_master_functions.c 
-USER_MASTER_SRC  += small_graph.c
+USER_MASTER_SRC  += small_graph.c $(NET_SRC)
 USER_MASTER_SRC  += $(COST_SRC)
 ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)

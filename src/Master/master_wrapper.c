@@ -475,16 +475,16 @@ int send_lp_data_u(sym_environment *env, int sender)
       send_int_array(env->base->userind, env->base->varnum);
    }
    send_int_array(&env->base->cutnum, 1);
-   if (env->mip){
-      MIPdesc *mip = env->mip;
+   MIPdesc *mip = env->mip;
+   send_int_array(&(mip->m), 1);
+   send_int_array(&(mip->n), 1);
+   send_int_array(&(mip->nz), 1);
+   send_char_array(&(mip->obj_sense), 1);
+   send_dbl_array(&(mip->obj_offset), 1);
+   if (env->mip->matbeg){
       char has_desc = TRUE;
       char has_colnames = FALSE;
       send_char_array(&has_desc, 1);
-      send_int_array(&(mip->m), 1);
-      send_int_array(&(mip->n), 1);
-      send_int_array(&(mip->nz), 1);
-      send_char_array(&(mip->obj_sense), 1);
-      send_dbl_array(&(mip->obj_offset), 1);
       send_int_array(mip->matbeg, mip->n+1);
       send_int_array(mip->matind, mip->nz);
       send_dbl_array(mip->matval, mip->nz);

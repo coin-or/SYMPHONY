@@ -83,15 +83,15 @@ int receive_lp_data_u(lp_prob *p)
       receive_int_array(p->base.userind, p->base.varnum);
    }
    receive_int_array(&p->base.cutnum, 1);
+   MIPdesc *mip = p->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+   receive_int_array(&(mip->m), 1);
+   receive_int_array(&(mip->n), 1);
+   receive_int_array(&(mip->nz), 1);
+   receive_char_array(&(mip->obj_sense), 1);
+   receive_dbl_array(&(mip->obj_offset), 1);
    receive_char_array(&has_desc, 1);
-   if (has_desc){
-      MIPdesc *mip = p->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
-      receive_int_array(&(mip->m), 1);
-      receive_int_array(&(mip->n), 1);
-      receive_int_array(&(mip->nz), 1);
-      receive_char_array(&(mip->obj_sense), 1);
-      receive_dbl_array(&(mip->obj_offset), 1);
 
+   if (has_desc){
       /* Allocate memory */
       mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
       mip->matind = (int *)    malloc(ISIZE * mip->nz);

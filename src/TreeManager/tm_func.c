@@ -603,6 +603,10 @@ void print_tree_status(tm_prob *tm)
 
    estimated_time_remaining =
       MAX(average_node_time*(num_nodes_estimate - tm->stat.analyzed), 0);
+#else
+
+   elapsed_time = wall_clock(NULL) - tm->start_time;
+
 #endif
    
    printf("\nCurrent number of candidate nodes: %i\n", tm->samephase_candnum);

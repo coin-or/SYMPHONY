@@ -13,6 +13,8 @@
 /*                                                                           */
 /*===========================================================================*/
 
+#define COMPILING_FOR_LP
+
 /* system include files */
 #include <math.h>
 #include <malloc.h>

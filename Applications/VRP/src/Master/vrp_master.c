@@ -34,6 +34,7 @@
 #include "vrp_types.h"
 #include "vrp_io.h"
 #include "compute_cost.h"
+#include "network.h"
 #ifdef COMPILE_HEURS
 #include "start_heurs.h"
 #endif
@@ -42,6 +43,9 @@
 #include "vrp_macros.h"
 #include "small_graph.h"
 #ifdef COMPILE_IN_TM
+#ifdef COMPILE_IN_CP
+#include "vrp_cp.h"
+#endif
 #ifdef COMPILE_IN_LP
 #include "vrp_lp.h"
 #ifdef COMPILE_IN_CG
@@ -51,9 +55,6 @@
 #include "my_decomp.h"
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
-#endif
-#ifdef COMPILE_IN_CP
-#include "vrp_cp.h"
 #endif
 #endif
 #endif
@@ -621,7 +622,7 @@ int user_send_cp_data(void *user, void **user_cp)
 {
    vrp_problem *vrp = (vrp_problem *)user;
 
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CP)
+#if defined(COMPILE_IN_TM) && defined (COMPILE_IN_CP)
    /* This is is the case when we are copying data directly because
       the LP is not running separately. This code should be virtually
       identical to that of user_receive_cp_data() in the CP process.*/

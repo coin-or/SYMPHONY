@@ -41,8 +41,9 @@ int main(int argc, char **argv)
 
    /* Find a priori problem bounds */
    si.findInitialBounds();
-
+   
    /* Solve the problem */
+   si.setSymParam("lp_executable_name", "vrp_lp_cg");
    si.branchAndBound();
 
    return(0);
@@ -76,6 +77,8 @@ int main(int argc, char **argv)
      sym_load_problem(env);
      
      sym_find_initial_bounds(env);
+     
+     sym_set_str_param(env, "lp_executable_name", "vrp_lp_cg");
      
      sym_solve(env);
 
