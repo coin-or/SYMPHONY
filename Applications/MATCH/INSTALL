@@ -116,7 +116,7 @@ path definitions for the CPLEX or OSL include files.
 
 -- Add the appropriate projects and libraries. For instance, if you want to 
 use "__OSI_OSL__", then add "osiOslLib" project to the workspace and 
-"oslmd6030", OSL solver library, to the "cnrp" project after deleting 
+"oslmd6030", OSL solver library, to the "match" project after deleting 
 "osiClpLib" and "clpLib" projetcs. Update the dependencies. If you want to use 
 the native OSL interface, then delete all the projects (except the 
 "symphonyLib") and just add the "oslmd6030" library for it is the 
@@ -125,7 +125,7 @@ unique solver library we need now.
 4. By default, SYMPHONY is also set to use the COIN CGL library for
 generating cuts. To use CGL, the workspace includes the "cglLib" project, the 
 "symphonyLib" project has the "ADD_CGL_CUTS" preprocessor definition and the 
-path to Cgl include directory, "..\..\..\..\COIN\Cgl\include" and the cnrp 
+path to Cgl include directory, "..\..\..\..\COIN\Cgl\include" and the "match" 
 project has a dependency on "cglLib". If you don't want to use the CGL 
 library, reverse this procedure and delete the "cglLib" project from the 
 workspace.
