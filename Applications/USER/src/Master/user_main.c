@@ -39,14 +39,6 @@ int main(int argc, char **argv)
    /* Find a priori problem bounds */
    si.findInitialBounds();
 
-   si.setSymParam(OsiSymNodeLimit, 100);
-   
-   /* Solve the problem */
-   si.branchAndBound();
-
-   si.setSymParam(OsiSymNodeLimit, 0);
-   si.setSymParam(OsiSymWarmStart, TRUE);
-   
    /* Solve the problem */
    si.branchAndBound();
 

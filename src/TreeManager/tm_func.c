@@ -302,7 +302,7 @@ int solve(tm_prob *tm)
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char no_work = TRUE, ramp_up = TRUE;
    double then, then2, then3, now;
-   double timeout2 = 600, timeout3 = tm->par.logging_interval, timeout4 = 5;
+   double timeout2 = 10, timeout3 = tm->par.logging_interval, timeout4 = 300;
    struct timeval timeout = {5, 0};
 
    /*------------------------------------------------------------------------*\
@@ -542,6 +542,56 @@ void write_log_files(tm_prob *tm)
 void print_tree_status(tm_prob *tm)
 {
    int i;
+   int *widths;
+   double *gamma;
+   int last_full_level = 0, max_width = 0, num_nodes_estimate = 1;
+   int first_waist_level = 0, last_waist_level = 0, waist_level = 0;
+   double average_node_time, estimated_time_remaining, user_time = 0.0;
+   double elapsed_time;
+   
+   widths = (int *) calloc (tm->stat.max_depth, sizeof(int));
+   gamma = (double *) calloc (tm->stat.max_depth, sizeof(double));
+   
+   calculate_widths(tm->rootnode, widths);
+   
+   for (i = tm->stat.max_depth; i > 0; i--){
+      if ((double)(widths[i])/(double)(widths[i - 1]) < 2){
+	 last_full_level = i - 1;
+      }
+      if (widths[i] > max_width){
+	 max_width = widths[i];
+	 last_waist_level = i;
+	 first_waist_level = i;
+      }
+      if (widths[i] == max_width){
+	 first_waist_level = i;
+      }
+   }
+
+   waist_level = (first_waist_level + last_waist_level)/2;
+   
+   for (i = 0; i < tm->stat.max_depth; i++){
+      if (i < last_full_level){
+	 gamma[i] = 2.0;
+      }else if (i < waist_level){
+	 gamma[i] = 2.0 - (double)((i - last_full_level + 1))/
+	    (double)((waist_level - last_full_level + 1));
+      }else{
+	 gamma[i] = 1.0 - (double)(i - waist_level + 1)/
+	    (double)(tm->stat.max_depth - waist_level + 1);
+      }
+   }
+
+   for (i = 1; i < tm->stat.max_depth; i++){
+      gamma[i] *= gamma[i - 1];
+      num_nodes_estimate += (int)(gamma[i] + 0.5);
+   }
+
+   elapsed_time = wall_clock(NULL) - tm->start_time;
+   average_node_time = elapsed_time/tm->stat.analyzed;
+
+   estimated_time_remaining =
+      MAX(average_node_time*(num_nodes_estimate - tm->stat.analyzed), 0);
    
    printf("\nCurrent number of candidate nodes: %i\n", tm->samephase_candnum);
    if (tm->has_ub){
@@ -565,6 +615,11 @@ void print_tree_status(tm_prob *tm)
       printf("Current gap percentage:            %.2f\n",
 	     100*(tm->ub-tm->lb)/tm->ub);
    }
+   printf("Elapsed time:                      %i\n", (int)(elapsed_time));
+   printf("Estimated nodes remaining:         %i\n", num_nodes_estimate);
+   printf("Estimated time remaining:          %i\n",
+	  (int)(estimated_time_remaining));
+   
    if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
       FILE *f;
 #pragma omp critical(write_vbc_emulation_file)
@@ -578,8 +633,21 @@ void print_tree_status(tm_prob *tm)
    }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
       printf("$L %.2f\n", tm->lb);
    }
+   
+   FREE(widths);
 }
 
+/*===========================================================================*/
+
+void calculate_widths(bc_node *node, int* widths)
+{
+   int i;
+   
+   widths[node->bc_level] += 1;
+   for (i = 0; i < node->bobj.child_num; i ++){ 
+      calculate_widths(node->children[i], widths);
+   }
+}
 /*===========================================================================*/
 
 /*===========================================================================*\

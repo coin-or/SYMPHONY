@@ -455,7 +455,7 @@ int sym_find_initial_bounds(problem *p)
 
 int sym_solve(problem *p)
 {
-   int s_bufid, r_bufid, bytes, msgtag = 0, sender, termcode = 0, i;
+   int s_bufid, r_bufid, bytes, msgtag = 0, sender, termcode = 0, temp, i;
    char lp_data_sent = FALSE, cg_data_sent = FALSE, cp_data_sent = FALSE;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    char sp_data_sent = TRUE; /*for now, we are not using this one*/
@@ -878,6 +878,8 @@ int sym_solve(problem *p)
    if (tm->lb > p->lb) p->lb = tm->lb;
    print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, p->lb, total_time,
 		    start_time);
+
+   temp = termcode;
 #ifdef COMPILE_IN_LP
    CALL_WRAPPER_FUNCTION( display_solution_u(p, p->tm->opt_thread_num) );
 #else
@@ -888,6 +890,15 @@ int sym_solve(problem *p)
 		    p->lb, 0, start_time);
    CALL_WRAPPER_FUNCTION( display_solution_u(p, 0) );
 #endif
+   termcode = temp;
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+   if (p->tm && p->tm->lpp[p->tm->opt_thread_num]){
+      p->best_sol = p->tm->lpp[p->tm->opt_thread_num]->best_sol;
+      p->tm->lpp[p->tm->opt_thread_num]->best_sol.xlength = 0;
+      p->tm->lpp[p->tm->opt_thread_num]->best_sol.xind = NULL;
+      p->tm->lpp[p->tm->opt_thread_num]->best_sol.xval = NULL;
+   }
+#else
 
    if (p->par.do_draw_graph){
       s_bufid = init_send(DataInPlace);
