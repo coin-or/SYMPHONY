@@ -3,6 +3,10 @@ mkdir $1
 foreach file (LICENSE Makefile README*)
 awk -f reformat.awk $file > $1/$file
 end
+mkdir $1/WIN32
+foreach file (WIN32/*)
+awk -f reformat.awk $file > $1/$file
+end
 mkdir $1/Common
 foreach file (Common/*.c)
 awk -f reformat.awk $file > $1/$file

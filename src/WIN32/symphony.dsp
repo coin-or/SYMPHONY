@@ -65,7 +65,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\include" /I "..\Vrp\include" /I "C:\ILOG\CPLEX70\include\ilcplex" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__CPLEX70__" /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\include" /I "..\Vrp\include" /I "C:\ILOG\cplex81\include\ilcplex" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__CPLEX__" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
@@ -248,7 +248,7 @@ SOURCE=.\Debug\vrp.lib
 # End Source File
 # Begin Source File
 
-SOURCE=C:\ILOG\CPLEX70\lib\msvc6\stat_sta\cplex70.lib
+SOURCE=C:\ILOG\cplex81\lib\msvc6\stat_sta\cplex81.lib
 # End Source File
 # End Target
 # End Project

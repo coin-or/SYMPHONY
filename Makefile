@@ -108,7 +108,7 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use CPLEX.
-#LP_SOLVER = CPLEX
+LP_SOLVER = CPLEX
 
 ifeq ($(LP_SOLVER),CPLEX)
 	LPINCDIR = -I/usr/local/include

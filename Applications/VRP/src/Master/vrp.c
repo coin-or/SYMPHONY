@@ -284,9 +284,9 @@ int user_init_draw_graph(void *user, int dg_id)
       
       display_graph(dg_id, node_place);
    }
+#endif
 
    return(USER_NO_PP);
-#endif
 }
 
 /*===========================================================================*/
