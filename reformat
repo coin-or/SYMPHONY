@@ -1,0 +1,69 @@
+#!/bin/tcsh -f
+mkdir $1
+foreach file (LICENSE Makefile README* sample.vrp)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Common
+foreach file (Common/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/LP
+foreach file (LP/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Master
+foreach file (Master/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/TreeManager
+foreach file (TreeManager/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/CutPool
+foreach file (CutPool/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/CutGen
+foreach file (CutGen/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/include
+foreach file (include/*.h)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/DrawGraph
+foreach file (DrawGraph/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Vrp
+foreach file (Vrp/Makefile)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Vrp/Common
+foreach file (Vrp/Common/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Vrp/LP
+foreach file (Vrp/LP/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Vrp/Master
+foreach file (Vrp/Master/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Vrp/CutPool
+foreach file (Vrp/CutPool/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Vrp/CutGen
+foreach file (Vrp/CutGen/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Vrp/include
+foreach file (Vrp/include/*.h)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Vrp/DrawGraph
+foreach file (Vrp/DrawGraph/*.c)
+awk -f reformat.awk $file > $1/$file
+end

@@ -1,0 +1,629 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/*                                                                           */
+/* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
+/* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
+/*                                                                           */
+/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
+#include <malloc.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "BB_macros.h"
+#include "timemeas.h"
+#include "proccomm.h"
+#include "qsortucb.h"
+#include "messages.h"
+#include "pack_cut.h"
+#include "cp.h"
+#include "BB_constants.h"
+
+#ifdef CHAR_IS_SIGNED
+#define MEMCMP(c0, c1, s) unsigned_memcmp(c0, c1, s)
+#else
+#include <memory.h>
+#define MEMCMP(c0, c1, s) memcmp(c0, c1, s)
+#endif
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * This file contains general functions used by the cut pool process.
+\*===========================================================================*/
+
+/*===========================================================================*\
+ * This small function simply returns a pointer to the current cut pool 
+ * so that it can be accessed from anywhere within the CP  
+ * without explicitly passing a pointer. This is essentially only uselful    
+ * to the more advanced user sho wishes to have access to the internal data  
+ * structures                                                                
+\*===========================================================================*/
+
+cut_pool *get_cp_ptr(cut_pool **cp_list, int index)
+{
+   static cut_pool **cp;
+
+   if (cp_list){
+      cp = cp_list;
+   }
+   
+   return(cp[index]);
+}
+
+/*===========================================================================*/
+
+void cp_initialize(cut_pool *cp, int master_tid)
+{
+#ifndef COMPILE_IN_CP
+   int bytes;
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+   int s_bufid, r_bufid;
+#endif
+#endif
+#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP)
+   int s_bufid, r_bufid;
+#endif
+   
+   /*------------------------------------------------------------------------*\
+    * Receive tid info; request and receive problem specific data
+   \*------------------------------------------------------------------------*/
+
+#ifdef COMPILE_IN_CP
+
+   cp->master = master_tid;
+
+#else /*We only need to do the rest of this if the CP is running as a separate
+	process*/
+
+   /* set stdout to be line buffered */
+   setvbuf(stdout, (char *)NULL, _IOLBF, 0);
+
+   register_process();
+   
+   r_bufid = receive_msg(ANYONE, MASTER_TID_INFO);
+   bufinfo(r_bufid, &bytes, &cp->msgtag, &cp->tree_manager);
+   receive_int_array(&cp->master, 1);
+   freebuf(r_bufid);
+
+#endif
+   
+#if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) || \
+    !defined(COMPILE_IN_CP)
+       
+   s_bufid = init_send(DataInPlace);
+   send_msg(cp->master, REQUEST_FOR_CP_DATA);
+   freebuf(s_bufid);
+   
+   r_bufid = receive_msg(cp->master, CP_DATA);
+   receive_char_array((char *)(&cp->par), sizeof(cp_params));
+   CALL_USER_FUNCTION( user_receive_cp_data(&cp->user) );
+   freebuf(r_bufid);
+   
+#endif
+
+   if (cp->par.warm_start == READ_CP_LIST){
+      read_cp_cut_list(cp, cp->par.warm_start_file_name);
+   }else if (cp->par.warm_start == READ_TM_LIST){
+      cp_read_tm_cut_list(cp, cp->par.warm_start_file_name);
+   }else{
+      cp->cuts = (cp_cut_data **) calloc (cp->par.block_size,
+					  sizeof(cp_cut_data *));
+      cp->allocated_cut_num = cp->par.block_size;
+   }
+}
+  
+/*===========================================================================*/
+
+int unsigned_memcmp(char *coef0, char *coef1, int size)
+{
+   register char *end0 = coef0 + size;
+
+   for ( ; coef0 != end0; coef0++, coef1++)
+      if (*coef0 != *coef1)
+	 break;
+   if (coef0 == end0)
+      return(0);
+   return ( (unsigned char)(*coef0) < (unsigned char)(*coef1) ? -1 : 1);
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * This function compares the quality of two cuts.
+\*===========================================================================*/
+
+int cut_quality_cmp(const void *cut0ptr, const void *cut1ptr)
+{
+   cp_cut_data *cut0 = *((cp_cut_data **)cut0ptr);
+   cp_cut_data *cut1 = *((cp_cut_data **)cut1ptr);
+
+   return(1000*(cut1->quality - cut0->quality));
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * This function orders the cuts in the pool by the numerical measure of
+ * "quality".
+\*===========================================================================*/
+
+void order_cuts_by_quality(cut_pool *cp)
+{
+   cp_cut_data **cuts = cp->cuts;
+
+   /* order the cuts according to the function "cutcmp" */
+   qsortucb((char *)cuts, cp->cut_num, sizeof(cp_cut_data *), cut_quality_cmp);
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * For purposes of deleting duplicate cuts, this function compares two cuts
+ * to see if they are the same or not. If the cuts are the same then the
+ * return value is 0, otherwise nonzero.
+\*===========================================================================*/
+
+int cutcmp(const void *cut0ptr, const void *cut1ptr)
+{
+   cut_data *cut0 = *((cut_data **)cut0ptr);
+   cut_data *cut1 = *((cut_data **)cut1ptr);
+   int typediff, sizediff;
+
+   if ((typediff = cut0->type - cut1->type))  return(typediff);
+   if ((sizediff = cut0->size - cut1->size))  return(sizediff);
+   return( MEMCMP(cut0->coef, cut1->coef, cut0->size) );
+}
+
+/*===========================================================================*/
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+/*===========================================================================*\
+ * This function purges the cut pool by removing duplicate and
+ * ineffective cuts
+\*===========================================================================*/
+
+int delete_cuts(cut_pool *cp, int min_to_delete)
+{
+   int del_cuts = 0;
+   int touches_until_deletion = cp->par.touches_until_deletion;
+   char deleted_duplicates = FALSE;
+
+   switch (cp->par.delete_which){
+
+    case DELETE_DUPLICATES:
+      /* delete duplicate cuts, and if it's not enough, fall through
+       * to delete ineffective ones */
+      del_cuts += delete_duplicate_cuts(cp);
+      if (del_cuts >= min_to_delete || del_cuts == cp->cut_num)
+	 break;
+      if (!touches_until_deletion)
+	 touches_until_deletion = 10;
+      deleted_duplicates = TRUE;
+
+    case DELETE_DUPLICATE_AND_INEFFECTIVE:
+      if (! deleted_duplicates){
+	 del_cuts += delete_duplicate_cuts(cp);
+      }
+#if 0
+      while (del_cuts < min_to_delete && cp->cut_num > 0){
+	 del_cuts += delete_ineffective_cuts(cp, touches_until_deletion,
+					     min_to_delete);
+	 touches_until_deletion--;
+      }
+#endif
+      del_cuts += delete_ineffective_cuts(cp, touches_until_deletion,
+					  min_to_delete);
+      break;
+   }
+
+   if (cp->par.verbosity == 5)
+      printf("******* CUT_POOL : Deleted %i total cuts leaving %i\n",
+	     del_cuts, cp->cut_num);
+
+   return(del_cuts);
+}
+#endif
+/*===========================================================================*/
+/*___END_EXPERIMENTAL_SECTION___*/
+
+int delete_ineffective_cuts(cut_pool *cp)
+{
+   cp_cut_data **cuts = cp->cuts;
+   int num;
+   int del_cuts = 0, tmp_del_cuts = 0, cuts_to_leave = 0;
+   cp_cut_data **cp_cut1, **cp_cut2;
+   int touches_until_deletion = cp->par.touches_until_deletion;
+   int min_to_delete = cp->par.min_to_delete;
+
+   if (min_to_delete > cp->cut_num)
+      min_to_delete = 0.2*cp->cut_num;
+   
+   switch (cp->par.delete_which){
+
+    case DELETE_BY_QUALITY:
+   
+      order_cuts_by_quality(cp);
+      
+      cuts_to_leave = MIN(cp->par.cuts_to_check, cp->cut_num-min_to_delete);
+      
+      for (cp_cut1 = cuts + cuts_to_leave, num = cuts_to_leave;
+	   num < cp->cut_num; cp_cut1++, num++){
+	 del_cuts++;
+	 cp->size -= (*cp_cut1)->cut.size;
+	 FREE((*cp_cut1)->cut.coef);
+	 FREE(*cp_cut1);
+      }
+      cp->cut_num -= del_cuts;
+      cp->size -= del_cuts * sizeof(cp_cut_data);
+      break;
+
+    case DELETE_BY_TOUCHES:
+    default:
+
+      while (del_cuts < min_to_delete){
+	 for (tmp_del_cuts = 0, cp_cut1 = cp_cut2 = cuts,
+		 num = cp->cut_num; num > 0; cp_cut2++, num--){
+	    if ((*cp_cut2)->touches >= touches_until_deletion){
+	       tmp_del_cuts++;
+	       cp->size -= (*cp_cut2)->cut.size;
+	       FREE((*cp_cut2)->cut.coef);
+	       FREE(*cp_cut2);
+	    }else{
+	       *cp_cut1 = *cp_cut2;
+	       cp_cut1++;
+	    }
+	 }
+	 cp->cut_num -= tmp_del_cuts;
+	 cp->size -= tmp_del_cuts * sizeof(cp_cut_data);
+	 del_cuts += tmp_del_cuts;
+	 touches_until_deletion--;
+      }
+      break;
+
+   }
+   
+   if (cp->par.verbosity > 5)
+      printf("******* CUT_POOL : Deleted %i ineffective cuts leaving %i\n",
+	     del_cuts, cp->cut_num);
+
+   return(del_cuts);
+}
+
+/*===========================================================================*/
+
+int delete_duplicate_cuts(cut_pool *cp)
+{
+   cp_cut_data **cuts = cp->cuts;
+   int num;
+   int del_cuts = 0;
+   cp_cut_data **cp_cut1, **cp_cut2;
+   int touches, level;
+   
+   /* order the cuts according to the function "cutcmp" */
+   qsortucb((char *)cuts, cp->cut_num, sizeof(cp_cut_data *), cutcmp);
+   /* go through and remove duplicates */
+   for(num = cp->cut_num-1, cp_cut1 = cuts, cp_cut2 = cp_cut1 + 1;
+       num > 0; cp_cut2++, num--){
+      switch (which_cut_to_delete(&(*cp_cut1)->cut, &(*cp_cut2)->cut)){
+       case 0:
+	 cp_cut1++;
+	 *cp_cut1 = *cp_cut2;
+	 break;
+       case 1:
+	 del_cuts++;
+	 cp->size -= (*cp_cut1)->cut.size;
+	 touches = MIN((*cp_cut1)->touches, (*cp_cut2)->touches);
+	 level = MIN((*cp_cut1)->level, (*cp_cut2)->level);
+	 FREE((*cp_cut1)->cut.coef);
+	 FREE(*cp_cut1);
+	 *cp_cut1 = *cp_cut2;
+	 (*cp_cut1)->touches = touches;
+	 (*cp_cut1)->level = level;
+	 break;
+       case 2:
+	 del_cuts++;
+	 cp->size -= (*cp_cut2)->cut.size;
+	 touches = MIN((*cp_cut1)->touches, (*cp_cut2)->touches);
+	 level = MIN((*cp_cut1)->level, (*cp_cut2)->level);
+	 FREE((*cp_cut2)->cut.coef);
+	 FREE(*cp_cut2);
+	 (*cp_cut1)->touches = touches;
+	 (*cp_cut1)->level = level;
+	 break;
+      }
+   }
+
+   cp->cut_num -= del_cuts;
+   cp->size -= del_cuts * sizeof(cp_cut_data);
+
+   if (cp->par.verbosity > 5)
+      printf("******* CUT_POOL : Deleted %i duplicate cuts leaving %i\n",
+	     del_cuts, cp->cut_num);
+   return(del_cuts);
+}
+
+/*===========================================================================*/
+
+int which_cut_to_delete(cut_data *cut1, cut_data *cut2)
+{
+   if (cutcmp(&cut1, &cut2))
+      return(0);
+
+   return(cut1->sense == 'E' ? 2 :
+	  cut2->sense == 'E' ? 1 :
+	  cut1->sense != cut2->sense ? 0 :
+	  cut1->sense == 'R' ? 0 :
+	  cut1->sense == 'L' ? (cut1->rhs<=cut2->rhs ? 2:1) :
+			       (cut1->rhs>=cut2->rhs ? 2:1));
+}
+
+/*===========================================================================*/
+
+int check_cuts(cut_pool *cp, lp_sol *cur_sol)
+{
+   int num_cuts = 0, i, violated;
+   cp_cut_data **pcp_cut;
+   double quality;
+   int cuts_to_check = MIN(cp->cut_num, cp->par.cuts_to_check);
+
+   if (user_prepare_to_check_cuts(cp->user, cur_sol->xlength, cur_sol->xind,
+				  cur_sol->xval) == ERROR){
+      return(0);
+   }
+   
+   switch(cp->par.check_which){ /* decide which cuts to check for violation */
+
+    case CHECK_ALL_CUTS: /* check all cuts in the pool */
+      for (i = 0, pcp_cut = cp->cuts; i < cuts_to_check; i++, pcp_cut++){
+	 if (user_check_cut(cp->user, cur_sol->lpetol, cur_sol->xlength,
+			    cur_sol->xind, cur_sol->xval, &(*pcp_cut)->cut,
+			    &violated, &quality) == ERROR)
+	    break;
+	 (*pcp_cut)->quality =
+	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
+	    (double)((*pcp_cut)->check_num+1);
+	 (*pcp_cut)->check_num++;
+	 if ( violated ){
+	    num_cuts++;
+	    (*pcp_cut)->touches = 0;
+	    cut_pool_send_cut(cp, &(*pcp_cut)->cut, cur_sol->lp);
+	 }else{
+	    (*pcp_cut)->touches++;
+	 }
+      }
+      break;
+      
+    case CHECK_LEVEL: /* only check cuts generated at a level higher
+			 than the current level. This prevents checking
+			 cuts generated in other parts of the tree which
+			 are not as likely to be violated */
+      for (i = 0, pcp_cut = cp->cuts; i < cuts_to_check; i++, pcp_cut++){
+	 if ((*pcp_cut)->level >= cur_sol->xlevel)
+	    continue;
+	 if (user_check_cut(cp->user, cur_sol->lpetol, cur_sol->xlength,
+			    cur_sol->xind, cur_sol->xval, &(*pcp_cut)->cut,
+			    &violated, &quality) == ERROR)
+	    break;
+	 (*pcp_cut)->quality =
+	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
+	    (double)((*pcp_cut)->check_num+1);
+	 (*pcp_cut)->check_num++;
+	 if ( violated ){
+	    num_cuts++;
+	    (*pcp_cut)->touches = 0;
+	    cut_pool_send_cut(cp, &(*pcp_cut)->cut, cur_sol->lp);
+	 }else{
+	    (*pcp_cut)->touches++;
+	 }
+      }
+      break;
+      
+    case CHECK_TOUCHES: /* only check cuts which have been recently
+			   violated */
+      for (i = 0, pcp_cut = cp->cuts; i < cuts_to_check; i++, pcp_cut++){
+	 if ((*pcp_cut)->touches > cp->par.touches_until_deletion)
+	    continue;
+	 if (user_check_cut(cp->user, cur_sol->lpetol, cur_sol->xlength,
+			    cur_sol->xind, cur_sol->xval, &(*pcp_cut)->cut,
+			    &violated, &quality) == ERROR)
+	    break;
+	 (*pcp_cut)->quality =
+	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
+	    (double)((*pcp_cut)->check_num+1);
+	 (*pcp_cut)->check_num++;
+	 if ( violated ){
+	    num_cuts++;
+	    (*pcp_cut)->touches = 0;
+	    cut_pool_send_cut(cp, &(*pcp_cut)->cut, cur_sol->lp);
+	 }else{
+	    (*pcp_cut)->touches++;
+	 }
+      }
+      break;
+      
+    case CHECK_LEVEL_AND_TOUCHES: /* a combination of the above two
+				     options */
+      for (i = 0, pcp_cut = cp->cuts; i < cuts_to_check; i++, pcp_cut++){
+	 if ((*pcp_cut)->touches > cp->par.touches_until_deletion ||
+	     (*pcp_cut)->level > cur_sol->xlevel)
+	    continue;
+	 if (user_check_cut(cp->user, cur_sol->lpetol, cur_sol->xlength,
+			    cur_sol->xind, cur_sol->xval, &(*pcp_cut)->cut,
+			    &violated, &quality) == ERROR)
+	    break;
+	 (*pcp_cut)->quality =
+	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
+	    (double)((*pcp_cut)->check_num+1);
+	 (*pcp_cut)->check_num++;
+	 if ( violated ){
+	    num_cuts++;
+	    (*pcp_cut)->touches = 0;
+	    cut_pool_send_cut(cp, &(*pcp_cut)->cut, cur_sol->lp);
+	 }else{
+	    (*pcp_cut)->touches++;
+	 }
+      }
+      break;
+      
+   default:
+      printf("Unknown rule for checking cuts \n\n");
+      break;
+   }
+   
+   user_finished_checking_cuts(cp->user);
+
+   return(num_cuts);
+}
+
+/*===========================================================================*/
+
+int write_cp_cut_list(cut_pool *cp, char *file, char append)
+{
+   FILE *f;
+   int i, j;
+
+   if (!(f = fopen(file, append ? "a" : "w"))){
+      printf("\nError opening cut file\n\n");
+      return(0);
+   }
+
+   fprintf(f, "CUTNUM: %i %i %i\n", cp->allocated_cut_num, cp->cut_num,
+	   cp->size);
+   for (i = 0; i < cp->cut_num; i++){
+      fprintf(f, "%i %i %i %i %i %c %i %f %f\n", cp->cuts[i]->touches,
+	      cp->cuts[i]->level, cp->cuts[i]->cut.name, cp->cuts[i]->cut.size,
+	      (int)cp->cuts[i]->cut.type, cp->cuts[i]->cut.sense,
+	      (int)cp->cuts[i]->cut.branch, cp->cuts[i]->cut.rhs,
+	      cp->cuts[i]->cut.range);
+      for (j = 0; j < cp->cuts[i]->cut.size; j++)
+	 fprintf(f, "%i ", (int)cp->cuts[i]->cut.coef[j]);
+      fprintf(f, "\n");
+   }
+
+   fclose(f);
+
+   return(1);
+}
+
+/*===========================================================================*/
+
+int read_cp_cut_list(cut_pool *cp, char *file)
+{
+   FILE *f;
+   int i, j, tmp1 = 0, tmp2 = 0;
+   char str[20];
+   
+   if (!(f = fopen(file, "r"))){
+      printf("\nError opening cut file\n\n");
+      return(0);
+   }
+
+   fscanf(f, "%s %i %i %i", str, &cp->allocated_cut_num, &cp->cut_num,
+	  &cp->size);
+   cp->cuts = (cp_cut_data **)
+      malloc(cp->allocated_cut_num*sizeof(cp_cut_data *));
+   for (i = 0; i < cp->cut_num; i++){
+      cp->cuts[i] = (cp_cut_data *) malloc(sizeof(cp_cut_data));
+      fscanf(f, "%i %i %i %i %i %c %i %lf %lf", &cp->cuts[i]->touches,
+	     &cp->cuts[i]->level, &cp->cuts[i]->cut.name,
+	     &cp->cuts[i]->cut.size, &tmp1, &cp->cuts[i]->cut.sense, &tmp2,
+	     &cp->cuts[i]->cut.rhs, &cp->cuts[i]->cut.range);
+      cp->cuts[i]->cut.type = (char) tmp1;
+      cp->cuts[i]->cut.branch = (char) tmp2;
+      cp->cuts[i]->cut.coef =
+	 malloc(cp->cuts[i]->cut.size*sizeof(char));
+      for (j = 0; j < cp->cuts[i]->cut.size; j++){
+	 fscanf(f, "%i ", &tmp1);
+	 cp->cuts[i]->cut.coef[j] = (char) tmp1;
+      }
+   }
+
+   fclose(f);
+
+   return(1);
+}   
+
+/*===========================================================================*/
+
+int cp_read_tm_cut_list(cut_pool *cp, char *file)
+{
+   FILE *f;
+   int i, j, tmp1 = 0, tmp2 = 0;
+   char str[20];
+   
+   if (!(f = fopen(file, "r"))){
+      printf("\nError opening cut file\n\n");
+      return(0);
+   }
+
+   cp->size = 0;
+   fscanf(f, "%s %i %i", str, &cp->cut_num, &cp->allocated_cut_num);
+   cp->cuts = (cp_cut_data **)
+      malloc(cp->allocated_cut_num*sizeof(cp_cut_data *));
+   for (i = 0; i < cp->cut_num; i++){
+      cp->cuts[i] = (cp_cut_data *) calloc(1, sizeof(cp_cut_data));
+      fscanf(f, "%i %i %i %c %i %lf %lf", &cp->cuts[i]->cut.name,
+	     &cp->cuts[i]->cut.size, &tmp1, &cp->cuts[i]->cut.sense,
+	     &tmp2, &cp->cuts[i]->cut.rhs, &cp->cuts[i]->cut.range);
+      cp->cuts[i]->cut.type = (char)tmp1;
+      cp->cuts[i]->cut.branch = (char)tmp2;
+      cp->cuts[i]->cut.coef = malloc(cp->cuts[i]->cut.size*sizeof(char));
+      cp->size += cp->cuts[i]->cut.size + sizeof(cp_cut_data);
+      for (j = 0; j < cp->cuts[i]->cut.size; j++){
+	 fscanf(f, "%i ", &tmp1);
+	 cp->cuts[i]->cut.coef[j] = (char)tmp1;
+      }
+   }
+
+   fclose(f);
+
+   return(1);
+}   
+
+/*===========================================================================*/
+
+void free_cut_pool(cut_pool *cp)
+{
+   int i;
+   
+   user_free_cp(&cp->user);
+   
+   for (i = cp->cut_num - 1; i >= 0; i--){
+      FREE(cp->cuts[i]->cut.coef);
+      FREE(cp->cuts[i]);
+   }
+   FREE(cp->cuts);
+   FREE(cp->cur_sol.xind);
+   FREE(cp->cur_sol.xval);
+#ifdef COMPILE_IN_CP
+   FREE(cp->cuts_to_add);
+#endif
+   FREE(cp);
+}
+
+/*===========================================================================*/
+
+void cp_close(cut_pool *cp)
+{
+#ifndef COMPILE_IN_CP
+   int s_bufid;
+      
+   s_bufid = init_send(DataInPlace);
+   send_dbl_array(&cp->cut_pool_time, 1);
+   send_int_array(&cp->total_cut_num, 1);
+   send_msg(cp->tree_manager, POOL_TIME);
+   freebuf(s_bufid);
+   if(cp->msgtag == YOU_CAN_DIE)
+      free_cut_pool(cp);
+#else
+   FREE(cp->cuts_to_add);
+   free_cut_pool(cp);
+#endif
+}
