@@ -118,6 +118,15 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
        case 'F':
 	 strncpy(par->infile, argv[++i], MAX_FILE_NAME_LENGTH);
 	 break;
+       case 'T':
+	 par->test = TRUE;
+	 if(i+1 < argc){
+	   sscanf(argv[i+1], "%c", &tmp);
+	   if(tmp != '-'){
+	     strncpy(par->test_dir, argv[++i],MAX_FILE_NAME_LENGTH);
+	   }
+	 }
+	 break;
       };
    }
 
@@ -492,8 +501,9 @@ int user_free_master(void **user)
    FREE(mpp->head);
    FREE(mpp->tail);
    FREE(mpp->type);
-   FREE(mpp);
-
+   if(!mpp->par.test){
+     FREE(mpp);
+   }
    return(USER_SUCCESS);
 }
 

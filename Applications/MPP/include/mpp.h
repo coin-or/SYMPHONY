@@ -28,6 +28,8 @@
 typedef struct MPP_PARAMETERS{
    /* Name of file containingthe instance data */
    char             infile[MAX_FILE_NAME_LENGTH + 1];
+   int              test;
+   char             test_dir[MAX_FILE_NAME_LENGTH +1]; /* Test files directory */  
 }mpp_parameters;
 
 /*---------------------------------------------------------------------------*\

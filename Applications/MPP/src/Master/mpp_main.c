@@ -55,29 +55,100 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony_api.h"
+#include "mpp.h"
 #include <stdlib.h>
+
+int mpp_test(sym_environment *env);
 
 int main(int argc, char **argv)
 {
    int termcode;
+   mpp_problem *mpp;
+
    sym_environment *env = sym_open_environment();
 
-   if (!env){
-      printf("Error initializing environement\n");
-      exit(0);
-   }
-   
+   CALL_FUNCTION( sym_get_user_data(env, (void **)&mpp) );
+
    CALL_FUNCTION( sym_parse_command_line(env, argc, argv) );
 
-   CALL_FUNCTION( sym_load_problem(env) );
+   if(mpp->par.test){
 
-   CALL_FUNCTION( sym_find_initial_bounds(env) );
+     mpp_test(env);
 
-   CALL_FUNCTION( sym_solve(env) );
+   } else {
 
+     CALL_FUNCTION( sym_load_problem(env) );
+     
+     CALL_FUNCTION( sym_find_initial_bounds(env) );
+     
+     CALL_FUNCTION( sym_solve(env) );
+   }
+     
    CALL_FUNCTION( sym_close_environment(env) );
 
    return(0);
+}
+
+/*===========================================================================*\
+\*===========================================================================*/
+
+int mpp_test(sym_environment *env)
+{
+   int termcode, i, file_num = 1;
+   char input_files[2][MAX_FILE_NAME_LENGTH +1] = {"sample.mpp"};
+   
+   double sol[1] = {70.00};
+   
+   char *input_dir = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
+   char *infile = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
+   double *obj_val = (double *)calloc(DSIZE,file_num);
+   double tol = 1e-03;
+   mpp_problem *mpp = (mpp_problem *) env->user;
+
+   if (strcmp(mpp->par.test_dir, "") == 0){ 
+     strcpy(input_dir, ".");
+   } else{
+     strcpy(input_dir, mpp->par.test_dir);
+   }
+  
+   sym_set_int_param(env, "verbosity", -10);
+
+  for(i = 0; i<file_num; i++){
+
+    strcpy(infile, "");
+    sprintf(infile, "%s%s%s", input_dir, "/", input_files[i]);
+    strcpy(mpp->par.infile, infile);
+
+    CALL_FUNCTION( sym_load_problem(env) );
+
+    printf("Solving %s...\n", input_files[i]); 
+
+    CALL_FUNCTION( sym_solve(env) );
+
+    sym_get_obj_val(env, &obj_val[i]);
+
+    if((obj_val[i] < sol[i] + tol) && 
+       (obj_val[i] > sol[i] - tol)){
+      printf("Success!\n");
+    } else {
+      printf("Failure!(%f, %f) \n", obj_val[i], sol[i]);
+    }
+
+    if(env->mip->n && i + 1 < file_num){
+      free_master_u(env);
+      strcpy(env->par.infile, "");
+      env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+    }
+  }
+
+  mpp->par->test = FALSE;
+
+  FREE(input_dir);
+  FREE(infile);
+  FREE(obj_val);
+  
+  return(0);
+
 }
 
 #endif
