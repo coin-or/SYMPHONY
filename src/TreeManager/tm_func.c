@@ -319,7 +319,8 @@ int solve(tm_prob *tm)
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char no_work = TRUE, ramp_up = TRUE;
    double then, then2, then3, now;
-   double timeout = 5, timeout2 = 600, timeout3 = tm->par.logging_interval;
+   double timeout2 = 600, timeout3 = tm->par.logging_interval, timeout4 = 5;
+   struct timeval timeout = {5, 0};
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
@@ -428,7 +429,7 @@ int solve(tm_prob *tm)
 	 }
 #endif
 	 now = wall_clock(NULL);
-	 if (now - then > timeout){
+	 if (now - then > timeout4){
 	    if (!processes_alive(tm)){
 	       for (i=tm->samephase_candnum, tm->lb=MAXDOUBLE; i >= 1; i--){
 		  if (tm->samephase_cand[i]->lower_bound < tm->lb)

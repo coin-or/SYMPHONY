@@ -342,10 +342,10 @@ void fathom_branch(lp_prob *p)
 	 if (p->cut_pool &&
 	     ((first_in_loop && (p->bc_level>0 || p->phase==1)) ||
 	      (p->iter_num % p->par.cut_pool_check_freq == 0)) ){
-	    no_more_cuts_count += pack_lp_solution_u(p, p->cut_pool);
+	    no_more_cuts_count += send_lp_solution_u(p, p->cut_pool);
 	 }
 	 if (p->cut_gen){
-	    no_more_cuts_count += pack_lp_solution_u(p, p->cut_gen);
+	    no_more_cuts_count += send_lp_solution_u(p, p->cut_gen);
 	 }
 
 	 if (p->par.verbosity > 4){
@@ -646,10 +646,10 @@ void repricing(lp_prob *p)
 	 no_more_cuts_count = 0;
 	 if (p->cut_pool &&
 	     ((p->iter_num-1) % p->par.cut_pool_check_freq == 0) ){
-	    no_more_cuts_count += pack_lp_solution_u(p, p->cut_pool);
+	    no_more_cuts_count += send_lp_solution_u(p, p->cut_pool);
 	 }
 	 if (p->cut_gen){
-	    no_more_cuts_count += pack_lp_solution_u(p, p->cut_gen);
+	    no_more_cuts_count += send_lp_solution_u(p, p->cut_gen);
 	 }
 
 	 if (p->par.verbosity > 4){
@@ -949,7 +949,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
    int *ulist, *clist; /* this later uses tmp.i1 */
    int cutcnt, i, j;
 #ifndef COMPILE_IN_LP
-   int s_bufid, r_bufid, *names;
+   int s_bufid, r_bufid;
 #endif
 
    get_basis(lp_data, cstat, rstat);
@@ -1038,8 +1038,8 @@ node_desc *create_explicit_node_desc(lp_prob *p)
    /* At this point we will need the missing names */
    if (cutcnt > 0){
       static struct timeval tout = {15, 0};
-      names = lp_data->tmp.i1; /* m */
-      start = wall_clock(NULL);
+      int *names = lp_data->tmp.i1; /* m */
+      double start = wall_clock(NULL);
       do{
 	 r_bufid = treceive_msg(p->tree_manager, LP__CUT_NAMES_SERVED, &tout);
 	 if (! r_bufid){

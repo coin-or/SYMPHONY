@@ -17,10 +17,8 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdio.h>
-#if 0
 #ifdef __PVM__
 #include <pvmtev.h>
-#endif
 #endif
 
 #include "proccomm.h"
@@ -179,7 +177,7 @@ int main(int argc, char **argv)
       printf( "  Total User Time    %.3f\n", total_time);
 #endif
       printf( "  Total Real Time    %.3f\n\n", wall_clock(NULL) - start_time);
-      printf( "Cost of best solution: %.3f\n", p->ub);
+      printf( "Upper Bound: %.3f\n", p->ub);
       display_solution_u(p, 0);
       free_master_u(p); /* free the problem data structures */
       if (p->par.tm_par.lp_machs)
@@ -582,7 +580,8 @@ void print_statistics(node_times *tim, tm_stat *stat, double ub, double lb,
    printf("      Strong Branching      %.3f\n", tim->strong_branching);
    printf("      Communication         %.3f\n", tim->communication);
 #ifndef COMPILE_IN_LP
-   printf("      Ramp Up Time          %.3f\n", tim->ramp_up_time);
+   printf("      Ramp Up Time (TM)     %.3f\n", tim->ramp_up_tm);
+   printf("      Ramp Up Time (LP)     %.3f\n", tim->ramp_up_lp);
    printf("      Ramp Down Time        %.3f\n", tim->ramp_down_time);
 #endif
    printf("      Idle Time (Node Pack) %.3f\n", tim->start_node);
@@ -614,6 +613,6 @@ void print_statistics(node_times *tim, tm_stat *stat, double ub, double lb,
       printf("\nCurrent Lower Bound:         %.3f", lb);
       printf("\nGap Percentage:              %.2f\n", 100*(ub-lb)/ub);
    }else{
-      printf("\nCost of best solution:        %.3f\n", ub);
+      printf("\nUpper Bound:        %.3f\n", ub);
    }
 }

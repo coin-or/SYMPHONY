@@ -38,9 +38,10 @@ int main(void)
 {
    lp_prob *p;
    int r_bufid;
-   double timeout = 10, time, diff;
+   double time, diff;
+   struct timeval timeout = {10, 0};
    double start_time;
-   first_node_rec = FALSE;
+   char first_node_rec = FALSE;
    
    start_time = wall_clock(NULL);
    
@@ -89,7 +90,7 @@ int main(void)
       }
    }
 
-   p->comp_time.wall_clock_lp = wall_clock(NULL) - start_time;
+   p->comp_times.wall_clock_lp = wall_clock(NULL) - start_time;
    
    lp_exit(p);
 

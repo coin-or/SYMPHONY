@@ -221,7 +221,7 @@ void bc_readparams(problem *p, int argc, char **argv)
    lp_par->max_presolve_iter = 50;
 
    lp_par->is_feasible_default = TEST_INTEGRALITY;
-   lp_par->pack_feasible_solution_default = SEND_NONZEROS;
+   lp_par->send_feasible_solution_default = SEND_NONZEROS;
    lp_par->display_solution_default = DISP_NOTHING;
    lp_par->shall_we_branch_default = USER__BRANCH_IF_MUST;
    lp_par->select_candidates_default = USER__CLOSE_TO_HALF;
@@ -1106,8 +1106,8 @@ void bc_readparams(problem *p, int argc, char **argv)
 	 READ_INT_PAR(lp_par->is_feasible_default);
       }
       else if (strcmp(key, "send_feasible_solution_default") == 0 ||
-	       strcmp(key, "LP_pack_feasible_solution_default") == 0){
-	 READ_INT_PAR(lp_par->pack_feasible_solution_default);
+	       strcmp(key, "LP_send_feasible_solution_default") == 0){
+	 READ_INT_PAR(lp_par->send_feasible_solution_default);
       }
       else if (strcmp(key, "display_solution_default") == 0 ||
 	       strcmp(key, "LP_display_solution_default") == 0){

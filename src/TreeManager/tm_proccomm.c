@@ -956,7 +956,7 @@ void receive_lp_timing(tm_prob *tm)
 	 tm->comp_times.fixing           += tim.fixing;
 	 tm->comp_times.pricing          += tim.pricing;
 	 tm->comp_times.strong_branching += tim.strong_branching;
-         tm->comp_times.wall_clock_lp    += tim.wall_clock;
+         tm->comp_times.wall_clock_lp    += tim.wall_clock_lp;
          tm->comp_times.ramp_up_lp       += tim.ramp_up_lp;
          tm->comp_times.idle_diving      += tim.idle_diving;
          tm->comp_times.idle_node        += tim.idle_node;

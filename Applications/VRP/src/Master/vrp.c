@@ -784,10 +784,39 @@ int user_process_own_messages(void *user, int msgtag)
  * Graph Drawing application to graphically display the solution.
 \*===========================================================================*/
 
-int user_display_solution(void *user)
+int user_display_solution(void *user, int length, int *xind, double *xval)
 {
    /*FIXME: This won't work for printing out from LP in sequential mode */
+
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+   vrp_spec *vrp = (vrp_spec *)user;
+   _node *tour = vrp->cur_sol;
    
+   int prev_node = 0, node, count = 0;
+
+   if (!tour)
+      return(USER_NO_PP);
+   
+   node = tour[0].next;
+
+   if (tour[0].route == 1)
+      printf("\n0 ");
+   while (node != 0){
+      if (tour[prev_node].route != tour[node].route){
+	 printf("\nRoute #%i: ", tour[node].route);
+	 count = 0;
+      }
+      printf("%i ", node);
+      count++;
+      if (count > 15){
+	 printf("\n");
+	 count = 0;
+      }
+      prev_node = node;
+      node = tour[node].next;
+   }
+   printf("\n\n");
+#else
    vrp_problem *vrp = (vrp_problem *)user;
    _node *tour = vrp->cur_tour->tour;
    int window = vrp->dg_id;
@@ -799,7 +828,6 @@ int user_display_solution(void *user)
    
    node = tour[0].next;
 
-   printf("\nSolution Found:\n");
    if (tour[0].route == 1)
       printf("\n0 ");
    while (node != 0){
@@ -825,8 +853,9 @@ int user_display_solution(void *user)
 		    CTOI_WAIT_FOR_CLICK_AND_REPORT);
    }
 #endif
-
-   return(USER_NO_PP);
+#endif
+   
+   return(DEFAULT);
 }
    
 /*===========================================================================*/

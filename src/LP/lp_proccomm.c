@@ -161,7 +161,7 @@ int process_message(lp_prob *p, int r_bufid, int *pindex, int *pitnum)
 
     case YOU_CAN_DIE:
 #if defined(COMPILE_IN_TM) && !defined(COMPILE_IN_LP)     
-      pack_feasible_solution_u(p, p->best_sol.lpetol, p->best_sol.objval,
+      send_feasible_solution_u(p, p->best_sol.lpetol, p->best_sol.objval,
 			       p->best_sol.xlength, p->best_sol.xind,
 			       p->best_sol.xval);
       FREE(p->best_sol.xind);
@@ -1357,7 +1357,8 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 
    /* We can expect a reply only in this case */
    if (*keep >= 0 && (dive == CHECK_BEFORE_DIVE || dive == DO_DIVE)){
-      double start, timeout = 15;
+      double start;
+      struct timeval timeout = {15, 0};
       start = wall_clock(NULL);
       do{
 	 r_bufid = treceive_msg(p->tree_manager, LP__DIVING_INFO, &timeout);

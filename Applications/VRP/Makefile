@@ -44,7 +44,7 @@ USER_LP_SRC      += cg_user.c biconnected.c shrink.c
 endif
 
 USER_CG_SRC       = cg_user.c biconnected.c
-USER_CG_SRC      += compute_cost.c vrp_dg.c ind_sort.c shrink.c
+USER_CG_SRC      += compute_cost.c vrp_dg.c shrink.c
 USER_CG_SRC      += $(MACROS_SRC) $(NET_SRC)
 
 USER_CP_SRC       = cp_user.c $(MACROS_SRC)
@@ -62,7 +62,6 @@ ALL_USER_SRC     += cp_user.c dg_user.c dg_user_network.c
 
 USER_INCDIR       =
 
-#___END_EXPERIMENTAL_SECTION___#
 ##############################################################################
 # This section is for CONCORDE
 ##############################################################################
@@ -196,7 +195,7 @@ ifeq ($(DECOMP),TRUE)
 ifeq ($(COMPILE_OUR_DECOMP),TRUE)
 USER_CG_SRC      += my_decomp_user.c decomp_lower_bound.c
 else
-USER_CG_SRC      += decomp_user.c
+USER_CG_SRC      += decomp_user.c ind_sort.c
 endif
 endif
 

@@ -99,7 +99,7 @@ typedef struct LP_PARAMS{
 
    /*Defaults for the user supplied routines*/
    int               is_feasible_default;
-   int               pack_feasible_solution_default;
+   int               send_feasible_solution_default;
    int               display_solution_default;
    int               shall_we_branch_default;
    int               select_candidates_default;

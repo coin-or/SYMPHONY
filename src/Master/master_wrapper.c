@@ -38,7 +38,7 @@ void initialize_u(problem *p)
 
 void free_master_u(problem *p)
 {
-   user_free_master(&p->user);
+   CALL_USER_FUNCTION( user_free_master(&p->user) );
 }
 
 /*===========================================================================*/
@@ -86,7 +86,7 @@ void start_heurs_u(problem *p)
    double ub = p->has_ub ? p->ub : -MAXDOUBLE;
    double ub_estimate = p->has_ub_estimate ? p->ub_estimate : -MAXDOUBLE;
 
-   user_start_heurs(p->user, &ub, &ub_estimate);
+   CALL_USER_FUNCTION( user_start_heurs(p->user, &ub, &ub_estimate) );
 
    if (!p->has_ub){
       if (ub > -MAXDOUBLE){
@@ -174,41 +174,37 @@ node_desc *create_root_u(problem *p)
 
 void receive_feasible_solution_u(problem *p, int msgtag)
 {
-   double new_ub, *values = NULL;
-   int nonzeros = 0, *userind = NULL;
-
+   receive_int_array(&(p->best_sol.xlevel), 1);
+   receive_int_array(&(p->best_sol.xindex), 1);
+   receive_int_array(&(p->best_sol.xiter_num), 1);
+   receive_dbl_array(&(p->best_sol.lpetol), 1);
+   receive_dbl_array(&(p->best_sol.objval), 1);
+   receive_int_array(&(p->best_sol.xlength), 1);
+   if (p->best_sol.xlength > 0){
+      FREE(p->best_sol.xind);
+      FREE(p->best_sol.xval);
+      p->best_sol.xind = (int *) malloc(p->best_sol.xlength * ISIZE);
+      p->best_sol.xval = (double *) malloc(p->best_sol.xlength * DSIZE);
+      receive_int_array(p->best_sol.xind, p->best_sol.xlength);
+      receive_dbl_array(p->best_sol.xval, p->best_sol.xlength);
+   }
+   if (!p->has_ub || p->best_sol.objval < p->ub){
+      p->has_ub = TRUE;
+      p->ub = p->best_sol.objval;
+   }
+   
    switch (msgtag){
     case FEASIBLE_SOLUTION_NONZEROS:
-      /* A feasible solution has been found in the LP process, and
-       * it was packed by the built-in routine */
-      receive_dbl_array(&new_ub, 1);
-      receive_int_array(&nonzeros, 1);
-      if (nonzeros > 0){
-	 userind = (int *) malloc(nonzeros * ISIZE);
-	 values = (double *) malloc(nonzeros * DSIZE);
-	 receive_int_array(userind, nonzeros);
-	 receive_dbl_array(values, nonzeros);
-      }
-      if (!p->has_ub || new_ub < p->ub){
-	 user_receive_feasible_solution(p->user, msgtag, new_ub, nonzeros,
-					userind, values);
-	 p->has_ub = TRUE;
-	 p->ub = new_ub;
-      }
-      FREE(userind);
-      FREE(values);
       break;
 
     case FEASIBLE_SOLUTION_USER:
       /* A feasible solution has been found in the LP process, and
        * it was packed by the user */
-      receive_dbl_array(&new_ub, 1);
-      if (!p->has_ub || new_ub < p->ub){
-	 user_receive_feasible_solution(p->user, msgtag, new_ub, nonzeros,
-					userind, values);
-	 p->has_ub = TRUE;
-	 p->ub = new_ub;
-      }
+      CALL_USER_FUNCTION( user_receive_feasible_solution(p->user, msgtag,
+							 p->best_sol.objval,
+							 p->best_sol.xlength,
+							 p->best_sol.xind,
+							 p->best_sol.xval) );
       break;
    }
 }
@@ -352,18 +348,68 @@ void send_sp_data_u(problem *p, int sender)
 
 void display_solution_u(problem *p, int thread_num)
 {
+   int user_res, i;
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    if (p->tm && p->tm->lpp[thread_num] && p->tm->lpp[thread_num]->user){
-      user_display_solution(p->tm->lpp[thread_num]->user);
-      printf("Solution Cost: %.3f\n\n", p->tm->ub);
+      lp_prob *lp = p->tm->lpp[thread_num];
+      if (lp->best_sol.xlength){
+	 printf("\nSolution Found: Node %i, Level %i\n", lp->best_sol.xindex,
+		lp->best_sol.xlevel);
+	 printf("Solution Cost: %.3f\n", p->tm->ub);
+	 qsortucb_id(lp->best_sol.xind, lp->best_sol.xval,
+		     lp->best_sol.xlength);
+      }
+      user_res = user_display_solution(lp->user, lp->best_sol.xlength,
+				       lp->best_sol.xind, lp->best_sol.xval);
+      switch(user_res){
+       case USER_NO_PP:
+	 return;
+       case USER_AND_PP:
+       case DEFAULT:
+	 if (lp->best_sol.xlength){
+	    printf("\nUser indices and values of nonzeros in the solution:\n");
+	    printf("\nINDEX     VALUE\n");
+	    printf("=====     =====\n");
+	    for (i = 0; i < lp->best_sol.xlength; i++)
+	       printf("%5d %10.3f\n", lp->best_sol.xind[i],
+		      lp->best_sol.xval[i]);
+	    return;
+	 }
+      }
    }else if (p->user){
-      user_display_solution(p->user);
       printf("Solution Cost: %.3f\n\n", p->ub);
+      CALL_USER_FUNCTION( user_display_solution(p->user, p->best_sol.xlength,
+						p->best_sol.xind,
+						p->best_sol.xval) );
    }
 #else
-   if (p->user)
-      user_display_solution(p->user);
-   printf("Solution Cost: %.3f\n\n", p->ub);
+   if (p->user){
+      if (p->best_sol.xlength){
+	 printf("Solution found at node %i, level %i\n", p->best_sol.xindex,
+		p->best_sol.xlevel);
+	 printf("Solution Cost: %.3f\n\n", p->ub);
+	 qsortucb_id(p->best_sol.xind, p->best_sol.xval,
+		     p->best_sol.xlength);
+      }
+      user_res = user_display_solution(p->user, p->best_sol.xlength,
+				       p->best_sol.xind, p->best_sol.xval);
+      switch(user_res){
+       case USER_NO_PP:
+	 return;
+       case USER_AND_PP:
+       case DEFAULT:
+	 if (p->best_sol.xlength){
+	    printf("\nUser indices and values of nonzeros in the solution\n");
+	    printf("\nINDEX     VALUE\n");
+	    printf("=====     =====\n");
+	    for (i = 0; i < p->best_sol.xlength; i++){
+	       printf("%5d: %10.3f\n", p->best_sol.xind[i],
+		      p->best_sol.xval[i]);
+	    }
+	 }
+	 printf("\n");
+      }
+   }
 #endif
 }
 
@@ -371,6 +417,6 @@ void display_solution_u(problem *p, int thread_num)
 
 void process_own_messages_u(problem *p, int msgtag)
 {
-   user_process_own_messages(p->user, msgtag);
+   CALL_USER_FUNCTION( user_process_own_messages(p->user, msgtag) );
 }
 

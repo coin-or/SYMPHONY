@@ -95,9 +95,7 @@ typedef struct LP_PROB{
 #ifdef COMPILE_IN_LP
    tm_prob      *tm;
 #endif
-#if defined(COMPILE_IN_TM) && !defined(COMPILE_IN_LP)
    lp_sol        best_sol;
-#endif
    
    double        tt;
    node_times    comp_times;
@@ -272,8 +270,10 @@ int comp_cut_name PROTO((const void *c0, const void *c1));
 int create_lp_u PROTO((lp_prob *p));
 void get_upper_bounds_u PROTO((lp_prob *p, int cnt, int *uindex, double *bd));
 int is_feasible_u PROTO((lp_prob *p));
-void send_feasible_solution_u PROTO((lp_prob *p, double lpetol, double new_ub,
-				     int cnt, int *tuind, double *tx));
+void send_feasible_solution_u PROTO((lp_prob *p, int xlevel, int xindex,
+				     int xiter_num, double lpetol,
+				     double new_ub, int cnt, int *xind,
+				     double *xval));
 void display_lp_solution_u PROTO((lp_prob *p, int which_sol));
 int select_candidates_u PROTO((lp_prob *p, int *cuts, int *new_vars,
 			       int *cand_num, branch_obj ***candidates));
@@ -286,7 +286,7 @@ int same_cuts_u PROTO((lp_prob *p, waiting_row *wrow1, waiting_row *wrow2));
 void unpack_cuts_u PROTO((lp_prob *p, int from, int type,
 			  int cut_num, cut_data **cuts,
 			  int *new_row_num, waiting_row ***new_rows));
-int pack_lp_solution_u PROTO((lp_prob *p, int tid));
+int send_lp_solution_u PROTO((lp_prob *p, int tid));
 void logical_fixing_u PROTO((lp_prob *p));
 int generate_column_u PROTO((lp_prob *p, int lpcutnum, cut_data **cuts,
 			     int prevind, int nextind, int generate_what,

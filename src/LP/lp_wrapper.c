@@ -506,6 +506,18 @@ int is_feasible_u(lp_prob *p)
 	 p->ub = new_ub;
 	 if (p->par.set_obj_upper_lim)
 	    set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
+	 p->best_sol.xlevel = p->bc_level;
+	 p->best_sol.xindex = p->bc_index;
+	 p->best_sol.xiter_num = p->iter_num;
+	 p->best_sol.xlength = cnt;
+	 p->best_sol.lpetol = lpetol;
+	 p->best_sol.objval = new_ub;
+	 FREE(p->best_sol.xind);
+	 FREE(p->best_sol.xval);
+	 p->best_sol.xind = (int *) malloc(cnt*ISIZE);
+	 p->best_sol.xval = (double *) malloc(cnt*DSIZE);
+	 memcpy((char *)p->best_sol.xind, (char *)xind, cnt*ISIZE);
+	 memcpy((char *)p->best_sol.xval, (char *)xval, cnt*DSIZE);
 #ifdef COMPILE_IN_LP
 	 p->tm->has_ub = TRUE;
 	 p->tm->ub = p->ub;
@@ -525,7 +537,7 @@ int is_feasible_u(lp_prob *p)
 	 }
 #ifdef COMPILE_IN_TM
 	 if (p->par.verbosity > 0)
-	    user_display_solution(p->user);
+	    user_display_solution(p->user, cnt, xind, xval);
 #endif
 #else
 	 s_bufid = init_send(DataInPlace);
@@ -541,19 +553,9 @@ int is_feasible_u(lp_prob *p)
 	       ("\n* Found Another Feasible Solution.\n"));
 	 PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", new_ub));
       }
-#if defined(COMPILE_IN_TM) && !defined(COMPILE_IN_LP)
-      p->best_sol.xlength = cnt;
-      p->best_sol.lpetol = lpetol;
-      p->best_sol.objval = new_ub;
-      FREE(p->best_sol.xind);
-      FREE(p->best_sol.xval);
-      p->best_sol.xind = (int *) malloc(cnt*ISIZE);
-      p->best_sol.xval = (double *) malloc(cnt*DSIZE);
-      memcpy((char *)p->best_sol.xind, (char *)xind, cnt*ISIZE);
-      memcpy((char *)p->best_sol.xval, (char *)xval, cnt*DSIZE);
-#endif
 #ifndef COMPILE_IN_TM
-      send_feasible_solution_u(p, lpetol, new_ub, cnt, xind, xval);
+      send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
+			       lpetol, new_ub, cnt, xind, xval);
 #endif
       lp_data->termcode = OPT_FEASIBLE;
    }
@@ -563,30 +565,35 @@ int is_feasible_u(lp_prob *p)
 
 /*===========================================================================*/
 
-void send_feasible_solution_u(lp_prob *p, double lpetol, double new_ub,
+void send_feasible_solution_u(lp_prob *p, int xlevel, int xindex,
+			      int xiter_num, double lpetol, double new_ub,
 			      int cnt, int *xind, double *xval)
 {
    int s_bufid, msgtag, user_res;
 
    /* Send to solution to the master */
    s_bufid = init_send(DataInPlace);
+   send_int_array(&xlevel, 1);
+   send_int_array(&xindex, 1);
+   send_int_array(&xiter_num, 1);
+   send_dbl_array(&lpetol, 1);
    send_dbl_array(&new_ub, 1);
+   send_int_array(&cnt, 1);
+   if (cnt > 0){
+      send_int_array(xind, cnt);
+      send_dbl_array(xval, cnt);
+   }
    user_res = user_send_feasible_solution(p->user, lpetol, cnt, xind, xval);
    switch (user_res){
     case USER_NO_PP:
       break;
     case ERROR: /* Error. Do the default */
     case DEFAULT: /* set the default */
-	 user_res = p->par.pack_feasible_solution_default;
+	 user_res = p->par.send_feasible_solution_default;
       break;
    }
    switch (user_res){
     case SEND_NONZEROS:
-      send_int_array(&cnt, 1);
-      if (cnt > 0){
-	 send_int_array(xind, cnt);
-	 send_dbl_array(xval, cnt);
-      }
       msgtag = FEASIBLE_SOLUTION_NONZEROS;
       break;
     default: /* Otherwise the user packed it */
@@ -628,7 +635,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
    
    switch(user_res){
     case ERROR:
-      /* BlackBox ignores error message. */
+      /* SYMPHONY ignores error message. */
       return;
     case USER_AND_PP:
     case USER_NO_PP:
@@ -1292,7 +1299,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
  * lp solution was successful or not.
 \*===========================================================================*/
 
-int pack_lp_solution_u(lp_prob *p, int tid)
+int send_lp_solution_u(lp_prob *p, int tid)
 {
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;

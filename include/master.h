@@ -102,6 +102,7 @@ typedef struct PROBLEM{
 			      problem */
    char       has_ub;
    double     ub;
+   lp_sol     best_sol;
    char       has_ub_estimate;
    double     ub_estimate;
    double     lb;

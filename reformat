@@ -1,6 +1,7 @@
 #!/bin/tcsh -f
 mkdir $1
-foreach file (LICENSE Makefile README*)
+awk -f reformat.awk Makefile.dist > $1/Makefile
+foreach file (LICENSE README*)
 awk -f reformat.awk $file > $1/$file
 end
 mkdir $1/WIN32
