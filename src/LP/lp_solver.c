@@ -76,6 +76,11 @@ void free_mip_desc(MIPdesc *mip)
    FREE(mip->matbeg);
    FREE(mip->matind);
    FREE(mip->matval);
+   FREE(mip->col_lengths);
+   FREE(mip->row_matbeg);
+   FREE(mip->row_matind);
+   FREE(mip->row_matval);
+   FREE(mip->row_lengths);
    FREE(mip->obj);
    FREE(mip->obj1);
    FREE(mip->obj2);
@@ -393,6 +398,8 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    mip->matbeg = (int *)    calloc(ISIZE, (mip->n + 1));
    mip->matval = (double *) malloc(DSIZE * mip->nz);
    mip->matind = (int *)    malloc(ISIZE * mip->nz);
+   mip->col_lengths = (int *) malloc(ISIZE * mip->n);
+   mip->row_lengths = (int *) malloc(ISIZE * mip->m);
 
 #if 0
    //make CoinPackedMatrix help us for now!!!
@@ -423,7 +430,13 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	 }
       } 
       mip->matbeg[j+1] = nonzeros;
+      mip->col_lengths[j] = mip->matbeg[j+1] - mip->matbeg[j];
    }
+
+   mip->row_matbeg = matbeg;
+   mip->row_matval = matval;
+   mip->row_matind = matind;
+
 
    /*get the other definitions: rhs, sense and rngval from row_lb and row_ub*/
 
@@ -456,11 +469,12 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	    mip->rhs[i] = 0.0;
 	 }
       }
+      mip->row_lengths[i] = mip->row_matbeg[i+1] - row_matbeg[i];
    }
 
-   FREE(matind);
-   FREE(matval);
-   FREE(matbeg);
+   //   FREE(matind);
+   //   FREE(matval);
+   //   FREE(matbeg);
    FREE(row_lb);
    FREE(row_ub);
    
@@ -2882,7 +2896,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 
 int read_mps(MIPdesc *mip, char *infile, char *probname)
 {
-   int j, k, last_dot = 0, last_dir = 0;
+   int i, j, k, last_dot = 0, last_dir = 0, nonzeros = 0;
    char fname[80] = "", ext[10] = "", slash;
 
    CoinMpsIO mps;
@@ -2959,6 +2973,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    
    mip->matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
    mip->matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
+   mip->col_lengths = (int *) malloc(ISIZE*mip->n);
    
    memcpy(mip->matval, const_cast<double *> (matrixByCol->getElements()),
 	  DSIZE * mip->matbeg[mip->n]);  
@@ -2967,6 +2982,28 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
+      mip->col_lengths[j] = mip->matbeg[j+1]-mip->matbeg[j];
+   }
+
+
+   mip->row_matbeg = (int *) malloc(ISIZE * (mip->m + 1));
+   mip->row_matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
+   mip->row_matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
+   mip->row_lengths = (int *) malloc(ISIZE*mip->m);
+
+   for(i = 0; i < mip->m; i++){
+      for(j = 0; j < mip->n; j++){
+	 for(k = mip->matbeg[j]; k < mip->matbeg[j+1]; k++){
+	    if(mip->matind[k] == i){	   
+	       mip->row_matind[nonzeros] = j;
+	       mip->row_matval[nonzeros] = mip->matval[k];
+	       nonzeros++;	  
+	       break;
+	    }
+	 }
+      } 
+      mip->row_matbeg[i+1] = nonzeros;
+      mip->row_lengths[i] = mip->row_matbeg[i+1] - mip->row_matbeg[i];
    }
    
    mip->obj_offset = -mps.objectiveOffset();
@@ -3012,75 +3049,171 @@ void write_sav(LPdata *lp_data, char *fname)
 #include "qsortucb.h"
 
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
-		       char send_to_pool)
+		       char send_to_pool, int is_rootnode)
 {
    OsiCuts cutlist;
    OsiRowCut cut;
    int i = 0, j = 0, k = 0; 
    int *matind;
    double *matval;
+   lp_params *par = &(lp_data->par);
+   int cut_num = 0;
    
    /* Set proper variables to be integer */
    for (i = 0; i < lp_data->n; i++) {
       if (lp_data->vars[i]->is_int) { // integer or binary
 	 lp_data->si->setInteger(i);
       }
+   }  
+
+   /* create CGL probing cuts */
+   if(lp_data->par.generate_cgl_probing_cuts){
+     if(is_rootnode || par->probing_generated_in_root){
+       CglProbing *probe = new CglProbing;
+       //#if 0
+       probe->setUsingObjective(true);
+       probe->setMaxPass(3);
+       probe->setMaxLook(50);
+       probe->setRowCuts(3);
+       //#endif
+       probe->generateCuts(*(lp_data->si), cutlist);
+       if (!par->probing_generated_in_root){
+	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	   par->probing_generated_in_root = TRUE;
+	 }
+       }
+       cut_num = cutlist.sizeRowCuts();
+       delete probe;
+     }
    }
-   
+
    /* create CGL gomory cuts */
    if(lp_data->par.generate_cgl_gomory_cuts){
-      CglGomory *gomory = new CglGomory;
-      gomory->generateCuts(*(lp_data->si), cutlist);
-      delete gomory;
+     if(is_rootnode || par->gomory_generated_in_root){
+       CglGomory *gomory = new CglGomory;
+       gomory->generateCuts(*(lp_data->si), cutlist);
+       if (!par->gomory_generated_in_root){
+	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	   par->gomory_generated_in_root = TRUE;
+	 }
+       }
+       cut_num = cutlist.sizeRowCuts();       
+       delete gomory;
+     }
    }
 
    /* create CGL knapsack cuts */
    if(lp_data->par.generate_cgl_knapsack_cuts){
-      CglKnapsackCover *knapsack = new CglKnapsackCover;
-      knapsack->generateCuts(*(lp_data->si), cutlist);
-      delete knapsack;
+     if(is_rootnode || par->knapsack_generated_in_root){
+       CglKnapsackCover *knapsack = new CglKnapsackCover;
+       knapsack->generateCuts(*(lp_data->si), cutlist);
+       if (!par->gomory_generated_in_root){
+	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	   par->knapsack_generated_in_root = TRUE;
+	 }
+       }
+       cut_num = cutlist.sizeRowCuts();       
+       delete knapsack;
+     }
    }
 
    /* create CGL odd hole cuts */
    if(lp_data->par.generate_cgl_oddhole_cuts){
-      CglOddHole *oddhole = new CglOddHole;
-      oddhole->generateCuts(*(lp_data->si), cutlist);
-      delete oddhole;
+     if(is_rootnode || par->oddhole_generated_in_root){
+       CglOddHole *oddhole = new CglOddHole;
+       //#if 0
+       oddhole->setMinimumViolation(0.005);
+       oddhole->setMinimumViolationPer(0.00002);
+       oddhole->setMaximumEntries(200);
+       //#endif
+       oddhole->generateCuts(*(lp_data->si), cutlist);
+       if (!par->oddhole_generated_in_root){
+	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	   par->oddhole_generated_in_root = TRUE;
+	 }
+       }
+       cut_num = cutlist.sizeRowCuts();       
+       delete oddhole;
+     }
    }
 
-   /* create CGL probing cuts */
-   if(lp_data->par.generate_cgl_probing_cuts){
-      CglProbing *probe = new CglProbing;
-      probe->generateCuts(*(lp_data->si), cutlist);
-      delete probe;
+   /* create CGL mir cuts */
+   if(lp_data->par.generate_cgl_mir_cuts){
+     if(is_rootnode || par->mir_generated_in_root){
+       CglMixedIntegerRounding *mir = new CglMixedIntegerRounding;
+       mir->generateCuts(*(lp_data->si), cutlist);
+       if (!par->mir_generated_in_root){
+	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	   par->mir_generated_in_root = TRUE;
+	 }
+       }
+       cut_num = cutlist.sizeRowCuts();       
+       delete mir;
+     }
    }
 
    /* create CGL clique cuts */
    if(lp_data->par.generate_cgl_clique_cuts){
-      CglClique *clique = new CglClique;
-      clique->generateCuts(*(lp_data->si), cutlist);
-      delete clique;
+     if(is_rootnode || par->clique_generated_in_root){
+       CglClique *clique = new CglClique;
+       clique->generateCuts(*(lp_data->si), cutlist);
+       if (!par->clique_generated_in_root){
+	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	   par->clique_generated_in_root = TRUE;
+	 }
+       }
+       cut_num = cutlist.sizeRowCuts();       
+       delete clique;
+     }
    }
-
+   
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    /* create CGL flow cover cuts */
    if(lp_data->par.generate_cgl_flow_and_cover_cuts){
-      CglFlowCover *flow = new CglFlowCover;
-      flow->generateCuts(*(lp_data->si), cutlist);
-      delete flow;
+     if(is_rootnode || par->flow_and_cover_generated_in_root){
+       CglFlowCover *flow = new CglFlowCover;
+       flow->generateCuts(*(lp_data->si), cutlist);
+       if (!par->flow_and_cover_generated_in_root){
+	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	   par->flow_and_cover_generated_in_root = TRUE;
+	 }
+       }
+       cut_num = cutlist.sizeRowCuts();       
+       delete flow;
+      //printf("%i\n", cutlist.sizeRowCuts());
+     }
    }
 
+   /*___END_EXPERIMENTAL_SECTION___*/
    /* create CGL simple rounding cuts */
    if(lp_data->par.generate_cgl_rounding_cuts){
-      CglSimpleRounding * rounding = new CglSimpleRounding;
-      rounding->generateCuts(*(lp_data->si), cutlist);
-      delete rounding;
+     if(is_rootnode || par->rounding_generated_in_root){
+       CglSimpleRounding * rounding = new CglSimpleRounding;
+       rounding->generateCuts(*(lp_data->si), cutlist);
+       if (!par->rounding_generated_in_root){
+	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	   par->rounding_generated_in_root = TRUE;
+	 }
+       }
+       cut_num = cutlist.sizeRowCuts();       
+       delete rounding;
+       //printf("%i\n", cutlist.sizeRowCuts());
+     }
    }
-
+   
    /* create CGL liftandproject cuts (currently buggy) */     
    if(lp_data->par.generate_cgl_lift_and_project_cuts){
-      CglLiftAndProject *liftandproject = new CglLiftAndProject;
-      liftandproject->generateCuts(*(lp_data->si), cutlist);
-      delete liftandproject;
+     if(is_rootnode || par->lift_and_project_generated_in_root){
+       CglLiftAndProject *liftandproject = new CglLiftAndProject;
+       liftandproject->generateCuts(*(lp_data->si), cutlist);
+       if (!par->lift_and_project_generated_in_root){
+	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	   par->lift_and_project_generated_in_root = TRUE;
+	 }
+       }
+       cut_num = cutlist.sizeRowCuts();       
+       delete liftandproject;
+     }
    }
 
    if (cutlist.sizeRowCuts() > 0){

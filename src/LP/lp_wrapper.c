@@ -21,6 +21,7 @@
 #include <malloc.h>
 
 #include "lp.h"
+#include "master.h" 
 #include "proccomm.h"
 #include "qsortucb.h"
 #include "messages.h"
@@ -573,8 +574,8 @@ int is_feasible_u(lp_prob *p, char branching)
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
    int *indices;
-   double *values, valuesi;
-   int cnt, i;
+   double *values, valuesi, ub, *heur_solution = NULL, *col_sol = NULL;
+   int cnt, i, heur_feasible = TRUE;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
@@ -630,20 +631,50 @@ int is_feasible_u(lp_prob *p, char branching)
       break;
    }
 
-   if (feasible == IP_FEASIBLE && p->par.multi_criteria){
-      if (analyze_multicriteria_solution(p, indices, values, cnt,
-					 &true_objval, lpetol, branching) > 0){
-	 if (p->par.mc_add_optimality_cuts || branching){
-	    feasible = IP_FEASIBLE_BUT_CONTINUE;
-	 }else{
-	    feasible = IP_FEASIBLE;
+   /* try rounding */
+   if (feasible == IP_INFEASIBLE){
+     true_objval = SYM_INFINITY;
+     if (p->has_ub){
+       true_objval = p->ub;      
+       heur_feasible = round_solution(p, &true_objval, &heur_solution);
+       col_sol = (double *)calloc(DSIZE, lp_data->n);
+       if (heur_feasible){
+	 memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+       } else {
+	 for(i = 0; i< p->best_sol.xlength; i++) {
+	   col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
 	 }
-      }else{
+       }
+       if(local_search(p, &true_objval, col_sol, &heur_solution)){
+	 heur_feasible = TRUE;
+       }
+     } else {
+       heur_feasible = round_solution(p, &true_objval, &heur_solution);
+     }
+
+     if (heur_feasible){
+       cnt = collect_nonzeros(p, heur_solution, indices, values);        
+     }
+   }     
+  
+   if ((feasible == IP_FEASIBLE || heur_feasible) && p->par.multi_criteria){
+     if (analyze_multicriteria_solution(p, indices, values, cnt,
+					&true_objval, lpetol, branching) > 0){
+       if(feasible == IP_FEASIBLE){
+	 if (p->par.mc_add_optimality_cuts || branching){
+	   feasible = IP_FEASIBLE_BUT_CONTINUE;
+	 }else{
+	   feasible = IP_FEASIBLE;
+	 }
+       }else{
 	 feasible = IP_FEASIBLE;
-      }
+       }
+     }
    }
    
-   if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE){
+
+   if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE ||
+       heur_feasible){
       /* Send the solution value to the treemanager */
       if (!p->has_ub || true_objval < p->ub - p->par.granularity){
 	 p->has_ub = TRUE;
@@ -667,6 +698,12 @@ int is_feasible_u(lp_prob *p, char branching)
 	       p->best_sol.has_sol = TRUE;
 	    PRINT(p->par.verbosity, -1,
 		  ("\n****** Found Better Feasible Solution !\n"));
+#if 0
+	    if(heur_feasible){
+	      PRINT(p->par.verbosity, -1,
+		    ("****** After Calling Heuristics !\n"));
+	    }
+#endif
 	    if (p->mip->obj_sense == SYM_MAXIMIZE){
 	       PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", -true_objval
 					    + p->mip->obj_offset));
@@ -702,6 +739,10 @@ int is_feasible_u(lp_prob *p, char branching)
 	 if (!p->par.multi_criteria){
 	    PRINT(p->par.verbosity, 0,
 		  ("\n* Found Another Feasible Solution.\n"));
+	    if(heur_feasible){
+	      PRINT(p->par.verbosity, 0,
+		    ("\n****** After Calling Heuristics !\n"));
+	    }	
 	    if (p->mip->obj_sense == SYM_MAXIMIZE){
 	       PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
 					   + p->mip->obj_offset));
@@ -718,9 +759,12 @@ int is_feasible_u(lp_prob *p, char branching)
       if (!p->par.multi_criteria){
 	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);
       }
-      lp_data->termcode = LP_OPT_FEASIBLE;
+      if(!heur_feasible)
+	lp_data->termcode = LP_OPT_FEASIBLE;
    }
-
+   
+   FREE(heur_solution);
+   FREE(col_sol);
    return(feasible);
 }
 
@@ -1964,7 +2008,7 @@ int generate_cuts_in_lp_u(lp_prob *p)
       /* Add to the user's list of cuts */
 #ifdef USE_CGL_CUTS
       if (p->par.generate_cgl_cuts){
-	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE);
+	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE, p->bc_index < 1 ? TRUE: FALSE);
       }
 #endif
       /* Fall through to next case */
@@ -2292,6 +2336,10 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
   p->best_sol.xval = (double *) malloc(length*DSIZE);
   memcpy((char *)p->best_sol.xind, (char *)indices, length * ISIZE);
   memcpy((char *)p->best_sol.xval, (char *)values, length * DSIZE);
+
+  if(!p->best_sol.has_sol){
+     p->best_sol.has_sol = TRUE;
+  }
 
 #ifndef COMPILE_IN_TM
   send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
