@@ -359,7 +359,7 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
    int max_size, numarcs, *arcs;
    
    max_size = DSIZE + ISIZE + (vertnum >> DELETE_POWER) + 1
-      + vertnum*vertnum*ISIZE/4;
+      + 2*vertnum*vertnum*ISIZE;
    new_cut->coef = (char *) calloc(max_size, sizeof(char));
    coef = new_cut->coef + DSIZE + ISIZE;
    arcs = (int *) (coef + (vertnum >> DELETE_POWER) + 1);
@@ -665,7 +665,7 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
    double r, q;
    
    max_size = DSIZE + ISIZE + (vertnum >> DELETE_POWER) + 1
-      + vertnum*vertnum*ISIZE/4;
+      + 2*vertnum*vertnum*ISIZE;
    new_cut->coef = (char *) calloc(max_size, sizeof(char));
    coef = new_cut->coef + DSIZE + ISIZE;
    arcs = (int *) (coef + (vertnum >> DELETE_POWER) + 1);
