@@ -191,11 +191,11 @@ int create_subproblem_u(lp_prob *p)
 
    if (desc->uind.size > 0){ /* fill up the rest of lp_data->vars */
       if (MAX(maxn, bvarnum) < lp_data->n){
-	 lp_data->vars = (var_desc **)
+	 vars = lp_data->vars = (var_desc **)
 	    realloc(lp_data->vars, lp_data->n * sizeof(var_desc *));
-	 vars = lp_data->vars;
-	 for (i = lp_data->n - 1; i >= MAX(maxn, bvarnum); i--)
+	 for (i = lp_data->n - 1; i >= MAX(maxn, bvarnum); i--){
 	    vars[i] = (var_desc *) malloc( sizeof(var_desc) );
+	 }
       }
       vars = lp_data->vars;
       d_uind = desc->uind.list;
@@ -321,6 +321,14 @@ int create_subproblem_u(lp_prob *p)
 
    size_lp_arrays(lp_data, FALSE, TRUE, maxm, maxn, maxnz);
 
+   if (lp_data->maxn > lp_data->n){
+      vars = lp_data->vars = (var_desc **)
+	 realloc(lp_data->vars, lp_data->maxn * sizeof(var_desc *));
+      for (i = lp_data->n; i < lp_data->maxn; i++){
+	 vars[i] = (var_desc *) malloc( sizeof(var_desc) );
+      }
+   }
+   
    /* Default status of every variable is NOT_FIXED */
    if (bvarnum > 0)
       memset(lp_data->status, NOT_FIXED | BASE_VARIABLE, bvarnum);
@@ -1597,7 +1605,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
    int user_res, new_row_num = 0;
    waiting_row **new_rows = NULL;
    char deleted_cut;
-   cut_data **cuts;
+   cut_data **cuts = NULL;
    
    int i, j;
    waiting_row **wrows = p->waiting_rows;
@@ -1732,6 +1740,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
    
    switch(user_res){
     case USER_ERROR:
+       FREE(cuts);
       return;
     case GENERATE_CGL_CUTS:
     case USER_DEFAULT:
@@ -1782,9 +1791,11 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	 add_new_rows_to_waiting_rows(p, new_rows, new_row_num);
 	 FREE(new_rows);
       }
+      FREE(cuts);
       return;
     default:
       /* Unexpected return value. Do something!! */
+      FREE(cuts);
       return;
    }      
 }

@@ -204,7 +204,7 @@ void free_lp(lp_prob *p)
 
    free_prob_dependent_u(p);
    free_waiting_row_array(&p->waiting_rows, p->waiting_row_num);
-   for (i = p->lp_data->n - 1; i >= 0; i--)
+   for (i = p->lp_data->maxn - 1; i >= 0; i--)
       FREE(p->lp_data->vars[i]);
    FREE(p->lp_data->vars);
 #ifdef COMPILE_IN_LP

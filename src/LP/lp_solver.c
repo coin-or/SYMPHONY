@@ -3043,7 +3043,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    //lp_data->si->applyCuts(cutlist);
 
    if (cutlist.sizeRowCuts() > 0){
-      if (*num_cuts > 0){
+      if (*cuts){
 	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+cutlist.sizeRowCuts())
 				      * sizeof(cut_data *));
       }else{
