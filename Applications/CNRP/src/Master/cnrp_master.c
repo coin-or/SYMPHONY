@@ -827,8 +827,8 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 #endif
 #endif
 
-   cnrp->fixed_cost = cnrp_lp->fixed_cost
-   cnrp->variable_cost = cnrp_lp->variable_cost
+   cnrp->fixed_cost = cnrp_lp->fixed_cost;
+   cnrp->variable_cost = cnrp_lp->variable_cost;
    
    printf("\nSolution Found:\n");
 #ifdef ADD_FLOW_VARS
