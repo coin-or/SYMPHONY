@@ -173,8 +173,8 @@ ifeq ($(OSI_INTERFACE),CLP)
        LPLIB += -lOsiClp -lClp
 endif
 ifeq ($(OSI_INTERFACE),XPRESS)
-       LPSINCDIR += 
-       LPLIBPATHS +=
+       LPSINCDIR += /usr/local/xpress/include
+       LPLIBPATHS += /usr/local/xpress/lib
        LPLIB += -lOsiXpr
 endif
 ifeq ($(OSI_INTERFACE),SOPLEX)
@@ -283,7 +283,7 @@ endif
 ##############################################################################
 ##############################################################################
 
-CC = g++
+CC = /usr/local/bin/g++
 
 ##############################################################################
 # Set the optimization level
@@ -1085,27 +1085,8 @@ endif
 
 ifeq ($(LP_SOLVER), OSI)
 WHATTOMAKE += coin
-
-ifeq ($(OSI_INTERFACE), CPLEX)
-LPSDIR = OsiCpx
-LPSINCDIR = CpxIncDir
-else 
 ifeq ($(OSI_INTERFACE), CLP)
 WHATTOMAKE += coin_clp
-LPSDIR = OsiClp
-LPSINCDIR = ClpIncDir
-endif
-ifeq ($(OSI_INTERFACE), OSL)
-LPSDIR = OsiOsl
-LPSINCDIR = OslIncDir
-endif
-ifeq ($(OSI_INTERFACE), GLPK)
-LPSDIR = OsiGlpk
-LPSINCDIR = GlpkIncDir
-endif
-ifeq ($(OSI_INTERFACE), XPRESS)
-LPSDIR = OsiXpr
-LPSINCDIR = XprIncDir
 endif
 endif
 
