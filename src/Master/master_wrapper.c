@@ -562,8 +562,10 @@ int display_solution_u(problem *p, int thread_num)
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    if (p->tm && p->tm->lpp[thread_num]){
       sol = p->tm->lpp[thread_num]->best_sol;
+#ifdef MULTI_CRITERIA
       p->obj[0] = p->tm->lpp[thread_num]->obj[0];
       p->obj[1] = p->tm->lpp[thread_num]->obj[1];
+#endif
    }
 #else
    sol = p->best_sol;

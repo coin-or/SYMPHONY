@@ -60,9 +60,9 @@ USE_OSI_INTERFACE = TRUE
 # These variables have to do with the multicriteria solver
 ##############################################################################
 
-MULTI_CRITERIA = TRUE
+MULTI_CRITERIA = FALSE
 LIFO = FALSE
-FIND_NONDOMINATED_SOLUTIONS = TRUE
+FIND_NONDOMINATED_SOLUTIONS = FALSE
 BINARY_SEARCH = FALSE
 
 ##############################################################################
