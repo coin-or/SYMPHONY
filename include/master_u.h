@@ -30,7 +30,8 @@ int user_init_draw_graph PROTO((void *user, int dg_id));
 int user_start_heurs PROTO((void *user, double *ub, double *ub_estimate));
 int user_initialize_root_node PROTO((void *user, int *basevarnum, int **basevars,
 				     int *basecutnum, int *extravarnum,
-				     int **extravars, int *colgen_strat));
+				     int **extravars, char ***colnames,
+				     int *colgen_strat));
 int user_receive_feasible_solution PROTO((void *user, int msgtag, double cost,
 					  int numvars, int *indices,
 					  double *values));

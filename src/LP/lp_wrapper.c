@@ -77,6 +77,20 @@ int receive_lp_data_u(lp_prob *p)
       receive_int_array(&(desc->m), 1);
       receive_int_array(&(desc->n), 1);
       receive_int_array(&(desc->nz), 1);
+
+      /* Allocate memory */
+      desc->matbeg = (int *) malloc(ISIZE * (desc->n + 1));
+      desc->matval = (double *) malloc(DSIZE * desc->matbeg[desc->n]);
+      desc->matind = (int *)    malloc(ISIZE * desc->matbeg[desc->n]);
+      desc->obj    = (double *) malloc(DSIZE * desc->n);
+      desc->rhs    = (double *) malloc(DSIZE * desc->m);
+      desc->sense  = (char *)   malloc(CSIZE * desc->m);
+      desc->rngval = (double *) malloc(DSIZE * desc->m);
+      desc->ub     = (double *) malloc(DSIZE * desc->n);
+      desc->lb     = (double *) malloc(DSIZE * desc->n);
+      desc->is_int = (char *)   calloc(CSIZE, desc->n);
+
+      /* Receive the problem description */
       receive_int_array(desc->matbeg, desc->n);
       receive_int_array(desc->matind, desc->nz);
       receive_dbl_array(desc->matval, desc->nz);
@@ -86,10 +100,7 @@ int receive_lp_data_u(lp_prob *p)
       receive_dbl_array(desc->rngval, desc->m);
       receive_dbl_array(desc->ub, desc->n);
       receive_dbl_array(desc->lb, desc->n);
-      receive_int_array(&desc->numints, 1);
-      if (desc->numints){
-	 receive_int_array(desc->ints, desc->numints);
-      }
+      receive_char_array(desc->is_int, desc->n);
       receive_char_array(&has_colnames, 1);
       if (has_colnames){
 	 desc->colname = (char **) malloc(sizeof(char *) * desc->n);   
@@ -178,6 +189,7 @@ int create_lp_u(lp_prob *p)
    int *userind;
 
    double *lb, *ub;
+   char *is_int;
 
    lp_data->n = bvarnum + desc->uind.size;
    lp_data->m = p->base.cutnum + desc->cutind.size;
@@ -231,7 +243,9 @@ int create_lp_u(lp_prob *p)
        &maxn, &maxm, &maxnz);
    
    switch (user_res){
+      
     case DEFAULT:
+       
       lp_data->desc->nz = p->lp_desc->nz;      
       /* Allocate the arrays.*/
       lp_data->desc->matbeg  = (int *) malloc((lp_data->desc->n + 1) * ISIZE);
@@ -243,12 +257,15 @@ int create_lp_u(lp_prob *p)
       lp_data->desc->rhs     = (double *) malloc(lp_data->desc->m * DSIZE);
       lp_data->desc->sense   = (char *)   malloc(lp_data->desc->m * CSIZE);
       lp_data->desc->rngval  = (double *) calloc(lp_data->desc->m, DSIZE);
+      lp_data->desc->is_int  = (char *)   calloc(lp_data->desc->n, DSIZE);
+
       /* Fill out the appropriate data structures*/
       lp_data->desc->matbeg[0] = 0;
       for (i = 0; i < lp_data->desc->n; i++){
 	 lp_data->desc->obj[i]        = p->lp_desc->obj[userind[i]];
 	 lp_data->desc->ub[i]         = p->lp_desc->ub[userind[i]];
 	 lp_data->desc->lb[i]         = p->lp_desc->lb[userind[i]];
+	 lp_data->desc->is_int[i]     = p->lp_desc->is_int[userind[i]];
 	 lp_data->desc->matbeg[i+1]   = p->lp_desc->matbeg[i] + 
 	                                (p->lp_desc->matbeg[userind[i]+1] -
 	                                 p->lp_desc->matbeg[userind[i]]);
@@ -273,17 +290,20 @@ int create_lp_u(lp_prob *p)
       break;
 
     case ERROR:
+       
       /* Error. The search tree node will not be processed. */
       FREE(userind);
       return(FALSE);
       
     case USER_AND_PP:
+       
       /* User function terminated without problems. User did everything
 	 that is done at case USER_NO_PP. (which is adding the constraints
 	 and setting maxm, maxn, maxnz) */
       break;
 
     case USER_NO_PP:
+       
       /* User function terminated without problems. In the post-processing
        * the extra cuts are added. HOWEVER, this might not be done until the
        * problem is loaded into the lp solver (for cplex it is not possible).
@@ -293,11 +313,11 @@ int create_lp_u(lp_prob *p)
       break;
 
     default:
+       
       /* Unexpected return value. Do something!! */
       FREE(userind);
       return(FALSE);
    }
-
    
    FREE(userind); /* No longer needed */
 
@@ -339,16 +359,18 @@ int create_lp_u(lp_prob *p)
    }
 
    /*------------------------------------------------------------------------*\
-    * Set the upper and lower bounds
+    * Set the upper and lower bounds and integer status
    \*----------------------------------------------------------------------- */
 
    lb = lp_data->desc->lb;
    ub = lp_data->desc->ub;
-   
+   is_int = lp_data->desc->is_int;
+
    vars = lp_data->vars;
    for (i = lp_data->n - 1; i >= 0; i--){
       vars[i]->lb = lb[i];
       vars[i]->ub = ub[i];
+      vars[i]->is_int = is_int[i];
    }
    
    /*------------------------------------------------------------------------*\
@@ -550,6 +572,8 @@ int is_feasible_u(lp_prob *p)
       break;
     case TEST_INTEGRALITY:
       for (i = cnt - 1; i >= 0; i--){
+	 if (!lp_data->vars[indices[i]]->is_int)
+	    continue; /* Not an integer variable */
 	 valuesi = values[i];
 	 if (valuesi-floor(valuesi) > lpetol && ceil(valuesi)-valuesi > lpetol)
 	    break;

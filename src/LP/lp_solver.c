@@ -2509,7 +2509,7 @@ int read_mps(LPdesc *desc, char *infile, char *probname)
    desc->rngval = (double *) malloc(DSIZE * desc->m);
    desc->ub     = (double *) malloc(DSIZE * desc->n);
    desc->lb     = (double *) malloc(DSIZE * desc->n);
-   desc->ints   = (int *)    malloc(ISIZE * desc->n);
+   desc->is_int = (char *)   calloc(CSIZE, desc->n);
    
    memcpy(desc->obj, const_cast <double *> (mps.getObjCoefficients()),
 	  DSIZE * desc->n); 
@@ -2540,10 +2540,8 @@ int read_mps(LPdesc *desc, char *infile, char *probname)
    memcpy(desc->matind, const_cast<int *> (matrixByCol->getIndices()), 
 	  ISIZE * desc->matbeg[desc->n]);  
    
-   for (j = 0, desc->numints = 0; j < desc->n; j++){
-      if (mps.isInteger(j)){
-	 desc->ints[desc->numints++] = j;
-      }
+   for (j = 0; j < desc->n; j++){
+      desc->is_int[j] = mps.isInteger(j);
    }
 
    desc->colname = (char **) malloc(sizeof(char *) * desc->n);   

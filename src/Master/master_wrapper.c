@@ -96,11 +96,12 @@ void io_u(problem *p)
 {
    int err;
 
+   p->desc = (LPdesc *) calloc(1, sizeof(LPdesc));
+
    switch( user_io(p->user) ){
 
     case DEFAULT: 
 
-      p->desc = (LPdesc *) malloc(sizeof(LPdesc));
       err = read_mps(p->desc, p->par.infile, p->probname);
       if(err != 0){
 	 printf("\nErrors in reading mps file\n");
@@ -192,7 +193,7 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
 
    switch (user_initialize_root_node(p->user, &base->varnum, &base->userind,
 				     &base->cutnum, &root->uind.size,
-				     &root->uind.list,
+				     &root->uind.list, &p->desc->colname,
 				     p->par.tm_par.colgen_strat)){
     case ERROR:
       
@@ -360,10 +361,7 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
       send_dbl_array(desc->rngval, desc->m);
       send_dbl_array(desc->ub, desc->n);
       send_dbl_array(desc->lb, desc->n);
-      send_int_array(&desc->numints, 1);
-      if (desc->numints){
-	 send_int_array(desc->ints, desc->numints);
-      }
+      send_int_array(desc->is_int, desc->n);
       if (desc->colname){
 	 has_colnames = TRUE;
 	 send_char_array(&has_colnames, 1);

@@ -79,6 +79,7 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
    desc->rhs     = (double *) malloc(desc->m * DSIZE);
    desc->sense   = (char *) malloc(desc->m * CSIZE);
    desc->rngval  = (double *) calloc(desc->m, DSIZE);
+   desc->is_int  = (char *) malloc(desc->n * CSIZE);
    
    /* Fill out the appropriate data structures -- each column has
       exactly two entried*/
@@ -88,6 +89,7 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
 	 prob->node1[index] = i; /* The first node of assignment 'index' */
 	 prob->node2[index] = j; /* The second node of assignment 'index' */
 	 desc->obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
+	 desc->is_int[index] = TRUE;
 	 desc->matbeg[index] = 2*index;
 	 desc->matval[2*index] = 1;
 	 desc->matval[2*index+1] = 1;

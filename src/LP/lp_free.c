@@ -249,7 +249,7 @@ void free_lp_desc(LPdesc *desc)
    FREE(desc->sense);
    FREE(desc->lb);
    FREE(desc->ub);
-   FREE(desc->ints);
+   FREE(desc->is_int);
    if (desc->colname){
       for (j = 0; j < desc->n; j++){
 	 FREE(desc->colname[j]);

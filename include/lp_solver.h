@@ -131,8 +131,7 @@ typedef struct LPdesc{
    int        n;           /* number of columns */
    int        m;           /* number of rows */
    int        nz;          /* number of nonzeros */
-   int        numints;     /* number of integer components*/
-   int       *ints;        /* indices of integer components*/
+   char      *is_int;      /* indicates whether a given variables is integer */
    int       *matbeg;      /* n */
    int       *matind;      /* nz */
    double    *matval;      /* nz */
