@@ -508,11 +508,6 @@ void vrp_io(vrp_problem *vrp, char *infile)
   if (f != stdin)
      fclose(f);
   
-  vrp->cur_tour = (best_tours *) calloc(1, sizeof(best_tours));
-  vrp->cur_tour->tour = (_node *) calloc(vertnum, sizeof(_node));
-  
-  /*calculate all the distances explcitly and then use distance type EXPLICIT*/
-
   if (vrp->par.prob_type != VRP && vrp->par.prob_type != BPP &&
       vrp->par.prob_type != TSP && vrp->par.prob_type != CSTP &&
       vrp->par.prob_type != CTP){
@@ -520,6 +515,12 @@ void vrp_io(vrp_problem *vrp, char *infile)
      exit(1);
   }
   
+  vrp->cur_tour = (best_tours *) calloc(1, sizeof(best_tours));
+  vrp->cur_tour->tour = (_node *) calloc(vertnum, sizeof(_node));
+  vrp->cur_sol_tree = (int *) calloc(vertnum, ISIZE);
+  
+  /*calculate all the distances explcitly and then use distance type EXPLICIT*/
+
   if (vrp->par.prob_type == BPP){
      dist->cost = (int *) calloc (vrp->edgenum, sizeof(int));
      for (i = 1, k = 0; i < vertnum; i++){

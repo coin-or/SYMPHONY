@@ -88,6 +88,8 @@ typedef struct VRP_PROBLEM{
 
    best_tours     *cur_tour;  /* temporary tour storage */
    int            *cur_sol_tree;
+   double          fixed_cost;
+   double          variable_cost;
    small_graph    *g;         /* contains the edge data for the reduced graph*/
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
    int             feas_sol_size;

@@ -52,8 +52,14 @@
 tm_prob *get_tm_ptr()
 {
    static tm_prob *tm;
+   static int count = 0;
+   
+   if (!tm || count == 2){
+      tm = (tm_prob *) calloc(1, sizeof(tm_prob));
+      count = 0;
+   }
 
-   if (!tm) tm = (tm_prob *) calloc(1, sizeof(tm_prob));
+   count++;
 
    return(tm);
 }

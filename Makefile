@@ -133,8 +133,8 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use an OSI interface.
-#LP_SOLVER = OSI
-OSI_INTERFACE = CPLEX
+LP_SOLVER = OSI
+OSI_INTERFACE = OSL
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
@@ -774,7 +774,7 @@ CFLAGS = $(DEFAULT_FLAGS) $(MORECFLAGS) $(MOREFLAGS)
 ##############################################################################
 ##############################################################################
 
-MASTER_SRC	= master.c master_wrapper.c master_io.c
+MASTER_SRC	= master_wrapper.c master_io.c
 DG_SRC		= draw_graph.c
 
 ifeq ($(COMPILE_IN_TM), TRUE)

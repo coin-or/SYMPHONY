@@ -88,6 +88,7 @@ NET_SRC           = network.c
 DG_FUNC_SRC       = cnrp_dg_functions.c
 
 USER_MASTER_SRC   = cnrp_master.c cnrp_io.c cnrp_master_functions.c small_graph.c
+USER_MASTER_SRC  += main.c
 USER_MASTER_SRC  += $(COST_SRC)
 ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)

@@ -134,10 +134,6 @@ int user_io(void *user)
 
    vrp_io(vrp, vrp->par.infile);
 
-   if (vrp->par.prob_type == TSP || vrp->par.prob_type == VRP ||
-       vrp->par.prob_type == BPP)
-      vrp->cur_sol_tree = (int *) calloc(vrp->vertnum, ISIZE);
-   
    return(USER_SUCCESS);
 }
    
@@ -814,6 +810,8 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 	 vrp->dist.cost[INDEX(n->edges[i].v0, n->edges[i].v1)];
 #endif
    }
+   vrp->fixed_cost = fixed_cost;
+   vrp->variable_cost = variable_cost;
    
    printf("\nSolution Found:\n");
 #ifdef ADD_FLOW_VARS
@@ -884,6 +882,10 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
       }
       printf("\n\n");
    }else{
+      
+      for (i = 0; i < n->edgenum; i++){
+	 vrp->cur_sol_tree[i] = INDEX(n->edges[i].v0, n->edges[i].v1);
+      }
       
       /* Display the solution */
       
