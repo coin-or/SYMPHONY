@@ -23,13 +23,13 @@
 # SYMPHONY's home directory
 ##############################################################################
 
-SYMPHONYROOT = ..
+SYMPHONYROOT = ${HOME}/COIN/SYMPHONY
 
 ##############################################################################
 # The home directory of the user files (must be an absolute path)
 ##############################################################################
 
-USERROOT = .
+USERROOT = ${SYMPHONYROOT}/CNRP
 
 ##############################################################################
 # The customized name of the master program (if desired)
@@ -71,7 +71,7 @@ MULTI_CRITERIA = FALSE
 #Whether to use cuts from the CONCORDE TSP solver that are valid for this model
 ##############################################################################
 
-DO_CONCORDE_CUTS = FALSE
+DO_CONCORDE_CUTS = TRUE
 
 ##############################################################################
 #Whether to use the model with two oppositely oriented copies of each 
@@ -205,16 +205,14 @@ USER_INCDIR       =
 # "make concorde.a" in the SYMPHONY root directory (not in this directory).
 ##############################################################################
 
-DO_CONCORDE_CUTS = FALSE
-
 ifeq ($(DO_CONCORDE_CUTS),TRUE)
 
 USER_BB_DEFINES += -DDO_TSP_CUTS
-USER_BB_DEFINES += -DCC_ONE_ENV
-CONCORDE_ROOT = $(HOME)/Concorde/
+#USER_BB_DEFINES += -DCC_ONE_ENV
+CONCORDE_ROOT = $(HOME)/concorde/
 USERLIBS = -lconcorde -lcplex
-USERLIBPATHS  = ${HOME}/lib
-USER_INCDIR += -I$(CONCORDE_ROOT)/INCLUDE
+USERLIBPATHS  = ${HOME}/lib /usr/local/cplex81/lib/i86_linux2_glibc2.2_gcc3.0/static_pic_mt/
+USER_INCDIR += -I$(CONCORDE_ROOT)/INCLUDE -I/usr/local/cplex81/include/ilcplex/
 
 ifeq ($(COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += tsp.c # $(TSP_SRC)
@@ -230,13 +228,13 @@ TSP_TSP_SRC      += tsp_lp.c prob_io.c branch.c
 TSP_TSP_SRC      += cliqhash.c ddecker.c qsparse.c xtour.c
 TSP_UTIL_SRC      = edgelen.c genhash.c edgemap.c getdata.c sortrus.c
 TSP_UTIL_SRC     += allocrus.c edgeutil.c priority.c urandom.c bgetopt.c 
-TSP_UTIL_SRC     += eunion.c profrus.c util.c dheaps_i.c fastread.c safe_io.c
+TSP_UTIL_SRC     += eunion.c util.c dheaps_i.c fastread.c safe_io.c
 TSP_UTIL_SRC     += zeit.c 
 TSP_CUT_SRC       = cut_st.c shrink.c gomoryhu.c mincut.c connect.c
 TSP_CUT_SRC      += segments.c
 TSP_BIGGUY_SRC    = bigguy.c
 TSP_COMB_SRC     += block.c dngreedy.c
-TSP_LP_SRC       += lpcplex5.c
+TSP_LP_SRC       += lpcplex8.c
 TSP_PQ_SRC       += consec1.c necklace.c cuttree.c pq.c
 TSP_KD_SRC        = kdnear.c kdtwoopt.c kdbuild.c kdspan.c
 TSP_EDGEGEN_SRC   = delaunay.c xnear.c edgegen.c mlinkern.c
@@ -246,7 +244,7 @@ TSP_LOCALCUT_SRC += intmat.c chunks.c
 TSP_VERIFY_SRC    = verify.c
 TSP_HELDKARP_SRC  = heldkarp.c
 TSP_LINKERN_SRC   = linkern.c flip_two.c
-TSP_TINY_SRC      = benttsp.c bnbtsp.c tinytsp.c bnbmsp.c
+TSP_TINY_SRC      = tinytsp.c bnbmsp.c
 
 TSP_SRC           = $(TSP_TSP_SRC) $(TSP_UTIL_SRC) $(TSP_CUT_SRC) 
 TSP_SRC          += $(TSP_BIGGUY_SRC) $(TSP_COMB_SRC) $(TSP_LP_SRC)
@@ -289,9 +287,8 @@ include $(SYMPHONYROOT)/Makefile
 # Targets for CONCORDE
 ##############################################################################
 
-concorde:
-	mv ${USERROOT}/CutGen/shrink.c ${USERROOT}/CutGen/temp.c
-	rm $(USER_OBJDIR)/shrink.o
+concorde : 
+	mv $(SYMPHONYROOT)/include/lp.h $(SYMPHONYROOT)/include/temp.h
 
 concorde.a : concorde $(TSP_OBJS)
 	@echo ""
@@ -299,7 +296,5 @@ concorde.a : concorde $(TSP_OBJS)
 	@echo ""
 	$(AR) $(HOME)/lib/libconcorde.a $(TSP_OBJS)
 	$(RANLIB) $(HOME)/lib/libconcorde.a
-	mv ${USERROOT}/CutGen/temp.c ${USERROOT}/CutGen/shrink.c
-	rm $(USER_OBJDIR)/shrink.o
+	mv $(SYMPHONYROOT)/include/temp.h $(SYMPHONYROOT)/include/lp.h
 	@echo ""
-

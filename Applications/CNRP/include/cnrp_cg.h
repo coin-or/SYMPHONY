@@ -145,6 +145,7 @@ int biconnected PROTO((network *n, int *compnodes, double *compdemands,
 		       double *compcuts));
 void compute_comp_nums PROTO((vertex *v, int parent_comp, int *num_comps,
 		       char parent_is_art_point));
-int tsp_cuts PROTO((network *n, int verbosity, char tsp_prob, int which_cuts));
+int tsp_cuts PROTO((network *n, int verbosity, char tsp_prob, int which_cuts,
+		    cut_data ***cuts, int *num_cuts, int *alloc_cuts));
 
 #endif
