@@ -33,7 +33,7 @@ BEGIN{
   printf("/* This software is licensed under the Common Public License Version 1.0.    */\n");
 }
 
-($1=="/*" && $8=="accompanying"){
+($1=="/*" && $2=="accompanying"){
   getline;
   printf("/* Please see accompanying file for terms.                                   */\n");
 }

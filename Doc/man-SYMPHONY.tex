@@ -1,4 +1,4 @@
-\BB\ (Single- or Multi-Process Optimization over Networks) Version 3.0
+\BB\ (Single- or Multi-Process Optimization over Networks) Version 3.0.1
 is a powerful environment for implementing branch, cut, and price
 algorithms. The subroutines in the \BB\ library comprise a
 state-of-the-art solver which is designed to be completely modular and
@@ -40,6 +40,22 @@ provides a high-level introduction to parallel branch, cut, and price
 and the overall design and use of \BB. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{New in Version 3.0.1}
+
+Here are the additions for Version 3.0.1:
+
+\begin{itemize}
+
+\item Updated the LP interface to work with all CPLEX Versions up to 8.1.
+
+\item A few small bugs were fixed.
+
+\item Added automatic detection of CPLEX version. Other than specifying the
+correct path (which may be version dependent), you do not need to specify the
+CPLEX version under either Windows or Unix.
+
+\end{itemize}
 
 \subsection{New in Version 3.0}
 
@@ -189,13 +205,13 @@ complaints from the compiler because of missing function prototypes, etc.
 
 \begin{itemize}
 
-        \item Download the file {\tt SYMPHONY-3.0.tgz}.
+        \item Download the file {\tt SYMPHONY-3.0.1.tgz}.
 
         \item Unpack the distribution with ``{\tt tar -xzf
-        SYMPHONY-3.0.tgz}''. This will create a subdirectory called
-        {\tt SYMPHONY-3.0/} containing the distribution.
+        SYMPHONY-3.0.1.tgz}''. This will create a subdirectory called
+        {\tt SYMPHONY-3.0.1/} containing the distribution.
         
-        \item Edit the makefile ({\tt SYMPHONY-3.0/Makefile}) to reflect your
+        \item Edit the makefile ({\tt SYMPHONY-3.0.1/Makefile}) to reflect your
 	environment. Only minor edits should be required. An explanation of
 	what has to be set is contained in the comments in the makefile.
 
@@ -204,13 +220,13 @@ complaints from the compiler because of missing function prototypes, etc.
 \paragraph{Compiling the Sequential Version.}
 
 \begin{itemize}
-        \item Type ``{\tt make}'' in the {\tt SYMPHONY-3.0/} directory. This will
+        \item Type ``{\tt make}'' in the {\tt SYMPHONY-3.0.1/} directory. This will
 first make the \BB\ library (sequential version). After making the \BB\
 library, make will compile the user code and link the executable for the
 sample application, a vehicle routing and traveling salesman problem
 solver. The name of the executable will be 
 \begin{center}
-{\tt SYMPHONY-3.0/Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp}, 
+{\tt SYMPHONY-3.0.1/Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp}, 
 \end{center}
 indicating that all
 modules are contained in a single executable. The makefile must be modified to
@@ -227,7 +243,7 @@ distribution. Type
 {\tt Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp -F sample.vrp
 -N 5 -u 522} 
 \end{center}
-in the {\tt SYMPHONY-3.0/} directory. The -N argument gives the number
+in the {\tt SYMPHONY-3.0.1/} directory. The -N argument gives the number
 of routes, which must be specified in advance. The -u argument supplies an
 initial upper bound which is used until a better feasible solution is
 found. TSP instances can also be solved by adding the option -T TSP. In the
@@ -269,7 +285,7 @@ sequential version so there is no need to compile both versions.
         \item Voila, you have a shared memory parallel solver. As above, to
 test the sample program, a sample data file is included with the
 distribution. Type {\tt Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp -F sample.vrp
--N 5 -u 522} in the {\tt SYMPHONY-3.0/} directory. The -N argument gives the number
+-N 5 -u 522} in the {\tt SYMPHONY-3.0.1/} directory. The -N argument gives the number
 of routes, which must be specified in advance. The -u argument supplies an
 initial upper bound which is used until a better feasible solution is
 found. TSP instances can also be solved by adding the option -T TSP. In the
@@ -308,7 +324,7 @@ from Oak Ridge National Laboratories
         set the path variables in the make file appropriately so that make can
         find the PVM library.
 
-        \item Type ``{\tt make}'' in the SYMPHPONY-3.0 directory to
+        \item Type ``{\tt make}'' in the SYMPHPONY-3.0.1 directory to
         make the distributed libraries. As in Step 1 of the sequential
         version, you may type ``{\tt make clean}'' after making the
         library. It should not have to remade again unless you modify
@@ -327,7 +343,7 @@ from Oak Ridge National Laboratories
 
         \item To test the sample program, a sample data file is included with
 the distribution. Type {\tt Vrp/bin.\$(ARCH)/master -F sample.vrp -N 5 -u
-522} in the {\tt SYMPHONY-3.0} directory (note that the actual executable name may
+522} in the {\tt SYMPHONY-3.0.1} directory (note that the actual executable name may
 not be ``{\tt master}'' if {\tt COMPILE\_IN\_TM} is set to {\tt TRUE}; see
 Section \ref{configuration} for more information on executable names.). The -N
 argument gives the number of routes, which must be specified in advance. The
@@ -368,12 +384,12 @@ running in sequential mode at this time.
 
 \begin{itemize}
 
-\item Download {\tt SYMPHONY-3.0.zip} and unzip the archive. This will
-create a subdirectory called {\tt SYMPHONY-3.0$\backslash$} containing all 
+\item Download {\tt SYMPHONY-3.0.1.zip} and unzip the archive. This will
+create a subdirectory called {\tt SYMPHONY-3.0.1$\backslash$} containing all 
 the source files.
 
 \item In MS Visual C++ 6.0, open the workspace 
-{\tt SYMPHONY-3.0$\backslash$WIN32$\backslash$symphony.dsw}.  Note that
+{\tt SYMPHONY-3.0.1$\backslash$WIN32$\backslash$symphony.dsw}.  Note that
 there are two projects, one called ``{\tt symphony}'' and one called ``{\tt
 vrp}''.  The symphony project contains the source code needed to build the
 internal library. The vrp project contains the source code for the
@@ -381,8 +397,8 @@ user-defined functions needed to build the sample application, a VRP and TSP
 solver. Note that to develop a solver of your own, you would replace the VRP
 library with one of your own.
 
-\item By default, SYMPHONY is set up to use CPLEX 7.0 installed in a folder
-called ``{\tt C:$\backslash$ILOG$\backslash$CPLEX70}''. To use a different LP 
+\item By default, SYMPHONY is set up to use CPLEX 8.1 installed in a folder
+called ``{\tt C:$\backslash$ILOG$\backslash$CPLEX81}''. To use a different LP 
 solver or to specify a different location for CPLEX, there are a number of 
 changes that need to be made.
 
@@ -403,15 +419,14 @@ window.
 \item You must set the compiler defines so that the right LP solver interface
 will be used. Follow the procedure above to get to the preprocessor settings
 and make sure that {\tt \_\_OSLLIB\_\_} is defined if you are using OSL or
-{\tt \_\_CPLEX**\_\_} is defined if you are using CPLEX, where ** is your
-version of CPLEX, i.e., {\tt \_\_CPLEX70\_\_} for CPLEX 7.0. DO NOT CHANGE
+{\tt \_\_CPLEX\_\_} is defined if you are using CPLEX. DO NOT CHANGE
 COMPILER DEFINES NOT RELATED TO THE LP SOLVER.
 
 \end{itemize}
 
 \item Note that there are a number of additional compiler defines that control
 the functionality of SYMPHONY. These defines are described in {\tt
-SYMPHONY-3.0$\backslash$Makefile}, a Unix-style make file included with the
+SYMPHONY-3.0.1$\backslash$Makefile}, a Unix-style make file included with the
 distribution. To enable the functionality associated with a particular
 compiler define, simply add it to the list of defines under the preprocessor
 settings, as above.
@@ -427,7 +442,7 @@ executable.
 
 \item To test the executable, right click on the symphony project, go to the
 ``Debug'' tab and set the Program arguments to ``{\tt -F
-SYMPHONY-3.0$\backslash$sample.vrp -N 5 -u 522.}'' Note that command-line
+SYMPHONY-3.0.1$\backslash$sample.vrp -N 5 -u 522.}'' Note that command-line
 switches are Unix-style. The argument to -N is the number of routes that
 should be used in the solution and the -u argument supplies the solver with an
 initial upper bound.
@@ -481,7 +496,7 @@ In addition to the subdirectories corresponding to each module, there are
 subdirectories corresponding to applications. The sample application is
 contained in the directory {\tt Vrp/}. The files containing function stubs
 that can be filled in to create a new application are contained in the
-directory {\tt SYMPHONY-3.0/User/}. There is one file for each module,
+directory {\tt SYMPHONY-3.0.1/User/}. There is one file for each module,
 initially called {\tt User/*/*\_user.c}. The primary thing that
 you, as the user, need to understand to build an application is how to fill in
 these stubs. That is what the second section of this manual is about.
@@ -631,15 +646,15 @@ modified to link with the new LP solver.
 
 Once the user functions are filled in, all that remains is to compile the
 application. The distribution comes with two make files that facilitate this
-process. The primary make file resides in the {\tt SYMPHONY-3.0/} directory.
+process. The primary make file resides in the {\tt SYMPHONY-3.0.1/} directory.
 The user make file resides in the user's subdirectory, initially called {\tt
-SYMPHONY-3.0/User/}. There are a number of variables that must be set in the
+SYMPHONY-3.0.1/User/}. There are a number of variables that must be set in the
 primary make file. First ensure that the sample application compiles by
 following the instructions in Section \ref{getting_started}. Then modify the
-makefile to reflect the new {\tt \$(USERROOT)} ({\tt SYMPHONY-3.0/User} by
+makefile to reflect the new {\tt \$(USERROOT)} ({\tt SYMPHONY-3.0.1/User} by
 default). When you are ready, type ``{\tt make}'' to make the executables.
-\BB\ will create three new subdirectories---{\tt SYMPHONY-3.0/User/obj.*}, 
-{\tt SYMPHONY-3.0/User/bin.*}, and {\tt SYMPHONY-3.0/User/dep.*} where *
+\BB\ will create three new subdirectories---{\tt SYMPHONY-3.0.1/User/obj.*}, 
+{\tt SYMPHONY-3.0.1/User/bin.*}, and {\tt SYMPHONY-3.0.1/User/dep.*} where *
 is a the current architecture (defined in the make file).
 
 \paragraph{Working with PVM.}
@@ -673,7 +688,7 @@ the user must perform all necessary initialization, etc. in the send
 function. This makes it a little confusing to write source code which
 will work for all configurations. However, the confusion should be
 cleared up by looking at the sample application, especially the file
-{\tt SYMPHONY-3.0/Vrp/Master/vrp.c}.
+{\tt SYMPHONY-3.0.1/Vrp/Master/vrp.c}.
 
 \paragraph{Configuring the Modules.}
 \label{configuration}
@@ -733,9 +748,9 @@ information on setting parameters in the parameter file.
 
 First, follow the instructions for compiling the sample application in Section
 \ref{getting_started} to ensure you have the proper settings. Once the stub 
-files in the {\tt SYMPHONY-3.0$\backslash$User} hierarchy are filled in, use
+files in the {\tt SYMPHONY-3.0.1$\backslash$User} hierarchy are filled in, use
 the project ``{\tt vrp}'' as a template to create a new project called ``{\tt
-user}'' that compiles the files in {\tt SYMPHONY-3.0$\backslash$User} and
+user}'' that compiles the files in {\tt SYMPHONY-3.0.1$\backslash$User} and
 creates a library. Modify the project ``{\tt symphony}'' to compile and link
 with the new user library.
 
