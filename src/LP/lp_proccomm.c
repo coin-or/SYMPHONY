@@ -161,9 +161,10 @@ int process_message(lp_prob *p, int r_bufid, int *pindex, int *pitnum)
 
     case YOU_CAN_DIE:
 #if defined(COMPILE_IN_TM) && !defined(COMPILE_IN_LP)     
-      send_feasible_solution_u(p, p->best_sol.lpetol, p->best_sol.objval,
-			       p->best_sol.xlength, p->best_sol.xind,
-			       p->best_sol.xval);
+      send_feasible_solution_u(p, p->best_sol.xlevel, p->best_sol.xindex,
+			       p->best_sol.xiter_num, p->best_sol.lpetol,
+			       p->best_sol.objval, p->best_sol.xlength,
+			       p->best_sol.xind, p->best_sol.xval);
       FREE(p->best_sol.xind);
       FREE(p->best_sol.xval);
 #endif
@@ -1429,8 +1430,8 @@ void send_cuts_to_pool(lp_prob *p, int eff_cnt_limit)
 {
    int i, cnt = 0;
    row_data *extrarows = p->lp_data->rows + p->base.cutnum;
-#ifdef COMPILE_IN_CP
-   
+#if defined(COMPILE_IN_CP) && defined(COMPILE_IN_LP)
+
    cut_pool *cp = p->tm->cpp[p->cut_pool];
 
    if (!cp)
@@ -1449,7 +1450,7 @@ void send_cuts_to_pool(lp_prob *p, int eff_cnt_limit)
 	 cnt++;
    }
 
-#ifdef COMPILE_IN_CP
+#if defined(COMPILE_IN_CP) && defined(COMPILE_IN_LP)
 
    if (cnt > 0){
       REALLOC(cp->cuts_to_add, cut_data *, cp->cuts_to_add_size,

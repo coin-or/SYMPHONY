@@ -507,7 +507,7 @@ void display_solution_u(problem *p, int thread_num)
    }
 
    printf("\nSolution Found: Node %i, Level %i\n", sol.xindex, sol.xlevel);
-   printf("Solution Cost: %.3f\n", p->tm->ub);
+   printf("Solution Cost: %.3f\n", sol.objval);
    qsortucb_id(sol.xind, sol.xval, sol.xlength);
    
    user_res = user_display_solution(p->user, sol.lpetol, sol.xlength, sol.xind,

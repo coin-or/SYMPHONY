@@ -1665,7 +1665,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	    FREE(cg_new_rows);
 	 }
       }
-#ifdef COMPILE_IN_CP
+#if defined(COMPILE_IN_CP) && defined(COMPILE_IN_LP)
       
       if ((p->iter_num == 1 && (p->bc_level > 0 || p->phase==1)) ||
 	  (p->iter_num % p->par.cut_pool_check_freq == 0) ||

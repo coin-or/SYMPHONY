@@ -2834,7 +2834,6 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    for (i = length - 1; i >= 0; i--){
       cut = rows[index[i]].cut;
       rhs[i] = cut->rhs;  
-      //      range[i]=0;
       if ((sense[i] = cut->sense) == 'R'){
 	 range[i] = cut->range;
 	 range_used = TRUE;
@@ -2971,8 +2970,6 @@ void write_sav(LPdata *lp_data, char *fname)
 
 #ifdef USE_CGL_CUTS
 
-#include "cg.h" /* For create_explicit_cut */
-
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 
    OsiCuts cutlist;
@@ -3031,20 +3028,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
       }else{
 	 *cuts = (cut_data **) malloc(cutlist.sizeRowCuts() * sizeof(cut_data *));
       }
-#if 1
-      for (i = 0, j = 0; i < cutlist.sizeRowCuts(); i++){
-	 cut = cutlist.rowCut(i);
-	 if (cut.sense() == 'R'){
-	    continue;
-	 }
-	 (*cuts)[j++] =
-	    create_explicit_cut(cut.row().getNumElements(),
-				const_cast<int *> (cut.row().getIndices()),
-				const_cast<double *> (cut.row().getElements()),
-				cut.rhs(), cut.range(), cut.sense(), FALSE);
-      }
-      *num_cuts += j;
-#else
+
       for (i = 0, j = 0; i < cutlist.sizeRowCuts(); i++){
 	 int num_elements;
 	 int *indices;
@@ -3070,7 +3054,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 	 (*cuts)[j]->deletable = TRUE;
 	 (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
       }
-#endif
    }
    
    delete gomory;

@@ -651,13 +651,9 @@ CPEXT = _cp
 endif
 ifeq ($(COMPILE_IN_LP),TRUE)
 TMEXT = _lp$(LPEXT)$(CPEXT)
-TMLPLIB = $(LPLIB)
 endif
 ifeq ($(COMPILE_IN_TM),TRUE)
 MASTEREXT = _tm$(TMEXT)
-ifeq ($(COMPILE_IN_LP),TRUE)
-MASTERLPLIB = $(LPLIB)
-endif
 endif
 ifeq ($(MASTERNAME),)
 MASTERNAME = master$(MASTEREXT)
@@ -671,6 +667,8 @@ endif
 endif
 endif
 endif
+MASTERLPLIB = $(LPLIB)
+TMLPLIB = $(LPLIB)
 
 ##############################################################################
 ##############################################################################
@@ -784,6 +782,7 @@ TM_SRC		= tm_func.c tm_proccomm.c
 else
 TM_SRC          = treemanager.c tm_func.c tm_proccomm.c
 endif
+
 ifeq ($(COMPILE_IN_LP),TRUE)
 TM_SRC         += lp_solver.c lp_varfunc.c lp_rowfunc.c lp_genfunc.c
 TM_SRC         += lp_proccomm.c lp_wrapper.c lp_free.c
@@ -800,7 +799,10 @@ TM_SRC		+= decomp.c decomp_lp.c
 endif
 #___END_EXPERIMENTAL_SECTION___#
 endif
+else
+MASTER_SRC += lp_solver.c
 endif
+
 ifeq ($(COMPILE_IN_CP),TRUE)
 TM_SRC	       += cp_proccomm.c cp_func.c cp_wrapper.c
 endif
@@ -815,6 +817,7 @@ LP_SRC         += lp_pseudo_branch.c
 else
 LP_SRC         += lp_branch.c
 endif
+
 ifeq ($(COMPILE_IN_CG),TRUE)
 LP_SRC         += cg_func.c cg_wrapper.c
 #__BEGIN_EXPERIMENTAL_SECTION__#
@@ -883,14 +886,9 @@ $(USER_DEPDIR)/%.d : %.c
 ##############################################################################
 ##############################################################################
 
-WHATTOMAKE = masterlib master
-PWHATTOMAKE = pmaster
-QWHATTOMAKE = pmaster
-ifeq ($(COMPILE_IN_TM),FALSE)
-WHATTOMAKE += tmlib tm
-PWHATTOMAKE += ptm
-QWHATTOMAKE += qtm
-endif
+WHATTOMAKE = 
+PWHATTOMAKE = 
+QWHATTOMAKE = 
 ifeq ($(COMPILE_IN_LP),FALSE)
 WHATTOMAKE += lplib lp
 PWHATTOMAKE += plp
@@ -906,6 +904,14 @@ WHATTOMAKE += cglib cg
 PWHATTOMAKE += pcg
 QWHATTOMAKE += qcg
 endif
+ifeq ($(COMPILE_IN_TM),FALSE)
+WHATTOMAKE += tmlib tm
+PWHATTOMAKE += ptm
+QWHATTOMAKE += qtm
+endif
+WHATTOMAKE += masterlib master
+PWHATTOMAKE += pmaster
+QWHATTOMAKE += pmaster
 
 all : 
 	$(MAKE) $(WHATTOMAKE)

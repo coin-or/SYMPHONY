@@ -42,10 +42,10 @@ MASTERNAME = mip
 # explanation of these variables in SYMPHONY's Makefile.
 ##############################################################################
 
-COMPILE_IN_TM = TRUE
+COMPILE_IN_TM = FALSE
 COMPILE_IN_LP = FALSE
 COMPILE_IN_CG = TRUE
-COMPILE_IN_CP = TRUE
+COMPILE_IN_CP = FALSE
 
 ##############################################################################
 # This section is for listing source file names
