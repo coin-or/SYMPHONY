@@ -58,12 +58,15 @@ void OSL_check_error PROTO((const char *erring_func));
 #include "CglCutGenerator.hpp"
 #include "CglLiftAndProject.hpp"
 #include "CglSimpleRounding.hpp"
+#include "CglMixedIntegerRounding.hpp"
 #include "CglClique.hpp"
 #include "CglGomory.hpp"
 #include "CglOddHole.hpp"
 #include "CglKnapsackCover.hpp"
 #include "CglProbing.hpp"
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
 #include "CglFlowCover.hpp"
+/*___END_EXPERIMENTAL_SECTION___*/
 #endif
 
 #ifdef __OSI_CPLEX__
@@ -265,7 +268,7 @@ void write_mps PROTO((LPdata *lp_data, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
 #ifdef USE_CGL_CUTS
 void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts, cut_data ***cuts,
-			      char send_to_pool));
+			      char send_to_pool, int is_rootnode));
 #endif
 #ifdef USE_GLPMPL
 int read_gmpl PROTO((MIPdesc *mip, char *modelfile, char *datafile,
