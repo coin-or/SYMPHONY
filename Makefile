@@ -67,7 +67,7 @@ ROOT = .
 # proper setting for the sample application, a VRP and TSP solver.
 ##############################################################################
 
-USERROOT = $(ROOT)/Vrp
+USERROOT = $(ROOT)/User
 
 ##############################################################################
 ##############################################################################
@@ -86,7 +86,7 @@ USERROOT = $(ROOT)/Vrp
 LP_SOLVER = NONE
 
 ##############################################################################
-# If you want something other than CPLEX or OSLLIB, add it here.
+# If you want something other than CPLEX or OSL, add it here.
 ##############################################################################
 
 ##############################################################################
@@ -94,10 +94,10 @@ LP_SOLVER = NONE
 ##############################################################################
 
 #Uncomment the line below if you want to use OSL.
-LP_SOLVER = OSLLIB
+LP_SOLVER = OSL
 
 #Set the paths and the name of the library
-ifeq ($(LP_SOLVER),OSLLIB)
+ifeq ($(LP_SOLVER),OSL)
        LPINCDIR = -I/usr/local/include
        LPLDFLAGS = -L/usr/local/lib
        LPLIB = -losl
@@ -133,8 +133,8 @@ endif
 # compile a distributed version of the code.
 ##############################################################################
 
-#COMM_PROTOCOL = NONE
-COMM_PROTOCOL = PVM
+COMM_PROTOCOL = NONE
+#COMM_PROTOCOL = PVM
 
 #Set the paths for PVM
 ifeq ($(COMM_PROTOCOL),PVM)
@@ -252,7 +252,7 @@ TM_BASIS_TESTS = FALSE
 #######################################################################
 
 TRACE_PATH = FALSE
-CHECK_CUT_VALIDITY = TRUE
+CHECK_CUT_VALIDITY = FALSE
 CHECK_LP = FALSE
 
 #######################################################################
@@ -300,12 +300,6 @@ ifeq ($(ARCH),LINUX)
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
 	SYSLIBS = -lpthread #-lefence
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = TRUE
-	COMPILE_IN_LP = TRUE
-	COMPILE_IN_TM = TRUE
 endif
 
 ##############################################################################
@@ -318,12 +312,6 @@ ifeq ($(ARCH),RS6K)
 	ifeq ($(ARCH),RS6KMP)
 	   SYSLIBS += -lpthreads
 	endif
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = TRUE
-	COMPILE_IN_LP = TRUE
-	COMPILE_IN_TM = TRUE
 endif
 
 ##############################################################################
@@ -337,12 +325,6 @@ ifeq ($(ARCH),SUN4SOL2)
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM 
 	SYSLIBS = -lsocket -lnsl
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = TRUE
-	COMPILE_IN_LP = TRUE
-	COMPILE_IN_TM = TRUE
 endif
 
 ##############################################################################
@@ -356,12 +338,6 @@ ifeq ($(ARCH),SUNMP)
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM 
 	SYSLIBS = -lsocket -lnsl
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = TRUE
-	COMPILE_IN_LP = TRUE
-	COMPILE_IN_TM = TRUE
 endif
 
 ##############################################################################
@@ -375,12 +351,6 @@ ifeq ($(ARCH),X86SOL2)
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
 	SYSLIBS = -lsocket -lnsl
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = TRUE
-	COMPILE_IN_LP = TRUE
-	COMPILE_IN_TM = TRUE
 endif
 
 ##############################################################################

@@ -71,3 +71,35 @@ mkdir $1/Vrp/DrawGraph
 foreach file (Vrp/DrawGraph/*.c)
 awk -f reformat.awk $file > $1/$file
 end
+mkdir $1/User
+foreach file (User/Makefile)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/User/Common
+foreach file (User/Common/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/User/LP
+foreach file (User/LP/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/User/Master
+foreach file (User/Master/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/User/CutPool
+foreach file (User/CutPool/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/User/CutGen
+foreach file (User/CutGen/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/User/include
+foreach file (User/include/*.h)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/User/DrawGraph
+foreach file (User/DrawGraph/*.c)
+awk -f reformat.awk $file > $1/$file
+end

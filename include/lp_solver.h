@@ -101,13 +101,13 @@ typedef struct LPdata{
 
 void CPX_check_error PROTO((const char *erring_func));
 
-#elif defined(__OSLLIB__)
+#elif defined(__OSL__)
 /*****************************************************************************/
-/*******            here are the definitions for OSLLIB                *******/
+/*******              here are the definitions for OSL                 *******/
 /*****************************************************************************/
 #include <ekk_c_api.h>
 
-void OSLLIB_check_error PROTO((const char *erring_func));
+void OSL_check_error PROTO((const char *erring_func));
 
 /* The second comment indicates where the arrays are resized: BB or LP,
  * BB is BlackBox, LP is the lp solver specific part */
