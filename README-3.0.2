@@ -290,14 +290,14 @@ be stored to describe your instance. Edit the file Template/include/user.h,
 adding the appropriate fields to the user_parameter and user_problem
 structures to store the relevant values.
 
-3. Now edit the file Template/Master/master_user.c. If you choose to have all
+3. Now edit the file Template/Master/user_master.c. If you choose to have all
 variables in the base set (a good starting point), the only function that
 really needs to be filled out initially is user_io(), where you can read in
 the instance data. Note that the name of the file to read the instance data
 from can be specified on the command line using the "-F" option by
 default. Also, check out the function user_set_base().
 
-4. Edit the file Template/LP/lp_user.c. The function user_create_lp() must be
+4. Edit the file Template/LP/user_lp.c. The function user_create_lp() must be
 filled out. This is the most important function, as it sets up the initial LP
 relaxation in each search node.
 
@@ -328,14 +328,14 @@ be stored to describe your instance. Edit the file Template\include\user.h,
 adding the appropriate fields to the user_parameter and user_problem
 structures to store the relevant values.
 
-3. Now edit the file Template\Master\master_user.c. If you choose to have all
+3. Now edit the file Template\Master\user_master.c. If you choose to have all
 variables in the base set (a good starting point), the only function that
 really needs to be filled out initially is user_io(), where you can read in
 the instance data. Note that the name of the file to read the instance data
 from can be specified on the command line using the "-F" option by
 default. Also, check out the function user_set_base().
 
-4. Edit the file Template\LP\lp_user.c. The function user_create_lp() must be
+4. Edit the file Template\LP\user_lp.c. The function user_create_lp() must be
 filled out. This is the most important function, as it sets up the initial LP
 relaxation in each search node.
 

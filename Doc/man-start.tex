@@ -344,7 +344,7 @@ to be stored to describe your instance. Edit the file
 \texttt{user\_parameter} and \texttt{user\_problem} structure to store the
 relevant values.
 
-\item Now edit the file \texttt{Template/Master/master\_user.c}. If you choose
+\item Now edit the file \texttt{Template/Master/user\_master.c}. If you choose
 to have all variables in the base set (a good starting point), the only
 function that really needs to be filled out initially is \texttt{user\_io()},
 where you can read in the instance data. Note that the name of the file to
@@ -352,7 +352,7 @@ read the instance data from can be specified on the command line using the
 "-F" switch.  Also, check out the function
 \texttt{user\_set\_base()}.
 
-\item Edit the file \texttt{Template/LP/lp\_user.c}. The function
+\item Edit the file \texttt{Template/LP/user\_lp.c}. The function
 \texttt{user\_create\_lp()} must be filled out. This is the most important
 function, as it sets up the initial LP relaxation in each search node.
 \end{enumerate}
@@ -387,15 +387,14 @@ fields to the \texttt{user\_parameter} and \texttt{user\_problem} structure to
 store the relevant values.
 
 \item Now edit the file
-\texttt{Template$\backslash$Master$\backslash$master\_user.c}. If you choose to 
-have all variables in the base set (a good starting point), the only function
-that really needs to be filled out initially is \texttt{user\_io()}, where you
-can read in the instance data. Note that the name of the file to read the
-instance data from can be specified on the command line using the "-F" switch.
-Also, check out the function
-\texttt{user\_set\_base()}.
+\texttt{Template$\backslash$Master$\backslash$user\_master.c}. If you choose 
+to have all variables in the base set (a good starting point), the only 
+function that really needs to be filled out initially is \texttt{user\_io()}, 
+where you can read in the instance data. Note that the name of the file to 
+read the instance data from can be specified on the command line using the 
+"-F" switch. Also, check out the function \texttt{user\_set\_base()}.
 
-\item Edit the file \texttt{Template$\backslash$LP$\backslash$lp\_user.c}. The
+\item Edit the file \texttt{Template$\backslash$LP$\backslash$user\_lp.c}. The
 function \texttt{user\_create\_lp()} must be filled out. This is the most
 important function, as it sets up the initial LP relaxation in each search
 node.
