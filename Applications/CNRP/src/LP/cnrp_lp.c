@@ -867,8 +867,8 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		 v0 = edges[edgeind << 1];
 		 v1 = edges[(edgeind << 1) + 1];
 	      }
-	      if ((coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1) &&
-		  !(coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1)){
+	      if ((coef2[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1) &&
+		  !(coef2[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1)){
 		 for (k = 0; k < numarcs; k++){
 		    if (v0 == arcs[k << 1] && v1 == arcs[(k << 1) + 1])
 		       break;
@@ -888,8 +888,8 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		 v1 = edges[edgeind << 1];
 		 v0 = edges[(edgeind << 1) + 1];
 	      }
-	      if ((coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1) &&
-		  !(coef[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1)){
+	      if ((coef2[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1) &&
+		  !(coef2[v0 >> DELETE_POWER] >> (v0 & DELETE_AND) & 1)){
 		 for (k = 0; k < numarcs; k++){
 		    if (v0 == arcs[k << 1] && v1 == arcs[(k << 1) + 1])
 		       break;

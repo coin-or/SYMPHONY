@@ -672,7 +672,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
    
    if (num_cuts < 10 && cnrp->par.do_greedy){
-#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS) && 0
+#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
       greedy_shrinking1_dicut(n, capacity, etol,
 			      cnrp->par.max_num_cuts_in_shrink,
 			      new_cut, compnodes_copy, compmembers, comp_num,
