@@ -214,7 +214,7 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
     case DEFAULT: 
 
       root->uind.size = p->desc->n;
-      root->uind.list = (int *)malloc(root->uind.size * ISIZE);
+      root->uind.list = (int *) malloc(root->uind.size * ISIZE);
       for (i = 0; i < root->uind.size; i++){
 	 root->uind.list[i] = i;
       }
@@ -223,13 +223,15 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
       base->varnum = 0;
       base->userind = NULL;
 
+#if 0
       if (base->varnum){
 	 qsortucb_i(base->userind, base->varnum);
       }
       if (root->uind.size && !p->par.warm_start){
 	 qsortucb_i(root->uind.list, root->uind.size);
       }
-
+#endif
+      
       break;
 
     default:

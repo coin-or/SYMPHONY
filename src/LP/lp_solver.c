@@ -2472,8 +2472,8 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 int read_mps(LPdesc *desc, char *infile, char *probname)
 {
    int j, k;
-   char fname[80];
-   char ext[10];
+   char fname[80] = "";
+   char ext[10] = "";
    bool no_dot = TRUE;
    CoinMpsIO mps;
    int errors;
@@ -2482,8 +2482,7 @@ int read_mps(LPdesc *desc, char *infile, char *probname)
       if (infile[j] != '.'){
 	 if (no_dot){
 	    fname[j] = infile[j];
-	 }
-	 if (!no_dot){
+	 }else{
 	    ext[k] = infile[j];
 	    k++;    
 	 }   
@@ -2494,11 +2493,11 @@ int read_mps(LPdesc *desc, char *infile, char *probname)
    
    mps.setInfinity(mps.getInfinity());
    
-   if (!(errors = mps.readMps(fname,ext))){
+   if (errors = mps.readMps(fname,ext)){
       return(errors);
    }
    
-   memcpy(probname, const_cast<char *>(mps.getProblemName()), 80 * CSIZE);
+   strncpy(probname, const_cast<char *>(mps.getProblemName()), 80);
    
    desc->m  = mps.getNumRows();
    desc->n  = mps.getNumCols();
@@ -2512,25 +2511,25 @@ int read_mps(LPdesc *desc, char *infile, char *probname)
    desc->lb     = (double *) malloc(DSIZE * desc->n);
    desc->ints   = (int *)    malloc(ISIZE * desc->n);
    
-   memcpy(desc->obj,const_cast <double *> (mps.getObjCoefficients()),
+   memcpy(desc->obj, const_cast <double *> (mps.getObjCoefficients()),
 	  DSIZE * desc->n); 
-   memcpy(desc->rhs,const_cast <double *> (mps.getRightHandSide()),
+   memcpy(desc->rhs, const_cast <double *> (mps.getRightHandSide()),
 	  DSIZE * desc->m); 
-   memcpy(desc->sense,const_cast <char *> (mps.getRowSense()),
+   memcpy(desc->sense, const_cast <char *> (mps.getRowSense()),
 	  CSIZE * desc->m); 
-   memcpy(desc->rngval,const_cast <double *> (mps.getRowRange()),
+   memcpy(desc->rngval, const_cast <double *> (mps.getRowRange()),
 	  DSIZE * desc->m); 
-   memcpy(desc->ub,const_cast <double *> (mps.getColUpper()),
+   memcpy(desc->ub, const_cast <double *> (mps.getColUpper()),
 	  DSIZE * desc->n); 
-   memcpy(desc->lb,const_cast <double *> (mps.getColLower()),
+   memcpy(desc->lb, const_cast <double *> (mps.getColLower()),
 	  DSIZE * desc->n); 
    
    //user defined matind, matval, matbeg--fill as column ordered
    
    const CoinPackedMatrix * matrixByCol= mps.getMatrixByCol();
    
-   desc->matbeg = (int *) malloc(ISIZE * desc->n+1);
-   memcpy(desc->matbeg,const_cast<int *>(matrixByCol->getVectorStarts()),
+   desc->matbeg = (int *) malloc(ISIZE * (desc->n + 1));
+   memcpy(desc->matbeg, const_cast<int *>(matrixByCol->getVectorStarts()),
 	  ISIZE * (desc->n + 1));
    
    desc->matval = (double *) malloc(DSIZE*desc->matbeg[desc->n]);
@@ -2543,7 +2542,7 @@ int read_mps(LPdesc *desc, char *infile, char *probname)
    
    for (j = 0, desc->numints = 0; j < desc->n; j++){
       if (mps.isInteger(j)){
-	 desc->ints[desc->numints] = j;
+	 desc->ints[desc->numints++] = j;
       }
    }
 
@@ -2551,7 +2550,7 @@ int read_mps(LPdesc *desc, char *infile, char *probname)
    
    for (j = 0; j < desc->n; j++){
       desc->colname[j] = (char *) malloc(CSIZE * 8);
-      memcpy(desc->colname[j],const_cast<char*>(mps.columnName(j)), CSIZE * 8);
+      memcpy(desc->colname[j], const_cast<char*>(mps.columnName(j)), CSIZE * 8);
    }
    
    return(errors);
