@@ -47,7 +47,7 @@ typedef struct USER_PROBLEM{
 }user_problem;
 
 
-int match_read_data PROTO((void *user, char *infile));
+int match_read_data PROTO((sym_environment *env, void *user, char *infile));
 int match_load_problem PROTO((sym_environment *env, void *user));
 
 #endif

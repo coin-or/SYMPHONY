@@ -11,9 +11,6 @@
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
-
-#define COMPILING_FOR_MASTER
-
 /*===========================================================================*/
 
 #define CALL_FUNCTION(f) \
@@ -32,64 +29,45 @@ if ((termcode = f) < 0){                                                    \
    default. See below for the usage.
 \*===========================================================================*/
 
-#if defined(USE_OSI_INTERFACE) && !defined(USER_MAIN) 
-
-#include "OsiSymSolverInterface.hpp"
-
-int main(int argc, char **argv)
-{
-   OsiSymSolverInterface si;
-
-   /* Parse the command line */
-   si.parseCommandLine(argc, argv);
-   
-   /* Read in the problem */
-   si.loadProblem();
-
-   /* Find a priori problem bounds */
-   si.findInitialBounds();
-
-   /* Solve the problem */
-   si.branchAndBound();
-   
-   return(0);
-}
-
-#elif !defined(USER_MAIN)
-
 #include "symphony_api.h"
 #include "user.h"
 #include <stdlib.h>
 
 int main(int argc, char **argv)
 {
-   int termcode;
-   user_problem *prob = (user_problem *)calloc(1, sizeof(user_problem));
 
-   /* FIXME! sym_open_environment calls user_initialize! */
+   int termcode;
+   char * infile;
+
+   /* Create a SYMPHONY environment */
    sym_environment *env = sym_open_environment();
+
+   /* Create a user problem structure to read in the data and then pass it to  
+      SYMPHONY. 
+   */
+   user_problem *prob = (user_problem *)calloc(1, sizeof(user_problem));
 
    CALL_FUNCTION( sym_parse_command_line(env, argc, argv) );
 
-   CALL_FUNCTION( match_read_data((void *) prob, env->par.infile));
+   CALL_FUNCTION( sym_get_str_param(env, "infile_name", &infile));
 
-   CALL_FUNCTION( sym_set_user_data(env, (void *)prob));
+   CALL_FUNCTION( match_read_data(env, (void *) prob, infile));
    
    CALL_FUNCTION( match_load_problem(env, (void *) prob ));
-
-   CALL_FUNCTION( sym_find_initial_bounds(env) );
 
    CALL_FUNCTION( sym_solve(env) );
 
    CALL_FUNCTION( sym_close_environment(env) );
 
    return(0);
+
 }
 
-int match_read_data(void *user, char *infile)
+int match_read_data(sym_environment *env, void *user, char *infile)
 {
    int i, j;
    FILE *f = NULL;
+   /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
 
    if ((f = fopen(infile, "r")) == NULL){
@@ -106,6 +84,9 @@ int match_read_data(void *user, char *infile)
    prob->colnum = (prob->nnodes)*(prob->nnodes-1)/2;
    prob->rownum = prob->nnodes;
 
+   /* This will pass the user data in to SYMPHONY*/
+   sym_set_user_data(env, (void *)prob);
+
    return (FUNCTION_TERMINATED_NORMALLY);
 }
 
@@ -121,12 +102,6 @@ int match_load_problem(sym_environment *env, void *user){
    n = prob->colnum;
    m = prob->rownum;
    nz = 2 * n;
-
-   /*  Estimate the maximum number of nonzeros 
-   *maxm = 2 * mip->m;
-   *maxn = mip->n;
-   *maxnz = mip->nz + ((*maxm) * (*maxn) / 10);
-   */   
 
    /* Allocate the arrays */
    matbeg  = (int *) malloc((n + 1) * ISIZE);
@@ -166,17 +141,10 @@ int match_load_problem(sym_environment *env, void *user){
       sense[i] = 'E';
    }
    
+   /* Load the problem to SYMPHONY */   
    sym_explicit_load_problem(env, n, m, matbeg, matind, matval, lb, ub, 
 			     is_int, obj, 0, sense, rhs, rngval, true);
 			     
-#if 0
-   for(i = 0; i<n; i++){
-      if (is_int[i]){
-	 sym_set_integer(env, i);
-	 }
-   }
-#endif
-
    FREE(matbeg);
    FREE(matind);
    FREE(matval);
@@ -187,8 +155,7 @@ int match_load_problem(sym_environment *env, void *user){
    FREE(rhs);
    FREE(rngval);
 
-	return(0);
+   return (FUNCTION_TERMINATED_NORMALLY);
 
 }
 
-#endif
