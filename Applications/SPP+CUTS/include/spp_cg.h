@@ -119,10 +119,8 @@ typedef struct SPP_CG_PROBLEM {
    cut_collection     *cut_coll;
 }spp_cg_problem;
 
-
-void free_var_length_structures PROTO((spp_cg_problem *spp));
 void allocate_var_length_structures PROTO((spp_cg_problem *spp, int max_ln));
-
+void free_var_length_structures PROTO((spp_cg_problem *spp));
 void construct_fractional_graph PROTO((spp_cg_problem *spp, int number,
 				       int *indices, double *values));
 void construct_cm_frac PROTO((spp_cg_problem *spp));
@@ -131,15 +129,14 @@ void construct_complement_graph PROTO((frac_graph *fgraph,
 				       frac_graph *cfgraph));
 void construct_level_graph PROTO((frac_graph *fgraph, int root,
 				  level_graph *lgraph));
-void display_level_graph PROTO((spp_cg_problem *spp, frac_graph *fgraph));
-void undisplay_level_graph PROTO((spp_cg_problem *spp));
-/*
-int enumerate_maximal_cliques
-PROTO((spp_cg_problem *spp, cut_data *new_cut,
-       int perm_length, int *perm_indices,
-       int length, int *indices, char *label,
-       int pos));
-       */
+int register_and_send_cut PROTO((spp_cg_problem *spp, cut_data *new_cut,
+				 double violation, double etol));
+
+void extend_clique_on_fgraph PROTO((spp_cg_problem *spp, cut_data *new_cut,
+				    double *pviolation));
+void translate_cut_to_indices PROTO((spp_cg_problem *spp, cut_data *cut));
+void rotate_odd_hole PROTO((int length, int *indices, int *itmp));
+
 int enumerate_maximal_cliques PROTO((spp_cg_problem *spp, int pos, double etol));
 void spp_delete_node PROTO((spp_cg_problem *spp, int del_ind,
 			    int *pcurrent_nodenum, int *current_indices,
@@ -167,10 +164,6 @@ double lift_nonviolated_odd_antihole PROTO((spp_cg_problem *spp, int oah_len,
 					    int *oah, double lhs_oah,
 					    int *phub_len, int *hubs,
 					    int *hub_coef, double etol));
-int register_and_send_cut PROTO((spp_cg_problem *spp, cut_data *new_cut,
-				 double violation, double etol));
-void extend_clique_on_fgraph PROTO((spp_cg_problem *spp, cut_data *new_cut,
-				    double *pviolation));
 void translate_cut_to_indices PROTO((spp_cg_problem *spp, cut_data *cut));
 void rotate_odd_hole PROTO((int length, int *indices, int *itmp));
 

@@ -13,15 +13,19 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
 
+/* SYMPHONY include files */
 #include "BB_macros.h"
 #include "BB_constants.h"
 #include "proccomm.h"
-#include "vrp_cg.h"
 #include "cg_u.h"
+
+/* VRP include files */
+#include "vrp_cg.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
 #include "my_decomp.h"

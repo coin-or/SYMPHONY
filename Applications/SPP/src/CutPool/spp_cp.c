@@ -14,10 +14,14 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdio.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "cp_u.h"
+
+/* SPP include files */
 #include "spp.h"
 
 /*===========================================================================*/

@@ -14,16 +14,22 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <malloc.h>
 #include <memory.h>
 #include <math.h>
 
+/* SYMPHONY include files */
 #include "proccomm.h"
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "qsortucb.h"
 #include "cg_u.h"
+
+/* SPP include files */
 #include "spp_cg.h"
+#include "spp_cg_clique.h"
+#include "spp_cg_functions.h"
 #include "spp_common.h"
 
 /*===========================================================================*/
@@ -283,7 +289,7 @@ void allocate_var_length_structures(spp_cg_problem *spp, int max_ln)
    spp->lgraph->level_of_node = (int *) malloc(max_ln * ISIZE);
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
 
 void free_var_length_structures(spp_cg_problem *spp)
 {
@@ -316,10 +322,7 @@ void free_var_length_structures(spp_cg_problem *spp)
    FREE(spp->lgraph->level_of_node);
 }
 
-/*****************************************************************************/
-/*****************************************************************************/
-/*****************************************************************************/
-/*****************************************************************************/
+/*===========================================================================*/
 
 /*===========================================================================*
  * Construct the fractional graph. 'number', 'indices' and 'values' describe
@@ -394,7 +397,8 @@ void construct_fractional_graph(spp_cg_problem *spp, int number,
    
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
+
 /*===========================================================================*
  * Construct the column ordered matrix corresponding to the fractional
  * solution. Only colnum, rownum, nzcnt, matbeg and matind are filled out.
@@ -424,7 +428,8 @@ void construct_cm_frac(spp_cg_problem *spp)
    spp->cm_frac->nzcnt = mb[nodenum];
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
+
 /*===========================================================================*
  * Construct row ordered version of cm_frac.
  * Note: columns in this row ordered matrix are indexed by integers from
@@ -444,7 +449,8 @@ void construct_rm_frac(spp_cg_problem *spp)
    spp_column_to_row(cm, rm, spp->tmp->itmp_m, spp->tmp->istartmp_m);
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
+
 /*===========================================================================*
  * Construct the complement of the fractional graph.
  *===========================================================================*/
@@ -497,8 +503,9 @@ void construct_complement_graph(frac_graph *fgraph, frac_graph *cfgraph)
    cfgraph->max_degree = cnodes[cfgraph->max_deg_node].degree;
 }
 
-/*****************************************************************************/
-/* root is an index wrt fgraph */
+/*===========================================================================*/
+
+/*********** root is an index wrt fgraph ********/
 
 void construct_level_graph(frac_graph *fgraph, int root, level_graph *lgraph)
 {
@@ -545,7 +552,7 @@ void construct_level_graph(frac_graph *fgraph, int root, level_graph *lgraph)
    lgraph->levelnum = curr_lev;
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
 
 /*===========================================================================*
  * Compare 'new_cut' that has just been generated to all cuts in the
@@ -774,7 +781,7 @@ int register_and_send_cut(spp_cg_problem *spp, cut_data *new_cut,
    return 1;
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
 
 /*===========================================================================*
  * Try to extend a clique on fgraph (greedily).
@@ -898,7 +905,8 @@ void translate_cut_to_indices(spp_cg_problem *spp, cut_data *cut)
    memcpy(cut->coef, names, coef_num * ISIZE);
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
+
 /*===========================================================================*
  * Rotate indices of odd hole so that entry with smallest index is first and
  * smaller indexed neighbor of first node is the second.

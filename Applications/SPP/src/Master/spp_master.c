@@ -14,28 +14,21 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "master_u.h"
+
+/* SPP include files */
 #include "spp.h"
 #include "spp_common.h"
 #include "spp_master_functions.h"
-#ifdef COMPILE_IN_TM
-#ifdef COMPILE_IN_LP
-/* fill these in for sequential compilation if needed. */
-#ifdef COMPILE_IN_CG
-/* fill these in for sequential compilation if needed. */
-#endif
-#ifdef COMPILE_IN_CP
-/* fill these in for sequential compilation if needed. */
-#endif
-#endif
-#endif
 
 /*===========================================================================*\
  * This file contains stubs for the user-written functions for the master 

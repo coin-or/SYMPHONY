@@ -13,6 +13,7 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdio.h>
 #include <stdlib.h>
 /*#include <sys/param.h>*/
@@ -20,15 +21,18 @@
 #include <memory.h>
 #include <math.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "proccomm.h"
 #include "messages.h"
 #include "timemeas.h"
-#include "vrp_lp.h"
 #include "lp_u.h"
 #include "dg_params.h"
-#include "vrp_dg_func.h"
+
+/* VRP include files */
+#include "vrp_lp.h"
+#include "vrp_dg_functions.h"
 #include "vrp_macros.h"
 #include "vrp_const.h"
 

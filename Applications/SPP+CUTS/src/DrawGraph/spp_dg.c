@@ -14,8 +14,10 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <malloc.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "dg.h"

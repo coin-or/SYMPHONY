@@ -20,7 +20,7 @@
 #include <malloc.h>
 #include <string.h>
 
-/* BB include files */
+/* SYMPHONY include files */
 #include "timemeas.h"
 #include "BB_macros.h"
 #include "BB_constants.h"

@@ -13,6 +13,7 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -23,10 +24,13 @@
 #include <malloc.h>
 #include <sys/types.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "proccomm.h"
+
+/* VRP include files */
 #include "vrp_const.h"
-#include "vrp_routines.h"
+#include "vrp_master_functions.h"
 #include "vrp_macros.h"
 
 /*===========================================================================*/

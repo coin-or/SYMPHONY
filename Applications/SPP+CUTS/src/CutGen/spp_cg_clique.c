@@ -4,19 +4,19 @@
 #include <malloc.h>
 #include <math.h>
 
-/* BlackBox include files */
+/* SYMPHONY include files */
 #include "BB_macros.h"
 #include "BB_constants.h"
 #include "pack_cut.h"
 #include "qsortucb.h"
 #include "cg.h"
 
-/* own include files */
+/* SPP include files */
 #include "spp_constants.h"
 #include "spp_types.h"
 #include "spp_common.h"
 #include "spp_cg.h"
-
+#include "spp_cg_clique.h"
 
 /*****************************************************************************/
 /* global variables                                                          */
@@ -222,7 +222,7 @@ int find_violated_star_cliques(spp_cg_problem *spp, double etol)
    return(clique_cnt);
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
 
 /*===========================================================================*
  * Delete the node of index del_ind (this index is wrt current_indices) from
@@ -560,7 +560,7 @@ int enumerate_maximal_cliques(spp_cg_problem *spp, int pos, double etol)
    return(found);
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
 
 /*===========================================================================*
  * Find a violated clique greedily in the given array of indices, starting

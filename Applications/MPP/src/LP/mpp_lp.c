@@ -1,23 +1,29 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Mixed Postman Problem.                                                */
 /*                                                                           */
-/* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
-/* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
+/* (c) Copyright 2003 Lehigh University. All Rights Reserved.                */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* This application was originally developed by Andrew Hofmann and was       */
+/* modified by  Ted Ralphs (tkralphs@lehigh.edu)                             */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdio.h>
 #include <malloc.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "lp_u.h"
+
+/* MPP include files */
 #include "mpp.h"
 
 /*===========================================================================*/
@@ -69,8 +75,8 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
    desc->matind  = (int *) malloc((desc->nz) * ISIZE);
    desc->matval  = (double *) malloc((desc->nz) * DSIZE);
    desc->obj     = (double *) malloc(desc->n * DSIZE);
-   desc->lb     = (double *) calloc(desc->n * DSIZE);
-   desc->ub     = (double *) malloc(desc->n * DSIZE);
+   desc->lb      = (double *) calloc(desc->n, DSIZE);
+   desc->ub      = (double *) malloc(desc->n * DSIZE);
    desc->rhs     = (double *) malloc(desc->m * DSIZE);
    desc->sense   = (char *) malloc(desc->m * CSIZE);
    desc->rngval  = (double *) calloc(desc->m, DSIZE);
@@ -101,7 +107,7 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
 	 /* desc->lb[i] = 0; */ /* Already set to zero from calloc */
 	 desc->ub[i] = (double) (mpp->numarcs + mpp->numedges);
       }else{
-	 desc->lb[i] = 1;
+	 desc->lb[i] = 1.0;
 	 desc->ub[i] = (double) (mpp->numarcs + mpp->numedges);
       }
       desc->obj[i] = (double) (mpp->cost[i]);
@@ -319,7 +325,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 int user_generate_column(void *user, int generate_what, int cutnum,
 			 cut_data **cuts, int prevind, int nextind,
 			 int *real_nextind, double *colval, int *colind,
-			 int *collen, double *obj)
+			 int *collen, double *obj, double *lb, double *ub)
 {
    switch (generate_what){
     case GENERATE_NEXTIND:

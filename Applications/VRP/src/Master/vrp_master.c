@@ -13,19 +13,23 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
 
+/* SYMPHONY include files */
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #include "master.h"
 /*___END_EXPERIMENTAL_SECTION___*/
 #include "BB_macros.h"
 #include "BB_constants.h"
-#include "master_u.h"
 #include "proccomm.h"
 #include "qsortucb.h"
 #include "dg_params.h"
+#include "master_u.h"
+
+/* VRP include files */
 #include "vrp_const.h"
 #include "vrp_types.h"
 #include "vrp_io.h"
@@ -33,8 +37,8 @@
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #include "start_heurs.h"
 /*___END_EXPERIMENTAL_SECTION___*/
-#include "vrp_routines.h"
-#include "vrp_dg_func.h"
+#include "vrp_master_functions.h"
+#include "vrp_dg_functions.h"
 #include "vrp_macros.h"
 #include "small_graph.h"
 #ifdef COMPILE_IN_TM

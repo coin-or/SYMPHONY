@@ -13,21 +13,25 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <malloc.h>
 
+/* SYMPHONY include files */
 #include "BB_macros.h"
 #include "BB_types.h"
 #include "master_u.h"
 #include "lp_params.h"
+
+/* VRP include files */
 #include "vrp_io.h"
-#include "compute_cost.h"
 #include "vrp_types.h"
 #include "vrp_const.h"
 #include "vrp_macros.h"
+#include "compute_cost.h"
 
 /*===========================================================================*/
 

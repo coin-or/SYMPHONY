@@ -13,16 +13,20 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <math.h>
 #include <malloc.h>
 #include <memory.h>
 #include <stdio.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "qsortucb.h"
-#include "vrp_lp.h"
 #include "lp_u.h"
+
+/* VRP include files */
+#include "vrp_lp.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #include "lp.h"
 /*___END_EXPERIMENTAL_SECTION___*/

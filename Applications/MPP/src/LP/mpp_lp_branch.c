@@ -1,17 +1,20 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* the Mixed Postman Problem.                                                */
 /*                                                                           */
-/* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
-/* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
+/* (c) Copyright 2003 Lehigh University. All Rights Reserved.                */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* This application was originally developed by Andrew Hofmann and was       */
+/* modified by  Ted Ralphs (tkralphs@lehigh.edu)                             */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "lp_u.h"

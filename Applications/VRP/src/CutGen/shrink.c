@@ -16,19 +16,23 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdlib.h>
 #include <math.h>
 #include <malloc.h>
 #include <string.h>           /* memset() is defined here in LINUX */
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "messages.h"
 #include "proccomm.h"
-#include "network.h"
 #include "cg.h"
+
+/* VRP include files */
 #include "vrp_cg.h"
 #include "vrp_macros.h"
+#include "network.h"
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #if 0

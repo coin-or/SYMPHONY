@@ -13,14 +13,16 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdio.h>
 #include <stdlib.h>    /* malloc() is here in AIX ... */
 #include <malloc.h>
 #include <string.h>
 
+/* VRP include files */
 #include "vrp_types.h"
 #include "small_graph.h"
-#include "vrp_routines.h"
+#include "vrp_master_functions.h"
 #include "compute_cost.h"
 
 /*===========================================================================*/

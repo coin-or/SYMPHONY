@@ -526,13 +526,13 @@ int is_feasible_u(lp_prob *p)
 	 send_msg(p->tree_manager, UPPER_BOUND);
 	 freebuf(s_bufid);
 #endif
-	 PRINT(p->par.verbosity,0,
+	 PRINT(p->par.verbosity, -1,
 	       ("\n****** Found Better Feasible Solution !\n"));
-	 PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", new_ub));
+	 PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", new_ub));
       }else{
-	 PRINT(p->par.verbosity,0,
+	 PRINT(p->par.verbosity, -1,
 	       ("\n* Found Another Feasible Solution.\n"));
-	 PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", new_ub));
+	 PRINT(p->par.verbosity, -1, ("* Cost: %f\n\n", new_ub));
       }
 #ifndef COMPILE_IN_TM
       send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,

@@ -13,8 +13,8 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _VRP_ROUTINES_H
-#define _VRP_ROUTINES_H
+#ifndef _VRP_MASTER_FUNCTIONS_H
+#define _VRP_MASTER_FUNCTIONS_H
 
 #include "proto.h"
 #include "vrp_types.h"

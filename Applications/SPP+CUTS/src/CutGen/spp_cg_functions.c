@@ -4,18 +4,19 @@
 #include <malloc.h>
 #include <math.h>
 
-/* BlackBox include files */
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "pack_cut.h"
 #include "qsortucb.h"
 #include "cg.h"
 
-/* own include files */
+/* SPP include files */
 #include "spp_constants.h"
 #include "spp_types.h"
 #include "spp_common.h"
 #include "spp_cg.h"
+#include "spp_cg_functions.h"
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -161,7 +162,8 @@ int find_violated_odd_holes(spp_cg_problem *spp, double etol)
    return(numcuts);
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
+
 /*===========================================================================*
  * Find a chordless odd hole of minimum cost (weights of edges added up
  * along the cycle) that contains u, w, and the root of the level-graph.
@@ -231,7 +233,8 @@ double find_chordless_oh(spp_cg_problem *spp, frac_graph *fgraph, int u,
    return(lhs_oh);
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
+
 /*===========================================================================*
  * Find a shortest path of length level_of_node[u] from u to the root of
  * the level-graph. Nodes on levels higher than that of u are enumerated
@@ -307,7 +310,8 @@ void min_path_to_root(spp_cg_problem *spp, frac_graph *fgraph, int u,
 }
 
 
-/*****************************************************************************/
+/*===========================================================================*/
+
 /* this version is closer to that of HP (each hub candidate is lifted in
  and the best (the one which improves the lhs the most) is chosen. */
 
@@ -402,7 +406,8 @@ double lift_nonviolated_odd_hole(spp_cg_problem *spp, int oh_len, int *oh,
 }
 
 #if 0
-/*****************************************************************************/
+/*===========================================================================*/
+
 /* phub_len, hubs and hub_coef are OUT, *pcost_oh contains the cost of the
    oh as an input and the cost of the lifted oh as an output.
    cost of oh (lifted oh) is the value of the lhs in the current soln */
@@ -521,7 +526,8 @@ double lift_nonviolated_odd_hole(spp_cg_problem *spp, int oh_len, int *oh,
 }
 #endif
 
-/*****************************************************************************/
+/*===========================================================================*/
+
 /* returns the max value of the lhs of the lifted odd hole provided that
    the hubs labeled by TRUE are set to 1.
    oh and hubs contain indices wrt fgraph
@@ -770,7 +776,7 @@ int find_violated_odd_antiholes(spp_cg_problem *spp, double etol)
    return(numcuts);
 }
 
-/*****************************************************************************/
+/*===========================================================================*/
 
 double lift_nonviolated_odd_antihole(spp_cg_problem *spp, int oah_len,
 				     int *oah, double lhs_oah, int *phub_len,

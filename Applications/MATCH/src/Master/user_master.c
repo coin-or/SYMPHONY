@@ -1,37 +1,32 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* bipartite matching.                                                       */
 /*                                                                           */
-/* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
-/* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
+/* (c) Copyright 2003 Michael Trick and Ted Ralphs. All Rights Reserved.     */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* This application was originally written by Michael Trick and was modified */
+/* by Ted Ralphs (tkralphs@lehigh.edu).                                      */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "master_u.h"
+
+/* MATCH include files */
 #include "user.h"
-#ifdef COMPILE_IN_TM
-#ifdef COMPILE_IN_LP
-/* fill these in for sequential compilation if needed. */
-#ifdef COMPILE_IN_CG
-/* fill these in for sequential compilation if needed. */
-#endif
-#ifdef COMPILE_IN_CP
-/* fill these in for sequential compilation if needed. */
-#endif
-#endif
-#endif
 
 /*===========================================================================*\
  * This file contains stubs for the user-written functions for the master 
@@ -206,8 +201,8 @@ int user_init_draw_graph(void *user, int dg_id)
  * the base set. In this case, this function need not be modified.
 \*===========================================================================*/
 
-int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
-		  double **ub, int *basecutnum, int *colgen_strat)
+int user_set_base(void *user, int *basevarnum, int **basevars,
+		  int *basecutnum, int *colgen_strat)
 {
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
@@ -217,18 +212,11 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
    /* Set the number of variables*/
    varnum = *basevarnum = prob->colnum;
  
-   /* Allocate memory for the uper and lower bounds. */
-   /* Lower bounds are (probably) all zero so calloc those. */
-   *lb = (double *) calloc (varnum, DSIZE);
-   *ub = (double *) malloc (varnum * DSIZE);
-
    /* This puts all the variable in the base set and fills out the 
       upper bounds */
    vars = *basevars = (int *) malloc(varnum * ISIZE);
    for (i = 0; i < varnum; i++){
      vars[i] = i;
-     (*ub)[i] = 1; /* If the upper bounds are not 1, change this line. */
-     /* (*lb)[i] = 0; /* If the lower bounds are not 0, uncomment this line. */
    }
 
    /* Set the number of rows in the base */

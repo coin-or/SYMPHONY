@@ -12,11 +12,15 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdio.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "lp_u.h"
+
+/* User include files */
 #include "user.h"
 
 /*===========================================================================*/

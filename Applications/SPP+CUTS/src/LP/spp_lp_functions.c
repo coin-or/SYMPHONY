@@ -1,16 +1,32 @@
+/*===========================================================================*/
+/*                                                                           */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* Set Partitioning Problems.                                                */
+/*                                                                           */
+/* (c) Copyright 2003 Marta Eso and Ted Ralphs. All Rights Reserved.         */
+/*                                                                           */
+/* This application was originally developed by Marta Eso and was modified   */
+/* Ted Ralphs (tkralphs@lehigh.edu)                                          */
+/*                                                                           */
+/* This software is licensed under the Common Public License. Please see     */
+/* accompanying file for terms.                                              */
+/*                                                                           */
+/*===========================================================================*/
+
 /* system include files */
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <math.h>
 
-/* BlackBox include files */
+/* SYMPHONY include files */
 #include "BB_types.h"
 #include "BB_macros.h"
 #include "BB_constants.h"
 #include "qsortucb.h"
 
-/* own include files */
+/* SPP include files */
 #include "spp_constants.h"
 #include "spp_types.h"
 #include "spp_common.h"

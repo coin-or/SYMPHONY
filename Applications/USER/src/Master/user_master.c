@@ -12,14 +12,18 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "master_u.h"
+
+/* User include files */
 #include "user.h"
 #ifdef COMPILE_IN_TM
 #ifdef COMPILE_IN_LP

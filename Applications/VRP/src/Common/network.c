@@ -13,13 +13,17 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <math.h>
 #include <malloc.h>
 #include <memory.h>
 #include <stddef.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
+
+/* VRP include files */
 #include "network.h"
 
 /*===========================================================================*\

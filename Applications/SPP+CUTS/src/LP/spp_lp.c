@@ -14,12 +14,16 @@
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <stdio.h>
 
+/* SYMPHONY include files */
 #include "proccomm.h"
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "lp_u.h"
+
+/* SPP include files */
 #include "spp_common.h"
 #include "spp_lp.h"
 #include "spp_lp_functions.h"

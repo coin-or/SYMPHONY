@@ -1,23 +1,29 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of a demonstration application for use with the         */
+/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* bipartite matching.                                                       */
 /*                                                                           */
-/* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
-/* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
+/* (c) Copyright 2003 Michael Trick and Ted Ralphs. All Rights Reserved.     */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* This application was originally written by Michael Trick and was modified */
+/* by Ted Ralphs (tkralphs@lehigh.edu).                                      */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
 
+/* system include files */
 #include <malloc.h>
 #include <stdio.h>
 
+/* SYMPHONY include files */
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "lp_u.h"
+
+/* MATCH include files */
 #include "user.h"
 
 /*===========================================================================*/
@@ -47,11 +53,8 @@ int user_receive_lp_data(void **user)
  * fill out this function.
 \*===========================================================================*/
 
-int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
-		   int cutnum, cut_data **cuts, int *nz, int **matbeg,
-		   int **matind, double **matval, double **obj, double **rhs,
-		   char **sense, double **rngval, int *maxn, int *maxm,
-		   int *maxnz, int *allocn, int *allocm, int *allocnz)
+int user_create_lp(void *user, LPdesc *desc, int *indices, 
+		   int *maxn, int *maxm, int *maxnz)
 {
    user_problem *prob = (user_problem *) user;
    int i, j, index;
@@ -59,47 +62,23 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
 
    /* set up the inital LP data */
 
-   *nz = 2 * varnum;
+   desc->nz = 2 * desc->n;
 
-   /* We have to check to make sure there is enough space allocated
-      for the matrix we are going to build */
-   if (2 * rownum > *maxm){
-      *maxm = 2 * rownum;
-      resize = TRUE;
-   }
+   /* Estimate the maximum number of nonzeros */
+   *maxm = 2 * desc->m;
+   *maxn = desc->n;
+   *maxnz = desc->nz + ((*maxm) * (*maxn) / 10);
    
-   /* Allocate space for all edges up front since we have small problems */
-   if (prob->colnum != *maxn){
-      *maxn = prob->colnum;
-      resize = TRUE;
-   }
-   
-   if (*nz + ((*maxm) * (*maxn) / 10) > *maxnz){
-      *maxnz = *nz + ((*maxm) * (*maxn) / 10);
-      resize = TRUE;
-   }
-   
-   /* If there was not enough space, the allocate more */
-   if (resize){
-      /*re-malloc all the arrays*/
-      FREE(*matbeg);
-      FREE(*matind);
-      FREE(*matval);
-      FREE(*obj);
-      FREE(*rhs);
-      FREE(*sense);
-      FREE(*rngval);
-      *allocm  = *maxm;
-      *allocn  = *maxm + *maxn + 1;
-      *allocnz = *maxnz + *maxm;
-      *matbeg  = (int *) malloc(*allocn * ISIZE);
-      *matind  = (int *) malloc(*allocnz * ISIZE);
-      *matval  = (double *) malloc(*allocnz * DSIZE);
-      *obj     = (double *) malloc(*allocn * DSIZE);
-      *rhs     = (double *) malloc(*allocm * DSIZE);
-      *sense   = (char *) malloc(*allocm * CSIZE);
-      *rngval  = (double *) calloc(*allocm, DSIZE);
-   }
+   /* Allocate the arrays. These are owned by SYMPHONY after returning. */
+   desc->matbeg  = (int *) malloc((desc->n + 1) * ISIZE);
+   desc->matind  = (int *) malloc((desc->nz) * ISIZE);
+   desc->matval  = (double *) malloc((desc->nz) * DSIZE);
+   desc->obj     = (double *) malloc(desc->n * DSIZE);
+   desc->lb      = (double *) calloc(desc->n, DSIZE);
+   desc->ub      = (double *) malloc(desc->n * DSIZE);
+   desc->rhs     = (double *) malloc(desc->m * DSIZE);
+   desc->sense   = (char *) malloc(desc->m * CSIZE);
+   desc->rngval  = (double *) calloc(desc->m, DSIZE);
    
    /* Fill out the appropriate data structures -- each column has
       exactly two entried*/
@@ -108,21 +87,21 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
       for (j = i+1; j < prob->nnodes; j++) {
 	 prob->node1[index] = i; /* The first node of assignment 'index' */
 	 prob->node2[index] = j; /* The second node of assignment 'index' */
-	 (*obj)[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
-	 (*matbeg)[index] = 2*index;
-	 (*matval)[2*index] = 1;
-	 (*matval)[2*index+1] = 1;
-	 (*matind)[2*index] = i;
-	 (*matind)[2*index+1] = j;
+	 desc->obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
+	 desc->matbeg[index] = 2*index;
+	 desc->matval[2*index] = 1;
+	 desc->matval[2*index+1] = 1;
+	 desc->matind[2*index] = i;
+	 desc->matind[2*index+1] = j;
 	 index++;
       }
    }
-   (*matbeg)[varnum] = 2*varnum;
+   desc->matbeg)[varnum] = 2*varnum;
    
    /* set the initial right hand side */
    for (i = 0; i < prob->nnodes; i++) {
-      (*rhs)[i] = 1;
-      (*sense)[i] = 'E';
+      desc->rhs[i] = 1;
+      desc->sense[i] = 'E';
    }
 
    return(USER_NO_PP);
@@ -283,7 +262,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 int user_generate_column(void *user, int generate_what, int cutnum,
 			 cut_data **cuts, int prevind, int nextind,
 			 int *real_nextind, double *colval, int *colind,
-			 int *collen, double *obj)
+			 int *collen, double *obj, double *lb, double *ub)
 {
    switch (generate_what){
     case GENERATE_NEXTIND:
