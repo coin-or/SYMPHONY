@@ -1064,7 +1064,7 @@ int sym_solve(sym_environment *env)
       if(env->par.verbosity >=0 ) {
 	 print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, env->lb, total_time,
 			  start_time, wall_clock(NULL), env->mip->obj_offset, 
-			  env->mip->obj_sense, env->has_ub);
+			  env->mip->obj_sense, tm->has_ub);
       }
       temp = termcode;
       if(env->par.verbosity >=-1 ) {

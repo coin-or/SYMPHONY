@@ -710,6 +710,8 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
 		      double finish_time, double obj_offset, char obj_sense, 
 		      char has_ub)
 {
+   double gap = 0.0;
+
    static str_int nfstatus[4] = {
       {"NF_CHECK_ALL"           , NF_CHECK_ALL }
       , {"NF_CHECK_AFTER_LAST"    , NF_CHECK_AFTER_LAST }
@@ -777,22 +779,25 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
       }
    }
 
+   if(has_ub){
+     gap = 100*(ub-lb)/ub;
+   }
+
    if (obj_sense == SYM_MAXIMIZE){
-     if (has_ub){
+     if (gap > -1e-07 && gap < 0){
        printf("\nCurrent Lower Bound:         %.3f", -ub + obj_offset);
        printf("\nCurrent Upper Bound:         %.3f", -lb + obj_offset);
-       printf("\nGap Percentage:              %.2f\n", -100*(ub-lb)/ub);
-     } else {
-       printf("\nCurrent Upper Bound:         %.3f", -lb + obj_offset);
+       printf("\nGap Percentage:              %.2f\n", -gap);
+     } else if (!has_ub) {
+       printf("\nCurrent Upper Bound:         %.3f\n", -lb + obj_offset);
      }
    }else{
-     if (has_ub){
+     if (gap > 1e-07){
        printf("\nCurrent Upper Bound:         %.3f", ub + obj_offset);
        printf("\nCurrent Lower Bound:         %.3f", lb + obj_offset);
-       printf("\nGap Percentage:              %.2f\n", 100*(ub-lb)/ub);
-     } else {
-       printf("\nCurrent Lower Bound:         %.3f", lb + obj_offset);
+       printf("\nGap Percentage:              %.2f\n", gap);
+     } else if (!has_ub){
+       printf("\nCurrent Lower Bound:         %.3f\n", lb + obj_offset);
      }
    }
 }
-

@@ -508,10 +508,6 @@ int solve(tm_prob *tm)
    tm->comp_times.ramp_down_time = ramp_down_time;
    write_log_files(tm);
 
-   if (termcode == TM_FINISHED){
-      tm->lb = 0;
-   }
-      
    return(termcode);
 }
 
