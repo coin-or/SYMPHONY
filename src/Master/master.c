@@ -1955,20 +1955,6 @@ int sym_is_proven_primal_infeasible(sym_environment *env)
 
 /*===========================================================================*/
 /*===========================================================================*/
-int sym_is_primal_objective_limit_reached(sym_environment *env)
-{
-
-   switch(env->termcode){
-    case TM_TARGET_GAP_ACHIEVED:
-       return(TRUE);
-    default:
-       break;
-   }
-   
-   return(FALSE);
-}
-/*===========================================================================*/
-/*===========================================================================*/
 
 int sym_is_iteration_limit_reached(sym_environment *env)
 {
