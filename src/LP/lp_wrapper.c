@@ -1428,7 +1428,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 
    for (i = 0; i < l; i++){
       if (cuts[i]){
-	 new_rows[i]->cut = cuts[i];
+	 (*new_rows)[i]->cut = cuts[i];
 	 cuts[i] = NULL;
       }
    }
