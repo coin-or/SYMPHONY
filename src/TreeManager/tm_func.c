@@ -357,7 +357,7 @@ int solve(tm_prob *tm)
 	    if (!tm->lp.free_num){
 	       ramp_down = FALSE;
 	       ramp_up = FALSE;
-	    }else{
+	    }else if (!ramp_up){
 	       ramp_down = TRUE;
 	       no_work_start = wall_clock(NULL);
 	    }
