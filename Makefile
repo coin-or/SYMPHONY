@@ -93,12 +93,12 @@ LP_SOLVER = NONE
 ##############################################################################
 
 #Uncomment the line below if you want to use OSL.
-LP_SOLVER = OSL
+#LP_SOLVER = OSL
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSL)
-       LPINCDIR = -I/usr/local/include
-       LPLDFLAGS = -L/usr/local/lib
+       LPINCDIR = -I${HOME}/include
+       LPLDFLAGS = -L${HOME}/lib
        LPLIB = -losl
 endif
 
@@ -107,11 +107,11 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use CPLEX.
-#LP_SOLVER = CPLEX
+LP_SOLVER = CPLEX
 
 ifeq ($(LP_SOLVER),CPLEX)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
+	LPINCDIR = -I/home/cplex/cplex75/include/ilcplex
+	LPLDFLAGS = -L/home/cplex/cplex75/lib/i86_linux2_glibc2.2_gcc3.0/static_mt
 	LPLIB = -lcplex
 endif
 
@@ -132,8 +132,8 @@ endif
 # compile a distributed version of the code.
 ##############################################################################
 
-COMM_PROTOCOL = NONE
-#COMM_PROTOCOL = PVM
+#COMM_PROTOCOL = NONE
+COMM_PROTOCOL = PVM
 
 #Set the paths for PVM
 ifeq ($(COMM_PROTOCOL),PVM)
@@ -383,54 +383,6 @@ else
 	VERSION=NOGNU
 endif
 
-##############################################################################
-##############################################################################
-# What to make ? This has to go here in case the user has any targets.
-##############################################################################
-##############################################################################
-
-WHATTOMAKE = masterlib master
-PWHATTOMAKE = pmaster
-QWHATTOMAKE = pmaster
-ifeq ($(COMPILE_IN_TM),FALSE)
-WHATTOMAKE += tmlib tm
-PWHATTOMAKE += ptm
-QWHATTOMAKE += qtm
-endif
-ifeq ($(COMPILE_IN_LP),FALSE)
-WHATTOMAKE += lplib lp
-PWHATTOMAKE += plp
-QWHATTOMAKE += qlp
-endif
-ifeq ($(COMPILE_IN_CP),FALSE)
-WHATTOMAKE += cplib cp
-PWHATTOMAKE += pcp
-QWHATTOMAKE += qcp
-endif
-ifeq ($(COMPILE_IN_CG),FALSE)
-WHATTOMAKE += cglib cg
-PWHATTOMAKE += pcg
-QWHATTOMAKE += qcg
-endif
-
-all : 
-	$(MAKE) $(WHATTOMAKE)
-
-pall :
-	$(MAKE) $(PWHATOTOMAKE)
-
-qall :
-	$(MAKE) $(QWHATOTOMAKE)
-
-##############################################################################
-##############################################################################
-#  Include the user specific makefile
-##############################################################################
-##############################################################################
-
-include $(USERROOT)/Makefile
-
-##############################################################################
 ##############################################################################
 # Paths
 ##############################################################################
@@ -783,6 +735,54 @@ $(USER_DEPDIR)/%.d : %.c
                                 } \
                         (NR!=1) {print;}" \
                 > $@'
+
+##############################################################################
+##############################################################################
+# What to make ? This has to go here in case the user has any targets.
+##############################################################################
+##############################################################################
+
+WHATTOMAKE = masterlib master
+PWHATTOMAKE = pmaster
+QWHATTOMAKE = pmaster
+ifeq ($(COMPILE_IN_TM),FALSE)
+WHATTOMAKE += tmlib tm
+PWHATTOMAKE += ptm
+QWHATTOMAKE += qtm
+endif
+ifeq ($(COMPILE_IN_LP),FALSE)
+WHATTOMAKE += lplib lp
+PWHATTOMAKE += plp
+QWHATTOMAKE += qlp
+endif
+ifeq ($(COMPILE_IN_CP),FALSE)
+WHATTOMAKE += cplib cp
+PWHATTOMAKE += pcp
+QWHATTOMAKE += qcp
+endif
+ifeq ($(COMPILE_IN_CG),FALSE)
+WHATTOMAKE += cglib cg
+PWHATTOMAKE += pcg
+QWHATTOMAKE += qcg
+endif
+
+all : 
+	$(MAKE) $(WHATTOMAKE)
+
+pall :
+	$(MAKE) $(PWHATOTOMAKE)
+
+qall :
+	$(MAKE) $(QWHATOTOMAKE)
+
+##############################################################################
+##############################################################################
+##############################################################################
+#  Include the user specific makefile
+##############################################################################
+##############################################################################
+
+include $(USERROOT)/Makefile
 
 ##############################################################################
 ##############################################################################

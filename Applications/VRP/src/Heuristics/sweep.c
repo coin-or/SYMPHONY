@@ -6,7 +6,7 @@
 #include "qsort.h"
 #include "timemeas.h"
 #include "compute_cost.h"
-#include "pvm_error.h"
+#include "proccomm.h"
 #include "vrp_const.h"
 #include "heur_routines.h"
 
