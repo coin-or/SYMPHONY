@@ -70,17 +70,19 @@ int user_receive_lp_solution_cg(void *user)
 
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   int index, double objval, int *indices, double *values,
-		   double ub, double etol, int *cutnum)
+		   double ub, double etol, int *num_cuts, int *alloc_cuts, 
+		   cut_data ***cuts)
 {
    user_problem *prob = (user_problem *) user;
    double edge_val[200][200]; /* Matrix of edge values */
    int i, j, k;
-   int *cuts;
+   int *new_cuts;
    cut_data cut;
+   int cutnum;
    
-   *cutnum = 0;
+   cutnum = 0;
 
-   cuts = (int *) malloc(prob->nnodes * ISIZE);
+   new_cuts = (int *) malloc(prob->nnodes * ISIZE);
 
    /* Allocate the edge_val matrix to zero (we could also just calloc it) */
    memset((char *)edge_val, 0, 200*200*ISIZE);
@@ -93,27 +95,26 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       for (j = i+1; j < prob->nnodes; j++){
 	 for (k = j+1; k < prob->nnodes; k++) {
 	    if (edge_val[i][j]+edge_val[j][k]+edge_val[i][k] > 1.0 + etol) {
-	       memset(cuts, 0, prob->nnodes * ISIZE);
-	       cuts[i] = 1; 
-	       cuts[j] = 1;
-	       cuts[k] = 1;
+	       memset(new_cuts, 0, prob->nnodes * ISIZE);
+	       new_cuts[i] = 1; 
+	       new_cuts[j] = 1;
+	       new_cuts[k] = 1;
 	       cut.size = (prob->nnodes)*ISIZE;
-	       cut.coef = (char *) cuts;
+	       cut.coef = (char *) new_cuts;
 	       cut.rhs = 1.0;
 	       cut.range = 0.0;
 	       cut.type = TRIANGLE;
 	       cut.sense = 'L';
 	       cut.deletable = TRUE;
 	       cut.branch = ALLOWED_TO_BRANCH_ON;
-	       cg_send_cut(&cut);
-	       (*cutnum)++;
-	       
+	       cg_add_user_cut(&cut, num_cuts, alloc_cuts, cuts);
+	       cutnum++; 
 	    }
 	 }
       }
    }
    
-   FREE(cuts);
+   FREE(new_cuts);
 
    return(USER_SUCCESS);
 }
