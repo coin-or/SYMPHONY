@@ -963,7 +963,8 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
 
 /*===========================================================================*\
  * Set an upper limit on the objective function value.
-\*===========================================================================*/void set_obj_upper_lim(LPdata *lp_data, double lim)
+\*===========================================================================*/
+void set_obj_upper_lim(LPdata *lp_data, double lim)
 {
    /* Not sure how to do this in OSL */
    fprintf(stderr, "Function not implemented yet.");
@@ -3107,7 +3108,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
      if(is_rootnode || par->knapsack_generated_in_root){
        CglKnapsackCover *knapsack = new CglKnapsackCover;
        knapsack->generateCuts(*(lp_data->si), cutlist);
-       if (!par->gomory_generated_in_root){
+       if (!par->knapsack_generated_in_root){
 	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
 	   par->knapsack_generated_in_root = TRUE;
 	 }
