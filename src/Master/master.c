@@ -712,7 +712,6 @@ int sym_solve(sym_environment *env)
       }
       env->best_sol = env->warm_start->best_sol;
       tm->phase = env->warm_start->phase;
-
    }else if (env->warm_start){
       /* Otherwise, free what was saved */
       free_subtree(env->warm_start->rootnode);
@@ -1123,11 +1122,10 @@ int sym_warm_solve(sym_environment *env)
 
    /* first check for the updates! */
 
-   if (!env->mip->change_num || !env->warm_start ||
-       (env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY)){
+   if (!env->warm_start ||
+       env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY){
       return(sym_solve(env));
-   }
-   else{
+   }else{
 
       if (env->warm_start){
 	 env->par.tm_par.warm_start = TRUE;
