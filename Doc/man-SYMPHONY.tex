@@ -28,12 +28,12 @@ data structures and function prototypes associated with the module
 (named {\tt *.h} where * is the module name), one containing the data
 structures for storing the parameters (these are also used by the
 master process), and the third containing the function prototypes for
-the user callbacks (name {\tt *\_u.h}). By looking at the header files, you
+the user functions (name {\tt *\_u.h}). By looking at the header files, you
 should get a general idea of how things are laid out.
 
 In addition to the subdirectories corresponding to each module, there is a
 subdirectory called \texttt{SYMPHONY-5.0/USER}, which contains the files
-needed for implementing callbacks. Before beginning
+needed for customizing the behaviors of the modules. Before beginning
 customization, it is recommended to make a copy of the directory
 \texttt{SYMPHONY-5.0/USER} that will be used as a template for creating your
 customized solver. In this directory and its subdirectories, which mirror the
@@ -44,7 +44,7 @@ module, initially called \texttt{SYMPHONY-5.0/USER/*/user\_*.c}, where
 need to understand to build a custom application is how to fill in these
 stubs. That is what the second section of this manual is about.
 
-\section{Writing the Callbacks}
+\section{Writing the User Functions}
 
 For each module, all user functions are invoked from so-called \emph{wrapper
 functions} that provide the interface and also performs a default action if

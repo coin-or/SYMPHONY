@@ -2459,9 +2459,9 @@ This routine is used to copy the given environment.
 
 \functiondef{sym\_get\_lb\_for\_new\_rhs}
 \begin{verbatim}
-double sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
-			      double *new_rhs_val)
-
+int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
+                           double *new_rhs_val, double *lb_for_new_rhs)
+			      
 \end{verbatim}
 
 \bd
@@ -2471,7 +2471,7 @@ This routine is used for a basic sensitivity analysis of the right hand side
 case. It returns a lower bound for the problem with a modified
 right hand side using the information gathered from the branching tree of 
 the original solved problem. Note that, in order to use this feature, the
-``sensitivity\_analysis'' parameter needs to be set before solving 
+\texttt{sensitivity\_analysis} parameter needs to be set before solving 
 the original problem.
 \args
 
@@ -2482,21 +2482,151 @@ hand side vector. \\
 {\tt int *new\_rhs\_ind} & IN & Array of the column indices of these non 
 zero elements. \\
 {\tt double *new\_rhs\_val} & IN & Array of the values of these non zero 
-elements. 
+elements. \\
+{\tt double *lb\_for\_new\_rhs} & OUT & Pointer to a double indicating the 
+lower bound obtained for the new problem. \\
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully, 
-trying to read an empty problem description, tree nodes were not kept in 
-memory or the sensitivity analysis flag was not set on before solving the 
-problem to keep the needed information.\\
-{\tt DOUBLE } & A double indicating the lower bound of the modified problem.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et  
 \ed
 \vspace{1ex}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_get_ub_for_new_rhs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_get\_ub\_for\_new\_rhs}
+\begin{verbatim}
+int sym_get_ub_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind, 
+                           double *new_rhs_val, double *ub_for_new_rhs)
+			      
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used for a basic sensitivity analysis of the right hand side
+case. It returns a quick upper bound for the problem with a modified
+right hand side using the information gathered from the branching tree of 
+the original solved problem. Note that, in order to use this feature, the
+\texttt{sensitivity\_analysis} parameter needs to be set before solving 
+the original problem. 
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+{\tt int cnt} & IN & The number of the non zero elements in the new right 
+hand side vector. \\
+{\tt int *new\_rhs\_ind} & IN & Array of the column indices of these non 
+zero elements. \\
+{\tt double *new\_rhs\_val} & IN & Array of the values of these non zero 
+elements. \\
+{\tt double *ub\_for\_new\_rhs} & OUT & Pointer to a double indicating the 
+lower bound obtained for the new problem. This value will be set to 
+{\tt SYM\_INFINITY} if an upper bound can not be found. \\
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+\et  
+\ed
+\vspace{1ex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_get_lb_for_new_obj
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_get\_lb\_for\_new\_obj}
+\begin{verbatim}
+int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_obj_ind, 
+                           double *new_obj_val, double *lb_for_new_obj)
+			      
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used for a basic sensitivity analysis of the objective 
+function case. It returns a quick lower bound for the problem with a modified
+objective vector using the information gathered from the branching tree of 
+the original solved problem. Note that, in order to use this feature, the
+\texttt{sensitivity\_analysis} parameter needs to be set before solving 
+the original problem.
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+{\tt int cnt} & IN & The number of the non zero elements in the new objective
+coefficients. \\
+{\tt int *new\_obj\_ind} & IN & Array of the column indices of these non 
+zero elements. \\
+{\tt double *new\_obj\_val} & IN & Array of the values of these non zero 
+elements. \\
+{\tt double *lb\_for\_new\_obj} & OUT & Pointer to a double indicating the 
+lower bound obtained for the new problem.\\
+\et
+\returns
+
+\bt{lp{317pt}}
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+\et  
+\ed
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_get_ub_for_new_obj
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_get\_ub\_for\_new\_obj}
+\begin{verbatim}
+int sym_get_ub_for_new_rhs(sym_environment *env, int cnt, int *new_obj_ind, 
+                           double *new_obj_val, double *ub_for_new_obj)
+			      
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used for a basic sensitivity analysis of the objective 
+function case. It returns a quick lower bound for the problem with a modified
+objective vector using the information gathered from the branching tree of 
+the original solved problem. Note that, in order to use this feature, the
+\texttt{sensitivity\_analysis} parameter needs to be set before solving 
+the original problem.
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+{\tt int cnt} & IN & The number of the non zero elements in the new objective
+coefficients. \\
+{\tt int *new\_obj\_ind} & IN & Array of the column indices of these non 
+zero elements. \\
+{\tt double *new\_obj\_val} & IN & Array of the values of these non zero 
+elements. \\
+{\tt double *ub\_for\_new\_obj} & OUT & Pointer to a double indicating the 
+upper bound obtained for the new problem. This value will be set to
+{\tt SYM\_INFINITY} if an upper bound can not be found.\\
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+\et  
+\ed
+\vspace{1ex}
 
 %\end{description}
 \ed
@@ -2566,7 +2696,17 @@ get the warm start description.\\ \hline \hline
 setWarmStart & sym\_set\_warm\_start & 
 set the warm start description. \\ \hline
 getLbForNewRhs & sym\_get\_lb\_for\_new\_rhs & 
-find a lower bound to the new problem.\\ \hline \hline
+find a lower bound to the new rhs problem\\ 
+&&using the post solution info.\\ \hline \hline
+getUbForNewRhs & sym\_get\_lb\_for\_new\_rhs & 
+find an upper bound to the new rhs problem.\\
+&&using the post solution info.\\ \hline \hline
+getLbForNewObj & sym\_get\_lb\_for\_new\_rhs & 
+find a lower bound to the new obj problem.\\
+&&using the post solution info.\\ \hline \hline
+getUbForNewObj & sym\_get\_lb\_for\_new\_rhs & 
+find an upper bound to the new obj problem.\\
+&&using the post solution info.\\ \hline \hline
 reset & sym\_close\_environment & 
 return the allocated memory.\\ \hline \hline
 setIntParam & sym\_set\_int\_param & 

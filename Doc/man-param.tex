@@ -658,10 +658,12 @@ next. For other possible values, see the description \htmlref{
 parameter is provided so that the user can change the default behavior
 without recompiling.
 
-\item[{\tt mc\_find\_nondominated\_solutions} -- boolean ({\tt TRUE}).]
-If the problem to be solved is a bicriteria problem and if only the 
-supported solutions are desired to be found, then the user should turn 
-this parameter off before calling {\tt sym\_mc\_solve} routine.
+\item[{\tt mc\_find\_supported\_solutions} -- boolean ({\tt FALSE}).]
+By default, {\tt sym\_mc\_solve} routine will find all the non-dominated 
+solutions if the problem to be solved is 
+a bicriteria problem. However, if the user plans to find only the supported 
+solutions, then, this parameter has to be set before 
+calling {\tt sym\_mc\_solve} routine. 
 
 \item[{\tt mc\_rho} -- double ({\tt 0.00001}).]
 The value used in augmented Chebyshev norm during the bicriteria 
@@ -794,8 +796,8 @@ OsiSymTrimWarmTree & trim\_warm\_tree * -boolean- \\
 \hline \hline
 OsiSymDoReducedCostFixing & do\_reduced\_cost\_fixing & -boolean- \\
 \hline \hline
-OsiSymMultiCriteriaFindNondominatedSolutions & 
-mc\_find\_nondominated\_solutions & -boolean- \\
+OsiSymMCFindSupportedSolutions & 
+mc\_find\_supported\_solutions & -boolean- \\
 \hline \hline
 OsiSymSensitivityAnalysis & sensitivity\_analysis & -boolean- \\
 \hline \hline
