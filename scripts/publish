@@ -135,8 +135,8 @@ mv Walkthrough.pdf $DIR/Doc/SYMPHONY-Walkthrough.pdf
 cd $HOME
 foreach app (VRP MATCH MPP SPP SPP+CUTS)
 mv $DIR/$app-$VER .
-tar -czvf SYMPHONY-$app-$VER.tgz $app-$VER/*
-zip -r SYMPHONY-$app-$VER.zip $app-$VER/* 
+tar --exclude '$DIR/Doc/*.zip' -czvf SYMPHONY-$app-$VER.tgz $app-$VER/*
+zip -r SYMPHONY-$app-$VER.zip -x \*.tgz $app-$VER/* 
 mv SYMPHONY-$app-$VER.* $DIR
 end
 tar -czvf SYMPHONY-$VER.tgz $DIR/*
@@ -145,3 +145,5 @@ mv SYMPHONY-$VER.* $DIR
 foreach app (VRP MATCH MPP SPP SPP+CUTS)
 mv $app-$VER $DIR
 end
+scp $DIR/*.zip $DIR/*.tgz branchandcut@branchandcut.org:www/SYMPHONY/Download/
+scp $DIR/Doc/*.zip $DIR/Doc/*.tgz branchandcut@branchandcut.org:anonftp/pub/reference/
