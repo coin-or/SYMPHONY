@@ -1116,7 +1116,8 @@ int sym_mc_solve(problem *p)
    compare_sol_tol = p->par.mc_compare_solution_tolerance;
    p->par.tm_par.granularity = p->par.lp_par.granularity =
       -MAX(p->par.lp_par.mc_rho, compare_sol_tol);
-
+   p->utopia[0] = p->utopia[1] = -MAXINT;
+   
    if (p->par.verbosity >= 0){
       if (p->par.mc_binary_search_tolerance > 0){
 	 binary_search = TRUE;
@@ -1228,15 +1229,18 @@ int sym_mc_solve(problem *p)
    printf("***************************************************\n\n");
    
    /* Add the first pair to the list */
-   if (binary_search){
-      pairs[first].gamma1 = 1.0;
-      pairs[first].gamma2 = 0.0;
+   if (solutions[0].obj[0] != solutions[1].obj[0]){
+      if (binary_search){
+	 pairs[first].gamma1 = 1.0;
+	 pairs[first].gamma2 = 0.0;
+      }
+      pairs[first].solution1 = 0;
+      pairs[first].solution2 = 1;
+      first = last = 0;
+      numpairs = 1;
+   }else{
+      numpairs = 0;
    }
-   pairs[first].solution1 = 0;
-   pairs[first].solution2 = 1;
-
-   first = last = 0;
-   numpairs = 1;
 
    /* Keep taking pairs off the list and processing them until there are none
       left */

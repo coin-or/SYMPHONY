@@ -23,6 +23,38 @@
 
 #include "OsiSymSolverInterface.hpp"
 
+#if 0
+int main(int argc, char **argv)
+{
+   OsiSymSolverInterface si;
+
+   si.parseCommandLine(argc, argv);
+
+   si.loadProblem();
+
+   si.setSymParam(OsiSymKeepDescOfPruned, KEEP_IN_MEMORY); 
+
+   si.setSymParam(OsiSymNodeLimit, 100);
+
+   si.branchAndBound();
+
+   CoinWarmStart * sWS = si.getWarmStart();
+
+   si.setSymParam(OsiSymNodeLimit, 10000);
+   si.branchAndBound();
+
+   si.setWarmStart(sWS);
+
+   /*test for p0201 */
+   si.setObjCoeff(0, 100);
+   si.setObjCoeff(200, 150);
+
+   si.resolve();
+
+   return(0);
+}
+#endif
+
 int main(int argc, char **argv)
 {
 
@@ -73,7 +105,8 @@ int main(int argc, char **argv)
    */
 
    /* Test for dc_multi */
-   si.setObj2Coeff(0, 10); 
+   //si.setObjCoeff(1, 8);
+   si.setObj2Coeff(1, -1); 
    //   si.setObj2Coeff(30, 100);
    
 
@@ -92,7 +125,7 @@ int main(int argc, char **argv)
    si.setSymParam(OsiSymNodeLimit, 5);
 #endif
 
-   si.branchAndBound();
+   //si.branchAndBound();
 
 #ifdef TEST_RESOLVE
    si.setSymParam(OsiSymWarmStart, TRUE);    

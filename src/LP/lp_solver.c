@@ -3077,6 +3077,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 elements = const_cast<double *> (cut.row().getElements());
 	 (*cuts)[j]->type = EXPLICIT_ROW;
 	 if (((*cuts)[j]->sense = cut.sense()) == 'R'){
+	    FREE((*cuts)[j]);
 	    continue; /* This must be a bug. */
 	 }
 	 (*cuts)[j]->rhs = cut.rhs();
