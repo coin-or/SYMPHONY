@@ -3006,12 +3006,12 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
    probe->generateCuts(*(lp_data->si), cutlist);
    //printf("%i\n", cutlist.sizeRowCuts());
 
-#if 0
    /* create CGL flow cover cuts */
    CglFlowCover *flow = new CglFlowCover;
    probe->generateCuts(*(lp_data->si), cutlist);
    //printf("%i\n", cutlist.sizeRowCuts());
 
+#if 0
    /* create CGL simple rounding cuts */
    CglSimpleRounding * rounding = new CglSimpleRounding;
    rounding->generateCuts(*(lp_data->si), cutlist);
@@ -3063,7 +3063,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
    delete knapsack;
    delete oddhole;
    delete probe;
-   /* delete flow; */
+   delete flow;
    /* delete rounding; */
    /* delete liftandproject; */
 
