@@ -1425,6 +1425,14 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
    user_res = user_unpack_cuts(p->user, from, type,
 			       lp_data->n, lp_data->vars,
 			       l, cuts, new_row_num, new_rows);
+
+   for (i = 0; i < l; i++){
+      if (cuts[i]){
+	 new_rows[i]->cut = cuts[i];
+	 cuts[i] = NULL;
+      }
+   }
+       
    switch(user_res){
     case USER_NO_PP:
 
@@ -1462,7 +1470,6 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
    }
 
    free_cuts(cuts, cut_num);
-
 }
 
 /*===========================================================================*/

@@ -44,7 +44,7 @@ ARCH = LINUX
 # If you have PVM installed, this will set the variable ARCH automatically.
 ##############################################################################
 
-#ARCH=$(PVM_ARCH)
+#ARCH=${PVM_ARCH}
 
 ##############################################################################
 # If you are getting errors using make, try changing MAKE to "gmake" and also 
@@ -66,7 +66,7 @@ RANLIB = ranlib
 ##############################################################################
 
 ### SYMPHONYROOT is now usually defined in the user's Makefile ###
-# SYMPHONYROOT = .
+### See SYMPHONY/MIP/Makefile                                      ###
 
 ##############################################################################
 # USERROOT is the name of the user's source directory. $(SYMPHONYROOT)/VRP is 
@@ -77,8 +77,14 @@ RANLIB = ranlib
 ##############################################################################
 
 ### These variables are now usually defined in the user's Makefile ###
-# USERROOT = $(SYMPHONYROOT)/Template
-# MASTERNAME = 
+### See SYMPHONY/MIP/Makefile                                      ###
+
+##############################################################################
+# COINROOT is the path to the root directory of the COIN libraries. Many of
+# the new features of COIN require the COIN libraries to be installed
+##############################################################################
+
+COINROOT = ${HOME}/COIN
 
 ##############################################################################
 ##############################################################################
@@ -136,8 +142,8 @@ OSI_INTERFACE = CPLEX
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
-       LPINCDIR = ${HOME}/COIN/include
-       LPLIBPATHS = ${HOME}/COIN/lib
+       LPINCDIR = $(COINROOT)/include
+       LPLIBPATHS = $(COINROOT)/lib
        LPLIB = -lCoin -lOsi
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPINCDIR += /usr/local/include/
@@ -228,8 +234,10 @@ endif
 ##############################################################################
 ##############################################################################
 # Set the compiler -- If an OpenMP compliant copiler is used, then a shared
-#	memory version of the code will result as long as at least 
-#	COMPILE_IN_LP is set to TRUE (see comments above).
+# memory version of the code will result as long as at least COMPILE_IN_LP is
+# set to TRUE (see comments above). Note that if you do not plan to install 
+# the COIN libraries, you can change the the compiler to be gcc for faster
+# compilation
 ##############################################################################
 ##############################################################################
 

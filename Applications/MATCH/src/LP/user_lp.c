@@ -205,7 +205,6 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	 
       case TRIANGLE:
 	 cutval = (int *) (cuts[j]->coef);
-	 row_list[j]->cut = cuts[j];
 	 row_list[j]->matind = (int *) malloc(varnum * ISIZE);
 	 row_list[j]->matval = (double *) malloc(varnum * DSIZE);
 	 row_list[j]->nzcnt = 0;

@@ -214,13 +214,23 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
 
     case DEFAULT: 
 
-      root->uind.size = p->desc->n;
+      if (p->desc){
+	 root->uind.size = p->desc->n;
+	 base->cutnum = p->desc->m;
+      }else if (!root->uind.size){
+	 printf("Error setting up the root node.\n");
+	 printf("User did not specify number of variables. Exiting.\n\n");
+	 exit(-999);
+      }else if (!base->varnum){
+	 printf("Error setting up the root node.\n");
+	 printf("User did not specify number of base constraints. Exiting.\n\n");
+	 exit(-999);
+      }
       root->uind.list = (int *) malloc(root->uind.size * ISIZE);
       for (i = 0; i < root->uind.size; i++){
 	 root->uind.list[i] = i;
       }
-
-      base->cutnum = p->desc->m;
+      
       base->varnum = 0;
       base->userind = NULL;
 
