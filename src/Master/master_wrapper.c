@@ -207,7 +207,8 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
 
    switch (user_initialize_root_node(p->user, &base->varnum, &base->userind,
 				     &base->cutnum, &root->uind.size,
-				     &root->uind.list, &p->mip->colname,
+				     &root->uind.list, &p->mip->obj_sense,
+				     &p->mip->obj_offset, &p->mip->colname,
 				     p->par.tm_par.colgen_strat)){
     case USER_ERROR:
       
@@ -225,7 +226,7 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
       
     case USER_DEFAULT: 
 
-      if (p->mip){
+      if (p->mip->n && p->mip->m){
 	 root->uind.size = p->mip->n;
 	 base->cutnum = p->mip->m;
       }else if (!root->uind.size){
@@ -374,6 +375,8 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
       send_int_array(&(mip->m), 1);
       send_int_array(&(mip->n), 1);
       send_int_array(&(mip->nz), 1);
+      send_char_array(&(mip->obj_sense), 1);
+      send_double_array(&(mip->obj_offset), 1);
       send_int_array(mip->matbeg, mip->n);
       send_int_array(mip->matind, mip->nz);
       send_dbl_array(mip->matval, mip->nz);

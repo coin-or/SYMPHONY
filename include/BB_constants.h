@@ -151,6 +151,9 @@
 #endif
 #define BIG_DBL                  1e40
 
+#define MINIMIZE                 0
+#define MAXIMIZE                 1 
+
 /*--------------------- Constants related to the basis ----------------------*/
 #  define INVALID_BASIS_STATUS 255
 #  define VAR_AT_LB    0

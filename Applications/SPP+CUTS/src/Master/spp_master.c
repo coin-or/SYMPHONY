@@ -203,9 +203,9 @@ int user_init_draw_graph(void *user, int dg_id)
 \*===========================================================================*/
 
 int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
-			      int *basecutnum, int *extravarnum,
-			      int **extravars, char ***colnames,
-			      int *colgen_strat)
+			      int *basecutnum, int *extravarnum, int **extravars,
+			      char *obj_sense, double *obj_offset,
+			      char ***colnames, int *colgen_strat)
 {
    /* This gives you access to the user data structure. */
    spp_problem *spp = (spp_problem *) user;

@@ -17,8 +17,6 @@
 #ifndef _SPP_TYPES_H_
 #define _SPP_TYPES_H_
 
-#include <values.h>
-
 #define    row_ind_type    short
 
 typedef struct STATISTICS {

@@ -160,6 +160,8 @@ typedef struct MIPDESC{
    double    *lb;          /* n */
    double    *ub;          /* n */
    char     **colname;     /* column names */
+   double     obj_offset;  /* constant to be added to the objective function. */
+   char       obj_sense;   /* objective sense. */
 }MIPdesc;
 
 /* The LP solver data */

@@ -75,6 +75,8 @@ int receive_lp_data_u(lp_prob *p)
       receive_int_array(&(mip->m), 1);
       receive_int_array(&(mip->n), 1);
       receive_int_array(&(mip->nz), 1);
+      receive_char_array(&(mip->obj_sense), 1);
+      receive_dbl_array(&(mip->obj_offset), 1);
 
       /* Allocate memory */
       mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
@@ -581,11 +583,23 @@ int is_feasible_u(lp_prob *p)
 #endif
 	 PRINT(p->par.verbosity, -1,
 	       ("\n****** Found Better Feasible Solution !\n"));
-	 PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", new_ub));
+	 if (p->mip->obj_sense == MAXIMIZE){
+	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", -new_ub 
+					 + p->mip->obj_offset));
+	 }else{
+	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", new_ub
+					 + p->mip->obj_offset));
+	 }
       }else{
 	 PRINT(p->par.verbosity, -1,
 	       ("\n* Found Another Feasible Solution.\n"));
-	 PRINT(p->par.verbosity, -1, ("* Cost: %f\n\n", new_ub));
+	 if (p->mip->obj_sense == MINIMIZE){
+	    PRINT(p->par.verbosity, -1, ("* Cost: %f\n\n", -new_ub
+					 + p->mip->obj_offset));
+	 }else{
+	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", new_ub
+					 + p->mip->obj_offset));
+	 }
       }
 #ifndef COMPILE_IN_TM
       send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,

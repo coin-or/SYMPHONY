@@ -81,7 +81,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    mip->is_int  = (char *) malloc(mip->n * CSIZE);
    
    /* Fill out the appropriate data structures -- each column has
-      exactly two entried*/
+      exactly two entries */
    index = 0;
    for (i = 0; i < prob->nnodes; i++) {
       for (j = i+1; j < prob->nnodes; j++) {

@@ -4,39 +4,118 @@
 
 First configure and compile SYMPHONY as described above. Download and unpack
 the source code for the sample applications. If the application is unpacked in
-the SYMPHONY subdirectory. Modify the
-variables in the application make file appropriately. In particular, you must
-set the path to SYMPHONY
+the SYMPHONY subdirectory. Modify the variables in the application make file
+appropriately. In particular, you must set the path to SYMPHONY
 
 *******************************************************************************
 *              COMPILING A SYMPHONY APPLICATION (Windows)                     *
 *******************************************************************************
 
+You have two options: 
+
+1. Use the NMAKE Utility:
+
+Open a command window (start-->run-->cmd), configure "vrp.mak" file in \WIN32
+directory if you need and then type "nmake /f vrp.mak" in the same
+directory. The executable "symphony.exe" will be created in \WIN32\Debug
+directory. See "vrp.mak" for further detail.
+
+2- MSVC
+
+In order to be able to use the Windows version of VRP application, you have to
+make sure that VRP application is a subdirectory of SYMHONY, strictly as
+..SYMPHONY\VRP. If the application is unpacked outside of the SYMPHONY
+directory, simply copy the VRP directory in to the SYMPHONY directory.
+
+After that, go into the VRP\WIN32 directory and load the "vrp" workspace,
+vrp.dsw, to the MS Visual Studio. In that case, "symphony" and "vrp" projects,
+namely symphony.dsp and vrp.dsp, including the related source files will be
+added directly to the workspace. By default, SYMPHONY is set up to use the
+CPLEX optimization solver via the CPLEX interface of COIN_OSI:
+
+-- "__OSI_CPLEX__" is defined in the preprocessor definitions of both
+"symphony" and "vrp" projects (to see that, right-click on one of the
+projects, and then --> Settings --> C/C++ --> Preprocessor in the Category
+scroll bar).
+
+-- paths to the include files of COIN utilities (Coin), OSI, OSI_CPLEX and
+CPLEX are specified in the same settings window we used for the preprocessor
+definitons. Note that, the Coin, OSI and OSI_CPLEX include directories are
+assumed to be in C:\COIN\Coin, C:\COIN\Osi, C:\COIN\Osi\OsiCpx and
+C:\ILOG\cplex81\include\ilcplex directories,respectively, if they are not,
+make sure that you have introduced the correct paths to SYMPHONY in both
+projects before executing.
+
+-- "symphony" project is dependent on "vrp" project (see the dependencies in
+Project->Dependencies) and it includes the necessary libraries: "vrp",
+"osiCpxLib", "osiLib", "coinLib" and "cplex81" (solver library).
+
+-- SYMPHONY is also set up to use the COIN CGL library for generating cuts. For
+that, "symphony" project has the "ADD_CGL_CUTS" preprocessor definiton, the
+path to C:\COIN\Cgl\ (be sure that this path directs SYMPHONY to the include
+directory of CGL) and the "cgllib" library.
+
+If you want to use another solver, basically:
+
+-- Change the preprocessor definition from "__OSI_CPLEX__" to "__OSI_XXX__"
+("__OSI_CLP__", "__OSI_GLPK__", "__OSI_OSL__", etc.) if you want to use OSI
+interface to the solver, otherwise, change it to "__XXX__" (you have two
+options: "__CPLEX__" and "__OSL__") in both projects.
+
+-- change the path definitions of the include files: for instance, if you want
+to use "__OSI_OSL__", define C:\COIN\OSi\OsiOsl and C:\Program Files\
+IbmOslV3Lib\osllib (assuming it is there) instead of OsiCpx and CPLEX path
+definitons or, if you want to use "__OSL__", delete all the path definitions
+since you are not required to have COIN and OSI anymore, and just add the path
+definiton for the OSL include files.
+
+-- Add the appropriate libraries to "symphony" project. For instance, if you
+want to use "__OSI_OSL__" then add the osiOslLib and oslmd6030 (OSL solver lib
+file) library files after deleting osiCpxLib and cplex81 libraries from the
+"symphony" project (you can do that by right_clicking on "symphony" project
+and then --> Add files to project with "library files" type selected as the
+file type) or, if you want to use "__OSL__", then delete all the libraries
+(except the "vrp" library ) from the "symphony" project and just add the
+"oslmd6030" library file for it is the unique solver library file we need now.
+
+-- If you also don't want to use the CGL library, simply delete the
+"ADD_CGL_CUTS" preprocessor definiton, the CGL path definitons and the
+"cglLib" library from the "symphony" project.
+
+Now, you are ready to compile the application. Click on "build symphony.exe"
+from the "Build" option in toolbar or just click F7. The executable will be
+created in ..VRP\WIN32\Debug. To run it, you can either specify your arguments
+in the program arguments section (right click on "symphony" project and then
+--> Settings --> Debug. But be careful with your referance location to specify
+the path to the other files to be used in your arguments: you are now in
+..VRP\WIN32 directory, not in ..VRP\WIN32\Debug) or go in to the
+..VRP\WIN32\Debug directory via a command windows (start-->run-->cmd) and type
+"symphony.exe --arguments".
+
 *******************************************************************************
 *                      USING THE SOLVER                                       *
 *******************************************************************************
 
-This file briefly introduces the use of the SYMPHONY VRP solver. To run the VRP
-solver, type the executable name followed by one or more of the command-line
-switches. There are two required switches. You must specify the location of
-the data file by using "-F 'filename'" (type this
-after executable name) and you must specify the desired number of routes using
-"-N 'n'", where 'n' is the desired number of routes.
-Below is a list of other parameters that can be set on the command line. This
-list can also be obtained by typing the executable name followed by "-H".
-Notice that all application-specific parameters are denoted by a capital
-letter. 
+This file briefly introduces the use of the SYMPHONY VRP solver. To run the
+VRP solver, type the executable name followed by one or more of the
+command-line switches. There are two required switches. You must specify the
+location of the data file by using "-F 'filename'" (type this after executable
+name) and you must specify the desired number of routes using "-N 'n'", where
+'n' is the desired number of routes.  Below is a list of other parameters that
+can be set on the command line. This list can also be obtained by typing the
+executable name followed by "-H".  Notice that all application-specific
+parameters are denoted by a capital letter.
 
-		-H: help,
-		-E: use sparse edge set,
-		-T: solve as a Traveling Salesman Problem,
-		-S file: load sparse graph from 'file',
-		-F file: problem data is in 'file',
-		-B i: which candidates to check in strong branching,
-		-V i: how to construct the base set of variables,
-		-K k: use 'k' closest edges to build sparse graph,
-		-N n: use 'n' routes,
-		-C c: use capacity 'c');
+	-H: help,
+	-E: use sparse edge set,
+	-T: solve as a Traveling Salesman Problem,
+	-S file: load sparse graph from 'file',
+	-F file: problem data is in 'file',
+	-B i: which candidates to check in strong branching,
+	-V i: how to construct the base set of variables,
+	-K k: use 'k' closest edges to build sparse graph,
+	-N n: use 'n' routes,
+	-C c: use capacity 'c');
 
 There are a number of other (for now) undocumented parameters that can be used
 to fine-tune the performance of the solver. These must be set in a parameter

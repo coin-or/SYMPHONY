@@ -10,26 +10,28 @@ You have two options:
 
 1- NMAKE Utility:
 
-Open a command window (start-->run-->cmd), configure "mpp.mak" file in \WIN32
-directory if you need and then type "nmake /f mpp.mak" in the same 
-directory. The executable "symphony.exe" will be created in \WIN32\Debug 
-directory. See "mpp.mak" for further detail.
+Open a command window (start-->run-->cmd), configure "spp+with_cuts.mak" 
+file in \WIN32 directory if you need and then type "nmake /f spp_with_cuts.mak"
+in the same directory. The executable "symphony.exe" will be created in 
+\WIN32\Debug directory. See "spp_with_cuts.mak" file for further detail.
 
 2- MSVC
 
-In order to be able to use the Windows version of MPP application, you have to 
-make sure that MPP application is a subdirectory of SYMHONY, strictly as 
-..SYMPHONY\MPP. If the application is unpacked outside of the SYMPHONY 
-directory, simply copy the MPP directory in to the SYMPHONY directory. 
+In order to be able to use the Windows version of SPP+CUTS application, 
+you have to make sure that SPP+CUTS application is a subdirectory of SYMHONY, 
+strictly as ..SYMPHONY\SPP+CUTS. If the application is unpacked outside of 
+the SYMPHONY directory, simply copy the SPP+CUTS directory in to the SYMPHONY 
+directory. 
 
-After that, go into the MPP\WIN32 directory and load the "mpp" workspace,
-mpp.dsw, to the MS Visual Studio. In that case, "symphony" and "mpp" projects, 
-namely symphony.dsp and mpp.dsp, including the related source files will be 
-added directly to the workspace. By default, SYMPHONY is set up to use the 
-CPLEX optimization solver via the CPLEX interface of COIN_OSI:
+After that, go into the SPP+CUTS\WIN32 directory and load the "spp_with_cuts" 
+workspace,spp_with_cuts.dsw, to the MS Visual Studio. In that case, 
+"symphony" and "spp_with_cuts" projects, namely symphony.dsp and 
+spp_with_cuts.dsp, including the related source files will be added directly 
+to the workspace. By default, SYMPHONY is set up to use the CPLEX optimization 
+solver via the CPLEX interface of COIN_OSI:
 
-- "__OSI_CPLEX__" is defined in the preprocessor definitions 
-  of both "symphony" and "mpp" projects (to see that, right-click on one of 
+- "__OSI_CPLEX__" is defined in the preprocessor definitions of both 
+"symphony" and "spp_with_cuts" projects (to see that, right-click on one of 
 the projects, and then --> Settings --> C/C++ --> Preprocessor in the Category 
 scroll bar).
 
@@ -41,9 +43,9 @@ C:\ILOG\cplex81\include\ilcplex directories,respectively, if they are not,
 make sure that you have introduced the correct paths to SYMPHONY in both 
 projects before executing. 
 
-- "symphony" project is dependent on "mpp" project (see the 
+- "symphony" project is dependent on "spp_with_cuts" project (see the 
 dependencies in Project->Dependencies) and it includes the necessary 
-libraries: "mpp", "osiCpxLib", "osiLib", "coinLib" and "cplex81" 
+libraries: "spp_with_cuts", "osiCpxLib", "osiLib", "coinLib" and "cplex81" 
 (solver library).  
 
 - SYMPHONY is also set up to use the COIN CGL library for generating cuts. For 
@@ -71,9 +73,9 @@ if you want to use "__OSI_OSL__" then add the osiOslLib and oslmd6030
 libraries from the "symphony" project (you can do that by right_clicking on 
 "symphony" project and then --> Add files to project with "library files" type 
 selected as the file type) or, if you want to use "__OSL__", then delete all 
-the libraries (except the "mpp" library ) from the "symphony" project and just 
-add the "oslmd6030" library file for it is the unique solver library file we 
-need now. 
+the libraries (except the "spp_with_cuts" library ) from the "symphony" 
+project and just add the "oslmd6030" library file for it is the unique solver 
+library file we need now. 
 
 - If you also don't want to use the CGL library, simply delete the 
 "ADD_CGL_CUTS" preprocessor definiton, the CGL path definitons and the 
@@ -81,25 +83,25 @@ need now.
 
 Now, you are ready to compile the application. Click on "build symphony.exe" 
 from the "Build" option in toolbar or just click F7. The executable will be 
-created in ..MPP\WIN32\Debug. To run it, you can either specify your arguments 
-in the program arguments section (right click on "symphony" project and 
-then --> Settings --> Debug. But be careful with your referance location to 
-specify the path to the other files to be used in your arguments: you are now 
-in ..MPP\WIN32 directory, not in ..MPP\WIN32\Debug) or go in to the 
-..MPP\WIN32\Debug directory via a command windows (start-->run-->cmd) and 
-type "symphony.exe --arguments". 
-
+created in ..SPP+CUTS\WIN32\Debug. To run it, you can either specify your 
+arguments in the program arguments section (right click on "symphony" project 
+and then --> Settings --> Debug. But be careful with your referance location 
+to specify the path to the other files to be used in your arguments: you are 
+now in ..SPP+CUTS\WIN32 directory, not in ..SPP+CUTS\WIN32\Debug) or go in to 
+the ..SPP+CUTS\WIN32\Debug directory via a command windows (start-->run-->cmd) 
+and type "symphony.exe --arguments". 
 
 *******************************************************************************
 *                      USING THE SOLVER                                       *
 *******************************************************************************
+The set partitioning problem (SPP) is a difficult (NP-complete, large size of 
+problems) combinatorial optimization problem mainly applied to scheduling 
+problems. SPP can be defined as finding the minimum cost partition of a matrix 
+having binary entities where a partition is the union of disjoint subsets to 
+cover all the row indices and a subset -associated to each column- consists of 
+the row indices if the corresponding entity is 1. 
 
-The mixed postman problem (MPP) can be defined as finding a minimum cost path 
-by traversing all edges at least once on the graph that may contain both 
-undirected and directed edges.
-
-
-To run MPP you are just required to specify the location of the data file 
+To run the SPP you are just required to specify the location of the data file 
 by typing "-F 'filename'" as an argument after the executable name. The other 
 user defined parameters are the following:
 

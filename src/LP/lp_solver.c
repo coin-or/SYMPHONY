@@ -42,8 +42,6 @@ double dot_product(double *val, int *ind, int collen, double *col)
 
 void free_lp_arrays(LPdata *lp_data)
 {
-   int i;
-   
    FREE(lp_data->not_fixed);
    FREE(lp_data->status);
    FREE(lp_data->x);
@@ -128,8 +126,7 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
                                              lp_data->maxm*sizeof(row_data));
    }
    if (maxn > lp_data->maxn){
-      int i, oldmaxn = MAX(lp_data->maxn, lp_data->n);
-      var_desc **vars;
+      int oldmaxn = MAX(lp_data->maxn, lp_data->n);
       resize_n = TRUE;
       lp_data->maxn = maxn + (set_max ? 0 : 5 * BB_BUNCH);
       if (! do_realloc){
@@ -159,15 +156,6 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
 					  lp_data->maxn * DSIZE);
 #endif
       }
-
-#if 0
-      /* vars is realloc'd in either case just to keep the base vars */
-      lp_data->vars = (var_desc **) realloc((char *)lp_data->vars,
-                                            lp_data->maxn*sizeof(var_desc *));
-      vars = lp_data->vars + oldmaxn;
-      for (i = lp_data->maxn - oldmaxn - 1; i >= 0; i--)
-	 vars[i] = (var_desc *) malloc( sizeof(var_desc) );
-#endif
    }
    if (maxnz > lp_data->maxnz){
       lp_data->maxnz = maxnz + (set_max ? 0 : 20 * BB_BUNCH);
@@ -270,15 +258,18 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
       type = mpl_get_row_kind(mpl, i+1);
       if (type == MPL_ST){  /* constraints */
 	 /* mpl_get_mat_row returns the # of nonzeros in the row i+1. */
+	 mip->obj_sense = MINIMIZE; 
 	 mip->nz += mpl_get_mat_row(mpl, i+1, NULL, NULL); 
       }else{
 	 obj_index = i;
+	 mip->obj_offset = mpl_get_row_c0(mpl, i+1);
 	 length = mpl_get_mat_row(mpl, i+1, indices, values);
 	 if (type == MPL_MAX){
+	    mip->obj_sense = MAXIMIZE; 
 	    for (j = 1; j <= length; j++){  
 	       mip->obj[indices[j]-1] = -values[j];
 	    }
-	 }else{   /* type=MPL_MIN */
+	 }else{   /* type == MPL_MIN */
 	    for( j = 1; j <= length; j++ ) 
 	       mip->obj[indices[j]-1] = values[j]; /* assign the obj coeff. */
 	 }
@@ -2861,26 +2852,34 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 
 int read_mps(MIPdesc *mip, char *infile, char *probname)
 {
-   int j, k;
+   int j, k, last_dot = 0;
    char fname[80] = "";
    char ext[10] = "";
-   bool no_dot = TRUE;
    CoinMpsIO mps;
    int errors;
    
-   for (j = 0, k = 0; infile[j] != '\0'; j++){
-      if (infile[j] != '.'){
-	 if (no_dot){
-	    fname[j] = infile[j];
-	 }else{
-	    ext[k] = infile[j];
-	    k++;    
-	 }   
-      }else{
-	 no_dot = FALSE;
+   for (j = 0;; j++){
+      if (infile[j] == '\0')
+	 break;
+      if (infile[j] == '.') {
+	 last_dot = j;
       }
    }
    
+   for (j = 0, k = 0; infile[j] != '\0'; j++){
+      if (last_dot){
+	 if (j < last_dot)
+	    fname[j] = infile[j];
+	 if(j > last_dot){
+	    ext[k] = infile[j];
+	    k++;    
+	 }
+      }
+      else{
+	 fname[j] = infile[j];
+      }
+   }
+
    mps.setInfinity(mps.getInfinity());
    
    if (errors = mps.readMps(fname,ext)){

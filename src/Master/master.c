@@ -178,7 +178,11 @@ int main(int argc, char **argv)
       printf( "  Total User Time    %.3f\n", total_time);
 #endif
       printf( "  Total Real Time    %.3f\n\n", wall_clock(NULL) - start_time);
-      printf( "Upper Bound: %.3f\n", p->ub);
+      if (p->mip->obj_sense == MAXIMIZE){
+	 printf( "Upper Bound: %.3f\n", -p->ub + p->mip->obj_offset);
+      }else{
+ 	 printf( "Upper Bound: %.3f\n", p->ub + p->mip->obj_offset);
+      } 
       display_solution_u(p, 0);
       free_master_u(p); /* free the problem data structures */
       if (p->par.tm_par.lp_machs)

@@ -67,7 +67,7 @@ int user_dg_process_message(void *user, window *win, FILE *write_to)
 
 int user_dg_init_window(void **user, window *win)
 {
-   vrp_dg *win_vrp = calloc(1, sizeof(vrp_dg));
+   vrp_dg *win_vrp = (vrp_dg *) calloc(1, sizeof(vrp_dg));
 #if 0
    int vertnum = win_vrp->g.nodenum;
 

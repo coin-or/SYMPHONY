@@ -1,3 +1,99 @@
+*******************************************************************************
+*                COMPILING A SYMPHONY APPLICATION (Unix)                      *
+*******************************************************************************
+
+*******************************************************************************
+*              COMPILING A SYMPHONY APPLICATION (Windows)                     *
+*******************************************************************************
+
+You have two options: 
+
+1- NMAKE Utility:
+
+Open a command window (start-->run-->cmd), configure "match.mak" file in \WIN32
+directory if you need and then type "nmake /f match.mak" in the same 
+directory. The executable "symphony.exe" will be created in \WIN32\Debug 
+directory. See match.mak for further detail.
+
+2- MSVC
+
+In order to be able to use the Windows version of MATCH application, you have 
+to make sure that MATCH application is a subdirectory of SYMHONY, strictly as 
+..SYMPHONY\MATCH. If the application is unpacked outside of the SYMPHONY 
+directory, simply copy the MATCH directory in to the SYMPHONY directory. 
+
+After that, go into the MATCH/WIN32 directory and load the "match" workspace,
+match.dsw, to the MS Visual Studio. In that case, "symphony" and "match" 
+projects, namely symphony.dsp and match.dsp, including the related source 
+files will be added directly to the workspace. By default, SYMPHONY is set up 
+to use the CPLEX optimization solver via the CPLEX interface of COIN_OSI:
+
+- "__OSI_CPLEX__" is defined in the preprocessor definitions 
+  of both "symphony" and "match" projects (to see that, right-click on one of 
+the projects, and then --> Settings --> C/C++ --> Preprocessor in the Category 
+scroll bar).
+
+- paths to the include files of COIN utilities (Coin), OSI, OSI_CPLEX and 
+CPLEX are specified in the same settings window we used for the preprocessor 
+definitons. Note that, the Coin, OSI and OSI_CPLEX include directories are 
+assumed to be in C:\COIN\Coin, C:\COIN\Osi, C:\COIN\Osi\OsiCpx and 
+C:\ILOG\cplex81\include\ilcplex directories,respectively, if they are not, 
+make sure that you have introduced the correct paths to SYMPHONY in both 
+projects before executing. 
+
+- "symphony" project is dependent on "match" project (see the 
+dependencies in Project->Dependencies) and it includes the necessary 
+libraries: "match", "osiCpxLib", "osiLib", "coinLib" and "cplex81" 
+(solver library).  
+
+- SYMPHONY is also set up to use the COIN CGL library for generating cuts. For 
+that, "symphony" project has the "ADD_CGL_CUTS" preprocessor definiton, the 
+path to C:\COIN\Cgl\ (be sure that this path directs SYMPHONY to the 
+include directory of CGL) and the "cgllib" library. 
+
+If you want to use another solver, basically:
+
+- change the preprocessor definition from "__OSI_CPLEX__" to "__OSI_XXX__" 
+("__OSI_CLP__", "__OSI_GLPK__", "__OSI_OSL__", etc.) if you want to use OSI 
+interface to the solver, otherwise, change it to "__XXX__" (you have two 
+options: "__CPLEX__" and "__OSL__") in both projects.
+
+- change the path definitions of the include files: for instance, if you want 
+to use "__OSI_OSL__", define C:\COIN\OSi\OsiOsl and C:\Program Files\
+IbmOslV3Lib\osllib (assuming it is there) instead of OsiCpx and CPLEX path 
+definitons or, if you want to use "__OSL__", delete all the path definitions 
+since you are not required to have COIN and OSI anymore, and just add the 
+path definiton for the OSL include files. 
+
+- add the appropriate libraries to "symphony" project. For instance, 
+if you want to use "__OSI_OSL__" then add the osiOslLib and oslmd6030 
+(OSL solver lib file) library files after deleting osiCpxLib and cplex81 
+libraries from the "symphony" project (you can do that by right_clicking on 
+"symphony" project and then --> Add files to project with "library files" type 
+selected as the file type) or, if you want to use "__OSL__", then delete all 
+the libraries (except the "match" library ) from the "symphony" project and 
+just add the "oslmd6030" library file for it is the unique solver library file 
+we need now. 
+
+- If you also don't want to use the CGL library, simply delete the 
+"ADD_CGL_CUTS" preprocessor definiton, the CGL path definitons and the 
+"cglLib" library from the "symphony" project. 
+
+Now, you are ready to compile the application. Click on "build symphony.exe" 
+from the "Build" option in toolbar or just click F7. The executable will be 
+created in ..MATCH\WIN32\Debug. To run it, you can either specify your 
+arguments in the program arguments section (right click on "symphony" project 
+and then --> Settings --> Debug. But be careful with your referance location 
+to specify the path to the other files to be used in your arguments: you are 
+now in ..MATCH\WIN32 directory, not in ..MATCH\WIN32\Debug) or go in to the 
+..MATCH\WIN32\Debug directory via a command window (start-->run-->cmd) and 
+type "symphony.exe --arguments". 
+
+
+*******************************************************************************
+*                      USING THE SOLVER                                       *
+*******************************************************************************
+
 Using the matching problem (MATCH), we try to pair the nodes(persons,jobs,etc) 
 with minimum cost. By pairing we mean that each node is matched with exactly 
 one other node in return for a cost. The data file consists of a symmetric, 

@@ -59,7 +59,6 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    mpp_problem *mpp = (mpp_problem *) user;
 
    int i, j, ind;
-   char first;
 
    /* set up the inital LP data */
 
