@@ -226,7 +226,7 @@ void bc_readparams(problem *p, int argc, char **argv)
    lp_par->is_feasible_default = TEST_INTEGRALITY;
    lp_par->send_feasible_solution_default = SEND_NONZEROS;
    lp_par->display_solution_default = DISP_NOTHING;
-   lp_par->shall_we_branch_default = USER__BRANCH_IF_MUST;
+   lp_par->shall_we_branch_default = USER__BRANCH_IF_TAILOFF;
    lp_par->select_candidates_default = USER__CLOSE_TO_HALF;
    lp_par->strong_branching_cand_num_max = 25;
    lp_par->strong_branching_cand_num_min = 5;

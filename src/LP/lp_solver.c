@@ -2065,11 +2065,12 @@ void close_lp_solver(LPdata *lp_data)
 
 void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 {
-   //cannot set the necessary parameters, check OsiCpxSolverInterface-MEN
-   //what about the alloc params?MEN
+   /* cannot set the necessary parameters, check OsiCpxSolverInterface-MEN
+      what about the alloc params?MEN */
 
    /* Turn off scaling for CLP */
-   lp_data->si->setHintParam(OsiDoScale,false,OsiHintDo);
+   /* lp_data->si->setHintParam(OsiDoScale,false,OsiHintDo); */
+
    lp_data->si->loadProblem(lp_data->n, lp_data->m,
 			    lp_data->desc->matbeg, lp_data->desc->matind,
 			    lp_data->desc->matval, lp_data->desc->lb,
@@ -2856,7 +2857,12 @@ void write_mps(LPdata *lp_data, char *fname)
 {
    char * extension = "MPS";
    double ObjSense = lp_data->si->getObjSense();
+   int i;
    
+   for (i = 0; i < lp_data->n; i++) {
+      lp_data->si->setContinuous(i);
+   }
+
    lp_data->si->writeMps(fname,extension,ObjSense);
 }
 
