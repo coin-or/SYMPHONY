@@ -20,6 +20,7 @@
 #include <stdio.h>
 
 #include "BB_types.h"
+#include "BB_macros.h"
 #include "master_params.h"
 #ifdef COMPILE_IN_TM
 #include "tm.h"
