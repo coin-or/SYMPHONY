@@ -381,14 +381,34 @@ int main(int argc, char **argv)
       }
       numsolutions++;
 #ifndef LIFO
-      for (i = first; i < last - 1; i++){
-	 if (pairs[i].solution1 >= solution2){
-	    pairs[i].solution1++;
+      if (first < last){
+	 for (i = first; i < last - 1; i++){
+	    if (pairs[i].solution1 >= solution2){
+	       pairs[i].solution1++;
+	    }
+	    if (pairs[i].solution2 >= solution2){
+	       pairs[i].solution2++;
+	    }
 	 }
-	 if (pairs[i].solution2 >= solution2){
-	    pairs[i].solution2++;
+      }else{
+	 for (i = first; i < MAX_NUM_PAIRS - (last == 0 ? 1 : 0); i++){
+	    if (pairs[i].solution1 >= solution2){
+	       pairs[i].solution1++;
+	    }
+	    if (pairs[i].solution2 >= solution2){
+	       pairs[i].solution2++;
+	    }
+	 }
+	 for (i = 0; i < last - 1; i++){
+	    if (pairs[i].solution1 >= solution2){
+	       pairs[i].solution1++;
+	    }
+	    if (pairs[i].solution2 >= solution2){
+	       pairs[i].solution2++;
+	    }
 	 }
       }
+	 
 #endif
       tree = solutions[solution2].tree =
 	 (int *) calloc(cnrp->vertnum-1, ISIZE);

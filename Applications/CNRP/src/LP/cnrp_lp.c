@@ -1756,16 +1756,12 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 	   continue_with_node = TRUE;
 	}
      }
-  }else if ((*true_objval < cnrp->ub - etol) ||
-	    ((cnrp->par.gamma*(fixed_cost - cnrp->utopia_fixed) >
-	      *true_objval-etol)
-	     && (variable_cost < cnrp->variable_cost + etol)) ||
-	    ((cnrp->par.tau*(variable_cost - cnrp->utopia_variable) >
-	      *true_objval - etol) && (fixed_cost <
-				       cnrp->fixed_cost + etol))){
-     if (!(*true_objval > cnrp->ub - etol &&
-	   variable_cost > cnrp->variable_cost - etol &&
-	   fixed_cost > cnrp->fixed_cost - etol)){
+  }else{
+     if ((*true_objval < cnrp->ub - etol) ||
+	 (fixed_cost < cnrp->fixed_cost - etol &&
+	  variable_cost < cnrp->variable_cost + etol) ||
+	 (variable_cost < cnrp->variable_cost - etol &&
+	  fixed_cost < cnrp->fixed_cost + etol)){
 	printf("\nBetter Solution Found:\n");
 #ifdef ADD_FLOW_VARS
 	printf("Solution Fixed Cost: %.1f\n", fixed_cost);
@@ -1784,9 +1780,9 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 	   /* Add an optimality cut for the second objective */
 	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	   new_cut->coef = NULL;
-	   new_cut->rhs = (int) (fixed_cost + etol) - 1;
+	   new_cut->rhs = (int) (variable_cost + etol) - 1;
 	   new_cut->size = 0;
-	   new_cut->type = OPTIMALITY_CUT_FIXED;
+	   new_cut->type = OPTIMALITY_CUT_VARIABLE;
 	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
 	   continue_with_node = cg_send_cut(new_cut);
 	   FREE(new_cut);
@@ -1794,9 +1790,9 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 	   /* Add an optimality cut for the second objective */
 	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	   new_cut->coef = NULL;
-	   new_cut->rhs = (int) (variable_cost + etol) - 1;
+	   new_cut->rhs = (int) (fixed_cost + etol) - 1;
 	   new_cut->size = 0;
-	   new_cut->type = OPTIMALITY_CUT_VARIABLE;
+	   new_cut->type = OPTIMALITY_CUT_FIXED;
 	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
 	   continue_with_node = cg_send_cut(new_cut);
 	   FREE(new_cut);
