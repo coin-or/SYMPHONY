@@ -23,6 +23,11 @@
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "master.h"
+#include "master_u.h"
+#include "lp_solver.h"
+#ifdef COMPILE_IN_TM
+#include "lp.h"
+#endif
 
 /*===========================================================================*/
 
@@ -32,6 +37,8 @@
 
 void initialize_u(problem *p)
 {
+   sym_set_defaults(p);
+   
    CALL_USER_FUNCTION( user_initialize(&p->user) );
 }
 
@@ -41,8 +48,8 @@ void readparams_u(problem *p, int argc, char **argv)
 {
    int i;
    char tmp, c, foundF, foundD;
-   
-   bc_readparams(p, argc, argv);
+
+   parse_command_line(p, argc, argv);
 
    switch(user_readparams(p->user, p->par.param_file, argc, argv)){
 

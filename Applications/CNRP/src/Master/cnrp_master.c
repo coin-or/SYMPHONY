@@ -133,6 +133,31 @@ int user_io(void *user)
 
    cnrp_io(cnrp, cnrp->par.infile);
 
+   if (cnrp->par.use_small_graph == LOAD_SMALL_GRAPH){
+      read_small_graph(cnrp);
+   }
+
+   if (!cnrp->numroutes && cnrp->par.prob_type == VRP){
+      printf("\nError: Number of trucks not specified or computed "
+	     "for VRP\n\n");
+      exit(1);
+   }
+   
+   if (cnrp->numroutes > 1){
+      printf("NUMBER OF TRUCKS: \t%i\n", cnrp->numroutes);
+      printf("TIGHTNESS: \t\t%.2f\n",
+	     cnrp->demand[0]/(cnrp->capacity*(double)cnrp->numroutes));
+   }
+   
+   /* Selects the cheapest edges adjacent to each node for the base set */
+
+   if (cnrp->par.use_small_graph == SAVE_SMALL_GRAPH){
+      if (!cnrp->g) make_small_graph(cnrp, 0);
+      save_small_graph(cnrp);
+   }else if (!cnrp->g){
+      make_small_graph(cnrp, 0);
+   }
+
    return(USER_SUCCESS);
 }
    
@@ -159,7 +184,6 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
    cnrp->cur_tour->numroutes = cnrp->numroutes;
    
    if (cnrp->par.use_small_graph == LOAD_SMALL_GRAPH){
-      read_small_graph(cnrp);
       if (*ub <= 0 && cnrp->cur_tour->cost > 0)
 	 *ub = (int)(cnrp->cur_tour->cost);
       cnrp->numroutes = cnrp->cur_tour->numroutes;
@@ -170,18 +194,6 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
       *ub = 1;
 #endif
    
-   if (!cnrp->numroutes && cnrp->par.prob_type == VRP){
-      printf("\nError: Number of trucks not specified or computed "
-	     "for VRP\n\n");
-      exit(1);
-   }
-   
-   if (cnrp->numroutes > 1){
-      printf("NUMBER OF TRUCKS: \t%i\n", cnrp->numroutes);
-      printf("TIGHTNESS: \t\t%.2f\n",
-	     cnrp->demand[0]/(cnrp->capacity*(double)cnrp->numroutes));
-   }
-   
    if (*ub > 0 && !(cnrp->par.prob_type == BPP))
       printf("INITIAL UPPER BOUND: \t%i\n\n", (int)(*ub));
    else if (!(cnrp->par.prob_type == BPP))
@@ -189,15 +201,6 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
    else
       printf("\n\n");
    
-   /* Selects the cheapest edges adjacent to each node for the base set */
-
-   if (cnrp->par.use_small_graph == SAVE_SMALL_GRAPH){
-      if (!cnrp->g) make_small_graph(cnrp, 0);
-      save_small_graph(cnrp);
-   }else if (!cnrp->g){
-      make_small_graph(cnrp, 0);
-   }
-
    return(USER_SUCCESS);
 }
 

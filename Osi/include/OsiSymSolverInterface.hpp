@@ -628,7 +628,7 @@ public:
   /**@name Methods to input a problem */
   //@{
 
-    virtual void loadProblem(int argc, char **argv);
+    virtual void loadProblem();
    
     /** Load in an problem by copying the arguments (the constraints on the
         rows are given by lower and upper bounds). If a pointer is 0 then the
@@ -741,6 +741,10 @@ public:
 		       "writeMps", "OsiSymSolverInterface");
     };
 
+   void parseCommandLine(int argc, char **argv);
+
+   void findInitialBounds();
+
   //@}
 
   //---------------------------------------------------------------------------
@@ -801,10 +805,7 @@ protected:
       OsiSolverInterface object when the object is created using the
       default constructor.
     */
-    void setInitialData(){
-       throw CoinError("Error: Function not implemented",
-		       "", "OsiSymSolverInterface");
-    };
+    void setInitialData();
   //@}
 
 private:

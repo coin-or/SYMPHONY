@@ -25,11 +25,14 @@
 #include "proccomm.h"
 #include "timemeas.h"
 #include "messages.h"
-#include "BB_types.h"
 #include "BB_macros.h"
 #include "pack_cut.h"
 #include "pack_array.h"
 #include "master.h"
+#include "lp_solver.h"
+#ifdef COMPILE_IN_TM
+#include "tm.h"
+#endif
 
 #ifndef TEV_INIT_MASK
 /* We must have pvm3.4 where it is called TEV_MASK_INIT */
@@ -44,9 +47,14 @@
 /*===========================================================================*/
 /*===========================================================================*/
 
-problem *sym_open_environment(){
-   
+problem *sym_open_environment()
+{
    problem *p;
+#if (!defined(COMPILE_IN_LP) || !defined(COMPILE_IN_CG) || \
+   !defined(COMPILE_IN_CP)) && defined(__PVM__)
+   int xpvm_tid;
+   Pvmtmask trace_mask;
+#endif
 
    setvbuf(stdout, (char *)NULL, _IOLBF, 0);
    
@@ -61,44 +69,6 @@ problem *sym_open_environment(){
 #endif
 #endif
    
-   printf("\n");
-   printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 4.0                      *\n");
-   printf("*   Copyright 2000-2003 Ted Ralphs                    *\n");
-   printf("*   All Rights Reserved.                              *\n");
-   printf("*   Distributed under the Common Public License 1.0   *\n");
-   printf("*******************************************************\n");
-   printf("\n");
-   
-   return(p = (problem *) calloc(1, sizeof(problem)));
-   
-}   
-   
-
-/*===========================================================================*/
-/*===========================================================================*/
-
-void sym_load_problem(problem *p, int argc, char **argv){
-
-#if (!defined(COMPILE_IN_LP) || !defined(COMPILE_IN_CG) || \
-   !defined(COMPILE_IN_CP)) && defined(__PVM__)
-   int xpvm_tid;
-   Pvmtmask trace_mask;
-#endif
-
-   double t = 0, start_time, total_time = 0;
- 
-   /*------------------------------------------------------------------------*\
-    *                         start reading in problem                        
-   \*------------------------------------------------------------------------*/
-
-   (void) used_time(&t);
-
-   initialize_u(p);
-   
-   /* Set the parameters */
-   readparams_u(p, argc, argv);
-
    /* This next set of commands has to be executed if we want to create a PVM
       trace file for viewing in xpvm (this is a very slow process) */
 
@@ -127,6 +97,282 @@ void sym_load_problem(problem *p, int argc, char **argv){
    }
 #endif
   
+   printf("\n");
+   printf("*******************************************************\n");
+   printf("*   This is SYMPHONY Version 4.0                      *\n");
+   printf("*   Copyright 2000-2003 Ted Ralphs                    *\n");
+   printf("*   All Rights Reserved.                              *\n");
+   printf("*   Distributed under the Common Public License 1.0   *\n");
+   printf("*******************************************************\n");
+   printf("\n");
+   
+   p = (problem *) calloc(1, sizeof(problem));
+
+   initialize_u(p);
+
+   return(p);
+}   
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void sym_set_defaults(problem *p)
+{
+   tm_params *tm_par = &p->par.tm_par;
+   lp_params *lp_par = &p->par.lp_par;
+   cg_params *cg_par = &p->par.cg_par;
+   cp_params *cp_par = &p->par.cp_par;
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_DECOMP
+   sp_params *sp_par = &p->par.sp_par;
+#endif
+   /*___END_EXPERIMENTAL_SECTION___*/
+   dg_params *dg_par = &p->par.dg_par;
+
+   /************************* Global defaults ********************************/
+   p->ub = 0;
+   p->has_ub = FALSE;
+   p->lb = 0;
+   p->par.verbosity = 0;
+   p->par.random_seed = 17;
+   p->par.tm_machine_set = FALSE;
+   p->par.dg_machine_set = FALSE;
+   strcpy(p->par.tm_exe, "tm");
+#ifdef COMPILE_IN_LP
+   strcat(p->par.tm_exe, "_lp");
+#ifdef COMPILE_IN_CG
+   strcat(p->par.tm_exe, "_cg");
+#endif
+#endif
+#ifdef COMPILE_IN_CP
+   strcat(p->par.tm_exe, "_cp");
+#endif   
+   strcpy(p->par.dg_exe, "dg");
+   p->par.tm_debug = 0;
+   p->par.dg_debug = 0;
+   p->par.pvm_trace = 0;
+   p->par.do_branch_and_cut = 1;
+   p->par.do_draw_graph = FALSE;
+
+   /************************** treemanager defaults **************************/
+   tm_par->verbosity = 0;
+   tm_par->granularity = 0.000001;
+   strcpy(tm_par->lp_exe, "lp");
+#ifdef COMPILE_IN_CG
+   strcat(tm_par->lp_exe, "_cg");
+#endif
+   strcpy(tm_par->cg_exe, "cg");
+   strcpy(tm_par->cp_exe, "cp");
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   strcpy(tm_par->sp_exe, "sp");
+   /*___END_EXPERIMENTAL_SECTION___*/
+   tm_par->lp_debug = 0;
+   tm_par->cg_debug = 0;
+   tm_par->cp_debug = 0;
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   tm_par->sp_debug = 0;
+   /*___END_EXPERIMENTAL_SECTION___*/
+   tm_par->max_active_nodes = 1;
+   tm_par->max_cp_num = 1;
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   tm_par->max_sp_num = 0;
+   /*___END_EXPERIMENTAL_SECTION___*/
+   tm_par->lp_mach_num = 0;
+   tm_par->lp_machs = NULL;
+   tm_par->cg_mach_num = 0;
+   tm_par->cg_machs = NULL;
+   tm_par->cp_mach_num = 0;
+   tm_par->cp_machs = NULL;
+
+   tm_par->use_cg = FALSE;
+   tm_par->random_seed = 17;
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   tm_par->do_decomp = FALSE;
+   /*___END_EXPERIMENTAL_SECTION___*/
+   tm_par->unconditional_dive_frac = .1;
+   tm_par->diving_strategy = BEST_ESTIMATE;
+   tm_par->diving_k = 1;
+   tm_par->diving_threshold = 0;
+   tm_par->node_selection_rule = LOWEST_LP_FIRST;
+
+   tm_par->keep_description_of_pruned = DISCARD;
+   tm_par->warm_start = FALSE;
+   tm_par->logging = NO_LOGGING;
+   tm_par->logging_interval = 1800;
+   tm_par->vbc_emulation = NO_VBC_EMULATION;
+   tm_par->price_in_root = FALSE;
+   tm_par->trim_search_tree = FALSE;
+   tm_par->colgen_strat[0] = (FATHOM__DO_NOT_GENERATE_COLS__DISCARD  |
+			      BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
+   tm_par->colgen_strat[1] = (FATHOM__DO_NOT_GENERATE_COLS__DISCARD  |
+			      BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
+   tm_par->not_fixed_storage_size = 2048;
+   tm_par->time_limit = 0;
+
+   /************************** lp defaults ***********************************/
+   lp_par->verbosity = 0;
+   lp_par->granularity = tm_par->granularity;
+   lp_par->use_cg = tm_par->use_cg;
+   lp_par->set_obj_upper_lim = FALSE;
+   lp_par->scaling = -1; /* CPLEX'ism ... don't scale */
+   lp_par->fastmip = 1; /* CPLEX'ism ... set it to 1 */
+   lp_par->try_to_recover_from_error = TRUE;
+   lp_par->problem_type = ZERO_ONE_PROBLEM;
+   lp_par->keep_description_of_pruned = tm_par->keep_description_of_pruned;
+   lp_par->not_fixed_storage_size = tm_par->not_fixed_storage_size;
+   lp_par->cut_pool_check_freq = 10;
+   lp_par->load_balance_level = -1;
+   lp_par->load_balance_iterations = -1;
+   lp_par->load_balance_compare_candidates = HIGHEST_LOW_OBJ;
+   lp_par->fractional_diving_ratio = 0.02;
+   lp_par->fractional_diving_num = 0;
+   lp_par->max_non_dual_feas_to_add_frac = 0.05;
+   lp_par->max_non_dual_feas_to_add_min = 20;
+   lp_par->max_non_dual_feas_to_add_max = 200;
+   lp_par->max_not_fixable_to_add_frac = 0.1;
+   lp_par->max_not_fixable_to_add_min = 100;
+   lp_par->max_not_fixable_to_add_max = 500;
+   lp_par->mat_col_compress_num = 50;
+   lp_par->mat_col_compress_ratio = .05;
+   lp_par->mat_row_compress_num = 20;
+   lp_par->mat_row_compress_ratio = .05;
+   lp_par->tailoff_gap_backsteps = 2;
+   lp_par->tailoff_gap_frac = .99;
+   lp_par->tailoff_obj_backsteps = 3;
+   lp_par->tailoff_obj_frac = .75;
+   lp_par->tailoff_absolute = 0.0001;
+   lp_par->ineff_cnt_to_delete = 0;
+   lp_par->eff_cnt_before_cutpool = 3;
+   lp_par->ineffective_constraints = BASIC_SLACKS_ARE_INEFFECTIVE;
+   lp_par->base_constraints_always_effective = TRUE;
+   lp_par->branch_on_cuts = FALSE;
+   lp_par->discard_slack_cuts = DISCARD_SLACKS_BEFORE_NEW_ITERATION;
+   lp_par->first_lp.first_cut_time_out = 0;
+   lp_par->first_lp.all_cuts_time_out = 0;
+   lp_par->later_lp.first_cut_time_out = 5;
+   lp_par->later_lp.first_cut_time_out = 0;
+   lp_par->later_lp.all_cuts_time_out = 1;
+   lp_par->later_lp.all_cuts_time_out = 0;
+   lp_par->max_cut_num_per_iter = 20;
+   lp_par->do_reduced_cost_fixing = TRUE;
+   lp_par->gap_as_ub_frac = .1;
+   lp_par->gap_as_last_gap_frac = .7;
+   lp_par->do_logical_fixing = 1;
+   lp_par->fixed_to_ub_before_logical_fixing = 1;
+   lp_par->fixed_to_ub_frac_before_logical_fixing = .01;
+
+   lp_par->generate_cgl_cuts = TRUE;
+
+#ifdef __OSI_GLPK__
+   lp_par->max_presolve_iter = -1;
+#else
+   lp_par->max_presolve_iter = 50;
+#endif
+   
+   lp_par->is_feasible_default = TEST_INTEGRALITY;
+   lp_par->send_feasible_solution_default = SEND_NONZEROS;
+   lp_par->display_solution_default = DISP_NOTHING;
+   lp_par->shall_we_branch_default = USER__BRANCH_IF_TAILOFF;
+   lp_par->select_candidates_default = USER__CLOSE_TO_HALF;
+   lp_par->strong_branching_cand_num_max = 25;
+   lp_par->strong_branching_cand_num_min = 5;
+   lp_par->strong_branching_red_ratio = 1;
+   lp_par->compare_candidates_default = HIGHEST_LOW_OBJ;
+   lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
+   lp_par->pack_lp_solution_default = SEND_NONZEROS;
+
+   /************************** cut_gen defaults *****************************/
+   cg_par->verbosity = 0;
+   cg_par->do_findcuts = TRUE;
+
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   cg_par->do_decomp = FALSE;
+   cg_par->decomp_sol_pool_check_freq = 10;
+   cg_par->decomp_wait_for_cols = TRUE;
+   cg_par->decomp_max_col_num_per_iter = 1000;
+   cg_par->decomp_col_block_size = 1000;
+   cg_par->decomp_mat_block_size = 100000;
+   cg_par->decomp_initial_timeout = 5;
+   cg_par->decomp_dynamic_timeout = 5;
+   cg_par->decomp_complete_enum = TRUE;
+
+   /*___END_EXPERIMENTAL_SECTION___*/
+   /************************** cutpool defaults ******************************/
+   cp_par->verbosity = 0;
+   cp_par->warm_start = FALSE;
+   cp_par->logging = FALSE;
+   cp_par->block_size = 5000;
+   cp_par->max_size = 2000000;
+   cp_par->max_number_of_cuts = 10000;
+   cp_par->cuts_to_check = 1000;
+   cp_par->delete_which = DELETE_BY_QUALITY;
+   cp_par->touches_until_deletion = 10;
+   cp_par->min_to_delete = 1000;
+   cp_par->check_which = CHECK_ALL_CUTS;
+
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   /************************** solpool defaults ******************************/
+#ifdef COMPILE_DECOMP
+   sp_par->verbosity = 0;
+   sp_par->etol = 0.000001;
+   sp_par->block_size = 1000;
+   sp_par->max_size = 1000000;
+   sp_par->max_number_of_sols = 10000;
+   sp_par->delete_which = DELETE_DUPLICATE_COLS;
+   sp_par->touches_until_deletion = 10;
+   sp_par->min_to_delete = 100;
+   sp_par->compress_num = 10;
+   sp_par->compress_ratio = .01;
+   sp_par->check_which = CHECK_COL_LEVEL_AND_TOUCHES;
+#endif
+   /*___END_EXPERIMENTAL_SECTION___*/
+   /********************** draw_graph defaults  ******************************/
+   strcpy(dg_par->source_path, ".");
+   dg_par->echo_commands = FALSE;
+   dg_par->canvas_width = 1000;
+   dg_par->canvas_height = 700;
+   dg_par->viewable_width = 600;
+   dg_par->viewable_height = 400;
+   dg_par->disp_nodelabels = 1;
+   dg_par->disp_nodeweights = 1;
+   dg_par->disp_edgeweights = 1;
+   dg_par->node_dash[0] = 0;
+   dg_par->edge_dash[0] = 0;
+   dg_par->node_radius = 8;
+   dg_par->interactive_mode = 1;
+   dg_par->mouse_tracking = 1;
+   dg_par->scale_factor = 1;
+   strcpy(dg_par->nodelabel_font,
+	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
+   strcpy(dg_par->nodeweight_font,
+	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
+   strcpy(dg_par->edgeweight_font,
+	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void sym_parse_command_line(problem *p, int argc, char **argv)
+{
+
+   readparams_u(p, argc, argv);
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void sym_load_problem(problem *p)
+{
+   double t = 0;
+ 
+   /*------------------------------------------------------------------------*\
+    *                         start reading in problem                        
+   \*------------------------------------------------------------------------*/
+
+   (void) used_time(&t);
+
    /* Get the problem data */
    io_u(p);
 
@@ -135,6 +381,22 @@ void sym_load_problem(problem *p, int argc, char **argv){
    init_draw_graph_u(p);
 #endif
 
+   /*------------------------------------------------------------------------*\
+    * Have the user generate the base and root description
+   \*------------------------------------------------------------------------*/
+
+   initialize_root_node_u(p);
+
+   p->comp_times.readtime = used_time(&t);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void sym_find_initial_bounds(problem *p)
+{
+   double total_time = 0;
+   
    /* Finds the upper and lower bounds for the problem */
    start_heurs_u(p);
 
@@ -153,7 +415,6 @@ void sym_load_problem(problem *p, int argc, char **argv){
       printf( "            LB   %.3f\n", p->comp_times.lb_heurtime);
       printf( "  Total User Time    %.3f\n", total_time);
 #endif
-      printf( "  Total Real Time    %.3f\n\n", wall_clock(NULL) - start_time);
       if (p->mip->obj_sense == MAXIMIZE){
 	 printf( "Upper Bound: %.3f\n", -p->ub + p->mip->obj_offset);
       }else{
@@ -172,16 +433,6 @@ void sym_load_problem(problem *p, int argc, char **argv){
 #endif
       exit(1);
    }
-
-   (void) used_time(&t);
-   
-   /*------------------------------------------------------------------------*\
-    * Have the user generate the base and root description
-   \*------------------------------------------------------------------------*/
-
-   initialize_root_node_u(p);
-
-   p->comp_times.readtime = used_time(&t);
 }
 
 /*===========================================================================*/

@@ -23,7 +23,7 @@
 /*=================== Master I/O functions (readparams.c) ===================*/
 /*===========================================================================*/
 
-void bc_readparams PROTO((problem *p, int argc, char **argv));
+void parse_command_line PROTO((problem *p, int argc, char **argv));
 void read_string PROTO((char *target, char *line, int maxlen));
 void print_statistics PROTO((node_times *tim, tm_stat *stat, double ub,
 			     double lb, double initial_time,

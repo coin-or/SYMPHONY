@@ -19,7 +19,8 @@
 /*===========================================================================*/
 /*===========================================================================*/
 
-OsiSymSolverInterface::OsiSymSolverInterface(){
+OsiSymSolverInterface::OsiSymSolverInterface()
+{
 
    env_ = sym_open_environment();
 
@@ -28,9 +29,10 @@ OsiSymSolverInterface::OsiSymSolverInterface(){
 /*===========================================================================*/
 /*===========================================================================*/
 
-void OsiSymSolverInterface::loadProblem(int argc, char **argv){
+void OsiSymSolverInterface::loadProblem()
+{
 
-   sym_load_problem(env_, argc, argv);
+   sym_load_problem(env_);
 
    setApplicationData((void *) (env_->user));
 
@@ -39,7 +41,8 @@ void OsiSymSolverInterface::loadProblem(int argc, char **argv){
 /*===========================================================================*/
 /*===========================================================================*/
 
-void OsiSymSolverInterface::branchAndBound(){
+void OsiSymSolverInterface::branchAndBound()
+{
 
    sym_solve(env_);
 
@@ -48,7 +51,8 @@ void OsiSymSolverInterface::branchAndBound(){
 /*===========================================================================*/
 /*===========================================================================*/
 
-OsiSymSolverInterface::~OsiSymSolverInterface(){
+OsiSymSolverInterface::~OsiSymSolverInterface()
+{
 
    sym_close_environment(env_);
 
@@ -59,7 +63,8 @@ OsiSymSolverInterface::~OsiSymSolverInterface(){
 /*===========================================================================*/
 /*===========================================================================*/
 
-void OsiSymSolverInterface::reset(){
+void OsiSymSolverInterface::reset()
+{
    
    sym_close_environment(env_);
 
@@ -70,7 +75,8 @@ void OsiSymSolverInterface::reset(){
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::setIntParam(OsiIntParam key, int value){
+bool OsiSymSolverInterface::setIntParam(OsiIntParam key, int value)
+{
 
    return false;
 
@@ -79,8 +85,8 @@ bool OsiSymSolverInterface::setIntParam(OsiIntParam key, int value){
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::setSymIntParam(OsiSymIntParam key, int value){
-
+bool OsiSymSolverInterface::setSymIntParam(OsiSymIntParam key, int value)
+{
    switch(key){
 
     case OsiSymVerbosity:
@@ -94,8 +100,8 @@ bool OsiSymSolverInterface::setSymIntParam(OsiSymIntParam key, int value){
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::setDblParam(OsiDblParam key, double value){
-
+bool OsiSymSolverInterface::setDblParam(OsiDblParam key, double value)
+{
    switch(key){
       
     case OsiObjOffset:
@@ -110,8 +116,8 @@ bool OsiSymSolverInterface::setDblParam(OsiDblParam key, double value){
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::setSymDblParam(OsiSymDblParam key, double value){
-
+bool OsiSymSolverInterface::setSymDblParam(OsiSymDblParam key, double value)
+{
    switch(key){
 
     case OsiSymGranularity:
@@ -127,7 +133,8 @@ bool OsiSymSolverInterface::setSymDblParam(OsiSymDblParam key, double value){
 /*===========================================================================*/
 
 bool OsiSymSolverInterface::setStrParam(OsiStrParam key, 
-					const std::string & value){
+					const std::string & value)
+{
 
    return false;
 
@@ -137,8 +144,8 @@ bool OsiSymSolverInterface::setStrParam(OsiStrParam key,
 /*===========================================================================*/
 
 bool OsiSymSolverInterface::setSymStrParam(OsiSymStrParam key, 
-					   const std::string & value){
-
+					   const std::string & value)
+{
    switch(key){
 
    default: 
@@ -149,7 +156,8 @@ bool OsiSymSolverInterface::setSymStrParam(OsiSymStrParam key,
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::getIntParam(OsiIntParam key, int& value) const{
+bool OsiSymSolverInterface::getIntParam(OsiIntParam key, int& value) const
+{
 
    return false;
 
@@ -158,8 +166,9 @@ bool OsiSymSolverInterface::getIntParam(OsiIntParam key, int& value) const{
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::getSymIntParam(OsiSymIntParam key, int& value) const{
-
+bool OsiSymSolverInterface::getSymIntParam(OsiSymIntParam key, int& value)
+     const
+{
    switch(key){
 
    default:
@@ -170,8 +179,8 @@ bool OsiSymSolverInterface::getSymIntParam(OsiSymIntParam key, int& value) const
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::getDblParam(OsiDblParam key, double& value) const{
-
+bool OsiSymSolverInterface::getDblParam(OsiDblParam key, double& value) const
+{
    switch (key){
       
    case OsiObjOffset:
@@ -187,8 +196,8 @@ bool OsiSymSolverInterface::getDblParam(OsiDblParam key, double& value) const{
 /*===========================================================================*/
 
 bool OsiSymSolverInterface::getSymDblParam(OsiSymDblParam key, 
-					   double& value) const{
-
+					   double& value) const
+{
    switch(key){
 
    default:
@@ -200,7 +209,8 @@ bool OsiSymSolverInterface::getSymDblParam(OsiSymDblParam key,
 /*===========================================================================*/
 
 bool OsiSymSolverInterface::getStrParam(OsiStrParam key, 
-					std::string& value) const {
+					std::string& value) const
+{
 
    return false;
 
@@ -210,8 +220,8 @@ bool OsiSymSolverInterface::getStrParam(OsiStrParam key,
 /*===========================================================================*/
 
 bool OsiSymSolverInterface::getSymStrParam(OsiSymStrParam key, 
-					   std::string& value) const{
-
+					   std::string& value) const
+{
    switch(key){
 
    default:
@@ -219,3 +229,32 @@ bool OsiSymSolverInterface::getSymStrParam(OsiSymStrParam key,
    }
 }
 
+/*===========================================================================*/
+/*===========================================================================*/
+
+void OsiSymSolverInterface::setInitialData()
+{
+
+   sym_set_defaults(env_);
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void OsiSymSolverInterface::parseCommandLine(int argc, char **argv)
+{
+
+   sym_parse_command_line(env_, argc, argv);
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void OsiSymSolverInterface::findInitialBounds()
+{
+
+   sym_find_initial_bounds(env_);
+
+}

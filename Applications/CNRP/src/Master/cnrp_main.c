@@ -71,7 +71,6 @@ int main(int argc, char **argv)
 {
    int i;
    problem *env;
-   cut_pool **cp = NULL;
    double gamma, gamma0, gamma1, tau, slope;
    double start_time;
 
@@ -88,6 +87,9 @@ int main(int argc, char **argv)
    node_desc *root= NULL;
    base_desc *base = NULL;
    double compare_sol_tol, ub = 0.0;
+#ifdef SAVE_CUT_POOL
+   cut_pool **cp = NULL;
+#endif
 
    start_time = wall_clock(NULL);
 
@@ -97,9 +99,15 @@ int main(int argc, char **argv)
    /* Get pointer to the SYMPHONY environment */
    env = si.getSymphonyEnvironment();
 
-   /* Parse the command line and read in the problem */
-   si.loadProblem(argc, argv);
+   /* Parse the command line */
+   si.parseCommandLine(argc, argv);
+   
+   /* Read in the problem */
+   si.loadProblem();
 
+   /* Find a priori problem bounds */
+   si.findInitialBounds();
+   
    /* Get the pointer to the user data */
    cnrp = static_cast<cnrp_problem *>(si.getApplicationData());
 
