@@ -2982,13 +2982,16 @@ void write_sav(LPdata *lp_data, char *fname)
 
 #ifdef USE_CGL_CUTS
 
-void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
-		       char send_to_pool){
+#include "qsortucb.h"
 
+void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
+		       char send_to_pool)
+{
    OsiCuts cutlist;
    OsiRowCut cut;
    int i = 0, j = 0, k = 0; 
    int *matind;
+   double *matval;
    
    /* Set proper variables to be integer */
    for (i = 0; i < lp_data->n; i++) {
@@ -3018,12 +3021,14 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    probe->generateCuts(*(lp_data->si), cutlist);
    //printf("%i\n", cutlist.sizeRowCuts());
 #endif
-   
+
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    /* create CGL flow cover cuts */
    CglFlowCover *flow = new CglFlowCover;
    flow->generateCuts(*(lp_data->si), cutlist);
    //printf("%i\n", cutlist.sizeRowCuts());
 
+   /*___END_EXPERIMENTAL_SECTION___*/
 #if 0
    /* create CGL simple rounding cuts */
    CglSimpleRounding * rounding = new CglSimpleRounding;
@@ -3066,8 +3071,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 for (k = 0; k < num_elements; k++){
 	    matind[k] = lp_data->vars[indices[k]]->userind;
 	 }
-	 memcpy((*cuts)[j]->coef + (num_elements + 1) * ISIZE,
-		(char *)elements, num_elements * DSIZE);
+	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
+	 memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
+	 qsortucb_id(matind, matval, num_elements);
 	 (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	 (*cuts)[j]->deletable = TRUE;
 	 if (send_to_pool){
@@ -3083,7 +3089,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    // delete knapsack;
    // delete oddhole;
    // delete probe;
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    delete flow;
+   /*___END_EXPERIMENTAL_SECTION___*/
    /* delete rounding; */
    /* delete liftandproject; */
 

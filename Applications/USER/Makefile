@@ -35,7 +35,7 @@ USERROOT = ${SYMPHONYROOT}/Template
 # The customized name of the master program (if desired)
 ##############################################################################
 
-MASTERNAME = mip-noflow
+MASTERNAME = mip
 
 ##############################################################################
 # These are only needed if parallel computation is used. Please see the
