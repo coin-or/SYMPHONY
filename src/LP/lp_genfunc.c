@@ -260,7 +260,13 @@ int fathom_branch(lp_prob *p)
       PRINT(p->par.verbosity, 2,
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
+      set_itlim(lp_data, 10000);
+
       termcode = dual_simplex(lp_data, &iterd);
+
+      if (termcode == LP_D_ITLIM){
+	printf("Reached maximum number of iterations\n\n", termcode);
+      }
 
 #ifdef DO_TESTS
       if (lp_data->objval < oldobjval - .01){
@@ -1051,7 +1057,7 @@ int check_tailoff(lp_prob *p)
       for (i = 2, sum = 0; i <= obj_backsteps; i++){
 	 if (obj_hist[i-1] - obj_hist[i] > p->lp_data->lpetol){
 	    sum += (obj_hist[i-2]-obj_hist[i-1]) / (obj_hist[i-1]-obj_hist[i]);
-	 }else{
+	 }else if (obj_hist[i-2] - obj_hist[i-1] > p->lp_data->lpetol){
 	    sum += 1;
 	 }
       }
