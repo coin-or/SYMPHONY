@@ -245,6 +245,36 @@ version will only run in sequential mode for a variety of reasons. However, it
 should be relatively easy to get it running in parallel if you can get PVM
 working under Windows. Let me know if you are interested.
 
+GETTING STARTED QUICKLY
+
+Developing a simple branch and bound solver can be done quite quickly using
+the sample framework provided in the SYMPHONY/User/ directory. The simplest
+approach is to develop a sequential application, sharing a single user data
+structure among all the modules. Using this approach, an application can be
+developed by filling in only a few simple functions. Here are three simple
+steps to get up and running. 
+
+1. First, decide what data has to be stored to describe your instance. Edit
+the file User/include/user.h, adding the appropriate fields to the
+user_problem structure to store a problem instance.
+
+2. Now edit the file User/Master/master_user.c. If you choose to have all
+variables in the base set (a good starting point), the only function that
+really needs to be filled out initially is user_io(), where you can read in
+the instance data. Note that the name of the file to read the instance data
+from can be specified on the command line using the "-F" option by
+default. Also, check out the function user_set_base().
+
+3. Edit the file User/LP/lp_user.c. The function user_create_lp() must be
+filled out. This is the most important function, as it sets up the initial LP
+relaxation in each search node.
+
+Now compile by setting the variable USERROOT in the make file to be
+${ROOT)/User} and typing "make" (assuming that the make file has already been
+modified appropriately). That's it! You should now have a working branch and
+bound solver. Next you can work on filling in more advanced functions and
+adding cutting planes. See the documentation for more information on this.
+
 LIST SERVE
 
 There is a list serve for SYMPHONY users. To subscribe, send a message

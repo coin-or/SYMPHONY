@@ -90,11 +90,11 @@ LP_SOLVER = NONE
 ##############################################################################
 
 ##############################################################################
-# OSLLIB definitions
+# OSL definitions
 ##############################################################################
 
 #Uncomment the line below if you want to use OSL.
-LP_SOLVER = OSL
+#LP_SOLVER = OSL
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSL)
@@ -361,12 +361,6 @@ ifeq ($(ARCH),ALPHA)
 	X11LDFLAGS = -L/usr/local/X11/lib
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
 	SYSLIBS =
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = FALSE
-	COMPILE_IN_LP = FALSE
-	COMPILE_IN_TM = FALSE
 endif
 
 ##############################################################################

@@ -30,15 +30,28 @@
 #endif
 #endif
 
+/*===========================================================================*\
+ * This file contains stubs for the user-written functions for the master 
+ * process. The primary function that has to be filled in here is user_io(),
+ * where the data for the instance is read in and the user data structure
+ * that stores the instance data filled out (this data structure is defined 
+ * in user.h). Other than that, the default routines should work fine.
+\*===========================================================================*/
+
 /*===========================================================================*/
 
+/*===========================================================================*\
+ * This function gives help on command-line switches defined by the user.
+ * All user switches have capital letters by convention.
+\*===========================================================================*/
+
 void user_usage(void){
-         printf("master [ -H ] \n\n\t-H: help");
+         printf("master [ -H ] [ -F file ] \n\t%s\n\t%s\n",
+		"-H: help (user switches)",
+		"-F file: problem instance data is in 'file'");
 }
 
-/*===========================================================================*\
- * This file contains the user-written functions for the master process.
-\*===========================================================================*/
+/*===========================================================================*/
 
 /*===========================================================================*\
  * Initialize user-defined data structures. This basically consists of 
@@ -58,7 +71,7 @@ int user_initialize(void **user)
 /*===========================================================================*/
 
 /*===========================================================================*\
- * Read in parameters from the parameter file given on the command line.
+ * Parse the user options Read in parameters from the parameter file given on the command line
 \*===========================================================================*/
 
 int user_readparams(void *user, char *filename, int argc, char **argv)
@@ -96,6 +109,9 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 	 user_usage();
 	 exit(0);
 	 break;
+       case 'F':
+	 strncpy(par.infile, argv[++i], MAX_FILE_NAME_LENGTH);
+	 break;
       };
    }
 
@@ -106,7 +122,10 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
 /*===========================================================================*\
  * Read in the data file, whose name was given in the parameter file.
- * This file contains instance data.
+ * This file contains instance data. Right now, this function is set up to 
+ * read in just the number of columns and number of rows from the file.
+ * Add more data as needed to describe the instance and set up the LP
+ * relaxation.
 \*===========================================================================*/
 
 int user_io(void *user)
@@ -144,7 +163,7 @@ int user_io(void *user)
 /*===========================================================================*\
  * Here is where the heuristics are performed and an upper bound is calculated.
  * An upper bound can also be specified in the parameter file. This function
- * need not be filled in
+ * need not be filled in if no upper bounding is done.
 \*===========================================================================*/
 
 int user_start_heurs(void *user, double *ub, double *ub_estimate)
@@ -177,7 +196,7 @@ int user_init_draw_graph(void *user, int dg_id)
 /*===========================================================================*\
  * This is the subroutine where the user specifies what variables are to be in
  * the base set. To begin with, a good bet is just to put all the variables in
- * the base set.
+ * the base set. In this case, this function need not be modified.
 \*===========================================================================*/
 
 int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
@@ -205,7 +224,7 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
 /*===========================================================================*/
 
 /*===========================================================================*\
- * This is the second step in the process where the user specifies
+ * This is the second step in the process, where the user specifies
  * which variables should be active in the root in addition to the base
  * set specified above. The set of extra variable would be empty if all
  * variables are in the base, as above.
@@ -225,7 +244,7 @@ int user_create_root(void *user, int *extravarnum, int **extravars)
 /*===========================================================================*/
 
 /*===========================================================================*\
- * Receive the feasible solution. Doesn't need to be folled in.
+ * Receive the feasible solution. Doesn't need to be filled in.
 \*===========================================================================*/
 
 int user_receive_feasible_solution(void *user, int msgtag, double cost,
@@ -243,7 +262,8 @@ int user_receive_feasible_solution(void *user, int msgtag, double cost,
  * message-passing. Otherwise, we can allocate the user-defined LP data
  * structure here and simply copy the necessary information. This is the
  * only place the user has to sorry about this distinction between
- * configurations. 
+ * configurations. If running sequentially and using the default data
+ * structure, nothing needs to be modified in here.
 \*===========================================================================*/
 
 int user_send_lp_data(void *user, void **user_lp)
@@ -279,7 +299,8 @@ int user_send_lp_data(void *user, void **user_lp)
  * message-passing. Otherwise, we can allocate the user-defined LP data
  * structure here and simply copy the necessary information. This is the
  * only place the user has to sorry about this distinction between
- * configurations. 
+ * configurations. If running sequentially and using the default data
+ * structure, nothing needs to be modified in here.
 \*===========================================================================*/
 
 int user_send_cg_data(void *user, void **user_cg)
@@ -321,7 +342,8 @@ int user_send_cg_data(void *user, void **user_cg)
  * message-passing. Otherwise, we can allocate the user-defined LP data
  * structure here and simply copy the necessary information. This is the
  * only place the user has to sorry about this distinction between
- * configurations. 
+ * configurations. If running sequentially and using the default data
+ * structure, nothing needs to be modified in here.
 \*===========================================================================*/
 
 int user_send_cp_data(void *user, void **user_cp)
@@ -406,6 +428,10 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 
 int user_free_master(void **user)
 {
+   user_problem *prob = (user_problem *) calloc(1, sizeof(user_problem));
+
+   FREE(prob);
+
    return(USER_NO_PP);
 }
 
