@@ -1446,6 +1446,12 @@ osisym:
 clean :
 	rm -rf $(OBJDIR)
 
+clean_coin :
+	(cd $(COINROOT)/Clp && $(MAKE) clean && cd -)
+	(cd $(COINROOT)/Coin && $(MAKE) clean && cd -)
+	(cd $(COINROOT)/Cgl && $(MAKE) clean && cd -)
+	(cd $(COINROOT)/Osi && $(MAKE) clean && cd -)
+
 clean_gmpl :
 	rm -rf $(GMPL_OBJDIR)
 
