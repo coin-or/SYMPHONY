@@ -102,7 +102,8 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
    desc->rhs    = (double *) malloc(desc->m * DSIZE);
    desc->sense  = (char *) malloc(desc->m * CSIZE);
    desc->rngval = (double *) malloc(desc->m * DSIZE);
-
+   desc->is_int = (char *) calloc (desc->n, CSIZE);
+   
    memcpy((char *) desc->matbeg, (char *) cm->matbeg, (cm->colnum+1) * ISIZE);   
    memcpy((char *) desc->obj, (char *) cm->obj, cm->colnum * DSIZE);      
 
@@ -112,6 +113,7 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
    }
 
    for (i = desc->n - 1; i >= 0; --i){
+      desc->is_int[i] = TRUE;
       desc->ub[i] = 1.0;
       /* desc->lb[i] = 0.0; */ /* Set by calloc */
    }

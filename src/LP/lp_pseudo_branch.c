@@ -39,7 +39,7 @@ void add_slacks_to_matrix(lp_prob *p, int cand_num, branch_obj **candidates)
    int m = p->lp_data->m;
    int j, k;
    branch_obj *can;
-   constraint *newrows;
+   row_data *newrows;
    waiting_row **wrows;
 
    for (j=cand_num-1; j >= 0; j--)
@@ -116,7 +116,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 {
    LPdata *lp_data = p->lp_data;
    var_desc **vars;
-   constraint *rows;
+   row_data *rows;
    int m;
 #ifndef MAX_CHILDREN_NUM
    int maxnum;

@@ -301,19 +301,17 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 {
    /* This gives you access to the user data structure. */
    mpp_problem *mpp = (mpp_problem *) user;
-   int i;
-   int *vars, varnum;
 
    /* Since we don't know how to form a good set of base variables, we'll put all
       the variables in the extra set */
 
    /* Set the number of extra variables*/
-   varnum = *extravarnum = 2 * mpp->numedges + mpp->numarcs;
+   *extravarnum = 2 * mpp->numedges + mpp->numarcs;
  
-   /* Put all the variables in the extra set */
-   vars = *basevars = (int *) malloc(varnum * ISIZE);
+   /* The variables are automatically put in the extra set */
+   *extravars = (int *) malloc(varnum * ISIZE);
    for (i = 0; i < varnum; i++){
-     vars[i] = i;
+     (*extravars)[i] = i;
    }
 
    /* Set the number of rows in the initial formulation */

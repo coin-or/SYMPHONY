@@ -80,9 +80,11 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
    desc->rhs     = (double *) malloc(desc->m * DSIZE);
    desc->sense   = (char *) malloc(desc->m * CSIZE);
    desc->rngval  = (double *) calloc(desc->m, DSIZE);
-
+   desc->is_int = (char *) calloc(desc->n, CSIZE);
+   
    for (i = 0, ind = 0; i < desc->n; i++){
       desc->matbeg[i] = ind;
+      desc->is_int[i] = TRUE;
       /* indegree equals outdegree constraint */
       for (j = 0; j <= mpp->numnodes - 1; j++){
 	 /* checks to see if node i is the start node of every edge arc */

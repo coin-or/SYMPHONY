@@ -83,7 +83,9 @@ typedef struct PARAMS{
    int        pvm_trace;
    int        do_branch_and_cut;
    int        do_draw_graph;
-   char       infile[MAX_FILE_NAME_LENGTH +1]; /* For MPS file name */
+   char       infile[MAX_FILE_NAME_LENGTH +1]; /* For MPS file name
+						  or GNUMP modelfile */
+   char       datafile[MAX_FILE_NAME_LENGTH +1]; /* GNUMP datafile */
 }params;
 
 /*===========================================================================*\

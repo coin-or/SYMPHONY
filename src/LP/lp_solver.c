@@ -71,8 +71,8 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
 					       lp_data->maxm * DSIZE);
       }
       /* rows is realloc'd in either case just to keep the base constr */
-      lp_data->rows = (constraint *) realloc((char *)lp_data->rows,
-                                             lp_data->maxm*sizeof(constraint));
+      lp_data->rows = (row_data *) realloc((char *)lp_data->rows,
+                                             lp_data->maxm*sizeof(row_data));
    }
    if (maxn > lp_data->maxn){
       int i, oldmaxn = MAX(lp_data->maxn, lp_data->n);
@@ -693,7 +693,7 @@ void get_dj_pi(LPdata *lp_data)
 
 void get_slacks(LPdata *lp_data)
 {
-   constraint *rows = lp_data->rows;
+   row_data *rows = lp_data->rows;
    double *slacks = lp_data->slacks;
    const double *racts;
    int i, m = lp_data->m;
@@ -949,7 +949,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    int i, j = 0;
    double *lb = ekk_getRowlower(lp_data->lp);
    double *ub = ekk_getRowupper(lp_data->lp);
-   constraint *rows = lp_data->rows;
+   row_data *rows = lp_data->rows;
    cut_data *cut;
    
    for (i = length - 1; i >= 0; i--) {
@@ -1490,7 +1490,7 @@ void get_dj_pi(LPdata *lp_data)
 
 void get_slacks(LPdata *lp_data)
 {
-   constraint *rows = lp_data->rows;
+   row_data *rows = lp_data->rows;
    double *slacks = lp_data->slacks;
    int i, m = lp_data->m;
    cpx_status = CPXgetslack(lp_data->cpxenv, lp_data->lp, lp_data->slacks, 0,
@@ -1662,7 +1662,7 @@ void release_var(LPdata *lp_data, int j, int where_to_move)
 void free_row_set(LPdata *lp_data, int length, int *index)
 {
    int i, j;
-   constraint *rows = lp_data->rows;
+   row_data *rows = lp_data->rows;
    double *rhsval = lp_data->tmp.d; /* m */
    int *ind_e = lp_data->tmp.i1 + 2 * lp_data->m; /* m (now) */
    /* See comment in check_row_effectiveness why the shift! */
@@ -1694,7 +1694,7 @@ void free_row_set(LPdata *lp_data, int length, int *index)
 void constrain_row_set(LPdata *lp_data, int length, int *index)
 {
    int i;
-   constraint *rows = lp_data->rows;
+   row_data *rows = lp_data->rows;
    cut_data *cut;
    double *rhsval = lp_data->tmp.d; /* m (now) */
    char *sense = lp_data->tmp.c + lp_data->m; /* m (now) */
@@ -1772,7 +1772,11 @@ void open_lp_solver(LPdata *lp_data)
    /* Turn off the OSL messages (There are LOTS of them) */
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
-   lp_data->si->getDblParam(OsiDualTolerance, lp_data->lpetol);   
+#ifdef __OSI_GLPK__
+   lp_data->lpetol = 1e-08; /* glpk doesn't return the value of this parameter */ 
+#else   
+   lp_data->si->getDblParam(OsiDualTolerance, lp_data->lpetol);
+#endif
 }
 
 /*===========================================================================*/
@@ -2194,7 +2198,7 @@ void get_slacks(LPdata *lp_data)
 {
    int m = lp_data->m, i = 0;
    double * slacks = lp_data->slacks;
-   constraint *rows = lp_data->rows;
+   row_data *rows = lp_data->rows;
    
 #ifndef __OSI_CPLEX__
    
@@ -2465,7 +2469,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    char *sense = lp_data->tmp.c; /* m (now) */
    double *rhs = lp_data->tmp.d; /* m */
    double *range = (double *) calloc(length, DSIZE);
-   constraint *rows = lp_data->rows;
+   row_data *rows = lp_data->rows;
    cut_data *cut;
    char range_used = FALSE;
    int i;
@@ -2704,5 +2708,273 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
    return;
 }
 #endif
+
+#ifdef USE_GLPMPL
+
+/*This function reads in the GNU MathProg model file and returns either 1 if 
+  it is succeded or 0 otherwise.*/
+
+int read_gmpl(LPdesc *desc, char *modelfile, char *datafile, char *probname)
+{
+   MPL * mpl;         
+   int errors;
+   int i, j, k, obj_index, length, type, count, nonzeros;
+   double *matval;
+   int *matind;
+   int * matbeg;
+
+   double *row_lb;
+   double *row_ub;
+
+   int *indices;
+   double *values;   
+
+   mpl = mpl_initialize();  /* initialize the translator */
+    
+   errors = mpl_read_model(mpl, modelfile);   /* read the model file */
+ 
+   /*if the data is not in the model file and will be given seperately, 
+     then errors=1! */
+   if (errors == 1){  
+      errors = mpl_read_data(mpl, datafile);
+   }
+
+   /*if there are some errors in reading the file(s): then errors!=2*/ 
+   if (errors != 2){
+      printf("\nError in reading the model (or data) file!"); 
+      mpl_terminate(mpl);   /* free all the mpl related stuff */
+      return(0);
+   }
+
+   /*Generate the model variables, constraints, objective by storing in the 
+     translator database.It is possible to capture the messages in a file by 
+     passing the filename instead of NULL.*/
+
+   errors = mpl_generate(mpl, NULL);  
+   if (errors != 3){           
+      printf("\nError in generating the model!");  
+      mpl_terminate(mpl);
+      return(0);
+   }
+   
+   strncpy(probname, mpl_get_prob_name(mpl), 80); /* give a name to the problem */
+
+   /* get num of rows and cols */
+   desc->m  = mpl_get_num_rows(mpl)-1; /* subtract the objective row */
+   desc->n  = mpl_get_num_cols(mpl);
+   desc->nz = 0; /* for now... */
+
+   /*Indices and values of nonzeros will return beginning with indices[1] and
+     values[1]. Also note that row and column indices begin with 1 in glpmpl*/
+
+   /*get desc->nz and desc->obj*/
+   desc->obj    = (double *) calloc(DSIZE, desc->n);
+
+   indices = new int[desc->n+1]; 
+   values = new double[desc->n+1];
+
+   count = 0;
+
+   for(i = 0; i < desc->m + 1; i++){
+
+      type = mpl_get_row_kind(mpl, i+1);
+      if (type == MPL_ST){  /* constraints */
+	 /* mpl_get_mat_row returns the # of nonzeros in the row i+1. */
+	 desc->nz += mpl_get_mat_row(mpl, i+1, NULL, NULL); 
+      }else{
+	 obj_index = i;
+	 length = mpl_get_mat_row(mpl, i+1, indices, values);
+	 if (type == MPL_MAX){
+	    for (j = 1; j <= length; j++){  
+	       desc->obj[indices[j]-1] = -values[j];
+	    }
+	 }else{   /* type=MPL_MIN */
+	    for( j = 1; j <= length; j++ ) 
+	       desc->obj[indices[j]-1] = values[j]; /* assign the obj coeff. */
+	 }
+	 count++;
+	 if (count > 1){
+	    printf("\nError due to having more than one objective function!"); 
+	    printf("\nSYMPHONY can solve problems with just one "); 
+	    printf("objective function\n");
+	    return(0);
+	 }  
+      }      
+   }
+
+   if (count < 1){
+      printf("\nError in reading the objective function!"); 
+      printf("\nSYMPHONY requires an objective function!");
+      return(0);
+   }
+
+   /* Define a row ordered dummy constraint matrix since glpmpl returns the 
+      constraint definitions as row ordered, we will change its order later. */
+
+   /* fill the dummy matbeg, matind, matval, row_lb and row_ub arrays */
+   matbeg = (int *) malloc(ISIZE * (desc->m + 1));
+   matind = (int *) malloc(ISIZE * desc->nz);
+   matval = (double *) malloc(DSIZE * desc->nz);
+
+   row_ub = (double *) malloc(DSIZE * desc->m);
+   row_lb = (double *) malloc(DSIZE * desc->m);
+
+   matbeg[0] = 0;
+   nonzeros = 0;
+   for(i = 0, k = 0; i < desc->m+1; i++){
+      if(i != obj_index){
+	 /* read the nonzeros in row i+1 */     
+	 length = mpl_get_mat_row(mpl, i+1, indices, values); 
+	 /* get the row bounds. we use k instead of i since we have the obj 
+	    row somewhere. */
+	 type = mpl_get_row_bnds(mpl, i+1, &row_lb[k],&row_ub[k]); 
+	 switch(type)                                           
+	    {
+	    case MPL_FR:  /* free */
+	       row_lb[k] = -INFINITY;
+	       row_ub[k] =  INFINITY;
+	       break;
+	    case MPL_LO:  /* has lower bound */
+	       row_ub[k] =  INFINITY;
+	       break;	 
+	    case MPL_UP:  /* has upper bound */
+	       row_lb[k] = -INFINITY;
+	       break;
+	    default: /* is bounded from both sides or is an equality */
+	       break;
+	    }
+	 for (j = 0; j < length; j++){
+	    matind[matbeg[k]+j] = indices[j+1] - 1;
+	    matval[matbeg[k]+j] = values[j+1];
+	 }
+	 nonzeros += length;
+	 k++;
+	 matbeg[k] = nonzeros;
+      }
+   }
+
+   /* fill the column related definitions: ub, lb, is_int and colname arrays */
+
+   desc->ub      = (double *) malloc(DSIZE * desc->n);
+   desc->lb      = (double *) malloc(DSIZE * desc->n);
+   desc->is_int  = (char *)   calloc(CSIZE, desc->n);
+   desc->colname = (char **)  malloc(sizeof(char *) * desc->n);   
+
+   for (j = 0; j < desc->n; j++){
+      type = mpl_get_col_bnds(mpl, j+1, &desc->lb[j], &desc->ub[j]);
+      switch(type){
+      case  MPL_FR: /* free */
+	    desc->lb[j] = -INFINITY;
+	    desc->ub[j] =  INFINITY;
+	    break;
+      case MPL_LO:  /* has lower bound */
+	    desc->ub[j] =  INFINITY;
+	    break;
+      case MPL_UP:  /* has upper bound */
+	    desc->lb[j] = -INFINITY;
+	    break;
+      default:  /* has both lower and upper bound or is a fixed variable */
+	    break;
+	 }
+
+      type = mpl_get_col_kind(mpl, j+1);
+      if(type == MPL_INT || type == MPL_BIN){
+	 desc->is_int[j] = TRUE;
+      }  
+      /* bounds for binary variables were probably not assigned.So assign them! */
+      if(type == MPL_BIN){ 
+	 desc->ub[j] = 1.0;	 
+	 desc->lb[j] = 0.0;
+
+      }
+
+      desc->colname[j] = (char *) malloc(CSIZE * 255); 
+      strncpy(desc->colname[j], mpl_get_col_name(mpl,j+1),255);
+      desc->colname[j][254] = 0;  /* ??? */
+   }
+
+   /*load the definitions to a CoinPackedMatrix as row ordered and get the 
+     column ordered matrix after reversing its order in order to fill the 
+     matrix definitons as column ordered*/
+
+   desc->matbeg = (int *)    calloc(ISIZE, (desc->n + 1));
+   desc->matval = (double *) malloc(DSIZE * desc->nz);
+   desc->matind = (int *)    malloc(ISIZE * desc->nz);
+
+#if 0
+   //make CoinPackedMatrix help us for now!!!
+   CoinPackedMatrix matrixByCol (false, desc->n, 
+			   desc->m, desc->nz, matval, matind, matbeg, 0);
+   matrixByCol.reverseOrdering();
+
+
+   memcpy(desc->matbeg, const_cast<int *>(matrixByCol.getVectorStarts()),
+	  ISIZE * (desc->n + 1));   
+   memcpy(desc->matval, const_cast<double *> (matrixByCol.getElements()),
+	  DSIZE * desc->nz);  
+   memcpy(desc->matind, const_cast<int *> (matrixByCol.getIndices()), 
+	  ISIZE * desc->nz);  
+#endif
+
+   //what if the user doesn't have COIN, is that possible?:)
+   nonzeros = 0;
+   for(j = 0; j < desc->n; j++){
+      for(i = 0; i < desc->m; i++){
+	 for(k = matbeg[i]; k < matbeg[i+1]; k++){
+	    if(matind[k] == j){	   
+	       desc->matind[nonzeros] = i;
+	       desc->matval[nonzeros] = matval[k];
+	       nonzeros++;	  
+	       break;
+	    }
+	 }
+      } 
+      desc->matbeg[j+1] = nonzeros;
+   }
+
+   /*get the other definitions: rhs, sense and rngval from row_lb and row_ub*/
+
+   desc->rhs    = (double *) malloc(DSIZE * desc->m);
+   desc->sense  = (char *)   malloc(CSIZE * desc->m);
+   desc->rngval = (double *) malloc(DSIZE * desc->m);
+
+   double inf = INFINITY;
+   //convertBoundToSense: stolen from COIN :)
+   for(i = 0; i < desc->m; i++) {      
+      desc->rngval[i] = 0.0;
+      if (row_lb[i] > -inf) {
+	 if (row_ub[i] < inf) {
+	    desc->rhs[i] = row_ub[i];
+	    if (row_lb[i] == row_ub[i]) {
+	       desc->sense[i] = 'E';
+	    } else {
+	       desc->sense[i] = 'R';
+	       desc->rngval[i] = row_ub[i] - row_lb[i];
+	    }
+	 }else{
+	    desc->sense[i] = 'G';
+	    desc->rhs[i] = row_lb[i];
+	 }
+      }else{
+	 if (row_ub[i] < inf) {
+	    desc->sense[i] = 'L';
+	    desc->rhs[i] = row_ub[i];
+	 }else{
+	    desc->sense[i] = 'N';
+	    desc->rhs[i] = 0.0;
+	 }
+      }
+   }
+
+   FREE(matind);
+   FREE(matval);
+   FREE(matbeg);
+   FREE(row_lb);
+   FREE(row_ub);
+   
+  //if you could reach here by chance, then you are safe anymore:) 
+   return(1);
+}
+#endif /* USE_GLPMPL */
 
 #endif /* __OSI_xxx__ */

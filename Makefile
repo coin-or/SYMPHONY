@@ -138,7 +138,7 @@ endif
 
 #Uncomment the line below if you want to use an OSI interface.
 LP_SOLVER = OSI
-OSI_INTERFACE = CPLEX
+OSI_INTERFACE = OSL
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
@@ -185,6 +185,18 @@ ifeq ($(OSI_INTERFACE),GLPK)
        LPLDFLAGS += ${HOME}/lib
        LPLIB += -lOsiGlpk -lglpk
 endif
+endif
+
+##############################################################################
+# GLPMPL definitions
+##############################################################################
+
+USE_GLPMPL = TRUE
+
+ifeq ($(USE_GLPMPL),TRUE)
+        LPINCDIR += ${HOME}/src/glpk-4.0/include
+        LPLDFLAGS +=${HOME}/src/glpk-4.0/
+        LPLIB += -lglpk 
 endif
 
 ##############################################################################
@@ -679,6 +691,9 @@ ifeq ($(LP_SOLVER), OSI)
 SYSDEFINES += -D__OSI_$(OSI_INTERFACE)__
 else
 SYSDEFINES += -D__$(LP_SOLVER)__
+endif
+ifeq ($(USE_GLPMPL),TRUE)
+SYSDEFINES += -DUSE_GLPMPL
 endif
 
 BB_DEFINES  = $(USER_BB_DEFINES)
@@ -1463,4 +1478,4 @@ clean_bin :
 clean_all : clean clean_dep clean_user clean_user_dep clean_lib clean_bin
 	true
 
-.SILENT:
+#.SILENT:

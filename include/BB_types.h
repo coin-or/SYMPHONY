@@ -81,13 +81,13 @@ typedef struct CUT_DATA{
 				  no name & no pool */
 }cut_data;
 
-typedef struct CONSTRAINT{
+typedef struct ROW_DATA{
    cut_data      *cut;
    int            ineff_cnt;
    int            eff_cnt;
    char           free;
    char           deletable;
-}constraint;
+}row_data;
 
 typedef struct WAITING_ROW{
    int            source_pid;

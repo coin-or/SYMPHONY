@@ -1428,7 +1428,7 @@ void send_lp_is_free(lp_prob *p)
 void send_cuts_to_pool(lp_prob *p, int eff_cnt_limit)
 {
    int i, cnt = 0;
-   constraint *extrarows = p->lp_data->rows + p->base.cutnum;
+   row_data *extrarows = p->lp_data->rows + p->base.cutnum;
 #ifdef COMPILE_IN_CP
    
    cut_pool *cp = p->tm->cpp[p->cut_pool];

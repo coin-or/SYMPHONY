@@ -172,7 +172,7 @@ int create_lp_u(lp_prob *p)
 
    LPdata *lp_data = p->lp_data;
    int i, j, maxm, maxn, maxnz;
-   constraint *row, *rows;
+   row_data *row, *rows;
 
    int bvarnum = p->base.varnum;
    int bcutnum = p->base.cutnum;
@@ -260,7 +260,7 @@ int create_lp_u(lp_prob *p)
       lp_data->desc->rhs     = (double *) malloc(lp_data->desc->m * DSIZE);
       lp_data->desc->sense   = (char *)   malloc(lp_data->desc->m * CSIZE);
       lp_data->desc->rngval  = (double *) calloc(lp_data->desc->m, DSIZE);
-      lp_data->desc->is_int  = (char *)   calloc(lp_data->desc->n, DSIZE);
+      lp_data->desc->is_int  = (char *)   calloc(lp_data->desc->n, CSIZE);
 
       /* Fill out the appropriate data structures*/
       lp_data->desc->matbeg[0] = 0;
@@ -813,7 +813,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 {
    int user_res, action = USER__BRANCH_IF_MUST;
    LPdata *lp_data = p->lp_data;
-   constraint *rows = lp_data->rows;
+   row_data *rows = lp_data->rows;
    double lpetol = lp_data->lpetol;
    int i, j = 0, m = lp_data->m;
    int *candidate_rows;

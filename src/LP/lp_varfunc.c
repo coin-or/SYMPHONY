@@ -437,7 +437,7 @@ our_col_set *price_all_vars(lp_prob *p)
 
    int cutnum;
    cut_data **cuts;
-   constraint *rows;
+   row_data *rows;
 
    char basevar = TRUE; /* just to keep gcc quiet */
    int ind, prevind, curind, nextind = -1; /* just to keep gcc quiet */

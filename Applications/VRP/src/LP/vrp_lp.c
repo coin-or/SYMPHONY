@@ -170,7 +170,7 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
    desc->rhs     = (double *) malloc(desc->m * DSIZE);
    desc->sense   = (char *) malloc(desc->m * CSIZE);
    desc->rngval  = (double *) calloc(desc->m, DSIZE);
-
+   desc->is_int  = (char *) calloc(desc->n, CSIZE);
    /* Fill out the appropriate data structures -- each column has
       exactly two entries */
    for (i = 0; i < desc->n; i++){
@@ -181,7 +181,8 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
       desc->matval[2*i+1] = 1.0;
       desc->matind[2*i]   = edges[2*indices[i]];
       desc->matind[2*i+1] = edges[2*indices[i] + 1];
-
+      desc->is_int[i]     = TRUE;
+      
       /* Set the upper and lower bounds */
       if (edges[indices[i] << 1] == 0){
 	 /*This is a depot edge and we have to check what its ub should be*/

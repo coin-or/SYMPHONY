@@ -243,7 +243,7 @@ void process_branching_info PROTO((tm_prob *tm, bc_node *node));
 char process_messages PROTO((tm_prob *tm, int r_bufid));
 void process_ub_message PROTO((tm_prob *tm));
 void unpack_cut_set PROTO((tm_prob *tm, int sender, int cutnum,
-			   constraint *rows));
+			   row_data *rows));
 void receive_lp_timing PROTO((tm_prob *tm));
 
 #endif

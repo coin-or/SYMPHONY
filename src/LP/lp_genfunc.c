@@ -74,7 +74,7 @@ void lp_initialize(lp_prob *p, int master_tid)
    int s_bufid;
 #endif
    int i;
-   constraint *rows;
+   row_data *rows;
    var_desc **vars;
 
 #ifdef COMPILE_IN_LP
@@ -139,7 +139,7 @@ void lp_initialize(lp_prob *p, int master_tid)
    }
 #endif
    p->lp_data->rows =
-      (constraint *) malloc((p->base.cutnum + BB_BUNCH) * sizeof(constraint));
+      (row_data *) malloc((p->base.cutnum + BB_BUNCH) * sizeof(row_data));
    rows = p->lp_data->rows;
    for (i = p->base.cutnum - 1; i >= 0; i--){
       ( rows[i].cut = (cut_data *) malloc(sizeof(cut_data)) )->coef = NULL;
@@ -848,7 +848,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
    int extravarnum = n - bvarnum;
 
    int bcutnum = p->base.cutnum;
-   constraint *rows = lp_data->rows;
+   row_data *rows = lp_data->rows;
    int extrarownum = m - bcutnum;
    int cutindsize;
 
@@ -884,7 +884,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
    }
    if (cutcnt > 0){
 #ifdef COMPILE_IN_LP
-      constraint *tmp_rows=(constraint *) malloc(cutcnt*sizeof(constraint));
+      row_data *tmp_rows = (row_data *) malloc(cutcnt*sizeof(row_data));
       
       for (j = 0, i = bcutnum; j < cutcnt; i++){
 	 if (rows[i].cut->name < 0 &&

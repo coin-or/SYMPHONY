@@ -52,7 +52,7 @@ void free_master_u(problem *p)
 void readparams_u(problem *p, int argc, char **argv)
 {
    int i;
-   char tmp, c, found;
+   char tmp, c, foundF, foundD;
    
    bc_readparams(p, argc, argv);
 
@@ -60,7 +60,7 @@ void readparams_u(problem *p, int argc, char **argv)
 
     case DEFAULT:
       
-      found = FALSE;
+      foundF = foundD = FALSE;
       for (i = 1; i < argc; i++){
 	 sscanf(argv[i], "%c %c", &tmp, &c);
 	 if (tmp != '-')
@@ -68,12 +68,16 @@ void readparams_u(problem *p, int argc, char **argv)
 	 switch (c) {
 	  case 'F':
 	    strncpy(p->par.infile, argv[++i],MAX_FILE_NAME_LENGTH);
-	    found = TRUE;
+	    foundF = TRUE;
 	    break;	     
-	  default:
+	 case 'D':
+	    strncpy(p->par.datafile, argv[++i],MAX_FILE_NAME_LENGTH);
+	    foundD = TRUE;
+	    break;	     
+	 default:
 	    break;
 	 }	 
-	 if (found){
+	 if (foundF && foundD){
 	    break;
 	 }
       }
@@ -102,12 +106,27 @@ void io_u(problem *p)
 
     case DEFAULT: 
 
-      err = read_mps(p->desc, p->par.infile, p->probname);
-      if(err != 0){
-	 printf("\nErrors in reading mps file\n");
-	 exit(1000);
+      if (strcmp(p->par.datafile, "") == 0){ 
+	 err = read_mps(p->desc, p->par.infile, p->probname);
+	 if (err != 0){
+	    printf("\nErrors in reading mps file\n");
+	    exit(1000);
+	 }
+      }else{
+#ifdef USE_GLPMPL
+	 err = read_gmpl(p->desc, p->par.infile, 
+			 p->par.datafile, p->probname);
+	 if(!err){
+	    printf("\nErrors in reading gmpl file\n");
+	    exit(1000);
+	 }
+#else
+	 printf("ERROR: SYMPHONY can only read GMPL files if GLPK is \n");
+	 printf("installed and the USE_GLMPL compiler define is set. \n");
+	 printf("Exiting.\n\n");
+#endif
       }
-
+      
       break;
 
     case ERROR:

@@ -35,7 +35,7 @@ int check_row_effectiveness(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    double *dualsol = lp_data->dualsol;
    double lpetol = lp_data->lpetol;
-   constraint *row, *rows = lp_data->rows;
+   row_data *row, *rows = lp_data->rows;
    int m = lp_data->m;
 
    int bcutnum = p->base.cutnum;
@@ -260,7 +260,7 @@ int check_row_effectiveness(lp_prob *p)
 void add_row_set(lp_prob *p, waiting_row **wrows, int length)
 {
    int i;
-   constraint *row;
+   row_data *row;
 
    add_waiting_rows(p, wrows, length);
 
@@ -339,7 +339,7 @@ void order_waiting_rows_based_on_sender(lp_prob *p)
 int add_best_waiting_rows(lp_prob *p)
 {
    int i, added_rows;
-   constraint *rows;
+   row_data *rows;
 
    added_rows = MIN(p->par.max_cut_num_per_iter, p->waiting_row_num);
    if (added_rows < p->waiting_row_num)

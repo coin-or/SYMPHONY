@@ -893,7 +893,7 @@ void process_ub_message(tm_prob *tm)
  * Receives and adds a set of cuts
 \*===========================================================================*/
 
-void unpack_cut_set(tm_prob *tm, int sender, int cutnum, constraint *rows)
+void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 {
    int old_cutnum = tm->cut_num, new_cutnum = cutnum, *itmp, i;
    cut_data **cuts;

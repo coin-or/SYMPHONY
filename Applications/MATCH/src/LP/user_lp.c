@@ -95,6 +95,7 @@ int user_create_lp(void *user, LPdesc *desc, int *indices,
 	 desc->matval[2*index+1] = 1;
 	 desc->matind[2*index] = i;
 	 desc->matind[2*index+1] = j;
+	 desc->ub[index] = 1.0;
 	 index++;
       }
    }

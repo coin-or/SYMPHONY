@@ -18,6 +18,13 @@
 #include "proto.h"
 #include "BB_types.h"
 
+#ifdef USE_GLPMP
+extern "C"
+{
+   #include "glpmpl.h"
+}
+#endif
+
 #define LP_MAX_ITER 9999999
 
 #ifdef __CPLEX__
@@ -198,7 +205,7 @@ typedef struct LPdata{
    double    *dualsol;     /* maxm */ /* BB */
    double    *slacks;      /* maxm */
 
-   constraint  *rows;      /* maxm */
+   row_data  *rows;      /* maxm */
 
    temporary   tmp;
 #ifdef PSEUDO_COSTS
@@ -267,5 +274,8 @@ void write_sav PROTO((LPdata *lp_data, char *fname));
 #ifdef USE_CGL_CUTS
 void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts, cut_data ***cuts));
 #endif
-
+#ifdef USE_GLPMPL
+int read_gmpl PROTO((LPdesc * lp_data, char *modelfile, char *datafile,
+		     char *probname));
+#endif
 #endif
