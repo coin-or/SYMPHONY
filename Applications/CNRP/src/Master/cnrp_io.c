@@ -827,10 +827,7 @@ void cnrp_readparams(cnrp_problem *cnrp, char *filename, int argc, char **argv)
       }
       else if (strcmp(key, "gamma") == 0){
 	 READ_DBL_PAR(lp_par->gamma);
-      }
-      else if (strcmp(key, "tau") == 0){
-	 READ_DBL_PAR(lp_par->tau);
-	 cg_par->tau = lp_par->tau;
+	 cg_par->tau = lp_par->tau = 1 - lp_par->gamma;
       }
       else if (strcmp(key, "rho") == 0){
 	 READ_DBL_PAR(lp_par->rho);

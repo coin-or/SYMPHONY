@@ -155,7 +155,7 @@ if (num_nodes > 2){                                                          \
    new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                      \
 		   RHS(num_nodes, total_demand, capacity) :                  \
 		   BINS(total_demand, capacity));                            \
-   num_cuts += cg_send_cut(new_cut);                                         \
+   cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);           \
 }                                                                            \
 
 #define SEND_SUBTOUR_CONSTRAINT(num_nodes, total_demand)                     \
@@ -165,11 +165,11 @@ if (mult - 1 && num_nodes > 2){                                              \
    new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                      \
 		   RHS(num_nodes, total_demand, capacity) :                  \
 		   mult*BINS(total_demand, capacity));                       \
-   num_cuts += cg_send_cut(new_cut);                                         \
+   cut_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);            \
 }else{                                                                       \
    new_cut->type = SUBTOUR_ELIM_ACROSS;                                      \
    new_cut->rhs = mult*BINS(total_demand, capacity);                         \
-   num_cuts += cg_send_cut(new_cut);                                         \
+   cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);           \
 }                                                                            \
 
 /*===========================================================================*/
@@ -182,7 +182,8 @@ if (mult - 1 && num_nodes > 2){                                              \
 
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   int index, double objval, int *indices, double *values,
-		   double ub, double etol, int *cutnum)
+		   double ub, double etol, int *num_cuts, int *alloc_cuts,
+		   cut_data ***cuts)
 {
    cg_cnrp_spec *cnrp = (cg_cnrp_spec *)user;
    int vertnum = cnrp->vertnum;
@@ -195,7 +196,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    int rcnt, cur_bins = 0;
    char **coef_list;
    int i, k, max_node;
-   int num_cuts = 0;
+   int cuts_found = 0;
    double cur_slack = 0.0;
    double capacity = cnrp->capacity;
    int cut_size = (vertnum >> DELETE_POWER) + 1;
@@ -255,20 +256,19 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       /* if the network is integral, check for connectivity */
 #ifdef ADD_FLOW_VARS      
       if (prob_type == CTP || prob_type == CSTP){
-	 num_cuts = check_flow_connectivity(n, etol, capacity, num_routes,
-					    mult);
-	 if (num_cuts){
+	 cuts_found = check_flow_connectivity(n, etol, capacity, num_routes,
+					      mult, num_cuts, alloc_cuts,
+					      cuts);
+	 if (cuts_found){
 	    free_net(n);
 	    FREE(new_cut);
-	    *cutnum = num_cuts;
 	    return(USER_SUCCESS);
 	 }
       }
 #else
-      num_cuts = check_connectivity(n, etol, capacity, num_routes, mult);
+      check_connectivity(n, etol, capacity, num_routes, mult);
       free_net(n);
       FREE(new_cut);
-      *cutnum = num_cuts;
       return(USER_SUCCESS);
 #endif
    }
@@ -290,7 +290,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	    new_cut->size  = ISIZE;
 	    new_cut->rhs   = 1.0;
 	    ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1);
-	    num_cuts += cg_send_cut(new_cut);
+	    cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	 }
       }
       FREE(new_cut->coef);
@@ -309,7 +309,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	       new_cut->size  = ISIZE;
 	       new_cut->rhs   = 0.0;
 	       ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1);
-	       num_cuts += cg_send_cut(new_cut);
+	       cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	    }
 	 }
 	 if ((flow_value = edge1->flow2) > etol){
@@ -319,7 +319,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	       new_cut->rhs   = 0.0;
 	       ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1) +
 		  total_edgenum;
-	       num_cuts += cg_send_cut(new_cut);
+	       cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	    }
 	 }
       }
@@ -335,17 +335,16 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	    new_cut->size  = ISIZE;
 	    new_cut->rhs   = 0.0;
 	    ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1);
-	    num_cuts += cg_send_cut(new_cut);
+	    cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	 }
       }
       FREE(new_cut->coef);
    }
 #endif   
    
-   if (num_cuts){
+   if (cuts_found){
       free_net(n);
       FREE(new_cut);
-      *cutnum = num_cuts;
       return(USER_SUCCESS);
    }
    
@@ -371,7 +370,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	       new_cut->size  = ISIZE;
 	       new_cut->rhs   = 0.0;
 	       ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1);
-	       num_cuts += cg_send_cut(new_cut);
+	       cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	    }
 	 }
 	 if ((flow_value = edge1->flow2) > etol){
@@ -393,7 +392,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	       new_cut->rhs   = 0.0;
 	       ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1) +
 		  total_edgenum;
-	       num_cuts += cg_send_cut(new_cut);
+	       cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	    }
 	 }
       }
@@ -420,7 +419,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	    new_cut->size  = ISIZE;
 	    new_cut->rhs   = 0.0;
 	    ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1);
-	    num_cuts += cg_send_cut(new_cut);
+	    cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	 }
 	 real_demand = edge1->v0 ? demand[edge1->v0] : 0;
 	 for (cur_edge = verts[edge1->v0].first; cur_edge;
@@ -440,17 +439,16 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	    new_cut->rhs   = 0.0;
 	    ((int *)new_cut->coef)[0] = INDEX(edge1->v0, edge1->v1) +
 	       total_edgenum;
-	    num_cuts += cg_send_cut(new_cut);
+	    cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 	 }
       }
       FREE(new_cut->coef);
    }
 #endif   
    
-   if (num_cuts){
+   if (cuts_found){
       free_net(n);
       FREE(new_cut);
-      *cutnum = num_cuts;
       return(USER_SUCCESS);
    }
 
@@ -458,23 +456,21 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    if (n->is_integral){
       if (prob_type == VRP || prob_type == TSP || prob_type == BPP){
       /* if the network is integral, check for connectivity */
-	 num_cuts = check_flow_connectivity(n, etol, capacity, num_routes,
-					    mult);
+	 cuts_found = check_flow_connectivity(n, etol, capacity, num_routes,
+					      mult, num_cuts, alloc_cuts,
+					      cuts);
       }
       /* If we got to here, the solution is feasible, so just return */
       free_net(n);
       FREE(new_cut);
-      *cutnum = num_cuts;
       return(USER_SUCCESS);
    }
 #endif
 
 #ifdef DO_TSP_CUTS
    if (cnrp->par.which_tsp_cuts && prob_type == TSP){
-      num_cuts += tsp_cuts(n, cnrp->par.verbosity, TRUE,
-			   cnrp->par.which_tsp_cuts);
+      tsp_cuts(n, cnrp->par.verbosity, TRUE, cnrp->par.which_tsp_cuts);
       free_net(n);
-      *cutnum = num_cuts;
       FREE(new_cut);
       return(USER_SUCCESS);
    }      
@@ -535,7 +531,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #if 0
 	    new_cut->type = SUBTOUR_ELIM_SIDE;
 	    new_cut->rhs = RHS(compnodes[i+1],compdemands[i+1], capacity);
-	    num_cuts += cg_send_cut(new_cut);
+	    cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 #endif
 #ifdef DIRECTED_X_VARS
 	    SEND_DIR_SUBTOUR_CONSTRAINT(compnodes[i+1], compdemands[i+1]);
@@ -595,7 +591,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		  new_cut->type = SUBTOUR_ELIM_SIDE;
 		  new_cut->rhs = RHS(compnodes[i+1],compdemands[i+1],capacity);
 		  new_cut->size = cut_size;
-		  num_cuts += cg_send_cut(new_cut);
+		  cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts,
+					    cuts);
 #endif
 #ifdef DIRECTED_X_VARS
 		  SEND_DIR_SUBTOUR_CONSTRAINT(compnodes[i+1],compdemands[i+1]);
@@ -613,17 +610,16 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(compnodes);
       FREE(compdemands);
       FREE(compcuts);
-   }while((!num_cuts || cnrp->par.which_connected_routine == BOTH)
+   }while((!cuts_found || cnrp->par.which_connected_routine == BOTH)
 	  && which_connected_routine < 2);
 
 #if 0
-   if (num_cuts < 10 && cnrp->par.do_mincut){
-      num_cuts += min_cut(cnrp, n, etol, mult);
+   if (cuts_found < 10 && cnrp->par.do_mincut){
+      cuts_found += min_cut(cnrp, n, etol, mult);
       free_net(n);
    }
    
-   if (!cnrp->par.do_greedy || num_cuts >= 10){
-      *cutnum = num_cuts;
+   if (!cnrp->par.do_greedy || cuts_found >= 10){
       FREE(new_cut);
       return(USER_SUCCESS);
    }
@@ -637,7 +633,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #endif
 #endif
 
-   if (num_cuts < 10 && cnrp->par.do_greedy && (prob_type == VRP ||
+   if (cuts_found < 10 && cnrp->par.do_greedy && (prob_type == VRP ||
 			prob_type == TSP || prob_type == BPP)){
       coef = (char *) malloc(cut_size * sizeof(char)); 
       for (cur_edge=verts[0].first; cur_edge; cur_edge=cur_edge->next_edge){
@@ -663,7 +659,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 			if ((i != node1) && (i != node2))
 			   (coef[i >> DELETE_POWER]) |= (1 << (i&DELETE_AND));
 		     new_cut->coef =coef;
-		     triangle_cuts += cg_send_cut(new_cut);
+		     triangle_cuts += cg_send_cut(new_cut, num_cuts,
+						  alloc_cuts, cuts);
 		  }
 		  break; 
 	       }
@@ -673,31 +670,33 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       FREE(coef);
       if (cnrp->par.verbosity > 2)
 	 printf("Found %d triangle cuts\n",triangle_cuts);
-      num_cuts += triangle_cuts;
+      cuts_found += triangle_cuts;
    }
    
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
-   if (num_cuts < 10 && cnrp->par.do_greedy){
-      num_cuts += greedy_shrinking1_dicut(n, capacity, etol,
+   if (cuts_found < 10 && cnrp->par.do_greedy){
+      cuts_found += greedy_shrinking1_dicut(n, capacity, etol,
 					  cnrp->par.max_num_cuts_in_shrink,
 					  new_cut, compnodes_copy, compmembers,
 					  comp_num, in_set, cut_val, ref,
-					  cut_list, demand, mult);
+					  cut_list, demand, mult, num_cuts,
+					  alloc_cuts, cuts);
    }
 
-   if (num_cuts < 10 && cnrp->par.do_greedy){
+   if (cuts_found < 10 && cnrp->par.do_greedy){
       if (cnrp->par.do_extra_in_root)
 	 num_trials = level ? cnrp->par.greedy_num_trials :
 	 2 * cnrp->par.greedy_num_trials;
       else
 	 num_trials = cnrp->par.greedy_num_trials;
-      num_cuts += greedy_shrinking6_dicut(n, capacity, etol, new_cut,
-					  compnodes_copy, compmembers,
-					  comp_num, in_set, cut_val, ref,
-					  cut_list,
-					  cnrp->par.max_num_cuts_in_shrink,
-					  demand, num_cuts ? num_trials :
-					  2 * num_trials, 10.5, mult);
+      cuts_found += greedy_shrinking6_dicut(n, capacity, etol, new_cut,
+					    compnodes_copy, compmembers,
+					    comp_num, in_set, cut_val, ref,
+					    cut_list,
+					    cnrp->par.max_num_cuts_in_shrink,
+					    demand, cuts_found ? num_trials :
+					    2 * num_trials, 10.5, mult,
+					    num_cuts, alloc_cuts, cuts);
    }
    if (prob_type == CTP){
       FREE(compmembers);
@@ -705,12 +704,11 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       
       FREE(new_cut);
       free_net(n);
-      *cutnum = num_cuts;
       return(USER_SUCCESS);
    }
 #endif
    
-   if (num_cuts < 10 && cnrp->par.do_greedy){
+   if (cuts_found < 10 && cnrp->par.do_greedy){
 
       memcpy((char *)new_demand, (char *)demand, vertnum*DSIZE);
 
@@ -721,54 +719,59 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #else
       {
 #endif
-	 num_cuts +=
-	    reduce_graph(n, etol, new_demand, cnrp->capacity, mult, new_cut);
+	 cuts_found +=
+	    reduce_graph(n, etol, new_demand, cnrp->capacity, mult, new_cut,
+			 num_cuts, alloc_cuts, cuts);
       }
 
       if (comp_num > 1 || prob_type == CSTP){
-	 num_cuts += greedy_shrinking1(n, capacity, etol,
+	 cuts_found += greedy_shrinking1(n, capacity, etol,
 				       cnrp->par.max_num_cuts_in_shrink,
 				       new_cut, compnodes_copy, compmembers,
 				       comp_num, in_set, cut_val,
-				       ref, cut_list, new_demand, mult);
+				       ref, cut_list, new_demand, mult,
+				       num_cuts, alloc_cuts, cuts);
       }else{
-	 num_cuts += greedy_shrinking1_one(n, capacity, etol,
+	 cuts_found += greedy_shrinking1_one(n, capacity, etol,
 					   cnrp->par.max_num_cuts_in_shrink,
 					   new_cut, in_set, cut_val, cut_list,
-					   num_routes, new_demand, mult);
+					   num_routes, new_demand, mult,
+					   num_cuts, alloc_cuts, cuts);
       }
-      if (num_cuts && cnrp->par.verbosity >2 )
-	 printf("Shrink1 found %d cuts \n", num_cuts);
+      if (cuts_found && cnrp->par.verbosity >2 )
+	 printf("Shrink1 found %d cuts \n", cuts_found);
    }
    
-   if (num_cuts < 10 && cnrp->par.do_greedy){
+   if (cuts_found < 10 && cnrp->par.do_greedy){
       if (cnrp->par.do_extra_in_root)
 	 num_trials = level ? cnrp->par.greedy_num_trials :
 	 2 * cnrp->par.greedy_num_trials;
       else
 	 num_trials = cnrp->par.greedy_num_trials;
       if (comp_num > 1 || prob_type == CSTP){
-	 num_cuts += greedy_shrinking6(n, capacity, etol, new_cut,
+	 cuts_found += greedy_shrinking6(n, capacity, etol, new_cut,
 				       compnodes_copy, compmembers, comp_num,
 				       in_set, cut_val, ref, cut_list,
 				       cnrp->par.max_num_cuts_in_shrink,
-				       new_demand, num_cuts ? num_trials :
-				       2 * num_trials, 10.5, mult);
+				       new_demand, cuts_found ? num_trials :
+				       2 * num_trials, 10.5, mult, num_cuts,
+				       alloc_cuts, cuts);
       }else{
 	 num_cuts += greedy_shrinking6_one(n, capacity, etol, new_cut, in_set,
 					   cut_val, num_routes, cut_list,
 					   cnrp->par.max_num_cuts_in_shrink,
-					   new_demand, num_cuts ? num_trials :
-					   2 * num_trials, 10.5, mult); 
+					   new_demand, cuts_found ?
+					   num_trials : 2 * num_trials, 10.5,
+					   mult, num_cuts, alloc_cuts, cuts); 
       }
-      if (num_cuts && cnrp->par.verbosity >2)
-	 printf("Shrink6 found %d cuts \n", num_cuts);
+      if (cuts_found && cnrp->par.verbosity >2)
+	 printf("Shrink6 found %d cuts \n", cuts_found);
    }
    
 #ifdef DO_TSP_CUTS
-   if (!num_cuts && cnrp->par.which_tsp_cuts){
-      num_cuts += tsp_cuts(n, cnrp->par.verbosity, FALSE,
-			   cnrp->par.which_tsp_cuts);
+   if (!cuts_found && cnrp->par.which_tsp_cuts){
+      tsp_cuts(n, cnrp->par.verbosity, FALSE,
+	       cnrp->par.which_tsp_cuts);
    }
 #endif
 
@@ -777,7 +780,6 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 
    FREE(new_cut);
    free_net(n);
-   *cutnum = num_cuts;
    return(USER_SUCCESS);
 }
 
@@ -790,7 +792,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 \*===========================================================================*/
 
 int check_connectivity(network *n, double etol, double capacity, int numroutes,
-		       char mult)
+		       char mult, int *num_cuts, int *alloc_cuts,
+		       cut_data ***cuts)
 {
   vertex *verts;
   elist *cur_route_start;
@@ -800,7 +803,7 @@ int check_connectivity(network *n, double etol, double capacity, int numroutes,
   int cur_vert = 0, prev_vert, cust_num = 0, cur_route, rcnt, *compnodes;
   cut_data *new_cut;
   char **coef_list, *coef;
-  int num_cuts = 0, i, reduced_cust_num;
+  int cuts_found = 0, i, reduced_cust_num;
   int vertnum = n->vertnum, vert1, vert2;
   int cut_size = (vertnum >> DELETE_POWER) +1;
   double *compcuts, *compdemands;
@@ -839,7 +842,7 @@ int check_connectivity(network *n, double etol, double capacity, int numroutes,
 #if 0
       new_cut->type = SUBTOUR_ELIM_SIDE;
       new_cut->rhs = RHS(compnodes[i+1], compdemands[i+1], capacity);
-      num_cuts += cg_send_cut(new_cut);
+      cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 #endif
 #ifdef DIRECTED_X_VARS
       SEND_DIR_SUBTOUR_CONSTRAINT(compnodes[i+1], compdemands[i+1]);
@@ -857,7 +860,7 @@ int check_connectivity(network *n, double etol, double capacity, int numroutes,
 
   if (mult == 1)
      /*This is a tree problem*/
-     return(num_cuts);
+     return(cuts_found);
   
   /*-------------------------------------------------------------------------*\
   | if the graph is connected, check each route to see if it obeys the        |
@@ -888,7 +891,7 @@ int check_connectivity(network *n, double etol, double capacity, int numroutes,
 #if 0
 	new_cut->type = SUBTOUR_ELIM_SIDE;
 	new_cut->rhs = RHS(cust_num, weight, capacity);
-	num_cuts += cg_send_cut(new_cut);
+	cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 #endif
 #ifdef DIRECTED_X_VARS
 	SEND_DIR_SUBTOUR_CONSTRAINT(cust_num, weight);
@@ -905,7 +908,7 @@ int check_connectivity(network *n, double etol, double capacity, int numroutes,
 #if 0
 	     new_cut->type = SUBTOUR_ELIM_SIDE;
 	     new_cut->rhs = RHS(reduced_cust_num, reduced_weight, capacity);
-	     num_cuts += cg_send_cut(new_cut);
+	     cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 #endif
 #ifdef DIRECTED_X_VARS
 	     SEND_DIR_SUBTOUR_CONSTRAINT(reduced_cust_num, reduced_weight);
@@ -955,13 +958,14 @@ int check_connectivity(network *n, double etol, double capacity, int numroutes,
        cur_route_start = cur_route_start->next_edge)
     cur_route_start->data->scanned = FALSE;
   
-  return(num_cuts);
+  return(cuts_found);
 }
 
 /*===========================================================================*/
 
 int check_flow_connectivity(network *n, double etol, double capacity,
-			    int numroutes, char mult)
+			    int numroutes, char mult, int *num_cuts,
+			    int *alloc_cuts, cut_data ***cuts)
 {
   vertex *verts;
   elist *cur_route_start;
@@ -971,7 +975,7 @@ int check_flow_connectivity(network *n, double etol, double capacity,
   int cur_vert = 0, prev_vert, cust_num = 0, cur_route, rcnt, *compnodes;
   cut_data *new_cut;
   char **coef_list, *coef;
-  int num_cuts = 0, i, reduced_cust_num;
+  int cuts_found = 0, i, reduced_cust_num;
   int vertnum = n->vertnum, vert1, vert2;
   int cut_size = (vertnum >> DELETE_POWER) +1;
   double *compcuts, *compdemands;
@@ -1015,7 +1019,7 @@ int check_flow_connectivity(network *n, double etol, double capacity,
 	 new_cut->type = SUBTOUR_ELIM_ACROSS;
 	 new_cut->rhs = mult * BINS(compdemands[i+1], capacity);
       }
-      num_cuts += cg_send_cut(new_cut);
+      cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 #endif
 #ifdef DIRECTED_X_VARS
       SEND_DIR_SUBTOUR_CONSTRAINT(compnodes[i+1], compdemands[i+1]);
@@ -1033,7 +1037,7 @@ int check_flow_connectivity(network *n, double etol, double capacity,
 
   if (mult == 1){
      FREE(new_cut);
-     return(num_cuts);
+     return(cuts_found);
   }
   
   /*-------------------------------------------------------------------------*\
@@ -1065,7 +1069,7 @@ int check_flow_connectivity(network *n, double etol, double capacity,
 #if 0
 	new_cut->type = SUBTOUR_ELIM_SIDE;
 	new_cut->rhs = RHS(cust_num, weight, capacity);
-	num_cuts += cg_send_cut(new_cut);
+	cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 #endif
 #ifdef DIRECTED_X_VARS
 	SEND_DIR_SUBTOUR_CONSTRAINT(cust_num, weight);
@@ -1082,7 +1086,7 @@ int check_flow_connectivity(network *n, double etol, double capacity,
 #if 0
 	     new_cut->type = SUBTOUR_ELIM_SIDE;
 	     new_cut->rhs = RHS(reduced_cust_num, reduced_weight, capacity);
-	     num_cuts += cg_send_cut(new_cut);
+	     cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
 #endif
 #ifdef DIRECTED_X_VARS
 	     SEND_DIR_SUBTOUR_CONSTRAINT(reduced_cust_num, reduced_weight);
@@ -1137,7 +1141,7 @@ int check_flow_connectivity(network *n, double etol, double capacity,
        cur_route_start = cur_route_start->next_edge)
     cur_route_start->data->scanned = FALSE;
   
-  return(num_cuts);
+  return(cuts_found);
 }
 
 /*===========================================================================*/

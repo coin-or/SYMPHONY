@@ -654,13 +654,15 @@ void OsiSymSolverInterface::loadProblem(const int numcols, const int numrows,
 					const double* rowrng)   
 {
 
-   sym_load_problem_user(env_, numcols, numrows, const_cast<int*>(start), 
-			 const_cast<int*>(index), const_cast<double*>(value), 
-			 const_cast<double*>(collb), 
-			 const_cast<double*>(colub), const_cast<double*>(obj), 
-			 const_cast<char*>(rowsen), 
-			 const_cast<double*>(rowrhs), 
-			 const_cast<double*>(rowrng)); 
+   sym_explicit_load_problem(env_, numcols, numrows, const_cast<int*>(start), 
+			     const_cast<int*>(index), 
+			     const_cast<double*>(value), 
+			     const_cast<double*>(collb), 
+			     const_cast<double*>(colub), NULL, 
+			     const_cast<double*>(obj), NULL, 
+			     const_cast<char*>(rowsen), 
+			     const_cast<double*>(rowrhs), 
+			     const_cast<double*>(rowrng), TRUE); 
 			 
    setApplicationData((void *) (env_->user));
     
@@ -985,6 +987,14 @@ double OsiSymSolverInterface::getObjValue() const
 /*===========================================================================*/
 /*===========================================================================*/
 
+double OsiSymSolverInterface::getPrimalBound() const
+{
+   return(sym_get_primal_bound(env_));
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 int OsiSymSolverInterface::getIterationCount() const
 {
    return sym_get_iteration_count(env_);
@@ -1076,6 +1086,14 @@ void OsiSymSolverInterface::setObjSense(double s)
 void OsiSymSolverInterface::setColSolution(const double *colsol)
 {
    sym_set_col_solution(env_, const_cast<double*>(colsol));
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void OsiSymSolverInterface::setPrimalBound(const double bound)
+{
+   sym_set_primal_bound(env_, bound);
 }
 
 /*===========================================================================*/

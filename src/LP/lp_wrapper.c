@@ -560,7 +560,7 @@ int is_feasible_u(lp_prob *p, char branching)
 #endif
    int user_res;
    int feasible;
-   double new_ub, true_objval = p->lp_data->objval;
+   double true_objval = p->lp_data->objval;
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
    int *indices;
@@ -633,10 +633,9 @@ int is_feasible_u(lp_prob *p, char branching)
    
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE){
       /* Send the solution value to the treemanager */
-      new_ub = true_objval > 0 ? true_objval : lp_data->objval;
-      if (!p->has_ub || new_ub < p->ub){
+      if (!p->has_ub || true_objval < p->ub - p->par.granularity){
 	 p->has_ub = TRUE;
-	 p->ub = new_ub;
+	 p->ub = true_objval;
 	 if (p->par.set_obj_upper_lim)
 	    set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
 	 if (!p->par.multi_criteria){
@@ -645,7 +644,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	    p->best_sol.xiter_num = p->iter_num;
 	    p->best_sol.xlength = cnt;
 	    p->best_sol.lpetol = lpetol;
-	    p->best_sol.objval = new_ub;
+	    p->best_sol.objval = true_objval;
 	    FREE(p->best_sol.xind);
 	    FREE(p->best_sol.xval);
 	    p->best_sol.xind = (int *) malloc(cnt*ISIZE);
@@ -655,10 +654,10 @@ int is_feasible_u(lp_prob *p, char branching)
 	    PRINT(p->par.verbosity, -1,
 		  ("\n****** Found Better Feasible Solution !\n"));
 	    if (p->mip->obj_sense == SYM_MAXIMIZE){
-	       PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", -new_ub 
+	       PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", -true_objval
 					    + p->mip->obj_offset));
 	    }else{
-	       PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", new_ub
+	       PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", true_objval
 					    + p->mip->obj_offset));
 	    }
 	 }
@@ -681,7 +680,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	 }
 #else
 	 s_bufid = init_send(DataInPlace);
-	 send_dbl_array(&new_ub, 1);
+	 send_dbl_array(&true_objval, 1);
 	 send_msg(p->tree_manager, UPPER_BOUND);
 	 freebuf(s_bufid);
 #endif
@@ -690,17 +689,17 @@ int is_feasible_u(lp_prob *p, char branching)
 	    PRINT(p->par.verbosity, 0,
 		  ("\n* Found Another Feasible Solution.\n"));
 	    if (p->mip->obj_sense == SYM_MAXIMIZE){
-	       PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -new_ub
+	       PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
 					   + p->mip->obj_offset));
 	    }else{
-	       PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", new_ub
+	       PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
 					   + p->mip->obj_offset));
 	    }
 	 }
       }
 #ifndef COMPILE_IN_TM
       send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
-			       lpetol, new_ub, cnt, indices, values);
+			       lpetol, true_objval, cnt, indices, values);
 #endif
       if (!p->par.multi_criteria){
 	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);

@@ -102,6 +102,11 @@ typedef struct CNRP_PROBLEM{
    int             feas_sol_size;
    int            *feas_sol;
 #endif
+   int             basecutnum;
+   int            *basevars;
+   int             basevarnum;
+   int            *extravars;
+   int             extravarnum;
    int            *zero_vars;
    int             zero_varnum;
 }cnrp_problem;

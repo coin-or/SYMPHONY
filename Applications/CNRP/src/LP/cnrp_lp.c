@@ -156,6 +156,8 @@ int user_free_lp(void **user)
 int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
 			   int *maxn, int *maxm, int *maxnz)
 {
+   return(USER_DEFAULT);
+   
    cnrp_spec *cnrp = (cnrp_spec *)user;
    int *costs = cnrp->costs;
    int *edges = cnrp->edges;
@@ -650,7 +652,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 #endif
    }
 
-#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
+#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS) && 0
    if (construct_feasible_solution(cnrp, n, true_objval, lpetol,
 				   branching) > 0){
       *feasible = IP_FEASIBLE_BUT_CONTINUE;
@@ -1665,6 +1667,7 @@ void free_lp_net(lp_net *n)
 
 /*===========================================================================*/
 
+#if 0
 char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 				 double *true_objval, double etol,
 				 char branching)
@@ -1883,6 +1886,9 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 
   return(continue_with_node);
 }
+#endif
+
+/*===========================================================================*/
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef TRACE_PATH

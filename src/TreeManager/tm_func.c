@@ -297,7 +297,7 @@ int solve(tm_prob *tm)
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char no_work = TRUE, ramp_up = TRUE;
    double then, then2, then3, now;
-   double timeout2 = 10, timeout3 = tm->par.logging_interval, timeout4 = 300;
+   double timeout2 = 600, timeout3 = tm->par.logging_interval, timeout4 = 300;
    struct timeval timeout = {5, 0};
 
    /*------------------------------------------------------------------------*\
@@ -547,7 +547,8 @@ void print_tree_status(tm_prob *tm)
    int first_waist_level = 0, last_waist_level = 0, waist_level = 0;
    double average_node_time, estimated_time_remaining, user_time = 0.0;
    double elapsed_time;
-   
+
+#if 0
    widths = (int *) calloc (tm->stat.max_depth + 1, ISIZE);
    gamma = (double *) calloc (tm->stat.max_depth + 1, DSIZE);
    
@@ -592,6 +593,7 @@ void print_tree_status(tm_prob *tm)
 
    estimated_time_remaining =
       MAX(average_node_time*(num_nodes_estimate - tm->stat.analyzed), 0);
+#endif
    
    printf("\nCurrent number of candidate nodes: %i\n", tm->samephase_candnum);
    if (tm->has_ub){
@@ -629,9 +631,11 @@ void print_tree_status(tm_prob *tm)
 	     fabs(100*(tm->ub-tm->lb)/tm->ub));
    }
    printf("Elapsed time:                      %i\n", (int)(elapsed_time));
+#if 0
    printf("Estimated nodes remaining:         %i\n", num_nodes_estimate);
    printf("Estimated time remaining:          %i\n",
 	  (int)(estimated_time_remaining));
+#endif
    
    if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
       FILE *f;
@@ -646,9 +650,11 @@ void print_tree_status(tm_prob *tm)
    }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
       printf("$L %.2f\n", tm->lb);
    }
-   
+
+#if 0
    FREE(widths);
    FREE(gamma);
+#endif
 }
 
 /*===========================================================================*/

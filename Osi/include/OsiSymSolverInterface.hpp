@@ -366,6 +366,9 @@ public:
       /// Get objective function value
    virtual double getObjValue() const;
 
+      /// Get the current upper/lower bound
+   virtual double getPrimalBound() const;
+
       /** Get the number of iterations it took to solve the problem (whatever
 	  ``iteration'' means to the solver). */
    virtual int getIterationCount() const;
@@ -457,6 +460,10 @@ public:
 	way is solver-dependent.
     */
    virtual void setColSolution(const double *colsol);
+   
+    /** Set the a priori upper/lower bound */
+
+   virtual void setPrimalBound(const double bound);
 
     /** Set dual solution variable values
 

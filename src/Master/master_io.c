@@ -82,7 +82,7 @@ void usage(void)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int parse_command_line(sym_environment * env, int argc, char **argv)
+int parse_command_line(sym_environment *env, int argc, char **argv)
 {
    int i;
    char line[MAX_LINE_LENGTH +1], tmp, c;

@@ -78,6 +78,146 @@ void delete_dup_edges(small_graph *g)
    g->edgenum = pos;
 }
 
+/*===========================================================================*\
+ * This is the function that creates the list of variables (edges in the graph)
+\*===========================================================================*/
+
+void cnrp_create_variables(cnrp_problem *cnrp)
+{
+   int base_varnum = 0, i, j, k, l;
+   int zero_varnum, *zero_vars;
+   int *edges;
+   int vertnum = cnrp->vertnum;
+   
+#ifdef DIRECTED_X_VARS
+   /*whether or not we will have the out-degree constraints*/
+   char od_const = (cnrp->par.prob_type == TSP || cnrp->par.prob_type == VRP ||
+		    cnrp->par.prob_type == BPP);
+   char d_x_vars = TRUE;
+#else
+   char od_const = FALSE;
+   char d_x_vars = FALSE;
+#endif
+   int total_edgenum = vertnum*(vertnum - 1)/2;
+#ifdef ADD_FLOW_VARS
+   int v0, v1;
+   double flow_capacity;
+#ifdef DIRECTED_X_VARS
+   flow_capacity = cnrp->capacity;
+#else
+   if (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == CTP)
+      flow_capacity = cnrp->capacity;
+   else
+      flow_capacity = cnrp->capacity/2;
+#endif
+#endif
+   
+#ifdef ADD_CAP_CUTS 
+   cnrp->basecutnum = (2 + od_const)*vertnum - 1 + 2*total_edgenum;
+#elif defined(ADD_FLOW_VARS)
+   cnrp->basecutnum = (2 + od_const)*vertnum - 1;
+#else
+   cnrp->basecutnum = (1 + od_const)*vertnum;
+#endif
+#ifdef ADD_X_CUTS
+   cnrp->basecutnum += total_edgenum;
+#endif
+#if defined(FIND_NONDOMINATED_SOLUTIONS) && 0
+   cnrp->basecutnum += 2; /* Need two extra constraints */
+#endif
+   
+   switch(cnrp->par.base_variable_selection){
+    case SOME_ARE_BASE:
+      if (cnrp->par.add_all_edges == FALSE){
+	 /*If we are not adding all the edges, then really EVERYTHING_IS_BASE*/
+	 cnrp->par.base_variable_selection = EVERYTHING_IS_BASE;
+      }else{ /*Otherwise, all we need to do is set this and then fall
+	       through -- the remaining edges get added later */
+	 cnrp->par.add_all_edges = FALSE;
+      }
+
+    case EVERYTHING_IS_BASE:
+      cnrp->basevars = create_edge_list(cnrp, &base_varnum, CHEAP_EDGES);
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+      cnrp->basevars = (int *) realloc((char *)cnrp->basevars,
+				       (base_varnum + 1) * ISIZE);
+      cnrp->basevarnum = base_varnum + 1; /* Need one extra variable */
+#ifdef ADD_FLOW_VARS
+      cnrp->basevars[base_varnum] = d_x_vars ? 4*total_edgenum:3*total_edgenum;
+#else
+      cnrp->basevars[base_varnum] = d_x_vars ? total_edgenum:2*total_edgenum;
+#endif	 
+#else
+      cnrp->basevars = (int *) realloc((char *)cnrp->basevars,
+				       base_varnum * ISIZE);
+      cnrp->basevarnum = base_varnum;
+#endif
+      break;
+
+    case EVERYTHING_IS_EXTRA:
+      cnrp->basevarnum = 0;
+      break;
+   }
+
+#if 0
+   if (cnrp->par.prob_tpye == BPP){
+      for (i = 0; i < cnrp->basevarnum; i++){
+	 cnrp->dist.cost[cnrp->basevars[i]] = 10;
+      }
+   }
+#endif
+       
+   /* The one additional edge allocated is for the extra variable when finding
+      nondominated solutions for multi-criteria problems */  
+   edges = cnrp->edges = (int *) calloc (vertnum*(vertnum-1) + 2, sizeof(int));
+
+   /* Create the edge list (we assume a complete graph) The edge is set to
+      (0,0) in the edge list if it was eliminated in preprocessing*/
+   zero_varnum = cnrp->zero_varnum;
+   zero_vars = cnrp->zero_vars;
+   for (i = 1, k = 0, l = 0; i < vertnum; i++){
+      for (j = 0; j < i; j++){
+	 if (l < zero_varnum && k == zero_vars[l]){
+	    /*This is one of the zero edges*/
+	    edges[2*k] = edges[2*k+1] = 0;
+	    l++;
+	    k++;
+	    continue;
+	 }
+	 edges[2*k] = j;
+	 edges[2*k+1] = i;
+	 k++;
+      }
+   }
+   edges[vertnum*(vertnum-1)] = edges[vertnum*(vertnum-1) + 1] = 0;
+
+   switch(cnrp->par.base_variable_selection){
+    case EVERYTHING_IS_EXTRA:
+
+      cnrp->extravars  = create_edge_list(cnrp, &cnrp->extravarnum,
+					  CHEAP_EDGES);
+#if defined(FIND_NONDOMINATED_SOLUTIONS) && 0
+      cnrp->extravars = cnrp->extravars + 1;
+#endif
+
+      break;
+
+    case SOME_ARE_BASE:
+      
+      cnrp->par.add_all_edges = TRUE; /*We turned this off in user_set_base()
+				       -- now we need to turn it back on*/
+
+      cnrp->extravars  = create_edge_list(cnrp, &cnrp->extravarnum,
+					  REMAINING_EDGES);
+
+      break;
+
+    case EVERYTHING_IS_BASE:
+
+      break;
+   }
+}   
+
 /*===========================================================================*/
 
 int *create_edge_list(cnrp_problem *cnrp, int *varnum, char which_edges)

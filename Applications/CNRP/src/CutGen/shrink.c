@@ -46,7 +46,7 @@ new_cut->type = (num_nodes < vertnum/2 ?                                     \
 new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                         \
                RHS(num_nodes, total_demand, capacity) :                      \
 	       BINS(total_demand, capacity));                                \
-num_cuts += cg_send_cut(new_cut);                                            \
+cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);              \
 
 #define SEND_SUBTOUR_CONSTRAINT(num_nodes, total_demand)                     \
 if (mult - 1){                                                               \
@@ -55,11 +55,11 @@ if (mult - 1){                                                               \
    new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                      \
 		   RHS(num_nodes, total_demand, capacity) :                  \
 		   mult*BINS(total_demand, capacity));                       \
-   num_cuts += cg_send_cut(new_cut);                                         \
+   cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);           \
 }else{                                                                       \
    new_cut->type = SUBTOUR_ELIM_ACROSS;                                      \
    new_cut->rhs = mult*BINS(total_demand, capacity);                         \
-   num_cuts += cg_send_cut(new_cut);                                         \
+   cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);           \
 }                                                                            \
 
 /*===========================================================================*/
@@ -70,13 +70,14 @@ if (mult - 1){                                                               \
 \*===========================================================================*/
 
 int reduce_graph(network *n, double etol, double *demand, double capacity,
-		 int mult, cut_data *new_cut)
+		 int mult, cut_data *new_cut, int *num_cuts, int *alloc_cuts,
+		 cut_data ***cuts)
 {
    elist *e1, *e2, *e3;
    edge *cur_edge;
    int v1, v2, deg, count, i, k, vertnum = n->vertnum;
    edge *edges = n->edges;
-   int num_edges = n->edgenum, num_cuts = 0;
+   int num_edges = n->edgenum, cuts_found = 0;
    int edges_deleted = 0;
    vertex *verts = n->verts;
    vertex *v2_pt, *third_node;
@@ -123,7 +124,7 @@ int reduce_graph(network *n, double etol, double *demand, double capacity,
 	       new_cut->rhs =  RHS(verts[v1].orig_node_list_size +
 				   verts[v2].orig_node_list_size + 2,
 				   demand[v1]+demand[v2], capacity);
-	       num_cuts += cg_send_cut(new_cut);
+	       cuts_found += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
 	       SEND_DIR_SUBTOUR_CONSTRAINT(verts[v1].orig_node_list_size +
@@ -213,7 +214,7 @@ int reduce_graph(network *n, double etol, double *demand, double capacity,
       if (!edges_deleted) break;
    }
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(cuts_found);
 }
 
 /*===========================================================================*/
@@ -222,12 +223,13 @@ int greedy_shrinking1(network *n, double capacity, double etol,
 		      int max_num_cuts, cut_data *new_cut,
 		      int *compnodes, int *compmembers, int compnum,
 		      char *in_set, double *cut_val, int *ref, char *cut_list,
-		      double *demand, int mult)
+		      double *demand, int mult, int *num_cuts, int *alloc_cuts,
+		      cut_data ***cuts)
 {
    double set_weight, set_demand;
    vertex *verts = n->verts;
    elist *e;
-   int num_cuts = 0, i, j, k;
+   int cuts_found = 0, i, j, k;
    char *pt, *cutpt;
    int *ipt; 
    double  *dpt;
@@ -286,15 +288,15 @@ int greedy_shrinking1(network *n, double capacity, double etol,
 			(1 << ((*ipt) & DELETE_AND));
 		  }  
 	       }
-	       for (k = 0, cutpt = cut_list; k < num_cuts; k++,
+	       for (k = 0, cutpt = cut_list; k < cuts_found; k++,
 		       cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char)))
 		     break;/* same cuts */ 
-	       if (k >= num_cuts){
+	       if (k >= cuts_found){
 #if 0
 		  new_cut->type = SUBTOUR_ELIM_SIDE;
 		  new_cut->rhs = RHS(set_size, set_demand, capacity);
-		  num_cuts += cg_send_cut(new_cut);
+		  cuts_found += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
 		  SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
@@ -303,9 +305,9 @@ int greedy_shrinking1(network *n, double capacity, double etol,
 #endif
 		  memcpy(cutpt, coef, new_cut->size);
 	       }
-	       if (num_cuts > max_num_cuts){
+	       if (cuts_found > max_num_cuts){
 		  FREE(new_cut->coef);
-		  return(num_cuts);
+		  return(cuts_found);
 	       }
 	    } 
 	    for (maxval = -1, pt = in_set + begin, dpt = cut_val + begin,
@@ -334,7 +336,7 @@ int greedy_shrinking1(network *n, double capacity, double etol,
 	 }   
       }
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(cuts_found);
 }
 
 /*===========================================================================*/
@@ -344,12 +346,14 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 			    int max_num_cuts, cut_data *new_cut,
 			    int *compnodes, int *compmembers, int compnum,
 			    char *in_set, double *cut_val, int *ref,
-			    char *cut_list, double *demand, int mult)
+			    char *cut_list, double *demand, int mult,
+			    int *num_cuts, int *alloc_cuts,
+			    cut_data ***cuts)
 {
    double set_demand, set_cut_val, tmp_cut_val;
    vertex *verts = n->verts;
    elist *e;
-   int num_cuts = 0, i, j;
+   int cuts_found = 0, i, j;
    char *pt;
    int vertnum = n->vertnum;
   
@@ -431,10 +435,10 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
 	       new_cut->type = MIXED_DICUT;
 	       new_cut->rhs = set_demand;
 	       new_cut->name  = CUT__SEND_TO_CP;
-	       num_cuts += cg_send_cut(new_cut);
-	       if (num_cuts > max_num_cuts){
+	       cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	       if (cuts_found > max_num_cuts){
 		  FREE(new_cut->coef);
-		  return(num_cuts);
+		  return(cuts_found);
 	       }
 	    } 
 	    for (min_val = 0, pt = in_set + begin, j = begin; j < end;
@@ -484,7 +488,7 @@ int greedy_shrinking1_dicut(network *n, double capacity, double etol,
       }
    }
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(cuts_found);
 }
 #endif
 
@@ -495,12 +499,13 @@ int greedy_shrinking6(network *n, double capacity, double etol,
 		      int *compmembers, int compnum,char *in_set,
 		      double *cut_val, int *ref, char *cut_list,
 		      int max_num_cuts, double *demand, int trial_num,
-		      double prob, int mult)
+		      double prob, int mult, int *num_cuts, int *alloc_cuts,
+		      cut_data ***cuts)
 {
    double set_weight, set_demand;
    vertex  *verts = n->verts;
    elist *e;
-   int i, j, k, num_cuts = 0;
+   int i, j, k, cuts_found = 0;
    char *pt, *cutpt;
    double *dpt;
    int vertnum = n->vertnum;
@@ -585,14 +590,14 @@ int greedy_shrinking6(network *n, double capacity, double etol,
 							      DELETE_AND));
 		  }  
 	       }
-	       for (k = 0, cutpt = cut_list; k < num_cuts; k++,
+	       for (k = 0, cutpt = cut_list; k < cuts_found; k++,
 		       cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
-	       if ( k >= num_cuts){
+	       if ( k >= cuts_found){
 #if 0
 		  new_cut->type = SUBTOUR_ELIM_SIDE;
 		  new_cut->rhs =  RHS(set_size, set_demand, capacity);
-		  num_cuts += cg_send_cut(new_cut);
+		  cuts_found += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
 		  SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
@@ -602,9 +607,9 @@ int greedy_shrinking6(network *n, double capacity, double etol,
 		  memcpy(cutpt, coef, new_cut->size);
 	       }
 	 
-	       if ( num_cuts > max_num_cuts){
+	       if ( cuts_found > max_num_cuts){
 		  FREE(new_cut->coef);
-		  return(num_cuts);
+		  return(cuts_found);
 	       }
 	    } 
 	    for (maxval = -1, pt = in_set+begin, dpt = cut_val+begin,
@@ -636,7 +641,7 @@ int greedy_shrinking6(network *n, double capacity, double etol,
    }
    
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(cuts_found);
 }
 
 /*===========================================================================*/
@@ -647,12 +652,13 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
 			    int *compmembers, int compnum,char *in_set,
 			    double *cut_val, int *ref, char *cut_list,
 			    int max_num_cuts, double *demand, int trial_num,
-			    double prob, int mult)
+			    double prob, int mult, int *num_cuts,
+			    int *alloc_cuts, cut_data ***cuts)
 {
    double set_demand, set_cut_val, tmp_cut_val;
    vertex  *verts = n->verts;
    elist *e;
-   int num_cuts = 0, i, j;
+   int cuts_found = 0, i, j;
    char *pt, *cutpt;
    double *dpt;
    int vertnum = n->vertnum;
@@ -767,10 +773,10 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
 	       new_cut->type = MIXED_DICUT;
 	       new_cut->rhs = set_demand;
 	       new_cut->name  = CUT__SEND_TO_CP;
-	       num_cuts += cg_send_cut(new_cut);
-	       if (num_cuts > max_num_cuts){
+	       cuts_found += cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	       if (cuts_found > max_num_cuts){
 		  FREE(new_cut->coef);
-		  return(num_cuts);
+		  return(cuts_found);
 	       }
 	    } 
 	    for (min_val = 0, pt = in_set + begin, j = begin; j < end;
@@ -820,7 +826,7 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
       }
    }
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(cuts_found);
 }
 #endif
 
@@ -829,13 +835,14 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
 int greedy_shrinking1_one(network *n, double capacity, double etol,
 			  int max_num_cuts, cut_data *new_cut,char *in_set,
 			  double *cut_val, char *cut_list, int num_routes,
-			  double *demand, int mult)
+			  double *demand, int mult, int *num_cuts,
+			  int *alloc_cuts, cut_data ***cuts)
 {
  
    double set_weight, set_cut_val, set_demand;
    vertex  *verts = n->verts;
    elist *e;
-   int i, j, k, num_cuts = 0;
+   int i, j, k, cuts_found = 0;
    char *pt, *cutpt;
    double  *dpt;
    int vertnum = n->vertnum;
@@ -890,15 +897,15 @@ int greedy_shrinking1_one(network *n, double capacity, double etol,
 	       }
 	    /*  printf("%f ", set_demand);
 	    printf("%f \n",set_cut_val);*/ 
-	    for (k = 0, cutpt = cut_list; k < num_cuts; k++,
+	    for (k = 0, cutpt = cut_list; k < cuts_found; k++,
 		    cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char)))
 		     break; /* same cuts */
-	    if ( k >= num_cuts){
+	    if ( k >= cuts_found){
 #if 0
 	       new_cut->type = SUBTOUR_ELIM_SIDE;
 	       new_cut->rhs =  RHS(set_size, set_demand, capacity);
-	       num_cuts += cg_send_cut(new_cut);
+	       cuts_found += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
 	       SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
@@ -908,9 +915,9 @@ int greedy_shrinking1_one(network *n, double capacity, double etol,
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
 	    
-	    if ( num_cuts > max_num_cuts){
+	    if ( cuts_found > max_num_cuts){
 	       FREE(new_cut->coef);
-	       return(num_cuts);
+	       return(cuts_found);
 	    }
 	 }
 	 /* check the complement */
@@ -933,15 +940,15 @@ int greedy_shrinking1_one(network *n, double capacity, double etol,
 		  (coef[j>> DELETE_POWER]) |= (1 << ( j & DELETE_AND));
 	       }
 	    }
-	    for (k=0, cutpt = cut_list; k < num_cuts; k++,
+	    for (k=0, cutpt = cut_list; k < cuts_found; k++,
 		    cutpt += new_cut->size)
 		  if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
-	    if ( k >= num_cuts){
+	    if ( k >= cuts_found){
 #if 0
 	       new_cut->type = SUBTOUR_ELIM_SIDE;
 	       new_cut->rhs =  RHS(complement_size, complement_demand,
 				   capacity);
-	       num_cuts += cg_send_cut(new_cut);
+	       cuts_found += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
 	       SEND_DIR_SUBTOUR_CONSTRAINT(complement_size, complement_demand);
@@ -951,9 +958,9 @@ int greedy_shrinking1_one(network *n, double capacity, double etol,
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
 	 
-	    if (num_cuts > max_num_cuts){
+	    if (cuts_found > max_num_cuts){
 	       FREE(new_cut->coef);
-	       return(num_cuts);
+	       return(cuts_found);
 	    }
 	 }
 
@@ -984,7 +991,7 @@ int greedy_shrinking1_one(network *n, double capacity, double etol,
       }   
    }
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(cuts_found);
 }
 
 /*===========================================================================*/
@@ -993,13 +1000,14 @@ int greedy_shrinking6_one(network *n, double capacity,
 			  double etol, cut_data *new_cut,
 			  char *in_set, double *cut_val, int num_routes,
 			  char *cut_list, int max_num_cuts, double *demand,
-			  int trial_num, double prob, int mult)
+			  int trial_num, double prob, int mult, int *num_cuts,
+			  int *alloc_cuts, cut_data ***cuts)
 {
   
    double set_weight, set_cut_val, set_demand;
    vertex  *verts=n->verts;
    elist *e;
-   int i, j, k, num_cuts = 0;
+   int i, j, k, cuts_found = 0;
    char *pt, *cutpt;
    double  *dpt;
    int vertnum = n->vertnum;
@@ -1073,15 +1081,15 @@ int greedy_shrinking6_one(network *n, double capacity,
 		  (coef[j>> DELETE_POWER]) |= (1 << ( j & DELETE_AND));
 	       }
 	    }
-	    for (k = 0, cutpt = cut_list; k < num_cuts; k++,
+	    for (k = 0, cutpt = cut_list; k < cuts_found; k++,
 		    cutpt += new_cut->size)
 	       if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
-	    if ( k >= num_cuts){
+	    if ( k >= cuts_found){
 #if 0
 	       new_cut->type = SUBTOUR_ELIM_SIDE;
 	       new_cut->rhs =  RHS(set_size, set_demand,
 				   capacity);
-	       num_cuts += cg_send_cut(new_cut);
+	       cuts_found += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
 	       SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
@@ -1090,9 +1098,9 @@ int greedy_shrinking6_one(network *n, double capacity,
 #endif
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
-	    if (num_cuts > max_num_cuts){
+	    if (cuts_found > max_num_cuts){
 	       FREE(new_cut->coef);
-	       return(num_cuts);
+	       return(cuts_found);
 	    }
 	 }
 	 
@@ -1116,15 +1124,15 @@ int greedy_shrinking6_one(network *n, double capacity,
 		  (coef[j>> DELETE_POWER]) |= (1 << ( j & DELETE_AND));
 	       }
 	    }
-	    for (k = 0, cutpt = cut_list; k < num_cuts; k++,
+	    for (k = 0, cutpt = cut_list; k < cuts_found; k++,
 		    cutpt += new_cut->size)
 	       if (!memcmp(coef, cutpt, new_cut->size*sizeof(char))) break; 
-	    if ( k >= num_cuts){
+	    if ( k >= cuts_found){
 #if 0
 	       new_cut->type = SUBTOUR_ELIM_SIDE;
 	       new_cut->rhs =  RHS(complement_size, complement_demand,
 				   capacity);
-	       num_cuts += cg_send_cut(new_cut);
+	       cuts_found += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
 	       SEND_DIR_SUBTOUR_CONSTRAINT(complement_size, complement_demand);
@@ -1134,9 +1142,9 @@ int greedy_shrinking6_one(network *n, double capacity,
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
 	    
-	    if (num_cuts > max_num_cuts){
+	    if (cuts_found > max_num_cuts){
 	       FREE(new_cut->coef);
-	       return(num_cuts);
+	       return(cuts_found);
 	    }
 	 }
 	 
@@ -1168,7 +1176,7 @@ int greedy_shrinking6_one(network *n, double capacity,
    }
 
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(cuts_found);
 }
 
 /*===========================================================================*/
@@ -1176,13 +1184,14 @@ int greedy_shrinking6_one(network *n, double capacity,
 int greedy_shrinking2_one(network *n, double capacity,
 			  double etol, cut_data *new_cut,
 			  char *in_set, double *cut_val, int num_routes,
-			  double *demand, int mult)
+			  double *demand, int mult, int *num_cuts,
+			  int *alloc_cuts, cut_data ***cuts)
 {
   
    double set_cut_val, set_demand;
    vertex *verts = n->verts;
    elist *e, *cur_edge1, *cur_edge2;
-   int j, k, num_cuts = 0;
+   int j, k, cuts_found = 0;
    char *pt;
    double  *dpt;
    int vertnum = n->vertnum;
@@ -1250,7 +1259,7 @@ int greedy_shrinking2_one(network *n, double capacity,
 #if 0
 	    new_cut->type = SUBTOUR_ELIM_SIDE;
 	    new_cut->rhs =  RHS(set_size, set_demand, capacity);
-	    num_cuts += cg_send_cut(new_cut);
+	    cuts_found += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
 	    SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
@@ -1282,7 +1291,7 @@ int greedy_shrinking2_one(network *n, double capacity,
 #if 0
 	    new_cut->type = SUBTOUR_ELIM_SIDE;
 	    new_cut->rhs =  RHS(complement_size, complement_demand, capacity);
-	    num_cuts += cg_send_cut(new_cut);
+	    cuts_found += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
 	    SEND_DIR_SUBTOUR_CONSTRAINT(complement_size, complement_demand);
@@ -1318,5 +1327,5 @@ int greedy_shrinking2_one(network *n, double capacity,
    }
    }
    FREE(new_cut->coef);
-   return(num_cuts);
+   return(cuts_found);
 }

@@ -75,53 +75,65 @@ int check_connectivity PROTO((network *n, double etol, double capacity,
 			      int numroutes, char mult));
 
 int check_flow_connectivity PROTO((network *n, double etol, double capacity,
-				   int numroutes, char mult));
+				   int numroutes, char mult, int *num_cuts,
+				   int *alloc_cuts, cut_data ***cuts));
 
 /*===========================================================================*/
 /*=============================== shrink.c ==================================*/
 /*===========================================================================*/
 
 int reduce_graph PROTO((network *n, double etol, double *demand,
-			double capacity, int mult, cut_data *new_cut));
+			double capacity, int mult, cut_data *new_cut,
+			int *num_cuts, int *alloc_cuts, cut_data ***cuts));
 int greedy_shrinking1 PROTO((network *n, double truck_cap, double etol,
 			     int max_num_cuts, cut_data *new_cut,
 			     int *compnodes, int *compmembers, int compnum,
 			     char *in_set, double *cut_val,int *ref,
-			     char *cut_list, double *demand, int mult));
+			     char *cut_list, double *demand, int mult,
+			     int *num_cuts, int *alloc_cuts,
+			     cut_data ***cuts));
 int greedy_shrinking1_dicut PROTO((network *n, double truck_cap, double etol,
 			     int max_num_cuts, cut_data *new_cut,
 			     int *compnodes, int *compmembers, int compnum,
 			     char *in_set, double *cut_val,int *ref,
-			     char *cut_list, double *demand, int mult));
+			     char *cut_list, double *demand, int mult,
+			     int *num_cuts, int *alloc_cuts,
+			     cut_data ***cuts));
 int greedy_shrinking6 PROTO((network *n, double truck_cap,
 			     double etol, cut_data *new_cut,
 			     int *compnodes,
 			     int *compmembers, int compnum, char *in_set,
 			     double *cut_val,int *ref, char *cut_list,
 			     int max_num_cuts, double *demand, int trial_num,
-			     double prob, int mult));
+			     double prob, int mult, int *num_cuts,
+			     int *alloc_cuts, cut_data ***cuts));
 int greedy_shrinking6_dicut PROTO((network *n, double truck_cap,
 			     double etol, cut_data *new_cut,
 			     int *compnodes,
 			     int *compmembers, int compnum, char *in_set,
 			     double *cut_val,int *ref, char *cut_list,
 			     int max_num_cuts, double *demand, int trial_num,
-			     double prob, int mult));
+			     double prob, int mult, int *num_cuts,
+			     int *alloc_cuts, cut_data ***cuts));
 int greedy_shrinking1_one PROTO((network *n, double truck_cap,
 				 double etol, int max_num_cuts,
 				 cut_data *new_cut, char *in_set,
 				 double *cut_val, char *cut_list,
-				 int num_routes, double *demand, int mult));
+				 int num_routes, double *demand,
+				 int mult, int *num_cuts,
+				 int *alloc_cuts, cut_data ***cuts));
 int greedy_shrinking6_one PROTO((network *n, double truck_cap,
 				 double etol, cut_data *new_cut,
 				 char *in_set, double *cut_val, int num_routes,
 				 char *cut_list, int max_num_cuts,
 				 double *demand,int trial_num, double prob,
-				 int mult));
+				 int mult, int *num_cuts,
+				 int *alloc_cuts, cut_data ***cuts));
 int greedy_shrinking2_one PROTO((network *n, double truck_cap,
 				 double etol, cut_data *new_cut,
 				 char *in_set, double *cut_val, int num_routes,
-				 double *demand, int mult));
+				 double *demand, int mult, int *num_cuts,
+				 int *alloc_cuts, cut_data ***cuts));
 
 /*===========================================================================*/
 /*============================ biconnected.c ================================*/

@@ -1669,9 +1669,9 @@ int sym_close_environment(sym_environment *env)
 
 int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 			      int *start, int *index, double *value,
-			      double *collb, double *colub, double *obj,
-			      double *obj2, char *rowsen, double *rowrhs,
-			      double *rowrng, char make_copy)
+			      double *collb, double *colub, char *is_int,
+			      double *obj, double *obj2, char *rowsen,
+			      double *rowrhs, double *rowrng, char make_copy)
 {
    int termcode = 0;   
    double t =0;
@@ -1711,8 +1711,11 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 	 memcpy(env->mip->rngval, rowrng, DSIZE * numrows);
       }
       memcpy(env->mip->ub, colub, DSIZE * numcols); 
-      memcpy(env->mip->lb, collb, DSIZE * numcols); 
-   
+      memcpy(env->mip->lb, collb, DSIZE * numcols);
+      if (is_int){
+	 memcpy(env->mip->is_int, is_int, CSIZE * numcols);
+      }
+      
       //user defined matind, matval, matbeg--fill as column ordered
       
       env->mip->matbeg = (int *) malloc(ISIZE * (numcols + 1));
@@ -1739,7 +1742,12 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 	 env->mip->rngval = (double *) calloc(numrows, DSIZE);
       }
       env->mip->ub = colub; 
-      env->mip->lb =  collb; 
+      env->mip->lb =  collb;
+      if (is_int){
+	 env->mip->is_int = is_int;
+      }else{
+	 env->mip->is_int = (char *) calloc(numcols, CSIZE);
+      }
       env->mip->matbeg = start;
       env->mip->matval = value;
       env->mip->matind = index;
@@ -2297,6 +2305,18 @@ double sym_get_obj_val(sym_environment *env)
 /*===========================================================================*/
 /*===========================================================================*/
 
+double sym_get_primal_bound(sym_environment *env)
+{
+   if (env->has_ub){
+      return (env->mip->obj_sense == SYM_MINIMIZE ? env->ub : -env->ub);
+   }else{
+      return (env->mip->obj_sense == SYM_MINIMIZE ? INFINITY : -INFINITY);
+   }
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 int sym_get_iteration_count(sym_environment *env)
 {
    if (!env->warm_start){
@@ -2773,6 +2793,20 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    if (rowAct)
       FREE(rowAct);
    return TRUE;      
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_set_primal_bound(sym_environment *env, double bound)
+{
+   bound = env->mip->obj_sense == SYM_MINIMIZE ? bound : -bound;
+
+   if (!env->has_ub || bound < env->ub){
+      env->ub = bound;
+   }
+
+   return TRUE;
 }
 
 /*===========================================================================*/
@@ -4398,6 +4432,10 @@ char *sym_get_str_param(sym_environment *env, char *key)
    else if (strcmp(key, "dg_machine") == 0 ||
 	    strcmp(key, "M_dg_machine") == 0){
       return(env->par.dg_machine);
+   }
+   else if (strcmp(key, "param_file") == 0 ||
+	    strcmp(key, "M_param_file") == 0){
+      return(env->par.param_file);
    }
 
    /***********************************************************************

@@ -60,7 +60,7 @@ USE_OSI_INTERFACE = TRUE
 # Other variables to be set by the user
 ##############################################################################
 
-MULTI_CRITERIA = TRUE
+MULTI_CRITERIA = FALSE
 LIFO = FALSE
 FIND_NONDOMINATED_SOLUTIONS = TRUE
 BINARY_SEARCH = FALSE

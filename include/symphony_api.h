@@ -40,8 +40,9 @@ int sym_create_permanent_cut_pools PROTO((sym_environment *env));
 int sym_close_environment PROTO((sym_environment *env));
 int sym_explicit_load_problem PROTO((sym_environment *env, int numcols, 
 				     int numrows, int *start, int *index, 
-				     double *value, double *collb, double *colub, 
-				     double *obj, double *obj2, char *rowsen,
+				     double *value, double *collb,
+				     double *colub, char *is_int, double *obj,
+				     double *obj2, char *rowsen,
 				     double *rowrhs, double *rowrng,
 				     char make_copy));   
 int sym_is_abandoned PROTO((sym_environment *env));
@@ -70,6 +71,7 @@ double sym_get_infinity PROTO(());
 double *sym_get_col_solution PROTO((sym_environment *env));
 double *sym_get_row_activity PROTO((sym_environment *env));
 double sym_get_obj_val PROTO((sym_environment *env));
+double sym_get_primal_bound PROTO((sym_environment *env));
 int sym_get_iteration_count PROTO((sym_environment *env));
 int sym_set_obj_coeff PROTO((sym_environment *env, int index, double value));
 int sym_set_obj2_coeff PROTO((sym_environment *env, int index, double value));
@@ -81,6 +83,7 @@ int sym_set_row_type PROTO((sym_environment *env, int index, char rowsense,
 			     double rowrhs, double rowrng));
 int sym_set_obj_sense PROTO((sym_environment *env, int sense));
 int sym_set_col_solution PROTO((sym_environment *env, double * colsol));
+int sym_set_primal_bound PROTO((sym_environment *env, double bound));
 int sym_set_continuous PROTO((sym_environment *env, int index));
 int sym_set_integer PROTO((sym_environment *env, int index));
 int sym_set_col_names PROTO((sym_environment *env, char **colname));
