@@ -380,7 +380,7 @@ int user_display_solution(void *user, int length, int *xind, double *xval)
    printf("########################################################\n");
    printf("\nBest Solution Found:\n");
    for (i = 0; i < length; i++)
-      printf("%i \n ", colnames[xind[i]]);
+      printf("%i \n", colnames[xind[i]]);
    printf("\n\n\n");
    
    return(USER_NO_PP);
