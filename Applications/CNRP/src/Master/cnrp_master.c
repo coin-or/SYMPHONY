@@ -744,7 +744,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    /* FIXME: This is UGLY! */
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    problem *p = get_problem_ptr(FALSE);
-   cnrp_spec *cnrp_lp = (cnrp_spec *) p->lpp[0]->user
+   cnrp_spec *cnrp_lp = (cnrp_spec *) p->tm->lpp[0]->user;
 #endif
       
 #if 0
