@@ -957,13 +957,13 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 
    switch(user_res){
     case USER__CLOSE_TO_HALF:
-      branch_close_to_half(i, cand_num, candidates);
+      branch_close_to_half(p, i, cand_num, candidates);
       break;
     case USER__CLOSE_TO_HALF_AND_EXPENSIVE:
-      branch_close_to_half_and_expensive(i, cand_num, candidates);
+      branch_close_to_half_and_expensive(p, i, cand_num, candidates);
       break;
     case USER__CLOSE_TO_ONE_AND_CHEAP:
-      branch_close_to_one_and_cheap(i, cand_num, candidates);
+      branch_close_to_one_and_cheap(p, i, cand_num, candidates);
       break;
 
     default:

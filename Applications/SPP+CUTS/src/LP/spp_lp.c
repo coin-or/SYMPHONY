@@ -224,6 +224,9 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
       display_cut_in_lp(spp, cuts[j], -1);
 #endif
 
+#if 0
+   /*FIXME: This doesn't work anymore because the user can't get the pointer to
+     the LP and therefore can't get the dual solution. */
    if (!one_row_only && spp->par->do_lift_in_lp) {
       /* we lift each cut and convert the lifted cuts into rows */
       lifted_cuts = (cut_data ***) malloc(cutnum * sizeof(cut_data **));
@@ -251,7 +254,8 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
       }
       FREE(lifted_cuts);
       *new_row_num = count;
-   } else {
+   }else{
+#endif
       /* derive one constraint from each cut */
       *new_rows = (waiting_row **) malloc(cutnum * sizeof(waiting_row *));
       for (i = 0; i < cutnum; i++) {
@@ -264,8 +268,10 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	 cuts[i] = NULL;
       }
       *new_row_num = cutnum;
+#if 0
    }
-
+#endif
+   
    return(USER_SUCCESS);
 }
 

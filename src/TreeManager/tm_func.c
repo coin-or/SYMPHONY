@@ -59,9 +59,6 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    tm_params *par;
    bc_node *root = (bc_node *) calloc(1, sizeof(bc_node));
 #ifdef COMPILE_IN_LP
-#ifndef COMPILE_IN_TM
-   cg_prob **cg_list;
-#endif
    int i;
 #else
 #ifdef COMPILE_IN_TM
@@ -140,12 +137,10 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
       tm->lpp[i] = (lp_prob *) calloc(1, sizeof(lp_prob));
       tm->lpp[i]->proc_index = i;
    }
-   get_lp_ptr(tm->lpp, 0);
 #ifdef COMPILE_IN_CG
-   cg_list = (cg_prob **) malloc(par->max_active_nodes * sizeof(cg_prob *));
+   tm->cgp = (cg_prob **) malloc(par->max_active_nodes * sizeof(cg_prob *));
    for (i = 0; i < par->max_active_nodes; i++)
-      tm->lpp[i]->cgp = cg_list[i] = (cg_prob *) calloc(1, sizeof(cg_prob));
-   get_cg_ptr(cg_list, 0);
+      tm->lpp[i]->cgp = tm->cgp[i] = (cg_prob *) calloc(1, sizeof(cg_prob));
    par->use_cg = FALSE;
 #endif
 #endif
@@ -2825,6 +2820,9 @@ void free_tm(tm_prob *tm)
    for (i = 0; i < num_threads; i++)
       free_lp(tm->lpp[i]);
    FREE(tm->lpp);
+#ifdef COMPILE_IN_CG
+   FREE(tm->cgp);
+#endif
 #endif
    
    if (tm->par.lp_machs){

@@ -20,6 +20,9 @@
 #include "tm_params.h"
 #include "BB_types.h"
 #include "lp_solver.h"
+#ifdef COMPILE_IN_CG
+#include "cg.h"
+#endif
 #ifdef COMPILE_IN_CP
 #include "cp.h"
 #endif
@@ -69,6 +72,9 @@ typedef struct TM_PROB{
 #ifdef COMPILE_IN_LP
    struct LP_PROB **lpp;
    int            opt_thread_num;
+#ifdef COMPILE_IN_CG
+   cg_prob      **cgp;
+#endif
 #endif
 #ifdef COMPILE_IN_CP
    cut_pool     **cpp;

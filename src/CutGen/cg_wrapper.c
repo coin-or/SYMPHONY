@@ -73,13 +73,18 @@ int find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
    cut_data **cuts;
    int i;
    int termcode;
+   int tmp = p->cuts_to_add_num; 
    
    CALL_USER_FUNCTION( user_find_cuts(p->user, p->cur_sol.xlength,
 				      p->cur_sol.xiter_num, p->cur_sol.xlevel,
 				      p->cur_sol.xindex, p->cur_sol.objval,
 				      p->cur_sol.xind, p->cur_sol.xval,
-				      p->ub, p->cur_sol.lpetol, num_cuts) );
+				      p->ub, p->cur_sol.lpetol,
+				      &p->cuts_to_add_num, &p->cuts_to_add_size,
+				      &p->cuts_to_add) );
 
+   *num_cuts += p->cuts_to_add_num - tmp;
+   
    return(FUNCTION_TERMINATED_NORMALLY);
 }
 

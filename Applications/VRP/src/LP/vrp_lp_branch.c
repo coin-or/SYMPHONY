@@ -53,14 +53,6 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
 			 int *cand_num, branch_obj ***candidates,
 			 int *action)
 {
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-   lp_prob *p = get_lp_ptr();
-   double *obj_hist = p->obj_history;
-   int i;
-   int backsteps = p->par.tailoff_obj_backsteps;
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
    vrp_lp_problem *vrp = (vrp_lp_problem *) user;
 
    if (!vrp->par.detect_tailoff){
@@ -70,43 +62,6 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
    }
 
    return(USER_SUCCESS);
-
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-   for (i = MIN(p->iter_num-1, backsteps) - 1; i >= 0; i--)
-      obj_hist[i+1] = obj_hist[i];
-   obj_hist[0] = p->lp_data->objval;
-
-#ifdef DO_TESTS
-   /*The solution cannot be integral at this point*/
-   for (i = 0; i < varnum; i++){
-      xvali = x[i];
-      if (xvali - floor(xvali) > lpetol && ceil(xvali) - xvali > lpetol)
-	 break;
-   }
-   if (i >= varnum){
-      /* solution is integral , yet infeasible*/
-      *action = USER__DO_NOT_BRANCH;
-      return(USER_SUCCESS);
-   }
-#endif
-   
-   /* if the objective function differences are below tailoff_obj_frac
-      tailoff_obj_backsteps  times in a row, branch */
-   for (i = 1; i <= backsteps; i++)
-     if ((obj_hist[i-1]-obj_hist[i]) > p->par.tailoff_obj_frac) break;  
-
-   if  (i < backsteps){
-      /* no tailoff */
-      *action = USER__BRANCH_IF_MUST;
-      return(USER_SUCCESS);
-   }else{
-      *action = USER__DO_BRANCH;
-      return(USER_SUCCESS);
-   }
-   return(USER_DEFAULT);
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 }
 
 /*===========================================================================*/
@@ -377,14 +332,9 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 	    }
 	 }
 	 break;
-	 
-      case 2:
-	candnum = vrp->par.strong_branching_cand_num_max -
-	   vrp->par.strong_branching_red_ratio * bc_level;
-	candnum = MAX(candnum, vrp->par.strong_branching_cand_num_min);
 
-	branch_close_to_half(candnum, &candnum, &cand_list);
-	break;
+       case 2:
+	 return(USER__CLOSE_TO_HALF);
       }
       *cand_num += candnum;
       *action = USER__DO_BRANCH;

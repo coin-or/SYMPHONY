@@ -42,8 +42,6 @@ int main(void)
 
    p = (cg_prob *) calloc(1, sizeof(cg_prob));
    
-   get_cg_ptr(&p);
-   
    cg_initialize(p, 0);
   
    /*------------------------------------------------------------------------*\

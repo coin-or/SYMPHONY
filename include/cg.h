@@ -81,15 +81,18 @@ cut_data *create_explicit_cut PROTO((int nzcnt, int *indices, double *values,
 				     char send_to_cp));
 int cg_add_explicit_cut PROTO((int nzcnt, int *indices, double *values,
 			       double rhs, double range, char sense,
-			       char send_to_cp));
-int cg_add_user_cut PROTO((cut_data *new_cut));
+			       char send_to_cp, int *num_cuts, int *alloc_cuts,
+			       cut_data ***cuts));
+int cg_add_user_cut PROTO((cut_data *new_cut, int *num_cuts, int *alloc_cuts,
+			   cut_data ***cuts));
 
 /*===========================================================================*/
 /*=============== CG communication functions (cg_proccomm.c) ================*/
 /*===========================================================================*/
 
 int cg_process_message PROTO((cg_prob *p, int r_bufid));
-int cg_send_cut PROTO((cut_data *new_cut));
+int cg_send_cut PROTO((cut_data *new_cut, int *num_cuts, int *alloc_cuts,
+		       cut_data ***cuts));
 
 /*===========================================================================*/
 /*==================== LP wrapper functions (cg_wrapper.c) ==================*/

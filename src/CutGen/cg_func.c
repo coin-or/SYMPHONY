@@ -37,30 +37,6 @@
  * This file contains general functions used by the cut generator process.
 \*===========================================================================*/
 
-/*===========================================================================*\
- * This small function simply returns a pointer to the current cut generator 
- * problem structure so that it can be accessed from anywhere within the CG  
- * without explicitly passing a pointer. This is essentially only uselful    
- * to the more advanced user sho wishes to have access to the internal data  
- * structures                                                                
-\*===========================================================================*/
-
-cg_prob *get_cg_ptr(cg_prob **cg_list)
-{
-#ifdef _OPENMP
-   int thread_num = omp_get_thread_num();
-#else
-   int thread_num = 0;
-#endif
-   static cg_prob **cg;
-
-   if (cg_list){
-      cg = cg_list;
-   }
-
-   return(cg[thread_num]);
-}
-
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -139,25 +115,24 @@ void cg_initialize(cg_prob *p, int master_tid)
  * cg_add_user_cut() below.                       
 \*===========================================================================*/
 
-int cg_send_cut(cut_data *new_cut)
+int cg_send_cut(cut_data *new_cut, int *num_cuts, int *alloc_cuts,
+		cut_data ***cuts)
 {
-   cg_prob *p = get_cg_ptr(NULL);
-
 #ifdef COMPILE_IN_CG
 
    int i;
    cut_data *tmp_cut;
 
-   for (i = 0; i < p->cuts_to_add_num; i++){
-      if (new_cut->type != p->cuts_to_add[i]->type ||
-	  new_cut->size != p->cuts_to_add[i]->size ||
-	  new_cut->rhs != p->cuts_to_add[i]->rhs){
+   for (i = 0; i < *num_cuts; i++){
+      if (new_cut->type != (*cuts)[i]->type ||
+	  new_cut->size != (*cuts)[i]->size ||
+	  new_cut->rhs != (*cuts)[i]->rhs){
 	 continue;
       }
       if (!new_cut->coef){
 	 return(0);
       }
-      if (memcmp(new_cut->coef, p->cuts_to_add[i]->coef,
+      if (memcmp(new_cut->coef, (*cuts)[i]->coef,
 		 new_cut->size) == 0){
 	 return(0);
       }
@@ -171,9 +146,8 @@ int cg_send_cut(cut_data *new_cut)
       memcpy((char *)tmp_cut->coef, (char *)new_cut->coef,
 	     new_cut->size * sizeof(char));
    }
-   REALLOC(p->cuts_to_add, cut_data *, p->cuts_to_add_size,
-	   p->cuts_to_add_num + 1, BB_BUNCH);
-   p->cuts_to_add[p->cuts_to_add_num++] = tmp_cut;
+   REALLOC(*cuts, cut_data *, *alloc_cuts, *num_cuts + 1, BB_BUNCH);
+   (*cuts)[*num_cuts++] = tmp_cut;
    
 #else
 
@@ -222,7 +196,8 @@ cut_data *create_explicit_cut(int nzcnt, int *indices, double *values, double rh
 
 int cg_add_explicit_cut(int nzcnt, int *indices, double *values,
 			double rhs, double range, char sense,
-			char send_to_cp)
+			char send_to_cp, int *num_cuts, int *alloc_cuts,
+			cut_data ***cuts)
 {
    cut_data *cut = (cut_data *) calloc(1, sizeof(cut_data));
 
@@ -239,25 +214,24 @@ int cg_add_explicit_cut(int nzcnt, int *indices, double *values,
    cut->deletable = TRUE;
    cut->name = send_to_cp ? CUT__SEND_TO_CP : CUT__DO_NOT_SEND_TO_CP;
 
-   return(cg_add_user_cut(cut));
+   return(cg_add_user_cut(cut, num_cuts, alloc_cuts, cuts));
 }
 
 /*===========================================================================*/
 
-int cg_add_user_cut(cut_data *new_cut)
+int cg_add_user_cut(cut_data *new_cut, int *num_cuts, int *alloc_cuts,
+		    cut_data ***cuts)
 {
-   cg_prob *p = get_cg_ptr(NULL);
-
 #ifdef COMPILE_IN_CG
 
    int i;
    cut_data *tmp_cut;
 
-   for (i = 0; i < p->cuts_to_add_num; i++){
-      if (new_cut->size != p->cuts_to_add[i]->size){
+   for (i = 0; i < *num_cuts; i++){
+      if (new_cut->size != (*cuts)[i]->size){
 	 continue;
       }
-      if (memcmp(new_cut->coef, p->cuts_to_add[i]->coef, new_cut->size) == 0){
+      if (memcmp(new_cut->coef, (*cuts)[i]->coef, new_cut->size) == 0){
 	 return(0);
       }
    }
@@ -270,9 +244,8 @@ int cg_add_user_cut(cut_data *new_cut)
       memcpy((char *)tmp_cut->coef, (char *)new_cut->coef,
 	     new_cut->size * sizeof(char));
    }
-   REALLOC(p->cuts_to_add, cut_data *, p->cuts_to_add_size,
-	   p->cuts_to_add_num + 1, BB_BUNCH);
-   p->cuts_to_add[p->cuts_to_add_num++] = tmp_cut;
+   REALLOC(*cuts, cut_data *, *alloc_cuts, *num_cuts + 1, BB_BUNCH);
+   (*cuts)[*num_cuts++] = tmp_cut;
 
 #else
 

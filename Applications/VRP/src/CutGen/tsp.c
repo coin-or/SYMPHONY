@@ -29,7 +29,8 @@
 #include "network.h"
 
 int add_tsp_cuts PROTO((CCtsp_lpcut_in **tsp_cuts, int *cutnum, int vertnum,
-			char tsp_prob));
+			char tsp_prob, int *num_cuts, int *alloc_cuts,
+			cut_data **cuts));
 
 /*===========================================================================*/
 
@@ -39,7 +40,8 @@ int add_tsp_cuts PROTO((CCtsp_lpcut_in **tsp_cuts, int *cutnum, int vertnum,
 
 /*===========================================================================*/
 
-int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts)
+int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts,
+	     int *num_cuts, int *alloc_cuts, cut_data **cuts)
 {
    edge *edges = n->edges;
    CCtsp_lpcut_in *tsp_cuts = NULL;
@@ -256,7 +258,8 @@ int tsp_cuts(network *n, int verbosity, char tsp_prob, int which_cuts)
       if (verbosity > 3)
 	 printf("Found %2d exactblossoms\n", cutnum);
       if (!rval && cutnum > 0){
-	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob);
+	 cuts_added += add_tsp_cuts(&tsp_cuts, &cutnum, n->vertnum, tsp_prob,
+				    num_cuts, alloc_cuts, cuts);
 	 if (cuts_added){
 	    if (verbosity > 3)
 	       printf("%i exact blossoms added\n", cuts_added);
@@ -277,7 +280,8 @@ CLEANUP:
 /*===========================================================================*/
 
 int add_tsp_cuts(CCtsp_lpcut_in **tsp_cuts, int *cutnum, int vertnum,
-		 char tsp_prob)
+		 char tsp_prob, int *num_cuts, int *alloc_cuts,
+		 cut_data **cuts)
 {
    cut_data cut;
    int i, j, k, cliquecount, cuts_added = 0;
@@ -325,7 +329,7 @@ int add_tsp_cuts(CCtsp_lpcut_in **tsp_cuts, int *cutnum, int vertnum,
 	 continue;
       }
 
-      cg_send_cut(&cut);
+      cg_send_cut(&cut, num_cuts, alloc_cuts, cuts);
       cuts_added++;
 
       FREE(cut.coef);

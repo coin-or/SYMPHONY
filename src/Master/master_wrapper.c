@@ -390,7 +390,6 @@ int send_lp_data_u(problem *p, int sender)
 
       CALL_USER_FUNCTION( user_send_lp_data(p->user, &(tm->lpp[i]->user)) );
    }
-   get_lp_ptr(tm->lpp);
 #else   
    int s_bufid;
 
@@ -454,20 +453,18 @@ int send_cg_data_u(problem *p, int sender)
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined(COMPILE_IN_CG)
    int i;
    tm_prob *tm = p->tm;
-   cg_prob **cg_list = (cg_prob **)
-                       malloc(tm->par.max_active_nodes*sizeof(cg_prob *));
+   tm->cgp = (cg_prob **) malloc(tm->par.max_active_nodes*sizeof(cg_prob *));
 #pragma omp parallel for
    for (i = 0; i < tm->par.max_active_nodes; i++){
-      tm->lpp[i]->cgp = cg_list[i] = (cg_prob *) calloc(1, sizeof(cg_prob));
+      tm->lpp[i]->cgp = tm->cgp[i] = (cg_prob *) calloc(1, sizeof(cg_prob));
       
-      cg_list[i]->par = p->par.cg_par;
+      tm->cgp[i]->par = p->par.cg_par;
       
-      cg_list[i]->draw_graph = p->dg_tid;
+      tm->cgp[i]->draw_graph = p->dg_tid;
       
       CALL_USER_FUNCTION( user_send_cg_data(p->user,
 					    &(tm->lpp[i]->cgp->user)) );
    }
-   get_cg_ptr(cg_list);
 #else
    int s_bufid;
 

@@ -114,15 +114,6 @@ int user_initialize(void **user)
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
    vrp_problem *vrp = (vrp_problem *)user;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-   problem *p = get_problem_ptr(FALSE);
-
-   p->par.tm_par.granularity = p->par.lp_par.granularity = .9999;
-   p->par.lp_par.problem_type = INTEGER_PROBLEM;
-   p->par.lp_par.generate_cgl_cuts = FALSE;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    vrp_readparams(vrp, filename, argc, argv);
 

@@ -47,8 +47,6 @@ int main(void)
    
    p = (lp_prob *) calloc(1, sizeof(lp_prob));
 
-   get_lp_ptr(&p);
-   
    if ((termcode = lp_initialize(p, 0)) < 0){
       printf("LP initialization failed with error code %i\n\n", termcode);
       lp_exit(p);

@@ -428,18 +428,12 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 	 }
 	 break;
 	 
-      case 2:
-	candnum = cnrp->par.strong_branching_cand_num_max -
-	   cnrp->par.strong_branching_red_ratio * bc_level;
-	candnum = MAX(candnum, cnrp->par.strong_branching_cand_num_min);
-
-	branch_close_to_half(candnum, &candnum, &cand_list);
-	break;
+       case 2:
+	 return(USER__CLOSE_TO_HALF);
       }
       *cand_num += candnum;
       *action = USER__DO_BRANCH;
    }
-   
    return(USER_SUCCESS);
 }
 

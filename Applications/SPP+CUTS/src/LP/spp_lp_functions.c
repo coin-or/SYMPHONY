@@ -336,7 +336,8 @@ void lift_cut_in_lp(spp_lp_problem *spp, int from, int n,
 		    var_desc **vars, cut_data **cut, int *plifted_cutnum,
 		    cut_data ***plifted_cuts)
 {
-   lp_prob *p = get_lp_ptr(NULL);
+   /* FIXME: This function is temporarily broken. */
+   lp_prob *p; /* = get_lp_ptr(NULL); */
    double lpetol = p->lp_data->lpetol;
    double *dj = p->lp_data->dj;
    double thres1, thres2, thres, gap, ub;

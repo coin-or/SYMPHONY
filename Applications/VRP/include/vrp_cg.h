@@ -83,28 +83,34 @@ int greedy_shrinking1 PROTO((network *n, double truck_cap, double etol,
 			     int max_num_cuts, cut_data *new_cut,
 			     int *compnodes, int *compmembers, int compnum,
 			     char *in_set, double *cut_val,int *ref,
-			     char *cut_list, int *demand));
+			     char *cut_list, int *demand, cut_data **cuts,
+			     int *num_cuts, int *alloc_cuts));
 int greedy_shrinking6 PROTO((network *n, double truck_cap,
 			     double etol, cut_data *new_cut,
 			     int *compnodes,
 			     int *compmembers, int compnum, char *in_set,
 			     double *cut_val,int *ref, char *cut_list,
 			     int max_num_cuts, int *demand, int trial_num,
-			     double prob));
+			     double prob, cut_data **cuts, int *num_cuts,
+			     int *alloc_cuts));
 int greedy_shrinking1_one PROTO((network *n, double truck_cap,
 				 double etol, int max_num_cuts,
 				 cut_data *new_cut, char *in_set,
 				 double *cut_val, char *cut_list,
-				 int num_routes, int *demand ));
+				 int num_routes, int *demand, cut_data **cuts,
+				 int *num_cuts, int *alloc_cuts));
 int greedy_shrinking6_one PROTO((network *n, double truck_cap,
 				 double etol, cut_data *new_cut,
 				 char *in_set, double *cut_val, int num_routes,
 				 char *cut_list, int max_num_cuts,
-				 int *demand,int trial_num, double prob));
+				 int *demand,int trial_num, double prob,
+				 cut_data **cuts, int *num_cuts,
+				 int *alloc_cuts));
 int greedy_shrinking2_one PROTO((network *n, double truck_cap,
 				 double etol, cut_data *new_cut,
 				 char *in_set, double *cut_val, int num_routes,
-				 int *demand));
+				 int *demand, cut_data **cuts, int *num_cuts,
+				 int *alloc_cuts));
 
 /*===========================================================================*/
 /*============================ biconnected.c ================================*/
@@ -120,6 +126,7 @@ void compute_comp_nums PROTO((vertex *v, int parent_comp, int *num_comps,
 /*================================ tsp.c ====================================*/
 /*===========================================================================*/
 
-int tsp_cuts PROTO((network *n, int verbosity, char tsp_prob, int which_cuts));
+int tsp_cuts PROTO((network *n, int verbosity, char tsp_prob, int which_cuts,
+		    cut_data **cuts, int *num_cuts));
 
 #endif

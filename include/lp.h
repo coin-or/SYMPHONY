@@ -206,11 +206,13 @@ int col_gen_before_branch PROTO((lp_prob *p, int *new_vars));
 
 /*----------- Generic selection rules to be used by the user ----------------*/
 
-void branch_close_to_half PROTO((int max_cand_num, int *cand_num,
+void branch_close_to_half PROTO((lp_prob *p, int max_cand_num, int *cand_num,
 				 branch_obj ***candidates));
-void branch_close_to_half_and_expensive PROTO((int max_cand_num, int *cand_num,
+void branch_close_to_half_and_expensive PROTO((lp_prob *p, int max_cand_num,
+					       int *cand_num,
 					       branch_obj ***candidates));
-void branch_close_to_one_and_cheap PROTO((int max_cand_num, int *cand_num,
+void branch_close_to_one_and_cheap PROTO((lp_prob *p, int max_cand_num,
+					  int *cand_num,
 					  branch_obj ***candidates));
 
 /*===========================================================================*/

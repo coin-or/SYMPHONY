@@ -35,32 +35,6 @@
 \*===========================================================================*/
 
 /*===========================================================================*\
- * This small function simply returns a pointer to the current LP 
- * problem structure so that it can be accessed from anywhere within the LP  
- * without explicitly passing a pointer. This is essentially only uselful    
- * to the more advanced user who wishes to have access to the internal data  
- * structures                                                                
-\*===========================================================================*/
-
-lp_prob *get_lp_ptr(lp_prob **lp_list)
-{
-#ifdef _OPENMP
-   int thread_num = omp_get_thread_num();
-#else
-   int thread_num = 0;
-#endif
-   static lp_prob **lp;
-
-   if (lp_list){
-      lp = lp_list;
-   }
-
-   return(lp[thread_num]);
-}
-
-/*===========================================================================*/
-
-/*===========================================================================*\
  * This function receives the problem data (if we are running in parallel)   
  * and intitializes the data structures.                                     
 \*===========================================================================*/
@@ -164,7 +138,6 @@ int lp_initialize(lp_prob *p, int master_tid)
 #ifdef COMPILE_IN_CG
    if (!p->cgp){
       p->cgp = (cg_prob *) calloc(1, sizeof(cg_prob));
-      get_cg_ptr(&(p->cgp));
    }
    
    cg_initialize(p->cgp, p->master);

@@ -681,10 +681,9 @@ int col_gen_before_branch(lp_prob *p, int *new_vars)
 /* This is a generic function                                                */
 /*****************************************************************************/
 
-void branch_close_to_half(int max_cand_num, int *cand_num,
+void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
 			  branch_obj ***candidates)
 {
-   lp_prob *p = get_lp_ptr(NULL);
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
@@ -738,10 +737,9 @@ void branch_close_to_half(int max_cand_num, int *cand_num,
 /* This is a generic function                                                */
 /*****************************************************************************/
 
-void branch_close_to_half_and_expensive(int max_cand_num, int *cand_num,
-					branch_obj ***candidates)
+void branch_close_to_half_and_expensive(lp_prob *p, int max_cand_num,
+					int *cand_num, branch_obj ***candidates)
 {
-   lp_prob *p = get_lp_ptr(NULL);
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
@@ -804,10 +802,9 @@ void branch_close_to_half_and_expensive(int max_cand_num, int *cand_num,
 /* This works only for 0/1 problems!!!                                       */
 /*****************************************************************************/
 
-void branch_close_to_one_and_cheap(int max_cand_num, int *cand_num,
+void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
 				   branch_obj ***candidates)
 {
-   lp_prob *p = get_lp_ptr(NULL);
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
