@@ -175,7 +175,7 @@ endif
 ifeq ($(OSI_INTERFACE),XPRESS)
        LPSINCDIR += /usr/local/xpress/include
        LPLIBPATHS += /usr/local/xpress/lib
-       LPLIB += -lOsiXpr
+       LPLIB += -lOsiXpr -lxprs
 endif
 ifeq ($(OSI_INTERFACE),SOPLEX)
        LPSINCDIR += ${HOME}/include
@@ -1085,9 +1085,30 @@ endif
 
 ifeq ($(LP_SOLVER), OSI)
 WHATTOMAKE += coin
+
+ifeq ($(OSI_INTERFACE), CPLEX)
+LPXDIR = OsiCpx
+LPXINCDIR = CpxIncDir
+else 
 ifeq ($(OSI_INTERFACE), CLP)
 WHATTOMAKE += coin_clp
+LPXDIR = OsiClp
+LPXINCDIR = ClpIncDir
 endif
+ifeq ($(OSI_INTERFACE), OSL)
+LPXDIR = OsiOsl
+LPXINCDIR = OslIncDir
+endif
+ifeq ($(OSI_INTERFACE), GLPK)
+LPXDIR = OsiGlpk
+LPXINCDIR = GlpkIncDir
+endif
+ifeq ($(OSI_INTERFACE), XPRESS)
+LPXDIR = OsiXpr
+LPXINCDIR = XprIncDir
+endif
+endif
+
 endif
 
 ifeq ($(USE_CGL_CUTS), TRUE)
@@ -1752,8 +1773,8 @@ warm_start2 : masterlib $(EXAMPLE_OBJDIR)/warm_start2.o
 coin:
 	(cd $(COINROOT)/Coin && $(MAKE) && cd -)
 	(cd $(COINROOT)/Osi  && $(MAKE) SOLVERLIBS=  && cd -)
-	(cd $(COINROOT)/Osi/$(LPSDIR) && \
-	$(MAKE) $(LPSINCDIR)=$(LPSINCDIR) && cd -)
+	(cd $(COINROOT)/Osi/$(LPXDIR) && \
+	$(MAKE) $(LPXINCDIR)=$(LPSINCDIR) && cd -)
 
 coin_clp:
 	(cd $(COINROOT)/Clp && $(MAKE) && cd -)
