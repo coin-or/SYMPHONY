@@ -19,15 +19,19 @@
 enum OsiSymIntParam {
    /** This controls the level of output */
    OsiSymVerbosity,
-   OsiSymWarmStart,
    OsiSymNodeLimit,
    OsiSymFindFirstFeasible,
    OsiSymSearchStrategy,
    OsiSymUsePermanentCutPools,
-   OsiSymKeepDescOfPruned,
+   OsiSymKeepWarmStart,
    OsiSymDoReducedCostFixing,
-   OsiSymMultiCriteriaFindNondominatedSolutions,
-   OsiSymSensitivityAnalysis
+   OsiSymMCFindSupportedSolutions,
+   OsiSymSensitivityAnalysis,
+   OsiSymRandomSeed,
+   OsiSymDivingStrategy,
+   OsiSymDivingK,
+   OsiSymDivingThreshold,
+   OsiSymTrimWarmTree
 };
 
 enum OsiSymDblParam {
@@ -37,7 +41,9 @@ enum OsiSymDblParam {
        coefficients, this would be 1, for instance. */ 
    OsiSymGranularity,
    OsiSymTimeLimit,
-   OsiSymGapLimit
+   OsiSymGapLimit,
+   OsiSymUpperBound,
+   OsiSymLowerBound
 };
 
 enum OsiSymStrParam {

@@ -40,9 +40,6 @@ public:
    /* Get the pointer to the loaded warmStart_ */
    virtual warm_start_desc * getCopyOfWarmStartDesc();
 
-   /* Trim the sub tree rooted at node */
-   virtual void trimTree(bc_node * node);
-
    /* Move the pointer to the rootnode of the warmStart to another
       node which will change the underlying tree 
    */

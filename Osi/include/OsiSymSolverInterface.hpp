@@ -19,8 +19,11 @@
 #include "OsiSolverInterface.hpp"
 #include "OsiSymSolverParameters.hpp"
 #include "SymWarmStart.hpp"
-#include "CoinPackedMatrix.hpp"
 #include "symphony_api.h"
+
+#include "CoinPackedVector.hpp"
+#include "CoinPackedMatrix.hpp"
+
 #include <iostream>
 #include <string>
 
@@ -50,7 +53,8 @@ using namespace std;
 */
 
 class OsiSymSolverInterface : public OsiSolverInterface {
-
+   friend void OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
+   
 public:
    ///@name Solve methods 
    //@{
@@ -68,6 +72,15 @@ public:
 
    /// Get a lower bound for the new rhs problem using the warm start tree.
    virtual double getLbForNewRhs(int cnt, int *index, 
+				 double * value);
+   /// Get an upper bound for the new rhs problem using the warm start tree.
+   virtual double getUbForNewRhs(int cnt, int *index, 
+				 double * value);
+   /// Get a lower bound for the new obj problem using the warm start tree.
+   virtual double getLbForNewObj(int cnt, int *index, 
+				 double * value);
+   /// Get an upper bound for the new obj problem using the warm start tree.
+   virtual double getUbForNewObj(int cnt, int *index, 
 				 double * value);
 
   //@}
@@ -87,83 +100,69 @@ public:
      solver and is implemented. In this case the value of the parameter is
      returned in the second argument. Otherwise they return false.
 
-     \note
-     There is a default implementation of the set/get
-     methods, namely to store/retrieve the given value using an array in the
-     base class. A specific solver implementation can use this feature, for
-     example, to store parameters that should be used later on. Implementors
-     of a solver interface should overload these functions to provide the
-     proper interface to and accurately reflect the capabilities of a
-     specific solver.
-
-     The format for hints is slightly different in that the value is 
-     boolean and there is an enum to show strength of hint.
-     There is also an optional void pointer to allow for any eventuality.
-     Hints should be initialised when a solver is instantiated.
-     (See OsiSolverParameters.hpp for defined hint parameters and strength.)
-     A value of true means to work with the hint, false to work against it.
-     For example,
-     <ul>
-       <li> \code setHintParam(OsiDoScale,true,OsiHintTry) \endcode
-	    is a mild suggestion to the solver to scale the constraint
-	    system.
-       <li> \code setHintParam(OsiDoScale,false,OsiForceDo) \endcode
-	    tells the solver to disable scaling, or throw an exception if
-	    it cannot comply.
-     </ul>
-     As another example, a solver interface could use the value and strength
-     of the \c OsiDoReducePrint hint to adjust the amount of information
-     printed by the interface and/or solver.  The extent to which a solver
-     obeys hints is left to the solver.  The value and strength returned by
-     \c getHintParam will match the most recent call to \c setHintParam,
-     and will not necessarily reflect the solver's ability to comply with the
-     hint.  If the hint strength is \c OsiForceDo, the solver is required to
-     throw an exception if it cannot perform the specified action.
-
-     \note
-     As with the other set/get methods, there is a default implementation
-     which maintains arrays in the base class for hint value and strength.
-     The default implementation does not store the void pointer, and always
-     throws an exception for strength \c OsiForceDo. Implementors of a solver
-     interface should overload these functions to provide the proper interface
-     to and accurately reflect the capabilities of a specific solver.
   */
   //@{
     // Set an integer parameter
     virtual bool setIntParam(OsiIntParam key, int value);
 
     // Set SYMPHONY int parameter
-    bool setSymParam(OsiSymIntParam key, int value);
+    virtual bool setSymParam(OsiSymIntParam key, int value);
+
+    // Set SYMPHONY int parameter directly by the C interface parameter name
+    virtual bool setSymParam(const std::string key, int value);
+
 
     // Set an double parameter
     virtual bool setDblParam(OsiDblParam key, double value);
 
     // Set SYMPHONY double parameter
-    bool setSymParam(OsiSymDblParam key, double value);
+    virtual bool setSymParam(OsiSymDblParam key, double value);
 
-    // Set an string parameter
+    // Set SYMPHONY double parameter directly by the C interface parameter name
+    virtual bool setSymParam(const std::string key, double value);
+
+
+
+    // Set a string parameter
     virtual bool setStrParam(OsiStrParam key, const std::string & value);
 
     // Set SYMPHONY string parameter
-    bool setSymParam(OsiSymStrParam key, const std::string & value);
+    virtual bool setSymParam(OsiSymStrParam key, const std::string & value);
+
+    // Set SYMPHONY string parameter directly by the C interface parameter name
+    virtual bool setSymParam(const std::string key, const std::string value);
+
+
 
     // Get an integer parameter
     virtual bool getIntParam(OsiIntParam key, int& value) const;
 
     // Get SYMPHONY int parameter
-    bool getSymParam(OsiSymIntParam key, int& value) const;
+    virtual bool getSymParam(OsiSymIntParam key, int& value) const;
+
+    // Get SYMPHONY int parameter directly by the C interface parameter name
+    virtual bool getSymParam(const std::string key, int& value) const;
+
 
     // Get an double parameter
     virtual bool getDblParam(OsiDblParam key, double& value) const;
 
     // Get SYMPHONY double parameter
-    bool getSymParam(OsiSymDblParam key, double& value) const;
+    virtual bool getSymParam(OsiSymDblParam key, double& value) const;
+
+    // Get SYMPHONY double parameter directly by the C interface parameter name
+    virtual bool getSymParam(const std::string key, double& value) const;
+
+
 
     // Get a string parameter
     virtual bool getStrParam(OsiStrParam key, std::string& value) const;
 
     // Get SYMPHONY string parameter
-    bool getSymParam(OsiSymStrParam key, std::string & value) const;
+    virtual bool getSymParam(OsiSymStrParam key, std::string& value) const;
+
+    // Get SYMPHONY string parameter directly by the C interface parameter name
+    virtual bool getSymParam(const std::string key, std::string& value) const;
 
   //@}
 
@@ -310,6 +309,11 @@ public:
       /// Get pointer to array[getNumCols()] of objective function coefficients
    virtual const double * getObjCoefficients() const;
   
+   /** Get pointer to array[getNumCols()] of second 
+       objective function coefficients if loaded before.
+   */
+   virtual const double * getObj2Coefficients() const;
+
       /// Get objective function sense (1 for min (default), -1 for max)
    virtual double getObjSense() const; 
  
@@ -632,6 +636,31 @@ public:
 
   //---------------------------------------------------------------------------
 
+   enum keepCachedFlag {
+      /// discard all cached data (default)
+      KEEPCACHED_NONE    = 0,
+      /// column information: objective values, lower and upper bounds, variable types
+      KEEPCACHED_COLUMN  = 1,
+      /// row information: right hand sides, ranges and senses, lower and upper bounds for row
+      KEEPCACHED_ROW     = 2,
+      /// problem matrix: matrix ordered by column and by row
+      KEEPCACHED_MATRIX  = 4,
+      /// LP solution: primal and dual solution, reduced costs, row activities
+      KEEPCACHED_RESULTS = 8,
+      /// only discard cached LP solution
+      KEEPCACHED_PROBLEM = KEEPCACHED_COLUMN | KEEPCACHED_ROW | KEEPCACHED_MATRIX,
+      /// keep all cached data (similar to getMutableLpPtr())
+      KEEPCACHED_ALL     = KEEPCACHED_PROBLEM | KEEPCACHED_RESULTS,
+      /// free only cached column and LP solution information
+      FREECACHED_COLUMN  = KEEPCACHED_PROBLEM & !KEEPCACHED_COLUMN,
+      /// free only cached row and LP solution information
+      FREECACHED_ROW     = KEEPCACHED_PROBLEM & !KEEPCACHED_ROW,
+      /// free only cached matrix and LP solution information
+      FREECACHED_MATRIX  = KEEPCACHED_PROBLEM & !KEEPCACHED_MATRIX,
+      /// free only cached LP solution information
+      FREECACHED_RESULTS = KEEPCACHED_ALL & !KEEPCACHED_RESULTS
+   };
+   
   ///@name Constructors and destructors
   //@{
     /// Default Constructor
@@ -667,7 +696,6 @@ public:
 protected:
   ///@name Protected methods
   //@{
-#ifdef USE_CGL_CUTS
     /** Apply a row cut (append to the constraint matrix). */
    virtual void applyRowCut( const OsiRowCut & rc );
 
@@ -680,20 +708,94 @@ protected:
       OsiSolverInterface object when the object is created using the
       default constructor.
     */
-#else
-   virtual void applyRowCut( const OsiRowCut & rc ){}
-   virtual void applyColCut( const OsiColCut & cc ){}
-#endif
+
     void setInitialData();
   //@}
 
 private:
+
+  /// The real work of the constructor
+  void gutsOfConstructor();
+  
+  /// The real work of the destructor
+  void gutsOfDestructor();
+
+  /// free cached column rim vectors
+  void freeCachedColRim();
+
+  /// free cached row rim vectors
+  void freeCachedRowRim();
+
+  /// free cached result vectors
+  void freeCachedResults();
+  
+  /// free cached matrices
+  void freeCachedMatrix();
+
+  /// free all cached data (except specified entries, see getLpPtr())
+  void freeCachedData( int keepCached = KEEPCACHED_NONE );
+
+  /// free all allocated memory
+  void freeAllMemory();
+
+  /// Just for testing purposes
+  void printBounds(); 
 
   /**@name Private member data */
   //@{
    /// The pointer to the SYMPHONY problem environment
    sym_environment *env_;
   //@}
+   
+   /// Pointer to objective vector
+   mutable double  *obj_;
+
+   /// Pointer to second objective vector to be used in bicriteria solver
+   mutable double  *obj2_;
+   
+   /// Pointer to dense vector of variable lower bounds
+   mutable double  *collower_;
+   
+   /// Pointer to dense vector of variable lower bounds
+   mutable double  *colupper_;
+   
+   /// Pointer to dense vector of row sense indicators
+   mutable char    *rowsense_;
+  
+   /// Pointer to dense vector of row right-hand side values
+   mutable double  *rhs_;
+  
+   /** Pointer to dense vector of slack upper bounds for range constraints 
+       (undefined for non-range rows) 
+   */
+   mutable double  *rowrange_;
+   
+   /// Pointer to dense vector of row lower bounds
+   mutable double  *rowlower_;
+   
+   /// Pointer to dense vector of row upper bounds
+   mutable double  *rowupper_;
+   
+   /// Pointer to primal solution vector
+   mutable double  *colsol_;
+   
+   /// Pointer to row activity (slack) vector
+   mutable double  *rowact_;
+   
+   /// Pointer to row-wise copy of problem matrix coefficients.
+   mutable CoinPackedMatrix *matrixByRow_;  
+   
+   /// Pointer to row-wise copy of problem matrix coefficients.
+   mutable CoinPackedMatrix *matrixByCol_;  
+
 };
+
+//#############################################################################
+/** A function that tests the methods in the OsiSymSolverInterface class. The
+    only reason for it not to be a member method is that this way it doesn't
+    have to be compiled into the library. And that's a gain, because the
+    library should be compiled with optimization on, but this method should be
+    compiled with debugging. */
+void OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
 
 #endif

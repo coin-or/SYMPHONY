@@ -13,6 +13,7 @@ SymWarmStart::SymWarmStart(warm_start_desc * ws)
 
 SymWarmStart::SymWarmStart(char * fileName)
 {
+   
    warmStart_ = sym_read_warm_start(fileName);
 }
 
@@ -26,7 +27,6 @@ SymWarmStart::SymWarmStart(const SymWarmStart & symWS)
    wsCopy = const_cast<warm_start_desc *>(sWS->getCopyOfWarmStartDesc());
 
    warmStart_ = wsCopy;
-
 }
 
 /*===========================================================================*/
@@ -58,14 +58,6 @@ warm_start_desc * SymWarmStart::getCopyOfWarmStartDesc()
       cout<<"getWarmStart(): No loaded warm start desc. to return!"<<endl;
       return 0;
    }
-}
-
-/*===========================================================================*/
-/*===========================================================================*/
-
-void SymWarmStart::trimTree(bc_node * node)
-{
-   sym_trim_tree(node);
 }
 
 /*===========================================================================*/
