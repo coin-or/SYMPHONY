@@ -38,7 +38,7 @@
 
 int user_receive_cg_data(void **user, int dg_id)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -51,7 +51,7 @@ int user_receive_cg_data(void **user, int dg_id)
 
 int user_receive_lp_solution_cg(void *user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -63,21 +63,11 @@ int user_receive_lp_solution_cg(void *user)
  * when they are found.
 \*===========================================================================*/
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-int user_find_cuts(void *user, int varnum, int iter_num, int level,
-		   int index, double objval, int *indices, double *values,
-		   double ub, double etol, int *cutnum, char *status)
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   int index, double objval, int *indices, double *values,
 		   double ub, double etol, int *cutnum)
-#endif
 {
-   *cutnum = 0;
-
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -89,7 +79,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 
 int user_free_cg(void **user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -102,6 +92,6 @@ int user_free_cg(void **user)
 #ifdef CHECK_CUT_VALIDITY
 int user_check_validity_of_cut(void *user, cut_data *new_cut)
 {
-  return(USER_NO_PP);
+  return(USER_DEFAULT);
 }
 #endif

@@ -69,7 +69,7 @@ int user_receive_lp_data(void **user)
    receive_int_array(m->matbeg, (colnum + 1));
    receive_char_array((char *)m->matind, m->nzcnt * sizeof(row_ind_type));
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -104,7 +104,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    mip->rngval = (double *) malloc(mip->m * DSIZE);
    mip->is_int = (char *) calloc (mip->n, CSIZE);
    
-   memcpy((char *) mip->matbeg, (char *) cm->matbeg, (cm->colnum+1) * ISIZE);   
+   memcpy((char *) mip->matbeg, (char *) cm->matbeg, (cm->colnum+1) * ISIZE);  
    memcpy((char *) mip->obj, (char *) cm->obj, cm->colnum * DSIZE);      
 
    for (i = cm->nzcnt - 1; i >= 0; i--) {
@@ -123,7 +123,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
       mip->sense[i] = 'E';
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }      
 
 
@@ -153,7 +153,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 int user_send_feasible_solution(void *user, double lpetol, int varnum,
 				int *indices, double *values)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 
@@ -181,7 +181,7 @@ int user_display_lp_solution(void *user, int which_sol, int varnum,
 
 int user_add_to_desc(void *user, int *desc_size, char **desc)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -193,7 +193,7 @@ int user_add_to_desc(void *user, int *desc_size, char **desc)
 
 int user_same_cuts(void *user, cut_data *cut1, cut_data *cut2, int *same_cuts)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -209,7 +209,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 {
    /* No cutting planes */
 
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -223,8 +223,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 int user_send_lp_solution(void *user, int varnum, var_desc **vars, double *x,
 			  int where)
 {
-   /* Needed for cutting planes */
-   return(where == LP_SOL_TO_CP ? SEND_NONZEROS : SEND_FRACTIONS);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -236,9 +235,7 @@ int user_send_lp_solution(void *user, int varnum, var_desc **vars, double *x,
 int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 			char *status, int *num_fixed)
 {
-   *num_fixed = 0;
-
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -252,16 +249,7 @@ int user_generate_column(void *user, int generate_what, int cutnum,
 			 int *real_nextind, double *colval, int *colind,
 			 int *collen, double *obj, double *lb, double *ub)
 {
-   switch (generate_what){
-    case GENERATE_NEXTIND:
-      /* Here we just have to generate the specified column. */
-      break;
-    case GENERATE_REAL_NEXTIND:
-      /* In this case, we have to determine what the "real" next edge is*/
-      break;
-   }
-
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -273,7 +261,7 @@ int user_generate_column(void *user, int generate_what, int cutnum,
 
 int user_print_stat_on_cuts_added(void *user, int rownum, waiting_row **rows)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -286,7 +274,7 @@ int user_print_stat_on_cuts_added(void *user, int rownum, waiting_row **rows)
 int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
 			    char *delete_rows)
 {
-   return(DEFAULT);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -300,7 +288,7 @@ int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
 			     var_desc **vars, double *x,
 			     int *new_row_num, cut_data ***cuts)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -317,7 +305,7 @@ int user_free_lp(void **user)
    spp_free_cmatrix(spp->cmatrix);
    FREE(*user);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 
 }
 

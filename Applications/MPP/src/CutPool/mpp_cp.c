@@ -36,9 +36,7 @@
 
 int user_receive_cp_data(void **user)
 {
-   *user = NULL;
-   
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -49,14 +47,14 @@ int user_receive_cp_data(void **user)
 
 int user_free_cp(void **user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
 
 int user_receive_lp_solution_cp(void *user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -70,7 +68,7 @@ int user_receive_lp_solution_cp(void *user)
 int user_prepare_to_check_cuts(void *user, int varnum, int *indices,
 			       double *values)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 
@@ -84,25 +82,7 @@ int user_check_cut(void *user, double etol, int number, int *indices,
 		   double *values, cut_data *cut, int *is_violated,
 		   double *quality)
 {
-   /*------------------------------------------------------------------------*\
-    * Here the cut is "unpacked" and checked for violation. Each cut is
-    * stored as compactly as possible. The subtour elimination constraints
-    * are stored as a vector of bits indicating which side of the cut each
-    * node is on. If the cut is violated, it is sent back to the lp.
-    * Otherwise, "touches" is incremented. "Touches" is a measure of the
-    * effectiveness of a cut and indicates how long it has been since a
-    * cut was useful
-   \*------------------------------------------------------------------------*/
-
-  switch (cut->type){
-      
-    default:
-       printf("Cut type not recognized! \n\n");
-       *is_violated = FALSE; 
-       return(USER_NO_PP);
-  }
-
-  return(USER_NO_PP);
+  return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -115,7 +95,7 @@ int user_check_cut(void *user, double etol, int number, int *indices,
 
 int user_finished_checking_cuts(void *user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/

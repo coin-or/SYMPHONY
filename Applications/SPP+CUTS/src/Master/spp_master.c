@@ -77,7 +77,7 @@ int user_initialize(void **user)
    spp->par = (spp_parameters *) calloc(1, sizeof(spp_parameters));
    spp->stat = (statistics *) calloc(2, sizeof(statistics));
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -117,7 +117,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
       };
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -148,7 +148,7 @@ int user_io(void *user)
    /* order cols into lex ascending order */
    spp_fix_lex(spp);
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
    
 /*===========================================================================*/
@@ -161,7 +161,7 @@ int user_io(void *user)
 
 int user_start_heurs(void *user, double *ub, double *ub_estimate)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -173,7 +173,7 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
 
 int user_init_draw_graph(void *user, int dg_id)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -203,16 +203,17 @@ int user_init_draw_graph(void *user, int dg_id)
 \*===========================================================================*/
 
 int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
-			      int *basecutnum, int *extravarnum, int **extravars,
-			      char ***colnames, int *colgen_strat)
+			      int *basecutnum, int *extravarnum,
+			      int **extravars, char ***colnames,
+			      int *colgen_strat)
 {
    /* This gives you access to the user data structure. */
    spp_problem *spp = (spp_problem *) user;
    int i;
    int *vars, varnum;
 
-   /* Since we don't know how to form a good set of base variables, we'll put all
-      the variables in the extra set */
+   /* Since we don't know how to form a good set of base variables, we'll put
+      all the variables in the extra set */
    
    /* Set the number of extra variables*/
    varnum = *extravarnum = spp->cmatrix->colnum;
@@ -250,7 +251,7 @@ int user_receive_feasible_solution(void *user, int msgtag, double cost,
       choose PACK_NONZEROS in user_pack_feasible_solution in LP. */
 
    if (spp->feasibility == FEASIBLE && cost >= spp->feas_value)
-      return(USER_NO_PP);
+      return(USER_SUCCESS);
 
    spp->feasibility = FEASIBLE;
    spp->feas_value = cost;
@@ -258,7 +259,7 @@ int user_receive_feasible_solution(void *user, int msgtag, double cost,
    for (i = 0; i < numvars; i++)
       spp->feas_sol[i] = colnames[indices[i]];
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -306,7 +307,7 @@ int user_send_lp_data(void *user, void **user_lp)
    
 #endif
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -330,7 +331,7 @@ int user_send_cg_data(void *user, void **user_cg)
 
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CG)
 
-   spp_cg_problem *spp_cg = (spp_cg_problem *) calloc(1, sizeof(spp_cg_problem));
+   spp_cg_problem *spp_cg = (spp_cg_problem *)calloc(1,sizeof(spp_cg_problem));
    *user_cg = (void *) spp_cg;
 
    spp_cg->par = spp->cg_par;
@@ -378,7 +379,7 @@ int user_send_cg_data(void *user, void **user_cg)
 
 #endif
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -396,7 +397,7 @@ int user_send_cg_data(void *user, void **user_cg)
 
 int user_send_cp_data(void *user, void **user_cp)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -408,13 +409,7 @@ int user_send_cp_data(void *user, void **user_cp)
 
 int user_process_own_messages(void *user, int msgtag)
 {
-   switch (msgtag){
-    default:
-      fprintf(stderr, "\nMaster: unknown message type %i!!!\n\n", msgtag);
-      exit(1);
-   }
-
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -436,7 +431,7 @@ int user_display_solution(void *user, double lpetol, int varnum,
       printf("%i \n", colnames[indices[i]]);
    printf("\n\n\n");
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
    
 /*===========================================================================*/
@@ -451,7 +446,7 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 #ifdef TRACE_PATH
 
 #endif
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }   
 
 /*===========================================================================*/
@@ -471,7 +466,7 @@ int user_free_master(void **user)
    FREE(spp->cmatrix);
    FREE(*user);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 

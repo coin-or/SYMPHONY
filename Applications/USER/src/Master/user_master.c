@@ -68,6 +68,7 @@ void user_usage(void){
 
 int user_initialize(void **user)
 {
+   /* Create the user's data structure and pass a pointer back to SYMPHONY. */
    user_problem *prob = (user_problem *) calloc(1, sizeof(user_problem));
 
    *user = prob;
@@ -84,7 +85,7 @@ int user_initialize(void **user)
 
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
-   /* This code is just here as a template for customization. Uncomment to use.*/
+   /* This code is just a template for customization. Uncomment to use.*/
 #if 0
    FILE *f;
    char line[50], key[50], value[50], c, tmp;
@@ -96,7 +97,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
    if (strcmp(filename, "")){
       if ((f = fopen(filename, "r")) == NULL){
 	 printf("SYMPHONY: file %s can't be opened\n", filename);
-	 exit(1); /*error check for existence of parameter file*/
+	 return(USER_ERROR); /*error check for existence of parameter file*/
       }
       
       /* Here you can read in the parameter settings from the file. See the 
@@ -148,7 +149,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
 int user_io(void *user)
 {
-   /* This code is just here as a template for customization. Uncomment to use.*/
+   /* This code is just a template for customization. Uncomment to use.*/
 #if 0
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
@@ -197,6 +198,9 @@ int user_io(void *user)
 
 int user_start_heurs(void *user, double *ub, double *ub_estimate)
 {
+   /* This gives you access to the user data structure. */
+   user_problem *prob = (user_problem *) user;
+
    return(USER_DEFAULT);
 }
 
@@ -286,6 +290,9 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 int user_receive_feasible_solution(void *user, int msgtag, double cost,
 				   int numvars, int *indices, double *values)
 {
+   /* This gives you access to the user data structure. */
+   user_problem *prob = (user_problem *) user;
+
    return(USER_DEFAULT);
 }
 
@@ -415,6 +422,9 @@ int user_send_cp_data(void *user, void **user_cp)
 
 int user_process_own_messages(void *user, int msgtag)
 {
+   /* This gives you access to the user data structure. */
+   user_problem *prob = (user_problem *) user;
+
    switch (msgtag){
     default:
       fprintf(stderr, "\nMaster: unknown message type %i!!!\n\n", msgtag);
@@ -428,8 +438,7 @@ int user_process_own_messages(void *user, int msgtag)
 
 /*===========================================================================*\
  * This is the user's chance to display the solution in whatever
- * manner desired. Change the return value to USER_NO_PP if you want to
- * display the solution yourself. A return value of USER_AND_PP will cause the
+ * manner desired. A return value of USER_DEFAULT will cause the
  * default solution display routine to be executed, even if the user displays
  * the solution as well.
 \*===========================================================================*/

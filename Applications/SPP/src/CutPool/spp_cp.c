@@ -39,7 +39,7 @@
 
 int user_receive_cp_data(void **user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -52,7 +52,7 @@ int user_receive_cp_data(void **user)
 
 int user_receive_lp_solution_cp(void *user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -66,7 +66,7 @@ int user_receive_lp_solution_cp(void *user)
 int user_prepare_to_check_cuts(void *user, int varnum, int *indices,
 			       double *values)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 
@@ -80,7 +80,7 @@ int user_check_cut(void *user, double etol, int number, int *indices,
 		   double *values, cut_data *cut, int *is_violated,
 		   double *quality)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -93,7 +93,7 @@ int user_check_cut(void *user, double etol, int number, int *indices,
 
 int user_finished_checking_cuts(void *user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -105,7 +105,7 @@ int user_finished_checking_cuts(void *user)
 
 int user_free_cp(void **user)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/

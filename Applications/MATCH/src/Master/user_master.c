@@ -59,11 +59,7 @@ void user_usage(void){
 
 int user_initialize(void **user)
 {
-   user_problem *prob = (user_problem *) calloc(1, sizeof(user_problem));
-
-   *user = prob;
-
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -121,7 +117,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
       };
    }
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -145,7 +141,7 @@ int user_io(void *user)
 
    if ((f = fopen(infile, "r")) == NULL){
       printf("Readparams: file %s can't be opened\n", infile);
-      exit(1); /*error check for existence of parameter file*/
+      return(USER_ERROR); /*error check for existence of parameter file*/
    }
 
    /* Read in the costs */
@@ -157,7 +153,7 @@ int user_io(void *user)
    prob->colnum = (prob->nnodes)*(prob->nnodes-1)/2;
    prob->rownum = prob->nnodes;
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
    
 /*===========================================================================*/
@@ -170,7 +166,7 @@ int user_io(void *user)
 
 int user_start_heurs(void *user, double *ub, double *ub_estimate)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -182,10 +178,7 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
 
 int user_init_draw_graph(void *user, int dg_id)
 {
-   /* This gives you access to the user data structure. */
-   user_problem *prob = (user_problem *) user;
-
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -215,16 +208,17 @@ int user_init_draw_graph(void *user, int dg_id)
 \*===========================================================================*/
 
 int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
-			      int *basecutnum, int *extravarnum, int **extravars,
-			      char ***colnames, int *colgen_strat)
+			      int *basecutnum, int *extravarnum,
+			      int **extravars, char ***colnames,
+			      int *colgen_strat)
 {
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
    int i;
    int *vars, varnum;
 
-   /* Since we don't know how to form a good set of base variables, we'll put all
-      the variables in the extra set */
+   /* Since we don't know how to form a good set of base variables, we'll put
+      all the variables in the extra set */
 
    /* Set the number of extra variables*/
    varnum = *extravarnum = prob->colnum;
@@ -243,7 +237,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    *basevarnum = 0;
    *basevars  = NULL;
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -255,7 +249,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 int user_receive_feasible_solution(void *user, int msgtag, double cost,
 				   int numvars, int *indices, double *values)
 {
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -292,7 +286,7 @@ int user_send_lp_data(void *user, void **user_lp)
    /* Here, we send that data using message passing and the rest is
       done in user_receive_lp_data() in the LP process */
 #endif
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -335,7 +329,7 @@ int user_send_cg_data(void *user, void **user_cg)
    /* Send the feasible solution here */
 #endif
 #endif
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -353,26 +347,7 @@ int user_send_cg_data(void *user, void **user_cg)
 
 int user_send_cp_data(void *user, void **user_cp)
 {
-   /* This gives you access to the user data structure. */
-   user_problem *prob = (user_problem *) user;
-
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined (COMPILE_IN_CP)
-   /* This is is the case when we are copying data directly because
-      the CP is not running separately. The easiest thing to do here is just
-      to use the same user data structure in both the master and the cut
-      pool. Then this subroutine would simply consist of 
-      
-      *user_cp = user;
-
-      Otherwise, this code should be virtually
-      identical to that of user_receive_cp_data() in the CP process.*/
-
-   *user_cp = user;
-#else
-   /* Here, we send that data using message passing and the rest is
-      done in user_receive_cp_data() in the CP process */
-#endif
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -384,21 +359,14 @@ int user_send_cp_data(void *user, void **user_cp)
 
 int user_process_own_messages(void *user, int msgtag)
 {
-   switch (msgtag){
-    default:
-      fprintf(stderr, "\nMaster: unknown message type %i!!!\n\n", msgtag);
-      exit(1);
-   }
-
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
 
 /*===========================================================================*\
  * This is the user's chance to display the solution in whatever
- * manner desired. Change the return value to USER_NO_PP if you want to
- * display the solution yourself. A return value of USER_AND_PP will cause the
+ * manner desired. A return value of USER_DEFAULT will cause the
  * default solution display routine to be executed, even if the user displays
  * the solution as well.
 \*===========================================================================*/
@@ -420,7 +388,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
       }	   
    }
    
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
    
 /*===========================================================================*/
@@ -435,7 +403,7 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 #ifdef TRACE_PATH
 
 #endif
-   return(USER_NO_PP);
+   return(USER_DEFAULT);
 }   
 
 /*===========================================================================*/
@@ -450,7 +418,7 @@ int user_free_master(void **user)
 
    FREE(prob);
 
-   return(USER_NO_PP);
+   return(USER_SUCCESS);
 }
 
 
