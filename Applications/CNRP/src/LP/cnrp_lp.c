@@ -800,31 +800,33 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
       case SUBTOUR_ELIM_ACROSS:
 	matind = (int *) malloc(varnum * ISIZE);
 	for (i = 0, nzcnt = 0; i < varnum; i++){
-	   edgeind = vars[i]->userind;
+#ifdef DIRECTED_X_VARS
 #ifdef ADD_FLOW_VARS
-#ifdef DIRECTED_X_VARS
 	   if (vars[i]->userind < 2*total_edgenum){
-	      if (vars[i]->userind >= total_edgenum){
-		 edgeind = vars[i]->userind - total_edgenum;
-	      }else{
-		 edgeind = vars[i]->userind;
-	      }
 #else
-	   if ((edgeind = vars[i]->userind) < total_edgenum){   
-#endif
-#else
-#ifdef DIRECTED_X_VARS
 	   {
+#endif
 	      if (vars[i]->userind >= total_edgenum){
 		 edgeind = vars[i]->userind - total_edgenum;
+		 v1 = edges[edgeind << 1];
+		 v0 = edges[(edgeind << 1) + 1];
 	      }else{
 		 edgeind = vars[i]->userind;
+		 v0 = edges[edgeind << 1];
+		 v1 = edges[(edgeind << 1) + 1];
 	      }
+	      if (coef[v1 >> DELETE_POWER] >>
+		  (v1 & DELETE_AND) & 1){
+		 matind[nzcnt++] = i;
+	      }
+	   }
+#else
+#ifdef ADD_FLOW_VARS
+	   if (vars[i]->userind < total_edgenum){   
 #else	      
            {
+#endif
 	      edgeind = vars[i]->userind;
-#endif
-#endif
 	      v0 = edges[edgeind << 1];
 	      v1 = edges[(edgeind << 1) + 1];
 	      if ((coef[v0 >> DELETE_POWER] >>
@@ -834,11 +836,69 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		 matind[nzcnt++] = i;
 	      }
 	   }
+#endif
 	}
 	cut->sense = 'G';
 	cut->deletable = TRUE;
 	break;
 
+#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
+      case MIXED_DICUT:
+	matind = (int *) malloc(varnum * ISIZE);
+	matval = (double *) malloc(varnum*DSIZE);
+	demand = ((double *)coef)[0];
+	numroutes = ((int *)(coef + DSIZE))[1];
+	numarcs = ((int *)(coef + DSIZE + ISIZE))[2];
+	arcs = (int *) (coef + DSIZE + 2*ISIZE); /* List of the arcs in C */
+	coef2 = coef + DSIZE + (numarcs+2)*ISIZE; /* List of the nodes in S */
+	for (i = 0, nzcnt = 0; i < varnum; i++){
+	   if (vars[i]->userind < 2*total_edgenum){
+	      if (vars[i]->userind >= total_edgenum){
+		 edgeind = vars[i]->userind - total_edgenum;
+		 v1 = edges[edgeind << 1];
+		 v0 = edges[(edgeind << 1) + 1];
+	      }else{
+		 edgeind = vars[i]->userind;
+		 v0 = edges[edgeind << 1];
+		 v1 = edges[(edgeind << 1) + 1];
+	      }
+	      if (coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1){
+		 for (j = 0; j < numarcs; j ++){
+		    if (v0 == arcs[j << 1] && v1 == arcs[(j << 1) + 1])
+		       break;
+		 }
+		 if (j == numarcs){
+		    matind[nzcnt] = i;
+		    matval[nzcnt++] = demand;
+		 }
+	      }
+	   }else{
+	      if (vars[i] < 3*total_edgenum){
+		 edgeind = vars[i]->userind - 2*total_edgenum;
+		 v0 = edges[edgeind << 1];
+		 v1 = edges[(edgeind << 1) + 1];
+	      }else{
+		 edgeind = vars[i]->userind - 3*total_edgenum;
+		 v1 = edges[edgeind << 1];
+		 v0 = edges[(edgeind << 1) + 1];
+	      }
+	      if (coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1){
+		 for (j = 0; j < numarcs; j ++){
+		    if (v0 == arcs[j << 1] && v1 == arcs[(j << 1) + 1])
+		       break;
+		 }
+		 if (j < numarcs){
+		    matind[nzcnt] = i;
+		    matval[nzcnt++] = demand;
+		 }
+	      }
+	   }
+	}
+	cut->sense = 'G';
+	cut->deletable = TRUE;
+	break;
+#endif
+	
 #ifdef ADD_FLOW_VARS
       case FLOW_CAP:
 	matind = (int *)    malloc(3 * ISIZE);

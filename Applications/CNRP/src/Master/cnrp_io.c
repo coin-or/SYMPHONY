@@ -541,11 +541,7 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 	   fprintf(stderr, "\nCNRP I/O: too much data in DEMAND_SECTION\n\n");
 	   exit(1);
 	}
-#if 1
 	demand_scale_factor = (double)(vertnum)/cnrp->demand[0];
-#else
-	demand_scale_factor = 1;
-#endif
 	for (i = 0; i < vertnum; i++){
 	   cnrp->demand[i] *= demand_scale_factor;
 	}

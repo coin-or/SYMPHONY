@@ -154,7 +154,7 @@ if (num_nodes > 2){                                                          \
 		    SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);                  \
    new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                      \
 		   RHS(num_nodes, total_demand, capacity) :                  \
-		   mult*BINS(total_demand, capacity));                       \
+		   BINS(total_demand, capacity));                            \
    num_cuts += cg_send_cut(new_cut);                                         \
 }                                                                            \
 
