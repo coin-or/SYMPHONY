@@ -35,6 +35,7 @@
 /*----------------- Return codes for sym_load_problem() ---------------------*/
 #define ERROR__READING_GMPL_FILE         -120
 #define ERROR__READING_WARM_START_FILE   -121
+#define ERROR__READING_MPS_FILE          -122
 
 /*-------------------- Return codes for sym_solve() -------------------------*/
 #define TM_NO_PROBLEM                     225
