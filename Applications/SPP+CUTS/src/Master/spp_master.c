@@ -253,7 +253,7 @@ int user_receive_feasible_solution(void *user, int msgtag, double cost,
    if (spp->feasibility == SPP_FEASIBLE && cost >= spp->feas_value)
       return(USER_SUCCESS);
 
-   spp->feasibility = FEASIBLE;
+   spp->feasibility = SPP_FEASIBLE;
    spp->feas_value = cost;
    spp->feas_sol_length = numvars;
    for (i = 0; i < numvars; i++)
