@@ -92,7 +92,7 @@ int match_load_problem(sym_environment *env, user_problem *prob){
    
    /* set up the inital LP data */
    n = prob->numnodes*(prob->numnodes-1)/2;
-   m = 2 * prob->numnodes;
+   m = prob->numnodes;
    nz = 2 * n;
 
    /* Allocate the arrays */
