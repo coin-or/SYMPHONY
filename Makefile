@@ -27,7 +27,11 @@
 ifeq ($(USE_SYM_APPL), TRUE)
 CONFIG_FILE_DIR = $(SYMPHONYROOT)
 else
+ifeq ($(SYM_EXAMPLE), TRUE)
+CONFIG_FILE_DIR = $(SYMPHONYROOT)
+else
 CONFIG_FILE_DIR = $(PWD)
+endif
 endif
 
 CONFIG_FILE = config
