@@ -108,21 +108,21 @@ char processes_alive(tm_prob *tm)
 #ifndef COMPILE_IN_LP
    for (i = tm->lp.procnum-1; i>=0; i--){
       if (pstat(tm->lp.procs[i]) != PROCESS_OK){
-	 printf("LP has died -- halting machine\n\n");
+	 printf("\nLP process has died -- halting machine\n\n");
 	 return(FALSE);
       }
    }
 #endif
    for (i = tm->cg.procnum-1; i>=0; i--){
       if (pstat(tm->cg.procs[i]) != PROCESS_OK){
-	 printf("CG has died -- halting machine\n\n");
+	 printf("\nCG process has died -- halting machine\n\n");
 	 return(FALSE);
       }
    }
 #ifndef COMPILE_IN_CP
    for (i = tm->cp.procnum-1; i>=0; i--){
       if (pstat(tm->cp.procs[i]) != PROCESS_OK){
-	 printf("CP has died -- halting machine\n\n");
+	 printf("\nCP process has died -- halting machine\n\n");
 	 return(FALSE);
       }
    }
@@ -130,7 +130,7 @@ char processes_alive(tm_prob *tm)
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    for (i = tm->sp.procnum-1; i>=0; i--){
       if (pstat(tm->sp.procs[i]) != PROCESS_OK){
-	 printf("SP has died -- halting machine\n\n");
+	 printf("\nSP process has died -- halting machine\n\n");
 	 return(FALSE);
       }
    }
@@ -1006,7 +1006,8 @@ int receive_lp_timing(tm_prob *tm)
    double start_node = tm->comp_times.start_node;
    int lp, cp;
    bc_node *node;
-
+   char SOMETHING_DIED = FALSE;
+   
    memset(&tm->comp_times, 0, sizeof(node_times));
    tm->comp_times.ramp_up_tm = ramp_up_tm;
    tm->comp_times.ramp_down_time = ramp_down_time;
@@ -1121,21 +1122,27 @@ int receive_lp_timing(tm_prob *tm)
 	    freebuf(r_bufid);
 	 }else{
 	    if (pstat(tm->lp.procs[i]) != PROCESS_OK){
-	       printf("LP has died -- halting machine\n\n");
+	       printf("\nLP process has died -- halting machine\n\n");
+	       
+#if 0
+	       /* Probably don't need this */
 	       stop_processes(&tm->lp);
 	       stop_processes(&tm->cg);
 	       stop_processes(&tm->cp);
 	       /*__BEGIN_EXPERIMENTAL_SECTION__*/
 	       stop_processes(&tm->sp);
 	       /*___END_EXPERIMENTAL_SECTION___*/
-	       return(SOMETHING_DIED);
+#endif
+	       something died = TRUE;
+	       break;
 	    }
 	 }
       }
    }
 #endif
-
-   return(FUNCTION_TERMINATED_NORMALLY);
+   
+   return(something_died ? FUNCTION_TERMINATED_ABNORMALLY :
+	  FUNCTION_TERMINATED_NORMALLY);
 }
 
 
