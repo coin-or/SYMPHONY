@@ -48,9 +48,10 @@ COMPILE_IN_CG = TRUE
 COMPILE_IN_CP = TRUE
 
 ##############################################################################
-# This section is for listing CNRP source file names
+# Other variables to be set by the user
 ##############################################################################
 
+USER_MAIN = TRUE
 DO_CONCORDE_CUTS = FALSE
 DIRECTED_X_VARS = TRUE
 ADD_FLOW_VARS = TRUE
@@ -79,7 +80,7 @@ endif
 endif
 
 ##############################################################################
-# Other variables to be set by the user
+# This section is for listing CNRP source file names
 ##############################################################################
 
 MACROS_SRC        = cnrp_macros.c
@@ -88,7 +89,9 @@ NET_SRC           = network.c
 DG_FUNC_SRC       = cnrp_dg_functions.c
 
 USER_MASTER_SRC   = cnrp_master.c cnrp_io.c cnrp_master_functions.c small_graph.c
-USER_MASTER_SRC  += main.c
+ifeq ($(USER_MAIN),TRUE)
+USER_MASTER_SRC  += cnrp_main.c
+endif
 USER_MASTER_SRC  += $(COST_SRC)
 ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)

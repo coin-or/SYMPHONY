@@ -773,20 +773,8 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 
 #ifdef ADD_FLOW_VARS
 #ifndef ADD_CAP_CUTS
-   if (vrp->lp_par.tau > 0){
       n = create_flow_net(indices, values, varnum, lpetol, vrp->edges,
 			  vrp->demand, vertnum);
-   }else{
-#ifdef DIRECTED_X_VARS
-      for (i = 0; i < varnum && indices[i] < 2*total_edgenum; i++);
-#else
-      for (i = 0; i < varnum && indices[i] < total_edgenum; i++);
-#endif   
-      varnum = i;
-      
-      n = create_net(indices, values, varnum, lpetol, vrp->edges, vrp->demand,
-		     vertnum);
-   }
 #else
 #ifdef DIRECTED_X_VARS
    for (i = 0; i < varnum && indices[i] < 2*total_edgenum; i++);

@@ -60,6 +60,8 @@ problem *get_problem_ptr(char reset)
  * This file contains the main() for the master process.
 \*===========================================================================*/
 
+#ifndef USER_MAIN
+
 int main(int argc, char **argv)
 {
    problem *p;
@@ -558,6 +560,8 @@ int main(int argc, char **argv)
    return(0);
 }
 
+#endif
+   
 /*===========================================================================*/
 
 void print_statistics(node_times *tim, tm_stat *stat, double ub, double lb,

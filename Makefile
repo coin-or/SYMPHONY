@@ -133,7 +133,7 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use an OSI interface.
-#LP_SOLVER = OSI
+LP_SOLVER = OSI
 OSI_INTERFACE = OSL
 
 #Set the paths and the name of the library
@@ -703,6 +703,9 @@ endif
 ifeq ($(CHECK_LP),TRUE)
 BB_DEFINES += -DCOMPILE_CHECK_LP
 endif
+ifeq ($(USER_MAIN),TRUE)
+BB_DEFINES += -DUSER_MAIN
+endif
 
 ifeq ($(COMPILE_IN_CG),TRUE)
 BB_DEFINES += -DCOMPILE_IN_CG
@@ -774,7 +777,7 @@ CFLAGS = $(DEFAULT_FLAGS) $(MORECFLAGS) $(MOREFLAGS)
 ##############################################################################
 ##############################################################################
 
-MASTER_SRC	= master_wrapper.c master_io.c
+MASTER_SRC	= master.c master_wrapper.c master_io.c
 DG_SRC		= draw_graph.c
 
 ifeq ($(COMPILE_IN_TM), TRUE)

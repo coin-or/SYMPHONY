@@ -452,20 +452,8 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    double flow_value;
    
 #ifndef ADD_CAP_CUTS
-   if (vrp->par.tau > 0){
       n = create_flow_net(indices, values, varnum, lpetol, vrp->edges, demand,
 			  vertnum);
-   }else{
-#ifdef DIRECTED_X_VARS
-      for (i = 0; i < varnum && indices[i] < 2*total_edgenum; i++);
-#else
-      for (i = 0; i < varnum && indices[i] < total_edgenum; i++);
-#endif   
-      varnum = i;
-      
-      n = create_net(indices, values, varnum, lpetol, vrp->edges, demand,
-		     vertnum);
-   }
 #else
 #ifdef DIRECTED_X_VARS
    for (i = 0; i < varnum && indices[i] < 2*total_edgenum; i++);
@@ -489,37 +477,35 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    }
 
 #if defined(ADD_FLOW_VARS) && !defined(ADD_CAP_CUTS)
-   if (vrp->par.tau > 0){
 #ifdef DIRECTED_X_VARS
-      for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
-	 if ((flow_value = edge1->flow1) > lpetol){
-	    real_demand = edge1->v0 ? demand[edge1->v0] : 0;
-	    if ((capacity - real_demand)*edge1->weight1 < edge1->flow1 -
-		lpetol){
-	       *feasible = IP_INFEASIBLE;
-	       free_net(n);
-	       return(USER_SUCCESS);
-	    }
-	 }
-	 if ((flow_value = edge1->flow2) > lpetol){
-	    if ((capacity-demand[edge1->v1])*edge1->weight2<edge1->flow2 -
-		lpetol){
-	       *feasible = IP_INFEASIBLE;
-	       free_net(n);
-	       return(USER_SUCCESS);
-	    }
-	 }
-      }
-#else
-      for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
-	 if (capacity*edge1->weight < edge1->flow1 + edge1->flow2 - lpetol){
+   for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
+      if ((flow_value = edge1->flow1) > lpetol){
+	 real_demand = edge1->v0 ? demand[edge1->v0] : 0;
+	 if ((capacity - real_demand)*edge1->weight1 < edge1->flow1 -
+	     lpetol){
 	    *feasible = IP_INFEASIBLE;
 	    free_net(n);
 	    return(USER_SUCCESS);
 	 }
       }
-#endif
+      if ((flow_value = edge1->flow2) > lpetol){
+	 if ((capacity-demand[edge1->v1])*edge1->weight2<edge1->flow2 -
+	     lpetol){
+	    *feasible = IP_INFEASIBLE;
+	    free_net(n);
+	    return(USER_SUCCESS);
+	 }
+      }
    }
+#else
+   for (i = 0, edge1 = n->edges; i < n->edgenum; i++, edge1++){
+      if (capacity*edge1->weight < edge1->flow1 + edge1->flow2 - lpetol){
+	 *feasible = IP_INFEASIBLE;
+	 free_net(n);
+	 return(USER_SUCCESS);
+      }
+   }
+#endif
 #endif
    
    verts = n->verts;

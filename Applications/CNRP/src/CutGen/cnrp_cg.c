@@ -246,7 +246,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       /* if the network is integral, check for connectivity */
 #ifdef ADD_FLOW_VARS      
       num_cuts = check_flow_connectivity(n, etol, capacity, num_routes, mult);
-      if (!vrp->par.tau || num_cuts){
+      if (num_cuts){
 	 free_net(n);
 	 *cutnum = num_cuts;
 	 return(USER_SUCCESS);
