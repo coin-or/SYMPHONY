@@ -98,6 +98,7 @@ typedef struct CNRP_SPEC{
    int           *cur_sol_tree;
    double         variable_cost;
    double         fixed_cost;
+   double         ub;
 }cnrp_spec;
 
 /*---------------------------------------------------------------------------*\
@@ -108,8 +109,8 @@ lp_net *create_lp_net PROTO((cnrp_spec *cnrp, char *status, int edgenum,
 			     var_desc **vars));
 int cnrp_lp_connected PROTO((lp_net *n, double *compdemands));
 void free_lp_net  PROTO((lp_net *n));
-void construct_feasible_solution PROTO((cnrp_spec *cnrp, network *n,
-					double *objval));
+int construct_feasible_solution PROTO((cnrp_spec *cnrp, network *n,
+				       double *objval, double etol));
 double compute_lhs PROTO((int number,  int *indices, double *values,
 			  cut_data *cut, int vertnum));
 

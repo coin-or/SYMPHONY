@@ -46,6 +46,8 @@ typedef struct SOLUTION_DATA{
    int *tree;
 }solution_data;
 
+/*===========================================================================*/
+
 typedef struct SOLUTION_PAIRS{
    int solution1;
    int solution2;
@@ -54,6 +56,12 @@ typedef struct SOLUTION_PAIRS{
    double gamma2;
 #endif
 }solution_pairs;
+
+/*===========================================================================*/
+
+#define MAX_NUM_PAIRS 100
+#define MAX_NUM_SOLUTIONS 100
+#define MAX_NUM_INFEASIBLE 100
 
 /*===========================================================================*/
 
@@ -75,20 +83,17 @@ int main(int argc, char **argv)
 
    solution_data utopia1;
    solution_data utopia2;
-   solution_data solutions[100];
-   int numsolutions = 0;
-   solution_pairs pairs[100];
-   int numpairs = 0;
+   solution_data solutions[MAX_NUM_PAIRS];
+   int numsolutions = 0, numprobs = 0, numinfeasible = 0;
+   solution_pairs pairs[MAX_NUM_PAIRS];
+   int numpairs = 0, cur_position = 0, first = 0, last = 0;
    int *tree;
    int solution1, solution2;
-   double utopia_fixed, utopia_variable, ub = 0.0;
+   double utopia_fixed, utopia_variable;
    cnrp_problem *cnrp;
    node_desc *root= NULL;
    base_desc *base = NULL;
-#ifdef BINARY_SEARCH
-   double tolerance = .1;
-   printf("Using binary search with tolerance = %f\n\n", tolerance);
-#endif
+   double compare_sol_tol, ub = 0.0;
    
    start_time = wall_clock(NULL);
 
@@ -136,6 +141,13 @@ int main(int argc, char **argv)
    
    initialize_root_node_u(p, base, root);
 
+   compare_sol_tol = cnrp->par.compare_solution_tolerance;
+
+#ifdef BINARY_SEARCH
+   printf("Using binary search with tolerance = %f\n\n",
+	  cnrp->par.binary_search_tolerance);
+#endif
+
 #ifdef SAVE_CUT_POOL
    if (p->par.tm_par.max_cp_num){
       cp = (cut_pool **) malloc(p->par.tm_par.max_cp_num*sizeof(cut_pool *));
@@ -161,7 +173,8 @@ int main(int argc, char **argv)
 
    /* Solve */
    cnrp_solve(p, cp, base, root);
-
+   numprobs++;
+   
    /* Store the solution */
    tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
    memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
@@ -182,7 +195,8 @@ int main(int argc, char **argv)
 
    /* Solve */
    cnrp_solve(p, cp, base, root);
-      
+   numprobs++;
+   
    /* Store the solution */
    tree = solutions[numsolutions].tree = (int *) calloc(cnrp->vertnum-1,ISIZE);
    memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
@@ -204,21 +218,38 @@ int main(int argc, char **argv)
    
    /* Add the first pair to the list */
 #ifdef BINARY_SEARCH
-   pairs[numpairs].gamma1 = 1.0;
-   pairs[numpairs].gamma2 = 0.0;
+   pairs[first].gamma1 = 1.0;
+   pairs[first].gamma2 = 0.0;
 #endif
-   pairs[numpairs].solution1 = 0;
-   pairs[numpairs++].solution2 = 1;
+   pairs[first].solution1 = 0;
+   pairs[first].solution2 = 1;
 
-   while (TRUE){
+   first = last = 0;
+   numpairs = 1;
 
-      if (!numpairs) break;
-      
-      solution1 = pairs[--numpairs].solution1;
-      solution2 = pairs[numpairs].solution2;
+   while (numpairs > 0 && numpairs < MAX_NUM_PAIRS &&
+	  numsolutions < MAX_NUM_SOLUTIONS &&
+	  numinfeasible < MAX_NUM_INFEASIBLE){
+
+#ifdef LIFO
+      solution1 = pairs[last].solution1;
+      solution2 = pairs[last].solution2;
+      cur_position = last;
+      if (--last < 0){
+	 last = MAX_NUM_PAIRS - 1;
+      }
+      numpairs--;
+#else
+      solution1 = pairs[first].solution1;
+      solution2 = pairs[first].solution2;
+      cur_position = first;
+      if (++first > MAX_NUM_PAIRS-1)
+	 first = 0;
+      numpairs--;
+#endif
 
 #ifdef BINARY_SEARCH
-      gamma = (pairs[numpairs].gamma1 + pairs[numpairs].gamma2)/2;
+      gamma = (pairs[cur_position].gamma1 + pairs[cur_position].gamma2)/2;
 #elif defined(FIND_NONDOMINATED_SOLUTIONS)
       gamma = (utopia_variable - solutions[solution1].variable_cost)/
 	 (utopia_fixed - solutions[solution2].fixed_cost +
@@ -249,10 +280,11 @@ int main(int argc, char **argv)
 #endif 
 	 if (ub < p->ub){
 	    p->has_ub = TRUE;
-	    p->ub = ub - .001;
+	    p->ub = ub - compare_sol_tol;
 	 }
       }
 #endif
+      cnrp->ub = p->ub;
       
       printf("***************************************************\n");
       printf("***************************************************\n");
@@ -263,96 +295,107 @@ int main(int argc, char **argv)
       cnrp->fixed_cost = cnrp->variable_cost = 0.0;
       
       cnrp_solve(p, cp, base, root);
+      numprobs++;
       
 #ifdef BINARY_SEARCH
-      if (cnrp->fixed_cost - solutions[solution1].fixed_cost < .001 &&
-	  solutions[solution1].variable_cost - cnrp->variable_cost < .001){
-	 if (pairs[numpairs].gamma1 - gamma > tolerance){
-	    pairs[numpairs].solution1 = solution1;
-	    pairs[numpairs].solution2 = solution2;
-	    pairs[numpairs++].gamma1 = gamma;
+      if (cnrp->fixed_cost - solutions[solution1].fixed_cost <
+	  compare_sol_tol &&
+	  solutions[solution1].variable_cost - cnrp->variable_cost <
+	  compare_sol_tol){
+	 if (pairs[cur_position].gamma1 - gamma >
+	     cnrp->par.binary_search_tolerance){
+	    if (++last > MAX_NUM_PAIRS - 1)
+	       last = 0;
+	    pairs[last].solution1 = solution1;
+	    pairs[last].solution2 = solution2;
+	    pairs[last].gamma1 = gamma;
+	    numpairs++;
 	 }
 	 continue;
       }
-      if (solutions[solution2].fixed_cost - cnrp->fixed_cost < .001 &&
-	  cnrp->variable_cost - solutions[solution2].variable_cost < .001){
-	 if (gamma - pairs[numpairs].gamma2 > tolerance){
-	    pairs[numpairs].solution1 = solution1;
-	    pairs[numpairs].solution2 = solution2;
-	    pairs[numpairs++].gamma2 = gamma;
+      if (solutions[solution2].fixed_cost - cnrp->fixed_cost < compare_sol_tol
+	  && cnrp->variable_cost - solutions[solution2].variable_cost <
+	  compare_sol_tol){
+	 if (gamma - pairs[cur_position].gamma2 >
+	     cnrp->par.binary_search_tolerance){
+	    if (++last > MAX_NUM_PAIRS - 1)
+	       last = 0;
+	    pairs[last].solution1 = solution1;
+	    pairs[last].solution2 = solution2;
+	    pairs[last].gamma1 = gamma;
+	    numpairs++;
 	 }
 	 continue;
       }
 #else
       if (cnrp->fixed_cost == 0.0 && cnrp->variable_cost == 0.0){
+	 numinfeasible++;
+	 continue;
+      }else if (cnrp->fixed_cost - solutions[solution1].fixed_cost <
+		compare_sol_tol &&
+		solutions[solution1].variable_cost - cnrp->variable_cost <
+		compare_sol_tol){
+	 numinfeasible++;
+	 continue;
+      }else if (solutions[solution2].fixed_cost - cnrp->fixed_cost <
+		compare_sol_tol &&
+		cnrp->variable_cost - solutions[solution2].variable_cost <
+		compare_sol_tol){
+	 numinfeasible++;
 	 continue;
       }
 #endif
       
-      if (numsolutions == 100){
-	 printf("Maximum number of solutions exceeded\n\n");
-	 exit(0);
-      }
       /* Insert new solution */
-      if ((fabs(solutions[0].fixed_cost - cnrp->fixed_cost) < .001) &&
-	  (fabs(solutions[0].variable_cost - cnrp->variable_cost) >
-	   .001)){
-	 tree = solutions[0].tree;
-	 memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);	 
-	 solutions[0].fixed_cost = cnrp->fixed_cost;
-	 solutions[0].variable_cost = cnrp->variable_cost;
-	 if (numpairs + 2 > 100){
-	    printf("Maximum number of solution pairs exceeded\n\n");
-	    exit(0);
-	 }
-#ifdef BINARY_SEARCH
-	 pairs[numpairs].gamma1 = gamma;
-#endif
-	 pairs[numpairs].solution1 = 0;
-	 pairs[numpairs++].solution2 = 1;
-      }else if ((fabs(solutions[numsolutions-1].variable_cost -
-		      cnrp->variable_cost) < .001) &&
-		(fabs(solutions[numsolutions-1].fixed_cost -
-		      cnrp->fixed_cost) > .001)){
-	 tree = solutions[numsolutions-1].tree;
-	 memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);	 
-	 solutions[numsolutions-1].fixed_cost = cnrp->fixed_cost;
-	 solutions[numsolutions-1].variable_cost = cnrp->variable_cost;
-	 if (numpairs + 2 > 100){
-	    printf("Maximum number of solution pairs exceeded\n\n");
-	    exit(0);
-	 }
-#ifdef BINARY_SEARCH
-	 pairs[numpairs].gamma2 = gamma;
-#endif
-	 pairs[numpairs].solution1 = numsolutions-2;
-	 pairs[numpairs++].solution2 = numsolutions-1;
+      if (last + 2 > MAX_NUM_PAIRS - 1){
+	 last = 1;
       }else{
+	 last += 2;
+      }
 #ifdef BINARY_SEARCH
-	 pairs[numpairs+1].gamma2 = pairs[numpairs].gamma2;
-	 pairs[numpairs+1].gamma1 = gamma;
-	 pairs[numpairs].gamma2 = gamma;
+      pairs[last - 1].gamma1 = pairs[cur_position].gamma1;
+      pairs[last - 1].gamma2 = gamma;
+      pairs[last].gamma1 = gamma;
+      pairs[last].gamma2 = pairs[cur_position].gamma2;
 #endif
-	 pairs[numpairs].solution1 = solution1;
-	 pairs[numpairs++].solution2 = solution2;
-	 pairs[numpairs].solution1 = solution2;
-	 pairs[numpairs++].solution2 = solution2+1;
-	 for (i = numsolutions; i > solution2; i--){
-	    solutions[i] = solutions[i-1];
+      pairs[last - 1].solution1 = solution1;
+      pairs[last - 1].solution2 = solution2;
+      pairs[last].solution1 = solution2;
+      pairs[last].solution2 = solution2+1;
+      numpairs += 2;
+      for (i = numsolutions; i > solution2; i--){
+	 solutions[i] = solutions[i-1];
+      }
+      numsolutions++;
+#ifndef LIFO
+      for (i = first; i < last - 1; i++){
+	 if (pairs[i].solution1 >= solution2){
+	    pairs[i].solution1++;
 	 }
-	 numsolutions++;
-	 tree = solutions[solution2].tree =
-	    (int *) calloc(cnrp->vertnum-1, ISIZE);
-	 memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
-	 solutions[solution2].gamma = gamma;
-	 solutions[solution2].tau = tau;
-	 solutions[solution2].fixed_cost = cnrp->fixed_cost;
-	 solutions[solution2].variable_cost = cnrp->variable_cost;
-	 if (numpairs + 2 > 100){
-	    printf("Maximum number of solution pairs exceeded\n\n");
-	    exit(0);
+	 if (pairs[i].solution2 >= solution2){
+	    pairs[i].solution2++;
 	 }
       }
+#endif
+      tree = solutions[solution2].tree =
+	 (int *) calloc(cnrp->vertnum-1, ISIZE);
+      memcpy((char *)tree, cnrp->cur_sol_tree, cnrp->vertnum-1);
+      solutions[solution2].gamma = gamma;
+      solutions[solution2].tau = tau;
+      solutions[solution2].fixed_cost = cnrp->fixed_cost;
+      solutions[solution2].variable_cost = cnrp->variable_cost;
+   }
+
+   if (numpairs >= MAX_NUM_PAIRS){
+      printf("Maximum number of solution pairs exceeded\n\n");
+   }
+   
+   if (numpairs >= MAX_NUM_SOLUTIONS){
+      printf("Maximum number of solutions exceeded\n\n");
+   }
+
+   if (numpairs >= MAX_NUM_INFEASIBLE){
+      printf("Maximum number of infeasible subproblems exceeded\n\n");
    }
    
    printf("\n********************************************************\n");
@@ -376,6 +419,9 @@ int main(int argc, char **argv)
    print_statistics(&(p->comp_times.bc_time), &(p->stat), 0.0, 0.0, 0,
 		    start_time);
 
+   printf("\nNumber of subproblem solved: %i\n", numprobs);
+   printf("Number of solutions found: %i\n\n", numsolutions);
+   
    printf("***************************************************\n");
    printf("***************************************************\n");
 #ifdef FIND_NONDOMINATED_SOLUTIONS
@@ -401,12 +447,12 @@ int main(int argc, char **argv)
 #endif
       printf("Fixed Cost: %.3f Variable Cost: %.3f ",
 	     solutions[i].fixed_cost, solutions[i].variable_cost);
-      printf("Optimal Range: %.2f - %.2f\n", gamma1, gamma0);
+      printf("Range: %.2f - %.2f\n", gamma1, gamma0);
       gamma0 = gamma1;
    }
    printf("Fixed Cost: %.3f Variable Cost: %.3f ",
 	  solutions[i].fixed_cost, solutions[i].variable_cost);
-   printf("Optimal Range: %.2f - %.2f\n", 0.0, gamma0);
+   printf("Range: %.2f - %.2f\n", 0.0, gamma0);
    
    FREE(root->desc);
    FREE(root->uind.list);
@@ -423,7 +469,7 @@ int main(int argc, char **argv)
    FREE(p);
    
    return(0);
-}
+}   
 
 void cnrp_solve(problem *p, cut_pool **cp, base_desc *base, node_desc *root)
 {

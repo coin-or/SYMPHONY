@@ -279,7 +279,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
      to see if there are any nonzero flow variables whose
      corresponding edge variable is zero. Recall, 'i' already equals the
      index of the first flow var*/
-#if 1
+
 #ifdef DIRECTED_X_VARS
    if (cnrp->par.generate_x_cuts){
       new_cut->coef  = (char *) malloc(ISIZE);
@@ -453,22 +453,22 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       *cutnum = num_cuts;
       return(USER_SUCCESS);
    }
-#endif
 
 #ifdef ADD_FLOW_VARS      
-   if ((prob_type == VRP || prob_type == TSP || prob_type == BPP) &&
-       n->is_integral){
+   if (n->is_integral){
+      if (prob_type == VRP || prob_type == TSP || prob_type == BPP){
       /* if the network is integral, check for connectivity */
-      num_cuts = check_flow_connectivity(n, etol, capacity, num_routes, mult);
-      if (num_cuts){
-	 free_net(n);
-	 FREE(new_cut);
-	 *cutnum = num_cuts;
-	 return(USER_SUCCESS);
+	 num_cuts = check_flow_connectivity(n, etol, capacity, num_routes,
+					    mult);
       }
+      /* If we got to here, the solution is feasible, so just return */
+      free_net(n);
+      FREE(new_cut);
+      *cutnum = num_cuts;
+      return(USER_SUCCESS);
    }
 #endif
-   
+
 #ifdef DO_TSP_CUTS
    if (cnrp->par.which_tsp_cuts && prob_type == TSP){
       num_cuts += tsp_cuts(n, cnrp->par.verbosity, TRUE,

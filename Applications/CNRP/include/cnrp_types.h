@@ -58,6 +58,10 @@ typedef struct CNRP_PARAMS{
    int           use_small_graph;
    char          small_graph_file[MAX_FILE_NAME_LENGTH];
    int           colgen_strat[2];
+#ifdef MULTI_CRITERIA
+   double        binary_search_tolerance;
+   double        compare_solution_tolerance;
+#endif
 }cnrp_params;
 
 /*---------------------------------------------------------------------------*\
@@ -92,6 +96,7 @@ typedef struct CNRP_PROBLEM{
    double          variable_cost;
    double          utopia_fixed;
    double          utopia_variable;
+   double          ub;
    small_graph    *g;         /* contains the edge data for the reduced graph*/
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
    int             feas_sol_size;

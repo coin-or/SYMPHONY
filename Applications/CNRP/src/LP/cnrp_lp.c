@@ -29,6 +29,9 @@
 #include "timemeas.h"
 #include "lp_u.h"
 #include "dg_params.h"
+#ifdef MULTI_CRITERIA
+#include "cg_u.h"
+#endif
 
 /* CNRP include files */
 #include "cnrp_lp.h"
@@ -78,6 +81,7 @@ int user_receive_lp_data(void **user)
    }
    receive_dbl_array(&cnrp->utopia_fixed, 1);
    receive_dbl_array(&cnrp->utopia_variable, 1);
+   receive_dbl_array(&cnrp->ub, 1);
  
    /* The one additional edge allocated is for the extra variable when finding
       nondominated solutions for multi-criteria problems */  
@@ -634,8 +638,6 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    FREE(compdemands);
    FREE(compcuts);
    
-   *feasible = IP_FEASIBLE;
-
    if (cnrp->par.verbosity > 5){
       display_support_graph(cnrp->window, FALSE, (char *)"Weighted solution",
 			    x_varnum, indices, values, .000001, total_edgenum,
@@ -647,47 +649,17 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 #endif
    }
 
-   for (i = 0; i < varnum; i++){
-      if (indices[i] < total_edgenum){
-	 fixed_cost += cnrp->costs[indices[i]];
-	 cnrp->cur_sol_tree[i] = indices[i];
-      }
-#ifdef DIRECTED_X_VARS
-      else if (indices[i] < 2 * total_edgenum){
-	 fixed_cost += cnrp->costs[indices[i] - total_edgenum];
-	 cnrp->cur_sol_tree[i] = indices[i] - total_edgenum;
-      }
-#endif
-#ifdef ADD_FLOW_VARS
-      else if (indices[i] < (2 + d_x_vars) * total_edgenum){
-	 variable_cost +=
-	    cnrp->costs[indices[i] - (1 + d_x_vars) * total_edgenum] * values[i]; 
-      }else if (indices[i] < (3 + d_x_vars) * total_edgenum){
-	 variable_cost +=
-	    cnrp->costs[indices[i] - (2 + d_x_vars) * total_edgenum] * values[i];
-      }
-#endif
+#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
+   if (construct_feasible_solution(cnrp, n, true_objval, lpetol) > 0){
+      *feasible = IP_FEASIBLE_BUT_CONTINUE;
+   }else{
+      *feasible = IP_FEASIBLE;
    }
-   
-   if ((fixed_cost < cnrp->fixed_cost - lpetol &&
-	variable_cost < cnrp->variable_cost + lpetol) ||
-       (fixed_cost < cnrp->fixed_cost + lpetol &&
-	variable_cost < cnrp->variable_cost - lpetol)){
-      cnrp->variable_cost = variable_cost;
-      cnrp->fixed_cost = fixed_cost;
-      
-      printf("\nBetter Solution Found:\n");
-#ifdef ADD_FLOW_VARS
-      printf("Solution Fixed Cost: %.1f\n", fixed_cost);
-      printf("Solution Variable Cost: %.1f\n", variable_cost);
-#else
-      printf("Solution Cost: %.0f\n", fixed_cost);
 #endif
-   }
    
    free_net(n);
-   
-   return(USER_SUCCESS);
+
+   return (USER_SUCCESS);
 }
 
 /*===========================================================================*/
@@ -802,7 +774,11 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
   int size, vertnum = ((cnrp_spec *)user)->vertnum; 
   int cliquecount = 0, val, edgeind;
   char *clique_array, first_coeff_found, second_coeff_found, third_coeff_found;
-  char d_x_vars;
+#ifdef DIRECTED_X_VARS
+  char d_x_vars = TRUE;
+#else
+  char d_x_vars = FALSE;
+#endif
 #if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
   int  numarcs, *arcs;
   char *coef2;
@@ -1111,7 +1087,6 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	}
 
 #ifdef DIRECTED_X_VARS
-	d_x_vars = TRUE;
 	for (nzcnt = 0, k = 0; k < varnum; k++){
 	   if (vars[k]->userind == index){
 	      matind[nzcnt] = k;
@@ -1120,7 +1095,6 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	   }
 	}
 #else
-	d_x_vars = FALSE;
 	for (nzcnt = 0, k = 0; k < varnum; k++){
 	   if (vars[k]->userind == (index < total_edgenum ? index :
 				    index - total_edgenum)){
@@ -1193,6 +1167,47 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	break;
 #endif
+
+      case OPTIMALITY_CUT_FIXED:
+	matind = (int *) malloc (varnum * ISIZE);
+	matval =  (double *) malloc (varnum * DSIZE);
+	for (nzcnt = 0, i = 0; i < varnum; i++){
+	   if (vars[i]->userind < total_edgenum){
+	      matind[nzcnt] = i;
+	      matval[nzcnt++] = cnrp->costs[vars[i]->userind];
+	   }
+#ifdef DIRECTED_X_VARS
+	   else if (vars[i]->userind < 2*total_edgenum){
+	      matind[nzcnt] = i;
+	      matval[nzcnt++] = cnrp->costs[vars[i]->userind - total_edgenum];
+	   }
+#endif
+	}
+	cut->sense = 'L';
+	cut->deletable = FALSE;
+	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+	break;
+	
+      case OPTIMALITY_CUT_VARIABLE:
+	matind = (int *) malloc (varnum * ISIZE);
+	matval =  (double *) malloc (varnum * DSIZE);
+	for (nzcnt = 0, i = 0; i < varnum; i++){
+	   if (vars[i]->userind >= (1 + d_x_vars) * total_edgenum &&
+	       vars[i]->userind < (3 + d_x_vars) * total_edgenum){
+	      matind[nzcnt] = i;
+	      if (vars[i]->userind < (2 + d_x_vars) * total_edgenum){
+		 matval[nzcnt++] =
+		    cnrp->costs[vars[i]->userind-(1+d_x_vars) * total_edgenum];
+	      }else{
+		 matval[nzcnt++] =
+		    cnrp->costs[vars[i]->userind-(2+d_x_vars) * total_edgenum];
+	      }
+	   }
+	}
+	cut->sense = 'L';
+	cut->deletable = FALSE;
+	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+	break;
 
       case CLIQUE:
 	size = (vertnum >> DELETE_POWER) + 1;
@@ -1648,8 +1663,8 @@ void free_lp_net(lp_net *n)
 
 /*===========================================================================*/
 
-void construct_feasible_solution(cnrp_spec *cnrp, network *n,
-				 double *true_objval)
+int construct_feasible_solution(cnrp_spec *cnrp, network *n,
+				 double *true_objval, double etol)
 {
   _node *tour = cnrp->cur_sol;
   int cur_vert = 0, prev_vert = 0, cur_route, i, count;
@@ -1657,7 +1672,13 @@ void construct_feasible_solution(cnrp_spec *cnrp, network *n,
   edge *edge_data;
   vertex *verts = n->verts;
   double fixed_cost = 0.0, variable_cost = 0.0;
+  int cuts = 0;
+  
+  if (cnrp->ub > 0 && *true_objval > cnrp->ub + etol){
+     return(0);
+  }
 
+#ifdef MULTI_CRITERIA
   for (i = 0; i < n->edgenum; i++){
      fixed_cost += cnrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
 #ifdef ADD_FLOW_VARS
@@ -1665,16 +1686,103 @@ void construct_feasible_solution(cnrp_spec *cnrp, network *n,
 	cnrp->costs[INDEX(n->edges[i].v0, n->edges[i].v1)];
 #endif
   }
-  *true_objval = cnrp->par.gamma*fixed_cost + cnrp->par.tau*variable_cost;
-     
-  printf("\nSolution Found:\n");
+
+  if (*true_objval > cnrp->ub - etol &&
+      variable_cost > cnrp->variable_cost - etol &&
+      fixed_cost > cnrp->fixed_cost - etol){
+     return(0);
+  }
+  
+  if (cnrp->par.gamma == 1.0){
+     if (fixed_cost < cnrp->fixed_cost - etol ||
+	 (fixed_cost >= cnrp->fixed_cost - etol
+	  && variable_cost < cnrp->variable_cost - etol)){
+	printf("\nBetter Solution Found:\n");
 #ifdef ADD_FLOW_VARS
-  printf("Solution Fixed Cost: %.1f\n", fixed_cost);
-  printf("Solution Variable Cost: %.1f\n", variable_cost);
+	printf("Solution Fixed Cost: %.1f\n", fixed_cost);
+	printf("Solution Variable Cost: %.1f\n", variable_cost);
 #else
-  printf("Solution Cost: %.0f\n", fixed_cost);
+	printf("Solution Cost: %.0f\n", fixed_cost);
 #endif
-     
+	cnrp->variable_cost = variable_cost;
+	cnrp->fixed_cost = fixed_cost;
+	cnrp->ub = *true_objval;
+	/* Add an optimality cut for the second objective */
+	cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	new_cut->coef = NULL;
+	new_cut->rhs = (int) (variable_cost + etol) - 1;
+	new_cut->size = 0;
+	new_cut->type = OPTIMALITY_CUT_VARIABLE;
+	new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	cuts += cg_send_cut(new_cut);
+	FREE(new_cut);
+     }
+  }else if (cnrp->par.tau == 1.0){
+     if (variable_cost < cnrp->variable_cost - etol ||
+	 (variable_cost >= cnrp->variable_cost - etol
+	  && fixed_cost < cnrp->fixed_cost - etol)){
+	printf("\nBetter Solution Found:\n");
+#ifdef ADD_FLOW_VARS
+	printf("Solution Fixed Cost: %.1f\n", fixed_cost);
+	printf("Solution Variable Cost: %.1f\n", variable_cost);
+#else
+	printf("Solution Cost: %.0f\n", fixed_cost);
+#endif
+	cnrp->variable_cost = variable_cost;
+	cnrp->fixed_cost = fixed_cost;
+	cnrp->ub = *true_objval;
+	/* Add an optimality cut for the second objective */
+	cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	new_cut->coef = NULL;
+	new_cut->rhs = (int) (fixed_cost + etol) - 1;
+	new_cut->size = 0;
+	new_cut->type = OPTIMALITY_CUT_FIXED;
+	new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	cuts += cg_send_cut(new_cut);
+	FREE(new_cut);
+     }
+  }else if ((*true_objval < cnrp->ub - etol) ||
+	    ((cnrp->par.gamma*(fixed_cost - cnrp->utopia_fixed) >
+			       *true_objval-etol)
+	     && (variable_cost < cnrp->variable_cost + etol)) ||
+	    ((cnrp->par.tau*(variable_cost - cnrp->utopia_variable) >
+	      *true_objval - etol) && (fixed_cost <
+				       cnrp->fixed_cost + etol))){
+     printf("\nBetter Solution Found:\n");
+#ifdef ADD_FLOW_VARS
+     printf("Solution Fixed Cost: %.1f\n", fixed_cost);
+     printf("Solution Variable Cost: %.1f\n", variable_cost);
+#else
+     printf("Solution Cost: %.0f\n", fixed_cost);
+#endif
+     cnrp->variable_cost = variable_cost;
+     cnrp->fixed_cost = fixed_cost;
+     cnrp->ub = *true_objval;
+     if (cnrp->par.gamma*(fixed_cost - cnrp->utopia_fixed) >
+	 *true_objval-etol){
+	/* Add an optimality cut for the second objective */
+	cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	new_cut->coef = NULL;
+	new_cut->rhs = (int) (fixed_cost + etol) - 1;
+	new_cut->size = 0;
+	new_cut->type = OPTIMALITY_CUT_FIXED;
+	new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	cuts += cg_send_cut(new_cut);
+	FREE(new_cut);
+     }else{
+	/* Add an optimality cut for the second objective */
+	cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	new_cut->coef = NULL;
+	new_cut->rhs = (int) (variable_cost + etol) - 1;
+	new_cut->size = 0;
+	new_cut->type = OPTIMALITY_CUT_VARIABLE;
+	new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	cuts += cg_send_cut(new_cut);
+	FREE(new_cut);
+     }
+  }
+#endif
+  
   if (cnrp->par.prob_type == TSP || cnrp->par.prob_type == VRP ||
       cnrp->par.prob_type == BPP){ 
      /*construct the tour corresponding to this solution vector*/
@@ -1743,6 +1851,8 @@ void construct_feasible_solution(cnrp_spec *cnrp, network *n,
 	printf("%i %i\n", n->edges[i].v0, n->edges[i].v1);
      }
   }
+
+  return(cuts);
 }
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/

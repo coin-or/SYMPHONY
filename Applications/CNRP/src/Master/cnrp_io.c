@@ -656,7 +656,11 @@ void cnrp_readparams(cnrp_problem *cnrp, char *filename, int argc, char **argv)
    par->colgen_strat[0] = 0;
    par->colgen_strat[1] = 0;
    par->verbosity = 0;
-
+#ifdef MULTI_CRITERIA
+   par->binary_search_tolerance = .1;
+   par->compare_solution_tolerance = .001;
+#endif
+   
    lp_par->verbosity = 0;
    lp_par->branching_rule = 2;
    lp_par->branch_on_cuts = FALSE;
@@ -667,7 +671,7 @@ void cnrp_readparams(cnrp_problem *cnrp, char *filename, int argc, char **argv)
    lp_par->child_compar_obj_tol = .01;
    lp_par->gamma = 1; /*Determines the fixed cost*/
    lp_par->tau = 0;   /*Determines the variable cost*/
-   lp_par->rho = .001;
+   lp_par->rho = 0;
    cg_par->verbosity = 0;
    cg_par->do_greedy = TRUE;
    cg_par->greedy_num_trials = 5;
@@ -784,7 +788,15 @@ void cnrp_readparams(cnrp_problem *cnrp, char *filename, int argc, char **argv)
 	 READ_INT_PAR(j);
 	 cnrp->numroutes = j;
       }
-
+#ifdef MULTI_CRITERIA
+      else if (strcmp(key, "binary_search_tolerance") == 0){
+	 READ_DBL_PAR(par->binary_search_tolerance);
+      }
+      else if (strcmp(key, "compare_solution_tolerance") == 0){
+	 READ_DBL_PAR(par->compare_solution_tolerance);
+      }
+#endif
+      
       /************************ lp parameters *******************************/
       else if (strcmp(key, "branching_rule") == 0){
 	 READ_INT_PAR(lp_par->branching_rule);

@@ -53,14 +53,16 @@
 #define COORD_DATA       4
 
 /*---------------- cut types ------------------------------------------------*/
-#define SUBTOUR_ELIM_SIDE    0
-#define SUBTOUR_ELIM_ACROSS  1
-#define SUBTOUR_ELIM         2
-#define CLIQUE               3
-#define FLOW_CAP             4
-#define X_CUT                5
-#define TIGHT_FLOW           6
-#define MIXED_DICUT          7
+#define SUBTOUR_ELIM_SIDE       0
+#define SUBTOUR_ELIM_ACROSS     1
+#define SUBTOUR_ELIM            2
+#define CLIQUE                  3
+#define FLOW_CAP                4
+#define X_CUT                   5
+#define TIGHT_FLOW              6
+#define MIXED_DICUT             7
+#define OPTIMALITY_CUT_FIXED    8
+#define OPTIMALITY_CUT_VARIABLE 9
 
 /*---------------- tsp cut routines -----------------------------------------*/
 

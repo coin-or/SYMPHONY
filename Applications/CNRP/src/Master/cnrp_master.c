@@ -517,6 +517,7 @@ int user_send_lp_data(void *user, void **user_lp)
    cnrp_lp->utopia_fixed = cnrp->utopia_fixed;
    cnrp_lp->utopia_variable = cnrp->utopia_variable;
    cnrp_lp->variable_cost = cnrp_lp->fixed_cost = MAXDOUBLE;
+   cnrp_lp->ub = cnrp->ub;
 
    if (cnrp->par.prob_type == VRP || cnrp->par.prob_type == TSP ||
        cnrp->par.prob_type == BPP){
@@ -548,6 +549,7 @@ int user_send_lp_data(void *user, void **user_lp)
    }
    send_dbl_array(cnrp->utopia_fixed, 1);
    send_dbl_array(cnrp->utopia_variable, 1);
+   send_dbl_array(cnrp->ub, 1);
 #endif
 
    return(USER_SUCCESS);
@@ -732,6 +734,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 {
    cnrp_problem *cnrp = (cnrp_problem *)user;
    _node *tour = cnrp->cur_tour->tour;
+   int *tree = cnrp->cur_sol_tree, node, prev_node;
    int cur_vert = 0, prev_vert = 0, cur_route, i, count;
    elist *cur_route_start = NULL;
    edge *edge_data;
@@ -741,30 +744,32 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    int vertnum = cnrp->vertnum, v0, v1;
    int total_edgenum =  vertnum*(vertnum-1)/2;
    network *n;
+
    /* FIXME: This is UGLY! */
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#if (defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)) && \
+   (defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
+      
    problem *p = get_problem_ptr(FALSE);
    cnrp_spec *cnrp_lp = (cnrp_spec *) p->tm->lpp[0]->user;
-#endif
-      
+
    cnrp->fixed_cost = cnrp_lp->fixed_cost;
    cnrp->variable_cost = cnrp_lp->variable_cost;
-   
+
+   tour = cnrp_lp->cur_sol;
+   tree = cnrp_lp->cur_sol_tree;
    printf("\nSolution Found:\n");
 #ifdef ADD_FLOW_VARS
    printf("Solution Fixed Cost: %.1f\n", cnrp->fixed_cost);
    printf("Solution Variable Cost: %.1f\n", cnrp->variable_cost);
 #else
-   printf("Solution Cost: %.0f\n", cnrp->fixed_cost);
+   printf("Solution Cost: %.0f\n", fixed_cost);
 #endif
-
-   return(USER_SUCCESS);
-
-#if 0
-   if (tour && cnrp->cur_tour->cost > (int) objval){
+#else
+   printf("\nSolution Found:\n");
+#endif
+   
+   if (tour){
       node = tour[0].next;
-      
-      printf("\nSolution Found:\n");
       if (tour[0].route == 1)
 	 printf("\n0 ");
       while (node != 0){
@@ -785,17 +790,17 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
       
       if (window){
 	 char name[MAX_NAME_LENGTH] = {"feas_solution"};
-	 disp_cnrp_tour(window, TRUE, name, tour, cnrp->vertnum,
+	 disp_vrp_tour(window, TRUE, name, tour, cnrp->vertnum,
 			cnrp->numroutes, CTOI_WAIT_FOR_CLICK_AND_REPORT);
       }
+      return(USER_SUCCESS);
    }
 
    if (tree){
-      printf("\nSolution Found:\n");
       printf("Edge List:\n");
       for (i = 0; i < vertnum - 1; i++){
 	 BOTH_ENDS(tree[i], &v0, &v1);
-	 printf("%i %i\n", v0, v1);
+	 printf("%i %i\n", v1, v0);
       }
       printf("\n\n");
 
@@ -806,12 +811,11 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 	 display_graph(window, name);
 	 wait_for_click(window, name, CTOI_WAIT_FOR_CLICK_NO_REPORT);
       }
+      return(USER_SUCCESS);
    }
-#endif
 
    /*Otherwise, construct the solution from scratch*/
 
-#if 0
 #ifdef ADD_FLOW_VARS
    n = create_flow_net(indices, values, varnum, lpetol, cnrp->edges,
 		       cnrp->demand, vertnum);
@@ -831,7 +835,6 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    }
    cnrp->fixed_cost = fixed_cost;
    cnrp->variable_cost = variable_cost;
-   printf("\nSolution Found:\n");
 #ifdef ADD_FLOW_VARS
    printf("Solution Fixed Cost: %.1f\n", fixed_cost);
    printf("Solution Variable Cost: %.1f\n", variable_cost);
@@ -915,7 +918,6 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    free_net(n);
 
    return(USER_SUCCESS);
-#endif
 }
    
 /*===========================================================================*/
