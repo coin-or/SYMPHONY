@@ -1818,7 +1818,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 {
    int termcode = 0;   
    double t = 0, inf = SYM_INFINITY;
-   int j;
+   int i, j, k, nonzeros = 0;
 
    if ((!numcols && !numrows) || numcols < 0 || numrows <0){
       printf("sym_load_problem_user():The given problem is empty or incorrect");
@@ -1956,6 +1956,33 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 	 env->mip->matval = value;
 	 env->mip->matind = index;
       }
+   }
+
+   env->mip->row_matbeg = (int *) malloc(ISIZE * (env->mip->m + 1));
+   env->mip->row_matval = (double *) malloc(DSIZE*env->mip->matbeg[env->mip->n]);
+   env->mip->row_matind = (int *)    malloc(ISIZE*env->mip->matbeg[env->mip->n]);
+   env->mip->row_lengths = (int *) malloc(ISIZE*env->mip->m);
+   env->mip->col_lengths = (int *) malloc(ISIZE * env->mip->n);
+
+   nonzeros = 0;
+   for(i = 0; i < env->mip->m; i++){
+      for(j = 0; j < env->mip->n; j++){
+	 for(k = env->mip->matbeg[j]; k < env->mip->matbeg[j+1]; k++){
+	    if(env->mip->matind[k] == i){	   
+	       env->mip->row_matind[nonzeros] = j;
+	       env->mip->row_matval[nonzeros] = env->mip->matval[k];
+	       nonzeros++;	  
+	       break;
+	    }
+	 }
+      } 
+      env->mip->row_matbeg[i+1] = nonzeros;
+      env->mip->row_lengths[i] = env->mip->row_matbeg[i+1] - 
+	env->mip->row_matbeg[i];
+   }
+
+   for(j = 0; j < env->mip->n; j++){
+     env->mip->col_lengths[j] = env->mip->matbeg[j+1] - env->mip->matbeg[j];
    }
       
    /* Start up the graphics window*/
