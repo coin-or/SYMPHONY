@@ -24,6 +24,38 @@
 #include "OsiColCut.hpp"
 
 
+//#############################################################################
+// A couple of helper functions
+// Taken from OsiCpxSolverInterface.cpp.
+//#############################################################################
+
+inline void freeCacheDouble( double*& ptr )
+{
+  if( ptr != NULL )
+    {
+      delete [] ptr;
+      ptr = NULL;
+    }
+}
+
+inline void freeCacheChar( char*& ptr )
+{
+  if( ptr != NULL )
+    {
+      delete [] ptr;
+      ptr = NULL;
+    }
+}
+
+inline void freeCacheMatrix( CoinPackedMatrix*& ptr )
+{
+  if( ptr != NULL )
+    {
+      delete ptr;
+      ptr = NULL;
+    }
+}
+
 /* Default constructor */
 /*===========================================================================*/
 /*===========================================================================*/
@@ -53,6 +85,7 @@ void OsiSymSolverInterface::loadProblem()
 
 void OsiSymSolverInterface::branchAndBound()
 {
+   freeCachedResults();
 
    if (env_->warm_start){
       sym_warm_solve(env_);
@@ -67,9 +100,8 @@ void OsiSymSolverInterface::branchAndBound()
 
 void OsiSymSolverInterface::resolve()
 {
-
+   freeCachedResults();
    sym_warm_solve(env_);
-
 }
 
 /*===========================================================================*/
@@ -672,6 +704,7 @@ int OsiSymSolverInterface::createPermanentCutPools()
 void OsiSymSolverInterface::initialSolve()
 {
 
+   freeCachedResults();
    sym_solve(env_);
 
 }   
@@ -1394,9 +1427,8 @@ int OsiSymSolverInterface::getIterationCount() const
 void OsiSymSolverInterface::setObjCoeff( int elementIndex, 
 					 double elementValue )
 {
-
+   freeCachedData(KEEPCACHED_ROW);
    sym_set_obj_coeff(env_, elementIndex, elementValue);
-
 }
 
 /*===========================================================================*/
@@ -1405,9 +1437,7 @@ void OsiSymSolverInterface::setObjCoeff( int elementIndex,
 void OsiSymSolverInterface::setObj2Coeff( int elementIndex, 
 					 double elementValue )
 {
-
    sym_set_obj2_coeff(env_, elementIndex, elementValue);
-
 }
 
 /*===========================================================================*/
@@ -1416,8 +1446,8 @@ void OsiSymSolverInterface::setObj2Coeff( int elementIndex,
 void OsiSymSolverInterface::setColLower( int elementIndex, 
 					 double elementValue )
 {
+   freeCachedData(KEEPCACHED_ROW);
    sym_set_col_lower(env_, elementIndex, elementValue);
-
 }
 
 /*===========================================================================*/
@@ -1426,8 +1456,8 @@ void OsiSymSolverInterface::setColLower( int elementIndex,
 void OsiSymSolverInterface::setColUpper( int elementIndex, 
 					 double elementValue )
 {
+   freeCachedData(KEEPCACHED_ROW);
    sym_set_col_upper(env_, elementIndex, elementValue);
-
 }
 
 /*===========================================================================*/
@@ -1436,6 +1466,7 @@ void OsiSymSolverInterface::setColUpper( int elementIndex,
 void OsiSymSolverInterface::setRowLower( int elementIndex, 
 					 double elementValue )
 {
+   freeCachedData(KEEPCACHED_COLUMN);
    sym_set_row_lower(env_, elementIndex, elementValue);
 }   
    
@@ -1445,6 +1476,7 @@ void OsiSymSolverInterface::setRowLower( int elementIndex,
 void OsiSymSolverInterface::setRowUpper( int elementIndex, 
 					 double elementValue )
 {
+   freeCachedData(KEEPCACHED_COLUMN);
    sym_set_row_upper(env_, elementIndex, elementValue);
 }
 
@@ -1454,8 +1486,8 @@ void OsiSymSolverInterface::setRowUpper( int elementIndex,
 void OsiSymSolverInterface::setRowType(int index, char sense, 
 				       double rightHandSide, double range)
 {
+   freeCachedData(KEEPCACHED_COLUMN);
    sym_set_row_type(env_, index, sense, rightHandSide, range);
-
 }
 
 /*===========================================================================*/
@@ -1471,6 +1503,7 @@ void OsiSymSolverInterface::setObjSense(double s)
 
 void OsiSymSolverInterface::setColSolution(const double *colsol)
 {
+   freeCachedResults();
    sym_set_col_solution(env_, const_cast<double *>(colsol));
 }
 
@@ -1681,6 +1714,7 @@ CoinWarmStart * OsiSymSolverInterface::getWarmStart() const
 bool OsiSymSolverInterface::setWarmStart(const CoinWarmStart* warmstart)
 {
 
+   freeCachedResults();
    CoinWarmStart * wsC = const_cast<CoinWarmStart*> (warmstart);
    SymWarmStart *symWS = dynamic_cast<SymWarmStart*>(wsC);
    
@@ -1795,48 +1829,36 @@ void OsiSymSolverInterface::gutsOfDestructor()
 
 void OsiSymSolverInterface::freeCachedColRim()
 {   
-   delete [] obj_;
-   delete [] collower_;
-   delete [] colupper_;
-   obj_ = NULL;
-   collower_ = NULL;
-   colupper_ = NULL;
+   freeCacheDouble(obj_);
+   freeCacheDouble(collower_);
+   freeCacheDouble(colupper_);
 }
 
 //-----------------------------------------------------------------------------
 
 void OsiSymSolverInterface::freeCachedRowRim()
 {
-   delete [] rowsense_;
-   delete [] rhs_;
-   delete [] rowrange_;
-   delete [] rowlower_;
-   delete [] rowupper_;
-   rowsense_ = NULL;
-   rhs_ = NULL;
-   rowrange_ = NULL;
-   rowlower_ = NULL;
-   rowupper_ = NULL;
+   freeCacheChar(rowsense_);
+   freeCacheDouble(rhs_);
+   freeCacheDouble(rowrange_);
+   freeCacheDouble(rowlower_);
+   freeCacheDouble(rowupper_);
 }
 
 //-----------------------------------------------------------------------------
 
 void OsiSymSolverInterface::freeCachedMatrix()
 {
-   delete matrixByRow_;
-   delete matrixByCol_;
-   matrixByRow_ = NULL;
-   matrixByCol_ = NULL;
+   freeCacheMatrix(matrixByRow_);
+   freeCacheMatrix(matrixByCol_);
 }
 
 //-----------------------------------------------------------------------------
 
 void OsiSymSolverInterface::freeCachedResults()
 {
-   delete [] colsol_;
-   delete [] rowact_;
-   colsol_ = NULL;
-   rowact_ = NULL;
+   freeCacheDouble(colsol_);
+   freeCacheDouble(rowact_);
 }
 
 //-----------------------------------------------------------------------------
