@@ -12,11 +12,6 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#define COMPILING_FOR_MASTER
-//#define TEST_MULTI_CRITERIA
-//#define TEST_RESOLVE
-//#define TEST_SENS_ANALYSIS
-
 /*===========================================================================*\
  * This file contains the main() for the SYMPHONY generic MIP solver.
  * Note that, if you want to use the OSI SYMPHONY interface, you should set the
@@ -44,91 +39,8 @@ int main(int argc, char **argv)
    /* Find a priori problem bounds */
    si.findInitialBounds();
 
-
-#ifdef TEST_MULTI_CRITERIA
-
-   /* Test for mc.mps */
-   si.setObj2Coeff(1, 1);
-
-   si.setSymParam(OsiSymMultiCriteriaFindNondominatedSolutions, FALSE);
-   
-   /* Solve the multi-criteria problem */
-   si.multiCriteriaBranchAndBound();
-#endif
-   
-#if defined TEST_RESOLVE || defined TEST_WARM_START
-   si.setSymParam(OsiSymKeepWarmStart, TRUE); 
-   si.setSymParam(OsiSymDoReducedCostFixing, FALSE);
-#endif
-
-#if defined TEST_WARM_START
-   /* testing for a generic problem */
-   si.setSymParam(OsiSymFindFirstFeasible, true);
-   si.setSymParam(OsiSymSearchStrategy, DEPTH_FIRST_SEARCH);
-#endif
-
-#if defined TEST_SENS_ANALYSIS
-   si.setSymParam(OsiSymSensitivityAnalysis, TRUE);
-#endif
-
-#ifndef TEST_MULTI_CRITERIA
+   /* Solve the problem */
    si.branchAndBound();
-
-   if(si.isIterationLimitReached()){
-      cout<<"Node Limit Reached!"<<endl;
-   }
-   if(si.isProvenOptimal()){
-      cout<<"Optimal Solution Found!"<<endl;
-   }
-#endif
-
-#ifdef TEST_RESOLVE
-   /* test for MIPLIB's p0201 */
-   si.setObjCoeff(0, 100);
-   si.setObjCoeff(200, 150);
-
-   printf("RESOLVING...\n");
-   si.resolve();
-#endif
-
-#ifdef TEST_WARM_START
-   /* test for a generic problem */
-   CoinWarmStart * sWS = si.getWarmStart();
-   si.setSymParam(OsiSymFindFirstFeasible, false);
-   printf("SOLVING THE ORIGINAL PROBLEM TO OPTIMALITY\n"); 
-   si.resolve();
-   printf("WARMSTARTING...\n");   
-   si.setSymParam(OsiSymSearchStrategy, BEST_FIRST_SEARCH);
-   si.setWarmStart(sWS);
-   si.resolve();
-#endif
-
-#ifdef TEST_SENS_ANALYSIS
-
-   /* test for MIPLIB's flugpl */
-   int cnt = 2;
-   int * ind = (int*) malloc(ISIZE*cnt);
-   double * val = (double*) malloc (DSIZE*cnt); 
-   double lb;
-   double ub;
-
-   ind[0] = 4;  val[0] = 7000;
-   ind[1] = 7;  val[1] = 6000;
-
-   //   lb = si.getLbForNewRhs(cnt, ind, val);
-   ub = si.getUbForNewRhs(cnt, ind, val);
-
-   //   printf("LB obtained for new rhs problem: %f \n\n\n",lb);
-   printf("UB obtained for new rhs problem: %f \n\n\n",ub);
-
-
-   lb = si.getLbForNewObj(cnt, ind, val);
-   ub = si.getUbForNewObj(cnt, ind, val);
-      
-   printf("LB obtained for new obj problem: %f \n\n\n",lb);
-   printf("UB obtained for new obj problem: %f \n\n\n",ub);
-	
-#endif
 
    return(0);
 }
