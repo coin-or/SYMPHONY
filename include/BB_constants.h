@@ -98,12 +98,12 @@
 #define NO_DATA_STORED           2
 
 /*----------------- possible stati of a node in the search tree -------------*/
-#define NODE_STATUS__CANDIDATE   0
-#define NODE_STATUS__BRANCHED_ON 1
-#define NODE_STATUS__HELD        2
-#define NODE_STATUS__ROOT        3
-#define NODE_STATUS__PRUNED      4
-
+#define NODE_STATUS__CANDIDATE    0
+#define NODE_STATUS__BRANCHED_ON  1
+#define NODE_STATUS__HELD         2
+#define NODE_STATUS__ROOT         3
+#define NODE_STATUS__PRUNED       4
+#define NODE_STATUS__WARM_STARTED 5
 
 /*------------------------------ not_fixed stati ----------------------------*/
 #define NF_CHECK_ALL             0x00
@@ -122,7 +122,7 @@
 #define INFEASIBLE_HOLD_FOR_NEXT_PHASE  2
 #define OVER_UB_HOLD_FOR_NEXT_PHASE     3
 #define INFEASIBLE_PRUNED               4
-#define FEASIBLE_PRUNED                  5
+#define FEASIBLE_PRUNED                 5
 #define OVER_UB_PRUNED                  6
 #define DISCARDED_NODE                  7
 #define REPRICED_NODE                   8
@@ -461,6 +461,12 @@
 #define KEEP_THIS_CHILD             2
 #define PRUNE_THIS_CHILD_FATHOMABLE 3
 
+/*SensAnalysis*/
+/*to be used to differentiate the fathomed nodes */
+#define PRUNE_THIS_CHILD_INFEASIBLE 4
+/*SensAnalysis */
+
+
 /*--------------------- shall_we_branch defaults ----------------------------*/
 #define USER__DO_NOT_BRANCH      0
 #define USER__DO_BRANCH          1
@@ -526,4 +532,15 @@
 #define DELETE_DUPLICATES                 2
 #define DELETE_DUPLICATE_AND_INEFFECTIVE  2
 
+
+
+/*--------------- parameter values for restart/sens analysis ----------------*/
+
+#define NOTHING_CHANGED                   0
+#define RHS_CHANGED                       1
+#define OBJ_COEFF_CHANGED                 2
+#define CONSTRAINT_MATRIX_CHANGED         3 
+#define COL_BOUNDS_CHANGED                4  
+#define OBJ_SENSE_CHANGED                 5
+#define RHS_SENSE_CHANGED                 6 
 #endif

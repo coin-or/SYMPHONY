@@ -590,15 +590,15 @@ void print_tree_status(tm_prob *tm)
    printf("\nCurrent number of candidate nodes: %i\n", tm->samephase_candnum);
    if (tm->has_ub){
       if (tm->lpp[0]->mip->obj_sense == MAXIMIZE){
-	 printf("Current lower bound:               %.2f\n", -tm->ub);
-      }else{
 	 printf("Current upper bound:               %.2f\n", tm->ub);
+      }else{
+	 printf("Current lower bound:               %.2f\n", -tm->ub);
       }
    }else{
       if (tm->lpp[0]->mip->obj_sense == MAXIMIZE){
-	 printf("No lower bound found yet...\n");
-      }else{
 	 printf("No upper bound found yet...\n");
+      }else{
+	 printf("No lower bound found yet...\n");
       }
    }
    if (tm->samephase_candnum == 0){
@@ -613,9 +613,9 @@ void print_tree_status(tm_prob *tm)
       tm->lb = tm->ub;
    }
    if (tm->lpp[0]->mip->obj_sense == MAXIMIZE){
-      printf("Current upper bound:               %.2f\n", -tm->lb);
-   }else{
       printf("Current lower bound:               %.2f\n", tm->lb);
+   }else{
+      printf("Current upper bound:               %.2f\n", -tm->lb);
    }
       
    if (tm->has_ub && tm->ub){
@@ -681,6 +681,10 @@ int start_node(tm_prob *tm, int thread_num)
       if ((best_node = del_best_node(tm)) == NULL)
 	 return(NEW_NODE__NONE);
 
+      if(best_node->node_status == NODE_STATUS__WARM_STARTED){
+	 break;
+      }
+
       /* if no UB yet or lb is lower than UB then go ahead */
       if (!tm->has_ub ||
 	  (tm->has_ub && best_node->lower_bound < tm->ub-tm->par.granularity))
@@ -690,6 +694,7 @@ int start_node(tm_prob *tm, int thread_num)
       switch (((best_node->desc.nf_status) << 8) + tm->phase){
        case (NF_CHECK_NOTHING << 8) + 0: /* prune these */
        case (NF_CHECK_NOTHING << 8) + 1:
+#ifdef TEST_SENS_ANALYSIS //FIX_ME-menal
 	 if (tm->par.max_cp_num > 0 && best_node->cp){
 #ifdef COMPILE_IN_CP
 	    ind = best_node->cp;
@@ -709,10 +714,16 @@ int start_node(tm_prob *tm, int thread_num)
 	 }
 	 /*___END_EXPERIMENTAL_SECTION___*/
 	 best_node->node_status = NODE_STATUS__PRUNED;
+
+	 /* SensAnalysis */
+	 best_node->feasibility_status = OVER_UB_PRUNED;
+	 /* SensAnalysis */
+
 	 if (tm->par.verbosity > 0){
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    printf("+ TM: Pruning NODE %i LEVEL %i instead of sending it.\n",
 		   best_node->bc_index, best_node->bc_level);
+	    printf("objval: %f\n",best_node->lower_bound);
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 }
 	 if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL ||
@@ -722,7 +733,7 @@ int start_node(tm_prob *tm, int thread_num)
 	    purge_pruned_nodes(tm, best_node, VBC_PRUNED);
 	 }
 	 break;
-
+#endif
        case (NF_CHECK_ALL            << 8) + 1: /* work on these */
        case (NF_CHECK_UNTIL_LAST     << 8) + 1:
        case (NF_CHECK_AFTER_LAST     << 8) + 1:
@@ -963,7 +974,8 @@ int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
 
 int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		      double *objval, int *feasible, char *action,
-		      char olddive, int *keep, int new_branching_cut)
+		      char olddive, int *keep, int new_branching_cut,
+		      double **solution, double **duals) /* SensAnalysis */
 {
    node_desc *desc;
    int np_cp = 0, np_sp = 0;
@@ -1027,6 +1039,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #ifndef ROOT_NODE_ONLY
       if (action[i] == PRUNE_THIS_CHILD ||
 	  action[i] == PRUNE_THIS_CHILD_FATHOMABLE ||
+	  action[i] == PRUNE_THIS_CHILD_INFEASIBLE ||  /* SensAnalysis */	  
 	  (tm->has_ub && tm->ub - tm->par.granularity < objval[i] &&
 	   node->desc.nf_status == NF_CHECK_NOTHING)){
 	 /* this last can happen if the TM got the new bound but it hasn't
@@ -1138,7 +1151,31 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       desc->desc_size = node->desc.desc_size;
       desc->desc = node->desc.desc;
       desc->nf_status = node->desc.nf_status;
+
+      /*SensAnalysis*/
+      child->sol = 
+	 (double *) malloc (DSIZE * tm->rootnode->desc.uind.size);
+      memcpy(child->sol, solution[i], sizeof(double)*
+	     tm->rootnode->desc.uind.size);
+
+      child->duals = 
+	 (double *) malloc (DSIZE * tm->rootnode->desc.uind.size);
+      memcpy(child->duals, duals[i], DSIZE*tm->rootnode->desc.uind.size);
+
       if (child->node_status == NODE_STATUS__PRUNED){
+	 if(feasible[i] || action[i]==PRUNE_THIS_CHILD_FATHOMABLE){
+	    if(feasible[i]){
+	       child->feasibility_status = FEASIBLE_PRUNED;	   	    
+	    }
+	    else{
+	       child->feasibility_status = OVER_UB_PRUNED;
+	    }
+	 }	 
+	 if(action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
+	    child->feasibility_status = INFEASIBLE_PRUNED;	   
+	 }
+	 /*SensAnalysis*/
+
 #ifdef TRACE_PATH
 	 if (child->optimal_path){
 	    printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
@@ -2551,6 +2588,7 @@ int read_node(tm_prob *tm, bc_node *node, FILE *f, int **children)
     case NODE_STATUS__ROOT:
       tm->rootnode = node;
       break;
+    case NODE_STATUS__WARM_STARTED:
     case NODE_STATUS__CANDIDATE:
 #pragma omp critical (tree_update)
       insert_new_node(tm, node);
@@ -2894,10 +2932,20 @@ void free_tm(tm_prob *tm)
    FREE(tm->tmp.i);
    FREE(tm->tmp.c);
    FREE(tm->tmp.d);
+
+   /* SensAnalysis */
+   /*get rid of the added pointers for sens.analysis*/
+   int j,k;
    for (i = 0; i < num_threads; i++){
-      FREE(tm->rpath[i]);
+   /* SensAnalysis */ 
+      if(tm->rpath[i])
+	 if(tm->rpath[i][0])
+	    tm->rpath[i][0] = NULL;
+      /* SensAnalysis */
       FREE(tm->bpath[i]);
+      FREE(tm->rpath[i]);
    }
+
    FREE(tm->rpath);
    FREE(tm->rpath_size);
    FREE(tm->bpath);
@@ -2923,6 +2971,11 @@ void free_subtree(bc_node *n)
 
 void free_tree_node(bc_node *n)
 {
+   /* SensAnalysis */
+   FREE(n->sol);
+   FREE(n->duals);
+   /*SensAnalysis*/
+
    FREE(n->children);
 #ifndef MAX_CHILDREN_NUM
    FREE(n->bobj.sense);

@@ -312,6 +312,16 @@ typedef struct BC_NODE{
    node_desc  desc;          /* the description of the node,
 			       defined in "BB_types.h" */
    char       node_status;
+
+   /*SensAnalysis*/
+   int          feasibility_status;  
+   double       *sol;
+   double       *duals;
+   double       C_LP;
+   double       B_IP;
+   /*SensAnalysis*/
+
+
 #ifdef TRACE_PATH
    char       optimal_path;
 #endif 
@@ -361,6 +371,7 @@ typedef struct WARM_START_DESC{
    double         lb;
    char           has_ub;
    double         ub;
+   lp_sol         best_sol;
 }warm_start_desc;
 
 #endif

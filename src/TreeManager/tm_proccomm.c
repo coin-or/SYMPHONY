@@ -411,6 +411,9 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
    }
    
 #ifdef COMPILE_IN_LP
+
+   /* SensAnalysis */
+# if 0
    
    /* Again, here, we need to do some things directly if the LP
       function is being performed within the tree manager. Otherwise,
@@ -444,6 +447,10 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
 	 return;
       }
    }
+
+#endif 
+
+   /* SensAnalysis */
 
    new_desc = lp[thread_num]->desc = (node_desc *) calloc(1,sizeof(node_desc));
 
@@ -715,6 +722,12 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    char olddive, dive;
    int new_branching_cut = FALSE, lp;
 
+
+   /* SensAnalysis */
+   double **solution = NULL;
+   double **duals = NULL;
+   /* SensAnalsysis */
+
    receive_char_array(&bobj->type, 1);
    receive_int_array(&bobj->name, 1);
    if (bobj->type == CANDIDATE_CUT_IN_MATRIX){
@@ -751,8 +764,10 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    oldkeep = keep;
    lp = node->lp;
    
+   /*SensAnalysis */
    dive = generate_children(tm, node, bobj, objval, feasible, action, olddive,
-			    &keep, new_branching_cut);
+			    &keep, new_branching_cut, solution, duals); 
+   /*SensAnalysis */
 
    if (oldkeep >= 0 && (olddive == CHECK_BEFORE_DIVE || olddive == DO_DIVE)){
       /* We have to reply */

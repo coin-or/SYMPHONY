@@ -302,7 +302,7 @@ int create_subproblem_u(lp_prob *p)
 						 p->mip->obj2[userind[i]]);
 	 lp_data->mip->matval[j] = p->par.gamma * p->mip->obj[userind[i]];
 	 lp_data->mip->matind[j++] = bcutnum - 2;
-	 lp_data->mip->matval[j] = p->par.tau * p->mip->obj2[userind[i]];
+	 lp_data->mip->matval[j] = p->par.tau * p->mip->obj[userind[i]];
 	 lp_data->mip->matind[j++] = bcutnum - 1;
 #else
 	 lp_data->mip->obj[i]        = p->par.gamma * p->mip->obj[userind[i]] +
@@ -631,7 +631,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	 p->ub = new_ub;
 	 if (p->par.set_obj_upper_lim)
 	    set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
-#if !defined(MULTI_CRITERIA) || !defined(FIND_NONDOMINATED_SOLUTIONS)
+#if !defined(MULTI_CRITERIA)
 	 p->best_sol.xlevel = p->bc_level;
 	 p->best_sol.xindex = p->bc_index;
 	 p->best_sol.xiter_num = p->iter_num;
@@ -1244,8 +1244,20 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
    for (ind = -1, i = 0; i < can->child_num; i++){
       action[i] = RETURN_THIS_CHILD;
       if (p->lp_data->nf_status == NF_CHECK_NOTHING && p->has_ub){
- 	    if (can->objval[i] > p->ub - p->par.granularity)
+	 if (can->objval[i] > p->ub - p->par.granularity){
+	    //action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
+	    /* SensAnalysis */
+	    /*see which one is infeasible!*/
+	    if(can->termcode[i] == LP_OPTIMAL || 
+	       can->termcode[i] == LP_D_ITLIM || 
+	       can->termcode[i] == LP_OPT_FEASIBLE||
+	       can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE){	       
 	       action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
+	    }else{
+	       action[i] = PRUNE_THIS_CHILD_INFEASIBLE;
+	    /* SensAnalysis */
+	    }
+	 }
       }
    }
 

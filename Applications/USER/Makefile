@@ -48,7 +48,7 @@ COMPILE_IN_CG = TRUE
 COMPILE_IN_CP = TRUE
 
 ##############################################################################
-# If you wish to compile and use the SYMPHONY callable library therough the 
+# If you wish to compile and use the SYMPHONY callable library through the 
 # SYMPHONY OSI interface, set USE_OSI_INTERFACE to TRUE below. Note that
 # you must have COIN installed to use this capability. See the main SYMPHONY
 # Makefile to set the path to the COIN directories.
@@ -60,7 +60,7 @@ USE_OSI_INTERFACE = TRUE
 # These variables have to do with the multicriteria solver
 ##############################################################################
 
-MULTI_CRITERIA = TRUE
+MULTI_CRITERIA = FALSE
 LIFO = FALSE
 FIND_NONDOMINATED_SOLUTIONS = TRUE
 BINARY_SEARCH = FALSE

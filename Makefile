@@ -788,7 +788,7 @@ CFLAGS = $(DEFAULT_FLAGS) $(MORECFLAGS) $(MOREFLAGS)
 ##############################################################################
 ##############################################################################
 
-MASTER_SRC	= master.c master_wrapper.c master_io.c
+MASTER_SRC	= master.c master_wrapper.c master_io.c master_func.c
 ifeq ($(USE_OSI_INTERFACE),TRUE)
 MASTER_SRC     += OsiSymSolverInterface.c SymWarmStart.c
 endif

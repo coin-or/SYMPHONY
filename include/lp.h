@@ -206,7 +206,9 @@ void add_slacks_to_matrix PROTO((lp_prob *p, int cand_num,
 int add_violated_slacks PROTO((lp_prob *p, int cand_num,
 			       branch_obj **candidates));
 int select_branching_object PROTO((lp_prob *p, int *cuts,
-				   branch_obj **can));
+				   branch_obj **can, double ***solution, 
+				   double ***duals));
+/* SensAnalysis */
 int branch PROTO((lp_prob *p, int cuts));
 int col_gen_before_branch PROTO((lp_prob *p, int *new_vars));
 
@@ -241,8 +243,11 @@ char pack_extra_diff PROTO((array_desc *olddesc, int *oldstat,
 			    array_desc *newdesc, int *newstat,
 			    char oldbasis_type_in_tm, char newdesc_type_in_tm,
 			    int *itmp, int *size));
-void send_branching_info PROTO((lp_prob *p,
-				branch_obj *can, char *action, int *keep));
+void send_branching_info PROTO((lp_prob *p, branch_obj *can, char *action, 
+				int *keep, double **solution, 
+				double **duals)); 
+/*SensAnalysis */
+				
 void send_lp_is_free PROTO((lp_prob *p));
 void send_cuts_to_pool PROTO((lp_prob *p, int eff_cnt_limit));
 

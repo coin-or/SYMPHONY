@@ -112,8 +112,11 @@ int add_violated_slacks(lp_prob *p, int cand_num, branch_obj **candidates)
 
 /*===========================================================================*/
 
-int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
+int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate, 
+			    double ***solution, double ***duals)
 {
+   /* SensAnalysis*/
+
    LPdata *lp_data = p->lp_data;
    var_desc **vars;
    row_data *rows;
@@ -237,6 +240,19 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
    /* Look at the candidates one-by-one and presolve them. */
    oldobjval = lp_data->objval;
+
+
+   /* SensAnalysis */
+#ifndef MAX_CHILDREN_NUM
+   *solution = (double **) malloc (maxnum * sizeof(double *));
+   *duals = (double **) malloc (maxnum * sizeof(double *));
+#else
+   *solution = (double **) malloc (MAX_CHILDREN_NUM * sizeof(double *));
+   *duals = (double **) malloc (MAX_CHILDREN_NUM * sizeof(double *));
+
+#endif
+   /* SensAnalysis */
+
    for (i=0; i<cand_num; i++){
 
       can = candidates[i];
@@ -290,6 +306,20 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    /* The original basis is in lp_data->lpbas */
 	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
 	    can->objval[j] = lp_data->objval;
+
+	    /* SensAnalysis */
+	    get_x(lp_data);
+	    get_dj_pi(lp_data);
+
+	    (*solution)[j] = (double *)malloc(DSIZE*lp_data->n);
+	    (*duals)[j]=(double *)malloc(DSIZE*p->base.cutnum);
+
+	    memcpy((*solution)[j], lp_data->x, DSIZE*lp_data->n);
+	    memcpy((*duals)[j], lp_data->dualsol, DSIZE*p->base.cutnum);
+
+	    /* SensAnalysis */
+
+
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
 	       switch (is_feasible_u(p, TRUE)){
@@ -356,6 +386,19 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    /* The original basis is in lp_data->lpbas */
 	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
 	    can->objval[j] = lp_data->objval;
+
+	    /* SensAnalysis */
+	    get_x(lp_data);
+	    get_dj_pi(lp_data);
+
+	    (*solution)[j] = (double *)malloc(DSIZE*p->desc->uind.size);
+	    (*duals)[j]=(double *)malloc(DSIZE*p->base.cutnum);
+
+	    memcpy((*solution)[j], lp_data->x, DSIZE*p->desc->uind.size);
+	    memcpy((*duals)[j], lp_data->dualsol, DSIZE*p->base.cutnum);
+
+	    /* SensAnalysis */
+
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
 	       switch (is_feasible_u(p, TRUE)){
@@ -517,9 +560,13 @@ int branch(lp_prob *p, int cuts)
    cut_data *cut;
    node_desc *desc;
    int termcode;
-   
-   termcode = select_branching_object(p, &cuts, &can);
 
+   /* SensAnalysis */
+   double **solution;
+   double **duals;
+ 
+   termcode = select_branching_object(p, &cuts, &can, &solution, &duals);
+  /* SensAnalysis */
    if (termcode == ERROR__NO_BRANCHING_CANDIDATE){
       return(termcode);
    }
@@ -549,7 +596,9 @@ int branch(lp_prob *p, int cuts)
    /* Send the branching information to the TM and inquire whether we
       should dive */
    p->comp_times.strong_branching += used_time(&p->tt);
-   send_branching_info(p, can, action, &keep);
+   /* SensAnalysis */
+   send_branching_info(p, can, action, &keep, solution, duals);
+   /* SensAnalysis */
    p->comp_times.communication += used_time(&p->tt);
 
    /* If we don't dive then return quickly */

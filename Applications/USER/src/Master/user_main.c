@@ -13,6 +13,7 @@
 /*===========================================================================*/
 
 #define COMPILING_FOR_MASTER
+#define TEST_RESOLVE
 
 /*===========================================================================*/
 
@@ -20,13 +21,14 @@
  * This file contains the main() for the SYMPHONY generic MIP solver.
 \*===========================================================================*/
 
-#if 1
-
 #include "OsiSymSolverInterface.hpp"
 
 int main(int argc, char **argv)
 {
-   OsiSymSolverInterface si;
+
+
+  OsiSymSolverInterface si;
+   //si.setSymParam(OsiSymVerbosity, -1);
 
    /* Parse the command line */
    si.parseCommandLine(argc, argv);
@@ -37,24 +39,67 @@ int main(int argc, char **argv)
    /* Find a priori problem bounds */
    si.findInitialBounds();
 
-   //si.setSymParam(OsiSymNodeLimit, 10);
-
 #ifdef MULTI_CRITERIA
 
-   //si.setObj2Coeff(81, 10000);
+   //si.setObj2Coeff(0, 1000);
    
    /* Solve the multi-criteria problem */
    si.MCBranchAndBound();
 #else
-   /* Solve the problem */
+
+#if defined TEST_RESOLVE || defined TEST_SENS_ANALYSIS || \
+   defined TEST_WARM_START
+   si.setSymParam(OsiSymKeepDescOfPruned, 3); //level 3: KEEP_IN_MEMORY
+#endif
+
+#if defined TEST_WARM_START
+   si.setSymParam(OsiSymNodeLimit, 5);
+#endif
+
+   si.branchAndBound();
+
+#ifdef TEST_RESOLVE
+   si.setSymParam(OsiSymWarmStart, TRUE);    
+
+   /* test for flugpl */
+   si.setObjCoeff(0, 2000);
+   si.setObjCoeff(1, 1400);
+   si.setObjCoeff(3, 2000);
+   si.setObjCoeff(6, 2000);
+   si.setObjCoeff(13, 1000);
+   si.setObjCoeff(17, 40);
+
+   printf("RESOLVING...\n");
+   si.resolve();
+#endif
+
+#ifdef TEST_WARM_START
+   CoinWarmStart * sWS = si.getWarmStart();
+   si.setWarmStart(sWS);
+   si.setSymParam(OsiSymNodeLimit, 100);
    si.branchAndBound();
 #endif
+
+#ifdef TEST_SENS_ANALYSIS
+
+   /* test for flugpl */
+   int cnt = 2;
+   int * ind = (int*) malloc(ISIZE*cnt);
+   double * val = (double*) malloc (DSIZE*cnt); 
+   double lb;
    
+   ind[0] = 1;  val[0] = 6000;
+   ind[1] = 4;  val[1] = 8000;
+   lb = si.getLbForNewRhs(cnt, ind, val);
+	
+   printf("LB obtained for new rhs problem: %f \n\n\n",lb);
+		      
+#endif
+#endif
    return(0);
 }
 
-#else
-
+#if 0
 #include "master.h"
 
 int main(int argc, char **argv)

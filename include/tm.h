@@ -149,7 +149,9 @@ int assign_pool PROTO((tm_prob *tm, int oldpool, process_set *pools,
 		       int *active_nodes_per_pool, int *nodes_per_pool));
 int generate_children PROTO((tm_prob *tm, bc_node *node, branch_obj *bobj,
 			     double *objval, int *feasible, char *action,
-			     char olddive, int *keep, int new_branching_cut));
+			     char olddive, int *keep, int new_branching_cut,
+			     double **solution, 
+			     double **duals)); /* SensAnalysis */
 char shall_we_dive PROTO((tm_prob *tm, double objval));
 int purge_pruned_nodes PROTO((tm_prob *tm, bc_node *node, int category));
 int find_process_index PROTO((process_set *pset, int tid));

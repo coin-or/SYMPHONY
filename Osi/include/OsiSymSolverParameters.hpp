@@ -22,7 +22,8 @@ enum OsiSymIntParam {
    OsiSymWarmStart,
    OsiSymNodeLimit,
    OsiSymFindFirstFeasible,
-   OsiSymUsePermanentCutPools
+   OsiSymUsePermanentCutPools,
+   OsiSymKeepDescOfPruned
 };
 
 enum OsiSymDblParam {

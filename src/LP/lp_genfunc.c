@@ -261,6 +261,10 @@ int fathom_branch(lp_prob *p)
       get_dj_pi(lp_data);
       get_slacks(lp_data);
 
+      /* SensAnalysis */
+      get_x(lp_data);
+      /* SensAnalysis */
+
       /* display the current solution */
       if (p->mip->obj_sense == MAXIMIZE){
 	 PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
@@ -403,7 +407,7 @@ int fathom_branch(lp_prob *p)
       switch (cuts = branch(p, cuts)){
 
        case NEW_NODE:
-#ifndef ROOT_NODE_ONLY
+#ifndef ROOT_NODEONLY
 	 if (p->par.verbosity > 0){
 	    printf("*************************************************\n");
 	    printf("* Now processing NODE %i LEVEL %i\n",

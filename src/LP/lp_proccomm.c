@@ -516,6 +516,20 @@ void send_node_desc(lp_prob *p, char node_type)
    bc_node *n = repricing ? (bc_node *) calloc(1, sizeof(bc_node)) :
       tm->active_nodes[p->proc_index];
    node_desc *tm_desc = &n->desc;
+
+   /* SensAnalysis */
+   if(n->sol){
+      FREE(n->sol);
+      FREE(n->duals);
+   }
+   n->sol = (double *) malloc (DSIZE * p->desc->uind.size);
+   memcpy(n->sol, lp_data->x, sizeof(double)*p->desc->uind.size);
+   
+   n->duals = (double *) malloc (DSIZE * p->base.cutnum);
+   memcpy(n->duals, lp_data->dualsol, sizeof(double)*p->base.cutnum);
+   
+   /* SensAnalysis */
+   
 #else
    int s_bufid;
 #endif
@@ -524,6 +538,22 @@ void send_node_desc(lp_prob *p, char node_type)
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
        node_type == DISCARDED_NODE || node_type == FEASIBLE_PRUNED){
       n->node_status = NODE_STATUS__PRUNED;
+
+      /* SensAnalysis */      
+      if (node_type == INFEASIBLE_PRUNED || node_type == DISCARDED_NODE){
+	 n->feasibility_status = INFEASIBLE_PRUNED;      
+      }
+      if(node_type == FEASIBLE_PRUNED) {
+	 n->feasibility_status = FEASIBLE_PRUNED;      
+      }
+      if( node_type == OVER_UB_PRUNED ){
+	 n->feasibility_status = OVER_UB_PRUNED;      
+      }
+
+      /* SensAnalysis */
+
+
+
 #ifdef TRACE_PATH
       if (n->optimal_path){
 	 printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
@@ -1222,7 +1252,9 @@ char pack_extra_diff(array_desc *olddesc, int *oldstat,
    
 /*===========================================================================*/
 
-void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
+void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep, 
+			 double **solution, double **duals)   
+     /*SensAnalysis */
 {
    LPdata *lp_data = p->lp_data;
 #ifndef COMPILE_IN_LP
@@ -1266,7 +1298,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 #endif
       
    dive = generate_children(tm, node, bobj, can->objval, can->feasible,
-			    action, dive, keep, i);
+			    action, dive, keep, i, solution, duals); /* SensAnalysis */
 
    if (*keep >= 0 && (p->dive == CHECK_BEFORE_DIVE || p->dive == DO_DIVE)){
       *can = node->bobj;
@@ -1403,6 +1435,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 	 PRINT(p->par.verbosity, 2, ("child %i is pruned by rule\n", i));
 	 break;
        case PRUNE_THIS_CHILD_FATHOMABLE:
+       case PRUNE_THIS_CHILD_INFEASIBLE: /* SensAnalysis */
 	 PRINT(p->par.verbosity, 2, ("child %i is fathomed [%i, %i]\n",
 				     i, can->termcode[i], can->iterd[i]));
 	 break;

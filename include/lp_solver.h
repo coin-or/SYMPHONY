@@ -19,6 +19,7 @@
 #include "BB_types.h"
 
 #define LP_MAX_ITER 9999999
+#define MAX_CHANGE_NUM 6  /* SensAnalysis */
 
 #ifdef __CPLEX__
 
@@ -62,7 +63,7 @@ void OSL_check_error PROTO((const char *erring_func));
 #include "CglKnapsackCover.hpp"
 #include "CglProbing.hpp"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#include "CglFlowCover.hpp"
+//#include "CglFlowCover.hpp"
 /*___END_EXPERIMENTAL_SECTION___*/
 #endif
 
@@ -163,8 +164,12 @@ typedef struct MIPDESC{
    double    *lb;          /* n */
    double    *ub;          /* n */
    char     **colname;     /* column names */
-   double     obj_offset;  /* constant to be added to the objective function. */
+   double     obj_offset;  /* constant to be added to the objective function.*/
    char       obj_sense;   /* objective sense. */
+
+   int        change_num;  /* number of updates on the mip desc */
+   int        change_type[MAX_CHANGE_NUM];  /* type of the mip desc. changes */
+
 }MIPdesc;
 
 /* The LP solver data */

@@ -53,19 +53,20 @@ class OsiSymSolverInterface : public OsiSolverInterface {
 public:
    ///@name Solve methods 
    //@{
-   /// Solve initial LP relaxation 
+   /// Solve initial LP relaxation
    virtual void initialSolve();
-   /// Resolve an LP relaxation after problem modification
-   virtual void resolve(){
-      throw CoinError("Error: SYMPHONY is only meant to solve MIPs, not LPs",
-		       "resolve", "OsiSymSolverInterface");
-    };
+   /// Resolve an IP problem modification
+   virtual void resolve();
+   /// Invoke solver's built-in enumeration algorithm
+   virtual void branchAndBound();
+   
+   /// Invoke solver's multi-criteria enumeration algorithm
+   virtual void MCBranchAndBound();
 
-    /// Invoke solver's built-in enumeration algorithm
-    virtual void branchAndBound();
+   /// Get a lower bound for the new rhs problem using the warm start tree.
+   virtual double getLbForNewRhs(int cnt, int *index, 
+				 double * value);
 
-    /// Invoke solver's multi-criteria enumeration algorithm
-    virtual void MCBranchAndBound();
   //@}
 
   //---------------------------------------------------------------------------
@@ -480,6 +481,9 @@ public:
       /** Set the index-th variable to be an integer variable */
    virtual void setInteger(int index);
 
+
+   virtual void setColName(char **colname);
+
     //@}
     //-------------------------------------------------------------------------
     
@@ -628,10 +632,7 @@ public:
       The result of calling clone(false) is defined to be equivalent to
       calling the default constructor OsiSolverInterface().
     */
-    virtual OsiSolverInterface * clone(bool copyData = true) const{
-       throw CoinError("Error: Function not implemented",
-		       "clone", "OsiSymSolverInterface");
-    };
+   virtual OsiSolverInterface * clone(bool copyData = true) const;
   
     /// Copy constructor 
     OsiSymSolverInterface(const OsiSolverInterface &);
@@ -656,6 +657,7 @@ public:
 protected:
   ///@name Protected methods
   //@{
+#ifdef USE_CGL_CUTS
     /** Apply a row cut (append to the constraint matrix). */
    virtual void applyRowCut( const OsiRowCut & rc );
 
@@ -668,6 +670,10 @@ protected:
       OsiSolverInterface object when the object is created using the
       default constructor.
     */
+#else
+   virtual void applyRowCut( const OsiRowCut & rc ){}
+   virtual void applyColCut( const OsiColCut & cc ){}
+#endif
     void setInitialData();
   //@}
 
