@@ -1,5 +1,6 @@
 
 \subsection{C Interface}
+\label{C_Interface}
 
 %begin{description}
 \bd
@@ -115,8 +116,11 @@ This routine is used to set the user problem structure of the environment.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment.\\
-{\tt int argc} & IN & The number of command line arguments. \\
-{\tt char **argv} & IN & Array of pointers to these arguments. 
+{\tt void *user} & IN & Pointer to the user defined problem structure. 
+SYMPHONY, instead of making a copy or overriding, will directly use the 
+object itself, thus, any later modification on the object will be known unless
+its location is changed. 
+
 \et
 
 \returns
@@ -176,8 +180,8 @@ int sym_find_initial_bounds(sym_environment *env)
 \bd
 \describe
 
-This routine attempts to find lower and upper bounds for the problem through
-the user defined heuristics in {\tt start\_heurs\_u} user callback. 
+This routine attempts to find bounds for the problem through
+the user defined heuristics if loaded to {\tt start\_heurs\_u} user callback. 
 
 \args
 
@@ -208,32 +212,12 @@ int sym_solve(sym_environment *env)
 \bd
 \describe
 
-This routine solves the corresponding MILP problem. 
-It may also be used to continue solving a problem stopped for modification 
-of some parameters.In this case, SYMPHONY should know that the warm start 
-structure constructed during the solution of the original problem 
-is going to be used. Thus, ``warm\_start'' parameter should have been set to 
-true before solving from where it was left off. For instance:
-
-\begin{verbatim}
-...
-sym_set_int_param(env, ``keep_description_of_pruned'', TRUE); 
-sym_set_int_param(env, ``find_first_feasible'', TRUE); 
-sym_set_int_param(env, ``node_selection_strategy'', DEPTH_FIRST_SEARCH); 
-sym_initial_solve(env); 
-sym_set_int_param(env, ``find_first_feasible'', FALSE); 
-sym_set_int_param(env, ``node_selection_strategy'', BEST_FIRST_SEARCH); 
-sym_set_int_param(env, ``warm_start'', TRUE);
-sym_solve(env); 
-... 
-\end{verbatim}
-
-However,  {\tt sym\_resolve} routine should be called if the modification is
-on the problem data. 
-
-Note that, the environment parameter ``keep\_description\_of\_pruned'' should 
-be set to true if it is desired to keep the warm start information for further 
-usage: warm starting, resolving or basic sensitivity analysis.
+This routine solves the corresponding MILP problem from scratch even in the 
+presence of a loaded warm start. Nonetheless, if any parameter or problem data
+has been changed, SYMPHONY will know about those modifications and hence, will
+solve the modified problem instead of the original one. However note that, 
+any warm start information loaded or kept before will be deleted from the 
+environment!
 
 \args
 
@@ -272,97 +256,24 @@ user callbacks called during TM processes. \\
 \ed
 \vspace{1ex}
 
-%%%s%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_initial_solve
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_warm_solve
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{sym\_initial\_solve}
+\functiondef{sym\_warm\_solve}
 \begin{verbatim}
-int sym_initial_solve(sym_environment *env)
-\end{verbatim}
-\bd
-\describe
-
-This routine solves the corresponding MILP problem from scratch even in the 
-presence of a loaded warm start. Nonetheless, SYMPHONY will differantiate 
-the problem data modification and will solve the modified problem (instead of 
-the original problem) from scratch. 
-
-Note that, the environment parameter ``keep\_description\_of\_pruned'' should 
-be set to true if it is desired to keep the warm start information for further 
-usage: warm starting, resolving or basic sensitivity analysis.
-
-\args
-
-\bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment.
-\et
-
-\returns
-
-\bt{lp{317pt}}
-{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_send\_lp\_data}, {\tt user\_send\_cg\_data}, {\tt user\_send\_cp\_data}, 
-{\tt user\_receive\_feasible\_solution}, {\tt user\_display\_solution}, 
-{\tt user\_process\_own\_messages} functions. \\ 
-{\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & Tree Manager (TM) found the optimal solution and stopped.\\ 
-{\tt TM\_TIME\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
-time limit.\\
-{\tt TM\_NODE\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
-node limit. \\
-{\tt TM\_TARGET\_GAP\_ACHIEVED} & TM stopped after achieving the predefined 
-target gap. \\
-{\tt TM\_FOUND\_FIRST\_FEASIBLE} & TM stopped after finding the first feasible 
-solution. \\
-{\tt TM\_ERROR\_\_NO\_BRANCHING\_CANDIDATE} & Error. TM stopped. User didn't 
-select branching candidate in {\tt user\_select\_candidates} callback\\ 
-{\tt TM\_ERROR\_\_ILLEGAL\_RETURN\_CODE} & Error. TM stopped after getting a 
-non-valid return code. \\
-{\tt TM\_ERROR\_\_NUMERICAL\_INSTABILITY} & Error. TM stopped due to some 
-numerical difficulties. \\
-{\tt TM\_ERROR\_\_COMM\_ERROR} & Error. TM stopped due to communication 
-error. \\
-{\tt TM\_ERROR\_\_USER} & Error. TM stopped. User error detected in one of 
-user callbacks called during TM processes. \\
-\et
-\ed
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sym_resolve
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{sym\_resolve}
-\begin{verbatim}
-int sym_resolve(sym_environment *env)
+int sym_warm_solve(sym_environment *env)
 \end{verbatim}
 
 \bd
 \describe
 
-This routine resolves the corresponding modified problem after a warm start 
-has been loaded or necessary parameter or problem data modification is done 
-on the existing warm start structure.  Note that, unless an explicit warm 
-start has been loaded, in order to use this functionality,
-``keep\_description\_of\_pruned''parameter should have been set to true before 
-solving the original problem. This will ask SYMPHONY to keep the necessary 
-warm starting and resolving information. 
-
-%In addition to that, if the resolve process is desired to be 
-%incurred on the warm start structure loaded to the environment
-%during the solution of the original problem, SYMPHONY should know that
-%the warm start structure constructed from the original problem and loaded 
-%by default is going to be used. Thus, ``warm_start'' parameter should have
-%been set to on before resolving. For instance:
-%... \\
-%sym_set_int_param(env, ``keep_description_of_pruned'', TRUE); \\
-%sym_set_int_param(env, ``find_first_feasible'', TRUE); \\
-%sym_set_int_param(env, ``node_selection_strategy'', DEPTH_FIRST_SEARCH); \\
-%sym_initial_solve(env); \\
-%sym_set_int_param(env, ``find_first_feasible'', FALSE); \\
-%sym_set_int_param(env, ``node_selection_strategy'', BEST_FIRST_SEARCH); \\
-%sym_set_int_param(env, ``warm_start'', TRUE);\\
-%sym_resolve(env); \\
-%... \\
+This routine re-solves the corresponding problem after some of the parameters 
+have been changed or problem data has been modified on the loaded warm start.
+Note that, the user can keep a warm start by setting the ``keep\_warm\_start''
+evironment parameter before calling a solve routine. So that, SYMPHONY 
+will collect the necessary warm starting information through the 
+solve procedure.
 
 \args
 
@@ -415,8 +326,8 @@ int sym_mc_solve(sym_environment *env)
 \describe
 
 This routine is used to solve the loaded problem as a multicriteria problem.
-The second objective function's coefficients can be set by calling
-{\tt sym\_set\_obj2\_coeff} function. 
+The second objective function's coefficients can always be set or altered 
+by calling {\tt sym\_set\_obj2\_coeff} function.
 
 \args
 
@@ -432,16 +343,8 @@ The second objective function's coefficients can be set by calling
 lp\_data}, {\tt user\_send\_cg\_data}, {\tt user\_send\_cp\_data}, 
 {\tt user\_receive\_feasible\_solution}, {\tt user\_display\_solution}, 
 {\tt user\_process\_own\_messages} functions. \\ 
-{\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & Tree Manager (TM) found the optimal 
-solution and stopped.\\ 
-{\tt TM\_TIME\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
-time limit.\\
-{\tt TM\_NODE\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
-node limit. \\
-{\tt TM\_TARGET\_GAP\_ACHIEVED} & TM stopped after achieving the predefined 
-target gap. \\
-{\tt TM\_FOUND\_FIRST\_FEASIBLE} & TM stopped after finding the first feasible 
-solution. \\
+{\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & The set of supported or nondominated 
+solutions have been found. \\
 {\tt TM\_ERROR\_\_NO\_BRANCHING\_CANDIDATE} & Error. TM stopped. User didn't 
 select branching candidate in {\tt user\_select\_candidates} callback\\ 
 {\tt TM\_ERROR\_\_ILLEGAL\_RETURN\_CODE} & Error. TM stopped after getting a 
@@ -451,7 +354,7 @@ numerical difficulties. \\
 {\tt TM\_ERROR\_\_COMM\_ERROR} & Error. TM stopped due to communication 
 error. \\
 {\tt TM\_ERROR\_\_USER} & Error. TM stopped. User error detected in one of 
-user callbacks called during TM processes. \\
+user callbacks activated by user and invoked during TM processes. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et
 \ed
@@ -463,7 +366,7 @@ user callbacks called during TM processes. \\
 
 \functiondef{sym\_create\_permanent\_cut\_pools}
 \begin{verbatim}
-int sym_create_permanent_cut_pools(sym_environment *env)
+int sym_create_permanent_cut_pools(sym_environment *env, int *cp_num)
 \end{verbatim}
 
 \bd
@@ -475,7 +378,9 @@ the environment.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
+{\tt int *cp\_num} & OUT & Pointer to an integer indicating the
+number of cut pools stored in the environment.
 \et
 
 \returns
@@ -563,7 +468,7 @@ coefficients when multi criteria solver is to be used. \\
 {\tt double *rowrng} & IN & Array of the row ranges.\\
 && ({\tt sym\_get\_row\_upper}) - ({\tt sym\_get\_row\_lower}) if the row 
 sense is {\tt 'R'}, 0 otherwise. \\
-{\tt char make\_copy} & IN & SYMPHONY will create the copies of the
+{\tt char make\_copy} & IN & SYMPHONY will create the copies of these
 arrays for internal usage if this flag is set to true, otherwise, will own 
 them.\\ 
 \et
@@ -591,8 +496,8 @@ int sym_is_abandoned(sym_environment *env)
 \bd
 \describe
 
-This query routine is used to learn about the problem status after 
-solving it: Is problem abandoned for some reason?
+This post-solution query routine is used to learn whether the problem 
+was abandoned for some reason.
 
 \args
 
@@ -603,9 +508,8 @@ solving it: Is problem abandoned for some reason?
 \returns
 
 \bt{lp{317pt}}
-{\tt TRUE} & The problem is abandoned. \\
-{\tt FALSE} & The problem is not abandoned.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt TRUE} & The problem was abandoned. \\
+{\tt FALSE} & The problem was not abandoned.\\
 \et
 \ed
 \vspace{1ex}
@@ -622,8 +526,8 @@ int sym_is_proven_optimal(sym_environment *env)
 \bd
 \describe
 
-This query routine is used to learn about the problem status after 
-solving it: Is problem solved to optimality?
+This post-solution query routine is used to learn whether the problem 
+was solved to optimality.
 
 \args
 
@@ -634,9 +538,8 @@ solving it: Is problem solved to optimality?
 \returns
 
 \bt{lp{317pt}}
-{\tt TRUE} & The problem is solved to optimality. \\
-{\tt FALSE} & The problem is not solved to optimality.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt TRUE} & The problem was solved to optimality. \\
+{\tt FALSE} & The problem was not solved to optimality.\\
 \et
 \ed
 \vspace{1ex}
@@ -653,8 +556,8 @@ int sym_is_proven_primal_infeasible(sym_environment *env)
 \bd
 \describe
 
-This query routine is used to learn about the problem status after 
-solving it: Is problem proven to be infeasible?
+This post-solution query routine is used to learn whether the problem 
+was proven to be infeasible.
 
 \args
 
@@ -665,9 +568,8 @@ solving it: Is problem proven to be infeasible?
 \returns
 
 \bt{lp{317pt}}
-{\tt TRUE} & The problem is proven to be infeasible. \\
-{\tt FALSE} & The problem is not proven to be infeasible.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt TRUE} & The problem was proven to be infeasible. \\
+{\tt FALSE} & The problem was not proven to be infeasible.\\
 \et
 \ed
 \vspace{1ex}
@@ -684,8 +586,8 @@ int sym_is_primal_objective_limit_reached(sym_environment *env)
 \bd
 \describe
 
-This query routine is used to learn about the problem status after 
-solving it: Is the objective limit ( or target gap) achieved?
+This post-solution query routine is used to learn whether the objective
+limit (target gap) was achieved.
 
 \args
 
@@ -696,9 +598,8 @@ solving it: Is the objective limit ( or target gap) achieved?
 \returns
 
 \bt{lp{317pt}}
-{\tt TRUE} & The goal is achieved. \\
-{\tt FALSE} & The goal is not achieved.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt TRUE} & The goal was achieved. \\
+{\tt FALSE} & The goal was not achieved.\\
 \et
 \ed
 \vspace{1ex}
@@ -715,10 +616,9 @@ int sym_is_iteration_limit_reached(sym_environment *env)
 \bd
 \describe
 
-This query routine is used to learn about the problem status after 
-solving it: Is iteration limit (or node limit) reached? It can also be used
-to query the solution status if ``find\_first\_feasible'' parameter 
-is set to true.
+This post-solution query routine is used to learn whether the iteration 
+(node limit) was reached. It can also be used if ``find\_first\_feasible'' 
+parameter wass set to true before solving the problem.
 
 \args
 
@@ -731,7 +631,6 @@ is set to true.
 \bt{lp{317pt}}
 {\tt TRUE} & The iteration limit is reached. \\
 {\tt FALSE} & The iteration limit is not reached.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -748,8 +647,8 @@ int sym_is_time_limit_reached(sym_environment *env)
 \bd
 \describe
 
-This query routine is used to learn about the problem status after 
-solving it: Is time limit reached?
+This post-solution query routine is used to learn whether the time limit 
+was reached. 
 
 \args
 
@@ -760,9 +659,8 @@ solving it: Is time limit reached?
 \returns
 
 \bt{lp{317pt}}
-{\tt TRUE} & Time limit is reached. \\
-{\tt FALSE} & Time limit is not reached.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt TRUE} & Time limit was reached. \\
+{\tt FALSE} & Time limit was not reached.\\
 \et
 \ed
 \vspace{1ex}
@@ -779,8 +677,8 @@ int sym_is_target_gap_achieved(sym_environment *env)
 \bd
 \describe
 
-This query routine is used to learn about the problem status after 
-solving it: Is target gap achieved?
+This post-solution query routine is used to learn whether the time limit 
+was reached. 
 
 \args
 
@@ -791,12 +689,61 @@ solving it: Is target gap achieved?
 \returns
 
 \bt{lp{317pt}}
-{\tt TRUE} & Target gap is reached. \\
-{\tt FALSE} & Target gap is not reached.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt TRUE} & Target gap was reached. \\
+{\tt FALSE} & Target gap was not reached.\\
 \et
 
 \ed
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_get_status
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_get\_status}
+\begin{verbatim}
+int sym_get_status(sym_environment *env)
+\end{verbatim}
+
+\bd
+\describe
+This post-solution query routine is used to learn the termination
+status of the solution procedure.
+
+\args
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{\tt ERROR\_\_USER} & Error. User error detected in one of {\tt user\_send\_
+lp\_data}, {\tt user\_send\_cg\_data}, {\tt user\_send\_cp\_data}, 
+{\tt user\_receive\_feasible\_solution}, {\tt user\_display\_solution}, 
+{\tt user\_process\_own\_messages} functions. \\ 
+{\tt TM\_OPTIMAL\_SOLUTION\_FOUND} & Tree Manager (TM) found the optimal solution and stopped.\\ 
+{\tt TM\_TIME\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
+time limit.\\
+{\tt TM\_NODE\_LIMIT\_EXCEEDED} & TM stopped after reaching the predefined 
+node limit. \\
+{\tt TM\_TARGET\_GAP\_ACHIEVED} & TM stopped after achieving the predefined 
+target gap. \\
+{\tt TM\_FOUND\_FIRST\_FEASIBLE} & TM stopped after finding the first feasible 
+solution. \\
+{\tt TM\_ERROR\_\_NO\_BRANCHING\_CANDIDATE} & Error. TM stopped. User didn't 
+select branching candidate in {\tt user\_select\_candidates} callback\\ 
+{\tt TM\_ERROR\_\_ILLEGAL\_RETURN\_CODE} & Error. TM stopped after getting a 
+non-valid return code. \\
+{\tt TM\_ERROR\_\_NUMERICAL\_INSTABILITY} & Error. TM stopped due to some 
+numerical difficulties. \\
+{\tt TM\_ERROR\_\_COMM\_ERROR} & Error. TM stopped due to communication 
+error. \\
+{\tt TM\_ERROR\_\_USER} & Error. TM stopped. User error detected in one of 
+user callbacks called during TM processes. \\
+\et
+\ed
+
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -805,7 +752,7 @@ solving it: Is target gap achieved?
 
 \functiondef{sym\_get\_num\_cols}
 \begin{verbatim}
-int sym_get_num_cols(sym_environment *env)
+int sym_get_num_cols(sym_environment *env, int *numcols)
 \end{verbatim}
 
 \bd
@@ -816,14 +763,16 @@ This routine is used to get the number of the columns of the current problem.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt int *numcols} & OUT & Pointer to an integer indicating the number of 
+columns.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt INT } & A positive integer indicating the number of the columns. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -834,7 +783,7 @@ This routine is used to get the number of the columns of the current problem.
 
 \functiondef{sym\_get\_num\_rows}
 \begin{verbatim}
-int sym_get_num_cols(sym_environment *env)
+int sym_get_num_cols(sym_environment *env, int *numrows)
 \end{verbatim}
 
 \bd
@@ -845,14 +794,15 @@ This routine is used to get the number of the rows of the current problem.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+{\tt int *numrows} & OUT & Pointer to an integer indicating the number of rows.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt INT} & A positive integer indicating the number of the rows.\\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -863,27 +813,28 @@ This routine is used to get the number of the rows of the current problem.
 
 \functiondef{sym\_get\_num\_elements}
 \begin{verbatim}
-int sym_get_num_elements(sym_environment *env)
+int sym_get_num_elements(sym_environment *env, int *numelems)
 \end{verbatim}
 
 \bd
 \describe
 
-This routine is used to get the number of the non zero entries in the 
-constraint matrix of the current problem.
+This routine is used to get the number of non-zero entries of the 
+constraint matrix of the loaded problem.
 
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+{\tt int *numelems} & OUT & Pointer to an integer indicating the number of 
+non-zero elements.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt INT }& A positive integer indicating the number of the non zero 
-elements. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -894,7 +845,7 @@ elements. \\
 
 \functiondef{sym\_get\_col\_lower}
 \begin{verbatim}
-double *sym_get_col_lower(sym_environment *env)
+int sym_get_col_lower(sym_environment *env, double *collb)
 \end{verbatim}
 
 \bd
@@ -905,14 +856,17 @@ This routine is used to get the lower bounds of the variables.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+{\tt double *collb} & OUT & Pointer to a double type array to be filled by 
+the column lower bounds. Note that, the size of this array has to be at least 
+the number of columns.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL} & There is no problem description loaded to the environment. \\
-{\tt DOUBLE *} & Array of the lower bounds of the variables. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -923,7 +877,7 @@ This routine is used to get the lower bounds of the variables.
 
 \functiondef{sym\_get\_col\_upper}
 \begin{verbatim}
-double *sym_get_col_upper(sym_environment *env)
+int sym_get_col_upper(sym_environment *env, double *colub)
 \end{verbatim}
 
 \bd
@@ -934,14 +888,17 @@ This routine is used to get the upper bounds of the variables.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+{\tt double *colub} & OUT & Pointer to a double type array to be filled by 
+the column upper bounds. Note that, the size of this array has to be at least 
+the number of columns.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL }& There is no problem description loaded to the environment. \\
-{\tt DOUBLE }* & Array of the upper bounds of the variables. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -952,7 +909,7 @@ This routine is used to get the upper bounds of the variables.
 
 \functiondef{sym\_get\_row\_sense}
 \begin{verbatim}
-char *sym_get_row_sense(sym_environment *env)
+int sym_get_row_sense(sym_environment *env, char *rowsen)
 \end{verbatim}
 
 \bd
@@ -963,14 +920,17 @@ This routine is used to get the row senses.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt char *rowsen} & OUT & Pointer to a char type array to be filled by 
+the row senses. Note that, the size of this array has to be at least 
+the number of rows.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL }& There is no problem description loaded to the environment. \\
-{\tt CHAR *} & Array of the row senses. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -982,7 +942,7 @@ This routine is used to get the row senses.
 
 \functiondef{sym\_get\_rhs}
 \begin{verbatim}
-double *sym_get_rhs(sym_environment *env)
+int sym_get_rhs(sym_environment *env, double *rowrhs)
 \end{verbatim}
 
 \bd
@@ -993,14 +953,17 @@ This routine is used to get the right hand side vector.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt double *rowrhs} & OUT & Pointer to a double type array to be filled by 
+the right hand side vector. Note that, the size of this array has to be at 
+least the number of rows.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL }& There is no problem description loaded to the environment. \\
-{\tt DOUBLE * }& Array of the right hand side values. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -1011,7 +974,7 @@ This routine is used to get the right hand side vector.
 
 \functiondef{sym\_get\_row\_range}
 \begin{verbatim}
-double *sym_get_row_range(sym_environment *env)
+int sym_get_row_range(sym_environment *env, double *rowrng)
 \end{verbatim}
 
 \bd
@@ -1022,16 +985,20 @@ This routine is used to get the row ranges.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt double *rowrng} & OUT & Pointer to a double type array to be filled by 
+the row range values. Note that, the size of this array has to be at 
+least the number of rows.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL }& There is no problem description loaded to the environment. \\
-{\tt DOUBLE * } & Array of the row ranges. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
+
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1040,7 +1007,7 @@ This routine is used to get the row ranges.
 
 \functiondef{sym\_get\_row\_lower}
 \begin{verbatim}
-double *sym_get_row_lower(sym_environment *env)
+int sym_get_row_lower(sym_environment *env, double *rowlb)
 \end{verbatim}
 
 \bd
@@ -1051,16 +1018,20 @@ This routine is used to get the lower bounds of the rows.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt double *rowlb} & OUT & Pointer to a double type array to be filled by 
+the row lower bounds. Note that, the size of this array has to be at 
+least the number of rows.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL }& There is no problem description loaded to the environment. \\
-{\tt DOUBLE *} & Array of the lower bounds of the rows. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
+
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1069,7 +1040,7 @@ This routine is used to get the lower bounds of the rows.
 
 \functiondef{sym\_get\_row\_upper}
 \begin{verbatim}
-double *sym_get_row_upper(sym_environment *env)
+int sym_get_row_upper(sym_environment *env, double *rowub)
 \end{verbatim}
 
 \bd
@@ -1080,16 +1051,20 @@ This routine is used to get the upper bounds of the rows.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt double *rowub} & OUT & Pointer to a double type array to be filled by 
+the row upper bounds. Note that, the size of this array has to be at 
+least the number of rows.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL }& There is no problem description loaded to the environment. \\
-{\tt DOUBLE *} & Array of the upper bounds of the rows. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
+
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1098,25 +1073,61 @@ This routine is used to get the upper bounds of the rows.
 
 \functiondef{sym\_get\_obj\_coeff}
 \begin{verbatim}
-double *sym_get_obj_coeff(sym_environment *env)
+int sym_get_obj_coeff(sym_environment *env, double *obj)
 \end{verbatim}
 
 \bd
 \describe
 
-This routine is used to get the objective coefficients.
+This routine is used to get the objective vector.
 
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt double *obj} & OUT & Pointer to a double type array to be filled by 
+the objective vector. Note that, the size of this array has to be at 
+least the number of columns.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL }& There is no problem description loaded to the environment. \\
-{\tt DOUBLE *} & Array of the objective coefficients. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
+\et
+\ed
+\vspace{1ex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_get_obj2_coeff
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{sym\_get\_obj2\_coeff}
+\begin{verbatim}
+int sym_get_obj2_coeff(sym_environment *env, double *obj2)
+\end{verbatim}
+
+\bd
+\describe
+
+This routine is used to get the second objective vector if loaded before.
+
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt double *obj2} & OUT & Pointer to a double type array to be filled by 
+the second objective vector. Note that, the size of this array has to be at 
+least the number of columns.
+\et
+
+\returns
+
+\bt{lp{317pt}}
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -1127,7 +1138,7 @@ This routine is used to get the objective coefficients.
 
 \functiondef{sym\_get\_obj\_sense}
 \begin{verbatim}
-int sym_get_obj_sense(sym_environment *env)
+int sym_get_obj_sense(sym_environment *env, int *sense)
 \end{verbatim}
 
 \bd
@@ -1138,15 +1149,17 @@ This routine is used to get the objective sense.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt int *sense} & OUT & Pointer to an integer indicating the objective 
+sense. In return, it will be {\tt 1} in case of minimization and {\tt -1}
+in case of maximization. 
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt 1 }& It is a minimization problem. \\
-{\tt -1 } & It is a maximization problem. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -1157,28 +1170,29 @@ This routine is used to get the objective sense.
 
 \functiondef{sym\_is\_continuous}
 \begin{verbatim}
-int sym_is_continuous(sym_environment *env, int index)
+int sym_is_continuous(sym_environment *env, int index, int *value)
 \end{verbatim}
 
 \bd
 \describe
 
-This routine is used to ask whether the queried variable is 
+This routine is used to learn whether the queried variable is 
 continuous.
 
 \args
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
-{\tt int index} & IN & The index of the queried variable.
+{\tt int index} & IN & The index of the queried variable. Note that, it has 
+to be at most the number of columns.\\
+{\tt int *value} & OUT & Pointer to a boolean indicating the variable status.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt TRUE }& The variable is continuos. \\
-{\tt FALSE }& The variable is not continuos. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et
 \ed
 \vspace{1ex}
@@ -1189,28 +1203,29 @@ continuous.
 
 \functiondef{sym\_is\_binary}
 \begin{verbatim}
-int sym_is_binary(sym_environment *env, int index)
+int sym_is_binary(sym_environment *env, int index, int *value)
 \end{verbatim}
 
 \bd
 \describe
 
-This routine is used to ask whether the queried variable is 
+This routine is used to learn whether the queried variable is 
 binary.
 
 \args
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
-{\tt int index} & IN & The index of the queried variable.
+{\tt int index} & IN & The index of the queried variable. Note that, it has 
+to be at most the number of columns.\\
+{\tt int *value} & OUT & Pointer to a boolean indicating the variable status.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt TRUE }& The variable is binary. \\
-{\tt FALSE }& The variable is not binary. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1222,7 +1237,7 @@ binary.
 
 \functiondef{sym\_is\_integer}
 \begin{verbatim}
-int sym_is_integer(sym_environment *env, int index)
+int sym_is_integer(sym_environment *env, int index, int *value)
 \end{verbatim}
 
 \bd
@@ -1235,15 +1250,16 @@ integer.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
-{\tt int index} & IN & Index of the queried variable.
+{\tt int index} & IN & Index of the queried variable. Note that, it has to 
+be at most the number of columns.\\
+{\tt int *value} & OUT & Pointer to a boolean indicating the variable status.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt TRUE }& The variable is integer. \\
-{\tt FALSE }& The variable is not integer. \\
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1278,25 +1294,28 @@ This routine returns the infinity value of SYMPHONY.
 
 \functiondef{sym\_get\_col\_solution}
 \begin{verbatim}
-double *sym_get_col_solution(sym_environment *env)
+int sym_get_col_solution(sym_environment *env, double *colsol)
 \end{verbatim}
 
 \bd
 \describe
 
-This routine is used to get the problem solution.
+This routine is used to get the post-solution column values.
 
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt double *colsol} & OUT & Pointer to a double type array to be filled by 
+the solution vector. Note that, the size of this array has to be at least 
+the number of colums.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL }& There is no solution found. \\
-{\tt DOUBLE *} & An array of the column solutions. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1307,7 +1326,7 @@ This routine is used to get the problem solution.
 
 \functiondef{sym\_get\_row\_activity}
 \begin{verbatim}
-double *sym_get_row_activity(sym_environment *env)
+double *sym_get_row_activity(sym_environment *env, double *rowact)
 \end{verbatim}
 
 \bd
@@ -1319,14 +1338,17 @@ left hand side values, i.e., constraint matrix times the solution.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt double *rowact} & OUT & Pointer to a double type array to be filled by 
+the row activity values. Note that, the size of this array has to be at least 
+the number of rows.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL }&  Function invoked unsuccessfully or there is no solution found. \\
-{\tt DOUBLE *} & Array of the row activities. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1337,7 +1359,7 @@ left hand side values, i.e., constraint matrix times the solution.
 
 \functiondef{sym\_get\_obj\_val}
 \begin{verbatim}
-double *sym_get_obj_val(sym_environment *env)
+double *sym_get_obj_val(sym_environment *env, double *objval)
 \end{verbatim}
 
 \bd
@@ -1348,14 +1370,16 @@ This routine is used to get the objective value after solving the problem.
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt double *objval} & OUT & Pointer to a double indicating the post-solution
+objective value. 
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt INFINITY }& There is no solution found.\\
-{\tt DOUBLE * }& A double indicating the objective value. \\ 
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1366,28 +1390,31 @@ This routine is used to get the objective value after solving the problem.
 
 \functiondef{sym\_get\_primal\_bound}
 \begin{verbatim}
-double *sym_get_primal_bound(sym_environment *env)
+double *sym_get_primal_bound(sym_environment *env, double *ub)
 \end{verbatim}
 
 \bd
 \describe
 
-This routine is used to get the priori upper bound for the problem via the 
-user defined heuristics in {\tt user\_start\_heurs } user callback function. 
-Note that {\tt sym\_find\_initial\_bounds} function should be invoked before to
-activate those heuristics. 
+This routine is used to get the priori upper/lower bound for the problem via 
+the user defined heuristics if loaded to {\tt user\_start\_heurs } user 
+callback function. Note that, {\tt sym\_find\_initial\_bounds} function should
+be invoked before to activate those heuristics. 
 
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt double *ub} & OUT & Pointer to a double indicating the upper 
+(for minimization) or lower (for maximization) bound obtained through user 
+defined primal heuristics.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt INFINITY }& There is no priori upper bound.\\
-{\tt DOUBLE } & A double indicating the primal bound. \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1399,7 +1426,7 @@ activate those heuristics.
 
 \functiondef{sym\_get\_iteration\_count}
 \begin{verbatim}
-double *sym_get_iteration\_count(sym_environment *env)
+double *sym_get_iteration\_count(sym_environment *env, int *numnodes)
 \end{verbatim}
 
 \bd
@@ -1407,20 +1434,21 @@ double *sym_get_iteration\_count(sym_environment *env)
 
 This routine is used to get the number of the analyzed nodes of the 
 branching tree after solving the problem. It can also be used to query
-the loaded warm starts.
+the status of a loaded warm start.
 
 \args
 
 \bt{llp{250pt}}
-{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment.\\
+{\tt int *numnodes} & OUT & Pointer to an integer indicating the number of 
+nodes analyzed so far. 
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt INT *} & An integer indicating the number of the anayzed nodes. \\ 
 {\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
-
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1443,17 +1471,16 @@ This routine is used to set an objective coefficient.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int index} & IN & Index of the objective coefficient to be modified. \\
-{\tt double value} & IN & New value of the objective coefficient to be 
-modified.
+{\tt int index} & IN & Index of the objective coefficient to be modified. 
+Note that, it has to be at most the number of columns.\\
+{\tt double value} & IN & New objective value of the corresponding column.
 \et
 
 \returns
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or
-{\tt index} is out of the range of [0, number of variables-1] \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1477,7 +1504,8 @@ of the corresponding bicriteria problem.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int index} & IN & Index of the objective coefficient to be modified. \\
+{\tt int index} & IN & Index of the objective coefficient to be modified. 
+Note that, it has to be at most the number of columns.\\
 {\tt double value} & IN & New value of the objective coefficient to be 
 modified.
 \et
@@ -1486,8 +1514,7 @@ modified.
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or
-{\tt index} is out of the range of [0, number of variables-1] \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1510,7 +1537,8 @@ This routine is used to set the lower bound of a variable.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int index} & IN & Index of the variable. \\
+{\tt int index} & IN & Index of the variable. Note that, it has to be at 
+most the number of columns.\\
 {\tt double value} & IN & New lower bound of the variable.
 \et
 
@@ -1518,8 +1546,7 @@ This routine is used to set the lower bound of a variable.
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or
-{\tt index} is out of the range of [0, number of variables-1] \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
 \et  
 \ed
 \vspace{1ex}
@@ -1542,7 +1569,8 @@ This routine is used to set the upper bound of a variable.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int index} & IN & Index of the variable. \\
+{\tt int index} & IN & Index of the variable. Note that, it has to be at most 
+the number of columns. \\
 {\tt double value} & IN & New upper bound of the variable.
 \et
 
@@ -1550,8 +1578,7 @@ This routine is used to set the upper bound of a variable.
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or
-{\tt index} is out of the range of [0, number of variables-1] \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1574,7 +1601,8 @@ This routine is used to set the lower bound of a row.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int index} & IN & Index of the row. \\
+{\tt int index} & IN & Index of the row. Note that, it has to be at most the 
+number of rows.\\
 {\tt double value} & IN & New lower bound of the row.
 \et
 
@@ -1582,8 +1610,7 @@ This routine is used to set the lower bound of a row.
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or
-{\tt index} is out of the range of [0, number of rows-1] \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1606,7 +1633,8 @@ This routine is used to set the upper bound of a row.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int index} & IN & Index of the row. \\
+{\tt int index} & IN & Index of the row. Note that, it has to be at most the 
+number of rows.\\
 {\tt double value} & IN & New upper bound of the row.
 \et
 
@@ -1614,8 +1642,7 @@ This routine is used to set the upper bound of a row.
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or
-{\tt index} is out of the range of [0, number of rows-1] \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1639,7 +1666,8 @@ This routine is used to set the characteristics of a row.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int index} & IN & Index of the row. \\
+{\tt int index} & IN & Index of the row. Note that, it has to be at most the 
+number of rows.\\
 {\tt char rowsense} & IN & New sense of the row. \\
 {\tt double rowrhs} & IN & New value of the right hand side of the row. \\
 {\tt double rowrng} & IN & New value of the row range.
@@ -1649,8 +1677,7 @@ This routine is used to set the characteristics of a row.
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or
-{\tt index} is out of the range of [0, number of rows-1] \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1668,7 +1695,8 @@ int sym_set_obj_sense(sym_environment *env, int sense)
 \bd
 \describe
 
-This routine is used to set the objective sense.
+This routine is used to set the objective sense. By default, SYMPHONY 
+will solve a minimization problem.
 
 \args
 
@@ -1711,16 +1739,17 @@ upper bound.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt double *colsol} & IN &  An array of the known column solutions.
+{\tt double *colsol} & IN &  Pointer to a double type array of the known 
+column values. Note that, if the given solution is not feasible or if 
+a better solution was found/loaded before, SYMPHONY will refuse to set the 
+column solution and will leave this function without success.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or the 
-given solution is not feasible. \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
 \et  
 \ed
 \vspace{1ex}
@@ -1739,13 +1768,14 @@ int sym_set_primal_bound(sym_environment *env, double bound)
 \bd
 \describe
 
-This routine is used to set a priori upper bound to the problem.
+This routine is used to set a priori upper/lower bound to the problem.
 
 \args
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt double double} & IN &  The value of the priori upper bound.
+{\tt double double} & IN &  The value of the priori upper (for minimization) 
+or lower (for maximization) bound.
 \et
 
 \returns
@@ -1753,8 +1783,7 @@ This routine is used to set a priori upper bound to the problem.
 \bt{lp{317pt}}
 
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or the 
-given solution is not feasible. \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1779,15 +1808,15 @@ This routine is used to set the type of a variable to be continuous.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int index} & IN &  The index of the variable to be modified. 
+{\tt int index} & IN &  The index of the variable to be modified. Note that, 
+it has to be at most the number of columns.\\ 
 \et
 
 \returns
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or
-{\tt index} is out of the range of [0, number of variables-1] \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1811,15 +1840,15 @@ This routine is used to set the type of a variable to be integer.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int index} & IN &  The index of the variable to be modified. 
+{\tt int index} & IN &  The index of the variable to be modified. Note that, 
+it has to be at most the number of columns.\\
 \et
 
 \returns
 
 \bt{lp{317pt}}
 {\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
-{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully or
-{\tt index} is out of the range of [0, number of variables-1] \\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully.\\
 \et  
 \ed
 \vspace{1ex}
@@ -1843,7 +1872,9 @@ This routine is used to set the column names.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt char **colname} & IN &  Double array including the column names. \\ 
+{\tt char **colname} & IN &  Ponter to a string array including the column 
+names. Note that, the size of this array has to be at least the number of 
+columns.\\ 
 \et
 
 \returns
@@ -1862,7 +1893,7 @@ This routine is used to set the column names.
 
 \functiondef{sym\_add\_col}
 \begin{verbatim}
-int sym_add_col(sym_environment *env, int num_elements, int *indices, 
+int sym_add_col(sym_environment *env, int numelems, int *indices, 
                 double *elements, double collb, double colub,
                 double obj, char *name)
 \end{verbatim}
@@ -1876,17 +1907,19 @@ This routine is used to add a new column to the original problem description.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int num\_elements} & IN & An integer indicating the non zero elements of
+{\tt int numelems} & IN & An integer indicating the non zero elements of
 the column. \\
-{\tt int *indices} & IN & An array indicating the row indices of the non zero
-elements of the column. \\
-{\tt double *elements} & IN & An array indicating the values of the non zero
-elements of the column. \\
+{\tt int *indices} & IN & Pointer to an integer type array indicating the row 
+indices of the non zero elements of the column and having a size of at least
+{\tt numelems}. \\
+{\tt double *elements} & IN & Ponter to a double type array indicating the 
+values of the non zero elements of the column and having a size of at least 
+{\tt numelems}. \\
 {\tt double collb} & IN & A double indicating the lower bound of the column. \\
 {\tt double colub} & IN & A double indicating the upper bound of the column.\\
 {\tt double obj} & IN & A double indicating the objective coefficient value
 of the column. \\
-{\tt char *name} An array including the name of the column.  
+{\tt char *name} Pointer to a string of the name of the column.  
 \et
 
 \returns
@@ -1904,7 +1937,7 @@ of the column. \\
 
 \functiondef{sym\_add\_row}
 \begin{verbatim}
-int sym_add_row(sym_environment *env, int num_elements, int *indices, 
+int sym_add_row(sym_environment *env, int numelems, int *indices, 
                 double *elements, char rowsen, double rowrhs,
                 double rowrng)
 
@@ -1919,12 +1952,14 @@ This routine is used to add a new row to the original constrint matrix.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int num\_elements} & IN & An integer indicating the non zero elements of
+{\tt int numelems} & IN & An integer indicating the non zero elements of
 the row. \\
-{\tt int *indices} & IN & An array indicating the column indices of the non zero
-elements of the row. \\
-{\tt double *elements} & IN & An array indicating the values of the non zero
-elements of the row. \\
+{\tt int *indices} & IN & Pointer to an integer type array indicating the 
+column indices of the non zero elements of the row and having a size of 
+at least {\tt numelems}. \\
+{\tt double *elements} & IN & Pointer to a double type array indicating the
+values of the non zero elements of the row and having a size of 
+at least {\tt numelems}. \\
 {\tt char rowsen} & IN & A character indicating the sense of the row. \\
 {\tt double rowrhs} & IN & A double indicating the right hand side of the 
 row.\\
@@ -1960,9 +1995,11 @@ This routine is used to delete columns from the original problem description.
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
-{\tt int num} & IN & An integer indicating the number of columns to be deleted.\\
-{\tt int *indices} & IN & An array indicating the indices of the columns to 
-be deleted.
+{\tt int num} & IN & An integer indicating the number of columns to be 
+deleted.\\
+{\tt int *indices} & IN & Pointer to an integer type array indicating the 
+indices of the columns to be deleted and having a size of 
+at least {\tt num}.
 \et
 
 \returns
@@ -1995,7 +2032,7 @@ This routine is used to delete rows from the original constraint matrix.
 {\tt sym\_environment *env} & INOUT & Pointer to the SYMPHONY environment. \\
 {\tt int num} & IN & An integer indicating the number of rows to be deleted.\\
 {\tt int *indices} & IN & An array indicating the indices of the rows to 
-be deleted.
+be deleted and having a size of at least {\tt num}.
 \et
 
 \returns
@@ -2028,7 +2065,7 @@ This routine is used to write the given warm start structure to a file.
 {\tt warm\_start\_desc *ws} & IN & Pointer to the warm start description to 
 be written. \\
 {\tt char *file} & IN & The name of the file the warm start is desired to be
-written in. 
+written to. 
 \et
 
 \returns
@@ -2046,7 +2083,7 @@ written in.
 
 \functiondef{sym\_read\_warm\_start}
 \begin{verbatim}
-warm_start_desc *sym_read_warm_start(char *file)
+int sym_read_warm_start(char *file, warm_start_desc *ws)
 \end{verbatim}
 
 \bd
@@ -2058,14 +2095,16 @@ This routine is used to read in a warm start structure from a file.
 
 \bt{llp{250pt}}
 {\tt char *file} & IN & The name of the file the warm start is desired to be
-read from. 
+read from. \\
+{\tt warm\_start\_desc *ws} & OUT & Pointer to a warm start object 
+to be read from the file.
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL} & SYMPHONY can not open the warm start file to read. \\
-{\tt WARM\_START\_DESC *} & Pointer to a warm start structure read in from the given file.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
 \et  
 \ed
 \vspace{1ex}
@@ -2101,32 +2140,31 @@ deleted.
 
 \functiondef{sym\_get\_warm\_start}
 \begin{verbatim}
-warm_start_desc *sym_get_warm_start(sym_environment *env, int copy_warm_start)
+warm_start_desc *sym_get_warm_start(sym_environment *env, int copy_warm_start,
+warm_start_desc **ws)
 \end{verbatim}
 
 \bd
 \describe
 
 This routine is used to get the warm start description loaded to the 
-environment. Note that, in order to use this functionality, 
-``keep\_description\_of\_pruned'' parameter should have been set to true 
-before solving the original problem. This will ask SYMPHONY to keep the 
-necessary warm start and resolve information.
+environment.
 
 \args
 
 \bt{llp{250pt}}
 {\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
-{\tt int copy\_warm\_start} & IN & A binary indicating whether the warm start
-of the environment is desired to be copied ( 1 ) or overtaken ( 0 ). 
+{\tt int copy\_warm\_start} & IN & A boolean indicating whether the warm start
+of the environment is desired to be copied or overtaken. \\
+{\tt warm\_start\_desc **ws} & OUT & Pointer to a pointer to be directed  
+to a copy or the itself of the currently loaded warm start.  
 \et
 
 \returns
 
 \bt{lp{317pt}}
-{\tt NULL} & There is no loaded warm start structure.\\
-{\tt WARM\_START\_DESC * }& Pointer to a warm start structure copied or 
-overtaken from the environment.\\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
 \et  
 \ed
 \vspace{1ex}
@@ -2432,9 +2470,9 @@ double sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
 This routine is used for a basic sensitivity analysis of the right hand side
 case. It returns a lower bound for the problem with a modified
 right hand side using the information gathered from the branching tree of 
-the original solved problem. Note that, in order to use this feature, 
-the ``keep\_description\_of\_pruned'' and ``sensitivity\_analysis'' parameters
-need to be set to true before solving the original problem. 
+the original solved problem. Note that, in order to use this feature, the
+``sensitivity\_analysis'' parameter needs to be set before solving 
+the original problem.
 \args
 
 \bt{llp{250pt}}
@@ -2469,6 +2507,7 @@ problem to keep the needed information.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{C++ Interface}
+\label{C++_Interface}
 
 The OSI SYMPHONY methods are implemented simply as
 wrapped calls to the SYMPHONY callable library. For instance, when an instance 
@@ -2503,11 +2542,12 @@ OsiSymSolverInterface & sym\_open\_environment &
 create a new environment.\\ \hline \hline
 loadProblem & sym\_load\_problem & 
 load the problem read trough an MPS or GMPL file\\ \hline \hline
-branchAndBound & sym\_solve & 
-solve the MILP problem. \\ \hline \hline
-resolve & sym\_resolve & 
-resolve the MILP problem after some modifications.\\ \hline \hline
-initialSolve & sym\_initial\_solve & 
+branchAndBound & sym\_solve/sym\_warm\_solve & 
+solve the MILP problem from scratch or \\
+& & from a warm start if loaded. \\ \hline \hline
+resolve & sym\_warm\_solve & 
+re-solve the MILP problem after some modifications.\\ \hline \hline
+initialSolve & sym\_solve & 
 solve the MILP problem from scratch.\\ \hline \hline
 multiCriteriaBranchAndBound & sym\_mc\_solve & 
 solve the multi criteria problem.\\ \hline \hline

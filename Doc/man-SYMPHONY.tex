@@ -32,14 +32,14 @@ the user functions (name {\tt *\_u.h}). By looking at the header files, you
 should get a general idea of how things are laid out.
 
 In addition to the subdirectories corresponding to each module, there is a
-subdirectory called \texttt{SYMPHONY-4.0/USER}, which contains the files
+subdirectory called \texttt{SYMPHONY-5.0/USER}, which contains the files
 needed for customizing the behaviors of the modules. Before beginning
 customization, it is recommended to make a copy of the directory
-\texttt{SYMPHONY-4.0/USER} that will be used as a template for creating your
+\texttt{SYMPHONY-5.0/USER} that will be used as a template for creating your
 customized solver. In this directory and its subdirectories, which mirror the
 subdirectories of SYMPHONY itself, each file contains function stubs that can
 be filled in to create a new custom application. There is one file for each
-module, initially called \texttt{SYMPHONY-4.0/USER/*/user\_*.c}, where
+module, initially called \texttt{SYMPHONY-5.0/USER/*/user\_*.c}, where
 \texttt{*} is the name of the module. The primary thing that you, as the user,
 need to understand to build a custom application is how to fill in these
 stubs. That is what the second section of this manual is about.
@@ -217,9 +217,9 @@ planes are not available or not implemented yet.
 
 Once the user functions are filled in, all that remains is to compile the
 application. The distribution comes with two makefiles that facilitate this
-process. The primary makefile resides in the {\tt SYMPHONY-4.0/} directory.
+process. The primary makefile resides in the {\tt SYMPHONY-5.0/} directory.
 The user makefile resides in the user's subdirectory, initially called
-\texttt{SYMPHONY-4.0/USER/}. This subdirectory can be moved, as well as
+\texttt{SYMPHONY-5.0/USER/}. This subdirectory can be moved, as well as
 renamed. There are a number of variables that must be set in the primary make
 file. To modify the makefiles appropriately, see the instructions in Section
 \ref{getting_started_unix}.
@@ -260,7 +260,7 @@ shared parallel.
 
 \paragraph{Configuring the Modules.}
 \label{configuration}
-In the application makefile, e.g., \texttt{SYMPHONY-4.0/USER/Makefile},there
+In the application makefile, e.g., \texttt{SYMPHONY-5.0/USER/Makefile},there
 are four variables that control which modules run as separate executables and
 which are called directly in serial fashion. The variables are as follows:
 \begin{description}
@@ -317,7 +317,7 @@ modules, as in the fully distributed version, you must set the parameters {\tt
 
 First, follow the instructions for compiling SYMPHONY in Section
 \ref{getting_started_windows} to ensure you have the proper settings. Once the
-stub files in the {\tt SYMPHONY-4.0$\backslash$USER} hierarchy are
+stub files in the {\tt SYMPHONY-5.0$\backslash$USER} hierarchy are
 filled in, you should be able to compile the new application and run it
 successfully. 
 

@@ -14,22 +14,21 @@ the other applications, such as MATCH, for a more gentle introduction.
 *              COMPILING THE SYMPHONY VRP APPLICATION (Unix)                  *
 *******************************************************************************
 This version of the SYMPHONY VRP application is intended to work with
-SYMPHONY-4.0. First, configure and compile SYMPHONY 4.0 as described in
-SYMPHONY-4.0/README-4.0/.  Download and unpack the source code for the VRP
-application from the file SYMPHONY-VRP-4.0.tgz. Modify the variables in the
+SYMPHONY-5.0. First, configure and compile SYMPHONY-5.0 as described in
+SYMPHONY-5.0/README-5.0/.  Download and unpack the source code for the VRP
+application from the file SYMPHONY-VRP-5.0.tgz. Modify the variables in the
 VRP/Makefile appropriately. In particular, you must set the path to SYMPHONY
-itself. If the application is unpacked as a subdirectory of SYMPHONY-4.0
+itself. If the application is unpacked as a subdirectory of SYMPHONY-5.0
 subdirectory, no further modification should be necessary. Typing "make" in
 the VRP subdirectory should successfully make the VRP executable. It will be
-installed in the directory SYMPHONY-4.0/VRP/bin.$(ARCH)/$(LP\_SOLVER). See
+installed in the directory SYMPHONY-5.0/VRP/bin.$(ARCH)/$(LP\_SOLVER). See
 usage below.
 
 *******************************************************************************
 *            COMPILING THE SYMPHONY VRP APPLICATION (Windows)                 *
 *******************************************************************************
 
-This version of the SYMPHONY VRP application is intended to work with
-SYMPHONY-4.0. Here is a sketch outline of how to compile the SYMPHONY VRP
+Here is a sketch outline of how to compile the SYMPHONY VRP
 application in Microsoft Windows. For information on developing your own
 applications, please see the quick start guide below or the detailed
 explanation in the user's manual. Direct support is provided for compilation
@@ -38,20 +37,20 @@ possible. Note that the Windows version has some limitations. Detailed timing
 information is not currently provided.  Support is only provided for running
 in sequential mode at this time.
 
-First, download SYMPHONY-4.0.zip and unzip the archive. This will create a
-subdirectory called SYMPHONY-4.0\ containing all the source files. Now
-download and unpack SYMPHONY-VRP-4.0.zip in the SYMPHONY-4.0\ subdirectory. It
-is important that the VRP source code be unpacked in the SYMPHONY-4.0\
-subdirectory or the project files will not work.
+First, download SYMPHONY-5.0.zip and unzip the archive. This will create a
+subdirectory called SYMPHONY-5.0\ containing all the source files. Now
+download and unpack SYMPHONY-VRP-5.0.zip. Only if you intend to use 
+the MSVC++ Workspace, it is important that the VRP source code be unpacked in 
+the SYMPHONY-5.0 subdirectory or the project files will not work.
 
 You now have two options. You can either compile on the command-line, using
-the MSVC++ makefile SYMPHONY-4.0\WIN32\vrp.mak or you can use the provided
+the MSVC++ makefile SYMPHONY-5.0\WIN32\vrp.mak or you can use the provided
 projects and workspaces. Compiling on the command-line is somewhat easier
 since it requires only editing the makefile and typing a single command.
 
 ******** Using the NMAKE Utility ********
 
-1. Edit the file SYMPHONY-4.0\VRP\WIN32\vrp.mak to reflect your
+1. Edit the file SYMPHONY-5.0\VRP\WIN32\vrp.mak to reflect your
 environment. This involves specifying the LP solver to be used and various
 paths. Only minor edits should be required. An explanation of what has to be
 set is contained in the comments in the makefile.
@@ -61,80 +60,79 @@ the COIN libraries, available from www.coin-or.org. Specifically, you should
 install OSI, CGL, and the Coin utilities (in the COIN/Coin directory). If you
 want to use the COIN LP solver, you should also download CLP. These can be
 downloaded from www.coin-or.org. The path to the COIN libraries must be
-specified in SYMPHONY-4.0\VRP\WIN32\vrp.mak.
+specified in SYMPHONY-5.0\VRP\WIN32\vrp.mak.
 
 3. If you wish to read GMPL/AMPL files, you will have to install the Gnu
 Linear Programming Kit (GLPK), which contains a parser for GMPL/AMPL
-files. The path to the GLPK libraries must be specified in
-SYMPHONY-4.0\VRP\WIN32\vrp.mak.
+files. The path to the GLPK libraries must be specified in the makefile.
 
 4. Once configuration is done, type "nmake /f vrp.mak" in the
-SYMPHONY-4.0\VRP\WIN32 directory. The executable "symphony.exe" will be
-created in the SYMPHONY-4.0\VRP\WIN32\Debug directory.
+SYMPHONY-5.0\VRP\WIN32 directory. The executable "symphony.exe" will be
+created in the SYMPHONY-5.0\VRP\WIN32\Debug directory.
 
 5. To test the executable, type "symphony.exe -F ..\..\sample.vrp" at a command
-prompt from the SYMPHONY-4.0\VRP\WIN32\Debug directory.
+prompt from the SYMPHONY-5.0\VRP\WIN32\Debug directory.
 
 ******** Using the MSVC++ Workspace ********
 
-1. In MS Visual C++ 6.0, open the workspace SYMPHONY-4.0\VRP\WIN32\vrp.dsw.
+1. In MS Visual C++ 6.0, open the workspace SYMPHONY-5.0\VRP\WIN32\vrp.dsw.
 Note that there are two projects, one called "symphony" and one called "vrp".
 The symphony project compiles the source of the internal library. The vrp
 project compiles a separate library containing the user-defined functions that
 can be used to customize the solver.
 
 2. To use many of the new capabilities of SYMPHONY, you must have installed
-the COIN libraries. Specifically, you should install OSI, CGL, and the Coin
-utilities (in the COIN/Coin directory). If you want to use the COIN LP solver,
-you should also download CLP. These can be downloaded from www.coin-or.org.
-The default location for COIN is C:\COIN\.
+the COIN libraries. Specifically, you should install OSI, CGL, CLP and the Coin
+utilities (in the COIN/Coin directory). These can be downloaded from 
+www.coin-or.org. The default location for COIN is C:\COIN\.
 
-3. By default, SYMPHONY is set up to use the OSI CPLEX interface. To see this
+3. By default, SYMPHONY is set up to use the OSI CLP interface. To see this
 check the following settings:
 
--- "__OSI_CPLEX__" is defined in the preprocessor definitions of both
-"symphony" and "vrp" projects (to see that, right-click on one of the
+-- "__OSI_CLP__" is defined in the preprocessor definitions of both
+"symphony" and "vrp" projects (right-click on one of the
 projects, and then choose Settings --> C/C++ --> Preprocessor in the category
 drop-down menu).
 
--- Paths to the include files of COIN utilities (Coin), OSI, OSI_CPLEX, and
-CPLEX are specified in the same settings window as for the preprocessor
-definitions. Note that the Coin, OSI, and OSI_CPLEX include directories are
-assumed to be in C:\COIN\Coin, C:\COIN\Osi, C:\COIN\Osi\OsiCpx and
-C:\ILOG\cplex81\include\ilcplex directories, respectively. If they are not,
+-- Paths to the include files of COIN utilities (Coin), OSI, OSI_CLP, and
+CLP are specified in the same settings window as for the preprocessor
+definitions. Note that, the Coin, OSI, OSI_CLP and CLP include directories are
+assumed to be in C:\COIN\Coin, C:\COIN\Osi, C:\COIN\Osi\OsiClp and
+C:\COIN\Clp directories, respectively. If they are not,
 make sure that you have set the correct paths in both projects before
 compiling.
 
 -- The "symphony" project is dependent on the "vrp" project (see the
 dependencies in Project --> Dependencies) and it includes the necessary
-libraries: "vrp", "osiCpxLib", "osiLib", "coinLib" and "cplex81" (solver
+libraries: "vrp", "osiClpLib", "osiLib", "coinLib" and "clpLib" (solver
 library).
 
-If you want to use the native CPLEX interface (without downloading COIN) or a
-solver other than CPLEX:
+If you want to use another solver:
 
--- If you want to use another OSI interface, change the preprocessor
-definition from "__OSI_CPLEX__" to "__OSI_XXX__", where "XXX" is replaced by
-the desired solver's acronym ("__OSI_CLP__", "__OSI_GLPK__", "__OSI_OSL__",
-etc.). Otherwise, change it to either "__CPLEX__" or "__OSL__" in both
-projects.
+-- If you want to use the solver again through the OSI interface, change the 
+preprocessor definition in both projects from "__OSI_CLP__" to "__OSI_XXX__", 
+where "XXX" is replaced by the desired solver's acronym ("__OSI_CPLEX__", 
+"__OSI_GLPK__", "__OSI_OSL__", etc.). Otherwise, change it to either  
+"__CPLEX__" or "__OSL__" in both projects since SYMPHONY is able to use 
+CPLEX and OSL solvers directly.
 
 -- Change the path definitions of the include files: for instance, if you want
-to use "__OSI_OSL__", define C:\COIN\OSi\OsiOsl and C:\Program
-Files\IbmOslV3Lib\osllib (assuming it is installed there) instead of the CPLEX
-path definitions. If you want to use the native OSL interface, delete all the
-path definitions (you are not required to have COIN or OSI), and just add the
-path definitions for the OSL include files.
+to use "__OSI_CPLEX__", define C:\COIN\Osi\OsiCpx and 
+"C:\ILOG\cplex81\include\ilcplex" (assuming CPLEX is installed here) as the 
+solver's include files path definitions or if you want to use "__OSI_OSL__", 
+define C:\COIN\Osi\OsiOsl and C:\ProgramFiles\IbmOslV3Lib\osllib (assuming 
+OSL is installed here) instead of the OSI CLP and CLP path definitions.
+If you want to use the native CPLX or OSL interface directly, delete all the 
+path definitions (you are not required to have COIN and OSI), and just add the
+path definitions for the CPLEX or OSL include files.
 
 -- Add the appropriate libraries to the "symphony" project. For instance, if
 you want to use "__OSI_OSL__", then add the osiOslLib and oslmd6030 (OSL solver
-lib file) library files after deleting osiCpxLib and cplex81 libraries from
-the "symphony" project (you can do that by right-clicking on the "symphony"
-project and then --> Add files to project with "library files" selected as the
-file type). If you want to use the native OSL interface, then delete all the
-libraries (except the "vrp" library ) from the "symphony" project and just
-add the "oslmd6030" library file for it is the unique solver library file we
-need now.
+lib file) library files after deleting osiClpLib and clpLib libraries from
+the "symphony" project file. If you want to use the native OSL interface, 
+then delete all the libraries (except the "vrp" library ) from the "symphony" 
+project and just add the "oslmd6030" library file for it is the unique solver 
+library file we need now.
 
 4. By default, SYMPHONY is also set up to use the COIN CGL library for
 generating cuts. To use CGL, the "symphony" project has the "ADD_CGL_CUTS"
@@ -150,7 +148,7 @@ list of definitions.
 
 6. Note that there are a number of additional preprocessor definitions that
 control the functionality of SYMPHONY. These definitions are described in
-SYMPHONY-4.0/Makefile, a Unix-style makefile included with the
+SYMPHONY-5.0/Makefile, a Unix-style makefile included with the
 distribution. To enable the functionality associated with a particular
 definition, simply add it to the list of definitions, as above.
 

@@ -40,8 +40,9 @@ find initial bounds using a custom heuristic.
 scratch. This method is described in more detail in Section 
 \ref{initial_solve}.
 
-\paragraph{\texttt{sym\_resolve()}} Solves the currently loaded problem from a
-warm start. This method is described in more detail in Section \ref{resolve}.\\
+\paragraph{\texttt{sym\_warm\_solve()}} Solves the currently loaded problem 
+from a warm start. This method is described in more detail in 
+Section \ref{warm_solve}.\\
 
 \paragraph{\texttt{sym\_mc\_solve()}} Solves the currently loaded problem as a
 multicriteria problem. This method is described in more detail in Section 
@@ -58,20 +59,20 @@ default parameter settings.
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
-   sym_environment *p = sym_open_environment();
-   sym_parse_command_line(p, argc, argv);
-   sym_load_problem(p);
-   sym_solve(p);
-   sym_close_environment(p);
+   sym_environment *env = sym_open_environment();
+   sym_parse_command_line(env, argc, argv);
+   sym_load_problem(env);
+   sym_solve(env);
+   sym_close_environment(env);
 }
 \end{Verbatim}
 \caption{Implementation of a generic MILP solver with the SYMPHONY
 C callable library. \label{default_main}}
 \end{figure}
-To read in an MPS file called \texttt{model.mps} and solve it using 
+To read in an MPS file called \texttt{sample.mps} and solve it using 
 this program, the following command would be issued: \\
 \begin{verbatim}
-symphony -F model.mps
+symphony -F sample.mps
 \end{verbatim}
 The user does not have to invoke a command to read the MPS file. During the
 call to \texttt{sym\_parse\_command\_line()}, SYMPHONY determines that the
@@ -79,7 +80,7 @@ user wants to read in an MPS file. During the subsequent call to
 \texttt{sym\_load\_problem()}, the file is read and the problem data stored.
 To read an GMPL file, the user would issue the command
 \begin{verbatim}
-symphony -F model.mod -D model.dat
+symphony -F sample.mod -D sample.dat
 \end{verbatim}
 Although the same command-line switch is used to specify the model file, the
 additional presence of the \texttt{-D} option indicates to SYMPHONY that the
@@ -90,12 +91,12 @@ sequential and parallel execution modes is made at compile-time through
 modification of the makefile or the project settings, depending on the
 operating system.
 
-To start the solution proces from a warm start, the \texttt{sym\_resolve()}
+To start the solution proces from a warm start, the \texttt{sym\_warm\_solve()}
 command is used. SYMPHONY automatically records the warm start information
 resulting from the last solve call and restarts from that checkpoint if a call
-to \texttt{sym\_resolve()} is made. Alternatively, external warm start
+to \texttt{sym\_warm\_solve()} is made. Alternatively, external warm start
 information can be loaded manually. Figure \ref{dynamic} illustrates the use
-of the resolve capability by showing the code for implementing a solver that
+of the re-solve capability by showing the code for implementing a solver that
 changes from depth first search to best first search after the first feasible
 solution is found.
 \begin{figure}[tb]
@@ -103,15 +104,15 @@ solution is found.
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
-   sym_environment *p = sym_open_environment();
-   sym_parse_command_line(p, argc, argv);
-   sym_load_problem(p);
-   sym_set_int_param(p, "find_first_feasible", TRUE);
-   sym_set_int_param(p, "node_selection_strategy", DEPTH_FIRST_SEARCH);
-   sym_solve(p);
-   sym_set_int_param(p, "find_first_feasible", FALSE);
-   sym_set_int_param(p, "node_selection_strategy", BEST_FIRST_SEARCH);
-   sym_resolve(p);
+   sym_environment *env = sym_open_environment();
+   sym_parse_command_line(env, argc, argv);
+   sym_load_problem(env);
+   sym_set_int_param(env, "find_first_feasible", TRUE);
+   sym_set_int_param(env, "node_selection_strategy", DEPTH_FIRST_SEARCH);
+   sym_solve(env);
+   sym_set_int_param(env, "find_first_feasible", FALSE);
+   sym_set_int_param(env, "node_selection_strategy", BEST_FIRST_SEARCH);
+   sym_warm_solve(env);
 }
 \end{Verbatim}
 \caption{Implementation of a dynamic MILP solver with SYMPHONY. 
@@ -121,7 +122,7 @@ The user can also modify problem data in between calls to the solver. Code for
 doing so is shown in Figure \ref{warm_start}. In this example, the
 solver is allowed to process 100 nodes and then save the warm start
 information. Afterward, the original problem is solved to optimality, then is
-modified and resolved from the saved checkpoint. Results from a sample run of
+modified and re-solved from the saved checkpoint. Results from a sample run of
 this code are discussed in Section \ref{examples}.
 \begin{figure}[tb]
 %\centering
@@ -129,18 +130,19 @@ this code are discussed in Section \ref{examples}.
 int main(int argc, char **argv)
 {
    warm_start_desc *ws;
-   sym_environment *p = sym_open_environment();
-   sym_parse_command_line(p, argc, argv);
-   sym_load_problem(p);
-   sym_set_int_param(p, "node_limit", 100);
-   sym_solve(p);
-   ws = sym_get_warm_start(p);
-   sym_resolve(p);
-   sym_set_obj_coeff(p, 0, 100);
-   sym_set_obj_coeff(p, 200, 150);
+   sym_environment *env = sym_open_environment();
+   sym_parse_command_line(env, argc, argv);
+   sym_load_problem(env);
+   sym_set_int_param(env, "node_limit", 100);
+   sym_set_int_param(env, "keep_warm_start", TRUE);
+   sym_solve(env);
+   ws = sym_get_warm_start(env);
+   sym_set_int_param(env, "node_limit", -1);
+   sym_warm_solve(env);
+   sym_set_obj_coeff(env, 0, 100);
+   sym_set_obj_coeff(env, 200, 150);
    sym_set_warm_start(ws);
-   sym_set_int_param(p, "node_limit", -1);
-   sym_resolve(p);
+   sym_warm_solve(env);
 }
 \end{Verbatim}
 \caption{Use of SYMPHONY's warm start capability. \label{warm_start}}
@@ -167,14 +169,14 @@ see Section \ref{examples}.
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
-   sym_environment *p = sym_open_environment();
-   sym_parse_command_line(p, argc, argv);
-   sym_load_problem(p);
-   syn_set_obj2_coeff(p, 0, 1);
-   sym_mc_solve(p);
+   sym_environment *env = sym_open_environment();
+   sym_parse_command_line(env, argc, argv);
+   sym_load_problem(env);
+   syn_set_obj2_coeff(env, 0, 1);
+   sym_mc_solve(env);
 }
 \end{Verbatim}
-\caption{Performing sensitivity analysis with SYMPHONY's bicriteria solver. 
+\caption{Performing sensitivity analysis with SYMPHONY's bicriteria solver.
 \label{multi_criteria}}
 \end{figure}
 
@@ -182,7 +184,7 @@ In addition to the parts of the API we have just described, there are a number
 of standard subroutines for accessing and modifying problem data and
 parameters. These can be used between calls to the solver to change the
 behavior of the algorithm or to modify the instance being solved. These
-modifications are discussed in more detail in Section \ref{resolve}.
+modifications are discussed in more detail in Section \ref{warm_solve}.
 
 \subsection{The OSI Interface}\label{OSI}
 

@@ -55,6 +55,10 @@ This parameter is used if the user wants to artificially impose an
 upper bound (for instance if a solution of that value is already
 known).
 
+\item[{\tt lower\_bound} -- double (no lower bound).]
+This parameter is used if the user wants to artificially impose a
+lower bound.
+
 \label{upper_bound_estimate}
 \item[{\tt upper\_bound\_estimate} -- double (no estimate).]
 This parameter is used if the user wants to provide an estimate of the
@@ -85,6 +89,32 @@ an introduction to this).
 \item[{\tt do\_branch\_and\_cut} -- boolean ({\tt TRUE}).]
 Whether to run the branch and cut algorithm or not. (Set this to {\tt
 FALSE} to run the user's heuristics only.)
+
+\item[{\tt mc\_search\_order} -- integer ({\tt MC\_FIFO}).]
+Use the fifo (MC\_FIFO) or lifo (MC\_LIFO) searh order during the multi
+criteria solution procedure.
+
+\item[{\tt mc\_warm\_start} -- boolean({\tt FALSE}).]
+Whether to solve the corresponding problem of each iteration from a warm 
+start loaded from a base iteration (which is the first iteration where 
+gamma = 1.0 and tau = 0.0) or from scratch. Currently, this option is 
+supported if only the supported solutions are desired to be found.
+
+\item[{\tt trim\_warm\_tree} -- boolean({\tt FALSE}).]
+Whether to trim the warm start tree before re-solving. This consists of 
+locating nodes whose descendants are all likely to be pruned in the resolve 
+and eliminating those descendants in favor of processing the parent node 
+itself.
+
+\item[{\tt mc\_compare\_solution\_tolerance} -- double({\tt 0.001}).]
+If the difference between the objective values of two solutions to be compared,
+during the bicriteria solution procedure, are less than this tolerance, then 
+assume them to be equal. 
+
+\item[{\tt mc\_binary\_search\_tolerance} -- double({\tt 0}).]
+The tolerance to be used to differantiate the gamma values if binary search 
+is used during the bicriteria solution procedure. A value greater than zero
+will cause the binary search to be activated.
 
 \end{description}
 
@@ -271,6 +301,15 @@ memory and written out to the regular log file if that option is
 chosen. This is really only useful for debugging. Otherwise, pruned
 nodes should be flushed.
 
+\item[{\tt keep\_warm\_start} -- boolean ({\tt FALSE}).] 
+Turning this parameter on will have exactly the same impact with 
+setting the {\tt keep\_description\_of\_pruned} to 
+{\tt KEEP\_IN\_MEMORY}\{2\}. This will allow SYMPHONY to keep all the
+necessary information obtained from the branching tree of the original 
+problem to be able to warm start after a parameter or problem data 
+modification. Thus, if it is intended to warm start later, the user 
+should set this parameter before solving the original problem.
+  
 \item[{\tt logging} -- integer ({\tt NO\_LOGGING}\{0\}).]
 Whether or not to write out the state of the search tree and all other
 necessary data to disk periodically in order to allow a warm start in
@@ -341,11 +380,34 @@ is not to generate columns before branching or fathoming, which
 corresponds to only the third lowest bit being set, resulting in a
 default value of 4.
 
-\item[{\tt time\_limit} -- integer (0).]
+\item[{\tt time\_limit} -- double (-1.0).]
 Number of seconds of wall-clock time allowed for solution. When this
 time limit is reached, the solution process will stop and the best
 solution found to that point, along with other relevant data, will be
-output. A time limit of zero means there is no limit.
+output. A time limit less than 0.0 means there is no limit.
+
+\item[{\tt node\_limit} -- integer (-1).]
+Number of nodes allowed to be analysed during the solution. When this
+node limit is reached, the solution process will stop and the best
+solution found to that point, along with other relevant data, will be
+output. A node limit less than 0 means there is no limit. 
+
+\item[{\tt gap\_limit} -- double (-1.0).]
+Target gap limit allowed for solution. When the gap between the lower and 
+the upper bound reaches this point, the solution process will stop and the 
+best solution found to that point, along with other relevant data, will be
+output. A gap limit less than 0 means there is no limit.
+
+\item[{\tt find\_first\_feasible} -- boolean (FALSE).]
+Whether to stop after finding the first feasible solution or not. 
+
+\item[{\tt sensitivity\_analysis} -- boolean (FALSE).]
+If the user wants to do the rudimentary sensitivity analysis, which will 
+give a lower bound for the problem modified by the right hand side, then, 
+this parameter has to be set before solving the original problem. If it 
+is set, SYMPHONY will keep the necessary information from the solution 
+processes of the original problem to be able to do the sensitivity analysis 
+later.  
 
 \end{description}
 
@@ -596,8 +658,16 @@ next. For other possible values, see the description \htmlref{
 parameter is provided so that the user can change the default behavior
 without recompiling.
 
-\end{description}
+\item[{\tt mc\_find\_nondominated\_solutions} -- boolean ({\tt TRUE}).]
+If the problem to be solved is a bicriteria problem and if only the 
+supported solutions are desired to be found, then the user should turn 
+this parameter off before calling {\tt sym\_mc\_solve} routine.
 
+\item[{\tt mc\_rho} -- double ({\tt 0.00001}).]
+The value used in augmented Chebyshev norm during the bicriteria 
+solution procedure.
+
+\end{description}
 \subsection{Cut Generator Parameters}
 
 \begin{description}
@@ -686,3 +756,79 @@ ordered by quality and the first {\tt cuts\_to\_check} cuts are
 checked for violation.
 
 \end{description}
+
+\subsection{C++ Interface/OSI Parameters}
+\label{OSI Parameters}
+
+As the implementation of the whole interface, there exists a matching 
+C interface parameter to each of the C++ Interface/OSI parameter and 
+the parameter setting functions are designed to set the 
+corresponding C interface parameter. Thus, we will just give a table of the 
+parameter names, their C interface complements and the values they can be set 
+to, rather than their detailed descriptions. For each parameter, the user 
+can see the C interface complement for further explanation. \\
+
+\resizebox{16cm}{7cm}{
+\begin{tabular}{|l||l||l|} \hline
+{\bf C++ Interface} & {\bf C Interface} & {\bf Value}\\ \hline \hline
+OsiSymVerbosity & verbosity & -user defined- \\
+\hline \hline
+OsiSymWarmStart & warm\_start & -boolean- \\
+\hline \hline
+OsiSymNodeLimit &  & \\
+OsiMaxNumIteration & node\_limit & -user defined-\\
+OsiMaxNumIterationHotStart & & \\
+\hline \hline
+OsiSymFindFirstFeasible & find\_first\_feasible & -boolean- \\
+\hline \hline
+OsiSymSearchStrategy & node\_selection\_rule & LOWEST\_LP\_FIRST \\
+& & HIGHEST\_LP\_FIRST \\
+& & BREADTH\_FIRST\_SEARCH \\
+& & DEPTH\_FIRST\_SEARCH \\
+\hline \hline
+OsiSymUsePermanentCutPools & use\_permanent\_cut\_pools & -boolean- \\
+\hline \hline
+OsiSymKeepWarmStart & keep\_warm\_start & -boolean- \\
+\hline \hline
+OsiSymTrimWarmTree & trim\_warm\_tree * -boolean- \\
+\hline \hline
+OsiSymDoReducedCostFixing & do\_reduced\_cost\_fixing & -boolean- \\
+\hline \hline
+OsiSymMultiCriteriaFindNondominatedSolutions & 
+mc\_find\_nondominated\_solutions & -boolean- \\
+\hline \hline
+OsiSymSensitivityAnalysis & sensitivity\_analysis & -boolean- \\
+\hline \hline
+OsiSymRandomSeed & random\_seed & -user defined-\\
+\hline \hline
+OsiSymDivingStrategy & diving\_strategy & BEST\_ESTIMATE \\
+& & COMP\_BEST\_K \\
+& & COMP\_BEST\_K\_GAP \\
+\hline \hline
+OsiSymDivingK & diving\_k & -user defined- \\
+\hline \hline
+OsiSymDivingThreshold & diving\_threshold & -user defined- \\
+\hline \hline
+OsiSymGranularity & granularity & -user defined- \\
+\hline \hline
+OsiSymTimeLimit & time\_limit & -user defined- \\
+\hline \hline   
+OsiSymGapLimit & gap\_limit & -user defined- \\
+\hline \hline
+OsiObjOffset & - & -user defined- \\
+\hline \hline
+OsiProbName & problem\_name & -user defined- \\
+\hline 
+\end{tabular}
+} \\
+
+However, as it is seen, only some of the C interface parameters have their 
+matches. If the other parameters are required to be modified, the user 
+can always set them directly by their C interface names, 
+using the overlapping functions: {\tt setSymParam(string, int), 
+setSymParam(string, double) and setSymParam(string,string)}. For instance, 
+the {\tt verbosity} parameter can be set, let's say, to 2 either by 
+setSymParam(OsiSymVerbosity, 2) or by setSymParam(``verbosity'', 2). 
+Note that, this flexibility is also supported for parameter querying 
+functions. 
+

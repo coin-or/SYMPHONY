@@ -1625,4 +1625,4 @@ clean_bin :
 clean_all : clean clean_dep clean_user clean_user_dep clean_lib clean_bin
 	true
 
-#.SILENT:
+.SILENT:
