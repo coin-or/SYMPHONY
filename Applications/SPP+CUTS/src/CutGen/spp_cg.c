@@ -130,11 +130,16 @@ int user_receive_lp_solution_cg(void *user)
 
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   int index, double objval, int *indices, double *values,
-		   double ub, double etol, int *cutnum)
+		   double ub, double etol, int *cutnum, int *alloc_cuts,
+		   cut_data ***cuts)
 {
    spp_cg_problem *spp = (spp_cg_problem *)user;
    int numcuts = 0;
    int i;
+
+	spp->num_cuts = cutnum;
+	spp->alloc_cuts= alloc_cuts;
+	spp->cuts = cuts;
 
    /* reallocate space if needed */
    if (varnum > spp->max_sol_length) {
@@ -686,7 +691,7 @@ int register_and_send_cut(spp_cg_problem *spp, cut_data *new_cut,
    cut_coll->mult[pos] = 0;
 
    /* now we send the cut indexed by 'pos' to the lp */
-   cg_send_cut(cuts[pos]);
+   cg_add_user_cut(cuts[pos], spp->num_cuts, spp->alloc_cuts, spp->cuts);
 
    /* for debugging purposes: print out info which cut was sent to the lp */
    switch (cuts[pos]->type) {

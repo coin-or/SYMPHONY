@@ -19,7 +19,6 @@
 
 #include "tm_params.h"
 #include "BB_types.h"
-#include "lp_solver.h"
 #ifdef COMPILE_IN_CG
 #include "cg.h"
 #endif

@@ -42,40 +42,31 @@ MASTERNAME = mip
 # explanation of these variables in SYMPHONY's Makefile.
 ##############################################################################
 
-COMPILE_IN_TM = TRUE
-COMPILE_IN_LP = TRUE
-COMPILE_IN_CG = TRUE
-COMPILE_IN_CP = TRUE
-
-##############################################################################
-# If you wish to compile and use the SYMPHONY callable library through the 
-# SYMPHONY OSI interface, set USE_OSI_INTERFACE to TRUE below. Note that
-# you must have COIN installed to use this capability. See the main SYMPHONY
-# Makefile to set the path to the COIN directories.
-##############################################################################
-
-USE_OSI_INTERFACE = TRUE
+APPL_COMPILE_IN_TM = TRUE
+APPL_COMPILE_IN_LP = TRUE
+APPL_COMPILE_IN_CG = TRUE
+APPL_COMPILE_IN_CP = TRUE
 
 ##############################################################################
 # This section is for listing source file names
 ##############################################################################
 
 USER_LP_SRC       = user_lp_branch.c user_lp.c 
-ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(APPL_COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += user_cg.c
 endif
 
 USER_TM_SRC       =
-ifeq ($(COMPILE_IN_LP),TRUE)
+ifeq ($(APPL_COMPILE_IN_LP),TRUE)
 USER_TM_SRC      += $(USER_LP_SRC)
 endif
-ifeq ($(COMPILE_IN_CP),TRUE)
+ifeq ($(APPL_COMPILE_IN_CP),TRUE)
 USER_TM_SRC      += user_cp.c 
 endif
 
 USER_MASTER_SRC   = user_main.c user_master.c
 
-ifeq ($(COMPILE_IN_TM),TRUE)
+ifeq ($(APPL_COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)
 endif
 
@@ -88,7 +79,15 @@ USER_DG_SRC       = user_dg.c
 ALL_USER_SRC      = user_lp_branch.c user_lp.c
 ALL_USER_SRC     += user_master.c user_cg.c user_cp.c user_dg.c
 
-USER_SRCDIR      += 
+USER_SRCDIR      = $(USERROOT)/source
+
+##############################################################################
+# This is the flag for the SYMPHONY Makefile to determine whether
+# an application is to be used. You shouldn't need to modify this
+# variable. 
+##############################################################################
+
+USE_SYM_APPL = TRUE
 
 ##############################################################################
 # Include the SYMPHONY makefile after all the source file names (and before

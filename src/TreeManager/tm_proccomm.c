@@ -412,46 +412,43 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
    
 #ifdef COMPILE_IN_LP
 
-   /* SensAnalysis */
-# if 0
-   
-   /* Again, here, we need to do some things directly if the LP
-      function is being performed within the tree manager. Otherwise,
-      we just send out the data below */
-   if (! (colgen_strat & COLGEN_REPRICING) &&
-       lp[thread_num]->has_ub && node->lower_bound >
-       lp[thread_num]->ub - lp[thread_num]->par.granularity){
-      if (desc->nf_status == NF_CHECK_NOTHING ||
-	  (colgen_strat & FATHOM__DO_NOT_GENERATE_COLS__DISCARD)){
-	 tm->active_nodes[thread_num]->node_status = NODE_STATUS__PRUNED;
-	 if (lp[thread_num]->par.verbosity > 0){
-	    printf("****************************************************\n");
-	    printf("* Immediately pruning NODE %i LEVEL %i\n",
+#if 0
+   if(!tm->par.sensitivity_analysis){   
+      /* Again, here, we need to do some things directly if the LP
+	 function is being performed within the tree manager. Otherwise,
+	 we just send out the data below */
+      if (! (colgen_strat & COLGEN_REPRICING) &&
+	  lp[thread_num]->has_ub && node->lower_bound >
+	  lp[thread_num]->ub - lp[thread_num]->par.granularity){
+	 if (desc->nf_status == NF_CHECK_NOTHING ||
+	     (colgen_strat & FATHOM__DO_NOT_GENERATE_COLS__DISCARD)){
+	    tm->active_nodes[thread_num]->node_status = NODE_STATUS__PRUNED;
+	    if (lp[thread_num]->par.verbosity > 0){
+	       printf("***************************************************\n");
+	       printf("* Immediately pruning NODE %i LEVEL %i\n",
 		   node->bc_index, node->bc_level);
-	    printf("****************************************************\n");
+	       printf("***************************************************\n");
+	    }
+	    return;
 	 }
-	 return;
-      }
-      if (colgen_strat & FATHOM__DO_NOT_GENERATE_COLS__SEND){
-	 tm->active_nodes[thread_num]->node_status = NODE_STATUS__HELD;
-	 REALLOC(tm->nextphase_cand, bc_node *,
-		 tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
-	 tm->nextphase_cand[tm->nextphase_candnum++] =
-	    tm->active_nodes[thread_num];
-	 if (lp[thread_num]->par.verbosity > 0){
-	    printf("****************************************************\n");
-	    printf("* Sending back NODE %i LEVEL %i\n",
-		   node->bc_index, node->bc_level);
-	    printf("****************************************************\n");
+	 if (colgen_strat & FATHOM__DO_NOT_GENERATE_COLS__SEND){
+	    tm->active_nodes[thread_num]->node_status = NODE_STATUS__HELD;
+	    REALLOC(tm->nextphase_cand, bc_node *,
+		    tm->nextphase_cand_size, tm->nextphase_candnum+1,
+		    BB_BUNCH);
+	    tm->nextphase_cand[tm->nextphase_candnum++] =
+	       tm->active_nodes[thread_num];
+	    if (lp[thread_num]->par.verbosity > 0){
+	       printf("***************************************************\n");
+	       printf("* Sending back NODE %i LEVEL %i\n",
+		      node->bc_index, node->bc_level);
+	       printf("***************************************************\n");
+	    }
+	    return;
 	 }
-	 return;
       }
    }
-
-#endif 
-
-   /* SensAnalysis */
-
+#endif
    new_desc = lp[thread_num]->desc = (node_desc *) calloc(1,sizeof(node_desc));
 
    lp[thread_num]->cut_pool = node->cp;
@@ -721,12 +718,6 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    int oldkeep, keep;
    char olddive, dive;
    int new_branching_cut = FALSE, lp;
-
-
-   /* SensAnalysis */
-   double **solution = NULL;
-   double **duals = NULL;
-   /* SensAnalsysis */
 
    receive_char_array(&bobj->type, 1);
    receive_int_array(&bobj->name, 1);

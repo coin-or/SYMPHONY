@@ -62,11 +62,11 @@ RANLIB = ranlib
 ##############################################################################
 # The SYMPHONYROOT environment variable specifies the root directory for the 
 # source code. If this file is not in the SYMPHONY root directory, change this
-# variable to the correct path.
+# variable to the correct path. 
 ##############################################################################
 
-### SYMPHONYROOT is now usually defined in the user's Makefile ###
-### See SYMPHONY/USER/Makefile                                 ###
+### If one is to be used, this variable needs to be defined in the 
+### application's Makefile.
 
 ##############################################################################
 # USERROOT is the name of the user's source directory. $(SYMPHONYROOT)/VRP is 
@@ -85,6 +85,13 @@ RANLIB = ranlib
 ##############################################################################
 
 COINROOT = ${HOME}/COIN
+
+##############################################################################
+# LIBTYPE is the variable to indicate what type of SYMPHONY library 
+# (SHARED or STATIC) is to be created.
+##############################################################################
+
+LIBTYPE = SHARED
 
 ##############################################################################
 ##############################################################################
@@ -134,7 +141,7 @@ endif
 
 #Uncomment the line below if you want to use an OSI interface.
 LP_SOLVER = OSI
-OSI_INTERFACE = OSL
+OSI_INTERFACE = CLP
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
@@ -147,8 +154,8 @@ ifeq ($(OSI_INTERFACE),CPLEX)
        LPLIB += -lOsiCpx -lcplex
 endif
 ifeq ($(OSI_INTERFACE),OSL)
-       LPINCDIR += /usr/local/include
-       LPLIBPATHS += /home/tkr/src/osllib/lib
+       LPINCDIR += $(HOME)/OSL/osllib/include
+       LPLIBPATHS += $(HOME)/OSL/osllib/lib
        LPLIB += -lOsiOsl -losl
 endif
 ifeq ($(OSI_INTERFACE),CLP)
@@ -177,8 +184,8 @@ ifeq ($(OSI_INTERFACE),DYLP)
        LPLIB += -lOsiDylp -lOsiDylpSolver -ldylpstd
 endif
 ifeq ($(OSI_INTERFACE),GLPK)
-       LPINCDIR += ${HOME}/include
-       LPLIBPATHS += ${HOME}/lib
+       LPINCDIR += ${HOME}/GLPK/glpk-4.1/include
+       LPLIBPATHS += ${HOME}/GLPK/glpk-4.1
        LPLIB += -lOsiGlpk -lglpk
 endif
 endif
@@ -187,12 +194,12 @@ endif
 # GLPMPL definitions
 ##############################################################################
 
-USE_GLPMPL = TRUE
+USE_GLPMPL = FALSE
 
 ifeq ($(USE_GLPMPL),TRUE)
-        LPINCDIR += ${HOME}/src/glpk-4.0/include
-        LPLIBPATHS += ${HOME}/src/glpk-4.0/
-        LPLIB += -lglpk 
+        LPINCDIR += ${HOME}/GLPK/glpk-4.4/include
+        LPLIBPATHS += ${HOME}/GLPK/glpk-4.4/src
+        LPLIB += -lglpk
 endif
 
 ##############################################################################
@@ -207,9 +214,33 @@ endif
 USE_CGL_CUTS = TRUE
 
 ifeq ($(USE_CGL_CUTS),TRUE)
-LPINCDIR += ${HOME}/COIN/include
-LPLIBPATHS += ${HOME}/COIN/lib
-LPLIB += -lCgl -lCoin -lOsi
+LPLIB += -lCgl
+ifneq ($(LP_SOLVER),OSI)
+LPINCDIR += $(COINROOT)/include
+LPLIBPATHS += $(COINROOT)/lib
+LPLIB += -lCoin -lOsi
+endif
+endif
+
+##############################################################################
+# If you wish to compile and use SYMPHONY or one of the application through 
+# the SYMPHONY OSI interface, set USE_OSI_INTERFACE to TRUE below. This will 
+# only have the main function to call the OSI SYMPHONY interface. See the 
+# corresponding main function for the implementation. Note that
+# you must have COIN and OSI SYMPHONY interface installed to use this 
+# capability. See above to set the path to the COIN root directory. 
+##############################################################################
+
+USE_OSI_INTERFACE = TRUE
+
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+OSISYM_INCDIR     = -I$(COINROOT)/Osi/OsiSym/include
+OSISYM_LIB        = -lOsiSym
+ifneq ($(LP_SOLVER),OSI)
+OSISYM_INCDIR     += -I$(COINROOT)/include
+OSISYM_LIBPATH    += $(COINROOT)/lib      
+OSISYM_LIB        += -lCoin -lOsi
+endif
 endif
 
 ##############################################################################
@@ -296,11 +327,13 @@ OPT = -g
 ##############################################################################
 ##############################################################################
 
-### These variables are now usually defined in the user's Makefile ###
-# COMPILE_IN_CG = TRUE
-# COMPILE_IN_CP = TRUE
-# COMPILE_IN_LP = TRUE
-# COMPILE_IN_TM = TRUE
+# !!!These variables will be overriden if user's or one of the application's 
+# Makefile is called!!!                                                    
+
+COMPILE_IN_CG = TRUE
+COMPILE_IN_CP = TRUE
+COMPILE_IN_LP = TRUE
+COMPILE_IN_TM = TRUE
 
 ##############################################################################
 ##############################################################################
@@ -492,8 +525,17 @@ endif
 ##############################################################################
 
 ##############################################################################
-# Set the configuration path
+# Set the configuration and path
 ##############################################################################
+
+ifeq ($(USE_SYM_APPL),TRUE)
+COMPILE_IN_CG = $(APPL_COMPILE_IN_CG)
+COMPILE_IN_CP = $(APPL_COMPILE_IN_CP)
+COMPILE_IN_LP = $(APPL_COMPILE_IN_LP)
+COMPILE_IN_TM = $(APPL_COMPILE_IN_TM)
+else
+SYMPHONYROOT = $(PWD)
+endif
 
 ifeq ($(COMPILE_IN_TM),TRUE)
 	CONFIG:=1
@@ -516,12 +558,8 @@ else
 	CONFIG:=0$(CONFIG)
 endif 
 
-INCDIR       = $(EXTRAINCDIR) -I$(SYMPHONYROOT)/include -I$(USERROOT)/include 
+INCDIR      = $(EXTRAINCDIR) -I$(SYMPHONYROOT)/include -I$(USERROOT)/include 
 INCDIR 	    += $(USER_INCDIR)
-
-ifeq ($(USE_OSI_INTERFACE),TRUE)
-INCDIR      += -I$(COINROOT)/include -I$(COINROOT)/Osi/OsiSym/include
-endif
 
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ifeq ($(DECOMP),TRUE)
@@ -533,41 +571,69 @@ USER_OBJDIR  = $(USERROOT)/objects.$(ARCH)/$(CONFIG)/
 DEPDIR       = $(SYMPHONYROOT)/dep.$(ARCH)
 USER_DEPDIR  = $(USERROOT)/dep.$(ARCH)
 ifeq ($(LP_SOLVER),OSI)
-OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)_$(OSI_INTERFACE)
-LIBDIR	     = $(SYMPHONYROOT)/lib.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
+ifeq ($(USE_SYM_APPL), TRUE)
+OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/APPL_$(LP_SOLVER)_$(OSI_INTERFACE)
+LIBDIR	     = $(SYMPHONYROOT)/lib.$(ARCH)/APPL_$(LP_SOLVER)_$(OSI_INTERFACE)
 BINDIR       = $(USERROOT)/bin.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
 else
-OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)
-LIBDIR	     = $(SYMPHONYROOT)/lib.$(ARCH)/$(LP_SOLVER)
-BINDIR       = $(USERROOT)/bin.$(ARCH)/$(LP_SOLVER)
+OBJDIR   = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)_$(OSI_INTERFACE)
+LIBDIR   = $(SYMPHONYROOT)/lib.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
+BINDIR   = $(SYMPHONYROOT)/bin.$(ARCH)/$(LP_SOLVER)_$(OSI_INTERFACE)
 endif
-ifeq ($(USE_OSI_INTERFACE),TRUE)
-OSI_SRC_PATH = $(COINROOT)/Osi/OsiSym
 else
-OSI_SRC_PATH = 
+ifeq ($(USE_SYM_APPL), TRUE)
+OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/APPL_$(LP_SOLVER)
+LIBDIR	     = $(SYMPHONYROOT)/lib.$(ARCH)/APPL_$(LP_SOLVER)
+BINDIR       = $(USERROOT)/bin.$(ARCH)/$(LP_SOLVER)
+else
+OBJDIR   = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/$(LP_SOLVER)
+LIBDIR   = $(SYMPHONYROOT)/lib.$(ARCH)/$(LP_SOLVER)
+BINDIR   = $(SYMPHONYROOT)/bin.$(ARCH)/$(LP_SOLVER)
+endif
 endif
 
 SRCDIR  = \
-	$(SYMPHONYROOT)/Common     : $(USERROOT)/Common    :\
-	$(SYMPHONYROOT)/LP         : $(USERROOT)/LP        :\
-	$(SYMPHONYROOT)/CutGen     : $(USERROOT)/CutGen    :\
-	$(SYMPHONYROOT)/CutPool    : $(USERROOT)/CutPool   :\
-	$(SYMPHONYROOT)/SolPool    : $(USERROOT)/SolPool   :\
-	$(SYMPHONYROOT)/DrawGraph  : $(USERROOT)/DrawGraph :\
-	$(SYMPHONYROOT)/Master     : $(USERROOT)/Master    :\
-	$(SYMPHONYROOT)/include    : $(USERROOT)/include   :\
-	$(SYMPHONYROOT)            : $(USERROOT)           :\
-	$(SYMPHONYROOT)/TreeManager                        :\
+	$(SYMPHONYROOT)/Common      :\
+	$(SYMPHONYROOT)/LP          :\
+	$(SYMPHONYROOT)/CutGen      :\
+	$(SYMPHONYROOT)/CutPool     :\
+	$(SYMPHONYROOT)/SolPool     :\
+	$(SYMPHONYROOT)/DrawGraph   :\
+	$(SYMPHONYROOT)/Master      :\
+	$(SYMPHONYROOT)/include     :\
+	$(SYMPHONYROOT)             :\
+	$(SYMPHONYROOT)/TreeManager 
 
-VPATH  = $(SRCDIR):$(USER_SRCDIR):$(OSI_SRC_PATH)
+
+ifeq ($(USER_SRCDIR),)
+USER_SRCDIR = \
+	$(USERROOT)/Common    :\
+	$(USERROOT)/LP        :\
+	$(USERROOT)/CutGen    :\
+	$(USERROOT)/CutPool   :\
+	$(USERROOT)/SolPool   :\
+	$(USERROOT)/DrawGraph :\
+	$(USERROOT)/Master    :\
+	$(USERROOT)/include   :\
+	$(USERROOT)           
+endif
+
+VPATH  = $(SRCDIR):$(USER_SRCDIR)
 
 ##############################################################################
 # Put it together
 ##############################################################################
 
-LIBPATHS      = $(LIBDIR) $(X11LIBPATHS) $(COMMLIBPATHS) $(LPLIBPATHS) 
+LIBPATHS      = $(LIBDIR) $(X11LIBPATHS) $(COMMLIBPATHS) $(LPLIBPATHS) \
+		$(OSISYM_LIBPATH)
 LIBPATHS     += $(USERLIBPATHS)
-INCPATHS      = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR)
+INCPATHS      = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR) $(OSISYM_INCDIR)
+
+ifeq ($(USE_SYM_APPL),TRUE)
+LIBNAME = master$(MASTEREXT)
+else
+LIBNAME = sym
+endif
 
 EXTRAINCDIR   = $(addprefix -I,${INCPATHS})
 LDFLAGS       = $(addprefix -L,${LIBPATHS})
@@ -581,10 +647,6 @@ ifeq ($(CC),ompcc)
 else
 	LIBS  = -lX11 -lm $(COMMLIBS) $(SYSLIBS) $(USERLIBS)
 endif
-
-ifeq ($(USE_OSI_INTERFACE),TRUE)
-LIBS += -lOsi
-endif	
 
 ifeq ($(OPT),-O)
     ifeq ($(CC),gcc)
@@ -670,7 +732,7 @@ ifeq ($(COMPILE_IN_TM),TRUE)
 MASTEREXT = _tm$(TMEXT)
 endif
 ifeq ($(MASTERNAME),)
-MASTERNAME = master$(MASTEREXT)
+MASTERNAME = symphony$(MASTEREXT)
 ifeq ($(COMPILE_IN_CG),TRUE)
 ifeq ($(COMPILE_IN_CP),TRUE)
 ifeq ($(COMPILE_IN_LP),TRUE)
@@ -695,6 +757,19 @@ SYSDEFINES += $(MACH_DEP)
 ifeq ($(USE_CGL_CUTS),TRUE)
 SYSDEFINES += -DUSE_CGL_CUTS
 endif
+
+#ifneq ($(MAKECMDGOALS), symphony)
+#SYSDEFINES += -DUSE_SYM_APPLICATION
+#endif
+
+ifeq ($(USE_SYM_APPL),TRUE)
+SYSDEFINES += -DUSE_SYM_APPLICATION
+endif
+
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+SYSDEFINES += -DUSE_OSI_INTERFACE
+endif
+
 ifeq ($(LP_SOLVER), OSI)
 SYSDEFINES += -D__OSI_$(OSI_INTERFACE)__
 else
@@ -776,11 +851,29 @@ ifeq ($(STRICT_CHECKING),TRUE)
 ifeq ($(VERSION),GNU)
 	MORECFLAGS = -ansi -pedantic -Wall -Wid-clash-81 -Wpointer-arith -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Winline -fnonnull-objects #-pipe
 endif
-else
+else 
 MOREFLAGS = 
 endif
 
+ifneq ($(USE_SYM_APPL),TRUE)
+MORECFLAGS += -fPIC
+endif
+
 CFLAGS = $(DEFAULT_FLAGS) $(MORECFLAGS) $(MOREFLAGS)
+
+LD             = $(AR)
+LIBNAME_TYPE   = $(addsuffix .a, $(addprefix lib, $(LIBNAME)))
+RANLIB        += $(LIBDIR)/$(LIBNAME_TYPE)
+LIBLDFLAGS     =
+
+ifneq ($(USE_SYM_APPL),TRUE)
+ifeq ($(LIBTYPE),SHARED)
+LD = $(CC) $(OPT) 
+LIBNAME_TYPE      = $(addsuffix .so, $(addprefix lib, $(LIBNAME)))
+LIBLDFLAGS = -shared -Wl,-soname,$(LIBNAME_TYPE) -o
+RANLIB = 
+endif
+endif
 
 ##############################################################################
 ##############################################################################
@@ -789,9 +882,12 @@ CFLAGS = $(DEFAULT_FLAGS) $(MORECFLAGS) $(MOREFLAGS)
 ##############################################################################
 
 MASTER_SRC	= master.c master_wrapper.c master_io.c master_func.c
-ifeq ($(USE_OSI_INTERFACE),TRUE)
-MASTER_SRC     += OsiSymSolverInterface.c SymWarmStart.c
+
+MASTER_MAIN_SRC =
+ifneq ($(USE_SYM_APPL),TRUE)
+MASTER_MAIN_SRC     = main.c
 endif
+
 DG_SRC		= draw_graph.c
 
 ifeq ($(COMPILE_IN_TM), TRUE)
@@ -872,6 +968,11 @@ $(OBJDIR)/%.o : %.c
 	@echo Compiling $*.c
 	$(CC) $(CFLAGS) $(EFENCE_LD_OPTIONS) -c $< -o $@
 
+$(SYM_OBJDIR)/%.o : %.c
+	mkdir -p $(SYM_OBJDIR)
+	@echo Compiling $*.c
+	$(CC) $(CFLAGS) $(EFENCE_LD_OPTIONS) -c $< -o $@
+
 $(DEPDIR)/%.d : %.c
 	mkdir -p $(DEPDIR)
 	@echo Creating dependency $*.d
@@ -906,26 +1007,31 @@ $(USER_DEPDIR)/%.d : %.c
 WHATTOMAKE = 
 PWHATTOMAKE = 
 QWHATTOMAKE = 
+
 ifeq ($(COMPILE_IN_LP),FALSE)
-WHATTOMAKE += lplib lp
+WHATTOMAKE  += lplib lp
 PWHATTOMAKE += plp
 QWHATTOMAKE += qlp
 endif
+
 ifeq ($(COMPILE_IN_CP),FALSE)
 WHATTOMAKE += cplib cp
 PWHATTOMAKE += pcp
 QWHATTOMAKE += qcp
 endif
+
 ifeq ($(COMPILE_IN_CG),FALSE)
 WHATTOMAKE += cglib cg
 PWHATTOMAKE += pcg
 QWHATTOMAKE += qcg
 endif
+
 ifeq ($(COMPILE_IN_TM),FALSE)
 WHATTOMAKE += tmlib tm
 PWHATTOMAKE += ptm
 QWHATTOMAKE += qtm
 endif
+
 WHATTOMAKE += masterlib master
 PWHATTOMAKE += pmaster
 QWHATTOMAKE += pmaster
@@ -974,14 +1080,19 @@ ALL_MASTER 	+= $(PACKCUT_SRC)
 ALL_MASTER 	+= $(PACKARRAY_SRC)
 
 MASTER_OBJS 	  = $(addprefix $(OBJDIR)/,$(notdir $(ALL_MASTER:.c=.o)))
-MASTER_DEP 	  = $(addprefix $(DEPDIR)/,$(ALL_MASTER:.c=.d))
+MAIN_OBJ          = $(addprefix $(OBJDIR)/,$(notdir $(MASTER_MAIN_SRC:.c=.o))) 
+MASTER_DEP        = $(addprefix $(DEPDIR)/,$(MASTER_MAIN_SRC:.c=.d))
+MASTER_DEP 	 += $(addprefix $(DEPDIR)/,$(ALL_MASTER:.c=.d))
 USER_MASTER_OBJS  = $(addprefix $(USER_OBJDIR)/,$(notdir $(USER_MASTER_SRC:.c=.o)))
 USER_MASTER_DEP   = $(addprefix $(USER_DEPDIR)/,$(USER_MASTER_SRC:.c=.d))
+
+DEPENDANTS = $(USER_MASTER_DEP) 
+OBJECTS = $(USER_MASTER_OBJS) $(MAIN_OBJ)
 
 master : $(BINDIR)/$(MASTERNAME)
 	true
 
-masterlib : $(LIBDIR)/libmaster$(MASTEREXT).a
+masterlib : $(LIBDIR)/$(LIBNAME_TYPE)
 	true
 
 pmaster : $(BINDIR)/p$(MASTERNAME)
@@ -996,6 +1107,7 @@ cmaster : $(BINDIR)/c$(MASTERNAME)
 master_clean :
 	cd $(OBJDIR)
 	rm -f $(MASTER_OBJS)
+	rm -f $(MAIN_OBJ)
 	cd $(DEPDIR)
 	rm -f $(MASTER_DEP)
 
@@ -1005,23 +1117,23 @@ master_clean_user :
 	cd $(USER_DEPDIR)
 	rm -f $(USER_MASTER_DEP)
 
-$(BINDIR)/$(MASTERNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
-$(LIBDIR)/libmaster$(MASTEREXT).a 
+$(BINDIR)/$(MASTERNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) $(MAIN_OBJ) \
+$(LIBDIR)/$(LIBNAME_TYPE) 
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) \
-	-lmaster$(MASTEREXT) $(LIBS) $(MASTERLPLIB) 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) $(MAIN_OBJ) \
+	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB) 
 	@echo ""
 
-$(LIBDIR)/libmaster$(MASTEREXT).a : $(MASTER_DEP) $(MASTER_OBJS)
+$(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS)
 	@echo ""
 	@echo "Making $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(LIBDIR)
-	$(AR) $(LIBDIR)/libmaster$(MASTEREXT).a $(MASTER_OBJS)
-	$(RANLIB) $(LIBDIR)/libmaster$(MASTEREXT).a
+	$(LD) $(LIBLDFLAGS) $@ $(MASTER_OBJS)
+	$(RANLIB)
 	@echo ""
 
 $(BINDIR)/p$(MASTERNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
@@ -1247,6 +1359,12 @@ lp_clean :
 	cd $(OBJDIR)
 	rm -f $(LP_OBJS)
 	cd $(DEPDIR)
+	rm -f $(LP_DEP)
+
+sym_lp_clean:
+	cd $(SYM_OBJDIR)
+	rm -f $(LP_OBJS)
+	cd $(SYM_DEPDIR)
 	rm -f $(LP_DEP)
 
 lp_clean_user :

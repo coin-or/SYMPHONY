@@ -135,6 +135,13 @@ typedef struct SPP_CG_PROBLEM {
    frac_graph         *cfgraph;
    level_graph        *lgraph;
    cut_collection     *cut_coll;
+
+   int                *num_cuts; 
+   int                *alloc_cuts;
+   cut_data         ***cuts;
+	
+
+
 }spp_cg_problem;
 
 void allocate_var_length_structures PROTO((spp_cg_problem *spp, int max_ln));

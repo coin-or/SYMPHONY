@@ -87,21 +87,30 @@ void free_candidate(branch_obj **cand)
 #ifndef MAX_CHILDREN_NUM
       FREE(can->sense); FREE(can->rhs); FREE(can->range); FREE(can->branch);
 
-      if(can->solutions){
+      if (can->solutions){
 	 for (i = can->child_num-1; i >= 0; i--){
 #else
-      if(can->solutions){
+      if (can->solutions){
 	 for (i = MAX_CHILDREN_NUM - 1; i >= 0; i--){
 #endif
 	    FREE(can->solutions[i]);
+	 }
+      }
+
+#ifndef MAX_CHILDREN_NUM
+      if (can->duals){
+	 for (i = can->child_num-1; i >= 0; i--){
+#else
+      if (can->duals){
+	 for (i = MAX_CHILDREN_NUM - 1; i >= 0; i--){
+#endif
 	    FREE(can->duals[i]);
 	 }
       }
 
-      /* SensAnalysis */
       FREE(can->solutions);
       FREE(can->duals);
-
+      
       FREE(*cand);
    }
 }

@@ -64,8 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GR /GX /ZI /Od /I "..\..\include" /I "..\include" /I "C:\concorde\INCLUDE" /I "C:\ILOG\cplex81\include\ilcplex" /I "C:\COIN\Osi\include" /I "C:\Coin\Coin\include" /I "C:\Coin\Osi\OsiCpx\include" /I "C:\COIN\Cgl\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CPLEX__" /D "USE_CGL_CUTS" /Fp"Debug/vrp.pch" /YX /FD /GZ /c /Tp
-# SUBTRACT CPP /u
+# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\include" /I "..\include" /I "C:\COIN\Osi\include" /I "C:\Coin\Coin\include" /I "C:\COIN\Cgl\include" /I "C:\Coin\Clp\include" /I "C:\Coin\Osi\OsiClp\include" /I "C:\Coin\Osi\OsiSym\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /Fp"Debug/vrp.pch" /YX /FD /GZ /c /Tp
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -89,7 +88,7 @@ LIB32=link.exe -lib
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\CutGen\user_cg.c
+SOURCE=..\source\user_cg.c
 # End Source File
 # End Group
 # Begin Group "CutPool"
@@ -97,7 +96,7 @@ SOURCE=..\CutGen\user_cg.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\CutPool\user_cp.c
+SOURCE=..\source\user_cp.c
 # End Source File
 # End Group
 # Begin Group "DrawGraph"
@@ -105,7 +104,7 @@ SOURCE=..\CutPool\user_cp.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\DrawGraph\user_dg.c
+SOURCE=..\source\user_dg.c
 # End Source File
 # End Group
 # Begin Group "LP"
@@ -113,16 +112,20 @@ SOURCE=..\DrawGraph\user_dg.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\LP\user_lp.c
+SOURCE=..\source\user_lp.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\LP\user_lp_branch.c
+SOURCE=..\source\user_lp_branch.c
 # End Source File
 # End Group
 # Begin Group "Master"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\source\user_main.c
+# End Source File
 # Begin Source File
 
 SOURCE=..\Master\user_master.c

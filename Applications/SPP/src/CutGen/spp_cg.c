@@ -65,7 +65,8 @@ int user_receive_lp_solution_cg(void *user)
 
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   int index, double objval, int *indices, double *values,
-		   double ub, double etol, int *cutnum)
+		   double ub, double etol, int *cutnum, int *alloc_cuts, 
+		   cut_data ***cuts)
 {
    return(USER_DEFAULT);
 }

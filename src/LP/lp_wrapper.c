@@ -132,7 +132,7 @@ int receive_lp_data_u(lp_prob *p)
 	 }
       }
    }
-   
+#ifdef USE_SYM_APPLICATION   
    switch( user_receive_lp_data(&p->user)){
     case USER_ERROR:
       freebuf(r_bufid);
@@ -147,6 +147,8 @@ int receive_lp_data_u(lp_prob *p)
       /* Unexpected return value. Do something!! */
       return(ERROR__USER);
    }
+#endif
+
    return(FUNCTION_TERMINATED_NORMALLY);
 }
 
@@ -238,6 +240,7 @@ int create_subproblem_u(lp_prob *p)
       userind[i] = vars[i]->userind;
    }
    
+#ifdef USE_SYM_APPLICATION
    user_res = user_create_subproblem(p->user,
        /* list of base and extra variables */
        userind,
@@ -245,7 +248,10 @@ int create_subproblem_u(lp_prob *p)
        lp_data->mip, 
        /* max sizes (estimated by the user) */
        &maxn, &maxm, &maxnz);
-   
+#else
+   user_res = USER_DEFAULT;
+#endif
+
    switch (user_res){
       
     case USER_DEFAULT:
@@ -338,7 +344,7 @@ int create_subproblem_u(lp_prob *p)
        * problem is loaded into the lp solver (for cplex it is not possible).
        * So for now just reset lp_data->m, do everything to load in the
        * stuff into the lp solver then come back to adding the cuts. */
-      if (p->mip->obj_sense == MAXIMIZE){
+      if (p->mip->obj_sense == SYM_MAXIMIZE){
          for (i = 0; i < lp_data->mip->n; i++){
 	    lp_data->mip->obj[i] *= -1.0;
 	 }
@@ -568,8 +574,13 @@ int is_feasible_u(lp_prob *p, char branching)
 
    cnt = collect_nonzeros(p, lp_data->x, indices, values);
 
+#ifdef USE_SYM_APPLICATION
    user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
 			       &feasible, &true_objval, branching);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
    switch (user_res){
     case USER_ERROR: /* Error. Consider as feasibility not recognized. */
       return(FALSE);
@@ -586,11 +597,11 @@ int is_feasible_u(lp_prob *p, char branching)
 
    switch (user_res){
     case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
-      for (i=cnt-1; i>=0; i--){
+       for (i=cnt-1; i>=0; i--){
 	 if (!lp_data->vars[i]->is_int)
 	    continue; /* Not an integer variable */
 	 if (values[i] < lpetol1) break;
-      }
+       }
       feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
       break;
     case TEST_INTEGRALITY:
@@ -643,7 +654,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	    memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
 	    PRINT(p->par.verbosity, -1,
 		  ("\n****** Found Better Feasible Solution !\n"));
-	    if (p->mip->obj_sense == MAXIMIZE){
+	    if (p->mip->obj_sense == SYM_MAXIMIZE){
 	       PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", -new_ub 
 					    + p->mip->obj_offset));
 	    }else{
@@ -678,7 +689,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	 if (!p->par.multi_criteria){
 	    PRINT(p->par.verbosity, 0,
 		  ("\n* Found Another Feasible Solution.\n"));
-	    if (p->mip->obj_sense == MAXIMIZE){
+	    if (p->mip->obj_sense == SYM_MAXIMIZE){
 	       PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -new_ub
 					   + p->mip->obj_offset));
 	    }else{
@@ -720,7 +731,12 @@ void send_feasible_solution_u(lp_prob *p, int xlevel, int xindex,
       send_int_array(xind, cnt);
       send_dbl_array(xval, cnt);
    }
+#ifdef USE_SYM_APPLICATION
    user_res = user_send_feasible_solution(p->user, lpetol, cnt, xind, xval);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
    switch (user_res){
     case USER_SUCCESS:
     case USER_AND_PP:
@@ -764,8 +780,12 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
    number = collect_nonzeros(p, x, xind, xval);
 
    /* Invoke user written function. */
+#ifdef USE_SYM_APPLICATION
    user_res = user_display_lp_solution(p->user, which_sol, number, xind, xval);
-   
+#else
+   user_res = USER_DEFAULT;
+#endif   
+
    switch(user_res){
     case USER_ERROR:
       /* SYMPHONY ignores error message. */
@@ -901,10 +921,15 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    }
 
    /* First decide if we are going to branch or not */
+#ifdef USE_SYM_APPLICATION
    user_res = user_shall_we_branch(p->user, lpetol, *cuts, j, slacks_in_matrix,
 				   p->slack_cut_num, p->slack_cuts, lp_data->n,
 				   lp_data->vars, lp_data->x, lp_data->status, 
 				   cand_num, candidates, &action);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
    switch (user_res){
     case USER_SUCCESS:
     case USER_AND_PP:
@@ -971,11 +996,16 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    action = USER__DO_BRANCH;
 
    /* OK, so we got to branch */
+#ifdef USE_SYM_APPLICATION
    user_res = user_select_candidates(p->user, lpetol, *cuts, j,
 				     slacks_in_matrix, p->slack_cut_num,
 				     p->slack_cuts, lp_data->n, lp_data->vars,
 				     lp_data->x, lp_data->status, cand_num,
 				     candidates, &action, p->bc_level);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
    /* Get rid of any contsraint from slack_cuts which is listed in candidates
     * and rewrite the position of the CANDIDATE_CUT_IN_MATRIX ones */
    if (p->par.branch_on_cuts){
@@ -1118,9 +1148,13 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
    }
 
    /* Otherwise, first give the choice to the user */
-
+#ifdef USE_SYM_APPLICATION
    user_res = user_compare_candidates(p->user, best, can, p->ub,
 				      p->par.granularity, &i);
+
+#else
+   user_res = USER_DEFAULT;
+#endif
 
    switch(user_res){
     case USER_SUCCESS:
@@ -1231,7 +1265,7 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
       if (p->lp_data->nf_status == NF_CHECK_NOTHING && p->has_ub){
 	 if (can->objval[i] > p->ub - p->par.granularity){
 	    //action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
-	    /* SensAnalysis */
+
 	    /*see which one is infeasible!*/
 	    if(can->termcode[i] == LP_OPTIMAL || 
 	       can->termcode[i] == LP_D_ITLIM || 
@@ -1240,13 +1274,16 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
 	       action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
 	    }else{
 	       action[i] = PRUNE_THIS_CHILD_INFEASIBLE;
-	    /* SensAnalysis */
 	    }
 	 }
       }
    }
 
+#ifdef USE_SYM_APPLICATION
    user_res = user_select_child(p->user, p->ub, can, action);
+#else
+   user_res = USER_DEFAULT;
+#endif
 
    switch(user_res){
     case USER_NO_PP:
@@ -1356,7 +1393,7 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
    }
    for (i=0; i<can->child_num; i++){
       if (can->objval[i] != MAXDOUBLE / 2){
-	 if (p->mip->obj_sense == MAXIMIZE){
+	 if (p->mip->obj_sense == SYM_MAXIMIZE){
 	    printf("[%.3f, %i,%i]  ", -can->objval[i] + p->mip->obj_offset,
 		   can->termcode[i], can->iterd[i]);
 	 }else{
@@ -1369,6 +1406,7 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
    }
    printf("\n");
 
+#ifdef USE_SYM_APPLICATION
    if (can->type == CANDIDATE_VARIABLE){
       user_print_branch_stat(p->user, can, NULL,
 			     p->lp_data->n, p->lp_data->vars, action);
@@ -1377,6 +1415,7 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
 			     p->lp_data->rows[can->position].cut,
 			     p->lp_data->n, p->lp_data->vars, action);
    }
+#endif
 }
 
 /*===========================================================================*/
@@ -1390,9 +1429,10 @@ void add_to_desc_u(lp_prob *p, node_desc *desc)
 {
    desc->desc_size = 0;
    desc->desc = NULL;
-
+#ifdef USE_SYM_APPLICATION
    user_add_to_desc(p->user, &desc->desc_size,
 		    &desc->desc);
+#endif
 }
 
 /*===========================================================================*/
@@ -1403,7 +1443,12 @@ int same_cuts_u(lp_prob *p, waiting_row *wrow1, waiting_row *wrow2)
    int same_cuts = DIFFERENT_CUTS;
    cut_data *rcut1 = NULL, *rcut2 = NULL;
 
+#ifdef USE_SYM_APPLICATION
    user_res = user_same_cuts(p->user, wrow1->cut, wrow2->cut, &same_cuts);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
    switch (user_res){
     case USER_SUCCESS:
     case USER_NO_PP:
@@ -1543,21 +1588,26 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 cuts[i] = NULL;
 	 break;
 
-      default: /* A user cut type */
-	 if (l != i){
-	    cuts[l++] = cuts[i];
-	    cuts[i] = NULL;
-	 }else{
-	    l++;
-	 }
+       default: /* A user cut type */
+	  if (l != i){
+	     cuts[l++] = cuts[i];
+	     cuts[i] = NULL;
+	  }else{
+	     l++;
+	  }
 	 break;
       }
    }
 
    *new_row_num = 0;
+      
+#ifdef USE_SYM_APPLICATION
    user_res = user_unpack_cuts(p->user, from, type,
 			       lp_data->n, lp_data->vars,
 			       l, cuts, new_row_num, new_rows);
+#else
+   user_res = USER_DEFAULT;
+#endif
 
    for (i = 0; i < l; i++){
       if (cuts[i]){
@@ -1641,9 +1691,14 @@ int send_lp_solution_u(lp_prob *p, int tid)
 	 send_dbl_array(&p->ub, 1);
    }
    colind_sort_extra(p);
+#ifdef USE_SYM_APPLICATION
    user_res = user_send_lp_solution(p->user, lp_data->n, lp_data->vars, x,
 				    tid == p->cut_gen ?
 				    LP_SOL_TO_CG : LP_SOL_TO_CP);
+#else
+   user_res = USER_DEFAULT;
+#endif
+   
    switch (user_res){
     case USER_ERROR: /* Error. Consider as couldn't send to cut_gen, i.e.,
 		   equivalent to NO_MORE_CUTS_FOUND */
@@ -1697,8 +1752,13 @@ void logical_fixing_u(lp_prob *p)
    colind_sort_extra(p);
    memcpy(status, lpstatus, p->lp_data->n);
 
+#ifdef USE_SYM_APPLICATION
    user_res = user_logical_fixing(p->user, p->lp_data->n, p->lp_data->vars,
 				  p->lp_data->x, status, &fixed_num);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
    switch(user_res){
     case USER_SUCCESS:
     case USER_AND_PP:
@@ -1725,12 +1785,13 @@ int generate_column_u(lp_prob *p, int lpcutnum, cut_data **cuts,
 {
    int real_nextind = nextind;
    int termcode = 0;
-   
+#ifdef USE_SYM_APPLICATION
    CALL_USER_FUNCTION( user_generate_column(p->user, generate_what,
 					    p->lp_data->m - p->base.cutnum,
 					    cuts, prevind, nextind,
 					    &real_nextind, colval, colind,
 					    collen, obj, lb, ub) );
+#endif
    return(real_nextind);
 }
 
@@ -1761,10 +1822,14 @@ int generate_cuts_in_lp_u(lp_prob *p)
       int user_res2, xlength = 0, *xind = NULL;
       lp_sol *cur_sol = &(p->cgp->cur_sol);
       double *xval = NULL, lpetol = 0;
-      
+
+#ifdef USE_SYM_APPLICATION
       user_res2 = user_send_lp_solution(p->user,
 					lp_data->n, lp_data->vars, x,
 					LP_SOL_WITHIN_LP);
+#else
+      user_res2 = USER_DEFAULT;
+#endif
       
       if (user_res2 == USER_DEFAULT)
 	 user_res2 = p->par.pack_lp_solution_default;
@@ -1869,10 +1934,14 @@ int generate_cuts_in_lp_u(lp_prob *p)
    }
 #endif      
    
+#ifdef USE_SYM_APPLICATION
    user_res = user_generate_cuts_in_lp(p->user, lp_data, lp_data->n,
 				       lp_data->vars, x,
 				       &new_row_num, &cuts);
-   
+#else
+   user_res = GENERATE_CGL_CUTS;
+#endif
+  
    switch(user_res){
     case USER_ERROR:
       FREE(cuts);
@@ -1937,8 +2006,13 @@ void print_stat_on_cuts_added_u(lp_prob *p, int added_rows)
 {
    int user_res;
    
+#ifdef USE_SYM_APPLICATION
    user_res = user_print_stat_on_cuts_added(p->user, added_rows,
 					    p->waiting_rows);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
    switch(user_res){
     case USER_ERROR:
     case USER_DEFAULT:
@@ -1970,8 +2044,13 @@ void purge_waiting_rows_u(lp_prob *p)
    delete_rows = p->lp_data->tmp.cv; /* wrow_num */
 
    memset(delete_rows, 0, wrow_num);
-   
+
+#ifdef USE_SYM_APPLICATION   
    user_res = user_purge_waiting_rows(p->user, wrow_num, wrows, delete_rows);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
    switch (user_res){
     case USER_ERROR: /* purge all */
       free_waiting_rows(wrows, wrow_num);
@@ -2012,18 +2091,21 @@ void purge_waiting_rows_u(lp_prob *p)
 
 void free_prob_dependent_u(lp_prob *p)
 {
+
+#ifdef USE_SYM_APPLICATION
    switch (user_free_lp(&p->user)){
     case USER_ERROR:
       /* SYMPHONY ignores error message */
-    case USER_SUCCESS:
-    case USER_AND_PP:
-    case USER_NO_PP:
+    case USER_SUCCESS: 
+    case USER_AND_PP:  
+    case USER_NO_PP:   
       /* User function terminated without problems. No post-processing. */
       return;
     default:
       /* Unexpected return value. Do something!! */
       break;
    }
+#endif
 }
 
 /*===========================================================================*/

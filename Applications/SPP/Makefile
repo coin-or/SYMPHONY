@@ -43,10 +43,10 @@ MASTERNAME = spp
 # explanation of these variables in SYMPHONY's Makefile.
 ##############################################################################
 
-COMPILE_IN_TM = TRUE
-COMPILE_IN_LP = TRUE
-COMPILE_IN_CG = TRUE
-COMPILE_IN_CP = TRUE
+APPL_COMPILE_IN_TM = TRUE
+APPL_COMPILE_IN_LP = TRUE
+APPL_COMPILE_IN_CG = TRUE
+APPL_COMPILE_IN_CP = TRUE
 
 ##############################################################################
 # This section is for listing SPP source file names
@@ -61,21 +61,22 @@ USER_CP_SRC       = spp_cp.c
 USER_DG_SRC       = spp_dg.c 
 
 USER_LP_SRC       = spp_lp_branch.c spp_lp.c
-ifeq ($(COMPILE_IN_CG),TRUE)
+ifeq ($(APPL_COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += $(USER_CG_SRC)
 endif
 
 USER_TM_SRC       =
-ifeq ($(COMPILE_IN_LP),TRUE)
+ifeq ($(APPL_COMPILE_IN_LP),TRUE)
 USER_TM_SRC      += $(USER_LP_SRC)
 endif
-ifeq ($(COMPILE_IN_CP),TRUE)
+ifeq ($(APPL_COMPILE_IN_CP),TRUE)
 USER_TM_SRC      += $(USER_CP_SRC)
 endif
 
-USER_MASTER_SRC   = spp_master.c spp_master_functions.c $(USER_COMMON_SRC)
+USER_MASTER_SRC   = spp_main.c spp_master.c spp_master_functions.c \
+$(USER_COMMON_SRC)
 
-ifeq ($(COMPILE_IN_TM),TRUE)
+ifeq ($(APPL_COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)
 endif
 
@@ -84,6 +85,14 @@ ALL_USER_SRC     += spp_master.c spp_master_functions.c
 ALL_USER_SRC     += spp_cg.c spp_cp.c spp_dg.c
 
 USER_SRCDIR      += 
+
+##############################################################################
+# This is the flag for the SYMPHONY Makefile to determine whether
+# a SYMPHONY application is to be used. You shouldn't need to modify this
+# variable. 
+##############################################################################
+
+USE_SYM_APPL = TRUE
 
 ##############################################################################
 # Include the SYMPHONY makefile after all the source file names (and before

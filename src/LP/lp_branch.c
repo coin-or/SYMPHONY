@@ -248,19 +248,26 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       can->termcode = pterm;
       can->feasible = pfeas;
       can->iterd = piter;
-   /* SensAnalysis */
       can->solutions = (double **)calloc(maxnum, sizeof(double *));
-      can->duals = (double **)calloc(maxnum, sizeof(double *));
+      if (p->tm->par.sensitivity_analysis){      
+	 can->duals = (double **)calloc(maxnum, sizeof(double *));
+      }else{
+	 can->duals = NULL;	 
+      }
 #ifdef COMPILE_FRAC_BRANCHING
       can->frac_num = pfrnum;
       can->frac_ind = pfrind;
       can->frac_val = pfrval;
 #endif
-   /* SensAnalysis */
+
 #else
       can->solutions = (double **) calloc 
 	 (MAX_CHILDREN_NUM, sizeof(double *));
-      can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
+      if (p->tm->par.sensitivity_analysis){      
+	 can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
+      }else{
+	 can->duals = NULL;	 
+      }	 
 #endif
 
 #ifdef STATISTICS
@@ -304,18 +311,15 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
 	    can->objval[j] = lp_data->objval;
 
-	    /* SensAnalysis */
 	    get_x(lp_data);
-	    get_dj_pi(lp_data);
-
-	    can->solutions[j] = (double *)calloc(DSIZE,lp_data->n);
-	    can->duals[j] = (double *)calloc(DSIZE,p->base.cutnum);
-	    
+	    can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
 	    memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-	    memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
 
-	    /* SensAnalysis */
-
+	    if (p->tm->par.sensitivity_analysis){      
+	       get_dj_pi(lp_data);
+	       can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
+	       memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
+	    }
 
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
@@ -384,17 +388,16 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
 	    can->objval[j] = lp_data->objval;
 
-	    /* SensAnalysis */
+
 	    get_x(lp_data);
-	    get_dj_pi(lp_data);
-
-	    can->solutions[j] = (double *)malloc(DSIZE*lp_data->n);
-	    can->duals[j] = (double *)malloc(DSIZE*p->base.cutnum);
-	    
+	    can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
 	    memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-	    memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
 
-	    /* SensAnalysis */
+	    if (p->tm->par.sensitivity_analysis){      
+	       get_dj_pi(lp_data);
+	       can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
+	       memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
+	    }
 
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
@@ -425,9 +428,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       }
 	    }
 #ifdef COMPILE_FRAC_BRANCHING
-	    else
+	    else{
 	       if (can->termcode[j] != LP_ABANDONED)
 		  get_x(lp_data);
+	    }
 	    if (can->termcode[j] != LP_ABANDONED){
 	       xind = lp_data->tmp.i1; /* n */
 	       xval = lp_data->tmp.d; /* n */

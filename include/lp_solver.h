@@ -19,7 +19,6 @@
 #include "BB_types.h"
 
 #define LP_MAX_ITER 9999999
-#define MAX_CHANGE_NUM 6  /* SensAnalysis */
 
 #ifdef __CPLEX__
 
@@ -145,33 +144,6 @@ typedef struct TEMPORARY{
    double    *dv;          /* variable */
    int        dv_size;
 }temporary;
-
-/* This structure stores the user's description of the model */
-
-typedef struct MIPDESC{
-   int        n;           /* number of columns */
-   int        m;           /* number of rows */
-   int        nz;          /* number of nonzeros */
-   char      *is_int;      /* indicates whether a given variables is integer */
-   int       *matbeg;      /* n */
-   int       *matind;      /* nz */
-   double    *matval;      /* nz */
-   double    *obj;         /* n */
-   double    *obj1;        /* n */ /* for bicriteria problems */
-   double    *obj2;        /* n */ /* for bicriteria problems */
-   double    *rhs;         /* m */
-   double    *rngval;      /* m */
-   char      *sense;       /* m */
-   double    *lb;          /* n */
-   double    *ub;          /* n */
-   char     **colname;     /* column names */
-   double     obj_offset;  /* constant to be added to the objective function.*/
-   char       obj_sense;   /* objective sense. */
-
-   int        change_num;  /* number of updates on the mip desc */
-   int        change_type[MAX_CHANGE_NUM];  /* type of the mip desc. changes */
-
-}MIPdesc;
 
 /* The LP solver data */
 

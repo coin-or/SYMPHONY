@@ -214,7 +214,10 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 
    mpl = mpl_initialize();  /* initialize the translator */
     
-   errors = mpl_read_model(mpl, modelfile);   /* read the model file */
+   //   errors = mpl_read_model(mpl, modelfile);   /* read the model file */
+
+   //version > 4.1
+   errors = mpl_read_model(mpl, modelfile, FALSE); 
  
    /*if the data is not in the model file and will be given seperately, 
      then errors=1! */
@@ -265,14 +268,14 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
       type = mpl_get_row_kind(mpl, i+1);
       if (type == MPL_ST){  /* constraints */
 	 /* mpl_get_mat_row returns the # of nonzeros in the row i+1. */
-	 mip->obj_sense = MINIMIZE; 
+	 mip->obj_sense = SYM_MINIMIZE; 
 	 mip->nz += mpl_get_mat_row(mpl, i+1, NULL, NULL); 
       }else{
 	 obj_index = i;
 	 mip->obj_offset = mpl_get_row_c0(mpl, i+1);
 	 length = mpl_get_mat_row(mpl, i+1, indices, values);
 	 if (type == MPL_MAX){
-	    mip->obj_sense = MAXIMIZE; 
+	    mip->obj_sense = SYM_MAXIMIZE; 
 	    for (j = 1; j <= length; j++){  
 	       mip->obj[indices[j]-1] = -values[j];
 	    }
@@ -2841,11 +2844,9 @@ void free_row_set(LPdata *lp_data, int length, int *index)
       }
    }
 
-   if (!range_used){
-     FREE(range);
-   }
-   
    lp_data->si->setRowSetTypes(index, index + length, sense, rhs, range);
+
+     FREE(range);
 }
 
 /*===========================================================================*/
@@ -2869,44 +2870,48 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
       }
    }
 
-   if (!range_used){
-      FREE(range);
-   }
-   
    lp_data->si->setRowSetTypes(index, index + length, sense, rhs, range);
+
+   FREE(range);
+
 }
 
 /*===========================================================================*/
 
 int read_mps(MIPdesc *mip, char *infile, char *probname)
 {
-   int j, k, last_dot = 0;
-   char fname[80] = "";
-   char ext[10] = "";
+   int j, k, last_dot = 0, last_dir = 0;
+   char fname[80] = "", ext[10] = "", slash;
+
    CoinMpsIO mps;
    int errors;
-   
+    
+#ifdef WIN32
+	slash = '\\';
+#else
+	slash = '/';
+#endif
+	
    for (j = 0;; j++){
       if (infile[j] == '\0')
 	 break;
       if (infile[j] == '.') {
-	 last_dot = j;
-      }
+	    last_dot = j;
+	  }
+	  if(infile[j] == slash){
+		last_dir = j;
+	  }
    }
    
-   for (j = 0, k = 0; infile[j] != '\0'; j++){
-      if (last_dot){
-	 if (j < last_dot)
-	    fname[j] = infile[j];
-	 if(j > last_dot){
-	    ext[k] = infile[j];
-	    k++;    
-	 }
-      }
-      else{
-	 fname[j] = infile[j];
-      }
+   if(last_dir < last_dot){
+	   printf("last_dir: last_dot   %i  %i\n", last_dir, last_dot);
+	   memcpy(fname, infile, CSIZE*last_dot);
+	   memcpy(ext, infile + last_dot + 1, CSIZE*(j - last_dot - 1)); 
    }
+   else{
+	   memcpy(fname, infile, CSIZE*j);
+   }
+
 
    mps.setInfinity(mps.getInfinity());
    

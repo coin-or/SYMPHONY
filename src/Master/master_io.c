@@ -68,37 +68,43 @@ void usage(void)
 	  "-j 0/1: whether or not to generate cgl cuts",
 	  "-z n: set diving threshold to 'n'");
    printf("Solver-specific switches:\n\n");
+#ifdef USE_SYM_APPLICATION
    user_usage();
+#else
+   printf("master [ -H ] [ -F file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
+	  "-H: help (solver-specific switches)",
+	  "-F model: model should be read in from file 'model'",
+	  "          (MPS format is assumed unless -D is also present)",
+	  "-D data: model is in AMPL format and data is in file 'data'");
+#endif   
 }
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-int parse_command_line(problem *p, int argc, char **argv)
+int parse_command_line(sym_environment * env, int argc, char **argv)
 {
    int i;
    char line[MAX_LINE_LENGTH +1], tmp, c;
    char key[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH +1];
    FILE *f = NULL, *f1 = NULL;
-   double timeout;
-   str_int colgen_str[COLGEN_STR_SIZE] = COLGEN_STR_ARRAY;
-   str_int compare_can_str[COMPARE_CAN_STR_SIZE] = COMPARE_CAN_STR_ARRAY;
-   tm_params *tm_par = &p->par.tm_par;
-   lp_params *lp_par = &p->par.lp_par;
-   cg_params *cg_par = &p->par.cg_par;
-   cp_params *cp_par = &p->par.cp_par;
+   //   str_int colgen_str[COLGEN_STR_SIZE] = COLGEN_STR_ARRAY;
+   tm_params *tm_par = &env->par.tm_par;
+   lp_params *lp_par = &env->par.lp_par;
+   cg_params *cg_par = &env->par.cg_par;
+   cp_params *cp_par = &env->par.cp_par;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
-   sp_params *sp_par = &p->par.sp_par;
+   sp_params *sp_par = &env->par.sp_par;
 #endif
    /*___END_EXPERIMENTAL_SECTION___*/
-   dg_params *dg_par = &p->par.dg_par;
+   dg_params *dg_par = &env->par.dg_par;
 
    if (argc < 2){
       usage();
       exit(0);
    }
-
+   
    printf("SYMPHONY was called with the following arguments:\n");
    printf("%s ", argv[0]);
    for (i = 1; i < argc; i++){
@@ -108,7 +114,7 @@ int parse_command_line(problem *p, int argc, char **argv)
       printf("%s ", argv[i]);
    }
    printf("\n\n");
-
+   
    for (i = 0; i < argc; i++){
       if (!strcmp(argv[i], "-f"))
 	 break;
@@ -117,295 +123,27 @@ int parse_command_line(problem *p, int argc, char **argv)
    if (i == argc){
       goto EXIT;
    }else{
-      strncpy(p->par.param_file, argv[i+1], MAX_FILE_NAME_LENGTH);
+      strncpy(env->par.param_file, argv[i+1], MAX_FILE_NAME_LENGTH);
    }
    
-   if ((f = fopen(p->par.param_file, "r")) == NULL){
+   if ((f = fopen(env->par.param_file, "r")) == NULL){
       (void) fprintf(stderr, "Readparams: file '%s' can't be opened\n\n",
-		     p->par.param_file);
+		     env->par.param_file);
       return(ERROR__OPENING_PARAM_FILE);
    }
 
    printf("============= Other Parameter Settings =============\n\n");
 
    while (NULL != fgets(line, MAX_LINE_LENGTH, f)){  /* read in parameters */
+
+      set_param(env, line);
+
       printf("%s", line);
       strcpy(key,"");
       sscanf(line,"%s%s", key, value);
 
-      /***********************************************************************
-       ***                    Global parameters                            ***
-       ***********************************************************************/
-      if (strcmp(key, "verbosity") == 0){
-	 READ_INT_PAR(p->par.verbosity);
-	 tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-	    sp_par->verbosity =
-#endif 
-	 /*___END_EXPERIMENTAL_SECTION___*/
-	    cp_par->verbosity = p->par.verbosity;
-      }
-      else if (strcmp(key, "random_seed") == 0){
-	 READ_INT_PAR(p->par.random_seed);
-	 tm_par->random_seed = p->par.random_seed;
-      }
-      else if (strcmp(key, "granularity") == 0){
-	 READ_DBL_PAR(tm_par->granularity);
-	 lp_par->granularity = tm_par->granularity;
-      }
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      else if (strcmp(key, "do_decomp") == 0 ||
-	       strcmp(key, "CG_do_decomp") == 0 ||
-	       strcmp(key, "TM_do_decomp") == 0){
-	 READ_INT_PAR(tm_par->do_decomp);
-	 cg_par->do_decomp = tm_par->do_decomp;
-      }
-      /*___END_EXPERIMENTAL_SECTION___*/
-
-      /***********************************************************************
-       ***                    Master parameters                            ***
-       ***********************************************************************/
-      else if (strcmp(key, "upper_bound") == 0 ||
-	       strcmp(key, "M_upper_bound") == 0){
-	 READ_DBL_PAR(p->ub);
-	 p->has_ub = TRUE;
-      }
-      else if (strcmp(key, "upper_bound_estimate") == 0 ||
-	       strcmp(key, "M_upper_bound_estimate") == 0){
-	 READ_DBL_PAR(p->ub_estimate);
-	 p->has_ub_estimate = TRUE;
-      }
-      else if (strcmp(key, "lower_bound") == 0 ||
-	       strcmp(key, "M_lower_bound") == 0){
-	 READ_DBL_PAR(p->lb);
-      }
-
-      else if (strcmp(key, "M_verbosity") == 0){
-	 READ_INT_PAR(p->par.verbosity);
-      }
-      else if (strcmp(key, "M_random_seed") == 0){
-	 READ_INT_PAR(p->par.random_seed);
-      }
-
-      else if (strcmp(key, "tm_executable_name") == 0 ||
-	       strcmp(key, "tm_exe") == 0 ||
-	       strcmp(key, "M_tm_exe") == 0 ||
-	       strcmp(key, "M_tm_executable_name") == 0){
-	 read_string(p->par.tm_exe, line, MAX_FILE_NAME_LENGTH);
-      }
-      else if (strcmp(key, "dg_executable_name") == 0 ||
-	       strcmp(key, "dg_exe") == 0 ||
-	       strcmp(key, "M_dg_exe") == 0 ||
-	       strcmp(key, "M_dg_executable_name") == 0){
-	 read_string(p->par.dg_exe, line, MAX_FILE_NAME_LENGTH);
-      }
-      else if (strcmp(key, "tm_debug") == 0 ||
-	       strcmp(key, "M_tm_debug") == 0){
-	 READ_INT_PAR(p->par.tm_debug);
-	 if (p->par.tm_debug) p->par.tm_debug = 4;
-      }
-      else if (strcmp(key, "dg_debug") == 0 ||
-	       strcmp(key, "M_dg_debug") == 0){
-	 READ_INT_PAR(p->par.dg_debug);
-	 if (p->par.dg_debug) p->par.dg_debug = 4;
-      }
-      else if (strcmp(key, "tm_machine") == 0 ||
-	       strcmp(key, "M_tm_machine") == 0){
-	 read_string(p->par.tm_machine, line, MACH_NAME_LENGTH);
-	 p->par.tm_machine_set = TRUE;
-      }
-      else if (strcmp(key, "dg_machine") == 0 ||
-	       strcmp(key, "M_dg_machine") == 0){
-	 read_string(p->par.dg_machine, line, MACH_NAME_LENGTH);
-	 p->par.dg_machine_set = TRUE;
-      }
-
-      else if (strcmp(key, "pvm_trace") == 0 ||
-	       strcmp(key, "M_pvm_trace") == 0){
-	 READ_INT_PAR(p->par.pvm_trace);
-      }
-      else if (strcmp(key, "do_branch_and_cut") == 0 ||
-	       strcmp(key, "M_do_branch_and_cut") == 0){
-	 READ_INT_PAR(p->par.do_branch_and_cut);
-      }
-      else if (strcmp(key, "do_draw_graph") == 0 ||
-	       strcmp(key, "M_do_draw_graph") == 0){
-	 READ_INT_PAR(p->par.do_draw_graph);
-      }
-      else if (strcmp(key, "use_permanent_cut_pools") == 0 ||
-	       strcmp(key, "M_use_permanent_cut_pools") == 0){
-	 READ_INT_PAR(p->par.use_permanent_cut_pools);
-      }
-      else if (strcmp(key, "mc_compare_solution_tolerance") == 0 ||
-	       strcmp(key, "M_mc_compare_solution_tolerance") == 0){
-	 READ_DBL_PAR(p->par.mc_compare_solution_tolerance);
-      }
-      else if (strcmp(key, "mc_binary_search_tolerance") == 0 ||
-	       strcmp(key, "M_mc_binary_search_tolerance") == 0){
-	 READ_DBL_PAR(p->par.mc_binary_search_tolerance);
-      }
-      else if (strcmp(key, "mc_search_order") == 0 ||
-	       strcmp(key, "M_mc_search_order") == 0){
-	 READ_DBL_PAR(p->par.mc_search_order);
-      }
-      else if (strcmp(key, "mc_warm_start") == 0 ||
-	       strcmp(key, "M_mc_warm_start") == 0){
-	 READ_DBL_PAR(p->par.mc_warm_start);
-      }
-
-      /***********************************************************************
-       ***                 DrawGraph parameters                            ***
-       ***********************************************************************/
-
-      else if (strcmp(key, "source_path") == 0 ||
-	       strcmp(key, "DG_source_path") == 0){
-	 read_string(dg_par->source_path, line, MAX_FILE_NAME_LENGTH);
-      }
-      else if (strcmp(key, "echo_commands") == 0 ||
-	       strcmp(key, "DG_echo_commands") == 0){
-	 READ_INT_PAR(dg_par->echo_commands);
-      }
-      else if (strcmp(key, "canvas_width") == 0 ||
-	       strcmp(key, "DG_canvas_width") == 0){
-	 READ_INT_PAR(dg_par->canvas_width);
-      }
-      else if (strcmp(key, "canvas_height") == 0 ||
-	       strcmp(key, "DG_canvas_height") == 0){
-	 READ_INT_PAR(dg_par->canvas_height);
-      }
-      else if (strcmp(key, "viewable_width") == 0 ||
-	       strcmp(key, "DG_viewable_width") == 0){
-	 READ_INT_PAR(dg_par->viewable_width);
-      }
-      else if (strcmp(key, "viewable_height") == 0 ||
-	       strcmp(key, "DG_viewable_height") == 0){
-	 READ_INT_PAR(dg_par->viewable_width);
-      }
-      else if (strcmp(key, "disp_nodelabels") == 0 ||
-	       strcmp(key, "DG_disp_nodelabels") == 0){
-	 READ_INT_PAR(dg_par->disp_nodelabels);
-      }
-      else if (strcmp(key, "disp_nodeweights") == 0 ||
-	       strcmp(key, "DG_disp_nodeweights") == 0){
-	 READ_INT_PAR(dg_par->disp_nodeweights);
-      }
-      else if (strcmp(key, "disp_edgeweights") == 0 ||
-	       strcmp(key, "DG_disp_edgeweights") == 0){
-	 READ_INT_PAR(dg_par->disp_edgeweights);
-      }
-      else if (strcmp(key, "node_dash") == 0 ||
-	       strcmp(key, "DG_node_dash") == 0){
-	 read_string(dg_par->node_dash, line, MAX_DASH_PATTERN_LENGTH);
-      }
-      else if (strcmp(key, "edge_dash") == 0 ||
-	       strcmp(key, "DG_edge_dash") == 0){
-	 read_string(dg_par->edge_dash, line, MAX_DASH_PATTERN_LENGTH);
-      }
-      else if (strcmp(key, "node_radius") == 0 ||
-	       strcmp(key, "DG_node_radius") == 0){
-	 READ_INT_PAR(dg_par->node_radius);
-      }
-      else if (strcmp(key, "interactive_mode") == 0 ||
-	       strcmp(key, "DG_interactive_mode") == 0){
-	 READ_INT_PAR(dg_par->interactive_mode);
-      }
-      else if (strcmp(key, "mouse_tracking") == 0 ||
-	       strcmp(key, "DG_mouse_tracking") == 0){
-	 READ_INT_PAR(dg_par->mouse_tracking);
-      }
-      else if (strcmp(key, "scale_factor") == 0 ||
-	       strcmp(key, "DG_scale_factor") == 0){
-	 READ_DBL_PAR(dg_par->scale_factor);
-      }
-      else if (strcmp(key, "nodelabel_font") == 0 ||
-	       strcmp(key, "DG_nodelabel_font") == 0){
-	 read_string(dg_par->nodelabel_font, line, MAX_FONT_LENGTH);
-      }
-      else if (strcmp(key, "nodeweight_font") == 0 ||
-	       strcmp(key, "DG_nodeweight_font") == 0){
-	 read_string(dg_par->nodeweight_font, line, MAX_FONT_LENGTH);
-      }
-      else if (strcmp(key, "edgeweight_font") == 0 ||
-	       strcmp(key, "DG_edgeweight_font") == 0){
-	 read_string(dg_par->edgeweight_font, line, MAX_FONT_LENGTH);
-      }
-
-      /***********************************************************************
-       ***                  Treemanager parameters                         ***
-       ***********************************************************************/
-      else if (strcmp(key, "TM_verbosity") == 0){
-	 READ_INT_PAR(tm_par->verbosity);
-      }
-      else if (strcmp(key, "TM_granularity") == 0){
-	 READ_DBL_PAR(tm_par->granularity);
-	 lp_par->granularity = tm_par->granularity;
-      }
-      else if (strcmp(key, "lp_executable_name") == 0 ||
-	       strcmp(key, "lp_exe") == 0 ||
-	       strcmp(key, "TM_lp_exe") == 0 ||
-	       strcmp(key, "TM_lp_executable_name") == 0){
-	 read_string(tm_par->lp_exe, line, MAX_FILE_NAME_LENGTH);
-      }
-      else if (strcmp(key, "cg_executable_name") == 0 ||
-	       strcmp(key, "cg_exe") == 0 ||
-	       strcmp(key, "TM_cg_exe") == 0 ||
-	       strcmp(key, "TM_cg_executable_name") == 0){
-	 read_string(tm_par->cg_exe, line, MAX_FILE_NAME_LENGTH);
-      }
-      else if (strcmp(key, "cp_executable_name") == 0 ||
-	       strcmp(key, "cp_exe") == 0 ||
-	       strcmp(key, "TM_cp_exe") == 0 ||
-	       strcmp(key, "TM_cp_executable_name") == 0){
-	 read_string(tm_par->cp_exe, line, MAX_FILE_NAME_LENGTH);
-      }
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      else if (strcmp(key, "sp_executable_name") == 0 ||
-	       strcmp(key, "sp_exe") == 0 ||
-	       strcmp(key, "TM_sp_exe") == 0 ||
-	       strcmp(key, "TM_sp_executable_name") == 0){
-	 read_string(tm_par->sp_exe, line, MAX_FILE_NAME_LENGTH);
-      }
-      /*___END_EXPERIMENTAL_SECTION___*/
-      else if (strcmp(key, "lp_debug") == 0 ||
-	       strcmp(key, "TM_lp_debug") == 0){
-	 READ_INT_PAR(tm_par->lp_debug);
-	 if (tm_par->lp_debug) tm_par->lp_debug = 4;
-      }
-      else if (strcmp(key, "cg_debug") == 0 ||
-	       strcmp(key, "TM_cg_debug") == 0){
-	 READ_INT_PAR(tm_par->cg_debug);
-	 if (tm_par->cg_debug) tm_par->cg_debug = 4;
-      }
-      else if (strcmp(key, "cp_debug") == 0 ||
-	       strcmp(key, "TM_cp_debug") == 0){
-	 READ_INT_PAR(tm_par->cp_debug);
-	 if (tm_par->cp_debug) tm_par->cp_debug = 4;
-      }
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      else if (strcmp(key, "sp_debug") == 0 ||
-	       strcmp(key, "TM_sp_debug") == 0){
-	 READ_INT_PAR(tm_par->sp_debug);
-	 if (tm_par->sp_debug) tm_par->sp_debug = 4;
-      }
-      /*___END_EXPERIMENTAL_SECTION___*/
-      else if (strcmp(key, "max_active_nodes") == 0 ||
-	       strcmp(key, "TM_max_active_nodes") == 0){
-	 READ_INT_PAR(tm_par->max_active_nodes);
-      }
-      else if (strcmp(key, "max_cp_num") == 0 ||
-	       strcmp(key, "TM_max_cp_num") == 0){
-	 READ_INT_PAR(tm_par->max_cp_num);
-      }
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      else if (strcmp(key, "max_sp_num") == 0 ||
-	       strcmp(key, "TM_max_sp_num") == 0){
-	 READ_INT_PAR(tm_par->max_sp_num);
-      }
-      /*___END_EXPERIMENTAL_SECTION___*/
-      else if (strcmp(key, "lp_mach_num") == 0 ||
-	       strcmp(key, "TM_lp_mach_num") == 0){
-	 READ_INT_PAR(tm_par->lp_mach_num);
+      if (strcmp(key, "lp_mach_num") == 0 ||
+	  strcmp(key, "TM_lp_mach_num") == 0){
 	 if (tm_par->lp_mach_num){
 	    char *lp_machs = (char *) malloc
 	       (tm_par->lp_mach_num * (MACH_NAME_LENGTH + 1));
@@ -431,7 +169,6 @@ int parse_command_line(problem *p, int argc, char **argv)
       }
       else if (strcmp(key, "cg_mach_num") == 0 ||
 	       strcmp(key, "TM_cg_mach_num") == 0){
-	 READ_INT_PAR(tm_par->cg_mach_num);
 	 if (tm_par->cg_mach_num){
 	    char *cg_machs = (char *) malloc
 	       (tm_par->cg_mach_num * (MACH_NAME_LENGTH + 1));
@@ -457,7 +194,6 @@ int parse_command_line(problem *p, int argc, char **argv)
       }
       else if (strcmp(key, "cp_mach_num") == 0 ||
 	       strcmp(key, "TM_cp_mach_num") == 0){
-	 READ_INT_PAR(tm_par->cp_mach_num);
 	 if (tm_par->cp_mach_num){
 	    char *cp_machs = (char *) malloc
 	       (tm_par->cp_mach_num * (MACH_NAME_LENGTH + 1));
@@ -481,40 +217,8 @@ int parse_command_line(problem *p, int argc, char **argv)
 	    }
 	 }
       }
-#ifndef COMPILE_IN_CG
-      else if (strcmp(key, "use_cg") == 0 ||
-	       strcmp(key, "TM_use_cg") == 0 ||
-	       strcmp(key, "LP_use_cg") == 0){
-	 READ_INT_PAR(tm_par->use_cg);
-	 lp_par->use_cg = tm_par->use_cg;
-      }
-#endif
-      else if (strcmp(key, "TM_random_seed") == 0){
-	 READ_INT_PAR(tm_par->random_seed);
-      }
-      else if (strcmp(key, "unconditional_dive_frac") == 0 ||
-	       strcmp(key, "TM_unconditional_dive_frac") == 0){
-	 READ_DBL_PAR(tm_par->unconditional_dive_frac);
-      }
-      else if (strcmp(key, "diving_strategy") == 0 ||
-	       strcmp(key, "TM_diving_strategy") == 0){
-	 READ_INT_PAR(tm_par->diving_strategy);
-      }
-      else if (strcmp(key, "diving_k") == 0 ||
-	       strcmp(key, "TM_diving_k") == 0){
-	 READ_INT_PAR(tm_par->diving_k);
-      }
-      else if (strcmp(key, "diving_threshold") == 0 ||
-	       strcmp(key, "TM_diving_threshold") == 0){
-	 READ_DBL_PAR(tm_par->diving_threshold);
-      }
-      else if (strcmp(key, "node_selection_rule") == 0 ||
-	       strcmp(key, "TM_node_selection_rule") == 0){
-	 READ_INT_PAR(tm_par->node_selection_rule);
-      }
       else if (strcmp(key, "keep_description_of_pruned") == 0 ||
 	       strcmp(key, "TM_keep_description_of_pruned") == 0){
-	 READ_INT_PAR(tm_par->keep_description_of_pruned);
 	 if (tm_par->keep_description_of_pruned == KEEP_ON_DISK_FULL ||
 	     tm_par->keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
@@ -546,8 +250,7 @@ int parse_command_line(problem *p, int argc, char **argv)
       }
       else if (strcmp(key, "warm_start") == 0 ||
 	       strcmp(key, "TM_warm_start") == 0){
-	 READ_INT_PAR(tm_par->warm_start);
-	 if ((p->par.warm_start = tm_par->warm_start)){
+	 if ((env->par.warm_start = tm_par->warm_start)){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No warm start tree file!\n\n");
 	       return(ERROR__PARSING_PARAM_FILE);
@@ -574,7 +277,6 @@ int parse_command_line(problem *p, int argc, char **argv)
       }
       else if (strcmp(key, "vbc_emulation") == 0 ||
 	       strcmp(key, "TM_vbc_emulation") == 0){
-	 READ_INT_PAR(tm_par->vbc_emulation);
 	 if (tm_par->vbc_emulation == VBC_EMULATION_FILE){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No vbc emulation file!\n\n");
@@ -607,13 +309,8 @@ int parse_command_line(problem *p, int argc, char **argv)
 	    printf("$N 0 1 %i\n", VBC_CAND_NODE);
 	 }
       }
-      else if (strcmp(key, "logging_interval") == 0 ||
-	       strcmp(key, "TM_logging_interval") == 0){
-	 READ_INT_PAR(tm_par->logging_interval);
-      }
       else if (strcmp(key, "logging") == 0 ||
 	       strcmp(key, "TM_logging") == 0){
-	 READ_INT_PAR(tm_par->logging);
 	 if (tm_par->logging){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No tree log file!\n\n");
@@ -641,432 +338,8 @@ int parse_command_line(problem *p, int argc, char **argv)
 	    }
 	 }
       }
-      else if (strcmp(key, "price_in_root") == 0 ||
-	       strcmp(key, "TM_price_in_root") == 0){
-	 READ_INT_PAR(tm_par->price_in_root);
-      }
-      else if (strcmp(key, "trim_search_tree") == 0 ||
-	       strcmp(key, "TM_trim_search_tree") == 0){
-	 READ_INT_PAR(tm_par->trim_search_tree);
-      }
-      else if (strcmp(key, "colgen_in_first_phase") == 0 ||
-	       strcmp(key, "TM_colgen_in_first_phase") == 0){
-	 READ_INT_PAR(tm_par->colgen_strat[0]);
-      }
-      else if (strcmp(key, "colgen_in_second_phase") == 0 ||
-	       strcmp(key, "TM_colgen_in_second_phase") == 0){
-	 READ_INT_PAR(tm_par->colgen_strat[1]);
-      }
-      else if (strcmp(key, "colgen_in_first_phase_str") == 0 ||
-	       strcmp(key, "TM_colgen_in_first_phase_str") == 0){
-	 READ_STRINT_PAR(tm_par->colgen_strat[0],
-			 colgen_str, COLGEN_STR_SIZE, value);
-      }
-      else if (strcmp(key, "colgen_in_second_phase_str") == 0 ||
-	       strcmp(key, "TM_colgen_in_second_phase_str") == 0){
-	 READ_STRINT_PAR(tm_par->colgen_strat[1],
-			 colgen_str, COLGEN_STR_SIZE, value);
-      }
-      else if (strcmp(key, "time_limit") == 0 ||
-	       strcmp(key, "TM_time_limit") == 0){
-	 READ_DBL_PAR(tm_par->time_limit);
-      }
-      else if (strcmp(key, "node_limit") == 0 ||
-	       strcmp(key, "TM_node_limit") == 0){
-	 READ_INT_PAR(tm_par->node_limit);
-      }
-      else if (strcmp(key, "gap_limit") == 0 ||
-	       strcmp(key, "TM_gap_limit") == 0){
-	 READ_DBL_PAR(tm_par->gap_limit);
-      }
-      else if (strcmp(key, "find_first_feasible") == 0 ||
-	       strcmp(key, "TM_find_first_feasible") == 0){
-	 READ_INT_PAR(tm_par->find_first_feasible);
-      }
-
-      /***********************************************************************
-       ***                      LP parameters                              ***
-       ***********************************************************************/
-      if (strcmp(key, "LP_verbosity") == 0){
-	 READ_INT_PAR(lp_par->verbosity);
-      }
-      else if (strcmp(key, "LP_granularity") == 0){
-	 READ_DBL_PAR(lp_par->granularity);
-	 tm_par->granularity = lp_par->granularity;
-      }
-      else if (strcmp(key, "set_obj_upper_lim") == 0 ||
-	       strcmp(key, "LP_set_obj_upper_lim") == 0){
-	 READ_INT_PAR(lp_par->set_obj_upper_lim);
-      }
-
-      else if (strcmp(key, "scaling") == 0 ||
-	       strcmp(key, "LP_scaling") == 0){
-	 READ_INT_PAR(lp_par->scaling);
-      }
-      else if (strcmp(key, "fastmip") == 0 ||
-	       strcmp(key, "LP_fastmip") == 0){
-	 READ_INT_PAR(lp_par->fastmip);
-      }
-      else if (strcmp(key, "try_to_recover_from_error") == 0 ||
-	       strcmp(key, "LP_try_to_recover_from_error") == 0){
-	 READ_INT_PAR(lp_par->try_to_recover_from_error);
-      }
-      else if (strcmp(key, "problem_type") == 0 ||
-	       strcmp(key, "LP_problem_type") == 0){
-	 READ_INT_PAR(lp_par->problem_type);
-      }
-      else if (strcmp(key, "not_fixed_storage_size") == 0 ||
-	       strcmp(key, "LP_not_fixed_storage_size") == 0 ||
-	       strcmp(key, "TM_not_fixed_storage_size") == 0 ){
-	 READ_INT_PAR(lp_par->not_fixed_storage_size);
-	 tm_par->not_fixed_storage_size = lp_par->not_fixed_storage_size;
-      }
-      else if (strcmp(key, "cut_pool_check_frequency") == 0 ||
-	       strcmp(key, "LP_cut_pool_check_frequency") == 0){
-	 READ_INT_PAR(lp_par->cut_pool_check_freq);
-      }
-      else if (strcmp(key, "load_balance_level") == 0 ||
-	       strcmp(key, "LP_load_balance_level") == 0){
-	 READ_INT_PAR(lp_par->load_balance_level);
-      }
-      else if (strcmp(key, "load_balance_iterations") == 0 ||
-	       strcmp(key, "LP_load_balance_iterations") == 0){
-	 READ_INT_PAR(lp_par->load_balance_iterations);
-      }
-      else if (strcmp(key, "load_balance_compare_candidates") == 0 ||
-	       strcmp(key, "LP_load_balance_compare_candidates") == 0){
-	 READ_INT_PAR(lp_par->load_balance_compare_candidates);
-      }
-      else if (strcmp(key, "fractional_diving_ratio") == 0 ||
-	       strcmp(key, "LP_fractional_diving_ratio") == 0){
-	 READ_DBL_PAR(lp_par->fractional_diving_ratio);
-      }
-      else if (strcmp(key, "fractional_diving_num") == 0 ||
-	       strcmp(key, "LP_fractional_diving_num") == 0){
-	 READ_INT_PAR(lp_par->fractional_diving_num);
-      }
-      else if (strcmp(key, "max_non_dual_feas_to_add_frac") == 0 ||
-	       strcmp(key, "LP_max_non_dual_feas_to_add_frac") == 0){
-	 READ_DBL_PAR(lp_par->max_non_dual_feas_to_add_frac);
-      }
-      else if (strcmp(key, "max_cols_to_add_min") == 0 ||
-	       strcmp(key, "LP_max_non_dual_feas_to_add_min") == 0){
-	 READ_INT_PAR(lp_par->max_non_dual_feas_to_add_min);
-      }
-      else if (strcmp(key, "max_non_dual_feas_to_add_max") == 0 ||
-	       strcmp(key, "LP_max_non_dual_feas_to_add_max") == 0){
-	 READ_INT_PAR(lp_par->max_non_dual_feas_to_add_max);
-      }
-      else if (strcmp(key, "max_not_fixable_to_add_frac") == 0 ||
-	       strcmp(key, "LP_max_not_fixable_to_add_frac") == 0){
-	 READ_DBL_PAR(lp_par->max_not_fixable_to_add_frac);
-      }
-      else if (strcmp(key, "max_not_fixable_to_add_min") == 0 ||
-	       strcmp(key, "LP_max_not_fixable_to_add_min") == 0){
-	 READ_INT_PAR(lp_par->max_not_fixable_to_add_min);
-      }
-      else if (strcmp(key, "max_not_fixable_to_add_max") == 0 ||
-	       strcmp(key, "LP_max_not_fixable_to_add_max") == 0){
-	 READ_INT_PAR(lp_par->max_not_fixable_to_add_max);
-      }
-
-      else if (strcmp(key, "mat_col_compress_num") == 0 ||
-	       strcmp(key, "LP_mat_col_compress_num") == 0){
-	 READ_INT_PAR(lp_par->mat_col_compress_num);
-      }
-      else if (strcmp(key, "mat_col_compress_ratio") == 0 ||
-	       strcmp(key, "LP_mat_col_compress_ratio") == 0){
-	 READ_DBL_PAR(lp_par->mat_col_compress_ratio);
-      }
-      else if (strcmp(key, "mat_row_compress_num") == 0 ||
-	       strcmp(key, "LP_mat_row_compress_num") == 0){
-	 READ_INT_PAR(lp_par->mat_row_compress_num);
-      }
-      else if (strcmp(key, "mat_row_compress_ratio") == 0 ||
-	       strcmp(key, "LP_mat_row_compress_ratio") == 0){
-	 READ_DBL_PAR(lp_par->mat_row_compress_ratio);
-      }
-
-      else if (strcmp(key, "tailoff_gap_backsteps") == 0 ||
-	       strcmp(key, "LP_tailoff_gap_backsteps") == 0){
-	 READ_INT_PAR(lp_par->tailoff_gap_backsteps);
-      }
-      else if (strcmp(key, "tailoff_obj_backsteps") == 0 ||
-	       strcmp(key, "LP_tailoff_obj_backsteps") == 0){
-	 READ_INT_PAR(lp_par->tailoff_obj_backsteps);
-      }
-      else if (strcmp(key, "tailoff_gap_frac") == 0 ||
-	       strcmp(key, "LP_tailoff_gap_frac") == 0){
-	 READ_DBL_PAR(lp_par->tailoff_gap_frac);
-      }
-      else if (strcmp(key, "tailoff_obj_frac") == 0 ||
-	       strcmp(key, "LP_tailoff_obj_frac") == 0){
-	 READ_DBL_PAR(lp_par->tailoff_obj_frac);
-      }
-      else if (strcmp(key, "tailoff_absolute") == 0 ||
-	       strcmp(key, "LP_tailoff_absolute") == 0){
-	 READ_DBL_PAR(lp_par->tailoff_absolute);
-      }
-
-     else if (strcmp(key, "ineff_cnt_to_delete") == 0 ||
-	      strcmp(key, "LP_ineff_cnt_to_delete") == 0){
-	 READ_INT_PAR(lp_par->ineff_cnt_to_delete);
-      }
-      else if (strcmp(key, "eff_cnt_before_cutpool") == 0 ||
-	       strcmp(key, "LP_eff_cnt_before_cutpool") == 0){
-	 READ_INT_PAR(lp_par->eff_cnt_before_cutpool);
-      }
-      else if (strcmp(key, "ineffective_constraints") == 0 ||
-	       strcmp(key, "LP_ineffective_constraints") == 0){
-	 READ_INT_PAR(lp_par->ineffective_constraints);
-      }
-      else if (strcmp(key, "base_constraints_always_effective") == 0 ||
-	       strcmp(key, "LP_base_constraints_always_effective") == 0){
-	 READ_INT_PAR(lp_par->base_constraints_always_effective);
-      }
-
-      else if (strcmp(key, "branch_on_cuts") == 0 ||
-	       strcmp(key, "LP_branch_on_cuts") == 0){
-	 READ_INT_PAR(lp_par->branch_on_cuts);
-      }
-      else if (strcmp(key, "discard_slack_cuts") == 0 ||
-	       strcmp(key, "LP_discard_slack_cuts") == 0){
-	 READ_INT_PAR(lp_par->discard_slack_cuts);
-      }
-
-      /* timeouts on receiving cuts */
-      else if (strcmp(key, "first_lp_first_cut_time_out") == 0 ||
-	       strcmp(key, "LP_first_lp_first_cut_time_out") == 0){
-	 READ_DBL_PAR(timeout);
-	 if (timeout == -1){
-	    lp_par->first_lp.first_cut_time_out = 0;
-	 }else{
-	    lp_par->first_lp.first_cut_time_out = timeout;
-	 }
-      }
-      else if (strcmp(key, "first_lp_all_cuts_time_out") == 0 ||
-	       strcmp(key, "LP_first_lp_all_cuts_time_out") == 0){
-	 READ_DBL_PAR(timeout);
-	 if (timeout == -1){
-	    lp_par->first_lp.all_cuts_time_out = 0;
-	 }else{
-	    lp_par->first_lp.all_cuts_time_out = timeout;
-	 }
-      }
-      else if (strcmp(key, "later_lp_first_cut_time_out") == 0 ||
-	       strcmp(key, "LP_later_lp_first_cut_time_out") == 0){
-	 READ_DBL_PAR(timeout);
-	 if (timeout == -1){
-	    lp_par->later_lp.first_cut_time_out = 0;
-	 }else{
-	   lp_par->later_lp.first_cut_time_out = timeout;
-	 }
-      }
-      else if (strcmp(key, "later_lp_all_cuts_time_out") == 0 ||
-	       strcmp(key, "LP_later_lp_all_cuts_time_out") == 0){
-	 READ_DBL_PAR(timeout);
-	 if (timeout == -1){
-	    lp_par->later_lp.all_cuts_time_out = 0;
-	 }else{
-	    lp_par->later_lp.all_cuts_time_out = timeout;
-	 }
-      }
-
-      else if (strcmp(key, "no_cut_timeout") == 0 ||
-	       strcmp(key, "LP_no_cut_timeout") == 0){
-	 lp_par->first_lp.first_cut_time_out = 0;
-	 lp_par->first_lp.all_cuts_time_out = 0;
-	 lp_par->later_lp.first_cut_time_out = 0;
-	 lp_par->later_lp.all_cuts_time_out = 0;
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 cg_par->decomp_dynamic_timeout = 6000;
-	 /*___END_EXPERIMENTAL_SECTION___*/
-      }
-      else if (strcmp(key, "all_cut_timeout") == 0 ||
-	       strcmp(key, "LP_all_cut_timeout") == 0){
-	 READ_DBL_PAR(timeout);
-	 lp_par->first_lp.first_cut_time_out = timeout;
-	 lp_par->first_lp.all_cuts_time_out = timeout;
-	 lp_par->later_lp.first_cut_time_out= timeout;
-	 lp_par->later_lp.all_cuts_time_out = timeout;
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 cg_par->decomp_dynamic_timeout = timeout;
-	 /*___END_EXPERIMENTAL_SECTION___*/
-      }
-
-      else if (strcmp(key, "max_cut_num_per_iter") == 0 ||
-	       strcmp(key, "LP_max_cut_num_per_iter") == 0){
-	 READ_INT_PAR(lp_par->max_cut_num_per_iter);
-      }
-
-      /* variable fixing parameters */
-      else if (strcmp(key, "do_reduced_cost_fixing") == 0 ||
-	       strcmp(key, "LP_do_reduced_cost_fixing") == 0){
-	 READ_INT_PAR(lp_par->do_reduced_cost_fixing);
-      }
-      else if (strcmp(key, "gap_as_ub_frac") == 0 ||
-	       strcmp(key, "LP_gap_as_ub_frac") == 0){
-	 READ_DBL_PAR(lp_par->gap_as_ub_frac);
-      }
-      else if (strcmp(key, "gap_as_last_gap_frac") == 0 ||
-	       strcmp(key, "LP_gap_as_last_gap_frac") == 0){
-	 READ_DBL_PAR(lp_par->gap_as_last_gap_frac);
-      }
-      else if (strcmp(key, "do_logical_fixing") == 0 ||
-	       strcmp(key, "LP_do_logical_fixing") == 0){
-	 READ_INT_PAR(lp_par->do_logical_fixing);
-      }
-      else if (strcmp(key, "fixed_to_ub_before_logical_fixing") == 0 ||
-	       strcmp(key, "LP_fixed_to_ub_before_logical_fixing") == 0){
-	 READ_INT_PAR(lp_par->fixed_to_ub_before_logical_fixing);
-      }
-      else if (strcmp(key, "fixed_to_ub_frac_before_logical_fixing")==0 ||
-	       strcmp(key, "LP_fixed_to_ub_frac_before_logical_fixing")==0){
-	 READ_DBL_PAR(lp_par->fixed_to_ub_frac_before_logical_fixing);
-      }
-
-      else if (strcmp(key, "generate_cgl_cuts") == 0 ||
-	       strcmp(key, "generate_cgl_cuts") == 0){
-	 READ_INT_PAR(cg_par->do_findcuts);
-      }
-
-      else if (strcmp(key, "max_presolve_iter") == 0 ||
-	       strcmp(key, "LP_max_presolve_iter") == 0){
-	 READ_INT_PAR(lp_par->max_presolve_iter);
-      }
-
-      /* user-defined function defaults */
-      else if (strcmp(key, "is_feasible_default") == 0 ||
-	       strcmp(key, "LP_is_feasible_default") == 0){
-	 READ_INT_PAR(lp_par->is_feasible_default);
-      }
-      else if (strcmp(key, "send_feasible_solution_default") == 0 ||
-	       strcmp(key, "LP_send_feasible_solution_default") == 0){
-	 READ_INT_PAR(lp_par->send_feasible_solution_default);
-      }
-      else if (strcmp(key, "display_solution_default") == 0 ||
-	       strcmp(key, "LP_display_solution_default") == 0){
-	 READ_INT_PAR(lp_par->display_solution_default);
-      }
-      else if (strcmp(key, "shall_we_branch_default") == 0 ||
-	       strcmp(key, "LP_shall_we_branch_default") == 0){
-	 READ_INT_PAR(lp_par->shall_we_branch_default);
-      }
-      else if (strcmp(key, "select_candidates_default") == 0 ||
-	       strcmp(key, "LP_select_candidates_default") == 0){
-	 READ_INT_PAR(lp_par->select_candidates_default);
-      }
-      else if (strcmp(key, "strong_branching_cand_num") == 0){
-	 READ_INT_PAR(lp_par->strong_branching_cand_num_max);
-	 lp_par->strong_branching_cand_num_min =
-	    lp_par->strong_branching_cand_num_max;
-	 lp_par->strong_branching_red_ratio = 0;
-      }
-      else if (strcmp(key, "strong_branching_cand_num_max") == 0 ||
-	       strcmp(key, "LP_strong_branching_cand_num_max") == 0){
-	 READ_INT_PAR(lp_par->strong_branching_cand_num_max);
-      }
-      else if (strcmp(key, "strong_branching_cand_num_min") == 0 ||
-	       strcmp(key, "LP_strong_branching_cand_num_min") == 0){
-	 READ_INT_PAR(lp_par->strong_branching_cand_num_min);
-      }
-      else if (strcmp(key,"strong_branching_red_ratio") == 0 ||
-	       strcmp(key,"LP_strong_branching_red_ratio") == 0){
-	 READ_DBL_PAR(lp_par->strong_branching_red_ratio);
-      }
-      else if (strcmp(key, "compare_candidates_default") == 0 ||
-	       strcmp(key, "LP_compare_candidates_default") == 0){
-	 READ_INT_PAR(lp_par->compare_candidates_default);
-      }
-      else if (strcmp(key, "compare_candidates_default_str") == 0 ||
-	       strcmp(key, "LP_compare_candidates_default_str") == 0){
-	 READ_STRINT_PAR(lp_par->compare_candidates_default,
-			 compare_can_str, COMPARE_CAN_STR_SIZE, value);
-      }
-      else if (strcmp(key, "select_child_default") == 0 ||
-	       strcmp(key, "LP_select_child_default") == 0){
-	 READ_INT_PAR(lp_par->select_child_default);
-      }
-      else if (strcmp(key, "pack_lp_solution_default") == 0 ||
-	       strcmp(key, "LP_pack_lp_solution_default") == 0){
-	 READ_INT_PAR(lp_par->pack_lp_solution_default);
-      }
-      else if (strcmp(key, "multi_criteria") == 0 ||
-	       strcmp(key, "LP_multi_criteria") == 0 ){
-	 READ_INT_PAR(lp_par->multi_criteria);
-	 p->par.multi_criteria = lp_par->multi_criteria;
-      }
-      else if (strcmp(key, "mc_find_nondominated_solutions") == 0 ||
-	       strcmp(key, "LP_mc_find_non_dominated_solutions") == 0 ){
-	 READ_INT_PAR(lp_par->mc_find_nondominated_solutions);
-      }
-      else if (strcmp(key, "mc_gamma") == 0 ||
-	       strcmp(key, "LP_mc_gamma") == 0 ){
-	 READ_DBL_PAR(lp_par->mc_gamma);
-      }
-      else if (strcmp(key, "mc_tau") == 0 ||
-	       strcmp(key, "LP_mc_tau") == 0 ){
-	 READ_DBL_PAR(lp_par->mc_tau);
-      }
-      else if (strcmp(key, "mc_rho") == 0 ||
-	       strcmp(key, "LP_mc_rho") == 0 ){
-	 READ_DBL_PAR(lp_par->mc_rho);
-      }
-      
-      /***********************************************************************
-       ***                     cut_gen parameters                          ***
-       ***********************************************************************/
-      else if (strcmp(key, "CG_verbosity") == 0){
-	 READ_INT_PAR(cg_par->verbosity);
-      }
-      else if (strcmp(key, "do_findcuts") == 0 ||
-	       strcmp(key, "CG_do_findcuts") == 0){
-	 READ_INT_PAR(cg_par->do_findcuts);
-      }
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      else if (strcmp(key, "decomp_sol_pool_check_freq") == 0 ||
-	       strcmp(key, "CG_decomp_sol_pool_check_freq") == 0){
-	 READ_INT_PAR(cg_par->decomp_sol_pool_check_freq);
-      }
-      else if (strcmp(key, "decomp_wait_for_cols") == 0 ||
-	       strcmp(key, "CG_decomp_wait_for_cols") == 0){
-	 READ_INT_PAR(cg_par->decomp_wait_for_cols);
-      }
-      else if (strcmp(key, "decomp_max_col_num_per_iter") == 0 ||
-	       strcmp(key, "CG_decomp_max_col_num_per_iter") == 0){
-	 READ_INT_PAR(cg_par->decomp_max_col_num_per_iter);
-      }
-      else if (strcmp(key, "decomp_col_block_size") == 0 ||
-	       strcmp(key, "CG_decomp_col_block_size") == 0){
-	 READ_INT_PAR(cg_par->decomp_col_block_size);
-      }
-      else if (strcmp(key, "decomp_mat_block_size") == 0 ||
-	       strcmp(key, "CG_decomp_mat_block_size") == 0){
-	 READ_INT_PAR(cg_par->decomp_mat_block_size);
-      }
-      else if (strcmp(key, "decomp_initial_timeout") == 0 ||
-	       strcmp(key, "CG_decomp_initial_timeout") == 0){
-	 READ_DBL_PAR(cg_par->decomp_initial_timeout);
-      }
-      else if (strcmp(key, "decomp_dynamic_timeout") == 0 ||
-	       strcmp(key, "CG_decomp_dynamic_timeout") == 0){
-	 READ_DBL_PAR(cg_par->decomp_dynamic_timeout);
-      }
-      else if (strcmp(key, "decomp_complete_enum") == 0 ||
-	       strcmp(key, "CG_decomp_complete_enum") == 0){
-	 READ_INT_PAR(cg_par->decomp_complete_enum);
-      }
-      /*___END_EXPERIMENTAL_SECTION___*/
-
-      /***********************************************************************
-       ***                      cutpool parameters                         ***
-       ***********************************************************************/
-      else if (strcmp(key, "CP_verbosity") == 0){
-	 READ_INT_PAR(cp_par->verbosity);
-      }
       else if (strcmp(key, "cp_warm_start") == 0 ||
 	       strcmp(key, "CP_warm_start") == 0){
-	 READ_INT_PAR(cp_par->warm_start);
 	 if (cp_par->warm_start){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No cut pool warm start file!\n\n");
@@ -1083,7 +356,6 @@ int parse_command_line(problem *p, int argc, char **argv)
       }
       else if (strcmp(key, "cp_logging") == 0 ||
 	       strcmp(key, "CP_logging") == 0){
-	 READ_INT_PAR(cp_par->logging);
 	 if ((tm_par->cp_logging = cp_par->logging)){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No cut pool log file!\n\n");
@@ -1098,86 +370,11 @@ int parse_command_line(problem *p, int argc, char **argv)
 	    strcpy(cp_par->log_file_name, value);
 	 }
       }
-      else if (strcmp(key, "block_size") == 0 ||
-	       strcmp(key, "CP_block_size") == 0){
-	 READ_INT_PAR(cp_par->block_size);
-      }
-      else if (strcmp(key, "max_size") == 0 ||
-	       strcmp(key, "CP_max_size") == 0){
-	 READ_INT_PAR(cp_par->max_size);
-      }
-      else if (strcmp(key, "max_number_of_cuts") == 0 ||
-	       strcmp(key, "CP_max_number_of_cuts") == 0){
-	 READ_INT_PAR(cp_par->max_number_of_cuts);
-      }
-      else if (strcmp(key, "cuts_to_check") == 0 ||
-	       strcmp(key, "cuts_to_check") == 0){
-	 READ_INT_PAR(cp_par->cuts_to_check);
-      }
-      else if (strcmp(key, "delete_which") == 0 ||
-	       strcmp(key, "CP_delete_which") == 0){
-	 READ_INT_PAR(cp_par->delete_which);
-      }
-      else if (strcmp(key, "touches_until_deletion") == 0 ||
-	       strcmp(key, "CP_touches_until_deletion") == 0){
-	 READ_INT_PAR(cp_par->touches_until_deletion);
-      }
-      else if (strcmp(key, "min_to_delete") == 0 ||
-	       strcmp(key, "CP_min_to_delete") == 0){
-	 READ_INT_PAR(cp_par->min_to_delete);
-      }
-      else if (strcmp(key, "check_which") == 0 ||
-	       strcmp(key, "CP_check_which") == 0){
-	 READ_INT_PAR(cp_par->check_which);
-      }
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-
-      /***********************************************************************
-       ***                     solpool parameters                          ***
-       ***********************************************************************/
-#ifdef COMPILE_DECOMP
-      else if (strcmp(key, "SP_verbosity") == 0){
-	 READ_INT_PAR(sp_par->verbosity);
-      }
-      else if (strcmp(key, "SP_etol") == 0){
-	 READ_DBL_PAR(sp_par->etol);
-      }
-
-      else if (strcmp(key, "SP_block_size") == 0){
-	 READ_INT_PAR(sp_par->block_size);
-      }
-      else if (strcmp(key, "SP_max_size") == 0){
-	 READ_INT_PAR(sp_par->max_size);
-      }
-      else if (strcmp(key, "max_number_of_sols") == 0 ||
-	       strcmp(key, "SP_max_number_of_sols") == 0){
-	 READ_INT_PAR(sp_par->max_number_of_sols);
-      }
-      else if (strcmp(key, "SP_delete_which") == 0){
-	 READ_INT_PAR(sp_par->delete_which);
-      }
-      else if (strcmp(key, "SP_touches_until_deletion") == 0){
-	 READ_INT_PAR(sp_par->touches_until_deletion);
-      }
-      else if (strcmp(key, "SP_min_to_delete") == 0){
-	 READ_INT_PAR(sp_par->min_to_delete);
-      }
-      else if (strcmp(key, "SP_compress_num") == 0){
-	 READ_INT_PAR(sp_par->compress_num);
-      }
-      else if (strcmp(key, "SP_compress_ratio") == 0){
-	 READ_DBL_PAR(sp_par->compress_ratio);
-      }
-      else if (strcmp(key, "SP_check_which") == 0){
-	 READ_INT_PAR(sp_par->check_which);
-      }
-#endif
-      /*___END_EXPERIMENTAL_SECTION___*/
    }
 
    printf("\n====================================================\n\n");
-
-EXIT:
+   
+ EXIT:
    
    for (i = 1; i < argc; i++){
       sscanf(argv[i], "%c %c", &tmp, &c);
@@ -1188,8 +385,16 @@ EXIT:
 	 usage();
 	 exit(0);
        case 'H':
-	 user_usage();
-	 exit(0);
+#ifdef USE_SYM_APPLICATION
+	  user_usage();
+#else
+	  printf("master [ -H ] [ -F file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
+		 "-H: help (solver-specific switches)",
+		 "-F model: model should be read in from file 'model'",
+		 "          (MPS format is assumed unless -D is also present)",
+		 "-D data: model is in AMPL format and data is in file 'data'");
+#endif 
+	  exit(0);
        case 'a':
 	 lp_par->first_lp.first_cut_time_out = 0;
 	 lp_par->first_lp.all_cuts_time_out = 0;
@@ -1200,7 +405,7 @@ EXIT:
 	 /*___END_EXPERIMENTAL_SECTION___*/
 	 break;
        case 'd':
-	 p->par.do_draw_graph = TRUE;
+	 env->par.do_draw_graph = TRUE;
 	 break;
        case 'g':
 	 lp_par->use_cg = tm_par->use_cg = TRUE;
@@ -1212,11 +417,11 @@ EXIT:
 	 tm_par->trim_search_tree = TRUE;
 	 break;
        case 'b':
-	 p->par.do_branch_and_cut = FALSE;
+	 env->par.do_branch_and_cut = FALSE;
 	 break;
        case 'u':
-	 sscanf(argv[++i], "%lf", &p->ub);
-	 p->has_ub = TRUE;
+	 sscanf(argv[++i], "%lf", &env->ub);
+	 env->has_ub = TRUE;
 	 break;
        case 'p':
 	 sscanf(argv[++i], "%i", &tm_par->max_active_nodes);
@@ -1225,14 +430,14 @@ EXIT:
 	 sscanf(argv[++i], "%i", &tm_par->node_selection_rule);
 	 break;
        case 'v':
-	 sscanf(argv[++i], "%i", &p->par.verbosity);
+	 sscanf(argv[++i], "%i", &env->par.verbosity);
 	 tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
 	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
 	    sp_par->verbosity =
 #endif 
 	 /*___END_EXPERIMENTAL_SECTION___*/
-	    cp_par->verbosity = p->par.verbosity;
+	    cp_par->verbosity = env->par.verbosity;
  	 break;
        case 's':
 	 sscanf(argv[++i], "%i",
@@ -1261,7 +466,7 @@ EXIT:
 	 sscanf(argv[++i], "%i", &lp_par->max_presolve_iter);
 	 break;
        case 'f':
-	 strncpy(p->par.param_file, argv[++i], MAX_FILE_NAME_LENGTH);
+	 strncpy(env->par.param_file, argv[++i], MAX_FILE_NAME_LENGTH);
 	 break;
        case 'j':
 	 sscanf(argv[++i], "%i", &lp_par->generate_cgl_cuts);
@@ -1403,7 +608,7 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    printf("Number of Chains:               %i\n", stat->chains);
    printf("Number of Diving Halts:         %i\n", stat->diving_halts);
    printf("Number of cuts in cut pool:     %i\n", stat->cuts_in_pool);
-   if (obj_sense == MAXIMIZE){
+   if (obj_sense == SYM_MAXIMIZE){
       printf("Upper Bound in Root:            %.3f\n",
 	     -stat->root_lb + obj_offset);
    }else{
@@ -1411,7 +616,7 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
 	     stat->root_lb + obj_offset);
    }
    if (lb > 0){
-      if (obj_sense == MAXIMIZE){
+      if (obj_sense == SYM_MAXIMIZE){
 	 printf("\nCurrent Lower Bound:         %.3f", -ub + obj_offset);
 	 printf("\nCurrent Upper Bound:         %.3f", -lb + obj_offset);
 	 printf("\nGap Percentage:              %.2f\n", -100*(ub-lb)/ub);

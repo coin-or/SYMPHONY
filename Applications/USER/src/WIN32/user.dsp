@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GR /GX /ZI /Od /I "..\..\include" /I "..\include" /I "C:\COIN\Osi\include" /I "C:\COIN\Osi\OsiCpx\include" /I "C:\COIN\Coin\include" /I "C:\ILOG\cplex81\include\ilcplex" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CPLEX__" /Fp"Debug/user.pch" /YX /FD /GZ /c /Tp
+# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\include" /I "..\include" /I "..\..\Osi\include" /I "C:\COIN\Osi\include" /I "C:\COIN\Osi\OsiClp\include" /I "C:\COIN\Coin\include" /I "C:\COIN\Clp\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /YX /FD /GZ /c /Tp
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -126,6 +126,23 @@ SOURCE=..\LP\user_lp_branch.c
 # Begin Group "Master"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\Master\user_main.c
+# PROP Exclude_From_Scan -1
+
+!IF  "$(CFG)" == "user - Win32 Release"
+
+# PROP BASE Exclude_From_Build 1
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "user - Win32 Debug"
+
+# PROP BASE Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
 # Begin Source File
 
 SOURCE=..\Master\user_master.c

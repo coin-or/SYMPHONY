@@ -16,6 +16,7 @@
 #define _BB_TYPES_H
 
 #define MAX_CHILDREN_NUM 4
+#define MAX_CHANGE_NUM 6  
 
 /*===========================================================================*\
  * This file contains those type definitions which are used in more than one
@@ -237,7 +238,6 @@ typedef struct BRANCH_OBJ{
 
 #endif
 
-   /* Sens Analysis */
    double      **solutions;
    double      **duals;
 
@@ -319,13 +319,11 @@ typedef struct BC_NODE{
 			       defined in "BB_types.h" */
    char       node_status;
 
-   /*SensAnalysis*/
    int          feasibility_status;  
    double       *sol;
    double       *duals;
    double       C_LP;
    double       B_IP;
-   /*SensAnalysis*/
 
 #ifdef TRACE_PATH
    char       optimal_path;
@@ -359,6 +357,34 @@ typedef struct PROBLEM_STAT{
    char        nf_status;          /* nf_status of the root node after
 				      repricing */
 }problem_stat;
+
+
+/* This structure stores the user's description of the model */
+
+typedef struct MIPDESC{
+   int        n;           /* number of columns */
+   int        m;           /* number of rows */
+   int        nz;          /* number of nonzeros */
+   char      *is_int;      /* indicates whether a given variables is integer */
+   int       *matbeg;      /* n */
+   int       *matind;      /* nz */
+   double    *matval;      /* nz */
+   double    *obj;         /* n */
+   double    *obj1;        /* n */ /* for bicriteria problems */
+   double    *obj2;        /* n */ /* for bicriteria problems */
+   double    *rhs;         /* m */
+   double    *rngval;      /* m */
+   char      *sense;       /* m */
+   double    *lb;          /* n */
+   double    *ub;          /* n */
+   char     **colname;     /* column names */
+   double     obj_offset;  /* constant to be added to the objective function.*/
+   char       obj_sense;   /* objective sense. */
+
+   int        change_num;  /* number of updates on the mip desc */
+   int        change_type[MAX_CHANGE_NUM];  /* type of the mip desc. changes */
+
+}MIPdesc;
 
 /*===========================================================================*\
  * The warm start description contains all information needed to warm start

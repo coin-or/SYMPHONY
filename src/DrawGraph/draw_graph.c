@@ -195,7 +195,9 @@ int main(void)
 	   par->nodeweight_font, par->edgeweight_font);
 
    /* invoke user initialization */
+#ifdef USE_SYM_APPLICATION
    CALL_USER_FUNCTION( user_initialize_dg(&dgp->user) );
+#endif
 
    while(TRUE){
 
@@ -289,10 +291,12 @@ int main(void)
 	    win->text[win->text_length] = 0;
 
 	    /* invoke function that interprets the message */
+#ifdef USE_SYM_APPLICATION
 	    CALL_USER_FUNCTION( user_interpret_text(dgp->user,
 						    win->text_length,
 						    win->text,
 						    win->owner_tid) );
+#endif
 	    break;
 
 	  case IGDTOI_REQUEST_GRAPH:
@@ -480,7 +484,9 @@ int main(void)
 	 switch ( msgtag ) {
 
 	  case CTOI_USER_MESSAGE:
+#ifdef USE_SYM_APPLICATION
 	    user_dg_process_message(win->user, win, write_to);
+#endif
 	    break;
 
 	  case CTOI_QUIT_WINDOW:
@@ -1413,8 +1419,13 @@ void free_window(int *pwindow_num, window **windows, int i)
    FREE(w->g.edges);
    /* free the bufid fifo */
    FREE(w->buf.bufid);
-   if (w->user)
+   if (w->user){
+#ifdef USE_SYM_APPLICATION
       user_dg_free_window(&w->user, w);
+#else
+      FREE(w->user);
+#endif
+   }
    FREE(w);
 
    /* delete pointer from windows */
@@ -1556,8 +1567,11 @@ window *init_dgwin(dg_prob *dgp, int sender, char *name, char *title)
       dgp->windows = (window **)
 	 realloc(dgp->windows, dgp->window_num * sizeof(window *));
    dgp->windows[dgp->window_num-1] = win;
+#ifdef USE_SYM_APPLICATION
    CALL_USER_FUNCTION( user_dg_init_window(&win->user, win) );
-
+#else
+   win->user = NULL;
+#endif
    return(win);
 }
 

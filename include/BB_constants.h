@@ -172,8 +172,8 @@
 #endif
 #define BIG_DBL                  1e40
 
-#define MINIMIZE                 0
-#define MAXIMIZE                 1 
+#define SYM_MINIMIZE                 0
+#define SYM_MAXIMIZE                 1 
 
 /*--------------------- Constants related to the basis ----------------------*/
 #  define INVALID_BASIS_STATUS 255
@@ -463,11 +463,8 @@
 #define KEEP_THIS_CHILD             2
 #define PRUNE_THIS_CHILD_FATHOMABLE 3
 
-/*SensAnalysis*/
 /*to be used to differentiate the fathomed nodes */
 #define PRUNE_THIS_CHILD_INFEASIBLE 4
-/*SensAnalysis */
-
 
 /*--------------------- shall_we_branch defaults ----------------------------*/
 #define USER__DO_NOT_BRANCH      0

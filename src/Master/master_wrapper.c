@@ -36,27 +36,37 @@
  * This file contains the wrapper functions for the master process.
 \*===========================================================================*/
 
-int initialize_u(problem *p)
+int initialize_u(sym_environment *env)
 {
-   sym_set_defaults(p);
-   
-   CALL_USER_FUNCTION( user_initialize(&p->user) );
+   sym_set_defaults(env);
 
-   p->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+#ifdef USE_SYM_APPLICATION
+   CALL_USER_FUNCTION( user_initialize(&env->user) );
+#else
+   env->user = NULL;
+#endif   
+
+   env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
 
    return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-int readparams_u(problem *p, int argc, char **argv)
+int readparams_u(sym_environment *env, int argc, char **argv)
 {
-   int i;
+   int i, user_res;
    char tmp, c, foundF, foundD;
 
-   parse_command_line(p, argc, argv);
+   parse_command_line(env, argc, argv);
 
-   switch(user_readparams(p->user, p->par.param_file, argc, argv)){
+#ifdef USE_SYM_APPLICATION
+   user_res = user_readparams(env->user, env->par.param_file, argc, argv);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
+   switch(user_res){
 
     case USER_DEFAULT:
       
@@ -67,11 +77,11 @@ int readparams_u(problem *p, int argc, char **argv)
 	    continue;
 	 switch (c) {
 	  case 'F':
-	    strncpy(p->par.infile, argv[++i],MAX_FILE_NAME_LENGTH);
+	    strncpy(env->par.infile, argv[++i],MAX_FILE_NAME_LENGTH);
 	    foundF = TRUE;
 	    break;	     
 	 case 'D':
-	    strncpy(p->par.datafile, argv[++i],MAX_FILE_NAME_LENGTH);
+	    strncpy(env->par.datafile, argv[++i],MAX_FILE_NAME_LENGTH);
 	    foundD = TRUE;
 	    break;	     
 	 default:
@@ -102,24 +112,30 @@ int readparams_u(problem *p, int argc, char **argv)
 
 /*===========================================================================*/
 
-int io_u(problem *p)
+int io_u(sym_environment *env)
 {
-   int err;
+   int err, user_res;
 
-   switch( user_io(p->user) ){
+#ifdef USE_SYM_APPLICATION
+   user_res = user_io(env->user);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
+   switch( user_res ){
 
     case USER_DEFAULT: 
 
-      if (strcmp(p->par.datafile, "") == 0){ 
-	 err = read_mps(p->mip, p->par.infile, p->probname);
+      if (strcmp(env->par.datafile, "") == 0){ 
+	 err = read_mps(env->mip, env->par.infile, env->probname);
 	 if (err != 0){
 	    printf("\nErrors in reading mps file\n");
 	    exit(1000);
 	 }
       }else{
 #ifdef USE_GLPMPL
-	 err = read_gmpl(p->mip, p->par.infile, 
-			 p->par.datafile, p->probname);
+	 err = read_gmpl(env->mip, env->par.infile, 
+			 env->par.datafile, env->probname);
 	 if(!err){
 	    printf("\nErrors in reading gmpl file\n");
 	    return (ERROR__READING_GMPL_FILE);
@@ -152,24 +168,26 @@ int io_u(problem *p)
 
 /*===========================================================================*/
 
-int init_draw_graph_u(problem *p)
+int init_draw_graph_u(sym_environment *env)
 {
-   if (p->par.do_draw_graph){ /*start up the graphics window*/
+   if (env->par.do_draw_graph){ /*start up the graphics window*/
       int s_bufid;
-      if (p->par.dg_machine_set){
-	 spawn(p->par.dg_exe, (char **)NULL, p->par.dg_debug | TaskHost,
-	       p->par.dg_machine, 1, &p->dg_tid);
+      if (env->par.dg_machine_set){
+	 spawn(env->par.dg_exe, (char **)NULL, env->par.dg_debug | TaskHost,
+	       env->par.dg_machine, 1, &env->dg_tid);
       }else{
-	 spawn(p->par.dg_exe, (char **)NULL, p->par.dg_debug, (char *)NULL, 1,
-	       &p->dg_tid);
+	 spawn(env->par.dg_exe, (char **)NULL, env->par.dg_debug, (char *)NULL, 1,
+	       &env->dg_tid);
       }
       s_bufid = init_send(DataInPlace);
-      send_char_array((char *)&p->par.dg_par, sizeof(dg_params));
-      send_msg(p->dg_tid, DG_DATA);
+      send_char_array((char *)&env->par.dg_par, sizeof(dg_params));
+      send_msg(env->dg_tid, DG_DATA);
       freebuf(s_bufid);
 
-      if (p->dg_tid)
-	 CALL_USER_FUNCTION( user_init_draw_graph(p->user, p->dg_tid) );
+#ifdef USE_SYM_APPLICATION
+      if (env->dg_tid)
+	 CALL_USER_FUNCTION( user_init_draw_graph(env->user, env->dg_tid) );
+#endif
    }
 
    return(FUNCTION_TERMINATED_NORMALLY);
@@ -177,41 +195,43 @@ int init_draw_graph_u(problem *p)
 
 /*===========================================================================*/
 
-int start_heurs_u(problem *p)
+int start_heurs_u(sym_environment *env)
 {
-   double ub = p->has_ub ? p->ub : -MAXDOUBLE;
-   double ub_estimate = p->has_ub_estimate ? p->ub_estimate : -MAXDOUBLE;
+   double ub = env->has_ub ? env->ub : -MAXDOUBLE;
+   double ub_estimate = env->has_ub_estimate ? env->ub_estimate : -MAXDOUBLE;
 
-   CALL_USER_FUNCTION( user_start_heurs(p->user, &ub, &ub_estimate) );
+#ifdef USE_SYM_APPLICATION
+   CALL_USER_FUNCTION( user_start_heurs(env->user, &ub, &ub_estimate) );
+#endif
 
-   if (!p->has_ub){
+   if (!env->has_ub){
       if (ub > -MAXDOUBLE){
-	 p->has_ub = TRUE;
-	 p->ub = ub;
+	 env->has_ub = TRUE;
+	 env->ub = ub;
       }else{
-	 p->ub = MAXDOUBLE;
+	 env->ub = MAXDOUBLE;
       }
-   }else if (ub < p->ub){
-      p->ub = ub;
+   }else if (ub < env->ub){
+      env->ub = ub;
    }
-   if (!p->has_ub_estimate){
+   if (!env->has_ub_estimate){
       if (ub_estimate > -MAXDOUBLE){
-	 p->has_ub_estimate = TRUE;
-	 p->ub_estimate = ub_estimate;
+	 env->has_ub_estimate = TRUE;
+	 env->ub_estimate = ub_estimate;
       }
-   }else if (ub_estimate < p->ub_estimate){
-      p->ub_estimate = ub_estimate;
+   }else if (ub_estimate < env->ub_estimate){
+      env->ub_estimate = ub_estimate;
    }
-   if (p->par.tm_par.vbc_emulation == VBC_EMULATION_FILE){
+   if (env->par.tm_par.vbc_emulation == VBC_EMULATION_FILE){
       FILE *f = NULL;
-      if (!(f = fopen(p->par.tm_par.vbc_emulation_file_name, "a"))){
+      if (!(f = fopen(env->par.tm_par.vbc_emulation_file_name, "a"))){
 	 printf("\nError opening vbc emulation file\n\n");
       }else{
-	 fprintf(f, "00:00:00.00 U %.2f \n", p->ub);
+	 fprintf(f, "00:00:00.00 U %.2f \n", env->ub);
 	 fclose(f); 
       }
-   }else if (p->par.tm_par.vbc_emulation == VBC_EMULATION_LIVE){
-      printf("$U %.2f\n", p->ub);
+   }else if (env->par.tm_par.vbc_emulation == VBC_EMULATION_LIVE){
+      printf("$U %.2f\n", env->ub);
    }
 
    return(FUNCTION_TERMINATED_NORMALLY);
@@ -219,18 +239,27 @@ int start_heurs_u(problem *p)
 
 /*===========================================================================*/
 
-int initialize_root_node_u(problem *p)
+int initialize_root_node_u(sym_environment *env)
 {
-   int i;
+   int i, user_res;
 
-   base_desc *base = p->base = (base_desc *) calloc(1, sizeof(base_desc));
-   node_desc *root = p->rootdesc = (node_desc *) calloc(1, sizeof(node_desc));
+   base_desc *base = env->base = (base_desc *) calloc(1, sizeof(base_desc));
+   node_desc *root = env->rootdesc = (node_desc *) calloc(1, sizeof(node_desc));
    
-   switch (user_initialize_root_node(p->user, &base->varnum, &base->userind,
-				     &base->cutnum, &root->uind.size,
-				     &root->uind.list, &p->mip->obj_sense,
-				     &p->mip->obj_offset, &p->mip->colname,
-				     p->par.tm_par.colgen_strat)){
+
+#ifdef USE_SYM_APPLICATION
+   user_res = user_initialize_root_node(env->user, &base->varnum, &base->userind,
+					&base->cutnum, &root->uind.size,
+					&root->uind.list, &env->mip->obj_sense,
+					&env->mip->obj_offset, 
+					&env->mip->colname,
+					env->par.tm_par.colgen_strat);
+#else
+   user_res = USER_DEFAULT;
+#endif
+
+   switch (user_res){ 
+      
     case USER_ERROR:
       
       printf("\n\n*********User error detected -- aborting***********\n\n");
@@ -241,10 +270,10 @@ int initialize_root_node_u(problem *p)
     case USER_AND_PP:  
       if (base->varnum)
 	 qsortucb_i(base->userind, base->varnum);
-      if (root->uind.size && !p->par.warm_start)
+      if (root->uind.size && !env->par.warm_start)
 	 qsortucb_i(root->uind.list, root->uind.size);
-      p->mip->n = base->varnum + root->uind.size;
-      p->mip->m = base->cutnum;
+      env->mip->n = base->varnum + root->uind.size;
+      env->mip->m = base->cutnum;
 #if 0
       /* FIXME: We'd like to create the user's problem description here,
 	 but we can't because we don't have access to the user's LP
@@ -257,15 +286,15 @@ int initialize_root_node_u(problem *p)
       memcpy((char *)(userind + base->varnum), (char *)root->uind.list,
 	     root->uind.size * ISIZE); 
       
-      user_create_subproblem(p->user, userind, p->mip, &maxn, &maxm, &maxnz);
+      user_create_subproble(env->user, userind, env->mip, &maxn, &maxm, &maxnz);
 #endif
       break;
       
     case USER_DEFAULT: 
 
-      if (p->mip->n && p->mip->m){
-	 root->uind.size = p->mip->n;
-	 base->cutnum = p->mip->m;
+      if (env->mip->n && env->mip->m){
+	 root->uind.size = env->mip->n;
+	 base->cutnum = env->mip->m;
       }else if (!root->uind.size){
 	 printf("Error setting up the root node.\n");
 	 printf("User did not specify number of variables. Exiting.\n\n");
@@ -288,7 +317,7 @@ int initialize_root_node_u(problem *p)
       if (base->varnum){
 	 qsortucb_i(base->userind, base->varnum);
       }
-      if (root->uind.size && !p->par.warm_start){
+      if (root->uind.size && !env->par.warm_start){
 	 qsortucb_i(root->uind.list, root->uind.size);
       }
 #endif
@@ -299,7 +328,7 @@ int initialize_root_node_u(problem *p)
       break;
    }
 
-   if (p->par.warm_start){
+   if (env->par.warm_start){
       root->uind.size = 0;
       FREE(root->uind.list);
       return(FUNCTION_TERMINATED_NORMALLY);
@@ -310,7 +339,7 @@ int initialize_root_node_u(problem *p)
    root->not_fixed.type = EXPLICIT_LIST;
    root->basis.basis_exists = FALSE;
    root->nf_status = NF_CHECK_NOTHING;
-   root->nf_status = (p->par.tm_par.colgen_strat[0] & COLGEN__FATHOM) ?
+   root->nf_status = (env->par.tm_par.colgen_strat[0] & COLGEN__FATHOM) ?
                       NF_CHECK_ALL : NF_CHECK_NOTHING;
 
    return(FUNCTION_TERMINATED_NORMALLY);
@@ -318,25 +347,25 @@ int initialize_root_node_u(problem *p)
 
 /*===========================================================================*/
 
-int receive_feasible_solution_u(problem *p, int msgtag)
+int receive_feasible_solution_u(sym_environment *env, int msgtag)
 {
-   receive_int_array(&(p->best_sol.xlevel), 1);
-   receive_int_array(&(p->best_sol.xindex), 1);
-   receive_int_array(&(p->best_sol.xiter_num), 1);
-   receive_dbl_array(&(p->best_sol.lpetol), 1);
-   receive_dbl_array(&(p->best_sol.objval), 1);
-   receive_int_array(&(p->best_sol.xlength), 1);
-   if (p->best_sol.xlength > 0){
-      FREE(p->best_sol.xind);
-      FREE(p->best_sol.xval);
-      p->best_sol.xind = (int *) malloc(p->best_sol.xlength * ISIZE);
-      p->best_sol.xval = (double *) malloc(p->best_sol.xlength * DSIZE);
-      receive_int_array(p->best_sol.xind, p->best_sol.xlength);
-      receive_dbl_array(p->best_sol.xval, p->best_sol.xlength);
+   receive_int_array(&(env->best_sol.xlevel), 1);
+   receive_int_array(&(env->best_sol.xindex), 1);
+   receive_int_array(&(env->best_sol.xiter_num), 1);
+   receive_dbl_array(&(env->best_sol.lpetol), 1);
+   receive_dbl_array(&(env->best_sol.objval), 1);
+   receive_int_array(&(env->best_sol.xlength), 1);
+   if (env->best_sol.xlength > 0){
+      FREE(env->best_sol.xind);
+      FREE(env->best_sol.xval);
+      env->best_sol.xind = (int *) malloc(env->best_sol.xlength * ISIZE);
+      env->best_sol.xval = (double *) malloc(env->best_sol.xlength * DSIZE);
+      receive_int_array(env->best_sol.xind, env->best_sol.xlength);
+      receive_dbl_array(env->best_sol.xval, env->best_sol.xlength);
    }
-   if (!p->has_ub || p->best_sol.objval < p->ub){
-      p->has_ub = TRUE;
-      p->ub = p->best_sol.objval;
+   if (!env->has_ub || env->best_sol.objval < env->ub){
+      env->has_ub = TRUE;
+      env->ub = env->best_sol.objval;
    }
    
    switch (msgtag){
@@ -346,11 +375,14 @@ int receive_feasible_solution_u(problem *p, int msgtag)
     case FEASIBLE_SOLUTION_USER:
       /* A feasible solution has been found in the LP process, and
        * it was packed by the user */
-      CALL_USER_FUNCTION( user_receive_feasible_solution(p->user, msgtag,
-							 p->best_sol.objval,
-							 p->best_sol.xlength,
-							 p->best_sol.xind,
-							 p->best_sol.xval) );
+
+#ifdef USE_SYM_APPLICATION
+      CALL_USER_FUNCTION( user_receive_feasible_solution(env->user, msgtag,
+							 env->best_sol.objval,
+							 env->best_sol.xlength,
+							 env->best_sol.xind,
+							 env->best_sol.xval) );
+#endif
       break;
    }
 
@@ -359,12 +391,12 @@ int receive_feasible_solution_u(problem *p, int msgtag)
 
 /*===========================================================================*/
 
-int send_lp_data_u(problem *p, int sender)
+int send_lp_data_u(sym_environment *env, int sender)
 {
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    int i;
-   tm_prob *tm = p->tm;
-   tm->par.max_active_nodes = p->par.tm_par.max_active_nodes;
+   tm_prob *tm = env->tm;
+   tm->par.max_active_nodes = env->par.tm_par.max_active_nodes;
 #ifdef _OPENMP
    omp_set_dynamic(FALSE);
    omp_set_num_threads(tm->par.max_active_nodes);
@@ -378,54 +410,56 @@ int send_lp_data_u(problem *p, int sender)
    for (i = 0; i < tm->par.max_active_nodes; i ++){
       tm->lpp[i] = (lp_prob *) calloc(1, sizeof(lp_prob));
       tm->lpp[i]->proc_index = i;
-      tm->lpp[i]->par = p->par.lp_par;
+      tm->lpp[i]->par = env->par.lp_par;
 
-      if ((tm->lpp[i]->has_ub = p->has_ub)){
-	 tm->lpp[i]->ub = p->ub;
+      if ((tm->lpp[i]->has_ub = env->has_ub)){
+	 tm->lpp[i]->ub = env->ub;
       }else{
-	 p->ub = - (MAXDOUBLE / 2);
+	 env->ub = - (MAXDOUBLE / 2);
       }
-      if (p->par.multi_criteria){
-	 if ((tm->lpp[i]->has_mc_ub = p->has_mc_ub)){
-	    tm->lpp[i]->mc_ub = p->mc_ub;
-	    tm->lpp[i]->obj[0] = p->obj[0];
-	    tm->lpp[i]->obj[1] = p->obj[1];
+      if (env->par.multi_criteria){
+	 if ((tm->lpp[i]->has_mc_ub = env->has_mc_ub)){
+	    tm->lpp[i]->mc_ub = env->mc_ub;
+	    tm->lpp[i]->obj[0] = env->obj[0];
+	    tm->lpp[i]->obj[1] = env->obj[1];
 	 }else{
-	    p->mc_ub = - (MAXDOUBLE / 2);
+	    env->mc_ub = - (MAXDOUBLE / 2);
 	 }
-	 tm->lpp[i]->utopia[0] = p->utopia[0];
-	 tm->lpp[i]->utopia[1] = p->utopia[1];
+	 tm->lpp[i]->utopia[0] = env->utopia[0];
+	 tm->lpp[i]->utopia[1] = env->utopia[1];
       }
-      tm->lpp[i]->draw_graph = p->dg_tid;
-      tm->lpp[i]->base = *(p->base);
-      tm->lpp[i]->mip = p->mip;
+      tm->lpp[i]->draw_graph = env->dg_tid;
+      tm->lpp[i]->base = *(env->base);
+      tm->lpp[i]->mip = env->mip;
 
-      CALL_USER_FUNCTION( user_send_lp_data(p->user, &(tm->lpp[i]->user)) );
+#ifdef USE_SYM_APPLICATION
+      CALL_USER_FUNCTION( user_send_lp_data(env->user, &(tm->lpp[i]->user)) );
+#endif
    }
 #else   
    int s_bufid;
 
    s_bufid = init_send(DataInPlace);
-   send_char_array((char *)(&p->par.lp_par), sizeof(lp_params));
-   send_char_array(&p->has_ub, 1);
-   if (p->has_ub)
-      send_dbl_array(&p->ub, 1);
-   if (p->par.multi_crtieria){
-      send_char_array(&p->has_mc_ub, 1);
-      if (p->has_mc_ub){
-	 send_dbl_array(&p->mc_ub, 1);
-	 send_dbl_array(p->obj, 2);
+   send_char_array((char *)(&env->par.lp_par), sizeof(lp_params));
+   send_char_array(&env->has_ub, 1);
+   if (env->has_ub)
+      send_dbl_array(&env->ub, 1);
+   if (env->par.multi_crtieria){
+      send_char_array(&env->has_mc_ub, 1);
+      if (env->has_mc_ub){
+	 send_dbl_array(&env->mc_ub, 1);
+	 send_dbl_array(env->obj, 2);
       }
-      send_dbl_array(p->utopia, 2);
+      send_dbl_array(env->utopia, 2);
    }
-   send_int_array(&p->dg_tid, 1);
-   send_int_array(&p->base->varnum, 1);
-   if (p->base->varnum){
-      send_int_array(p->base->userind, p->base->varnum);
+   send_int_array(&env->dg_tid, 1);
+   send_int_array(&env->base->varnum, 1);
+   if (env->base->varnum){
+      send_int_array(env->base->userind, env->base->varnum);
    }
-   send_int_array(&p->base->cutnum, 1);
-   if (p->mip){
-      MIPdesc *mip = p->mip;
+   send_int_array(&env->base->cutnum, 1);
+   if (env->mip){
+      MIPdesc *mip = env->mip;
       char has_desc = TRUE;
       char has_colnames = FALSE;
       send_char_array(&has_desc, 1);
@@ -438,7 +472,7 @@ int send_lp_data_u(problem *p, int sender)
       send_int_array(mip->matind, mip->nz);
       send_dbl_array(mip->matval, mip->nz);
       send_dbl_array(mip->obj, mip->n);
-      if (p->par.multi_criteria){
+      if (env->par.multi_criteria){
 	 send_dbl_array(mip->obj, mip->n);
 	 send_dbl_array(mip->obj2, mip->n);
       }
@@ -462,7 +496,9 @@ int send_lp_data_u(problem *p, int sender)
       char has_desc = FALSE;
       send_char_array(&has_desc, 1);
    }
-   CALL_USER_FUNCTION( user_send_lp_data(p->user, NULL) );
+#ifdef USE_SYM_APPLICATION
+   CALL_USER_FUNCTION( user_send_lp_data(env->user, NULL) );
+#endif
    send_msg(sender, LP_DATA);
    freebuf(s_bufid);
 #endif
@@ -472,30 +508,33 @@ int send_lp_data_u(problem *p, int sender)
 
 /*===========================================================================*/
 
-int send_cg_data_u(problem *p, int sender)
+int send_cg_data_u(sym_environment *env, int sender)
 {
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined(COMPILE_IN_CG)
    int i;
-   tm_prob *tm = p->tm;
+   tm_prob *tm = env->tm;
    tm->cgp = (cg_prob **) malloc(tm->par.max_active_nodes*sizeof(cg_prob *));
 #pragma omp parallel for
    for (i = 0; i < tm->par.max_active_nodes; i++){
       tm->lpp[i]->cgp = tm->cgp[i] = (cg_prob *) calloc(1, sizeof(cg_prob));
       
-      tm->cgp[i]->par = p->par.cg_par;
+      tm->cgp[i]->par = env->par.cg_par;
       
-      tm->cgp[i]->draw_graph = p->dg_tid;
-      
-      CALL_USER_FUNCTION( user_send_cg_data(p->user,
+      tm->cgp[i]->draw_graph = env->dg_tid;
+#ifdef USE_SYM_APPLICATION      
+      CALL_USER_FUNCTION( user_send_cg_data(env->user,
 					    &(tm->lpp[i]->cgp->user)) );
+#endif
    }
 #else
    int s_bufid;
 
    s_bufid = init_send(DataInPlace);
-   send_char_array((char *)(&p->par.cg_par), sizeof(cg_params));
-   send_int_array(&p->dg_tid, 1);
-   CALL_USER_FUNCTION( user_send_cg_data(p->user, NULL) );
+   send_char_array((char *)(&env->par.cg_par), sizeof(cg_params));
+   send_int_array(&env->dg_tid, 1);
+#ifdef USE_SYM_APPLICATION
+   CALL_USER_FUNCTION( user_send_cg_data(env->user, NULL) );
+#endif
    send_msg(sender, CG_DATA);
    freebuf(s_bufid);
 #endif
@@ -505,24 +544,28 @@ int send_cg_data_u(problem *p, int sender)
 
 /*===========================================================================*/
 
-int send_cp_data_u(problem *p, int sender)
+int send_cp_data_u(sym_environment *env, int sender)
 {
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP)
    int i;
-   tm_prob *tm = p->tm;
+   tm_prob *tm = env->tm;
 
-   tm->cpp = (cut_pool **) malloc(p->par.tm_par.max_cp_num*sizeof(cut_pool *));
-   for (i = 0; i < p->par.tm_par.max_cp_num; i++){
+   tm->cpp = (cut_pool **) malloc(env->par.tm_par.max_cp_num*sizeof(cut_pool *));
+   for (i = 0; i < env->par.tm_par.max_cp_num; i++){
       tm->cpp[i] = (cut_pool *) calloc(1, sizeof(cut_pool));
-      tm->cpp[i]->par = p->par.cp_par;
-      CALL_USER_FUNCTION( user_send_cp_data(p->user, &p->tm->cpp[i]->user) );
+      tm->cpp[i]->par = env->par.cp_par;
+#ifdef USE_SYM_APPLICATION
+      CALL_USER_FUNCTION( user_send_cp_data(env->user, &env->tm->cpp[i]->user) );
+#endif
    }
 #else
    int s_bufid;
 
    s_bufid = init_send(DataInPlace);
-   send_char_array((char *)(&p->par.cp_par), sizeof(cp_params));
-   CALL_USER_FUNCTION( user_send_cp_data(p->user, NULL) );
+   send_char_array((char *)(&env->par.cp_par), sizeof(cp_params));
+#ifdef USE_SYM_APPLICATION
+   CALL_USER_FUNCTION( user_send_cp_data(env->user, NULL) );
+#endif
    send_msg(sender, CP_DATA);
    freebuf(s_bufid);
 #endif
@@ -533,14 +576,16 @@ int send_cp_data_u(problem *p, int sender)
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 /*===========================================================================*/
 
-int send_sp_data_u(problem *p, int sender)
+int send_sp_data_u(sym_environment *env, int sender)
 {
 #ifdef COMPILE_DECOMP
    int s_bufid;
 
    s_bufid = init_send(DataInPlace);
-   send_char_array((char *)(&p->par.sp_par), sizeof(sp_params));
-   CALL_USER_FUNCTION( user_send_sp_data(p->user) );
+   send_char_array((char *)(&env->par.sp_par), sizeof(sp_params))
+#ifdef USE_SYM_APPLICATION
+   CALL_USER_FUNCTION( user_send_sp_data(env->user) );
+#endif
    send_msg(sender, SP_DATA);
    freebuf(s_bufid);
 #endif
@@ -551,7 +596,7 @@ int send_sp_data_u(problem *p, int sender)
 /*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 
-int display_solution_u(problem *p, int thread_num)
+int display_solution_u(sym_environment *env, int thread_num)
 {
    int user_res, i;
    lp_sol sol;
@@ -559,65 +604,76 @@ int display_solution_u(problem *p, int thread_num)
    sol.xlength = 0;
    
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-   if (p->tm && p->tm->lpp[thread_num]){
-      sol = p->tm->lpp[thread_num]->best_sol;
-      if (p->par.multi_criteria){
-	 p->obj[0] = p->tm->lpp[thread_num]->obj[0];
-	 p->obj[1] = p->tm->lpp[thread_num]->obj[1];
+   if (env->tm && env->tm->lpp[thread_num]){
+      sol = env->tm->lpp[thread_num]->best_sol;
+      if (env->par.multi_criteria){
+	 env->obj[0] = env->tm->lpp[thread_num]->obj[0];
+	 env->obj[1] = env->tm->lpp[thread_num]->obj[1];
       }
    }
 #else
-   sol = p->best_sol;
+   sol = env->best_sol;
 #endif
-   
-   if (!sol.xlength){
-      printf("\nNo Solution Found\n\n");
-      return(FUNCTION_TERMINATED_NORMALLY);
-   }
 
-   printf("\nSolution Found: Node %i, Level %i\n", sol.xindex, sol.xlevel);
-   if (p->par.multi_criteria){
-      printf("First Objective: %.3f\n", p->tm->lpp[thread_num]->obj[0]);
-      printf("Second Objective: %.3f\n", p->tm->lpp[thread_num]->obj[1]);
-   }else{
-      printf("Solution Cost: %.3f\n", sol.objval);
+   if (!sol.xlength){
+      if(env->termcode != TM_OPTIMAL_SOLUTION_FOUND){
+	 printf("\nNo Solution Found\n\n");
+	 return(FUNCTION_TERMINATED_NORMALLY);
+      }
+   }
+   if(env->par.verbosity >=0){
+      printf("\nSolution Found: Node %i, Level %i\n", sol.xindex, sol.xlevel);
+      if (env->par.multi_criteria){
+	 printf("First Objective: %.3f\n", env->tm->lpp[thread_num]->obj[0]);
+	 printf("Second Objective: %.3f\n", env->tm->lpp[thread_num]->obj[1]);
+      }else{
+	 printf("Solution Cost: %.3f\n", sol.objval);
+      }
    }
    qsortucb_id(sol.xind, sol.xval, sol.xlength);
-   
-   user_res = user_display_solution(p->user, sol.lpetol, sol.xlength, sol.xind,
+
+#ifdef USE_SYM_APPLICATION   
+   user_res = user_display_solution(env->user, sol.lpetol, sol.xlength, sol.xind,
 				    sol.xval, sol.objval);
    
+#else
+   user_res = USER_DEFAULT;
+#endif
+
    switch(user_res){
     case USER_SUCCESS:
       return(FUNCTION_TERMINATED_NORMALLY);
     case USER_DEFAULT:
-      if (sol.xlength){
-	 if (p->mip->colname){ 
-	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    printf(" Column names and values of nonzeros in the solution\n");
-	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    for (i = 0; i < sol.xlength; i++){
-	       if (sol.xind[i] == p->mip->n){
-		  continue;
-	       }
-	       printf("%8s %10.3f\n", p->mip->colname[sol.xind[i]],
-		      sol.xval[i]);
-	    }
-	    printf("\n");
-	 }else{
-	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    printf(" User indices and values of nonzeros in the solution\n");
-	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    for (i = 0; i < sol.xlength; i++){
-	       if (sol.xind[i] == p->mip->n){
-		  continue;
-	       }
-	       printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
-	    }
-	    printf("\n");
-	 }
-	 return(FUNCTION_TERMINATED_NORMALLY);
-      }
+       if(env->par.verbosity >=0){
+	  if (sol.xlength){
+	     if (env->mip->colname){ 
+		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		printf(" Column names and values of nonzeros in the solution\n");
+		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		for (i = 0; i < sol.xlength; i++){
+		   if (sol.xind[i] == env->mip->n){
+		      continue;
+		   }
+		   printf("%8s %10.3f\n", env->mip->colname[sol.xind[i]],
+			  sol.xval[i]);
+		}
+		printf("\n");
+	     }else{
+		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		printf(" User indices and values of nonzeros in the solution\n");
+		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		for (i = 0; i < sol.xlength; i++){
+		   if (sol.xind[i] == env->mip->n){
+		      continue;
+		   }
+		   printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+		}
+		printf("\n");
+	     }
+	     
+	     return(FUNCTION_TERMINATED_NORMALLY);
+	  }
+       }
     case USER_ERROR:
       return(FUNCTION_TERMINATED_NORMALLY);
       
@@ -630,62 +686,66 @@ int display_solution_u(problem *p, int thread_num)
 
 /*===========================================================================*/
 
-int process_own_messages_u(problem *p, int msgtag)
+int process_own_messages_u(sym_environment *env, int msgtag)
 {
-   CALL_USER_FUNCTION( user_process_own_messages(p->user, msgtag) );
-
+#ifdef USE_SYM_APPLICATION
+   CALL_USER_FUNCTION( user_process_own_messages(env->user, msgtag) );
+#endif
    return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-int free_master_u(problem *p)
+int free_master_u(sym_environment *env)
 {
    int i;
-   
-   CALL_USER_FUNCTION( user_free_master(&p->user) );
 
-   FREE(p->best_sol.xind);
-   FREE(p->best_sol.xval);
+#ifdef USE_SYM_APPLICATION
+   CALL_USER_FUNCTION( user_free_master(&env->user) );
+#endif
+   FREE(env->best_sol.xind);
+   FREE(env->best_sol.xval);
    
-   if (p->mip){
-      free_mip_desc(p->mip);
-      FREE(p->mip);
+   if (env->mip){
+      free_mip_desc(env->mip);
+      FREE(env->mip);
    }
    
-   if (p->rootdesc){
-      FREE(p->rootdesc->desc);
-      FREE(p->rootdesc->uind.list);
-      FREE(p->rootdesc->not_fixed.list);
-      FREE(p->rootdesc->cutind.list);
-      FREE(p->rootdesc);
+   if (env->rootdesc){
+      FREE(env->rootdesc->desc);
+      FREE(env->rootdesc->uind.list);
+      FREE(env->rootdesc->not_fixed.list);
+      FREE(env->rootdesc->cutind.list);
+      FREE(env->rootdesc);
    }
 
-   if (p->base){
-      FREE(p->base->userind);
-      FREE(p->base);
+   if (env->base){
+      FREE(env->base->userind);
+      FREE(env->base);
    }
 
 #ifdef COMPILE_IN_TM
-   if (p->warm_start){
-      free_subtree(p->warm_start->rootnode);
-      if (p->warm_start->cuts){
-	 for (i = p->warm_start->cut_num - 1; i >= 0; i--)
-	 if (p->warm_start->cuts[i]){
-	    FREE(p->warm_start->cuts[i]->coef);
-	    FREE(p->warm_start->cuts[i]);
+   if (env->warm_start){
+      free_subtree(env->warm_start->rootnode);
+      if (env->warm_start->cuts){
+	 for (i = env->warm_start->cut_num - 1; i >= 0; i--){
+	    if (env->warm_start->cuts[i]){
+	       FREE(env->warm_start->cuts[i]->coef);
+	    }
+	    FREE(env->warm_start->cuts[i]);
 	 }
       }
-      FREE(p->warm_start->cuts);
-      FREE(p->warm_start);
+
+      FREE(env->warm_start->cuts);
+      FREE(env->warm_start);
    }
 #ifdef COMPILE_IN_CP
-   if (p->cp){
-      for (i = 0; i < p->par.tm_par.max_cp_num; i++){
-	 p->cp[i]->msgtag = YOU_CAN_DIE;
-	 cp_close(p->cp[i]);
+   if (env->cp){
+      for (i = 0; i < env->par.tm_par.max_cp_num; i++){
+	 env->cp[i]->msgtag = YOU_CAN_DIE;
+	 cp_close(env->cp[i]);
       }
-      FREE(p->cp);
+      FREE(env->cp);
    }
 #endif
 #endif

@@ -19,7 +19,6 @@
 
 #include "BB_types.h"
 #include "master_params.h"
-#include "lp_solver.h"
 #ifdef COMPILE_IN_TM
 #include "tm.h"
 #endif
@@ -29,7 +28,7 @@
  * well as some of the tours that have been generated.
 \*===========================================================================*/
 
-typedef struct PROBLEM{
+typedef struct SYM_ENVIRONMENT{
    void            *user;
    int              tm_tid;
    int              dg_tid;
@@ -63,13 +62,13 @@ typedef struct PROBLEM{
    cut_pool       **cp;
 #endif
 #endif
-}problem;
+}sym_environment;
 
 /*===========================================================================*/
 /*=================== Master I/O functions (readparams.c) ===================*/
 /*===========================================================================*/
 
-int parse_command_line PROTO((problem *p, int argc, char **argv));
+int parse_command_line PROTO((sym_environment *env, int argc, char **argv));
 void read_string PROTO((char *target, char *line, int maxlen));
 void print_statistics PROTO((node_times *tim, problem_stat *stat, double ub,
 			     double lb, double initial_time,
@@ -80,40 +79,40 @@ void print_statistics PROTO((node_times *tim, problem_stat *stat, double ub,
 /*=============== Master wrapper functions (master_wrapper.c) ===============*/
 /*===========================================================================*/
 
-int initialize_u PROTO((problem *p));
-int free_master_u PROTO((problem *p));
-int readparams_u PROTO((problem *p, int argc, char **argv));
-int io_u PROTO((problem *p));
-int init_draw_graph_u PROTO((problem *p));
-int start_heurs_u PROTO((problem *p));
-int display_solution_u PROTO((problem *p, int thread_num));
-int initialize_root_node_u PROTO((problem *p));
-int receive_feasible_solution_u PROTO((problem *p, int msgtag));
-int send_lp_data_u PROTO((problem *p, int sender));
-int send_cg_data_u PROTO((problem *p, int sender));
-int send_cp_data_u PROTO((problem *p, int sender));
-int send_sp_data_u PROTO((problem *p, int sender));
-int process_own_messages_u PROTO((problem *p, int msgtag));
+int initialize_u PROTO((sym_environment *env));
+int free_master_u PROTO((sym_environment *env));
+int readparams_u PROTO((sym_environment *env, int argc, char **argv));
+int io_u PROTO((sym_environment *env));
+int init_draw_graph_u PROTO((sym_environment *env));
+int start_heurs_u PROTO((sym_environment *env));
+int display_solution_u PROTO((sym_environment *env, int thread_num));
+int initialize_root_node_u PROTO((sym_environment *env));
+int receive_feasible_solution_u PROTO((sym_environment *env, int msgtag));
+int send_lp_data_u PROTO((sym_environment *env, int sender));
+int send_cg_data_u PROTO((sym_environment *env, int sender));
+int send_cp_data_u PROTO((sym_environment *env, int sender));
+int send_sp_data_u PROTO((sym_environment *env, int sender));
+int process_own_messages_u PROTO((sym_environment *env, int msgtag));
 
 /*===========================================================================*/
 /*=================== Master helper functions (master_func.c) ===============*/
 /*===========================================================================*/
 
-int resolve_node PROTO((problem *p, bc_node * node));
-void update_tree_bound PROTO((problem *p, bc_node *root, int change_type));
-
+int resolve_node PROTO((sym_environment *env, bc_node * node));
+void update_tree_bound PROTO((sym_environment *env, bc_node *root, 
+			      int change_type));
 int copy_node PROTO((bc_node * n_to, bc_node *n_from));
 int copy_tree PROTO((bc_node *root_to, bc_node *root_from));
-int read_node PROTO((bc_node * node, FILE * f));
+int read_node PROTO((bc_node * node, FILE *f));
 int read_tree PROTO((bc_node * root, FILE *f));
-int write_node PROTO((bc_node *node, FILE*f));
+int write_node PROTO((bc_node *node, FILE *f));
 int write_tree PROTO((bc_node *root, FILE *f));
 
-int set_param PROTO((problem *p,  char *line));
+int set_param PROTO((sym_environment *env,  char *line));
 
 warm_start_desc *create_copy_warm_start PROTO((warm_start_desc * ws));
 MIPdesc *create_copy_mip_desc PROTO((MIPdesc *mip));
-problem *create_copy_problem PROTO((problem *p));
+sym_environment *create_copy_environment PROTO((sym_environment *env));
 
 double get_lb_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt, 
 				 int *ind, double *val));

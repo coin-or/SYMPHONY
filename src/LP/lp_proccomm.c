@@ -517,18 +517,17 @@ void send_node_desc(lp_prob *p, char node_type)
       tm->active_nodes[p->proc_index];
    node_desc *tm_desc = &n->desc;
 
-   /* SensAnalysis */
-   if(n->sol){
-      FREE(n->sol);
-      FREE(n->duals);
+   if (tm->par.sensitivity_analysis){ 
+      if (n->sol){
+	 FREE(n->sol);
+	 FREE(n->duals);
+      }
+      n->sol = (double *) malloc (DSIZE * p->desc->uind.size);
+      memcpy(n->sol, lp_data->x, DSIZE*p->desc->uind.size);
+      
+      n->duals = (double *) malloc (DSIZE * p->base.cutnum);
+      memcpy(n->duals, lp_data->dualsol, DSIZE*p->base.cutnum);
    }
-   n->sol = (double *) malloc (DSIZE * p->desc->uind.size);
-   memcpy(n->sol, lp_data->x, DSIZE*p->desc->uind.size);
-   
-   n->duals = (double *) malloc (DSIZE * p->base.cutnum);
-   memcpy(n->duals, lp_data->dualsol, DSIZE*p->base.cutnum);
-   
-   /* SensAnalysis */
    
 #else
    int s_bufid;
@@ -538,21 +537,21 @@ void send_node_desc(lp_prob *p, char node_type)
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
        node_type == DISCARDED_NODE || node_type == FEASIBLE_PRUNED){
       n->node_status = NODE_STATUS__PRUNED;
-
-      /* SensAnalysis */      
+      
       if (node_type == INFEASIBLE_PRUNED || node_type == DISCARDED_NODE){
 	 n->feasibility_status = INFEASIBLE_PRUNED;      
       }
-      if(node_type == FEASIBLE_PRUNED) {
+      if (node_type == FEASIBLE_PRUNED) {
+	 if (!tm->par.sensitivity_analysis){ 
+	    n->sol = (double *) malloc (DSIZE * p->desc->uind.size);
+	    memcpy(n->sol, lp_data->x, DSIZE*p->desc->uind.size);
+	 }
 	 n->feasibility_status = FEASIBLE_PRUNED;      
       }
-      if( node_type == OVER_UB_PRUNED ){
+      if (node_type == OVER_UB_PRUNED ){
 	 n->feasibility_status = OVER_UB_PRUNED;      
+	 
       }
-
-      /* SensAnalysis */
-
-
 
 #ifdef TRACE_PATH
       if (n->optimal_path){
@@ -1434,8 +1433,8 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 	 PRINT(p->par.verbosity, 2, ("child %i is pruned by rule\n", i));
 	 break;
        case PRUNE_THIS_CHILD_FATHOMABLE:
-       case PRUNE_THIS_CHILD_INFEASIBLE: /* SensAnalysis */
-	 PRINT(p->par.verbosity, 2, ("child %i is fathomed [%i, %i]\n",
+       case PRUNE_THIS_CHILD_INFEASIBLE: 
+	  PRINT(p->par.verbosity, 2, ("child %i is fathomed [%i, %i]\n",
 				     i, can->termcode[i], can->iterd[i]));
 	 break;
       }

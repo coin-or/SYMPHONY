@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* This file was developed by Menal Guzelsoy for the SYMPHONY OSI interface. */  
+/* This file was developed by Menal Guzelsoy for the SYMPHONY OSI interface. */
 /*                                                                           */
 /* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
@@ -18,6 +18,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #ifdef __PVM__
 #include <pvmtev.h>
 #endif
@@ -32,11 +33,11 @@
 /*===========================================================================*/
 /*===========================================================================*/
 
-int resolve_node(problem *p, bc_node *node)
+int resolve_node(sym_environment *env, bc_node *node)
 {
    node_desc * desc = &node->desc;
    LPdata *lp_data = (LPdata*)calloc(1, sizeof(LPdata));
-   lp_data->mip = create_copy_mip_desc(p->mip); //FIX_ME!!!
+   lp_data->mip = create_copy_mip_desc(env->mip); //FIXME!!!
    branch_desc *bpath;
    branch_obj *bobj;
    bc_node **path, *n;
@@ -157,10 +158,10 @@ int resolve_node(problem *p, bc_node *node)
    }
    if (not_fixed.size)
       not_fixed.list = (int *) malloc(not_fixed.size*ISIZE);
-   if (p->base->varnum && basis.basis_exists)
-      basis.basevars.stat = (int *) malloc(p->base->varnum*ISIZE);
-   if (p->base->cutnum && basis.basis_exists)
-      basis.baserows.stat = (int *) malloc(p->base->cutnum*ISIZE);
+   if (env->base->varnum && basis.basis_exists)
+      basis.basevars.stat = (int *) malloc(env->base->varnum*ISIZE);
+   if (env->base->cutnum && basis.basis_exists)
+      basis.baserows.stat = (int *) malloc(env->base->cutnum*ISIZE);
    
    /* The extra variables (uind) and the corresponding basis part */
    if (varexp_ind >= 0){
@@ -342,7 +343,7 @@ int resolve_node(problem *p, bc_node *node)
    }
    /*------------------------------------------------------------------------*\
    /* Add cuts here */
-   /* FIX_ME! ASSUMING ALL THE CUTS ARE EXPLICIT ROW! */
+   /* FIXME! ASSUMING ALL THE CUTS ARE EXPLICIT ROW! */
    /*----------------------------------------------------------------------- */
    desc = new_desc;
 
@@ -353,9 +354,9 @@ int resolve_node(problem *p, bc_node *node)
       matbeg = (int *) calloc(size + 1, ISIZE);
       matbeg[0] = 0;
 
-      for (i = 0, j = 0; i<p->warm_start->cut_num, j<desc->cutind.size; i++){
+      for (i = 0, j = 0; i<env->warm_start->cut_num, j<desc->cutind.size; i++){
 	 if (i == desc->cutind.list[j]){
-	    cut = p->warm_start->cuts[i];
+	    cut = env->warm_start->cuts[i];
 	    nzcnt = ((int *) (cut->coef))[0];
 	    sense[j] = cut->sense;
 	    rhs[j] = cut->rhs;
@@ -367,9 +368,9 @@ int resolve_node(problem *p, bc_node *node)
       matind = (int *) malloc(nzcnt*ISIZE);
       matval = (double *) malloc(nzcnt*DSIZE);
 
-      for (i = 0, j = 0; i<p->warm_start->cut_num, j<desc->cutind.size; i++){
+      for (i = 0, j = 0; i<env->warm_start->cut_num, j<desc->cutind.size; i++){
 	 if (i == desc->cutind.list[j]){
-	    cut = p->warm_start->cuts[i];
+	    cut = env->warm_start->cuts[i];
 	    nzcnt = matbeg[j+1] - matbeg[j];
 	    memcpy(matind + matbeg[j], (int *) (cut->coef + ISIZE), 
 		   ISIZE * nzcnt);
@@ -429,8 +430,8 @@ int resolve_node(problem *p, bc_node *node)
       get_x(lp_data);
       for(i = lp_data->n; i>=0; i--){
 	 colsol = lp_data->x[i];
-	 if(colsol-floor(colsol) > p->par.lp_par.granularity &&
-	    ceil(colsol)-colsol > p->par.lp_par.granularity){
+	 if(colsol-floor(colsol) > env->par.lp_par.granularity &&
+	    ceil(colsol)-colsol > env->par.lp_par.granularity){
 	    break;
 	 }
       }
@@ -438,8 +439,6 @@ int resolve_node(problem *p, bc_node *node)
 	 node->feasibility_status = FEASIBLE_PRUNED;
       }
    }
-
-      //FIX_ME!update_node_status'de node_candidate'lari belirle!
      
    node->lower_bound = lp_data->objval;
    free_mip_desc(lp_data->mip);
@@ -454,12 +453,12 @@ int resolve_node(problem *p, bc_node *node)
 /*===========================================================================*/
 /*===========================================================================*/
 
-void update_tree_bound(problem *p, bc_node *root, int change_type)
+void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 {
    int i, cnt = 0, *indices, set_sol = FALSE;
    MIPdesc * mip;
    double upper_bound = 0.0, lpetol = 1e-09, *values;
-   lp_sol * best_sol = &(p->warm_start->best_sol);
+   lp_sol * best_sol = &(env->warm_start->best_sol);
 
    if (root){
       if (root->node_status == NODE_STATUS__PRUNED){
@@ -467,18 +466,19 @@ void update_tree_bound(problem *p, bc_node *root, int change_type)
 	    if(root->feasibility_status == OVER_UB_PRUNED ||
 	       root->feasibility_status == FEASIBLE_PRUNED) {
 	       if (root->feasibility_status == FEASIBLE_PRUNED){
-		  mip = p->mip;
+		  mip = env->mip;
 		  for(i = 0; i<mip->n; i++){
 		     upper_bound += mip->obj[i] * root->sol[i];
 		  }	    	       
-		  if((p->warm_start->has_ub && upper_bound<p->warm_start->ub)||
-		     !p->warm_start->has_ub){
+		  if((env->warm_start->has_ub && 
+		      upper_bound<env->warm_start->ub)||
+		     !env->warm_start->has_ub){
 		     
-		     if(!p->warm_start->has_ub){
-			p->warm_start->has_ub = TRUE;
+		     if(!env->warm_start->has_ub){
+			env->warm_start->has_ub = TRUE;
 		     }
 		     
-		     p->warm_start->ub = upper_bound;
+		     env->warm_start->ub = upper_bound;
 		     
 		     indices = (int*) malloc(ISIZE*mip->n);
 		     values = (double*) malloc(DSIZE*mip->n);
@@ -500,8 +500,8 @@ void update_tree_bound(problem *p, bc_node *root, int change_type)
 		     FREE(best_sol->xval);
 		     best_sol->xind = (int *) malloc(cnt*ISIZE);
 		     best_sol->xval = (double *) malloc(cnt*DSIZE);
-		     memcpy((char *)best_sol->xind,(char *)indices, cnt*ISIZE);
-		     memcpy((char *)best_sol->xval, (char *)values, cnt*DSIZE);
+		     best_sol->xind = indices;
+		     best_sol->xval = values;
 		  }
 	       }
 	    }
@@ -513,7 +513,7 @@ void update_tree_bound(problem *p, bc_node *root, int change_type)
       }	       
       else{
 	 for(i = 0; i<root->bobj.child_num; i++){
-	    update_tree_bound(p, root->children[i], change_type);
+	    update_tree_bound(env, root->children[i], change_type);
 	 }
       }
    }
@@ -551,8 +551,9 @@ int copy_node(bc_node * n_to, bc_node *n_from)
 
 #if defined (COMPILING_FOR_LP) || defined(COMPILE_IN_LP)
 
-   //FIX_ME, Do we need this while writing to file
+   //FIXME, Do we need this while writing to file
 
+#if 0
    if (n_from->bobj.row){   
       n_to->bobj.row = (waiting_row*) malloc(sizeof(waiting_row));
       memcpy(n_to->bobj.row, n_from->bobj.row, sizeof(waiting_row));
@@ -574,6 +575,8 @@ int copy_node(bc_node * n_to, bc_node *n_from)
       memcpy(n_to->bobj.row->cut->coef, n_from->bobj.row->cut->coef, 
 	     CSIZE*n_to->bobj.row->cut->size);   
    }
+#endif
+
 #endif
 
 #ifndef MAX_CHILDREN_NUM
@@ -1087,7 +1090,7 @@ int read_tree(bc_node * root, FILE *f)
 	 root->children[i]->parent = root;
 	 read_tree(root->children[i], f); 
       }
-   }         
+   }
 
    return TRUE;
 }
@@ -1095,25 +1098,23 @@ int read_tree(bc_node * root, FILE *f)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int set_param(problem *p, char *line)
+int set_param(sym_environment *env, char *line)
 {
    int i;
-   char tmp, c;
    char key[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH +1];
-   //   FILE *f = NULL, *f1 = NULL;
    double timeout;
    str_int colgen_str[COLGEN_STR_SIZE] = COLGEN_STR_ARRAY;
    str_int compare_can_str[COMPARE_CAN_STR_SIZE] = COMPARE_CAN_STR_ARRAY;
-   tm_params *tm_par = &p->par.tm_par;
-   lp_params *lp_par = &p->par.lp_par;
-   cg_params *cg_par = &p->par.cg_par;
-   cp_params *cp_par = &p->par.cp_par;
+   tm_params *tm_par = &env->par.tm_par;
+   lp_params *lp_par = &env->par.lp_par;
+   cg_params *cg_par = &env->par.cg_par;
+   cp_params *cp_par = &env->par.cp_par;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
-   sp_params *sp_par = &p->par.sp_par;
+   sp_params *sp_par = &env->par.sp_par;
 #endif
    /*___END_EXPERIMENTAL_SECTION___*/
-   dg_params *dg_par = &p->par.dg_par;
+   dg_params *dg_par = &env->par.dg_par;
    
    strcpy(key,"");
    sscanf(line,"%s%s", key, value);
@@ -1122,18 +1123,18 @@ int set_param(problem *p, char *line)
     ***                    Global parameters                            ***
     ***********************************************************************/
    if (strcmp(key, "verbosity") == 0){
-      READ_INT_PAR(p->par.verbosity);
+      READ_INT_PAR(env->par.verbosity);
       tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
 	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
 	 sp_par->verbosity =
 #endif 
 	 /*___END_EXPERIMENTAL_SECTION___*/
-	 cp_par->verbosity = p->par.verbosity;
+	 cp_par->verbosity = env->par.verbosity;
    }
    else if (strcmp(key, "random_seed") == 0){
-      READ_INT_PAR(p->par.random_seed);
-      tm_par->random_seed = p->par.random_seed;
+      READ_INT_PAR(env->par.random_seed);
+      tm_par->random_seed = env->par.random_seed;
    }
    else if (strcmp(key, "granularity") == 0){
       READ_DBL_PAR(tm_par->granularity);
@@ -1153,90 +1154,90 @@ int set_param(problem *p, char *line)
        ***********************************************************************/
    else if (strcmp(key, "upper_bound") == 0 ||
 	    strcmp(key, "M_upper_bound") == 0){
-      READ_DBL_PAR(p->ub);
-      p->has_ub = TRUE;
+      READ_DBL_PAR(env->ub);
+      env->has_ub = TRUE;
    }
    else if (strcmp(key, "upper_bound_estimate") == 0 ||
 	    strcmp(key, "M_upper_bound_estimate") == 0){
-      READ_DBL_PAR(p->ub_estimate);
-      p->has_ub_estimate = TRUE;
+      READ_DBL_PAR(env->ub_estimate);
+      env->has_ub_estimate = TRUE;
    }
    else if (strcmp(key, "lower_bound") == 0 ||
 	    strcmp(key, "M_lower_bound") == 0){
-      READ_DBL_PAR(p->lb);
+      READ_DBL_PAR(env->lb);
    }
    
    else if (strcmp(key, "M_verbosity") == 0){
-      READ_INT_PAR(p->par.verbosity);
+      READ_INT_PAR(env->par.verbosity);
    }
    else if (strcmp(key, "M_random_seed") == 0){
-      READ_INT_PAR(p->par.random_seed);
+      READ_INT_PAR(env->par.random_seed);
    }
    
    else if (strcmp(key, "tm_executable_name") == 0 ||
 	    strcmp(key, "tm_exe") == 0 ||
 	    strcmp(key, "M_tm_exe") == 0 ||
 	    strcmp(key, "M_tm_executable_name") == 0){
-      read_string(p->par.tm_exe, line, MAX_FILE_NAME_LENGTH);
+      read_string(env->par.tm_exe, line, MAX_FILE_NAME_LENGTH);
    }
    else if (strcmp(key, "dg_executable_name") == 0 ||
 	    strcmp(key, "dg_exe") == 0 ||
 	    strcmp(key, "M_dg_exe") == 0 ||
 	    strcmp(key, "M_dg_executable_name") == 0){
-      read_string(p->par.dg_exe, line, MAX_FILE_NAME_LENGTH);
+      read_string(env->par.dg_exe, line, MAX_FILE_NAME_LENGTH);
    }
    else if (strcmp(key, "tm_debug") == 0 ||
 	    strcmp(key, "M_tm_debug") == 0){
-      READ_INT_PAR(p->par.tm_debug);
-      if (p->par.tm_debug) p->par.tm_debug = 4;
+      READ_INT_PAR(env->par.tm_debug);
+      if (env->par.tm_debug) env->par.tm_debug = 4;
    }
    else if (strcmp(key, "dg_debug") == 0 ||
 	    strcmp(key, "M_dg_debug") == 0){
-      READ_INT_PAR(p->par.dg_debug);
-      if (p->par.dg_debug) p->par.dg_debug = 4;
+      READ_INT_PAR(env->par.dg_debug);
+      if (env->par.dg_debug) env->par.dg_debug = 4;
    }
    else if (strcmp(key, "tm_machine") == 0 ||
 	    strcmp(key, "M_tm_machine") == 0){
-	 read_string(p->par.tm_machine, line, MACH_NAME_LENGTH);
-	 p->par.tm_machine_set = TRUE;
+	 read_string(env->par.tm_machine, line, MACH_NAME_LENGTH);
+	 env->par.tm_machine_set = TRUE;
    }
    else if (strcmp(key, "dg_machine") == 0 ||
 	    strcmp(key, "M_dg_machine") == 0){
-      read_string(p->par.dg_machine, line, MACH_NAME_LENGTH);
-      p->par.dg_machine_set = TRUE;
+      read_string(env->par.dg_machine, line, MACH_NAME_LENGTH);
+      env->par.dg_machine_set = TRUE;
    }
    
    else if (strcmp(key, "pvm_trace") == 0 ||
 	    strcmp(key, "M_pvm_trace") == 0){
-      READ_INT_PAR(p->par.pvm_trace);
+      READ_INT_PAR(env->par.pvm_trace);
    }
    else if (strcmp(key, "do_branch_and_cut") == 0 ||
 	    strcmp(key, "M_do_branch_and_cut") == 0){
-      READ_INT_PAR(p->par.do_branch_and_cut);
+      READ_INT_PAR(env->par.do_branch_and_cut);
    }
    else if (strcmp(key, "do_draw_graph") == 0 ||
 	    strcmp(key, "M_do_draw_graph") == 0){
-      READ_INT_PAR(p->par.do_draw_graph);
+      READ_INT_PAR(env->par.do_draw_graph);
    }
    else if (strcmp(key, "use_permanent_cut_pools") == 0 ||
 	    strcmp(key, "M_use_permanent_cut_pools") == 0){
-      READ_INT_PAR(p->par.use_permanent_cut_pools);
+      READ_INT_PAR(env->par.use_permanent_cut_pools);
    }
    else if (strcmp(key, "mc_compare_solution_tolerance") == 0 ||
 	    strcmp(key, "M_mc_compare_solution_tolerance") == 0){
-      READ_DBL_PAR(p->par.mc_compare_solution_tolerance);
+      READ_DBL_PAR(env->par.mc_compare_solution_tolerance);
    }
    else if (strcmp(key, "mc_binary_search_tolerance") == 0 ||
 	    strcmp(key, "M_mc_binary_search_tolerance") == 0){
-      READ_DBL_PAR(p->par.mc_binary_search_tolerance);
+      READ_DBL_PAR(env->par.mc_binary_search_tolerance);
    }
    else if (strcmp(key, "mc_search_order") == 0 ||
 	    strcmp(key, "M_mc_search_order") == 0){
-      READ_DBL_PAR(p->par.mc_search_order);
+      READ_DBL_PAR(env->par.mc_search_order);
    }
    else if (strcmp(key, "mc_warm_start") == 0 ||
 	    strcmp(key, "M_mc_warm_start") == 0){
-      READ_DBL_PAR(p->par.mc_warm_start);
+      READ_DBL_PAR(env->par.mc_warm_start);
    }
    
    /***********************************************************************
@@ -1391,86 +1392,14 @@ int set_param(problem *p, char *line)
    else if (strcmp(key, "lp_mach_num") == 0 ||
 	    strcmp(key, "TM_lp_mach_num") == 0){
       READ_INT_PAR(tm_par->lp_mach_num);
-#if 0
-      if (tm_par->lp_mach_num){
-	 char *lp_machs = (char *) malloc
-	    (tm_par->lp_mach_num * (MACH_NAME_LENGTH + 1));
-	 tm_par->lp_machs =
-	    (char **) malloc(tm_par->lp_mach_num * sizeof(char *));
-	 for (i=0; i<tm_par->lp_mach_num; i++)
-	    tm_par->lp_machs[i] = lp_machs + i * (MACH_NAME_LENGTH+1);
-	 for (i=0; i<tm_par->lp_mach_num; i++){
-	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-	       fprintf(stderr, "\nio: error reading lp_machine list\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(key, "");
-	    sscanf(line, "%s%s", key, value);
-	    if (strcmp(key, "TM_lp_machine") != 0){
-	       fprintf(stderr, "\nio: error reading lp_machine list\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    read_string(tm_par->lp_machs[i], line, MACH_NAME_LENGTH);
-	    printf("%s", line);
-	 }
-      }
-#endif
    }
    else if (strcmp(key, "cg_mach_num") == 0 ||
 	    strcmp(key, "TM_cg_mach_num") == 0){
       READ_INT_PAR(tm_par->cg_mach_num);
-#if 0
-      if (tm_par->cg_mach_num){
-	 char *cg_machs = (char *) malloc
-	    (tm_par->cg_mach_num * (MACH_NAME_LENGTH + 1));
-	 tm_par->cg_machs =
-	    (char **) malloc(tm_par->cg_mach_num * sizeof(char *));
-	 for (i=0; i<tm_par->cg_mach_num; i++)
-	    tm_par->cg_machs[i] = cg_machs + i * (MACH_NAME_LENGTH+1);
-	 for (i=0; i<tm_par->cg_mach_num; i++){
-	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-	       fprintf(stderr, "\nio: error reading cg_machine list\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(key, "");
-	    sscanf(line, "%s%s", key, value);
-	    if (strcmp(key, "TM_cg_machine") != 0){
-	       fprintf(stderr, "\nio: error reading cg_machine list\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    read_string(tm_par->cg_machs[i], line, MACH_NAME_LENGTH);
-	    printf("%s", line);
-	 }
-      }
-#endif
    }
    else if (strcmp(key, "cp_mach_num") == 0 ||
 	    strcmp(key, "TM_cp_mach_num") == 0){
       READ_INT_PAR(tm_par->cp_mach_num);
-#if 0
-      if (tm_par->cp_mach_num){
-	    char *cp_machs = (char *) malloc
-	       (tm_par->cp_mach_num * (MACH_NAME_LENGTH + 1));
-	    tm_par->cp_machs =
-	       (char **) malloc(tm_par->cp_mach_num * sizeof(char *));
-	    for (i=0; i<tm_par->cp_mach_num; i++)
-	       tm_par->cp_machs[i] = cp_machs + i * (MACH_NAME_LENGTH+1);
-	    for (i=0; i<tm_par->cp_mach_num; i++){
-	       if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-		  fprintf(stderr, "\nio: error reading cp_machine list\n\n");
-		  return(ERROR__PARSING_PARAM_FILE);
-	       }
-	       strcpy(key, "");
-	       sscanf(line, "%s%s", key, value);
-	       if (strcmp(key, "TM_cp_machine") != 0){
-		  fprintf(stderr, "\nio: error reading cp_machine list\n\n");
-		  return(ERROR__PARSING_PARAM_FILE);
-	       }
-	       read_string(tm_par->cp_machs[i], line, MACH_NAME_LENGTH);
-	       printf("%s", line);
-	    }
-	 }
-#endif
    }
 #ifndef COMPILE_IN_CG
    else if (strcmp(key, "use_cg") == 0 ||
@@ -1506,103 +1435,14 @@ int set_param(problem *p, char *line)
    else if (strcmp(key, "keep_description_of_pruned") == 0 ||
 	    strcmp(key, "TM_keep_description_of_pruned") == 0){
       READ_INT_PAR(tm_par->keep_description_of_pruned);
-#if 0
-      if (tm_par->keep_description_of_pruned == KEEP_ON_DISK_FULL ||
-	     tm_par->keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
-	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-	       printf("No pruned node file!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(key, "");
-	    sscanf(line, "%s%s", key, value);
-	    if (strcmp(key, "pruned_node_file_name") != 0){
-	       printf("Need pruned_node_file_name next!!!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(tm_par->pruned_node_file_name, value);
-	    if (!(f1 = fopen(tm_par->pruned_node_file_name, "w"))){
-	       printf("\nError opening pruned node file\n\n");
-	    }else{
-	       if (tm_par->keep_description_of_pruned == KEEP_ON_DISK_FULL){
-		  fprintf(f1, "******* Pruned Node Log File *******\n\n");
-	       }else{
-		  fprintf(f1, "#TYPE: COMPLETE TREE\n");
-		  fprintf(f1, "#TIME: NOT\n");
-		  fprintf(f1, "#BOUNDS: NONE\n");
-		  fprintf(f1, "#INFORMATION: EXCEPTION\n");
-		  fprintf(f1, "#NODE_NUMBER: NONE\n");
-	       }
-	       fclose(f1);
-	    }
-	 }
-#endif
    }
    else if (strcmp(key, "warm_start") == 0 ||
 	    strcmp(key, "TM_warm_start") == 0){
       READ_INT_PAR(tm_par->warm_start);
-#if 0
-      if ((p->par.warm_start = tm_par->warm_start)){
-	 if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-	    printf("No warm start tree file!\n\n");
-	    return(ERROR__PARSING_PARAM_FILE);
-	 }
-	 strcpy(key, "");
-	    sscanf(line, "%s%s", key, value);
-	    if (strcmp(key, "warm_start_tree_file_name") != 0){
-	       printf("Need warm_start_tree_file_name next!!!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(tm_par->warm_start_tree_file_name, value);
-	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-	       printf("No warm start cut file!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(key, "");
-	    sscanf(line, "%s%s", key, value);
-	    if (strcmp(key, "warm_start_cut_file_name") != 0){
-	       printf("Need warm_start_cut_file_name next!!!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(tm_par->warm_start_cut_file_name, value);
-	 }
-#endif
    }
    else if (strcmp(key, "vbc_emulation") == 0 ||
 	    strcmp(key, "TM_vbc_emulation") == 0){
       READ_INT_PAR(tm_par->vbc_emulation);
-#if 0
-      if (tm_par->vbc_emulation == VBC_EMULATION_FILE){
-	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-	       printf("No vbc emulation file!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(key, "");
-	    sscanf(line, "%s%s", key, value);
-	    if (strcmp(key, "vbc_emulation_file_name") != 0){
-	       printf("Need vbc_emulation_file_name next!!!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(tm_par->vbc_emulation_file_name, value);
-	    if (!(f1 = fopen(tm_par->vbc_emulation_file_name, "w"))){
-	       printf("\nError opening vbc emulation file\n\n");
-	    }else{
-	       fprintf(f1, "#TYPE: COMPLETE TREE\n");
-	       fprintf(f1, "#TIME: SET\n");
-	       fprintf(f1, "#BOUNDS: NONE\n");
-	       fprintf(f1, "#INFORMATION: STANDARD\n");
-	       fprintf(f1, "#NODE_NUMBER: NONE\n");
-	       fprintf(f1, "00:00:00.00 N 0 1 %i\n", VBC_CAND_NODE);
-	       fclose(f1);
-	    }
-	 }else if (tm_par->vbc_emulation == VBC_EMULATION_LIVE){
-	    printf("$#TYPE: COMPLETE TREE\n");
-	    printf("$#TIME: SET\n");
-	    printf("$#BOUNDS: NONE\n");
-	    printf("$#INFORMATION: STANDARD\n");
-	    printf("$#NODE_NUMBER: NONE\n");
-	    printf("$N 0 1 %i\n", VBC_CAND_NODE);
-	 }
-#endif
    }
    else if (strcmp(key, "logging_interval") == 0 ||
 	    strcmp(key, "TM_logging_interval") == 0){
@@ -1611,34 +1451,6 @@ int set_param(problem *p, char *line)
    else if (strcmp(key, "logging") == 0 ||
 	    strcmp(key, "TM_logging") == 0){
       READ_INT_PAR(tm_par->logging);
-#if 0
-	 if (tm_par->logging){
-	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-	       printf("No tree log file!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(key, "");
-	    sscanf(line, "%s%s", key, value);
-	    if (strcmp(key, "tree_log_file_name") != 0){
-	       printf("tree_log_file_name next!!!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(tm_par->tree_log_file_name, value);
-	    if (tm_par->logging != VBC_TOOL){
-	       if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-		  printf("No cut log file!\n\n");
-		  return(ERROR__PARSING_PARAM_FILE);
-	       }
-	       strcpy(key, "");
-	       sscanf(line, "%s%s", key, value);
-	       if (strcmp(key, "cut_log_file_name") != 0){
-		  printf("Need cut_log_file_name next!!!\n\n");
-		  return(ERROR__PARSING_PARAM_FILE);
-	       }
-	       strcpy(tm_par->cut_log_file_name, value);
-	    }
-	 }
-#endif 
    }
    else if (strcmp(key, "price_in_root") == 0 ||
 	    strcmp(key, "TM_price_in_root") == 0){
@@ -1681,6 +1493,10 @@ int set_param(problem *p, char *line)
    else if (strcmp(key, "find_first_feasible") == 0 ||
 	    strcmp(key, "TM_find_first_feasible") == 0){
       READ_INT_PAR(tm_par->find_first_feasible);
+   }
+   else if (strcmp(key, "sensitivity_analysis") == 0 ||
+	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
+      READ_INT_PAR(tm_par->sensitivity_analysis);
    }
    
    /***********************************************************************
@@ -1993,7 +1809,7 @@ int set_param(problem *p, char *line)
    else if (strcmp(key, "multi_criteria") == 0 ||
 	    strcmp(key, "LP_multi_criteria") == 0 ){
       READ_INT_PAR(lp_par->multi_criteria);
-      p->par.multi_criteria = lp_par->multi_criteria;
+      env->par.multi_criteria = lp_par->multi_criteria;
    }
    else if (strcmp(key, "mc_find_nondominated_solutions") == 0 ||
 	    strcmp(key, "LP_mc_find_non_dominated_solutions") == 0 ){
@@ -2011,7 +1827,7 @@ int set_param(problem *p, char *line)
 	    strcmp(key, "LP_mc_rho") == 0 ){
       READ_DBL_PAR(lp_par->mc_rho);
    }
-   
+
    /***********************************************************************
     ***                     cut_gen parameters                          ***
     ***********************************************************************/
@@ -2066,40 +1882,10 @@ int set_param(problem *p, char *line)
    else if (strcmp(key, "cp_warm_start") == 0 ||
 	    strcmp(key, "CP_warm_start") == 0){
       READ_INT_PAR(cp_par->warm_start);
-#if 0
-      if (cp_par->warm_start){
-	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-	       printf("No cut pool warm start file!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(key, "");
-	    sscanf(line, "%s%s", key, value);
-	    if (strcmp(key, "cp_warm_start_file_name") != 0){
-	       printf("Need cp_warm_start_file_name next!!!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(cp_par->warm_start_file_name, value);
-	 }
-#endif
    }
    else if (strcmp(key, "cp_logging") == 0 ||
 	    strcmp(key, "CP_logging") == 0){
       READ_INT_PAR(cp_par->logging);
-#if 0
-      if ((tm_par->cp_logging = cp_par->logging)){
-	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
-	       printf("No cut pool log file!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(key, "");
-	    sscanf(line, "%s%s", key, value);
-	    if (strcmp(key, "cp_log_file_name") != 0){
-	       printf("Need cp_log_file_name next!!!\n\n");
-	       return(ERROR__PARSING_PARAM_FILE);
-	    }
-	    strcpy(cp_par->log_file_name, value);
-	 }
-#endif
    }
    else if (strcmp(key, "block_size") == 0 ||
 	    strcmp(key, "CP_block_size") == 0){
@@ -2177,39 +1963,6 @@ int set_param(problem *p, char *line)
 #endif
    /*___END_EXPERIMENTAL_SECTION___*/
 
-   /*Sanity checks*/
-#if 0
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-if (cg_par->decomp_max_col_num_per_iter >
-       cg_par->decomp_col_block_size){
-      printf("io: decomp_max_col_num_per_iter is greater than\n");
-      printf("    decomp_col_block_size -- adjusting\n");
-      cg_par->decomp_max_col_num_per_iter = cg_par->decomp_col_block_size;
-   }
-	 
-/*___END_EXPERIMENTAL_SECTION___*/
-if (cp_par->block_size >cp_par->max_number_of_cuts){
-      printf("io: Cut pool block size is too big -- adjusting\n");
-      cp_par->block_size = cp_par->max_number_of_cuts;
-   }
-
-   if (cp_par->min_to_delete > cp_par->max_number_of_cuts -
-                               cp_par->cuts_to_check){
-      printf("io: Cut pool min to delete is too big -- adjusting\n");
-      cp_par->min_to_delete = cp_par->max_number_of_cuts -
-	                      cp_par->cuts_to_check;
-   }
-
-   /*if (tm_par->price_in_root &&
-       tm_par->colgen_strat[0] != (FATHOM__DO_NOT_GENERATE_COLS__SEND |
-				   BEFORE_BRANCH__DO_NOT_GENERATE_COLS)){
-      printf("io: pricing in root is asked for but colums are to be\n");
-      printf("    generated in the 1st phase -- adjusting colgen_strat[0]\n");
-      tm_par->colgen_strat[0] = (FATHOM__DO_NOT_GENERATE_COLS__SEND |
-				 BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
-   }*/
-#endif
-
    return(FUNCTION_TERMINATED_NORMALLY);
 }
 
@@ -2244,6 +1997,17 @@ warm_start_desc *create_copy_warm_start(warm_start_desc *ws)
    ws_copy->rootnode = (bc_node*)calloc(1,sizeof(bc_node));	 
    copy_tree(ws_copy->rootnode, ws->rootnode);
 
+
+   if(ws->best_sol.xlength){
+      ws_copy->best_sol.xind = (int*) malloc (ISIZE * ws->best_sol.xlength);
+      ws_copy->best_sol.xval = (double*) malloc (DSIZE * ws->best_sol.xlength);
+
+      memcpy(ws_copy->best_sol.xind, ws->best_sol.xind, 
+	     ISIZE * ws->best_sol.xlength);   
+      memcpy(ws_copy->best_sol.xval, ws->best_sol.xval, 
+	     DSIZE * ws->best_sol.xlength);   
+   }
+
    return ws_copy;
 }
 
@@ -2274,7 +2038,7 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	 mip_copy->colname = (char**)malloc(sizeof(char*)*mip_copy->n);
 	 
 	 for(i=0; i<mip_copy->n; i++){
-	    /* FIX_ME! Resctricting col_name to 20 chars! */
+	    /* FIXME! Resctricting col_name to 20 chars! */
 	    mip_copy->colname[i] = (char*)malloc(CSIZE*20);
 	    strncpy(mip_copy->colname[i], mip->colname[i], 20); 
 	    mip_copy->colname[i][19] = 0;
@@ -2287,6 +2051,7 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
       memcpy(mip_copy-> rngval, mip->rngval, DSIZE * mip_copy->m); 	  
       memcpy(mip_copy->ub, mip->ub, DSIZE * mip_copy->n); 
       memcpy(mip_copy->lb, mip->lb, DSIZE * mip_copy->n);    
+      memcpy(mip_copy->is_int, mip->is_int, CSIZE * mip_copy->n);    
       memcpy(mip_copy->matbeg, mip->matbeg, ISIZE * (mip_copy->n + 1));
       memcpy(mip_copy->matval, mip->matval, DSIZE * mip_copy->nz);  
       memcpy(mip_copy->matind, mip->matind, ISIZE * mip_copy->nz);  
@@ -2303,68 +2068,72 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 /*===========================================================================*/
 /*===========================================================================*/
 
-problem * create_copy_problem (problem *p)
+sym_environment * create_copy_environment (sym_environment *env)
 {
    int i, j, num;
-   problem * p_copy;
+   sym_environment * env_copy;
    params * par;
    lp_sol * sol;
-   MIPdesc * mip; 
-   base_desc *base;
-   node_desc *desc;
+   MIPdesc * mip = NULL; 
+   base_desc *base = NULL;
+   node_desc *desc = NULL; 
    cp_cut_data * cp_cut;
    cut_data * cut;
 
-   if (!p){
-      printf("create_copy_problem(): The given problem is empty!\n");
+   if (!env){
+      printf("create_copy_sym_environment(): The given problem is empty!\n");
       printf("Unable to copy.\n");
       return (0);
    }
-   p_copy = (problem*) calloc(1, sizeof(problem));
-   memcpy(p_copy, p, sizeof(problem));
+   env_copy = (sym_environment*) calloc(1, sizeof(sym_environment));
+   memcpy(env_copy, env, sizeof(sym_environment));
    
-   par = &(p_copy->par);
+   par = &(env_copy->par);
 
-   /* FIX_ME! Ask to Prof. Ralphs */
-   initialize_u(p_copy);
+   /* FIXME! Ask to Prof. Ralphs */
+   initialize_u(env_copy);
 
    /*========================================================================*/
    /*   copy params */
 
-   par->tm_par.lp_machs = 
-      (char**)malloc(sizeof(char*)*par->tm_par.lp_mach_num);
-   par->tm_par.cg_machs = 
-      (char**)malloc(sizeof(char*)*par->tm_par.cg_mach_num);
-   par->tm_par.cp_machs =
-      (char**)malloc(sizeof(char*)*par->tm_par.cp_mach_num);
-   par->tm_par.sp_machs =
-      (char**)malloc(sizeof(char*)*par->tm_par.sp_mach_num);
+   if(par->tm_par.lp_mach_num)
+      par->tm_par.lp_machs = 
+	 (char**)malloc(sizeof(char*)*par->tm_par.lp_mach_num);
+   if(par->tm_par.cg_mach_num)
+      par->tm_par.cg_machs = 
+	 (char**)malloc(sizeof(char*)*par->tm_par.cg_mach_num);
+   if(par->tm_par.cp_mach_num)
+      par->tm_par.cp_machs =
+	 (char**)malloc(sizeof(char*)*par->tm_par.cp_mach_num);
+   if(par->tm_par.sp_mach_num)
+      par->tm_par.sp_machs =
+	 (char**)malloc(sizeof(char*)*par->tm_par.sp_mach_num);
    
    for(i = 0; i<par->tm_par.lp_mach_num; i++){
       par->tm_par.lp_machs[i] = 
 	 (char*)malloc(CSIZE*(MACH_NAME_LENGTH+1));
-      memcpy(par->tm_par.lp_machs[i], p->par.tm_par.lp_machs[i],
+      memcpy(par->tm_par.lp_machs[i], env->par.tm_par.lp_machs[i],
 	     CSIZE*(MACH_NAME_LENGTH+1));
    }
 
    for(i = 0; i<par->tm_par.cg_mach_num; i++){
       par->tm_par.cg_machs[i] = 
 	 (char*)malloc(CSIZE*(MACH_NAME_LENGTH+1));
-      memcpy(par->tm_par.cg_machs[i], p->par.tm_par.cg_machs[i],
+      memcpy(par->tm_par.cg_machs[i], env->par.tm_par.cg_machs[i],
 	     CSIZE*(MACH_NAME_LENGTH+1));
    }
 
    for(i = 0; i<par->tm_par.cp_mach_num; i++){
       par->tm_par.cp_machs[i] = 
 	 (char*)malloc(CSIZE*(MACH_NAME_LENGTH+1));
-      memcpy(par->tm_par.cp_machs[i], p->par.tm_par.cp_machs[i],
+      memcpy(par->tm_par.cp_machs[i], env->par.tm_par.cp_machs[i],
 	     CSIZE*(MACH_NAME_LENGTH+1));
    }
    
    for(i = 0; i<par->tm_par.sp_mach_num; i++){
       par->tm_par.sp_machs[i] = 
 	 (char*)malloc(CSIZE*(MACH_NAME_LENGTH+1));
-      memcpy(par->tm_par.sp_machs[i], p->par.tm_par.sp_machs[i],
+      memcpy(par->tm_par.sp_machs[i], env->par.tm_par.sp_machs[i],
 	     CSIZE*(MACH_NAME_LENGTH+1));
    }
 
@@ -2372,59 +2141,65 @@ problem * create_copy_problem (problem *p)
 	
    /* copy lp_sol */
 
-   sol = &(p_copy->best_sol);
-   
-   sol->xind = (int *)malloc(ISIZE * sol->max_sol_length);
-   sol->xval = (double *)malloc(DSIZE * sol->max_sol_length);
-   memcpy(sol->xind, p->best_sol.xind, ISIZE*sol->max_sol_length);
-   memcpy(sol->xval, p->best_sol.xval, DSIZE*sol->max_sol_length);
+   sol = &(env_copy->best_sol);
+   if(sol->xlength){   
+      sol->xind = (int *)malloc(ISIZE * sol->max_sol_length);
+      sol->xval = (double *)malloc(DSIZE * sol->max_sol_length);
+      memcpy(sol->xind, env->best_sol.xind, ISIZE*sol->max_sol_length);
+      memcpy(sol->xval, env->best_sol.xval, DSIZE*sol->max_sol_length);
+   }
 
    /*========================================================================*/
 
    /* copy mip */
-
-   mip = create_copy_mip_desc(p->mip);
+   if(env->mip){
+      mip = create_copy_mip_desc(env->mip);
+   }
 
    /*========================================================================*/
 
    /* copy base_desc */
 
-   base = (base_desc*) calloc(1, sizeof(base_desc));
-   memcpy(base, p->base, sizeof(base_desc));
+   if(env->base){
+      base = (base_desc*) calloc(1, sizeof(base_desc));
+      memcpy(base, env->base, sizeof(base_desc));
 
-   base->userind = (int *) malloc(ISIZE*base->varnum);
-   memcpy(base->userind, p->base->userind, ISIZE*base->varnum);
+      base->userind = (int *) malloc(ISIZE*base->varnum);
+      memcpy(base->userind, env->base->userind, ISIZE*base->varnum);
+   }
 
    /*========================================================================*/
 
    /* copy root_desc */
 
-   desc = (node_desc *) calloc(1, sizeof(node_desc));
-   memcpy(desc, p->rootdesc, sizeof(node_desc));
+   if(env->rootdesc){
+      desc = (node_desc *) calloc(1, sizeof(node_desc));
+      memcpy(desc, env->rootdesc, sizeof(node_desc));
 
-   if (desc->uind.size){
-      desc->uind.list = (int *) malloc(desc->uind.size*ISIZE);
-      memcpy( desc->uind.list,  p->rootdesc->uind.list, 
-	      desc->uind.size*ISIZE);
-   }
-
-   if (desc->not_fixed.size){
-      desc->not_fixed.list = 
-	 (int *) malloc(desc->not_fixed.size*ISIZE);	 
-      memcpy( desc->not_fixed.list,  p->rootdesc->not_fixed.list, 
-	      desc->not_fixed.size*ISIZE);
-   }
-
-   if (desc->cutind.size){
-      desc->cutind.list = (int *) malloc(desc->cutind.size*ISIZE);
-      memcpy( desc->cutind.list,  p->rootdesc->cutind.list, 
-	      desc->cutind.size*ISIZE);   
-   }
-   
-   if (desc->desc_size){
-      desc->desc = (char*) malloc(desc->desc_size*CSIZE);
-      memcpy(desc->desc, p->rootdesc->desc, 
-	     desc->desc_size*CSIZE);   
+      if (desc->uind.size){
+	 desc->uind.list = (int *) malloc(desc->uind.size*ISIZE);
+	 memcpy( desc->uind.list,  env->rootdesc->uind.list, 
+		 desc->uind.size*ISIZE);
+      }
+      
+      if (desc->not_fixed.size){
+	 desc->not_fixed.list = 
+	    (int *) malloc(desc->not_fixed.size*ISIZE);	 
+	 memcpy( desc->not_fixed.list,  env->rootdesc->not_fixed.list, 
+		 desc->not_fixed.size*ISIZE);
+      }
+      
+      if (desc->cutind.size){
+	 desc->cutind.list = (int *) malloc(desc->cutind.size*ISIZE);
+	 memcpy( desc->cutind.list,  env->rootdesc->cutind.list, 
+		 desc->cutind.size*ISIZE);   
+      }
+      
+      if (desc->desc_size){
+	 desc->desc = (char*) malloc(desc->desc_size*CSIZE);
+	 memcpy(desc->desc, env->rootdesc->desc, 
+		desc->desc_size*CSIZE);   
+      }
    }
 
    /*========================================================================*/
@@ -2434,61 +2209,66 @@ problem * create_copy_problem (problem *p)
    /*========================================================================*/
    /* copy the warm start */
 
-   p_copy->warm_start = create_copy_warm_start(p->warm_start);
-
+   if(env->warm_start){
+      env_copy->warm_start = create_copy_warm_start(env->warm_start);
+   }
    /*========================================================================*/
 
    /*copy the cut pool */
 
-   if (p_copy->par.tm_par.max_cp_num){
-      p_copy->cp =
-	 (cut_pool **) malloc(p_copy->par.tm_par.max_cp_num*
+   if (env_copy->par.tm_par.max_cp_num > 1){
+      env_copy->cp =
+	 (cut_pool **) malloc(env_copy->par.tm_par.max_cp_num*
 			      sizeof(cut_pool *));
-      for (i = 0; i < p_copy->par.tm_par.max_cp_num; i++){
-	 p_copy->cp[i] = (cut_pool *) calloc(1, sizeof(cut_pool));
-	 p_copy->cp[i]->par = p_copy->par.cp_par;
-	 user_send_cp_data(p_copy->user, &p_copy->cp[i]->user);
+      for (i = 0; i < env_copy->par.tm_par.max_cp_num; i++){
+	 env_copy->cp[i] = (cut_pool *) calloc(1, sizeof(cut_pool));
+	 env_copy->cp[i]->par = env_copy->par.cp_par;
+#ifdef USE_SYM_APPLICATION
+	 user_send_cp_data(env_copy->user, &env_copy->cp[i]->user);
+#else
+	 env_copy->cp[i]->user = env_copy->user;
+#endif
       }
-      num = p_copy->par.tm_par.max_cp_num;
+      num = env_copy->par.tm_par.max_cp_num;
    }else{
       num = 0;
    }
    
    if (num){
       for (i = 0; i < num; i++){
-	 memcpy(p_copy->cp[i], p->cp[i], sizeof(cut_pool));
-	 p_copy->cp[i]->cuts = 
-	    (cp_cut_data**)malloc(p_copy->cp[i]->allocated_cut_num*
+	 memcpy(env_copy->cp[i], env->cp[i], sizeof(cut_pool));
+	 env_copy->cp[i]->cuts = 
+	    (cp_cut_data**)malloc(env_copy->cp[i]->allocated_cut_num*
 				  sizeof(cp_cut_data*));
-	    for(j = 0; j<p_copy->cp[i]->cut_num; j++){
-	       p_copy->cp[i]->cuts[j] = 
+	    for(j = 0; j<env_copy->cp[i]->cut_num; j++){
+	       env_copy->cp[i]->cuts[j] = 
 	       (cp_cut_data*)calloc(1, sizeof(cp_cut_data));
-	       cp_cut = p_copy->cp[i]->cuts[j];
-	       memcpy(cp_cut, p->cp[i]->cuts[j], sizeof(cp_cut_data));
+	       cp_cut = env_copy->cp[i]->cuts[j];
+	       memcpy(cp_cut, env->cp[i]->cuts[j], sizeof(cp_cut_data));
 	       cp_cut->cut.coef = (char*)malloc(cp_cut->cut.size*CSIZE);
-	       memcpy(cp_cut->cut.coef, p->cp[i]->cuts[j]->cut.coef, 
+	       memcpy(cp_cut->cut.coef, env->cp[i]->cuts[j]->cut.coef, 
 		      cp_cut->cut.size*CSIZE);
 	    }
       
-	 sol = &(p_copy->cp[i]->cur_sol);
+	 sol = &(env_copy->cp[i]->cur_sol);
    
 	 sol->xind = (int *)malloc(ISIZE * sol->max_sol_length);
 	 sol->xval = (double *)malloc(DSIZE * sol->max_sol_length);
-	 memcpy(sol->xind, p->cp[i]->cur_sol.xind, ISIZE*sol->max_sol_length);
-	 memcpy(sol->xval, p->cp[i]->cur_sol.xval, DSIZE*sol->max_sol_length);
+	 memcpy(sol->xind, env->cp[i]->cur_sol.xind, ISIZE*sol->max_sol_length);
+	 memcpy(sol->xval, env->cp[i]->cur_sol.xval, DSIZE*sol->max_sol_length);
           
 #ifdef COMPILE_IN_CP
-	 num = p_copy->cp[i]->cuts_to_add_num;  
+	 num = env_copy->cp[i]->cuts_to_add_num;  
 	 if (num){
-	    p_copy->cp[i]->cuts_to_add = 
+	    env_copy->cp[i]->cuts_to_add = 
 	       (cut_data**)malloc(num * sizeof(cut_data*));
 	    for(j = 0; j<num; j++){
-	       p_copy->cp[i]->cuts_to_add[j] = 
+	       env_copy->cp[i]->cuts_to_add[j] = 
 		  (cut_data*)calloc(1, sizeof(cut_data)); 
-	       cut = p_copy->cp[i]->cuts_to_add[j];
-	       memcpy(cut,p_copy->cp[i]->cuts_to_add[j], sizeof(cut_data)); 
+	       cut = env_copy->cp[i]->cuts_to_add[j];
+	       memcpy(cut,env_copy->cp[i]->cuts_to_add[j], sizeof(cut_data)); 
 	       cut->coef = (char*)malloc(cut->size*CSIZE);
-	       memcpy(cut->coef, p->cp[i]->cuts_to_add[j]->coef, 
+	       memcpy(cut->coef, env->cp[i]->cuts_to_add[j]->coef, 
 		      cut->size*CSIZE);
 	    }
 	 }
@@ -2496,11 +2276,13 @@ problem * create_copy_problem (problem *p)
       }
    }
 
-   p_copy->mip = mip;
-   p_copy->base = base;
-   p_copy->rootdesc = desc;
-  
-   return p_copy;
+
+   free_mip_desc(env_copy->mip);
+   env_copy->mip = mip;
+   env_copy->base = base;
+   env_copy->rootdesc = desc;
+
+   return env_copy;
 }   
 
 /*===========================================================================*/
@@ -2522,6 +2304,7 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
       for(i=0; i<cnt; i++){ 
 	 root->C_LP += root->duals[ind[i]]*(val[i] - mip->rhs[ind[i]]);
       }
+      //      printf("objval: %f\n", objval);
 
       for(i = 0; i < root->bobj.child_num; i++){
 
@@ -2536,6 +2319,7 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 		  objval += mip->obj[j] * child->sol[j];
 	       }
 	       child->C_LP = objval;
+	       //	       printf("objval: %f\n", objval);
 
 	       for(j=0; j<cnt; j++){
 		  child->C_LP += child->duals[ind[j]] *
@@ -2557,6 +2341,8 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 		  retval == LP_D_ITLIM){
 		  child->B_IP = -INFINITY;
 	       }
+	       //	       printf("feas: %f\n", child->B_IP);
+
 	    }
 	    else {
 	       printf("get_lb_for_new_rhs(): Unknown error!\n");
@@ -2576,6 +2362,8 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
       else
 	 return (min);
    }
+
+   return (min);
 } 
 
 /*===========================================================================*/
@@ -2627,7 +2415,7 @@ int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip,
 
    //change the rhs!
 
-   //FIX_ME! cange_rhs needs lp_data->tmp.c and lp_data->tmp.d???
+   //FIXME! cange_rhs needs lp_data->tmp.c and lp_data->tmp.d???
    
    lp_data->tmp.c = (char*) calloc(mip->m, CSIZE);
    lp_data->tmp.d = (double*) calloc(mip->m, DSIZE);

@@ -260,13 +260,10 @@ int fathom_branch(lp_prob *p)
       /* Get relevant data */
       get_dj_pi(lp_data);
       get_slacks(lp_data);
-
-      /* SensAnalysis */
       get_x(lp_data);
-      /* SensAnalysis */
-
+      
       /* display the current solution */
-      if (p->mip->obj_sense == MAXIMIZE){
+      if (p->mip->obj_sense == SYM_MAXIMIZE){
 	 PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
 				     -lp_data->objval + p->mip->obj_offset,
 				     termcode, iterd));
@@ -603,7 +600,7 @@ int repricing(lp_prob *p)
       get_slacks(lp_data);
 
       /* display the current solution */
-      if (p->mip->obj_sense == MAXIMIZE){
+      if (p->mip->obj_sense == SYM_MAXIMIZE){
 	 PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
 				     -lp_data->objval + p->mip->obj_offset,
 				     termcode, iterd));
