@@ -18,7 +18,7 @@
 #include "proto.h"
 #include "BB_types.h"
 
-#ifdef USE_GLPMP
+#ifdef USE_GLPMPL
 extern "C"
 {
    #include "glpmpl.h"

@@ -298,10 +298,10 @@ void fathom_branch(lp_prob *p)
 	    
 	    continue;
 	 }else{
+	    char name[50] = "";
 	    printf("######## Recovery failed. %s%s",
 		   "LP solver is having numerical difficulties :(.\n",
 		   "######## Dumping current LP to MPS file and exiting.\n\n");
-	    char name[50] = "";
 	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
 	    write_mps(lp_data, name);
 	    exit(-3);

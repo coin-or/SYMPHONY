@@ -137,7 +137,7 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use an OSI interface.
-LP_SOLVER = OSI
+#LP_SOLVER = OSI
 OSI_INTERFACE = OSL
 
 #Set the paths and the name of the library
@@ -157,32 +157,32 @@ ifeq ($(OSI_INTERFACE),OSL)
 endif
 ifeq ($(OSI_INTERFACE),CLP)
        LPINCDIR += 
-       LPLDFLAGS +=
+       LPLIBPATHS +=
        LPLIB += -lOsiClp -lClp
 endif
 ifeq ($(OSI_INTERFACE),XPRESS)
        LPINCDIR += 
-       LPLDFLAGS +=
+       LPLIBPATHS +=
        LPLIB += -lOsiXpr
 endif
 ifeq ($(OSI_INTERFACE),SOPLEX)
        LPINCDIR += ${HOME}/include
-       LPLDFLAGS += ${HOME}/lib
+       LPLIBPATHS += ${HOME}/lib
        LPLIB += -lOsiSpx -lsoplex.linux.x86.gnu.opt
 endif
 ifeq ($(OSI_INTERFACE),VOL)
        LPINCDIR += 
-       LPLDFLAGS +=
+       LPLIBPATHS +=
        LPLIB += -lOsiVol
 endif
 ifeq ($(OSI_INTERFACE),DYLP)
        LPINCDIR += ${HOME}/include
-       LPLDFLAGS += ${HOME}/lib
+       LPLIBPATHS += ${HOME}/lib
        LPLIB += -lOsiDylp -lOsiDylpSolver -ldylpstd
 endif
 ifeq ($(OSI_INTERFACE),GLPK)
        LPINCDIR += ${HOME}/include
-       LPLDFLAGS += ${HOME}/lib
+       LPLIBPATHS += ${HOME}/lib
        LPLIB += -lOsiGlpk -lglpk
 endif
 endif
@@ -195,7 +195,7 @@ USE_GLPMPL = TRUE
 
 ifeq ($(USE_GLPMPL),TRUE)
         LPINCDIR += ${HOME}/src/glpk-4.0/include
-        LPLDFLAGS +=${HOME}/src/glpk-4.0/
+        LPLIBPATHS += ${HOME}/src/glpk-4.0/
         LPLIB += -lglpk 
 endif
 
@@ -213,7 +213,7 @@ USE_CGL_CUTS = TRUE
 ifeq ($(USE_CGL_CUTS),TRUE)
 LPINCDIR += ${HOME}/COIN/include
 LPLIBPATHS += ${HOME}/COIN/lib
-LPLIB += -lCgl 
+LPLIB += -lCgl -lCoin -lOsi
 endif
 
 ##############################################################################
