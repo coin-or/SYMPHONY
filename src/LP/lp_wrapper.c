@@ -575,7 +575,7 @@ int is_feasible_u(lp_prob *p, char branching)
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
    int *indices;
    double *values, valuesi, ub, *heur_solution = NULL, *col_sol = NULL;
-   int cnt, i, heur_feasible = TRUE;
+   int cnt, i, heur_feasible = FALSE;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
