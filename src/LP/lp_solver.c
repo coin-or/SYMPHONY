@@ -647,7 +647,9 @@ void get_row(LPdata *lp_data, int i,
 /*===========================================================================*/
 /* This routine returns the index of a row which proves the lp to be primal
  * infeasible. It is only needed when column generation is used.             */
-/*===========================================================================*/int get_proof_of_infeas(LPdata *lp_data, int *infind)
+/*===========================================================================*/
+
+int get_proof_of_infeas(LPdata *lp_data, int *infind)
 {
   fprintf(stderr, "Function not implemented yet.");
   exit(-1);
@@ -733,7 +735,6 @@ void change_rhs(LPdata *lp_data, int rownum, int *rhsind, double *rhsval)
 {
    fprintf(stderr, "Function not implemented yet.");
    exit(-1);
-   /* lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED; */
 }
 
 /*===========================================================================*/
@@ -743,7 +744,6 @@ void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 {
    fprintf(stderr, "Function not implemented yet.");
    exit(-1);
-   /* lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED; */
 }
 
 /*===========================================================================*/
@@ -2114,9 +2114,6 @@ void get_row(LPdata *lp_data, int i,
 
 /* This routine returns the index of a row which proves the lp to be primal
  * infeasible. There must be one, or this function wouldn't be called. */
-/* There MUST be something better than this...
- * A function call perhaps... Ask CPLEX... */
-
 
 int get_proof_of_infeas(LPdata *lp_data, int *infind)
 {
