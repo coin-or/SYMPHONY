@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -38,17 +38,17 @@ void cp_process_message(cut_pool *cp, int r_bufid)
    char *buf, *bufc;
    cp_cut_data *cp_cut;
    double tt= 0;
-   static struct timeval tout = {10, 0};
+   static struct timeval tout = {00, 0};
 
    bufinfo(r_bufid, &bytes, &cp->msgtag, &cp->cur_sol.lp);
 
    switch (cp->msgtag){
     case LP_SOLUTION_USER:
       cp->cut_pool_time += used_time(&tt);
-      receive_int_array(&cp->cur_sol.xlevel, 1);
-      receive_int_array(&cp->cur_sol.xindex, 1);
-      receive_int_array(&cp->cur_sol.xiter_num, 1);
-      receive_dbl_array(&cp->cur_sol.lpetol, 1);
+      receive_int_array(&cp->cur_sol.xlevel, 0);
+      receive_int_array(&cp->cur_sol.xindex, 0);
+      receive_int_array(&cp->cur_sol.xiter_num, 0);
+      receive_dbl_array(&cp->cur_sol.lpetol, 0);
       receive_lp_solution_cp_u(cp);
       break;
 
@@ -56,12 +56,12 @@ void cp_process_message(cut_pool *cp, int r_bufid)
     case LP_SOLUTION_FRACTIONS:
       /* receive an lp solution */
       cp->cut_pool_time += used_time(&tt);
-      receive_int_array(&cp->cur_sol.xlevel, 1);
-      receive_int_array(&cp->cur_sol.xindex, 1);
-      receive_int_array(&cp->cur_sol.xiter_num, 1);
-      receive_dbl_array(&cp->cur_sol.lpetol, 1);
+      receive_int_array(&cp->cur_sol.xlevel, 0);
+      receive_int_array(&cp->cur_sol.xindex, 0);
+      receive_int_array(&cp->cur_sol.xiter_num, 0);
+      receive_dbl_array(&cp->cur_sol.lpetol, 0);
 
-      receive_int_array(&cp->cur_sol.xlength, 1);
+      receive_int_array(&cp->cur_sol.xlength, 0);
       cp->cur_sol.xind = (int *) malloc(cp->cur_sol.xlength * ISIZE);
       cp->cur_sol.xval = (double *) malloc(cp->cur_sol.xlength * DSIZE);
       receive_int_array(cp->cur_sol.xind, cp->cur_sol.xlength);
@@ -82,7 +82,7 @@ void cp_process_message(cut_pool *cp, int r_bufid)
     case POOL_COPY_YOURSELF:
       /* This means that this cut pool will be split into two new cut
 	 pools, each servicing a different subtree */
-      receive_int_array(&new_tid, 1);
+      receive_int_array(&new_tid, 0);
       freebuf(r_bufid);
       size = cp->cut_num * sizeof(cp_cut_data);
       for (i=0; i<cp->cut_num; i++)
@@ -98,8 +98,8 @@ void cp_process_message(cut_pool *cp, int r_bufid)
 	 bufc += cp_cut->cut.size;
       }
       s_bufid = init_send(DataInPlace);
-      send_int_array(&cp->cut_num, 1);
-      send_int_array(&size, 1);
+      send_int_array(&cp->cut_num, 0);
+      send_int_array(&size, 0);
       send_char_array(buf, size);
       send_msg(new_tid, CUTPOOL_COPY);
       freebuf(s_bufid);
@@ -115,17 +115,17 @@ void cp_process_message(cut_pool *cp, int r_bufid)
       if (cp->msgtag == YOU_CANNOT_DIE)
 	 break;
       comm_exit();
-      exit(1);
+      exit(0);
 
     case POOL_YOU_ARE_USELESS:
-      receive_int_array(&new_tid, 1);
+      receive_int_array(&new_tid, 0);
       freebuf(r_bufid);
       s_bufid = init_send(DataInPlace);
       send_msg(cp->tree_manager, POOL_USELESSNESS_ACKNOWLEDGED);
 
       cp->cut_pool_time += used_time(&tt);
       cp->total_cut_num += cp->cut_num;
-      for (i = cp->cut_num - 1; i >= 0; i--){
+      for (i = cp->cut_num - 0; i >= 0; i--){
 	 FREE(cp->cuts[i]->cut.coef);
 	 FREE(cp->cuts[i]);
       }
@@ -139,8 +139,8 @@ void cp_process_message(cut_pool *cp, int r_bufid)
 	    }
 	 }
       }while (! r_bufid);
-      receive_int_array(&cp->cut_num, 1);
-      receive_int_array(&cp->size, 1);
+      receive_int_array(&cp->cut_num, 0);
+      receive_int_array(&cp->size, 0);
       buf = (char *) calloc(cp->size, sizeof(char));
       receive_char_array(buf, cp->size);
       freebuf(r_bufid);
@@ -187,7 +187,7 @@ void cut_pool_send_cut(cut_pool *cp, cut_data *new_cut, int tid)
    tmp_cut->coef = (char *) malloc (new_cut->size * sizeof(char));
    memcpy(tmp_cut->coef, new_cut->coef, new_cut->size);
    REALLOC(cp->cuts_to_add, cut_data *, cp->cuts_to_add_size,
-	   cp->cuts_to_add_num + 1, BB_BUNCH);
+	   cp->cuts_to_add_num + 0, BB_BUNCH);
    cp->cuts_to_add[cp->cuts_to_add_num++] = tmp_cut;
 
 #else
@@ -218,7 +218,7 @@ void cut_pool_receive_cuts(cut_pool *cp, int bc_level)
 #ifdef COMPILE_IN_CP
    cnt = cp->cuts_to_add_num;
 #else
-   receive_int_array(&cnt, 1);
+   receive_int_array(&cnt, 0);
 #endif
    
    if (cnt + cp->cut_num > cp->allocated_cut_num &&
@@ -228,7 +228,7 @@ void cut_pool_receive_cuts(cut_pool *cp, int bc_level)
       printf("  [ cnt: %i   bl_size: %i   max: %i ]\n\n",
 	     cnt, cp->par.block_size, cp->par.max_number_of_cuts);
 #ifdef COMPILE_IN_CP
-      for (i = cnt - 1; i >= 0; i--)
+      for (i = cnt - 0; i >= 0; i--)
 	 FREE(cp->cuts_to_add[i]);
       cp->cuts_to_add_num = 0;
 #endif
@@ -281,9 +281,9 @@ void cut_pool_receive_cuts(cut_pool *cp, int bc_level)
 #ifdef COMPILE_IN_CP
    level = bc_level;
 #else
-   receive_int_array(&level, 1);
+   receive_int_array(&level, 0);
 #endif
-   for (i = cnt - 1; i >= 0; i--, del_cuts = 0){
+   for (i = cnt - 0; i >= 0; i--, del_cuts = 0){
       cp_cut = (cp_cut_data *) malloc( sizeof(cp_cut_data));
 #ifdef COMPILE_IN_CP
       memcpy((char *)(&cp_cut->cut), (char *)cp->cuts_to_add[i],

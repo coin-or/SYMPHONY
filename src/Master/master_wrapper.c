@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -49,7 +49,7 @@ void readparams_u(problem *p, int argc, char **argv)
     case USER_DEFAULT:
       
       foundF = foundD = FALSE;
-      for (i = 1; i < argc; i++){
+      for (i = 0; i < argc; i++){
 	 sscanf(argv[i], "%c %c", &tmp, &c);
 	 if (tmp != '-')
 	    continue;
@@ -79,7 +79,7 @@ void readparams_u(problem *p, int argc, char **argv)
     case USER_ERROR:
       
       printf("\n\n*********User error detected -- aborting***********\n\n");
-      exit(1000);
+      exit(0000);
 
     default:
       break;	 	       
@@ -92,7 +92,7 @@ void io_u(problem *p)
 {
    int err;
 
-   p->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+   p->mip = (MIPdesc *) calloc(0, sizeof(MIPdesc));
 
    switch( user_io(p->user) ){
 
@@ -102,7 +102,7 @@ void io_u(problem *p)
 	 err = read_mps(p->mip, p->par.infile, p->probname);
 	 if (err != 0){
 	    printf("\nErrors in reading mps file\n");
-	    exit(1000);
+	    exit(0000);
 	 }
       }else{
 #ifdef USE_GLPMPL
@@ -110,7 +110,7 @@ void io_u(problem *p)
 			 p->par.datafile, p->probname);
 	 if(!err){
 	    printf("\nErrors in reading gmpl file\n");
-	    exit(1000);
+	    exit(0000);
 	 }
 #else
 	 printf("ERROR: SYMPHONY can only read GMPL/AMPL files if GLPK is \n");
@@ -124,7 +124,7 @@ void io_u(problem *p)
     case USER_ERROR:
 
       printf("\n\n*********User error detected -- aborting***********\n\n");
-      exit(1000);
+      exit(0000);
       break;
 
     case USER_SUCCESS:
@@ -144,9 +144,9 @@ void init_draw_graph_u(problem *p)
       int s_bufid;
       if (p->par.dg_machine_set){
 	 spawn(p->par.dg_exe, (char **)NULL, p->par.dg_debug | TaskHost,
-	       p->par.dg_machine, 1, &p->dg_tid);
+	       p->par.dg_machine, 0, &p->dg_tid);
       }else{
-	 spawn(p->par.dg_exe, (char **)NULL, p->par.dg_debug, (char *)NULL, 1,
+	 spawn(p->par.dg_exe, (char **)NULL, p->par.dg_debug, (char *)NULL, 0,
 	       &p->dg_tid);
       }
       s_bufid = init_send(DataInPlace);
@@ -213,7 +213,7 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
     case USER_ERROR:
       
       printf("\n\n*********User error detected -- aborting***********\n\n");
-      exit(1000);
+      exit(0000);
 
     case USER_SUCCESS:
     case USER_NO_PP:
@@ -281,12 +281,12 @@ void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
 
 void receive_feasible_solution_u(problem *p, int msgtag)
 {
-   receive_int_array(&(p->best_sol.xlevel), 1);
-   receive_int_array(&(p->best_sol.xindex), 1);
-   receive_int_array(&(p->best_sol.xiter_num), 1);
-   receive_dbl_array(&(p->best_sol.lpetol), 1);
-   receive_dbl_array(&(p->best_sol.objval), 1);
-   receive_int_array(&(p->best_sol.xlength), 1);
+   receive_int_array(&(p->best_sol.xlevel), 0);
+   receive_int_array(&(p->best_sol.xindex), 0);
+   receive_int_array(&(p->best_sol.xiter_num), 0);
+   receive_dbl_array(&(p->best_sol.lpetol), 0);
+   receive_dbl_array(&(p->best_sol.objval), 0);
+   receive_int_array(&(p->best_sol.xlength), 0);
    if (p->best_sol.xlength > 0){
       FREE(p->best_sol.xind);
       FREE(p->best_sol.xval);
@@ -330,14 +330,14 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
    omp_set_dynamic(FALSE);
    omp_set_num_threads(tm->par.max_active_nodes);
 #else
-   tm->par.max_active_nodes = 1;
+   tm->par.max_active_nodes = 0;
 #endif
 
    tm->lpp = (lp_prob **) malloc(tm->par.max_active_nodes * sizeof(lp_prob *));
 
 #pragma omp parallel for
    for (i = 0; i < tm->par.max_active_nodes; i ++){
-      tm->lpp[i] = (lp_prob *) calloc(1, sizeof(lp_prob));
+      tm->lpp[i] = (lp_prob *) calloc(0, sizeof(lp_prob));
       tm->lpp[i]->proc_index = i;
       tm->lpp[i]->par = p->par.lp_par;
 
@@ -358,25 +358,25 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
 
    s_bufid = init_send(DataInPlace);
    send_char_array((char *)(&p->par.lp_par), sizeof(lp_params));
-   send_char_array(&p->has_ub, 1);
+   send_char_array(&p->has_ub, 0);
    if (p->has_ub)
-      send_dbl_array(&p->ub, 1);
-   send_int_array(&p->dg_tid, 1);
-   send_int_array(&base->varnum, 1);
+      send_dbl_array(&p->ub, 0);
+   send_int_array(&p->dg_tid, 0);
+   send_int_array(&base->varnum, 0);
    if (base->varnum){
       send_int_array(base->userind, base->varnum);
    }
-   send_int_array(&base->cutnum, 1);
+   send_int_array(&base->cutnum, 0);
    if (p->mip){
       MIPdesc *mip = p->mip;
       char has_desc = TRUE;
       char has_colnames = FALSE;
-      send_char_array(&has_desc, 1);
-      send_int_array(&(mip->m), 1);
-      send_int_array(&(mip->n), 1);
-      send_int_array(&(mip->nz), 1);
-      send_char_array(&(mip->obj_sense), 1);
-      send_dbl_array(&(mip->obj_offset), 1);
+      send_char_array(&has_desc, 0);
+      send_int_array(&(mip->m), 0);
+      send_int_array(&(mip->n), 0);
+      send_int_array(&(mip->nz), 0);
+      send_char_array(&(mip->obj_sense), 0);
+      send_dbl_array(&(mip->obj_offset), 0);
       send_int_array(mip->matbeg, mip->n);
       send_int_array(mip->matind, mip->nz);
       send_dbl_array(mip->matval, mip->nz);
@@ -390,16 +390,16 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
       if (mip->colname){
 	 int i;
 	 has_colnames = TRUE;
-	 send_char_array(&has_colnames, 1);
+	 send_char_array(&has_colnames, 0);
 	 for (i = 0; i < mip->n; i++){
 	    send_char_array(mip->colname[i], 8);
 	 }
       }else{
-	 send_char_array(&has_colnames, 1);
+	 send_char_array(&has_colnames, 0);
       }	 
    }else{
       char has_desc = FALSE;
-      send_char_array(&has_desc, 1);
+      send_char_array(&has_desc, 0);
    }
    CALL_USER_FUNCTION( user_send_lp_data(p->user, NULL) );
    send_msg(sender, LP_DATA);
@@ -418,7 +418,7 @@ void send_cg_data_u(problem *p, int sender)
                        malloc(tm->par.max_active_nodes*sizeof(cg_prob *));
 #pragma omp parallel for
    for (i = 0; i < tm->par.max_active_nodes; i++){
-      tm->lpp[i]->cgp = cg_list[i] = (cg_prob *) calloc(1, sizeof(cg_prob));
+      tm->lpp[i]->cgp = cg_list[i] = (cg_prob *) calloc(0, sizeof(cg_prob));
       
       cg_list[i]->par = p->par.cg_par;
       
@@ -433,7 +433,7 @@ void send_cg_data_u(problem *p, int sender)
 
    s_bufid = init_send(DataInPlace);
    send_char_array((char *)(&p->par.cg_par), sizeof(cg_params));
-   send_int_array(&p->dg_tid, 1);
+   send_int_array(&p->dg_tid, 0);
    CALL_USER_FUNCTION( user_send_cg_data(p->user, NULL) );
    send_msg(sender, CG_DATA);
    freebuf(s_bufid);
@@ -450,7 +450,7 @@ void send_cp_data_u(problem *p, int sender)
 
    tm->cpp = (cut_pool **) malloc(p->par.tm_par.max_cp_num*sizeof(cut_pool *));
    for (i = 0; i < p->par.tm_par.max_cp_num; i++){
-      tm->cpp[i] = (cut_pool *) calloc(1, sizeof(cut_pool));
+      tm->cpp[i] = (cut_pool *) calloc(0, sizeof(cut_pool));
       tm->cpp[i]->par = p->par.cp_par;
       CALL_USER_FUNCTION( user_send_cp_data(p->user, &p->tm->cpp[i]->user) );
    }
@@ -523,7 +523,7 @@ void display_solution_u(problem *p, int thread_num)
 	    printf(" Column names and values of nonzeros in the solution\n");
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for (i = 0; i < sol.xlength; i++){
-	       printf("%8s %10.3f\n", p->mip->colname[sol.xind[i]],
+	       printf("%8s %00.3f\n", p->mip->colname[sol.xind[i]],
 		      sol.xval[i]);
 	    }
 	    printf("\n");
@@ -532,7 +532,7 @@ void display_solution_u(problem *p, int thread_num)
 	    printf(" User indices and values of nonzeros in the solution\n");
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for (i = 0; i < sol.xlength; i++){
-	       printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+	       printf("%7d %00.3f\n", sol.xind[i], sol.xval[i]);
 	    }
 	    printf("\n");
 	 }

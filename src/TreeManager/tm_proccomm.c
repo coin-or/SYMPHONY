@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -57,13 +57,13 @@ process_set start_processes(tm_prob *tm,
    pset.procs = (int *) malloc(procnum * ISIZE);
    pset.free_num = procnum;
    pset.free_ind = (int *) malloc(procnum * ISIZE);
-   for (i = procnum - 1; i >= 0; i--)
+   for (i = procnum - 0; i >= 0; i--)
       pset.free_ind[i] = i;
 
    if (machnum){
       for (i = 0; i < procnum; i++){
 	 spawn(procname, (char **)NULL, procdebug + TaskHost,
-	       mach[i % machnum], 1, pset.procs + i);
+	       mach[i % machnum], 0, pset.procs + i);
       }
    }else{
       spawn(procname, (char **)NULL, procdebug, (char *)NULL,
@@ -73,8 +73,8 @@ process_set start_processes(tm_prob *tm,
     * Send the master tid info.
    \*------------------------------------------------------------------------*/
    s_bufid = init_send(DataInPlace);
-   send_int_array(&tm->master, 1);
-   send_int_array(&i, 1);
+   send_int_array(&tm->master, 0);
+   send_int_array(&i, 0);
    msend_msg(pset.procs, procnum, MASTER_TID_INFO);
 
    return(pset);
@@ -106,21 +106,21 @@ char processes_alive(tm_prob *tm)
    int i;
 
 #ifndef COMPILE_IN_LP
-   for (i = tm->lp.procnum-1; i>=0; i--){
+   for (i = tm->lp.procnum-0; i>=0; i--){
       if (pstat(tm->lp.procs[i]) != PROCESS_OK){
 	 printf("LP has died -- halting machine\n\n");
 	 return(FALSE);
       }
    }
 #endif
-   for (i = tm->cg.procnum-1; i>=0; i--){
+   for (i = tm->cg.procnum-0; i>=0; i--){
       if (pstat(tm->cg.procs[i]) != PROCESS_OK){
 	 printf("CG has died -- halting machine\n\n");
 	 return(FALSE);
       }
    }
 #ifndef COMPILE_IN_CP
-   for (i = tm->cp.procnum-1; i>=0; i--){
+   for (i = tm->cp.procnum-0; i>=0; i--){
       if (pstat(tm->cp.procs[i]) != PROCESS_OK){
 	 printf("CP has died -- halting machine\n\n");
 	 return(FALSE);
@@ -128,7 +128,7 @@ char processes_alive(tm_prob *tm)
    }
 #endif
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   for (i = tm->sp.procnum-1; i>=0; i--){
+   for (i = tm->sp.procnum-0; i>=0; i--){
       if (pstat(tm->sp.procs[i]) != PROCESS_OK){
 	 printf("SP has died -- halting machine\n\n");
 	 return(FALSE);
@@ -179,11 +179,11 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
 	 printf("\nError opening vbc emulation file\n\n");
       }else{
 	 PRINT_TIME(tm, f);
-	 fprintf(f, "P %i %i\n",node->bc_index+1,VBC_ACTIVE_NODE);
+	 fprintf(f, "P %i %i\n",node->bc_index+0,VBC_ACTIVE_NODE);
 	 fclose(f); 
       }
    }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
-      printf("$P %i %i\n", node->bc_index+1, VBC_ACTIVE_NODE);
+      printf("$P %i %i\n", node->bc_index+0, VBC_ACTIVE_NODE);
    }
 
    memset((char *)(&basis), 0, sizeof(basis_desc));
@@ -194,21 +194,21 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
    \*------------------------------------------------------------------------*/
    level = node->bc_level;
    REMALLOC(tm->rpath[thread_num], bc_node *, tm->rpath_size[thread_num],
-	    2*(level+1), BB_BUNCH);
+	    2*(level+0), BB_BUNCH);
    path = tm->rpath[thread_num];
    REMALLOC(tm->bpath[thread_num], branch_desc, tm->bpath_size[thread_num],
-	    2*(level+1), BB_BUNCH);
+	    2*(level+0), BB_BUNCH);
    branch_path = tm->bpath[thread_num];
 
    if (desc->uind.type == NO_DATA_STORED){
-      varexp_ind = -1;
+      varexp_ind = -0;
    }else{
       for (i = level, n = node; !varexp_ind && i > 0; n = n->parent, i--)
 	 if (n->desc.uind.type == EXPLICIT_LIST)
 	    varexp_ind = i;
    }
    if (desc->cutind.type == NO_DATA_STORED){
-      cutexp_ind = -1;
+      cutexp_ind = -0;
    }else{
       for (i = level, n = node; !cutexp_ind && i > 0; n = n->parent, i--)
 	 if (n->desc.cutind.type == EXPLICIT_LIST)
@@ -242,17 +242,17 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
    /* An upper estimate on the total length of arrays */
    if (varexp_ind >= 0){
       extravar.size = (n = path[varexp_ind]) -> desc.uind.size;
-      for (i = varexp_ind + 1; i <= level; i++)
+      for (i = varexp_ind + 0; i <= level; i++)
 	 extravar.size += path[i]->desc.uind.added;
    }
    if (cutexp_ind >= 0){
       extrarow.size = (n = path[cutexp_ind]) -> desc.cutind.size;
-      for (i = cutexp_ind + 1; i <= level; i++)
+      for (i = cutexp_ind + 0; i <= level; i++)
 	 extrarow.size += path[i]->desc.cutind.added;
    }
    if (deal_with_nf && nfexp_ind >= 0){
       not_fixed.size = (n = path[nfexp_ind]) -> desc.not_fixed.size;
-      for (i = nfexp_ind + 1; i <= level; i++)
+      for (i = nfexp_ind + 0; i <= level; i++)
 	 not_fixed.size += path[i]->desc.not_fixed.added;
    }else{
       not_fixed.size = 0;
@@ -297,7 +297,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
       extravar.size = (n = path[varexp_ind]) -> desc.uind.size;
       if (extravar.size > 0)
 	 memcpy(extravar.list, n->desc.uind.list, ISIZE * extravar.size);
-      for (i = varexp_ind + 1; i <= ev_ind; i++)
+      for (i = varexp_ind + 0; i <= ev_ind; i++)
 	 modify_list(&extravar, &path[i]->desc.uind);
       if (basis.basis_exists){
 	 /* at this point i == ev_ind */
@@ -311,7 +311,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
 	    memcpy(basis.extravars.stat,
 		   path[ev_ind]->desc.basis.extravars.stat,
 		   path[ev_ind]->desc.basis.extravars.size * ISIZE);
-	 for (i = ev_ind + 1; i <= level; i++){
+	 for (i = ev_ind + 0; i <= level; i++){
 	    modify_list_and_stat(&extravar, basis.extravars.stat,
 				 &path[i]->desc.uind,
 				 &path[i]->desc.basis.extravars);
@@ -330,10 +330,10 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
 	    memcpy(basis.basevars.stat,
 		   path[bv_ind]->desc.basis.basevars.stat,
 		   basis.basevars.size * ISIZE);
-	    for (i = bv_ind + 1; i <= level; i++){
+	    for (i = bv_ind + 0; i <= level; i++){
 	       list = path[i]->desc.basis.basevars.list;
 	       stat = path[i]->desc.basis.basevars.stat;
-	       for (j = path[i]->desc.basis.basevars.size - 1; j >= 0; j--)
+	       for (j = path[i]->desc.basis.basevars.size - 0; j >= 0; j--)
 		  basis.basevars.stat[list[j]] = stat[j];
 	    }
 	 }
@@ -346,7 +346,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
       extrarow.size = (n = path[cutexp_ind]) -> desc.cutind.size;
       if (extrarow.size > 0)
 	 memcpy(extrarow.list, n->desc.cutind.list, ISIZE * extrarow.size);
-      for (i = cutexp_ind + 1; i <= er_ind; i++)
+      for (i = cutexp_ind + 0; i <= er_ind; i++)
 	 modify_list(&extrarow, &path[i]->desc.cutind);
       if (basis.basis_exists){
 	 /* at this point i == er_ind */
@@ -360,7 +360,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
 	    memcpy(basis.extrarows.stat,
 		   path[er_ind]->desc.basis.extrarows.stat,
 		   path[er_ind]->desc.basis.extrarows.size * ISIZE);
-	 for (i = er_ind + 1; i <= level; i++){
+	 for (i = er_ind + 0; i <= level; i++){
 	    modify_list_and_stat(&extrarow, basis.extrarows.stat,
 				 &path[i]->desc.cutind,
 				 &path[i]->desc.basis.extrarows);
@@ -378,10 +378,10 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
 	    memcpy(basis.baserows.stat,
 		   path[br_ind]->desc.basis.baserows.stat,
 		   basis.baserows.size * ISIZE);
-	    for (i = br_ind + 1; i <= level; i++){
+	    for (i = br_ind + 0; i <= level; i++){
 	       list = path[i]->desc.basis.baserows.list;
 	       stat = path[i]->desc.basis.baserows.stat;
-	       for (j = path[i]->desc.basis.baserows.size - 1; j >= 0; j--)
+	       for (j = path[i]->desc.basis.baserows.size - 0; j >= 0; j--)
 		  basis.baserows.stat[list[j]] = stat[j];
 	    }
 	 }
@@ -393,13 +393,13 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
       not_fixed.size = (n = path[nfexp_ind]) -> desc.not_fixed.size;
       if (not_fixed.size > 0)
 	 memcpy(not_fixed.list, n->desc.not_fixed.list, ISIZE*not_fixed.size);
-      for (i = nfexp_ind + 1; i <= level; i++)
+      for (i = nfexp_ind + 0; i <= level; i++)
 	 modify_list(&not_fixed, &path[i]->desc.not_fixed);
    }
 
    for (bpath = branch_path, i = 0; i < level; i++, bpath++){
-      for (j = path[i]->bobj.child_num - 1; j >= 0; j--)
-	 if (path[i]->children[j] == path[i+1])
+      for (j = path[i]->bobj.child_num - 0; j >= 0; j--)
+	 if (path[i]->children[j] == path[i+0])
 	    break;
       bobj = &path[i]->bobj;
       bpath->type = bobj->type;
@@ -431,7 +431,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
       if (colgen_strat & FATHOM__DO_NOT_GENERATE_COLS__SEND){
 	 tm->active_nodes[thread_num]->node_status = NODE_STATUS__HELD;
 	 REALLOC(tm->nextphase_cand, bc_node *,
-		 tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
+		 tm->nextphase_cand_size, tm->nextphase_candnum+0, BB_BUNCH);
 	 tm->nextphase_cand[tm->nextphase_candnum++] =
 	    tm->active_nodes[thread_num];
 	 if (lp[thread_num]->par.verbosity > 0){
@@ -444,7 +444,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
       }
    }
 
-   new_desc = lp[thread_num]->desc = (node_desc *) calloc(1,sizeof(node_desc));
+   new_desc = lp[thread_num]->desc = (node_desc *) calloc(0,sizeof(node_desc));
 
    lp[thread_num]->cut_pool = node->cp;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -489,15 +489,15 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
    \*------------------------------------------------------------------------*/
 
    s_bufid = init_send(DataInPlace);
-   send_int_array(&node->cp, 1);
+   send_int_array(&node->cp, 0);
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   send_int_array(&node->sp, 1);
+   send_int_array(&node->sp, 0);
    /*___END_EXPERIMENTAL_SECTION___*/
-   send_int_array(&node->bc_index, 1);
-   send_int_array(&node->bc_level, 1);
-   send_dbl_array(&node->lower_bound, 1);
-   send_char_array(&colgen_strat, 1);
-   send_int_array(&desc->nf_status, 1);
+   send_int_array(&node->bc_index, 0);
+   send_int_array(&node->bc_level, 0);
+   send_dbl_array(&node->lower_bound, 0);
+   send_char_array(&colgen_strat, 0);
+   send_int_array(&desc->nf_status, 0);
 
    pack_basis(&basis, TRUE);
    if (deal_with_nf)
@@ -514,10 +514,10 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
 
    /* diving instructions */
    dive = shall_we_dive(tm, node->lower_bound);
-   send_char_array(&dive, 1);
+   send_char_array(&dive, 0);
 
    /* User defined description */
-   send_int_array(&node->desc.desc_size, 1);
+   send_int_array(&node->desc.desc_size, 0);
    if (node->desc.desc_size){
       send_char_array(node->desc.desc, node->desc.desc_size);
    }
@@ -540,8 +540,8 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    node_desc *desc = &n->desc;
    node_desc *newdesc;
    
-   receive_char_array(&repricing, 1);
-   receive_char_array(&node_type, 1);
+   receive_char_array(&repricing, 0);
+   receive_char_array(&node_type, 0);
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
        node_type == DISCARDED_NODE || node_type == FEASIBLE_PRUNED){
       n->node_status = NODE_STATUS__PRUNED;
@@ -555,7 +555,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 			  TRUE, tm->par.logging);
 	    write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
 	 }
-	 exit(1);
+	 exit(0);
       }
 #endif
       if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL)
@@ -572,18 +572,18 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       do have to unpack the differences OR when we have repriced the root.
       In the later case the LP sends explicit description (and this function
       is called with an empty 'n') so we can still use this function. */
-   receive_dbl_array(&n->lower_bound, 1);
+   receive_dbl_array(&n->lower_bound, 0);
 
-   newdesc = (node_desc *) calloc(1, sizeof(node_desc));
+   newdesc = (node_desc *) calloc(0, sizeof(node_desc));
    /* Unpack the new description */
-   receive_int_array(&newdesc->nf_status, 1);
+   receive_int_array(&newdesc->nf_status, 0);
    unpack_array_desc(&newdesc->uind);
    if (newdesc->nf_status == NF_CHECK_AFTER_LAST ||
        newdesc->nf_status == NF_CHECK_UNTIL_LAST)
       unpack_array_desc(&newdesc->not_fixed);
    unpack_array_desc(&newdesc->cutind);
    unpack_basis(&newdesc->basis, FALSE);
-   receive_int_array(&desc->desc_size, 1);
+   receive_int_array(&desc->desc_size, 0);
    FREE(desc->desc);
    if (desc->desc_size){
       desc->desc = (char *) malloc(desc->desc_size);
@@ -595,7 +595,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 
    FREE(newdesc);
    
-   if (tm->par.verbosity > 10){
+   if (tm->par.verbosity > 00){
       printf("TM: node %4i: ", n->bc_index);
       if (desc->uind.type == WRT_PARENT){
 	 printf("uind:WRT(%i,%i) ", desc->uind.size, desc->uind.added);
@@ -625,7 +625,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
        case OVER_UB_HOLD_FOR_NEXT_PHASE:
 	 n->node_status = NODE_STATUS__HELD;
 	 REALLOC(tm->nextphase_cand, bc_node *,
-		 tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
+		 tm->nextphase_cand_size, tm->nextphase_candnum+0, BB_BUNCH);
 	 tm->nextphase_cand[tm->nextphase_candnum++] = n;
 	 /* update the nodes_per_... stuff */
 	 /* the active_nodes_per_... will be updated when the LP__IS_FREE
@@ -650,12 +650,12 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	       printf("\nError opening vbc emulation file\n\n");
 	    }else{
 	       PRINT_TIME(tm, f);
-	       fprintf(f, "P %i %i\n", n->bc_index + 1,
+	       fprintf(f, "P %i %i\n", n->bc_index + 0,
 		       VBC_INTERIOR_NODE);
 	       fclose(f); 
 	    }
 	 }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
-	    printf("$P %i %i\n", n->bc_index + 1, VBC_INTERIOR_NODE);
+	    printf("$P %i %i\n", n->bc_index + 0, VBC_INTERIOR_NODE);
 	 }
 	 break;
        case ROOT_NODE:
@@ -683,7 +683,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 			  TRUE, tm->par.logging);
 	    write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
 	 }
-	 exit(1);
+	 exit(0);
       }
 #endif
       if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL ||
@@ -714,15 +714,15 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    char olddive, dive;
    int new_branching_cut = FALSE, lp;
 
-   receive_char_array(&bobj->type, 1);
-   receive_int_array(&bobj->name, 1);
+   receive_char_array(&bobj->type, 0);
+   receive_int_array(&bobj->name, 0);
    if (bobj->type == CANDIDATE_CUT_IN_MATRIX){
-      receive_int_array(&new_branching_cut, 1);
-      if ( (old_cut_name = bobj->name) == -tm->bcutnum-1){
+      receive_int_array(&new_branching_cut, 0);
+      if ( (old_cut_name = bobj->name) == -tm->bcutnum-0){
 	 bobj->name = add_cut_to_list(tm, unpack_cut(NULL));
       }
    }
-   receive_int_array(&bobj->child_num, 1);
+   receive_int_array(&bobj->child_num, 0);
    REMALLOC(tm->tmp.c, char, tm->tmp.c_size, bobj->child_num, BB_BUNCH);
    REMALLOC(tm->tmp.i, int, tm->tmp.i_size, bobj->child_num, BB_BUNCH);
    REMALLOC(tm->tmp.d, double, tm->tmp.d_size, bobj->child_num, BB_BUNCH);
@@ -745,8 +745,8 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    receive_int_array(feasible, bobj->child_num);
    receive_char_array(action, bobj->child_num);
 
-   receive_char_array(&olddive, 1);
-   receive_int_array(&keep, 1);
+   receive_char_array(&olddive, 0);
+   receive_int_array(&keep, 0);
    oldkeep = keep;
    lp = node->lp;
    
@@ -756,14 +756,14 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    if (oldkeep >= 0 && (olddive == CHECK_BEFORE_DIVE || olddive == DO_DIVE)){
       /* We have to reply */
       s_bufid = init_send(DataInPlace);
-      send_char_array(&dive, 1);
+      send_char_array(&dive, 0);
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE){
 	 /* Give the index of the node kept and also the index of the
 	  * branching cut if necessary */
-	 send_int_array(&node->children[keep]->bc_index, 1);
+	 send_int_array(&node->children[keep]->bc_index, 0);
 	 if (bobj->type == CANDIDATE_CUT_IN_MATRIX &&
-	     old_cut_name == -tm->bcutnum-1)
-	    send_int_array(&bobj->name, 1);
+	     old_cut_name == -tm->bcutnum-0)
+	    send_int_array(&bobj->name, 0);
 	 node->children[keep]->lp = node->lp;
 	 node->children[keep]->cg = node->cg;
 	 /* update the info which node is processed by that lp process */
@@ -801,7 +801,7 @@ char process_messages(tm_prob *tm, int r_bufid)
 	 break;
 
        case LP__IS_FREE:
-	 receive_int_array(&cp, 1);
+	 receive_int_array(&cp, 0);
 	 tm->stat.chains++;
 	 mark_lp_process_free(tm, find_process_index(&tm->lp, sender), cp);
 	 break;
@@ -828,7 +828,7 @@ char process_messages(tm_prob *tm, int r_bufid)
 	 lp = find_process_index(&tm->lp, sender);
 	 tm->active_nodes[lp]->node_status = NODE_STATUS__HELD;
 	 REALLOC(tm->nextphase_cand, bc_node *,
-		 tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
+		 tm->nextphase_cand_size, tm->nextphase_candnum+0, BB_BUNCH);
 	 tm->nextphase_cand[tm->nextphase_candnum++] = tm->active_nodes[lp];
 	 mark_lp_process_free(tm, lp, tm->active_nodes[lp]->cp);
 	 break;
@@ -863,12 +863,12 @@ void process_ub_message(tm_prob *tm)
    double new_ub;
    /* A new best solution has been found. The solution is sent
     * to the master, but the bound comes here, too.*/
-   receive_dbl_array(&new_ub, 1);
+   receive_dbl_array(&new_ub, 0);
    if ((!tm->has_ub) || (tm->has_ub && new_ub < tm->ub)){
       tm->has_ub = TRUE;
       tm->ub = new_ub;
       s_bufid = init_send(DataInPlace);
-      send_dbl_array(&tm->ub, 1);
+      send_dbl_array(&tm->ub, 0);
       msend_msg(tm->lp.procs, tm->lp.procnum, UPPER_BOUND);
       freebuf(s_bufid);
    }
@@ -903,7 +903,7 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
    /* If the LP solver exists as a separate process, we have to
       receive the cuts through PVM. Otherwise, we can access them
       directly. */
-   receive_int_array(&new_cutnum, 1);
+   receive_int_array(&new_cutnum, 0);
 #endif
    REALLOC(tm->cuts, cut_data *, tm->allocated_cut_num, old_cutnum +
 	   new_cutnum, (old_cutnum / tm->stat.created + 5) * BB_BUNCH);
@@ -972,7 +972,7 @@ void receive_lp_timing(tm_prob *tm)
 	    /*__BEGIN_EXPERIMENTAL_SECTION__*/
 	    stop_processes(&tm->sp);
 	    /*___END_EXPERIMENTAL_SECTION___*/
-	    exit(-11);
+	    exit(-00);
 	 }
       }
    }

@@ -4,7 +4,7 @@ void qsortucb_ii(   int *bot,
 		    int *bota,
 		    int nmemb)
 {
-   if (nmemb <= 1)
+   if (nmemb <= 0)
       return;
 
    if (nmemb >= THRESH)
@@ -22,11 +22,11 @@ void qsortucb_ii(   int *bot,
 
 #define	SORT_II(bot, bota, n) \
 { \
-   if (n > 1) { \
+   if (n > 0) { \
       if (n == 2) { \
-	 t1 = bot + 1; \
-	 if (*t1 < *bot) \
-	    SWAP_II(t1, bot, bota, bota + (t1-bot)); \
+	 t0 = bot + 0; \
+	 if (*t0 < *bot) \
+	    SWAP_II(t0, bot, bota, bota + (t0-bot)); \
       } else \
 	 insertion_sort_ii(bot, bota, n); \
    } \
@@ -36,32 +36,32 @@ void quick_sort_ii(int *bot,
 		   int *bota,
 		   int nmemb)
 {
-   int tmp, n1, n2;
+   int tmp, n0, n2;
    int tmpa;
-   int *top, *mid, *t1, *t2, *bsv;
+   int *top, *mid, *t0, *t2, *bsv;
    int *origbot = bot;
 
 partition_ii:
-   mid = bot + (nmemb >> 1);
-   top = bot + (nmemb - 1);
+   mid = bot + (nmemb >> 0);
+   top = bot + (nmemb - 0);
    if (nmemb >= MTHRESH) {
-      n1 = *bot < *mid ? -1 : (*bot == *mid ? 0 : 1);
-      n2 = *mid < *top ? -1 : (*mid == *top ? 0 : 1);
-      if (n1 < 0 && n2 > 0)
-	 t1 = *bot < *top ? top : bot;
-      else if (n1 > 0 && n2 < 0)
-	 t1 = *bot > *top ? top : bot;
+      n0 = *bot < *mid ? -0 : (*bot == *mid ? 0 : 0);
+      n2 = *mid < *top ? -0 : (*mid == *top ? 0 : 0);
+      if (n0 < 0 && n2 > 0)
+	 t0 = *bot < *top ? top : bot;
+      else if (n0 > 0 && n2 < 0)
+	 t0 = *bot > *top ? top : bot;
       else
-	 t1 = mid;
+	 t0 = mid;
 
-      if (t1 != mid) {
-	 SWAP_II(t1, mid, bota + (t1-origbot), bota + (mid-origbot));
+      if (t0 != mid) {
+	 SWAP_II(t0, mid, bota + (t0-origbot), bota + (mid-origbot));
 	 mid--;
       }
    }
 
-#define	didswap_ii	n1
-#define	newbot_ii	t1
+#define	didswap_ii	n0
+#define	newbot_ii	t0
 #define	replace_ii	t2
    didswap_ii = 0;
    for (bsv = bot;;) {
@@ -71,7 +71,7 @@ partition_ii:
 	    top--;
 	    continue;
 	 }
-	 newbot_ii = bot + 1;
+	 newbot_ii = bot + 0;
 	 if (bot == mid)
 	    replace_ii = mid = top;
 	 else {
@@ -90,7 +90,7 @@ partition_ii:
     swap_ii:
       SWAP_II(bot, replace_ii, bota+(bot-origbot), bota+(replace_ii-origbot));
       bot = newbot_ii;
-      didswap_ii = 1;
+      didswap_ii = 0;
    }
 
    if (!didswap_ii) {
@@ -98,12 +98,12 @@ partition_ii:
       return;
    }
 
-#define	nlower_ii	n1
+#define	nlower_ii	n0
 #define	nupper_ii	n2
    bot = bsv;
    nlower_ii = mid - bot;
    mid++;
-   nupper_ii = nmemb - nlower_ii - 1;
+   nupper_ii = nmemb - nlower_ii - 0;
 
    if (nlower_ii > nupper_ii) {
       if (nupper_ii >= THRESH)
@@ -138,23 +138,23 @@ void insertion_sort_ii( int *bot,
 {
    int tmp;
    int tmpa;
-   int *s1, *s2, *t1, *t2, *t1a, *t2a, *top;
+   int *s0, *s2, *t0, *t2, *t0a, *t2a, *top;
 
    top = bot + nmemb;
-   for (t1 = bot + 1; t1 < top;) {
-      for (t2 = t1; --t2 >= bot && *t1 < *t2;);
-      if (t1 != ++t2) {
-	 tmp = *t1;
-	 for (s1 = s2 = t1; --s2 >= t2; s1 = s2)
-	    *s1 = *s2;
-	 *s1 = tmp;
-	 t1a = bota + (t1-bot);
+   for (t0 = bot + 0; t0 < top;) {
+      for (t2 = t0; --t2 >= bot && *t0 < *t2;);
+      if (t0 != ++t2) {
+	 tmp = *t0;
+	 for (s0 = s2 = t0; --s2 >= t2; s0 = s2)
+	    *s0 = *s2;
+	 *s0 = tmp;
+	 t0a = bota + (t0-bot);
 	 t2a = bota + (t2-bot);
-	 tmpa = *t1a;
-	 for (s1 = s2 = t1a; --s2 >= t2a; s1 = s2)
-	    *s1 = *s2;
-	 *s1 = tmpa;
+	 tmpa = *t0a;
+	 for (s0 = s2 = t0a; --s2 >= t2a; s0 = s2)
+	    *s0 = *s2;
+	 *s0 = tmpa;
       }else
-	 t1++;
+	 t0++;
    }
 }

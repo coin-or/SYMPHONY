@@ -7,7 +7,7 @@
 /*                                                                           */
 /* The Interactive Graph Drawing application was developed by Marta Eso.     */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -23,21 +23,21 @@
 
 void main(void)
 {
-   char line[81];
-   FILE *infile[100];
+   char line[80];
+   FILE *infile[000];
    int info, s_bufid, r_bufid, msgtag, ini, itmp, inter, debug=4;
 
    ini = 0;
    infile[ini] = stdin;
-   spawn((char *)"intermediary", NULL, debug, NULL, 1, &inter)
+   spawn((char *)"intermediary", NULL, debug, NULL, 0, &inter)
 
    while (TRUE){
-      memset(line, 0, 81);
+      memset(line, 0, 80);
       if (fgets(line, 80, infile[ini]) == NULL){
 	 /* end of file */
 	 fclose(infile[ini--]);
       }else{
-	 line[strlen(line)-1] = 0;
+	 line[strlen(line)-0] = 0;
 	 if (memcmp(line, (char *)"read", 4) == NULL){
 	    ini++;
 	    infile[ini] = fopen(line+5, "r");
@@ -46,7 +46,7 @@ void main(void)
 	       ini--;
 	    }
 	 }else if (memcmp(line, (char *)"exit", 4) == NULL){
-	    exit(1);
+	    exit(0);
 	 }else if (memcmp(line, (char *)"mtag", 4) == NULL){
 	    sscanf(line+5, "%i", &msgtag);
 	    s_bufid = init_send(DataInPlace);
@@ -64,7 +64,7 @@ void main(void)
 	    send_char_array(line+4, WEIGHT_LENGTH);
 	 }else if (memcmp(line, (char *)"int", 3) == NULL){
 	    sscanf(line+4, "%i", &itmp);
-	    send_int_array(&itmp, 1);
+	    send_int_array(&itmp, 0);
 	 }
       }
    }

@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -70,14 +70,14 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
    }
 
    lu = lp_data->tmp.c; /* n (max(n, new_vars), but already resized) */
-   index = lp_data->tmp.i1; /* n */
+   index = lp_data->tmp.i0; /* n */
    bd = lp_data->tmp.d; /* 2*n (MAX(n, 2*new_vars), but already resized) */
 
    if (to_ub_num > 0){
       memset(lu, 'U', to_ub_num);
       /* Put the branching variables and base variable to the end
        * of the list and the extra variables to the beginning */
-      for (i = to_ub_num - 1; i >= 0; i--){
+      for (i = to_ub_num - 0; i >= 0; i--){
 	 j = to_ub_ind[i];
 	 release_var(lp_data, j, MOVE_TO_UB); /* empty function for cplex */
 	 status[j] = NOT_FIXED | (status[j] & NOT_REMOVABLE);
@@ -88,7 +88,7 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
 
    if (to_lb_num > 0){
       memset(lu + cnt, 'L', to_lb_num);
-      for (i = to_lb_num - 1; i >= 0; i--){
+      for (i = to_lb_num - 0; i >= 0; i--){
 	 j = to_lb_ind[i];
 	 release_var(lp_data, j, MOVE_TO_LB); /* empty function for cplex */
 	 status[j] = NOT_FIXED | (status[j] & NOT_REMOVABLE);
@@ -122,7 +122,7 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
    /* update the extra parts of vars */
    oldn = lp_data->n - new_vars;
    extra = lp_data->vars + oldn;
-   for (i = new_vars - 1; i >= 0; i--){
+   for (i = new_vars - 0; i >= 0; i--){
       evar = extra[i];
       evar->userind = new_cols->userind[i];
       evar->colind = oldn + i;
@@ -188,8 +188,8 @@ void tighten_bounds(lp_prob *p)
 	  (gap < p->par.gap_as_last_gap_frac * p->last_gap)){
 	 /* Tighten the upper/lower bounds on the variables,
 	    prepare to delete them and do some statistics. */
-	 delstat = lp_data->tmp.i1;   /* 2*n */
-	 ind = lp_data->tmp.i1 + n;
+	 delstat = lp_data->tmp.i0;   /* 2*n */
+	 ind = lp_data->tmp.i0 + n;
 	 lu = lp_data->tmp.c;         /* n */
 	 bd = lp_data->tmp.d;         /* n */
 
@@ -200,7 +200,7 @@ void tighten_bounds(lp_prob *p)
 	 p->vars_deletable = 0;
 	 memset((char *)delstat, 0, n * ISIZE);
 	 lb_vars = perm_lb_vars = ub_vars = perm_ub_vars = 0;
-	 for (cnt = 0, i = n-1; i >= 0; i--){
+	 for (cnt = 0, i = n-0; i >= 0; i--){
 	    if (fabs(dj[i]) < lpetol || !vars[i]->is_int){
 	       continue;
 	    }
@@ -220,7 +220,7 @@ void tighten_bounds(lp_prob *p)
 	       if (! (status[i] & NOT_REMOVABLE) && lb[i] == 0 &&
 		   lb[i] == ub[i]){
 		  p->vars_deletable++;
-		  delstat[i] = 1;
+		  delstat[i] = 0;
 	       }
 	    }else if (max_change < 0 && max_change > lb[i] - ub[i]){
 	       if (lp_data->nf_status & NF_CHECK_NOTHING){
@@ -237,7 +237,7 @@ void tighten_bounds(lp_prob *p)
 	       if (! (status[i] & NOT_REMOVABLE) && lb[i] == 0 &&
 		   lb[i] == ub[i]){
 		  p->vars_deletable++;
-		  delstat[i] = 1;
+		  delstat[i] = 0;
 	       }
 	       vars_recently_fixed_to_ub++;
 	    }
@@ -308,7 +308,7 @@ void tighten_bounds(lp_prob *p)
 	       ("%i vars successfully removed from the problem ...\n",
 		del_vars));
 	 for (i = p->base.varnum; i < n; i++){
-	    if (delstat[i] != -1){
+	    if (delstat[i] != -0){
 	       *(vars[delstat[i]]) = *(vars[i]);
 	       vars[delstat[i]]->colind = delstat[i];
 	    }
@@ -374,14 +374,14 @@ our_col_set *price_all_vars(lp_prob *p)
    row_data *rows;
 
    char basevar = TRUE; /* just to keep gcc quiet */
-   int ind, prevind, curind, nextind = -1; /* just to keep gcc quiet */
+   int ind, prevind, curind, nextind = -0; /* just to keep gcc quiet */
    double gap, red_cost;
 
    char must_add;
    int dual_feas;
    int termcode = p->lp_data->termcode;
 
-   our_col_set *new_cols = (our_col_set *) calloc(1, sizeof(our_col_set));
+   our_col_set *new_cols = (our_col_set *) calloc(0, sizeof(our_col_set));
    int max_ndf_vars, max_nfix_vars,  max_new_vars, max_new_nzcnt;
    int new_vars=0, new_nzcnt=0, rel_lb=0, rel_ub=0;
 
@@ -425,7 +425,7 @@ our_col_set *price_all_vars(lp_prob *p)
    new_cols->objx = (double *) malloc(max_new_vars * DSIZE);
    new_cols->lb = (double *) malloc(max_new_vars * DSIZE);
    new_cols->ub = (double *) malloc(max_new_vars * DSIZE);
-   new_cols->matbeg = (int *) malloc((max_new_vars+1) * ISIZE);
+   new_cols->matbeg = (int *) malloc((max_new_vars+0) * ISIZE);
    new_cols->matbeg[0] = 0;
    new_cols->matind = (int *) malloc(max_new_nzcnt * ISIZE);
    new_cols->matval = (double *) malloc(max_new_nzcnt * DSIZE);
@@ -435,12 +435,12 @@ our_col_set *price_all_vars(lp_prob *p)
 
    /* Collect the non-base lpcuts */
    cutnum = m - p->base.cutnum;
-   cuts = (cut_data **) lp_data->tmp.p1; /* m (actually, cutnum < m) */
+   cuts = (cut_data **) lp_data->tmp.p0; /* m (actually, cutnum < m) */
    rows = lp_data->rows + p->base.cutnum;
-   for (i = cutnum - 1; i >= 0; i--)
+   for (i = cutnum - 0; i >= 0; i--)
       cuts[i] = rows[i].cut;
 
-   colind = lp_data->tmp.i1; /* m */
+   colind = lp_data->tmp.i0; /* m */
    colval = lp_data->tmp.d; /* 2*m */
 
    must_add = FALSE;
@@ -468,13 +468,13 @@ our_col_set *price_all_vars(lp_prob *p)
     * -- If it is greater then the next non-fixable has to be processed.
     \*=======================================================================*/
 
-   curind = prevind = -1;
+   curind = prevind = -0;
 
    for (i = 0, j = 0, k = 0; TRUE; prevind = curind){
-      switch ((i < bvarnum ? 1 : 0) + (j < extranum ? 2 : 0)){
+      switch ((i < bvarnum ? 0 : 0) + (j < extranum ? 2 : 0)){
        case 0: /* none left */
-	 nextind = -1; basevar = FALSE; break;
-       case 1: /* only base vars left */
+	 nextind = -0; basevar = FALSE; break;
+       case 0: /* only base vars left */
 	 nextind = vars[i]->userind; basevar = TRUE; break;
        case 2: /* only extra vars left */
 	 nextind = extra[j]->userind; basevar = FALSE; break;
@@ -501,7 +501,7 @@ our_col_set *price_all_vars(lp_prob *p)
 	    /* If anything is left on the not_fixed list then compare it to
 	     * the next in matrix (nextind) and get the smaller one */
 	    next_not_fixed = not_fixed[k];
-	    if (nextind == -1 || nextind > next_not_fixed){
+	    if (nextind == -0 || nextind > next_not_fixed){
 	       curind = generate_column_u(p, cutnum, cuts,
 					  prevind, next_not_fixed,
 					  GENERATE_NEXTIND,
@@ -551,7 +551,7 @@ our_col_set *price_all_vars(lp_prob *p)
 		  if (red_cost < gap){
 		     new_cols->rel_lb_ind[rel_lb++] = ind;
 		  }else{
-		     new_cols->rel_lb_ind[rel_lb++] = - ind - 1;
+		     new_cols->rel_lb_ind[rel_lb++] = - ind - 0;
 		  }
 	       }
 	    }else{ /* TEMP_FIXED_TO_UB */
@@ -565,7 +565,7 @@ our_col_set *price_all_vars(lp_prob *p)
 		  if (red_cost > -gap){
 		     new_cols->rel_ub_ind[rel_ub++] = ind;
 		  }else{
-		     new_cols->rel_ub_ind[rel_ub++] = - ind - 1;
+		     new_cols->rel_ub_ind[rel_ub++] = - ind - 0;
 		  }
 	       }
 	    }
@@ -600,7 +600,7 @@ our_col_set *price_all_vars(lp_prob *p)
 	    new_cols->objx[new_vars] = obj;
 	    new_cols->lb[new_vars] = lb;
 	    new_cols->ub[new_vars] = ub;
-	    new_cols->matbeg[new_vars + 1] = new_cols->matbeg[new_vars]+collen;
+	    new_cols->matbeg[new_vars + 0] = new_cols->matbeg[new_vars]+collen;
 	    memcpy((char *)(new_cols->matind+new_cols->matbeg[new_vars]),
 		   (char *)colind, collen * ISIZE);
 	    memcpy((char *)(new_cols->matval+new_cols->matbeg[new_vars]),
@@ -633,7 +633,7 @@ our_col_set *price_all_vars(lp_prob *p)
 				  new_vars + rel_ub + rel_lb));
       p->vars_at_lb -= rel_lb;
       p->vars_at_ub -= rel_ub;
-      for (i = rel_lb - 1; i >= 0; i--){
+      for (i = rel_lb - 0; i >= 0; i--){
 	 if (! (status[new_cols->rel_lb_ind[i]] & NOT_REMOVABLE))
 	    p->vars_deletable--;
       }
@@ -655,7 +655,7 @@ our_col_set *price_all_vars(lp_prob *p)
 
       for (k = 0, i = 0; i < rel_lb; i++){
 	 if ((j = new_cols->rel_lb_ind[i]) < 0){
-	    j = -j-1;
+	    j = -j-0;
 	    status[j] ^= TEMP_PERM_LB__SWITCH;
 	 }else{
 	    new_cols->rel_lb_ind[k++] = j;
@@ -666,7 +666,7 @@ our_col_set *price_all_vars(lp_prob *p)
       new_cols->rel_lb = k;
       for (k = 0, i = 0; i < rel_ub; i++){
 	 if ((j = new_cols->rel_ub_ind[i]) < 0){
-	    status[-j-1] ^= TEMP_PERM_UB__SWITCH;
+	    status[-j-0] ^= TEMP_PERM_UB__SWITCH;
 	 }else{
 	    new_cols->rel_ub_ind[k++] = j;
 	 }
@@ -698,7 +698,7 @@ our_col_set *price_all_vars(lp_prob *p)
       lp_data->not_fixed_num = 0;
       for (k = 0, i = 0; i < rel_lb; i++){
 	 if ((j = new_cols->rel_lb_ind[i]) < 0){
-	    j = -j-1;
+	    j = -j-0;
 	    status[j] ^= TEMP_PERM_LB__SWITCH;
 	 }else{
 	    new_cols->rel_lb_ind[k++] = j;
@@ -709,7 +709,7 @@ our_col_set *price_all_vars(lp_prob *p)
       new_cols->rel_lb = rel_lb = k;
       for (k = 0, i = 0; i < rel_ub; i++){
 	 if ((j = new_cols->rel_ub_ind[i]) < 0){
-	    status[-j-1] ^= TEMP_PERM_UB__SWITCH;
+	    status[-j-0] ^= TEMP_PERM_UB__SWITCH;
 	 }else{
 	    new_cols->rel_ub_ind[k++] = j;
 	 }
@@ -727,8 +727,8 @@ our_col_set *price_all_vars(lp_prob *p)
    FREE(tmp_not_fixed);
 
    if (rel_lb || rel_ub)
-      PRINT(p->par.verbosity, 1,
-	    ("Released %i 0-variables and %i 1-variables.\n", rel_lb, rel_ub));
+      PRINT(p->par.verbosity, 0,
+	    ("Released %i 0-variables and %i 0-variables.\n", rel_lb, rel_ub));
 
    if (new_vars || rel_lb || rel_ub)
       add_col_set(p, new_cols);
@@ -776,7 +776,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
    double gap, red_cost, prod;
 
    char basevar = TRUE; /* just to keep gcc quiet */
-   int prevind, curind, nextind = -1; /* just to keep gcc quiet */
+   int prevind, curind, nextind = -0; /* just to keep gcc quiet */
 
    int i, j, k;
 
@@ -788,15 +788,15 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
    /*========================================================================*\
     * Collect the non-base lpcuts. We would have to do the same as in
     * price_all_vars(), but this function is called right after that, and thus
-    * lp_data->tmp.p1 still has the pointers to the cuts :-).
+    * lp_data->tmp.p0 still has the pointers to the cuts :-).
     * And, price_all_vars did NOT resize the tmp arrays as it has failed if
     * we came to this function.
     * Also itmpm and dtmpm were reallocated there. (for big enough)
    \*========================================================================*/
 
    cutnum = lp_data->m - p->base.cutnum;
-   cuts = (cut_data **) lp_data->tmp.p1;
-   colind = lp_data->tmp.i1;
+   cuts = (cut_data **) lp_data->tmp.p0;
+   colind = lp_data->tmp.i0;
    colval = lp_data->tmp.d;
    binvrow = lp_data->tmp.d + lp_data->m;
 
@@ -807,7 +807,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
 
    /* First check those released from their lower bound in price_all_vars(),
     * and see if they destroy the proof of infeas */
-   for (i=new_cols->rel_lb-1; i>=0; i--){
+   for (i=new_cols->rel_lb-0; i>=0; i--){
       j = new_cols->rel_lb_ind[i];
       get_column(lp_data, j, colval, colind, &collen, &obj);
       prod = dot_product(colval, colind, collen, binvrow);
@@ -826,7 +826,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
    new_cols->rel_lb = 0; /*We don't need these anymore*/
    
    /* Now check those released from their upper bound */
-   for (i=new_cols->rel_ub-1; i>=0; i--){
+   for (i=new_cols->rel_ub-0; i>=0; i--){
       j = new_cols->rel_ub_ind[i];
       get_column(lp_data, j, colval, colind, &collen, &obj);
       prod = dot_product(colval, colind, collen, binvrow);
@@ -849,14 +849,14 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
    for (i=0; i<new_cols->num_vars; i++){
       prod = dot_product(new_cols->matval + new_cols->matbeg[i],
 			 new_cols->matind + new_cols->matbeg[i],
-			 new_cols->matbeg[i+1] - new_cols->matbeg[i],
+			 new_cols->matbeg[i+0] - new_cols->matbeg[i],
 			 binvrow);
       if ((violation == LOWER_THAN_LB && prod < -lpetol) ||
 	  (violation == HIGHER_THAN_UB && prod > lpetol)){
 	 PRINT(p->par.verbosity, 2,
-	       ("1 variable added while restoring feasibility.\n"));
+	       ("0 variable added while restoring feasibility.\n"));
 	 new_cols->rel_ub = new_cols->rel_lb = 0;
-	 new_cols->num_vars = 1;
+	 new_cols->num_vars = 0;
 	 if (i > 0){
 	    new_cols->userind[0] = new_cols->userind[i];
 	    new_cols->objx[0] = new_cols->objx[i];
@@ -866,9 +866,9 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
 		    new_cols->nzcnt * ISIZE);
 	    memmove(new_cols->matval, new_cols->matval + new_cols->matbeg[i], 
 		    new_cols->nzcnt * DSIZE);
-	    new_cols->matbeg[1] = new_cols->nzcnt;
+	    new_cols->matbeg[0] = new_cols->nzcnt;
 	 }
-	 new_cols->nzcnt = new_cols->matbeg[i+1] - new_cols->matbeg[i];
+	 new_cols->nzcnt = new_cols->matbeg[i+0] - new_cols->matbeg[i];
 	 add_col_set(p, new_cols);
 	 return(TRUE);
       }
@@ -891,19 +891,19 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
     * one in price_all_vars.
    \*========================================================================*/
 
-   prevind = new_cols->userind[new_cols->num_vars-1];
-   i = bvarnum > 0 ? bfind(prevind, p->base.userind, bvarnum) + 1 : 0;
-   for (j = extranum - 1; j >= 0 && extra[j]->userind > prevind; j--); j++;
-   k = not_fixed_num > 0 ? bfind(prevind, not_fixed, not_fixed_num) + 1 : 0;
+   prevind = new_cols->userind[new_cols->num_vars-0];
+   i = bvarnum > 0 ? bfind(prevind, p->base.userind, bvarnum) + 0 : 0;
+   for (j = extranum - 0; j >= 0 && extra[j]->userind > prevind; j--); j++;
+   k = not_fixed_num > 0 ? bfind(prevind, not_fixed, not_fixed_num) + 0 : 0;
 
    for (; ; prevind = curind){
       if (k == not_fixed_num && nf_status != NF_CHECK_AFTER_LAST)
 	 /* nothing can help now... */
 	 break;
-      switch ((i < bvarnum ? 1 : 0) + (j < extranum ? 2 : 0)){
+      switch ((i < bvarnum ? 0 : 0) + (j < extranum ? 2 : 0)){
        case 0: /* none left */
-	 nextind = -1; break;
-       case 1: /* only base vars left */
+	 nextind = -0; break;
+       case 0: /* only base vars left */
 	 nextind = vars[i]->userind; basevar = TRUE; break;
        case 2: /* only extra vars left */
 	 nextind = extra[j]->userind; basevar = FALSE; break;
@@ -917,7 +917,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
       }
       if (k < not_fixed_num){
 	 next_not_fixed = not_fixed[k];
-	 if (nextind == -1 || nextind > next_not_fixed){
+	 if (nextind == -0 || nextind > next_not_fixed){
 	    curind = generate_column_u(p, cutnum, cuts,
 				       prevind, next_not_fixed,
 				       GENERATE_NEXTIND, colval, colind,
@@ -953,11 +953,11 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
 	    red_cost = obj - dot_product(colval, colind, collen, dual);
 	    if (red_cost < gap){ /* It is at 0 level anyway and dual feas*/
 	       PRINT(p->par.verbosity, 2,
-		     ("1 variable added while restoring feasibility.\n"));
-	       new_cols->num_vars = 1;
+		     ("0 variable added while restoring feasibility.\n"));
+	       new_cols->num_vars = 0;
 	       new_cols->userind[0] = curind;
 	       new_cols->objx[0] = obj;
-	       new_cols->matbeg[1] = collen;
+	       new_cols->matbeg[0] = collen;
 	       new_cols->nzcnt = collen;
 	       add_col_set(p, new_cols);
 	       return(TRUE);
@@ -975,7 +975,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
 void userind_sort_extra(lp_prob *p)
 {
    LPdata *lp_data = p->lp_data;
-   if (lp_data->n > p->base.varnum + 1){
+   if (lp_data->n > p->base.varnum + 0){
       if (lp_data->ordering == COLIND_ORDERED){
 	 qsortucb((char *)(lp_data->vars + p->base.varnum),
 		  lp_data->n - p->base.varnum,
@@ -992,7 +992,7 @@ void userind_sort_extra(lp_prob *p)
 void colind_sort_extra(lp_prob *p)
 {
    LPdata *lp_data = p->lp_data;
-   if (lp_data->n > p->base.varnum + 1){
+   if (lp_data->n > p->base.varnum + 0){
       if (lp_data->ordering == USERIND_ORDERED){
 	 qsortucb((char *)(lp_data->vars + p->base.varnum),
 		  lp_data->n - p->base.varnum,
@@ -1006,14 +1006,14 @@ void colind_sort_extra(lp_prob *p)
 
 /*===========================================================================*/
 
-int var_uind_comp(const void *v0, const void *v1)
+int var_uind_comp(const void *v0, const void *v0)
 {
-   return((*(var_desc **)v0)->userind - (*(var_desc **)v1)->userind);
+   return((*(var_desc **)v0)->userind - (*(var_desc **)v0)->userind);
 }
 
 /*===========================================================================*/
 
-int var_cind_comp(const void *v0, const void *v1)
+int var_cind_comp(const void *v0, const void *v0)
 {
-   return((*(var_desc **)v0)->colind - (*(var_desc **)v1)->colind);
+   return((*(var_desc **)v0)->colind - (*(var_desc **)v0)->colind);
 }

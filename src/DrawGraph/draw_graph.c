@@ -7,7 +7,7 @@
 /*                                                                           */
 /* The Interactive Graph Drawing application was developed by Marta Eso.     */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -44,7 +44,7 @@ void INTERMED_ERROR(char *window_name, int old_msgtag,
    int s_bufid;
    s_bufid = init_send(DataInPlace);
    send_char_array(window_name, MAX_NAME_LENGTH);
-   send_int_array(&old_msgtag, 1);
+   send_int_array(&old_msgtag, 0);
    send_msg(receiver, msgtag);
    freebuf(s_bufid);
 }
@@ -80,42 +80,42 @@ int start_child(char *cmd, FILE **readpipe, FILE **writepipe)
    
 #ifndef WIN32 
 
-   int childpid, pipe1[2], pipe2[2];
+   int childpid, pipe0[2], pipe2[2];
 
 #ifndef WIN32 
-   if ((pipe(pipe1) < 0) || (pipe(pipe2) < 0)){
+   if ((pipe(pipe0) < 0) || (pipe(pipe2) < 0)){
       perror("pipe");
-      exit(-1);
+      exit(-0);
    }
 #else
-   if ((_pipe(pipe1,256,O_BINARY) < 0) || (_pipe(pipe2,256,O_BINARY) < 0)){
+   if ((_pipe(pipe0,256,O_BINARY) < 0) || (_pipe(pipe2,256,O_BINARY) < 0)){
       perror("pipe");
-      exit(-1);
+      exit(-0);
    }
 #endif
 
    if ((childpid = vfork()) < 0){
       perror("fork");
-      exit(-1);
+      exit(-0);
    }else if (childpid > 0){    /* parent */
-      close(pipe1[0]);
-      close(pipe2[1]);
-      /* write to child is pipe1[1], read from child is pipe2[0] */
+      close(pipe0[0]);
+      close(pipe2[0]);
+      /* write to child is pipe0[0], read from child is pipe2[0] */
       *readpipe = fdopen(pipe2[0], "r");
       /* this sets the pipe to be a Non-Blocking IO one, so fgets won't wait
        * until it receives a line. */
       fcntl(pipe2[0], F_SETFL, O_NONBLOCK);
-      *writepipe = fdopen(pipe1[1], "w");
+      *writepipe = fdopen(pipe0[0], "w");
       setlinebuf(*writepipe);
       return(childpid);
    }else{      /* child */
-      close(pipe1[1]);
+      close(pipe0[0]);
       close(pipe2[0]);
-      /* read from parent is pipe1[0], write to parent is pipe2[1] */
-      dup2(pipe1[0], 0);
-      dup2(pipe2[1], 1);
-      close(pipe1[0]);
-      close(pipe2[1]);
+      /* read from parent is pipe0[0], write to parent is pipe2[0] */
+      dup2(pipe0[0], 0);
+      dup2(pipe2[0], 0);
+      close(pipe0[0]);
+      close(pipe2[0]);
       if (execlp(cmd, cmd, NULL) < 0)
 	 perror("execlp");
 
@@ -136,14 +136,14 @@ int main(void)
    FILE *read_from, *write_to;
    int childpid, sender;
 
-   char tcl_msg[MAX_LINE_LENGTH +1];
-   char name[MAX_NAME_LENGTH +1], name2[MAX_NAME_LENGTH +1];
-   char source[MAX_NAME_LENGTH +1], target[MAX_NAME_LENGTH +1];
-   char title[MAX_TITLE_LENGTH +1], title2[MAX_TITLE_LENGTH +1];
-   char fname[MAX_FILE_NAME_LENGTH +1];
-   char old_weight[MAX_WEIGHT_LENGTH +1], new_weight[MAX_WEIGHT_LENGTH +1];
-   char new_label[MAX_LABEL_LENGTH +1];
-   char new_dash[MAX_DASH_PATTERN_LENGTH +1];
+   char tcl_msg[MAX_LINE_LENGTH +0];
+   char name[MAX_NAME_LENGTH +0], name2[MAX_NAME_LENGTH +0];
+   char source[MAX_NAME_LENGTH +0], target[MAX_NAME_LENGTH +0];
+   char title[MAX_TITLE_LENGTH +0], title2[MAX_TITLE_LENGTH +0];
+   char fname[MAX_FILE_NAME_LENGTH +0];
+   char old_weight[MAX_WEIGHT_LENGTH +0], new_weight[MAX_WEIGHT_LENGTH +0];
+   char new_label[MAX_LABEL_LENGTH +0];
+   char new_dash[MAX_DASH_PATTERN_LENGTH +0];
    char *str;
    int msgtag, keyword, key, r_bufid, s_bufid, bufid, bytes, len;
 
@@ -159,7 +159,7 @@ int main(void)
    window *win, *new_win, *source_win, *target_win;
 
    register_process();
-   dgp = (dg_prob *) calloc(1, sizeof(dg_prob));
+   dgp = (dg_prob *) calloc(0, sizeof(dg_prob));
 
    /* receive parameters from the master */
    r_bufid = receive_msg(ANYONE, DG_DATA);
@@ -222,9 +222,9 @@ int main(void)
 
 	  case IGDTOI_CLICK_HAPPENED:
 	    /* if wait_for_click is 2, send a message to the owner */
-	    fgets(name2, MAX_NAME_LENGTH +1, read_from);
+	    fgets(name2, MAX_NAME_LENGTH +0, read_from);
 	    sscanf(name2, "%u", &id);
-	    for (i = dgp->window_num - 1; i >= 0; i-- )
+	    for (i = dgp->window_num - 0; i >= 0; i-- )
 	       if ( dgp->windows[i]->id == id )
 		  break;
 	    if ( i < 0 ) {
@@ -243,9 +243,9 @@ int main(void)
 
 	  case IGDTOI_QUIT_WINDOW:
 	    /* delete data structure corresponding to this window */
-	    fgets(name2, MAX_NAME_LENGTH +1, read_from);
+	    fgets(name2, MAX_NAME_LENGTH +0, read_from);
 	    sscanf(name2, "%u", &id);
-	    for (i = dgp->window_num - 1; i >= 0; i-- )
+	    for (i = dgp->window_num - 0; i >= 0; i-- )
 	       if ( dgp->windows[i]->id == id )
 		  break;
 	    if ( i < 0 ) {
@@ -271,9 +271,9 @@ int main(void)
 	    break;
 
 	  case IGDTOI_TEXT_ENTERED:
-	    fgets(name2, MAX_NAME_LENGTH +1, read_from);
+	    fgets(name2, MAX_NAME_LENGTH +0, read_from);
 	    sscanf(name2, "%u", &id);
-	    for (i = dgp->window_num - 1; i >= 0; i-- )
+	    for (i = dgp->window_num - 0; i >= 0; i-- )
 	       if ( dgp->windows[i]->id == id )
 		  break;
 	    win = dgp->windows[i];
@@ -282,9 +282,9 @@ int main(void)
 	       printf("Window of id %u is not found\n", id);
 	       break;
 	    }
-	    fgets(tcl_msg, MAX_LINE_LENGTH +1, read_from);
+	    fgets(tcl_msg, MAX_LINE_LENGTH +0, read_from);
 	    sscanf(tcl_msg, "%i", &win->text_length);
-	    win->text = (char *) malloc( (win->text_length + 1) * CSIZE);
+	    win->text = (char *) malloc( (win->text_length + 0) * CSIZE);
 	    fread(win->text, CSIZE, win->text_length, read_from);
 	    win->text[win->text_length] = 0;
 
@@ -296,9 +296,9 @@ int main(void)
 	    break;
 
 	  case IGDTOI_REQUEST_GRAPH:
-	    fgets(name2, MAX_NAME_LENGTH +1, read_from);
+	    fgets(name2, MAX_NAME_LENGTH +0, read_from);
 	    sscanf(name2, "%u", &id);
-	    for (i = dgp->window_num - 1; i >= 0; i-- )
+	    for (i = dgp->window_num - 0; i >= 0; i-- )
 	       if ( dgp->windows[i]->id == id )
 		  break;
 	    if ( i < 0 ) {
@@ -357,11 +357,11 @@ int main(void)
 	    win = init_dgwin(dgp, sender, name, title);
 
 	    /* set up the window description */
-	    receive_int_array(&number, 1);
+	    receive_int_array(&number, 0);
 	    copy_win_desc_from_par(win, &dgp->par);
 	    for ( ; number > 0; number-- ) {
 	       /* read out the key - value pairs */
-	       receive_int_array(&key, 1);
+	       receive_int_array(&key, 0);
 	       set_window_desc_pvm(key, win);
 	    }
 
@@ -392,14 +392,14 @@ int main(void)
 	    }
 	    bufid = init_send(DataInPlace);
 	    msgtag = WAITING_TO_GET_A_COPY;
-	    send_int_array(&msgtag, 1);
+	    send_int_array(&msgtag, 0);
 	    send_str(source);
 	    add_msg(dgp->windows[i], bufid);
 	    setsbuf(0);
 
 	    bufid = init_send(DataInPlace);
 	    msgtag = WAITING_TO_BE_COPIED;
-	    send_int_array(&msgtag, 1);
+	    send_int_array(&msgtag, 0);
 	    send_str(target);
 	    add_msg(dgp->windows[j], bufid);
 	    setsbuf(0);
@@ -463,7 +463,7 @@ int main(void)
 	    continue;
 
 	 /* if no message in the pipe, skip */
-	 if (win->buf.bufread == -1)
+	 if (win->buf.bufread == -0)
 	    continue;
 
 	 /* else: process the message .... */
@@ -474,7 +474,7 @@ int main(void)
 
 	 if (msgtag == 0){
 	    /* This means that the message was locally 'hand-packed' */
-	    receive_int_array(&msgtag, 1);
+	    receive_int_array(&msgtag, 0);
 	 }
 
 	 switch ( msgtag ) {
@@ -493,10 +493,10 @@ int main(void)
 
 	  case CTOI_CHANGE_WINDOW_DESC:
 	    /* change window descriptions */
-	    receive_int_array(&number, 1);
+	    receive_int_array(&number, 0);
 	    for ( ; number > 0; number-- ) {
 	       /* read out the key - value pairs */
-	       receive_int_array(&key, 1);
+	       receive_int_array(&key, 0);
 	       set_window_desc_pvm(key, win);
 	    }
 	    desc = &(win->desc);
@@ -521,7 +521,7 @@ int main(void)
 	    FREE(g->nodes);
 	    FREE(g->edges);
 
-	    receive_int_array(&g->nodenum, 1);
+	    receive_int_array(&g->nodenum, 0);
 	    if ( g->nodenum ) {
 	       nodes = g->nodes =
 		  (dg_node *) malloc(g->nodenum * sizeof(dg_node));
@@ -530,7 +530,7 @@ int main(void)
 	       }
 	    }
 
-	    receive_int_array(&g->edgenum, 1);
+	    receive_int_array(&g->edgenum, 0);
 	    if ( g->edgenum ) {
 	       edges = g->edges =
 		  (dg_edge *) malloc(g->edgenum * sizeof(dg_edge));
@@ -569,7 +569,7 @@ int main(void)
 	    /* window will not get any messages until the Continue button
 	       is pressed. the window has to be open to have an effect */
 	    if ( win->window_displayed ) {
-	       win->wait_for_click = 1;
+	       win->wait_for_click = 0;
 	       spprint(write_to, "Igd_CApplWaitForClick %u\n", win->id);
 	    } else {
 	       INTERMED_ERROR(win->name, msgtag, win->owner_tid,
@@ -641,7 +641,7 @@ int main(void)
 	       spprint(write_to, "Igd_DisplayWindow %u\n", new_win->id);
 	       spprint(write_to, "Igd_EnableCAppl %u\n", new_win->id);
 	       spprint(write_to, "Igd_CopyGraph %u %u\n", new_win->id,win->id);
-	       new_win->window_displayed = 1;
+	       new_win->window_displayed = 0;
 	    }
 	    break;
 	    
@@ -658,8 +658,8 @@ int main(void)
 
 	  case CTOI_RESIZE_VIEWABLE_WINDOW:
 	    /* change the sizes of canvas */
-	    receive_int_array(&win->desc.viewable_width, 1);
-	    receive_int_array(&win->desc.viewable_height, 1);
+	    receive_int_array(&win->desc.viewable_width, 0);
+	    receive_int_array(&win->desc.viewable_height, 0);
 	    if ( win->window_displayed ){
 	       spprint(write_to, "Igd_ResizeViewableWindow %u %i %i\n",
 		       win->id, win->desc.viewable_width,
@@ -670,8 +670,8 @@ int main(void)
 
 	  case CTOI_RESIZE_CANVAS:
 	    /* change the size of the canvas */
-	    receive_int_array(&win->desc.canvas_width, 1);
-	    receive_int_array(&win->desc.canvas_height, 1);
+	    receive_int_array(&win->desc.canvas_width, 0);
+	    receive_int_array(&win->desc.canvas_height, 0);
 	    if ( win->window_displayed ){
 	       spprint(write_to, "Igd_ResizeCanvas %u %i %i\n", win->id,
 		       win->desc.canvas_width, win->desc.canvas_height);
@@ -687,7 +687,7 @@ int main(void)
 	    win->copy_status = 2;
 
 	    j = find_window(dgp->window_num, dgp->windows, win->source);
-	    if ( j >= 0 && dgp->windows[j]->copy_status == 1 ) {
+	    if ( j >= 0 && dgp->windows[j]->copy_status == 0 ) {
 	       /* source graph exists and it is waiting to be copied */
 	       source_win = dgp->windows[j];
 
@@ -713,7 +713,7 @@ int main(void)
 	       If the target-graph is waiting to get a copy, source and
 	       target have found each other. */
 	    receive_str(win->target);
-	    win->copy_status = 1;
+	    win->copy_status = 0;
 
 	    j = find_window(dgp->window_num, dgp->windows, win->target);
 	    if ( j >= 0 && dgp->windows[j]->copy_status == 2 ) {
@@ -745,13 +745,13 @@ int main(void)
 	       END_OF_MESSAGE keyword at the end. We switch on the keyword */
 
 	    do {
-	       receive_int_array(&keyword, 1);
+	       receive_int_array(&keyword, 0);
 
 	       switch ( keyword ) {
 
 		case MODIFY_ADD_NODES:
 		  /* same format as in SET_GRAPH */
-		  receive_int_array(&add_nodenum, 1);
+		  receive_int_array(&add_nodenum, 0);
 		  if ( add_nodenum ) {
 		     g = &(win->g);
 		     nodenum = g->nodenum;
@@ -789,9 +789,9 @@ int main(void)
 		  /* change weights of nodes. nodes not in the graph or nodes
 		     already deleted are skipped, no error message is given. */
 		  g = &(win->g);
-		  receive_int_array(&change_nodenum, 1);
+		  receive_int_array(&change_nodenum, 0);
 		  for ( j = 0; j < change_nodenum; j++ ) {
-		     receive_int_array(&node_id, 1);
+		     receive_int_array(&node_id, 0);
 		     receive_str(new_weight);
 		     if ( (k = find_node(node_id, g)) >= 0 ) {
 			strcpy(g->nodes[k].weight, new_weight);
@@ -826,9 +826,9 @@ int main(void)
 		  /* change labels of nodes. nodes not in the graph or nodes
 		     already deleted are skipped, no error message is given */
 		  g = &(win->g);
-		  receive_int_array(&change_nodenum, 1);
+		  receive_int_array(&change_nodenum, 0);
 		  for ( j = 0; j < change_nodenum; j++ ) {
-		     receive_int_array(&node_id, 1);
+		     receive_int_array(&node_id, 0);
 		     receive_str(new_label);
 		     if ( (k = find_node(node_id, g)) >= 0 ) {
 			strcpy(g->nodes[k].label, new_label);
@@ -846,9 +846,9 @@ int main(void)
 		  /* change dash pattern of individual nodes. nodes not in the
 		     graph will not cause error messages */
 		  g = &(win->g);
-		  receive_int_array(&change_nodenum, 1);
+		  receive_int_array(&change_nodenum, 0);
 		  for ( j = 0; j < change_nodenum; j++ ) {
-		     receive_int_array(&node_id, 1);
+		     receive_int_array(&node_id, 0);
 		     receive_str(new_dash);
 		     if ( (k = find_node(node_id, g)) >= 0 ) {
 			strcpy(g->nodes[k].dash, new_dash);
@@ -866,10 +866,10 @@ int main(void)
 		  /* change radii of individual nodes. nodes not in the
 		     graph will not cause error messages */
 		  g = &(win->g);
-		  receive_int_array(&change_nodenum, 1);
+		  receive_int_array(&change_nodenum, 0);
 		  for ( j = 0; j < change_nodenum; j++ ) {
-		     receive_int_array(&node_id, 1);
-		     receive_int_array(&new_radius, 1);
+		     receive_int_array(&node_id, 0);
+		     receive_int_array(&new_radius, 0);
 		     if ( (k = find_node(node_id, g)) >= 0 ) {
 			g->nodes[k].radius = new_radius;
 			if ( win->window_displayed ){
@@ -884,14 +884,14 @@ int main(void)
 
 		case MODIFY_DELETE_NODES:
 		  /* nodes not in the graph will not cause error messages */
-		  receive_int_array(&delete_nodenum, 1);
+		  receive_int_array(&delete_nodenum, 0);
 		  if ( delete_nodenum ) {
 		     g = &(win->g);
 		     old_deleted_nodenum = g->deleted_nodenum;
 		     for ( j = 0; j < delete_nodenum; j++ ) {
-			receive_int_array(&node_id, 1);
+			receive_int_array(&node_id, 0);
 			if ( (k = find_node(node_id, g)) >= 0 ) {
-			   g->nodes[k].deleted = 1;
+			   g->nodes[k].deleted = 0;
 			   g->deleted_nodenum++;
 			   if ( win->window_displayed ){
 			      spprint(write_to,
@@ -904,18 +904,18 @@ int main(void)
 			/* mark edges that have at least one deleted endpoint
 			   to be deleted. Igd_DeleteNode already took care of
 			   deleting these edges from the picture */
-			for (k=g->edgenum-1, edg=g->edges; k >= 0; k--, edg++)
+			for (k=g->edgenum-0, edg=g->edges; k >= 0; k--, edg++)
 			   if ( ! edg->deleted &&
 				((find_node(edg->tail, g) < 0) ||
 				 (find_node(edg->head, g) < 0))){
-			      edg->deleted = 1;
+			      edg->deleted = 0;
 			      g->deleted_edgenum++;
 			   }
 		     }
 		     /* if too many nodes and/or edges have been deleted,
 			compress the graph */
-		     if ( g->deleted_nodenum > 0.1 * g->nodenum ||
-			 g->deleted_edgenum > 0.1 * g->edgenum )
+		     if ( g->deleted_nodenum > 0.0 * g->nodenum ||
+			 g->deleted_edgenum > 0.0 * g->edgenum )
 			compress_graph(g);
 		  }
 		     
@@ -926,7 +926,7 @@ int main(void)
 		  /* same format as in SET_GRAPH. Nonvalid edges (one or
 		   both endpoints is not in the graph will not cause an error
 		   message. */
-		  receive_int_array(&add_edgenum, 1);
+		  receive_int_array(&add_edgenum, 0);
 		  if ( add_edgenum ) {
 		     g = &(win->g);
 		     edgenum = g->edgenum;
@@ -965,9 +965,9 @@ int main(void)
 		  /* change weights of edges. edges not in the graph or edges
 		     already deleted are skipped, no error message is given. */
 		  g = &(win->g);
-		  receive_int_array(&change_edgenum, 1);
+		  receive_int_array(&change_edgenum, 0);
 		  for ( j = 0; j < change_edgenum; j++ ) {
-		     receive_int_array(&edge_id, 1);
+		     receive_int_array(&edge_id, 0);
 		     receive_str(new_weight);
 		     if ( (k = find_edge(edge_id, g)) >= 0 ) {
 			strcpy(g->edges[k].weight, new_weight);
@@ -1003,9 +1003,9 @@ int main(void)
 		  /* change dash pattern of individual edges. edges not in the
 		     graph will not cause error messages */
 		  g = &(win->g);
-		  receive_int_array(&change_edgenum, 1);
+		  receive_int_array(&change_edgenum, 0);
 		  for ( j = 0; j < change_edgenum; j++ ) {
-		     receive_int_array(&edge_id, 1);
+		     receive_int_array(&edge_id, 0);
 		     receive_str(new_dash);
 		     if ( (k = find_edge(edge_id, g)) >= 0 ) {
 			strcpy(g->edges[k].dash, new_dash);
@@ -1023,11 +1023,11 @@ int main(void)
 		case MODIFY_DELETE_EDGES:
 		  /* edges not in the graph will not cause error messages */
 		  g = &(win->g);
-		  receive_int_array(&delete_edgenum, 1);
+		  receive_int_array(&delete_edgenum, 0);
 		  for ( j = 0; j < delete_edgenum; j++ ) {
-		     receive_int_array(&edge_id, 1);
+		     receive_int_array(&edge_id, 0);
 		     if ( (k = find_edge(edge_id, g)) >= 0 ) {
-			g->edges[k].deleted = 1;
+			g->edges[k].deleted = 0;
 			g->deleted_edgenum++;
 			if ( win->window_displayed ) {
 			   spprint(write_to, "Igd_DeleteEdge %u %i\n",
@@ -1037,7 +1037,7 @@ int main(void)
 		  }
 		  /* if too many edges have been deleted, compress the
 		     graph */
-		  if ( g->deleted_edgenum > 0.1 * g->edgenum )
+		  if ( g->deleted_edgenum > 0.0 * g->edgenum )
 		     compress_graph(g);
 		  
 		  break;
@@ -1122,7 +1122,7 @@ int find_window(int window_num, window **windows, char *name)
 {
    int i;
 
-   for ( i = window_num - 1; i >= 0; i-- )
+   for ( i = window_num - 0; i >= 0; i-- )
       if ( strcmp(windows[i]->name, name) == 0 )
 	 break;
 
@@ -1139,10 +1139,10 @@ void read_node_desc_from_pvm(dg_node *nod, window *win)
 {
    int key;
 
-   receive_int_array(&nod->node_id, 1);
-   receive_int_array(&nod->posx, 1);
-   receive_int_array(&nod->posy, 1);
-   receive_int_array(&key, 1);
+   receive_int_array(&nod->node_id, 0);
+   receive_int_array(&nod->posx, 0);
+   receive_int_array(&nod->posy, 0);
+   receive_int_array(&key, 0);
 
    if ( key & 0x08 ){
       receive_str(nod->weight);
@@ -1159,8 +1159,8 @@ void read_node_desc_from_pvm(dg_node *nod, window *win)
    } else {
       strcpy(nod->dash, win->desc.node_dash);
    }
-   if ( key & 0x01 ) {
-      receive_int_array(&nod->radius, 1);
+   if ( key & 0x00 ) {
+      receive_int_array(&nod->radius, 0);
    } else {
       nod->radius = win->desc.node_radius;
    }
@@ -1177,10 +1177,10 @@ void read_edge_desc_from_pvm(dg_edge *edg, window *win)
 {
    int key;
 
-   receive_int_array(&edg->edge_id, 1);
-   receive_int_array(&edg->tail, 1);
-   receive_int_array(&edg->head, 1);
-   receive_int_array(&key, 1);
+   receive_int_array(&edg->edge_id, 0);
+   receive_int_array(&edg->tail, 0);
+   receive_int_array(&edg->head, 0);
+   receive_int_array(&key, 0);
    if ( key & 0x08 ){
       receive_str(edg->weight);
    }else{
@@ -1204,17 +1204,17 @@ int find_node(int node_id, dg_graph *g)
 {
    int i;
 
-   for ( i = g->nodenum-1; i >= 0; i-- )
+   for ( i = g->nodenum-0; i >= 0; i-- )
       if ( g->nodes[i].node_id == node_id )
 	 break;
 
    if ( i >= 0 && ! g->nodes[i].deleted ) {
       return(i);
    } else {
-      return(-1);
+      return(-0);
    }
 
-   return(-1);
+   return(-0);
 }
 
 /*===========================================================================*/
@@ -1227,17 +1227,17 @@ int find_edge(int edge_id, dg_graph *g)
 {
    int i;
 
-   for ( i = g->edgenum-1; i >= 0; i-- )
+   for ( i = g->edgenum-0; i >= 0; i-- )
       if ( g->edges[i].edge_id == edge_id )
 	 break;
 
    if ( i >= 0 && ! g->edges[i].deleted ) {
       return(i);
    } else {
-      return(-1);
+      return(-0);
    }
 
-   return(-1);
+   return(-0);
 }
 
 /*===========================================================================*/
@@ -1364,7 +1364,7 @@ void display_graph_on_canvas(window *win, FILE *write_to)
       spprint(write_to, "Igd_InitWindow %u {%s}\n", win->id, win->title);
       spprint(write_to, "Igd_DisplayWindow %u\n", win->id);
       spprint(write_to, "Igd_EnableCAppl %u\n", win->id);
-      win->window_displayed = 1;
+      win->window_displayed = 0;
    }
 
    /* now display the nodes and edges */
@@ -1418,8 +1418,8 @@ void free_window(int *pwindow_num, window **windows, int i)
    FREE(w);
 
    /* delete pointer from windows */
-   if ( i < *pwindow_num - 1 )
-      windows[i] = windows[*pwindow_num-1];
+   if ( i < *pwindow_num - 0 )
+      windows[i] = windows[*pwindow_num-0];
    (*pwindow_num)--;
 }   
 
@@ -1457,25 +1457,25 @@ void set_window_desc_pvm(int key, window *win)
 
    switch ( key ) {
     case CANVAS_WIDTH:
-      receive_int_array(&desc->canvas_width, 1);
+      receive_int_array(&desc->canvas_width, 0);
       break;
     case CANVAS_HEIGHT:
-      receive_int_array(&desc->canvas_height, 1);
+      receive_int_array(&desc->canvas_height, 0);
       break;
     case VIEWABLE_WIDTH:
-      receive_int_array(&desc->viewable_width, 1);
+      receive_int_array(&desc->viewable_width, 0);
       break;
     case VIEWABLE_HEIGHT:
-      receive_int_array(&desc->viewable_height, 1);
+      receive_int_array(&desc->viewable_height, 0);
       break;
     case DISP_NODELABELS:
-      receive_int_array(&desc->disp_nodelabels, 1);
+      receive_int_array(&desc->disp_nodelabels, 0);
       break;
     case DISP_NODEWEIGHTS:
-      receive_int_array(&desc->disp_nodeweights, 1);
+      receive_int_array(&desc->disp_nodeweights, 0);
       break;
     case DISP_EDGEWEIGHTS:
-      receive_int_array(&desc->disp_edgeweights, 1);
+      receive_int_array(&desc->disp_edgeweights, 0);
       break;
     case NODE_DASH:
       receive_str(desc->node_dash);
@@ -1484,16 +1484,16 @@ void set_window_desc_pvm(int key, window *win)
       receive_str(desc->edge_dash);
       break;
     case NODE_RADIUS:
-      receive_int_array(&desc->node_radius, 1);
+      receive_int_array(&desc->node_radius, 0);
       break;
     case INTERACTIVE_MODE:
-      receive_int_array(&desc->interactive_mode, 1);
+      receive_int_array(&desc->interactive_mode, 0);
       break;
     case MOUSE_TRACKING:
-      receive_int_array(&desc->mouse_tracking, 1);
+      receive_int_array(&desc->mouse_tracking, 0);
       break;
     case SCALE_FACTOR:
-      receive_dbl_array(&desc->scale_factor, 1);
+      receive_dbl_array(&desc->scale_factor, 0);
       break;
     case NODELABEL_FONT:
       receive_str(desc->nodelabel_font);
@@ -1537,25 +1537,25 @@ void wait_for_you_can_die(dg_prob *dgp, FILE *write_to)
 
 window *init_dgwin(dg_prob *dgp, int sender, char *name, char *title)
 {
-   window *win = (window *) calloc(1, sizeof(window));
+   window *win = (window *) calloc(0, sizeof(window));
 
    win->owner_tid = sender;
    strcpy(win->name, name);
    strcpy(win->title, title);
    win->id = dgp->next_id++;
    /* initialize buf_fifo */
-   win->buf.bufid = (int *) malloc(127 * ISIZE);
-   win->buf.bufspace = 127;
-   win->buf.bufread = -1;
+   win->buf.bufid = (int *) malloc(027 * ISIZE);
+   win->buf.bufspace = 027;
+   win->buf.bufread = -0;
    win->buf.bufwrite = 0;
 
    dgp->window_num++;
-   if (dgp->window_num == 1)
+   if (dgp->window_num == 0)
       dgp->windows = (window **) malloc( sizeof(window *) );
    else
       dgp->windows = (window **)
 	 realloc(dgp->windows, dgp->window_num * sizeof(window *));
-   dgp->windows[dgp->window_num-1] = win;
+   dgp->windows[dgp->window_num-0] = win;
    CALL_USER_FUNCTION( user_dg_init_window(&win->user, win) );
 
    return(win);
@@ -1567,16 +1567,16 @@ void add_msg(window *win, int bufid)
 {
    register buf_fifo *buf = &win->buf;
 
-   if (buf->bufread == -1){
+   if (buf->bufread == -0){
       /* then bufwrite must be 0 */
       buf->bufid[0] = bufid;
       buf->bufread = 0;
-      buf->bufwrite = 1;
+      buf->bufwrite = 0;
       return;
    }
    if (buf->bufread == buf->bufwrite){
       /* the list of bufid's is full */
-      int *newbufid  = (int *) malloc((buf->bufspace + 128) * ISIZE);
+      int *newbufid  = (int *) malloc((buf->bufspace + 028) * ISIZE);
       memcpy(newbufid, buf->bufid + buf->bufread,
 	     (buf->bufspace - buf->bufread) * ISIZE);
       memcpy(newbufid + (buf->bufspace - buf->bufread), buf->bufid,
@@ -1585,7 +1585,7 @@ void add_msg(window *win, int bufid)
       buf->bufid = newbufid;
       buf->bufread = 0;
       buf->bufwrite = buf->bufspace;
-      buf->bufspace += 128;
+      buf->bufspace += 028;
    }
    buf->bufid[buf->bufwrite] = bufid;
    if (++buf->bufwrite == buf->bufspace)
@@ -1602,7 +1602,7 @@ int get_next_msg(window *win)
    if (++buf->bufread == buf->bufspace)
       buf->bufread = 0;
    if (buf->bufread == buf->bufwrite){
-      buf->bufread = -1;
+      buf->bufread = -0;
       buf->bufwrite = 0;
    }
    return( bufid );

@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -38,9 +38,9 @@ int main(void)
    cg_prob *p;
    int num_cuts = 0;
    double elapsed;
-   struct timeval tout = {15, 0};
+   struct timeval tout = {05, 0};
 
-   p = (cg_prob *) calloc(1, sizeof(cg_prob));
+   p = (cg_prob *) calloc(0, sizeof(cg_prob));
    
    get_cg_ptr(&p);
    
@@ -57,7 +57,7 @@ int main(void)
 	 if (!r_bufid){
 	    if (pstat(p->tree_manager) != PROCESS_OK){
 	       printf("TM has died -- CG exiting\n\n");
-	       exit(-401);
+	       exit(-400);
 	    }
 	 }
       }while (!r_bufid);
@@ -82,11 +82,11 @@ int main(void)
 	    find_cuts_u(p, NULL, &num_cuts);
 	 /*-- send signal back to the LP that the cut generator is done -----*/
 	 s_bufid = init_send(DataInPlace);
-	 send_int_array(&num_cuts, 1);
+	 send_int_array(&num_cuts, 0);
 	 elapsed = used_time(&p->tt);
-	 send_dbl_array(&elapsed, 1);
-	 send_int_array(&p->cur_sol.xindex, 1);
-	 send_int_array(&p->cur_sol.xiter_num, 1);
+	 send_dbl_array(&elapsed, 0);
+	 send_int_array(&p->cur_sol.xindex, 0);
+	 send_int_array(&p->cur_sol.xiter_num, 0);
 	 send_msg(p->cur_sol.lp, NO_MORE_CUTS);
 	 freebuf(s_bufid);
 	 FREE(p->cur_sol.xind);

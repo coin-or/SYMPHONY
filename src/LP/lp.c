@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -39,13 +39,13 @@ int main(void)
    lp_prob *p;
    int r_bufid;
    double time, diff;
-   struct timeval timeout = {10, 0};
+   struct timeval timeout = {00, 0};
    double start_time;
    char first_node_rec = FALSE;
    
    start_time = wall_clock(NULL);
    
-   p = (lp_prob *) calloc(1, sizeof(lp_prob));
+   p = (lp_prob *) calloc(0, sizeof(lp_prob));
 
    get_lp_ptr(&p);
    
@@ -86,7 +86,7 @@ int main(void)
       if (!process_chain(p)){
 	 printf("\nUser had problems creating LP! Exiting now.\n\n");
 	 /* User had problems creating initial LP. Abandon node. */
-	 exit(-1);
+	 exit(-0);
       }
    }
 

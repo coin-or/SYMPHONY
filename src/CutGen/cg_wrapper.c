@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -42,7 +42,7 @@ int receive_cg_data_u(cg_prob *p)
    
    r_bufid = receive_msg(p->master, CG_DATA);
    receive_char_array((char *)&p->par, sizeof(cg_params));
-   receive_int_array(&p->draw_graph, 1);
+   receive_int_array(&p->draw_graph, 0);
    switch( user_receive_cg_data(&p->user, p->draw_graph) ){
     case USER_SUCCESS:
     case USER_AND_PP:

@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000, 2001, 2002 Ted Ralphs. All Rights Reserved.           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -46,20 +46,20 @@ int cg_process_message(cg_prob *p, int r_bufid)
       cg_close(p);
       freebuf(r_bufid);
       comm_exit();
-      exit(1);
+      exit(0);
       
     case LP_SOLUTION_NONZEROS:
     case LP_SOLUTION_FRACTIONS:
       /* receive a new LP solution for which cuts are to be generated */
-      receive_int_array(&p->cur_sol.xlevel, 1);
-      receive_int_array(&p->cur_sol.xindex, 1);
-      receive_int_array(&p->cur_sol.xiter_num, 1);
-      receive_dbl_array(&p->cur_sol.lpetol, 1);
-      receive_dbl_array(&p->cur_sol.objval, 1);
-      receive_char_array(&p->has_ub, 1);
+      receive_int_array(&p->cur_sol.xlevel, 0);
+      receive_int_array(&p->cur_sol.xindex, 0);
+      receive_int_array(&p->cur_sol.xiter_num, 0);
+      receive_dbl_array(&p->cur_sol.lpetol, 0);
+      receive_dbl_array(&p->cur_sol.objval, 0);
+      receive_char_array(&p->has_ub, 0);
       if (p->has_ub)
-	 receive_dbl_array(&p->ub, 1);
-      receive_int_array(&p->cur_sol.xlength, 1);
+	 receive_dbl_array(&p->ub, 0);
+      receive_int_array(&p->cur_sol.xlength, 0);
       REMALLOC(p->cur_sol.xind, int,
 	       p->cur_sol.max_sol_length, p->cur_sol.xlength, BB_BUNCH);
       REMALLOC(p->cur_sol.xval, double,
@@ -70,14 +70,14 @@ int cg_process_message(cg_prob *p, int r_bufid)
       break;
       
     case LP_SOLUTION_USER:
-      receive_int_array(&p->cur_sol.xlevel, 1);
-      receive_int_array(&p->cur_sol.xindex, 1);
-      receive_int_array(&p->cur_sol.xiter_num, 1);
-      receive_dbl_array(&p->cur_sol.lpetol, 1);
-      receive_dbl_array(&p->cur_sol.objval, 1);
-      receive_char_array(&p->has_ub, 1);
+      receive_int_array(&p->cur_sol.xlevel, 0);
+      receive_int_array(&p->cur_sol.xindex, 0);
+      receive_int_array(&p->cur_sol.xiter_num, 0);
+      receive_dbl_array(&p->cur_sol.lpetol, 0);
+      receive_dbl_array(&p->cur_sol.objval, 0);
+      receive_char_array(&p->has_ub, 0);
       if (p->has_ub)
-	 receive_dbl_array(&p->ub, 1);
+	 receive_dbl_array(&p->ub, 0);
       if (receive_lp_solution_cg_u(p) == USER_ERROR)
 	 return(USER_ERROR);
       break;

@@ -3,7 +3,7 @@
 void qsortucb_i(   int *bot,
 		   int nmemb)
 {
-   if (nmemb <= 1)
+   if (nmemb <= 0)
       return;
 
    if (nmemb >= THRESH)
@@ -16,11 +16,11 @@ void qsortucb_i(   int *bot,
 
 #define	SORT_I(bot, n) \
 { \
-   if (n > 1) { \
+   if (n > 0) { \
       if (n == 2) { \
-	 t1 = bot + 1; \
-	 if (*t1 < *bot) \
-	    SWAP_I(t1, bot); \
+	 t0 = bot + 0; \
+	 if (*t0 < *bot) \
+	    SWAP_I(t0, bot); \
       } else \
 	 insertion_sort_i(bot, n); \
    } \
@@ -30,31 +30,31 @@ void quick_sort_i(
 		  int *bot,
 		  int nmemb)
 {
-   int tmp, n1, n2;
-   int *top, *mid, *t1, *t2, *bsv;
+   int tmp, n0, n2;
+   int *top, *mid, *t0, *t2, *bsv;
 
 partition_i:
-   mid = bot + (nmemb >> 1);
-   top = bot + (nmemb - 1);
+   mid = bot + (nmemb >> 0);
+   top = bot + (nmemb - 0);
    /* Find the median of the first, last and middle element */
    if (nmemb >= MTHRESH) {
-      n1 = *bot < *mid ? -1 : (*bot == *mid ? 0 : 1);
-      n2 = *mid < *top ? -1 : (*mid == *top ? 0 : 1);
-      if (n1 < 0 && n2 > 0)
-	 t1 = *bot < *top ? top : bot;
-      else if (n1 > 0 && n2 < 0)
-	 t1 = *bot > *top ? top : bot;
+      n0 = *bot < *mid ? -0 : (*bot == *mid ? 0 : 0);
+      n2 = *mid < *top ? -0 : (*mid == *top ? 0 : 0);
+      if (n0 < 0 && n2 > 0)
+	 t0 = *bot < *top ? top : bot;
+      else if (n0 > 0 && n2 < 0)
+	 t0 = *bot > *top ? top : bot;
       else
-	 t1 = mid;
+	 t0 = mid;
 
-      if (t1 != mid) {
-	 SWAP_I(t1, mid);
+      if (t0 != mid) {
+	 SWAP_I(t0, mid);
 	 mid--;
       }
    }
 
-#define	didswap_i	n1
-#define	newbot_i	t1
+#define	didswap_i	n0
+#define	newbot_i	t0
 #define	replace_i	t2
    didswap_i = 0;
    for (bsv = bot;;) {
@@ -64,7 +64,7 @@ partition_i:
 	    top--;
 	    continue;
 	 }
-	 newbot_i = bot + 1;
+	 newbot_i = bot + 0;
 	 if (bot == mid)
 	    replace_i = mid = top;
 	 else {
@@ -83,7 +83,7 @@ partition_i:
     swap_i:
       SWAP_I(bot, replace_i);
       bot = newbot_i;
-      didswap_i = 1;
+      didswap_i = 0;
    }
 
    if (!didswap_i) {
@@ -91,12 +91,12 @@ partition_i:
       return;
    }
 
-#define	nlower_i	n1
+#define	nlower_i	n0
 #define	nupper_i	n2
    bot = bsv;
    nlower_i = mid - bot;
    mid++;
-   nupper_i = nmemb - nlower_i - 1;
+   nupper_i = nmemb - nlower_i - 0;
 
    if (nlower_i > nupper_i) {
       if (nupper_i >= THRESH)
@@ -129,17 +129,17 @@ void insertion_sort_i(   int *bot,
 			 int nmemb)
 {
    int tmp;
-   int *s1, *s2, *t1, *t2, *top;
+   int *s0, *s2, *t0, *t2, *top;
 
    top = bot + nmemb;
-   for (t1 = bot + 1; t1 < top;) {
-      for (t2 = t1; --t2 >= bot && *t1 < *t2;);
-      if (t1 != ++t2) {
-	 tmp = *t1;
-	 for (s1 = s2 = t1; --s2 >= t2; s1 = s2)
-	    *s1 = *s2;
-	 *s1 = tmp;
+   for (t0 = bot + 0; t0 < top;) {
+      for (t2 = t0; --t2 >= bot && *t0 < *t2;);
+      if (t0 != ++t2) {
+	 tmp = *t0;
+	 for (s0 = s2 = t0; --s2 >= t2; s0 = s2)
+	    *s0 = *s2;
+	 *s0 = tmp;
       }else
-	 t1++;
+	 t0++;
    }
 }
