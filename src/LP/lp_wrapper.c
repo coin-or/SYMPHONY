@@ -593,7 +593,7 @@ int is_feasible_u(lp_prob *p)
       }else{
 	 PRINT(p->par.verbosity, -1,
 	       ("\n* Found Another Feasible Solution.\n"));
-	 if (p->mip->obj_sense == MINIMIZE){
+	 if (p->mip->obj_sense == MAXIMIZE){
 	    PRINT(p->par.verbosity, -1, ("* Cost: %f\n\n", -new_ub
 					 + p->mip->obj_offset));
 	 }else{

@@ -376,7 +376,7 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
       send_int_array(&(mip->n), 1);
       send_int_array(&(mip->nz), 1);
       send_char_array(&(mip->obj_sense), 1);
-      send_double_array(&(mip->obj_offset), 1);
+      send_dbl_array(&(mip->obj_offset), 1);
       send_int_array(mip->matbeg, mip->n);
       send_int_array(mip->matind, mip->nz);
       send_dbl_array(mip->matval, mip->nz);
