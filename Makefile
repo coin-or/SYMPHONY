@@ -751,6 +751,9 @@ QWHATTOMAKE += pmaster
 all : 
 	$(MAKE) $(WHATTOMAKE)
 
+parallel : 
+	$(MAKE) COMM_PROTOCOL=PVM SYM_COMPILE_IN_LP=FALSE $(WHATTOMAKE)
+
 pall :
 	$(MAKE) $(PWHATOTOMAKE)
 
