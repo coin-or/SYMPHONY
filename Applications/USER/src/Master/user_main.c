@@ -43,7 +43,7 @@ int main(int argc, char **argv)
    /* Test for dc_multi */
    si.setObj2Coeff(76, 100);
 
-   si.setSymParam(OsiSymMultiCriteriaFindNondominatedSolutions, TRUE);
+   si.setSymParam(OsiSymMultiCriteriaFindNondominatedSolutions, FALSE);
    
    /* Solve the multi-criteria problem */
    si.multiCriteriaBranchAndBound();

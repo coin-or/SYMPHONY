@@ -632,6 +632,7 @@ int sym_solve(problem *p)
       }
       FREE(p->best_sol.xind);
       FREE(p->best_sol.xval);
+      memset(&(p->best_sol), 0, sizeof(lp_sol));
    }
    /* Now the tree manager owns everything */
    FREE(p->warm_start);
@@ -987,7 +988,7 @@ int sym_resolve(problem *p)
 	 p->warm_start->ub = 0.0;
 
 	 for(i = 0; i < p->mip->change_num; i++){
-	    change_type == p->mip->change_type[i];
+	    change_type = p->mip->change_type[i];
 	    if (change_type == RHS_CHANGED){
 
 #ifdef USE_CGL_CUTS
@@ -996,6 +997,8 @@ int sym_resolve(problem *p)
 	       return(TM_NO_SOLUTION);
 	       
 #else
+
+	       p->mip->change_num = 0;
 	       update_tree_bound(p, p->warm_start->rootnode, RHS_CHANGED);
 	       return sym_solve(p);
 #endif
@@ -1018,6 +1021,7 @@ int sym_resolve(problem *p)
       }   
    }
    
+   p->mip->change_num = 0;
    return sym_solve(p);
    
 }
@@ -2261,6 +2265,7 @@ int sym_set_row_lower(problem *p, int index, double value)
 {
    double rhs, range, lower, upper, inf = INFINITY;
    char   sense;
+   int i;
 
    if (!p->mip){
       printf("sym_set_row_lower():The problem description is empty!\n");
@@ -2324,6 +2329,22 @@ int sym_set_row_lower(problem *p, int index, double value)
       p->mip->rngval[index] = range;
    }
 
+   if (p->mip->change_num){
+      for(i = p->mip->change_num - 1 ; i >=0 ; i--){
+	 if (p->mip->change_type[i] == RHS_CHANGED){
+	    break;
+	 }
+      }
+      if (i < 0 ){
+	 p->mip->change_type[p->mip->change_num] = RHS_CHANGED;
+	 p->mip->change_num++;
+      }
+   }
+   else{
+      p->mip->change_type[p->mip->change_num] = RHS_CHANGED;
+      p->mip->change_num++;
+   }
+   
    return TRUE;      
 }
 
@@ -2401,16 +2422,22 @@ int sym_set_row_upper(problem *p, int index, double value)
       p->mip->rngval[index] = range;
    }
 
-   if (!p->mip->change_num){
+   if (p->mip->change_num){
       for(i = p->mip->change_num - 1 ; i >=0 ; i--){
 	 if (p->mip->change_type[i] == RHS_CHANGED){
 	    break;
 	 }
       }
-      if (i >= 0 ){
-	 p->mip->change_num++;
+      if (i < 0 ){
 	 p->mip->change_type[p->mip->change_num] = RHS_CHANGED;
+	 p->mip->change_num++;
+
       }
+   }
+   else{
+      p->mip->change_type[p->mip->change_num] = RHS_CHANGED;
+      p->mip->change_num++;
+
    }
 
    return TRUE;      
@@ -2422,15 +2449,39 @@ int sym_set_row_upper(problem *p, int index, double value)
 int sym_set_row_type(problem *p, int index, char rowsense, double rowrhs, 
 		      double rowrng)
 {
+
+   int i;
+
    if (!p->mip){
       printf("sym_set_row_type():The problem description is empty!\n");
       return FALSE;
    }
-   
+
+   //FIX_ME! what if sense is changed? 
+
    p->mip->sense[index] = rowsense;   
    p->mip->rhs[index] = rowrhs;
    p->mip->rngval[index] = rowrng;
 
+
+   if (p->mip->change_num){
+      for(i = p->mip->change_num - 1 ; i >=0 ; i--){
+	 if (p->mip->change_type[i] == RHS_CHANGED){
+	    break;
+	 }
+      }
+      if (i < 0 ){
+	 p->mip->change_type[p->mip->change_num] = RHS_CHANGED;
+	 p->mip->change_num++;
+
+      }
+   }
+   else{
+      p->mip->change_type[p->mip->change_num] = RHS_CHANGED;
+      p->mip->change_num++;
+
+   }
+   
    return TRUE;      
 }
 

@@ -2160,7 +2160,7 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 						&p->cgp->cuts_to_add);
 	   FREE(new_cut);
 	}
-     }else{
+     }else if (branching){
 	continue_with_node = TRUE;
      }
   }

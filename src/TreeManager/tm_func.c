@@ -543,12 +543,13 @@ void print_tree_status(tm_prob *tm)
    double average_node_time, estimated_time_remaining, user_time = 0.0;
    double elapsed_time;
    
-   widths = (int *) calloc (tm->stat.max_depth, sizeof(int));
-   gamma = (double *) calloc (tm->stat.max_depth, sizeof(double));
+   widths = (int *) calloc (tm->stat.max_depth + 1, ISIZE);
+   gamma = (double *) calloc (tm->stat.max_depth + 1, DSIZE);
    
    calculate_widths(tm->rootnode, widths);
-   
-   for (i = tm->stat.max_depth - 1; i >= 0; i--){
+
+   last_full_level = tm->stat.max_depth;
+   for (i = tm->stat.max_depth - 1; i > 0; i--){
       if ((double)(widths[i])/(double)(widths[i - 1]) < 2){
 	 last_full_level = i - 1;
       }
