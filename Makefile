@@ -121,14 +121,13 @@ endif
 
 #Uncomment the line below if you want to use an OSI interface.
 LP_SOLVER = OSI
-OSI_INTERFACE = CLP
+OSI_INTERFACE = CPLEX
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
        LPINCDIR = ${HOME}/COIN/include
        LPLIBPATHS = ${HOME}/COIN/lib
        LPLIB = -lCoin -lOsi
-       CC = g++
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPINCDIR += /usr/local/include/
        LPLIBPATHS += /usr/local/lib/
@@ -204,7 +203,7 @@ endif
 ##############################################################################
 ##############################################################################
 
-CC = gcc
+CC = g++
 
 ##############################################################################
 # Set the optimization level

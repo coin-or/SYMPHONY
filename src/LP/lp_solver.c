@@ -1613,6 +1613,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 	 dj[delstat[i]] = dj[i];
 	 x[delstat[i]] = x[i];
 	 status[delstat[i]] = status[i];
+	 num_to_keep++;
       }
    }
 

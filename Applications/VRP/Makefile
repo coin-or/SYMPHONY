@@ -32,7 +32,7 @@ USER_MASTER_SRC  += $(MACROS_SRC) $(DG_FUNC_SRC)
 endif
 
 ifeq ($(COMPILE_IN_LP),TRUE)
-USER_TM_SRC       = $(USER_LP_SRC)
+USER_TM_SRC       = $(USER_LP_SRC) 
 endif
 ifeq ($(COMPILE_IN_CP),TRUE)
 USER_TM_SRC      += vrp_cp.c 
