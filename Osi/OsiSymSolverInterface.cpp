@@ -146,7 +146,7 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
        return true;
        
    case OsiSymSearchStrategy:
-      sym_set_int_param(env_, "node_selection_strategy");
+      sym_set_int_param(env_, "node_selection_strategy", value);
       return true;
 
     case OsiSymUsePermanentCutPools:
