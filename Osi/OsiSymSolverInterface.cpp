@@ -70,14 +70,11 @@ double OsiSymSolverInterface::getLbForNewRhs(int cnt, int *index,
 /*===========================================================================*/
 /*===========================================================================*/
 
-void OsiSymSolverInterface::MCBranchAndBound()
+void OsiSymSolverInterface::multiCriteriaBranchAndBound()
 {
-#ifdef MULTI_CRITERIA
+
    sym_mc_solve(env_);
-#else
-   printf("Multi-criteria option not specified. Recompile with\n");
-   printf("MULTI_CRITERA set to TRUE in your Makefile.\n\n");
-#endif
+
 } 
 
 /*===========================================================================*/
@@ -980,8 +977,9 @@ int OsiSymSolverInterface::getIterationCount() const
 void OsiSymSolverInterface::setObjCoeff( int elementIndex, 
 					 double elementValue )
 {
+
    sym_set_obj_coeff(env_, elementIndex, elementValue);
-   //   env_->desc_modification = OBJ_COEF_CHANGED;
+
 }
 
 /*===========================================================================*/
@@ -991,10 +989,7 @@ void OsiSymSolverInterface::setObj2Coeff( int elementIndex,
 					 double elementValue )
 {
 
-   assert(env_->mip);
-
-   env_->mip->obj2[elementIndex] = elementValue;
-   //   env_->desc_modification = OBJ2_COEF_CHANGED;
+   sym_set_obj2_coeff(env_, elementIndex, elementValue);
 
 }
 

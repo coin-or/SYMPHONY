@@ -62,10 +62,13 @@ typedef struct PARAMS{
    char       infile[MAX_FILE_NAME_LENGTH +1]; /* For MPS file name
 						  or GNUMP modelfile */
    char       datafile[MAX_FILE_NAME_LENGTH +1]; /* GNUMP datafile */
-#ifdef MULTI_CRITERIA
-   double     compare_solution_tolerance;
-   double     binary_search_tolerance;
-#endif
+
+   /* Multi-criteria parameters */
+   int        multi_criteria;
+   int        mc_search_order;
+   double     mc_compare_solution_tolerance;
+   double     mc_binary_search_tolerance;
+   int        mc_warm_start;
 }params;
 
 #endif

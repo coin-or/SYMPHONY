@@ -77,6 +77,7 @@ void free_mip_desc(MIPdesc *mip)
    FREE(mip->matind);
    FREE(mip->matval);
    FREE(mip->obj);
+   FREE(mip->obj1);
    FREE(mip->obj2);
    FREE(mip->rhs);
    FREE(mip->rngval);
@@ -251,6 +252,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 
    /*get mip->nz and mip->obj*/
    mip->obj    = (double *) calloc(DSIZE, mip->n);
+   mip->obj1   = (double *) calloc(DSIZE, mip->n);
    mip->obj2   = (double *) calloc(DSIZE, mip->n);
    
    indices = (int *) malloc(ISIZE * (mip->n + 1));
@@ -2919,6 +2921,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    mip->nz = mps.getNumElements();
    
    mip->obj    = (double *) malloc(DSIZE * mip->n);
+   mip->obj1   = (double *) calloc(mip->n, DSIZE);
    mip->obj2   = (double *) calloc(mip->n, DSIZE);
    mip->rhs    = (double *) malloc(DSIZE * mip->m);
    mip->sense  = (char *)   malloc(CSIZE * mip->m);

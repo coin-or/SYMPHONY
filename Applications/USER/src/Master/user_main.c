@@ -39,13 +39,10 @@ int main(int argc, char **argv)
    /* Find a priori problem bounds */
    si.findInitialBounds();
 
-#ifdef MULTI_CRITERIA
-
    si.setObj2Coeff(76, 100);
    
    /* Solve the multi-criteria problem */
-   si.MCBranchAndBound();
-#else
+   si.multiCriteriaBranchAndBound();
 
 #if defined TEST_RESOLVE || defined TEST_SENS_ANALYSIS || \
    defined TEST_WARM_START
@@ -95,7 +92,7 @@ int main(int argc, char **argv)
    printf("LB obtained for new rhs problem: %f \n\n\n",lb);
 		      
 #endif
-#endif
+
    return(0);
 }
 

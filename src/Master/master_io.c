@@ -234,16 +234,22 @@ int parse_command_line(problem *p, int argc, char **argv)
 	       strcmp(key, "M_use_permanent_cut_pools") == 0){
 	 READ_INT_PAR(p->par.use_permanent_cut_pools);
       }
-#ifdef MULTI_CRITERIA
-      else if (strcmp(key, "compare_solution_tolerance") == 0 ||
-	       strcmp(key, "M_compare_solution_tolerance") == 0){
-	 READ_DBL_PAR(p->par.use_permanent_cut_pools);
+      else if (strcmp(key, "mc_compare_solution_tolerance") == 0 ||
+	       strcmp(key, "M_mc_compare_solution_tolerance") == 0){
+	 READ_DBL_PAR(p->par.mc_compare_solution_tolerance);
       }
-      else if (strcmp(key, "binary_search_tolerance") == 0 ||
-	       strcmp(key, "M_binary_search_tolerance") == 0){
-	 READ_DBL_PAR(p->par.binary_search_tolerance);
+      else if (strcmp(key, "mc_binary_search_tolerance") == 0 ||
+	       strcmp(key, "M_mc_binary_search_tolerance") == 0){
+	 READ_DBL_PAR(p->par.mc_binary_search_tolerance);
       }
-#endif
+      else if (strcmp(key, "mc_search_order") == 0 ||
+	       strcmp(key, "M_mc_search_order") == 0){
+	 READ_DBL_PAR(p->par.mc_search_order);
+      }
+      else if (strcmp(key, "mc_warm_start") == 0 ||
+	       strcmp(key, "M_mc_warm_start") == 0){
+	 READ_DBL_PAR(p->par.mc_warm_start);
+      }
 
       /***********************************************************************
        ***                 DrawGraph parameters                            ***
@@ -982,20 +988,27 @@ int parse_command_line(problem *p, int argc, char **argv)
 	       strcmp(key, "LP_pack_lp_solution_default") == 0){
 	 READ_INT_PAR(lp_par->pack_lp_solution_default);
       }
-#ifdef MULTI_CRITERIA
-      else if (strcmp(key, "gamma") == 0 ||
-	       strcmp(key, "LP_gamma") == 0 ){
-	 READ_DBL_PAR(lp_par->gamma);
+      else if (strcmp(key, "multi_criteria") == 0 ||
+	       strcmp(key, "LP_multi_criteria") == 0 ){
+	 READ_INT_PAR(lp_par->multi_criteria);
+	 p->par.multi_criteria = lp_par->multi_criteria;
       }
-      else if (strcmp(key, "tau") == 0 ||
-	       strcmp(key, "LP_tau") == 0 ){
-	 READ_DBL_PAR(lp_par->tau);
+      else if (strcmp(key, "mc_find_nondominated_solutions") == 0 ||
+	       strcmp(key, "LP_mc_find_non_dominated_solutions") == 0 ){
+	 READ_INT_PAR(lp_par->mc_find_nondominated_solutions);
       }
-      else if (strcmp(key, "rho") == 0 ||
-	       strcmp(key, "LP_rho") == 0 ){
-	 READ_DBL_PAR(lp_par->rho);
+      else if (strcmp(key, "mc_gamma") == 0 ||
+	       strcmp(key, "LP_mc_gamma") == 0 ){
+	 READ_DBL_PAR(lp_par->mc_gamma);
       }
-#endif
+      else if (strcmp(key, "mc_tau") == 0 ||
+	       strcmp(key, "LP_mc_tau") == 0 ){
+	 READ_DBL_PAR(lp_par->mc_tau);
+      }
+      else if (strcmp(key, "mc_rho") == 0 ||
+	       strcmp(key, "LP_mc_rho") == 0 ){
+	 READ_DBL_PAR(lp_par->mc_rho);
+      }
       
       /***********************************************************************
        ***                     cut_gen parameters                          ***

@@ -266,9 +266,10 @@ int initialize_root_node_u(problem *p)
       if (p->mip->n && p->mip->m){
 	 root->uind.size = p->mip->n;
 	 base->cutnum = p->mip->m;
-#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
-	 base->cutnum += 2;
-#endif
+	 if (p->par.multi_criteria &&
+	     p->par.lp_par.mc_find_nondominated_solutions){
+	    base->cutnum += 2;
+	 }
       }else if (!root->uind.size){
 	 printf("Error setting up the root node.\n");
 	 printf("User did not specify number of variables. Exiting.\n\n");
@@ -387,17 +388,17 @@ int send_lp_data_u(problem *p, int sender)
       }else{
 	 p->ub = - (MAXDOUBLE / 2);
       }
-#ifdef MULTI_CRITERIA
-      if ((tm->lpp[i]->has_mc_ub = p->has_mc_ub)){
-	 tm->lpp[i]->mc_ub = p->mc_ub;
- 	 tm->lpp[i]->obj[0] = p->obj[0];
-	 tm->lpp[i]->obj[1] = p->obj[1];
-     }else{
-	 p->mc_ub = - (MAXDOUBLE / 2);
+      if (p->par.multi_criteria){
+	 if ((tm->lpp[i]->has_mc_ub = p->has_mc_ub)){
+	    tm->lpp[i]->mc_ub = p->mc_ub;
+	    tm->lpp[i]->obj[0] = p->obj[0];
+	    tm->lpp[i]->obj[1] = p->obj[1];
+	 }else{
+	    p->mc_ub = - (MAXDOUBLE / 2);
+	 }
+	 tm->lpp[i]->utopia[0] = p->utopia[0];
+	 tm->lpp[i]->utopia[1] = p->utopia[1];
       }
-      tm->lpp[i]->utopia[0] = p->utopia[0];
-      tm->lpp[i]->utopia[1] = p->utopia[1];
-#endif
       tm->lpp[i]->draw_graph = p->dg_tid;
       tm->lpp[i]->base = *(p->base);
       tm->lpp[i]->mip = p->mip;
@@ -412,14 +413,14 @@ int send_lp_data_u(problem *p, int sender)
    send_char_array(&p->has_ub, 1);
    if (p->has_ub)
       send_dbl_array(&p->ub, 1);
-#ifdef MULTI_CRITERIA
-   send_char_array(&p->has_mc_ub, 1);
-   if (p->has_mc_ub){
-      send_dbl_array(&p->mc_ub, 1);
-      send_dbl_array(p->obj, 2);
+   if (p->par.multi_crtieria){
+      send_char_array(&p->has_mc_ub, 1);
+      if (p->has_mc_ub){
+	 send_dbl_array(&p->mc_ub, 1);
+	 send_dbl_array(p->obj, 2);
+      }
+      send_dbl_array(p->utopia, 2);
    }
-   send_dbl_array(p->utopia, 2);
-#endif
    send_int_array(&p->dg_tid, 1);
    send_int_array(&p->base->varnum, 1);
    if (p->base->varnum){
@@ -440,9 +441,10 @@ int send_lp_data_u(problem *p, int sender)
       send_int_array(mip->matind, mip->nz);
       send_dbl_array(mip->matval, mip->nz);
       send_dbl_array(mip->obj, mip->n);
-#ifdef MULTI_CRITERIA
-      send_dbl_array(mip->obj2, mip->n);
-#endif
+      if (p->par.multi_criteria){
+	 send_dbl_array(mip->obj, mip->n);
+	 send_dbl_array(mip->obj2, mip->n);
+      }
       send_dbl_array(mip->rhs, mip->m);
       send_char_array(mip->sense, mip->m);
       send_dbl_array(mip->rngval, mip->m);
@@ -562,10 +564,10 @@ int display_solution_u(problem *p, int thread_num)
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    if (p->tm && p->tm->lpp[thread_num]){
       sol = p->tm->lpp[thread_num]->best_sol;
-#ifdef MULTI_CRITERIA
-      p->obj[0] = p->tm->lpp[thread_num]->obj[0];
-      p->obj[1] = p->tm->lpp[thread_num]->obj[1];
-#endif
+      if (p->par.multi_criteria){
+	 p->obj[0] = p->tm->lpp[thread_num]->obj[0];
+	 p->obj[1] = p->tm->lpp[thread_num]->obj[1];
+      }
    }
 #else
    sol = p->best_sol;
@@ -577,12 +579,12 @@ int display_solution_u(problem *p, int thread_num)
    }
 
    printf("\nSolution Found: Node %i, Level %i\n", sol.xindex, sol.xlevel);
-#ifdef MULTI_CRITERIA
-   printf("First Objective: %.3f\n", p->tm->lpp[thread_num]->obj[0]);
-   printf("Second Objective: %.3f\n", p->tm->lpp[thread_num]->obj[1]);
-#else
-   printf("Solution Cost: %.3f\n", sol.objval);
-#endif
+   if (p->par.multi_criteria){
+      printf("First Objective: %.3f\n", p->tm->lpp[thread_num]->obj[0]);
+      printf("Second Objective: %.3f\n", p->tm->lpp[thread_num]->obj[1]);
+   }else{
+      printf("Solution Cost: %.3f\n", sol.objval);
+   }
    qsortucb_id(sol.xind, sol.xval, sol.xlength);
    
    user_res = user_display_solution(p->user, sol.lpetol, sol.xlength, sol.xind,
@@ -598,11 +600,9 @@ int display_solution_u(problem *p, int thread_num)
 	    printf(" Column names and values of nonzeros in the solution\n");
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for (i = 0; i < sol.xlength; i++){
-#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
 	       if (sol.xind[i] == p->mip->n){
 		  continue;
 	       }
-#endif
 	       printf("%8s %10.3f\n", p->mip->colname[sol.xind[i]],
 		      sol.xval[i]);
 	    }
@@ -612,6 +612,9 @@ int display_solution_u(problem *p, int thread_num)
 	    printf(" User indices and values of nonzeros in the solution\n");
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for (i = 0; i < sol.xlength; i++){
+	       if (sol.xind[i] == p->mip->n){
+		  continue;
+	       }
 	       printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
 	    }
 	    printf("\n");

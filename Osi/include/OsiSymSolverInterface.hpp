@@ -55,13 +55,15 @@ public:
    //@{
    /// Solve initial LP relaxation
    virtual void initialSolve();
+
    /// Resolve an IP problem modification
    virtual void resolve();
+
    /// Invoke solver's built-in enumeration algorithm
    virtual void branchAndBound();
    
    /// Invoke solver's multi-criteria enumeration algorithm
-   virtual void MCBranchAndBound();
+   virtual void multiCriteriaBranchAndBound();
 
    /// Get a lower bound for the new rhs problem using the warm start tree.
    virtual double getLbForNewRhs(int cnt, int *index, 

@@ -98,12 +98,10 @@ typedef struct LP_PROB{
    tm_prob      *tm;
 #endif
    lp_sol        best_sol;
-#ifdef MULTI_CRITERIA
    double        obj[2];
    double        utopia[2];
    char          has_mc_ub;
    double        mc_ub;
-#endif
    
    double        tt;
    node_times    comp_times;
@@ -301,10 +299,8 @@ int generate_column_u PROTO((lp_prob *p, int lpcutnum, cut_data **cuts,
 void print_stat_on_cuts_added_u PROTO((lp_prob *p, int added_rows));
 void purge_waiting_rows_u PROTO((lp_prob *p));
 int generate_cuts_in_lp_u PROTO((lp_prob *p));
-#ifdef MULTI_CRITERIA
 char analyze_multicriteria_solution PROTO((lp_prob *p, int *indices,
 					   double *values, int length,
 					   double *true_objval, double etol,
 					   char branching));
-#endif
 #endif

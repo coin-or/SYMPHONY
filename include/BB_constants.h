@@ -151,6 +151,10 @@
 #define VBC_EMULATION_FILE       1
 #define VBC_EMULATION_LIVE       2
 
+/*------------ search order options for multi-criteria problems -------------*/
+#define MC_FIFO                  0
+#define MC_LIFO                  1
+
 /*****************************************************************************
  *****************************************************************************
  *************                                                      **********
@@ -304,10 +308,8 @@
 
 /*------------------------- built-in cut types ------------------------------*/
 #define EXPLICIT_ROW                100
-#ifdef MULTI_CRITERIA
 #define OPTIMALITY_CUT_FIRST        101
 #define OPTIMALITY_CUT_SECOND       102
-#endif
 
 /*----------------- possible types of candidate objects ---------------------*/
 #define CANDIDATE_VARIABLE          0

@@ -22,6 +22,7 @@
 #include <pvmtev.h>
 #endif
 
+#include "symphony_api.h"
 #include "proccomm.h"
 #include "timemeas.h"
 #include "messages.h"
@@ -163,11 +164,12 @@ int sym_set_defaults(problem *p)
    p->par.pvm_trace = 0;
    p->par.do_branch_and_cut = 1;
    p->par.do_draw_graph = FALSE;
-   p->par.use_permanent_cut_pools = FALSE;
-#ifdef MULTI_CRITERIA
-   p->par.binary_search_tolerance = .01;
-   p->par.compare_solution_tolerance = .001;
-#endif
+   p->par.use_permanent_cut_pools = TRUE;
+   p->par.multi_criteria = FALSE;
+   p->par.mc_binary_search_tolerance = 0; 
+   p->par.mc_compare_solution_tolerance = .001;
+   p->par.mc_search_order = MC_FIFO;
+   p->par.mc_warm_start = TRUE;
 
    /************************** treemanager defaults **************************/
    tm_par->verbosity = 0;
@@ -281,15 +283,11 @@ int sym_set_defaults(problem *p)
 
    lp_par->generate_cgl_cuts = TRUE;
 
-#ifdef MULTI_CRITERIA
-   lp_par->gamma = 1;       /* Determines the weight on objective 1 */
-   lp_par->tau   = 0;       /* Determines the weight on objective 2 */
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-   lp_par->rho   = 0.00001; /* For augmented Chebyshev norm */
-#else
-   lp_par->rho   = 0.0;
-#endif
-#endif
+   lp_par->multi_criteria = FALSE;
+   lp_par->mc_find_nondominated_solutions = TRUE;
+   lp_par->mc_gamma = 1;       /* Determines the weight on objective 1 */
+   lp_par->mc_tau   = 0;       /* Determines the weight on objective 2 */
+   lp_par->mc_rho   = 0.00001; /* For augmented Chebyshev norm */
    
 #ifdef __OSI_GLPK__
    lp_par->max_presolve_iter = -1;
@@ -1025,10 +1023,9 @@ int sym_resolve(problem *p)
 }
 
 /*===========================================================================*/
+/* These data types are for multi-criteria problems and are only used here   */
 /*===========================================================================*/
-   
-#ifdef MULTI_CRITERIA
-
+ 
 typedef struct SOLUTION_DATA{
    double  obj[2];
    double  gamma;
@@ -1043,10 +1040,8 @@ typedef struct SOLUTION_DATA{
 typedef struct SOLUTION_PAIRS{
    int solution1;
    int solution2;
-#ifdef BINARY_SEARCH
    double gamma1;
    double gamma2;
-#endif
 }solution_pairs;
 
 /*===========================================================================*/
@@ -1062,6 +1057,7 @@ int sym_mc_solve(problem *p)
    int i;
    double gamma, gamma0, gamma1, tau, slope;
    double start_time;
+   warm_start_desc *ws;
 
    solution_data utopia1;
    solution_data utopia2;
@@ -1077,51 +1073,57 @@ int sym_mc_solve(problem *p)
    node_desc *root= NULL;
    base_desc *base = NULL;
    double compare_sol_tol, ub = 0.0;
-
-#ifdef MULTI_CRITERIA
+   int binary_search = FALSE;
+   
    for (i = 0; i < p->mip->n; i++){
       if (p->mip->obj2[i] != 0){
 	 break;
       }
    }
    if (i == p->mip->n){
-      printf("Warning: second objective function is identically zero.\n");
+      printf("Second objective function is identically zero.\n");
+      printf("Switching to standard branch and bound.\n\n");
       return(sym_solve(p));
    }
-#endif
+
+   p->par.multi_criteria = TRUE;
+   memcpy((char *)p->mip->obj1, (char *)p->mip->obj, DSIZE*p->mip->n);
    
    start_time = wall_clock(NULL);
 
    /* Set some parameters */
-   compare_sol_tol = p->par.compare_solution_tolerance;
+   compare_sol_tol = p->par.mc_compare_solution_tolerance;
    p->par.tm_par.granularity = p->par.lp_par.granularity =
-      -MAX(p->par.lp_par.rho, compare_sol_tol);
+      -MAX(p->par.lp_par.mc_rho, compare_sol_tol);
 
-#ifdef BINARY_SEARCH
-   printf("Using binary search with tolerance = %f...\n",
-	  p->par.binary_search_tolerance);
-#endif
-#ifdef LIFO
-   printf("Using LIFO search order...\n");
-#endif
-   if (p->par.lp_par.rho > 0){
-      printf("Using augmented Chebyshev weight %.8f\n", p->par.lp_par.rho);
+   if (p->par.verbosity >= 0){
+      if (p->par.mc_binary_search_tolerance > 0){
+	 binary_search = TRUE;
+	 printf("Using binary search with tolerance = %f...\n",
+		p->par.mc_binary_search_tolerance);
+      }
+      if (p->par.mc_search_order = MC_LIFO){
+	 printf("Using LIFO search order...\n");
+      }else{
+	 printf("Using FIFO search order...\n");
+      }
+      if (p->par.lp_par.mc_rho > 0){
+	 printf("Using augmented Chebyshev weight %.8f\n", p->par.lp_par.mc_rho);
+      }
+      printf("\n");
+      if (p->par.use_permanent_cut_pools){
+	 printf("Saving the global cut pool between iterations...\n");
+	 sym_create_permanent_cut_pools(p);
+      }
    }
-   printf("\n");
 
-#ifdef SAVE_CUT_POOL
-   printf("Saving the global cut pool between iterations...\n");
-   sym_create_permanent_cut_pools(p);
-   p->par.use_permanent_cut_pools = TRUE;
-#endif
-   
    /* First, calculate the utopia point */
-   p->par.lp_par.gamma = 1.0;
-   p->par.lp_par.tau = 0.0;
+   p->par.lp_par.mc_gamma = 1.0;
+   p->par.lp_par.mc_tau = 0.0;
       
    printf("***************************************************\n");
    printf("***************************************************\n");
-   printf("Now solving with gamma = 1.0 tau = 0.0 \n", gamma, tau);  
+   printf("Now solving with gamma = 1.0 tau = 0.0 \n");  
    printf("***************************************************\n");
    printf("***************************************************\n\n");
 
@@ -1130,6 +1132,10 @@ int sym_mc_solve(problem *p)
       return(termcode);
    }
    numprobs++;
+   
+   if (!p->par.lp_par.mc_find_nondominated_solutions){
+      ws = sym_get_warm_start(p, TRUE);
+   }
    
    /* Store the solution */
    length = solutions[numsolutions].length = p->best_sol.xlength;
@@ -1143,19 +1149,30 @@ int sym_mc_solve(problem *p)
    solutions[numsolutions++].obj[1] = p->obj[1];
    utopia[0] = p->obj[0];
       
-   p->par.lp_par.gamma = 0.0;
-   p->par.lp_par.tau = 1.0;
+   p->par.lp_par.mc_gamma = 0.0;
+   p->par.lp_par.mc_tau = 1.0;
       
    printf("***************************************************\n");
    printf("***************************************************\n");
-   printf("Now solving with gamma = 0.0 tau = 1.0 \n", gamma, tau);  
+   printf("Now solving with gamma = 0.0 tau = 1.0 \n");  
    printf("***************************************************\n");
    printf("***************************************************\n\n");
 
-   /* Solve */
-   if (termcode = sym_solve(p) < 0){
-      return(termcode);
-   }
+   /* Resolve */
+   if (!p->par.lp_par.mc_find_nondominated_solutions){
+      sym_set_warm_start(p, ws);
+      for (i = 0; i < p->mip->n; i++){
+	 sym_set_obj_coeff(p, i, p->mip->obj2[i]);
+      }
+      if (termcode = sym_resolve(p) < 0){
+	 sym_delete_warm_start(ws);
+	 return(termcode);
+      }
+   }else{
+      if (termcode = sym_solve(p) < 0){
+	 return(termcode);
+      }
+   }      
    numprobs++;
    
    /* Store the solution */
@@ -1181,10 +1198,10 @@ int sym_mc_solve(problem *p)
    printf("***************************************************\n\n");
    
    /* Add the first pair to the list */
-#ifdef BINARY_SEARCH
-   pairs[first].gamma1 = 1.0;
-   pairs[first].gamma2 = 0.0;
-#endif
+   if (binary_search){
+      pairs[first].gamma1 = 1.0;
+      pairs[first].gamma2 = 0.0;
+   }
    pairs[first].solution1 = 0;
    pairs[first].solution2 = 1;
 
@@ -1197,62 +1214,62 @@ int sym_mc_solve(problem *p)
 	  numsolutions < MAX_NUM_SOLUTIONS &&
 	  numinfeasible < MAX_NUM_INFEASIBLE){
 
-#ifdef LIFO
-      solution1 = pairs[last].solution1;
-      solution2 = pairs[last].solution2;
-      cur_position = last;
-      if (--last < 0){
-	 last = MAX_NUM_PAIRS - 1;
+      if (p->par.mc_search_order == MC_LIFO){
+	 solution1 = pairs[last].solution1;
+	 solution2 = pairs[last].solution2;
+	 cur_position = last;
+	 if (--last < 0){
+	    last = MAX_NUM_PAIRS - 1;
+	 }
+	 numpairs--;
+      }else{
+	 solution1 = pairs[first].solution1;
+	 solution2 = pairs[first].solution2;
+	 cur_position = first;
+	 if (++first > MAX_NUM_PAIRS-1)
+	    first = 0;
+	 numpairs--;
       }
-      numpairs--;
-#else
-      solution1 = pairs[first].solution1;
-      solution2 = pairs[first].solution2;
-      cur_position = first;
-      if (++first > MAX_NUM_PAIRS-1)
-	 first = 0;
-      numpairs--;
-#endif
 
-#ifdef BINARY_SEARCH
-      gamma = (pairs[cur_position].gamma1 + pairs[cur_position].gamma2)/2;
-#elif defined(FIND_NONDOMINATED_SOLUTIONS)
-      gamma = (utopia[1] - solutions[solution1].obj[1])/
-	 (utopia[0] - solutions[solution2].obj[0] +
-	  utopia[1] - solutions[solution1].obj[1]);
-#else
-      slope = (solutions[solution1].obj[1] -
-	       solutions[solution2].obj[1])/
-	      (solutions[solution2].obj[0] -
-	       solutions[solution1].obj[0]);
-      gamma = slope/(1+slope);
-#endif
+      if (binary_search){
+	 gamma = (pairs[cur_position].gamma1 + pairs[cur_position].gamma2)/2;
+      }else if (p->par.lp_par.mc_find_nondominated_solutions){
+	 gamma = (utopia[1] - solutions[solution1].obj[1])/
+	    (utopia[0] - solutions[solution2].obj[0] +
+	     utopia[1] - solutions[solution1].obj[1]);
+      }else{
+	 slope = (solutions[solution1].obj[1] -
+		  solutions[solution2].obj[1])/
+	    (solutions[solution2].obj[0] -
+	     solutions[solution1].obj[0]);
+	 gamma = slope/(1+slope);
+      }
       tau = 1 - gamma;
       
-      p->par.lp_par.gamma = gamma;
-      p->par.lp_par.tau = tau;
+      p->par.lp_par.mc_gamma = gamma;
+      p->par.lp_par.mc_tau = tau;
 
       /* Find upper bound */
 
       p->has_mc_ub = p->has_ub = FALSE;
       p->mc_ub = p->ub = MAXDOUBLE;
-#ifndef BINARY_SEARCH
-      for (i = 0; i < numsolutions; i++){
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-	 ub = MAX(gamma*(solutions[i].obj[0] - utopia[0]),
-		  tau*(solutions[i].obj[1] - utopia[1]));
-#else
-	 ub = gamma*solutions[i].obj[0] + tau*solutions[i].obj[1];
-#endif 
-	 if (ub < p->ub){
-	    p->has_mc_ub = p->has_ub = TRUE;
-	    p->ub = ub - compare_sol_tol;
-	    p->obj[0] = solutions[i].obj[0];
-	    p->obj[1] = solutions[i].obj[1];
-	    p->mc_ub = ub - p->par.lp_par.rho * (p->obj[0] + p->obj[1]);
+      if (!binary_search){
+	 for (i = 0; i < numsolutions; i++){
+	    if (p->par.lp_par.mc_find_nondominated_solutions){
+	       ub = MAX(gamma*(solutions[i].obj[0] - utopia[0]),
+			tau*(solutions[i].obj[1] - utopia[1]));
+	    }else{
+	       ub = gamma*solutions[i].obj[0] + tau*solutions[i].obj[1];
+	    }
+	    if (ub < p->ub){
+	       p->has_mc_ub = p->has_ub = TRUE;
+	       p->ub = ub - compare_sol_tol;
+	       p->obj[0] = solutions[i].obj[0];
+	       p->obj[1] = solutions[i].obj[1];
+	       p->mc_ub = ub - p->par.lp_par.mc_rho * (p->obj[0] + p->obj[1]);
+	    }
 	 }
       }
-#endif
       
       printf("***************************************************\n");
       printf("***************************************************\n");
@@ -1262,61 +1279,72 @@ int sym_mc_solve(problem *p)
       
       p->obj[0] = p->obj[1] = 0.0;
       
-      if (termcode = sym_solve(p) < 0){
-	 return(termcode);
+      if (!p->par.lp_par.mc_find_nondominated_solutions){
+	 sym_set_warm_start(p, ws);
+	 for (i = 0; i < p->mip->n; i++){
+	    sym_set_obj_coeff(p, i, gamma*p->mip->obj1[i] + tau*p->mip->obj2[i]);
+	 }
+	 if (termcode = sym_resolve(p) < 0){
+	    sym_delete_warm_start(ws);
+	    return(termcode);
+	 }
+      }else{
+	 if (termcode = sym_solve(p) < 0){
+	    return(termcode);
+	 }
       }
       numprobs++;
       
-#ifdef BINARY_SEARCH
-      if (p->obj[0] - solutions[solution1].obj[0] <
-	  compare_sol_tol &&
-	  solutions[solution1].obj[1] - p->obj[1] <
-	  compare_sol_tol){
-	 if (pairs[cur_position].gamma1 - gamma >
-	     p->par.binary_search_tolerance){
-	    if (++last > MAX_NUM_PAIRS - 1)
-	       last = 0;
-	    pairs[last].solution1 = solution1;
-	    pairs[last].solution2 = solution2;
-	    pairs[last].gamma1 = gamma;
-	    pairs[last].gamma2 = pairs[cur_position].gamma2;
-	    numpairs++;
+      if (binary_search){
+	 if (p->obj[0] - solutions[solution1].obj[0] <
+	     compare_sol_tol &&
+	     solutions[solution1].obj[1] - p->obj[1] <
+	     compare_sol_tol){
+	    if (pairs[cur_position].gamma1 - gamma >
+		p->par.mc_binary_search_tolerance){
+	       if (++last > MAX_NUM_PAIRS - 1)
+		  last = 0;
+	       pairs[last].solution1 = solution1;
+	       pairs[last].solution2 = solution2;
+	       pairs[last].gamma1 = gamma;
+	       pairs[last].gamma2 = pairs[cur_position].gamma2;
+	       numpairs++;
+	    }
+	    continue;
 	 }
-	 continue;
-      }
-      if (solutions[solution2].obj[0] - p->obj[0] < compare_sol_tol
-	  && p->obj[1] - solutions[solution2].obj[1] <
-	  compare_sol_tol){
-	 if (gamma - pairs[cur_position].gamma2 >
-	     p->par.binary_search_tolerance){
-	    if (++last > MAX_NUM_PAIRS - 1)
-	       last = 0;
-	    pairs[last].solution1 = solution1;
-	    pairs[last].solution2 = solution2;
-	    pairs[last].gamma1 = pairs[cur_position].gamma1;
-	    pairs[last].gamma2 = gamma;
-	    numpairs++;
+	 if (solutions[solution2].obj[0] - p->obj[0] < compare_sol_tol
+	     && p->obj[1] - solutions[solution2].obj[1] <
+	     compare_sol_tol){
+	    if (gamma - pairs[cur_position].gamma2 >
+		p->par.mc_binary_search_tolerance){
+	       if (++last > MAX_NUM_PAIRS - 1)
+		  last = 0;
+	       pairs[last].solution1 = solution1;
+	       pairs[last].solution2 = solution2;
+	       pairs[last].gamma1 = pairs[cur_position].gamma1;
+	       pairs[last].gamma2 = gamma;
+	       numpairs++;
+	    }
+	    continue;
 	 }
-	 continue;
+      }else{
+	 if (p->obj[0] == 0.0 && p->obj[1] == 0.0){
+	    numinfeasible++;
+	    continue;
+	 }else if (p->obj[0] - solutions[solution1].obj[0] <
+		   compare_sol_tol &&
+		   solutions[solution1].obj[1] - p->obj[1] <
+		   compare_sol_tol){
+	    numinfeasible++;
+	    continue;
+	 }else if (solutions[solution2].obj[0] - p->obj[0] <
+		   compare_sol_tol &&
+		   p->obj[1] - solutions[solution2].obj[1] <
+		   compare_sol_tol){
+	    numinfeasible++;
+	    continue;
+	 }
       }
-#else
-      if (p->obj[0] == 0.0 && p->obj[1] == 0.0){
-	 numinfeasible++;
-	 continue;
-      }else if (p->obj[0] - solutions[solution1].obj[0] <
-		compare_sol_tol &&
-		solutions[solution1].obj[1] - p->obj[1] <
-		compare_sol_tol){
-	 numinfeasible++;
-	 continue;
-      }else if (solutions[solution2].obj[0] - p->obj[0] <
-		compare_sol_tol &&
-		p->obj[1] - solutions[solution2].obj[1] <
-		compare_sol_tol){
-	 numinfeasible++;
-	 continue;
-      }
-#endif
       
       /* Insert new solution */
       numinfeasible = 0;
@@ -1330,12 +1358,12 @@ int sym_mc_solve(problem *p)
 	 last += 2;
 	 previous = last - 1;
       }
-#ifdef BINARY_SEARCH
-      pairs[previous].gamma1 = pairs[cur_position].gamma1;
-      pairs[previous].gamma2 = gamma;
-      pairs[last].gamma1 = gamma;
-      pairs[last].gamma2 = pairs[cur_position].gamma2;
-#endif
+      if (binary_search){
+	 pairs[previous].gamma1 = pairs[cur_position].gamma1;
+	 pairs[previous].gamma2 = gamma;
+	 pairs[last].gamma1 = gamma;
+	 pairs[last].gamma2 = pairs[cur_position].gamma2;
+      }
       pairs[previous].solution1 = solution1;
       pairs[previous].solution2 = solution2;
       pairs[last].solution1 = solution2;
@@ -1345,36 +1373,36 @@ int sym_mc_solve(problem *p)
 	 solutions[i] = solutions[i-1];
       }
       numsolutions++;
-#ifndef LIFO
-      if (first < last){
-	 for (i = first; i < last - 1; i++){
-	    if (pairs[i].solution1 >= solution2){
-	       pairs[i].solution1++;
+      if (p->par.mc_search_order == MC_FIFO){
+	 if (first < last){
+	    for (i = first; i < last - 1; i++){
+	       if (pairs[i].solution1 >= solution2){
+		  pairs[i].solution1++;
+	       }
+	       if (pairs[i].solution2 >= solution2){
+		  pairs[i].solution2++;
+	       }
 	    }
-	    if (pairs[i].solution2 >= solution2){
-	       pairs[i].solution2++;
+	 }else{
+	    for (i = first; i < MAX_NUM_PAIRS - (last == 0 ? 1 : 0); i++){
+	       if (pairs[i].solution1 >= solution2){
+		  pairs[i].solution1++;
+	       }
+	       if (pairs[i].solution2 >= solution2){
+		  pairs[i].solution2++;
+	       }
 	    }
-	 }
-      }else{
-	 for (i = first; i < MAX_NUM_PAIRS - (last == 0 ? 1 : 0); i++){
-	    if (pairs[i].solution1 >= solution2){
-	       pairs[i].solution1++;
-	    }
-	    if (pairs[i].solution2 >= solution2){
-	       pairs[i].solution2++;
-	    }
-	 }
-	 for (i = 0; i < last - 1; i++){
-	    if (pairs[i].solution1 >= solution2){
-	       pairs[i].solution1++;
-	    }
-	    if (pairs[i].solution2 >= solution2){
-	       pairs[i].solution2++;
+	    for (i = 0; i < last - 1; i++){
+	       if (pairs[i].solution1 >= solution2){
+		  pairs[i].solution1++;
+	       }
+	       if (pairs[i].solution2 >= solution2){
+		  pairs[i].solution2++;
+	       }
 	    }
 	 }
       }
-	 
-#endif
+
       length = solutions[solution2].length = p->best_sol.xlength;
       indices = solutions[solution2].indices = (int *) calloc(length, ISIZE);
       values = solutions[solution2].values = (double *) calloc(length, DSIZE);
@@ -1402,28 +1430,28 @@ int sym_mc_solve(problem *p)
       printf("Maximum number of solution pairs (%i) reached\n\n",
 	     MAX_NUM_PAIRS);
       printf("\n********************************************************\n");
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-      printf(  "* Found set of non-dominated solutions!!!!!!! *\n");
-#else
-      printf(  "* Found set of supported solutions!!!!!!!     *\n");
-#endif
+      if (p->par.lp_par.mc_find_nondominated_solutions){
+	 printf(  "* Found set of non-dominated solutions!!!!!!! *\n");
+      }else{
+	 printf(  "* Found set of supported solutions!!!!!!!     *\n");
+      }
    }else{
       printf("\n********************************************************\n");
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-      printf(  "* Found complete set of non-dominated solutions!!!!!!! *\n");
-#else
-      printf(  "* Found complete set of supported solutions!!!!!!!     *\n");
-#endif
+      if (p->par.lp_par.mc_find_nondominated_solutions){
+	 printf(  "* Found complete set of non-dominated solutions!!!!!!! *\n");
+      }else{
+	 printf(  "* Found complete set of supported solutions!!!!!!!     *\n");
+      }
    }
    printf(  "* Now displaying stats...                              *\n");
    printf(  "********************************************************\n\n");
 
-#ifdef SAVE_CUT_POOL
-   for (i = 0; i < p->par.tm_par.max_cp_num; i++){
-      p->comp_times.bc_time.cut_pool += p->cp[i]->cut_pool_time;
-      p->warm_start->stat.cuts_in_pool += p->cp[i]->cut_num;
+   if (p->par.use_permanent_cut_pools){
+      for (i = 0; i < p->par.tm_par.max_cp_num; i++){
+	 p->comp_times.bc_time.cut_pool += p->cp[i]->cut_pool_time;
+	 p->warm_start->stat.cuts_in_pool += p->cp[i]->cut_num;
+      }
    }
-#endif
    
    print_statistics(&(p->comp_times.bc_time), &(p->warm_start->stat), 0.0,
 		    0.0, 0, start_time, p->mip->obj_offset,
@@ -1434,27 +1462,27 @@ int sym_mc_solve(problem *p)
    
    printf("***************************************************\n");
    printf("***************************************************\n");
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-   printf("Displaying non-dominated solution values and breakpoints\n");  
-#else
-   printf("Displaying supported solution values and breakpoints\n");  
-#endif
+   if (p->par.lp_par.mc_find_nondominated_solutions){
+      printf("Displaying non-dominated solution values and breakpoints\n");  
+   }else{
+      printf("Displaying supported solution values and breakpoints\n");  
+   }
    printf("***************************************************\n");
    printf("***************************************************\n\n");
 
    gamma0 = 1.0;
    for (i = 0; i < numsolutions - 1; i++){
-#ifdef FIND_NONDOMINATED_SOLUTIONS
-      gamma1 = (utopia[1] - solutions[i].obj[1])/
-	 (utopia[0] - solutions[i+1].obj[0] +
-	  utopia[1] - solutions[i].obj[1]);
-#else
-      slope = (solutions[i].obj[1] -
-	       solutions[i+1].obj[1])/
-	      (solutions[i+1].obj[0] -
-	       solutions[i].obj[0]);
-      gamma1 = slope/(1+slope);
-#endif
+      if (p->par.lp_par.mc_find_nondominated_solutions){
+	 gamma1 = (utopia[1] - solutions[i].obj[1])/
+	    (utopia[0] - solutions[i+1].obj[0] +
+	     utopia[1] - solutions[i].obj[1]);
+      }else{
+	 slope = (solutions[i].obj[1] -
+		  solutions[i+1].obj[1])/
+	    (solutions[i+1].obj[0] -
+	     solutions[i].obj[0]);
+	 gamma1 = slope/(1+slope);
+      }
       printf("First Objective: %.3f Second Objective: %.3f ",
 	     solutions[i].obj[0], solutions[i].obj[1]);
       printf("Range: %.6f - %.6f\n", gamma1, gamma0);
@@ -1468,11 +1496,10 @@ int sym_mc_solve(problem *p)
       FREE(solutions[i].values);
       FREE(solutions[i].indices);
    }
+   sym_delete_warm_start(ws);
    
    return(TM_OPTIMAL_SOLUTION_FOUND);
 }
-
-#endif
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -2162,6 +2189,24 @@ int sym_set_obj_coeff(problem *p, int index, double value)
    
    
    
+   return TRUE;
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_set_obj2_coeff(problem *p, int index, double value)
+{
+
+   int i;
+
+   if (!p->mip){
+      printf("sym_set_obj_coeff():The problem description is empty!\n");
+      return FALSE;
+   }
+   
+   p->mip->obj2[index] = value;
+
    return TRUE;
 }
 

@@ -69,6 +69,7 @@ double *sym_get_row_activity PROTO((problem *p));
 double sym_get_obj_val PROTO((problem *p));
 int sym_get_iteration_count PROTO((problem *p));
 int sym_set_obj_coeff PROTO((problem *p, int index, double value));
+int sym_set_obj2_coeff PROTO((problem *p, int index, double value));
 int sym_set_col_lower PROTO((problem *p, int index, double value));
 int sym_set_col_upper PROTO((problem *p, int index, double value));
 int sym_set_row_lower PROTO((problem *p, int index, double value));
