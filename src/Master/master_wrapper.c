@@ -232,6 +232,22 @@ void initialize_root_node_u(problem *p)
 	 qsortucb_i(base->userind, base->varnum);
       if (root->uind.size && !p->par.warm_start)
 	 qsortucb_i(root->uind.list, root->uind.size);
+      p->mip->n = base->varnum + root->uind.size;
+      p->mip->m = base->cutnum;
+#if 0
+      /* FIXME: We'd like to create the user's problem description here,
+	 but we can't because we don't have access to the user's LP
+	 data structures. Right now, this means that we cannot answer
+	 queries through the OSI interface. */
+      
+      userind = (int *) malloc((base->varnum + root->uind.size) * ISIZE);
+      
+      memcpy((char *)userind, (char *)base->userind, base->varnum * ISIZE);
+      memcpy((char *)(userind + base->varnum), (char *)root->uind.list,
+	     root->uind.size * ISIZE); 
+      
+      user_create_subproblem(p->user, userind, p->mip, &maxn, &maxm, &maxnz);
+#endif
       break;
       
     case USER_DEFAULT: 
@@ -284,6 +300,8 @@ void initialize_root_node_u(problem *p)
    root->nf_status = NF_CHECK_NOTHING;
    root->nf_status = (p->par.tm_par.colgen_strat[0] & COLGEN__FATHOM) ?
                       NF_CHECK_ALL : NF_CHECK_NOTHING;
+
+
    return;
 }
 
