@@ -1420,19 +1420,24 @@ warm_start2 : masterlib $(EXAMPLE_OBJDIR)/warm_start2.o
 ##############################################################################
 
 coin: $(COIN_WHATTOMAKE)
-	(cd $(COINROOT)/Coin && $(MAKE) && cd -)
+	(cd $(COINROOT)/Coin && $(MAKE) CXX=$(CC) LibType=$(LIBTYPE) \
+	OptLevel=$(COIN_OPT) && cd -)
 	(cd $(COINROOT)/Osi/$(LPXDIR) && \
-	$(MAKE) $(LPXINCDIR)=$(LPSINCDIR) && cd -)
+	$(MAKE) CXX=$(CC) LibType=$(LIBTYPE) OptLevel=$(COIN_OPT) \
+	$(LPXINCDIR)=$(LPSINCDIR) && cd -)
 
 coin_clp:
-	(cd $(COINROOT)/Clp && $(MAKE) && cd -)
+	(cd $(COINROOT)/Clp && $(MAKE) CXX=$(CC) LibType=$(LIBTYPE) \
+	OptLevel=$(COIN_OPT) && cd -)
 
 cgl:
-	(cd $(COINROOT)/Cgl && $(MAKE) && cd -)
+	(cd $(COINROOT)/Cgl && $(MAKE) CXX=$(CC) LibType=$(LIBTYPE) \
+	OptLevel=$(COIN_OPT) && cd -)
 
 osisym:
 	(cd $(COINROOT)/Osi/OsiSym && \
-	$(MAKE) SymIncDir=$(SYMPHONYROOT)/include && cd -)
+	$(MAKE) CXX=$(CC) LibType=$(LIBTYPE) OptLevel=$(COIN_OPT) \
+	SymIncDir=$(SYMPHONYROOT)/include && cd -)
 
 ###############################################################################
 ##############################################################################
