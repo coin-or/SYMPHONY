@@ -380,8 +380,9 @@
 
 #define IP_INFEASIBLE               0
 #define IP_FEASIBLE                 1
-#define IP_ALMOST_FEASIBLE          2
-#define IP_FEASIBILITY_NOT_KNOWN    3
+#define IP_FEASIBLE_BUT_CONTINUE    2
+#define IP_ALMOST_FEASIBLE          3
+#define IP_FEASIBILITY_NOT_KNOWN    4
 
 /*------------------------- display_solution --------------------------------*/
 #define DISP_NOTHING             0

@@ -504,7 +504,7 @@ int is_feasible_u(lp_prob *p)
 #endif
    int user_res;
    int feasible;
-   double new_ub, true_objval = 0;
+   double new_ub, true_objval = p->lp_data->objval;
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
    int *indices;
@@ -559,7 +559,7 @@ int is_feasible_u(lp_prob *p)
       break;
    }
 
-   if (feasible == IP_FEASIBLE){
+   if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE){
       /* Send the solution value to the treemanager */
       new_ub = true_objval > 0 ? true_objval : lp_data->objval;
       if (!p->has_ub || new_ub < p->ub){
@@ -612,13 +612,13 @@ int is_feasible_u(lp_prob *p)
 					 + p->mip->obj_offset));
 	 }
       }else{
-	 PRINT(p->par.verbosity, -1,
+	 PRINT(p->par.verbosity, 0,
 	       ("\n* Found Another Feasible Solution.\n"));
 	 if (p->mip->obj_sense == MAXIMIZE){
-	    PRINT(p->par.verbosity, -1, ("* Cost: %f\n\n", -new_ub
+	    PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -new_ub
 					 + p->mip->obj_offset));
 	 }else{
-	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", new_ub
+	    PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", new_ub
 					 + p->mip->obj_offset));
 	 }
       }
@@ -1660,7 +1660,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	 find_cuts_u(p->cgp, p->lp_data, &cg_new_row_num);
 #endif
 
-      if (cg_new_row_num){
+      if (p->cgp->cuts_to_add_num){
 	 unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
 		       p->cgp->cuts_to_add_num, p->cgp->cuts_to_add,
 		       &cg_new_row_num, &cg_new_rows);

@@ -149,10 +149,16 @@ int cg_send_cut(cut_data *new_cut)
    cut_data *tmp_cut;
 
    for (i = 0; i < p->cuts_to_add_num; i++){
-      if (new_cut->size != p->cuts_to_add[i]->size){
+      if (new_cut->type != p->cuts_to_add[i]->type ||
+	  new_cut->size != p->cuts_to_add[i]->size ||
+	  new_cut->rhs != p->cuts_to_add[i]->rhs){
 	 continue;
       }
-      if (memcmp(new_cut->coef, p->cuts_to_add[i]->coef, new_cut->size) == 0){
+      if (!new_cut->coef){
+	 return(0);
+      }
+      if (memcmp(new_cut->coef, p->cuts_to_add[i]->coef,
+		 new_cut->size) == 0){
 	 return(0);
       }
    }
