@@ -30,7 +30,7 @@
 #endif*/
 
 #if !defined(HAS_SRANDOM)
-//extern int srandom PROTO((unsigned seed));
+extern int srandom PROTO((unsigned seed));
 #endif
 #if !defined(HAS_RANDOM)
 extern long random PROTO((void));
