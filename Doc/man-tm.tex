@@ -20,13 +20,17 @@ void user_usage()
 
 \describe
 
-The user can use any capitol letter (except 'H') for command line
-switches to control user-defined parameter settings without the use of
-a parameter file. The function {\tt user\_usage()} can optionally
-print out usage information for the user-defined command line
-switches. The command line switch {\tt -H} automatically calls the
-user's usage subroutine. The switch {\tt -h} prints
-\BB's own usage information.
+SYMPHONY's command-line switches are all lower case letters. The user can use
+any upper case letter (except 'H' and as specified below) for command line
+switches to control user-defined parameter settings without the use of a
+parameter file. The function {\tt user\_usage()} can optionally print out
+usage information for the user-defined command line switches. The command line
+switch {\tt -H} automatically calls the user's usage subroutine. The switch
+{\tt -h} prints \BB's own usage information. In its default configuration, the
+command-line switch ``-F'' is used to specify the file in which the instance
+data in constained (either an MPS file or an AMPL file). The ``-M'' switch
+indicates the file is an MPS file, while the ``-A'' switch indicates an AMPL
+file. 
 
 \ed
 
@@ -104,6 +108,7 @@ also free {\tt *user} itself. This can be done using the built-in macro
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_readparams}
+\label{user_readparams}
 \begin{verbatim}
 int user_readparams(void *user, char *filename, int argc, char **argv)
 \end{verbatim}
@@ -112,18 +117,25 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
 \describe
 
-The user reads in parameters from the file named {\tt filename}. The
-file {\tt filename} is a file containing both built-in parameters and
-user parameters. The filename is given as a command line argument when
-starting the application and is then passed to the user. The user must
-open the file for reading, scan the file for lines that contain user
-parameters and then read the parameters in as appropriate. See the
-file {\tt Master/master\_io.c} to see how \BB\ does this.
+The user can optionally read in parameter settings from the file named 
+\texttt{filename}, specified on the command ine using the ``-f'' switch. The 
+parameter file \texttt{filename} can contain both SYMPHONY's built-in
+parameters and user-defined parameters. If desired, the user must open the
+file for reading, scan the file for lines that contain user parameter settings
+and then read the parameters in as appropriate. A shell for doing this is set
+up in the file \texttt{user\_master.c}. Also, see the file
+\texttt{Master/master\_io.c} to see how \BB\ does this. 
 
-Optionally, the user can also parse the command line arguments. All
-capital letters are reserved for user-defined command line switches.
-The switch {\tt -H} is reserved for help and calls the user's usage
-subroutine (see {\tt user\_send\_lp\_data()}).
+Optionally, the user can also parse the command line arguments for user
+settings. A shell for doing this is set up in the file
+\texttt{user\_master.c}. All upper case letters are reserved for user-defined
+command line switches.  The switch {\tt -H} is reserved for help and calls the
+user's usage subroutine (see \hyperref{\texttt{user_usage}}
+{\texttt{user\_usage()} in Section }{}{user_usage}). If the user returns
+`\texttt{DEFAULT}, then \BB\ will look for the command-line switch ``-F'' to
+specify the file name for reading the instance data. The ``-M'' switch will be
+used to indicates the file is an MPS file and the ``-A'' switch will be used
+to indicate the file is an AMPL file.
 
 \args
 
@@ -137,6 +149,8 @@ subroutine (see {\tt user\_send\_lp\_data()}).
 \bt{lp{300pt}}
 {\tt ERROR} & Error. \BB\ stops. \\
 {\tt USER\_NO\_PP} & User parameters were read successfully. \\
+{\tt DEFAULT} & User parameters will be obtained from either an MPS file or an
+AMPL file. \\
 \et
 
 \ed
@@ -148,6 +162,7 @@ subroutine (see {\tt user\_send\_lp\_data()}).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_io}
+\label{user_io}
 \begin{verbatim}
 int user_io(void *user)
 \end{verbatim}
@@ -156,8 +171,12 @@ int user_io(void *user)
 
 \describe
 
-The user prepares all information needed to specify the problem
-instance (e.g., reads in data from a data file, etc.).
+Here, the user can read in and prepare data needed to specify the problem
+instance. If the user wants to use the default parsers to read either an MPS
+file or an AMPL file, then the return value \texttt{DEFAULT} should be
+specified (see \hyperref{\texttt{user_readparams}}
+{\texttt{user\_readparams()} in Section }{}{user_readparams} for the
+command-line switches to use to specify this behavior).
 
 \args
 
@@ -170,6 +189,7 @@ instance (e.g., reads in data from a data file, etc.).
 \bt{lp{300pt}}
 {\tt ERROR} & Error. \BB\ stops. \\
 {\tt USER\_NO\_PP} & User I/O was completed successfully. \\
+{\tt DEFAULT} & Input will be read in from an MPS or AMPL file.
 \et
 
 \ed
@@ -258,36 +278,59 @@ strategy is used (see the treemanager parameter
 
 \vspace{1ex}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% user_set_base
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\functiondef{user\_set\_base}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_initialize_root_node
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\functiondef{user\_initialize\_root\_node}
 \begin{verbatim}
-int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
-                  double **ub, int *basecutnum, int *colgen_strat)
+int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
+                              int *basecutnum, int *extravarnum, 
+			      int **extravars, char ***colnames, 
+			      int *colgen_strat)
 \end{verbatim}
 
 \bd
 
 \describe
 
-The user must specify the set of base variables and the number of base
-constraints. The base constraints themselves need not be specified
-since they are never stored explicitly.
+The user must specify the list of indices for sets of base and extra
+variables. The option to specify a variable as base is provided simply for
+efficiency reasons. If there is no reasonable way to come up with a set of
+base variables, then all variables should be specified as extra (see Section
+\ref{variables} for a discussio of base and extra variables). If the user
+sets \texttt{extravarnum}, but does not allocate the \texttt{extravars} array,
+then SYMPHONY will put all variables indexed from 0 to \texttt{extravarnum} in
+the set of extra variables.
+
+If an MPS or AMPL file was read in using SYMPHONY's built-in parser, i.e., the
+default behavior of
+\hyperref{\texttt{user\_io}}{\texttt{user\_io()}}{}{user_io} 
+was not modified, the return value \texttt{DEFAULT} will automatically put all
+variables in the extra set. Otherwise, if the user sets \texttt{extravarnum}
+and \texttt{basevarnum} and returns \texttt{DEFAULT}, then SYMPHONY will put
+all variables indexed from 0 to \texttt{extravarnum} in the set of extra
+variables.
+
+In this functions, the user may also specify column names for display
+putposes. If the \texttt{colnames} array is allocated, then SYMPHONY will
+use for displaying solutions. If the data was read in from either an MPS or
+AMPL file, then the column names will be set automatically. 
 
 \args
 
-\bt{llp{245pt}}
+\bt{llp{265pt}}
 {\tt void *user} & IN & Pointer to the user-defined data structure. \\
-{\tt int *varnum} & OUT & Pointer to the number of base variables. \\
-{\tt int **userind} & OUT & Pointer to an array containing the user
-indices of the base variables. \\
-{\tt int **lb} & OUT & Pointer to an array containing the lower bounds for
-the base variables. \\
-{\tt int **ub} & OUT & Pointer to an array containing the upper bounds for
-the base variables. \\
-{\tt int *cutnum} & OUT & The number of base constraints. \\
+{\tt int *basevarnum} & OUT & Pointer to the number of base variables. \\
+{\tt int **basevars} & OUT & Pointer to an array containing a list of
+user indices of the base variables to be active in the root. \\
+{\tt int *basecutnum} & OUT & The number of base constraints. \\
+{\tt int *extravarnum} & OUT & Pointer to the number of extra active
+variables in the root. \\
+{\tt int **extravars} & OUT & Pointer to an array containing a list of
+user indices of the extra variables to be active in the root. \\
+{\tt int ***colnames} & OUT & Pointer to an array containing a list of
+column names to be used for display purposes. \\
 {\tt int *colgen\_strat} & INOUT & The default strategy or one that has
 been read in from the parameter file is passed in, but the user is free
 to change it. See {\tt colgen\_strat} in the description of
@@ -301,54 +344,14 @@ parameters for details on how to set it.
 {\tt USER\_NO\_PP} & The required data are filled in, but no
 post-processing done. \\
 {\tt USER\_AND\_PP} & All required post-processing done. \\
+{\tt DEFAULT} & An MPS or AMPL file was read and all the variables should be
+put in the extra set.
 \et
 
 \postp
 
-The array of user indices is sorted if the user has not already done so.
-
-\ed
-
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% user_create_root
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{user\_create\_root}
-\begin{verbatim}
-int user_create_root(void *user, int *extravarnum, int **extravars)
-\end{verbatim}
-
-\bd
-
-\describe
-
-The user must specify which extra variables are to be active in the root
-node in addition to the base variables.
-
-\args
-
-\bt{llp{265pt}}
-{\tt void *user} & IN & Pointer to the user-defined data structure. \\
-{\tt int *extravarnum} & OUT & Pointer to the number of extra active
-variables in the root. \\
-{\tt int *extravars} & OUT & Pointer to an array containing a list of
-user indices of the extra variables to be active in the root. \\
-\et
-
-\returns
-
-\bt{lp{300pt}}
-{\tt ERROR} & Error. \BB\ stops. \\
-{\tt USER\_NO\_PP} & All required data  filled out, but no
-post-processing done. \\
-{\tt USER\_AND\_PP} & All required post-processing done. \\
-\et
-
-\postp
-
-The array of extra indices is sorted if the user has not already done so.
+The array of base and extra indices are sorted if the user has not already
+done so.
 
 \ed
 
@@ -422,24 +425,22 @@ int user_send_lp_data(void *user, void **user_lp)
 
 \describe
 
-The user has to send all problem-specific data that will be needed in
-the LP process to set up the initial LP relaxation and perform later
-computations. This could include instance data, as well as user
-parameter settings. This is one of the few places where the user will
-need to worry about the configuration of the modules. If either the
-tree manager or the LP are running as a separate process (either {\tt
-COMPILE\_IN\_LP} or {\tt COMPILE\_IN\_TM} are {\tt FALSE} in the {\tt
-make} file), then the data will be sent and received through
-message-passing. See \hyperref{{\tt user\_receive\_lp\_data()}}
-{{\tt user\_receive\_lp\_data()} in Section }{}{user_receive_lp_data} for more
-discussion. Otherwise, it can be copied over directly to the
-user-defined data structure for the LP. In the latter case, {\tt
-*user\_lp} is a pointer to the user-defined data structure for the LP
-that must be allocated and initialized. For a discussion of
-message-passing in \BB, see Section \ref{communication}. The code
-for the two cases is put in the same source file by use of {\tt
-\#ifdef} statements. See the comments in the code stub for this
-function for more details.
+If the user wishes to employ parallelism, he has to send all problem-specific
+data that will be needed by the LP process in order to set up the initial LP
+relaxation and perform later computations. This could include instance data,
+as well as user parameter settings (see Section \ref{communication} for a
+discussion of this). This is one of the few places where the user may need to
+worry about the configuration of the modules. If either the tree manager or
+the LP are running as a separate process (either {\tt COMPILE\_IN\_LP} or {\tt
+COMPILE\_IN\_TM} are {\tt FALSE} in the {\tt make} file), then the data will
+be sent and received through message-passing. See \hyperref{{\tt
+user_receive_lp_data}} {{\tt user\_receive\_lp\_data()} in Section
+}{}{user_receive_lp_data} for more discussion. Otherwise, it can be copied
+through shared memory. The easiest solution, which is set up by default is to
+cimply copy over a pointer to a single user data structure where instance data
+is stored. The code for the two cases is put in the same source file by use of
+{\tt \#ifdef} statements. See the comments in the code stub for this function
+for more details.
 
 \args
 
@@ -474,23 +475,21 @@ int user_pack_cg_data(void *user, void **user_cg)
 
 \describe
 
-The user has to send all problem-specific data that will be needed by
-the cut generator for separation. This is one of the few places where
-the user will need to worry about the configuration of the modules. If
-either the tree manager, the LP, or the cut generator are running as a
-separate process (either {\tt COMPILE\_IN\_LP}, {\tt COMPILE\_IN\_TM},
-or {\tt COMPILE\_IN\_CG} are {\tt FALSE} in the make file), then
-the data will be sent and received through message-passing. See 
-\hyperref{{\tt user\_receive\_cg\_data()}}
-{{\tt user\_receive\_cg\_data} in Section }{}{user_receive_cg_data} 
-for more discussion. Otherwise, it can be
-copied over directly to the user-defined data structure for the CG. In
-the latter case, {\tt *user\_cg} is a pointer to the user-defined data
-structure for the CG that must be allocated and initialized. For a
-discussion of message-passing in \BB, see Section
-\ref{communication}. The code for the two cases is put in the same
-source file by use of {\tt \#ifdef} statements. See the comments in
-the code stub for this function for more details.
+If the user wishes to employ parallelism, he has to send all problem-specific
+data that will be needed by the cut generator process to perform separation.
+This could include instance data, as well as user parameter settings (see
+Section \ref{communication} for a discussion of this). This is one of the few
+places where the user may need to worry about the configuration of the
+modules. If either the tree manager or the LP are running as a separate
+process (either {\tt COMPILE\_IN\_LP} or {\tt COMPILE\_IN\_TM} are {\tt FALSE}
+in the {\tt make} file), then the data will be sent and received through
+message-passing. See \hyperref{{\tt user_receive_cg_data}} {{\tt
+user\_receive\_cg\_data()} in Section }{}{user_receive_cg_data} for more
+discussion. Otherwise, it can be copied through shared memory. The easiest
+solution, which is set up by default is to cimply copy over a pointer to a
+single user data structure where instance data is stored. The code for the two
+cases is put in the same source file by use of {\tt \#ifdef} statements. See
+the comments in the code stub for this function for more details.
 
 \args
 
@@ -525,23 +524,21 @@ int user_pack_cp_data(void *user, void **user_cp)
 
 \describe
 
-The user has to send all problem-specific data that will be needed by
-the cut pool in order to store and check cuts. This is one of the few
-places where the user will need to worry about the configuration of
-the modules. If either the tree manager, the LP, or the cut pool are
-running as a separate process(either {\tt COMPILE\_IN\_LP}, {\tt
-COMPILE\_IN\_TM}, or {\tt COMPILE\_IN\_CP} are {\tt FALSE} in the {\tt
-make} file), then the data will be sent and received through
-message-passing. See \hyperref{{\tt user\_receive\_cp\_data()}} {{\tt
+If the user wishes to employ parallelism, he has to send all problem-specific
+data that will be needed by the cut pool process.
+This could include instance data, as well as user parameter settings (see
+Section \ref{communication} for a discussion of this). This is one of the few
+places where the user may need to worry about the configuration of the
+modules. If either the tree manager or the LP are running as a separate
+process (either {\tt COMPILE\_IN\_LP} or {\tt COMPILE\_IN\_TM} are {\tt FALSE}
+in the {\tt make} file), then the data will be sent and received through
+message-passing. See \hyperref{{\tt user_receive_cp_data}} {{\tt
 user\_receive\_cp\_data()} in Section }{}{user_receive_cp_data} for more
-discussion. Otherwise, it can be copied over directly to the
-user-defined data structure for the CP. In the latter case, {\tt
-*user\_cp} is a pointer to the user-defined data structure for the CP
-that must be allocated and initialized. For a discussion of message
-passing in \BB, see Section \ref{communication}. The code for the two
-cases is put in the same source file by use of {\tt \#ifdef}
-statements. See the comments in the code stub for this function for
-more details.
+discussion. Otherwise, it can be copied through shared memory. The easiest
+solution, which is set up by default is to cimply copy over a pointer to a
+single user data structure where instance data is stored. The code for the two
+cases is put in the same source file by use of {\tt \#ifdef} statements. See
+the comments in the code stub for this function for more details.
 
 \args
 
@@ -580,11 +577,10 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 This function is invoked when a best solution found so far is to be displayed
 (after heuristics, after the end of the first phase, or the end of the whole
 algorithm). This can be done using either a text-based format or using the
-{\tt drawgraph} process. By default, SYMPHONY displays the indices and values
-for each nonzero variable in the solution. The user may wish to display a
-custom version of the solution by interpreting the variables. For instance,
-the user could keep an array of names for each variable and then display the
-name instead of the index.
+{\tt drawgraph} process. By default, SYMPHONY displays the indices (or column
+names, if specified) and values for each nonzero variable in the solution. The
+user may wish to display a custom version of the solution by interpreting the
+variables. 
 
 \args
 
@@ -593,10 +589,11 @@ name instead of the index.
 sequential computation, a pointer to the user's LP data structure is passed
 in. For parallel computation, a pointer to the user's Master data structure is
 passed in. \\
-{\tt int length} & IN & Number of nonzeros in best solution (stored internally 
-by SYMPHONY). \\
-{\tt int *xind} & IN & Indices of variables with nonzero values. \\
-{\tt double *xval} & IN & Corresponding values of nonzero variables. \\
+{\tt double lpetol} & IN & The LP zero tolerance used.\\
+{\tt int varnum} & IN & The number of nonzeros in the solution. \\
+{\tt int *indices} & IN & The indices of the nonzeros. \\
+{\tt double *values} & IN & The values of the nonzeros. \\
+{\tt double objval} &  IN & The objective function value of the solution. \\
 \et
 
 \returns

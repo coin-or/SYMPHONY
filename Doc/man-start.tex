@@ -1,28 +1,31 @@
-BB\ (Single- or Multi-Process Optimization over Networks) Version 3.0.2
-is a powerful environment for implementing branch, cut, and price
-algorithms. The subroutines in the \BB\ library comprise a
-state-of-the-art solver which is designed to be completely modular and
-easy to port to various problem settings. All library subroutines are
-generic---their implementation does not depend on the the
-problem-setting. To develop a full-scale, parallel branch and cut
-algorithm, the user has only to specify a few problem-specific
-functions such as preprocessing and separation. The vast majority of
-the computation takes place within a ``black box,'' of which the user
-need have no knowledge. \BB\ communicates with the user's routines
-through well-defined interfaces and performs all the normal functions
-of branch and cut---tree management, LP solution, cut pool management,
-as well as inter-process or inter-thread communication. Although there
-are default options, the user can also assert control over the
-behavior of \BB\ through a myriad of parameters and optional
-subroutines. \BB\ can be built in a variety of configurations, ranging
-from fully parallel to completely sequential, depending on the user's
-needs. The library runs serially on almost any platform, and can also
-run in parallel in either a fully distributed environment (network of
-workstations) or shared-memory environment simply by changing a few
-options in the makefile. To run in a distributed environment, the
-user must have installed {\em \htmladdnormallink{Parallel Virtual
-Machine}{http://www.ccs.ornl.gov/pvm/}} (PVM) software, available for
-free from Oak Ridge National Laboratories
+BB\ (Single- or Multi-Process Optimization over Networks) Version 4.0 is a
+powerful environment for implementing custom branch, cut, and price
+algorithms. The subroutines in the \BB\ library comprise a state-of-the-art
+MIP solver designed to be modular and easy to customize for various problem
+settings. All internal library subroutines are generic---their implementation
+does not depend on the the problem-setting. As of Version 4.0, SYMPHONY works
+out of the box as a generic MIP solver, with the capability to read both MPS
+files and AMPL files and solve the described mixed integer programs. To
+customize SYMPHONY, various user subroutines can be written and parameters
+set that modify the default behavior of the algorithm. The API for these
+subroutines is described in this manual and files containing function stubs
+are provided. As an example, by modifying the default I/O subroutine, one can
+easily modify the solver so that it reads in problem instances in a custom
+format (such as the TSPLIB format for specifying traveling salesman problem
+instances).
+
+The vast majority of the computation takes place within a ``black box,'' of
+which the user need have no knowledge. \BB\ performs all the normal functions
+of branch and cut---tree management, LP solution, cut pool management, as well
+as inter-process or inter-thread communication. \BB\ can be built in a variety
+of configurations, ranging from fully parallel to completely sequential,
+depending on the user's needs. The library runs serially on almost any
+platform, and can also run in parallel in either a fully distributed
+environment (network of workstations) or shared-memory environment simply by
+changing a few options in the makefile. To run in a distributed environment,
+the user must have installed {\em
+\htmladdnormallink{Parallel Virtual Machine}{http://www.ccs.ornl.gov/pvm/}}
+(PVM) software, available for free from Oak Ridge National Laboratories
 \begin{latexonly}
 at {\tt http://www.ccs.ornl.gov/pvm/} 
 \end{latexonly}. 
@@ -33,89 +36,168 @@ OpenMP compliant compiler. A cross-platform compiler called {\em
 \begin{latexonly}
 at {\tt http://pdplab.trc.rwcp.or.jp/Omni}.
 \end{latexonly}.
+
+New in Version 4.0 is the extensive use of the
+\emph{\htmladdnormallink{COIN}{http://www.coin-or.org}}
+optimization libraries 
+\begin{latexonly} 
+COIN optimization libraries,
+available from \texttt{http://www.coin-or.org} 
+\end{latexonly}.
+SYMPHONY now uses COIN's OSI to interface with most commonly available LP
+solvers. Generic cuts are now generated using COIN's Cut Generator Library
+(CGL) and the COIN LP Solver (CLP) can be used through the OSI to solve the LP
+relaxations. The COIN MPS reader is used to read in MIP instances in MPS
+format. For a summary of what else is new, see Section \ref{whats-new}.
+
 This section of the manual is concerned with the detailed
 specifications needed to develop an application using \BB. It is
 assumed that the user has already read the first part of the manual, which
 provides a high-level introduction to parallel branch, cut, and price
 and the overall design and use of \BB. 
 
+\subsection{What's New in SYMPHONY 4.0}
+\label{whats-new}
+
+SYMPHONY 4.0 contains many enhancements and new features. Among them are:
+
+\begin{itemize}
+
+\item SYMPHONY now works out of the box as a full-featured, parallel MIP solver,
+with a wide variety of options for developing custom solvers.
+
+\item SYMPHONY now makes full use of the libraries available from 
+\emph{\htmladdnormallink{COIN}{http://www.coin-or.org}}
+\begin{latexonly} 
+COIN
+\end{latexonly}.
+for cut generation, file I/O, and solver interface.
+
+\begin{itemize}
+
+    \item SYMPHONY is now capable of reading both MPS files (through the COIN MPS
+reader) and basic AMPL files (using the parser available from GLPK).
+
+    \item SYMPHONY now uses the COIN Open Solver Interface (OSI), allowing it to
+be used with almost any commonly available LP solver, including a number of
+open source solvers. This makes SYMPHONY an end-to-end open source solution.
+
+    \item SYMPHONY can now use COIN's Cut Generator Library (CGL) to generate
+generic cutting planes.
+
+\end{itemize}
+
+\item The API has been simplified SIGNIFICANTLY, with more default options,
+helper functions, and more automation of basic functions. The parallelism is
+now more hidden, especially for sequential users.
+
+\item Automated support for user cuts generated and stored as explicit matrix
+rows. 
+
+\item Improvements have been made to the mechanism for accessing and displaying
+solutions.
+
+\item There is now built-in support for column names.
+
+\item More sample codes are now available, including solvers for vehicle routing,
+set partitioning (basic and advanced versions), bipartite matching, and the
+mixed postman problem.
+
+\item Improvements to the makefile now allow the user to make the code from the 
+User directory instead of the SYMPHONY directory. Also, executables can have
+custom names and are built in different directories for different LP solvers
+so the object files don't have to be cleaned to switch LP solvers.
+
+\item There is now a white paper available that illustrates the use of SYMPHONY
+to build a simple matching solver.
+
+\end{itemize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Compiling the Sample Application with Unix Operating Systems}
-\label{getting_strated_unix}
+\label{getting_started_unix}
 
-Here is a sketch outline of how to get started with \BB\ in Unix. This is
+Here is a sketch outline of how to get started with SYMPHONY in Unix. This is
 basically the same information contained in the README file that comes with
-the distribution and will lead you through the steps required to compile the
-sample application, a VRP and TSP solver. Because SYMPHONY is intended to run
-over nonhomogeneous networks of workstations, installation is not fully
-automated, but requires the user to make minor edits to the Makefile.  With
-this setup, compilation for multiple architectures and configurations can be
-performed in a single directory without reconfiguring or "cleaning". This is
-convenient on nonhomogeneous networks, but it means that you might need to
-edit the Makefile to get SYMPHONY to compile. For the casual user, this
-editing is limited to providing some path names.
-
-For more information about how to use the SYMPHONY VRP/TSP solver after
-compilation, see the file SYMPHONY-3.0.2/Vrp/README.
+the distribution and will lead you through the steps required to compile
+SYMPHONY as a generic MIP solver that can then be customized by filling out
+the functions provided in the user interface files. Because SYMPHONY is
+intended to run over nonhomogeneous networks of workstations, installation is
+not fully automated, but requires the user to make minor edits to the
+Makefile.  With this setup, compilation for multiple architectures and
+configurations can be performed in a single directory without reconfiguring or
+"cleaning". This is convenient on nonhomogeneous networks, but it means that
+you might need to edit the Makefiles to get SYMPHONY to compile. For the casual
+user, this editing is limited to providing some path names.
 
 \subsubsection{Preparing for Sample Compilation.}
 
 \begin{itemize}
 
-        \item Download the file {\tt SYMPHONY-3.0.2.tgz}.
+        \item Download the file {\tt SYMPHONY-4.0.tgz}.
 
         \item Unpack the distribution with ``{\tt tar -xzf
-        SYMPHONY-3.0.2.tgz}''. This will create a subdirectory called
-        {\tt SYMPHONY-3.0.2/} containing the distribution.
+        SYMPHONY-4.0.tgz}''. This will create a subdirectory called
+        {\tt SYMPHONY-4.0/} containing the distribution.
         
-        \item Edit the makefile ({\tt SYMPHONY-3.0.2/Makefile}) to reflect your
-	environment. Only minor edits should be required. An explanation of
-	what has to be set is contained in the comments in the makefile.
+        \item Edit the makefile ({\tt SYMPHONY-4.0/Makefile}) to reflect your
+              environment. This involves specifying the LP solver to be used
+              and the paths to various libraries and include files. Only minor
+              edits should be required. An explanation of what has to be set
+              is contained in the comments in the Makefile. 
+
+        \item To use many of the new capabilities of SYMPHONY, you must have
+	      installed the
+	      \emph{\htmladdnormallink{COIN}{http://www.ccs.ornl.gov/pvm/}}
+	      optimization libraries 
+	      \begin{latexonly} 
+	      COIN optimization libraries, available from 
+	      \texttt{http://www.coin-or.org}
+	      \end{latexonly}. 
+	      Specifically, you should install OSI, CGL, and
+	      the Coin utilities (in the COIN/Coin directory). If you want to
+	      use the COIN LP solver, you should also download CLP. These can
+	      be downloaded from www.coin-or.org. The path to the COIN
+	      libraries must be specified in \texttt{SYMPHONY-4.0/Makefile}.
+
+        \item If you wish to read AMPL files, you will have to install the Gnu
+	      Linear Programming Kit (GLPK), which contains a parser for AMPL
+	      files. The path to the GLPK libraries must be specified in
+	      \texttt{SYMPHONY-4.0/Makefile}.
 
 \end{itemize}
         
 \subsubsection{Compiling the Sequential Version.}
 
 \begin{itemize}
-        \item Type ``{\tt make}'' in the {\tt SYMPHONY-3.0.2/} directory. This will
-first make the \BB\ library (sequential version). After making the \BB\
-library, make will compile the user code and link the executable for the
-sample application, a vehicle routing and traveling salesman problem
-solver. The name of the executable will be 
-\begin{center}
-{\tt SYMPHONY-3.0.2/Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp}, 
-\end{center}
-indicating that all
-modules are contained in a single executable. The makefile must be modified to
-enable parallel execution of the code.
+        \item Change to the \texttt{SYMPHONY-4.0/USER} directory and type
+``\texttt{ make}''. This will first make the
+\BB\ library (sequential version). After making the \BB\ library, make will
+compile the user customization library and link the executable. The name of
+the executable is specified in the file \texttt{SYMPHONY-4.0/USER/Makefile}
+and is ``\texttt{mip}'' by default. The executable is installed in the directory
+\texttt{SYMPHONY-4.0/USER/bin.\$(ARCH)/\$(LP\_SOLVER)}, where \texttt{ARCH} is 
+the current architecture and \texttt{LP\_SOLVER} is the current LP solver, as 
+specified in the makefile. The makefile must be modified to enable parallel 
+execution of the code (see below).
 
-\item After the code is compiled, you are free to type ``{\tt make
-        clean}'' if you want to save disk space. You
-        should only have to remake the library if you change something
-        in \BB's internal files.
+\item After the SYMPHONY library is compiled, you are free to type ``{\tt make
+        clean}'' if you want to save disk space. You should only have to
+        remake the library if you change something in \BB's internal files. To
+        clean the user files, type ``{\tt make
+        clean\_user}''.
 
-\item To test the sample program, a sample data file is included with the
-distribution. Type 
-\begin{center}
-{\tt Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp -F sample.vrp
--N 5 -u 522} 
-\end{center}
-in the {\tt SYMPHONY-3.0.2/} directory. The -N argument gives the number
-of routes, which must be specified in advance. The -u argument supplies an
-initial upper bound which is used until a better feasible solution is
-found. TSP instances can also be solved by adding the option -T TSP. In the
-case of the TSP, the number of routes does not need to be specified. You can
-get additional problem data files from from \htmladdnormallink{\tt
-http://branchandcut.org/VRP/data/}{http://branchandcut.org/VRP/data/} or the
-\\ 
-\htmladdnormallink{TSPLIB}
-{http://www.iwr.uni-heidelberg.de/iwr/comopt/software/TSPLIB95/}
-\begin{latexonly}
-        (http://www.iwr.uni-heidelberg.de/iwr/comopt/software/TSPLIB95/)
-\end{latexonly}. \\
-The file
-format is described on the TSPLIB Web site.
+\item To test SYMPHONY, a sample MPS file called \texttt{test.mps} is included 
+with the distribution. To specify the file name, use the "-F" command-line
+option, i.e., type ``\texttt{bin.$(ARCH)/$(LP\_SOLVER)/mip -F test.mps} in the
+\texttt{SYMPHONY-4.0/USER} directory. To obtain more MPS data files for further
+testing, download the MIPLIB library.
+
+\item That's it! Now you are ready to develop your own application by modifying
+the files in the \texttt{SYMPHONY-4.0/USER} directory and it's
+subdirectories. See the user manual for help.
+
 \end{itemize}
 
 \subsubsection{Compiling the Shared Memory Version.}
@@ -136,27 +218,20 @@ format is described on the TSPLIB Web site.
         \item Follow the instructions above for configuring the makefile. Set
 the variable {\tt CC} to the compiler name in the makefile and compile as
 above. Note that if you have previously compiled the sequential version, then
-you should first type {\tt make clean\_all}, as this version uses the same
+you should first type ``{\tt make clean\_all}'', as this version uses the same
 directories.  With one thread allowed, it should run exactly the same as the
 sequential version so there is no need to compile both versions.
 
         \item Voila, you have a shared memory parallel solver. As above, to
-test the sample program, a sample data file is included with the
-distribution. Type {\tt Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp -F sample.vrp
--N 5 -u 522} in the {\tt SYMPHONY-3.0.2/} directory. The -N argument gives the number
-of routes, which must be specified in advance. The -u argument supplies an
-initial upper bound which is used until a better feasible solution is
-found. TSP instances can also be solved by adding the option -T TSP. In the
-case of the TSP, the number of routes does not need to be specified. You can
-get additional problem data files from from \htmladdnormallink{\tt
-http://branchandcut.org/VRP/data/} {http://branchandcut.org/VRP/data/} or the
-\\ 
-\htmladdnormallink{TSPLIB}
-{http://www.iwr.uni-heidelberg.de/iwr/comopt/software/TSPLIB95/}
-\begin{latexonly}
-        (http://www.iwr.uni-heidelberg.de/iwr/comopt/software/TSPLIB95/)
-\end{latexonly}. \\
-The file format is described on the TSPLIB Web site.
+test SYMPHONY, a sample MPS file called \texttt{test.mps} is included with the
+distribution. To specify the file name, use the "-F" command-line option,
+i.e., type ``\texttt{bin.$(ARCH)/$(LP\_SOLVER)/mip -F test.mps} in the
+\texttt{SYMPHONY-4.0/USER} directory. To obtain more MPS data files for further
+testing, download the MIPLIB library.
+
+\item That's it! Now you are ready to develop your own application by modifying
+the files in the \texttt{SYMPHONY-4.0/USER} directory and it's
+subdirectories. See the user manual for help.
 
 \end{itemize}
 
@@ -182,7 +257,7 @@ from Oak Ridge National Laboratories
         set the path variables in the makefile appropriately so that make can
         find the PVM library.
 
-        \item Type ``{\tt make}'' in the SYMPHPONY-3.0.2 directory to
+        \item Type ``{\tt make}'' in the \texttt{SYMPHPONY-4.0/USER} directory to
         make the distributed libraries. As in Step 1 of the sequential
         version, you may type ``{\tt make clean}'' after making the
         library. It should not have to remade again unless you modify
@@ -192,32 +267,20 @@ from Oak Ridge National Laboratories
         required executables linked.
 
         \item Make sure there are links from your
-        \$PVM\_ROOT/bin/\$PVM\_ARCH/ directory to each of the
-        executables in the Vrp/bin.\$(ARCH) directory. This is required
-        by PVM.
+        \texttt{\$PVM\_ROOT/bin/\$PVM\_ARCH/} directory to each of the
+        executables in the
+        \texttt{SYMPHONY-4.0/USER/bin.\$(ARCH)/\$(LP\_SOLVER)} directory. 
+	This is required by PVM.
 
         \item Start the PVM daemon by typing ``{\tt pvm}'' on the command line
         and then typing ``{\tt quit}''.
 
-        \item To test the sample program, a sample data file is included with
-the distribution. Type {\tt Vrp/bin.\$(ARCH)/master -F sample.vrp -N 5 -u
-522} in the {\tt SYMPHONY-3.0.2} directory (note that the actual executable name may
-not be ``{\tt master}'' if {\tt COMPILE\_IN\_TM} is set to {\tt TRUE}; see
-Section \ref{configuration} for more information on executable names.). The -N
-argument gives the number of routes, which must be specified in advance. The
--u argument supplies an initial upper bound which is used until a better
-feasible solution is found. TSP instances can also be solved by adding the
-option -T TSP. In the case of the TSP, the number of routes does not need to
-be specified. You can get additional problem data files from from
-\htmladdnormallink{\tt http://branchandcut.org/VRP/data/}
-{http://branchandcut.org/VRP/data/} or the \\
-\htmladdnormallink{TSPLIB}
-{http://www.iwr.uni-heidelberg.de/iwr/comopt/software/TSPLIB95/}
-\begin{latexonly}
-        (http://www.iwr.uni-heidelberg.de/iwr/comopt/software/TSPLIB95/)
-\end{latexonly}. \\
-The file
-format is described on the TSPLIB Web site.
+        \item As above, test SYMPHONY using the sample MPS file called
+        \texttt{test.mps} is included with the distribution. To specify the
+        file name, use the "-F" command-line option, i.e., type
+        ``\texttt{bin.$(ARCH)/$(LP\_SOLVER)/mip -F test.mps} in the
+        \texttt{SYMPHONY-4.0/USER} directory. To obtain more MPS data files
+        for further testing, download the MIPLIB library.
 
 \end{itemize}
 
@@ -230,45 +293,43 @@ get lost, consult the source code for the sample application to see
 how it's done.
 
 \subsection{Compiling the Sample Application with Microsoft Windows}
-\label{getting_strated_windows}
+\label{getting_started_windows}
 
-Here is a sketch outline of how to compile the sample application, a VRP and
-TSP solver, in Microsoft Windows. This is the same information contained in
-the README file that comes with the distribution. Direct support is provided
-for compilation under MS Visual Studio 6.0. Compilation for other compilers
-should also be possible. Note that the windows version has some
-limitations. Detailed timing information is not currently provided.  Support
-is only provided for running in sequential mode at this time.
+Here is a sketch outline of how to compile SYMPHONY in Microsoft Windows. This
+is the same information contained in the README file that comes with the
+distribution. Direct support is provided for compilation under MS Visual
+Studio 6.0. Compilation for other compilers should also be possible. Note that
+the windows version has some limitations. Detailed timing information is not
+currently provided.  Support is only provided for running in sequential mode
+at this time.
 
 \begin{itemize}
 
-\item Download {\tt SYMPHONY-3.0.2.zip} and unzip the archive. This will
-create a subdirectory called {\tt SYMPHONY-3.0.2$\backslash$} containing all 
+\item Download {\tt SYMPHONY-4.0.zip} and unzip the archive. This will
+create a subdirectory called {\tt SYMPHONY-4.0$\backslash$} containing all 
 the source files.
 
 \item In MS Visual C++ 6.0, open the workspace 
-{\tt SYMPHONY-3.0.2$\backslash$WIN32$\backslash$vrp.dsw}.  Note that there are
-two projects, one called ``{\tt symphony}'' and one called ``{\tt vrp}''.  The
-symphony project contains the source code needed to build the internal
-library. The vrp project contains the source code for the user-defined
-functions needed to build the sample application, a VRP and TSP solver. Note
-that to develop a solver of your own, you would replace the VRP library with
-one of your own. A template for doing so is provided (see the quick start
-guide in Section \ref{getting_started_windows}).
+{\tt SYMPHONY-4.0$\backslash$USER$\backslash$WIN32$\backslash$user.dsw}.  Note
+that there are two projects, one called ``{\tt symphony}'' and one called
+``{\tt user}''.  The symphony project contains the source code needed to build
+the internal library. The user project compiles a separate library containing
+the user-defined functions that can be used to customize the solver.
 
-\item By default, SYMPHONY is set up to use CPLEX 8.1 installed in a folder
-called ``{\tt C:$\backslash$ILOG$\backslash$CPLEX81}''. To use a different LP 
-solver or to specify a different location for CPLEX, there are a number of 
-changes that need to be made.
+\item By default, SYMPHONY is set up to use the OSI CPLEX interface with the COIN
+libraries installed in a folder called ``\texttt{C:$\backslash$COIN}'' and CPLEX
+installed in a folder called
+``\texttt{C:$\backslash$ILOG$\backslash$CPLEX81}''. To use a different LP
+solver or to specify a different location for OSI or CPLEX, there are a number
+of changes that need to be made.
 
 \begin{itemize}
 
 \item You must specify the name of and path to the library to be linked. Do 
 this by right-clicking on the symphony project and choosing ``Add Files to
-Project...'' Then locate the library file for the LP solver you are using
-(either CPLEX or OSL). For CPLEX, you need the library called {\tt
-cplex**.lib}, where ** is your CPLEX version. Make sure to delete the old
-library dependency.
+Project...'' Then locate the library file for the LP solver you are using, as
+well as the OSI library (if you are using OSI). If you switch, make sure to
+delete the old library dependency.
 
 \item You must set the include path for the solver header files. Do this
 by right-clicking on the symphony project and choosing ``Settings...'' Then
@@ -280,14 +341,23 @@ window.
 will be used. Follow the procedure above to get to the preprocessor settings
 and edit the ``Preprocessor definitions.'' Make sure that {\tt \_\_OSL\_\_} is
 defined if you are using OSL or {\tt \_\_CPLEX\_\_} is defined if you are
-using CPLEX. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP
-SOLVER. Important note for OSL users: When using OSL in Windows, you must also add \texttt{OSLMSDLL} to the list of definitions. 
+using CPLEX. If you are using an OSI interface, then the proper define is
+\texttt{\_\_OSI\_xxx\_\_}, where "xxx" specifies the desired solver. For
+example, to specify OSL with the OSI interface, the proper define is
+\texttt{\_\_OSI\_OSL\_\_}. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP
+SOLVER. Important note for OSL users: When using OSL in Windows, you must also
+add \texttt{OSLMSDLL} to the list of definitions.
+
+\item By default, SYMPHONY is also set up to use the COIN CGL library for
+generating cuts. If you have not installed CGL, delete the define
+``\texttt{ADD\_CGL\_CUTS}'' from the list.
+
 
 \end{itemize}
 
 \item Note that there are a number of additional compiler defines that control
 the functionality of SYMPHONY. These defines are described in {\tt
-SYMPHONY-3.0.2$\backslash$Makefile}, a Unix-style makefile included with the
+SYMPHONY-4.0$\backslash$Makefile}, a Unix-style makefile included with the
 distribution. To enable the functionality associated with a particular
 compiler define, simply add it to the list of defines under the preprocessor
 settings, as above.
@@ -303,10 +373,8 @@ executable.
 
 \item To test the executable, right click on the symphony project, go to the
 ``Debug'' tab and set the Program arguments to ``{\tt -F
-SYMPHONY-3.0.2$\backslash$sample.vrp -N 5 -u 522.}'' Note that command-line
-switches are Unix-style. The argument to -N is the number of routes that
-should be used in the solution and the -u argument supplies the solver with an
-initial upper bound.
+SYMPHONY-4.0$\backslash$USER$\backslash$test.mps}'' Note that command-line
+switches are Unix-style. 
 
 \item Now choose ``Execute'' from the ``Build'' menu and the solver should 
 solve the sample VRP file.
@@ -324,37 +392,38 @@ working under Windows.
 
 \subsubsection{Unix}
 
-Developing a simple branch and bound solver can be done quite quickly using
-the template provided in the \texttt{SYMPHONY/Template/}
-directory. The simplest approach is to develop a sequential application,
-sharing a single user data structure among all the modules. Using this
-approach, an application can be developed by filling in only a few simple
-functions. Here are four simple steps to get up and running.
-\begin{enumerate}
+Developing a simple branch and bound solver that can read in instance data in
+a custom format is straightforward using the template provided in the
+\texttt{SYMPHONY-4.0/USER/} directory. The simplest approach is to develop a 
+sequential application, sharing a single user data structure among all the
+modules. Using this approach, an application can be developed by filling in
+only a few simple functions. Here are four steps to make the most common
+custom modifications.
 
-\item Set the variable \texttt{USERROOT} in the makefile to be
-\texttt{\$(ROOT)/Template} and type "\texttt{make}". Assuming that the make
-file has already been modified appropriately, as described in Section
-\ref{getting_strated_windows}, this should successfully compile the template
-code, although it will not run until it is modified as described below.
+\begin{enumerate}
 
 \item Decide what run-time parameters you might need and what data has 
 to be stored to describe your instance. Edit the file
-\texttt{Template/include/user.h}, adding the appropriate fields to the
+\texttt{SYMPHONY-4.0/USER/include/user.h}, adding the appropriate fields to the
 \texttt{user\_parameter} and \texttt{user\_problem} structure to store the
 relevant values.
 
-\item Now edit the file \texttt{Template/Master/user\_master.c}. If you choose
-to have all variables in the base set (a good starting point), the only
-function that really needs to be filled out initially is \texttt{user\_io()},
-where you can read in the instance data. Note that the name of the file to
-read the instance data from can be specified on the command line using the
-"-F" switch.  Also, check out the function
-\texttt{user\_set\_base()}.
+\item Now edit the file \texttt{SYMPHONY-4.0/USER/Master/user\_master.c}. Only two
+function needs to be filled out initially in order to read in . The function
+\texttt{user\_io()} is where you can read in the instance data, if it is in
+something other than MPS format (a TSPLIB file, for example. Note that the
+name of the file to read the instance data from can be specified on the
+command line using the "-F" option by default. Also, you'll probably need to
+modify the \texttt{user\_initialize\_root\_node()} function to set up the root
+node. 
 
-\item Edit the file \texttt{Template/LP/user\_lp.c}. The function
+\item Edit the file \texttt{USER/LP/user\_lp.c}. The function
 \texttt{user\_create\_lp()} must be filled out. This is the most important
 function, as it sets up the initial LP relaxation in each search node.
+
+\item You may also want to add some problem-specific cutting planes by modifying
+the \texttt{user\_find\_cuts()} function.
+
 \end{enumerate}
 
 Now compile by by typing ``\texttt{make}'' (assuming that the make
@@ -363,44 +432,56 @@ a working branch and bound solver. Next you can work on filling in more
 advanced functions and adding cutting planes.
 
 \subsubsection{Microsoft Windows}
+Developing a simple branch and bound solver that can read in instance data in
+a custom format is straightforward using the template provided in the
+\texttt{SYMPHONY-4.0$\backslash$USER$\backslash$} directory. The simplest approach is to develop a
+sequential application, sharing a single user data structure among all the
+modules. Using this approach, an application can be developed by filling in
+only a few simple functions. Here are some steps to make the most common
+custom modifications.
 
-Developing a simple branch and bound solver can be done quite quickly using
-the template provided in the 
-\texttt{SYMPHONY$\backslash$Template$\backslash$} directory. The
-simplest approach is to develop a sequential application, sharing a single
-user data structure among all the modules. Using this approach, an application
-can be developed by filling in only a few simple functions. Here are four
-simple steps to get up and running.
 \begin{enumerate}
 
-\item First open the workspace {\tt
-SYMPHONY-3.0.2$\backslash$WIN32$\backslash$template.dsw} and modify for your
-local setup, as described in Section \ref{getting_strated_windows}. Note that
-you will also have to delete the file \texttt{vrp.lib} from the symphony
-project and add \texttt{template.lib}. It should build right away, although it
-won't run until modified as described below.
-
-\item First, decide what run-time parameters you might need and what data has 
+\item Decide what run-time parameters you might need and what data has 
 to be stored to describe your instance. Edit the file
-\texttt{Template$\backslash$include$\backslash$user.h}, adding the appropriate
+\texttt{USER$\backslash$include$\backslash$user.h}, adding the appropriate
 fields to the \texttt{user\_parameter} and \texttt{user\_problem} structure to
 store the relevant values.
 
 \item Now edit the file
-\texttt{Template$\backslash$Master$\backslash$user\_master.c}. If you choose 
-to have all variables in the base set (a good starting point), the only 
-function that really needs to be filled out initially is \texttt{user\_io()}, 
-where you can read in the instance data. Note that the name of the file to 
-read the instance data from can be specified on the command line using the 
-"-F" switch. Also, check out the function \texttt{user\_set\_base()}.
+\texttt{USER$\backslash$Master$\backslash$user\_master.c}. Only two
+function needs to be filled out initially in order to read in . The function
+\texttt{user\_io()} is where you can read in the instance data, if it is in
+something other than MPS format (a TSPLIB file, for example. Note that the
+name of the file to read the instance data from can be specified on the
+command line using the "-F" option by default. Also, you'll probably need to
+modify the \texttt{user\_initialize\_root\_node()} function to set up the root
+node. 
 
-\item Edit the file \texttt{Template$\backslash$LP$\backslash$user\_lp.c}. The
+\item Edit the file \texttt{USER$\backslash$LP$\backslash$user\_lp.c}. The
 function \texttt{user\_create\_lp()} must be filled out. This is the most
 important function, as it sets up the initial LP relaxation in each search
 node.
+
+\item You may also want to add some problem-specific cutting planes by modifying
+the \texttt{user\_find\_cuts()} function.
+
 \end{enumerate}
 
 Now build again and you have a working branch and bound solver! Next you can
 work on filling in more advanced functions and adding cutting planes. See the
 documentation for more information on this.
 
+\subsection{Sample Applications}
+
+There are now a number of sample applications available as examples of how
+to do development with SYMPHONY. These include solvers for the matching
+problem, the set partitioning problem (simple and advanced versions), the 
+vehicle routing and traveling salesman problems, and the mixed postman
+problem. These applications are distributed as separate packages and can be
+downloaded 	      
+\emph{\htmladdnormallink{here}{http://www.branchandcut.org/SYMPHONY/}}
+\begin{latexonly} 
+from \texttt{http://www.branchandcut.org/SYMPHONY}
+\end{latexonly}. There is also a white paper that guides the
+user through the development of the matching solver.

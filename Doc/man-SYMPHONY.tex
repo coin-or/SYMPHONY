@@ -31,31 +31,32 @@ master process), and the third containing the function prototypes for
 the user functions (name {\tt *\_u.h}). By looking at the header files, you
 should get a general idea of how things are laid out.
 
-In addition to the subdirectories corresponding to each module, there are
-subdirectories corresponding to applications. The sample application is
-contained in the directory {\tt Vrp/}. The files containing function stubs
-that can be filled in to create a new application are contained in the
-directory {\tt SYMPHONY-3.0.2/Template/}. There is one file for each module,
-initially called {\tt Template/*/*\_user.c}. The primary thing that you, as
-the user, need to understand to build an application is how to fill in these
+In addition to the subdirectories corresponding to each module, there is a
+subdirectory called \texttt{SYMPHONY-4.0/USER}, which contains the files
+needed for customizing the behaviors of the modules. Before beginning
+customization, it is recommended to make a copy of the directory
+\texttt{SYMPHONY-4.0/USER} that will be used as a template for creating your
+customizesd solver. In this directory and its subdirectories, which mirror the
+subdirectories of SYMPHONY itself, ach file contains function stubs that can
+be filled in to create a new custom application. There is one file for each
+module, initially called \texttt{SYMPHONY-4.0/USER/*/user\_*.c}, where
+\texttt{*} is the name of the module. The primary thing that you, as the user,
+need to understand to build a custom application is how to fill in these
 stubs. That is what the second section of this manual is about.
 
 \subsection{Writing the User Functions}
 
-The majority of the user functions are called from either the master
-process or the LP process. For these two modules, user functions are
-invoked from so-called {\em wrapper functions} that provide the
-interface. Each wrapper function is named {\tt *\_u()} , where {\tt *}
-is the name of the corresponding user function, and is defined in a
-file called {\tt *\_wrapper.c}. The wrapper function first collects
-the necessary data and hands it to the user by calling the user
-function. Based on the return value from the user, the wrapper then
-performs any necessary post-processing. Most user functions are
-designed so that the user can do as little or as much as she likes.
-Where it is feasible, there are default options that allow the user to
-do nothing if the default behavior is acceptable. This is not possible
-in all cases and the user must provide certain functions, such as
-separation.
+For each module, all user functions are invoked from so-called \emph{wrapper
+functions} that provide the interface and also performs a default action if
+the user chooses not to override it. Although SYMPHONY is written in C, the
+wrapper functions provide a C++-style interface in whisch the user can either
+accept the default action or override it. Each wrapper function is named {\tt
+*\_u()} , where {\tt *} is the name of the corresponding user function, and is
+defined in a file called {\tt *\_wrapper.c}. The wrapper function first
+collects the necessary data and hands it to the user by calling the user
+function. Based on the return value from the user, the wrapper then performs
+any necessary post-processing. All user functions have default options, so
+that SYMPHONY now acts as a generic MIP solver out of the box.
 
 In the next section, the user functions are described in detail.
 The name of every user written function starts with {\tt user\_}.
@@ -68,7 +69,7 @@ return a result (requested data, decision, etc.) of the function.
 \item[\rm INOUT:] An argument which contains information the user might need,
 but also for which the user can change the value.
 \end{description}
-The return values from each function are as follows:
+The return values for most function are as follows:
 \begin{description}
 \item[Return values:] \hfill
 
@@ -109,8 +110,7 @@ If an output array is optional then the user {\em must not} set {\tt
 \item Some built-in options are implemented so that the user can invoke them
 directly from the user function. This might be useful if, for example,
 the user wants to use different built-in options at different stages
-of the algorithm, or if he wants to do the post-processing himself but
-does not want to implement the option itself.
+of the algorithm.
 \end{itemize}
 
 \end{description}
@@ -130,54 +130,86 @@ modifying \BB's internal data structures directly.
 
 \subsubsection{User-defined Data Structures}
 
-The user can define her own data structure for each module to maintain
-problem-specific data and any other information the user needs access
-to. A pointer to this data structure is maintained by \BB\ and is
-passed to the user as an argument to each user function. Since
-\BB\ knows nothing about this data structure, it is up to the user
-to allocate it, maintain it, and free it as required.
+The user can define her own data structure for each module to maintain problem
+data and any other information the user needs access to in order to implement
+functions to customize the solver. A pointer to this data structure is
+maintained by \BB\ and is passed to the user as an argument to each user
+function. Since \BB\ knows nothing about this data structure, it is up to the
+user to allocate it and maintain it. The user must also implement a function
+to free it. The functions for freeing the user data structures in each module
+are called \texttt{user\_free\_*}, where \texttt{*} is the module. These
+functions are called by SYMPHONY at the time when other data structures for
+the modules are being freed and the module is being closed. By default, for
+sequential computation, there is one common user data structure for all
+modules and the pointer to that data structure is passed to all user
+functions, regardless of the module. This setup should work fine for most
+sequential applications. In parallel, however, poiners cannot be shared
+between modules and data must be explicitly passed. IN this case, it is
+sometimes more efficien to maintain in each module only the data necessary to
+perform the functions of that module.
 
 \subsection{Inter-process Communication for Distributed Computing}
 \label{communication}
-While the implementation of \BB\ strives to shield the user from
-having to know anything about communications protocols or the
-specifics of inter-process communication, it may be necessary for the
-user to pass information from one module to another in some
-cases---for instance, if the user must pass problem-specific data to
-the LP process after reading them in from a data file. In cases where
-this might be appropriate, user functions are supplied in pairs---a
-{\em send} function and a {\em receive} function. All data are sent in
-the form of arrays of either type {\tt char}, {\tt int}, or {\tt
-double}, or as strings. To send an array, the user has simply to
-invoke the function {\tt send\_?\_array(? *array, int length)} where ?
-is one of the previously listed types. To receive that array, there is
-a corresponding function called {\tt receive\_?\_array(? *array, int
-length)}. When receiving an array, the user must first
-allocate the appropriate amount of memory. In cases where variable
-length arrays need to be passed, the user must first pass the length
-of the array (as a separate array of length one) and then the array
-itself. In the receive function, this allows the length to be received
-first so that the proper amount of space can be allocated before
-receiving the array itself. Note that data must be received in exactly
-the same order as it was passed, as data is read linearly into and out
-of the message buffer. The easiest way to ensure this is done properly
-is to simply copy the send statements into the receive function and
-change the function names. It may then be necessary to add some
-allocation statements in between the receive function calls.
+While the implementation of \BB\ strives to shield the user from having to
+know anything about communications protocols or the specifics of inter-process
+communication, it may be necessary for the user to pass information from one
+module to another in order to implement a parallel application. For instance,
+the user may want to pass data describing the problem instance to the LP
+process after reading them in from a file in the master process. For the
+purpose of passing user data from the master process to other processes, a
+customization function called
+\texttt{user\_send\_*\_data()} is provided in the master module, along with a
+corresponding function called \texttt{user\_receive\_*\_data()} in the module
+\texttt{*}. These two functions work in tandem to transport the user's data
+from the maser, where it can be read in from a file, to the proper module for
+processing. There are also a number of other tandem pairs of \emph{send} and
+\emph{receive} functions that are used to transport user data from place to
+place.
+
+All data are sent in the form of arrays of either type {\tt char}, {\tt int},
+or {\tt double}, or as strings. To send an array, the user has simply to
+invoke the function {\tt send\_?\_array(? *array, int length)} where ?  is one
+of the previously listed types. To receive that array, there is a
+corresponding function called {\tt receive\_?\_array(?  *array, int
+length)}. When receiving an array, the user must first allocate the
+appropriate amount of memory. In cases where variable length arrays need to be
+passed, the user must first pass the length of the array (as a separate array
+of length one) and then the array itself. In the receive function, this allows
+the length to be received first so that the proper amount of space can be
+allocated before receiving the array itself. Note that data must be received
+in exactly the same order as it was passed, as data is read linearly into and
+out of the message buffer. The easiest way to ensure this is done properly is
+to simply copy the send statements into the receive function and change the
+function names. It may then be necessary to add some allocation statements in
+between the receive function calls.
 
 \subsection{The LP Engine}
 
 \BB\ requires the use of a third-party callable library to solve the LP 
-relaxations once they are formulated. Currently, ILOG's
+relaxations once they are formulated. Legacy interfaces to ILOG's
 \htmladdnormallink{CPLEX}{http://www.cplex.com}$^{\copyright}$
 and IBM's
 \htmladdnormallink{OSL}{http://www-4.ibm.com/software/data/bi/osl/index.html}
-are the available options. Be forewarned that OSL's interface is not
-tested and has exhibited suboptimal performance. Any LP solver with
-the appropriate capabilities can be interfaced with \BB\ by writing a
-set of interface routines contained in the file {\tt LP/lp\_solver.c}.
-Once the interface routines are written, the make file must be
-modified to link with the new LP solver.
+are available. As of Version 4.0, the Open Solver Interface, avilable from
+\htmladdnormallink{COIN}{http://www.coin-or.org}
+\begin{latexonly} 
+COIN (\texttt{http://www.coin-or.org})
+\end{latexonly}.
+Through the OSI, most commonly available LP solvers can be used. The list of
+solvers with OSI interfaces currently numbers eight and includes both
+commercial and open source alternatives. If the COIN libraries are used, make
+sure to set the proper paths in the SYMPHONY make file.
+
+\subsection{Cut Generation}
+
+SYMPHONY now generates generic cutting planes using the Cut Generator Library,
+also available from 
+\htmladdnormallink{COIN}{http://www.coin-or.org}
+\begin{latexonly} 
+COIN (\texttt{http://www.coin-or.org})
+\end{latexonly}.
+The CGL can be used to generate cuts in cases where problem-specific cutting
+planes are not available or not implemented yet. 
 
 \subsection{Compiling Your Application}
 
@@ -185,17 +217,12 @@ modified to link with the new LP solver.
 
 Once the user functions are filled in, all that remains is to compile the
 application. The distribution comes with two make files that facilitate this
-process. The primary make file resides in the {\tt SYMPHONY-3.0.2/} directory.
-The user make file resides in the user's subdirectory, initially called {\tt
-SYMPHONY-3.0.2/Template/}. There are a number of variables that must be set in
-the primary make file. First ensure that the sample application compiles by
-following the instructions in Section \ref{getting_started_unix}. Then modify
-the makefile to reflect the new {\tt \$(USERROOT)} ({\tt
-SYMPHONY-3.0.2/Template} by default). When you are ready, type ``{\tt make}''
-to make the executables. \BB\ will create three new subdirectories---{\tt
-SYMPHONY-3.0.2/Template/obj.*}, {\tt SYMPHONY-3.0.2/Template/bin.*}, and {\tt
-SYMPHONY-3.0.2/Template/dep.*} where * is a the current architecture (defined
-in the make file).
+process. The primary make file resides in the {\tt SYMPHONY-4.0/} directory.
+The user make file resides in the user's subdirectory, initially called
+\texttt{SYMPHONY-4.0/USER/}. THis subdirectory can be moved, as well as
+renamed. There are a number of variables that must be set in the primary make
+file. To modify the make files appropriately, see the instructions in Section
+\ref{getting_started_unix}.
 
 \paragraph{Working with PVM.}
 \label{PVM}
@@ -227,12 +254,13 @@ the {\em receive} function is never actually called. This means that
 the user must perform all necessary initialization, etc. in the send
 function. This makes it a little confusing to write source code which
 will work for all configurations. However, the confusion should be
-cleared up by looking at the sample application, especially the file
-{\tt SYMPHONY-3.0.2/Vrp/Master/vrp.c}.
+minimized by looking at the sample applications, especially the VRP solver,
+which works in all configurations, sequential, distributed parallel, and
+shared parallel. 
 
 \paragraph{Configuring the Modules.}
 \label{configuration}
-In the {\tt make} file, there are
+In the make file, there are
 four variables that control which modules run as separate executables
 and which are called directly in serial fashion. The variables are as
 follows:
@@ -269,30 +297,30 @@ the function stubs. See also Section \ref{shared}.
 
 \paragraph{Executable Names.}
 \label{exe_names}
-In order to keep track of the various possible configurations,
-executable and their corresponding libraries are named as follows. For
-the fully distributed version, the names are {\tt master}, {\tt tm},
-{\tt lp}, {\tt cg}, and {\tt cp}. For other configurations, the
-executable name is a combination of all the modules that were compiled
-together joined by underscores. In other words, if the LP and the cut
-generator modules were compiled together (i.e.~{\tt COMPILE\_IN\_CG}
-set to {\tt TRUE}), then the executable name would be ``{\tt lp\_cg}''
-and the corresponding library file would be called ``{\tt
-liblp\_cg.a}.'' You can rename the executables as you like. However, if
-you are using PVM to spawn the modules, as in the fully distributed
-version, you must set the parameters {\tt *\_exe} in the parameter
-file to the new executable names. See Section \ref{tm_params} for
-information on setting parameters in the parameter file.
+In order to keep track of the various possible configurations, executable and
+their corresponding libraries are named as follows. The name of the master
+module, along with all other modules compiled in with the master, is set in
+the make file. For the other modules, default names are typically used, since
+these names have to be hard-coded in order for PVM to correctly spawn the
+corresponding processes.  In the fully distributed version, the default names
+are \texttt{tm}, \texttt{lp}, \texttt{cg}, and \texttt{cp}. For other
+configurations, the executable name is a combination of all the modules that
+were compiled together joined by underscores. In other words, if the LP and
+the cut generator modules were compiled together (i.e.~{\tt COMPILE\_IN\_CG}
+set to {\tt TRUE}), then the executable name would be ``{\tt lp\_cg}'' and the
+corresponding library file would be called ``{\tt liblp\_cg.a}.'' You can
+rename the executables as you like. However, if you are using PVM to spawn the
+modules, as in the fully distributed version, you must set the parameters {\tt
+*\_exe} in the parameter file to the new executable names. See Section
+\ref{tm_params} for information on setting parameters in the parameter file.
 
 \subsubsection{Microsoft Windows}
 
-First, follow the instructions for compiling the sample application in Section
+First, follow the instructions for compiling SYMPHONY in Section
 \ref{getting_started_windows} to ensure you have the proper settings. Once the
-stub files in the {\tt SYMPHONY-3.0.2$\backslash$Template} hierarchy are
-filled in, use the project ``{\tt vrp}'' as a template to create a new project
-called ``{\tt user}'' that compiles the files in {\tt
-SYMPHONY-3.0.2$\backslash$Template} and creates a library. Modify the project
-``{\tt symphony}'' to compile and link with the new user library.
+stub files in the {\tt SYMPHONY-4.0$\backslash$USER} hierarchy are
+filled in, you should be able to compile the new application and run it
+successfully. 
 
 \subsection{Debugging Your Application}
 
@@ -453,11 +481,11 @@ for the appropriate parameter settings to use logging.
 
 \subsection{Controlling Execution and Output}
 \label{output}
-Calling \BB\ with no arguments simply lists all command-line options.
-Most of the common parameters can be set on the command line. Usually
-it is easier to use a parameter file. To invoke \BB\ with a parameter
-file type ``{\tt master -f filename ...}'' where filename is the name
-of the parameter file. The format of the file is explained in Section
+Calling \BB\ with no arguments simply lists all command-line options.  Most of
+the common parameters can be set on the command line. Sometimes, however, it
+may be easier to use a parameter file. To invoke \BB\ with a parameter file
+type ``{\tt master -f filename ...}'' where filename is the name of the
+parameter file. The format of the file is explained in Section
 \ref{parameter_file}. 
 
 The output level can be controlled through the use of the verbosity

@@ -199,12 +199,8 @@ the existence of a pointer before freeing it.
 
 \functiondef{user\_create\_lp}
 \begin{verbatim}
-int user_create_lp(void *user, int varnum, var_desc **vars, int
-                   numrows, int cutnum, cut_data **cuts, int *nz,
-                   int **matbeg, int **matind, double **matval, 
-                   double **obj, double **rhs, char **sense, 
-                   double **rngval, int *maxn, int *maxm, 
-                   int *maxnz, int *allocn, int *allocm, int *allocnz)
+int user_create_lp(void *user, LPdesc *desc, int *indices, 
+                   int *maxn, int *maxm, int *maxnz)
 \end{verbatim}
 
 \bd
@@ -212,10 +208,10 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int
 \describe
 
 Based on the instance data contained in the user data structure and
-the list of cuts and variables that are active in the
+the list of base and extra variables that are active in the
 current subproblem, the user has to create the initial LP relaxation
 for the search node. The matrix of the LP problem must contain the
-variables whose user indices are listed in {\tt vars} (in the same
+variables whose user indices are listed in {\tt indices} (in the same
 order) and at least the base constraints. \\
 \\
 An LP is defined by a matrix of constraints, an objective function,
@@ -252,61 +248,29 @@ the very last entry in {\tt *matval} and {\tt *matind} (so it is very
 conveniently equal to $nz$). This representation of a matrix is known
 as a {\em column ordered} or {\em column major} representation.\\
 \\
-The arrays that are passed in can be overwritten and have already been
-previously allocated for the lengths indicated (see the description of
-arguments below). Therefore, if they are big enough, the user need not
-reallocate them. If the max lengths are not big enough then she has to
-free the corresponding arrays and allocate them again. In this case
-she {\em must} return the allocated size of the array to avoid further
-reallocation. If the user plans to utilize dynamic column and/or cut
-generation, arrays should be allocated large enough to allow for
-reasonable growth of the matrix or unnecessary reallocations will
-result. In order to accommodate {\tt *maxn} variables, arrays must be
-allocated to size {\tt *allocn = *maxn + *maxm +1} and {\tt *allocnz =
-*maxnz + *maxm} because of the extra space required by the LP solver
-for slack and artificial variables.
+The user is required to construct a description of the LP relaxation by
+specifying the constraint matrix in column-ordered format through the members
+of the LP description structure pointer passed to the function. The user is
+not responsible for allocating extra memory to allow for the addition of
+dynamically generated cuts and variables. The arrays allocated in
+\texttt{user\_create\_lp()} are owned by SYMPHONY after allocation and are
+freed as soon as the relaxation is loaded into the solver.
+
+Note that, the user should return ``DEFAULT'' value without any modification
+if an mps file is read in. \BB\ will allocate the corresponding arrays and 
+specify the constraint matrix by default in that case.
 
 \args
 
 \bt{llp{257pt}}
 {\tt void *user} & IN & Pointer to the user-defined LP data structure. \\
-& & \\
+& \\
+{\tt LPdesc *desc} & INOUT & Pointer to the LP description structure. \\
+{\tt int * indices} & IN & The list of the active variables (base and extra).\\
 
-{\tt int varnum} & IN & Number of variables in the relaxation (base
-and extra). \\
-
-{\tt var\_desc **vars} & IN & An array of length {\tt n} containing the user
-indices of the active variables (base and extra). \\
-
-{\tt int rownum} & IN & Number of constraints in the relaxation (base
-and extra). \\
-
-{\tt int cutnum} & IN & Number of extra constraints. \\
-
-{\tt cut\_data **cuts} & IN & Packed description of extra constraints. \\
-& & \\
-
-{\tt int *nz} & OUT &  Pointer to the number of nonzeros in the LP.\\
-
-{\tt int **matbeg} & INOUT & Pointers to the arrays that describe the LP
-problem (see description above. \\
-{\tt int **matind} & INOUT & \\
-{\tt double **matval} & INOUT & \\
-{\tt double **obj} & INOUT & \\
-{\tt double **rhs} & INOUT & \\
-{\tt char **sense} & INOUT & \\
-{\tt double **rngval} & INOUT & \\
-& & \\
 {\tt int *maxn} & INOUT & The maximum number of variables.\\
 {\tt int *maxm} & INOUT & The maximum number of constraints.\\
 {\tt int *maxnz} & INOUT & The maximum number of nonzeros. \\
-& & \\
-{\tt int *allocn} & INOUT & The length of the {\tt *matbeg} and {\tt *obj}
-arrays (should be {\tt *maxm + *maxn +1}). \\
-{\tt int *allocm} & INOUT & The length of the {\tt *rhs}, {\tt *sense}
-and {\tt *rngval} arrays. \\
-{\tt int *allocnz} & INOUT & The length of the {\tt *matval} and {\tt
-*matind} arrays (should be {\tt *maxnz + *maxm}. \\
 \et
 
 \returns
@@ -316,6 +280,7 @@ and {\tt *rngval} arrays. \\
 {\tt USER\_AND\_PP} & Post-processing will be skipped, the user added the
 constraints corresponding to the cuts. \\
 {\tt USER\_NO\_PP} & User created the matrix with only the base constraints. \\
+{\tt DEFAULT} & User let \BB\ create the LP relaxation since an mps file is read in.
 \et
 
 \postp
@@ -331,57 +296,6 @@ invoked when setting up a the initial search node in a chain.
 
 \ed
 \vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% user_get_upper_bounds
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{user\_get\_upper\_bounds}
-\begin{verbatim}
-int user_get_upper_bounds(void *user, int varnum, int *indices, double *ub)
-\end{verbatim}
-
-\bd
-\describe
-
-The user has to return the upper bounds of the variables whose user indices
-are given. Note that space for {\tt ub} is already allocated when this
-function is invoked. There is no post-processing. The default is to set all
-the upper bounds to 1.
-
-\args
-
-\bt{llp{250pt}}
-& & \\
-{\tt void *user} & IN & Pointer to the user-defined LP data structure. \\
-
-{\tt int varnum} & IN & Length of {\tt vars}. \\
-{\tt int *vars} & IN & Array containing the user indices of the variables. \\
-{\tt double *ub} & OUT & Array of upper bounds (to be filled out by
-the user).
-\\
-\et
-
-\returns
-
-\bt{lp{300pt}}
-{\tt ERROR} & Error. The LP process is aborted. \\ 
-{\tt DEFAULT} & Upper bounds are set to one. \\ 
-{\tt USER\_NO\_PP} & The user filled up the upper bound array. \\
-\et
-
-\item[Wrapper invoked from:] {\tt add\_col\_set()} (when \BB\ adds columns
-after pricing out) and from {\tt create\_lp\_u()} (when \BB\ has to get the
-bounds on the extra variables in the new active node).
-
-\item[Note:] \hfill
-
-Only the upper bounds for extra variables are ever asked for since the
-array of bounds for the base variables is always maintained. Lower
-bounds for the extra variables must be zero and hence there is no
-corresponding function for lower bounds.
-
-\ed
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % user_is_feasible
@@ -1379,7 +1293,8 @@ by reduced cost (see LP parameter settings).
 int user_generate_column(void *user, int generate_what, int cutnum, 
                          cut_data **cuts, int prevind, int nextind, 
                          int *real_nextind, double *colval, 
-                         int *colind, int *collen, double *obj)
+                         int *colind, int *collen, double *obj,
+                         double *lb, double *ub)
 \end{verbatim}
 
 \bd
@@ -1430,6 +1345,8 @@ array.) \\
 colind} arrays.\\
 {\tt double *obj} & OUT & Objective coefficient corresponding to the
 next variable.\\
+{\tt double *lb} & OUT & Lower bound of the next variable.\\
+{\tt double *ub} & OUT & Upper bound of the next variable.\\
 \et
 
 \returns
