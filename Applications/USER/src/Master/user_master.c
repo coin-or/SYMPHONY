@@ -145,8 +145,6 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
 int user_io(void *user)
 {
-
-
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
    user_parameters *par = &(prob->par);

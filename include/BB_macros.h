@@ -151,7 +151,7 @@ if (newad.size > 0){                                                       \
 
 #define CALL_USER_FUNCTION(f)                                              \
 switch (f){                                                                \
- case ERROR:                                                               \
+ case USER_ERROR:                                                          \
    printf("\n\n*********User error detected -- aborting***********\n\n");  \
    exit(1000);                                                             \
  default:                                                                  \

@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{User-written functions of the CP process}
+\subsection{User-written functions of the CP module}
 
 Due to the relative simplicity of the cut pool, there are no wrapper
 functions implemented for CP. Consequently, there are no default
@@ -25,7 +25,7 @@ int user_receive_cp_data(void **user)
 
 The user has to receive here all problem-specific information sent
 from \hyperref{{\tt user\_send\_cp\_data()}}{{\tt user\_send\_cp\_data()}
-(see Section }{)}{user_send_cp_data} function in the master process.
+(see Section }{)}{user_send_cp_data} function in the master module.
 The user has to allocate space for all the data structures, including
 {\tt user} itself. Note that this function is only called if the
 either the Tree Manager, LP, or CP are running as a separate process
@@ -48,7 +48,7 @@ description of that function for more details.
 {\tt USER\_NO\_PP} & The user received data successfully. \\
 \et
 
-\item[Invoked from:] {\tt cp\_initialize} at process start.
+\item[Invoked from:] {\tt cp\_initialize} at module start-up.
 
 \ed
 
@@ -86,7 +86,7 @@ the existence of a pointer before freeing it.
 {\tt USER\_NO\_PP} & The user freed all data structures. \\
 \et
 
-\item[Invoked from:] cp\_close() at process shutdown.
+\item[Invoked from:] cp\_close() at module shutdown.
 
 \ed
 
@@ -107,7 +107,7 @@ void user_receive_lp_solution_cp(void *user)
 
 This function is invoked only if in the {\tt 
 \htmlref{user\_send\_lp\_solution()}{user_send_lp_solution}}
-function of the LP process the user opted for packing the current LP
+function of the LP module the user opted for packing the current LP
 solution herself. Here she must receive the very same data she sent
 there.
 
@@ -206,7 +206,7 @@ information.
 
 \bt{llp{255pt}}
 {\tt void *user} & INOUT & The user defined part of p. \\
-{\tt double lpetol} & IN & The $\epsilon$ tolerance in the LP process. \\
+{\tt double lpetol} & IN & The $\epsilon$ tolerance in the LP module. \\
 {\tt int varnum} & IN & Same as the previous function. \\
 {\tt int *indices} & IN & Same as the previous function. \\
 {\tt double *values} & IN & Same as the previous function. \\

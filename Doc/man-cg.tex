@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{User-written functions of the CG process}
+\subsection{User-written functions of the CG module}
 
 Due to the relative simplicity of the cut generator, there are no wrapper
 functions implemented for CG. Consequently, there are no default
@@ -24,10 +24,10 @@ int user_receive_cg_data (void **user)
 
 The user has to receive here all problem-specific information that is
 known to the master and will be needed for computation in the CG
-process later on. The same data must be received here that was sent in
+module later on. The same data must be received here that was sent in
 the \hyperref{{\tt user\_send\_cg\_data()}}{{\tt
 user\_send\_cg\_data()} (see Section }{)}{user_send_cg_data} function
-in the master process. The user has to allocate space for all the data
+in the master module. The user has to allocate space for all the data
 structures, including {\tt user} itself. Note that some or all of this
 may be done in the function {\tt 
 \htmlref{user\_send\_cg\_data()}{user_send_cg_data}} if the Tree Manager, LP,
@@ -68,7 +68,7 @@ int user_receive_lp_solution_cg(void *user)
 
 This function is invoked only if in the {\tt
 \htmlref{user\_send\_lp\_solution()}{user_send_lp_solution}} function
-of the LP process the user opted for packing the current LP solution
+of the LP module the user opted for packing the current LP solution
 himself. Here he must unpack the very same data he packed there.
 
 \args
@@ -127,7 +127,7 @@ the existence of a pointer before freeing it.
 {\tt USER\_NO\_PP} & The user freed all data structures. \\
 \et
 
-\item[Invoked from:] {\tt cg\_close()} at process shutdown. 
+\item[Invoked from:] {\tt cg\_close()} at module shutdown. 
 
 \ed
 

@@ -71,12 +71,12 @@ int user_generate_column PROTO((void *user, int generate_what, int cutnum,
 				int *real_nextind, double *colval, int *colind,
 				int *collen, double *obj, double *lb,
 				double *ub));
+int user_generate_cuts_in_lp PROTO((void *user, LPdata *lp_data, int varnum,
+				    var_desc **vars,double *x,int *new_cut_num,
+				    cut_data ***new_cuts));
 int user_print_stat_on_cuts_added PROTO((void *user, int rownum,
 					 waiting_row **rows));
 int user_purge_waiting_rows PROTO((void *user, int rownum,
 				   waiting_row **rows, char *deleten));
-int user_generate_cuts_in_lp PROTO((void *user, LPdata *lp_data, int varnum,
-				    var_desc **vars, double *x, int *new_row_num,
-				    cut_data ***cuts));
 
 #endif

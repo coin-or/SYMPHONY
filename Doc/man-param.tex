@@ -10,7 +10,7 @@ considered a comment line. Otherwise the parameter corresponding to the
 keyword is set to the listed value. Usually the keyword is the same as the
 parameter name in the source code. Here we list the keywords, the type of
 value that should be given with the keywords and the default value. A
-parameter corresponding to keyword ``K'' in process ``P'' can also be set by
+parameter corresponding to keyword ``K'' in module ``P'' can also be set by
 using the keyword ``P\_K''.
 
 To make this list shorter, occasionally a comma separated list of parameters
@@ -23,8 +23,8 @@ corresponding value is given in curly braces for convenience.
 \begin{description}
 
 \item[{\tt verbosity} -- integer (0).]
-Sets the verbosity of all processes to the given value. In general,
-the greater this number the more verbose each process is. Experiment
+Sets the verbosity of all modules to the given value. In general,
+the greater this number the more verbose each module is. Experiment
 to find out what this means.
 
 \item[{\tt random\_seed} -- integer (17).]
@@ -42,13 +42,13 @@ The value of the best known upper bound.
 
 \end{description}
 
-\subsection{Master Process parameters}
+\subsection{Master module parameters}
 \begin{description}
 
 \item[{\tt M\_verbosity} -- integer (0).]
 
 \item[{\tt M\_random\_seed} -- integer (17).]
-A random seed just for the Master Process.
+A random seed just for the Master module.
 
 \item[{\tt upper\_bound} -- double (no upper bound).]
 This parameter is used if the user wants to artificially impose an
@@ -63,7 +63,7 @@ conjunction with the diving strategy \htmlref{\tt
 BEST\_ESTIMATE}{diving_strategy}.
 
 \item[{\tt tm\_exe, dg\_exe} -- strings (``tm'', ``dg'').]
-The name of the executable files of the TM and DG processes. Note that
+The name of the executable files of the TM and DG modules. Note that
 the TM executable name may have extensions that depend on the
 configuration of the modules, but the default is always set to the
 file name produced by the make file. If you change the name of the
@@ -71,7 +71,7 @@ treemanager executable from the default, you must set this parameter
 to the new name.
 
 \item[{\tt tm\_debug, dg\_debug} -- boolean (both {\tt FALSE}).]
-Whether these processes should be started under a debugger or not (see
+Whether these modules should be started under a debugger or not (see
 \ref{debugging-PVM} for more details on this).
 
 \item[{\tt tm\_machine} -- string (empty string).]
@@ -79,7 +79,7 @@ On which processor of the virtual machine the TM should be run. Leaving this
 parameter as an empty string means arbitrary selection.
 
 \item[{\tt do\_draw\_graph} -- boolean ({\tt FALSE}).]
-Whether to start up the DG process or not (see Section \ref{IGD} for
+Whether to start up the DG module or not (see Section \ref{IGD} for
 an introduction to this).
 
 \item[{\tt do\_branch\_and\_cut} -- boolean ({\tt TRUE}).]
@@ -129,11 +129,11 @@ dashed edges.
 \begin{description}
 
 \item[{\tt TM\_verbosity} -- integer (0).]
-The verbosity of the TM process.
+The verbosity of the TM module.
 
 \item[{\tt lp\_exe, cg\_exe, cp\_exe} -- strings (``lp'', ``cg'',
 ``cp'').]
-The name of the LP, CG, and CP process binaries. Note: when running in
+The name of the LP, CG, and CP module binaries. Note: when running in
 parallel using PVM, these executables (or links to them) must reside
 in the {\tt PVM\_ROOT/bin/PVM\_ARCH/} directory. Also, be sure to note
 that the executable names may have extensions that depend on the
@@ -142,7 +142,7 @@ the name that the make file produce.
 
 \item[{\tt lp\_debug, cg\_debug, cp\_debug} -- boolean (all {\tt
 FALSE}).]
-Whether the processes should be started under a debugger or not.
+Whether the modules should be started under a debugger or not.
 
 \item[{\tt max\_active\_nodes} -- integer (1).]
 The maximum number of active search tree nodes---equal to the number of
@@ -156,14 +156,14 @@ The maximum number of cut pools to be used.
 The number of processors in the virtual machine to run LP (CG, CP)
 processes. If this value is 0 then the processes will be assigned to
 processors in round-robin order. Otherwise the next {\tt xx\_mach\_num} lines
-describe the processors where the LP (CG, CP) processes must run. The
+describe the processors where the LP (CG, CP) modules must run. The
 keyword -- value pairs on these lines must be {\bf TM\_xx\_machine} and the
 name or IP address of a processor (the processor names need not be distinct).
 In this case the actual processes are assigned in a round robin fashion to the
 processors on this list.\\
 \\
 This feature is useful if a specific software package is needed for
-some process, but that software is not licensed for every node of the
+some module, but that software is not licensed for every node of the
 virtual machine or if a certain process must run on a certain type of
 machine due to resource requirements.
 
@@ -354,7 +354,7 @@ output. A time limit of zero means there is no limit.
 \begin{description}
 
 \item[{\tt LP\_verbosity} -- integer (0).]
-Verbosity level of the LP process.
+Verbosity level of the LP module.
 
 \item[{\tt set\_obj\_upper\_lim} -- boolean ({\tt FALSE}).]
 Whether to stop solving the LP relaxation when it's optimal value is
@@ -380,7 +380,7 @@ INTEGER\_PROBLEM}\{1\} or {\tt MIXED\_INTEGER\_PROBLEM}\{2\}.
 \item[{\tt cut\_pool\_check\_frequency} -- integer (10).]
 The number of iterations between sending LP solutions to the cut pool
 to find violated cuts. It is not advisable to check the cut pool too
-frequently as the cut pool process can get bogged down and the LP
+frequently as the cut pool module can get bogged down and the LP
 solution generally do not change that drastically from one iteration
 to the next anyway.
 
@@ -427,7 +427,7 @@ Same as above except for rows.
 
 \item[{\tt tailoff\_gap\_backsteps, tailoff\_gap\_frac} -- integer, double
 (2, .99).]
-Determines when tailoff is detected in the LP process.
+Determines when tailoff is detected in the LP module.
 Tailoff is reported if the average ratio of the current gap to the
 previous iteration's gap over the last {\tt tailoff\_gap\_backsteps}
 iterations wasn't at least {\tt tailoff\_gap\_frac}.
@@ -489,7 +489,7 @@ combinations of these two variables.
 This keyword does not have an associated value. If this keyword
 appears on a line by itself or with a value, this tells the framework
 not to time out while waiting for cuts. This is useful for debugging
-since it enables runs with a single LP process to be duplicated.
+since it enables runs with a single LP module to be duplicated.
 
 \item[{\tt all\_cut\_timeout} -- double (no default).]
 This keyword tells the framework to set all of the above timeout
@@ -603,7 +603,7 @@ without recompiling.
 \begin{description}
 
 \item[{\tt CG\_verbosity} -- integer (0).]
-Verbosity level for the cut generator process.
+Verbosity level for the cut generator module.
 
 \end{description}
 
@@ -612,7 +612,7 @@ Verbosity level for the cut generator process.
 \begin{description}
 
 \item[{\tt CP\_verbosity} -- integer (0).]
-Verbosity of the cut pool process.
+Verbosity of the cut pool module.
 
 \item[{\tt cp\_logging} -- boolean (0).]
 Determines whether the logging option is enabled. In this case, the

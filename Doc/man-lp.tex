@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{User-written functions of the LP process}
+\subsection{User-written functions of the LP module}
 \label{user-written-lp}
 \begin{latexonly}
 {\large \bf Data Structures}\\
@@ -9,7 +9,7 @@
 \subsubsection{Data Structures}
 \end{htmlonly}
 \noindent We first describe a few structures that are used to pass
-data into and out of the user functions of the LP process.
+data into and out of the user functions of the LP module.
 
 %begin{latexonly}
 \begin{description}
@@ -30,8 +30,8 @@ purposes. First, it is used to store the description of a generic MIP that is
 either read in from an MPS or AMPL file. More importantly, it is the data
 structure the user must use to pass the subproblem descriptions back to
 SYMPHONY at the time a new search tree node is created in the function
-\hyperref{{\tt user\_create\_subproblem()}} {{\tt user\_create\_subproblem()} (see
-Section }{)}{user_create_subproblem}. The structure has 14 fields (listed
+\hyperref{{\tt user\_create\_subproblem()}} {{\tt user\_create\_subproblem()}
+(see Section }{)}{user_create_subproblem}. The structure has 14 fields (listed
 below) that must be filled out to describe a subproblem (some fields are
 optional). \\
 \\
@@ -205,17 +205,19 @@ int user_receive_lp_data (void **user)
 
 \describe
 
-The user has to receive here all problem-specific information sent
-from the master, set up necessary data structures, etc. Note that the
-data need only be actively received and the user data structure
-allocated if either the TM or LP modules are configured as separate
-processes. Otherwise, data will have been copied into appropriate
-locations in the master function \hyperref{{\tt user\_send\_lp\_data()}}
-{{\tt user\_send\_lp\_data()} (see Section }{)}{user_send_lp_data}. The two
-cases can be handled by means of {\tt \#ifdef} statements. See comments
-in the source code stubs for more details. Note that the data must be
-received in exactly the same order as it was sent from the master. See
-Section \ref{communication} for more notes on receiving data.
+This function only has to be filled out for parallel execution and only if
+either the TM or LP modules are configured as separate processes. Otherwise,
+data will have been copied into appropriate locations in the master function
+\hyperref{{\tt user\_send\_lp\_data()}} {{\tt user\_send\_lp\_data()} (see
+Section }{)}{user_send_lp_data}. The two cases can be handled by means of {\tt
+\#ifdef} statements. See comments in the source code stubs for more details.
+
+Here, the user must receive here all problem-specific information sent from
+the master, set up necessary data structures, etc. Note that the data must be
+received in exactly the same order as it was sent in \hyperref{{\tt
+user\_send\_lp\_data()}} {{\tt user\_send\_lp\_data()} (see Section
+}{)}{user_send_lp_data}. See Section \ref{communication} for more notes on
+receiving data.
 
 \args
 
@@ -227,47 +229,12 @@ structure. \\
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. \BB\ aborts this LP process. \\
-{\tt USER\_NO\_PP} & User received the data. \\
+{\tt USER\_ERROR} & Error. \BB\ aborts this LP module. \\
+{\tt USER\_SUCCESS} & User received the data. \\
+{\tt USER\_DEFAULT} & User function not implemented. \\
 \et
 
 \item[Wrapper invoked from:] {\tt lp\_initialize()} at process start.
-
-\ed
-
-\vspace{1ex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% user_free_lp
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\functiondef{user\_free\_lp}
-\begin{verbatim}
-int user_free_lp(void **user)
-\end{verbatim}
-
-\bd
-
-\describe
-
-The user has to free all the data structures within {\tt *user}, and also free
-{\tt user} itself. The user can use the built-in macro {\tt FREE} that checks
-the existence of a pointer before freeing it. 
-
-\args
-
-\bt{llp{250pt}}
-{\tt void **user} & INOUT & Pointer to the user-defined LP data structure. \\
-\et
-
-\returns
-
-\bt{lp{300pt}}
-{\tt ERROR} & Error. \BB\ ignores error message. \\
-{\tt USER\_NO\_PP} & User freed everything in the user space. \\
-\et
-
-\item[Wrapper invoked from:] {\tt lp\_close()} at process shutdown.
 
 \ed
 
@@ -328,11 +295,13 @@ arrays and specify the constraint matrix automatically in this case.
 \returns
 
 \bt{lp{330pt}}
-{\tt ERROR} & Error. The LP process is aborted. \\
-{\tt USER\_AND\_PP} & Post-processing will be skipped, the user added the
-constraints corresponding to the cuts. \\
-{\tt USER\_NO\_PP} & User created the matrix with only the base constraints. \\
-{\tt DEFAULT} & User let \BB\ create the LP relaxation since an mps file is read in.
+{\tt USER\_ERROR} & Error. The LP module is aborted. \\
+{\tt USER\_SUCCESS} & User created the constraint matrix with the base
+constraints. 
+{\tt USER\_DEFAULT} & This return code is used when the default routines for
+reading in an MPS or AMPL file were used and the user wants to let SYMPHONY
+set up the subproblem automatically. This return will cause an error if the
+default I/O routines were not used. 
 \et
 
 \postp
@@ -356,7 +325,8 @@ invoked when setting up a the initial search node in a chain.
 \functiondef{user\_is\_feasible}
 \begin{verbatim}
 int user_is_feasible(void *user, double lpetol, int varnum, int
-                     *indices, double *values, int *feasible)
+                     *indices, double *values, int *feasible, 
+		     double *true_objval)
 \end{verbatim}
 
 \bd
@@ -383,15 +353,18 @@ current solution.\\
 & & \\
 {\tt int *feasible} & OUT & Feasibility status of the solution ({\tt
 NOT\_FEASIBLE}, or {\tt FEASIBLE}). \\
+{\tt double *true_objval} & OUT & The user can return the ``true'' objective
+function value of the solution in the case it is feasible, i.e., eliminating
+the round-off error.
 \et
 
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. Solution is considered to be not feasible.\\
-{\tt USER\_NO\_PP} & User checked IP feasibility. \\
-{\tt DEFAULT} & Regulated by the parameter {\tt is\_feasible\_default},
-but set to {\tt TEST\_INTEGRALITY} unless over-ridden by the user.\\
+{\tt USER\_ERROR} & Error. Solution is considered to be not feasible.\\
+{\tt USER\_SUCCESS} & User checked IP feasibility. \\
+{\tt USER\_DEFAULT} & Regulated by the parameter {\tt is\_feasible\_default},
+but set to {\tt TEST\_INTEGRALITY} unless overridden by the user.\\
 {\tt TEST\_INTEGRALITY} & Test integrality of the given solution. \\
 {\tt TEST\_ZERO\_ONE} & Tests whether the solution is binary. \\
 \et
@@ -416,15 +389,17 @@ int user_send_feasible_solution(void *user, double lpetol,
 \bd
 \describe
 
-Send a feasible solution to the master process. The solution is sent
-using the communication functions described in Section
+This function is only used for parallel computation. The user can send a
+feasible solution in custom format to the master module if desired. However,
+the default routine suffices in most situations. The solution is sent using
+the communication functions described in Section
 \ref{communication} in whatever logical format the user wants to use.
 The default is to pack the user indices and values of variables at
 non-zero level. If the user packs the
 solution herself then the same data must be packed here that will be
 received in the {\tt \htmlref{user\_receive\_feasible\_solution()}
 {user_receive_feasible_solution}} function in
-the master process. See the description of that function for details.
+the master module. See the description of that function for details.
 This function will only be called when either the LP or tree manager
 are running as a separate executable. Otherwise, the solution gets
 stored within the LP user data structure.
@@ -445,11 +420,11 @@ in the current solution.\\
 \returns
 
 \bt{lp{315pt}}
-{\tt ERROR} & Error. Do the default.\\
-{\tt USER\_NO\_PP} & User packed the solution.\\
-{\tt DEFAULT} & Regulated by the parameter {\tt
+{\tt USER\_ERROR} & Error. Do the default.\\
+{\tt USER\_SUCCESS} & User packed the solution.\\
+{\tt USER\_DEFAULT} & Regulated by the parameter {\tt
 pack\_feasible\_solution\_default}, but set to {\tt SEND\_NONZEROS}
-unless over-ridden by the user.\\
+unless overridden by the user.\\
 {\tt SEND\_NONZEROS} & Pack the nonzero values and their indices.\\
 \et
 
@@ -500,9 +475,11 @@ nonzero level in the current solution.\\
 \returns
 
 \bt{lp{317pt}}
-{\tt ERROR} & Error. \BB\ ignores error message. \\
-{\tt USER\_NO\_PP} & User displayed whatever she wanted to.\\
-{\tt DEFAULT} & Regulated by the parameter {\tt display\_solution\_default}. \\
+{\tt USER\_ERROR} & Error. \BB\ ignores error message. \\
+{\tt USER\_SUCCESS} & User displayed whatever she wanted to.\\
+{\tt USER\_DEFAULT} & Regulated by the parameter {\tt
+display\_solution\_default}, but set to {\tt DISP\_NZ\_INT} unless overridden
+by the user.\\
 {\tt DISP\_NOTHING} & Display nothing. \\
 {\tt DISP\_NZ\_INT} & Display user indices (as integers) and values of
 nonzero variables. \\
@@ -627,18 +604,18 @@ returned (the length of {\tt *candidates}).\\
 {\tt candidate ***candidates} & OUT & Pointer to the array of
 candidates generated (see description below).\\
 {\tt int *action} & OUT & What to do. Must be one of the four above described
-values.
+valuesunless the return code is {\tt USER\_DEFAULT}.
 \et
 
 \returns
 
 \bt{lp{340pt}}
-{\tt ERROR} & Error. {\tt DEFAULT} is used. \\
-{\tt USER\_NO\_PP} & The user filled out {\tt *action} (and possibly {\tt
+{\tt USER\_ERROR} & Error. {\tt DEFAULT} is used. \\
+{\tt USER\_SUCCESS} & The user filled out {\tt *action} (and possibly {\tt
 *cand\_num} and {\tt *candidates}). \\
-{\tt DEFAULT} & action is set to the value of the parameter {\tt
+{\tt USER\_DEFAULT} & action is set to the value of the parameter {\tt
 shall\_we\_branch\_default}, which is initially
-{\tt USER\_\_BRANCH\_IF\_MUST} unless over-ridden by the user. \\ 
+{\tt USER\_\_BRANCH\_IF\_MUST} unless overridden by the user. \\ 
 \et
 
 \item[Notes:] \hfill
@@ -798,10 +775,11 @@ in deciding how many strong branching candidates to use.
 \returns
 
 \bt{lp{210pt}}
-{\tt ERROR} & Error. {\tt DEFAULT} is used. \\
-{\tt USER\_NO\_PP} & User generated branching candidates. \\
-{\tt DEFAULT} & Regulated by the {\tt select\_candidates\_default} parameter
-(one of the following three options).\\
+{\tt USER\_ERROR} & Error. {\tt DEFAULT} is used. \\
+{\tt USER\_SUCCESS} & User generated branching candidates. \\
+{\tt USER\_DEFAULT} & Regulated by the {\tt select\_candidates\_default} 
+parameter, but set to {\tt USER\_\_CLOSE\_TO\_HALF} unless overridden by the
+user.\\
 {\tt USER\_\_CLOSE\_TO\_HALF} & Choose variables with values closest to half.\\
 {\tt USER\_\_CLOSE\_TO\_HALF\_AND\_EXPENSIVE} & Choose variables
 with values close to half and with high objective function coefficients.\\
@@ -833,18 +811,17 @@ int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
 \bd
 \describe
 
-By the time this function is invoked, the children of the current
-search tree node corresponding to each branching candidate have been
-pre-solved, i.e., the {\tt objval}, {\tt termcode}, {\tt iterd}, and
-{\tt feasible} fields of the {\tt can1} and {\tt can2} structures are
-filled out. Note that if the termination code for a child is {\tt
-D\_UNBOUNDED} or {\tt D\_OBJLIM}, i.e., the dual problem is unbounded
-or the objective limit is reached, then the objective value of that
-child is set to {\tt MAXDOUBLE / 2}. Similarly, if the termination
-code is one of {\tt D\_ITLIM} (iteration limit reached), {\tt
-D\_INFEASIBLE} (dual infeasible) or {\tt ABANDONED} (because of
-numerical difficulties) then the objective value of that child is set
-to that of the parent's.\\
+By the time this function is invoked, the children of the current search tree
+node corresponding to each branching candidate have been pre-solved, i.e., the
+{\tt objval}, {\tt termcode}, {\tt iterd}, and {\tt feasible} fields of the
+{\tt can1} and {\tt can2} structures are filled out. Note that if the
+termination code for a child is {\tt LP\_D\_UNBOUNDED} or {\tt LP\_D\_OBJLIM},
+i.e., the dual problem is unbounded or the objective limit is reached, then
+the objective value of that child is set to {\tt MAXDOUBLE / 2}. Similarly, if
+the termination code is one of {\tt LP\_D\_ITLIM} (iteration limit reached),
+{\tt LP\_D\_INFEASIBLE} (dual infeasible) or {\tt LP\_ABANDONED} (because of
+numerical difficulties) then the objective value of that child is set to that
+of the parent's.\\
 \\
 Based on this information the user must choose which candidate he
 considers better and whether to branch on this better one immediately
@@ -874,22 +851,32 @@ above. \\
 \returns
 
 \bt{lp{290pt}}
-{\tt ERROR} & Error. {\tt DEFAULT} is used. \\
-{\tt USER\_NO\_PP} & User filled out {\tt *which\_is\_better}. \\
-{\tt DEFAULT} & Regulated by the {\tt compare\_candidates\_default}
-parameter, initially set to {\tt LOWEST\_LOW\_OBJ} unless over-ridden by the
+{\tt USER\_ERROR} & Error. {\tt DEFAULT} is used. \\
+{\tt USER\_SUCCESS} & User filled out {\tt *which\_is\_better}. \\
+{\tt USER\_DEFAULT} & Regulated by the {\tt compare\_candidates\_default}
+parameter, initially set to {\tt LOWEST\_LOW\_OBJ} unless overridden by the
 user. \\
-{\tt BIGGEST\_DIFFERENCE} & Prefer the candidate with the biggest
+{\tt BIGGEST\_DIFFERENCE\_OBJ} & Prefer the candidate with the biggest
 difference between highest and lowest objective function values.\\
-{\tt LOWEST\_LOW} & Prefer the candidate with the lowest minimum
+{\tt LOWEST\_LOW\_OBJ} & Prefer the candidate with the lowest minimum
 objective function value. The minimum is taken over the objective function
 values of all the children. \\
-{\tt HIGHEST\_LOW} & Prefer the candidate with the highest minimum
+{\tt HIGHEST\_LOW\_OBJ} & Prefer the candidate with the highest minimum
 objective function value. \\
-{\tt LOWEST\_HIGH} & Prefer the candidate with the lowest maximum
+{\tt LOWEST\_HIGH\_OBJ} & Prefer the candidate with the lowest maximum
 objective function value. \\
-{\tt HIGHEST\_HIGH} & Prefer the candidate with the highest maximum
+{\tt HIGHEST\_HIGH\_OBJ} & Prefer the candidate with the highest maximum
 objective function value .\\
+{\tt LOWEST\_LOW\_FRAC} & Prefer the candidate with the lowest minimum
+number of fractional variables. The minimum is taken over the number of
+fractional variables in all the children. Fractional branching options are 
+only available if the fractional branching compile-time option is set in the
+make file.\\ 
+{\tt HIGHEST\_LOW\_FRAC} & Prefer the candidate with the highest minimum
+{\tt LOWEST\_HIGH\_FRAC} & Prefer the candidate with the lowest maximum
+number of fractional variables. \\
+{\tt HIGHEST\_HIGH\_FRAC} & Prefer the candidate with the highest maximum
+number of fractional variables. \\
 \et
 
 \item[Wrapper invoked from:] {\tt select\_branching\_object()} after
@@ -924,7 +911,7 @@ pruned based on some problem specific property---no questions
 asked...), {\tt PRUNE\_THIS\_CHILD\_FATHOMABLE} (the child will be
 pruned based on its pre-solved LP relaxation) and {\tt
 RETURN\_THIS\_CHILD} (the child will be sent back to tree manager).
-Note that at most one child can be kept at the current LP process.
+Note that at most one child can be kept at the current LP module.
 
 There are two default options---in both of them, objective values of the
 pre-solved LP relaxations are compared (for those children whose pre-solve
@@ -948,17 +935,21 @@ already allocated to length {\tt can->number}.\\
 \returns
 
 \bt{lp{265pt}}
-{\tt ERROR} & Error. {\tt DEFAULT} is used. \\
-{\tt USER\_NO\_PP} & User filled out {\tt *action}. \\
-{\tt USER\_AND\_PP} & User filled out {\tt *action} and did an
-equivalent of the post-processing.\\
-{\tt DEFAULT} & Regulated by the {\tt select\_child\_default}
+{\tt USER\_ERROR} & Error. {\tt DEFAULT} is used. \\
+{\tt USER\_SUCCESS} & User filled out {\tt *action}. \\
+{\tt USER\_DEFAULT} & Regulated by the {\tt select\_child\_default}
 parameter, which is initially set to {\tt PREFER\_LOWER\_OBJ\_VALUE},
-unless over-ridden by the user. \\
+unless overridden by the user. \\
 {\tt PREFER\_HIGHER\_OBJ\_VALUE} & Choose child with the highest
 objective value.\\
 {\tt PREFER\_LOWER\_OBJ\_VALUE} & Choose child with the lowest
 objective value.\\
+{\tt PREFER\_MORE\_FRACTIONAL} & Choose child with the most fractional
+variables. Fractional branching options are 
+only available if the fractional branching compile-time option is set in the
+make file.\\
+{\tt PREFER\_LESS\_FRACTIONAL} & Choose child with the lowest number of
+fractional variables.\\
 \et
 
 \postp
@@ -1007,8 +998,9 @@ branching object is a cut. \\
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. Ignored by \BB. \\
-{\tt USER\_NO\_PP} & The user printed out whatever she wanted to. \\
+{\tt USER\_ERROR} & Error. Ignored by \BB. \\
+{\tt USER\_SUCCESS} & The user printed out whatever she wanted to. \\
+{\tt USER\_DEFAULT} & SYMPHONY prints out is own branching information. \\
 \et
 
 \item[Wrapper invoked from:] {\tt branch()} after the best candidate has been
@@ -1054,9 +1046,9 @@ allocated by the user).\\
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. {\tt DEFAULT} is used. \\
-{\tt USER\_NO\_PP} & User filled out {\tt *desc\_size} and {\tt *desc}.\\
-{\tt DEFAULT} & No description is appended. \\
+{\tt USER\_ERROR} & Error. {\tt DEFAULT} is used. \\
+{\tt USER\_SUCCESS} & User filled out {\tt *desc\_size} and {\tt *desc}.\\
+{\tt USER\_DEFAULT} & No description is appended. \\
 \et
 
 \item[Wrapper invoked from:] {\tt create\_explicit\_node\_desc()} before a
@@ -1100,9 +1092,9 @@ comparable).\\
 \returns
 
 \bt{lp{295.386pt}}
-{\tt ERROR} & Error. {\tt DEFAULT} is used.\\
-{\tt USER\_NO\_PP} & User did the comparison, filled out {\tt *same\_cuts}. \\
-{\tt DEFAULT} & Compare byte by byte (see above). \\
+{\tt USER\_ERROR} & Error. {\tt DEFAULT} is used.\\
+{\tt USER\_SUCCESS} & User did the comparison, filled out {\tt *same\_cuts}. \\
+{\tt USER\_DEFAULT} & Compare byte by byte (see above). \\
 \et
 
 \item[Wrapper invoked from:] {\tt process\_message()} when a {\tt PACKED\_CUT}
@@ -1133,14 +1125,23 @@ int user_unpack_cuts(void *user, int from, int one_row_only, int varnum,
 \bd
 \describe
 
-The user has to interpret the given cuts as constraints for the
-current LP relaxation, i.e., he must decode the compact representation
-of the cuts (see the {\tt \htmlref{cut\_data}{cut_data}} structure) into
-rows for the matrix. A pointer to the array of generated rows must be
-returned in {\tt ***new\_rows} (the user has to allocate this array)
-and their number in {\tt *new\_row\_num}.
+If the user has defined application-specific cut classes, these cuts must be
+interpreted as constraints for the current LP relaxation, i.e., the user must
+decode the compact representation of the cuts (see the {\tt
+\htmlref{cut\_data}{cut_data}} structure) into rows for the matrix. A pointer
+to the array of generated rows must be returned in {\tt ***new\_rows} (the
+user has to allocate this array) and their number in {\tt *new\_row\_num}.
 
-There is no post processing. There are no built-in default options.
+Note that SYMPHONY has built-in support for cuts generated explicitly as
+matrix rows with no user-defined packed form, i.e., cuts whose indices and
+coefficients are given explicitly (see the function
+\hyperref{{\tt user\_find\_cuts()}} {{\tt user\_find\_cuts()} in Section
+}{}{user_find_cuts}. These cuts can be constructed using the helper function
+\hyperref{{\tt create\_explicit\_cut()}} {{\tt create\_explicit\_cut()} (see
+Section }{)}{create_explicit_cut} and are packed and unpacked automatically,
+so the user does not need to implement this function. In post processing,
+SYMPHONY unpacks explicitly defined cuts and internally generated generic
+cuts.
 
 \args
 
@@ -1165,12 +1166,21 @@ pointers to the new rows. \\
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. The cuts are discarded.\\
-{\tt USER\_NO\_PP} & User unpacked the cuts.\\
+{\tt USER\_ERROR} & Error. The cuts are discarded.\\
+{\tt USER\_SUCCESS} & User unpacked the cuts. \\
+{\tt USER\_DEFAULT} & There are no user cut types defined. In this case,
+SYMPHONY deals with only exlicit cuts and internally generated cuts. 
 \et
 
 \item[Wrapper invoked from:] Wherever a cut needs to be unpacked
 (multiple places).
+
+\postp
+
+Explicit row cuts are processed, as well as SYMPHONY's internally generated
+cuts. Also, the pointers to each cut are transferred to the
+\texttt{waiting\_rows} data structure (in previous version, this was done by
+the user).   
 
 \item[Notes:] \hfill
 
@@ -1233,6 +1243,7 @@ int user_send_lp_solution(void *user, int varnum, var_desc **vars,
 \bd
 \describe
 
+This function is only used in the case of parallel execution. 
 The user has the option to send the LP solution to either the cut pool
 or the cut generator in some user-defined form if desired. There are
 two default options---sending the indices and values for all nonzero
@@ -1248,15 +1259,16 @@ for all fractional variables ({\tt SEND\_FRACTIONS}).
 relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\
 {\tt var\_desc **vars} & IN & The variables currently in the LP relaxation.\\
 {\tt double *x} & IN & Values of the above variables.\\
-{\tt int where} & IN & Where the solution is to be sent---{\tt LP\_SOL\_TO\_CG} or {\tt LP\_SOL\_TO\_CP}. \\
+{\tt int where} & IN & Where the solution is to be sent---{\tt
+LP\_SOL\_TO\_CG} or {\tt LP\_SOL\_TO\_CP}. \\
 \et
 
 \returns
 
 \bt{lp{315pt}}
-{\tt ERROR} & Error. No message will be sent. \\
-{\tt USER\_NO\_PP} & User packed and sent the message. \\
-{\tt DEFAULT} & Regulated by the {\tt pack\_lp\_solution\_default}
+{\tt USER\_ERROR} & Error. No message will be sent. \\
+{\tt USER\_SUCCESS} & User packed and sent the message. \\
+{\tt USER\_DEFAULT} & Regulated by the {\tt pack\_lp\_solution\_default}
 parameter, initially set to {\tt SEND\_NOZEROS}. \\
 {\tt SEND\_NONZEROS} & Send user indices and values of variables
 at nonzero level.\\
@@ -1324,9 +1336,10 @@ relaxation. \\
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. Ignored by \BB. \\
-{\tt USER\_NO\_PP} & User changed the stati of the variables she
+{\tt USER\_ERROR} & Error. Ignored by \BB. \\
+{\tt USER\_SUCCESS} & User changed the stati of the variables she
 wanted. \\
+{\tt USER\_DEFAULT} & User function not implemented. \\
 \et
 
 \item[Wrapper invoked from:] {\tt fix\_variables()} after doing reduced cost
@@ -1404,9 +1417,10 @@ next variable.\\
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Error. The LP process is aborted.\\
-{\tt USER\_NO\_PP} & User filled out {\tt *real\_nextind} and
+{\tt USER\_ERROR} & Error. The LP process is aborted.\\
+{\tt USER\_SUCCESS} & User filled out {\tt *real\_nextind} and
 generated its column if needed.\\
+{\tt USER\_DEFAULT} & User function not implemented. \\
 \et
 
 \item[Wrapper invoked from:] {\tt price\_all\_vars()} and {\tt
@@ -1427,72 +1441,59 @@ generate\_what} is {\tt GENERATE\_REAL\_NEXTIND}.
 
 \functiondef{user\_generate\_cuts\_in\_lp}
 \begin{verbatim}
-int user_generate_cuts_in_lp(void *user, int varnum, var_desc **vars, 
-                             double *x, int *new_row_num, 
-                             waiting_row ***new_rows)
+int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
+			     var_desc **vars, double *x, int *new_cut_num,
+			     cut_data ***new_cuts)
 \end{verbatim}
 
 \bd
 \describe
 
-The user might decide to generate cuts directly within the LP process
-instead of using the cut generator. This can be accomplished either
-through a call to this function or simply by configuring \BB\ such
-that the cut generator is called directly from the LP solver. One
-example of when this might be done is when generating Gomory cuts
-(this is planned to be part of \BB\ later) or something else that
-requires knowledge of the current LP tableau. The IN arguments are the
-same as in {\tt 
-\htmlref{user\_send\_lp\_solution()}{user_send_lp_solution}} (except
-that there is no {\tt where} argument). Not only the generated cuts
-but the corresponding rows must be returned (the cuts are in the
-{\tt \htmlref{waiting\_row}{waiting_row}} structures) because the {\tt
-\htmlref{user\_unpack\_cuts()}{user_unpack_cuts}}
-function will not be invoked for the generated cuts. Also, the user
-must fill out the {\tt violation} field for every row. The reason for
-this is that any cut generated here will definitely correspond to the
-current LP solution so the user must have already computed the
-violation when generating the cut.\\
-\\
-Post-processing consists of checking if any of the new cuts are
-already in the local pool (or dominated by a cut in the local pool).
-Since the user will probably use this function to generate
-tableau-dependent cuts, it is highly unlikely that any of the new cuts would
-already be in the pool. Therefore the user will probably return {\tt
-USER\_AND\_PP} to force \BB\ to skip post-processing.
+The user might decide to generate cuts directly within the LP module instead
+of using the cut generator. This can be accomplished either through a call to
+this function or simply by configuring \BB\ such that the cut generator is
+called directly from the LP solver. One example of when this might be done is
+when generating Gomory cuts or something else that requires knowledge of the
+current LP tableau. The user must return the list of generated cuts by
+allocating an array of \texttt{cut\_data} structures and setting
+\texttt{*new\_cuts} to point to this array. Post-processing consists of
+checking if any of the new cuts are already in the local pool (or dominated by
+a cut in the local pool).
 
 \args
 
 \bt{llp{225pt}}
 {\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\
 & & \\
+{\tt LPdata *lp_data} & A pointer to SYMPHONY's internal data structure for
+storing the LP relaxation and related data.
 {\tt int varnum} & IN & The number of variables currently in the LP
 relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\
 {\tt var\_desc **vars} & IN & The variables currently in the LP relaxation.\\
 {\tt double *x} & IN & Values of the above variables.\\
-{\tt int *new\_row\_num} & OUT & The number of cuts generated. \\
-{\tt waiting\_row ***new\_rows} & OUT & The cuts and the corresponding rows. \\
+{\tt int *new\_cut\_num} & OUT & The number of cuts generated. \\
+{\tt cut\_data ***new\_cuts} & OUT & The cuts and the corresponding rows. \\
 \et
 
 \returns
 
 \bt{lp{330pt}}
-{\tt ERROR} & Error. Interpreted as if no cuts were generated. \\
-{\tt USER\_NO\_PP} & Cuts were generated but \BB\ must compare them to those
-in the local pool. \\
-{\tt USER\_AND\_PP} & Cuts were generated and \BB\ should not compare them to
-those in the local pool. \\
-{\tt DEFAULT} & No cuts are generated. (At least for now. We might add Gomory
-cuts for default later.) \\
+{\tt USER\_ERROR} & Error. Interpreted as if no cuts were generated. \\
+{\tt USER\_SUCCESS} & Cuts were generated. \\
+{\tt USER\_DEFAULT} & No cuts were generated. By default, SYMPHONY uses the
+CGL to generate generic cuts, according to parameter settings. 
+{\tt GENERATE_CGL_CUTS} & Generate generic CGL cuts, according to parameter
+settings. \\
+{\tt DO_NOT_GENERATE_CGL_CUTS} & No additional cuts are generated. \\
 \et
 
 \postp
 
-\BB\ checks if any of the newly generated rows are already in the
+\BB\ checks if any of the newly generated cuts are already in the
 local pool. 
 
 \item[Wrapper invoked from:] {\tt receive\_cuts()} before the cuts from the CG
-process are received. Since the user will probably use this function
+module are received. Since the user will probably use this function
 to generate tableau-dependent cuts, it is highly unlikely that any of
 the new cuts would already be in the pool. Therefore the user will
 probably return {\tt USER\_AND\_PP} to force \BB\ to skip post-processing.
@@ -1539,9 +1540,9 @@ cuts added. \\
 \returns
 
 \bt{lp{300pt}}
-{\tt ERROR} & Revert to default. \\
-{\tt USER\_AND\_PP} & User printed whatever he wanted. \\
-{\tt DEFAULT} & Print out the number of cuts added. \\
+{\tt USER\_ERROR} & Revert to default. \\
+{\tt USER\_SUCCESS} & User printed whatever he wanted. \\
+{\tt USER\_DEFAULT} & Print out the number of cuts added. \\
 \et
 
 \item[Wrapper invoked from:] {\tt add\_best\_waiting\_rows()} after it has been decided how many cuts to
@@ -1591,18 +1592,53 @@ char}) showing which waiting rows are to be deleted. \\
 \returns
 
 \bt{lp{330pt}}
-{\tt ERROR} & Purge every single waiting row. \\
-{\tt USER\_AND\_PP} & The user removed the unwanted waiting rows and
-compressed the remaining list. \\
-{\tt USER\_NO\_PP} & The user marked in {\tt delete} the rows to be deleted. \\
-{\tt DEFAULT} & Described above. \\
+{\tt USER\_ERROR} & Purge every single waiting row. \\
+{\tt USER\_SUCCESS} & The user marked in {\tt delete} the rows to be deleted. 
+\\
+{\tt USER\_DEFAULT} & Described above. \\
 \et
 
 \postp
 
-Delete the appropriate rows.
+The marked rows are deleted.
 
 \item[Wrapper invoked from:] {\tt receive\_cuts()} after cuts have been added.
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_free_lp
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_free\_lp}
+\begin{verbatim}
+int user_free_lp(void **user)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user has to free all the data structures within {\tt *user}, and also free
+{\tt user} itself. The user can use the built-in macro {\tt FREE} that checks
+the existence of a pointer before freeing it. 
+
+\args
+
+\bt{llp{250pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined LP data structure. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt USER\_ERROR} & Error. \BB\ ignores error message. \\
+{\tt USER\_SUCCESS} & User freed everything in the user space. \\
+\et
+
+\item[Wrapper invoked from:] {\tt lp\_close()} at module shutdown.
 
 \ed
 

@@ -38,18 +38,6 @@ void initialize_u(problem *p)
 
 /*===========================================================================*/
 
-void free_master_u(problem *p)
-{
-   CALL_USER_FUNCTION( user_free_master(&p->user) );
-
-   if (p->mip){
-      free_mip_desc(p->mip);
-      FREE(p->mip);
-   }
-}
-
-/*===========================================================================*/
-
 void readparams_u(problem *p, int argc, char **argv)
 {
    int i;
@@ -59,7 +47,7 @@ void readparams_u(problem *p, int argc, char **argv)
 
    switch(user_readparams(p->user, p->par.param_file, argc, argv)){
 
-    case DEFAULT:
+    case USER_DEFAULT:
       
       foundF = foundD = FALSE;
       for (i = 1; i < argc; i++){
@@ -84,12 +72,16 @@ void readparams_u(problem *p, int argc, char **argv)
       }
       break;
       
-    case ERROR:
+    case USER_SUCCESS:
+    case USER_NO_PP:
+    case USER_AND_PP:
+      break;
+      
+    case USER_ERROR:
       
       printf("\n\n*********User error detected -- aborting***********\n\n");
       exit(1000);
-      break;
-      
+
     default:
       break;	 	       
    }
@@ -105,7 +97,7 @@ void io_u(problem *p)
 
    switch( user_io(p->user) ){
 
-    case DEFAULT: 
+    case USER_DEFAULT: 
 
       if (strcmp(p->par.datafile, "") == 0){ 
 	 err = read_mps(p->mip, p->par.infile, p->probname);
@@ -122,7 +114,7 @@ void io_u(problem *p)
 	    exit(1000);
 	 }
 #else
-	 printf("ERROR: SYMPHONY can only read GMPL files if GLPK is \n");
+	 printf("ERROR: SYMPHONY can only read GMPL/AMPL files if GLPK is \n");
 	 printf("installed and the USE_GLMPL compiler define is set. \n");
 	 printf("Exiting.\n\n");
 #endif
@@ -136,6 +128,9 @@ void io_u(problem *p)
       exit(1000);
       break;
 
+    case USER_SUCCESS:
+    case USER_NO_PP:
+    case USER_AND_PP:
     default:
 
       break;
@@ -518,23 +513,23 @@ void display_solution_u(problem *p, int thread_num)
 				    sol.xval, sol.objval);
    
    switch(user_res){
-    case USER_NO_PP:
+    case USER_SUCCESS:
       return;
-    case USER_AND_PP:
-    case DEFAULT:
+    case USER_DEFAULT:
       if (sol.xlength){
 	 if (p->mip->colname){ 
-	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    printf(" Column names and values of nonzeros in the solution\n");
-	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for (i = 0; i < sol.xlength; i++){
-	       printf("%8s %10.3f\n", p->mip->colname[sol.xind[i]], sol.xval[i]);
+	       printf("%8s %10.3f\n", p->mip->colname[sol.xind[i]],
+		      sol.xval[i]);
 	    }
 	    printf("\n");
 	 }else{
-	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    printf(" User indices and values of nonzeros in the solution\n");
-	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for (i = 0; i < sol.xlength; i++){
 	       printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
 	    }
@@ -542,6 +537,11 @@ void display_solution_u(problem *p, int thread_num)
 	 }
 	 return;
       }
+    case USER_ERROR:
+      return;
+      
+    default:
+      return;
    }
 }
 
@@ -552,3 +552,16 @@ void process_own_messages_u(problem *p, int msgtag)
    CALL_USER_FUNCTION( user_process_own_messages(p->user, msgtag) );
 }
 
+/*===========================================================================*/
+
+void free_master_u(problem *p)
+{
+   CALL_USER_FUNCTION( user_free_master(&p->user) );
+
+   if (p->mip){
+      free_mip_desc(p->mip);
+      FREE(p->mip);
+   }
+}
+
+/*===========================================================================*/

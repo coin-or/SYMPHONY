@@ -111,9 +111,11 @@ int receive_lp_data_u(lp_prob *p)
    }
    
    switch( user_receive_lp_data(&p->user)){
-    case ERROR:
+    case USER_ERROR:
       freebuf(r_bufid);
       return(FALSE);
+    case USER_SUCCESS:
+    case USER_AND_PP: 
     case USER_NO_PP:
       /* User function terminated without problems. No post-processing. */
       break;
@@ -123,28 +125,6 @@ int receive_lp_data_u(lp_prob *p)
       return(FALSE);
    }
    return(TRUE);
-}
-
-/*===========================================================================*/
-
-/*===========================================================================*\
- * This function invokes the user written function user_free_prob_dependent
- * that deallocates the user defined part of the data structure. Returns TRUE
- * if succeeded, FALSE otherwise.
-\*===========================================================================*/
-
-void free_prob_dependent_u(lp_prob *p)
-{
-   switch (user_free_lp(&p->user)){
-    case ERROR:
-      /* BlackBox ignores error message */
-    case USER_NO_PP:
-      /* User function terminated without problems. No post-processing. */
-      return;
-    default:
-      /* Unexpected return value. Do something!! */
-      break;
-   }
 }
 
 /*===========================================================================*/
@@ -242,8 +222,15 @@ int create_subproblem_u(lp_prob *p)
    
    switch (user_res){
       
-    case DEFAULT:
+    case USER_DEFAULT:
        
+      if (!p->mip->matbeg){
+	 printf("Illegal return code.\n");
+	 printf("Trying to use default user_create_subproblem without");
+	 printf("reading an MPS or AMPL file. Exiting...\n\n");
+	 exit(2000);
+      }
+
       lp_data->mip->nz = p->mip->nz;      
       /* Allocate the arrays.*/
       lp_data->mip->matbeg  = (int *) malloc((lp_data->mip->n + 1) * ISIZE);
@@ -287,6 +274,7 @@ int create_subproblem_u(lp_prob *p)
 
       /* Fall through to next case */
 
+    case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
        
@@ -298,7 +286,7 @@ int create_subproblem_u(lp_prob *p)
       lp_data->m = p->base.cutnum;
       break;
 
-    case ERROR:
+    case USER_ERROR:
        
       /* Error. The search tree node will not be processed. */
       FREE(userind);
@@ -491,26 +479,6 @@ int create_subproblem_u(lp_prob *p)
 
 /*===========================================================================*/
 
-/* Deprecated function */
-
-#if 0
-void get_upper_bounds_u(lp_prob *p, int cnt, int *uindex, double *bd)
-{
-   int i;
-   switch (user_get_upper_bounds(p->user, cnt, uindex, bd)){
-    case DEFAULT:
-      for (i = cnt - 1; i >= 0; i--)
-	 bd[i] = 1;
-      break;
-
-    default: /* there shouldn't be any errors */
-      break;
-   }
-}
-#endif
-
-/*===========================================================================*/
-
 int is_feasible_u(lp_prob *p)
 {
 #ifndef COMPILE_IN_LP
@@ -535,12 +503,16 @@ int is_feasible_u(lp_prob *p)
    user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
 			       &feasible, &true_objval);
    switch (user_res){
-    case ERROR: /* Error. Consider as feasibility not recognized. */
+    case USER_ERROR: /* Error. Consider as feasibility not recognized. */
       return(FALSE);
+    case USER_SUCCESS:
+    case USER_AND_PP:
     case USER_NO_PP:
       break;
-    case DEFAULT: /* set the default */
+    case USER_DEFAULT: /* set the default */
       user_res = p->par.is_feasible_default;
+      break;
+    case default:
       break;
    }
 
@@ -648,10 +620,12 @@ void send_feasible_solution_u(lp_prob *p, int xlevel, int xindex,
    }
    user_res = user_send_feasible_solution(p->user, lpetol, cnt, xind, xval);
    switch (user_res){
+    case USER_SUCCESS:
+    case USER_AND_PP:
     case USER_NO_PP:
       break;
-    case ERROR: /* Error. Do the default */
-    case DEFAULT: /* set the default */
+    case USER_ERROR: /* Error. Do the default */
+    case USER_DEFAULT: /* set the default */
 	 user_res = p->par.send_feasible_solution_default;
       break;
    }
@@ -691,14 +665,14 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
    user_res = user_display_lp_solution(p->user, which_sol, number, xind, xval);
    
    switch(user_res){
-    case ERROR:
+    case USER_ERROR:
       /* SYMPHONY ignores error message. */
       return;
     case USER_AND_PP:
     case USER_NO_PP:
       /* User function terminated without problems. No post-processing. */
       return;
-    case DEFAULT:
+    case USER_DEFAULT:
       user_res = p->par.display_solution_default;
       break;
     default:
@@ -824,11 +798,12 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 				   lp_data->vars, lp_data->x, lp_data->status, 
 				   cand_num, candidates, &action);
    switch (user_res){
+    case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
       break;
-    case ERROR:   /* In case of error, default is used. */
-    case DEFAULT:
+    case USER_ERROR:   /* In case of error, default is used. */
+    case USER_DEFAULT:
       action = p->par.shall_we_branch_default;
       break;
    }
@@ -925,6 +900,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
       return(DO_NOT_BRANCH);
 
    switch(user_res){
+    case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
       if (! *cand_num){
@@ -932,8 +908,8 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 	 exit(-1);
       }
       return(DO_BRANCH);
-    case ERROR:    /* In case of error, default is used. */
-    case DEFAULT:
+    case USER_ERROR:    /* In case of error, default is used. */
+    case USER_DEFAULT:
       user_res = p->par.select_candidates_default;
       break;
     default:
@@ -1034,13 +1010,14 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
 				      p->par.granularity, &i);
 
    switch(user_res){
+    case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
        /* User function terminated without problems. No post-processing. */
       return(i);
-    case ERROR:
+    case USER_ERROR:
       /* In case of error, default is used. */
-    case DEFAULT:
+    case USER_DEFAULT:
       user_res = p->par.compare_candidates_default;
       break;
     default:
@@ -1142,9 +1119,9 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
     case USER_AND_PP:
       /* User function terminated without problems. Skip post-processing. */
       break;
-    case ERROR:
+    case USER_ERROR:
       /* In case of error, default is used. */
-    case DEFAULT:
+    case USER_DEFAULT:
       user_res = p->par.select_child_default;
       break;
     default:
@@ -1267,12 +1244,12 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
    printf("\n");
 
    if (can->type == CANDIDATE_VARIABLE){
-      user_print_branch_stat(p->user, can, NULL, p->lp_data->n,
-			     p->lp_data->vars, action);
+      CALL_USER_FUNCTION( user_print_branch_stat(p->user, can, NULL,
+			     p->lp_data->n, p->lp_data->vars, action) );
    }else{
-      user_print_branch_stat(p->user, can,
+      CALL_USER_FUNCTION( user_print_branch_stat(p->user, can,
 			     p->lp_data->rows[can->position].cut,
-			     p->lp_data->n, p->lp_data->vars, action);
+			     p->lp_data->n, p->lp_data->vars, action) );
    }
 }
 
@@ -1288,7 +1265,8 @@ void add_to_desc_u(lp_prob *p, node_desc *desc)
    desc->desc_size = 0;
    desc->desc = NULL;
 
-   user_add_to_desc(p->user, &desc->desc_size, &desc->desc);
+   CALL_USER_FUNCTION( user_add_to_desc(p->user, &desc->desc_size,
+					&desc->desc) );
 }
 
 /*===========================================================================*/
@@ -1301,11 +1279,12 @@ int same_cuts_u(lp_prob *p, waiting_row *wrow1, waiting_row *wrow2)
 
    user_res = user_same_cuts(p->user, wrow1->cut, wrow2->cut, &same_cuts);
    switch (user_res){
+    case USER_SUCCESS:
     case USER_NO_PP:
     case USER_AND_PP:
       break;
-    case ERROR: /* Error. Use the default */
-    case DEFAULT: /* the only default is to compare byte by byte */
+    case USER_ERROR: /* Error. Use the default */
+    case USER_DEFAULT: /* the only default is to compare byte by byte */
       rcut1 = wrow1->cut;
       rcut2 = wrow2->cut;
       if (rcut1->type != rcut2->type || rcut1->sense != rcut2->sense ||
@@ -1418,6 +1397,8 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
    }
        
    switch(user_res){
+    case USER_SUCCESS:
+    case USER_AND_PP:
     case USER_NO_PP:
 
       /* Combine the user's rows with SYMPHONY's rows */ 
@@ -1445,7 +1426,8 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
       
       break;
 
-    case ERROR: /* Error. ??? what will happen ??? */
+    case USER_DEFAULT:
+    case USER_ERROR: /* Error. ??? what will happen ??? */
       *new_row_num = 0;
       FREE(new_rows);
 
@@ -1492,15 +1474,16 @@ int send_lp_solution_u(lp_prob *p, int tid)
 				    tid == p->cut_gen ?
 				    LP_SOL_TO_CG : LP_SOL_TO_CP);
    switch (user_res){
-    case ERROR: /* Error. Consider as couldn't send to cut_gen, i.e.,
+    case USER_ERROR: /* Error. Consider as couldn't send to cut_gen, i.e.,
 		   equivalent to NO_MORE_CUTS_FOUND */
       freebuf(s_bufid);
       return(0);
+    case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
       msgtag = LP_SOLUTION_USER;
       break;
-    case DEFAULT: /* set the default */
+    case USER_DEFAULT: /* set the default */
       user_res = p->par.pack_lp_solution_default; /* SEND_NONZEROS */
       break;
    }
@@ -1546,8 +1529,8 @@ void logical_fixing_u(lp_prob *p)
    user_res = user_logical_fixing(p->user, p->lp_data->n, p->lp_data->vars,
 				  p->lp_data->x, status, &fixed_num);
    switch(user_res){
+    case USER_SUCCESS:
     case USER_AND_PP:
-      break;
     case USER_NO_PP:
       if (fixed_num > 0){
 	 while (status != laststat) {
@@ -1557,7 +1540,7 @@ void logical_fixing_u(lp_prob *p)
 					 PERM_FIXED_TO_LB | PERM_FIXED_TO_UB));
 	 }
       }
-    case DEFAULT:
+    case USER_DEFAULT:
       break;
    }
 }
@@ -1576,75 +1559,6 @@ int generate_column_u(lp_prob *p, int lpcutnum, cut_data **cuts,
 					    &real_nextind, colval, colind,
 					    collen, obj, lb, ub) );
    return(real_nextind);
-}
-
-/*===========================================================================*/
-
-void print_stat_on_cuts_added_u(lp_prob *p, int added_rows)
-{
-   int user_res;
-   
-   user_res = user_print_stat_on_cuts_added(p->user, added_rows,
-					    p->waiting_rows);
-   switch(user_res){
-    case ERROR:
-    case DEFAULT:
-      /* print out how many cuts have been added */
-      PRINT(p->par.verbosity, 5,
-	    ("Number of cuts added to the problem: %i\n", added_rows));
-      break;
-    case USER_AND_PP:
-      break;
-    default:
-      /* Unexpected return value. Do something!! */
-      break;
-   }      
-}
-
-/*===========================================================================*/
-
-void purge_waiting_rows_u(lp_prob *p)
-{
-   int user_res, i, j;
-   waiting_row **wrows = p->waiting_rows;
-   int wrow_num = p->waiting_row_num;
-   char *delete_rows;
-
-   REMALLOC(p->lp_data->tmp.cv, char, p->lp_data->tmp.cv_size, wrow_num,
-	    BB_BUNCH);
-   delete_rows = p->lp_data->tmp.cv; /* wrow_num */
-
-   memset(delete_rows, 0, wrow_num);
-   
-   user_res = user_purge_waiting_rows(p->user, wrow_num, wrows, delete_rows);
-   switch (user_res){
-    case ERROR: /* purge all */
-      free_waiting_rows(wrows, wrow_num);
-      p->waiting_row_num = 0;
-      break;
-    case USER_AND_PP:
-      break;
-    case DEFAULT: /* the only default is to keep enough for one iteration */
-      if (wrow_num - p->par.max_cut_num_per_iter > 0){
-	 free_waiting_rows(wrows + p->par.max_cut_num_per_iter,
-			   wrow_num-p->par.max_cut_num_per_iter);
-	 p->waiting_row_num = p->par.max_cut_num_per_iter;
-      }
-      break;
-    case USER_NO_PP:
-      for (i = j = 0; i < wrow_num; i++){
-	 if (delete_rows[i]){
-	    free_waiting_row(wrows + i);
-	 }else{
-	    wrows[j++] = wrows[i];
-	 }
-      }
-      p->waiting_row_num = j;
-      break;
-    default:
-      /* Unexpected return value. Do something!! */
-      break;
-   }
 }
 
 /*===========================================================================*/
@@ -1681,11 +1595,13 @@ void generate_cuts_in_lp_u(lp_prob *p)
 					lp_data->n, lp_data->vars, x,
 					LP_SOL_WITHIN_LP);
       
-      if (user_res2 == DEFAULT) user_res2 = p->par.pack_lp_solution_default;
+      if (user_res2 == USER_DEFAULT)
+	 user_res2 = p->par.pack_lp_solution_default;
       
       switch (user_res2){
-       case ERROR: 
+       case USER_ERROR: 
 	 return;
+       case USER_SUCCESS:
        case USER_AND_PP:
        case USER_NO_PP:
 	 break;
@@ -1787,30 +1703,33 @@ void generate_cuts_in_lp_u(lp_prob *p)
 				       lp_data->vars, x,
 				       &new_row_num, &cuts);
    
-#ifdef USE_CGL_CUTS
-
-   if (p->par.generate_cgl_cuts){
-      generate_cgl_cuts(lp_data, &new_row_num, &cuts);
-   }
-   
-#endif
-
-   if (new_row_num){
-      unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
-		    new_row_num, cuts, &new_row_num, &new_rows);
-      for (i = 0; i < new_row_num; i++){
-	 if (new_rows[i]->cut->name != CUT__SEND_TO_CP)
-	    new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
-	 new_rows[i]->source_pid = INTERNAL_CUT_GEN;
-      }
-   }
-   
    switch(user_res){
-    case ERROR:
+    case USER_ERROR:
       return;
-    case DEFAULT:
+    case GENERATE_CGL_CUTS:
+    case USER_DEFAULT:
+      /* Add to the user's list of cuts */
+#ifdef USE_CGL_CUTS
+      if (p->par.generate_cgl_cuts){
+	 generate_cgl_cuts(lp_data, &new_row_num, &cuts);
+      }
+#endif
+      /* Fall through to next case */
+      
+    case DO_NOT_GENERATE_CGL_CUTS:
+    case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
+      /* Process the generated cuts */
+      if (new_row_num){
+	 unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
+		       new_row_num, cuts, &new_row_num, &new_rows);
+	 for (i = 0; i < new_row_num; i++){
+	    if (new_rows[i]->cut->name != CUT__SEND_TO_CP)
+	       new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
+	    new_rows[i]->source_pid = INTERNAL_CUT_GEN;
+	 }
+      }
       /* Test whether any of the new cuts are identical to any of
          the old ones. */
       if (p->waiting_row_num && new_row_num){
@@ -1838,4 +1757,101 @@ void generate_cuts_in_lp_u(lp_prob *p)
       return;
    }      
 }
+
+/*===========================================================================*/
+
+void print_stat_on_cuts_added_u(lp_prob *p, int added_rows)
+{
+   int user_res;
+   
+   user_res = user_print_stat_on_cuts_added(p->user, added_rows,
+					    p->waiting_rows);
+   switch(user_res){
+    case USER_ERROR:
+    case USER_DEFAULT:
+      /* print out how many cuts have been added */
+      PRINT(p->par.verbosity, 5,
+	    ("Number of cuts added to the problem: %i\n", added_rows));
+      break;
+    case USER_SUCCESS:
+    case USER_AND_PP:
+    case USER_NO_PP:
+      break;
+    default:
+      /* Unexpected return value. Do something!! */
+      break;
+   }      
+}
+
+/*===========================================================================*/
+
+void purge_waiting_rows_u(lp_prob *p)
+{
+   int user_res, i, j;
+   waiting_row **wrows = p->waiting_rows;
+   int wrow_num = p->waiting_row_num;
+   char *delete_rows;
+
+   REMALLOC(p->lp_data->tmp.cv, char, p->lp_data->tmp.cv_size, wrow_num,
+	    BB_BUNCH);
+   delete_rows = p->lp_data->tmp.cv; /* wrow_num */
+
+   memset(delete_rows, 0, wrow_num);
+   
+   user_res = user_purge_waiting_rows(p->user, wrow_num, wrows, delete_rows);
+   switch (user_res){
+    case USER_ERROR: /* purge all */
+      free_waiting_rows(wrows, wrow_num);
+      p->waiting_row_num = 0;
+      break;
+    case USER_DEFAULT: /* the only default is to keep enough for one
+			  iteration */
+      if (wrow_num - p->par.max_cut_num_per_iter > 0){
+	 free_waiting_rows(wrows + p->par.max_cut_num_per_iter,
+			   wrow_num-p->par.max_cut_num_per_iter);
+	 p->waiting_row_num = p->par.max_cut_num_per_iter;
+      }
+      break;
+    case USER_SUCCESS:
+    case USER_AND_PP:
+    case USER_NO_PP:
+      for (i = j = 0; i < wrow_num; i++){
+	 if (delete_rows[i]){
+	    free_waiting_row(wrows + i);
+	 }else{
+	    wrows[j++] = wrows[i];
+	 }
+      }
+      p->waiting_row_num = j;
+      break;
+    default:
+      /* Unexpected return value. Do something!! */
+      break;
+   }
+}
+
+/*===========================================================================*/
+/*===========================================================================*\
+ * This function invokes the user written function user_free_prob_dependent
+ * that deallocates the user defined part of the data structure. Returns TRUE
+ * if succeeded, FALSE otherwise.
+\*===========================================================================*/
+
+void free_prob_dependent_u(lp_prob *p)
+{
+   switch (user_free_lp(&p->user)){
+    case USER_ERROR:
+      /* BlackBox ignores error message */
+    case USER_SUCCESS:
+    case USER_AND_PP:
+    case USER_NO_PP:
+      /* User function terminated without problems. No post-processing. */
+      return;
+    default:
+      /* Unexpected return value. Do something!! */
+      break;
+   }
+}
+
+/*===========================================================================*/
 

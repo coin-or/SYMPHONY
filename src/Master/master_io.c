@@ -39,10 +39,10 @@ void usage(void)
          printf("master [ -hagrtbd ] [ -u ub ] [ -p procs ] [ -n rule ]\n\t"
 		"[ -v level ] [ -s cands ] [ -c rule ] [ -k rule ] \n\t"
 		"[ -m max ] [ -l pools ] [ -i iters ] "
-		"[ -f parameter_file_name ]"
+		"[ -f parameter_file_name ] [-j 0/1]"
 		"\n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 		"\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
-		"\t%s\n\t%s\n\t%s\n\n",
+		"\t%s\n\t%s\n\t%s\n\t%s\n\n",
 		"-h: help",
 		"-a: no cut timeout",
 		"-d: enable graph drawing",
@@ -61,8 +61,9 @@ void usage(void)
 		"-e n: allow a max of 'n' cut pools",
 		"-l n k: load balance level 'n' and iterations 'k'",
    		"-i n: allow a max of 'n' iterations in presolve",
+		"-f file: read parameters from parameter file 'file'");
+		"-j 0/1: whether or not to generate cgl cuts",
    		"-z n: set diving threshold to 'n'",
-	 "-f file: read parameters from parameter file 'file'");
 	 printf("Type 'master -H' to get help for user options\n\n");
 }
 
@@ -1344,7 +1345,7 @@ EXIT:
 	 usage();
 	 exit(0);
        case 'H':
-	 user_usage();
+	 CALL_USER_FUNCTION( user_usage() );
 	 exit(0);
        case 'a':
 	 lp_par->first_lp.first_cut_time_out = 0;
@@ -1354,9 +1355,6 @@ EXIT:
 	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 	 cg_par->decomp_dynamic_timeout = 6000;
 	 /*___END_EXPERIMENTAL_SECTION___*/
-	 break;
-       case 'j':
-	 sscanf(argv[++i], "%i", &lp_par->generate_cgl_cuts);
 	 break;
        case 'd':
 	 p->par.do_draw_graph = TRUE;
@@ -1421,6 +1419,9 @@ EXIT:
 	 break;
        case 'f':
 	 strncpy(p->par.param_file, argv[++i], MAX_FILE_NAME_LENGTH);
+	 break;
+       case 'j':
+	 sscanf(argv[++i], "%i", &lp_par->generate_cgl_cuts);
 	 break;
        case 'z':
 	 sscanf(argv[++i], "%lf", &tm_par->diving_threshold);

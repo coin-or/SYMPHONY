@@ -64,16 +64,13 @@
 #define	MAXDOUBLE 1.79769313486231570e+308
 
 /*--------------------- return values for user-written functions ------------*/
-#define ERROR                   -4
-#define USER_ERROR              -4
-#define USER_SUCCESS            -3
-#define USER_NO_PP              -3
+#define USER_ERROR              -3
+#define USER_SUCCESS            -2
+#define USER_NO_PP              -2
 #define USER_AND_PP             -2
-#define DEFAULT                 -1
 #define USER_DEFAULT            -1
 
 /*---------------------------- type of the problem --------------------------*/
-
 #define ZERO_ONE_PROBLEM         0
 #define INTEGER_PROBLEM          1
 #define MIXED_INTEGER_PROBLEM    2
@@ -446,6 +443,10 @@
 #define USER__CLOSE_TO_HALF                10
 #define USER__CLOSE_TO_HALF_AND_EXPENSIVE  11
 #define USER__CLOSE_TO_ONE_AND_CHEAP       12
+
+/*-------------------- generate_cuts_in_lp defaults -------------------------*/
+#define GENERATE_CGL_CUTS                  20
+#define DO_NOT_GENERATE_CGL_CUTS           21
 
 /*****************************************************************************
  *****************************************************************************
