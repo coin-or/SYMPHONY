@@ -527,7 +527,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    vertex *verts;
    double *demand = cnrp->demand, capacity = cnrp->capacity, *compdemands;
    int rcnt, *compnodes;
-   int vertnum = cnrp->vertnum, i;
+   int vertnum = cnrp->vertnum, i, x_varnum;
    network *n;
    double *compcuts;
    int total_edgenum = vertnum*(vertnum - 1)/2;
@@ -548,17 +548,18 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 			  vertnum);
 #else
 #ifdef DIRECTED_X_VARS
-   for (i = 0; i < varnum && indices[i] < 2*total_edgenum; i++);
+   for (x_varnum = 0; x_varnum < varnum && indices[x_varnum] < 2*total_edgenum;
+	x_varnum++);
 #else
-   for (i = 0; i < varnum && indices[i] < total_edgenum; i++);
+   for (x_varnum = 0; x_varnum < varnum && indices[x_varnum] < total_edgenum;
+	x_varnum++);
 #endif   
-   varnum = i;
    
-   n = create_net(indices, values, varnum, lpetol, cnrp->edges, demand,
+   n = create_net(indices, values, x_varnum, lpetol, cnrp->edges, demand,
 		  vertnum);
 #endif   
 #else
-   n = create_net(indices, values, varnum, lpetol, cnrp->edges, demand,
+   n = create_net(indices, values, x_varnum, lpetol, cnrp->edges, demand,
 		  vertnum);
 #endif
    
@@ -637,11 +638,11 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 
    if (cnrp->par.verbosity > 5){
       display_support_graph(cnrp->window, FALSE, (char *)"Weighted solution",
-			    varnum, indices, values, .000001, total_edgenum,
+			    x_varnum, indices, values, .000001, total_edgenum,
 			    FALSE);
 #ifdef ADD_FLOW_VARS
       display_support_graph_flow(cnrp->window, FALSE, (char *)"Flow solution",
-				 tmp, varnum, indices, values, .000001,
+				 tmp, x_varnum, indices, values, .000001,
 				 total_edgenum,CTOI_WAIT_FOR_CLICK_AND_REPORT);
 #endif
    }
