@@ -222,36 +222,12 @@ int user_init_draw_graph(void *user, int dg_id)
 \*===========================================================================*/
 
 int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
-			      int *basecutnum, int *extravarnum, int **extravars,
-			      char *obj_sense, double *obj_offset,
-			      char ***colnames, int *colgen_strat)
+			      int *basecutnum, int *extravarnum,
+			      int **extravars, char *obj_sense,
+			      double *obj_offset, char ***colnames,
+			      int *colgen_strat)
 {
-   /* This gives you access to the user data structure. */
-   user_problem *prob = (user_problem *) user;
-   int i;
-   int *vars, varnum;
-
-   /* Since we don't know how to form a good set of base variables, we'll put
-      all the variables in the extra set */
-
-   /* Set the number of extra variables*/
-   varnum = *extravarnum = prob->colnum;
- 
-   /* This puts all the variable in the base set and fills out the 
-      upper bounds */
-   vars = *extravars = (int *) malloc(varnum * ISIZE);
-   for (i = 0; i < varnum; i++){
-     vars[i] = i;
-   }
-
-   /* Set the number of rows in the base */
-   *basecutnum = prob->rownum;
-
-   /* The set base variables will be empty */
-   *basevarnum = 0;
-   *basevars  = NULL;
-
-   return(USER_SUCCESS);
+   return(USER_DEFAULT);
 }
 
 /*===========================================================================*/
@@ -395,10 +371,10 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    for (index = 0; index < varnum; index++){
       if (values[index] > lpetol) {
 	 printf("%2d matched with %2d at cost %6d\n",
-		prob->node1[indices[index]],
-		prob->node2[indices[index]],
-		prob->cost[prob->node1[indices[index]]]
-		[prob->node2[indices[index]]]);
+		prob->match1[indices[index]],
+		prob->match2[indices[index]],
+		prob->cost[prob->match1[indices[index]]]
+		[prob->match2[indices[index]]]);
       }	   
    }
    

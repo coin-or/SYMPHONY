@@ -91,12 +91,12 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    memset((char *)edge_val, 0, 200*200*ISIZE);
    
    for (i = 0; i < varnum; i++) {
-      edge_val[prob->node1[indices[i]]][prob->node2[indices[i]]] = values[i];
+      edge_val[prob->match1[indices[i]]][prob->match2[indices[i]]] = values[i];
    }
    
-   for (i = 0; i < prob->nnodes; i++){
-      for (j = i+1; j < prob->nnodes; j++){
-	 for (k = j+1; k < prob->nnodes; k++) {
+   for (i = 0; i < prob->numnodes; i++){
+      for (j = i+1; j < prob->numnodes; j++){
+	 for (k = j+1; k < prob->numnodes; k++) {
 	    if (edge_val[i][j]+edge_val[j][k]+edge_val[i][k] > 1.0 + etol) {
 	       /* Found violated triangle cut */
 	       /* Form the cut as a sparse vector */
@@ -131,14 +131,14 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    memset((char *)edge_val, 0, 200*200*ISIZE);
    
    for (i = 0; i < varnum; i++) {
-      edge_val[prob->node1[indices[i]]][prob->node2[indices[i]]] 
+      edge_val[prob->match1[indices[i]]][prob->match2[indices[i]]] 
 	 = values[i];
    }
-   for (i = 0; i < prob->nnodes; i++){
-      for (j = i+1; j < prob->nnodes; j++){
-	 for (k = j+1; k < prob->nnodes; k++) {
+   for (i = 0; i < prob->numnodes; i++){
+      for (j = i+1; j < prob->numnodes; j++){
+	 for (k = j+1; k < prob->numnodes; k++) {
 	    if (edge_val[i][j]+edge_val[j][k]+edge_val[i][k] > 1.0 + etol) {
-	       memset(new_cuts, 0, prob->nnodes * ISIZE);
+	       memset(new_cuts, 0, prob->numnodes * ISIZE);
 	       coef[1] = i; 
 	       coef[2] = j;
 	       coef[3] = k;

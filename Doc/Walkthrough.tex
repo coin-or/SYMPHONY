@@ -124,13 +124,14 @@ read in the data. The datafile contains first the number of nodes in the graph
 read the file in with the \texttt{match\_read\_data()} routine in
 \texttt{user\_main.c}:
 
+%FIXME: Here, we don't need to pass in the user data structure...just return
+%it. We also don't need to pass in the sym_enviroment 
+
 \begin{verbatim}
-int match_read_data(sym_environment *env, void *user, char *infile)
+int match_read_data(user_problem *, char *infile)
 {
    int i, j;
    FILE *f = NULL;
-   /* This gives you access to the user data structure. */
-   user_problem *prob = (user_problem *) user;
 
    if ((f = fopen(infile, "r")) == NULL){
       printf("main(): user file %s can't be opened\n", infile);

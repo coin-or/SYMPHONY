@@ -31,6 +31,7 @@ if ((termcode = f) < 0){                                                    \
 
 #include "symphony_api.h"
 #include "user.h"
+
 #include <stdlib.h>
 
 int main(int argc, char **argv)
@@ -42,18 +43,18 @@ int main(int argc, char **argv)
    /* Create a SYMPHONY environment */
    sym_environment *env = sym_open_environment();
 
-   /* Create a user problem structure to read in the data and then pass it to  
-      SYMPHONY. 
-   */
+   /* Create the data structure for storing the problem instance.*/
    user_problem *prob = (user_problem *)calloc(1, sizeof(user_problem));
+   
+   CALL_FUNCTION( sym_set_user_data(env, (void *)prob) );
 
    CALL_FUNCTION( sym_parse_command_line(env, argc, argv) );
 
    CALL_FUNCTION( sym_get_str_param(env, "infile_name", &infile));
 
-   CALL_FUNCTION( match_read_data(env, (void *) prob, infile));
-   
-   CALL_FUNCTION( match_load_problem(env, (void *) prob ));
+   CALL_FUNCTION( match_read_data(prob, infile) );
+
+   CALL_FUNCTION( match_load_problem(env, prob) );
 
    CALL_FUNCTION( sym_solve(env) );
 
@@ -63,12 +64,10 @@ int main(int argc, char **argv)
 
 }
 
-int match_read_data(sym_environment *env, void *user, char *infile)
+int match_read_data(user_problem *prob, char *infile)
 {
    int i, j;
    FILE *f = NULL;
-   /* This gives you access to the user data structure. */
-   user_problem *prob = (user_problem *) user;
 
    if ((f = fopen(infile, "r")) == NULL){
       printf("main(): user file %s can't be opened\n", infile);
@@ -76,31 +75,24 @@ int match_read_data(sym_environment *env, void *user, char *infile)
    }
 
    /* Read in the costs */
-   fscanf(f,"%d",&(prob->nnodes));
-   for (i = 0; i < prob->nnodes; i++)
-      for (j = 0; j < prob->nnodes; j++)
+   fscanf(f,"%d",&(prob->numnodes));
+   for (i = 0; i < prob->numnodes; i++)
+      for (j = 0; j < prob->numnodes; j++)
 	 fscanf(f, "%d", &(prob->cost[i][j]));
    
-   prob->colnum = (prob->nnodes)*(prob->nnodes-1)/2;
-   prob->rownum = prob->nnodes;
-
-   /* This will pass the user data in to SYMPHONY*/
-   sym_set_user_data(env, (void *)prob);
-
    return (FUNCTION_TERMINATED_NORMALLY);
 }
 
 
-int match_load_problem(sym_environment *env, void *user){
+int match_load_problem(sym_environment *env, user_problem *prob){
    
    int i, j, index, n, m, nz, *matbeg, *matind;
    double *matval, *lb, *ub, *obj, *rhs, *rngval;
    char *sense, *is_int;
-   user_problem *prob = (user_problem *) user;
    
    /* set up the inital LP data */
-   n = prob->colnum;
-   m = prob->rownum;
+   n = prob->numnodes*(prob->numnodes-1)/2;
+   m = 2 * prob->numnodes;
    nz = 2 * n;
 
    /* Allocate the arrays */
@@ -118,10 +110,10 @@ int match_load_problem(sym_environment *env, void *user){
    /* Fill out the appropriate data structures -- each column has
       exactly two entries */
    index = 0;
-   for (i = 0; i < prob->nnodes; i++) {
-      for (j = i+1; j < prob->nnodes; j++) {
-	 prob->node1[index] = i; /* The first component of assignment 'index' */
-	 prob->node2[index] = j; /* The second componet of assignment 'index' */
+   for (i = 0; i < prob->numnodes; i++) {
+      for (j = i+1; j < prob->numnodes; j++) {
+	 prob->match1[index] = i; /*The first component of assignment 'index'*/
+	 prob->match2[index] = j; /*The second componet of assignment 'index'*/
 	 /* So we can recover the index later */
 	 prob->index[i][j] = prob->index[j][i] = index;
 	 obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
@@ -138,7 +130,7 @@ int match_load_problem(sym_environment *env, void *user){
    matbeg[n] = 2 * n;
    
    /* set the initial right hand side */
-   for (i = 0; i < prob->nnodes; i++) {
+   for (i = 0; i < m; i++) {
       rhs[i] = 1;
       sense[i] = 'E';
    }

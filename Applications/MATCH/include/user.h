@@ -20,25 +20,27 @@
 #include "master.h"
 #include "BB_macros.h"
 
+#define MAXNODES 200
+
 /*---------------------------------------------------------------------------*\
  * Use this data structure to store the instance data after it is read in.
 \*---------------------------------------------------------------------------*/
 
 typedef struct USER_PROBLEM{
-   int              colnum;         /* Number of rows in base matrix */
-   int              rownum;         /* Number of columns in base matrix */
-   int		    nnodes;         /* Number of nodes */
-   int		    cost[200][200]; /* Cost of assigning i to j */ 
-   int		    node1[20000];   /* node1[i] is the first component of
-				       the assignment with index 'i' */
-   int		    node2[20000];   /* node2[i] is the second component of
-				       the assignment with index 'i' */
-   int              index[200][200];/* index[j][k] is the index of the variable
-				       associated with assigning 'j' to 'k'*/
+   /* Number of nodes */
+   int		    numnodes;
+   /* Cost of matching i and j */
+   int		    cost[MAXNODES][MAXNODES];
+   /* match1[k] is the first component of the assignment with index k */
+   int		    match1[MAXNODES*(MAXNODES-1)/2];
+   /* match2[k] is the first component of the assignment with index k */
+   int		    match2[MAXNODES*(MAXNODES-1)/2]; 
+   /* index[i][j] is the index of the variable assoc. w/ matching i and j */
+   int              index[MAXNODES][MAXNODES];
 }user_problem;
 
 
-int match_read_data PROTO((sym_environment *env, void *user, char *infile));
-int match_load_problem PROTO((sym_environment *env, void *user));
+int match_read_data PROTO((user_problem *prob, char *infile));
+int match_load_problem PROTO((sym_environment *env, user_problem *prob));
 
 #endif
