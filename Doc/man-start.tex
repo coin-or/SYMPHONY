@@ -1,4 +1,4 @@
-BB\ (Single- or Multi-Process Optimization over Networks) Version 3.0.1
+BB\ (Single- or Multi-Process Optimization over Networks) Version 3.0.2
 is a powerful environment for implementing branch, cut, and price
 algorithms. The subroutines in the \BB\ library comprise a
 state-of-the-art solver which is designed to be completely modular and
@@ -57,19 +57,19 @@ edit the Makefile to get SYMPHONY to compile. For the casual user, this
 editing is limited to providing some path names.
 
 For more information about how to use the SYMPHONY VRP/TSP solver after
-compilation, see the file SYMPHONY-3.0.1/Vrp/README.
+compilation, see the file SYMPHONY-3.0.2/Vrp/README.
 
 \subsubsection{Preparing for Sample Compilation.}
 
 \begin{itemize}
 
-        \item Download the file {\tt SYMPHONY-3.0.1.tgz}.
+        \item Download the file {\tt SYMPHONY-3.0.2.tgz}.
 
         \item Unpack the distribution with ``{\tt tar -xzf
-        SYMPHONY-3.0.1.tgz}''. This will create a subdirectory called
-        {\tt SYMPHONY-3.0.1/} containing the distribution.
+        SYMPHONY-3.0.2.tgz}''. This will create a subdirectory called
+        {\tt SYMPHONY-3.0.2/} containing the distribution.
         
-        \item Edit the makefile ({\tt SYMPHONY-3.0.1/Makefile}) to reflect your
+        \item Edit the makefile ({\tt SYMPHONY-3.0.2/Makefile}) to reflect your
 	environment. Only minor edits should be required. An explanation of
 	what has to be set is contained in the comments in the makefile.
 
@@ -78,13 +78,13 @@ compilation, see the file SYMPHONY-3.0.1/Vrp/README.
 \subsubsection{Compiling the Sequential Version.}
 
 \begin{itemize}
-        \item Type ``{\tt make}'' in the {\tt SYMPHONY-3.0.1/} directory. This will
+        \item Type ``{\tt make}'' in the {\tt SYMPHONY-3.0.2/} directory. This will
 first make the \BB\ library (sequential version). After making the \BB\
 library, make will compile the user code and link the executable for the
 sample application, a vehicle routing and traveling salesman problem
 solver. The name of the executable will be 
 \begin{center}
-{\tt SYMPHONY-3.0.1/Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp}, 
+{\tt SYMPHONY-3.0.2/Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp}, 
 \end{center}
 indicating that all
 modules are contained in a single executable. The makefile must be modified to
@@ -101,7 +101,7 @@ distribution. Type
 {\tt Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp -F sample.vrp
 -N 5 -u 522} 
 \end{center}
-in the {\tt SYMPHONY-3.0.1/} directory. The -N argument gives the number
+in the {\tt SYMPHONY-3.0.2/} directory. The -N argument gives the number
 of routes, which must be specified in advance. The -u argument supplies an
 initial upper bound which is used until a better feasible solution is
 found. TSP instances can also be solved by adding the option -T TSP. In the
@@ -143,7 +143,7 @@ sequential version so there is no need to compile both versions.
         \item Voila, you have a shared memory parallel solver. As above, to
 test the sample program, a sample data file is included with the
 distribution. Type {\tt Vrp/bin.\$(ARCH)/master\_tm\_lp\_cg\_cp -F sample.vrp
--N 5 -u 522} in the {\tt SYMPHONY-3.0.1/} directory. The -N argument gives the number
+-N 5 -u 522} in the {\tt SYMPHONY-3.0.2/} directory. The -N argument gives the number
 of routes, which must be specified in advance. The -u argument supplies an
 initial upper bound which is used until a better feasible solution is
 found. TSP instances can also be solved by adding the option -T TSP. In the
@@ -182,7 +182,7 @@ from Oak Ridge National Laboratories
         set the path variables in the makefile appropriately so that make can
         find the PVM library.
 
-        \item Type ``{\tt make}'' in the SYMPHPONY-3.0.1 directory to
+        \item Type ``{\tt make}'' in the SYMPHPONY-3.0.2 directory to
         make the distributed libraries. As in Step 1 of the sequential
         version, you may type ``{\tt make clean}'' after making the
         library. It should not have to remade again unless you modify
@@ -201,7 +201,7 @@ from Oak Ridge National Laboratories
 
         \item To test the sample program, a sample data file is included with
 the distribution. Type {\tt Vrp/bin.\$(ARCH)/master -F sample.vrp -N 5 -u
-522} in the {\tt SYMPHONY-3.0.1} directory (note that the actual executable name may
+522} in the {\tt SYMPHONY-3.0.2} directory (note that the actual executable name may
 not be ``{\tt master}'' if {\tt COMPILE\_IN\_TM} is set to {\tt TRUE}; see
 Section \ref{configuration} for more information on executable names.). The -N
 argument gives the number of routes, which must be specified in advance. The
@@ -242,12 +242,12 @@ is only provided for running in sequential mode at this time.
 
 \begin{itemize}
 
-\item Download {\tt SYMPHONY-3.0.1.zip} and unzip the archive. This will
-create a subdirectory called {\tt SYMPHONY-3.0.1$\backslash$} containing all 
+\item Download {\tt SYMPHONY-3.0.2.zip} and unzip the archive. This will
+create a subdirectory called {\tt SYMPHONY-3.0.2$\backslash$} containing all 
 the source files.
 
 \item In MS Visual C++ 6.0, open the workspace 
-{\tt SYMPHONY-3.0.1$\backslash$WIN32$\backslash$vrp.dsw}.  Note that there are
+{\tt SYMPHONY-3.0.2$\backslash$WIN32$\backslash$vrp.dsw}.  Note that there are
 two projects, one called ``{\tt symphony}'' and one called ``{\tt vrp}''.  The
 symphony project contains the source code needed to build the internal
 library. The vrp project contains the source code for the user-defined
@@ -287,7 +287,7 @@ SOLVER. Important note for OSL users: When using OSL in Windows, you must also a
 
 \item Note that there are a number of additional compiler defines that control
 the functionality of SYMPHONY. These defines are described in {\tt
-SYMPHONY-3.0.1$\backslash$Makefile}, a Unix-style makefile included with the
+SYMPHONY-3.0.2$\backslash$Makefile}, a Unix-style makefile included with the
 distribution. To enable the functionality associated with a particular
 compiler define, simply add it to the list of defines under the preprocessor
 settings, as above.
@@ -303,7 +303,7 @@ executable.
 
 \item To test the executable, right click on the symphony project, go to the
 ``Debug'' tab and set the Program arguments to ``{\tt -F
-SYMPHONY-3.0.1$\backslash$sample.vrp -N 5 -u 522.}'' Note that command-line
+SYMPHONY-3.0.2$\backslash$sample.vrp -N 5 -u 522.}'' Note that command-line
 switches are Unix-style. The argument to -N is the number of routes that
 should be used in the solution and the -u argument supplies the solver with an
 initial upper bound.
@@ -374,7 +374,7 @@ simple steps to get up and running.
 \begin{enumerate}
 
 \item First open the workspace {\tt
-SYMPHONY-3.0.1$\backslash$WIN32$\backslash$template.dsw} and modify for your
+SYMPHONY-3.0.2$\backslash$WIN32$\backslash$template.dsw} and modify for your
 local setup, as described in Section \ref{getting_strated_windows}. Note that
 you will also have to delete the file \texttt{vrp.lib} from the symphony
 project and add \texttt{template.lib}. It should build right away, although it

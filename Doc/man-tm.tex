@@ -569,30 +569,64 @@ structure for the cut pool process. \\
 \functiondef{user\_display\_solution}
 \label{user_display_solution}
 \begin{verbatim}
-int user_display_solution(void *user)
+int user_display_solution(void *user, int length, int *xind, double *xval)
 \end{verbatim}
 
 \bd
 
 \describe
 
-This function is invoked when the best solution found so far is to be
-displayed (after heuristics, after the end of the first phase, or the end of
-the whole algorithm). This can be done using either a text-based
-format or using the {\tt drawgraph} process.
+This function is invoked when a best solution found so far is to be displayed
+(after heuristics, after the end of the first phase, or the end of the whole
+algorithm). This can be done using either a text-based format or using the
+{\tt drawgraph} process. There are several ways this can be
+accomplished. First, the user can let SYMPHONY keep track of a best solution
+found so far and display it using the default format, which lists the
+indices of the nonzero variables and their corresponding
+values. Alternatively, the user can allow SYMPHONY to keep track of a best
+solution found so far, but write a custom function for displaying it. This is
+done by interpreting the solution that is passed as an argument to the
+function.
+
+Finally, the user has the option of storing the solution(s) as they are found
+by customizing the \hyperref{{\tt user\_is\_feasible()}} {{\tt
+user\_is\_feasible()}} function. In sequential executables, the solution(s) can
+be stored in the user LP data structure. In this case, a pointer to this
+structure is passed into the function through the {\tt user} argument and the
+solution(s) can then be displayed. For parallel computation, the user must
+pass the solutions back to the master module, using the \hyperref{{\tt
+user\_send\_feasible_solution()}} {{\tt user\_send\_feasible\_solution()}}
+function. In parallel mode, a pointer to the user's master data structure is
+passed into this function through the {\tt user} argument.
+
+\args
+
+\bt{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. For
+sequential computation, a pointer to the user's LP data structure is passed
+in. For parallel computation, a pointer to the user's Master data structure is
+passed in. \\
+{\tt int length} & IN & Number of nonzeros in best solution (stored internally 
+by SYMPHONY). \\
+{\tt int *xind} & IN & Indices of variables with nonzero values. \\
+{\tt double *xval} & IN & Corresponding values of nonzero variables. \\
+\et
 
 \returns
 
 \bt{lp{300pt}}
 {\tt ERROR} & Ignored. \\
-{\tt USER\_NO\_PP} & Displaying is done. \\
+{\tt DEFAULT} & SYMPHONY should display the solution in default format. \\
+{\tt USER\_NO\_PP} & User displayed the solution. SYMPHONY should do nothing. 
+\\
+{\tt USER\_AND\_PP} & User displayed the solution, but SYMPHONY should also 
+display it in default format. \\
 \et
 
-\args
+\postp
 
-\bt{llp{280pt}}
-{\tt void *user} & IN & Pointer to the user-defined data structure. \\
-\et
+If requested, SYMPHONY will display a best solution found so far in the
+default format. 
 
 \ed
 

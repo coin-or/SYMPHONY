@@ -35,7 +35,7 @@ In addition to the subdirectories corresponding to each module, there are
 subdirectories corresponding to applications. The sample application is
 contained in the directory {\tt Vrp/}. The files containing function stubs
 that can be filled in to create a new application are contained in the
-directory {\tt SYMPHONY-3.0.1/Template/}. There is one file for each module,
+directory {\tt SYMPHONY-3.0.2/Template/}. There is one file for each module,
 initially called {\tt Template/*/*\_user.c}. The primary thing that you, as
 the user, need to understand to build an application is how to fill in these
 stubs. That is what the second section of this manual is about.
@@ -185,16 +185,16 @@ modified to link with the new LP solver.
 
 Once the user functions are filled in, all that remains is to compile the
 application. The distribution comes with two make files that facilitate this
-process. The primary make file resides in the {\tt SYMPHONY-3.0.1/} directory.
+process. The primary make file resides in the {\tt SYMPHONY-3.0.2/} directory.
 The user make file resides in the user's subdirectory, initially called {\tt
-SYMPHONY-3.0.1/Template/}. There are a number of variables that must be set in
+SYMPHONY-3.0.2/Template/}. There are a number of variables that must be set in
 the primary make file. First ensure that the sample application compiles by
 following the instructions in Section \ref{getting_started_unix}. Then modify
 the makefile to reflect the new {\tt \$(USERROOT)} ({\tt
-SYMPHONY-3.0.1/Template} by default). When you are ready, type ``{\tt make}''
+SYMPHONY-3.0.2/Template} by default). When you are ready, type ``{\tt make}''
 to make the executables. \BB\ will create three new subdirectories---{\tt
-SYMPHONY-3.0.1/Template/obj.*}, {\tt SYMPHONY-3.0.1/Template/bin.*}, and {\tt
-SYMPHONY-3.0.1/Template/dep.*} where * is a the current architecture (defined
+SYMPHONY-3.0.2/Template/obj.*}, {\tt SYMPHONY-3.0.2/Template/bin.*}, and {\tt
+SYMPHONY-3.0.2/Template/dep.*} where * is a the current architecture (defined
 in the make file).
 
 \paragraph{Working with PVM.}
@@ -228,7 +228,7 @@ the user must perform all necessary initialization, etc. in the send
 function. This makes it a little confusing to write source code which
 will work for all configurations. However, the confusion should be
 cleared up by looking at the sample application, especially the file
-{\tt SYMPHONY-3.0.1/Vrp/Master/vrp.c}.
+{\tt SYMPHONY-3.0.2/Vrp/Master/vrp.c}.
 
 \paragraph{Configuring the Modules.}
 \label{configuration}
@@ -288,10 +288,10 @@ information on setting parameters in the parameter file.
 
 First, follow the instructions for compiling the sample application in Section
 \ref{getting_started_windows} to ensure you have the proper settings. Once the
-stub files in the {\tt SYMPHONY-3.0.1$\backslash$Template} hierarchy are
+stub files in the {\tt SYMPHONY-3.0.2$\backslash$Template} hierarchy are
 filled in, use the project ``{\tt vrp}'' as a template to create a new project
 called ``{\tt user}'' that compiles the files in {\tt
-SYMPHONY-3.0.1$\backslash$Template} and creates a library. Modify the project
+SYMPHONY-3.0.2$\backslash$Template} and creates a library. Modify the project
 ``{\tt symphony}'' to compile and link with the new user library.
 
 \subsection{Debugging Your Application}
