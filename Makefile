@@ -1090,8 +1090,6 @@ WHATTOMAKE += coin_clp
 endif
 endif
 
-endif
-
 ifeq ($(USE_CGL_CUTS), TRUE)
 WHATTOMAKE += cgl
 endif
