@@ -17,30 +17,6 @@
 
 #include "proto.h"
 
-typedef struct TM_STAT{
-   double      root_lb;
-   int         cuts_in_pool;
-   int         max_depth;          /* keeps track of the deepest level reached
-				      in the tree so far */
-   int         chains;             /* the number of diving chains */
-   int         diving_halts;       /* how many times was an already started
-				      dive stopped */
-   int         tree_size;          /* number of search tree nodes */
-   int         created;            /* the number of created nodes (not
-				      necessarily the same as tree_size
-				      (trimming...) */
-   int         analyzed;           /* the number of analyzed (i.e., CG-LP
-				      iteration) nodes (not necessarily same
-				      as created, leaves can be cut off
-				      without analyzing; trimming) */
-   int         leaves_before_trimming;
-   int         leaves_after_trimming;
-   int         vars_not_priced;    /* How many variables did not price out
-				      after the first phase */
-   char        nf_status;          /* nf_status of the root node after
-				      repricing */
-}tm_stat;
-
 /*===========================================================================*\
  * The params structure contains all of the user-specified parameters   
  * to be read in from the parameter file.
@@ -111,6 +87,8 @@ typedef struct TM_PARAMS{
 				   in the two phases */
    int         not_fixed_storage_size;
    double      time_limit;
+   double      gap_limit;
+   int         node_limit;
 }tm_params;
 
 #endif

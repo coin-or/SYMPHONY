@@ -20,7 +20,7 @@
  * This file contains the main() for the master process.
 \*===========================================================================*/
 
-#if defined(USE_OSI_INTERFACE) && !defined(USER_MAIN) 
+#if 1
 
 #include "OsiSymSolverInterface.hpp"
 
@@ -37,13 +37,21 @@ int main(int argc, char **argv)
    /* Find a priori problem bounds */
    si.findInitialBounds();
 
+   si.setSymDblParam(OsiSymTimeLimit, 5.0);
+   
    /* Solve the problem */
    si.branchAndBound();
+
+   si.setSymIntParam(OsiSymWarmStart, TRUE);
+   si.setSymDblParam(OsiSymTimeLimit, 3600.0);
    
+   /* Solve the problem */
+   si.branchAndBound();
+
    return(0);
 }
 
-#elif !defined(USER_MAIN)
+#else
 
 #include "master.h"
 

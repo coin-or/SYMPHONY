@@ -18,7 +18,7 @@
 #define COMPILING_FOR_MASTER
 
 #include "proto.h"
-#include "BB_types.h"
+#include "master.h"
 #include "lp_solver.h"
 
 /*===========================================================================*/

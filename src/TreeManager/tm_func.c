@@ -50,12 +50,12 @@
  * the tree manager data structures, etc.
 \*===========================================================================*/
 
-int tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
+int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 {
 #ifndef COMPILE_IN_TM
    int r_bufid, bytes, msgtag, i;
 #endif
-   FILE *f;
+   FILE *f = NULL;
    tm_params *par;
    bc_node *root = (bc_node *) calloc(1, sizeof(bc_node));
 #ifdef COMPILE_IN_LP
@@ -170,8 +170,10 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
    tm->lp = start_processes(tm, par->max_active_nodes, par->lp_exe,
 			    par->lp_debug, par->lp_mach_num, par->lp_machs);
 #endif
-   
-   tm->cuts = (cut_data **) malloc(BB_BUNCH * sizeof(cut_data *));
+
+   if (!tm->cuts){
+      tm->cuts = (cut_data **) malloc(BB_BUNCH * sizeof(cut_data *));
+   }
 
    if (par->use_cg){
 #ifndef COMPILE_IN_CG
@@ -233,28 +235,36 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
    \*------------------------------------------------------------------------*/
    
    if (tm->par.warm_start){
-      if (!(f = fopen(tm->par.warm_start_tree_file_name, "r"))){
-	 printf("Error reading warm start file %s\n\n",
-		tm->par.warm_start_tree_file_name);
-	 return(ERROR__READING_WARM_START_FILE);
+      if (!tm->rootnode){
+	 if (!(f = fopen(tm->par.warm_start_tree_file_name, "r"))){
+	    printf("Error reading warm start file %s\n\n",
+		   tm->par.warm_start_tree_file_name);
+	    return(ERROR__READING_WARM_START_FILE);
+	 }
+	 read_tm_info(tm, f);
+      }else{
+	 free(root);
+	 root = tm->rootnode;
       }
-      read_tm_info(tm, NULL, f);
-      read_subtree(tm, root, NULL, f);
-      fclose(f);
-      if (!read_tm_cut_list(tm, tm->par.warm_start_cut_file_name)){
-	 printf("Error reading warm start file %s\n\n",
-		tm->par.warm_start_cut_file_name);
-	 return(ERROR__READING_WARM_START_FILE);
+      read_subtree(tm, root, f);
+      if (f)
+	 fclose(f);
+      if (!tm->rootnode){
+	 if (!read_tm_cut_list(tm, tm->par.warm_start_cut_file_name)){
+	    printf("Error reading warm start file %s\n\n",
+		   tm->par.warm_start_cut_file_name);
+	    return(ERROR__READING_WARM_START_FILE);
+	 }
       }
       tm->rootnode = root;
       root->node_status = NODE_STATUS__ROOT;
    }else{
 #ifdef COMPILE_IN_TM
-      (tm->rootnode = root)->desc = *root_desc;
+      (tm->rootnode = root)->desc = *rootdesc;
       /* Copy the root description in case it is still needed */
-      root->desc.uind.list = (int *) malloc(root_desc->uind.size*ISIZE);
-      memcpy((char *)root->desc.uind.list, (char *)root_desc->uind.list,
-	     root_desc->uind.size*ISIZE);
+      root->desc.uind.list = (int *) malloc(rootdesc->uind.size*ISIZE);
+      memcpy((char *)root->desc.uind.list, (char *)rootdesc->uind.list,
+	     rootdesc->uind.size*ISIZE);
       root->bc_index = tm->stat.created++;
       tm->stat.tree_size++;
       insert_new_node(tm, root);
@@ -463,6 +473,7 @@ int solve(tm_prob *tm)
 
    if (termcode == TM_OPTIMAL_SOLUTION_FOUND)
       tm->lb = 0;
+      
    return(termcode);
 }
 
@@ -2261,142 +2272,135 @@ int write_node(bc_node *node, char *file, FILE* f, char append)
 
 /*===========================================================================*/
 
-int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
+int read_node(tm_prob *tm, bc_node *node, FILE *f, int **children)
 {
    int i, parent = 0, tmp = 0;
    char str1[10], str2[10];
-   char close = FALSE;
-   
-   if (!f){
-      if (!(f = fopen(file, "r"))){
-	 printf("\nError opening node file\n\n");
-	 return(-2);
-      }
-      close = TRUE;
-   }
 
-   fscanf(f, "%s %s %i", str1, str2, &node->bc_index);
-   fscanf(f, "%s %s %i", str1, str2, &node->bc_level);
-   fscanf(f, "%s %s %lf", str1, str2, &node->lower_bound);
-   fscanf(f, "%s %s %i", str1, str2, &tmp);
-   node->node_status = (char)tmp;
+   if (f){
+      fscanf(f, "%s %s %i", str1, str2, &node->bc_index);
+      fscanf(f, "%s %s %i", str1, str2, &node->bc_level);
+      fscanf(f, "%s %s %lf", str1, str2, &node->lower_bound);
+      fscanf(f, "%s %s %i", str1, str2, &tmp);
+      node->node_status = (char)tmp;
 #ifdef TRACE_PATH
-   fscanf(f, "%s %s %i\n", str1, str2, &tmp);
-   node->optimal_path = (char)tmp;
+      fscanf(f, "%s %s %i\n", str1, str2, &tmp);
+      node->optimal_path = (char)tmp;
 #endif
-   fscanf(f, "%s %s %i", str1, str2, &parent);
-   fscanf(f, "%s %i %i %i", str1, &tmp,
-	  &node->bobj.name, &node->bobj.child_num);
-   node->bobj.type = (char)tmp;
-   if (node->bobj.child_num){
+      fscanf(f, "%s %s %i", str1, str2, &parent);
+      fscanf(f, "%s %i %i %i", str1, &tmp,
+	     &node->bobj.name, &node->bobj.child_num);
+      node->bobj.type = (char)tmp;
+      if (node->bobj.child_num){
 #ifndef MAX_CHILDREN_NUM
-      node->bobj.sense = malloc(node->bobj.child_num*sizeof(char));
-      node->bobj.rhs = (double *) malloc(node->bobj.child_num*DSIZE);
-      node->bobj.range = (double *) malloc(node->bobj.child_num*DSIZE);
-      node->bobj.branch = (int *) malloc(node->bobj.child_num*ISIZE);
+	 node->bobj.sense = malloc(node->bobj.child_num*sizeof(char));
+	 node->bobj.rhs = (double *) malloc(node->bobj.child_num*DSIZE);
+	 node->bobj.range = (double *) malloc(node->bobj.child_num*DSIZE);
+	 node->bobj.branch = (int *) malloc(node->bobj.child_num*ISIZE);
 #endif
-      *children = (int *) malloc(node->bobj.child_num*ISIZE);
-      for (i = 0; i < node->bobj.child_num; i++)
-	 fscanf(f, "%i %c %lf %lf %i", *children+i, node->bobj.sense+i,
-		node->bobj.rhs+i, node->bobj.range+i, node->bobj.branch+i);
-   }
-   fscanf(f, "%s %s %i", str1, str2, &node->desc.nf_status);
-   fscanf(f, "%s %s %i %i %i", str1, str2, &tmp, &node->desc.uind.size,
-	  &node->desc.uind.added);
-   node->desc.uind.type = (char)tmp;
-   if (node->desc.uind.size){
-      node->desc.uind.list = (int *) malloc(node->desc.uind.size*ISIZE);
-      for (i = 0; i < node->desc.uind.size; i++)
-	 fscanf(f, "%i", node->desc.uind.list+i);
-   }
-   fscanf(f, "%s %s %i %i %i", str1, str2, &tmp,
-	  &node->desc.not_fixed.size, &node->desc.not_fixed.added);
-   node->desc.not_fixed.type = (char)tmp;
-   if (node->desc.not_fixed.size){
-      node->desc.not_fixed.list =
-	 (int *) malloc(node->desc.not_fixed.size*ISIZE);
-      for (i = 0; i < node->desc.not_fixed.size; i++)
-	 fscanf(f, "%i", node->desc.not_fixed.list+i);
-   }
-   fscanf(f, "%s %s %i %i %i", str1, str2, &tmp,
-	  &node->desc.cutind.size, &node->desc.cutind.added);
-   node->desc.cutind.type = (char)tmp;
-   if (node->desc.cutind.size){
-      node->desc.cutind.list = (int *) malloc(node->desc.cutind.size*ISIZE);
-      for (i = 0; i < node->desc.cutind.size; i++)
-	 fscanf(f, "%i", node->desc.cutind.list+i);
-   }
-   fscanf(f, "%s %i", str1, &tmp);
-   node->desc.basis.basis_exists = (char)tmp;
-   fscanf(f, "%s %s %i %i", str1, str2, &tmp,
-	  &node->desc.basis.basevars.size);
-   node->desc.basis.basevars.type = (char)tmp;
-   if (node->desc.basis.basevars.size){
-      node->desc.basis.basevars.stat =
-	 (int *) malloc(node->desc.basis.basevars.size*ISIZE);
-      if (node->desc.basis.basevars.type == WRT_PARENT){
-	 node->desc.basis.basevars.list = 
-	    (int *) malloc(node->desc.basis.basevars.size*ISIZE);   
-	 for (i = 0; i < node->desc.basis.basevars.size; i++)
-	    fscanf(f, "%i %i", node->desc.basis.basevars.list+i,
-		   node->desc.basis.basevars.stat+i);
-      }else{
-	 for (i = 0; i < node->desc.basis.basevars.size; i++)
-	    fscanf(f, "%i", node->desc.basis.basevars.stat+i);
+	 *children = (int *) malloc(node->bobj.child_num*ISIZE);
+	 for (i = 0; i < node->bobj.child_num; i++)
+	    fscanf(f, "%i %c %lf %lf %i", *children+i, node->bobj.sense+i,
+		   node->bobj.rhs+i, node->bobj.range+i, node->bobj.branch+i);
+      }
+      fscanf(f, "%s %s %i", str1, str2, &node->desc.nf_status);
+      fscanf(f, "%s %s %i %i %i", str1, str2, &tmp, &node->desc.uind.size,
+	     &node->desc.uind.added);
+      node->desc.uind.type = (char)tmp;
+      if (node->desc.uind.size){
+	 node->desc.uind.list = (int *) malloc(node->desc.uind.size*ISIZE);
+	 for (i = 0; i < node->desc.uind.size; i++)
+	    fscanf(f, "%i", node->desc.uind.list+i);
+      }
+      fscanf(f, "%s %s %i %i %i", str1, str2, &tmp,
+	     &node->desc.not_fixed.size, &node->desc.not_fixed.added);
+      node->desc.not_fixed.type = (char)tmp;
+      if (node->desc.not_fixed.size){
+	 node->desc.not_fixed.list =
+	    (int *) malloc(node->desc.not_fixed.size*ISIZE);
+	 for (i = 0; i < node->desc.not_fixed.size; i++)
+	    fscanf(f, "%i", node->desc.not_fixed.list+i);
+      }
+      fscanf(f, "%s %s %i %i %i", str1, str2, &tmp,
+	     &node->desc.cutind.size, &node->desc.cutind.added);
+      node->desc.cutind.type = (char)tmp;
+      if (node->desc.cutind.size){
+	 node->desc.cutind.list = (int *) malloc(node->desc.cutind.size*ISIZE);
+	 for (i = 0; i < node->desc.cutind.size; i++)
+	    fscanf(f, "%i", node->desc.cutind.list+i);
+      }
+      fscanf(f, "%s %i", str1, &tmp);
+      node->desc.basis.basis_exists = (char)tmp;
+      fscanf(f, "%s %s %i %i", str1, str2, &tmp,
+	     &node->desc.basis.basevars.size);
+      node->desc.basis.basevars.type = (char)tmp;
+      if (node->desc.basis.basevars.size){
+	 node->desc.basis.basevars.stat =
+	    (int *) malloc(node->desc.basis.basevars.size*ISIZE);
+	 if (node->desc.basis.basevars.type == WRT_PARENT){
+	    node->desc.basis.basevars.list = 
+	       (int *) malloc(node->desc.basis.basevars.size*ISIZE);   
+	    for (i = 0; i < node->desc.basis.basevars.size; i++)
+	       fscanf(f, "%i %i", node->desc.basis.basevars.list+i,
+		      node->desc.basis.basevars.stat+i);
+	 }else{
+	    for (i = 0; i < node->desc.basis.basevars.size; i++)
+	       fscanf(f, "%i", node->desc.basis.basevars.stat+i);
+	 }
+      }
+      fscanf(f, "%s %s %i %i", str1, str2, &tmp,
+	     &node->desc.basis.extravars.size);
+      node->desc.basis.extravars.type = (char)tmp;
+      if (node->desc.basis.extravars.size){
+	 node->desc.basis.extravars.stat =
+	    (int *) malloc(node->desc.basis.extravars.size*ISIZE);
+	 if (node->desc.basis.extravars.type == WRT_PARENT){
+	    node->desc.basis.extravars.list = 
+	       (int *) malloc(node->desc.basis.extravars.size*ISIZE);   
+	    for (i = 0; i < node->desc.basis.extravars.size; i++)
+	       fscanf(f, "%i %i", node->desc.basis.extravars.list+i,
+		      node->desc.basis.extravars.stat+i);
+	 }else{
+	    for (i = 0; i < node->desc.basis.extravars.size; i++)
+	       fscanf(f, "%i", node->desc.basis.extravars.stat+i);
+	 }
+      }
+      fscanf(f, "%s %s %i %i", str1, str2, &tmp,
+	     &node->desc.basis.baserows.size);
+      node->desc.basis.baserows.type = (char)tmp;
+      if (node->desc.basis.baserows.size){
+	 node->desc.basis.baserows.stat =
+	    (int *) malloc(node->desc.basis.baserows.size*ISIZE);
+	 if (node->desc.basis.baserows.type == WRT_PARENT){
+	    node->desc.basis.baserows.list = 
+	       (int *) malloc(node->desc.basis.baserows.size*ISIZE);   
+	    for (i = 0; i < node->desc.basis.baserows.size; i++)
+	       fscanf(f, "%i %i", node->desc.basis.baserows.list+i,
+		      node->desc.basis.baserows.stat+i);
+	 }else{
+	    for (i = 0; i < node->desc.basis.baserows.size; i++)
+	       fscanf(f, "%i", node->desc.basis.baserows.stat+i);
+	 }
+      }
+      fscanf(f, "%s %s %i %i", str1, str2, &tmp,
+	     &node->desc.basis.extrarows.size);
+      node->desc.basis.extrarows.type = (char)tmp;
+      if (node->desc.basis.extrarows.size){
+	 node->desc.basis.extrarows.stat =
+	    (int *) malloc(node->desc.basis.extrarows.size*ISIZE);
+	 if (node->desc.basis.extrarows.type == WRT_PARENT){
+	    node->desc.basis.extrarows.list = 
+	       (int *) malloc(node->desc.basis.extrarows.size*ISIZE);   
+	    for (i = 0; i < node->desc.basis.extrarows.size; i++)
+	       fscanf(f, "%i %i", node->desc.basis.extrarows.list+i,
+		      node->desc.basis.extrarows.stat+i);
+	 }else{
+	    for (i = 0; i < node->desc.basis.extrarows.size; i++)
+	       fscanf(f, "%i", node->desc.basis.extrarows.stat+i);
+	 }
       }
    }
-   fscanf(f, "%s %s %i %i", str1, str2, &tmp,
-	  &node->desc.basis.extravars.size);
-   node->desc.basis.extravars.type = (char)tmp;
-   if (node->desc.basis.extravars.size){
-      node->desc.basis.extravars.stat =
-	 (int *) malloc(node->desc.basis.extravars.size*ISIZE);
-      if (node->desc.basis.extravars.type == WRT_PARENT){
-	 node->desc.basis.extravars.list = 
-	    (int *) malloc(node->desc.basis.extravars.size*ISIZE);   
-	 for (i = 0; i < node->desc.basis.extravars.size; i++)
-	    fscanf(f, "%i %i", node->desc.basis.extravars.list+i,
-		   node->desc.basis.extravars.stat+i);
-      }else{
-	 for (i = 0; i < node->desc.basis.extravars.size; i++)
-	    fscanf(f, "%i", node->desc.basis.extravars.stat+i);
-      }
-   }
-   fscanf(f, "%s %s %i %i", str1, str2, &tmp,
-	  &node->desc.basis.baserows.size);
-   node->desc.basis.baserows.type = (char)tmp;
-   if (node->desc.basis.baserows.size){
-      node->desc.basis.baserows.stat =
-	 (int *) malloc(node->desc.basis.baserows.size*ISIZE);
-      if (node->desc.basis.baserows.type == WRT_PARENT){
-	 node->desc.basis.baserows.list = 
-	    (int *) malloc(node->desc.basis.baserows.size*ISIZE);   
-	 for (i = 0; i < node->desc.basis.baserows.size; i++)
-	    fscanf(f, "%i %i", node->desc.basis.baserows.list+i,
-		   node->desc.basis.baserows.stat+i);
-      }else{
-	 for (i = 0; i < node->desc.basis.baserows.size; i++)
-	    fscanf(f, "%i", node->desc.basis.baserows.stat+i);
-      }
-   }
-   fscanf(f, "%s %s %i %i", str1, str2, &tmp,
-	  &node->desc.basis.extrarows.size);
-   node->desc.basis.extrarows.type = (char)tmp;
-   if (node->desc.basis.extrarows.size){
-      node->desc.basis.extrarows.stat =
-	 (int *) malloc(node->desc.basis.extrarows.size*ISIZE);
-      if (node->desc.basis.extrarows.type == WRT_PARENT){
-	 node->desc.basis.extrarows.list = 
-	    (int *) malloc(node->desc.basis.extrarows.size*ISIZE);   
-	 for (i = 0; i < node->desc.basis.extrarows.size; i++)
-	    fscanf(f, "%i %i", node->desc.basis.extrarows.list+i,
-		   node->desc.basis.extrarows.stat+i);
-      }else{
-	 for (i = 0; i < node->desc.basis.extrarows.size; i++)
-	    fscanf(f, "%i", node->desc.basis.extrarows.stat+i);
-      }
-   }
-
+   
    switch (node->node_status){
     case NODE_STATUS__HELD:
       REALLOC(tm->nextphase_cand, bc_node *,
@@ -2425,9 +2429,6 @@ int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
       break;
    }
 
-   if (close)
-      fclose(f);
-   
    return(parent);
 }
 
@@ -2463,34 +2464,24 @@ int write_subtree(bc_node *root, char *file, FILE *f, char append, int logging)
 
 /*===========================================================================*/
 
-int read_subtree(tm_prob *tm, bc_node *root, char *file, FILE *f)
+int read_subtree(tm_prob *tm, bc_node *root, FILE *f)
 {
    int parent, i;
    int *children;
-   char close = FALSE;
    
-   if (!f){
-      if (!(f = fopen(file, "r"))){
-	 printf("\nError opening subtree file\n\n");
-	 return(0);
-      }
-      close = TRUE;
-   }
-
-   parent = read_node(tm, root, file, f, &children);
-   if (root->bobj.child_num){
+   parent = read_node(tm, root, f, &children);
+   if (f && root->bobj.child_num){
       root->children = (bc_node **)
 	 malloc(root->bobj.child_num*sizeof(bc_node *));
       for (i = 0; i < root->bobj.child_num; i++){
 	 root->children[i] = (bc_node *) calloc(1, sizeof(bc_node));
 	 root->children[i]->parent = root;
-	 read_subtree(tm, root->children[i], file, f);
       }
    }
+   for (i = 0; i < root->bobj.child_num; i++){
+      read_subtree(tm, root->children[i], f);
+   }
 
-   if (close)
-      fclose(f);
-   
    return(parent);
 }
 			 
@@ -2616,21 +2607,15 @@ int write_tm_info(tm_prob *tm, char *file, FILE* f, char append)
 
 /*===========================================================================*/
 
-int read_tm_info(tm_prob *tm, char *file, FILE *f)
+int read_tm_info(tm_prob *tm, FILE *f)
 {
    char str1[20], str2[20];
-   char close = FALSE;
    int tmp = 0;
    double previous_elapsed_time = 0;
-   
-   if (!f){
-      if (!(f = fopen(file, "r"))){
-	 printf("\nError opening TM info file\n\n");
-	 return(0);
-      }
-      close = TRUE;
-   }
-   
+
+   if (!f)
+      return(0);
+      
    fscanf(f, "%s %s", str1, str2);
    if (fscanf(f, "%lf", &tm->ub) != 0)
       tm->has_ub = TRUE;
@@ -2657,9 +2642,6 @@ int read_tm_info(tm_prob *tm, char *file, FILE *f)
    fscanf(f, "%s %s %lf", str1, str2, &tm->comp_times.cut_pool);
    fscanf(f, "%s %s %lf\n", str1, str2, &previous_elapsed_time);
    tm->start_time -= previous_elapsed_time;
-
-   if (close)
-      fclose(f);
 
    return(1);
 }
@@ -2691,27 +2673,15 @@ int write_base(base_desc *base, char *file, FILE *f, char append)
 
 /*===========================================================================*/
 
-int read_base(base_desc *base, char *file, FILE *f)
+int read_base(base_desc *base, FILE *f)
 {
    char str1[20], str2[20];
    int i;
-   char close = FALSE;
-
-   if (!f){
-      if (!(f = fopen(file, "r"))){
-	 printf("\nError opening base file\n\n");
-	 return(0);
-      }
-      close = TRUE;
-   }
    
    fscanf(f, "%s %s %i %i", str1, str2, &base->varnum, &base->cutnum);
    base->userind = (int *) malloc(base->varnum*ISIZE);
    for (i = 0; i < base->varnum; i++)
       fscanf(f, "%i", base->userind+i);
-
-   if (close)
-      fclose(f);
 
    return(1);
 }
@@ -2775,16 +2745,20 @@ void free_tm(tm_prob *tm)
    FREE(tm->samephase_cand);
    FREE(tm->nextphase_cand);
 
+#ifndef COMPILE_IN_TM
    /* Go over the tree and free the nodes */
    free_subtree(tm->rootnode);
-
+#endif
+   
    /* Go over the cuts stored and free them all */
-   for (i = tm->cut_num - 1; i >= 0; i--)
-      if (cuts[i]){
-	 FREE(cuts[i]->coef);
-	 FREE(cuts[i]);
-      }
-   FREE(tm->cuts);
+   if (cuts){
+      for (i = tm->cut_num - 1; i >= 0; i--)
+	 if (cuts[i]){
+	    FREE(cuts[i]->coef);
+	    FREE(cuts[i]);
+	 }
+      FREE(tm->cuts);
+   }
 
    FREE(tm->tmp.i);
    FREE(tm->tmp.c);
@@ -2807,6 +2781,8 @@ void free_subtree(bc_node *n)
 {
    int i;
 
+   if (n == NULL) return;
+   
    for (i = n->bobj.child_num - 1; i >= 0; i--)
       free_subtree(n->children[i]);
    free_tree_node(n);

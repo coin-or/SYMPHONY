@@ -49,11 +49,9 @@ COMPILE_IN_CP = TRUE
 
 ##############################################################################
 # If you wish to compile and use the SYMPHONY callable library therough the 
-# SYMPHONY OSI interface, set USER_MAIN to TRUE here and see below. Note that
+# SYMPHONY OSI interface, set USE_OSI_INTERFACE to TRUE below. Note that
 # you must have COIN installed to use this capability. See the main SYMPHONY
-# Makefile to set the path to the COIN directories. Also, in this case, you 
-# may also be writing your own main(), so you may want to set USER_MAIN to 
-# TRUE also.
+# Makefile to set the path to the COIN directories.
 ##############################################################################
 
 USE_OSI_INTERFACE = TRUE

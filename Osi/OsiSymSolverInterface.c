@@ -91,6 +91,15 @@ bool OsiSymSolverInterface::setSymIntParam(OsiSymIntParam key, int value)
 
     case OsiSymVerbosity:
       env_->par.verbosity = value;
+      return true;
+
+    case OsiSymWarmStart:
+      env_->par.tm_par.warm_start = value;
+      return true;
+
+    case OsiSymNodeLimit:
+      env_->par.tm_par.node_limit = value;
+      return true;
 
     default: 
       return false;
@@ -122,6 +131,14 @@ bool OsiSymSolverInterface::setSymDblParam(OsiSymDblParam key, double value)
 
     case OsiSymGranularity:
       env_->par.lp_par.granularity = env_->par.tm_par.granularity = value;
+      return true;
+
+    case OsiSymTimeLimit:
+      env_->par.tm_par.time_limit = value;
+      return true;
+
+    case OsiSymGapLimit:
+      env_->par.tm_par.gap_limit = value;
       return true;
 
    default: 
@@ -171,6 +188,18 @@ bool OsiSymSolverInterface::getSymIntParam(OsiSymIntParam key, int& value)
 {
    switch(key){
 
+    case OsiSymVerbosity:
+      value = env_->par.verbosity;
+      return true;
+
+    case OsiSymWarmStart:
+      value = env_->par.tm_par.warm_start;
+      return true;
+
+    case OsiSymNodeLimit:
+      value = env_->par.tm_par.node_limit;
+      return true;
+
    default:
       return false;
    }
@@ -183,7 +212,7 @@ bool OsiSymSolverInterface::getDblParam(OsiDblParam key, double& value) const
 {
    switch (key){
       
-   case OsiObjOffset:
+    case OsiObjOffset:
       value = env_->mip->obj_offset;
       return true;
 
@@ -199,6 +228,18 @@ bool OsiSymSolverInterface::getSymDblParam(OsiSymDblParam key,
 					   double& value) const
 {
    switch(key){
+
+    case OsiSymGranularity:
+      value = env_->par.lp_par.granularity;
+      return true;
+
+    case OsiSymTimeLimit:
+      value = env_->par.tm_par.time_limit;
+      return true;
+
+    case OsiSymGapLimit:
+      value = env_->par.tm_par.gap_limit;
+      return true;
 
    default:
       return false;

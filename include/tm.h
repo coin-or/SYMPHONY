@@ -21,37 +21,6 @@
 #include "BB_types.h"
 #include "lp_solver.h"
 
-/*===========================================================================*\
- * The bc_node data structure stores the information needed to     
- * process a node in the branch and cut tree                            
-\*===========================================================================*/
-
-typedef struct BC_NODE{
-   int        bc_index;     /* the identifier of the node */
-   int        bc_level;     /* the level in the tree of the node */
-   
-   int        lp;           /* the tid of the lp processing the node */
-   int        cg;           /* the tid of the cut generator serving the node */
-   int        cp;           /* the tid of the cut pool assigned to the node */
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int        sp;           /* the tid of the solution pool */
-   /*___END_EXPERIMENTAL_SECTION___*/
-   double     lower_bound;  /* the current best objective function value
-			       obtained in the subproblem */
-   double     opt_estimate; /* an estimate of the value of the best feasible
-			       solution that could be obtained in this node */
-   struct BC_NODE  *parent;
-   struct BC_NODE **children;
-   branch_obj       bobj;
-
-   node_desc  desc;          /* the description of the node,
-			       defined in "BB_types.h" */
-   char       node_status;
-#ifdef TRACE_PATH
-   char       optimal_path;
-#endif 
-}bc_node;
-
 /*===========================================================================*/
 
 typedef struct PROCESS_SET{
@@ -136,7 +105,7 @@ typedef struct TM_PROB{
    int             allocated_cut_num;
    cut_data      **cuts;
 
-   tm_stat         stat;
+   problem_stat    stat;
 
    node_times      comp_times;         /* keeps track of the computation times
 			                  for the problem */
@@ -211,12 +180,11 @@ int write_subtree PROTO((bc_node *node, char *file, FILE* f, char append,
 int write_tm_cut_list PROTO((tm_prob *tm, char *file, char append));
 int write_tm_info PROTO((tm_prob *tm, char *file, FILE* f, char append));
 int write_base PROTO((base_desc *base, char *file, FILE* f, char append));
-int read_node PROTO((tm_prob *tm, bc_node *node, char *file, FILE *f,
-		     int **children));
-int read_subtree PROTO((tm_prob *tm, bc_node *node, char *file, FILE *f));
+int read_node PROTO((tm_prob *tm, bc_node *node, FILE *f, int **children));
+int read_subtree PROTO((tm_prob *tm, bc_node *node, FILE *f));
 int read_tm_cut_list PROTO((tm_prob *tm, char * file));
-int read_tm_info PROTO((tm_prob *tm, char *file, FILE *f));
-int read_base PROTO((base_desc *base, char *file, FILE *f));
+int read_tm_info PROTO((tm_prob *tm, FILE *f));
+int read_base PROTO((base_desc *base, FILE *f));
 
 /*-------------- Functions related to freeing and closing -------------------*/
 

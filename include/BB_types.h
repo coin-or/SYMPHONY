@@ -15,17 +15,6 @@
 #ifndef _BB_TYPES_H
 #define _BB_TYPES_H
 
-#include "tm_params.h"
-#include "cp_params.h"
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-#include "sp_params.h"
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
-#include "cg_params.h"
-#include "lp_params.h"
-#include "dg_params.h"
-
 #define MAX_CHILDREN_NUM 4
 
 /*===========================================================================*\
@@ -298,77 +287,80 @@ typedef struct PROB_TIMES{
 }prob_times;
 
 /*===========================================================================*\
- * The params structure contains all of the user-specified parameters
- * to be read in from the parameter file. See the README file for an
- * explanation of the parameters
+ * The bc_node data structure stores the information needed to     
+ * process a node in the branch and cut tree                            
 \*===========================================================================*/
 
-typedef struct PARAMS{
-   int        warm_start;
-   int        verbosity;
-   char       param_file[MAX_FILE_NAME_LENGTH +1];
-   int        random_seed;
-   cp_params  cp_par;
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params  sp_par;
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
-   cg_params  cg_par;
-   lp_params  lp_par;
-   tm_params  tm_par;
-   dg_params  dg_par;
-   char       tm_exe[MAX_FILE_NAME_LENGTH +1];
-   char       dg_exe[MAX_FILE_NAME_LENGTH +1];
-   int        tm_debug;
-   int        dg_debug;
-   int        tm_machine_set;
-   char       tm_machine[MACH_NAME_LENGTH +1];
-   int        dg_machine_set;
-   char       dg_machine[MACH_NAME_LENGTH +1];
-   int        pvm_trace;
-   int        do_branch_and_cut;
-   int        do_draw_graph;
-   char       infile[MAX_FILE_NAME_LENGTH +1]; /* For MPS file name
-						  or GNUMP modelfile */
-   char       datafile[MAX_FILE_NAME_LENGTH +1]; /* GNUMP datafile */
-}params;
+typedef struct BC_NODE{
+   int        bc_index;     /* the identifier of the node */
+   int        bc_level;     /* the level in the tree of the node */
+   
+   int        lp;           /* the tid of the lp processing the node */
+   int        cg;           /* the tid of the cut generator serving the node */
+   int        cp;           /* the tid of the cut pool assigned to the node */
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   int        sp;           /* the tid of the solution pool */
+   /*___END_EXPERIMENTAL_SECTION___*/
+   double     lower_bound;  /* the current best objective function value
+			       obtained in the subproblem */
+   double     opt_estimate; /* an estimate of the value of the best feasible
+			       solution that could be obtained in this node */
+   struct BC_NODE  *parent;
+   struct BC_NODE **children;
+   branch_obj       bobj;
+
+   node_desc  desc;          /* the description of the node,
+			       defined in "BB_types.h" */
+   char       node_status;
+#ifdef TRACE_PATH
+   char       optimal_path;
+#endif 
+}bc_node;
 
 /*===========================================================================*\
- * The problem data structure contains the data for a problem instance, as
- * well as some of the tours that have been generated.
+ * Keeps problem statistics
 \*===========================================================================*/
 
-typedef struct MIPDESC;
-typedef struct TM_PROB;
+typedef struct PROBLEM_STAT{
+   double      root_lb;
+   int         cuts_in_pool;
+   int         max_depth;          /* keeps track of the deepest level reached
+				      in the tree so far */
+   int         chains;             /* the number of diving chains */
+   int         diving_halts;       /* how many times was an already started
+				      dive stopped */
+   int         tree_size;          /* number of search tree nodes */
+   int         created;            /* the number of created nodes (not
+				      necessarily the same as tree_size
+				      (trimming...) */
+   int         analyzed;           /* the number of analyzed (i.e., CG-LP
+				      iteration) nodes (not necessarily same
+				      as created, leaves can be cut off
+				      without analyzing; trimming) */
+   int         leaves_before_trimming;
+   int         leaves_after_trimming;
+   int         vars_not_priced;    /* How many variables did not price out
+				      after the first phase */
+   char        nf_status;          /* nf_status of the root node after
+				      repricing */
+}problem_stat;
 
-typedef struct PROBLEM{
-   void      *user;
-#ifdef COMPILE_IN_TM
-   struct TM_PROB *tm;
-#endif
-   int        tm_tid;
-   int        dg_tid;
-   params     par;         /* problem parameters */
-   prob_times comp_times;  /* keeps track of the computation times for the
-			      problem */
-   char       has_ub;
-   double     ub;
-   lp_sol     best_sol;
-   char       has_ub_estimate;
-   double     ub_estimate;
-   double     lb;
+/*===========================================================================*\
+ * The warm start description contains all information needed to warm start
+ * the algorithm.
+\*===========================================================================*/
 
-   struct MIPDESC *mip; /* For holding the description when read in from MPS */
-   
-   char       probname[81];
-
-   base_desc *base;
-   node_desc *root;
-
-   tm_stat    stat;
-
-   int termcode;
-}problem;
+typedef struct WARM_START_DESC{
+   bc_node       *rootnode;
+   int            cut_num;
+   int            allocated_cut_num;
+   cut_data     **cuts;
+   problem_stat   stat;
+   node_times     comp_times;
+   int            phase;
+   double         lb;
+   char           has_ub;
+   double         ub;
+}warm_start_desc;
 
 #endif

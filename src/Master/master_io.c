@@ -1289,7 +1289,7 @@ void read_string(char *target, char *line, int maxlen)
 /*===========================================================================*/
 /*===========================================================================*/
 
-void print_statistics(node_times *tim, tm_stat *stat, double ub, double lb,
+void print_statistics(node_times *tim, problem_stat *stat, double ub, double lb,
 		      double initial_time, double start_time)
 {
    static str_int nfstatus[4] = {

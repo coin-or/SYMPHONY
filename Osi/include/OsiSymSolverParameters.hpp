@@ -18,7 +18,9 @@
 
 enum OsiSymIntParam {
    /** This controls the level of output */
-   OsiSymVerbosity
+   OsiSymVerbosity,
+   OsiSymWarmStart,
+   OsiSymNodeLimit
 };
 
 enum OsiSymDblParam {
@@ -26,7 +28,9 @@ enum OsiSymDblParam {
        value for two solutions that actually have do different objective
        function values. For integer programs with integral objective function
        coefficients, this would be 1, for instance. */ 
-   OsiSymGranularity
+   OsiSymGranularity,
+   OsiSymTimeLimit,
+   OsiSymGapLimit
 };
 
 enum OsiSymStrParam {

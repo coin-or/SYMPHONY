@@ -20,6 +20,7 @@
 #include "qsortucb.h"
 #include "messages.h"
 #include "proccomm.h"
+#include "symphony_api.h"
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "master.h"
@@ -223,7 +224,7 @@ int initialize_root_node_u(problem *p)
    int i;
 
    base_desc *base = p->base = (base_desc *) calloc(1, sizeof(base_desc));
-   node_desc *root = p->root = (node_desc *) calloc(1, sizeof(node_desc));
+   node_desc *root = p->rootdesc = (node_desc *) calloc(1, sizeof(node_desc));
    
    switch (user_initialize_root_node(p->user, &base->varnum, &base->userind,
 				     &base->cutnum, &root->uind.size,
@@ -606,6 +607,8 @@ int process_own_messages_u(problem *p, int msgtag)
 
 int free_master_u(problem *p)
 {
+   int i;
+   
    CALL_USER_FUNCTION( user_free_master(&p->user) );
 
    if (p->mip){
@@ -613,19 +616,34 @@ int free_master_u(problem *p)
       FREE(p->mip);
    }
    
-   if (p->root){
-      FREE(p->root->desc);
-      FREE(p->root->uind.list);
-      FREE(p->root->not_fixed.list);
-      FREE(p->root->cutind.list);
-      FREE(p->root);
+   if (p->rootdesc){
+      FREE(p->rootdesc->desc);
+      FREE(p->rootdesc->uind.list);
+      FREE(p->rootdesc->not_fixed.list);
+      FREE(p->rootdesc->cutind.list);
+      FREE(p->rootdesc);
    }
 
    if (p->base){
       FREE(p->base->userind);
       FREE(p->base);
    }
-   
+
+#ifdef COMPILE_IN_TM
+   if (p->warm_start){
+      free_subtree(p->warm_start->rootnode);
+      if (p->warm_start->cuts){
+	 for (i = p->warm_start->cut_num - 1; i >= 0; i--)
+	 if (p->warm_start->cuts[i]){
+	    FREE(p->warm_start->cuts[i]->coef);
+	    FREE(p->warm_start->cuts[i]);
+	 }
+      }
+      FREE(p->warm_start->cuts);
+      FREE(p->warm_start);
+   }
+#endif
+      
    return(FUNCTION_TERMINATED_NORMALLY);
 }
 

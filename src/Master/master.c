@@ -448,9 +448,9 @@ int sym_find_initial_bounds(problem *p)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_solve(problem *p){
-
-   int s_bufid, r_bufid, bytes, msgtag = 0, sender, termcode = 0;
+int sym_solve(problem *p)
+{
+   int s_bufid, r_bufid, bytes, msgtag = 0, sender, termcode = 0, i;
    char lp_data_sent = FALSE, cg_data_sent = FALSE, cp_data_sent = FALSE;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    char sp_data_sent = TRUE; /*for now, we are not using this one*/
@@ -464,7 +464,7 @@ int sym_solve(problem *p){
    struct timeval timeout = {10, 0};
    double t = 0, total_time = 0;
 
-   node_desc *root = p->root;
+   node_desc *rootdesc = p->rootdesc;
    base_desc *base = p->base;
 
    start_time = wall_clock(NULL);
@@ -527,22 +527,22 @@ int sym_solve(problem *p){
       send_char_array(&repricing, 1);
       send_char_array(&node_type, 1);
       send_dbl_array(&p->lb, 1);
-      send_int_array(&root->nf_status, 1);
-      pack_array_desc(&root->uind);
-      if (root->nf_status == NF_CHECK_AFTER_LAST ||
-	  root->nf_status == NF_CHECK_UNTIL_LAST)
-	 pack_array_desc(&root->not_fixed);
-      pack_array_desc(&root->cutind);
-      pack_basis(&root->basis, TRUE);
-      send_int_array(&root->desc_size, 1);
-      if (root->desc_size)
-	 send_char_array(root->desc, root->desc_size);
-      if (root->cutind.size > 0){ /* Hey, we have cuts! Pack them, too. */
+      send_int_array(&rootdesc->nf_status, 1);
+      pack_array_desc(&rootdesc->uind);
+      if (rootdesc->nf_status == NF_CHECK_AFTER_LAST ||
+	  rootdesc->nf_status == NF_CHECK_UNTIL_LAST)
+	 pack_array_desc(&rootdesc->not_fixed);
+      pack_array_desc(&rootdesc->cutind);
+      pack_basis(&rootdesc->basis, TRUE);
+      send_int_array(&rootdesc->desc_size, 1);
+      if (rootdesc->desc_size)
+	 send_char_array(rootdesc->desc, rootdesc->desc_size);
+      if (rootdesc->cutind.size > 0){ /* Hey, we have cuts! Pack them, too. */
 	 /* Pack their number again, so we can call unpack_cut_set in TM */
 	 int i;
-	 send_int_array(&root->cutind.size, 1);
-	 for (i = 0; i < root->cutind.size; i++)
-	    pack_cut(root->cuts[i]);
+	 send_int_array(&rootdesc->cutind.size, 1);
+	 for (i = 0; i < rootdesc->cutind.size; i++)
+	    pack_cut(rootdesc->cuts[i]);
       }
       send_msg(p->tm_tid, TM_ROOT_DESCRIPTION);
       freebuf(s_bufid);
@@ -575,7 +575,38 @@ int sym_solve(problem *p){
 #endif
 #endif
 
-   if ((termcode = tm_initialize(tm , base, root)) < 0){
+   if (p->warm_start && p->par.tm_par.warm_start){
+      /* Load warm start info */
+      tm->rootnode = p->warm_start->rootnode;
+      tm->cuts = p->warm_start->cuts;
+      tm->cut_num = p->warm_start->cut_num;
+      tm->allocated_cut_num = p->warm_start->allocated_cut_num;
+      tm->stat = p->warm_start->stat;
+      tm->comp_times = p->warm_start->comp_times;
+      tm->lb = p->warm_start->lb;
+      if (p->warm_start->has_ub){
+	 if (p->warm_start->ub < tm->ub || !tm->has_ub){
+	    tm->ub = p->warm_start->ub;
+	 }
+	 tm->has_ub = TRUE;
+      }
+      tm->phase = p->warm_start->phase;
+   }else if (p->warm_start){
+      /* Otherwise, free what was saved */
+      free_subtree(p->warm_start->rootnode);
+      if (p->warm_start->cuts){
+	 for (i = p->warm_start->cut_num - 1; i >= 0; i--)
+	    if (p->warm_start->cuts[i]){
+	       FREE(p->warm_start->cuts[i]->coef);
+	       FREE(p->warm_start->cuts[i]);
+	    }
+	 FREE(p->warm_start->cuts);
+      }
+   }
+   /* Now the tree manager owns everything */
+   FREE(p->warm_start);
+   
+   if ((termcode = tm_initialize(tm , base, rootdesc)) < 0){
       tm_close(tm, termcode);
 
       if (p->par.do_draw_graph){
@@ -691,15 +722,15 @@ int sym_solve(problem *p){
 			     sizeof(node_times));
 	 receive_dbl_array(&lb, 1);
 	 if (lb > p->lb) p->lb = lb;
-	 receive_char_array((char *)&p->stat, sizeof(tm_stat));
+	 receive_char_array((char *)&p->warm_start->stat, sizeof(problem_stat));
 	 printf( "\n");
 	 printf( "****************************************************\n");
 	 printf( "* Branch and Cut First Phase Finished!!!!          *\n");
 	 printf( "* Now displaying stats and best solution...        *\n");
 	 printf( "****************************************************\n\n");
 
-	 print_statistics(&(p->comp_times.bc_time), &(p->stat), p->ub, p->lb,
-			  0, start_time);
+	 print_statistics(&(p->comp_times.bc_time), &(p->warm_start->stat),
+			  p->ub, p->lb, 0, start_time);
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
 	 CALL_WRAPPER_FUNCTION( display_solution_u(p, p->tm->opt_thread_num) );
 #else
@@ -721,7 +752,7 @@ int sym_solve(problem *p){
 			    sizeof(node_times));
 	 receive_dbl_array(&lb, 1);
 	 if (lb > p->lb) p->lb = lb;
-	 receive_char_array((char *)&p->stat, sizeof(tm_stat));
+	 receive_char_array((char *)&p->warm_start->stat, sizeof(problem_stat));
 	 break;
 
        default:
@@ -750,8 +781,25 @@ int sym_solve(problem *p){
    \*------------------------------------------------------------------------*/
 
    tm->start_time += start_time;
+
    termcode = solve(tm);
 
+   /* Save the warm start info */
+   p->warm_start = (warm_start_desc *) calloc (1, sizeof(warm_start_desc));
+   p->warm_start->rootnode = tm->rootnode;
+   p->warm_start->cuts = p->tm->cuts;
+   p->warm_start->cut_num = p->tm->cut_num;
+   p->warm_start->allocated_cut_num = p->tm->allocated_cut_num;
+   p->warm_start->stat = tm->stat;
+   p->warm_start->phase = tm->phase;
+   p->warm_start->lb = tm->lb;
+   if (p->warm_start->has_ub = tm->has_ub){
+      p->warm_start->ub = tm->ub;
+   }
+   tm->rootnode = NULL;
+   tm->cuts = NULL;
+   tm->cut_num = tm->allocated_cut_num = 0;
+      
    tm_close(tm, termcode);
 
 #ifndef COMPILE_IN_LP
@@ -837,8 +885,8 @@ int sym_solve(problem *p){
    CALL_WRAPPER_FUNCTION( display_solution_u(p, 0) );
 #endif
 #else
-   print_statistics(&(p->comp_times.bc_time), &(p->stat), p->ub, p->lb, 0,
-		    start_time);
+   print_statistics(&(p->comp_times.bc_time), &(p->warm_start->stat), p->ub,
+		    p->lb, 0, start_time);
    CALL_WRAPPER_FUNCTION( display_solution_u(p, 0) );
 #endif
 
