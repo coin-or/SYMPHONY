@@ -19,7 +19,7 @@ from fully parallel to completely sequential, depending on the user's
 needs. The library runs serially on almost any platform, and can also
 run in parallel in either a fully distributed environment (network of
 workstations) or shared-memory environment simply by changing a few
-options in the make file. To run in a distributed environment, the
+options in the makefile. To run in a distributed environment, the
 user must have installed {\em \htmladdnormallink{Parallel Virtual
 Machine}{http://www.ccs.ornl.gov/pvm/}} (PVM) software, available for
 free from Oak Ridge National Laboratories
@@ -134,7 +134,7 @@ format is described on the TSPLIB Web site.
 \end{latexonly}.
 
         \item Follow the instructions above for configuring the makefile. Set
-the variable {\tt CC} to the compiler name in the make file and compile as
+the variable {\tt CC} to the compiler name in the makefile and compile as
 above. Note that if you have previously compiled the sequential version, then
 you should first type {\tt make clean\_all}, as this version uses the same
 directories.  With one thread allowed, it should run exactly the same as the
@@ -179,7 +179,7 @@ from Oak Ridge National Laboratories
         sequential version. Various combinations of these variables will give
         you different configurations and different executables. See Section
         \ref{configuration} for more info on setting them. Also, be sure to
-        set the path variables in the make file appropriately so that make can
+        set the path variables in the makefile appropriately so that make can
         find the PVM library.
 
         \item Type ``{\tt make}'' in the SYMPHPONY-3.0.1 directory to
@@ -267,7 +267,8 @@ changes that need to be made.
 this by right-clicking on the symphony project and choosing ``Add Files to
 Project...'' Then locate the library file for the LP solver you are using
 (either CPLEX or OSL). For CPLEX, you need the library called {\tt
-cplex**.lib}, where ** is your CPLEX version.
+cplex**.lib}, where ** is your CPLEX version. Make sure to delete the old
+library dependency.
 
 \item You must set the include path for the solver header files. Do this
 by right-clicking on the symphony project and choosing ``Settings...'' Then
@@ -277,16 +278,16 @@ window.
 
 \item You must set the compiler defines so that the right LP solver interface
 will be used. Follow the procedure above to get to the preprocessor settings
-and make sure that {\tt \_\_OSL\_\_} is defined if you are using OSL or
-{\tt \_\_CPLEX\_\_} is defined if you are using CPLEX. DO NOT CHANGE COMPILER
-DEFINES NOT RELATED TO THE LP SOLVER. Important note for OSL users: When using
-OSL in Windows, you must also define the symbol OSLMSDLL.
+and edit the ``Preprocessor definitions.'' Make sure that {\tt \_\_OSL\_\_} is
+defined if you are using OSL or {\tt \_\_CPLEX\_\_} is defined if you are
+using CPLEX. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP
+SOLVER. Important note for OSL users: When using OSL in Windows, you must also add \texttt{OSLMSDLL} to the list of definitions. 
 
 \end{itemize}
 
 \item Note that there are a number of additional compiler defines that control
 the functionality of SYMPHONY. These defines are described in {\tt
-SYMPHONY-3.0.1$\backslash$Makefile}, a Unix-style make file included with the
+SYMPHONY-3.0.1$\backslash$Makefile}, a Unix-style makefile included with the
 distribution. To enable the functionality associated with a particular
 compiler define, simply add it to the list of defines under the preprocessor
 settings, as above.
@@ -331,13 +332,13 @@ approach, an application can be developed by filling in only a few simple
 functions. Here are four simple steps to get up and running.
 \begin{enumerate}
 
-\item Set the variable \texttt{USERROOT} in the make file to be
+\item Set the variable \texttt{USERROOT} in the makefile to be
 \texttt{\$(ROOT)/Template} and type "\texttt{make}". Assuming that the make
 file has already been modified appropriately, as described in Section
 \ref{getting_strated_windows}, this should successfully compile the template
 code, although it will not run until it is modified as described below.
 
-\item First, decide what run-time parameters you might need and what data has 
+\item Decide what run-time parameters you might need and what data has 
 to be stored to describe your instance. Edit the file
 \texttt{Template/include/user.h}, adding the appropriate fields to the
 \texttt{user\_parameter} and \texttt{user\_problem} structure to store the
@@ -373,7 +374,7 @@ simple steps to get up and running.
 \begin{enumerate}
 
 \item First open the workspace {\tt
-SYMPHONY-3.0.1$\backslash$WIN32$\backslash$user.dsw} and modify for your local
+SYMPHONY-3.0.1$\backslash$WIN32$\backslash$template.dsw} and modify for your local
 setup, as described in Section \ref{getting_strated_windows}. It should
 build right away, although it won't run until modified as described below.
 

@@ -188,7 +188,7 @@ user manual for help.
 
 Here is a sketch outline of how to compile the sample application, a VRP and
 TSP solver, in Microsoft Windows. For information on developing your own
-applications, please see the quick strat guide below or the detailed
+applications, please see the quick start guide below or the detailed
 explanation in the user's manual. Direct support is provided for compilation
 under MS Visual Studio 6.0. Compilation for other compilers should also be
 possible. Note that the Windows version has some limitations. Detailed timing
@@ -224,18 +224,17 @@ Edit the path in the "Additional include directories" window.
 
   --You must set the compiler defines so that the right LP solver interface
 will be used. Follow the procedure above to get to the preprocessor settings
-and edit the "Preprcoessor definitions". Make sure that __OSL__ is defined if
+and edit the "Preprocessor definitions". Make sure that __OSL__ is defined if
 you are using OSL or __CPLEX__ is defined if you are using CPLEX. DO NOT
 CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important note for OSL
 users: When using OSL in Windows, you must also add "OSLMSDLL" to the list of
 definitions. 
 
-4. Note that there are a number of additional compiler defines that control
-the functionality of SYMPHONY. These defines are described in
-SYMPHONY-3.0.1/Makefile, a Unix-style make file included with the
+4. Note that there are a number of additional preprocessor definitions that
+control the functionality of SYMPHONY. These definitions are described in
+SYMPHONY-3.0.1/Makefile, a Unix-style makefile included with the
 distribution. To enable the functionality associated with a particular
-compiler define, simply add it to the list of defines under the preprocessor
-settings, as above.
+definition, simply add it to the list of definitions, as above.
 
 5. You must also be sure to have any .dll files required for your LP solver to
 be in your search path. Either move the required .dll to the directory
@@ -275,13 +274,13 @@ user data structure among all the modules. Using this approach, an application
 can be developed by filling in only a few simple functions. Here are four
 simple steps to get up and running.
 
-1. Set the variable USERROOT in the make file to be ${ROOT)/Template and type
-"make". Assuming that the make file has already been modified appropriately,
+1. Set the variable USERROOT in the makefile to be ${ROOT)/Template and type
+"make". Assuming that the makefile has already been modified appropriately,
 as described in the sample compilation section, this should successfully
 compile the template code, although it will not run until it is modified as
 described below.
 
-2. First, decide what run-time parameters you might need and what data has to
+2. Decide what run-time parameters you might need and what data has to
 be stored to describe your instance. Edit the file Template/include/user.h,
 adding the appropriate fields to the user_parameter and user_problem
 structures to store the relevant values.
@@ -313,9 +312,9 @@ user data structure among all the modules. Using this approach, an application
 can be developed by filling in only a few simple functions. Here are four
 simple steps to get up and running.
 
-1. First open the workspace user.dsw and modify for your local setup, as
-described in the sample compilation section. It should build right away,
-although it won't run until modified as described below.
+1. First open the workspace SYMPHONY-3.0.1\WIN32\template.dsw and modify for
+your local setup, as described in the sample compilation section. It should
+build right away, although it won't run until modified as described below.
 
 2. Next, decide what run-time parameters you might need and what data has to
 be stored to describe your instance. Edit the file Template\include\user.h,
