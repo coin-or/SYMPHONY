@@ -222,6 +222,10 @@ void free_lp(lp_prob *p)
    free_lp_desc(p->lp_data->desc);
    FREE(p->lp_data->desc);
    FREE(p->lp_data);
+#if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
+   free_lp_desc(p->lp_desc);
+   FREE(p->lp_desc);
+#endif
    FREE(p->base.userind);
    if (p->par.branch_on_cuts){
       FREE(p->slack_cuts);
@@ -234,6 +238,8 @@ void free_lp(lp_prob *p)
 
 void free_lp_desc(LPdesc *desc)
 {
+   int j;
+   
    FREE(desc->matbeg);
    FREE(desc->matind);
    FREE(desc->matval);
@@ -243,6 +249,13 @@ void free_lp_desc(LPdesc *desc)
    FREE(desc->sense);
    FREE(desc->lb);
    FREE(desc->ub);
+   FREE(desc->ints);
+   if (desc->colname){
+      for (j = 0; j < desc->n; j++){
+	 FREE(desc->colname[j]);
+      }
+      FREE(desc->colname);
+   }
 }
 
 /*===========================================================================*/

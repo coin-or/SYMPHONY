@@ -52,6 +52,7 @@
 int receive_lp_data_u(lp_prob *p)
 {
    int r_bufid;
+   char has_desc;
 
    r_bufid = receive_msg(p->master, LP_DATA);
    receive_char_array((char *)(&p->par), sizeof(lp_params));
@@ -68,7 +69,24 @@ int receive_lp_data_u(lp_prob *p)
       receive_int_array(p->base.userind, p->base.varnum);
    }
    receive_int_array(&p->base.cutnum, 1);
-
+   receive_char_array(&has_desc, 1);
+   if (has_desc){
+      LPdesc *desc = p->lp_desc = (LPdesc *) calloc(1, sizeof(LPdesc));
+      receive_int_array(&(desc->m), 1);
+      receive_int_array(&(desc->n), 1);
+      receive_int_array(&(desc->nz), 1);
+      receive_dbl_array(desc->obj, desc->n);
+      receive_dbl_array(desc->rhs, desc->m);
+      receive_char_array(desc->sense, desc->m);
+      receive_dbl_array(desc->rngval, desc->m);
+      receive_dbl_array(desc->ub, desc->n);
+      receive_dbl_array(desc->lb, desc->n);
+      receive_int_array(&desc->numints, 1);
+      if (desc->numints){
+	 receive_int_array(desc->ints, desc->numints);
+      }
+   }
+   
    switch( user_receive_lp_data(&p->user)){
     case ERROR:
       freebuf(r_bufid);
@@ -182,6 +200,7 @@ int create_lp_u(lp_prob *p)
    lp_data->desc->n = lp_data->n;
    lp_data->desc->m = lp_data->m;
 
+
    /* Create the list of indices to pass to the user */
    userind = (int *) malloc(lp_data->n * ISIZE);
    vars = lp_data->vars;
@@ -196,14 +215,54 @@ int create_lp_u(lp_prob *p)
        userind,
        /* max sizes (estimated by the user) */
        &maxn, &maxm, &maxnz);
-
-   FREE(userind);
    
    switch (user_res){
+    case DEFAULT:
+      lp_data->desc->nz = p->lp_desc->nz;      
+      /* Allocate the arrays.*/
+      lp_data->desc->matbeg  = (int *) malloc((lp_data->desc->n + 1) * ISIZE);
+      lp_data->desc->matind  = (int *) malloc((lp_data->desc->nz) * ISIZE);
+      lp_data->desc->matval  = (double *) malloc((lp_data->desc->nz) * DSIZE);
+      lp_data->desc->obj     = (double *) malloc(lp_data->desc->n * DSIZE);
+      lp_data->desc->ub      = (double *) malloc(lp_data->desc->n * DSIZE);
+      lp_data->desc->lb      = (double *) calloc(lp_data->desc->n, DSIZE); 
+      lp_data->desc->rhs     = (double *) malloc(lp_data->desc->m * DSIZE);
+      lp_data->desc->sense   = (char *)   malloc(lp_data->desc->m * CSIZE);
+      lp_data->desc->rngval  = (double *) calloc(lp_data->desc->m, DSIZE);
+      /* Fill out the appropriate data structures*/
+      lp_data->desc->matbeg[0] = 0;
+      for (i = 0; i < lp_data->desc->n; i++){
+	 lp_data->desc->obj[i]        = p->lp_desc->obj[userind[i]];
+	 lp_data->desc->ub[i]         = p->lp_desc->ub[userind[i]];
+	 lp_data->desc->lb[i]         = p->lp_desc->lb[userind[i]];
+	 lp_data->desc->matbeg[i+1]   = p->lp_desc->matbeg[i] + 
+	                                (p->lp_desc->matbeg[userind[i]+1] -
+	                                 p->lp_desc->matbeg[userind[i]]);
+	 for (j = 0; j < (lp_data->desc->matbeg[i+1]-lp_data->desc->matbeg[i]);
+	      j++){
+	    lp_data->desc->matind[lp_data->desc->matbeg[i]+j]=
+	       p->lp_desc->matind[p->lp_desc->matbeg[userind[i]]+j];
+	    lp_data->desc->matval[lp_data->desc->matbeg[i]+j]=
+	       p->lp_desc->matval[p->lp_desc->matbeg[userind[i]]+j];
+	 }
+      }
+      for (i = 0; i < lp_data->desc->m; i++){
+	 lp_data->desc->rhs[i] = p->lp_desc->rhs[i];
+	 lp_data->desc->sense[i] = p->lp_desc->sense[i];
+	 lp_data->desc->rngval[i] = p->lp_desc->rngval[i];
+      }
+      
+      maxm = p->lp_desc->m;
+      maxn = p->lp_desc->n;
+      maxnz = p->lp_desc->nz;
+
+      break;
+
     case ERROR:
       /* Error. The search tree node will not be processed. */
+      FREE(userind);
       return(FALSE);
-
+      
     case USER_AND_PP:
       /* User function terminated without problems. User did everything
 	 that is done at case USER_NO_PP. (which is adding the constraints
@@ -221,8 +280,12 @@ int create_lp_u(lp_prob *p)
 
     default:
       /* Unexpected return value. Do something!! */
+      FREE(userind);
       return(FALSE);
    }
+
+   
+   FREE(userind); /* No longer needed */
 
    /*------------------------------------------------------------------------*\
     * Let's see about reallocing...

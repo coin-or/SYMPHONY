@@ -21,7 +21,6 @@
 #include "BB_macros.h"
 
 
-
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -989,6 +988,15 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 
 /*===========================================================================*/
 
+int read_mps(LPdesc *desc, char *infile, char **probname)
+{
+   printf("\nMps-format file can be read only through OSI interface.\n");
+
+   return(1);
+}
+
+/*===========================================================================*/
+
 void write_mps(LPdata *lp_data, char *fname)
 {
    osllib_status = ekk_exportModel(lp_data->lp, fname, 1, 2);
@@ -1704,6 +1712,15 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
       }
    }
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
+}
+
+/*===========================================================================*/
+
+int read_mps(LPdesc *desc, char *infile, char **probname)
+{
+   printf("\nMps-format file can be read only through OSI interface.\n");
+
+   return(1);
 }
 
 /*===========================================================================*/
@@ -2452,6 +2469,96 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 
 /*===========================================================================*/
 
+int read_mps(LPdesc *desc, char *infile, char *probname)
+{
+   int j, k;
+   char fname[80];
+   char ext[10];
+   bool no_dot = TRUE;
+   CoinMpsIO mps;
+   int errors;
+   
+   for (j = 0, k = 0; infile[j] != '\0'; j++){
+      if (infile[j] != '.'){
+	 if (no_dot){
+	    fname[j] = infile[j];
+	 }
+	 if (!no_dot){
+	    ext[k] = infile[j];
+	    k++;    
+	 }   
+      }else{
+	 no_dot = FALSE;
+      }
+   }
+   
+   mps.setInfinity(mps.getInfinity());
+   
+   if (!(errors = mps.readMps(fname,ext))){
+      return(errors);
+   }
+   
+   memcpy(probname, const_cast<char *>(mps.getProblemName()), 80 * CSIZE);
+   
+   desc->m  = mps.getNumRows();
+   desc->n  = mps.getNumCols();
+   desc->nz = mps.getNumElements();
+   
+   desc->obj    = (double *) malloc(DSIZE * desc->n);
+   desc->rhs    = (double *) malloc(DSIZE * desc->m);
+   desc->sense  = (char *)   malloc(CSIZE * desc->m);
+   desc->rngval = (double *) malloc(DSIZE * desc->m);
+   desc->ub     = (double *) malloc(DSIZE * desc->n);
+   desc->lb     = (double *) malloc(DSIZE * desc->n);
+   desc->ints   = (int *)    malloc(ISIZE * desc->n);
+   
+   memcpy(desc->obj,const_cast <double *> (mps.getObjCoefficients()),
+	  DSIZE * desc->n); 
+   memcpy(desc->rhs,const_cast <double *> (mps.getRightHandSide()),
+	  DSIZE * desc->m); 
+   memcpy(desc->sense,const_cast <char *> (mps.getRowSense()),
+	  CSIZE * desc->m); 
+   memcpy(desc->rngval,const_cast <double *> (mps.getRowRange()),
+	  DSIZE * desc->m); 
+   memcpy(desc->ub,const_cast <double *> (mps.getColUpper()),
+	  DSIZE * desc->n); 
+   memcpy(desc->lb,const_cast <double *> (mps.getColLower()),
+	  DSIZE * desc->n); 
+   
+   //user defined matind, matval, matbeg--fill as column ordered
+   
+   const CoinPackedMatrix * matrixByCol= mps.getMatrixByCol();
+   
+   desc->matbeg = (int *) malloc(ISIZE * desc->n+1);
+   memcpy(desc->matbeg,const_cast<int *>(matrixByCol->getVectorStarts()),
+	  ISIZE * (desc->n + 1));
+   
+   desc->matval = (double *) malloc(DSIZE*desc->matbeg[desc->n]);
+   desc->matind = (int *)    malloc(ISIZE*desc->matbeg[desc->n]);
+   
+   memcpy(desc->matval, const_cast<double *> (matrixByCol->getElements()),
+	  DSIZE * desc->matbeg[desc->n]);  
+   memcpy(desc->matind, const_cast<int *> (matrixByCol->getIndices()), 
+	  ISIZE * desc->matbeg[desc->n]);  
+   
+   for (j = 0, desc->numints = 0; j < desc->n; j++){
+      if (mps.isInteger(j)){
+	 desc->ints[desc->numints] = j;
+      }
+   }
+
+   desc->colname = (char **) malloc(sizeof(char *) * desc->n);   
+   
+   for (j = 0; j < desc->n; j++){
+      desc->colname[j] = (char *) malloc(CSIZE * 8);
+      memcpy(desc->colname[j],const_cast<char*>(mps.columnName(j)), CSIZE * 8);
+   }
+   
+   return(errors);
+}
+
+/*===========================================================================*/
+
 void write_mps(LPdata *lp_data, char *fname)
 {
    char * extension = "MPS";
@@ -2467,5 +2574,51 @@ void write_sav(LPdata *lp_data, char *fname)
    fprintf(stderr, "Function not implemented yet.");
    exit(-1);
 }
+
+/*===========================================================================*/
+
+#if 0
+
+int generate_cuts_in_lp(LPdata * lp_data){
+   
+   OsiCuts cutlist;
+   
+   //create CGL gomory cuts
+   CglGomory * gomory = new CglGomory;
+   gomory->generateCuts(*(lp_data->si), cutlist);
+   
+   //create CGL knapsack cuts
+   CglKnapsackCover * knapsack = new CglKnapsackCover;
+   knapsack->generateCuts(*(lp_data->si), cutlist);
+   
+   //create CGL simple rounding cuts
+   CglSimpleRounding * rounding = new CglSimpleRounding;
+   rounding->generateCuts(*(lp_data->si), cutlist);
+   
+   //create CGL odd hole cuts
+   CglOddHole * oddhole = new CglOddHole;
+   oddhole->generateCuts(*(lp_data->si), cutlist);
+   
+   //create CGL probing cuts
+   CglProbing * probe = new CglProbing;
+   probe->generateCuts(*(lp_data->si), cutlist);
+
+   //create CGL liftandproject cuts      
+   CglLiftAndProject * liftandproject = new CglLiftAndProject;
+   liftandproject->generateCuts(*(lp_data->si), cutlist);
+
+
+   lp_data->si->applyCuts(cutlist);
+   
+   delete gomory;
+   delete knapsack;
+   delete rounding;
+   delete oddhole;
+   delete probe;
+   delete liftandproject;
+
+   return (0);
+}
+#endif
 
 #endif /* __OSI_xxx__ */

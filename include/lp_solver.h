@@ -51,6 +51,7 @@ void OSL_check_error PROTO((const char *erring_func));
 #include "OsiSolverInterface.hpp"
 #include "CoinHelperFunctions.hpp"
 #include "CoinPackedVector.hpp"
+#include "CoinMpsIO.hpp"
 
 #ifdef __OSI_CPLEX__
 #include "OsiCpxSolverInterface.hpp"
@@ -130,6 +131,8 @@ typedef struct LPdesc{
    int        n;           /* number of columns */
    int        m;           /* number of rows */
    int        nz;          /* number of nonzeros */
+   int        numints;     /* number of integer components*/
+   int       *ints;        /* indices of integer components*/
    int       *matbeg;      /* n + m + 1 */
    int       *matind;      /* nz + m */
    double    *matval;      /* nz + m */
@@ -139,6 +142,7 @@ typedef struct LPdesc{
    char      *sense;       /* m */
    double    *lb;          /* n + m */
    double    *ub;          /* n + m */
+   char     **colname;     /* column names */
 }LPdesc;
 
 /* The LP solver data */
@@ -248,6 +252,7 @@ int delete_cols PROTO((LPdata *lp_data, int delnum, int *delstat));
 void release_var PROTO((LPdata *lp_data, int j, int where_to_move));
 void free_row_set PROTO((LPdata *lp_data, int length, int *index));
 void constrain_row_set PROTO((LPdata *lp_data, int length, int *index));
+int read_mps PROTO((LPdesc *desc, char *infile, char *probname));
 void write_mps PROTO((LPdata *lp_data, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
 

@@ -83,6 +83,7 @@ typedef struct PARAMS{
    int        pvm_trace;
    int        do_branch_and_cut;
    int        do_draw_graph;
+   char       infile[MAX_FILE_NAME_LENGTH +1]; /* For MPS file name */
 }params;
 
 /*===========================================================================*\
@@ -106,6 +107,9 @@ typedef struct PROBLEM{
    char       has_ub_estimate;
    double     ub_estimate;
    double     lb;
+
+   LPdesc    *desc;     /* For holding the description when read in from MPS */
+   char       probname[80];
 
    tm_stat    stat;
 }problem;

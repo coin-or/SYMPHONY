@@ -19,6 +19,7 @@
 
 #include "tm_params.h"
 #include "BB_types.h"
+#include "lp_solver.h"
 
 /*===========================================================================*\
  * The bc_node data structure stores the information needed to     

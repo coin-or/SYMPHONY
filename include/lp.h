@@ -118,7 +118,8 @@ typedef struct LP_PROB{
    int           node_iter_num;
    int           vars_recently_fixed_to_ub;
    LPdata       *lp_data;
-
+   LPdesc       *lp_desc; /* Holds the LP description when read in from MPS */
+   
    double        last_gap;
    double       *obj_history;
 

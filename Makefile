@@ -46,6 +46,11 @@ ARCH = LINUX
 
 #ARCH=$(PVM_ARCH)
 
+##############################################################################
+# If you are getting errors using make, try changing MAKE to "gmake" and also 
+# using gmake on the command line.  
+##############################################################################
+
 MAKE = make
 
 AWK = awk
@@ -155,9 +160,9 @@ ifeq ($(OSI_INTERFACE),XPRESS)
        LPLIB += -lOsiXpr
 endif
 ifeq ($(OSI_INTERFACE),SOPLEX)
-       LPINCDIR += 
-       LPLDFLAGS +=
-       LPLIB += -lOsiSpx
+       LPINCDIR += ${HOME}/include
+       LPLDFLAGS += ${HOME}/lib
+       LPLIB += -lOsiSpx -lsoplex.linux.x86.gnu.opt
 endif
 ifeq ($(OSI_INTERFACE),VOL)
        LPINCDIR += 
@@ -165,12 +170,14 @@ ifeq ($(OSI_INTERFACE),VOL)
        LPLIB += -lOsiVol
 endif
 ifeq ($(OSI_INTERFACE),DYLP)
-       LPINCDIR += 
-       LPLDFLAGS +=
-       LPLIB += -lOsiDylp
+       LPINCDIR += ${HOME}/include
+       LPLDFLAGS += ${HOME}/lib
+       LPLIB += -lOsiDylp -lOsiDylpSolver -ldylpstd
 endif
 ifeq ($(OSI_INTERFACE),GLPK)
-       LPLIB += -lOsiGlpk
+       LPINCDIR += ${HOME}/include
+       LPLDFLAGS += ${HOME}/lib
+       LPLIB += -lOsiGlpk -lglpk
 endif
 endif
 

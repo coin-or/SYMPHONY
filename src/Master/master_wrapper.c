@@ -15,6 +15,7 @@
 #include <malloc.h>
 #include <stdlib.h>          /* malloc() is defined here in AIX ... */
 #include <stdio.h>
+#include <string.h>
 
 #include "qsortucb.h"
 #include "messages.h"
@@ -22,6 +23,7 @@
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "master.h"
+#include "lp_solver.h"
 
 /*===========================================================================*/
 
@@ -39,21 +41,84 @@ void initialize_u(problem *p)
 void free_master_u(problem *p)
 {
    CALL_USER_FUNCTION( user_free_master(&p->user) );
+
+   if (p->desc){
+      free_lp_desc(p->desc);
+   }
 }
 
 /*===========================================================================*/
 
 void readparams_u(problem *p, int argc, char **argv)
 {
+   int i;
+   char tmp, c, found;
+   
    bc_readparams(p, argc, argv);
-   CALL_USER_FUNCTION(user_readparams(p->user, p->par.param_file, argc, argv));
+
+   switch(user_readparams(p->user, p->par.param_file, argc, argv)){
+
+    case DEFAULT:
+      
+      found = FALSE;
+      for (i = 1; i < argc; i++){
+	 sscanf(argv[i], "%c %c", &tmp, &c);
+	 if (tmp != '-')
+	    continue;
+	 switch (c) {
+	  case 'F':
+	    strncpy(p->par.infile, argv[++i],MAX_FILE_NAME_LENGTH);
+	    found = TRUE;
+	    break;	     
+	  default:
+	    break;
+	 }	 
+	 if (found){
+	    break;
+	 }
+      }
+      break;
+      
+    case ERROR:
+      
+      printf("\n\n*********User error detected -- aborting***********\n\n");
+      exit(1000);
+      break;
+      
+    default:
+      break;	 	       
+   }
 }
 
 /*===========================================================================*/
 
 void io_u(problem *p)
 {
-   CALL_USER_FUNCTION( user_io(p->user) );
+   int err;
+
+   switch( user_io(p->user) ){
+
+    case DEFAULT: 
+
+      p->desc = (LPdesc *) malloc(sizeof(LPdesc));
+      err = read_mps(p->desc, p->par.infile, p->probname);
+      if(err != 0){
+	 printf("\nErrors in reading mps file\n");
+	 exit(1000);
+      }
+
+      break;
+
+    case ERROR:
+
+      printf("\n\n*********User error detected -- aborting***********\n\n");
+      exit(1000);
+      break;
+
+    default:
+
+      break;
+   }
 }
 
 /*===========================================================================*/
@@ -123,21 +188,50 @@ void start_heurs_u(problem *p)
 
 void initialize_root_node_u(problem *p, base_desc *base, node_desc *root)
 {
-   /* set some defaults for root first */
+   int i;
 
    switch (user_initialize_root_node(p->user, &base->varnum, &base->userind,
 				     &base->cutnum, &root->uind.size,
 				     &root->uind.list,
 				     p->par.tm_par.colgen_strat)){
     case ERROR:
+      
       printf("\n\n*********User error detected -- aborting***********\n\n");
       exit(1000);
+
     case USER_NO_PP:
+      
       if (base->varnum)
 	 qsortucb_i(base->userind, base->varnum);
       if (root->uind.size && !p->par.warm_start)
 	 qsortucb_i(root->uind.list, root->uind.size);
+      break;
+      
     case USER_AND_PP:
+      
+      break;
+
+    case DEFAULT: 
+
+      root->uind.size = p->desc->n;
+      root->uind.list = (int *)malloc(root->uind.size * ISIZE);
+      for (i = 0; i < root->uind.size; i++){
+	 root->uind.list[i] = i;
+      }
+
+      base->cutnum = p->desc->m;
+      base->varnum = 0;
+      base->userind = NULL;
+
+      if (base->varnum){
+	 qsortucb_i(base->userind, base->varnum);
+      }
+      if (root->uind.size && !p->par.warm_start){
+	 qsortucb_i(root->uind.list, root->uind.size);
+      }
+
+      break;
+
     default:
       break;
    }
@@ -229,7 +323,8 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
       
       tm->lpp[i]->draw_graph = p->dg_tid;
       tm->lpp[i]->base = *base;
-      
+      tm->lpp[i]->lp_desc = p->desc;
+
       CALL_USER_FUNCTION( user_send_lp_data(p->user, &(tm->lpp[i]->user)) );
    }
    get_lp_ptr(tm->lpp);
@@ -247,6 +342,26 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
       send_int_array(base->userind, base->varnum);
    }
    send_int_array(&base->cutnum, 1);
+   if (p->desc){
+      int has_desc = TRUE;
+      send_char_array(&has_desc, 1);
+      send_int_array(&(desc->m), 1);
+      send_int_array(&(desc->n), 1);
+      send_int_array(&(desc->nz), 1);
+      send_dbl_array(desc->obj, desc->n);
+      send_dbl_array(desc->rhs, desc->m);
+      send_char_array(desc->sense, desc->m);
+      send_dbl_array(desc->rngval, desc->m);
+      send_dbl_array(desc->ub, desc->n);
+      send_dbl_array(desc->lb, desc->n);
+      send_int_array(&desc->numints, 1);
+      if (desc->numints){
+	 send_int_array(desc->ints, desc->numints);
+      }
+   }else{
+      int has_desc = FALSE;
+      send_char_array(&has_desc, 1);
+   }
    CALL_USER_FUNCTION( user_send_lp_data(p->user, NULL) );
    send_msg(sender, LP_DATA);
    freebuf(s_bufid);

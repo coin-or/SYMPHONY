@@ -7,6 +7,8 @@
 #include "vrp_master_functions.h"
 #include "vrp_const.h"
 #include "proccomm.h"
+#include "BB_macros.h"
+
 
 /*===========================================================================*/
 
@@ -18,7 +20,7 @@ void generate_starter(int vertnum, int *starter, int *startpos,
    
    for (i=0; i<num; i++){
       do{
-	 ran = (random() % vertnum)+1;
+	 ran = (RANDOM() % vertnum)+1;
 	 for (pos=*startpos; pos < rans; pos++)
 	    if (starter[pos] == ran) break;
       }while (pos < rans);
@@ -189,7 +191,7 @@ void cluster_heur(vrp_problem *vrp, heur_params *heur_par,
   /*------------------------------------------------------------------------*\
   |           Generate the random starting points and broadcast              |
   \*------------------------------------------------------------------------*/
-  srandom(vrp->par.rand_seed[0]);
+  SRANDOM(vrp->par.rand_seed[0]);
   starter = ch->starter = 
      (int *) calloc (tsp_fi_jobs+tsp_ni_jobs+tsp_fini_jobs,sizeof(int));
   rand_nums = 0;

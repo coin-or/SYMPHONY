@@ -108,6 +108,7 @@ typedef struct VAR_DESC{
    int            colind;
    double         lb;
    double         ub;
+   char           is_int; /* whether or not the variable is integer */
 }var_desc;
 
 typedef struct BRANCH_DESC{
