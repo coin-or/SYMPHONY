@@ -133,15 +133,15 @@ typedef struct LPdesc{
    int        nz;          /* number of nonzeros */
    int        numints;     /* number of integer components*/
    int       *ints;        /* indices of integer components*/
-   int       *matbeg;      /* n + m + 1 */
-   int       *matind;      /* nz + m */
-   double    *matval;      /* nz + m */
-   double    *obj;         /* n + m */
+   int       *matbeg;      /* n */
+   int       *matind;      /* nz */
+   double    *matval;      /* nz */
+   double    *obj;         /* n */
    double    *rhs;         /* m */
    double    *rngval;      /* m */
    char      *sense;       /* m */
-   double    *lb;          /* n + m */
-   double    *ub;          /* n + m */
+   double    *lb;          /* n */
+   double    *ub;          /* n */
    char     **colname;     /* column names */
 }LPdesc;
 

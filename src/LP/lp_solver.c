@@ -2549,8 +2549,9 @@ int read_mps(LPdesc *desc, char *infile, char *probname)
    desc->colname = (char **) malloc(sizeof(char *) * desc->n);   
    
    for (j = 0; j < desc->n; j++){
-      desc->colname[j] = (char *) malloc(CSIZE * 8);
+      desc->colname[j] = (char *) malloc(CSIZE * 9);
       memcpy(desc->colname[j], const_cast<char*>(mps.columnName(j)), CSIZE * 8);
+      desc->colname[j][8] = 0;
    }
    
    return(errors);

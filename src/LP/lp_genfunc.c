@@ -327,10 +327,6 @@ void fathom_branch(lp_prob *p)
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
       if (is_feasible_u(p) == FEASIBLE){
-	 if (p->par.verbosity > 2){
-	    printf ("Now displaying the feasible solution ...\n");
-	    display_lp_solution_u(p, DISP_FEAS_SOLUTION);
-	 }
 	 cuts = -1;
       }else{
 	 /*------------------------------------------------------------------*\

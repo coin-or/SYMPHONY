@@ -53,6 +53,8 @@ int receive_lp_data_u(lp_prob *p)
 {
    int r_bufid;
    char has_desc;
+   char has_colnames;
+   int i;
 
    r_bufid = receive_msg(p->master, LP_DATA);
    receive_char_array((char *)(&p->par), sizeof(lp_params));
@@ -75,6 +77,9 @@ int receive_lp_data_u(lp_prob *p)
       receive_int_array(&(desc->m), 1);
       receive_int_array(&(desc->n), 1);
       receive_int_array(&(desc->nz), 1);
+      receive_int_array(desc->matbeg, desc->n);
+      receive_int_array(desc->matind, desc->nz);
+      receive_dbl_array(desc->matval, desc->nz);
       receive_dbl_array(desc->obj, desc->n);
       receive_dbl_array(desc->rhs, desc->m);
       receive_char_array(desc->sense, desc->m);
@@ -84,6 +89,15 @@ int receive_lp_data_u(lp_prob *p)
       receive_int_array(&desc->numints, 1);
       if (desc->numints){
 	 receive_int_array(desc->ints, desc->numints);
+      }
+      receive_char_array(&has_colnames, 1);
+      if (has_colnames){
+	 desc->colname = (char **) malloc(sizeof(char *) * desc->n);   
+	 for (i = 0; i < desc->n; i++){
+	    desc->colname[i] = (char *) malloc(CSIZE * 9);
+	    receive_char_array(desc->colname[i], 8);
+	    desc->colname[i][8] = 0;
+	 }
       }
    }
    
@@ -535,7 +549,7 @@ int is_feasible_u(lp_prob *p)
       feasible = i < 0 ? FEASIBLE : NOT_FEASIBLE;
       break;
     case TEST_INTEGRALITY:
-      for (i=cnt-1; i>=0; i--){
+      for (i = cnt - 1; i >= 0; i--){
 	 valuesi = values[i];
 	 if (valuesi-floor(valuesi) > lpetol && ceil(valuesi)-valuesi > lpetol)
 	    break;
@@ -601,6 +615,7 @@ int is_feasible_u(lp_prob *p)
       send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
 			       lpetol, new_ub, cnt, indices, values);
 #endif
+      display_lp_solution_u(p, DISP_FEAS_SOLUTION);
       lp_data->termcode = OPT_FEASIBLE;
    }
 
@@ -696,14 +711,24 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
     case DISP_NOTHING:
       break;
     case DISP_NZ_INT:
-      printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-      printf(" User indices and values of nonzeros in the solution\n");
-      printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-      for (i = 0; i < number; ){
-	 printf("%7d %10.7f ", xind[i], xval[i]);
-	 if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
+      if (p->lp_desc->colname){ 
+	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf(" Column names and values of nonzeros in the solution\n");
+	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 for (i = 0; i < number; i++){
+	    printf("%8s %10.7f\n", p->lp_desc->colname[xind[i]], xval[i]);
+	 }
+	 printf("\n");
+      }else{
+	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf(" User indices and values of nonzeros in the solution\n");
+	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 for (i = 0; i < number; ){
+	    printf("%7d %10.7f ", xind[i], xval[i]);
+	    if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
+	 }
+	 printf("\n");
       }
-      printf("\n");
       break;
     case DISP_NZ_HEXA:
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
@@ -716,14 +741,27 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf("\n");
       break;
     case DISP_FRAC_INT:
-      printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-      printf(" User indices and values of fractional vars in the solution\n");
-      printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-      for (i = 0; i < number; ){
-	 tmpd = xval[i];
-	 if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
-	    printf("%7d %10.7f ", xind[i], tmpd);
-	    if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
+      if (p->lp_desc->colname){ 
+	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf(" Column names and values of fractional vars in the solution\n");
+	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 for (i = 0; i < number; i++){
+	    tmpd = xval[i];
+	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
+	       printf("%8s %10.7f\n", p->lp_desc->colname[xind[i]], tmpd);
+	    }
+	 }
+	 printf("\n");
+      }else{
+	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf(" User indices and values of fractional vars in the solution\n");
+	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 for (i = 0; i < number; ){
+	    tmpd = xval[i];
+	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
+	       printf("%7d %10.7f ", xind[i], tmpd);
+	       if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
+	    }
 	 }
       }
       printf("\n");

@@ -345,11 +345,15 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
    }
    send_int_array(&base->cutnum, 1);
    if (p->desc){
-      int has_desc = TRUE;
+      char has_desc = TRUE;
+      char has_colnames = FALSE;
       send_char_array(&has_desc, 1);
       send_int_array(&(desc->m), 1);
       send_int_array(&(desc->n), 1);
       send_int_array(&(desc->nz), 1);
+      send_int_array(desc->matbeg, desc->n);
+      send_int_array(desc->matind, desc->nz);
+      send_dbl_array(desc->matval, desc->nz);
       send_dbl_array(desc->obj, desc->n);
       send_dbl_array(desc->rhs, desc->m);
       send_char_array(desc->sense, desc->m);
@@ -360,6 +364,15 @@ void send_lp_data_u(problem *p, int sender, base_desc *base)
       if (desc->numints){
 	 send_int_array(desc->ints, desc->numints);
       }
+      if (desc->colname){
+	 has_colnames = TRUE;
+	 send_char_array(&has_colnames, 1);
+	 for (i = 0; i < desc->n; i++){
+	    send_char_array(desc->colname[i], 8);
+	 }
+      }else{
+	 send_char_array(&has_colnames, 1);
+      }	 
    }else{
       int has_desc = FALSE;
       send_char_array(&has_desc, 1);
@@ -482,11 +495,23 @@ void display_solution_u(problem *p, int thread_num)
     case USER_AND_PP:
     case DEFAULT:
       if (sol.xlength){
-	 printf("\nUser indices and values of nonzeros in the solution:\n");
-	 printf("\nINDEX     VALUE\n");
-	 printf("=====     =====\n");
-	 for (i = 0; i < sol.xlength; i++)
-	    printf("%5d %10.3f\n", sol.xind[i], sol.xval[i]);
+	 if (p->desc->colname){ 
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf(" Column names and values of nonzeros in the solution\n");
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    for (i = 0; i < sol.xlength; i++){
+	       printf("%8s %10.3f\n", p->desc->colname[sol.xind[i]], sol.xval[i]);
+	    }
+	    printf("\n");
+	 }else{
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf(" User indices and values of nonzeros in the solution\n");
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    for (i = 0; i < sol.xlength; i++){
+	       printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+	    }
+	    printf("\n");
+	 }
 	 return;
       }
    }
