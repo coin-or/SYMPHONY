@@ -584,6 +584,8 @@ int is_feasible_u(lp_prob *p, char branching)
 
    cnt = collect_nonzeros(p, lp_data->x, indices, values);
 
+   heur_solution = (double *) malloc(lp_data->n*DSIZE);
+   
 #ifdef USE_SYM_APPLICATION
    user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
 			       &feasible, &true_objval, branching,
