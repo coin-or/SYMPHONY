@@ -148,13 +148,13 @@ latest created callable library with the same name (libsym.so or libsym.a)
 will be created in \texttt{SYMPHONY-5.0/lib} subdirectory. This library 
 together with the header files in the subdirectory 
 \texttt{SYMPHONY-5.0/include} can then be used to call \BB\ from any C code. 
-The \texttt{API} for this is described in section \ref{API}.
-After compiling the \BB\ library, the default \texttt{main} function will 
-be compiled and linked with the the callable library to form an executable
-called \texttt{symphony} to be used for solving generic MILP problems 
-in \texttt{MPS} or \texttt{GMPL} format. \texttt{FlopC++} can also be used to 
-obtain a capability similar to \texttt{ILOG}'s Concert technology for building 
-math programming models. The executable is installed in 
+The \texttt{API} for this is described in section \ref{API}. After compiling
+the \BB\ library, the default \texttt{main} function will be compiled and
+linked with the the callable library to form an executable called
+\texttt{symphony} to be used for solving generic MILP problems in \texttt{MPS}
+or \texttt{GMPL} format. \texttt{FlopC++} \cite{flopc++} can also be used to
+obtain a capability similar to \texttt{ILOG}'s Concert technology for building
+math programming models. The executable is installed in
 \texttt{SYMPHONY-5.0/bin.\$(ARCH)/\$(LP\_SOLVER)} subdirectory. The makefile 
 can also be modified to enable parallel execution of the code (see below).
 

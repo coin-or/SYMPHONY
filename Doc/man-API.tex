@@ -122,8 +122,7 @@ The user can also modify problem data in between calls to the solver. Code for
 doing so is shown in Figure \ref{warm_start}. In this example, the
 solver is allowed to process 100 nodes and then save the warm start
 information. Afterward, the original problem is solved to optimality, then is
-modified and re-solved from the saved checkpoint. Results from a sample run of
-this code are discussed in Section \ref{examples}.
+modified and re-solved from the saved checkpoint. 
 \begin{figure}[tb]
 %\centering
 \begin{Verbatim}[frame=lines]
@@ -162,8 +161,7 @@ the $i^\textrm{th}$ unit vector, we can derive the desired sensitivity
 function by using the bicriteria solution algorithm to enumerate all supported
 solutions and breakpoints. This information can easily be used to obtain the
 desired function. Figure \ref{multi_criteria} shows the code for performing
-this analysis on variable 0. For an example of the application of this code,
-see Section \ref{examples}.
+this analysis on variable 0. 
 \begin{figure}[tb]
 %\centering
 \begin{Verbatim}[frame=lines]
@@ -243,8 +241,7 @@ solvers.  In SYMPHONY 5.0, we have implemented for MILPs some of the same
 functionality that has long been available for LP solvers. As such, our OSI
 interface supports warm starting and sensitivity analysis. The implementations
 of this functionality is straightforward at the moment, but will be improved
-in the future, as discussed in Sections \ref{internal} and
-\ref{other}.
+in future versions.
 
 \subsection{User Callback Functions}\label{callback}
 

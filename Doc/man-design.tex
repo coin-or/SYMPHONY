@@ -103,7 +103,7 @@ cut} and {\em row} are typically used interchangeably. Similarly, {\em
 variable} and {\em column} are often used with similar meanings. In
 many situations, this is appropriate and does not cause confusion.
 However, in object-oriented BCP frameworks, such as \BB\ or ABACUS
-\cite{abacus,abacus1}, a {\em cut} and a {\em row} are {\em fundamentally
+\cite{abacus1}, a {\em cut} and a {\em row} are {\em fundamentally
 different objects}. A {\em cut} (also referred to as a {\em
 constraint}) is a user-defined representation of an abstract object
 which can only be realized as a row in an LP matrix {\em with respect
@@ -344,7 +344,7 @@ performed by the cut generator module:
 \subsubsection{The Cut Pool Module}
 
 The concept of a {\em cut pool} was first suggested by Padberg and
-Rinaldi \cite{P&R}, and is based on the observation that in BCP, the
+Rinaldi \cite{padb:branc}, and is based on the observation that in BCP, the
 inequalities which are generated while processing a particular node in
 the search tree are also generally valid and potentially useful at
 other nodes. Since generating these cuts is usually a relatively
@@ -373,7 +373,7 @@ central list of candidate subproblems to be processed, which is
 maintained by the tree manager. Most sequential implementations use
 such a single-pool scheme. However, other schemes may be used in
 parallel implementations. For a description of various types of
-parallel branch and bound, see \cite{G&C}.
+parallel branch and bound, see \cite{gend:paral}.
 
 The user begins by initializing the SYMPHONY environment and can then invoke
 subroutines for reading in parameters and problem data, finding an initial
@@ -384,9 +384,9 @@ up the cut pool module(s), the linear programming module(s), and the cut
 generator module(s). Currently, there are three solve calls supported by the
 API. The first call is the \emph{initial solve} (see Section
 \ref{initial_solve}), which solves the problem from scratch without using warm
-start information. The second type of solve call is a \emph{resolve}, which
+start information. The second type of solve call is a \emph{warm solve}, which
 solves the problem using previously computed warm start information (see
-Section \ref{resolve}). Finally, there is a \emph{multicriteria solve} call
+Section \ref{warm_solve}). Finally, there is a \emph{multicriteria solve} call
 which is used to enumerate efficient solutions to a given multicriteria MILP
 (see Section \ref{mc_solve}).
 
@@ -405,7 +405,7 @@ central list of candidate subproblems to be processed, which is
 maintained by the tree manager. Most sequential implementations use
 such a single-pool scheme. However, other schemes may be used in
 parallel implementations. For a description of various types of
-parallel branch and bound, see \cite{G&C}.
+parallel branch and bound, see \cite{gend:paral}.
 
 The preference ordering for processing nodes is a run-time parameter.
 Typically, the node with the smallest lower bound is chosen to be
@@ -945,7 +945,7 @@ were generated in the same subtree as the current search node. As
 described above, this helps focus the search and should increase the
 efficiency and effectiveness of the search. This idea also
 allows us to generate locally valid cuts, such as the classical
-Gomory cuts (see \cite{N&W}).
+Gomory cuts (see \cite{nemwol88}).
 
 \section{Parallelizing BCP}
 \label{parallelizing}
@@ -956,7 +956,8 @@ algorithms lend themselves well to parallelization. As a result, there
 is already a significant body of research on performing branch and
 bound in parallel environments. We again point the reader to the
 survey of parallel branch and bound algorithms by Gendron and Crainic
-\cite{G&C}, as well as other references such as \cite{PICO, G&K, R&K, K&R}.
+\cite{gend:paral}, as well as other references such as
+\cite{PICO,GraKum99,kuma:para4,kuma:para3}.
 
 In parallel BCP, as in general branch and bound, there are two major
 sources of parallelism. First, it is clear that any number of
@@ -982,7 +983,7 @@ reason we chose this approach is because it allows memory-efficient
 data structures for sequential computation and yet is conceptually
 easy to parallelize. Unfortunately, this approach does have limited
 scalability. For further discussions on the scalability of BCP algorithms and
-approaches to improving it, see \cite{symphony1} and \cite{ALPS}.
+approaches to improving it, see \cite{symphony1} and \cite{ALPS2}.
 
 %\subsection{Details of the Parallel Implementation}
 
@@ -1011,11 +1012,11 @@ creating a single, more efficient executable.
 
 \subsection{Inter-process Communication}
 
-SYMPHONY can utilize any third-party communication protocol supporting
-basic message-passing functions. All communication subroutines
-interface with SYMPHONY through a separate communications API.
-Currently, PVM \cite{pvm} is the only message-passing protocol supported, but
-interfacing with another protocol is a straightforward exercise.
+SYMPHONY can utilize any third-party communication protocol supporting basic
+message-passing functions. All communication subroutines interface with
+SYMPHONY through a separate communications API. Currently, PVM \cite{PVMbook}
+is the only message-passing protocol supported, but interfacing with another
+protocol is a straightforward exercise.
 
 Additionally, it is possible to configure the code to run in parallel
 using threading to process multiple search tree nodes simultaneously.

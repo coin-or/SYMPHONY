@@ -9,8 +9,7 @@ conceptually easy to model as integer programs, have long remained
 challenging to solve in practice. The last two decades have seen
 tremendous progress in our ability to solve large-scale discrete
 optimization problems. These advances have culminated in the approach
-that we now call {\it branch and cut}, a technique (see \cite{GJ&R,
-P&R, H&P}) which brings the computational tools of branch and bound
+that we now call {\it branch and cut}, a technique (see \cite{Grotschel84cut,padb:branc,hoff:LP}) which brings the computational tools of branch and bound
 algorithms together with the theoretical tools of polyhedral
 combinatorics. Indeed, in 1998, Applegate, Bixby, Chv\'atal, and Cook
 used this technique to solve a {\em Traveling Salesman Problem}
@@ -88,7 +87,7 @@ Other related software includes several frameworks for implementing
 parallel branch and bound. Frameworks for general parallel branch and
 bound include PUBB \cite{PUBB}, BoB \cite{BoB}, PPBB-Lib
 \cite{PPBB-Lib}, and PICO \cite{PICO}. PARINO \cite{PARINO} and FATCOP
-\cite{FATCOP} are parallel MILP solvers.
+\cite{chen:fatcop2} are parallel MILP solvers.
 
 \section{Introduction to Branch, Cut, and Price}
 \label{B&C-intro}
@@ -135,11 +134,11 @@ optimal one.
 
 In many applications, the bounding operation is accomplished using the
 tools of linear programming (LP), a technique first described in full
-generality by Hoffman and Padberg \cite{H&P}. This general class of
+generality by Hoffman and Padberg \cite{hoff:LP}. This general class of
 algorithms is known as {\em LP-based branch and bound}. Typically, the
 integrality constraints of an integer programming formulation of the
 problem are relaxed to obtain a {\em LP relaxation}, which is then
-solved to obtain a lower bound for the problem. In \cite{P&R},
+solved to obtain a lower bound for the problem. In \cite{padb:branc},
 Padberg and Rinaldi improved on this basic idea by describing a method
 of using globally valid inequalities (i.e., inequalities valid for the
 convex hull of integer solutions) to strengthen the LP relaxation.
@@ -193,7 +192,7 @@ sometimes specified as the the set of all incidence vectors obeying a
 (relatively) small set of inequalities. These inequalities are
 typically the ones used in the initial LP relaxation. Now let ${\cal
 P}$ be the convex hull of incidence vectors of members of ${\cal
-F}$. Then we know by Weyl's Theorem (see \cite{N&W}) that there exists
+F}$. Then we know by Weyl's Theorem (see \cite{nemwol88}) that there exists
 a finite set ${\cal L}$ of inequalities valid for ${\cal P}$ such that
 \begin{equation}
 \label{the-polyhedron}
@@ -280,7 +279,7 @@ pricing} in the jargon of linear programming, but can also be viewed
 as that of generating cutting planes for the dual of the current
 LP relaxation. Hence, LP-based branch and bound algorithms in which
 the variables are generated dynamically when needed are known as {\em
-branch and price} algorithms. In \cite{B&PII}, Barnhart,
+branch and price} algorithms. In \cite{barn:branc}, Barnhart,
 et al. provide a thorough review of these methods. 
 
 When both variables and cutting planes are generated dynamically
