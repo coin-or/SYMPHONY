@@ -164,7 +164,7 @@ typedef struct LPdata{
    char       col_set_changed;
    double     objval;
    int        termcode;
-   LPdesc     desc;
+   LPdesc    *desc;
    int        n;           /* number of columns without slacks */
    int        maxn;
    int        m;           /* number of rows */

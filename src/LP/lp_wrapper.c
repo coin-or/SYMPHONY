@@ -196,11 +196,11 @@ int create_lp_u(lp_prob *p)
        /* the number of constraints to be added and their description */
        lp_data->m, desc->cutind.size, desc->cuts, &lp_data->nz,
        /* matrix */
-       &lp_data->desc.matbeg, &lp_data->desc.matind, &lp_data->desc.matval,
+       &lp_data->desc->matbeg, &lp_data->desc->matind, &lp_data->desc->matval,
        /* variable obj coefs */
-       &lp_data->desc.obj,
+       &lp_data->desc->obj,
        /* description of the rows */
-       &lp_data->desc.rhs, &lp_data->desc.sense, &lp_data->desc.rngval,
+       &lp_data->desc->rhs, &lp_data->desc->sense, &lp_data->desc->rngval,
        /* max sizes */
        &maxn, &maxm, &maxnz);
 
@@ -250,9 +250,9 @@ int create_lp_u(lp_prob *p)
    \*----------------------------------------------------------------------- */
 
    rows = lp_data->rows;
-   rhs = lp_data->desc.rhs;
-   rngval = lp_data->desc.rngval;
-   sense = lp_data->desc.sense;
+   rhs = lp_data->desc->rhs;
+   rngval = lp_data->desc->rngval;
+   sense = lp_data->desc->sense;
    for (i = bcutnum - 1; i >= 0; i--){
       row = rows + i;
       cut = row->cut;
@@ -270,18 +270,18 @@ int create_lp_u(lp_prob *p)
     * Fill out lp_data->lb/ub
    \*----------------------------------------------------------------------- */
 
-   lp_data->desc.lb = (double *) malloc((bvarnum + desc->uind.size)*DSIZE);
-   lp_data->desc.ub = (double *) malloc((bvarnum + desc->uind.size)*DSIZE);
+   lp_data->desc->lb = (double *) malloc((bvarnum + desc->uind.size)*DSIZE);
+   lp_data->desc->ub = (double *) malloc((bvarnum + desc->uind.size)*DSIZE);
    
    if (bvarnum){
-      memcpy(lp_data->desc.lb, blb, bvarnum * DSIZE);
-      memcpy(lp_data->desc.ub, bub, bvarnum * DSIZE);
+      memcpy(lp_data->desc->lb, blb, bvarnum * DSIZE);
+      memcpy(lp_data->desc->ub, bub, bvarnum * DSIZE);
    }
    if (desc->uind.size > 0){
       /* LB of extra variables must be 0 */
-      memset(lp_data->desc.lb + bvarnum, 0, desc->uind.size * DSIZE);
+      memset(lp_data->desc->lb + bvarnum, 0, desc->uind.size * DSIZE);
       /* Get the UB of extra variables */
-      bd = lp_data->desc.ub + bvarnum;
+      bd = lp_data->desc->ub + bvarnum;
       get_upper_bounds_u(p, desc->uind.size, desc->uind.list, bd);
       vars = lp_data->vars + bvarnum;
       for (i = desc->uind.size - 1; i >= 0; i--){
@@ -297,7 +297,7 @@ int create_lp_u(lp_prob *p)
    load_lp_prob(lp_data, p->par.scaling, p->par.fastmip);
 
    /* Free the user's description */
-   free_lp_desc(lp_data->desc);   
+   /* free_lp_desc(lp_data->desc); */
 
    if (desc->cutind.size > 0 && user_res == USER_NO_PP){
       unpack_cuts_u(p, CUT_FROM_TM, UNPACK_CUTS_SINGLE,

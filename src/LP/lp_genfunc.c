@@ -99,7 +99,9 @@ void lp_initialize(lp_prob *p, int master_tid)
 
 #endif
 
-   p->lp_data = (LPdata *) calloc(1, sizeof(LPdata));   
+   p->lp_data = (LPdata *) calloc(1, sizeof(LPdata));
+   p->lp_data->desc = (LPdesc *) calloc(1, sizeof(LPdesc));
+   
 #pragma omp critical (lp_solver)
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
    {

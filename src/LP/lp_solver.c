@@ -1701,7 +1701,7 @@ void open_lp_solver(LPdata *lp_data)
 {
    lp_data->si = new OsiXSolverInterface();
    
-   retval = lp_data->si->getDblParam(OsiPrimalTolerance,lp_data->lpetol);
+   // retval = lp_data->si->getDblParam(OsiPrimalTolerance,lp_data->lpetol);
 
    /* Turn off the OSL messages (There are LOTS of them) */
    lp_data->si->setHintParam(OsiDoReducePrint);
@@ -1730,11 +1730,11 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
   //what about the alloc params?MEN
 
   lp_data->si->loadProblem(lp_data->n, lp_data->m,
-			   lp_data->desc.matbeg, lp_data->desc.matind,
-			   lp_data->desc.matval, lp_data->desc.lb,
-			   lp_data->desc.ub, lp_data->desc.obj,
-			   lp_data->desc.sense, lp_data->desc.rhs,
-			   lp_data->desc.rngval);
+			   lp_data->desc->matbeg, lp_data->desc->matind,
+			   lp_data->desc->matval, lp_data->desc->lb,
+			   lp_data->desc->ub, lp_data->desc->obj,
+			   lp_data->desc->sense, lp_data->desc->rhs,
+			   lp_data->desc->rngval);
 }
 
 /*===========================================================================*/

@@ -217,6 +217,8 @@ void free_lp(lp_prob *p)
    FREE(p->lp_data->rows);
    close_lp_solver(p->lp_data);
    free_lp_arrays(p->lp_data);
+   free_lp_desc(p->lp_data->desc);
+   FREE(p->lp_data->desc);
    FREE(p->lp_data);
    FREE(p->base.ub);
    FREE(p->base.lb);
@@ -230,17 +232,17 @@ void free_lp(lp_prob *p)
 
 /*===========================================================================*/
 
-void free_lp_desc(LPdesc desc)
+void free_lp_desc(LPdesc *desc)
 {
-   FREE(desc.matbeg);
-   FREE(desc.matind);
-   FREE(desc.matval);
-   FREE(desc.obj);
-   FREE(desc.rhs);
-   FREE(desc.rngval);
-   FREE(desc.sense);
-   FREE(desc.lb);
-   FREE(desc.ub);
+   FREE(desc->matbeg);
+   FREE(desc->matind);
+   FREE(desc->matval);
+   FREE(desc->obj);
+   FREE(desc->rhs);
+   FREE(desc->rngval);
+   FREE(desc->sense);
+   FREE(desc->lb);
+   FREE(desc->ub);
 }
 
 /*===========================================================================*/

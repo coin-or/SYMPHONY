@@ -256,7 +256,7 @@ void free_candidate_completely PROTO((branch_obj **cand));
 void free_node_dependent PROTO((lp_prob *p));
 void free_node_desc PROTO((node_desc **desc));
 void free_lp PROTO((lp_prob *p));
-void free_lp_desc PROTO((LPdesc desc));
+void free_lp_desc PROTO((LPdesc *desc));
 void free_lp_arrays PROTO((LPdata *lp_data));
 
 /*===========================================================================*/
