@@ -546,8 +546,8 @@ int sym_solve(sym_environment *env)
    send_int_array(&base->cutnum, 1);
 #ifdef TRACE_PATH
    {
-      int feas_sol;
-      int *feas_sol_size;
+      int feas_sol_size;
+      int *feas_sol;
 
 #ifdef USE_SYM_APPLICATION
       if (user_send_feas_sol(env->user, &feas_sol_size, &feas_sol)==USER_NO_PP){
@@ -4906,6 +4906,10 @@ int sym_get_str_param(sym_environment *env, char *key, char **value)
       *value = env->probname;
       return(0);
    }  
+   else if(strcmp(key, "infile_name") == 0){      
+      *value = env->par.infile;
+      return(0);
+   }
    else if (strcmp(key, "tm_executable_name") == 0 ||
 	    strcmp(key, "tm_exe") == 0 ||
 	    strcmp(key, "M_tm_exe") == 0 ||
