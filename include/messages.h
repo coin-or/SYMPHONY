@@ -80,16 +80,8 @@
 #define TM_ROOT_DESCRIPTION              211
 #define TM_FIRST_PHASE_FINISHED          212
 
-/* tm termination codes */
-#define TM_FINISHED                      213
-#define TM_TIME_LIMIT_EXCEEDED           214
-#define TM_NODE_LIMIT_EXCEEDED           215
-#define TM_TARGET_GAP_ACHIEVED           216
-#define TM_ERROR__NO_BRANCHING_CANDIDATE 250
-#define TM_ERROR__ILLEGAL_RETURN_CODE    251
-#define TM_ERROR__NUMERICAL_INSTABILITY  252
-#define TM_ERROR__COMM_ERROR             253
-#define TM_ERROR__USER                   275
+/* there are message codes here, too. reserve 225-300 for these */
+#include "return_values.h"
 
 /*===========================================================================*
  * treemanager-->lp messages

@@ -138,6 +138,7 @@ int sym_set_defaults(problem *p)
    p->ub = 0;
    p->has_ub = FALSE;
    p->lb = 0;
+   p->termcode = TM_NO_PROBLEM;
    p->par.verbosity = 0;
    p->par.random_seed = 17;
    p->par.tm_machine_set = FALSE;
@@ -399,6 +400,8 @@ int sym_load_problem(problem *p)
 
    p->comp_times.readtime = used_time(&t);
 
+   p->termcode = TM_NO_SOLUTION;
+
    return(termcode);
 }
 
@@ -593,6 +596,8 @@ int sym_solve(problem *p){
       
       free_tm(tm);
 
+      p->termcode = termcode;
+      
       return(termcode);
    }
    
@@ -706,7 +711,7 @@ int sym_solve(problem *p){
        case TM_TIME_LIMIT_EXCEEDED:
        case TM_NODE_LIMIT_EXCEEDED:
        case TM_TARGET_GAP_ACHIEVED:
-       case TM_FINISHED:
+       case TM_OPTIMAL_SOLUTION_FOUND:
        case TM_ERROR__NO_BRANCHING_CANDIDATE:
        case TM_ERROR__ILLEGAL_RETURN_CODE:
        case TM_ERROR__NUMERICAL_INSTABILITY:
@@ -726,7 +731,7 @@ int sym_solve(problem *p){
       freebuf(r_bufid);
 
 #ifndef COMPILE_IN_TM
-   }while (msgtag != TM_FINISHED && msgtag != SOMETHING_DIED &&
+   }while (msgtag != TM_OPTIMAL_SOLUTION_FOUND && msgtag != SOMETHING_DIED &&
 	   msgtag != TM_TIME_LIMIT_EXCEEDED &&
 	   msgtag != TM_NODE_LIMIT_EXCEEDED &&
 	   msgtag != TM_TARGET_GAP_ACHIEVED &&
@@ -772,7 +777,7 @@ int sym_solve(problem *p){
     * Display the the results and solution data                               
    \*------------------------------------------------------------------------*/
 
-   if (termcode == TM_FINISHED){
+   if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
       printf("\n****************************************************\n");
       printf(  "* Branch and Cut Finished!!!!!!!                   *\n");
       printf(  "* Now displaying stats and optimal solution...     *\n");
@@ -855,6 +860,8 @@ int sym_solve(problem *p){
 
    free_tm(tm);
 
+   p->termcode = termcode;
+   
    return(termcode);
 }
 

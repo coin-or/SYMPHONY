@@ -301,12 +301,12 @@ int solve(tm_prob *tm)
 
    no_work_start = wall_clock(NULL);
 
-   termcode = TM_FINISHED;
+   termcode = TM_OPTIMAL_SOLUTION_FOUND;
    for (; tm->phase <= 1; tm->phase++){
       if (tm->phase == 1 && !tm->par.warm_start){
 	 if ((termcode = tasks_before_phase_two(tm)) ==
 	     FUNCTION_TERMINATED_NORMALLY){
-	    termcode = TM_FINISHED; /* Continue normally */
+	    termcode = TM_OPTIMAL_SOLUTION_FOUND; /* Continue normally */
 	 }
       }
       then  = wall_clock(NULL);
@@ -453,7 +453,7 @@ int solve(tm_prob *tm)
 }
       if (tm->nextphase_candnum == 0)
 	 break;
-      if (termcode != TM_FINISHED)
+      if (termcode != TM_OPTIMAL_SOLUTION_FOUND)
 	 break;
    }
    tm->stat.root_lb = tm->rootnode->lower_bound;
@@ -461,7 +461,7 @@ int solve(tm_prob *tm)
    tm->comp_times.ramp_down_time = ramp_down_time;
    write_log_files(tm);
 
-   if (termcode == TM_FINISHED)
+   if (termcode == TM_OPTIMAL_SOLUTION_FOUND)
       tm->lb = 0;
    return(termcode);
 }

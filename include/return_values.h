@@ -24,22 +24,28 @@
  *****************************************************************************/
 
 /*----------------------- Global return codes -------------------------------*/
-#define FUNCTION_TERMINATED_NORMALLY    0
-#define ERROR__USER                    -100
-
-/*------------------- Return codes for sym_solve() --------------------------*/
-#define ERROR__NO_BRANCHING_CANDIDATE  -101
-#define ERROR__ILLEGAL_RETURN_CODE     -102
-#define ERROR__NUMERICAL_INSTABILITY   -103
-#define ERROR__ILLEGAL_BRANCHING       -104
-#define ERROR__COMM_ERROR              -105
+#define FUNCTION_TERMINATED_NORMALLY      0
+#define ERROR__USER                      -100
 
 /*-------------- Return codes for sym_parse_comand_line() -------------------*/
-#define ERROR__OPENING_PARAM_FILE      -110
-#define ERROR__PARSING_PARAM_FILE      -111
+#define ERROR__OPENING_PARAM_FILE        -110
+#define ERROR__PARSING_PARAM_FILE        -111
 
 /*----------------- Return codes for sym_load_problem() ---------------------*/
-#define ERROR__READING_GMPL_FILE       -120
-#define ERROR__READING_WARM_START_FILE -121
+#define ERROR__READING_GMPL_FILE         -120
+#define ERROR__READING_WARM_START_FILE   -121
+
+/*-------------------- Return codes for sym_solve() -------------------------*/
+#define TM_NO_PROBLEM                     225
+#define TM_NO_SOLUTION                    226
+#define TM_OPTIMAL_SOLUTION_FOUND         227
+#define TM_TIME_LIMIT_EXCEEDED            228
+#define TM_NODE_LIMIT_EXCEEDED            229
+#define TM_TARGET_GAP_ACHIEVED            230
+#define TM_ERROR__NO_BRANCHING_CANDIDATE -250
+#define TM_ERROR__ILLEGAL_RETURN_CODE    -251
+#define TM_ERROR__NUMERICAL_INSTABILITY  -252
+#define TM_ERROR__COMM_ERROR             -253
+#define TM_ERROR__USER                   -275
 
 #endif

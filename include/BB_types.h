@@ -367,6 +367,8 @@ typedef struct PROBLEM{
    node_desc *root;
 
    tm_stat    stat;
+
+   int termcode;
 }problem;
 
 #endif
