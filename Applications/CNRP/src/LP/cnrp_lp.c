@@ -157,7 +157,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    int edgenum = varnum/2;
 #elif defined(ADD_FLOW_VARS)
    double flow_capacity;
-   int v0;
+   int v0, v1;
 #ifdef DIRECTED_X_VARS
    int edgenum = (mip->n)/4;
 
@@ -171,7 +171,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
       flow_capacity = ((double)vrp->capacity)/2;
 #endif
 #else
-   int edgenum = varnum;
+   int edgenum = mip->n;
 #endif
    
    /* set up the inital LP data */
@@ -223,6 +223,8 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    for (i = 0, j = 0; i < mip->n; i++){
       if (indices[i] < total_edgenum){
 	 mip->obj[i]       = vrp->par.gamma*((double) costs[indices[i]]);
+	 mip->is_int[i]    = TRUE;
+	 mip->ub[i]        = 1.0;
 	 mip->matbeg[i]    = j;
 	 if (prob_type == CSTP || prob_type == CTP){
 	    /*cardinality constraint*/
@@ -265,6 +267,8 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
       }else if (indices[i] < 2*total_edgenum){
 	 mip->obj[i]       = vrp->par.gamma*((double)costs[indices[i] -
 							  total_edgenum]);
+	 mip->is_int[i]    = TRUE;
+	 mip->ub[i]        = 1.0;
 	 mip->matbeg[i]    = j;
 	 if (prob_type == CSTP || prob_type == CTP){
 	    /*cardinality constraint*/
@@ -292,11 +296,14 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 mip->matind[j++]  = (2 + od_const)*vertnum-1 + 2*total_edgenum +
 	    indices[i] - total_edgenum;
 #endif
-#endif
+#elif defined(ADD_FLOW_VARS)
       }else if (indices[i] < (2+d_x_vars)*total_edgenum){
 	 mip->obj[i]       =
 	    vrp->par.tau*((double) costs[indices[i]-
 					(1+d_x_vars)*total_edgenum]);
+	 mip->is_int[i] = FALSE;
+	 v0 = edges[2*(indices[i]-(1+d_x_vars)*total_edgenum)];
+	 mip->ub[i] = flow_capacity - (v0 ? vrp->demand[v0] : 0);
 #ifdef ADD_CAP_CUTS
 	 mip->matbeg[i]    = j;
 	 mip->matval[j]    = 1.0;
@@ -325,6 +332,9 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 mip->obj[i]       =
 	    vrp->par.tau*((double) costs[indices[i]-
 					(2+d_x_vars)*total_edgenum]);
+	 mip->is_int[i] = FALSE;
+	 v1 = edges[2*(indices[i]-(1+d_x_vars)*total_edgenum) + 1];
+	 mip->ub[i] = flow_capacity - vrp->demand[v1];
 #ifdef ADD_CAP_CUTS
 	 mip->matbeg[i]    = j;
 	 mip->matval[j]    = 1.0;
@@ -348,6 +358,7 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	 if (edges[2*(indices[i] - (2+d_x_vars)*total_edgenum)])
 	    mip->matind[j++] = (1+od_const)*vertnum + edges[2*(indices[i] -
 				(2+d_x_vars)*total_edgenum)] - 1;
+#endif
 #endif
       }
    }
