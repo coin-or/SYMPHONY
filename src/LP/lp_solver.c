@@ -1446,8 +1446,8 @@ int dual_simplex(LPdata *lp_data, int *iterd)
     case CPX_STAT_OPTIMAL:                        term = OPTIMAL; break;
     case CPX_STAT_INFEASIBLE:                     term = D_INFEASIBLE; break;
     case CPX_STAT_UNBOUNDED:                      term = D_UNBOUNDED; break;
-    case CPX_ABORT_OBJ_LIM:                       term = D_OBJLIM; break;
-    case CPX_ABORT_IT_LIM:                        term = D_ITLIM; break;
+    case CPX_STAT_ABORT_OBJ_LIM:                  term = D_OBJLIM; break;
+    case CPX_STAT_ABORT_IT_LIM:                   term = D_ITLIM; break;
     default:                                      term = ABANDONED; break;
    }
 #else
