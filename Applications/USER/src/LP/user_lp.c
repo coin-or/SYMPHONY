@@ -68,7 +68,8 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 \*===========================================================================*/
 
 int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
-		     double *values, int *feasible, double *objval)
+		     double *values, int *feasible, double *objval,
+		     char branching)
 {
    return(USER_DEFAULT);
 }
@@ -243,7 +244,7 @@ int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
 			     var_desc **vars, double *x,
 			     int *new_row_num, cut_data ***cuts)
 {
-   return(GENERATE_CGL_CUTS);
+   return(DO_NOT_GENERATE_CGL_CUTS);
 }
 
 /*===========================================================================*/

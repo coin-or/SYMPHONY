@@ -35,7 +35,7 @@ USERROOT = ${SYMPHONYROOT}/Template
 # The customized name of the master program (if desired)
 ##############################################################################
 
-MASTERNAME = mip
+MASTERNAME = mip-vol
 
 ##############################################################################
 # These are only needed if parallel computation is used. Please see the
@@ -64,7 +64,7 @@ ifeq ($(COMPILE_IN_CP),TRUE)
 USER_TM_SRC      += user_cp.c 
 endif
 
-USER_MASTER_SRC   = user_master.c
+USER_MASTER_SRC   = user_main.c user_master.c
 
 ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)
