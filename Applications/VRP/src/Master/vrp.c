@@ -796,8 +796,6 @@ int user_process_own_messages(void *user, int msgtag)
 int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 			  double *values, double objval)
 {
-   /*FIXME: This won't work for printing out from LP in sequential mode */
-
    vrp_problem *vrp = (vrp_problem *)user;
    _node *tour = vrp->cur_tour->tour;
    int window = vrp->dg_id;
@@ -879,67 +877,6 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 		    CTOI_WAIT_FOR_CLICK_AND_REPORT);
    }
 
-   return(USER_NO_PP);
-
-#if 0
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-   vrp_spec *vrp = (vrp_spec *)user;
-   _node *tour = vrp->cur_sol;
-   
-   int prev_node = 0, node, count = 0;
-
-   if (!tour)
-      return(USER_NO_PP);
-   
-   node = tour[0].next;
-
-   if (tour[0].route == 1)
-      printf("\n0 ");
-   while (node != 0){
-      if (tour[prev_node].route != tour[node].route){
-	 printf("\nRoute #%i: ", tour[node].route);
-	 count = 0;
-      }
-      printf("%i ", node);
-      count++;
-      if (count > 15){
-	 printf("\n");
-	 count = 0;
-      }
-      prev_node = node;
-      node = tour[node].next;
-   }
-   printf("\n\n");
-#else
-   vrp_problem *vrp = (vrp_problem *)user;
-   _node *tour = vrp->cur_tour->tour;
-   int window = vrp->dg_id;
-   
-   int prev_node = 0, node, count = 0;
-
-   if (!tour)
-      return(USER_NO_PP);
-   
-   node = tour[0].next;
-
-   if (tour[0].route == 1)
-      printf("\n0 ");
-   while (node != 0){
-      if (tour[prev_node].route != tour[node].route){
-	 printf("\nRoute #%i: ", tour[node].route);
-	 count = 0;
-      }
-      printf("%i ", node);
-      count++;
-      if (count > 15){
-	 printf("\n");
-	 count = 0;
-      }
-      prev_node = node;
-      node = tour[node].next;
-   }
-   printf("\n\n");
-
 #ifndef WIN32
    if (window){
       char name[MAX_NAME_LENGTH] = {"feas_solution"};
@@ -947,9 +884,8 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 		    CTOI_WAIT_FOR_CLICK_AND_REPORT);
    }
 #endif
-#endif
-#endif   
-   return(DEFAULT);
+
+   return(USER_NO_PP);
 }
    
 /*===========================================================================*/

@@ -40,16 +40,20 @@ generic cutting planes.
 
 CHANGES TO THE USER INTERFACE
 
+The meachanism for diplaying a solution is now vastly improved. 
 SYMPHONY now passes the user the indices and values of the nonzero
 variables for the best solution found. The function user_display_solution()
-now has four arguments, as follows:  
+now has six arguments, as follows:  
 
-int user_display_solution (void *user, int length, int *xind, double *xval);
+int user_display_solution (void *user, double lpetol, int varnum,
+			   int *indices, double *values, double objval);
 
-user:   The pointer to the user data structure (as usual).
-length: The number of nonzeros in the solution.
-xind:   The indices of the nonzeros.
-xval:   The values of the nonzeros.
+user:    The pointer to the user data structure (as usual).
+lpetol:  The LP zero tolerance used.
+varnum:  The number of nonzeros in the solution.
+indices: The indices of the nonzeros.
+values:  The values of the nonzeros.
+objval:  The objective function value of the solution.
 
 The user can interpret the solution and print it out in a custom format or
 simply return "DEFAULT", in which case the solution will be displayed by

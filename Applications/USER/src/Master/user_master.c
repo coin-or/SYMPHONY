@@ -409,30 +409,15 @@ int user_process_own_messages(void *user, int msgtag)
 
 /*===========================================================================*\
  * This is the user's chance to display the solution in whatever
- * manner desired. 
+ * manner desired. Change the return value to USER_NO_PP if you want to
+ * display the solution yourself. A return value of USER_AND_PP will cause the
+ * default solution display routine to be executed, even if the user displays
+ * the solution as well.
 \*===========================================================================*/
 
-int user_display_solution(void *user, int length, int *xind, double *xval)
+int user_display_solution(void *user, double lpetol, int varnum, int *indices,
+			  double *values, double objval)
 {
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
-   /* In this case, the LP user data structure is passed in, along with the
-      indices and values of the nonzeros for the best solution found.
-      In the template code, there is only one data structure, so these ifdefs
-      are not really necessary... Fill this function in if you want to
-      interpret the solution and display it. By default, SYMPHONY prints out
-      the indices and values of nonzero variables. */
-#else
-   /* In this case, it is the Master user data structure that is passed in,
-      along with the indices and values of the nonzeros for the best solution
-      found. Fill this in for parallel computation, if you want to interpret
-      the solution and display it. By default, SYMPHONY prints out the indices
-      and values of nonzero variables. */
-#endif
-   /* Change the return value to USER_NO_PP if you want to display the solution
-      yourself. A return value of USER_AND_PP will cause the default solution
-      display routine to be executed, even if the user displays the solution
-      as well. */
-   
    return(DEFAULT);
 }
    

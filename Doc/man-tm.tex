@@ -569,7 +569,8 @@ structure for the cut pool process. \\
 \functiondef{user\_display\_solution}
 \label{user_display_solution}
 \begin{verbatim}
-int user_display_solution(void *user, int length, int *xind, double *xval)
+int user_display_solution(void *user, double lpetol, int varnum, int *indices, 
+                          double *values, double objval)
 \end{verbatim}
 
 \bd
@@ -579,25 +580,11 @@ int user_display_solution(void *user, int length, int *xind, double *xval)
 This function is invoked when a best solution found so far is to be displayed
 (after heuristics, after the end of the first phase, or the end of the whole
 algorithm). This can be done using either a text-based format or using the
-{\tt drawgraph} process. There are several ways this can be
-accomplished. First, the user can let SYMPHONY keep track of a best solution
-found so far and display it using the default format, which lists the
-indices of the nonzero variables and their corresponding
-values. Alternatively, the user can allow SYMPHONY to keep track of a best
-solution found so far, but write a custom function for displaying it. This is
-done by interpreting the solution that is passed as an argument to the
-function.
-
-Finally, the user has the option of storing the solution(s) as they are found
-by customizing the \hyperref{{\tt user\_is\_feasible()}} {{\tt
-user\_is\_feasible()}} function. In sequential executables, the solution(s) can
-be stored in the user LP data structure. In this case, a pointer to this
-structure is passed into the function through the {\tt user} argument and the
-solution(s) can then be displayed. For parallel computation, the user must
-pass the solutions back to the master module, using the \hyperref{{\tt
-user\_send\_feasible_solution()}} {{\tt user\_send\_feasible\_solution()}}
-function. In parallel mode, a pointer to the user's master data structure is
-passed into this function through the {\tt user} argument.
+{\tt drawgraph} process. By default, SYMPHONY displays the indices and values
+for each nonzero variable in the solution. The user may wish to display a
+custom version of the solution by interpreting the variables. For instance,
+the user could keep an array of names for each variable and then display the
+name instead of the index.
 
 \args
 
