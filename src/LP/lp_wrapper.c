@@ -631,7 +631,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	 p->ub = new_ub;
 	 if (p->par.set_obj_upper_lim)
 	    set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
-#if !defined(MULTI_CRITERIA)
+#if !defined(MULTI_CRITERIA) || !defined(FIND_NONDOMINATED_SOLUTIONS)
 	 p->best_sol.xlevel = p->bc_level;
 	 p->best_sol.xindex = p->bc_index;
 	 p->best_sol.xiter_num = p->iter_num;

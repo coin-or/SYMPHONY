@@ -1016,9 +1016,11 @@ int sym_mc_solve(problem *p)
 
    /* Set some parameters */
    compare_sol_tol = p->par.compare_solution_tolerance;
+#ifdef FIND_NONDOMINATED_SOLUTIONS
    p->par.tm_par.granularity = p->par.lp_par.granularity =
       -MAX(p->par.lp_par.rho, compare_sol_tol);
-
+#endif
+   
 #ifdef BINARY_SEARCH
    printf("Using binary search with tolerance = %f...\n",
 	  p->par.binary_search_tolerance);
