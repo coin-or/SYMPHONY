@@ -59,25 +59,25 @@ DG_FUNC_SRC       = vrp_dg_functions.c
 USER_MASTER_SRC   = vrp_main.c vrp_master.c vrp_io.c vrp_master_functions.c 
 USER_MASTER_SRC  += small_graph.c
 USER_MASTER_SRC  += $(COST_SRC)
-ifeq ($(APPL_COMPILE_IN_TM),TRUE)
+ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)
-ifeq ($(APPL_COMPILE_IN_LP),FALSE)
+ifeq ($(COMPILE_IN_LP),FALSE)
 USER_MASTER_SRC  += $(MACROS_SRC) $(DG_FUNC_SRC)
 endif
 else
 USER_MASTER_SRC  += $(MACROS_SRC) $(DG_FUNC_SRC)
 endif
 
-ifeq ($(APPL_COMPILE_IN_LP),TRUE)
+ifeq ($(COMPILE_IN_LP),TRUE)
 USER_TM_SRC       = $(USER_LP_SRC) 
 endif
-ifeq ($(APPL_COMPILE_IN_CP),TRUE)
+ifeq ($(COMPILE_IN_CP),TRUE)
 USER_TM_SRC      += vrp_cp.c 
 endif
 
 USER_LP_SRC       = vrp_lp_branch.c vrp_lp.c 
 USER_LP_SRC      += $(MACROS_SRC) $(NET_SRC) $(DG_FUNC_SRC)
-ifeq ($(APPL_COMPILE_IN_CG),TRUE)
+ifeq ($(COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += vrp_cg.c biconnected.c shrink.c 
 endif
 

@@ -19,6 +19,7 @@
 #ifdef __PVM__
 
 #include <pvm3.h>
+#include <stdlib.h>
 
 /*===========================================================================*
  * These functions are just a front-end to PVM

@@ -1192,6 +1192,9 @@ int sym_mc_solve(sym_environment *env)
 
    /* Set some parameters */
    compare_sol_tol = env->par.mc_compare_solution_tolerance;
+   if (!env->par.lp_par.mc_find_nondominated_solutions){
+      env->par.lp_par.mc_rho = 0;
+   }
    env->par.tm_par.granularity = env->par.lp_par.granularity =
       -MAX(env->par.lp_par.mc_rho, compare_sol_tol);
    

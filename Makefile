@@ -260,8 +260,8 @@ endif
 # compile a distributed version of the code.
 ##############################################################################
 
-COMM_PROTOCOL = NONE
-#COMM_PROTOCOL = PVM
+#COMM_PROTOCOL = NONE
+COMM_PROTOCOL = PVM
 
 #Set the paths for PVM
 ifeq ($(COMM_PROTOCOL),PVM)
@@ -1122,7 +1122,7 @@ $(LIBDIR)/$(LIBNAME_TYPE)
 	@echo ""
 	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) $(MAIN_OBJ) \
-	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB) 
+	$(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB) $(LIBS) 
 	@echo ""
 
 $(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS)
@@ -1625,4 +1625,4 @@ clean_bin :
 clean_all : clean clean_dep clean_user clean_user_dep clean_lib clean_bin
 	true
 
-.SILENT:
+#.SILENT:
