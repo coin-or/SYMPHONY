@@ -1123,14 +1123,14 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 	 child->sp = node->sp;
 	 /*___END_EXPERIMENTAL_SECTION___*/
-#ifdef DO_TESTS
-	 if (child->lower_bound < child->paret->lower_bound){
-	    printf("#######Error: Child's lower bound isless than parent's\n");
-	 }
-#endif
       }
       child->lower_bound = objval[i];
       child->parent = node;
+#ifdef DO_TESTS
+      if (child->lower_bound < child->parent->lower_bound){
+	printf("#######Error: Child's lower bound isless than parent's\n");
+      }
+#endif
 
       /* child->children = NULL;   zeroed out by calloc */
       /* child->child_num = 0;   zeroed out by calloc */
