@@ -202,8 +202,7 @@ typedef struct LPDATA{
    double     *pseudo_costs_zero;
 #endif
 
-   lp_params  par;
-   cgl_params cgl;
+   cgl_params  cgl;
 
 }LPdata;
 

@@ -28,10 +28,8 @@ typedef struct CUT_TIME_OUT{
    double            all_cuts_time_out;
 }cut_time_out;
 
-
 typedef struct CGL_PARAMS{
-
-  /* Cut generation in LP */
+   /* Cut generation in LP */
    int               generate_cgl_cuts;
    int               generate_cgl_gomory_cuts;
    int               generate_cgl_knapsack_cuts;
@@ -122,9 +120,9 @@ typedef struct LP_PARAMS{
    int               fixed_to_ub_before_logical_fixing; /* OK */
    double            fixed_to_ub_frac_before_logical_fixing; /* OK */
 
-  /* Cut generation in LP */
+   /* CGL parameters */
    cgl_params        cgl;
-
+   
    /* Parameters affecting branching */
    int               max_presolve_iter;
 
