@@ -56,6 +56,16 @@ end
 foreach file (DrawGraph/IGD_1.0/Simple_version/*.c)
 awk -f scripts/reformat.awk $file > $DIR/$file
 end
+mkdir $DIR/WIN32
+foreach file (WIN32/*.dsp)
+awk -f scripts/reformat.awk $file > $DIR/$file
+end
+foreach file (WIN32/*.dsw)
+awk -f scripts/reformat.awk $file > $DIR/$file
+end
+foreach file (WIN32/*.mak)
+awk -f scripts/reformat.awk $file > $DIR/$file
+end
 
 foreach app (Vrp CNRP MCKP MATCH MPP SPP SPP+CUTS Template)
 mkdir $DIR/$app

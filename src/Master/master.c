@@ -111,7 +111,7 @@ sym_environment *sym_open_environment()
 
    printf("\n");
    printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 4.0                      *\n");
+   printf("*   This is SYMPHONY Version 5.0                      *\n");
    printf("*   Copyright 2000-2004 Ted Ralphs                    *\n");
    printf("*   All Rights Reserved.                              *\n");
    printf("*   Distributed under the Common Public License 1.0   *\n");
