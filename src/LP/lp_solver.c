@@ -1032,7 +1032,6 @@ void CPX_check_error(const char *erring_func)
 void open_lp_solver(LPdata *lp_data)
 {
    int i;
-   LPdata *lp_data = (LPdata *) calloc(1, sizeof(LPdata));
 
    i = CPX_OFF;
    lp_data->cpxenv = CPXopenCPLEX(&cpx_status);
@@ -2312,6 +2311,8 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    int i, m = lp_data->m, n = lp_data->n;
    int *which = (int *) calloc(delnum, ISIZE);
    int num_to_delete = 0, num_to_keep = 0;
+   double *dj = lp_data->dj;
+   double *x = lp_data->x;
    char *status = lp_data->status;
 
    for (i = n - 1; i >= 0; i--){
