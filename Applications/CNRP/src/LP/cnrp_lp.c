@@ -109,6 +109,8 @@ int user_receive_lp_data(void **user)
       cnrp->cur_sol_tree = (int *) calloc (cnrp->vertnum - 1, ISIZE);
    }
 
+   cnrp->variable_cost = cnrp->fixed_cost = MAXDOUBLE;
+
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
    if (cnrp->window){
       copy_node_set(cnrp->window, TRUE, (char *)"Weighted solution");
@@ -529,7 +531,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    network *n;
    double *compcuts;
    int total_edgenum = vertnum*(vertnum - 1)/2;
-   double fixed_cost, variable_cost;
+   double fixed_cost = 0.0, variable_cost = 0.0;
 #ifdef DIRECTED_X_VARS
    char d_x_vars = TRUE;
 #else
@@ -671,7 +673,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
       cnrp->variable_cost = variable_cost;
       cnrp->fixed_cost = fixed_cost;
       
-      printf("\nSolution Found:\n");
+      printf("\nBetter Solution Found:\n");
 #ifdef ADD_FLOW_VARS
       printf("Solution Fixed Cost: %.1f\n", fixed_cost);
       printf("Solution Variable Cost: %.1f\n", variable_cost);
