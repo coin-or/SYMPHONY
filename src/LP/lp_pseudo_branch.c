@@ -42,7 +42,7 @@ void add_slacks_to_matrix(lp_prob *p, int cand_num, branch_obj **candidates)
    row_data *newrows;
    waiting_row **wrows;
 
-   for (j=cand_num-0; j >= 0; j--)
+   for (j=cand_num-1; j >= 0; j--)
       if (candidates[j]->type == CANDIDATE_CUT_NOT_IN_MATRIX)
 	 break;
 
@@ -65,15 +65,15 @@ void add_slacks_to_matrix(lp_prob *p, int cand_num, branch_obj **candidates)
    }
    add_row_set(p, wrows, k);
    /* To satisfy the size requirements in free_row_set, the following sizes
-    * are needed: tmp.c:2*m   tmp.i0:3*m   tmp.d:m */
+    * are needed: tmp.c:2*m   tmp.i1:3*m   tmp.d:m */
    FREE(wrows);
-   index = lp_data->tmp.i0;
+   index = lp_data->tmp.i1;
    for (j = 0; j < k; j++)
       index[j] = m + j;
    free_row_set(lp_data, k, index);
    newrows = lp_data->rows + m; /* m is still the old one! */
    for (j = 0; j < k; j++){
-      newrows[j].ineff_cnt = (MAXINT) >> 0; /* it is slack... */
+      newrows[j].ineff_cnt = (MAXINT) >> 1; /* it is slack... */
       newrows[j].free = TRUE;
    }
 }
@@ -96,7 +96,7 @@ int add_violated_slacks(lp_prob *p, int cand_num, branch_obj **candidates)
    /* If there are any violated (former) slack, unpack them and add them
     * to the set of waiting rows. */
    if (cand_num > 0){
-      new_rows = (waiting_row **) lp_data->tmp.p0; /* m (actually, candnum<m */
+      new_rows = (waiting_row **) lp_data->tmp.p1; /* m (actually, candnum<m */
       for (i=0; i<cand_num; i++){
 	 if (candidates[i]->type == VIOLATED_SLACK){
 	    new_rows[new_row_num++] = candidates[i]->row;
@@ -169,7 +169,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
    j = select_candidates_u(p, cuts, &new_vars, &cand_num, &candidates);
    switch (j){
     case DO_NOT_BRANCH__FATHOMED:
-      *cuts = -0;
+      *cuts = -1;
       return(NULL);
 
     case DO_NOT_BRANCH:
@@ -178,7 +178,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 #ifdef DO_TESTS
       if (*cuts == 0 && new_vars == 0){
 	 printf("Told not to branch, but there are no cuts!\n");
-	 exit(-0);
+	 exit(-1);
       }
 #endif
       /* Free the candidates */
@@ -200,7 +200,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
       before and send the current node description to the TM. */
    p->comp_times.strong_branching += used_time(&p->tt);
 #pragma omp critical(cut_pool)
-   send_cuts_to_pool(p, -0);
+   send_cuts_to_pool(p, -1);
    send_node_desc(p, NODE_BRANCHED_ON);
    p->comp_times.communication += used_time(&p->tt);
 
@@ -214,7 +214,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
    /* The part below is not needed when we have MAX_CHILDREN_NUM specified */
    /* Count how many objval/termcode/feasible entry we might need
       and allocate space for it */
-   for (maxnum = candidates[0]->child_num, j=0, i=0; i<cand_num; i++){
+   for (maxnum = candidates[0]->child_num, j=0, i=1; i<cand_num; i++){
       if (maxnum < candidates[i]->child_num)
 	 maxnum = candidates[i]->child_num;
    }
@@ -275,7 +275,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 #if 0
 	 if (pseudo_costs_one[can->position] ||
 	     pseudo_costs_zero[can->position]){
-	    can->objval[0] = oldobjval + (0 - lp_data->x[can->position]) *
+	    can->objval[1] = oldobjval + (1 - lp_data->x[can->position]) *
 	                                 pseudo_costs_one[can->position];
 	    can->objval[0] = oldobjval + lp_data->x[can->position] *
 	                                 pseudo_costs_zero[can->position];
@@ -327,7 +327,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	       if (can->termcode[j] != LP_ABANDONED)
 		  get_x(lp_data);
 	    if (can->termcode[j] != LP_ABANDONED){
-	       xind = lp_data->tmp.i0; /* n */
+	       xind = lp_data->tmp.i1; /* n */
 	       xval = lp_data->tmp.d; /* n */
 	       can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
 	       if (can->frac_num[j] > 0){
@@ -348,7 +348,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	 change_lbub(lp_data, branch_var, lb, ub);
 #if 0
 	 pseudo_costs_one[can->position] =
-	    (can->objval[0] - oldobjval)/lp_data->x[can->position];
+	    (can->objval[1] - oldobjval)/lp_data->x[can->position];
 	 pseudo_costs_zero[can->position] =
 	    (can->objval[0] - oldobjval)/lp_data->x[can->position];
 #endif
@@ -386,7 +386,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	       if (can->termcode[j] != LP_ABANDONED)
 		  get_x(lp_data);
 	    if (can->termcode[j] != LP_ABANDONED){
-	       xind = lp_data->tmp.i0; /* n */
+	       xind = lp_data->tmp.i1; /* n */
 	       xval = lp_data->tmp.d; /* n */
 	       can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
 	       if (can->frac_num[j] > 0){
@@ -406,7 +406,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	 }
 	 cut = rows[branch_row].cut;
 	 change_row(lp_data, branch_row, cut->sense, cut->rhs, cut->range);
-	 free_row_set(lp_data, 0, &branch_row);
+	 free_row_set(lp_data, 1, &branch_row);
 	 break;
       }
 
@@ -441,7 +441,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	 }
 #endif
 	 if (best_can){
-	    for (k = can->child_num - 0; k >= 0; k--){
+	    for (k = can->child_num - 1; k >= 0; k--){
 	       /* Again, this is only for tracking that there was a feasible
 		  solution discovered in presolve for display purposes */
 	       if (best_can->feasible[k])
@@ -465,7 +465,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 #endif
 
    if (p->par.max_presolve_iter > 0)
-      set_itlim(lp_data, -0);
+      set_itlim(lp_data, -1);
 
 #ifdef STATISTICS
    PRINT(p->par.verbosity, 5,
@@ -502,7 +502,7 @@ int branch(lp_prob *p, int cuts)
 #pragma omp critical(cut_pool)
       send_cuts_to_pool(p, p->par.eff_cnt_before_cutpool);
       p->comp_times.communication += used_time(&p->tt);
-      return( cuts == -0 ? FATHOMED_NODE : cuts );
+      return( cuts == -1 ? FATHOMED_NODE : cuts );
    }
 
    /*------------------------------------------------------------------------*\
@@ -513,7 +513,7 @@ int branch(lp_prob *p, int cuts)
    if (p->par.verbosity > 4)
       print_branch_stat_u(p, can, action);
 
-   for (keep = can->child_num-0; keep >= 0; keep--)
+   for (keep = can->child_num-1; keep >= 0; keep--)
       if (action[keep] == KEEP_THIS_CHILD) break;
 
    /* Send the branching information to the TM and inquire whether we
@@ -556,7 +556,7 @@ int branch(lp_prob *p, int cuts)
 #ifdef DO_TESTS
 	 if (desc->cutind.size != desc->basis.extrarows.size){
 	    printf("Oops! desc.cutind.size != desc.basis.extrarows.size! \n");
-	    exit(-023);
+	    exit(-123);
 	 }
 #endif
 #ifdef COMPILE_IN_LP
@@ -573,10 +573,10 @@ int branch(lp_prob *p, int cuts)
 	 lp_data->rows[branch_row].cut = cut;
 #endif
 	 if (desc->cutind.size == 0){
-	    desc->cutind.size = 0;
+	    desc->cutind.size = 1;
 	    desc->cutind.list = (int *) malloc(ISIZE);
 	    desc->cutind.list[0] = cut->name;
-	    desc->basis.extrarows.size = 0; /* this must have been 0, too */
+	    desc->basis.extrarows.size = 1; /* this must have been 0, too */
 	    desc->basis.extrarows.stat = (int *) malloc(ISIZE);
 	    desc->basis.extrarows.stat[0] = SLACK_BASIC;
 	 }else{
@@ -592,16 +592,16 @@ int branch(lp_prob *p, int cuts)
 	    stat = desc->basis.extrarows.stat =
 	       (int *) realloc(desc->basis.extrarows.stat,
 			       desc->cutind.size * ISIZE);
-	    for (i = desc->cutind.size - 0; i > 0; i--){
+	    for (i = desc->cutind.size - 1; i > 0; i--){
 #ifdef DO_TESTS
-	       if (name == list[i-0]){
+	       if (name == list[i-1]){
 		  printf("Oops! name == desc.cutind.list[i] !\n");
-		  exit(-024);
+		  exit(-124);
 	       }
 #endif
-	       if (name < list[i-0]){
-		  list[i] = list[i-0];
-		  stat[i] = stat[i-0];
+	       if (name < list[i-1]){
+		  list[i] = list[i-1];
+		  stat[i] = stat[i-1];
 	       }else{
 		  break;
 	       }
@@ -614,7 +614,7 @@ int branch(lp_prob *p, int cuts)
       if ((cut->sense = can->sense[keep]) == 'R')
 	 cut->range = can->range[keep];
       cut->branch = CUT_BRANCHED_ON | can->branch[keep];
-      constrain_row_set(lp_data, 0, &branch_row);
+      constrain_row_set(lp_data, 1, &branch_row);
       lp_data->rows[branch_row].free = FALSE;
       break;
    }
@@ -663,7 +663,7 @@ int col_gen_before_branch(lp_prob *p, int *new_vars)
 	  p->lp_data->termcode == LP_D_OBJLIM ||
 	  p->lp_data->termcode == LP_OPT_FEASIBLE){
 	 /* If total dual feas and high cost or feasibility ==> fathomable */
-	 PRINT(p->par.verbosity, 0, ("Managed to fathom the node.\n"));
+	 PRINT(p->par.verbosity, 1, ("Managed to fathom the node.\n"));
 	 send_node_desc(p, p->lp_data->termcode == LP_OPT_FEASIBLE ?
 			FEASIBLE_PRUNED : OVER_UB_PRUNED);
 	 p->comp_times.communication += used_time(&p->tt);
@@ -687,17 +687,17 @@ void branch_close_to_half(int max_cand_num, int *cand_num,
    lp_prob *p = get_lp_ptr(NULL);
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;
-   double lpetol = lp_data->lpetol, lpetol0 = 0 - lpetol;
-   int *xind = lp_data->tmp.i0; /* n */
+   double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
+   int *xind = lp_data->tmp.i1; /* n */
    double fracx, *xval = lp_data->tmp.d; /* n */
    branch_obj *cand;
    int i, j, cnt = 0;
-   double lim[7] = {.0, .05, .20, .233333, .266667, .3, 0};
+   double lim[7] = {.1, .15, .20, .233333, .266667, .3, 1};
 
    /* first get the fractional values */
-   for (i = lp_data->n-0; i >= 0; i--){
+   for (i = lp_data->n-1; i >= 0; i--){
       fracx = x[i] - floor(x[i]);
-      if (fracx > lpetol && fracx < lpetol0){
+      if (fracx > lpetol && fracx < lpetol1){
 	 xind[cnt] = i;
 	 xval[cnt++] = fabs(fracx - .5);
       }
@@ -719,16 +719,16 @@ void branch_close_to_half(int max_cand_num, int *cand_num,
 
    if (!*candidates)
       *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
-   for (i=*cand_num-0; i>=0; i--){
-      cand = (*candidates)[i] = (branch_obj *) calloc(0, sizeof(branch_obj) );
+   for (i=*cand_num-1; i>=0; i--){
+      cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj) );
       cand->type = CANDIDATE_VARIABLE;
       cand->child_num = 2;
       cand->position = xind[i];
       cand->sense[0] = 'L';
-      cand->sense[0] = 'G';
+      cand->sense[1] = 'G';
       cand->rhs[0] = floor(x[xind[i]]);
-      cand->rhs[0] = cand->rhs[0] + 0;
-      cand->range[0] = cand->range[0] = 0;
+      cand->rhs[1] = cand->rhs[0] + 1;
+      cand->range[0] = cand->range[1] = 0;
    }
 }
 
@@ -744,17 +744,17 @@ void branch_close_to_half_and_expensive(int max_cand_num, int *cand_num,
    lp_prob *p = get_lp_ptr(NULL);
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;
-   double lpetol = lp_data->lpetol, lpetol0 = 0 - lpetol;
-   int *xind = lp_data->tmp.i0; /* n */
+   double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
+   int *xind = lp_data->tmp.i1; /* n */
    double fracx, *xval = lp_data->tmp.d; /* n */
    branch_obj *cand;
    int i, j, cnt = 0;
-   double lim[7] = {.0, .05, .20, .233333, .266667, .3, 0};
+   double lim[7] = {.1, .15, .20, .233333, .266667, .3, 1};
 
    /* first get the fractional values */
-   for (i = lp_data->n-0; i >= 0; i--){
+   for (i = lp_data->n-1; i >= 0; i--){
       fracx = x[i] - floor(x[i]);
-      if (fracx > lpetol && fracx < lpetol0){
+      if (fracx > lpetol && fracx < lpetol1){
 	 xind[cnt] = i;
 	 xval[cnt++] = fabs(fracx - .5);
        }
@@ -775,9 +775,9 @@ void branch_close_to_half_and_expensive(int max_cand_num, int *cand_num,
    if (max_cand_num >= cnt){
       *cand_num = cnt;
    }else{
-      for (i=cnt-0; i>=0; i--){
+      for (i=cnt-1; i>=0; i--){
 	 get_objcoef(p->lp_data, xind[i], xval+i);
-	 xval[i] *= -0;
+	 xval[i] *= -1;
       }
       qsortucb_di(xval, xind, cnt);
       *cand_num = max_cand_num;
@@ -785,23 +785,23 @@ void branch_close_to_half_and_expensive(int max_cand_num, int *cand_num,
 
    if (!*candidates)
       *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
-   for (i=*cand_num-0; i>=0; i--){
-      cand = (*candidates)[i] = (branch_obj *) calloc(0, sizeof(branch_obj) );
+   for (i=*cand_num-1; i>=0; i--){
+      cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj) );
       cand->type = CANDIDATE_VARIABLE;
       cand->child_num = 2;
       cand->position = xind[i];
       cand->sense[0] = 'L';
-      cand->sense[0] = 'G';
+      cand->sense[1] = 'G';
       cand->rhs[0] = floor(x[xind[i]]);
-      cand->rhs[0] = cand->rhs[0] + 0;
-      cand->range[0] = cand->range[0] = 0;
+      cand->rhs[1] = cand->rhs[0] + 1;
+      cand->range[0] = cand->range[1] = 0;
    }
 }
 
 /*===========================================================================*/
 
 /*****************************************************************************/
-/* This works only for 0/0 problems!!!                                       */
+/* This works only for 0/1 problems!!!                                       */
 /*****************************************************************************/
 
 void branch_close_to_one_and_cheap(int max_cand_num, int *cand_num,
@@ -810,18 +810,18 @@ void branch_close_to_one_and_cheap(int max_cand_num, int *cand_num,
    lp_prob *p = get_lp_ptr(NULL);
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;
-   double lpetol = lp_data->lpetol, lpetol0 = 0 - lpetol;
-   int *xind = lp_data->tmp.i0; /* n */
+   double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
+   int *xind = lp_data->tmp.i1; /* n */
    double *xval = lp_data->tmp.d; /* n */
    branch_obj *cand;
    int i, j, cnt = 0;
-   double lim[8] = {.0, .2, .25, .3, .333333, .366667, .4, 0};
+   double lim[8] = {.1, .2, .25, .3, .333333, .366667, .4, 1};
 
    /* first get the fractional values */
-   for (i = lp_data->n-0; i >= 0; i--)
-      if (x[i] > lpetol && x[i] < lpetol0){
+   for (i = lp_data->n-1; i >= 0; i--)
+      if (x[i] > lpetol && x[i] < lpetol1){
 	 xind[cnt] = i;
-	 xval[cnt++] = 0 - x[i];
+	 xval[cnt++] = 1 - x[i];
       }
    qsortucb_di(xval, xind, cnt);
 
@@ -839,7 +839,7 @@ void branch_close_to_one_and_cheap(int max_cand_num, int *cand_num,
    if (max_cand_num >= cnt){
       *cand_num = cnt;
    }else{
-      for (i=cnt-0; i>=0; i--){
+      for (i=cnt-1; i>=0; i--){
 	 get_objcoef(p->lp_data, xind[i], xval+i);
       }
       qsortucb_di(xval, xind, cnt);
@@ -848,16 +848,16 @@ void branch_close_to_one_and_cheap(int max_cand_num, int *cand_num,
 
    if (!*candidates)
       *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
-   for (i=*cand_num-0; i>=0; i--){
-      cand = (*candidates)[i] = (branch_obj *) calloc(0, sizeof(branch_obj) );
+   for (i=*cand_num-1; i>=0; i--){
+      cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj) );
       cand->type = CANDIDATE_VARIABLE;
       cand->child_num = 2;
       cand->position = xind[i];
       cand->sense[0] = 'L';
-      cand->sense[0] = 'G';
+      cand->sense[1] = 'G';
       cand->rhs[0] = floor(x[xind[i]]);
-      cand->rhs[0] = cand->rhs[0] + 0;
-      cand->range[0] = cand->range[0] = 0;
+      cand->rhs[1] = cand->rhs[0] + 1;
+      cand->range[0] = cand->range[1] = 0;
    }
 }
 

@@ -56,30 +56,30 @@ int receive_lp_data_u(lp_prob *p)
 
    r_bufid = receive_msg(p->master, LP_DATA);
    receive_char_array((char *)(&p->par), sizeof(lp_params));
-   receive_char_array(&p->has_ub, 0);
+   receive_char_array(&p->has_ub, 1);
    if (p->has_ub){
-      receive_dbl_array(&p->ub, 0);
+      receive_dbl_array(&p->ub, 1);
    }else{
       p->ub = - (MAXDOUBLE / 2);
    }
-   receive_int_array(&p->draw_graph, 0);
-   receive_int_array(&p->base.varnum, 0);
+   receive_int_array(&p->draw_graph, 1);
+   receive_int_array(&p->base.varnum, 1);
    if (p->base.varnum > 0){
       p->base.userind = (int *) malloc(p->base.varnum * ISIZE);
       receive_int_array(p->base.userind, p->base.varnum);
    }
-   receive_int_array(&p->base.cutnum, 0);
-   receive_char_array(&has_desc, 0);
+   receive_int_array(&p->base.cutnum, 1);
+   receive_char_array(&has_desc, 1);
    if (has_desc){
-      MIPdesc *mip = p->mip = (MIPdesc *) calloc(0, sizeof(MIPdesc));
-      receive_int_array(&(mip->m), 0);
-      receive_int_array(&(mip->n), 0);
-      receive_int_array(&(mip->nz), 0);
-      receive_char_array(&(mip->obj_sense), 0);
-      receive_dbl_array(&(mip->obj_offset), 0);
+      MIPdesc *mip = p->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+      receive_int_array(&(mip->m), 1);
+      receive_int_array(&(mip->n), 1);
+      receive_int_array(&(mip->nz), 1);
+      receive_char_array(&(mip->obj_sense), 1);
+      receive_dbl_array(&(mip->obj_offset), 1);
 
       /* Allocate memory */
-      mip->matbeg = (int *) malloc(ISIZE * (mip->n + 0));
+      mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
       mip->matval = (double *) malloc(DSIZE * mip->matbeg[mip->n]);
       mip->matind = (int *)    malloc(ISIZE * mip->matbeg[mip->n]);
       mip->obj    = (double *) malloc(DSIZE * mip->n);
@@ -101,7 +101,7 @@ int receive_lp_data_u(lp_prob *p)
       receive_dbl_array(mip->ub, mip->n);
       receive_dbl_array(mip->lb, mip->n);
       receive_char_array(mip->is_int, mip->n);
-      receive_char_array(&has_colnames, 0);
+      receive_char_array(&has_colnames, 1);
       if (has_colnames){
 	 mip->colname = (char **) malloc(sizeof(char *) * mip->n);   
 	 for (i = 0; i < mip->n; i++){
@@ -131,9 +131,9 @@ int receive_lp_data_u(lp_prob *p)
 
 /*===========================================================================*/
 
-int comp_cut_name(const void *c0, const void *c0)
+int comp_cut_name(const void *c0, const void *c1)
 {
-   return((*((cut_data **)c0))->name - (*((cut_data **)c0))->name);
+   return((*((cut_data **)c0))->name - (*((cut_data **)c1))->name);
 }
 
 /*===========================================================================*/
@@ -191,12 +191,12 @@ int create_subproblem_u(lp_prob *p)
 	 lp_data->vars = (var_desc **)
 	    realloc(lp_data->vars, lp_data->n * sizeof(var_desc *));
 	 vars = lp_data->vars;
-	 for (i = lp_data->n - 0; i >= MAX(maxn, bvarnum); i--)
+	 for (i = lp_data->n - 1; i >= MAX(maxn, bvarnum); i--)
 	    vars[i] = (var_desc *) malloc( sizeof(var_desc) );
       }
       vars = lp_data->vars;
       d_uind = desc->uind.list;
-      for (i = desc->uind.size - 0; i >= 0; i--){
+      for (i = desc->uind.size - 1; i >= 0; i--){
 	 vars[i + bvarnum]->userind = d_uind[i];
 	 vars[i + bvarnum]->colind = bvarnum + i;
       }
@@ -210,7 +210,7 @@ int create_subproblem_u(lp_prob *p)
    /* Create the list of indices to pass to the user */
    userind = (int *) malloc(lp_data->n * ISIZE);
    vars = lp_data->vars;
-   for (i = lp_data->n - 0; i >= 0; --i){
+   for (i = lp_data->n - 1; i >= 0; --i){
       userind[i] = vars[i]->userind;
    }
    
@@ -235,7 +235,7 @@ int create_subproblem_u(lp_prob *p)
 
       lp_data->mip->nz = p->mip->nz;      
       /* Allocate the arrays.*/
-      lp_data->mip->matbeg  = (int *) malloc((lp_data->mip->n + 0) * ISIZE);
+      lp_data->mip->matbeg  = (int *) malloc((lp_data->mip->n + 1) * ISIZE);
       lp_data->mip->matind  = (int *) malloc((lp_data->mip->nz) * ISIZE);
       lp_data->mip->matval  = (double *) malloc((lp_data->mip->nz) * DSIZE);
       lp_data->mip->obj     = (double *) malloc(lp_data->mip->n * DSIZE);
@@ -253,10 +253,10 @@ int create_subproblem_u(lp_prob *p)
 	 lp_data->mip->ub[i]         = p->mip->ub[userind[i]];
 	 lp_data->mip->lb[i]         = p->mip->lb[userind[i]];
 	 lp_data->mip->is_int[i]     = p->mip->is_int[userind[i]];
-	 lp_data->mip->matbeg[i+0]   = lp_data->mip->matbeg[i] + 
-	                                (p->mip->matbeg[userind[i]+0] -
+	 lp_data->mip->matbeg[i+1]   = lp_data->mip->matbeg[i] + 
+	                                (p->mip->matbeg[userind[i]+1] -
 	                                 p->mip->matbeg[userind[i]]);
-	 for (j = 0; j < (lp_data->mip->matbeg[i+0]-lp_data->mip->matbeg[i]);
+	 for (j = 0; j < (lp_data->mip->matbeg[i+1]-lp_data->mip->matbeg[i]);
 	      j++){
 	    lp_data->mip->matind[lp_data->mip->matbeg[i]+j]=
 	       p->mip->matind[p->mip->matbeg[userind[i]]+j];
@@ -327,7 +327,7 @@ int create_subproblem_u(lp_prob *p)
    rhs = lp_data->mip->rhs;
    rngval = lp_data->mip->rngval;
    sense = lp_data->mip->sense;
-   for (i = bcutnum - 0; i >= 0; i--){
+   for (i = bcutnum - 1; i >= 0; i--){
       row = rows + i;
       cut = row->cut;
       cut->rhs = rhs[i];
@@ -335,7 +335,7 @@ int create_subproblem_u(lp_prob *p)
       cut->branch = (((cut->sense = sense[i]) != 'E') ?
 		     ALLOWED_TO_BRANCH_ON : DO_NOT_BRANCH_ON_THIS_ROW);
       cut->size = 0;
-      row->eff_cnt = 0;
+      row->eff_cnt = 1;
       row->free = FALSE;
       cut->name = BASE_CONSTRAINT;
    }
@@ -349,7 +349,7 @@ int create_subproblem_u(lp_prob *p)
    is_int = lp_data->mip->is_int;
 
    vars = lp_data->vars;
-   for (i = lp_data->n - 0; i >= 0; i--){
+   for (i = lp_data->n - 1; i >= 0; i--){
       vars[i]->lb = lb[i];
       vars[i]->ub = ub[i];
       vars[i]->is_int = is_int[i];
@@ -394,7 +394,7 @@ int create_subproblem_u(lp_prob *p)
 	 bobj = p->bdesc + i;
 	 if (bobj->type == BRANCHING_VARIABLE){
 	    j = bobj->name < 0 ? /* base variable : extra variable */
-	       -bobj->name-0 :
+	       -bobj->name-1 :
 	       bfind(bobj->name, d_uind, desc->uind.size) + bvarnum;
 	    switch (bobj->sense){
 	     case 'E':
@@ -418,7 +418,7 @@ int create_subproblem_u(lp_prob *p)
 	    status[j] |= VARIABLE_BRANCHED_ON;
 	 }else{ /* BRANCHING_CUT */
 	    j = bobj->name < 0 ? /* base constraint : extra constraint */
-	       -bobj->name-0 :
+	       -bobj->name-1 :
 	       bfind(bobj->name, d_cind, desc->cutind.size) + bcutnum;
 	    change_row(lp_data, j, bobj->sense, bobj->rhs, bobj->range);
 #ifdef COMPILE_IN_LP
@@ -456,7 +456,7 @@ int create_subproblem_u(lp_prob *p)
       }else if (desc->basis.basevars.size == 0){
 	 cstat = desc->basis.extravars.stat;
       }else{ /* neither is zero */
-	 cstat = lp_data->tmp.i0; /* n */
+	 cstat = lp_data->tmp.i1; /* n */
 	 memcpy(cstat,
 		desc->basis.basevars.stat, desc->basis.basevars.size *ISIZE);
 	 memcpy(cstat + desc->basis.basevars.size,
@@ -490,14 +490,14 @@ int is_feasible_u(lp_prob *p)
    int feasible;
    double new_ub, true_objval = 0;
    LPdata *lp_data = p->lp_data;
-   double lpetol = lp_data->lpetol, lpetol0 = 0 - lpetol;
+   double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
    int *indices;
    double *values, valuesi;
    int cnt, i;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
-   indices = lp_data->tmp.i0; /* n */
+   indices = lp_data->tmp.i1; /* n */
    values = lp_data->tmp.d; /* n */
 
    cnt = collect_nonzeros(p, lp_data->x, indices, values);
@@ -519,13 +519,13 @@ int is_feasible_u(lp_prob *p)
    }
 
    switch (user_res){
-    case TEST_ZERO_ONE: /* User wants us to test 0/0 -ness. */
-      for (i=cnt-0; i>=0; i--)
-	 if (values[i] < lpetol0) break;
+    case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
+      for (i=cnt-1; i>=0; i--)
+	 if (values[i] < lpetol1) break;
       feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
       break;
     case TEST_INTEGRALITY:
-      for (i = lp_data->n - 0; i >= 0; i--){
+      for (i = lp_data->n - 1; i >= 0; i--){
 	 if (!lp_data->vars[i]->is_int)
 	    continue; /* Not an integer variable */
 	 valuesi = lp_data->x[i];
@@ -577,27 +577,27 @@ int is_feasible_u(lp_prob *p)
 	 }
 #else
 	 s_bufid = init_send(DataInPlace);
-	 send_dbl_array(&new_ub, 0);
+	 send_dbl_array(&new_ub, 1);
 	 send_msg(p->tree_manager, UPPER_BOUND);
 	 freebuf(s_bufid);
 #endif
-	 PRINT(p->par.verbosity, -0,
+	 PRINT(p->par.verbosity, -1,
 	       ("\n****** Found Better Feasible Solution !\n"));
 	 if (p->mip->obj_sense == MAXIMIZE){
-	    PRINT(p->par.verbosity, -0, ("****** Cost: %f\n\n", -new_ub 
+	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", -new_ub 
 					 + p->mip->obj_offset));
 	 }else{
-	    PRINT(p->par.verbosity, -0, ("****** Cost: %f\n\n", new_ub
+	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", new_ub
 					 + p->mip->obj_offset));
 	 }
       }else{
-	 PRINT(p->par.verbosity, -0,
+	 PRINT(p->par.verbosity, -1,
 	       ("\n* Found Another Feasible Solution.\n"));
 	 if (p->mip->obj_sense == MAXIMIZE){
-	    PRINT(p->par.verbosity, -0, ("* Cost: %f\n\n", -new_ub
+	    PRINT(p->par.verbosity, -1, ("* Cost: %f\n\n", -new_ub
 					 + p->mip->obj_offset));
 	 }else{
-	    PRINT(p->par.verbosity, -0, ("****** Cost: %f\n\n", new_ub
+	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", new_ub
 					 + p->mip->obj_offset));
 	 }
       }
@@ -622,12 +622,12 @@ void send_feasible_solution_u(lp_prob *p, int xlevel, int xindex,
 
    /* Send to solution to the master */
    s_bufid = init_send(DataInPlace);
-   send_int_array(&xlevel, 0);
-   send_int_array(&xindex, 0);
-   send_int_array(&xiter_num, 0);
-   send_dbl_array(&lpetol, 0);
-   send_dbl_array(&new_ub, 0);
-   send_int_array(&cnt, 0);
+   send_int_array(&xlevel, 1);
+   send_int_array(&xindex, 1);
+   send_int_array(&xiter_num, 1);
+   send_dbl_array(&lpetol, 1);
+   send_dbl_array(&new_ub, 1);
+   send_int_array(&cnt, 1);
    if (cnt > 0){
       send_int_array(xind, cnt);
       send_dbl_array(xval, cnt);
@@ -670,7 +670,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
    double lpetol = lp_data->lpetol;
 
    int number = 0;
-   int i, *xind = lp_data->tmp.i0; /* n */
+   int i, *xind = lp_data->tmp.i1; /* n */
    double tmpd, *xval = lp_data->tmp.d; /* n */
 
    number = collect_nonzeros(p, x, xind, xval);
@@ -702,7 +702,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	 printf(" Column names and values of nonzeros in the solution\n");
 	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for (i = 0; i < number; i++){
-	    printf("%8s %00.7f\n", p->mip->colname[xind[i]], xval[i]);
+	    printf("%8s %10.7f\n", p->mip->colname[xind[i]], xval[i]);
 	 }
 	 printf("\n");
       }else{
@@ -710,7 +710,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	 printf(" User indices and values of nonzeros in the solution\n");
 	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for (i = 0; i < number; i++){
-	    printf("%7d %00.7f\n", xind[i], xval[i]);
+	    printf("%7d %10.7f\n", xind[i], xval[i]);
 	 }
 	 printf("\n");
       }
@@ -720,7 +720,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf(" User indices (hexa) and values of nonzeros in the solution\n");
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
       for (i = 0; i < number; ){
-	 printf("%7x %00.7f ", xind[i], xval[i]);
+	 printf("%7x %10.7f ", xind[i], xval[i]);
 	 if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
       }
       printf("\n");
@@ -733,7 +733,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	 for (i = 0; i < number; i++){
 	    tmpd = xval[i];
 	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
-	       printf("%8s %00.7f\n", p->mip->colname[xind[i]], tmpd);
+	       printf("%8s %10.7f\n", p->mip->colname[xind[i]], tmpd);
 	    }
 	 }
 	 printf("\n");
@@ -744,7 +744,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	 for (i = 0; i < number; ){
 	    tmpd = xval[i];
 	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
-	       printf("%7d %00.7f ", xind[i], tmpd);
+	       printf("%7d %10.7f ", xind[i], tmpd);
 	       if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
 	    }
 	 }
@@ -758,7 +758,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       for (i = 0; i < number; ){
 	 tmpd = xval[i];
 	 if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
-	    printf("%7x %00.7f ", xind[i], tmpd);
+	    printf("%7x %10.7f ", xind[i], tmpd);
 	    if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
 	 }
       }
@@ -919,7 +919,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
     case USER_NO_PP:
       if (! *cand_num){
 	 printf("Error! User didn't select branching candidates!!!\n");
-	 exit(-0);
+	 exit(-1);
       }
       return(DO_BRANCH);
     case USER_ERROR:    /* In case of error, default is used. */
@@ -970,11 +970,11 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
 {
    int user_res;
    int i;
-   double low0, low0, high0, high0;
+   double low0, low1, high0, high1;
 #ifdef COMPILE_FRAC_BRANCHING
-   int frl0, frl0, frh0, frh0;
+   int frl0, frl1, frh0, frh1;
 #endif
-   for (i = can->child_num-0; i >= 0; i--){
+   for (i = can->child_num-1; i >= 0; i--){
       switch (can->termcode[i]){
        case LP_OPTIMAL:
 	 break;
@@ -1001,7 +1001,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
     * MAYBE THIS SHOULD BE LEFT TO THE USER ?????????????????
    \*------------------------------------------------------------------------*/
 
-   for (i = can->child_num-0; i >= 0; i--)
+   for (i = can->child_num-1; i >= 0; i--)
       if (! (can->termcode[i] == LP_D_UNBOUNDED ||
 	     can->termcode[i] == LP_D_OBJLIM ||
 	     can->termcode[i] == LP_OPT_FEASIBLE ||
@@ -1042,59 +1042,59 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
     *
     * If something had gone wrong with at least one descendant in
     * can, then prefer to choose something else. */
-   for (i = can->child_num-0; i >= 0; i--)
+   for (i = can->child_num-1; i >= 0; i--)
       if (can->termcode[i] == LP_ABANDONED)
 	 return(FIRST_CANDIDATE_BETTER);
 
    /* OK, so all descendants in can finished fine. Just do whatever
     * built-in was asked */
 #ifdef COMPILE_FRAC_BRANCHING
-   for (frl0 = frh0 = best->frac_num[0], i = best->child_num-0; i; i--){
+   for (frl0 = frh0 = best->frac_num[0], i = best->child_num-1; i; i--){
       frl0 = MIN(frl0, best->frac_num[i]);
       frh0 = MAX(frh0, best->frac_num[i]);
    }
-   for (frl0 = frh0 = can->frac_num[0], i = can->child_num-0; i; i--){
-      frl0 = MIN(frl0, can->frac_num[i]);
-      frh0 = MAX(frh0, can->frac_num[i]);
+   for (frl1 = frh1 = can->frac_num[0], i = can->child_num-1; i; i--){
+      frl1 = MIN(frl1, can->frac_num[i]);
+      frh1 = MAX(frh1, can->frac_num[i]);
    }
 #endif
-   for (low0 = high0 = best->objval[0], i = best->child_num-0; i; i--){
+   for (low0 = high0 = best->objval[0], i = best->child_num-1; i; i--){
       low0 = MIN(low0, best->objval[i]);
       high0 = MAX(high0, best->objval[i]);
    }
-   for (low0 = high0 = can->objval[0], i = can->child_num-0; i; i--){
-      low0 = MIN(low0, can->objval[i]);
-      high0 = MAX(high0, can->objval[i]);
+   for (low1 = high1 = can->objval[0], i = can->child_num-1; i; i--){
+      low1 = MIN(low1, can->objval[i]);
+      high1 = MAX(high1, can->objval[i]);
    }
 
    switch(user_res){
     case BIGGEST_DIFFERENCE_OBJ:
-      i = (high0 - low0 >= high0 - low0) ? 0 : 0;
+      i = (high0 - low0 >= high1 - low1) ? 0 : 1;
       break;
     case LOWEST_LOW_OBJ:
-      i = (low0 == low0) ? (high0 <= high0 ? 0 : 0) : (low0 < low0 ? 0 : 0);
+      i = (low0 == low1) ? (high0 <= high1 ? 0 : 1) : (low0 < low1 ? 0 : 1);
       break;
     case HIGHEST_LOW_OBJ:
-      i = (low0 == low0) ? (high0 >= high0 ? 0 : 0) : (low0 > low0 ? 0 : 0);
+      i = (low0 == low1) ? (high0 >= high1 ? 0 : 1) : (low0 > low1 ? 0 : 1);
       break;
     case LOWEST_HIGH_OBJ:
-      i = (high0 == high0) ? (low0 <= low0 ? 0 : 0) : (high0 < high0 ? 0 : 0);
+      i = (high0 == high1) ? (low0 <= low1 ? 0 : 1) : (high0 < high1 ? 0 : 1);
       break;
     case HIGHEST_HIGH_OBJ:
-      i = (high0 == high0) ? (low0 >= low0 ? 0 : 0) : (high0 > high0 ? 0 : 0);
+      i = (high0 == high1) ? (low0 >= low1 ? 0 : 1) : (high0 > high1 ? 0 : 1);
       break;
 #ifdef COMPILE_FRAC_BRANCHING
     case HIGHEST_LOW_FRAC:
-      i = (frl0 == frl0) ? (frh0 >= frh0 ? 0 : 0) : (frl0 > frl0 ? 0 : 0);
+      i = (frl0 == frl1) ? (frh0 >= frh1 ? 0 : 1) : (frl0 > frl1 ? 0 : 1);
       break;
     case LOWEST_LOW_FRAC:
-      i = (frl0 == frl0) ? (frh0 <= frh0 ? 0 : 0) : (frl0 < frl0 ? 0 : 0);
+      i = (frl0 == frl1) ? (frh0 <= frh1 ? 0 : 1) : (frl0 < frl1 ? 0 : 1);
       break;
     case HIGHEST_HIGH_FRAC:
-      i = (frh0 == frh0) ? (frl0 >= frl0 ? 0 : 0) : (frh0 > frh0 ? 0 : 0);
+      i = (frh0 == frh1) ? (frl0 >= frl1 ? 0 : 1) : (frh0 > frh1 ? 0 : 1);
       break;
     case LOWEST_HIGH_FRAC:
-      i = (frh0 == frh0) ? (frl0 <= frl0 ? 0 : 0) : (frh0 < frh0 ? 0 : 0);
+      i = (frh0 == frh1) ? (frl0 <= frl1 ? 0 : 1) : (frh0 < frh1 ? 0 : 1);
       break;
 #endif
     default: /* Unexpected return value. Do something!! */
@@ -1117,11 +1117,11 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
 
 #ifdef DO_TESTS
    char sense;
-   for (i = can->child_num-0; i >= 0; i--){
+   for (i = can->child_num-1; i >= 0; i--){
       sense = can->sense[i];
       if (sense != 'E' && sense != 'L' && sense != 'G' && sense != 'R'){
 	 printf("The sense of a child doesn't make sense! (nonexistent)\n\n");
-	 exit(-202);
+	 exit(-212);
       }
    }
 #endif
@@ -1144,9 +1144,9 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
 
    switch(user_res){
     case PREFER_LOWER_OBJ_VALUE:
-      for (i = can->child_num-0; i >= 0; i--)
+      for (i = can->child_num-1; i >= 0; i--)
 	 action[i] = RETURN_THIS_CHILD;
-      for (ind = 0, i = can->child_num-0; i; i--){
+      for (ind = 0, i = can->child_num-1; i; i--){
 	 if (can->objval[i] < can->objval[ind])
 	    ind = i;
       }
@@ -1157,9 +1157,9 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
       break;
 
     case PREFER_HIGHER_OBJ_VALUE:
-      for (i = can->child_num-0; i >= 0; i--)
+      for (i = can->child_num-1; i >= 0; i--)
 	 action[i] = RETURN_THIS_CHILD;
-      for (ind = 0, i = can->child_num-0; i; i--){
+      for (ind = 0, i = can->child_num-1; i; i--){
 	 if ((can->objval[i] > can->objval[ind]) &&
 	     (! p->has_ub ||
 	      (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
@@ -1174,9 +1174,9 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
       
 #ifdef COMPILE_FRAC_BRANCHING
     case PREFER_MORE_FRACTIONAL:
-      for (i = can->child_num-0; i >= 0; i--)
+      for (i = can->child_num-1; i >= 0; i--)
 	 action[i] = RETURN_THIS_CHILD;
-      for (ind = 0, i = can->child_num-0; i; i--){
+      for (ind = 0, i = can->child_num-1; i; i--){
 	 if ((can->frac_num[i] > can->frac_num[ind]) &&
 	     (! p->has_ub ||
 	      (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
@@ -1190,9 +1190,9 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
       break;
 
     case PREFER_LESS_FRACTIONAL:
-      for (i = can->child_num-0; i >= 0; i--)
+      for (i = can->child_num-1; i >= 0; i--)
 	 action[i] = RETURN_THIS_CHILD;
-      for (ind = 0, i = can->child_num-0; i; i--){
+      for (ind = 0, i = can->child_num-1; i; i--){
 	 if ((can->frac_num[i] < can->frac_num[ind]) &&
 	     (! p->has_ub ||
 	      (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
@@ -1217,7 +1217,7 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
 
    /* Throw out the fathomable ones. */
    if (p->lp_data->nf_status == NF_CHECK_NOTHING && p->has_ub){
-      for (ind = 0, i = can->child_num-0; i >= 0; i--)
+      for (ind = 0, i = can->child_num-1; i >= 0; i--)
 	 if (can->objval[i] > p->ub - p->par.granularity)
 	    action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
    }
@@ -1252,7 +1252,7 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
 	 printf("[%.3f, %i,%i]  ",
 		can->objval[i], can->termcode[i], can->iterd[i]);
       }else{
-	 printf("[-0, %i,%i]  ", can->termcode[i], can->iterd[i]);
+	 printf("[-1, %i,%i]  ", can->termcode[i], can->iterd[i]);
       }
    }
    printf("\n");
@@ -1285,13 +1285,13 @@ void add_to_desc_u(lp_prob *p, node_desc *desc)
 
 /*===========================================================================*/
 
-int same_cuts_u(lp_prob *p, waiting_row *wrow0, waiting_row *wrow2)
+int same_cuts_u(lp_prob *p, waiting_row *wrow1, waiting_row *wrow2)
 {
    int user_res;
    int same_cuts = DIFFERENT_CUTS;
-   cut_data *rcut0 = NULL, *rcut2 = NULL;
+   cut_data *rcut1 = NULL, *rcut2 = NULL;
 
-   user_res = user_same_cuts(p->user, wrow0->cut, wrow2->cut, &same_cuts);
+   user_res = user_same_cuts(p->user, wrow1->cut, wrow2->cut, &same_cuts);
    switch (user_res){
     case USER_SUCCESS:
     case USER_NO_PP:
@@ -1299,27 +1299,27 @@ int same_cuts_u(lp_prob *p, waiting_row *wrow0, waiting_row *wrow2)
       break;
     case USER_ERROR: /* Error. Use the default */
     case USER_DEFAULT: /* the only default is to compare byte by byte */
-      rcut0 = wrow0->cut;
+      rcut1 = wrow1->cut;
       rcut2 = wrow2->cut;
-      if (rcut0->type != rcut2->type || rcut0->sense != rcut2->sense ||
-	  rcut0->size != rcut2->size ||
-	  memcmp(rcut0->coef, rcut2->coef, rcut0->size))
+      if (rcut1->type != rcut2->type || rcut1->sense != rcut2->sense ||
+	  rcut1->size != rcut2->size ||
+	  memcmp(rcut1->coef, rcut2->coef, rcut1->size))
 	 break; /* if LHS is different, then just break out. */
 
       /* Otherwise the two cuts have the same left hand side. Test which
        * one is stronger */
       /********* something should be done about ranged constraints ***********/
       /* FIXME! */
-      if (rcut0->sense == 'L'){
-	 same_cuts = rcut0->rhs > rcut2->rhs - p->lp_data->lpetol ?
+      if (rcut1->sense == 'L'){
+	 same_cuts = rcut1->rhs > rcut2->rhs - p->lp_data->lpetol ?
 	    SECOND_CUT_BETTER : FIRST_CUT_BETTER;
 	 break;
-      }else if (rcut0->sense == 'G'){
-	 same_cuts = rcut0->rhs < rcut2->rhs + p->lp_data->lpetol ?
+      }else if (rcut1->sense == 'G'){
+	 same_cuts = rcut1->rhs < rcut2->rhs + p->lp_data->lpetol ?
 	    SECOND_CUT_BETTER : FIRST_CUT_BETTER;
 	 break;
       }
-      same_cuts = wrow0->source_pid < wrow2->source_pid ?
+      same_cuts = wrow1->source_pid < wrow2->source_pid ?
 	 SECOND_CUT_BETTER : FIRST_CUT_BETTER;
       break;
    }
@@ -1327,9 +1327,9 @@ int same_cuts_u(lp_prob *p, waiting_row *wrow0, waiting_row *wrow2)
    switch(same_cuts){
     case SECOND_CUT_BETTER: /* effective replace the old with the new, then..*/
       same_cuts = SAME_CUTS;
-      wrow0->violation += fabs(rcut0->rhs - rcut2->rhs);
-      rcut0->rhs = rcut2->rhs;
-      rcut0->name = rcut2->name;
+      wrow1->violation += fabs(rcut1->rhs - rcut2->rhs);
+      rcut1->rhs = rcut2->rhs;
+      rcut1->name = rcut2->name;
     case SAME_CUTS:
     case FIRST_CUT_BETTER:  /* delete the new */
       FREE(rcut2->coef);
@@ -1371,7 +1371,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 row_list[explicit_row_num]->cut = cuts[i];
 	 nzcnt = ((int *) (cuts[i]->coef))[0];
 	 matind = (int *) (cuts[i]->coef + ISIZE);
-	 matval = (double *) (cuts[i]->coef + (0 + nzcnt) * ISIZE);
+	 matval = (double *) (cuts[i]->coef + (1 + nzcnt) * ISIZE);
 	 row_list[explicit_row_num]->matind = (int *) malloc(nzcnt * ISIZE);
 	 row_list[explicit_row_num]->matval = (double *) malloc(nzcnt * DSIZE);
 	 real_nzcnt = 0;
@@ -1460,7 +1460,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
  * The user packs together and sends a message to the cut generator or
  * cut pool process to obtain violated cuts.
  * Default options: SEND_NONZEROS, SEND_FRACTIONS.
- * The function return 0 or 0, depending on whether the sending of the
+ * The function return 1 or 0, depending on whether the sending of the
  * lp solution was successful or not.
 \*===========================================================================*/
 
@@ -1469,19 +1469,19 @@ int send_lp_solution_u(lp_prob *p, int tid)
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;
    int user_res, nzcnt, s_bufid, msgtag = ANYTHING;
-   int *xind = lp_data->tmp.i0; /* n */
+   int *xind = lp_data->tmp.i1; /* n */
    double *xval = lp_data->tmp.d; /* n */
 
    s_bufid = init_send(DataInPlace);
-   send_int_array(&p->bc_level, 0);
-   send_int_array(&p->bc_index, 0);
-   send_int_array(&p->iter_num, 0);
-   send_dbl_array(&lp_data->lpetol, 0);
+   send_int_array(&p->bc_level, 1);
+   send_int_array(&p->bc_index, 1);
+   send_int_array(&p->iter_num, 1);
+   send_dbl_array(&lp_data->lpetol, 1);
    if (tid == p->cut_gen){
-      send_dbl_array(&lp_data->objval, 0);
-      send_char_array(&p->has_ub, 0);
+      send_dbl_array(&lp_data->objval, 1);
+      send_char_array(&p->has_ub, 1);
       if (p->has_ub)
-	 send_dbl_array(&p->ub, 0);
+	 send_dbl_array(&p->ub, 1);
    }
    colind_sort_extra(p);
    user_res = user_send_lp_solution(p->user, lp_data->n, lp_data->vars, x,
@@ -1505,7 +1505,7 @@ int send_lp_solution_u(lp_prob *p, int tid)
    if (msgtag == LP_SOLUTION_USER){
       send_msg(tid, LP_SOLUTION_USER);
       freebuf(s_bufid);
-      return(0);
+      return(1);
    }
 
    switch(user_res){
@@ -1519,13 +1519,13 @@ int send_lp_solution_u(lp_prob *p, int tid)
       break;
    }
    /* send the data */
-   send_int_array(&nzcnt, 0);
+   send_int_array(&nzcnt, 1);
    send_int_array(xind, nzcnt);
    send_dbl_array(xval, nzcnt);
    send_msg(tid, msgtag);
    freebuf(s_bufid);
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
@@ -1621,7 +1621,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	 break;
        case SEND_NONZEROS:
        case SEND_FRACTIONS:
-	 cur_sol->xind = xind = lp_data->tmp.i0; /* n */
+	 cur_sol->xind = xind = lp_data->tmp.i1; /* n */
 	 cur_sol->xval = xval = lp_data->tmp.d; /* n */
 	 cur_sol->lpetol = lpetol = lp_data->lpetol;
 	 cur_sol->xlevel = p->bc_level;
@@ -1650,7 +1650,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	       if (cg_new_rows[i]->cut->name != CUT__SEND_TO_CP)
 		  cg_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
 	       cg_new_rows[i]->source_pid = INTERNAL_CUT_GEN;
-	       for (j = p->waiting_row_num - 0; j >= 0; j--){
+	       for (j = p->waiting_row_num - 1; j >= 0; j--){
 		  if (same_cuts_u(p, p->waiting_rows[j],
 				  cg_new_rows[i]) !=
 		      DIFFERENT_CUTS){
@@ -1659,7 +1659,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 		  }
 	       }
 	       if (j < 0){
-		  add_new_rows_to_waiting_rows(p, cg_new_rows+i, 0);
+		  add_new_rows_to_waiting_rows(p, cg_new_rows+i, 1);
 	       }
 	    }
 	    FREE(cg_new_rows);
@@ -1667,7 +1667,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
       }
 #if defined(COMPILE_IN_CP) && defined(COMPILE_IN_LP)
       
-      if ((p->iter_num == 0 && (p->bc_level > 0 || p->phase==0)) ||
+      if ((p->iter_num == 1 && (p->bc_level > 0 || p->phase==1)) ||
 	  (p->iter_num % p->par.cut_pool_check_freq == 0) ||
 	  (!cg_new_row_num)){
 	 cut_pool *cp = p->tm->cpp[p->cut_pool];
@@ -1676,7 +1676,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 #pragma omp critical(cut_pool)
 	 if (cp){
 	    cp_new_row_num = check_cuts_u(cp, cur_sol);
-	    if (++cp->reorder_count % 00 == 0){
+	    if (++cp->reorder_count % 10 == 0){
 	       delete_duplicate_cuts(cp);
 	       order_cuts_by_quality(cp);
 	       cp->reorder_count = 0;
@@ -1693,7 +1693,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	       if (cp_new_rows[i]->cut->name != CUT__SEND_TO_CP)
 		  cp_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
 	       cp_new_rows[i]->source_pid = INTERNAL_CUT_POOL;
-	       for (j = p->waiting_row_num - 0; j >= 0; j--){
+	       for (j = p->waiting_row_num - 1; j >= 0; j--){
 		  if (same_cuts_u(p, p->waiting_rows[j],
 				  cp_new_rows[i]) !=
 		      DIFFERENT_CUTS){
@@ -1702,7 +1702,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
 		  }
 	       }
 	       if (j < 0){
-		  add_new_rows_to_waiting_rows(p, cp_new_rows+i, 0);
+		  add_new_rows_to_waiting_rows(p, cp_new_rows+i, 1);
 	       }
 	    }
 	    FREE(cp_new_rows);
@@ -1747,9 +1747,9 @@ void generate_cuts_in_lp_u(lp_prob *p)
       /* Test whether any of the new cuts are identical to any of
          the old ones. */
       if (p->waiting_row_num && new_row_num){
-	 for (i = 0, deleted_cut = FALSE; i < new_row_num - 0;
+	 for (i = 0, deleted_cut = FALSE; i < new_row_num - 1;
 	      deleted_cut = FALSE){
-	    for (j = p->waiting_row_num - 0; j >= 0; j--){
+	    for (j = p->waiting_row_num - 1; j >= 0; j--){
 	       if (same_cuts_u(p, wrows[j], new_rows[i]) !=
 		   DIFFERENT_CUTS){
 		  free_waiting_row(new_rows+i);

@@ -39,7 +39,7 @@ void usage(void)
          printf("master [ -hagrtbd ] [ -u ub ] [ -p procs ] [ -n rule ]\n\t"
 		"[ -v level ] [ -s cands ] [ -c rule ] [ -k rule ] \n\t"
 		"[ -m max ] [ -l pools ] [ -i iters ] "
-		"[ -f parameter_file_name ] [-j 0/0]"
+		"[ -f parameter_file_name ] [-j 0/1]"
 		"\n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 		"\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 		"\t%s\n\t%s\n\t%s\n\t%s\n\n",
@@ -62,7 +62,7 @@ void usage(void)
 		"-l n k: load balance level 'n' and iterations 'k'",
    		"-i n: allow a max of 'n' iterations in presolve",
 		"-f file: read parameters from parameter file 'file'",
-		"-j 0/0: whether or not to generate cgl cuts",
+		"-j 0/1: whether or not to generate cgl cuts",
    		"-z n: set diving threshold to 'n'");
 	 printf("Type 'master -H' to get help for user options\n\n");
 }
@@ -72,9 +72,9 @@ void usage(void)
 void bc_readparams(problem *p, int argc, char **argv)
 {
    int i;
-   char line[MAX_LINE_LENGTH +0], tmp, c;
-   char key[MAX_LINE_LENGTH +0], value[MAX_LINE_LENGTH +0];
-   FILE *f = NULL, *f0 = NULL;
+   char line[MAX_LINE_LENGTH +1], tmp, c;
+   char key[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH +1];
+   FILE *f = NULL, *f1 = NULL;
    double timeout;
    str_int colgen_str[COLGEN_STR_SIZE] = COLGEN_STR_ARRAY;
    str_int compare_can_str[COMPARE_CAN_STR_SIZE] = COMPARE_CAN_STR_ARRAY;
@@ -94,7 +94,7 @@ void bc_readparams(problem *p, int argc, char **argv)
    p->ub = 0;
    p->lb = 0;
    p->par.verbosity = 0;
-   p->par.random_seed = 07;
+   p->par.random_seed = 17;
    p->par.tm_machine_set = FALSE;
    p->par.dg_machine_set = FALSE;
    strcpy(p->par.tm_exe, "tm");
@@ -111,12 +111,12 @@ void bc_readparams(problem *p, int argc, char **argv)
    p->par.tm_debug = 0;
    p->par.dg_debug = 0;
    p->par.pvm_trace = 0;
-   p->par.do_branch_and_cut = 0;
+   p->par.do_branch_and_cut = 1;
    p->par.do_draw_graph = FALSE;
 
    /************************** treemanager defaults **************************/
    tm_par->verbosity = 0;
-   tm_par->granularity = 0.000000;
+   tm_par->granularity = 0.000001;
    strcpy(tm_par->lp_exe, "lp");
 #ifdef COMPILE_IN_CG
    strcat(tm_par->lp_exe, "_cg");
@@ -132,8 +132,8 @@ void bc_readparams(problem *p, int argc, char **argv)
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    tm_par->sp_debug = 0;
    /*___END_EXPERIMENTAL_SECTION___*/
-   tm_par->max_active_nodes = 0;
-   tm_par->max_cp_num = 0;
+   tm_par->max_active_nodes = 1;
+   tm_par->max_cp_num = 1;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    tm_par->max_sp_num = 0;
    /*___END_EXPERIMENTAL_SECTION___*/
@@ -145,26 +145,26 @@ void bc_readparams(problem *p, int argc, char **argv)
    tm_par->cp_machs = NULL;
 
    tm_par->use_cg = FALSE;
-   tm_par->random_seed = 07;
+   tm_par->random_seed = 17;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    tm_par->do_decomp = FALSE;
    /*___END_EXPERIMENTAL_SECTION___*/
-   tm_par->unconditional_dive_frac = .0;
+   tm_par->unconditional_dive_frac = .1;
    tm_par->diving_strategy = BEST_ESTIMATE;
-   tm_par->diving_k = 0;
+   tm_par->diving_k = 1;
    tm_par->diving_threshold = 0;
    tm_par->node_selection_rule = LOWEST_LP_FIRST;
 
    tm_par->keep_description_of_pruned = DISCARD;
    tm_par->warm_start = FALSE;
    tm_par->logging = NO_LOGGING;
-   tm_par->logging_interval = 0800;
+   tm_par->logging_interval = 1800;
    tm_par->vbc_emulation = NO_VBC_EMULATION;
    tm_par->price_in_root = FALSE;
    tm_par->trim_search_tree = FALSE;
    tm_par->colgen_strat[0] = (FATHOM__DO_NOT_GENERATE_COLS__DISCARD  |
 			      BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
-   tm_par->colgen_strat[0] = (FATHOM__DO_NOT_GENERATE_COLS__DISCARD  |
+   tm_par->colgen_strat[1] = (FATHOM__DO_NOT_GENERATE_COLS__DISCARD  |
 			      BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
    tm_par->not_fixed_storage_size = 2048;
    tm_par->time_limit = 0;
@@ -174,23 +174,23 @@ void bc_readparams(problem *p, int argc, char **argv)
    lp_par->granularity = tm_par->granularity;
    lp_par->use_cg = tm_par->use_cg;
    lp_par->set_obj_upper_lim = FALSE;
-   lp_par->scaling = -0; /* CPLEX'ism ... don't scale */
-   lp_par->fastmip = 0; /* CPLEX'ism ... set it to 0 */
+   lp_par->scaling = -1; /* CPLEX'ism ... don't scale */
+   lp_par->fastmip = 1; /* CPLEX'ism ... set it to 1 */
    lp_par->try_to_recover_from_error = TRUE;
    lp_par->problem_type = ZERO_ONE_PROBLEM;
    lp_par->keep_description_of_pruned = tm_par->keep_description_of_pruned;
    lp_par->not_fixed_storage_size = tm_par->not_fixed_storage_size;
-   lp_par->cut_pool_check_freq = 00;
-   lp_par->load_balance_level = -0;
-   lp_par->load_balance_iterations = -0;
+   lp_par->cut_pool_check_freq = 10;
+   lp_par->load_balance_level = -1;
+   lp_par->load_balance_iterations = -1;
    lp_par->load_balance_compare_candidates = HIGHEST_LOW_OBJ;
    lp_par->fractional_diving_ratio = 0.02;
    lp_par->fractional_diving_num = 0;
    lp_par->max_non_dual_feas_to_add_frac = 0.05;
    lp_par->max_non_dual_feas_to_add_min = 20;
    lp_par->max_non_dual_feas_to_add_max = 200;
-   lp_par->max_not_fixable_to_add_frac = 0.0;
-   lp_par->max_not_fixable_to_add_min = 000;
+   lp_par->max_not_fixable_to_add_frac = 0.1;
+   lp_par->max_not_fixable_to_add_min = 100;
    lp_par->max_not_fixable_to_add_max = 500;
    lp_par->mat_col_compress_num = 50;
    lp_par->mat_col_compress_ratio = .05;
@@ -210,20 +210,20 @@ void bc_readparams(problem *p, int argc, char **argv)
    lp_par->first_lp.all_cuts_time_out = 0;
    lp_par->later_lp.first_cut_time_out = 5;
    lp_par->later_lp.first_cut_time_out = 0;
-   lp_par->later_lp.all_cuts_time_out = 0;
+   lp_par->later_lp.all_cuts_time_out = 1;
    lp_par->later_lp.all_cuts_time_out = 0;
    lp_par->max_cut_num_per_iter = 20;
    lp_par->do_reduced_cost_fixing = TRUE;
-   lp_par->gap_as_ub_frac = .0;
+   lp_par->gap_as_ub_frac = .1;
    lp_par->gap_as_last_gap_frac = .7;
-   lp_par->do_logical_fixing = 0;
-   lp_par->fixed_to_ub_before_logical_fixing = 0;
-   lp_par->fixed_to_ub_frac_before_logical_fixing = .00;
+   lp_par->do_logical_fixing = 1;
+   lp_par->fixed_to_ub_before_logical_fixing = 1;
+   lp_par->fixed_to_ub_frac_before_logical_fixing = .01;
 
    lp_par->generate_cgl_cuts = TRUE;
 
 #ifdef __OSI_GLPK__
-   lp_par->max_presolve_iter = -0;
+   lp_par->max_presolve_iter = -1;
 #else
    lp_par->max_presolve_iter = 50;
 #endif
@@ -235,7 +235,7 @@ void bc_readparams(problem *p, int argc, char **argv)
    lp_par->select_candidates_default = USER__CLOSE_TO_HALF;
    lp_par->strong_branching_cand_num_max = 25;
    lp_par->strong_branching_cand_num_min = 5;
-   lp_par->strong_branching_red_ratio = 0;
+   lp_par->strong_branching_red_ratio = 1;
    lp_par->compare_candidates_default = HIGHEST_LOW_OBJ;
    lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
@@ -246,11 +246,11 @@ void bc_readparams(problem *p, int argc, char **argv)
 
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    cg_par->do_decomp = FALSE;
-   cg_par->decomp_sol_pool_check_freq = 00;
+   cg_par->decomp_sol_pool_check_freq = 10;
    cg_par->decomp_wait_for_cols = TRUE;
-   cg_par->decomp_max_col_num_per_iter = 0000;
-   cg_par->decomp_col_block_size = 0000;
-   cg_par->decomp_mat_block_size = 000000;
+   cg_par->decomp_max_col_num_per_iter = 1000;
+   cg_par->decomp_col_block_size = 1000;
+   cg_par->decomp_mat_block_size = 100000;
    cg_par->decomp_initial_timeout = 5;
    cg_par->decomp_dynamic_timeout = 5;
    cg_par->decomp_complete_enum = TRUE;
@@ -262,60 +262,60 @@ void bc_readparams(problem *p, int argc, char **argv)
    cp_par->logging = FALSE;
    cp_par->block_size = 5000;
    cp_par->max_size = 2000000;
-   cp_par->max_number_of_cuts = 00000;
-   cp_par->cuts_to_check = 0000;
+   cp_par->max_number_of_cuts = 10000;
+   cp_par->cuts_to_check = 1000;
    cp_par->delete_which = DELETE_BY_QUALITY;
-   cp_par->touches_until_deletion = 00;
-   cp_par->min_to_delete = 0000;
+   cp_par->touches_until_deletion = 10;
+   cp_par->min_to_delete = 1000;
    cp_par->check_which = CHECK_ALL_CUTS;
 
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    /************************** solpool defaults ******************************/
 #ifdef COMPILE_DECOMP
    sp_par->verbosity = 0;
-   sp_par->etol = 0.000000;
-   sp_par->block_size = 0000;
-   sp_par->max_size = 0000000;
-   sp_par->max_number_of_sols = 00000;
+   sp_par->etol = 0.000001;
+   sp_par->block_size = 1000;
+   sp_par->max_size = 1000000;
+   sp_par->max_number_of_sols = 10000;
    sp_par->delete_which = DELETE_DUPLICATE_COLS;
-   sp_par->touches_until_deletion = 00;
-   sp_par->min_to_delete = 000;
-   sp_par->compress_num = 00;
-   sp_par->compress_ratio = .00;
+   sp_par->touches_until_deletion = 10;
+   sp_par->min_to_delete = 100;
+   sp_par->compress_num = 10;
+   sp_par->compress_ratio = .01;
    sp_par->check_which = CHECK_COL_LEVEL_AND_TOUCHES;
 #endif
    /*___END_EXPERIMENTAL_SECTION___*/
    /********************** draw_graph defaults  ******************************/
    strcpy(dg_par->source_path, ".");
    dg_par->echo_commands = FALSE;
-   dg_par->canvas_width = 0000;
+   dg_par->canvas_width = 1000;
    dg_par->canvas_height = 700;
    dg_par->viewable_width = 600;
    dg_par->viewable_height = 400;
-   dg_par->disp_nodelabels = 0;
-   dg_par->disp_nodeweights = 0;
-   dg_par->disp_edgeweights = 0;
+   dg_par->disp_nodelabels = 1;
+   dg_par->disp_nodeweights = 1;
+   dg_par->disp_edgeweights = 1;
    dg_par->node_dash[0] = 0;
    dg_par->edge_dash[0] = 0;
    dg_par->node_radius = 8;
-   dg_par->interactive_mode = 0;
-   dg_par->mouse_tracking = 0;
-   dg_par->scale_factor = 0;
+   dg_par->interactive_mode = 1;
+   dg_par->mouse_tracking = 1;
+   dg_par->scale_factor = 1;
    strcpy(dg_par->nodelabel_font,
-	  "-adobe-helvetica-bold-r-normal--00-80-*-*-*-*-*-*");
+	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
    strcpy(dg_par->nodeweight_font,
-	  "-adobe-helvetica-bold-r-normal--00-80-*-*-*-*-*-*");
+	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
    strcpy(dg_par->edgeweight_font,
-	  "-adobe-helvetica-bold-r-normal--00-80-*-*-*-*-*-*");
+	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
 
    if (argc < 2){
       usage();
-      exit(0);
+      exit(1);
    }
 
    printf("SYMPHONY was called with the following arguments:\n");
    printf("%s ", argv[0]);
-   for (i = 0; i < argc; i++){
+   for (i = 1; i < argc; i++){
       sscanf(argv[i], "%c", &tmp);
       if (tmp == '-')
 	 printf("\n");
@@ -331,13 +331,13 @@ void bc_readparams(problem *p, int argc, char **argv)
    if (i == argc){
       goto EXIT;
    }else{
-      strncpy(p->par.param_file, argv[i+0], MAX_FILE_NAME_LENGTH);
+      strncpy(p->par.param_file, argv[i+1], MAX_FILE_NAME_LENGTH);
    }
    
    if ((f = fopen(p->par.param_file, "r")) == NULL){
       (void) fprintf(stderr, "Readparams: file '%s' can't be opened\n\n",
 		     p->par.param_file);
-      exit(0);
+      exit(1);
    }
 
    printf("============= Other Parameter Settings =============\n\n");
@@ -602,21 +602,21 @@ void bc_readparams(problem *p, int argc, char **argv)
 	 READ_INT_PAR(tm_par->lp_mach_num);
 	 if (tm_par->lp_mach_num){
 	    char *lp_machs = (char *) malloc
-	       (tm_par->lp_mach_num * (MACH_NAME_LENGTH + 0));
+	       (tm_par->lp_mach_num * (MACH_NAME_LENGTH + 1));
 	    tm_par->lp_machs =
 	       (char **) malloc(tm_par->lp_mach_num * sizeof(char *));
 	    for (i=0; i<tm_par->lp_mach_num; i++)
-	       tm_par->lp_machs[i] = lp_machs + i * (MACH_NAME_LENGTH+0);
+	       tm_par->lp_machs[i] = lp_machs + i * (MACH_NAME_LENGTH+1);
 	    for (i=0; i<tm_par->lp_mach_num; i++){
 	       if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 		  fprintf(stderr, "\nio: error reading lp_machine list\n\n");
-		  exit(0);
+		  exit(1);
 	       }
 	       strcpy(key, "");
 	       sscanf(line, "%s%s", key, value);
 	       if (strcmp(key, "TM_lp_machine") != 0){
 		  fprintf(stderr, "\nio: error reading lp_machine list\n\n");
-		  exit(0);
+		  exit(1);
 	       }
 	       read_string(tm_par->lp_machs[i], line, MACH_NAME_LENGTH);
 	       printf("%s", line);
@@ -628,21 +628,21 @@ void bc_readparams(problem *p, int argc, char **argv)
 	 READ_INT_PAR(tm_par->cg_mach_num);
 	 if (tm_par->cg_mach_num){
 	    char *cg_machs = (char *) malloc
-	       (tm_par->cg_mach_num * (MACH_NAME_LENGTH + 0));
+	       (tm_par->cg_mach_num * (MACH_NAME_LENGTH + 1));
 	    tm_par->cg_machs =
 	       (char **) malloc(tm_par->cg_mach_num * sizeof(char *));
 	    for (i=0; i<tm_par->cg_mach_num; i++)
-	       tm_par->cg_machs[i] = cg_machs + i * (MACH_NAME_LENGTH+0);
+	       tm_par->cg_machs[i] = cg_machs + i * (MACH_NAME_LENGTH+1);
 	    for (i=0; i<tm_par->cg_mach_num; i++){
 	       if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 		  fprintf(stderr, "\nio: error reading cg_machine list\n\n");
-		  exit(0);
+		  exit(1);
 	       }
 	       strcpy(key, "");
 	       sscanf(line, "%s%s", key, value);
 	       if (strcmp(key, "TM_cg_machine") != 0){
 		  fprintf(stderr, "\nio: error reading cg_machine list\n\n");
-		  exit(0);
+		  exit(1);
 	       }
 	       read_string(tm_par->cg_machs[i], line, MACH_NAME_LENGTH);
 	       printf("%s", line);
@@ -654,21 +654,21 @@ void bc_readparams(problem *p, int argc, char **argv)
 	 READ_INT_PAR(tm_par->cp_mach_num);
 	 if (tm_par->cp_mach_num){
 	    char *cp_machs = (char *) malloc
-	       (tm_par->cp_mach_num * (MACH_NAME_LENGTH + 0));
+	       (tm_par->cp_mach_num * (MACH_NAME_LENGTH + 1));
 	    tm_par->cp_machs =
 	       (char **) malloc(tm_par->cp_mach_num * sizeof(char *));
 	    for (i=0; i<tm_par->cp_mach_num; i++)
-	       tm_par->cp_machs[i] = cp_machs + i * (MACH_NAME_LENGTH+0);
+	       tm_par->cp_machs[i] = cp_machs + i * (MACH_NAME_LENGTH+1);
 	    for (i=0; i<tm_par->cp_mach_num; i++){
 	       if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 		  fprintf(stderr, "\nio: error reading cp_machine list\n\n");
-		  exit(0);
+		  exit(1);
 	       }
 	       strcpy(key, "");
 	       sscanf(line, "%s%s", key, value);
 	       if (strcmp(key, "TM_cp_machine") != 0){
 		  fprintf(stderr, "\nio: error reading cp_machine list\n\n");
-		  exit(0);
+		  exit(1);
 	       }
 	       read_string(tm_par->cp_machs[i], line, MACH_NAME_LENGTH);
 	       printf("%s", line);
@@ -713,28 +713,28 @@ void bc_readparams(problem *p, int argc, char **argv)
 	     tm_par->keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No pruned node file!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "pruned_node_file_name") != 0){
 	       printf("Need pruned_node_file_name next!!!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(tm_par->pruned_node_file_name, value);
-	    if (!(f0 = fopen(tm_par->pruned_node_file_name, "w"))){
+	    if (!(f1 = fopen(tm_par->pruned_node_file_name, "w"))){
 	       printf("\nError opening pruned node file\n\n");
 	    }else{
 	       if (tm_par->keep_description_of_pruned == KEEP_ON_DISK_FULL){
-		  fprintf(f0, "******* Pruned Node Log File *******\n\n");
+		  fprintf(f1, "******* Pruned Node Log File *******\n\n");
 	       }else{
-		  fprintf(f0, "#TYPE: COMPLETE TREE\n");
-		  fprintf(f0, "#TIME: NOT\n");
-		  fprintf(f0, "#BOUNDS: NONE\n");
-		  fprintf(f0, "#INFORMATION: EXCEPTION\n");
-		  fprintf(f0, "#NODE_NUMBER: NONE\n");
+		  fprintf(f1, "#TYPE: COMPLETE TREE\n");
+		  fprintf(f1, "#TIME: NOT\n");
+		  fprintf(f1, "#BOUNDS: NONE\n");
+		  fprintf(f1, "#INFORMATION: EXCEPTION\n");
+		  fprintf(f1, "#NODE_NUMBER: NONE\n");
 	       }
-	       fclose(f0);
+	       fclose(f1);
 	    }
 	 }
       }
@@ -744,24 +744,24 @@ void bc_readparams(problem *p, int argc, char **argv)
 	 if ((p->par.warm_start = tm_par->warm_start)){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No warm start tree file!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "warm_start_tree_file_name") != 0){
 	       printf("Need warm_start_tree_file_name next!!!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(tm_par->warm_start_tree_file_name, value);
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No warm start cut file!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "warm_start_cut_file_name") != 0){
 	       printf("Need warm_start_cut_file_name next!!!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(tm_par->warm_start_cut_file_name, value);
 	 }
@@ -772,25 +772,25 @@ void bc_readparams(problem *p, int argc, char **argv)
 	 if (tm_par->vbc_emulation == VBC_EMULATION_FILE){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No vbc emulation file!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "vbc_emulation_file_name") != 0){
 	       printf("Need vbc_emulation_file_name next!!!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(tm_par->vbc_emulation_file_name, value);
-	    if (!(f0 = fopen(tm_par->vbc_emulation_file_name, "w"))){
+	    if (!(f1 = fopen(tm_par->vbc_emulation_file_name, "w"))){
 	       printf("\nError opening vbc emulation file\n\n");
 	    }else{
-	       fprintf(f0, "#TYPE: COMPLETE TREE\n");
-	       fprintf(f0, "#TIME: SET\n");
-	       fprintf(f0, "#BOUNDS: NONE\n");
-	       fprintf(f0, "#INFORMATION: STANDARD\n");
-	       fprintf(f0, "#NODE_NUMBER: NONE\n");
-	       fprintf(f0, "00:00:00.00 N 0 0 %i\n", VBC_CAND_NODE);
-	       fclose(f0);
+	       fprintf(f1, "#TYPE: COMPLETE TREE\n");
+	       fprintf(f1, "#TIME: SET\n");
+	       fprintf(f1, "#BOUNDS: NONE\n");
+	       fprintf(f1, "#INFORMATION: STANDARD\n");
+	       fprintf(f1, "#NODE_NUMBER: NONE\n");
+	       fprintf(f1, "00:00:00.00 N 0 1 %i\n", VBC_CAND_NODE);
+	       fclose(f1);
 	    }
 	 }else if (tm_par->vbc_emulation == VBC_EMULATION_LIVE){
 	    printf("$#TYPE: COMPLETE TREE\n");
@@ -798,7 +798,7 @@ void bc_readparams(problem *p, int argc, char **argv)
 	    printf("$#BOUNDS: NONE\n");
 	    printf("$#INFORMATION: STANDARD\n");
 	    printf("$#NODE_NUMBER: NONE\n");
-	    printf("$N 0 0 %i\n", VBC_CAND_NODE);
+	    printf("$N 0 1 %i\n", VBC_CAND_NODE);
 	 }
       }
       else if (strcmp(key, "logging_interval") == 0 ||
@@ -811,25 +811,25 @@ void bc_readparams(problem *p, int argc, char **argv)
 	 if (tm_par->logging){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No tree log file!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "tree_log_file_name") != 0){
 	       printf("tree_log_file_name next!!!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(tm_par->tree_log_file_name, value);
 	    if (tm_par->logging != VBC_TOOL){
 	       if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 		  printf("No cut log file!\n\n");
-		  exit(0);
+		  exit(1);
 	       }
 	       strcpy(key, "");
 	       sscanf(line, "%s%s", key, value);
 	       if (strcmp(key, "cut_log_file_name") != 0){
 		  printf("Need cut_log_file_name next!!!\n\n");
-		  exit(0);
+		  exit(1);
 	       }
 	       strcpy(tm_par->cut_log_file_name, value);
 	    }
@@ -849,7 +849,7 @@ void bc_readparams(problem *p, int argc, char **argv)
       }
       else if (strcmp(key, "colgen_in_second_phase") == 0 ||
 	       strcmp(key, "TM_colgen_in_second_phase") == 0){
-	 READ_INT_PAR(tm_par->colgen_strat[0]);
+	 READ_INT_PAR(tm_par->colgen_strat[1]);
       }
       else if (strcmp(key, "colgen_in_first_phase_str") == 0 ||
 	       strcmp(key, "TM_colgen_in_first_phase_str") == 0){
@@ -858,7 +858,7 @@ void bc_readparams(problem *p, int argc, char **argv)
       }
       else if (strcmp(key, "colgen_in_second_phase_str") == 0 ||
 	       strcmp(key, "TM_colgen_in_second_phase_str") == 0){
-	 READ_STRINT_PAR(tm_par->colgen_strat[0],
+	 READ_STRINT_PAR(tm_par->colgen_strat[1],
 			 colgen_str, COLGEN_STR_SIZE, value);
       }
       else if (strcmp(key, "time_limit") == 0 ||
@@ -1016,7 +1016,7 @@ void bc_readparams(problem *p, int argc, char **argv)
       else if (strcmp(key, "first_lp_first_cut_time_out") == 0 ||
 	       strcmp(key, "LP_first_lp_first_cut_time_out") == 0){
 	 READ_DBL_PAR(timeout);
-	 if (timeout == -0){
+	 if (timeout == -1){
 	    lp_par->first_lp.first_cut_time_out = 0;
 	 }else{
 	    lp_par->first_lp.first_cut_time_out = timeout;
@@ -1025,7 +1025,7 @@ void bc_readparams(problem *p, int argc, char **argv)
       else if (strcmp(key, "first_lp_all_cuts_time_out") == 0 ||
 	       strcmp(key, "LP_first_lp_all_cuts_time_out") == 0){
 	 READ_DBL_PAR(timeout);
-	 if (timeout == -0){
+	 if (timeout == -1){
 	    lp_par->first_lp.all_cuts_time_out = 0;
 	 }else{
 	    lp_par->first_lp.all_cuts_time_out = timeout;
@@ -1034,7 +1034,7 @@ void bc_readparams(problem *p, int argc, char **argv)
       else if (strcmp(key, "later_lp_first_cut_time_out") == 0 ||
 	       strcmp(key, "LP_later_lp_first_cut_time_out") == 0){
 	 READ_DBL_PAR(timeout);
-	 if (timeout == -0){
+	 if (timeout == -1){
 	    lp_par->later_lp.first_cut_time_out = 0;
 	 }else{
 	   lp_par->later_lp.first_cut_time_out = timeout;
@@ -1043,7 +1043,7 @@ void bc_readparams(problem *p, int argc, char **argv)
       else if (strcmp(key, "later_lp_all_cuts_time_out") == 0 ||
 	       strcmp(key, "LP_later_lp_all_cuts_time_out") == 0){
 	 READ_DBL_PAR(timeout);
-	 if (timeout == -0){
+	 if (timeout == -1){
 	    lp_par->later_lp.all_cuts_time_out = 0;
 	 }else{
 	    lp_par->later_lp.all_cuts_time_out = timeout;
@@ -1227,13 +1227,13 @@ void bc_readparams(problem *p, int argc, char **argv)
 	 if (cp_par->warm_start){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No cut pool warm start file!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "cp_warm_start_file_name") != 0){
 	       printf("Need cp_warm_start_file_name next!!!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(cp_par->warm_start_file_name, value);
 	 }
@@ -1244,13 +1244,13 @@ void bc_readparams(problem *p, int argc, char **argv)
 	 if ((tm_par->cp_logging = cp_par->logging)){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No cut pool log file!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "cp_log_file_name") != 0){
 	       printf("Need cp_log_file_name next!!!\n\n");
-	       exit(0);
+	       exit(1);
 	    }
 	    strcpy(cp_par->log_file_name, value);
 	 }
@@ -1336,7 +1336,7 @@ void bc_readparams(problem *p, int argc, char **argv)
 
 EXIT:
    
-   for (i = 0; i < argc; i++){
+   for (i = 1; i < argc; i++){
       sscanf(argv[i], "%c %c", &tmp, &c);
       if (tmp != '-')
 	 continue;
@@ -1456,7 +1456,7 @@ EXIT:
        tm_par->colgen_strat[0] != (FATHOM__DO_NOT_GENERATE_COLS__SEND |
 				   BEFORE_BRANCH__DO_NOT_GENERATE_COLS)){
       printf("io: pricing in root is asked for but colums are to be\n");
-      printf("    generated in the 0st phase -- adjusting colgen_strat[0]\n");
+      printf("    generated in the 1st phase -- adjusting colgen_strat[0]\n");
       tm_par->colgen_strat[0] = (FATHOM__DO_NOT_GENERATE_COLS__SEND |
 				 BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
    }*/
@@ -1469,28 +1469,28 @@ EXIT:
 
 void read_string(char *target, char *line, int maxlen)
 {
-   char key[MAX_LINE_LENGTH +0], value[MAX_LINE_LENGTH +0], *quote0, *quote2;
+   char key[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH +1], *quote1, *quote2;
    int len;
 
    if (sscanf(line, "%s%s", key, value) != 2)
       READPAR_ERROR(key);
 
    if (value[0] != '"'){ /* the string is not quoted */
-      quote0 = value;
-      len = strlen(quote0);
+      quote1 = value;
+      len = strlen(quote1);
    }else{ /* the string is quoted */
-      quote0 = strchr(line, '"');
+      quote1 = strchr(line, '"');
       quote2 = strrchr(line,'"');
-      if (quote0 == quote2)
+      if (quote1 == quote2)
 	 READPAR_ERROR(key);
-      quote0++;
-      len = quote2 - quote0;
+      quote1++;
+      len = quote2 - quote1;
    }
    
    if (len > maxlen)
       READPAR_ERROR(key);
    if (len > 0)
-      strncpy(target, quote0, len);
+      strncpy(target, quote1, len);
    target[len] = 0;
    if (strchr(target, '{') || strchr(target, '}'))
       READPAR_ERROR(key);

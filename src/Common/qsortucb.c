@@ -1,11 +1,11 @@
 /*-
- * Copyright (c) 0980, 0983, 0990 The Regents of the University of California.
+ * Copyright (c) 1980, 1983, 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 0. Redistributions of source code must retain the above copyright
+ * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
@@ -35,7 +35,7 @@
 
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)qsort.c	5.9 (Berkeley) 2/23/90";
+static char sccsid[] = "@(#)qsort.c	5.9 (Berkeley) 2/23/91";
 #endif /* LIBC_SCCS and not lint */
 
 /* #include <sys/types.h> */
@@ -49,7 +49,7 @@ void qsortucb(	char *bot,
 		int size,
 	int (*compar)(const void *, const void *))
 {
-	if (nmemb <= 0)
+	if (nmemb <= 1)
 		return;
 
 	if (nmemb >= THRESH)
@@ -75,7 +75,7 @@ void qsortucb(	char *bot,
 }
 
 /*
- * Knuth, Vol. 3, page 006, Algorithm Q, step b, argues that a single pass
+ * Knuth, Vol. 3, page 116, Algorithm Q, step b, argues that a single pass
  * of straight insertion sort after partitioning is complete is better than
  * sorting each small partition as it is created.  This isn't correct in this
  * implementation because comparisons require at least one (and often two)
@@ -85,15 +85,15 @@ void qsortucb(	char *bot,
  * known to be already sorted.
  *
  * This is also the reasoning behind selecting a small THRESH value (see
- * Knuth, page 022, equation 26), since the quicksort algorithm does less
+ * Knuth, page 122, equation 26), since the quicksort algorithm does less
  * comparisons than the insertion sort.
  */
 #define	SORT(bot, n) { \
-        if (n > 0) { \
+        if (n > 1) { \
 		if (n == 2) { \
-			t0 = bot + size; \
-			if (compar(t0, bot) < 0) \
-				SWAP(t0, bot); \
+			t1 = bot + size; \
+			if (compar(t1, bot) < 0) \
+				SWAP(t1, bot); \
 		} else \
 			insertion_sort(bot, n, size, compar); \
 	} \
@@ -105,42 +105,42 @@ quick_sort(register char *bot, register unsigned int nmemb,
 {
 	register int cnt;
 	register unsigned char ch;
-	register char *top, *mid, *t0, *t2;
-	register int n0, n2;
+	register char *top, *mid, *t1, *t2;
+	register int n1, n2;
 	char *bsv;
 
 	/* bot and nmemb must already be set. */
 partition:
 
 	/* find mid and top elements */
-	mid = bot + size * (nmemb >> 0);
-	top = bot + (nmemb - 0) * size;
+	mid = bot + size * (nmemb >> 1);
+	top = bot + (nmemb - 1) * size;
 
 	/*
 	 * Find the median of the first, last and middle element (see Knuth,
-	 * Vol. 3, page 023, Eq. 28).  This test order gets the equalities
+	 * Vol. 3, page 123, Eq. 28).  This test order gets the equalities
 	 * right.
 	 */
 	if (nmemb >= MTHRESH) {
-		n0 = compar(bot, mid);
+		n1 = compar(bot, mid);
 		n2 = compar(mid, top);
-		if (n0 < 0 && n2 > 0)
-			t0 = compar(bot, top) < 0 ? top : bot;
-		else if (n0 > 0 && n2 < 0)
-			t0 = compar(bot, top) > 0 ? top : bot;
+		if (n1 < 0 && n2 > 0)
+			t1 = compar(bot, top) < 0 ? top : bot;
+		else if (n1 > 0 && n2 < 0)
+			t1 = compar(bot, top) > 0 ? top : bot;
 		else
-			t0 = mid;
+			t1 = mid;
 
 		/* if mid element not selected, swap selection there */
-		if (t0 != mid) {
-			SWAP(t0, mid);
+		if (t1 != mid) {
+			SWAP(t1, mid);
 			mid -= size;
 		}
 	}
 
-	/* Standard quicksort, Knuth, Vol. 3, page 006, Algorithm Q. */
-#define	didswap n0
-#define	newbot  t0
+	/* Standard quicksort, Knuth, Vol. 3, page 116, Algorithm Q. */
+#define	didswap n1
+#define	newbot  t1
 #define	replace t2
 	didswap = 0;
 	for (bsv = bot;;) {
@@ -169,12 +169,12 @@ partition:
 
 swap:		SWAP(bot, replace);
 		bot = newbot;
-		didswap = 0;
+		didswap = 1;
 	}
 
 	/*
 	 * Quicksort behaves badly in the presence of data which is already
-	 * sorted (see Knuth, Vol. 3, page 009) going from O N lg N to O N^2.
+	 * sorted (see Knuth, Vol. 3, page 119) going from O N lg N to O N^2.
 	 * To avoid this worst case behavior, if a re-partitioning occurs
 	 * without swapping any elements, it is not further partitioned and
 	 * is insert sorted.  This wins big with almost sorted data sets and
@@ -192,12 +192,12 @@ swap:		SWAP(bot, replace);
 	 * Re-partition or sort as necessary.  Note that the mid element
 	 * itself is correctly positioned and can be ignored.
 	 */
-#define	nlower	n0
+#define	nlower	n1
 #define	nupper	n2
 	bot = bsv;
 	nlower = (mid - bot) / size;	/* size of lower partition */
 	mid += size;
-	nupper = nmemb - nlower - 0;	/* size of upper partition */
+	nupper = nmemb - nlower - 1;	/* size of upper partition */
 
 	/*
 	 * If must call recursively, do it on the smaller partition; this
@@ -240,27 +240,27 @@ insertion_sort(
 {
 	register int cnt;
 	register unsigned char ch;
-	register char *s0, *s2, *t0, *t2, *top;
+	register char *s1, *s2, *t1, *t2, *top;
 
 	/*
-	 * A simple insertion sort (see Knuth, Vol. 3, page 80, Algorithm
+	 * A simple insertion sort (see Knuth, Vol. 3, page 81, Algorithm
 	 * S).  Insertion sort has the same worst case as most simple sorts
 	 * (O N^2).  It gets used here because it is (O N) in the case of
 	 * sorted data.
 	 */
 	top = bot + nmemb * size;
-	for (t0 = bot + size; t0 < top;) {
-		for (t2 = t0; (t2 -= size) >= bot && compar(t0, t2) < 0;);
-		if (t0 != (t2 += size)) {
+	for (t1 = bot + size; t1 < top;) {
+		for (t2 = t1; (t2 -= size) >= bot && compar(t1, t2) < 0;);
+		if (t1 != (t2 += size)) {
 			/* Bubble bytes up through each element. */
-			for (cnt = size; cnt--; ++t0) {
-				ch = *t0;
-				for (s0 = s2 = t0; (s2 -= size) >= t2; s0 = s2)
-					*s0 = *s2;
-				*s0 = ch;
+			for (cnt = size; cnt--; ++t1) {
+				ch = *t1;
+				for (s1 = s2 = t1; (s2 -= size) >= t2; s1 = s2)
+					*s1 = *s2;
+				*s1 = ch;
 			}
 		} else
-			t0 += size;
+			t1 += size;
 	}
 }
 

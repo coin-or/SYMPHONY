@@ -54,10 +54,10 @@ void free_lp_arrays(LPdata *lp_data)
 #endif
    FREE(lp_data->vars);
    FREE(lp_data->tmp.c);
-   FREE(lp_data->tmp.i0);
+   FREE(lp_data->tmp.i1);
    FREE(lp_data->tmp.i2);
    FREE(lp_data->tmp.d);
-   FREE(lp_data->tmp.p0);
+   FREE(lp_data->tmp.p1);
    FREE(lp_data->tmp.p2);
    FREE(lp_data->tmp.cv);
    FREE(lp_data->tmp.iv);
@@ -169,18 +169,18 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
       maxmax = MAX(maxm, maxn);
       /* anything with maxm and maxn in it has to be resized */
       FREE(tmp->c);
-      FREE(tmp->i0);
+      FREE(tmp->i1);
       FREE(tmp->d);
       tmp->c = (char *) malloc(CSIZE * maxmax);
-      tmp->i0 = (int *) malloc(ISIZE * MAX(3*maxm, 2*maxn + 0));
+      tmp->i1 = (int *) malloc(ISIZE * MAX(3*maxm, 2*maxn + 1));
       tmp->d = (double *) malloc(DSIZE * 2 * maxmax);
       /* These have to be resized only if maxm changes */
       if (resize_m){
 	 FREE(tmp->i2);
-	 FREE(tmp->p0);
+	 FREE(tmp->p1);
 	 FREE(tmp->p2);
 	 tmp->i2 = (int *) malloc(maxm * ISIZE);
-	 tmp->p0 = (void **) malloc(maxm * sizeof(void *));
+	 tmp->p1 = (void **) malloc(maxm * sizeof(void *));
 	 tmp->p2 = (void **) malloc(maxm * sizeof(void *));
       }
    }
@@ -188,7 +188,7 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
 
 #ifdef USE_GLPMPL
 
-/*This function reads in the GNU MathProg model file and returns either 0 if 
+/*This function reads in the GNU MathProg model file and returns either 1 if 
   it is succeded or 0 otherwise.*/
 
 int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
@@ -212,8 +212,8 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    errors = mpl_read_model(mpl, modelfile);   /* read the model file */
  
    /*if the data is not in the model file and will be given seperately, 
-     then errors=0! */
-   if (errors == 0){  
+     then errors=1! */
+   if (errors == 1){  
       errors = mpl_read_data(mpl, datafile);
    }
 
@@ -238,43 +238,43 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    strncpy(probname, mpl_get_prob_name(mpl), 80); /* give a name to the problem */
 
    /* get num of rows and cols */
-   mip->m  = mpl_get_num_rows(mpl)-0; /* subtract the objective row */
+   mip->m  = mpl_get_num_rows(mpl)-1; /* subtract the objective row */
    mip->n  = mpl_get_num_cols(mpl);
    mip->nz = 0; /* for now... */
 
-   /*Indices and values of nonzeros will return beginning with indices[0] and
-     values[0]. Also note that row and column indices begin with 0 in glpmpl*/
+   /*Indices and values of nonzeros will return beginning with indices[1] and
+     values[1]. Also note that row and column indices begin with 1 in glpmpl*/
 
    /*get mip->nz and mip->obj*/
    mip->obj    = (double *) calloc(DSIZE, mip->n);
 
-   indices = (int *) malloc(ISIZE * (mip->n + 0));
-   values = (double *) malloc(DSIZE * (mip->n + 0));
+   indices = (int *) malloc(ISIZE * (mip->n + 1));
+   values = (double *) malloc(DSIZE * (mip->n + 1));
 
    count = 0;
 
-   for(i = 0; i < mip->m + 0; i++){
+   for(i = 0; i < mip->m + 1; i++){
 
-      type = mpl_get_row_kind(mpl, i+0);
+      type = mpl_get_row_kind(mpl, i+1);
       if (type == MPL_ST){  /* constraints */
-	 /* mpl_get_mat_row returns the # of nonzeros in the row i+0. */
+	 /* mpl_get_mat_row returns the # of nonzeros in the row i+1. */
 	 mip->obj_sense = MINIMIZE; 
-	 mip->nz += mpl_get_mat_row(mpl, i+0, NULL, NULL); 
+	 mip->nz += mpl_get_mat_row(mpl, i+1, NULL, NULL); 
       }else{
 	 obj_index = i;
-	 mip->obj_offset = mpl_get_row_c0(mpl, i+0);
-	 length = mpl_get_mat_row(mpl, i+0, indices, values);
+	 mip->obj_offset = mpl_get_row_c0(mpl, i+1);
+	 length = mpl_get_mat_row(mpl, i+1, indices, values);
 	 if (type == MPL_MAX){
 	    mip->obj_sense = MAXIMIZE; 
-	    for (j = 0; j <= length; j++){  
-	       mip->obj[indices[j]-0] = -values[j];
+	    for (j = 1; j <= length; j++){  
+	       mip->obj[indices[j]-1] = -values[j];
 	    }
 	 }else{   /* type == MPL_MIN */
-	    for( j = 0; j <= length; j++ ) 
-	       mip->obj[indices[j]-0] = values[j]; /* assign the obj coeff. */
+	    for( j = 1; j <= length; j++ ) 
+	       mip->obj[indices[j]-1] = values[j]; /* assign the obj coeff. */
 	 }
 	 count++;
-	 if (count > 0){
+	 if (count > 1){
 	    printf("\nError due to having more than one objective function!"); 
 	    printf("\nSYMPHONY can solve problems with just one "); 
 	    printf("objective function\n");
@@ -283,7 +283,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
       }      
    }
 
-   if (count < 0){
+   if (count < 1){
       printf("\nError in reading the objective function!"); 
       printf("\nSYMPHONY requires an objective function!");
       return(0);
@@ -293,7 +293,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
       constraint definitions as row ordered, we will change its order later. */
 
    /* fill the dummy matbeg, matind, matval, row_lb and row_ub arrays */
-   matbeg = (int *) malloc(ISIZE * (mip->m + 0));
+   matbeg = (int *) malloc(ISIZE * (mip->m + 1));
    matind = (int *) malloc(ISIZE * mip->nz);
    matval = (double *) malloc(DSIZE * mip->nz);
 
@@ -302,13 +302,13 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 
    matbeg[0] = 0;
    nonzeros = 0;
-   for(i = 0, k = 0; i < mip->m+0; i++){
+   for(i = 0, k = 0; i < mip->m+1; i++){
       if(i != obj_index){
-	 /* read the nonzeros in row i+0 */     
-	 length = mpl_get_mat_row(mpl, i+0, indices, values); 
+	 /* read the nonzeros in row i+1 */     
+	 length = mpl_get_mat_row(mpl, i+1, indices, values); 
 	 /* get the row bounds. we use k instead of i since we have the obj 
 	    row somewhere. */
-	 type = mpl_get_row_bnds(mpl, i+0, &row_lb[k],&row_ub[k]); 
+	 type = mpl_get_row_bnds(mpl, i+1, &row_lb[k],&row_ub[k]); 
 	 switch(type)                                           
 	    {
 	    case MPL_FR:  /* free */
@@ -325,8 +325,8 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	       break;
 	    }
 	 for (j = 0; j < length; j++){
-	    matind[matbeg[k]+j] = indices[j+0] - 0;
-	    matval[matbeg[k]+j] = values[j+0];
+	    matind[matbeg[k]+j] = indices[j+1] - 1;
+	    matval[matbeg[k]+j] = values[j+1];
 	 }
 	 nonzeros += length;
 	 k++;
@@ -342,7 +342,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    mip->colname = (char **)  malloc(sizeof(char *) * mip->n);   
 
    for (j = 0; j < mip->n; j++){
-      type = mpl_get_col_bnds(mpl, j+0, &mip->lb[j], &mip->ub[j]);
+      type = mpl_get_col_bnds(mpl, j+1, &mip->lb[j], &mip->ub[j]);
       switch(type){
       case  MPL_FR: /* free */
 	    mip->lb[j] = -inf;
@@ -358,19 +358,19 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	    break;
 	 }
 
-      type = mpl_get_col_kind(mpl, j+0);
+      type = mpl_get_col_kind(mpl, j+1);
       if(type == MPL_INT || type == MPL_BIN){
 	 mip->is_int[j] = TRUE;
       }  
       /* bounds for binary variables were probably not assigned.So assign them! */
       if(type == MPL_BIN){ 
-	 mip->ub[j] = 0.0;	 
+	 mip->ub[j] = 1.0;	 
 	 mip->lb[j] = 0.0;
 
       }
 
       mip->colname[j] = (char *) malloc(CSIZE * 255); 
-      strncpy(mip->colname[j], mpl_get_col_name(mpl,j+0),255);
+      strncpy(mip->colname[j], mpl_get_col_name(mpl,j+1),255);
       mip->colname[j][254] = 0;  /* ??? */
    }
 
@@ -378,7 +378,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
      column ordered matrix after reversing its order in order to fill the 
      matrix definitons as column ordered*/
 
-   mip->matbeg = (int *)    calloc(ISIZE, (mip->n + 0));
+   mip->matbeg = (int *)    calloc(ISIZE, (mip->n + 1));
    mip->matval = (double *) malloc(DSIZE * mip->nz);
    mip->matind = (int *)    malloc(ISIZE * mip->nz);
 
@@ -390,7 +390,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 
 
    memcpy(mip->matbeg, const_cast<int *>(matrixByCol.getVectorStarts()),
-	  ISIZE * (mip->n + 0));   
+	  ISIZE * (mip->n + 1));   
    memcpy(mip->matval, const_cast<double *> (matrixByCol.getElements()),
 	  DSIZE * mip->nz);  
    memcpy(mip->matind, const_cast<int *> (matrixByCol.getIndices()), 
@@ -401,7 +401,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    nonzeros = 0;
    for(j = 0; j < mip->n; j++){
       for(i = 0; i < mip->m; i++){
-	 for(k = matbeg[i]; k < matbeg[i+0]; k++){
+	 for(k = matbeg[i]; k < matbeg[i+1]; k++){
 	    if(matind[k] == j){	   
 	       mip->matind[nonzeros] = i;
 	       mip->matval[nonzeros] = matval[k];
@@ -410,7 +410,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	    }
 	 }
       } 
-      mip->matbeg[j+0] = nonzeros;
+      mip->matbeg[j+1] = nonzeros;
    }
 
    /*get the other definitions: rhs, sense and rngval from row_lb and row_ub*/
@@ -453,7 +453,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    FREE(row_ub);
    
    /* if you could reach here by chance, then you are safe anymore:) */
-   return(0);
+   return(1);
 }
 #endif /* USE_GLPMPL */
 
@@ -500,15 +500,15 @@ void open_lp_solver(LPdata *lp_data)
   baseModel = ekk_baseModel(lp_data->env);
   osllib_status = (baseModel == NULL);
   OSL_check_error("open_lp_solver - ekk_baseModel");
-  ekk_setDebug(baseModel, -0, 0);
+  ekk_setDebug(baseModel, -1, 0);
   ekk_setIloglevel(baseModel, 2);
-/*  0    - 2999 informational messsages
+/*  1    - 2999 informational messsages
     3000 - 5999 warn
     6000 - 6999 error, but keep running
     7000 - 8999 error and stop running */
-/*    osllib_status = ekk_messagesPrintOn(baseModel, 0, 8999); */
+/*    osllib_status = ekk_messagesPrintOn(baseModel, 1, 8999); */
 /*    OSL_check_error("open_lp_solver - ekk_messagePrintOn"); */
-  osllib_status = ekk_messagesPrintOff(baseModel, 0, 5999);
+  osllib_status = ekk_messagesPrintOff(baseModel, 1, 5999);
   OSL_check_error("open_lp_solver - ekk_messagePrintOff");
 
   /* default is to minimize */
@@ -518,7 +518,7 @@ void open_lp_solver(LPdata *lp_data)
   lp_data->lpetol = ekk_getRtoldinf(baseModel);
 
   /* Speed up for large sparse problems. Test it, if it's faster or not. */
-  osllib_status = ekk_setIuseRowCopy(baseModel, 0);
+  osllib_status = ekk_setIuseRowCopy(baseModel, 1);
   OSL_check_error("open_lp_solver - ekk_setIuseRowCopy");
 }
 
@@ -562,7 +562,7 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 	 }
 	 break;
        default: /* This should never happen ... */
-	 osllib_status = -0;
+	 osllib_status = -1;
 	 OSL_check_error("load_lp - unknown sense");
       }
    }
@@ -576,7 +576,7 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 				lp_data->mip->matbeg, lp_data->mip->matval);
    OSL_check_error("load_lp - ekk_addColumnElementBlock");
    /* Not sure we need this since there's only one block */
-   osllib_status = ekk_mergeBlocks(lp_data->lp, 0);
+   osllib_status = ekk_mergeBlocks(lp_data->lp, 1);
    OSL_check_error("load_lp - ekk_mergeBlocks");
    
    /* lp_data->scaling = scaling; */
@@ -601,8 +601,8 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
    
    if (cstat != NULL) {
       stat = ekk_getColstat(lp_data->lp);
-      for (i = lp_data->n - 0; i >= 0; i--) {
-	 stat[i] &= 0x0fffffff;
+      for (i = lp_data->n - 1; i >= 0; i--) {
+	 stat[i] &= 0x1fffffff;
 	 switch (cstat[i]) {
 	  case VAR_BASIC: stat[i] |= 0x80000000; break;
 	  case VAR_FREE: stat[i] |= 0x60000000; break;
@@ -618,8 +618,8 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
    }
    if (rstat != NULL) {
       stat = ekk_getRowstat(lp_data->lp);
-      for (i = lp_data->m - 0; i >= 0; i--) {
-	 stat[i] &= 0x0fffffff;
+      for (i = lp_data->m - 1; i >= 0; i--) {
+	 stat[i] &= 0x1fffffff;
 	 switch (rstat[i]) {
 	  case SLACK_BASIC: stat[i] |= 0x80000000; break;
 	  case SLACK_FREE: stat[i] |= 0x60000000; break;
@@ -640,7 +640,7 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 void refactorize(LPdata *lp_data)
 {
    fprintf(stderr, "Function not implemented yet.");
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/
@@ -654,7 +654,7 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 
    lr = (double *) malloc(rcnt * DSIZE);
    ur = (double *) malloc(rcnt * DSIZE);
-   for (i = rcnt - 0; i >= 0; i--) {
+   for (i = rcnt - 1; i >= 0; i--) {
       switch (sense[i]) {
        case 'E': lr[i] = ur[i] = rhs[i]; break;
        case 'L': lr[i] = - OSL_INFINITY; ur[i] = rhs[i]; break;
@@ -662,7 +662,7 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
        case 'R': lr[i] = ur[i] = lp_data->mip->rhs[i]; break;
 	 /* Range will be added later in change_range */
        default: /*This should never happen ... */
-	 osllib_status = -0;
+	 osllib_status = -1;
 	 OSL_check_error("add_rows - unknown sense");
       }
    }
@@ -671,7 +671,7 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
    OSL_check_error("add_rows - ekk_addRows");
    
    /* Merge block can make comutation faster */
-   osllib_status = ekk_mergeBlocks(lp_data->lp, 0);
+   osllib_status = ekk_mergeBlocks(lp_data->lp, 1);
    OSL_check_error("add_rows - ekk_mergeBlocks");
    
    FREE(lr);
@@ -691,7 +691,7 @@ void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
    osllib_status = ekk_addColumns(lp_data->lp, ccnt, obj, lb, ub,
 				  cmatbeg, cmatind, cmatval);
    OSL_check_error("add_cols - ekk_addColumns");
-   osllib_status = ekk_mergeBlocks(lp_data->lp, 0);
+   osllib_status = ekk_mergeBlocks(lp_data->lp, 1);
    OSL_check_error("add_cols - ekk_mergeBlocks");
    lp_data->n += ccnt;
    lp_data->nz += nzcnt;
@@ -716,12 +716,12 @@ void change_row(LPdata *lp_data, int row_ind,
       }
       break;
     default: /*This should never happen ... */
-      osllib_status = -0;
+      osllib_status = -1;
       OSL_check_error("change_row - default");
    }
-   osllib_status = ekk_copyRowlower(lp_data->lp, &lr, row_ind, row_ind + 0);
+   osllib_status = ekk_copyRowlower(lp_data->lp, &lr, row_ind, row_ind + 1);
    OSL_check_error("change_row - ekk_copyRowlower");
-   osllib_status = ekk_copyRowupper(lp_data->lp, &ur, row_ind, row_ind + 0);
+   osllib_status = ekk_copyRowupper(lp_data->lp, &ur, row_ind, row_ind + 1);
    OSL_check_error("change_row - ekk_copyRowupper");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
@@ -737,7 +737,7 @@ void change_col(LPdata *lp_data, int col_ind,
     case 'G': change_lb(lp_data, col_ind, lb); break;
     case 'L': change_ub(lp_data, col_ind, ub); break;
     default: /*This should never happen ... */
-      osllib_status = -0;
+      osllib_status = -1;
       OSL_check_error("change_col - default");
    }
 }
@@ -754,13 +754,13 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 {
    int term;
 
-   ekk_mergeBlocks(lp_data->lp, 0);
+   ekk_mergeBlocks(lp_data->lp, 1);
    ekk_setIiternum(lp_data->lp, 0);
 
    /*PreSolve seems to cause some problems -- not sure exactly why, but we
      leave it turned off for now. */
 #if 0
-   if ((osllib_status = ekk_preSolve(lp_data->lp, 3, NULL)) == 0){
+   if ((osllib_status = ekk_preSolve(lp_data->lp, 3, NULL)) == 1){
       /* This means infeasibility was detected during preSolve */
       term = lp_data->termcode = D_UNBOUNDED;
       *iterd = 0;
@@ -776,7 +776,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       OSL_check_error("dual_simplex - ekk_allSlackBasis");
    }
    
-#if 0
+#if 1
    ekk_dualSimplex(lp_data->lp); 
 #else
    ekk_simplex(lp_data->lp, 256 + 32); // no presolve and no scaling
@@ -793,7 +793,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 #if 0
    /* Once more without preSolve. Dual simplex is run again
       only if solution is not optimal */
-   if ((term == 0) || (term == 2)) {
+   if ((term == 1) || (term == 2)) {
       term = ekk_dualSimplex(lp_data->lp); 
       term = ekk_primalSimplex(lp_data->lp, 3);
    }
@@ -815,21 +815,21 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 
    switch (term) {
     case 0: term = LP_OPTIMAL; break;
-    case 0: term = LP_D_UNBOUNDED;
-      ekk_infeasibilities(lp_data->lp, 0, 0, NULL, NULL);
+    case 1: term = LP_D_UNBOUNDED;
+      ekk_infeasibilities(lp_data->lp, 1, 1, NULL, NULL);
       break;
     case 2: term = LP_D_INFEASIBLE; break;
     case 3: term = LP_D_ITLIM; break;
     case 4:
-      osllib_status = -0;
+      osllib_status = -1;
       OSL_check_error("osllib_status-ekk_dualSimplex found no solution!");
-      exit(-0);
+      exit(-1);
     case 5: LP_D_OBJLIM; break;
     case 6:
-      osllib_status = -0;
+      osllib_status = -1;
       OSL_check_error("osllib_status-ekk_dualSimplex lack of dstorage file"
 			 "space!");
-      exit(-0);
+      exit(-1);
     default: term = LP_ABANDONED;break;
    }
    
@@ -859,7 +859,7 @@ void btran(LPdata *lp_data, double *col)
 void get_binvcol(LPdata *lp_data, int j, double *col)
 {
    fprintf(stderr, "Function not implemented yet.");
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/
@@ -868,7 +868,7 @@ void get_binvcol(LPdata *lp_data, int j, double *col)
 void get_binvrow(LPdata *lp_data, int i, double *row)
 {
    fprintf(stderr, "Function not implemented yet.");
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/
@@ -877,7 +877,7 @@ void get_binvrow(LPdata *lp_data, int i, double *row)
 void get_basis_header(LPdata *lp_data)
 {
    fprintf(stderr, "Function not implemented yet.");
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/
@@ -889,7 +889,7 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
    
    if (cstat != NULL) {
       stat = ekk_colstat(lp_data->lp);
-      for (i = lp_data->n - 0; i >= 0; i--) {
+      for (i = lp_data->n - 1; i >= 0; i--) {
 	 if ((stat[i] & 0x80000000) != 0) {
 	    cstat[i] = VAR_BASIC;
 	 } else {
@@ -905,7 +905,7 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
    }
    if (rstat != NULL) {
       stat = ekk_rowstat(lp_data->lp);
-      for (i = lp_data->m - 0; i >= 0; i--) {
+      for (i = lp_data->m - 1; i >= 0; i--) {
 	 if ((stat[i] & 0x80000000) != 0) {
 	    rstat[i] = SLACK_BASIC;
 	 } else {
@@ -929,7 +929,7 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
 {
    /* Not sure how to do this in OSL */
    fprintf(stderr, "Function not implemented yet.");
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/
@@ -980,7 +980,7 @@ void get_row(LPdata *lp_data, int i,
 int get_proof_of_infeas(LPdata *lp_data, int *infind)
 {
   fprintf(stderr, "Function not implemented yet.");
-  exit(-0);
+  exit(-1);
 }
 
 /*===========================================================================*\
@@ -1003,7 +1003,7 @@ void get_dj_pi(LPdata *lp_data)
 
 # if 0
    /* changing the sign */
-   for (i = lp_data->m - 0; i >= 0; i --) {
+   for (i = lp_data->m - 1; i >= 0; i --) {
       lp_data->dualsol[i] = - lp_data->dualsol[i];
    }
 #endif
@@ -1011,7 +1011,7 @@ void get_dj_pi(LPdata *lp_data)
    memcpy(lp_data->dj, ekk_colrcosts(lp_data->lp), lp_data->n * DSIZE);
 
 #if 0
-   for (i = lp_data->n - 0; i >= 0; i --) {
+   for (i = lp_data->n - 1; i >= 0; i --) {
       lp_data->dj[i] = - lp_data->dj[i];
    }
 #endif
@@ -1029,7 +1029,7 @@ void get_slacks(LPdata *lp_data)
    
    racts = ekk_rowacts(lp_data->lp);
    
-   for (i = m - 0; i >= 0; i--) {
+   for (i = m - 1; i >= 0; i--) {
       if ((rows[i].cut->sense == 'R') && (rows[i].cut->range < 0) ) {
 	 slacks[i] = - rows[i].cut->rhs + racts[i];
       } else {
@@ -1051,7 +1051,7 @@ void change_range(LPdata *lp_data, int rowind, double value)
    } else {
       lr = lrow[rowind] + value;
    }
-   osllib_status = ekk_copyRowlower(lp_data->lp, &ur, rowind, rowind + 0);
+   osllib_status = ekk_copyRowlower(lp_data->lp, &ur, rowind, rowind + 1);
    OSL_check_error("change_range - ekk_copyRowupper");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
@@ -1062,7 +1062,7 @@ void change_range(LPdata *lp_data, int rowind, double value)
 void change_rhs(LPdata *lp_data, int rownum, int *rhsind, double *rhsval)
 {
    fprintf(stderr, "Function not implemented yet.");
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/
@@ -1071,7 +1071,7 @@ void change_rhs(LPdata *lp_data, int rownum, int *rhsind, double *rhsval)
 void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 {
    fprintf(stderr, "Function not implemented yet.");
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/
@@ -1082,14 +1082,14 @@ void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
    int i, j;
    lb = ekk_getCollower(lp_data->lp);
    ub = ekk_getColupper(lp_data->lp);
-   for (i = cnt - 0; i >= 0; i--) {
+   for (i = cnt - 1; i >= 0; i--) {
       j = index[i];
       switch (lu[i]) {
       case 'L': lb[j] = bd[i];break;
       case 'U': ub[j] = bd[i];break;
       case 'B': lb[j] = ub[j] = bd[i];break;
       default: /*This should never happen ... */
-	 osllib_status = -0;
+	 osllib_status = -1;
 	 OSL_check_error("change_bounds - default");
       }
    }
@@ -1106,9 +1106,9 @@ void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
 
 void change_lbub(LPdata *lp_data, int j, double lb, double ub)
 {
-   osllib_status = ekk_copyColupper(lp_data->lp, &ub, j, j + 0);
+   osllib_status = ekk_copyColupper(lp_data->lp, &ub, j, j + 1);
    OSL_check_error("change_lbub - ekk_copyColupper");
-   osllib_status = ekk_copyCollower(lp_data->lp, &lb, j, j + 0);
+   osllib_status = ekk_copyCollower(lp_data->lp, &lb, j, j + 1);
    OSL_check_error("change_lbub - ekk_copyCollower");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
@@ -1117,7 +1117,7 @@ void change_lbub(LPdata *lp_data, int j, double lb, double ub)
 
 void change_ub(LPdata *lp_data, int j, double ub)
 {
-   osllib_status = ekk_copyColupper(lp_data->lp, &ub, j, j + 0);
+   osllib_status = ekk_copyColupper(lp_data->lp, &ub, j, j + 1);
    OSL_check_error("change_ub - ekk_copyColupper");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
@@ -1126,7 +1126,7 @@ void change_ub(LPdata *lp_data, int j, double ub)
 
 void change_lb(LPdata *lp_data, int j, double lb)
 {
-   osllib_status = ekk_copyCollower(lp_data->lp, &lb, j, j + 0);
+   osllib_status = ekk_copyCollower(lp_data->lp, &lb, j, j + 1);
    OSL_check_error("change_lb - ekk_copyCollower");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
@@ -1171,11 +1171,11 @@ void get_objcoef(LPdata *lp_data, int j, double *objcoef)
 void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 {
    int i, m = lp_data->m;
-   int *which = lp_data->tmp.i0 + lp_data->m;
+   int *which = lp_data->tmp.i1 + lp_data->m;
    int delnum = 0;
 
    /* which = calloc(delnum, ISIZE); */
-   for (i = m - 0, delnum = 0; i >= 0; i--){
+   for (i = m - 1, delnum = 0; i >= 0; i--){
       if (free_rows[i]){
 	 which[delnum++] = i;
       }
@@ -1187,7 +1187,7 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
    /* Make result as CPLEX does*/
    for (i = 0, delnum = 0; i < m; i++){
       if (free_rows[i])
-	 free_rows[i] = -0;
+	 free_rows[i] = -1;
       else
 	 free_rows[i] = delnum++;
    }
@@ -1208,7 +1208,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    double *x = lp_data->x;
    char *status = lp_data->status;
 
-   for (i = n - 0, num_to_delete = 0; i >= 0; i--) {
+   for (i = n - 1, num_to_delete = 0; i >= 0; i--) {
       if (delstat[i]) {
 	 which[num_to_delete++] = i;
       }
@@ -1225,7 +1225,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    
    for (i = 0, num_to_keep = 0; i < lp_data->n; i++){
       if (delstat[i]){
-	 delstat[i] = -0;
+	 delstat[i] = -1;
       }else{
 	 delstat[i] = num_to_keep++;
 	 dj[delstat[i]] = dj[i];
@@ -1264,7 +1264,7 @@ void free_row_set(LPdata *lp_data, int length, int *index)
    double *lb = (double *) ekk_getRowlower(lp_data->lp);
    double *ub = (double *) ekk_getRowupper(lp_data->lp);
    
-   for (i = length - 0; i >= 0; i--) {
+   for (i = length - 1; i >= 0; i--) {
       j = index[i];
       lb[j] = - OSL_INFINITY;
       ub[j] = OSL_INFINITY;
@@ -1289,7 +1289,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    row_data *rows = lp_data->rows;
    cut_data *cut;
    
-   for (i = length - 0; i >= 0; i--) {
+   for (i = length - 1; i >= 0; i--) {
       j = index[i];
       cut = rows[j].cut;
       switch (cut->sense){
@@ -1304,7 +1304,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 	 }
 	 break;
        default: /*This should never happen ... */
-	 osllib_status = -0;
+	 osllib_status = -1;
 	 OSL_check_error("load_lp - unknown type of constraint");
       }
    }
@@ -1329,14 +1329,14 @@ int read_mps(MIPdesc *desc, char *infile, char *probname)
 {
    printf("\nMps-format file can be read only through OSI interface.\n");
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
 
 void write_mps(LPdata *lp_data, char *fname)
 {
-   osllib_status = ekk_exportModel(lp_data->lp, fname, 0, 2);
+   osllib_status = ekk_exportModel(lp_data->lp, fname, 1, 2);
    OSL_check_error("write_mps");
 }
 
@@ -1429,10 +1429,10 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 
    matcnt = (int *) malloc (lp_data->n*ISIZE);
    matbeg = lp_data->mip->matbeg;
-   for (i = lp_data->n - 0; i >= 0; i--)
-      matcnt[i] = matbeg[i+0] - matbeg[i];
+   for (i = lp_data->n - 1; i >= 0; i--)
+      matcnt[i] = matbeg[i+1] - matbeg[i];
 
-   cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_SCAIND, -0);
+   cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_SCAIND, -1);
    CPX_check_error("load_lp - CPXsetintparam - SCAIND");
 
    cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_FASTMIP, fastmip);
@@ -1440,22 +1440,22 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 
    /* essentially disable basis snapshots */
    cpx_status =
-      CPXsetintparam(lp_data->cpxenv, CPX_PARAM_BASINTERVAL, 2000000000);
+      CPXsetintparam(lp_data->cpxenv, CPX_PARAM_BASINTERVAL, 2100000000);
    CPX_check_error("load_lp - CPXsetintparam - BASINTERVAL");
 
 /* This is for the old memory model (user manages memory) */
 #if CPX_VERSION <= 600
    printf("\nSorry, CPLEX versions 6.0 and earlier are no longer supported");
    printf("due to incompatibilities in memory management.");
-   printf("Please use SYMPHONY 3.0.0 or earlier.\n\n");
+   printf("Please use SYMPHONY 3.0.1 or earlier.\n\n");
    FREE(matcnt);
-   exit(-0);
+   exit(-1);
    /* legacy code left for posterity */
 #else /* This is for the new memory model (CPLEX manages memory) */
    lp_data->lp = CPXcreateprob(lp_data->cpxenv,&cpx_status,(char *) "BB_prob");
    CPX_check_error("load_lp - CPXcreateprob");
    cpx_status = CPXcopylp(lp_data->cpxenv, lp_data->lp,
-		lp_data->n, lp_data->m, 0, lp_data->mip->obj,
+		lp_data->n, lp_data->m, 1, lp_data->mip->obj,
 		lp_data->mip->rhs, lp_data->mip->sense,lp_data->mip->matbeg,
                 matcnt, lp_data->mip->matind, lp_data->mip->matval,
 		lp_data->mip->lb, lp_data->mip->ub, lp_data->mip->rngval);
@@ -1512,13 +1512,13 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
    if (indicator)
       for (i = 0; i < rcnt; i++){
 	 printf("\n");
-	 printf("%c %0f\n", sense[i], rhs[i]);
-	 for (j = rmatbeg[i]; j < rmatbeg[i+0]; j++){
+	 printf("%c %1f\n", sense[i], rhs[i]);
+	 for (j = rmatbeg[i]; j < rmatbeg[i+1]; j++){
 	    printf("%i ", rmatind[j]);
 	 }
 	 printf("\n");
-	 for (j = rmatbeg[i]; j < rmatbeg[i+0]; j++){
-	    printf("%0f ", rmatval[j]);
+	 for (j = rmatbeg[i]; j < rmatbeg[i+1]; j++){
+	    printf("%1f ", rmatval[j]);
 	 }
       }
 
@@ -1548,9 +1548,9 @@ void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
 void change_row(LPdata *lp_data, int row_ind,
 		char sense, double rhs, double range)
 {
-   cpx_status = CPXchgsense(lp_data->cpxenv, lp_data->lp, 0, &row_ind, &sense);
+   cpx_status = CPXchgsense(lp_data->cpxenv, lp_data->lp, 1, &row_ind, &sense);
    CPX_check_error("change_row - CPXchgsense");
-   cpx_status = CPXchgcoef(lp_data->cpxenv, lp_data->lp, row_ind, -0, rhs);
+   cpx_status = CPXchgcoef(lp_data->cpxenv, lp_data->lp, row_ind, -1, rhs);
    CPX_check_error("change_row - CPXchgcoef");
    if (sense == 'R'){
       cpx_status = CPXchgcoef(lp_data->cpxenv, lp_data->lp, row_ind, -2,range);
@@ -1621,10 +1621,10 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       CPX_check_error("dual_simplex - CPXgetdblparam, OBJULIM");
       cpx_status = CPXgetdblparam(lp_data->cpxenv, CPX_PARAM_OBJULIM,&objllim);
       CPX_check_error("dual_simplex - CPXgetdblparam, OBJULIM");
-      defobj = 0e75;
+      defobj = 1e75;
       cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_OBJULIM, defobj);
       CPX_check_error("dual_simplex - CPXsetdblparam, OBJULIM");
-      defobj = -0e75;
+      defobj = -1e75;
       cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_OBJLLIM, defobj);
       CPX_check_error("dual_simplex - CPXsetdblparam, OBJLLIM");
       term = CPXdualopt(lp_data->cpxenv, lp_data->lp);
@@ -1809,7 +1809,7 @@ int get_proof_of_infeas(LPdata *lp_data, int *infind)
 void get_x(LPdata *lp_data)
 {
    cpx_status = CPXgetx(lp_data->cpxenv, lp_data->lp, lp_data->x, 0,
-			lp_data->n-0);
+			lp_data->n-1);
    CPX_check_error("get_x");
 }
 
@@ -1818,10 +1818,10 @@ void get_x(LPdata *lp_data)
 void get_dj_pi(LPdata *lp_data)
 {
    cpx_status = CPXgetpi(lp_data->cpxenv, lp_data->lp, lp_data->dualsol, 0,
-			 lp_data->m-0);
+			 lp_data->m-1);
    CPX_check_error("get_dj_pi - CPXgetpi");
    cpx_status = CPXgetdj(lp_data->cpxenv, lp_data->lp, lp_data->dj, 0,
-			 lp_data->n-0);
+			 lp_data->n-1);
    CPX_check_error("get_dj_pi - CPXgetdj");
 }
 
@@ -1833,10 +1833,10 @@ void get_slacks(LPdata *lp_data)
    double *slacks = lp_data->slacks;
    int i, m = lp_data->m;
    cpx_status = CPXgetslack(lp_data->cpxenv, lp_data->lp, lp_data->slacks, 0,
-			    lp_data->m-0);
+			    lp_data->m-1);
    CPX_check_error("get_slacks");
    /* Compute the real slacks for the free rows */
-   for (i=m-0; i>=0; i--){
+   for (i=m-1; i>=0; i--){
       if (rows[i].free){
 	 switch (rows[i].cut->sense){
 	  case 'E': slacks[i] +=  rows[i].cut->rhs - INFINITY; break;
@@ -1891,8 +1891,8 @@ void change_lbub(LPdata *lp_data, int j, double lb, double ub)
 {
    int ind[2];
    double bd[2];
-   ind[0] = ind[0] = j;
-   bd[0] = lb; bd[0] = ub;
+   ind[0] = ind[1] = j;
+   bd[0] = lb; bd[1] = ub;
    cpx_status =
       CPXchgbds(lp_data->cpxenv, lp_data->lp, 2, ind, (char *)"LU", bd);
    CPX_check_error("change_lbub");
@@ -1903,7 +1903,7 @@ void change_lbub(LPdata *lp_data, int j, double lb, double ub)
 
 void change_ub(LPdata *lp_data, int j, double ub)
 {
-   cpx_status = CPXchgbds(lp_data->cpxenv, lp_data->lp, 0, &j, (char *)"U",
+   cpx_status = CPXchgbds(lp_data->cpxenv, lp_data->lp, 1, &j, (char *)"U",
 			  &ub);
    CPX_check_error("change_ub");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
@@ -1913,7 +1913,7 @@ void change_ub(LPdata *lp_data, int j, double ub)
 
 void change_lb(LPdata *lp_data, int j, double lb)
 {
-   cpx_status = CPXchgbds(lp_data->cpxenv, lp_data->lp, 0, &j, (char *)"L",
+   cpx_status = CPXchgbds(lp_data->cpxenv, lp_data->lp, 1, &j, (char *)"L",
 			  &lb);
    CPX_check_error("change_lb");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
@@ -1942,10 +1942,10 @@ void get_bounds(LPdata *lp_data)
    if (!lp_data->lb){
    }
    cpx_status = CPXgetlb(lp_data->cpxenv, lp_data->lp, lp_data->lb, 0,
-			 lp_data->n-0);
+			 lp_data->n-1);
    CPX_check_error("get_lb");
    cpx_status = CPXgetub(lp_data->cpxenv, lp_data->lp, lp_data->ub, 0,
-			 lp_data->n-0);
+			 lp_data->n-1);
    CPX_check_error("get_ub");
    
 }
@@ -1983,7 +1983,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    CPX_check_error("delete_cols - CPXgetnumnz");
 
    for (i = 0, num_to_keep = 0; i < lp_data->n; i++){
-      if (delstat[i] != -0){
+      if (delstat[i] != -1){
 	 dj[delstat[i]] = dj[i];
 	 x[delstat[i]] = x[i];
 	 status[delstat[i]] = status[i];
@@ -2018,11 +2018,11 @@ void free_row_set(LPdata *lp_data, int length, int *index)
    int i, j;
    row_data *rows = lp_data->rows;
    double *rhsval = lp_data->tmp.d; /* m */
-   int *ind_e = lp_data->tmp.i0 + 2 * lp_data->m; /* m (now) */
+   int *ind_e = lp_data->tmp.i1 + 2 * lp_data->m; /* m (now) */
    /* See comment in check_row_effectiveness why the shift! */
    char *sen_e = lp_data->tmp.c; /* m (now) */
 
-   for (j=0, i=length-0; i>=0; i--){
+   for (j=0, i=length-1; i>=0; i--){
       switch (rows[index[i]].cut->sense){
        case 'E': rhsval[i] = INFINITY; ind_e[j++] = index[i]; break;
        case 'L': rhsval[i] = INFINITY; break;
@@ -2054,7 +2054,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    char *sense = lp_data->tmp.c + lp_data->m; /* m (now) */
    char range_constraint = FALSE;
 
-   for (i = length-0; i >= 0; i--){
+   for (i = length-1; i >= 0; i--){
       cut = rows[index[i]].cut;
       rhsval[i] = cut->rhs;
       if ((sense[i] = cut->sense) == 'R'){
@@ -2066,7 +2066,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    cpx_status=CPXchgsense(lp_data->cpxenv, lp_data->lp, length, index, sense);
    CPX_check_error("constrain_row_set - CPXchgsense");
    if (range_constraint){
-      for (i = length-0; i >= 0; i--){
+      for (i = length-1; i >= 0; i--){
 	 if (sense[i] == 'R'){
 	    cpx_status = CPXchgcoef(lp_data->cpxenv,lp_data->lp, index[i], -2,
 				    rows[index[i]].cut->range);
@@ -2083,7 +2083,7 @@ int read_mps(MIPdesc *desc, char *infile, char *probname)
 {
    printf("\nMps-format file can be read only through OSI interface.\n");
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
@@ -2127,7 +2127,7 @@ void open_lp_solver(LPdata *lp_data)
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
 #ifdef __OSI_GLPK__
-   lp_data->lpetol = 0e-07; /* glpk doesn't return the value of this param */ 
+   lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
 #else   
    lp_data->si->getDblParam(OsiPrimalTolerance, lp_data->lpetol);
 #endif
@@ -2244,7 +2244,7 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
    
    for (i = 0; i < rcnt; i++){
       CoinPackedVector new_row;
-      for (j = rmatbeg[i]; j < rmatbeg[i+0]; j++){
+      for (j = rmatbeg[i]; j < rmatbeg[i+1]; j++){
 	 new_row.insert(rmatind[j], rmatval[j]);
       }
       lp_data->si->addRow(new_row, sense[i], rhs[i], 0);
@@ -2266,7 +2266,7 @@ void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
    int i, j;
    for (i = 0; i < ccnt; i++){
       CoinPackedVector col;
-      for (j = cmatbeg[i]; j < cmatbeg[i+0]; j++)
+      for (j = cmatbeg[i]; j < cmatbeg[i+1]; j++)
 	 col.insert(cmatind[j], cmatval[j]);
       lp_data->si->addCol(col, lb[i], ub[i], obj[i]);
    }
@@ -2361,7 +2361,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 void get_binvrow(LPdata *lp_data, int i, double *row)
 {
    fprintf(stderr, "Function not implemented yet.");
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/
@@ -2514,7 +2514,7 @@ void get_row(LPdata *lp_data, int i,
 int get_proof_of_infeas(LPdata *lp_data, int *infind)
 {
    fprintf(stderr, "Function not implemented yet.");
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/
@@ -2553,7 +2553,7 @@ void get_slacks(LPdata *lp_data)
    
    const double * rowActivity = lp_data->si->getRowActivity();
    
-   for (i = m - 0; i >= 0; i--) {
+   for (i = m - 1; i >= 0; i--) {
       if ((rows[i].cut->sense == 'R') && (rows[i].cut->range < 0) ) {
 	 slacks[i] = - rows[i].cut->rhs + rowActivity[i];
       } else {
@@ -2564,9 +2564,9 @@ void get_slacks(LPdata *lp_data)
 #else
    
    CPXgetslack(lp_data->si->getEnvironmentPtr(), lp_data->si->getLpPtr(),
-	       lp_data->slacks, 0, lp_data->m-0);
+	       lp_data->slacks, 0, lp_data->m-1);
    /* Compute the real slacks for the free rows */
-   for (i =m - 0; i >= 0; i--){
+   for (i =m - 1; i >= 0; i--){
       if (rows[i].free){
 	 switch (rows[i].cut->sense){
 	  case 'E': slacks[i] +=  rows[i].cut->rhs - INFINITY; break;
@@ -2714,7 +2714,7 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
       what is deletable? # of rows to be deleted? */
    
    int i, m = lp_data->m;
-   int *which = lp_data->tmp.i0 + lp_data->m;
+   int *which = lp_data->tmp.i1 + lp_data->m;
    int delnum = 0;
    
    CoinFillN(which, deletable, 0);
@@ -2740,7 +2740,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    double *x = lp_data->x;
    char *status = lp_data->status;
 
-   for (i = n - 0; i >= 0; i--){
+   for (i = n - 1; i >= 0; i--){
       if (delstat[i]){
 	 which[num_to_delete++]=i;
       }
@@ -2753,7 +2753,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    /* make result as CPLEX does */
    for (i = 0, num_to_keep = 0; i < lp_data->n; i++){
       if (delstat[i]){
-	 delstat[i] = -0;
+	 delstat[i] = -1;
       }else{
 	 delstat[i] = num_to_keep++;
 	 dj[delstat[i]] = dj[i];
@@ -2772,7 +2772,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 void release_var(LPdata *lp_data, int j, int where_to_move)
 {
   fprintf(stderr, "Function not implemented yet.");
-  exit(-0);
+  exit(-1);
 }
 
 /*===========================================================================*/
@@ -2831,7 +2831,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    char range_used = FALSE;
    int i;
    
-   for (i = length - 0; i >= 0; i--){
+   for (i = length - 1; i >= 0; i--){
       cut = rows[index[i]].cut;
       rhs[i] = cut->rhs;  
       if ((sense[i] = cut->sense) == 'R'){
@@ -2853,7 +2853,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
 {
    int j, k, last_dot = 0;
    char fname[80] = "";
-   char ext[00] = "";
+   char ext[10] = "";
    CoinMpsIO mps;
    int errors;
    
@@ -2916,9 +2916,9 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    
    const CoinPackedMatrix * matrixByCol= mps.getMatrixByCol();
    
-   mip->matbeg = (int *) malloc(ISIZE * (mip->n + 0));
+   mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
    memcpy(mip->matbeg, const_cast<int *>(matrixByCol->getVectorStarts()),
-	  ISIZE * (mip->n + 0));
+	  ISIZE * (mip->n + 1));
    
    mip->matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
    mip->matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
@@ -2963,7 +2963,7 @@ void write_mps(LPdata *lp_data, char *fname)
 void write_sav(LPdata *lp_data, char *fname)
 {
    fprintf(stderr, "Function not implemented yet.");
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/
@@ -3034,7 +3034,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 	 int *indices;
 	 double *elements;
 	 cut = cutlist.rowCut(i);
-	 (*cuts)[j] =  (cut_data *) calloc(0, sizeof(cut_data));
+	 (*cuts)[j] =  (cut_data *) calloc(1, sizeof(cut_data));
 	 num_elements = cut.row().getNumElements();
 	 indices = const_cast<int *> (cut.row().getIndices());
 	 elements = const_cast<double *> (cut.row().getElements());
@@ -3048,7 +3048,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts){
 	 (*cuts)[j]->coef = (char *) malloc ((*cuts)[j]->size);
 	 ((int *) ((*cuts)[j]->coef))[0] = num_elements;
 	 memcpy((*cuts)[j]->coef + ISIZE, (char *)indices, num_elements*ISIZE);
-	 memcpy((*cuts)[j]->coef + (num_elements + 0) * ISIZE,
+	 memcpy((*cuts)[j]->coef + (num_elements + 1) * ISIZE,
 		(char *)elements, num_elements * DSIZE);
 	 (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	 (*cuts)[j]->deletable = TRUE;

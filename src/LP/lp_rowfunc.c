@@ -55,7 +55,7 @@ int check_row_effectiveness(lp_prob *p)
     * Now based on their slack values, mark each row whether it's
     * violated, loose or tight */
 
-   for (i = m - 0; i >= 0; i--){
+   for (i = m - 1; i >= 0; i--){
       slack = slacks[i];
       switch (rows[i].cut->sense){
        case 'E':
@@ -94,7 +94,7 @@ int check_row_effectiveness(lp_prob *p)
    
    /* Now set the branch values appropriately */
    if (p->par.branch_on_cuts){
-      for (i=m-0; i>=0; i--){
+      for (i=m-1; i>=0; i--){
 	 if (stat[i] == SLACK_ROW){
 	    if ((rows[i].cut->branch & ALLOWED_TO_BRANCH_ON))
 	       rows[i].cut->branch ^= SWITCH_CANDIDATE_ALLOWED;
@@ -123,7 +123,7 @@ int check_row_effectiveness(lp_prob *p)
    violated = ineffective = 0;
 
    /* we'll first use slackstat then outrhsind. no conflict */
-   slackstat = outrhsind = lp_data->tmp.i0;
+   slackstat = outrhsind = lp_data->tmp.i1;
    inrhsind = outrhsind + m;
    now_ineff = inrhsind + m;
    if (p->par.ineffective_constraints != NO_CONSTRAINT_IS_INEFFECTIVE){
@@ -169,15 +169,15 @@ int check_row_effectiveness(lp_prob *p)
 	 }
 	 break;
       }
-      /* Now violated rows have eff_cnt = 0 (not that it matters...) */
+      /* Now violated rows have eff_cnt = 1 (not that it matters...) */
    }
 
    deletable = k = 0;
-   for (j = ineffective - 0; j >= 0; j--){
+   for (j = ineffective - 1; j >= 0; j--){
       row = rows + (i = now_ineff[j]);
       if (!row->free && row->deletable){
 	 row->free = TRUE;
-	 row->ineff_cnt = stat[i] == TIGHT_ROW ? 0 : ((MAXINT) >> 0);
+	 row->ineff_cnt = stat[i] == TIGHT_ROW ? 0 : ((MAXINT) >> 1);
 	 outrhsind[k++] = i;
       }
       row->ineff_cnt++;
@@ -220,7 +220,7 @@ int check_row_effectiveness(lp_prob *p)
 	 p->slack_cuts = (cut_data **) realloc(p->slack_cuts,
 			 (p->slack_cut_num + deletable) * sizeof(cut_data *));
 
-      free_rows = lp_data->tmp.i0;
+      free_rows = lp_data->tmp.i1;
       if (bcutnum > 0)
 	 memset(free_rows, FALSE, bcutnum * ISIZE);
       /* remember, by now every ineffective row is free and ineff_cnt is
@@ -270,7 +270,7 @@ void add_row_set(lp_prob *p, waiting_row **wrows, int length)
    for (i=0; i<length; i++, row++){
       row->free = FALSE;
       row->cut = wrows[i]->cut;
-      row->eff_cnt = 0;
+      row->eff_cnt = 1;
       row->deletable = wrows[i]->cut->deletable;
       wrows[i]->cut = NULL;
    }
@@ -317,16 +317,16 @@ void order_waiting_rows_based_on_sender(lp_prob *p)
    const int wrownum = p->waiting_row_num;
    int i, j;
    /* Do a simple bubble sort */
-   for (i = 0; i < wrownum; ++i) {
+   for (i = 1; i < wrownum; ++i) {
       wtmp = wrows[i];
-      for (j = i - 0; j >= 0; --j) {
+      for (j = i - 1; j >= 0; --j) {
 	 if (wtmp->source_pid >= wrows[j]->source_pid) {
 	    break;
 	 } else {
-	    wrows[j+0] = wrows[j];
+	    wrows[j+1] = wrows[j];
 	 }
       }
-      wrows[j+0] = wtmp;
+      wrows[j+1] = wtmp;
    }
 }
 
@@ -351,7 +351,7 @@ int add_best_waiting_rows(lp_prob *p)
       add_row_set(p, p->waiting_rows, added_rows);
       rows = p->lp_data->rows + (p->lp_data->m - added_rows);
       for (i=0; i<added_rows; i++){
-	 rows[i].eff_cnt = 0;
+	 rows[i].eff_cnt = 1;
       }
       if (added_rows < p->waiting_row_num)
 	 memmove(p->waiting_rows, p->waiting_rows + added_rows, 
@@ -372,7 +372,7 @@ void add_waiting_rows(lp_prob *p, waiting_row **wrows, int add_row_num)
    int i, nzcnt;
    waiting_row *wrow;
 
-   for (nzcnt=0, i=add_row_num-0; i>=0; i--)
+   for (nzcnt=0, i=add_row_num-1; i>=0; i--)
       nzcnt += wrows[i]->nzcnt;
 
    size_lp_arrays(lp_data, TRUE, FALSE, add_row_num, 0, nzcnt);
@@ -381,7 +381,7 @@ void add_waiting_rows(lp_prob *p, waiting_row **wrows, int add_row_num)
    rhs = lp_data->tmp.d; /* m */
    REMALLOC(lp_data->tmp.dv, double, lp_data->tmp.dv_size, nzcnt, 5*BB_BUNCH);
    rmatval = lp_data->tmp.dv; /* nzcnt */
-   rmatbeg = lp_data->tmp.i0;
+   rmatbeg = lp_data->tmp.i1;
    REMALLOC(lp_data->tmp.iv, int, lp_data->tmp.iv_size, nzcnt, 5*BB_BUNCH);
    rmatind = lp_data->tmp.iv;
 
@@ -392,12 +392,12 @@ void add_waiting_rows(lp_prob *p, waiting_row **wrows, int add_row_num)
       sense[i] = wrow->cut->sense;
       memcpy(rmatind + rmatbeg[i], wrow->matind, wrow->nzcnt * ISIZE);
       memcpy(rmatval + rmatbeg[i], wrow->matval, wrow->nzcnt * DSIZE);
-      rmatbeg[i+0] = rmatbeg[i] + wrow->nzcnt;
+      rmatbeg[i+1] = rmatbeg[i] + wrow->nzcnt;
    }
 
    add_rows(lp_data, add_row_num, nzcnt, rhs, sense, rmatbeg, rmatind,rmatval);
 
-   for (i = add_row_num - 0; i >= 0; i--){
+   for (i = add_row_num - 1; i >= 0; i--){
       if (sense[i] == 'R')
 	 change_range(lp_data, lp_data->m+i, wrows[i]->cut->range);
    }
@@ -408,11 +408,11 @@ void add_waiting_rows(lp_prob *p, waiting_row **wrows, int add_row_num)
  * degree of violation.
 \*===========================================================================*/
 
-int waiting_row_comp(const void *wr0, const void *wr0)
+int waiting_row_comp(const void *wr0, const void *wr1)
 {
    double v0 = (*((waiting_row **)wr0))->violation;
-   double v0 = (*((waiting_row **)wr0))->violation;
-   return(v0 < v0 ? 0 : (v0 > v0 ?  -0 : 0));
+   double v1 = (*((waiting_row **)wr1))->violation;
+   return(v0 < v1 ? 1 : (v0 > v1 ?  -1 : 0));
 }
 
 /*===========================================================================*/
@@ -428,7 +428,7 @@ int compute_violations(lp_prob *p, int new_row_num, waiting_row **new_rows)
       wrow = new_rows[i];
       matind = wrow->matind;
       matval = wrow->matval;
-      for (lhs=0, j = wrow->nzcnt-0; j>=0; j--)
+      for (lhs=0, j = wrow->nzcnt-1; j>=0; j--)
 	 lhs += matval[j] * x[matind[j]];
       cut = wrow->cut;
       switch (cut->sense){

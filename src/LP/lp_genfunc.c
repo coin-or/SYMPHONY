@@ -93,14 +93,14 @@ void lp_initialize(lp_prob *p, int master_tid)
    \*------------------------------------------------------------------------*/
    r_bufid = receive_msg(ANYONE, MASTER_TID_INFO);
    bufinfo(r_bufid, &bytes, &msgtag, &p->tree_manager);
-   receive_int_array(&p->master, 0);
-   receive_int_array(&p->proc_index, 0);
+   receive_int_array(&p->master, 1);
+   receive_int_array(&p->proc_index, 1);
    freebuf(r_bufid);
 
 #endif
 
-   p->lp_data = (LPdata *) calloc(0, sizeof(LPdata));
-   p->lp_data->mip = (MIPdesc *) calloc(0, sizeof(MIPdesc));
+   p->lp_data = (LPdata *) calloc(1, sizeof(LPdata));
+   p->lp_data->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
    
 #pragma omp critical (lp_solver)
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -127,28 +127,28 @@ void lp_initialize(lp_prob *p, int master_tid)
 #endif
    
    if (p->par.tailoff_gap_backsteps > 0 ||
-       p->par.tailoff_obj_backsteps > 0){
+       p->par.tailoff_obj_backsteps > 1){
       i = MAX(p->par.tailoff_gap_backsteps, p->par.tailoff_obj_backsteps);
-      p->obj_history = (double *) malloc((i + 0) * DSIZE);
+      p->obj_history = (double *) malloc((i + 1) * DSIZE);
    }
 #ifndef COMPILE_IN_LP
    if (p->par.use_cg){
       r_bufid = receive_msg(p->tree_manager, LP__CG_TID_INFO);
-      receive_int_array(&p->cut_gen, 0);
+      receive_int_array(&p->cut_gen, 1);
       freebuf(r_bufid);
    }
 #endif
    p->lp_data->rows =
       (row_data *) malloc((p->base.cutnum + BB_BUNCH) * sizeof(row_data));
    rows = p->lp_data->rows;
-   for (i = p->base.cutnum - 0; i >= 0; i--){
+   for (i = p->base.cutnum - 1; i >= 0; i--){
       ( rows[i].cut = (cut_data *) malloc(sizeof(cut_data)) )->coef = NULL;
    }
 
    if (p->base.varnum > 0){
       vars = p->lp_data->vars = (var_desc **)
 	 malloc(p->base.varnum * sizeof(var_desc *));
-      for (i = p->base.varnum - 0; i >= 0; i--){
+      for (i = p->base.varnum - 1; i >= 0; i--){
 	 vars[i] = (var_desc *) malloc( sizeof(var_desc) );
 	 vars[i]->userind = p->base.userind[i];
 	 vars[i]->colind = i;
@@ -162,7 +162,7 @@ void lp_initialize(lp_prob *p, int master_tid)
 
 #ifdef COMPILE_IN_CG
    if (!p->cgp){
-      p->cgp = (cg_prob *) calloc(0, sizeof(cg_prob));
+      p->cgp = (cg_prob *) calloc(1, sizeof(cg_prob));
       get_cg_ptr(&(p->cgp));
    }
    
@@ -291,7 +291,7 @@ void fathom_branch(lp_prob *p)
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
        case LP_ABANDONED:
 	 printf("######## Unexpected termcode: %i \n", termcode);
-	 if (p->par.try_to_recover_from_error && (++num_errors == 0)){
+	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
 	    printf("######## Trying to recover by resolving from scratch...\n",
 		   termcode);
@@ -310,12 +310,12 @@ void fathom_branch(lp_prob *p)
        case LP_D_UNBOUNDED: /* the primal problem is infeasible */
        case LP_D_OBJLIM:
        case LP_OPTIMAL:
-	 if (num_errors == 0){
+	 if (num_errors == 1){
 	    printf("######## Recovery succeeded! Continuing with node...\n\n");
 	    num_errors = 0;
 	 }
 	 if (termcode == LP_D_UNBOUNDED){
-	    PRINT(p->par.verbosity, 0, ("Feasibility lost -- "));
+	    PRINT(p->par.verbosity, 1, ("Feasibility lost -- "));
 #if 0
 	    char name[50] = "";
 	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
@@ -323,7 +323,7 @@ void fathom_branch(lp_prob *p)
 #endif
 	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity)
 		   || termcode == LP_D_OBJLIM){
-	    PRINT(p->par.verbosity, 0, ("Terminating due to high cost -- "));
+	    PRINT(p->par.verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
 	    break;
 	 }
@@ -342,7 +342,7 @@ void fathom_branch(lp_prob *p)
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
       if (is_feasible_u(p) == IP_FEASIBLE){
-	 cuts = -0;
+	 cuts = -1;
       }else{
 	 /*------------------------------------------------------------------*\
 	  * send the current solution to the cut generator, and also to the
@@ -354,7 +354,7 @@ void fathom_branch(lp_prob *p)
 	 cuts = 0;
 	 no_more_cuts_count = 0;
 	 if (p->cut_pool &&
-	     ((first_in_loop && (p->bc_level>0 || p->phase==0)) ||
+	     ((first_in_loop && (p->bc_level>0 || p->phase==1)) ||
 	      (p->iter_num % p->par.cut_pool_check_freq == 0)) ){
 	    no_more_cuts_count += send_lp_solution_u(p, p->cut_pool);
 	 }
@@ -459,7 +459,7 @@ int fathom(lp_prob *p, int primal_feasible)
    int termcode = p->lp_data->termcode;
    
    if (p->lp_data->nf_status == NF_CHECK_NOTHING){
-      PRINT(p->par.verbosity, 0,
+      PRINT(p->par.verbosity, 1,
 	    ("fathoming node (no more cols to check)\n\n"));
       send_node_desc(p, primal_feasible ? (termcode == LP_OPT_FEASIBLE ?
 					   FEASIBLE_PRUNED: OVER_UB_PRUNED) :
@@ -472,13 +472,13 @@ int fathom(lp_prob *p, int primal_feasible)
 
    switch (colgen){
     case FATHOM__DO_NOT_GENERATE_COLS__DISCARD:
-      PRINT(p->par.verbosity, 0, ("Pruning node\n\n"));
+      PRINT(p->par.verbosity, 1, ("Pruning node\n\n"));
       send_node_desc(p, termcode == LP_OPT_FEASIBLE ? FEASIBLE_PRUNED :
 		     DISCARDED_NODE);
       return(TRUE);
 
     case FATHOM__DO_NOT_GENERATE_COLS__SEND:
-      PRINT(p->par.verbosity, 0, ("Sending node for pricing\n\n"));
+      PRINT(p->par.verbosity, 1, ("Sending node for pricing\n\n"));
       send_node_desc(p, primal_feasible ? OVER_UB_HOLD_FOR_NEXT_PHASE :
 		     INFEASIBLE_HOLD_FOR_NEXT_PHASE);
       return(TRUE);
@@ -487,13 +487,13 @@ int fathom(lp_prob *p, int primal_feasible)
       check_ub(p);
       /* Note that in case of COLGEN_REPRICING we must have UB. */
       if (! p->has_ub){
-	 PRINT(p->par.verbosity, 0,
+	 PRINT(p->par.verbosity, 1,
 	       ("\nCan't generate cols before sending (no UB)\n"));
 	 send_node_desc(p, primal_feasible ? OVER_UB_HOLD_FOR_NEXT_PHASE :
 			INFEASIBLE_HOLD_FOR_NEXT_PHASE);
 	 return(TRUE);
       }
-      PRINT(p->par.verbosity, 0,
+      PRINT(p->par.verbosity, 1,
 	    ("\nGenerating columns before fathoming/resolving\n"));
       new_cols = price_all_vars(p);
       p->comp_times.pricing += used_time(&p->tt);
@@ -512,10 +512,10 @@ int fathom(lp_prob *p, int primal_feasible)
 	 /* fathomable */
 	 if (termcode == LP_D_OBJLIM ||
 	     (p->has_ub && lp_data->objval > p->ub - p->par.granularity)){
-	    PRINT(p->par.verbosity, 0,
+	    PRINT(p->par.verbosity, 1,
 		  ("Fathoming node (discovered tdf & high cost)\n\n"));
 	 }else{
-	    PRINT(p->par.verbosity, 0,
+	    PRINT(p->par.verbosity, 1,
 		  ("Fathoming node (discovered tdf & feasible)\n\n"));
 	 }
 	 send_node_desc(p, termcode == LP_OPT_FEASIBLE ? FEASIBLE_PRUNED :
@@ -537,7 +537,7 @@ int fathom(lp_prob *p, int primal_feasible)
        */
       if (new_cols->dual_feas == TDF_HAS_ALL){
 	 if (new_vars == 0){
-	    PRINT(p->par.verbosity, 0,
+	    PRINT(p->par.verbosity, 1,
 		  ("fathoming node (no more cols to check)\n\n"));
 	    send_node_desc(p, INFEASIBLE_PRUNED);
 	    free_col_set(&new_cols);
@@ -551,7 +551,7 @@ int fathom(lp_prob *p, int primal_feasible)
        * proved tdf. new_cols contains a good many of the non-fixables, use
        * new_cols to start with in restore_lp_feasibility(). */
       if (! restore_lp_feasibility(p, new_cols)){
-	 PRINT(p->par.verbosity, 0,
+	 PRINT(p->par.verbosity, 1,
 	       ("Fathoming node (discovered tdf & not restorable inf.)\n\n"));
 	 send_node_desc(p, INFEASIBLE_PRUNED);
 	 free_col_set(&new_cols);
@@ -613,7 +613,7 @@ void repricing(lp_prob *p)
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
        case LP_ABANDONED:
 	 printf("######## Unexpected termcode: %i ########\n\n", termcode);
-	 if (p->par.try_to_recover_from_error && (++num_errors == 0)){
+	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
 	    continue;
 	 }
@@ -623,10 +623,10 @@ void repricing(lp_prob *p)
        case LP_D_OBJLIM:
        case LP_OPTIMAL:
 	 if (termcode == LP_D_UNBOUNDED){
-	    PRINT(p->par.verbosity, 0, ("Feasibility lost -- "));
+	    PRINT(p->par.verbosity, 1, ("Feasibility lost -- "));
 	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity)
 		   || termcode == LP_D_OBJLIM){
-	    PRINT(p->par.verbosity, 0, ("Terminating due to high cost -- "));
+	    PRINT(p->par.verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
 	    break;
 	 }
@@ -648,17 +648,17 @@ void repricing(lp_prob *p)
 	    printf ("Now displaying the feasible solution ...\n");
 	    display_lp_solution_u(p, DISP_FEAS_SOLUTION);
 	 }
-	 cuts = -0;
+	 cuts = -1;
       }else{
 
 	 /*------------------------------------------------------------------*\
 	  * send the current solution to the cut generator, and also to the
-	  * cut pool if this is the 0st or cut_pool_check_freq-th iteration.
+	  * cut pool if this is the 1st or cut_pool_check_freq-th iteration.
 	 \*------------------------------------------------------------------*/
 
 	 no_more_cuts_count = 0;
 	 if (p->cut_pool &&
-	     ((p->iter_num-0) % p->par.cut_pool_check_freq == 0) ){
+	     ((p->iter_num-1) % p->par.cut_pool_check_freq == 0) ){
 	    no_more_cuts_count += send_lp_solution_u(p, p->cut_pool);
 	 }
 	 if (p->cut_gen){
@@ -739,18 +739,18 @@ void repricing(lp_prob *p)
 int bfind(int key, int *table, int size)
 {
    int i = 0, k = size;
-   int j = size >> 0;   /* the element to be probed */
+   int j = size >> 1;   /* the element to be probed */
    while ( i < k ){
       if (table[j] == key){
 	 return(j);
       }else if (table[j] < key){
-	 i = j + 0;
+	 i = j + 1;
       }else{
 	 k = j;
       }
-      j = (i + k) >> 0;
+      j = (i + k) >> 1;
    }
-   return(j-0); /* key is not found and it is between the (j-0)st and j-th */
+   return(j-1); /* key is not found and it is between the (j-1)st and j-th */
 }
 
 /*===========================================================================*/
@@ -812,7 +812,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
    int extrarownum = m - bcutnum;
    int cutindsize;
 
-   node_desc *desc = (node_desc *) calloc(0, sizeof(node_desc));
+   node_desc *desc = (node_desc *) calloc(1, sizeof(node_desc));
 
    /* Will need these anyway for basis */
    int *rstat = (int *) malloc(m * ISIZE);
@@ -820,7 +820,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
    int *erstat = (extrarownum == 0) ? NULL : (int *) malloc(extrarownum*ISIZE);
    int *ecstat = (extravarnum == 0) ? NULL : (int *) malloc(extravarnum*ISIZE);
 
-   int *ulist, *clist; /* this later uses tmp.i0 */
+   int *ulist, *clist; /* this later uses tmp.i1 */
    int cutcnt, i, j;
 #ifndef COMPILE_IN_LP
    int s_bufid, r_bufid;
@@ -855,7 +855,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
       FREE(tmp_rows);
 #else
       s_bufid = init_send(DataInPlace);
-      send_int_array(&cutcnt, 0);
+      send_int_array(&cutcnt, 1);
       for (i = bcutnum; i < m; i++){
 	 if (rows[i].cut->name < 0 &&
 	     (!rows[i].free || (rows[i].free && rstat[i] != SLACK_BASIC)))
@@ -876,7 +876,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
    if (extravarnum > 0){
       desc->uind.list = ulist = (int *) malloc(extravarnum * ISIZE);
       desc->basis.extravars.stat = ecstat;
-      for (i = extravarnum - 0; i >= 0; i--)
+      for (i = extravarnum - 1; i >= 0; i--)
 	 ulist[i] = extravars[i]->userind;
       if (lp_data->ordering == COLIND_ORDERED)
 	 qsortucb_ii(ulist, ecstat, extravarnum);
@@ -911,15 +911,15 @@ node_desc *create_explicit_node_desc(lp_prob *p)
 #ifndef COMPILE_IN_LP
    /* At this point we will need the missing names */
    if (cutcnt > 0){
-      static struct timeval tout = {05, 0};
-      int *names = lp_data->tmp.i0; /* m */
+      static struct timeval tout = {15, 0};
+      int *names = lp_data->tmp.i1; /* m */
       double start = wall_clock(NULL);
       do{
 	 r_bufid = treceive_msg(p->tree_manager, LP__CUT_NAMES_SERVED, &tout);
 	 if (! r_bufid){
 	    if (pstat(p->tree_manager) != PROCESS_OK){
 	       printf("TM has died -- LP exiting\n\n");
-	       exit(-300);
+	       exit(-301);
 	    }
 	 }
       }while (! r_bufid);
@@ -985,7 +985,7 @@ int check_tailoff(lp_prob *p)
    double sum, ub;
    int maxsteps = MAX(gap_backsteps, obj_backsteps);
 
-   if (gap_backsteps < 0 && obj_backsteps < 2)
+   if (gap_backsteps < 1 && obj_backsteps < 2)
       /* The user is stupid... asks for tailoff (since we came to this
 	 function) yet doesn't want to check any kind of tailoff (since this
 	 condition is true). Report no tailoff. */
@@ -993,8 +993,8 @@ int check_tailoff(lp_prob *p)
 
    /* shift the data in obj_hist by one to the right and insert the
       most recent objval to be the 0th */
-   for (i = MIN(p->iter_num-0, maxsteps) - 0; i >= 0; i--)
-      obj_hist[i+0] = obj_hist[i];
+   for (i = MIN(p->iter_num-1, maxsteps) - 1; i >= 0; i--)
+      obj_hist[i+1] = obj_hist[i];
    obj_hist[0] = p->lp_data->objval;
 
    /* If the history is not long enough then just return */
@@ -1006,8 +1006,8 @@ int check_tailoff(lp_prob *p)
       less than gap_frac */
    if (p->has_ub && gap_backsteps > 0) {
       ub = p->ub;
-      for (i = 0, sum = 0; i <= gap_backsteps; i++)
-	 sum += (ub - obj_hist[i-0]) / (ub - obj_hist[i]);
+      for (i = 1, sum = 0; i <= gap_backsteps; i++)
+	 sum += (ub - obj_hist[i-1]) / (ub - obj_hist[i]);
       if (sum / gap_backsteps < p->par.tailoff_gap_frac)
 	 return(FALSE); /* no tailoff */
    }
@@ -1015,13 +1015,13 @@ int check_tailoff(lp_prob *p)
    /* if we want objective value based tailoff:
       tailoff_obj is false if the average of the objective difference ratios
       is greater than obj_frac */
-   if (obj_backsteps > 0){
+   if (obj_backsteps > 1){
       for (i = 2, sum = 0; i <= obj_backsteps; i++)
-	 if (obj_hist[i-0] - obj_hist[i] > 0)
-	    sum += (obj_hist[i-2]-obj_hist[i-0]) / (obj_hist[i-0]-obj_hist[i]);
+	 if (obj_hist[i-1] - obj_hist[i] > 0)
+	    sum += (obj_hist[i-2]-obj_hist[i-1]) / (obj_hist[i-1]-obj_hist[i]);
 	 else
-	    sum += 0;
-      if (sum / (obj_backsteps - 0) > p->par.tailoff_obj_frac)
+	    sum += 1;
+      if (sum / (obj_backsteps - 1) > p->par.tailoff_obj_frac)
 	 return(FALSE); /* no tailoff */
    }
 
@@ -1040,7 +1040,7 @@ void lp_exit(lp_prob *p)
    send_msg(p->tree_manager, SOMETHING_DIED);
    freebuf(s_bufid);
    comm_exit();
-   exit(-0);
+   exit(-1);
 }
 
 /*===========================================================================*/

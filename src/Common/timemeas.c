@@ -38,7 +38,7 @@ double used_time(double *T)
    (void) gettimeofday(&tp, NULL);
 #endif
 
-   t = (double)tp.tv_sec + ((double)tp.tv_usec)/0000000;
+   t = (double)tp.tv_sec + ((double)tp.tv_usec)/1000000;
    if (T) *T = t;
    return (t - oldT);
 #else   
@@ -53,8 +53,8 @@ double used_time(double *T)
    struct rusage x;
 
    (void) getrusage(RUSAGE_SELF, &x);
-   *T = (0e6 * x.ru_utime.tv_sec) + x.ru_utime.tv_usec;
-   *T /= 0e6;
+   *T = (1e6 * x.ru_utime.tv_sec) + x.ru_utime.tv_usec;
+   *T /= 1e6;
    return (*T - oldT);
 
 #endif
@@ -80,14 +80,14 @@ double wall_clock(double *T)
    (void) gettimeofday(&tp, NULL);
 #endif
 
-   t = (double)tp.tv_sec + ((double)tp.tv_usec)/0000000;
+   t = (double)tp.tv_sec + ((double)tp.tv_usec)/1000000;
    if (T) *T = t;
    return (t - oldT);
 }
 
 #if 0
 
-#define MAX_SEC 000000000
+#define MAX_SEC 100000000
 
 void start_time(void)
 {
@@ -104,7 +104,7 @@ double used_time(double *T)
    getitimer(ITIMER_VIRTUAL, &value);
    return( ((double) MAX_SEC) -
 	   ((double) value.it_value.tv_sec) -
-	   ((double) value.it_value.tv_usec) / 0e6 - *T);
+	   ((double) value.it_value.tv_usec) / 1e6 - *T);
 }
 
 #endif

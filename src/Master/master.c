@@ -47,7 +47,7 @@ problem *get_problem_ptr()
 {
    static problem* p;
 
-   if (!p) p = (problem *) calloc(0, sizeof(problem));
+   if (!p) p = (problem *) calloc(1, sizeof(problem));
 
    return(p);
 }
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 
    double t = 0, total_time=0;
    double start_time, lb;
-   struct timeval timeout = {00, 0};
+   struct timeval timeout = {10, 0};
 
    char lp_data_sent = FALSE, cg_data_sent = FALSE, cp_data_sent = FALSE;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
    printf("*   This is SYMPHONY Version 4.0                      *\n");
    printf("*   Copyright 2000-2003 Ted Ralphs                    *\n");
    printf("*   All Rights Reserved.                                     *\n");
-   printf("*   Distributed under the Common Public License 0.0   *\n");
+   printf("*   Distributed under the Common Public License 1.0   *\n");
    printf("*******************************************************\n");
    printf("\n");
    
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
       pvm_catchout(0);
       comm_exit();
 #endif
-      exit(0);
+      exit(1);
    }
 
    (void) used_time(&t);
@@ -203,8 +203,8 @@ int main(int argc, char **argv)
     * Have the user generate the base and root description
    \*------------------------------------------------------------------------*/
 
-   base = (base_desc *) calloc(0, sizeof(base_desc));
-   root = (node_desc *) calloc(0, sizeof(node_desc));
+   base = (base_desc *) calloc(1, sizeof(base_desc));
+   root = (node_desc *) calloc(1, sizeof(node_desc));
    
    initialize_root_node_u(p, base, root);
 
@@ -215,19 +215,19 @@ int main(int argc, char **argv)
 
    if (p->par.tm_machine_set){
       spawn(p->par.tm_exe, (char **)NULL, p->par.tm_debug | TaskHost,
-	    p->par.tm_machine, 0, &p->tm_tid);
+	    p->par.tm_machine, 1, &p->tm_tid);
    }else{
-      spawn(p->par.tm_exe, (char **)NULL, p->par.tm_debug, (char *)NULL, 0,
+      spawn(p->par.tm_exe, (char **)NULL, p->par.tm_debug, (char *)NULL, 1,
 	    &p->tm_tid);
    }
    s_bufid = init_send(DataInPlace);
    send_char_array((char *)(&p->par.tm_par), sizeof(tm_params));
-   send_char_array(&p->has_ub, 0);
+   send_char_array(&p->has_ub, 1);
    if (p->has_ub)
-      send_dbl_array(&p->ub, 0);
-   send_char_array(&p->has_ub_estimate, 0);
+      send_dbl_array(&p->ub, 1);
+   send_char_array(&p->has_ub_estimate, 1);
    if (p->has_ub_estimate)
-      send_dbl_array(&p->ub_estimate, 0);
+      send_dbl_array(&p->ub_estimate, 1);
    if (p->par.tm_par.lp_mach_num)
       send_char_array(p->par.tm_par.lp_machs[0],
 		      p->par.tm_par.lp_mach_num*MACH_NAME_LENGTH);
@@ -237,15 +237,15 @@ int main(int argc, char **argv)
    if (p->par.tm_par.cp_mach_num)
       send_char_array(p->par.tm_par.cp_machs[0],
 		      p->par.tm_par.cp_mach_num*MACH_NAME_LENGTH);
-   send_int_array(&base->varnum, 0);
-   send_int_array(&base->cutnum, 0);
+   send_int_array(&base->varnum, 1);
+   send_int_array(&base->cutnum, 1);
 #ifdef TRACE_PATH
    {
       int feas_sol;
       int *feas_sol_size;
 
       if (user_send_feas_sol(p->user, &feas_sol_size, &feas_sol)==USER_NO_PP){
-	 send_int_array(&feas_sol_size, 0);
+	 send_int_array(&feas_sol_size, 1);
 	 if (feas_sol_size){
 	    send_int_array(feas_sol, feas_sol_size);
 	 }
@@ -263,23 +263,23 @@ int main(int argc, char **argv)
       node_type = ROOT_NODE;
       
       s_bufid = init_send(DataInPlace);
-      send_char_array(&repricing, 0);
-      send_char_array(&node_type, 0);
-      send_dbl_array(&p->lb, 0);
-      send_int_array(&root->nf_status, 0);
+      send_char_array(&repricing, 1);
+      send_char_array(&node_type, 1);
+      send_dbl_array(&p->lb, 1);
+      send_int_array(&root->nf_status, 1);
       pack_array_desc(&root->uind);
       if (root->nf_status == NF_CHECK_AFTER_LAST ||
 	  root->nf_status == NF_CHECK_UNTIL_LAST)
 	 pack_array_desc(&root->not_fixed);
       pack_array_desc(&root->cutind);
       pack_basis(&root->basis, TRUE);
-      send_int_array(&root->desc_size, 0);
+      send_int_array(&root->desc_size, 1);
       if (root->desc_size)
 	 send_char_array(root->desc, root->desc_size);
       if (root->cutind.size > 0){ /* Hey, we have cuts! Pack them, too. */
 	 /* Pack their number again, so we can call unpack_cut_set in TM */
 	 int i;
-	 send_int_array(&root->cutind.size, 0);
+	 send_int_array(&root->cutind.size, 1);
 	 for (i = 0; i < root->cutind.size; i++)
 	    pack_cut(root->cuts[i]);
       }
@@ -400,7 +400,7 @@ int main(int argc, char **argv)
        case TM_FIRST_PHASE_FINISHED:
 	 receive_char_array((char *)(&p->comp_times.bc_time),
 			     sizeof(node_times));
-	 receive_dbl_array(&lb, 0);
+	 receive_dbl_array(&lb, 1);
 	 if (lb > p->lb) p->lb = lb;
 	 receive_char_array((char *)&p->stat, sizeof(tm_stat));
 	 printf( "\n");
@@ -423,7 +423,7 @@ int main(int argc, char **argv)
        case TM_FINISHED:
 	 receive_char_array((char *)(&p->comp_times.bc_time),
 			    sizeof(node_times));
-	 receive_dbl_array(&lb, 0);
+	 receive_dbl_array(&lb, 1);
 	 if (lb > p->lb) p->lb = lb;
 	 receive_char_array((char *)&p->stat, sizeof(tm_stat));
 	 break;
@@ -618,7 +618,7 @@ void print_statistics(node_times *tim, tm_stat *stat, double ub, double lb,
    if (lb > 0){
       printf("\nCurrent Upper Bound:         %.3f", ub);
       printf("\nCurrent Lower Bound:         %.3f", lb);
-      printf("\nGap Percentage:              %.2f\n", 000*(ub-lb)/ub);
+      printf("\nGap Percentage:              %.2f\n", 100*(ub-lb)/ub);
    }else{
       printf("\nUpper Bound:        %.3f\n", ub);
    }

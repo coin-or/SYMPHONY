@@ -26,10 +26,10 @@
 #include "BB_constants.h"
 
 #ifdef CHAR_IS_SIGNED
-#define MEMCMP(c0, c0, s) unsigned_memcmp(c0, c0, s)
+#define MEMCMP(c0, c1, s) unsigned_memcmp(c0, c1, s)
 #else
 #include <memory.h>
-#define MEMCMP(c0, c0, s) memcmp(c0, c0, s)
+#define MEMCMP(c0, c1, s) memcmp(c0, c1, s)
 #endif
 
 /*===========================================================================*/
@@ -89,7 +89,7 @@ void cp_initialize(cut_pool *cp, int master_tid)
    
    r_bufid = receive_msg(ANYONE, MASTER_TID_INFO);
    bufinfo(r_bufid, &bytes, &cp->msgtag, &cp->tree_manager);
-   receive_int_array(&cp->master, 0);
+   receive_int_array(&cp->master, 1);
    freebuf(r_bufid);
 
 #endif
@@ -118,16 +118,16 @@ void cp_initialize(cut_pool *cp, int master_tid)
   
 /*===========================================================================*/
 
-int unsigned_memcmp(char *coef0, char *coef0, int size)
+int unsigned_memcmp(char *coef0, char *coef1, int size)
 {
    register char *end0 = coef0 + size;
 
-   for ( ; coef0 != end0; coef0++, coef0++)
-      if (*coef0 != *coef0)
+   for ( ; coef0 != end0; coef0++, coef1++)
+      if (*coef0 != *coef1)
 	 break;
    if (coef0 == end0)
       return(0);
-   return ( (unsigned char)(*coef0) < (unsigned char)(*coef0) ? -0 : 0);
+   return ( (unsigned char)(*coef0) < (unsigned char)(*coef1) ? -1 : 1);
 }
 
 /*===========================================================================*/
@@ -136,12 +136,12 @@ int unsigned_memcmp(char *coef0, char *coef0, int size)
  * This function compares the quality of two cuts.
 \*===========================================================================*/
 
-int cut_quality_cmp(const void *cut0ptr, const void *cut0ptr)
+int cut_quality_cmp(const void *cut0ptr, const void *cut1ptr)
 {
    cp_cut_data *cut0 = *((cp_cut_data **)cut0ptr);
-   cp_cut_data *cut0 = *((cp_cut_data **)cut0ptr);
+   cp_cut_data *cut1 = *((cp_cut_data **)cut1ptr);
 
-   return((int)(0000*(cut0->quality - cut0->quality)));
+   return((int)(1000*(cut1->quality - cut0->quality)));
 }
 
 /*===========================================================================*/
@@ -167,15 +167,15 @@ void order_cuts_by_quality(cut_pool *cp)
  * return value is 0, otherwise nonzero.
 \*===========================================================================*/
 
-int cutcmp(const void *cut0ptr, const void *cut0ptr)
+int cutcmp(const void *cut0ptr, const void *cut1ptr)
 {
    cut_data *cut0 = *((cut_data **)cut0ptr);
-   cut_data *cut0 = *((cut_data **)cut0ptr);
+   cut_data *cut1 = *((cut_data **)cut1ptr);
    int typediff, sizediff;
 
-   if ((typediff = cut0->type - cut0->type))  return(typediff);
-   if ((sizediff = cut0->size - cut0->size))  return(sizediff);
-   return( MEMCMP(cut0->coef, cut0->coef, cut0->size) );
+   if ((typediff = cut0->type - cut1->type))  return(typediff);
+   if ((sizediff = cut0->size - cut1->size))  return(sizediff);
+   return( MEMCMP(cut0->coef, cut1->coef, cut0->size) );
 }
 
 /*===========================================================================*/
@@ -201,7 +201,7 @@ int delete_cuts(cut_pool *cp, int min_to_delete)
       if (del_cuts >= min_to_delete || del_cuts == cp->cut_num)
 	 break;
       if (!touches_until_deletion)
-	 touches_until_deletion = 00;
+	 touches_until_deletion = 10;
       deleted_duplicates = TRUE;
 
     case DELETE_DUPLICATE_AND_INEFFECTIVE:
@@ -235,7 +235,7 @@ int delete_ineffective_cuts(cut_pool *cp)
    cp_cut_data **cuts = cp->cuts;
    int num;
    int del_cuts = 0, tmp_del_cuts = 0, cuts_to_leave = 0;
-   cp_cut_data **cp_cut0, **cp_cut2;
+   cp_cut_data **cp_cut1, **cp_cut2;
    int touches_until_deletion = cp->par.touches_until_deletion;
    int min_to_delete = cp->par.min_to_delete;
 
@@ -250,12 +250,12 @@ int delete_ineffective_cuts(cut_pool *cp)
       
       cuts_to_leave = MIN(cp->par.cuts_to_check, cp->cut_num-min_to_delete);
       
-      for (cp_cut0 = cuts + cuts_to_leave, num = cuts_to_leave;
-	   num < cp->cut_num; cp_cut0++, num++){
+      for (cp_cut1 = cuts + cuts_to_leave, num = cuts_to_leave;
+	   num < cp->cut_num; cp_cut1++, num++){
 	 del_cuts++;
-	 cp->size -= (*cp_cut0)->cut.size;
-	 FREE((*cp_cut0)->cut.coef);
-	 FREE(*cp_cut0);
+	 cp->size -= (*cp_cut1)->cut.size;
+	 FREE((*cp_cut1)->cut.coef);
+	 FREE(*cp_cut1);
       }
       cp->cut_num -= del_cuts;
       cp->size -= del_cuts * sizeof(cp_cut_data);
@@ -265,7 +265,7 @@ int delete_ineffective_cuts(cut_pool *cp)
     default:
 
       while (del_cuts < min_to_delete){
-	 for (tmp_del_cuts = 0, cp_cut0 = cp_cut2 = cuts,
+	 for (tmp_del_cuts = 0, cp_cut1 = cp_cut2 = cuts,
 		 num = cp->cut_num; num > 0; cp_cut2++, num--){
 	    if ((*cp_cut2)->touches >= touches_until_deletion){
 	       tmp_del_cuts++;
@@ -273,8 +273,8 @@ int delete_ineffective_cuts(cut_pool *cp)
 	       FREE((*cp_cut2)->cut.coef);
 	       FREE(*cp_cut2);
 	    }else{
-	       *cp_cut0 = *cp_cut2;
-	       cp_cut0++;
+	       *cp_cut1 = *cp_cut2;
+	       cp_cut1++;
 	    }
 	 }
 	 cp->cut_num -= tmp_del_cuts;
@@ -300,39 +300,39 @@ int delete_duplicate_cuts(cut_pool *cp)
    cp_cut_data **cuts = cp->cuts;
    int num;
    int del_cuts = 0;
-   cp_cut_data **cp_cut0, **cp_cut2;
+   cp_cut_data **cp_cut1, **cp_cut2;
    int touches, level;
    
    /* order the cuts according to the function "cutcmp" */
    qsortucb((char *)cuts, cp->cut_num, sizeof(cp_cut_data *), cutcmp);
    /* go through and remove duplicates */
-   for(num = cp->cut_num-0, cp_cut0 = cuts, cp_cut2 = cp_cut0 + 0;
+   for(num = cp->cut_num-1, cp_cut1 = cuts, cp_cut2 = cp_cut1 + 1;
        num > 0; cp_cut2++, num--){
-      switch (which_cut_to_delete(&(*cp_cut0)->cut, &(*cp_cut2)->cut)){
+      switch (which_cut_to_delete(&(*cp_cut1)->cut, &(*cp_cut2)->cut)){
        case 0:
-	 cp_cut0++;
-	 *cp_cut0 = *cp_cut2;
+	 cp_cut1++;
+	 *cp_cut1 = *cp_cut2;
 	 break;
-       case 0:
+       case 1:
 	 del_cuts++;
-	 cp->size -= (*cp_cut0)->cut.size;
-	 touches = MIN((*cp_cut0)->touches, (*cp_cut2)->touches);
-	 level = MIN((*cp_cut0)->level, (*cp_cut2)->level);
-	 FREE((*cp_cut0)->cut.coef);
-	 FREE(*cp_cut0);
-	 *cp_cut0 = *cp_cut2;
-	 (*cp_cut0)->touches = touches;
-	 (*cp_cut0)->level = level;
+	 cp->size -= (*cp_cut1)->cut.size;
+	 touches = MIN((*cp_cut1)->touches, (*cp_cut2)->touches);
+	 level = MIN((*cp_cut1)->level, (*cp_cut2)->level);
+	 FREE((*cp_cut1)->cut.coef);
+	 FREE(*cp_cut1);
+	 *cp_cut1 = *cp_cut2;
+	 (*cp_cut1)->touches = touches;
+	 (*cp_cut1)->level = level;
 	 break;
        case 2:
 	 del_cuts++;
 	 cp->size -= (*cp_cut2)->cut.size;
-	 touches = MIN((*cp_cut0)->touches, (*cp_cut2)->touches);
-	 level = MIN((*cp_cut0)->level, (*cp_cut2)->level);
+	 touches = MIN((*cp_cut1)->touches, (*cp_cut2)->touches);
+	 level = MIN((*cp_cut1)->level, (*cp_cut2)->level);
 	 FREE((*cp_cut2)->cut.coef);
 	 FREE(*cp_cut2);
-	 (*cp_cut0)->touches = touches;
-	 (*cp_cut0)->level = level;
+	 (*cp_cut1)->touches = touches;
+	 (*cp_cut1)->level = level;
 	 break;
       }
    }
@@ -348,17 +348,17 @@ int delete_duplicate_cuts(cut_pool *cp)
 
 /*===========================================================================*/
 
-int which_cut_to_delete(cut_data *cut0, cut_data *cut2)
+int which_cut_to_delete(cut_data *cut1, cut_data *cut2)
 {
-   if (cutcmp(&cut0, &cut2))
+   if (cutcmp(&cut1, &cut2))
       return(0);
 
-   return(cut0->sense == 'E' ? 2 :
-	  cut2->sense == 'E' ? 0 :
-	  cut0->sense != cut2->sense ? 0 :
-	  cut0->sense == 'R' ? 0 :
-	  cut0->sense == 'L' ? (cut0->rhs<=cut2->rhs ? 2:0) :
-			       (cut0->rhs>=cut2->rhs ? 2:0));
+   return(cut1->sense == 'E' ? 2 :
+	  cut2->sense == 'E' ? 1 :
+	  cut1->sense != cut2->sense ? 0 :
+	  cut1->sense == 'R' ? 0 :
+	  cut1->sense == 'L' ? (cut1->rhs<=cut2->rhs ? 2:1) :
+			       (cut1->rhs>=cut2->rhs ? 2:1));
 }
 
 /*===========================================================================*/
@@ -388,7 +388,7 @@ int write_cp_cut_list(cut_pool *cp, char *file, char append)
 
    fclose(f);
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
@@ -396,7 +396,7 @@ int write_cp_cut_list(cut_pool *cp, char *file, char append)
 int read_cp_cut_list(cut_pool *cp, char *file)
 {
    FILE *f;
-   int i, j, tmp0 = 0, tmp2 = 0;
+   int i, j, tmp1 = 0, tmp2 = 0;
    char str[20];
    
    if (!(f = fopen(file, "r"))){
@@ -412,21 +412,21 @@ int read_cp_cut_list(cut_pool *cp, char *file)
       cp->cuts[i] = (cp_cut_data *) malloc(sizeof(cp_cut_data));
       fscanf(f, "%i %i %i %i %i %c %i %lf %lf", &cp->cuts[i]->touches,
 	     &cp->cuts[i]->level, &cp->cuts[i]->cut.name,
-	     &cp->cuts[i]->cut.size, &tmp0, &cp->cuts[i]->cut.sense, &tmp2,
+	     &cp->cuts[i]->cut.size, &tmp1, &cp->cuts[i]->cut.sense, &tmp2,
 	     &cp->cuts[i]->cut.rhs, &cp->cuts[i]->cut.range);
-      cp->cuts[i]->cut.type = (char) tmp0;
+      cp->cuts[i]->cut.type = (char) tmp1;
       cp->cuts[i]->cut.branch = (char) tmp2;
       cp->cuts[i]->cut.coef =
 	 (char *) malloc(cp->cuts[i]->cut.size*sizeof(char));
       for (j = 0; j < cp->cuts[i]->cut.size; j++){
-	 fscanf(f, "%i ", &tmp0);
-	 cp->cuts[i]->cut.coef[j] = (char) tmp0;
+	 fscanf(f, "%i ", &tmp1);
+	 cp->cuts[i]->cut.coef[j] = (char) tmp1;
       }
    }
 
    fclose(f);
 
-   return(0);
+   return(1);
 }   
 
 /*===========================================================================*/
@@ -434,7 +434,7 @@ int read_cp_cut_list(cut_pool *cp, char *file)
 int cp_read_tm_cut_list(cut_pool *cp, char *file)
 {
    FILE *f;
-   int i, j, tmp0 = 0, tmp2 = 0;
+   int i, j, tmp1 = 0, tmp2 = 0;
    char str[20];
    
    if (!(f = fopen(file, "r"))){
@@ -447,24 +447,24 @@ int cp_read_tm_cut_list(cut_pool *cp, char *file)
    cp->cuts = (cp_cut_data **)
       malloc(cp->allocated_cut_num*sizeof(cp_cut_data *));
    for (i = 0; i < cp->cut_num; i++){
-      cp->cuts[i] = (cp_cut_data *) calloc(0, sizeof(cp_cut_data));
+      cp->cuts[i] = (cp_cut_data *) calloc(1, sizeof(cp_cut_data));
       fscanf(f, "%i %i %i %c %i %lf %lf", &cp->cuts[i]->cut.name,
-	     &cp->cuts[i]->cut.size, &tmp0, &cp->cuts[i]->cut.sense,
+	     &cp->cuts[i]->cut.size, &tmp1, &cp->cuts[i]->cut.sense,
 	     &tmp2, &cp->cuts[i]->cut.rhs, &cp->cuts[i]->cut.range);
-      cp->cuts[i]->cut.type = (char)tmp0;
+      cp->cuts[i]->cut.type = (char)tmp1;
       cp->cuts[i]->cut.branch = (char)tmp2;
       cp->cuts[i]->cut.coef = 
 	(char *) malloc(cp->cuts[i]->cut.size*sizeof(char));
       cp->size += cp->cuts[i]->cut.size + sizeof(cp_cut_data);
       for (j = 0; j < cp->cuts[i]->cut.size; j++){
-	 fscanf(f, "%i ", &tmp0);
-	 cp->cuts[i]->cut.coef[j] = (char)tmp0;
+	 fscanf(f, "%i ", &tmp1);
+	 cp->cuts[i]->cut.coef[j] = (char)tmp1;
       }
    }
 
    fclose(f);
 
-   return(0);
+   return(1);
 }   
 
 /*===========================================================================*/
@@ -475,8 +475,8 @@ void cp_close(cut_pool *cp)
    int s_bufid;
       
    s_bufid = init_send(DataInPlace);
-   send_dbl_array(&cp->cut_pool_time, 0);
-   send_int_array(&cp->total_cut_num, 0);
+   send_dbl_array(&cp->cut_pool_time, 1);
+   send_int_array(&cp->total_cut_num, 1);
    send_msg(cp->tree_manager, POOL_TIME);
    freebuf(s_bufid);
    if(cp->msgtag == YOU_CAN_DIE)

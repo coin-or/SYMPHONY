@@ -51,8 +51,8 @@ array_desc *unpack_array_desc(array_desc *padesc)
 
 void pack_double_array_desc(double_array_desc *dad, char explicit_packing)
 {
-   send_char_array(&dad->type, 0);
-   send_int_array(&dad->size, 0);
+   send_char_array(&dad->type, 1);
+   send_int_array(&dad->size, 1);
    if (dad->size > 0){
       if (!explicit_packing && dad->type == WRT_PARENT)
 	 send_int_array(dad->list, dad->size);
@@ -64,8 +64,8 @@ void pack_double_array_desc(double_array_desc *dad, char explicit_packing)
 
 void unpack_double_array_desc(double_array_desc *dad, char explicit_packing)
 {
-   receive_char_array(&dad->type, 0);
-   receive_int_array(&dad->size, 0);
+   receive_char_array(&dad->type, 1);
+   receive_int_array(&dad->size, 1);
    if (dad->size > 0){
       if (!explicit_packing && dad->type == WRT_PARENT){
 	 dad->list = (int *) malloc(dad->size * ISIZE);
@@ -85,7 +85,7 @@ void unpack_double_array_desc(double_array_desc *dad, char explicit_packing)
 
 void pack_basis(basis_desc *basis, char explicit_packing)
 {
-   send_char_array(&basis->basis_exists, 0);
+   send_char_array(&basis->basis_exists, 1);
    if (basis->basis_exists){
       pack_double_array_desc(&basis->baserows, explicit_packing);
       pack_double_array_desc(&basis->extrarows, explicit_packing);
@@ -99,8 +99,8 @@ void pack_basis(basis_desc *basis, char explicit_packing)
 basis_desc *unpack_basis(basis_desc *pbasis, char explicit_packing)
 {
    basis_desc *basis =
-      pbasis ? pbasis : (basis_desc *) calloc(0, sizeof(basis_desc) );
-   receive_char_array(&basis->basis_exists, 0);
+      pbasis ? pbasis : (basis_desc *) calloc(1, sizeof(basis_desc) );
+   receive_char_array(&basis->basis_exists, 1);
    if (basis->basis_exists){
       unpack_double_array_desc(&basis->baserows, explicit_packing);
       unpack_double_array_desc(&basis->extrarows, explicit_packing);

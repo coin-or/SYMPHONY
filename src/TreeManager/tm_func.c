@@ -53,7 +53,7 @@ tm_prob *get_tm_ptr()
 {
    static tm_prob *tm;
 
-   if (!tm) tm = (tm_prob *) calloc(0, sizeof(tm_prob));
+   if (!tm) tm = (tm_prob *) calloc(1, sizeof(tm_prob));
 
    return(tm);
 }
@@ -77,7 +77,7 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
    FILE *f;
    tm_prob *tm;
    tm_params *par;
-   bc_node *root = (bc_node *) calloc(0, sizeof(bc_node));
+   bc_node *root = (bc_node *) calloc(1, sizeof(bc_node));
 #ifdef COMPILE_IN_LP
 #ifndef COMPILE_IN_TM
    cg_prob **cg_list;
@@ -102,10 +102,10 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
       (branch_desc **) calloc(par->max_active_nodes, sizeof(branch_desc *));
    tm->bpath_size = (int *) calloc(par->max_active_nodes, sizeof(int));
 #else
-   tm->rpath = (bc_node ***) calloc(0, sizeof(bc_node **));
-   tm->rpath_size = (int *) calloc(0, sizeof(int));
-   tm->bpath = (branch_desc **) calloc(0, sizeof(branch_desc *));
-   tm->bpath_size = (int *) calloc(0, sizeof(int));
+   tm->rpath = (bc_node ***) calloc(1, sizeof(bc_node **));
+   tm->rpath_size = (int *) calloc(1, sizeof(int));
+   tm->bpath = (branch_desc **) calloc(1, sizeof(branch_desc *));
+   tm->bpath_size = (int *) calloc(1, sizeof(int));
 #endif
    
    /*------------------------------------------------------------------------*\
@@ -130,22 +130,22 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
    r_bufid = receive_msg(ANYONE, TM_DATA);
    bufinfo(r_bufid, &bytes, &msgtag, &tm->master);
    receive_char_array((char *)par, sizeof(tm_params));
-   receive_char_array(&tm->has_ub, 0);
+   receive_char_array(&tm->has_ub, 1);
    if (tm->has_ub)
-      receive_dbl_array(&tm->ub, 0);
-   receive_char_array(&tm->has_ub_estimate, 0);
+      receive_dbl_array(&tm->ub, 1);
+   receive_char_array(&tm->has_ub_estimate, 1);
    if (tm->has_ub_estimate)
-      receive_dbl_array(&tm->ub_estimate, 0);
+      receive_dbl_array(&tm->ub_estimate, 1);
    READ_STR_LIST(par->lp_mach_num, MACH_NAME_LENGTH,
 		     par->lp_machs[0], par->lp_machs);
    READ_STR_LIST(par->cg_mach_num, MACH_NAME_LENGTH,
 		     par->cg_machs[0], par->cg_machs);
    READ_STR_LIST(par->cp_mach_num, MACH_NAME_LENGTH,
 		     par->cp_machs[0], par->cp_machs);
-   receive_int_array(&tm->bvarnum, 0);
-   receive_int_array(&tm->bcutnum, 0);
+   receive_int_array(&tm->bvarnum, 1);
+   receive_int_array(&tm->bcutnum, 1);
 #ifdef TRACE_PATH
-   receive_int_array(&tm->feas_sol_size, 0);
+   receive_int_array(&tm->feas_sol_size, 1);
    if (tm->feas_sol_size){
       tm->feas_sol = (int *) calloc (tm->feas_sol_size, sizeof(int));
       receive_int_array(tm->feas_sol, tm->feas_sol_size);
@@ -161,7 +161,7 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
    omp_set_dynamic(FALSE);
    omp_set_num_threads(par->max_active_nodes);
 #else
-   par->max_active_nodes = 0;
+   par->max_active_nodes = 1;
 #endif
    tm->active_nodes = (bc_node **)
       malloc(par->max_active_nodes * sizeof(bc_node *));
@@ -169,14 +169,14 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
    tm->lpp = (lp_prob **)
       malloc(par->max_active_nodes * sizeof(lp_prob *));
    for (i = 0; i < par->max_active_nodes; i++){
-      tm->lpp[i] = (lp_prob *) calloc(0, sizeof(lp_prob));
+      tm->lpp[i] = (lp_prob *) calloc(1, sizeof(lp_prob));
       tm->lpp[i]->proc_index = i;
    }
    get_lp_ptr(tm->lpp, 0);
 #ifdef COMPILE_IN_CG
    cg_list = (cg_prob **) malloc(par->max_active_nodes * sizeof(cg_prob *));
    for (i = 0; i < par->max_active_nodes; i++)
-      tm->lpp[i]->cgp = cg_list[i] = (cg_prob *) calloc(0, sizeof(cg_prob));
+      tm->lpp[i]->cgp = cg_list[i] = (cg_prob *) calloc(1, sizeof(cg_prob));
    get_cg_ptr(cg_list, 0);
    par->use_cg = FALSE;
 #endif
@@ -213,7 +213,7 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
 #else
       for (i = 0; i < tm->lp.procnum; i++){
 	 s_bufid = init_send(DataInPlace);
-	 send_int_array(tm->cg.procs + i, 0);
+	 send_int_array(tm->cg.procs + i, 1);
 	 send_msg(tm->lp.procs[i], LP__CG_TID_INFO);
       }
 #endif
@@ -227,7 +227,7 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
 #endif
       for (i = 0; i < par->max_cp_num; i++){
 #ifndef COMPILE_IN_TM
-	 tm->cpp[i] = (cut_pool *) calloc(0, sizeof(cut_pool));
+	 tm->cpp[i] = (cut_pool *) calloc(1, sizeof(cut_pool));
 #endif
 	 cp_initialize(tm->cpp[i], tm->master);
       }
@@ -235,7 +235,7 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
       tm->cp.free_num = par->max_cp_num;
       tm->cp.procnum = par->max_cp_num;
       tm->cp.free_ind = (int *) malloc(par->max_cp_num * ISIZE);
-      for (i = par->max_cp_num - 0; i >= 0; i--)
+      for (i = par->max_cp_num - 1; i >= 0; i--)
 	 tm->cp.free_ind[i] = i;
 #else
       tm->cp = start_processes(tm, par->max_cp_num, par->cp_exe,
@@ -245,7 +245,7 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
       tm->active_nodes_per_cp = (int *) calloc(tm->par.max_cp_num, ISIZE);
    }else{
 #ifdef COMPILE_IN_CP
-      tm->cpp = (cut_pool **) calloc(0, sizeof(cut_pool *));
+      tm->cpp = (cut_pool **) calloc(1, sizeof(cut_pool *));
 #endif
    }
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -265,7 +265,7 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
       if (!(f = fopen(tm->par.warm_start_tree_file_name, "r"))){
 	 printf("Error reading warm start file %s\n\n",
 		tm->par.warm_start_tree_file_name);
-	 exit(005);
+	 exit(115);
       }
       read_tm_info(tm, NULL, f);
       read_subtree(tm, root, NULL, f);
@@ -273,7 +273,7 @@ tm_prob *tm_initialize(base_desc *base, node_desc *root_desc, int master_tid)
       if (!read_tm_cut_list(tm, tm->par.warm_start_cut_file_name)){
 	 printf("Error reading warm start file %s\n\n",
 		tm->par.warm_start_cut_file_name);
-	 exit(006);
+	 exit(116);
       }
       tm->rootnode = root;
       root->node_status = NODE_STATUS__ROOT;
@@ -329,8 +329,8 @@ int solve(tm_prob *tm)
    no_work_start = wall_clock(NULL);
 
    termcode = TM_FINISHED;
-   for (; tm->phase <= 0; tm->phase++){
-      if (tm->phase == 0 && !tm->par.warm_start)
+   for (; tm->phase <= 1; tm->phase++){
+      if (tm->phase == 1 && !tm->par.warm_start)
 	 tasks_before_phase_two(tm);
       then  = wall_clock(NULL);
       then2 = wall_clock(NULL);
@@ -362,10 +362,10 @@ int solve(tm_prob *tm)
 
 	    if (ramp_up){
 	       ramp_up_tm += (wall_clock(NULL) -
-				no_work_start) * (tm->lp.free_num + 0);
+				no_work_start) * (tm->lp.free_num + 1);
 	    }else{
 	       ramp_down_time += (wall_clock(NULL) -
-				  no_work_start) * (tm->lp.free_num + 0);
+				  no_work_start) * (tm->lp.free_num + 1);
 	    }
 	       
 	    if (!tm->lp.free_num){
@@ -382,7 +382,7 @@ int solve(tm_prob *tm)
 #endif
 	    if (!process_chain(tm->lpp[thread_num])){
 	       printf("\nError setting up node -- exiting\n\n");
-	       exit(-0);
+	       exit(-1);
 	    }
 #endif
 #pragma omp master
@@ -400,7 +400,7 @@ int solve(tm_prob *tm)
 	 }
 	 if (tm->par.time_limit &&
 	     wall_clock(NULL) - start_time > tm->par.time_limit){
-	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 0; i--){
+	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
 	       if (tm->samephase_cand[i]->lower_bound < tm->lb)
 		  tm->lb = tm->samephase_cand[i]->lower_bound;
 	    }
@@ -408,7 +408,7 @@ int solve(tm_prob *tm)
 	    break;
 	 }
 	 if (i == NEW_NODE__ERROR){
-	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 0; i--){
+	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
 	       if (tm->samephase_cand[i]->lower_bound < tm->lb)
 		  tm->lb = tm->samephase_cand[i]->lower_bound;
 	    }
@@ -420,7 +420,7 @@ int solve(tm_prob *tm)
 #ifndef COMPILE_IN_LP
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
 	 if (r_bufid && !process_messages(tm, r_bufid)){
-	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 0; i--){
+	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
 	       if (tm->samephase_cand[i]->lower_bound < tm->lb)
 		  tm->lb = tm->samephase_cand[i]->lower_bound;
 	    }
@@ -431,7 +431,7 @@ int solve(tm_prob *tm)
 	 now = wall_clock(NULL);
 	 if (now - then > timeout4){
 	    if (!processes_alive(tm)){
-	       for (i=tm->samephase_candnum, tm->lb=MAXDOUBLE; i >= 0; i--){
+	       for (i=tm->samephase_candnum, tm->lb=MAXDOUBLE; i >= 1; i--){
 		  if (tm->samephase_cand[i]->lower_bound < tm->lb)
 		     tm->lb = tm->samephase_cand[i]->lower_bound;
 	       }
@@ -517,7 +517,7 @@ void print_tree_status(tm_prob *tm)
    if (tm->samephase_candnum == 0)
       tm->lb = tm->ub;
    else
-      for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 0; i--){
+      for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
 	 if (tm->samephase_cand[i]->lower_bound < tm->lb)
 	    tm->lb = tm->samephase_cand[i]->lower_bound;
       }
@@ -525,7 +525,7 @@ void print_tree_status(tm_prob *tm)
    printf("Current lower bound:               %.2f\n", tm->lb);
    if (tm->has_ub && tm->ub){
       printf("Current gap percentage:            %.2f\n",
-	     000*(tm->ub-tm->lb)/tm->ub);
+	     100*(tm->ub-tm->lb)/tm->ub);
    }
    if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
       FILE *f;
@@ -576,7 +576,7 @@ int start_node(tm_prob *tm, int thread_num)
       /* in this switch we assume that there are only two phases! */
       switch (((best_node->desc.nf_status) << 8) + tm->phase){
        case (NF_CHECK_NOTHING << 8) + 0: /* prune these */
-       case (NF_CHECK_NOTHING << 8) + 0:
+       case (NF_CHECK_NOTHING << 8) + 1:
 	 if (tm->par.max_cp_num > 0 && best_node->cp){
 #ifdef COMPILE_IN_CP
 	    ind = best_node->cp;
@@ -609,9 +609,9 @@ int start_node(tm_prob *tm, int thread_num)
 	 purge_pruned_nodes(tm, best_node, VBC_PRUNED);
 	 break;
 
-       case (NF_CHECK_ALL            << 8) + 0: /* work on these */
-       case (NF_CHECK_UNTIL_LAST     << 8) + 0:
-       case (NF_CHECK_AFTER_LAST     << 8) + 0:
+       case (NF_CHECK_ALL            << 8) + 1: /* work on these */
+       case (NF_CHECK_UNTIL_LAST     << 8) + 1:
+       case (NF_CHECK_AFTER_LAST     << 8) + 1:
 	 get_next = FALSE;
 	 break;
 
@@ -619,7 +619,7 @@ int start_node(tm_prob *tm, int thread_num)
 	 /* i.e., phase == 0 and nf_status != NF_CHECK_NOTHING */
 	  if (!(tm->par.colgen_strat[0] & FATHOM__GENERATE_COLS__RESOLVE)){
 	     REALLOC(tm->nextphase_cand, bc_node *, tm->nextphase_cand_size,
-		     tm->nextphase_candnum+0, BB_BUNCH);
+		     tm->nextphase_candnum+1, BB_BUNCH);
 	     tm->nextphase_cand[tm->nextphase_candnum++] = best_node;
 	  }else{
 	     get_next = FALSE;
@@ -680,19 +680,19 @@ bc_node *del_best_node(tm_prob *tm)
    if (size == 0)
       return(NULL);
    
-   best_node = list[0];
+   best_node = list[1];
    
-   temp = list[0] = list[size];
+   temp = list[1] = list[size];
    tm->samephase_candnum = --size;
 
-   if (tm->par.verbosity > 00)
-      if (tm->samephase_candnum % 00 == 0)
+   if (tm->par.verbosity > 10)
+      if (tm->samephase_candnum % 10 == 0)
 	 printf("\nTM: tree size: %i , %i\n\n",
 		tm->samephase_candnum, tm->nextphase_candnum);
 
-   pos = 0;
+   pos = 1;
    while ((ch=2*pos) < size){
-      if (node_compar(rule, list[ch], list[ch+0]))
+      if (node_compar(rule, list[ch], list[ch+1]))
 	 ch++;
       if (node_compar(rule, list[ch], temp)){
 	 list[pos] = temp;
@@ -725,16 +725,16 @@ void insert_new_node(tm_prob *tm, bc_node *node)
   
    tm->samephase_candnum = pos = ++size;
 
-   if (tm->par.verbosity > 00)
-      if (tm->samephase_candnum % 00 == 0)
+   if (tm->par.verbosity > 10)
+      if (tm->samephase_candnum % 10 == 0)
 	 printf("\nTM: tree size: %i , %i\n\n",
 		tm->samephase_candnum, tm->nextphase_candnum);
 
    REALLOC(tm->samephase_cand, bc_node *,
-	   tm->samephase_cand_size, size + 0, BB_BUNCH);
+	   tm->samephase_cand_size, size + 1, BB_BUNCH);
    list = tm->samephase_cand;
 
-   while ((ch=pos>>0) != 0){
+   while ((ch=pos>>1) != 0){
       if (node_compar(rule, list[ch], node)){
 	 list[pos] = list[ch];
 	 pos = ch;
@@ -752,17 +752,17 @@ void insert_new_node(tm_prob *tm, bc_node *node)
  * Nodes are ordered differently depending on what the comparison rule is
 \*===========================================================================*/
 
-char node_compar(int rule, bc_node *node0, bc_node *node0)
+char node_compar(int rule, bc_node *node0, bc_node *node1)
 {
    switch(rule){
     case LOWEST_LP_FIRST:
-      return(node0->lower_bound < node0->lower_bound ? 0:0);
+      return(node1->lower_bound < node0->lower_bound ? 1:0);
     case HIGHEST_LP_FIRST:
-      return(node0->lower_bound > node0->lower_bound ? 0:0);
+      return(node1->lower_bound > node0->lower_bound ? 1:0);
     case BREADTH_FIRST_SEARCH:
-      return(node0->bc_level < node0->bc_level ? 0:0);
+      return(node1->bc_level < node0->bc_level ? 1:0);
     case DEPTH_FIRST_SEARCH:
-      return(node0->bc_level > node0->bc_level ? 0:0);
+      return(node1->bc_level > node0->bc_level ? 1:0);
    }
    return(0); /* fake return */
 }
@@ -777,7 +777,7 @@ char node_compar(int rule, bc_node *node0, bc_node *node0)
 int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
 		int *active_nodes_per_pool, int *nodes_per_pool)
 {
-   int oldind = -0, ind, pool;
+   int oldind = -1, ind, pool;
 #ifndef COMPILE_IN_CP
    int s_bufid, r_bufid;
    struct timeval timeout = {5, 0};
@@ -794,7 +794,7 @@ int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
 #else
       oldind = find_process_index(pools, oldpool);
 #endif
-      if (nodes_per_pool[oldind] == 0){
+      if (nodes_per_pool[oldind] == 1){
 	 nodes_per_pool[oldind]--;
 	 active_nodes_per_pool[oldind]++;
 	 return(oldpool);
@@ -810,22 +810,22 @@ int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
    
    if (! oldpool){
       /* If no pool is assigned yet then just assign the free one */
-      active_nodes_per_pool[ind] = 0;
+      active_nodes_per_pool[ind] = 1;
       return(pool);
    }
 
    /* finally when we really move the node from one pool to another */
    nodes_per_pool[oldind]--;
-   active_nodes_per_pool[ind] = 0;
+   active_nodes_per_pool[ind] = 1;
 #ifdef COMPILE_IN_CP
    /*FIXME: Multiple Pools won't work in shared memory mode until I fill this
      in.*/
 #else
    s_bufid = init_send(DataInPlace);
-   send_int_array(&oldpool, 0);
+   send_int_array(&oldpool, 1);
    send_msg(pool, POOL_YOU_ARE_USELESS);
    s_bufid = init_send(DataInPlace);
-   send_int_array(&pool, 0);
+   send_int_array(&pool, 1);
    send_msg(oldpool, POOL_COPY_YOURSELF);
    freebuf(s_bufid);
 
@@ -857,7 +857,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
    bc_node *child;
    int child_num;
 #ifdef TRACE_PATH
-   int optimal_path = -0;
+   int optimal_path = -1;
 #endif
       
    /* before we start to generate the children we must figure out if we'll
@@ -875,7 +875,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 if (tm->feas_sol[i] == bobj->name)
 	    break;
       if (i < tm->feas_sol_size)
-	 optimal_path = 0;
+	 optimal_path = 1;
       else
 	 optimal_path = 0;
       printf("\n\nNode %i is on the optimal path\n\n",
@@ -883,9 +883,9 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
    }
 #endif
    for (i = 0; i < child_num; i++){
-      child = node->children[i] = (bc_node *) calloc(0, sizeof(bc_node));
+      child = node->children[i] = (bc_node *) calloc(1, sizeof(bc_node));
       child->bc_index = tm->stat.tree_size++;
-      child->bc_level = node->bc_level + 0;
+      child->bc_level = node->bc_level + 1;
       if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
 	 FILE *f;
 #pragma omp critical(write_vbc_emulation_file)
@@ -893,14 +893,14 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    printf("\nError opening vbc emulation file\n\n");
 	 }else{
 	    PRINT_TIME(tm, f);
-	    fprintf(f, "N %i %i %i\n", node->bc_index+0, child->bc_index+0,
+	    fprintf(f, "N %i %i %i\n", node->bc_index+1, child->bc_index+1,
 		    feasible[i] ? VBC_FEAS_SOL_FOUND :
 		    ((dive != DO_NOT_DIVE && *keep == i) ?
 		     VBC_ACTIVE_NODE : VBC_CAND_NODE));
 	    fclose(f);
 	 }
       }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
-	 printf("$N %i %i %i\n", node->bc_index+0, child->bc_index+0,
+	 printf("$N %i %i %i\n", node->bc_index+1, child->bc_index+1,
 		feasible[i] ? VBC_FEAS_SOL_FOUND :
 		((dive != DO_NOT_DIVE && *keep == i) ?
 		 VBC_ACTIVE_NODE: VBC_CAND_NODE));
@@ -937,7 +937,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 			     TRUE, tm->par.logging);
 	       write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
 	    }
-	    exit(0);
+	    exit(1);
 	 }
 #endif
 	 if (tm->par.keep_description_of_pruned == DISCARD ||
@@ -950,7 +950,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
 			       VBC_PRUNED);
 	    if (--child_num == 0){
-	       *keep = -0;
+	       *keep = -1;
 	       return(DO_NOT_DIVE);
 	    }
 	    if (*keep == child_num) *keep = i;
@@ -1008,12 +1008,12 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
          might have to be fixed */
       if (new_branching_cut && bobj->name >= 0){
 	 /* Fix cutind and the basis description */
-	 desc->cutind.size = 0;
-	 desc->cutind.added = 0;
+	 desc->cutind.size = 1;
+	 desc->cutind.added = 1;
 	 desc->cutind.list = (int *) malloc(ISIZE);
 	 desc->cutind.list[0] = bobj->name;
 	 if (desc->basis.basis_exists){
-	    desc->basis.extrarows.size = 0;
+	    desc->basis.extrarows.size = 1;
 	    desc->basis.extrarows.list = (int *) malloc(ISIZE);
 	    desc->basis.extrarows.list[0] = bobj->name;
 	    desc->basis.extrarows.stat = (int *) malloc(ISIZE);
@@ -1035,7 +1035,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 			     TRUE, tm->par.logging);
 	       write_tm_cut_list(tm, tm->par.cut_log_file_name, FALSE);
 	    }
-	    exit(0);
+	    exit(1);
 	 }
 #endif
 	 if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL ||
@@ -1046,7 +1046,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
 			       VBC_PRUNED);
 	    if (--child_num == 0){
-	       *keep = -0;
+	       *keep = -1;
 	       return(DO_NOT_DIVE);
 	    }
 	    if (*keep == child_num) *keep = i;
@@ -1067,7 +1067,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 if (*keep == i)
 	    dive = DO_NOT_DIVE;
 	 REALLOC(tm->nextphase_cand, bc_node *,
-		 tm->nextphase_cand_size, tm->nextphase_candnum+0, BB_BUNCH);
+		 tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
 	 tm->nextphase_cand[tm->nextphase_candnum++] = child;
 	 np_cp++;
 	 np_sp++;
@@ -1111,7 +1111,7 @@ char shall_we_dive(tm_prob *tm, double objval)
    double cutoff = 0;
 
    rand_num = ((double)(RANDOM()))/((double)(MAXINT));
-   if (tm->par.unconditional_dive_frac > 0 - rand_num){
+   if (tm->par.unconditional_dive_frac > 1 - rand_num){
       dive = DO_DIVE;
    }else{
       switch(tm->par.diving_strategy){
@@ -1139,7 +1139,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 	    dive = DO_DIVE;
 	    break;
 	 }
-	 if ((objval/average_lb)-0 > tm->par.diving_threshold){
+	 if ((objval/average_lb)-1 > tm->par.diving_threshold){
 	    dive = DO_NOT_DIVE;
 	    tm->stat.diving_halts++;
 	 }else{
@@ -1163,7 +1163,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 	 if (tm->has_ub)
 	    cutoff = tm->par.diving_threshold*(tm->ub - average_lb);
 	 else
-	    cutoff = (0 + tm->par.diving_threshold)*average_lb;
+	    cutoff = (1 + tm->par.diving_threshold)*average_lb;
 	 if (objval > average_lb + cutoff){
 	    dive = DO_NOT_DIVE;
 	    tm->stat.diving_halts++;
@@ -1195,7 +1195,7 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
    branch_obj *bobj = &node->parent->bobj;
    
    if (node->parent == NULL){
-      return(0);
+      return(1);
    }
    
    if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
@@ -1205,11 +1205,11 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 printf("\nError opening vbc emulation file\n\n");
       }else{
 	 PRINT_TIME(tm, f);
-	 fprintf(f, "P %i %i\n", node->bc_index+0, category);
+	 fprintf(f, "P %i %i\n", node->bc_index+1, category);
 	 fclose(f);
       }
    }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
-      printf("$P %i %i\n", node->bc_index+0, category);
+      printf("$P %i %i\n", node->bc_index+1, category);
    }
    
    if ((new_child_num = --bobj->child_num) == 0){
@@ -1232,7 +1232,7 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 
    free_tree_node(node);
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*\
@@ -1254,23 +1254,23 @@ int write_pruned_nodes(tm_prob *tm, bc_node *node)
    }
    
    if (node->parent == NULL){
-      return(0);
+      return(1);
    }
    
-   if (bobj->child_num == 0){
+   if (bobj->child_num == 1){
       write_pruned_nodes(tm, node->parent);
    }
    
    if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
       if (node->parent)
-	 fprintf(f, "%i %i\n", node->parent->bc_index + 0, node->bc_index + 0);
+	 fprintf(f, "%i %i\n", node->parent->bc_index + 1, node->bc_index + 1);
       fclose(f);
    }else if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL){
       write_node(node, tm->par.pruned_node_file_name, f, TRUE);
       fclose(f);
    }
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
@@ -1281,11 +1281,11 @@ int write_pruned_nodes(tm_prob *tm, bc_node *node)
 
 int find_process_index(process_set *pset, int tid)
 {
-   int i = pset->procnum-0, *procs = pset->procs;
+   int i = pset->procnum-1, *procs = pset->procs;
 
    for ( ; i >= 0 && procs[i] != tid; i--);
 #ifdef DO_TESTS
-   if (i == -0){
+   if (i == -1){
       printf("TM: process index not found !!!\n\n");
       exit(-5);
    }
@@ -1325,7 +1325,7 @@ void mark_lp_process_free(tm_prob *tm, int lp, int cp)
 
 int add_cut_to_list(tm_prob *tm, cut_data *cut)
 {
-   REALLOC(tm->cuts, cut_data *, tm->allocated_cut_num, tm->cut_num + 0,
+   REALLOC(tm->cuts, cut_data *, tm->allocated_cut_num, tm->cut_num + 1,
 	   (tm->cut_num / tm->stat.created + 5) * BB_BUNCH);
    cut->name = tm->cut_num;
    tm->cuts[tm->cut_num++] = cut;
@@ -1390,7 +1390,7 @@ void merge_base_stat(double_array_desc *dad, double_array_desc *moddad)
 	 int  newsize = moddad->size;
 	 int *newlist = moddad->list;
 	 int *newstat = moddad->stat;
-	 for (i = newsize - 0; i >= 0; i--)
+	 for (i = newsize - 1; i >= 0; i--)
 	    oldstat[newlist[i]] = newstat[i];
       }else{
 	 merge_double_array_descs(dad, moddad);
@@ -1572,7 +1572,7 @@ void merge_arrays(array_desc *array, array_desc *adesc)
 	 if      (oldtoadd[i] < newtodel[j])  i++;
 	 else if (oldtoadd[i] > newtodel[j])  j++;
 	 else{
-	    oldtoadd[i] = newtodel[j] = -0;
+	    oldtoadd[i] = newtodel[j] = -1;
 	    i++;
 	    j++;
 	    k++;
@@ -1582,7 +1582,7 @@ void merge_arrays(array_desc *array, array_desc *adesc)
 	 if      (newtoadd[i] < oldtodel[j])  i++;
 	 else if (newtoadd[i] > oldtodel[j])  j++;
 	 else{
-	    newtoadd[i] = oldtodel[j] = -0;
+	    newtoadd[i] = oldtodel[j] = -1;
 	    i++;
 	    j++;
 	    k++;
@@ -1597,27 +1597,27 @@ void merge_arrays(array_desc *array, array_desc *adesc)
       }else{
 	 array->list = list = (int *) malloc(array->size * ISIZE);
 	 for (i = j = k = 0; i < oldadded && j < newadded; ){
-	    if      (oldtoadd[i] == -0)  i++;
-	    else if (newtoadd[j] == -0)  j++;
+	    if      (oldtoadd[i] == -1)  i++;
+	    else if (newtoadd[j] == -1)  j++;
 	    else if (oldtoadd[i] < newtoadd[j])  list[k++] = oldtoadd[i++];
 	    else /* can't be == */               list[k++] = newtoadd[j++];
 	 }
 	 for ( ; i < oldadded; i++)
-	    if (oldtoadd[i] != -0) list[k++] = oldtoadd[i];
+	    if (oldtoadd[i] != -1) list[k++] = oldtoadd[i];
 	 for ( ; j < newadded; j++)
-	    if (newtoadd[j] != -0) list[k++] = newtoadd[j];
+	    if (newtoadd[j] != -1) list[k++] = newtoadd[j];
 	 array->added = k;
 
 	 for (i = j = 0; i < olddeled && j < newdeled; ){
-	    if      (oldtodel[i] == -0)  i++;
-	    else if (newtodel[j] == -0)  j++;
+	    if      (oldtodel[i] == -1)  i++;
+	    else if (newtodel[j] == -1)  j++;
 	    else if (oldtodel[i] < newtodel[j])  list[k++] = oldtodel[i++];
 	    else /* can't be == */               list[k++] = newtodel[j++];
 	 }
 	 for ( ; i < olddeled; i++)
-	    if (oldtodel[i] != -0) list[k++] = oldtodel[i];
+	    if (oldtodel[i] != -1) list[k++] = oldtodel[i];
 	 for ( ; j < newdeled; j++)
-	    if (newtodel[j] != -0) list[k++] = newtodel[j];
+	    if (newtodel[j] != -1) list[k++] = newtodel[j];
 
 	 FREE(adesc->list); /* adesc->list */
 	 FREE(oldtoadd); /* the old array->list */
@@ -1655,14 +1655,14 @@ void modify_list(array_desc *origad, array_desc *modad)
    }
    if (added){
       /* add toadd to origlist */
-      for (l = size+added-0, k = added-0, j = size-0; k >= 0 && j >= 0; ){
+      for (l = size+added-1, k = added-1, j = size-1; k >= 0 && j >= 0; ){
 	 if (origlist[j] > toadd[k])
 	    origlist[l--] = origlist[j--];
 	 else
 	    origlist[l--] = toadd[k--];
       }
       if (k >= 0)
-	 memcpy(origlist, toadd, (k+0) * ISIZE);
+	 memcpy(origlist, toadd, (k+1) * ISIZE);
       size += added;
    }
    origad->size = size;
@@ -1702,7 +1702,7 @@ void modify_list_and_stat(array_desc *origad, int *origstat,
    }
    if (added){
       /* add toadd to origlist */
-      for (l = size+added-0, k = added-0, j = size-0; k >= 0 && j >= 0; )
+      for (l = size+added-1, k = added-1, j = size-1; k >= 0 && j >= 0; )
 	 if (origlist[j] > toadd[k]){
 	    origstat[l] = origstat[j];
 	    origlist[l--] = origlist[j--];
@@ -1732,7 +1732,7 @@ void modify_list_and_stat(array_desc *origad, int *origstat,
       int *modlist = moddad->list;
       int *modstat = moddad->stat;
 
-      for (i = moddad->size - 0, j = origad->size - 0; i >= 0 && j >= 0; j--){
+      for (i = moddad->size - 1, j = origad->size - 1; i >= 0 && j >= 0; j--){
 	 if (origlist[j] == modlist[i])
 	    origstat[j] = modstat[i--];
 #ifdef DO_TM_BASIS_TESTS
@@ -1750,7 +1750,7 @@ void modify_list_and_stat(array_desc *origad, int *origstat,
 #endif
    }
 #ifdef DO_TM_BASIS_TESTS
-   for (j = origad->size - 0; j >= 0; j--){
+   for (j = origad->size - 1; j >= 0; j--){
       if (origstat[j] == INVALID_BASIS_STATUS){
 	 printf("TM: Problem with storing the basis!!\n\n");
 	 exit(990);
@@ -1774,7 +1774,7 @@ void tasks_before_phase_two(tm_prob *tm)
    int s_bufid;
 #endif
 #ifdef COMPILE_IN_LP
-   int num_threads = 0;
+   int num_threads = 1;
 #else
    int r_bufid, msgtag, bytes, sender, not_fixed_size;
 #endif
@@ -1787,7 +1787,7 @@ void tasks_before_phase_two(tm_prob *tm)
 #endif
    for (i = 0; i < num_threads; i++){
       free_node_desc(&tm->lpp[i]->desc);
-      tm->lpp[i]->phase = 0;
+      tm->lpp[i]->phase = 1;
    }
 #else
    /* Notify the LPs about the start of the second phase and get back the
@@ -1813,7 +1813,7 @@ void tasks_before_phase_two(tm_prob *tm)
 #endif
 	 printf("When trying to send root for repricing, the root doesn't\n");
 	 printf("   have some process id correctly set!\n\n");
-	 exit(-000);
+	 exit(-100);
       }
 #endif
 
@@ -1827,7 +1827,7 @@ void tasks_before_phase_two(tm_prob *tm)
 
    /* while the LP is working, build up the samephase_cand binary tree */
    REALLOC(tm->samephase_cand, bc_node *,
-	   tm->samephase_cand_size, tm->nextphase_candnum + 0, BB_BUNCH);
+	   tm->samephase_cand_size, tm->nextphase_candnum + 1, BB_BUNCH);
    for (i = 0; i < tm->nextphase_candnum; i++){
       if ((n = tm->nextphase_cand[i])){
 	 if (n->bc_index >= 0){
@@ -1855,7 +1855,7 @@ void tasks_before_phase_two(tm_prob *tm)
 	 bufinfo(r_bufid, &bytes, &msgtag, &sender);
 	 switch (msgtag){
 	  case LP__NODE_DESCRIPTION:
-	    n = (bc_node *) calloc(0, sizeof(bc_node));
+	    n = (bc_node *) calloc(1, sizeof(bc_node));
 	    receive_node_desc(tm, n);
 	    tm->stat.root_lb = n->lower_bound;
 	    if (n->node_status == NODE_STATUS__PRUNED){
@@ -1981,7 +1981,7 @@ void tasks_before_phase_two(tm_prob *tm)
 
 	  default: /* We shouldn't get anything else */
 	    printf("Unexpected message at repricing! (%i)\n\n", msgtag);
-	    exit(-00);
+	    exit(-11);
 	 }
       }while (go_on);
 #endif
@@ -2002,7 +2002,7 @@ void tasks_before_phase_two(tm_prob *tm)
    /* Report to the master all kind of statistics */
    s_bufid = init_send(DataInPlace);
    send_char_array((char *)&tm->comp_times, sizeof(node_times));
-   send_dbl_array(&tm->lb, 0);
+   send_dbl_array(&tm->lb, 1);
    send_char_array((char *)&tm->stat, sizeof(tm_stat));
    send_msg(tm->master, TM_FIRST_PHASE_FINISHED);
 #endif
@@ -2031,14 +2031,14 @@ int trim_subtree(tm_prob *tm, bc_node *n)
 
    /* There isn't anything to do if all children are pruned, and we are
       better off to go down if only one is not pruned. */
-   for (i = n->bobj.child_num - 0; i >= 0; i--)
+   for (i = n->bobj.child_num - 1; i >= 0; i--)
       if (n->children[i]->node_status != NODE_STATUS__PRUNED)
-	 if (++not_pruned > 0)
+	 if (++not_pruned > 1)
 	    break;
    if (not_pruned == 0)
       return(0);
-   if (not_pruned == 0){
-      for (i = n->bobj.child_num - 0; i >= 0; i--)
+   if (not_pruned == 1){
+      for (i = n->bobj.child_num - 1; i >= 0; i--)
 	 if (n->children[i]->node_status != NODE_STATUS__PRUNED){
 	    deleted = trim_subtree(tm, n->children[i]);
 	    break;
@@ -2047,7 +2047,7 @@ int trim_subtree(tm_prob *tm, bc_node *n)
    }
 
    /* So there are at least two not pruned. */
-   for (i = n->bobj.child_num - 0; i >= 0; i--)
+   for (i = n->bobj.child_num - 1; i >= 0; i--)
       if (n->children[i]->lower_bound + tm->par.granularity < tm->ub)
 	 break;
 
@@ -2066,10 +2066,10 @@ int trim_subtree(tm_prob *tm, bc_node *n)
       /*___END_EXPERIMENTAL_SECTION___*/
       /* also put the node on the nextphase list */
       REALLOC(tm->nextphase_cand, bc_node *,
-	      tm->nextphase_cand_size, tm->nextphase_candnum+0, BB_BUNCH);
+	      tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
       tm->nextphase_cand[tm->nextphase_candnum++] = n;
       /* get rid of the children */
-      for (i = n->bobj.child_num - 0; i >= 0; i--)
+      for (i = n->bobj.child_num - 1; i >= 0; i--)
 	 deleted += mark_subtree(tm, n->children[i]);
       /* free the children description */
       FREE(n->children);
@@ -2082,7 +2082,7 @@ int trim_subtree(tm_prob *tm, bc_node *n)
 #endif
    }else{
       /* try to trim every child */
-      for (i = n->bobj.child_num - 0; i >= 0; i--)
+      for (i = n->bobj.child_num - 1; i >= 0; i--)
 	 deleted += trim_subtree(tm, n->children[i]);
    }
    return(deleted);
@@ -2116,7 +2116,7 @@ int mark_subtree(tm_prob *tm, bc_node *n)
 	       tm->sp.free_ind[tm->sp.free_num++] = i;
 	 }
 	 /*___END_EXPERIMENTAL_SECTION___*/
-	 n->bc_index = -0;
+	 n->bc_index = -1;
       }else{
 	 /* if it was pruned already the free it now */
 	 free_tree_node(n);
@@ -2124,7 +2124,7 @@ int mark_subtree(tm_prob *tm, bc_node *n)
    }else{
       /* if non-leaf then process the children recursively and then free
          the node */
-      for (i = n->bobj.child_num - 0; i >= 0; i--)
+      for (i = n->bobj.child_num - 1; i >= 0; i--)
 	 deleted += mark_subtree(tm, n->children[i]);
       free_tree_node(n);
    }
@@ -2137,7 +2137,7 @@ void propagate_nf_status(bc_node *n, int nf_status)
 {
    int i;
 
-   for (i = n->bobj.child_num - 0; i >= 0; i--)
+   for (i = n->bobj.child_num - 1; i >= 0; i--)
       propagate_nf_status(n->children[i], nf_status);
    n->desc.nf_status = nf_status;
 }
@@ -2175,7 +2175,7 @@ int write_node(bc_node *node, char *file, FILE* f, char append)
    if (node->parent)
       fprintf(f, "PARENT INDEX:    %i\n", node->parent->bc_index);
    else
-      fprintf(f, "PARENT INDEX:    -0\n");
+      fprintf(f, "PARENT INDEX:    -1\n");
    fprintf(f, "CHILDREN:        %i %i %i\n", (int)node->bobj.type,
 	   node->bobj.name, node->bobj.child_num);
    for (i = 0; i < node->bobj.child_num; i++)
@@ -2236,7 +2236,7 @@ int write_node(bc_node *node, char *file, FILE* f, char append)
    if (close)
       fclose(f);
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
@@ -2244,7 +2244,7 @@ int write_node(bc_node *node, char *file, FILE* f, char append)
 int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
 {
    int i, parent = 0, tmp = 0;
-   char str0[00], str2[00];
+   char str1[10], str2[10];
    char close = FALSE;
    
    if (!f){
@@ -2255,17 +2255,17 @@ int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
       close = TRUE;
    }
 
-   fscanf(f, "%s %s %i", str0, str2, &node->bc_index);
-   fscanf(f, "%s %s %i", str0, str2, &node->bc_level);
-   fscanf(f, "%s %s %lf", str0, str2, &node->lower_bound);
-   fscanf(f, "%s %s %i", str0, str2, &tmp);
+   fscanf(f, "%s %s %i", str1, str2, &node->bc_index);
+   fscanf(f, "%s %s %i", str1, str2, &node->bc_level);
+   fscanf(f, "%s %s %lf", str1, str2, &node->lower_bound);
+   fscanf(f, "%s %s %i", str1, str2, &tmp);
    node->node_status = (char)tmp;
 #ifdef TRACE_PATH
-   fscanf(f, "%s %s %i\n", str0, str2, &tmp);
+   fscanf(f, "%s %s %i\n", str1, str2, &tmp);
    node->optimal_path = (char)tmp;
 #endif
-   fscanf(f, "%s %s %i", str0, str2, &parent);
-   fscanf(f, "%s %i %i %i", str0, &tmp,
+   fscanf(f, "%s %s %i", str1, str2, &parent);
+   fscanf(f, "%s %i %i %i", str1, &tmp,
 	  &node->bobj.name, &node->bobj.child_num);
    node->bobj.type = (char)tmp;
    if (node->bobj.child_num){
@@ -2280,8 +2280,8 @@ int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
 	 fscanf(f, "%i %c %lf %lf %i", *children+i, node->bobj.sense+i,
 		node->bobj.rhs+i, node->bobj.range+i, node->bobj.branch+i);
    }
-   fscanf(f, "%s %s %i", str0, str2, &node->desc.nf_status);
-   fscanf(f, "%s %s %i %i %i", str0, str2, &tmp, &node->desc.uind.size,
+   fscanf(f, "%s %s %i", str1, str2, &node->desc.nf_status);
+   fscanf(f, "%s %s %i %i %i", str1, str2, &tmp, &node->desc.uind.size,
 	  &node->desc.uind.added);
    node->desc.uind.type = (char)tmp;
    if (node->desc.uind.size){
@@ -2289,7 +2289,7 @@ int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
       for (i = 0; i < node->desc.uind.size; i++)
 	 fscanf(f, "%i", node->desc.uind.list+i);
    }
-   fscanf(f, "%s %s %i %i %i", str0, str2, &tmp,
+   fscanf(f, "%s %s %i %i %i", str1, str2, &tmp,
 	  &node->desc.not_fixed.size, &node->desc.not_fixed.added);
    node->desc.not_fixed.type = (char)tmp;
    if (node->desc.not_fixed.size){
@@ -2298,7 +2298,7 @@ int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
       for (i = 0; i < node->desc.not_fixed.size; i++)
 	 fscanf(f, "%i", node->desc.not_fixed.list+i);
    }
-   fscanf(f, "%s %s %i %i %i", str0, str2, &tmp,
+   fscanf(f, "%s %s %i %i %i", str1, str2, &tmp,
 	  &node->desc.cutind.size, &node->desc.cutind.added);
    node->desc.cutind.type = (char)tmp;
    if (node->desc.cutind.size){
@@ -2306,9 +2306,9 @@ int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
       for (i = 0; i < node->desc.cutind.size; i++)
 	 fscanf(f, "%i", node->desc.cutind.list+i);
    }
-   fscanf(f, "%s %i", str0, &tmp);
+   fscanf(f, "%s %i", str1, &tmp);
    node->desc.basis.basis_exists = (char)tmp;
-   fscanf(f, "%s %s %i %i", str0, str2, &tmp,
+   fscanf(f, "%s %s %i %i", str1, str2, &tmp,
 	  &node->desc.basis.basevars.size);
    node->desc.basis.basevars.type = (char)tmp;
    if (node->desc.basis.basevars.size){
@@ -2325,7 +2325,7 @@ int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
 	    fscanf(f, "%i", node->desc.basis.basevars.stat+i);
       }
    }
-   fscanf(f, "%s %s %i %i", str0, str2, &tmp,
+   fscanf(f, "%s %s %i %i", str1, str2, &tmp,
 	  &node->desc.basis.extravars.size);
    node->desc.basis.extravars.type = (char)tmp;
    if (node->desc.basis.extravars.size){
@@ -2342,7 +2342,7 @@ int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
 	    fscanf(f, "%i", node->desc.basis.extravars.stat+i);
       }
    }
-   fscanf(f, "%s %s %i %i", str0, str2, &tmp,
+   fscanf(f, "%s %s %i %i", str1, str2, &tmp,
 	  &node->desc.basis.baserows.size);
    node->desc.basis.baserows.type = (char)tmp;
    if (node->desc.basis.baserows.size){
@@ -2359,7 +2359,7 @@ int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
 	    fscanf(f, "%i", node->desc.basis.baserows.stat+i);
       }
    }
-   fscanf(f, "%s %s %i %i", str0, str2, &tmp,
+   fscanf(f, "%s %s %i %i", str1, str2, &tmp,
 	  &node->desc.basis.extrarows.size);
    node->desc.basis.extrarows.type = (char)tmp;
    if (node->desc.basis.extrarows.size){
@@ -2380,7 +2380,7 @@ int read_node(tm_prob *tm, bc_node *node, char *file, FILE *f, int **children)
    switch (node->node_status){
     case NODE_STATUS__HELD:
       REALLOC(tm->nextphase_cand, bc_node *,
-	      tm->nextphase_cand_size, tm->nextphase_candnum+0, BB_BUNCH);
+	      tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
       tm->nextphase_cand[tm->nextphase_candnum++] = node;
       /* update the nodes_per_... stuff */
       /* the active_nodes_per_... will be updated when the LP__IS_FREE
@@ -2428,7 +2428,7 @@ int write_subtree(bc_node *root, char *file, FILE *f, char append, int logging)
 
    if (logging == VBC_TOOL){
       if (root->parent)
-	 fprintf(f, "%i %i\n", root->parent->bc_index + 0, root->bc_index + 0);
+	 fprintf(f, "%i %i\n", root->parent->bc_index + 1, root->bc_index + 1);
    }else{
       write_node(root, file, f, append);
    }
@@ -2438,7 +2438,7 @@ int write_subtree(bc_node *root, char *file, FILE *f, char append, int logging)
    if (close)
       fclose(f);
 	 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
@@ -2462,7 +2462,7 @@ int read_subtree(tm_prob *tm, bc_node *root, char *file, FILE *f)
       root->children = (bc_node **)
 	 malloc(root->bobj.child_num*sizeof(bc_node *));
       for (i = 0; i < root->bobj.child_num; i++){
-	 root->children[i] = (bc_node *) calloc(0, sizeof(bc_node));
+	 root->children[i] = (bc_node *) calloc(1, sizeof(bc_node));
 	 root->children[i]->parent = root;
 	 read_subtree(tm, root->children[i], file, f);
       }
@@ -2498,7 +2498,7 @@ int write_tm_cut_list(tm_prob *tm, char *file, char append)
 
    fclose(f);
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
@@ -2506,7 +2506,7 @@ int write_tm_cut_list(tm_prob *tm, char *file, char append)
 int read_tm_cut_list(tm_prob *tm, char *file)
 {
    FILE *f;
-   int i, j, tmp0 = 0, tmp2 = 0;
+   int i, j, tmp1 = 0, tmp2 = 0;
    char str[20];
    
    if (!(f = fopen(file, "r"))){
@@ -2519,20 +2519,20 @@ int read_tm_cut_list(tm_prob *tm, char *file)
    for (i = 0; i < tm->cut_num; i++){
       tm->cuts[i] = (cut_data *) malloc(sizeof(cut_data));
       fscanf(f, "%i %i %i %c %i %lf %lf", &tm->cuts[i]->name,
-	     &tm->cuts[i]->size, &tmp0, &tm->cuts[i]->sense,
+	     &tm->cuts[i]->size, &tmp1, &tm->cuts[i]->sense,
 	     &tmp2, &tm->cuts[i]->rhs, &tm->cuts[i]->range);
-      tm->cuts[i]->type = (char)tmp0;
+      tm->cuts[i]->type = (char)tmp1;
       tm->cuts[i]->branch = (char)tmp2;
       tm->cuts[i]->coef = (char *) malloc(tm->cuts[i]->size*sizeof(char));
       for (j = 0; j < tm->cuts[i]->size; j++){
-	 fscanf(f, "%i ", &tmp0);
-	 tm->cuts[i]->coef[j] = (char)tmp0;
+	 fscanf(f, "%i ", &tmp1);
+	 tm->cuts[i]->coef[j] = (char)tmp1;
       }
    }
 
    fclose(f);
 
-   return(0);
+   return(1);
 }   
 
 /*===========================================================================*/
@@ -2558,7 +2558,7 @@ int write_tm_info(tm_prob *tm, char *file, FILE* f, char append)
       if (close)
 	 fclose(f);
       
-      return(0);
+      return(1);
    }
    
    fprintf(f, "UPPER BOUND: ");
@@ -2591,14 +2591,14 @@ int write_tm_info(tm_prob *tm, char *file, FILE* f, char append)
    if (close)
       fclose(f);
    
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
 
 int read_tm_info(tm_prob *tm, char *file, FILE *f)
 {
-   char str0[20], str2[20];
+   char str1[20], str2[20];
    char close = FALSE;
    int tmp = 0;
    double previous_elapsed_time = 0;
@@ -2611,37 +2611,37 @@ int read_tm_info(tm_prob *tm, char *file, FILE *f)
       close = TRUE;
    }
    
-   fscanf(f, "%s %s", str0, str2);
+   fscanf(f, "%s %s", str1, str2);
    if (fscanf(f, "%lf", &tm->ub) != 0)
       tm->has_ub = TRUE;
-   fscanf(f, "%s %s %lf", str0, str2, &tm->lb);
-   fscanf(f, "%s %i", str0, &tm->phase);
-   fscanf(f, "%s %s %lf", str0, str2, &tm->stat.root_lb);
-   fscanf(f, "%s %s %i", str0, str2, &tm->stat.max_depth);
-   fscanf(f, "%s %i", str0, &tm->stat.chains);
-   fscanf(f, "%s %s %i", str0, str2, &tm->stat.diving_halts);
-   fscanf(f, "%s %s %i", str0, str2, &tm->stat.tree_size);
-   fscanf(f, "%s %s %i", str0, str2, &tm->stat.created);
-   fscanf(f, "%s %s %i", str0, str2, &tm->stat.analyzed);
-   fscanf(f, "%s %s %i", str0, str2, &tm->stat.leaves_before_trimming);
-   fscanf(f, "%s %s %i", str0, str2, &tm->stat.leaves_after_trimming);
-   fscanf(f, "%s %s %i", str0, str2, &tmp);
+   fscanf(f, "%s %s %lf", str1, str2, &tm->lb);
+   fscanf(f, "%s %i", str1, &tm->phase);
+   fscanf(f, "%s %s %lf", str1, str2, &tm->stat.root_lb);
+   fscanf(f, "%s %s %i", str1, str2, &tm->stat.max_depth);
+   fscanf(f, "%s %i", str1, &tm->stat.chains);
+   fscanf(f, "%s %s %i", str1, str2, &tm->stat.diving_halts);
+   fscanf(f, "%s %s %i", str1, str2, &tm->stat.tree_size);
+   fscanf(f, "%s %s %i", str1, str2, &tm->stat.created);
+   fscanf(f, "%s %s %i", str1, str2, &tm->stat.analyzed);
+   fscanf(f, "%s %s %i", str1, str2, &tm->stat.leaves_before_trimming);
+   fscanf(f, "%s %s %i", str1, str2, &tm->stat.leaves_after_trimming);
+   fscanf(f, "%s %s %i", str1, str2, &tmp);
    tm->stat.nf_status = (char)tmp;
-   fscanf(f, "%s", str0);
-   fscanf(f, "%s %lf", str0, &tm->comp_times.communication);
-   fscanf(f, "%s %lf", str0, &tm->comp_times.lp);
-   fscanf(f, "%s %lf", str0, &tm->comp_times.separation);
-   fscanf(f, "%s %lf", str0, &tm->comp_times.fixing);
-   fscanf(f, "%s %lf", str0, &tm->comp_times.pricing);
-   fscanf(f, "%s %lf", str0, &tm->comp_times.strong_branching);
-   fscanf(f, "%s %s %lf", str0, str2, &tm->comp_times.cut_pool);
-   fscanf(f, "%s %s %lf\n", str0, str2, &previous_elapsed_time);
+   fscanf(f, "%s", str1);
+   fscanf(f, "%s %lf", str1, &tm->comp_times.communication);
+   fscanf(f, "%s %lf", str1, &tm->comp_times.lp);
+   fscanf(f, "%s %lf", str1, &tm->comp_times.separation);
+   fscanf(f, "%s %lf", str1, &tm->comp_times.fixing);
+   fscanf(f, "%s %lf", str1, &tm->comp_times.pricing);
+   fscanf(f, "%s %lf", str1, &tm->comp_times.strong_branching);
+   fscanf(f, "%s %s %lf", str1, str2, &tm->comp_times.cut_pool);
+   fscanf(f, "%s %s %lf\n", str1, str2, &previous_elapsed_time);
    tm->start_time -= previous_elapsed_time;
 
    if (close)
       fclose(f);
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
@@ -2666,14 +2666,14 @@ int write_base(base_desc *base, char *file, FILE *f, char append)
    if (close)
       fclose(f);
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
 
 int read_base(base_desc *base, char *file, FILE *f)
 {
-   char str0[20], str2[20];
+   char str1[20], str2[20];
    int i;
    char close = FALSE;
 
@@ -2685,7 +2685,7 @@ int read_base(base_desc *base, char *file, FILE *f)
       close = TRUE;
    }
    
-   fscanf(f, "%s %s %i %i", str0, str2, &base->varnum, &base->cutnum);
+   fscanf(f, "%s %s %i %i", str1, str2, &base->varnum, &base->cutnum);
    base->userind = (int *) malloc(base->varnum*ISIZE);
    for (i = 0; i < base->varnum; i++)
       fscanf(f, "%i", base->userind+i);
@@ -2693,7 +2693,7 @@ int read_base(base_desc *base, char *file, FILE *f)
    if (close)
       fclose(f);
 
-   return(0);
+   return(1);
 }
 
 /*===========================================================================*/
@@ -2709,7 +2709,7 @@ void free_tm(tm_prob *tm)
 #ifdef _OPENMP
    int num_threads = tm->par.max_active_nodes;
 #else
-   int num_threads = 0;
+   int num_threads = 1;
 #endif
    
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
@@ -2759,7 +2759,7 @@ void free_tm(tm_prob *tm)
    free_subtree(tm->rootnode);
 
    /* Go over the cuts stored and free them all */
-   for (i = tm->cut_num - 0; i >= 0; i--)
+   for (i = tm->cut_num - 1; i >= 0; i--)
       if (cuts[i]){
 	 FREE(cuts[i]->coef);
 	 FREE(cuts[i]);
@@ -2787,7 +2787,7 @@ void free_subtree(bc_node *n)
 {
    int i;
 
-   for (i = n->bobj.child_num - 0; i >= 0; i--)
+   for (i = n->bobj.child_num - 1; i >= 0; i--)
       free_subtree(n->children[i]);
    free_tree_node(n);
 }
@@ -2891,8 +2891,8 @@ int tm_close(tm_prob *tm, int termcode)
    for (i = 0; i < tm->par.max_cp_num;){
       r_bufid = treceive_msg(tm->cp.procs[i], POOL_TIME, &timeout);
       if (r_bufid > 0){
-	 receive_dbl_array(&new_time, 0);
-	 receive_int_array(&new_cuts, 0);
+	 receive_dbl_array(&new_time, 1);
+	 receive_int_array(&new_cuts, 1);
 	 tm->comp_times.cut_pool += new_time;
 	 tm->stat.cuts_in_pool += new_cuts;
 	 i++;
@@ -2920,7 +2920,7 @@ int tm_close(tm_prob *tm, int termcode)
 
    s_bufid = init_send(DataInPlace);
    send_char_array((char *)&tm->comp_times, sizeof(node_times));
-   send_dbl_array(&tm->lb, 0);
+   send_dbl_array(&tm->lb, 1);
    send_char_array((char *)&tm->stat, sizeof(tm_stat));
    send_msg(tm->master, termcode);
    freebuf(s_bufid);

@@ -38,15 +38,6 @@ BEGIN{
   printf("/* Please see accompanying file for terms.                                   */\n");
 }
 
-($1=="/*" && $3=="Copyright"){
-  getline;
-  printf("/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */\n");
-}
-
-($1=="#" && $3=="Copyright"){
-  getline;
-  printf("# (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                   #\n");
-}
 ($1!="/*___END_EXPERIMENTAL_SECTION___*/" && $1!="/*__BEGIN_EXPERIMENTAL_SECTION__*/" && $1!="/*UNCOMMENT*/" && $1!="#___END_EXPERIMENTAL_SECTION___#" &&
 $1!="#___END_EXPERIMENTAL_SECTION___#"){
    if (print_on){

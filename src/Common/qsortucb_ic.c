@@ -4,7 +4,7 @@ void qsortucb_ic(int *bot,
 		 char *botd,
 		 int nmemb)
 {
-   if (nmemb <= 0)
+   if (nmemb <= 1)
       return;
 
    if (nmemb >= THRESH)
@@ -22,11 +22,11 @@ void qsortucb_ic(int *bot,
 
 #define	SORT_IC(bot, botd, n) \
 { \
-   if (n > 0) { \
+   if (n > 1) { \
       if (n == 2) { \
-	 t0 = bot + 0; \
-	 if (*t0 < *bot) \
-	    SWAP_IC(t0, bot, botd, botd + (t0-bot)); \
+	 t1 = bot + 1; \
+	 if (*t1 < *bot) \
+	    SWAP_IC(t1, bot, botd, botd + (t1-bot)); \
       } else \
 	 insertion_sort_ic(bot, botd, n); \
    } \
@@ -36,32 +36,32 @@ void quick_sort_ic(int *bot,
 		   char *botd,
 		   int nmemb)
 {
-   int tmp, n0, n2;
+   int tmp, n1, n2;
    char tmpd;
-   int *top, *mid, *t0, *t2, *bsv;
+   int *top, *mid, *t1, *t2, *bsv;
    int *origbot = bot;
 
 partition_ic:
-   mid = bot + (nmemb >> 0);
-   top = bot + (nmemb - 0);
+   mid = bot + (nmemb >> 1);
+   top = bot + (nmemb - 1);
    if (nmemb >= MTHRESH) {
-      n0 = *bot < *mid ? -0 : (*bot == *mid ? 0 : 0);
-      n2 = *mid < *top ? -0 : (*mid == *top ? 0 : 0);
-      if (n0 < 0 && n2 > 0)
-	 t0 = *bot < *top ? top : bot;
-      else if (n0 > 0 && n2 < 0)
-	 t0 = *bot > *top ? top : bot;
+      n1 = *bot < *mid ? -1 : (*bot == *mid ? 0 : 1);
+      n2 = *mid < *top ? -1 : (*mid == *top ? 0 : 1);
+      if (n1 < 0 && n2 > 0)
+	 t1 = *bot < *top ? top : bot;
+      else if (n1 > 0 && n2 < 0)
+	 t1 = *bot > *top ? top : bot;
       else
-	 t0 = mid;
+	 t1 = mid;
 
-      if (t0 != mid) {
-	 SWAP_IC(t0, mid, botd + (t0-origbot), botd + (mid-origbot));
+      if (t1 != mid) {
+	 SWAP_IC(t1, mid, botd + (t1-origbot), botd + (mid-origbot));
 	 mid--;
       }
    }
 
-#define	didswap_ic	n0
-#define	newbot_ic	t0
+#define	didswap_ic	n1
+#define	newbot_ic	t1
 #define	replace_ic	t2
    didswap_ic = 0;
    for (bsv = bot;;) {
@@ -71,7 +71,7 @@ partition_ic:
 	    top--;
 	    continue;
 	 }
-	 newbot_ic = bot + 0;
+	 newbot_ic = bot + 1;
 	 if (bot == mid)
 	    replace_ic = mid = top;
 	 else {
@@ -90,7 +90,7 @@ partition_ic:
     swap_ic:
       SWAP_IC(bot, replace_ic, botd+(bot-origbot), botd+(replace_ic-origbot));
       bot = newbot_ic;
-      didswap_ic = 0;
+      didswap_ic = 1;
    }
 
    if (!didswap_ic) {
@@ -98,12 +98,12 @@ partition_ic:
       return;
    }
 
-#define	nlower_ic	n0
+#define	nlower_ic	n1
 #define	nupper_ic	n2
    bot = bsv;
    nlower_ic = mid - bot;
    mid++;
-   nupper_ic = nmemb - nlower_ic - 0;
+   nupper_ic = nmemb - nlower_ic - 1;
 
    if (nlower_ic > nupper_ic) {
       if (nupper_ic >= THRESH)
@@ -138,24 +138,24 @@ void insertion_sort_ic(int *bot,
 {
    int tmp;
    char tmpd;
-   int *s0, *s2, *t0, *t2, *top;
-   char *s0d, *s2d, *t0d, *t2d;
+   int *s1, *s2, *t1, *t2, *top;
+   char *s1d, *s2d, *t1d, *t2d;
 
    top = bot + nmemb;
-   for (t0 = bot + 0; t0 < top;) {
-      for (t2 = t0; --t2 >= bot && *t0 < *t2;);
-      if (t0 != ++t2) {
-	 tmp = *t0;
-	 for (s0 = s2 = t0; --s2 >= t2; s0 = s2)
-	    *s0 = *s2;
-	 *s0 = tmp;
-	 t0d = botd + (t0-bot);
+   for (t1 = bot + 1; t1 < top;) {
+      for (t2 = t1; --t2 >= bot && *t1 < *t2;);
+      if (t1 != ++t2) {
+	 tmp = *t1;
+	 for (s1 = s2 = t1; --s2 >= t2; s1 = s2)
+	    *s1 = *s2;
+	 *s1 = tmp;
+	 t1d = botd + (t1-bot);
 	 t2d = botd + (t2-bot);
-	 tmpd = *t0d;
-	 for (s0d = s2d = t0d; --s2d >= t2d; s0d = s2d)
-	    *s0d = *s2d;
-	 *s0d = tmpd;
+	 tmpd = *t1d;
+	 for (s1d = s2d = t1d; --s2d >= t2d; s1d = s2d)
+	    *s1d = *s2d;
+	 *s1d = tmpd;
       }else
-	 t0++;
+	 t1++;
    }
 }

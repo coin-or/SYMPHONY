@@ -38,9 +38,9 @@ int main(void)
    int s_bufid, r_bufid;
    int num_cuts = 0;
    double tt = 0, get_cuts_time;
-   struct timeval tout = {00, 0};
+   struct timeval tout = {10, 0};
 
-   cp = (cut_pool *) calloc(0, sizeof(cut_pool));
+   cp = (cut_pool *) calloc(1, sizeof(cut_pool));
    
    cp_initialize(cp, 0);
    
@@ -56,7 +56,7 @@ int main(void)
 	 if (!r_bufid){
 	    if (pstat(cp->tree_manager) != PROCESS_OK){
 	       printf("TM has died -- CP exiting\n\n");
-	       exit(-600);
+	       exit(-601);
 	    }
 	 }
       }while (! r_bufid);
@@ -72,15 +72,15 @@ int main(void)
 	     cp->par.check_which == CHECK_LEVEL_AND_TOUCHES){
 	    get_cuts_time = used_time(&tt);
 	    s_bufid = init_send(DataInPlace);
-	    send_int_array(&num_cuts, 0);
-	    send_dbl_array(&get_cuts_time, 0);
-	    send_int_array(&cp->cur_sol.xindex, 0);
-	    send_int_array(&cp->cur_sol.xiter_num, 0);
+	    send_int_array(&num_cuts, 1);
+	    send_dbl_array(&get_cuts_time, 1);
+	    send_int_array(&cp->cur_sol.xindex, 1);
+	    send_int_array(&cp->cur_sol.xiter_num, 1);
 	    send_msg(cp->cur_sol.lp, NO_MORE_CUTS);
 	    freebuf(s_bufid);
 	 }
 
-	 if (++cp->reorder_count % 00 == 0){
+	 if (++cp->reorder_count % 10 == 0){
 	    delete_duplicate_cuts(cp);
 	    order_cuts_by_quality(cp);
 	    cp->reorder_count = 0;

@@ -88,7 +88,7 @@ int check_cuts_u(cut_pool *cp, lp_sol *cur_sol)
 	    break;
 	 (*pcp_cut)->quality =
 	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
-	    (double)((*pcp_cut)->check_num+0);
+	    (double)((*pcp_cut)->check_num+1);
 	 (*pcp_cut)->check_num++;
 	 if ( violated ){
 	    num_cuts++;
@@ -112,7 +112,7 @@ int check_cuts_u(cut_pool *cp, lp_sol *cur_sol)
 	    break;
 	 (*pcp_cut)->quality =
 	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
-	    (double)((*pcp_cut)->check_num+0);
+	    (double)((*pcp_cut)->check_num+1);
 	 (*pcp_cut)->check_num++;
 	 if ( violated ){
 	    num_cuts++;
@@ -134,7 +134,7 @@ int check_cuts_u(cut_pool *cp, lp_sol *cur_sol)
 	    break;
 	 (*pcp_cut)->quality =
 	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
-	    (double)((*pcp_cut)->check_num+0);
+	    (double)((*pcp_cut)->check_num+1);
 	 (*pcp_cut)->check_num++;
 	 if ( violated ){
 	    num_cuts++;
@@ -157,7 +157,7 @@ int check_cuts_u(cut_pool *cp, lp_sol *cur_sol)
 	    break;
 	 (*pcp_cut)->quality =
 	    ((*pcp_cut)->quality*(double)((*pcp_cut)->check_num) + quality)/
-	    (double)((*pcp_cut)->check_num+0);
+	    (double)((*pcp_cut)->check_num+1);
 	 (*pcp_cut)->check_num++;
 	 if ( violated ){
 	    num_cuts++;
@@ -195,7 +195,7 @@ int check_cut_u(cut_pool *cp, lp_sol *cur_sol, cut_data *cut, int *is_violated,
     case EXPLICIT_ROW:
       nzcnt = ((int *) (cut->coef))[0];
       matind = (int *) (cut->coef + ISIZE);
-      matval = (double *) (cut->coef + (0 + nzcnt) * ISIZE);
+      matval = (double *) (cut->coef + (1 + nzcnt) * ISIZE);
       for (i = 0, j = 0; i < nzcnt && j < varnum; ){
 	 if (matind[i] == indices[j]){
 	    lhs += matval[i++]*values[j++];
@@ -249,7 +249,7 @@ void free_cut_pool_u(cut_pool *cp)
    
    CALL_USER_FUNCTION( user_free_cp(&cp->user) );
    
-   for (i = cp->cut_num - 0; i >= 0; i--){
+   for (i = cp->cut_num - 1; i >= 0; i--){
       FREE(cp->cuts[i]->cut.coef);
       FREE(cp->cuts[i]);
    }

@@ -52,7 +52,7 @@ int send_char_array(char *array, int size)
 {
    int info;
    
-   PVM_FUNC(info, pvm_pkbyte(array, size, 0));
+   PVM_FUNC(info, pvm_pkbyte(array, size, 1));
    
    return(info);
 }
@@ -63,7 +63,7 @@ int send_int_array(int *array, int size)
 {
    int info;
    
-   PVM_FUNC(info, pvm_pkint(array, size, 0));
+   PVM_FUNC(info, pvm_pkint(array, size, 1));
    
    return(info);
 }
@@ -74,7 +74,7 @@ int send_float_array(float *array, int size)
 {
    int info;
    
-   PVM_FUNC(info, pvm_pkfloat(array, size, 0));
+   PVM_FUNC(info, pvm_pkfloat(array, size, 1));
    
    return(info);
 }
@@ -85,7 +85,7 @@ int send_dbl_array(double *array, int size)
 {
    int info;
    
-   PVM_FUNC(info, pvm_pkdouble(array, size, 0));
+   PVM_FUNC(info, pvm_pkdouble(array, size, 1));
    
    return(info);
 }
@@ -184,7 +184,7 @@ int receive_char_array(char *array, int size)
 {
    int info;
    
-   PVM_FUNC(info, pvm_upkbyte(array, size, 0));
+   PVM_FUNC(info, pvm_upkbyte(array, size, 1));
    
    return(info);
 }
@@ -195,7 +195,7 @@ int receive_int_array(int *array, int size)
 {
    int info;
    
-   PVM_FUNC(info, pvm_upkint(array, size, 0));
+   PVM_FUNC(info, pvm_upkint(array, size, 1));
    
    return(info);
 }
@@ -206,7 +206,7 @@ int receive_dbl_array(double *array, int size)
 {
    int info;
    
-   PVM_FUNC(info, pvm_upkdouble(array, size, 0));
+   PVM_FUNC(info, pvm_upkdouble(array, size, 1));
    
    return(info);
 }
@@ -217,7 +217,7 @@ int receive_float_array(float *array, int size)
 {
    int info;
    
-   PVM_FUNC(info, pvm_upkfloat(array, size, 0));
+   PVM_FUNC(info, pvm_upkfloat(array, size, 1));
    
    return(info);
 }

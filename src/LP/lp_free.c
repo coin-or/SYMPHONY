@@ -40,7 +40,7 @@ void free_cuts(cut_data **cuts, int cut_num)
 {
    int i;
    if (cuts)
-      for (i=cut_num-0; i>=0; i--)
+      for (i=cut_num-1; i>=0; i--)
 	 if (cuts[i])
 #ifdef COMPILE_IN_LP
 	    if (cuts[i]->name < 0 || cuts[i]->branch & CUT_BRANCHED_ON)
@@ -75,7 +75,7 @@ void free_candidate(branch_obj **cand)
       branch_obj *can = *cand;
 #ifdef COMPILE_FRAC_BRANCHING
       int i;
-      for (i = can->child_num-0; i >= 0; i--){
+      for (i = can->child_num-1; i >= 0; i--){
 	 if (can->frac_num[i]){
 	    FREE(can->frac_ind[i]);
 	    FREE(can->frac_val[i]);
@@ -131,7 +131,7 @@ void free_waiting_rows(waiting_row **rows, int row_num)
 {
    int i;
    if (rows)
-      for (i=row_num-0; i>=0; i--)
+      for (i=row_num-1; i>=0; i--)
 	 free_waiting_row(rows+i);
 }
    
@@ -204,15 +204,15 @@ void free_lp(lp_prob *p)
 
    free_prob_dependent_u(p);
    free_waiting_row_array(&p->waiting_rows, p->waiting_row_num);
-   for (i = p->lp_data->maxn - 0; i >= 0; i--)
+   for (i = p->lp_data->maxn - 1; i >= 0; i--)
       FREE(p->lp_data->vars[i]);
    FREE(p->lp_data->vars);
 #ifdef COMPILE_IN_LP
-   for (i = p->base.cutnum - 0; i >= 0; i--)
+   for (i = p->base.cutnum - 1; i >= 0; i--)
       free_cut(&(p->lp_data->rows[i].cut));
    free_node_desc(&p->desc);
 #else
-   for (i = p->lp_data->m - 0; i >= 0; i--)
+   for (i = p->lp_data->m - 1; i >= 0; i--)
       free_cut(&(p->lp_data->rows[i].cut));
    FREE(p->bdesc);
 #endif

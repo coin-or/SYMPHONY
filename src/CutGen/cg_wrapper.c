@@ -42,7 +42,7 @@ int receive_cg_data_u(cg_prob *p)
    
    r_bufid = receive_msg(p->master, CG_DATA);
    receive_char_array((char *)&p->par, sizeof(cg_params));
-   receive_int_array(&p->draw_graph, 0);
+   receive_int_array(&p->draw_graph, 1);
    switch( user_receive_cg_data(&p->user, p->draw_graph) ){
     case USER_SUCCESS:
     case USER_AND_PP:
