@@ -18,10 +18,12 @@
 #include <io.h>
 #define execlp _execlp
 #include <process.h>
+#else
+#include <unistd.h>
+#endif
 #include <memory.h>
 #include <fcntl.h>
 #include <malloc.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -78,79 +78,41 @@ USERROOT = $(ROOT)/Vrp
 ##############################################################################
 ##############################################################################
 #You must define an LP solver in order to use the software. However, by
-#default, this option is set to "NONE," which allows the software to be
-#compiled, but not run.
+#default, this option is set to "NONE," which results in an error.
 ##############################################################################
 ##############################################################################
 
 LP_SOLVER = NONE
 
 ##############################################################################
-# If you want something other than CPLEX or OSLLIB, add it here.
+# If you want something other than CPLEX or OSL, add it here.
 ##############################################################################
 
 ##############################################################################
-# OSLLIB definitions
+# OSL definitions
 ##############################################################################
 
 #Uncomment the line below if you want to use OSL.
-LP_SOLVER = OSLLIB
+LP_SOLVER = OSL
 
 #Set the paths and the name of the library
-ifeq ($(LP_SOLVER),OSLLIB)
+ifeq ($(LP_SOLVER),OSL)
        LPINCDIR = -I/usr/local/include
        LPLDFLAGS = -L/usr/local/lib
        LPLIB = -losl
 endif
 
 ##############################################################################
-# There are subtle differences between CPLEX versions
+# CPLEX definitions
 ##############################################################################
 
-#Uncomment your version of CPLEX if you want to use CPLEX
-#LP_SOLVER = CPLEX40
-#LP_SOLVER = CPLEX50
-#LP_SOLVER = CPLEX60
-#LP_SOLVER = CPLEX65
-#LP_SOLVER = CPLEX66
-#LP_SOLVER = CPLEX70
-#LP_SOLVER = CPLEX75
+#Uncomment the line below if you want to use CPLEX.
+#LP_SOLVER = CPLEX
 
-#Set the paths and the name of the library
-ifeq ($(LP_SOLVER),CPLEX40)
+ifeq ($(LP_SOLVER),CPLEX)
 	LPINCDIR = -I/usr/local/include
 	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex40 
-endif
-ifeq ($(LP_SOLVER),CPLEX50)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex50 
-endif
-ifeq ($(LP_SOLVER),CPLEX60)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex60
-endif
-ifeq ($(LP_SOLVER),CPLEX65)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex65
-endif
-ifeq ($(LP_SOLVER),CPLEX66)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex66
-endif
-ifeq ($(LP_SOLVER),CPLEX70)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex70
-endif
-ifeq ($(LP_SOLVER),CPLEX75)
-	LPINCDIR = -I/usr/local/include
-	LPLDFLAGS = -L/usr/local/lib
-	LPLIB = -lcplex75
+	LPLIB = -lcplex
 endif
 
 ##############################################################################
@@ -175,8 +137,8 @@ COMM_PROTOCOL = NONE
 
 #Set the paths for PVM
 ifeq ($(COMM_PROTOCOL),PVM)
-	COMMINCDIR = $(PVM_ROOT)/include
-	COMMLDFLAGS = $(PVM_ROOT)/lib/$(PVM_ARCH)
+	COMMINCDIR = -I$(PVM_ROOT)/include
+	COMMLDFLAGS = -L$(PVM_ROOT)/lib/$(PVM_ARCH)
 	COMMLIBS = -lgpvm3 -lpvm3
 endif
 
@@ -332,18 +294,11 @@ GCCLIBDIR =
 
 ifeq ($(ARCH),LINUX)
 	X11LDFLAGS = -L/usr/X11R6/lib
-########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX70)
+	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSFREEUNIX
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
-	SYSLIBS = -lpthread # -lefence
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = TRUE
-	COMPILE_IN_LP = TRUE
-	COMPILE_IN_TM = TRUE
+	SYSLIBS = -lpthread #-lefence
 endif
 
 ##############################################################################
@@ -356,12 +311,6 @@ ifeq ($(ARCH),RS6K)
 	ifeq ($(ARCH),RS6KMP)
 	   SYSLIBS += -lpthreads
 	endif
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = TRUE
-	COMPILE_IN_LP = TRUE
-	COMPILE_IN_TM = TRUE
 endif
 
 ##############################################################################
@@ -370,18 +319,11 @@ endif
 
 ifeq ($(ARCH),SUN4SOL2)
 	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
-########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX70)
+	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM 
 	SYSLIBS = -lsocket -lnsl
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = TRUE
-	COMPILE_IN_LP = TRUE
-	COMPILE_IN_TM = TRUE
 endif
 
 ##############################################################################
@@ -390,18 +332,11 @@ endif
 
 ifeq ($(ARCH),SUNMP)
 	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
-########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX70)
+	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM 
 	SYSLIBS = -lsocket -lnsl
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = TRUE
-	COMPILE_IN_LP = TRUE
-	COMPILE_IN_TM = TRUE
 endif
 
 ##############################################################################
@@ -410,18 +345,11 @@ endif
 
 ifeq ($(ARCH),X86SOL2)
 	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
-########Change this to your CPLEX version
-	ifeq ($(LP_SOLVER),CPLEX70)
+	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
 	SYSLIBS = -lsocket -lnsl
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = TRUE
-	COMPILE_IN_LP = TRUE
-	COMPILE_IN_TM = TRUE
 endif
 
 ##############################################################################
@@ -432,12 +360,6 @@ ifeq ($(ARCH),ALPHA)
 	X11LDFLAGS = -L/usr/local/X11/lib
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
 	SYSLIBS =
-	CC = gcc
-	OPT = -g
-	COMPILE_IN_CG = TRUE
-	COMPILE_IN_CP = FALSE
-	COMPILE_IN_LP = FALSE
-	COMPILE_IN_TM = FALSE
 endif
 
 ##############################################################################
@@ -739,7 +661,7 @@ endif
 # Compiler flags
 ##############################################################################
 
-STRICT_CHECKING = FALSE
+STRICT_CHECKING = TRUE
 
 DEFAULT_FLAGS = $(OPT) $(SYSDEFINES) $(BB_DEFINES) $(INCDIR)
 
@@ -1391,16 +1313,16 @@ $(BINDIR)/ccg : $(USER_CG_DEP) $(USER_CG_OBJS) $(LIBDIR)/libcg.a
 	dg_clean
 
 clean :
-	rm -f $(OBJDIR)/* 
+	rm -rf $(ROOT)/objects.$(ARCH)
 
 clean_user :
-	rm -f $(USER_OBJDIR)/*
+	rm -rf $(USERROOT)/objects.$(ARCH)
 
 clean_dep :
-	rm -f $(DEPDIR)/* 
+	rm -rf $(DEPDIR)/ 
 
 clean_user_dep :
-	rm -f $(USER_DEPDIR)/*
+	rm -rf $(USER_DEPDIR)/
 
 clean_lib :
 	rm -rf $(LIBDIR)

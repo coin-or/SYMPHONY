@@ -115,7 +115,6 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
    p->par.tm_par.granularity = p->par.lp_par.granularity = .9999;
    p->par.lp_par.problem_type = INTEGER_PROBLEM;
-   strcpy(p->par.dg_par.source_path, "/home/tkr/BlackBox/DrawGraph/IGD_1.0/");
    /*___END_EXPERIMENTAL_SECTION___*/
 
    vrp_readparams(vrp, filename, argc, argv);
@@ -284,9 +283,9 @@ int user_init_draw_graph(void *user, int dg_id)
       
       display_graph(dg_id, node_place);
    }
+#endif
 
    return(USER_NO_PP);
-#endif
 }
 
 /*===========================================================================*/
@@ -511,12 +510,14 @@ int user_send_lp_data(void *user, void **user_lp)
 
    vrp_lp->cur_sol = (_node *) calloc (vrp_lp->vertnum, sizeof(_node));
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
+
    if (vrp_lp->window){
       copy_node_set(vrp_lp->window, TRUE, (char *)"Original solution");
+#if 0
       copy_node_set(vrp_lp->window, TRUE, (char *)"Compressed solution");
-   }
 #endif
+   }
+
 /*___END_EXPERIMENTAL_SECTION___*/
    
 #else

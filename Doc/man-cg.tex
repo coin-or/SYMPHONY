@@ -1,0 +1,246 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{User-written functions of the CG process}
+
+Due to the relative simplicity of the cut generator, there are no wrapper
+functions implemented for CG. Consequently, there are no default
+options and no post-processing.
+
+%begin{latexonly}
+\bd
+%end{latexonly}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_receive_cg_data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\functiondef{user\_receive\_cg\_data}
+\label{user_receive_cg_data}
+\begin{verbatim}
+int user_receive_cg_data (void **user)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user has to receive here all problem-specific information that is
+known to the master and will be needed for computation in the CG
+process later on. The same data must be received here that was sent in
+the \hyperref{{\tt user\_send\_cg\_data()}}{{\tt
+user\_send\_cg\_data()} (see Section }{)}{user_send_cg_data} function
+in the master process. The user has to allocate space for all the data
+structures, including {\tt user} itself. Note that some or all of this
+may be done in the function {\tt 
+\htmlref{user\_send\_cg\_data()}{user_send_cg_data}} if the Tree Manager, LP,
+and CG are all compiled together. See that function for more
+information.
+
+\args
+
+\bt{llp{250pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined data structure. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. CG exits. \\
+{\tt USER\_NO\_PP} & The user received the data properly. \\
+\et
+
+\item[Invoked from:] {\tt cg\_initialize()} at process start.
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_unpack_lp_solution_cg
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_receive\_lp\_solution\_cg}
+\begin{verbatim}
+int user_receive_lp_solution_cg(void *user)
+\end{verbatim}
+
+\bd
+
+\describe
+
+This function is invoked only if in the {\tt
+\htmlref{user\_send\_lp\_solution()}{user_send_lp_solution}} function
+of the LP process the user opted for packing the current LP solution
+himself. Here he must unpack the very same data he packed there.
+
+\args
+
+\bt{llp{250pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+\et
+
+\item[Invoked from:] Whenever an LP solution is received.
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. This LP solution is not processed. \\
+{\tt USER\_NO\_PP} & The user received the LP solution. \\
+\et
+
+\item[Note:] \hfill
+
+\BB\ automatically unpacks the level, index and iteration number
+corresponding to the current LP solution within the current search tree node
+as well as the objective value and upper bound.
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_free_cg
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_free\_cg}
+\begin{verbatim}
+int user_free_cg(void **user)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user has to free all the data structures within {\tt user}, and also free
+{\tt user} itself. The user can use the built-in macro {\tt FREE} that checks
+the existence of a pointer before freeing it. 
+
+\args
+
+\bt{llp{280pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined data structure
+(should be {\tt NULL} on exit from this function). \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Ignored. \\
+{\tt USER\_NO\_PP} & The user freed all data structures. \\
+\et
+
+\item[Invoked from:] {\tt cg\_close()} at process shutdown. 
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_find_cuts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_find\_cuts}
+\begin{verbatim}
+int user_find_cuts(void *user, int varnum, int iter_num, int level,
+		    int index, double objval, int *indices, double *values,
+		    double ub, double lpetol, int *cutnum)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user can generate cuts based on the current LP solution stored in
+{\tt soln}. Cuts found need to be sent back to the LP by calling the
+{\tt cg\_send\_cut(\htmlref{cut\_data}{cut_data} *new\_cut)} function.
+The argument of this function is a pointer to the cut to be sent. See
+Section
+\ref{user-written-lp} for a description of this data structure. If the
+user wants the cut to be added to the cut pool in case it proves to be
+effective in the LP, then {\tt new\_cut->name} should be set to {\tt
+CUT\_\_SEND\_TO\_CP}. Otherwise, it should be set to {\tt
+CUT\_\_DO\_NOT\_SEND\_TO\_CP}.\\
+\\
+The only output of this function is the number of cuts generated and this
+value is returned in the last argument.
+
+\args
+
+\bt{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure.
+\\
+{\tt int iter\_num} & IN & The iteration number of the current LP solution. \\
+{\tt int level} & IN & The level in the tree on which the current LP
+solution was generated. \\
+{\tt index} & IN & The index of the node in which LP solution was generated.
+\\
+{\tt objval} & IN & The objective function value of the current LP solution.
+\\
+{\tt int varnum} & IN & The number of nonzeros in the current LP solution. \\
+{\tt indices} & IN & The column indices of the nonzero variables in the current
+LP solution. \\
+{\tt values} & IN & The values of the nonzero variables listed in 
+{\tt indices}.
+\\
+{\tt double ub} & IN & The current global upper bound. \\
+{\tt double lpetol} & IN & The current error tolerance in the LP. \\
+{\tt int *cutnum} & OUT & Pointer to the number of cuts generated
+and sent to the LP. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Ignored. \\
+{\tt USER\_NO\_PP} & The user function exited properly. \\
+\et
+
+\item[Invoked from:] Whenever an LP solution is received.
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_check_validity_of_cut
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\label{user_check_validity_of_cut}
+\functiondef{user\_check\_validity\_of\_cut}
+\begin{verbatim}
+int user_check_validity_of_cut(void *user, cut_data *new_cut)
+\end{verbatim}
+
+\bd
+
+\describe
+
+This function is provided as a debugging tool. Every cut that is to be
+sent to the LP solver is first passed to this function where the user
+can independently verify that the cut is valid by testing it against a
+known feasible solution (usually an optimal one). This is useful for
+determining why a particular known feasible (optimal) solution was
+never found. Usually, this is due to an invalid cut being added. See
+Section \ref{debugging} for more on this feature.
+
+\args
+
+\bt{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt cut\_data *new\_cut} & IN & Pointer to the cut that must be
+checked. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Ignored. \\
+{\tt USER\_NO\_PP} & The user is done checking the cut. \\
+\et
+
+\item[Invoked from:] Whenever a cut is being sent to the LP.
+
+\ed
+
+\vspace{1ex}
+
+%begin{latexonly}
+\ed
+%end{latexonly}

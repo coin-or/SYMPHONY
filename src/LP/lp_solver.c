@@ -35,12 +35,12 @@ double dot_product(double *val, int *ind, int collen, double *col)
    return(prod);
 }
 
-#if defined(__OSLLIB__)
+#ifdef __OSL__
 
 /*****************************************************************************/
 /*****************************************************************************/
 /*******                                                               *******/
-/*******                  routines when OSLLIB is used                 *******/
+/*******                  routines when OSL is used                    *******/
 /*******                                                               *******/
 /*******       WARNING! Not well tested. Please, report bugs.          *******/
 /*****************************************************************************/
@@ -56,7 +56,7 @@ double dot_product(double *val, int *ind, int collen, double *col)
  *============================================================================
 */
 
-/* Default value of OSLLIB has set */
+/* Default value of OSL has set */
 #define LP_MAX_ITER 9999999
 /*
    lp_data->bhead and lp_data->xbzero are never used
@@ -68,10 +68,10 @@ static int osllib_status;
 
 #include <memory.h>
 
-void OSLLIB_check_error(const char *erring_func)
+void OSL_check_error(const char *erring_func)
 {
   if (osllib_status){
-    printf("!!! OSLLIB status is nonzero !!! [%s, %i]\n",
+    printf("!!! OSL status is nonzero !!! [%s, %i]\n",
 	   erring_func, osllib_status);
   }
 }
@@ -83,10 +83,10 @@ void open_lp_solver(LPdata *lp_data)
 
   lp_data->env = ekk_initializeContext();
   osllib_status = (lp_data->env == NULL);
-  OSLLIB_check_error("open_lp_solver - ekk_initializeContext");
+  OSL_check_error("open_lp_solver - ekk_initializeContext");
   baseModel = ekk_baseModel(lp_data->env);
   osllib_status = (baseModel == NULL);
-  OSLLIB_check_error("open_lp_solver - ekk_baseModel");
+  OSL_check_error("open_lp_solver - ekk_baseModel");
   ekk_setDebug(baseModel, -1, 0);
   ekk_setIloglevel(baseModel, 2);
 /*  1    - 2999 informational messsages
@@ -94,19 +94,19 @@ void open_lp_solver(LPdata *lp_data)
     6000 - 6999 error, but keep running
     7000 - 8999 error and stop running */
 /*    osllib_status = ekk_messagesPrintOn(baseModel, 1, 8999); */
-/*    OSLLIB_check_error("open_lp_solver - ekk_messagePrintOn"); */
+/*    OSL_check_error("open_lp_solver - ekk_messagePrintOn"); */
   osllib_status = ekk_messagesPrintOff(baseModel, 1, 5999);
-  OSLLIB_check_error("open_lp_solver - ekk_messagePrintOff");
+  OSL_check_error("open_lp_solver - ekk_messagePrintOff");
 
   /* default is to minimize */
 /*    osllib_status = ekk_setMinimize(baseModel); */
-/*    OSLLIB_check_error("open_lp_solver - ekk_setMinimize"); */
+/*    OSL_check_error("open_lp_solver - ekk_setMinimize"); */
   /* This should be infeasibility tolerance.*/
   lp_data->lpetol = ekk_getRtoldinf(baseModel);
 
   /* Speed up for large sparse problems. Test it, if it's faster or not. */
   osllib_status = ekk_setIuseRowCopy(baseModel, 1);
-  OSLLIB_check_error("open_lp_solver - ekk_setIuseRowCopy");
+  OSL_check_error("open_lp_solver - ekk_setIuseRowCopy");
 }
 
 /*===========================================================================*/
@@ -157,21 +157,21 @@ void check_lp(LPdata *lp_data)
    /* Chcecking the structure, not content */
    osllib_status =  ekk_validateModel(lp_data->lp);
    if (osllib_status != 0) {
-      OSLLIB_check_error("check_lp ekk_validateModel");
+      OSL_check_error("check_lp ekk_validateModel");
       exit(-1);
    }
    /* Check coeficients of objective function */
    osllib_status = memcmp(ekk_objective(lp_data->lp), lp_data->obj,
 			  lp_data->n * DSIZE);
-   OSLLIB_check_error("check_lp objective");
+   OSL_check_error("check_lp objective");
    /* Check upper bounds of (structural) variables */
    osllib_status = memcmp(ekk_colupper(lp_data->lp), lp_data->ub,
 			  lp_data->n * DSIZE);
-   OSLLIB_check_error("check_lp column upper bounds");
+   OSL_check_error("check_lp column upper bounds");
    /* Check upper bounds of (structural) variables */
    osllib_status = memcmp(ekk_collower(lp_data->lp), lp_data->lb,
 			  lp_data->n * DSIZE);
-   OSLLIB_check_error("check_lp column lower bounds");
+   OSL_check_error("check_lp column lower bounds");
    
    osllib_status = -1;
    
@@ -184,30 +184,30 @@ void check_lp(LPdata *lp_data)
       switch (lp_data->sense[i]) {
        case 'E':
 	 if ( (ub[i] != d1[i]) && (lb[i] != d1[i])) {
-	    OSLLIB_check_error("check_lp not an 'E' row");
+	    OSL_check_error("check_lp not an 'E' row");
 	    return;
 	 }
 	 break;
        case 'L':
 	 if ( (ub[i] != d1[i]) && (lb[i] != - OSL_INFINITY)) {
-	    OSLLIB_check_error("check_lp not an 'L' row");
+	    OSL_check_error("check_lp not an 'L' row");
 	    return;
 	 }
 	 break;
        case 'G':
 	 if ( (lb[i] != d1[i]) && (ub[i] != OSL_INFINITY)) {
-	    OSLLIB_check_error("check_lp not an 'G' row");
+	    OSL_check_error("check_lp not an 'G' row");
 	    return;
 	 }
 	 break;
        case 'R':
 	 if ( (ub[i] != d1[i]) && (ub[i] - lb[i] !=  d2[i]) ) {
-	    OSLLIB_check_error("check_lp not an 'R' row");
+	    OSL_check_error("check_lp not an 'R' row");
 	    return;
 	 }
 	 break;
        default:
-	 OSLLIB_check_error("check_lp unknown sense");
+	 OSL_check_error("check_lp unknown sense");
 	 return;
       }
    }
@@ -223,19 +223,17 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 {
    int i, *matcnt, *matbeg;
    double *lr = lp_data->tmp.d, *ur = lp_data->tmp.d + lp_data->n;
-   EKKVector debug;
-   const double *debug_obj;
    
    lp_data->lp = ekk_newModel(lp_data->env, NULL);
    osllib_status = (lp_data->env == NULL);
-   OSLLIB_check_error("open_lp_solver - ekk_newModel");
+   OSL_check_error("open_lp_solver - ekk_newModel");
    
    /* realloc_lp_arrays(lp_data); */
    
    matcnt = lp_data->matcnt;
    matbeg = lp_data->matbeg;
    
-   /* OSLLIB doesn't need matcnt as CPLEX.
+   /* OSL doesn't need matcnt as CPLEX.
       SYMPHONY need it only when writing MPS file. */
    for (i=lp_data->n-1; i>=0; i--)
       matcnt[i] = matbeg[i+1] - matbeg[i];
@@ -254,20 +252,20 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 	 break;
        default: /* This should never happen ... */
 	 osllib_status = -1;
-	 OSLLIB_check_error("load_lp - unknown sense");
+	 OSL_check_error("load_lp - unknown sense");
       }
    }
    osllib_status =
       ekk_loadRimModel(lp_data->lp, lp_data->m, lr, ur,
 		       lp_data->n, lp_data->obj, lp_data->lb, lp_data->ub);
-   OSLLIB_check_error("load_lp - ekk_loadRimModel");
+   OSL_check_error("load_lp - ekk_loadRimModel");
    osllib_status =
       ekk_addColumnElementBlock(lp_data->lp, lp_data->n, lp_data->matind,
 				lp_data->matbeg, lp_data->matval);
-   OSLLIB_check_error("load_lp - ekk_addColumnElementBlock");
+   OSL_check_error("load_lp - ekk_addColumnElementBlock");
    /* Not sure we need this since there's only one block */
    osllib_status = ekk_mergeBlocks(lp_data->lp, 1);
-   OSLLIB_check_error("load_lp - ekk_mergeBlocks");
+   OSL_check_error("load_lp - ekk_mergeBlocks");
    
    /* lp_data->scaling = scaling; */
 }
@@ -277,7 +275,7 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 void unload_lp_prob(LPdata *lp_data)
 {
    osllib_status = ekk_deleteModel(lp_data->lp);
-   OSLLIB_check_error("unload_lp - ekk_deleteModel");
+   OSL_check_error("unload_lp - ekk_deleteModel");
    lp_data->lp = NULL;
 }
 
@@ -297,11 +295,11 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 	  case VAR_AT_UB: stat[i] |= 0x40000000; break;
 	  case VAR_AT_LB: stat[i] |= 0x20000000; break;
 	  case VAR_FIXED: stat[i] |= 0x00000000; break;
-	  default: /* should never happen */
+	  default: break; /* should never happen */
 	 }
       }
       osllib_status = ekk_setColstat(lp_data->lp, stat);
-      OSLLIB_check_error("load_basis - ekk_setColstat");
+      OSL_check_error("load_basis - ekk_setColstat");
       ekk_free(stat);
    }
    if (rstat != NULL) {
@@ -317,7 +315,7 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 	 }
       }
       osllib_status = ekk_setRowstat(lp_data->lp, stat);
-      OSLLIB_check_error("load_basis - ekk_setRowstat");
+      OSL_check_error("load_basis - ekk_setRowstat");
       ekk_free(stat);
    }
    lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
@@ -336,7 +334,7 @@ void refactorize(LPdata *lp_data)
 void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
 {
-   int i, j, m = lp_data->m;
+   int i;
    double *lr, *ur;
    /* double *lr = lp_data->tmp.d, *ur = lp_data->tmp.d + lp_data->n; */
 
@@ -349,18 +347,18 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
        case 'G': lr[i] = rhs[i]; ur[i] = OSL_INFINITY; break;
        case 'R': lr[i] = ur[i] = lp_data->rhs[i]; break;
 	 /* Range will be added later in change_range */
-       default: /*This shoul never happend ... */
+       default: /*This should never happen ... */
 	 osllib_status = -1;
-	 OSLLIB_check_error("add_rows - unknown sense");
+	 OSL_check_error("add_rows - unknown sense");
       }
    }
    osllib_status = ekk_addRows(lp_data->lp, rcnt, lr, ur, rmatbeg, rmatind,
 			       rmatval);
-   OSLLIB_check_error("add_rows - ekk_addRows");
+   OSL_check_error("add_rows - ekk_addRows");
    
    /* Merge block can make comutation faster */
    osllib_status = ekk_mergeBlocks(lp_data->lp, 1);
-   OSLLIB_check_error("add_rows - ekk_mergeBlocks");
+   OSL_check_error("add_rows - ekk_mergeBlocks");
    
    FREE(lr);
    FREE(ur);
@@ -378,9 +376,9 @@ void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
 {
    osllib_status = ekk_addColumns(lp_data->lp, ccnt, obj, lb, ub,
 				  cmatbeg, cmatind, cmatval);
-   OSLLIB_check_error("add_cols - ekk_addColumns");
+   OSL_check_error("add_cols - ekk_addColumns");
    osllib_status = ekk_mergeBlocks(lp_data->lp, 1);
-   OSLLIB_check_error("add_cols - ekk_mergeBlocks");
+   OSL_check_error("add_cols - ekk_mergeBlocks");
    lp_data->n += ccnt;
    lp_data->nz += nzcnt;
 }
@@ -403,14 +401,14 @@ void change_row(LPdata *lp_data, int row_ind,
 	 ur = rhs; lr = ur + range;
       }
       break;
-    default: /*This shoul never happend ... */
+    default: /*This should never happen ... */
       osllib_status = -1;
-      OSLLIB_check_error("change_row - default");
+      OSL_check_error("change_row - default");
    }
    osllib_status = ekk_copyRowlower(lp_data->lp, &lr, row_ind, row_ind + 1);
-   OSLLIB_check_error("change_row - ekk_copyRowlower");
+   OSL_check_error("change_row - ekk_copyRowlower");
    osllib_status = ekk_copyRowupper(lp_data->lp, &ur, row_ind, row_ind + 1);
-   OSLLIB_check_error("change_row - ekk_copyRowupper");
+   OSL_check_error("change_row - ekk_copyRowupper");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
 
@@ -424,9 +422,9 @@ void change_col(LPdata *lp_data, int col_ind,
     case 'R': change_lbub(lp_data, col_ind, lb, ub); break;
     case 'G': change_lb(lp_data, col_ind, lb); break;
     case 'L': change_ub(lp_data, col_ind, ub); break;
-    default: /*This shoul never happend ... */
+    default: /*This should never happen ... */
       osllib_status = -1;
-      OSLLIB_check_error("change_col - default");
+      OSL_check_error("change_col - default");
    }
 }
 
@@ -440,7 +438,7 @@ void change_col(LPdata *lp_data, int col_ind,
 /* Basis head in the end of this function not finished yet */
 int dual_simplex(LPdata *lp_data, int *iterd)
 {
-   int term, maxiter;
+   int term;
 
    /*PreSolve seems to cause some problems -- not sure exactly why, but we
      leave it turned off for now. */
@@ -456,9 +454,9 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    
    if (lp_data->lp_is_modified == LP_HAS_BEEN_ABANDONED) {
       /* osllib_status = ekk_crash(lp_data->lp, 2); */
-      /* OSLLIB_check_error("dual_simplex - ekk_crash"); */
+      /* OSL_check_error("dual_simplex - ekk_crash"); */
       osllib_status = ekk_allSlackBasis(lp_data->lp);
-      OSLLIB_check_error("dual_simplex - ekk_allSlackBasis");
+      OSL_check_error("dual_simplex - ekk_allSlackBasis");
    }
    
    term = ekk_dualSimplex(lp_data->lp);
@@ -486,10 +484,10 @@ int dual_simplex(LPdata *lp_data, int *iterd)
        * the given iteration limit. */
       maxiter = ekk_getImaxiter(lp_data->lp);
       osllib_status = ekk_setImaxiter(lp_data->lp, LP_MAX_ITER);
-      OSLLIB_check_error("dual_simplex - ekk_setImaxiter");
+      OSL_check_error("dual_simplex - ekk_setImaxiter");
       term = ekk_dualSimplex(lp_data->lp);
       osllib_status = ekk_setImaxiter(lp_data->lp, maxiter);
-      OSLLIB_check_error("dual_simplex - ekk_setImaxiter");
+      OSL_check_error("dual_simplex - ekk_setImaxiter");
    }
 #endif
 
@@ -502,12 +500,12 @@ int dual_simplex(LPdata *lp_data, int *iterd)
     case 3: term = D_ITLIM; break;
     case 4:
       osllib_status = -1;
-      OSLLIB_check_error("osllib_status-ekk_dualSimplex found no solution!");
+      OSL_check_error("osllib_status-ekk_dualSimplex found no solution!");
       exit(-1);
     case 5: D_OBJLIM; break;
     case 6:
       osllib_status = -1;
-      OSLLIB_check_error("osllib_status-ekk_dualSimplex lack of dstorage file"
+      OSL_check_error("osllib_status-ekk_dualSimplex lack of dstorage file"
 			 "space!");
       exit(-1);
     default: term = ABANDONED;break;
@@ -530,7 +528,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 void btran(LPdata *lp_data, double *col)
 {
    osllib_status = ekk_formBInverseTransposeb(lp_data->lp, col);
-   OSLLIB_check_error("btran - ekk_formBInverseTransposeb");
+   OSL_check_error("btran - ekk_formBInverseTransposeb");
 }
 
 /*===========================================================================*/
@@ -623,7 +621,7 @@ void set_itlim(LPdata *lp_data, int itlim)
 {
    if (itlim < 0) itlim = LP_MAX_ITER;
    osllib_status = ekk_setImaxiter(lp_data->lp, itlim);
-   OSLLIB_check_error("set_itlim - ekk_setImaxiter");
+   OSL_check_error("set_itlim - ekk_setImaxiter");
 }
 
 /*===========================================================================*/
@@ -696,7 +694,7 @@ void resize_lp_solver_arrays(LPdata *lp_data)
       osllib_status = ekk_resizeModelExact(lp_data->lp, lp_data->m, lp_data->n,
 					   lp_data->maxm, lp_data->maxn,
 					   FALSE);
-      OSLLIB_check_error("resize_lp_solver_arrays ekk_resizeModelExact");
+      OSL_check_error("resize_lp_solver_arrays ekk_resizeModelExact");
    }
 }
 
@@ -748,10 +746,9 @@ void get_x(LPdata *lp_data)
 /*===========================================================================*/
 void get_dj_pi(LPdata *lp_data)
 {
-   int i;
    /*If scaling, fast integer or compress is used, maybe some changes will be
      needed */
-   /* OSLLIB returns changed sign - is it good or not? */
+   /* OSL returns changed sign - is it good or not? */
    memmove(lp_data->dualsol, ekk_rowduals(lp_data->lp), lp_data->m * DSIZE);
 
 # if 0
@@ -805,7 +802,7 @@ void change_range(LPdata *lp_data, int rowind, double value)
       lr = lrow[rowind] + value;
    }
    osllib_status = ekk_copyRowlower(lp_data->lp, &ur, rowind, rowind + 1);
-   OSLLIB_check_error("change_range - ekk_copyRowupper");
+   OSL_check_error("change_range - ekk_copyRowupper");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
 
@@ -845,14 +842,14 @@ void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
       case 'B': lb[j] = ub[j] = bd[i];break;
       default: /*This should never happen ... */
 	 osllib_status = -1;
-	 OSLLIB_check_error("change_bounds - default");
+	 OSL_check_error("change_bounds - default");
       }
    }
    osllib_status = ekk_setCollower(lp_data->lp, lb);
-   OSLLIB_check_error("change_bounds - ekk_setCollower");
+   OSL_check_error("change_bounds - ekk_setCollower");
    ekk_free(lb);
    osllib_status = ekk_setColupper(lp_data->lp, ub);
-   OSLLIB_check_error("change_bounds - ekk_setColupper");
+   OSL_check_error("change_bounds - ekk_setColupper");
    ekk_free(ub);
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
@@ -862,9 +859,9 @@ void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
 void change_lbub(LPdata *lp_data, int j, double lb, double ub)
 {
    osllib_status = ekk_copyColupper(lp_data->lp, &ub, j, j + 1);
-   OSLLIB_check_error("change_lbub - ekk_copyColupper");
+   OSL_check_error("change_lbub - ekk_copyColupper");
    osllib_status = ekk_copyCollower(lp_data->lp, &lb, j, j + 1);
-   OSLLIB_check_error("change_lbub - ekk_copyCollower");
+   OSL_check_error("change_lbub - ekk_copyCollower");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
 
@@ -873,7 +870,7 @@ void change_lbub(LPdata *lp_data, int j, double lb, double ub)
 void change_ub(LPdata *lp_data, int j, double ub)
 {
    osllib_status = ekk_copyColupper(lp_data->lp, &ub, j, j + 1);
-   OSLLIB_check_error("change_ub - ekk_copyColupper");
+   OSL_check_error("change_ub - ekk_copyColupper");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
 
@@ -882,7 +879,7 @@ void change_ub(LPdata *lp_data, int j, double ub)
 void change_lb(LPdata *lp_data, int j, double lb)
 {
    osllib_status = ekk_copyCollower(lp_data->lp, &lb, j, j + 1);
-   OSLLIB_check_error("change_lb - ekk_copyCollower");
+   OSL_check_error("change_lb - ekk_copyCollower");
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
 
@@ -922,7 +919,7 @@ void delete_rows(LPdata *lp_data, int delnum, int *free_rows)
    /* which = calloc(delnum, ISIZE); */
    for (i = m - 1, j = 0; i >= 0; i--) if (free_rows[i]) which[j++] = i;
    osllib_status = ekk_deleteRows(lp_data->lp, j, which);
-   OSLLIB_check_error("delete_rows - ekk_deleteRows");
+   OSL_check_error("delete_rows - ekk_deleteRows");
    /* FREE(which); */
 
    /* Make result as CPLEX does*/
@@ -950,11 +947,11 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
       }
    }
    osllib_status = ekk_deleteColumns(lp_data->lp, j, which);
-   OSLLIB_check_error("delete_cols - ekk_deleteCols");
+   OSL_check_error("delete_cols - ekk_deleteCols");
    FREE(which);
    
    lp_data->nz = ekk_getInumels(lp_data->lp);
-   OSLLIB_check_error("delete_cols - ekk_getInumels");
+   OSL_check_error("delete_cols - ekk_getInumels");
    
    /* make result as CPLEX does */
    for (i = 0, j = 0; i < lp_data->n; i++){
@@ -1000,10 +997,10 @@ void free_row_set(LPdata *lp_data, int length, int *index)
       ub[j] = OSL_INFINITY;
    }
    osllib_status = ekk_setRowlower(lp_data->lp, lb);
-   OSLLIB_check_error("free_row_set ekk_setRowLower");
+   OSL_check_error("free_row_set ekk_setRowLower");
    ekk_free(lb);
    osllib_status = ekk_setRowupper(lp_data->lp, ub);
-   OSLLIB_check_error("free_row_set ekk_setRowUpper");
+   OSL_check_error("free_row_set ekk_setRowUpper");
    ekk_free(ub);
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
@@ -1033,9 +1030,9 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 	    ub[j] = cut->rhs; lb[j] = ub[j] + lp_data->rngval[j];
 	 }
 	 break;
-      default: /*This shoul never happend ... */
+      default: /*This should never happen ... */
 	 osllib_status = -1;
-	 OSLLIB_check_error("load_lp - unknown type of constraint");
+	 OSL_check_error("load_lp - unknown type of constraint");
       }
    }
    
@@ -1044,10 +1041,10 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
       ekk_free(lb);
    
    osllib_status = ekk_setRowlower(lp_data->lp, lb);
-   OSLLIB_check_error("constrain_row_set ekk_setRowLower");
+   OSL_check_error("constrain_row_set ekk_setRowLower");
    ekk_free(lb);
    osllib_status = ekk_setRowupper(lp_data->lp, ub);
-   OSLLIB_check_error("constrain_row_set ekk_setRowUpper");
+   OSL_check_error("constrain_row_set ekk_setRowUpper");
    ekk_free(ub);
    lp_data->lp_is_modified = LP_HAS_BEEN_MODIFIED;
 }
@@ -1058,7 +1055,7 @@ void free_lp_solver_data(LPdata *lp_data, char arrays_too)
    if (lp_data){
       if (lp_data->lp != NULL) {
 	 osllib_status = ekk_deleteModel(lp_data->lp);
-	 OSLLIB_check_error("free_lp_solver_data - ekk_deleteModel");
+	 OSL_check_error("free_lp_solver_data - ekk_deleteModel");
 	 lp_data->lp = NULL;
       }
       if (arrays_too){
@@ -1081,19 +1078,19 @@ void free_lp_solver_data(LPdata *lp_data, char arrays_too)
 void write_mps(LPdata *lp_data, char *fname)
 {
    osllib_status = ekk_exportModel(lp_data->lp, fname, 1, 2);
-   OSLLIB_check_error("write_mps");
+   OSL_check_error("write_mps");
 }
 
 void write_sav(LPdata *lp_data, char *fname)
 {
    osllib_status = ekk_saveModel(lp_data->lp, fname);
-   OSLLIB_check_error("write_sav");
+   OSL_check_error("write_sav");
 }
 
-#endif /* __OSLLIB__ */
+#endif /* __OSL__ */
 
 
-#if defined(__CPLEX75__) || defined(__CPLEX70__) || defined(__CPLEX66__) || defined(__CPLEX65__) || defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
+#ifdef __CPLEX__
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -1122,12 +1119,6 @@ void CPX_check_error(const char *erring_func)
 void open_lp_solver(LPdata *lp_data)
 {
    int i;
-
-   /* If we are on the SP2, first make sure that there are no stray
-      cplex licenses about */
-#ifdef SYSRS6000___________0
-   system("/bin/rm -f /local/license/cplex/.cpxlicense/.tko*");
-#endif
 
    i = CPX_OFF;
    lp_data->cpxenv = CPXopenCPLEX(&cpx_status);
@@ -1183,7 +1174,7 @@ void close_lp_solver(LPdata *lp_data)
 
 void check_lp(LPdata *lp_data)
 {
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
    cpx_status = CPXchecklp(lp_data->cpxenv,
 		(char *) "BB_prob", lp_data->n, lp_data->m, 1, lp_data->obj,
 		lp_data->rhs, lp_data->sense, lp_data->matbeg, lp_data->matcnt,
@@ -1230,19 +1221,8 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
       CPXsetintparam(lp_data->cpxenv, CPX_PARAM_BASINTERVAL, 2100000000);
    CPX_check_error("load_lp - CPXsetintparam - BASINTERVAL");
 
-#if 0 /* This is for the old memory model (user manages memory) */
-   lp_data->lp =
-      CPXloadlp(lp_data->cpxenv,
-		(char *) "BB_prob", lp_data->n, lp_data->m, 1, lp_data->obj,
-		lp_data->rhs, lp_data->sense, lp_data->matbeg, lp_data->matcnt,
-		lp_data->matind, lp_data->matval, lp_data->lb, lp_data->ub,
-		lp_data->rngval, lp_data->alloc_mplusn, lp_data->alloc_m,
-		lp_data->alloc_mplusnz);
-   CPX_check_error("load_lp - CPXloadlp");
-#endif
-
-#if 1 /* This is for the old memory model (user manages memory) */
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+/* This is for the old memory model (user manages memory) */
+#if CPX_VERSION <= 600 
    lp_data->lp =
       CPXloadlp(lp_data->cpxenv,
 		(char *) "BB_prob", lp_data->n, lp_data->m, 1, lp_data->obj,
@@ -1261,7 +1241,6 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 		lp_data->rngval);
    CPX_check_error("load_lp - CPXcopylp");
 #endif
-#endif
 }
 
 /*===========================================================================*/
@@ -1277,7 +1256,7 @@ void unload_lp_prob(LPdata *lp_data)
 
 void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 {
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
    cpx_status = CPXloadbase(lp_data->cpxenv, lp_data->lp, cstat, rstat);
 #else
    cpx_status = CPXcopybase(lp_data->cpxenv, lp_data->lp, cstat, rstat);
@@ -1298,7 +1277,7 @@ void refactorize(LPdata *lp_data)
    CPX_check_error("refactorize - CPXgetintparam");
    cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, 0);
    CPX_check_error("refactorize - CPXsetintparam");
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
    cpx_status = CPXoptimize(lp_data->cpxenv, lp_data->lp);
 #else
    cpx_status = CPXprimopt(lp_data->cpxenv, lp_data->lp);
@@ -1413,7 +1392,11 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }
 
    term = CPXgetstat(lp_data->cpxenv,lp_data->lp);
+#if CPX_VERSION >= 800
+   if (term == CPX_STAT_INFEASIBLE){
+#else
    if (term == CPX_INFEASIBLE){
+#endif
       /* Dual infeas. This is impossible, so we must have had iteration
        * limit AND bound shifting AND dual feasibility not restored within
        * the given iteration limit. */
@@ -1443,6 +1426,16 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       CPX_check_error("refactorize - CPXsetintparam, ITLIM");
    }
 
+#if CPX_VERSION >= 800
+   switch (real_term = CPXgetstat(lp_data->cpxenv,lp_data->lp)){
+    case CPX_STAT_OPTIMAL:                        term = OPTIMAL; break;
+    case CPX_STAT_INFEASIBLE:                     term = D_UNBOUNDED; break;
+    case CPX_STAT_UNBOUNDED:                      term = D_INFEASIBLE; break;
+    case CPX_STAT_ABORT_OBJ_LIM:                  term = D_OBJLIM; break;
+    case CPX_STAT_ABORT_IT_LIM:                   term = D_ITLIM; break;
+    default:                                      term = ABANDONED; break;
+   }
+#else
    switch (real_term = CPXgetstat(lp_data->cpxenv,lp_data->lp)){
     case CPX_OPTIMAL:                             term = OPTIMAL; break;
     case CPX_INFEASIBLE:                          term = D_INFEASIBLE; break;
@@ -1451,6 +1444,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
     case CPX_IT_LIM_FEAS: case CPX_IT_LIM_INFEAS: term = D_ITLIM; break;
     default:                                      term = ABANDONED; break;
    }
+#endif
 
    lp_data->termcode = term;
 
@@ -1459,7 +1453,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 			       lp_data->bhead, lp_data->xbzero);
       lp_data->bhead_is_valid = TRUE;
       CPX_check_error("dual_simplex - CPXgetbhead");
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
       *iterd = CPXgetitc(lp_data->cpxenv, lp_data->lp);
 #else
       *iterd = CPXgetitcnt(lp_data->cpxenv, lp_data->lp);
@@ -1630,7 +1624,7 @@ void resize_lp_solver_arrays(LPdata *lp_data)
 	 resize = TRUE;
       }
       if (resize){
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
 	 /* This is only needed in the old memory model */
 	 cpx_status =
 	    CPXreallocprob(lp_data->cpxenv, lp_data->lp, &lp_data->obj,
@@ -1806,7 +1800,7 @@ void get_x(LPdata *lp_data)
 
 void get_dj_pi(LPdata *lp_data)
 {
-#if defined(__CPLEX40__) || defined(__CPLEX50__) || defined(__CPLEX60__)
+#if CPX_VERSION <= 600 
    /* This mess is only needed for old versions of CPLEX */
    int i;
    cpx_status = CPXgetintparam(lp_data->cpxenv, CPX_PARAM_FASTMIP, &i);
@@ -2040,7 +2034,7 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 {
    int i, *bhead = lp_data->bhead;
-#if defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
+#if CPX_VERSION <= 600
    int j;
 #endif
 
@@ -2057,7 +2051,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    CPX_check_error("delete_cols - CPXdelsetcols");
    lp_data->nz = CPXgetnumnz(lp_data->cpxenv, lp_data->lp);
    CPX_check_error("delete_cols - CPXgetnumnz");
-#if defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
+#if CPX_VERSION <= 600
    for (i = 0, j = 0; i < lp_data->n; i++){
       if (delstat[i])
 	 delstat[i] = -1;

@@ -96,7 +96,9 @@ int user_receive_lp_data(void **user)
    vrp->cur_sol = (_node *) calloc (vrp->vertnum, sizeof(_node));
    if (vrp->window){
       copy_node_set(vrp->window, TRUE, (char *)"Original solution");
+#if 0
       copy_node_set(vrp->window, TRUE, (char *)"Compressed solution");
+#endif
    }
    return(USER_NO_PP);
 }
@@ -246,9 +248,9 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    }
    
    verts = n->verts;
-   compnodes = (int *) calloc ((vertnum/2) +1, sizeof(int));
-   compdemands = (int *) calloc ((vertnum/2) +1, sizeof(int));
-   compcuts = (double *) calloc ((vertnum/2) +1, sizeof(double));
+   compnodes = (int *) calloc (vertnum + 1, sizeof(int));
+   compdemands = (int *) calloc (vertnum + 1, sizeof(int));
+   compcuts = (double *) calloc (vertnum + 1, sizeof(double));
    /*get the components of the solution graph without the depot to check if the
      graph is connected or not*/
    rcnt = connected(n, compnodes, compdemands, NULL, compcuts, NULL);
@@ -320,11 +322,13 @@ int user_display_lp_solution(void *user, int which_sol, int varnum,
        (vrp->par.verbosity > 6 && (which_sol == DISP_FEAS_SOLUTION))){
       display_support_graph(vrp->window, FALSE, (char *)"Original solution",
 			    varnum, indices, values, .000001,
-			    CTOI_WAIT_FOR_CLICK_NO_REPORT);
+			    CTOI_WAIT_FOR_CLICK_AND_REPORT);
+#if 0
       display_compressed_support_graph(vrp->window, FALSE,
 				       (char *)"Compressed solution",
 				       varnum, indices, values,
 				       CTOI_WAIT_FOR_CLICK_AND_REPORT);
+#endif
    }
    return(DISP_NOTHING);
 }

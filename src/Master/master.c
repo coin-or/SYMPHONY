@@ -17,8 +17,10 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdio.h>
+#if 0
 #ifdef __PVM__
 #include <pvmtev.h>
+#endif
 #endif
 
 #include "proccomm.h"
@@ -95,7 +97,7 @@ int main(int argc, char **argv)
 
    printf("\n");
    printf("******************************************************\n");
-   printf("*     This is SYMPHONY Version 3.0                   *\n");
+   printf("*     This is SYMPHONY Version 3.0.1                 *\n");
    printf("*     Copyright 2000-2003 Ted Ralphs                 *\n");
    printf("*     All Rights Reserved                            *\n");
    printf("*     Distributed under the Common Public License    *\n");
@@ -320,6 +322,7 @@ int main(int argc, char **argv)
       
       if (user_send_feas_sol(p->user, &feas_sol_size, &feas_sol)==USER_NO_PP){
 	 tm->feas_sol_size = feas_sol_size;
+	 tm->feas_sol = (int *) calloc (tm->feas_sol_size, sizeof(int));
 	 memcpy((char *)tm->feas_sol, (char *)feas_sol, feas_sol_size * ISIZE);
       }
    }

@@ -1,0 +1,683 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{User-written functions of the Master process}
+
+%begin{latexonly}
+\bd
+%end{latexonly}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_usage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_usage}
+\label{user_usage}
+\begin{verbatim}
+void user_usage()
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user can use any capitol letter (except 'H') for command line
+switches to control user-defined parameter settings without the use of
+a parameter file. The function {\tt user\_usage()} can optionally
+print out usage information for the user-defined command line
+switches. The command line switch {\tt -H} automatically calls the
+user's usage subroutine. The switch {\tt -h} prints
+\BB's own usage information.
+
+\ed
+
+\vspace{1ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_initialize
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_initialize}
+\begin{verbatim}
+int user_initialize(void **user)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user allocates space for and initializes the user-defined
+data structures for the master process.
+
+\args
+
+\bt{llp{250pt}}
+{\tt void **user} & OUT & Pointer to the user-defined data structure. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. \BB\ stops. \\
+{\tt USER\_NO\_PP} & Initialization is done. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_free_master
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_free\_master}
+\begin{verbatim}
+int user_free_master(void **user)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user frees all the data structures within {\tt *user}, and
+also free {\tt *user} itself. This can be done using the built-in macro
+{\tt FREE} that checks the existence of a pointer before freeing it.
+
+\args
+
+\bt{llp{280pt}}
+{\tt void **user} & INOUT & Pointer to the user-defined data structure
+(should be {\tt NULL} on return). \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Ignored. This is probably not a fatal error.\\
+{\tt USER\_NO\_PP} & Everything was freed successfully. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_readparams
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_readparams}
+\begin{verbatim}
+int user_readparams(void *user, char *filename, int argc, char **argv)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user reads in parameters from the file named {\tt filename}. The
+file {\tt filename} is a file containing both built-in parameters and
+user parameters. The filename is given as a command line argument when
+starting the application and is then passed to the user. The user must
+open the file for reading, scan the file for lines that contain user
+parameters and then read the parameters in as appropriate. See the
+file {\tt Master/master\_io.c} to see how \BB\ does this.
+
+Optionally, the user can also parse the command line arguments. All
+capital letters are reserved for user-defined command line switches.
+The switch {\tt -H} is reserved for help and calls the user's usage
+subroutine (see {\tt user\_send\_lp\_data()}).
+
+\args
+
+\bt{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt char *filename} & IN & The name of the parameter file. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. \BB\ stops. \\
+{\tt USER\_NO\_PP} & User parameters were read successfully. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_io
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_io}
+\begin{verbatim}
+int user_io(void *user)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user prepares all information needed to specify the problem
+instance (e.g., reads in data from a data file, etc.).
+
+\args
+
+\bt{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. \BB\ stops. \\
+{\tt USER\_NO\_PP} & User I/O was completed successfully. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_init_draw_graph
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_init\_draw\_graph}
+\begin{verbatim}
+int user_init_draw_graph(void *user, int dg_id)
+\end{verbatim}
+
+\bd
+
+\describe
+
+This function is invoked only if the {\tt do\_draw\_graph} parameter is set.
+The user can initialize the graph drawing process by sending
+some initial information (e.g., the location of the nodes of a
+graph, like in the TSP.)
+
+\args
+
+\bt{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt int dg\_id} & IN & The process id of the graph drawing process. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. \BB\ stops. \\
+{\tt USER\_NO\_PP} & The user completed initialization successfully. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_start_heurs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_start\_heurs}
+\label{user_start_heurs}
+\begin{verbatim}
+int user_start_heurs(void *user, double *ub, double *ub_estimate)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user invokes heuristics and generates the initial global upper
+bound and also perhaps an upper bound estimate. This is the last place 
+where the user can do things before the
+branch and cut algorithm starts. She might do some preprocessing,
+in addition to generating the upper bound.
+
+\args
+
+\bt{llp{300pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt double *ub} & OUT & Pointer to the global upper bound. Initially,
+the upper bound is set to either {\tt -MAXDOUBLE} or the bound read in
+from the parameter file, and should be changed by the user only if
+a better valid upper bound is found. \\
+{\tt double *ub\_estimate} & OUT & Pointer to an estimate of the global
+upper bound. This is useful if the {\tt BEST\_ESTIMATE} diving
+strategy is used (see the treemanager parameter
+\hyperref{\tt diving\_strategy}{{\tt diving\_strategy} (Section } {)}
+{diving_strategy}) \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. This error is probably not fatal. \\
+{\tt USER\_NO\_PP} & User executed function successfully. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_set_base
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_set\_base}
+\begin{verbatim}
+int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
+                  double **ub, int *basecutnum, int *colgen_strat)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user must specify the set of base variables and the number of base
+constraints. The base constraints themselves need not be specified
+since they are never stored explicitly.
+
+\args
+
+\bt{llp{245pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt int *varnum} & OUT & Pointer to the number of base variables. \\
+{\tt int **userind} & OUT & Pointer to an array containing the user
+indices of the base variables. \\
+{\tt int **lb} & OUT & Pointer to an array containing the lower bounds for
+the base variables. \\
+{\tt int **ub} & OUT & Pointer to an array containing the upper bounds for
+the base variables. \\
+{\tt int *cutnum} & OUT & The number of base constraints. \\
+{\tt int *colgen\_strat} & INOUT & The default strategy or one that has
+been read in from the parameter file is passed in, but the user is free
+to change it. See {\tt colgen\_strat} in the description of
+parameters for details on how to set it.
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. \BB\ stops. \\
+{\tt USER\_NO\_PP} & The required data are filled in, but no
+post-processing done. \\
+{\tt USER\_AND\_PP} & All required post-processing done. \\
+\et
+
+\postp
+
+The array of user indices is sorted if the user has not already done so.
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_create_root
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_create\_root}
+\begin{verbatim}
+int user_create_root(void *user, int *extravarnum, int **extravars)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user must specify which extra variables are to be active in the root
+node in addition to the base variables.
+
+\args
+
+\bt{llp{265pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt int *extravarnum} & OUT & Pointer to the number of extra active
+variables in the root. \\
+{\tt int *extravars} & OUT & Pointer to an array containing a list of
+user indices of the extra variables to be active in the root. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. \BB\ stops. \\
+{\tt USER\_NO\_PP} & All required data  filled out, but no
+post-processing done. \\
+{\tt USER\_AND\_PP} & All required post-processing done. \\
+\et
+
+\postp
+
+The array of extra indices is sorted if the user has not already done so.
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_receive_feasible_solution
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_receive\_feasible\_solution}
+\label{user_receive_feasible_solution}
+\begin{verbatim}
+int user_receive_feasible_solution(void *user, int msgtag, double cost, 
+                                   int numvars, int *indices, double *values)
+\end{verbatim}
+
+\bd
+
+\describe
+
+Feasible solutions can be sent and/or stored in a user-defined packed
+form if desired. For instance, the TSP, a tour can be specified simply
+as a permutation, rather than as a list of variable indices. In the LP
+process, a feasible solution is packed either by the user or by a
+default packing routine. If the default packing routine was used, the
+{\tt msgtag} will be {\tt FEASIBLE\_SOLUTION\_NONZEROS}. In this case,
+{\tt cost}, {\tt numvars}, {\tt indices} and {\tt values} will contain
+the solution value, the number of nonzeros in the feasible solution,
+and their user indices and values. The user has only to interpret and
+store the solution. Otherwise, when {\tt msgtag} is {\tt
+FEASIBLE\_SOLUTION\_USER}, \BB\ will send and receive the solution
+value only and the user has to unpack exactly what she has packed in
+the LP process. In this case the contents of the last three arguments
+are undefined.
+
+\args
+
+\bt{llp{290pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt int msgtag} &    IN & {\tt FEASIBLE\_SOLUTION\_NONZEROS} or {\tt
+FEASIBLE\_SOLUTION\_USER} \\
+{\tt double cost}  &    IN & The cost of the feasible solution.\\
+{\tt int numvars} &  IN & The number of variables whose user indices and
+values were sent (length of {\tt indices} and {\tt values}). \\
+{\tt int *indices} &  IN & The user indices of the nonzero variables. \\
+{\tt double *values} & IN & The corresponding values. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Ignored. This is probably not a fatal error.\\
+{\tt USER\_NO\_PP} & The solution has been unpacked and stored. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_send_lp_data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_send\_lp\_data}
+\label{user_send_lp_data}
+\begin{verbatim}
+int user_send_lp_data(void *user, void **user_lp)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user has to send all problem-specific data that will be needed in
+the LP process to set up the initial LP relaxation and perform later
+computations. This could include instance data, as well as user
+parameter settings. This is one of the few places where the user will
+need to worry about the configuration of the modules. If either the
+tree manager or the LP are running as a separate process (either {\tt
+COMPILE\_IN\_LP} or {\tt COMPILE\_IN\_TM} are {\tt FALSE} in the {\tt
+make} file), then the data will be sent and received through
+message-passing. See \hyperref{{\tt user\_receive\_lp\_data()}}
+{{\tt user\_receive\_lp\_data()} in Section }{}{user_receive_lp_data} for more
+discussion. Otherwise, it can be copied over directly to the
+user-defined data structure for the LP. In the latter case, {\tt
+*user\_lp} is a pointer to the user-defined data structure for the LP
+that must be allocated and initialized. For a discussion of
+message-passing in \BB, see Section \ref{communication}. The code
+for the two cases is put in the same source file by use of {\tt
+\#ifdef} statements. See the comments in the code stub for this
+function for more details.
+
+\args
+
+\bt{llp{275pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt void **user\_lp} & OUT & Pointer to the user-defined data
+structure for the LP process. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. \BB\ stops. \\
+{\tt USER\_NO\_PP} & Packing is done. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_send_cg_data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_send\_cg\_data}
+\label{user_send_cg_data}
+\begin{verbatim}
+int user_pack_cg_data(void *user, void **user_cg)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user has to send all problem-specific data that will be needed by
+the cut generator for separation. This is one of the few places where
+the user will need to worry about the configuration of the modules. If
+either the tree manager, the LP, or the cut generator are running as a
+separate process (either {\tt COMPILE\_IN\_LP}, {\tt COMPILE\_IN\_TM},
+or {\tt COMPILE\_IN\_CG} are {\tt FALSE} in the make file), then
+the data will be sent and received through message-passing. See 
+\hyperref{{\tt user\_receive\_cg\_data()}}
+{{\tt user\_receive\_cg\_data} in Section }{}{user_receive_cg_data} 
+for more discussion. Otherwise, it can be
+copied over directly to the user-defined data structure for the CG. In
+the latter case, {\tt *user\_cg} is a pointer to the user-defined data
+structure for the CG that must be allocated and initialized. For a
+discussion of message-passing in \BB, see Section
+\ref{communication}. The code for the two cases is put in the same
+source file by use of {\tt \#ifdef} statements. See the comments in
+the code stub for this function for more details.
+
+\args
+
+\bt{llp{275pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt void **user\_cg} & OUT & Pointer to the user-defined data
+structure for the cut generator process. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. \BB\ stops. \\
+{\tt USER\_NO\_PP} & Packing is done. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_send_cp_data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_send\_cp\_data}
+\label{user_send_cp_data}
+\begin{verbatim}
+int user_pack_cp_data(void *user, void **user_cp)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user has to send all problem-specific data that will be needed by
+the cut pool in order to store and check cuts. This is one of the few
+places where the user will need to worry about the configuration of
+the modules. If either the tree manager, the LP, or the cut pool are
+running as a separate process(either {\tt COMPILE\_IN\_LP}, {\tt
+COMPILE\_IN\_TM}, or {\tt COMPILE\_IN\_CP} are {\tt FALSE} in the {\tt
+make} file), then the data will be sent and received through
+message-passing. See \hyperref{{\tt user\_receive\_cp\_data()}} {{\tt
+user\_receive\_cp\_data()} in Section }{}{user_receive_cp_data} for more
+discussion. Otherwise, it can be copied over directly to the
+user-defined data structure for the CP. In the latter case, {\tt
+*user\_cp} is a pointer to the user-defined data structure for the CP
+that must be allocated and initialized. For a discussion of message
+passing in \BB, see Section \ref{communication}. The code for the two
+cases is put in the same source file by use of {\tt \#ifdef}
+statements. See the comments in the code stub for this function for
+more details.
+
+\args
+
+\bt{llp{275pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt void **user\_cp} & OUT & Pointer to the user-defined data
+structure for the cut pool process. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Error. \BB\ stops. \\
+{\tt USER\_NO\_PP} & Packing is done. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_display_solution
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_display\_solution}
+\label{user_display_solution}
+\begin{verbatim}
+int user_display_solution(void *user)
+\end{verbatim}
+
+\bd
+
+\describe
+
+This function is invoked when the best solution found so far is to be
+displayed (after heuristics, after the end of the first phase, or the end of
+the whole algorithm). This can be done using either a text-based
+format or using the {\tt drawgraph} process.
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Ignored. \\
+{\tt USER\_NO\_PP} & Displaying is done. \\
+\et
+
+\args
+
+\bt{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_send_feas_sol
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_send\_feas\_sol}
+\label{user_send_feas_sol}
+\begin{verbatim}
+int user_process_own_messages(void *user, int *feas_sol_size, int **feas_sol)
+\end{verbatim}
+
+\bd
+
+\describe
+
+This function is useful for debugging purposes. It passes a known
+feasible solution to the tree manager. The tree manager then tracks
+which current subproblem admits this feasible solution and notifies
+the user when it gets pruned. It is useful for finding out why a known
+optimal solution never gets discovered. Usually, this is due to either
+an invalid cut of an invalid branching. Note that this feature only
+works when branching on binary variables. See Section \ref{debugging}
+for more on how to use this feature.
+
+\returns
+
+\args
+
+\bt{llp{245pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt int *feas\_sol\_size} & INOUT & Pointer to size of the feasible
+solution passed by the user. \\
+{\tt int **feas\_sol} & INOUT & Pointer to the array of user indices
+containing the feasible solution. This array is simply copied by the tree
+manager and must be freed by the user. \\
+\et
+
+\bt{lp{260pt}}
+{\tt ERROR} & Solution tracing is not enabled. \\
+{\tt USER\_NO\_PP} & Tracing of the given solution is enabled. \\
+\et
+
+\ed
+
+\vspace{1ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_process_own_messages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\functiondef{user\_process\_own\_messages}
+\begin{verbatim}
+int user_process_own_messages(void *user, int msgtag)
+\end{verbatim}
+
+\bd
+
+\describe
+
+The user must receive any message he sends to the master process
+(independently of \BB's own messages). An example for such a message is
+sending feasible solutions from separate heuristics processes fired up
+in \htmlref{\tt user\_start\_heurs()}{user_start_heurs}. 
+
+\args
+
+\bt{llp{280pt}}
+{\tt void *user} & IN & Pointer to the user-defined data structure. \\
+{\tt int msgtag} & IN & The message tag of the message. \\
+\et
+
+\returns
+
+\bt{lp{300pt}}
+{\tt ERROR} & Ignored. \\
+{\tt USER\_NO\_PP} & Message is processed. \\
+\et
+
+\ed
+
+\vspace{1ex}
+
+%begin{latexonly}
+\ed
+%end{latexonly}

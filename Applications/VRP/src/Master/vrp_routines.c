@@ -13,13 +13,15 @@
 /*                                                                           */
 /*===========================================================================*/
 
+#ifndef WIN32
+#include <unistd.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 #include <malloc.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 #include "BB_constants.h"
 #include "proccomm.h"
@@ -129,7 +131,6 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
 	    }
 	 }
       }
-      
       edgenum = vrp->par.add_all_edges ?
 	 vrp->vertnum*(vrp->vertnum-1)/2 : vrp->g->edgenum;
       
@@ -149,8 +150,9 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
 		  uind[(*varnum)++] = new_ind;	
 	       }else if (new_ind < zero_vars[j]){
 		  uind[(*varnum)++] = new_ind;
-	       }else
+	       }else{
 		  j++;
+	       }
 	    }
 	 }
 	 /*Now we have exhausted all the zero edges*/
@@ -192,14 +194,23 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
       
       *varnum = 0;
       for (i = 0, j = 0, k = 0; i<edgenum; i++, k++){
-	 /*In this loop, we check each edge to se if it is in the small
+	 /*In this loop, we check each edge to see if it is in the small
 	   graph and whether it is a zero edge*/
 	 new_ind = INDEX(vrp->g->edges[i].v0, vrp->g->edges[i].v1);
 	 for (; k < new_ind; k++){
-	    if ((j < zero_varnum && k < zero_vars[j]) || j >= zero_varnum)
+	    if ((j < zero_varnum && k < zero_vars[j]) || j >= zero_varnum){
 	       uind[(*varnum)++] = k;
-	    else /*curent edge is a zero edge so don't add it*/
-	       j++;
+	    }else{
+	       while (j < zero_varnum && k > zero_vars[j])
+		  j++;
+	       if (j == zero_varnum){
+		  uind[(*varnum)++] = k;	
+	       }else if (k < zero_vars[j]){
+		  uind[(*varnum)++] = k;
+	       }else{
+		  j++;
+	       }
+	    }
 	 }
 	 /*k == new_ind here so we don't want to add that edge */
       }

@@ -16,6 +16,7 @@
 
 #include "BB_constants.h"
 #include "cp_u.h"
+#include "user.h"
 
 /*===========================================================================*/
 
@@ -27,28 +28,21 @@
  * Here is where the user must receive all of the data sent from
  * user_send_cp_data() and set up data structures. Note that this function is
  * only called if one of COMPILE_IN_CP, COMPILE_IN_LP, or COMPILE_IN_TM is
- * FALSE.
+ * FALSE. For sequential computation, nothing is needed here.
 \*===========================================================================*/
 
 int user_receive_cp_data(void **user)
 {
-   *user = NULL;
-   
    return(USER_NO_PP);
 }
 
 /*===========================================================================*/
 
 /*===========================================================================*\
- * Here, we free up the data structures
+ * If the user wants to fill in a customized routine for sending and receiving
+ * the LP solution, it can be done here. For most cases, the default routines
+ * are fine.
 \*===========================================================================*/
-
-int user_free_cp(void **user)
-{
-   return(USER_NO_PP);
-}
-
-/*===========================================================================*/
 
 int user_receive_lp_solution_cp(void *user)
 {
@@ -66,6 +60,8 @@ int user_receive_lp_solution_cp(void *user)
 int user_prepare_to_check_cuts(void *user, int varnum, int *indices,
 			       double *values)
 {
+   user_problem *prob = (user_problem *) user;
+
    return(USER_NO_PP);
 }
 
@@ -90,6 +86,8 @@ int user_check_cut(void *user, double etol, int number, int *indices,
     * cut was useful
    \*------------------------------------------------------------------------*/
 
+   user_problem *prob = (user_problem *) user;
+
    switch (cut->type){
       
     default:
@@ -108,6 +106,18 @@ int user_check_cut(void *user, double etol, int number, int *indices,
 \*===========================================================================*/
 
 int user_finished_checking_cuts(void *user)
+{
+   return(USER_NO_PP);
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Here, we free up the data structures. If the default setup is used with 
+ * sequential computation, nothing needs to be filled in here.
+\*===========================================================================*/
+
+int user_free_cp(void **user)
 {
    return(USER_NO_PP);
 }

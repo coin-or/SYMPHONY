@@ -18,7 +18,7 @@
 #include "proto.h"
 #include "BB_types.h"
 
-#if defined(__CPLEX70__) || defined(__CPLEX66__) || defined(__CPLEX65__) || defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
+#ifdef __CPLEX__
 
 /*****************************************************************************/
 /*******              here are the definitions for CPLEX               *******/
@@ -101,13 +101,13 @@ typedef struct LPdata{
 
 void CPX_check_error PROTO((const char *erring_func));
 
-#elif defined(__OSLLIB__)
+#elif defined(__OSL__)
 /*****************************************************************************/
-/*******            here are the definitions for OSLLIB                *******/
+/*******              here are the definitions for OSL                 *******/
 /*****************************************************************************/
 #include <ekk_c_api.h>
 
-void OSLLIB_check_error PROTO((const char *erring_func));
+void OSL_check_error PROTO((const char *erring_func));
 
 /* The second comment indicates where the arrays are resized: BB or LP,
  * BB is BlackBox, LP is the lp solver specific part */
@@ -185,7 +185,11 @@ typedef struct LPdata{
 
 #else
 
-#error Unknown LP solver
+#error ###################################
+#error # Undefined or unknown LP solver.
+#error # Please edit SYMPHONY/Makefile
+#error # and define LP_SOLVER properly.
+#error ###################################
 
 #endif 
 

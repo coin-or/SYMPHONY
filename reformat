@@ -1,6 +1,13 @@
 #!/bin/tcsh -f
 mkdir $1
-foreach file (LICENSE Makefile README* sample.vrp)
+foreach file (LICENSE Makefile README*)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/WIN32
+foreach file (WIN32/*.dsp)
+awk -f reformat.awk $file > $1/$file
+end
+foreach file (WIN32/*.dsw)
 awk -f reformat.awk $file > $1/$file
 end
 mkdir $1/Common
@@ -35,8 +42,25 @@ mkdir $1/DrawGraph
 foreach file (DrawGraph/*.c)
 awk -f reformat.awk $file > $1/$file
 end
+mkdir $1/DrawGraph/IGD_1.0
+foreach file (DrawGraph/IGD_1.0/*.txt)
+awk -f reformat.awk $file > $1/$file
+end
+foreach file (DrawGraph/IGD_1.0/*.tcl)
+awk -f reformat.awk $file > $1/$file
+end
+foreach file (DrawGraph/IGD_1.0/*.g)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/DrawGraph/IGD_1.0/Simple_version
+foreach file (DrawGraph/IGD_1.0/Simple_version/*.txt)
+awk -f reformat.awk $file > $1/$file
+end
+foreach file (DrawGraph/IGD_1.0/Simple_version/*.c)
+awk -f reformat.awk $file > $1/$file
+end
 mkdir $1/Vrp
-foreach file (Vrp/Makefile)
+foreach file (Vrp/Makefile Vrp/sample.vrp Vrp/README)
 awk -f reformat.awk $file > $1/$file
 end
 mkdir $1/Vrp/Common
@@ -65,5 +89,33 @@ awk -f reformat.awk $file > $1/$file
 end
 mkdir $1/Vrp/DrawGraph
 foreach file (Vrp/DrawGraph/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Template
+foreach file (Template/Makefile)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Template/LP
+foreach file (Template/LP/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Template/Master
+foreach file (Template/Master/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Template/CutPool
+foreach file (Template/CutPool/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Template/CutGen
+foreach file (Template/CutGen/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Template/include
+foreach file (Template/include/*.h)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/Template/DrawGraph
+foreach file (Template/DrawGraph/*.c)
 awk -f reformat.awk $file > $1/$file
 end

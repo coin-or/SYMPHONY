@@ -9,7 +9,8 @@
 /* This file was jointly authored by Ted Ralphs and Leonid Kopman.           */
 /*                                                                           */
 /* (c) Copyright 2000, 2001, 2001 Ted Ralphs. All Rights Reserved.           */
-/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  *//*                                                                           */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
+/*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
 /*                                                                           */

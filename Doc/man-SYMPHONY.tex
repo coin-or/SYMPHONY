@@ -1,0 +1,500 @@
+\subsection{Orienting Yourself}
+
+The easiest way to get oriented is to examine the organization of the source
+files (note that file names will be given Unix-style). When you unpack the
+\BB\ distribution, you will notice that the source files are organized along
+the lines of the modules.  There is a separate directory for each
+module---master ({\tt Master}), tree manager ({\tt TreeManager}), cut
+generator ({\tt CutGen}), cut pool ({\tt CutPool}), and LP solver ({\tt
+LP}). In addition, there is a directory called {\tt DrawGraph} and a directory
+called {\tt Common} that also contain source files. The {\tt DrawGraph}
+directory provides an interface from \BB\ to the {\em Interactive Graph
+Drawing} software package developed by Marta Es\"o. This is an excellent
+utility for graphical display and debugging. The {\tt Common} directory
+contains source code for functions used by multiple modules.
+
+Within each module's directory, there is a primary source file
+containing the function {\tt main()} (named {\tt *.c} where * is the
+module name), a source file containing functions related to
+inter-process communication (named {\tt *\_proccomm.c}) and a file
+containing general subroutines used by the module (named {\tt
+*\_func.c}). The master is the exception and is organized slightly
+differently. The LP process source code is further subdivided due to
+the sheer number of functions.
+
+The {\tt include} directory contains the header files. Corresponding
+to each module, there are three header files, one containing internal
+data structures and function prototypes associated with the module
+(named {\tt *.h} where * is the module name), one containing the data
+structures for storing the parameters (these are also used by the
+master process), and the third containing the function prototypes for
+the user functions (name {\tt *\_u.h}). By looking at the header files, you
+should get a general idea of how things are laid out.
+
+In addition to the subdirectories corresponding to each module, there are
+subdirectories corresponding to applications. The sample application is
+contained in the directory {\tt Vrp/}. The files containing function stubs
+that can be filled in to create a new application are contained in the
+directory {\tt SYMPHONY-3.0.1/Template/}. There is one file for each module,
+initially called {\tt Template/*/*\_user.c}. The primary thing that you, as
+the user, need to understand to build an application is how to fill in these
+stubs. That is what the second section of this manual is about.
+
+\subsection{Writing the User Functions}
+
+The majority of the user functions are called from either the master
+process or the LP process. For these two modules, user functions are
+invoked from so-called {\em wrapper functions} that provide the
+interface. Each wrapper function is named {\tt *\_u()} , where {\tt *}
+is the name of the corresponding user function, and is defined in a
+file called {\tt *\_wrapper.c}. The wrapper function first collects
+the necessary data and hands it to the user by calling the user
+function. Based on the return value from the user, the wrapper then
+performs any necessary post-processing. Most user functions are
+designed so that the user can do as little or as much as she likes.
+Where it is feasible, there are default options that allow the user to
+do nothing if the default behavior is acceptable. This is not possible
+in all cases and the user must provide certain functions, such as
+separation.
+
+In the next section, the user functions are described in detail.
+The name of every user written function starts with {\tt user\_}.
+There are three kinds of arguments:
+\begin{description}
+\item[\rm IN:] An argument containing information that the user might need
+to perform the function.
+\item[\rm OUT:] A pointer to an argument in which the user should
+return a result (requested data, decision, etc.) of the function. 
+\item[\rm INOUT:] An argument which contains information the user might need,
+but also for which the user can change the value.
+\end{description}
+The return values from each function are as follows:
+\begin{description}
+\item[Return values:] \hfill
+
+\begin{tabular}{lp{310pt}} 
+
+{\tt ERROR} & Error in the user function. Printing an error message is
+the user's responsibility. Depending on the work the user function was
+supposed to do, the error might be ignored (and some default option
+used), or the process aborts. \\
+
+{\tt USER\_AND\_PP} & The user implemented both the user function and
+post-processing (post-processing by \BB\ will be skipped).\\
+
+{\tt USER\_NO\_PP} & The user implemented the user function only. \\
+
+{\tt DEFAULT} & The default option is going to be used (the default is one of
+the built-in options, \BB\ decides which one to use based on initial parameter
+settings and the execution of the algorithm). \\
+
+{\tt built\_in\_option1 } & \\
+{\tt built\_in\_option2 } ... & The specified built-in option will be used.\\
+\end{tabular}
+
+\item[Notes:] \hfill
+\begin{itemize}
+\vspace{-3ex}
+
+\item Sometimes an output is optional. This is always be noted in the
+function descriptions.
+
+\item If an array has to be returned (i.e., the argument is {\tt type
+**array}) then (unless otherwise noted) the user has to allocate space
+for the array itself and set {\tt *array} to be the array allocated.
+If an output array is optional then the user {\em must not} set {\tt
+*array} for the array she is not going to fill up because this is how
+\BB\ decides which optional arrays are filled up.
+
+\item Some built-in options are implemented so that the user can invoke them
+directly from the user function. This might be useful if, for example,
+the user wants to use different built-in options at different stages
+of the algorithm, or if he wants to do the post-processing himself but
+does not want to implement the option itself.
+\end{itemize}
+
+\end{description}
+
+\subsection{Data Structures}
+
+\subsubsection{Internal Data Structures}
+
+With few exceptions, the data structures used internally by \BB\
+are undocumented and most users will not need to access them
+directly. However, if such access is desired, a pointer to the main data
+structure used by each of the modules can be obtained simply by calling
+the function {\tt get\_*\_ptr()} where * is the appropriate module (see the
+header files). This function will return a pointer to the data
+structure for the appropriate module. Casual users are advised against
+modifying \BB's internal data structures directly.
+
+\subsubsection{User-defined Data Structures}
+
+The user can define her own data structure for each module to maintain
+problem-specific data and any other information the user needs access
+to. A pointer to this data structure is maintained by \BB\ and is
+passed to the user as an argument to each user function. Since
+\BB\ knows nothing about this data structure, it is up to the user
+to allocate it, maintain it, and free it as required.
+
+\subsection{Inter-process Communication for Distributed Computing}
+\label{communication}
+While the implementation of \BB\ strives to shield the user from
+having to know anything about communications protocols or the
+specifics of inter-process communication, it may be necessary for the
+user to pass information from one module to another in some
+cases---for instance, if the user must pass problem-specific data to
+the LP process after reading them in from a data file. In cases where
+this might be appropriate, user functions are supplied in pairs---a
+{\em send} function and a {\em receive} function. All data are sent in
+the form of arrays of either type {\tt char}, {\tt int}, or {\tt
+double}, or as strings. To send an array, the user has simply to
+invoke the function {\tt send\_?\_array(? *array, int length)} where ?
+is one of the previously listed types. To receive that array, there is
+a corresponding function called {\tt receive\_?\_array(? *array, int
+length)}. When receiving an array, the user must first
+allocate the appropriate amount of memory. In cases where variable
+length arrays need to be passed, the user must first pass the length
+of the array (as a separate array of length one) and then the array
+itself. In the receive function, this allows the length to be received
+first so that the proper amount of space can be allocated before
+receiving the array itself. Note that data must be received in exactly
+the same order as it was passed, as data is read linearly into and out
+of the message buffer. The easiest way to ensure this is done properly
+is to simply copy the send statements into the receive function and
+change the function names. It may then be necessary to add some
+allocation statements in between the receive function calls.
+
+\subsection{The LP Engine}
+
+\BB\ requires the use of a third-party callable library to solve the LP 
+relaxations once they are formulated. Currently, ILOG's
+\htmladdnormallink{CPLEX}{http://www.cplex.com}$^{\copyright}$
+and IBM's
+\htmladdnormallink{OSL}{http://www-4.ibm.com/software/data/bi/osl/index.html}
+are the available options. Be forewarned that OSL's interface is not
+tested and has exhibited suboptimal performance. Any LP solver with
+the appropriate capabilities can be interfaced with \BB\ by writing a
+set of interface routines contained in the file {\tt LP/lp\_solver.c}.
+Once the interface routines are written, the make file must be
+modified to link with the new LP solver.
+
+\subsection{Compiling Your Application}
+
+\subsubsection{Unix Operating Systems}
+
+Once the user functions are filled in, all that remains is to compile the
+application. The distribution comes with two make files that facilitate this
+process. The primary make file resides in the {\tt SYMPHONY-3.0.1/} directory.
+The user make file resides in the user's subdirectory, initially called {\tt
+SYMPHONY-3.0.1/Template/}. There are a number of variables that must be set in
+the primary make file. First ensure that the sample application compiles by
+following the instructions in Section \ref{getting_started_unix}. Then modify
+the makefile to reflect the new {\tt \$(USERROOT)} ({\tt
+SYMPHONY-3.0.1/Template} by default). When you are ready, type ``{\tt make}''
+to make the executables. \BB\ will create three new subdirectories---{\tt
+SYMPHONY-3.0.1/Template/obj.*}, {\tt SYMPHONY-3.0.1/Template/bin.*}, and {\tt
+SYMPHONY-3.0.1/Template/dep.*} where * is a the current architecture (defined
+in the make file).
+
+\paragraph{Working with PVM.}
+\label{PVM}
+To compile a distributed application, it is necessary to install PVM.
+The current version of PVM can be obtained at {\tt
+\htmladdnormallink{http://www.csm.ornl.gov/pvm/}
+{http://www.csm.ornl.gov/pvm/}}. It should compile and install without
+any problem. You will have to make a few modifications to your {\tt
+.cshrc} file, such as defining the {\tt PVM\_ROOT} environment
+variable, but this is all explained clearly in the PVM documentation.
+Note that all executables (or at least a link to them) must reside in
+the {\tt \$PVM\_ROOT/bin/\$PVM\_ARCH} directory in order for parallel
+processes to be spawned correctly. The environment variable {\tt
+PVM\_ARCH} is set in your {\tt .cshrc} file and contains a string
+representing the current architecture type. To run a parallel
+application, you must first start up the daemon on each of the
+machines you plan to use in the computation. How to do this is also
+explained in the PVM documentation.
+
+\paragraph{Communication with Shared Memory.}
+\label{shared}
+In the shared memory configuration, it is not necessary to use
+message passing to move information from one module to another since
+memory is globally accessible. In the few cases where the user would
+ordinarily have to pass information using message passing, it is
+easiest and most efficient to simply copy the information to the new
+location. This copying gets done in the {\em send} function and hence
+the {\em receive} function is never actually called. This means that
+the user must perform all necessary initialization, etc. in the send
+function. This makes it a little confusing to write source code which
+will work for all configurations. However, the confusion should be
+cleared up by looking at the sample application, especially the file
+{\tt SYMPHONY-3.0.1/Vrp/Master/vrp.c}.
+
+\paragraph{Configuring the Modules.}
+\label{configuration}
+In the {\tt make} file, there are
+four variables that control which modules run as separate executables
+and which are called directly in serial fashion. The variables are as
+follows:
+\begin{description}
+        \item [COMPILE\_IN\_CG:] If set to {\tt TRUE}, then the cut generator
+        function will be called directly from the LP in serial
+        fashion, instead of running as a separate executable. This is
+        desirable if cut generation is quick and running it in
+        parallel is not worth the price of the communication overhead.
+        \item [COMPILE\_IN\_CP:] If set to {\tt TRUE}, then the cut
+        pool(s) will be maintained as a data structure auxiliary to the
+        tree manager. 
+        \item [COMPILE\_IN\_LP:] If set to {\tt TRUE}, then the LP
+        functions will be called directly from the tree manager. When
+        running the distributed version, this
+        necessarily implies that there will only be one active
+        subproblem at a time, and hence the code will essentially be
+        running serially. IN the shared-memory version, however, the
+        tree manager will be threaded in order to execute subproblems 
+        in parallel.
+        \item [COMPILE\_IN\_TM:] If set to {\tt TRUE}, then the tree
+        will be managed directly from the master process. This is only
+        recommended if a single executable is desired (i.e.~the three
+        other variables are also set to true). A single executable is
+        extremely useful for debugging purposes.
+\end{description}
+These variables can be set in virtually any combination, though some
+don't really make much sense. Note that in a few user functions that
+involve process communication, there will be different versions for
+serial and parallel computation. This is accomplished through the use
+of {\tt \#ifdef} statements in the source code. This is well documented
+in the function descriptions and the in the source files containing
+the function stubs. See also Section \ref{shared}.
+
+\paragraph{Executable Names.}
+\label{exe_names}
+In order to keep track of the various possible configurations,
+executable and their corresponding libraries are named as follows. For
+the fully distributed version, the names are {\tt master}, {\tt tm},
+{\tt lp}, {\tt cg}, and {\tt cp}. For other configurations, the
+executable name is a combination of all the modules that were compiled
+together joined by underscores. In other words, if the LP and the cut
+generator modules were compiled together (i.e.~{\tt COMPILE\_IN\_CG}
+set to {\tt TRUE}), then the executable name would be ``{\tt lp\_cg}''
+and the corresponding library file would be called ``{\tt
+liblp\_cg.a}.'' You can rename the executables as you like. However, if
+you are using PVM to spawn the modules, as in the fully distributed
+version, you must set the parameters {\tt *\_exe} in the parameter
+file to the new executable names. See Section \ref{tm_params} for
+information on setting parameters in the parameter file.
+
+\subsubsection{Microsoft Windows}
+
+First, follow the instructions for compiling the sample application in Section
+\ref{getting_started_windows} to ensure you have the proper settings. Once the
+stub files in the {\tt SYMPHONY-3.0.1$\backslash$Template} hierarchy are
+filled in, use the project ``{\tt vrp}'' as a template to create a new project
+called ``{\tt user}'' that compiles the files in {\tt
+SYMPHONY-3.0.1$\backslash$Template} and creates a library. Modify the project
+``{\tt symphony}'' to compile and link with the new user library.
+
+\subsection{Debugging Your Application}
+
+Much of this section applies to Unix operating systems. However, it may
+also be useful for Windows users.
+
+\subsubsection{The First Rule}
+
+\BB\ has many built-in options to make debugging easier. The most
+important one, however, is the following rule. {\bf It is easier to
+debug the fully sequential version than the fully distributed
+version}. Debugging parallel code is not terrible, but it is more
+difficult to understand what is going on when you have to look at the
+interaction of several different modules running as separate
+processes. This means multiple debugging windows which have to be
+closed and restarted each time the application is re-run. For this
+reason, it is highly recommended to develop code that can be compiled
+serially even if you eventually intend to run in a fully distributed
+environment. This does make the coding marginally more complex, but
+believe me, it's worth the effort. The vast majority of your code will
+be the same for either case. Make sure to set the compile flag to
+``{\tt -g}'' in the make file.
+
+\subsubsection{Debugging with PVM}
+\label{debugging-PVM}
+If you wish to venture into debugging your distributed application,
+then you simply need to set the parameter {\tt *\_debug}, where * is
+the name of the module you wish to debug, 
+to the value ``4'' in the parameter file (the number ``4'' is chosen
+by PVM). This will tell PVM to spawn the particular process or
+processes in question under a debugger. What PVM actually does in this
+case is to launch the script {\tt \$PVM\_ROOT/lib/debugger}. You will
+undoubtedly want to modify this script to launch your preferred
+debugger in the manner you deem fit. If you have trouble with this,
+please send e-mail to the list serve (see Section \ref{resources}).
+
+It's a little tricky to debug interacting parallel processes, but you
+will quickly get the idea. The main difficulty is in that the order of
+operations is difficult to control. Random interactions can occur when
+processes run in parallel due to varying system loads, process
+priorities, etc. Therefore, it may not always be possible to duplicate
+errors. To force runs that you should be able to reproduce, make sure
+the parameter {\tt no\_cut\_timeout} appears in the parameter file or
+start \BB\ with the ``{\tt -a}'' option. This will keep the cut
+generator from timing out, a major source of randomness. Furthermore,
+run with only one active node allowed at a time (set {\tt
+max\_active\_nodes} to ``1''). This will keep the tree search from
+becoming random. These two steps should allow runs to be reproduced.
+You still have to be careful, but this should make things easier.
+
+\subsubsection{Using {\tt Purify} and {\tt Quantify}}
+
+The make file is already set up for compiling applications using {\tt
+purify} and {\tt quantify}. Simply set the paths to the executables
+and type ``{\tt make pall}'' or ``{\tt p*}'' where * is the module you
+want to purify. The executable name is the same as described in
+Section \ref{exe_names}, but with a ``p'' in front of it. To tell PVM
+to launch the purified version of the executables, you must set the
+parameters {\tt *\_exe} in the parameter file to the purified
+executable names. See Section \ref{tm_params} for information on
+setting parameters in the parameter file.
+
+\subsubsection{Checking the Validity of Cuts and Tracing the Optimal Path}
+\label{debugging}
+Sometimes the only evidence of a bug is the fact that the optimal
+solution to a particular problem is never found. This is usually
+caused by either (1) adding an invalid cut, or (2) performing an
+invalid branching. There are two options available for discovering
+such errors. The first is for checking the validity of added cuts.
+This checking must, of course, be done by the user, but \BB\ can
+facilitate such checking. To do this, the user must fill in the
+function \hyperref{{\tt user\_check\_validity\_of\_cut()}} {{\tt
+user\_check\_validity\_of\_cut()} (see Section
+}{)}{user_check_validity_of_cut}. THIS function is called every time a
+cut is passed from the cut generator to the LP and can function as an
+independent verifier. To do this, the user must pass (through her own
+data structures) a known feasible solution. Then for each cut passed
+into the function, the user can check whether the cut is satisfied
+by the feasible solution. If not, then there is a problem! Of course,
+the problem could also be with the checking routine. To see how this is
+done, check out the sample application file {\tt Vrp/cg\_user.c}.
+After filling in this function, the user must recompile everything
+(including the libraries) after uncommenting the line in the make file
+that contains ``{\tt BB\_DEFINES += -DCHECK\_CUT\_VALIDITY}.'' Type
+``{\tt make clean\_all}'' and then ``{\tt make}.''
+
+Tracing the optimal path can alert the user when the subproblem which
+admits a particular known feasible solution (at least
+according to the branching restrictions that have been imposed so far)
+is pruned. This could be due to an invalid branching. Note that this
+option currently only works for branching on binary variables. To use
+this facility, the user must fill in the function \hyperref{{\tt
+user\_send\_feas\_sol()}} {{\tt user\_send\_feas\_sol()} (see Section
+}{)}{user_send_feas_sol}. All that is required is to pass out an array
+of user indices that are in the feasible solution that you want to
+trace. Each time the subproblem which admits this feasible solution is
+branched on, the branch that continues to admit the solution is
+marked. When one of these marked subproblems is pruned, the user is
+notified.
+
+\subsubsection{Using the {\tt Interactive Graph Drawing} Software}
+\label{IGD}
+The Interactive Graph Drawing (IGD) software package is included with
+\BB\ and \BB\ facilitates its use through interfaces with the
+package. The package, which is a Tcl/Tk application, is extremely
+useful for developing and debugging applications involving graph-based
+problems. Given display coordinates for each node in the graph, IGD
+can display support graphs corresponding to fractional solutions with or
+without edge weights and node labels and weights, as well as other
+information. Furthermore, the user can interactively modify the graph
+by, for instance, moving the nodes apart to ``disentangle'' the
+edges. The user can also interactively enter violated cuts through the
+IGD interface.
+
+To use IGD, you must have installed PVM since the drawing window runs
+as a separate application and communicates with the user's routines
+through message passing. To compile the graph drawing application,
+type ``{\tt make dg}'' in the \BB\ root directory. The user
+routines in the file {\tt dg\_user.c} can be filled in, but it is not
+necessary to fill anything in for basic applications. 
+
+After compiling {\tt dg}, the user must write some subroutines that
+communicate with {\tt dg} and cause the graph to be drawn.
+Regrettably, this is currently a little more complicated than it needs
+to be and is not well documented. However, by looking at the sample
+application, it should be possible to see how it is done. To
+enable graph drawing, put the line {\tt do\_draw\_graph 1} into the
+parameter file or use the {\tt -d} command line option. It can be difficult to
+get IGD to work. If you are interested in using it and cannot get it to work,
+feel free to contact me.
+
+\subsubsection{Other Debugging Techniques}
+
+Another useful built-in function is MakeMPS, which will write the
+current LP relaxation to a file in MPS format. This file can then be
+read into the LP solver interactively or examined by hand for errors.
+Many times, CPLEX gives much more explicit error messages
+interactively than through the callable library. The form of the
+function is 
+\begin{verbatim}
+void MakeMPS(LPData *lp_data, int bc_index, int iter_num)
+\end{verbatim}
+The matrix is written to the file ``{\tt
+matrix.[bc\_index].[iter\_num].mps}'' where {\em bc\_index} is the
+usually passed as the index of the current subproblem and {\em
+iter\_num} is the current iteration number. These can, however, be any
+numbers the user chooses. If \BB\ is forced to abandon solution
+of an LP because the LP solver returns an error code, the current LP
+relaxation is automatically written to the file ``{\tt
+matrix.[bc\_index].[iter\_num].mps}'' where {\em bc\_index} is the
+index of the current subproblem and {\em iter\_num} is the current
+iteration number. MakeMPS can be called using breakpoint code to
+examine the status of the matrix at any point during execution.
+
+Logging is another useful feature. Logging the state of the search tree can
+help isolate some problems more easily. See Section \ref{tm_params}
+for the appropriate parameter settings to use logging.
+
+\subsection{Controlling Execution and Output}
+\label{output}
+Calling \BB\ with no arguments simply lists all command-line options.
+Most of the common parameters can be set on the command line. Usually
+it is easier to use a parameter file. To invoke \BB\ with a parameter
+file type ``{\tt master -f filename ...}'' where filename is the name
+of the parameter file. The format of the file is explained in Section
+\ref{parameter_file}. 
+
+The output level can be controlled through the use of the verbosity
+parameter. Setting this parameter at different levels will cause
+different progress messages to be printed out. Level 0 only prints out
+the introductory and solution summary messages, along with status
+messages every 10 minutes. Level 1 prints out a message every time a
+new node is created. Level 3 prints out messages describing each
+iteration of the solution process. Levels beyond 3 print out even more
+detailed information.
+
+There are also two possible graphical interfaces. For graph-based
+problems, the Interactive Graph Drawing Software allows visual display
+of fractional solutions, as well as feasible and optimal solutions
+discovered during the solution process. For all types of problems,
+VBCTOOL creates a visual picture of the branch and cut tree, either
+in real time as the solution process evolves or as an emulation from a
+file created by
+\BB. See Section \ref{tm_params} for information on how to use VBCTOOL
+with SYMPHONY. Binaries for VBCTOOL can be obtained at \\ 
+{\tt \htmladdnormallink
+{http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}
+{http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}}.
+
+
+\subsection{Other Resources}
+\label{resources}
+There is a \BB\ user's list serve for posting questions/comments.
+To subscribe, send ``{\tt subscribe symphony-users}'' to
+{\tt \htmladdnormallink{majordomo@branchandcut.org}
+{mailto:majordomo@branchandcut.org}}. There is also a Web site for
+\htmladdnormallink{SYMPHONY}{http://branchandcut.org/SYMPHONY} 
+\begin{latexonly}
+at {\tt http://branchandcut.org/SYMPHONY}
+\end{latexonly}.  
+Bug reports can be sent to \\
+{\tt \htmladdnormallink{symphony-bugs@branchandcut.org}
+{mailto:symphony-bugs@branchandcut.org}}.
+
+

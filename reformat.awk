@@ -28,6 +28,16 @@ BEGIN{
    getline;
 }
 
+($1=="/*" && $8=="Common"){
+  getline;
+  printf("/* This software is licensed under the Common Public License Version 1.0.    */\n");
+}
+
+($1=="/*" && $2=="accompanying"){
+  getline;
+  printf("/* Please see accompanying file for terms.                                   */\n");
+}
+
 ($1=="/*" && $3=="Copyright"){
   getline;
   printf("/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */\n");

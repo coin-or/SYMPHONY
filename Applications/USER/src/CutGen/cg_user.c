@@ -15,6 +15,7 @@
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "cg_u.h"
+#include "user.h"
 
 /*===========================================================================*/
 
@@ -27,19 +28,16 @@
  * Here is where the user must receive all of the data sent from
  * user_send_cg_data() and set up data structures. Note that this function is
  * only called if one of COMPILE_IN_CG, COMPILE_IN_LP, or COMPILE_IN_TM is
- * FALSE.
+ * FALSE. For sequential computation, nothing is needed here.
 \*===========================================================================*/
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+int user_receive_cg_data(void **user, int dg_id, int *varnum)
+/*___END_EXPERIMENTAL_SECTION___*/
+/*UNCOMMENT FOR PRODUCTION CODE*/
+#if 0
 int user_receive_cg_data(void **user, int dg_id)
-{
-   *user = NULL;
-   
-   return(USER_NO_PP);
-}
-
-/*===========================================================================*/
-
-int user_receive_lp_solution_cg(void *user)
+#endif
 {
    return(USER_NO_PP);
 }
@@ -47,10 +45,12 @@ int user_receive_lp_solution_cg(void *user)
 /*===========================================================================*/
 
 /*===========================================================================*\
- * Free the user data structure
+ * If the user wants to fill in a customized routine for sending and receiving
+ * the LP solution, it can be done here. For most cases, the default routines
+ * are fine.
 \*===========================================================================*/
 
-int user_free_cg(void **user)
+int user_receive_lp_solution_cg(void *user)
 {
    return(USER_NO_PP);
 }
@@ -61,15 +61,39 @@ int user_free_cg(void **user)
  * Find cuts violated by a particular LP solution. This can be a fairly
  * involved function but the bottom line is that an LP solution comes in
  * and cuts go out. Remember, use the function cg_send_cut() to send cuts out
- * when they are found
+ * when they are found.
 \*===========================================================================*/
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+int user_find_cuts(void *user, int varnum, int iter_num, int level,
+		   int index, double objval, int *indices, double *values,
+		   double ub, double etol, int *cutnum, char *status)
+/*___END_EXPERIMENTAL_SECTION___*/
+/*UNCOMMENT FOR PRODUCTION CODE*/
+#if 0
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   int index, double objval, int *indices, double *values,
 		   double ub, double etol, int *cutnum)
+#endif
 {
+   user_problem *prob = (user_problem *) user;
+
+   /* Fill in cut generation here if desired */
+
    *cutnum = 0;
 
+   return(USER_NO_PP);
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Free the user data structure. If the default setup is used with sequential
+ * computation, nothing needs to be filled in here.
+\*===========================================================================*/
+
+int user_free_cg(void **user)
+{
    return(USER_NO_PP);
 }
 

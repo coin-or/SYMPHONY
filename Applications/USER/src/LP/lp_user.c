@@ -17,6 +17,7 @@
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "lp_u.h"
+#include "user.h"
 
 /*===========================================================================*/
 
@@ -27,23 +28,11 @@
 /*===========================================================================*\
  * Here is where the user must receive all of the data sent from
  * user_send_lp_data() and set up data structures. Note that this function is
- * only called if one of COMPILE_IN_LP or COMPILE_IN_TM is FALSE.
+ * only called if one of COMPILE_IN_LP or COMPILE_IN_TM is FALSE. For 
+ * sequential computation, nothing is needed here.
 \*===========================================================================*/
 
 int user_receive_lp_data(void **user)
-{
-   *user = NULL;
-   
-   return(USER_NO_PP);
-}
-
-/*===========================================================================*/
-
-/*===========================================================================*\
- * Free all the user data structures
-\*===========================================================================*/
-
-int user_free_lp(void **user)
 {
    return(USER_NO_PP);
 }
@@ -52,7 +41,9 @@ int user_free_lp(void **user)
 
 /*===========================================================================*\
  * Here is where the user must create the initial LP relaxation for
- * each search node. See the comments below.
+ * each search node. Basically, this involves constructing the base matrix in 
+ * column ordered format. See the documentation for an explanation of how to 
+ * fill out this function.
 \*===========================================================================*/
 
 int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
@@ -61,6 +52,8 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
 		   char **sense, double **rngval, int *maxn, int *maxm,
 		   int *maxnz, int *allocn, int *allocm, int *allocnz)
 {
+   user_problem *prob = (user_problem *) user;
+
    return(USER_NO_PP);
 }      
 
@@ -68,7 +61,9 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
 /*===========================================================================*/
 
 /*===========================================================================*\
- * This function takes an LP solution and checks it for feasibility.
+ * This function takes an LP solution and checks it for feasibility. By 
+ * default, SYMPHONY checks for integrality. If any integral solution for your 
+ * problem is feasible, then nothing needs to be done here.
 \*===========================================================================*/
 
 int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
@@ -80,12 +75,10 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 /*===========================================================================*/
 
 /*===========================================================================*\
- * In my case, a feasible solution is specified most compactly by
- * essentially a permutation of the customers along with routes numbers,
- * specifying the order of the customers on their routes. This is just
- * sent as a character array which then gets cast to an array of
- * structures, one for each customers specifying the route number and
- * the next customer on the route.
+ * Here, the user can specify a special routine for sending back the feasible
+ * solution. This need not be used unless there is a special format the user
+ * wants the solution in. For sequential computation, you can use this routine
+ * to interpret and store the feasible solution whenever one is found.
 \*===========================================================================*/
 
 int user_send_feasible_solution(void *user, double lpetol, int varnum,
@@ -99,7 +92,7 @@ int user_send_feasible_solution(void *user, double lpetol, int varnum,
 
 /*===========================================================================*\
  * This function graphically displays the current fractional solution
- * This is done using the Interactie Graph Drawing program.
+ * This is done using the Interactive Graph Drawing program, if it is used.
 \*===========================================================================*/
 
 int user_display_lp_solution(void *user, int which_sol, int varnum,
@@ -136,7 +129,7 @@ int user_same_cuts(void *user, cut_data *cut1, cut_data *cut2, int *same_cuts)
 
 /*===========================================================================*\
  * This function receives a cut, unpacks it, and adds it to the set of
- * rows to be added to the LP.
+ * rows to be added to the LP. Only used if cutting planes are generated.
 \*===========================================================================*/
 
 int user_unpack_cuts(void *user, int from, int type, int varnum,
@@ -145,6 +138,8 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 {
    int j;
    
+   user_problem *prob = (user_problem *) user;
+
    *new_row_num = 0;
    for (j = 0; j < cutnum; j++){
       switch (cuts[j]->type){
@@ -158,6 +153,12 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 }
 
 /*===========================================================================*/
+
+/*===========================================================================*\
+ * If the user wants to fill in a customized routine for sending and receiving
+ * the LP solution, it can be done here. For most cases, the default routines
+ * are fine.
+\*===========================================================================*/
 
 int user_send_lp_solution(void *user, int varnum, var_desc **vars, double *x,
 			  int where)
@@ -182,7 +183,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 /*===========================================================================*/
 
 /*===========================================================================*\
- * This function generates the 'next' column
+ * This function generates the 'next' column. Only used for column generation.
 \*===========================================================================*/
 
 int user_generate_column(void *user, int generate_what, int cutnum,
@@ -248,6 +249,17 @@ int user_get_upper_bounds(void *user, int varnum, int *indices, double *bd)
 
 int user_generate_cuts_in_lp(void *user, int varnum, var_desc **vars, double *x,
 			     int *new_row_num, waiting_row ***new_rows)
+{
+   return(USER_NO_PP);
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Free all the user data structures
+\*===========================================================================*/
+
+int user_free_lp(void **user)
 {
    return(USER_NO_PP);
 }
