@@ -286,6 +286,9 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
    case OsiSymGenerateCglProbingCuts:
        keyVal = "generate_cgl_probing_cuts";
        break;
+   case OsiSymGenerateCglCliqueCuts:
+       keyVal = "generate_cgl_clique_cuts";
+       break;
    case OsiSymGenerateCglFlowAndCoverCuts:
        keyVal = "generate_cgl_flow_and_cover_cuts";
        break;

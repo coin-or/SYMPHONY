@@ -101,6 +101,7 @@ typedef struct LP_PARAMS{
    int               generate_cgl_knapsack_cuts;
    int               generate_cgl_oddhole_cuts;
    int               generate_cgl_probing_cuts;
+   int               generate_cgl_clique_cuts;
    int               generate_cgl_flow_and_cover_cuts;
    int               generate_cgl_rounding_cuts;
    int               generate_cgl_lift_and_project_cuts;

@@ -294,6 +294,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->generate_cgl_gomory_cuts = TRUE;
    lp_par->generate_cgl_knapsack_cuts = TRUE;
    lp_par->generate_cgl_oddhole_cuts = TRUE;
+   lp_par->generate_cgl_clique_cuts = TRUE;
    lp_par->generate_cgl_probing_cuts = TRUE;
    lp_par->generate_cgl_flow_and_cover_cuts = FALSE;
    lp_par->generate_cgl_rounding_cuts = FALSE;
