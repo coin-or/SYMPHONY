@@ -300,7 +300,7 @@ int fathom_branch(lp_prob *p)
 	    printf("####### Recovery failed. %s%s",
 		   "LP solver is having numerical difficulties :(.\n",
 		   "####### Dumping current LP to MPS file and exiting.\n\n");
-	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
+	    sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
 	    write_mps(lp_data, name);
 	    return(ERROR__NUMERICAL_INSTABILITY);
 	 }
@@ -316,7 +316,7 @@ int fathom_branch(lp_prob *p)
 	    PRINT(p->par.verbosity, 1, ("Feasibility lost -- "));
 #if 0
 	    char name[50] = "";
-	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
+	    sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
 	    write_mps(lp_data, name);
 #endif
 	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity)
@@ -640,7 +640,7 @@ int repricing(lp_prob *p)
 	    printf("######## Recovery failed. %s%s",
 		   "LP solver is having numerical difficulties :(.\n",
 		   "######## Dumping current LP to MPS file and exiting.\n\n");
-	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
+	    sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
 	    write_mps(lp_data, name);
 	    return(ERROR__NUMERICAL_INSTABILITY);
 	 }

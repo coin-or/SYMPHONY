@@ -243,7 +243,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->verbosity = 0;
    lp_par->granularity = tm_par->granularity;
    lp_par->use_cg = tm_par->use_cg;
-   lp_par->set_obj_upper_lim = FALSE;
+   lp_par->set_obj_upper_lim = TRUE;
    lp_par->do_primal_heuristic = FALSE;
    lp_par->scaling = -1; /* CPLEX'ism ... don't scale */
    lp_par->fastmip = 1; /* CPLEX'ism ... set it to 1 */
