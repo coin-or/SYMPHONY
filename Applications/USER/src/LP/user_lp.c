@@ -46,11 +46,11 @@ int user_receive_lp_data(void **user)
  * fill out this function.
 \*===========================================================================*/
 
-int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
-		   int cutnum, cut_data **cuts, int *nz, int **matbeg,
-		   int **matind, double **matval, double **obj, double **rhs,
-		   char **sense, double **rngval, int *maxn, int *maxm,
-		   int *maxnz, int *allocn, int *allocm, int *allocnz)
+int user_create_lp (void *user, int varnum, var_desc **vars,
+		    int rownum, int cutnum, cut_data **cuts, int *nz,
+		    int **matbeg, int **matind, double **matval,
+		    double **obj, double **rhs, char **sense,
+		    double **rngval, int *maxn, int *maxm, int *maxnz)
 {
    user_problem *prob = (user_problem *) user;
 
@@ -223,7 +223,7 @@ int user_print_stat_on_cuts_added(void *user, int rownum, waiting_row **rows)
 \*===========================================================================*/
 
 int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
-			    char *delete)
+			    char *delete_rows)
 {
    return(DEFAULT);
 }

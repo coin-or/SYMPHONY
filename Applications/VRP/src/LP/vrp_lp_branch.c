@@ -21,7 +21,7 @@
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "qsortucb.h"
-#include "lp_user.h"
+#include "vrp_lp.h"
 #include "lp_u.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #include "lp.h"
@@ -60,7 +60,7 @@ int user_shall_we_branch(void *user, double lpetol, int cutnum,
    int backsteps = p->par.tailoff_obj_backsteps;
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
-   vrp_spec *vrp = (vrp_spec *) user;
+   vrp_lp_problem *vrp = (vrp_lp_problem *) user;
 
    if (!vrp->par.detect_tailoff){
       *action = USER__BRANCH_IF_MUST;
@@ -125,7 +125,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 			   int bc_level)
 
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    cut_data *cut;  
    branch_obj **cand_list, *can;
    int i, candnum, found_violated = FALSE;
@@ -321,7 +321,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 
     case FALSE:
 
-      switch (((vrp_spec *)user)->par.branching_rule){
+      switch (((vrp_lp_problem *)user)->par.branching_rule){
        case 0:
 	 {
 	    int *xind = (int *) malloc(varnum*ISIZE);
@@ -532,7 +532,7 @@ int user_select_candidates(lp_prob *p, void *user, double lpetol, int cutnum,
 			   branch_obj ***candidates, int *action)
 
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    int i;
    int *sorted_cand_list, j = 0, k = 0;
    double *sorted_diffs;

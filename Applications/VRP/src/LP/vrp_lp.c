@@ -25,10 +25,10 @@
 #include "proccomm.h"
 #include "messages.h"
 #include "timemeas.h"
-#include "lp_user.h"
+#include "vrp_lp.h"
 #include "lp_u.h"
 #include "dg_params.h"
-#include "vrp_dg.h"
+#include "vrp_dg_func.h"
 #include "vrp_macros.h"
 #include "vrp_const.h"
 
@@ -46,13 +46,13 @@
 
 int user_receive_lp_data(void **user)
 {
-   vrp_spec *vrp;
+   vrp_lp_problem *vrp;
    int vertnum;
    int i, j, k, l;
    int total_edgenum;
    int zero_varnum, *zero_vars = NULL;
 
-   vrp = (vrp_spec *) calloc (1, sizeof(vrp_spec));
+   vrp = (vrp_lp_problem *) calloc (1, sizeof(vrp_lp_problem));
 
    *user = (void *)vrp;
 
@@ -111,7 +111,7 @@ int user_receive_lp_data(void **user)
 
 int user_free_lp(void **user)
 {
-   vrp_spec *vrp = (vrp_spec *)(*user);
+   vrp_lp_problem *vrp = (vrp_lp_problem *)(*user);
 
 #ifndef COMPILE_IN_CG
    FREE(vrp->demand);
@@ -136,7 +136,7 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
 		   char **sense, double **rngval, int *maxn, int *maxm,
 		   int *maxnz)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    int *costs = vrp->costs;
    int *edges = vrp->edges;
    int i;
@@ -204,7 +204,7 @@ int user_create_lp(void *user, int varnum, var_desc **vars, int rownum,
 int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 		     double *values, int *feasible, double *true_objval)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    vertex *verts;
    int *demand = vrp->demand, capacity = vrp->capacity;
    int rcnt, *compnodes, *compdemands;
@@ -271,7 +271,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 int user_send_feasible_solution(void *user, double lpetol, int varnum,
 				int *indices, double *values)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   vrp_lp_problem *vrp = (vrp_lp_problem *)user;
 
    send_char_array((char *)vrp->cur_sol, vrp->vertnum*sizeof(_node));
    return(USER_NO_PP);
@@ -288,7 +288,7 @@ int user_send_feasible_solution(void *user, double lpetol, int varnum,
 int user_display_lp_solution(void *user, int which_sol, int varnum,
 			     int *indices, double *values)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   vrp_lp_problem *vrp = (vrp_lp_problem *)user;
 
    if (vrp->par.verbosity > 10 ||
        (vrp->par.verbosity > 8 && (which_sol == DISP_FINAL_RELAXED_SOLUTION ||
@@ -345,13 +345,13 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		     int *new_row_num, waiting_row ***new_rows)
 {
   int i, j, nzcnt = 0, nzcnt_side = 0, nzcnt_across = 0;
-  int v0, v1, *edges = ((vrp_spec *)user)->edges;
+  int v0, v1, *edges = ((vrp_lp_problem *)user)->edges;
   waiting_row **row_list = NULL;
   int *matind = NULL, *matind_across, *matind_side;
   cut_data *cut;
   char *coef;
   double *matval = NULL;
-  int jj, size, vertnum = ((vrp_spec *)user)->vertnum; 
+  int jj, size, vertnum = ((vrp_lp_problem *)user)->vertnum; 
   int cliquecount = 0, val;
   char *clique_array;
   
@@ -633,7 +633,7 @@ int user_send_lp_solution(void *user, int varnum, var_desc **vars, double *x,
 int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 			char *status, int *num_fixed)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    lp_net *lp_net;
    int *compdemands, capacity = vrp->capacity;
    int numchains = 0, v0, v1;
@@ -710,7 +710,7 @@ int user_generate_column(void *user, int generate_what, int cutnum,
 			 int *real_nextind, double *colval, int *colind,
 			 int *collen, double *obj)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    int vh, vl, i;
    int total_edgenum = vrp->vertnum*(vrp->vertnum-1)/2;
 
@@ -903,7 +903,7 @@ int user_purge_waiting_rows(void *user, int rownum, waiting_row **rows,
 
 int user_get_upper_bounds(void *user, int varnum, int *indices, double *ub)
 {
-   vrp_spec *vrp = (vrp_spec *)user;
+   vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    int *edges = vrp->edges, i;
    int cap_check = vrp->capacity*(vrp->numroutes-1);
    int total_demand = vrp->demand[0];
@@ -947,7 +947,7 @@ int user_generate_cuts_in_lp(void *user, int varnum, var_desc **vars,
  * logical fixing routine 
 \*===========================================================================*/
 
-lp_net *create_lp_net(vrp_spec *vrp, char *status, int edgenum,
+lp_net *create_lp_net(vrp_lp_problem *vrp, char *status, int edgenum,
 		      var_desc **vars)
 {
    lp_net *n;
@@ -1075,7 +1075,7 @@ void free_lp_net(lp_net *n)
 
 /*===========================================================================*/
 
-void construct_feasible_solution(vrp_spec *vrp, network *n,
+void construct_feasible_solution(vrp_lp_problem *vrp, network *n,
 				 double *true_objval)
 {
    _node *tour = vrp->cur_sol;

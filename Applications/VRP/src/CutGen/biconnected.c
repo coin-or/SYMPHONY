@@ -16,7 +16,7 @@
 #include <malloc.h>
 
 #include "BB_constants.h"
-#include "cg_user.h"
+#include "vrp_cg.h"
 
 /*===========================================================================*\
  * This file contains functions for finding biconnected components.

@@ -20,7 +20,7 @@
 #include "BB_macros.h"
 #include "BB_constants.h"
 #include "proccomm.h"
-#include "cg_user.h"
+#include "vrp_cg.h"
 #include "cg_u.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
@@ -66,7 +66,7 @@ int user_receive_cg_data(void **user, int dg_id)
    /* This is the user-defined data structure, a pointer to which will
       be passed to each user function. It must contain all the
       problem-specific data needed for computations within the CG */
-   cg_vrp_spec *vrp = (cg_vrp_spec *) malloc(sizeof(cg_vrp_spec));
+   vrp_cg_problem *vrp = (vrp_cg_problem *) malloc(sizeof(vrp_cg_problem));
    int edgenum;
 
    *user = vrp;
@@ -156,7 +156,7 @@ int user_receive_lp_solution_cg(void *user)
 
 int user_free_cg(void **user)
 {
-   cg_vrp_spec *vrp = (cg_vrp_spec *)(*user);
+   vrp_cg_problem *vrp = (vrp_cg_problem *)(*user);
 
 #if defined(CHECK_CUT_VALIDITY) && !defined(COMPILE_IN_TM)
    if (vrp->feas_sol_size)
@@ -207,7 +207,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   double ub, double etol, int *cutnum)
 #endif
 {
-   cg_vrp_spec *vrp = (cg_vrp_spec *)user;
+   vrp_cg_problem *vrp = (vrp_cg_problem *)user;
    int vertnum = vrp->vertnum;
    network *n;
    vertex *verts = NULL;
@@ -651,7 +651,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 int user_find_cuts(void *user, int xlength, int *xind,
 		   double *xval, double etol, int *pnumcuts)
 {
-   cg_vrp_spec *vrp = (cg_vrp_spec *)user;
+   vrp_cg_problem *vrp = (vrp_cg_problem *)user;
    int vertnum = vrp->vertnum;
    network *n;
    vertex *verts;
@@ -1033,7 +1033,7 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
 #endif
    cg_prob *cg = get_cg_ptr(NULL);
 /*___END_EXPERIMENTAL_SECTION___*/
-   cg_vrp_spec *vrp = (cg_vrp_spec *)user;
+   vrp_cg_problem *vrp = (vrp_cg_problem *)user;
    int *edges = vrp->edges;
    int *feas_sol = vrp->feas_sol;
    double lhs = 0;

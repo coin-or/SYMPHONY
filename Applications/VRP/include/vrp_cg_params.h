@@ -13,8 +13,8 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _CUT_GEN_USER_PARAMS_H
-#define _CUT_GEN_USER_PARAMS_H
+#ifndef _VRP_CG_PARAMS_H
+#define _VRP_CG_PARAMS_H
 
 /* which_connected_routine choices */
 #define CONNECTED    0

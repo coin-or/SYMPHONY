@@ -34,14 +34,14 @@
 #include "start_heurs.h"
 /*___END_EXPERIMENTAL_SECTION___*/
 #include "vrp_routines.h"
-#include "vrp_dg.h"
+#include "vrp_dg_func.h"
 #include "vrp_macros.h"
 #include "small_graph.h"
 #ifdef COMPILE_IN_TM
 #ifdef COMPILE_IN_LP
-#include "lp_user.h"
+#include "vrp_lp.h"
 #ifdef COMPILE_IN_CG
-#include "cg_user.h"
+#include "vrp_cg.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_OUR_DECOMP
 #include "my_decomp.h"
@@ -49,7 +49,7 @@
 /*___END_EXPERIMENTAL_SECTION___*/
 #endif
 #ifdef COMPILE_IN_CP
-#include "cp_user.h"
+#include "vrp_cp.h"
 #endif
 #endif
 #endif
@@ -501,7 +501,7 @@ int user_send_lp_data(void *user, void **user_lp)
       the LP is not running separately. This code should be virtually
       identical to that of user_receive_lp_data() in the LP process.*/
    
-   vrp_spec *vrp_lp = (vrp_spec *) calloc(1, sizeof(vrp_spec));
+   vrp_lp_problem *vrp_lp = (vrp_lp_problem *) calloc(1, sizeof(vrp_lp_problem));
    int zero_varnum = vrp->zero_varnum;
    int *zero_vars = vrp->zero_vars;
    int vertnum, i, j, k, l;
@@ -570,7 +570,7 @@ int user_send_cg_data(void *user, void **user_cg)
       the CG is not running separately. This code should be virtually
       identical to that of user_receive_cg_data() in the CG process.*/
    
-   cg_vrp_spec *vrp_cg = (cg_vrp_spec *) malloc (sizeof(cg_vrp_spec));
+   vrp_cg_problem *vrp_cg = (vrp_cg_problem *) malloc (sizeof(vrp_cg_problem));
    int edgenum, vertnum, i, j, k;
    
    *user_cg = (void *)vrp_cg;
@@ -663,7 +663,7 @@ int user_send_cp_data(void *user, void **user_cp)
       the LP is not running separately. This code should be virtually
       identical to that of user_receive_cp_data() in the CP process.*/
    
-   vrp_spec_cp *vrp_cp = (vrp_spec_cp *) malloc (sizeof(vrp_spec_cp));
+   vrp_cp_problem *vrp_cp = (vrp_cp_problem *) malloc (sizeof(vrp_cp_problem));
    int i, j, k;
 
    vrp_cp->vertnum = vrp->vertnum;

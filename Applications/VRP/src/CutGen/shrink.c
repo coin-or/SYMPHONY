@@ -27,7 +27,7 @@
 #include "proccomm.h"
 #include "network.h"
 #include "cg.h"
-#include "cg_user.h"
+#include "vrp_cg.h"
 #include "vrp_macros.h"
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/

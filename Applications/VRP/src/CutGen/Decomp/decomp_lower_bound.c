@@ -7,7 +7,7 @@
 #include "decomp.h"
 #include "my_decomp.h"
 #include "vrp_macros.h"
-#include "cg_user.h"
+#include "vrp_cg.h"
 #include "vrp_const.h"
 #include "vrp_common_types.h"
 #include "proccomm.h"

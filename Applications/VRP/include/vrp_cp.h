@@ -13,22 +13,43 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _LP_USER_PARAMS_H
-#define _LP_USER_PARAMS_H
+#ifndef _VRP_CP_H
+#define _VRP_CP_H
 
-/*---------------------------------------------------------------------------*\
- * Here we store the vrp specific data needed to process each node of the tree
-\*---------------------------------------------------------------------------*/
+#include "proto.h"
 
-typedef struct VRP_LP_PARAMS{
-   int    verbosity;
-   int    branching_rule;
-   int    detect_tailoff; /* 1  indicates tailing-off detection is desirable */
-   float  child_compar_obj_tol;
-   int    branch_on_cuts;
-   int    strong_branching_cand_num_max;
-   int    strong_branching_cand_num_min;
-   int    strong_branching_red_ratio;
-}lp_user_params;
+typedef struct VRP_CP_PROBLEM{
+   int vertnum;         /*number of vertices in the problem*/
+   int edgenum;         /*number of edges in the problem*/
+   int *edges;          /*a list of the edges (by index pairs)*/
+   struct POOL_NET *n;
+}vrp_cp_problem;
+
+/*--------------------------------------------------------------------------*
+ * The next three data structuires are used in the construction of the        
+ * solution graph which we use to check the violation of certain cuts         
+ *--------------------------------------------------------------------------*/
+
+typedef struct POOL_NET{
+   struct POOL_NODE *verts;
+   struct POOL_EDGE *adjlist;
+   int vertnum;
+   int edgenum;
+}pool_net;
+
+typedef struct POOL_NODE{
+   struct POOL_EDGE *first;
+}pool_node;
+
+typedef struct POOL_EDGE{
+   struct POOL_EDGE *next;
+   int other_end;
+   double weight;
+}pool_edge;
+
+pool_net *create_pool_net PROTO((vrp_cp_problem *vcp, int varnum, int *indices,
+				 double *values));
+void free_pool_net PROTO((vrp_cp_problem *vcp));
+
 
 #endif

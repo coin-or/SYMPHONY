@@ -13,13 +13,13 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _LP_USER_H
-#define _LP_USER_H
+#ifndef _VRP_LP_H
+#define _VRP_LP_H
 
 #define COMPILING_FOR_LP
 
 #include "BB_types.h"
-#include "lp_user_params.h"
+#include "vrp_lp_params.h"
 #include "vrp_common_types.h"
 #include "network.h"
 
@@ -77,7 +77,7 @@ typedef struct LP_NET{
 | Here we store the vrp specific data needed to process each node of the tree |
 \*---------------------------------------------------------------------------*/
 
-typedef struct VRP_SPEC{
+typedef struct VRP_LP_PROBLEM{
    lp_user_params par;
    int            window;    /*contains the tid of the graphics window*/
    int            vertnum;   /*the number of nodes in the problem,
@@ -90,17 +90,17 @@ typedef struct VRP_SPEC{
 			       subproblem*/
    int           *costs;     /*contains the objective function values*/
    _node         *cur_sol;
-}vrp_spec;
+}vrp_lp_problem;
 
 /*---------------------------------------------------------------------------*\
 | Routines entirely specific to main_lp                                       |
 \*---------------------------------------------------------------------------*/
 
-lp_net *create_lp_net PROTO((vrp_spec *vrp, char *status, int edgenum,
+lp_net *create_lp_net PROTO((vrp_lp_problem *vrp, char *status, int edgenum,
 			     var_desc **vars));
 int vrp_lp_connected PROTO((lp_net *n, int *compdemands));
 void free_lp_net  PROTO((lp_net *n));
-void construct_feasible_solution PROTO((vrp_spec *vrp, network *n,
+void construct_feasible_solution PROTO((vrp_lp_problem *vrp, network *n,
 					double *true_objval));
 double compute_lhs PROTO((int number,  int *indices, double *values,
 			  cut_data *cut, int vertnum));

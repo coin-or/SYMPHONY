@@ -19,7 +19,7 @@
 #include "BB_macros.h"
 #include "BB_constants.h"
 #include "dg.h"
-#include "dg_user.h"
+#include "vrp_dg.h"
 #include "vrp_const.h"
 #include "vrp_macros.h"
 

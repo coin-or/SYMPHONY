@@ -92,6 +92,7 @@ mkdir $1/Vrp/DrawGraph
 foreach file (Vrp/DrawGraph/*.c)
 awk -f reformat.awk $file > $1/$file
 end
+mv $1/Vrp $1/VRP
 mkdir $1/Template
 foreach file (Template/Makefile)
 awk -f reformat.awk $file > $1/$file
@@ -118,5 +119,89 @@ awk -f reformat.awk $file > $1/$file
 end
 mkdir $1/Template/DrawGraph
 foreach file (Template/DrawGraph/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/SPP
+foreach file (SPP/Makefile)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/SPP/LP
+foreach file (SPP/LP/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/SPP/Master
+foreach file (SPP/Master/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/SPP/CutPool
+foreach file (SPP/CutPool/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/SPP/CutGen
+foreach file (SPP/CutGen/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/SPP/include
+foreach file (SPP/include/*.h)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/SPP/DrawGraph
+foreach file (SPP/DrawGraph/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MPP
+foreach file (MPP/Makefile)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MPP/LP
+foreach file (MPP/LP/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MPP/Master
+foreach file (MPP/Master/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MPP/CutPool
+foreach file (MPP/CutPool/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MPP/CutGen
+foreach file (MPP/CutGen/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MPP/include
+foreach file (MPP/include/*.h)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MPP/DrawGraph
+foreach file (MPP/DrawGraph/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MATCH
+foreach file (MATCH/Makefile)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MATCH/LP
+foreach file (MATCH/LP/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MATCH/Master
+foreach file (MATCH/Master/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MATCH/CutPool
+foreach file (MATCH/CutPool/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MATCH/CutGen
+foreach file (MATCH/CutGen/*.c)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MATCH/include
+foreach file (MATCH/include/*.h)
+awk -f reformat.awk $file > $1/$file
+end
+mkdir $1/MATCH/DrawGraph
+foreach file (MATCH/DrawGraph/*.c)
 awk -f reformat.awk $file > $1/$file
 end

@@ -18,8 +18,8 @@
 
 #include "proto.h"
 #include "vrp_common_types.h"
-#include "cg_user_params.h"
-#include "lp_user_params.h"
+#include "vrp_cg_params.h"
+#include "vrp_lp_params.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #include "heur_params.h"
 #include "lb_params.h"

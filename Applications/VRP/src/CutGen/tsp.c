@@ -20,8 +20,8 @@
 #include "BB_constants.h"
 #include "proto.h"
 #include "network.h"
-#include "cg_user.h"
 #include "cg.h"
+#include "vrp_cg.h"
 #include "tsp.h"
 
 int add_tsp_cuts PROTO((CCtsp_lpcut_in **tsp_cuts, int *cutnum, int vertnum,

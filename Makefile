@@ -97,8 +97,8 @@ LP_SOLVER = NONE
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSL)
-       LPINCDIR = -I${HOME}/include
-       LPLDFLAGS = -L${HOME}/lib
+       LPINCDIR = ${HOME}/include
+       LPLIBPATHS = ${HOME}/lib
        LPLIB = -losl
 endif
 
@@ -107,11 +107,11 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use CPLEX.
-LP_SOLVER = CPLEX
+#LP_SOLVER = CPLEX
 
 ifeq ($(LP_SOLVER),CPLEX)
-       LPINCDIR = -I/usr/local/include/
-       LPLDFLAGS = -L/usr/local/lib/
+       LPINCDIR = /usr/local/include/
+       LPLIBPATHS = /usr/local/lib/
        LPLIB = -lcplex
 endif
 
@@ -120,37 +120,48 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use an OSI interface.
-#LP_SOLVER = OSI
-OSI_INTERFACE = CPLEX
+LP_SOLVER = OSI
+OSI_INTERFACE = CLP
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
-       LPINCDIR = -I${HOME}/COIN/include
-       LPLDFLAGS = -L${HOME}/COIN/lib
+       LPINCDIR = ${HOME}/COIN/include
+       LPLIBPATHS = ${HOME}/COIN/lib
        LPLIB = -lCoin -lOsi
+       CC = g++
 ifeq ($(OSI_INTERFACE),CPLEX)
-       LPINCDIR += -I/usr/local/include/
-       LPLDFLAGS += -L/usr/local/lib/
+       LPINCDIR += /usr/local/include/
+       LPLIBPATHS += /usr/local/lib/
        LPLIB += -lOsiCpx -lcplex
 endif
 ifeq ($(OSI_INTERFACE),OSL)
-       LPINCDIR += -I${HOME}/include
-       LPLDFLAGS += -L${HOME}/lib
+       LPINCDIR += ${HOME}/include
+       LPLIBPATHS += ${HOME}/lib
        LPLIB += -lOsiOsl -losl
 endif
 ifeq ($(OSI_INTERFACE),CLP)
+       LPINCDIR += 
+       LPLDFLAGS +=
        LPLIB += -lOsiClp -lClp
 endif
 ifeq ($(OSI_INTERFACE),XPRESS)
+       LPINCDIR += 
+       LPLDFLAGS +=
        LPLIB += -lOsiXpr
 endif
 ifeq ($(OSI_INTERFACE),SOPLEX)
+       LPINCDIR += 
+       LPLDFLAGS +=
        LPLIB += -lOsiSpx
 endif
 ifeq ($(OSI_INTERFACE),VOL)
+       LPINCDIR += 
+       LPLDFLAGS +=
        LPLIB += -lOsiVol
 endif
 ifeq ($(OSI_INTERFACE),DYLP)
+       LPINCDIR += 
+       LPLDFLAGS +=
        LPLIB += -lOsiDylp
 endif
 ifeq ($(OSI_INTERFACE),GLPK)
@@ -180,8 +191,8 @@ COMM_PROTOCOL = NONE
 
 #Set the paths for PVM
 ifeq ($(COMM_PROTOCOL),PVM)
-	COMMINCDIR = -I$(PVM_ROOT)/include
-	COMMLDFLAGS = -L$(PVM_ROOT)/lib/$(PVM_ARCH)
+	COMMINCDIR = $(PVM_ROOT)/include
+	COMMLIBPATHS = $(PVM_ROOT)/lib/$(PVM_ARCH)
 	COMMLIBS = -lgpvm3 -lpvm3
 endif
 
@@ -193,7 +204,7 @@ endif
 ##############################################################################
 ##############################################################################
 
-CC = g++
+CC = gcc
 
 ##############################################################################
 # Set the optimization level
@@ -313,7 +324,7 @@ PSEUDO_COSTS = FALSE
 ##############################################################################
 
 X11INCDIR  =
-X11LDFLAGS =
+X11LIBPATHS =
 
 ##############################################################################
 # Other variables
@@ -335,7 +346,8 @@ GCCLIBDIR =
 ##############################################################################
 
 ifeq ($(ARCH),LINUX)
-	X11LDFLAGS = -L/usr/X11R6/lib
+	SHLINKPREFIX := -Wl,-rpath,
+	X11LIBPATHS = /usr/X11R6/lib
 	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSFREEUNIX
 	endif
@@ -360,7 +372,8 @@ endif
 ##############################################################################
 
 ifeq ($(ARCH),SUN4SOL2)
-	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
+	SHLINKPREFIX = -Wl,-R,
+	X11LIBPATHS = /usr/local/X11/lib
 	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
@@ -373,7 +386,8 @@ endif
 ##############################################################################
 
 ifeq ($(ARCH),SUNMP)
-	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
+	SHLINKPREFIX = -Wl,-R,
+	X11LIBPATHS = /usr/local/X11/lib
 	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
@@ -386,7 +400,8 @@ endif
 ##############################################################################
 
 ifeq ($(ARCH),X86SOL2)
-	X11LDFLAGS = -L/usr/local/X11/lib -R/usr/local/X11/lib
+	SHLINKPREFIX = -Wl,-R,
+	X11LIBPATHS = /usr/local/X11/lib
 	ifeq ($(LP_SOLVER),CPLEX)
 	   LPSOLVER_DEFS = -DSYSGNUSOLARIS
 	endif
@@ -399,7 +414,7 @@ endif
 ##############################################################################
 
 ifeq ($(ARCH),ALPHA)
-	X11LDFLAGS = -L/usr/local/X11/lib
+	X11LIBPATHS = /usr/local/X11/lib
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
 	SYSLIBS =
 endif
@@ -487,8 +502,14 @@ VPATH  = $(SRCDIR):$(USER_SRCDIR)
 # Put it together
 ##############################################################################
 
-LDFLAGS = -L$(LIBDIR) $(X11LDFLAGS) $(COMMLDFLAGS) $(LPLDFLAGS) $(USERLDFLAGS)
-EXTRAINCDIR = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR)
+LIBPATHS = $(LIBDIR) $(X11LIBPATHS) $(COMMLIBPATHS) $(LPLIBPATHS) $(USERLIBPATHS)
+INCPATHS = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR)
+
+EXTRAINCDIR = $(addprefix -I,${INCPATHS})
+LDFLAGS = $(addprefix -L,${LIBPATHS})
+ifneq (${SHLINKPREFIX},)
+     LDFLAGS += $(addprefix ${SHLINKPREFIX},${LIBPATHS})
+endif
 
 ifeq ($(CC),ompcc)
 	LIBS  = -lX11 -lm -lompc -ltlog -lthread $(COMMLIBS) $(SYSLIBS) \

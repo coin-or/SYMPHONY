@@ -13,17 +13,17 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _CUT_GEN_USER_H
-#define _CUT_GEN_USER_H
+#ifndef _VRP_CG_H
+#define _VRP_CG_H
 
 #include <stdio.h>
 
 #include "BB_types.h"
 #include "proto.h"
 #include "network.h"
-#include "cg_user_params.h"
+#include "vrp_cg_params.h"
 
-typedef struct CG_VRP_SPEC{
+typedef struct VRP_CG_PROBLEM{
    cg_user_params par;
    int           dg_id;   /*contains the tid of the graphics window*/
    int           vertnum;  /*the number of nodes in the problem,
@@ -58,7 +58,7 @@ typedef struct CG_VRP_SPEC{
    int           feas_sol_size;
    int          *feas_sol;
 #endif
-}cg_vrp_spec;
+}vrp_cg_problem;
 
 /*===========================================================================*/
 /*========================= Other user subroutines =========================*/

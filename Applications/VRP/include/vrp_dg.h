@@ -13,35 +13,69 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _VRP_DG_H
-#define _VRP_DG_H
+#ifndef _DG_USER_H
+#define _DG_USER_H
 
 #include "proto.h"
-#include "vrp_common_types.h"
+#include "dg.h"
 
-void init_window PROTO((int dg_id, char *name, int width, int height));
-void wait_for_click PROTO((int dg_id, char *name, int report));
-void display_graph PROTO((int dg_id, char *name));
-void copy_node_set PROTO((int dg_id, int clone, char *name));
-void disp_vrp_tour PROTO((int dg_id, int clone, char *name,
-			  _node *tour, int vertnum, int numroutes,int report));
-void draw_edge_set_from_edge_data PROTO((int dg_id, char *name,
-					 int edgenum, edge_data *edges));
-void draw_edge_set_from_userind PROTO((int dg_id, char *name,
-				       int edgenum, int *userind));
-void draw_weighted_edge_set PROTO((int dg_id, char *name,
-				   int edgenum, int *userind,
-				   double *value, double etol));
-void display_support_graph PROTO((int dg_id, int clone, char *name,
-				  int edgenum, int *userind,
-				  double *value, double etol, int report));
-void display_compressed_support_graph PROTO((int dg_id, int clone, char *name,
-					     int edgenum, int *userind,
-					     double *value, int report));
-void display_part_tour PROTO((int dg_id, int clone, char *name, int *tour,
-		       int numroutes, int report));
-void delete_graph PROTO((int dg_id, char *name));
-void disp_lb PROTO((int dg_id, int clone, char *name, int *tree,
-		    struct DBL_EDGE_DATA *best_edges, int vertnum,
-		    int numroutes, int report));
+/* Possible scanned stati of dg_net_vertices */
+#define NOT_SCANNED    0 
+#define SCANNED_SHRUNK 1
+#define SCANNED_ALIVE  2
+
+typedef struct DG_NET_EDGE{
+   struct DG_NET_VERTEX *head;
+   struct DG_NET_VERTEX *tail;
+   double                weight;  
+   char                  deleted;
+}dg_net_edge;
+
+typedef struct DG_NET_ELIST{
+   struct DG_NET_ELIST  *next_edge; /* next edge in the edgelist */
+   dg_net_edge          *data;      /* the data of the edge */
+   struct DG_NET_VERTEX *other;     /* pointer to the other end of the edge*/
+}dg_net_elist;
+
+typedef struct DG_NET_VERTEX{
+   int                  degree;/*contains the degree of the node in the graph*/
+   int                  orignodenum;/*the node number in the original graph*/
+
+   struct DG_NET_ELIST *first;/*points to the 1st edge in the adjacency list*/
+   struct DG_NET_ELIST *last; /*points to the last edge in the adjacency list*/
+
+   int                  snode_size;  /*size of the supernode identified by this
+				      *node. makes sense only at the 
+				      *identifier. 0 to start with*/
+   struct DG_NET_VERTEX *snode_next; /*the next node in the list of nodes
+				      *belonging to the same supernode.
+				      *NULL to start with*/
+
+   char                 scanned;
+}dg_net_vertex;
+
+typedef struct DG_NET_NETWORK{
+   int         origvertnum; /*number of vertices in the original graph*/
+   int         vertnum;     /*number of supernodes in the graph*/
+   int         edgenum;     /*number of edges in the graph (size of 'edges');
+			     *as edges might contain unlinked edges, the real
+			     *number of edges might be smaller!*/
+   dg_net_elist   *adjlist; /*the array containing the adjacency lists for each
+			     *node*/
+   dg_net_edge    *edges;   /*the list of edges in the graph*/
+   dg_net_vertex  *verts;   /*the list of vertices (everything, not just
+			     *supernodes)*/
+}dg_net_network;
+
+typedef struct VRP_DG{
+   dg_net_network *n;
+}vrp_dg;
+
+
+dg_net_network *dg_createnet PROTO((int vertnum,
+				    int length, int *xind, double *xval));
+void dg_freenet PROTO((dg_net_network *n));
+void dg_net_shrink_chains PROTO((dg_net_network *n));
+void copy_network_into_graph PROTO((dg_net_network *n, dg_graph *g));
+
 #endif

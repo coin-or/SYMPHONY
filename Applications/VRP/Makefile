@@ -18,9 +18,10 @@
 MACROS_SRC        = vrp_macros.c
 COST_SRC          = compute_cost.c
 NET_SRC           = network.c
-DG_FUNC_SRC       = vrp_dg.c
+DG_FUNC_SRC       = vrp_dg_func.c 
 
-USER_MASTER_SRC   = vrp.c vrp_io.c vrp_routines.c small_graph.c $(COST_SRC)
+USER_MASTER_SRC   = vrp_master.c vrp_io.c vrp_routines.c small_graph.c
+USER_MASTER_SRC  += $(COST_SRC)
 ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)
 ifeq ($(COMPILE_IN_LP),FALSE)
@@ -34,31 +35,31 @@ ifeq ($(COMPILE_IN_LP),TRUE)
 USER_TM_SRC       = $(USER_LP_SRC)
 endif
 ifeq ($(COMPILE_IN_CP),TRUE)
-USER_TM_SRC      += cp_user.c 
+USER_TM_SRC      += vrp_cp.c 
 endif
 
-USER_LP_SRC       = lp_user_branch.c lp_user.c 
+USER_LP_SRC       = vrp_lp_branch.c vrp_lp.c 
 USER_LP_SRC      += $(MACROS_SRC) $(NET_SRC) $(DG_FUNC_SRC)
 ifeq ($(COMPILE_IN_CG),TRUE)
-USER_LP_SRC      += cg_user.c biconnected.c shrink.c 
+USER_LP_SRC      += vrp_cg.c biconnected.c shrink.c 
 endif
 
-USER_CG_SRC       = cg_user.c biconnected.c
-USER_CG_SRC      += compute_cost.c vrp_dg.c shrink.c
+USER_CG_SRC       = vrp_cg.c biconnected.c
+USER_CG_SRC      += compute_cost.c shrink.c $(DG_FUNC_SRC)
 USER_CG_SRC      += $(MACROS_SRC) $(NET_SRC)
 
-USER_CP_SRC       = cp_user.c $(MACROS_SRC)
+USER_CP_SRC       = vrp_cp.c $(MACROS_SRC)
 
-USER_DG_SRC       = dg_user.c dg_user_network.c $(MACROS_SRC)
+USER_DG_SRC       = vrp_dg.c vrp_dg_network.c $(MACROS_SRC)
 
-ALL_USER_SRC      = $(MACROS_SRC) $(COST_SRC) $(NET_SRC) 
-ALL_USER_SRC     += lp_user_branch.c lp_user.c
-ALL_USER_SRC     += vrp_dg.c vrp.c vrp_io.c vrp_routines.c vrp_dg.c
+ALL_USER_SRC      = $(MACROS_SRC) $(COST_SRC) $(NET_SRC) $(DG_FUNC_SRC)
+ALL_USER_SRC     += lp_user_branch.c vrp_lp.c
+ALL_USER_SRC     += vrp_master.c vrp_io.c vrp_routines.c
 ALL_USER_SRC     += start_heurs.c lower_bound.c route_heur.c exchange_heur.c
 ALL_USER_SRC     += cluster_heur.c receive_rout.c small_graph.c
-ALL_USER_SRC     += cg_user.c biconnected.c
+ALL_USER_SRC     += vrp_cg.c biconnected.c
 ALL_USER_SRC     += compute_cost.c decomp_user.c vrp_dg.c heur_routines.c
-ALL_USER_SRC     += cp_user.c dg_user.c dg_user_network.c 
+ALL_USER_SRC     += vrp_cp.c vrp_dg.c vrp_dg_network.c 
 
 USER_INCDIR       =
 
@@ -72,7 +73,7 @@ USER_INCDIR       =
 # set the variables DO_CONCORDE_CUTS to TRUE. Download the source code from
 # http://www.math.princeton.edu/tsp/concorde.html and compile it as a library.
 # Then make sure to add the path to the library file libconcorde.a to the
-# variable USERLDFLAGS, as below (currently, it is set to ${HOME}/lib).
+# variable USERLIBPATHS, as below (currently, it is set to ${HOME}/lib).
 # Alternatively, this makefile can also be used to make the library. Just set
 # the variable CONCORDE_ROOT below to the CONCORDE source directory and type
 # "make concord.a" in the SYMPHONY root directory (not in this directory).
@@ -86,7 +87,7 @@ USER_BB_DEFINES += -DDO_TSP_CUTS
 USER_BB_DEFINES += -DCC_ONE_ENV
 CONCORDE_ROOT = $(HOME)/Concorde/
 USERLIBS = -lconcorde -lcplex
-USERLDFLAGS  = -L${HOME}/lib
+USERLIBPATHS  = ${HOME}/lib
 USER_INCDIR += -I$(CONCORDE_ROOT)/INCLUDE
 
 ifeq ($(COMPILE_IN_CG),TRUE)
