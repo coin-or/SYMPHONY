@@ -86,6 +86,9 @@ int receive_lp_data_u(lp_prob *p)
       mip->matval = (double *) malloc(DSIZE * mip->matbeg[mip->n]);
       mip->matind = (int *)    malloc(ISIZE * mip->matbeg[mip->n]);
       mip->obj    = (double *) malloc(DSIZE * mip->n);
+#ifdef MULTI_CRITERIA
+      mip->obj2    = (double *) malloc(DSIZE * mip->n);
+#endif
       mip->rhs    = (double *) malloc(DSIZE * mip->m);
       mip->sense  = (char *)   malloc(CSIZE * mip->m);
       mip->rngval = (double *) malloc(DSIZE * mip->m);
@@ -252,7 +255,12 @@ int create_subproblem_u(lp_prob *p)
       /* Fill out the appropriate data structures*/
       lp_data->mip->matbeg[0] = 0;
       for (i = 0; i < lp_data->mip->n; i++){
+#ifdef MULTI_CRITERIA
+	 lp_data->mip->obj[i]        = p->par.gamma * mip->obj[userind[i]] +
+	                               p->par.tau * mip->obj2[userind[i]];
+#else
 	 lp_data->mip->obj[i]        = p->mip->obj[userind[i]];
+#endif
 	 lp_data->mip->ub[i]         = p->mip->ub[userind[i]];
 	 lp_data->mip->lb[i]         = p->mip->lb[userind[i]];
 	 lp_data->mip->is_int[i]     = p->mip->is_int[userind[i]];
@@ -559,6 +567,20 @@ int is_feasible_u(lp_prob *p, char branching)
       break;
    }
 
+#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
+   if ((user_res == TEST_ZERO_ONE || user_res == TEST_INTEGRALITY) &&
+       *feasible == IP_FEASIBLE){
+      if (analyze_multicriteria_solution(p, indices, values, cnt,
+					 true_objval, lpetol, branching) > 0){
+	 *feasible = IP_FEASIBLE_BUT_CONTINUE;
+      }else{
+	 *feasible = IP_FEASIBLE;
+      }
+   }
+#else
+   *feasible = IP_FEASIBLE;
+#endif
+   
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE){
       /* Send the solution value to the treemanager */
       new_ub = true_objval > 0 ? true_objval : lp_data->objval;
@@ -1408,7 +1430,32 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 row_list[explicit_row_num++]->nzcnt = real_nzcnt;
 	 cuts[i] = NULL;
 	 break;
+	 
+#ifdef MULTI_CRITERIA
+      case OPTIMALITY_CUT_FIRST:
+	 matind = (int *) malloc (lp_data->n * ISIZE);
+	 matval =  (double *) malloc (lp_data->n * DSIZE);
+	 for (nzcnt = 0, i = 0; i < lp_data->n; i++){
+	    matind[nzcnt] = i;
+	    matval[nzcnt++] = p->mip->obj[vars[i]->userind];
+	 }
+	 cut->sense = 'L';
+	 cut->deletable = FALSE;
+	 cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+	 break;
 
+      case OPTIMALITY_CUT_SECOND:
+	 matind = (int *) malloc (lp_data->n * ISIZE);
+	 matval =  (double *) malloc (lp_data->n * DSIZE);
+	 for (nzcnt = 0, i = 0; i < lp_data->n; i++){
+	    matind[nzcnt] = i;
+	    matval[nzcnt++] = p->mip->obj2[vars[i]->userind];
+	 }
+	 cut->sense = 'L';
+	 cut->deletable = FALSE;
+	 cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+	 break;
+#endif
       default: /* A user cut type */
 	 if (l != i){
 	    cuts[l++] = cuts[i];
@@ -1894,3 +1941,145 @@ void free_prob_dependent_u(lp_prob *p)
 
 /*===========================================================================*/
 
+/*===========================================================================*/
+
+#ifdef MULTI_CRITERIA
+char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
+				    int length, double *true_objval, double etol,
+				    char branching)
+{
+  double obj[2] = {0.0, 0.0};
+  int cuts = 0;
+  char print_solution = FALSE;
+  char continue_with_node = FALSE;
+  
+  for (i = 0; i < length; i++){
+     obj[0] += p->mip->obj[indices[i]]*values[i];
+     obj[1] += p->mip->obj2[indices[i]]*values[i];
+  }
+
+  if (p->mc_ub > 0 &&
+      *true_objval-p->par.rho*(obj[0]+obj[1]) > p->mc_ub+etol){
+     return(FALSE);
+  }
+
+  if (p->par.gamma == 1.0){
+     if (obj[0] < p->obj[0] + etol){
+	 if (obj[0] < p->obj[0] - etol ||
+	     (obj[0] >= p->obj[0] - etol
+	      && obj[1] < p->obj[1] - etol)){
+	    printf("\nBetter Solution Found:\n");
+	    printf("First Objective Cost: %.1f\n", obj[0]);
+	    printf("Second Objective Cost: %.1f\n", obj[1]);
+	    p->obj[1] = obj[1];
+	    p->obj[0] = obj[0];
+	    p->mc_ub = *true_objval-p->par.rho*(obj[0]+obj[1]);
+	    print_solution = TRUE;
+	 }
+	/* Add an optimality cut for the second objective */
+	 if (!branching){
+	    cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	    new_cut->coef = NULL;
+	    new_cut->rhs = (int) (obj[1] + etol) - 1;
+	    new_cut->size = 0;
+	    new_cut->type = OPTIMALITY_CUT_SECOND;
+	    new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	    continue_with_node = cg_add_user_cut(new_cut,
+						 &p->cgp->cuts_to_add_num,
+						 &p->cgp->cuts_to_add,
+						 &p->cgp->cuts_to_add);
+	    FREE(new_cut);
+	 }else{
+	    continue_with_node = TRUE;
+	 }
+     }
+  }else if (p->par.tau == 1.0){
+     if (obj[1] < p->obj[1] + etol){
+	if (obj[1] < p->obj[1] - etol ||
+	    (obj[1] >= p->obj[1] - etol
+	     && obj[0] < p->obj[0] - etol)){
+	   printf("\nBetter Solution Found:\n");
+	   printf("First Objective Cost: %.1f\n", obj[0]);
+	   printf("Second Objective Cost: %.1f\n", obj[1]);
+	   p->obj[1] = obj[1];
+	   p->obj[0] = obj[0];
+	   p->mc_ub = *true_objval-p->par.rho*(obj[0]+obj[1]);
+	   print_solution = TRUE;
+	}
+	/* Add an optimality cut for the second objective */
+	if (!branching){
+	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	   new_cut->coef = NULL;
+	   new_cut->rhs = (int) (obj[0] + etol) - 1;
+	   new_cut->size = 0;
+	   new_cut->type = OPTIMALITY_CUT_FIRST;
+	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	   continue_with_node = cg_add_user_cut(new_cut,
+						&p->cgp->cuts_to_add_num,
+						&p->cgp->cuts_to_add,
+						&p->cgp->cuts_to_add);
+	   FREE(new_cut);
+	}else{
+	   continue_with_node = TRUE;
+	}
+     }
+  }else{
+     if ((*true_objval-p->par.rho*(obj[0]+obj[1]) <
+	  p->mc_ub - etol) ||
+	 (obj[0] < p->obj[0] - etol &&
+	  obj[1] < p->obj[1] + etol) ||
+	 (obj[1] < p->obj[1] - etol &&
+	  obj[0] < p->obj[0] + etol)){
+	printf("\nBetter Solution Found:\n");
+	printf("First Objective Cost: %.1f\n", obj[0]);
+	printf("Second Objective Cost: %.1f\n", obj[1]);
+	p->obj[1] = obj[1];
+	p->obj[0] = obj[0];
+	p->mc_ub = *true_objval-p->par.rho*(obj[0]+obj[1]);
+	print_solution = TRUE;
+     }
+     if (!branching){
+	if (p->par.gamma*(obj[0] - p->utopia[0]) >
+	    *true_objval-p->par.rho*(obj[0]+obj[1])-etol){
+	   /* Add an optimality cut for the second objective */
+	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	   new_cut->coef = NULL;
+	   new_cut->rhs = (int) (obj[1] + etol) - 1;
+	   new_cut->size = 0;
+	   new_cut->type = OPTIMALITY_CUT_SECOND;
+	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	   continue_with_node = cg_add_user_cut(new_cut,
+						&p->cgp->cuts_to_add_num,
+						&p->cgp->cuts_to_add,
+						&p->cgp->cuts_to_add);
+	   FREE(new_cut);
+	}else{
+	   /* Add an optimality cut for the second objective */
+	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+	   new_cut->coef = NULL;
+	   new_cut->rhs = (int) (obj[0] + etol) - 1;
+	   new_cut->size = 0;
+	   new_cut->type = OPTIMALITY_CUT_FIRST;
+	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+	   continue_with_node = cg_add_user_cut(new_cut,
+						&p->cgp->cuts_to_add_num,
+						&p->cgp->cuts_to_add,
+						&p->cgp->cuts_to_add);
+	   FREE(new_cut);
+	}
+     }else{
+	continue_with_node = TRUE;
+     }
+  }
+#endif
+
+  if (!print_solution){
+     return(continue_with_node);
+  }
+
+  /* Print the solution here */
+  
+  return(continue_with_node);
+
+}
+#endif

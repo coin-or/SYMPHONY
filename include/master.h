@@ -39,6 +39,10 @@ typedef struct PROBLEM{
    char             has_ub;
    double           ub;
    lp_sol           best_sol;
+#ifdef MULTI_CRITERIA
+   double           obj[2];
+   double           utopia[2];
+#endif
    char             has_ub_estimate;
    double           ub_estimate;
    double           lb;

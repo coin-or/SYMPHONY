@@ -234,6 +234,16 @@ int parse_command_line(problem *p, int argc, char **argv)
 	       strcmp(key, "M_use_permanent_cut_pools") == 0){
 	 READ_INT_PAR(p->par.use_permanent_cut_pools);
       }
+#ifdef MULTI_CRITERIA
+      else if (strcmp(key, "compare_solution_tolerance") == 0 ||
+	       strcmp(key, "M_compare_solution_tolerance") == 0){
+	 READ_DBL_PAR(p->par.use_permanent_cut_pools);
+      }
+      else if (strcmp(key, "binary_search_tolerance") == 0 ||
+	       strcmp(key, "M_binary_search_tolerance") == 0){
+	 READ_DBL_PAR(p->par.binary_search_tolerance);
+      }
+#endif
 
       /***********************************************************************
        ***                 DrawGraph parameters                            ***
@@ -972,7 +982,22 @@ int parse_command_line(problem *p, int argc, char **argv)
 	       strcmp(key, "LP_pack_lp_solution_default") == 0){
 	 READ_INT_PAR(lp_par->pack_lp_solution_default);
       }
-
+#ifdef MULTI_CRITERIA
+      else if (strcmp(key, "gamma") == 0 ||
+	       strcmp(key, "LP_gamma") == 0 ){
+	 READ_DBL_PAR(lp_par->gamma);
+      }
+      else if (strcmp(key, "tau") == 0 ||
+	       strcmp(key, "LP_tau") == 0 ){
+	 READ_DBL_PAR(lp_par->tau);
+	 cg_par->tau = lp_par->tau;
+      }
+      else if (strcmp(key, "rho") == 0 ||
+	       strcmp(key, "LP_rho") == 0 ){
+	 READ_DBL_PAR(lp_par->rho);
+      }
+#endif
+      
       /***********************************************************************
        ***                     cut_gen parameters                          ***
        ***********************************************************************/

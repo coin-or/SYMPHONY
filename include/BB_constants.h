@@ -304,6 +304,10 @@
 
 /*------------------------- built-in cut types ------------------------------*/
 #define EXPLICIT_ROW                100
+#ifdef MULTI_CRITERIA
+#define OPTIMALITY_CUT_FIRST        101
+#define OPTIMALITY_CUT_SECOND       102
+#endif
 
 /*----------------- possible types of candidate objects ---------------------*/
 #define CANDIDATE_VARIABLE          0

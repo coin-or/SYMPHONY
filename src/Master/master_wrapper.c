@@ -418,6 +418,9 @@ int send_lp_data_u(problem *p, int sender)
       send_int_array(mip->matind, mip->nz);
       send_dbl_array(mip->matval, mip->nz);
       send_dbl_array(mip->obj, mip->n);
+#ifdef MULTI_CRITERIA
+      send_dbl_array(mip->obj2, mip->n);
+#endif
       send_dbl_array(mip->rhs, mip->m);
       send_char_array(mip->sense, mip->m);
       send_dbl_array(mip->rngval, mip->m);

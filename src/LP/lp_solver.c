@@ -77,6 +77,9 @@ void free_mip_desc(MIPdesc *mip)
    FREE(mip->matind);
    FREE(mip->matval);
    FREE(mip->obj);
+#ifdef MULTI_CRITERIA
+   FREE(mip->obj2);
+#endif
    FREE(mip->rhs);
    FREE(mip->rngval);
    FREE(mip->sense);

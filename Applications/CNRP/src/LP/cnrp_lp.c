@@ -1667,7 +1667,7 @@ void free_lp_net(lp_net *n)
 
 char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 				 double *true_objval, double etol,
-				char branching)
+				 char branching)
 {
   _node *tour = cnrp->cur_sol;
   int cur_vert = 0, prev_vert = 0, cur_route, i, count;

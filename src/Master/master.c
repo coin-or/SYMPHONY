@@ -164,6 +164,10 @@ int sym_set_defaults(problem *p)
    p->par.do_branch_and_cut = 1;
    p->par.do_draw_graph = FALSE;
    p->par.use_permanent_cut_pools = FALSE;
+#ifdef MULTI_CRITERIA
+   p->par.binary_search_tolerance = .01;
+   p->par.compare_solution_tolerance = .001;
+#endif
 
    /************************** treemanager defaults **************************/
    tm_par->verbosity = 0;
@@ -277,6 +281,12 @@ int sym_set_defaults(problem *p)
 
    lp_par->generate_cgl_cuts = TRUE;
 
+#ifdef MULTI_CRITERIA
+   lp_par->gamma = 1;       /* Determines the weight on objective 1 */
+   lp_par->tau   = 0;       /* Determines the weight on objective 2 */
+   lp_par->rho   = 0.00001; /* For augmented Chebyshev norm */
+#endif
+   
 #ifdef __OSI_GLPK__
    lp_par->max_presolve_iter = -1;
 #else

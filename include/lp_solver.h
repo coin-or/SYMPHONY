@@ -156,6 +156,9 @@ typedef struct MIPDESC{
    int       *matind;      /* nz */
    double    *matval;      /* nz */
    double    *obj;         /* n */
+#ifdef MULTI_CRITERIA
+   double    *obj2;        /* n */
+#endif
    double    *rhs;         /* m */
    double    *rngval;      /* m */
    char      *sense;       /* m */
