@@ -40,10 +40,44 @@ int main(int argc, char **argv)
    si.findInitialBounds();
 
 #ifdef TEST_MULTI_CRITERIA
-   /* Test for dc_multi */
-   si.setObj2Coeff(76, 100);
 
-   si.setSymParam(OsiSymMultiCriteriaFindNondominatedSolutions, FALSE);
+
+   /* Test for p0033   
+   int i;
+   for(i = 0; i<10; i++)
+      si.setObj2Coeff(i, 50);
+
+   for(i = 10; i<33; i++)
+      si.setObj2Coeff(i, -50);
+   */
+
+   /* Test for p0033   
+      si.setObj2Coeff(0, 200); 
+      si.setObj2Coeff(6, 200);  
+      si.setObj2Coeff(20, 300);   
+      si.setObj2Coeff(25, 300); 
+   */
+
+   /* test for lseu 
+   si.setObj2Coeff(0, 200);
+   si.setObj2Coeff(10, -200);
+   si.setObj2Coeff(50, 200);
+   si.setObj2Coeff(88, -10);
+   */
+
+   /* Test for flugpl 
+   si.setObj2Coeff(0, 2000);
+   si.setObj2Coeff(3, 2000);
+   si.setObj2Coeff(6, 2000);
+   si.setObj2Coeff(17, 40);
+   */
+
+   /* Test for dc_multi */
+   si.setObj2Coeff(0, 10); 
+   //   si.setObj2Coeff(30, 100);
+   
+
+   si.setSymParam(OsiSymMultiCriteriaFindNondominatedSolutions, TRUE);
    
    /* Solve the multi-criteria problem */
    si.multiCriteriaBranchAndBound();
@@ -63,16 +97,35 @@ int main(int argc, char **argv)
 #ifdef TEST_RESOLVE
    si.setSymParam(OsiSymWarmStart, TRUE);    
 
-   /* test for flugpl */
+
+
+  /*test for dsbmip 
+   si.setObjCoeff(0, -0.001);
+   si.setObjCoeff(1693, -0.001);
+  */ 
+
+   /*test for p0201 
+   si.setObjCoeff(0, 100);
+   si.setObjCoeff(200, 150);
+   */
+
+   /* test for flugpl 
+   si.setObjCoeff(0, 2000);
+   si.setObjCoeff(17, 10);
+   */
+
+
+   /* test for flugpl    
    si.setObjCoeff(0, 2000);
    si.setObjCoeff(1, 1400);
    si.setObjCoeff(3, 2000);
    si.setObjCoeff(6, 2000);
    si.setObjCoeff(13, 1000);
    si.setObjCoeff(17, 40);
+   */
 
    printf("RESOLVING...\n");
-   si.resolve();
+   //   si.resolve();
 #endif
 
 #ifdef TEST_WARM_START
@@ -84,14 +137,17 @@ int main(int argc, char **argv)
 
 #ifdef TEST_SENS_ANALYSIS
 
-   /* test for flugpl */
    int cnt = 2;
    int * ind = (int*) malloc(ISIZE*cnt);
    double * val = (double*) malloc (DSIZE*cnt); 
    double lb;
    
-   ind[0] = 1;  val[0] = 6000;
-   ind[1] = 4;  val[1] = 8000;
+   //   ind[0] = 1;  val[0] = (atoi)(argv[1]);
+   //   ind[1] = 4;  val[1] = (atoi)(argv[2]);
+
+   ind[0] = 1;  val[0] = (atoi)(argv[1]);
+   ind[1] = 4;  val[1] = (atoi)(argv[2]);
+
    lb = si.getLbForNewRhs(cnt, ind, val);
 	
    printf("LB obtained for new rhs problem: %f \n\n\n",lb);

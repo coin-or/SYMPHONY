@@ -194,9 +194,6 @@ int create_subproblem_u(lp_prob *p)
 
    lp_data->n = bvarnum + desc->uind.size;
    lp_data->m = bcutnum + desc->cutind.size;
-   if (p->par.multi_criteria && p->par.mc_find_nondominated_solutions){
-      lp_data->n += 1;
-   }
    
    maxm = lp_data->maxm;
    maxn = lp_data->maxn;
@@ -262,7 +259,7 @@ int create_subproblem_u(lp_prob *p)
 
       lp_data->mip->nz = p->mip->nz;
       if (p->par.multi_criteria && p->par.mc_find_nondominated_solutions){
-	 lp_data->mip->nz += 2 * (lp_data->n + 1);
+	 lp_data->mip->nz += 2 * lp_data->n;
       }
       
       /* Allocate the arrays.*/

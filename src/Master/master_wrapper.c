@@ -645,6 +645,9 @@ int free_master_u(problem *p)
    
    CALL_USER_FUNCTION( user_free_master(&p->user) );
 
+   FREE(p->best_sol.xind);
+   FREE(p->best_sol.xval);
+   
    if (p->mip){
       free_mip_desc(p->mip);
       FREE(p->mip);

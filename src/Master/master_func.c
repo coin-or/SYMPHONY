@@ -2673,6 +2673,7 @@ int check_feasibility_new_rhs(bc_node * node, MIPdesc * mip,
 
    lp_data->mip = NULL;
    FREE(lp_data);
+   bpath -= level;
    FREE(bpath);
 
    for(i=0; i<2*(level+1)+BB_BUNCH; i++){

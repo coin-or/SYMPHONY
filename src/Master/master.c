@@ -836,8 +836,7 @@ int sym_solve(problem *p)
       if (p->tm->lpp[thread_num]){
 	 if (p->tm->lpp[thread_num]->best_sol.xlength){
 	    p->warm_start->best_sol = p->tm->lpp[thread_num]->best_sol;
-	 }
-	 else{
+	 }else if (!p->par.multi_criteria){
 	    p->tm->lpp[thread_num]->best_sol = p->best_sol;
 	 }
       }
@@ -1050,9 +1049,9 @@ typedef struct SOLUTION_PAIRS{
 
 /*===========================================================================*/
 
-#define MAX_NUM_PAIRS 100
-#define MAX_NUM_SOLUTIONS 100
-#define MAX_NUM_INFEASIBLE 100
+#define MAX_NUM_PAIRS 10000
+#define MAX_NUM_SOLUTIONS 10000
+#define MAX_NUM_INFEASIBLE 10000
 
 /*===========================================================================*/
 
@@ -1094,6 +1093,10 @@ int sym_mc_solve(problem *p)
    memcpy((char *)p->mip->obj1, (char *)p->mip->obj, DSIZE*p->mip->n);
    if (p->par.lp_par.mc_find_nondominated_solutions){
       p->base->cutnum += 2;
+      p->rootdesc->uind.size++;
+      p->rootdesc->uind.list = (int *) realloc(p->rootdesc->uind.list,
+					       p->rootdesc->uind.size*ISIZE);
+      p->rootdesc->uind.list[p->rootdesc->uind.size-1] = p->mip->n;
    }else{
       sym_set_int_param(p, "keep_description_of_pruned", KEEP_IN_MEMORY);
    }
@@ -1140,6 +1143,7 @@ int sym_mc_solve(problem *p)
    /* Solve */
    if (termcode = sym_solve(p) < 0){
       p->base->cutnum -=2;
+      p->rootdesc->uind.size--;
       return(termcode);
    }
    numprobs++;
@@ -1180,11 +1184,13 @@ int sym_mc_solve(problem *p)
       if (termcode = sym_resolve(p) < 0){
 	 sym_delete_warm_start(ws);
 	 p->base->cutnum -=2;
+	 p->rootdesc->uind.size--;
 	 return(termcode);
       }
    }else{
       if (termcode = sym_solve(p) < 0){
 	 p->base->cutnum -=2;
+	 p->rootdesc->uind.size--;
 	 return(termcode);
       }
    }      
@@ -1207,8 +1213,8 @@ int sym_mc_solve(problem *p)
    
    printf("***************************************************\n");
    printf("***************************************************\n");
-   printf("Utopia point has fixed cost %.3f and variable cost %.3f \n",
-	  utopia[0], utopia[1]);
+   printf("Utopia point has first  objective value %.3f\n", utopia[0]);
+   printf("                 second objective value %.3f\n", utopia[1]);
    printf("***************************************************\n");
    printf("***************************************************\n\n");
    
@@ -1304,11 +1310,13 @@ int sym_mc_solve(problem *p)
 	 if (termcode = sym_resolve(p) < 0){
 	    sym_delete_warm_start(ws);
 	    p->base->cutnum -=2;
+	    p->rootdesc->uind.size--;
 	    return(termcode);
 	 }
       }else{
 	 if (termcode = sym_solve(p) < 0){
 	    p->base->cutnum -=2;
+	    p->rootdesc->uind.size--;
 	    return(termcode);
 	 }
       }
@@ -1515,8 +1523,11 @@ int sym_mc_solve(problem *p)
       FREE(solutions[i].values);
       FREE(solutions[i].indices);
    }
-   sym_delete_warm_start(ws);
+   if (!p->par.lp_par.mc_find_nondominated_solutions){
+      sym_delete_warm_start(ws);
+   }
    p->base->cutnum -=2;
+   p->rootdesc->uind.size--;
 
    return(TM_OPTIMAL_SOLUTION_FOUND);
 }

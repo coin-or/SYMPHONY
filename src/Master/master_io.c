@@ -38,35 +38,37 @@ void usage(void);
 
 void usage(void)
 {
-         printf("master [ -hagrtbd ] [ -u ub ] [ -p procs ] [ -n rule ]\n\t"
-		"[ -v level ] [ -s cands ] [ -c rule ] [ -k rule ] \n\t"
-		"[ -m max ] [ -l pools ] [ -i iters ] "
-		"[ -f parameter_file_name ] [-j 0/1]"
-		"\n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
-		"\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
-		"\t%s\n\t%s\n\t%s\n\t%s\n\n",
-		"-h: help",
-		"-a: no cut timeout",
-		"-d: enable graph drawing",
-		"-g: use cut generator",
-		"-r: do repricing in root",
-		"-t: trim the tree",
-		"-b: don't perform branch and cut",
-		"-u ub: use upper bound 'ub'",
-		"-p procs: allow 'procs' active nodes",
-		"-n i: use node selection rule 'i'",
-		"-v i: set verbosity to level 'i'",
-		"-s cands: use 'cands' candidates for strong branching",
-		"-c i: use rule 'i' to compare candidates",
-		"-k i: use rule 'i' to select child",
-		"-m n: allow a max of 'n' cuts to enter per iteration",
-		"-e n: allow a max of 'n' cut pools",
-		"-l n k: load balance level 'n' and iterations 'k'",
-   		"-i n: allow a max of 'n' iterations in presolve",
-		"-f file: read parameters from parameter file 'file'",
-		"-j 0/1: whether or not to generate cgl cuts",
-   		"-z n: set diving threshold to 'n'");
-	 printf("Type 'master -H' to get help for user options\n\n");
+   printf("Generic switches:\n\n");
+   printf("master [ -hagrtbd ] [ -u ub ] [ -p procs ] [ -n rule ]\n\t"
+	  "[ -v level ] [ -s cands ] [ -c rule ] [ -k rule ] \n\t"
+	  "[ -m max ] [ -l pools ] [ -i iters ] "
+	  "[ -f parameter_file_name ] [-j 0/1]"
+	  "\n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
+	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
+	  "\t%s\n\t%s\n\t%s\n\t%s\n\n",
+	  "-h: help",
+	  "-a: no cut timeout",
+	  "-d: enable graph drawing",
+	  "-g: use cut generator",
+	  "-r: do repricing in root",
+	  "-t: trim the tree",
+	  "-b: don't perform branch and cut",
+	  "-u ub: use upper bound 'ub'",
+	  "-p procs: allow 'procs' active nodes",
+	  "-n i: use node selection rule 'i'",
+	  "-v i: set verbosity to level 'i'",
+	  "-s cands: use 'cands' candidates for strong branching",
+	  "-c i: use rule 'i' to compare candidates",
+	  "-k i: use rule 'i' to select child",
+	  "-m n: allow a max of 'n' cuts to enter per iteration",
+	  "-e n: allow a max of 'n' cut pools",
+	  "-l n k: load balance level 'n' and iterations 'k'",
+	  "-i n: allow a max of 'n' iterations in presolve",
+	  "-f file: read parameters from parameter file 'file'",
+	  "-j 0/1: whether or not to generate cgl cuts",
+	  "-z n: set diving threshold to 'n'");
+   printf("Solver-specific switches:\n\n");
+   user_usage();
 }
 
 /*===========================================================================*/
@@ -93,7 +95,8 @@ int parse_command_line(problem *p, int argc, char **argv)
    dg_params *dg_par = &p->par.dg_par;
 
    if (argc < 2){
-      return(FUNCTION_TERMINATED_NORMALLY);
+      usage();
+      exit(0);
    }
 
    printf("SYMPHONY was called with the following arguments:\n");

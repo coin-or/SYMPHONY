@@ -1299,7 +1299,13 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep,
       
    dive = generate_children(tm, node, bobj, can->objval, can->feasible,
 			    action, dive, keep, i, solution, duals); /* SensAnalysis */
-
+   for (i = 0; i < can->child_num; i++){
+      FREE(solution[i]);
+      FREE(duals[i]);
+   }
+   FREE(solution);
+   FREE(duals);
+   
    if (*keep >= 0 && (p->dive == CHECK_BEFORE_DIVE || p->dive == DO_DIVE)){
       *can = node->bobj;
 #ifndef MAX_CHILDREN_NUM

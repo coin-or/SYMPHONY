@@ -53,9 +53,11 @@
 \*===========================================================================*/
 
 void user_usage(void){
-  printf("master [ -H ] [ -F file ] \n\t%s\n\t%s\n",
-	 "-H: help (user switches)",
-	 "-F file: problem instance data is in 'file'");
+  printf("master [ -H ] [ -F file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
+	 "-H: help (solver-specific switches)",
+	 "-F model: model should be read in from file 'model'",
+	 "          (MPS format is assumed unless -D is also present)",
+	 "-D data: model is in AMPL format and data is in file 'data'");
 }
 
 /*===========================================================================*/
