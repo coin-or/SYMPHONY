@@ -1247,7 +1247,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 
    term = CPXgetstat(lp_data->cpxenv,lp_data->lp);
 #if CPX_VERSION >= 800
-   if (term == CPX_STAT_INFEASIBLE){
+   if (term == CPX_STAT_UNBOUNDED){
 #else
    if (term == CPX_INFEASIBLE){
 #endif
