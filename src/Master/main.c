@@ -68,7 +68,7 @@ int main(int argc, char **argv)
      sym_solve(env);
    
    } else{
-     
+     FILE *f = NULL;
      char key[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH +1];
      char infile1[MAX_LINE_LENGTH +1], infile2[MAX_LINE_LENGTH +1];     
      char ext[4], *line = NULL;     
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
 	       continue;
 	     } 
 	     if(strcmp(key, "solution") == 0){
-	       if(colsol) free(colsol);
+	       if(colsol) FREE(colsol);
 	       colsol = (double *) malloc(DSIZE * env->mip->n);
 	       if(sym_get_col_solution(env, colsol)){
 		 printf("Error in displaying solution! The problem is either "
@@ -275,9 +275,11 @@ int main(int argc, char **argv)
 	 }
        } else if (strcmp(key, "set") == 0){
 	 printf("Please type 'help'/'?' to see the list of parameters!\n");
+	 line = (char*) malloc(CSIZE*(MAX_LINE_LENGTH+1));	     
 	 while (true){
 	   printf("SYMPHONY\\Set: ");	 
 	   scanf("%s", &key);
+
 	   if (strcmp(key, "help") == 0 || strcmp(key, "?") == 0) {
 	     sym_help("set_help");
 	   } else if (strcmp(key, "back") == 0){
@@ -285,10 +287,29 @@ int main(int argc, char **argv)
 	   } else if (strcmp(key, "quit") == 0){
 	     terminate = TRUE;
 	     break;
+	   } else if (strcmp(key, "param_file") == 0){
+	     printf("Name of the parameter file: ");
+	     scanf("%s", infile1);
+	     if ((f = fopen(infile1, "r")) == NULL){
+	       printf("Parameter file '%s' can't be opened\n",
+		      infile1);
+	       continue;
+	     }
+	     while(NULL != fgets(line, MAX_LINE_LENGTH, f)){  /*read in parameters*/
+	       strcpy(key, "");
+	       strcpy(value, "");
+	       sscanf(line,"%s%s", key, value);
+	       if(set_param(env, line) == 0){
+		 printf("Setting %s to: %s\n", key, value); 
+	       } else {
+		 printf("Unknown parameter %s: !\n", key);
+		 continue;
+	       }	     
+	     }
+	     fclose(f);
 	   } else {
 	     printf("Value of the parameter: ");
 	     scanf("%s", value);
-	     line = (char*) malloc(CSIZE*(MAX_LINE_LENGTH+1));	     
 	     sprintf(line, "%s %s", key, value);  
 	     if(set_param(env, line) == 0){
 	       printf("Setting %s to: %s\n", key, value); 
@@ -297,7 +318,8 @@ int main(int argc, char **argv)
 	       continue;
 	     }
 	   }
-	 }
+         }
+         if(line) FREE(line);       
        } else if (strcmp(key, "reset") == 0){
 	 printf("Resetting...\n");
 	 sym_close_environment(env);
@@ -362,7 +384,8 @@ int sym_help(char *key)
 	   "do_reduced_cost_fixing             : whether ot not to use reduced cost fixing (default: 1)\n"
 	   "time_limit                         : set the time limit\n"
 	   "node_limit                         : set the node limit\n"
-	   "gap_limit                          : set the target gap between the lower and upper bound\n\n"
+	   "gap_limit                          : set the target gap between the lower and upper bound\n"
+           "param_file                         : read parameters from a parameter file\n\n"
 
 	   "back                               : leave this menu\n"
 	   "quit                               : leave the optimizer\n\n");
