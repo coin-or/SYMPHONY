@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Set Partitioning Problem.                                             */
 /*                                                                           */
-/* (c) Copyright 2004 Marta Eso and Ted Ralphs. All Rights Reserved.         */
+/* (c) Copyright 2005 Marta Eso and Ted Ralphs. All Rights Reserved.         */
 /*                                                                           */
 /* This application was originally developed by Marta Eso and was modified   */
 /* Ted Ralphs (tkralphs@lehigh.edu)                                          */
