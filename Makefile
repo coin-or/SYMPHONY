@@ -193,13 +193,7 @@ endif
 # GLPMPL definitions
 ##############################################################################
 
-USE_GLPMPL = FALSE
-
-ifeq ($(USE_GLPMPL),TRUE)
-        LPINCDIR += ${HOME}/glpk-4.7/include
-        LPLIBPATHS += ${HOME}/glpk-4.7/src
-        LPLIB += -lglpk
-endif
+USE_GLPMPL = TRUE
 
 ##############################################################################
 ##############################################################################
@@ -570,6 +564,12 @@ USER_OBJDIR  = $(USERROOT)/objects.$(ARCH)/$(CONFIG)/
 DEPDIR       = $(SYMPHONYROOT)/dep.$(ARCH)
 USER_DEPDIR  = $(USERROOT)/dep.$(ARCH)
 
+ifeq ($(USE_GLPMPL), TRUE)
+GMPLINCDIR   = $(SYMPHONYROOT)/GMPL
+LPINCDIR    += $(GMPLINCDIR)
+GMPL_OBJDIR  = $(SYMPHONYROOT)/GMPL/objects.$(ARCH)
+endif
+
 ifeq ($(LP_SOLVER),OSI)
 ifeq ($(USE_SYM_APPL), TRUE)
 OBJDIR	     = $(SYMPHONYROOT)/objects.$(ARCH)/$(CONFIG)/APPL_$(LP_SOLVER)_$(OSI_INTERFACE)
@@ -602,8 +602,8 @@ SRCDIR  = \
 	$(SYMPHONYROOT)/Master      :\
 	$(SYMPHONYROOT)/include     :\
 	$(SYMPHONYROOT)             :\
-	$(SYMPHONYROOT)/TreeManager 
-
+	$(SYMPHONYROOT)/TreeManager :\
+	$(SYMPHONYROOT)/GMPL
 
 USER_SRCDIR += \
 	$(USERROOT)/Common    :\
@@ -896,7 +896,6 @@ TM_SRC		= tm_func.c tm_proccomm.c
 else
 TM_SRC          = treemanager.c tm_func.c tm_proccomm.c
 endif
-
 ifeq ($(SYM_COMPILE_IN_LP),TRUE)
 TM_SRC         += lp_solver.c lp_varfunc.c lp_rowfunc.c lp_genfunc.c
 TM_SRC         += lp_proccomm.c lp_wrapper.c lp_free.c
@@ -952,6 +951,11 @@ PROCCOMM_SRC	= proccomm.c
 PACKCUT_SRC	= pack_cut.c
 PACKARRAY_SRC	= pack_array.c
 
+ifeq ($(USE_GLPMPL),TRUE)
+GMPL_SRC        = glpmpl1.c glpmpl2.c glpmpl3.c glpmpl4.c glpdmp.c \
+glpavl.c glprng.c glplib1a.c glplib2.c glplib3.c
+endif
+
 BB_SRC = $(MASTER_SRC) $(DG_SRC) $(TM_SRC) $(LP_SRC) $(CP_SRC) $(CG_SRC) \
 	 $(QSORT_SRC) $(TIME_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
 	 $(PACKARRAY_SRC)
@@ -973,6 +977,11 @@ $(SYM_OBJDIR)/%.o : %.c
 	mkdir -p $(SYM_OBJDIR)
 	@echo Compiling $*.c
 	$(CC) $(CFLAGS) $(EFENCE_LD_OPTIONS) -c $< -o $@
+
+$(GMPL_OBJDIR)/%.o : %.c
+	mkdir -p $(GMPL_OBJDIR)
+	@echo Compiling $*.c
+	gcc -DHAVE_LIBM=1 -DSTDC_HEADERS=1 -I$(GMPLINCDIR) -g -o2 -c $< -o $@
 
 $(DEPDIR)/%.d : %.c
 	mkdir -p $(DEPDIR)
@@ -1082,13 +1091,16 @@ ALL_MASTER 	+= $(PACKARRAY_SRC)
 
 MASTER_OBJS 	  = $(addprefix $(OBJDIR)/,$(notdir $(ALL_MASTER:.c=.o)))
 MAIN_OBJ          = $(addprefix $(OBJDIR)/,$(notdir $(MASTER_MAIN_SRC:.c=.o))) 
+ifeq ($(USE_GLPMPL),TRUE)
+GMPL_OBJ          = $(addprefix $(GMPL_OBJDIR)/,$(notdir $(GMPL_SRC:.c=.o))) 
+endif
 MASTER_DEP        = $(addprefix $(DEPDIR)/,$(MASTER_MAIN_SRC:.c=.d))
 MASTER_DEP 	 += $(addprefix $(DEPDIR)/,$(ALL_MASTER:.c=.d))
 USER_MASTER_OBJS  = $(addprefix $(USER_OBJDIR)/,$(notdir $(USER_MASTER_SRC:.c=.o)))
 USER_MASTER_DEP   = $(addprefix $(USER_DEPDIR)/,$(USER_MASTER_SRC:.c=.d))
 
-DEPENDANTS = $(USER_MASTER_DEP) 
-OBJECTS = $(USER_MASTER_OBJS) $(MAIN_OBJ)
+DEPENDANTS = $(USER_MASTER_DEP)
+OBJECTS = $(USER_MASTER_OBJS) $(MAIN_OBJ) 
 
 master : $(BINDIR)/$(MASTERNAME)
 	true
@@ -1118,22 +1130,22 @@ master_clean_user :
 	cd $(USER_DEPDIR)
 	rm -f $(USER_MASTER_DEP)
 
-$(BINDIR)/$(MASTERNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) $(MAIN_OBJ) \
-$(LIBDIR)/$(LIBNAME_TYPE) 
+$(BINDIR)/$(MASTERNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
+$(MAIN_OBJ) $(LIBDIR)/$(LIBNAME_TYPE) 
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) $(MAIN_OBJ) \
-	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB) 
+	$(LIBS) $(OSISYM_LIB) -l$(LIBNAME) $(MASTERLPLIB)
 	@echo ""
 
-$(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS)
+$(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS) $(GMPL_OBJ) 
 	@echo ""
 	@echo "Making $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(LIBDIR)
-	$(LD) $(LIBLDFLAGS) $@ $(MASTER_OBJS)
+	$(LD) $(LIBLDFLAGS) $@ $(MASTER_OBJS) $(GMPL_OBJ)
 	$(RANLIB)
 	$(MKSYMLIBDIR)
 	$(LN_S)
@@ -1606,11 +1618,14 @@ $(BINDIR)/ccg : $(USER_CG_DEP) $(USER_CG_OBJS) $(LIBDIR)/libcg.a
 ##############################################################################
 ##############################################################################
 
-.PHONY:	clean clean_all master_clean lp_clean cg_clean cp_clean tm_clean \
-	dg_clean
+.PHONY:	clean clean_gmpl clean_all master_clean lp_clean cg_clean cp_clean \
+	tm_clean dg_clean
 
 clean :
 	rm -rf $(OBJDIR)
+
+clean_gmpl :
+	rm -rf $(GMPL_OBJDIR)
 
 clean_user :
 	rm -rf $(USER_OBJDIR)
@@ -1628,7 +1643,8 @@ clean_lib :
 clean_bin :
 	rm -rf $(BINDIR)
 
-clean_all : clean clean_dep clean_user clean_user_dep clean_lib clean_bin
+clean_all : clean clean_gmpl clean_dep clean_user clean_user_dep clean_lib \
+	clean_bin
 	true
 
 .SILENT:
