@@ -216,7 +216,7 @@ int create_subproblem_u(lp_prob *p)
 	 for (i = lp_data->n - 1; i >= MAX(maxn, bvarnum); i--){
 	    vars[i] = (var_desc *) malloc(sizeof(var_desc) );
 	 }	  
-	  }
+      }
       vars = lp_data->vars;
       d_uind = desc->uind.list;
       for (i = desc->uind.size - 1; i >= 0; i--){
@@ -290,6 +290,7 @@ int create_subproblem_u(lp_prob *p)
 	    /* solutions. */
 	    lp_data->mip->is_int[i]    = FALSE;
 	    lp_data->mip->ub[i]        = MAXINT;
+	    lp_data->mip->lb[i]         = -MAXINT;
 	    lp_data->mip->obj[i]       = 1.0;
 	    lp_data->mip->matval[j]    = -1.0;
 	    lp_data->mip->matind[j++]  = bcutnum - 2;

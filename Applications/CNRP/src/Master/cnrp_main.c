@@ -57,7 +57,7 @@ int main(int argc, char **argv)
    /* Read parameters from a file if there is one */
    sym_get_str_param(env, "param_file", &pf);
    cnrp_readparams(cnrp, pf, argc, argv);
-   cnrp->par.base_variable_selection = EVERYTHING_IS_EXTRA;
+   cnrp->par.base_variable_selection = SOME_ARE_BASE;
 
    sym_set_dbl_param(env, "granularity", .999999);
 		     
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
    }
 
 #if 0
-   if(cnrp->par.prob_tpye == BPP)
+   if(cnrp->par.prob_type == BPP)
       sym_set_primal_bound(env, 1);
 #endif
    
@@ -152,7 +152,7 @@ void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp)
    double *matval, *obj, *obj2, *rhs, *rngval;
    double *lb, *ub; 
    int *costs = cnrp->dist.cost;
-   int i, j, maxvars = 0;
+   int i, j;
    char resize = FALSE;
    int vertnum = cnrp->vertnum;
    int total_edgenum = vertnum*(vertnum-1)/2;
@@ -160,7 +160,7 @@ void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp)
    int v0, v1;
    double flow_capacity;
    int *edges;
-   int *vars, numvars, phase, varindex;
+   int *vars, phase, varindex;
 #ifdef DIRECTED_X_VARS
    /*whether or not we will have the out-degree constraints*/
    char od_const = (cnrp->par.prob_type == TSP || cnrp->par.prob_type == VRP ||
@@ -170,8 +170,14 @@ void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp)
    char od_const = FALSE;
    char d_x_vars = FALSE;
 #endif
-   int edgenum = cnrp->basevarnum + cnrp->extravarnum;
+   int varnum = cnrp->basevarnum + cnrp->extravarnum;
 
+   if (varnum != 4*total_edgenum){
+      printf("Error: Variables missing from problem description.\n");
+      printf("Exiting...\n");
+      exit(0);
+   }
+   
 #if defined(ADD_FLOW_VARS)
 #ifdef DIRECTED_X_VARS
    flow_capacity = cnrp->capacity;
@@ -189,20 +195,20 @@ void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp)
    
    /* set up the inital LP data */
 
-   n = edgenum;
+   n = varnum;
    m = cnrp->basecutnum;
    edges = cnrp->edges;
    
    /*Estimate the number of nonzeros*/
 #ifdef ADD_CAP_CUTS
-   nz = 12*edgenum;
+   nz = 12*varnum;
 #elif defined(ADD_FLOW_VARS)
-   nz = 8*edgenum;
+   nz = 8*varnum;
 #else
-   nz = 3*edgenum;
+   nz = 3*varnum;
 #endif
 #ifdef ADD_X_CUTS
-   nz += 2*edgenum;
+   nz += 2*varnum;
 #endif
 
    /* Allocate the arrays. These are owned by SYMPHONY after returning. */
@@ -218,151 +224,140 @@ void cnrp_load_problem(sym_environment *env, cnrp_problem *cnrp)
    rngval  = (double *) calloc(m, DSIZE);
    is_int  = (char *) calloc(n, CSIZE);
 
-   /* First add the base vars */
-   for (i = 0, j = 0, phase = 0; phase < 2; phase++){
-      if (phase == 0){
-	 vars = cnrp->basevars;
-	 numvars = cnrp->basevarnum;
-      }else{
-	 vars = cnrp->extravars;
-	 numvars += cnrp->extravarnum;
-      }
-      for (; i < numvars; i++){
-	 varindex = i - phase*cnrp->basevarnum; 
-	 if (vars[varindex] < total_edgenum){
-	    is_int[i] = TRUE;
-	    ub[i] = 1.0;
-	    matbeg[i] = j;
-	    obj[i] = (double) (cnrp->lp_par.gamma*costs[vars[varindex]]);
-	    if (prob_type == CSTP || prob_type == CTP){
-	       /*cardinality constraint*/
-	       matind[j] = 0;
-	       matval[j++] = 1.0;
-	    }
-	    /*in-degree constraint*/
-	    matval[j] = 1.0;
-	    matind[j++] = edges[2*vars[varindex]+1];
+   for (i = 0, j = 0; i < varnum; i++){
+      if (i < total_edgenum){
+	 is_int[i] = TRUE;
+	 ub[i] = 1.0;
+	 matbeg[i] = j;
+	 obj[i] = (double) (cnrp->lp_par.gamma*costs[i]);
+	 if (prob_type == CSTP || prob_type == CTP){
+	    /*cardinality constraint*/
+	    matind[j] = 0;
+	    matval[j++] = 1.0;
+	 }
+	 /*in-degree constraint*/
+	 matval[j] = 1.0;
+	 matind[j++] = edges[2*i+1];
 #ifdef DIRECTED_X_VARS
-	    /*out-degree constraint*/
-	    if (od_const){
-	       matval[j]   = 1.0;
-	       matind[j++] = vertnum + edges[2*vars[varindex]];
-	    }
+	 /*out-degree constraint*/
+	 if (od_const){
+	    matval[j]   = 1.0;
+	    matind[j++] = vertnum + edges[2*i];
+	 }
 #else
-	    if (prob_type == VRP || prob_type == TSP ||
-		prob_type == BPP || edges[2*vars[varindex]]){
-	       matval[j] = 1.0;
-	       matind[j++] = edges[2*vars[varindex]];
-	    }
+	 if (prob_type == VRP || prob_type == TSP ||
+	     prob_type == BPP || edges[2*vars[varindex]]){
+	    matval[j] = 1.0;
+	    matind[j++] = edges[2*i];
+	 }
 #endif	 
 #ifdef ADD_CAP_CUTS
-	    v0 = edges[2*vars[varindex]];
-	    matval[j] = -flow_capacity + (v0 ? cnrp->demand[v0] : 0);
-	    matind[j++] = (2 + od_const)*vertnum - 1 + vars[varindex];
+	 v0 = edges[2*i];
+	 matval[j] = -flow_capacity + (v0 ? cnrp->demand[v0] : 0);
+	 matind[j++] = (2 + od_const)*vertnum - 1 + i;
 #ifndef DIRECTED_X_VARS
-	    matval[j] = -flow_capacity+cnrp->demand[edges[2*vars[varindex]+1]];
-	    matind[j++] = 2*cnrp->vertnum - 1 + total_edgenum + vars[varindex];
+	 matval[j] = -flow_capacity+cnrp->demand[edges[2*i+1]];
+	 matind[j++] = 2*cnrp->vertnum - 1 + total_edgenum + i;
 #endif
 #endif
 #ifdef ADD_X_CUTS
-	    matval[j] = 1.0;
-	    matind[j++]=(2+od_const)*vertnum-1+2*total_edgenum+vars[varindex];
+	 matval[j] = 1.0;
+	 matind[j++]=(2+od_const)*vertnum-1+2*total_edgenum+i;
 #endif
-	 }
+      }
 #ifdef DIRECTED_X_VARS
-	 else if (vars[varindex] < 2*total_edgenum){
-	    is_int[i] = TRUE;
-	    ub[i] = 1.0;
-	    matbeg[i] = j;
-	    obj[i] = (double)(cnrp->lp_par.gamma*
-			      costs[vars[varindex]-total_edgenum]);
-	    if (prob_type == CSTP || prob_type == CTP){
-	       /*cardinality constraint*/
-	       matind[j] = 0;
-	       matval[j++] = 1.0;
-	    }
-	    /*in-degree constraint*/
-	    if (od_const || edges[2*(vars[varindex] - total_edgenum)]){
-	       matval[j] = 1.0;
-	       matind[j++] = edges[2*(vars[varindex] - total_edgenum)];
-	    }
-	    /*out-degree constraint*/
-	    if (od_const){
-	       matval[j] = 1.0;
-	       matind[j++] = vertnum+edges[2*(vars[varindex]-total_edgenum)+1];
-	    }
+      else if (i < 2*total_edgenum){
+	 is_int[i] = TRUE;
+	 ub[i] = 1.0;
+	 matbeg[i] = j;
+	 obj[i] = (double)(cnrp->lp_par.gamma*
+			   costs[i-total_edgenum]);
+	 if (prob_type == CSTP || prob_type == CTP){
+	    /*cardinality constraint*/
+	    matind[j] = 0;
+	    matval[j++] = 1.0;
+	 }
+	 /*in-degree constraint*/
+	 if (od_const || edges[2*(i - total_edgenum)]){
+	    matval[j] = 1.0;
+	    matind[j++] = edges[2*(i - total_edgenum)];
+	 }
+	 /*out-degree constraint*/
+	 if (od_const){
+	    matval[j] = 1.0;
+	    matind[j++] = vertnum+edges[2*(i-total_edgenum)+1];
+	 }
 #ifdef ADD_CAP_CUTS
-	    matval[j] = -flow_capacity +
-	       cnrp->demand[edges[2*(vars[varindex] - total_edgenum) + 1]];
-	    matind[j++] = (2 + od_const)*vertnum - 1 + vars[varindex];
+	 matval[j] = -flow_capacity +
+	    cnrp->demand[edges[2*(i - total_edgenum) + 1]];
+	 matind[j++] = (2 + od_const)*vertnum - 1 + i;
 #endif
 #ifdef ADD_X_CUTS
-	    matval[j] = 1.0;
-	    matind[j++] = (2 + od_const)* vertnum - 1 + 2 * total_edgenum +
-	       vars[varindex] - total_edgenum;
+	 matval[j] = 1.0;
+	 matind[j++] = (2 + od_const)* vertnum - 1 + 2 * total_edgenum +
+	    i - total_edgenum;
 #endif
-	 }
+      }
 #endif
-	 else if (vars[varindex] < (2+d_x_vars)*total_edgenum){
-	    is_int[i] = FALSE;
-	    v0 = edges[2*(vars[varindex]-(1+d_x_vars)*total_edgenum)];
-	    ub[i] = flow_capacity - (v0 ? cnrp->demand[v0] : 0);
-	    matbeg[i] = j;
-	    obj2[i] = (double)(cnrp->lp_par.tau*
-			costs[vars[varindex]-(1+d_x_vars)*total_edgenum]);
+      else if (i < (2+d_x_vars)*total_edgenum){
+	 is_int[i] = FALSE;
+	 v0 = edges[2*(i-(1+d_x_vars)*total_edgenum)];
+	 ub[i] = flow_capacity - (v0 ? cnrp->demand[v0] : 0);
+	 matbeg[i] = j;
+	 obj2[i] = (double)(cnrp->lp_par.tau*
+			    costs[i-(1+d_x_vars)*total_edgenum]);
 #ifdef ADD_CAP_CUTS
-	    matval[j] = 1.0;
-	    matval[j+1] = 1.0;
-	    if (edges[2*(vars[varindex]-(1+d_x_vars)*total_edgenum)])
-	       matval[j+2] = -1.0;
-	    matind[j++] = (2 + od_const)*vertnum - 1 + vars[varindex] -
-	       (1+d_x_vars)*total_edgenum;
-	    matind[j++] = (1+od_const)*vertnum + edges[2*(vars[varindex] -
-				(1+d_x_vars)*total_edgenum) + 1] - 1;
-	    if (edges[2*(vars[varindex] - (1+d_x_vars)*total_edgenum)])
-	       matind[j++] = (1+od_const)*vertnum + edges[2*(vars[varindex] -
-				(1+d_x_vars)*total_edgenum)] - 1;
+	 matval[j] = 1.0;
+	 matval[j+1] = 1.0;
+	 if (edges[2*(i-(1+d_x_vars)*total_edgenum)])
+	    matval[j+2] = -1.0;
+	 matind[j++] = (2 + od_const)*vertnum - 1 + i -
+	    (1+d_x_vars)*total_edgenum;
+	 matind[j++] = (1+od_const)*vertnum + edges[2*(i -
+			       (1+d_x_vars)*total_edgenum) + 1] - 1;
+	 if (edges[2*(i - (1+d_x_vars)*total_edgenum)])
+	    matind[j++] = (1+od_const)*vertnum + edges[2*(i -
+				  (1+d_x_vars)*total_edgenum)] - 1;
 #else
-	    matval[j] = 1.0;
-	    if (edges[2*(vars[varindex]-(1+d_x_vars)*total_edgenum)])
-	       matval[j+1] = -1.0;
-	    matind[j++] = (1+od_const)*vertnum + edges[2*(vars[varindex] -
-				(1+d_x_vars)*total_edgenum) + 1] - 1;
-	    if (edges[2*(vars[varindex] - (1+d_x_vars)*total_edgenum)])
-	       matind[j++] = (1+od_const)*vertnum + edges[2*(vars[varindex] -
-				(1+d_x_vars)*total_edgenum)] - 1;
-#endif
-	 }
-	 else{
-	    is_int[i] = FALSE;
-	    v1 = edges[2*(vars[varindex] - (2+d_x_vars)*total_edgenum) + 1];
-	    ub[i] = flow_capacity - cnrp->demand[v1];
-	    matbeg[i] = j;
-	    obj2[i] = (double) (cnrp->lp_par.tau*costs[vars[varindex]-
-					  (2+d_x_vars)*total_edgenum]);
-#ifdef ADD_CAP_CUTS
-	    matval[j] = 1.0;
+	 matval[j] = 1.0;
+	 if (edges[2*(i-(1+d_x_vars)*total_edgenum)])
 	    matval[j+1] = -1.0;
-	    if (edges[2*(vars[varindex] - (2+d_x_vars)*total_edgenum)])
-	       matval[j+2] = 1.0;
-	    matind[j++] = (2+od_const)*vertnum - 1 + vars[varindex] -
-	       (1+d_x_vars)*total_edgenum;
-	    matind[j++] = (1+od_const)*vertnum + edges[2*(vars[varindex] -
-				(2+d_x_vars)*total_edgenum)+1] - 1;
-	    if (edges[2*(vars[varindex] - (2+d_x_vars)*total_edgenum)])
-	       matind[j++] = (1+od_const)*vertnum + edges[2*(vars[varindex] -
-				(2+d_x_vars)*total_edgenum)] - 1;
-#else
-	    matval[j] = -1.0;
-	    if (edges[2*(vars[varindex] - (2+d_x_vars)*total_edgenum)])
-	       matval[j+1] = 1.0;
-	    matind[j++] = (1+od_const)*vertnum + edges[2*(vars[varindex] -
-				(2+d_x_vars)*total_edgenum)+1] - 1;
-	    if (edges[2*(vars[varindex] - (2+d_x_vars)*total_edgenum)])
-	       matind[j++] = (1+od_const)*vertnum + edges[2*(vars[varindex] -
-				(2+d_x_vars)*total_edgenum)] - 1;
+	 matind[j++] = (1+od_const)*vertnum + edges[2*(i -
+			       (1+d_x_vars)*total_edgenum) + 1] - 1;
+	 if (edges[2*(i - (1+d_x_vars)*total_edgenum)])
+	    matind[j++] = (1+od_const)*vertnum + edges[2*(i -
+				  (1+d_x_vars)*total_edgenum)] - 1;
 #endif
-	 }
+      }
+      else{
+	 is_int[i] = FALSE;
+	 v1 = edges[2*(i - (2+d_x_vars)*total_edgenum) + 1];
+	 ub[i] = flow_capacity - cnrp->demand[v1];
+	 matbeg[i] = j;
+	 obj2[i] = (double) (cnrp->lp_par.tau*costs[i-
+			    (2+d_x_vars)*total_edgenum]);
+#ifdef ADD_CAP_CUTS
+	 matval[j] = 1.0;
+	 matval[j+1] = -1.0;
+	 if (edges[2*(i - (2+d_x_vars)*total_edgenum)])
+	    matval[j+2] = 1.0;
+	 matind[j++] = (2+od_const)*vertnum - 1 + i -
+	    (1+d_x_vars)*total_edgenum;
+	 matind[j++] = (1+od_const)*vertnum + edges[2*(i -
+			       (2+d_x_vars)*total_edgenum)+1] - 1;
+	 if (edges[2*(i - (2+d_x_vars)*total_edgenum)])
+	    matind[j++] = (1+od_const)*vertnum + edges[2*(i -
+				  (2+d_x_vars)*total_edgenum)] - 1;
+#else
+	 matval[j] = -1.0;
+	 if (edges[2*(i - (2+d_x_vars)*total_edgenum)])
+	    matval[j+1] = 1.0;
+	 matind[j++] = (1+od_const)*vertnum + edges[2*(i -
+			       (2+d_x_vars)*total_edgenum)+1] - 1;
+	 if (edges[2*(i - (2+d_x_vars)*total_edgenum)])
+	    matind[j++] = (1+od_const)*vertnum + edges[2*(i -
+				  (2+d_x_vars)*total_edgenum)] - 1;
+#endif
       }
    }
    matbeg[i] = j;

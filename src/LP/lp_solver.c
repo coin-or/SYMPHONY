@@ -3030,22 +3030,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    /* create CGL gomory cuts */
    CglGomory *gomory = new CglGomory;
    gomory->generateCuts(*(lp_data->si), cutlist);
-   //printf("%i\n", cutlist.sizeRowCuts());
    
    /* create CGL knapsack cuts */
    CglKnapsackCover *knapsack = new CglKnapsackCover;
    knapsack->generateCuts(*(lp_data->si), cutlist);
-   //printf("%i\n", cutlist.sizeRowCuts());
    
    /* create CGL odd hole cuts */
    CglOddHole *oddhole = new CglOddHole;
    oddhole->generateCuts(*(lp_data->si), cutlist);
-   //printf("%i\n", cutlist.sizeRowCuts());
    
    /* create CGL probing cuts */
    CglProbing *probe = new CglProbing;
    probe->generateCuts(*(lp_data->si), cutlist);
-   //printf("%i\n", cutlist.sizeRowCuts());
 
 #if 0
    /*__BEGIN_EXPERIMENTAL_SECTION__*/

@@ -173,10 +173,13 @@ void cnrp_create_variables(cnrp_problem *cnrp)
 
    /* Create the edge list (we assume a complete graph) The edge is set to
       (0,0) in the edge list if it was eliminated in preprocessing*/
+   /* For now, we cannot preprocess anything out because SYMPHONY assumes all
+      variables are present */
    zero_varnum = cnrp->zero_varnum;
    zero_vars = cnrp->zero_vars;
    for (i = 1, k = 0, l = 0; i < vertnum; i++){
       for (j = 0; j < i; j++){
+#if 0
 	 if (l < zero_varnum && k == zero_vars[l]){
 	    /*This is one of the zero edges*/
 	    edges[2*k] = edges[2*k+1] = 0;
@@ -184,13 +187,14 @@ void cnrp_create_variables(cnrp_problem *cnrp)
 	    k++;
 	    continue;
 	 }
+#endif
 	 edges[2*k] = j;
 	 edges[2*k+1] = i;
 	 k++;
       }
    }
    edges[vertnum*(vertnum-1)] = edges[vertnum*(vertnum-1) + 1] = 0;
-
+   
    switch(cnrp->par.base_variable_selection){
     case EVERYTHING_IS_EXTRA:
 

@@ -1214,7 +1214,7 @@ int sym_mc_solve(sym_environment *env)
 
    /* First, calculate the utopia point */
    env->par.lp_par.mc_gamma = 1.0;
-   env->par.lp_par.mc_tau = 0.0;
+   env->par.lp_par.mc_tau = -1.0;
       
    printf("***************************************************\n");
    printf("***************************************************\n");
@@ -1259,7 +1259,7 @@ int sym_mc_solve(sym_environment *env)
    solutions[numsolutions++].obj[1] = env->obj[1];
    utopia[0] = env->obj[0];
       
-   env->par.lp_par.mc_gamma = 0.0;
+   env->par.lp_par.mc_gamma = -1.0;
    env->par.lp_par.mc_tau = 1.0;
       
    printf("***************************************************\n");
