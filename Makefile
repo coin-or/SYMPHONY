@@ -94,7 +94,7 @@ LP_SOLVER = NONE
 ##############################################################################
 
 #Uncomment the line below if you want to use OSL.
-LP_SOLVER = OSLLIB
+#LP_SOLVER = OSLLIB
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSLLIB)
@@ -108,7 +108,7 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use CPLEX.
-#LP_SOLVER = CPLEX
+LP_SOLVER = CPLEX
 
 ifeq ($(LP_SOLVER),CPLEX)
 	LPINCDIR = -I/usr/local/include
@@ -133,13 +133,13 @@ endif
 # compile a distributed version of the code.
 ##############################################################################
 
-COMM_PROTOCOL = NONE
-#COMM_PROTOCOL = PVM
+#COMM_PROTOCOL = NONE
+COMM_PROTOCOL = PVM
 
 #Set the paths for PVM
 ifeq ($(COMM_PROTOCOL),PVM)
-	COMMINCDIR = $(PVM_ROOT)/include
-	COMMLDFLAGS = $(PVM_ROOT)/lib/$(PVM_ARCH)
+	COMMINCDIR = -I$(PVM_ROOT)/include
+	COMMLDFLAGS = -L$(PVM_ROOT)/lib/$(PVM_ARCH)
 	COMMLIBS = -lgpvm3 -lpvm3
 endif
 
