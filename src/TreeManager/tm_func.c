@@ -1213,23 +1213,42 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 memcpy(child->duals,node->bobj.duals[i] , DSIZE*tm->bcutnum);
       }	 
 #endif
-
+      
+      if(child->node_status != NODE_STATUS__PRUNED && bobj->feasible[i]){
+	if(!tm->par.sensitivity_analysis && 
+	   tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+	  child->sol_size = tm->rootnode->desc.uind.size;
+	  child->sol = bobj->solutions[i];
+	  bobj->solutions[i] = 0;
+	  child->feasibility_status = NOT_PRUNED_HAS_CAN_SOLUTION;
+	}
+      }
+      
       if (child->node_status == NODE_STATUS__PRUNED){
 
 	 child->feasibility_status = OVER_UB_PRUNED;	   
 
 	 if (feasible[i]){
-	    if(!tm->par.sensitivity_analysis){
-#if 0
+	    if(!tm->par.sensitivity_analysis && 
+	       tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
 	       child->sol_size = tm->rootnode->desc.uind.size;
 	       child->sol = bobj->solutions[i];
 	       bobj->solutions[i] = 0;
-#endif
 	    }
 	    child->feasibility_status = FEASIBLE_PRUNED;	   	    
 	 }
 	 if(action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
-	    child->feasibility_status = INFEASIBLE_PRUNED;
+	     child->feasibility_status = INFEASIBLE_PRUNED;
+	 }
+	 
+	 if(!feasible[i] && bobj->feasible[i]){
+	   if(!tm->par.sensitivity_analysis && 
+	      tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+	     child->sol_size = tm->rootnode->desc.uind.size;
+	     child->sol = bobj->solutions[i];
+	     bobj->solutions[i] = 0;
+	     child->feasibility_status = PRUNED_HAS_CAN_SOLUTION;
+	   }
 	 }
 	 
 #ifdef TRACE_PATH

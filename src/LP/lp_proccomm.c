@@ -547,8 +547,9 @@ void send_node_desc(lp_prob *p, char node_type)
 	 n->feasibility_status = INFEASIBLE_PRUNED;      
       }
       if (node_type == FEASIBLE_PRUNED) {
-	 if (!tm->par.sensitivity_analysis){ 
-	    n->sol_size = p->desc->uind.size;
+	 if (!tm->par.sensitivity_analysis && 
+	     tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){ 
+   	    n->sol_size = p->desc->uind.size;
 	    n->sol = (double *) malloc (DSIZE * p->desc->uind.size);
 	    memcpy(n->sol, lp_data->x, DSIZE*p->desc->uind.size);
 	 }

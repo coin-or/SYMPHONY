@@ -1061,63 +1061,71 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
    lp_sol * best_sol = &(env->warm_start->best_sol);
 
    if (root){
-      if (root->node_status == NODE_STATUS__PRUNED){
-	 if(change_type == OBJ_COEFF_CHANGED){      
-	    if(root->feasibility_status == OVER_UB_PRUNED ||
-	       root->feasibility_status == FEASIBLE_PRUNED) {
-	       if (root->feasibility_status == FEASIBLE_PRUNED){
-		  mip = env->mip;
-		  for(i = 0; i<mip->n; i++){
-		     upper_bound += mip->obj[i] * root->sol[i];
-		  }	    	       
-		  if((env->warm_start->has_ub && 
-		      upper_bound<env->warm_start->ub)||
-		     !env->warm_start->has_ub){
-		     
-		     if(!env->warm_start->has_ub){
-			env->warm_start->has_ub = TRUE;
-			best_sol->has_sol = TRUE;
-		     }
-		     
-		     env->warm_start->ub = upper_bound;
-		     
-		     indices = (int*) malloc(ISIZE*mip->n);
-		     values = (double*) malloc(DSIZE*mip->n);
-		     
-		     for(i = 0; i<mip->n; i++){
-			if(root->sol[i]>lpetol || root->sol[i] < -lpetol){
-			   indices[cnt] = i;
-			   values[cnt] = root->sol[i];
-			   cnt++;
-			}
-		     }
-
-		     best_sol->xlevel = root->bc_level;
-		     best_sol->xindex = root->bc_index;
-		     best_sol->xlength = cnt;
-		     best_sol->lpetol = lpetol;
-		     best_sol->objval = upper_bound;
-		     FREE(best_sol->xind);
-		     FREE(best_sol->xval);
-		     best_sol->xind = (int *) malloc(cnt*ISIZE);
-		     best_sol->xval = (double *) malloc(cnt*DSIZE);
-		     best_sol->xind = indices;
-		     best_sol->xval = values;
+      if (root->node_status == NODE_STATUS__PRUNED || 
+	  root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
+	  root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
+	if(change_type == OBJ_COEFF_CHANGED){      
+	  if(root->feasibility_status == OVER_UB_PRUNED ||
+	     root->feasibility_status == FEASIBLE_PRUNED ||
+	     root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
+	     root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION) {
+	    if (root->feasibility_status == FEASIBLE_PRUNED ||
+		root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
+		root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
+	      mip = env->mip;
+	      for(i = 0; i<mip->n; i++){
+		upper_bound += mip->obj[i] * root->sol[i];
+	      }	    	       
+	      if((env->warm_start->has_ub && 
+		  upper_bound<env->warm_start->ub)||
+		 !env->warm_start->has_ub){
+		
+		if(!env->warm_start->has_ub){
+		  env->warm_start->has_ub = TRUE;
+		  best_sol->has_sol = TRUE;
+		}
+		
+		env->warm_start->ub = upper_bound;
+		
+		indices = (int*) malloc(ISIZE*mip->n);
+		values = (double*) malloc(DSIZE*mip->n);
+		
+		for(i = 0; i<mip->n; i++){
+		  if(root->sol[i]>lpetol || root->sol[i] < -lpetol){
+		    indices[cnt] = i;
+		    values[cnt] = root->sol[i];
+		    cnt++;
 		  }
-	       }
+		}
+		
+		best_sol->xlevel = root->bc_level;
+		best_sol->xindex = root->bc_index;
+		best_sol->xlength = cnt;
+		best_sol->lpetol = lpetol;
+		best_sol->objval = upper_bound;
+		FREE(best_sol->xind);
+		FREE(best_sol->xval);
+		best_sol->xind = (int *) malloc(cnt*ISIZE);
+		best_sol->xval = (double *) malloc(cnt*DSIZE);
+		best_sol->xind = indices;
+		best_sol->xval = values;
+	      }
 	    }
-	    FREE(root->sol);
+	  }
+	  FREE(root->sol);
+	  if (root->node_status == NODE_STATUS__PRUNED){ 
 	    root->node_status = NODE_STATUS__WARM_STARTED;
-	 }
-	 else if(change_type == RHS_CHANGED){      
-	    root->node_status = NODE_STATUS__WARM_STARTED;
-	 }
-	 //   }	else if (root->bobj.child_num < 1){
-	 // root->node_status = NODE_STATUS__WARM_STARTED;
+	  }
+	}
+	else if(change_type == RHS_CHANGED){      
+	  root->node_status = NODE_STATUS__WARM_STARTED;
+	}
+	//   }	else if (root->bobj.child_num < 1){
+	// root->node_status = NODE_STATUS__WARM_STARTED;
       } else{
-	 for(i = 0; i<root->bobj.child_num; i++){
-	    update_tree_bound(env, root->children[i], change_type);
-	 }
+	for(i = 0; i<root->bobj.child_num; i++){
+	  update_tree_bound(env, root->children[i], change_type);
+	}
       }
    }
 }
@@ -2231,10 +2239,12 @@ int set_param(sym_environment *env, char *line)
    }
    else if(strcmp(key, "keep_warm_start") == 0){
       if (value){
-	 tm_par->keep_description_of_pruned = KEEP_IN_MEMORY;
+	 tm_par->keep_description_of_pruned = 
+	   lp_par->keep_description_of_pruned = KEEP_IN_MEMORY;
          return(0);
    } else
-	 tm_par->keep_description_of_pruned = DISCARD;
+	 tm_par->keep_description_of_pruned = 
+	   lp_par->keep_description_of_pruned = DISCARD;
       return(0);
    }
    else if (strcmp(key, "warm_start") == 0 ||
