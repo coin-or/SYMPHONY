@@ -147,11 +147,11 @@ typedef struct LP_PROB{
 /*===========================================================================*/
 
 lp_prob *get_lp_ptr PROTO((lp_prob **lp_list));
-void lp_initialize PROTO((lp_prob *p, int master_tid));
+int lp_initialize PROTO((lp_prob *p, int master_tid));
 int process_chain PROTO((lp_prob *p));
-void fathom_branch PROTO((lp_prob *p));
+int fathom_branch PROTO((lp_prob *p));
 int fathom PROTO((lp_prob *p, int primal_feasible));
-void repricing PROTO((lp_prob *p));
+int repricing PROTO((lp_prob *p));
 int bfind PROTO((int key, int *table, int size));
 int collect_nonzeros PROTO((lp_prob *p, double *x, int *tind, double *tx));
 int collect_fractions PROTO((lp_prob *p, double *x, int *tind, double *tx));
@@ -199,7 +199,8 @@ void add_slacks_to_matrix PROTO((lp_prob *p, int cand_num,
 				 branch_obj **candidates));
 int add_violated_slacks PROTO((lp_prob *p, int cand_num,
 			       branch_obj **candidates));
-branch_obj *select_branching_object PROTO((lp_prob *p, int *cuts));
+int select_branching_object PROTO((lp_prob *p, int *cuts,
+				   branch_obj **can));
 int branch PROTO((lp_prob *p, int cuts));
 int col_gen_before_branch PROTO((lp_prob *p, int *new_vars));
 
@@ -271,7 +272,7 @@ int select_candidates_u PROTO((lp_prob *p, int *cuts, int *new_vars,
 			       int *cand_num, branch_obj ***candidates));
 int compare_candidates_u PROTO((lp_prob *p, double oldobjval,
 				branch_obj *best,branch_obj *can));
-void select_child_u PROTO((lp_prob *p, branch_obj *can, char *action));
+int select_child_u PROTO((lp_prob *p, branch_obj *can, char *action));
 void print_branch_stat_u PROTO((lp_prob *p, branch_obj *can, char *action));
 void add_to_desc_u PROTO((lp_prob *p, node_desc *desc));
 int same_cuts_u PROTO((lp_prob *p, waiting_row *wrow1, waiting_row *wrow2));
@@ -286,6 +287,6 @@ int generate_column_u PROTO((lp_prob *p, int lpcutnum, cut_data **cuts,
 			     double *obj, double *ub, double *lb));
 void print_stat_on_cuts_added_u PROTO((lp_prob *p, int added_rows));
 void purge_waiting_rows_u PROTO((lp_prob *p));
-void generate_cuts_in_lp_u PROTO((lp_prob *p));
+int generate_cuts_in_lp_u PROTO((lp_prob *p));
 
 #endif

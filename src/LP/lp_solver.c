@@ -817,22 +817,33 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 #endif
 
    switch (term) {
-    case 0: term = LP_OPTIMAL; break;
-    case 1: term = LP_D_UNBOUNDED;
+    case 0:
+      term = LP_OPTIMAL;
+      break;
+    case 1:
+      term = LP_D_UNBOUNDED;
       ekk_infeasibilities(lp_data->lp, 1, 1, NULL, NULL);
       break;
-    case 2: term = LP_D_INFEASIBLE; break;
-    case 3: term = LP_D_ITLIM; break;
+    case 2:
+      term = LP_D_INFEASIBLE;
+      break;
+    case 3:
+      term = LP_D_ITLIM;
+      break;
     case 4:
       osllib_status = -1;
       OSL_check_error("osllib_status-ekk_dualSimplex found no solution!");
-      exit(-1);
-    case 5: LP_D_OBJLIM; break;
+      term = LP_ABANDONED;
+      break;
+    case 5:
+      LP_D_OBJLIM;
+      break;
     case 6:
       osllib_status = -1;
       OSL_check_error("osllib_status-ekk_dualSimplex lack of dstorage file"
 			 "space!");
-      exit(-1);
+      term = LP_ABANDONED;
+      break;
     default: term = LP_ABANDONED;
       break;
    }

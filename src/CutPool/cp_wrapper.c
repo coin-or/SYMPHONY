@@ -60,9 +60,13 @@ int receive_cp_data_u(cut_pool *cp)
 
 /*===========================================================================*/
 
-void receive_lp_solution_cp_u(cut_pool *cp)
+int receive_lp_solution_cp_u(cut_pool *cp)
 {
-   CALL_USER_FUNCTION( (user_receive_lp_solution_cp(&cp->user)) );
+   int termcode = 0;
+   
+   CALL_USER_FUNCTION( user_receive_lp_solution_cp(&cp->user) );
+
+   return(termcode);
 }
 
 /*===========================================================================*/
@@ -247,7 +251,7 @@ void free_cut_pool_u(cut_pool *cp)
 {
    int i;
    
-   CALL_USER_FUNCTION( user_free_cp(&cp->user) );
+   user_free_cp(&cp->user);
    
    for (i = cp->cut_num - 1; i >= 0; i--){
       FREE(cp->cuts[i]->cut.coef);

@@ -118,7 +118,7 @@ int receive_lp_data_u(lp_prob *p)
    switch( user_receive_lp_data(&p->user)){
     case USER_ERROR:
       freebuf(r_bufid);
-      return(FALSE);
+      return(ERROR__USER);
     case USER_SUCCESS:
     case USER_AND_PP: 
     case USER_NO_PP:
@@ -127,9 +127,9 @@ int receive_lp_data_u(lp_prob *p)
     default:
       freebuf(r_bufid);
       /* Unexpected return value. Do something!! */
-      return(FALSE);
+      return(ERROR__USER);
    }
-   return(TRUE);
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -233,7 +233,7 @@ int create_subproblem_u(lp_prob *p)
 	 printf("Illegal return code.\n");
 	 printf("Trying to use default user_create_subproblem without");
 	 printf("reading an MPS or AMPL file. Exiting...\n\n");
-	 exit(2000);
+	 return(ERROR__ILLEGAL_RETURN_CODE);
       }
 
       lp_data->mip->nz = p->mip->nz;      
@@ -300,13 +300,13 @@ int create_subproblem_u(lp_prob *p)
        
       /* Error. The search tree node will not be processed. */
       FREE(userind);
-      return(FALSE);
+      return(ERROR__USER);
       
     default:
        
       /* Unexpected return value. Do something!! */
       FREE(userind);
-      return(FALSE);
+      return(ERROR__USER);
    }
    
    FREE(userind); /* No longer needed */
@@ -492,7 +492,7 @@ int create_subproblem_u(lp_prob *p)
       load_basis(lp_data, cstat, rstat);
    }
 
-   return(TRUE);
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -855,7 +855,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    action = col_gen_before_branch(p, new_vars);
    /* vars might have been added, so tmp arrays might be freed/malloc'd,
       but only those where maxn plays any role in the size. Therefore tmp.i2
-      and tmp.p2 does NOT change. Phew... */
+      and tmp.p2 do NOT change. Phew... */
 
    if (action == DO_NOT_BRANCH__FATHOMED)
       return(DO_NOT_BRANCH__FATHOMED);
@@ -939,8 +939,8 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
     case USER_AND_PP:
     case USER_NO_PP:
       if (! *cand_num){
-	 printf("Error! User didn't select branching candidates!!!\n");
-	 exit(-1);
+	 printf("Error! User didn't select branching candidates!\n");
+	 return(ERROR__NO_BRANCHING_CANDIDATE);
       }
       return(DO_BRANCH);
     case USER_ERROR:    /* In case of error, default is used. */
@@ -1136,7 +1136,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
  * selects one of the candidates after branching for further processing.
 \*===========================================================================*/
 
-void select_child_u(lp_prob *p, branch_obj *can, char *action)
+int select_child_u(lp_prob *p, branch_obj *can, char *action)
 {
    int user_res;
    int ind, i;
@@ -1146,8 +1146,9 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
    for (i = can->child_num-1; i >= 0; i--){
       sense = can->sense[i];
       if (sense != 'E' && sense != 'L' && sense != 'G' && sense != 'R'){
-	 printf("The sense of a child doesn't make sense! (nonexistent)\n\n");
-	 exit(-212);
+	 printf("Error! The sense of a child doesn't make sense!");
+	 printf("(nonexistent)\n\n");
+	 return(ERROR__ILLEGAL_BRANCHING);
       }
    }
 #endif
@@ -1240,6 +1241,8 @@ void select_child_u(lp_prob *p, branch_obj *can, char *action)
       /* Unexpected return value. Do something!! */
       break;
    }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -1277,12 +1280,12 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
    printf("\n");
 
    if (can->type == CANDIDATE_VARIABLE){
-      CALL_USER_FUNCTION( user_print_branch_stat(p->user, can, NULL,
-			     p->lp_data->n, p->lp_data->vars, action) );
+      user_print_branch_stat(p->user, can, NULL,
+			     p->lp_data->n, p->lp_data->vars, action);
    }else{
-      CALL_USER_FUNCTION( user_print_branch_stat(p->user, can,
+      user_print_branch_stat(p->user, can,
 			     p->lp_data->rows[can->position].cut,
-			     p->lp_data->n, p->lp_data->vars, action) );
+			     p->lp_data->n, p->lp_data->vars, action);
    }
 }
 
@@ -1298,8 +1301,8 @@ void add_to_desc_u(lp_prob *p, node_desc *desc)
    desc->desc_size = 0;
    desc->desc = NULL;
 
-   CALL_USER_FUNCTION( user_add_to_desc(p->user, &desc->desc_size,
-					&desc->desc) );
+   user_add_to_desc(p->user, &desc->desc_size,
+		    &desc->desc);
 }
 
 /*===========================================================================*/
@@ -1587,6 +1590,8 @@ int generate_column_u(lp_prob *p, int lpcutnum, cut_data **cuts,
 		      double *lb, double *ub)
 {
    int real_nextind = nextind;
+   int termcode = 0;
+   
    CALL_USER_FUNCTION( user_generate_column(p->user, generate_what,
 					    p->lp_data->m - p->base.cutnum,
 					    cuts, prevind, nextind,
@@ -1597,7 +1602,7 @@ int generate_column_u(lp_prob *p, int lpcutnum, cut_data **cuts,
 
 /*===========================================================================*/
 
-void generate_cuts_in_lp_u(lp_prob *p)
+int generate_cuts_in_lp_u(lp_prob *p)
 {
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;
@@ -1632,7 +1637,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
       
       switch (user_res2){
        case USER_ERROR: 
-	 return;
+	 return(ERROR__USER);
        case USER_SUCCESS:
        case USER_AND_PP:
        case USER_NO_PP:
@@ -1737,7 +1742,7 @@ void generate_cuts_in_lp_u(lp_prob *p)
    switch(user_res){
     case USER_ERROR:
       FREE(cuts);
-      return;
+      return(ERROR__USER);
     case GENERATE_CGL_CUTS:
     case USER_DEFAULT:
       /* Add to the user's list of cuts */
@@ -1784,11 +1789,11 @@ void generate_cuts_in_lp_u(lp_prob *p)
 	 FREE(new_rows);
       }
       FREE(cuts);
-      return;
+      return(FUNCTION_TERMINATED_NORMALLY);
     default:
       /* Unexpected return value. Do something!! */
       FREE(cuts);
-      return;
+      return(ERROR__USER);
    }      
 }
 
@@ -1875,7 +1880,7 @@ void free_prob_dependent_u(lp_prob *p)
 {
    switch (user_free_lp(&p->user)){
     case USER_ERROR:
-      /* BlackBox ignores error message */
+      /* SYMPHONY ignores error message */
     case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:

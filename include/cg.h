@@ -97,8 +97,8 @@ int cg_send_cut PROTO((cut_data *new_cut));
 
 int receive_cg_data_u PROTO((cg_prob *p));
 int receive_lp_solution_cg_u PROTO((cg_prob *p));
-void free_cg_u PROTO((cg_prob *p));
-void find_cuts_u PROTO((cg_prob *p, LPdata *lp_data, int *num_cuts));
-void check_validity_of_cut_u PROTO((cg_prob *p, cut_data *new_cut));
+int free_cg_u PROTO((cg_prob *p));
+int find_cuts_u PROTO((cg_prob *p, LPdata *lp_data, int *num_cuts));
+int check_validity_of_cut_u PROTO((cg_prob *p, cut_data *new_cut));
 
 #endif

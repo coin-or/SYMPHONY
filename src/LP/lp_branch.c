@@ -112,7 +112,7 @@ int add_violated_slacks(lp_prob *p, int cand_num, branch_obj **candidates)
 
 /*===========================================================================*/
 
-branch_obj *select_branching_object(lp_prob *p, int *cuts)
+int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 {
    LPdata *lp_data = p->lp_data;
    var_desc **vars;
@@ -144,7 +144,7 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 #endif
 
    /*------------------------------------------------------------------------*\
-    * First we call branch_u() to select candidates. It can
+    * First we call select_candidates_u() to select candidates. It can
     * -- return with DO_BRANCH and a bunch of candidates, or
     * -- return with DO_NOT_BRANCH along with a bunch of violated cuts
     *    in the matrix and/or among the slack_cuts, or
@@ -154,16 +154,18 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
    j = select_candidates_u(p, cuts, &new_vars, &cand_num, &candidates);
    switch (j){
     case DO_NOT_BRANCH__FATHOMED:
-      *cuts = -1;
-      return(NULL);
+      *candidate = NULL;
+      return(DO_NOT_BRANCH__FATHOMED);
 
     case DO_NOT_BRANCH:
       if (cand_num)
 	 *cuts += add_violated_slacks(p, cand_num, candidates);
 #ifdef DO_TESTS
       if (*cuts == 0 && new_vars == 0){
-	 printf("Told not to branch, but there are no cuts!\n");
-	 exit(-1);
+	 printf("Error! Told not to branch, but there are no new cuts or ");
+	 printf("variables!\n");
+	 *candidate = NULL;
+	 return(ERROR__NO_BRANCHING_CANDIDATE);
       }
 #endif
       /* Free the candidates */
@@ -173,10 +175,15 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	 }
 	 FREE(candidates);
       }
-      return(NULL);
+      *candidate = NULL;
+      return(DO_NOT_BRANCH);
 
     case DO_BRANCH:
       break;
+
+   case ERROR__NO_BRANCHING_CANDIDATE:
+      *candidate = NULL;
+      return(ERROR__NO_BRANCHING_CANDIDATE);
    }
 
    /* OK, now we have to branch. */
@@ -493,7 +500,9 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
    }
    FREE(candidates);
 
-   return(best_can);
+   *candidate = best_can;
+   
+   return(DO_BRANCH);
 }
 
 /*===========================================================================*/
@@ -507,9 +516,14 @@ int branch(lp_prob *p, int cuts)
    var_desc *var;
    cut_data *cut;
    node_desc *desc;
+   int termcode;
+   
+   termcode = select_branching_object(p, &cuts, &can);
 
-   can = select_branching_object(p, &cuts);
-
+   if (termcode == ERROR__NO_BRANCHING_CANDIDATE){
+      return(termcode);
+   }
+   
    if (can == NULL){
       /* We were either able to fathom the node or found violated cuts
        * In any case, send the qualifying cuts to the cutpool */
@@ -517,14 +531,15 @@ int branch(lp_prob *p, int cuts)
 #pragma omp critical(cut_pool)
       send_cuts_to_pool(p, p->par.eff_cnt_before_cutpool);
       p->comp_times.communication += used_time(&p->tt);
-      return( cuts == -1 ? FATHOMED_NODE : cuts );
+      return( termcode == DO_NOT_BRANCH__FATHOMED ? FATHOMED_NODE : cuts );
    }
 
    /*------------------------------------------------------------------------*\
     * Now we evaluate can, the best of the candidates.
    \*------------------------------------------------------------------------*/
    action = lp_data->tmp.c; /* n (good estimate... can->child_num) */
-   select_child_u(p, can, action);
+   if ((termcode = select_child_u(p, can, action)) < 0)
+      return(termcode);
    if (p->par.verbosity > 4)
       print_branch_stat_u(p, can, action);
 

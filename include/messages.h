@@ -59,26 +59,37 @@
 
 /* messages to set up an lp: lp-->master; master-->lp */
 #define REQUEST_FOR_LP_DATA 200
-#define LP_DATA 201
+#define LP_DATA             201
 /* similar for cg */
 #define REQUEST_FOR_CG_DATA 202
-#define CG_DATA 203
+#define CG_DATA             203
 /* similar for cp */
 #define REQUEST_FOR_CP_DATA 204
-#define CP_DATA 205
+#define CP_DATA             205
 /* similar for sp */
 #define REQUEST_FOR_SP_DATA 206
-#define SP_DATA 207
+#define SP_DATA             207
 /* similar for dg */
 #define REQUEST_FOR_DG_DATA 208
-#define DG_DATA 209
+#define DG_DATA             209
 
-/* startup data for the tm */
-#define TM_DATA 210
-#define TM_FINISHED 211
-#define TM_FIRST_PHASE_FINISHED 212
-#define TM_ROOT_DESCRIPTION 213
-#define TIME_LIMIT_EXCEEDED 214
+/* startup data for the TM */
+#define TM_DATA             210
+
+/* miscellaneous tm messages */
+#define TM_ROOT_DESCRIPTION              211
+#define TM_FIRST_PHASE_FINISHED          212
+
+/* tm termination codes */
+#define TM_FINISHED                      213
+#define TM_TIME_LIMIT_EXCEEDED           214
+#define TM_NODE_LIMIT_EXCEEDED           215
+#define TM_TARGET_GAP_ACHIEVED           216
+#define TM_ERROR__NO_BRANCHING_CANDIDATE 250
+#define TM_ERROR__ILLEGAL_RETURN_CODE    251
+#define TM_ERROR__NUMERICAL_INSTABILITY  252
+#define TM_ERROR__COMM_ERROR             253
+#define TM_ERROR__USER                   275
 
 /*===========================================================================*
  * treemanager-->lp messages

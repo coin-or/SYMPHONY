@@ -49,7 +49,10 @@ int main(void)
 
    get_lp_ptr(&p);
    
-   lp_initialize(p, 0);
+   if ((termcode = lp_initialize(p, 0)) < 0){
+      printf("LP initialization failed with error code %i\n\n", termcode);
+      lp_exit(p);
+   }
    
    /*------------------------------------------------------------------------*\
     * Continue receiving node data and fathoming branches until this
@@ -83,10 +86,10 @@ int main(void)
 
       p->comp_times.communication += used_time(&p->tt);
 
-      if (!process_chain(p)){
-	 printf("\nUser had problems creating LP! Exiting now.\n\n");
-	 /* User had problems creating initial LP. Abandon node. */
-	 exit(-1);
+      if (process_chain(p) < 0){
+	 printf("\nThere was an error in the LP process. Exiting now.\n\n");
+	 /* There was an error in the LP. Abandon node. */
+	 lp_exit(p);
       }
    }
 

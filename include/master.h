@@ -23,7 +23,7 @@
 /*=================== Master I/O functions (readparams.c) ===================*/
 /*===========================================================================*/
 
-void parse_command_line PROTO((problem *p, int argc, char **argv));
+int parse_command_line PROTO((problem *p, int argc, char **argv));
 void read_string PROTO((char *target, char *line, int maxlen));
 void print_statistics PROTO((node_times *tim, tm_stat *stat, double ub,
 			     double lb, double initial_time,
@@ -33,19 +33,19 @@ void print_statistics PROTO((node_times *tim, tm_stat *stat, double ub,
 /*=============== Master wrapper functions (master_wrapper.c) ===============*/
 /*===========================================================================*/
 
-void initialize_u PROTO((problem *p));
-void free_master_u PROTO((problem *p));
-void readparams_u PROTO((problem *p, int argc, char **argv));
-void io_u PROTO((problem *p));
-void init_draw_graph_u PROTO((problem *p));
-void start_heurs_u PROTO((problem *p));
-void display_solution_u PROTO((problem *p, int thread_num));
-void initialize_root_node_u PROTO((problem *p));
-void receive_feasible_solution_u PROTO((problem *p, int msgtag));
-void send_lp_data_u PROTO((problem *p, int sender));
-void send_cg_data_u PROTO((problem *p, int sender));
-void send_cp_data_u PROTO((problem *p, int sender));
-void send_sp_data_u PROTO((problem *p, int sender));
-void process_own_messages_u PROTO((problem *p, int msgtag));
+int initialize_u PROTO((problem *p));
+int free_master_u PROTO((problem *p));
+int readparams_u PROTO((problem *p, int argc, char **argv));
+int io_u PROTO((problem *p));
+int init_draw_graph_u PROTO((problem *p));
+int start_heurs_u PROTO((problem *p));
+int display_solution_u PROTO((problem *p, int thread_num));
+int initialize_root_node_u PROTO((problem *p));
+int receive_feasible_solution_u PROTO((problem *p, int msgtag));
+int send_lp_data_u PROTO((problem *p, int sender));
+int send_cg_data_u PROTO((problem *p, int sender));
+int send_cp_data_u PROTO((problem *p, int sender));
+int send_sp_data_u PROTO((problem *p, int sender));
+int process_own_messages_u PROTO((problem *p, int msgtag));
 
 #endif

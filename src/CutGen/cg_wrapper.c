@@ -68,10 +68,11 @@ int receive_lp_solution_cg_u(cg_prob *p)
 
 /*===========================================================================*/
 
-void find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
+int find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
 {
    cut_data **cuts;
    int i;
+   int termcode;
    
    CALL_USER_FUNCTION( user_find_cuts(p->user, p->cur_sol.xlength,
 				      p->cur_sol.xiter_num, p->cur_sol.xlevel,
@@ -79,13 +80,15 @@ void find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
 				      p->cur_sol.xind, p->cur_sol.xval,
 				      p->ub, p->cur_sol.lpetol, num_cuts) );
 
-   return;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void free_cg_u(cg_prob *p)
+int free_cg_u(cg_prob *p)
 {
+   int termcode;
+
 #ifdef COMPILE_IN_CG
    FREE(p->cuts_to_add);
 #else
@@ -94,6 +97,8 @@ void free_cg_u(cg_prob *p)
 #endif   
    CALL_USER_FUNCTION( user_free_cg(&p->user) );
    FREE(p);
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -101,18 +106,19 @@ void free_cg_u(cg_prob *p)
 #ifdef CHECK_VALIDITY
 void check_validity_of_cut_u(cg_prob *p, cut_data *new_cut)
 {
+   int termcode;
+
    switch(new_cut->type){
 
     case EXPLICIT_ROW:
 
       /* Not implemented yet */
 	 
-       return;
+       return (FUNCTION_TERMINATED_NORMALLY);
 
     default:
 
       CALL_USER_FUNCTION( user_check_validity_of_cut(p->user, new_cut) );
-      return;
    }
 }
 #endif

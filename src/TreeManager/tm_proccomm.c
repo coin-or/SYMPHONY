@@ -932,7 +932,7 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
 
 /*===========================================================================*/
 
-void receive_lp_timing(tm_prob *tm)
+int receive_lp_timing(tm_prob *tm)
 {
 #ifndef COMPILE_IN_LP
    int i, r_bufid = 0;
@@ -973,12 +973,14 @@ void receive_lp_timing(tm_prob *tm)
 	    /*__BEGIN_EXPERIMENTAL_SECTION__*/
 	    stop_processes(&tm->sp);
 	    /*___END_EXPERIMENTAL_SECTION___*/
-	    exit(-11);
+	    return(SOMETHING_DIED);
 	 }
       }
    }
    freebuf(r_bufid);
 #endif
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 

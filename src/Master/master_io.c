@@ -72,7 +72,7 @@ void usage(void)
 /*===========================================================================*/
 /*===========================================================================*/
 
-void parse_command_line(problem *p, int argc, char **argv)
+int parse_command_line(problem *p, int argc, char **argv)
 {
    int i;
    char line[MAX_LINE_LENGTH +1], tmp, c;
@@ -93,8 +93,7 @@ void parse_command_line(problem *p, int argc, char **argv)
    dg_params *dg_par = &p->par.dg_par;
 
    if (argc < 2){
-      usage();
-      exit(1);
+      return(FUNCTION_TERMINATED_NORMALLY);
    }
 
    printf("SYMPHONY was called with the following arguments:\n");
@@ -121,7 +120,7 @@ void parse_command_line(problem *p, int argc, char **argv)
    if ((f = fopen(p->par.param_file, "r")) == NULL){
       (void) fprintf(stderr, "Readparams: file '%s' can't be opened\n\n",
 		     p->par.param_file);
-      exit(1);
+      return(ERROR__OPENING_PARAM_FILE);
    }
 
    printf("============= Other Parameter Settings =============\n\n");
@@ -394,13 +393,13 @@ void parse_command_line(problem *p, int argc, char **argv)
 	    for (i=0; i<tm_par->lp_mach_num; i++){
 	       if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 		  fprintf(stderr, "\nio: error reading lp_machine list\n\n");
-		  exit(1);
+		  return(ERROR__PARSING_PARAM_FILE);
 	       }
 	       strcpy(key, "");
 	       sscanf(line, "%s%s", key, value);
 	       if (strcmp(key, "TM_lp_machine") != 0){
 		  fprintf(stderr, "\nio: error reading lp_machine list\n\n");
-		  exit(1);
+		  return(ERROR__PARSING_PARAM_FILE);
 	       }
 	       read_string(tm_par->lp_machs[i], line, MACH_NAME_LENGTH);
 	       printf("%s", line);
@@ -420,13 +419,13 @@ void parse_command_line(problem *p, int argc, char **argv)
 	    for (i=0; i<tm_par->cg_mach_num; i++){
 	       if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 		  fprintf(stderr, "\nio: error reading cg_machine list\n\n");
-		  exit(1);
+		  return(ERROR__PARSING_PARAM_FILE);
 	       }
 	       strcpy(key, "");
 	       sscanf(line, "%s%s", key, value);
 	       if (strcmp(key, "TM_cg_machine") != 0){
 		  fprintf(stderr, "\nio: error reading cg_machine list\n\n");
-		  exit(1);
+		  return(ERROR__PARSING_PARAM_FILE);
 	       }
 	       read_string(tm_par->cg_machs[i], line, MACH_NAME_LENGTH);
 	       printf("%s", line);
@@ -446,13 +445,13 @@ void parse_command_line(problem *p, int argc, char **argv)
 	    for (i=0; i<tm_par->cp_mach_num; i++){
 	       if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 		  fprintf(stderr, "\nio: error reading cp_machine list\n\n");
-		  exit(1);
+		  return(ERROR__PARSING_PARAM_FILE);
 	       }
 	       strcpy(key, "");
 	       sscanf(line, "%s%s", key, value);
 	       if (strcmp(key, "TM_cp_machine") != 0){
 		  fprintf(stderr, "\nio: error reading cp_machine list\n\n");
-		  exit(1);
+		  return(ERROR__PARSING_PARAM_FILE);
 	       }
 	       read_string(tm_par->cp_machs[i], line, MACH_NAME_LENGTH);
 	       printf("%s", line);
@@ -497,13 +496,13 @@ void parse_command_line(problem *p, int argc, char **argv)
 	     tm_par->keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No pruned node file!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "pruned_node_file_name") != 0){
 	       printf("Need pruned_node_file_name next!!!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(tm_par->pruned_node_file_name, value);
 	    if (!(f1 = fopen(tm_par->pruned_node_file_name, "w"))){
@@ -528,24 +527,24 @@ void parse_command_line(problem *p, int argc, char **argv)
 	 if ((p->par.warm_start = tm_par->warm_start)){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No warm start tree file!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "warm_start_tree_file_name") != 0){
 	       printf("Need warm_start_tree_file_name next!!!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(tm_par->warm_start_tree_file_name, value);
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No warm start cut file!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "warm_start_cut_file_name") != 0){
 	       printf("Need warm_start_cut_file_name next!!!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(tm_par->warm_start_cut_file_name, value);
 	 }
@@ -556,13 +555,13 @@ void parse_command_line(problem *p, int argc, char **argv)
 	 if (tm_par->vbc_emulation == VBC_EMULATION_FILE){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No vbc emulation file!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "vbc_emulation_file_name") != 0){
 	       printf("Need vbc_emulation_file_name next!!!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(tm_par->vbc_emulation_file_name, value);
 	    if (!(f1 = fopen(tm_par->vbc_emulation_file_name, "w"))){
@@ -595,25 +594,25 @@ void parse_command_line(problem *p, int argc, char **argv)
 	 if (tm_par->logging){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No tree log file!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "tree_log_file_name") != 0){
 	       printf("tree_log_file_name next!!!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(tm_par->tree_log_file_name, value);
 	    if (tm_par->logging != VBC_TOOL){
 	       if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 		  printf("No cut log file!\n\n");
-		  exit(1);
+		  return(ERROR__PARSING_PARAM_FILE);
 	       }
 	       strcpy(key, "");
 	       sscanf(line, "%s%s", key, value);
 	       if (strcmp(key, "cut_log_file_name") != 0){
 		  printf("Need cut_log_file_name next!!!\n\n");
-		  exit(1);
+		  return(ERROR__PARSING_PARAM_FILE);
 	       }
 	       strcpy(tm_par->cut_log_file_name, value);
 	    }
@@ -1015,13 +1014,13 @@ void parse_command_line(problem *p, int argc, char **argv)
 	 if (cp_par->warm_start){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No cut pool warm start file!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "cp_warm_start_file_name") != 0){
 	       printf("Need cp_warm_start_file_name next!!!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(cp_par->warm_start_file_name, value);
 	 }
@@ -1032,13 +1031,13 @@ void parse_command_line(problem *p, int argc, char **argv)
 	 if ((tm_par->cp_logging = cp_par->logging)){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No cut pool log file!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(key, "");
 	    sscanf(line, "%s%s", key, value);
 	    if (strcmp(key, "cp_log_file_name") != 0){
 	       printf("Need cp_log_file_name next!!!\n\n");
-	       exit(1);
+	       return(ERROR__PARSING_PARAM_FILE);
 	    }
 	    strcpy(cp_par->log_file_name, value);
 	 }
@@ -1251,6 +1250,8 @@ EXIT:
 
    if (f)
       fclose(f);
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/

@@ -502,6 +502,7 @@ our_col_set *price_all_vars(lp_prob *p)
 	     * the next in matrix (nextind) and get the smaller one */
 	    next_not_fixed = not_fixed[k];
 	    if (nextind == -1 || nextind > next_not_fixed){
+	       /* FIXME: Catch the error message for this function */
 	       curind = generate_column_u(p, cutnum, cuts,
 					  prevind, next_not_fixed,
 					  GENERATE_NEXTIND,
@@ -518,6 +519,7 @@ our_col_set *price_all_vars(lp_prob *p)
 	    if (nf_status == NF_CHECK_UNTIL_LAST){
 	       curind = nextind;
 	    }else{ /* NF_CHECK_AFTER_LAST */
+	       /* FIXME: Catch the error message for this function */
 	       curind = generate_column_u(p, cutnum, cuts,
 					  prevind, nextind,
 					  GENERATE_REAL_NEXTIND,
@@ -918,6 +920,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
       if (k < not_fixed_num){
 	 next_not_fixed = not_fixed[k];
 	 if (nextind == -1 || nextind > next_not_fixed){
+	    /* FIXME: Catch the error message for this function */
 	    curind = generate_column_u(p, cutnum, cuts,
 				       prevind, next_not_fixed,
 				       GENERATE_NEXTIND, colval, colind,
@@ -929,6 +932,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
 	    curind = nextind;
 	 }
       }else{ /* no we know that NF_CHECK_AFTER_LAST */
+	 /* FIXME: Catch the error message for this function */
 	 curind = generate_column_u(p, cutnum, cuts,
 				    prevind, nextind, GENERATE_REAL_NEXTIND,
 				    colval, colind, &collen, &obj, &lb, &ub);

@@ -16,6 +16,13 @@
 
 /*===========================================================================*/
 
+#define CALL_FUNCTION(f)
+if ((termcode = f) < 0){                                                    \
+   printf("Error detected: termcode = %i\n", termcode);                     \
+   printf("Exiting...\n\n");                                                \
+   exit(termcode);                                                          \
+}
+
 /*===========================================================================*\
  * This file contains the main() for the master process.
 \*===========================================================================*/
@@ -51,15 +58,20 @@ int main(int argc, char **argv)
 {
    problem *p = sym_open_environment();
 
-   sym_parse_command_line(p, argc, argv);
+   if (!p){
+      printf("Error initializing environement\n");
+      exit(0);
+   }
+   
+   CALL_FUNCTION( sym_parse_command_line(p, argc, argv) );
 
-   sym_load_problem(p);
+   CALL_FUNCTION( sym_load_problem(p) );
 
-   sym_find_initial_bounds(p);
+   CALL_FUNCTION( sym_find_initial_bounds(p) );
 
-   sym_solve(p);
+   CALL_FUNCTION( sym_solve(p) );
 
-   sym_close_environment(p);
+   CALL_FUNCTION( sym_close_environment(p) );
 
    return(0);
 }

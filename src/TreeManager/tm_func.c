@@ -50,7 +50,7 @@
  * the tree manager data structures, etc.
 \*===========================================================================*/
 
-void tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
+int tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
 {
 #ifndef COMPILE_IN_TM
    int r_bufid, bytes, msgtag, i;
@@ -69,7 +69,8 @@ void tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
 #endif
    int s_bufid;
 #endif
-
+   int termcode = 0;
+   
    par = &tm->par;
 
 #ifdef _OPENMP
@@ -150,7 +151,10 @@ void tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
 #endif
 #pragma omp parallel for shared(tm)
    for (i = 0; i < par->max_active_nodes; i++){
-      lp_initialize(tm->lpp[i], 0);
+      if ((termcode = lp_initialize(tm->lpp[i], 0)) < 0){
+	 printf("LP initialization failed with error code %i\n\n", termcode);
+	 return(termcode);
+      }
       tm->lpp[i]->tm = tm;
    }
    tm->lp.free_num = par->max_active_nodes;
@@ -232,7 +236,7 @@ void tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
       if (!(f = fopen(tm->par.warm_start_tree_file_name, "r"))){
 	 printf("Error reading warm start file %s\n\n",
 		tm->par.warm_start_tree_file_name);
-	 exit(115);
+	 return(ERROR__READING_WARM_START_FILE);
       }
       read_tm_info(tm, NULL, f);
       read_subtree(tm, root, NULL, f);
@@ -240,7 +244,7 @@ void tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
       if (!read_tm_cut_list(tm, tm->par.warm_start_cut_file_name)){
 	 printf("Error reading warm start file %s\n\n",
 		tm->par.warm_start_cut_file_name);
-	 exit(116);
+	 return(ERROR__READING_WARM_START_FILE);
       }
       tm->rootnode = root;
       root->node_status = NODE_STATUS__ROOT;
@@ -268,6 +272,8 @@ void tm_initialize(tm_prob *tm, base_desc *base, node_desc *root_desc)
       root->optimal_path = TRUE;
 #endif
    }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
    
 /*===========================================================================*/
@@ -297,8 +303,12 @@ int solve(tm_prob *tm)
 
    termcode = TM_FINISHED;
    for (; tm->phase <= 1; tm->phase++){
-      if (tm->phase == 1 && !tm->par.warm_start)
-	 tasks_before_phase_two(tm);
+      if (tm->phase == 1 && !tm->par.warm_start){
+	 if ((termcode = tasks_before_phase_two(tm)) ==
+	     FUNCTION_TERMINATED_NORMALLY){
+	    termcode = TM_FINISHED; /* Continue normally */
+	 }
+      }
       then  = wall_clock(NULL);
       then2 = wall_clock(NULL);
       then3 = wall_clock(NULL);
@@ -347,9 +357,30 @@ int solve(tm_prob *tm)
 	       printf("Thread %i now processing node %i\n", thread_num,
 		      tm->lpp[thread_num]->bc_index);
 #endif
-	    if (!process_chain(tm->lpp[thread_num])){
-	       printf("\nError setting up node -- exiting\n\n");
-	       exit(-1);
+	    switch(process_chain(tm->lpp[thread_num])){
+
+	    case FUNCTION_TERMINATED_NORMALLY:
+	       break;
+	       
+	    case ERROR__NO_BRANCHING_CANDIDATE:
+	       termcode = TM_ERROR__NO_BRANCHING_CANDIDATE;
+	       break;
+	       
+	    case ERROR__ILLEGAL_RETURN_CODE:
+	       termcode = TM_ERROR__ILLEGAL_RETURN_CODE;
+	       break;
+
+	    case ERROR__NUMERICAL_INSTABILITY:
+	       termcode = TM_ERROR__NUMERICAL_INSTABILITY;
+	       break;
+
+	    case ERROR__COMM_ERROR:
+	       termcode = TM_ERROR__COMM_ERROR;
+
+	    case ERROR__USER:
+	       termcode = TM_ERROR__USER;
+	       break;
+	       
 	    }
 #endif
 #pragma omp master
@@ -371,7 +402,7 @@ int solve(tm_prob *tm)
 	       if (tm->samephase_cand[i]->lower_bound < tm->lb)
 		  tm->lb = tm->samephase_cand[i]->lower_bound;
 	    }
-	    termcode = TIME_LIMIT_EXCEEDED;
+	    termcode = TM_TIME_LIMIT_EXCEEDED;
 	    break;
 	 }
 	 if (i == NEW_NODE__ERROR){
@@ -1736,7 +1767,7 @@ void modify_list_and_stat(array_desc *origad, int *origstat,
  * - inform everyone about it
 \*===========================================================================*/
 
-void tasks_before_phase_two(tm_prob *tm)
+int tasks_before_phase_two(tm_prob *tm)
 {
 #if !defined(COMPILE_IN_TM)||(defined(COMPILE_IN_TM)&&!defined(COMPILE_IN_LP))
    int s_bufid;
@@ -1748,6 +1779,7 @@ void tasks_before_phase_two(tm_prob *tm)
 #endif
    int i;
    bc_node *n;
+   int termcode = 0;
 
 #ifdef COMPILE_IN_LP
 #ifdef _OPENMP
@@ -1807,13 +1839,31 @@ void tasks_before_phase_two(tm_prob *tm)
    }
    tm->stat.leaves_after_trimming = tm->samephase_candnum;
 
-   receive_lp_timing(tm);
+   if ((termcode = receive_lp_timing(tm)) < 0)
+      return(SOMETHING_DIED);
 
    if (tm->par.price_in_root && tm->has_ub){
       /* receive what the LP has to say, what is the new not_fixed list.
        * also, incorporate that list into the not_fixed field of everything */
 #ifdef COMPILE_IN_LP
-      process_chain(tm->lpp[0]);
+      switch(process_chain(tm->lpp[0])){
+	 
+      case FUNCTION_TERMINATED_NORMALLY:
+	 break;
+	 
+      case ERROR__NO_BRANCHING_CANDIDATE:
+	 return(TM_ERROR__NO_BRANCHING_CANDIDATE);
+	 
+      case ERROR__ILLEGAL_RETURN_CODE:
+	 return(TM_ERROR__ILLEGAL_RETURN_CODE);
+	 
+      case ERROR__NUMERICAL_INSTABILITY:
+	 return(TM_ERROR__NUMERICAL_INSTABILITY);
+	 
+      case ERROR__USER:
+	 return(TM_ERROR__USER);
+	 
+      }
 #else
       char go_on;
       int nsize, nf_status;
@@ -1831,7 +1881,7 @@ void tasks_before_phase_two(tm_prob *tm)
 	       free_subtree(tm->rootnode);
 	       tm->rootnode = n;
 	       tm->samephase_candnum = tm->nextphase_candnum = 0;
-	       return;
+	       return (FUNCTION_TERMINATED_NORMALLY);
 	    }
 	    /* Otherwise in 'n' we have the new description of the root node.
 	       We don't care about the cuts, just the not fixed variables.
@@ -1917,7 +1967,7 @@ void tasks_before_phase_two(tm_prob *tm)
 	       }
 	       free_tree_node(n);
 	       tm->samephase_candnum = tm->nextphase_candnum = 0;
-	       return;
+	       return(FUNCTION_TERMINATED_NORMALLY);
 	    }else{
 	       tm->rootnode->desc.not_fixed.list = n->desc.not_fixed.list;
 	       n->desc.not_fixed.list = NULL;
@@ -1949,7 +1999,7 @@ void tasks_before_phase_two(tm_prob *tm)
 
 	  default: /* We shouldn't get anything else */
 	    printf("Unexpected message at repricing! (%i)\n\n", msgtag);
-	    exit(-11);
+	    return(ERROR__COMM_ERROR);
 	 }
       }while (go_on);
 #endif
@@ -1976,6 +2026,8 @@ void tasks_before_phase_two(tm_prob *tm)
 #endif
    
    tm->nextphase_candnum = 0;
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -2876,7 +2928,9 @@ int tm_close(tm_prob *tm, int termcode)
 #endif
    /* Receive timing from the LPs */
 
-   receive_lp_timing(tm);
+   if (receive_lp_timing(tm) < 0){
+      printf("Warning: problem receiving LP timing. LP process is dead\n\n");
+   }
    
 #ifdef COMPILE_IN_LP
    for (i = 0; i < tm->par.max_active_nodes; i ++){

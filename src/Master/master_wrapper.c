@@ -35,16 +35,18 @@
  * This file contains the wrapper functions for the master process.
 \*===========================================================================*/
 
-void initialize_u(problem *p)
+int initialize_u(problem *p)
 {
    sym_set_defaults(p);
    
    CALL_USER_FUNCTION( user_initialize(&p->user) );
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void readparams_u(problem *p, int argc, char **argv)
+int readparams_u(problem *p, int argc, char **argv)
 {
    int i;
    char tmp, c, foundF, foundD;
@@ -86,16 +88,18 @@ void readparams_u(problem *p, int argc, char **argv)
     case USER_ERROR:
       
       printf("\n\n*********User error detected -- aborting***********\n\n");
-      exit(1000);
+      return(ERROR__USER);
 
     default:
       break;	 	       
    }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void io_u(problem *p)
+int io_u(problem *p)
 {
    int err;
 
@@ -117,7 +121,7 @@ void io_u(problem *p)
 			 p->par.datafile, p->probname);
 	 if(!err){
 	    printf("\nErrors in reading gmpl file\n");
-	    exit(1000);
+	    return (ERROR__READING_GMPL_FILE);
 	 }
 #else
 	 printf("ERROR: SYMPHONY can only read GMPL/AMPL files if GLPK is \n");
@@ -131,7 +135,7 @@ void io_u(problem *p)
     case USER_ERROR:
 
       printf("\n\n*********User error detected -- aborting***********\n\n");
-      exit(1000);
+      return(ERROR__USER);
       break;
 
     case USER_SUCCESS:
@@ -141,11 +145,13 @@ void io_u(problem *p)
 
       break;
    }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void init_draw_graph_u(problem *p)
+int init_draw_graph_u(problem *p)
 {
    if (p->par.do_draw_graph){ /*start up the graphics window*/
       int s_bufid;
@@ -164,11 +170,13 @@ void init_draw_graph_u(problem *p)
       if (p->dg_tid)
 	 CALL_USER_FUNCTION( user_init_draw_graph(p->user, p->dg_tid) );
    }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void start_heurs_u(problem *p)
+int start_heurs_u(problem *p)
 {
    double ub = p->has_ub ? p->ub : -MAXDOUBLE;
    double ub_estimate = p->has_ub_estimate ? p->ub_estimate : -MAXDOUBLE;
@@ -204,11 +212,13 @@ void start_heurs_u(problem *p)
    }else if (p->par.tm_par.vbc_emulation == VBC_EMULATION_LIVE){
       printf("$U %.2f\n", p->ub);
    }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void initialize_root_node_u(problem *p)
+int initialize_root_node_u(problem *p)
 {
    int i;
 
@@ -223,7 +233,7 @@ void initialize_root_node_u(problem *p)
     case USER_ERROR:
       
       printf("\n\n*********User error detected -- aborting***********\n\n");
-      exit(1000);
+      return(ERROR__USER);
 
     case USER_SUCCESS:
     case USER_NO_PP:
@@ -290,7 +300,7 @@ void initialize_root_node_u(problem *p)
    if (p->par.warm_start){
       root->uind.size = 0;
       FREE(root->uind.list);
-      return;
+      return(FUNCTION_TERMINATED_NORMALLY);
    }
    
    root->uind.type = EXPLICIT_LIST;
@@ -301,13 +311,12 @@ void initialize_root_node_u(problem *p)
    root->nf_status = (p->par.tm_par.colgen_strat[0] & COLGEN__FATHOM) ?
                       NF_CHECK_ALL : NF_CHECK_NOTHING;
 
-
-   return;
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void receive_feasible_solution_u(problem *p, int msgtag)
+int receive_feasible_solution_u(problem *p, int msgtag)
 {
    receive_int_array(&(p->best_sol.xlevel), 1);
    receive_int_array(&(p->best_sol.xindex), 1);
@@ -342,11 +351,13 @@ void receive_feasible_solution_u(problem *p, int msgtag)
 							 p->best_sol.xval) );
       break;
    }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void send_lp_data_u(problem *p, int sender)
+int send_lp_data_u(problem *p, int sender)
 {
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    int i;
@@ -431,11 +442,13 @@ void send_lp_data_u(problem *p, int sender)
    send_msg(sender, LP_DATA);
    freebuf(s_bufid);
 #endif
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void send_cg_data_u(problem *p, int sender)
+int send_cg_data_u(problem *p, int sender)
 {
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP) && defined(COMPILE_IN_CG)
    int i;
@@ -464,11 +477,13 @@ void send_cg_data_u(problem *p, int sender)
    send_msg(sender, CG_DATA);
    freebuf(s_bufid);
 #endif
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void send_cp_data_u(problem *p, int sender)
+int send_cp_data_u(problem *p, int sender)
 {
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP)
    int i;
@@ -491,12 +506,14 @@ void send_cp_data_u(problem *p, int sender)
    send_msg(sender, CP_DATA);
    freebuf(s_bufid);
 #endif
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 /*===========================================================================*/
 
-void send_sp_data_u(problem *p, int sender)
+int send_sp_data_u(problem *p, int sender)
 {
 #ifdef COMPILE_DECOMP
    int s_bufid;
@@ -507,12 +524,14 @@ void send_sp_data_u(problem *p, int sender)
    send_msg(sender, SP_DATA);
    freebuf(s_bufid);
 #endif
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 
-void display_solution_u(problem *p, int thread_num)
+int display_solution_u(problem *p, int thread_num)
 {
    int user_res, i;
    lp_sol sol;
@@ -529,7 +548,7 @@ void display_solution_u(problem *p, int thread_num)
    
    if (!sol.xlength){
       printf("\nNo Solution Found\n\n");
-      return;
+      return(FUNCTION_TERMINATED_NORMALLY);
    }
 
    printf("\nSolution Found: Node %i, Level %i\n", sol.xindex, sol.xlevel);
@@ -541,7 +560,7 @@ void display_solution_u(problem *p, int thread_num)
    
    switch(user_res){
     case USER_SUCCESS:
-      return;
+      return(FUNCTION_TERMINATED_NORMALLY);
     case USER_DEFAULT:
       if (sol.xlength){
 	 if (p->mip->colname){ 
@@ -562,26 +581,30 @@ void display_solution_u(problem *p, int thread_num)
 	    }
 	    printf("\n");
 	 }
-	 return;
+	 return(FUNCTION_TERMINATED_NORMALLY);
       }
     case USER_ERROR:
-      return;
+      return(FUNCTION_TERMINATED_NORMALLY);
       
     default:
-      return;
+      return(FUNCTION_TERMINATED_NORMALLY);
    }
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void process_own_messages_u(problem *p, int msgtag)
+int process_own_messages_u(problem *p, int msgtag)
 {
    CALL_USER_FUNCTION( user_process_own_messages(p->user, msgtag) );
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
 
-void free_master_u(problem *p)
+int free_master_u(problem *p)
 {
    CALL_USER_FUNCTION( user_free_master(&p->user) );
 
@@ -603,6 +626,7 @@ void free_master_u(problem *p)
       FREE(p->base);
    }
    
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/

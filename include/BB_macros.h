@@ -153,11 +153,17 @@ if (newad.size > 0){                                                       \
 switch (f){                                                                \
  case USER_ERROR:                                                          \
    printf("\n\n*********User error detected -- aborting***********\n\n");  \
-   exit(1000);                                                             \
+   return(ERROR__USER);                                                    \
  default:                                                                  \
    break;                                                                  \
 }
    
+/*------------- Macro for calling wrapper functions -------------------------*/
+
+#define CALL_WRAPPER_FUNCTION(f)                                           \
+if ((termcode = f) < 0)                                                    \
+   return(termcode);
+
 /*---------------------- Standard macros ------------------------------------*/
 
 #ifdef FREE

@@ -65,7 +65,7 @@ lp_prob *get_lp_ptr(lp_prob **lp_list)
  * and intitializes the data structures.                                     
 \*===========================================================================*/
 
-void lp_initialize(lp_prob *p, int master_tid)
+int lp_initialize(lp_prob *p, int master_tid)
 {
 #ifndef COMPILE_IN_LP
    int msgtag, bytes, r_bufid;
@@ -76,6 +76,7 @@ void lp_initialize(lp_prob *p, int master_tid)
    int i;
    row_data *rows;
    var_desc **vars;
+   int termcode = 0;
 
 #ifdef COMPILE_IN_LP
 
@@ -123,7 +124,7 @@ void lp_initialize(lp_prob *p, int master_tid)
    send_msg(p->master, REQUEST_FOR_LP_DATA);
    freebuf(s_bufid);
 
-   receive_lp_data_u(p);
+   CALL_WRAPPER_FUNCTION( receive_lp_data_u(p) );
 #endif
    
    if (p->par.tailoff_gap_backsteps > 0 ||
@@ -175,6 +176,8 @@ void lp_initialize(lp_prob *p, int master_tid)
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
 #endif
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }   
 
 /*===========================================================================*/
@@ -186,10 +189,12 @@ void lp_initialize(lp_prob *p, int master_tid)
 
 int process_chain(lp_prob *p)
 {
+   int termcode;
+   
    /* Create the LP */
-   if (! create_subproblem_u(p)){
+   if ((termcode = create_subproblem_u(p)) < 0){
       /* User had problems creating initial LP. Abandon node. */
-      return(FALSE);
+      return(termcode);
    }
 
    p->last_gap = 0.0;
@@ -203,7 +208,7 @@ int process_chain(lp_prob *p)
 		p->bc_index, p->bc_level);
 	 printf("****************************************************\n\n");
       }
-      repricing(p);
+      termcode = repricing(p);
       free_node_dependent(p);
    }else{
       if (p->par.verbosity > 0){
@@ -213,7 +218,7 @@ int process_chain(lp_prob *p)
 	 printf("****************************************************\n\n");
 	 PRINT(p->par.verbosity, 4, ("Diving set to %i\n\n", p->dive));
       }
-      fathom_branch(p);
+      termcode = fathom_branch(p);
 
 #ifdef COMPILE_IN_LP
       p->tm->stat.chains++;
@@ -228,7 +233,7 @@ int process_chain(lp_prob *p)
 
    p->comp_times.lp += used_time(&p->tt);
 
-   return(TRUE);
+   return(termcode);
 }
 
 /*===========================================================================*/
@@ -240,7 +245,7 @@ int process_chain(lp_prob *p)
  * is pruned at point                                                        *
 \*===========================================================================*/
 
-void fathom_branch(lp_prob *p)
+int fathom_branch(lp_prob *p)
 {
    LPdata *lp_data = p->lp_data;
    node_times *comp_times = &p->comp_times;
@@ -248,6 +253,7 @@ void fathom_branch(lp_prob *p)
    int iterd, termcode, i;
    int cuts, no_more_cuts_count;
    int num_errors = 0;
+   int cut_term = 0;
 
    check_ub(p);
    p->iter_num = p->node_iter_num = 0;
@@ -304,7 +310,7 @@ void fathom_branch(lp_prob *p)
 		   "######## Dumping current LP to MPS file and exiting.\n\n");
 	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
 	    write_mps(lp_data, name);
-	    exit(-3);
+	    return(ERROR__NUMERICAL_INSTABILITY);
 	 }
 
        case LP_D_UNBOUNDED: /* the primal problem is infeasible */
@@ -330,7 +336,7 @@ void fathom_branch(lp_prob *p)
 	 comp_times->lp += used_time(&p->tt);
 	 if (fathom(p, (termcode != LP_D_UNBOUNDED))){
 	    comp_times->communication += used_time(&p->tt);
-	    return;
+	    return(FUNCTION_TERMINATED_NORMALLY);
 	 }else{
 	    first_in_loop = FALSE;
 	    comp_times->communication += used_time(&p->tt);
@@ -381,13 +387,17 @@ void fathom_branch(lp_prob *p)
 	  * receive the cuts from the cut generator and the cut pool
 	 \*------------------------------------------------------------------*/
 
-	 cuts += receive_cuts(p, first_in_loop, no_more_cuts_count);
+	 if ((cut_term = receive_cuts(p, first_in_loop, no_more_cuts_count))>=0){
+	    cuts += cut_term;
+	 }else{
+	    return(ERROR__USER);
+	 }
       }
 
       comp_times->lp += used_time(&p->tt);
       if (cuts < 0){ /* i.e. feasible solution is found */
 	 if (fathom(p, TRUE)){
-	    return;
+	    return(FUNCTION_TERMINATED_NORMALLY);
 	 }else{
 	    first_in_loop = FALSE;
 	    check_ub(p);
@@ -425,8 +435,11 @@ void fathom_branch(lp_prob *p)
 #endif
        case FATHOMED_NODE:
 	 comp_times->strong_branching += used_time(&p->tt);
-	 return;
+	 return(FUNCTION_TERMINATED_NORMALLY);
 
+       case ERROR__NO_BRANCHING_CANDIDATE: /* Something went wrong */
+	 return(ERROR__NO_BRANCHING_CANDIDATE);
+	 
        default: /* the return value is the number of cuts added */
 	 if (p->par.verbosity > 2){
 	    printf("Continue with this node.");
@@ -443,6 +456,8 @@ void fathom_branch(lp_prob *p)
       first_in_loop = FALSE;
    }
    comp_times->lp += used_time(&p->tt);
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -574,7 +589,7 @@ int fathom(lp_prob *p, int primal_feasible)
 /*****************************************************************************/
 /*****************************************************************************/
 
-void repricing(lp_prob *p)
+int repricing(lp_prob *p)
 {
    LPdata *lp_data = p->lp_data;
    node_times *comp_times = &p->comp_times;
@@ -582,7 +597,8 @@ void repricing(lp_prob *p)
    int num_errors = 0;
    our_col_set *new_cols = NULL;
    int dual_feas, new_vars, cuts, no_more_cuts_count;
-
+   int cut_term = 0;
+   
    check_ub(p);
    p->iter_num = 0;
   
@@ -612,12 +628,22 @@ void repricing(lp_prob *p)
        case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
        case LP_ABANDONED:
-	 printf("######## Unexpected termcode: %i ########\n\n", termcode);
+	 printf("######## Unexpected termcode: %i \n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
+	    printf("######## Trying to recover by resolving from scratch...\n",
+		   termcode);
+	    
 	    continue;
+	 }else{
+	    char name[50] = "";
+	    printf("######## Recovery failed. %s%s",
+		   "LP solver is having numerical difficulties :(.\n",
+		   "######## Dumping current LP to MPS file and exiting.\n\n");
+	    sprintf(name, "matrix.%i.%i.mps", p->bc_index, p->iter_num);
+	    write_mps(lp_data, name);
+	    return(ERROR__NUMERICAL_INSTABILITY);
 	 }
-	 exit(-2);
 
        case LP_D_UNBOUNDED: /* the primal problem is infeasible */
        case LP_D_OBJLIM:
@@ -633,7 +659,7 @@ void repricing(lp_prob *p)
 	 comp_times->lp += used_time(&p->tt);
 	 if (fathom(p, (termcode != LP_D_UNBOUNDED))){
 	    comp_times->communication += used_time(&p->tt);
-	    return;
+	    return(FUNCTION_TERMINATED_NORMALLY);
 	 }else{
 	    comp_times->communication += used_time(&p->tt);
 	    continue;
@@ -685,14 +711,18 @@ void repricing(lp_prob *p)
 	  * receive the cuts from the cut generator and the cut pool
 	 \*------------------------------------------------------------------*/
 
-	 cuts += receive_cuts(p, TRUE, no_more_cuts_count);
+	 if ((cut_term = receive_cuts(p, TRUE, no_more_cuts_count)) >= 0){
+	    cuts += cut_term;
+	 }else{
+	    return(ERROR__USER);
+	 }
       }
 
       comp_times->lp += used_time(&p->tt);
       if (cuts < 0){ /* i.e. feasible solution is found */
 	 if (fathom(p, TRUE)){
 	    comp_times->communication += used_time(&p->tt);
-	    return;
+	    return(FUNCTION_TERMINATED_NORMALLY);
 	 }else{
 	    comp_times->communication += used_time(&p->tt);
 	    check_ub(p);
@@ -732,6 +762,8 @@ void repricing(lp_prob *p)
    comp_times->lp += used_time(&p->tt);
    send_node_desc(p, REPRICED_NODE);
    comp_times->communication += used_time(&p->tt);
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/

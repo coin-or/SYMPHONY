@@ -26,11 +26,11 @@
 /*===========================================================================*/
 
 problem *sym_open_environment PROTO((void));
-void sym_set_defaults PROTO((problem *p));
-void sym_parse_command_line PROTO((problem *p, int argc, char **argv));
-void sym_load_problem PROTO((problem *p));
-void sym_find_initial_bounds PROTO((problem *p));
-void sym_solve PROTO((problem *p));
-void sym_close_environment PROTO((problem *p));
+int sym_set_defaults PROTO((problem *p));
+int sym_parse_command_line PROTO((problem *p, int argc, char **argv));
+int sym_load_problem PROTO((problem *p));
+int sym_find_initial_bounds PROTO((problem *p));
+int sym_solve PROTO((problem *p));
+int sym_close_environment PROTO((problem *p));
 
 #endif

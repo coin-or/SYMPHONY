@@ -44,15 +44,16 @@ int main(void)
 
    tm = (tm_prob *) calloc(1, sizeof(tm_prob));
    
-   tm_initialize(tm, NULL, NULL);
+   if ((termcode = tm_initialize(tm, NULL, NULL)) == 0){
+      
+      tm->start_time = wall_clock(NULL);
    
-   tm->start_time = wall_clock(NULL);
-   
-   termcode = tm_close(tm, solve(tm));
+      termcode = tm_close(tm, solve(tm));
+   }
 
    comm_exit();
 
-   return(termcode);
+   exit(termcode);
 }
 
 #endif

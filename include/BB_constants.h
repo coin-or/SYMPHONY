@@ -17,6 +17,8 @@
 
 #define BB_BUNCH 127 * sizeof(double)
 
+#include "return_values.h"
+
 /*****************************************************************************
  *****************************************************************************
  *************                                                      **********
@@ -305,8 +307,11 @@
 #define DO_NOT_BRANCH__FATHOMED     2
 
 /*---------------- possible return values of branch() -----------------------*/
-#define FATHOMED_NODE              -2
-#define NEW_NODE                   -1
+#define NEW_NODE                     -1
+#define FATHOMED_NODE                -2
+
+/*------------- normal return value of various functions --------------------*/
+
 /*---------------------------------------------------------------------------*\
  * anything non-negative means continue the node and the value is the
  * number of cuts added. if there were vars added then that fact has already
@@ -316,7 +321,6 @@
 /*----------------------- discard_slack_cuts --------------------------------*/
 #define DISCARD_SLACKS_BEFORE_NEW_ITERATION   0
 #define DISCARD_SLACKS_WHEN_STARTING_NEW_NODE 1
-
 
 /*---------------- What is the solution to be displayed ---------------------*/
 #define DISP_FEAS_SOLUTION          0

@@ -310,6 +310,7 @@ int receive_cuts(lp_prob *p, int first_lp, int no_more_cuts_count)
    struct timeval tvtimeout, *ptimeout;
    int added_rows, old_waiting_row_num;
    int bc_index, itnum;
+   int termcode = 0;
 
    PRINT(p->par.verbosity, 3, ("Receiving/creating cuts...\n"));
 
@@ -365,7 +366,7 @@ int receive_cuts(lp_prob *p, int first_lp, int no_more_cuts_count)
     * generated these cuts, she must have tested whether the violation is
     * positive, i.e., she must knew the violations.) Also, the generated cuts
     * are added to the list of waiting rows. */
-   generate_cuts_in_lp_u(p);
+   CALL_WRAPPER_FUNCTION( generate_cuts_in_lp_u(p) );
    p->comp_times.separation += used_time(&p->tt);
    if (no_more_cuts_count > 0){
       /* Receive cuts if we have sent out the lp solution somewhere. */

@@ -79,7 +79,8 @@ int main(void)
       if (p->msgtag == LP_SOLUTION_NONZEROS || p->msgtag == LP_SOLUTION_USER ||
 	  p->msgtag == LP_SOLUTION_FRACTIONS){
 	 if (p->par.do_findcuts)
-	    find_cuts_u(p, NULL, &num_cuts);
+	    if ((termcode = find_cuts_u(p, NULL, &num_cuts)) < 0)
+	       printf("Warning: User error detected in cut generator\n\n");
 	 /*-- send signal back to the LP that the cut generator is done -----*/
 	 s_bufid = init_send(DataInPlace);
 	 send_int_array(&num_cuts, 1);

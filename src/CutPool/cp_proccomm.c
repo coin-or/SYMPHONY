@@ -39,7 +39,8 @@ void cp_process_message(cut_pool *cp, int r_bufid)
    cp_cut_data *cp_cut;
    double tt= 0;
    static struct timeval tout = {10, 0};
-
+   int termcode = 0;
+   
    bufinfo(r_bufid, &bytes, &cp->msgtag, &cp->cur_sol.lp);
 
    switch (cp->msgtag){
@@ -49,7 +50,9 @@ void cp_process_message(cut_pool *cp, int r_bufid)
       receive_int_array(&cp->cur_sol.xindex, 1);
       receive_int_array(&cp->cur_sol.xiter_num, 1);
       receive_dbl_array(&cp->cur_sol.lpetol, 1);
-      receive_lp_solution_cp_u(cp);
+      if ((termcode = receive_lp_solution_cp_u(cp)) < 0){
+	 printf("Warning: User error detected in cut pool\n\n");
+      }
       break;
 
     case LP_SOLUTION_NONZEROS:

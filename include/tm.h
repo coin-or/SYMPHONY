@@ -159,8 +159,8 @@ typedef struct TM_PROB{
 /*==================== TM basic functions (tm_func.c) =======================*/
 /*===========================================================================*/
 
-void tm_initialize PROTO((tm_prob *tm, base_desc *base,
-			      node_desc *root_desc));
+int tm_initialize PROTO((tm_prob *tm, base_desc *base,
+			 node_desc *root_desc));
 int solve PROTO((tm_prob *tm));
 void print_tree_status PROTO((tm_prob *tm));
 int start_node PROTO((tm_prob *tm, int thread_num));
@@ -196,7 +196,7 @@ void modify_list_and_stat PROTO((array_desc *origad, int *origstat,
 
 /*--------------- Functions related to two-phase algorithm ------------------*/
 
-void tasks_before_phase_two PROTO((tm_prob *tm));
+int tasks_before_phase_two PROTO((tm_prob *tm));
 int trim_subtree PROTO((tm_prob *tm, bc_node *n));
 int mark_subtree PROTO((tm_prob *tm, bc_node *n));
 void propagate_nf_status PROTO((bc_node *n, int nf_status));
@@ -243,6 +243,6 @@ char process_messages PROTO((tm_prob *tm, int r_bufid));
 void process_ub_message PROTO((tm_prob *tm));
 void unpack_cut_set PROTO((tm_prob *tm, int sender, int cutnum,
 			   row_data *rows));
-void receive_lp_timing PROTO((tm_prob *tm));
+int receive_lp_timing PROTO((tm_prob *tm));
 
 #endif
