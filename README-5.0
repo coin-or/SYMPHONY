@@ -594,16 +594,17 @@ that fixes the problem.
 
 LIST SERVE
 
-There is a list serve for SYMPHONY users. To subscribe, send a message
-containing "subscribe symphony-users" to majordomo@branchandcut.org.
+There is a list serve for SYMPHONY users. To subscribe, go to 
+http://list.coin-or.org/mailman/listinfo/coin-symphony 
 
 AUTHORS
 
 SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and Laci
 Ladanyi (ladanyi@us.ibm.com). Menal Guzelsoy (megb@lehigh.edu) helped with
-development, documentation, and debugging of SYMPHONY 4.0 and 5.0, and wrote the OSI interfae for SYMPHONY 5.0.
+development, documentation, and debugging of SYMPHONY 4.0 and 5.0, and wrote 
+the OSI interfae for SYMPHONY 5.0. 
 
 BUG REPORTS
 
-Bug reports should be sent to symphony-bugs@branchandcut.org.
+Bug reports should be posted to the SYMPHONY mailing list (see above).
 
