@@ -146,8 +146,8 @@ int cg_send_cut(cut_data *new_cut, int *num_cuts, int *alloc_cuts,
       memcpy((char *)tmp_cut->coef, (char *)new_cut->coef,
 	     new_cut->size * sizeof(char));
    }
-   REALLOC(*cuts, cut_data *, *alloc_cuts, *num_cuts + 1, BB_BUNCH);
-   (*cuts)[*num_cuts++] = tmp_cut;
+   REALLOC((*cuts), cut_data *, (*alloc_cuts), (*num_cuts + 1), BB_BUNCH);
+   (*cuts)[(*num_cuts)++] = tmp_cut;
    
 #else
 
@@ -244,8 +244,8 @@ int cg_add_user_cut(cut_data *new_cut, int *num_cuts, int *alloc_cuts,
       memcpy((char *)tmp_cut->coef, (char *)new_cut->coef,
 	     new_cut->size * sizeof(char));
    }
-   REALLOC(*cuts, cut_data *, *alloc_cuts, *num_cuts + 1, BB_BUNCH);
-   (*cuts)[*num_cuts++] = tmp_cut;
+   REALLOC((*cuts), cut_data *, (*alloc_cuts), (*num_cuts + 1), BB_BUNCH);
+   (*cuts)[(*num_cuts)++] = tmp_cut;
 
 #else
 

@@ -32,6 +32,7 @@ int sym_parse_command_line PROTO((problem *p, int argc, char **argv));
 int sym_load_problem PROTO((problem *p));
 int sym_find_initial_bounds PROTO((problem *p));
 int sym_solve PROTO((problem *p));
+int sym_mc_solve PROTO((problem *p));
 int sym_create_permanent_cut_pools PROTO((problem *p));
 int sym_close_environment PROTO((problem *p));
 

@@ -63,6 +63,9 @@ public:
 
     /// Invoke solver's built-in enumeration algorithm
     virtual void branchAndBound();
+
+    /// Invoke solver's multi-criteria enumeration algorithm
+    virtual void MCBranchAndBound();
   //@}
 
   //---------------------------------------------------------------------------
@@ -412,6 +415,9 @@ public:
     //@{
       /** Set an objective function coefficient */
    virtual void setObjCoeff( int elementIndex, double elementValue );
+
+      /** Set an objective function coefficient for the second objective */
+   virtual void setObj2Coeff( int elementIndex, double elementValue );
 
       /** Set a single column lower bound.
     	  Use -getInfinity() for -infinity. */

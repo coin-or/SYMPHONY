@@ -51,6 +51,16 @@ void OsiSymSolverInterface::branchAndBound()
 /*===========================================================================*/
 /*===========================================================================*/
 
+void OsiSymSolverInterface::MCBranchAndBound()
+{
+
+   sym_mc_solve(env_);
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 OsiSymSolverInterface::~OsiSymSolverInterface()
 {
 
@@ -1111,6 +1121,20 @@ void OsiSymSolverInterface::setObjCoeff( int elementIndex,
 
    env_->mip->obj[elementIndex] = elementValue;
    //   env_->desc_modification = OBJ_COEF_CHANGED;
+
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void OsiSymSolverInterface::setObj2Coeff( int elementIndex, 
+					 double elementValue )
+{
+
+   assert(env_->mip);
+
+   env_->mip->obj2[elementIndex] = elementValue;
+   //   env_->desc_modification = OBJ2_COEF_CHANGED;
 
 }
 

@@ -101,6 +101,7 @@ typedef struct LP_PROB{
 #ifdef MULTI_CRITERIA
    double        obj[2];
    double        utopia[2];
+   char          has_mc_ub;
    double        mc_ub;
 #endif
    

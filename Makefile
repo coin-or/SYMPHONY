@@ -948,6 +948,22 @@ qall :
 
 #include $(USERROOT)/Makefile
 
+ifeq ($(MULTI_CRITERIA),TRUE)
+USER_BB_DEFINES += -DMULTI_CRITERIA
+endif
+
+ifeq ($(LIFO),TRUE)
+USER_BB_DEFINES += -DLIFO
+endif
+
+ifeq ($(FIND_NONDOMINATED_SOLUTIONS),TRUE)
+USER_BB_DEFINES += -DFIND_NONDOMINATED_SOLUTIONS
+endif
+
+ifeq ($(BINARY_SEARCH),TRUE)
+USER_BB_DEFINES += -DBINARY_SEARCH
+endif
+
 ##############################################################################
 ##############################################################################
 # Master

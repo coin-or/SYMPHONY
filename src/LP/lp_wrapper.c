@@ -65,6 +65,16 @@ int receive_lp_data_u(lp_prob *p)
    }else{
       p->ub = - (MAXDOUBLE / 2);
    }
+#ifdef MULTI_CRITERIA
+   receive_char_array(&p->has_mc_ub, 1);
+   if (p->has_mc_ub){
+      receive_dbl_array(&p->mc_ub, 1);
+      receive_dbl_array(p->obj, 2);
+   }else{
+      p->mc_ub = - (MAXDOUBLE / 2);
+   }
+   receive_dbl_array(p->utopia, 2);
+#endif
    receive_int_array(&p->draw_graph, 1);
    receive_int_array(&p->base.varnum, 1);
    if (p->base.varnum > 0){
@@ -154,7 +164,7 @@ int create_subproblem_u(lp_prob *p)
    node_desc *desc = p->desc;
 
    LPdata *lp_data = p->lp_data;
-   int i, j, maxm, maxn, maxnz;
+   int i, j, k, maxm, maxn, maxnz;
    row_data *row, *rows;
 
    int bvarnum = p->base.varnum;
@@ -178,8 +188,11 @@ int create_subproblem_u(lp_prob *p)
    char *is_int;
 
    lp_data->n = bvarnum + desc->uind.size;
-   lp_data->m = p->base.cutnum + desc->cutind.size;
-
+   lp_data->m = bcutnum + desc->cutind.size;
+#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
+   lp_data->n += 1;
+#endif
+   
    maxm = lp_data->maxm;
    maxn = lp_data->maxn;
    maxnz = lp_data->maxnz;
@@ -206,12 +219,15 @@ int create_subproblem_u(lp_prob *p)
 	 vars[i + bvarnum]->userind = d_uind[i];
 	 vars[i + bvarnum]->colind = bvarnum + i;
       }
+#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
+      vars[lp_data->n - 1]->userind = p->mip->n;
+      vars[lp_data->n - 1]->colind  = lp_data->n - 1;
+#endif
    }
    lp_data->ordering = COLIND_AND_USERIND_ORDERED;
 
    lp_data->mip->n = lp_data->n;
    lp_data->mip->m = lp_data->m;
-
 
    /* Create the list of indices to pass to the user */
    userind = (int *) malloc(lp_data->n * ISIZE);
@@ -239,7 +255,11 @@ int create_subproblem_u(lp_prob *p)
 	 return(ERROR__ILLEGAL_RETURN_CODE);
       }
 
-      lp_data->mip->nz = p->mip->nz;      
+      lp_data->mip->nz = p->mip->nz;
+#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
+      lp_data->mip->nz += 2 * (lp_data->n + 1);
+#endif
+      
       /* Allocate the arrays.*/
       lp_data->mip->matbeg  = (int *) malloc((lp_data->mip->n + 1) * ISIZE);
       lp_data->mip->matind  = (int *) malloc((lp_data->mip->nz) * ISIZE);
@@ -254,36 +274,60 @@ int create_subproblem_u(lp_prob *p)
 
       /* Fill out the appropriate data structures*/
       lp_data->mip->matbeg[0] = 0;
-      for (i = 0; i < lp_data->mip->n; i++){
-#ifdef MULTI_CRITERIA
-	 lp_data->mip->obj[i]        = p->par.gamma * mip->obj[userind[i]] +
-	                               p->par.tau * mip->obj2[userind[i]];
-#else
-	 lp_data->mip->obj[i]        = p->mip->obj[userind[i]];
+      for (j = 0, i = 0; i < lp_data->mip->n; i++){
+#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
+	 if (userind[i] == p->mip->n){
+	    lp_data->mip->is_int[i]    = FALSE;
+	    lp_data->mip->ub[i]        = MAXINT;
+	    lp_data->mip->obj[i]       = 1.0;
+	    lp_data->mip->matval[j]    = -1.0;
+	    lp_data->mip->matind[j++]  = bcutnum - 2;
+	    lp_data->mip->matval[j]    = -1.0;
+	    lp_data->mip->matind[j++]  = bcutnum - 1;
+	    lp_data->mip->matbeg[i+1]  = j;
+	    continue;
+	 }
 #endif
 	 lp_data->mip->ub[i]         = p->mip->ub[userind[i]];
 	 lp_data->mip->lb[i]         = p->mip->lb[userind[i]];
 	 lp_data->mip->is_int[i]     = p->mip->is_int[userind[i]];
-	 lp_data->mip->matbeg[i+1]   = lp_data->mip->matbeg[i] + 
-	                                (p->mip->matbeg[userind[i]+1] -
-	                                 p->mip->matbeg[userind[i]]);
-	 for (j = 0; j < (lp_data->mip->matbeg[i+1]-lp_data->mip->matbeg[i]);
-	      j++){
-	    lp_data->mip->matind[lp_data->mip->matbeg[i]+j]=
-	       p->mip->matind[p->mip->matbeg[userind[i]]+j];
-	    lp_data->mip->matval[lp_data->mip->matbeg[i]+j]=
-	       p->mip->matval[p->mip->matbeg[userind[i]]+j];
+	 for (k = p->mip->matbeg[userind[i]]; k < p->mip->matbeg[userind[i]+1];
+	      k++){
+	    lp_data->mip->matind[j] = p->mip->matind[k];
+	    lp_data->mip->matval[j++] = p->mip->matval[k];
 	 }
+#ifdef MULTI_CRITERIA
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+	 lp_data->mip->obj[i]    = p->par.rho * (p->mip->obj[userind[i]] +
+						 p->mip->obj2[userind[i]]);
+	 lp_data->mip->matval[j] = p->par.gamma * p->mip->obj[userind[i]];
+	 lp_data->mip->matind[j++] = bcutnum - 2;
+	 lp_data->mip->matval[j] = p->par.tau * p->mip->obj[userind[i]];
+	 lp_data->mip->matind[j++] = bcutnum - 1;
+#else
+	 lp_data->mip->obj[i]        = p->par.gamma * p->mip->obj[userind[i]] +
+	                               p->par.tau * p->mip->obj2[userind[i]];
+#endif
+#else
+	 lp_data->mip->obj[i]        = p->mip->obj[userind[i]];
+#endif
+	 lp_data->mip->matbeg[i+1]  = j;
       }
+      lp_data->mip->nz = j;
       for (i = 0; i < p->mip->m; i++){
 	 lp_data->mip->rhs[i] = p->mip->rhs[i];
 	 lp_data->mip->sense[i] = p->mip->sense[i];
 	 lp_data->mip->rngval[i] = p->mip->rngval[i];
       }
-      
-      maxm = p->mip->m;
-      maxn = p->mip->n;
-      maxnz = p->mip->nz;
+#if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
+      lp_data->mip->rhs[bcutnum - 2] = p->par.gamma * p->utopia[0]; 
+      lp_data->mip->sense[bcutnum - 2] = 'L';
+      lp_data->mip->rhs[bcutnum - 1] = p->par.tau * p->utopia[1]; 
+      lp_data->mip->sense[bcutnum - 1] = 'L';
+#endif
+      maxm = lp_data->m;
+      maxn = lp_data->n;
+      maxnz = lp_data->nz;
 
       /* Fall through to next case */
 
@@ -301,7 +345,7 @@ int create_subproblem_u(lp_prob *p)
 	    lp_data->mip->obj[i] *= -1.0;
 	 }
       }
-      lp_data->m = p->base.cutnum;
+      lp_data->m = bcutnum;
       break;
 
     case USER_ERROR:
@@ -569,16 +613,16 @@ int is_feasible_u(lp_prob *p, char branching)
 
 #if defined(MULTI_CRITERIA) && defined(FIND_NONDOMINATED_SOLUTIONS)
    if ((user_res == TEST_ZERO_ONE || user_res == TEST_INTEGRALITY) &&
-       *feasible == IP_FEASIBLE){
+       feasible == IP_FEASIBLE){
       if (analyze_multicriteria_solution(p, indices, values, cnt,
-					 true_objval, lpetol, branching) > 0){
-	 *feasible = IP_FEASIBLE_BUT_CONTINUE;
+					 &true_objval, lpetol, branching) > 0){
+	 feasible = IP_FEASIBLE_BUT_CONTINUE;
       }else{
-	 *feasible = IP_FEASIBLE;
+	 feasible = IP_FEASIBLE;
       }
    }
 #else
-   *feasible = IP_FEASIBLE;
+   feasible = IP_FEASIBLE;
 #endif
    
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE){
@@ -589,6 +633,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	 p->ub = new_ub;
 	 if (p->par.set_obj_upper_lim)
 	    set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
+#if !defined(MULTI_CRITERIA)
 	 p->best_sol.xlevel = p->bc_level;
 	 p->best_sol.xindex = p->bc_index;
 	 p->best_sol.xiter_num = p->iter_num;
@@ -601,6 +646,16 @@ int is_feasible_u(lp_prob *p, char branching)
 	 p->best_sol.xval = (double *) malloc(cnt*DSIZE);
 	 memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
 	 memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
+	 PRINT(p->par.verbosity, -1,
+	       ("\n****** Found Better Feasible Solution !\n"));
+	 if (p->mip->obj_sense == MAXIMIZE){
+	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", -new_ub 
+					 + p->mip->obj_offset));
+	 }else{
+	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", new_ub
+					 + p->mip->obj_offset));
+	 }
+#endif
 #ifdef COMPILE_IN_LP
 	 p->tm->has_ub = TRUE;
 	 p->tm->ub = p->ub;
@@ -624,16 +679,8 @@ int is_feasible_u(lp_prob *p, char branching)
 	 send_msg(p->tree_manager, UPPER_BOUND);
 	 freebuf(s_bufid);
 #endif
-	 PRINT(p->par.verbosity, -1,
-	       ("\n****** Found Better Feasible Solution !\n"));
-	 if (p->mip->obj_sense == MAXIMIZE){
-	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", -new_ub 
-					 + p->mip->obj_offset));
-	 }else{
-	    PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", new_ub
-					 + p->mip->obj_offset));
-	 }
       }else{
+#if !defined(MULTI_CRITERIA)
 	 PRINT(p->par.verbosity, 0,
 	       ("\n* Found Another Feasible Solution.\n"));
 	 if (p->mip->obj_sense == MAXIMIZE){
@@ -643,12 +690,15 @@ int is_feasible_u(lp_prob *p, char branching)
 	    PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", new_ub
 					 + p->mip->obj_offset));
 	 }
+#endif
       }
 #ifndef COMPILE_IN_TM
       send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
 			       lpetol, new_ub, cnt, indices, values);
 #endif
+#if !defined(MULTI_CRITERIA)
       display_lp_solution_u(p, DISP_FEAS_SOLUTION);
+#endif
       lp_data->termcode = LP_OPT_FEASIBLE;
    }
 
@@ -741,18 +791,24 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       break;
     case DISP_NZ_INT:
       if (p->mip->colname){ 
-	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 printf(" Column names and values of nonzeros in the solution\n");
-	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for (i = 0; i < number; i++){
+#ifdef MULTI_CRITERIA
+	    if (xind[i] == p->mip->n) continue;
+#endif
 	    printf("%8s %10.7f\n", p->mip->colname[xind[i]], xval[i]);
 	 }
 	 printf("\n");
       }else{
-	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 printf(" User indices and values of nonzeros in the solution\n");
-	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for (i = 0; i < number; i++){
+#ifdef MULTI_CRITERIA
+	    if (xind[i] == p->mip->n) continue;
+#endif
 	    printf("%7d %10.7f\n", xind[i], xval[i]);
 	 }
 	 printf("\n");
@@ -763,6 +819,9 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf(" User indices (hexa) and values of nonzeros in the solution\n");
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
       for (i = 0; i < number; ){
+#ifdef MULTI_CRITERIA
+	 if (xind[i] == p->mip->n) continue;
+#endif
 	 printf("%7x %10.7f ", xind[i], xval[i]);
 	 if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
       }
@@ -770,10 +829,13 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       break;
     case DISP_FRAC_INT:
       if (p->mip->colname){ 
-	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf(" Column names and values of fractional vars in the solution\n");
-	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf(" Column names and values of fractional vars in solution\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for (i = 0; i < number; i++){
+#ifdef MULTI_CRITERIA
+	    if (xind[i] == p->mip->n) continue;
+#endif
 	    tmpd = xval[i];
 	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
 	       printf("%8s %10.7f\n", p->mip->colname[xind[i]], tmpd);
@@ -781,14 +843,17 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	 }
 	 printf("\n");
       }else{
-	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf(" User indices and values of fractional vars in the solution\n");
-	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf(" User indices and values of fractional vars in solution\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for (i = 0; i < number; ){
+#ifdef MULTI_CRITERIA
+	    if (xind[i] == p->mip->n) continue;
+#endif
 	    tmpd = xval[i];
 	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
 	       printf("%7d %10.7f ", xind[i], tmpd);
-	       if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
+	       if (!(++i & 3)) printf("\n"); /* new line after every four*/
 	    }
 	 }
       }
@@ -799,6 +864,9 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf(" User indices (hexa) and values of frac vars in the solution\n");
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
       for (i = 0; i < number; ){
+#ifdef MULTI_CRITERIA
+	 if (xind[i] == p->mip->n) continue;
+#endif
 	 tmpd = xval[i];
 	 if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
 	    printf("%7x %10.7f ", xind[i], tmpd);
@@ -1438,27 +1506,47 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 
 #ifdef MULTI_CRITERIA
       case OPTIMALITY_CUT_FIRST:
-	 matind = (int *) malloc (lp_data->n * ISIZE);
-	 matval =  (double *) malloc (lp_data->n * DSIZE);
-	 for (nzcnt = 0, i = 0; i < lp_data->n; i++){
-	    matind[nzcnt] = i;
-	    matval[nzcnt++] = p->mip->obj[vars[i]->userind];
+	 row_list[explicit_row_num] =
+	    (waiting_row *) malloc(sizeof(waiting_row));
+	 row_list[explicit_row_num]->matind =
+	    (int *) malloc (lp_data->n * ISIZE);
+	 row_list[explicit_row_num]->matval =
+	    (double *) malloc (lp_data->n * DSIZE);
+	 row_list[explicit_row_num]->cut = cuts[i];
+	 for (nzcnt = 0, j = 0; j < lp_data->n; j++){
+	    if (lp_data->vars[j]->userind == p->mip->n)
+	       continue;
+	    row_list[explicit_row_num]->matind[nzcnt] = j;
+	    row_list[explicit_row_num]->matval[nzcnt++] =
+	       p->mip->obj[lp_data->vars[j]->userind];
 	 }
-	 cut->sense = 'L';
-	 cut->deletable = FALSE;
-	 cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+	 cuts[i]->sense = 'L';
+	 cuts[i]->deletable = FALSE;
+	 cuts[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+         row_list[explicit_row_num++]->nzcnt = nzcnt;
+	 cuts[i] = NULL;
 	 break;
 
       case OPTIMALITY_CUT_SECOND:
-	 matind = (int *) malloc (lp_data->n * ISIZE);
-	 matval =  (double *) malloc (lp_data->n * DSIZE);
-	 for (nzcnt = 0, i = 0; i < lp_data->n; i++){
-	    matind[nzcnt] = i;
-	    matval[nzcnt++] = p->mip->obj2[vars[i]->userind];
+	 row_list[explicit_row_num] =
+	    (waiting_row *) malloc(sizeof(waiting_row));
+	 row_list[explicit_row_num]->matind =
+	    (int *) malloc (lp_data->n * ISIZE);
+	 row_list[explicit_row_num]->matval =
+	    (double *) malloc (lp_data->n * DSIZE);
+	 row_list[explicit_row_num]->cut = cuts[i];
+	 for (nzcnt = 0, j = 0; j < lp_data->n; j++){
+	    if (lp_data->vars[j]->userind == p->mip->n)
+	       continue;
+	    row_list[explicit_row_num]->matind[nzcnt] = j;
+	    row_list[explicit_row_num]->matval[nzcnt++] =
+	       p->mip->obj2[lp_data->vars[j]->userind];
 	 }
-	 cut->sense = 'L';
-	 cut->deletable = FALSE;
-	 cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+	 cuts[i]->sense = 'L';
+	 cuts[i]->deletable = FALSE;
+	 cuts[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+         row_list[explicit_row_num++]->nzcnt = nzcnt;
+	 cuts[i] = NULL;
 	 break;
 #endif
       default: /* A user cut type */
@@ -1950,48 +2038,52 @@ void free_prob_dependent_u(lp_prob *p)
 
 #ifdef MULTI_CRITERIA
 char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
-				    int length, double *true_objval, double etol,
-				    char branching)
+				    int length, double *true_objval,
+				    double etol, char branching)
 {
   double obj[2] = {0.0, 0.0};
-  int cuts = 0;
-  char print_solution = FALSE;
+  int cuts = 0, i;
+  char new_solution = FALSE;
   char continue_with_node = FALSE;
   
   for (i = 0; i < length; i++){
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+     if (indices[i] == p->mip->n)
+	continue;
+#endif
      obj[0] += p->mip->obj[indices[i]]*values[i];
      obj[1] += p->mip->obj2[indices[i]]*values[i];
   }
 
-  if (p->mc_ub > 0 &&
-      *true_objval-p->par.rho*(obj[0]+obj[1]) > p->mc_ub+etol){
+  if (p->has_mc_ub && *true_objval-p->par.rho*(obj[0]+obj[1]) > p->mc_ub+etol){
      return(FALSE);
   }
 
   if (p->par.gamma == 1.0){
-     if (obj[0] < p->obj[0] + etol){
-	 if (obj[0] < p->obj[0] - etol ||
-	     (obj[0] >= p->obj[0] - etol
-	      && obj[1] < p->obj[1] - etol)){
+     if (!p->has_mc_ub || obj[0] < p->obj[0] + etol){
+	if (!p->has_mc_ub || (obj[0] < p->obj[0] - etol ||
+			      (obj[0] >= p->obj[0] - etol
+			       && obj[1] < p->obj[1] - etol))){
 	    printf("\nBetter Solution Found:\n");
 	    printf("First Objective Cost: %.1f\n", obj[0]);
 	    printf("Second Objective Cost: %.1f\n", obj[1]);
 	    p->obj[1] = obj[1];
 	    p->obj[0] = obj[0];
 	    p->mc_ub = *true_objval-p->par.rho*(obj[0]+obj[1]);
-	    print_solution = TRUE;
+	    p->has_mc_ub = TRUE;
+	    new_solution = TRUE;
 	 }
 	/* Add an optimality cut for the second objective */
 	 if (!branching){
 	    cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	    new_cut->coef = NULL;
-	    new_cut->rhs = (int) (obj[1] + etol) - 1;
+	    new_cut->rhs = obj[1] - 1 + etol;
 	    new_cut->size = 0;
 	    new_cut->type = OPTIMALITY_CUT_SECOND;
 	    new_cut->name = CUT__DO_NOT_SEND_TO_CP;
 	    continue_with_node = cg_add_user_cut(new_cut,
 						 &p->cgp->cuts_to_add_num,
-						 &p->cgp->cuts_to_add,
+						 &p->cgp->cuts_to_add_size,
 						 &p->cgp->cuts_to_add);
 	    FREE(new_cut);
 	 }else{
@@ -1999,29 +2091,30 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	 }
      }
   }else if (p->par.tau == 1.0){
-     if (obj[1] < p->obj[1] + etol){
-	if (obj[1] < p->obj[1] - etol ||
-	    (obj[1] >= p->obj[1] - etol
-	     && obj[0] < p->obj[0] - etol)){
+     if (!p->has_mc_ub || obj[1] < p->obj[1] + etol){
+	if (!p->has_mc_ub || (obj[1] < p->obj[1] - etol ||
+			      (obj[1] >= p->obj[1] - etol
+			       && obj[0] < p->obj[0] - etol))){
 	   printf("\nBetter Solution Found:\n");
 	   printf("First Objective Cost: %.1f\n", obj[0]);
 	   printf("Second Objective Cost: %.1f\n", obj[1]);
 	   p->obj[1] = obj[1];
 	   p->obj[0] = obj[0];
 	   p->mc_ub = *true_objval-p->par.rho*(obj[0]+obj[1]);
-	   print_solution = TRUE;
+	   p->has_mc_ub = TRUE;
+	   new_solution = TRUE;
 	}
 	/* Add an optimality cut for the second objective */
 	if (!branching){
 	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	   new_cut->coef = NULL;
-	   new_cut->rhs = (int) (obj[0] + etol) - 1;
+	   new_cut->rhs = obj[0] - 1 + etol;
 	   new_cut->size = 0;
 	   new_cut->type = OPTIMALITY_CUT_FIRST;
 	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
 	   continue_with_node = cg_add_user_cut(new_cut,
 						&p->cgp->cuts_to_add_num,
-						&p->cgp->cuts_to_add,
+						&p->cgp->cuts_to_add_size,
 						&p->cgp->cuts_to_add);
 	   FREE(new_cut);
 	}else{
@@ -2029,7 +2122,8 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	}
      }
   }else{
-     if ((*true_objval-p->par.rho*(obj[0]+obj[1]) <
+     if (!p->has_mc_ub ||
+	 (p->has_mc_ub && *true_objval-p->par.rho*(obj[0]+obj[1]) <
 	  p->mc_ub - etol) ||
 	 (obj[0] < p->obj[0] - etol &&
 	  obj[1] < p->obj[1] + etol) ||
@@ -2041,7 +2135,8 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	p->obj[1] = obj[1];
 	p->obj[0] = obj[0];
 	p->mc_ub = *true_objval-p->par.rho*(obj[0]+obj[1]);
-	print_solution = TRUE;
+	p->has_mc_ub = TRUE;
+	new_solution = TRUE;
      }
      if (!branching){
 	if (p->par.gamma*(obj[0] - p->utopia[0]) >
@@ -2049,26 +2144,26 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	   /* Add an optimality cut for the second objective */
 	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	   new_cut->coef = NULL;
-	   new_cut->rhs = (int) (obj[1] + etol) - 1;
+	   new_cut->rhs = obj[1] - 1 + etol;
 	   new_cut->size = 0;
 	   new_cut->type = OPTIMALITY_CUT_SECOND;
 	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
 	   continue_with_node = cg_add_user_cut(new_cut,
 						&p->cgp->cuts_to_add_num,
-						&p->cgp->cuts_to_add,
+						&p->cgp->cuts_to_add_size,
 						&p->cgp->cuts_to_add);
 	   FREE(new_cut);
 	}else{
 	   /* Add an optimality cut for the second objective */
 	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
 	   new_cut->coef = NULL;
-	   new_cut->rhs = (int) (obj[0] + etol) - 1;
+	   new_cut->rhs = obj[0] - 1 + etol;
 	   new_cut->size = 0;
 	   new_cut->type = OPTIMALITY_CUT_FIRST;
 	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
 	   continue_with_node = cg_add_user_cut(new_cut,
 						&p->cgp->cuts_to_add_num,
-						&p->cgp->cuts_to_add,
+						&p->cgp->cuts_to_add_size,
 						&p->cgp->cuts_to_add);
 	   FREE(new_cut);
 	}
@@ -2076,13 +2171,30 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	continue_with_node = TRUE;
      }
   }
-#endif
 
-  if (!print_solution){
+  if (!new_solution){
      return(continue_with_node);
   }
 
-  /* Print the solution here */
+  p->best_sol.xlevel = p->bc_level;
+  p->best_sol.xindex = p->bc_index;
+  p->best_sol.xiter_num = p->iter_num;
+  p->best_sol.xlength = length;
+  p->best_sol.lpetol = etol;
+  p->best_sol.objval = *true_objval-p->par.rho*(obj[0]+obj[1]);
+  FREE(p->best_sol.xind);
+  FREE(p->best_sol.xval);
+  p->best_sol.xind = (int *) malloc(length*ISIZE);
+  p->best_sol.xval = (double *) malloc(length*DSIZE);
+  memcpy((char *)p->best_sol.xind, (char *)indices, length * ISIZE);
+  memcpy((char *)p->best_sol.xval, (char *)values, length * DSIZE);
+
+#ifndef COMPILE_IN_TM
+  send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
+			   lpetol, *true_objval-p->par.rho*(obj[0]+obj[1]),
+			   length, indices, values);
+#endif
+  display_lp_solution_u(p, DISP_FEAS_SOLUTION);
   
   return(continue_with_node);
 

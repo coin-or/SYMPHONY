@@ -34,12 +34,14 @@ typedef struct PROBLEM{
    int              tm_tid;
    int              dg_tid;
    params           par;         /* problem parameters */
-   prob_times       comp_times;  /* keeps track of the computation times for the
-			           problem */
+   prob_times       comp_times;  /* keeps track of the computation times for
+				    the problem */
    char             has_ub;
    double           ub;
    lp_sol           best_sol;
 #ifdef MULTI_CRITERIA
+   char             has_mc_ub;
+   double           mc_ub;
    double           obj[2];
    double           utopia[2];
 #endif
@@ -47,7 +49,7 @@ typedef struct PROBLEM{
    double           ub_estimate;
    double           lb;
 
-   MIPdesc         *mip; /* For holding the description when read in from MPS */
+   MIPdesc         *mip; /*For holding the description when read in from MPS*/
    
    char             probname[81];
 

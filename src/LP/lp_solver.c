@@ -77,9 +77,7 @@ void free_mip_desc(MIPdesc *mip)
    FREE(mip->matind);
    FREE(mip->matval);
    FREE(mip->obj);
-#ifdef MULTI_CRITERIA
    FREE(mip->obj2);
-#endif
    FREE(mip->rhs);
    FREE(mip->rngval);
    FREE(mip->sense);
@@ -241,7 +239,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
       return(0);
    }
    
-   strncpy(probname, mpl_get_prob_name(mpl), 80); /* give a name to the problem */
+   strncpy(probname, mpl_get_prob_name(mpl), 80); /* name the problem */
 
    /* get num of rows and cols */
    mip->m  = mpl_get_num_rows(mpl)-1; /* subtract the objective row */
@@ -253,7 +251,8 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 
    /*get mip->nz and mip->obj*/
    mip->obj    = (double *) calloc(DSIZE, mip->n);
-
+   mip->obj2   = (double *) calloc(DSIZE, mip->n);
+   
    indices = (int *) malloc(ISIZE * (mip->n + 1));
    values = (double *) malloc(DSIZE * (mip->n + 1));
 
@@ -2920,6 +2919,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    mip->nz = mps.getNumElements();
    
    mip->obj    = (double *) malloc(DSIZE * mip->n);
+   mip->obj2   = (double *) calloc(mip->n, DSIZE);
    mip->rhs    = (double *) malloc(DSIZE * mip->m);
    mip->sense  = (char *)   malloc(CSIZE * mip->m);
    mip->rngval = (double *) malloc(DSIZE * mip->m);

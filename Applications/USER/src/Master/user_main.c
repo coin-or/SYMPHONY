@@ -37,11 +37,16 @@ int main(int argc, char **argv)
    /* Find a priori problem bounds */
    si.findInitialBounds();
 
-   si.setSymParam(OsiSymNodeLimit, 10);
+   //si.setSymParam(OsiSymNodeLimit, 10);
 
+#ifdef MULTI_CRITERIA
+   /* Solve the multi-criteria problem */
+   si.MCBranchAndBound();
+#else
    /* Solve the problem */
    si.branchAndBound();
-
+#endif
+   
    return(0);
 }
 

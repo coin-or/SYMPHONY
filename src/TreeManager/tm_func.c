@@ -589,9 +589,17 @@ void print_tree_status(tm_prob *tm)
    
    printf("\nCurrent number of candidate nodes: %i\n", tm->samephase_candnum);
    if (tm->has_ub){
-      printf("Current upper bound:               %.2f\n", tm->ub);
+      if (tm->lpp[0]->mip->obj_sense == MAXIMIZE){
+	 printf("Current upper bound:               %.2f\n", tm->ub);
+      }else{
+	 printf("Current lower bound:               %.2f\n", -tm->ub);
+      }
    }else{
-      printf("No upper bound found yet...\n");
+      if (tm->lpp[0]->mip->obj_sense == MAXIMIZE){
+	 printf("No upper bound found yet...\n");
+      }else{
+	 printf("No lower bound found yet...\n");
+      }
    }
    if (tm->samephase_candnum == 0){
       tm->lb = tm->ub;

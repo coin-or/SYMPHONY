@@ -990,7 +990,6 @@ int parse_command_line(problem *p, int argc, char **argv)
       else if (strcmp(key, "tau") == 0 ||
 	       strcmp(key, "LP_tau") == 0 ){
 	 READ_DBL_PAR(lp_par->tau);
-	 cg_par->tau = lp_par->tau;
       }
       else if (strcmp(key, "rho") == 0 ||
 	       strcmp(key, "LP_rho") == 0 ){
