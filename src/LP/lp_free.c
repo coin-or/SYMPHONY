@@ -268,6 +268,10 @@ void free_lp_arrays(LPdata *lp_data)
   FREE(lp_data->dj);
   FREE(lp_data->dualsol);
   FREE(lp_data->slacks);
+#ifdef __CPLEX__
+  FREE(lp_data->lb);
+  FREE(lp_data->ub);
+#endif
   FREE(lp_data->tmp.c);
   FREE(lp_data->tmp.i1);
   FREE(lp_data->tmp.i2);

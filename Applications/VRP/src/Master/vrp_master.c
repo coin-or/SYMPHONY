@@ -119,6 +119,7 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
    p->par.tm_par.granularity = p->par.lp_par.granularity = .9999;
    p->par.lp_par.problem_type = INTEGER_PROBLEM;
+   p->par.lp_par.generate_cgl_cuts = FALSE;
    /*___END_EXPERIMENTAL_SECTION___*/
 
    vrp_readparams(vrp, filename, argc, argv);

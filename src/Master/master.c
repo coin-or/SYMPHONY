@@ -95,12 +95,12 @@ int main(int argc, char **argv)
    setvbuf(stdout, (char *)NULL, _IOLBF, 0);
 
    printf("\n");
-   printf("******************************************************\n");
-   printf("*     This is SYMPHONY Version 3.0.1                 *\n");
-   printf("*     Copyright 2000-2003 Ted Ralphs                 *\n");
-   printf("*     All Rights Reserved                            *\n");
-   printf("*     Distributed under the Common Public License    *\n");
-   printf("******************************************************\n");
+   printf("*******************************************************\n");
+   printf("*   This is SYMPHONY Version 4.0                      *\n");
+   printf("*   Copyright 2000-2003 Ted Ralphs                    *\n");
+   printf("*   All Rights Reserved                               *\n");
+   printf("*   Distributed under the Common Public License 1.0   *\n");
+   printf("*******************************************************\n");
    printf("\n");
    
 #if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP) ||                   \

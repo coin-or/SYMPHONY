@@ -87,6 +87,12 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
          lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->status);
          lp_data->status = (char *) malloc(lp_data->maxn * CSIZE);
+#ifdef __CPLEX__
+	 FREE(lp_data->lb);
+	 lp_data->lb = (double *) malloc(lp_data->maxn * DSIZE);
+	 FREE(lp_data->ub);
+	 lp_data->ub = (double *) malloc(lp_data->maxn * DSIZE);
+#endif
       }else{
          lp_data->x = (double *) realloc((char *)lp_data->x,
                                          lp_data->maxn * DSIZE);
@@ -94,6 +100,12 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
                                           lp_data->maxn * DSIZE);
          lp_data->status = (char *) realloc((char *)lp_data->status,
                                             lp_data->maxn * CSIZE);
+#ifdef __CPLEX__
+	 lp_data->lb = (double *) realloc((char *)lp_data->lb,
+					  lp_data->maxn * DSIZE);
+	 lp_data->ub = (double *) realloc((char *)lp_data->ub,
+					  lp_data->maxn * DSIZE);
+#endif
       }
       /* vers is realloc'd in either case just to keep the base vars */
       lp_data->vars = (var_desc **) realloc((char *)lp_data->vars,
@@ -1091,6 +1103,14 @@ void get_lb(LPdata *lp_data, int j, double *lb)
 
 /*===========================================================================*/
 
+void get_bounds(LPdata *lp_data)
+{
+   lp_data->ub = ekk_colupper(lp_data->lp);
+   lp_data->lb = ekk_collower(lp_data->lp);
+}
+
+/*===========================================================================*/
+
 void get_objcoef(LPdata *lp_data, int j, double *objcoef)
 {
    /* Maybe some range checking could be added ...*/
@@ -1867,6 +1887,21 @@ void get_lb(LPdata *lp_data, int j, double *lb)
 
 /*===========================================================================*/
 
+void get_bounds(LPdata *lp_data)
+{
+   if (!lp_data->lb){
+   }
+   cpx_status = CPXgetlb(lp_data->cpxenv, lp_data->lp, lp_data->lb, 0,
+			 lp_data->n-1);
+   CPX_check_error("get_lb");
+   cpx_status = CPXgetub(lp_data->cpxenv, lp_data->lp, lp_data->ub, 0,
+			 lp_data->n-1);
+   CPX_check_error("get_ub");
+   
+}
+
+/*===========================================================================*/
+
 void get_objcoef(LPdata *lp_data, int j, double *objcoef)
 {
    cpx_status = CPXgetobj(lp_data->cpxenv, lp_data->lp, objcoef, j, j);
@@ -2042,7 +2077,7 @@ void open_lp_solver(LPdata *lp_data)
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
 #ifdef __OSI_GLPK__
-   lp_data->lpetol = 1e-08; /* glpk doesn't return the value of this parameter */ 
+   lp_data->lpetol = 1e-08; /* glpk doesn't return the value of this param */ 
 #else   
    lp_data->si->getDblParam(OsiPrimalTolerance, lp_data->lpetol);
 #endif
@@ -2089,7 +2124,6 @@ void unload_lp_prob(LPdata *lp_data)
    /* Set parameters as in open_lp_solver() (do these persist?) */
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
-   lp_data->si->getDblParam(OsiDualTolerance, lp_data->lpetol);   
 
    lp_data->maxn = lp_data->maxm = lp_data->maxnz = 0;
    lp_data->m = lp_data->n = lp_data->nz = 0;
@@ -2558,6 +2592,7 @@ void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
 {
    int i;
+   double ub, lb;
  
    for (i = 0; i < cnt; i++){
       switch (lu[i]){
@@ -2570,6 +2605,12 @@ void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
        default:
 	 /* default: can't happen */
 	 break;
+      }
+      get_ub(lp_data, index[i], &ub);
+      get_lb(lp_data, index[i], &lb);
+      if (lb > ub){
+	 printf("Error in changin bounds!!!!!!!!!!!!!!!!!");
+	 sleep(600);
       }
    }
    
@@ -2612,6 +2653,14 @@ void get_ub(LPdata *lp_data, int j, double *ub)
 void get_lb(LPdata *lp_data, int j, double *lb)
 {
    *lb=lp_data->si->getColLower()[j];
+}
+
+/*===========================================================================*/
+
+void get_bounds(LPdata *lp_data)
+{
+   lp_data->ub = const_cast<double *>(lp_data->si->getColUpper());
+   lp_data->lb = const_cast<double *>(lp_data->si->getColLower());
 }
 
 /*===========================================================================*/

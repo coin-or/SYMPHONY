@@ -205,10 +205,12 @@ typedef struct LPdata{
    double    *dj;          /* maxn */ /* BB */
    double    *dualsol;     /* maxm */ /* BB */
    double    *slacks;      /* maxm */
-
+   double    *ub;
+   double    *lb;
+   
    row_data  *rows;      /* maxm */
 
-   temporary   tmp;
+   temporary  tmp;
 #ifdef PSEUDO_COSTS
    double     *pseudo_costs_one;
    double     *pseudo_costs_zero;
@@ -263,6 +265,7 @@ void change_ub PROTO((LPdata *lp_data, int j, double ub));
 void change_lb PROTO((LPdata *lp_data, int j, double lb));
 void get_ub PROTO((LPdata *lp_data, int j, double *ub));
 void get_lb PROTO((LPdata *lp_data, int j, double *lb));
+void get_bounds PROTO((LPdata *lp_data));
 void get_objcoef PROTO((LPdata *lp_data, int j, double *objcoef));
 void delete_rows PROTO((LPdata *lp_data, int deletable, int *free_rows));
 int delete_cols PROTO((LPdata *lp_data, int delnum, int *delstat));

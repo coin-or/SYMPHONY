@@ -160,7 +160,7 @@ void fix_variables(lp_prob *p)
    char not_fixed__lb__switch, not_fixed__ub__switch;
    int *ind;
    char *lu;
-   double *bd;
+   double *bd, *ub, *lb;
    int cnt = 0;
 
    colind_sort_extra(p);
@@ -192,6 +192,10 @@ void fix_variables(lp_prob *p)
 	 ind = lp_data->tmp.i1 + n;
 	 lu = lp_data->tmp.c;         /* n */
 	 bd = lp_data->tmp.d;         /* n */
+
+	 get_bounds(lp_data);
+	 ub = lp_data->ub;
+	 lb = lp_data->lb;
 	 
 	 p->vars_deletable = 0;
 	 memset((char *)delstat, 0, n * ISIZE);
@@ -201,7 +205,7 @@ void fix_variables(lp_prob *p)
 	       continue;
 	    }
 	    max_change = gap/dj[i];
-	    if (max_change > 0 && max_change < vars[i]->ub - vars[i]->lb){
+	    if (max_change > 0 && max_change < ub[i] - lb[i]){
 	       if (lp_data->nf_status & NF_CHECK_NOTHING){
 		  status[i] ^= NOT_FIXED__PERM_LB__SWITCH;
 		  perm_lb_vars++;
@@ -211,14 +215,14 @@ void fix_variables(lp_prob *p)
 	       }
 	       ind[cnt] = i;
 	       lu[cnt] = 'U';
-	       bd[cnt++] = vars[i]->is_int ? floor(vars[i]->lb + max_change) :
-		  vars[i]->lb + max_change;
-	       if (! (status[i] & NOT_REMOVABLE) && vars[i]->lb == 0 &&
-		   vars[i]->lb == vars[i]->ub){
+	       bd[cnt++] = vars[i]->is_int ? floor(lb[i] + max_change) :
+		  lb[i] + max_change;
+	       if (! (status[i] & NOT_REMOVABLE) && lb[i] == 0 &&
+		   lb[i] == ub[i]){
 		  p->vars_deletable++;
 		  delstat[i] = 1;
 	       }
-	    }else if (max_change < 0 && max_change > vars[i]->lb - vars[i]->ub){
+	    }else if (max_change < 0 && max_change > lb[i] - ub[i]){
 	       if (lp_data->nf_status & NF_CHECK_NOTHING){
 		  status[i] ^= NOT_FIXED__PERM_UB__SWITCH;
 		  perm_ub_vars++;
@@ -228,10 +232,10 @@ void fix_variables(lp_prob *p)
 	       }
 	       ind[cnt] = i;
 	       lu[cnt] = 'L';
-	       bd[cnt++] = vars[i]->is_int ? floor(vars[i]->ub + max_change) :
-		  vars[i]->ub + max_change;
-	       if (! (status[i] & NOT_REMOVABLE) && vars[i]->ub == 0 &&
-		   vars[i]->lb == vars[i]->ub){
+	       bd[cnt++] = vars[i]->is_int ? floor(ub[i] + max_change) :
+		  ub[i] + max_change;
+	       if (! (status[i] & NOT_REMOVABLE) && lb[i] == 0 &&
+		   lb[i] == ub[i]){
 		  p->vars_deletable++;
 		  delstat[i] = 1;
 	       }
