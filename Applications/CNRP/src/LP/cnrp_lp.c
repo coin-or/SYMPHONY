@@ -76,6 +76,8 @@ int user_receive_lp_data(void **user)
       zero_vars = (int *) malloc (zero_varnum*sizeof(int));
       receive_int_array(zero_vars, zero_varnum);
    }
+   receive_dbl_array(&cnrp->utopia_fixed, 1);
+   receive_dbl_array(&cnrp->utopia_variable, 1);
    
    cnrp->edges = (int *) calloc (2*total_edgenum, sizeof(int));
 
@@ -155,15 +157,37 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    char prob_type = cnrp->par.prob_type, od_const = FALSE, d_x_vars = FALSE;
    int v0, v1;
    double flow_capacity;
+#ifdef ADD_CAP_CUTS 
+   int basecutnum = (2 + od_const)*vertnum - 1 + 2*total_edgenum;
+#elif defined(ADD_FLOW_VARS)
+   int basecutnum = (2 + od_const)*vertnum - 1;
+#else
+   int basecutnum = (1 + od_const)*vertnum;
+#endif
+#ifdef ADD_X_CUTS
+   int basecutnum += total_edgenum;
+#endif
 #if defined(DIRECTED_X_VARS) && !defined(ADD_FLOW_VARS)
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   int edgenum = (mip->n - 1)/2;
+#else
    int edgenum = (mip->n)/2;
+#endif
 #elif defined(ADD_FLOW_VARS)
 #ifdef DIRECTED_X_VARS
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   int edgenum = (mip->n - 1)/4;
+#else
    int edgenum = (mip->n)/4;
+#endif
 
    flow_capacity = cnrp->capacity;
 #else
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   int edgenum = (mip->n-1)/3;
+#else
    int edgenum = (mip->n)/3;
+#endif
 
    if (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == CTP)
       flow_capacity = cnrp->capacity;
@@ -171,7 +195,11 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
       flow_capacity = cnrp->capacity/2;
 #endif
 #else
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   int edgenum = mip->n - 1;
+#else
    int edgenum = mip->n;
+#endif
 #endif
    
    /* set up the inital LP data */
@@ -186,6 +214,9 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #endif
 #ifdef ADD_X_CUTS
    mip->nz += 2*edgenum;
+#endif
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   mip->nz += mip->n + 1;
 #endif
    *maxm = MAX(100, 3 * mip->m);
 #ifdef ADD_FLOW_VARS
@@ -217,11 +248,30 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #endif
    
    for (i = 0, j = 0; i < mip->n; i++){
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+      if (indices[i] == mip->n - 1){
+	 mip->is_int[i]    = FALSE;
+	 mip->ub[i]        = MAXINT;
+	 mip->matbeg[i]    = j;
+	 mip->obj[i]       = 1.0;
+	 mip->matval[j]    = -1.0;
+	 mip->matind[j++]  = basecutnum;
+	 mip->matval[j]    = -1.0;
+	 mip->matind[j++]  = basecutnum + 1;
+	 continue;
+      }
+#endif
       if (indices[i] < total_edgenum){
-	 mip->obj[i]       = cnrp->par.gamma*((double) costs[indices[i]]);
 	 mip->is_int[i]    = TRUE;
 	 mip->ub[i]        = 1.0;
 	 mip->matbeg[i]    = j;
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+	 mip->obj[i]       = 0.0;
+	 mip->matval[j]    = cnrp->par.gamma*((double) costs[indices[i]]);
+	 mip->matind[j++]  = basecutnum;
+#else
+	 mip->obj[i]       = cnrp->par.gamma*((double) costs[indices[i]]);
+#endif
 	 if (prob_type == CSTP || prob_type == CTP){
 	    /*cardinality constraint*/
 	    mip->matind[j] = 0;
@@ -261,11 +311,18 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #endif
 #ifdef DIRECTED_X_VARS
       }else if (indices[i] < 2*total_edgenum){
-	 mip->obj[i]       = cnrp->par.gamma*((double)costs[indices[i] -
-							  total_edgenum]);
 	 mip->is_int[i]    = TRUE;
 	 mip->ub[i]        = 1.0;
 	 mip->matbeg[i]    = j;
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+	 mip->obj[i]       = 0.0;
+	 mip->matval[j]    = cnrp->par.gamma*((double) costs[indices[i] -
+							    total_edgenum]);
+	 mip->matind[j++]  = basecutnum;
+#else
+	 mip->obj[i]       = cnrp->par.gamma*((double)costs[indices[i] -
+							  total_edgenum]);
+#endif
 	 if (prob_type == CSTP || prob_type == CTP){
 	    /*cardinality constraint*/
 	    mip->matind[j] = 0;
@@ -294,14 +351,21 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #endif
 #endif
       }else if (indices[i] < (2+d_x_vars)*total_edgenum){
-	 mip->obj[i]       =
-	    cnrp->par.tau*((double) costs[indices[i]-
-					(1+d_x_vars)*total_edgenum]);
 	 mip->is_int[i] = FALSE;
 	 v0 = edges[2*(indices[i]-(1+d_x_vars)*total_edgenum)];
 	 mip->ub[i] = flow_capacity - (v0 ? cnrp->demand[v0] : 0);
-#ifdef ADD_CAP_CUTS
 	 mip->matbeg[i]    = j;
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+	 mip->obj[i]       = 0.0;
+	 mip->matval[j]    = cnrp->par.tau*((double) costs[indices[i]-
+					(1+d_x_vars)*total_edgenum]);
+	 mip->matind[j++]  = basecutnum + 1;
+#else
+	 mip->obj[i]       =
+	    cnrp->par.tau*((double) costs[indices[i]-
+					(1+d_x_vars)*total_edgenum]);
+#endif
+#ifdef ADD_CAP_CUTS
 	 mip->matval[j]    = 1.0;
 	 mip->matval[j+1]  = 1.0;
 	 if (edges[2*(indices[i]-(1+d_x_vars)*total_edgenum)])
@@ -325,14 +389,21 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 				(1+d_x_vars)*total_edgenum)] - 1;
 #endif	 
       }else{
-	 mip->obj[i]       =
-	    cnrp->par.tau*((double) costs[indices[i]-
-					(2+d_x_vars)*total_edgenum]);
 	 mip->is_int[i] = FALSE;
 	 v1 = edges[2*(indices[i]-(2+d_x_vars)*total_edgenum) + 1];
 	 mip->ub[i] = flow_capacity - cnrp->demand[v1];
-#ifdef ADD_CAP_CUTS
 	 mip->matbeg[i]    = j;
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+	 mip->obj[i]       = 0.0;
+	 mip->matval[j]    = cnrp->par.tau*((double) costs[indices[i]-
+					(2+d_x_vars)*total_edgenum]);
+	 mip->matind[j++]  = basecutnum + 1;
+#else
+	 mip->obj[i]       =
+	    cnrp->par.tau*((double) costs[indices[i]-
+					(2+d_x_vars)*total_edgenum]);
+#endif
+#ifdef ADD_CAP_CUTS
 	 mip->matval[j]    = 1.0;
 	 mip->matval[j+1]  = -1.0;
 	 if (edges[2*(indices[i] - (2+d_x_vars)*total_edgenum)])
@@ -345,7 +416,6 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 	    mip->matind[j++] = (1+od_const)*vertnum + edges[2*(indices[i] -
 				(2+d_x_vars)*total_edgenum)] - 1;
 #else
-	 mip->matbeg[i]  = j;
 	 mip->matval[j]  = -1.0;
 	 if (edges[2*(indices[i] - (2+d_x_vars)*total_edgenum)])
 	    mip->matval[j+1] = 1.0;
@@ -425,7 +495,12 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
       mip->sense[i] = 'L';
    }
 #endif
-   
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   mip->rhs[basecutnum] = cnrp->par.gamma*cnrp->utopia_fixed;   
+   mip->sense[basecutnum] = 'L';
+   mip->rhs[basecutnum+1] = cnrp->par.tau*cnrp->utopia_variable;   
+   mip->sense[basecutnum+1] = 'L';
+#endif
    return(USER_SUCCESS);
 }      
 

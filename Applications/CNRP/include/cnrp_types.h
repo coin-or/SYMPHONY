@@ -90,6 +90,8 @@ typedef struct CNRP_PROBLEM{
    int            *cur_sol_tree;
    double          fixed_cost;
    double          variable_cost;
+   double          utopia_fixed;
+   double          utopia_variable;
    small_graph    *g;         /* contains the edge data for the reduced graph*/
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
    int             feas_sol_size;

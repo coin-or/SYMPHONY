@@ -309,9 +309,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    char od_const = FALSE;
    char d_x_vars = FALSE;
 #endif
-#if defined(ADD_CAP_CUTS) || defined(ADD_X_CUTS) 
    int total_edgenum = vertnum*(vertnum - 1)/2;
-#endif
 #ifdef ADD_FLOW_VARS
    int v0, v1;
    double flow_capacity;
@@ -335,7 +333,10 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 #ifdef ADD_X_CUTS
    *basecutnum += total_edgenum;
 #endif
-
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+   *basecutnum += 2; /* Need two extra constraints */
+#endif
+   
    switch(cnrp->par.base_variable_selection){
     case SOME_ARE_BASE:
       if (cnrp->par.add_all_edges == FALSE)
@@ -345,18 +346,19 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 	     the remaining edges get added in user_create_root()*/
 	 cnrp->par.add_all_edges = FALSE;
 
-
     case EVERYTHING_IS_BASE:
       *basevars = create_edge_list(cnrp, &base_varnum, CHEAP_EDGES);
-      
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+      *basevars = (int *) realloc((char *)(*basevars), (base_varnum + 1) * ISIZE);
+      *basevarnum = base_varnum + 1; /* Need one extra variable */
+#ifdef ADD_FLOW_VARS
+      (*basevars)[base_varnum] = d_x_vars ? 4*total_edgenum : 3*total_edgenum;
+#else
+      (*basevars)[base_varnum] = d_x_vars ? total_edgenum : 2*total_edgenum;
+#endif	 
+#else
       *basevars = (int *) realloc((char *)(*basevars), base_varnum * ISIZE);
       *basevarnum = base_varnum;
-      
-      /*First, set base_varnum equal to the number of edges in the base set*/
-#ifdef ADD_FLOW_VARS
-      base_varnum = (*basevarnum)/(3+d_x_vars);
-#else
-      base_varnum = (*basevarnum)/(1+d_x_vars);
 #endif
       break;
 
@@ -422,7 +424,10 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
     case EVERYTHING_IS_EXTRA:
 
       *extravars  = create_edge_list(cnrp, extravarnum, CHEAP_EDGES);
-      
+#ifdef FIND_NONDOMINATED_SOLUTIONS
+      *extravars = *extravars + 1;
+#endif
+
       break;
 
     case SOME_ARE_BASE:
@@ -504,6 +509,8 @@ int user_send_lp_data(void *user, void **user_lp)
    cnrp_lp->demand = cnrp->demand;
    cnrp_lp->capacity = cnrp->capacity;
    cnrp_lp->costs = cnrp->dist.cost;
+   cnrp_lp->utopia_fixed = cnrp->utopia_fixed;
+   cnrp_lp->utopia_variable = cnrp->utopia_variable;
 
    if (cnrp->par.prob_type == VRP || cnrp->par.prob_type == TSP ||
        cnrp->par.prob_type == BPP){
@@ -533,6 +540,8 @@ int user_send_lp_data(void *user, void **user_lp)
    if (cnrp->zero_varnum){
       send_int_array(cnrp->zero_vars, cnrp->zero_varnum);
    }
+   send_dbl_array(cnrp->utopia_fixed, 1);
+   send_dbl_array(cnrp->utopia_variable, 1);
 #endif
 
    return(USER_SUCCESS);

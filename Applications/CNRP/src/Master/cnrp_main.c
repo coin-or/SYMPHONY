@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 {
    int i;
    problem *p;
-   double gamma, tau;
+   double gamma, tau, slope;
    double start_time, t = 0;
 
    solution_data utopia1;
@@ -148,7 +148,6 @@ int main(int argc, char **argv)
    solutions[numsolutions].tau = 0.0;
    solutions[numsolutions].fixed_cost = cnrp->fixed_cost;
    solutions[numsolutions++].variable_cost = cnrp->variable_cost;
-   utopia_fixed = cnrp->fixed_cost;
       
    cnrp->lp_par.gamma = 0.0;
    cnrp->cg_par.tau = cnrp->lp_par.tau = 1.0;
@@ -169,7 +168,9 @@ int main(int argc, char **argv)
    solutions[numsolutions].tau = 1.0;
    solutions[numsolutions].fixed_cost = cnrp->fixed_cost;
    solutions[numsolutions++].variable_cost = cnrp->variable_cost;
-   utopia_variable = cnrp->variable_cost;
+
+   cnrp->utopia_fixed = utopia_fixed = cnrp->fixed_cost;
+   cnrp->utopia_variable = utopia_variable = cnrp->variable_cost;
 
    printf("***************************************************\n");
    printf("***************************************************\n");
@@ -188,10 +189,18 @@ int main(int argc, char **argv)
       
       solution1 = pairs[--numpairs].solution1;
       solution2 = pairs[numpairs].solution2;
-	 
+
+#ifdef FIND_NONDOMINATED_SOLUTIONS
       gamma = (utopia_variable - solutions[solution1].variable_cost)/
 	 (utopia_fixed - solutions[solution2].fixed_cost +
 	  utopia_variable - solutions[solution1].variable_cost);
+#else
+      slope = (solutions[solution1].variable_cost -
+	       solutions[solution2].variable_cost)/
+	      (solutions[solution2].fixed_cost -
+	       solutions[solution1].fixed_cost);
+      gamma = slope/(1+slope);
+#endif
       tau = 1 - gamma;
       
       cnrp->lp_par.gamma = gamma;

@@ -89,6 +89,8 @@ typedef struct CNRP_SPEC{
    double         capacity;  /*the capacity of the trucks*/
    int            numroutes; /*contains the number of routes that the problem
 			       is to be solved with. can be prespecified.  */
+   double         utopia_fixed;
+   double         utopia_variable;
    int           *edges;     /*contains a list of the edges in the current
 			       subproblem*/
    int           *costs;     /*contains the objective function values*/

@@ -202,10 +202,12 @@ network *create_flow_net(int *xind, double *xval, int edgenum, double etol,
 	 nv0 = edges[(xind[i] - total_edgenum) << 1];
 	 nv1 = edges[((xind[i] - total_edgenum) << 1) + 1];
 	 flow_var = TRUE;
-      }else{
+      }else if (xind[i] < 3 * total_edgenum){
 	 nv0 = edges[((xind[i] - 2*total_edgenum) << 1) + 1];
 	 nv1 = edges[(xind[i] - 2*total_edgenum) << 1];
 	 flow_var = TRUE;
+      }else{
+	 continue;
       }
       
 #elif defined(DIRECTED_X_VARS)
@@ -221,10 +223,12 @@ network *create_flow_net(int *xind, double *xval, int edgenum, double etol,
 	 nv0 = edges[(xind[i] - 2 * total_edgenum) << 1];
 	 nv1 = edges[((xind[i] - 2 * total_edgenum) << 1) + 1];
 	 flow_var = TRUE;	 
-      }else{
+      }else if (xind[i] < 4 * total_edgenum){
 	 nv0 = edges[((xind[i] - 3 * total_edgenum) << 1) + 1];
 	 nv1 = edges[(xind[i] - 3 * total_edgenum) << 1];
 	 flow_var = TRUE;
+      }else{
+	 continue;
       }
 #endif
 
