@@ -28,6 +28,32 @@ typedef struct CUT_TIME_OUT{
    double            all_cuts_time_out;
 }cut_time_out;
 
+
+typedef struct CGL_PARAMS{
+
+  /* Cut generation in LP */
+   int               generate_cgl_cuts;
+   int               generate_cgl_gomory_cuts;
+   int               generate_cgl_knapsack_cuts;
+   int               generate_cgl_oddhole_cuts;
+   int               generate_cgl_probing_cuts;
+   int               generate_cgl_mir_cuts;
+   int               generate_cgl_clique_cuts;
+   int               generate_cgl_flow_and_cover_cuts;
+   int               generate_cgl_rounding_cuts;
+   int               generate_cgl_lift_and_project_cuts;
+
+   int               gomory_generated_in_root;
+   int               knapsack_generated_in_root;
+   int               oddhole_generated_in_root;
+   int               probing_generated_in_root;
+   int               mir_generated_in_root;
+   int               clique_generated_in_root;
+   int               flow_and_cover_generated_in_root;
+   int               rounding_generated_in_root;
+   int               lift_and_project_generated_in_root;
+}cgl_params;
+
 typedef struct LP_PARAMS{
    int               verbosity;
    double            granularity;
@@ -96,27 +122,8 @@ typedef struct LP_PARAMS{
    int               fixed_to_ub_before_logical_fixing; /* OK */
    double            fixed_to_ub_frac_before_logical_fixing; /* OK */
 
-   /* Cut generation in LP */
-   int               generate_cgl_cuts;
-   int               generate_cgl_gomory_cuts;
-   int               generate_cgl_knapsack_cuts;
-   int               generate_cgl_oddhole_cuts;
-   int               generate_cgl_probing_cuts;
-   int               generate_cgl_mir_cuts;
-   int               generate_cgl_clique_cuts;
-   int               generate_cgl_flow_and_cover_cuts;
-   int               generate_cgl_rounding_cuts;
-   int               generate_cgl_lift_and_project_cuts;
-
-   int               gomory_generated_in_root;
-   int               knapsack_generated_in_root;
-   int               oddhole_generated_in_root;
-   int               probing_generated_in_root;
-   int               mir_generated_in_root;
-   int               clique_generated_in_root;
-   int               flow_and_cover_generated_in_root;
-   int               rounding_generated_in_root;
-   int               lift_and_project_generated_in_root;
+  /* Cut generation in LP */
+   cgl_params        cgl;
 
    /* Parameters affecting branching */
    int               max_presolve_iter;
