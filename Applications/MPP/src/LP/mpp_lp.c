@@ -104,17 +104,17 @@ int user_create_lp (void *user, int varnum, var_desc **vars,
    }
    (*matbeg)[2*(mpp->numedges)+(mpp->numarcs)] = ind;
 
-   for (i = 0; i <= varnum; i++){
+   for (i = 0; i < varnum; i++){
       (*obj)[i] = mpp->cost[i];
    }
 
    /* set the initial right hand side */
-   for (i = 0; i <= mpp->numnodes-1 ; i++){
+   for (i = 0; i < mpp->numnodes; i++){
       (*rhs)[i]   = 0;
       (*sense)[i] = 'E';
    }
 
-   for (i = mpp->numnodes; i <= mpp->numnodes+mpp->numedges-1 ; i++){
+   for (i = mpp->numnodes; i < mpp->numnodes+mpp->numedges; i++){
       (*rhs)[i]   = 1;
       (*sense)[i] = 'G';
    }
@@ -163,7 +163,7 @@ int user_send_feasible_solution(void *user, double lpetol, int varnum,
 int user_display_lp_solution(void *user, int which_sol, int varnum,
 			     int *indices, double *values)
 {
-   return(DEFAULT);
+   return(DISP_NZ_INT);
 }
 
 /*===========================================================================*/
