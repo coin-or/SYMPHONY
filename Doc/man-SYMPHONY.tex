@@ -37,7 +37,7 @@ needed for customizing the behaviors of the modules. Before beginning
 customization, it is recommended to make a copy of the directory
 \texttt{SYMPHONY-4.0/USER} that will be used as a template for creating your
 customizesd solver. In this directory and its subdirectories, which mirror the
-subdirectories of SYMPHONY itself, ach file contains function stubs that can
+subdirectories of SYMPHONY itself, each file contains function stubs that can
 be filled in to create a new custom application. There is one file for each
 module, initially called \texttt{SYMPHONY-4.0/USER/*/user\_*.c}, where
 \texttt{*} is the name of the module. The primary thing that you, as the user,
@@ -49,7 +49,7 @@ stubs. That is what the second section of this manual is about.
 For each module, all user functions are invoked from so-called \emph{wrapper
 functions} that provide the interface and also performs a default action if
 the user chooses not to override it. Although SYMPHONY is written in C, the
-wrapper functions provide a C++-style interface in whisch the user can either
+wrapper functions provide a C++-style interface in which the user can either
 accept the default action or override it. Each wrapper function is named {\tt
 *\_u()} , where {\tt *} is the name of the corresponding user function, and is
 defined in a file called {\tt *\_wrapper.c}. The wrapper function first
@@ -83,7 +83,7 @@ used), or the process aborts. \\
 {\tt USER\_SUCCESS} & The user function was implemented and executed correctly. \\
 
 {\tt USER\_DEFAULT} & This option means that the user function was not
-imlemented and that SYMPHONY should either execute a default subroutine (the
+implemented and that SYMPHONY should either execute a default subroutine (the
 default is one of the built-in options, \BB\ decides which one to use based on
 initial parameter settings and the execution of the algorithm) or else do
 nothing, if execution of the subroutine is optional. \\
@@ -142,9 +142,9 @@ the modules are being freed and the module is being closed. By default, for
 sequential computation, there is one common user data structure for all
 modules and the pointer to that data structure is passed to all user
 functions, regardless of the module. This setup should work fine for most
-sequential applications. In parallel, however, poiners cannot be shared
+sequential applications. In parallel, however, pointers cannot be shared
 between modules and data must be explicitly passed. IN this case, it is
-sometimes more efficien to maintain in each module only the data necessary to
+sometimes more efficient to maintain in each module only the data necessary to
 perform the functions of that module.
 
 \subsection{Inter-process Communication for Distributed Computing}
@@ -189,7 +189,7 @@ relaxations once they are formulated. Legacy interfaces to ILOG's
 \htmladdnormallink{CPLEX}{http://www.cplex.com}$^{\copyright}$
 and IBM's
 \htmladdnormallink{OSL}{http://www-4.ibm.com/software/data/bi/osl/index.html}
-are available. As of Version 4.0, the Open Solver Interface, avilable from
+are available. As of Version 4.0, the Open Solver Interface, available from
 \htmladdnormallink{COIN}{http://www.coin-or.org}
 \begin{latexonly} 
 COIN (\texttt{http://www.coin-or.org})
@@ -218,7 +218,7 @@ Once the user functions are filled in, all that remains is to compile the
 application. The distribution comes with two make files that facilitate this
 process. The primary make file resides in the {\tt SYMPHONY-4.0/} directory.
 The user make file resides in the user's subdirectory, initially called
-\texttt{SYMPHONY-4.0/USER/}. THis subdirectory can be moved, as well as
+\texttt{SYMPHONY-4.0/USER/}. This subdirectory can be moved, as well as
 renamed. There are a number of variables that must be set in the primary make
 file. To modify the make files appropriately, see the instructions in Section
 \ref{getting_started_unix}.

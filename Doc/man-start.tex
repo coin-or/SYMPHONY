@@ -1,10 +1,10 @@
 BB\ (Single- or Multi-Process Optimization over Networks) Version 4.0 is a
 powerful environment for implementing custom branch, cut, and price
 algorithms. The subroutines in the \BB\ library comprise a state-of-the-art
-MIP solver designed to be modular and easy to customize for various problem
+MILP solver designed to be modular and easy to customize for various problem
 settings. All internal library subroutines are generic---their implementation
 does not depend on the the problem-setting. As of Version 4.0, SYMPHONY works
-out of the box as a generic MIP solver, with the capability to read both MPS
+out of the box as a generic MILP solver, with the capability to read both MPS
 files and GMPL (a subset of AMPL) files and solve the described mixed integer
 programs. To customize SYMPHONY, various user subroutines can be written and
 parameters set that modify the default behavior of the algorithm. The API for
@@ -47,7 +47,7 @@ available from \texttt{http://www.coin-or.org}
 SYMPHONY now uses COIN's OSI to interface with most commonly available LP
 solvers. Generic cuts are now generated using COIN's Cut Generator Library
 (CGL) and the COIN LP Solver (CLP) can be used through the OSI to solve the LP
-relaxations. The COIN MPS reader is used to read in MIP instances in MPS
+relaxations. The COIN MPS reader is used to read in MILP instances in MPS
 format. For a summary of what else is new, see Section \ref{whats-new}. The
 improvements have required a number of changes to the API. Code written for
 previous versions of SYMPHONY will be broken, but not too badly. Instructions
@@ -68,7 +68,7 @@ and the overall design and use of \BB.
 Here is a sketch outline of how to get started with SYMPHONY in Unix. This is
 basically the same information contained in the README file that comes with
 the distribution and will lead you through the steps required to compile
-SYMPHONY as a generic MIP solver that can then be customized by filling out
+SYMPHONY as a generic MILP solver that can then be customized by filling out
 the functions provided in the user interface files. Because SYMPHONY is
 intended to run over nonhomogeneous networks of workstations, installation is
 not fully automated, but requires the user to make minor edits to the
@@ -311,7 +311,7 @@ directory.
 \begin{itemize}
 
 \item In MS Visual C++ 6.0, open the workspace
-\texttt{SYMPHONY-4.0$\backslash$USER$\backslash$WIN32$\backslash$user.dsw. 
+\texttt{SYMPHONY-4.0$\backslash$USER$\backslash$WIN32$\backslash$user.dsw}. 
 Note that there are two projects, one called \texttt{symphony} and one called
 \texttt{user}.  The \texttt{symphony} project compiles the source of the internal
 library. The \texttt{user} project compiles a separate library containing the
@@ -338,9 +338,9 @@ check the following settings:
 projects, and then choose Settings --> C/C++ --> Preprocessor in the category
 drop-down menu).
 
-\item Paths to the include files of COIN utilities (Coin), OSI, OSI_CPLEX, and
+\item Paths to the include files of COIN utilities (Coin), OSI, OSI\_CPLEX, and
 CPLEX are specified in the same settings window as for the preprocessor
-definitons. Note that the Coin, OSI, and OSI\_CPLEX include directories are
+definitions. Note that the Coin, OSI, and OSI\_CPLEX include directories are
 assumed to be in \texttt{C:$\backslash$COIN$\backslash$Coin},
 \texttt{C:$\backslash$COIN$\backslash$Osi},
 \texttt{C:$\backslash$COIN$\backslash$Osi$\backslash$OsiCpx} and 
@@ -355,7 +355,7 @@ necessary libraries: \texttt{user}, \texttt{osiCpxLib}, \texttt{osiLib},
 
 \end{itemize}
 
-If you want to use the native CPLEX interface (without dowloading COIN) or a
+If you want to use the native CPLEX interface (without downloading COIN) or a
 solver other than CPLEX:
 
 \begin{itemize}
@@ -368,21 +368,21 @@ etc.). Otherwise, change it to \texttt{\_\_XXX\_\_} (you have two options:
 
 \item Change the path definitions of the include files: for instance, if you want
 to use \texttt{\_\_OSI\_OSL\_\_}, define
-\texttt{C:$\backslash$COIN$\backslash$OSi$\backslash$OsiOsl} and \texttt{C:$\backslash$Program
+\texttt{C:$\backslash$COIN$\backslash$Osi$\backslash$OsiOsl} and \texttt{C:$\backslash$Program
 Files$\backslash$IbmOslV3Lib$\backslash$osllib} (assuming it is installed
-there) instead of OsiCpx and CPLEX path definitons. If you want to use the
+there) instead of OsiCpx and CPLEX path definitions. If you want to use the
 native OSL interface, delete all the path definitions (you are not required to
-have COIN or OSI), and just add the path definiton for the OSL include files.
+have COIN or OSI), and just add the path definition for the OSL include files.
 
 \item Add the appropriate libraries to the \texttt{symphony} project. For
 instance, if you want to use \texttt{\_\_OSI\_OSL\_\_} then add the
 \texttt{osiOslLib} and \texttt{oslmd6030} (OSL solver lib file) library files
 after deleting \texttt{osiCpxLib} and \texttt{cplex81} libraries from the
-\texttt{symphony} project (you can do that by right_clicking on the
+\texttt{symphony} project (you can do that by right-clicking on the
 \texttt{symphony} project and then choosing --> Add files to project with
 \texttt{library files} selected as the file type). If 
-you want to use the mative OSL insterface, then delete all the libraries
-(except the "user" library ) from the \textt{symphony} project and just add
+you want to use the native OSL interface, then delete all the libraries
+(except the "user" library ) from the \texttt{symphony} project and just add
 the \texttt{oslmd6030} library file for it is the unique solver library file
 we need now.
 
@@ -390,12 +390,12 @@ we need now.
 
 \item By default, SYMPHONY is also set up to use the COIN CGL library for
 generating cuts. To use CGL, the \texttt{symphony} project has the
-\texttt{ADD_CGL_CUTS} preprocessor definiton, the path to
+\texttt{ADD\_CGL\_CUTS} preprocessor definition, the path to
 \texttt{C:$\backslash$COIN$\backslash$Cgl$\backslash$} (be sure that this path
 directs SYMPHONY to the include directory of CGL) and a dependence on the
 \texttt{cgllib} library. If you also don't want to use the CGL library, simply
-delete the \texttt{ADD_CGL_CUTS} preprocessor definiton, the CGL path
-definitons and the \texttt{cgllib} library from the "symphony" project.
+delete the \texttt{ADD\_CGL\_CUTS} preprocessor definition, the CGL path
+definitions and the \texttt{cgllib} library from the "symphony" project.
 
 \item DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important note
 for OSL users: When using OSL in Windows, you must also add \texttt{OSLMSDLL}

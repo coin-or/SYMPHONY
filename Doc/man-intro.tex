@@ -15,7 +15,7 @@ all bugs that you find.Among the new enhancements and features are:
 
 \begin{itemize}
 
-\item SYMPHONY now works out of the box as a full-featured, parallel MIP solver,
+\item SYMPHONY now works out of the box as a full-featured, parallel MILP solver,
 with a wide variety of options for developing custom solvers.
 
 \item SYMPHONY now makes full use of the libraries available from 
@@ -159,7 +159,7 @@ The 1990's witnessed a broad development of software for discrete
 optimization. Almost without exception, these new software packages
 were based on the techniques of branch, cut, and price. The packages
 fell into two main categories---those based on general-purpose
-algorithms for solving mixed integer programs (MIPs)
+algorithms for solving mixed-integer linear programs (MILPs)
 (without the use of special structure)
 and those facilitating the use of special structure by interfacing
 with user-supplied, problem-specific subroutines. We will call
@@ -167,13 +167,13 @@ packages in this second category {\em frameworks}. There have also
 been numerous special-purpose codes developed for use in particular
 problem settings.
 
-Of the two categories, MIP solvers are the most common. Among the
+Of the two categories, MILP solvers are the most common. Among the
 dozens of offerings in this category are MINTO \cite{MINTO}, MIPO
 \cite{MIPO}, bc-opt \cite{bc-opt}, and SIP \cite{SIP}. Generic
 frameworks, on the other hand, are far less numerous. The three
 frameworks we have already mentioned (SYMPHONY, ABACUS, and COIN/BCP)
 are the most full-featured packages available. Several others, such as
-MINTO, originated as MIP solvers but have the capability of utilizing
+MINTO, originated as MILP solvers but have the capability of utilizing
 problem-specific subroutines. CONCORDE \cite{concorde, concorde2}, a
 package for solving the {\em Traveling Salesman Problem} (TSP), also
 deserves mention as the most sophisticated special-purpose code
@@ -183,7 +183,7 @@ Other related software includes several frameworks for implementing
 parallel branch and bound. Frameworks for general parallel branch and
 bound include PUBB \cite{PUBB}, BoB \cite{BoB}, PPBB-Lib
 \cite{PPBB-Lib}, and PICO \cite{PICO}. PARINO \cite{PARINO} and FATCOP
-\cite{FATCOP} are parallel MIP solvers.
+\cite{FATCOP} are parallel MILP solvers.
 
 \section{Introduction to Branch, Cut, and Price}
 \label{B&C-intro}
@@ -1181,7 +1181,7 @@ the various slave processes that perform the actual computation. The
 reason we chose this approach is because it allows memory-efficient
 data structures for sequential computation and yet is conceptually
 easy to parallelize. Unfortunately, this approach does have limited
-scalability. For further discussions on the scalibility of BCP algorithms and
+scalability. For further discussions on the scalability of BCP algorithms and
 approaches to improving it, see \cite{symphony1} and \cite{ALPS}.
 
 \subsection{Details of the Parallel Implementation}

@@ -75,9 +75,9 @@ fields that must be filled out to describe a subproblem.\\
 \item [\texttt{int n} --] The number of columns.
 \item [\texttt{int m} --] The number of rows.
 \item [\texttt{int nz} --] The number of nonzeros.
-\item [\texttt{double obj_offset} --] Constant to be added to the objective
+\item [\texttt{double obj\_offset} --] Constant to be added to the objective
 function value when printed out.
-\item [\texttt{char obj_sense} --] Objective sense (set to \texttt{MAXIMIZE}
+\item [\texttt{char obj\_sense} --] Objective sense (set to \texttt{MAXIMIZE}
 or \texttt{MINIMIZE}).
 \item [\texttt{char *is\_int} --] Indicates which variables are required to be 
 integer.
@@ -279,13 +279,13 @@ subproblem, this information can be passed to SYMPHONY in the variables
 \texttt{*maxn}, \texttt{*maxm}, and \texttt{*maxnz}. These numbers are only
 estimates that SYMPHONY can use to perform memory allocation. They do not have
 to be exact numbers. In fact, these estimates need not be provided at all. The
-\texttt{obj_sense} and \texttt{obj_offset} fields are set globally in the
+\texttt{obj\_sense} and \texttt{obj\_offset} fields are set globally in the
 function \hyperref{{\tt user\_initialize\_root\_node()}} {{\tt
 user\_initialize\_root\_node()} (see
 Section}{)}{user_initialize_root_node}. Setting them here will have no
 effect.\\
 \\
-Note that, the user should return ``USER_DEFAULT'' if an MPS or GMPL/AMPL 
+Note that, the user should return ``USER\_DEFAULT'' if an MPS or GMPL/AMPL 
 file was read in to describe the original MIP. \BB\ will allocate the 
 corresponding arrays and specify the constraint matrix automatically in this 
 case.
@@ -613,7 +613,7 @@ returned (the length of {\tt *candidates}).\\
 {\tt candidate ***candidates} & OUT & Pointer to the array of
 candidates generated (see description below).\\
 {\tt int *action} & OUT & What to do. Must be one of the four above described
-valuesunless the return code is {\tt USER\_DEFAULT}.
+values unless the return code is {\tt USER\_DEFAULT}.
 \et
 
 \returns
@@ -643,7 +643,7 @@ shall\_we\_branch\_default}, which is initially
 	she chose to branch in this function. A possible scenario:
 	{\tt cut\_num} is zero when this function is invoked and the
 	user asks for {\tt USER\_\_BRANCH\_IF\_MUST} without checking
-	the slack constraints and slack cuts. Afterwards no columns
+	the slack constraints and slack cuts. Afterward no columns
 	are generated (no dual infeasible variables found) and thus
 	\BB\ decides branching is called for and invokes 
 	{\tt \htmlref{user\_select\_candidates()}{user_select_candidates}}. 
@@ -1005,7 +1005,7 @@ printed out to the standard output by \BB.
 {\tt cut\_data *cut} & IN & The description of the cut if the
 branching object is a cut. \\
 {\tt int n} & IN & Number of variables. \\
-{\tt var_desc **vars} & IN & Array of variables in the current relaxation.\\
+{\tt var\_desc **vars} & IN & Array of variables in the current relaxation.\\
 {\tt char *action} & IN & Array of actions for the children. \\
 \et
 
@@ -1183,7 +1183,7 @@ pointers to the new rows. \\
 {\tt USER\_ERROR} & Error. The cuts are discarded.\\
 {\tt USER\_SUCCESS} & User unpacked the cuts. \\
 {\tt USER\_DEFAULT} & There are no user cut types defined. In this case,
-SYMPHONY deals with only exlicit cuts and internally generated cuts.  \\
+SYMPHONY deals with only explicit cuts and internally generated cuts.  \\
 \et
 
 \item[Wrapper invoked from:] Wherever a cut needs to be unpacked
@@ -1345,7 +1345,7 @@ relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\
 {\tt double *x} & IN & Values of the above variables.\\
 {\tt char *status} & INOUT & Stati of variables currently in the LP
 relaxation. \\
-{\tt int *num_fixed} & OUT & Number of fixed variables.\\
+{\tt int *num\_fixed} & OUT & Number of fixed variables.\\
 \et
 
 \returns
@@ -1583,7 +1583,7 @@ The local pool is purged from time to time to control its size. In
 this function the user has the power to decide which cuts to purge
 from this pool if desired. To mark the {\tt i$^{\tt th}$} waiting row
 (an element of the pre-pool) for removal she has to set {\tt
-delete_rows[i]} to be {\tt TRUE} ({\tt delete_rows} is allocated before the
+delete\_rows[i]} to be {\tt TRUE} ({\tt delete\_rows} is allocated before the
 function is called and its elements are set to {\tt FALSE} by
 default).\\
 \\
@@ -1600,8 +1600,8 @@ parameter).
 & & \\
 {\tt int rownum} & IN & The number of waiting rows. \\
 {\tt waiting\_row **rows} & IN & The array of waiting rows.\\
-{\tt char *delete_rows} & OUT & An array of indicators (each of them is one 
-{\tt char}) showing which waiting rows are to be deleted. \\ 
+{\tt char *delete\_rows} & OUT & An array of indicators showing which waiting 
+rows are to be deleted. \\ 
 \et
 
 \returns

@@ -298,12 +298,12 @@ user indices of the base variables to be active in the root. \\
 variables in the root. \\
 {\tt int **extravars} & OUT & Pointer to an array containing a list of
 user indices of the extra variables to be active in the root. \\
-{\tt char *obj_sense} & INOUT & Whether to negate the objective function value
+{\tt char *obj\_sense} & INOUT & Whether to negate the objective function value
 when printing the solution, set to either \texttt{MAXIMIZE} or
 \texttt{MINIMIZE}. Note that SYMPHONY always minimizes---\textbf{this only
-effects the printing of the solution}. The default is \texttt{MINIMIZE}
-{\tt double *obj_offset} & INOUT & A specified constant to be added to the
-objective function value when printing out the solution.
+effects the printing of the solution}. The default is \texttt{MINIMIZE} \\
+{\tt double *obj\_offset} & INOUT & A specified constant to be added to the
+objective function value when printing out the solution. \\
 {\tt int ***colnames} & OUT & Pointer to an array containing a list of
 column names to be used for display purposes. \\
 {\tt int *colgen\_strat} & INOUT & The default strategy or one that has
