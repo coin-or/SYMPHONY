@@ -749,6 +749,10 @@ int is_feasible_u(lp_prob *p, char branching)
 	 send_msg(p->tree_manager, UPPER_BOUND);
 	 freebuf(s_bufid);
 #endif
+#if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_TM)
+	 send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
+				  lpetol, true_objval, cnt, indices, values);
+#endif
       }else{
 	 if (!p->par.multi_criteria){
 	    PRINT(p->par.verbosity, 0,
@@ -762,10 +766,6 @@ int is_feasible_u(lp_prob *p, char branching)
 	    }
 	 }
       }
-#if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_TM)
-      send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
-			       lpetol, true_objval, cnt, indices, values);
-#endif
       if (!p->par.multi_criteria){
 	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);
       }

@@ -5476,7 +5476,7 @@ int sym_test(sym_environment *env)
     if( termcode = sym_read_mps(env, infile) < 0)
       return(termcode);
 
-    printf("Solving %s...", mps_files[i]);
+    printf("\nSolving %s...\n\n", mps_files[i]);
     
     if(termcode = sym_solve(env) < 0 )
       return(termcode);
@@ -5485,9 +5485,10 @@ int sym_test(sym_environment *env)
 
     if((obj_val[i] < sol[i] + tol) && 
        (obj_val[i] > sol[i] - tol)){
-      printf("Success!\n");
+      printf("\nSuccess! %s solved correctly...\n\n", mps_files[i]);
     } else {
-      printf("Failure!(%f, %f) \n", obj_val[i], sol[i]);
+       printf("\nFailure! Solver returned solution value: %f", obj_val[i]);
+       printf("\n         True solution value is:         %f\n\n", sol[i]);
     }
   }
 
