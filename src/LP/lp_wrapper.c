@@ -1411,6 +1411,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	    }
 	 }
 	 row_list[explicit_row_num++]->nzcnt = real_nzcnt;
+	 cuts[i] = NULL;
 	 break;
 
       default: /* A user cut type */
@@ -1422,6 +1423,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
       }
    }
 
+   *new_row_num = 0;
    user_res = user_unpack_cuts(p->user, from, type,
 			       lp_data->n, lp_data->vars,
 			       l, cuts, new_row_num, new_rows);
