@@ -611,11 +611,6 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }while((!num_cuts || cnrp->par.which_connected_routine == BOTH)
 	  && which_connected_routine < 2);
 
-   free_net(n);
-   FREE(new_cut);
-   *cutnum = num_cuts;
-   return(USER_SUCCESS);
-   
 #if 0
    if (num_cuts < 10 && cnrp->par.do_mincut){
       num_cuts += min_cut(cnrp, n, etol, mult);
@@ -677,6 +672,11 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
    
    if (num_cuts < 10 && cnrp->par.do_greedy){
+#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
+      greedy_shrinking1_dicut(n, capacity, etol, cnrp->par.max_num_cuts_in_shrink,
+			      new_cut, compnodes_copy, compmembers, comp_num,
+			      in_set, cut_val, ref, cut_list, demand, mult);
+#endif
       memcpy((char *)new_demand, (char *)demand, vertnum*DSIZE);
 #ifndef DIRECTED_X_VARS
       if (mult == 2){

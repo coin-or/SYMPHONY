@@ -60,6 +60,7 @@
 #define FLOW_CAP             4
 #define X_CUT                5
 #define TIGHT_FLOW           6
+#define MIXED_DICUT          7
 
 /*---------------- tsp cut routines -----------------------------------------*/
 

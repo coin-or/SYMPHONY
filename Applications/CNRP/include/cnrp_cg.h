@@ -88,6 +88,11 @@ int greedy_shrinking1 PROTO((network *n, double truck_cap, double etol,
 			     int *compnodes, int *compmembers, int compnum,
 			     char *in_set, double *cut_val,int *ref,
 			     char *cut_list, double *demand, int mult));
+int greedy_shrinking1_dicut PROTO((network *n, double truck_cap, double etol,
+			     int max_num_cuts, cut_data *new_cut,
+			     int *compnodes, int *compmembers, int compnum,
+			     char *in_set, double *cut_val,int *ref,
+			     char *cut_list, double *demand, int mult));
 int greedy_shrinking6 PROTO((network *n, double truck_cap,
 			     double etol, cut_data *new_cut,
 			     int *compnodes,

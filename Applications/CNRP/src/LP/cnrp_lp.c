@@ -672,7 +672,10 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
   int cliquecount = 0, val, edgeind;
   char *clique_array, first_coeff_found, second_coeff_found, third_coeff_found;
   char d_x_vars;
-  
+#if defined(ADD_FLOW_VARS) && defined(DIRECTED_X_VARS)
+  int  numroutes, numarcs, *arcs;
+  char *coef2;
+#endif
   *new_row_num = cutnum;
   if (cutnum > 0)
      *new_rows = row_list = (waiting_row **) calloc (cutnum,
@@ -849,8 +852,10 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	demand = ((double *)coef)[0];
 	numroutes = ((int *)(coef + DSIZE))[1];
 	numarcs = ((int *)(coef + DSIZE + ISIZE))[2];
-	arcs = (int *) (coef + DSIZE + 2*ISIZE); /* List of the arcs in C */
-	coef2 = coef + DSIZE + (numarcs+2)*ISIZE; /* List of the nodes in S */
+	/* Array of the nodes in the set S */
+	coef2 = coef + DSIZE + 2*ISIZE;
+	/* Array of the arcs in the set C */
+	arcs = (int *) (coef + DSIZE + 2*ISIZE + (vertnum >> DELETE_POWER) + 1); 
 	for (i = 0, nzcnt = 0; i < varnum; i++){
 	   if (vars[i]->userind < 2*total_edgenum){
 	      if (vars[i]->userind >= total_edgenum){
@@ -862,7 +867,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		 v0 = edges[edgeind << 1];
 		 v1 = edges[(edgeind << 1) + 1];
 	      }
-	      if (coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1){
+	      if (coef2[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1){
 		 for (j = 0; j < numarcs; j ++){
 		    if (v0 == arcs[j << 1] && v1 == arcs[(j << 1) + 1])
 		       break;
@@ -873,7 +878,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		 }
 	      }
 	   }else{
-	      if (vars[i] < 3*total_edgenum){
+	      if (vars[i]->userind < 3*total_edgenum){
 		 edgeind = vars[i]->userind - 2*total_edgenum;
 		 v0 = edges[edgeind << 1];
 		 v1 = edges[(edgeind << 1) + 1];
@@ -882,14 +887,14 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 		 v1 = edges[edgeind << 1];
 		 v0 = edges[(edgeind << 1) + 1];
 	      }
-	      if (coef[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1){
+	      if (coef2[v1 >> DELETE_POWER] >> (v1 & DELETE_AND) & 1){
 		 for (j = 0; j < numarcs; j ++){
 		    if (v0 == arcs[j << 1] && v1 == arcs[(j << 1) + 1])
 		       break;
 		 }
 		 if (j < numarcs){
 		    matind[nzcnt] = i;
-		    matval[nzcnt++] = demand;
+		    matval[nzcnt++] = (double) numroutes;
 		 }
 	      }
 	   }
