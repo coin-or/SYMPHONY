@@ -2044,7 +2044,7 @@ void open_lp_solver(LPdata *lp_data)
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-08; /* glpk doesn't return the value of this parameter */ 
 #else   
-   lp_data->si->getDblParam(OsiDualTolerance, lp_data->lpetol);
+   lp_data->si->getDblParam(OsiPrimalTolerance, lp_data->lpetol);
 #endif
 }
 
@@ -2067,7 +2067,9 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 {
    //cannot set the necessary parameters, check OsiCpxSolverInterface-MEN
    //what about the alloc params?MEN
-   
+
+   /* Turn off scaling for CLP */
+   lp_data->si->setHintParam(OsiDoScale,false,OsiHintDo);
    lp_data->si->loadProblem(lp_data->n, lp_data->m,
 			    lp_data->desc->matbeg, lp_data->desc->matind,
 			    lp_data->desc->matval, lp_data->desc->lb,

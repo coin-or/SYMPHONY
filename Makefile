@@ -114,8 +114,8 @@ LP_SOLVER = NONE
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSL)
-       LPINCDIR = ${HOME}/include
-       LPLIBPATHS = ${HOME}/lib
+       LPINCDIR = /usr/local/include/
+       LPLIBPATHS = /home/tkr/src/osllib/lib
        LPLIB = -losl
 endif
 
@@ -137,8 +137,8 @@ endif
 ##############################################################################
 
 #Uncomment the line below if you want to use an OSI interface.
-#LP_SOLVER = OSI
-OSI_INTERFACE = OSL
+LP_SOLVER = OSI
+OSI_INTERFACE = CLP
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSI)
@@ -151,8 +151,8 @@ ifeq ($(OSI_INTERFACE),CPLEX)
        LPLIB += -lOsiCpx -lcplex
 endif
 ifeq ($(OSI_INTERFACE),OSL)
-       LPINCDIR += ${HOME}/include
-       LPLIBPATHS += ${HOME}/lib
+       LPINCDIR += /usr/local/include
+       LPLIBPATHS += /home/tkr/src/osllib/lib
        LPLIB += -lOsiOsl -losl
 endif
 ifeq ($(OSI_INTERFACE),CLP)
@@ -1478,4 +1478,4 @@ clean_bin :
 clean_all : clean clean_dep clean_user clean_user_dep clean_lib clean_bin
 	true
 
-#.SILENT:
+.SILENT:

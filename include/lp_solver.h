@@ -18,13 +18,6 @@
 #include "proto.h"
 #include "BB_types.h"
 
-#ifdef USE_GLPMPL
-extern "C"
-{
-   #include "glpmpl.h"
-}
-#endif
-
 #define LP_MAX_ITER 9999999
 
 #ifdef __CPLEX__
@@ -123,6 +116,13 @@ typedef OsiGlpkSolverInterface OsiXSolverInterface;
 /*****************************************************************************/
 /*******                  end LP solver definitions                    *******/
 /*****************************************************************************/
+
+#ifdef USE_GLPMPL
+extern "C"
+{
+   #include "glpmpl.h"
+}
+#endif
 
 /* Temporary storage */
 
