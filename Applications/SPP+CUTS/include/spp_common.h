@@ -2,9 +2,9 @@
 /*                                                                           */
 /* This file is part of a demonstration application for use with the         */
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
-/* Set Partitioning Problems.                                                */
+/* the Set Partitioning Problem.                                             */
 /*                                                                           */
-/* (c) Copyright 2003 Marta Eso and Ted Ralphs. All Rights Reserved.                       */
+/* (c) Copyright 2003 Marta Eso and Ted Ralphs. All Rights Reserved.         */
 /*                                                                           */
 /* This application was originally developed by Marta Eso and was modified   */
 /* Ted Ralphs (tkralphs@lehigh.edu)                                          */
@@ -17,9 +17,13 @@
 #ifndef _SPP_COMMON_H_
 #define _SPP_COMMON_H_
 
+/* system include files */
 #include <stdio.h>
 
+/* SYMPHONY include files */
 #include "proto.h"
+
+/* SPP include files */
 #include "spp_types.h"
 
 int *spp_lexsort PROTO((col_ordered *matrix));

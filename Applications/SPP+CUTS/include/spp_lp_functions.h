@@ -2,9 +2,9 @@
 /*                                                                           */
 /* This file is part of a demonstration application for use with the         */
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
-/* Set Partitioning Problems.                                                */
+/* the Set Partitioning Problem.                                             */
 /*                                                                           */
-/* (c) Copyright 2003 Marta Eso and Ted Ralphs. All Rights Reserved.                       */
+/* (c) Copyright 2003 Marta Eso and Ted Ralphs. All Rights Reserved.         */
 /*                                                                           */
 /* This application was originally developed by Marta Eso and was modified   */
 /* Ted Ralphs (tkralphs@lehigh.edu)                                          */

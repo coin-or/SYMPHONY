@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
 /*                                                                           */
-/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                         */
+/* (c) Copyright 2000-2003 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
 /*                                                                           */
@@ -16,7 +16,10 @@
 #ifndef _VRP_DG_H
 #define _VRP_DG_H
 
+/* SYMPHONY include files */
 #include "proto.h"
+
+/* VRP include files */
 #include "vrp_common_types.h"
 
 void init_window PROTO((int dg_id, char *name, int width, int height));

@@ -89,7 +89,7 @@ USER_CP_SRC       = vrp_cp.c $(MACROS_SRC)
 USER_DG_SRC       = vrp_dg.c vrp_dg_network.c $(MACROS_SRC)
 
 ALL_USER_SRC      = $(MACROS_SRC) $(COST_SRC) $(NET_SRC) $(DG_FUNC_SRC)
-ALL_USER_SRC     += lp_user_branch.c vrp_lp.c
+ALL_USER_SRC     += vrp_lp_branch.c vrp_lp.c
 ALL_USER_SRC     += vrp_master.c vrp_io.c vrp_master_functions.c
 ALL_USER_SRC     += start_heurs.c lower_bound.c route_heur.c exchange_heur.c
 ALL_USER_SRC     += cluster_heur.c receive_rout.c small_graph.c
