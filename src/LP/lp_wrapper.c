@@ -607,6 +607,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	 printf("Warning: User set feasibility status of solution, but\n");
 	 printf("SYMPHONY to check feasibility. Ignoring request.");
 	 user_res = USER_SUCCESS;
+      }
       break;
     default:
       break;
@@ -768,8 +769,8 @@ int is_feasible_u(lp_prob *p, char branching)
       if (!p->par.multi_criteria){
 	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);
       }
-      if (*feasile = IP_FEASIBLE){
-	lp_data->termcode = LP_OPT_FEASIBLE;
+      if (feasible == IP_FEASIBLE){
+	 lp_data->termcode = LP_OPT_FEASIBLE;
       }
    }
    
@@ -777,7 +778,7 @@ int is_feasible_u(lp_prob *p, char branching)
    FREE(col_sol);
    return(feasible);
 }
-
+   
 /*===========================================================================*/
 
 void send_feasible_solution_u(lp_prob *p, int xlevel, int xindex,
