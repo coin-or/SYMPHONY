@@ -28,7 +28,7 @@
 #include "vrp_cg_params.h"
 
 typedef struct VRP_CG_PROBLEM{
-   cg_user_params par;
+   vrp_cg_params par;
    int           dg_id;   /*contains the tid of the graphics window*/
    int           vertnum;  /*the number of nodes in the problem,
 			      including the depot                */

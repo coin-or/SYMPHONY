@@ -75,7 +75,7 @@ int user_receive_cg_data(void **user, int dg_id)
     * Receive the data
    \*------------------------------------------------------------------------*/
    
-   receive_char_array((char *)(&vrp->par), sizeof(cg_user_params));
+   receive_char_array((char *)(&vrp->par), sizeof(vrp_cg_params));
    
    receive_int_array(&vrp->dg_id, 1);
    receive_int_array(&vrp->numroutes, 1);

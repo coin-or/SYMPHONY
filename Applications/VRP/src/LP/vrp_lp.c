@@ -60,7 +60,7 @@ int user_receive_lp_data(void **user)
 
    *user = (void *)vrp;
 
-   receive_char_array((char *)(&vrp->par), sizeof(lp_user_params));
+   receive_char_array((char *)(&vrp->par), sizeof(vrp_lp_params));
    receive_int_array(&vrp->window, 1);
    receive_int_array(&vrp->numroutes, 1);
    receive_int_array(&vrp->vertnum, 1);

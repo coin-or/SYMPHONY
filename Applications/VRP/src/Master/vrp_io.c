@@ -544,8 +544,8 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
    heur_params *heur_par = &vrp->heur_par;
    lb_params *lb_par = &vrp->lb_par;
    /*___END_EXPERIMENTAL_SECTION___*/
-   lp_user_params *lp_par = &vrp->lp_par;
-   cg_user_params *cg_par = &vrp->cg_par;
+   vrp_lp_params *lp_par = &vrp->lp_par;
+   vrp_cg_params *cg_par = &vrp->cg_par;
 
    vrp->numroutes = 0;
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)

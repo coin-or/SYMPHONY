@@ -1398,9 +1398,16 @@ void open_lp_solver(LPdata *lp_data)
    CPX_check_error("open_lp_solver - error opening environment");
    cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_SCRIND, i);
    CPX_check_error("open_lp_solver - CPXsetintparam, SCRIND");
+#if 0
+   lp_data->lpetol = 1e-09;
+   cpx_status = CPXsetdblparam(lp_data->cpxenv, CPX_PARAM_EPRHS,
+			       lp_data->lpetol);
+   CPX_check_error("open_lp_solver - CPXsetdblparam");
+#else
    cpx_status = CPXgetdblparam(lp_data->cpxenv, CPX_PARAM_EPRHS,
 			       &lp_data->lpetol);
    CPX_check_error("open_lp_solver - CPXgetdblparam");
+#endif
 }
 
 /*===========================================================================*/

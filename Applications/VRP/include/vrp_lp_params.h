@@ -29,6 +29,6 @@ typedef struct VRP_LP_PARAMS{
    int    strong_branching_cand_num_max;
    int    strong_branching_cand_num_min;
    int    strong_branching_red_ratio;
-}lp_user_params;
+}vrp_lp_params;
 
 #endif

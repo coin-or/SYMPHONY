@@ -685,13 +685,15 @@ void branch_close_to_half(int max_cand_num, int *cand_num,
    }
    qsortucb_di(xval, xind, cnt);
 
-   for (j = 0, i = 0; i < cnt; i++){
+   for (j = 0, i = 0; i < cnt;){
       if (xval[i] > lim[j]){
 	 if (i == 0){
 	    j++; continue;
 	 }else{
 	    break;
 	 }
+      }else{
+	 i++;
       }
    }
    cnt = i;

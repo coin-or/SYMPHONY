@@ -81,7 +81,7 @@ typedef struct LP_NET{
 \*---------------------------------------------------------------------------*/
 
 typedef struct VRP_LP_PROBLEM{
-   lp_user_params par;
+   vrp_lp_params par;
    int            window;    /*contains the tid of the graphics window*/
    int            vertnum;   /*the number of nodes in the problem,
 			       including the depot                */

@@ -183,8 +183,8 @@ typedef struct VRP_PARAMS{
 typedef struct VRP_PROBLEM{
    char            name[100];  /* the name of the problem instance */
    vrp_params      par;
-   cg_user_params  cg_par;
-   lp_user_params  lp_par;
+   vrp_cg_params   cg_par;
+   vrp_lp_params   lp_par;
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    heur_params     heur_par;
    lb_params       lb_par;

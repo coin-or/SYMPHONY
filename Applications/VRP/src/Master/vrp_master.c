@@ -506,7 +506,7 @@ int user_send_lp_data(void *user, void **user_lp)
    /* Here, we send that data using message passing and the rest is
       done in user_receive_lp_data() in the LP process */
    
-   send_char_array((char *)(&vrp->lp_par), sizeof(lp_user_params));
+   send_char_array((char *)(&vrp->lp_par), sizeof(vrp_lp_params));
    send_int_array(&vrp->dg_id, 1);
    send_int_array(&vrp->numroutes, 1);
    send_int_array(&vrp->vertnum, 1);
@@ -594,7 +594,7 @@ int user_send_cg_data(void *user, void **user_cg)
    /* Here, we send that data using message passing and the rest is
       done in user_receive_cg_data() in the CG process */
    
-   send_char_array((char *)&vrp->cg_par, sizeof(cg_user_params));
+   send_char_array((char *)&vrp->cg_par, sizeof(vrp_cg_params));
    send_int_array(&vrp->dg_id, 1);
    send_int_array(&vrp->numroutes, 1);
    send_int_array(&vrp->vertnum, 1);

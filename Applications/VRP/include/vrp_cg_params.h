@@ -29,7 +29,7 @@ typedef struct COL_GEN_PARAMS{
 }col_gen_params;
 
 /*___END_EXPERIMENTAL_SECTION___*/
-typedef struct CG_USER_PARAMS{
+typedef struct VRP_CG_PARAMS{
    int            verbosity;
    char           tsp_prob;
    int            do_greedy;
@@ -64,6 +64,6 @@ typedef struct CG_USER_PARAMS{
    float          gap_threshold;
 #endif
    /*___END_EXPERIMENTAL_SECTION___*/
-}cg_user_params;
+}vrp_cg_params;
 
 #endif
