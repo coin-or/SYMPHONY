@@ -874,7 +874,8 @@ int sym_solve(problem *p)
 	     termcode == TM_ERROR__NUMERICAL_INSTABILITY ||
 	     termcode == TM_ERROR__COMM_ERROR ||
 	     termcode == TM_ERROR__USER){
-      printf(  "* Terminated abnormally with error message %i      *\n",termcode);
+      printf(  "* Terminated abnormally with error message %i      *\n",
+	       termcode);
    }else{
       printf("* A process has died abnormally -- halting \n\n");
    }
@@ -992,12 +993,27 @@ int sym_mc_solve(problem *p)
    int numpairs = 0, cur_position = 0, first = 0, last = 0, previous = 0;
    int *indices;
    double *values;
-   int length;
+   int length, termcode;
    int solution1, solution2;
    double utopia[2];
    node_desc *root= NULL;
    base_desc *base = NULL;
    double compare_sol_tol, ub = 0.0;
+
+#ifdef MULTI_CRITERIA
+   for (i = 0; i < p->mip->n; i++){
+      if (p->mip->obj2 != 0){
+	 break;
+      }
+   }
+   if (i == p->mip->n){
+      printf("Second objective function is zero.\n");
+      printf("Solving as a single criteria MIP. \n\n");
+      return(sym_solve(p));
+   }
+#else
+
+#endif
    
    start_time = wall_clock(NULL);
 
@@ -1035,7 +1051,9 @@ int sym_mc_solve(problem *p)
    printf("***************************************************\n\n");
 
    /* Solve */
-   sym_solve(p);
+   if (termcode = sym_solve(p) < 0){
+      return(termcode);
+   }
    numprobs++;
    
    /* Store the solution */
@@ -1060,7 +1078,9 @@ int sym_mc_solve(problem *p)
    printf("***************************************************\n\n");
 
    /* Solve */
-   sym_solve(p);
+   if (termcode = sym_solve(p) < 0){
+      return(termcode);
+   }
    numprobs++;
    
    /* Store the solution */
@@ -1167,7 +1187,9 @@ int sym_mc_solve(problem *p)
       
       p->obj[0] = p->obj[1] = 0.0;
       
-      sym_solve(p);
+      if (termcode = sym_solve(p) < 0){
+	 return(termcode);
+      }
       numprobs++;
       
 #ifdef BINARY_SEARCH
@@ -1372,7 +1394,7 @@ int sym_mc_solve(problem *p)
       FREE(solutions[i].indices);
    }
    
-   return(0);
+   return(TM_OPTIMAL_SOLUTION_FOUND);
 }
 
 #endif

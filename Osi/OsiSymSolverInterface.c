@@ -53,10 +53,14 @@ void OsiSymSolverInterface::branchAndBound()
 
 void OsiSymSolverInterface::MCBranchAndBound()
 {
-
+#ifdef MULTI_CRITERIA
    sym_mc_solve(env_);
+#else
+   printf("Multi-criteria option not specified. Recompile with\n");
+   printf("MULTI_CRITERA set to TRUE in your Makefile.\n\n");
+#endif
+} 
 
-}
 
 /*===========================================================================*/
 /*===========================================================================*/
