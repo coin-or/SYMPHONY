@@ -262,6 +262,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
       memcpy((char *)root->desc.uind.list, (char *)rootdesc->uind.list,
 	     rootdesc->uind.size*ISIZE);
       root->bc_index = tm->stat.created++;
+      root->lower_bound = -MAXDOUBLE;
       tm->stat.tree_size++;
       insert_new_node(tm, root);
       tm->phase = 0;

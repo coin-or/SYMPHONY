@@ -633,7 +633,7 @@ int is_feasible_u(lp_prob *p, char branching)
    if (feasible == IP_FEASIBLE && p->par.multi_criteria){
       if (analyze_multicriteria_solution(p, indices, values, cnt,
 					 &true_objval, lpetol, branching) > 0){
-	 if (p->par.mc_add_optimality_cuts){
+	 if (p->par.mc_add_optimality_cuts || branching){
 	    feasible = IP_FEASIBLE_BUT_CONTINUE;
 	 }else{
 	    feasible = IP_FEASIBLE;
@@ -2141,7 +2141,8 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
      obj[1] += p->mip->obj2[indices[i]]*values[i];
   }
 
-  if (p->has_mc_ub && *true_objval-p->par.mc_rho*(obj[0]+obj[1]) > p->mc_ub+etol){
+  if (p->has_mc_ub && *true_objval-p->par.mc_rho*(obj[0]+obj[1]) >
+      p->mc_ub + etol + MAX(0, MIN(p->par.mc_gamma, p->par.mc_tau))){
      return(FALSE);
   }
 
@@ -2220,11 +2221,11 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
   }else{
      if (!p->has_mc_ub ||
 	 (p->has_mc_ub && *true_objval-p->par.mc_rho*(obj[0]+obj[1]) <
-	  p->mc_ub - etol) ||
+	  p->mc_ub - MIN(p->par.mc_gamma, p->par.mc_tau) + 100*etol) ||
 	 (obj[0] < p->obj[0] - etol &&
-	  obj[1] < p->obj[1] + etol) ||
+	  obj[1] < p->obj[1] + etol + MIN(p->par.mc_gamma, p->par.mc_tau)) ||
 	 (obj[1] < p->obj[1] - etol &&
-	  obj[0] < p->obj[0] + etol)){
+	  obj[0] < p->obj[0] + etol + MIN(p->par.mc_gamma, p->par.mc_tau))){
 	printf("\nBetter Solution Found:\n");
 	if(p->mip->obj_sense == SYM_MAXIMIZE){
 	   printf("First Objective Cost: %.1f\n", -obj[0]);

@@ -3028,7 +3028,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
    
    /* create CGL gomory cuts */
-   
    if(lp_data->par.generate_cgl_gomory_cuts){
       CglGomory *gomory = new CglGomory;
       gomory->generateCuts(*(lp_data->si), cutlist);
@@ -3127,6 +3126,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       *num_cuts = j;
    }
    
+<<<<<<< lp_solver.c
+   //delete gomory;
+   //delete knapsack;
+   //delete oddhole;
+   //delete probe;
+=======
+>>>>>>> 1.92
    /*__BEGIN_EXPERIMENTAL_SECTION__*/
    // delete flow;
    /*___END_EXPERIMENTAL_SECTION___*/

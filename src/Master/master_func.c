@@ -30,6 +30,7 @@
 #include "pack_array.h"
 #include "lp_solver.h"
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
 /*===========================================================================*/
 /*===========================================================================*/
 /* not used now!  used for testing! */
@@ -1042,6 +1043,7 @@ int resolve_node(sym_environment *env, bc_node *node)
 }
 #endif
 
+/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 /*===========================================================================*/
 
@@ -1130,8 +1132,10 @@ int copy_node(bc_node * n_to, bc_node *n_from)
    n_to->lp = n_from->lp;
    n_to->cg = n_from->cg;
    n_to->cp = n_from->cp;
-   
+
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/   
    n_to->sp = n_from->sp;
+   /*___END_EXPERIMENTAL_SECTION___*/
    
    n_to->lower_bound = n_from->lower_bound;
    n_to->opt_estimate = n_from->opt_estimate;
@@ -1342,7 +1346,9 @@ int write_node(bc_node *node, FILE*f)
    fprintf(f," NODE_LP         : %i\n",node->lp);
    fprintf(f," NODE_CG         : %i\n",node->cg);
    fprintf(f," NODE_CP         : %i\n",node->cp);
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
    fprintf(f," NODE_SP         : %i\n",node->sp);
+/*___END_EXPERIMENTAL_SECTION___*/
    fprintf(f," OPT_ESTIMATE    : %.4f\n",node->opt_estimate);  
 
 
@@ -1514,7 +1520,9 @@ int read_node(bc_node * node, FILE * f)
    fscanf(f,"%s %s %i", str, str, &node->lp);
    fscanf(f,"%s %s %i", str, str, &node->cg);
    fscanf(f,"%s %s %i", str, str, &node->cp);
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    fscanf(f,"%s %s %i", str, str, &node->sp);
+   /*___END_EXPERIMENTAL_SECTION___*/
    fscanf(f,"%s %s %lf", str, str, &node->opt_estimate);
 
 #ifdef TRACE_PATH
