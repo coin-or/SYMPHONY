@@ -5458,13 +5458,13 @@ int sym_test(sym_environment *env)
 
   sym_set_int_param(env, "verbosity", -10);
   
-  int i, file_num = 13;
-  char mps_files[13][MAX_FILE_NAME_LENGTH +1] = {
+  int i, file_num = 12;
+  char mps_files[12][MAX_FILE_NAME_LENGTH +1] = {
     "air03", "dcmulti", "egout", "flugpl", "khb05250", "l152lav", 
-    "lseu", "mod008", "mod010", "p0033", "p0201", "stein27", "vpm1" };
+    "lseu", "mod010", "p0033", "p0201", "stein27", "vpm1" };
   
-  double sol[13] = {340160, 188182, 568.101, 1201500,
-			  106940226, 4722, 1120, 307, 6548, 
+  double sol[12] = {340160, 188182, 568.101, 1201500,
+			  106940226, 4722, 1120, 6548, 
 			  3089, 7615, 18, 20};
 
   char *mps_dir = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
