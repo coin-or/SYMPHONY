@@ -210,7 +210,6 @@ int user_set_base(void *user, int *basevarnum, int **basevars, double **lb,
 {
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
-   user_parameters par = prob->par;
    int i;
    int *vars, varnum;
  

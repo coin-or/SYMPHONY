@@ -187,6 +187,7 @@ compiling with version 2.8.
 \label{getting_started}
 
 \subsubsection{Compiling the Sample Application with Unix Operating Systems}
+\label{getting_strated_unix}
 
 Here is a sketch outline of how to get started with \BB\ in Unix. This is
 basically the same information contained in the README file that comes with
@@ -372,6 +373,7 @@ get lost, consult the source code for the sample application to see
 how it's done.
 
 \subsubsection{Compiling the Sample Application with Microsoft Windows}
+\label{getting_strated_windows}
 
 Here is a sketch outline of how to get started with \BB\ in Windows. This is
 basically the same information contained in the README file that comes with
@@ -389,7 +391,7 @@ create a subdirectory called {\tt SYMPHONY-3.0.1$\backslash$} containing all
 the source files.
 
 \item In MS Visual C++ 6.0, open the workspace 
-{\tt SYMPHONY-3.0.1$\backslash$WIN32$\backslash$symphony.dsw}.  Note that
+{\tt SYMPHONY-3.0.1$\backslash$WIN32$\backslash$vrp.dsw}.  Note that
 there are two projects, one called ``{\tt symphony}'' and one called ``{\tt
 vrp}''.  The symphony project contains the source code needed to build the
 internal library. The vrp project contains the source code for the
@@ -577,32 +579,88 @@ does not want to implement the option itself.
 
 \end{description}
 
-\subsection{Getting a Quick Start}
+\subsection{Development Quick Start Guide}
+
+\subsubsection{Unix}
 
 Developing a simple branch and bound solver can be done quite quickly using
-the sample framework provided in the \textt{SYMPHONY/User/} directory. The
+the sample framework provided in the \texttt{SYMPHONY/User/} directory. The
 simplest approach is to develop a sequential application, sharing a single
 user data structure among all the modules. Using this approach, an application
-can be developed by filling in only a few simple functions. Here are the
-steps.
+can be developed by filling in only a few simple functions. Here are four
+simple steps to get up and running.
 \begin{enumerate}
-\item First, decide what data has to be stored to describe your instance. Edit
-the file \texttt{User/include/user.h}, adding the appropriate fields to the 
-\textt{user\_problem} structure to store a problem instance.
-\item Now edit the file \texttt{User/Master/master_user.c}. If you choose to
+
+\item Set the variable \texttt{USERROOT} in the make file to be
+\texttt{\$(ROOT)/User} and type "\texttt{make}". Assuming that the make file 
+has already been modified appropriately, as described in Section
+\ref{getting_strated_windows}, this should successfully compile the template
+code, although it will not run until it is modified as described below.
+
+\item First, decide what run-time parameters you might need and what data has 
+to be stored to describe your instance. Edit the file
+\texttt{User/include/user.h}, adding the appropriate fields to the
+\texttt{user\_parameter} and \texttt{user\_problem} structure to store the
+relevant values. 
+
+\item Now edit the file \texttt{User/Master/master\_user.c}. If you choose to
 have all variables in the base set (a good starting point), the only function
 that really needs to be filled out initially is \texttt{user\_io()}, where you
-can read in the instance data. Also, check out the function
+can read in the instance data. Note that the name of the file to read the
+instance data from can be specified on the command line using the "-F" switch.
+Also, check out the function
 \texttt{user\_set\_base()}.
-\item Edit the file \texttt{User/LP/lp_user.c}. The function
+
+\item Edit the file \texttt{User/LP/lp\_user.c}. The function
 \texttt{user\_create\_lp()} must be filled out. This is the most important
 function, as it sets up the initial LP relaxation in each search node.
 \end{enumerate}
-Now compile by setting the variable \texttt{USERROOT} in the make file to be
-\texttt{\${ROOT)/User} and typing ``\texttt{make}'' (assuming that the make
+
+Now compile by by typing ``\texttt{make}'' (assuming that the make
 file has already been modified appropriately). That's it! You should now have
 a working branch and bound solver. Next you can work on filling in more
 advanced functions and adding cutting planes.
+
+\subsubsection{Microsoft Windows}
+
+Developing a simple branch and bound solver can be done quite quickly using
+the sample framework provided in the 
+\texttt{SYMPHONY$\backslash$User$\backslash$} directory. The
+simplest approach is to develop a sequential application, sharing a single
+user data structure among all the modules. Using this approach, an application
+can be developed by filling in only a few simple functions. Here are four
+simple steps to get up and running.
+\begin{enumerate}
+
+\item First open the workspace {\tt
+SYMPHONY-3.0.1$\backslash$WIN32$\backslash$user.dsw} and modify for your local
+setup, as described in Section \ref{getting_strated_windows}. It should
+build right away, although it won't run until modified as described below.
+
+\item First, decide what run-time parameters you might need and what data has 
+to be stored to describe your instance. Edit the file
+\texttt{User$\backslash$include$\backslash$user.h}, adding the appropriate
+fields to the \texttt{user\_parameter} and \texttt{user\_problem} structure to
+store the relevant values.
+
+\item Now edit the file
+\texttt{User$\backslash$Master$\backslash$master\_user.c}. If you choose to 
+have all variables in the base set (a good starting point), the only function
+that really needs to be filled out initially is \texttt{user\_io()}, where you
+can read in the instance data. Note that the name of the file to read the
+instance data from can be specified on the command line using the "-F" switch.
+Also, check out the function
+\texttt{user\_set\_base()}.
+
+\item Edit the file \texttt{User$\backslash$LP$\backslash$lp\_user.c}. The
+function \texttt{user\_create\_lp()} must be filled out. This is the most
+important function, as it sets up the initial LP relaxation in each search
+node.
+\end{enumerate}
+
+Now build again and you have a working branch and bound solver! Next you can
+work on filling in more advanced functions and adding cutting planes. See the
+documentation for more information on this.
 
 \subsection{Data Structures}
 
