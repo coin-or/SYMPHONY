@@ -2973,10 +2973,11 @@ sym_environment * create_copy_environment (sym_environment *env)
    if(par->tm_par.cp_mach_num)
       par->tm_par.cp_machs =
 	 (char**)malloc(sizeof(char*)*par->tm_par.cp_mach_num);
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
    if(par->tm_par.sp_mach_num)
       par->tm_par.sp_machs =
 	 (char**)malloc(sizeof(char*)*par->tm_par.sp_mach_num);
-   
+/*___END_EXPERIMENTAL_SECTION___*/   
    for(i = 0; i<par->tm_par.lp_mach_num; i++){
       par->tm_par.lp_machs[i] = 
 	 (char*)malloc(CSIZE*(MACH_NAME_LENGTH+1));
@@ -2998,13 +2999,15 @@ sym_environment * create_copy_environment (sym_environment *env)
 	     CSIZE*(MACH_NAME_LENGTH+1));
    }
    
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    for(i = 0; i<par->tm_par.sp_mach_num; i++){
       par->tm_par.sp_machs[i] = 
 	 (char*)malloc(CSIZE*(MACH_NAME_LENGTH+1));
       memcpy(par->tm_par.sp_machs[i], env->par.tm_par.sp_machs[i],
 	     CSIZE*(MACH_NAME_LENGTH+1));
    }
-
+   /*___END_EXPERIMENTAL_SECTION___*/
+   
    /*========================================================================*/
 	
    /* copy lp_sol */

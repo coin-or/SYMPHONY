@@ -9,7 +9,7 @@
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
-/*                                                                          */
+/*                                                                           */
 /*===========================================================================*/
 
 #define COMPILING_FOR_MASTER
@@ -301,6 +301,7 @@ int sym_set_defaults(sym_environment *env)
 
    lp_par->multi_criteria = FALSE;
    lp_par->mc_find_supported_solutions = FALSE;
+   lp_par->mc_add_optimality_cuts = TRUE;
    lp_par->mc_gamma = 1;       /* Determines the weight on objective 1 */
    lp_par->mc_tau   = 0;       /* Determines the weight on objective 2 */
    lp_par->mc_rho   = 0.00001; /* For augmented Chebyshev norm */
@@ -735,7 +736,7 @@ int sym_solve(sym_environment *env)
    /*___END_EXPERIMENTAL_SECTION___*/
    /*UNCOMMENT FOR PRODUCTION CODE*/
 #if 0
-   while (!lp_data_sent || !cg_data_sent || !cp_data_sent)
+   while (!lp_data_sent || !cg_data_sent || !cp_data_sent){
 #endif
 #else
    do{
@@ -1201,9 +1202,11 @@ int sym_mc_solve(sym_environment *env)
    env->par.tm_par.granularity = env->par.lp_par.granularity =
       -MAX(env->par.lp_par.mc_rho, compare_sol_tol);
    
+   if (env->par.mc_binary_search_tolerance > 0){
+      binary_search = TRUE;
+   }
    if (env->par.verbosity >= 0){
       if (env->par.mc_binary_search_tolerance > 0){
-	 binary_search = TRUE;
 	 printf("Using binary search with tolerance = %f...\n",
 		env->par.mc_binary_search_tolerance);
       }
@@ -1245,7 +1248,7 @@ int sym_mc_solve(sym_environment *env)
 
    /* Solve */
    env->utopia[0] = 0;
-   env->utopia[1] = -MAXDOUBLE;
+   env->utopia[1] = -MAXINT;
    if (termcode = sym_solve(env) < 0){
       env->base->cutnum -=2;
       env->rootdesc->uind.size--;
@@ -1289,7 +1292,7 @@ int sym_mc_solve(sym_environment *env)
    }
 
    /* Resolve */
-   env->utopia[0] = -MAXDOUBLE;
+   env->utopia[0] = -MAXINT;
    env->utopia[1] = 0;
    if (env->par.lp_par.mc_find_supported_solutions){
       if (env->par.mc_warm_start){      
@@ -5066,7 +5069,7 @@ int sym_get_str_param(sym_environment *env, char *key, char **value)
       *value = tm_par->sp_exe;
       return(0);
    }
-
+   /*___END_EXPERIMENTAL_SECTION___*/
    return (FUNCTION_TERMINATED_ABNORMALLY);
 }
 
