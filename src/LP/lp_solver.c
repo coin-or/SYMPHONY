@@ -2165,8 +2165,8 @@ void get_slacks(LPdata *lp_data)
 
 #else
    
-   CPXgetslack(const_cast<OsiCpxSolverInterface *>lp_data->si->getEnvironmentPtr,
-	       const_cast<OsiCpxSolverInterface *>lp_data->si->getLpPtr,
+   CPXgetslack(const_cast<OsiCpxSolverInterface *>(lp_data->si)->getEnvironmentPtr,
+	       const_cast<OsiCpxSolverInterface *>(lp_data->si)->getLpPtr,
 	       lp_data->slacks, 0, lp_data->m-1);
    /* Compute the real slacks for the free rows */
    for (i =m - 1; i >= 0; i--){
