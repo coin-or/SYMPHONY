@@ -31,7 +31,7 @@
 \*===========================================================================*/
 
 network *create_net(int *xind, double *xval, int edgenum, double etol,
-		    int *edges, int *demand, int vertnum)
+		    int *edges, double *demand, int vertnum)
 {
    register edge *net_edges;
    network *n;
@@ -152,7 +152,7 @@ network *create_net(int *xind, double *xval, int edgenum, double etol,
 \*===========================================================================*/
 
 network *create_flow_net(int *xind, double *xval, int edgenum, double etol,
-			 int *edges, int *demand, int vertnum)
+			 int *edges, double *demand, int vertnum)
 {
    register edge *net_edges;
    network *n;
@@ -373,8 +373,8 @@ network *create_flow_net(int *xind, double *xval, int edgenum, double etol,
  * the value of the cut induced by the component is put in "compcuts".
 \*===========================================================================*/
 
-int connected(network *n, int *compnodes, int *compdemands, int *compmembers,
-		   double *compcuts, double *compdensity)
+int connected(network *n, int *compnodes, double *compdemands,
+	      int *compmembers, double *compcuts, double *compdensity)
 {
   int cur_node = 0, cur_comp = 0;
   int cur_member = 0;
@@ -462,7 +462,7 @@ int connected(network *n, int *compnodes, int *compdemands, int *compmembers,
 
 /*===========================================================================*/
 
-int flow_connected(network *n, int *compnodes, int *compdemands,
+int flow_connected(network *n, int *compnodes, double *compdemands,
 		   int *compmembers, double *compcuts, double *compdensity,
 		   double etol)
 {

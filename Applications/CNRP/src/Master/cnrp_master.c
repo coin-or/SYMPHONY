@@ -180,7 +180,7 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
    if (cnrp->numroutes > 1){
       printf("NUMBER OF TRUCKS: \t%i\n", cnrp->numroutes);
       printf("TIGHTNESS: \t\t%.2f\n",
-     (double)cnrp->demand[0]/((double)cnrp->capacity*(double)cnrp->numroutes));
+	     cnrp->demand[0]/(cnrp->capacity*(double)cnrp->numroutes));
    }
    
    if (*ub > 0 && !(cnrp->par.prob_type == BPP))
@@ -254,7 +254,7 @@ int user_init_draw_graph(void *user, int dg_id)
 	 send_int_array(posx + i, 1);
 	 send_int_array(posy + i, 1);
 	 send_int_array(&eight, 1);
-	 sprintf(weight, "%i", cnrp->demand[i]);
+	 sprintf(weight, "%i", (int)(cnrp->demand[i]));
 	 send_str(weight);
       }
       /* No edges are passed to the default graph */
@@ -316,12 +316,12 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    int v0, v1;
    double flow_capacity;
 #ifdef DIRECTED_X_VARS
-   flow_capacity = (double) cnrp->capacity;
+   flow_capacity = cnrp->capacity;
 #else
    if (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == CTP)
-      flow_capacity = (double) cnrp->capacity;
+      flow_capacity = cnrp->capacity;
    else
-      flow_capacity = ((double)cnrp->capacity)/2;
+      flow_capacity = cnrp->capacity/2;
 #endif
 #endif
    
@@ -526,8 +526,8 @@ int user_send_lp_data(void *user, void **user_lp)
    send_int_array(&cnrp->dg_id, 1);
    send_int_array(&cnrp->numroutes, 1);
    send_int_array(&cnrp->vertnum, 1);
-   send_int_array(cnrp->demand, cnrp->vertnum);
-   send_int_array(&cnrp->capacity, 1);
+   send_dbl_array(cnrp->demand, cnrp->vertnum);
+   send_dbl_array(&cnrp->capacity, 1);
    send_int_array(cnrp->dist.cost, cnrp->edgenum);
    send_int_array(&cnrp->zero_varnum, 1);
    if (cnrp->zero_varnum){
@@ -575,7 +575,7 @@ int user_send_cg_data(void *user, void **user_cg)
       
    cnrp_cg->in_set = (char *) calloc(cnrp->vertnum, sizeof(char));
    cnrp_cg->ref = (int *) malloc(cnrp->vertnum*sizeof(int));
-   cnrp_cg->new_demand = (int *) malloc(cnrp->vertnum*sizeof(int));
+   cnrp_cg->new_demand = (double *) malloc(cnrp->vertnum*sizeof(double));
    cnrp_cg->cut_val = (double *) calloc(cnrp->vertnum, sizeof(double));
    cnrp_cg->cut_list = (char *) malloc(((cnrp->vertnum >> DELETE_POWER)+1)*
 				   (cnrp->cg_par.max_num_cuts_in_shrink + 1)*
@@ -605,8 +605,8 @@ int user_send_cg_data(void *user, void **user_cg)
    send_int_array(&cnrp->dg_id, 1);
    send_int_array(&cnrp->numroutes, 1);
    send_int_array(&cnrp->vertnum, 1);
-   send_int_array(cnrp->demand, cnrp->vertnum);
-   send_int_array(&cnrp->capacity, 1);
+   send_dble_array(cnrp->demand, cnrp->vertnum);
+   send_dbl_array(&cnrp->capacity, 1);
 #ifdef CHECK_CUT_VALIDITY
    send_int_array(&cnrp->feas_sol_size, 1);
    if (cnrp->feas_sol_size){
@@ -773,8 +773,8 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    /*Otherwise, construct the solution from scratch*/
 
 #ifdef ADD_FLOW_VARS
-      n = create_flow_net(indices, values, varnum, lpetol, cnrp->edges,
-			  cnrp->demand, vertnum);
+   n = create_flow_net(indices, values, varnum, lpetol, cnrp->edges,
+		       cnrp->demand, vertnum);
 #else
    n = create_net(indices, values, varnum, lpetol, cnrp->edges, cnrp->demand,
 		  vertnum);
@@ -787,8 +787,8 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 	 cnrp->dist.cost[INDEX(n->edges[i].v0, n->edges[i].v1)];
 #endif
    }
-   cnrp->fixed_cost = fixed_cost;
-   cnrp->variable_cost = variable_cost;
+   cnrp->fixed_cost = (int) (fixed_cost+0.5);
+   cnrp->variable_cost = (int) (variable_cost+0.5);
    
    printf("\nSolution Found:\n");
 #ifdef ADD_FLOW_VARS

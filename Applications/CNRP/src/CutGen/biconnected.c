@@ -68,7 +68,7 @@ void depth_first_search(vertex *v, int *count1, int *count2)
 
 /*===========================================================================*/
 
-int biconnected(network *n, int *compnodes, int *compdemands,
+int biconnected(network *n, int *compnodes, double *compdemands,
 		double *compcuts)
 {
    int i, vertnum = n->vertnum;

@@ -44,7 +44,7 @@ typedef struct ROUTE_DATA{
    int first;
    int last;
    int numcust;
-   int weight;
+   double weight;
    int cost;
 }route_data;
 

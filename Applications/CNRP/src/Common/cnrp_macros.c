@@ -46,15 +46,15 @@ int INDEX(int v0, int v1)
 /*===========================================================================*/
 
 /*approximates the number of trucks necessary to service a set of customers*/
-int BINS(int weight, int capacity)
+int BINS(double weight, double capacity)
 {
-   return((int) ceil(((double)weight)/((double)capacity)));
+   return((int) ceil(weight/capacity));
 }
 
 /*===========================================================================*/
 
 /*calculates the right hand side of a subtour elimination constraint*/
-int RHS(int cust_num, int weight, int capacity)
+int RHS(int cust_num, double weight, double capacity)
 {
    return(cust_num-BINS(weight, capacity));
 }

@@ -61,7 +61,7 @@ typedef struct LP_NET_NODE{
    lp_net_edge *first;
    int degree;
    int comp;
-   int demand;
+   double demand;
    char scanned;
 }lp_net_node;
 
@@ -85,8 +85,8 @@ typedef struct CNRP_SPEC{
    int            window;    /*contains the tid of the graphics window*/
    int            vertnum;   /*the number of nodes in the problem,
 			       including the depot                */
-   int           *demand;    /* alist of the customer demands*/
-   int            capacity;  /*the capacity of the trucks*/
+   double        *demand;    /*a list of the customer demands*/
+   double         capacity;  /*the capacity of the trucks*/
    int            numroutes; /*contains the number of routes that the problem
 			       is to be solved with. can be prespecified.  */
    int           *edges;     /*contains a list of the edges in the current
@@ -102,7 +102,7 @@ typedef struct CNRP_SPEC{
 
 lp_net *create_lp_net PROTO((cnrp_spec *cnrp, char *status, int edgenum,
 			     var_desc **vars));
-int cnrp_lp_connected PROTO((lp_net *n, int *compdemands));
+int cnrp_lp_connected PROTO((lp_net *n, double *compdemands));
 void free_lp_net  PROTO((lp_net *n));
 void construct_feasible_solution PROTO((cnrp_spec *cnrp, network *n,
 					double *objval));

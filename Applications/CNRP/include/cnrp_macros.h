@@ -34,7 +34,7 @@ if (sscanf(value, "%f", &(par)) != 1){					\
 void BOTH_ENDS PROTO((int index, int *vh, int *vl));
 int NEAREST_INT PROTO((double num));
 int INDEX PROTO((int v0, int v1));
-int BINS PROTO((int weight, int capacity));
-int RHS PROTO((int cust_num, int weight, int capacity));
+int BINS PROTO((double weight, double capacity));
+int RHS PROTO((int cust_num, double weight, double capacity));
 
 #endif

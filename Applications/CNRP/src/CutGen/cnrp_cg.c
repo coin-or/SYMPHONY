@@ -66,9 +66,9 @@ int user_receive_cg_data(void **user, int dg_id)
    receive_int_array(&cnrp->dg_id, 1);
    receive_int_array(&cnrp->numroutes, 1);
    receive_int_array(&cnrp->vertnum, 1);
-   cnrp->demand = (int *) calloc(cnrp->vertnum, sizeof(int));
-   receive_int_array(cnrp->demand, cnrp->vertnum);
-   receive_int_array(&cnrp->capacity, 1);
+   cnrp->demand = (double *) calloc(cnrp->vertnum, sizeof(double));
+   receive_dbl_array(cnrp->demand, cnrp->vertnum);
+   receive_dbl_array(&cnrp->capacity, 1);
    edgenum = cnrp->vertnum*(cnrp->vertnum-1)/2;
 #ifdef CHECK_CUT_VALIDITY
    receive_int_array(&cnrp->feas_sol_size, 1);
@@ -84,7 +84,7 @@ int user_receive_cg_data(void **user, int dg_id)
 
    cnrp->in_set = (char *) calloc(cnrp->vertnum, sizeof(char));
    cnrp->ref = (int *) malloc(cnrp->vertnum*sizeof(int));
-   cnrp->new_demand = (int *) malloc(cnrp->vertnum*sizeof(int));
+   cnrp->new_demand = (double *) malloc(cnrp->vertnum*sizeof(double));
    cnrp->cut_val = (double *) calloc(cnrp->vertnum, sizeof(double));
    cnrp->cut_list = (char *) malloc(((cnrp->vertnum >> DELETE_POWER)+1)*
 				   (cnrp->par.max_num_cuts_in_shrink + 1)*
@@ -182,7 +182,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    int vertnum = cnrp->vertnum;
    network *n;
    vertex *verts = NULL;
-   int *compdemands = NULL, *compnodes = NULL, *compnodes_copy = NULL;
+   double *compdemands = NULL;
+   int *compnodes = NULL, *compnodes_copy = NULL;
    int *compmembers = NULL, comp_num = 0;
    double node_cut, max_node_cut, *compcuts = NULL;
    int rcnt, cur_bins = 0;
@@ -190,7 +191,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    int i, k, max_node;
    int num_cuts = 0;
    double cur_slack = 0.0;
-   int capacity = cnrp->capacity;
+   double capacity = cnrp->capacity;
    int cut_size = (vertnum >> DELETE_POWER) + 1;
    cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
    elist *cur_edge = NULL;
@@ -202,16 +203,17 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 
    elist *cur_edge1 = NULL, *cur_edge2 = NULL;
    int node1 = 0, node2 = 0;
-   int *demand = cnrp->demand;
-   int *new_demand = cnrp->new_demand;
-   int total_demand = demand[0]; 
+   double *demand = cnrp->demand;
+   double *new_demand = cnrp->new_demand;
+   double total_demand = demand[0]; 
    int num_routes = cnrp->numroutes, num_trials;
    int triangle_cuts = 0;
    char *coef;
    int mult;
    char prob_type = cnrp->par.prob_type;
 #ifdef ADD_FLOW_VARS
-   int total_edgenum = vertnum*(vertnum - 1)/2, l, real_demand;
+   int total_edgenum = vertnum*(vertnum - 1)/2, l;
+   double real_demand;
    double flow_value;
 #ifndef DIRECTED_X_VARS
    int j;
@@ -461,7 +463,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    
    do{
       compnodes = (int *) calloc(vertnum, sizeof(int));
-      compdemands = (int *) calloc(vertnum, sizeof(int));
+      compdemands = (double *) calloc(vertnum, sizeof(double));
       compcuts = (double *) calloc(vertnum, sizeof(double));
       
       /*------------------------------------------------------------------*\
@@ -475,7 +477,8 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       /* copy the arrays as they will be needed later */
       if (!which_connected_routine &&
 	  cnrp->par.do_greedy){
-	 compnodes_copy = (int *) memcpy((char *)compnodes_copy, (char*)compnodes,
+	 compnodes_copy = (int *) memcpy((char *)compnodes_copy,
+					 (char*)compnodes,
 					 vertnum*sizeof(int));
 	 n->compnodes = compnodes_copy;
 	 comp_num = rcnt;
@@ -648,7 +651,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
    
    if (num_cuts < 10 && cnrp->par.do_greedy){
-      memcpy((char *)new_demand, (char *)demand, vertnum*ISIZE);
+      memcpy((char *)new_demand, (char *)demand, vertnum*DSIZE);
 #ifndef DIRECTED_X_VARS
       if (mult == 2){
 	 /*We can only do this for VRP and TSP problems without directed X
@@ -897,12 +900,13 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
  * sure each route obeys the capacity constraints.
 \*===========================================================================*/
 
-int check_connectivity(network *n, double etol, int capacity, int numroutes,
+int check_connectivity(network *n, double etol, double capacity, int numroutes,
 		       char mult)
 {
   vertex *verts;
   elist *cur_route_start;
-  int weight = 0, reduced_weight, *compdemands, *route;
+  double weight = 0, reduced_weight;
+  int *route;
   edge *edge_data;
   int cur_vert = 0, prev_vert, cust_num = 0, cur_route, rcnt, *compnodes;
   cut_data *new_cut;
@@ -910,13 +914,13 @@ int check_connectivity(network *n, double etol, int capacity, int numroutes,
   int num_cuts = 0, i, reduced_cust_num;
   int vertnum = n->vertnum, vert1, vert2;
   int cut_size = (vertnum >> DELETE_POWER) +1;
-  double *compcuts;
+  double *compcuts, *compdemands;
   
   if (!n->is_integral) return(NOT_INTEGRAL);
 
   verts = n->verts;
   compnodes = (int *) calloc(vertnum + 1, sizeof(int));
-  compdemands = (int *) calloc(vertnum + 1, sizeof(int));
+  compdemands = (double *) calloc(vertnum + 1, sizeof(double));
   compcuts = (double *) calloc(vertnum + 1, sizeof(double));
   /*get the components of the solution graph without the depot to check if the
     graph is connected or not*/
@@ -978,8 +982,9 @@ int check_connectivity(network *n, double etol, int capacity, int numroutes,
     edge_data = cur_route_start->data;
     edge_data->scanned = TRUE;
     cur_vert = edge_data->v1;
-    prev_vert = weight = cust_num = 0;
-
+    prev_vert = cust_num = 0;
+    weight = 0.0;
+    
     coef = new_cut->coef = (char *) calloc(cut_size, sizeof(char));
 
     route[0] = cur_vert;
@@ -1066,12 +1071,13 @@ int check_connectivity(network *n, double etol, int capacity, int numroutes,
 
 /*===========================================================================*/
 
-int check_flow_connectivity(network *n, double etol, int capacity,
+int check_flow_connectivity(network *n, double etol, double capacity,
 			    int numroutes, char mult)
 {
   vertex *verts;
   elist *cur_route_start;
-  int weight = 0, reduced_weight, *compdemands, *route;
+  double weight = 0, reduced_weight;
+  int *route;
   edge *edge_data;
   int cur_vert = 0, prev_vert, cust_num = 0, cur_route, rcnt, *compnodes;
   cut_data *new_cut;
@@ -1079,13 +1085,13 @@ int check_flow_connectivity(network *n, double etol, int capacity,
   int num_cuts = 0, i, reduced_cust_num;
   int vertnum = n->vertnum, vert1, vert2;
   int cut_size = (vertnum >> DELETE_POWER) +1;
-  double *compcuts;
+  double *compcuts, *compdemands;
   
   if (!n->is_integral) return(NOT_INTEGRAL);
 
   verts = n->verts;
   compnodes = (int *) calloc(vertnum + 1, sizeof(int));
-  compdemands = (int *) calloc(vertnum + 1, sizeof(int));
+  compdemands = (double *) calloc(vertnum + 1, sizeof(double));
   compcuts = (double *) calloc(vertnum + 1, sizeof(double));
   /*get the components of the solution graph without the depot to check if the
     graph is connected or not*/
@@ -1151,7 +1157,8 @@ int check_flow_connectivity(network *n, double etol, int capacity,
     edge_data = cur_route_start->data;
     edge_data->scanned = TRUE;
     cur_vert = edge_data->v1;
-    prev_vert = weight = cust_num = 0;
+    prev_vert = cust_num = 0;
+    weight = 0.0;
 
     coef = new_cut->coef = (char *) calloc(cut_size, sizeof(char));
 

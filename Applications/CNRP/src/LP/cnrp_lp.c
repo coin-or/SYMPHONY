@@ -65,9 +65,9 @@ int user_receive_lp_data(void **user)
    receive_int_array(&cnrp->numroutes, 1);
    receive_int_array(&cnrp->vertnum, 1);
    vertnum = cnrp->vertnum;
-   cnrp->demand = (int *) calloc (vertnum, sizeof(int));
-   receive_int_array(cnrp->demand, (int)vertnum);
-   receive_int_array(&cnrp->capacity, 1);
+   cnrp->demand = (double *) calloc (vertnum, sizeof(double));
+   receive_dbl_array(cnrp->demand, vertnum);
+   receive_dbl_array(&cnrp->capacity, 1);
    total_edgenum =  vertnum*(vertnum-1)/2;
    cnrp->costs = (int *) calloc (total_edgenum, sizeof(int));
    receive_int_array(cnrp->costs, total_edgenum);
@@ -161,14 +161,14 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 #ifdef DIRECTED_X_VARS
    int edgenum = (mip->n)/4;
 
-   flow_capacity = (double) cnrp->capacity;
+   flow_capacity = cnrp->capacity;
 #else
    int edgenum = (mip->n)/3;
 
    if (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == CTP)
-      flow_capacity = (double) cnrp->capacity;
+      flow_capacity = cnrp->capacity;
    else
-      flow_capacity = ((double)cnrp->capacity)/2;
+      flow_capacity = cnrp->capacity/2;
 #endif
 #else
    int edgenum = mip->n;
@@ -440,16 +440,16 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 {
    cnrp_spec *cnrp = (cnrp_spec *)user;
    vertex *verts;
-   int *demand = cnrp->demand, capacity = cnrp->capacity;
-   int rcnt, *compnodes, *compdemands;
+   double *demand = cnrp->demand, capacity = cnrp->capacity, *compdemands;
+   int rcnt, *compnodes;
    int vertnum = cnrp->vertnum, i;
    network *n;
    double *compcuts;
    int total_edgenum = vertnum*(vertnum - 1)/2;
 #ifdef ADD_FLOW_VARS
-   int tmp = varnum, real_demand;
+   int tmp = varnum;
    edge* edge1;
-   double flow_value;
+   double flow_value, real_demand;
    
 #ifndef ADD_CAP_CUTS
       n = create_flow_net(indices, values, varnum, lpetol, cnrp->edges, demand,
@@ -510,7 +510,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
    
    verts = n->verts;
    compnodes = (int *) calloc (vertnum + 1, sizeof(int));
-   compdemands = (int *) calloc (vertnum + 1, sizeof(int));
+   compdemands = (double *) calloc (vertnum + 1, sizeof(double));
    compcuts = (double *) calloc (vertnum + 1, sizeof(double));
    /*get the components of the solution graph without the depot to check if the
      graph is connected or not*/
@@ -658,7 +658,8 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 {
   int i, j, k, nzcnt = 0, nzcnt_side = 0, nzcnt_across = 0;
   cnrp_spec *cnrp = (cnrp_spec *)user;
-  int index, v0, v1, demand, *edges = cnrp->edges;
+  int index, v0, v1, *edges = cnrp->edges;
+  double demand;
   waiting_row **row_list = NULL;
   int *matind = NULL, *matind_across, *matind_side;
   cut_data *cut;
@@ -881,12 +882,12 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 #endif
 	if (first_coeff_found){
 #ifdef DIRECTED_X_VARS
-	   matval[0] = -((double)cnrp->capacity - demand);
+	   matval[0] = -(cnrp->capacity - demand);
 #else
 	   if (cnrp->par.prob_type == CSTP || cnrp->par.prob_type == CTP){
-	      matval[0] = -((double)cnrp->capacity);
+	      matval[0] = -cnrp->capacity;
 	   }else{
-	      matval[0] = -((double)cnrp->capacity)/2;
+	      matval[0] = -cnrp->capacity/2;
 	   }
 #endif
 	   if (second_coeff_found){
@@ -1117,7 +1118,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 {
    cnrp_spec *cnrp = (cnrp_spec *)user;
    lp_net *lp_net;
-   int *compdemands, capacity = cnrp->capacity;
+   double *compdemands, capacity = cnrp->capacity;
    int numchains = 0, v0, v1;
    lp_net_node *verts;
    int i;
@@ -1137,7 +1138,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 
    verts = lp_net->verts;
 
-   compdemands = (int *) calloc (varnum + 1, sizeof(int));
+   compdemands = (double *) calloc (varnum + 1, sizeof(double));
 
    /*get the connected components of the 1-edge graph*/
    numchains = cnrp_lp_connected(lp_net, compdemands);
@@ -1185,7 +1186,7 @@ int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
 
    free_lp_net(lp_net);
 
-   free((char *)compdemands);
+   FREE(compdemands);
 
    return(USER_SUCCESS);
 }
@@ -1333,7 +1334,7 @@ int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
 			     var_desc **vars, double *x,
 			     int *new_row_num, cut_data ***cuts)
 {
-   return(GENERATE_CGL_CUTS);
+   return(DO_NOT_GENERATE_CGL_CUTS);
 }
 
 /*===========================================================================*/
@@ -1351,7 +1352,7 @@ lp_net *create_lp_net(cnrp_spec *cnrp, char *status, int edgenum,
    int nv0 = 0, nv1 = 0;
    lp_net_edge *adjlist;
    int vertnum = cnrp->vertnum, i;
-   int *demand = cnrp->demand;
+   double *demand = cnrp->demand;
    int *edges = cnrp->edges;
 #ifdef ADD_FLOW_VARS
    int total_edgenum = vertnum*(vertnum-1)/2;
@@ -1411,7 +1412,7 @@ lp_net *create_lp_net(cnrp_spec *cnrp, char *status, int edgenum,
  * used in the logical fixing routine 
 \*===========================================================================*/
 
-int cnrp_lp_connected(lp_net *n, int *compdemands)
+int cnrp_lp_connected(lp_net *n, double *compdemands)
 {
    int cur_node = 0, cur_comp = 0;
    lp_net_node *verts = n->verts;

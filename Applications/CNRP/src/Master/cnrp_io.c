@@ -137,7 +137,7 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 
   char line[LENGTH], line1[LENGTH], key[30], tmp[80];
   int wformat=-1, dtype=-1, nctype=-1;
-  double fdummy;
+  double fdummy, demand_scale_factor = 1;
   int i, j = 0;
   int l, m, *coef2;
   FILE *f;
@@ -260,7 +260,7 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 	   fprintf(stderr, "CNRP I/O: error reading CAPACITY\n\n");
 	   exit(1);
 	}
-	cnrp->capacity = (int) k;
+	cnrp->capacity = ((double) k)*demand_scale_factor;
 	break;
       case 5 : /* EDGE_WEIGHT_TYPE */
 	sscanf(line, "%s", tmp);
@@ -521,7 +521,7 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 	capacity_vol = TRUE;
 	break;
       case 14: /*DEMAND_SECTION*/
-	cnrp->demand = (int *) malloc(vertnum*sizeof(int));
+	cnrp->demand = (double *) malloc(vertnum*sizeof(double));
 	for (i = 0; i < vertnum; i++){
 	   if (capacity_vol){
 	      if (fscanf(f, "%i%i%i", &k, &l, &m) != 3){
@@ -533,13 +533,18 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
 	      fprintf(stderr, "\nCNRP I/O: error reading DEMAND_SECTION\n\n");
 	      exit(1);
 	   }
-	   cnrp->demand[k-1] = l;
-	   cnrp->demand[0] += l;
+	   cnrp->demand[k-1] = (double) l;
+	   cnrp->demand[0] += (double) l;
 	}
 	if (fscanf(f, "%i%i", &k, &l)){
 	   fprintf(stderr, "\nCNRP I/O: too much data in DEMAND_SECTION\n\n");
 	   exit(1);
 	}
+	demand_scale_factor = (double)(vertnum)/cnrp->demand[0];
+	for (i = 0; i < vertnum; i++){
+	   cnrp->demand[i] *= demand_scale_factor;
+	}
+	if (cnrp->capacity > 0) cnrp->capacity *= demand_scale_factor;
 	break;
       case 15: /*TIME_WINDOW_SECTION*/  /*These sections are not used*/
 	while (fscanf(f, "%d %*d:%*d %*d:%*d", &k));
@@ -575,7 +580,7 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
      dist->cost = (int *) calloc (cnrp->edgenum, sizeof(int));
      for (i = 1, k = 0; i < vertnum; i++){
 	for (j = 0; j < i; j++){
-	   dist->cost[k++] = cnrp->demand[i]+cnrp->demand[j];
+	   dist->cost[k++] = (int)cnrp->demand[i] + (int)cnrp->demand[j];
 	}
      }
   }else if (dist->wtype != _EXPLICIT){
@@ -600,17 +605,17 @@ void cnrp_io(cnrp_problem *cnrp, char *infile)
   if (cnrp->par.prob_type == TSP || cnrp->par.prob_type == CTP){
      cnrp->numroutes = 1;
      if (!cnrp->demand)
-	cnrp->demand = (int *) malloc (vertnum * ISIZE);
+	cnrp->demand = (double *) malloc (vertnum * DSIZE);
      for (i = vertnum - 1; i > 0; i--)
-	cnrp->demand[i] = 1;
+	cnrp->demand[i] = 1.0;
      if (!cnrp->cg_par.which_tsp_cuts)
 	cnrp->cg_par.which_tsp_cuts = ALL_TSP_CUTS;
   }
   
   if (cnrp->par.prob_type == TSP)
-     cnrp->capacity = cnrp->demand[0] = vertnum;
+     cnrp->capacity = cnrp->demand[0] = (double)(vertnum);
   else if (cnrp->par.prob_type == CTP)
-     cnrp->capacity = cnrp->demand[0] = vertnum-1;
+     cnrp->capacity = cnrp->demand[0] = (double)(vertnum) -1;
 }
 
 /*===========================================================================*/
@@ -997,7 +1002,7 @@ EXIT:
 	 break;
 
        case 'C':
-	 sscanf(argv[++i], "%i", &cnrp->capacity);
+	 sscanf(argv[++i], "%f", &cnrp->capacity);
 	 break;
       };
    }

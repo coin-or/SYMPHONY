@@ -68,7 +68,7 @@ typedef struct VERTEX{
   int           comp;  /* contains the component number if the graph is
 			  disconnected */
   char          scanned;
-  int           demand; /* contains the demand for this node */
+  double        demand; /* contains the demand for this node */
   int           degree; /* contains the degree of the node in the graph */
   int           orig_node_list_size;
   int          *orig_node_list; /* contains a list of the nodes that have been
@@ -108,13 +108,13 @@ typedef struct NETWORK{
 }network;
 
 network *create_net PROTO((int *xind, double *xval, int edgenum, double etol,
-			   int *edges, int *demands, int vertnum));
+			   int *edges, double *demands, int vertnum));
 network *create_flow_net PROTO((int *xind, double *xval, int edgenum,
-				double etol, int *edges, int *demands,
+				double etol, int *edges, double *demands,
 				int vertnum));
-int connected PROTO((network *n, int *compnodes, int *compdemands,
+int connected PROTO((network *n, int *compnodes, double *compdemands,
 		   int *compmembers, double *compcuts, double *compdensity));
-int flow_connected PROTO((network *n, int *compnodes, int *compdemands,
+int flow_connected PROTO((network *n, int *compnodes, double *compdemands,
 			  int *compmembers, double *compcuts,
 			  double *compdensity, double etol));
 void free_net PROTO((network *n));

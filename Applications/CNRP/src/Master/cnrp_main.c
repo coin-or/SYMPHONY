@@ -52,7 +52,8 @@ typedef struct SOLUTION_PAIRS{
 
 /*===========================================================================*/
 
-void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau);
+void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau,
+		double ub);
 
 /*===========================================================================*/
 
@@ -74,7 +75,7 @@ int main(int argc, char **argv)
    int numpairs = 0;
    int *tree;
    int solution1, solution2;
-   double utopia_fixed, utopia_variable;
+   double utopia_fixed, utopia_variable, ub = 0.0, tmp;
    cnrp_problem *cnrp;
    
    setvbuf(stdout, (char *)NULL, _IOLBF, 0);
@@ -108,7 +109,7 @@ int main(int argc, char **argv)
    printf("***************************************************\n\n");
 
    /* Solve */
-   cnrp_solve(p, argc, argv,  gamma, tau);
+   cnrp_solve(p, argc, argv,  gamma, tau, 0.0);
 
    /* Store the solution */
    cnrp = (cnrp_problem *)(p->user);
@@ -134,7 +135,7 @@ int main(int argc, char **argv)
    printf("***************************************************\n\n");
 
    /* Solve */
-   cnrp_solve(p, argc, argv,  gamma, tau);
+   cnrp_solve(p, argc, argv,  gamma, tau, 0.0);
       
    /* Store the solution */
    cnrp = (cnrp_problem *)(p->user);
@@ -174,13 +175,20 @@ int main(int argc, char **argv)
       
       tau = 1 - gamma;
       
+      /* Find upper bound */
+
+      for (ub = 0, i = 0; i < numsolutions; i++){
+	 tmp = gamma*solutions[i].fixed_cost + tau*solutions[i].variable_cost;
+	 if (tmp < ub || ub == 0) ub = tmp; 
+      }
+      
       printf("***************************************************\n");
       printf("***************************************************\n");
       printf("Now solving with gamma = %.2f tau = %.2f \n", gamma, tau);  
       printf("***************************************************\n");
       printf("***************************************************\n\n");
 
-      cnrp_solve(p, argc, argv,  gamma, tau);
+      cnrp_solve(p, argc, argv,  gamma, tau, ub);
 
       cnrp = (cnrp_problem *)(p->user);
       
@@ -231,7 +239,8 @@ int main(int argc, char **argv)
    return(0);
 }
 
-void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau)
+void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau,
+		double ub)
 {
    int termcode;
    double t = 0, total_time=0;
@@ -265,6 +274,11 @@ void cnrp_solve(problem *p, int argc, char **argv, double gamma, double tau)
    
    /* Finds the upper and lower bounds for the problem */
    start_heurs_u(p);
+
+   if (ub > 0){
+      p->has_ub = TRUE;
+      p->ub = ub;
+   }
    
    (void) used_time(&t);
    

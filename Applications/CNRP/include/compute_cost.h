@@ -24,9 +24,9 @@
 
 int compute_icost PROTO((distances *dist, int v0, int v1));
 void canonical_tour PROTO((distances *dist, best_tours *cur_tour,
-			   int vertnum, int capacity, int *demand));
+			   int vertnum, double capacity, double *demand));
 int route_calc PROTO((distances *dist, _node *tour, int numroutes, 
-		      route_data *route_info, int *demand));
+		      route_data *route_info, double *demand));
 int compute_tour_cost PROTO((distances *dist, _node *tour));
 double ECOST PROTO((double *cost, int v0, int v1, int vertnum));
 int ICOST PROTO((distances *dist, int v0, int v1));

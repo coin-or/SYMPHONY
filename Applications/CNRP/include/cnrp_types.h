@@ -78,8 +78,8 @@ typedef struct CNRP_PROBLEM{
    int             numroutes; /* contains the number of routes that the problem
 				 is to be solved with. can be prespecified. */
    int             depot;     /* the index of the depot, usually 1 */
-   int             capacity;  /* the capacity of a truck */
-   int            *demand;    /* an array containing the demands for each node.
+   double          capacity;  /* the capacity of a truck */
+   double         *demand;    /* an array containing the demands for each node.
 				 node i's demand is p->demand[i-1] */
    int            *posx;      /* x coordinate for display purposes */
    int            *posy;      /* y coordinate for display purposes */
@@ -88,8 +88,8 @@ typedef struct CNRP_PROBLEM{
 
    best_tours     *cur_tour;  /* temporary tour storage */
    int            *cur_sol_tree;
-   double          fixed_cost;
-   double          variable_cost;
+   int             fixed_cost;
+   int             variable_cost;
    small_graph    *g;         /* contains the edge data for the reduced graph*/
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
    int             feas_sol_size;

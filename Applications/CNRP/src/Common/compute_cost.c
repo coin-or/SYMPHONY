@@ -82,10 +82,10 @@ int compute_icost(distances *dist, int va, int vb)
 \*===========================================================================*/
 
 void canonical_tour(distances *dist, best_tours *cur_tour, int vertnum,
-		    int capacity, int *demand)
+		    double capacity, double *demand)
 {
   register int i, j = 1;
-  int weight = 0;
+  double weight = 0;
   _node *tour = cur_tour->tour;
 
   if (demand[1] > capacity){

@@ -44,8 +44,8 @@ extern CCrandstate rand_state;
 new_cut->type = (num_nodes < vertnum/2 ?                                     \
 		 SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);                     \
 new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                         \
-		RHS(num_nodes, total_demand, (int)capacity) :                \
-		mult*BINS(total_demand, (int)capacity));                     \
+		RHS(num_nodes, total_demand, capacity) :                     \
+		mult*BINS(total_demand, capacity));                          \
 num_cuts += cg_send_cut(new_cut);                                            \
 
 #define SEND_SUBTOUR_CONSTRAINT(num_nodes, total_demand)                     \
@@ -53,12 +53,12 @@ if (mult - 1){                                                               \
    new_cut->type = (num_nodes < vertnum/2 ?                                  \
 		    SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);                  \
    new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?                      \
-		   RHS(num_nodes, total_demand, (int)capacity) :             \
-		   mult*BINS(total_demand, (int)capacity));                  \
+		   RHS(num_nodes, total_demand, capacity) :                  \
+		   mult*BINS(total_demand, capacity));                       \
    num_cuts += cg_send_cut(new_cut);                                         \
 }else{                                                                       \
    new_cut->type = SUBTOUR_ELIM_ACROSS;                                      \
-   new_cut->rhs = mult*BINS(total_demand, (int)capacity);                    \
+   new_cut->rhs = mult*BINS(total_demand, capacity);                         \
    num_cuts += cg_send_cut(new_cut);                                         \
 }                                                                            \
 
@@ -69,8 +69,8 @@ if (mult - 1){                                                               \
  * The original implementation was done by Leonid Kopman.
 \*===========================================================================*/
 
-int reduce_graph(network *n, double etol, int *demand, int capacity, int mult,
-		  cut_data *new_cut)
+int reduce_graph(network *n, double etol, double *demand, double capacity,
+		 int mult, cut_data *new_cut)
 {
    elist *e1, *e2, *e3;
    edge *cur_edge;
@@ -221,7 +221,7 @@ int greedy_shrinking1(network *n, double capacity, double etol,
 		      int max_num_cuts, cut_data *new_cut,
 		      int *compnodes, int *compmembers, int compnum,
 		      char *in_set, double *cut_val, int *ref, char *cut_list,
-		      int *demand, int mult)
+		      double *demand, int mult)
 {
    double set_weight, set_demand;
    vertex *verts = n->verts;
@@ -269,8 +269,8 @@ int greedy_shrinking1(network *n, double capacity, double etol,
 	 set_demand = demand[compmembers[i]];  
 	 
 	 while(TRUE){ 
-	    if (set_weight > RHS((int)set_size, (int)set_demand,
-				 (int)capacity) + etol && (int)set_size > 2){
+	    if (set_weight > RHS(set_size, set_demand, capacity) + etol &&
+		set_size > 2){
 	       memset(coef, 0, new_cut->size*sizeof(char));
 	       for (j = begin, ipt = compmembers + begin; j < end; j++, ipt++){
 		  if (in_set[j]){
@@ -292,14 +292,13 @@ int greedy_shrinking1(network *n, double capacity, double etol,
 	       if (k >= num_cuts){
 #if 0
 		  new_cut->type = SUBTOUR_ELIM_SIDE;
-		  new_cut->rhs = RHS((int)set_size, (int)set_demand,
-				     (int)capacity);
+		  new_cut->rhs = RHS(set_size, set_demand, capacity);
 		  num_cuts += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
-		  SEND_DIR_SUBTOUR_CONSTRAINT((int)set_size, (int)set_demand);
+		  SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
 #else
-		  SEND_SUBTOUR_CONSTRAINT((int)set_size, (int)set_demand);
+		  SEND_SUBTOUR_CONSTRAINT(set_size, set_demand);
 #endif
 		  memcpy(cutpt, coef, new_cut->size);
 	       }
@@ -343,7 +342,7 @@ int greedy_shrinking6(network *n, double capacity, double etol,
 		      cut_data *new_cut, int *compnodes,
 		      int *compmembers, int compnum,char *in_set,
 		      double *cut_val, int *ref, char *cut_list,
-		      int max_num_cuts, int *demand, int trial_num,
+		      int max_num_cuts, double *demand, int trial_num,
 		      double prob, int mult)
 {
    double set_weight, set_demand;
@@ -417,8 +416,8 @@ int greedy_shrinking6(network *n, double capacity, double etol,
 	    }
 	 }
 	 while(set_size){ 
-	    if (set_weight > RHS((int)set_size, (int)set_demand,
-				 (int)capacity) + etol && (int)set_size > 2){
+	    if (set_weight > RHS(set_size, set_demand, capacity) + etol &&
+		set_size > 2){
 	       memset(coef, 0, new_cut->size*sizeof(char));
 	       for (j = begin, ipt = compmembers + begin; j < end; j++, ipt++){
 		  if (in_set[j]){
@@ -439,14 +438,13 @@ int greedy_shrinking6(network *n, double capacity, double etol,
 	       if ( k >= num_cuts){
 #if 0
 		  new_cut->type = SUBTOUR_ELIM_SIDE;
-		  new_cut->rhs =  RHS((int)set_size, (int)set_demand,
-				      (int)capacity);
+		  new_cut->rhs =  RHS(set_size, set_demand, capacity);
 		  num_cuts += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
-		  SEND_DIR_SUBTOUR_CONSTRAINT((int)set_size, (int)set_demand);
+		  SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
 #else
-		  SEND_SUBTOUR_CONSTRAINT((int)set_size, (int)set_demand);
+		  SEND_SUBTOUR_CONSTRAINT(set_size, set_demand);
 #endif
 		  memcpy(cutpt, coef, new_cut->size);
 	       }
@@ -493,7 +491,7 @@ int greedy_shrinking6(network *n, double capacity, double etol,
 int greedy_shrinking1_one(network *n, double capacity, double etol,
 			  int max_num_cuts, cut_data *new_cut,char *in_set,
 			  double *cut_val, char *cut_list, int num_routes,
-			  int *demand, int mult)
+			  double *demand, int mult)
 {
  
    double set_weight, set_cut_val, set_demand;
@@ -536,8 +534,7 @@ int greedy_shrinking1_one(network *n, double capacity, double etol,
       set_demand = demand[i];  
       
       while(TRUE){ 
-	 if (set_weight > RHS((int)set_size, (int)set_demand,
-			      (int)capacity) + etol &&
+	 if (set_weight > RHS(set_size, set_demand, capacity) + etol &&
 	     set_size > 2){
 	    memset(coef, 0, new_cut->size*sizeof(char));
 	    /* printf("%d :", i); */
@@ -562,13 +559,13 @@ int greedy_shrinking1_one(network *n, double capacity, double etol,
 	    if ( k >= num_cuts){
 #if 0
 	       new_cut->type = SUBTOUR_ELIM_SIDE;
-	       new_cut->rhs =  RHS((int)set_size, (int)set_demand, (int)capacity);
+	       new_cut->rhs =  RHS(set_size, set_demand, capacity);
 	       num_cuts += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
-	       SEND_DIR_SUBTOUR_CONSTRAINT((int)set_size, (int)set_demand);
+	       SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
 #else
-	       SEND_SUBTOUR_CONSTRAINT((int)set_size, (int)set_demand);
+	       SEND_SUBTOUR_CONSTRAINT(set_size, set_demand);
 #endif
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
@@ -604,16 +601,14 @@ int greedy_shrinking1_one(network *n, double capacity, double etol,
 	    if ( k >= num_cuts){
 #if 0
 	       new_cut->type = SUBTOUR_ELIM_SIDE;
-	       new_cut->rhs =  RHS((int)complement_size, (int)complement_demand,
-				   (int)capacity);
+	       new_cut->rhs =  RHS(complement_size, complement_demand,
+				   capacity);
 	       num_cuts += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
-	       SEND_DIR_SUBTOUR_CONSTRAINT((int)complement_size,
-					   (int)complement_demand);
+	       SEND_DIR_SUBTOUR_CONSTRAINT(complement_size, complement_demand);
 #else
-	       SEND_SUBTOUR_CONSTRAINT((int)complement_size,
-				       (int)complement_demand);
+	       SEND_SUBTOUR_CONSTRAINT(complement_size, complement_demand);
 #endif
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
@@ -659,7 +654,7 @@ int greedy_shrinking1_one(network *n, double capacity, double etol,
 int greedy_shrinking6_one(network *n, double capacity,
 			  double etol, cut_data *new_cut,
 			  char *in_set, double *cut_val, int num_routes,
-			  char *cut_list, int max_num_cuts, int *demand,
+			  char *cut_list, int max_num_cuts, double *demand,
 			  int trial_num, double prob, int mult)
 {
   
@@ -724,8 +719,8 @@ int greedy_shrinking6_one(network *n, double capacity,
 	 }
       }
       while(set_size){ 
-	 if (set_weight > RHS((int)set_size, (int)set_demand,
-			      (int)capacity) + etol && (int)set_size > 2){
+	 if (set_weight > RHS(set_size, set_demand, capacity) + etol &&
+	     set_size > 2){
 	    memset(coef, 0, new_cut->size*sizeof(char));
 	    for (j = 1; j < vertnum; j++ ){
 	       if (in_set[j]){
@@ -745,14 +740,14 @@ int greedy_shrinking6_one(network *n, double capacity,
 	    if ( k >= num_cuts){
 #if 0
 	       new_cut->type = SUBTOUR_ELIM_SIDE;
-	       new_cut->rhs =  RHS((int)set_size, (int)set_demand,
-				   (int)capacity);
+	       new_cut->rhs =  RHS(set_size, set_demand,
+				   capacity);
 	       num_cuts += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
-	       SEND_DIR_SUBTOUR_CONSTRAINT((int)set_size, (int)set_demand);
+	       SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
 #else
-	       SEND_SUBTOUR_CONSTRAINT((int)set_size, (int)set_demand);
+	       SEND_SUBTOUR_CONSTRAINT(set_size, set_demand);
 #endif
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
@@ -788,16 +783,14 @@ int greedy_shrinking6_one(network *n, double capacity,
 	    if ( k >= num_cuts){
 #if 0
 	       new_cut->type = SUBTOUR_ELIM_SIDE;
-	       new_cut->rhs =  RHS((int)complement_size, (int)complement_demand,
-				   (int)capacity);
+	       new_cut->rhs =  RHS(complement_size, complement_demand,
+				   capacity);
 	       num_cuts += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
-	       SEND_DIR_SUBTOUR_CONSTRAINT((int)complement_size,
-					   (int)complement_demand);
+	       SEND_DIR_SUBTOUR_CONSTRAINT(complement_size, complement_demand);
 #else
-	       SEND_SUBTOUR_CONSTRAINT((int)complement_size,
-				       (int)complement_demand);
+	       SEND_SUBTOUR_CONSTRAINT(complement_size, complement_demand);
 #endif
 	       memcpy(cutpt, coef, new_cut->size);
 	    }
@@ -844,7 +837,7 @@ int greedy_shrinking6_one(network *n, double capacity,
 int greedy_shrinking2_one(network *n, double capacity,
 			  double etol, cut_data *new_cut,
 			  char *in_set, double *cut_val, int num_routes,
-			  int *demand, int mult)
+			  double *demand, int mult)
 {
   
    double set_cut_val, set_demand;
@@ -917,13 +910,13 @@ int greedy_shrinking2_one(network *n, double capacity,
 	    }
 #if 0
 	    new_cut->type = SUBTOUR_ELIM_SIDE;
-	    new_cut->rhs =  RHS((int)set_size, (int)set_demand, (int)capacity);
+	    new_cut->rhs =  RHS(set_size, set_demand, capacity);
 	    num_cuts += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
-	    SEND_DIR_SUBTOUR_CONSTRAINT((int)set_size, (int)set_demand);
+	    SEND_DIR_SUBTOUR_CONSTRAINT(set_size, set_demand);
 #else
-	    SEND_SUBTOUR_CONSTRAINT((int)set_size, (int)set_demand);
+	    SEND_SUBTOUR_CONSTRAINT(set_size, set_demand);
 #endif
 	 }
 
@@ -949,18 +942,15 @@ int greedy_shrinking2_one(network *n, double capacity,
 	    }
 #if 0
 	    new_cut->type = SUBTOUR_ELIM_SIDE;
-	    new_cut->rhs =  RHS((int)complement_size, (int)complement_demand,
-				(int)capacity);
+	    new_cut->rhs =  RHS(complement_size, complement_demand, capacity);
 	    num_cuts += cg_send_cut(new_cut);
 #endif
 #ifdef DIRECTED_X_VARS
-	    SEND_DIR_SUBTOUR_CONSTRAINT((int)complement_size,
-					(int)complement_demand);
+	    SEND_DIR_SUBTOUR_CONSTRAINT(complement_size, complement_demand);
 #else
-	    SEND_SUBTOUR_CONSTRAINT((int)complement_size,
-				    (int)complement_demand);
+	    SEND_SUBTOUR_CONSTRAINT(complement_size, complement_demand);
 #endif
-	    SEND_SUBTOUR_CONSTRAINT((int)complement_size, (int)complement_demand);
+	    SEND_SUBTOUR_CONSTRAINT(complement_size, complement_demand);
 	 }
 	 
 	 for (maxval = -1, pt = in_set+begin, dpt = cut_val+begin,
