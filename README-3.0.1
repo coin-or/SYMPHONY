@@ -28,7 +28,7 @@ development.
 3. Expanded application starter template to make getting started easier. Now
 new applications can be developed by implementing only two user functions.
 
-4. Bug fizes for all reported bugs.
+4. Bug fixes for all reported bugs.
 
 5.  Simplified configuration, including automatic detection of CPLEX
 version. It is no longer necessary to specify the CPLEX version under either
@@ -268,31 +268,31 @@ working under Windows. Let me know if you are interested.
 *******************************************************************************
 
 Developing a simple branch and bound solver can be done quite quickly using
-the sample framework provided in the SYMPHONY/User/ directory. The simplest
-approach is to develop a sequential application, sharing a single user data
-structure among all the modules. Using this approach, an application can be
-developed by filling in only a few simple functions. Here are four simple
-steps to get up and running. 
+the template provided in the SYMPHONY/Template/ directory. The
+simplest approach is to develop a sequential application, sharing a single
+user data structure among all the modules. Using this approach, an application
+can be developed by filling in only a few simple functions. Here are four
+simple steps to get up and running.
 
-1. Set the variable USERROOT in the make file to be ${ROOT)/User and type
+1. Set the variable USERROOT in the make file to be ${ROOT)/Template and type
 "make". Assuming that the make file has already been modified appropriately,
 as described in the sample compilation section, this should successfully
 compile the template code, although it will not run until it is modified as
 described below.
 
 2. First, decide what run-time parameters you might need and what data has to
-be stored to describe your instance. Edit the file User/include/user.h, adding
-the appropriate fields to the user_parameter and user_problem structures to
-store the relevant values.
+be stored to describe your instance. Edit the file Template/include/user.h,
+adding the appropriate fields to the user_parameter and user_problem
+structures to store the relevant values.
 
-3. Now edit the file User/Master/master_user.c. If you choose to have all
+3. Now edit the file Template/Master/master_user.c. If you choose to have all
 variables in the base set (a good starting point), the only function that
 really needs to be filled out initially is user_io(), where you can read in
 the instance data. Note that the name of the file to read the instance data
 from can be specified on the command line using the "-F" option by
 default. Also, check out the function user_set_base().
 
-4. Edit the file User/LP/lp_user.c. The function user_create_lp() must be
+4. Edit the file Template/LP/lp_user.c. The function user_create_lp() must be
 filled out. This is the most important function, as it sets up the initial LP
 relaxation in each search node.
 
@@ -306,29 +306,29 @@ information on this.
 *******************************************************************************
 
 Developing a simple branch and bound solver can be done quite quickly using
-the sample framework provided in the SYMPHONY\User\ directory. The simplest
-approach is to develop a sequential application, sharing a single user data
-structure among all the modules. Using this approach, an application can be
-developed by filling in only a few simple functions. Here are four simple
-steps to get up and running. 
+the template provided in the SYMPHONY\Template\ directory. The
+simplest approach is to develop a sequential application, sharing a single
+user data structure among all the modules. Using this approach, an application
+can be developed by filling in only a few simple functions. Here are four
+simple steps to get up and running.
 
 1. First open the workspace user.dsw and modify for your local setup, as
 described in the sample compilation section. It should build right away,
 although it won't run until modified as described below.
 
 2. Next, decide what run-time parameters you might need and what data has to
-be stored to describe your instance. Edit the file User\include\user.h, adding
-the appropriate fields to the user_parameter and user_problem structures to
-store the relevant values.
+be stored to describe your instance. Edit the file Template\include\user.h,
+adding the appropriate fields to the user_parameter and user_problem
+structures to store the relevant values.
 
-3. Now edit the file User\Master\master_user.c. If you choose to have all
+3. Now edit the file Template\Master\master_user.c. If you choose to have all
 variables in the base set (a good starting point), the only function that
 really needs to be filled out initially is user_io(), where you can read in
 the instance data. Note that the name of the file to read the instance data
 from can be specified on the command line using the "-F" option by
 default. Also, check out the function user_set_base().
 
-4. Edit the file User\LP\lp_user.c. The function user_create_lp() must be
+4. Edit the file Template\LP\lp_user.c. The function user_create_lp() must be
 filled out. This is the most important function, as it sets up the initial LP
 relaxation in each search node.
 
