@@ -256,8 +256,10 @@ branch_obj *select_branching_object(lp_prob *p, int *cuts)
 	     lp_data->status[branch_var] & PERM_FIXED_TO_UB){
 #endif
 	 if (vars[branch_var]->lb == vars[branch_var]->ub){
-	    printf("Error -- candidate is fixed. Discarding.\n\n");
-	    continue;
+	    printf("Error -- branching candidate is already fixed. \n");
+	    printf("SYMPHONY has encountered numerical difficulties \n");
+	    printf("With the LP solver. Exiting...\n\n");
+	    exit(3000);
 	 }
 	 lb = vars[branch_var]->lb;
 	 ub = vars[branch_var]->ub;
