@@ -1093,7 +1093,7 @@ void write_sav(LPdata *lp_data, char *fname)
 #endif /* __OSLLIB__ */
 
 
-#if defined(__CPLEX75__) || defined(__CPLEX70__) || defined(__CPLEX66__) || defined(__CPLEX65__) || defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
+#if defined(__CPLEX81__) || defined(__CPLEX80__) || defined(__CPLEX75__) || defined(__CPLEX70__) || defined(__CPLEX66__) || defined(__CPLEX65__) || defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
 
 /*****************************************************************************/
 /*****************************************************************************/

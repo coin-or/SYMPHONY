@@ -94,7 +94,7 @@ LP_SOLVER = NONE
 ##############################################################################
 
 #Uncomment the line below if you want to use OSL.
-LP_SOLVER = OSLLIB
+#LP_SOLVER = OSLLIB
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),OSLLIB)
@@ -115,6 +115,8 @@ endif
 #LP_SOLVER = CPLEX66
 #LP_SOLVER = CPLEX70
 #LP_SOLVER = CPLEX75
+#LP_SOLVER = CPLEX80
+LP_SOLVER = CPLEX81
 
 #Set the paths and the name of the library
 ifeq ($(LP_SOLVER),CPLEX40)
@@ -151,6 +153,16 @@ ifeq ($(LP_SOLVER),CPLEX75)
 	LPINCDIR = -I/usr/local/include
 	LPLDFLAGS = -L/usr/local/lib
 	LPLIB = -lcplex75
+endif
+ifeq ($(LP_SOLVER),CPLEX80)
+	LPINCDIR = -I/usr/local/include
+	LPLDFLAGS = -L/usr/local/lib
+	LPLIB = -lcplex80
+endif
+ifeq ($(LP_SOLVER),CPLEX81)
+	LPINCDIR = -I/usr/local/include
+	LPLDFLAGS = -L/usr/local/lib
+	LPLIB = -lcplex81
 endif
 
 ##############################################################################
