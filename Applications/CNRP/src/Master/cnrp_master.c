@@ -517,7 +517,7 @@ int user_send_lp_data(void *user, void **user_lp)
    cnrp_lp->costs = cnrp->dist.cost;
    cnrp_lp->utopia_fixed = cnrp->utopia_fixed;
    cnrp_lp->utopia_variable = cnrp->utopia_variable;
-   cnrp->variable_cost = cnrp->fixed_cost = MAXDOUBLE;
+   cnrp_lp->variable_cost = cnrp_lp->fixed_cost = MAXDOUBLE;
 
    if (cnrp->par.prob_type == VRP || cnrp->par.prob_type == TSP ||
        cnrp->par.prob_type == BPP){

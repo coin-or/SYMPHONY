@@ -652,13 +652,13 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 	 cnrp->cur_sol_tree[i] = indices[i];
       }
 #ifdef DIRECTED_X_VARS
-      if (indices[i] < 2 * total_edgenum){
+      else if (indices[i] < 2 * total_edgenum){
 	 fixed_cost += cnrp->costs[indices[i] - total_edgenum];
 	 cnrp->cur_sol_tree[i] = indices[i] - total_edgenum;
       }
 #endif
 #ifdef ADD_FLOW_VARS
-      if (indices[i] < (2 + d_x_vars) * total_edgenum){
+      else if (indices[i] < (2 + d_x_vars) * total_edgenum){
 	 variable_cost +=
 	    cnrp->costs[indices[i] - (1 + d_x_vars) * total_edgenum] * values[i]; 
       }else if (indices[i] < (3 + d_x_vars) * total_edgenum){
