@@ -675,6 +675,38 @@ calling {\tt sym\_mc\_solve} routine.
 The value used in augmented Chebyshev norm during the bicriteria 
 solution procedure.
 
+\item[{\tt generate\_cgl\_cuts} -- boolean ({\tt TRUE}).]
+Whether or not to generate cuts using COIN's cut generation library. 
+Note that, to use CGL cuts, OSI interface has to be used and moreover the 
+corresponding flags have to be set during installation. See the makefile for 
+more details.
+
+\item[{\tt generate\_cgl\_gomory\_cuts} -- boolean ({\tt TRUE}).]
+Whether or not to generate Gomory cuts using COIN's cut generation library. 
+
+\item[{\tt generate\_cgl\_knapsack\_cuts} -- boolean ({\tt TRUE}).]
+Whether or not to generate knapsack cover cuts using COIN's cut generation 
+library. 
+
+\item[{\tt generate\_cgl\_oddhole\_cuts} -- boolean ({\tt TRUE}).]
+Whether or not to generate generalized odd hole cuts using COIN's cut 
+generation library. 
+
+\item[{\tt generate\_cgl\_probing\_cuts} -- boolean ({\tt TRUE}).]
+Whether or not to generate probing cuts using COIN's cut generation library. 
+
+\item[{\tt generate\_cgl\_flow\_and\_cover\_cuts} -- boolean ({\tt FALSE}).]
+Whether or not to generate flow and cover cuts using COIN's cut generation 
+library. 
+
+\item[{\tt generate\_cgl\_rounding\_cuts} -- boolean ({\tt FALSE}).]
+Whether or not to generate simple rounding cuts using COIN's cut generation 
+library. 
+
+\item[{\tt generate\_cgl\_lift\_and\_project\_cuts} -- boolean ({\tt FALSE}).]
+Whether or not to generate lift-and-project cuts using COIN's cut generation 
+library. 
+
 \end{description}
 \subsection{Cut Generator Parameters}
 
@@ -795,6 +827,20 @@ OsiSymSearchStrategy & node\_selection\_rule & LOWEST\_LP\_FIRST \\
 & & DEPTH\_FIRST\_SEARCH \\
 \hline \hline
 OsiSymUsePermanentCutPools & use\_permanent\_cut\_pools & -boolean- \\
+\hline \hline
+OsiSymGenerateCglGomoryCuts & generate\_cgl\_gomory\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglKnapsackCuts & generate\_cgl\_knapsack\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglOddHoleCuts & generate\_cgl\_oddhole\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglProbingCuts & generate\_cgl\_probing\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglFlowAndCoverCuts & generate\_cgl\_flow\_and\_cover\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglRoundingCuts & generate\_cgl\_rounding\_cuts & -boolean- \\
+\hline \hline
+OsiSymGenerateCglLiftAndProjectCuts & generate\_cgl\_lift\_and\_project\_cuts & -boolean- \\
 \hline \hline
 OsiSymKeepWarmStart & keep\_warm\_start & -boolean- \\
 \hline \hline
