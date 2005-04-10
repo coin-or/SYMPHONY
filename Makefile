@@ -898,7 +898,7 @@ $(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS) $(GMPL_OBJ)
 	@echo "Making $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(LIBDIR)
-	$(LD) $(LIBLDFLAGS) $@ $(MASTER_OBJS) $(GMPL_OBJ)
+	$(LD) $(LIBLDFLAGS) $@ $(MASTER_OBJS) $(GMPL_OBJ) 
 	$(MAKELIB)
 	$(MKSYMLIBDIR)
 	$(LN_S)
@@ -1380,23 +1380,23 @@ $(BINDIR)/ccg : $(USER_CG_DEP) $(USER_CG_OBJS) $(LIBDIR)/libcg.a
 
 coin: $(COIN_WHATTOMAKE)
 	(cd $(COINROOT)/Coin && $(MAKE) CXX=$(CC) LibType=$(LIBTYPE) \
-	OptLevel=$(COIN_OPT) && cd -)
+	OptLevel=$(COIN_OPT))
 	(cd $(COINROOT)/Osi/$(LPXDIR) && \
 	$(MAKE) CXX=$(CC) LibType=$(LIBTYPE) OptLevel=$(COIN_OPT) \
-	$(LPXINCDIR)=$(LPSINCDIR) && cd -)
+	$(LPXINCDIR)=$(LPSINCDIR))
 
 coin_clp:
 	(cd $(COINROOT)/Clp && $(MAKE) CXX=$(CC) LibType=$(LIBTYPE) \
-	OptLevel=$(COIN_OPT) && cd -)
+	OptLevel=$(COIN_OPT))
 
 cgl:
 	(cd $(COINROOT)/Cgl && $(MAKE) CXX=$(CC) LibType=$(LIBTYPE) \
-	OptLevel=$(COIN_OPT) && cd -)
+	OptLevel=$(COIN_OPT))
 
 osisym:
 	(cd $(COINROOT)/Osi/OsiSym && \
 	$(MAKE) CXX=$(CC) LibType=$(LIBTYPE) OptLevel=$(COIN_OPT) \
-	SymIncDir=$(SYMPHONYROOT)/include && cd -)
+	SymIncDir=$(SYMPHONYROOT)/include)
 
 ###############################################################################
 ##############################################################################
@@ -1411,10 +1411,10 @@ clean :
 	rm -rf $(OBJDIR)
 
 clean_coin :
-	(cd $(COINROOT)/Clp && $(MAKE) clean && cd -)
-	(cd $(COINROOT)/Coin && $(MAKE) clean && cd -)
-	(cd $(COINROOT)/Cgl && $(MAKE) clean && cd -)
-	(cd $(COINROOT)/Osi && $(MAKE) clean && cd -)
+	(cd $(COINROOT)/Clp && $(MAKE) clean)
+	(cd $(COINROOT)/Coin && $(MAKE) clean)
+	(cd $(COINROOT)/Cgl && $(MAKE) clean)
+	(cd $(COINROOT)/Osi && $(MAKE) clean)
 
 clean_gmpl :
 	rm -rf $(GMPL_OBJDIR)
