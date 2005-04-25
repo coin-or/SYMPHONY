@@ -30,6 +30,37 @@ CONFIG_FILE_DIR = $(SYMPHONYROOT)
 endif
 
 CONFIG_FILE = config
+UNAME = $(shell uname -a)
+
+ifeq ($(findstring Linux,${UNAME}),Linux)
+    ARCH = LINUX
+else
+ifeq ($(findstring alpha,${UNAME}),alpha)
+    ARCH = ALPHA
+else
+ifeq ($(findstring AIX,${UNAME}),AIX)
+    ARCH = RS6K
+else
+ifeq ($(findstring SunOS,${UNAME}),SunOS)
+     ifeq ($(findstring i86pc,${UNAME}),i86pc)
+           ARCH = X86SOL2
+     else
+     ifeq ($(findstring 5.,$(UNAME)),5.)
+           ARCH = SUN4SOL2
+           NP = $(shell mpstat | wc -l -gt -a)
+                  ifeq ($(NP,ON)
+                         ARCH = SUNMP
+                  endif
+     endif
+     endif
+else
+ifeq ($(findstring CYGWIN,${UNAME}),CYGWIN)
+    ARCH = CYGWIN
+endif
+endif
+endif
+endif
+endif
 
 include $(CONFIG_FILE_DIR)/$(CONFIG_FILE)
 
@@ -887,7 +918,6 @@ $(BINDIR)/$(MASTERBIN) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
 $(MAIN_OBJ) $(LIBDIR)/$(LIBNAME_TYPE) 
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
-	@echo ""
 	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) $(MAIN_OBJ) \
 	$(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB) $(MASTERLPLIB) $(LIBS) 

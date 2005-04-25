@@ -38,7 +38,12 @@
 # library. 
 ##############################################################################
 
-ARCH = LINUX
+##############################################################################
+# This variable should be detected automatically now! If not, please see the 
+# Makefile and set it manually.
+##############################################################################
+
+#ARCH = LINUX
 
 ##############################################################################
 # If you have PVM installed, this will set the variable ARCH automatically.
