@@ -392,7 +392,7 @@ typedef struct MIPDESC{
 
 /* Only to be allocated and used by SYMPHONY */
 
-   int       *collen;   
+   int       *col_lengths;   
    int       *row_matbeg;      /* m */  /* a row ordered desc for heuristics */
    int       *row_matind;      /* nz */
    double    *row_matval;      /* nz */
