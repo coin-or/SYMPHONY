@@ -378,11 +378,6 @@ typedef struct MIPDESC{
    int       *matbeg;      /* n */
    int       *matind;      /* nz */
    double    *matval;      /* nz */
-   int       *collen;   
-   int       *row_matbeg;      /* m */  /* a row ordered desc for heuristics */
-   int       *row_matind;      /* nz */
-   double    *row_matval;      /* nz */
-   int       *row_lengths;  
    double    *obj;         /* n */
    double    *obj1;        /* n */ /* for bicriteria problems */
    double    *obj2;        /* n */ /* for bicriteria problems */
@@ -395,6 +390,13 @@ typedef struct MIPDESC{
    double     obj_offset;  /* constant to be added to the objective function.*/
    char       obj_sense;   /* objective sense. */
 
+/* Only to be allocated and used by SYMPHONY */
+
+   int       *collen;   
+   int       *row_matbeg;      /* m */  /* a row ordered desc for heuristics */
+   int       *row_matind;      /* nz */
+   double    *row_matval;      /* nz */
+   int       *row_lengths;  
    int        change_num;  /* number of updates on the mip desc */
    int        change_type[MAX_CHANGE_NUM];  /* type of the mip desc. changes */
 
