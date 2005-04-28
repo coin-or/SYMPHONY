@@ -107,6 +107,7 @@ COMMAND parameter_commands[] = {
   { "node_limit" },
   { "gap_limit" },
   { "param_file" },
+  { "do_primal_heuristic" },
   { "back" },
   { "quit" },
   { "exit" },
@@ -140,7 +141,7 @@ int main(int argc, char **argv)
       sym_parse_command_line(env, argc, argv);
       
       if (env->par.test){
-	 
+
 	 sym_test(env);
 	 
       }else{
@@ -565,8 +566,8 @@ int sym_help(char *line)
 	   "time_limit                         : set the time limit\n"
 	   "node_limit                         : set the node limit\n"
 	   "gap_limit                          : set the target gap between the lower and upper bound\n"
-           "param_file                         : read parameters from a parameter file\n\n"
-
+           "param_file                         : read parameters from a parameter file\n"
+	   "do_primal_heuristic                : whether or not to use primal heuristics\n\n"
 	   "back                               : leave this menu\n"
 	   "quit/exit                          : leave the optimizer\n\n");
 					    

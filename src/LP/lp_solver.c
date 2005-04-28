@@ -76,7 +76,7 @@ void free_mip_desc(MIPdesc *mip)
    FREE(mip->matbeg);
    FREE(mip->matind);
    FREE(mip->matval);
-   FREE(mip->collen);
+   FREE(mip->col_lengths);
    FREE(mip->row_matbeg);
    FREE(mip->row_matind);
    FREE(mip->row_matval);
@@ -361,14 +361,14 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    for (j = 0; j < mip->n; j++){
       type = mpl_get_col_bnds(mpl, j+1, &mip->lb[j], &mip->ub[j]);
       switch(type){
-      case  MPL_FR: /* free */
-	    mip->lb[j] = -inf;
+	case  MPL_FR: /* free */
+	   mip->lb[j] = -inf;
+	   mip->ub[j] =  inf;
+	   break;
+	case MPL_LO:  /* has lower bound */
 	    mip->ub[j] =  inf;
 	    break;
-      case MPL_LO:  /* has lower bound */
-	    mip->ub[j] =  inf;
-	    break;
-      case MPL_UP:  /* has upper bound */
+	case MPL_UP:  /* has upper bound */
 	    mip->lb[j] = -inf;
 	    break;
       default:  /* has both lower and upper bound or is a fixed variable */
@@ -398,8 +398,6 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    mip->matbeg = (int *)    calloc(ISIZE, (mip->n + 1));
    mip->matval = (double *) malloc(DSIZE * mip->nz);
    mip->matind = (int *)    malloc(ISIZE * mip->nz);
-   mip->collen = (int *) malloc(ISIZE * mip->n);
-   mip->row_lengths = (int *) malloc(ISIZE * mip->m);
 
 #if 0
    //make CoinPackedMatrix help us for now!!!
@@ -430,13 +428,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	 }
       } 
       mip->matbeg[j+1] = nonzeros;
-      mip->collen[j] = mip->matbeg[j+1] - mip->matbeg[j];
    }
-
-   mip->row_matbeg = matbeg;
-   mip->row_matval = matval;
-   mip->row_matind = matind;
-
 
    /*get the other definitions: rhs, sense and rngval from row_lb and row_ub*/
 
@@ -469,12 +461,11 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	    mip->rhs[i] = 0.0;
 	 }
       }
-      mip->row_lengths[i] = mip->row_matbeg[i+1] - mip->row_matbeg[i];
    }
 
-   //   FREE(matind);
-   //   FREE(matval);
-   //   FREE(matbeg);
+   FREE(matind);
+   FREE(matval);
+   FREE(matbeg);
    FREE(row_lb);
    FREE(row_ub);
    
@@ -2974,7 +2965,6 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    
    mip->matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
    mip->matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
-   mip->collen = (int *) malloc(ISIZE*mip->n);
    
    memcpy(mip->matval, const_cast<double *> (matrixByCol->getElements()),
 	  DSIZE * mip->matbeg[mip->n]);  
@@ -2983,30 +2973,8 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
-      mip->collen[j] = mip->matbeg[j+1]-mip->matbeg[j];
    }
 
-
-   mip->row_matbeg = (int *) malloc(ISIZE * (mip->m + 1));
-   mip->row_matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
-   mip->row_matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
-   mip->row_lengths = (int *) malloc(ISIZE*mip->m);
-
-   for(i = 0; i < mip->m; i++){
-      for(j = 0; j < mip->n; j++){
-	 for(k = mip->matbeg[j]; k < mip->matbeg[j+1]; k++){
-	    if(mip->matind[k] == i){	   
-	       mip->row_matind[nonzeros] = j;
-	       mip->row_matval[nonzeros] = mip->matval[k];
-	       nonzeros++;	  
-	       break;
-	    }
-	 }
-      } 
-      mip->row_matbeg[i+1] = nonzeros;
-      mip->row_lengths[i] = mip->row_matbeg[i+1] - mip->row_matbeg[i];
-   }
-   
    mip->obj_offset = -mps.objectiveOffset();
 
    mip->colname = (char **) malloc(sizeof(char *) * mip->n);   

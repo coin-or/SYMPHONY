@@ -3048,10 +3048,7 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	 mip_copy->lb        = (double *) malloc(DSIZE * mip_copy->n);
 	 mip_copy->is_int    = (char *)   malloc(CSIZE * mip_copy->n);
 	 mip_copy->matbeg    = (int *)    malloc(ISIZE * (mip_copy->n + 1));
-	 if (mip->collen){
-	    mip_copy->collen    = (int *)    malloc(ISIZE * mip_copy->n);
-	 }
-	 
+
 	 memcpy(mip_copy->obj,    mip->obj,    DSIZE * mip_copy->n); 
 	 memcpy(mip_copy->obj1,   mip->obj1,   DSIZE * mip_copy->n); 
 	 memcpy(mip_copy->obj2,   mip->obj2,   DSIZE * mip_copy->n); 
@@ -3059,46 +3056,40 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	 memcpy(mip_copy->lb,     mip->lb,     DSIZE * mip_copy->n);    
 	 memcpy(mip_copy->is_int, mip->is_int, CSIZE * mip_copy->n);    
 	 memcpy(mip_copy->matbeg, mip->matbeg, ISIZE * (mip_copy->n + 1));
-	 if (mip->collen){
-	    memcpy(mip_copy->collen, mip->collen, ISIZE * mip_copy->n);
-	 }
       }
 
       if (mip->m){
 	 mip_copy->rhs    = (double *) malloc(DSIZE * mip_copy->m);
 	 mip_copy->sense  = (char *)   malloc(CSIZE * mip_copy->m);
 	 mip_copy->rngval = (double *) malloc(DSIZE * mip_copy->m);
-	 if (mip->row_matbeg){
-	    mip_copy->row_matbeg  = (int *) malloc(ISIZE * (mip_copy->m + 1));
-	    mip_copy->row_lengths = (int *) malloc(ISIZE * mip_copy->m);
-	 }
 
 	 memcpy(mip_copy->rhs, mip->rhs,       DSIZE * mip_copy->m); 
 	 memcpy(mip_copy->sense, mip->sense,   CSIZE * mip_copy->m); 
 	 memcpy(mip_copy->rngval, mip->rngval, DSIZE * mip_copy->m);
-	 if (mip->row_matbeg){
-	    memcpy(mip_copy->row_matbeg, mip->row_matbeg,
-		   ISIZE*(mip_copy->m + 1));
-	    memcpy(mip_copy->row_lengths, mip->row_lengths, ISIZE*mip_copy->m);
-	 }
       }
 
       if (mip->nz){
 	 mip_copy->matval     = (double *) malloc(DSIZE*mip_copy->nz);
 	 mip_copy->matind     = (int *)    malloc(ISIZE*mip_copy->nz);
-	 if (mip->row_matind){
-	    mip_copy->row_matind = (int *)    malloc(ISIZE*mip_copy->nz);
-	    mip_copy->row_matval = (double *) malloc(DSIZE*mip_copy->nz);
-	 }
-      	
 	 memcpy(mip_copy->matval, mip->matval, DSIZE * mip_copy->nz);  
 	 memcpy(mip_copy->matind, mip->matind, ISIZE * mip_copy->nz);  
-	 if (mip->row_matind){
-	    memcpy(mip_copy->row_matind, mip->row_matind, ISIZE*mip_copy->nz);
-	    memcpy(mip_copy->row_matval, mip->row_matval, DSIZE*mip_copy->nz);
-	 }
       }
 
+      if (mip->row_matbeg){
+	 mip_copy->row_matbeg  = (int *) malloc(ISIZE * (mip_copy->m + 1));
+	 mip_copy->row_matind = (int *)    malloc(ISIZE*mip_copy->nz);
+	 mip_copy->row_matval = (double *) malloc(DSIZE*mip_copy->nz);
+	 mip_copy->row_lengths = (int *) malloc(ISIZE * mip_copy->m);
+	 mip_copy->col_lengths    = (int *)    malloc(ISIZE * mip_copy->n);
+	 
+	 memcpy(mip_copy->row_matbeg, mip->row_matbeg,
+		ISIZE*(mip_copy->m + 1));
+	 memcpy(mip_copy->row_matind, mip->row_matind, ISIZE*mip_copy->nz);
+	 memcpy(mip_copy->row_matval, mip->row_matval, DSIZE*mip_copy->nz);
+	 memcpy(mip_copy->row_lengths, mip->row_lengths, ISIZE*mip_copy->m);
+	 memcpy(mip_copy->col_lengths, mip->col_lengths, ISIZE * mip_copy->n);
+      }
+      
       if (mip->colname){
 	 mip_copy->colname = (char**)calloc(sizeof(char*), mip_copy->n);
 	 

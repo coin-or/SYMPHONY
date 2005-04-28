@@ -2001,37 +2001,6 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 	 env->mip->matind = index;
       }
    }
-
-   if (env->par.lp_par.do_primal_heuristic){
-      env->mip->collen = (int *) malloc(ISIZE * env->mip->n);
-      env->mip->row_matbeg = (int *) malloc(ISIZE * (env->mip->m + 1));
-      env->mip->row_matval =
-	 (double *)malloc(DSIZE*env->mip->matbeg[env->mip->n]);
-      env->mip->row_matind =
-	 (int *)   malloc(ISIZE*env->mip->matbeg[env->mip->n]);
-      env->mip->row_lengths = (int *) malloc(ISIZE*env->mip->m);
-
-      nonzeros = 0;
-      for(i = 0; i < env->mip->m; i++){
-	 for(j = 0; j < env->mip->n; j++){
-	    for(k = env->mip->matbeg[j]; k < env->mip->matbeg[j+1]; k++){
-	       if(env->mip->matind[k] == i){	   
-		  env->mip->row_matind[nonzeros] = j;
-		  env->mip->row_matval[nonzeros] = env->mip->matval[k];
-		  nonzeros++;	  
-		  break;
-	       }
-	    }
-	 } 
-	 env->mip->row_matbeg[i+1] = nonzeros;
-	 env->mip->row_lengths[i] = env->mip->row_matbeg[i+1] - 
-	    env->mip->row_matbeg[i];
-      }
-
-      for(j = 0; j < env->mip->n; j++){
-	 env->mip->collen[j] = env->mip->matbeg[j+1] - env->mip->matbeg[j];
-      }
-   }
       
    /* Start up the graphics window*/
 #ifndef WIN32
@@ -5481,6 +5450,7 @@ int sym_test(sym_environment *env)
   }
 
   for(i = 0; i<file_num; i++){
+
     if(env->mip->n){
       free_master_u(env);
       strcpy(env->par.infile, "");

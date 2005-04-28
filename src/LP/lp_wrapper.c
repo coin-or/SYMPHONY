@@ -136,7 +136,7 @@ int receive_lp_data_u(lp_prob *p)
    if (p->par.do_primal_heuristic){
       int nonzeros = 0, j , k;
       
-      mip->collen = (int *) malloc(ISIZE * mip->n);
+      mip->col_lengths = (int *) malloc(ISIZE * mip->n);
       mip->row_matbeg = (int *) malloc(ISIZE * (mip->m + 1));
       mip->row_matval = (double *)malloc(DSIZE*mip->matbeg[mip->n]);
       mip->row_matind = (int *)   malloc(ISIZE*mip->matbeg[mip->n]);
@@ -158,7 +158,7 @@ int receive_lp_data_u(lp_prob *p)
       }
 
       for (j = 0; j < mip->n; j++){
-	 mip->collen[j] = mip->matbeg[j+1] - mip->matbeg[j];
+	 mip->col_lengths[j] = mip->matbeg[j+1] - mip->matbeg[j];
       }
    }
 #ifdef USE_SYM_APPLICATION   
@@ -403,6 +403,45 @@ int create_subproblem_u(lp_prob *p)
       return(ERROR__USER);
    }
    
+   if (p->par.do_primal_heuristic){
+
+      FREE(p->mip->row_matbeg);
+      FREE(p->mip->row_matval);
+      FREE(p->mip->row_lengths);
+      FREE(p->mip->col_lengths);
+
+      p->mip->row_matbeg = (int *) malloc(ISIZE * (lp_data->mip->m + 1));
+      p->mip->row_matval =
+	 (double *)malloc(DSIZE*lp_data->mip->nz);
+      p->mip->row_matind =
+	(int *)   malloc(ISIZE*lp_data->mip->nz);
+      p->mip->row_lengths = (int *) malloc(ISIZE*lp_data->mip->m);
+      p->mip->col_lengths = (int *) malloc(ISIZE * lp_data->mip->n);
+      
+      int nonzeros = 0;
+      for(i = 0; i < lp_data->mip->m; i++){
+	 for(j = 0; j < lp_data->mip->n; j++){
+	    for(k = lp_data->mip->matbeg[j]; k < lp_data->mip->matbeg[j+1]; 
+		k++){
+	       if(lp_data->mip->matind[k] == i){	   
+		  p->mip->row_matind[nonzeros] = j;
+		  p->mip->row_matval[nonzeros] = lp_data->mip->matval[k];
+		  nonzeros++;  
+		  break;
+	       }
+	    }
+	 } 
+	 p->mip->row_matbeg[i+1] = nonzeros;
+	 p->mip->row_lengths[i] = p->mip->row_matbeg[i+1] - 
+	    p->mip->row_matbeg[i];
+      }
+
+      for(j = 0; j < lp_data->mip->n; j++){
+	 p->mip->col_lengths[j] = lp_data->mip->matbeg[j+1] - 
+	    lp_data->mip->matbeg[j];
+      }
+   }
+
    FREE(userind); /* No longer needed */
 
    /*------------------------------------------------------------------------*\
