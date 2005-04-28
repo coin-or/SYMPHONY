@@ -297,9 +297,9 @@ unique solver library we need now.
 4. By default, SYMPHONY is also set to use the COIN CGL library for
 generating cuts. To use CGL, the workspace includes the "cglLib" project, the 
 "symphonyLib" project has the "ADD_CGL_CUTS" preprocessor definition and the 
-path to Cgl include directory, COIN\Cgl\include and the symphony project has a 
-dependency on "cglLib". If you don't want to use the CGL library, reverse 
-this procedure and delete the "cglLib" project from the workspace.
+path to Cgl include directory, "COIN\Cgl\include" and the "symphony" project 
+has a dependency on "cglLib". If you don't want to use the CGL library, 
+reverse this procedure and delete the "cglLib" project from the workspace.
 
 5. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important note
 for OSL users: when using OSL in Windows, you must also add "OSLMSDLL" to the

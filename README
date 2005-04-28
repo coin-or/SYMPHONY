@@ -185,6 +185,25 @@ file. These parameters are listed in the SYMPHONY user's manual.
 	-j 0/1: whether or not to generate cgl cuts
 	-z n: set diving threshold to 'n'
 
+************ Using the SYMPHONY Interactive Optimizer ************************
+
+To use SYMPHONY's Interactive shell, run the executable name without any
+command line arguments. Then type "help" or "?" to see a list of available
+commands which are as follows for this version:
+
+	load      : read a problem in mps or ampl format
+	solve     : solve the problem
+	lpsolve   : solve the lp relaxation of the problem
+	set       : set a parameter
+	display   : display optimization results and stats
+	reset     : restart the optimizer
+	help      : show the available commands/params/options	
+
+	quit/exit : leave the optimizer
+
+So, if you want to load and solve an ampl/gmpl file, you will need to type
+"load sample.mod sample.dat" and then "solve". 
+
 ************************ Using the callable library **************************
 
 To use SYMPHONY as a generic callable library, compile SYMPHONY as described
@@ -198,15 +217,16 @@ callable library in this way, see the multi-criteria knapsack application
 *******************************************************************************
 
 To customize SYMPHONY by implementing the custom callback functions, simply
-modify the files in the USER/ subdirectory, as described in the user's manual 
-and follow the compilation procedures in the file USER/README. There are now a 
-number of sample applications available as examples of how to do this kind of 
-development with SYMPHONY. These include solvers for the matching problem, the 
-set partitioning problem (simple and advanced versions), the vehicle routing 
-and traveling salesman problems, and the mixed postman problem. These 
-applications are distributed as separate packages and can be downloaded from 
-www.branchandcut.org. There is a white paper that guides the user through the 
-development of the matching solver.
+modify the files in the Applications/USER/ subdirectory, as described in the 
+user's manual and follow the compilation procedures in the file 
+Applications/USER/README. There are now a number of sample applications 
+available as examples of how to do this kind of development with SYMPHONY. 
+These include solvers for the matching problem, the set partitioning problem 
+(simple and advanced versions), the vehicle routing and traveling salesman 
+problems, and the mixed postman problem. These applications are distributed as 
+separate packages and can be downloaded from www.branchandcut.org. There is a 
+white paper that guides the user through the development of the matching 
+solver.
 
 *******************************************************************************
 *                         CURRENT TESTING STATUS                              *
