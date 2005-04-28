@@ -81,7 +81,7 @@ endif
 
 ifeq ($(USE_OSI_INTERFACE),TRUE)
 OSISYM_INCDIR     = $(COINROOT)/Osi/OsiSym/include
-OSISYM_LIB        = OsiSym
+OSISYM_LIB        = -lOsiSym
 ifneq ($(LP_SOLVER),OSI)
 OSISYM_INCDIR     += $(COINROOT)/include
 OSISYM_LIBPATH    += $(COINROOT)/lib      
