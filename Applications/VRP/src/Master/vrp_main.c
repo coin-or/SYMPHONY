@@ -188,7 +188,7 @@ int vrp_test(sym_environment *env, int argc, char **argv)
      }
      
    }
-
+   return (0);
 }
 
 #endif
