@@ -56,7 +56,7 @@ int user_receive_lp_data(void **user)
    
    receive_char_array((char *)spp->par, sizeof(spp_lp_params));
    m = spp->cmatrix = (col_ordered *) calloc(1, sizeof(col_ordered));
-   receive_int_array(&colnum, 1);
+   receive_int_array(&m->colnum, 1);
    colnum = m->active_colnum = m->colnum;
    receive_int_array(&m->rownum, 1);
    receive_int_array(&m->nzcnt, 1);

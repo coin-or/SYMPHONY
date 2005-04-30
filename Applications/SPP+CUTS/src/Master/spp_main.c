@@ -47,6 +47,7 @@ int main(int argc, char **argv)
    si.findInitialBounds();
 
    /* Solve the problem */
+   si.setSymParam("lp_executable_name", "spp_lp_cg");
    si.branchAndBound();
    
    return(0);
@@ -82,6 +83,9 @@ int main(int argc, char **argv)
      
      CALL_FUNCTION( sym_find_initial_bounds(env) );
      
+     sym_set_str_param(env, "lp_executable_name", "spp_lp_cg");
+     sym_set_int_param(env, "generate_cgl_cuts", FALSE);
+
      CALL_FUNCTION( sym_solve(env) );
    
    }

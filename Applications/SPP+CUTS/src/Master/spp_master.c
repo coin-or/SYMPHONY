@@ -24,6 +24,7 @@
 #include "BB_constants.h"
 #include "BB_macros.h"
 #include "master_u.h"
+#include "proccomm.h"
 
 /* SPP include files */
 #include "spp.h"
@@ -293,7 +294,8 @@ int user_send_lp_data(void *user, void **user_lp)
 
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
    
-   spp_lp_problem *spp_lp = (spp_lp_problem *) calloc(1, sizeof(spp_lp_problem));
+   spp_lp_problem *spp_lp = (spp_lp_problem *)
+      calloc(1, sizeof(spp_lp_problem));
    *user_lp = (void *) spp_lp;
 
    spp_lp->par = spp->lp_par;
@@ -306,13 +308,13 @@ int user_send_lp_data(void *user, void **user_lp)
    /* Here, we send that data using message passing and the rest is
       done in user_receive_lp_data() in the LP process */
 
-   send_char_array((char *)spp->par, sizeof(air_parameters));
+   send_char_array((char *)spp->lp_par, sizeof(spp_lp_params));
    send_int_array(&m->colnum, 1);
    send_int_array(&m->rownum, 1);
    send_int_array(&m->nzcnt, 1);
-   send_int_array(m->colnames, colnum);
-   send_dbl_array(m->obj, colnum);
-   send_int_array(m->matbeg, (colnum + 1));
+   send_int_array(m->colnames, m->colnum);
+   send_dbl_array(m->obj, m->colnum);
+   send_int_array(m->matbeg, (m->colnum + 1));
    send_char_array((char *)m->matind, m->nzcnt * sizeof(row_ind_type));
    
 #endif
@@ -378,12 +380,12 @@ int user_send_cg_data(void *user, void **user_cg)
 
    int info;
 
-   send_char_array((char *)spp->par->cg_par, sizeof(spp_cg_params));
+   send_char_array((char *)spp->cg_par, sizeof(spp_cg_params));
    send_int_array(&colnum, 1);
    send_int_array(&m->rownum, 1);
    send_int_array(&m->nzcnt, 1);
    send_int_array(m->colnames, colnum);
-   send_double_array(m->obj, colnum);
+   send_dbl_array(m->obj, colnum);
    send_int_array(m->matbeg, colnum + 1);
    send_char_array((char *)m->matind, m->nzcnt * sizeof(row_ind_type));
 
