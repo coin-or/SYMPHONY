@@ -39,16 +39,6 @@ USERROOT = .
 MASTERNAME = match
 
 ##############################################################################
-# These are only needed if parallel computation is used. Please see the
-# explanation of these variables in SYMPHONY's Makefile.
-##############################################################################
-
-COMPILE_IN_TM = TRUE
-COMPILE_IN_LP = TRUE
-COMPILE_IN_CG = TRUE
-COMPILE_IN_CP = TRUE
-
-##############################################################################
 # This section is for listing MATCH source file names
 ##############################################################################
 
@@ -77,15 +67,13 @@ USER_CP_SRC       = user_cp.c
 
 USER_DG_SRC       = user_dg.c
 
-ALL_USER_SRC      = user_lp_branch.c user_lp.c
-ALL_USER_SRC     += user_master.c user_cg.c user_cp.c user_dg.c
-
 USER_SRCDIR       =
+USER_INCDIR       =
 
 ##############################################################################
 # This is the flag for the SYMPHONY Makefile to determine whether
-# a SYMPHONY application is to be used. You shouldn't need to modify this
-# variable. 
+# SYMPHONY is being compiled by itself or as part of a user-defined 
+# application. You shouldn't need to modify this variable. 
 ##############################################################################
 
 USE_SYM_APPL = TRUE

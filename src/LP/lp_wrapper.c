@@ -133,7 +133,9 @@ int receive_lp_data_u(lp_prob *p)
 	 }
       }
    }
+
    if (p->par.do_primal_heuristic){
+
       int nonzeros = 0, j , k;
       
       mip->col_lengths = (int *) malloc(ISIZE * mip->n);
@@ -142,10 +144,10 @@ int receive_lp_data_u(lp_prob *p)
       mip->row_matind = (int *)   malloc(ISIZE*mip->matbeg[mip->n]);
       mip->row_lengths = (int *) malloc(ISIZE*mip->m);
 
-      for(i = 0; i < mip->m; i++){
-	 for(j = 0; j < mip->n; j++){
-	    for(k = mip->matbeg[j]; k < mip->matbeg[j+1]; k++){
-	       if(mip->matind[k] == i){	   
+      for (i = 0; i < mip->m; i++){
+	 for (j = 0; j < mip->n; j++){
+	    for (k = mip->matbeg[j]; k < mip->matbeg[j+1]; k++){
+	       if (mip->matind[k] == i){	   
 		  mip->row_matind[nonzeros] = j;
 		  mip->row_matval[nonzeros] = mip->matval[k];
 		  nonzeros++;	  

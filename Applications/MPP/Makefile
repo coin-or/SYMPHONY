@@ -40,7 +40,7 @@ MASTERNAME = mpp
 
 ##############################################################################
 # These are only needed if parallel computation is used. Please see the
-# explanation of these variables in SYMPHONY's Makefile.
+# explanation of these variables in SYMPHONY's configuration file.
 ##############################################################################
 
 COMPILE_IN_TM = TRUE
@@ -77,15 +77,13 @@ USER_CP_SRC       = mpp_cp.c
 
 USER_DG_SRC       = mpp_dg.c
 
-ALL_USER_SRC      = mpp_lp_branch.c mpp_lp.c
-ALL_USER_SRC     += mpp_master.c mpp_cg.c mpp_cp.c mpp_dg.c
-
-USER_SRCDIR      += 
+USER_SRCDIR       = 
+USER_INCDIR       = 
 
 ##############################################################################
 # This is the flag for the SYMPHONY Makefile to determine whether
-# a SYMPHONY application is to be used. You shouldn't need to modify this
-# variable.  
+# SYMPHONY is being compiled by itself or as part of a user-defined 
+# application. You shouldn't need to modify this variable. 
 ##############################################################################
 
 USE_SYM_APPL = TRUE

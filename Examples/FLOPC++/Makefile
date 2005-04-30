@@ -1,9 +1,9 @@
-SymDir  := $(HOME)/SYMPHONY
-FlopcDir := $(HOME)/FLOPC++/flopc
 CoinDir  := $(HOME)/COIN
+SymDir  := $(CoinDir)/SYMPHONY
+FlopcDir := $(CoinDir)/flopc
 #LPSolverDir :=$(HOME)/OSL/osllib
 
-CXX     =  g++
+CXX     =  /usr/local/bin/g++
 
 ## Chose optimization level
 CXXFLAGS += -g
@@ -17,7 +17,7 @@ IncDir	+= $(SymDir)/include
 
 SHLINKPREFIX = -Wl,-rpath,
 
-CXXFLAGS += $(addprefix -I,${IncDir})
+CXXFLAGS += $(addprefix -I,${IncDir}) -DHAS_RANDOM -DHAS_SRANDOM
 
 LIBDIRS := $(CoinDir)/lib
 LIBDIRS += $(FlopcDir)/lib

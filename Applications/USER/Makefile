@@ -39,7 +39,7 @@ MASTERNAME = mip
 
 ##############################################################################
 # These are only needed if parallel computation is used. Please see the
-# explanation of these variables in SYMPHONY's Makefile.
+# explanation of these variables in SYMPHONY's configuration file.
 ##############################################################################
 
 COMPILE_IN_TM = TRUE
@@ -76,15 +76,13 @@ USER_CP_SRC       = user_cp.c
 
 USER_DG_SRC       = user_dg.c
 
-ALL_USER_SRC      = user_lp_branch.c user_lp.c
-ALL_USER_SRC     += user_master.c user_cg.c user_cp.c user_dg.c
-
-USER_SRCDIR      = $(USERROOT)/source
+USER_SRCDIR       =
+USER_INCDIR       =
 
 ##############################################################################
 # This is the flag for the SYMPHONY Makefile to determine whether
-# an application is to be used. You shouldn't need to modify this
-# variable. 
+# SYMPHONY is being compiled by itself or as part of a user-defined 
+# application. You shouldn't need to modify this variable. 
 ##############################################################################
 
 USE_SYM_APPL = TRUE

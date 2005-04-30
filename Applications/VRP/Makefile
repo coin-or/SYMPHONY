@@ -39,7 +39,7 @@ MASTERNAME = vrp
 
 ##############################################################################
 # These are only needed if parallel computation is used. Please see the
-# explanation of these variables in SYMPHONY's Makefile.
+# explanation of these variables in SYMPHONY's configuration file.
 ##############################################################################
 
 COMPILE_IN_TM = TRUE
@@ -92,18 +92,8 @@ USER_CP_SRC       = vrp_cp.c $(MACROS_SRC)
 
 USER_DG_SRC       = vrp_dg.c vrp_dg_network.c $(MACROS_SRC)
 
-ALL_USER_SRC      = $(MACROS_SRC) $(COST_SRC) $(NET_SRC) $(DG_FUNC_SRC)
-ALL_USER_SRC     += vrp_main.c vrp_lp_branch.c vrp_lp.c
-ALL_USER_SRC     += vrp_master.c vrp_io.c vrp_master_functions.c
-ALL_USER_SRC     += vrp_cg.c biconnected.c
-ALL_USER_SRC     += compute_cost.c decomp_user.c vrp_dg.c heur_routines.c
-ALL_USER_SRC     += vrp_cp.c vrp_dg.c vrp_dg_network.c 
-#__BEGIN_EXPERIMENTAL_SECTION__#
-ALL_USER_SRC     += start_heurs.c lower_bound.c route_heur.c exchange_heur.c
-ALL_USER_SRC     += cluster_heur.c receive_rout.c small_graph.c
-#__END_EXPERIMENTAL_SECTION__#
-
 USER_INCDIR       =
+USER_SRCDIR       =
 
 ##############################################################################
 # This section is for CONCORDE source file names
@@ -132,7 +122,7 @@ USERLIBS = -lconcorde -lcplex
 USERLIBPATHS  = ${HOME}/lib
 USER_INCDIR += -I$(CONCORDE_ROOT)/INCLUDE
 
-ifeq ($(APPL_COMPILE_IN_CG),TRUE)
+ifeq ($(COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += tsp.c # $(TSP_SRC)
 endif
 
@@ -242,7 +232,7 @@ ifeq ($(FARKAS_LIFTING_METHOD),NONE)
 USER_BB_DEFINES += -DNO_LIFTING
 endif
 
-ifeq ($(APPL_COMPILE_IN_CG),TRUE)
+ifeq ($(COMPILE_IN_CG),TRUE)
 ifeq ($(DECOMP),TRUE)
 ifeq ($(COMPILE_OUR_DECOMP),TRUE)
 USER_LP_SRC      += my_decomp_user.c decomp_lower_bound.c

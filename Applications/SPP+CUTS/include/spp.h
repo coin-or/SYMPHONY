@@ -65,10 +65,6 @@ typedef struct SPP_PARAMETERS{
    char             test_dir[MAX_FILE_NAME_LENGTH +1]; /* Test files directory */ 
    int              verbosity;
 
-   /* Pointers to CG and LP parameters */
-   spp_lp_params   *lp_par;
-   spp_cg_params   *cg_par;
-
 }spp_parameters;
 
 /*---------------------------------------------------------------------------*\

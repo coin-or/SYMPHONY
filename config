@@ -16,31 +16,21 @@
 
 ##############################################################################
 ##############################################################################
-# These entries define the various architectures that are supported as
-# determined by the variable ARCH. If your arcitecture is not listed, simply
-# add it below and then search for the places where there are
-# architecture-specific variables set and make sure to set them properly for
-# your specific architecture. For each architecture, there will be three
-# subdirectories created called $(SYMBUILDDIR)/bin/$(ARCH),
-# $(SYMBUILDDIR)/dep/$(ARCH) and ${SYMBUILDDIR)/objects/$(ARCH) where the
-# corresponding objects, binaries, and dependencies for each architecture type
-# will reside.
-##############################################################################
-##############################################################################
-
-##############################################################################
-# !!!!!!!!! User must set this variable to the proper architecture !!!!!!!!!!!
+# The architecture should be detected and set automatically if you are working
+# on one of the following: 
 #
-# CURRENT OPTIONS: LINUX, CYGWIN, RS6K, SUN4SOL2, SUNMP, X86SOL2, ALPHA
+# LINUX, CYGWIN, RS6K, SUN4SOL2, SUNMP, X86SOL2, ALPHA
 #
-# Note that these architecture variable names are the ones used to define
-# the various architectures recognized by the Parallel Virtual Machine (PVM)
-# library. 
+# Note that these architecture names are the ones used to define the
+# various architectures recognized by the Parallel Virtual Machine (PVM)
+# library. If your arcitecture is not listed, simply set it below and then
+# search for the places in the Makefile where there are architecture-specific 
+# variables set and make sure to set them properly for your specific 
+# architecture. For each architecture, there will be three subdirectories 
+# created called $(SYMBUILDDIR)/bin/$(ARCH), $(SYMBUILDDIR)/dep/$(ARCH) and
+# ${SYMBUILDDIR)/objects/$(ARCH) where the corresponding objects, binaries, 
+# and dependencies for each architecture type will reside.
 ##############################################################################
-
-##############################################################################
-# This variable should be detected automatically now! If not, please see the 
-# Makefile and set it manually.
 ##############################################################################
 
 #ARCH = LINUX
@@ -62,8 +52,12 @@
 #SYMBUILDDIR = .
 
 ##############################################################################
-# If you are getting errors using make, try changing MAKE to "gmake" and also 
-# using gmake on the command line.  
+# System command definitions
+##############################################################################
+
+##############################################################################
+# Note: If you are getting errors using make, try changing MAKE to "gmake" 
+# and also using gmake on the command line.  
 ##############################################################################
 
 MAKE = make
@@ -75,30 +69,12 @@ AR = ar -r
 RANLIB = ranlib
 
 ##############################################################################
-# The SYMPHONYROOT environment variable specifies the root directory for the 
-# source code. If this file is not in the SYMPHONY root directory, change this
-# variable to the correct path. 
-##############################################################################
-
-### If one is to be used, this variable needs to be defined in the 
-### application's Makefile.
-
-##############################################################################
-# USERROOT is the name of the user's source directory. 
-# Set MASTERNAME if you want to give the master executable a custom name.
-# Otherwise, it will be named "symphony" if the executable is sequential 
-# and master (with some configuration specific extension) otherwise.
-##############################################################################
-
-### These variables are now usually defined in the user's Makefile ###
-### See SYMPHONY/USER/Makefile                                     ###
-
-##############################################################################
 # COINROOT is the path to the root directory of the COIN libraries. Many of
-# the new features of SYMPHONY require the COIN libraries to be installed
+# the new features of SYMPHONY require the COIN libraries to be installed.
+# BY default, SYMPHONY should be located in the COINROOT directory.
 ##############################################################################
 
-COINROOT = ${HOME}/COIN
+COINROOT = ..
 
 ##############################################################################
 # LIBTYPE is the variable to indicate what type of SYMPHONY library 
@@ -116,19 +92,11 @@ LIBTYPE = SHARED
 ##############################################################################
 
 ##############################################################################
-##############################################################################
-#You must define an LP solver in order to use the software. However, by
-#default, this option is set to "NONE," which results in an error.
-##############################################################################
-##############################################################################
-
-LP_SOLVER = NONE
-
-##############################################################################
 # OSL definitions
 ##############################################################################
 
-#Uncomment the line below if you want to use OSL.
+#Uncomment the line below if you want to use the native OSL interface.
+#Note that OSL can also be used through the OSI (see below).
 #LP_SOLVER = OSL
 
 #Set the paths and the name of the library
@@ -142,7 +110,8 @@ endif
 # CPLEX definitions
 ##############################################################################
 
-#Uncomment the line below if you want to use CPLEX.
+#Uncomment the line below if you want to use the native CPLEX interface.
+#Note that CPLEX can also be used through the OSI (see below).
 #LP_SOLVER = CPLEX
 
 ifeq ($(LP_SOLVER),CPLEX)
@@ -155,8 +124,10 @@ endif
 # OSI definitions
 ##############################################################################
 
-#Uncomment the line below if you want to use an OSI interface.
+#Uncomment the line below if you want to use a solver with an OSI interface.
 LP_SOLVER = OSI
+
+#The following variable defines what Lp solver to use
 OSI_INTERFACE = CLP
 
 #Set the paths and the name of the library
@@ -210,12 +181,14 @@ endif
 # Interactive optimizer definitions
 ##############################################################################
 
+##############################################################################
 # If you want to use the GNU readline library, then simply set the following 
 # flag. It will allow the interactive shell to be able to behave exactly like 
 # the Linux terminal command line, i.e., it will keep the history of the used 
 # commands, will complete the input word to possible commands, etc. Make sure
 # that you have the needed package (readline.h and history.h include files 
 # and their libraries) on the system files path. 
+##############################################################################
 
 HAS_READLINE = TRUE
 
@@ -223,9 +196,10 @@ HAS_READLINE = TRUE
 # GLPMPL definitions
 ##############################################################################
 
-# Now, SYMPHONY includes the corresponding GLPK's GMPL parser files by 
-# default. If you don't want to compile those files, simply set the following
-# flag off. 
+##############################################################################
+# SYMPHONY includes the GMPL parser from GLPK by default. If you don't want 
+# to compile those files, simply set the following flag off. 
+##############################################################################
 
 USE_GLPMPL = TRUE
 
@@ -271,13 +245,6 @@ USE_OSI_INTERFACE = FALSE
 COMM_PROTOCOL = NONE
 #COMM_PROTOCOL = PVM
 
-#Set the paths for PVM
-ifeq ($(COMM_PROTOCOL),PVM)
-	COMMINCDIR = $(PVM_ROOT)/include
-	COMMLIBPATHS = $(PVM_ROOT)/lib/$(PVM_ARCH)
-	COMMLIBS = -lgpvm3 -lpvm3
-endif
-
 ##############################################################################
 ##############################################################################
 # Set the compiler -- If an OpenMP compliant copiler is used, then a shared
@@ -312,25 +279,25 @@ COIN_OPT = -O
 # These options are for configuring the modules and have the following
 # meanings:
 #
-# COMPILE_IN_CG: If set to true, then the CG function will be called directly 
-#	from each LP solver instead of running as a separate executable. Note 
-#	that the parameter "use_cg" should be set to FALSE (the default) if 
-#	this option is set. The executable containing the LP solver will have 
-#	the suffix _cg added to it to denote the inclusion of the cut generator
-# 	function.
-# COMPILE_IN_CP: As above, if this flag is set, then the cut pool resides in
-#	the LP solver and the pool is scanned directly from there. Note that
+# SYM_COMPILE_IN_CG: If set to true, then the CG function will be called
+#       directly from each LP solver instead of running as a separate 
+#       executable. Note that the parameter "use_cg" should be set to FALSE 
+#       (the default) if this option is set. The executable containing the LP 
+#       solver will have the suffix _cg added to it to denote the inclusion of
+#       the cut generator function.
+# SYM_COMPILE_IN_CP: As above, if this flag is set, then the cut pool resides
+#	in the LP solver and the pool is scanned directly from there. Note that
 #	if this option is chosen when multiple LP processes are running, then
 #	they will all have their own cut pool. The executable containing the 
 #	LP solver will have the suffix _cp added to it to denote the inclusion
 #	of the cut generator function.
-# COMPILE_IN_LP: If this flag is set, the LP solver will be called directly 
-#	from the tree manager. Note that this necessarily implies that there
-#	only be one LP solver. This DOES NOT automatically imply that
-#	the cut generator and/or cut pool will be compiled in. The tree 
+# SYM_COMPILE_IN_LP: If this flag is set, the LP solver will be called 
+#       directly from the tree manager. Note that this necessarily implies 
+#       that there only be one LP solver. This DOES NOT automatically imply 
+#       that the cut generator and/or cut pool will be compiled in. The tree 
 #	manager executable name will have the appropriate suffix added to it
 #	to denote the inclusion of the LP solver function.
-# COMPILE_IN_TM: If this flag is set, the tree manager function will be 
+# SYM_COMPILE_IN_TM: If this flag is set, the tree manager function will be 
 #	compiled directly from the master module instead of running as a 
 #	separate executable. This DOES NOT imply that the LP, cut generator 
 #	or cut pool functions will be compiled in. The master executable
@@ -345,6 +312,13 @@ COIN_OPT = -O
 
 # !!!These variables will be overriden if user's or one of the application's 
 # Makefile is called!!!                                                    
+
+##############################################################################
+##############################################################################
+# Note: The only parallel configuration currently supported is 
+# to set SYM_COMPILE_IN_LP = FALSE 
+##############################################################################
+##############################################################################
 
 SYM_COMPILE_IN_CG = TRUE
 SYM_COMPILE_IN_CP = TRUE
@@ -363,14 +337,6 @@ SYM_COMPILE_IN_TM = TRUE
 
 SENSITIVITY_ANALYSIS = FALSE
 
-#__BEGIN_EXPERIMENTAL_SECTION__#
-##############################################################################
-# DECOMP related stuff 
-##############################################################################
-
-DECOMP = FALSE
-
-#___END_EXPERIMENTAL_SECTION___#
 ##############################################################################
 # Option to only process the root node (for testing root lower bounds)
 ##############################################################################
@@ -420,19 +386,3 @@ STATISTICS = FALSE
 
 PSEUDO_COSTS = FALSE
 
-##############################################################################
-# Path to the X11 include directory and library files
-##############################################################################
-
-X11INCDIR  =
-X11LIBPATHS =
-
-##############################################################################
-# Other variables
-##############################################################################
-
-MACH_DEP  =
-SYSLIBS   = 
-GCCLIBDIR =
-
-##############################################################################

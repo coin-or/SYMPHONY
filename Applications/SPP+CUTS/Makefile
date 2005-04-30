@@ -40,11 +40,11 @@ MASTERNAME = spp
 
 ##############################################################################
 # These are only needed if parallel computation is used. Please see the
-# explanation of these variables in SYMPHONY's Makefile.
+# explanation of these variables in SYMPHONY's configuration file.
 ##############################################################################
 
 COMPILE_IN_TM = TRUE
-COMPILE_IN_LP = TRUE
+COMPILE_IN_LP = FALSE
 COMPILE_IN_CG = TRUE
 COMPILE_IN_CP = TRUE
 
@@ -60,7 +60,7 @@ USER_CP_SRC       = spp_cp.c
 
 USER_DG_SRC       = spp_dg.c 
 
-USER_LP_SRC       = spp_lp.c spp_lp_branch.c spp_lp_functions.c
+USER_LP_SRC       = spp_lp.c spp_lp_branch.c spp_lp_functions.c $(USER_COMMON_SRC)
 ifeq ($(COMPILE_IN_CG),TRUE)
 USER_LP_SRC      += $(USER_CG_SRC)
 endif
@@ -73,23 +73,22 @@ ifeq ($(COMPILE_IN_CP),TRUE)
 USER_TM_SRC      += $(USER_CP_SRC)
 endif
 
-USER_MASTER_SRC   = spp_main.c spp_master.c spp_master_functions.c $(USER_COMMON_SRC)
+USER_MASTER_SRC   = spp_main.c spp_master.c spp_master_functions.c 
+ifeq ($(COMPILE_IN_LP),FALSE)
+USER_MASTER_SRC  += $(USER_COMMON_SRC)
+endif
 
 ifeq ($(COMPILE_IN_TM),TRUE)
 USER_MASTER_SRC  += $(USER_TM_SRC)
 endif
 
-ALL_USER_SRC      = spp_common.c spp_lp_branch.c spp_lp.c
-ALL_USER_SRC     += spp_main.c spp_master.c spp_master_functions.c 
-ALL_USER_SRC     += spp_cg.c spp_cg_functions.c spp_cg_clique.c
-ALL_USER_SRC     += spp_cp.c spp_dg.c
-
-USER_SRCDIR      += 
+USER_SRCDIR       = 
+USER_INCDIR       = 
 
 ##############################################################################
 # This is the flag for the SYMPHONY Makefile to determine whether
-# a SYMPHONY application is to be used. You shouldn't need to modify this
-# variable. 
+# SYMPHONY is being compiled by itself or as part of a user-defined 
+# application. You shouldn't need to modify this variable. 
 ##############################################################################
 
 USE_SYM_APPL = TRUE
