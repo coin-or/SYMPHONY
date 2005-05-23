@@ -152,6 +152,7 @@ ifeq ($(ARCH),CYGWIN)
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
 	SYSLIBS = -lpthread #-lefence
 	LIBTYPE = STATIC #SHARED is not supported on CYGWIN
+	HAS_READLINE = FALSE
 endif
 
 ##############################################################################
@@ -574,7 +575,7 @@ else
 MOREFLAGS = 
 endif
 
-ifneq ($(USE_SYM_APPL),TRUE)
+ifeq ($(LIBTYPE),SHARED)
 ifneq ($(ARCH),CYGWIN)
 MORECFLAGS += -fPIC
 endif
