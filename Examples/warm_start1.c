@@ -22,7 +22,7 @@ int main(int argc, char **argv)
   OsiSymSolverInterface si;
   si.parseCommandLine(argc, argv);
   si.loadProblem();
-
+  si.setSymParam(OsiSymKeepWarmStart, true);
   si.setSymParam(OsiSymFindFirstFeasible, true);
   si.setSymParam(OsiSymSearchStrategy, DEPTH_FIRST_SEARCH);
 
@@ -48,6 +48,8 @@ int main(int argc, char **argv)
    sym_parse_command_line(env, argc, argv);   
    sym_load_problem(env);
    
+   sym_set_int_param(env, "keep_warm_start", TRUE);
+
    sym_set_int_param(env, "find_first_feasible", TRUE);
    sym_set_int_param(env, "node_selection_rule", DEPTH_FIRST_SEARCH);
 

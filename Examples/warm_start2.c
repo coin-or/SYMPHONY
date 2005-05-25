@@ -25,6 +25,7 @@ int main(int argc, char **argv)
   si.parseCommandLine(argc, argv);
   si.loadProblem();
 
+  si.setSymParam(OsiSymKeepWarmStart, true);
   si.setSymParam(OsiSymNodeLimit, 100);
 
   si.initialSolve();
@@ -56,6 +57,7 @@ int main(int argc, char **argv)
    sym_parse_command_line(env, argc, argv);   
    sym_load_problem(env);
 
+   sym_set_int_param(env, "keep_warm_start", TRUE);
    sym_set_int_param(env, "node_limit", 100);
 
    sym_solve(env);
