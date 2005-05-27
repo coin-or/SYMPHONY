@@ -285,7 +285,10 @@ else
 	CONFIG:=0$(CONFIG)
 endif 
 
-INCDIR      = $(EXTRAINCDIR) -I$(SYMPHONYROOT)/include -I$(USERROOT)/include 
+INCDIR       = $(EXTRAINCDIR) -I$(SYMPHONYROOT)/include 
+ifeq ($(USE_SYM_APP),TRUE)
+INCDIR      += -I$(USERROOT)/include 
+endif
 INCDIR 	    += $(USER_INCDIR)
 
 #__BEGIN_EXPERIMENTAL_SECTION__#
