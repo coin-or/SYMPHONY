@@ -57,6 +57,9 @@ else
 ifeq ($(findstring CYGWIN,${UNAME}),CYGWIN)
     ARCH = CYGWIN
 endif
+ifeq ($(findstring Darwin,${UNAME}),Darwin)
+    ARCH = DARWIN
+endif
 endif
 endif
 endif
@@ -217,6 +220,19 @@ ifeq ($(ARCH),ALPHA)
 	X11LIBPATHS = /usr/local/X11/lib
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
 	SYSLIBS =
+endif
+
+##############################################################################
+# Darwin Definitions
+##############################################################################
+
+ifeq ($(ARCH),DARWIN)
+	X11LIBPATHS = /usr/local/X11/lib
+	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
+	SYSLIBS =
+	EXTRAINCDIR = /usr/include/malloc
+	LIBTYPE = STATIC #SHARED is not supported on Darwin
+	HAS_READLINE = FALSE
 endif
 
 ##############################################################################
@@ -473,7 +489,7 @@ endif
 ##############################################################################
 
 SYSDEFINES  = -D__$(COMM_PROTOCOL)__ $(LPSOLVER_DEFS) 
-SYSDEFINES += $(MACH_DEP)
+SYSDEFINES += $(MACH_DEP) -D__$(ARCH)
 
 ifeq ($(USE_CGL_CUTS),TRUE)
 SYSDEFINES += -DUSE_CGL_CUTS
@@ -694,7 +710,7 @@ $(SYM_OBJDIR)/%.o : %.c
 $(GMPL_OBJDIR)/%.o : %.c
 	mkdir -p $(GMPL_OBJDIR)
 	@echo Compiling $*.c
-	gcc -DHAVE_LIBM=1 -DSTDC_HEADERS=1 -I$(GMPLINCDIR) -g -o2 -c $< -o $@
+	gcc -DHAVE_LIBM=1 -DSTDC_HEADERS=1 -I$(GMPLINCDIR) -g -c $< -o $@
 
 $(DEPDIR)/%.d : %.c
 	mkdir -p $(DEPDIR)
