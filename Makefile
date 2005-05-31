@@ -302,7 +302,7 @@ else
 endif 
 
 INCDIR       = $(EXTRAINCDIR) -I$(SYMPHONYROOT)/include 
-ifeq ($(USE_SYM_APP),TRUE)
+ifeq ($(USE_SYM_APPL),TRUE)
 INCDIR      += -I$(USERROOT)/include 
 endif
 INCDIR 	    += $(USER_INCDIR)
@@ -313,7 +313,7 @@ INCDIR 	    += -I$(SYMPHONYROOT)/include/decomp
 endif
 #___END_EXPERIMENTAL_SECTION___#
 
-USER_OBJDIR  = $(USERBUILDDIR)/objects/$(ARCH)/$(CONFIG)/
+USER_OBJDIR  = $(USERBUILDDIR)/objects/$(ARCH)/$(CONFIG)
 DEPDIR       = $(SYMBUILDDIR)/dep/$(ARCH)
 USER_DEPDIR  = $(USERBUILDDIR)/dep/$(ARCH)
 
@@ -696,6 +696,7 @@ ALL_SRC = $(BB_SRC) $(USER_SRC)
 # Global rules
 ##############################################################################
 ##############################################################################
+
 
 $(OBJDIR)/%.o : %.c
 	mkdir -p $(OBJDIR)
