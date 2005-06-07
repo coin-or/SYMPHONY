@@ -160,11 +160,11 @@ USER_SRCDIR       =
 USER_INCDIR       =
 
 ##############################################################################
-# This section is for CONCORDE source file names
+# This section is for CONCORDE
 ##############################################################################
 
 ##############################################################################
-# This solver can now solve TSPs using separation routines from CONCORDE, the
+# This solver can use separation routines from CONCORDE, the
 # TSP solver of Applegate, Bixby, Chvatal, and Cook. To enable this option:
 # 1. set the variables DO_CONCORDE_CUTS to TRUE. 
 # 2. Download the source code for CONCORDE and the qsopt LP solver from 
@@ -184,8 +184,6 @@ DO_CONCORDE_CUTS = FALSE
 
 ifeq ($(DO_CONCORDE_CUTS),TRUE)
 USER_BB_DEFINES += -DDO_TSP_CUTS
-#USER_BB_DEFINES += -DCC_ONE_ENV
-CONCORDE_ROOT = $(HOME)/concorde/
 USERLIBS = -lconcorde -lqsopt
 USERLIBPATHS  = ${HOME}/lib
 USER_INCDIR += -I${HOME}/include 
