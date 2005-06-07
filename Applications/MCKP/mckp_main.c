@@ -26,7 +26,7 @@
 
 void mckp_parse_command_line(int argc, char **argv, char *infile,
 			     int *num_items, int *num_constraints,
-			     int *format);
+			     int *format, char *solve_mc, double *gamma);
 void mckp_read_problem1(sym_environment *env, char *infile, int *num_items,
 			double ***objectives, double ***constraints,
 			double **capacity, int *num_objectives,
@@ -54,15 +54,15 @@ int main(int argc, char **argv)
    int i, j, k;
    int nz;
    int *matbeg, *matind;
-   double *matval, *lb, *ub;
-   char *sense, *is_int;
+   double *matval, *lb, *ub, gamma;
+   char *sense, *is_int, solve_mc = TRUE;
 
    sym_environment *env = sym_open_environment();
 
    sym_parse_command_line(env, argc, argv);
 
    mckp_parse_command_line(argc, argv, infile, &num_items, &num_constraints,
-			   &format);
+			   &format, &solve_mc, &gamma);
 
    sym_set_int_param(env, "do_reduced_cost_fixing", FALSE);
 
@@ -116,7 +116,23 @@ int main(int argc, char **argv)
 			     matval, lb, ub, is_int, objectives[0],
 			     objectives[1], sense, capacity, NULL, TRUE);
 
-   sym_mc_solve(env);
+   if (solve_mc){
+      sym_mc_solve(env);
+   }else{
+      sym_set_int_param(env, "multi_criteria", TRUE);
+      sym_set_dbl_param(env, "mc_gamma", gamma);
+      sym_set_dbl_param(env, "mc_tau", 1-gamma);
+      sym_set_int_param(env, "mc_find_supported_solutions", FALSE);
+      memcpy((char *)env->mip->obj1, (char *)env->mip->obj, DSIZE*env->mip->n);
+      env->base->cutnum += 2;
+      env->rootdesc->uind.size++;
+      env->rootdesc->uind.list = (int *) realloc(env->rootdesc->uind.list,
+					 env->rootdesc->uind.size*ISIZE);
+      env->rootdesc->uind.list[env->rootdesc->uind.size-1] = env->mip->n;
+      env->par.tm_par.granularity = env->par.lp_par.granularity =
+	 -MAX(env->par.lp_par.mc_rho, env->par.mc_compare_solution_tolerance);
+      sym_solve(env);
+   }
 
    sym_close_environment(env);
 
@@ -148,35 +164,91 @@ int main(int argc, char **argv)
 
 void mckp_parse_command_line(int argc, char **argv, char *infile,
 			     int *num_items, int *num_constraints,
-			     int *format)
+			     int *format, char *solve_mc, double *gamma)
 {
-   int i;
+   int i, tmpi;
    char foundF = FALSE, foundT = FALSE;
    char tmp, c;
    char line[LENGTH];
-  
+   double tmpd;
+
    for (i = 1; i < argc; i++){
       sscanf(argv[i], "%c %c", &tmp, &c);
       if (tmp != '-')
 	 continue;
       switch (c) {
-      case 'F':
-	 strncpy(infile, argv[++i], LENGTH);
-	 foundF = TRUE;
+       case 'F':
+	 if (i < argc - 1){
+	    sscanf(argv[i+1], "%c", &tmp); 
+	    if (tmp == '-'){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       strncpy(infile, argv[++i], LENGTH);
+	       foundF = TRUE;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;	     
-      case 'N':
-	 strncpy(line, argv[++i], LENGTH);
-	 sscanf(line, "%d", num_items); /*read in next keyword*/
+       case 'N':
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%d", &tmpi)){ 
+	       printf("Warning: Missing argument to command-line switch -%c",
+		      c);
+	       printf("\n");
+	    }else{
+	       i++;
+	       *num_items = tmpi;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;	     
-      case 'C':
-	 strncpy(line, argv[++i], LENGTH);
-	 sscanf(line, "%d", num_constraints); /*read in next keyword*/
-	 break;
+       case 'C':
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%d", &tmpi)){ 
+		printf("Warning: Missing argument to command-line switch -%c",
+		       c);
+		printf("\n");
+	    }else{
+	       i++;
+	       *num_constraints = tmpi;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 break;	     
        case 'T':
-	 strncpy(line, argv[++i], LENGTH);
-	 sscanf(line, "%d", format); /*read in next keyword*/
-	 foundT = TRUE;
-	 break;
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%d", &tmpi)){
+		printf("Warning: Missing argument to command-line switch -%c",
+		       c);
+		printf("\n");
+	    }else{
+	       i++;
+	       *format = tmpi;
+	       foundT = TRUE;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 break;	     
+       case 'G':
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%lf", &tmpd)){ 
+		printf("Warning: Missing argument to command-line switch -%c",
+		       c);
+		printf("\n");
+	    }else{
+	       i++;
+	       *gamma = tmpd;
+	       *solve_mc = FALSE;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 break;	     
       default:
 	 break;
       }	 

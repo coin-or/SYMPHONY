@@ -16,7 +16,7 @@
 ##############################################################################
 
 CC = g++
-OPT = -g
+OPT = -O
 ARCH = LINUX
 
 SYMPHONYROOT = ../..
@@ -75,7 +75,7 @@ LDFLAGS       = $(addprefix -L,${LPLIBPATHS})
 
 mckp : mckp_main.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB) $(LPLIB)
 
 clean : 
 
