@@ -19,6 +19,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#if !defined(HAS_SRANDOM)
+extern int srandom PROTO((unsigned seed));
+#endif
+#if !defined(HAS_RANDOM)
+extern long random PROTO((void));
+#endif
 
 #include "tm.h"
 #include "BB_constants.h"
