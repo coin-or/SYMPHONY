@@ -17,7 +17,43 @@
 
 CC = g++
 OPT = -O
-ARCH = LINUX
+
+# Automatically set the architecture
+
+UNAME = $(shell uname -a)
+
+ifeq ($(findstring Linux,${UNAME}),Linux)
+    ARCH = LINUX
+else
+ifeq ($(findstring alpha,${UNAME}),alpha)
+    ARCH = ALPHA
+else
+ifeq ($(findstring AIX,${UNAME}),AIX)
+    ARCH = RS6K
+else
+ifeq ($(findstring SunOS,${UNAME}),SunOS)
+     ifeq ($(findstring i86pc,${UNAME}),i86pc)
+           ARCH = X86SOL2
+     else
+     ifeq ($(findstring 5.,$(UNAME)),5.)
+           ARCH = SUN4SOL2
+           NP = $(shell mpstat | wc -l -gt -a)
+                  ifeq ($(NP,ON)
+                         ARCH = SUNMP
+                  endif
+     endif
+     endif
+else
+ifeq ($(findstring CYGWIN,${UNAME}),CYGWIN)
+    ARCH = CYGWIN
+endif
+ifeq ($(findstring Darwin,${UNAME}),Darwin)
+    ARCH = DARWIN
+endif
+endif
+endif
+endif
+endif
 
 SYMPHONYROOT = ../..
 COINROOT = ../../..
@@ -27,7 +63,7 @@ LP_SOLVER = OSI
 OSI_INTERFACE = CLP
 
 LPINCDIR = $(SYMPHONYROOT)/include
-LPLIB = -lsym
+LPLIB    = -lsym
 
 ifeq ($(LP_SOLVER),CPLEX)
        LPINCDIR += /usr/local/include/
@@ -47,7 +83,6 @@ ifeq ($(LP_SOLVER),OSI)
        LPINCDIR += $(COINROOT)/include
        LPLIBPATHS += $(COINROOT)/lib
        LPLIBPATHS += $(SYMPHONYROOT)/lib/${ARCH}/$(LP_SOLVER)_$(OSI_INTERFACE)
-       LPLIB += -lCoin -lOsi -lCgl
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPINCDIR += /usr/local/include/
        LPLIBPATHS += /usr/local/lib/
@@ -68,15 +103,15 @@ ifeq ($(OSI_INTERFACE),GLPK)
        LPLIBPATHS += ${HOME}/GLPK/glpk-4.3/src
        LPLIB += -lOsiGlpk -lglpk
 endif
+       LPLIB +=  -lCgl -lOsi -lCoin
 endif
 
 INCDIR        = $(addprefix -I,${LPINCDIR})
 LDFLAGS       = $(addprefix -L,${LPLIBPATHS})
-LDFLAGS      += -DHAS_RANDOM -DHAS_SRANDOM
 
 mckp : mckp_main.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB) $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB)
 
 clean : 
 
