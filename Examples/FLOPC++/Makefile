@@ -21,7 +21,7 @@ SymDir  := $(CoinDir)/SYMPHONY
 FlopcDir := $(CoinDir)/flopc
 #LPSolverDir :=$(HOME)/OSL/osllib
 
-CXX     =  /usr/local/bin/g++
+CXX     =  g++
 
 ## Chose optimization level
 CXXFLAGS += -O

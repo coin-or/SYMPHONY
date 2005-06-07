@@ -11,11 +11,13 @@
 # This software is licensed under the Common Public License. Please see      #
 # accompanying file for terms.                                               #
 #                                                                            #
+# The author of this file is Menal Guzelsoy (megb@lehigh.edu)                #
+#                                                                            #
 ##############################################################################
 ##############################################################################
 
-CC = /usr/local/bin/g++
-OPT = -g
+CC = g++
+OPT = -O
 
 SYMPHONYROOT = ..
 COINROOT = ../..
