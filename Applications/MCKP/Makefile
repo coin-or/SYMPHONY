@@ -72,6 +72,7 @@ endif
 
 INCDIR        = $(addprefix -I,${LPINCDIR})
 LDFLAGS       = $(addprefix -L,${LPLIBPATHS})
+LDFLAGS      += -DHAS_RANDOM -DHAS_SRANDOM
 
 mckp : mckp_main.c
 
