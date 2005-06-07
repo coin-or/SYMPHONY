@@ -1,3 +1,21 @@
+##############################################################################
+##############################################################################
+#                                                                            #
+# This file is part of the SYMPHONY Branch, Cut, and Price Library.          #
+#                                                                            #
+# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and     #
+# Laci Ladanyi (ladanyi@us.ibm.com).                                         #
+#                                                                            #
+# (c) Copyright 2005,  Lehigh University. All Rights Reserved.               #
+#                                                                            #
+# This software is licensed under the Common Public License. Please see      #
+# accompanying file for terms.                                               #
+#                                                                            #
+# The author of this file is Menal Guzelsoy (megb@lehigh.edu)                #
+#                                                                            #
+##############################################################################
+##############################################################################
+
 CoinDir  := $(HOME)/COIN
 SymDir  := $(CoinDir)/SYMPHONY
 FlopcDir := $(CoinDir)/flopc
@@ -6,8 +24,7 @@ FlopcDir := $(CoinDir)/flopc
 CXX     =  /usr/local/bin/g++
 
 ## Chose optimization level
-CXXFLAGS += -g
-#CXXFLAGS += -O
+CXXFLAGS += -O
 
 ##############################################################################
 IncDir	:= $(FlopcDir)/include 
@@ -17,7 +34,7 @@ IncDir	+= $(SymDir)/include
 
 SHLINKPREFIX = -Wl,-rpath,
 
-CXXFLAGS += $(addprefix -I,${IncDir}) -DHAS_RANDOM -DHAS_SRANDOM
+CXXFLAGS += $(addprefix -I,${IncDir})
 
 LIBDIRS := $(CoinDir)/lib
 LIBDIRS += $(FlopcDir)/lib
