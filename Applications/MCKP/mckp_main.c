@@ -26,7 +26,8 @@
 
 void mckp_parse_command_line(int argc, char **argv, char *infile,
 			     int *num_items, int *num_constraints,
-			     int *format, char *solve_mc, double *gamma);
+			     int *format, char *solve_mc, double *gamma,
+			     double *utopia);
 void mckp_read_problem1(sym_environment *env, char *infile, int *num_items,
 			double ***objectives, double ***constraints,
 			double **capacity, int *num_objectives,
@@ -54,7 +55,7 @@ int main(int argc, char **argv)
    int i, j, k;
    int nz;
    int *matbeg, *matind;
-   double *matval, *lb, *ub, gamma;
+   double *matval, *lb, *ub, gamma, utopia[2];
    char *sense, *is_int, solve_mc = TRUE;
 
    sym_environment *env = sym_open_environment();
@@ -62,7 +63,7 @@ int main(int argc, char **argv)
    sym_parse_command_line(env, argc, argv);
 
    mckp_parse_command_line(argc, argv, infile, &num_items, &num_constraints,
-			   &format, &solve_mc, &gamma);
+			   &format, &solve_mc, &gamma, utopia);
 
    sym_set_int_param(env, "do_reduced_cost_fixing", FALSE);
 
@@ -119,9 +120,24 @@ int main(int argc, char **argv)
    if (solve_mc){
       sym_mc_solve(env);
    }else{
+      double tau = 0.0;
       sym_set_int_param(env, "multi_criteria", TRUE);
+      if (gamma == 1.0){
+	 tau = -1.0;
+	 env->utopia[0] = 0;
+	 env->utopia[1] = -MAXINT;
+      }else if (gamma == 0.0){
+	 gamma = -1.0;
+	 tau = 1.0;
+	 env->utopia[0] = -MAXINT;
+	 env->utopia[1] = 0;
+      }else{
+	 tau = 1 - gamma;
+	 env->utopia[0] = utopia[0];
+	 env->utopia[1] = utopia[1];
+      }
       sym_set_dbl_param(env, "mc_gamma", gamma);
-      sym_set_dbl_param(env, "mc_tau", 1-gamma);
+      sym_set_dbl_param(env, "mc_tau", tau);
       sym_set_int_param(env, "mc_find_supported_solutions", FALSE);
       memcpy((char *)env->mip->obj1, (char *)env->mip->obj, DSIZE*env->mip->n);
       env->base->cutnum += 2;
@@ -164,7 +180,8 @@ int main(int argc, char **argv)
 
 void mckp_parse_command_line(int argc, char **argv, char *infile,
 			     int *num_items, int *num_constraints,
-			     int *format, char *solve_mc, double *gamma)
+			     int *format, char *solve_mc, double *gamma,
+			     double *utopia)
 {
    int i, tmpi;
    char foundF = FALSE, foundT = FALSE;
@@ -244,6 +261,22 @@ void mckp_parse_command_line(int argc, char **argv, char *infile,
 	       i++;
 	       *gamma = tmpd;
 	       *solve_mc = FALSE;
+	       if (tmpd != 1.0 && tmpd != 0.0){
+		  if (!sscanf(argv[i+1], "%lf", &tmpd)){ 
+		     printf("Warning: Missing argument to command-line switch -%c",
+			    c);
+		     printf("\n");
+		  }else{
+		     utopia[0] = tmpd;
+		  }
+		  if (!sscanf(argv[i+1], "%lf", &tmpd)){ 
+		     printf("Warning: Missing argument to command-line switch -%c",
+			    c);
+		     printf("\n");
+		  }else{
+		     utopia[1] = tmpd;
+		  }
+	       }
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
