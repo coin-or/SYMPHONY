@@ -134,7 +134,7 @@ OSI_INTERFACE = CLP
 ifeq ($(LP_SOLVER),OSI)
        LPINCDIR = $(COINROOT)/include
        LPLIBPATHS = $(COINROOT)/lib
-       LPLIB = -lCoin -lOsi
+       LPLIB = -lOsi -lCoin
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPSINCDIR = /usr/local/include
        LPLIBPATHS += /usr/local/lib/
