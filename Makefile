@@ -136,6 +136,7 @@ ifeq ($(ARCH),LINUX)
 	   LPSOLVER_DEFS = -DSYSFREEUNIX
 	endif
 	MACH_DEP = -DHAS_RANDOM -DHAS_SRANDOM
+	SYSLIBPATHS = /usr/lib/termcap
 	SYSLIBS = -lpthread #-lefence
 	ifeq ($(HAS_READLINE), TRUE)
 		SYSLIBS += -lreadline -ltermcap
@@ -375,7 +376,7 @@ VPATH  = $(SRCDIR):$(USER_SRCDIR)
 # Put it together
 ##############################################################################
 
-LIBPATHS      = $(LIBDIR) $(X11LIBPATHS) $(COMMLIBPATHS) $(LPLIBPATHS) \
+LIBPATHS      = $(LIBDIR) $(X11LIBPATHS) $(SYSLIBPATHS) $(COMMLIBPATHS) $(LPLIBPATHS) \
 		$(OSISYM_LIBPATH)
 LIBPATHS     += $(USERLIBPATHS)
 INCPATHS      = $(X11INCDIR) $(COMMINCDIR) $(LPINCDIR) $(LPSINCDIR)\
@@ -725,6 +726,21 @@ $(DEPDIR)/%.d : %.c
                         (NR!=1) {print;}" \
                 > $@'
 
+$(USER_OBJDIR)/%.o : %.cpp
+	mkdir -p $(USER_OBJDIR)
+	@echo Compiling $*.cpp
+	$(CC) $(CFLAGS) $(EFENCE_LD_OPTIONS) -c $< -o $@
+
+$(USER_DEPDIR)/%.d : %.cpp
+	mkdir -p $(USER_DEPDIR)
+	@echo Creating dependency $*.d
+	$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
+		| $(AWK) "(NR==1) {printf(\"$(USER_OBJDIR)/$*.o \\\\\\n\"); \
+                                 printf(\"$(USER_DEPDIR)/$*.d :\\\\\\n \\\\\\n\"); \
+                                } \
+                        (NR!=1) {print;}" \
+                > $@'
+
 $(USER_OBJDIR)/%.o : %.c
 	mkdir -p $(USER_OBJDIR)
 	@echo Compiling $*.c
@@ -867,13 +883,15 @@ GMPL_OBJ          = $(addprefix $(GMPL_OBJDIR)/,$(notdir $(GMPL_SRC:.c=.o)))
 endif
 MASTER_DEP        = $(addprefix $(DEPDIR)/,$(MASTER_MAIN_SRC:.c=.d))
 MASTER_DEP 	 += $(addprefix $(DEPDIR)/,$(ALL_MASTER:.c=.d))
-USER_MASTER_OBJS  = $(addprefix $(USER_OBJDIR)/,$(notdir $(USER_MASTER_SRC:.c=.o)))
-USER_MASTER_DEP   = $(addprefix $(USER_DEPDIR)/,$(USER_MASTER_SRC:.c=.d))
+
+
+USER_MASTER_OBJS = $(addprefix $(USER_OBJDIR)/,\
+	$(notdir $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(USER_MASTER_SRC)))))
+USER_MASTER_DEP = $(addprefix $(USER_DEPDIR)/,\
+	$(notdir $(patsubst %.cpp,%.d,$(patsubst %.c,%.d,$(USER_MASTER_SRC)))))
 
 DEPENDANTS = $(USER_MASTER_DEP)
 OBJECTS = $(USER_MASTER_OBJS) $(MAIN_OBJ) 
-
-
 
 ifeq ($(USE_SYM_APPL),TRUE)
 LIBNAME = sym_app
