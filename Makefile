@@ -473,6 +473,8 @@ CPEXT = _cp
 endif
 ifeq ($(SYM_COMPILE_IN_LP),TRUE)
 TMEXT = _lp$(LPEXT)$(CPEXT)
+else
+TMEXT = $(CPEXT)
 endif
 ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 MASTEREXT = _m_tm$(TMEXT)
@@ -1310,7 +1312,7 @@ $(BINDIR)/$(MASTERNAME)_cp : $(USER_CP_DEP) $(USER_CP_OBJS) $(LIBDIR)/lib$(LIBNA
 	-l$(LIBNAME)_cp $(LIBS) 
 	@echo ""
 
-$(LIBDIR)/libcp.a : $(CP_DEP) $(CP_OBJS)
+$(LIBDIR)/lib$(LIBNAME)_cp.a : $(CP_DEP) $(CP_OBJS)
 	@echo ""
 	@echo "Making $(notdir $@) ..."
 	@echo ""

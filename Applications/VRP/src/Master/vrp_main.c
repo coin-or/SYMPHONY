@@ -31,7 +31,9 @@ int main(int argc, char **argv)
 
    //si.setSymParam(OsiSymVerbosity, 3);
    si.setSymParam(OsiSymGranularity, 0.9999); 
-   //si.setSymParam(OsiSymGenerateMipCuts, false);
+   si.setSymParam(OsiSymGenerateMipCuts, false);
+   si.setSymParam("lp_executable_name", "vrp_lp_cg");
+   si.setSymParam("cp_executable_name", "vrp_cp");
    
    /* Parse the command line */
    si.parseCommandLine(argc, argv);
@@ -43,7 +45,6 @@ int main(int argc, char **argv)
    si.findInitialBounds();
    
    /* Solve the problem */
-   si.setSymParam("lp_executable_name", "vrp_lp_cg");
    si.branchAndBound();
 
    return(0);
@@ -79,6 +80,7 @@ int main(int argc, char **argv)
      sym_find_initial_bounds(env);
      
      sym_set_str_param(env, "lp_executable_name", "vrp_lp_cg");
+     sym_set_str_param(env, "cp_executable_name", "vrp_cp");
      sym_set_int_param(env, "generate_cgl_cuts", FALSE);
      
      sym_solve(env);

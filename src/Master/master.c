@@ -762,7 +762,7 @@ int sym_solve(sym_environment *env)
       int feas_sol_size;
       int *feas_sol;
 #ifdef USE_SYM_APPLICATION      
-      if (user_send_feas_sol(env->user, &feas_sol_size, &feas_sol)==USER_NO_PP){
+      if (user_send_feas_sol(env->user,&feas_sol_size,&feas_sol)==USER_NO_PP){
 	 tm->feas_sol_size = feas_sol_size;
 	 tm->feas_sol = (int *) calloc (tm->feas_sol_size, sizeof(int));
 	 memcpy((char *)tm->feas_sol, (char *)feas_sol, feas_sol_size * ISIZE);
@@ -937,7 +937,7 @@ int sym_solve(sym_environment *env)
    }
    env->par.tm_par.warm_start = FALSE;
    
-#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
+#ifdef COMPILE_IN_LP
    thread_num = env->tm->opt_thread_num;
    if (env->tm->lpp[thread_num]){
       if (env->tm->lpp[thread_num]->best_sol.has_sol){
@@ -950,24 +950,24 @@ int sym_solve(sym_environment *env)
 	  env->best_sol;
       }
    }
-#elif defined(COMPILE_IN_TM)
+#else
    if (env->tm->best_sol.has_sol){
       FREE(env->best_sol.xind);
       FREE(env->best_sol.xval);
       env->best_sol = env->warm_start->best_sol = 
 	 env->tm->best_sol;
    }
-#else
-   env->warm_start->best_sol = env->best_sol;
 #endif
 
    tm->rootnode = NULL;
    tm->cuts = NULL;
    tm->cut_num = tm->allocated_cut_num = 0;
+#ifdef COMPILE_IN_CP
    if (env->cp && env->par.use_permanent_cut_pools){
       tm->cpp = NULL;
    }
-
+#endif
+   
 #if !defined(COMPILE_IN_LP) && 0
    /* This is not needed anymore */
    if (termcode != SOMETHING_DIED){
@@ -989,7 +989,7 @@ int sym_solve(sym_environment *env)
    }
 #endif
 
-   /* FIXEM: Set the correct termcode. This can't be done in the treemanager
+   /* FIXME: Set the correct termcode. This can't be done in the treemanager
       because it doesn't know whether a solution was found. This should be
       changed. */
    if (termcode == TM_FINISHED){
@@ -1723,17 +1723,19 @@ int sym_mc_solve(sym_environment *env)
    printf(  "* Now displaying stats...                              *\n");
    printf(  "********************************************************\n\n");
 
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP)
    if (env->par.use_permanent_cut_pools){
       for (i = 0; i < env->par.tm_par.max_cp_num; i++){
 	 env->comp_times.bc_time.cut_pool += env->cp[i]->cut_pool_time;
 	 env->warm_start->stat.cuts_in_pool += env->cp[i]->cut_num;
       }
    }
+#endif
    
    print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 0.0,
 		    0.0, 0, start_time, wall_clock(NULL), env->mip->obj_offset,
 		    env->mip->obj_sense, env->has_ub);
-
+   
    printf("\nNumber of subproblems solved: %i\n", numprobs);
    printf("Number of solutions found: %i\n\n", numsolutions);
    

@@ -43,9 +43,9 @@ MASTERNAME = vrp
 ##############################################################################
 
 COMPILE_IN_TM = TRUE
-COMPILE_IN_LP = TRUE
+COMPILE_IN_LP = FALSE
 COMPILE_IN_CG = TRUE
-COMPILE_IN_CP = TRUE
+COMPILE_IN_CP = FALSE
 
 ##############################################################################
 # This section is for listing VRP source file names
@@ -129,6 +129,7 @@ USER_LP_SRC      += tsp.c # $(TSP_SRC)
 endif
 
 USER_CG_SRC      += tsp.c # $(TSP_SRC)
+endif
 
 #__BEGIN_EXPERIMENTAL_SECTION__#
 ##############################################################################

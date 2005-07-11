@@ -1056,9 +1056,9 @@ int resolve_node(sym_environment *env, bc_node *node)
 void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 {
    int i, cnt = 0, *indices, set_sol = FALSE;
-   MIPdesc * mip;
+   MIPdesc *mip;
    double upper_bound = 0.0, lpetol = 9.9999999999999995e-07, *values;
-   lp_sol * best_sol = &(env->warm_start->best_sol);
+   lp_sol *best_sol = &(env->warm_start->best_sol);
 
    if (root){
       if (root->node_status == NODE_STATUS__PRUNED || 
@@ -3115,15 +3115,17 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 /*===========================================================================*/
 /*===========================================================================*/
 
-sym_environment * create_copy_environment (sym_environment *env)
+sym_environment *create_copy_environment (sym_environment *env)
 {
    int i, j, num;
-   sym_environment * env_copy;
-   params * par;
-   lp_sol * sol;
-   cp_cut_data * cp_cut;
-   cut_data * cut;
-
+   sym_environment *env_copy;
+   params *par;
+   lp_sol *sol;
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP)
+   cp_cut_data *cp_cut;
+   cut_data *cut;
+#endif
+   
    if (!env){
       printf("create_copy_sym_environment(): The given problem is empty!\n");
       printf("Unable to copy.\n");
@@ -3273,10 +3275,11 @@ sym_environment * create_copy_environment (sym_environment *env)
    if (env->warm_start){
       env_copy->warm_start = create_copy_warm_start(env->warm_start);
    }
-   /*========================================================================*/
 
+   /*========================================================================*/
    /*copy the cut pool */
 
+#if defined(COMPILE_IN_TM) && defined(COMPILE_IN_CP)
    if (env_copy->par.tm_par.max_cp_num > 1){
       env_copy->cp =
 	 (cut_pool **) malloc(env_copy->par.tm_par.max_cp_num*
@@ -3318,7 +3321,6 @@ sym_environment * create_copy_environment (sym_environment *env)
 	 memcpy(sol->xind, env->cp[i]->cur_sol.xind, ISIZE*sol->max_sol_length);
 	 memcpy(sol->xval, env->cp[i]->cur_sol.xval, DSIZE*sol->max_sol_length);
           
-#ifdef COMPILE_IN_CP
 	 num = env_copy->cp[i]->cuts_to_add_num;  
 	 if (num){
 	    env_copy->cp[i]->cuts_to_add = 
@@ -3333,10 +3335,10 @@ sym_environment * create_copy_environment (sym_environment *env)
 		      cut->size*CSIZE);
 	    }
 	 }
-#endif
       }
    }
-
+#endif
+   
    return(env_copy);
 }   
 
