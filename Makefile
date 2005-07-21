@@ -92,10 +92,9 @@ OSISYM_LIB        += -lCoin -lOsi
 endif
 endif
 
-
 ##############################################################################
 ##############################################################################
-# Determine if COIN is using lapack
+# Determine if COIN is using lapack &/or zlib.
 ##############################################################################
 ##############################################################################
 
@@ -105,7 +104,16 @@ ifneq ($(filter COIN_lapack,$(CoinLibsDefined)),)
 	LPLIBPATHS += lapackLibDir
 	LPLIB += -llapack -lblas -lg2c
 endif
-
+ifneq ($(filter COIN_libz,$(CoinLibsDefined)),)
+	LPINCDIR += zlibIncDir
+	LPLIBPATHS += zlibLibDir
+	LPLIB += -lz
+endif
+ifneq ($(filter COIN_libbz,$(CoinLibsDefined)),)
+	LPINCDIR += bzlibIncDir
+	LPLIBPATHS += bzlibLibDir
+	LPLIB += -lbz2
+endif
 ##############################################################################
 ##############################################################################
 # Set the paths for PVM
