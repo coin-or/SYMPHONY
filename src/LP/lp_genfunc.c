@@ -422,8 +422,8 @@ int fathom_branch(lp_prob *p)
 	    printf("* Now processing NODE %i LEVEL %i\n",
 		   p->bc_index, p->bc_level);
 	    printf("*************************************************\n\n");
-	    p->node_iter_num = 0;
 	 }
+	 p->node_iter_num = 0;
 	 break;
 #endif
        case FATHOMED_NODE:
