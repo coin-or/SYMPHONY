@@ -49,6 +49,9 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony_api.h"
+#ifndef WIN32
+#include <pwd.h>
+#endif
 #ifdef HAS_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -130,6 +133,10 @@ int main_level = 0; /* 0 - SYMPHONY:
 int sym_help(char *line);
 int sym_read_line(char *prompt, char **input);
 
+#ifndef WIN32
+void sym_read_tilde(char input[]);
+#endif
+
 int main(int argc, char **argv)
 {    
      
@@ -157,7 +164,7 @@ int main(int argc, char **argv)
 		   termcode);
 	    exit(termcode);
 	 }
-	 
+
 	 sym_solve(env);
       }
    
@@ -198,24 +205,31 @@ int main(int argc, char **argv)
 	   sym_help("display_help");
 	 } else  sym_help("main_help");
        } else if (strcmp(args[0], "load") == 0){ 
-	 if(env->mip->n){
-	   free_master_u(env);
-	   strcpy(env->par.infile, "");
-	   strcpy(env->par.datafile, "");
-	   env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
-	 }
+	  if(env->mip->n){
+	     free_master_u(env);
+	     env->ub = 0;
+	     env->lb = -MAXDOUBLE;
+	     env->has_ub = FALSE;
+	     env->termcode = TM_NO_SOLUTION;
+	     strcpy(env->par.infile, "");
+	     strcpy(env->par.datafile, "");
+	     env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+	  }
 
 	 if(strcmp(args[1], "") == 0){
 	   sym_read_line("Name of the file: ", &line);
 	   strcpy(args[1], line);
 	 }	 
-	 
+
+#ifndef WIN32
+	 sym_read_tilde(args[1]);	 
+#endif	 	 
 	 if (fopen(args[1], "r") == NULL){
 	   printf("Input file '%s' can't be opened\n",
 		  args[1]);
 	   continue;
 	 }
-
+	 
 	 /* check to see if SYMPHONY knows the input type! */
 
 	 last_dot = 0;
@@ -255,6 +269,10 @@ int main(int argc, char **argv)
 	     sym_read_line("Name of the data file: ", &line);
 	     strcpy(args[2], line);
 	   }
+
+#ifndef WIN32
+	   sym_read_tilde(args[2]);	 
+#endif	 	 
 	 
 	   if(fopen(args[2], "r") == NULL){
 	     printf("Data file '%s' can't be opened\n",
@@ -298,11 +316,14 @@ int main(int argc, char **argv)
 	     main_level = 1;
 	     sym_read_line("SYMPHONY\\Display: ", &line);	 
 	     sscanf(line, "%s%s", args[1], args[2]);
-	     last_level = 1;
-	   } else{
-	     last_level = 0;
+       	     last_level = 1;
+	     if (strcmp(args[2], "") == 0){
+		last_level = 1;
+	     }
+	   } else {
+	      last_level = 0;
 	   }
-	   
+
 	   if (strcmp(args[1], "help") == 0 || strcmp(args[1], "?") == 0) {
 	     sym_help("display_help");
 	   } else if (strcmp(args[1], "solution") == 0 || 
@@ -312,49 +333,83 @@ int main(int argc, char **argv)
 	       printf("No loaded problem! "
 		      "Use 'load' in the main menu to read in a problem!\n");
 	       strcpy(args[1], "");
-	       continue;
 	     } 
 	     if(strcmp(args[1], "solution") == 0){
-	       if(colsol) FREE(colsol);
-	       colsol = (double *) malloc(DSIZE * env->mip->n);
-	       if(sym_get_col_solution(env, colsol)){
-		 printf("Error in displaying solution! The problem is either "
-			"infeasible or has not been solved yet!\n");
-		 strcpy(args[1], "");
-		 continue;
-	       } else {
-		 if (env->mip->colname){ 
-		   printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
-		   printf("Column names and values in the solution\n");
-		   printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
-		   for(j = 0; j<env->mip->n; j++){
-		     printf("%8s %10.3f\n", env->mip->colname[j],
-			    colsol[j]);
+		int display = TRUE;
+		switch(env->termcode){
+		 case TM_NO_SOLUTION:
+		    printf("Error in displaying solution! \n"
+			   "The problem is either infeasible or "
+			   "has not been solved yet!\n");
+		    display = FALSE;
+		    break;
+		 case TM_NODE_LIMIT_EXCEEDED:		    
+		    printf("Node limit reached!\n");		    
+		    break;
+		 case TM_FOUND_FIRST_FEASIBLE:    
+		    printf("First feasible solution found!\n");
+		    break;
+		 case TM_TIME_LIMIT_EXCEEDED:   
+		    printf("Time limit reached!\n");
+		    break;
+		 case TM_TARGET_GAP_ACHIEVED:
+		    printf("Target gap achieved!\n");
+		    break;
+		 case TM_OPTIMAL_SOLUTION_FOUND:
+		    printf("Optimal Solution found!\n");
+		    break;
+		 case SOMETHING_DIED:
+		 case TM_ERROR__NUMERICAL_INSTABILITY:  
+		 case TM_ERROR__NO_BRANCHING_CANDIDATE:
+		 case TM_ERROR__ILLEGAL_RETURN_CODE:
+		 case TM_ERROR__COMM_ERROR:
+		 case TM_ERROR__USER:
+		    printf("Error in displaying solution! \n"); 
+		    printf(  "* Terminated abnormally with error message %i *\n",
+			     termcode);		      
+		 default:
+		    display = FALSE;		    
+		    break;		    
+		}
+		if(display){
+		   if(env->best_sol.has_sol){
+		      if (env->mip->colname){ 
+			 printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
+			 printf("Nonzero column names and values in the solution\n");
+			 printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
+			 for(j = 0; j<env->best_sol.xlength; j++){		      
+			    printf("%8s %10.3f\n", 
+				   env->mip->colname[env->best_sol.xind[j]],
+				   env->best_sol.xval[j]);
+			 }
+			 printf("\n");
+		      }else{
+			 printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
+			 printf("User indices and values in the solution\n");
+			 printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
+			 for(j = 0; j<env->best_sol.xlength; j++){		      
+			    printf("%7d %10.3f\n", env->best_sol.xind[j], 
+				   env->best_sol.xval[j]);
+			 }			    
+			 printf("\n");
+		      }
+		   } else{
+		      printf("Error in displaying solution!\n");
 		   }
-		   printf("\n");
-		 }else{
-		   printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
-		   printf("User indices and values in the solution\n");
-		   printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
-		   for(j = 0; j<env->mip->n; j++){
-		     printf("%7d %10.3f\n", j, colsol[j]);
-		   }
-		   printf("\n");
-		 }
-	       }
-	       strcpy(args[1], "");	       
+		}
+		strcpy(args[1], ""); 		   
 	     } else if (strcmp(args[1], "obj") == 0){
-	       if(sym_get_obj_val(env, &objval)){
-		 printf("Error in displaying objective value!" 
-			"The problem is either infeasible" 
-			"or has not been solved yet!\n");
+		if(sym_get_obj_val(env, &objval)){
+		   printf("Error in displaying objective value!\n" 
+			  "The problem is either infeasible " 
+			  "or has not been solved yet!\n");
 		 strcpy(args[1], "");
-		 continue;
+		 //		 continue;
 	       } else { 
 		 printf("Objective Value: %f\n", objval);
 	       }
 	       strcpy(args[1], "");	       
-	     } else {
+	     } else if (strcmp(args[1], "stats") == 0){
 	       initial_time  = env->comp_times.readtime;
 	       initial_time += env->comp_times.ub_overhead + 
 		 env->comp_times.ub_heurtime;
@@ -382,8 +437,8 @@ int main(int argc, char **argv)
 		 main_level = 3;
 		 sym_read_line("SYMPHONY\\Display\\Parameter: ", &line);
 		 strcpy(args[2], line);	
-		 if (last_level != 0)
-		   last_level = 2;
+		 if (last_level != 0 || last_level !=1)
+		    last_level = 2;
 	       }
 
 	       if (strcmp(args[2], "help") == 0 || strcmp(args[2], "?") == 0) {
@@ -450,6 +505,10 @@ int main(int argc, char **argv)
 	       sym_read_line("Name of the parameter file: ", &line);
 	       strcpy(args[2], line);
 	     }
+
+#ifndef WIN32
+	     sym_read_tilde(args[2]);	 
+#endif	 	 
 
 	     if ((f = fopen(args[2], "r")) == NULL){
 	       printf("Parameter file '%s' can't be opened\n",
@@ -558,7 +617,7 @@ int sym_help(char *line)
 	   "generate_cgl_lift_and_project_cuts : whether or not to use cgl lift and project cuts (default: 0)\n"
 	   "node_selection_rule                : set the node selection rule/search strategy (default: 5)\n"
 	   "strong_branching_candidate_num     : set the stong branching candidates number (default: var)\n"
-	   "compare_candidadates_dafult        : set the rule to compare the candidates (defualt: 2)\n"
+	   "compare_candidates_dafult        : set the rule to compare the candidates (defualt: 2)\n"
 	   "select_child_default               : set the rule to select the children (default: 0)\n"
 	   "diving_threshold                   : set diving threshold (default: 0)\n"
 	   "diving_strategy                    : set diving strategy (default: 0)\n"
@@ -734,7 +793,26 @@ char *alloc_str(char *s)
 
 /*===========================================================================*\
 \*===========================================================================*/
-  
+#ifndef WIN32  
+void sym_read_tilde(char input[])
+{
+   char temp;
+   char temp_inp[MAX_LINE_LENGTH+1];
+   struct passwd *pwd = 0 ;
+
+   if(*input){
+      sscanf(input, "%c", &temp);
+      if(temp == '~'){
+	 pwd = getpwuid(getuid());
+	 if(pwd != NULL){
+	    strcpy(temp_inp, input);
+	    sprintf(input, "%s%s", pwd->pw_dir, &temp_inp[1]);
+	 }
+      }	    
+   }
+}
+#endif
+
 #endif
 #endif
 
