@@ -397,10 +397,13 @@ ifneq (${SHLINKPREFIX},)
 endif
 
 ifeq ($(CC),ompcc)
-	LIBS  = -lX11 -lm -lompc -ltlog -lthread $(COMMLIBS) $(SYSLIBS) \
+	LIBS  = -lm -lompc -ltlog -lthread $(COMMLIBS) $(SYSLIBS) \
 	$(USERLIBS)
 else
-	LIBS  = -lX11 -lm $(SYSLIBS) $(USERLIBS) $(COMMLIBS) 
+	LIBS  = -lm $(SYSLIBS) $(USERLIBS) $(COMMLIBS)
+endif
+ifeq ($(DRAWGRAPH),TRUE)
+	LIBS += -lX11
 endif
 
 ifeq ($(OPT),-O)

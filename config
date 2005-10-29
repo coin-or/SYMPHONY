@@ -386,3 +386,9 @@ STATISTICS = FALSE
 
 PSEUDO_COSTS = FALSE
 
+##############################################################################
+# Set this to true if you are going to use the IGD graph drawing application
+##############################################################################
+
+DRAWGRAPH = FALSE
+
