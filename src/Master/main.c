@@ -134,7 +134,7 @@ int sym_help(char *line);
 int sym_read_line(char *prompt, char **input);
 
 #ifndef WIN32
-void sym_read_tilde(char input[]);
+void sym_read_tilde(char *input);
 #endif
 
 int main(int argc, char **argv)
@@ -681,6 +681,29 @@ int sym_read_line(char *prompt, char **input)
  
 /*===========================================================================*\
 \*===========================================================================*/
+
+#ifndef WIN32  
+void sym_read_tilde(char *input)
+{
+   char temp;
+   char temp_inp[MAX_LINE_LENGTH+1];
+   struct passwd *pwd = 0 ;
+
+   if(*input){
+      sscanf(input, "%c", &temp);
+      if(temp == '~'){
+	 pwd = getpwuid(getuid());
+	 if(pwd != NULL){
+	    strcpy(temp_inp, input);
+	    sprintf(input, "%s%s", pwd->pw_dir, &temp_inp[1]);
+	 }
+      }	    
+   }
+}
+#endif
+
+/*===========================================================================*\
+\*===========================================================================*/
 #ifdef HAS_READLINE
 
 void sym_initialize_readline()
@@ -790,28 +813,6 @@ char *alloc_str(char *s)
   }
   return (r);
 }
-
-/*===========================================================================*\
-\*===========================================================================*/
-#ifndef WIN32  
-void sym_read_tilde(char input[])
-{
-   char temp;
-   char temp_inp[MAX_LINE_LENGTH+1];
-   struct passwd *pwd = 0 ;
-
-   if(*input){
-      sscanf(input, "%c", &temp);
-      if(temp == '~'){
-	 pwd = getpwuid(getuid());
-	 if(pwd != NULL){
-	    strcpy(temp_inp, input);
-	    sprintf(input, "%s%s", pwd->pw_dir, &temp_inp[1]);
-	 }
-      }	    
-   }
-}
-#endif
 
 #endif
 #endif
