@@ -323,6 +323,7 @@ endif
 #___END_EXPERIMENTAL_SECTION___#
 
 USER_OBJDIR  = $(USERBUILDDIR)/objects/$(ARCH)/$(CONFIG)
+USER_LIBDIR  = $(USERBUILDDIR)/lib/$(ARCH)/$(LP_SOLVER)
 DEPDIR       = $(SYMBUILDDIR)/dep/$(ARCH)
 USER_DEPDIR  = $(USERBUILDDIR)/dep/$(ARCH)
 
@@ -956,6 +957,8 @@ master : $(BINDIR)/$(MASTERBIN)
 masterlib : $(LIBDIR)/$(LIBNAME_TYPE)
 	true
 
+usermasterlib : $(USER_LIBDIR)/lib$(MASTERBIN)
+
 pmaster : $(BINDIR)/p$(MASTERBIN)
 	true
 
@@ -985,6 +988,14 @@ $(MAIN_OBJ) $(LIBDIR)/$(LIBNAME_TYPE)
 	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) $(MAIN_OBJ) \
 	$(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB) $(MASTERLPLIB) $(LIBS) 
+	@echo ""
+
+$(USER_LIBDIR)/lib$(MASTERBIN) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS)
+	@echo ""
+	@echo "Making $(notdir $@) ..."
+	@echo ""
+	mkdir -p $(USER_LIBDIR)
+	$(LD) $(LIBLDFLAGS) $@ $(USER_MASTER_OBJS) 
 	@echo ""
 
 $(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS) $(GMPL_OBJ) 
