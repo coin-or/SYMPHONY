@@ -323,7 +323,7 @@ endif
 #___END_EXPERIMENTAL_SECTION___#
 
 USER_OBJDIR  = $(USERBUILDDIR)/objects/$(ARCH)/$(CONFIG)
-USER_LIBDIR  = $(USERBUILDDIR)/lib/$(ARCH)/$(LP_SOLVER)
+USER_LIBDIR  = $(USERBUILDDIR)/lib/$(ARCH)
 DEPDIR       = $(SYMBUILDDIR)/dep/$(ARCH)
 USER_DEPDIR  = $(USERBUILDDIR)/dep/$(ARCH)
 
@@ -930,11 +930,14 @@ SYMLIBDIR  = $(SYMBUILDDIR)/lib
 LN_S = ln -fs $(LIBDIR)/$(LIBNAME_TYPE) $(SYMLIBDIR)
 ifeq ($(LIBTYPE),SHARED)
 LIBNAME_TYPE      = $(addsuffix .so, $(addprefix lib, $(MASTERLIBNAME)))
+USER_LIBNAME      = $(addsuffix .so, $(addprefix lib, $(MASTERBIN)))
 LD = $(CC) $(OPT) 
 LIBLDFLAGS = -shared -Wl,-soname,$(LIBNAME_TYPE) -o
+USERLIBLDFLAGS = -shared -Wl,-soname,$(USER_LIBNAME) -o
 MAKELIB        = 
 else
 LIBNAME_TYPE   = $(addsuffix .a, $(addprefix lib, $(MASTERLIBNAME)))
+USER_LIBNAME   = $(addsuffix .a, $(addprefix lib, $(MASTERBIN)))
 MKSYMLIBDIR    = mkdir -p $(SYMLIBDIR)
 endif
 
@@ -957,7 +960,7 @@ master : $(BINDIR)/$(MASTERBIN)
 masterlib : $(LIBDIR)/$(LIBNAME_TYPE)
 	true
 
-usermasterlib : $(USER_LIBDIR)/lib$(MASTERBIN)
+usermasterlib : $(USER_LIBDIR)/$(USER_LIBNAME)
 
 pmaster : $(BINDIR)/p$(MASTERBIN)
 	true
@@ -986,16 +989,19 @@ $(MAIN_OBJ) $(LIBDIR)/$(LIBNAME_TYPE)
 	@echo ""
 	@echo "Linking $(notdir $@) ..."
 	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) $(MAIN_OBJ) \
-	$(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB) $(MASTERLPLIB) $(LIBS) 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(USER_MASTER_OBJS) \
+	$(MAIN_OBJ) $(OSISYM_LIB) -l$(MASTERLIBNAME) $(MASTERLPLIB) \
+	$(MASTERLPLIB) $(LIBS) 
 	@echo ""
 
-$(USER_LIBDIR)/lib$(MASTERBIN) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS)
+$(USER_LIBDIR)/$(USER_LIBNAME) : $(USER_MASTER_DEP) $(USER_MASTER_OBJS) \
+$(MASTER_DEP) $(MASTER_OBJS) $(GMPL_OBJ)
 	@echo ""
 	@echo "Making $(notdir $@) ..."
 	@echo ""
 	mkdir -p $(USER_LIBDIR)
-	$(LD) $(LIBLDFLAGS) $@ $(USER_MASTER_OBJS) 
+	$(LD) $(USERLIBLDFLAGS) $@ $(USER_MASTER_OBJS) $(MASTER_OBJS) \
+	$(GMPL_OBJ)
 	@echo ""
 
 $(LIBDIR)/$(LIBNAME_TYPE) : $(MASTER_DEP) $(MASTER_OBJS) $(GMPL_OBJ) 
