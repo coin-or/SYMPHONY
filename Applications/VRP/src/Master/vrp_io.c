@@ -85,6 +85,8 @@ void vrp_io(vrp_problem *vrp, char *infile)
     "PICKUP_SECTION:",
     "EOF",
     "EOF.",
+    "NUMBER_OF_TRUCKS",
+    "NUMBER_OF_TRUCKS:",
     "",
     "",
     "NO_MORE_TYPE"
@@ -464,7 +466,15 @@ void vrp_io(vrp_problem *vrp, char *infile)
 	while (fscanf(f, "%d%*d%*d", &k));
 	break;
       case 18: /*  EOF  */
-      default: break;
+	break;
+      case 19: /*  NUMBER_OF_TRUCKS  */
+	 if (!sscanf(line, "%i", &k)){
+	    fprintf(stderr, "Vrp I/O: error reading NO_OF_TRUCKS\n\n");
+	    exit(1);
+	 }
+	 vrp->numroutes = (int) k;
+      default:
+	break;
      }
   }
   
