@@ -60,7 +60,6 @@ int vrp_test(sym_environment *env, int argc, char **argv);
 
 int main(int argc, char **argv)
 {
-
    vrp_problem *vrp;
 
    sym_environment *env = sym_open_environment();

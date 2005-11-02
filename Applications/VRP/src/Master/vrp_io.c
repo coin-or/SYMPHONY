@@ -481,13 +481,6 @@ void vrp_io(vrp_problem *vrp, char *infile)
   if (f != stdin)
      fclose(f);
   
-  vrp->cur_tour = (best_tours *) calloc(1, sizeof(best_tours));
-  vrp->cur_tour->tour = (_node *) calloc(vertnum, sizeof(_node));
-#ifdef COMPILE_HEURS
-  vrp->tours = (best_tours *) calloc(vrp->par.tours_to_keep,
-				     sizeof(best_tours));
-#endif
-  
   /*calculate all the distances explcitly and then use distance type EXPLICIT*/
   
   /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -511,15 +504,6 @@ void vrp_io(vrp_problem *vrp, char *infile)
     dist->wtype = _EXPLICIT;
   }
   
-  if (vrp->par.k_closest < 0){
-     vrp->par.k_closest = (int) (ceil(0.1 * vrp->vertnum));
-     if (vrp->par.k_closest < vrp->par.min_closest ) 
-	vrp->par.k_closest = vrp->par.min_closest;
-     if (vrp->par.k_closest > vrp->par.max_closest) 
-	vrp->par.k_closest = vrp->par.max_closest;
-     if (vrp->par.k_closest > vertnum-1) 
-	vrp->par.k_closest = vertnum-1;
-  }
   if (vrp->par.tsp_prob){
      vrp->capacity = vertnum;
      vrp->numroutes = 1;
@@ -531,20 +515,6 @@ void vrp_io(vrp_problem *vrp, char *infile)
      if (!vrp->cg_par.which_tsp_cuts)
 	vrp->cg_par.which_tsp_cuts = ALL_TSP_CUTS;
   }
-
-  if (vrp->par.use_small_graph == LOAD_SMALL_GRAPH){
-     read_small_graph(vrp);
-     vrp->numroutes = vrp->cur_tour->numroutes;
-  }
-  
-  /* Selects the cheapest edges adjacent to each node for the base set */
-  
-  if (vrp->par.use_small_graph == SAVE_SMALL_GRAPH){
-     if (!vrp->g) make_small_graph(vrp, 0);
-     save_small_graph(vrp);
-  }else if (!vrp->g){
-     make_small_graph(vrp, 0);
-  }  
 }
 
 /*===========================================================================*/
@@ -572,108 +542,6 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
    vrp_lp_params *lp_par = &vrp->lp_par;
    vrp_cg_params *cg_par = &vrp->cg_par;
 
-   vrp->numroutes = 0;
-#if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
-   vrp->feas_sol_size = 0;
-   vrp->feas_sol = NULL;
-#endif
-   par->tsp_prob = FALSE;
-#ifdef COMPILE_HEURS
-   par->rand_seed = NULL;
-   par->tours_to_keep = 15;
-   par->do_heuristics = FALSE;
-#endif
-   par->k_closest = -1;
-   par->min_closest = 4;
-   par->max_closest = 10;
-   par->add_all_edges = TRUE;
-   par->base_variable_selection = SOME_ARE_BASE;
-   par->use_small_graph = FALSE;
-   par->colgen_strat[0] = 0;
-   par->colgen_strat[1] = 0;
-   par->verbosity = 9;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   par->debug.winprog = 0;
-   /*___END_EXPERIMENTAL_SECTION___*/
-#ifdef COMPILE_HEURS
-   par->debug.heuristics = 0;
-   par->time_out.ub = 60;
-   par->time_out.lb = 60;
-   heur_par->no_of_machines = 3;
-   heur_par->sweep_trials = 1000;        /*default parameter settings*/
-   heur_par->savings_par.savings_trials = 0;
-   heur_par->savings_par.savings2_trials = 1;
-   heur_par->savings_par.grid_size = 1;
-   heur_par->savings_par.mu = 1;
-   heur_par->savings_par.lamda = 2;
-   heur_par->savings3_par.savings_trials = 1;
-   heur_par->savings3_par.grid_size = 1;
-   heur_par->savings3_par.mu = 1;
-   heur_par->savings3_par.lamda = 2;
-   heur_par->route_opt1 = -1;
-   heur_par->route_opt2 = -1;
-   heur_par->route_opt3 = -1;
-   heur_par->fini_ratio = 0;
-   heur_par->ni_trials = 1;
-   heur_par->fi_trials = 1;
-   heur_par->fini_trials = 1;
-   heur_par->near_cluster_trials = 1;
-   heur_par->tsp.fi_trials = 3;
-   heur_par->tsp.ni_trials = 3;
-   heur_par->tsp.fini_trials = 3;
-   heur_par->tsp.num_starts = 1000;
-   heur_par->exchange = -1;
-   heur_par->exchange2 = -1;
-   lb_par->lower_bound = 0;
-   lb_par->lb_max_iter = 200;
-   lb_par->lb_penalty_mult = 100;
-   vrp->lb = (low_bd *) calloc (1, sizeof(low_bd));
-   strcpy(par->executables.heuristics, "vrp_heuristics");
-#endif
-   
-   lp_par->verbosity = 0;
-   lp_par->branching_rule = 2;
-   lp_par->branch_on_cuts = FALSE;
-   lp_par->strong_branching_cand_num_max = 7;
-   lp_par->strong_branching_cand_num_min = 7;
-   lp_par->strong_branching_red_ratio = 0;
-   lp_par->detect_tailoff  = 0;
-   lp_par->child_compar_obj_tol = .01;
-
-   cg_par->verbosity = 0;
-   cg_par->do_greedy = 1;
-   cg_par->greedy_num_trials = 5;
-   cg_par->do_extra_in_root = FALSE;
-   cg_par->which_tsp_cuts = NO_TSP_CUTS;
-   cg_par->which_connected_routine = BOTH;
-   cg_par->max_num_cuts_in_shrink = 200;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   cg_par->do_mincut = 0;
-   cg_par->always_do_mincut = 0;
-   cg_par->update_contr_above = 0;
-   cg_par->shrink_one_edges = 1;
-   cg_par->do_extra_checking = 0;
-#ifdef COMPILE_DECOMP
-   cg_par->generate_farkas_cuts = TRUE;
-   cg_par->generate_no_cols_cuts = TRUE;
-   cg_par->generate_capacity_cuts = TRUE;
-   cg_par->decomp_decompose = FALSE;
-   cg_par->allow_one_routes_in_bfm = TRUE;
-   cg_par->follow_one_edges = TRUE;
-   cg_par->max_num_columns = 1000; 
-   cg_par->col_gen_par.grid_size = 1;
-   cg_par->col_gen_par.lambda = 2;
-   cg_par->col_gen_par.mu = 1;
-#endif
-#ifdef COMPILE_OUR_DECOMP
-   cg_par->feasible_tours_only = FALSE;
-   cg_par->graph_density_threshold = 10;
-   cg_par->gap_threshold = -1;
-   cg_par->do_our_decomp = FALSE;
-   cg_par->do_decomp_once = TRUE;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
-      
    if (!strcmp(filename, ""))
       goto EXIT;
    
@@ -1183,4 +1051,144 @@ EXIT:
    if (heur_par->exchange2 < 0)
       heur_par->exchange2 = par->tours_to_keep;
 #endif
+}
+
+/*===========================================================================*/
+
+void vrp_set_defaults(vrp_problem *vrp)
+{
+   vrp_params *par = &vrp->par;
+#ifdef COMPILE_HEURS
+   heur_params *heur_par = &vrp->heur_par;
+   lb_params *lb_par = &vrp->lb_par;
+#endif
+   vrp_lp_params *lp_par = &vrp->lp_par;
+   vrp_cg_params *cg_par = &vrp->cg_par;
+
+   /*vrp->numroutes = 0;*/
+#if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
+   vrp->feas_sol_size = 0;
+   vrp->feas_sol = NULL;
+#endif
+   par->tsp_prob = FALSE;
+#ifdef COMPILE_HEURS
+   par->rand_seed = NULL;
+   par->tours_to_keep = 15;
+   par->do_heuristics = FALSE;
+#endif
+   par->k_closest = -1;
+   par->min_closest = 4;
+   par->max_closest = 10;
+   par->add_all_edges = TRUE;
+   par->base_variable_selection = SOME_ARE_BASE;
+   par->use_small_graph = FALSE;
+   par->colgen_strat[0] = 0;
+   par->colgen_strat[1] = 0;
+   par->verbosity = 9;
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   par->debug.winprog = 0;
+   /*___END_EXPERIMENTAL_SECTION___*/
+#ifdef COMPILE_HEURS
+   par->debug.heuristics = 0;
+   par->time_out.ub = 60;
+   par->time_out.lb = 60;
+   heur_par->no_of_machines = 3;
+   heur_par->sweep_trials = 1000;        /*default parameter settings*/
+   heur_par->savings_par.savings_trials = 0;
+   heur_par->savings_par.savings2_trials = 1;
+   heur_par->savings_par.grid_size = 1;
+   heur_par->savings_par.mu = 1;
+   heur_par->savings_par.lamda = 2;
+   heur_par->savings3_par.savings_trials = 1;
+   heur_par->savings3_par.grid_size = 1;
+   heur_par->savings3_par.mu = 1;
+   heur_par->savings3_par.lamda = 2;
+   heur_par->route_opt1 = -1;
+   heur_par->route_opt2 = -1;
+   heur_par->route_opt3 = -1;
+   heur_par->fini_ratio = 0;
+   heur_par->ni_trials = 1;
+   heur_par->fi_trials = 1;
+   heur_par->fini_trials = 1;
+   heur_par->near_cluster_trials = 1;
+   heur_par->tsp.fi_trials = 3;
+   heur_par->tsp.ni_trials = 3;
+   heur_par->tsp.fini_trials = 3;
+   heur_par->tsp.num_starts = 1000;
+   heur_par->exchange = -1;
+   heur_par->exchange2 = -1;
+   lb_par->lower_bound = 0;
+   lb_par->lb_max_iter = 200;
+   lb_par->lb_penalty_mult = 100;
+   vrp->lb = (low_bd *) calloc (1, sizeof(low_bd));
+   strcpy(par->executables.heuristics, "vrp_heuristics");
+#endif
+   
+   lp_par->verbosity = 0;
+   lp_par->branching_rule = 2;
+   lp_par->branch_on_cuts = FALSE;
+   lp_par->strong_branching_cand_num_max = 7;
+   lp_par->strong_branching_cand_num_min = 7;
+   lp_par->strong_branching_red_ratio = 0;
+   lp_par->detect_tailoff  = 0;
+   lp_par->child_compar_obj_tol = .01;
+
+   cg_par->verbosity = 0;
+   cg_par->do_greedy = 1;
+   cg_par->greedy_num_trials = 5;
+   cg_par->do_extra_in_root = FALSE;
+   cg_par->which_tsp_cuts = NO_TSP_CUTS;
+   cg_par->which_connected_routine = BOTH;
+   cg_par->max_num_cuts_in_shrink = 200;
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   cg_par->do_mincut = 0;
+   cg_par->always_do_mincut = 0;
+   cg_par->update_contr_above = 0;
+   cg_par->shrink_one_edges = 1;
+   cg_par->do_extra_checking = 0;
+#ifdef COMPILE_DECOMP
+   cg_par->generate_farkas_cuts = TRUE;
+   cg_par->generate_no_cols_cuts = TRUE;
+   cg_par->generate_capacity_cuts = TRUE;
+   cg_par->decomp_decompose = FALSE;
+   cg_par->allow_one_routes_in_bfm = TRUE;
+   cg_par->follow_one_edges = TRUE;
+   cg_par->max_num_columns = 1000; 
+   cg_par->col_gen_par.grid_size = 1;
+   cg_par->col_gen_par.lambda = 2;
+   cg_par->col_gen_par.mu = 1;
+#endif
+#ifdef COMPILE_OUR_DECOMP
+   cg_par->feasible_tours_only = FALSE;
+   cg_par->graph_density_threshold = 10;
+   cg_par->gap_threshold = -1;
+   cg_par->do_our_decomp = FALSE;
+   cg_par->do_decomp_once = TRUE;
+#endif
+   /*___END_EXPERIMENTAL_SECTION___*/
+      
+   return;
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void vrp_create_instance(void *user, int vertnum, int numroutes, int capacity,
+			 int *demand, int *cost)
+{
+   vrp_problem *vrp = (vrp_problem *)user;
+   int edgenum = vertnum*(vertnum-1)/2;
+
+   vrp->vertnum = vertnum;
+   vrp->numroutes = numroutes;
+   vrp->capacity = capacity;
+   vrp->demand = (int *) malloc(vertnum*ISIZE);
+   memcpy(vrp->demand, demand, vertnum*ISIZE);
+   vrp->dist.cost = (int *) malloc(edgenum*ISIZE);
+   memcpy(vrp->dist.cost, cost, edgenum*ISIZE);
+   vrp->dist.wtype = _EXPLICIT;
+
+   strcpy(vrp->par.infile, "");
+   
+   return;
 }

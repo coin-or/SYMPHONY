@@ -13,8 +13,8 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _VRP_TYPES_H
-#define _VRP_TYPES_H
+#ifndef _VRP_TYPES2_H
+#define _VRP_TYPES2_H
 
 /* SYMPHONY include files */
 #include "proto.h"
@@ -203,6 +203,7 @@ typedef struct VRP_PROBLEM{
 #ifdef COMPILE_HEURS
    bd_times        bd_time;
 #endif
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    int             sol_pool_col_num;
    int            *sol_pool_cols;
    /*___END_EXPERIMENTAL_SECTION___*/

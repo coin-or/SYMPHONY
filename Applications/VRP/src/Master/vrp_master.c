@@ -101,6 +101,8 @@ int user_initialize(void **user)
 
    *user = vrp;
 
+   vrp_set_defaults(vrp);
+   
    return(USER_SUCCESS);
 }
 
@@ -146,9 +148,56 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 int user_io(void *user)
 {
    vrp_problem *vrp = (vrp_problem *)user;
+   int i;
 
-   vrp_io(vrp, vrp->par.infile);
+   if (strcmp(vrp->par.infile, "")){
+      vrp_io(vrp, vrp->par.infile);
+   }
 
+   if (vrp->numroutes == 1){
+      vrp->par.tsp_prob = TRUE;
+      vrp->capacity = vrp->vertnum;
+      vrp->numroutes = 1;
+      vrp->demand = (int *) malloc (vrp->vertnum * ISIZE);
+      vrp->demand[0] = vrp->vertnum;
+      for (i = vrp->vertnum - 1; i > 0; i--)
+	 vrp->demand[i] = 1;
+      vrp->cg_par.tsp_prob = TRUE;
+      if (!vrp->cg_par.which_tsp_cuts)
+	 vrp->cg_par.which_tsp_cuts = ALL_TSP_CUTS;
+   }
+   
+   vrp->cur_tour = (best_tours *) calloc(1, sizeof(best_tours));
+   vrp->cur_tour->tour = (_node *) calloc(vrp->vertnum, sizeof(_node));
+#ifdef COMPILE_HEURS
+   vrp->tours = (best_tours *) calloc(vrp->par.tours_to_keep,
+				      sizeof(best_tours));
+#endif
+  
+   if (vrp->par.k_closest < 0){
+      vrp->par.k_closest = (int) (ceil(0.1 * vrp->vertnum));
+      if (vrp->par.k_closest < vrp->par.min_closest ) 
+	 vrp->par.k_closest = vrp->par.min_closest;
+      if (vrp->par.k_closest > vrp->par.max_closest) 
+	 vrp->par.k_closest = vrp->par.max_closest;
+      if (vrp->par.k_closest > vrp->vertnum-1) 
+	 vrp->par.k_closest = vrp->vertnum-1;
+   }
+
+   if (vrp->par.use_small_graph == LOAD_SMALL_GRAPH){
+      read_small_graph(vrp);
+      vrp->numroutes = vrp->cur_tour->numroutes;
+   }
+  
+   /* Selects the cheapest edges adjacent to each node for the base set */
+  
+   if (vrp->par.use_small_graph == SAVE_SMALL_GRAPH){
+      if (!vrp->g) make_small_graph(vrp, 0);
+      save_small_graph(vrp);
+   }else if (!vrp->g){
+      make_small_graph(vrp, 0);
+   }
+   
    return(USER_SUCCESS);
 }
    

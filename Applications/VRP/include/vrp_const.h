@@ -17,7 +17,7 @@
 #define _VRP_CONST_H
 
 #define LENGTH 255
-#define KEY_NUM 41
+#define KEY_NUM 43
 #define DEAD 2
 #define NEAR_INS -1
 #define FAR_INS -2
