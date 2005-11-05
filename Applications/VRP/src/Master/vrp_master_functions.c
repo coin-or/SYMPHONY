@@ -183,8 +183,10 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
 	 break;
       }
 
+#if 0      
       if (vrp->par.verbosity > 0)
 	 printf("Fixed %i edges in root creation\n\n", zero_varnum);
+#endif
       
       vrp->zero_varnum = zero_varnum;
 

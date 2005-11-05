@@ -998,8 +998,11 @@ EXIT:
        case 'B':
 	 sscanf(argv[++i], "%i", &lp_par->branching_rule);
 	 break;
-       case 'V':
+       case 'A':
 	 sscanf(argv[++i], "%i", &par->base_variable_selection);
+	 break;
+       case 'V':
+	 sscanf(argv[++i], "%i", &par->verbosity);
 	 break;
        case 'K':
 	 sscanf(argv[++i], "%i", &par->k_closest);
@@ -1013,11 +1016,6 @@ EXIT:
        case 'C':
 	 sscanf(argv[++i], "%i", &vrp->capacity);
 	 break;
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-       case 'P':
-	 par->bpp_prob = TRUE;
-	 break;
-/*___END_EXPERIMENTAL_SECTION___*/
        case 'T':
 	 par->test = TRUE;
 	 if(i+1 < argc){
@@ -1174,7 +1172,7 @@ void vrp_set_defaults(vrp_problem *vrp)
 /*===========================================================================*/
 
 void vrp_create_instance(void *user, int vertnum, int numroutes, int capacity,
-			 int *demand, int *cost)
+			 int *demand, int *cost, small_graph *g)
 {
    vrp_problem *vrp = (vrp_problem *)user;
    int edgenum = vertnum*(vertnum-1)/2;
@@ -1187,7 +1185,13 @@ void vrp_create_instance(void *user, int vertnum, int numroutes, int capacity,
    vrp->dist.cost = (int *) malloc(edgenum*ISIZE);
    memcpy(vrp->dist.cost, cost, edgenum*ISIZE);
    vrp->dist.wtype = _EXPLICIT;
-
+   if (g){
+      vrp->g = (small_graph *) malloc(sizeof(small_graph));
+      memcpy(vrp->g, g, sizeof(small_graph));
+      vrp->g->edges = (edge_data *) malloc (vrp->g->edgenum*sizeof(edge_data));
+      memcpy(vrp->g->edges, g->edges, vrp->g->edgenum*sizeof(edge_data));
+   }
+   
    strcpy(vrp->par.infile, "");
    
    return;

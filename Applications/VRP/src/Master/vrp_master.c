@@ -80,7 +80,8 @@ void user_usage(void){
 	  "-S file: load sparse graph from 'file'",
 	  "-F file: problem data is in 'file'",
 	  "-B i: which candidates to check in strong branching",
-	  "-V i: how to construct the base set of variables",
+	  "-A i: how to construct the base set of variables",
+	  "-V i: verbosity level",
 	  "-K k: use 'k' closest edges to build sparse graph",
 	  "-N n: use 'n' routes",
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
@@ -242,6 +243,10 @@ int user_start_heurs(void *user, double *ub, double *ub_estimate)
 	     "for VRP\n\n");
       exit(1);
    }
+
+   if (vrp->par.verbosity < 0){
+      return(USER_SUCCESS);
+   }
    
    if (vrp->numroutes > 1){
       printf("NUMBER OF TRUCKS: \t%i\n", vrp->numroutes);
@@ -395,6 +400,8 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    *basecutnum = vertnum;
 
    if (!vrp->par.colgen_strat[0]){
+#if 0
+      /* Currently, column generation is broken */
       if (vrp->par.add_all_edges ||
 	  vrp->par.base_variable_selection == SOME_ARE_BASE){
 	 colgen_strat[0]=(FATHOM__DO_NOT_GENERATE_COLS__DISCARD |
@@ -403,6 +410,9 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 	 colgen_strat[0] = (FATHOM__DO_NOT_GENERATE_COLS__SEND  |
 			    BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
       }
+#endif
+      colgen_strat[0]=(FATHOM__DO_NOT_GENERATE_COLS__DISCARD |
+		       BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
    }else{
       colgen_strat[0] = vrp->par.colgen_strat[0];
    }
