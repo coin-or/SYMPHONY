@@ -82,9 +82,6 @@ int main(int argc, char **argv)
      sym_set_str_param(env, "cp_executable_name", "vrp_cp");
      sym_set_int_param(env, "generate_cgl_cuts", FALSE);
 
-     //printf("Turning off upper bound...\n");
-     //env->has_ub = FALSE;
-     
      sym_solve(env);
 
    }
