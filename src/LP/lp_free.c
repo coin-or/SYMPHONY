@@ -91,8 +91,9 @@ void free_candidate(branch_obj **cand)
 	 for (i = can->child_num-1; i >= 0; i--){
 #else
       if (can->solutions){
-	 for (i = MAX_CHILDREN_NUM - 1; i >= 0; i--){
+         for (i = MAX_CHILDREN_NUM - 1; i >= 0; i--){
 #endif
+	    FREE(can->sol_inds[i]);	    
 	    FREE(can->solutions[i]);
 	 }
       }
@@ -109,7 +110,9 @@ void free_candidate(branch_obj **cand)
 	 }
       }
 #endif
-      
+
+      FREE(can->sol_sizes);
+      FREE(can->sol_inds);
       FREE(can->solutions);
 #ifdef SENSITIVITY_ANALYSIS
       FREE(can->duals);

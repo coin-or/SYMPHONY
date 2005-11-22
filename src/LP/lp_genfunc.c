@@ -1091,61 +1091,73 @@ int check_tailoff(lp_prob *p)
 int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
 {
 
-  /* FIXME! Make it free of COIN! OsiSolverInterface, CoinPackedMatrix, etc */
-  /* Then, carry to lp_wrapper function! */
-  /* Fine for now! */
-
-  OsiSolverInterface * solver = p->lp_data->si;
-  const CoinPackedMatrix matrix = *(solver->getMatrixByCol());
-  const CoinPackedMatrix matrixByRow = *(solver->getMatrixByRow());
-
-  const double * lower = solver->getColLower();
-  const double * upper = solver->getColUpper();
-  const double * rowLower = solver->getRowLower();
-  const double * rowUpper = solver->getRowUpper();
-  const double * solution = solver->getColSolution();
-  const double * objective = solver->getObjCoefficients();
-  double primalTolerance = p->lp_data->lpetol;
-  double integerTolerance = primalTolerance;
-  int numberColumns = solver->getNumCols();
-  int numberRows = solver->getNumRows();
-  double direction = solver->getObjSense();
-  double newSolutionValue = direction*solver->getObjValue();
-  int returnCode = 0;
-  int numberIntegers = 0;
-  int * integerVariable = NULL;
+  LPdata *lp_data = p->lp_data;
+  int numberColumns = lp_data->n;
+  //  int numberRows = lp_data->m; 
+  int numberRows = p->base.cutnum + p->desc->cutind.size, nz = lp_data->nz;
+  int returnCode = 0, numberIntegers = 0;
+  double primalTolerance = lp_data->lpetol, integerTolerance = primalTolerance;
+  double *lower, *upper, *rowLower, *rowUpper, *solution, *objective;
+  double direction = p->mip->obj_sense == SYM_MINIMIZE ? 1: -1 ;
+  double newSolutionValue = direction*lp_data->objval;
+  double *element, *elementByRow;
+  int * integerVariable, *isInteger;
+  int *row, *column, *columnStart, *rowStart, *columnLength, *rowLength;
   int i, j, k;
-     
-  /* FIX_ME! Shouldn't do the following each time! */
 
-  for(i = 0; i<numberColumns; i++){
-    if(p->lp_data->vars[i]->is_int){
-      numberIntegers++;
-    }
+  get_bounds(lp_data);
+  get_x(lp_data);
+
+  lower = lp_data->lb;
+  upper = lp_data->ub;
+  solution = lp_data->x;
+
+  element = new double[nz];
+  row = new int[nz];
+  columnStart = new int[numberColumns+1];
+  columnLength = new int[numberColumns];
+  objective = new double[numberColumns];     
+
+  elementByRow = new double[nz];
+  column = new int[nz];
+  rowStart = new int[numberRows+1];
+  rowLength = new int[numberRows];
+  rowUpper = new double[numberRows];
+  rowLower = new double[numberRows];
+
+  columnStart[0] = 0;
+  rowStart[0] = 0;
+
+  for (i = 0; i < numberColumns; i++){
+     get_column(lp_data, i, &element[columnStart[i]], &row[columnStart[i]], 
+		&columnLength[i], &objective[i]);     
+     columnStart[i+1] = columnStart[i] + columnLength[i];
+
+     for(j = 0; j < columnLength[i]; j++){
+	if(row[columnStart[i] + j] >= numberRows){
+	   columnLength[i] = j;
+	   break;
+	}
+     }     
   }
-  
-  if(numberIntegers){
-    integerVariable = (int *)malloc(ISIZE*numberIntegers);
-    for(i = 0, j = 0; i<numberColumns; i++){
-      if(p->lp_data->vars[i]->is_int){
-	integerVariable[j] = i;
-	j++;
-      }
-    }
+
+  for (i = 0; i < numberRows; i++){
+     get_row(lp_data, i, &elementByRow[rowStart[i]], &column[rowStart[i]],
+	     &rowLength[i], &rowUpper[i], &rowLower[i]);
+     rowStart[i+1] = rowStart[i] + rowLength[i];
+  }	     
+
+  isInteger = new int[numberColumns];
+  integerVariable = new int[numberColumns];
+
+  for (i = 0; i<numberColumns; i++){
+     isInteger[i] = 0;
+     if (lp_data->vars[i]->is_int){
+	isInteger[i] = 1;
+	integerVariable[numberIntegers++] = i;
+     }
   }
-
-  // Column copy
-  const double * element = p->mip->matval;
-  const int * row = p->mip->matind;
-  const CoinBigIndex * columnStart = p->mip->matbeg;
-  const int * columnLength = p->mip->col_lengths;
-
-  // Row copy
-  const double * elementByRow = p->mip->row_matval;
-  const int * column = p->mip->row_matind;
-  const CoinBigIndex * rowStart = p->mip->row_matbeg;
-  const int * rowLength = p->mip->row_lengths;
-
+ 
   // Get solution array for heuristic solution
 
   double * newSolution = new double [numberColumns];
@@ -1160,6 +1172,10 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
       for (j=columnStart[i];
 	   j<columnStart[i]+columnLength[i];j++) {
 	int iRow=row[j];
+	//	printf("rowind %i: %i \n", j, iRow);
+	//	if(j < 5){
+	//	printf("element %i: %f \n", j, element[j]);
+	//	}
 	rowActivity[iRow] += value*element[j];
       }
     }
@@ -1240,7 +1256,7 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
 	      // possible - check if integer
 	      double distance = absInfeasibility/absElement;
 	      double thisCost = -direction*objective[iColumn]*distance;
-	      if (solver->isInteger(iColumn)) {
+	      if (isInteger[iColumn]) {
 		distance = ceil(distance-primalTolerance);
 		if (currentValue-distance>=lowerValue-primalTolerance) {
 		  if (absInfeasibility-distance*absElement< -gap-primalTolerance)
@@ -1265,7 +1281,7 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
 	      // possible - check if integer
 	      double distance = absInfeasibility/absElement;
 	      double thisCost = direction*objective[iColumn]*distance;
-	      if (solver->isInteger(iColumn)) {
+	      if (isInteger[iColumn]) {
 		distance = ceil(distance-primalTolerance);
 		//assert (currentValue-distance<=upperValue+primalTolerance);
 		if (absInfeasibility-distance*absElement< -gap-primalTolerance)
@@ -1395,6 +1411,22 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
       }
     }
   }
+  delete [] integerVariable;
+  delete [] isInteger;
+
+  delete [] element;
+  delete [] row;
+  delete [] columnStart;
+  delete [] columnLength;
+  delete [] objective;
+
+  delete [] elementByRow;
+  delete [] column;
+  delete [] rowStart;
+  delete [] rowLength;
+  delete [] rowUpper;
+  delete [] rowLower;
+
   delete [] newSolution;
   delete [] rowActivity;
   return returnCode;
@@ -1412,40 +1444,62 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
 int local_search(lp_prob *p, double *solutionValue, double *colSolution,
 		 double *betterSolution)
 {
-  
-  OsiSolverInterface * solver = p->lp_data->si;
-  const double * rowLower = solver->getRowLower();
-  const double * rowUpper = solver->getRowUpper();
-  const double * solution = colSolution;
-  const double * objective = solver->getObjCoefficients();
-  double primalTolerance = p->lp_data->lpetol;
-  const CoinPackedMatrix matrix = *(solver->getMatrixByCol());
-  double direction = solver->getObjSense();
-  double newSolutionValue = p->ub*direction;
-  int numberIntegers = 0;
-  int * integerVariable = NULL;
-  int numberRows = p->mip->m;  
-  int numberColumns = p->mip->n;
+ 
+  LPdata *lp_data = p->lp_data;
+  int numberColumns = lp_data->n;
+  int numberRows = p->base.cutnum + p->desc->cutind.size, nz = lp_data->nz;
+  int returnCode = 0, numberIntegers = 0;
+  double primalTolerance = lp_data->lpetol;
+  double *rowLower, *rowUpper, *solution = colSolution, *objective;
+  double direction = p->mip->obj_sense == SYM_MINIMIZE ? 1: -1 ;
+  double newSolutionValue = direction*p->ub;
+  double *element, *elementByRow;
+  int * integerVariable, *isInteger;
+  int *row, *columnStart, *columnLength, *column, rowLength;
   int i, j;
-  int returnCode = 0;
-
-
-  /* FIX_ME! Shouldn't do the following each time! */
-
-  for(i = 0; i<numberColumns; i++){
-    if(p->lp_data->vars[i]->is_int){
-      numberIntegers++;
-    }
-  }
   
-  if(numberIntegers){
-    integerVariable = (int *)malloc(ISIZE*numberIntegers);
-    for(i = 0, j = 0; i<numberColumns; i++){
-      if(p->lp_data->vars[i]->is_int){
-	integerVariable[j] = i;
-	j++;
-      }
-    }
+  element = new double[nz];
+  row = new int[nz];
+  columnStart = new int[numberColumns+1];
+  columnLength = new int[numberColumns];
+  objective = new double[numberColumns];     
+
+  rowUpper = new double[numberRows];
+  rowLower = new double[numberRows];
+
+
+  elementByRow = new double[numberColumns];
+  column = new int[numberColumns];
+  
+  columnStart[0] = 0;
+
+  for (i = 0; i < numberColumns; i++){
+     get_column(lp_data, i, &element[columnStart[i]], &row[columnStart[i]], 
+		&columnLength[i], &objective[i]);     
+     columnStart[i+1] = columnStart[i] + columnLength[i];
+
+     for(j = 0; j < columnLength[i]; j++){
+	if(row[columnStart[i] + j] >= numberRows){
+	   columnLength[i] = j;
+	   break;
+	}
+     }     
+  }
+
+  for (i = 0; i < numberRows; i++){
+     get_row(lp_data, i, elementByRow, column, &rowLength, &rowUpper[i], 
+	     &rowLower[i]);
+  }
+
+  isInteger = new int[numberColumns];
+  integerVariable = new int[numberColumns];
+
+  for (i = 0; i<numberColumns; i++){
+     isInteger[i] = 0;
+     if (lp_data->vars[i]->is_int){
+	isInteger[i] = 1;
+	integerVariable[numberIntegers++] = i;
+     }
   }
 
   // Column copy
@@ -1455,11 +1509,6 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
   const CoinBigIndex * columnStart = matrix.getVectorStarts();
   const int * columnLength = matrix.getVectorLengths();
   */
-
-  const double * element = p->mip->matval;
-  const int * row = p->mip->matind;
-  const CoinBigIndex * columnStart = p->mip->matbeg;
-  int * columnLength = p->mip->col_lengths;
 
   // Get solution array for heuristic solution
   double * newSolution = new double [numberColumns];
@@ -1480,8 +1529,14 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
     int iColumn = integerVariable[i];
     
     // get original bounds
-    double originalLower = p->mip->lb[iColumn];
-    double originalUpper = p->mip->ub[iColumn];
+    double originalLower = lp_data->vars[iColumn]->lb; //p->mip->lb[iColumn];
+    double originalUpper = lp_data->vars[iColumn]->ub; //p->mip->ub[iColumn];
+
+    //  double originalLower = lp_data->lb[iColumn];
+    //double originalUpper = lp_data->ub[iColumn];
+
+    //   double originalLower = p->mip->lb[iColumn];
+    //  double originalUpper = p->mip->ub[iColumn];
 
     double value=newSolution[iColumn];
     double nearest=floor(value+0.5);
@@ -1783,6 +1838,22 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
       }
     }
   }
+
+
+  delete [] integerVariable;
+  delete [] isInteger;
+
+  delete [] element;
+  delete [] row;
+  delete [] columnStart;
+  delete [] columnLength;
+  delete [] objective;
+
+  delete [] elementByRow;
+  delete [] column;
+  delete [] rowUpper;
+  delete [] rowLower;
+
   delete [] newSolution;
   delete [] rowActivity;
   delete [] way;

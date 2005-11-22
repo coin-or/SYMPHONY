@@ -509,55 +509,61 @@ void send_node_desc(lp_prob *p, char node_type)
    node_desc *lp_desc = p->desc;
    char repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
    char deal_with_nf;
-
+   int i, *indices;
+   double *values;
+   
    LPdata *lp_data = p->lp_data;
 
 #ifdef COMPILE_IN_LP
    tm_prob *tm = p->tm;
    bc_node *n = repricing ? (bc_node *) calloc(1, sizeof(bc_node)) :
       tm->active_nodes[p->proc_index];
-   node_desc *tm_desc = &n->desc;
-
-#ifdef SENSITIVITY_ANALYSIS
-   if (tm->par.sensitivity_analysis){ 
-      if (n->sol){
-	 FREE(n->sol);
-	 FREE(n->duals);
-      }
-      n->sol_size = p->desc->uind.size;
-      n->sol = (double *) malloc (DSIZE * p->desc->uind.size);
-      memcpy(n->sol, lp_data->x, DSIZE*p->desc->uind.size);
-
-      n->dual_size = p->base.cutnum;      
-      n->duals = (double *) malloc (DSIZE * p->base.cutnum);
-      memcpy(n->duals, lp_data->dualsol, DSIZE*p->base.cutnum);
-   }
-#endif
-   
+   node_desc *tm_desc = &n->desc;   
 #else
    int s_bufid;
 #endif
    
+
+#ifdef SENSITIVITY_ANALYSIS
+      if (tm->par.sensitivity_analysis && 
+	  !(node_type == INFEASIBLE_PRUNED || node_type == DISCARDED_NODE)){
+	 if (n->duals){
+	    FREE(n->duals);
+	 }
+	 n->duals = (double *) malloc (DSIZE * p->base.cutnum);
+	 memcpy(n->duals, lp_data->dualsol, DSIZE*p->base.cutnum);
+      }
+#endif	 
+
 #ifdef COMPILE_IN_LP
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
        node_type == DISCARDED_NODE || node_type == FEASIBLE_PRUNED){
       n->node_status = NODE_STATUS__PRUNED;
-      
-      if (node_type == INFEASIBLE_PRUNED || node_type == DISCARDED_NODE){
-	 n->feasibility_status = INFEASIBLE_PRUNED;      
-      }
-      if (node_type == FEASIBLE_PRUNED) {
-	 if (!tm->par.sensitivity_analysis && 
-	     tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){ 
-   	    n->sol_size = p->desc->uind.size;
-	    n->sol = (double *) malloc (DSIZE * p->desc->uind.size);
-	    memcpy(n->sol, lp_data->x, DSIZE*p->desc->uind.size);
+
+      if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){       
+	 if (node_type == INFEASIBLE_PRUNED || node_type == DISCARDED_NODE){
+	    if (n->feasibility_status != NOT_PRUNED_HAS_CAN_SOLUTION){
+	       n->feasibility_status = INFEASIBLE_PRUNED;      
+	    }
 	 }
-	 n->feasibility_status = FEASIBLE_PRUNED;      
-      }
-      if (node_type == OVER_UB_PRUNED ){
-	 n->feasibility_status = OVER_UB_PRUNED;      
-	 
+	 if (node_type == FEASIBLE_PRUNED) {
+	    indices = lp_data->tmp.i1;
+	    values = lp_data->tmp.d;
+
+	    n->sol_size = collect_nonzeros(p, lp_data->x, indices, values);
+	    n->sol_ind = (int *) malloc (ISIZE * n->sol_size);
+	    n->sol = (double *) malloc (DSIZE * n->sol_size);
+	    memcpy(n->sol, values, DSIZE*n->sol_size);
+	    memcpy(n->sol_ind, indices, ISIZE*n->sol_size);
+	    n->feasibility_status = FEASIBLE_PRUNED;      
+	 }
+      
+	 if (node_type == OVER_UB_PRUNED ){
+	    n->feasibility_status = OVER_UB_PRUNED;      
+	    if (n->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){	    
+	       n->feasibility_status = FEASIBLE_PRUNED;      
+	    } 
+	 }
       }
 
 #ifdef TRACE_PATH
