@@ -47,6 +47,7 @@
 #define TM_FOUND_FIRST_FEASIBLE           231
 #define TM_FINISHED                       232
 #define TM_FEASIBLE_SOLUTION_FOUND        233
+#define TM_SIGNAL_CAUGHT                  234
 #define TM_ERROR__NO_BRANCHING_CANDIDATE -250
 #define TM_ERROR__ILLEGAL_RETURN_CODE    -251
 #define TM_ERROR__NUMERICAL_INSTABILITY  -252

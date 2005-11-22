@@ -241,9 +241,10 @@ typedef struct BRANCH_OBJ{
 #endif
 
 #endif
-
+   int          *sol_sizes;
+   int         **sol_inds;
    double      **solutions;
-#ifdef SENSITIVITY_ANALYSIS
+#ifdef SENSITIVITY_ANALYSIS   
    double      **duals;
 #endif
    
@@ -324,11 +325,11 @@ typedef struct BC_NODE{
 			       defined in "BB_types.h" */
    char       node_status;
 
-   int          feasibility_status;  
+   int          feasibility_status;
    int          sol_size;
+   int         *sol_ind;
    double      *sol;
 #ifdef SENSITIVITY_ANALYSIS
-   int          dual_size;
    double      *duals;
    double       C_LP;
    double       B_IP;

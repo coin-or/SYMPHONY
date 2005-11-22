@@ -158,6 +158,12 @@
 #define MC_FIFO                  0
 #define MC_LIFO                  1
 
+/*------------  warm_starting options for multi-criteria problems -------------*/
+#define MC_WS_UTOPIA_FIRST               0
+#define MC_WS_UTOPIA_BOTH_FIXED          1
+#define MC_WS_UTOPIA_BOTH                2
+#define MC_WS_BEST_CLOSE                 3
+
 /*****************************************************************************
  *****************************************************************************
  *************                                                      **********

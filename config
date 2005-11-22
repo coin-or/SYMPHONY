@@ -190,6 +190,8 @@ endif
 # and their libraries) on the system files path. 
 ##############################################################################
 
+# This flag is automatically set to FALSE for the archs CYGWIN and Darwin...
+
 HAS_READLINE = TRUE
 
 ##############################################################################

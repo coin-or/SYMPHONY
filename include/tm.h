@@ -224,4 +224,6 @@ void unpack_cut_set PROTO((tm_prob *tm, int sender, int cutnum,
 			   row_data *rows));
 int receive_lp_timing PROTO((tm_prob *tm));
 
+void sym_catch_c PROTO((int num));
+
 #endif

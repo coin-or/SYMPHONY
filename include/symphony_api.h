@@ -66,6 +66,8 @@ int sym_get_col_lower PROTO((sym_environment *env, double *collb));
 int sym_get_col_upper PROTO((sym_environment *env, double *colub));
 int sym_get_row_sense PROTO((sym_environment *env, char *rowsen));
 int sym_get_rhs PROTO((sym_environment *env, double *rowrhs));
+int sym_get_matrix PROTO((sym_environment *env, int *nz, int *matbeg, 
+			  int *matind, double *matval));
 int sym_get_row_range PROTO((sym_environment *env, double *rowrng));
 int sym_get_row_lower PROTO((sym_environment *env, double *rowlb));
 int sym_get_row_upper PROTO((sym_environment *env, double *rowub));

@@ -74,6 +74,7 @@ typedef struct TM_PARAMS{
    int         warm_start;
    int         warm_start_node_limit;
    int         warm_start_node_level;
+   double      warm_start_node_level_ratio;
    double      warm_start_node_ratio;
    int         logging;
    int         logging_interval;

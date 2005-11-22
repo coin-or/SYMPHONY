@@ -240,7 +240,8 @@ void set_itlim PROTO((LPdata *lp_data, int itlim));
 void get_column PROTO((LPdata *lp_data, int j,
 		       double *colval, int *colind, int *collen, double *cj));
 void get_row PROTO((LPdata *lp_data, int i,
-		    double *rowval, int *rowind, int *rowlen));
+		    double *rowval, int *rowind, int *rowlen,
+		    double *rowub, double *rowlb));
 int get_proof_of_infeas PROTO((LPdata *lp_data, int *infind));
 void get_x PROTO((LPdata *lp_data));
 void get_dj_pi PROTO((LPdata *lp_data));
