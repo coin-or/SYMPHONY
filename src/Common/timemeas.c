@@ -12,7 +12,7 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef WIN32
+#if !defined WIN32 || !defined __DARWIN
 #include <sys/resource.h>
 #endif
 #include <stdio.h>

@@ -134,35 +134,6 @@ int receive_lp_data_u(lp_prob *p)
       }
    }
 
-   if (p->par.do_primal_heuristic){
-
-      int nonzeros = 0, j , k;
-      
-      mip->col_lengths = (int *) malloc(ISIZE * mip->n);
-      mip->row_matbeg = (int *) malloc(ISIZE * (mip->m + 1));
-      mip->row_matval = (double *)malloc(DSIZE*mip->matbeg[mip->n]);
-      mip->row_matind = (int *)   malloc(ISIZE*mip->matbeg[mip->n]);
-      mip->row_lengths = (int *) malloc(ISIZE*mip->m);
-
-      for (i = 0; i < mip->m; i++){
-	 for (j = 0; j < mip->n; j++){
-	    for (k = mip->matbeg[j]; k < mip->matbeg[j+1]; k++){
-	       if (mip->matind[k] == i){	   
-		  mip->row_matind[nonzeros] = j;
-		  mip->row_matval[nonzeros] = mip->matval[k];
-		  nonzeros++;	  
-		  break;
-	       }
-	    }
-	 } 
-	 mip->row_matbeg[i+1] = nonzeros;
-	 mip->row_lengths[i] = mip->row_matbeg[i+1] - mip->row_matbeg[i];
-      }
-
-      for (j = 0; j < mip->n; j++){
-	 mip->col_lengths[j] = mip->matbeg[j+1] - mip->matbeg[j];
-      }
-   }
 #ifdef USE_SYM_APPLICATION   
    switch( user_receive_lp_data(&p->user)){
     case USER_ERROR:
@@ -367,7 +338,7 @@ int create_subproblem_u(lp_prob *p)
       maxnz = lp_data->nz;
 
       lp_data->m = bcutnum;
-
+      lp_data->nz = lp_data->mip->nz;
       break;
     case USER_SUCCESS:
        /* Fall through to next case */
@@ -390,6 +361,7 @@ int create_subproblem_u(lp_prob *p)
       }
 
       lp_data->m = bcutnum;
+      lp_data->nz = lp_data->mip->nz;
       break;
 
     case USER_ERROR:
@@ -403,45 +375,6 @@ int create_subproblem_u(lp_prob *p)
       /* Unexpected return value. Do something!! */
       FREE(userind);
       return(ERROR__USER);
-   }
-   
-   if (p->par.do_primal_heuristic){
-
-      FREE(p->mip->row_matbeg);
-      FREE(p->mip->row_matval);
-      FREE(p->mip->row_lengths);
-      FREE(p->mip->col_lengths);
-
-      p->mip->row_matbeg = (int *) malloc(ISIZE * (lp_data->mip->m + 1));
-      p->mip->row_matval =
-	 (double *)malloc(DSIZE*lp_data->mip->nz);
-      p->mip->row_matind =
-	(int *)   malloc(ISIZE*lp_data->mip->nz);
-      p->mip->row_lengths = (int *) malloc(ISIZE*lp_data->mip->m);
-      p->mip->col_lengths = (int *) malloc(ISIZE * lp_data->mip->n);
-      
-      int nonzeros = 0;
-      for(i = 0; i < lp_data->mip->m; i++){
-	 for(j = 0; j < lp_data->mip->n; j++){
-	    for(k = lp_data->mip->matbeg[j]; k < lp_data->mip->matbeg[j+1]; 
-		k++){
-	       if(lp_data->mip->matind[k] == i){	   
-		  p->mip->row_matind[nonzeros] = j;
-		  p->mip->row_matval[nonzeros] = lp_data->mip->matval[k];
-		  nonzeros++;  
-		  break;
-	       }
-	    }
-	 } 
-	 p->mip->row_matbeg[i+1] = nonzeros;
-	 p->mip->row_lengths[i] = p->mip->row_matbeg[i+1] - 
-	    p->mip->row_matbeg[i];
-      }
-
-      for(j = 0; j < lp_data->mip->n; j++){
-	 p->mip->col_lengths[j] = lp_data->mip->matbeg[j+1] - 
-	    lp_data->mip->matbeg[j];
-      }
    }
 
    FREE(userind); /* No longer needed */
@@ -709,7 +642,8 @@ int is_feasible_u(lp_prob *p, char branching)
    }
 
    /* try rounding */
-   if (feasible != IP_FEASIBLE && p->par.do_primal_heuristic &&
+   if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE && 
+       p->par.do_primal_heuristic &&
        !p->par.multi_criteria){
       if (feasible == IP_INFEASIBLE){ 
 	 true_objval = SYM_INFINITY;
@@ -781,12 +715,10 @@ int is_feasible_u(lp_prob *p, char branching)
 	       p->best_sol.has_sol = TRUE;
 	    PRINT(p->par.verbosity, -1,
 		  ("\n****** Found Better Feasible Solution !\n"));
-#if 0
 	    if (feasible == IP_HEUR_FEASIBLE){
-	      PRINT(p->par.verbosity, -1,
+	      PRINT(p->par.verbosity, 2,
 		    ("****** After Calling Heuristics !\n"));
 	    }
-#endif
 	    if (p->mip->obj_sense == SYM_MAXIMIZE){
 	       PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", -true_objval
 					    + p->mip->obj_offset));
@@ -2099,6 +2031,10 @@ int generate_cuts_in_lp_u(lp_prob *p)
 #ifdef USE_CGL_CUTS
       if (p->par.cgl.generate_cgl_cuts){
 	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE, p->bc_index < 1 ? TRUE: FALSE);
+	 if(p->bc_index < 1){
+	    p->par.cgl = 
+	       lp_data->cgl;
+	 }
       }
 #endif
       /* Fall through to next case */
