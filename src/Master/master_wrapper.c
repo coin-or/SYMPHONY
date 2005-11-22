@@ -657,6 +657,13 @@ int display_solution_u(sym_environment *env, int thread_num)
 #endif
 
    if (!sol.has_sol){
+      switch(env->termcode){
+       case TM_NO_SOLUTION:
+	  printf("\nThe problem is infeasible!");
+	  break;
+       default:
+	  break;		    
+      }
       printf("\nNo Solution Found\n\n");
       return(FUNCTION_TERMINATED_NORMALLY);
    }

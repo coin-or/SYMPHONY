@@ -68,6 +68,7 @@ sym_environment *sym_open_environment()
    Pvmtmask trace_mask;
 #endif
 
+
    setvbuf(stdout, (char *)NULL, _IOLBF, 0);
    
    env = (sym_environment *) calloc(1, sizeof(sym_environment));
@@ -178,6 +179,7 @@ int sym_set_defaults(sym_environment *env)
    env->par.mc_compare_solution_tolerance = .001;
    env->par.mc_search_order = MC_FIFO;
    env->par.mc_warm_start = FALSE;
+   env->par.mc_warm_start_rule = MC_WS_UTOPIA_FIRST;
    env->par.trim_warm_tree = FALSE;
    env->par.test = FALSE;
    /************************** treemanager defaults **************************/
@@ -223,6 +225,11 @@ int sym_set_defaults(sym_environment *env)
    tm_par->keep_description_of_pruned = DISCARD;
 
    tm_par->warm_start = FALSE;
+   tm_par->warm_start_node_ratio = 0.0;
+   tm_par->warm_start_node_limit = SYM_INFINITY;      
+   tm_par->warm_start_node_level_ratio = 0.0; 
+   tm_par->warm_start_node_level = SYM_INFINITY;
+
    tm_par->logging = NO_LOGGING;
    tm_par->logging_interval = 1800;
    tm_par->vbc_emulation = NO_VBC_EMULATION;
@@ -874,6 +881,7 @@ int sym_solve(sym_environment *env)
 
        case SOMETHING_DIED:
        case TM_TIME_LIMIT_EXCEEDED:
+       case TM_SIGNAL_CAUGHT:  
        case TM_NODE_LIMIT_EXCEEDED:
        case TM_TARGET_GAP_ACHIEVED:
        case TM_FOUND_FIRST_FEASIBLE:
@@ -900,6 +908,7 @@ int sym_solve(sym_environment *env)
 #ifndef COMPILE_IN_TM
    }while (msgtag != TM_OPTIMAL_SOLUTION_FOUND && msgtag != SOMETHING_DIED &&
 	   msgtag != TM_TIME_LIMIT_EXCEEDED &&
+	   msgtag != TM_SIGNAL_CAUGHT &&
 	   msgtag != TM_NODE_LIMIT_EXCEEDED &&
 	   msgtag != TM_TARGET_GAP_ACHIEVED &&
 	   msgtag != TM_FOUND_FIRST_FEASIBLE &&
@@ -940,14 +949,15 @@ int sym_solve(sym_environment *env)
 #ifdef COMPILE_IN_LP
    thread_num = env->tm->opt_thread_num;
    if (env->tm->lpp[thread_num]){
+      env->par.lp_par.cgl = env->tm->lpp[thread_num]->par.cgl;
       if (env->tm->lpp[thread_num]->best_sol.has_sol){
 	 FREE(env->best_sol.xind);
 	 FREE(env->best_sol.xval);
 	 env->best_sol = env->warm_start->best_sol = 
 	    env->tm->lpp[thread_num]->best_sol;
-      }else if (!env->par.multi_criteria){
-	env->tm->lpp[thread_num]->best_sol = env->warm_start->best_sol = 
-	  env->best_sol;
+      }else {
+	 env->tm->lpp[thread_num]->best_sol = env->warm_start->best_sol = 
+	    env->best_sol;
       }
    }
 #else
@@ -1016,7 +1026,7 @@ int sym_solve(sym_environment *env)
     * Display the the results and solution data                               
    \*------------------------------------------------------------------------*/
 
-   if (env->par.verbosity >=0 ){
+   if (env->par.verbosity >=-1 ){
       printf("\n****************************************************\n");
       if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
 	 printf(  "* Optimal Solution Found                           *\n");
@@ -1026,6 +1036,8 @@ int sym_solve(sym_environment *env)
 	 printf(  "* Time Limit Reached                               *\n");
       }else if (termcode == TM_NODE_LIMIT_EXCEEDED){
 	 printf(  "* Node Limit Reached                               *\n");
+      }else if (termcode == TM_SIGNAL_CAUGHT){
+	 printf(  "* Abort Requested                                  *\n");
       }else if (termcode == TM_TARGET_GAP_ACHIEVED){
 	 printf(  "* Target Gap Achieved                              *\n");
       }else if (termcode == TM_FOUND_FIRST_FEASIBLE){
@@ -1040,25 +1052,30 @@ int sym_solve(sym_environment *env)
       }else{
 	 printf(  "* A process has died abnormally -- halting         *\n");
       }
-      printf(  "* Now displaying stats and best solution found...  *\n");
+      if (env->par.verbosity >=0 ){
+	 printf(  "* Now displaying stats and best solution found...  *\n");
+      }
       printf(  "****************************************************\n\n");
-      
-      total_time  = env->comp_times.readtime;
-      total_time += env->comp_times.ub_overhead + env->comp_times.ub_heurtime;
-      total_time += env->comp_times.lb_overhead + env->comp_times.lb_heurtime;
+      if (env->par.verbosity >=0 ){
+	 total_time  = env->comp_times.readtime;
+	 total_time += env->comp_times.ub_overhead + env->comp_times.ub_heurtime;
+	 total_time += env->comp_times.lb_overhead + env->comp_times.lb_heurtime;
    
 #ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
-      printf( "====================== Misc Timing =========================\n");
-      printf( "  Problem IO        %.3f\n", env->comp_times.readtime);
+	 printf( "====================== Misc Timing =========================\n");
+	 printf( "  Problem IO        %.3f\n", env->comp_times.readtime);
 #if 0
-      printf( "  UB overhead:      %.3f\n", env->comp_times.ub_overhead);
-      printf( "  UB runtime:       %.3f\n", env->comp_times.ub_heurtime);
-      printf( "  LB overhead:      %.3f\n", env->comp_times.lb_overhead);
-      printf( "  LB runtime:       %.3f\n", env->comp_times.lb_heurtime);
+	 printf( "  UB overhead:      %.3f\n", env->comp_times.ub_overhead);
+	 printf( "  UB runtime:       %.3f\n", env->comp_times.ub_heurtime);
+	 printf( "  LB overhead:      %.3f\n", env->comp_times.lb_overhead);
+	 printf( "  LB runtime:       %.3f\n", env->comp_times.lb_heurtime);
 #endif
 #endif
+      }
    }
    
+   env->termcode = termcode;
+
 #ifdef COMPILE_IN_TM
       if (tm->lb > env->lb) env->lb = tm->lb;
       if(env->par.verbosity >=0 ) {
@@ -1110,8 +1127,6 @@ int sym_solve(sym_environment *env)
    
    free_tm(tm);
 
-   env->termcode = termcode;
-   
    return(termcode);
 }
 
@@ -1120,12 +1135,13 @@ int sym_solve(sym_environment *env)
 int sym_warm_solve(sym_environment *env)
 {
 
-  int i, change_type, node_limit, analyzed, index, rated, level;
+  int i, change_type, node_limit, analyzed, depth, index, rated, level, level_rated;
 
    /* first check for the updates! */
 
    if (!env->warm_start ||
-       env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY){
+       env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY ||
+       !env->mip->change_num){
       return(sym_solve(env));
    }else{
 
@@ -1133,80 +1149,72 @@ int sym_warm_solve(sym_environment *env)
 	 env->par.tm_par.warm_start = TRUE;
       }
 
-      analyzed = env->warm_start->stat.analyzed;
-      rated = (int)(env->par.tm_par.warm_start_node_ratio * analyzed);
-      level = env->par.tm_par.warm_start_node_level; 
-      node_limit = env->par.tm_par.warm_start_node_limit;      
+      env->has_ub = FALSE;
+      env->ub = 0.0;
+
+      if(env->par.multi_criteria){
+	 env->has_ub = env->has_mc_ub;
+	 env->ub = env->mc_ub;
+      }
+
+      env->warm_start->has_ub = env->best_sol.has_sol = 
+	 env->warm_start->best_sol.has_sol = FALSE;
+      env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+      FREE(env->warm_start->best_sol.xind);
+      FREE(env->warm_start->best_sol.xval);
       
-      if (level < SYM_INFINITY && level > 0 && 
-	 level < env->warm_start->stat.max_depth){
-	 cut_ws_tree_level(env->warm_start->rootnode, level);	 
-	 /* FIXME: what to do with stats? */
-	 //	 memset(&(env->warm_start->stat), 0, sizeof(problem_stat));
-      } else if(rated > 0 || node_limit > 0) {
-	index = node_limit <= rated ? node_limit : rated ;
-	if (index < analyzed) {
-	  env->warm_start->stat.analyzed = env->warm_start->stat.created =
-	    env->warm_start->stat.tree_size = index;
-	  cut_ws_tree_index(env->warm_start->rootnode, index, index,
-			    &(env->warm_start->stat));
-	}
-      }
-
-      if(!env->par.multi_criteria){
-	 env->has_ub = FALSE;
-	 env->ub = 0.0;
-      }	 
-
-      if(env->mip->change_num){
-	env->warm_start->has_ub = env->best_sol.has_sol = 
-	  env->warm_start->best_sol.has_sol = FALSE;
-	env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
-      }
-
       for(i = 0; i < env->mip->change_num; i++){
 	 change_type = env->mip->change_type[i];
-	 if (change_type == RHS_CHANGED){
-	    
-	    //#ifdef USE_CGL_CUTS
-	    if(env->par.lp_par.cgl.generate_cgl_cuts){
-	       printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
-	       printf("rhs change when cuts exist, for now!\n"); 
-	       return(FUNCTION_TERMINATED_ABNORMALLY);	    
-	       //#else
-	    }else{	    
-	       env->mip->change_num = 0;
-	       update_tree_bound(env, env->warm_start->rootnode, RHS_CHANGED);
-	       return(sym_solve(env));
-	       //#endif
+	 if(change_type == RHS_CHANGED || change_type == OBJ_COEFF_CHANGED){
+	    if(change_type == RHS_CHANGED){
+	       if(env->par.lp_par.cgl.generate_cgl_cuts){
+		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
+		  printf("rhs change when cuts exist, for now!\n"); 
+		  return(FUNCTION_TERMINATED_ABNORMALLY);	    
+	       }
+	    } else{
+	       if(env->par.lp_par.do_reduced_cost_fixing && !env->par.multi_criteria){		 
+		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
+		  printf("obj coeff change when reduced cost fixing is on,"); 
+		  printf("for now!\n"); 
+		  return(FUNCTION_TERMINATED_ABNORMALLY);   
+	       } 
 	    }
-	 }
-      }
-      
-      for(i = 0; i < env->mip->change_num; i++){
-	 change_type = env->mip->change_type[i];
-	 switch(change_type){
-	  case OBJ_COEFF_CHANGED:
-#if 0
-	     if(env->par.lp_par.do_reduced_cost_fixing &&
-		!env->par.mc_warm_start){
-		printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
-		printf("obj coeff change when reduced cost fixing is on,"); 
-		printf("for now!\n"); 
-		return(FUNCTION_TERMINATED_ABNORMALLY);   
-	     }
-#endif
-	     update_tree_bound(env, env->warm_start->rootnode, 
-			       OBJ_COEFF_CHANGED);
-	     break;
-	  default:
-	     printf("sym_warm_solve():");
-	     printf("Unable to re-solve this change,for now!\n");
-	     return(FUNCTION_TERMINATED_ABNORMALLY); 
+
+	    analyzed = env->warm_start->stat.analyzed;
+	    depth = env->warm_start->stat.max_depth;
+	    rated = (int)(env->par.tm_par.warm_start_node_ratio * analyzed);
+	    level_rated = (int)(env->par.tm_par.warm_start_node_level_ratio * depth); 
+	    node_limit = env->par.tm_par.warm_start_node_limit;      
+	    level = env->par.tm_par.warm_start_node_level;
+	    index = node_limit <= rated ? node_limit : rated ;
+	    level = level <= level_rated ? level : level_rated;
+
+	    if ((level > 0 && level < depth) || index > 0) {
+	       env->warm_start->stat.analyzed = env->warm_start->stat.created =
+		  env->warm_start->stat.tree_size = 0;
+	       if ( level > 0 && level < depth) {
+		  cut_ws_tree_level(env, env->warm_start->rootnode, level, 
+				    &(env->warm_start->stat), change_type);	 
+		  env->warm_start->stat.max_depth = level;
+	       } else {
+		  if (index < analyzed) {
+		     if (!index) index = 1; 
+		     cut_ws_tree_index(env, env->warm_start->rootnode, index,
+				       &(env->warm_start->stat), change_type);
+		  }
+	       }	    
+	    }	       
+	    update_tree_bound(env, env->warm_start->rootnode, change_type);
+	    /* FIXME: Cannot warm start for more than 1 modificaiton */
+	    env->mip->change_num = 0;
+	 } else{
+	    printf("sym_warm_solve():");
+	    printf("Unable to re-solve this type of modification,for now!\n");
+	    return(FUNCTION_TERMINATED_ABNORMALLY); 
 	 }
       }      
-   }  
-
+   }
 
    /* Uncommented for now! */
 #if 0 
@@ -1215,7 +1223,6 @@ int sym_warm_solve(sym_environment *env)
    }
 #endif
    
-   env->mip->change_num = 0;
    return(sym_solve(env));
 }
 
@@ -1243,6 +1250,14 @@ typedef struct SOLUTION_PAIRS{
 
 /*===========================================================================*/
 
+ typedef struct WS_ITEM{
+   warm_start_desc * ws;
+   struct WS_ITEM * next;
+   double gamma;
+}ws_item;
+
+/*===========================================================================*/
+
 #define MAX_NUM_PAIRS 10000
 #define MAX_NUM_SOLUTIONS 10000
 #define MAX_NUM_INFEASIBLE 10000
@@ -1255,8 +1270,8 @@ int sym_mc_solve(sym_environment *env)
    int i, cp_num;
    double gamma, gamma0, gamma1, tau, slope;
    double start_time;
-   warm_start_desc *ws;
-
+   warm_start_desc *ws, *ws1, *ws2;
+   ws_item *head, *tail, *item, *temp;
    solution_data utopia1;
    solution_data utopia2;
    solution_data solutions[MAX_NUM_PAIRS];
@@ -1343,7 +1358,6 @@ int sym_mc_solve(sym_environment *env)
    */
    if (env->par.lp_par.mc_find_supported_solutions && 
        env->par.mc_warm_start){
-      // env->par.lp_par.do_reduced_cost_fixing = FALSE;      
       sym_set_int_param(env, "do_reduced_cost_fixing", FALSE);      
       sym_set_int_param(env, "keep_warm_start", TRUE);
    }
@@ -1356,12 +1370,31 @@ int sym_mc_solve(sym_environment *env)
       env->rootdesc->uind.size--;
       return(termcode);
    }
-   numprobs++;
-   
-   if (env->par.lp_par.mc_find_supported_solutions && 
-       env->par.mc_warm_start){
-      ws = sym_get_warm_start(env, TRUE);
+
+
+   if(env->par.lp_par.mc_find_supported_solutions && 
+      env->par.mc_warm_start){
+
+      ws = sym_get_warm_start(env, FALSE);
+      
+      switch (env->par.mc_warm_start_rule){
+       case 0:
+       case 1: 
+	  sym_set_int_param(env, "do_reduced_cost_fixing", TRUE);      
+	  sym_set_int_param(env, "keep_warm_start", FALSE);
+       case 2:
+	  ws1=ws2=ws;
+	  break;
+       case 3:
+	  head = tail = (ws_item *) calloc (1, sizeof(ws_item));
+	  head->ws = tail->ws = ws;
+	  head->gamma = tail->gamma = 1.0;
+	  break;
+       default:
+	  break;
+      }
    }
+   numprobs++;
    
    /* Store the solution */
    length = solutions[numsolutions].length = env->best_sol.xlength;
@@ -1384,22 +1417,10 @@ int sym_mc_solve(sym_environment *env)
    printf("***************************************************\n");
    printf("***************************************************\n\n");
 
-   /* Now, we can turn on reduced cost fixing and turn off keeping 
-      warm start data
-   */
-   if(env->par.lp_par.mc_find_supported_solutions && 
-      env->par.mc_warm_start){
-      sym_set_int_param(env, "do_reduced_cost_fixing", TRUE);      
-      sym_set_int_param(env, "keep_warm_start", FALSE);
-   }
-
    /* Resolve */
    env->utopia[0] = -MAXINT;
    env->utopia[1] = 0;
    if (env->par.lp_par.mc_find_supported_solutions){
-      if (env->par.mc_warm_start){      
-	 sym_set_warm_start(env, ws);
-      }
       
       for (i = 0; i < env->mip->n; i++){
 	 sym_set_obj_coeff(env, i, env->mip->obj2[i] +
@@ -1407,9 +1428,18 @@ int sym_mc_solve(sym_environment *env)
 						   env->mip->obj2[i]));
       }
 
-      if (env->par.mc_warm_start){      
+      if (env->par.mc_warm_start && env->par.mc_warm_start_rule == 0){
+	 sym_set_warm_start(env, ws);
 	 if (termcode = sym_warm_solve(env) < 0){
-	    sym_delete_warm_start(ws);
+	    switch(env->par.mc_warm_start_rule){
+	     case 0:
+		sym_delete_warm_start(ws);
+		break;
+	     case 3:
+		sym_delete_warm_start(head->ws);
+		FREE(head);
+		break;
+	    }
 	    return(termcode);
 	 }
       }else{
@@ -1424,6 +1454,27 @@ int sym_mc_solve(sym_environment *env)
 	 return(termcode);
       }
    }      
+   
+   if(env->par.lp_par.mc_find_supported_solutions && 
+      env->par.mc_warm_start){
+      
+      switch (env->par.mc_warm_start_rule){
+       case 0:
+	  break;
+       case 1:	 
+       case 2:
+	  ws2=sym_get_warm_start(env, FALSE);
+	  break;
+       case 3:
+	  item = (ws_item *) calloc (1, sizeof(ws_item)); 
+	  item->ws = sym_get_warm_start(env, FALSE);      
+	  item->gamma = 0.0;
+	  head->next = tail = item;
+	  break;
+       default:
+	  break;
+      }
+   }
    numprobs++;
    
    /* Store the solution */
@@ -1466,7 +1517,7 @@ int sym_mc_solve(sym_environment *env)
    }else{
       numpairs = 0;
    }
-
+   
    /* Keep taking pairs off the list and processing them until there are none
       left */
    while (numpairs > 0 && numpairs < MAX_NUM_PAIRS &&
@@ -1541,21 +1592,89 @@ int sym_mc_solve(sym_environment *env)
       printf("***************************************************\n\n");
       
       env->obj[0] = env->obj[1] = 0.0;
-      
+   
       if (env->par.lp_par.mc_find_supported_solutions){
-	 if(env->par.mc_warm_start){
-	    sym_set_warm_start(env, ws);
-	 }
-
+	 
 	 for (i = 0; i < env->mip->n; i++){
 	    sym_set_obj_coeff(env, i, gamma*env->mip->obj1[i]
 			      + tau*env->mip->obj2[i]
 			      + env->par.lp_par.mc_rho*(env->mip->obj1[i]
 							+ env->mip->obj2[i]));
 	 }
+      
 	 if(env->par.mc_warm_start){
+	    
+	    switch(env->par.mc_warm_start_rule){
+	     case 0:
+		sym_set_warm_start(env, ws);
+		break;
+	     case 1:
+		if (gamma > 0.5 ){
+		   sym_set_warm_start(env, ws1);
+		} else {
+		   sym_set_warm_start(env, ws2);
+		}
+		break;
+	     case 2:
+		sym_delete_warm_start(env->warm_start);
+		if (gamma > 0.5 ){
+		   env->warm_start = ws1;
+		} else {
+		   env->warm_start = ws2;
+		}
+		break;
+	     case 3:
+
+		if (gamma > 0.0){
+		   for(item = head;;item = item->next){
+		      if (gamma >= item->next->gamma){
+			 break;
+		      }
+		   } 
+		   if ((item->gamma - gamma) <= (gamma - item->next->gamma)){
+		      sym_set_warm_start(env, item->ws);
+		   } else {
+		      sym_set_warm_start(env, item->next->ws);
+		   }
+		} else {
+		   sym_set_warm_start(env, tail->ws);
+		}
+		break;
+	     default:
+		break;
+	    }
+	    
 	    if (termcode = sym_warm_solve(env) < 0){
-	       sym_delete_warm_start(ws);
+
+	       /* FIXME! copy best_sol.xind and .xval from env to warm_start*/
+	       memset(&(env->best_sol), 0, sizeof(lp_sol));
+
+	       switch(env->par.mc_warm_start_rule){
+		case 0:
+		   sym_delete_warm_start(ws);
+		   break;
+		case 1:
+		case 2:
+		   sym_delete_warm_start(ws1);
+		   sym_delete_warm_start(ws2);
+		   break;
+		case 3:
+		   while(TRUE){
+		      sym_delete_warm_start(head->ws); 
+		      if(head != tail){
+			 temp = head->next;
+			 head->next = 0;
+			 FREE(head);
+			 head = temp;
+		      } else {
+			 FREE(head);
+			 break;
+		      }
+		   }
+		   break;
+		default:
+		   break;
+	       }
 	       return(termcode);
 	    }
 	 }else{
@@ -1563,13 +1682,36 @@ int sym_mc_solve(sym_environment *env)
 	       return(termcode);
 	    }
 	 }
-      }else{
+      } else{
 	 if (termcode = sym_solve(env) < 0){
 	    env->base->cutnum -=2;
 	    env->rootdesc->uind.size--;
 	    return(termcode);
 	 }
       }
+      
+      switch(env->par.mc_warm_start_rule){
+       case 0:
+       case 1:
+	  break;
+       case 2:
+	  if (gamma > 0.5 ){
+	     ws1 = sym_get_warm_start(env,FALSE);
+	  } else {
+	     ws2 = sym_get_warm_start(env,FALSE);
+	  }
+	  break;
+       case 3:
+	  temp = (ws_item *) calloc (1, sizeof(ws_item)); 
+	  temp->ws = sym_get_warm_start(env, FALSE);      
+	  temp->gamma = gamma;
+	  temp->next = item->next;
+	  item->next = temp;
+	  break;
+       default:
+	  break;
+      }
+   
       numprobs++;
       
       if (binary_search){
@@ -1732,10 +1874,15 @@ int sym_mc_solve(sym_environment *env)
    }
 #endif
    
-   print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 0.0,
-		    0.0, 0, start_time, wall_clock(NULL), env->mip->obj_offset,
-		    env->mip->obj_sense, env->has_ub);
-   
+   if (!env->par.multi_criteria){
+      print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 0.0,
+		       0.0, 0, start_time, wall_clock(NULL), env->mip->obj_offset,
+		       env->mip->obj_sense, env->has_ub);
+   } else{ 
+      printf("Total WallClock Time         %.3f\n", wall_clock(NULL) -
+	     start_time);
+   }
+
    printf("\nNumber of subproblems solved: %i\n", numprobs);
    printf("Number of solutions found: %i\n\n", numsolutions);
    
@@ -1789,7 +1936,36 @@ int sym_mc_solve(sym_environment *env)
    }
    if (env->par.lp_par.mc_find_supported_solutions){
        if(env->par.mc_warm_start){
-	  sym_delete_warm_start(ws);
+
+	  /* FIXME! copy best_sol.xind and .xval from env to warm_start*/
+	  memset(&(env->best_sol), 0, sizeof(lp_sol));
+	  
+	  switch(env->par.mc_warm_start_rule){
+	   case 0:
+	      sym_delete_warm_start(ws);
+	      break;
+	   case 1:
+	   case 2:
+	      sym_delete_warm_start(ws1);
+	      sym_delete_warm_start(ws2);
+	      break;
+	   case 3:
+	      while(TRUE){
+		 sym_delete_warm_start(head->ws); 
+		 if(head != tail){
+		    temp = head->next;
+		    head->next = 0;
+		    FREE(head);
+		    head = temp;
+		 } else {
+		    FREE(head);
+		    break;
+		 }
+	      }
+	      break;
+	   default:
+	      break;
+	  }
        }
    }else {       
       env->base->cutnum -=2;
@@ -1797,7 +1973,7 @@ int sym_mc_solve(sym_environment *env)
    }
 
    return(TM_OPTIMAL_SOLUTION_FOUND);
-}
+   }
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -2003,7 +2179,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 	 env->mip->matind = index;
       }
    }
-      
+
    /* Start up the graphics window*/
 #ifndef WIN32
    CALL_WRAPPER_FUNCTION( init_draw_graph_u(env) );   
@@ -2239,6 +2415,27 @@ int sym_get_rhs(sym_environment *env, double *rowrhs)
    
    return(FUNCTION_TERMINATED_NORMALLY);
 
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_matrix(sym_environment *env, int *nz, int *matbeg, int *matind, 
+		   double *matval)
+{
+   if (!env->mip || !env->mip->m || !env->mip->n || !env->mip->matbeg){   
+      printf("sym_get_rhs():There is no loaded mip description or\n");
+      printf("there is no loaded matrix description!\n");      
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+   
+   *nz = env->mip->nz;
+
+   memcpy(matbeg, env->mip->matbeg, ISIZE * (env->mip->n + 1));
+   memcpy(matind, env->mip->matind, ISIZE * (*nz));
+   memcpy(matval, env->mip->matval, DSIZE * (*nz));
+
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
@@ -3999,7 +4196,7 @@ void sym_delete_warm_start(warm_start_desc *ws)
 	 }
 	 FREE(ws->cuts);
       }
-
+      
       if(ws->best_sol.xlength){
 	 FREE(ws->best_sol.xind);
 	 FREE(ws->best_sol.xval);
@@ -4182,6 +4379,11 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
    else if (strcmp(key, "mc_warm_start") == 0 ||
 	     strcmp(key, "M_mc_warm_start") == 0){
       *value = env->par.mc_warm_start;
+      return(0);
+   }
+   else if (strcmp(key, "mc_warm_start_rule") == 0 ||
+	    strcmp(key, "M_mc_warm_start_rule") == 0){
+      *value = env->par.mc_warm_start_rule;
       return(0);
    }
    else if (strcmp(key, "trim_warm_tree") == 0 ||
@@ -5490,3 +5692,4 @@ int sym_test(sym_environment *env)
   return(termcode);
   
 }
+
