@@ -128,8 +128,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    double **frval, **pfrval;
 #endif
 #endif
-   int i, j, k, branch_var, branch_row;
-   double lb, ub, oldobjval;
+   int i, j, k, l, branch_var, branch_row, min_ind;
+   double lb, ub, oldobjval, min_obj;
    cut_data *cut;
    branch_obj *can, *best_can = NULL;
 #ifdef COMPILE_FRAC_BRANCHING
@@ -138,7 +138,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #endif
 
    /* These are the return values from select_candidates_u() */
-   int cand_num = 0, new_vars = 0;
+   int cand_num = 0, new_vars = 0, *indices;
+   double *values;
    branch_obj **candidates = NULL;
 #ifdef STATISTICS
    int itlim = 0, cnum = 0;
@@ -249,8 +250,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       can->feasible = pfeas;
       can->iterd = piter;
       if (p->tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	can->solutions = (double **) calloc(maxnum, sizeof(double *));
+	 can->solutions = (double **) calloc(maxnum, sizeof(double *));	
+	 can->sol_inds = (int **) calloc(maxnum, sizeof(int *));	
+	 can->sol_size = (int *) calloc(maxnum, ISIZE);	
       }
+
 #ifdef SENSITIVITY_ANALYSIS
       if (p->tm->par.sensitivity_analysis){      
 	 can->duals = (double **) calloc(maxnum, sizeof(double *));
@@ -265,9 +269,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #endif
 
 #else
-      if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	can->solutions = (double **) calloc (MAX_CHILDREN_NUM, 
-					     sizeof(double *));
+      if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){	 	 
+	 can->solutions = (double **) calloc (MAX_CHILDREN_NUM, 
+					      sizeof(double *));
+	 can->sol_inds = (int **) calloc(MAX_CHILDREN_NUM, 
+					 sizeof(int *));	
+	 can->sol_sizes = (int *) calloc(MAX_CHILDREN_NUM, ISIZE);	
       }
 #ifdef SENSITIVITY_ANALYSIS
       if (p->par.sensitivity_analysis){      
@@ -315,10 +322,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    }
 	    check_ub(p);
 	    /* The original basis is in lp_data->lpbas */
-
 	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
 	    can->objval[j] = lp_data->objval;
-
 	    get_x(lp_data);
 
 #ifdef SENSITIVITY_ANALYSIS
@@ -344,45 +349,23 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
 		case IP_FEASIBLE:
 		  can->termcode[j] = LP_OPT_FEASIBLE;
-		  if (best_can){
-		     best_can->feasible[j] = TRUE;
-		     if (p->par.keep_description_of_pruned == 
-			 KEEP_IN_MEMORY){
-		       best_can->solutions[j] =
-			 (double *) malloc (DSIZE*lp_data->n);
-		       memcpy(best_can->solutions[j], lp_data->x,
-			      DSIZE*lp_data->n);
-		     }
-		  }else{
-		    can->feasible[j] = TRUE;
-		          if (p->par.keep_description_of_pruned ==
-			      KEEP_IN_MEMORY){
-			    can->solutions[j] = (double *) malloc (DSIZE*
-								   lp_data->n);
-			    memcpy(can->solutions[j], lp_data->x, DSIZE*
-				   lp_data->n);
-			  }
+		  can->feasible[j] = TRUE;
+		  if (p->par.keep_description_of_pruned ==
+		      KEEP_IN_MEMORY){
+		     can->solutions[j] = (double *) malloc (DSIZE*
+							    lp_data->n);
+		     memcpy(can->solutions[j], lp_data->x, DSIZE*
+			    lp_data->n);
 		  }
 		  break;
 		  
 		case IP_FEASIBLE_BUT_CONTINUE:
 		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
-		  if (best_can){
-		     best_can->feasible[j] = TRUE;
-		     if (p->par.keep_description_of_pruned == 
-			 KEEP_IN_MEMORY){
-		       best_can->solutions[j] =
-			 (double *) malloc (DSIZE*lp_data->n);
-		       memcpy(best_can->solutions[j], lp_data->x,
-			      DSIZE*lp_data->n);
-		     }
-		  }else{
-		     can->feasible[j] = TRUE;
-		     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		       can->solutions[j] = (double *) malloc (DSIZE*
-							      lp_data->n);
-		       memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-		     }
+		  can->feasible[j] = TRUE;
+		  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+		     can->solutions[j] = (double *) malloc (DSIZE*
+							    lp_data->n);
+		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 		  }
 		  break;
 
@@ -454,41 +437,21 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
 		case IP_FEASIBLE:
 		  can->termcode[j] = LP_OPT_FEASIBLE;
-		  if (best_can){
-		     best_can->feasible[j] = TRUE;
-		     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		       best_can->solutions[j] =
-			 (double *) malloc (DSIZE*lp_data->n);
-		       memcpy(best_can->solutions[j], lp_data->x,
-			      DSIZE*lp_data->n);
-		     }
-		  }else{
-		     can->feasible[j] = TRUE;
-		     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		       can->solutions[j] = (double *) malloc (DSIZE*
-							      lp_data->n);
-		       memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-		     }
+		  can->feasible[j] = TRUE;
+		  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+		     can->solutions[j] = (double *) malloc (DSIZE*
+							    lp_data->n);
+		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 		  }
 		  break;
 		  
 		case IP_FEASIBLE_BUT_CONTINUE:
 		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
-		  if (best_can){
-		     best_can->feasible[j] = TRUE;
-		     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		       best_can->solutions[j] =
-			 (double *) malloc (DSIZE*lp_data->n);
-		       memcpy(best_can->solutions[j], lp_data->x,
-			      DSIZE*lp_data->n);
-		     }
-		  }else{
-		     can->feasible[j] = TRUE;
-		     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		       can->solutions[j] = (double *) malloc (DSIZE*
-							      lp_data->n);
-		       memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-		     }
+		  can->feasible[j] = TRUE;
+		  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+		     can->solutions[j] = (double *) malloc (DSIZE*
+							    lp_data->n);
+		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 		  }
 		  break;
 		  
@@ -529,21 +492,41 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       switch ((j = compare_candidates_u(p, oldobjval, best_can, can))){
        case FIRST_CANDIDATE_BETTER:
        case FIRST_CANDIDATE_BETTER_AND_BRANCH_ON_IT:
-	 if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	   for (k = can->child_num - 1; k >= 0; k--){
-	     if (can->feasible[k]){
-	       if(best_can->feasible[k] && best_can->objval[k] < 
-		  can->objval[k]){
-		 continue;
-	       }
-	       best_can->feasible[k] = TRUE;
-	       best_can->solutions[k] = can->solutions[k];
-	       can->solutions[k] = 0;
+	  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+	     min_ind = -1;
+	     for (k = can->child_num - 1; k >= 0; k--){
+		if (can->feasible[k]){
+		   if (min_ind < 0){
+		      min_obj = SYM_INFINITY;
+		      for (l = best_can->child_num - 1; l >= 0; l--){
+			 if (best_can->feasible[l] && best_can->objval[k] < 
+			     min_obj){
+			    min_obj = best_can->objval[l]; 
+			    min_ind = l;		      
+			 }
+		      }
+		   }		   
+		   if (min_ind > -1){
+		      if(can->objval[k] > best_can->objval[min_ind]){
+			 best_can->feasible[k] = TRUE;
+			 best_can->solutions[k] = can->solutions[k];
+			 can->solutions[k] = 0;
+			 min_ind = -1;
+		      }
+		   }
+		}
 	     }
-	   }
-	 }
-	 free_candidate(candidates + i);
-	 break;
+	  } else{
+	     for (k = best_can->child_num - 1; k >= 0; k--){
+		/* Again, this is only for tracking that there was a feasible
+		   solution discovered in presolve for display purposes */
+		if (can->feasible[k]){
+		   best_can->feasible[k] = TRUE;
+		}
+	     }
+	  }
+	  free_candidate(candidates + i);
+	  break;
        case SECOND_CANDIDATE_BETTER:
        case SECOND_CANDIDATE_BETTER_AND_BRANCH_ON_IT:
 #ifndef MAX_CHILDREN_NUM
@@ -570,22 +553,41 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 }
 #endif
 	 if (best_can){
-	   for (k = can->child_num - 1; k >= 0; k--){
-	     /* Again, this is only for tracking that there was a feasible
-		solution discovered in presolve for display purposes */
-	     if (best_can->feasible[k]){
-	       if(can->feasible[k] && can->objval[k] < 
-		  best_can->objval[k]){
-		 continue;
+	    if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+	       min_ind = -1;
+	       for (k = best_can->child_num - 1; k >= 0; k--){
+		  if (best_can->feasible[k]){
+		     if (min_ind < 0){
+			min_obj = SYM_INFINITY;
+			for (l = can->child_num - 1; l >= 0; l--){
+			   if (can->feasible[l] && can->objval[k] < 
+			       min_obj){
+			      min_obj = can->objval[l]; 
+			      min_ind = l;		      
+			   }
+			}
+		     }		   
+		     if (min_ind > -1){
+			if(best_can->objval[k] > can->objval[min_ind]){
+			   can->feasible[k] = TRUE;
+			   can->solutions[k] = best_can->solutions[k];
+			   best_can->solutions[k] = 0;
+			   min_ind = -1;
+			}
+		     }
+		  }
 	       }
-	       can->feasible[k] = TRUE;
-	       if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		 can->solutions[k] = best_can->solutions[k];
-		 best_can->solutions[k] = NULL;
+	    }	
+	    else{
+	       for (k = can->child_num - 1; k >= 0; k--){
+		  /* Again, this is only for tracking that there was a feasible
+		     solution discovered in presolve for display purposes */
+		  if (best_can->feasible[k]){
+		     can->feasible[k] = TRUE;
+		  }
 	       }
-	     }
-	   }
-	   free_candidate(&best_can);
+	    }
+	    free_candidate(&best_can);
 	 }
 	 best_can = can;
 	 candidates[i] = NULL;
@@ -633,7 +635,28 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       free_candidate(candidates + i);
    }
    FREE(candidates);
-
+   if(p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+      indices = lp_data->tmp.i1;
+      values = lp_data->tmp.d;
+      for (k = best_can->child_num - 1; k >= 0; k--){
+	 if (best_can->feasible[k]){
+	    best_can->sol_sizes[k] = collect_nonzeros(p, 
+						      best_can->solutions[k],
+						     indices, values);
+	    FREE(best_can->solutions[k]);
+	    best_can->sol_inds[k] = (int *) malloc(best_can->sol_sizes[k]* 
+						   ISIZE);
+	    best_can->solutions[k] = (double *) malloc(best_can->sol_sizes[k]* 
+						       DSIZE);
+	    memcpy(best_can->sol_inds[k], indices, best_can->sol_sizes[k] * 
+		   ISIZE);
+	    memcpy(best_can->solutions[k], values, best_can->sol_sizes[k]* 
+		   DSIZE);
+	    break;
+	 }
+      }
+   }
+   
    *candidate = best_can;
    
    return(DO_BRANCH);

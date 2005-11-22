@@ -19,6 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#ifndef WIN32
+#include <signal.h>
+#endif
 #if !defined(HAS_SRANDOM)
 extern int srandom PROTO((unsigned seed));
 #endif
@@ -43,6 +46,9 @@ extern long random PROTO((void));
 #else
 #include "cp.h"
 #endif
+
+
+int c_count = 0;
 
 /*===========================================================================*/
 
@@ -74,7 +80,9 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    int s_bufid;
 #endif
    int termcode = 0;
-   
+#ifndef WIN32
+   signal(SIGINT, sym_catch_c);    
+#endif   
    par = &tm->par;
 
 #ifdef _OPENMP
@@ -344,7 +352,7 @@ int solve(tm_prob *tm)
 		tm->stat.analyzed < tm->par.node_limit : TRUE) &&
 		((tm->has_ub && (tm->par.gap_limit >= 0.0)) ?
 		 fabs(100*(tm->ub-tm->lb)/tm->ub) > tm->par.gap_limit : TRUE)
-		&& !(tm->par.find_first_feasible && tm->has_ub)){
+		&& !(tm->par.find_first_feasible && tm->has_ub) && c_count <= 0){
 #pragma omp critical (tree_update)
 	    i = tm->samephase_candnum > 0 ? start_node(tm, thread_num) :
 	                                    NEW_NODE__NONE;
@@ -382,7 +390,7 @@ int solve(tm_prob *tm)
 	    }
 
 	    switch(process_chain(tm->lpp[thread_num])){
-
+	       
 	    case FUNCTION_TERMINATED_NORMALLY:
 	       break;
 	       
@@ -422,6 +430,12 @@ int solve(tm_prob *tm)
 	    }
 }
 	 }
+
+	 if(c_count > 0){
+	    termcode = TM_SIGNAL_CAUGHT;
+	    break;
+	 }
+	 
 	 if (tm->par.time_limit >= 0.0 &&
 	     wall_clock(NULL) - start_time > tm->par.time_limit){
 	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
@@ -1198,32 +1212,20 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       desc->desc = node->desc.desc;
       desc->nf_status = node->desc.nf_status;
 
+
 #ifdef SENSITIVITY_ANALYSIS
-      if (tm->par.sensitivity_analysis){ 
-	 child->sol = bobj->solutions[i];
+      if (tm->par.sensitivity_analysis && 
+	  action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
 	 child->duals = bobj->duals[i];
-	 bobj->solutions[i] = 0;
 	 bobj->duals[i] = 0;
       }
 #endif
-      
-#if 0
 
-	 child->sol = 
-	    (double *) malloc (DSIZE * tm->rootnode->desc.uind.size);
-	 memcpy(child->sol, node->bobj.solutions[i], 
-		DSIZE*tm->rootnode->desc.uind.size);
-	 
-	 child->duals = 
-	    (double *) malloc (DSIZE * tm->bcutnum);
-	 memcpy(child->duals,node->bobj.duals[i] , DSIZE*tm->bcutnum);
-      }	 
-#endif
-      
       if (child->node_status != NODE_STATUS__PRUNED && feasible[i]){
-	 if (!tm->par.sensitivity_analysis && 
-	     tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	    child->sol_size = tm->rootnode->desc.uind.size;
+	 if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+	    child->sol_size = bobj->sol_sizes[i];
+	    child->sol_ind = bobj->sol_inds[i];
+	    bobj->sol_inds[i]=0;
 	    child->sol = bobj->solutions[i];
 	    bobj->solutions[i] = 0;
 	    child->feasibility_status = NOT_PRUNED_HAS_CAN_SOLUTION;
@@ -1231,34 +1233,25 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       }
       
       if (child->node_status == NODE_STATUS__PRUNED){
+
+	 if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
 	 
-	 child->feasibility_status = OVER_UB_PRUNED;	   
-	 
-	 if (feasible[i]){
-	    if (!tm->par.sensitivity_analysis && 
-		tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	       child->sol_size = tm->rootnode->desc.uind.size;
+	    child->feasibility_status = OVER_UB_PRUNED;	   
+	    
+	    if (feasible[i]){
+	       child->sol_size = bobj->sol_sizes[i];
+	       child->sol_ind = bobj->sol_inds[i];
+	       bobj->sol_inds[i] = 0;
 	       child->sol = bobj->solutions[i];
 	       bobj->solutions[i] = 0;
+	       child->feasibility_status = FEASIBLE_PRUNED;	   	    
 	    }
-	    child->feasibility_status = FEASIBLE_PRUNED;	   	    
-	 }
-	 if (action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
-	    child->feasibility_status = INFEASIBLE_PRUNED;
+
+	    if (action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
+	       child->feasibility_status = INFEASIBLE_PRUNED;
+	    }
 	 }
 
-#if 0
-	 if (!feasible[i] && bobj->feasible[i]){
-	    if (!tm->par.sensitivity_analysis && 
-		tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	       child->sol_size = tm->rootnode->desc.uind.size;
-	       child->sol = bobj->solutions[i];
-	       bobj->solutions[i] = 0;
-	       child->feasibility_status = PRUNED_HAS_CAN_SOLUTION;
-	    }
-	 }
-#endif
-	 
 #ifdef TRACE_PATH
 	 if (child->optimal_path){
 	    printf("\n\nAttempting to prune the optimal path!!!!!!!!!\n\n");
@@ -1293,6 +1286,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }
 	 continue;
       }
+
       if (tm->phase == 0 &&
 	  !(tm->par.colgen_strat[0] & FATHOM__GENERATE_COLS__RESOLVE) &&
 	  (feasible[i] == LP_D_UNBOUNDED ||
@@ -2305,7 +2299,7 @@ int trim_subtree(tm_prob *tm, bc_node *n)
 {
    int i, deleted = 0, not_pruned = 0;
 
-   /* There isn't anything to do if this is a leaf. */
+   /* Theer isn't anything to do if this is a leaf. */
    if (n->bobj.child_num == 0)
       return(0);
 
@@ -3055,6 +3049,7 @@ void free_tree_node(bc_node *n)
 
    int i;
    FREE(n->sol);
+   FREE(n->sol_ind);
 #ifdef SENSITIVITY_ANALYSIS
    FREE(n->duals);
 #endif
@@ -3199,3 +3194,35 @@ int tm_close(tm_prob *tm, int termcode)
    return(termcode);
 }   
    
+/*===========================================================================*/
+/*===========================================================================*/
+void sym_catch_c(int num)
+{
+#ifndef WIN32
+
+   sigset_t mask_set;
+   sigset_t old_set;
+
+   signal(SIGINT, sym_catch_c);
+
+   char temp = 0;
+   
+   sigfillset(&mask_set);
+   sigprocmask(SIG_SETMASK, &mask_set, &old_set);
+   
+   printf("\nDo you want to abort? [y/Y]: ");
+   fflush(stdout);   
+   gets(&temp);
+
+   if (temp == 'y' || temp == 'Y'){
+      c_count++;
+   } else{
+      printf("\nContinuing...\n");
+      fflush(stdout);
+      c_count = 0;      
+   }
+#endif
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
