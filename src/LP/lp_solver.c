@@ -76,11 +76,13 @@ void free_mip_desc(MIPdesc *mip)
    FREE(mip->matbeg);
    FREE(mip->matind);
    FREE(mip->matval);
+#if 0
    FREE(mip->col_lengths);
    FREE(mip->row_matbeg);
    FREE(mip->row_matind);
    FREE(mip->row_matval);
    FREE(mip->row_lengths);
+#endif
    FREE(mip->obj);
    FREE(mip->obj1);
    FREE(mip->obj2);
@@ -992,7 +994,8 @@ void get_column(LPdata *lp_data, int j,
 
 /*===========================================================================*/
 void get_row(LPdata *lp_data, int i,
-	     double *rowval, int *rowind, int *rowlen)
+	     double *rowval, int *rowind, int *rowlen,
+	     double *rowub, double *rowlb)
 {
    EKKVector vec;
    vec = ekk_getRow(lp_data->lp, i);
@@ -1790,7 +1793,8 @@ void get_column(LPdata *lp_data, int j,
 /*===========================================================================*/
 
 void get_row(LPdata *lp_data, int i,
-	     double *rowval, int *rowind, int *rowlen)
+	     double *rowval, int *rowind, int *rowlen,
+	     double *rowub, double *rowlb)
 {
    int rmatbeg, surplus;
    /* If there was no scaling, then we could probably copy the data out
@@ -2189,8 +2193,6 @@ void close_lp_solver(LPdata *lp_data)
 
 void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 {
-   /* cannot set the necessary parameters, check OsiCpxSolverInterface-MEN
-      what about the alloc params?MEN */
 
    /* Turn off scaling for CLP */
    //lp_data->si->setHintParam(OsiDoScale,false,OsiHintDo);
@@ -2221,7 +2223,6 @@ void unload_lp_prob(LPdata *lp_data)
 
 void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 {
-   //COULD BE WARMSTARTBASIS CONSTRUCTOR OR ASSIGN BASIS? MEN
    
    CoinWarmStartBasis *warmstart = new CoinWarmStartBasis;
 
@@ -2345,12 +2346,6 @@ void change_col(LPdata *lp_data, int col_ind,
 
 int dual_simplex(LPdata *lp_data, int *iterd)
 {
-   /* THERE ARE PROBLEMS HERE -- NEED TO ADD ITER NUMBER AS AN ARGUMENT??? MEN!
-      if(lp_data->si->isAbandoned()) no advanced setting for Osi MEN
-      no setting to reach presolve status! so can not determine to close
-      presolve! MEN!
-      retval = lp_data->si->setHintParam(OsiDoPresolveInResolve, false);
-      TURN OFF PRESOLVE MEN! */
    
    //int term = LP_ABANDONED;
    int term;
@@ -2414,7 +2409,7 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
    
    int numcols = ws->getNumStructural();   /* has to be <= lp_data->n */
    int numrows = ws->getNumArtificial();   /* has to be <= lp_data->m */
-   int i;                                  /* hence an assert? MEN */  
+   int i;                                  /* hence an assert? */  
    
    if (rstat){
       for (i = 0; i < numrows; i++){
@@ -2428,11 +2423,11 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
 	  case CoinWarmStartBasis::atUpperBound:
 	    rstat[i] = SLACK_AT_UB;
 	    break;
-	  case CoinWarmStartBasis::isFree:     //can it happen? MEN
+	  case CoinWarmStartBasis::isFree:     //can it happen?
 	    rstat[i] = SLACK_FREE;
 	    break;
 	  default:
-	    break;                            //can it happen? MEN
+	    break;                            //can it happen?
 	 }
       }
    }
@@ -2453,7 +2448,7 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
 	    cstat[i] = VAR_FREE;
 	    break;
 	  default:
-	    break;                            //can it happen? MEN
+	    break;                            //can it happen?
 	 }
       }
    }
@@ -2502,18 +2497,13 @@ void get_column(LPdata *lp_data, int j,
    
    const double *matval = matrixByCol->getElements();
    const int *matind = matrixByCol->getIndices(); 
-   
+   const int *matbeg = matrixByCol->getVectorStarts();
+
    *collen = matrixByCol->getVectorSize(j);
    
-   int matbeg = 0;
-   
-   for (i = 0; i < j; i++)
-      matbeg += matrixByCol->getVectorSize(i);
-   
-   
    for (i = 0; i < (*collen); i++){
-      colval[i] = matval[matbeg + i];
-      colind[i] = matind[matbeg + i];
+      colval[i] = matval[matbeg[j] + i];
+      colind[i] = matind[matbeg[j] + i];
    }
    
    const double * objval = lp_data->si->getObjCoefficients();
@@ -2524,25 +2514,24 @@ void get_column(LPdata *lp_data, int j,
 /*===========================================================================*/
 
 void get_row(LPdata *lp_data, int i,
-	     double *rowval, int *rowind, int *rowlen)
+	     double *rowval, int *rowind, int *rowlen, 
+	     double *rowub, double *rowlb)
 {
    const CoinPackedMatrix * matrixByRow = lp_data->si->getMatrixByRow();
   
-   int nr = matrixByRow->getNumRows();
+   int nr = matrixByRow->getNumRows(), j = 0;
    
-   const double * matval = matrixByRow->getElements();  
-   const int * matind = matrixByRow->getIndices(); 
-   
+   const double *matval = matrixByRow->getElements();  
+   const int *matind = matrixByRow->getIndices(); 
+   const int *matbeg = matrixByRow->getVectorStarts();
+
    *rowlen = matrixByRow->getVectorSize(i);
-   
-   int matbeg = 0, j = 0;
-   
-   for (j = 0; j < i; j++)
-      matbeg += matrixByRow->getVectorSize(j);
-   
+   *rowub = lp_data->si->getRowUpper()[i];
+   *rowlb = lp_data->si->getRowLower()[i];      
+
    for (j = 0; j < (*rowlen); j++){
-      rowval[j] = matval[matbeg + j];
-      rowind[j] = matind[matbeg + j];
+      rowval[j] = matval[matbeg[i] + j];
+      rowind[j] = matind[matbeg[i] + j];
    }
 }
 
@@ -2624,7 +2613,7 @@ void get_slacks(LPdata *lp_data)
 
 void change_range(LPdata *lp_data, int rowind, double value)
 {
-   /* IS THIS VALID FOR RANGES? MEN */
+
    double rhs = lp_data->si->getRightHandSide()[rowind]; 
 
    lp_data->si->setRowType(rowind,'R', rhs, value);
@@ -2750,8 +2739,6 @@ void get_objcoef(LPdata *lp_data, int j, double *objcoef)
 
 void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 {
-   /* What to do with all of these stuff? MEN!
-      what is deletable? # of rows to be deleted? */
    
    int i, m = lp_data->m;
    int *which = lp_data->tmp.i1 + lp_data->m;
@@ -2766,6 +2753,7 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
    }
    
    lp_data->si->deleteRows(delnum, which);
+   lp_data->nz = lp_data->si->getNumElements();
    lp_data->m -= delnum;
 }
 
@@ -3039,7 +3027,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    par->lift_and_project_generated_in_root = TRUE;
 #endif
       
-   
+
    /* Set proper variables to be integer */
    for (i = 0; i < lp_data->n; i++) {
       if (lp_data->vars[i]->is_int) { // integer or binary
