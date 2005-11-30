@@ -463,8 +463,9 @@ int sym_get_user_data(sym_environment *env, void **user)
 
 int sym_read_mps(sym_environment *env, char *infile)
 {  
-
+   
   strncpy(env->par.infile, infile,MAX_FILE_NAME_LENGTH);
+  strcpy(env->par.datafile, "");
   return(sym_load_problem(env));
 }
 
