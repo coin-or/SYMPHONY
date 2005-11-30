@@ -175,7 +175,7 @@ int main(int argc, char **argv)
      char *infile = NULL;     
      char args[3][MAX_LINE_LENGTH + 1];
      char param[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH+1];
-     char ext[4];     
+     char ext[5];     
      int last_dot = 0, j, terminate = FALSE, termcode = 0, int_value = 0;
      int last_level = 0;
      char * is_int = NULL;
@@ -190,12 +190,12 @@ int main(int argc, char **argv)
 #ifdef HAS_READLINE
      sym_initialize_readline();
 #endif
-
+     
      while(true){
        main_level = last_level = 0;
-       sym_read_line("SYMPHONY: ", &line);              
        for(j = 0; j< 3; j++)
-	 strcpy(args[j], "");
+	  strcpy(args[j], "");
+       sym_read_line("SYMPHONY: ", &line);
        sscanf(line, "%s%s%s", args[0], args[1], args[2]); 
        
        if (strcmp(args[0], "help") == 0 || strcmp(args[0], "?") == 0) {
@@ -240,9 +240,12 @@ int main(int argc, char **argv)
 	     last_dot = j;
 	   }
 	 } 
-	 
-	 strcpy(ext, args[1] + last_dot + 1);
-	 
+	 if(last_dot){
+	    strcpy(ext, args[1] + last_dot + 1);
+	 }else{
+	    strcpy(ext, ""); 
+	 }
+
 	 if(!(strcmp(ext, "mod") == 0 || strcmp(ext, "mps") == 0)){
 	   while(true){
 	     sym_read_line("Type of the file ('mps'/'ampl'/'gmpl'): ", &line);
