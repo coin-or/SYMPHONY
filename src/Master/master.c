@@ -2885,7 +2885,7 @@ int sym_set_col_lower(sym_environment *env, int index, double value)
 
    env->mip->lb[index] = value;
 
-   return(FUNCTION_TERMINATED_ABNORMALLY);
+   return(FUNCTION_TERMINATED_NORMALLY);
 }
 
 /*===========================================================================*/
