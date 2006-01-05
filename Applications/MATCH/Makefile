@@ -39,6 +39,16 @@ USERROOT = .
 MASTERNAME = match
 
 ##############################################################################
+# These are only needed if parallel computation is used. Please see the
+# explanation of these variables in SYMPHONY's configuration file.
+##############################################################################
+
+COMPILE_IN_TM = TRUE
+COMPILE_IN_LP = TRUE
+COMPILE_IN_CG = TRUE
+COMPILE_IN_CP = TRUE
+
+##############################################################################
 # This section is for listing MATCH source file names
 ##############################################################################
 
