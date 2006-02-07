@@ -3010,52 +3010,47 @@ double get_ub_for_new_obj(bc_node *root, MIPdesc *mip, int cnt,
    bc_node * child;
    double valuesi = 0.0, lpetol =  9.9999999999999995e-07;
    double objval = inf;
-
+   double objval_pr = inf;
+   double * sol = NULL;
    if(root){   
 
       for(n = 0; n < root->bobj.child_num; n++){
-
-	 child = root->children[n];
 	 
-	 if(child->node_status == NODE_STATUS__PRUNED){
-	    if(child->feasibility_status == OVER_UB_PRUNED){
+	 child = root->children[n];
+
+	 if(child->node_status == NODE_STATUS__PRUNED ||
+	    child->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
+
+	    if (child->feasibility_status == FEASIBLE_PRUNED || 
+		child->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
+		child->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
+
+	       /* too much memory to keep the OVER_UB_PRUNED solutions -
+		  if sensitivity-analysis is set,
+		  try the feasibility test and if succeeded then keep them*/
 	       
-	       /* TEST_INTEGRALITY */
-	       for (i = mip->n - 1; i >= 0; i--){
-		  if (!mip->is_int[i])
-		     continue; /* Not an integer variable */
-		  valuesi = child->sol[i];
-		  if (valuesi > mip->lb[i] && valuesi < mip->ub[i] && 
-		      valuesi-floor(valuesi) > lpetol &&
-		      ceil(valuesi)-valuesi > lpetol){
-		     break;
-		  }
-	       }
-	       //feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
-	       if(i < 0) {
-		  objval = 0.0;
-		  for(j = 0; j< child->sol_size; j++){
-		     objval += mip->obj[child->sol_ind[j]] * child->sol[j];
-		  }
-		  
-		  for(j=0; j<cnt; j++){
-		     objval += child->sol[ind[j]] *
-			(val[j] - mip->obj[ind[j]]);
-		  }		  
-	       }
-	    } else if (child->feasibility_status == FEASIBLE_PRUNED){
+	       if (sol) 
+		  FREE(sol);   
+	       sol = (double*)calloc(mip->n, DSIZE);
+	       
 	       objval = 0.0;
 	       for(j = 0; j< child->sol_size; j++){
 		  objval += mip->obj[child->sol_ind[j]] * child->sol[j];
+		  sol[child->sol_ind[j]] = child->sol[j];
 	       }
 	       
 	       for(j=0; j<cnt; j++){
-		  objval += child->sol[ind[j]] *
-		     (val[j] - mip->obj[child->sol_ind[ind[j]]]);
+		  objval += sol[ind[j]] *
+		     (val[j] - mip->obj[ind[j]]);
 	       }		  
-	    }	        
-
-	 } else {	    
+	       	       
+	       if(child->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
+		  objval_pr = get_ub_for_new_obj(child, mip, cnt, ind, val);
+		  objval = objval < objval_pr ? objval : objval_pr;
+	       }
+	    }
+	 
+	 }else{ 
 	    objval = get_ub_for_new_obj(child, mip, cnt, ind, val);	    
 	 }
 	 
@@ -3064,6 +3059,9 @@ double get_ub_for_new_obj(bc_node *root, MIPdesc *mip, int cnt,
 	 }
       }
    }
+
+   if (sol) 
+      FREE(sol);   
 
    return (min);
 #else
@@ -3088,8 +3086,10 @@ double get_ub_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt,
    bc_node * child;
    double valuesi = 0.0, lpetol =  9.9999999999999995e-07;
    double objval = inf, row_val = 0.0;
-   int feasible = TRUE;
+   double objval_pr;
+   int feasible;
    int nonzeros;
+   double * sol = NULL;
 
    int *matbeg = mip->matbeg, *matind = mip->matind;
    double *matval = mip->matval;
@@ -3099,35 +3099,52 @@ double get_ub_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt,
       for(n = 0; n < root->bobj.child_num; n++){
 
 	 child = root->children[n];
-	 
-	 if(child->node_status == NODE_STATUS__PRUNED){
-	    if(child->feasibility_status == OVER_UB_PRUNED || 
-	       child->feasibility_status == FEASIBLE_PRUNED){
+
+	 if(child->node_status == NODE_STATUS__PRUNED ||
+	    child->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
+
+	    if (child->feasibility_status == FEASIBLE_PRUNED || 
+		child->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
+		child->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
+
+	       if (sol) 
+		  FREE(sol);   
+	       sol = (double*)calloc(mip->n, DSIZE);
+	       objval = 0.0;
+
+	       for(j = 0; j< child->sol_size; j++){
+		  objval += mip->obj[child->sol_ind[j]] * child->sol[j];
+		  sol[child->sol_ind[j]] = child->sol[j];
+	       }
+
 	       /* see whether it is feasible for the new rhs! */
+	       feasible = TRUE;
 
 	       for(i=0; i<cnt; i++){
 		  row_val = 0.0;
 		  for(j=matbeg[ind[i]]; j<matbeg[ind[i]+1]; j++){
-		     row_val += matval[j] * child->sol[matind[j]];
+		     row_val += matval[j] * sol[matind[j]];
 		  }
 		  switch(mip->sense[ind[i]]){
 		   case 'L': 
-		      if(row_val > val[i]){
+		      if(row_val > val[i] + lpetol){
 			 feasible = FALSE;
 		      }
 		      break;
 		   case 'G':
-		      if(row_val < val[i]){
+		      if(row_val < val[i] - lpetol){
 			 feasible = FALSE;
 		      }
 		      break;
 		   case 'E':
-		      if(row_val != val[i]){
+		      if(!((row_val > val[i] - lpetol) &&
+			   (row_val < val[i] + lpetol))){
 			 feasible = FALSE;
 		      }
 		      break;
 		   case 'R':
-		      if(row_val > val[i] || row_val < val[i] - mip->rngval[i]){
+		      if(row_val > val[i] + lpetol 
+			 || row_val < val[i] - mip->rngval[i] - lpetol){
 			 feasible = FALSE;
 		      }
 		      break;
@@ -3138,38 +3155,16 @@ double get_ub_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt,
 		     break;
 		  }
 	       }
+	       
+	       if(!feasible){
+		  objval = inf;
+	       }  
 
-	       if(feasible){
-		  if(child->feasibility_status == FEASIBLE_PRUNED){
-		     objval = 0.0;
-		     for(j = 0; j< child->sol_size; j++){
-			objval += mip->obj[child->sol_ind[j]] * child->sol[j];
-		     }
-		  }
-		  if(child->feasibility_status == OVER_UB_PRUNED){
-		     /* TEST_INTEGRALITY */
-		     for (i = mip->n - 1; i >= 0; i--){
-			if (!mip->is_int[i])
-			   continue; /* Not an integer variable */
-			valuesi = child->sol[i];
-			if (valuesi > mip->lb[i] && valuesi < mip->ub[i] && 
-			    valuesi-floor(valuesi) > lpetol &&
-			    ceil(valuesi)-valuesi > lpetol){
-			   break;
-			}
-		     }
-		     if (i < 0){
-			objval = 0.0;	 
-			for(j = 0; j< child->sol_size; j++){
-			   objval += mip->obj[child->sol_ind[j]] * 
-			      child->sol[j];
-			}		     
-		     } else {
-			objval = inf;
-		     }
-		  }
+	       if(child->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
+		  objval_pr = get_ub_for_new_rhs(child, mip, cnt, ind, val);
+		  objval = objval < objval_pr ? objval : objval_pr;
 	       }
-	    }  
+	    }
 	 } else {	    
 	    objval = get_ub_for_new_rhs(child, mip, cnt, ind, val);
 	 }
