@@ -416,7 +416,7 @@ int fathom_branch(lp_prob *p)
       switch (cuts = branch(p, cuts)){
 
        case NEW_NODE:
-#ifndef ROOT_NODEONLY
+#ifndef ROOT_NODE_ONLY
 	 if (p->par.verbosity > 0){
 	    printf("*************************************************\n");
 	    printf("* Now processing NODE %i LEVEL %i\n",

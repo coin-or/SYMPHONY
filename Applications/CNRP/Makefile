@@ -56,7 +56,7 @@ COMPILE_IN_CP = TRUE
 #or single-criteria problem
 ##############################################################################
 
-MULTI_CRITERIA = FALSE
+MULTI_CRITERIA = TRUE
 
 ##############################################################################
 #Whether to use the model with two oppositely oriented copies of each 

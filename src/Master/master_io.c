@@ -415,7 +415,17 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	 tm_par->price_in_root = TRUE;
 	 break;
        case 't':
-	 tm_par->trim_search_tree = TRUE;
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%lf", &tmpd)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	       tm_par->time_limit = tmpd;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'b':
 	 env->par.do_branch_and_cut = FALSE;

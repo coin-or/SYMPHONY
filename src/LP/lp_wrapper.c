@@ -846,6 +846,8 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
    int i, *xind = lp_data->tmp.i1; /* n */
    double tmpd, *xval = lp_data->tmp.d; /* n */
 
+   if (p->par.verbosity < 0) return;
+   
    number = collect_nonzeros(p, x, xind, xval);
 
    /* Invoke user written function. */
@@ -869,88 +871,87 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
     default:
       break;
    }
-   if(p->par.verbosity >= 0){
-     switch(user_res){
-       case DISP_NOTHING:
-	 break;
-       case DISP_NZ_INT:
-	 if (p->mip->colname){ 
-	   printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	   printf(" Column names and values of nonzeros in the solution\n");
-	   printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	   for (i = 0; i < number; i++){
-	     if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	     printf("%8s %10.7f\n", p->mip->colname[xind[i]], xval[i]);
-	   }
-	   printf("\n");
-	 }else{
-	   printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	   printf(" User indices and values of nonzeros in the solution\n");
-	   printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	   for (i = 0; i < number; i++){
-	     if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	     printf("%7d %10.7f\n", xind[i], xval[i]);
-	   }
-	   printf("\n");
-	 }
-	 break;
-       case DISP_NZ_HEXA:
-	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf(" User indices (hexa) and values of nonzeros in the solution\n");
-	 printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < number; ){
-	   if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	   printf("%7x %10.7f ", xind[i], xval[i]);
-	   if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
+
+   switch(user_res){
+    case DISP_NOTHING:
+      break;
+    case DISP_NZ_INT:
+      if (p->mip->colname){ 
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf(" Column names and values of nonzeros in the solution\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 for (i = 0; i < number; i++){
+	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+	    printf("%8s %10.7f\n", p->mip->colname[xind[i]], xval[i]);
 	 }
 	 printf("\n");
-	 break;
-       case DISP_FRAC_INT:
-	 if (p->mip->colname){ 
-	   printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	   printf(" Column names and values of fractional vars in solution\n");
-	   printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	   for (i = 0; i < number; i++){
-	     if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	     tmpd = xval[i];
-	     if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
+      }else{
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf(" User indices and values of nonzeros in the solution\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 for (i = 0; i < number; i++){
+	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+	    printf("%7d %10.7f\n", xind[i], xval[i]);
+	 }
+	 printf("\n");
+      }
+      break;
+    case DISP_NZ_HEXA:
+      printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+      printf(" User indices (hexa) and values of nonzeros in the solution\n");
+      printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+      for (i = 0; i < number; ){
+	 if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+	 printf("%7x %10.7f ", xind[i], xval[i]);
+	 if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
+      }
+      printf("\n");
+      break;
+    case DISP_FRAC_INT:
+      if (p->mip->colname){ 
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf(" Column names and values of fractional vars in solution\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 for (i = 0; i < number; i++){
+	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+	    tmpd = xval[i];
+	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
 	       printf("%8s %10.7f\n", p->mip->colname[xind[i]], tmpd);
-	     }
-	   }
-	   printf("\n");
-	 }else{
-	   printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	   printf(" User indices and values of fractional vars in solution\n");
-	   printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	   for (i = 0; i < number; ){
-	     if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	     tmpd = xval[i];
-	     if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
+	    }
+	 }
+	 printf("\n");
+      }else{
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 printf(" User indices and values of fractional vars in solution\n");
+	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 for (i = 0; i < number; ){
+	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+	    tmpd = xval[i];
+	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
 	       printf("%7d %10.7f ", xind[i], tmpd);
 	       if (!(++i & 3)) printf("\n"); /* new line after every four*/
-	     }
-	   }
+	    }
 	 }
-	 printf("\n");
-	 break;
-      case DISP_FRAC_HEXA:
-	printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	printf(" User indices (hexa) and values of frac vars in the solution\n");
-	printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	for (i = 0; i < number; ){
-	  if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	  tmpd = xval[i];
-	  if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
+      }
+      printf("\n");
+      break;
+    case DISP_FRAC_HEXA:
+      printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+      printf(" User indices (hexa) and values of frac vars in the solution\n");
+      printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+      for (i = 0; i < number; ){
+	 if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+	 tmpd = xval[i];
+	 if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
 	    printf("%7x %10.7f ", xind[i], tmpd);
 	    if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
-	  }
-	}
-	printf("\n");
-	break;
-     default:
-       /* Unexpected return value. Do something!! */
-       break;
-     }
+	 }
+      }
+      printf("\n");
+      break;
+    default:
+      /* Unexpected return value. Do something!! */
+      break;
    }
 }
 

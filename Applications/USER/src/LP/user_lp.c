@@ -79,8 +79,7 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 /*===========================================================================*\
  * Here, the user can specify a special routine for sending back the feasible
  * solution. This need not be used unless there is a special format the user
- * wants the solution in. For sequential computation, you can use this routine
- * to interpret and store the feasible solution whenever one is found.
+ * wants the solution in. This function is only called in sequential mode.
 \*===========================================================================*/
 
 int user_send_feasible_solution(void *user, double lpetol, int varnum,
