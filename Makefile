@@ -29,7 +29,7 @@ ifeq ($(USE_SYM_APPL), TRUE)
 CONFIG_FILE_DIR = $(SYMPHONYROOT)
 endif
 
-CONFIG_FILE = conf
+CONFIG_FILE = config
 UNAME = $(shell uname -a)
 
 ifeq ($(findstring Linux,${UNAME}),Linux)
