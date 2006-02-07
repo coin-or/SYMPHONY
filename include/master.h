@@ -133,8 +133,10 @@ double get_lb_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt,
 				 int *ind, double *val));
 double get_ub_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt, 
 				 int *ind, double *val));
+#if 0
 double get_lb_for_new_obj PROTO((bc_node *root, MIPdesc *mip, int cnt, 
 				 int *ind, double *val));
+#endif
 double get_ub_for_new_obj PROTO((bc_node *root, MIPdesc *mip, int cnt, 
 				 int *ind, double *val));
 int check_feasibility_new_rhs PROTO((bc_node * node, MIPdesc * mip, 

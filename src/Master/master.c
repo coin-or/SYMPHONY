@@ -5541,7 +5541,7 @@ int sym_get_ub_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
 
 /*===========================================================================*/
 /*===========================================================================*/
-
+#if 0
 int sym_get_lb_for_new_obj(sym_environment *env, int cnt, 
 				 int *new_obj_ind, 
 				 double *new_obj_val, 
@@ -5583,7 +5583,7 @@ int sym_get_lb_for_new_obj(sym_environment *env, int cnt,
    return(FUNCTION_TERMINATED_ABNORMALLY);
 #endif
 }
-
+#endif
 /*===========================================================================*/
 /*===========================================================================*/
 
