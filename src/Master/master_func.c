@@ -1877,6 +1877,7 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "time_limit") == 0 ||
 	    strcmp(key, "TM_time_limit") == 0){
       READ_DBL_PAR(tm_par->time_limit);
+      lp_par->time_limit = tm_par->time_limit;
       return(0);
    }
    else if (strcmp(key, "node_limit") == 0 ||

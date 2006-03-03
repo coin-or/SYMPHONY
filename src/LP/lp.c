@@ -44,9 +44,9 @@ int main(void)
    char first_node_rec = FALSE;
    int termcode;
    
-   start_time = wall_clock(NULL);
-   
    p = (lp_prob *) calloc(1, sizeof(lp_prob));
+
+   p->start_time = wall_clock(NULL);
 
    if ((termcode = lp_initialize(p, 0)) < 0){
       printf("LP initialization failed with error code %i\n\n", termcode);
@@ -92,7 +92,7 @@ int main(void)
       }
    }
 
-   p->comp_times.wall_clock_lp = wall_clock(NULL) - start_time;
+   p->comp_times.wall_clock_lp = wall_clock(NULL) - p->start_time;
    
    lp_exit(p);
 

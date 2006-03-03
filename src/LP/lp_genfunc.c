@@ -451,9 +451,16 @@ int fathom_branch(lp_prob *p)
 #ifdef COMPILE_IN_LP
       if (p->tm->par.time_limit >= 0.0 &&
 	  wall_clock(NULL) - p->tm->start_time >= p->tm->par.time_limit){
-	 return(FUNCTION_TERMINATED_NORMALLY);
-      }
+#else
+      if (p->par.time_limit >= 0.0 &&
+	  wall_clock(NULL) - p->start_time >= p->par.time_limit){
 #endif
+	 if (fathom(p, TRUE)){
+	    return(FUNCTION_TERMINATED_NORMALLY);
+	 }else{
+	    return(FUNCTION_TERMINATED_ABNORMALLY);
+	 }
+      }
    }
 
    comp_times->lp += used_time(&p->tt);
@@ -477,12 +484,24 @@ int fathom(lp_prob *p, int primal_feasible)
    if (p->lp_data->nf_status == NF_CHECK_NOTHING){
       PRINT(p->par.verbosity, 1,
 	    ("fathoming node (no more cols to check)\n\n"));
-      send_node_desc(p, primal_feasible ? (termcode == LP_OPT_FEASIBLE ?
-					   FEASIBLE_PRUNED: OVER_UB_PRUNED) :
-		     INFEASIBLE_PRUNED);
+      if (primal_feasible){
+	 switch (termcode){
+	  case LP_OPT_FEASIBLE:
+	    send_node_desc(p, FEASIBLE_PRUNED);
+	    break;
+	  case LP_OPTIMAL:
+	    send_node_desc(p, INTERRUPTED_NODE);
+	    break;
+	  default:
+	    send_node_desc(p, OVER_UB_PRUNED);
+	    break;
+	 }
+      }else{
+	 send_node_desc(p, INFEASIBLE_PRUNED);
+      }
       return(TRUE);
    }
-
+	 
    if (p->colgen_strategy & COLGEN_REPRICING)
       colgen = FATHOM__GENERATE_COLS__RESOLVE;
 

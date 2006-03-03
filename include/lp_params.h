@@ -58,6 +58,7 @@ typedef struct LP_PARAMS{
    int               use_cg;
    int               set_obj_upper_lim;
    int               do_primal_heuristic;
+   double            time_limit;
 
    /* these two are passed directly to the lp solver */
    int               scaling;

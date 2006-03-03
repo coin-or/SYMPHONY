@@ -240,7 +240,7 @@ int sym_set_defaults(sym_environment *env)
    tm_par->colgen_strat[1] = (FATHOM__DO_NOT_GENERATE_COLS__DISCARD  |
 			      BEFORE_BRANCH__DO_NOT_GENERATE_COLS);
    tm_par->not_fixed_storage_size = 2048;
-   tm_par->time_limit = -1.0;
+   tm_par->time_limit = lp_par->time_limit = -1.0;
    tm_par->node_limit = -1;
    tm_par->gap_limit = -1.0;
    tm_par->find_first_feasible = FALSE;

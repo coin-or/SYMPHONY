@@ -607,6 +607,12 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	     old_lower_bound, n->lower_bound);
    }
 #endif
+
+   if (node_type == INTERRUPTED_NODE){
+      n->node_status == NODE_STATUS__INTERRUPTED;
+      insert_new_node(tm, n);
+      return;
+   }
    
    newdesc = (node_desc *) calloc(1, sizeof(node_desc));
    /* Unpack the new description */

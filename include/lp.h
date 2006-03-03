@@ -77,6 +77,8 @@ typedef struct LP_PROB{
 
    int           phase;
 
+   double        start_time;
+   
    base_desc     base;
 
    branch_desc  *bdesc;        /* there are p->bc_level branch_desc's */

@@ -538,9 +538,10 @@ void send_node_desc(lp_prob *p, char node_type)
 #ifdef COMPILE_IN_LP
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
        node_type == DISCARDED_NODE || node_type == FEASIBLE_PRUNED){
+
       n->node_status = NODE_STATUS__PRUNED;
 
-      if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){       
+      if (tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){       
 	 if (node_type == INFEASIBLE_PRUNED || node_type == DISCARDED_NODE){
 	    if (n->feasibility_status != NOT_PRUNED_HAS_CAN_SOLUTION){
 	       n->feasibility_status = INFEASIBLE_PRUNED;      
@@ -590,6 +591,14 @@ void send_node_desc(lp_prob *p, char node_type)
 	 if (!repricing)
 	    return;
       }
+   }
+
+   if (node_type == INTERRUPTED_NODE){
+      n->node_status = NODE_STATUS__INTERRUPTED;
+      n->lower_bound = lp_data->objval;
+      insert_new_node(tm, n);
+      if (!repricing)
+	 return;
    }
 
    if (!repricing || n->node_status != NODE_STATUS__PRUNED){
@@ -904,6 +913,12 @@ void send_node_desc(lp_prob *p, char node_type)
    send_char_array(&repricing, 1);
    send_char_array(&node_type, 1);
    send_dbl_array(&lp_data->objval, 1);
+   if (node_type == INTERRUPTED_NODE){
+      send_msg(p->tree_manager, LP__NODE_DESCRIPTION);
+      freebuf(s_bufid);
+      return;
+   }
+
    send_int_array(&new_lp_desc->nf_status, 1);
 
    deal_with_nf = (new_lp_desc->nf_status == NF_CHECK_AFTER_LAST ||

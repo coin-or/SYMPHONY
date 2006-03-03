@@ -421,7 +421,7 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
-	       tm_par->time_limit = tmpd;
+	       lp_par->time_limit = tm_par->time_limit = tmpd;
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);

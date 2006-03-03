@@ -391,25 +391,25 @@ int solve(tm_prob *tm)
 
 	    switch(process_chain(tm->lpp[thread_num])){
 	       
-	    case FUNCTION_TERMINATED_NORMALLY:
+	     case FUNCTION_TERMINATED_NORMALLY:
 	       break;
 	       
-	    case ERROR__NO_BRANCHING_CANDIDATE:
+	     case ERROR__NO_BRANCHING_CANDIDATE:
 	       termcode = TM_ERROR__NO_BRANCHING_CANDIDATE;
 	       break;
 	       
-	    case ERROR__ILLEGAL_RETURN_CODE:
+	     case ERROR__ILLEGAL_RETURN_CODE:
 	       termcode = TM_ERROR__ILLEGAL_RETURN_CODE;
 	       break;
-
-	    case ERROR__NUMERICAL_INSTABILITY:
+	       
+	     case ERROR__NUMERICAL_INSTABILITY:
 	       termcode = TM_ERROR__NUMERICAL_INSTABILITY;
 	       break;
-
-	    case ERROR__COMM_ERROR:
+	       
+	     case ERROR__COMM_ERROR:
 	       termcode = TM_ERROR__COMM_ERROR;
-
-	    case ERROR__USER:
+	       
+	     case ERROR__USER:
 	       termcode = TM_ERROR__USER;
 	       break;
 	       
@@ -431,28 +431,23 @@ int solve(tm_prob *tm)
 }
 	 }
 
-	 if(c_count > 0){
+	 if (c_count > 0){
 	    termcode = TM_SIGNAL_CAUGHT;
 	    break;
 	 }
 	 
 	 if (tm->par.time_limit >= 0.0 &&
 	     wall_clock(NULL) - start_time > tm->par.time_limit){
-	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-	       if (tm->samephase_cand[i]->lower_bound < tm->lb)
-		  tm->lb = tm->samephase_cand[i]->lower_bound;
-	    }
-	    if (tm->lb >= MAXDOUBLE / 2){
-	       tm->lb = tm->ub;
-	    }
 	    termcode = TM_TIME_LIMIT_EXCEEDED;
 	    break;
 	 }
+
 	 if (tm->par.node_limit >= 0 && tm->stat.analyzed >= 
 	     tm->par.node_limit){
 	    termcode = TM_NODE_LIMIT_EXCEEDED;
 	    break;
 	 }
+
 	 if (tm->par.find_first_feasible && tm->has_ub){
 	    break;
 	 }
@@ -461,6 +456,7 @@ int solve(tm_prob *tm)
 	    termcode = SOMETHING_DIED;
 	    break;
 	 }
+
 	 if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
 	    if (fabs(100*(tm->ub-tm->lb)/tm->ub) <= tm->par.gap_limit){
 	       if (tm->lb < tm->ub){
@@ -473,6 +469,7 @@ int solve(tm_prob *tm)
 	 }
 	 if (i == NEW_NODE__NONE && tm->active_node_num == 0)
 	    break;
+
 #ifndef COMPILE_IN_LP
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
 	 if (r_bufid && !process_messages(tm, r_bufid)){
@@ -523,7 +520,6 @@ int solve(tm_prob *tm)
    if (tm->lb >= MAXDOUBLE / 2){
       tm->lb = tm->ub;
    }
-   tm->stat.root_lb = tm->rootnode->lower_bound;
    tm->comp_times.ramp_up_tm = ramp_up_tm;
    tm->comp_times.ramp_down_time = ramp_down_time;
    write_log_files(tm);
@@ -3175,6 +3171,17 @@ int tm_close(tm_prob *tm, int termcode)
    }
 #endif
    
+   tm->stat.root_lb = tm->rootnode->lower_bound;
+   for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
+      if (tm->samephase_cand[i]->lower_bound < tm->lb)
+	 tm->lb = tm->samephase_cand[i]->lower_bound;
+   }
+   if (tm->lb >= MAXDOUBLE / 2){
+      tm->lb = tm->ub;
+   }
+
+   return(termcode);
+
 #ifndef COMPILE_IN_TM
    /*------------------------------------------------------------------------*\
     * Send back the statistics to the master

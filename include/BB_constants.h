@@ -103,7 +103,8 @@
 #define NODE_STATUS__HELD         2
 #define NODE_STATUS__ROOT         3
 #define NODE_STATUS__PRUNED       4
-#define NODE_STATUS__WARM_STARTED 5
+#define NODE_STATUS__INTERRUPTED  5
+#define NODE_STATUS__WARM_STARTED 6
 /*------------------------------ not_fixed stati ----------------------------*/
 #define NF_CHECK_ALL             0x00
 #define NF_CHECK_AFTER_LAST      0x01
@@ -124,11 +125,12 @@
 #define FEASIBLE_PRUNED                 5
 #define OVER_UB_PRUNED                  6
 #define DISCARDED_NODE                  7
-#define REPRICED_NODE                   8
-#define MC_FEASIBLE_PRUNED              9
+#define INTERRUPTED_NODE                8
+#define REPRICED_NODE                   9
+#define MC_FEASIBLE_PRUNED              10
 /*to be used when warm_started*/
-#define PRUNED_HAS_CAN_SOLUTION        10
-#define NOT_PRUNED_HAS_CAN_SOLUTION    11
+#define PRUNED_HAS_CAN_SOLUTION        11
+#define NOT_PRUNED_HAS_CAN_SOLUTION    12
 
 /*------------------- possible node types for VBC Tool ----------------------*/
 #define VBC_INTERIOR_NODE       1 /*Dark Red*/ 
