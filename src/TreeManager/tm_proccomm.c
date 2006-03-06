@@ -609,7 +609,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 #endif
 
    if (node_type == INTERRUPTED_NODE){
-      n->node_status == NODE_STATUS__INTERRUPTED;
+      n->node_status = NODE_STATUS__INTERRUPTED;
       insert_new_node(tm, n);
       return;
    }
