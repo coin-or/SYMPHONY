@@ -133,9 +133,11 @@ int sym_get_lb_for_new_rhs PROTO((sym_environment *env, int cnt,
 int sym_get_ub_for_new_rhs PROTO((sym_environment *env, int cnt, 
 				  int *new_rhs_ind, double *new_rhs_val,
 				  double *ub_for_new_rhs));
+#if 0
 int sym_get_lb_for_new_obj PROTO((sym_environment *env, int cnt, 
 				  int *new_obj_ind, double *new_obj_val,
 				  double *lb_for_new_obj));
+#endif
 int sym_get_ub_for_new_obj PROTO((sym_environment *env, int cnt, 
 				  int *new_obj_ind, double *new_obj_val,
 				  double *ub_for_new_obj));
