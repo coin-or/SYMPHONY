@@ -1150,19 +1150,21 @@ int sym_warm_solve(sym_environment *env)
 	 env->par.tm_par.warm_start = TRUE;
       }
 
-      env->has_ub = FALSE;
-      env->ub = 0.0;
+      if(env->mip->change_num){
+	 env->has_ub = FALSE;
+	 env->ub = 0.0;
+
+	 env->warm_start->has_ub = env->best_sol.has_sol = 
+	    env->warm_start->best_sol.has_sol = FALSE;
+	 env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+	 FREE(env->warm_start->best_sol.xind);
+	 FREE(env->warm_start->best_sol.xval);
+      }
 
       if(env->par.multi_criteria){
 	 env->has_ub = env->has_mc_ub;
 	 env->ub = env->mc_ub;
       }
-
-      env->warm_start->has_ub = env->best_sol.has_sol = 
-	 env->warm_start->best_sol.has_sol = FALSE;
-      env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
-      FREE(env->warm_start->best_sol.xind);
-      FREE(env->warm_start->best_sol.xval);
       
       for(i = 0; i < env->mip->change_num; i++){
 	 change_type = env->mip->change_type[i];
