@@ -946,7 +946,7 @@ int sym_solve(sym_environment *env)
       env->warm_start->ub = tm->ub;
    }
    env->par.tm_par.warm_start = FALSE;
-   
+
 #ifdef COMPILE_IN_LP
    thread_num = env->tm->opt_thread_num;
    if (env->tm->lpp[thread_num]){
@@ -1110,6 +1110,9 @@ int sym_solve(sym_environment *env)
    }
 #endif
 
+   env->has_ub = FALSE;
+   env->ub = 0.0;
+
    if (env->par.do_draw_graph){
       s_bufid = init_send(DataInPlace);
       send_msg(env->dg_tid, CTOI_YOU_CAN_DIE);
@@ -1159,6 +1162,9 @@ int sym_warm_solve(sym_environment *env)
 	 env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
 	 FREE(env->warm_start->best_sol.xind);
 	 FREE(env->warm_start->best_sol.xval);
+      }else {
+	 env->has_ub = env->warm_start->has_ub;
+	 env->ub = env->warm_start->ub;
       }
 
       if(env->par.multi_criteria){
@@ -3181,7 +3187,7 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    int i, j, nz = 0,*matBeg, *matInd;
    double value, *rowAct = NULL, *matVal; 
    char feasible;
-   double granularity = env->par.lp_par.granularity;
+   double lpetol =  9.9999999999999995e-07;
    lp_sol * sol;
 
    if (!env->mip || !env->mip->n){
@@ -3193,15 +3199,16 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
 
    /* step 1. check for bounds and integrality */   
    for (i = env->mip->n - 1; i >= 0; i--){
-      if (colsol[i] < env->mip->lb[i] || colsol[i] > env->mip->ub[i])
+      if (colsol[i] < env->mip->lb[i] - lpetol || 
+	  colsol[i] > env->mip->ub[i] + lpetol)
 	 break;
       if (!env->mip->is_int[i])
 	 continue; /* Not an integer variable */
       value = colsol[i];
       if (colsol[i] > env->mip->lb[i] && colsol[i] < env->mip->ub[i]
-	  && colsol[i]-floor(colsol[i]) > env->par.lp_par.granularity &&
-	  ceil(colsol[i])-colsol[i] > env->par.lp_par.granularity){
-	 break;   //FIXME, can we use granularity here?
+	  && colsol[i]-floor(colsol[i]) > lpetol &&
+	  ceil(colsol[i])-colsol[i] > lpetol){
+	 break;  
       }
    }
 
@@ -3224,20 +3231,21 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       for(i = 0; i < env->mip->m; i++){
 	 switch(env->mip->sense[i]){
 	  case 'L': 
-	     if (rowAct[i] > env->mip->rhs[i])
+	     if (rowAct[i] > env->mip->rhs[i] + lpetol)
 		feasible = FALSE;
 	     break;
 	  case 'G':
-	     if (rowAct[i] < env->mip->rhs[i])
+	     if (rowAct[i] < env->mip->rhs[i] - lpetol)
 		feasible = FALSE;
 	     break;
 	  case 'E':
-	     if (rowAct[i] != env->mip->rhs[i])
+	     if (!((rowAct[i] > env->mip->rhs[i] - lpetol) && 
+		   (rowAct[i] < env->mip->rhs[i] + lpetol)))
 		feasible = FALSE;
 	     break;
 	  case 'R':
-	     if (rowAct[i] > env->mip->rhs[i] || 
-		rowAct[i] < env->mip->rhs[i] - env->mip->rngval[i])
+	     if (rowAct[i] > env->mip->rhs[i] + lpetol || 
+		 rowAct[i] < env->mip->rhs[i] - env->mip->rngval[i] - lpetol)
 		feasible = FALSE;
 	     break;
 	  case 'N':
@@ -3251,7 +3259,7 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    }
 
    for (i = 0; i < env->mip->n; i++){
-      if (fabs(colsol[i]) >= 0.0 + granularity){
+      if (colsol[i] > lpetol || colsol[i] < - lpetol){
 	 nz++;
       }
    }
@@ -3428,8 +3436,9 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
 	 matBeg = NULL;
       }
       return(sym_explicit_load_problem(env, n, m, matBeg, indices, elements,
-				       &collb, &colub, NULL, &obj, NULL, NULL, 
-				       NULL, NULL, TRUE));
+				       &collb, &colub, &is_int, &obj, NULL, 
+				       NULL, NULL, NULL, TRUE));
+				       
    } else{
 
       n = env->mip->n;
@@ -3520,22 +3529,25 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
 
       /* take care of the name */
       
-      if(name){
+      if(env->mip->colname || name){
 	 colName = (char**) calloc(sizeof(char*),(n+1));
-	 
-	 if(env->mip->colname){
+	 if(env->mip->colname){	 
 	    for (i = 0; i < n; i++){
 	       if(env->mip->colname[i]){
 		  colName[i] = (char *) malloc(CSIZE * 21); 
 		  strncpy(colName[i], env->mip->colname[i],21);
 		  colName[i][20] = 0;
+		  FREE(env->mip->colname[i]);
 	       }
 	    }
 	 }
 
-	 colName[n] = (char *) malloc(CSIZE * 21); 
-	 strncpy(colName[n], name,21);
-	 colName[n][20] = 0;
+	 if(name){
+	    colName[n] = (char *) malloc(CSIZE * 21); 	
+	    strncpy(colName[n], name, 21);
+	    colName[n][20] = 0;
+	 }
+
 	 FREE(env->mip->colname);
 	 env->mip->colname = colName;      
       }
