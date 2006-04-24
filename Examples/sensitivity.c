@@ -30,7 +30,7 @@ int main(int argc, char **argv)
   int ind[2];
   double val[2];
   ind[0] = 4; val[0] = 7000;
-  ind[1] = 7; val[0] = 6000;
+  ind[1] = 7; val[1] = 6000;
   
   double lb = si.getLbForNewRhs(2, ind, val);
   double ub =  si.getUbForNewRhs(2, ind, val);
