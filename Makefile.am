@@ -8,6 +8,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+EXTRA_DIST = 
+
 ########################################################################
 #                          Subdirectories                              #
 ########################################################################
@@ -24,6 +26,9 @@ SUBDIRS = $(subdirs)
 #	cd Cbc; make test
 
 #unitTest: test
+
+symphony: all
+	make; cd SYMPHONY; make
 
 tests: all
 	for dir in $(subdirs); do \

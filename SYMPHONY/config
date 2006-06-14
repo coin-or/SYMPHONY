@@ -74,7 +74,7 @@ RANLIB = ranlib
 # BY default, SYMPHONY should be located in the COINROOT directory.
 ##############################################################################
 
-COINROOT = $(HOME)/COIN
+COINROOT = $(HOME)/SYMPHONY
 
 ##############################################################################
 # LIBTYPE is the variable to indicate what type of SYMPHONY library 
@@ -134,7 +134,7 @@ OSI_INTERFACE = CLP
 ifeq ($(LP_SOLVER),OSI)
        LPINCDIR = $(COINROOT)/include
        LPLIBPATHS = $(COINROOT)/lib
-       LPLIB = -lOsi -lCoin
+       LPLIB = -lOsi -lCoinUtils
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPSINCDIR = /usr/local/include
        LPLIBPATHS += /usr/local/lib/

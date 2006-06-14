@@ -1,5 +1,13 @@
 * text=auto !eol
 /Externals -text
 /Makefile.am -text
+/Makefile.in -text
 SYMPHONY/Makefile -text
+/config.guess -text
+/config.sub -text
+/configure -text
 /configure.ac -text
+/depcomp -text
+/install-sh -text
+/ltmain.sh -text
+/missing -text

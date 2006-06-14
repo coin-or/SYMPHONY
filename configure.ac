@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Cbc],[0.1],[coin-symphony@lists.coin-or.org])
+AC_INIT([SYMPHONY],[0.1],[coin-symphony@lists.coin-or.org])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
@@ -55,10 +55,8 @@ AC_COIN_INIT_AUTOMAKE
 
 AC_COIN_MAIN_SUBDIRS(CoinUtils)
 AC_COIN_MAIN_SUBDIRS(Clp)
-AC_COIN_MAIN_SUBDIRS(Vol)
 AC_COIN_MAIN_SUBDIRS(Osi)
 AC_COIN_MAIN_SUBDIRS(Cgl)
-AC_COIN_MAIN_SUBDIRS(Cbc)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
