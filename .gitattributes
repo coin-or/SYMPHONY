@@ -1,4 +1,5 @@
 * text=auto !eol
 /Externals -text
 /Makefile.am -text
+SYMPHONY/Makefile -text
 /configure.ac -text
