@@ -17,10 +17,12 @@
 ##############################################################################
 
 CC = g++
-OPT = -O
+OPT = -O #-fPIC
+SHLINKPREFIX = -Wl,-rpath,
 
 SYMPHONYROOT = ..
 COINROOT = ../..
+
 
 LP_SOLVER = OSI
 OSI_INTERFACE = CLP
@@ -70,6 +72,8 @@ endif
 INCDIR        = $(addprefix -I,${LPINCDIR})
 LDFLAGS       = $(addprefix -L,${LPLIBPATHS})
 
+LINKFLAGS += $(addprefix ${SHLINKPREFIX},${LPLIBPATHS})
+
 EXAMPLES = milp bicriteria sensitivity warm_start1 warm_start2 warm_start3
 
 examples: $(EXAMPLES)
@@ -79,27 +83,27 @@ examples: $(EXAMPLES)
 
 milp : milp.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPLIB)
 
 bicriteria : bicriteria.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
 
 sensitivity : sensitivity.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPLIB)
 
 warm_start1 : warm_start1.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
 
 warm_start2 : warm_start2.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
 
 warm_start3 : warm_start3.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
 
 
 clean : 
