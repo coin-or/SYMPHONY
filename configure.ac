@@ -2,7 +2,7 @@
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
-## $Id: configure.ac 343 2006-06-01 05:14:49Z andreasw $
+## $Id$
 
 # Author:  Andreas Waechter            IBM    2006-04-13
 

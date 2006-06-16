@@ -74,7 +74,7 @@ RANLIB = ranlib
 # BY default, SYMPHONY should be located in the COINROOT directory.
 ##############################################################################
 
-COINROOT = $(HOME)/SYMPHONY
+COINROOT = $(HOME)/COIN-SYMPHONY
 
 ##############################################################################
 # LIBTYPE is the variable to indicate what type of SYMPHONY library 

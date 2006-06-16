@@ -1,5 +1,7 @@
 * text=auto !eol
+/AUTHORS -text
 /Externals -text
+/LICENSE -text
 /Makefile.am -text
 /Makefile.in -text
 SYMPHONY/Makefile -text

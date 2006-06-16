@@ -1,62 +1,99 @@
 SYMPHONY Version 5.1 INSTALLATION
 =================================
 
+**********************************************************************
+***                COMPILATION AND INSTALLATION                    ***
+**********************************************************************
+
 ******************************************************************************
-*   COMPILING The SYMPHONY Library and Executable (UNIX Operating Systems)   *
+*   COMPILING The SYMPHONY Library and Executable (UNIX/Linux/CYGWIN/MSYS)   *
 ******************************************************************************
 
-Here is a sketch outline of how to get started with SYMPHONY in Unix. These
-instructions will lead you through the steps required to compile SYMPHONY as a
-generic MILP solver. This process will create (1) a generic
-callable library that allows SYMPHONY to be called from an application and (2)
-an executable that can be used as a stand-alone application to solve MILPs
-written in either MPS or GMPL file format. SYMPHONY can be further customized
-by implementing one of more than 50 callback functions that change SYMPHONY's
-default execution of its algorithm. For information on customizing SYMPHONY
-using callbacks, a quick start guide is provided below.
+Here is a sketch outline of how to get started with SYMPHONY in Unix and
+Unix-like environments. These instructions will lead you through the steps
+required to compile SYMPHONY as a generic MILP solver. This process will
+create (1) a generic callable library that allows SYMPHONY to be called from
+an application and (2) an executable that can be used as a stand-alone
+application to solve MILPs written in either MPS or GMPL file format. SYMPHONY
+can be further customized by implementing one of more than 50 callback
+functions that change SYMPHONY's default execution of its algorithm. For
+information on customizing SYMPHONY using callbacks, a quick start guide is
+provided below.
 
-Because SYMPHONY is intended to run over nonhomogeneous networks of
-workstations, installation is not fully automated, but requires the user to
-make minor edits to the configuration file. With this setup, compilation for 
-multiple architectures and configurations can be performed in a single 
-directory without reconfiguring or "cleaning". This is convenient on 
-nonhomogeneous networks, but it means that you might need to edit the 
-makefiles to get SYMPHONY to compile. For the casual user, this editing is 
-limited to providing some path names.
+The COIN-OR tools on which SYMPHONY depends for certain functionality now use
+the GNU autotools to automate the build process. We are currently in the
+process of convering SYMPHONY itself to the same build process, but this
+has not been completed yet, so some hand-configuration is still required.
 
-PREPARING FOR COMPILATION
-=========================
+COMPILING the COIN-OR Libriares
+===============================
 
-1. Download the file SYMPHONY-5.1.tgz.
+The first step is to build the COIN-OR libraries. This must be done before
+building SYMPHONY itself. To Build the libraries, follow the steps below.
 
-2. Unpack the distribution with "tar -xzf SYMPHONY-5.1.tgz". This will create
-a subdirectory called SYMPHONY-5.1 containing the distribution.
+CONFIGURATION
 
-3. Edit the the configuration file, config, to reflect your environment. This 
-involves specifying the LP solver to be used, assigning some
-variables and setting the paths to various libraries and include files. 
-Only minor edits should be required. An explanation of what has to be set is 
-contained in the comments in the file.
+In the root directory of the installation (probably called COIN-SYMPHONY),
+type
 
-4. To use many of the new capabilities of SYMPHONY, you must have installed
-the COIN libraries, available both from www.coin-or.org and with this 
-distribution. By default, SYMPHONY is set to use COIN LP solver, CLP, COIN 
-Open Solver Interface, OSI, and COIN Cut Generation Library, CGL. To keep this 
-configuration, you should install OSI, CGL, CLP and the Coin utilities 
-(under COIN/Coin). If you also want to use the new OSI interface to SYMPHONY, 
-you should be sure to compile it when you are installing the rest of the COIN 
-packages. The path to the COIN libraries, unless you want to use the included
-package, must be specified in configuration file. If you haven't installed the 
-necessary COIN packages, you can manage that simply by typing "make coin" in 
-the SYMPHONY subdirectory. 
+   ./configure
 
-5. With this version you will also be able to read GMPL/AMPL files by default. 
-SYMPHONY now includes the parser files from Gnu Linear Programming Kit (GLPK).
-If you don't want SYMPHONY to have this property, set the corresponding
-variable in the configuration file off.
+Note that you might have to specify additional options, in case you
+don't want to use the default choices that configure makes (e.g.,
+compilers).  Please visit
 
-COMPILING
-=========
+   https://projects.coin-or.org/BuildTools/wiki/user-configure
+
+and the SYMPHONY Trac page
+
+   https://projects.coin-or.org/Clp
+
+for more information.
+
+If everything went fine, you will see at the end of the output
+
+   "Main configuration of SYMPHONY successful"
+
+BUILDING AND INSTALLATION
+
+In the directory where you ran the configure script:
+
+1. Compile the COIN-OR libraries by typing
+
+   make
+
+3. To install the libraries, type
+
+   make install
+
+   After this, you will find the executables, libraries and header
+   files in the "bin", "lib" and "include" subdirectory, respectively.
+
+More information on the compilation and installation can be found at
+
+   https://projects.coin-or.org/BuildTools/wiki/user-compile
+
+COMPILING SYMPHPONY
+===================
+
+Now it is time to compile SYMPHONY itself. Follow the steps below.
+
+
+CONFIGURATION
+
+1. First, edit the configuration file, called "config" to reflect your
+environment. This involves specifying the LP solver to be used, assigning some
+variables and setting the paths to various libraries and include files. If you
+are planning to use the COIN-OR LP solver and want to compile with default
+options, then in most cases, you will not need to make any edits. An
+explanation of what has to be set is contained in the comments in the file.
+
+2. With this version, you will also be able to read GMPL/AMPL files by
+default. SYMPHONY now includes the parser files from Gnu Linear Programming
+Kit (GLPK). If you don't want SYMPHONY to use GLPK, which is licensed under
+the GPL, set the corresponding variable in the configuration file off.
+
+BUILDING AND INSTALLING
 
 1. The user simply has to type "make". This will first make the SYMPHONY 
 library (sequential version) libsym.so (or 'libsym.a' if library type is set 
@@ -172,25 +209,45 @@ user manual for help.
 *      COMPILING The SYMPHONY Library and Executable (Microsoft Windows)     *
 ******************************************************************************
 
-Here is a sketch outline of how to compile SYMPHONY in Microsoft Windows.
-These instructions will lead you through the steps required to compile
-SYMPHONY as a generic MILP solver. This process will create (1) a generic
-callable library that allows SYMPHONY to be called from an application and (2)
-an executable that can be used as a stand-alone application to solve MILPs
-written in either MPS or GMPL file format. SYMPHONY can be further customized
-by implementing one of more than 50 callback functions that change SYMPHONY's
-default execution of its algorithm. For information on customizing SYMPHONY
-using callbacks, a quick start guide is provided below. Direct support
-is provided for compilation under MS Visual Studio 6.0. Compilation for other
-compilers should also be possible. Note that the Windows version has some
-limitations. Detailed timing information is not currently provided.  Support
-is only provided for running in sequential mode at this time.
+The recommended way to work with COIN-OR and SYMPHONY in MS Windows is to
+install a Unix-like environment such as CYGWIN or Msys and build using the GNU
+autotools by following the instructions above. However, if you prefer MS
+Visual Studio, here is a sketch outline of how to compile SYMPHONY in
+Microsoft Windows. These instructions will lead you through the steps required
+to compile SYMPHONY as a generic MILP solver. This process will create (1) a
+generic callable library that allows SYMPHONY to be called from an application
+and (2) an executable that can be used as a stand-alone application to solve
+MILPs written in either MPS or GMPL file format. SYMPHONY can be further
+customized by implementing one of more than 50 callback functions that change
+SYMPHONY's default execution of its algorithm. For information on customizing
+SYMPHONY using callbacks, a quick start guide is provided below. Direct
+support is provided for compilation under MS Visual Studio 6.0. Compilation
+for other compilers should also be possible. Note that the Windows version has
+some limitations. Detailed timing information is not currently provided.
+Support is only provided for running in sequential mode at this time.
 
-First, download SYMPHONY-5.1.zip and unzip the archive. This will create a
-subdirectory called SYMPHONY-5.1 containing all the source files. You now
-have two options. You can either compile on the command-line, using the MSVC++
-makefile, src\WIN32\sym.mak, or you can use the provided projects and 
-workspaces. Compiling on the command-line is somewhat easier since it requires 
+COMPILING THE COIN-OR LIBRARIES
+===============================
+
+To use many of the capabilities of SYMPHONY, you must have first
+installed the COIN-OR libraries, which should have come with this
+distribution. By default, SYMPHONY is set to use COIN-OR LP solver, CLP,
+COIN-OR Open Solver Interface, OSI, and the COIN-OR Cut Generation Library,
+CGL. To keep this configuration, you should build and install OSI, CGL, CLP
+and additionally, the Coin utilities. The path to these libraries, unless you
+want to use the included package, must be specified in the makefile. For
+information on bulding and installing the COIN libraries in Visual Studio,
+please see
+
+https://projects.coin-or.org/MSVisualStudio
+
+COMPILING SYMPHONY
+==================
+
+To build SYMPHONY in MS Windows with the Microsoft compiler, You now have two
+options. You can either compile on the command-line, using the MSVC++
+makefile, src\WIN32\sym.mak, or you can use the provided projects and
+workspaces. Compiling on the command-line is somewhat easier since it requires
 only editing the makefile and typing a single command.
 
 ******************** Using the NMAKE Utility *********************************
@@ -200,20 +257,12 @@ involves specifying the LP solver to be used, assigning some variables and
 setting various paths. Only minor edits should be required. An explanation of 
 what has to be set is contained in the comments in the makefile.
 
-2. To use many of the new capabilities of SYMPHONY, you must have installed
-the COIN libraries, available both from www.coin-or.org and with this 
-distribution. By default, SYMPHONY is set to use COIN LP solver, CLP, COIN 
-Open Solver Interface, OSI, and COIN Cut Generation Library, CGL. To keep this 
-configuration, you should install OSI, CGL, CLP and additionally, the Coin 
-utilities (under COIN\Coin). The path to the COIN libraries, unless you want 
-to use the included package, must be specified in the makefile.
-
-3. With this version you will also be able to read GMPL/AMPL files by default. 
+2. With this version you will also be able to read GMPL/AMPL files by default. 
 SYMPHONY now includes the parser files from Gnu Linear Programming Kit (GLPK).
 If you don't want SYMPHONY to have this property, set the corresponding
 variable in the makefile off.
 
-4. Once configuration is done, type "nmake /f sym.mak" in the src\WIN32\ 
+3. Once configuration is done, type "nmake /f sym.mak" in the src\WIN32\ 
 subdirectory. This will first make the SYMPHONY library (sequential version): 
 src\WIN32\Debug\symphonyLib.lib. This library, together with the header files 
 in include\, can then be used to call SYMPHONY from any C/C++ code. The API 
@@ -223,7 +272,7 @@ executable called 'symphony.exe', which can then be used to solve generic MILP
 problems in MPS or GMPL format. The executable will be created in the 
 src\WIN32\Debug subdirectory.
 
-5. To test the executable, type "symphony.exe -F ..\..\..\sample.mps" or
+4. To test the executable, type "symphony.exe -F ..\..\..\sample.mps" or
 "symphony.exe -F ..\..\..\sample.mod -D ..\..\..\sample.dat" at a command
 prompt from the src\WIN32\Debug subdirectory. If you want to use
 the interactive optimizer, simply type  "symphony.exe" and then type "help" or 
@@ -238,14 +287,7 @@ is for the GLPK's necessary GMPL parser files, to create "symphonyLib.lib" and
 the symphony project compiles the main function and links that with the 
 callable library to create the executable "symphony.exe". 
 
-2. To use many of the new capabilities of SYMPHONY, you must have
-the COIN project files. Specifically, you should have OSI, CGL, CLP and the 
-Coin utilities (in the COIN/Coin subdirectory). These can be downloaded from 
-www.coin-or.org or can be found in COIN/ subdirectory. If you don't want to 
-use this included package then you will need to reload the needed COIN projects
-to the workspace. 
-
-3. By default, SYMPHONY is set to use the OSI CLP interface. To see this
+2. By default, SYMPHONY is set to use the OSI CLP interface. To see this
 check the following settings:
 
 -- "__OSI_CLP__" is defined in the preprocessor definitions of both
@@ -294,39 +336,39 @@ the native OSL interface, then delete all the projects (except the
 "symphonyLib" and "glpmpl") and just add the "oslmd6030" library for it is the 
 unique solver library we need now.
 
-4. By default, SYMPHONY is also set to use the COIN CGL library for
+3. By default, SYMPHONY is also set to use the COIN CGL library for
 generating cuts. To use CGL, the workspace includes the "cglLib" project, the 
 "symphonyLib" project has the "ADD_CGL_CUTS" preprocessor definition and the 
 path to Cgl include directory, "COIN\Cgl\include" and the "symphony" project 
 has a dependency on "cglLib". If you don't want to use the CGL library, 
 reverse this procedure and delete the "cglLib" project from the workspace.
 
-5. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important note
+4. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important note
 for OSL users: when using OSL in Windows, you must also add "OSLMSDLL" to the
 list of definitions.
 
-6. Note that there are a number of additional preprocessor definitions that
+5. Note that there are a number of additional preprocessor definitions that
 control the functionality of SYMPHONY. These definitions are described in
 "config", a Unix-style configuration file included in the distribution. To 
 enable the functionality associated with a particular definition, simply add 
 it to the list of definitions of "symphonyLib", as above.
 
-7. You must also be sure to have any .dll files required for your LP solver to
+6. You must also be sure to have any .dll files required for your LP solver to
 be in your search path. Either move the required .dll to the subdirectory
 containing symphony.exe or add the path to the "PATH" Windows environment
 variable.
 
-8. Once you have the proper settings for your LP solver, choose "Build
+7. Once you have the proper settings for your LP solver, choose "Build
 symphony.exe" from the Build menu. This should successfully build the
 SYMPHONY library and the corresponding executable.
 
-9. To test the executable, right click on the symphony project, go to the
+8. To test the executable, right click on the symphony project, go to the
 "Debug" tab and set the program arguments to "-F ..\..\sample.mps" Note that
 command-line switches are Unix-style. If you want to use the interactive 
 optimizer, simply type  "symphony.exe" and then type "help" or "?" to see a 
 list of available commands.
 
-10. Now choose "Execute" from the build menu and the solver should solve the
+9. Now choose "Execute" from the build menu and the solver should solve the
 sample problem.
 
 Note that there is some functionality missing from the Windows version. Most
