@@ -3205,30 +3205,34 @@ int tm_close(tm_prob *tm, int termcode)
 /*===========================================================================*/
 void sym_catch_c(int num)
 {
-#ifndef WIN32
 
    sigset_t mask_set;
    sigset_t old_set;
 
+   /* SIGTSTP ? */
    signal(SIGINT, sym_catch_c);
 
-   char temp = 0;
+   char temp [MAX_LINE_LENGTH + 1];
+   strcpy(temp, "");
    
    sigfillset(&mask_set);
    sigprocmask(SIG_SETMASK, &mask_set, &old_set);
    
-   printf("\nDo you want to abort? [y/Y]: ");
+   while(true) {
+      printf("\nDo you want to abort? [y/N]: ");
    fflush(stdout);   
-   gets(&temp);
-
-   if (temp == 'y' || temp == 'Y'){
+      gets(temp);
+      if (temp[0] != ' ') {      
+	 if(temp[1] == 0 && (temp[0] == 'y' || temp[0] == 'Y')){
       c_count++;
    } else{
       printf("\nContinuing...\n");
       fflush(stdout);
       c_count = 0;      
    }
-#endif
+	 break;
+      } else continue;
+   }
 }
 
 /*===========================================================================*/

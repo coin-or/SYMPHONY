@@ -27,7 +27,7 @@
 void mckp_parse_command_line(int argc, char **argv, char *infile,
 			     int *num_items, int *num_constraints,
 			     int *format, char *solve_mc, double *gamma,
-			     double *utopia);
+			     double *utopia, double *ub);
 void mckp_read_problem1(sym_environment *env, char *infile, int *num_items,
 			double ***objectives, double ***constraints,
 			double **capacity, int *num_objectives,
@@ -57,13 +57,16 @@ int main(int argc, char **argv)
    int *matbeg, *matind;
    double *matval, *lb, *ub, gamma, utopia[2];
    char *sense, *is_int, solve_mc = TRUE;
+   char output_file[50];
+   FILE *f;
+   double mc_ub = MAXDOUBLE;
 
    sym_environment *env = sym_open_environment();
 
    sym_parse_command_line(env, argc, argv);
 
    mckp_parse_command_line(argc, argv, infile, &num_items, &num_constraints,
-			   &format, &solve_mc, &gamma, utopia);
+			   &format, &solve_mc, &gamma, utopia, &mc_ub);
 
    sym_set_int_param(env, "do_reduced_cost_fixing", FALSE);
 
@@ -140,6 +143,11 @@ int main(int argc, char **argv)
       sym_set_dbl_param(env, "mc_tau", tau);
       sym_set_int_param(env, "mc_find_supported_solutions", FALSE);
       memcpy((char *)env->mip->obj1, (char *)env->mip->obj, DSIZE*env->mip->n);
+      if (mc_ub < MAXDOUBLE){
+	 env->ub = env->mc_ub = mc_ub;
+	 env->has_mc_ub = env->has_ub = TRUE;
+      }
+      env->obj[0] = env->obj[1] = 0.0;
       env->base->cutnum += 2;
       env->rootdesc->uind.size++;
       env->rootdesc->uind.list = (int *) realloc(env->rootdesc->uind.list,
@@ -148,6 +156,19 @@ int main(int argc, char **argv)
       env->par.tm_par.granularity = env->par.lp_par.granularity =
 	 -MAX(env->par.lp_par.mc_rho, env->par.mc_compare_solution_tolerance);
       sym_solve(env);
+      sprintf(output_file, "output.%s", argv[6]);
+      if (!(f = fopen(output_file, "w"))){
+	 printf("\nError opening output file\n\n");
+      }else{
+	 fprintf(f, "Gamma: %.10f\n", gamma);
+	 if (env->obj[0] == 0.0 && env->obj[1] == 0.0){
+	    fprintf(f, "Subproblem Infeasible\n");
+	 }else{
+	    fprintf(f, "First Objective: %lf\n", env->obj[0]);
+	    fprintf(f, "Second Objective: %lf\n", env->obj[1]);
+	 }
+      }
+      fclose(f);
    }
 
    sym_close_environment(env);
@@ -181,7 +202,7 @@ int main(int argc, char **argv)
 void mckp_parse_command_line(int argc, char **argv, char *infile,
 			     int *num_items, int *num_constraints,
 			     int *format, char *solve_mc, double *gamma,
-			     double *utopia)
+			     double *utopia, double *ub)
 {
    int i, tmpi;
    char foundF = FALSE, foundT = FALSE;
@@ -203,6 +224,19 @@ void mckp_parse_command_line(int argc, char **argv, char *infile,
 	    }else{
 	       strncpy(infile, argv[++i], LENGTH);
 	       foundF = TRUE;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 break;	     
+       case 'U':
+	 if (i < argc - 1){
+	    sscanf(argv[i+1], "%lf", &tmpd); 
+	    if (tmp == '-'){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       *ub = tmpd;
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
@@ -267,6 +301,7 @@ void mckp_parse_command_line(int argc, char **argv, char *infile,
 			    c);
 		     printf("\n");
 		  }else{
+		     i++;
 		     utopia[0] = tmpd;
 		  }
 		  if (!sscanf(argv[i+1], "%lf", &tmpd)){ 
@@ -274,6 +309,7 @@ void mckp_parse_command_line(int argc, char **argv, char *infile,
 			    c);
 		     printf("\n");
 		  }else{
+		     i++;
 		     utopia[1] = tmpd;
 		  }
 	       }

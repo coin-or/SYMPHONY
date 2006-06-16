@@ -422,6 +422,7 @@ int create_subproblem_u(lp_prob *p)
       row->eff_cnt = 1;
       row->free = FALSE;
       cut->name = BASE_CONSTRAINT;
+      cut->type = ORIGINAL_CONSTRAINT;
    }
 
    /*------------------------------------------------------------------------*\

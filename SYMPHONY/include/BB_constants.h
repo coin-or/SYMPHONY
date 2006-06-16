@@ -319,6 +319,7 @@
 #define EXPLICIT_ROW                100
 #define OPTIMALITY_CUT_FIRST        101
 #define OPTIMALITY_CUT_SECOND       102
+#define ORIGINAL_CONSTRAINT         103
 
 /*----------------- possible types of candidate objects ---------------------*/
 #define CANDIDATE_VARIABLE          0

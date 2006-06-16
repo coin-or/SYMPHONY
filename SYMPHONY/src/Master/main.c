@@ -49,10 +49,8 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony_api.h"
-#ifndef WIN32
-#include <pwd.h>
-#endif
 #ifdef HAS_READLINE
+#include <pwd.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -121,6 +119,7 @@ char **sym_completion(const char *text, int start, int end);
 void sym_initialize_readline();
 char *command_generator (const char *text, int state);
 char *alloc_str (char *s);
+void sym_read_tilde(char input[]);
 #endif
 
 int comp_level = 0;
@@ -132,10 +131,6 @@ int main_level = 0; /* 0 - SYMPHONY:
 
 int sym_help(char *line);
 int sym_read_line(char *prompt, char **input);
-
-#ifndef WIN32
-void sym_read_tilde(char *input);
-#endif
 
 int main(int argc, char **argv)
 {    
@@ -221,7 +216,7 @@ int main(int argc, char **argv)
 	   strcpy(args[1], line);
 	 }	 
 
-#ifndef WIN32
+#ifdef HAS_READLINE
 	 sym_read_tilde(args[1]);	 
 #endif	 	 
 	 if (fopen(args[1], "r") == NULL){
@@ -273,7 +268,7 @@ int main(int argc, char **argv)
 	     strcpy(args[2], line);
 	   }
 
-#ifndef WIN32
+#ifdef HAS_READLINE
 	   sym_read_tilde(args[2]);	 
 #endif	 	 
 	 
@@ -509,7 +504,7 @@ int main(int argc, char **argv)
 	       strcpy(args[2], line);
 	     }
 
-#ifndef WIN32
+#ifdef HAS_READLINE
 	     sym_read_tilde(args[2]);	 
 #endif	 	 
 
@@ -542,9 +537,9 @@ int main(int argc, char **argv)
 	       sym_read_line("Value of the parameter: ", &line);
 	       strcpy(args[2], line);
 	     }
-
-	     sprintf(line, "%s %s", args[1], args[2]);  
-	     if(set_param(env, line) == 0){
+	     strcpy(args[0], "");
+	     sprintf(args[0], "%s %s", args[1], args[2]);  
+	     if(set_param(env, args[0]) == 0){
 	       printf("Setting %s to: %s\n", args[1], args[2]); 
 	     } else {
 	       printf("Unknown parameter/command!\n");
@@ -684,29 +679,6 @@ int sym_read_line(char *prompt, char **input)
  
 /*===========================================================================*\
 \*===========================================================================*/
-
-#ifndef WIN32  
-void sym_read_tilde(char *input)
-{
-   char temp;
-   char temp_inp[MAX_LINE_LENGTH+1];
-   struct passwd *pwd = 0 ;
-
-   if(*input){
-      sscanf(input, "%c", &temp);
-      if(temp == '~'){
-	 pwd = getpwuid(getuid());
-	 if(pwd != NULL){
-	    strcpy(temp_inp, input);
-	    sprintf(input, "%s%s", pwd->pw_dir, &temp_inp[1]);
-	 }
-      }	    
-   }
-}
-#endif
-
-/*===========================================================================*\
-\*===========================================================================*/
 #ifdef HAS_READLINE
 
 void sym_initialize_readline()
@@ -815,6 +787,27 @@ char *alloc_str(char *s)
     strcpy (r, s);
   }
   return (r);
+}
+
+/*===========================================================================*\
+\*===========================================================================*/
+
+void sym_read_tilde(char input[])
+{
+   char temp;
+   char temp_inp[MAX_LINE_LENGTH+1];
+   struct passwd *pwd = 0 ;
+
+   if(*input){
+      sscanf(input, "%c", &temp);
+      if(temp == '~'){
+	 pwd = getpwuid(getuid());
+	 if(pwd != NULL){
+	    strcpy(temp_inp, input);
+	    sprintf(input, "%s%s", pwd->pw_dir, &temp_inp[1]);
+	 }
+      }	    
+   }
 }
 
 #endif
