@@ -52,7 +52,7 @@ POST_UNINSTALL = :
 LIBOBJDIR =
 DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/configure INSTALL \
+	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS INSTALL \
 	config.guess config.sub depcomp install-sh ltmain.sh missing
 @HAVE_EXTERNALS_TRUE@am__append_1 = Externals
 @HAVE_EXTERNALS_TRUE@am__append_2 = .Externals-stamp
@@ -96,6 +96,7 @@ AUTOMAKE = @AUTOMAKE@
 AUX_DIR = @AUX_DIR@
 AWK = @AWK@
 BUILDTOOLSDIR = @BUILDTOOLSDIR@
+COIN_SKIP_PROJECTS = @COIN_SKIP_PROJECTS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 ECHO_C = @ECHO_C@
@@ -593,6 +594,9 @@ uninstall-info: uninstall-info-recursive
 #	cd Cbc; make test
 
 #unitTest: test
+
+symphony: all
+	cd SYMPHONY; make
 
 tests: all
 	for dir in $(subdirs); do \
