@@ -103,7 +103,7 @@ ifeq ($(OSI_INTERFACE),GLPK)
        LPLIBPATHS += ${HOME}/GLPK/glpk-4.3/src
        LPLIB += -lOsiGlpk -lglpk
 endif
-       LPLIB +=  -lCgl -lOsi -lCoin
+       LPLIB +=  -lCgl -lOsi -lCoinUtils
 endif
 
 INCDIR        = $(addprefix -I,${LPINCDIR})
