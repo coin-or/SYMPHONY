@@ -6,6 +6,7 @@
 /Makefile.in -text
 /README -text
 SYMPHONY/Makefile -text
+SYMPHONY/Makefile.am -text
 /config.guess -text
 /config.sub -text
 /configure -text
