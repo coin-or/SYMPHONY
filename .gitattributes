@@ -8,6 +8,7 @@
 SYMPHONY/Makefile -text
 SYMPHONY/Makefile.am -text
 SYMPHONY/Makefile.in -text
+SYMPHONY/configure -text
 SYMPHONY/configure.ac -text
 SYMPHONY/src/Makefile.am -text
 SYMPHONY/sym_addlibs.txt.in -text
