@@ -10,6 +10,7 @@ SYMPHONY/Makefile.am -text
 SYMPHONY/Makefile.in -text
 SYMPHONY/configure.ac -text
 SYMPHONY/src/Makefile.am -text
+SYMPHONY/sym_addlibs.txt.in -text
 /config.guess -text
 /config.sub -text
 /configure -text
