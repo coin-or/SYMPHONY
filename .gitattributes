@@ -11,6 +11,7 @@ SYMPHONY/Makefile.in -text
 SYMPHONY/configure -text
 SYMPHONY/configure.ac -text
 SYMPHONY/include/SymConfig.h -text
+SYMPHONY/include/config_sym.h -text
 SYMPHONY/src/GMPL/Makefile.am -text
 SYMPHONY/src/GMPL/Makefile.in -text
 SYMPHONY/src/Makefile.am -text
