@@ -27,19 +27,24 @@ SUBDIRS = $(subdirs)
 
 #unitTest: test
 
+<<<<<<< .mine
+#symphony: all
+#	make; cd SYMPHONY; make
+=======
 symphony: all
 	cd SYMPHONY; make
+>>>>>>> .r630
 
-tests: all
-	for dir in $(subdirs); do \
-	  if test -r $$dir/test/Makefile; then \
-	    (cd $$dir; make test) \
-	  fi; \
-	done
+#tests: all
+#	for dir in $(subdirs); do \
+#	  if test -r $$dir/test/Makefile; then \
+#	    (cd $$dir; make test) \
+#	  fi; \
+#	done
 
-unitTests: tests
+#unitTests: tests
 
-.PHONY: tests unitTests
+#.PHONY: tests unitTests
 
 ########################################################################
 #                         Maintainer Stuff                             #
