@@ -57,6 +57,7 @@ AC_COIN_MAIN_SUBDIRS(CoinUtils)
 AC_COIN_MAIN_SUBDIRS(Clp)
 AC_COIN_MAIN_SUBDIRS(Osi)
 AC_COIN_MAIN_SUBDIRS(Cgl)
+AC_COIN_MAIN_SUBDIRS(SYMPHONY)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
