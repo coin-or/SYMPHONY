@@ -108,6 +108,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LIBEXT = @LIBEXT@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOLM4 = @LIBTOOLM4@
@@ -608,32 +609,6 @@ uninstall-info: uninstall-info-recursive
 	uninstall uninstall-am uninstall-info-am
 
 
-<<<<<<< .mine
-=======
-########################################################################
-#                           Extra Targets                              #
-########################################################################
-
-#test: all
-#	cd Cbc; make test
-
-#unitTest: test
-
-symphony: all
-	cd SYMPHONY; make
-
-tests: all
-	for dir in $(subdirs); do \
-	  if test -r $$dir/test/Makefile; then \
-	    (cd $$dir; make test) \
-	  fi; \
-	done
-
-unitTests: tests
-
-.PHONY: tests unitTests
-
->>>>>>> .r630
 # Make sure acinclude is using most recent coin.m4
 @MAINTAINER_MODE_TRUE@$(srcdir)/acinclude.m4: $(BUILDTOOLSDIR)/coin.m4
 @MAINTAINER_MODE_TRUE@	cat $(LIBTOOLM4) $< > $@
