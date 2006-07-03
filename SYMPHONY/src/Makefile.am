@@ -8,8 +8,10 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+SUBDIRS = GMPL
+
 ########################################################################
-#                               libCbc                                 #
+#                               libSym                                 #
 ########################################################################
 
 # Name of the library compiled in this directory.  We want it to be installed
@@ -55,7 +57,6 @@ libSym_la_SOURCES = \
 	Master/master_func.c \
 	TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c \
-	TreeManager/tm_proccomm.c \
 	LP/lp_solver.c \
 	LP/lp_varfunc.c \
 	LP/lp_rowfunc.c \
@@ -78,17 +79,11 @@ libSym_la_SOURCES = \
 	Common/qsortucb_ic.c \
 	Common/proccomm.c \
 	Common/pack_cut.c \
-	Common/pack_array.c \
-	GMPL/glpmpl1.c \
-	GMPL/glpmpl2.c \
-	GMPL/glpmpl3.c \
-	GMPL/glpmpl4.c \
-	GMPL/glpdmp.c \
-	GMPL/glpavl.c \
-	GMPL/glprng.c \
-	GMPL/glplib1a.c \
-	GMPL/glplib2.c \
-	GMPL/glplib3.c
+	Common/pack_array.c
+
+# Add Gmpl library
+
+libSym_la_LIBADD = GMPL/libGmpl.la
 
 # This is for libtool (on Windows)
 libSym_la_LDFLAGS = $(LT_LDFLAGS)
@@ -105,8 +100,8 @@ bin_PROGRAMS = symphony
 symphony_SOURCES = \
 	Master/main.c ../include/symphony_api.h
 
-# The following file is not to be distributed, since it is "borrowed" from Clp
-#nodist_cbc_generic_SOURCES = CbcOrClpParam.cpp
+# List all required libraries -other than the LP solver's- needed to create
+# the executable
 
 symphony_LDADD = libSym.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
@@ -117,7 +112,7 @@ LIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
 	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
 	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
 
-#AM_CPPFLAGS = -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCbc`
+# Add include files
 AM_CPPFLAGS = -I`$(CYGPATH_W) ../include`
 
 # List all additionally required solver and Osi libraries
@@ -179,8 +174,6 @@ if COIN_HAS_XPR
   symphony_LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
 endif
 
-# Finally the Osi Coin library (many of the above need it)
-
 LIBS += $(ADDLIBS)
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
@@ -203,24 +196,35 @@ AM_CPPFLAGS += \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglSimpleRounding` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src`
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+	-I`$(CYGPATH_W) $(srcdir)/GMPL`
 
 # List additional defines
 AM_CPPFLAGS += -DHAS_RANDOM -DHAS_SRANDOM -DUSE_CGL_CUTS -D__NONE__ -D__LINUX \
 	-DUSE_GLPMPL -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP \
-	-DCOMPILE_IN_TM 
+	-DCOMPILE_IN_TM
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
+
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+
+
+# Compile everything with g++
+CC = $(CXX)
+
+# Get rid of C flags
+CFLAGS =
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -228,9 +232,12 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 # Here list all the header files that are required by a user of the library,
 # and that therefore should be installed in 'install'
-include_HEADERS = \
-	../inc/config_sym.h \
-	symphony_api.h
+
+# They are already in include dir. 
+
+# include_HEADERS = \
+# 	../include/config_sym.h \
+# 	../include/symphony_api.h
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #
@@ -239,13 +246,15 @@ include_HEADERS = \
 # You only need to adapt the following line
 ConfigHeader = SymConfig.h
 
-install-exec-local:
-	echo "#ifndef HAVE_CONFIG_H" >bla
-	echo "#define HAVE_CONFIG_H" >>bla
-	echo "#endif" >> bla
-	cat $(srcdir)/$(ConfigHeader) >> bla
-	$(install_sh_DATA) bla $(DESTDIR)$(includedir)/$(ConfigHeader)
-	rm -f bla
+# It is already defined in include dir. 
 
-uninstall-local:
-	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
+# install-exec-local:
+# 	echo "#ifndef HAVE_CONFIG_H" >bla
+# 	echo "#define HAVE_CONFIG_H" >>bla
+# 	echo "#endif" >> bla
+# 	cat $(includedir)/$(ConfigHeader) >> bla
+# 	$(install_sh_DATA) bla $(DESTDIR)$(includedir)/$(ConfigHeader)
+# 	rm -f bla
+
+# uninstall-local:
+# 	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
