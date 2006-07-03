@@ -27,13 +27,8 @@ SUBDIRS = $(subdirs)
 
 #unitTest: test
 
-<<<<<<< .mine
 #symphony: all
 #	make; cd SYMPHONY; make
-=======
-symphony: all
-	cd SYMPHONY; make
->>>>>>> .r630
 
 #tests: all
 #	for dir in $(subdirs); do \
