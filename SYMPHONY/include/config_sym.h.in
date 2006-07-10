@@ -1,8 +1,5 @@
 /* include/config_sym.h.in.  Generated from configure.ac by autoheader.  */
 
-/* If defined, debug sanity checks are performed during runtime */
-#undef COIN_DEBUG
-
 /* Define to 1 if the Cgl package is used */
 #undef COIN_HAS_CGL
 
@@ -32,6 +29,12 @@
 
 /* Define to 1 if the Xpress package is used */
 #undef COIN_HAS_XPR
+
+/* Define to the debug sanity check level (0 is no test) */
+#undef COIN_SYMPHONY_CHECKLEVEL
+
+/* Define to the debug verbosity level (0 is no output) */
+#undef COIN_SYMPHONY_VERBOSITY
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
