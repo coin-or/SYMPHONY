@@ -459,7 +459,8 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) ../include` $(am__append_1) \
 	$(CGLSRCDIR)/src/CglRedSplit` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglSimpleRounding` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglTwomir` -I`$(CYGPATH_W) \
-	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
+	$(COINUTILSSRCDIR)/inc` -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
 	-I`$(CYGPATH_W) $(srcdir)/GMPL` -DHAS_RANDOM -DHAS_SRANDOM \
 	-DUSE_CGL_CUTS -D__NONE__ -D__LINUX -DUSE_GLPMPL \
 	-DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP \
