@@ -8,7 +8,6 @@
 SYMPHONY/Makefile -text
 SYMPHONY/include/SymConfig.h -text
 SYMPHONY/include/config_sym.h.in -text
-SYMPHONY/sym_addlibs.txt.in -text
 /config.guess -text
 /config.sub -text
 /configure -text
