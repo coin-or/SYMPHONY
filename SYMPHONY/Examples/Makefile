@@ -23,56 +23,57 @@ SHLINKPREFIX = -Wl,-rpath,
 SYMPHONYROOT = ..
 COINROOT = ../..
 
-
 LP_SOLVER = OSI
 OSI_INTERFACE = CLP
 
-LPINCDIR = $(SYMPHONYROOT)/include
-LPLIBPATHS = $(SYMPHONYROOT)/lib
-LPLIB = -lsym
+INCDIR = $(SYMPHONYROOT)/include
+LIBPATHS = $(SYMPHONYROOT)/lib
 
 ifeq ($(LP_SOLVER),CPLEX)
-       LPINCDIR += /usr/local/include/
-       LPLIBPATHS += /usr/local/lib/ 
-       LPLIB += -lcplex -lpthread
+       LPINCDIR = /usr/local/include/
+       LPLIBPATHS = /usr/local/lib/ 
+       LPLIB = -lcplex -lpthread
 endif
 
 ifeq ($(LP_SOLVER),OSL)
-       LPINCDIR +=  $(HOME)/OSL/osllib/include/
-       LPLIBPATHS += $(HOME)/OSL/osllib/lib
-       LPLIB += -losl
+       LPINCDIR =  $(HOME)/OSL/osllib/include/
+       LPLIBPATHS = $(HOME)/OSL/osllib/lib
+       LPLIB = -losl
 endif
 
 ifeq ($(LP_SOLVER),OSI)
-       LPINCDIR += $(COINROOT)/include
-       LPLIBPATHS += $(COINROOT)/lib
-       LPLIB += -lCoin -lOsi -lCgl
+       LPINCDIR = $(COINROOT)/include
+       LPLIBPATHS = $(COINROOT)/lib
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPINCDIR += /usr/local/include/
        LPLIBPATHS += /usr/local/lib/
-       LPLIB += -lOsiCpx -lcplex -lpthread
+       LPLIB = -lOsiCpx -lcplex -lpthread
 endif
 ifeq ($(OSI_INTERFACE),OSL)
        LPINCDIR += $(HOME)/OSL/osllib/include
        LPLIBPATHS += $(HOME)/OSL/osllib/lib
-       LPLIB += -lOsiOsl -losl
+       LPLIB = -lOsiOsl -losl
 endif
 ifeq ($(OSI_INTERFACE),CLP)
-       LPINCDIR += 
-       LPLIBPATHS +=
-       LPLIB += -lOsiClp -lClp
+       LPINCDIR += $(COINROOT)/include
+       LPLIBPATHS += $(COINROOT)/lib
+       LPLIB = -lOsiClp -lClp
 endif
 ifeq ($(OSI_INTERFACE),GLPK)
        LPINCDIR += ${HOME}/GLPK/glpk-4.3/include
        LPLIBPATHS += ${HOME}/GLPK/glpk-4.3/src
-       LPLIB += -lOsiGlpk -lglpk
+       LPLIB = -lOsiGlpk -lglpk
 endif
+       LPLIB += -lCgl -lOsi -lCoinUtils
 endif
 
-INCDIR        = $(addprefix -I,${LPINCDIR})
-LDFLAGS       = $(addprefix -L,${LPLIBPATHS})
+INCDIR       += ${LPINCDIR} 
+LIB           = -lsym $(LPLIB) 
+LIBPATHS     += $(LPLIBPATHS)
+LDFLAGS       = $(addprefix -I,${INCDIR})
+LDFLAGS      += $(addprefix -L,${LIBPATHS})
 
-LINKFLAGS += $(addprefix ${SHLINKPREFIX},${LPLIBPATHS})
+LINKFLAGS += $(addprefix ${SHLINKPREFIX},${LIBPATHS})
 
 EXAMPLES = milp bicriteria sensitivity warm_start1 warm_start2 warm_start3
 
@@ -83,27 +84,27 @@ examples: $(EXAMPLES)
 
 milp : milp.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(LINKFLAGS) $< -o $@ $(LIB)
 
 bicriteria : bicriteria.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LIB)
 
 sensitivity : sensitivity.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LIB)
 
 warm_start1 : warm_start1.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LIB)
 
 warm_start2 : warm_start2.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LIB)
 
 warm_start3 : warm_start3.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LIB)
 
 
 clean : 
