@@ -39,9 +39,9 @@ void usage(void);
 void usage(void)
 {
    printf("Generic switches:\n\n");
-   printf("master [ -hagrtbd ] [ -u ub ] [ -p procs ] [ -n rule ]\n\t"
-	  "[ -v level ] [ -s cands ] [ -c rule ] [ -k rule ] \n\t"
-	  "[ -m max ] [ -l pools ] [ -i iters ] "
+   printf("master [ -hagrbd ] [-t sec] [ -u ub ] [ -p procs ] \n\t"
+	  "[ -n rule ] [ -v level ] [ -s cands ] [ -c rule ] \n\t"
+	  "[ -k rule ] [ -m max ] [ -l pools ] [ -i iters ] \n\t"
 	  "[ -f parameter_file_name ] [-j 0/1]"
 	  "\n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
@@ -51,7 +51,7 @@ void usage(void)
 	  "-d: enable graph drawing",
 	  "-g: use cut generator",
 	  "-r: do repricing in root",
-	  "-t: trim the tree",
+	  "-t sec: impose a time limit of 'sec' seconds",
 	  "-b: don't perform branch and cut",
 	  "-u ub: use upper bound 'ub'",
 	  "-p procs: allow 'procs' active nodes",
