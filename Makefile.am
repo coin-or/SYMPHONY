@@ -27,15 +27,15 @@ SUBDIRS = $(subdirs)
 
 #unitTest: test
 
-#symphony: all
-#	make; cd SYMPHONY; make
+symphony: all
+	make; cd SYMPHONY; make
 
-#tests: all
-#	for dir in $(subdirs); do \
-#	  if test -r $$dir/test/Makefile; then \
-#	    (cd $$dir; make test) \
-#	  fi; \
-#	done
+tests: all
+	for dir in $(subdirs); do \
+	  if test -r $$dir/test/Makefile; then \
+	    (cd $$dir; make test) \
+	  fi; \
+	done
 
 #unitTests: tests
 
