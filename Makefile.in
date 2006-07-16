@@ -182,7 +182,7 @@ SUBDIRS = $(subdirs)
 #unitTest: test
 
 symphony: all
-	make; cd SYMPHONY; make
+	cd SYMPHONY; make
 
 tests: all
 	for dir in $(subdirs); do \
