@@ -602,18 +602,22 @@ DEFAULT_FLAGS = $(OPT) $(SYSDEFINES) $(BB_DEFINES) $(INCDIR)
 
 MORECFLAGS =
 
+ifeq ($(LIBTYPE),SHARED)
+ifneq ($(ARCH),CYGWIN)
+MORECFLAGS += -fPIC
+endif
+endif
+
+ifeq ($(ARCH),CYGWIN)
+MORECFLAGS += -mno-cygwin
+endif
+
 ifeq ($(STRICT_CHECKING),TRUE)
 ifeq ($(VERSION),GNU)
 	MORECFLAGS = -ansi -pedantic -Wall -Wid-clash-81 -Wpointer-arith -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Winline -fnonnull-objects #-pipe
 endif
 else 
 MOREFLAGS = 
-endif
-
-ifeq ($(LIBTYPE),SHARED)
-ifneq ($(ARCH),CYGWIN)
-MORECFLAGS += -fPIC
-endif
 endif
 
 CFLAGS = $(DEFAULT_FLAGS) $(MORECFLAGS) $(MOREFLAGS)
@@ -727,7 +731,8 @@ $(SYM_OBJDIR)/%.o : %.c
 $(GMPL_OBJDIR)/%.o : %.c
 	mkdir -p $(GMPL_OBJDIR)
 	@echo Compiling $*.c
-	gcc -DHAVE_LIBM=1 -DSTDC_HEADERS=1 -I$(GMPLINCDIR) -g -c $< -o $@
+	gcc $(MORECFLAGS) -DHAVE_LIBM=1 -DSTDC_HEADERS=1 -I$(GMPLINCDIR) -g \
+	-c $< -o $@
 
 $(DEPDIR)/%.d : %.c
 	mkdir -p $(DEPDIR)
