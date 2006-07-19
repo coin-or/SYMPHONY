@@ -17,7 +17,7 @@
 ##############################################################################
 
 CC = g++
-OPT = -O #-fPIC
+OPT = -O -mno-cygwin #-fPIC
 SHLINKPREFIX = -Wl,-rpath,
 
 SYMPHONYROOT = ..
@@ -73,7 +73,7 @@ LIBPATHS     += $(LPLIBPATHS)
 LDFLAGS       = $(addprefix -I,${INCDIR})
 LDFLAGS      += $(addprefix -L,${LIBPATHS})
 
-LINKFLAGS += $(addprefix ${SHLINKPREFIX},${LIBPATHS})
+LINKFLAGS     = $(addprefix ${SHLINKPREFIX},${LIBPATHS}) 
 
 EXAMPLES = milp bicriteria sensitivity warm_start1 warm_start2 warm_start3
 
@@ -88,23 +88,23 @@ milp : milp.c
 
 bicriteria : bicriteria.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LIB)
+	$(CC) $(OPT) $(LDFLAGS) $(LINKFLAGS) $< -o $@ $(LIB)
 
 sensitivity : sensitivity.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LIB)
+	$(CC) $(OPT) $(LDFLAGS) $(LINKFLAGS) $< -o $@ $(LIB)
 
 warm_start1 : warm_start1.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LIB)
+	$(CC) $(OPT) $(LDFLAGS) $(LINKFLAGS) $< -o $@ $(LIB)
 
 warm_start2 : warm_start2.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LIB)
+	$(CC) $(OPT) $(LDFLAGS) $(LINKFLAGS) $< -o $@ $(LIB)
 
 warm_start3 : warm_start3.c
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LIB)
+	$(CC) $(OPT) $(LDFLAGS) $(LINKFLAGS) $< -o $@ $(LIB)
 
 
 clean : 

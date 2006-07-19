@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__CYGWIN)
 #include <signal.h>
 #endif
 #if !defined(HAS_SRANDOM)
@@ -80,7 +80,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    int s_bufid;
 #endif
    int termcode = 0;
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__CYGWIN)
    signal(SIGINT, sym_catch_c);    
 #endif   
    par = &tm->par;
@@ -3200,7 +3200,8 @@ int tm_close(tm_prob *tm, int termcode)
    
    return(termcode);
 }   
-   
+
+#ifndef __CYGWIN
 /*===========================================================================*/
 /*===========================================================================*/
 void sym_catch_c(int num)
@@ -3235,5 +3236,6 @@ void sym_catch_c(int num)
    }
 }
 
+#endif
 /*===========================================================================*/
 /*===========================================================================*/
