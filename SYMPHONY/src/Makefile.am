@@ -8,7 +8,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = GMPL
+SUBDIRS = #GMPL
 
 ########################################################################
 #                               libSym                                 #
@@ -18,8 +18,7 @@ SUBDIRS = GMPL
 # in the 'lib' directory
 lib_LTLIBRARIES = libSym.la
 
-# List all source files for this library, including headers
-libSym_la_SOURCES = \
+SYMINCFILES = \
 	../include/SymConfig.h \
 	../include/BB_constants.h \
 	../include/BB_macros.h \
@@ -50,7 +49,10 @@ libSym_la_SOURCES = \
 	../include/symphony_api.h \
 	../include/timemeas.h \
 	../include/tm.h \
-	../include/tm_params.h \
+	../include/tm_params.h
+
+# List all source files for this library, including headers
+libSym_la_SOURCES = $(SYMINCFILES) \
 	Master/master.c \
 	Master/master_wrapper.c \
 	Master/master_io.c \
@@ -81,9 +83,14 @@ libSym_la_SOURCES = \
 	Common/pack_cut.c \
 	Common/pack_array.c
 
+nodist_libSym_la_SOURCES = dummy.cpp
+
+dummy.cpp:
+	echo 'static void dummy();' > $@
+
 # Add Gmpl library
 
-libSym_la_LIBADD = GMPL/libGmpl.la
+#libSym_la_LIBADD = GMPL/libGmpl.la
 
 # This is for libtool (on Windows)
 libSym_la_LDFLAGS = $(LT_LDFLAGS)
@@ -103,17 +110,23 @@ symphony_SOURCES = \
 # List all required libraries -other than the LP solver's- needed to create
 # the executable
 
-symphony_LDADD = libSym.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(OSIOBJDIR)/src/libOsi.la \
-	$(CGLOBJDIR)/src/libCgl.la
+symphony_LDADD = libSym.la
 
-LIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
-	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
-	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+if USE_CGL_CUTS
+symphony_LDADD += $(CGLOBJDIR)/src/libCgl.la
+endif
+
+#FIXME! LIBS adds the solver libs to libSym!
+
+# LIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
+# 	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
+# 	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+
+#Add SYMPHONY defines 
+AM_CPPFLAGS = $(SYMDEFS)
 
 # Add include files
-AM_CPPFLAGS = -I`$(CYGPATH_W) ../include`
+AM_CPPFLAGS += -I`$(CYGPATH_W) ../include`
 
 # List all additionally required solver and Osi libraries
 if COIN_HAS_CLP
@@ -125,11 +138,11 @@ if COIN_HAS_CLP
   LIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
   AM_CPPFLAGS += -D__OSI_CLP__
 endif
-
 if COIN_HAS_CPX
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
   symphony_LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+  AM_CPPFLAGS += -D__OSI_CPLEX__
 endif
 
 # if COIN_HAS_DYLP
@@ -145,19 +158,22 @@ endif
 if COIN_HAS_GLPK
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
-  symphony_LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la
+  symphony_LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
+  AM_CPPFLAGS += -D__OSI_GLPK__
 endif
 
 if COIN_HAS_OSL
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSLINCDIR)` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl`
   symphony_LDADD += $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
+  AM_CPPFLAGS += -D__OSI_OSL__
 endif
 
 if COIN_HAS_SPX
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
   symphony_LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
+AM_CPPFLAGS += -D__OSI_SPX__
 endif
 
 #if COIN_HAS_SYM
@@ -172,9 +188,12 @@ if COIN_HAS_XPR
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
   symphony_LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
+  AM_CPPFLAGS += -D__OSI_XPRESS__
 endif
 
-LIBS += $(ADDLIBS)
+symphony_LDADD += $(OSIOBJDIR)/src/libOsi.la \
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
+	$(ADDLIBS)
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
@@ -207,13 +226,73 @@ AM_CPPFLAGS += \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/inc` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(srcdir)/GMPL`
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src`
+#	-I`$(CYGPATH_W) $(srcdir)/GMPL`
 
-# List additional defines
-AM_CPPFLAGS += -DHAS_RANDOM -DHAS_SRANDOM -DUSE_CGL_CUTS -D__NONE__ -D__LINUX \
-	-DUSE_GLPMPL -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP \
-	-DCOMPILE_IN_TM
+########################################################################
+#                            Additional Definitions                    #
+########################################################################
+
+if COIN_HAS_READLINE
+AM_CPPFLAGS += -DHAS_READLINE
+endif
+
+if SENSITIVITY_ANALYSIS
+AM_CPPFLAGS += -DSENSITIVITY_ANALYSIS
+endif
+
+if USE_CGL_CUTS
+AM_CPPFLAGS += -DUSE_CGL_CUTS
+endif
+
+if USE_OSI_INTERFACE
+AM_CPPFLAGS += 
+endif
+
+if ROOT_NODE_ONLY
+AM_CPPFLAGS += -DROOT_NODE_ONLY
+endif
+
+#if CCMALLOC
+#AM_CPPFLAGS += 
+#endif
+
+if COMPILE_FRAC_BRANCHING
+AM_CPPFLAGS += -DCOMPILE_FRAC_BRANCHING
+endif
+
+if DO_TESTS
+AM_CPPFLAGS += -DDO_TESTS
+endif
+
+if TM_BASIS_TESTS
+AM_CPPFLAGS += -DTM_BASIS_TESTS
+endif
+
+if TRACE_PATH
+AM_CPPFLAGS += -DTRACE_PATH
+endif
+
+if CHECK_CUT_VALIDITY
+AM_CPPFLAGS += -DCHECK_CUT_VALIDITY
+endif
+
+if STATISTICS
+AM_CPPFLAGS += -DSTATISTICS
+endif
+
+if PSEUDO_COSTS
+AM_CPPFLAGS += -DPSEUDO_COSTS
+endif
+
+if DRAWGRAPH
+AM_CPPFLAGS += 
+endif
+
+#FIXME For now, assume that we have gmpl files, later check for GLPK package
+if USE_GMPL
+AM_CPPFLAGS += -DUSE_GLPMPL
+endif
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
@@ -221,11 +300,104 @@ AM_CPPFLAGS += -DHAS_RANDOM -DHAS_SRANDOM -DUSE_CGL_CUTS -D__NONE__ -D__LINUX \
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 
+########################################################################
+#                Application Library                                   #    
+########################################################################
+
+if SYM_WITH_APPL
+
+lib_LTLIBRARIES += libSymAppl.la
+
+libSymAppl_la_SOURCES = $(libSym_la_SOURCES)
+
+# $(SYMINCFILES) \
+# 	Master/master.c \
+# 	Master/master_wrapper.c \
+# 	Master/master_io.c \
+# 	Master/master_func.c \
+# 	TreeManager/tm_func.c \
+# 	TreeManager/tm_proccomm.c \
+# 	LP/lp_solver.c \
+# 	LP/lp_varfunc.c \
+# 	LP/lp_rowfunc.c \
+# 	LP/lp_genfunc.c \
+# 	LP/lp_proccomm.c \
+# 	LP/lp_wrapper.c \
+# 	LP/lp_free.c \
+# 	LP/lp_branch.c \
+# 	CutGen/cg_func.c \
+# 	CutGen/cg_wrapper.c \
+# 	CutPool/cp_proccomm.c \
+# 	CutPool/cp_func.c \
+# 	CutPool/cp_wrapper.c \
+# 	Common/timemeas.c \
+# 	Common/qsortucb.c \
+# 	Common/qsortucb_i.c \
+# 	Common/qsortucb_ii.c \
+# 	Common/qsortucb_id.c \
+# 	Common/qsortucb_di.c \
+# 	Common/qsortucb_ic.c \
+# 	Common/proccomm.c \
+# 	Common/pack_cut.c \
+# 	Common/pack_array.c 
+
+# $(SYMINCFILES) \
+# 	appl_src/appl_master.cpp \
+# 	appl_src/appl_master_wrapper.cpp \
+# 	appl_src/appl_master_io.cpp \
+# 	appl_src/appl_master_func.cpp \
+# 	appl_src/appl_tm_func.cpp \
+# 	appl_src/appl_tm_proccomm.cpp \
+# 	appl_src/appl_lp_solver.cpp \
+# 	appl_src/appl_lp_varfunc.cpp \
+# 	appl_src/appl_lp_rowfunc.cpp \
+# 	appl_src/appl_lp_genfunc.cpp \
+# 	appl_src/appl_lp_proccomm.cpp \
+# 	appl_src/appl_lp_wrapper.cpp \
+# 	appl_src/appl_lp_free.cpp \
+# 	appl_src/appl_lp_branch.cpp \
+# 	appl_src/appl_cg_func.cpp \
+# 	appl_src/appl_cg_wrapper.cpp \
+# 	appl_src/appl_cp_proccomm.cpp \
+# 	appl_src/appl_cp_func.cpp \
+# 	appl_src/appl_cp_wrapper.cpp \
+# 	appl_src/appl_timemeas.cpp \
+# 	appl_src/appl_qsortucb.cpp \
+# 	appl_src/appl_qsortucb_i.cpp \
+# 	appl_src/appl_qsortucb_ii.cpp \
+# 	appl_src/appl_qsortucb_id.cpp \
+# 	appl_src/appl_qsortucb_di.cpp \
+# 	appl_src/appl_qsortucb_ic.cpp \
+# 	appl_src/appl_proccomm.cpp \
+# 	appl_src/appl_pack_cut.cpp \
+# 	appl_src/appl_pack_array.cpp
+
+#libSymAppl_la_LIBADD = GMPL/libGmpl.la
+
+libSymAppl_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_SYM_APPLICATION
+
+# This is for libtool (on Windows)
+libSymAppl_la_LDFLAGS = $(LT_LDFLAGS)
+
+endif 
+
+COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
 # Compile everything with g++
 CC = $(CXX)
+# Get rid of warning flags
+#FIXME-Try to have the following later
+#CFLAGS := $(subst $(COIN_WARNINGS), ,$(CFLAGS))
+#CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
 
-# Get rid of C flags
-CFLAGS =
+CFLAGS := 
+
+if SYM_DEBUG
+CFLAGS += -g
+endif
+
+CFLAGS += -pipe
+CXXFLAGS := $(CFLAGS)
+
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -259,3 +431,5 @@ ConfigHeader = SymConfig.h
 
 # uninstall-local:
 # 	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
+
+CLEANFILES = dummy.cpp
