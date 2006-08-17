@@ -22,6 +22,11 @@ SUBDIRS = src
 #  SUBDIRS += test
 #endif
 
+#if SYM_WITH_CNRP
+#SUBDIRS += Applications/CNRP
+#endif
+
+
 ########################################################################
 #             Additional files to be included in tarball               #
 ########################################################################
