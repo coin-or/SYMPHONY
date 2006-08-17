@@ -482,7 +482,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LT_LDFLAGS RPATH_FLAGS COINUTILSSRCDIR COINUTILSOBJDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE CLPSRCDIR CLPOBJDIR COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE OSISRCDIR OSIOBJDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CGLSRCDIR CGLOBJDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CPXINCDIR CPXLIB COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE GLPKINCDIR GLPKLIB COIN_HAS_GLPK_TRUE COIN_HAS_GLPK_FALSE OSLINCDIR OSLLIB COIN_HAS_OSL_TRUE COIN_HAS_OSL_FALSE SPXINCDIR SPXLIB COIN_HAS_SPX_TRUE COIN_HAS_SPX_FALSE XPRINCDIR XPRLIB COIN_HAS_XPR_TRUE COIN_HAS_XPR_FALSE LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LT_LDFLAGS RPATH_FLAGS COIN_HAS_READLINE_TRUE COIN_HAS_READLINE_FALSE COINUTILSSRCDIR COINUTILSOBJDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE OSISRCDIR OSIOBJDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CGLSRCDIR CGLOBJDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CPXINCDIR CPXLIB COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE GLPKINCDIR GLPKLIB COIN_HAS_GLPK_TRUE COIN_HAS_GLPK_FALSE OSLINCDIR OSLLIB COIN_HAS_OSL_TRUE COIN_HAS_OSL_FALSE SPXINCDIR SPXLIB COIN_HAS_SPX_TRUE COIN_HAS_SPX_FALSE XPRINCDIR XPRLIB COIN_HAS_XPR_TRUE COIN_HAS_XPR_FALSE COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE CLPSRCDIR CLPOBJDIR USE_CGL_CUTS_TRUE USE_CGL_CUTS_FALSE USE_GMPL_TRUE USE_GMPL_FALSE USE_OSI_INTERFACE_TRUE USE_OSI_INTERFACE_FALSE SENSITIVITY_ANALYSIS_TRUE SENSITIVITY_ANALYSIS_FALSE ROOT_NODE_ONLY_TRUE ROOT_NODE_ONLY_FALSE COMPILE_FRAC_BRANCHING_TRUE COMPILE_FRAC_BRANCHING_FALSE DO_TESTS_TRUE DO_TESTS_FALSE TM_BASIS_TESTS_TRUE TM_BASIS_TESTS_FALSE TRACE_PATH_TRUE TRACE_PATH_FALSE CHECK_CUT_VALIDITY_TRUE CHECK_CUT_VALIDITY_FALSE STATISTICS_TRUE STATISTICS_FALSE PSEUDO_COSTS_TRUE PSEUDO_COSTS_FALSE DRAWGRAPH_TRUE DRAWGRAPH_FALSE SYM_PARALLEL_TRUE SYM_PARALLEL_FALSE PVM_ROOT COMPILE_IN_CG_TRUE COMPILE_IN_CG_FALSE COMPILE_IN_CP_TRUE COMPILE_IN_CP_FALSE COMPILE_IN_LP_TRUE COMPILE_IN_LP_FALSE COMPILE_IN_TM_TRUE COMPILE_IN_TM_FALSE SYM_WITH_APPL_TRUE SYM_WITH_APPL_FALSE SYM_WITH_CNRP_TRUE SYM_WITH_CNRP_FALSE SYM_WITH_MATCH_TRUE SYM_WITH_MATCH_FALSE SYM_WITH_MCKP_TRUE SYM_WITH_MCKP_FALSE SYM_WITH_MPP_TRUE SYM_WITH_MPP_FALSE SYM_WITH_SPP_TRUE SYM_WITH_SPP_FALSE SYM_WITH_SPP_CUTS_TRUE SYM_WITH_SPP_CUTS_FALSE SYM_WITH_USER_TRUE SYM_WITH_USER_FALSE SYM_WITH_VRP_TRUE SYM_WITH_VRP_FALSE SYMINCDIR SYMSRCDIR SYMDEFS COIN_HAS_CLP SYMAPPLDIR SYM_DEBUG_TRUE SYM_DEBUG_FALSE LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1110,6 +1110,20 @@ Optional Features:
   --enable-xpress-libcheck
                           use disable-xpress-libcheck to skip the
                           link check at configuration time
+  --disable-cgl-cuts      disable generic cut generation
+  --enable-sensitivity-analysis
+                          compile in the sensitivity analysis features
+  --enable-root-only      option to only process the root node
+  --enable-frac-branching whether to compile in the fractional branching
+                          option
+  --enable-tests          whether to perform additional sanity checks (for
+                          debugging purposes)
+  --enable-tm-tests       more tests...
+  --enable-trace-path     additional debugging options
+  --enable-cut-check      additional debugging options
+  --enable-statistics     additional statistics
+  --enable-pseudo-costs   enable some experimental pseudo-cost branching stuff
+  --enable-draw-graph     enable IGD graph drawing application
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1124,9 +1138,6 @@ Optional Packages:
                           both]
   --with-tags[=TAGS]
                           include additional configurations [automatic]
-  --with-sym-default-solver
-                          specify default solver for SYMPHONY in lower case
-                          letters (if not given, clp is assumed)
   --with-cplex-incdir specify the directory with the header files for library
                           Cplex
   --with-cplex-lib specify the flags to link with the library Cplex
@@ -1142,6 +1153,15 @@ Optional Packages:
   --with-xpress-incdir specify the directory with the header files for library
                           Xpress
   --with-xpress-lib specify the flags to link with the library Xpress
+  --with-gmpl             compile with GMPL reader
+  --with-osi-interface    compile with SymOsi interface
+  --with-pvm              set the root directory for pvm
+  --without-cg            compile without cut generator module
+  --without-cp            compile without cut pool module
+  --without-lp            compile without LP solver module
+  --without-tm            compile without tree manager module
+  --with-application      specify the application to be compiled with lower
+                          case
 
 Some influential environment variables:
   CDEFS       Additional -D flags to be used when compiling C code.
@@ -4792,7 +4812,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4795 "configure"' > conftest.$ac_ext
+  echo '#line 4815 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5926,7 +5946,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5929:" \
+echo "$as_me:5949:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6993,11 +7013,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6996: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7016: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7000: \$? = $ac_status" >&5
+   echo "$as_me:7020: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7261,11 +7281,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7264: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7284: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7268: \$? = $ac_status" >&5
+   echo "$as_me:7288: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7365,11 +7385,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7368: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7388: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7372: \$? = $ac_status" >&5
+   echo "$as_me:7392: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9710,7 +9730,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9713 "configure"
+#line 9733 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9810,7 +9830,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9813 "configure"
+#line 9833 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12154,11 +12174,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12157: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12177: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12161: \$? = $ac_status" >&5
+   echo "$as_me:12181: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -12258,11 +12278,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12261: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12281: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12265: \$? = $ac_status" >&5
+   echo "$as_me:12285: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13828,11 +13848,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13831: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13851: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13835: \$? = $ac_status" >&5
+   echo "$as_me:13855: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13932,11 +13952,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13935: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13955: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13939: \$? = $ac_status" >&5
+   echo "$as_me:13959: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16139,11 +16159,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16142: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16162: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16146: \$? = $ac_status" >&5
+   echo "$as_me:16166: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16407,11 +16427,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16410: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16430: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16414: \$? = $ac_status" >&5
+   echo "$as_me:16434: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16511,11 +16531,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16514: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16534: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16518: \$? = $ac_status" >&5
+   echo "$as_me:16538: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -20370,7 +20390,17 @@ _ACEOF
 
   LIBS="$coin_save_LIBS"
 fi
-:
+
+
+
+if test $coin_has_readline = yes; then
+  COIN_HAS_READLINE_TRUE=
+  COIN_HAS_READLINE_FALSE='#'
+else
+  COIN_HAS_READLINE_TRUE='#'
+  COIN_HAS_READLINE_FALSE=
+fi
+
 
 #############################################################################
 #                              COIN components                              #
@@ -20431,62 +20461,6 @@ fi
 
 echo "$as_me:$LINENO: result: $coin_has_coinutils" >&5
 echo "${ECHO_T}$coin_has_coinutils" >&6
-
-echo "$as_me:$LINENO: checking for COIN project Clp" >&5
-echo $ECHO_N "checking for COIN project Clp... $ECHO_C" >&6
-
-# First check, if the sub-project is actually available (ToDo: allow
-# other locations)
-
-coin_has_clp=unavailable
-if test x"$COIN_SKIP_PROJECTS" != x; then
-  for dir in $COIN_SKIP_PROJECTS; do
-    if test $dir = Clp; then
-      coin_has_clp=skipping
-    fi
-  done
-fi
-
-if test $coin_has_clp != skipping; then
-  if test $PACKAGE_TARNAME = clp; then
-    coin_has_clp=.
-  else
-    if test -d $srcdir/../Clp; then
-      coin_has_clp=../Clp
-    fi
-  fi
-fi
-
-if test $coin_has_clp != unavailable &&
-   test $coin_has_clp != skipping; then
-  # Set the #define if the component is available
-
-cat >>confdefs.h <<\_ACEOF
-#define COIN_HAS_CLP 1
-_ACEOF
-
-
-  # Set the variables for source and object code location
-
-  CLPSRCDIR=`cd $srcdir/$coin_has_clp; pwd`
-
-  CLPOBJDIR=`pwd`/$coin_has_clp
-fi
-
-  # Define the Makefile conditional
-
-
-if test $coin_has_clp != unavailable &&
-                test $coin_has_clp != skipping; then
-  COIN_HAS_CLP_TRUE=
-  COIN_HAS_CLP_FALSE='#'
-else
-  COIN_HAS_CLP_TRUE='#'
-  COIN_HAS_CLP_FALSE=
-fi
-
-echo "$as_me:$LINENO: result: $coin_has_clp" >&5
-echo "${ECHO_T}$coin_has_clp" >&6
 
 echo "$as_me:$LINENO: checking for COIN project Osi" >&5
 echo $ECHO_N "checking for COIN project Osi... $ECHO_C" >&6
@@ -20600,42 +20574,6 @@ fi
 echo "$as_me:$LINENO: result: $coin_has_cgl" >&5
 echo "${ECHO_T}$coin_has_cgl" >&6
 
-
-# ToDo: find out when CBC_HAS_CLP should be defined!  For now, I
-# replaced all CBC_USE by COIN_HAS #ifdef's
-
-# Decide which one is the default solver
-echo "$as_me:$LINENO: checking for SYMPHONY default solver" >&5
-echo $ECHO_N "checking for SYMPHONY default solver... $ECHO_C" >&6
-
-# Check whether --with-sym-default-solver or --without-sym-default-solver was given.
-if test "${with_sym_default_solver+set}" = set; then
-  withval="$with_sym_default_solver"
-  sym_default_solver=$with_val
-else
-  sym_default_solver=clp
-fi;
-echo "$as_me:$LINENO: result: $sym_default_solver" >&5
-echo "${ECHO_T}$sym_default_solver" >&6
-
-case $sym_default_solver in
-  clp)
-
-cat >>confdefs.h <<\_ACEOF
-#define SYM_DEFAULT_SOLVER "clp"
-_ACEOF
-
-    ;;
-#  glpk)
-#    AC_DEFINE([SYM_DEFAULT_SOLVER],"glpk",[GLPK is chosen...])
-#    AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h],[glp_lpx_simplex])
-#    ;;
-  *)
-    { { echo "$as_me:$LINENO: error: Unknown solver $sym_default_solver chosen as SYMPHONY's default solver" >&5
-echo "$as_me: error: Unknown solver $sym_default_solver chosen as SYMPHONY's default solver" >&2;}
-   { (exit 1); exit 1; }; }
-    ;;
-esac
 
 #############################################################################
 #                            Third party solvers                            #
@@ -20871,66 +20809,6 @@ fi
 
   # Check if the symbol is provided in the library
   # ToDo: FOR NOW WE ASSUME THAT WE ARE USING THE C++ COMPILER
-  if test x"$glpk_libcheck" != xno; then
-                    coin_save_LIBS="$LIBS"
-                    LIBS="$GLPKLIB $ADDLIBS"
-		    echo "$as_me:$LINENO: checking whether symbol glp_lpx_simplex is available with GLPK" >&5
-echo $ECHO_N "checking whether symbol glp_lpx_simplex is available with GLPK... $ECHO_C" >&6
-# ToDo find out what to do about extern "C"
-#                    AC_TRY_LINK([extern "C" {void glp_lpx_simplex();}],[glp_lpx_simplex()],
-                    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-void glp_lpx_simplex();
-int
-main ()
-{
-glp_lpx_simplex()
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-                                 { { echo "$as_me:$LINENO: error: Cannot find symbol glp_lpx_simplex with GLPK" >&5
-echo "$as_me: error: Cannot find symbol glp_lpx_simplex with GLPK" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-                    LIBS="$coin_save_LIBS"
-                  fi
 
   ADDLIBS="$GLPKLIB $ADDLIBS"
 
@@ -20955,7 +20833,7 @@ else
   COIN_HAS_GLPK_FALSE=
 fi
 
-
+#,[glp_lpx_simplex])
 
 echo "$as_me:$LINENO: checking if user provides library for Osl" >&5
 echo $ECHO_N "checking if user provides library for Osl... $ECHO_C" >&6
@@ -21369,6 +21247,718 @@ fi
 
 
 #############################################################################
+#                      Check for the LP solver                              #
+#############################################################################
+
+
+
+if false; then
+  COIN_HAS_CLP_TRUE=
+  COIN_HAS_CLP_FALSE='#'
+else
+  COIN_HAS_CLP_TRUE='#'
+  COIN_HAS_CLP_FALSE=
+fi
+
+
+echo "$as_me:$LINENO: checking for SYMPHONY default solver" >&5
+echo $ECHO_N "checking for SYMPHONY default solver... $ECHO_C" >&6
+if test $coin_has_glpk = true; then
+   echo "$as_me:$LINENO: result: glpk" >&5
+echo "${ECHO_T}glpk" >&6
+elif test -r $coin_has_cplex = true; then
+   echo "$as_me:$LINENO: result: cplex" >&5
+echo "${ECHO_T}cplex" >&6
+#FIXME! What is wrong with osl?
+elif test -r $coin_has_soplex = true; then
+   echo "$as_me:$LINENO: result: soplex" >&5
+echo "${ECHO_T}soplex" >&6
+elif test -r $coin_has_xpress = true; then
+   echo "$as_me:$LINENO: result: xpress" >&5
+echo "${ECHO_T}xpress" >&6
+else
+   echo "$as_me:$LINENO: result: clp" >&5
+echo "${ECHO_T}clp" >&6
+   echo "$as_me:$LINENO: checking for COIN project Clp" >&5
+echo $ECHO_N "checking for COIN project Clp... $ECHO_C" >&6
+
+# First check, if the sub-project is actually available (ToDo: allow
+# other locations)
+
+coin_has_clp=unavailable
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = Clp; then
+      coin_has_clp=skipping
+    fi
+  done
+fi
+
+if test $coin_has_clp != skipping; then
+  if test $PACKAGE_TARNAME = clp; then
+    coin_has_clp=.
+  else
+    if test -d $srcdir/../Clp; then
+      coin_has_clp=../Clp
+    fi
+  fi
+fi
+
+if test $coin_has_clp != unavailable &&
+   test $coin_has_clp != skipping; then
+  # Set the #define if the component is available
+
+cat >>confdefs.h <<\_ACEOF
+#define COIN_HAS_CLP 1
+_ACEOF
+
+
+  # Set the variables for source and object code location
+
+  CLPSRCDIR=`cd $srcdir/$coin_has_clp; pwd`
+
+  CLPOBJDIR=`pwd`/$coin_has_clp
+fi
+
+  # Define the Makefile conditional
+
+
+if test $coin_has_clp != unavailable &&
+                test $coin_has_clp != skipping; then
+  COIN_HAS_CLP_TRUE=
+  COIN_HAS_CLP_FALSE='#'
+else
+  COIN_HAS_CLP_TRUE='#'
+  COIN_HAS_CLP_FALSE=
+fi
+
+echo "$as_me:$LINENO: result: $coin_has_clp" >&5
+echo "${ECHO_T}$coin_has_clp" >&6
+
+fi
+
+#############################################################################
+#                       Add the options                                     #
+#############################################################################
+
+#FIXME! Should we carry this to root config file?
+#---------------------------------------------------------------------------#
+# USE_CGL_CUTS
+#---------------------------------------------------------------------------#
+# Check whether --enable-cgl-cuts or --disable-cgl-cuts was given.
+if test "${enable_cgl_cuts+set}" = set; then
+  enableval="$enable_cgl_cuts"
+  case "${enableval}" in
+   yes) sym_cut_generation=true
+   ;;
+   no)  sym_cut_generation=no
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-cgl-cuts" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-cgl-cuts" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_cut_generation=true
+fi;
+
+
+
+if test $sym_cut_generation = true; then
+  USE_CGL_CUTS_TRUE=
+  USE_CGL_CUTS_FALSE='#'
+else
+  USE_CGL_CUTS_TRUE='#'
+  USE_CGL_CUTS_FALSE=
+fi
+
+
+#---------------------------------------------------------------------------#
+#USE_GMPL
+#FIXME! Check for GLPK!
+#---------------------------------------------------------------------------#
+#AC_MSG_CHECKING([whether to compile in gmpl])
+
+# Check whether --with-gmpl or --without-gmpl was given.
+if test "${with_gmpl+set}" = set; then
+  withval="$with_gmpl"
+  sym_gmpl=$withval
+else
+  sym_gmpl=no
+fi;
+
+
+if test "$sym_gmpl" = yes; then
+  USE_GMPL_TRUE=
+  USE_GMPL_FALSE='#'
+else
+  USE_GMPL_TRUE='#'
+  USE_GMPL_FALSE=
+fi
+
+
+#FIXME! NO WAY TO COMPILE OSISYM! all other packages refer to SYM instead of
+# SYMPHONY
+#---------------------------------------------------------------------------#
+# USE_OSI_INTERFACE
+#---------------------------------------------------------------------------#
+echo "$as_me:$LINENO: checking whether to compile osi interface" >&5
+echo $ECHO_N "checking whether to compile osi interface... $ECHO_C" >&6
+
+# Check whether --with-osi-interface or --without-osi-interface was given.
+if test "${with_osi_interface+set}" = set; then
+  withval="$with_osi_interface"
+  sym_osi=$withval
+fi;
+
+if test "$sym_osi" = yes; then
+   echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+ else
+   echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+ fi
+
+
+if test "$sym_osi" = yes; then
+  USE_OSI_INTERFACE_TRUE=
+  USE_OSI_INTERFACE_FALSE='#'
+else
+  USE_OSI_INTERFACE_TRUE='#'
+  USE_OSI_INTERFACE_FALSE=
+fi
+
+
+#---------------------------------------------------------------------------#
+# SENSITIVITY_ANALYSIS
+#---------------------------------------------------------------------------#
+
+#AC_MSG_CHECKING([whether we want to compile in sensitivity analysis features])
+# Check whether --enable-sensitivity-analysis or --disable-sensitivity-analysis was given.
+if test "${enable_sensitivity_analysis+set}" = set; then
+  enableval="$enable_sensitivity_analysis"
+  case "${enableval}" in
+   yes) sym_sensitivity=true
+   ;;
+   no)  sym_sensitivity=false
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-sensitivity-analysis" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-sensitivity-analysis" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_sensitivity=false
+fi;
+#if test $sym_sensitivity = true; then
+#  AC_MSG_RESULT([yes])
+#else
+#  AC_MSG_RESULT([no])
+#fi
+
+
+if test $sym_sensitivity = true; then
+  SENSITIVITY_ANALYSIS_TRUE=
+  SENSITIVITY_ANALYSIS_FALSE='#'
+else
+  SENSITIVITY_ANALYSIS_TRUE='#'
+  SENSITIVITY_ANALYSIS_FALSE=
+fi
+
+
+#---------------------------------------------------------------------------#
+# ROOT_NODE_ONLY
+#---------------------------------------------------------------------------#
+
+# Check whether --enable-root-only or --disable-root-only was given.
+if test "${enable_root_only+set}" = set; then
+  enableval="$enable_root_only"
+  case "${enableval}" in
+   yes) sym_root_only=true
+   ;;
+   no)  sym_root_only=false
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-root-only" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-root-only" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_root_only=false
+fi;
+
+
+
+if test $sym_root_only = true; then
+  ROOT_NODE_ONLY_TRUE=
+  ROOT_NODE_ONLY_FALSE='#'
+else
+  ROOT_NODE_ONLY_TRUE='#'
+  ROOT_NODE_ONLY_FALSE=
+fi
+
+
+#---------------------------------------------------------------------------#
+# FIXME CCMALLOC
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+# COMPILE_FRAC_BRANCHING
+#---------------------------------------------------------------------------#
+
+# Check whether --enable-frac-branching or --disable-frac-branching was given.
+if test "${enable_frac_branching+set}" = set; then
+  enableval="$enable_frac_branching"
+  case "${enableval}" in
+   yes) sym_frac_branch=true
+   ;;
+   no)  sym_frac_branch=false
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-frac-branching" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-frac-branching" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_frac_branch=false
+fi;
+
+
+
+if test $sym_frac_branch = true; then
+  COMPILE_FRAC_BRANCHING_TRUE=
+  COMPILE_FRAC_BRANCHING_FALSE='#'
+else
+  COMPILE_FRAC_BRANCHING_TRUE='#'
+  COMPILE_FRAC_BRANCHING_FALSE=
+fi
+
+
+
+#---------------------------------------------------------------------------#
+# DO_TESTS
+#---------------------------------------------------------------------------#
+
+# Check whether --enable-tests or --disable-tests was given.
+if test "${enable_tests+set}" = set; then
+  enableval="$enable_tests"
+  case "${enableval}" in
+   yes) sym_tests=true
+   ;;
+   no)  sym_tests=false
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-tests" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-tests" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_tests=false
+fi;
+
+
+
+if test $sym_tests = true; then
+  DO_TESTS_TRUE=
+  DO_TESTS_FALSE='#'
+else
+  DO_TESTS_TRUE='#'
+  DO_TESTS_FALSE=
+fi
+
+
+#---------------------------------------------------------------------------#
+# TM_BASIS_TESTS
+#---------------------------------------------------------------------------#
+
+# Check whether --enable-tm-tests or --disable-tm-tests was given.
+if test "${enable_tm_tests+set}" = set; then
+  enableval="$enable_tm_tests"
+  case "${enableval}" in
+   yes) sym_tm_tests=true
+   ;;
+   no)  sym_tm_tests=false
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-tm-tests" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-tm-tests" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_tm_tests=false
+fi;
+
+
+
+if test $sym_tm_tests = true; then
+  TM_BASIS_TESTS_TRUE=
+  TM_BASIS_TESTS_FALSE='#'
+else
+  TM_BASIS_TESTS_TRUE='#'
+  TM_BASIS_TESTS_FALSE=
+fi
+
+
+#---------------------------------------------------------------------------#
+# TRACE_PATH
+#---------------------------------------------------------------------------#
+
+# Check whether --enable-trace-path or --disable-trace-path was given.
+if test "${enable_trace_path+set}" = set; then
+  enableval="$enable_trace_path"
+  case "${enableval}" in
+   yes) sym_trace_path=true
+   ;;
+   no)  sym_trace_path=false
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-trace-path" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-trace-path" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_trace_path=false
+fi;
+
+
+
+if test $sym_trace_path = true; then
+  TRACE_PATH_TRUE=
+  TRACE_PATH_FALSE='#'
+else
+  TRACE_PATH_TRUE='#'
+  TRACE_PATH_FALSE=
+fi
+
+
+#---------------------------------------------------------------------------#
+# CHECK_CUT_VALIDITY
+#---------------------------------------------------------------------------#
+
+# Check whether --enable-cut-check or --disable-cut-check was given.
+if test "${enable_cut_check+set}" = set; then
+  enableval="$enable_cut_check"
+  case "${enableval}" in
+   yes) sym_cut_check=true
+   ;;
+   no)  sym_cut_check=false
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-cut-check" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-cut-check" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_cut_check=false
+fi;
+
+
+
+if test $sym_cut_check = true; then
+  CHECK_CUT_VALIDITY_TRUE=
+  CHECK_CUT_VALIDITY_FALSE='#'
+else
+  CHECK_CUT_VALIDITY_TRUE='#'
+  CHECK_CUT_VALIDITY_FALSE=
+fi
+
+
+#---------------------------------------------------------------------------#
+# STATISTICS
+#---------------------------------------------------------------------------#
+
+# Check whether --enable-statistics or --disable-statistics was given.
+if test "${enable_statistics+set}" = set; then
+  enableval="$enable_statistics"
+  case "${enableval}" in
+   yes) sym_statistics=true
+   ;;
+   no)  sym_sttistics=false
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-statistics" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-statistics" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_statistics=false
+fi;
+
+
+
+if test $sym_statistics = true; then
+  STATISTICS_TRUE=
+  STATISTICS_FALSE='#'
+else
+  STATISTICS_TRUE='#'
+  STATISTICS_FALSE=
+fi
+
+
+#---------------------------------------------------------------------------#
+# PSEUDO_COSTS
+#---------------------------------------------------------------------------#
+
+# Check whether --enable-pseudo-costs or --disable-pseudo-costs was given.
+if test "${enable_pseudo_costs+set}" = set; then
+  enableval="$enable_pseudo_costs"
+  case "${enableval}" in
+   yes) sym_pseudo_costs=true
+   ;;
+   no)  sym_pseudo_costs=false
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-pseudo-costs" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-pseudo-costs" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_pseudo_costs=false
+fi;
+
+
+
+if test $sym_pseudo_costs = true; then
+  PSEUDO_COSTS_TRUE=
+  PSEUDO_COSTS_FALSE='#'
+else
+  PSEUDO_COSTS_TRUE='#'
+  PSEUDO_COSTS_FALSE=
+fi
+
+
+#---------------------------------------------------------------------------#
+# DRAWGRAPH
+#---------------------------------------------------------------------------#
+
+# Check whether --enable-draw-graph or --disable-draw-graph was given.
+if test "${enable_draw_graph+set}" = set; then
+  enableval="$enable_draw_graph"
+  case "${enableval}" in
+   yes) sym_graph=true
+   ;;
+   no)  sym_graph=false
+   ;;
+   *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-graph" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-graph" >&2;}
+   { (exit 1); exit 1; }; }
+   ;;
+esac
+else
+  sym_graph=false
+fi;
+
+
+
+if test $sym_graph = true; then
+  DRAWGRAPH_TRUE=
+  DRAWGRAPH_FALSE='#'
+else
+  DRAWGRAPH_TRUE='#'
+  DRAWGRAPH_FALSE=
+fi
+
+
+
+#############################################################################
+#              Check the OS and add default defs                            #
+#############################################################################
+
+SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM -D__NONE__'
+
+case $build in
+  *-cygwin* | *-mingw*)
+       SYMDEFS="$SYMDEFS -D__CYGWIN" ;;
+  *-darwin*)
+       SYMDEFS="$SYMDEFS -D__DARWIN" ;;
+  *-linux-*)
+       SYMDEFS="$SYMDEFS -D__LINUX" ;;
+  *-alpha-*)
+       SYMDEFS="$SYMDEFS -D__ALPHA" ;;
+  *-aix-*)
+       SYMDEFS="$SYMDEFS -D__RS6K" ;;
+  *-sun-*)
+       case $build in
+            *-i86pc-*)
+                SYMDEFS="$SYMDEFS -D__X86SOL2" ;;
+            *-5.-*)
+                SYMDEFS="$SYMDEFS -D__SUN4SOL2"
+                np=$(shell mpstat | wc -l -gt -a)
+                case $np in
+                    ON)
+                       SYMDEFS="$SYMDEFS -D__SUNMP";;
+                esac
+            ;;
+       esac
+       ;;
+  *-sgi-*)
+       SYMDEFS="$SYMDEFS -D__" ;;
+  *-hp-*)
+       SYMDEFS="$SYMDEFS -D__" ;;
+  *-ibm-*)
+       SYMDEFS="$SYMDEFS -D__" ;;
+  *)
+       { { echo "$as_me:$LINENO: error: Unknown OS" >&5
+echo "$as_me: error: Unknown OS" >&2;}
+   { (exit 1); exit 1; }; } ;;
+esac
+
+#############################################################################
+#                       Parallel configuration                              #
+#############################################################################
+echo "$as_me:$LINENO: checking whether to compile in the parallel configuration" >&5
+echo $ECHO_N "checking whether to compile in the parallel configuration... $ECHO_C" >&6
+
+# Check whether --with-pvm or --without-pvm was given.
+if test "${with_pvm+set}" = set; then
+  withval="$with_pvm"
+  PVM_ROOT=$withval
+else
+  PVM_ROOT=none
+fi;
+sym_parallel=yes
+case $PVM_ROOT in
+     none)
+    sym_parallel=false
+    echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+     ;;
+     *)
+     as_ac_File=`echo "ac_cv_file_$PVM_ROOT/src/pvmalloc.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $PVM_ROOT/src/pvmalloc.h" >&5
+echo $ECHO_N "checking for $PVM_ROOT/src/pvmalloc.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$PVM_ROOT/src/pvmalloc.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  :
+else
+  { { echo "$as_me:$LINENO: error: Cannot find the pvm header files
+in $PVM_ROOT/src" >&5
+echo "$as_me: error: Cannot find the pvm header files
+in $PVM_ROOT/src" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+    echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+    ;;
+esac
+
+
+
+if test "$sym_parallel" = yes; then
+  SYM_PARALLEL_TRUE=
+  SYM_PARALLEL_FALSE='#'
+else
+  SYM_PARALLEL_TRUE='#'
+  SYM_PARALLEL_FALSE=
+fi
+
+
+
+#---------------------------------------------------------------------------#
+
+#AC_MSG_CHECKING([whether to compile in cg])
+
+# Check whether --with-cg or --without-cg was given.
+if test "${with_cg+set}" = set; then
+  withval="$with_cg"
+  in_cg=$withval
+else
+  in_cg=yes
+fi;
+
+
+if test "$in_cg" = yes; then
+  COMPILE_IN_CG_TRUE=
+  COMPILE_IN_CG_FALSE='#'
+else
+  COMPILE_IN_CG_TRUE='#'
+  COMPILE_IN_CG_FALSE=
+fi
+
+
+#AC_MSG_CHECKING([whether to compile in cp])
+
+# Check whether --with-cg or --without-cg was given.
+if test "${with_cg+set}" = set; then
+  withval="$with_cg"
+  in_cp=$withval
+else
+  in_cp=yes
+fi;
+
+
+if test "$in_cp" = yes; then
+  COMPILE_IN_CP_TRUE=
+  COMPILE_IN_CP_FALSE='#'
+else
+  COMPILE_IN_CP_TRUE='#'
+  COMPILE_IN_CP_FALSE=
+fi
+
+
+
+#AC_MSG_CHECKING([whether to compile in lp])
+
+# Check whether --with-lp or --without-lp was given.
+if test "${with_lp+set}" = set; then
+  withval="$with_lp"
+  in_lp=$withval
+else
+  in_lp=yes
+fi;
+
+
+if test "$in_lp" = yes; then
+  COMPILE_IN_LP_TRUE=
+  COMPILE_IN_LP_FALSE='#'
+else
+  COMPILE_IN_LP_TRUE='#'
+  COMPILE_IN_LP_FALSE=
+fi
+
+
+#AC_MSG_CHECKING([whether to compile in tm])
+
+# Check whether --with-tm or --without-tm was given.
+if test "${with_tm+set}" = set; then
+  withval="$with_tm"
+  in_tm=$withval
+else
+  in_tm=yes
+fi;
+
+
+if test "$in_tm" = yes; then
+  COMPILE_IN_TM_TRUE=
+  COMPILE_IN_TM_FALSE='#'
+else
+  COMPILE_IN_TM_TRUE='#'
+  COMPILE_IN_TM_FALSE=
+fi
+
+
+
+#FIXME-For now, add defaults to SYMDEFS
+
+SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP -DCOMPILE_IN_TM "
+
+#############################################################################
 #                       Other third party software                          #
 #############################################################################
 
@@ -21386,17 +21976,192 @@ fi
 #AC_COIN_VPATH_LINK(examples/quad.mps)
 #AC_COIN_VPATH_LINK(examples/quad2.mps)
 
+
+#############################################################################
+#                       Applications                                        #
+#############################################################################
+
+
+if false; then
+  SYM_WITH_APPL_TRUE=
+  SYM_WITH_APPL_FALSE='#'
+else
+  SYM_WITH_APPL_TRUE='#'
+  SYM_WITH_APPL_FALSE=
+fi
+
+echo "$as_me:$LINENO: checking for the application to be compiled" >&5
+echo $ECHO_N "checking for the application to be compiled... $ECHO_C" >&6
+
+# Check whether --with-application or --without-application was given.
+if test "${with_application+set}" = set; then
+  withval="$with_application"
+  sym_appl=$withval
+else
+  sym_appl=none
+fi;
+
+sym_with_appl=true
+case $sym_appl in
+     cnrp)
+     ;;
+     match)
+     ;;
+     mckp)
+     ;;
+     mpp)
+     ;;
+     spp)
+     ;;
+     spp_with_cuts)
+     ;;
+     user)
+     ;;
+     vrp)
+     ;;
+     none)
+     sym_with_appl=false
+     ;;
+     *)
+     { { echo "$as_me:$LINENO: error: Unknown application is requested to be compiled!" >&5
+echo "$as_me: error: Unknown application is requested to be compiled!" >&2;}
+   { (exit 1); exit 1; }; }
+     ;;
+esac
+echo "$as_me:$LINENO: result: $sym_appl" >&5
+echo "${ECHO_T}$sym_appl" >&6
+
+
+if test $sym_with_appl = true; then
+  SYM_WITH_APPL_TRUE=
+  SYM_WITH_APPL_FALSE='#'
+else
+  SYM_WITH_APPL_TRUE='#'
+  SYM_WITH_APPL_FALSE=
+fi
+
+
+
+if test $sym_appl = cnrp; then
+  SYM_WITH_CNRP_TRUE=
+  SYM_WITH_CNRP_FALSE='#'
+else
+  SYM_WITH_CNRP_TRUE='#'
+  SYM_WITH_CNRP_FALSE=
+fi
+
+
+
+if test $sym_appl = match; then
+  SYM_WITH_MATCH_TRUE=
+  SYM_WITH_MATCH_FALSE='#'
+else
+  SYM_WITH_MATCH_TRUE='#'
+  SYM_WITH_MATCH_FALSE=
+fi
+
+
+
+if test $sym_appl = mckp; then
+  SYM_WITH_MCKP_TRUE=
+  SYM_WITH_MCKP_FALSE='#'
+else
+  SYM_WITH_MCKP_TRUE='#'
+  SYM_WITH_MCKP_FALSE=
+fi
+
+
+
+if test $sym_appl = mpp; then
+  SYM_WITH_MPP_TRUE=
+  SYM_WITH_MPP_FALSE='#'
+else
+  SYM_WITH_MPP_TRUE='#'
+  SYM_WITH_MPP_FALSE=
+fi
+
+
+
+if test $sym_appl = spp; then
+  SYM_WITH_SPP_TRUE=
+  SYM_WITH_SPP_FALSE='#'
+else
+  SYM_WITH_SPP_TRUE='#'
+  SYM_WITH_SPP_FALSE=
+fi
+
+
+
+if test $sym_appl = spp_with_cuts; then
+  SYM_WITH_SPP_CUTS_TRUE=
+  SYM_WITH_SPP_CUTS_FALSE='#'
+else
+  SYM_WITH_SPP_CUTS_TRUE='#'
+  SYM_WITH_SPP_CUTS_FALSE=
+fi
+
+
+
+if test $sym_appl = user; then
+  SYM_WITH_USER_TRUE=
+  SYM_WITH_USER_FALSE='#'
+else
+  SYM_WITH_USER_TRUE='#'
+  SYM_WITH_USER_FALSE=
+fi
+
+
+
+if test $sym_appl = vrp; then
+  SYM_WITH_VRP_TRUE=
+  SYM_WITH_VRP_FALSE='#'
+else
+  SYM_WITH_VRP_TRUE='#'
+  SYM_WITH_VRP_FALSE=
+fi
+
+
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
+# Location of SYMPHONY for later use
+
+
+SYMINCDIR=`pwd`/include
+SYMSRCDIR=`pwd`/src
+
+# To be used in applications: default SYMPHONY defs
+
+
+
+# Location of Applications for later use
+
+SYMAPPLDIR=`pwd`/Applications
+
+#FIXME-Debugging conditional, for now
+
+
+
+if  test $coin_debug_compile = true; then
+  SYM_DEBUG_TRUE=
+  SYM_DEBUG_FALSE='#'
+else
+  SYM_DEBUG_TRUE='#'
+  SYM_DEBUG_FALSE=
+fi
+
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                        ac_config_files="$ac_config_files Makefile src/Makefile src/GMPL/Makefile sym_addlibs.txt"
+                                                  ac_config_files="$ac_config_files Makefile src/Makefile Applications/CNRP/Makefile Applications/USER/Makefile sym_addlibs.txt"
 
+
+#src/GMPL/Makefile
 
 # Here put the location and name of the configuration header file
           ac_config_headers="$ac_config_headers include/config_sym.h"
+
+
 
 
 # Finally, we let configure write all the output...
@@ -21551,17 +22316,17 @@ echo "$as_me: error: conditional \"HAVE_EXTERNALS\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${COIN_HAS_READLINE_TRUE}" && test -z "${COIN_HAS_READLINE_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_READLINE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COIN_HAS_READLINE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${COIN_HAS_COINUTILS_TRUE}" && test -z "${COIN_HAS_COINUTILS_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_COINUTILS\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"COIN_HAS_COINUTILS\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${COIN_HAS_CLP_TRUE}" && test -z "${COIN_HAS_CLP_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_CLP\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"COIN_HAS_CLP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -21611,6 +22376,223 @@ if test -z "${COIN_HAS_XPR_TRUE}" && test -z "${COIN_HAS_XPR_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_XPR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"COIN_HAS_XPR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COIN_HAS_CLP_TRUE}" && test -z "${COIN_HAS_CLP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_CLP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COIN_HAS_CLP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COIN_HAS_CLP_TRUE}" && test -z "${COIN_HAS_CLP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_CLP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COIN_HAS_CLP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${USE_CGL_CUTS_TRUE}" && test -z "${USE_CGL_CUTS_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"USE_CGL_CUTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"USE_CGL_CUTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${USE_GMPL_TRUE}" && test -z "${USE_GMPL_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"USE_GMPL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"USE_GMPL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${USE_OSI_INTERFACE_TRUE}" && test -z "${USE_OSI_INTERFACE_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"USE_OSI_INTERFACE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"USE_OSI_INTERFACE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SENSITIVITY_ANALYSIS_TRUE}" && test -z "${SENSITIVITY_ANALYSIS_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SENSITIVITY_ANALYSIS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SENSITIVITY_ANALYSIS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ROOT_NODE_ONLY_TRUE}" && test -z "${ROOT_NODE_ONLY_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"ROOT_NODE_ONLY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"ROOT_NODE_ONLY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COMPILE_FRAC_BRANCHING_TRUE}" && test -z "${COMPILE_FRAC_BRANCHING_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COMPILE_FRAC_BRANCHING\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COMPILE_FRAC_BRANCHING\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${DO_TESTS_TRUE}" && test -z "${DO_TESTS_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"DO_TESTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"DO_TESTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${TM_BASIS_TESTS_TRUE}" && test -z "${TM_BASIS_TESTS_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"TM_BASIS_TESTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"TM_BASIS_TESTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${TRACE_PATH_TRUE}" && test -z "${TRACE_PATH_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"TRACE_PATH\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"TRACE_PATH\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${CHECK_CUT_VALIDITY_TRUE}" && test -z "${CHECK_CUT_VALIDITY_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"CHECK_CUT_VALIDITY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"CHECK_CUT_VALIDITY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${STATISTICS_TRUE}" && test -z "${STATISTICS_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"STATISTICS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"STATISTICS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${PSEUDO_COSTS_TRUE}" && test -z "${PSEUDO_COSTS_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"PSEUDO_COSTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"PSEUDO_COSTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${DRAWGRAPH_TRUE}" && test -z "${DRAWGRAPH_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"DRAWGRAPH\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"DRAWGRAPH\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_PARALLEL_TRUE}" && test -z "${SYM_PARALLEL_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_PARALLEL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_PARALLEL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COMPILE_IN_CG_TRUE}" && test -z "${COMPILE_IN_CG_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COMPILE_IN_CG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COMPILE_IN_CG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COMPILE_IN_CP_TRUE}" && test -z "${COMPILE_IN_CP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COMPILE_IN_CP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COMPILE_IN_CP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COMPILE_IN_LP_TRUE}" && test -z "${COMPILE_IN_LP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COMPILE_IN_LP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COMPILE_IN_LP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COMPILE_IN_TM_TRUE}" && test -z "${COMPILE_IN_TM_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COMPILE_IN_TM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COMPILE_IN_TM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_WITH_APPL_TRUE}" && test -z "${SYM_WITH_APPL_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_APPL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_APPL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_WITH_APPL_TRUE}" && test -z "${SYM_WITH_APPL_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_APPL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_APPL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_WITH_CNRP_TRUE}" && test -z "${SYM_WITH_CNRP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_CNRP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_CNRP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_WITH_MATCH_TRUE}" && test -z "${SYM_WITH_MATCH_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_MATCH\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_MATCH\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_WITH_MCKP_TRUE}" && test -z "${SYM_WITH_MCKP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_MCKP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_MCKP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_WITH_MPP_TRUE}" && test -z "${SYM_WITH_MPP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_MPP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_MPP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_WITH_SPP_TRUE}" && test -z "${SYM_WITH_SPP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_SPP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_SPP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_WITH_SPP_CUTS_TRUE}" && test -z "${SYM_WITH_SPP_CUTS_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_SPP_CUTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_SPP_CUTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_WITH_USER_TRUE}" && test -z "${SYM_WITH_USER_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_USER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_USER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_WITH_VRP_TRUE}" && test -z "${SYM_WITH_VRP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_VRP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_VRP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYM_DEBUG_TRUE}" && test -z "${SYM_DEBUG_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_DEBUG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_DEBUG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -22060,7 +23042,8 @@ do
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-  "src/GMPL/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/GMPL/Makefile" ;;
+  "Applications/CNRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/CNRP/Makefile" ;;
+  "Applications/USER/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/USER/Makefile" ;;
   "sym_addlibs.txt" ) CONFIG_FILES="$CONFIG_FILES sym_addlibs.txt" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/config_sym.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config_sym.h" ;;
@@ -22245,14 +23228,12 @@ s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
 s,@LT_LDFLAGS@,$LT_LDFLAGS,;t t
 s,@RPATH_FLAGS@,$RPATH_FLAGS,;t t
+s,@COIN_HAS_READLINE_TRUE@,$COIN_HAS_READLINE_TRUE,;t t
+s,@COIN_HAS_READLINE_FALSE@,$COIN_HAS_READLINE_FALSE,;t t
 s,@COINUTILSSRCDIR@,$COINUTILSSRCDIR,;t t
 s,@COINUTILSOBJDIR@,$COINUTILSOBJDIR,;t t
 s,@COIN_HAS_COINUTILS_TRUE@,$COIN_HAS_COINUTILS_TRUE,;t t
 s,@COIN_HAS_COINUTILS_FALSE@,$COIN_HAS_COINUTILS_FALSE,;t t
-s,@CLPSRCDIR@,$CLPSRCDIR,;t t
-s,@CLPOBJDIR@,$CLPOBJDIR,;t t
-s,@COIN_HAS_CLP_TRUE@,$COIN_HAS_CLP_TRUE,;t t
-s,@COIN_HAS_CLP_FALSE@,$COIN_HAS_CLP_FALSE,;t t
 s,@OSISRCDIR@,$OSISRCDIR,;t t
 s,@OSIOBJDIR@,$OSIOBJDIR,;t t
 s,@COIN_HAS_OSI_TRUE@,$COIN_HAS_OSI_TRUE,;t t
@@ -22281,6 +23262,72 @@ s,@XPRINCDIR@,$XPRINCDIR,;t t
 s,@XPRLIB@,$XPRLIB,;t t
 s,@COIN_HAS_XPR_TRUE@,$COIN_HAS_XPR_TRUE,;t t
 s,@COIN_HAS_XPR_FALSE@,$COIN_HAS_XPR_FALSE,;t t
+s,@COIN_HAS_CLP_TRUE@,$COIN_HAS_CLP_TRUE,;t t
+s,@COIN_HAS_CLP_FALSE@,$COIN_HAS_CLP_FALSE,;t t
+s,@CLPSRCDIR@,$CLPSRCDIR,;t t
+s,@CLPOBJDIR@,$CLPOBJDIR,;t t
+s,@USE_CGL_CUTS_TRUE@,$USE_CGL_CUTS_TRUE,;t t
+s,@USE_CGL_CUTS_FALSE@,$USE_CGL_CUTS_FALSE,;t t
+s,@USE_GMPL_TRUE@,$USE_GMPL_TRUE,;t t
+s,@USE_GMPL_FALSE@,$USE_GMPL_FALSE,;t t
+s,@USE_OSI_INTERFACE_TRUE@,$USE_OSI_INTERFACE_TRUE,;t t
+s,@USE_OSI_INTERFACE_FALSE@,$USE_OSI_INTERFACE_FALSE,;t t
+s,@SENSITIVITY_ANALYSIS_TRUE@,$SENSITIVITY_ANALYSIS_TRUE,;t t
+s,@SENSITIVITY_ANALYSIS_FALSE@,$SENSITIVITY_ANALYSIS_FALSE,;t t
+s,@ROOT_NODE_ONLY_TRUE@,$ROOT_NODE_ONLY_TRUE,;t t
+s,@ROOT_NODE_ONLY_FALSE@,$ROOT_NODE_ONLY_FALSE,;t t
+s,@COMPILE_FRAC_BRANCHING_TRUE@,$COMPILE_FRAC_BRANCHING_TRUE,;t t
+s,@COMPILE_FRAC_BRANCHING_FALSE@,$COMPILE_FRAC_BRANCHING_FALSE,;t t
+s,@DO_TESTS_TRUE@,$DO_TESTS_TRUE,;t t
+s,@DO_TESTS_FALSE@,$DO_TESTS_FALSE,;t t
+s,@TM_BASIS_TESTS_TRUE@,$TM_BASIS_TESTS_TRUE,;t t
+s,@TM_BASIS_TESTS_FALSE@,$TM_BASIS_TESTS_FALSE,;t t
+s,@TRACE_PATH_TRUE@,$TRACE_PATH_TRUE,;t t
+s,@TRACE_PATH_FALSE@,$TRACE_PATH_FALSE,;t t
+s,@CHECK_CUT_VALIDITY_TRUE@,$CHECK_CUT_VALIDITY_TRUE,;t t
+s,@CHECK_CUT_VALIDITY_FALSE@,$CHECK_CUT_VALIDITY_FALSE,;t t
+s,@STATISTICS_TRUE@,$STATISTICS_TRUE,;t t
+s,@STATISTICS_FALSE@,$STATISTICS_FALSE,;t t
+s,@PSEUDO_COSTS_TRUE@,$PSEUDO_COSTS_TRUE,;t t
+s,@PSEUDO_COSTS_FALSE@,$PSEUDO_COSTS_FALSE,;t t
+s,@DRAWGRAPH_TRUE@,$DRAWGRAPH_TRUE,;t t
+s,@DRAWGRAPH_FALSE@,$DRAWGRAPH_FALSE,;t t
+s,@SYM_PARALLEL_TRUE@,$SYM_PARALLEL_TRUE,;t t
+s,@SYM_PARALLEL_FALSE@,$SYM_PARALLEL_FALSE,;t t
+s,@PVM_ROOT@,$PVM_ROOT,;t t
+s,@COMPILE_IN_CG_TRUE@,$COMPILE_IN_CG_TRUE,;t t
+s,@COMPILE_IN_CG_FALSE@,$COMPILE_IN_CG_FALSE,;t t
+s,@COMPILE_IN_CP_TRUE@,$COMPILE_IN_CP_TRUE,;t t
+s,@COMPILE_IN_CP_FALSE@,$COMPILE_IN_CP_FALSE,;t t
+s,@COMPILE_IN_LP_TRUE@,$COMPILE_IN_LP_TRUE,;t t
+s,@COMPILE_IN_LP_FALSE@,$COMPILE_IN_LP_FALSE,;t t
+s,@COMPILE_IN_TM_TRUE@,$COMPILE_IN_TM_TRUE,;t t
+s,@COMPILE_IN_TM_FALSE@,$COMPILE_IN_TM_FALSE,;t t
+s,@SYM_WITH_APPL_TRUE@,$SYM_WITH_APPL_TRUE,;t t
+s,@SYM_WITH_APPL_FALSE@,$SYM_WITH_APPL_FALSE,;t t
+s,@SYM_WITH_CNRP_TRUE@,$SYM_WITH_CNRP_TRUE,;t t
+s,@SYM_WITH_CNRP_FALSE@,$SYM_WITH_CNRP_FALSE,;t t
+s,@SYM_WITH_MATCH_TRUE@,$SYM_WITH_MATCH_TRUE,;t t
+s,@SYM_WITH_MATCH_FALSE@,$SYM_WITH_MATCH_FALSE,;t t
+s,@SYM_WITH_MCKP_TRUE@,$SYM_WITH_MCKP_TRUE,;t t
+s,@SYM_WITH_MCKP_FALSE@,$SYM_WITH_MCKP_FALSE,;t t
+s,@SYM_WITH_MPP_TRUE@,$SYM_WITH_MPP_TRUE,;t t
+s,@SYM_WITH_MPP_FALSE@,$SYM_WITH_MPP_FALSE,;t t
+s,@SYM_WITH_SPP_TRUE@,$SYM_WITH_SPP_TRUE,;t t
+s,@SYM_WITH_SPP_FALSE@,$SYM_WITH_SPP_FALSE,;t t
+s,@SYM_WITH_SPP_CUTS_TRUE@,$SYM_WITH_SPP_CUTS_TRUE,;t t
+s,@SYM_WITH_SPP_CUTS_FALSE@,$SYM_WITH_SPP_CUTS_FALSE,;t t
+s,@SYM_WITH_USER_TRUE@,$SYM_WITH_USER_TRUE,;t t
+s,@SYM_WITH_USER_FALSE@,$SYM_WITH_USER_FALSE,;t t
+s,@SYM_WITH_VRP_TRUE@,$SYM_WITH_VRP_TRUE,;t t
+s,@SYM_WITH_VRP_FALSE@,$SYM_WITH_VRP_FALSE,;t t
+s,@SYMINCDIR@,$SYMINCDIR,;t t
+s,@SYMSRCDIR@,$SYMSRCDIR,;t t
+s,@SYMDEFS@,$SYMDEFS,;t t
+s,@COIN_HAS_CLP@,$COIN_HAS_CLP,;t t
+s,@SYMAPPLDIR@,$SYMAPPLDIR,;t t
+s,@SYM_DEBUG_TRUE@,$SYM_DEBUG_TRUE,;t t
+s,@SYM_DEBUG_FALSE@,$SYM_DEBUG_FALSE,;t t
 s,@LIBEXT@,$LIBEXT,;t t
 s,@VPATH_DISTCLEANFILES@,$VPATH_DISTCLEANFILES,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
