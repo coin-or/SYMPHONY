@@ -44,20 +44,21 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = symphony$(EXEEXT)
+@USE_CGL_CUTS_TRUE@am__append_1 = $(CGLOBJDIR)/src/libCgl.la
 
 # List all additionally required solver and Osi libraries
-@COIN_HAS_CLP_TRUE@am__append_1 = -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+@COIN_HAS_CLP_TRUE@am__append_2 = -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
 @COIN_HAS_CLP_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 @COIN_HAS_CLP_TRUE@	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
 @COIN_HAS_CLP_TRUE@	-D__OSI_CLP__
-@COIN_HAS_CLP_TRUE@am__append_2 = $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+@COIN_HAS_CLP_TRUE@am__append_3 = $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
 @COIN_HAS_CLP_TRUE@	$(CLPOBJDIR)/src/libClp.la
 
-@COIN_HAS_CLP_TRUE@am__append_3 = `cat $(CLPOBJDIR)/clp_addlibs.txt`
-@COIN_HAS_CPX_TRUE@am__append_4 = -I`$(CYGPATH_W) $(CPXINCDIR)` \
-@COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-
-@COIN_HAS_CPX_TRUE@am__append_5 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+@COIN_HAS_CLP_TRUE@am__append_4 = `cat $(CLPOBJDIR)/clp_addlibs.txt`
+@COIN_HAS_CPX_TRUE@am__append_5 = -I`$(CYGPATH_W) $(CPXINCDIR)` \
+@COIN_HAS_CPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
+@COIN_HAS_CPX_TRUE@	-D__OSI_CPLEX__
+@COIN_HAS_CPX_TRUE@am__append_6 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
 
 # if COIN_HAS_DYLP
 #   AM_CPPFLAGS += -I`$(CYGPATH_W) $(DYLPSRCDIR)/src/DylpStdLib` \
@@ -68,18 +69,18 @@ bin_PROGRAMS = symphony$(EXEEXT)
 # 	$(DYLPOBJDIR)/src/Dylp/libDylp.la
 #   LIBS += `cat $(DYLPOBJDIR)/dylp_addlibs.txt`
 # endif
-@COIN_HAS_GLPK_TRUE@am__append_6 = -I`$(CYGPATH_W) $(GLPKINCDIR)` \
-@COIN_HAS_GLPK_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
-
-@COIN_HAS_GLPK_TRUE@am__append_7 = $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la
-@COIN_HAS_OSL_TRUE@am__append_8 = -I`$(CYGPATH_W) $(OSLINCDIR)` \
-@COIN_HAS_OSL_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl`
-
-@COIN_HAS_OSL_TRUE@am__append_9 = $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
-@COIN_HAS_SPX_TRUE@am__append_10 = -I`$(CYGPATH_W) $(SPXINCDIR)` \
-@COIN_HAS_SPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
-
-@COIN_HAS_SPX_TRUE@am__append_11 = $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
+@COIN_HAS_GLPK_TRUE@am__append_7 = -I`$(CYGPATH_W) $(GLPKINCDIR)` \
+@COIN_HAS_GLPK_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk` \
+@COIN_HAS_GLPK_TRUE@	-D__OSI_GLPK__
+@COIN_HAS_GLPK_TRUE@am__append_8 = $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
+@COIN_HAS_OSL_TRUE@am__append_9 = -I`$(CYGPATH_W) $(OSLINCDIR)` \
+@COIN_HAS_OSL_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl` \
+@COIN_HAS_OSL_TRUE@	-D__OSI_OSL__
+@COIN_HAS_OSL_TRUE@am__append_10 = $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
+@COIN_HAS_SPX_TRUE@am__append_11 = -I`$(CYGPATH_W) $(SPXINCDIR)` \
+@COIN_HAS_SPX_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx` \
+@COIN_HAS_SPX_TRUE@	-D__OSI_SPX__
+@COIN_HAS_SPX_TRUE@am__append_12 = $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
 
 #if COIN_HAS_SYM
 #  AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMSRCDIR)/src` \
@@ -88,10 +89,41 @@ bin_PROGRAMS = symphony$(EXEEXT)
 #	$(SYMOBJDIR)/src/libSym.la
 #  LIBS += `cat $(SYMOBJDIR)/sym_addlibs.txt`
 #endif
-@COIN_HAS_XPR_TRUE@am__append_12 = -I`$(CYGPATH_W) $(XPRINCDIR)` \
-@COIN_HAS_XPR_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
+@COIN_HAS_XPR_TRUE@am__append_13 = -I`$(CYGPATH_W) $(XPRINCDIR)` \
+@COIN_HAS_XPR_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr` \
+@COIN_HAS_XPR_TRUE@	-D__OSI_XPRESS__
+@COIN_HAS_XPR_TRUE@am__append_14 = $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
+#	-I`$(CYGPATH_W) $(srcdir)/GMPL`
 
-@COIN_HAS_XPR_TRUE@am__append_13 = $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
+########################################################################
+#                            Additional Definitions                    #
+########################################################################
+@COIN_HAS_READLINE_TRUE@am__append_15 = -DHAS_READLINE
+@SENSITIVITY_ANALYSIS_TRUE@am__append_16 = -DSENSITIVITY_ANALYSIS
+@USE_CGL_CUTS_TRUE@am__append_17 = -DUSE_CGL_CUTS
+@USE_OSI_INTERFACE_TRUE@am__append_18 = 
+@ROOT_NODE_ONLY_TRUE@am__append_19 = -DROOT_NODE_ONLY
+
+#if CCMALLOC
+#AM_CPPFLAGS += 
+#endif
+@COMPILE_FRAC_BRANCHING_TRUE@am__append_20 = -DCOMPILE_FRAC_BRANCHING
+@DO_TESTS_TRUE@am__append_21 = -DDO_TESTS
+@TM_BASIS_TESTS_TRUE@am__append_22 = -DTM_BASIS_TESTS
+@TRACE_PATH_TRUE@am__append_23 = -DTRACE_PATH
+@CHECK_CUT_VALIDITY_TRUE@am__append_24 = -DCHECK_CUT_VALIDITY
+@STATISTICS_TRUE@am__append_25 = -DSTATISTICS
+@PSEUDO_COSTS_TRUE@am__append_26 = -DPSEUDO_COSTS
+@DRAWGRAPH_TRUE@am__append_27 = 
+
+#FIXME For now, assume that we have gmpl files, later check for GLPK package
+@USE_GMPL_TRUE@am__append_28 = -DUSE_GLPMPL
+
+########################################################################
+#                Application Library                                   #    
+########################################################################
+@SYM_WITH_APPL_TRUE@am__append_29 = libSymAppl.la
+@SYM_DEBUG_TRUE@am__append_30 = -g
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -111,39 +143,86 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libSym_la_DEPENDENCIES = GMPL/libGmpl.la
-am_libSym_la_OBJECTS = master.lo master_wrapper.lo master_io.lo \
-	master_func.lo tm_func.lo tm_proccomm.lo lp_solver.lo \
-	lp_varfunc.lo lp_rowfunc.lo lp_genfunc.lo lp_proccomm.lo \
-	lp_wrapper.lo lp_free.lo lp_branch.lo cg_func.lo cg_wrapper.lo \
-	cp_proccomm.lo cp_func.lo cp_wrapper.lo timemeas.lo \
-	qsortucb.lo qsortucb_i.lo qsortucb_ii.lo qsortucb_id.lo \
-	qsortucb_di.lo qsortucb_ic.lo proccomm.lo pack_cut.lo \
-	pack_array.lo
-libSym_la_OBJECTS = $(am_libSym_la_OBJECTS)
+libSym_la_LIBADD =
+am__objects_1 =
+am_libSym_la_OBJECTS = $(am__objects_1) master.lo master_wrapper.lo \
+	master_io.lo master_func.lo tm_func.lo tm_proccomm.lo \
+	lp_solver.lo lp_varfunc.lo lp_rowfunc.lo lp_genfunc.lo \
+	lp_proccomm.lo lp_wrapper.lo lp_free.lo lp_branch.lo \
+	cg_func.lo cg_wrapper.lo cp_proccomm.lo cp_func.lo \
+	cp_wrapper.lo timemeas.lo qsortucb.lo qsortucb_i.lo \
+	qsortucb_ii.lo qsortucb_id.lo qsortucb_di.lo qsortucb_ic.lo \
+	proccomm.lo pack_cut.lo pack_array.lo
+nodist_libSym_la_OBJECTS = dummy.lo
+libSym_la_OBJECTS = $(am_libSym_la_OBJECTS) \
+	$(nodist_libSym_la_OBJECTS)
+libSymAppl_la_LIBADD =
+am__libSymAppl_la_SOURCES_DIST = ../include/SymConfig.h \
+	../include/BB_constants.h ../include/BB_macros.h \
+	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
+	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
+	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
+	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
+	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
+	../include/master_params.h ../include/master_u.h \
+	../include/messages.h ../include/pack_array.h \
+	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
+	../include/qsortucb.h ../include/return_values.h \
+	../include/symphony_api.h ../include/timemeas.h \
+	../include/tm.h ../include/tm_params.h Master/master.c \
+	Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c
+am__objects_2 = $(am__objects_1) libSymAppl_la-master.lo \
+	libSymAppl_la-master_wrapper.lo libSymAppl_la-master_io.lo \
+	libSymAppl_la-master_func.lo libSymAppl_la-tm_func.lo \
+	libSymAppl_la-tm_proccomm.lo libSymAppl_la-lp_solver.lo \
+	libSymAppl_la-lp_varfunc.lo libSymAppl_la-lp_rowfunc.lo \
+	libSymAppl_la-lp_genfunc.lo libSymAppl_la-lp_proccomm.lo \
+	libSymAppl_la-lp_wrapper.lo libSymAppl_la-lp_free.lo \
+	libSymAppl_la-lp_branch.lo libSymAppl_la-cg_func.lo \
+	libSymAppl_la-cg_wrapper.lo libSymAppl_la-cp_proccomm.lo \
+	libSymAppl_la-cp_func.lo libSymAppl_la-cp_wrapper.lo \
+	libSymAppl_la-timemeas.lo libSymAppl_la-qsortucb.lo \
+	libSymAppl_la-qsortucb_i.lo libSymAppl_la-qsortucb_ii.lo \
+	libSymAppl_la-qsortucb_id.lo libSymAppl_la-qsortucb_di.lo \
+	libSymAppl_la-qsortucb_ic.lo libSymAppl_la-proccomm.lo \
+	libSymAppl_la-pack_cut.lo libSymAppl_la-pack_array.lo
+@SYM_WITH_APPL_TRUE@am_libSymAppl_la_OBJECTS = $(am__objects_2)
+libSymAppl_la_OBJECTS = $(am_libSymAppl_la_OBJECTS)
+@SYM_WITH_APPL_TRUE@am_libSymAppl_la_rpath = -rpath $(libdir)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_symphony_OBJECTS = main.$(OBJEXT)
 symphony_OBJECTS = $(am_symphony_OBJECTS)
-@COIN_HAS_CLP_TRUE@am__DEPENDENCIES_1 =  \
+@USE_CGL_CUTS_TRUE@am__DEPENDENCIES_1 = $(CGLOBJDIR)/src/libCgl.la
+@COIN_HAS_CLP_TRUE@am__DEPENDENCIES_2 =  \
 @COIN_HAS_CLP_TRUE@	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
 @COIN_HAS_CLP_TRUE@	$(CLPOBJDIR)/src/libClp.la
-@COIN_HAS_CPX_TRUE@am__DEPENDENCIES_2 =  \
+@COIN_HAS_CPX_TRUE@am__DEPENDENCIES_3 =  \
 @COIN_HAS_CPX_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-@COIN_HAS_GLPK_TRUE@am__DEPENDENCIES_3 =  \
+@COIN_HAS_GLPK_TRUE@am__DEPENDENCIES_4 =  \
 @COIN_HAS_GLPK_TRUE@	$(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la
-@COIN_HAS_OSL_TRUE@am__DEPENDENCIES_4 =  \
+@COIN_HAS_OSL_TRUE@am__DEPENDENCIES_5 =  \
 @COIN_HAS_OSL_TRUE@	$(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
-@COIN_HAS_SPX_TRUE@am__DEPENDENCIES_5 =  \
+@COIN_HAS_SPX_TRUE@am__DEPENDENCIES_6 =  \
 @COIN_HAS_SPX_TRUE@	$(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
-@COIN_HAS_XPR_TRUE@am__DEPENDENCIES_6 =  \
+@COIN_HAS_XPR_TRUE@am__DEPENDENCIES_7 =  \
 @COIN_HAS_XPR_TRUE@	$(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
-symphony_DEPENDENCIES = libSym.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(OSIOBJDIR)/src/libOsi.la $(CGLOBJDIR)/src/libCgl.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_3) $(am__DEPENDENCIES_4) \
-	$(am__DEPENDENCIES_5) $(am__DEPENDENCIES_6)
+am__DEPENDENCIES_8 =
+symphony_DEPENDENCIES = libSym.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_3) \
+	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_5) \
+	$(am__DEPENDENCIES_6) $(am__DEPENDENCIES_7) \
+	$(OSIOBJDIR)/src/libOsi.la \
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_8)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -154,8 +233,18 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libSym_la_SOURCES) $(symphony_SOURCES)
-DIST_SOURCES = $(libSym_la_SOURCES) $(symphony_SOURCES)
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CXXFLAGS) $(CXXFLAGS)
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+SOURCES = $(libSym_la_SOURCES) $(nodist_libSym_la_SOURCES) \
+	$(libSymAppl_la_SOURCES) $(symphony_SOURCES)
+DIST_SOURCES = $(libSym_la_SOURCES) $(am__libSymAppl_la_SOURCES_DIST) \
+	$(symphony_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -182,22 +271,26 @@ AUTOMAKE = @AUTOMAKE@
 AUX_DIR = @AUX_DIR@
 AWK = @AWK@
 BUILDTOOLSDIR = @BUILDTOOLSDIR@
-
 # Compile everything with g++
 CC = $(CXX)
 CCDEPMODE = @CCDEPMODE@
 CDEFS = @CDEFS@
-
-# Get rid of C flags
-CFLAGS = 
+# Get rid of warning flags
+#FIXME-Try to have the following later
+#CFLAGS := $(subst $(COIN_WARNINGS), ,$(CFLAGS))
+#CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
+CFLAGS := $(am__append_30) -pipe
 CGLOBJDIR = @CGLOBJDIR@
 CGLSRCDIR = @CGLSRCDIR@
+CHECK_CUT_VALIDITY_FALSE = @CHECK_CUT_VALIDITY_FALSE@
+CHECK_CUT_VALIDITY_TRUE = @CHECK_CUT_VALIDITY_TRUE@
 CLPOBJDIR = @CLPOBJDIR@
 CLPSRCDIR = @CLPSRCDIR@
 COINUTILSOBJDIR = @COINUTILSOBJDIR@
 COINUTILSSRCDIR = @COINUTILSSRCDIR@
 COIN_HAS_CGL_FALSE = @COIN_HAS_CGL_FALSE@
 COIN_HAS_CGL_TRUE = @COIN_HAS_CGL_TRUE@
+COIN_HAS_CLP = @COIN_HAS_CLP@
 COIN_HAS_CLP_FALSE = @COIN_HAS_CLP_FALSE@
 COIN_HAS_CLP_TRUE = @COIN_HAS_CLP_TRUE@
 COIN_HAS_COINUTILS_FALSE = @COIN_HAS_COINUTILS_FALSE@
@@ -210,10 +303,22 @@ COIN_HAS_OSI_FALSE = @COIN_HAS_OSI_FALSE@
 COIN_HAS_OSI_TRUE = @COIN_HAS_OSI_TRUE@
 COIN_HAS_OSL_FALSE = @COIN_HAS_OSL_FALSE@
 COIN_HAS_OSL_TRUE = @COIN_HAS_OSL_TRUE@
+COIN_HAS_READLINE_FALSE = @COIN_HAS_READLINE_FALSE@
+COIN_HAS_READLINE_TRUE = @COIN_HAS_READLINE_TRUE@
 COIN_HAS_SPX_FALSE = @COIN_HAS_SPX_FALSE@
 COIN_HAS_SPX_TRUE = @COIN_HAS_SPX_TRUE@
 COIN_HAS_XPR_FALSE = @COIN_HAS_XPR_FALSE@
 COIN_HAS_XPR_TRUE = @COIN_HAS_XPR_TRUE@
+COMPILE_FRAC_BRANCHING_FALSE = @COMPILE_FRAC_BRANCHING_FALSE@
+COMPILE_FRAC_BRANCHING_TRUE = @COMPILE_FRAC_BRANCHING_TRUE@
+COMPILE_IN_CG_FALSE = @COMPILE_IN_CG_FALSE@
+COMPILE_IN_CG_TRUE = @COMPILE_IN_CG_TRUE@
+COMPILE_IN_CP_FALSE = @COMPILE_IN_CP_FALSE@
+COMPILE_IN_CP_TRUE = @COMPILE_IN_CP_TRUE@
+COMPILE_IN_LP_FALSE = @COMPILE_IN_LP_FALSE@
+COMPILE_IN_LP_TRUE = @COMPILE_IN_LP_TRUE@
+COMPILE_IN_TM_FALSE = @COMPILE_IN_TM_FALSE@
+COMPILE_IN_TM_TRUE = @COMPILE_IN_TM_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPXINCDIR = @CPXINCDIR@
@@ -222,12 +327,16 @@ CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEFS = @CXXDEFS@
 CXXDEPMODE = @CXXDEPMODE@
-CXXFLAGS = @CXXFLAGS@
+CXXFLAGS := $(CFLAGS)
 CYGPATH_W = @CYGPATH_W@
 DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DO_TESTS_FALSE = @DO_TESTS_FALSE@
+DO_TESTS_TRUE = @DO_TESTS_TRUE@
+DRAWGRAPH_FALSE = @DRAWGRAPH_FALSE@
+DRAWGRAPH_TRUE = @DRAWGRAPH_TRUE@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -248,9 +357,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBEXT = @LIBEXT@
 LIBOBJS = @LIBOBJS@
-LIBS = @LIBS@ `cat $(OSIOBJDIR)/osi_addlibs.txt` `cat \
-	$(COINUTILSOBJDIR)/coinutils_addlibs.txt` `cat \
-	$(CGLOBJDIR)/cgl_addlibs.txt` $(am__append_3) $(ADDLIBS)
+LIBS = @LIBS@ $(am__append_4)
 LIBTOOL = @LIBTOOL@
 LIBTOOLM4 = @LIBTOOLM4@
 LN_S = @LN_S@
@@ -276,13 +383,58 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PSEUDO_COSTS_FALSE = @PSEUDO_COSTS_FALSE@
+PSEUDO_COSTS_TRUE = @PSEUDO_COSTS_TRUE@
+PVM_ROOT = @PVM_ROOT@
 RANLIB = @RANLIB@
+ROOT_NODE_ONLY_FALSE = @ROOT_NODE_ONLY_FALSE@
+ROOT_NODE_ONLY_TRUE = @ROOT_NODE_ONLY_TRUE@
 RPATH_FLAGS = @RPATH_FLAGS@
+SENSITIVITY_ANALYSIS_FALSE = @SENSITIVITY_ANALYSIS_FALSE@
+SENSITIVITY_ANALYSIS_TRUE = @SENSITIVITY_ANALYSIS_TRUE@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SPXINCDIR = @SPXINCDIR@
 SPXLIB = @SPXLIB@
+STATISTICS_FALSE = @STATISTICS_FALSE@
+STATISTICS_TRUE = @STATISTICS_TRUE@
 STRIP = @STRIP@
+SYMAPPLDIR = @SYMAPPLDIR@
+SYMDEFS = @SYMDEFS@
+SYMINCDIR = @SYMINCDIR@
+SYMSRCDIR = @SYMSRCDIR@
+SYM_DEBUG_FALSE = @SYM_DEBUG_FALSE@
+SYM_DEBUG_TRUE = @SYM_DEBUG_TRUE@
+SYM_PARALLEL_FALSE = @SYM_PARALLEL_FALSE@
+SYM_PARALLEL_TRUE = @SYM_PARALLEL_TRUE@
+SYM_WITH_APPL_FALSE = @SYM_WITH_APPL_FALSE@
+SYM_WITH_APPL_TRUE = @SYM_WITH_APPL_TRUE@
+SYM_WITH_CNRP_FALSE = @SYM_WITH_CNRP_FALSE@
+SYM_WITH_CNRP_TRUE = @SYM_WITH_CNRP_TRUE@
+SYM_WITH_MATCH_FALSE = @SYM_WITH_MATCH_FALSE@
+SYM_WITH_MATCH_TRUE = @SYM_WITH_MATCH_TRUE@
+SYM_WITH_MCKP_FALSE = @SYM_WITH_MCKP_FALSE@
+SYM_WITH_MCKP_TRUE = @SYM_WITH_MCKP_TRUE@
+SYM_WITH_MPP_FALSE = @SYM_WITH_MPP_FALSE@
+SYM_WITH_MPP_TRUE = @SYM_WITH_MPP_TRUE@
+SYM_WITH_SPP_CUTS_FALSE = @SYM_WITH_SPP_CUTS_FALSE@
+SYM_WITH_SPP_CUTS_TRUE = @SYM_WITH_SPP_CUTS_TRUE@
+SYM_WITH_SPP_FALSE = @SYM_WITH_SPP_FALSE@
+SYM_WITH_SPP_TRUE = @SYM_WITH_SPP_TRUE@
+SYM_WITH_USER_FALSE = @SYM_WITH_USER_FALSE@
+SYM_WITH_USER_TRUE = @SYM_WITH_USER_TRUE@
+SYM_WITH_VRP_FALSE = @SYM_WITH_VRP_FALSE@
+SYM_WITH_VRP_TRUE = @SYM_WITH_VRP_TRUE@
+TM_BASIS_TESTS_FALSE = @TM_BASIS_TESTS_FALSE@
+TM_BASIS_TESTS_TRUE = @TM_BASIS_TESTS_TRUE@
+TRACE_PATH_FALSE = @TRACE_PATH_FALSE@
+TRACE_PATH_TRUE = @TRACE_PATH_TRUE@
+USE_CGL_CUTS_FALSE = @USE_CGL_CUTS_FALSE@
+USE_CGL_CUTS_TRUE = @USE_CGL_CUTS_TRUE@
+USE_GMPL_FALSE = @USE_GMPL_FALSE@
+USE_GMPL_TRUE = @USE_GMPL_TRUE@
+USE_OSI_INTERFACE_FALSE = @USE_OSI_INTERFACE_FALSE@
+USE_OSI_INTERFACE_TRUE = @USE_OSI_INTERFACE_TRUE@
 VERSION = @VERSION@
 VPATH_DISTCLEANFILES = @VPATH_DISTCLEANFILES@
 XPRINCDIR = @XPRINCDIR@
@@ -338,7 +490,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = GMPL
+SUBDIRS = #GMPL
 
 ########################################################################
 #                               libSym                                 #
@@ -346,10 +498,8 @@ SUBDIRS = GMPL
 
 # Name of the library compiled in this directory.  We want it to be installed
 # in the 'lib' directory
-lib_LTLIBRARIES = libSym.la
-
-# List all source files for this library, including headers
-libSym_la_SOURCES = \
+lib_LTLIBRARIES = libSym.la $(am__append_29)
+SYMINCFILES = \
 	../include/SymConfig.h \
 	../include/BB_constants.h \
 	../include/BB_macros.h \
@@ -380,7 +530,11 @@ libSym_la_SOURCES = \
 	../include/symphony_api.h \
 	../include/timemeas.h \
 	../include/tm.h \
-	../include/tm_params.h \
+	../include/tm_params.h
+
+
+# List all source files for this library, including headers
+libSym_la_SOURCES = $(SYMINCFILES) \
 	Master/master.c \
 	Master/master_wrapper.c \
 	Master/master_io.c \
@@ -411,9 +565,11 @@ libSym_la_SOURCES = \
 	Common/pack_cut.c \
 	Common/pack_array.c
 
+nodist_libSym_la_SOURCES = dummy.cpp
 
 # Add Gmpl library
-libSym_la_LIBADD = GMPL/libGmpl.la
+
+#libSym_la_LIBADD = GMPL/libGmpl.la
 
 # This is for libtool (on Windows)
 libSym_la_LDFLAGS = $(LT_LDFLAGS)
@@ -425,10 +581,18 @@ symphony_SOURCES = \
 
 # List all required libraries -other than the LP solver's- needed to create
 # the executable
-symphony_LDADD = libSym.la $(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(OSIOBJDIR)/src/libOsi.la $(CGLOBJDIR)/src/libCgl.la \
-	$(am__append_2) $(am__append_5) $(am__append_7) \
-	$(am__append_9) $(am__append_11) $(am__append_13)
+symphony_LDADD = libSym.la $(am__append_1) $(am__append_3) \
+	$(am__append_6) $(am__append_8) $(am__append_10) \
+	$(am__append_12) $(am__append_14) $(OSIOBJDIR)/src/libOsi.la \
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(ADDLIBS)
+
+#FIXME! LIBS adds the solver libs to libSym!
+
+# LIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
+# 	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
+# 	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+
+#Add SYMPHONY defines 
 
 # Add include files
 
@@ -440,11 +604,9 @@ symphony_LDADD = libSym.la $(COINUTILSOBJDIR)/src/libCoinUtils.la \
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
 # "top_srcdir" refers to the basic directory for the main package that is
 # being compiled.
-
-# List additional defines
-AM_CPPFLAGS = -I`$(CYGPATH_W) ../include` $(am__append_1) \
-	$(am__append_4) $(am__append_6) $(am__append_8) \
-	$(am__append_10) $(am__append_12) -I`$(CYGPATH_W) \
+AM_CPPFLAGS = $(SYMDEFS) -I`$(CYGPATH_W) ../include` $(am__append_2) \
+	$(am__append_5) $(am__append_7) $(am__append_9) \
+	$(am__append_11) $(am__append_13) -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src` -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` -I`$(CYGPATH_W) \
@@ -461,10 +623,11 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) ../include` $(am__append_1) \
 	$(CGLSRCDIR)/src/CglTwomir` -I`$(CYGPATH_W) \
 	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
 	$(COINUTILSSRCDIR)/inc` -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(srcdir)/GMPL` -DHAS_RANDOM -DHAS_SRANDOM \
-	-DUSE_CGL_CUTS -D__NONE__ -D__LINUX -DUSE_GLPMPL \
-	-DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP \
-	-DCOMPILE_IN_TM
+	$(am__append_15) $(am__append_16) $(am__append_17) \
+	$(am__append_18) $(am__append_19) $(am__append_20) \
+	$(am__append_21) $(am__append_22) $(am__append_23) \
+	$(am__append_24) $(am__append_25) $(am__append_26) \
+	$(am__append_27) $(am__append_28)
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic
@@ -474,6 +637,76 @@ symphony_LDFLAGS = -rpath $(libdir)
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+@SYM_WITH_APPL_TRUE@libSymAppl_la_SOURCES = $(libSym_la_SOURCES)
+
+# $(SYMINCFILES) \
+# 	Master/master.c \
+# 	Master/master_wrapper.c \
+# 	Master/master_io.c \
+# 	Master/master_func.c \
+# 	TreeManager/tm_func.c \
+# 	TreeManager/tm_proccomm.c \
+# 	LP/lp_solver.c \
+# 	LP/lp_varfunc.c \
+# 	LP/lp_rowfunc.c \
+# 	LP/lp_genfunc.c \
+# 	LP/lp_proccomm.c \
+# 	LP/lp_wrapper.c \
+# 	LP/lp_free.c \
+# 	LP/lp_branch.c \
+# 	CutGen/cg_func.c \
+# 	CutGen/cg_wrapper.c \
+# 	CutPool/cp_proccomm.c \
+# 	CutPool/cp_func.c \
+# 	CutPool/cp_wrapper.c \
+# 	Common/timemeas.c \
+# 	Common/qsortucb.c \
+# 	Common/qsortucb_i.c \
+# 	Common/qsortucb_ii.c \
+# 	Common/qsortucb_id.c \
+# 	Common/qsortucb_di.c \
+# 	Common/qsortucb_ic.c \
+# 	Common/proccomm.c \
+# 	Common/pack_cut.c \
+# 	Common/pack_array.c 
+
+# $(SYMINCFILES) \
+# 	appl_src/appl_master.cpp \
+# 	appl_src/appl_master_wrapper.cpp \
+# 	appl_src/appl_master_io.cpp \
+# 	appl_src/appl_master_func.cpp \
+# 	appl_src/appl_tm_func.cpp \
+# 	appl_src/appl_tm_proccomm.cpp \
+# 	appl_src/appl_lp_solver.cpp \
+# 	appl_src/appl_lp_varfunc.cpp \
+# 	appl_src/appl_lp_rowfunc.cpp \
+# 	appl_src/appl_lp_genfunc.cpp \
+# 	appl_src/appl_lp_proccomm.cpp \
+# 	appl_src/appl_lp_wrapper.cpp \
+# 	appl_src/appl_lp_free.cpp \
+# 	appl_src/appl_lp_branch.cpp \
+# 	appl_src/appl_cg_func.cpp \
+# 	appl_src/appl_cg_wrapper.cpp \
+# 	appl_src/appl_cp_proccomm.cpp \
+# 	appl_src/appl_cp_func.cpp \
+# 	appl_src/appl_cp_wrapper.cpp \
+# 	appl_src/appl_timemeas.cpp \
+# 	appl_src/appl_qsortucb.cpp \
+# 	appl_src/appl_qsortucb_i.cpp \
+# 	appl_src/appl_qsortucb_ii.cpp \
+# 	appl_src/appl_qsortucb_id.cpp \
+# 	appl_src/appl_qsortucb_di.cpp \
+# 	appl_src/appl_qsortucb_ic.cpp \
+# 	appl_src/appl_proccomm.cpp \
+# 	appl_src/appl_pack_cut.cpp \
+# 	appl_src/appl_pack_array.cpp
+
+#libSymAppl_la_LIBADD = GMPL/libGmpl.la
+@SYM_WITH_APPL_TRUE@libSymAppl_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_SYM_APPLICATION
+
+# This is for libtool (on Windows)
+@SYM_WITH_APPL_TRUE@libSymAppl_la_LDFLAGS = $(LT_LDFLAGS)
+COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -494,10 +727,24 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 # You only need to adapt the following line
 ConfigHeader = SymConfig.h
+
+# It is already defined in include dir. 
+
+# install-exec-local:
+# 	echo "#ifndef HAVE_CONFIG_H" >bla
+# 	echo "#define HAVE_CONFIG_H" >>bla
+# 	echo "#endif" >> bla
+# 	cat $(includedir)/$(ConfigHeader) >> bla
+# 	$(install_sh_DATA) bla $(DESTDIR)$(includedir)/$(ConfigHeader)
+# 	rm -f bla
+
+# uninstall-local:
+# 	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
+CLEANFILES = dummy.cpp
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .cpp .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -555,7 +802,9 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libSym.la: $(libSym_la_OBJECTS) $(libSym_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libSym_la_LDFLAGS) $(libSym_la_OBJECTS) $(libSym_la_LIBADD) $(LIBS)
+	$(CXXLINK) -rpath $(libdir) $(libSym_la_LDFLAGS) $(libSym_la_OBJECTS) $(libSym_la_LIBADD) $(LIBS)
+libSymAppl.la: $(libSymAppl_la_OBJECTS) $(libSymAppl_la_DEPENDENCIES) 
+	$(LINK) $(am_libSymAppl_la_rpath) $(libSymAppl_la_LDFLAGS) $(libSymAppl_la_OBJECTS) $(libSymAppl_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
@@ -599,6 +848,36 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cp_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cp_proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cp_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dummy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-cg_func.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-cg_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-cp_func.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-cp_proccomm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-cp_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_branch.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_free.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_genfunc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_proccomm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_rowfunc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_varfunc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-master.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-master_func.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-master_io.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-master_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-pack_array.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-pack_cut.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-proccomm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-qsortucb.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-qsortucb_di.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-qsortucb_i.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-qsortucb_ic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-qsortucb_id.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-qsortucb_ii.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-timemeas.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-tm_func.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-tm_proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lp_branch.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lp_free.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lp_genfunc.Plo@am__quote@
@@ -849,6 +1128,209 @@ pack_array.lo: Common/pack_array.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pack_array.lo `test -f 'Common/pack_array.c' || echo '$(srcdir)/'`Common/pack_array.c
 
+libSymAppl_la-master.lo: Master/master.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-master.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-master.Tpo" -c -o libSymAppl_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-master.Tpo" "$(DEPDIR)/libSymAppl_la-master.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-master.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Master/master.c' object='libSymAppl_la-master.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c
+
+libSymAppl_la-master_wrapper.lo: Master/master_wrapper.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-master_wrapper.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-master_wrapper.Tpo" -c -o libSymAppl_la-master_wrapper.lo `test -f 'Master/master_wrapper.c' || echo '$(srcdir)/'`Master/master_wrapper.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-master_wrapper.Tpo" "$(DEPDIR)/libSymAppl_la-master_wrapper.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-master_wrapper.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Master/master_wrapper.c' object='libSymAppl_la-master_wrapper.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-master_wrapper.lo `test -f 'Master/master_wrapper.c' || echo '$(srcdir)/'`Master/master_wrapper.c
+
+libSymAppl_la-master_io.lo: Master/master_io.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-master_io.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-master_io.Tpo" -c -o libSymAppl_la-master_io.lo `test -f 'Master/master_io.c' || echo '$(srcdir)/'`Master/master_io.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-master_io.Tpo" "$(DEPDIR)/libSymAppl_la-master_io.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-master_io.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Master/master_io.c' object='libSymAppl_la-master_io.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-master_io.lo `test -f 'Master/master_io.c' || echo '$(srcdir)/'`Master/master_io.c
+
+libSymAppl_la-master_func.lo: Master/master_func.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-master_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-master_func.Tpo" -c -o libSymAppl_la-master_func.lo `test -f 'Master/master_func.c' || echo '$(srcdir)/'`Master/master_func.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-master_func.Tpo" "$(DEPDIR)/libSymAppl_la-master_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-master_func.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Master/master_func.c' object='libSymAppl_la-master_func.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-master_func.lo `test -f 'Master/master_func.c' || echo '$(srcdir)/'`Master/master_func.c
+
+libSymAppl_la-tm_func.lo: TreeManager/tm_func.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-tm_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-tm_func.Tpo" -c -o libSymAppl_la-tm_func.lo `test -f 'TreeManager/tm_func.c' || echo '$(srcdir)/'`TreeManager/tm_func.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-tm_func.Tpo" "$(DEPDIR)/libSymAppl_la-tm_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-tm_func.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='TreeManager/tm_func.c' object='libSymAppl_la-tm_func.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-tm_func.lo `test -f 'TreeManager/tm_func.c' || echo '$(srcdir)/'`TreeManager/tm_func.c
+
+libSymAppl_la-tm_proccomm.lo: TreeManager/tm_proccomm.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-tm_proccomm.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-tm_proccomm.Tpo" -c -o libSymAppl_la-tm_proccomm.lo `test -f 'TreeManager/tm_proccomm.c' || echo '$(srcdir)/'`TreeManager/tm_proccomm.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-tm_proccomm.Tpo" "$(DEPDIR)/libSymAppl_la-tm_proccomm.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-tm_proccomm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='TreeManager/tm_proccomm.c' object='libSymAppl_la-tm_proccomm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-tm_proccomm.lo `test -f 'TreeManager/tm_proccomm.c' || echo '$(srcdir)/'`TreeManager/tm_proccomm.c
+
+libSymAppl_la-lp_solver.lo: LP/lp_solver.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-lp_solver.Tpo" -c -o libSymAppl_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-lp_solver.Tpo" "$(DEPDIR)/libSymAppl_la-lp_solver.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-lp_solver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='LP/lp_solver.c' object='libSymAppl_la-lp_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c
+
+libSymAppl_la-lp_varfunc.lo: LP/lp_varfunc.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-lp_varfunc.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-lp_varfunc.Tpo" -c -o libSymAppl_la-lp_varfunc.lo `test -f 'LP/lp_varfunc.c' || echo '$(srcdir)/'`LP/lp_varfunc.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-lp_varfunc.Tpo" "$(DEPDIR)/libSymAppl_la-lp_varfunc.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-lp_varfunc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='LP/lp_varfunc.c' object='libSymAppl_la-lp_varfunc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-lp_varfunc.lo `test -f 'LP/lp_varfunc.c' || echo '$(srcdir)/'`LP/lp_varfunc.c
+
+libSymAppl_la-lp_rowfunc.lo: LP/lp_rowfunc.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-lp_rowfunc.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-lp_rowfunc.Tpo" -c -o libSymAppl_la-lp_rowfunc.lo `test -f 'LP/lp_rowfunc.c' || echo '$(srcdir)/'`LP/lp_rowfunc.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-lp_rowfunc.Tpo" "$(DEPDIR)/libSymAppl_la-lp_rowfunc.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-lp_rowfunc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='LP/lp_rowfunc.c' object='libSymAppl_la-lp_rowfunc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-lp_rowfunc.lo `test -f 'LP/lp_rowfunc.c' || echo '$(srcdir)/'`LP/lp_rowfunc.c
+
+libSymAppl_la-lp_genfunc.lo: LP/lp_genfunc.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-lp_genfunc.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-lp_genfunc.Tpo" -c -o libSymAppl_la-lp_genfunc.lo `test -f 'LP/lp_genfunc.c' || echo '$(srcdir)/'`LP/lp_genfunc.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-lp_genfunc.Tpo" "$(DEPDIR)/libSymAppl_la-lp_genfunc.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-lp_genfunc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='LP/lp_genfunc.c' object='libSymAppl_la-lp_genfunc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-lp_genfunc.lo `test -f 'LP/lp_genfunc.c' || echo '$(srcdir)/'`LP/lp_genfunc.c
+
+libSymAppl_la-lp_proccomm.lo: LP/lp_proccomm.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-lp_proccomm.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-lp_proccomm.Tpo" -c -o libSymAppl_la-lp_proccomm.lo `test -f 'LP/lp_proccomm.c' || echo '$(srcdir)/'`LP/lp_proccomm.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-lp_proccomm.Tpo" "$(DEPDIR)/libSymAppl_la-lp_proccomm.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-lp_proccomm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='LP/lp_proccomm.c' object='libSymAppl_la-lp_proccomm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-lp_proccomm.lo `test -f 'LP/lp_proccomm.c' || echo '$(srcdir)/'`LP/lp_proccomm.c
+
+libSymAppl_la-lp_wrapper.lo: LP/lp_wrapper.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-lp_wrapper.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-lp_wrapper.Tpo" -c -o libSymAppl_la-lp_wrapper.lo `test -f 'LP/lp_wrapper.c' || echo '$(srcdir)/'`LP/lp_wrapper.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-lp_wrapper.Tpo" "$(DEPDIR)/libSymAppl_la-lp_wrapper.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-lp_wrapper.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='LP/lp_wrapper.c' object='libSymAppl_la-lp_wrapper.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-lp_wrapper.lo `test -f 'LP/lp_wrapper.c' || echo '$(srcdir)/'`LP/lp_wrapper.c
+
+libSymAppl_la-lp_free.lo: LP/lp_free.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-lp_free.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-lp_free.Tpo" -c -o libSymAppl_la-lp_free.lo `test -f 'LP/lp_free.c' || echo '$(srcdir)/'`LP/lp_free.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-lp_free.Tpo" "$(DEPDIR)/libSymAppl_la-lp_free.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-lp_free.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='LP/lp_free.c' object='libSymAppl_la-lp_free.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-lp_free.lo `test -f 'LP/lp_free.c' || echo '$(srcdir)/'`LP/lp_free.c
+
+libSymAppl_la-lp_branch.lo: LP/lp_branch.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-lp_branch.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-lp_branch.Tpo" -c -o libSymAppl_la-lp_branch.lo `test -f 'LP/lp_branch.c' || echo '$(srcdir)/'`LP/lp_branch.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-lp_branch.Tpo" "$(DEPDIR)/libSymAppl_la-lp_branch.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-lp_branch.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='LP/lp_branch.c' object='libSymAppl_la-lp_branch.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-lp_branch.lo `test -f 'LP/lp_branch.c' || echo '$(srcdir)/'`LP/lp_branch.c
+
+libSymAppl_la-cg_func.lo: CutGen/cg_func.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-cg_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-cg_func.Tpo" -c -o libSymAppl_la-cg_func.lo `test -f 'CutGen/cg_func.c' || echo '$(srcdir)/'`CutGen/cg_func.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-cg_func.Tpo" "$(DEPDIR)/libSymAppl_la-cg_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-cg_func.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CutGen/cg_func.c' object='libSymAppl_la-cg_func.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-cg_func.lo `test -f 'CutGen/cg_func.c' || echo '$(srcdir)/'`CutGen/cg_func.c
+
+libSymAppl_la-cg_wrapper.lo: CutGen/cg_wrapper.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-cg_wrapper.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-cg_wrapper.Tpo" -c -o libSymAppl_la-cg_wrapper.lo `test -f 'CutGen/cg_wrapper.c' || echo '$(srcdir)/'`CutGen/cg_wrapper.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-cg_wrapper.Tpo" "$(DEPDIR)/libSymAppl_la-cg_wrapper.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-cg_wrapper.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CutGen/cg_wrapper.c' object='libSymAppl_la-cg_wrapper.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-cg_wrapper.lo `test -f 'CutGen/cg_wrapper.c' || echo '$(srcdir)/'`CutGen/cg_wrapper.c
+
+libSymAppl_la-cp_proccomm.lo: CutPool/cp_proccomm.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-cp_proccomm.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-cp_proccomm.Tpo" -c -o libSymAppl_la-cp_proccomm.lo `test -f 'CutPool/cp_proccomm.c' || echo '$(srcdir)/'`CutPool/cp_proccomm.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-cp_proccomm.Tpo" "$(DEPDIR)/libSymAppl_la-cp_proccomm.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-cp_proccomm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CutPool/cp_proccomm.c' object='libSymAppl_la-cp_proccomm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-cp_proccomm.lo `test -f 'CutPool/cp_proccomm.c' || echo '$(srcdir)/'`CutPool/cp_proccomm.c
+
+libSymAppl_la-cp_func.lo: CutPool/cp_func.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-cp_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-cp_func.Tpo" -c -o libSymAppl_la-cp_func.lo `test -f 'CutPool/cp_func.c' || echo '$(srcdir)/'`CutPool/cp_func.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-cp_func.Tpo" "$(DEPDIR)/libSymAppl_la-cp_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-cp_func.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CutPool/cp_func.c' object='libSymAppl_la-cp_func.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-cp_func.lo `test -f 'CutPool/cp_func.c' || echo '$(srcdir)/'`CutPool/cp_func.c
+
+libSymAppl_la-cp_wrapper.lo: CutPool/cp_wrapper.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-cp_wrapper.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-cp_wrapper.Tpo" -c -o libSymAppl_la-cp_wrapper.lo `test -f 'CutPool/cp_wrapper.c' || echo '$(srcdir)/'`CutPool/cp_wrapper.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-cp_wrapper.Tpo" "$(DEPDIR)/libSymAppl_la-cp_wrapper.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-cp_wrapper.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CutPool/cp_wrapper.c' object='libSymAppl_la-cp_wrapper.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-cp_wrapper.lo `test -f 'CutPool/cp_wrapper.c' || echo '$(srcdir)/'`CutPool/cp_wrapper.c
+
+libSymAppl_la-timemeas.lo: Common/timemeas.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-timemeas.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-timemeas.Tpo" -c -o libSymAppl_la-timemeas.lo `test -f 'Common/timemeas.c' || echo '$(srcdir)/'`Common/timemeas.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-timemeas.Tpo" "$(DEPDIR)/libSymAppl_la-timemeas.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-timemeas.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Common/timemeas.c' object='libSymAppl_la-timemeas.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-timemeas.lo `test -f 'Common/timemeas.c' || echo '$(srcdir)/'`Common/timemeas.c
+
+libSymAppl_la-qsortucb.lo: Common/qsortucb.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-qsortucb.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-qsortucb.Tpo" -c -o libSymAppl_la-qsortucb.lo `test -f 'Common/qsortucb.c' || echo '$(srcdir)/'`Common/qsortucb.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-qsortucb.Tpo" "$(DEPDIR)/libSymAppl_la-qsortucb.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-qsortucb.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Common/qsortucb.c' object='libSymAppl_la-qsortucb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-qsortucb.lo `test -f 'Common/qsortucb.c' || echo '$(srcdir)/'`Common/qsortucb.c
+
+libSymAppl_la-qsortucb_i.lo: Common/qsortucb_i.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-qsortucb_i.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-qsortucb_i.Tpo" -c -o libSymAppl_la-qsortucb_i.lo `test -f 'Common/qsortucb_i.c' || echo '$(srcdir)/'`Common/qsortucb_i.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-qsortucb_i.Tpo" "$(DEPDIR)/libSymAppl_la-qsortucb_i.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-qsortucb_i.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Common/qsortucb_i.c' object='libSymAppl_la-qsortucb_i.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-qsortucb_i.lo `test -f 'Common/qsortucb_i.c' || echo '$(srcdir)/'`Common/qsortucb_i.c
+
+libSymAppl_la-qsortucb_ii.lo: Common/qsortucb_ii.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-qsortucb_ii.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-qsortucb_ii.Tpo" -c -o libSymAppl_la-qsortucb_ii.lo `test -f 'Common/qsortucb_ii.c' || echo '$(srcdir)/'`Common/qsortucb_ii.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-qsortucb_ii.Tpo" "$(DEPDIR)/libSymAppl_la-qsortucb_ii.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-qsortucb_ii.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Common/qsortucb_ii.c' object='libSymAppl_la-qsortucb_ii.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-qsortucb_ii.lo `test -f 'Common/qsortucb_ii.c' || echo '$(srcdir)/'`Common/qsortucb_ii.c
+
+libSymAppl_la-qsortucb_id.lo: Common/qsortucb_id.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-qsortucb_id.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-qsortucb_id.Tpo" -c -o libSymAppl_la-qsortucb_id.lo `test -f 'Common/qsortucb_id.c' || echo '$(srcdir)/'`Common/qsortucb_id.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-qsortucb_id.Tpo" "$(DEPDIR)/libSymAppl_la-qsortucb_id.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-qsortucb_id.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Common/qsortucb_id.c' object='libSymAppl_la-qsortucb_id.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-qsortucb_id.lo `test -f 'Common/qsortucb_id.c' || echo '$(srcdir)/'`Common/qsortucb_id.c
+
+libSymAppl_la-qsortucb_di.lo: Common/qsortucb_di.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-qsortucb_di.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-qsortucb_di.Tpo" -c -o libSymAppl_la-qsortucb_di.lo `test -f 'Common/qsortucb_di.c' || echo '$(srcdir)/'`Common/qsortucb_di.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-qsortucb_di.Tpo" "$(DEPDIR)/libSymAppl_la-qsortucb_di.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-qsortucb_di.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Common/qsortucb_di.c' object='libSymAppl_la-qsortucb_di.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-qsortucb_di.lo `test -f 'Common/qsortucb_di.c' || echo '$(srcdir)/'`Common/qsortucb_di.c
+
+libSymAppl_la-qsortucb_ic.lo: Common/qsortucb_ic.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-qsortucb_ic.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-qsortucb_ic.Tpo" -c -o libSymAppl_la-qsortucb_ic.lo `test -f 'Common/qsortucb_ic.c' || echo '$(srcdir)/'`Common/qsortucb_ic.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-qsortucb_ic.Tpo" "$(DEPDIR)/libSymAppl_la-qsortucb_ic.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-qsortucb_ic.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Common/qsortucb_ic.c' object='libSymAppl_la-qsortucb_ic.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-qsortucb_ic.lo `test -f 'Common/qsortucb_ic.c' || echo '$(srcdir)/'`Common/qsortucb_ic.c
+
+libSymAppl_la-proccomm.lo: Common/proccomm.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-proccomm.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-proccomm.Tpo" -c -o libSymAppl_la-proccomm.lo `test -f 'Common/proccomm.c' || echo '$(srcdir)/'`Common/proccomm.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-proccomm.Tpo" "$(DEPDIR)/libSymAppl_la-proccomm.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-proccomm.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Common/proccomm.c' object='libSymAppl_la-proccomm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-proccomm.lo `test -f 'Common/proccomm.c' || echo '$(srcdir)/'`Common/proccomm.c
+
+libSymAppl_la-pack_cut.lo: Common/pack_cut.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-pack_cut.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-pack_cut.Tpo" -c -o libSymAppl_la-pack_cut.lo `test -f 'Common/pack_cut.c' || echo '$(srcdir)/'`Common/pack_cut.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-pack_cut.Tpo" "$(DEPDIR)/libSymAppl_la-pack_cut.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-pack_cut.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Common/pack_cut.c' object='libSymAppl_la-pack_cut.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-pack_cut.lo `test -f 'Common/pack_cut.c' || echo '$(srcdir)/'`Common/pack_cut.c
+
+libSymAppl_la-pack_array.lo: Common/pack_array.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-pack_array.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-pack_array.Tpo" -c -o libSymAppl_la-pack_array.lo `test -f 'Common/pack_array.c' || echo '$(srcdir)/'`Common/pack_array.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-pack_array.Tpo" "$(DEPDIR)/libSymAppl_la-pack_array.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-pack_array.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Common/pack_array.c' object='libSymAppl_la-pack_array.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-pack_array.lo `test -f 'Common/pack_array.c' || echo '$(srcdir)/'`Common/pack_array.c
+
 main.o: Master/main.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT main.o -MD -MP -MF "$(DEPDIR)/main.Tpo" -c -o main.o `test -f 'Master/main.c' || echo '$(srcdir)/'`Master/main.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/main.Tpo" "$(DEPDIR)/main.Po"; else rm -f "$(DEPDIR)/main.Tpo"; exit 1; fi
@@ -862,6 +1344,27 @@ main.obj: Master/main.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Master/main.c' object='main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o main.obj `if test -f 'Master/main.c'; then $(CYGPATH_W) 'Master/main.c'; else $(CYGPATH_W) '$(srcdir)/Master/main.c'; fi`
+
+.cpp.o:
+@am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
+
+.cpp.obj:
+@am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.cpp.lo:
+@am__fastdepCXX_TRUE@	if $(LTCXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1074,6 +1577,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -1153,18 +1657,8 @@ uninstall-info: uninstall-info-recursive
 	uninstall-libLTLIBRARIES
 
 
-# It is already defined in include dir. 
-
-# install-exec-local:
-# 	echo "#ifndef HAVE_CONFIG_H" >bla
-# 	echo "#define HAVE_CONFIG_H" >>bla
-# 	echo "#endif" >> bla
-# 	cat $(includedir)/$(ConfigHeader) >> bla
-# 	$(install_sh_DATA) bla $(DESTDIR)$(includedir)/$(ConfigHeader)
-# 	rm -f bla
-
-# uninstall-local:
-# 	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
+dummy.cpp:
+	echo 'static void dummy();' > $@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
