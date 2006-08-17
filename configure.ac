@@ -54,9 +54,45 @@ AC_COIN_INIT_AUTOMAKE
 #############################################################################
 
 AC_COIN_MAIN_SUBDIRS(CoinUtils)
-AC_COIN_MAIN_SUBDIRS(Clp)
 AC_COIN_MAIN_SUBDIRS(Osi)
 AC_COIN_MAIN_SUBDIRS(Cgl)
+
+#############################################################################
+#                            Third party solvers                            #
+#############################################################################
+
+# Check which third party solvers are available ToDo!
+AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
+AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h])#,[glp_lpx_simplex])
+AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
+AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
+AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
+
+
+#############################################################################
+#                      Check for the LP solver                              #
+#############################################################################
+
+AC_MSG_CHECKING(for SYMPHONY default solver)
+if test $coin_has_glpk = true; then
+   AC_MSG_RESULT(glpk)
+elif test -r $coin_has_cplex = true; then
+   AC_MSG_RESULT(cplex)
+#FIXME! What is wrong osl?
+dnl elif test -r $coin_has_osl = true; then
+dnl   AC_MSG_RESULT(osl)
+elif test -r $coin_has_soplex = true; then
+     AC_MSG_RESULT(soplex)
+elif test -r $coin_has_xpress = true; then
+     AC_MSG_RESULT(xpress)
+else
+    AC_MSG_RESULT(clp)
+    AC_COIN_MAIN_SUBDIRS(Clp)
+fi
+#############################################################################
+#                            Add SYMPHONY                                   #
+#############################################################################
+
 AC_COIN_MAIN_SUBDIRS(SYMPHONY)
 
 ##############################################################################
