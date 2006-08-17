@@ -16,6 +16,7 @@ SYMPHONY/src/GMPL/Makefile.in -text
 SYMPHONY/src/Makefile.am -text
 SYMPHONY/src/Makefile.in -text
 SYMPHONY/sym_addlibs.txt.in -text
+/compile -text
 /config.guess -text
 /config.sub -text
 /configure -text
