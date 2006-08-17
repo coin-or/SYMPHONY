@@ -1,0 +1,140 @@
+# Copyright (C) 2006 International Business Machines and others.
+# All Rights Reserved.
+# This file is distributed under the Common Public License.
+
+# $Id: Makefile.in 726 2006-04-17 04:16:00Z andreasw $
+
+EXE = cnrp@EXEEXT@
+
+# CHANGEME: Additional sources
+ADDSOURCES =
+
+# CHANGEME: Additional libraries
+ADDLIBS =
+
+# CHANGEME: Additional flags for compilation (e.g., include flags)
+ADDINCFLAGS = 
+
+OBJS =  src/Master/cnrp_io.@OBJEXT@ \
+	src/Master/cnrp_main.@OBJEXT@ \
+	src/Master/cnrp_master.@OBJEXT@ \
+	src/Master/cnrp_master_functions.@OBJEXT@ \
+	src/Master/small_graph.@OBJEXT@ \
+	src/LP/cnrp_lp_branch.@OBJEXT@ \
+	src/LP/cnrp_lp.@OBJEXT@ \
+	src/Common/cnrp_macros.@OBJEXT@ \
+	src/Common/compute_cost.@OBJEXT@ \
+	src/Common/network.@OBJEXT@ \
+	src/CutGen/biconnected.@OBJEXT@ \
+	src/CutGen/cnrp_cg.@OBJEXT@ \
+	src/CutGen/shrink.@OBJEXT@ \
+	src/CutPool/cnrp_cp.@OBJEXT@  \
+	src/DrawGraph/cnrp_dg_functions.@OBJEXT@ \
+	$(ADDSOURCES)
+
+##########################################################################
+#  Usually, you don't have to change anything below.  Note that if you   #
+#  change certain compiler options, you might have to recompile the      #
+#  COIN package.                                                         #
+##########################################################################
+
+# C++ Compiler command
+CXX = @CXX@
+
+# C++ Compiler options
+CXXFLAGS = #@CXXFLAGS@
+
+# additional C++ Compiler options for linking
+CXXLINKFLAGS = @RPATH_FLAGS@
+
+# Directory with COIN header files
+COININCDIR = @abs_include_dir@
+
+# Directory with COIN libraries
+COINLIBDIR = @abs_lib_dir@
+
+# Directoy with SYMPHONY header files 
+SYMLIBDIR = @SYMSRCDIR@
+
+# Directoy with SYMPHONY library
+SYMINCDIR = @SYMINCDIR@
+
+#Add SYMPHONY defs
+ADDINCFLAGS += @SYMDEFS@
+
+
+#Include files
+INCL =  -Iinclude -I`$(CYGPATH_W) $(COININCDIR)` \
+	-I`$(CYGPATH_W) $(SYMINCDIR)`
+
+# Libraries necessary to link
+LIBS = -L$(COINLIBDIR) -L$(SYMLIBDIR) -lSymAppl
+#	`cat $(COINLIBDIR)/cgl_addlibs.txt` \
+#	`cat $(COINLIBDIR)/osi_addlibs.txt` \
+#	`cat $(COINLIBDIR)/clp_addlibs.txt` \
+#	`cat $(COINLIBDIR)/coinutils_addlibs.txt`
+
+USE_CGL_CUTS_TRUE = @USE_CGL_CUTS_TRUE@TRUE
+COIN_HAS_CLP_TRUE = @COIN_HAS_CLP_TRUE@TRUE
+COIN_HAS_GLPK_TRUE = @COIN_HAS_GLPK_TRUE@TRUE
+COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@TRUE
+COIN_HAS_OSL_TRUE = @COIN_HAS_OSL_TRUE@TRUE
+COIN_HAS_SPX_TRUE = @COIN_HAS_SPX_TRUE@TRUE
+
+ifeq ($(USE_CGL_CUTS_TRUE),TRUE)
+LIBS += -lCgl
+ADDINCFLAGS += -DUSE_CGL_CUTS
+endif
+
+ifeq ($(COIN_HAS_CLP_TRUE),TRUE)
+LIBS += -lOsiClp -lClp
+ADDINCFLAGS += -D__OSI_CLP__
+endif
+
+ifeq ($(COIN_HAS_GLPK_TRUE),TRUE)
+INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+LIBS += -lglpk
+ADDINCFLAGS += -D__OSI_GLPK__
+endif
+
+ifeq ($(COIN_HAS_CPX_TRUE),TRUE)
+INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
+LIBS += -lcplex
+ADDINCFLAGS += -D__OSI_CPLEX__
+endif
+
+ifeq ($(COIN_HAS_OSL_TRUE),TRUE)
+INCL += -I`$(CYGPATH_W) $(OSLINCDIR)`
+LIBS += -losl
+ADDINCFLAGS += -D__OSI_OSL__
+endif
+
+ifeq ($(COIN_HAS_SPX_TRUE),TRUE)
+INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
+LIBS += -l
+ADDINCFLAGS += -D__OSI_SPX__
+endif
+
+LIBS += -lOsi -lCoinUtils @ADDLIBS@
+INCL +=	$(ADDINCFLAGS)
+
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
+
+all: $(EXE)
+
+.SUFFIXES: .cpp .c .o .obj
+
+$(EXE): $(OBJS)
+	bla=;\
+	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+
+clean:
+	rm -rf $(EXE) $(OBJS)
+
+.c.o:
+	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+.c.obj:
+	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
