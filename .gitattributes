@@ -5,7 +5,6 @@
 /Makefile.am -text
 /Makefile.in -text
 /README -text
-SYMPHONY/Makefile -text
 SYMPHONY/Makefile.am -text
 SYMPHONY/Makefile.in -text
 SYMPHONY/configure -text
