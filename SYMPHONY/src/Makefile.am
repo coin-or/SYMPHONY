@@ -118,9 +118,10 @@ endif
 
 #FIXME! LIBS adds the solver libs to libSym!
 
-# LIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
-# 	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
-# 	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+LIBS += $(ADDLIBS) \
+	`cat $(OSIOBJDIR)/osi_addlibs.txt` \
+	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
+	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
 
 #Add SYMPHONY defines 
 AM_CPPFLAGS = $(SYMDEFS)
@@ -192,8 +193,7 @@ if COIN_HAS_XPR
 endif
 
 symphony_LDADD += $(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(ADDLIBS)
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la 
 
 # Finally, the -rpath flag is used by libtool to make sure that the shared
 # library is found (in the lib install directory) when we are using dynamic

@@ -216,13 +216,12 @@ symphony_OBJECTS = $(am_symphony_OBJECTS)
 @COIN_HAS_SPX_TRUE@	$(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
 @COIN_HAS_XPR_TRUE@am__DEPENDENCIES_7 =  \
 @COIN_HAS_XPR_TRUE@	$(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
-am__DEPENDENCIES_8 =
 symphony_DEPENDENCIES = libSym.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_5) \
 	$(am__DEPENDENCIES_6) $(am__DEPENDENCIES_7) \
 	$(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_8)
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -357,7 +356,11 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBEXT = @LIBEXT@
 LIBOBJS = @LIBOBJS@
-LIBS = @LIBS@ $(am__append_4)
+
+#FIXME! LIBS adds the solver libs to libSym!
+LIBS = @LIBS@ $(ADDLIBS) `cat $(OSIOBJDIR)/osi_addlibs.txt` `cat \
+	$(COINUTILSOBJDIR)/coinutils_addlibs.txt` `cat \
+	$(CGLOBJDIR)/cgl_addlibs.txt` $(am__append_4)
 LIBTOOL = @LIBTOOL@
 LIBTOOLM4 = @LIBTOOLM4@
 LN_S = @LN_S@
@@ -584,13 +587,7 @@ symphony_SOURCES = \
 symphony_LDADD = libSym.la $(am__append_1) $(am__append_3) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
 	$(am__append_12) $(am__append_14) $(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(ADDLIBS)
-
-#FIXME! LIBS adds the solver libs to libSym!
-
-# LIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
-# 	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
-# 	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 
 #Add SYMPHONY defines 
 
