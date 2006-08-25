@@ -58,7 +58,8 @@ AC_COIN_DEBUG_COMPILE(SYMPHONY)
 
 # Get the name of the C++ compiler and appropriate compiler options
 AC_COIN_PROG_CXX
-
+#AC_LIBTOOL_LANG_CXX_CONFIG
+AC_LANG_PUSH(C++)
 # Initialize automake and libtool
 AC_COIN_INIT_AUTO_TOOLS
 
@@ -93,22 +94,75 @@ AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
 AM_CONDITIONAL(COIN_HAS_CLP,
                false)
 
-AC_MSG_CHECKING(for SYMPHONY default solver)
-if test $m4_tolower(coin_has_glpk) = true; then
-   AC_MSG_RESULT(glpk)
-elif test -r $m4_tolower(coin_has_cplex) = true; then
-   AC_MSG_RESULT(cplex)
-#FIXME! What is wrong with osl?
-dnl elif test -r $coin_has_osl = true; then
-dnl   AC_MSG_RESULT(osl)
-elif test -r $m4_tolower(coin_has_soplex) = true; then
-   AC_MSG_RESULT(soplex)
-elif test -r $m4_tolower(coin_has_xpress) = true; then
-   AC_MSG_RESULT(xpress)
-else
-   AC_MSG_RESULT(clp)
-   AC_COIN_HAS_PROJECT(Clp)
+AC_MSG_CHECKING([for SYMPHONY default solver])
+AC_ARG_WITH([lp-solver],
+[AC_HELP_STRING([--with-lp-solver@<:@=lpsolver@:>@],
+                [specify the LP solver in small
+                letters(default lpsolver=clp)])],
+		[sym_lp_solver=$withval],[sym_lp_solver=clp])
+
+found_package=true
+case $sym_lp_solver in 
+   clp)
+    AC_MSG_RESULT(Clp) 
+    AC_COIN_HAS_PROJECT(Clp)
+     if [test $coin_has_clp = unavailable ||
+                test $coin_has_clp = skipping]; then
+         found_package=false
+      fi
+   ;;
+   glpk)
+     AC_MSG_RESULT(Glpk)
+     if test $coin_has_glpk = false; then 
+         found_package=false
+      fi
+   ;; 
+   cplex)
+     AC_MSG_RESULT(Cplex)
+     if test $coin_has_cplex = false; then 
+         found_package=false
+      fi
+   ;; 
+   osl)
+         AC_MSG_RESULT(Osl)
+     if test $coin_has_osl = false; then 
+         found_package=false
+      fi
+   ;; 
+   soplex)
+         AC_MSG_RESULT(Soplex)
+     if test $coin_has_soplex = false; then 
+         found_package=false
+      fi
+   ;; 
+   xpress)
+         AC_MSG_RESULT(Xpress)
+     if test $coin_has_xpress = false; then 
+         found_package=false
+      fi
+   ;; 
+  *)
+    AC_MSG_ERROR(Unknown LP solver!)
+  ;;
+esac
+
+if test $found_package = false; then 
+  AC_MSG_ERROR(Couldn't find the $sym_lp_solver package!)
 fi
+
+AM_CONDITIONAL(CLP_LP_SOLVER,[test $sym_lp_solver = clp &&
+test $coin_has_clp != unavailable &&
+                test $coin_has_clp != skipping])
+AM_CONDITIONAL(GLPK_LP_SOLVER,[test $sym_lp_solver = glpk &&
+test $coin_has_glpk = true])
+AM_CONDITIONAL(OSL_LP_SOLVER,[test $sym_lp_solver = osl &&
+test $coin_has_osl = true])
+AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $sym_lp_solver = cplex&&
+test $coin_has_cplex = true])
+AM_CONDITIONAL(SOPLEX_LP_SOLVER,[test $sym_lp_solver = soplex &&
+test $coin_has_soplex = true])
+AM_CONDITIONAL(XPRESS_LP_SOLVER,[test $sym_lp_solver = xpress &&
+test $coin_has_xpress = true])
 
 #############################################################################
 #                       Add the options                                     #
@@ -135,13 +189,27 @@ AM_CONDITIONAL(USE_CGL_CUTS, [test $sym_cut_generation = true])
 
 #---------------------------------------------------------------------------#
 #USE_GMPL
-#FIXME! Check for GLPK! 
 #---------------------------------------------------------------------------#
-#AC_MSG_CHECKING([whether to compile in gmpl])
+AC_MSG_CHECKING([whether to compile with gmpl])
 AC_ARG_WITH([gmpl],
 [AC_HELP_STRING([--with-gmpl],
                 [compile with GMPL reader])],
-		[sym_gmpl=$withval],[sym_gmpl=no])
+		[sym_gmpl=$withval],[sym_gmpl=none])
+
+if test $sym_gmpl = yes; then 
+   AC_MSG_RESULT([yes])
+   if test $coin_has_glpk = false; then 
+      AC_MSG_ERROR(Couldn't find GLPK package to compile in GMPL feature)
+   fi     
+else
+   if test $coin_has_glpk = true && test $sym_gmpl != no; then 
+     AC_MSG_RESULT([yes])
+     sym_gmpl=yes     
+   else 
+     AC_MSG_RESULT([no])
+   fi
+fi
+
 AM_CONDITIONAL(USE_GMPL, [test "$sym_gmpl" = yes])
 
 #FIXME! NO WAY TO COMPILE OSISYM! all other packages refer to SYM instead of
@@ -368,29 +436,37 @@ AM_CONDITIONAL(DRAWGRAPH, [test $sym_graph = true])
 #############################################################################
 
 SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM -D__NONE__'
-
+ARCH=
 case $build in
   *-cygwin* | *-mingw*) 
-       SYMDEFS="$SYMDEFS -D__CYGWIN" ;;
+       SYMDEFS="$SYMDEFS -D__CYGWIN" 
+       ARCH=CYGWIN ;;
   *-darwin*) 
-       SYMDEFS="$SYMDEFS -D__DARWIN" ;; 
+       SYMDEFS="$SYMDEFS -D__DARWIN"
+       ARCH=DARWIN ;;
   *-linux-*)
-       SYMDEFS="$SYMDEFS -D__LINUX" ;; 
+       SYMDEFS="$SYMDEFS -D__LINUX" 
+       ARCH=LINUX ;;
   *-alpha-*)
-       SYMDEFS="$SYMDEFS -D__ALPHA" ;; 
+       SYMDEFS="$SYMDEFS -D__ALPHA"
+       ARCH=ALPHA ;;
   *-aix-*)
-       SYMDEFS="$SYMDEFS -D__RS6K" ;; 
+       SYMDEFS="$SYMDEFS -D__RS6K" 
+       ARCH=RS6K ;;
   *-sun-*)
        case $build in
             *-i86pc-*)	
-                SYMDEFS="$SYMDEFS -D__X86SOL2" ;; 
+                SYMDEFS="$SYMDEFS -D__X86SOL2"
+	        ARCH=X86SOL2 ;;
             *-5.-*)
-                SYMDEFS="$SYMDEFS -D__SUN4SOL2" 
                 np=$(shell mpstat | wc -l -gt -a)
-                case $np in 
-                    ON)
-                       SYMDEFS="$SYMDEFS -D__SUNMP";;
-                esac
+                if test $np = ON; then 
+                       SYMDEFS="$SYMDEFS -D__SUNMP"
+		       ARCH=SUNMP
+                else
+                       SYMDEFS="$SYMDEFS -D__SUN4SOL2" 
+		       ARCH=SUN4SOL2
+                fi 
             ;;
        esac
        ;;
@@ -410,60 +486,147 @@ esac
 AC_MSG_CHECKING([whether to compile in the parallel configuration])
 AC_ARG_WITH([pvm],
 [AC_HELP_STRING([--with-pvm],
-                [set the root directory for pvm])],
-		[PVM_ROOT=$withval],[PVM_ROOT=none])
-sym_parallel=yes
-case $PVM_ROOT in
-     none)
-    sym_parallel=false
+                [compile in parallel architecture (assuming that 
+		pvm is installed and the variable PVM_ROOT is 
+		defined.)])],
+		[sym_parallel=$withval],[sym_parallel=no])
+	
+if test $sym_parallel = no; then 
     AC_MSG_RESULT(no)
-     ;;
-     *)
-     m4_ifvaln([pvmalloc.h],[AC_CHECK_FILE([$PVM_ROOT/src/pvmalloc.h],[],
-                 [AC_MSG_ERROR([Cannot find the pvm header files 
-in $PVM_ROOT/src])])])
+else
     AC_MSG_RESULT(yes)
-    ;;
-esac
+fi
 
-AM_CONDITIONAL(SYM_PARALLEL, [test "$sym_parallel" = yes])
-AC_SUBST(PVM_ROOT)
+dnl AC_MSG_CHECKING([whether to compile in the parallel configuration])
+dnl AC_ARG_WITH([pvm],
+dnl [AC_HELP_STRING([--with-pvm],
+dnl                 [set the root directory for pvm])],
+dnl 		[PVM_ROOT=$withval],[PVM_ROOT=none])
+dnl sym_parallel='yes'
+dnl case $PVM_ROOT in
+dnl      none)
+dnl     sym_parallel=false
+dnl     AC_MSG_RESULT(no)
+dnl      ;;
+dnl      *)
+dnl     AC_MSG_RESULT(yes)
+dnl      m4_ifvaln([pvmalloc.h],[AC_CHECK_FILE([$PVM_ROOT/src/pvmalloc.h],[],
+dnl                  [AC_MSG_ERROR([Cannot find the pvm header files 
+dnl in $PVM_ROOT/src])])])
+dnl     ;;
+dnl esac
+
+dnl AC_SUBST(PVM_ROOT)
+
 
 #---------------------------------------------------------------------------#
 
 #AC_MSG_CHECKING([whether to compile in cg])
 AC_ARG_WITH([cg],
 [AC_HELP_STRING([--without-cg],
-                [compile without cut generator module])],
+                [compile without cut generator module(default=yes)])],
 [in_cg=$withval],[in_cg=yes])
-AM_CONDITIONAL(COMPILE_IN_CG, [test "$in_cg" = yes])
+AM_CONDITIONAL(SYM_COMPILE_IN_CG, [test "$in_cg" = yes])
 
 #AC_MSG_CHECKING([whether to compile in cp])
-AC_ARG_WITH([cg],
+AC_ARG_WITH([cp],
 [AC_HELP_STRING([--without-cp],
-                [compile without cut pool module])],
+                [compile without cut pool module(defualt=yes)])],
 [in_cp=$withval],[in_cp=yes])
-AM_CONDITIONAL(COMPILE_IN_CP, [test "$in_cp" = yes])
+AM_CONDITIONAL(SYM_COMPILE_IN_CP, [test "$in_cp" = yes])
 
 
 #AC_MSG_CHECKING([whether to compile in lp])
 AC_ARG_WITH([lp],
 [AC_HELP_STRING([--without-lp],
-                [compile without LP solver module])],
+                [compile without LP solver module(default=yes)])],
 [in_lp=$withval],[in_lp=yes])
-AM_CONDITIONAL(COMPILE_IN_LP, [test "$in_lp" = yes])
+AM_CONDITIONAL(SYM_COMPILE_IN_LP, [test "$in_lp" = yes])
 
 #AC_MSG_CHECKING([whether to compile in tm])
 AC_ARG_WITH([tm],
 [AC_HELP_STRING([--without-tm],
-                [compile without tree manager module])],
+                [compile without tree manager module (default=yes)])],
 [in_tm=$withval],[in_tm=yes])
-AM_CONDITIONAL(COMPILE_IN_TM, [test "$in_tm" = yes])
+AM_CONDITIONAL(SYM_COMPILE_IN_TM, [test "$in_tm" = yes])
 
+#sym_def_pconfig=true;
+sym_enable_parallel=false;
+if [test $in_cg = no || test $in_cp = no ||  
+   test $in_lp = no || test $in_tm = no]; then
+#   sym_def_pconfig=false;
+   if test $sym_parallel=true; then 
+      AC_MSG_ERROR(First enable parallel configuration!)
+   fi
+   sym_enable_parallel=true;
+else 
+   if test $sym_parallel = yes; then 
+       in_lp=no
+       AM_CONDITIONAL(SYM_COMPILE_IN_LP, false)
+       sym_enable_parallel=true;
+   fi
+fi
 
-#FIXME-For now, add defaults to SYMDEFS
+AM_CONDITIONAL(SYM_PARALLEL, $sym_enable_parallel)
 
-SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP -DCOMPILE_IN_TM "
+LPEXT=
+CPEXT=
+TMEXT=
+MASTEREXT=
+LIBNAME=
+
+if test $in_cg = yes; then 
+   LPEXT=_cg
+   SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG"
+fi 
+if test $in_cp = yes; then 
+   SYMDEFS="$SYMDEFS -DCOMPILE_IN_CP"
+   CPEXT=_cp
+fi 
+if test $in_lp = yes; then 
+  SYMDEFS="$SYMDEFS -DCOMPILE_IN_LP"
+  TMEXT="_lp$LPEXT$CPEXT"
+else
+  TMEXT=$CPEXT
+fi 
+if test $in_tm = yes; then 
+  SYMDEFS="$SYMDEFS -DCOMPILE_IN_TM"
+  MASTEREXT="_m_tm$TMEXT"
+fi 
+
+WHATTOMAKELIBS=
+WHATTOMAKEBINS=
+
+if test $sym_enable_parallel = true; then
+   SYMDEFS="$SYMDEFS -D__PVM__"
+if test $in_cg = no; then 
+   WHATTOMAKELIBS=libSym_cg.la
+   WHATTOMAKEBINS=symphony_cg
+fi 
+if test $in_cp = no; then 
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
+   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp"
+fi 
+if test $in_lp = no; then 
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
+   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT"
+fi 
+if test $in_tm = no; then 
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
+   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT"
+fi 
+else
+  MASTEREXT=
+fi
+
+WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
+WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT"
+
+AC_SUBST(WHATTOMAKELIBS)
+AC_SUBST(WHATTOMAKEBINS)
+AC_SUBST(LPEXT)
+AC_SUBST(CPEXT)
+AC_SUBST(MASTEREXT)
 
 #############################################################################
 #                       Other third party software                          #
@@ -487,48 +650,57 @@ SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP -DCOMPILE_IN_T
 #############################################################################
 #                       Applications                                        #
 #############################################################################
-AM_CONDITIONAL(SYM_WITH_APPL, false)
-AC_MSG_CHECKING(for the application to be compiled)
+
+AC_MSG_CHECKING(whether to compile application library)
 AC_ARG_WITH([application],
 [AC_HELP_STRING([--with-application],
-                [specify the application to be compiled with lower case])],
-		[sym_appl=$withval],[sym_appl=none])
+                [compile the application library])],
+		[sym_appl=$withval],[sym_appl=no])
 
-sym_with_appl=true
-case $sym_appl in 
-     cnrp)
-     ;;
-     match)
-     ;;
-     mckp)
-     ;;
-     mpp)
-     ;;
-     spp)
-     ;;
-     spp_with_cuts)
-     ;;
-     user)
-     ;;
-     vrp)
-     ;;
-     none)
-     sym_with_appl=false
-     ;;
-     *)
-     AC_MSG_ERROR([Unknown application is requested to be compiled!])
-     ;;
-esac
+AM_CONDITIONAL(SYM_WITH_APPL, [test $sym_appl = true])
 AC_MSG_RESULT($sym_appl)
-AM_CONDITIONAL(SYM_WITH_APPL, [test $sym_with_appl = true])
-AM_CONDITIONAL(SYM_WITH_CNRP, [test $sym_appl = cnrp])
-AM_CONDITIONAL(SYM_WITH_MATCH, [test $sym_appl = match])
-AM_CONDITIONAL(SYM_WITH_MCKP, [test $sym_appl = mckp])
-AM_CONDITIONAL(SYM_WITH_MPP, [test $sym_appl = mpp])
-AM_CONDITIONAL(SYM_WITH_SPP, [test $sym_appl = spp])
-AM_CONDITIONAL(SYM_WITH_SPP_CUTS, [test $sym_appl = spp_with_cuts])
-AM_CONDITIONAL(SYM_WITH_USER, [test $sym_appl = user])
-AM_CONDITIONAL(SYM_WITH_VRP, [test $sym_appl = vrp])
+dnl AM_CONDITIONAL(SYM_WITH_APPL, false)
+dnl AC_MSG_CHECKING(whether to compile application library)
+dnl AC_ARG_WITH([application],
+dnl [AC_HELP_STRING([--with-application],
+dnl                 [specify the application to be compiled with lower case])],
+dnl 		[sym_appl=$withval],[sym_appl=none])
+
+dnl sym_with_appl=true
+dnl case $sym_appl in 
+dnl      cnrp)
+dnl      ;;
+dnl      match)
+dnl      ;;
+dnl      mckp)
+dnl      ;;
+dnl      mpp)
+dnl      ;;
+dnl      spp)
+dnl      ;;
+dnl      spp_with_cuts)
+dnl      ;;
+dnl      user)
+dnl      ;;
+dnl      vrp)
+dnl      ;;
+dnl      none)
+dnl      sym_with_appl=false
+dnl      ;;
+dnl      *)
+dnl      AC_MSG_ERROR([Unknown application is requested to be compiled!])
+dnl      ;;
+dnl esac
+dnl AC_MSG_RESULT($sym_appl)
+dnl AM_CONDITIONAL(SYM_WITH_APPL, [test $sym_with_appl = true])
+dnl AM_CONDITIONAL(SYM_WITH_CNRP, [test $sym_appl = cnrp])
+dnl AM_CONDITIONAL(SYM_WITH_MATCH, [test $sym_appl = match])
+dnl AM_CONDITIONAL(SYM_WITH_MCKP, [test $sym_appl = mckp])
+dnl AM_CONDITIONAL(SYM_WITH_MPP, [test $sym_appl = mpp])
+dnl AM_CONDITIONAL(SYM_WITH_SPP, [test $sym_appl = spp])
+dnl AM_CONDITIONAL(SYM_WITH_SPP_CUTS, [test $sym_appl = spp_with_cuts])
+dnl AM_CONDITIONAL(SYM_WITH_USER, [test $sym_appl = user])
+dnl AM_CONDITIONAL(SYM_WITH_VRP, [test $sym_appl = vrp])
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
@@ -536,11 +708,12 @@ AM_CONDITIONAL(SYM_WITH_VRP, [test $sym_appl = vrp])
 # Location of SYMPHONY for later use
 AC_SUBST(SYMINCDIR)
 AC_SUBST(SYMSRCDIR)
-SYMINCDIR=`pwd`/include
-SYMSRCDIR=`pwd`/src 
+SYMINCDIR=`cd $srcdir; pwd`/include
+SYMSRCDIR=`cd $srcdir; pwd`/src
 
 # To be used in applications: default SYMPHONY defs
 AC_SUBST(SYMDEFS)
+AC_SUBST(ARCH)
 AC_SUBST(COIN_HAS_CLP)
 
 # Location of Applications for later use
