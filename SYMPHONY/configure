@@ -482,7 +482,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LT_LDFLAGS RPATH_FLAGS COIN_HAS_READLINE_TRUE COIN_HAS_READLINE_FALSE COINUTILSSRCDIR COINUTILSOBJDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE OSISRCDIR OSIOBJDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CGLSRCDIR CGLOBJDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CPXINCDIR CPXLIB COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE GLPKINCDIR GLPKLIB COIN_HAS_GLPK_TRUE COIN_HAS_GLPK_FALSE OSLINCDIR OSLLIB COIN_HAS_OSL_TRUE COIN_HAS_OSL_FALSE SPXINCDIR SPXLIB COIN_HAS_SPX_TRUE COIN_HAS_SPX_FALSE XPRINCDIR XPRLIB COIN_HAS_XPR_TRUE COIN_HAS_XPR_FALSE COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE CLPSRCDIR CLPOBJDIR CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE GLPK_LP_SOLVER_TRUE GLPK_LP_SOLVER_FALSE OSL_LP_SOLVER_TRUE OSL_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE SOPLEX_LP_SOLVER_TRUE SOPLEX_LP_SOLVER_FALSE XPRESS_LP_SOLVER_TRUE XPRESS_LP_SOLVER_FALSE USE_CGL_CUTS_TRUE USE_CGL_CUTS_FALSE USE_GMPL_TRUE USE_GMPL_FALSE USE_OSI_INTERFACE_TRUE USE_OSI_INTERFACE_FALSE SENSITIVITY_ANALYSIS_TRUE SENSITIVITY_ANALYSIS_FALSE ROOT_NODE_ONLY_TRUE ROOT_NODE_ONLY_FALSE COMPILE_FRAC_BRANCHING_TRUE COMPILE_FRAC_BRANCHING_FALSE DO_TESTS_TRUE DO_TESTS_FALSE TM_BASIS_TESTS_TRUE TM_BASIS_TESTS_FALSE TRACE_PATH_TRUE TRACE_PATH_FALSE CHECK_CUT_VALIDITY_TRUE CHECK_CUT_VALIDITY_FALSE STATISTICS_TRUE STATISTICS_FALSE PSEUDO_COSTS_TRUE PSEUDO_COSTS_FALSE DRAWGRAPH_TRUE DRAWGRAPH_FALSE SYM_COMPILE_IN_CG_TRUE SYM_COMPILE_IN_CG_FALSE SYM_COMPILE_IN_CP_TRUE SYM_COMPILE_IN_CP_FALSE SYM_COMPILE_IN_LP_TRUE SYM_COMPILE_IN_LP_FALSE SYM_COMPILE_IN_TM_TRUE SYM_COMPILE_IN_TM_FALSE SYM_PARALLEL_TRUE SYM_PARALLEL_FALSE WHATTOMAKELIBS WHATTOMAKEBINS LPEXT CPEXT MASTEREXT SYM_WITH_APPL_TRUE SYM_WITH_APPL_FALSE SYMINCDIR SYMSRCDIR SYMDEFS ARCH COIN_HAS_CLP SYMAPPLDIR SYM_DEBUG_TRUE SYM_DEBUG_FALSE LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LT_LDFLAGS RPATH_FLAGS COIN_HAS_READLINE_TRUE COIN_HAS_READLINE_FALSE COINUTILSSRCDIR COINUTILSOBJDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE OSISRCDIR OSIOBJDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CGLSRCDIR CGLOBJDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CPXINCDIR CPXLIB COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE GLPKINCDIR GLPKLIB COIN_HAS_GLPK_TRUE COIN_HAS_GLPK_FALSE OSLINCDIR OSLLIB COIN_HAS_OSL_TRUE COIN_HAS_OSL_FALSE SPXINCDIR SPXLIB COIN_HAS_SPX_TRUE COIN_HAS_SPX_FALSE XPRINCDIR XPRLIB COIN_HAS_XPR_TRUE COIN_HAS_XPR_FALSE COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE CLPSRCDIR CLPOBJDIR CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE GLPK_LP_SOLVER_TRUE GLPK_LP_SOLVER_FALSE OSL_LP_SOLVER_TRUE OSL_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE SOPLEX_LP_SOLVER_TRUE SOPLEX_LP_SOLVER_FALSE XPRESS_LP_SOLVER_TRUE XPRESS_LP_SOLVER_FALSE USE_CGL_CUTS_TRUE USE_CGL_CUTS_FALSE USE_GMPL_TRUE USE_GMPL_FALSE USE_OSI_INTERFACE_TRUE USE_OSI_INTERFACE_FALSE SENSITIVITY_ANALYSIS_TRUE SENSITIVITY_ANALYSIS_FALSE ROOT_NODE_ONLY_TRUE ROOT_NODE_ONLY_FALSE COMPILE_FRAC_BRANCHING_TRUE COMPILE_FRAC_BRANCHING_FALSE DO_TESTS_TRUE DO_TESTS_FALSE TM_BASIS_TESTS_TRUE TM_BASIS_TESTS_FALSE TRACE_PATH_TRUE TRACE_PATH_FALSE CHECK_CUT_VALIDITY_TRUE CHECK_CUT_VALIDITY_FALSE STATISTICS_TRUE STATISTICS_FALSE PSEUDO_COSTS_TRUE PSEUDO_COSTS_FALSE DRAWGRAPH_TRUE DRAWGRAPH_FALSE SYM_WITH_APPL_TRUE SYM_WITH_APPL_FALSE SYM_COMPILE_IN_CG_TRUE SYM_COMPILE_IN_CG_FALSE SYM_COMPILE_IN_CP_TRUE SYM_COMPILE_IN_CP_FALSE SYM_COMPILE_IN_LP_TRUE SYM_COMPILE_IN_LP_FALSE SYM_COMPILE_IN_TM_TRUE SYM_COMPILE_IN_TM_FALSE SYM_PARALLEL_TRUE SYM_PARALLEL_FALSE WHATTOMAKELIBS WHATTOMAKEBINS LPEXT CPEXT TMEXT MASTEREXT SYMINCDIR SYMSRCDIR SYMDEFS ARCH COIN_HAS_CLP SYMAPPLDIR SYM_DEBUG_TRUE SYM_DEBUG_FALSE LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1158,13 +1158,13 @@ Optional Packages:
                           lpsolver=clp)
   --with-gmpl             compile with GMPL reader
   --with-osi-interface    compile with SymOsi interface
+  --with-application      compile the application library
   --with-pvm              compile in parallel architecture (assuming that pvm
                           is installed and the variable PVM_ROOT is defined.)
   --without-cg            compile without cut generator module(default=yes)
   --without-cp            compile without cut pool module(defualt=yes)
   --without-lp            compile without LP solver module(default=yes)
   --without-tm            compile without tree manager module (default=yes)
-  --with-application      compile the application library
 
 Some influential environment variables:
   CDEFS       Additional -D flags to be used when compiling C code.
@@ -21958,6 +21958,35 @@ echo "$as_me: error: Unknown OS" >&2;}
 esac
 
 #############################################################################
+#                       Applications                                        #
+#############################################################################
+
+echo "$as_me:$LINENO: checking whether to compile application library" >&5
+echo $ECHO_N "checking whether to compile application library... $ECHO_C" >&6
+
+# Check whether --with-application or --without-application was given.
+if test "${with_application+set}" = set; then
+  withval="$with_application"
+  sym_appl=$withval
+else
+  sym_appl=no
+fi;
+
+
+
+if test $sym_appl = yes; then
+  SYM_WITH_APPL_TRUE=
+  SYM_WITH_APPL_FALSE='#'
+else
+  SYM_WITH_APPL_TRUE='#'
+  SYM_WITH_APPL_FALSE=
+fi
+
+echo "$as_me:$LINENO: result: $sym_appl" >&5
+echo "${ECHO_T}$sym_appl" >&6
+
+
+#############################################################################
 #                       Parallel configuration                              #
 #############################################################################
 echo "$as_me:$LINENO: checking whether to compile in the parallel configuration" >&5
@@ -22136,18 +22165,30 @@ if test $sym_enable_parallel = true; then
    SYMDEFS="$SYMDEFS -D__PVM__"
 if test $in_cg = no; then
    WHATTOMAKELIBS=libSym_cg.la
+	if test $sym_appl = yes ; then
+	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cg.la"
+	fi
    WHATTOMAKEBINS=symphony_cg
 fi
 if test $in_cp = no; then
    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
+	if test $sym_appl = yes ; then
+	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cp.la"
+	fi
    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp"
 fi
 if test $in_lp = no; then
    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
+	if test $sym_appl = yes ; then
+	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_lp$LPEXT.la"
+	fi
    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT"
 fi
 if test $in_tm = no; then
    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
+	if test $sym_appl = yes ; then
+	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_tm$TMEXT.la"
+	fi
    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT"
 fi
 else
@@ -22156,6 +22197,11 @@ fi
 
 WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
 WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT"
+
+if test $sym_appl = yes ; then
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
+fi
+
 
 
 
@@ -22180,45 +22226,19 @@ WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT"
 #AC_COIN_VPATH_LINK(examples/sudoku_sample.csv)
 #AC_COIN_VPATH_LINK(examples/quad.mps)
 #AC_COIN_VPATH_LINK(examples/quad2.mps)
-
-
-#############################################################################
-#                       Applications                                        #
-#############################################################################
-
-echo "$as_me:$LINENO: checking whether to compile application library" >&5
-echo $ECHO_N "checking whether to compile application library... $ECHO_C" >&6
-
-# Check whether --with-application or --without-application was given.
-if test "${with_application+set}" = set; then
-  withval="$with_application"
-  sym_appl=$withval
-else
-  sym_appl=no
-fi;
-
-
-
-if test $sym_appl = true; then
-  SYM_WITH_APPL_TRUE=
-  SYM_WITH_APPL_FALSE='#'
-else
-  SYM_WITH_APPL_TRUE='#'
-  SYM_WITH_APPL_FALSE=
-fi
-
-echo "$as_me:$LINENO: result: $sym_appl" >&5
-echo "${ECHO_T}$sym_appl" >&6
-
+#AC_COIN_VPATH_LINK(examples/quad2.mps)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
+
 # Location of SYMPHONY for later use
 
 
 SYMINCDIR=`cd $srcdir; pwd`/include
 SYMSRCDIR=`cd $srcdir; pwd`/src
+
+
 
 # To be used in applications: default SYMPHONY defs
 
@@ -22617,6 +22637,13 @@ echo "$as_me: error: conditional \"DRAWGRAPH\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${SYM_WITH_APPL_TRUE}" && test -z "${SYM_WITH_APPL_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_APPL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYM_WITH_APPL\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${SYM_COMPILE_IN_CG_TRUE}" && test -z "${SYM_COMPILE_IN_CG_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"SYM_COMPILE_IN_CG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -22656,13 +22683,6 @@ if test -z "${SYM_PARALLEL_TRUE}" && test -z "${SYM_PARALLEL_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"SYM_PARALLEL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"SYM_PARALLEL\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${SYM_WITH_APPL_TRUE}" && test -z "${SYM_WITH_APPL_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"SYM_WITH_APPL\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"SYM_WITH_APPL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -23381,6 +23401,8 @@ s,@PSEUDO_COSTS_TRUE@,$PSEUDO_COSTS_TRUE,;t t
 s,@PSEUDO_COSTS_FALSE@,$PSEUDO_COSTS_FALSE,;t t
 s,@DRAWGRAPH_TRUE@,$DRAWGRAPH_TRUE,;t t
 s,@DRAWGRAPH_FALSE@,$DRAWGRAPH_FALSE,;t t
+s,@SYM_WITH_APPL_TRUE@,$SYM_WITH_APPL_TRUE,;t t
+s,@SYM_WITH_APPL_FALSE@,$SYM_WITH_APPL_FALSE,;t t
 s,@SYM_COMPILE_IN_CG_TRUE@,$SYM_COMPILE_IN_CG_TRUE,;t t
 s,@SYM_COMPILE_IN_CG_FALSE@,$SYM_COMPILE_IN_CG_FALSE,;t t
 s,@SYM_COMPILE_IN_CP_TRUE@,$SYM_COMPILE_IN_CP_TRUE,;t t
@@ -23395,9 +23417,8 @@ s,@WHATTOMAKELIBS@,$WHATTOMAKELIBS,;t t
 s,@WHATTOMAKEBINS@,$WHATTOMAKEBINS,;t t
 s,@LPEXT@,$LPEXT,;t t
 s,@CPEXT@,$CPEXT,;t t
+s,@TMEXT@,$TMEXT,;t t
 s,@MASTEREXT@,$MASTEREXT,;t t
-s,@SYM_WITH_APPL_TRUE@,$SYM_WITH_APPL_TRUE,;t t
-s,@SYM_WITH_APPL_FALSE@,$SYM_WITH_APPL_FALSE,;t t
 s,@SYMINCDIR@,$SYMINCDIR,;t t
 s,@SYMSRCDIR@,$SYMSRCDIR,;t t
 s,@SYMDEFS@,$SYMDEFS,;t t
