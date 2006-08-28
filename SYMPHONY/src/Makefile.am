@@ -9,19 +9,19 @@
 AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = 
+#FIXME! Doesn't work for appl library!
+# SYMSOURCES  = \
+# 	$(SYMSRCDIR)/Common      :\
+# 	$(SYMSRCDIR)/LP          :\
+# 	$(SYMSRCDIR)/CutGen      :\
+# 	$(SYMSRCDIR)/CutPool     :\
+# 	$(SYMSRCDIR)/DrawGraph   :\
+# 	$(SYMSRCDIR)/Master      :\
+# 	$(SYMSRCDIR)/../include     :\
+# 	$(SYMSRCDIR)/ :\
+# 	$(SYMSRCDIR)/TreeManager
 
-SYMSOURCES  = \
-	$(SYMSRCDIR)/Common      :\
-	$(SYMSRCDIR)/LP          :\
-	$(SYMSRCDIR)/CutGen      :\
-	$(SYMSRCDIR)/CutPool     :\
-	$(SYMSRCDIR)/DrawGraph   :\
-	$(SYMSRCDIR)/Master      :\
-	$(SYMSRCDIR)/../include     :\
-	$(SYMSRCDIR)/ :\
-	$(SYMSRCDIR)/TreeManager
-
-VPATH  = $(SYMSOURCES)
+#VPATH  = $(vpath)
 
 ##############################################################################
 ##############################################################################
@@ -30,93 +30,98 @@ VPATH  = $(SYMSOURCES)
 ##############################################################################
 
 SYMINCFILES = \
-	SymConfig.h \
-	BB_constants.h \
-	BB_macros.h \
-	BB_types.h \
-	cg.h \
-	cg_params.h \
-	cg_u.h \
-	cp.h \
-	cp_params.h \
-	cp_u.h \
-	dg.h \
-	dg_params.h \
-	dg_u.h \
-	lp.h \
-	lp_params.h \
-	lp_solver.h \
-	lp_u.h \
-	master.h \
-	master_params.h \
-	master_u.h \
-	messages.h \
-	pack_array.h \
-	pack_cut.h \
-	proccomm.h \
-	proto.h \
-	qsortucb.h \
-	return_values.h \
-	symphony_api.h \
-	timemeas.h \
-	tm.h \
-	tm_params.h
+	../include/SymConfig.h \
+	../include/BB_constants.h \
+	../include/BB_macros.h \
+	../include/BB_types.h \
+	../include/cg.h \
+	../include/cg_params.h \
+	../include/cg_u.h \
+	../include/cp.h \
+	../include/cp_params.h \
+	../include/cp_u.h \
+	../include/dg.h \
+	../include/dg_params.h \
+	../include/dg_u.h \
+	../include/lp.h \
+	../include/lp_params.h \
+	../include/lp_solver.h \
+	../include/lp_u.h \
+	../include/master.h \
+	../include/master_params.h \
+	../include/master_u.h \
+	../include/messages.h \
+	../include/pack_array.h \
+	../include/pack_cut.h \
+	../include/proccomm.h \
+	../include/proto.h \
+	../include/qsortucb.h \
+	../include/return_values.h \
+	../include/symphony_api.h \
+	../include/timemeas.h \
+	../include/tm.h \
+	../include/tm_params.h
 
-MASTER_SRC	= master.c master_wrapper.c master_io.c master_func.c
+MASTER_SRC	= Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c
 
-MASTER_MAIN_SRC     = main.c
+MASTER_MAIN_SRC     = Master/main.c
 
-DG_SRC		= draw_graph.c
+DG_SRC		= DrawGraph/draw_graph.c
 
 if SYM_COMPILE_IN_TM
-TM_SRC		= tm_func.c tm_proccomm.c
+TM_SRC		= TreeManager/tm_func.c TreeManager/tm_proccomm.c
 else
-TM_SRC          = treemanager.c tm_func.c tm_proccomm.c
+TM_SRC          = TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c
 endif
 if SYM_COMPILE_IN_LP
-TM_SRC         += lp_solver.c lp_varfunc.c lp_rowfunc.c lp_genfunc.c
-TM_SRC         += lp_proccomm.c lp_wrapper.c lp_free.c
+TM_SRC         += LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
+	LP/lp_genfunc.c
+TM_SRC         += LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c
 if PSEUDO_COSTS
-TM_SRC         += lp_pseudo_branch.c
+TM_SRC         += LP/lp_pseudo_branch.c
 else
-TM_SRC         += lp_branch.c
+TM_SRC         += LP/lp_branch.c
 endif
 if SYM_COMPILE_IN_CG
-TM_SRC         += cg_func.c cg_wrapper.c
+TM_SRC         += CutGen/cg_func.c CutGen/cg_wrapper.c
 endif
 else
-MASTER_SRC += lp_solver.c
+MASTER_SRC += LP/lp_solver.c
 endif
 
 if SYM_COMPILE_IN_CP
-TM_SRC	       += cp_proccomm.c cp_func.c cp_wrapper.c
+TM_SRC	       += CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c
 endif
 if SYM_COMPILE_IN_TM
 MASTER_SRC     += $(TM_SRC)
 endif
 
-LP_SRC		= lp_solver.c lp_varfunc.c lp_rowfunc.c lp_genfunc.c \
-		  lp_proccomm.c lp_wrapper.c lp.c lp_free.c
+LP_SRC		= LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c
 if PSEUDO_COSTS
-LP_SRC         += lp_pseudo_branch.c
+LP_SRC         += LP/lp_pseudo_branch.c
 else
-LP_SRC         += lp_branch.c
+LP_SRC         += LP/lp_branch.c
 endif
 
 if SYM_COMPILE_IN_CG
-LP_SRC         += cg_func.c cg_wrapper.c
+LP_SRC         += CutGen/cg_func.c CutGen/cg_wrapper.c
 endif
 
-CP_SRC		= cut_pool.c cp_proccomm.c cp_func.c cp_wrapper.c
+CP_SRC		= CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c
 
-CG_SRC		= cut_gen.c cg_proccomm.c cg_func.c cg_wrapper.c
+CG_SRC		= CutGen/cut_gen.c CutGen/cg_proccomm.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c
 
-QSORT_SRC	= qsortucb.c qsortucb_i.c qsortucb_ii.c qsortucb_id.c \
-		  qsortucb_di.c qsortucb_ic.c
-TIME_SRC	= timemeas.c
-PROCCOMM_SRC	= proccomm.c
-PACKCUT_SRC	= pack_cut.c
-PACKARRAY_SRC	= pack_array.c
+QSORT_SRC	= Common/qsortucb.c Common/qsortucb_i.c Common/qsortucb_ii.c \
+	Common/qsortucb_id.c Common/qsortucb_di.c Common/qsortucb_ic.c
+TIME_SRC	= Common/timemeas.c
+PROCCOMM_SRC	= Common/proccomm.c
+PACKCUT_SRC	= Common/pack_cut.c
+PACKARRAY_SRC	= Common/pack_array.c
 
 BB_SRC = $(MASTER_SRC) $(DG_SRC) $(TM_SRC) $(LP_SRC) $(CP_SRC) $(CG_SRC) \
 	 $(QSORT_SRC) $(TIME_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
@@ -263,14 +268,12 @@ endif
 LDADD += $(OSIOBJDIR)/src/libOsi.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 
+ALLLDADD = $(LDADD) $(ADDLIBS)
+
 if SYM_PARALLEL
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-LDADD +=  -L$(PVM_ROOT)/lib/$(ARCH) -lgpvm3 -lpvm3
+ALLLDADD +=  -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` -lgpvm3 -lpvm3
 endif
-
-#LIBS += $(ADDLIBS)
-
-ALLLDADD = $(LDADD) $(ADDLIBS)
 
 ########################################################################
 #                            Additional flags                          #
@@ -442,7 +445,11 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 	libSym_tm.la libSym_tm_lp.la libSym_tm_cp.la libSym_tm_lp_cg.la \
 	libSym_tm_lp_cg_cp.la libSym_m_tm.la libSym_m_tm_lp.la \
 	libSym_m_tm_cp.la libSym_m_tm_lp_cg.la libSym_m_tm_lp_cg_cp.la \
-	libSym_cp.la 
+	libSym_cp.la libSymAppl.la libSymAppl_cg.la libSymAppl_lp.la \
+	libSymAppl_lp_cg.la libSymAppl_tm.la libSymAppl_tm_lp.la \
+	libSymAppl_tm_cp.la libSymAppl_tm_lp_cg.la libSymAppl_tm_lp_cg_cp.la \
+	libSymAppl_m_tm.la libSymAppl_m_tm_lp.la libSymAppl_m_tm_cp.la \
+	libSymAppl_m_tm_lp_cg.la libSymAppl_m_tm_lp_cg_cp.la libSymAppl_cp.la 
 
 #$(WHATTOMAKELIBS) $(WHATTOMAKEBINS)
 #if !SYM_PARALLEL
@@ -451,7 +458,6 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 # in the 'lib' directory
 
 lib_LTLIBRARIES = $(WHATTOMAKELIBS)
-
 
 STATIC_LINK =  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -static\
 	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -556,6 +562,12 @@ libSym_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
 # LDFLAGS += -rpath $(libdir)
 
 # # List all source files for this executable, including headers
+# symphony_SOURCES = $(MAIN_SRC) symphony_api.h
+# symphony_DEPENDENCIES = $(LDADD)
+# symphony_LDADD = libSym$(MASTEREXT).la $(ALLLDADD)
+# symphony_LDFLAGS = -rpath $(libdir)
+
+
 symphony_SOURCES = $(MAIN_SRC) symphony_api.h
 symphony_DEPENDENCIES = $(LDADD)
 symphony_LDADD = libSym$(MASTEREXT).la $(ALLLDADD)
@@ -636,18 +648,69 @@ symphony_lp_cg_cp_LDFLAGS = -rpath $(libdir)
 #                Application Library                                   #    
 ########################################################################
 
-if SYM_WITH_APPL
+APPLCPPFLAGS = $(AM_CPPFLAGS) -DUSE_SYM_APPLICATION
 
-lib_LTLIBRARIES += libSymAppl.la
+libSymAppl_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
+libSymAppl_m_tm_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
+libSymAppl_m_tm_lp_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
+libSymAppl_m_tm_cp_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
+libSymAppl_m_tm_lp_cg_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
+libSymAppl_m_tm_lp_cg_cp_la_SOURCES = $(SYMINCFILES) $(ALL_MASTER)
+libSymAppl_lp_la_SOURCES = $(SYMINCFILES) $(ALL_LP)
+libSymAppl_lp_cg_la_SOURCES = $(SYMINCFILES) $(ALL_LP)
+libSymAppl_cg_la_SOURCES = $(SYMINCFILES) $(ALL_CG)
+libSymAppl_cp_la_SOURCES = $(SYMINCFILES) $(ALL_CP)
+libSymAppl_tm_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
+libSymAppl_tm_lp_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
+libSymAppl_tm_lp_cg_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
+libSymAppl_tm_lp_cg_cp_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
+libSymAppl_tm_cp_la_SOURCES = $(SYMINCFILES) $(ALL_TM)
 
-libSymAppl_la_SOURCES = $(libSym_la_SOURCES)
+libSymAppl_lp_la_LINK = $(STATIC_LINK)
+libSymAppl_lp_cg_la_LINK = $(STATIC_LINK)
+libSymAppl_cg_la_LINK = $(STATIC_LINK)
+libSymAppl_cp_la_LINK = $(STATIC_LINK)
+libSymAppl_tm_la_LINK = $(STATIC_LINK)
+libSymAppl_tm_lp_la_LINK = $(STATIC_LINK)
+libSymAppl_tm_lp_cg_la_LINK = $(STATIC_LINK)
+libSymAppl_tm_lp_cg_cp_la_LINK = $(STATIC_LINK)
+libSymAppl_tm_cp_la_LINK = $(STATIC_LINK)
 
-libSymAppl_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_SYM_APPLICATION
+libSymAppl_la_LDFLAGS = $(LT_LDFLAGS) 
+libSymAppl_m_tm_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_m_tm_lp_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_m_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_m_tm_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_m_tm_lp_cg_cp_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_lp_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_cg_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_cp_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_tm_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_tm_lp_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_tm_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_tm_lp_cg_cp_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
 
-# This is for libtool (on Windows)
-libSymAppl_la_LDFLAGS = $(LT_LDFLAGS)
+libSymAppl_la_CPPFLAGS = $(APPLCPPFLAGS) 
+libSymAppl_m_tm_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_m_tm_lp_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_m_tm_cp_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_m_tm_lp_cg_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_m_tm_lp_cg_cp_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_lp_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_lp_cg_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_cg_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_cp_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_tm_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_tm_lp_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_tm_lp_cg_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_tm_lp_cg_cp_la_CPPFLAGS = $(APPLCPPFLAGS)
+libSymAppl_tm_cp_la_CPPFLAGS = $(APPLCPPFLAGS)
 
-endif 
+########################################################################
+#                Other stuff                                           #    
+########################################################################
 
 COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
 # Compile everything with g++
@@ -703,4 +766,4 @@ ConfigHeader = SymConfig.h
 # uninstall-local:
 # 	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
 
-CLEANFILES = dummy.cpp
+
