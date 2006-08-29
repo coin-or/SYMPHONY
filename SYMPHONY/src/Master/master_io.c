@@ -790,7 +790,7 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    }
 
    if (has_ub){
-     gap = 100*(ub-lb)/ub;
+     gap = fabs(100*(ub-lb)/ub);
    }
 
    if (obj_sense == SYM_MAXIMIZE){
