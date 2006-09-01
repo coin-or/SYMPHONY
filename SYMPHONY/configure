@@ -482,7 +482,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LT_LDFLAGS RPATH_FLAGS COIN_HAS_READLINE_TRUE COIN_HAS_READLINE_FALSE COINUTILSSRCDIR COINUTILSOBJDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE OSISRCDIR OSIOBJDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CGLSRCDIR CGLOBJDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CPXINCDIR CPXLIB COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE GLPKINCDIR GLPKLIB COIN_HAS_GLPK_TRUE COIN_HAS_GLPK_FALSE OSLINCDIR OSLLIB COIN_HAS_OSL_TRUE COIN_HAS_OSL_FALSE SPXINCDIR SPXLIB COIN_HAS_SPX_TRUE COIN_HAS_SPX_FALSE XPRINCDIR XPRLIB COIN_HAS_XPR_TRUE COIN_HAS_XPR_FALSE COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE CLPSRCDIR CLPOBJDIR CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE GLPK_LP_SOLVER_TRUE GLPK_LP_SOLVER_FALSE OSL_LP_SOLVER_TRUE OSL_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE SOPLEX_LP_SOLVER_TRUE SOPLEX_LP_SOLVER_FALSE XPRESS_LP_SOLVER_TRUE XPRESS_LP_SOLVER_FALSE USE_CGL_CUTS_TRUE USE_CGL_CUTS_FALSE USE_GMPL_TRUE USE_GMPL_FALSE USE_OSI_INTERFACE_TRUE USE_OSI_INTERFACE_FALSE SENSITIVITY_ANALYSIS_TRUE SENSITIVITY_ANALYSIS_FALSE ROOT_NODE_ONLY_TRUE ROOT_NODE_ONLY_FALSE COMPILE_FRAC_BRANCHING_TRUE COMPILE_FRAC_BRANCHING_FALSE DO_TESTS_TRUE DO_TESTS_FALSE TM_BASIS_TESTS_TRUE TM_BASIS_TESTS_FALSE TRACE_PATH_TRUE TRACE_PATH_FALSE CHECK_CUT_VALIDITY_TRUE CHECK_CUT_VALIDITY_FALSE STATISTICS_TRUE STATISTICS_FALSE PSEUDO_COSTS_TRUE PSEUDO_COSTS_FALSE DRAWGRAPH_TRUE DRAWGRAPH_FALSE SYM_WITH_APPL_TRUE SYM_WITH_APPL_FALSE SYM_COMPILE_IN_CG_TRUE SYM_COMPILE_IN_CG_FALSE SYM_COMPILE_IN_CP_TRUE SYM_COMPILE_IN_CP_FALSE SYM_COMPILE_IN_LP_TRUE SYM_COMPILE_IN_LP_FALSE SYM_COMPILE_IN_TM_TRUE SYM_COMPILE_IN_TM_FALSE SYM_PARALLEL_TRUE SYM_PARALLEL_FALSE WHATTOMAKELIBS WHATTOMAKEBINS LPEXT CPEXT TMEXT MASTEREXT SYMINCDIR SYMSRCDIR SYMDEFS ARCH COIN_HAS_CLP SYMAPPLDIR SYM_DEBUG_TRUE SYM_DEBUG_FALSE LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LT_LDFLAGS RPATH_FLAGS COIN_HAS_READLINE_TRUE COIN_HAS_READLINE_FALSE COINUTILSSRCDIR COINUTILSOBJDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE OSISRCDIR OSIOBJDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CGLSRCDIR CGLOBJDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CPXINCDIR CPXLIB COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE GLPKINCDIR GLPKLIB COIN_HAS_GLPK_TRUE COIN_HAS_GLPK_FALSE OSLINCDIR OSLLIB COIN_HAS_OSL_TRUE COIN_HAS_OSL_FALSE SPXINCDIR SPXLIB COIN_HAS_SPX_TRUE COIN_HAS_SPX_FALSE XPRINCDIR XPRLIB COIN_HAS_XPR_TRUE COIN_HAS_XPR_FALSE COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE CLPSRCDIR CLPOBJDIR CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE GLPK_LP_SOLVER_TRUE GLPK_LP_SOLVER_FALSE OSL_LP_SOLVER_TRUE OSL_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE SOPLEX_LP_SOLVER_TRUE SOPLEX_LP_SOLVER_FALSE XPRESS_LP_SOLVER_TRUE XPRESS_LP_SOLVER_FALSE USE_CGL_CUTS_TRUE USE_CGL_CUTS_FALSE USE_GMPL_TRUE USE_GMPL_FALSE USE_OSI_INTERFACE_TRUE USE_OSI_INTERFACE_FALSE SENSITIVITY_ANALYSIS_TRUE SENSITIVITY_ANALYSIS_FALSE ROOT_NODE_ONLY_TRUE ROOT_NODE_ONLY_FALSE COMPILE_FRAC_BRANCHING_TRUE COMPILE_FRAC_BRANCHING_FALSE DO_TESTS_TRUE DO_TESTS_FALSE TM_BASIS_TESTS_TRUE TM_BASIS_TESTS_FALSE TRACE_PATH_TRUE TRACE_PATH_FALSE CHECK_CUT_VALIDITY_TRUE CHECK_CUT_VALIDITY_FALSE STATISTICS_TRUE STATISTICS_FALSE PSEUDO_COSTS_TRUE PSEUDO_COSTS_FALSE DRAWGRAPH_TRUE DRAWGRAPH_FALSE SYM_WITH_APPL_TRUE SYM_WITH_APPL_FALSE SYM_COMPILE_IN_CG_TRUE SYM_COMPILE_IN_CG_FALSE SYM_COMPILE_IN_CP_TRUE SYM_COMPILE_IN_CP_FALSE SYM_COMPILE_IN_LP_TRUE SYM_COMPILE_IN_LP_FALSE SYM_COMPILE_IN_TM_TRUE SYM_COMPILE_IN_TM_FALSE SYM_PARALLEL_TRUE SYM_PARALLEL_FALSE WHATTOMAKELIBS WHATTOMAKEBINS LPEXT CPEXT TMEXT MASTEREXT SYMINCDIR SYMSRCDIR SYMDEFS SYMPDEFS ARCH COIN_HAS_CLP SYMAPPLDIR SYM_DEBUG_TRUE SYM_DEBUG_FALSE LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -22000,16 +22000,115 @@ else
   sym_parallel=no
 fi;
 
+pvm_path=no
+
 if test $sym_parallel = no; then
     echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 else
     echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
+        if test x"" = x; then
+  hdr="#include <pvm3.h>"
+else
+  hdr=""
+fi
+
+for ac_header in pvm3.h
+do
+as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6
+if eval "test \"\${$as_ac_Header+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$hdr
+
+#include <$ac_header>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  eval "$as_ac_Header=yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+eval "$as_ac_Header=no"
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Header'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_Header'}'`" >&6
+if test `eval echo '${'$as_ac_Header'}'` = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+ pvm_path=yes
+fi
+
+done
+
+
+    if test $pvm_path = no; then
+        as_ac_File=`echo "ac_cv_file_$PVM_ROOT/include/pvm3.h" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $PVM_ROOT/include/pvm3.h" >&5
+echo $ECHO_N "checking for $PVM_ROOT/include/pvm3.h... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$PVM_ROOT/include/pvm3.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  pvm_path=yes
 fi
 
 
+    fi
 
+    if test $pvm_path = no; then
+       { { echo "$as_me:$LINENO: error: Cannot find the pvm header files either in system path or
+in PVM_ROOT path:$PVM_ROOT" >&5
+echo "$as_me: error: Cannot find the pvm header files either in system path or
+in PVM_ROOT path:$PVM_ROOT" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
+fi
 
 #---------------------------------------------------------------------------#
 
@@ -22099,9 +22198,9 @@ sym_enable_parallel=false;
 if test $in_cg = no || test $in_cp = no ||
    test $in_lp = no || test $in_tm = no; then
 #   sym_def_pconfig=false;
-   if test $sym_parallel=true; then
-      { { echo "$as_me:$LINENO: error: First enable parallel configuration!" >&5
-echo "$as_me: error: First enable parallel configuration!" >&2;}
+   if test $sym_parallel=no; then
+      { { echo "$as_me:$LINENO: error: First enable parallel configuration: --with-pvm!" >&5
+echo "$as_me: error: First enable parallel configuration: --with-pvm!" >&2;}
    { (exit 1); exit 1; }; }
    fi
    sym_enable_parallel=true;
@@ -22138,31 +22237,34 @@ CPEXT=
 TMEXT=
 MASTEREXT=
 LIBNAME=
+SYMPDEFS="$SYMDEFS"
+
+SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP -DCOMPILE_IN_TM"
 
 if test $in_cg = yes; then
    LPEXT=_cg
-   SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG"
+   SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_CG"
 fi
 if test $in_cp = yes; then
-   SYMDEFS="$SYMDEFS -DCOMPILE_IN_CP"
+   SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_CP"
    CPEXT=_cp
 fi
 if test $in_lp = yes; then
-  SYMDEFS="$SYMDEFS -DCOMPILE_IN_LP"
+  SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_LP"
   TMEXT="_lp$LPEXT$CPEXT"
 else
   TMEXT=$CPEXT
 fi
 if test $in_tm = yes; then
-  SYMDEFS="$SYMDEFS -DCOMPILE_IN_TM"
-  MASTEREXT="_m_tm$TMEXT"
+  SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_TM"
+  MASTEREXT="_tm$TMEXT"
 fi
 
 WHATTOMAKELIBS=
 WHATTOMAKEBINS=
 
 if test $sym_enable_parallel = true; then
-   SYMDEFS="$SYMDEFS -D__PVM__"
+   SYMPDEFS="$SYMPDEFS -D__PVM__"
 if test $in_cg = no; then
    WHATTOMAKELIBS=libSym_cg.la
 	if test $sym_appl = yes ; then
@@ -22191,16 +22293,23 @@ if test $in_tm = no; then
 	fi
    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT"
 fi
+  MASTEREXT="_m$MASTEREXT"
+  WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
+  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT"
+  if test $sym_appl = yes ; then
+     WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
+  fi
 else
   MASTEREXT=
 fi
 
-WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
-WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT"
+  WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
+  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony"
 
-if test $sym_appl = yes ; then
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
-fi
+  if test $sym_appl = yes ; then
+     WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+  fi
+
 
 
 
@@ -22245,6 +22354,7 @@ SYMSRCDIR=`cd $srcdir; pwd`/src
 
 
 
+
 # Location of Applications for later use
 
 SYMAPPLDIR=`pwd`/Applications
@@ -22262,9 +22372,19 @@ else
 fi
 
 
+#FIXME-For now, redefine CFLAGS and CXXFLAGS
+CFLAGS=
+CXXFLAGS=
+if test $coin_debug_compile = true; then
+   CFLAGS="-g -pipe"
+   CXXFLAGS="$CFLAGS"
+fi
+
+
+
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                  ac_config_files="$ac_config_files Makefile src/Makefile Applications/CNRP/Makefile Applications/USER/Makefile sym_addlibs.txt"
+                                                            ac_config_files="$ac_config_files Makefile src/Makefile Applications/CNRP/Makefile Applications/USER/Makefile Applications/VRP/Makefile sym_addlibs.txt"
 
 
 #src/GMPL/Makefile
@@ -23141,6 +23261,7 @@ do
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "Applications/CNRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/CNRP/Makefile" ;;
   "Applications/USER/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/USER/Makefile" ;;
+  "Applications/VRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/VRP/Makefile" ;;
   "sym_addlibs.txt" ) CONFIG_FILES="$CONFIG_FILES sym_addlibs.txt" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/config_sym.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config_sym.h" ;;
@@ -23422,6 +23543,7 @@ s,@MASTEREXT@,$MASTEREXT,;t t
 s,@SYMINCDIR@,$SYMINCDIR,;t t
 s,@SYMSRCDIR@,$SYMSRCDIR,;t t
 s,@SYMDEFS@,$SYMDEFS,;t t
+s,@SYMPDEFS@,$SYMPDEFS,;t t
 s,@ARCH@,$ARCH,;t t
 s,@COIN_HAS_CLP@,$COIN_HAS_CLP,;t t
 s,@SYMAPPLDIR@,$SYMAPPLDIR,;t t
