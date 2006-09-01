@@ -1,0 +1,192 @@
+
+##############################################################################
+##############################################################################
+#                                                                            #
+# This file is part of the SYMPHONY Branch, Cut, and Price Library.          #
+#                                                                            #
+# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and     #
+# Laci Ladanyi (ladanyi@us.ibm.com).                                         #
+#                                                                            #
+# (c) Copyright 2000-2005  Ted Ralphs. All Rights Reserved.                  #
+#                                                                            #
+# This software is licensed under the Common Public License. Please see      #
+# accompanying file for terms.                                               #
+#                                                                            #
+##############################################################################
+##############################################################################
+
+
+#Configuration of SYMPHONY 5.1
+
+# Compile all projects with debug options tests
+#--enable-debug          
+
+# Compile this project (SYMPHONY) with debug options
+#--enable-debug-symphony 
+
+# Build static libraries [default=no]
+#--enable-static[=PKGS]
+                          
+# Build shared libraries [default=yes]
+#--enable-shared[=PKGS]
+
+##############################################################################
+# Compile with GNU packages (disabled by default). 
+# If you want to use the GNU readline library, then simply set the following 
+# flag. It will allow the interactive shell to be able to behave exactly like 
+# the Linux terminal command line, i.e., it will keep the history of the used 
+# commands, will complete the input word to possible commands, etc. Make sure
+# that you have the needed package (readline.h and history.h include files 
+# and their libraries) on the system files path. 
+##############################################################################
+#--enable-gnu-packages   
+
+##############################################################################
+##############################################################################
+# Generate generic cutting planes (enabled by default). If you are using the 
+# OSI interface, you can now add generic cutting planes from the CGL by 
+# setting the flag below. Which cutting planes are added can be controlled 
+# by SYMPHONY parameters (see the user's manual). 
+##############################################################################
+##############################################################################
+#--disable-cgl-cuts      
+
+##############################################################################
+# Compile in the sensitivity analysis features
+##############################################################################
+#--enable-sensitivity-analysis
+
+##############################################################################
+# Option to only process the root node (for testing root lower bounds)
+##############################################################################
+#--enable-root-only      
+
+######################################################################
+# Whether to compile in the fractional branching option
+######################################################################
+#--enable-frac-branching 
+
+#######################################################################
+# Whether to perform additional sanity checks (for debugging purposes)
+#######################################################################
+#--enable-tests          
+
+#######################################################################
+# More testing ....
+#######################################################################
+#--enable-tm-tests       
+
+#######################################################################
+# Additional debugging options 
+#######################################################################
+#  --enable-trace-path     
+#  --enable-cut-check      
+
+#######################################################################
+# Additional statistics
+#######################################################################
+#--enable-statistics     
+
+##############################################################################
+# Some experimental pseudo-cost branching stuff
+##############################################################################
+#--enable-pseudo-costs   
+  
+##############################################################################
+# Set this to true if you are going to use the IGD graph drawing application
+##############################################################################
+#--enable-draw-graph     
+
+
+##############################################################################
+##############################################################################
+# LP solver dependent definitions
+# Specify the name, library and the directory with the header files for the 
+# corresponding lp solver. By default, SYMPHONY uses Clp.
+##############################################################################
+##############################################################################
+
+#Specify the LP solver in small letters(default lpsolver=clp)
+#--with-lp-solver[=lpsolver]
+
+# Specify the library and the directory with the header files for the 
+# corresponding lp solver
+
+#--with-cplex-incdir 
+#--with-cplex-lib 
+
+#--with-glpk-incdir 
+#--with-glpk-lib 
+
+#--with-osl-incdir 
+#--with-osl-lib 
+
+#--with-soplex-incdir 
+#--with-soplex-lib 
+
+#--with-xpress-incdir 
+#--with-xpress-lib 
+
+##############################################################################
+# Compile with GMPL reader. GLPK package is required to use this option. 
+# When GLPK package is specified, this option will be enabled by default. 
+##############################################################################
+#--without-gmpl             
+
+##############################################################################
+# If you wish to compile and use SYMPHONY or one of the application through 
+# the SYMPHONY OSI interface, set the following flag. This will 
+# only have the main function to call the OSI SYMPHONY interface. See the 
+# corresponding main function for the implementation. 
+##############################################################################
+#--with-osi-interface    
+
+##############################################################################
+# Compile the application library
+##############################################################################
+#--with-application      
+
+##############################################################################
+#Compile in parallel architecture (assuming that pvm is installed either in 
+# system path or the bash variable PVM_ROOT is defined.) 
+##############################################################################
+#--with-pvm              
+
+##############################################################################
+#
+# These options are for configuring the modules and have the following
+# meanings:
+# --with-cg: If set to true, then the CG function will be called
+#       directly from each LP solver instead of running as a separate 
+#       executable. Note that the parameter "use_cg" should be set to FALSE 
+#       (the default) if this option is set. The executable containing the LP 
+#       solver will have the suffix _cg added to it to denote the inclusion of
+#       the cut generator function.
+# --with-cp: As above, if this flag is set, then the cut pool resides
+#	in the LP solver and the pool is scanned directly from there. Note that
+#	if this option is chosen when multiple LP processes are running, then
+#	they will all have their own cut pool. The executable containing the 
+#	LP solver will have the suffix _cp added to it to denote the inclusion
+#	of the cut generator function.
+# --with-lp: If this flag is set, the LP solver will be called 
+#       directly from the tree manager. Note that this necessarily implies 
+#       that there only be one LP solver. This DOES NOT automatically imply 
+#       that the cut generator and/or cut pool will be compiled in. The tree 
+#	manager executable name will have the appropriate suffix added to it
+#	to denote the inclusion of the LP solver function.
+# --with-tm: If this flag is set, the tree manager function will be 
+#	compiled directly from the master module instead of running as a 
+#	separate executable. This DOES NOT imply that the LP, cut generator 
+#	or cut pool functions will be compiled in. The master executable
+#	name will contain a suffix indicating what functions are compiled in
+#
+##############################################################################
+# When parallel configuration is set by '--with-pvm', and none of the 
+# following flags are set, SYMPHONY will set up the default configuration: 
+# '--without-lp --with-cg --with-cp --with-tm'. If you want to override the 
+# default configuration, comment out any of the followings. 
+##############################################################################
+#--without-cg            
+#--without-cp            
+#--without-lp            
+#--without-tm            

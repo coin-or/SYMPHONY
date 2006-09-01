@@ -31,3 +31,4 @@ SYMPHONY/sym_addlibs.txt.in -text
 /install-sh -text
 /ltmain.sh -text
 /missing -text
+share/config.site -text
