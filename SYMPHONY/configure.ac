@@ -481,173 +481,6 @@ case $build in
 esac
 
 #############################################################################
-#                       Parallel configuration                              #
-#############################################################################
-AC_MSG_CHECKING([whether to compile in the parallel configuration])
-AC_ARG_WITH([pvm],
-[AC_HELP_STRING([--with-pvm],
-                [compile in parallel architecture (assuming that 
-		pvm is installed and the variable PVM_ROOT is 
-		defined.)])],
-		[sym_parallel=$withval],[sym_parallel=no])
-	
-if test $sym_parallel = no; then 
-    AC_MSG_RESULT(no)
-else
-    AC_MSG_RESULT(yes)
-fi
-
-dnl AC_MSG_CHECKING([whether to compile in the parallel configuration])
-dnl AC_ARG_WITH([pvm],
-dnl [AC_HELP_STRING([--with-pvm],
-dnl                 [set the root directory for pvm])],
-dnl 		[PVM_ROOT=$withval],[PVM_ROOT=none])
-dnl sym_parallel='yes'
-dnl case $PVM_ROOT in
-dnl      none)
-dnl     sym_parallel=false
-dnl     AC_MSG_RESULT(no)
-dnl      ;;
-dnl      *)
-dnl     AC_MSG_RESULT(yes)
-dnl      m4_ifvaln([pvmalloc.h],[AC_CHECK_FILE([$PVM_ROOT/src/pvmalloc.h],[],
-dnl                  [AC_MSG_ERROR([Cannot find the pvm header files 
-dnl in $PVM_ROOT/src])])])
-dnl     ;;
-dnl esac
-
-dnl AC_SUBST(PVM_ROOT)
-
-
-#---------------------------------------------------------------------------#
-
-#AC_MSG_CHECKING([whether to compile in cg])
-AC_ARG_WITH([cg],
-[AC_HELP_STRING([--without-cg],
-                [compile without cut generator module(default=yes)])],
-[in_cg=$withval],[in_cg=yes])
-AM_CONDITIONAL(SYM_COMPILE_IN_CG, [test "$in_cg" = yes])
-
-#AC_MSG_CHECKING([whether to compile in cp])
-AC_ARG_WITH([cp],
-[AC_HELP_STRING([--without-cp],
-                [compile without cut pool module(defualt=yes)])],
-[in_cp=$withval],[in_cp=yes])
-AM_CONDITIONAL(SYM_COMPILE_IN_CP, [test "$in_cp" = yes])
-
-
-#AC_MSG_CHECKING([whether to compile in lp])
-AC_ARG_WITH([lp],
-[AC_HELP_STRING([--without-lp],
-                [compile without LP solver module(default=yes)])],
-[in_lp=$withval],[in_lp=yes])
-AM_CONDITIONAL(SYM_COMPILE_IN_LP, [test "$in_lp" = yes])
-
-#AC_MSG_CHECKING([whether to compile in tm])
-AC_ARG_WITH([tm],
-[AC_HELP_STRING([--without-tm],
-                [compile without tree manager module (default=yes)])],
-[in_tm=$withval],[in_tm=yes])
-AM_CONDITIONAL(SYM_COMPILE_IN_TM, [test "$in_tm" = yes])
-
-#sym_def_pconfig=true;
-sym_enable_parallel=false;
-if [test $in_cg = no || test $in_cp = no ||  
-   test $in_lp = no || test $in_tm = no]; then
-#   sym_def_pconfig=false;
-   if test $sym_parallel=true; then 
-      AC_MSG_ERROR(First enable parallel configuration!)
-   fi
-   sym_enable_parallel=true;
-else 
-   if test $sym_parallel = yes; then 
-       in_lp=no
-       AM_CONDITIONAL(SYM_COMPILE_IN_LP, false)
-       sym_enable_parallel=true;
-   fi
-fi
-
-AM_CONDITIONAL(SYM_PARALLEL, $sym_enable_parallel)
-
-LPEXT=
-CPEXT=
-TMEXT=
-MASTEREXT=
-LIBNAME=
-
-if test $in_cg = yes; then 
-   LPEXT=_cg
-   SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG"
-fi 
-if test $in_cp = yes; then 
-   SYMDEFS="$SYMDEFS -DCOMPILE_IN_CP"
-   CPEXT=_cp
-fi 
-if test $in_lp = yes; then 
-  SYMDEFS="$SYMDEFS -DCOMPILE_IN_LP"
-  TMEXT="_lp$LPEXT$CPEXT"
-else
-  TMEXT=$CPEXT
-fi 
-if test $in_tm = yes; then 
-  SYMDEFS="$SYMDEFS -DCOMPILE_IN_TM"
-  MASTEREXT="_m_tm$TMEXT"
-fi 
-
-WHATTOMAKELIBS=
-WHATTOMAKEBINS=
-
-if test $sym_enable_parallel = true; then
-   SYMDEFS="$SYMDEFS -D__PVM__"
-if test $in_cg = no; then 
-   WHATTOMAKELIBS=libSym_cg.la
-   WHATTOMAKEBINS=symphony_cg
-fi 
-if test $in_cp = no; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp"
-fi 
-if test $in_lp = no; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT"
-fi 
-if test $in_tm = no; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT"
-fi 
-else
-  MASTEREXT=
-fi
-
-WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
-WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT"
-
-AC_SUBST(WHATTOMAKELIBS)
-AC_SUBST(WHATTOMAKEBINS)
-AC_SUBST(LPEXT)
-AC_SUBST(CPEXT)
-AC_SUBST(MASTEREXT)
-
-#############################################################################
-#                       Other third party software                          #
-#############################################################################
-
-# Ampl Solver library
-#AC_COIN_HAS_ASL
-
-##############################################################################
-#                   VPATH links for example input files                      #
-##############################################################################
-
-# In case this is a VPATH configuration we need to make sure that the
-# input files for the examples are available in the VPATH directory.
-
-#AC_COIN_VPATH_LINK(examples/sudoku_sample.csv)
-#AC_COIN_VPATH_LINK(examples/quad.mps)
-#AC_COIN_VPATH_LINK(examples/quad2.mps)
-
-
-#############################################################################
 #                       Applications                                        #
 #############################################################################
 
@@ -657,7 +490,7 @@ AC_ARG_WITH([application],
                 [compile the application library])],
 		[sym_appl=$withval],[sym_appl=no])
 
-AM_CONDITIONAL(SYM_WITH_APPL, [test $sym_appl = true])
+AM_CONDITIONAL(SYM_WITH_APPL, [test $sym_appl = yes])
 AC_MSG_RESULT($sym_appl)
 dnl AM_CONDITIONAL(SYM_WITH_APPL, false)
 dnl AC_MSG_CHECKING(whether to compile application library)
@@ -702,17 +535,217 @@ dnl AM_CONDITIONAL(SYM_WITH_SPP_CUTS, [test $sym_appl = spp_with_cuts])
 dnl AM_CONDITIONAL(SYM_WITH_USER, [test $sym_appl = user])
 dnl AM_CONDITIONAL(SYM_WITH_VRP, [test $sym_appl = vrp])
 
+#############################################################################
+#                       Parallel configuration                              #
+#############################################################################
+AC_MSG_CHECKING([whether to compile in the parallel configuration])
+AC_ARG_WITH([pvm],
+[AC_HELP_STRING([--with-pvm],
+                [compile in parallel architecture (assuming that 
+		pvm is installed and the variable PVM_ROOT is 
+		defined.)])],
+		[sym_parallel=$withval],[sym_parallel=no])
+
+pvm_path=no
+
+if test $sym_parallel = no; then 
+    AC_MSG_RESULT(no)
+else
+    AC_MSG_RESULT(yes)
+        AC_COIN_CHECK_HEADER([pvm3.h],[pvm_path=yes])                       
+    if test $pvm_path = no; then 
+        m4_ifvaln([pvm3.h],[AC_CHECK_FILE([$PVM_ROOT/include/pvm3.h],
+                 [pvm_path=yes])],[])
+    fi
+
+    if test $pvm_path = no; then
+       AC_MSG_ERROR([Cannot find the pvm header files either in system path or 
+in PVM_ROOT path:$PVM_ROOT])
+    fi
+fi
+
+#---------------------------------------------------------------------------#
+
+#AC_MSG_CHECKING([whether to compile in cg])
+AC_ARG_WITH([cg],
+[AC_HELP_STRING([--without-cg],
+                [compile without cut generator module(default=yes)])],
+[in_cg=$withval],[in_cg=yes])
+AM_CONDITIONAL(SYM_COMPILE_IN_CG, [test "$in_cg" = yes])
+
+#AC_MSG_CHECKING([whether to compile in cp])
+AC_ARG_WITH([cp],
+[AC_HELP_STRING([--without-cp],
+                [compile without cut pool module(defualt=yes)])],
+[in_cp=$withval],[in_cp=yes])
+AM_CONDITIONAL(SYM_COMPILE_IN_CP, [test "$in_cp" = yes])
+
+
+#AC_MSG_CHECKING([whether to compile in lp])
+AC_ARG_WITH([lp],
+[AC_HELP_STRING([--without-lp],
+                [compile without LP solver module(default=yes)])],
+[in_lp=$withval],[in_lp=yes])
+AM_CONDITIONAL(SYM_COMPILE_IN_LP, [test "$in_lp" = yes])
+
+#AC_MSG_CHECKING([whether to compile in tm])
+AC_ARG_WITH([tm],
+[AC_HELP_STRING([--without-tm],
+                [compile without tree manager module (default=yes)])],
+[in_tm=$withval],[in_tm=yes])
+AM_CONDITIONAL(SYM_COMPILE_IN_TM, [test "$in_tm" = yes])
+
+#sym_def_pconfig=true;
+sym_enable_parallel=false;
+if [test $in_cg = no || test $in_cp = no ||  
+   test $in_lp = no || test $in_tm = no]; then
+#   sym_def_pconfig=false;
+   if test $sym_parallel=no; then 
+      AC_MSG_ERROR(First enable parallel configuration: --with-pvm!)
+   fi
+   sym_enable_parallel=true;
+else 
+   if test $sym_parallel = yes; then 
+       in_lp=no
+       AM_CONDITIONAL(SYM_COMPILE_IN_LP, false)
+       sym_enable_parallel=true;
+   fi
+fi
+
+AM_CONDITIONAL(SYM_PARALLEL, $sym_enable_parallel)
+
+LPEXT=
+CPEXT=
+TMEXT=
+MASTEREXT=
+LIBNAME=
+SYMPDEFS="$SYMDEFS"
+
+SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP -DCOMPILE_IN_TM"
+
+if test $in_cg = yes; then 
+   LPEXT=_cg
+   SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_CG"
+fi 
+if test $in_cp = yes; then 
+   SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_CP"
+   CPEXT=_cp
+fi 
+if test $in_lp = yes; then 
+  SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_LP"
+  TMEXT="_lp$LPEXT$CPEXT"
+else
+  TMEXT=$CPEXT
+fi 
+if test $in_tm = yes; then 
+  SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_TM"
+  MASTEREXT="_tm$TMEXT"
+fi 
+
+WHATTOMAKELIBS=
+WHATTOMAKEBINS=
+
+if test $sym_enable_parallel = true; then
+   SYMPDEFS="$SYMPDEFS -D__PVM__"
+if test $in_cg = no; then 
+   WHATTOMAKELIBS=libSym_cg.la
+	if test $sym_appl = yes ; then 
+	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cg.la"
+	fi
+   WHATTOMAKEBINS=symphony_cg
+fi 
+if test $in_cp = no; then 
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
+	if test $sym_appl = yes ; then 
+	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cp.la"
+	fi
+   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp"
+fi 
+if test $in_lp = no; then 
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
+	if test $sym_appl = yes ; then 
+	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_lp$LPEXT.la"
+	fi
+   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT"
+fi 
+if test $in_tm = no; then 
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
+	if test $sym_appl = yes ; then 
+	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_tm$TMEXT.la"
+	fi
+   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT"
+fi 
+  MASTEREXT="_m$MASTEREXT"
+  WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
+  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT"
+  if test $sym_appl = yes ; then 
+     WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
+  fi
+else
+  MASTEREXT=
+fi
+
+  WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
+  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony"
+
+  if test $sym_appl = yes ; then 
+     WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+  fi
+
+
+AC_SUBST(WHATTOMAKELIBS)
+AC_SUBST(WHATTOMAKEBINS)
+AC_SUBST(LPEXT)
+AC_SUBST(CPEXT)
+AC_SUBST(TMEXT)
+AC_SUBST(MASTEREXT)
+
+#############################################################################
+#                       Other third party software                          #
+#############################################################################
+
+# Ampl Solver library
+#AC_COIN_HAS_ASL
+
+##############################################################################
+#                   VPATH links for example input files                      #
+##############################################################################
+
+# In case this is a VPATH configuration we need to make sure that the
+# input files for the examples are available in the VPATH directory.
+
+#AC_COIN_VPATH_LINK(examples/sudoku_sample.csv)
+#AC_COIN_VPATH_LINK(examples/quad.mps)
+#AC_COIN_VPATH_LINK(examples/quad2.mps)
+#AC_COIN_VPATH_LINK(examples/quad2.mps)
+
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
+
 # Location of SYMPHONY for later use
 AC_SUBST(SYMINCDIR)
 AC_SUBST(SYMSRCDIR)
 SYMINCDIR=`cd $srcdir; pwd`/include
 SYMSRCDIR=`cd $srcdir; pwd`/src
 
+dnl SYMSOURCES="\
+dnl 	$SYMSRCDIR/Common      :\
+dnl 	$SYMSRCDIR/LP          :\
+dnl 	$SYMSRCDIR/CutGen      :\
+dnl 	$SYMSRCDIR/CutPool     :\
+dnl 	$SYMSRCDIR/DrawGraph   :\
+dnl 	$SYMSRCDIR/Master      :\
+dnl 	$SYMSRCDIR/../include     :\
+dnl 	$SYMSRCDIR/ :\
+dnl 	$SYMSRCDIR/TreeManager"
+
+dnl VPATH="$SYMSRCDIR/Master"
+dnl AC_SUBST(VPATH)
+
 # To be used in applications: default SYMPHONY defs
 AC_SUBST(SYMDEFS)
+AC_SUBST(SYMPDEFS)
 AC_SUBST(ARCH)
 AC_SUBST(COIN_HAS_CLP)
 
@@ -724,12 +757,23 @@ SYMAPPLDIR=`pwd`/Applications
 
 AM_CONDITIONAL(SYM_DEBUG, [ test $coin_debug_compile = true])
 
+#FIXME-For now, redefine CFLAGS and CXXFLAGS
+CFLAGS=
+CXXFLAGS=
+if test $coin_debug_compile = true; then
+   CFLAGS="-g -pipe"
+   CXXFLAGS="$CFLAGS"
+fi
+AC_SUBST(CFLAGS)
+AC_SUBST(CXXFLAGS)
+
 # Here list all the files that configure should create (except for the
 # configuration header file)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
 		 Applications/CNRP/Makefile
 		 Applications/USER/Makefile
+		 Applications/VRP/Makefile
                  sym_addlibs.txt])
 
 #src/GMPL/Makefile 
