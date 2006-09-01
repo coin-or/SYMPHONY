@@ -9,6 +9,7 @@ SYMPHONY/Applications/CNRP/Makefile.in -text
 SYMPHONY/Applications/CNRP/Makefile.orig -text
 SYMPHONY/Applications/USER/Makefile.in -text
 SYMPHONY/Applications/USER/Makefile.orig -text
+SYMPHONY/Applications/VRP/Makefile.orig -text
 SYMPHONY/Makefile.am -text
 SYMPHONY/Makefile.in -text
 SYMPHONY/configure -text
