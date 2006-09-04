@@ -7,6 +7,11 @@
 /README -text
 SYMPHONY/Applications/CNRP/Makefile.in -text
 SYMPHONY/Applications/CNRP/Makefile.orig -text
+SYMPHONY/Applications/MATCH/Makefile.orig -text
+SYMPHONY/Applications/MCKP/Makefile.orig -text
+SYMPHONY/Applications/MPP/Makefile.orig -text
+SYMPHONY/Applications/SPP+CUTS/Makefile.orig -text
+SYMPHONY/Applications/SPP/Makefile.orig -text
 SYMPHONY/Applications/USER/Makefile.in -text
 SYMPHONY/Applications/USER/Makefile.orig -text
 SYMPHONY/Applications/VRP/Makefile.in -text
