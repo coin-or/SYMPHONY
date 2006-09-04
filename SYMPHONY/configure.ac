@@ -682,7 +682,7 @@ fi
      WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
   fi
 else
-  MASTEREXT=
+  MASTEREXT="_m"
 fi
 
   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
@@ -772,6 +772,11 @@ AC_SUBST(CXXFLAGS)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
 		 Applications/CNRP/Makefile
+		 Applications/MATCH/Makefile
+		 Applications/MCKP/Makefile
+		 Applications/MPP/Makefile
+		 Applications/SPP/Makefile
+		 Applications/SPP+CUTS/Makefile
 		 Applications/USER/Makefile
 		 Applications/VRP/Makefile
                  sym_addlibs.txt])

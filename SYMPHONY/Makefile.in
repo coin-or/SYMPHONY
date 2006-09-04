@@ -58,6 +58,11 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/sym_addlibs.txt.in \
 	$(top_srcdir)/Applications/CNRP/Makefile.in \
+	$(top_srcdir)/Applications/MATCH/Makefile.in \
+	$(top_srcdir)/Applications/MCKP/Makefile.in \
+	$(top_srcdir)/Applications/MPP/Makefile.in \
+	$(top_srcdir)/Applications/SPP+CUTS/Makefile.in \
+	$(top_srcdir)/Applications/SPP/Makefile.in \
 	$(top_srcdir)/Applications/USER/Makefile.in \
 	$(top_srcdir)/Applications/VRP/Makefile.in \
 	$(top_srcdir)/configure $(top_srcdir)/include/config_sym.h.in
@@ -74,8 +79,10 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/config_sym.h
 CONFIG_CLEAN_FILES = Applications/CNRP/Makefile \
-	Applications/USER/Makefile Applications/VRP/Makefile \
-	sym_addlibs.txt
+	Applications/MATCH/Makefile Applications/MCKP/Makefile \
+	Applications/MPP/Makefile Applications/SPP/Makefile \
+	Applications/SPP+CUTS/Makefile Applications/USER/Makefile \
+	Applications/VRP/Makefile sym_addlibs.txt
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -441,6 +448,16 @@ distclean-hdr:
 	-rm -f include/config_sym.h include/stamp-h1
 Applications/CNRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/CNRP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/MATCH/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MATCH/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/MCKP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MCKP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/MPP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MPP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/SPP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/SPP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/SPP+CUTS/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/SPP+CUTS/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/USER/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/USER/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/VRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/VRP/Makefile.in
@@ -593,7 +610,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/Applications/CNRP $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/include
+	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/include
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

@@ -66,7 +66,7 @@
 /* #define COIN_HAS_VOL 1 */
 
 /* Define to 1 if the Cplex package is used */
-/* #undef COIN_HAS_CPX */
+#define COIN_HAS_CPX 1
 
 /* Define to 1 if the Dylp package is used */
 /* #undef COIN_HAS_DYLP */
