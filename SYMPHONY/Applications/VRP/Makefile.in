@@ -102,8 +102,8 @@ DG_FUNC_OBJS       = src/DrawGraph/vrp_dg_functions.@OBJEXT@
 USER_MASTER_OBJS   = src/Master/vrp_main.@OBJEXT@ \
 	src/Master/vrp_master.@OBJEXT@ src/Master/vrp_io.@OBJEXT@
 USER_MASTER_OBJS  += src/Master/vrp_master_functions.@OBJEXT@ \
-	src/Master/small_graph.@OBJEXT@ $(NET_OBJS)
-
+	src/Master/small_graph.@OBJEXT@ $(NET_OBJS) 
+USER_MASTER_OBJS  += $(ADDSOURCES)
 USER_MASTER_OBJS  += $(COST_OBJS)
 ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 USER_MASTER_OBJS  += $(USER_TM_OBJS)
@@ -158,6 +158,7 @@ ALL_OBJS =  src/Master/vrp_main.@OBJEXT@ \
 	src/Master/vrp_master.@OBJEXT@ \
 	src/Master/vrp_io.@OBJEXT@ \
 	src/Master/vrp_master_functions.@OBJEXT@ \
+	$(ADDSOURCES) \
 	src/Master/small_graph.@OBJEXT@ \
 	$(COST_OBJS) \
 	src/LP/vrp_lp_branch.@OBJEXT@ \
@@ -191,10 +192,6 @@ CXXFLAGS = @CXXFLAGS@
 
 # additional C++ Compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
-
-#Add SYMPHONY defs
-ADDINCFLAGS = #+= @SYMDEFS@
-
 
 #Include files
 INCL =  -Iinclude -I`$(CYGPATH_W) $(COININCDIR)` \
@@ -285,7 +282,7 @@ INCL += -I`$(CYGPATH_W) $(PVM_ROOT)/include`
 SYMLIBS = -lSymAppl $(LIBS) 
 PSYMLIBS = -L$(PVM_ROOT)/lib/@ARCH@ -lgpvm3 -lpvm3 $(LIBS) 
 
-all: $(APPL_PARALLEL)$(WHATTOMAKE)
+all: $(APPL_PARALLEL) $(WHATTOMAKE)
 
 .c.o:
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
@@ -303,41 +300,41 @@ $(EXE): $(ALL_OBJS)
 	bla=;\
 	for file in $(ALL_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
 	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(SYMLIBS)
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  $(SYMLIBS)
 
 $(MASTERNAME)$(MASTEREXT) : $(PUSER_MASTER_OBJS)
 	bla=;\
 	for file in $(PUSER_MASTER_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
 	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
 	-lSymAppl$(MASTEREXT) $(PSYMLIBS)
 
 $(MASTERNAME)_lp$(LPEXT) : $(PUSER_LP_OBJS)
 	bla=;\
 	for file in $(PUSER_LP_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
 	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
 	-lSymAppl_lp$(LPEXT) $(PSYMLIBS)
 
 $(MASTERNAME)_cp : $(PUSER_CP_OBJS)
 	bla=;\
 	for file in $(PUSER_CP_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
 	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
 	-lSymAppl_cp $(PSYMLIBS)
 
 $(MASTERNAME)_cg : $(PUSER_CG_OBJS)
 	bla=;\
 	for file in $(PUSER_CG_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
 	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(PSYMLIBS) \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  $(PSYMLIBS) \
 	-lSymAppl_cg
 
 $(MASTERNAME)_tm$(TMEXT) : $(PUSER_TM_OBJS)
 	bla=;\
 	for file in $(PUSER_TM_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
 	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
 	-lSymAppl_tm$(TMEXT) $(PSYMLIBS)
 
 .SUFFIXES: .cpp .c .o .obj .oappl .objappl
