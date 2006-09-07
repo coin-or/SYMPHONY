@@ -104,11 +104,11 @@ ALL_OBJS =   src/Master/spp_main.@OBJEXT@ src/Master/spp_master.@OBJEXT@\
 	src/LP/spp_lp_functions.@OBJEXT@ $(USER_COMMON_OBJS) $(USER_CG_OBJS) \
 	$(USER_CP_OBJS) $(USER_DG_OBJS)
 
-PUSER_MASTER_OBJS = $(addsuffix appl, $(USER_MASTER_OBJS))
-PUSER_LP_OBJS = $(addsuffix appl, $(USER_LP_OBJS))
-PUSER_CG_OBJS = $(addsuffix appl, $(USER_CG_OBJS))
-PUSER_CP_OBJS = $(addsuffix appl, $(USER_CP_OBJS))
-PUSER_TM_OBJS = $(addsuffix appl, $(USER_TM_OBJS))
+PUSER_MASTER_OBJS = $(addsuffix o, $(USER_MASTER_OBJS))
+PUSER_LP_OBJS = $(addsuffix o, $(USER_LP_OBJS))
+PUSER_CG_OBJS = $(addsuffix o, $(USER_CG_OBJS))
+PUSER_CP_OBJS = $(addsuffix o, $(USER_CP_OBJS))
+PUSER_TM_OBJS = $(addsuffix o, $(USER_TM_OBJS))
 
 PALL_OBJS = $(PUSER_MASTER_OBJS) $(PUSER_LP_OBJS) $(PUSER_CP_OBJS) \
 	$(PUSER_TM_OBJS)
@@ -219,10 +219,10 @@ all: $(APPL_PARALLEL) $(WHATTOMAKE)
 .c.obj:
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
 
-.c.oappl:
+.c.oo:
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
 
-.c.objappl:
+.c.objo:
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
 
 $(EXE): $(ALL_OBJS)
@@ -266,7 +266,7 @@ $(MASTERNAME)_tm$(TMEXT) : $(PUSER_TM_OBJS)
 	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
 	-lSymAppl_tm$(TMEXT) $(PSYMLIBS)
 
-.SUFFIXES: .cpp .c .o .obj .oappl .objappl
+.SUFFIXES: .cpp .c .o .obj .oo .objo
 
 clean:
 	rm -rf $(WHATTOMAKE) $(ALL_OBJS) $(PALL_OBJS)

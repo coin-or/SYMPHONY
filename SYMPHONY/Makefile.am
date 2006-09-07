@@ -26,6 +26,15 @@ SUBDIRS = src
 #SUBDIRS += Applications/CNRP
 #endif
 
+#Deneme
+DENEME1 = $(builddir)
+DENEME2 = $(top_srcdir)
+DENEME3 = $(abs_builddir)
+DENEME4 = $(top_builddir)
+DENEME5 = $(abs_top_builddir)
+DENEME6 = $(srcdir)
+DENEME7 = $(abs_srcdir)
+DENEME8 = $(abs_top_srcdir)
 
 ########################################################################
 #             Additional files to be included in tarball               #
