@@ -63,6 +63,9 @@ AC_LANG_PUSH(C++)
 # Initialize automake and libtool
 AC_COIN_INIT_AUTO_TOOLS
 
+# Get the EXEXT variable for CYGWIN
+AC_EXEEXT
+
 # Check if user wants to use readline library
 AC_COIN_CHECK_GNU_READLINE
 AM_CONDITIONAL(COIN_HAS_READLINE,
@@ -652,32 +655,32 @@ if test $in_cg = no; then
 	if test $sym_appl = yes ; then 
 	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cg.la"
 	fi
-   WHATTOMAKEBINS=symphony_cg
+   WHATTOMAKEBINS="symphony_cg$EXEEXT"
 fi 
 if test $in_cp = no; then 
    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
 	if test $sym_appl = yes ; then 
 	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cp.la"
 	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp"
+   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp$EXEEXT"
 fi 
 if test $in_lp = no; then 
    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
 	if test $sym_appl = yes ; then 
 	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_lp$LPEXT.la"
 	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT"
+   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT$EXEEXT"
 fi 
 if test $in_tm = no; then 
    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
 	if test $sym_appl = yes ; then 
 	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_tm$TMEXT.la"
 	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT"
+   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT$EXEEXT"
 fi 
   MASTEREXT="_m$MASTEREXT"
   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
-  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT"
+  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
   if test $sym_appl = yes ; then 
      WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
   fi
@@ -686,7 +689,7 @@ else
 fi
 
   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
-  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony"
+  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
 
   if test $sym_appl = yes ; then 
      WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"

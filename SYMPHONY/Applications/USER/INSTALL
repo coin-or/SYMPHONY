@@ -1,3 +1,18 @@
+
+
+
+1. In order to compile SYMPHONY's applications, first you must compile the 
+application specific library. Type
+
+   ./configure --with-applications
+   make 
+   make install
+
+This will create application library called 'libSymAppl' to bu linked while
+compiling the applications. See 
+
+
+
 ******************************************************************************
 *                 COMPILING A CUSTOM APPLICATION (Unix)                      *
 ******************************************************************************

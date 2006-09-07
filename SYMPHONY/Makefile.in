@@ -65,7 +65,8 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/Applications/SPP/Makefile.in \
 	$(top_srcdir)/Applications/USER/Makefile.in \
 	$(top_srcdir)/Applications/VRP/Makefile.in \
-	$(top_srcdir)/configure $(top_srcdir)/include/config_sym.h.in
+	$(top_srcdir)/configure $(top_srcdir)/include/config_sym.h.in \
+	INSTALL
 @HAVE_EXTERNALS_TRUE@am__append_1 = Externals
 @HAVE_EXTERNALS_TRUE@am__append_2 = .Externals-stamp
 subdir = .

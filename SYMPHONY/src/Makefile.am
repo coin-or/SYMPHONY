@@ -507,6 +507,7 @@ EXTRA_PROGRAMS = symphony symphony_m symphony_m_tm symphony_m_tm_lp \
 
 # # # Name of the executable compiled in this directory.  We want it to be
 # # # installed in the 'bin' directory
+
 bin_PROGRAMS = $(WHATTOMAKEBINS)
 
 symphony_SOURCES = $(MAIN_SRC) symphony_api.h
