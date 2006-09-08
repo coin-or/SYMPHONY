@@ -29,7 +29,7 @@ OSI_INTERFACE = CLP
 
 LPINCDIR = $(SYMPHONYROOT)/include
 LPLIBPATHS = $(SYMPHONYROOT)/lib
-LPLIB = -lsym
+LPLIB = -lSym
 
 ifeq ($(LP_SOLVER),CPLEX)
        LPINCDIR += /usr/local/include/
@@ -46,7 +46,7 @@ endif
 ifeq ($(LP_SOLVER),OSI)
        LPINCDIR += $(COINROOT)/include
        LPLIBPATHS += $(COINROOT)/lib
-       LPLIB += -lCoin -lOsi -lCgl
+       LPLIB += -lCoinUtils -lOsi -lCgl
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPINCDIR += /usr/local/include/
        LPLIBPATHS += /usr/local/lib/
