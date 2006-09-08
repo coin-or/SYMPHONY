@@ -32,6 +32,11 @@ SYMPHONY/src/GMPL/Makefile.in -text
 SYMPHONY/src/Makefile.am -text
 SYMPHONY/src/Makefile.in -text
 SYMPHONY/sym_addlibs.txt.in -text
+Win32/gmpl.dsp -text
+Win32/sym.mak -text
+Win32/symphony.dsp -text
+Win32/symphony.dsw -text
+Win32/symphonyLib.dsp -text
 /compile -text
 /config.guess -text
 /config.sub -text

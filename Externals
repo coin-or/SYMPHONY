@@ -3,3 +3,8 @@ CoinUtils     https://projects.coin-or.org/svn/CoinUtils/branches/devel/CoinUtil
 Cgl           https://projects.coin-or.org/svn/Cgl/branches/devel/Cgl
 Clp           https://projects.coin-or.org/svn/Clp/branches/devel/Clp
 Osi           https://projects.coin-or.org/svn/Osi/branches/devel/Osi
+Win32/CoinUtils     https://projects.coin-or.org/svn/MSVisualStudio/trunk/v6/CoinUtils
+Win32/Cgl     https://projects.coin-or.org/svn/MSVisualStudio/trunk/v6/Cgl
+Win32/Clp     https://projects.coin-or.org/svn/MSVisualStudio/trunk/v6/Clp
+Win32/Osi     https://projects.coin-or.org/svn/MSVisualStudio/trunk/v6/Osi
+
