@@ -5,7 +5,6 @@
 /Makefile.am -text
 /Makefile.in -text
 /README -text
-SYMPHONY/Makefile -text
 SYMPHONY/include/SymConfig.h -text
 SYMPHONY/include/config_sym.h.in -text
 /config.guess -text
