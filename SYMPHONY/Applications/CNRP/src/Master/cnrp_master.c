@@ -427,9 +427,9 @@ int user_send_lp_data(void *user, void **user_lp)
    if (cnrp->zero_varnum){
       send_int_array(cnrp->zero_vars, cnrp->zero_varnum);
    }
-   send_dbl_array(cnrp->utopia_fixed, 1);
-   send_dbl_array(cnrp->utopia_variable, 1);
-   send_dbl_array(cnrp->ub, 1);
+   send_dbl_array(&cnrp->utopia_fixed, 1);
+   send_dbl_array(&cnrp->utopia_variable, 1);
+   send_dbl_array(&cnrp->ub, 1);
 #endif
 
    return(USER_SUCCESS);
@@ -502,7 +502,7 @@ int user_send_cg_data(void *user, void **user_cg)
    send_int_array(&cnrp->dg_id, 1);
    send_int_array(&cnrp->numroutes, 1);
    send_int_array(&cnrp->vertnum, 1);
-   send_dble_array(cnrp->demand, cnrp->vertnum);
+   send_dbl_array(cnrp->demand, cnrp->vertnum);
    send_dbl_array(&cnrp->capacity, 1);
 #ifdef CHECK_CUT_VALIDITY
    send_int_array(&cnrp->feas_sol_size, 1);

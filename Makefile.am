@@ -16,7 +16,13 @@ EXTRA_DIST =
 
 # subdirs is set by configure as the list of all subdirectories to recurse
 # into
-SUBDIRS = $(subdirs)
+SUBDIRS = CoinUtils Osi Cgl 
+
+if ADD_CLP
+SUBDIRS += Clp
+endif 
+
+SUBDIRS += SYMPHONY
 
 ########################################################################
 #                           Extra Targets                              #
@@ -28,7 +34,7 @@ SUBDIRS = $(subdirs)
 #unitTest: test
 
 #symphony: all
-#	cd SYMPHONY; make
+#	make; cd SYMPHONY; make
 
 #tests: all
 #	for dir in $(subdirs); do \

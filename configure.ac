@@ -54,9 +54,42 @@ AC_COIN_INIT_AUTOMAKE
 #############################################################################
 
 AC_COIN_MAIN_SUBDIRS(CoinUtils)
-AC_COIN_MAIN_SUBDIRS(Clp)
 AC_COIN_MAIN_SUBDIRS(Osi)
 AC_COIN_MAIN_SUBDIRS(Cgl)
+AC_COIN_MAIN_SUBDIRS(Clp)
+
+#############################################################################
+#                            Third party solvers                            #
+#############################################################################
+
+# Check which third party solvers are available ToDo!
+AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
+AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h])#,[glp_lpx_simplex])
+AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
+AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
+AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
+
+
+#############################################################################
+#                      Check for the LP solver                              #
+#############################################################################
+AC_MSG_CHECKING(whether Clp is required)
+AC_ARG_WITH([lp-solver],
+[AC_HELP_STRING([--with-lp-solver],
+                [specify the LP solver you want SYMPHONY to use in small
+                letters(default=clp)])],
+		[sym_lp_solver=$withval],[sym_lp_solver=clp])
+
+if test $sym_lp_solver = clp; then
+    AC_MSG_RESULT(yes)
+else
+    AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(ADD_CLP, [test $sym_lp_solver = clp])
+#############################################################################
+#                            Check SYMPHONY                                 #
+#############################################################################
+
 AC_COIN_MAIN_SUBDIRS(SYMPHONY)
 
 ##############################################################################

@@ -18,7 +18,7 @@
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
 
-# Author:  Andreas Waechter           IBM    2006-04-13
+# Authors: Ted Ralphs, Menal Guzelsoy 
 
 # Copyright (C) 2006 International Business Machines and others.
 # All Rights Reserved.
@@ -49,14 +49,26 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-@ADD_CLP_TRUE@am__append_1 = Clp
+build_triplet = @build@
+host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) \
-	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS INSTALL \
-	compile config.guess config.sub depcomp install-sh ltmain.sh \
-	missing
-@HAVE_EXTERNALS_TRUE@am__append_2 = Externals
-@HAVE_EXTERNALS_TRUE@am__append_3 = .Externals-stamp
+	$(srcdir)/../BuildTools/Makemain.inc $(srcdir)/../config.guess \
+	$(srcdir)/../config.sub $(srcdir)/../install-sh \
+	$(srcdir)/../ltmain.sh $(srcdir)/../missing \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/sym_addlibs.txt.in \
+	$(top_srcdir)/Applications/CNRP/Makefile.in \
+	$(top_srcdir)/Applications/MATCH/Makefile.in \
+	$(top_srcdir)/Applications/MCKP/Makefile.in \
+	$(top_srcdir)/Applications/MPP/Makefile.in \
+	$(top_srcdir)/Applications/SPP+CUTS/Makefile.in \
+	$(top_srcdir)/Applications/SPP/Makefile.in \
+	$(top_srcdir)/Applications/USER/Makefile.in \
+	$(top_srcdir)/Applications/VRP/Makefile.in \
+	$(top_srcdir)/configure $(top_srcdir)/include/config_sym.h.in \
+	INSTALL
+@HAVE_EXTERNALS_TRUE@am__append_1 = Externals
+@HAVE_EXTERNALS_TRUE@am__append_2 = .Externals-stamp
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -66,7 +78,20 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_CLEAN_FILES =
+CONFIG_HEADER = $(top_builddir)/include/config_sym.h
+CONFIG_CLEAN_FILES = Applications/CNRP/Makefile \
+	Applications/MATCH/Makefile Applications/MCKP/Makefile \
+	Applications/MPP/Makefile Applications/SPP/Makefile \
+	Applications/SPP+CUTS/Makefile Applications/USER/Makefile \
+	Applications/VRP/Makefile sym_addlibs.txt \
+	$srcdir/Applications/CNRP/Makefile \
+	$srcdir/Applications/MATCH/Makefile \
+	$srcdir/Applications/MCKP/Makefile \
+	$srcdir/Applications/MPP/Makefile \
+	$srcdir/Applications/SPP/Makefile \
+	$srcdir/Applications/SPP+CUTS/Makefile \
+	$srcdir/Applications/USER/Makefile \
+	$srcdir/Applications/VRP/Makefile
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -77,7 +102,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = CoinUtils Osi Cgl Clp SYMPHONY
+DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -91,13 +116,15 @@ distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
 ACLOCAL = @ACLOCAL@
 ADDLIBS = @ADDLIBS@
-ADD_CLP_FALSE = @ADD_CLP_FALSE@
-ADD_CLP_TRUE = @ADD_CLP_TRUE@
+ADD_CFLAGS = @ADD_CFLAGS@
+ADD_CXXFLAGS = @ADD_CXXFLAGS@
 ALWAYS_FALSE_FALSE = @ALWAYS_FALSE_FALSE@
 ALWAYS_FALSE_TRUE = @ALWAYS_FALSE_TRUE@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
+AR = @AR@
+ARCH = @ARCH@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -106,32 +133,75 @@ AWK = @AWK@
 BUILDTOOLSDIR = @BUILDTOOLSDIR@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
+CDEFS = @CDEFS@
 CFLAGS = @CFLAGS@
+CGLOBJDIR = @CGLOBJDIR@
+CGLSRCDIR = @CGLSRCDIR@
+CHECK_CUT_VALIDITY_FALSE = @CHECK_CUT_VALIDITY_FALSE@
+CHECK_CUT_VALIDITY_TRUE = @CHECK_CUT_VALIDITY_TRUE@
+CLPOBJDIR = @CLPOBJDIR@
+CLPSRCDIR = @CLPSRCDIR@
+CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
+CLP_LP_SOLVER_TRUE = @CLP_LP_SOLVER_TRUE@
+COINUTILSOBJDIR = @COINUTILSOBJDIR@
+COINUTILSSRCDIR = @COINUTILSSRCDIR@
+COIN_HAS_CGL_FALSE = @COIN_HAS_CGL_FALSE@
+COIN_HAS_CGL_TRUE = @COIN_HAS_CGL_TRUE@
+COIN_HAS_CLP = @COIN_HAS_CLP@
+COIN_HAS_CLP_FALSE = @COIN_HAS_CLP_FALSE@
+COIN_HAS_CLP_TRUE = @COIN_HAS_CLP_TRUE@
+COIN_HAS_COINUTILS_FALSE = @COIN_HAS_COINUTILS_FALSE@
+COIN_HAS_COINUTILS_TRUE = @COIN_HAS_COINUTILS_TRUE@
 COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
 COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@
 COIN_HAS_GLPK_FALSE = @COIN_HAS_GLPK_FALSE@
 COIN_HAS_GLPK_TRUE = @COIN_HAS_GLPK_TRUE@
+COIN_HAS_OSI_FALSE = @COIN_HAS_OSI_FALSE@
+COIN_HAS_OSI_TRUE = @COIN_HAS_OSI_TRUE@
 COIN_HAS_OSL_FALSE = @COIN_HAS_OSL_FALSE@
 COIN_HAS_OSL_TRUE = @COIN_HAS_OSL_TRUE@
+COIN_HAS_READLINE_FALSE = @COIN_HAS_READLINE_FALSE@
+COIN_HAS_READLINE_TRUE = @COIN_HAS_READLINE_TRUE@
 COIN_HAS_SPX_FALSE = @COIN_HAS_SPX_FALSE@
 COIN_HAS_SPX_TRUE = @COIN_HAS_SPX_TRUE@
 COIN_HAS_XPR_FALSE = @COIN_HAS_XPR_FALSE@
 COIN_HAS_XPR_TRUE = @COIN_HAS_XPR_TRUE@
-COIN_SKIP_PROJECTS = @COIN_SKIP_PROJECTS@
+COMPILE_FRAC_BRANCHING_FALSE = @COMPILE_FRAC_BRANCHING_FALSE@
+COMPILE_FRAC_BRANCHING_TRUE = @COMPILE_FRAC_BRANCHING_TRUE@
+CPEXT = @CPEXT@
+CPLEX_LP_SOLVER_FALSE = @CPLEX_LP_SOLVER_FALSE@
+CPLEX_LP_SOLVER_TRUE = @CPLEX_LP_SOLVER_TRUE@
+CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPXINCDIR = @CPXINCDIR@
 CPXLIB = @CPXLIB@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+CXXDEFS = @CXXDEFS@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DBG_CFLAGS = @DBG_CFLAGS@
+DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DO_TESTS_FALSE = @DO_TESTS_FALSE@
+DO_TESTS_TRUE = @DO_TESTS_TRUE@
+DRAWGRAPH_FALSE = @DRAWGRAPH_FALSE@
+DRAWGRAPH_TRUE = @DRAWGRAPH_TRUE@
+ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+F77 = @F77@
 FADDLIBS = @FADDLIBS@
+FFLAGS = @FFLAGS@
 GLPKINCDIR = @GLPKINCDIR@
 GLPKLIB = @GLPKLIB@
+GLPK_LP_SOLVER_FALSE = @GLPK_LP_SOLVER_FALSE@
+GLPK_LP_SOLVER_TRUE = @GLPK_LP_SOLVER_TRUE@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
 HAVE_EXTERNALS_TRUE = @HAVE_EXTERNALS_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
@@ -142,15 +212,28 @@ LDFLAGS = @LDFLAGS@
 LIBEXT = @LIBEXT@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBTOOL = @LIBTOOL@
 LIBTOOLM4 = @LIBTOOLM4@
+LN_S = @LN_S@
+LPEXT = @LPEXT@
 LTLIBOBJS = @LTLIBOBJS@
+LT_LDFLAGS = @LT_LDFLAGS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+MASTEREXT = @MASTEREXT@
+MPICC = @MPICC@
+MPICXX = @MPICXX@
 OBJEXT = @OBJEXT@
+OPT_CFLAGS = @OPT_CFLAGS@
+OPT_CXXFLAGS = @OPT_CXXFLAGS@
+OSIOBJDIR = @OSIOBJDIR@
+OSISRCDIR = @OSISRCDIR@
 OSLINCDIR = @OSLINCDIR@
 OSLLIB = @OSLLIB@
+OSL_LP_SOLVER_FALSE = @OSL_LP_SOLVER_FALSE@
+OSL_LP_SOLVER_TRUE = @OSL_LP_SOLVER_TRUE@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -158,36 +241,96 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PSEUDO_COSTS_FALSE = @PSEUDO_COSTS_FALSE@
+PSEUDO_COSTS_TRUE = @PSEUDO_COSTS_TRUE@
+RANLIB = @RANLIB@
+ROOT_NODE_ONLY_FALSE = @ROOT_NODE_ONLY_FALSE@
+ROOT_NODE_ONLY_TRUE = @ROOT_NODE_ONLY_TRUE@
+RPATH_FLAGS = @RPATH_FLAGS@
+SENSITIVITY_ANALYSIS_FALSE = @SENSITIVITY_ANALYSIS_FALSE@
+SENSITIVITY_ANALYSIS_TRUE = @SENSITIVITY_ANALYSIS_TRUE@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SOPLEX_LP_SOLVER_FALSE = @SOPLEX_LP_SOLVER_FALSE@
+SOPLEX_LP_SOLVER_TRUE = @SOPLEX_LP_SOLVER_TRUE@
 SPXINCDIR = @SPXINCDIR@
 SPXLIB = @SPXLIB@
+STATISTICS_FALSE = @STATISTICS_FALSE@
+STATISTICS_TRUE = @STATISTICS_TRUE@
 STRIP = @STRIP@
+SYMAPPLDIR = @SYMAPPLDIR@
+SYMDEFS = @SYMDEFS@
+SYMINCDIR = @SYMINCDIR@
+SYMPDEFS = @SYMPDEFS@
+SYMSRCDIR = @SYMSRCDIR@
+SYM_COMPILE_IN_CG_FALSE = @SYM_COMPILE_IN_CG_FALSE@
+SYM_COMPILE_IN_CG_TRUE = @SYM_COMPILE_IN_CG_TRUE@
+SYM_COMPILE_IN_CP_FALSE = @SYM_COMPILE_IN_CP_FALSE@
+SYM_COMPILE_IN_CP_TRUE = @SYM_COMPILE_IN_CP_TRUE@
+SYM_COMPILE_IN_LP_FALSE = @SYM_COMPILE_IN_LP_FALSE@
+SYM_COMPILE_IN_LP_TRUE = @SYM_COMPILE_IN_LP_TRUE@
+SYM_COMPILE_IN_TM_FALSE = @SYM_COMPILE_IN_TM_FALSE@
+SYM_COMPILE_IN_TM_TRUE = @SYM_COMPILE_IN_TM_TRUE@
+SYM_DEBUG_FALSE = @SYM_DEBUG_FALSE@
+SYM_DEBUG_TRUE = @SYM_DEBUG_TRUE@
+SYM_PARALLEL_FALSE = @SYM_PARALLEL_FALSE@
+SYM_PARALLEL_TRUE = @SYM_PARALLEL_TRUE@
+SYM_WITH_APPL_FALSE = @SYM_WITH_APPL_FALSE@
+SYM_WITH_APPL_TRUE = @SYM_WITH_APPL_TRUE@
+TMEXT = @TMEXT@
+TM_BASIS_TESTS_FALSE = @TM_BASIS_TESTS_FALSE@
+TM_BASIS_TESTS_TRUE = @TM_BASIS_TESTS_TRUE@
+TRACE_PATH_FALSE = @TRACE_PATH_FALSE@
+TRACE_PATH_TRUE = @TRACE_PATH_TRUE@
+USE_CGL_CUTS_FALSE = @USE_CGL_CUTS_FALSE@
+USE_CGL_CUTS_TRUE = @USE_CGL_CUTS_TRUE@
+USE_GMPL_FALSE = @USE_GMPL_FALSE@
+USE_GMPL_TRUE = @USE_GMPL_TRUE@
+USE_OSI_INTERFACE_FALSE = @USE_OSI_INTERFACE_FALSE@
+USE_OSI_INTERFACE_TRUE = @USE_OSI_INTERFACE_TRUE@
 VERSION = @VERSION@
 VPATH_DISTCLEANFILES = @VPATH_DISTCLEANFILES@
+WHATTOMAKEBINS = @WHATTOMAKEBINS@
+WHATTOMAKELIBS = @WHATTOMAKELIBS@
+XPRESS_LP_SOLVER_FALSE = @XPRESS_LP_SOLVER_FALSE@
+XPRESS_LP_SOLVER_TRUE = @XPRESS_LP_SOLVER_TRUE@
 XPRINCDIR = @XPRINCDIR@
 XPRLIB = @XPRLIB@
 abs_bin_dir = @abs_bin_dir@
 abs_include_dir = @abs_include_dir@
 abs_lib_dir = @abs_lib_dir@
 abs_source_dir = @abs_source_dir@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
+ac_ct_F77 = @ac_ct_F77@
+ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
+am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
+am__fastdepCXX_TRUE = @am__fastdepCXX_TRUE@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
 bindir = @bindir@
+build = @build@
 build_alias = @build_alias@
+build_cpu = @build_cpu@
+build_os = @build_os@
+build_vendor = @build_vendor@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
 have_autoconf = @have_autoconf@
 have_automake = @have_automake@
 have_svn = @have_svn@
+host = @host@
 host_alias = @host_alias@
+host_cpu = @host_cpu@
+host_os = @host_os@
+host_vendor = @host_vendor@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
@@ -201,55 +344,80 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
-subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
-EXTRA_DIST = $(am__append_2)
 
 ########################################################################
 #                          Subdirectories                              #
 ########################################################################
+SUBDIRS = src
 
-# subdirs is set by configure as the list of all subdirectories to recurse
-# into
-SUBDIRS = CoinUtils Osi Cgl $(am__append_1) SYMPHONY
+# We don't want to compile the test subdirectory, unless the test target is
+# specified.  But we need to list it as subdirectory to make sure that it is
+# included in the tarball
+
+#if ALWAYS_FALSE
+#  SUBDIRS += test
+#endif
+
+#if SYM_WITH_CNRP
+#SUBDIRS += Applications/CNRP
+#endif
+
+#Deneme
+DENEME1 = $(builddir)
+DENEME2 = $(top_srcdir)
+DENEME3 = $(abs_builddir)
+DENEME4 = $(top_builddir)
+DENEME5 = $(abs_top_builddir)
+DENEME6 = $(srcdir)
+DENEME7 = $(abs_srcdir)
+DENEME8 = $(abs_top_srcdir)
+
+########################################################################
+#             Additional files to be included in tarball               #
+########################################################################
+
+# Here we need include all files that are not mentioned in other Makefiles
+
+# FIXME-Add everything here!
+EXTRA_DIST = $(am__append_1)
 
 ########################################################################
 #                           Extra Targets                              #
 ########################################################################
 
-#test: all
-#	cd Cbc; make test
+# test: all
+# 	cd test; make test
 
-#unitTest: test
+# unitTest: test
 
-#symphony: all
-#	make; cd SYMPHONY; make
+# clean-local:
+# 	if test -r test/Makefile; then cd test; make clean; fi
 
-#tests: all
-#	for dir in $(subdirs); do \
-#	  if test -r $$dir/test/Makefile; then \
-#	    (cd $$dir; make test) \
-#	  fi; \
-#	done
+# distclean-local:
+# 	if test -r test/Makefile; then cd test; make distclean; fi
 
-#unitTests: tests
+# .PHONY: test unitTest
 
-#.PHONY: tests unitTests
+########################################################################
+#                  Installation of the addlibs file                    #
+########################################################################
+addlibsfile = sym_addlibs.txt
 
 ########################################################################
 #                         Maintainer Stuff                             #
 ########################################################################
 
 # Files that are generated and should be cleaned with make distclean
-DISTCLEANFILES = $(am__append_3) $(VPATH_DISTCLEANFILES)
+DISTCLEANFILES = $(am__append_2) $(VPATH_DISTCLEANFILES)
 all: all-recursive
 
 .SUFFIXES:
 am--refresh:
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/BuildTools/Makemain.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../BuildTools/Makemain.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -280,6 +448,66 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+
+include/config_sym.h: include/stamp-h1
+	@if test ! -f $@; then \
+	  rm -f include/stamp-h1; \
+	  $(MAKE) include/stamp-h1; \
+	else :; fi
+
+include/stamp-h1: $(top_srcdir)/include/config_sym.h.in $(top_builddir)/config.status
+	@rm -f include/stamp-h1
+	cd $(top_builddir) && $(SHELL) ./config.status include/config_sym.h
+$(top_srcdir)/include/config_sym.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+	cd $(top_srcdir) && $(AUTOHEADER)
+	rm -f include/stamp-h1
+	touch $@
+
+distclean-hdr:
+	-rm -f include/config_sym.h include/stamp-h1
+Applications/CNRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/CNRP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/MATCH/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MATCH/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/MCKP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MCKP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/MPP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MPP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/SPP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/SPP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/SPP+CUTS/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/SPP+CUTS/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/USER/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/USER/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/VRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/VRP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+sym_addlibs.txt: $(top_builddir)/config.status $(srcdir)/sym_addlibs.txt.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+$srcdir/Applications/CNRP/Makefile: $(top_builddir)/config.status Applications/CNRP/Makefile
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+$srcdir/Applications/MATCH/Makefile: $(top_builddir)/config.status Applications/MATCH/Makefile
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+$srcdir/Applications/MCKP/Makefile: $(top_builddir)/config.status Applications/MCKP/Makefile
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+$srcdir/Applications/MPP/Makefile: $(top_builddir)/config.status Applications/MPP/Makefile
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+$srcdir/Applications/SPP/Makefile: $(top_builddir)/config.status Applications/SPP/Makefile
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+$srcdir/Applications/SPP+CUTS/Makefile: $(top_builddir)/config.status Applications/SPP+CUTS/Makefile
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+$srcdir/Applications/USER/Makefile: $(top_builddir)/config.status Applications/USER/Makefile
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+$srcdir/Applications/VRP/Makefile: $(top_builddir)/config.status Applications/VRP/Makefile
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+	-rm -f libtool
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd
@@ -417,7 +645,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/BuildTools
+	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/include
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -588,12 +816,13 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic mostlyclean-am
+clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-tags
+distclean-am: clean-am distclean-generic distclean-hdr \
+	distclean-libtool distclean-tags
 
 dvi: dvi-recursive
 
@@ -607,7 +836,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am:
+install-exec-am: install-exec-local
 
 install-info: install-info-recursive
 
@@ -623,7 +852,7 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-generic
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
 pdf: pdf-recursive
 
@@ -633,24 +862,32 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-info-am
+uninstall-am: uninstall-info-am uninstall-local
 
 uninstall-info: uninstall-info-recursive
 
 .PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am am--refresh check \
-	check-am clean clean-generic clean-recursive ctags \
-	ctags-recursive dist dist-all dist-bzip2 dist-gzip dist-shar \
-	dist-tarZ dist-zip distcheck distclean distclean-generic \
+	check-am clean clean-generic clean-libtool clean-recursive \
+	ctags ctags-recursive dist dist-all dist-bzip2 dist-gzip \
+	dist-shar dist-tarZ dist-zip distcheck distclean \
+	distclean-generic distclean-hdr distclean-libtool \
 	distclean-recursive distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-man \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	install-exec-am install-exec-local install-info \
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive \
+	mostlyclean mostlyclean-generic mostlyclean-libtool \
 	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-info-am
+	uninstall uninstall-am uninstall-info-am uninstall-local
 
+
+install-exec-local:
+	$(install_sh_DATA) $(addlibsfile) $(DESTDIR)$(libdir)/$(addlibsfile)
+
+uninstall-local:
+	rm -f $(DESTDIR)$(libdir)/$(addlibsfile)
 
 # Make sure acinclude is using most recent coin.m4
 @MAINTAINER_MODE_TRUE@$(srcdir)/acinclude.m4: $(BUILDTOOLSDIR)/coin.m4

@@ -45,6 +45,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define to 1 if you have the <pvm3.h> header file. */
+#undef HAVE_PVM3_H
+
 /* Define to 1 if you have the <readline/readline.h> header file. */
 #undef HAVE_READLINE_READLINE_H
 
@@ -89,9 +92,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* Default solver is chosen... */
-#undef SYM_DEFAULT_SOLVER
 
 /* Version number of package */
 #undef VERSION
