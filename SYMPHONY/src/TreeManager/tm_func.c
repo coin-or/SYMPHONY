@@ -21,12 +21,12 @@
 #include <math.h>
 #ifndef WIN32
 #include <signal.h>
-#endif
 #if !defined(HAS_SRANDOM)
 extern int srandom PROTO((unsigned seed));
 #endif
 #if !defined(HAS_RANDOM)
 extern long random PROTO((void));
+#endif
 #endif
 
 #include "tm.h"
@@ -3203,6 +3203,7 @@ int tm_close(tm_prob *tm, int termcode)
    
 /*===========================================================================*/
 /*===========================================================================*/
+#ifndef WIN32
 void sym_catch_c(int num)
 {
 
@@ -3234,6 +3235,6 @@ void sym_catch_c(int num)
       } else continue;
    }
 }
-
+#endif
 /*===========================================================================*/
 /*===========================================================================*/
