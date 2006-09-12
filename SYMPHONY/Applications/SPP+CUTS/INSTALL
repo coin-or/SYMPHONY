@@ -1,160 +1,214 @@
 SYMPHONY SPP+CUTS-5.1 APPLICATION INSTALLATION
-==============================================
+==========================================
 
 *******************************************************************************
-*            COMPILING THE SYMPHONY SPP+CUTS APPLICATION (Unix)               *
+*             COMPILING THE SYMPHONY SPP+CUTS APPLICATION (Unix)              *
 *******************************************************************************
 
-First, configure and compile SYMPHONY as described in SYMPHONY/README. Modify
-the variables in the SPP+CUTS/Makefile appropriately. In particular, you
-must set the path to SYMPHONY itself. If the application is unpacked as a
-subdirectory of SYMPHONY root directory, no further modification should be
-necessary. Typing "make" in the SPP+CUTS subdirectory should successfully make
-the executable "spp". It will be installed in the directory
-bin/$(ARCH)/$(LP\_SOLVER). Otherwise, you must also set the path
-to the application's files. See usage below.
+Although SPP+CUTS application is designed to work stand alone, it requires to 
+be  configured with SYMPHONY. Therefore, you have to get this application 
+within SYMPHONY package and follow the configuration steps of SYMPHONY.   
 
-******************************************************************************
-*          COMPILING THE SYMPHONY SPP+CUTS APPLICATION (Windows)              *
-******************************************************************************
+1. You can obtain the SYMPHONY source code either via the subversion 
+repository or in the form of daily tarballs. 
 
-Here is a sketch outline of how to compile the SYMPHONY SPP+CUTS application
-in Microsoft Windows. Direct support is provided for compilation under MS
-Visual Studio 6.0. Compilation for other compilers should also be possible.
-Note that the Windows version has some limitations. Detailed timing
-information is not currently provided. Support is only provided for running in
-sequential mode at this time.
+The recommended method is to use subversion because it makes it easier to 
+obtain updates. In a Unix-like environment (such as Linux or CYGWIN), 
+the following command may be used to obtain SYMPHONY from 
+source using SVN in most cases:
 
-There are two options. You can either compile on the command-line, using the
-MSVC++ makefile, src\WIN32\spp_with_cuts.mak, or you can use the
-provided projects and workspaces. However for the second option, it is
-important the SPP+CUTS archive be unpacked in the SYMPHONY root directory or
-the project files will not work. Compiling on the command-line is somewhat
-easier since it requires only editing the makefile and typing a single
-command.
+   svn checkout https://projects.coin-or.org/svn/SYMPHONY/trunk/ COIN-SYMPHONY
+
+The alternative way is to get a daily snapshot of the source code as a tarball 
+from  the download page of COIN-OR:
+
+   http://www.coin-or.org/Tarballs/
+
+2. If the code is obtained as a tarball, unpack the distribution with 
+"tar -xzf SYMPHONY_XXX.tgz" where XXX is the date the snapshot is taken. 
+This will create a subdirectory called SYMPHONY_XXX containing the 
+distribution.
+
+3. In order to compile SYMPHONY's applications, you must first compile the 
+application specific library. Type
+
+   cd 
+   cd COIN-SYMPHONY
+   ./configure --with-applications
+   make
+   make install
+
+This will create the the Makefile of SPP+CUTS application together with 
+SYMPHONY's application library called 'libSymAppl' to be used while 
+building SPP+CUTS. Note that, sequential version library and the 
+executable of SYMPHON will also be made and installed. 
+
+4. Now you are free to move the application directory to wherever you want. 
+Go to SPP+CUTS directory, (go to SYMPHONY/Applications/SPP+CUTS, if the package 
+was not moved) and modify the variables in the Makefile if you want to add
+your own defines, source and library files. Then, type    
+
+   make
+
+The executable "spp" should be successfully made here. 
+
+4. Test SPP+CUTS, using the sample file called sample.spp included
+with the distribution. To specify the file name, use the "-F" command-line
+option, i.e., type
+
+   spp -F sample.spp 
+
+COMPILING FOR DISTRIBUTED NETWORKS
+==================================
+
+PLEASE NOTE THAT THE DISTRIBUTED MEMORY PARALLEL VERSION HAS NOT BEEN TESTED
+IN VERSION 5.0 AND MAY BE BROKEN. PLEASE LET ME KNOW IF YOU WANT TO USE IT AND
+I WILL GET IT WORKING.
+
+1. If you wish to compile a distributed version of the code, obtain and
+install PVM from http://www.csm.ornl.gov/pvm/.
+
+2. Type, 
+
+   cd 
+   cd COIN-SYMPHONY
+   ./configure --with-applications --with-pvm
+   make
+   make install
+
+This will create the the Makefile of SPP+CUTS application together with 
+SYMPHONY's parallel version application libraries to be used while 
+building SPP+CUTS. Note that, sequential version library and the 
+executable of SYMPHON will also be made and installed. 
+Be sure that, you have PVM installed either in system path or PVM_ROOT
+set as a bash environment variable. By default, configuration will assume
+the following module dependencies: '--with-cg=yes --with-cp=yes --with-lp=no 
+--with-tm=yes' (see the user manual or the file 'share/config.site' for more 
+information). If you configure with
+
+   ./configure --with-applications --with-pvm --with-lp=yes
+
+then you will end up with the sequential version. Therefore, if you want 
+to override the default set up, you must configure without one or more of 
+module dependencies. 
+
+3. Now you are free to move the application directory to wherever you want. 
+Go to SPP+CUTS directory, (go to SYMPHONY/Applications/SPP+CUTS, if the package 
+was not moved) and modify the variables in the Makefile if you want to add
+your own defines, source and library files. Then, type    
+
+   make
+
+The executable "spp_m$(EXT)", where $(EXT) is an extension to be added 
+according to the chosen module dependencies, should be successfully made here. 
+
+4. Make sure there are links from your '$PVM_ROOT/bin/$PVM_ARCH/' subdirectory 
+to each of the executables in your 'bin/' directory. This is required by PVM.
+
+5. Start the PVM daemon by typing "pvm" on the command line and then typing
+"quit".
+
+6. Test SPP+CUTS, using the sample file called sample.spp included
+with the distribution. To specify the file name, use the "-F" command-line
+option, i.e., type 
+
+   spp_m$(EXT) -F sample.spp 
+
+*******************************************************************************
+*            COMPILING THE SYMPHONY SPP+CUTS APPLICATION (Windows)                *
+*******************************************************************************
+
+Here is a sketch outline of how to compile the SYMPHONY SPP+CUTS
+application in Microsoft Windows. For information on developing your own
+applications, please see the quick start guide below or the detailed
+explanation in the user's manual. Direct support is provided for compilation
+under MS Visual Studio 6.0. Compilation for other compilers should also be
+possible. Note that the Windows version has some limitations. Detailed timing
+information is not currently provided.  Support is only provided for running
+in sequential mode at this time.
+
+First, download SYMPHONY and unpack the archive if it is required. 
+You now have three options. You can either compile on the command-line using 
+automated MSDEV build system or NMAKE utility or you can use the provided 
+projects and workspaces. Note that, in Windows, it is not recommended to 
+move SPP+CUTS package from the SYMPHONY package. Otherwise, the user has 
+to redefine all the paths to SYMPHONY and COIN header files as well as 
+the paths to COIN project files. For all of the following options, first 
+go to the SYMPHONY/Appliacations/SPP+CUTS/Win32/v6 directory. 
+
+************************ Using MSDEV Utility *********************************
+
+1. Open a command line terminal and type
+
+   msdev spp_with_cuts.dsw /make all    
+
+This will create both the debug and release versions of SYMPHONY. If you 
+want to compile only one of them, type 
+ 
+   msdev spp_with_cuts.dsw /make "all - debug" 
+
+or 
+
+   msdev spp_with_cuts.dsw /make "all - release" 
+
+For each command, the executable 'spp_with_cuts.exe' will be created in 
+'Debug' and/or 'Release' directories.
+
+2. To test the executable, type 
+
+   Debug/spp_with_cuts.exe -F ..\..\sample.spp
+
+3. If SPP+CUTS is modified, type 
+
+   msdev spp_with_cuts.dsw /make all /rebuild
+
+in order to clean and rebuild everything. 
 
 ******************** Using the NMAKE Utility *********************************
 
-1. Edit the src\WIN32\spp_with_cuts.mak makefile to reflect your 
-environment. This involves specifying the LP solver to be used, assigning some 
-variables and setting various paths. Only minor edits should be required. 
-An explanation of what has to be set is contained in the comments in the 
-makefile.
+1. Edit the file Win32\v6\spp_with_cuts.mak to reflect your environment. 
+This involves 
+specifying the LP solver to be used and various paths. Only minor edits should 
+be required. An explanation of what has to be set is contained in the comments 
+in the makefile. Note that, you have to first create the COIN libraries
+Cgl, Clp, Osi, OsiClp and CoinUtils which reside in Win32 directory of the 
+root directory of SYMPHONY package. 
 
-2. To use many of the new capabilities of SYMPHONY, you must have installed
-the COIN libraries, available from www.coin-or.org and with the latest 
-SYMPHONY distribution. By default, SYMPHONY is set to use COIN LP solver, CLP, 
-COIN Open Solver Interface, OSI, and COIN Cut Generation Library, CGL. To keep 
-this configuration, you should install OSI, CGL, CLP and additionally, the 
-Coin utilities (under COIN\Coin). The path to the COIN libraries, unless you 
-want to use the included package, must be specified in the makefile.
+2. Once configuration is done, open a command line terminal and type
 
-3. Once configuration is done, type "nmake /f spp_with_cuts.mak" in the 
-src\WIN32 directory. The executable "spp_with_cuts.exe" will be 
-created under src\WIN32\Debug subdirectory.
+   nmake /f spp_with_cuts.mak
 
-4. To test the executable, type "spp_with_cuts.exe -F ..\..\..\sample.spp" at a
-command prompt from the src\WIN32\Debug directory.
+   The executable "spp_with_cuts.exe" will be created in the Debug directory.
+
+3. To test the executable, type 
+
+   spp_with_cuts.exe -F ..\..\sample.spp
 
 ******************** Using the MSVC++ Workspace ******************************
 
-1. In MS Visual C++ 6.0, open the workspace src\WIN32\spp_with_cuts.dsw. Note 
-that there are two projects, one called "spp_with_cuts" and the other called 
-"symphonyLib". The "symphonyLib" project compiles the source code, with the 
-calls to the user-defined callbacks used to customize the solver, to create 
-the callable library: "symphonyLib.lib". The "spp_with_cuts" project compiles 
-those user callbacks together with the main and the application functions, 
-links them with the callable library and creates the executable: 
-"spp_with_cuts.exe".
- 
-2. To use many of the new capabilities of SYMPHONY, you must have
-the COIN project files. Specifically, you should have OSI, CGL, CLP and the 
-Coin utilities (in the COIN/Coin subdirectory). These can be downloaded from 
-www.coin-or.org or can be found in the latest SYMPHONY distribution. Current
-workspace is set to use the COIN packages included in the SYMPHONY repository. 
-You will need to reload the needed COIN projects to the workspace if you want
-to use another COIN distribution.
+1. Open the workspace 'spp.dsw'. 
 
-3. By default, SYMPHONY is set to use the OSI CLP interface. To see this
-check the following settings:
-
--- "__OSI_CLP__" is defined in the preprocessor definitions of both
-"symphonyLib" and "spp_with_cuts" projects (right-click on one of the 
-projects, and then choose Settings --> C/C++ --> Preprocessor in the category 
-drop-down menu).
-
--- Paths to the include files of COIN utilities (Coin), OSI, OSI_CLP, and
-CLP are specified in the same settings window as for the preprocessor
-definitions. Note that, the Coin, OSI, OSI_CLP and CLP include directories are
-assumed to be in ..\..\..\..\COIN\,i.e., COIN is assumed to be in SYMPHONY 
-subdirectory. If it is not, make sure that you have set the correct paths in 
-both projects before compiling.
-
--- The "spp_with_cuts" project is dependent on the "symphonyLib", "coinLib", 
-"osiLib", "osiClpLib", "clpLib" projects (see the dependencies in Project --> 
-Dependencies)
-
-If you want to use another solver:
-
--- If you want to use the solver again through the OSI interface, change the 
-preprocessor definition in both projects from "__OSI_CLP__" to "__OSI_XXX__", 
-where "XXX" is replaced by the desired solver's acronym ("__OSI_CPLEX__", 
-"__OSI_GLPK__", "__OSI_OSL__", etc.). Otherwise, change it to either  
-"__CPLEX__" or "__OSL__" in both projects since SYMPHONY is able to use 
-CPLEX and OSL solvers directly.
-
--- Change the path definitions of the include files: for instance, if you want
-to use "__OSI_CPLEX__", define "..\..\..\..\COIN\Osi\OsiCpx" and 
-"C:\ILOG\cplex81\include\ilcplex" (assuming CPLEX is installed here) as the 
-solver's header files path definitions or if you want to use "__OSI_OSL__", 
-define "..\..\..\..\COIN\Osi\OsiOsl" and "C:\ProgramFiles\IbmOslV3Lib\osllib" 
-(assuming OSL is installed here) instead of the OSI CLP and CLP path 
-definitions.
-
-If you want to use the native CPLEX or OSL interface directly, delete all the 
-path definitions (you are not required to have COIN and OSI), and just add the
-path definitions for the CPLEX or OSL include files.
-
--- Add the appropriate projects and libraries. For instance, if you want to 
-use "__OSI_OSL__", then add "osiOslLib" project to the workspace and 
-"oslmd6030", OSL solver library, to the "spp_with_cuts" project after deleting 
-"osiClpLib" and "clpLib" projetcs. Update the dependencies. If you want to use 
-the native OSL interface, then delete all the projects (except the 
-"symphonyLib") and just add the "oslmd6030" library for it is the 
-unique solver library we need now.
-
-4. By default, SYMPHONY is also set to use the COIN CGL library for
-generating cuts. To use CGL, the workspace includes the "cglLib" project, the 
-"symphonyLib" project has the "ADD_CGL_CUTS" preprocessor definition and the 
-path to Cgl include directory, "..\..\..\..\COIN\Cgl\include" and the 
-"spp_with_cuts" project has a dependency on "cglLib". If you don't want to use 
-the CGL library, reverse this procedure and delete the "cglLib" project from 
-the workspace.
-
-5. DO NOT CHANGE COMPILER DEFINES NOT RELATED TO THE LP SOLVER. Important note
-for OSL users: when using OSL in Windows, you must also add "OSLMSDLL" to the
-list of definitions.
-
-6. Note that there are a number of additional preprocessor definitions that
+2. Note that there are a number of additional preprocessor definitions that
 control the functionality of SYMPHONY. These definitions are described in
-"config", a Unix-style configuration file included in the distribution, under
-SYMPHONY subdirectory.  To enable the functionality associated with a 
-particular definition, simply add it to the list of definitions, as above.
+"spp.mak", a Unix-style makefile included in the distribution. To 
+enable the functionality associated with a particular definition, simply add 
+it to the list of definitions of "libSymphony" project together with the 
+required libraries and paths. For instance, if you 
+want to enable GMPL reader option, you need to
 
-7. You must also be sure to have any .dll files required for your LP solver to
-be in your search path. Either move the required .dll to the directory
-containing "spp_with_cuts.exe" or add the path to the "PATH" Windows 
-environment variable.
+  - add the directory of the header files of GLPK to the include files path
+  - add USE_GLPMPL to the defines
+  - add the GLPK library to the workspace
 
-8. Once you have the proper settings for your LP solver, choose "Build
-spp_with_cuts.exe" from the Build menu. This should successfully build the
-executable.
+2. Make sure that the project 'spp_with_cuts' is set as the active project 
+from the Project/Set Active menu. Choose "Build spp.exe" from the Build menu. 
+This should successfully build the SPP+CUTS executable. 
 
-9. To test the executable, right click on the "spp_with_cuts" project, go to
-the "Debug" tab and set the program arguments to "-F ..\..\sample.spp" Note
-that command-line switches are Unix-style.
+3. To test the executable, right click on the spp project, go to the
+"Debug" tab and set the program arguments to "-F ..\..\sample.spp". 
+Note that command-line switches are Unix-style. 
 
-10. Now choose "Execute" from the build menu and the solver should solve the
+4. Now choose "Execute" from the build menu and the solver should solve the
 sample problem.
 
 Note that there is some functionality missing from the Windows version. Most
@@ -163,4 +217,8 @@ easy to add -- let me know if you are interested in doing it and I will give
 you all the help I can. In addition, the Windows version will only run in
 sequential mode for a variety of reasons. However, it should be relatively
 easy to get it running in parallel if you can get PVM working under
-Windows. Let me know if you are interested.
+Windows. Let me know if you are interested. Finally, only CLP LP solver 
+is maintained in current release. If you need to work with any other 
+LP solver; although support for other LP solvers will be added later, I can 
+send you simple instructions for configuring SYMPHONY's Windows version 
+with other LP solvers. 

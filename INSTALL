@@ -183,10 +183,11 @@ module dependencies.
     make 
     make install
 
-in the root directory to make and install the distributed libraries. As in 
-Step 1 of the sequential version, you may type "make clean" after making the 
-library. It should not have to be remade again unless you modify SYMPHONY's 
-internal files.
+in the root directory to make and install the distributed libraries. Note 
+that, this will additionally make and install the sequential version library 
+and the executable. As in Step 1 of the sequential version, you may type 
+"make clean" after installing. It should not have to be remade again 
+unless you modify SYMPHONY's internal files.
 
 5. Make sure there are links from your '$PVM_ROOT/bin/$PVM_ARCH/' subdirectory 
 to each of the executables in your 'bin/' directory. This is required by PVM.
@@ -196,11 +197,12 @@ to each of the executables in your 'bin/' directory. This is required by PVM.
 
 7. As above, test SYMPHONY using the sample MPS file called sample.mps included
 with the distribution. To specify the file name, use the "-F" command-line
-option, i.e., type 
+option, i.e., in the root directory, type 
 
-   bin/symphony -F SYMPHONY/Datasets/sample.mps 
+   bin/symphony_m$(EXT) -F SYMPHONY/Datasets/sample.mps 
 
-in the root directory. To obtain more MPS data files for further
+where $(EXT) is an extension to be added according to the chosen module 
+dependencies. To obtain more MPS data files for further
 testing, download the MIPLIB library.
 
 4. That's it! Now, you are ready to develop your own application using 
@@ -218,10 +220,12 @@ application specific library. Type
    make install
 
 This will create the application library called 'libSymAppl' to be used while 
-building custom applications.
+building custom applications. Note that, sequential version library and the 
+executable will also be made and installed. 
 
 2. Go to SYMPHONY/Applications/Appl-Pckg directory and type 'make' there. 
-For more information, see the INSTALL file of the corresponding application. 
+For more information including the parallel configuration instructions, see 
+the INSTALL file of the corresponding application. 
 
 ******************************************************************************
 *      COMPILING The SYMPHONY Library and Executable (Microsoft Windows)     *
@@ -241,9 +245,9 @@ compilers should also be possible. Note that the Windows version has some
 limitations. Detailed timing information is not currently provided.  Support
 is only provided for running in sequential mode at this time.
 
-First, download SYMPHONY and unpack the archive. You now have three options. 
-You can either compile on the command-line using automated MSDEV 
-build system or NMAKE utility or you can use the provided projects and 
+First, download SYMPHONY and unpack the archive if it is required. You now 
+have three options. You can either compile on the command-line using automated 
+MSDEV build system or NMAKE utility or you can use the provided projects and 
 workspaces. 
 
 ************************ Using MSDEV Utility *********************************
@@ -290,9 +294,11 @@ in order to clean and rebuild everything.
 your environment. This involves specifying the LP solver to be used, 
 assigning some variables and  setting various paths. Only minor edits 
 should be required. An explanation of what has to be set is contained in the 
-comments in the makefile.
+comments in the makefile.  Note that, you have to first create the COIN 
+libraries Cgl, Clp, Osi, OsiClp and CoinUtils which reside in Win32/v6 
+directory.
 
-2. Once configuration is done, type 
+2. Once configuration is done, open a command line terminal and type 
 
    nmake /f sym.mak
 
@@ -319,11 +325,18 @@ and then type "help" or "?" to see a list of available commands.
 control the functionality of SYMPHONY. These definitions are described in
 "sym.mak", a Unix-style makefile included in the distribution. To 
 enable the functionality associated with a particular definition, simply add 
-it to the list of definitions of "libSymphony" project. Also note that, 
-currently, only CLP lp solver is maintained.  
+it to the list of definitions of "libSymphony" project together with the 
+required libraries and paths. For instance, if you 
+want to enable GMPL reader option, you need to
 
-2. Choose "Build symphony.exe" from the Build menu. This should successfully 
-build the SYMPHONY library and the corresponding executable.
+  - add the directory of the header files of GLPK to the include files path
+  - add USE_GLPMPL to the defines
+  - add the GLPK library to the workspace
+
+2.  Make sure that the project 'symphony' is set as the active project from 
+the Project/Set Active menu. Choose "Build symphony.exe" from the Build menu. 
+This should successfully build the SYMPHONY library and the corresponding 
+executable.
 
 3. To test the executable, right click on the symphony project, go to the
 "Debug" tab and set the program arguments to 
@@ -342,4 +355,8 @@ easy to add -- let me know if you are interested in doing it and I will give
 you all the help I can. In addition, the Windows version will only run in
 sequential mode for a variety of reasons. However, it should be relatively
 easy to get it running in parallel if you can get PVM working under
-Windows. Let me know if you are interested.
+Windows. Let me know if you are interested. Finally, only CLP LP solver 
+is maintained in current release. If you need to work with any other 
+LP solver; although support for other LP solvers will be added later, I can 
+send you simple instructions for configuring SYMPHONY's Windows version 
+ with other LP solvers. 
