@@ -28,24 +28,21 @@ SUBDIRS += SYMPHONY
 #                           Extra Targets                              #
 ########################################################################
 
-#test: all
-#	cd Cbc; make test
+test: all
+	cd SYMPHONY; make test
 
-#unitTest: test
+unitTest: test
 
-#symphony: all
-#	make; cd SYMPHONY; make
+tests: all
+	for dir in $(SUBDIRS); do \
+	  if test -r $$dir/test/Makefile; then \
+	    (cd $$dir; make test) \
+	  fi; \
+	done
 
-#tests: all
-#	for dir in $(subdirs); do \
-#	  if test -r $$dir/test/Makefile; then \
-#	    (cd $$dir; make test) \
-#	  fi; \
-#	done
+unitTests: tests
 
-#unitTests: tests
-
-#.PHONY: tests unitTests
+.PHONY: test unitTest tests unitTests
 
 ########################################################################
 #                         Maintainer Stuff                             #

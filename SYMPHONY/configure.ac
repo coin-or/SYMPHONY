@@ -774,6 +774,7 @@ AC_SUBST(CXXFLAGS)
 # configuration header file)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 test/Makefile
                  Applications/CNRP/Makefile
 		 Applications/MATCH/Makefile
 		 Applications/MCKP/Makefile

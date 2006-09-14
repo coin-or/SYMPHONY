@@ -22387,7 +22387,7 @@ fi
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                              ac_config_files="$ac_config_files Makefile src/Makefile Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile sym_addlibs.txt"
+                                                                                                                        ac_config_files="$ac_config_files Makefile src/Makefile test/Makefile Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile sym_addlibs.txt"
 
 
 if test `cd $srcdir; pwd` != `pwd`; then
@@ -23263,6 +23263,7 @@ do
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+  "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
   "Applications/CNRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/CNRP/Makefile" ;;
   "Applications/MATCH/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MATCH/Makefile" ;;
   "Applications/MCKP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MCKP/Makefile" ;;

@@ -18,23 +18,9 @@ SUBDIRS = src
 # specified.  But we need to list it as subdirectory to make sure that it is
 # included in the tarball
 
-#if ALWAYS_FALSE
-#  SUBDIRS += test
-#endif
-
-#if SYM_WITH_CNRP
-#SUBDIRS += Applications/CNRP
-#endif
-
-#Deneme
-DENEME1 = $(builddir)
-DENEME2 = $(top_srcdir)
-DENEME3 = $(abs_builddir)
-DENEME4 = $(top_builddir)
-DENEME5 = $(abs_top_builddir)
-DENEME6 = $(srcdir)
-DENEME7 = $(abs_srcdir)
-DENEME8 = $(abs_top_srcdir)
+if ALWAYS_FALSE
+  SUBDIRS += test
+endif
 
 ########################################################################
 #             Additional files to be included in tarball               #
@@ -50,18 +36,18 @@ DENEME8 = $(abs_top_srcdir)
 #                           Extra Targets                              #
 ########################################################################
 
-# test: all
-# 	cd test; make test
+ test: all
+	cd test; make test
 
-# unitTest: test
+ unitTest: test
 
-# clean-local:
-# 	if test -r test/Makefile; then cd test; make clean; fi
+ clean-local:
+	if test -r test/Makefile; then cd test; make clean; fi
 
-# distclean-local:
-# 	if test -r test/Makefile; then cd test; make distclean; fi
+ distclean-local:
+	if test -r test/Makefile; then cd test; make distclean; fi
 
-# .PHONY: test unitTest
+ .PHONY: test unitTest
 
 ########################################################################
 #                  Installation of the addlibs file                    #

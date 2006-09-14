@@ -216,29 +216,6 @@ EXTRA_DIST = $(am__append_2)
 SUBDIRS = CoinUtils Osi Cgl $(am__append_1) SYMPHONY
 
 ########################################################################
-#                           Extra Targets                              #
-########################################################################
-
-#test: all
-#	cd Cbc; make test
-
-#unitTest: test
-
-#symphony: all
-#	make; cd SYMPHONY; make
-
-#tests: all
-#	for dir in $(subdirs); do \
-#	  if test -r $$dir/test/Makefile; then \
-#	    (cd $$dir; make test) \
-#	  fi; \
-#	done
-
-#unitTests: tests
-
-#.PHONY: tests unitTests
-
-########################################################################
 #                         Maintainer Stuff                             #
 ########################################################################
 
@@ -651,6 +628,26 @@ uninstall-info: uninstall-info-recursive
 	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
 	uninstall uninstall-am uninstall-info-am
 
+
+########################################################################
+#                           Extra Targets                              #
+########################################################################
+
+test: all
+	cd SYMPHONY; make test
+
+unitTest: test
+
+tests: all
+	for dir in $(SUBDIRS); do \
+	  if test -r $$dir/test/Makefile; then \
+	    (cd $$dir; make test) \
+	  fi; \
+	done
+
+unitTests: tests
+
+.PHONY: test unitTest tests unitTests
 
 # Make sure acinclude is using most recent coin.m4
 @MAINTAINER_MODE_TRUE@$(srcdir)/acinclude.m4: $(BUILDTOOLSDIR)/coin.m4
