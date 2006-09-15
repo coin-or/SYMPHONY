@@ -16,7 +16,7 @@ EXTRA_DIST =
 
 # subdirs is set by configure as the list of all subdirectories to recurse
 # into
-SUBDIRS = CoinUtils Osi Cgl 
+SUBDIRS = CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl 
 
 if ADD_CLP
 SUBDIRS += Clp
