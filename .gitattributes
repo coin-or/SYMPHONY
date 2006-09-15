@@ -64,6 +64,7 @@ SYMPHONY/src/Makefile.in -text
 SYMPHONY/sym_addlibs.txt.in -text
 SYMPHONY/test/Makefile.am -text
 SYMPHONY/test/Makefile.in -text
+SYMPHONY/test/unitTestSym.cpp -text
 Win32/v6/libSymphony.dsp -text
 Win32/v6/sym.mak -text
 Win32/v6/symphony.dsp -text
