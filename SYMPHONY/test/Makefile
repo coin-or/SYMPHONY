@@ -19,6 +19,7 @@
 # This file is distributed under the Common Public License.
 
 # Author:  Andreas Waechter           IBM    2006-04-13
+
 srcdir = .
 top_srcdir = ..
 
@@ -41,6 +42,42 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = i686-pc-linux-gnu
 host_triplet = i686-pc-linux-gnu
+am__append_1 = $(CGLOBJDIR)/src/libCgl.la
+am__append_2 = \
+	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+
+# List all additionally required solver and Osi libraries
+am__append_3 = -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
+	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
+	-D__OSI_CLP__
+am__append_4 = $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+	$(CLPOBJDIR)/src/libClp.la
+
+am__append_5 = `cat $(CLPOBJDIR)/clp_addlibs.txt`
+#am__append_6 = -I`$(CYGPATH_W) $(CPXINCDIR)` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
+#	-D__OSI_CPLEX__
+#am__append_7 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+#am__append_8 = -I`$(CYGPATH_W) $(GLPKINCDIR)` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk` \
+#	-D__OSI_GLPK__
+#am__append_9 = $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
+#am__append_10 = -I`$(CYGPATH_W) $(GLPKINCDIR)`
+#am__append_11 = -I`$(CYGPATH_W) $(OSLINCDIR)` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl` \
+#	-D__OSI_OSL__
+#am__append_12 = $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
+#am__append_13 = -I`$(CYGPATH_W) $(SPXINCDIR)` \
+#	-I`$(CYGPATH_W) \
+#	$(OSISRCDIR)/src/OsiSpx` -D__OSI_SPX__
+#am__append_14 = $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
+#am__append_15 = -I`$(CYGPATH_W) $(XPRINCDIR)` \
+#	-I`$(CYGPATH_W) \
+#	$(OSISRCDIR)/src/OsiXpr` \
+#	-D__OSI_XPRESS__
+#am__append_16 = $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
+noinst_PROGRAMS = unitTest$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -51,11 +88,62 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/config_sym.h
 CONFIG_CLEAN_FILES =
-SOURCES =
-DIST_SOURCES =
+PROGRAMS = $(noinst_PROGRAMS)
+am_unitTest_OBJECTS = unitTest-OsiColCutTest.$(OBJEXT) \
+	unitTest-OsiCutsTest.$(OBJEXT) \
+	unitTest-OsiRowCutDebuggerTest.$(OBJEXT) \
+	unitTest-OsiRowCutTest.$(OBJEXT) \
+	unitTest-OsiSolverInterfaceTest.$(OBJEXT) \
+	unitTest-OsiSymSolverInterfaceTest.$(OBJEXT) \
+	unitTest-unitTestSym.$(OBJEXT)
+unitTest_OBJECTS = $(am_unitTest_OBJECTS)
+am__DEPENDENCIES_1 = $(CGLOBJDIR)/src/libCgl.la
+am__DEPENDENCIES_2 =  \
+	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+	$(CLPOBJDIR)/src/libClp.la
+#am__DEPENDENCIES_3 =  \
+#	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+#am__DEPENDENCIES_4 =  \
+#	$(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la
+#am__DEPENDENCIES_5 =  \
+#	$(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
+#am__DEPENDENCIES_6 =  \
+#	$(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
+#am__DEPENDENCIES_7 =  \
+#	$(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
+am__DEPENDENCIES_8 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
+	$(am__DEPENDENCIES_3) $(am__DEPENDENCIES_4) \
+	$(am__DEPENDENCIES_5) $(am__DEPENDENCIES_6) \
+	$(am__DEPENDENCIES_7) $(OSIOBJDIR)/src/libOsi.la \
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
+	$(OSIOBJDIR)/src/OsiSym/libOsiSym.la
+am__DEPENDENCIES_9 = `cat \
+	$(CGLOBJDIR)/cgl_addlibs.txt`
+am__DEPENDENCIES_10 = `cat \
+	$(CLPOBJDIR)/clp_addlibs.txt`
+am__DEPENDENCIES_11 = `cat $(OSIOBJDIR)/osi_addlibs.txt` `cat \
+	$(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
+	$(am__DEPENDENCIES_9) $(am__DEPENDENCIES_10)
+am__DEPENDENCIES_12 = $(am__DEPENDENCIES_8) $(am__DEPENDENCIES_11)
+depcomp = $(SHELL) $(top_srcdir)/../depcomp
+am__depfiles_maybe = depfiles
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CXXFLAGS) $(CXXFLAGS)
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+SOURCES = $(unitTest_SOURCES)
+DIST_SOURCES = $(unitTest_SOURCES)
+ETAGS = etags
+CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = ${SHELL} /home/menal/Sym-Trunk/missing --run aclocal-1.9
-ADDLIBS = -lm
+ADDLIBS = -lm `cat $(OSIOBJDIR)/osi_addlibs.txt` `cat \
+	$(COINUTILSOBJDIR)/coinutils_addlibs.txt` $(am__append_2) \
+	$(am__append_5)
 ADD_CFLAGS = 
 ADD_CXXFLAGS = 
 ALWAYS_FALSE_FALSE = 
@@ -94,6 +182,8 @@ COIN_HAS_COINUTILS_FALSE = #
 COIN_HAS_COINUTILS_TRUE = 
 COIN_HAS_CPX_FALSE = 
 COIN_HAS_CPX_TRUE = #
+COIN_HAS_DATA_FALSE = #
+COIN_HAS_DATA_TRUE = 
 COIN_HAS_GLPK_FALSE = 
 COIN_HAS_GLPK_TRUE = #
 COIN_HAS_OSI_FALSE = #
@@ -104,6 +194,8 @@ COIN_HAS_READLINE_FALSE =
 COIN_HAS_READLINE_TRUE = #
 COIN_HAS_SPX_FALSE = 
 COIN_HAS_SPX_TRUE = #
+COIN_HAS_SYMPHONY_FALSE = #
+COIN_HAS_SYMPHONY_TRUE = 
 COIN_HAS_XPR_FALSE = 
 COIN_HAS_XPR_TRUE = #
 COMPILE_FRAC_BRANCHING_FALSE = 
@@ -121,6 +213,8 @@ CXXDEFS =
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = 
 CYGPATH_W = echo
+DATAOBJDIR = /home/menal/Sym-Trunk/SYMPHONY/../Data
+DATASRCDIR = /home/menal/Sym-Trunk/Data
 DBG_CFLAGS = -g -pipe -pedantic-errors -Wimplicit -Wparentheses -Wsequence-point -Wreturn-type -Wcast-qual -Wall  
 DBG_CXXFLAGS = -g -pipe -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion  
 DEFS = -DHAVE_CONFIG_H
@@ -202,6 +296,8 @@ SYMAPPLDIR = /home/menal/Sym-Trunk/SYMPHONY/Applications
 SYMDEFS = -DHAS_RANDOM -DHAS_SRANDOM -D__NONE__ -D__LINUX -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP -DCOMPILE_IN_TM
 SYMINCDIR = /home/menal/Sym-Trunk/SYMPHONY/include
 SYMPDEFS = -DHAS_RANDOM -DHAS_SRANDOM -D__NONE__ -D__LINUX -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP -DCOMPILE_IN_TM
+SYMPHONYOBJDIR = /home/menal/Sym-Trunk/SYMPHONY/.
+SYMPHONYSRCDIR = /home/menal/Sym-Trunk/SYMPHONY
 SYMSRCDIR = /home/menal/Sym-Trunk/SYMPHONY/src
 SYM_COMPILE_IN_CG_FALSE = #
 SYM_COMPILE_IN_CG_TRUE = 
@@ -289,15 +385,80 @@ target_alias =
 AUTOMAKE_OPTIONS = foreign
 
 ########################################################################
+#                         unitTest for Symphony                        #
+########################################################################
+test_srcdir = $(OSISRCDIR)/test
+
+# Add include files
+
+########################################################################
+#                            Additional flags                          #
+########################################################################
+
+# Here list all include flags, relative to this "srcdir" directory.  This
+# "cygpath" stuff is necessary to compile with native compilers on Windows.
+# "top_srcdir" refers to the basic directory for the main package that is
+# being compiled.
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(SYMINCDIR)` -I`$(CYGPATH_W) \
+	$(OSISRCDIR)/src/OsiSym` $(am__append_3) $(am__append_6) \
+	$(am__append_8) $(am__append_10) $(am__append_11) \
+	$(am__append_13) $(am__append_15) -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src` -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglGomory` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglKnapsackCover` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglLiftAndProject` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglMixedIntegerRounding` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglMixedIntegerRounding2` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglOddHole` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglPreProcess` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglProbing` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglRedSplit` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglSimpleRounding` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglTwomir` -I`$(CYGPATH_W) \
+	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
+	$(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` -I`$(CYGPATH_W) \
+	$(CGLOBJDIR)/inc`
+SYMCPPFLAGS = $(AM_CPPFLAGS) $(SYMDEFS)
+APPLCPPFLAGS = 
+LDADD = $(am__append_1) $(am__append_4) $(am__append_7) \
+	$(am__append_9) $(am__append_12) $(am__append_14) \
+	$(am__append_16) $(OSIOBJDIR)/src/libOsi.la \
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
+	$(OSIOBJDIR)/src/OsiSym/libOsiSym.la
+
+########################################################################
+#                            Additional Definitions                    #
+########################################################################
+ALLLDADD = $(LDADD) $(ADDLIBS)
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+unitTest_SOURCES = \
+	$(test_srcdir)/OsiColCutTest.cpp \
+	$(test_srcdir)/OsiCutsTest.cpp \
+	$(test_srcdir)/OsiRowCutDebuggerTest.cpp \
+	$(test_srcdir)/OsiRowCutTest.cpp \
+	$(test_srcdir)/OsiSolverInterfaceTest.cpp \
+	$(test_srcdir)/OsiSymSolverInterfaceTest.cpp \
+	unitTestSym.cpp
+
+unitTest_DEPENDENCIES = $(LDADD)
+unitTest_CPPFLAGS = $(SYMCPPFLAGS)
+unitTest_LDADD = $(SYMPHONYOBJDIR)/src/libSym.la $(ALLLDADD)
+unitTest_LDFLAGS = -rpath $(libdir)
+
+########################################################################
 #                          Cleaning stuff                              #
 ########################################################################
 
 # Here we list everything that is not generated by the compiler, e.g.,
 # output files of a program
-DISTCLEANFILES = yy.mps xx.mps
+DISTCLEANFILES = *.mps *.mps.gz *.lp test2out *.out.gz
 all: all-am
 
 .SUFFIXES:
+.SUFFIXES: .cpp .lo .o .obj
 $(srcdir)/Makefile.in: # $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -328,6 +489,149 @@ $(top_srcdir)/configure: # $(am__configure_deps)
 $(ACLOCAL_M4): # $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  echo " rm -f $$p $$f"; \
+	  rm -f $$p $$f ; \
+	done
+unitTest$(EXEEXT): $(unitTest_OBJECTS) $(unitTest_DEPENDENCIES) 
+	@rm -f unitTest$(EXEEXT)
+	$(CXXLINK) $(unitTest_LDFLAGS) $(unitTest_OBJECTS) $(unitTest_LDADD) $(LIBS)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+
+distclean-compile:
+	-rm -f *.tab.c
+
+include ./$(DEPDIR)/unitTest-OsiColCutTest.Po
+include ./$(DEPDIR)/unitTest-OsiCutsTest.Po
+include ./$(DEPDIR)/unitTest-OsiRowCutDebuggerTest.Po
+include ./$(DEPDIR)/unitTest-OsiRowCutTest.Po
+include ./$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Po
+include ./$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po
+include ./$(DEPDIR)/unitTest-unitTestSym.Po
+
+.cpp.o:
+	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+#	source='$<' object='$@' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXXCOMPILE) -c -o $@ $<
+
+.cpp.obj:
+	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
+	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+#	source='$<' object='$@' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.cpp.lo:
+	if $(LTCXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+#	source='$<' object='$@' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LTCXXCOMPILE) -c -o $@ $<
+
+unitTest-OsiColCutTest.o: $(test_srcdir)/OsiColCutTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiColCutTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiColCutTest.Tpo" -c -o unitTest-OsiColCutTest.o `test -f '$(test_srcdir)/OsiColCutTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiColCutTest.cpp; \
+	then mv -f "$(DEPDIR)/unitTest-OsiColCutTest.Tpo" "$(DEPDIR)/unitTest-OsiColCutTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiColCutTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiColCutTest.cpp' object='unitTest-OsiColCutTest.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiColCutTest.o `test -f '$(test_srcdir)/OsiColCutTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiColCutTest.cpp
+
+unitTest-OsiColCutTest.obj: $(test_srcdir)/OsiColCutTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiColCutTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiColCutTest.Tpo" -c -o unitTest-OsiColCutTest.obj `if test -f '$(test_srcdir)/OsiColCutTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiColCutTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiColCutTest.cpp'; fi`; \
+	then mv -f "$(DEPDIR)/unitTest-OsiColCutTest.Tpo" "$(DEPDIR)/unitTest-OsiColCutTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiColCutTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiColCutTest.cpp' object='unitTest-OsiColCutTest.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiColCutTest.obj `if test -f '$(test_srcdir)/OsiColCutTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiColCutTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiColCutTest.cpp'; fi`
+
+unitTest-OsiCutsTest.o: $(test_srcdir)/OsiCutsTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiCutsTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiCutsTest.Tpo" -c -o unitTest-OsiCutsTest.o `test -f '$(test_srcdir)/OsiCutsTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiCutsTest.cpp; \
+	then mv -f "$(DEPDIR)/unitTest-OsiCutsTest.Tpo" "$(DEPDIR)/unitTest-OsiCutsTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiCutsTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiCutsTest.cpp' object='unitTest-OsiCutsTest.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiCutsTest.o `test -f '$(test_srcdir)/OsiCutsTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiCutsTest.cpp
+
+unitTest-OsiCutsTest.obj: $(test_srcdir)/OsiCutsTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiCutsTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiCutsTest.Tpo" -c -o unitTest-OsiCutsTest.obj `if test -f '$(test_srcdir)/OsiCutsTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiCutsTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiCutsTest.cpp'; fi`; \
+	then mv -f "$(DEPDIR)/unitTest-OsiCutsTest.Tpo" "$(DEPDIR)/unitTest-OsiCutsTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiCutsTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiCutsTest.cpp' object='unitTest-OsiCutsTest.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiCutsTest.obj `if test -f '$(test_srcdir)/OsiCutsTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiCutsTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiCutsTest.cpp'; fi`
+
+unitTest-OsiRowCutDebuggerTest.o: $(test_srcdir)/OsiRowCutDebuggerTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiRowCutDebuggerTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiRowCutDebuggerTest.Tpo" -c -o unitTest-OsiRowCutDebuggerTest.o `test -f '$(test_srcdir)/OsiRowCutDebuggerTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiRowCutDebuggerTest.cpp; \
+	then mv -f "$(DEPDIR)/unitTest-OsiRowCutDebuggerTest.Tpo" "$(DEPDIR)/unitTest-OsiRowCutDebuggerTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiRowCutDebuggerTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiRowCutDebuggerTest.cpp' object='unitTest-OsiRowCutDebuggerTest.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiRowCutDebuggerTest.o `test -f '$(test_srcdir)/OsiRowCutDebuggerTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiRowCutDebuggerTest.cpp
+
+unitTest-OsiRowCutDebuggerTest.obj: $(test_srcdir)/OsiRowCutDebuggerTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiRowCutDebuggerTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiRowCutDebuggerTest.Tpo" -c -o unitTest-OsiRowCutDebuggerTest.obj `if test -f '$(test_srcdir)/OsiRowCutDebuggerTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiRowCutDebuggerTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiRowCutDebuggerTest.cpp'; fi`; \
+	then mv -f "$(DEPDIR)/unitTest-OsiRowCutDebuggerTest.Tpo" "$(DEPDIR)/unitTest-OsiRowCutDebuggerTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiRowCutDebuggerTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiRowCutDebuggerTest.cpp' object='unitTest-OsiRowCutDebuggerTest.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiRowCutDebuggerTest.obj `if test -f '$(test_srcdir)/OsiRowCutDebuggerTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiRowCutDebuggerTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiRowCutDebuggerTest.cpp'; fi`
+
+unitTest-OsiRowCutTest.o: $(test_srcdir)/OsiRowCutTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiRowCutTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiRowCutTest.Tpo" -c -o unitTest-OsiRowCutTest.o `test -f '$(test_srcdir)/OsiRowCutTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiRowCutTest.cpp; \
+	then mv -f "$(DEPDIR)/unitTest-OsiRowCutTest.Tpo" "$(DEPDIR)/unitTest-OsiRowCutTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiRowCutTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiRowCutTest.cpp' object='unitTest-OsiRowCutTest.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiRowCutTest.o `test -f '$(test_srcdir)/OsiRowCutTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiRowCutTest.cpp
+
+unitTest-OsiRowCutTest.obj: $(test_srcdir)/OsiRowCutTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiRowCutTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiRowCutTest.Tpo" -c -o unitTest-OsiRowCutTest.obj `if test -f '$(test_srcdir)/OsiRowCutTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiRowCutTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiRowCutTest.cpp'; fi`; \
+	then mv -f "$(DEPDIR)/unitTest-OsiRowCutTest.Tpo" "$(DEPDIR)/unitTest-OsiRowCutTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiRowCutTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiRowCutTest.cpp' object='unitTest-OsiRowCutTest.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiRowCutTest.obj `if test -f '$(test_srcdir)/OsiRowCutTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiRowCutTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiRowCutTest.cpp'; fi`
+
+unitTest-OsiSolverInterfaceTest.o: $(test_srcdir)/OsiSolverInterfaceTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSolverInterfaceTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" -c -o unitTest-OsiSolverInterfaceTest.o `test -f '$(test_srcdir)/OsiSolverInterfaceTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiSolverInterfaceTest.cpp; \
+	then mv -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiSolverInterfaceTest.cpp' object='unitTest-OsiSolverInterfaceTest.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSolverInterfaceTest.o `test -f '$(test_srcdir)/OsiSolverInterfaceTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiSolverInterfaceTest.cpp
+
+unitTest-OsiSolverInterfaceTest.obj: $(test_srcdir)/OsiSolverInterfaceTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSolverInterfaceTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" -c -o unitTest-OsiSolverInterfaceTest.obj `if test -f '$(test_srcdir)/OsiSolverInterfaceTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiSolverInterfaceTest.cpp'; fi`; \
+	then mv -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiSolverInterfaceTest.cpp' object='unitTest-OsiSolverInterfaceTest.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSolverInterfaceTest.obj `if test -f '$(test_srcdir)/OsiSolverInterfaceTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiSolverInterfaceTest.cpp'; fi`
+
+unitTest-OsiSymSolverInterfaceTest.o: $(test_srcdir)/OsiSymSolverInterfaceTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSymSolverInterfaceTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" -c -o unitTest-OsiSymSolverInterfaceTest.o `test -f '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiSymSolverInterfaceTest.cpp; \
+	then mv -f "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiSymSolverInterfaceTest.cpp' object='unitTest-OsiSymSolverInterfaceTest.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSymSolverInterfaceTest.o `test -f '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiSymSolverInterfaceTest.cpp
+
+unitTest-OsiSymSolverInterfaceTest.obj: $(test_srcdir)/OsiSymSolverInterfaceTest.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSymSolverInterfaceTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" -c -o unitTest-OsiSymSolverInterfaceTest.obj `if test -f '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; fi`; \
+	then mv -f "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo"; exit 1; fi
+#	source='$(test_srcdir)/OsiSymSolverInterfaceTest.cpp' object='unitTest-OsiSymSolverInterfaceTest.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSymSolverInterfaceTest.obj `if test -f '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; fi`
+
+unitTest-unitTestSym.o: unitTestSym.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-unitTestSym.o -MD -MP -MF "$(DEPDIR)/unitTest-unitTestSym.Tpo" -c -o unitTest-unitTestSym.o `test -f 'unitTestSym.cpp' || echo '$(srcdir)/'`unitTestSym.cpp; \
+	then mv -f "$(DEPDIR)/unitTest-unitTestSym.Tpo" "$(DEPDIR)/unitTest-unitTestSym.Po"; else rm -f "$(DEPDIR)/unitTest-unitTestSym.Tpo"; exit 1; fi
+#	source='unitTestSym.cpp' object='unitTest-unitTestSym.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-unitTestSym.o `test -f 'unitTestSym.cpp' || echo '$(srcdir)/'`unitTestSym.cpp
+
+unitTest-unitTestSym.obj: unitTestSym.cpp
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-unitTestSym.obj -MD -MP -MF "$(DEPDIR)/unitTest-unitTestSym.Tpo" -c -o unitTest-unitTestSym.obj `if test -f 'unitTestSym.cpp'; then $(CYGPATH_W) 'unitTestSym.cpp'; else $(CYGPATH_W) '$(srcdir)/unitTestSym.cpp'; fi`; \
+	then mv -f "$(DEPDIR)/unitTest-unitTestSym.Tpo" "$(DEPDIR)/unitTest-unitTestSym.Po"; else rm -f "$(DEPDIR)/unitTest-unitTestSym.Tpo"; exit 1; fi
+#	source='unitTestSym.cpp' object='unitTest-unitTestSym.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-unitTestSym.obj `if test -f 'unitTestSym.cpp'; then $(CYGPATH_W) 'unitTestSym.cpp'; else $(CYGPATH_W) '$(srcdir)/unitTestSym.cpp'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -337,12 +641,54 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+
+ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
+	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	mkid -fID $$unique
 tags: TAGS
-TAGS:
 
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+		$(TAGS_FILES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	if test -z "$(ETAGS_ARGS)$$tags$$unique"; then :; else \
+	  test -n "$$unique" || unique=$$empty_fix; \
+	  $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
+	    $$tags $$unique; \
+	fi
 ctags: CTAGS
-CTAGS:
+CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+		$(TAGS_FILES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(CTAGS_ARGS)$$tags$$unique" \
+	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
+	     $$tags $$unique
 
+GTAGS:
+	here=`$(am__cd) $(top_builddir) && pwd` \
+	  && cd $(top_srcdir) \
+	  && gtags -i $(GTAGS_ARGS) $$here
+
+distclean-tags:
+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
@@ -373,7 +719,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile
+all-am: Makefile $(PROGRAMS)
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -402,11 +748,14 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-noinstPROGRAMS \
+	mostlyclean-am
 
 distclean: distclean-am
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-libtool
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-libtool distclean-tags
 
 dvi: dvi-am
 
@@ -429,12 +778,14 @@ install-man:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-am
 
@@ -446,27 +797,27 @@ ps-am:
 
 uninstall-am: uninstall-info-am
 
-.PHONY: all all-am check check-am clean clean-generic clean-libtool \
-	distclean distclean-generic distclean-libtool distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-man install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-libtool clean-noinstPROGRAMS ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-info-am
 
 
-########################################################################
-#                         unitTest for Cbc                             #
-########################################################################
-
 # We are using the Cbc solver executable to do the unit test
 
-test: ../src/symphony$(EXEEXT)
-#	cd ../../Data/miplib3; make uncompress
-	../src/symphony$(EXEEXT) -T
-
+test: unitTest$(EXEEXT)
+	cd ../../Data/miplib3; make uncompress
+	cd ../../Data/Netlib; make uncompress
+	./unitTest$(EXEEXT) -T $(DATAOBJDIR)/miplib3 \
+	-mpsDir=$(DATAOBJDIR)/Sample \
+	-netlibDir=$(DATAOBJDIR)/Netlib
 .PHONY: test
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

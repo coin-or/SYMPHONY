@@ -5663,7 +5663,7 @@ int sym_test(sym_environment *env)
   double tol = 1e-03;
 
   if (strcmp(env->par.test_dir, "") == 0){ 
-    strcpy(mps_dir, "../../../MIPLIB3");
+    strcpy(mps_dir, "../../Data/miplib3");
   } else{
     strcpy(mps_dir, env->par.test_dir);
   }

@@ -12,6 +12,9 @@
 /* Define to 1 if the Cplex package is used */
 #undef COIN_HAS_CPX
 
+/* Define to 1 if the Data package is used */
+#undef COIN_HAS_DATA
+
 /* Define to 1 if the Glpk package is used */
 #undef COIN_HAS_GLPK
 
@@ -26,6 +29,9 @@
 
 /* Define to 1 if the Soplex package is used */
 #undef COIN_HAS_SPX
+
+/* Define to 1 if the SYMPHONY package is used */
+#undef COIN_HAS_SYMPHONY
 
 /* Define to 1 if the Xpress package is used */
 #undef COIN_HAS_XPR
