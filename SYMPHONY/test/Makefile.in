@@ -46,6 +46,7 @@ host_triplet = @host@
 @USE_CGL_CUTS_TRUE@am__append_2 = \
 @USE_CGL_CUTS_TRUE@	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
 
+
 # List all additionally required solver and Osi libraries
 @CLP_LP_SOLVER_TRUE@am__append_3 = -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
 @CLP_LP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
@@ -400,12 +401,13 @@ test_srcdir = $(OSISRCDIR)/test
 # "top_srcdir" refers to the basic directory for the main package that is
 # being compiled.
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(SYMINCDIR)` -I`$(CYGPATH_W) \
-	$(OSISRCDIR)/src/OsiSym` $(am__append_3) $(am__append_6) \
-	$(am__append_8) $(am__append_10) $(am__append_11) \
-	$(am__append_13) $(am__append_15) -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src` -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` -I`$(CYGPATH_W) \
+	$(OSISRCDIR)/src/OsiSym` -DCOIN_HAS_SYM $(am__append_3) \
+	$(am__append_6) $(am__append_8) $(am__append_10) \
+	$(am__append_11) $(am__append_13) $(am__append_15) \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglClique` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglDuplicateRow` -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src/CglFlowCover` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglGomory` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglKnapsackCover` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglLiftAndProject` -I`$(CYGPATH_W) \
@@ -439,8 +441,8 @@ unitTest_SOURCES = \
 	$(test_srcdir)/OsiCutsTest.cpp \
 	$(test_srcdir)/OsiRowCutDebuggerTest.cpp \
 	$(test_srcdir)/OsiRowCutTest.cpp \
-	$(test_srcdir)/OsiSolverInterfaceTest.cpp \
-	$(test_srcdir)/OsiSymSolverInterfaceTest.cpp \
+	OsiSolverInterfaceTest.cpp \
+	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
 unitTest_DEPENDENCIES = $(LDADD)
@@ -590,33 +592,33 @@ unitTest-OsiRowCutTest.obj: $(test_srcdir)/OsiRowCutTest.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiRowCutTest.obj `if test -f '$(test_srcdir)/OsiRowCutTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiRowCutTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiRowCutTest.cpp'; fi`
 
-unitTest-OsiSolverInterfaceTest.o: $(test_srcdir)/OsiSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSolverInterfaceTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" -c -o unitTest-OsiSolverInterfaceTest.o `test -f '$(test_srcdir)/OsiSolverInterfaceTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiSolverInterfaceTest.cpp; \
+unitTest-OsiSolverInterfaceTest.o: OsiSolverInterfaceTest.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSolverInterfaceTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" -c -o unitTest-OsiSolverInterfaceTest.o `test -f 'OsiSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSolverInterfaceTest.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(test_srcdir)/OsiSolverInterfaceTest.cpp' object='unitTest-OsiSolverInterfaceTest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='OsiSolverInterfaceTest.cpp' object='unitTest-OsiSolverInterfaceTest.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSolverInterfaceTest.o `test -f '$(test_srcdir)/OsiSolverInterfaceTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiSolverInterfaceTest.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSolverInterfaceTest.o `test -f 'OsiSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSolverInterfaceTest.cpp
 
-unitTest-OsiSolverInterfaceTest.obj: $(test_srcdir)/OsiSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSolverInterfaceTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" -c -o unitTest-OsiSolverInterfaceTest.obj `if test -f '$(test_srcdir)/OsiSolverInterfaceTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiSolverInterfaceTest.cpp'; fi`; \
+unitTest-OsiSolverInterfaceTest.obj: OsiSolverInterfaceTest.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSolverInterfaceTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" -c -o unitTest-OsiSolverInterfaceTest.obj `if test -f 'OsiSolverInterfaceTest.cpp'; then $(CYGPATH_W) 'OsiSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/OsiSolverInterfaceTest.cpp'; fi`; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(test_srcdir)/OsiSolverInterfaceTest.cpp' object='unitTest-OsiSolverInterfaceTest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='OsiSolverInterfaceTest.cpp' object='unitTest-OsiSolverInterfaceTest.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSolverInterfaceTest.obj `if test -f '$(test_srcdir)/OsiSolverInterfaceTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiSolverInterfaceTest.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSolverInterfaceTest.obj `if test -f 'OsiSolverInterfaceTest.cpp'; then $(CYGPATH_W) 'OsiSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/OsiSolverInterfaceTest.cpp'; fi`
 
-unitTest-OsiSymSolverInterfaceTest.o: $(test_srcdir)/OsiSymSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSymSolverInterfaceTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" -c -o unitTest-OsiSymSolverInterfaceTest.o `test -f '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiSymSolverInterfaceTest.cpp; \
+unitTest-OsiSymSolverInterfaceTest.o: OsiSymSolverInterfaceTest.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSymSolverInterfaceTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" -c -o unitTest-OsiSymSolverInterfaceTest.o `test -f 'OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSymSolverInterfaceTest.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(test_srcdir)/OsiSymSolverInterfaceTest.cpp' object='unitTest-OsiSymSolverInterfaceTest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='OsiSymSolverInterfaceTest.cpp' object='unitTest-OsiSymSolverInterfaceTest.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSymSolverInterfaceTest.o `test -f '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`$(test_srcdir)/OsiSymSolverInterfaceTest.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSymSolverInterfaceTest.o `test -f 'OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSymSolverInterfaceTest.cpp
 
-unitTest-OsiSymSolverInterfaceTest.obj: $(test_srcdir)/OsiSymSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSymSolverInterfaceTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" -c -o unitTest-OsiSymSolverInterfaceTest.obj `if test -f '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; fi`; \
+unitTest-OsiSymSolverInterfaceTest.obj: OsiSymSolverInterfaceTest.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSymSolverInterfaceTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" -c -o unitTest-OsiSymSolverInterfaceTest.obj `if test -f 'OsiSymSolverInterfaceTest.cpp'; then $(CYGPATH_W) 'OsiSymSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/OsiSymSolverInterfaceTest.cpp'; fi`; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(test_srcdir)/OsiSymSolverInterfaceTest.cpp' object='unitTest-OsiSymSolverInterfaceTest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='OsiSymSolverInterfaceTest.cpp' object='unitTest-OsiSymSolverInterfaceTest.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSymSolverInterfaceTest.obj `if test -f '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; then $(CYGPATH_W) '$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/$(test_srcdir)/OsiSymSolverInterfaceTest.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSymSolverInterfaceTest.obj `if test -f 'OsiSymSolverInterfaceTest.cpp'; then $(CYGPATH_W) 'OsiSymSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/OsiSymSolverInterfaceTest.cpp'; fi`
 
 unitTest-unitTestSym.o: unitTestSym.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-unitTestSym.o -MD -MP -MF "$(DEPDIR)/unitTest-unitTestSym.Tpo" -c -o unitTest-unitTestSym.o `test -f 'unitTestSym.cpp' || echo '$(srcdir)/'`unitTestSym.cpp; \

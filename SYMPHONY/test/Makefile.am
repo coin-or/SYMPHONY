@@ -34,6 +34,9 @@ endif
 # Add include files
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSym`
+
+AM_CPPFLAGS += -DCOIN_HAS_SYM
+
 # List all additionally required solver and Osi libraries
 
 if CLP_LP_SOLVER
@@ -135,8 +138,8 @@ unitTest_SOURCES = \
 	$(test_srcdir)/OsiCutsTest.cpp \
 	$(test_srcdir)/OsiRowCutDebuggerTest.cpp \
 	$(test_srcdir)/OsiRowCutTest.cpp \
-	$(test_srcdir)/OsiSolverInterfaceTest.cpp \
-	$(test_srcdir)/OsiSymSolverInterfaceTest.cpp \
+	OsiSolverInterfaceTest.cpp \
+	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
 unitTest_DEPENDENCIES = $(LDADD)
