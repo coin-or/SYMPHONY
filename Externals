@@ -1,8 +1,8 @@
 BuildTools https://projects.coin-or.org/svn/BuildTools/stable/0.5
-CoinUtils -r592  https://projects.coin-or.org/svn/CoinUtils/branches/devel/CoinUtils
-Cgl -r311        https://projects.coin-or.org/svn/Cgl/branches/devel/Cgl
-Clp -r852        https://projects.coin-or.org/svn/Clp/branches/devel/Clp
-Osi -r796        https://projects.coin-or.org/svn/Osi/branches/devel/Osi
+CoinUtils -r 595 https://projects.coin-or.org/svn/CoinUtils/branches/devel/CoinUtils
+Cgl -r313       https://projects.coin-or.org/svn/Cgl/branches/devel/Cgl
+Clp -r854       https://projects.coin-or.org/svn/Clp/branches/devel/Clp
+Osi -r796       https://projects.coin-or.org/svn/Osi/branches/devel/Osi
 Win32/v6/CoinUtils -r83 https://projects.coin-or.org/svn/MSVisualStudio/trunk/v6/CoinUtils
 Win32/v6/Cgl -r83 https://projects.coin-or.org/svn/MSVisualStudio/trunk/v6/Cgl
 Win32/v6/Clp -r83 https://projects.coin-or.org/svn/MSVisualStudio/trunk/v6/Clp
