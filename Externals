@@ -1,4 +1,4 @@
-BuildTools -r103 https://projects.coin-or.org/svn/BuildTools/trunk
+BuildTools https://projects.coin-or.org/svn/BuildTools/stable/0.5
 CoinUtils -r592  https://projects.coin-or.org/svn/CoinUtils/branches/devel/CoinUtils
 Cgl -r311        https://projects.coin-or.org/svn/Cgl/branches/devel/Cgl
 Clp -r852        https://projects.coin-or.org/svn/Clp/branches/devel/Clp
