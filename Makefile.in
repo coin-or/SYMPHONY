@@ -77,7 +77,8 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = CoinUtils Osi Cgl Clp SYMPHONY
+DIST_SUBDIRS = CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl \
+	Clp SYMPHONY
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -213,30 +214,8 @@ EXTRA_DIST = $(am__append_2)
 
 # subdirs is set by configure as the list of all subdirectories to recurse
 # into
-SUBDIRS = CoinUtils Osi Cgl $(am__append_1) SYMPHONY
-
-########################################################################
-#                           Extra Targets                              #
-########################################################################
-
-#test: all
-#	cd Cbc; make test
-
-#unitTest: test
-
-#symphony: all
-#	make; cd SYMPHONY; make
-
-#tests: all
-#	for dir in $(subdirs); do \
-#	  if test -r $$dir/test/Makefile; then \
-#	    (cd $$dir; make test) \
-#	  fi; \
-#	done
-
-#unitTests: tests
-
-#.PHONY: tests unitTests
+SUBDIRS = CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl \
+	$(am__append_1) SYMPHONY
 
 ########################################################################
 #                         Maintainer Stuff                             #
@@ -651,6 +630,26 @@ uninstall-info: uninstall-info-recursive
 	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
 	uninstall uninstall-am uninstall-info-am
 
+
+########################################################################
+#                           Extra Targets                              #
+########################################################################
+
+test: all
+	cd SYMPHONY; make test
+
+unitTest: test
+
+tests: all
+	for dir in $(SUBDIRS); do \
+	  if test -r $$dir/test/Makefile; then \
+	    (cd $$dir; make test) \
+	  fi; \
+	done
+
+unitTests: tests
+
+.PHONY: test unitTest tests unitTests
 
 # Make sure acinclude is using most recent coin.m4
 @MAINTAINER_MODE_TRUE@$(srcdir)/acinclude.m4: $(BUILDTOOLSDIR)/coin.m4

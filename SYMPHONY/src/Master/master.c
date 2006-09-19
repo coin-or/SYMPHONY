@@ -1143,15 +1143,17 @@ int sym_warm_solve(sym_environment *env)
 
    /* first check for the updates! */
 
-   if (!env->warm_start &&
-       env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY &&
-       !env->mip->change_num){
-      return(sym_solve(env));
-   }else{
+  if(env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY){
 
-      if (env->warm_start){
-	 env->par.tm_par.warm_start = TRUE;
-      }
+     return(sym_solve(env));
+
+  }else{
+     
+     if (env->warm_start){
+	env->par.tm_par.warm_start = TRUE;
+     } else {
+	return(sym_solve(env));
+     }
 
       if(env->mip->change_num){
 	 env->has_ub = FALSE;
@@ -5663,7 +5665,7 @@ int sym_test(sym_environment *env)
   double tol = 1e-03;
 
   if (strcmp(env->par.test_dir, "") == 0){ 
-    strcpy(mps_dir, "../../MIPLIB3");
+    strcpy(mps_dir, "../../Data/miplib3");
   } else{
     strcpy(mps_dir, env->par.test_dir);
   }

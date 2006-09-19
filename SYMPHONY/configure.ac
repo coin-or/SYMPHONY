@@ -74,8 +74,9 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 #############################################################################
 #                              COIN components                              #
 #############################################################################
-
+AC_COIN_HAS_PROJECT(SYMPHONY)
 AC_COIN_HAS_PROJECT(CoinUtils)
+AC_COIN_HAS_PROJECT(Data)
 AC_COIN_HAS_PROJECT(Osi)
 AC_COIN_HAS_PROJECT(Cgl)
 
@@ -774,6 +775,7 @@ AC_SUBST(CXXFLAGS)
 # configuration header file)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 test/Makefile
                  Applications/CNRP/Makefile
 		 Applications/MATCH/Makefile
 		 Applications/MCKP/Makefile
