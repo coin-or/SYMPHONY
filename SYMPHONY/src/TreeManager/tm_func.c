@@ -28,6 +28,9 @@ extern int srandom PROTO((unsigned seed));
 extern long random PROTO((void));
 #endif
 #endif
+#ifdef _OPENMP
+#include "omp.h"
+#endif
 
 #include "tm.h"
 #include "BB_constants.h"
@@ -79,7 +82,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #endif
    int s_bufid;
 #endif
-   int termcode = 0;
+   int termcode = 0, *termcodes = NULL;
 #ifndef WIN32
    signal(SIGINT, sym_catch_c);    
 #endif   
@@ -92,6 +95,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    tm->bpath =
       (branch_desc **) calloc(par->max_active_nodes, sizeof(branch_desc *));
    tm->bpath_size = (int *) calloc(par->max_active_nodes, sizeof(int));
+   termcodes = (int *) calloc(par->max_active_nodes, sizeof(int));
 #else
    tm->rpath = (bc_node ***) calloc(1, sizeof(bc_node **));
    tm->rpath_size = (int *) calloc(1, sizeof(int));
@@ -161,13 +165,18 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #endif
 #pragma omp parallel for shared(tm)
    for (i = 0; i < par->max_active_nodes; i++){
-      if ((termcode = lp_initialize(tm->lpp[i], 0)) < 0){
-	 printf("LP initialization failed with error code %i\n\n", termcode);
-	 return(termcode);
+      if ((termcodes[i] = lp_initialize(tm->lpp[i], 0)) < 0){
+	 printf("LP initialization failed with error code %i in thread %i\n\n",
+		termcodes[i], i); 
       }
       tm->lpp[i]->tm = tm;
    }
    tm->lp.free_num = par->max_active_nodes;
+   for (i = 0; i < par->max_active_nodes; i++){
+      if (termcodes[i] < 0){
+	 return(termcodes[i]);
+      }
+   }
 #else
    tm->active_nodes =
       (bc_node **) malloc(par->max_active_nodes * sizeof(bc_node *));

@@ -16,6 +16,9 @@
 #include <stdlib.h>          /* malloc() is defined here in AIX ... */
 #include <stdio.h>
 #include <string.h>
+#ifdef _OPENMP
+#include "omp.h"
+#endif
 
 #include "qsortucb.h"
 #include "messages.h"
