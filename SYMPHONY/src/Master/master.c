@@ -684,12 +684,20 @@ int sym_solve(sym_environment *env)
    tm->obj_sense = env->mip->obj_sense;
    tm->master = env->my_tid;
    
-#ifdef COMPILE_IN_LP
+#ifdef COMPILE_IN_LP  
    CALL_WRAPPER_FUNCTION( send_lp_data_u(env, 0) );
+#ifdef _OPENMP
+   lp_data_sent = env->par.tm_par.max_active_nodes;
+#else 
    lp_data_sent = 1;
+#endif
 #ifdef COMPILE_IN_CG
    CALL_WRAPPER_FUNCTION( send_cg_data_u(env, 0) );
+#ifdef _OPENMP
+   cg_data_sent = env->par.tm_par.max_active_nodes;
+#else 
    cg_data_sent = 1;
+#endif
 #endif
 #endif
 #ifdef COMPILE_IN_CP
@@ -698,7 +706,11 @@ int sym_solve(sym_environment *env)
    }else{
       CALL_WRAPPER_FUNCTION( send_cp_data_u(env, 0) );
    }
+#ifdef _OPENMP
+   cp_data_sent = env->par.tm_par.max_cp_num;
+#else 
    cp_data_sent = 1;
+#endif
 #endif
 
    memset(&(env->best_sol), 0, sizeof(lp_sol));
