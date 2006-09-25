@@ -1,88 +1,139 @@
-\section{Introducing SYMPHONY 5.0}
+\section{Introducing SYMPHONY 5.1}
 \label{whats-new}
 
 Welcome to the SYMPHONY user's manual. Whether you are a new user or simply
-upgrading to version 5.0, this manual will help you get started with what we
+upgrading to version 5.1, this manual will help you get started with what we
 hope you will find to be a very useful framework for solving mixed-integer
 linear programs either using the generic tools provided or by developing a
 custom branch, cut, and price algorithm. There have been some very significant
-developments since the last version of SYMPHONY was released. IN particular,
-SYMPHONY is now a callable library with an interface whose look and feel is
-similar to other popular solvers. This change allows SYMPHONY to be used in a
-variety of new and powerful ways that were not possible before. For existing
-users, there have been a few minor changes to the API needed to make SYMPHONY
-thread-safe. Code written for previous versions of SYMPHONY will have to be
-ported. Instructions for porting from previous version are contained in the
-file \texttt{SYMPHONY-5.0/README-5.0}. As always, these changes have
-undoubtedly introduced bugs. There are now an even larger number of
-configurations in which SYMPHONY can be used and we have tested many of them,
-but it is simply not possible to test them all. Please keep this in mind and
-report all bugs that you find. Among the new enhancements and features are:
+developments since the last version of SYMPHONY was released. There are a very
+large number of configurations in which SYMPHONY can be used and we have
+tested many of them, but it is simply not possible to test them all. Please
+keep this in mind and report all bugs that you find. Among the new
+enhancements and features are:
 
 \begin{itemize}
 
-\item SYMPHONY is now a C callable library with an interface whose look and
-feel is similar to other popular solvers. This interface works for SYMPHONY's
-built-in generic MILP solver, as well as any customized algorithm developed by
-implementing one or more of SYMPHONY's user callback functions. The interface
-is exactly the same for both sequential and parallel versions of the code.
-
-\item The callable library also has a C++ interface conforming to COIN-OR's
-Open Solver Interface standard for accessing LP and MILP solvers.
-
-\item SYMPHONY has been made thread-safe in order to allow multiple
-environments to be opened within a single executable.
-
-\item It is now possible to stop SYMPHONY during the solution process and then
-restart the computation later, even after modifying the problem data. The user
-can also save warm start information outside the solver environment and then
-reload it later into a different environment, in much the same way as can be
-done with a simplex-based linear programming solver. This allows the user to
-efficiently implement procedures, such as those for multi-criteria
-optimization, in which a series of similar MILPs must be solved.
-
-\item Along with the ability to perform warm starts, the user call also define
-permanent cut pools that persist between solver calls. This is useful for
-situations in which a series of MILPs needs to be solved and the cuts
-generated during one solution call are still valid during later calls.
-
-\item SYMPHONY now has the ability to enumerate the efficient solutions of a
-bicriteria MILP if the user specifies a second objective function. This is
-done using a new algorithm described in \cite{WCN} and takes advantage of the
-warm starting capabilities of SYMPHONY.
-
-\item SYMPHONY has a very rudimentary to perform sensitivity analysis for
-MILP. This capability is till very much in the development stages, but is
-present in version 5.0.
+\item 
 
 \end{itemize}
 
+\section{A Brief History}
+\label{history}
+
+Since the inception of optimization as a recognized field of study in
+mathematics, researchers have been both intrigued and stymied by the
+difficulty of solving many of the most interesting classes of discrete
+optimization problems. Even combinatorial problems, though
+conceptually easy to model as integer programs, have long remained
+challenging to solve in practice. The last two decades have seen
+tremendous progress in our ability to solve large-scale discrete
+optimization problems. These advances have culminated in the approach
+that we now call {\it branch and cut}, a technique (see \cite{Grotschel84cut,padb:branc,hoff:LP}) which brings the computational tools of branch and bound
+algorithms together with the theoretical tools of polyhedral
+combinatorics. Indeed, in 1998, Applegate, Bixby, Chv\'atal, and Cook
+used this technique to solve a {\em Traveling Salesman Problem}
+instance with 13,509 cities, a full order of magnitude larger than
+what had been possible just a decade earlier \cite{concorde} and two
+orders of magnitude larger than the largest problem that had been
+solved up until 1978. This feat becomes even more impressive when one
+realizes that the number of variables in the standard formulation for
+this problem is approximately the {\em square} of the number of
+cities. Hence, we are talking about solving a problem with roughly
+{\em 100 million variables}.
+
+There are several reasons for this impressive progress. Perhaps the
+most important is the dramatic increase in available computing power
+over the last decade, both in terms of processor speed and memory.
+This increase in the power of hardware has subsequently facilitated
+the development of increasingly sophisticated software for
+optimization, built on a wealth of theoretical results. As software
+development has become a central theme of optimization research
+efforts, many theoretical results have been ``re-discovered'' in light
+of their new-found computational importance. Finally, the use of
+parallel computing has allowed researchers to further leverage their
+gains.
+
+Because of the rapidly increasing sophistication of computational
+techniques, one of the main difficulties faced by researchers who wish
+to apply these techniques is the level of effort required to develop
+an efficient implementation. The inherent need for incorporating
+problem-dependent methods (most notably for dynamic generation of
+variables and cutting planes) has typically required the
+time-consuming development of custom implementations. Around 1993,
+this led to the development by two independent research groups of
+software libraries aimed at providing a generic framework that users
+could easily customize for use in a particular problem setting. One of
+these groups, headed by J\"unger and Thienel, eventually produced
+ABACUS (A Branch And CUt System) \cite{abacus1}, while the other,
+headed by the authors, produced what was then known as COMPSys
+(Combinatorial Optimization Multi-processing System). After several
+revisions to enable more broad functionality, COMPSys became SYMPHONY
+(Single- or Multi-Process Optimization over Networks). 
+A version of SYMPHONY written in C++, which we call
+COIN/BCP has also been produced at IBM under the COIN-OR project
+\cite{coin-or}. The COIN/BCP package takes substantially the same
+approach and has the same functionality as SYMPHONY, but has extended
+SYMPHONY's capabilities in some areas.
+
+\section{Related Work}
+\label{related}
+
+The 1990's witnessed a broad development of software for discrete
+optimization. Almost without exception, these new software packages
+were based on the techniques of branch, cut, and price. The packages
+fell into two main categories---those based on general-purpose
+algorithms for solving mixed-integer linear programs (MILPs)
+(without the use of special structure)
+and those facilitating the use of special structure by interfacing
+with user-supplied, problem-specific subroutines. We will call
+packages in this second category {\em frameworks}. There have also
+been numerous special-purpose codes developed for use in particular
+problem settings.
+
+Of the two categories, MILP solvers are the most common. Among the
+dozens of offerings in this category are MINTO \cite{MINTO}, MIPO
+\cite{MIPO}, bc-opt \cite{bc-opt}, and SIP \cite{SIP}. Generic
+frameworks, on the other hand, are far less numerous. The three
+frameworks we have already mentioned (SYMPHONY, ABACUS, and COIN/BCP)
+are the most full-featured packages available. Several others, such as
+MINTO, originated as MILP solvers but have the capability of utilizing
+problem-specific subroutines. CONCORDE \cite{concorde, concorde2}, a
+package for solving the {\em Traveling Salesman Problem} (TSP), also
+deserves mention as the most sophisticated special-purpose code
+developed to date.
+
+Other related software includes several frameworks for implementing
+parallel branch and bound. Frameworks for general parallel branch and
+bound include PUBB \cite{PUBB}, BoB \cite{BoB}, PPBB-Lib
+\cite{PPBB-Lib}, and PICO \cite{PICO}. PARINO \cite{PARINO} and FATCOP
+\cite{chen:fatcop2} are parallel MILP solvers.
+
 \section{How to Use This Manual}
 
-The manual is divided into seven chapters. The first is the introduction,
-which you are reading now. Chapter \ref{SYMPHONY-background} contains
-background information. Those not familiar with the basic methodology of
-branch, cut, and price may want to read these sections, especially Section
-\ref{B&C-intro}, where we briefly describe the techniques involved. Chapter
-\ref{API-overview} contains an overview of the API, both for the callable
-library and for the user callback functions. Chapter \ref{SYMPHONY-design}
-contains further depth and a more complete description of the design and
-implementation of SYMPHONY. In Section \ref{design}, we describe the overall
-design of SYMPHONY without reference to the implementational details and with
-only passing reference to parallelism. In Section \ref{modules}, we discuss
-the details of the implementation. In Section \ref{parallelizing}, we briefly
-discuss issues involved in parallel execution of SYMPHONY. It is not necessary
-to read Chapters \ref{SYMPHONY-background} and \ref{SYMPHONY-design} before
-undertaking development of a SYMPHONY application. Chapter
-\ref{getting_started} describes how to install and compile SYMPHONY. Many
-users will want to go straight to this section of the manual to get started
-quickly. Chapter \ref{SYMPHONY-development} describes in detail how to develop
-a custom application using SYMPHONY. Chapter
-\ref{SYMPHONY-reference} contains reference material. Section
-\ref{C_Interface} contains a description of the native C interface for the
-callable library. Section \ref{C++_Interface} contains a description of the
-interface for C++ environments. Section \ref{API} contains a description of
-the user callback functions. SYMPHONY's parameters are described in Section
-\ref{params}. Please note that for reference use, the HTML version of this
-manual may be more practical, as the embedded hyperlinks make it easier to
-navigate.
+The manual is divided into six chapters. The first is the introduction, which
+you are reading now. Chapter \ref{getting_started} describes how to install
+SYMPHONY from either a source or binary distribution. If you have already
+managed to get SYMPHONY running using the instructions in the \texttt{README}
+file, you might want to skip to the next chapter. However, keep in mind that
+the manual contains additional details for customizing your build.
+\ref{API-overview} contains an overview of how to use in all three major
+modes---as a black-box solver through the interactive shell or on the command
+line, as a callable library, and as a customizable framework. Chapter
+\ref{SYMPHONY-design} contains further depth and a more complete technical
+description of the design and implementation of SYMPHONY. In Section
+\ref{design}, we describe the overall design of SYMPHONY without reference to
+the implementational details and with only passing reference to parallelism.
+In Section \ref{modules}, we discuss the details of the implementation. In
+Section \ref{parallelizing}, we briefly discuss issues involved in parallel
+execution of SYMPHONY. Chapter \ref{SYMPHONY-development} describes in detail
+how to develop a custom application using SYMPHONY. Note that it is not
+necessary to read Chapter \ref{SYMPHONY-design} before undertaking development
+of a SYMPHONY application, but it may help. Chapter \ref{SYMPHONY-reference}
+contains reference material. Section \ref{C_Interface} contains a description
+of the native C interface for the callable library. Section
+\ref{C++_Interface} contains a description of the interface for C++
+environments. Section \ref{API} contains a description of the user callback
+functions. SYMPHONY's parameters are described in Section \ref{params}. For
+reference use, the HTML version of this manual may be more practical, as the
+embedded hyperlinks make it easier to navigate.

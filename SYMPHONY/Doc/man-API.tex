@@ -1,10 +1,6 @@
-SYMPHONY 5.0 is the first version of SYMPHONY to be implemented as a callable
-library with a new interface derived from the COIN-OR Open Solver Interface.
-This change markedly improves SYMPHONY's usability and flexibility. Below, we
-briefly describe the new API, the C++ interface, and the use of the user
-callback functions.
+\section{Using SYMPHONY Interactively}
 
-\section{The Callable Library}\label{callable_library}
+\section{Using the Callable Library}\label{callable_library}
 
 SYMPHONY's callable library consists of a complete set of subroutines for
 loading and modifying problem data, setting parameters, and invoking solution
@@ -184,7 +180,7 @@ parameters. These can be used between calls to the solver to change the
 behavior of the algorithm or to modify the instance being solved. These
 modifications are discussed in more detail in Section \ref{warm_solve}.
 
-\section{The OSI Interface}\label{OSI}
+\section{Using the OSI Interface}\label{OSI}
 
 The Open Solver Interface (OSI) is a C++ class that provides a standard API
 for accessing a variety of solvers for mathematical programs. It is provided
@@ -198,7 +194,7 @@ supports only solvers for linear and mixed-integer linear programs, although a
 new version supporting a wider variety of solvers is currently under
 development.
 
-We have implemented an OSI interface for SYMPHONY 5.0 that allows any solver
+We have implemented an OSI interface for SYMPHONY 5.1 that allows any solver
 built with SYMPHONY to be accessed through the OSI, including customized
 solvers and those configured to run on parallel architectures. To ease code
 maintenance, for each method in the OSI base class, there is a corresponding
@@ -237,13 +233,13 @@ the OSI is geared primarily toward support of solvers for linear programming
 simplex algorithm support much richer functionality and a wider range of
 interface functions, due to their support of warm starting from previously
 saved checkpoints. This functionality is difficult to provide for MILP
-solvers.  In SYMPHONY 5.0, we have implemented for MILPs some of the same
+solvers.  In SYMPHONY 5.1, we have implemented for MILPs some of the same
 functionality that has long been available for LP solvers. As such, our OSI
 interface supports warm starting and sensitivity analysis. The implementations
 of this functionality is straightforward at the moment, but will be improved
 in future versions.
 
-\section{User Callback Functions}\label{callback}
+\section{Using Callback Functions}\label{callback}
 
 The user's main avenues for customization of SYMPHONY are the tuning of
 parameters and the implementation of one or more of over 50 user callback

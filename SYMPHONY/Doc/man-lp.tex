@@ -52,10 +52,11 @@ are stored. Each entry of the matrix has a column index, a row index and a
 coefficient value associated with it. A matrix is specified in the form of the
 three arrays \texttt{matval}, \texttt{matind}, and \texttt{matbeg}. The array
 \texttt{matval} contains the values of the nonzero entries of the matrix in
-\emph{column order}; that is, all the entries for the $0^th$ column come first,
-then the entries for the $1^st$ column, etc. The row index corresponding to
-each entry of \texttt{matval} is listed in \texttt{matind} (both of them are
-of length \texttt{nz}, the number of nonzero entries in the matrix).  Finally,
+\emph{column order}; that is, all the entries for the $0^{th}$ column come 
+first, then the entries for the $1^{st}$ column, etc. The row index
+corresponding to each entry of \texttt{matval} is listed in \texttt{matind}
+(both of them are of length \texttt{nz}, the number of nonzero entries in the
+matrix). Finally,
 \texttt{matbeg} contains the starting positions of each of the columns in 
 \texttt{matval} and \texttt{matind}. Thus, \texttt{matbeg[i]} is the position
 of the first entry of column \texttt{i} in both \texttt{matval} and
@@ -375,7 +376,7 @@ heuristic solution, if one is found. \\
 {\tt int branching} & In & Indicates whether the function is being invoked
 during strong branching (from {\tt select\_branching\_object()}) or after
 solving an Lp relaxation (from {\tt fathom\_branch()}). \\
-{\tt double *heur_solution} & OUT & Used to return a solution determined
+{\tt double *heur\_solution} & OUT & Used to return a solution determined
 heuristically.
 \et
 
@@ -1496,7 +1497,7 @@ a cut in the local pool).
 \bt{llp{225pt}}
 {\tt void *user} &  IN & Pointer to the user-defined LP data structure. \\
 & & \\
-{\tt LPdata *lp\_data} & A pointer to SYMPHONY's internal data structure for
+{\tt LPdata *lp\_data} & IN & A pointer to SYMPHONY's internal data structure for
 storing the LP relaxation and related data. \\
 {\tt int varnum} & IN & The number of variables currently in the LP
 relaxation. (The length of the {\tt *vars} and {\tt x} arrays.) \\
