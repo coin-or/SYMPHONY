@@ -1,57 +1,57 @@
-SYMPHONY Version 5.1 INSTALLATION
-=================================
+BUILDING AND INSTALLING SYMPHONY Version 5.1
+============================================
 
 ******************************************************************************
-*   COMPILING The SYMPHONY Library and Executable (UNIX Operating Systems)   *
+* Building SYMPHONY in Unix-like environments (UNIX/LINUX/CYGWIN/MINGW/OSX)  *
 ******************************************************************************
 
-Here is a sketch outline of how to get started with SYMPHONY in Unix. These
-instructions will lead you through the steps required to compile SYMPHONY as a
-generic MILP solver. This process will create (1) a generic
-callable library that allows SYMPHONY to be called from an application and (2)
-an executable that can be used as a stand-alone application to solve MILPs
-written in either MPS or GMPL file format. SYMPHONY can be further customized
-by implementing one of more than 50 callback functions that change SYMPHONY's
-default execution of its algorithm. For information on customizing SYMPHONY
-using callbacks, a quick start guide is provided below.
+SYMPHONY now uses the COIN-OR build system and the GNU autotools to automate
+the build process. The build process should therefore be identical in all
+Unix-like environments. These instructions will lead you through the steps
+required to compile SYMPHONY as a generic MILP solver. This process will
+create (1) a generic callable library that allows SYMPHONY to be called from
+an application and (2) an executable that can be used as a stand-alone
+application to solve MILPs written in either MPS or GMPL file format. SYMPHONY
+can be further customized by implementing one of more than 50 callback
+functions that change SYMPHONY's default execution of its algorithm. For
+information on customizing SYMPHONY using callbacks, a quick start guide is
+provided below.
 
-PREPARING FOR COMPILATION
-=========================
+DOWNLOADING
+===========
 
-1. You can obtain the SYMPHONY source code either via the subversion 
-repository or in the form of daily tarballs. 
-
-The recommended method is to use subversion because it makes it easier to 
-obtain updates. In a Unix-like environment (such as Linux or CYGWIN), 
-the following command may be used to obtain SYMPHONY from 
+You can obtain the SYMPHONY source code either via the subversion repository
+or in the form of daily tarballs. The recommended method is to use subversion
+because it makes it easier to obtain updates. In a Unix-like environment (such
+as Linux or CYGWIN), the following command may be used to obtain SYMPHONY from
 source using SVN in most cases:
 
-   svn checkout https://projects.coin-or.org/svn/SYMPHONY/trunk/ COIN-SYMPHONY
+  svn checkout https://projects.coin-or.org/svn/SYMPHONY/trunk/ COIN-SYMPHONY
 
-The alternative way is to get a daily snapshot of the source code as a tarball 
+Alternatively, you can get a daily snapshot of the source code as a tarball 
 from  the download page of COIN-OR:
 
-   http://www.coin-or.org/Tarballs/
+  http://www.coin-or.org/Tarballs/
 
-2. If the code is obtained as a tarball, unpack the distribution with 
-"tar -xzf SYMPHONY_XXX.tgz" where XXX is the date the snapshot is taken. 
-This will create a subdirectory called SYMPHONY_XXX containing the 
-distribution.
+If the code is obtained as a tarball, unpack the distribution with "tar -xzf
+SYMPHONY_XXX.tgz" where XXX is the date the snapshot is taken. This will
+create a subdirectory called SYMPHONY_XXX containing the distribution.
 
-COMPILING FOR SEQUENTIAL VERSION
-=================================
+CONFIGURING
+===========
 
-1. The user simply has to run 
+The first step is to run a configuration script that will allow the
+compilation process to be customized for your environment. to perform this
+step, switch into the root directory of the distribution and type
 
-   ./configure 
+  ./configure 
 
-in the root directory. This will set up the default configuration for 
-SYMPHONY. If you want to override the default settings, run the configuration 
-script with required options to reflect your environment. This usually 
-involves specifying the LP solver to be used, assigning some variables and 
-setting the paths to various libraries and include files. A list of options 
-together with brief explanations can be seen both in the file 
-'share/config.site' and by typing  
+This will set up the default configuration files. If you want to override the
+default settings, you can either run the configuration script with
+command-line options or else modify the options in the file
+'share/config.site'. For instance, you might want to specify the LP solver to
+be used (Clp is the default). A list of options together with brief
+explanations can be seen both in the file 'share/config.site' and by typing
 
    ./configure --help=recursive 
 
@@ -59,15 +59,24 @@ In order to enable or disable an option, either update the file
 'share/config.site' or add the option as an argument to configuration script. 
 As an instance for the second case, running 
 
-    ./configure --enable-debug
+  ./configure --enable-debug
 
 will set the configuration to compile the source files with debugging
 flag. 
 
-2. After configuring SYMPHONY, type 
+In order to read GMPL files, you need to have the GLPK package and SYMPHONY
+has to be configured with
 
-   make
-   make install
+  ./configure --with-gmpl --with-glpk-lib[=GLPK library] 
+              --with-glpk-incdir[=GLPK include dir] 
+
+BUILDING
+========
+
+2. After configuring, the code can be built by  
+
+  make
+  make install
 
 This will first create the required libraries and binaries and then will 
 install SYMPHONY. By default, the library 'libSym' and the executable 
@@ -89,26 +98,6 @@ technology for building math programming models
 (see SYMPHONY/Examples/FLOPC++). The configuration file can also be modified 
 to enable parallel execution of the code (see below).
 
-4. After the SYMPHONY library and the executable are compiled, you are free 
-to type "make clean" if you want to save disk space. You should only have to 
-remake the SYMPHONY library if you change something in SYMPHONY's 
-internal files.
-
-5. To test SYMPHONY, a sample MPS file called "sample.mps" and a sample 
-GMPL/AMPL file called "sample.mod" together with its data file "sample.dat" are
-included with the distribution. You can use either the command-line or the 
-interactive optimizer. For the first option, use the "-F" 
-command-line option to specify the file name and the "-D" for the data 
-file name if the input is in GMPL/AMPL format, i.e., type 
-
-   bin/symphony -F SYMPHONY/Datasets/sample.mps
-
-or 
-
-  bin/symphony -F SYMPHONY/Datasets/sample.mod -D SYMPHONY/Datasets/sample.dat
-
-To obtain more MPS data files for further testing, download the MIPLIB library.
-
 For the interactive optimizer, it is recommended to run the configuration 
 script with 
 
@@ -119,83 +108,100 @@ a Linux terminal command line, i.e., it will keep the history of the used
 commands, will complete the input word to possible commands, etc. Make sure
 that you have the needed package (readline.h and history.h include files 
 and their libraries) on the system files path. To start the optimizer, call 
-the executable without any command-line arguments, i.e., type 
+
+For the interactive optimizer, it is recommended to run the configuration 
+script with 
+
+  ./configure --enable-gnu-packages 
+
+This will allow the interactive shell to be able to behave exactly like 
+a Linux terminal command line, i.e., it will keep the history of the used 
+commands, will complete the input word to possible commands, etc. Make sure
+that you have the needed package (readline.h and history.h include files 
+and their libraries) on the system files path. 
+
+4. To test SYMPHONY, type
+
+  make test
+
+to execute an automated unit test. To test out the optimizer manually. a
+sample MPS file called "sample.mps" and a sample GMPL/AMPL file called
+"sample.mod" together with its data file "sample.dat" are included with the
+distribution. You can use either the command-line or the interactive
+optimizer. To solve the sample MPS model, type 
+
+  bin/symphony -F SYMPHONY/Datasets/sample.mps
+
+To solve the GMPL model, use the "-F" switch to specify the file
+name and the "-D" for the data file name if the input is in GMPL/AMPL format,
+i.e., type
+
+  bin/symphony -F SYMPHONY/Datasets/sample.mod -D SYMPHONY/Datasets/sample.dat
+
+FOr more MPS data files for further testing, see the MIPLIB library in the
+Data/ subdirectory. To run the interactive optimizer, execute SYMPHONY without
+any command-line arguments, i.e., type
 
    bin/symphony 
 
 and then type "help" or "?" to see a list of available commands.
 
+
+5. After the SYMPHONY library and the executable are compiled and tested, you
+can type
+
+  make clean 
+
+if you want to save disk space. 
+
 6. That's it! Now you are ready to use SYMPHONY callable library or 
 solve generic MILP problems through the executable.
 
-COMPILING FOR SHARED MEMORY
-===========================
+SHARED MEMORY BUILD
+===================
 
-1. To compile a shared memory version, obtain an OpenMP compliant compiler,
-such as Omni (free from http://phase.etl.go.jp/Omni). Other options are listed
-at http://www.openmp.org.
+1. To compile a shared memory version of SYMPHONY, simply use an OpenMP
+compliant compiler. Version 5.1 has been tested with gcc 4.2, and should work
+by configuring with
 
-2. Follow the instructions above for modifying the configuration file. Set the
-variable CC to the compiler name and compile as above. Note that if you have 
-previously compiled the sequential version, then you should first type "make 
-clean_all", as this version uses the same directories. With one thread allowed,
-it should run exactly the same as the sequential version so there is no need 
-to compile both versions.
+  ./configure CXX='g++ -fopenmp'
 
-3. Voila, you have a shared memory parallel solver! As above, test symphony,
-using the sample MPS file called sample.mps included with the distribution. To
-specify the file name, use the "-F" command-line option, i.e., type
-"bin/symphony -F SYMPHONY/Datasets/sample.mps". To obtain more MPS data 
-files for further testing, download the MIPLIB library.
+2. Follow the instructions above for building and testing.
 
-4. That's it! Now, you are ready to develop your own application using 
-SYMPHONY callable library or solve MILP problems using the executable. See the
-user manual for help.
+3. To invoke SYMPHONY from the command-line with multiple threads, specify the
+number of threads with the '-p' option, i.e.,
 
-COMPILING FOR DISTRIBUTED NETWORKS
-==================================
+  bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps
 
-PLEASE NOTE THAT THE DISTRIBUTED MEMORY PARALLEL VERSION HAS NOT BEEN TESTED
-IN VERSION 5.0 AND MAY BE BROKEN. PLEASE LET ME KNOW IF YOU WANT TO USE IT AND
-I WILL GET IT WORKING.
+DISTRIBUTED MEMORY BUILD
+========================
 
-1. If you wish to compile a distributed version of the code, obtain and
-install PVM from http://www.csm.ornl.gov/pvm/.
+1. If you wish to compile a distributed version of the code, first make sure
+you have PVM installed. You can obtain it from http://www.csm.ornl.gov/pvm/.
 
-2. While configuring, run 
+2. To configure for a parallel build, invoke the configuration script as
+follows:
 
-   ./configure --with-pvm
+  ./configure --with-pvm
 
-Be sure that, you have PVM installed either in system path or PVM_ROOT
-set as a bash environment variable. By default, configuration will assume
-the following module dependencies: '--with-cg=yes --with-cp=yes --with-lp=no 
---with-tm=yes' (see the user manual or the file 'share/config.site' for more 
-information). If you configure with
+Be sure that PVM is installed either in system path or that you have the
+environment variable PVM_ROOT set properly. Note that there are a number of
+different parallel configurations. The default configuration is to build two
+parallel modules. The first one consists of the master, tree management, and
+cut management modules, while the second one consists of the node processing,
+and cut generation modules. For other configuration options, see the
+share/config.site file.
 
-   ./configure --with-pvm --with-lp=yes
+3. Follow the build instructions above to build the code. Note that this will
+also compile the sequential version.
 
-then you will end up with the sequential version. Therefore, if you want 
-to override the default set up, you must configure without one or more of 
-module dependencies. 
-
-3. As above, type 
-  
-    make 
-    make install
-
-in the root directory to make and install the distributed libraries. Note 
-that, this will additionally make and install the sequential version library 
-and the executable. As in Step 1 of the sequential version, you may type 
-"make clean" after installing. It should not have to be remade again 
-unless you modify SYMPHONY's internal files.
-
-5. Make sure there are links from your '$PVM_ROOT/bin/$PVM_ARCH/' subdirectory 
+4. Make sure there are links from your '$PVM_ROOT/bin/$PVM_ARCH/' subdirectory 
 to each of the executables in your 'bin/' directory. This is required by PVM.
 
-6. Start the PVM daemon by typing "pvm" on the command line and then typing
+5. Start the PVM daemon by typing "pvm" on the command line and then typing
 "quit".
 
-7. As above, test SYMPHONY using the sample MPS file called sample.mps included
+6. As above, test SYMPHONY using the sample MPS file called sample.mps included
 with the distribution. To specify the file name, use the "-F" command-line
 option, i.e., in the root directory, type 
 
@@ -205,17 +211,13 @@ where $(EXT) is an extension to be added according to the chosen module
 dependencies. To obtain more MPS data files for further
 testing, download the MIPLIB library.
 
-4. That's it! Now, you are ready to develop your own application using 
-SYMPHONY callable library or solve MILP problems using the executable. See the
-user manual for help.
-
-COMPILING FOR APPLICATIONS
-==================================
+BUILDING APPLICATIONS
+=====================
 
 1. In order to compile SYMPHONY's applications, you must first compile the 
-application specific library. Type
+application-specific library with
 
-   ./configure --with-applications
+  ./configure --with-applications
    make 
    make install
 
@@ -223,9 +225,10 @@ This will create the application library called 'libSymAppl' to be used while
 building custom applications. Note that, sequential version library and the 
 executable will also be made and installed. 
 
-2. Go to SYMPHONY/Applications/Appl-Pckg directory and type 'make' there. 
-For more information including the parallel configuration instructions, see 
-the INSTALL file of the corresponding application. 
+2. After building the library, go to one of the application subdirectories in
+the SYMPHONY/Applications/ directory and type 'make' there. For more
+information including the parallel configuration instructions, see the INSTALL
+file of the corresponding application.
 
 ******************************************************************************
 *      COMPILING The SYMPHONY Library and Executable (Microsoft Windows)     *
