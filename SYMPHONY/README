@@ -16,22 +16,18 @@ DOCUMENTATION
 
 If you have downloaded a source distribution, full documentation is available
 in the SYMPHONY/Doc/ subdirectory. If you have downloaded a binary
-distribution,the manual should be located in the man/ subdirectory. An HTML
+distribution, the manual should be located in the man/ subdirectory. An HTML
 version of the manual can also be viewed at the official SYMPHONY Web site:
 
-http://www.branchandcut.org/SYMPHONY
-
-or at the SYMPHONY development Web site
-
-https://projects.coin-or.org/SYMPHONY
+http://www.branchandcut.org/SYMPHONY/man-5.1
 
 WHAT'S NEW
 ==========
 
-1. SYMPHONY now has an interactive optimizer that can be used through command
-prompt. In both the sequential and parallel configurations, the user can 
-set parameters, load and solve instances interactively, and display 
-results and statistics (see below).  
+1. SYMPHONY now has an interactive optimizer that can be used through a
+command shell. In both the sequential and parallel configurations, the user
+can set parameters, load and solve instances interactively, and display
+results and statistics (see below).
 
 2. SYMPHONY now supports automatic configuration using the new COIN-OR build
 system and the GNU autotools.Using autotools utilities, it is now possible to
@@ -53,10 +49,26 @@ solution procedure or all of the nodes above a given level of the tree.
 5. The native interfaces to OSL and CPLEX are now deprecated and no longer
 supported. These solvers can be called through the COIN-OR OSI interface.
 
+6. Column generation functionality has also been officially deprecated. For
+now, there are a number of other software packages that offer better
+functionality than SYMPHONY for implementing branch and price algorithms.
+
 CHANGES TO THE USER INTERFACE
 =============================
 
-None.
+1. There was one minor change to the user callback API from version 5.0 to 5.1.
+The user can now execute a primal heuristic in the user_is_feasible() callback
+and return the solution to SYMPHONY. The API for the user_is_feasible()
+subroutine is now
+
+int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
+		     double *values, int *feasible, double *objval,
+		     char branching, double *heur_solution)
+
+Any feasible solution can be passed (in dense format) through the last
+argument to this function.
+
+2. Several new subroutines were added to the callable library API.
 
 ******************************************************************************
 *                              INSTALLATION                                  *

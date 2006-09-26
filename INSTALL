@@ -73,7 +73,7 @@ has to be configured with
 BUILDING
 ========
 
-2. After configuring, the code can be built by  
+1. After configuring, the code can be built by typing the commands
 
   make
   make install
@@ -82,35 +82,23 @@ This will first create the required libraries and binaries and then will
 install SYMPHONY. By default, the library 'libSym' and the executable 
 'symphony' will be installed to the 'lib/' and 'bin/' directories. 
 
-3. The SYMPHONY library, together with the header files in the subdirectory 
-'include/', can then be used to call SYMPHONY from any C/C++ code. The API for 
-this is described in the user's manual. On the other hand, the executable can 
-be used for solving generic MILP problems in MPS format. In order to read 
-GMPL files, you need to have the GLPK package and SYMPHONY has to be 
-configured with 
+2. The SYMPHONY library, together with the header files in the subdirectory
+'include/', can then be used to call SYMPHONY from any C/C++ code. The API for
+this is described in the user's manual. The executable can also be used for
+solving generic MILP problems in MPS or GMPL format. In order to read GMPL
+files, you need to have the GLPK package and SYMPHONY has to be configured
+with
 
   ./configure --with-gmpl --with-glpk-lib[=GLPK library] 
               --with-glpk-incdir[=GLPK include dir] 
 
 
-FlopC++ can also be used to obtain a capability similar to ILOG's Concert 
-technology for building math programming models 
-(see SYMPHONY/Examples/FLOPC++). The configuration file can also be modified 
-to enable parallel execution of the code (see below).
+For more pwerful modeling interface, FlopC++ can also be used to obtain a
+capability similar to ILOG's Concert technology for building math programming
+models (see SYMPHONY/Examples/FLOPC++). 
 
-For the interactive optimizer, it is recommended to run the configuration 
-script with 
-
-  ./configure --enable-gnu-packages 
-
-This will allow the interactive shell to be able to behave exactly like 
-a Linux terminal command line, i.e., it will keep the history of the used 
-commands, will complete the input word to possible commands, etc. Make sure
-that you have the needed package (readline.h and history.h include files 
-and their libraries) on the system files path. To start the optimizer, call 
-
-For the interactive optimizer, it is recommended to run the configuration 
-script with 
+If you are planning to use the interactive optimizer, it is recommended to run
+the configuration script with
 
   ./configure --enable-gnu-packages 
 
@@ -118,9 +106,9 @@ This will allow the interactive shell to be able to behave exactly like
 a Linux terminal command line, i.e., it will keep the history of the used 
 commands, will complete the input word to possible commands, etc. Make sure
 that you have the needed package (readline.h and history.h include files 
-and their libraries) on the system files path. 
+and their libraries) on the system files path.
 
-4. To test SYMPHONY, type
+3. To test SYMPHONY after building, type
 
   make test
 
@@ -138,7 +126,7 @@ i.e., type
 
   bin/symphony -F SYMPHONY/Datasets/sample.mod -D SYMPHONY/Datasets/sample.dat
 
-FOr more MPS data files for further testing, see the MIPLIB library in the
+For more MPS data files for further testing, see the MIPLIB library in the
 Data/ subdirectory. To run the interactive optimizer, execute SYMPHONY without
 any command-line arguments, i.e., type
 
@@ -147,14 +135,14 @@ any command-line arguments, i.e., type
 and then type "help" or "?" to see a list of available commands.
 
 
-5. After the SYMPHONY library and the executable are compiled and tested, you
+4. After the SYMPHONY library and the executable are compiled and tested, you
 can type
 
   make clean 
 
 if you want to save disk space. 
 
-6. That's it! Now you are ready to use SYMPHONY callable library or 
+5. That's it! Now you are ready to use SYMPHONY callable library or 
 solve generic MILP problems through the executable.
 
 SHARED MEMORY BUILD
@@ -222,7 +210,7 @@ application-specific library with
    make install
 
 This will create the application library called 'libSymAppl' to be used while 
-building custom applications. Note that, sequential version library and the 
+building custom applications. Note that the sequential version library and the 
 executable will also be made and installed. 
 
 2. After building the library, go to one of the application subdirectories in
