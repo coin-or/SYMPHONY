@@ -209,14 +209,14 @@ application-specific library with
    make 
    make install
 
-This will create the application library called 'libSymAppl' to be used while 
-building custom applications. Note that the sequential version library and the 
-executable will also be made and installed. 
+This will create the application library called 'libSymAppl' to be used while
+building custom applications. Note that the sequential version library and
+executable will also be made and installed.
 
 2. After building the library, go to one of the application subdirectories in
 the SYMPHONY/Applications/ directory and type 'make' there. For more
-information including the parallel configuration instructions, see the INSTALL
-file of the corresponding application.
+information, including the parallel configuration instructions, see the
+INSTALL file of the corresponding application.
 
 ******************************************************************************
 *      COMPILING The SYMPHONY Library and Executable (Microsoft Windows)     *
