@@ -1,22 +1,94 @@
 \section{Introducing SYMPHONY 5.1}
 \label{whats-new}
 
-Welcome to the SYMPHONY user's manual. Whether you are a new user or simply
-upgrading to version 5.1, this manual will help you get started with what we
-hope you will find to be a very useful framework for solving mixed-integer
-linear programs either using the generic tools provided or by developing a
-custom branch, cut, and price algorithm. There have been some very significant
-developments since the last version of SYMPHONY was released. There are a very
-large number of configurations in which SYMPHONY can be used and we have
-tested many of them, but it is simply not possible to test them all. Please
-keep this in mind and report all bugs that you find. Among the new
-enhancements and features are:
+Welcome to the SYMPHONY Version 5.1 user's manual. Whether you are a new user
+or simply upgrading to 5.1, this manual will help you get started with what we
+hope you will find to be a useful and powerful framework for solving
+mixed-integer linear programs (MILP) either using the generic tools provided
+or by developing a custom brancha and cut algorithm. The subroutines in the
+\BB\ library comprise a state-of-the-art MILP solver with a modular design
+that is easy to customize for various problem settings. All internal library
+subroutines are generic---their implementation does not depend on the the
+problem setting. SYMPHONY therefore works out of the box as a generic MILP
+solver, with the ability to read both MPS files and GMPL (a subset of AMPL)
+files, as well as interface with more powerful modeling environments, such as
+FlopC++. As a blackbox solver, SYMPHONY can be invoked either from the command
+line, through an interactive shell, or by linking to the provided callable
+library. To develop a customized SYMPHONY application, various callbacks can
+be written and parameters set that modify the default behavior of the
+algorithm. The API for these subroutines is described in
+Chapter~\ref{API-overview} and files containing function stubs are provided.
+
+The callable library has both C and C++ interfaces whose look and feel are
+similar to other popular solvers (see Sections \ref{C_Interface} and
+\ref{C++_Interface} for the library routines). The interface is identical for
+SYMPHONY's built-in generic MILP solver (both parallel and sequential
+versions), as well as all custom applications developed by implementing one or
+more of SYMPHONY's user callback functions. SYMPHONY can be built in a wide
+variety of configurations, ranging from fully parallel to completely
+sequential, depending on the user's needs. The library runs serially on almost
+any platform, and can also run in parallel in either a fully distributed
+environment (network of workstations) or a shared-memory environment simply by
+changing a few configuration options (see Chapter~\ref{getting_started}). To
+run in a distributed environment, the user must have installed the {\em
+\htmladdnormallink{Parallel Virtual Machine}{http://www.ccs.ornl.gov/pvm/}}
+(PVM), available for free from Oak Ridge National Laboratories. To run in a
+shared-memory environment, the user must have installed an OpenMP compliant
+compiler (gcc 4.2 is currently the only compiler tested and fully supported).
+
+\section{What's New}
+
+There have been some significant developments since the last version of
+SYMPHONY was released. We have continued to develop some of the more unique
+capabilities SYMPHONY provides, such as the ability to warm start MILP
+computations, the ability to perform simple sensitivity analyses, and the
+ability to solve bicriteria MILPs. Specifically, the new enhancements and
+features include:
 
 \begin{itemize}
 
-\item 
+\item As mentioned above, SYMPHONY now has an interactive optimizer that can
+be used through a command shell. In both the sequential and parallel
+configurations, the user can set parameters, load and solve instances
+interactively, and display results and statistics (see below).
+
+\item SYMPHONY now supports automatic configuration using the new COIN-OR build
+system and the GNU autotools.Using autotools utilities, it is now possible to
+build SYMPHONY in most operating systems and with most common compilers
+compilers without user intervention.
+
+\item Both the distributed and shared memory parallel configurations are now
+fully debugged, tested, and supported. The user can now build and execute
+custom SYMPHONY applications in parallel, as well as solving generic MILPs in
+parallel "out of the box."
+
+\item There are now additional options for warm starting. The user can trim the
+warm starting tree before starting to resolve a problem. More specifically,
+the user can decide to initiate warm starting with a predefined partition of
+the final branch-and-cut tree resulting from a previous solution procedure.
+This partition can include either a number of nodes created first during the
+solution procedure or all of the nodes above a given level of the tree.
 
 \end{itemize}
+
+Two features have also been deprecated and are now longer supported:
+
+\begin{itemize}
+
+\item The native interfaces to OSL and CPLEX are now deprecated and no longer
+supported. These solvers can be called through the COIN-OR OSI interface.
+
+\item Column generation functionality has also been officially deprecated. For
+now, there are a number of other software packages that offer better
+functionality than SYMPHONY for implementing branch and price algorithms.
+
+\end{itemize}
+
+There was one minor change to the user callback API from version 5.0 to 5.1.
+The user can now execute a primal heuristic in the
+\texttt{user\_is\_feasible()} callback and return the solution to SYMPHONY.
+Several new subroutines were also added to the callable library API. See the
+\texttt{README} file included with the distribution for more details.
 
 \section{A Brief History}
 \label{history}
@@ -24,90 +96,80 @@ enhancements and features are:
 Since the inception of optimization as a recognized field of study in
 mathematics, researchers have been both intrigued and stymied by the
 difficulty of solving many of the most interesting classes of discrete
-optimization problems. Even combinatorial problems, though
-conceptually easy to model as integer programs, have long remained
-challenging to solve in practice. The last two decades have seen
-tremendous progress in our ability to solve large-scale discrete
-optimization problems. These advances have culminated in the approach
-that we now call {\it branch and cut}, a technique (see \cite{Grotschel84cut,padb:branc,hoff:LP}) which brings the computational tools of branch and bound
-algorithms together with the theoretical tools of polyhedral
-combinatorics. Indeed, in 1998, Applegate, Bixby, Chv\'atal, and Cook
-used this technique to solve a {\em Traveling Salesman Problem}
-instance with 13,509 cities, a full order of magnitude larger than
-what had been possible just a decade earlier \cite{concorde} and two
-orders of magnitude larger than the largest problem that had been
-solved up until 1978. This feat becomes even more impressive when one
-realizes that the number of variables in the standard formulation for
-this problem is approximately the {\em square} of the number of
-cities. Hence, we are talking about solving a problem with roughly
-{\em 100 million variables}.
+optimization problems. Even combinatorial problems, though conceptually easy
+to model as integer programs, have long remained challenging to solve in
+practice. The last two decades have seen tremendous progress in our ability to
+solve large-scale discrete optimization problems. These advances have
+culminated in the approach that we now call {\it branch and cut}, a technique
+(see \cite{Grotschel84cut,padb:branc,hoff:LP}) which brings the computational
+tools of branch and bound algorithms together with the theoretical tools of
+polyhedral combinatorics. Indeed, in 1998, Applegate, Bixby, Chv\'atal, and
+Cook used this technique to solve a {\em Traveling Salesman Problem} instance
+with 13,509 cities, a full order of magnitude larger than what had been
+possible just a decade earlier \cite{concorde} and two orders of magnitude
+larger than the largest problem that had been solved up until 1978. This feat
+becomes even more impressive when one realizes that the number of variables in
+the standard formulation for this problem is approximately the {\em square} of
+the number of cities. Hence, we are talking about solving a problem with
+roughly {\em 100 million variables}.
 
-There are several reasons for this impressive progress. Perhaps the
-most important is the dramatic increase in available computing power
-over the last decade, both in terms of processor speed and memory.
-This increase in the power of hardware has subsequently facilitated
-the development of increasingly sophisticated software for
-optimization, built on a wealth of theoretical results. As software
-development has become a central theme of optimization research
-efforts, many theoretical results have been ``re-discovered'' in light
-of their new-found computational importance. Finally, the use of
-parallel computing has allowed researchers to further leverage their
-gains.
+There are several reasons for this impressive progress. Perhaps the most
+important is the dramatic increase in available computing power over the last
+decade, both in terms of processor speed and memory. This increase in the
+power of hardware has subsequently facilitated the development of increasingly
+sophisticated software for optimization, built on a wealth of theoretical
+results. As software development has become a central theme of optimization
+research efforts, many theoretical results have been ``re-discovered'' in
+light of their new-found computational importance. Finally, the use of
+parallel computing has allowed researchers to further leverage their gains.
 
-Because of the rapidly increasing sophistication of computational
-techniques, one of the main difficulties faced by researchers who wish
-to apply these techniques is the level of effort required to develop
-an efficient implementation. The inherent need for incorporating
-problem-dependent methods (most notably for dynamic generation of
-variables and cutting planes) has typically required the
-time-consuming development of custom implementations. Around 1993,
-this led to the development by two independent research groups of
-software libraries aimed at providing a generic framework that users
-could easily customize for use in a particular problem setting. One of
-these groups, headed by J\"unger and Thienel, eventually produced
-ABACUS (A Branch And CUt System) \cite{abacus1}, while the other,
-headed by the authors, produced what was then known as COMPSys
-(Combinatorial Optimization Multi-processing System). After several
-revisions to enable more broad functionality, COMPSys became SYMPHONY
-(Single- or Multi-Process Optimization over Networks). 
-A version of SYMPHONY written in C++, which we call
-COIN/BCP has also been produced at IBM under the COIN-OR project
-\cite{coin-or}. The COIN/BCP package takes substantially the same
-approach and has the same functionality as SYMPHONY, but has extended
-SYMPHONY's capabilities in some areas.
+Because of the rapidly increasing sophistication of computational techniques,
+one of the main difficulties faced by researchers who wish to apply these
+techniques is the level of effort required to develop an efficient
+implementation. The inherent need for incorporating problem-dependent methods
+(most notably for dynamic generation of variables and cutting planes) has
+typically required the time-consuming development of custom implementations.
+Around 1993, this led to the development by two independent research groups of
+software libraries aimed at providing a generic framework that users could
+easily customize for use in a particular problem setting. One of these groups,
+headed by J\"unger and Thienel, eventually produced ABACUS (A Branch And CUt
+System) \cite{abacus1}, while the other, headed by the authors, produced what
+was then known as COMPSys (Combinatorial Optimization Multi-processing
+System). After several revisions to enable more broad functionality, COMPSys
+became SYMPHONY (Single- or Multi-Process Optimization over Networks). A
+version of SYMPHONY written in C++, which we call COIN/BCP has also been
+produced at IBM under the COIN-OR project \cite{coin-or}. The COIN/BCP package
+takes substantially the same approach and has the same functionality as
+SYMPHONY, but has extended SYMPHONY's capabilities in some areas.
 
 \section{Related Work}
 \label{related}
 
 The 1990's witnessed a broad development of software for discrete
-optimization. Almost without exception, these new software packages
-were based on the techniques of branch, cut, and price. The packages
-fell into two main categories---those based on general-purpose
-algorithms for solving mixed-integer linear programs (MILPs)
-(without the use of special structure)
-and those facilitating the use of special structure by interfacing
-with user-supplied, problem-specific subroutines. We will call
-packages in this second category {\em frameworks}. There have also
-been numerous special-purpose codes developed for use in particular
-problem settings.
+optimization. Almost without exception, these new software packages were based
+on the techniques of branch, cut, and price. The packages fell into two main
+categories---those based on general-purpose algorithms for solving
+mixed-integer linear programs (MILPs) (without the use of special structure)
+and those facilitating the use of special structure by interfacing with
+user-supplied, problem-specific subroutines. We will call packages in this
+second category {\em frameworks}. There have also been numerous
+special-purpose codes developed for use in particular problem settings.
 
-Of the two categories, MILP solvers are the most common. Among the
-dozens of offerings in this category are MINTO \cite{MINTO}, MIPO
-\cite{MIPO}, bc-opt \cite{bc-opt}, and SIP \cite{SIP}. Generic
-frameworks, on the other hand, are far less numerous. The three
-frameworks we have already mentioned (SYMPHONY, ABACUS, and COIN/BCP)
-are the most full-featured packages available. Several others, such as
-MINTO, originated as MILP solvers but have the capability of utilizing
-problem-specific subroutines. CONCORDE \cite{concorde, concorde2}, a
-package for solving the {\em Traveling Salesman Problem} (TSP), also
-deserves mention as the most sophisticated special-purpose code
-developed to date.
+Of the two categories, MILP solvers are the most common. Among the dozens of
+offerings in this category are MINTO \cite{MINTO}, MIPO \cite{MIPO}, bc-opt
+\cite{bc-opt}, and SIP \cite{SIP}. Generic frameworks, on the other hand, are
+far less numerous. The three frameworks we have already mentioned (SYMPHONY,
+ABACUS, and COIN/BCP) are the most full-featured packages available. Several
+others, such as MINTO, originated as MILP solvers but have the capability of
+utilizing problem-specific subroutines. CONCORDE \cite{concorde, concorde2}, a
+package for solving the {\em Traveling Salesman Problem} (TSP), also deserves
+mention as the most sophisticated special-purpose code developed to date.
 
-Other related software includes several frameworks for implementing
-parallel branch and bound. Frameworks for general parallel branch and
-bound include PUBB \cite{PUBB}, BoB \cite{BoB}, PPBB-Lib
-\cite{PPBB-Lib}, and PICO \cite{PICO}. PARINO \cite{PARINO} and FATCOP
-\cite{chen:fatcop2} are parallel MILP solvers.
+Other related software includes several frameworks for implementing parallel
+branch and bound. Frameworks for general parallel branch and bound include
+PUBB \cite{PUBB}, BoB \cite{BoB}, PPBB-Lib \cite{PPBB-Lib}, and PICO
+\cite{PICO}. PARINO \cite{PARINO} and FATCOP \cite{chen:fatcop2} are parallel
+MILP solvers.
 
 \section{How to Use This Manual}
 
