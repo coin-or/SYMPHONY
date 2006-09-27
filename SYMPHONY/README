@@ -75,7 +75,8 @@ argument to this function.
 ******************************************************************************
 
 If you downloaded a source distribution and would like instructions on
-building SYMPHONY, please see the INSTALL file.
+building SYMPHONY or you downloaded a binary distribution and would like to
+know how to install it, please see the file SYMPHONY-5.1/INSTALL. 
 
 *******************************************************************************
 *                             USING SYMPHONY                                  *
