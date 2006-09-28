@@ -1,4 +1,210 @@
-\section{Design Approach}
+%===========================================================================%
+%                                                                           %
+% This file is part of the documentation for the SYMPHONY MILP Solver.      %
+%                                                                           %
+% SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    %
+% Laci Ladanyi (ladanyi@us.ibm.com).                                        %
+%                                                                           %
+% (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  %
+%                                                                           %
+% SYMPHONY is licensed under the Common Public License. Please see          %
+% accompanying file for terms.                                              %
+%                                                                           %
+%===========================================================================%
+
+\section{Introduction to Branch and Cut}
+\label{B&C-intro}
+
+\subsection{Branch and Bound}
+
+{\em Branch and bound} is the broad class of algorithms from which
+branch, cut, and price is descended. A branch and bound algorithm uses
+a divide and conquer strategy to partition the solution space into
+{\em subproblems} and then optimizes individually over each
+subproblem. For instance, let $S$ be the set of solutions to a given
+problem, and let $c \in {\bf R}^S$ be a vector of costs associated
+with members of S. Suppose we wish to determine a least cost member of
+S and we are given $\hat{s} \in S$, a ``good'' solution determined
+heuristically. Using branch and bound, we initially examine the entire
+solution space $S$. In the {\em processing} or {\em bounding} phase,
+we relax the problem. In so doing, we admit solutions that are not in
+the feasible set $S$. Solving this relaxation yields a lower bound on
+the value of an optimal solution. If the solution to this relaxation
+is a member of $S$ or has cost equal to $\hat{s}$, then we are
+done---either the new solution or $\hat{s}$, respectively, is optimal.
+Otherwise, we identify $n$ subsets of $S$, $S_1, \ldots, S_n$, such
+that $\cup_{i = 1}^n S_i = S$. Each of these subsets is called a {\em
+subproblem}; $S_1, \ldots, S_n$ are sometimes called the {\em
+children} of $S$. We add the children of $S$ to the list of {\em
+candidate subproblems} (those which need processing). This is called
+{\em branching}.
+
+To continue the algorithm, we select one of the candidate subproblems
+and process it. There are four possible results. If we find a feasible
+solution better than $\hat{s}$, then we replace $\hat{s}$ with the new
+solution and continue. We may also find that the subproblem has no
+solutions, in which case we discard, or {\em prune} it. Otherwise, we
+compare the lower bound to our global upper bound. If it is greater
+than or equal to our current upper bound, then we may again prune the
+subproblem. Finally, if we cannot prune the subproblem, we are forced
+to branch and add the children of this subproblem to the list of
+active candidates. We continue in this way until the list of active
+subproblems is empty, at which point our current best solution is the
+optimal one.
+
+\subsection{Branch and Cut}
+\label{branchandcut}
+
+In many applications, the bounding operation is accomplished using the
+tools of linear programming (LP), a technique first described in full
+generality by Hoffman and Padberg \cite{hoff:LP}. This general class of
+algorithms is known as {\em LP-based branch and bound}. Typically, the
+integrality constraints of an integer programming formulation of the
+problem are relaxed to obtain a {\em LP relaxation}, which is then
+solved to obtain a lower bound for the problem. In \cite{padb:branc},
+Padberg and Rinaldi improved on this basic idea by describing a method
+of using globally valid inequalities (i.e., inequalities valid for the
+convex hull of integer solutions) to strengthen the LP relaxation.
+They called this technique {\em branch and cut}. Since then, many
+implementations (including ours) have been fashioned around the
+framework they described for solving the Traveling Salesman Problem.
+
+\begin{figure}
+\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Bounding Operation}\\
+\underbar{Input:} A subproblem ${\cal S}$, described in
+terms of a ``small'' set of inequalities ${\cal L'}$ such that ${\cal
+S} = \{x^s : s \in {\cal F}\;\hbox{\rm and}\;ax^s \leq \beta\;\forall
+\;(a,\beta) \in {\cal L'}\}$ and $\alpha$, an upper bound on the global 
+optimal value. \\
+\underbar{Output:} Either (1) an optimal solution $s^* \in {\cal S}$ to
+the subproblem, (2) a lower bound on the optimal value of the 
+subproblem, or (3) a message {\tt pruned} indicating that the
+subproblem should not be considered further. \\
+{\bf Step 1.} Set ${\cal C} \leftarrow {\cal L'}$. \\ 
+{\bf Step 2.} Solve the LP $\min\{cx : ax \leq \beta\;\forall\;(a, \beta) 
+\in {\cal C}\}$. \\
+{\bf Step 3.} If the LP has a feasible solution $\hat{x}$, then go to
+Step 4. Otherwise, STOP and output {\tt pruned}. This subproblem has no 
+feasible solutions. \\ 
+{\bf Step 4.} If $c\hat{x} < \alpha$, then go to Step
+5. Otherwise, STOP and output {\tt pruned}. This subproblem
+cannot produce a solution of value better than $\alpha$. \\ 
+{\bf Step 5.} If $\hat{x}$ is the incidence vector of some $\hat{s}
+\in {\cal S}$, then $\hat{s}$ is the optimal solution to this
+subproblem. STOP and output $\hat{s}$ as $s^*$. Otherwise, apply
+separation algorithms and heuristics to $\hat{x}$ to get a set of
+violated inequalities ${\cal C'}$. If ${\cal C'} = \emptyset$, then
+$c\hat{x}$ is a lower bound on the value of an optimal element of
+${\cal S}$.  STOP and return $\hat{x}$ and the lower bound
+$c\hat{x}$. Otherwise, set ${\cal C} \leftarrow {\cal C} \cup {\cal
+C'}$ and go to Step 2.}
+\end{minipage}
+}
+\caption{Bounding in the branch and cut algorithm}
+\label{proc-bound}
+\end{figure}
+As an example, let a combinatorial optimization problem $\hbox{\em CP} =
+(E, {\cal F})$ with {\em ground set} $E$ and {\em feasible set} ${\cal F}
+\subseteq 2^E$ be given along with a cost function $c \in {\bf R}^E$.
+The incidence vectors corresponding to the members of ${\cal F}$ are
+sometimes specified as the the set of all incidence vectors obeying a
+(relatively) small set of inequalities. These inequalities are
+typically the ones used in the initial LP relaxation. Now let ${\cal
+P}$ be the convex hull of incidence vectors of members of ${\cal
+F}$. Then we know by Weyl's Theorem (see \cite{nemwol88}) that there exists
+a finite set ${\cal L}$ of inequalities valid for ${\cal P}$ such that
+\begin{equation}
+\label{the-polyhedron}
+{\cal P} = \{x \in {\bf R}^n: ax \leq \beta\;\;\forall\;(a, \beta) \in 
+{\cal L}\}.
+\end{equation}
+The inequalities in ${\cal L}$ are the potential cutting planes to be
+added to the relaxation as needed. Unfortunately, it is usually
+difficult, if not impossible, to enumerate all of inequalities in
+${\cal L}$ or we could simply solve the problem using linear
+programming. Instead, they are defined implicitly and we use
+separation algorithms and heuristics to generate these inequalities
+when they are violated. In Figure \ref{proc-bound}, we describe more
+precisely how the bounding operation is carried out in branch and cut.
+\begin{figure}
+\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Branching Operation} \\
+\underbar{Input:} A subproblem ${\cal S}$ and $\hat{x}$, the LP solution
+yielding the lower bound. \\
+\underbar{Output:} $S_1, \ldots, S_p$ such that ${\cal S} = \cup_{i = 1}^p
+S_i$. \\
+{\bf Step 1.} Determine sets ${\cal L}_1, \ldots, {\cal L}_p$ of
+inequalities such that ${\cal S} = \cup_{i = 1}^n \{x \in {\cal S}: ax \leq
+\beta\;\forall\;(a, \beta) \in {\cal L}_i\}$ and $\hat{x} \notin
+\cup_{i = 1}^n S_i$. \\
+{\bf Step 2.} Set $S_i = \{x \in {\cal S}: ax \leq
+\beta\;\;\forall\;(a, \beta) \in {\cal L}_i \cup {\cal L}'\}$ where 
+${\cal L'}$ is the set of inequalities used to describe ${\cal S}$.}
+\end{minipage}
+}
+\caption{Branching in the branch and cut algorithm}
+\label{branching-fig}
+\end{figure}
+
+\indent Once we have failed to either prune the current subproblem or separate
+the current fractional solution from ${\cal P}$, we are forced to
+branch. The branching operation is accomplished by specifying a set of
+hyperplanes which divide the current subproblem in such a way that the
+current solution is not feasible for the LP relaxation of any of the
+new subproblems. For example, in a combinatorial optimization problem,
+branching could be accomplished simply by fixing a variable whose
+current value is fractional to 0 in one branch and 1
+in the other. The procedure is described more formally in Figure
+\ref{branching-fig}. Figure \ref{gb&c} gives a high level description
+of the generic branch and cut algorithm.
+\begin{figure}
+\framebox[6.5in]{
+\begin{minipage}{6.0in}
+\vskip .1in
+{\rm
+{\bf Generic Branch and Cut Algorithm}\\
+\underbar{Input:} A data array specifying the problem instance.\\
+\underbar{Output:} The global optimal solution $s^*$ to the problem
+instance. \\
+{\bf Step 1.} Generate a ``good'' feasible solution ${\hat s}$ using 
+heuristics. Set $\alpha \leftarrow c(\hat{s})$. \\
+{\bf Step 2.} Generate the first subproblem ${\cal S}^I$ by constructing a
+small set ${\cal L'}$ of inequalities valid for ${\cal P}$. Set $A
+\leftarrow \{{\cal S}^I\}$. \\
+{\bf Step 3.} If $A = \emptyset$, STOP and output $\hat{s}$ as the
+global optimum $s^*$. Otherwise, choose some ${\cal S} \in A$. Set $A
+\leftarrow A \setminus \{{\cal S}\}$. Process ${\cal S}$. \\
+{\bf Step 4.} If the result of Step 3 is a feasible solution
+$\overline{s}$, then $c\overline{s} < c\hat{s}$.
+Set $\hat{s} \leftarrow \overline{s}$ and $\alpha \leftarrow 
+c(\overline{s})$ and go to Step 3. If the subproblem was pruned, go to
+Step 3. Otherwise, go to Step 5. \\
+{\bf Step 5.} Perform the branching operation. Add the set of
+subproblems generated to $A$ and go to Step 3.}
+\end{minipage}
+}
+\caption{Description of the generic branch and cut algorithm}
+\label{gb&c}
+\end{figure}
+
+In the remainder of the manual, we often use the term {\em search
+tree}. This term derives from the common representation of the list of
+subproblems as the nodes of a graph in which each subproblem is
+connected only to its parent and its children. Storing the subproblems
+in such a form is an important aspect of our global data structures.
+Since the subproblems correspond to the nodes of this graph, they are
+sometimes be referred to as {\em nodes in the search tree} or simply
+as {\em nodes}. The {\em root node} or {\em root} of the tree is the
+node representing the initial subproblem.
+
+\section{Design of SYMPHONY}
 \label{design}
 
 \BB\ was designed with two major goals in mind---portability and

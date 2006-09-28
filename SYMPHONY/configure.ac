@@ -1,10 +1,20 @@
-# Copyright (C) 2006 International Business Machines.
-# All Rights Reserved.
-# This file is distributed under the Common Public License.
+#===========================================================================#
+#                                                                           #
+# This file is part of the SYMPHONY Branch, Cut, and Price Library.         #
+#                                                                           #
+# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
+# Laci Ladanyi (ladanyi@us.ibm.com).                                        #
+#                                                                           #
+# The author of this file is Menal Guzelsoy                                 #
+#                                                                           #
+# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+#                                                                           #
+# This software is licensed under the Common Public License. Please see     #
+# accompanying file for terms.                                              #
+#                                                                           #
+#===========================================================================#
 
 ## $Id: configure.ac 369 2006-06-14 01:19:26Z menal $
-
-# Authors:  Ted Ralphs, Menal Guzelsoy 
 
 #############################################################################
 #                       Names and other basic things                        #

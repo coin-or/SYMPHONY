@@ -1,17 +1,19 @@
-SYMPHONY Version 5.0 is a powerful environment for implementing custom branch,
-cut, and price algorithms. The subroutines in the \BB\ library comprise a
-state-of-the-art MILP solver designed to be modular and easy to customize for
-various problem settings. All internal library subroutines are generic---their
-implementation does not depend on the the problem-setting. As from Version 4.0,
-SYMPHONY works out of the box as a generic MILP solver, with the capability to
-read both MPS files and GMPL (a subset of AMPL) files and solve the described
-mixed integer programs. To customize SYMPHONY, various user subroutines can be
-written and parameters set that modify the default behavior of the
-algorithm. The API for these subroutines is described in this manual and files
-containing function stubs are provided. As an example, by replacing the
-default I/O subroutine, one can easily modify the solver so that it reads in
-problem instances in a custom format (such as the TSPLIB format for specifying
-traveling salesman problem instances).
+%===========================================================================%
+%                                                                           %
+% This file is part of the documentation for the SYMPHONY MILP Solver.      %
+%                                                                           %
+% SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    %
+% Laci Ladanyi (ladanyi@us.ibm.com).                                        %
+%                                                                           %
+% (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  %
+%                                                                           %
+% SYMPHONY is licensed under the Common Public License. Please see          %
+% accompanying file for terms.                                              %
+%                                                                           %
+%===========================================================================%
+
+This chapter is concerned with detailed instructions for building and
+installing \BB, along with its associated libraries and applications.
 
 The vast majority of the computation takes place within a ``black box,'' of
 which the user need have no knowledge. \BB\ performs all the normal functions

@@ -6,7 +6,7 @@
 # SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and     #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                         #
 #                                                                            #
-# (c) Copyright 2005 Lehigh University. All Rights Reserved.                 #
+# (c) Copyright 2005-2006 Lehigh University. All Rights Reserved.            #
 #                                                                            #
 # This software is licensed under the Common Public License. Please see      #
 # accompanying file for terms.                                               #
