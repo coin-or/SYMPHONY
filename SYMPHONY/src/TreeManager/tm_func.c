@@ -101,6 +101,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    tm->rpath_size = (int *) calloc(1, sizeof(int));
    tm->bpath = (branch_desc **) calloc(1, sizeof(branch_desc *));
    tm->bpath_size = (int *) calloc(1, sizeof(int));
+   termcodes = (int *) calloc(1, sizeof(int));
 #endif
    
    /*------------------------------------------------------------------------*\
