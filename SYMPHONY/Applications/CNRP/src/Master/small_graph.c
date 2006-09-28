@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* Capacitated Network Routing Problems.                                     */
 /*                                                                           */
-/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
 /*                                                                           */
