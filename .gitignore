@@ -10,8 +10,16 @@ SYMPHONY/Applications/VRP/Makefile
 SYMPHONY/Makefile
 SYMPHONY/config.log
 SYMPHONY/config.status
+SYMPHONY/include/config_sym.h
+SYMPHONY/include/stamp-h1
 SYMPHONY/libtool
+SYMPHONY/src/.deps
+SYMPHONY/src/.libs
+SYMPHONY/src/Makefile
+SYMPHONY/src/symphony
 SYMPHONY/sym_addlibs.txt
+SYMPHONY/test/.deps
+SYMPHONY/test/Makefile
 /bin
 /config.log
 /config.status
