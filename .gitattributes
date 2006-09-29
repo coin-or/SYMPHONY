@@ -80,4 +80,4 @@ Win32/v6/symphony.dsw -text
 /install-sh -text
 /ltmain.sh -text
 /missing -text
-share/config.site -text
+share/config.site.tmpl -text
