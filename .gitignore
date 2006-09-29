@@ -1,4 +1,17 @@
 /Makefile
+SYMPHONY/Applications/CNRP/Makefile
+SYMPHONY/Applications/MATCH/Makefile
+SYMPHONY/Applications/MCKP/Makefile
+SYMPHONY/Applications/MPP/Makefile
+SYMPHONY/Applications/SPP+CUTS/Makefile
+SYMPHONY/Applications/SPP/Makefile
+SYMPHONY/Applications/USER/Makefile
+SYMPHONY/Applications/VRP/Makefile
+SYMPHONY/Makefile
+SYMPHONY/config.log
+SYMPHONY/config.status
+SYMPHONY/libtool
+SYMPHONY/sym_addlibs.txt
 /bin
 /config.log
 /config.status
