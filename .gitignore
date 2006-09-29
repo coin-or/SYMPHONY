@@ -1,2 +1,6 @@
-/Data*
-/Win32*
+/Makefile
+/bin
+/config.log
+/config.status
+/include
+/lib
