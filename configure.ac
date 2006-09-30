@@ -1,6 +1,6 @@
 #===========================================================================#
 #                                                                           #
-# This file is part of the SYMPHONY Branch, Cut, and Price Library.         #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
 #                                                                           #
 # SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                        #
@@ -27,12 +27,12 @@ AC_INIT([SYMPHONY],[5.1],[coin-symphony@lists.coin-or.org])
 AC_COPYRIGHT([
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
