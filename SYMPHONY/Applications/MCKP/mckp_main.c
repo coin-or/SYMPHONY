@@ -1,7 +1,7 @@
 /*===========================================================================*/
 /*                                                                           */
 /* This file is part of a demonstration application for use with the         */
-/* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
+/* SYMPHONY MILP Solver Framework.          This application is a solver for */
 /* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
 /*                                                                           */
 /* (c) Copyright 2005-2006 Lehigh University. All Rights Reserved.           */
