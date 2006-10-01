@@ -29,6 +29,7 @@
 #include "BB_macros.h"
 #include "BB_types.h"
 #include "lp_solver.h"
+#include "rounding.h"
 #ifdef USE_CGL_CUTS
 #include "cg.h"
 #endif
@@ -670,7 +671,10 @@ int is_feasible_u(lp_prob *p, char branching)
 	    feasible = IP_HEUR_FEASIBLE;
 	 }
       }
-   }     
+   }    
+
+
+   rnd_test();
    
    if (feasible == IP_FEASIBLE && p->par.multi_criteria){
       if (analyze_multicriteria_solution(p, indices, values, cnt,

@@ -41,6 +41,7 @@ typedef struct ROUNDING_PROB {
    double 	lpetol;
 }rounding_problem;
 
+int rnd_test();
 int rnd_create_rnd_problem(lp_prob *p);
 int rnd_find_row_bounds(rounding_problem *rp);
 int rnd_initialize_rp(rounding_problem *rp, lp_prob *p);

@@ -7,7 +7,7 @@
 /*                                                                           */
 /* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
-/* author: asm4                                                              */
+/*                                                                           */
 /*===========================================================================*/
 
 #include <stdlib.h>
@@ -26,6 +26,15 @@
 #include "rounding.h"
 #include "symphony_api.h"
 
+
+/*===========================================================================*/
+/* Test function
+*/
+int rnd_test()
+{
+   printf("Rounding: Successfully compiled.\n");
+   return 0;
+}
 
 /*===========================================================================*/
 /* 
@@ -228,4 +237,16 @@ int rnd_find_row_bounds(rounding_problem *rp)
    }
 }
 
+/*===========================================================================*/
+int rnd_check_constr_feas(int n, int m, double *rowActivity, const double 
+      *rowLower, const double *rowUpper, double lpetol)
+{
+   return 0;
+}
+
+/*===========================================================================*/
+int rnd_check_integrality(int n, int *intvars, double *xval, double lpetol) 
+{
+
+}
 

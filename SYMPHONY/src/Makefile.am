@@ -70,7 +70,11 @@ SYMINCFILES = \
 	../include/symphony_api.h \
 	../include/timemeas.h \
 	../include/tm.h \
-	../include/tm_params.h
+	../include/tm_params.h 
+
+if PRIMAL_HEURISTICS
+SYMINCFILES += ../include/rounding.h
+endif
 
 SYM_MASTER_SRC	= Master/master.c Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c
@@ -97,6 +101,10 @@ SYM_LP_SRC += LP/lp_pseudo_branch.c
 else
 SYM_LP_SRC += LP/lp_branch.c
 endif
+
+#if PRIMAL_HEURISTICS
+#SYM_LP_SRC += Heuristics/rounding.c
+#endif
 
 SYM_CG_SRC = CutGen/cg_func.c CutGen/cg_wrapper.c
 SYM_CP_SRC = CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c
@@ -142,6 +150,10 @@ CP_SRC		= CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 CG_SRC		= CutGen/cut_gen.c CutGen/cg_proccomm.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c
 
+if PRIMAL_HEURISTICS
+PH_SRC          = Heuristics/rounding.c
+endif
+
 QSORT_SRC	= Common/qsortucb.c Common/qsortucb_i.c Common/qsortucb_ii.c \
 	Common/qsortucb_id.c Common/qsortucb_di.c Common/qsortucb_ic.c
 TIME_SRC	= Common/timemeas.c
@@ -151,13 +163,13 @@ PACKARRAY_SRC	= Common/pack_array.c
 
 BB_SRC = $(MASTER_SRC) $(DG_SRC) $(TM_SRC) $(LP_SRC) $(CP_SRC) $(CG_SRC) \
 	 $(QSORT_SRC) $(TIME_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
-	 $(PACKARRAY_SRC)
+	 $(PACKARRAY_SRC) $(PH_SRC)
 
 ALL_SRC = $(BB_SRC)
 
 ALL_SYM_MASTER = $(SYM_MASTER_SRC) $(SYM_TM_SRC) $(SYM_LP_SRC) $(SYM_CG_SRC) \
 	$(SYM_CP_SRC) $(TIME_SRC) $(QSORT_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
-	$(PACKARRAY_SRC)
+	$(PACKARRAY_SRC) $(PH_SRC)
 
 ALL_MASTER	 = $(MASTER_SRC)
 ALL_MASTER 	+= $(TIME_SRC)

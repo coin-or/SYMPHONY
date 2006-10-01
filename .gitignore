@@ -1,4 +1,8 @@
+/*.cache
+/*.m4
 /Makefile
+SYMPHONY/*.cache
+SYMPHONY/*.m4
 SYMPHONY/Applications/CNRP/Makefile
 SYMPHONY/Applications/MATCH/Makefile
 SYMPHONY/Applications/MCKP/Makefile
@@ -25,3 +29,4 @@ SYMPHONY/test/Makefile
 /config.status
 /include
 /lib
+share/config.site

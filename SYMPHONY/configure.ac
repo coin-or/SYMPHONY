@@ -32,7 +32,7 @@ AC_COPYRIGHT([
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -444,6 +444,24 @@ esac],
 
 AM_CONDITIONAL(DRAWGRAPH, [test $sym_graph = true])
 
+#---------------------------------------------------------------------------#
+# PRIMAL_HEURISTICS
+#---------------------------------------------------------------------------#
+
+AC_ARG_ENABLE([primal-heuristics],
+[AC_HELP_STRING([--enable-primal-heuristics],
+                [enable heuristics to search for good solutions])],
+[case "${enableval}" in
+   yes) sym_primal_heuristics=true
+   ;;
+   no)  sym_primal_heuristics=false
+   ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for --enable-primal-heuristics)
+   ;;
+esac],
+[sym_primal_heuristics=false])
+
+AM_CONDITIONAL(PRIMAL_HEURISTICS, [test $sym_primal_heuristics = true])
 
 #############################################################################
 #              Check the OS and add default defs                            #
