@@ -42,13 +42,42 @@ int rnd_test()
  * A rounding problem can be constructed in several ways.
  * 1. Just take lexicographic ordering of all int variables.
  * 2. Take lexicographic ordering of all int variables with fractional values. 
+ * TODO: rename this function
 */
 
 int rnd_create_rnd_problem(lp_prob *p)
 {
 
+   rounding_problem *rp = (rounding_problem*) malloc(sizeof(rounding_problem));
+   rnd_initialize_data(rp, p);
 
-
+   /* create a search order of int variables */
+   /* for now its just the lex. order of ALL int variables */
+   int **var_list = (int **)malloc(sizeof(int*));
+   int group_size = 10;
+   int rn;
+   int *var_search_grp = (int *)malloc(group_size*ISIZE);
+   rnd_order(rp, var_list, rn);
+   int grp_first_ind = 0;
+   int grp_last_ind;
+   int grp_cnt;
+   int num_fixed_vars = 0;
+   while(grp_first_ind<rn) {
+      grp_cnt = group_size;
+      grp_last_ind = grp_first_ind+group_size-1;
+      if (num_fixed_vars+group_size>rn) {
+	grp_last_ind = rn-1;
+	grp_cnt = grp_last_ind-grp_first_ind+1;
+      }
+      memcpy(var_search_grp,var_list[grp_first_ind],grp_cnt*ISIZE);
+      if (rnd_find_feas_rounding(rp, grp_cnt, var_search_grp, 0) == 
+	    SYM_RND_FAIL) {
+	 break;
+      }
+      grp_first_ind = grp_first_ind+grp_cnt;
+      num_fixed_vars = num_fixed_vars+grp_cnt;
+   }
+   return 0;
 }
 
 
@@ -70,7 +99,7 @@ int rnd_find_feas_rounding(rounding_problem *rp, int grp_cnt, int *var_search_gr
    double lpetol = rp->lpetol;
    const int *rowStart = rp->rowStart;
    const int *rowLength = rp->rowLength;
-   const double *matrixByCol = rp->matrixByCol;
+   const double *colVal = rp->colVal;
 
    double *rowMin = rp->rowMin;
    double *rowMax = rp->rowMax;
@@ -160,7 +189,7 @@ int rnd_update_rp(rounding_problem *rp, int xind, double newval, double newlb, d
    const int *colLength = rp->colLength;
    const int *colStart = rp->colStart;
    const int *colIndex = rp->colIndex;
-   const double *matrixByCol = rp->matrixByCol;
+   const double *colVal = rp->colVal;
    double *lb = rp->lb;
    double *ub = rp->ub;
 
@@ -173,16 +202,16 @@ int rnd_update_rp(rounding_problem *rp, int xind, double newval, double newlb, d
    
    for (int i=colStart[xind];i<colStart[xind]+colLength[xind];i++) {
       int row = colIndex[i];
-      double row_delta = (newval-xval[xind])*matrixByCol[i]; 
+      double row_delta = (newval-xval[xind])*colVal[i]; 
       /* update rowActivity */
       rowActivity[row] = rowActivity[row]+row_delta;
       /* update rowMin and rowMax */
-      if (matrixByCol[i]<0) {
-	 rowMin[row] = rowMin[row]+matrixByCol[i]*(newub-ub[xind]);
-	 rowMax[row] = rowMax[row]+matrixByCol[i]*(newlb-lb[xind]);
+      if (colVal[i]<0) {
+	 rowMin[row] = rowMin[row]+colVal[i]*(newub-ub[xind]);
+	 rowMax[row] = rowMax[row]+colVal[i]*(newlb-lb[xind]);
       } else {
-	 rowMin[row] = rowMin[row]+matrixByCol[i]*(newlb-lb[xind]);
-	 rowMax[row] = rowMax[row]+matrixByCol[i]*(newub-ub[xind]);
+	 rowMin[row] = rowMin[row]+colVal[i]*(newlb-lb[xind]);
+	 rowMax[row] = rowMax[row]+colVal[i]*(newub-ub[xind]);
       }
    }
 
@@ -211,7 +240,7 @@ int rnd_find_row_bounds(rounding_problem *rp)
    const int *colLength = rp->colLength;
    const int *colStart = rp->colStart;
    const int *colIndex = rp->colIndex;
-   const double *matrixByCol = rp->matrixByCol;
+   const double *colVal = rp->colVal;
    double *lb = rp->lb;
    double *ub = rp->ub;
 
@@ -226,12 +255,12 @@ int rnd_find_row_bounds(rounding_problem *rp)
       }
       for (int index=colStart[i]; index<colStart[i]+colLength[i]; index++) {
 	 int row = colIndex[index];
-	 if (matrixByCol[index]>0) {
-	    rowMax[row] = rowMax[row]+matrixByCol[index]*ub[i];
-	    rowMin[row] = rowMin[row]+matrixByCol[index]*lb[i];
+	 if (colVal[index]>0) {
+	    rowMax[row] = rowMax[row]+colVal[index]*ub[i];
+	    rowMin[row] = rowMin[row]+colVal[index]*lb[i];
 	 } else {
-	    rowMax[row] = rowMax[row]+matrixByCol[index]*lb[i];
-	    rowMin[row] = rowMin[row]+matrixByCol[index]*ub[i];
+	    rowMax[row] = rowMax[row]+colVal[index]*lb[i];
+	    rowMin[row] = rowMin[row]+colVal[index]*ub[i];
 	 }
       }
    }
@@ -248,5 +277,98 @@ int rnd_check_constr_feas(int n, int m, double *rowActivity, const double
 int rnd_check_integrality(int n, int *intvars, double *xval, double lpetol) 
 {
 
+}
+
+
+/*===========================================================================*/
+int rnd_initialize_data(rounding_problem *rp, lp_prob *p)
+{
+   /* initialize the rounding problem data structure */
+   LPdata *lp_data = p->lp_data;
+   var_desc **vars = lp_data->vars;
+   rp->n = lp_data->n;
+   rp->m = lp_data->m;
+   rp->num_ints = 0;
+   rp->nz = lp_data->nz;
+
+   rp->is_int = (int *)calloc(rp->n,ISIZE);
+   rp->xval = (double *)malloc(rp->n*DSIZE);
+   rp->obj = (double *)malloc(rp->n*DSIZE);
+   rp->rowActivity = (double *)malloc(rp->m*DSIZE);
+   rp->rowLower = (double *)malloc(rp->m*DSIZE);
+   rp->rowUpper = (double *)malloc(rp->m*DSIZE);
+   rp->rowMin = (double *)malloc(rp->m*DSIZE);
+   rp->rowMax = (double *)malloc(rp->m*DSIZE);
+   rp->rowStart = (int *)malloc((rp->m+1)*DSIZE);
+   rp->rowIndex = (int *)malloc(rp->nz*ISIZE);
+   rp->rowLength = (int *)malloc(rp->m*ISIZE);
+   rp->rowVal = (double *)malloc(rp->nz*DSIZE);
+   rp->colStart = (int *)malloc((rp->n+1)*ISIZE);
+   rp->colIndex = (int *)malloc(rp->n*ISIZE);
+   rp->colLength = (int *)malloc(rp->n*ISIZE);
+   rp->colVal = (double *)malloc(rp->nz*DSIZE);
+   rp->lb = (double *)malloc(rp->n*DSIZE);
+   rp->ub = (double *)malloc(rp->n*DSIZE);
+   rp->lpetol = lp_data->lpetol;
+
+   /* query lp solver to retrieve bounds, rowActivities, etc. */
+   get_bounds(lp_data);
+   memcpy(rp->lb,lp_data->lb,rp->n*DSIZE);
+   memcpy(rp->ub,lp_data->ub,rp->n*DSIZE);
+
+   /* TODO: implement a better function in lp_solver.c */
+   for (int j=0; j<rp->n; j++){
+      get_column(lp_data, j, &rp->colVal[rp->colStart[j]], 
+	    &rp->colIndex[rp->colStart[j]], &rp->colLength[j], &rp->obj[j]);
+      rp->colStart[j+1] = rp->colStart[j] + rp->colLength[j];
+   }
+
+   /* TODO: implement better function in lp_solver.c */
+   for (int i=0; i<rp->m; i++){
+      get_row(lp_data, i, &rp->rowVal[rp->rowStart[i]],
+	    &rp->rowIndex[rp->rowStart[i]], &rp->rowLength[i], &rp->rowUpper[i],
+	    &rp->rowLower[i]);
+      rp->rowStart[i+1] = rp->rowStart[i] + rp->rowLength[i];
+   }
+
+   for (int j=0; j<rp->n; j++) {
+      /* search for integer variables */
+      if (vars[j]->is_int) {
+	 rp->is_int[j] = TRUE;
+	 rp->is_int++;
+      }
+   }
+
+   PRINT(p->par.verbosity,-1,("Rounding: number of integers = %d\n",rp->num_ints));
+
+   return 0;
+   /* Initialization complete */
+}
+
+
+/*===========================================================================*/
+int rnd_order(rounding_problem *rp, int **var_list_ptr, int &rn)
+{
+
+   /* for now we include all ints in lex. order */
+   int *var_list = *var_list_ptr;
+   int order_type = 0;
+   switch(order_type) {
+    case 0:
+      int count = 0;
+      rn = rp->num_ints;
+      var_list = (int *)malloc(rp->n*ISIZE);
+      for (int j=0; j<rp->n; j++) {
+	 if (rp->is_int[j]) {
+	    var_list[count] = j;
+	    count++;
+	 }
+      }
+      if (count != rp->num_ints) {
+	 printf("Rounding: Error in lexicographic ordering. Aborting.\n");
+      }
+      break;
+   }
+   return 0;
 }
 
