@@ -1,10 +1,20 @@
-# Copyright (C) 2006 International Business Machines and others.
-# All Rights Reserved.
-# This file is distributed under the Common Public License.
+#===========================================================================#
+#                                                                           #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
+#                                                                           #
+# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
+# Laci Ladanyi (ladanyi@us.ibm.com).                                        #
+#                                                                           #
+# The author of this file is Menal Guzelsoy                                 #
+#                                                                           #
+# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+#                                                                           #
+# This software is licensed under the Common Public License. Please see     #
+# accompanying file for terms.                                              #
+#                                                                           #
+#===========================================================================#
 
 ## $Id$
-
-# Author:  Andreas Waechter           IBM    2006-04-13
 
 AUTOMAKE_OPTIONS = foreign
 
@@ -31,7 +41,12 @@ SUBDIRS += SYMPHONY
 test: all
 	cd SYMPHONY; make test
 
+ptest: all
+	cd SYMPHONY; make ptest
+
 unitTest: test
+
+punitTest: ptest
 
 tests: all
 	for dir in $(SUBDIRS); do \
@@ -42,7 +57,7 @@ tests: all
 
 unitTests: tests
 
-.PHONY: test unitTest tests unitTests
+.PHONY: test unitTest ptest punitTest tests unitTests
 
 ########################################################################
 #                         Maintainer Stuff                             #

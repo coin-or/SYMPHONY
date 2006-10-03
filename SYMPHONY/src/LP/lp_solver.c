@@ -269,13 +269,12 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    values = (double *) malloc(DSIZE * (mip->n + 1));
 
    count = 0;
-
-   for(i = 0; i < mip->m + 1; i++){
-
+   
+   mip->obj_sense = SYM_MINIMIZE; 
+   for(i = 0; i < mip->m + 1; i++){      
       type = mpl_get_row_kind(mpl, i+1);
       if (type == MPL_ST){  /* constraints */
 	 /* mpl_get_mat_row returns the # of nonzeros in the row i+1. */
-	 mip->obj_sense = SYM_MINIMIZE; 
 	 mip->nz += mpl_get_mat_row(mpl, i+1, NULL, NULL); 
       }else{
 	 obj_index = i;
@@ -284,10 +283,11 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 	 if (type == MPL_MAX){
 	    mip->obj_sense = SYM_MAXIMIZE; 
 
-	    /* this is done in create_subproblem_u function! */
-	    //	    for (j = 1; j <= length; j++){  
-	    //   mip->obj[indices[j]-1] = -values[j];
-	    //	    }
+	    /* this is done in create_subproblem_u function! -but only  */
+	    /* if user creates the problem  */
+	    for (j = 1; j <= length; j++){  
+	       mip->obj[indices[j]-1] = -values[j];
+	    }
 	 }else{   /* type == MPL_MIN */
 	    for( j = 1; j <= length; j++ ) 
 	       mip->obj[indices[j]-1] = values[j]; /* assign the obj coeff. */

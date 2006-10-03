@@ -2066,7 +2066,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
    int i, j, k, nonzeros = 0;
 
    if ((!numcols && !numrows) || numcols < 0 || numrows <0){
-      printf("sym_load_problem_user():The given problem is empty or incorrect");
+      printf("sym_explicit_load_problem():The given problem is empty or incorrect ");
       printf("problem description!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }

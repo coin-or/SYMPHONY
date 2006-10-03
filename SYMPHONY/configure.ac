@@ -444,6 +444,24 @@ esac],
 
 AM_CONDITIONAL(DRAWGRAPH, [test $sym_graph = true])
 
+#---------------------------------------------------------------------------#
+# STATIC EXECUTABLE
+#---------------------------------------------------------------------------#
+
+AC_ARG_ENABLE([static-executable],
+[AC_HELP_STRING([--enable-static-executable],
+                [create a complete static executable])],
+[case "${enableval}" in
+   yes) sym_static_exe=true
+   ;;
+   no)  sym_static_exe=false
+   ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for --enable-static-executable)
+   ;;
+esac],
+[sym_static_exe=false])
+
+AM_CONDITIONAL(STATICEXE, [test $sym_static_exe = true])
 
 #############################################################################
 #              Check the OS and add default defs                            #
@@ -714,6 +732,44 @@ AC_SUBST(CPEXT)
 AC_SUBST(TMEXT)
 AC_SUBST(MASTEREXT)
 
+##############################################################################
+#                           OPENMP defs                                     #
+##############################################################################
+
+
+AC_ARG_ENABLE([openmp],
+[AC_HELP_STRING([--enable-openmp],
+                [compile in OpenMP features])],
+[case "${enableval}" in
+   yes) sym_openmp=true
+   ;;
+   no)  sym_openmp=false
+   ;;
+   *) AC_MSG_ERROR(Bad value ${enableval} for --enable-openmp)
+   ;;
+esac],
+[sym_openmp=false])
+
+if test $sym_openmp = true; then 
+   if test $sym_enable_parallel = false; then 
+      AC_MSG_ERROR(First enable parallel configuration with --with-pvm to be able to use OpenMP features)
+   else 
+   AC_MSG_CHECKING([GCC version])
+   fopenmp_version=4.2
+   gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
+   get_gcc_version=`$CC -dumpversion`
+   gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
+   major_gcc_version=`echo ${gcc_version:0:3}`
+   AC_MSG_RESULT([$get_gcc_version])
+   if test ${major_gcc_version} -lt ${gcc_required_version}; then
+       AC_MSG_ERROR(OpenMP feautures are supported by GCC 4.2.0 or higher.)
+   fi   
+   SYMPDEFS="$SYMPDEFS -D_OPENMP"
+   fi
+fi      
+
+AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
+
 #############################################################################
 #                       Other third party software                          #
 #############################################################################
@@ -778,6 +834,11 @@ if test $coin_debug_compile = true; then
    CFLAGS="-g -pipe"
    CXXFLAGS="$CFLAGS"
 fi
+
+if test $sym_openmp = true; then
+   CFLAGS="$CFLAGS -fopenmp"
+fi
+
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 

@@ -51,13 +51,18 @@ endif
 
  unitTest: test
 
+ ptest: all
+	cd test; make ptest
+
+ punitTest: ptest
+
  clean-local:
 	if test -r test/Makefile; then cd test; make clean; fi
 
  distclean-local:
 	if test -r test/Makefile; then cd test; make distclean; fi
 
- .PHONY: test unitTest
+ .PHONY: test unitTest ptest punitTest
 
 ########################################################################
 #                  Installation of the addlibs file                    #

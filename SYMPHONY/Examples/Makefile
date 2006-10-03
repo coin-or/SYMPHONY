@@ -74,7 +74,7 @@ LDFLAGS       = $(addprefix -L,${LPLIBPATHS})
 
 LINKFLAGS += $(addprefix ${SHLINKPREFIX},${LPLIBPATHS})
 
-EXAMPLES = milp bicriteria sensitivity warm_start1 warm_start2 warm_start3
+EXAMPLES = milp milp2 bicriteria sensitivity warm_start1 warm_start2 warm_start3
 
 examples: $(EXAMPLES)
 	true
@@ -82,6 +82,10 @@ examples: $(EXAMPLES)
 
 
 milp : milp.c
+
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPLIB)
+
+milp2 : milp2.c
 
 	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPLIB)
 

@@ -26,7 +26,9 @@ test_srcdir = $(OSISRCDIR)/test
 
 AM_CPPFLAGS =
 SYMCPPFLAGS =
+SYMPCPPFLAGS =
 APPLCPPFLAGS =
+SYMPALLLDADD =
 LDADD =
 ALLLDADD =
 
@@ -139,9 +141,15 @@ AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 ALLLDADD += $(LDADD) $(ADDLIBS)
 SYMCPPFLAGS += $(AM_CPPFLAGS) $(SYMDEFS)
 
+if SYM_PARALLEL
+SYMPCPPFLAGS += $(AM_CPPFLAGS) $(SYMPDEFS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+SYMPALLLDADD += $(ALLLDADD) -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
+	-lgpvm3 -lpvm3
+endif
+
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
-noinst_PROGRAMS = unitTest
+noinst_PROGRAMS = unitTest punitTest
 
 unitTest_SOURCES = \
 	$(test_srcdir)/OsiColCutTest.cpp \
@@ -152,10 +160,24 @@ unitTest_SOURCES = \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
-unitTest_DEPENDENCIES = $(LDADD)
+punitTest_SOURCES = \
+	$(test_srcdir)/OsiColCutTest.cpp \
+	$(test_srcdir)/OsiCutsTest.cpp \
+	$(test_srcdir)/OsiRowCutDebuggerTest.cpp \
+	$(test_srcdir)/OsiRowCutTest.cpp \
+	OsiSolverInterfaceTest.cpp \
+	OsiSymSolverInterfaceTest.cpp \
+	unitTestSym.cpp
+
+unitTest_DEPENDENCIES = $(LDADD) $(SYMPHONYOBJDIR)/src/libSym.la
 unitTest_CPPFLAGS = $(SYMCPPFLAGS)
 unitTest_LDADD = $(SYMPHONYOBJDIR)/src/libSym.la $(ALLLDADD)
 unitTest_LDFLAGS = -rpath $(libdir)
+
+punitTest_DEPENDENCIES = $(LDADD) $(SYMPHONYOBJDIR)/src/libSym$(MASTEREXT).la
+punitTest_CPPFLAGS = $(SYMPCPPFLAGS)
+punitTest_LDADD = $(SYMPHONYOBJDIR)/src/libSym$(MASTEREXT).la $(SYMPALLLDADD)
+punitTest_LDFLAGS = -rpath $(libdir)
 
 
 # We are using the Cbc solver executable to do the unit test
@@ -166,7 +188,14 @@ test: unitTest$(EXEEXT)
 	./unitTest$(EXEEXT) -T $(DATAOBJDIR)/miplib3 \
 	-mpsDir=$(DATAOBJDIR)/Sample \
 	-netlibDir=$(DATAOBJDIR)/Netlib
-.PHONY: test
+
+ptest: punitTest$(EXEEXT)
+	cd ../../Data/miplib3; make uncompress
+	cd ../../Data/Netlib; make uncompress
+	./punitTest$(EXEEXT) -T $(DATAOBJDIR)/miplib3 \
+	-mpsDir=$(DATAOBJDIR)/Sample \
+	-netlibDir=$(DATAOBJDIR)/Netlib
+.PHONY: test ptest
 
 ########################################################################
 #                          Cleaning stuff                              #
