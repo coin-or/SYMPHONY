@@ -192,7 +192,7 @@ test: unitTest$(EXEEXT)
 ptest: punitTest$(EXEEXT)
 	cd ../../Data/miplib3; make uncompress
 	cd ../../Data/Netlib; make uncompress
-	./punitTest$(EXEEXT) -T $(DATAOBJDIR)/miplib3 \
+	./punitTest$(EXEEXT) -p 2 -T $(DATAOBJDIR)/miplib3 \
 	-mpsDir=$(DATAOBJDIR)/Sample \
 	-netlibDir=$(DATAOBJDIR)/Netlib
 .PHONY: test ptest
