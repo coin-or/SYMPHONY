@@ -53,6 +53,7 @@ SYMPHONY/Applications/VRP/Win32/v6/libSymphony.dsp -text
 SYMPHONY/Applications/VRP/Win32/v6/vrp.dsp -text
 SYMPHONY/Applications/VRP/Win32/v6/vrp.dsw -text
 SYMPHONY/Applications/VRP/Win32/v6/vrp.mak -text
+SYMPHONY/Examples/milp2.c -text
 SYMPHONY/Makefile.am -text
 SYMPHONY/Makefile.in -text
 SYMPHONY/configure -text
