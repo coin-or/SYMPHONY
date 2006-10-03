@@ -183,8 +183,9 @@ share/config.site file.
 3. Follow the build instructions above to build the code. Note that this will
 also compile the sequential version.
 
-4. Make sure there are links from your '$PVM_ROOT/bin/$PVM_ARCH/' subdirectory 
-to each of the executables in your 'bin/' directory. This is required by PVM.
+4. Make sure there are links from your '$HOME/pvm3/bin/$PVM_ARCH/'
+subdirectory to each of the executables in your 'bin/' directory. This is
+required by PVM.
 
 5. Start the PVM daemon by typing "pvm" on the command line and then typing
 "quit".
