@@ -12,7 +12,6 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#include <malloc.h>
 #include <stdlib.h>          /* malloc() is defined here in AIX ... */
 #include <stdio.h>
 #include <string.h>

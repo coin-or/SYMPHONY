@@ -15,7 +15,6 @@
 #ifndef COMPILE_IN_CG
 
 #include <stdlib.h>
-#include <malloc.h>
 #include <stdio.h>
 
 #include "proccomm.h"

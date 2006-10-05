@@ -14,7 +14,6 @@
 
 #ifndef COMPILE_IN_CP
 
-#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 

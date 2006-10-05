@@ -15,9 +15,9 @@
 
 /* system include files */
 #include <stdio.h>
-#include <malloc.h>
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 
 /* SYMPHONY include files */
 #include "BB_constants.h"

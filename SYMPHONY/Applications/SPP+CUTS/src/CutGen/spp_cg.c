@@ -15,10 +15,10 @@
 /*===========================================================================*/
 
 /* system include files */
-#include <malloc.h>
 #include <memory.h>
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 
 /* SYMPHONY include files */
 #include "proccomm.h"

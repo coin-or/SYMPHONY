@@ -15,7 +15,6 @@
 /*===========================================================================*/
 
 #include <math.h>
-#include <malloc.h>
 
 #include "BB_constants.h"
 #include "ins_routines2.h"

@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h>
 
 #include "pack_cut.h"
 #include "messages.h"

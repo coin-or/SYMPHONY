@@ -15,7 +15,6 @@
 
 /* system include files */
 #include <string.h>
-#include <malloc.h>
 
 /* SYMPHONY include files */
 #include "BB_macros.h"

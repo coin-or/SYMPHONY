@@ -23,7 +23,6 @@
 #endif
 #include <memory.h>
 #include <fcntl.h>
-#include <malloc.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

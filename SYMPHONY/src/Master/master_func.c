@@ -16,7 +16,6 @@
 
 #define COMPILING_FOR_MASTER
 
-#include <malloc.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
