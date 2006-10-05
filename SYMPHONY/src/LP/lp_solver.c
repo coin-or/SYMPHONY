@@ -16,7 +16,6 @@
 /*===========================================================================*/
 
 #include <stdlib.h>              /* free() is here on AIX ... */
-#include <malloc.h>
 #include <math.h>
 #include <string.h>
 

@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <malloc.h>
 
 /* SYMPHONY include files */
 #include "BB_macros.h"

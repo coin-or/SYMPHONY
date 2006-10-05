@@ -14,7 +14,6 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#include <malloc.h>
 #include <stdio.h>
 #include "BB_macros.h"
 #include "vrp_const.h"

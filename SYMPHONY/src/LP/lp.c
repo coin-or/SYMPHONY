@@ -17,7 +17,6 @@
 #include <stdlib.h> 
 #include <math.h>
 #include <memory.h>
-#include <malloc.h>
 
 #include "lp.h"
 #include "proccomm.h"

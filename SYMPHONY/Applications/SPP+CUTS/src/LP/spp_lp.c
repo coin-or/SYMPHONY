@@ -16,7 +16,6 @@
 
 /* system include files */
 #include <stdio.h>
-#include <malloc.h>
 #include <memory.h>
 
 /* SYMPHONY include files */

@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <math.h>
-#include <malloc.h>
 
 #include "lp.h"
 #include "master.h" 

@@ -14,7 +14,6 @@
 
 #include <values.h>
 #include <math.h>
-#include <malloc.h>
 #include <strings.h>
 
 #include "lp.h"

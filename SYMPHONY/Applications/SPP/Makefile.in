@@ -80,7 +80,11 @@ USER_CP_OBJS       = src/CutPool/spp_cp.@OBJEXT@
 
 USER_DG_OBJS       = src/DrawGraph/spp_dg.@OBJEXT@
 
-USER_LP_OBJS      = src/LP/spp_lp_branch.@OBJEXT@ src/LP/spp_lp.@OBJEXT@ 
+ifeq ($(SYM_COMPILE_IN_LP),FALSE)
+USER_LP_OBJS       = src/LP/spp_lp_branch.@OBJEXT@ src/LP/spp_lp.@OBJEXT@ 
+else
+USER_LP_OBJS       = src/LP/spp_lp_branch.@OBJEXT@ src/LP/spp_lp.@OBJEXT@ $(USER_COMMON_OBJS)
+endif
 
 ifeq ($(SYM_COMPILE_IN_CG),TRUE)
 USER_LP_OBJS      += $(USER_CG_OBJS)

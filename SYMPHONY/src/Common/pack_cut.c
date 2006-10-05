@@ -13,7 +13,6 @@
 /*===========================================================================*/
 
 #include <stdlib.h>        /* has malloc() in AIX ... */
-#include <malloc.h>
 
 #include "BB_constants.h"
 #include "pack_cut.h"

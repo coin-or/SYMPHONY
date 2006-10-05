@@ -17,7 +17,6 @@
 
 /* system include files */
 #include <math.h>
-#include <malloc.h>
 #include <memory.h>
 #include <stdio.h>
 

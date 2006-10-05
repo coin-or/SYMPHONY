@@ -16,7 +16,6 @@
 /* system include files */
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <string.h>
 
 /* SYMPHONY include files */
@@ -39,6 +38,7 @@
 #include "cnrp_dg_functions.h"
 #include "cnrp_macros.h"
 #include "small_graph.h"
+#include "network.h"
 #ifdef COMPILE_IN_TM
 #ifdef COMPILE_IN_LP
 #include "cnrp_lp.h"
