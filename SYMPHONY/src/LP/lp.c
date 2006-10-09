@@ -39,7 +39,6 @@ int main(void)
    int r_bufid;
    double time, diff;
    struct timeval timeout = {10, 0};
-   double start_time;
    char first_node_rec = FALSE;
    int termcode;
    

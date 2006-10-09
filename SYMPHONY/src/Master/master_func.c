@@ -349,9 +349,9 @@ int resolve_node(sym_environment *env, bc_node *node)
       }
    }
    /*------------------------------------------------------------------------*\
-   /* Add cuts here */
-   /* FIXME! ASSUMING ALL THE CUTS ARE EXPLICIT ROW! */
-   /*----------------------------------------------------------------------- */
+    * Add cuts here 
+    * FIXME! ASSUMING ALL THE CUTS ARE EXPLICIT ROW!
+   \*----------------------------------------------------------------------- */
    desc = new_desc;
 
    if (desc->cutind.size > 0){
@@ -463,11 +463,7 @@ int resolve_node(sym_environment *env, bc_node *node)
 
 void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 {
-   int i, set_sol = FALSE, new_solution = FALSE;
-   MIPdesc *mip;
-   double upper_bound = 0.0, lpetol = 9.9999999999999995e-07;
-   double obj[2] = {0.0, 0.0}, gamma, tau, objval;
-   lp_sol *best_sol = &(env->warm_start->best_sol);
+   int i;
 		 
    if (root){
       if (root->node_status == NODE_STATUS__PRUNED || 
@@ -524,7 +520,7 @@ void cut_ws_tree_index(sym_environment *env, bc_node *root, int index,
 		       problem_stat *stat, int change_type)
 {
 
-  int i, j;
+  int i;
   
   if (root){
      if (root->node_status == !NODE_STATUS__CANDIDATE){
@@ -599,9 +595,6 @@ void cut_ws_tree_level(sym_environment *env, bc_node *root, int level,
 {
 
    int i;
-   double upper_bound = 0.0, lpetol = 9.9999999999999995e-07;
-   MIPdesc *mip;
-   lp_sol *best_sol;
 
    if (root == NULL) return;
 
@@ -676,7 +669,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 	    
 	    if(!env->has_mc_ub){
 	       env->has_mc_ub = TRUE;
-	       env->warm_start->has_ub;
+	       env->warm_start->has_ub = TRUE;
 	       best_sol->has_sol = TRUE;
 	    }
 	    
@@ -785,8 +778,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 
 int copy_node(bc_node * n_to, bc_node *n_from)
 {
-   int i, parent = 0, tmp = 0;
-   
+
    if (!n_to || !n_from){
       printf("copy_node(): Empty node_structure(s)!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);;
@@ -1180,9 +1172,8 @@ int write_tree(bc_node *root, FILE *f)
 
 int read_node(bc_node * node, FILE * f)
 {
-  char str[80], str2[80], str3[80], str4[80];
-   int i=0, j=0, num=0, ch=0;
-   int temp =0;
+   char str[80];
+   int i=0, num=0, ch=0;
 
    if (!node || !f){
       printf("read_node(): Empty node or unable to read from file!\n");
@@ -1813,7 +1804,7 @@ int set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "warm_start_node_level") == 0 ||
 	    strcmp(key, "TM_warm_start_node_level") == 0){
-      READ_INT_PAR(tm_par->warm_start_node_level_ratio);
+      READ_INT_PAR(tm_par->warm_start_node_level);
       return(0);
    }
    else if (strcmp(key, "warm_start_node_level_ratio") == 0 ||

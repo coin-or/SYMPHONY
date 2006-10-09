@@ -39,8 +39,7 @@ SUBDIRS =
 ##############################################################################
 ##############################################################################
 
-SYMINCFILES = \
-	../include/SymConfig.h \
+SYMHEADERS = \
 	../include/BB_constants.h \
 	../include/BB_macros.h \
 	../include/BB_types.h \
@@ -71,6 +70,10 @@ SYMINCFILES = \
 	../include/timemeas.h \
 	../include/tm.h \
 	../include/tm_params.h
+
+
+#Add SymConfig.h even though it is not used - for COIN compability
+SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 
 SYM_MASTER_SRC	= Master/master.c Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c
@@ -712,12 +715,12 @@ endif
 
 # Here list all the header files that are required by a user of the library,
 # and that therefore should be installed in 'install'
+# Although SYMPHONY is not using configuration defs file config.sym, we 
+# add it for now for COIN compatibility.  
 
-# They are already in include dir. 
-
-# include_HEADERS = \
-# 	../include/config_sym.h \
-# 	../include/symphony_api.h
+ include_HEADERS = \
+	../include/config_sym.h \
+	$(SYMHEADERS)
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #
@@ -726,17 +729,15 @@ endif
 # You only need to adapt the following line
 ConfigHeader = SymConfig.h
 
-# It is already defined in include dir. 
+install-exec-local:
+	echo "#ifndef HAVE_CONFIG_H" >bla
+	echo "#define HAVE_CONFIG_H" >>bla
+	echo "#endif" >> bla
+	cat $(top_srcdir)/include/$(ConfigHeader) >> bla
+	$(install_sh_DATA) bla $(DESTDIR)$(includedir)/$(ConfigHeader)
+	rm -f bla
 
-# install-exec-local:
-# 	echo "#ifndef HAVE_CONFIG_H" >bla
-# 	echo "#define HAVE_CONFIG_H" >>bla
-# 	echo "#endif" >> bla
-# 	cat $(includedir)/$(ConfigHeader) >> bla
-# 	$(install_sh_DATA) bla $(DESTDIR)$(includedir)/$(ConfigHeader)
-# 	rm -f bla
-
-# uninstall-local:
-# 	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
+uninstall-local:
+	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
 
 

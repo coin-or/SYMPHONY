@@ -504,12 +504,10 @@ if (newad.size > 0){                                                        \
 
 void send_node_desc(lp_prob *p, char node_type)
 {
-   node_desc *new_lp_desc, *new_tm_desc;
+   node_desc *new_lp_desc = NULL, *new_tm_desc = NULL;
    node_desc *lp_desc = p->desc;
    char repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
    char deal_with_nf;
-   int i, *indices;
-   double *values;
    
    LPdata *lp_data = p->lp_data;
 
@@ -535,6 +533,8 @@ void send_node_desc(lp_prob *p, char node_type)
 #endif	 
 
 #ifdef COMPILE_IN_LP
+   int *indices;
+   double *values;
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
        node_type == DISCARDED_NODE || node_type == FEASIBLE_PRUNED){
 

@@ -81,7 +81,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #endif
    int s_bufid;
 #endif
-   int termcode = 0, *termcodes = NULL;
+   int *termcodes = NULL;
 #ifndef WIN32
    signal(SIGINT, sym_catch_c);    
 #endif   
@@ -323,7 +323,6 @@ int solve(tm_prob *tm)
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
    double timeout2 = 600, timeout3 = tm->par.logging_interval, timeout4 = 10;
-   struct timeval timeout = {5, 0};
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
@@ -480,6 +479,8 @@ int solve(tm_prob *tm)
 	    break;
 
 #ifndef COMPILE_IN_LP
+
+	 struct timeval timeout = {5, 0};
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
 	 if (r_bufid && !process_messages(tm, r_bufid)){
 	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
@@ -576,14 +577,15 @@ void write_log_files(tm_prob *tm)
 void print_tree_status(tm_prob *tm)
 {
    int i;
+   double elapsed_time;
+
+#if 0
    int *widths;
    double *gamma;
    int last_full_level = 0, max_width = 0, num_nodes_estimate = 1;
    int first_waist_level = 0, last_waist_level = 0, waist_level = 0;
    double average_node_time, estimated_time_remaining, user_time = 0.0;
-   double elapsed_time;
 
-#if 0
    widths = (int *) calloc (tm->stat.max_depth + 1, ISIZE);
    gamma = (double *) calloc (tm->stat.max_depth + 1, DSIZE);
    
@@ -3017,7 +3019,7 @@ void free_tm(tm_prob *tm)
    FREE(tm->tmp.d);
 
    /*get rid of the added pointers for sens.analysis*/
-   int j,k;
+
    for (i = 0; i < num_threads; i++){
       if(tm->rpath[i])
 	 if(tm->rpath[i][0])
@@ -3052,7 +3054,6 @@ void free_subtree(bc_node *n)
 void free_tree_node(bc_node *n)
 {
 
-   int i;
    FREE(n->sol);
    FREE(n->sol_ind);
 #ifdef SENSITIVITY_ANALYSIS

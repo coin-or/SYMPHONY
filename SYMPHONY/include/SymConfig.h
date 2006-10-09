@@ -1,8 +1,5 @@
-#ifndef HAVE_CONFIG_H
-#define HAVE_CONFIG_H
-#endif
 /*
- * Include file for the configuration of Cbc.
+ * Include file for the configuration of SYMPHONY.
  *
  * On systems where the code is configured with the configure script
  * (i.e., compilation is always done with HAVE_CONFIG_H defined), this
@@ -19,8 +16,6 @@
  * setting by editing this file here.
  *
  */
-
-#ifndef __CBCCONFIG_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config_sym.h"
@@ -66,7 +61,7 @@
 /* #define COIN_HAS_VOL 1 */
 
 /* Define to 1 if the Cplex package is used */
-#define COIN_HAS_CPX 1
+/* #define COIN_HAS_CPX 1 */
 
 /* Define to 1 if the Dylp package is used */
 /* #undef COIN_HAS_DYLP */

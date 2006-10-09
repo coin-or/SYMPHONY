@@ -33,7 +33,7 @@ int check_row_effectiveness(lp_prob *p)
    int ineff_cnt_to_delete = p->par.ineff_cnt_to_delete;
    char orig_eff = p->par.base_constraints_always_effective;
    LPdata *lp_data = p->lp_data;
-   double *dualsol = lp_data->dualsol;
+   //double *dualsol = lp_data->dualsol;
    double lpetol = lp_data->lpetol;
    row_data *row, *rows = lp_data->rows;
    int m = lp_data->m;

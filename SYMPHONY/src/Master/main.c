@@ -167,14 +167,13 @@ int main(int argc, char **argv)
 
      FILE *f = NULL;
      char *line = NULL;
-     char *infile = NULL;     
      char args[3][MAX_LINE_LENGTH + 1];
      char param[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH+1];
      char ext[5];     
      int last_dot = 0, j, terminate = FALSE, termcode = 0, int_value = 0;
      int last_level = 0;
      char * is_int = NULL;
-     double *colsol = NULL, objval = 0.0, initial_time = 0.0, start_time = 0.0;
+     double objval = 0.0, initial_time = 0.0, start_time = 0.0;
      double finish_time = 0.0, dbl_value = 0;
 
      printf("***** WELCOME TO SYMPHONY INTERACTIVE MIP SOLVER ******\n\n"

@@ -825,19 +825,22 @@ SYMAPPLDIR=`pwd`/Applications
 
 #FIXME-Debugging conditional, for now
 
-AM_CONDITIONAL(SYM_DEBUG, [ test $coin_debug_compile = true])
+#AM_CONDITIONAL(SYM_DEBUG, [ test $coin_debug_compile = true])
 
-#FIXME-For now, redefine CFLAGS and CXXFLAGS
-CFLAGS=
-CXXFLAGS=
-if test $coin_debug_compile = true; then
-   CFLAGS="-g -pipe"
-   CXXFLAGS="$CFLAGS"
-fi
-
+#Add openmp flag
 if test $sym_openmp = true; then
-   CFLAGS="$CFLAGS -fopenmp"
+   CXXFLAGS="$CXXFLAGS -fopenmp"
 fi
+
+#Ignore warnings about unrecognized pragma lines, deprecated string conversions
+CXXFLAGS="$CXXFLAGS -Wno-unknown-pragmas -Wno-write-strings"
+
+#Ignore warnings about comparisons of signed and unsigned values and 
+#casting const pointers to ordinary pointers
+CXXFLAGS="$CXXFLAGS -Wno-sign-compare -Wno-cast-qual"
+
+#Set CFLAGS to CXXFLAGS since we are using g++
+CFLAGS=$CXXFLAGS
 
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)

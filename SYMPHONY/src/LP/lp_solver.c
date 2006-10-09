@@ -137,7 +137,7 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
                                              lp_data->maxm*sizeof(row_data));
    }
    if (maxn > lp_data->maxn){
-      int oldmaxn = MAX(lp_data->maxn, lp_data->n);
+      // int oldmaxn = MAX(lp_data->maxn, lp_data->n);
       resize_n = TRUE;
       lp_data->maxn = maxn + (set_max ? 0 : 5 * BB_BUNCH);
       if (! do_realloc){
@@ -1547,7 +1547,7 @@ void refactorize(LPdata *lp_data)
 void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
 {
-   int i, m = lp_data->m, j, indicator = FALSE;
+   int i, j, indicator = FALSE;
 
    if (indicator)
       for (i = 0; i < rcnt; i++){
@@ -2279,7 +2279,7 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
 {
-   int i, j, m = lp_data->m;
+   int i, j;
    
    for (i = 0; i < rcnt; i++){
       CoinPackedVector new_row;
@@ -2347,7 +2347,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 {
    
    //int term = LP_ABANDONED;
-   int term;
+   int term = 0;
     
    lp_data->si->resolve();
    
@@ -2492,7 +2492,7 @@ void get_column(LPdata *lp_data, int j,
 {
    const CoinPackedMatrix *matrixByCol = lp_data->si->getMatrixByCol();
    
-   int nc = matrixByCol->getNumCols(), i;
+   int i;
    
    const double *matval = matrixByCol->getElements();
    const int *matind = matrixByCol->getIndices(); 
@@ -2518,7 +2518,7 @@ void get_row(LPdata *lp_data, int i,
 {
    const CoinPackedMatrix * matrixByRow = lp_data->si->getMatrixByRow();
   
-   int nr = matrixByRow->getNumRows(), j = 0;
+   int j;
    
    const double *matval = matrixByRow->getElements();  
    const int *matind = matrixByRow->getIndices(); 
@@ -2760,7 +2760,7 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 
 int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 {
-   int i, m = lp_data->m, n = lp_data->n;
+   int i, n = lp_data->n;
    int *which = (int *) calloc(delnum, ISIZE);
    int num_to_delete = 0, num_to_keep = 0;
    double *dj = lp_data->dj;
@@ -2875,7 +2875,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 
 int read_mps(MIPdesc *mip, char *infile, char *probname)
 {
-   int i, j, k, last_dot = 0, last_dir = 0, nonzeros = 0;
+   int j, last_dot = 0, last_dir = 0;
    char fname[80] = "", ext[10] = "", slash;
 
    CoinMpsIO mps;

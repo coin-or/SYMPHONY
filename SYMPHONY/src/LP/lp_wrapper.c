@@ -576,7 +576,7 @@ int is_feasible_u(lp_prob *p, char branching)
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
    int *indices;
-   double *values, valuesi, ub, *heur_solution = NULL, *col_sol = NULL;
+   double *values, valuesi, *heur_solution = NULL, *col_sol = NULL;
    int cnt, i;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
@@ -969,7 +969,6 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    int user_res, action = USER__BRANCH_IF_MUST;
    LPdata *lp_data = p->lp_data;
    row_data *rows = lp_data->rows;
-   double lpetol = lp_data->lpetol;
    int i, j = 0, m = lp_data->m;
    int *candidate_rows;
    branch_obj *can;
@@ -993,10 +992,11 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 
    /* First decide if we are going to branch or not */
 #ifdef USE_SYM_APPLICATION
-   user_res = user_shall_we_branch(p->user, lpetol, *cuts, j, slacks_in_matrix,
-				   p->slack_cut_num, p->slack_cuts, lp_data->n,
-				   lp_data->vars, lp_data->x, lp_data->status, 
-				   cand_num, candidates, &action);
+   user_res = user_shall_we_branch(p->user, lp_data->lpetol, *cuts, j, 
+				   slacks_in_matrix, p->slack_cut_num, 
+				   p->slack_cuts, lp_data->n, lp_data->vars, 
+				   lp_data->x, lp_data->status, cand_num, 
+				   candidates, &action);
 #else
    user_res = USER_DEFAULT;
 #endif
@@ -1068,7 +1068,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 
    /* OK, so we got to branch */
 #ifdef USE_SYM_APPLICATION
-   user_res = user_select_candidates(p->user, lpetol, *cuts, j,
+   user_res = user_select_candidates(p->user, lp_data->lpetol, *cuts, j,
 				     slacks_in_matrix, p->slack_cut_num,
 				     p->slack_cuts, lp_data->n, lp_data->vars,
 				     lp_data->x, lp_data->status, cand_num,
@@ -1585,9 +1585,9 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
    LPdata *lp_data = p->lp_data;
    int user_res;
    int i, j, k, l = 0, nzcnt, real_nzcnt, explicit_row_num = 0;
-   int *matbeg, *matind;
+   int *matind;
    double *matval;
-   waiting_row **row_list;
+   waiting_row **row_list = NULL;
    
    colind_sort_extra(p);
 
@@ -1864,7 +1864,6 @@ int generate_column_u(lp_prob *p, int lpcutnum, cut_data **cuts,
 		      double *lb, double *ub)
 {
    int real_nextind = nextind;
-   int termcode = 0;
 #ifdef USE_SYM_APPLICATION
    CALL_USER_FUNCTION( user_generate_column(p->user, generate_what,
 					    p->lp_data->m - p->base.cutnum,
@@ -2200,7 +2199,7 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 				    double etol, char branching)
 {
   double obj[2] = {0.0, 0.0};
-  int cuts = 0, i;
+  int i;
   char new_solution = FALSE;
   char continue_with_node = FALSE;
   

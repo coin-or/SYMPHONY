@@ -153,6 +153,6 @@ window *init_dgwin PROTO((dg_prob *dgp, int sender, char *name, char *title));
 void add_msg PROTO((window *win, int bufid));
 int get_next_msg PROTO((window *win));
 
-FILE *fdopen PROTO((int, const char *));
+//FILE *fdopen PROTO((int, const char *));
 
 #endif

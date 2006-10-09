@@ -98,7 +98,7 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
    sp_params *sp_par = &env->par.sp_par;
 #endif
    /*___END_EXPERIMENTAL_SECTION___*/
-   dg_params *dg_par = &env->par.dg_par;
+   //dg_params *dg_par = &env->par.dg_par;
 
    if (argc < 2){
       usage();
@@ -721,12 +721,14 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
 {
    double gap = 0.0;
 
+#if 0
    static str_int nfstatus[4] = {
       {"NF_CHECK_ALL"           , NF_CHECK_ALL }
       , {"NF_CHECK_AFTER_LAST"    , NF_CHECK_AFTER_LAST }
       , {"NF_CHECK_UNTIL_LAST"    , NF_CHECK_UNTIL_LAST }
       , {"NF_CHECK_NOTHING"       , NF_CHECK_NOTHING }
    };
+#endif
 
    initial_time += tim->communication;
    initial_time += tim->lp;
@@ -789,7 +791,7 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    }
 
    if (has_ub){
-     gap = abs(100*(ub-lb)/ub);
+     gap = fabs(100*(ub-lb)/ub);
    }
 
    if (obj_sense == SYM_MAXIMIZE){
