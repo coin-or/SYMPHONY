@@ -14,6 +14,319 @@
 
 \section{Using SYMPHONY Interactively}
 
+If you are planning to use the interactive optimizer, it is recommended to run
+the configuration script (see Section \ref{Configuring}) with
+\begin{verbatim}
+./configure --enable-gnu-packages 
+\end{verbatim}
+This will allow the interactive shell to be able to behave exactly like 
+a Linux terminal command line, i.e., it will keep the history of the used 
+commands, will complete the input word to possible commands, etc. Make sure
+that you have the needed package (readline.h and history.h include files 
+and their libraries) on the system files path. 
+
+To use SYMPHONY's Interactive shell, run the executable without any
+command line arguments, i.e., type 
+\begin{verbatim}
+ bin/symphony 
+\end{verbatim}
+You will enter a command shell environment where you will be prompted to
+feed in inputs to use SYMPHONY interactively. The user interface consists 
+of a {\tt main menu}, where an instance is read in and solved, a 
+{\tt set menu}, where parameters are set, and a {\tt display menu}, where 
+results, statistics and parameter values are displayed. 
+ 
+\subsection{Main Menu}
+
+Below is the main menu displayed at the beginning of a fresh session:
+
+{\color{Brown}
+\begin{verbatim}
+ *******************************************************
+ *   This is SYMPHONY Version 5.1                      *
+ *   Copyright 2000-2006 Ted Ralphs                    *
+ *   All Rights Reserved.                              *
+ *   Distributed under the Common Public License 1.0   *
+ *******************************************************
+
+ ***** WELCOME TO SYMPHONY INTERACTIVE MIP SOLVER ******
+
+ Please type 'help'/'?' to see the main commands!
+
+ SYMPHONY:
+\end{verbatim}
+}
+When you type {\tt help} or {\tt ?}, a list of main commands is displayed:
+{\color{Brown}
+\begin{verbatim}
+ SYMPHONY: help
+
+ List of main commands:
+
+ load      : read a problem in mps or ampl format
+ solve     : solve the problem
+ lpsolve   : solve the lp relaxation of the problem
+ set       : set a parameter
+ display   : display optimization results and stats
+ reset     : restart the optimizer
+ help      : show the available commands/params/options
+
+ quit/exit : leave the optimizer
+
+ SYMPHONY:
+\end{verbatim}
+}
+Following is an illustration of a session to read in a sample instance:
+{\color{Brown}
+\begin{verbatim}
+ SYMPHONY: load 
+ Name of the file: sample.mps
+ Coin0001I At line 1 NAME SAMPLE
+ Coin0001I At line 2 ROWS
+ Coin0001I At line 6 COLUMNS
+ Coin0001I At line 25 RHS
+ Coin0001I At line 28 BOUNDS
+ Coin0001I At line 34 ENDATA
+ Coin0002I Problem SAMPLE has 2 rows, 6 columns and 10 elements
+ SYMPHONY: 
+\end{verbatim}
+}
+The format of the input file is recognized from the file extension. If there is
+none, you will be prompted to define the input format: 
+{\color{Brown}
+\begin{verbatim}
+ SYMPHONY: load 
+ Name of the file: sample
+ Type of the file ('mps'/'ampl'/'gmpl'): mps 
+ Coin0001I At line 1 NAME SAMPLE
+ Coin0001I At line 2 ROWS
+ Coin0001I At line 6 COLUMNS
+ Coin0001I At line 25 RHS
+ Coin0001I At line 28 BOUNDS
+ Coin0001I At line 34 ENDATA
+ Coin0002I Problem SAMPLE has 2 rows, 6 columns and 10 elements
+ SYMPHONY: 
+\end{verbatim}
+}
+Similary, if the input is in 'ampl/gmpl' format, you will also be prompted to 
+read in the data file 
+(note that, in order to enable GMPL/AMPL reader, you have to 
+configure SYMPHONY with GLPK package - see Section \ref{building}):
+{\color{Brown}
+\begin{verbatim}
+ SYMPHONY: load 
+ Name of the file: sample.mod
+ Name of the data file: sample.dat
+ Reading model section from sample.mod...
+ 32 lines were read
+ Reading data section from sample.dat...
+ 68 lines were read
+ Generating nb...
+ Generating cost...
+ Model has been successfully generated
+ SYMPHONY:
+\end{verbatim}
+}
+Note that, in order to enable GMPL/AMPL reader, you have to 
+configure SYMPHONY with GLPK package (see Section \ref{building}). 
+
+After loading the instance, you are free to type {\tt solve} to solve the 
+corresponding integer program or {\tt lpsolve} to solve its linear
+relaxation:
+{\color{Brown}
+\begin{verbatim}
+ SYMPHONY: solve
+
+ ****** Found Better Feasible Solution !
+ ****** Cost: -40.000000
+
+
+ ****************************************************
+ * Optimal Solution Found                           *
+ ****************************************************
+
+ SYMPHONY: lpsolve
+
+ ****** Found Better Feasible Solution !
+ ****** Cost: -43.000000
+
+
+ ****************************************************
+ * Optimal Solution Found                           *
+ ****************************************************
+
+ SYMPHONY:
+\end{verbatim}
+}
+As above, only the objective values of the feasible solutions found so far and 
+the termination code of the solution process will be displayed (see Section 
+\ref{opt_set} for displaying more output).  
+
+\subsection{Set Menu}
+Set submenu is used to set SYMPHONY's run-time parameters. 
+To enter this submenu, type {\tt set}: 
+{\color{Brown}
+\begin{verbatim}
+SYMPHONY: set
+Please type 'help'/'?' to see the list of parameters!
+SYMPHONY\Set:
+\end{verbatim}
+}
+You can override the default value of a parameter by typing the name of 
+the parameter. You will then be prompted 
+to enter the new value of that parameter. For instance, in order to 
+display more outputs during the solution process, you need to set the 
+{\tt verbosity} parameter (set to -1 by defualt for the interactive shell 
+routines) to a nonnegative integer: 
+{\color{Brown}
+\begin{verbatim}
+SYMPHONY\Set: verbosity
+Value of the parameter: 3
+Setting verbosity to: 3
+SYMPHONY\Set:
+\end{verbatim}
+}
+A confirmation message will also be displayed. Notice that, typing 
+{\tt help} or {\tt ?} displays only a subset of all 
+available run-time parameters which are the most commonly used ones. However, 
+you are allowed to set any of the parameters given in Section \ref{params}.
+Additionaly, you can set the values of parameters using a parameter file 
+as an input. In such a file, the new value of each parameter must follow the 
+name of that parameter. As an instance, assume that {\tt my\_param} file  
+consists of the following lines: 
+\begin{verbatim}
+ verbosity 3
+ node_selection_rule 3
+ time_limit 100
+\end{verbatim}
+Then, type {\tt param\_file} to be prompted to read in the parameter file: 
+{\color{Brown}
+\begin{verbatim}
+ SYMPHONY\Set: param_file
+ Name of the parameter file: my_param
+ Setting verbosity to: 3
+ Setting node_selection_rule to: 3
+ Setting time_limit to: 100
+ SYMPHONY\Set:
+\end{verbatim}
+}
+At this point, you can return to the main menu by typing {\tt back},  
+load an instance and solve it with updated run-time parameters. 
+
+\subsection{Display Menu}
+Display submenu is used to print out results and statistics of the solution 
+process after a {\tt solve} call. To enter this submenu and see available 
+options, type {\tt display} and then {\tt help} or {\tt ?}:  
+{\color{Brown}
+\begin{verbatim}
+ SYMPHONY: display
+ Please type 'help'/'?' to see the display options!
+ SYMPHONY\Display: help
+
+ List of display options:
+
+ solution     : display the column values
+ obj          : display the objective value
+ stats        : display the statistics
+ parameter    : display the value of a parameter
+
+ back         : leave this menu
+ quit/exit    : leave the optimizer
+
+ SYMPHONY\Display:
+\end{verbatim}
+}
+Clearly, in order to display column solutions and the optimal solution value, 
+you need to type {\tt solution} and then {\tt obj}:
+{\color{Brown}
+\begin{verbatim}
+ SYMPHONY\Display: solution
+ Optimal Solution found!
+ +++++++++++++++++++++++++++++++++++++++++++++++
+ Nonzero column names and values in the solution
+ +++++++++++++++++++++++++++++++++++++++++++++++
+ COL00002      3.000
+ COL00006      1.000
+
+ SYMPHONY\Display: obj
+ Objective Value: -40.000000
+ SYMPHONY\Display:
+\end{verbatim}
+}
+You can also display the values of SYMPHONY's run-time parameters (see Section
+\ref{params}) by moving into {\tt parameters} submenu: 
+{\color{Brown}
+\begin{verbatim}
+ SYMPHONY\Display: parameter
+ Please type 'help'/'?' to see the list of available parameters!
+ SYMPHONY\Display\Parameter:
+\end{verbatim}
+}
+For instance, in order to display the verbosity level, type {\tt verbosity}:
+{\color{Brown}
+\begin{verbatim}
+ SYMPHONY\Display\Parameter: verbosity 
+ The value of verbosity: 3
+ SYMPHONY\Display\Parameter:
+\end{verbatim}
+}
+As in Set submenu, typing {\tt help} or {\tt ?} will display only a subset of 
+available run-time parameters. However, you are allowed to display the value of
+any of the parameters given in Section \ref{params}. 
+
+\subsection{Sub Menu Browsing}
+
+SYMPHONY's interactive optimizer also allows the user to reach the lower 
+level menu commands from the higher level menus. In other words, the user 
+has the flexibility to use submenu commands without entering the 
+corresponding submenu. As an instance, all three of the following sessions 
+have the same result: 
+{\color{Brown}
+\begin{itemize}
+\item 
+  \begin{verbatim}
+    SYMPHONY: display parameter verbosity
+  \end{verbatim}
+\item 
+  \begin{verbatim}
+    SYMPHONY: display
+    Please type 'help'/'?' to see the display options!
+    SYMPHONY\Display: parameter verbosity
+  \end{verbatim}
+\item 
+  \begin{verbatim}
+    SYMPHONY: display
+    Please type 'help'/'?' to see the display options!
+    SYMPHONY\Display: parameter
+    Please type 'help'/'?' to see the list of available parameters!
+    SYMPHONY\Display\Parameter: verbosity
+  \end{verbatim}
+\end{itemize}
+}
+This flexibility is also enabled for the {\tt load} command and the Set 
+submenu. The followings are all valid commands: 
+{\color{Brown}
+\begin{itemize}
+\item 
+  \begin{verbatim}
+    SYMPHONY: load sample.mps
+  \end{verbatim}
+\item 
+  \begin{verbatim}
+    SYMPHONY: load sample.mod sample.dat
+  \end{verbatim}
+\item 
+  \begin{verbatim}
+    SYMPHONY: set
+    SYMPHONY\Set: verbosity 3
+  \end{verbatim}
+\item 
+  \begin{verbatim}
+    SYMPHONY: set verbosity 3
+    SYMPHONY: set param_file my_param
+  \end{verbatim}
+\end{itemize}
+}
 \section{Using the Callable Library}\label{callable_library}
 
 SYMPHONY's callable library consists of a complete set of subroutines for
@@ -22,19 +335,19 @@ algorithms. The user invokes these subroutines through the API specified in
 the header file \texttt{sym\_api.h}. Some of the basic commands are described
 below. For the sake of brevity, the arguments have been left out. 
 
-\paragraph{\texttt{sym\_open\_environment()}} Opens a new environment, and
+\paragraph{\ptt{sym\_open\_environment()}} Opens a new environment, and
 returns a pointer to it. This pointer then has to be passed as an argument to
 all other API subroutines (in the C++ interface, this pointer is maintained
 for the user).
 
-\paragraph{\texttt{sym\_parse\_command\_line()}} Invokes the built-in
+\paragraph{\ptt{sym\_parse\_command\_line()}} Invokes the built-in
 parser for setting commonly used parameters, such as the file name which to
 read the problem data, via command-line switches. A call to this subroutine
 instructs SYMPHONY to parse the command line and set the appropriate
 parameters. This subroutine also sets all other parameter values to their
 defaults, so it should only called when this is desired.
 
-\paragraph{\texttt{sym\_load\_problem()}} Reads the problem data and sets up
+\paragraph{\ptt{sym\_load\_problem()}} Reads the problem data and sets up
 the root subproblem. This includes specifying which cuts and variables are in
 the \emph{core} (those that are initially present in every subproblem during
 the search process) and the additional cuts and variables to be initially
@@ -43,22 +356,22 @@ file specified by the user, but the user can override this default by
 implementing a user callback that reads the data from a file in a customized
 format (see Section \ref{callback}).
 
-\paragraph{\texttt{sym\_find\_initial\_bounds()}} Invokes the user callback to
+\paragraph{\ptt{sym\_find\_initial\_bounds()}} Invokes the user callback to
 find initial bounds using a custom heuristic.
 
-\paragraph{\texttt{sym\_solve()}} Solves the currently loaded problem from
+\paragraph{\ptt{sym\_solve()}} Solves the currently loaded problem from
 scratch. This method is described in more detail in Section 
 \ref{initial_solve}.
 
-\paragraph{\texttt{sym\_warm\_solve()}} Solves the currently loaded problem 
+\paragraph{\ptt{sym\_warm\_solve()}} Solves the currently loaded problem 
 from a warm start. This method is described in more detail in 
 Section \ref{warm_solve}.\\
 
-\paragraph{\texttt{sym\_mc\_solve()}} Solves the currently loaded problem as a
+\paragraph{\ptt{sym\_mc\_solve()}} Solves the currently loaded problem as a
 multicriteria problem. This method is described in more detail in Section 
 \ref{mc_solve}.
 
-\paragraph{\texttt{sym\_close\_environment()}} Frees all problem data and
+\paragraph{\ptt{sym\_close\_environment()}} Frees all problem data and
 deletes the environment. \\
 
 \noindent As an example of the use of the library functions, Figure
@@ -66,6 +379,7 @@ deletes the environment. \\
 default parameter settings.
 \begin{figure}[tb]
 %\centering
+{\color{Brown}
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
@@ -76,6 +390,7 @@ int main(int argc, char **argv)
    sym_close_environment(env);
 }
 \end{Verbatim}
+}
 \caption{Implementation of a generic MILP solver with the SYMPHONY
 C callable library. \label{default_main}}
 \end{figure}
@@ -85,9 +400,9 @@ this program, the following command would be issued: \\
 symphony -F sample.mps
 \end{verbatim}
 The user does not have to invoke a command to read the MPS file. During the
-call to \texttt{sym\_parse\_command\_line()}, SYMPHONY determines that the
+call to \ptt{sym\_parse\_} \ptt{command\_line()}, SYMPHONY determines that the
 user wants to read in an MPS file. During the subsequent call to
-\texttt{sym\_load\_problem()}, the file is read and the problem data stored.
+\ptt{sym\_load\_problem()}, the file is read and the problem data stored.
 To read an GMPL file, the user would issue the command
 \begin{verbatim}
 symphony -F sample.mod -D sample.dat
@@ -101,16 +416,17 @@ sequential and parallel execution modes is made at compile-time through
 modification of the makefile or the project settings, depending on the
 operating system.
 
-To start the solution process from a warm start, the \texttt{sym\_warm\_solve()}
+To start the solution process from a warm start, the \ptt{sym\_warm\_solve()}
 command is used. SYMPHONY automatically records the warm start information
 resulting from the last solve call and restarts from that checkpoint if a call
-to \texttt{sym\_warm\_solve()} is made. Alternatively, external warm start
+to \ptt{sym\_warm\_solve()} is made. Alternatively, external warm start
 information can be loaded manually. Figure \ref{dynamic} illustrates the use
 of the re-solve capability by showing the code for implementing a solver that
 changes from depth first search to best first search after the first feasible
 solution is found.
 \begin{figure}[tb]
 %\centering
+{\color{Brown}
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
@@ -125,6 +441,7 @@ int main(int argc, char **argv)
    sym_warm_solve(env);
 }
 \end{Verbatim}
+}
 \caption{Implementation of a dynamic MILP solver with SYMPHONY. 
 \label{dynamic}}
 \end{figure}
@@ -135,6 +452,7 @@ information. Afterward, the original problem is solved to optimality, then is
 modified and re-solved from the saved checkpoint. 
 \begin{figure}[tb]
 %\centering
+{\color{Brown}
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
@@ -154,6 +472,7 @@ int main(int argc, char **argv)
    sym_warm_solve(env);
 }
 \end{Verbatim}
+}
 \caption{Use of SYMPHONY's warm start capability. \label{warm_start}}
 \end{figure}
 
@@ -174,6 +493,7 @@ desired function. Figure \ref{multi_criteria} shows the code for performing
 this analysis on variable 0. 
 \begin{figure}[tb]
 %\centering
+{\color{Brown}
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
@@ -184,6 +504,7 @@ int main(int argc, char **argv)
    sym_mc_solve(env);
 }
 \end{Verbatim}
+}
 \caption{Performing sensitivity analysis with SYMPHONY's bicriteria solver.
 \label{multi_criteria}}
 \end{figure}
@@ -215,17 +536,18 @@ maintenance, for each method in the OSI base class, there is a corresponding
 method in the callable library. The OSI methods are implemented simply as
 wrapped calls to the SYMPHONY callable library. When an instance of the OSI
 interface class is constructed, a call is made to
-\texttt{sym\_open\_environment()} and a pointer to the environment is stored
+\ptt{sym\_open\_environment()} and a pointer to the environment is stored
 in the class. Most subsequent calls within the class can then be made without
 any arguments. When the OSI object is destroyed,
-\texttt{sym\_close\_environment} is called and the environment is destroyed.
+\ptt{sym\_close\_environment} is called and the environment is destroyed.
 
 To fully support SYMPHONY's capabilities, we have extended the OSI interface to
 include some methods not in the base class. For example, we added calls
-equivalent to our \texttt{sym\_parse\_command\_line()} and
-\texttt{sym\_find\_initial\_bounds()}. Figure \ref{OSI_main} shows the
+equivalent to our \ptt{sym\_parse\_command\_line()} and
+\ptt{sym\_find\_initial\_bounds()}. Figure \ref{OSI_main} shows the
 program of Figure \ref{default_main} implemented using the OSI interface.
 \begin{figure}[tb]
+{\color{Brown}
 \begin{Verbatim}[frame=lines]
 int main(int argc, char **argv)
 {
@@ -235,6 +557,7 @@ int main(int argc, char **argv)
    si.branchAndBound();
 }
 \end{Verbatim}
+}
 \caption{Implementation of a generic MILP solver with the SYMPHONY
 OSI interface. \label{OSI_main}}
 \end{figure}

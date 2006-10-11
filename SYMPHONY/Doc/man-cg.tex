@@ -27,6 +27,7 @@ options and no post-processing.
 % user_receive_cg_data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \firstfuncdef{user\_receive\_cg\_data}
+\sindex[cf]{user\_receive\_cg\_data}
 \label{user_receive_cg_data}
 \begin{verbatim}
 int user_receive_cg_data (void **user)
@@ -73,6 +74,7 @@ information.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_receive\_lp\_solution\_cg}
+\sindex[cf]{user\_receive\_lp\_solution\_cg}
 \begin{verbatim}
 int user_receive_lp_solution_cg(void *user)
 \end{verbatim}
@@ -119,6 +121,7 @@ as well as the objective value and upper bound.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_find\_cuts}
+\sindex[cf]{user\_find\_cuts}
 \label{user_find_cuts}
 \begin{verbatim}
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
@@ -215,6 +218,7 @@ and sent to the LP. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{user_check_validity_of_cut}
 \functiondef{user\_check\_validity\_of\_cut}
+\sindex[cf]{user\_check\_validity\_of\_cut}
 \begin{verbatim}
 int user_check_validity_of_cut(void *user, cut_data *new_cut)
 \end{verbatim}
@@ -258,6 +262,7 @@ checked. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_free\_cg}
+\sindex[cf]{user\_free\_cg}
 \begin{verbatim}
 int user_free_cg(void **user)
 \end{verbatim}

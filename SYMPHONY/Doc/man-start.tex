@@ -41,18 +41,24 @@ or in the form of daily tarballs. The recommended method is to use subversion
 because it makes it easier to obtain updates. In a Unix-like environment (such
 as Linux or CYGWIN), the following command may be used to obtain SYMPHONY from
 source using SVN in most cases:
+{\color{Brown}
 \begin{verbatim}
 svn checkout https://projects.coin-or.org/svn/SYMPHONY/trunk/ COIN-SYMPHONY
 \end{verbatim}
+}
 Alternatively, you can get a daily snapshot of the source code as a tarball
 from the download page of COIN-OR:
+{\color{Brown}
 \begin{verbatim}
 http://www.coin-or.org/Tarballs/
 \end{verbatim}
+}
 If the code is obtained as a tarball, unpack the distribution with 
+{\color{Brown}
 \begin{verbatim}
 tar -xzf SYMPHONY_XXX.tgz
 \end{verbatim}
+}
 where ``\texttt{XXX}'' is the date the snapshot is taken. This will create a
 subdirectory called \texttt{SYMPHONY\_XXX/} containing the distribution.
 
@@ -61,41 +67,91 @@ subdirectory called \texttt{SYMPHONY\_XXX/} containing the distribution.
 The first step is to run a configuration script that will allow the
 compilation process to be customized for your environment. to perform this
 step, switch into the root directory of the distribution and type
+{\color{Brown}
 \begin{verbatim}
 ./configure 
 \end{verbatim}
+}
 This will set up the default configuration files. If you want to override the
 default settings, you can either run the configuration script with
 command-line options or else modify the options in the file
-'share/config.site'. For instance, you might want to specify the LP solver to
-be used (Clp is the default). A list of options together with brief
+'share/config.site'. A complete list of options with brief
 explanations can be seen both in the file 'share/config.site' and by typing
+{\color{Brown}
 \begin{verbatim}
  ./configure --help=recursive 
 \end{verbatim}
+}
+See Figure \ref{conf_opts} for a list of options the user may want to set. 
+
+\begin{figure}[htb]
+\begin{tabular}{ll}
+\hline
+\texttt{--enable-debug} & compile all projects with debug options set \\
+\texttt{--enable-debug-symphony} & compile only SYMPHONY project with debug options \\
+\texttt{--enable-static} & build static libraries \\
+\texttt{--enable-static-executable} &  create a complete static executable \\
+\texttt{--enable-gnu-packages} & compile with GNU packages \\ 
+& compile interactive optimizer with readline library \\
+\hline
+\texttt{--disable-cgl-cuts} & disable generic cut generation \\
+\texttt{--enable-sensitivity-analysis} & compile in the sensitivity analysis features \\
+\texttt{--enable-root-only} & process only the root node \\
+\texttt{--enable-frac-branching} & compile in the fractional branching option \\
+\texttt{--enable-tests}&  perform additional sanity checks (for debugging purposes) \\
+\texttt{--enable-tm-tests }& perform more tests  \\
+\texttt{--enable-trace-path}&  additional debugging options \\
+\texttt{--enable-cut-check}& additional debugging options \\
+\texttt{--enable-statistics}& additional statistics \\
+\texttt{--enable-pseudo-costs}& enable some experimental pseudo-cost branching tools \\
+\texttt{--enable-draw-graph} &  enable IGD graph drawing application \\
+\hline
+\texttt{ --with-XXX-incdir} &  specify the directory with the header files for the XXX package \\ 
+&where XXX is one of LP solver packages: cplex, glpk, osl, soplex, \\ 
+& xpress \\
+\texttt{--with-XXX-lib} &  specify the flags to link with the library  
+XXX package \\ 
+&where XXX is one of LP solver packages: cplex, glpk, osl, soplex, \\ 
+& xpress \\
+\texttt{--with-lp-solver[=lpsolver]} &  specify the LP solver in small 
+letters (default lpsolver=clp) \\
+\texttt{ --with-gmpl} &  compile with GMPL reader (requires 
+\texttt{--with-glpk-incdir} and \\ &
+\texttt{--with-glpk-lib} options to be set) \\
+\texttt{--with-osi-interface} &  compile with SymOsi interface \\
+\texttt{--with-application} &  compile the application library \\
+\hline
+\texttt{--enable-openmp} &   compile in OpenMP features \\
+\texttt{--with-pvm } &  compile in parallel architecture (assuming that pvm is \\ 
+&installed and the variable PVM\_ROOT is defined.) \\
+\texttt{--without-cg} &  compile without cut generator module \\
+\texttt{--without-cp} &  compile without cut pool module \\
+\texttt{--without-lp} &  compile without LP solver module \\
+\texttt{--without-tm} &  compile without tree manager module
+\end{tabular}
+\caption{A list of useful configuration options \label{conf_opts}}
+\end{figure}
+
 In order to enable or disable an option, either update the file 
 'share/config.site' or add the option as an argument to configuration script. 
 As an instance for the second case, running 
+{\color{Brown}
 \begin{verbatim}
 ./configure --enable-debug
 \end{verbatim}
+}
 will set the configuration to compile the source files with debugging
 flag. 
 
-In order to read GMPL files, you need to have the GLPK package and SYMPHONY
-has to be configured with
-\begin{verbatim}
-./configure --with-gmpl --with-glpk-lib[=GLPK library] 
-            --with-glpk-incdir[=GLPK include dir] 
-\end{verbatim}
-
-\subsection{Building}
+\subsection{Building}\label{building}
 
 After configuring, the code can be built by typing the commands
+{\color{Brown}
 \begin{verbatim}
 make
 make install
 \end{verbatim}
+}
 This will first create the required libraries and binaries and then will
 install them. By default, the library \texttt{libSym} and the executable
 \texttt{symphony} will be installed to the \texttt{lib/} and \texttt{bin/}
@@ -105,70 +161,60 @@ After compilation, the SYMPHONY library, together with the header files in the
 subdirectory \texttt{include/}, can then be used to call SYMPHONY from any
 C/C++ code. The API for this is described in Chapter~\ref{API-overview}. The
 executable can also be used for solving generic MILP problems in MPS and GMPL
-format. In order to read GMPL files, you will need to have GLPK installed and
+format. In order to read GMPL files, you will need to have GLPK 
+(\url{http://www.gnu.org/software/glpk/}) installed and
 SYMPHONY must be configured with
+{\color{Brown}
 \begin{verbatim}
 ./configure --with-gmpl --with-glpk-lib[=GLPK library] 
             --with-glpk-incdir[=GLPK include dir] 
 \end{verbatim}
-
+}
 For more pwerful modeling interface, FlopC++ can also be used to obtain a
 capability similar to ILOG's Concert technology for building math programming
 models (see SYMPHONY/Examples/FLOPC++). 
 
-If you are planning to use the interactive optimizer, it is recommended to run
-the configuration script with
-\begin{verbatim}
-./configure --enable-gnu-packages 
-\end{verbatim}
-This will allow the interactive shell to be able to behave exactly like 
-a Linux terminal command line, i.e., it will keep the history of the used 
-commands, will complete the input word to possible commands, etc. Make sure
-that you have the needed package (readline.h and history.h include files 
-and their libraries) on the system files path. To start the optimizer, call 
-
-For the interactive optimizer, it is recommended to run the configuration 
-script with 
-\begin{verbatim}
-./configure --enable-gnu-packages 
-\end{verbatim}
-This will allow the interactive shell to be able to behave exactly like 
-a Linux terminal command line, i.e., it will keep the history of the used 
-commands, will complete the input word to possible commands, etc. Make sure
-that you have the needed package (readline.h and history.h include files 
-and their libraries) on the system files path. 
-
 To test SYMPHONY after building, type
+{\color{Brown}
 \begin{verbatim}
 make test
 \end{verbatim}
+}
 to execute an automated unit test. To test out the optimizer manually. a
 sample MPS file called "sample.mps" and a sample GMPL/AMPL file called
 "sample.mod" together with its data file "sample.dat" are included with the
 distribution. You can use either the command-line or the interactive
 optimizer. To solve the sample MPS model, type 
+{\color{Brown}
 \begin{verbatim}
 bin/symphony -F SYMPHONY/Datasets/sample.mps
 \end{verbatim}
+}
 To solve the GMPL model, use the "-F" switch to specify the file
 name and the "-D" for the data file name if the input is in GMPL/AMPL format,
 i.e., type
+{\color{Brown}
 \begin{verbatim}
 bin/symphony -F SYMPHONY/Datasets/sample.mod -D SYMPHONY/Datasets/sample.dat
 \end{verbatim}
+}
 For more MPS data files for further testing, see the MIPLIB library in the
 Data/ subdirectory. To run the interactive optimizer, execute SYMPHONY without
 any command-line arguments, i.e., type
+{\color{Brown}
 \begin{verbatim}
  bin/symphony 
 \end{verbatim}
+}
 and then type "help" or "?" to see a list of available commands.
 
 After the SYMPHONY library and the executable are compiled and tested, you
 can type
+{\color{Brown}
 \begin{verbatim}
 make clean 
 \end{verbatim}
+}
 if you want to save disk space. That's it! Now you are ready to use SYMPHONY
 callable library or solve generic MILP problems through the executable.
 
@@ -177,25 +223,30 @@ callable library or solve generic MILP problems through the executable.
 To compile a shared memory version of SYMPHONY, simply use an OpenMP compliant
 compiler. Version 5.1 has been tested with gcc 4.2, and should work by
 configuring with
+{\color{Brown}
 \begin{verbatim}
-./configure CXX='g++ -fopenmp'
+./configure -enable-openmp
 \end{verbatim}
+}
 Follow the instructions above for building and testing. To invoke SYMPHONY
 from the command-line with multiple threads, specify the number of threads
 with the \texttt{-p} option, i.e.,
+{\color{Brown}
 \begin{verbatim}
 bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps
 \end{verbatim}
-
+}
 \section{Building for distribuited-memory architectuires}
 
 If you wish to compile a distributed version of the code, first make sure
 you have PVM installed. You can obtain it from
 \url{http://www.csm.ornl.gov/pvm/}. To configure for a parallel build, invoke
 the configuration script as follows:
+{\color{Brown}
 \begin{verbatim}
 ./configure --with-pvm
 \end{verbatim}
+}
 Be sure that PVM is installed either in system path or that you have the
 environment variable \texttt{PVM\_ROOT} set properly. Note that there are a
 number of different parallel configurations. The default configuration is to
@@ -214,9 +265,11 @@ To test the parallel version, first start the PVM daemon by typing
 invoke SYMPHONY using the sample MPS file called \texttt{sample.mps} included
 with the distribution. To specify the file name, use the \texttt{-F}
 command-line option, i.e., in the root directory, type
+{\color{Brown}
 \begin{verbatim}
 bin/symphony_m$(EXT) -F SYMPHONY/Datasets/sample.mps 
 \end{verbatim}
+}
 where \texttt{\$(EXT)} is an extension to be added according to the chosen
 module dependencies. To obtain more MPS data files for further testing,
 download the MIPLIB library.
@@ -225,11 +278,13 @@ download the MIPLIB library.
 
 In order to compile SYMPHONY's applications, you must first compile the 
 application-specific library with
+{\color{Brown}
 \begin{verbatim}
 ./configure --with-applications
 make 
 make install
 \end{verbatim}
+}
 This will create the application library called 'libSymAppl' to be used while
 building custom applications. Note that that sequential version library and
 executable will also be made and installed.

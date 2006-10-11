@@ -26,6 +26,7 @@
 
 \firstfuncdef{user\_usage}
 \label{user_usage}
+\sindex[cf]{user\_usage}
 \begin{verbatim}
 void user_usage()
 \end{verbatim}
@@ -55,6 +56,7 @@ being read in (see the README file).
 
 \functiondef{user\_initialize}
 \label{user_initialize}
+\sindex[cf]{user\_initialize}
 \begin{verbatim}
 int user_initialize(void **user)
 \end{verbatim}
@@ -92,6 +94,7 @@ file. \\
 
 \functiondef{user\_readparams}
 \label{user_readparams}
+\sindex[cf]{user\_readparams}
 \begin{verbatim}
 int user_readparams(void *user, char *filename, int argc, char **argv)
 \end{verbatim}
@@ -149,6 +152,7 @@ GMPL/AMPL) the data file.  \\
 
 \functiondef{user\_io}
 \label{user_io}
+\sindex[cf]{user\_io}
 \begin{verbatim}
 int user_io(void *user)
 \end{verbatim}
@@ -188,6 +192,7 @@ command-line switches to use to specify this behavior).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_init\_draw\_graph}
+\sindex[cf]{user\_init\_draw\_graph}
 \begin{verbatim}
 int user_init_draw_graph(void *user, int dg_id)
 \end{verbatim}
@@ -226,6 +231,7 @@ graph, like in the TSP.)
 
 \functiondef{user\_start\_heurs}
 \label{user_start_heurs}
+\sindex[cf]{user\_start\_heurs}
 \begin{verbatim}
 int user_start_heurs(void *user, double *ub, double *ub_estimate)
 \end{verbatim}
@@ -274,6 +280,7 @@ default MIP heuristic here). \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \functiondef{user\_initialize\_root\_node}
 \label{user_initialize_root_node}
+\sindex[cf]{user\_initialize\_root\_node}
 \begin{verbatim}
 int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
                               int *basecutnum, int *extravarnum,  int **extravars,
@@ -352,6 +359,7 @@ The array of base and extra indices are sorted.
 
 \functiondef{user\_receive\_feasible\_solution}
 \label{user_receive_feasible_solution}
+\sindex[cf]{user\_receive\_feasible\_solution}
 \begin{verbatim}
 int user_receive_feasible_solution(void *user, int msgtag, double cost, 
                                    int numvars, int *indices, double *values)
@@ -414,6 +422,7 @@ values were sent (length of {\tt indices} and {\tt values}). \\
 
 \functiondef{user\_send\_lp\_data}
 \label{user_send_lp_data}
+\sindex[cf]{user\_send\_lp\_data}
 \begin{verbatim}
 int user_send_lp_data(void *user, void **user_lp)
 \end{verbatim}
@@ -466,6 +475,7 @@ SYMPHONY has read in an MPS or GMPL/AMPL model file.
 
 \functiondef{user\_send\_cg\_data}
 \label{user_send_cg_data}
+\sindex[cf]{user\_send\_cg\_data}
 \begin{verbatim}
 int user_pack_cg_data(void *user, void **user_cg)
 \end{verbatim}
@@ -518,6 +528,7 @@ performed). \\
 
 \functiondef{user\_send\_cp\_data}
 \label{user_send_cp_data}
+\sindex[cf]{user\_send\_cp\_data}
 \begin{verbatim}
 int user_pack_cp_data(void *user, void **user_cp)
 \end{verbatim}
@@ -575,6 +586,7 @@ classes or cut pool not used). \\
 
 \functiondef{user\_display\_solution}
 \label{user_display_solution}
+\sindex[cf]{user\_display\_solution}
 \begin{verbatim}
 int user_display_solution(void *user, double lpetol, int varnum, int *indices, 
                           double *values, double objval)
@@ -631,6 +643,7 @@ default format.
 
 \functiondef{user\_send\_feas\_sol}
 \label{user_send_feas_sol}
+\sindex[cf]{user\_send\_feas\_sol}
 \begin{verbatim}
 int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 \end{verbatim}
@@ -675,6 +688,7 @@ manager and must be freed by the user. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_process\_own\_messages}
+\sindex[cf]{user\_process\_own\_messages}
 \begin{verbatim}
 int user_process_own_messages(void *user, int msgtag)
 \end{verbatim}
@@ -712,6 +726,7 @@ in \htmlref{\tt user\_start\_heurs()}{user_start_heurs}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_free\_master}
+\sindex[cf]{user\_free\_master}
 \begin{verbatim}
 int user_free_master(void **user)
 \end{verbatim}

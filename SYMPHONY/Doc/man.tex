@@ -79,6 +79,19 @@
 \usepackage{fancyvrb}
 \usepackage{listings}
 \usepackage{url}
+\usepackage{splitidx}
+\usepackage[usenames]{color}
+\makeindex
+\newindex[Index of C API Functions]{f}
+\newindex[Index of User Callback API Functions]{cf}
+\newindex[Index of Parameters]{p}
+\def\GP{{Global Pramaters}}
+\def\DP{{Draw Graph Pramaters}}
+\def\MP{{Master Module Pramaters}}
+\def\TP{{Tree Manager Pramaters}}
+\def\LPP{{LP Pramaters}}
+\def\CP{{Cut Pool Pramaters}}
+\def\CGP{{Cut Generator Pramaters}}
 \lstloadlanguages{C++}
 
 \newcommand{\be}{\begin{enumerate}}
@@ -96,14 +109,16 @@
 \newcommand{\functiondef}[1]{\subsubsection{#1}}
 \newcommand{\firstfuncdef}[1]{\subsubsection{#1}}
 %begin{latexonly}
-\renewcommand{\functiondef}[1]{\newpage \item[\Large $\triangleright$] {\bf
-\Large #1}}
-\renewcommand{\firstfuncdef}[1]{\item[\Large $\triangleright$] {\bf
-\Large #1}}
+\renewcommand{\functiondef}[1]{\newpage \item[\Large $\triangleright$] 
+{\color{red}{\bf
+\Large #1}}}
+\renewcommand{\firstfuncdef}[1]{\item[\Large $\triangleright$] 
+{\color{red}{\bf 
+\Large #1}}}
 %end{latexonly}
-\newcommand{\describe}{\item[Description:] \hfill}
-\newcommand{\args}{\item[Arguments:] \hfill}
-\newcommand{\returns}{\item[Return values:] \hfill}
+\newcommand{\describe}{\item[{\color{cyan}Description:}] \hfill}
+\newcommand{\args}{\item[{\color{Brown}Arguments:}] \hfill}
+\newcommand{\returns}{\item[{\color{green}Return values:}] \hfill}
 \newcommand{\postp}{\item[Post-processing:] \hfill}
 \newcommand{\nopostp}{\item[Post-processing:] None \hfill}
 
@@ -116,10 +131,16 @@
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\Q}{\mathbb{Q}}
 \renewcommand{\Re}{\mathbb{R}}
-
+\newcommand{\ptt}[1]{{\tt {\color{BrickRed} #1}}} 
+\usepackage[latex2html,dvipdfm,colorlinks]{hyperref}
+\hypersetup{
+  linkcolor=blue,
+}
 
 %\htmladdtonavigation{\htmladdnormallink 
 %       {\htmladdimg{contents_motif.gif}}{man.html}}
+
+
 
 \begin{document}
 
@@ -135,18 +156,19 @@ supported by NSF Grants DMS-9527124, DMI-0534862, and DMI-0522796, as well as
 Texas ATP Grant 97-3604-010. A revised version of Chapters
 \ref{SYMPHONY-design} of this manual now appears
 in the Springer-Verlag book {\em Computational Combinatorial Optimization}
-edited by M. J\"unger and D. Naddef, see
-http://link.springer.de/link/service/series/0558/tocs/t2241.htm}
+edited by M. J\"unger and D. Naddef, see \url{
+http://link.springer.de/link/service/series/0558/tocs/t2241.htm}}
 %begin{latexonly}
 \vskip 1.7in
 \LARGE 
 \vskip .2in
 T.K. Ralphs\thanks{Department of Industrial and
-Systems Engineering, Lehigh University, Bethlehem, PA 18017, {\tt
-tkralphs@lehigh.edu}, {\tt http://www.lehigh.edu/\~{ }tkr2}} \\
+Systems Engineering, Lehigh University, Bethlehem, PA 18017, {\tt 
+\htmladdnormallink{tkralphs@lehigh.edu}{mailto:tkralphs@lehigh.edu}}, 
+{\tt \url{http://www.lehigh.edu/\~tkr2}}} \\
 M. G\"uzelsoy\thanks{Department of Industrial and
 Systems Engineering, Lehigh University, Bethlehem, PA 18017, {\tt
-megb@lehigh.edu}, {\tt http://coral.ie.lehigh.edu/\~{ }menal}} \\
+  \htmladdnormallink{megb@lehigh.edu}{mailto:megb@lehigh.edu}}, {\tt \url{http://coral.ie.lehigh.edu/\~menal}}} \\
 %\vskip .5in
 %Interactive Graph Drawing \\
 %Software By \\
@@ -237,7 +259,7 @@ First, many thanks are due to Laci Lad\'anyi who worked with me on the
 development of an early precursor of SYMPHONY called COMPSys and who taught me
 much of what I know about programming. Many thanks are due also to Marta
 Es\"o, who wrote a draft of this manual for what was then COMPSys. Thanks are
-also due to Menal Guzelsoy, who was been instrumental in the development of
+also due to Menal Guzelsoy, who has been instrumental in the development of
 SYMPHONY since version 4.0 and who helped update this manual. Thanks to
 Matthew Galati and Ondrej Medek, who also helped with the development of
 SYMPHONY. Finally, thanks to Leslie Trotter, William Cook, Cornell University,
@@ -330,5 +352,6 @@ state of Texas, all of whom have supported the development of SYMPHONY.
 %\section{Constant Names}
 
 %\input{man-consts}
-
+\addcontentsline{toc}{chapter}{Index}
+\printindex*
 \end{document}
