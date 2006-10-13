@@ -445,13 +445,14 @@ int solve(tm_prob *tm)
 	 }
 	 
 	 if (tm->par.time_limit >= 0.0 &&
-	     wall_clock(NULL) - start_time > tm->par.time_limit){
+	     wall_clock(NULL) - start_time > tm->par.time_limit &&
+	     termcode != TM_FINISHED){
 	    termcode = TM_TIME_LIMIT_EXCEEDED;
 	    break;
 	 }
 
 	 if (tm->par.node_limit >= 0 && tm->stat.analyzed >= 
-	     tm->par.node_limit){
+	     tm->par.node_limit && termcode != TM_FINISHED){
 	    termcode = TM_NODE_LIMIT_EXCEEDED;
 	    break;
 	 }
