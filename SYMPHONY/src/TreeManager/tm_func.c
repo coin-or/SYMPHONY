@@ -3032,7 +3032,8 @@ void free_tm(tm_prob *tm)
    FREE(tm->rpath_size);
    FREE(tm->bpath);
    FREE(tm->bpath_size);
-
+   FREE(termcodes);
+   
    FREE(tm);
 }
 
