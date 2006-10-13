@@ -614,7 +614,7 @@ int sym_help(char *line)
 	   "generate_cgl_lift_and_project_cuts : whether or not to use cgl lift and project cuts (default: 0)\n"
 	   "node_selection_rule                : set the node selection rule/search strategy (default: 5)\n"
 	   "strong_branching_candidate_num     : set the stong branching candidates number (default: var)\n"
-	   "compare_candidates_dafult        : set the rule to compare the candidates (defualt: 2)\n"
+	   "compare_candidates_dafult          : set the rule to compare the candidates (defualt: 2)\n"
 	   "select_child_default               : set the rule to select the children (default: 0)\n"
 	   "diving_threshold                   : set diving threshold (default: 0)\n"
 	   "diving_strategy                    : set diving strategy (default: 0)\n"

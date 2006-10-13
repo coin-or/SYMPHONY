@@ -22489,11 +22489,6 @@ else
 fi;
 
 if test $sym_openmp = true; then
-   if test $sym_enable_parallel = false; then
-      { { echo "$as_me:$LINENO: error: First enable parallel configuration with --with-pvm to be able to use OpenMP features" >&5
-echo "$as_me: error: First enable parallel configuration with --with-pvm to be able to use OpenMP features" >&2;}
-   { (exit 1); exit 1; }; }
-   else
    echo "$as_me:$LINENO: checking GCC version" >&5
 echo $ECHO_N "checking GCC version... $ECHO_C" >&6
    fopenmp_version=4.2
@@ -22507,8 +22502,8 @@ echo "${ECHO_T}$get_gcc_version" >&6
        { { echo "$as_me:$LINENO: error: OpenMP feautures are supported by GCC 4.2.0 or higher." >&5
 echo "$as_me: error: OpenMP feautures are supported by GCC 4.2.0 or higher." >&2;}
    { (exit 1); exit 1; }; }
-   fi
    SYMPDEFS="$SYMPDEFS -D_OPENMP"
+   SYMDEFS="$SYMDEFS -D_OPENMP"
    fi
 fi
 

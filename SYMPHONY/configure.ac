@@ -751,9 +751,6 @@ esac],
 [sym_openmp=false])
 
 if test $sym_openmp = true; then 
-   if test $sym_enable_parallel = false; then 
-      AC_MSG_ERROR(First enable parallel configuration with --with-pvm to be able to use OpenMP features)
-   else 
    AC_MSG_CHECKING([GCC version])
    fopenmp_version=4.2
    gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
@@ -763,8 +760,8 @@ if test $sym_openmp = true; then
    AC_MSG_RESULT([$get_gcc_version])
    if test ${major_gcc_version} -lt ${gcc_required_version}; then
        AC_MSG_ERROR(OpenMP feautures are supported by GCC 4.2.0 or higher.)
-   fi   
    SYMPDEFS="$SYMPDEFS -D_OPENMP"
+   SYMDEFS="$SYMDEFS -D_OPENMP"
    fi
 fi      
 
