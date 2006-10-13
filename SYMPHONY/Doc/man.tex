@@ -81,6 +81,7 @@
 \usepackage{url}
 \usepackage{splitidx}
 \usepackage[usenames]{color}
+
 \makeindex
 \newindex[Index of C API Functions]{f}
 \newindex[Index of User Callback API Functions]{cf}
@@ -126,12 +127,13 @@
 \newcommand{\TM}{{\sc TreeManager}}
 \newcommand{\LP}{{\sc LP}}
 \newcommand{\ra}{$\rightarrow$}
-\newcommand{\bs} {\(\backslash\)}
 \newcommand{\vmin}{\mathop{\text{vmin}}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\Q}{\mathbb{Q}}
 \renewcommand{\Re}{\mathbb{R}}
 \newcommand{\ptt}[1]{{\tt {\color{BrickRed} #1}}} 
+\newcommand{\bs}{{$\backslash$}}
+
 \usepackage[latex2html,dvipdfm,colorlinks]{hyperref}
 \hypersetup{
   linkcolor=blue,
@@ -140,6 +142,8 @@
 %\htmladdtonavigation{\htmladdnormallink 
 %       {\htmladdimg{contents_motif.gif}}{man.html}}
 
+\setlength{\parindent}{0in}
+\setlength{\parskip}{0.1in}
 
 
 \begin{document}
@@ -343,15 +347,23 @@ state of Texas, all of whom have supported the development of SYMPHONY.
 
 \backmatter
 
+\cleardoublepage
+\phantomsection
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliographystyle{plain}
-\bibliography{/home/ted/PAPERS/BIB/bib}
+\bibliography{/home/menal/PAPERS/BIB/bib}
+
 %\input{biblio}
 
 %\newpage
 %\section{Constant Names}
 
 %\input{man-consts}
+
+
+\cleardoublepage
+\phantomsection
+%\refstepcounter{chapter}
 \addcontentsline{toc}{chapter}{Index}
 \printindex*
 \end{document}

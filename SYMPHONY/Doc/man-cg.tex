@@ -41,8 +41,9 @@ This function only has to be filled out for parallel execution and only if the
 TM, LP, and CG modules are all compiled as separate modules. This would not be
 typical. If needed, the user can use this function to receive problem-specific
 data needed for computation in the CG module. The same data must be received
-here that was sent in the \hyperref{{\tt user\_send\_cg\_data()}}{{\tt
-user\_send\_cg\_data()} (see Section }{)}{user_send_cg_data} function in the
+here that was sent in the \hyperref{{\tt user\_send\_cg\_data()}}
+{\ptt{user\_send\_cg\_data()} (see Section }{)}{user_send_cg_data} 
+function in the
 master module. The user has to allocate space for all the data structures,
 including {\tt user} itself. Note that some or all of this may be done in the
 function {\tt \htmlref{user\_send\_cg\_data()}{user_send_cg_data}} if the Tree
@@ -141,7 +142,7 @@ shared memory.  The argument of this function is a pointer to the cut to be
 sent. See Section \ref{user-written-lp} for a description of this data
 structure. Each user-defined cut assigned a type and a designated packed
 form. Each user-defined type must be recognized by the user's \hyperref{{\tt
-user\_unpack\_cuts()}}{{\tt user\_unpack\_cuts()}}{}{user_unpack_cuts}
+user\_unpack\_cuts()}}{\ptt{user\_unpack\_cuts()}}{}{user_unpack_cuts}
 function in the master module. If the user wants a user-defined cut to be
 added to the cut pool in case it proves to be effective in the LP, then {\tt
 new\_cut->name} should be set to {\tt CUT\_\_SEND\_TO\_CP}. In this case, the
@@ -170,7 +171,7 @@ or whether it is only to be used locally.\\
 The only output of the \texttt{user\_find\_cuts()} function is the number of
 cuts generated and this value is returned in the last argument. For options to
 generate generic cuts automatically using the COIN Cut Generation Library, see
-the function \hyperref{{\tt user\_generate\_cuts\_in\_lp()}}{{\tt
+the function \hyperref{\ptt{user\_generate\_cuts\_in\_lp()}}{{\tt
 user\_generate\_cuts\_in\_lp()}}{}{user_generate_cuts_in_lp}\\
 \\
 

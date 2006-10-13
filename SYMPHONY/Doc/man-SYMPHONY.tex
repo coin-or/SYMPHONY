@@ -46,14 +46,15 @@ the user callbacks (name {\tt *\_u.h}). By looking at the header files, you
 should get a general idea of how things are laid out.
 
 In addition to the subdirectories corresponding to each module, there is a
-subdirectory called \texttt{SYMPHONY-5.1/USER}, which contains the files
-needed for implementing the callbacks. Before beginning
-customization, it is recommended to make a copy of the directory
-\texttt{SYMPHONY-5.1/USER} that will be used as a template for creating your
+subdirectory called \texttt{SYMPHONY-5.1/SYMPHONY/Applications/USER}, which 
+contains the files needed for implementing the callbacks. Before beginning
+customization, it is recommended to make a copy of this directory that will 
+be used as a template for creating your
 customized solver. In this directory and its subdirectories, which mirror the
 subdirectories of SYMPHONY itself, each file contains function stubs that can
 be filled in to create a new custom application. There is one file for each
-module, initially called \texttt{SYMPHONY-5.1/USER/*/user\_*.c}, where
+module, initially called 
+\texttt{SYMPHONY-5.1/SYMPHONY/Applications/USER/*/user\_*.c}, where
 \texttt{*} is the name of the module. The primary thing that you, as the user,
 need to understand to build a custom application is how to fill in these
 stubs. That is what the second section of this manual is about.
@@ -233,10 +234,10 @@ Once the callback functions are filled in, all that remains is to compile the
 application. The distribution comes with two makefiles that facilitate this
 process. The primary makefile resides in the {\tt SYMPHONY-5.1/} directory.
 The user makefile resides in the user's subdirectory, initially called
-\texttt{SYMPHONY-5.1/USER/}. This subdirectory can be moved, as well as
-renamed. There are a number of variables that must be set in the primary make
-file. To modify the makefiles appropriately, see the instructions in Section
-\ref{getting_started_unix}.
+\texttt{SYMPHONY-5.1/SYMPHONY/Applications/USER/}. This subdirectory can be 
+moved, as well as renamed. There are a number of variables that must be set in 
+the primary make file. To modify the makefiles appropriately, see the 
+instructions in Section \ref{getting_started_unix}.
 
 \paragraph{Working with PVM.}
 \label{PVM}
@@ -274,27 +275,27 @@ shared parallel.
 
 \paragraph{Configuring the Modules.}
 \label{configuration}
-In the application makefile, e.g., \texttt{SYMPHONY-5.1/USER/Makefile},there
+While configuring SYMPHONY (see Section \ref{configuring}), there 
 are four variables that control which modules run as separate executables and
 which are called directly in serial fashion. The variables are as follows:
 \begin{description}
-        \item [COMPILE\_IN\_CG:] If set to {\tt TRUE}, then the cut generator
+        \item [--with-cg:] If set to {\tt yes}, then the cut generator
         function will be called directly from the LP in serial
         fashion, instead of running as a separate executable. This is
         desirable if cut generation is quick and running it in
         parallel is not worth the price of the communication overhead.
-        \item [COMPILE\_IN\_CP:] If set to {\tt TRUE}, then the cut
+        \item [--with-cp:] If set to {\tt yes}, then the cut
         pool(s) will be maintained as a data structure auxiliary to the
         tree manager. 
-        \item [COMPILE\_IN\_LP:] If set to {\tt TRUE}, then the LP
+        \item [--with-lp:] If set to {\tt yes}, then the LP
         functions will be called directly from the tree manager. When
         running the distributed version, this
         necessarily implies that there will only be one active
         subproblem at a time, and hence the code will essentially be
-        running serially. IN the shared-memory version, however, the
+        running serially. In the shared-memory version, however, the
         tree manager will be threaded in order to execute subproblems 
         in parallel.
-        \item [COMPILE\_IN\_TM:] If set to {\tt TRUE}, then the tree
+        \item [--with-tm:] If set to {\tt yes}, then the tree
         will be managed directly from the master process. This is only
         recommended if a single executable is desired (i.e.~the three
         other variables are also set to true). A single executable is
@@ -319,8 +320,8 @@ corresponding processes.  In the fully distributed version, the default names
 are \texttt{tm}, \texttt{lp}, \texttt{cg}, and \texttt{cp}. For other
 configurations, the executable name is a combination of all the modules that
 were compiled together joined by underscores. In other words, if the LP and
-the cut generator modules were compiled together (i.e.~{\tt COMPILE\_IN\_CG}
-set to {\tt TRUE}), then the executable name would be ``{\tt lp\_cg}'' and the
+the cut generator modules were compiled together (i.e.~{\tt --with-cg}
+set to {\tt yes}), then the executable name would be ``{\tt lp\_cg}'' and the
 corresponding library file would be called ``{\tt liblp\_cg.a}.'' You can
 rename the executables as you like. However, if you are using PVM to spawn the
 modules, as in the fully distributed version, you must set the parameters {\tt
@@ -331,9 +332,9 @@ modules, as in the fully distributed version, you must set the parameters {\tt
 
 First, follow the instructions for compiling SYMPHONY in Section
 \ref{getting_started_windows} to ensure you have the proper settings. Once the
-stub files in the {\tt SYMPHONY-5.1$\backslash$USER} hierarchy are
-filled in, you should be able to compile the new application and run it
-successfully. 
+stub files in the {\tt SYMPHONY-5.1\bs SYMPHONY\bs Applications \bs USER} 
+hierarchy are filled in, you should be able to compile the new application 
+and run it successfully. 
 
 \section{Debugging Your Application}
 
@@ -354,8 +355,8 @@ reason, it is highly recommended to develop code that can be compiled
 serially even if you eventually intend to run in a fully distributed
 environment. This does make the coding marginally more complex, but
 believe me, it's worth the effort. The vast majority of your code will
-be the same for either case. Make sure to set the compile flag to
-``{\tt -g}'' in the makefile.
+be the same for either case. Make sure to use the configuration flag to
+``{\tt -enable-debug}'' while configuring (see Section \ref{configuring}). 
 
 \subsection{Debugging with PVM}
 \label{debugging-PVM}
@@ -376,10 +377,10 @@ operations is difficult to control. Random interactions can occur when
 processes run in parallel due to varying system loads, process
 priorities, etc. Therefore, it may not always be possible to duplicate
 errors. To force runs that you should be able to reproduce, make sure
-the parameter {\tt no\_cut\_timeout} appears in the parameter file or
+the parameter \ptt{no\_cut\_timeout} appears in the parameter file or
 start \BB\ with the ``{\tt -a}'' option. This will keep the cut
 generator from timing out, a major source of randomness. Furthermore,
-run with only one active node allowed at a time (set {\tt
+run with only one active node allowed at a time (set \ptt{
 max\_active\_nodes} to ``1''). This will keep the tree search from
 becoming random. These two steps should allow runs to be reproduced.
 You still have to be careful, but this should make things easier.
@@ -405,7 +406,7 @@ invalid branching. There are two options available for discovering
 such errors. The first is for checking the validity of added cuts.
 This checking must, of course, be done by the user, but \BB\ can
 facilitate such checking. To do this, the user must fill in the
-function \hyperref{{\tt user\_check\_validity\_of\_cut()}} {{\tt
+function \hyperref{{\tt user\_check\_validity\_of\_cut()}} {\ptt{
 user\_check\_validity\_of\_cut()} (see Section
 }{)}{user_check_validity_of_cut}. THIS function is called every time a
 cut is passed from the cut generator to the LP and can function as an
@@ -414,10 +415,9 @@ data structures) a known feasible solution. Then for each cut passed
 into the function, the user can check whether the cut is satisfied
 by the feasible solution. If not, then there is a problem! Of course,
 the problem could also be with the checking routine. 
-After filling in this function, the user must recompile everything
-(including the libraries) after uncommenting the line in the makefile
-that contains ``{\tt BB\_DEFINES += -DCHECK\_CUT\_VALIDITY}.'' Type
-``{\tt make clean\_all}'' and then ``{\tt make}.''
+After filling in this function, the user must configure SYMPHONY
+with the flag \texttt{--enable-cut-check} (see Section \ref{configuring}). 
+Type ``{\tt make clean}'' and then ``{\tt make}.''
 
 Tracing the optimal path can alert the user when the subproblem which
 admits a particular known feasible solution (at least
@@ -425,7 +425,7 @@ according to the branching restrictions that have been imposed so far)
 is pruned. This could be due to an invalid branching. Note that this
 option currently only works for branching on binary variables. To use
 this facility, the user must fill in the function \hyperref{{\tt
-user\_send\_feas\_sol()}} {{\tt user\_send\_feas\_sol()} (see Section
+user\_send\_feas\_sol()}} {\ptt {user\_send\_feas\_sol()} (see Section
 }{)}{user_send_feas_sol}. All that is required is to pass out an array
 of user indices that are in the feasible solution that you want to
 trace. Each time the subproblem which admits this feasible solution is
@@ -459,7 +459,7 @@ communicate with {\tt dg} and cause the graph to be drawn.
 Regrettably, this is currently a little more complicated than it needs
 to be and is not well documented. However, by looking at the sample
 application, it should be possible to see how it is done. To
-enable graph drawing, put the line {\tt do\_draw\_graph 1} into the
+enable graph drawing, put the line {\ptt {do\_draw\_graph 1} into the
 parameter file or use the {\tt -d} command line option. It can be difficult to
 get IGD to work. If you are interested in using it and cannot get it to work,
 feel free to contact me.
@@ -517,19 +517,5 @@ with SYMPHONY. Binaries for VBCTOOL can be obtained at \\
 {http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}
 {http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}}.
 
-
-\section{Other Resources}
-\label{resources}
-There is a \BB\ user's list serve for posting questions/comments.
-To subscribe, send ``{\tt subscribe symphony-users}'' to
-{\tt \htmladdnormallink{majordomo@branchandcut.org}
-{mailto:majordomo@branchandcut.org}}. There is also a Web site for
-\htmladdnormallink{SYMPHONY}{http://branchandcut.org/SYMPHONY} 
-\begin{latexonly}
-at {\tt http://branchandcut.org/SYMPHONY}
-\end{latexonly}.  
-Bug reports can be sent to \\
-{\tt \htmladdnormallink{symphony-bugs@branchandcut.org}
-{mailto:symphony-bugs@branchandcut.org}}.
 
 

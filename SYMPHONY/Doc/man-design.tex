@@ -758,11 +758,13 @@ pure integer programs (ILPs), but the principles are easily generalized. A
 bicriteria ILP is a generalization of a standard ILP presented earlier that
 includes a second objective function, yielding an optimization problem of the
 form
-\begin{EQ}[lrcl]
-\vmin & [cx, dx], \yesnumber \\
-\textrm{s.t.} & Ax & \leq & b, \label{bicrit} \\ 
-& x & \in & \Z^{n}. \\
-\end{EQ}
+\begin{equation}
+\begin{array}{lrcl}
+\vmin & [cx, dx],  \label{bicrit} \\
+\textrm{s.t.} & Ax & \leq & b, \\ 
+& x & \in & \Z^{n}.
+\end{array}
+\end{equation}
 The operator \emph{vmin} is understood to mean that solving this program is
 the problem of generating \emph{efficient} solutions, which are these feasible
 solutions $p$ to \ref{bicrit} for which there does not exist a second

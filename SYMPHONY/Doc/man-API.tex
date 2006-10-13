@@ -15,7 +15,7 @@
 \section{Using SYMPHONY Interactively}
 
 If you are planning to use the interactive optimizer, it is recommended to run
-the configuration script (see Section \ref{Configuring}) with
+the configuration script (see Section \ref{configuring}) with
 \begin{verbatim}
 ./configure --enable-gnu-packages 
 \end{verbatim}
@@ -160,9 +160,9 @@ relaxation:
 }
 As above, only the objective values of the feasible solutions found so far and 
 the termination code of the solution process will be displayed (see Section 
-\ref{opt_set} for displaying more output).  
+\ref{set_menu} for displaying more output).
 
-\subsection{Set Menu}
+\subsection{Set Menu}\label{set_menu}
 Set submenu is used to set SYMPHONY's run-time parameters. 
 To enter this submenu, type {\tt set}: 
 {\color{Brown}
@@ -332,8 +332,8 @@ submenu. The followings are all valid commands:
 SYMPHONY's callable library consists of a complete set of subroutines for
 loading and modifying problem data, setting parameters, and invoking solution
 algorithms. The user invokes these subroutines through the API specified in
-the header file \texttt{sym\_api.h}. Some of the basic commands are described
-below. For the sake of brevity, the arguments have been left out. 
+the header file \texttt{symphony\_api.h}. Some of the basic commands are 
+described below. For the sake of brevity, the arguments have been left out. 
 
 \paragraph{\ptt{sym\_open\_environment()}} Opens a new environment, and
 returns a pointer to it. This pointer then has to be passed as an argument to
@@ -586,8 +586,8 @@ The user has complete control over branching, cutting plane generation,
 management of the cut pool and the LP relaxation, search and diving
 strategies, and limited column generation. The callback functions are grouped
 by module according to their functionality. The names of the callback
-functions begin with the prefix \texttt{user\_}. For instance, the
-\texttt{user\_find\_cuts()} subroutine is used to implement subroutines for
+functions begin with the prefix \ptt{user\_}. For instance, the
+\ptt{user\_find\_cuts()} subroutine is used to implement subroutines for
 finding problem-specific cutting planes and is part of the cut generation
 module. A full list of callbacks is contained in Chapter \ref{API}.
 
@@ -603,3 +603,17 @@ functions to obtain an executable. Makefiles and Microsoft Visual C++ project
 files are provided for automatic compilation.
 
 \section{Getting Help}
+\label{resources}
+There is a \BB\ user's list serve for posting questions/comments.
+To subscribe, visit 
+\begin{center}
+\url{http://list.coin-or.org/mailman/listinfo/coin-symphony}
+\end{center}
+There is also a Web site for \BB\ at 
+\begin{center}
+\url{https://projects.coin-or.org/SYMPHONY}
+\end{center}
+Bug reports can be submitted to and viewed from 
+\begin{center}
+\url{https://projects.coin-or.org/SYMPHONY/report}
+\end{center}

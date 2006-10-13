@@ -38,7 +38,7 @@ void user_usage()
 SYMPHONY's command-line switches are all lower case letters. The user can use
 any upper case letter (except 'H' and as specified below) for command line
 switches to control user-defined parameter settings without the use of a
-parameter file. The function {\tt user\_usage()} can optionally print out
+parameter file. The function \ptt{user\_usage()} can optionally print out
 usage information for the user-defined command line switches. The command line
 switch {\tt -H} automatically calls the user's usage subroutine. The switch
 {\tt -h} prints \BB's own usage information. In its default configuration, the
@@ -387,8 +387,8 @@ In most cases, SYMPHONY's default routines for sending and receiving feasible
 solutions, as well as displaying them, will suffice. These routines simply
 display all nonzeros by either index or name, depending on whether the user
 set the column names. See
-\hyperref{{\tt user_send_feasible_solution()}} {{\tt
-user\_receive\_lp\_data()} in Section }{}{user_send_feasible_solution} for
+\hyperref{{\tt user_send_feasible_solution()}} 
+{\ptt{user\_receive\_lp\_data()} in Section }{}{user_send_feasible_solution} for
 more discussion.
 
 \args
@@ -440,7 +440,7 @@ where the user may need to worry about the configuration of the modules. If
 either the tree manager or the LP are running as a separate process (either
 {\tt COMPILE\_IN\_LP} or {\tt COMPILE\_IN\_TM} are {\tt FALSE} in the make
 file), then the data will be sent and received through message-passing. See
-\hyperref{{\tt user_receive_lp_data}} {{\tt user\_receive\_lp\_data()} in
+\hyperref{{\tt user_receive_lp_data}} {\ptt{user\_receive\_lp\_data()} in
 Section }{}{user_receive_lp_data} for more discussion. Otherwise, it can be
 copied through shared memory. The easiest solution, which is set up by default
 is to simply copy over a pointer to a single user data structure where
@@ -493,7 +493,7 @@ where the user may need to worry about the configuration of the modules. If
 either the tree manager or the LP are running as a separate process (either
 {\tt COMPILE\_IN\_LP} or {\tt COMPILE\_IN\_TM} are {\tt FALSE} in the {\tt
 make} file), then the data will be sent and received through message-passing.
-See \hyperref{{\tt user_receive_cg_data}} {{\tt user\_receive\_cg\_data()} in
+See \hyperref{{\tt user_receive_cg_data}} {\ptt{user\_receive\_cg\_data()} in
 Section }{}{user_receive_cg_data} for more discussion. Otherwise, it can be
 copied through shared memory. The easiest solution, which is set up by default
 is to simply copy over a pointer to a single user data structure where
@@ -546,7 +546,7 @@ where the user may need to worry about the configuration of the modules. If
 either the tree manager or the LP are running as a separate process (either
 {\tt COMPILE\_IN\_LP} or {\tt COMPILE\_IN\_TM} are {\tt FALSE} in the {\tt
 make} file), then the data will be sent and received through message-passing.
-See \hyperref{{\tt user_receive_cp_data}} {{\tt user\_receive\_cp\_data()} in
+See \hyperref{{\tt user_receive_cp_data}} {\ptt{user\_receive\_cp\_data()} in
 Section }{}{user_receive_cp_data} for more discussion. Otherwise, it can be
 copied through shared memory. The easiest solution, which is set up by default
 is to simply copy over a pointer to a single user data structure where

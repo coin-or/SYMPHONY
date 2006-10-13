@@ -393,19 +393,31 @@ problem to be able to warm start after a parameter or problem data
 modification. Thus, if it is intended to warm start later, the user 
 should set this parameter before solving the original problem.
 
+\item[\ptt{warm\_start\_node\_limit} -- integer ({\tt SYM\_INFINITY}).]
+\sindex[p]{\TP!warm\_start\_node\_limit}
+Setting this parameter will start the warm start routine using only the 
+first \ptt{warm\_start\_node\_limit} nodes generated during the 
+previous solve procedure. The rest of the tree will be trimmed. 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% NEW 
-% warm_start_node_ratio
-% warm_start_node_limit
-% warm_start_node_level_ratio
-% warm_start_node_level
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item[\ptt{warm\_start\_node\_ratio} -- double ({\tt 0.0}).]
+\sindex[p]{\TP!warm\_start\_node\_ratio}
+Setting this parameter will start the warm start routine using only the 
+first \ptt{warm\_start\_node\_ratio}\% of the nodes generated during the 
+previous solve procedure. 
 
+\item[\ptt{warm\_start\_node\_level} -- integer ({\tt SYM\_INFINITY}).]
+\sindex[p]{\TP!warm\_start\_node\_level}
+Setting this parameter will start the warm start routine using all the
+nodes above the level \ptt{warm\_start\_node\_level} of the 
+tree generated during the previous solve procedure. The rest of the tree 
+will be trimmed. 
 
+\item[\ptt{warm\_start\_node\_level\_ratio} -- double ({\tt 0.0}).]
+\sindex[p]{\TP!warm\_start\_node\_level\_ratio}
+Setting this parameter will start the warm start routine using all the
+nodes above the level \ptt{warm\_start\_node\_level}\% of the 
+warm start tree depth. The rest of the tree will be trimmed
 
-
-  
 \item[\ptt{logging} -- integer ({\tt NO\_LOGGING}\{0\}).] 
 \sindex[p]{\TP!logging}
 Whether or not to write out the state of the search tree and all other

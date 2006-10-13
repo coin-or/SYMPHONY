@@ -277,6 +277,64 @@ them.\\
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_read_mps
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\functiondef{sym\_read\_mps}
+\sindex[f]{sym\_read\_mps}
+\begin{verbatim}
+int sym_read_mps(sym_environment *env, char *infile)
+\end{verbatim}
+
+\bd
+\describe
+This routine is used to load an instance from an MPS file. 
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+{\tt char *infile} & IN & Pointer to a character array indicating the name 
+of the file. \\
+\et
+
+\returns
+\bt{lp{317pt}}
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
+\et
+\ed
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_read_gmpl
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\functiondef{sym\_read\_gmpl}
+\sindex[f]{sym\_read\_gmpl}
+\begin{verbatim}
+int sym_read_gmpl(sym_environment *env, char *modelfile, char *datafile)
+\end{verbatim}
+
+\bd
+\describe
+This routine is used to load an instance from a GMPL file. 
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+{\tt char *modelfile} & IN & Pointer to a character array indicating the name 
+of the model file. \\
+{\tt char *datafile} & IN & Pointer to a character array indicating the name 
+of the data file. \\
+\et
+
+\returns
+\bt{lp{317pt}}
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
+\et
+\ed
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % sym_solve
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -537,6 +595,8 @@ int sym_get_user_data(sym_environment *env, void **user)
 
 \bd
 \describe
+This routine is used to get the user's problem data structure from 
+SYMPHONY environment. 
 
 \args
 
@@ -1417,6 +1477,42 @@ least the number of rows.
 \et
 \ed
 
+\vspace{1ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sym_get_matrix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\functiondef{sym\_get\_matrix}
+\sindex[f]{sym\_get\_matrix}
+\begin{verbatim}
+int sym_get_matrix(sym_environment *env, int *nz, int *matbeg, int *matind, 
+		   double *matval)
+\end{verbatim}
+
+\bd
+\describe
+This routine is used to get the constraint matrix in a standard column-ordered format.
+\args
+
+\bt{llp{250pt}}
+{\tt sym\_environment *env} & IN & Pointer to the SYMPHONY environment. \\
+{\tt int *nz} & OUT &  Pointer to integer indicating the non zero elements of
+the constraint matrix. \\
+{\tt int *matbeg} & OUT & Pointer to a double type array to be filled 
+by the starting positions of each of 
+column. Note that, the size of this array has to be at least the number 
+of columns+1\\
+{\tt int *matind} & OUT  &Pointer to a double type array to be filled by the
+ row indices corresponding to each entry of {\tt matval}. Note that, the size of this array has to be at least the number of nonzero elements of the constraint matrix.\\ 
+{\tt int *matval} & OUT & Pointer to a double type array of the values of 
+nonzero entries of the constraint matrix in \emph{column order}.  Note that, the size of this array has to be at least the number of nonzero elements of the constraint matrix.\\
+\et
+\returns
+\bt{lp{317pt}}
+{\tt FUNCTION\_TERMINATED\_ABNORMALLY} & Function invoked unsuccessfully. \\
+{\tt FUNCTION\_TERMINATED\_NORMALLY} & Function invoked successfully.\\
+\et
+\ed
 \vspace{1ex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2821,26 +2917,7 @@ upper bound obtained for the new problem. This value will be set to
 \ed
 \vspace{1ex}
 
-%\end{description}
 \ed
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% NEW sym_read_mps
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% NEW sym_read_gmpl
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% NEW sym_get_matrix
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% NEW sym_test
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % END
