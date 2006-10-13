@@ -900,7 +900,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
       printf(" User indices (hexa) and values of nonzeros in the solution\n");
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-      for (i = 0; i < number; ){
+      for (i = 0; i < number; i++){
 	 if (xind[i] == p->mip->n) continue; /* For multi-criteria */
 	 printf("%7x %10.7f ", xind[i], xval[i]);
 	 if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
@@ -924,7 +924,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 printf(" User indices and values of fractional vars in solution\n");
 	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < number; ){
+	 for (i = 0; i < number; i++){
 	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
 	    tmpd = xval[i];
 	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
@@ -939,7 +939,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
       printf(" User indices (hexa) and values of frac vars in the solution\n");
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-      for (i = 0; i < number; ){
+      for (i = 0; i < number; i++){
 	 if (xind[i] == p->mip->n) continue; /* For multi-criteria */
 	 tmpd = xval[i];
 	 if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
