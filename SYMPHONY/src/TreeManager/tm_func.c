@@ -174,7 +174,9 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    tm->lp.free_num = par->max_active_nodes;
    for (i = 0; i < par->max_active_nodes; i++){
       if (termcodes[i] < 0){
-	 return(termcodes[i]);
+	 int tmp = termcodes[i];
+	 FREE(termcodes);
+	 return(tmp);
       }
    }
 #else
@@ -252,6 +254,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
     * Receive the root node and send out initial data to the LP processes
    \*------------------------------------------------------------------------*/
    
+   FREE(termcodes);
    if (tm->par.warm_start){
       if (!tm->rootnode){
 	 if (!(f = fopen(tm->par.warm_start_tree_file_name, "r"))){
