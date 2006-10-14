@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include "savings2.h"
 
-#include "BB_constants.h"
+#include "sym_constants.h"
 #include "heur_routines.h"
 #include "binomial.h"
 #include "vrp_common_types.h"

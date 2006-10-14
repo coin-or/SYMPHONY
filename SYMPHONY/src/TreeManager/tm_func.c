@@ -31,22 +31,22 @@ extern long random PROTO((void));
 #include "omp.h"
 #endif
 
-#include "tm.h"
-#include "BB_constants.h"
-#include "BB_types.h"
-#include "BB_macros.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "timemeas.h"
-#include "pack_cut.h"
-#include "pack_array.h"
+#include "sym_tm.h"
+#include "sym_constants.h"
+#include "sym_types.h"
+#include "sym_macros.h"
+#include "sym_messages.h"
+#include "sym_proccomm.h"
+#include "sym_timemeas.h"
+#include "sym_pack_cut.h"
+#include "sym_pack_array.h"
 #ifdef COMPILE_IN_LP
-#include "lp.h"
+#include "sym_lp.h"
 #endif
 #ifdef COMPILE_IN_TM
-#include "master.h"
+#include "sym_master.h"
 #else
-#include "cp.h"
+#include "sym_cp.h"
 #endif
 
 

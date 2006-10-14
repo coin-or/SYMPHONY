@@ -19,14 +19,14 @@
 
 /* SYMPHONY include files */
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#include "master.h"
+#include "sym_sym_master.h"
 /*___END_EXPERIMENTAL_SECTION___*/
-#include "BB_macros.h"
-#include "BB_constants.h"
-#include "proccomm.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
+#include "sym_sym_proccomm.h"
 #include "qsortucb.h"
-#include "dg_params.h"
-#include "master_u.h"
+#include "sym_sym_dg_params.h"
+#include "sym_sym_master_u.h"
 
 /* VRP include files */
 #include "vrp_const.h"
@@ -43,12 +43,12 @@
 #include "small_graph.h"
 #ifdef COMPILE_IN_TM
 #ifdef COMPILE_IN_CP
-#include "vrp_cp.h"
+#include "vrp_sym_sym_cp.h"
 #endif
 #ifdef COMPILE_IN_LP
-#include "vrp_lp.h"
+#include "vrp_sym_sym_lp.h"
 #ifdef COMPILE_IN_CG
-#include "vrp_cg.h"
+#include "vrp_sym_sym_cg.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_OUR_DECOMP
 #include "my_decomp.h"

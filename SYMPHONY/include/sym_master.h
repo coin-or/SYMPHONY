@@ -19,11 +19,11 @@
 
 #include <stdio.h>
 
-#include "BB_types.h"
-#include "BB_macros.h"
-#include "master_params.h"
+#include "sym_types.h"
+#include "sym_macros.h"
+#include "sym_master_params.h"
 #ifdef COMPILE_IN_TM
-#include "tm.h"
+#include "sym_tm.h"
 #endif
 
 /*===========================================================================*\

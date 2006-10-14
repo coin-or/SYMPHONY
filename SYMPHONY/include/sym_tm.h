@@ -17,13 +17,13 @@
 
 #define COMPILING_FOR_TM
 
-#include "tm_params.h"
-#include "BB_types.h"
+#include "sym_tm_params.h"
+#include "sym_types.h"
 #ifdef COMPILE_IN_CG
-#include "cg.h"
+#include "sym_cg.h"
 #endif
 #ifdef COMPILE_IN_CP
-#include "cp.h"
+#include "sym_cp.h"
 #endif
 
 /*===========================================================================*/

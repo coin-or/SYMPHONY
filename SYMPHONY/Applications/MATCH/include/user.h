@@ -17,8 +17,8 @@
 #ifndef _USER_H
 #define _USER_H
 
-#include "master.h"
-#include "BB_macros.h"
+#include "sym_master.h"
+#include "sym_macros.h"
 
 #define MAXNODES 200
 

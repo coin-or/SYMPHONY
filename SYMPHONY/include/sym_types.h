@@ -27,7 +27,7 @@
 #include <unistd.h>            /* this defines sleep() */
 #endif
 
-#include "proto.h"
+#include "sym_proto.h"
 
 typedef struct LP_SOL{
    int            lp;          /* the tid of the lp process asssociated with
@@ -322,7 +322,7 @@ typedef struct BC_NODE{
    branch_obj       bobj;
 
    node_desc  desc;          /* the description of the node,
-			       defined in "BB_types.h" */
+			       defined in "sym_types.h" */
    char       node_status;
 
    int          feasibility_status;

@@ -20,17 +20,17 @@
 #include <math.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "pack_cut.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_sym_pack_cut.h"
 #include "qsortucb.h"
-#include "cg.h"
+#include "sym_sym_cg.h"
 
 /* SPP include files */
 #include "spp_constants.h"
 #include "spp_types.h"
 #include "spp_common.h"
-#include "spp_cg.h"
+#include "spp_sym_sym_cg.h"
 #include "spp_cg_functions.h"
 
 /*****************************************************************************/

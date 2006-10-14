@@ -17,8 +17,8 @@
 #include <stdio.h>
 
 #include "savings3.h"
-#include "BB_macros.h"
-#include "BB_constants.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
 #include "heur_routines.h"
 #include "ins_routines2.h"
 #include "binomial.h"

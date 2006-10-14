@@ -23,7 +23,7 @@
 #include "lower_bound.h"
 #include "vrp_master_functions.h"
 #include "vrp_const.h"
-#include "proccomm.h"
+#include "sym_proccomm.h"
 
 /*===========================================================================*/
 

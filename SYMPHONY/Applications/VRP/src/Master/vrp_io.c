@@ -20,10 +20,10 @@
 #include <math.h>
 
 /* SYMPHONY include files */
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "master_u.h"
-#include "lp_params.h"
+#include "sym_macros.h"
+#include "sym_types.h"
+#include "sym_sym_master_u.h"
+#include "sym_sym_lp_params.h"
 
 /* VRP include files */
 #include "vrp_io.h"

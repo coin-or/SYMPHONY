@@ -14,10 +14,10 @@
 
 #include <stdlib.h>         /* has malloc() in AIX ... */
 
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "pack_array.h"
-#include "proccomm.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_pack_array.h"
+#include "sym_proccomm.h"
 
 /*===========================================================================*/
 

@@ -22,7 +22,7 @@
 
 #include "heur_types.h"
 #include "heur_common.h"
-#include "BB_constants.h"
+#include "sym_constants.h"
 #include "heur_routines.h"
 
 typedef struct SWEEP_DATA{

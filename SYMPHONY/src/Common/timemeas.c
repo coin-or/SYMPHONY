@@ -17,7 +17,7 @@
 #endif
 #include <stdio.h>
 
-#include "timemeas.h"
+#include "sym_timemeas.h"
 
 //extern int getrusage(int who, struct rusage *x);
 

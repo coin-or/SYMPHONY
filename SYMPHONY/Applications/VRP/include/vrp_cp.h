@@ -17,7 +17,7 @@
 #define _VRP_CP_H
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 
 typedef struct VRP_CP_PROBLEM{
    int vertnum;         /*number of vertices in the problem*/

@@ -19,9 +19,9 @@
 #include <math.h>
 #include <string.h>
 
-#include "lp_solver.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_lp_solver.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 
 
 /*===========================================================================*/

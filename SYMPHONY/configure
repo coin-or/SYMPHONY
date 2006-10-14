@@ -443,7 +443,7 @@ PACKAGE_VERSION='5.1'
 PACKAGE_STRING='SYMPHONY 5.1'
 PACKAGE_BUGREPORT='coin-symphony@list.coin-or.org'
 
-ac_unique_file="include/symphony_api.h"
+ac_unique_file="include/symphony.h"
 ac_default_prefix=`pwd`
 # Factoring default headers for most tests.
 ac_includes_default="\

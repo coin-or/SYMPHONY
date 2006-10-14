@@ -15,9 +15,9 @@
 #ifndef _LPSOLVER_H
 #define _LPSOLVER_H
 
-#include "proto.h"
-#include "BB_types.h"
-#include "lp_params.h"
+#include "sym_proto.h"
+#include "sym_types.h"
+#include "sym_lp_params.h"
 
 #define LP_MAX_ITER 9999999
 

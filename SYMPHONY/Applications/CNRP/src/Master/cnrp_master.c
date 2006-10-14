@@ -20,14 +20,14 @@
 
 /* SYMPHONY include files */
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#include "master.h"
+#include "sym_sym_master.h"
 /*___END_EXPERIMENTAL_SECTION___*/
-#include "BB_macros.h"
-#include "BB_constants.h"
-#include "proccomm.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
+#include "sym_sym_proccomm.h"
 #include "qsortucb.h"
-#include "dg_params.h"
-#include "master_u.h"
+#include "sym_sym_dg_params.h"
+#include "sym_sym_master_u.h"
 
 /* CNRP include files */
 #include "cnrp_const.h"
@@ -41,12 +41,12 @@
 #include "network.h"
 #ifdef COMPILE_IN_TM
 #ifdef COMPILE_IN_LP
-#include "cnrp_lp.h"
+#include "cnrp_sym_sym_lp.h"
 #ifdef COMPILE_IN_CG
-#include "cnrp_cg.h"
+#include "cnrp_sym_sym_cg.h"
 #endif
 #ifdef COMPILE_IN_CP
-#include "cnrp_cp.h"
+#include "cnrp_sym_sym_cp.h"
 #endif
 #endif
 #endif

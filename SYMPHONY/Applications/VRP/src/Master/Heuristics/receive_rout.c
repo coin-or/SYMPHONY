@@ -21,12 +21,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "BB_constants.h"
-#include "messages.h"
+#include "sym_messages.h"
 #include "receive_rout.h"
 #include "compute_cost.h"
 #include "vrp_master_functions.h"
 #include "network.h"
-#include "proccomm.h"
+#include "sym_proccomm.h"
 #include "vrp_const.h"
 #include "vrp_macros.h"
 

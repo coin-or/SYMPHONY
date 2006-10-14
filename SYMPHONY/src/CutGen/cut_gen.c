@@ -17,12 +17,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "proccomm.h"
-#include "messages.h"
-#include "cg.h"
-#include "timemeas.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_proccomm.h"
+#include "sym_messages.h"
+#include "sym_cg.h"
+#include "sym_timemeas.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 
 /*===========================================================================*/
 

@@ -18,7 +18,7 @@
 #define _START_HEURS_H
 
 #include "vrp_const.h"
-#include "proto.h"
+#include "sym_sym_proto.h"
 #include "vrp_types.h"
 #include "heur_types.h"
 #include "lb_types.h"

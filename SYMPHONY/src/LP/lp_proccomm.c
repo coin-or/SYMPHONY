@@ -16,17 +16,17 @@
 #include <memory.h>
 #include <math.h>
 
-#include "lp.h"
-#include "timemeas.h"
-#include "proccomm.h"
+#include "sym_lp.h"
+#include "sym_timemeas.h"
+#include "sym_proccomm.h"
 #include "qsortucb.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "messages.h"
-#include "pack_cut.h"
-#include "pack_array.h"
-#include "lp_solver.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_types.h"
+#include "sym_messages.h"
+#include "sym_pack_cut.h"
+#include "sym_pack_array.h"
+#include "sym_lp_solver.h"
 
 /*===========================================================================*/
 
@@ -441,7 +441,7 @@ int receive_cuts(lp_prob *p, int first_lp, int no_more_cuts_count)
 	 tvtimeout.tv_sec = 15; tvtimeout.tv_usec = 0;
 	 r_bufid = treceive_msg(ANYONE, YOU_CAN_DIE, &tvtimeout);
 	 if (! r_bufid){
-	    /* well, the cg has really died and the TM did not send a you can
+	    /* well, the sym_cg.has really died and the TM did not send a you can
 	       die message to us. Just comit harakiri. */
 	    printf("   Cut generator died -- halting machine\n\n");
 	    lp_exit(p);
@@ -455,7 +455,7 @@ int receive_cuts(lp_prob *p, int first_lp, int no_more_cuts_count)
 	 tvtimeout.tv_sec = 15; tvtimeout.tv_usec = 0;
 	 r_bufid = treceive_msg(ANYONE, YOU_CAN_DIE, &tvtimeout);
 	 if (! r_bufid){
-	    /* well, the cp has really died and the TM did not send a you can
+	    /* well, the sym_cp.has really died and the TM did not send a you can
 	       die message to us. Just comit harakiri. */
 	    printf("   Cut Pool died -- halting machine\n\n");
 	    lp_exit(p);

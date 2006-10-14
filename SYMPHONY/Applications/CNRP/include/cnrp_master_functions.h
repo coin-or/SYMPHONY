@@ -17,7 +17,7 @@
 #define _CNRP_ROUTINES_H
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 
 /* CNRP include files */
 #include "cnrp_types.h"

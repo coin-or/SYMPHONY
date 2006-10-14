@@ -16,12 +16,12 @@
 /* system include files */
 
 /* SYMPHONY include files */
-#include "BB_macros.h"
-#include "BB_constants.h"
-#include "dg.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
+#include "sym_sym_dg.h"
 
 /* CNRP include files */
-#include "cnrp_dg.h"
+#include "cnrp_sym_sym_dg.h"
 #include "cnrp_const.h"
 #include "cnrp_macros.h"
 

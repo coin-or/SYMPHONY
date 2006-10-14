@@ -17,7 +17,7 @@
 #define _NETWORK
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 
 /* CNRP include files */
 #include "cnrp_const.h"

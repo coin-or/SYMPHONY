@@ -15,8 +15,8 @@
 #ifndef _PROCCOMM_H
 #define _PROCCOMM_H
 
-#include "proto.h"
-#include "timemeas.h"
+#include "sym_proto.h"
+#include "sym_timemeas.h"
 
 #ifdef __PVM__
 #include <pvm3.h>

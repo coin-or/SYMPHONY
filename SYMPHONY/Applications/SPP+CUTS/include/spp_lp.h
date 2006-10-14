@@ -17,13 +17,13 @@
 #ifndef _SPP_LP_H_
 #define _SPP_LP_H_
 
-#include "proto.h"
-#include "BB_types.h"
-#include "dg_params.h"
-#include "lp.h"
+#include "sym_proto.h"
+#include "sym_types.h"
+#include "sym_dg_params.h"
+#include "sym_lp.h"
 
 #include "spp_types.h"
-#include "spp_lp_params.h"
+#include "spp_sym_lp_params.h"
 
 typedef struct SPP_LP_TMP {
    char               *ctmp_2nD;       /* length: 2*n*DSIZE */

@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 
 /* SPP include files */
 #include "spp_types.h"

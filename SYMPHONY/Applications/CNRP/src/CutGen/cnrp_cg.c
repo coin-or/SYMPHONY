@@ -18,14 +18,14 @@
 #include <string.h>
 
 /* SYMPHONY include files */
-#include "BB_macros.h"
-#include "BB_constants.h"
-#include "proccomm.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
+#include "sym_sym_proccomm.h"
 #include "qsortucb.h"
-#include "cg_u.h"
+#include "sym_sym_cg_u.h"
 
 /* CNRP include files */
-#include "cnrp_cg.h"
+#include "cnrp_sym_sym_cg.h"
 #include "cnrp_macros.h"
 #include "cnrp_const.h"
 

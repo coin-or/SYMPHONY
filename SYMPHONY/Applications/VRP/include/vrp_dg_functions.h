@@ -17,7 +17,7 @@
 #define _VRP_DG_FUNCTIONS_H
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 
 /* CNRP include files */
 #include "vrp_common_types.h"

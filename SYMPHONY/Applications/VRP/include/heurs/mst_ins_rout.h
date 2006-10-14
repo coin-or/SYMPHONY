@@ -17,7 +17,7 @@
 #ifndef _MST_INS_ROUT_H
 #define _MST_INS_ROUT_H
 
-#include "proto.h"
+#include "sym_sym_proto.h"
 #include "lb_types.h"
 #include "heur_types.h"
 

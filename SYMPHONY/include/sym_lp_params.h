@@ -15,8 +15,8 @@
 #ifndef _LP_PARAMS_H
 #define _LP_PARAMS_H
 
-#include "BB_constants.h"
-#include "timemeas.h"
+#include "sym_constants.h"
+#include "sym_timemeas.h"
 
 /*---------------------------------------------------------------------------*\
 | The list of parameters associated with processing a node in the branch and  |

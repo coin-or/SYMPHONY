@@ -17,12 +17,12 @@
 #ifndef _SPP_H
 #define _SPP_H
 
-#include "proto.h"
+#include "sym_proto.h"
 
 #include "spp_types.h"
 #include "spp_constants.h"
-#include "spp_cg_params.h"
-#include "spp_lp_params.h"
+#include "spp_sym_cg_params.h"
+#include "spp_sym_lp_params.h"
 
 /*---------------------------------------------------------------------------*\
  * Use this data structure to store the value of any run-time parameters.

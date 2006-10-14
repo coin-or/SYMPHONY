@@ -24,8 +24,8 @@
 #include <sys/types.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "proccomm.h"
+#include "sym_constants.h"
+#include "sym_sym_proccomm.h"
 #include "qsortucb.h"
 
 /* CNRP include files */

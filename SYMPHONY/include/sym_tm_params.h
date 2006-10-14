@@ -15,7 +15,7 @@
 #ifndef _TM_PARAMS_H
 #define _TM_PARAMS_H
 
-#include "proto.h"
+#include "sym_proto.h"
 
 /*===========================================================================*\
  * The params structure contains all of the user-specified parameters   

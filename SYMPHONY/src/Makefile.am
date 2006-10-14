@@ -40,36 +40,36 @@ SUBDIRS =
 ##############################################################################
 
 SYMHEADERS = \
-	../include/BB_constants.h \
-	../include/BB_macros.h \
-	../include/BB_types.h \
-	../include/cg.h \
-	../include/cg_params.h \
-	../include/cg_u.h \
-	../include/cp.h \
-	../include/cp_params.h \
-	../include/cp_u.h \
-	../include/dg.h \
-	../include/dg_params.h \
-	../include/dg_u.h \
-	../include/lp.h \
-	../include/lp_params.h \
-	../include/lp_solver.h \
-	../include/lp_u.h \
-	../include/master.h \
-	../include/master_params.h \
-	../include/master_u.h \
-	../include/messages.h \
-	../include/pack_array.h \
-	../include/pack_cut.h \
-	../include/proccomm.h \
-	../include/proto.h \
+	../include/sym_constants.h \
+	../include/sym_macros.h \
+	../include/sym_types.h \
+	../include/sym_cg.h \
+	../include/sym_cg_params.h \
+	../include/sym_cg_u.h \
+	../include/sym_cp.h \
+	../include/sym_cp_params.h \
+	../include/sym_cp_u.h \
+	../include/sym_dg.h \
+	../include/sym_dg_params.h \
+	../include/sym_dg_u.h \
+	../include/sym_lp.h \
+	../include/sym_lp_params.h \
+	../include/sym_lp_solver.h \
+	../include/sym_lp_u.h \
+	../include/sym_master.h \
+	../include/sym_master_params.h \
+	../include/sym_master_u.h \
+	../include/sym_messages.h \
+	../include/sym_pack_array.h \
+	../include/sym_pack_cut.h \
+	../include/sym_proccomm.h \
+	../include/sym_proto.h \
 	../include/qsortucb.h \
-	../include/return_values.h \
-	../include/symphony_api.h \
-	../include/timemeas.h \
-	../include/tm.h \
-	../include/tm_params.h
+	../include/sym_return_values.h \
+	../include/symphony.h \
+	../include/sym_timemeas.h \
+	../include/sym_tm.h \
+	../include/sym_tm_params.h
 
 
 #Add SymConfig.h even though it is not used - for COIN compability
@@ -523,43 +523,43 @@ EXTRA_PROGRAMS = symphony symphony_m symphony_m_tm symphony_m_tm_lp \
 
 bin_PROGRAMS = $(WHATTOMAKEBINS)
 
-symphony_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_SOURCES = $(MAIN_SRC) symphony.h
 symphony_DEPENDENCIES = $(LDADD) libSym.la
 symphony_CPPFLAGS = $(SYMCPPFLAGS)
 symphony_LDADD = libSym.la $(ALLLDADD)
 symphony_LDFLAGS = -rpath $(libdir)
 
-symphony_m_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_LDFLAGS = -rpath $(libdir)
 
-symphony_m_tm_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_tm_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_tm_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_LDFLAGS = -rpath $(libdir)
 
-symphony_m_tm_lp_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_tm_lp_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_tm_lp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_lp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_lp_LDFLAGS = -rpath $(libdir)
 
-symphony_m_tm_cp_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_tm_cp_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_tm_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_cp_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_cp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_cp_LDFLAGS = -rpath $(libdir)
 
-symphony_m_tm_lp_cg_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_tm_lp_cg_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_tm_lp_cg_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_cg_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_lp_cg_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_lp_cg_LDFLAGS = -rpath $(libdir)
 
-symphony_m_tm_lp_cg_cp_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_tm_lp_cg_cp_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_tm_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_lp_cg_cp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)

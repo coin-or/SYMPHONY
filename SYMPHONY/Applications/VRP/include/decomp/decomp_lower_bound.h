@@ -1,7 +1,7 @@
 #ifndef _DECOMP_LOWER_BOUND_H
 #define _DECOMP_LOWER_BOUND_H
 
-#include "proto.h"
+#include "sym_sym_proto.h"
 #include "cg_user.h"
 
 struct DBL_NEIGHBOR;

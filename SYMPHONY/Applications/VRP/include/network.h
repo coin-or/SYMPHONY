@@ -17,7 +17,7 @@
 #define _NETWORK
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 #include "qsortucb.h"
 
 /* VRP include files */

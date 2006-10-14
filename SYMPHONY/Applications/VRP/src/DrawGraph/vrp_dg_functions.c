@@ -18,12 +18,12 @@
 #include <stdio.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "proccomm.h"
-#include "dg_params.h"
+#include "sym_constants.h"
+#include "sym_sym_proccomm.h"
+#include "sym_sym_dg_params.h"
 
 /* VRP include files */
-#include "vrp_messages.h"
+#include "vrp_sym_sym_messages.h"
 #include "vrp_common_types.h"
 #include "vrp_dg_functions.h"
 #include "vrp_macros.h"

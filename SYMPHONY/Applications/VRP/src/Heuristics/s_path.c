@@ -16,7 +16,7 @@
 
 #include <stddef.h>
 
-#include "BB_constants.h"
+#include "sym_constants.h"
 #include "s_path.h"
 #include "vrp_const.h"
 #include "compute_cost.h"

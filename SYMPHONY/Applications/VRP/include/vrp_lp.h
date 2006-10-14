@@ -19,10 +19,10 @@
 #define COMPILING_FOR_LP
 
 /* SYMPHONY include files */
-#include "BB_types.h"
+#include "sym_types.h"
 
 /* VRP include files */
-#include "vrp_lp_params.h"
+#include "vrp_sym_lp_params.h"
 #include "vrp_common_types.h"
 #include "network.h"
 

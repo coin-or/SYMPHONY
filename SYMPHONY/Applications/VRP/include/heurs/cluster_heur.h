@@ -17,7 +17,7 @@
 #ifndef _CLUSTER_HEUR_H
 #define _CLUSTER_HEUR_H
 
-#include "proto.h"
+#include "sym_sym_proto.h"
 #include "vrp_types.h"
 
 void cluster_heur PROTO((vrp_problem *vrp, heur_params *heur_par,

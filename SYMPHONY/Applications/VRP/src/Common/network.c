@@ -20,8 +20,8 @@
 #include <stdlib.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 
 /* VRP include files */
 #include "network.h"

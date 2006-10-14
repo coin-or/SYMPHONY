@@ -16,8 +16,8 @@
 #include <stdio.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "cp_u.h"
+#include "sym_constants.h"
+#include "sym_sym_cp_u.h"
 
 /* User include files */
 #include "user.h"

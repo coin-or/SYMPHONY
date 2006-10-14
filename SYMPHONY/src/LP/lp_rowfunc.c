@@ -16,11 +16,11 @@
 #include <math.h>
 #include <string.h>
 
-#include "lp.h"
+#include "sym_lp.h"
 #include "qsortucb.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_types.h"
 
 /*===========================================================================*/
 

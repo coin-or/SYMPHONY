@@ -1,8 +1,8 @@
 #ifndef _DECOMP_H
 #define _DECOMP_H
 
-#include "proto.h"
-#include "cg.h"
+#include "sym_proto.h"
+#include "sym_cg.h"
 #include "decomp_types.h"
 
 int create_initial_lp PROTO((cg_prob *p));

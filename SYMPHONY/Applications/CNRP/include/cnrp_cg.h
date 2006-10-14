@@ -20,12 +20,12 @@
 #include <stdio.h>
 
 /* SYMPHONY include files */
-#include "BB_types.h"
-#include "proto.h"
+#include "sym_types.h"
+#include "sym_proto.h"
 
 /* CNRP include files */
 #include "network.h"
-#include "cnrp_cg_params.h"
+#include "cnrp_sym_cg_params.h"
 
 typedef struct CG_CNRP_SPEC{
    cnrp_cg_params par;

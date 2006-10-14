@@ -81,7 +81,7 @@
 #define TM_FIRST_PHASE_FINISHED          212
 
 /* there are message codes here, too. reserve 225-300 for these */
-#include "return_values.h"
+#include "sym_return_values.h"
 
 /*===========================================================================*
  * treemanager-->lp messages

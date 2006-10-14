@@ -18,8 +18,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "tsp_fini.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 #include "tsp_ins_rout.h"
 #include "s_path.h"
 #include "heur_routines.h"

@@ -18,7 +18,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "proccomm.h"
+#include "sym_proccomm.h"
 #include "intermediary.h"
 
 void main(void)

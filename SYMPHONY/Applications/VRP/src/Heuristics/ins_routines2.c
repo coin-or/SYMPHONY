@@ -16,13 +16,13 @@
 
 #include <math.h>
 
-#include "BB_constants.h"
+#include "sym_constants.h"
 #include "ins_routines2.h"
 #include "sweep.h"
 #include "qsort.h"
-#include "messages.h"
+#include "sym_sym_messages.h"
 #include "vrp_const.h"
-#include "proccomm.h"
+#include "sym_sym_proccomm.h"
 #include "compute_cost.h"
 #include "heur_routines.h"
 #include <string.h>

@@ -19,8 +19,8 @@
 #include <string.h>
 
 /* SYMPHONY include files */
-#include "BB_macros.h"
-#include "symphony_api.h"
+#include "sym_macros.h"
+#include "symphony.h"
 
 #define LENGTH 100
 

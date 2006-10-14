@@ -1,7 +1,7 @@
 #ifndef _MIN_CUT_H
 #define _MIN_CUT_H
 
-#include "proto.h"
+#include "sym_sym_proto.h"
 #include "cg_user.h"
 #include "network.h"
 

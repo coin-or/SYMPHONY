@@ -17,13 +17,13 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "timemeas.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "lp_params.h"
-#include "master.h"
-#include "master_u.h"
+#include "sym_timemeas.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_types.h"
+#include "sym_lp_params.h"
+#include "sym_master.h"
+#include "sym_master_u.h"
 
 void usage(void);
 

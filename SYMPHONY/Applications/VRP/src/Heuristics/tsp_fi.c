@@ -17,7 +17,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "tsp_fi.h"
-#include "BB_constants.h"
+#include "sym_constants.h"
 #include "tsp_ins_rout.h"
 #include "s_path.h"
 #include "heur_routines.h"

@@ -15,9 +15,9 @@
 /*===========================================================================*/
 
 #include <stdio.h>
-#include "BB_macros.h"
+#include "sym_macros.h"
 #include "vrp_const.h"
-#include "proccomm.h"
+#include "sym_sym_proccomm.h"
 #include "heur_routines.h"
 
 /*===========================================================================*/

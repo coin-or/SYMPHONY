@@ -18,20 +18,20 @@
 #include <string.h>
 
 /* SYMPHONY include files */
-#include "BB_macros.h"
-#include "BB_constants.h"
-#include "proccomm.h"
-#include "cg_u.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
+#include "sym_sym_proccomm.h"
+#include "sym_sym_cg_u.h"
 
 /* VRP include files */
-#include "vrp_cg.h"
+#include "vrp_sym_sym_cg.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
 #include "my_decomp.h"
 #include "decomp.h"
 #endif
-#include "dg_params.h"
-#include "vrp_dg.h"
+#include "sym_sym_dg_params.h"
+#include "vrp_sym_sym_dg.h"
 /*___END_EXPERIMENTAL_SECTION___*/
 #include "vrp_macros.h"
 #include "vrp_const.h"
@@ -992,7 +992,7 @@ void user_send_to_sol_pool(cg_prob *p)
 #ifdef CHECK_CUT_VALIDITY
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 
-#include "cg.h"
+#include "sym_sym_cg.h"
 /*___END_EXPERIMENTAL_SECTION___*/
 
 int user_check_validity_of_cut(void *user, cut_data *new_cut)

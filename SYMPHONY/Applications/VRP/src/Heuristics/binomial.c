@@ -16,8 +16,8 @@
 
 #include <stdio.h>
 
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 #include "binomial.h"
 #include "vrp_const.h"
 #include <stdlib.h>

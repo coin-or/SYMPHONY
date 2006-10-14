@@ -19,14 +19,14 @@
 #include <string.h>
 #include "BB_constants.h"
 #include "BB_macros.h"
-#include "messages.h"
+#include "sym_messages.h"
 #include "vrp_const.h"
 #include "route_heur.h"
-#include "timemeas.h"
+#include "sym_timemeas.h"
 #include <pvm3.h>
 #include <stdio.h>
 #include "compute_cost.h"
-#include "proccomm.h"
+#include "sym_proccomm.h"
 #include "heur_routines.h"
 #include "receive_rout.h"
 /*----------------------------------------------------------------------*\

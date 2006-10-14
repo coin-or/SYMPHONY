@@ -21,14 +21,14 @@
 #include <string.h>           /* memset() is defined here in LINUX */
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "cg.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_sym_messages.h"
+#include "sym_sym_proccomm.h"
+#include "sym_sym_cg.h"
 
 /* VRP include files */
-#include "vrp_cg.h"
+#include "vrp_sym_sym_cg.h"
 #include "vrp_macros.h"
 #include "network.h"
 

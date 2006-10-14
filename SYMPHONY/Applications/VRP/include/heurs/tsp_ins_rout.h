@@ -18,7 +18,7 @@
 #define _TSP_INS_ROUT_H
 
 #include "heur_types.h"
-#include "proto.h"
+#include "sym_sym_proto.h"
 
 int tsp_farthest_ins_from_to PROTO((
 			 heur_prob *p, _node *tour, int cost,

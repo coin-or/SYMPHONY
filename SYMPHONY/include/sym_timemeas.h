@@ -16,12 +16,12 @@
 #define __TIMEMEAS_H
 
 #ifdef WIN32
-#include "win32_time.h"
+#include "sym_win32_time.h"
 #else
 #include <sys/time.h>
 #endif
 
-#include "proto.h"
+#include "sym_proto.h"
 
 #define PRINT_TIME(tm, f) { /* Print the elapsed time in vbctool format*/    \
    double elapsed = wall_clock(NULL) - tm->start_time;                       \

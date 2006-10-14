@@ -21,19 +21,19 @@
 #include <math.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "proccomm.h"
-#include "messages.h"
-#include "timemeas.h"
-#include "lp_u.h"
-#include "dg_params.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_sym_proccomm.h"
+#include "sym_sym_messages.h"
+#include "sym_sym_timemeas.h"
+#include "sym_sym_lp_u.h"
+#include "sym_sym_dg_params.h"
 #ifdef MULTI_CRITERIA
-#include "cg_u.h"
+#include "sym_sym_cg_u.h"
 #endif
 
 /* CNRP include files */
-#include "cnrp_lp.h"
+#include "cnrp_sym_sym_lp.h"
 #include "cnrp_dg_functions.h"
 #include "cnrp_macros.h"
 #include "cnrp_const.h"
@@ -1892,7 +1892,7 @@ char construct_feasible_solution(cnrp_spec *cnrp, network *n,
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef TRACE_PATH
 
-#include "lp.h"
+#include "sym_sym_lp.h"
 
 void check_lp(lp_prob *p)
 {

@@ -22,20 +22,20 @@
 #include <pvmtev.h>
 #endif
 
-#include "symphony_api.h"
-#include "proccomm.h"
-#include "timemeas.h"
-#include "messages.h"
-#include "BB_macros.h"
-#include "pack_cut.h"
-#include "pack_array.h"
-#include "master.h"
-#include "master_u.h"
-#include "lp_solver.h"
+#include "symphony.h"
+#include "sym_proccomm.h"
+#include "sym_timemeas.h"
+#include "sym_messages.h"
+#include "sym_macros.h"
+#include "sym_pack_cut.h"
+#include "sym_pack_array.h"
+#include "sym_master.h"
+#include "sym_master_u.h"
+#include "sym_lp_solver.h"
 #ifdef COMPILE_IN_TM
-#include "tm.h"
+#include "sym_tm.h"
 #ifdef COMPILE_IN_LP
-#include "lp.h"
+#include "sym_lp.h"
 #endif
 #endif
 

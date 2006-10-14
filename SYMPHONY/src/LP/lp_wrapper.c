@@ -19,23 +19,23 @@
 #include <memory.h>
 #include <math.h>
 
-#include "lp.h"
-#include "master.h" 
-#include "proccomm.h"
+#include "sym_lp.h"
+#include "sym_master.h" 
+#include "sym_proccomm.h"
 #include "qsortucb.h"
-#include "messages.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "lp_solver.h"
+#include "sym_messages.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_types.h"
+#include "sym_lp_solver.h"
 #ifdef USE_CGL_CUTS
-#include "cg.h"
+#include "sym_cg.h"
 #endif
 #if defined (COMPILE_IN_LP) && defined (COMPILE_IN_TM)
-#include "master_u.h"
+#include "sym_master_u.h"
 #endif
 #ifdef COMPILE_IN_CP
-#include "cp.h"
+#include "sym_cp.h"
 #endif
 
 /*===========================================================================*/

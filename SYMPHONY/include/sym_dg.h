@@ -17,9 +17,9 @@
 
 #include <stdio.h>
 
-#include "proto.h"
-#include "dg_params.h"
-#include "dg_u.h"
+#include "sym_proto.h"
+#include "sym_dg_params.h"
+#include "sym_dg_u.h"
 
 #ifndef PIPE_ERROR
 #define PIPE_ERROR {printf("PIPE_ERROR !!!!!!!!!!!"); }

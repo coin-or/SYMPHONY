@@ -15,16 +15,16 @@
 #ifndef _MASTER_PARAMS_H
 #define _MASTER_PARAMS_H
 
-#include "tm_params.h"
-#include "cp_params.h"
+#include "sym_tm_params.h"
+#include "sym_cp_params.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
-#include "sp_params.h"
+#include "sym_sp_params.h"
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
-#include "cg_params.h"
-#include "lp_params.h"
-#include "dg_params.h"
+#include "sym_cg_params.h"
+#include "sym_lp_params.h"
+#include "sym_dg_params.h"
 
 /*===========================================================================*\
  * The params structure contains all of the user-specified parameters

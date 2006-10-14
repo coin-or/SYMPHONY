@@ -15,10 +15,10 @@
 #ifndef _CUT_POOL_H
 #define _CUT_POOL_H
 
-#include "proto.h"
-#include "BB_types.h"
-#include "cp_params.h"
-#include "cp_u.h"
+#include "sym_proto.h"
+#include "sym_types.h"
+#include "sym_cp_params.h"
+#include "sym_cp_u.h"
 
 #define PREPARE_TO_CHECK_CUTS  0
 #define CHECK_ONE_CUT          1

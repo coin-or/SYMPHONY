@@ -17,7 +17,7 @@
 #define _CNRP_DG_FUNCTIONS_H
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 
 /* CNRP include files */
 #include "cnrp_common_types.h"

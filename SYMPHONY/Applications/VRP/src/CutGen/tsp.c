@@ -17,13 +17,13 @@
 #include <string.h>
 
 /* SYMPHONY include files */
-#include "BB_macros.h"
-#include "BB_constants.h"
-#include "proto.h"
-#include "cg.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
+#include "sym_sym_proto.h"
+#include "sym_sym_cg.h"
 
 /* VRP include files */
-#include "vrp_cg.h"
+#include "vrp_sym_sym_cg.h"
 #include "tsp.h"
 #include "network.h"
 

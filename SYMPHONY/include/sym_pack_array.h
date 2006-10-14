@@ -15,8 +15,8 @@
 #ifndef _PACK_ARRAY_H
 #define _PACK_ARRAY_H
 
-#include "proto.h"
-#include "BB_types.h"
+#include "sym_proto.h"
+#include "sym_types.h"
 
 void pack_array_desc PROTO((array_desc *adesc));
 array_desc *unpack_array_desc PROTO((array_desc *padesc));

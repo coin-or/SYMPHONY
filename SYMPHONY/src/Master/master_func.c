@@ -24,16 +24,16 @@
 #include <pvmtev.h>
 #endif
 
-#include "master.h"
-#include "master_u.h"
-#include "BB_macros.h"
-#include "pack_cut.h"
-#include "pack_array.h"
-#include "lp_solver.h"
-/* FIXME remove lp.h after carrying the heuristics to lp_wrapper*/
-/* and from master.h */
-//#include "lp.h"
-#include "tm.h"
+#include "sym_master.h"
+#include "sym_master_u.h"
+#include "sym_macros.h"
+#include "sym_pack_cut.h"
+#include "sym_pack_array.h"
+#include "sym_lp_solver.h"
+/* FIXME remove sym_lp.h after carrying the heuristics to lp_wrapper*/
+/* and from sym_master.h */
+//#include "sym_lp.h"
+#include "sym_tm.h"
 
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 /*===========================================================================*/

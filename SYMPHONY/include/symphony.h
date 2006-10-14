@@ -17,9 +17,9 @@
 
 #define COMPILING_FOR_MASTER
 
-#include "proto.h"
-#include "master.h"
-#include "messages.h"
+#include "sym_proto.h"
+#include "sym_master.h"
+#include "sym_messages.h"
 
 /*===========================================================================*/
 /*===================== Interface functions (master.c) ======================*/

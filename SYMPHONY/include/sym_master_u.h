@@ -15,7 +15,7 @@
 #ifndef MASTER_U_H
 #define MASTER_U_H
 
-#include "proto.h"
+#include "sym_proto.h"
 
 /*===========================================================================*/
 /*======================= User supplied functions ===========================*/

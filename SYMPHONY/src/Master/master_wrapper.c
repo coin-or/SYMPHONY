@@ -20,16 +20,16 @@
 #endif
 
 #include "qsortucb.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "symphony_api.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "master.h"
-#include "master_u.h"
-#include "lp_solver.h"
+#include "sym_messages.h"
+#include "sym_proccomm.h"
+#include "symphony.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_master.h"
+#include "sym_master_u.h"
+#include "sym_lp_solver.h"
 #ifdef COMPILE_IN_TM
-#include "lp.h"
+#include "sym_lp.h"
 #endif
 
 /*===========================================================================*/

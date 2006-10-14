@@ -15,9 +15,9 @@
 /*===========================================================================*/
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "lp_u.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_sym_lp_u.h"
 
 /*===========================================================================*/
 

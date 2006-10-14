@@ -16,7 +16,7 @@
 
 #include <stddef.h>
 
-#include "BB_constants.h"
+#include "sym_constants.h"
 #include "binomial.h"
 #include "savings3.h"//lazimmi dene
 #include "ins_routines2.h"

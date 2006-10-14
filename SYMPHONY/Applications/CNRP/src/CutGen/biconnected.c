@@ -16,10 +16,10 @@
 /* system include files */
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
+#include "sym_constants.h"
 
 /* CNRP include files */
-#include "cnrp_cg.h"
+#include "cnrp_sym_sym_cg.h"
 
 /*===========================================================================*\
  * This file contains functions for finding biconnected components.

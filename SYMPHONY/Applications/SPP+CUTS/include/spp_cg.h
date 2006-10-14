@@ -19,12 +19,12 @@
 
 /* system include files */
 #include <stdio.h>
-#include <proto.h>
+#include <sym_proto.h>
 
 /* SPP include files */
 #include "spp_constants.h"
 #include "spp_types.h"
-#include "spp_cg_params.h"
+#include "spp_sym_cg_params.h"
 
 typedef struct FNODE {        /*describes a node of the fractional graph*/
    int          *nbrs;        /* pointer into all_nbr */

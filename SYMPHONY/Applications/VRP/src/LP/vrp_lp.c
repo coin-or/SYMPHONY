@@ -21,16 +21,16 @@
 #include <math.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "proccomm.h"
-#include "messages.h"
-#include "timemeas.h"
-#include "lp_u.h"
-#include "dg_params.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_sym_proccomm.h"
+#include "sym_sym_messages.h"
+#include "sym_sym_timemeas.h"
+#include "sym_sym_lp_u.h"
+#include "sym_sym_dg_params.h"
 
 /* VRP include files */
-#include "vrp_lp.h"
+#include "vrp_sym_sym_lp.h"
 #include "vrp_dg_functions.h"
 #include "vrp_macros.h"
 #include "vrp_const.h"
@@ -1193,7 +1193,7 @@ void construct_feasible_solution(vrp_lp_problem *vrp, network *n,
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef TRACE_PATH
 
-#include "lp.h"
+#include "sym_sym_lp.h"
 
 void check_lp(lp_prob *p)
 {

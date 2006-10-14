@@ -17,22 +17,22 @@
 
 #define COMPILING_FOR_LP
 
-#include "timemeas.h"
-#include "lp_params.h"
-#include "BB_types.h"
-#include "lp_solver.h"
-#include "lp_u.h"
+#include "sym_timemeas.h"
+#include "sym_lp_params.h"
+#include "sym_types.h"
+#include "sym_lp_solver.h"
+#include "sym_lp_u.h"
 
 #ifdef COMPILE_IN_CG
-#include "cg.h"
+#include "sym_cg.h"
 #endif
 
 #ifdef COMPILE_IN_CP
-#include "cp.h"
+#include "sym_cp.h"
 #endif
 
 #ifdef COMPILE_IN_LP
-#include "tm.h"
+#include "sym_tm.h"
 #endif
 
 /*===========================================================================*/

@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
 #else
 
-#include "symphony_api.h"
+#include "symphony.h"
 #include <stdlib.h>
 
 int main(int argc, char **argv)

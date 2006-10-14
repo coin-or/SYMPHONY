@@ -30,7 +30,7 @@
 
 /*-------------------------------------------------------------------------*/
 
-#include "symphony_api.h"
+#include "symphony.h"
 #include <iostream>
 
 int main(int argc, char* argv[]){

@@ -15,14 +15,14 @@
 #ifndef _CUT_GEN_H
 #define _CUT_GEN_H
 
-#include "BB_types.h"
-#include "cg_params.h"
-#include "cg_u.h"
-#include "lp_solver.h"
+#include "sym_types.h"
+#include "sym_cg_params.h"
+#include "sym_cg_u.h"
+#include "sym_lp_solver.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #ifdef COMPILE_DECOMP
-#include "lp_solver.h"
-#include "decomp_types.h"
+#include "sym_lp_solver.h"
+#include "sym_decomp_types.h"
 #endif
 
 /*===========================================================================*/

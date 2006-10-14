@@ -12,33 +12,24 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _CG_U_H
-#define _CG_U_H
+#ifndef _CP_U_H
+#define _CP_U_H
 
-#include "BB_types.h"
-
-int cg_add_explicit_cut PROTO((int nzcnt, int *indices, double *values,
-			       double rhs, double range, char sense,
-			       char send_to_cp, int *num_cuts, int *alloc_cuts,
-			       cut_data ***cuts));
-int cg_add_user_cut PROTO((cut_data *new_cut, int *num_cuts, int *alloc_cuts, 
-			   cut_data ***cuts));
-int cg_send_cut PROTO((cut_data *new_cut, int *num_cuts, int *alloc_cuts,
-		       cut_data ***cuts));
+#include "sym_proto.h"
+#include "sym_types.h"
 
 /*===========================================================================*/
-/*======================= User supplied functions ===========================*/
+/*====================== User supplied functions ============================*/
 /*===========================================================================*/
 
-int user_receive_cg_data PROTO((void **user, int dg_id));
-int user_free_cg PROTO((void **user));
-int user_find_cuts PROTO((void *user, int varnum, int iter_num, int level,
-			  int index, double objval, int *indices,
-			  double *values, double ub, double lpetol,
-			  int *num_cuts, int *alloc_cuts, cut_data ***cuts));
-int user_receive_lp_solution_cg PROTO((void *user));
-#ifdef CHECK_CUT_VALIDITY
-int user_check_validity_of_cut PROTO((void *user, cut_data *new_cut));
-#endif
+int user_receive_cp_data PROTO((void **user));
+int user_free_cp PROTO((void **user));
+int user_prepare_to_check_cuts PROTO((void *user, int varnum, int *indices,
+				      double *values));
+int user_check_cut PROTO((void *user, double lpetol, int varnum, int *indices,
+			  double *values, cut_data *cut, int *is_violated,
+			  double *quality));
+int user_finished_checking_cuts PROTO((void *user));
+int user_receive_lp_solution_cp PROTO((void *user));
 
 #endif

@@ -17,7 +17,7 @@
 #ifndef _COLLECT_SOLUTIONS_H
 #define _COLLECT_SOLUTIONS_H 
 
-#include "proto.h"
+#include "sym_sym_proto.h"
 #include "vrp_types.h"
 
 double collect_solutions PROTO((vrp_problem *vrp, int trials, int *last, 

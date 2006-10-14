@@ -18,14 +18,14 @@
 #include <math.h>
 #include <string.h>
 
-#include "proccomm.h"
+#include "sym_proccomm.h"
 #include "qsortucb.h"
-#include "lp.h"
-#include "messages.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "pack_cut.h"
+#include "sym_lp.h"
+#include "sym_messages.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_types.h"
+#include "sym_pack_cut.h"
 
 /*===========================================================================*/
 

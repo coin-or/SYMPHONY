@@ -17,7 +17,7 @@
 #ifndef _HEUR_ROUTINES_H
 #define _HEUR_ROUTINES_H
 
-#include "proto.h"
+#include "sym_sym_proto.h"
 #include "heur_types.h"
 #include "lb_types.h"
 

@@ -174,18 +174,21 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libSym_la_LIBADD =
 am__libSym_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
@@ -226,18 +229,21 @@ am_libSym_la_OBJECTS = $(am__objects_2) $(am__objects_15)
 libSym_la_OBJECTS = $(am_libSym_la_OBJECTS)
 libSymAppl_la_LIBADD =
 am__libSymAppl_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
@@ -310,18 +316,21 @@ am_libSymAppl_cp_la_OBJECTS = $(am__objects_2) $(am__objects_40)
 libSymAppl_cp_la_OBJECTS = $(am_libSymAppl_cp_la_OBJECTS)
 libSymAppl_lp_la_LIBADD =
 am__libSymAppl_lp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h LP/lp_solver.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h LP/lp_solver.c \
 	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
 	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
@@ -355,18 +364,21 @@ am_libSymAppl_lp_la_OBJECTS = $(am__objects_2) $(am__objects_50)
 libSymAppl_lp_la_OBJECTS = $(am_libSymAppl_lp_la_OBJECTS)
 libSymAppl_lp_cg_la_LIBADD =
 am__libSymAppl_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h LP/lp_solver.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h LP/lp_solver.c \
 	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
 	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
@@ -404,18 +416,21 @@ am_libSymAppl_lp_cg_la_OBJECTS = $(am__objects_2) $(am__objects_60)
 libSymAppl_lp_cg_la_OBJECTS = $(am_libSymAppl_lp_cg_la_OBJECTS)
 libSymAppl_m_la_LIBADD =
 am__libSymAppl_m_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -475,18 +490,21 @@ am_libSymAppl_m_la_OBJECTS = $(am__objects_2) $(am__objects_76)
 libSymAppl_m_la_OBJECTS = $(am_libSymAppl_m_la_OBJECTS)
 libSymAppl_m_tm_la_LIBADD =
 am__libSymAppl_m_tm_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -551,18 +569,21 @@ am_libSymAppl_m_tm_la_OBJECTS = $(am__objects_2) $(am__objects_92)
 libSymAppl_m_tm_la_OBJECTS = $(am_libSymAppl_m_tm_la_OBJECTS)
 libSymAppl_m_tm_cp_la_LIBADD =
 am__libSymAppl_m_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -629,18 +650,21 @@ am_libSymAppl_m_tm_cp_la_OBJECTS = $(am__objects_2) $(am__objects_108)
 libSymAppl_m_tm_cp_la_OBJECTS = $(am_libSymAppl_m_tm_cp_la_OBJECTS)
 libSymAppl_m_tm_lp_la_LIBADD =
 am__libSymAppl_m_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -707,18 +731,21 @@ am_libSymAppl_m_tm_lp_la_OBJECTS = $(am__objects_2) $(am__objects_124)
 libSymAppl_m_tm_lp_la_OBJECTS = $(am_libSymAppl_m_tm_lp_la_OBJECTS)
 libSymAppl_m_tm_lp_cg_la_LIBADD =
 am__libSymAppl_m_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -784,18 +811,21 @@ libSymAppl_m_tm_lp_cg_la_OBJECTS =  \
 	$(am_libSymAppl_m_tm_lp_cg_la_OBJECTS)
 libSymAppl_m_tm_lp_cg_cp_la_LIBADD =
 am__libSymAppl_m_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -859,18 +889,21 @@ libSymAppl_m_tm_lp_cg_cp_la_OBJECTS =  \
 	$(am_libSymAppl_m_tm_lp_cg_cp_la_OBJECTS)
 libSymAppl_tm_la_LIBADD =
 am__libSymAppl_tm_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
@@ -926,18 +959,21 @@ am_libSymAppl_tm_la_OBJECTS = $(am__objects_2) $(am__objects_169)
 libSymAppl_tm_la_OBJECTS = $(am_libSymAppl_tm_la_OBJECTS)
 libSymAppl_tm_cp_la_LIBADD =
 am__libSymAppl_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
@@ -995,18 +1031,21 @@ am_libSymAppl_tm_cp_la_OBJECTS = $(am__objects_2) $(am__objects_182)
 libSymAppl_tm_cp_la_OBJECTS = $(am_libSymAppl_tm_cp_la_OBJECTS)
 libSymAppl_tm_lp_la_LIBADD =
 am__libSymAppl_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
@@ -1064,18 +1103,21 @@ am_libSymAppl_tm_lp_la_OBJECTS = $(am__objects_2) $(am__objects_195)
 libSymAppl_tm_lp_la_OBJECTS = $(am_libSymAppl_tm_lp_la_OBJECTS)
 libSymAppl_tm_lp_cg_la_LIBADD =
 am__libSymAppl_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
@@ -1133,18 +1175,21 @@ am_libSymAppl_tm_lp_cg_la_OBJECTS = $(am__objects_2) \
 libSymAppl_tm_lp_cg_la_OBJECTS = $(am_libSymAppl_tm_lp_cg_la_OBJECTS)
 libSymAppl_tm_lp_cg_cp_la_LIBADD =
 am__libSymAppl_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
@@ -1227,18 +1272,21 @@ am_libSym_cp_la_OBJECTS = $(am__objects_2) $(am__objects_233)
 libSym_cp_la_OBJECTS = $(am_libSym_cp_la_OBJECTS)
 libSym_lp_la_LIBADD =
 am__libSym_lp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h LP/lp_solver.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h LP/lp_solver.c \
 	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
 	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
@@ -1269,18 +1317,21 @@ am_libSym_lp_la_OBJECTS = $(am__objects_2) $(am__objects_243)
 libSym_lp_la_OBJECTS = $(am_libSym_lp_la_OBJECTS)
 libSym_lp_cg_la_LIBADD =
 am__libSym_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h LP/lp_solver.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h LP/lp_solver.c \
 	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
 	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
@@ -1314,18 +1365,21 @@ am_libSym_lp_cg_la_OBJECTS = $(am__objects_2) $(am__objects_253)
 libSym_lp_cg_la_OBJECTS = $(am_libSym_lp_cg_la_OBJECTS)
 libSym_m_la_LIBADD =
 am__libSym_m_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1382,18 +1436,21 @@ am_libSym_m_la_OBJECTS = $(am__objects_2) $(am__objects_269)
 libSym_m_la_OBJECTS = $(am_libSym_m_la_OBJECTS)
 libSym_m_tm_la_LIBADD =
 am__libSym_m_tm_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1455,18 +1512,21 @@ am_libSym_m_tm_la_OBJECTS = $(am__objects_2) $(am__objects_285)
 libSym_m_tm_la_OBJECTS = $(am_libSym_m_tm_la_OBJECTS)
 libSym_m_tm_cp_la_LIBADD =
 am__libSym_m_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1533,18 +1593,21 @@ am_libSym_m_tm_cp_la_OBJECTS = $(am__objects_2) $(am__objects_301)
 libSym_m_tm_cp_la_OBJECTS = $(am_libSym_m_tm_cp_la_OBJECTS)
 libSym_m_tm_lp_la_LIBADD =
 am__libSym_m_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1611,18 +1674,21 @@ am_libSym_m_tm_lp_la_OBJECTS = $(am__objects_2) $(am__objects_317)
 libSym_m_tm_lp_la_OBJECTS = $(am_libSym_m_tm_lp_la_OBJECTS)
 libSym_m_tm_lp_cg_la_LIBADD =
 am__libSym_m_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1689,18 +1755,21 @@ am_libSym_m_tm_lp_cg_la_OBJECTS = $(am__objects_2) $(am__objects_333)
 libSym_m_tm_lp_cg_la_OBJECTS = $(am_libSym_m_tm_lp_cg_la_OBJECTS)
 libSym_m_tm_lp_cg_cp_la_LIBADD =
 am__libSym_m_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h Master/master.c \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1767,18 +1836,21 @@ libSym_m_tm_lp_cg_cp_la_OBJECTS =  \
 	$(am_libSym_m_tm_lp_cg_cp_la_OBJECTS)
 libSym_tm_la_LIBADD =
 am__libSym_tm_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
@@ -1830,18 +1902,21 @@ am_libSym_tm_la_OBJECTS = $(am__objects_2) $(am__objects_362)
 libSym_tm_la_OBJECTS = $(am_libSym_tm_la_OBJECTS)
 libSym_tm_cp_la_LIBADD =
 am__libSym_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
@@ -1896,18 +1971,21 @@ am_libSym_tm_cp_la_OBJECTS = $(am__objects_2) $(am__objects_375)
 libSym_tm_cp_la_OBJECTS = $(am_libSym_tm_cp_la_OBJECTS)
 libSym_tm_lp_la_LIBADD =
 am__libSym_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
@@ -1962,18 +2040,21 @@ am_libSym_tm_lp_la_OBJECTS = $(am__objects_2) $(am__objects_388)
 libSym_tm_lp_la_OBJECTS = $(am_libSym_tm_lp_la_OBJECTS)
 libSym_tm_lp_cg_la_LIBADD =
 am__libSym_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
@@ -2031,18 +2112,21 @@ am_libSym_tm_lp_cg_la_OBJECTS = $(am__objects_2) $(am__objects_401)
 libSym_tm_lp_cg_la_OBJECTS = $(am_libSym_tm_lp_cg_la_OBJECTS)
 libSym_tm_lp_cg_cp_la_LIBADD =
 am__libSym_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
-	../include/BB_constants.h ../include/BB_macros.h \
-	../include/BB_types.h ../include/cg.h ../include/cg_params.h \
-	../include/cg_u.h ../include/cp.h ../include/cp_params.h \
-	../include/cp_u.h ../include/dg.h ../include/dg_params.h \
-	../include/dg_u.h ../include/lp.h ../include/lp_params.h \
-	../include/lp_solver.h ../include/lp_u.h ../include/master.h \
-	../include/master_params.h ../include/master_u.h \
-	../include/messages.h ../include/pack_array.h \
-	../include/pack_cut.h ../include/proccomm.h ../include/proto.h \
-	../include/qsortucb.h ../include/return_values.h \
-	../include/symphony_api.h ../include/timemeas.h \
-	../include/tm.h ../include/tm_params.h \
+	../include/sym_constants.h ../include/sym_macros.h \
+	../include/sym_types.h ../include/sym_cg.h \
+	../include/sym_cg_params.h ../include/sym_cg_u.h \
+	../include/sym_cp.h ../include/sym_cp_params.h \
+	../include/sym_cp_u.h ../include/sym_dg.h \
+	../include/sym_dg_params.h ../include/sym_dg_u.h \
+	../include/sym_lp.h ../include/sym_lp_params.h \
+	../include/sym_lp_solver.h ../include/sym_lp_u.h \
+	../include/sym_master.h ../include/sym_master_params.h \
+	../include/sym_master_u.h ../include/sym_messages.h \
+	../include/sym_pack_array.h ../include/sym_pack_cut.h \
+	../include/sym_proccomm.h ../include/sym_proto.h \
+	../include/qsortucb.h ../include/sym_return_values.h \
+	../include/symphony.h ../include/sym_timemeas.h \
+	../include/sym_tm.h ../include/sym_tm_params.h \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
@@ -2528,36 +2612,36 @@ SUBDIRS =
 ##############################################################################
 ##############################################################################
 SYMHEADERS = \
-	../include/BB_constants.h \
-	../include/BB_macros.h \
-	../include/BB_types.h \
-	../include/cg.h \
-	../include/cg_params.h \
-	../include/cg_u.h \
-	../include/cp.h \
-	../include/cp_params.h \
-	../include/cp_u.h \
-	../include/dg.h \
-	../include/dg_params.h \
-	../include/dg_u.h \
-	../include/lp.h \
-	../include/lp_params.h \
-	../include/lp_solver.h \
-	../include/lp_u.h \
-	../include/master.h \
-	../include/master_params.h \
-	../include/master_u.h \
-	../include/messages.h \
-	../include/pack_array.h \
-	../include/pack_cut.h \
-	../include/proccomm.h \
-	../include/proto.h \
+	../include/sym_constants.h \
+	../include/sym_macros.h \
+	../include/sym_types.h \
+	../include/sym_cg.h \
+	../include/sym_cg_params.h \
+	../include/sym_cg_u.h \
+	../include/sym_cp.h \
+	../include/sym_cp_params.h \
+	../include/sym_cp_u.h \
+	../include/sym_dg.h \
+	../include/sym_dg_params.h \
+	../include/sym_dg_u.h \
+	../include/sym_lp.h \
+	../include/sym_lp_params.h \
+	../include/sym_lp_solver.h \
+	../include/sym_lp_u.h \
+	../include/sym_master.h \
+	../include/sym_master_params.h \
+	../include/sym_master_u.h \
+	../include/sym_messages.h \
+	../include/sym_pack_array.h \
+	../include/sym_pack_cut.h \
+	../include/sym_proccomm.h \
+	../include/sym_proto.h \
 	../include/qsortucb.h \
-	../include/return_values.h \
-	../include/symphony_api.h \
-	../include/timemeas.h \
-	../include/tm.h \
-	../include/tm_params.h
+	../include/sym_return_values.h \
+	../include/symphony.h \
+	../include/sym_timemeas.h \
+	../include/sym_tm.h \
+	../include/sym_tm_params.h
 
 
 #Add SymConfig.h even though it is not used - for COIN compability
@@ -2789,37 +2873,37 @@ libSym_tm_lp_la_LDFLAGS = $(LT_LDFLAGS)
 libSym_tm_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
 libSym_tm_lp_cg_cp_la_LDFLAGS = $(LT_LDFLAGS)
 libSym_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
-symphony_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_SOURCES = $(MAIN_SRC) symphony.h
 symphony_DEPENDENCIES = $(LDADD) libSym.la
 symphony_CPPFLAGS = $(SYMCPPFLAGS)
 symphony_LDADD = libSym.la $(ALLLDADD)
 symphony_LDFLAGS = -rpath $(libdir)
-symphony_m_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_LDFLAGS = -rpath $(libdir)
-symphony_m_tm_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_tm_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_tm_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_LDFLAGS = -rpath $(libdir)
-symphony_m_tm_lp_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_tm_lp_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_tm_lp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_lp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_lp_LDFLAGS = -rpath $(libdir)
-symphony_m_tm_cp_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_tm_cp_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_tm_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_cp_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_cp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_cp_LDFLAGS = -rpath $(libdir)
-symphony_m_tm_lp_cg_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_tm_lp_cg_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_tm_lp_cg_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_cg_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_lp_cg_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_lp_cg_LDFLAGS = -rpath $(libdir)
-symphony_m_tm_lp_cg_cp_SOURCES = $(MAIN_SRC) symphony_api.h
+symphony_m_tm_lp_cg_cp_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_tm_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_lp_cg_cp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)

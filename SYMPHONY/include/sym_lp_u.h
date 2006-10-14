@@ -15,9 +15,9 @@
 #ifndef LP_U_H
 #define LP_U_H
 
-#include "proto.h"
-#include "BB_types.h"
-#include "lp_solver.h"
+#include "sym_proto.h"
+#include "sym_types.h"
+#include "sym_lp_solver.h"
 
 /*----------- Generic selection rules to be used by the user ----------------*/
 
