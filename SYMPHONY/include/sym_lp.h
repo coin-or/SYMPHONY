@@ -88,9 +88,6 @@ typedef struct LP_PROB{
    int           draw_graph;
    int           tree_manager;
    int           cut_pool;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int           sol_pool;
-   /*___END_EXPERIMENTAL_SECTION___*/
    int           cut_gen;
 
 #ifdef COMPILE_IN_CG

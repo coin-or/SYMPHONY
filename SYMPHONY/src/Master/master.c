@@ -140,11 +140,6 @@ int sym_set_defaults(sym_environment *env)
    lp_params *lp_par = &env->par.lp_par;
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params *sp_par = &env->par.sp_par;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    dg_params *dg_par = &env->par.dg_par;
 
    /************************* Global defaults ********************************/
@@ -190,20 +185,11 @@ int sym_set_defaults(sym_environment *env)
 #endif
    strcpy(tm_par->cg_exe, "symphony_cg");
    strcpy(tm_par->cp_exe, "symphony_cp");
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   strcpy(tm_par->sp_exe, "symphony_sp");
-   /*___END_EXPERIMENTAL_SECTION___*/
    tm_par->lp_debug = 0;
    tm_par->cg_debug = 0;
    tm_par->cp_debug = 0;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   tm_par->sp_debug = 0;
-   /*___END_EXPERIMENTAL_SECTION___*/
    tm_par->max_active_nodes = 1;
    tm_par->max_cp_num = 1;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   tm_par->max_sp_num = 0;
-   /*___END_EXPERIMENTAL_SECTION___*/
    tm_par->lp_mach_num = 0;
    tm_par->lp_machs = NULL;
    tm_par->cg_mach_num = 0;
@@ -213,9 +199,6 @@ int sym_set_defaults(sym_environment *env)
 
    tm_par->use_cg = FALSE;
    tm_par->random_seed = 17;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   tm_par->do_decomp = FALSE;
-   /*___END_EXPERIMENTAL_SECTION___*/
    tm_par->unconditional_dive_frac = 0;
    tm_par->diving_strategy = BEST_ESTIMATE;
    tm_par->diving_k = 1;
@@ -350,18 +333,6 @@ int sym_set_defaults(sym_environment *env)
    cg_par->verbosity = 0;
    cg_par->do_findcuts = TRUE;
 
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   cg_par->do_decomp = FALSE;
-   cg_par->decomp_sol_pool_check_freq = 10;
-   cg_par->decomp_wait_for_cols = TRUE;
-   cg_par->decomp_max_col_num_per_iter = 1000;
-   cg_par->decomp_col_block_size = 1000;
-   cg_par->decomp_mat_block_size = 100000;
-   cg_par->decomp_initial_timeout = 5;
-   cg_par->decomp_dynamic_timeout = 5;
-   cg_par->decomp_complete_enum = TRUE;
-
-   /*___END_EXPERIMENTAL_SECTION___*/
    /************************** cutpool defaults ******************************/
    cp_par->verbosity = 0;
    cp_par->warm_start = FALSE;
@@ -375,22 +346,6 @@ int sym_set_defaults(sym_environment *env)
    cp_par->min_to_delete = 1000;
    cp_par->check_which = CHECK_ALL_CUTS;
 
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   /************************** solpool defaults ******************************/
-#ifdef COMPILE_DECOMP
-   sp_par->verbosity = 0;
-   sp_par->etol = 0.000001;
-   sp_par->block_size = 1000;
-   sp_par->max_size = 1000000;
-   sp_par->max_number_of_sols = 10000;
-   sp_par->delete_which = DELETE_DUPLICATE_COLS;
-   sp_par->touches_until_deletion = 10;
-   sp_par->min_to_delete = 100;
-   sp_par->compress_num = 10;
-   sp_par->compress_ratio = .01;
-   sp_par->check_which = CHECK_COL_LEVEL_AND_TOUCHES;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    /********************** draw_graph defaults  ******************************/
    strcpy(dg_par->source_path, ".");
    dg_par->echo_commands = FALSE;
@@ -563,9 +518,6 @@ int sym_solve(sym_environment *env)
 
    int s_bufid, r_bufid, bytes, msgtag = 0, sender, termcode = 0, temp, i;
    int lp_data_sent = 0, cg_data_sent = 0, cp_data_sent = 0;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int sp_data_sent = 1; /*for now, we are not using this one*/
-   /*___END_EXPERIMENTAL_SECTION___*/
 #ifndef COMPILE_IN_TM
    char repricing, node_type;
 #else
@@ -795,17 +747,9 @@ int sym_solve(sym_environment *env)
    \*------------------------------------------------------------------------*/
    
 #ifdef COMPILE_IN_TM
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    while (!(lp_data_sent == env->par.tm_par.max_active_nodes) ||
 	  !(cg_data_sent == env->par.tm_par.max_active_nodes) ||
-	  !(cp_data_sent == env->par.tm_par.max_cp_num) || !sp_data_sent){
-   /*___END_EXPERIMENTAL_SECTION___*/
-   /*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
-   while (!(lp_data_sent == env->tm_par.max_active_nodes) ||
-	  !(cg_data_sent == env->tm_par.max_active_nodes) ||
-	  !(cp_data_sent == env->max_cp_num)){
-#endif
+	  !(cp_data_sent == env->par.tm_par.max_cp_num)){
 #else
    do{
 #endif
@@ -857,14 +801,6 @@ int sym_solve(sym_environment *env)
 	 cp_data_sent++;
 	 break;
 
-       /*__BEGIN_EXPERIMENTAL_SECTION__*/
-       case REQUEST_FOR_SP_DATA:
-	 /* An SP process has been started and asks for all necessary data */
-	 CALL_WRAPPER_FUNCTION( send_sp_data_u(env, sender) );
-	 sp_data_sent++;
-	 break;
-
-       /*___END_EXPERIMENTAL_SECTION___*/
        case TM_FIRST_PHASE_FINISHED:
 	 receive_char_array((char *)(&env->comp_times.bc_time),
 			     sizeof(node_times));
@@ -4326,11 +4262,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params *sp_par = &env->par.sp_par;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    dg_params *dg_par = &env->par.dg_par;
 
    if (strcmp(key, "verbosity") == 0){
@@ -4341,14 +4272,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = env->par.random_seed;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "do_decomp") == 0 ||
-	    strcmp(key, "CG_do_decomp") == 0 ||
-	    strcmp(key, "TM_do_decomp") == 0){
-      *value = tm_par->do_decomp;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    /***********************************************************************
     ***                    Master params                            ***
@@ -4494,13 +4417,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = tm_par->cp_debug;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "sp_debug") == 0 ||
-	    strcmp(key, "TM_sp_debug") == 0){
-      *value = tm_par->sp_debug;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "max_active_nodes") == 0 ||
 	    strcmp(key, "TM_max_active_nodes") == 0){
       *value = tm_par->max_active_nodes;
@@ -4511,13 +4427,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = tm_par->max_cp_num;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "max_sp_num") == 0 ||
-	    strcmp(key, "TM_max_sp_num") == 0){
-      *value = tm_par->max_sp_num;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "lp_mach_num") == 0 ||
 	    strcmp(key, "TM_lp_mach_num") == 0){
       *value = tm_par->lp_mach_num;
@@ -4930,38 +4839,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = cg_par->do_findcuts;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "decomp_sol_pool_check_freq") == 0 ||
-	    strcmp(key, "CG_decomp_sol_pool_check_freq") == 0){
-      *value = cg_par->decomp_sol_pool_check_freq;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_wait_for_cols") == 0 ||
-	    strcmp(key, "CG_decomp_wait_for_cols") == 0){
-      *value = cg_par->decomp_wait_for_cols;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_max_col_num_per_iter") == 0 ||
-	    strcmp(key, "CG_decomp_max_col_num_per_iter") == 0){
-     *value =  cg_par->decomp_max_col_num_per_iter;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_col_block_size") == 0 ||
-	    strcmp(key, "CG_decomp_col_block_size") == 0){
-      *value = cg_par->decomp_col_block_size;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_mat_block_size") == 0 ||
-	    strcmp(key, "CG_decomp_mat_block_size") == 0){
-      *value = cg_par->decomp_mat_block_size;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_complete_enum") == 0 ||
-	    strcmp(key, "CG_decomp_complete_enum") == 0){
-	 *value = cg_par->decomp_complete_enum;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    /***********************************************************************
     ***                      cutpool params                         ***
@@ -5019,52 +4896,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
 	    strcmp(key, "CP_check_which") == 0){
 	 *value = cp_par->check_which;
 		}
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-
-   /***********************************************************************
-    ***                     solpool params                          ***
-    ***********************************************************************/
-#ifdef COMPILE_DECOMP
-   else if (strcmp(key, "SP_verbosity") == 0){
-	 *value = sp_par->verbosity;
-      return(0);
-   }
-   else if (strcmp(key, "SP_block_size") == 0){
-      *value = sp_par->block_size;
-      return(0);
-   }
-   else if (strcmp(key, "SP_max_size") == 0){
-      *value = sp_par->max_size;
-      return(0);
-   }
-   else if (strcmp(key, "max_number_of_sols") == 0 ||
-	    strcmp(key, "SP_max_number_of_sols") == 0){
-      *value = sp_par->max_number_of_sols;
-      return(0);
-   }
-   else if (strcmp(key, "SP_delete_which") == 0){
-      *value = sp_par->delete_which;
-      return(0);
-   }
-   else if (strcmp(key, "SP_touches_until_deletion") == 0){
-      *value = sp_par->touches_until_deletion;
-      return(0);
-   }
-   else if (strcmp(key, "SP_min_to_delete") == 0){
-      *value = sp_par->min_to_delete;
-      return(0);
-   }
-   else if (strcmp(key, "SP_compress_num") == 0){
-      *value = sp_par->compress_num;
-      return(0);
-   }
-   else if (strcmp(key, "SP_check_which") == 0){
-      *value = sp_par->check_which;
-      return(0);
-   }
-#endif
-
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    return (FUNCTION_TERMINATED_ABNORMALLY);
 }
@@ -5080,11 +4911,6 @@ int sym_get_dbl_param(sym_environment *env, char *key, double *value)
    cg_params *cg_par = &env->par.cg_par;
    //cp_params *cp_par = &env->par.cp_par;
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params *sp_par = &env->par.sp_par;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    dg_params *dg_par = &env->par.dg_par;
    
    if (strcmp(key, "granularity") == 0){
@@ -5256,35 +5082,6 @@ int sym_get_dbl_param(sym_environment *env, char *key, double *value)
       return(0);
    }
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   /***********************************************************************
-    ***                     cut_gen params                          ***
-    ***********************************************************************/
-   else if (strcmp(key, "decomp_initial_timeout") == 0 ||
-	    strcmp(key, "CG_decomp_initial_timeout") == 0){
-      *value = cg_par->decomp_initial_timeout;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_dynamic_timeout") == 0 ||
-	    strcmp(key, "CG_decomp_dynamic_timeout") == 0){
-      *value = cg_par->decomp_dynamic_timeout;
-      return(0);
-   }
-
-   /***********************************************************************
-    ***                     solpool params                          ***
-    ***********************************************************************/
-#ifdef COMPILE_DECOMP
-   else if (strcmp(key, "SP_etol") == 0){
-      *value = sp_par->etol;
-      return(0);
-   }
-   else if (strcmp(key, "SP_compress_ratio") == 0){
-      *value = sp_par->compress_ratio;
-      return(0);
-   }
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    return (FUNCTION_TERMINATED_ABNORMALLY);
 }
@@ -5300,11 +5097,6 @@ int sym_get_str_param(sym_environment *env, char *key, char **value)
    //cg_params *cg_par = &env->par.cg_par;
    //cp_params *cp_par = &env->par.cp_par;
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params *sp_par = &env->par.sp_par;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    dg_params *dg_par = &env->par.dg_par;
    
    if (strcmp(key, "problem_name") == 0){      
@@ -5404,15 +5196,6 @@ int sym_get_str_param(sym_environment *env, char *key, char **value)
       *value = tm_par->cp_exe;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "sp_executable_name") == 0 ||
-	    strcmp(key, "sp_exe") == 0 ||
-	    strcmp(key, "TM_sp_exe") == 0 ||
-	    strcmp(key, "TM_sp_executable_name") == 0){
-      *value = tm_par->sp_exe;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    return (FUNCTION_TERMINATED_ABNORMALLY);
 }
 

@@ -19,24 +19,6 @@
 #include "sym_cg_params.h"
 #include "sym_cg_u.h"
 #include "sym_lp_solver.h"
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-#include "sym_lp_solver.h"
-#include "sym_decomp_types.h"
-#endif
-
-/*===========================================================================*/
-
-#ifdef COMPILE_DECOMP
-typedef struct DECOMP_DATA{
-   LPdata        *lp_data;
-   int            iter_num;
-   double        *unbdd_row;
-   int            dunbr;
-   int            timeout;
-}decomp_data;
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 
 /*===========================================================================*/
 
@@ -48,9 +30,6 @@ typedef struct CG_PROB{
    int            master;
    int            draw_graph;    /* the tid of DrawGraph */
    int            tree_manager;  /* the tid of the tree manager */
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int            sol_pool;      /* the tid of the solution pool */
-   /*___END_EXPERIMENTAL_SECTION___*/
    cg_params      par;           /* the parameters for the cut generator */
    char           has_ub;        /* is there an upper bound */
    double         ub;            /* the current best upper bound if there
@@ -62,11 +41,6 @@ typedef struct CG_PROB{
    cut_data    **cuts_to_add;
    int           cuts_to_add_size;
 #endif
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   decomp_data    dcmp_data;
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 }cg_prob;
 
 /*===========================================================================*/

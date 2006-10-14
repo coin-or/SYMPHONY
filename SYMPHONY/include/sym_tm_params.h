@@ -28,20 +28,11 @@ typedef struct TM_PARAMS{
    char        lp_exe[MAX_FILE_NAME_LENGTH +1];
    char        cg_exe[MAX_FILE_NAME_LENGTH +1];
    char        cp_exe[MAX_FILE_NAME_LENGTH +1];
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   char        sp_exe[MAX_FILE_NAME_LENGTH +1];
-   /*___END_EXPERIMENTAL_SECTION___*/
    int         lp_debug;
    int         cg_debug;
    int         cp_debug;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int         sp_debug;
-   /*___END_EXPERIMENTAL_SECTION___*/
    int         max_active_nodes;
    int         max_cp_num;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int         max_sp_num;
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    /* if a ..._machine_num is not 0 and there MUST be that many machine
       names listed in ..._machines (one name can be listed more than once) */
@@ -51,17 +42,10 @@ typedef struct TM_PARAMS{
    char      **cg_machs;
    int         cp_mach_num;
    char      **cp_machs;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int         sp_mach_num;
-   char      **sp_machs;
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    int         use_cg;
 
    int         random_seed;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int         do_decomp;
-   /*___END_EXPERIMENTAL_SECTION___*/
    double      unconditional_dive_frac;
    int         diving_strategy;
    int         diving_k;

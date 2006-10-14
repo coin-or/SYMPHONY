@@ -76,18 +76,7 @@ int lp_initialize(lp_prob *p, int master_tid)
    p->lp_data->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
    
 #pragma omp critical (lp_solver)
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   {
-#if 0
-      system("/bin/rm -f /usr/lib/.cpxlicense/.tko*");
-#endif
-      open_lp_solver(p->lp_data);
-   }
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
    open_lp_solver(p->lp_data);
-#endif
 
    (void) used_time(&p->tt);
 
@@ -140,13 +129,6 @@ int lp_initialize(lp_prob *p, int master_tid)
    }
    
    cg_initialize(p->cgp, p->master);
-   
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   if (p->cgp->dcmp_data.lp_data)
-      p->cgp->dcmp_data.lp_data->cpxenv = p->lp_data->cpxenv;
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 #endif
 
    return(FUNCTION_TERMINATED_NORMALLY);

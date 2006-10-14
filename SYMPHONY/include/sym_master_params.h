@@ -17,11 +17,6 @@
 
 #include "sym_tm_params.h"
 #include "sym_cp_params.h"
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-#include "sym_sp_params.h"
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 #include "sym_cg_params.h"
 #include "sym_lp_params.h"
 #include "sym_dg_params.h"
@@ -38,11 +33,6 @@ typedef struct PARAMS{
    char       param_file[MAX_FILE_NAME_LENGTH +1];
    int        random_seed;
    cp_params  cp_par;
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params  sp_par;
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
    cg_params  cg_par;
    lp_params  lp_par;
    tm_params  tm_par;

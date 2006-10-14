@@ -207,9 +207,6 @@ int receive_active_node(lp_prob *p)
    desc = p->desc = (node_desc *) malloc( sizeof(node_desc) );
 
    receive_int_array(&p->cut_pool, 1);
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   receive_int_array(&p->sol_pool, 1);
-   /*___END_EXPERIMENTAL_SECTION___*/
    receive_int_array(&p->bc_index, 1);
    receive_int_array(&p->bc_level, 1);
    receive_dbl_array(&p->lp_data->objval, 1);
@@ -713,10 +710,6 @@ void send_node_desc(lp_prob *p, char node_type)
 #else	    
 	    tm->nodes_per_cp[find_process_index(&tm->cp, n->cp)]++;
 #endif
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 if (n->sp)
-	    tm->nodes_per_sp[find_process_index(&tm->sp, n->sp)]++;
-	 /*___END_EXPERIMENTAL_SECTION___*/
 	 break;
        case NODE_BRANCHED_ON:
 	 n->node_status = NODE_STATUS__BRANCHED_ON;

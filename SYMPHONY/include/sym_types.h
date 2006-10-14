@@ -310,9 +310,6 @@ typedef struct BC_NODE{
    int        lp;           /* the tid of the lp processing the node */
    int        cg;           /* the tid of the cut generator serving the node */
    int        cp;           /* the tid of the cut pool assigned to the node */
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int        sp;           /* the tid of the solution pool */
-   /*___END_EXPERIMENTAL_SECTION___*/
    double     lower_bound;  /* the current best objective function value
 			       obtained in the subproblem */
    double     opt_estimate; /* an estimate of the value of the best feasible

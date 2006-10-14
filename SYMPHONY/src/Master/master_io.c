@@ -93,11 +93,6 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
    lp_params *lp_par = &env->par.lp_par;
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params *sp_par = &env->par.sp_par;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    //dg_params *dg_par = &env->par.dg_par;
 
    if (argc < 2){
@@ -400,9 +395,6 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	 lp_par->first_lp.all_cuts_time_out = 0;
 	 lp_par->later_lp.first_cut_time_out = 0;
 	 lp_par->later_lp.all_cuts_time_out = 0;
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 cg_par->decomp_dynamic_timeout = 6000;
-	 /*___END_EXPERIMENTAL_SECTION___*/
 	 break;
        case 'd':
 	 env->par.do_draw_graph = TRUE;
@@ -477,11 +469,6 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	    }else{
 	       i++;
 	       tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
-		  /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-		  sp_par->verbosity =
-#endif 
-		  /*___END_EXPERIMENTAL_SECTION___*/
 		  cp_par->verbosity = env->par.verbosity = tmpi;
 	    }
 	 }else{
@@ -643,15 +630,6 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 
    /*Sanity checks*/
 
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (cg_par->decomp_max_col_num_per_iter >
-       cg_par->decomp_col_block_size){
-      printf("io: decomp_max_col_num_per_iter is greater than\n");
-      printf("    decomp_col_block_size -- adjusting\n");
-      cg_par->decomp_max_col_num_per_iter = cg_par->decomp_col_block_size;
-   }
-	 
-   /*___END_EXPERIMENTAL_SECTION___*/
    if (cp_par->block_size >cp_par->max_number_of_cuts){
       printf("io: Cut pool block size is too big -- adjusting\n");
       cp_par->block_size = cp_par->max_number_of_cuts;
