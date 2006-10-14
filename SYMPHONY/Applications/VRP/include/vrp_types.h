@@ -21,8 +21,8 @@
 
 /* VRP include files */
 #include "vrp_common_types.h"
-#include "vrp_sym_cg_params.h"
-#include "vrp_sym_lp_params.h"
+#include "vrp_cg_params.h"
+#include "vrp_lp_params.h"
 #ifdef COMPILE_HEURS
 #include "heur_params.h"
 #include "lb_params.h"

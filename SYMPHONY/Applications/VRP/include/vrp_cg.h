@@ -25,7 +25,7 @@
 
 /* VRP include files */
 #include "network.h"
-#include "vrp_sym_cg_params.h"
+#include "vrp_cg_params.h"
 
 typedef struct VRP_CG_PROBLEM{
    vrp_cg_params par;

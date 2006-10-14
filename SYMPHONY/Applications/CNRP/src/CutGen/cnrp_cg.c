@@ -20,12 +20,12 @@
 /* SYMPHONY include files */
 #include "sym_macros.h"
 #include "sym_constants.h"
-#include "sym_sym_proccomm.h"
+#include "sym_proccomm.h"
 #include "qsortucb.h"
-#include "sym_sym_cg_u.h"
+#include "sym_cg_u.h"
 
 /* CNRP include files */
-#include "cnrp_sym_sym_cg.h"
+#include "cnrp_cg.h"
 #include "cnrp_macros.h"
 #include "cnrp_const.h"
 

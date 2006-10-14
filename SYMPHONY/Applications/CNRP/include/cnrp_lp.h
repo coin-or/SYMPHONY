@@ -22,7 +22,7 @@
 #include "sym_types.h"
 
 /* CNRP include files */
-#include "cnrp_sym_lp_params.h"
+#include "cnrp_lp_params.h"
 #include "cnrp_common_types.h"
 #include "network.h"
 

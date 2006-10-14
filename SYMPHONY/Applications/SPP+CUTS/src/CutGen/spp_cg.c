@@ -21,14 +21,14 @@
 #include <stdlib.h>
 
 /* SYMPHONY include files */
-#include "sym_sym_proccomm.h"
+#include "sym_proccomm.h"
 #include "sym_constants.h"
 #include "sym_macros.h"
 #include "qsortucb.h"
-#include "sym_sym_cg_u.h"
+#include "sym_cg_u.h"
 
 /* SPP include files */
-#include "spp_sym_sym_cg.h"
+#include "spp_cg.h"
 #include "spp_cg_clique.h"
 #include "spp_cg_functions.h"
 #include "spp_common.h"

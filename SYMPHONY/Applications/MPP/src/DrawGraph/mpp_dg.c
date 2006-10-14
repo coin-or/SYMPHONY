@@ -22,10 +22,10 @@
 
 /* SYMPHONY include files */
 #include "sym_constants.h"
-#include "sym_sym_proccomm.h"
-#include "sym_sym_dg_params.h"
+#include "sym_proccomm.h"
+#include "sym_dg_params.h"
 #include "sym_macros.h"
-#include "sym_sym_dg.h"
+#include "sym_dg.h"
 
 /*===========================================================================*/
 

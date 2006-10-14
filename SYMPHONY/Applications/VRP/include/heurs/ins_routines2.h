@@ -17,7 +17,7 @@
 #ifndef _INS_ROUTINES2_H
 #define _INS_ROUTINES2_H
 
-#include "sym_sym_proto.h"
+#include "sym_proto.h"
 #include "heur_types.h"
 #include "vrp_common_types.h"
 

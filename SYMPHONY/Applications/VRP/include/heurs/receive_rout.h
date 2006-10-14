@@ -17,7 +17,7 @@
 #ifndef _RECEIVE_ROUT_H
 #define _RECEIVE_ROUT_H
 
-#include "sym_sym_proto.h"
+#include "sym_proto.h"
 #include "vrp_types.h"
 
 double receive_tours PROTO((vrp_problem *vrp, heurs *hh, int *last, char print,

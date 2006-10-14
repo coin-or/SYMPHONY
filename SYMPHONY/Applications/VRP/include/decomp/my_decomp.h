@@ -1,9 +1,9 @@
 #ifndef _MY_DECOMP_H
 #define _MY_DECOMP_H
 
-#include "sym_sym_proto.h"
-#include "sym_sym_cg.h"
-#include "sym_sym_lp.h"
+#include "sym_proto.h"
+#include "sym_cg.h"
+#include "sym_lp.h"
 #include "network.h"
 #include "cg_user.h"
 

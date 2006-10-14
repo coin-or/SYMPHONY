@@ -20,7 +20,7 @@
 #include <string.h>
 
 /* SYMPHONY include files */
-#include "sym_sym_timemeas.h"
+#include "sym_timemeas.h"
 #include "sym_macros.h"
 #include "sym_constants.h"
 

@@ -22,11 +22,11 @@
 #include "sym_constants.h"
 #include "sym_macros.h"
 #include "sym_types.h"
-#include "sym_sym_proccomm.h"
-#include "sym_sym_cp_u.h"
+#include "sym_proccomm.h"
+#include "sym_cp_u.h"
 
 /* VRP include files */
-#include "vrp_sym_sym_cp.h"
+#include "vrp_cp.h"
 #include "vrp_const.h"
 #include "vrp_macros.h"
 

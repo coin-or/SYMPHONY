@@ -20,13 +20,13 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "sym_sym_proccomm.h"
+#include "sym_proccomm.h"
 
 /* VRP include files */
-#include "vrp_sym_sym_dg.h"
+#include "vrp_dg.h"
 #include "vrp_const.h"
 #include "vrp_macros.h"
-#include "vrp_sym_sym_messages.h"
+#include "vrp_messages.h"
 
 /*===========================================================================*/
 

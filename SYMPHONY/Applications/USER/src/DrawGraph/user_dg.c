@@ -18,8 +18,8 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "sym_sym_dg.h"
-#include "sym_sym_dg_u.h"
+#include "sym_dg.h"
+#include "sym_dg_u.h"
 
 /*===========================================================================*/
 

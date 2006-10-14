@@ -23,8 +23,8 @@
 #include "sym_macros.h"
 #include "sym_types.h"
 #include "qsortucb.h"
-#include "sym_sym_master_u.h"
-#include "sym_sym_lp_params.h"
+#include "sym_master_u.h"
+#include "sym_lp_params.h"
 
 /* CNRP include files */
 #include "cnrp_io.h"

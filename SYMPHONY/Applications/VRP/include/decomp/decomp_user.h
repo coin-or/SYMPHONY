@@ -1,7 +1,7 @@
 #ifndef _DECOMP_USER_H
 #define _DECOMP_USER_H
 
-#include "sym_sym_proto.h"
+#include "sym_proto.h"
 #include "cg_user.h"
 
 int int_compar PROTO((const void *int1, const void *int2));

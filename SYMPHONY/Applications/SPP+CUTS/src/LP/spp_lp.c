@@ -19,14 +19,14 @@
 #include <memory.h>
 
 /* SYMPHONY include files */
-#include "sym_sym_proccomm.h"
+#include "sym_proccomm.h"
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "sym_sym_lp_u.h"
+#include "sym_lp_u.h"
 
 /* SPP include files */
 #include "spp_common.h"
-#include "spp_sym_sym_lp.h"
+#include "spp_lp.h"
 #include "spp_lp_functions.h"
 
 /*===========================================================================*/

@@ -22,8 +22,8 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "sym_sym_master_u.h"
-#include "sym_sym_proccomm.h"
+#include "sym_master_u.h"
+#include "sym_proccomm.h"
 
 /* SPP include files */
 #include "spp.h"
@@ -31,10 +31,10 @@
 #include "spp_master_functions.h"
 #ifdef COMPILE_IN_TM
 #ifdef COMPILE_IN_LP
-#include "spp_sym_sym_lp.h"
+#include "spp_lp.h"
 #include "spp_lp_functions.h"
 #ifdef COMPILE_IN_CG
-#include "spp_sym_sym_cg.h"
+#include "spp_cg.h"
 #endif
 #endif
 #endif

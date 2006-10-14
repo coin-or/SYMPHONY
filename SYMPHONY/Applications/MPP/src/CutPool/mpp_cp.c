@@ -19,7 +19,7 @@
 
 /* SYMPHONY include files */
 #include "sym_constants.h"
-#include "sym_sym_cp_u.h"
+#include "sym_cp_u.h"
 
 /*===========================================================================*/
 

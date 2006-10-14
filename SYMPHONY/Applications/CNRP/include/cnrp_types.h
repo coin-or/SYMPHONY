@@ -21,9 +21,9 @@
 
 /* CNRP include files */
 #include "cnrp_common_types.h"
-#include "cnrp_sym_cg_params.h"
-#include "cnrp_sym_lp_params.h"
-#include "cnrp_sym_cp_params.h"
+#include "cnrp_cg_params.h"
+#include "cnrp_lp_params.h"
+#include "cnrp_cp_params.h"
 
 /*---------------------------------------------------------------------------*\
  * The "small_graph" data structure is used to store the subset of the

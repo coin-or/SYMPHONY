@@ -18,7 +18,7 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "sym_sym_lp_u.h"
+#include "sym_lp_u.h"
 
 /* User include files */
 #include "user.h"

@@ -20,9 +20,9 @@
 #include "ins_routines2.h"
 #include "sweep.h"
 #include "qsort.h"
-#include "sym_sym_messages.h"
+#include "sym_messages.h"
 #include "vrp_const.h"
-#include "sym_sym_proccomm.h"
+#include "sym_proccomm.h"
 #include "compute_cost.h"
 #include "heur_routines.h"
 #include <string.h>

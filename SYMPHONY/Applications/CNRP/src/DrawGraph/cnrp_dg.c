@@ -20,13 +20,13 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "sym_sym_proccomm.h"
+#include "sym_proccomm.h"
 
 /* CNRP include files */
-#include "cnrp_sym_sym_dg.h"
+#include "cnrp_dg.h"
 #include "cnrp_const.h"
 #include "cnrp_macros.h"
-#include "cnrp_sym_sym_messages.h"
+#include "cnrp_messages.h"
 
 /*===========================================================================*/
 

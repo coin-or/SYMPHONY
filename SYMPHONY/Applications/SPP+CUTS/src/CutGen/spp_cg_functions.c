@@ -22,15 +22,15 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "sym_sym_pack_cut.h"
+#include "sym_pack_cut.h"
 #include "qsortucb.h"
-#include "sym_sym_cg.h"
+#include "sym_cg.h"
 
 /* SPP include files */
 #include "spp_constants.h"
 #include "spp_types.h"
 #include "spp_common.h"
-#include "spp_sym_sym_cg.h"
+#include "spp_cg.h"
 #include "spp_cg_functions.h"
 
 /*****************************************************************************/

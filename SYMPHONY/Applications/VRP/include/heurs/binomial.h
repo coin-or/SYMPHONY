@@ -19,7 +19,7 @@
 
 #include <malloc.h>
 
-#include "sym_sym_proto.h"
+#include "sym_proto.h"
 
 /*----------------------------------------------------------------------*\
 | The structure tree_node is the structure used in the binomial heaps    |

@@ -21,12 +21,12 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "sym_sym_messages.h"
-#include "sym_sym_proccomm.h"
-#include "sym_sym_cg.h"
+#include "sym_messages.h"
+#include "sym_proccomm.h"
+#include "sym_cg.h"
 
 /* CNRP include files */
-#include "cnrp_sym_sym_cg.h"
+#include "cnrp_cg.h"
 #include "cnrp_macros.h"
 #include "network.h"
 

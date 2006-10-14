@@ -17,7 +17,7 @@
 #ifndef _S_PATH_H
 #define _S_PATH_H
 
-#include "sym_sym_proto.h"
+#include "sym_proto.h"
 #include "heur_types.h"
 
 typedef struct ADJ_LIST{

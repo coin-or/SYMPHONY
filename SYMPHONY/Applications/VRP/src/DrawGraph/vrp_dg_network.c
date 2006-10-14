@@ -19,10 +19,10 @@
 /* SYMPHONY include files */
 #include "sym_macros.h"
 #include "sym_constants.h"
-#include "sym_sym_dg.h"
+#include "sym_dg.h"
 
 /* VRP include files */
-#include "vrp_sym_sym_dg.h"
+#include "vrp_dg.h"
 #include "vrp_const.h"
 #include "vrp_macros.h"
 

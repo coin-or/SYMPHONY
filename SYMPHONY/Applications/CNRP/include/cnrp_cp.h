@@ -20,7 +20,7 @@
 #include "sym_proto.h"
 
 /* CNRP include files */
-#include "cnrp_sym_cp_params.h"
+#include "cnrp_cp_params.h"
 
 
 typedef struct CNRP_SPEC_CP{

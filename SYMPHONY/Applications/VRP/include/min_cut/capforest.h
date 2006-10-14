@@ -1,7 +1,7 @@
 #ifndef _CAPFOREST_H
 #define _CAPFOREST_H
 
-#include "sym_sym_proto.h"
+#include "sym_proto.h"
 #include "network.h"
 
 float capforest PROTO((network *n, int Vertnum, char scannedmark));

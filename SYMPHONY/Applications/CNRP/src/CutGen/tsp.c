@@ -19,11 +19,11 @@
 /* SYMPHONY include files */
 #include "sym_macros.h"
 #include "sym_constants.h"
-#include "sym_sym_proto.h"
-#include "sym_sym_cg.h"
+#include "sym_proto.h"
+#include "sym_cg.h"
 
 /* CNRP include files */
-#include "cnrp_sym_sym_cg.h"
+#include "cnrp_cg.h"
 #include "network.h"
 extern "C"{
 #include "concorde.h"

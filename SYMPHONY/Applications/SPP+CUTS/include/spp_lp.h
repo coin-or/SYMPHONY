@@ -23,7 +23,7 @@
 #include "sym_lp.h"
 
 #include "spp_types.h"
-#include "spp_sym_lp_params.h"
+#include "spp_lp_params.h"
 
 typedef struct SPP_LP_TMP {
    char               *ctmp_2nD;       /* length: 2*n*DSIZE */

@@ -19,7 +19,7 @@
 #include "sym_constants.h"
 
 /* VRP include files */
-#include "vrp_sym_sym_cg.h"
+#include "vrp_cg.h"
 
 /*===========================================================================*\
  * This file contains functions for finding biconnected components.

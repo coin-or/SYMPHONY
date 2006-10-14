@@ -19,11 +19,11 @@
 /* SYMPHONY include files */
 #include "sym_macros.h"
 #include "sym_constants.h"
-#include "sym_sym_proto.h"
-#include "sym_sym_cg.h"
+#include "sym_proto.h"
+#include "sym_cg.h"
 
 /* VRP include files */
-#include "vrp_sym_sym_cg.h"
+#include "vrp_cg.h"
 #include "tsp.h"
 #include "network.h"
 

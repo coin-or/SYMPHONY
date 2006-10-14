@@ -17,7 +17,7 @@
 #ifndef _LOWER_BOUND_H
 #define _LOWER_BOUND_H
 
-#include "sym_sym_proto.h"
+#include "sym_proto.h"
 #include "vrp_types.h"
 #include "heur_types.h"
 #include "lb_params.h"

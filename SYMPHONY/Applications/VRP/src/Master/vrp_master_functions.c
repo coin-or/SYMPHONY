@@ -25,7 +25,7 @@
 
 /* SYMPHONY include files */
 #include "sym_constants.h"
-#include "sym_sym_proccomm.h"
+#include "sym_proccomm.h"
 
 /* VRP include files */
 #include "vrp_const.h"
