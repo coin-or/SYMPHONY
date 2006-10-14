@@ -24,9 +24,6 @@
 #include "BB_macros.h"
 #include "qsortucb.h"
 #include "lp_u.h"
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#include "lp.h"
-/*___END_EXPERIMENTAL_SECTION___*/
 
 /* CNRP include files */
 #include "cnrp_lp.h"

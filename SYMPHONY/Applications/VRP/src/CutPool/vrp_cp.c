@@ -140,15 +140,6 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
    int i;
    int j, cliquecount, size;
    char *clique_array;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-
-   int  num_arcs = 0, edge_index; 
-   char *cpt; 
-   int *arcs ;
-   char *indicators;
-   double bigM, *weights ;
-   int jj, num_fracs = 0, fracs = 0;
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    n = vcp->n;
    verts = n->verts;
@@ -218,114 +209,6 @@ int user_check_cut(void *user, double etol, int varnum, int *indices,
       if (*quality < etol && *quality > -etol) *quality = 0;
       return(USER_SUCCESS);
       
-    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-    case FARKAS:
-      coef = cut->coef;
-      cpt = coef+ ((vertnum >> DELETE_POWER) + 1); 
-      memcpy((char *)&num_arcs, cpt, ISIZE);
-      cpt += ISIZE;
-      arcs = (int *) malloc(num_arcs * ISIZE);
-      indicators = (char *) malloc(num_arcs);  
-      memcpy((char *)arcs, cpt, ISIZE*(num_arcs));
-      cpt += num_arcs * ISIZE;
-      memcpy(indicators, cpt, num_arcs);
-      cpt += num_arcs;
-      memcpy((char *)&num_fracs, cpt, ISIZE);
-      cpt += ISIZE;
-      weights = (double *) malloc((num_fracs + 1) * DSIZE);
-      memcpy((char *)weights, cpt, (num_fracs + 1) * DSIZE);
-      bigM = (*(double *)weights);
-      weights++;
-      
-      for (fracs = 0, i = 0, lhs = 0 ; i < varnum; i++){
-	 v0 = vcp->edges[indices[i] << 1];
-	 v1 = vcp->edges[(indices[i] << 1) + 1];
-	 /*edge_index=INDEX(v0, v1);*/
-	 edge_index = indices[i];
-	 if (isset(coef, v1) || isset(coef,v0)){
-	    for (jj = 0; jj < num_arcs; jj++){
-	       if (arcs[jj] == edge_index){
-		  if (indicators[jj]){
-		     lhs += -bigM*values[i];
-		     break;
-		  }else{
-		     lhs += weights[fracs++]*values[i];
-		     break;
-		  }
-	       }
-	    }
-	    if (jj == num_arcs) lhs += bigM*values[i];
-	 }
-      }
-      weights--;
-      FREE(arcs);
-      FREE(indicators);
-      FREE(weights);
-      *is_violated = (lhs < cut->rhs - etol); 
-      *quality   = (double)cut->rhs - lhs;
-      if (*quality < etol && *quality > -etol) *quality = 0;
-      return(USER_SUCCESS);
-      
-    case NO_COLUMNS:
-      coef = cut->coef;
-      cpt = coef+ ((vertnum >> DELETE_POWER) + 1); 
-      memcpy((char *)&num_arcs, cpt, ISIZE);
-      arcs = (int *) malloc(num_arcs * ISIZE);
-      indicators = (char *) malloc(num_arcs);
-      cpt += ISIZE;
-      memcpy((char *)arcs, cpt, num_arcs * ISIZE);
-      cpt += num_arcs * ISIZE;
-      memcpy(indicators, cpt, num_arcs);
-      
-      for (i = 0, lhs = 0 ; i < varnum; i++){
-	 v0 = vcp->edges[indices[i] << 1];
-	 v1 = vcp->edges[(indices[i] << 1) + 1];
-	 /*edge_index = INDEX(v0, v1);*/
-	 edge_index = indices[i];
-	 if (isset(coef, v1) || isset(coef,v0)){
-	    for (jj = 0; jj < num_arcs; jj++){
-	       if ( arcs[jj] == edge_index){
-		  lhs += indicators[jj] ? values[i] : 0.0;
-		  break;
-	       }
-	    }
-	    if (jj == num_arcs) lhs -= values[i];
-	 }
-      }
-      FREE(arcs);
-      FREE(indicators);
-      *is_violated = (lhs > cut->rhs + etol); 
-      *quality   = lhs - (double)cut->rhs;
-      if (*quality < etol && *quality > -etol) *quality = 0;
-      return(USER_SUCCESS);
-      
-    case GENERAL_NONZEROS:
-      cpt = cut->coef;
-      memcpy((char *)&num_arcs, cpt, ISIZE);
-      cpt += ISIZE;
-      arcs = (int *) calloc(num_arcs, ISIZE);
-      weights = (double *) calloc(num_arcs, DSIZE);
-      memcpy((char *)arcs, cpt, num_arcs * ISIZE);
-      cpt += num_arcs * ISIZE;
-      memcpy((char *)weights, cpt, num_arcs * DSIZE);
-      
-      for (i = 0, lhs = 0; i < varnum; i++){
-	 edge_index = indices[i];
-	 for (j = 0; j < num_arcs; j++){
-	    if (arcs[j] == edge_index)
-	       lhs += values[i]*weights[j];
-	 }
-      }
-      FREE(arcs);
-      FREE(weights);
-      *is_violated = (cut->sense == 'G' ? (lhs < cut->rhs + etol) :
-		                          (lhs > cut->rhs - etol));
-      *quality   = (cut->sense == 'G' ? (double)cut->rhs - lhs :
-		                           lhs - (double)cut->rhs);
-      if (*quality < etol && *quality > -etol) *quality = 0;
-      return(USER_SUCCESS);
-      
-    /*___END_EXPERIMENTAL_SECTION___*/
     default:
       printf("Cut types not recognized! \n\n");
       *is_violated = FALSE;

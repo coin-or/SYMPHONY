@@ -32,12 +32,6 @@
 #include "vrp_macros.h"
 #include "network.h"
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-#include "util.h"
-extern CCrandstate rand_state;
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 
 /*===========================================================================*/
 
@@ -332,11 +326,6 @@ int greedy_shrinking6(network *n, double truck_cap, double etol,
 	 set_demand = 0;
          for (i = begin; i < end; i++ ){
 	    if (compmembers[i] == 0) continue;
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-	    r  = CCutil_lprand(&rand_state)/CC_PRANDMAX;
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 	    r = (RANDOM()/denominator);
 	    q = (prob/compnodes[cur_comp]);
 	    if (r < q){

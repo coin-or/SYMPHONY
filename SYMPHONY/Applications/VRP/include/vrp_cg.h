@@ -47,19 +47,6 @@ typedef struct VRP_CG_PROBLEM{
    double       *cut_val;
    char         *cut_list;
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int          *dec_data;
-   int           last_decomp_index;
-   double        last_objval;
-   FILE         *decomp_res; 
-   /* the next four arrays pertain to storing no-columns cuts - kind of an
-      auxiliary  cutpool*/ 
-   int         **data;
-   char        **indicators;
-   int          *ones;
-   int          *size;
-   int           num_nocolscuts;
-/*___END_EXPERIMENTAL_SECTION___*/
 
 #ifdef CHECK_CUT_VALIDITY
    int           feas_sol_size;
