@@ -46,7 +46,7 @@ the user callbacks (name {\tt *\_u.h}). By looking at the header files, you
 should get a general idea of how things are laid out.
 
 In addition to the subdirectories corresponding to each module, there is a
-subdirectory called \texttt{SYMPHONY-5.1/SYMPHONY/Applications/USER}, which 
+subdirectory called \texttt{SYMPHONY-\VER/SYMPHONY/Applications/USER}, which 
 contains the files needed for implementing the callbacks. Before beginning
 customization, it is recommended to make a copy of this directory that will 
 be used as a template for creating your
@@ -54,7 +54,7 @@ customized solver. In this directory and its subdirectories, which mirror the
 subdirectories of SYMPHONY itself, each file contains function stubs that can
 be filled in to create a new custom application. There is one file for each
 module, initially called 
-\texttt{SYMPHONY-5.1/SYMPHONY/Applications/USER/*/user\_*.c}, where
+\texttt{SYMPHONY-\VER/SYMPHONY/Applications/USER/*/user\_*.c}, where
 \texttt{*} is the name of the module. The primary thing that you, as the user,
 need to understand to build a custom application is how to fill in these
 stubs. That is what the second section of this manual is about.
@@ -232,9 +232,9 @@ planes are not available or not implemented yet.
 
 Once the callback functions are filled in, all that remains is to compile the
 application. The distribution comes with two makefiles that facilitate this
-process. The primary makefile resides in the {\tt SYMPHONY-5.1/} directory.
+process. The primary makefile resides in the {\tt SYMPHONY-\VER/} directory.
 The user makefile resides in the user's subdirectory, initially called
-\texttt{SYMPHONY-5.1/SYMPHONY/Applications/USER/}. This subdirectory can be 
+\texttt{SYMPHONY-\VER/SYMPHONY/Applications/USER/}. This subdirectory can be 
 moved, as well as renamed. There are a number of variables that must be set in 
 the primary make file. To modify the makefiles appropriately, see the 
 instructions in Section \ref{getting_started_unix}.
@@ -332,7 +332,7 @@ modules, as in the fully distributed version, you must set the parameters {\tt
 
 First, follow the instructions for compiling SYMPHONY in Section
 \ref{getting_started_windows} to ensure you have the proper settings. Once the
-stub files in the {\tt SYMPHONY-5.1\bs SYMPHONY\bs Applications \bs USER} 
+stub files in the {\tt SYMPHONY-\VER\bs SYMPHONY\bs Applications \bs USER} 
 hierarchy are filled in, you should be able to compile the new application 
 and run it successfully. 
 

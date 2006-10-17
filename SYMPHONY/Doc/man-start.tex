@@ -21,7 +21,7 @@ For the users who only need the generic MILP solver or the SYMPHONY
 callable library to be used in their custom applications, there are 
 binary distributions released for different compilers and platforms. 
 Each distribution consists of an executable and libraries built from the 
-source code of SYMPHONY version 5.1.
+source code of SYMPHONY version \VER.
  
 \subsection{Downloading}
 You can obtain the SYMPHONY binary distributions from 
@@ -51,7 +51,7 @@ parallel architectures.
 \item Unpack the package with
 {\color{Brown}
 \begin{verbatim}
- tar xzvf symphony-5.1-XXX.tgz
+ tar xzvf symphony-\VER-XXX.tgz
 \end{verbatim}
 }
 where \texttt{XXX} is the platform and the version of 
@@ -91,7 +91,7 @@ go to \texttt{test} directory and type,
 \end{itemize}
 \subsection{Testing for Microsoft Visual C++}
 Direct support is provided only for MS Visual Studio 6.0. 
-Download and unzip the archive \texttt{symphony-5.1-winv6.zip} 
+Download and unzip the archive \texttt{symphony-\VER-winv6.zip} 
 \begin{itemize}
 \item To test the executable, open a command line terminal,  
 switch into the root directory of the distribution and type, 
@@ -341,7 +341,7 @@ callable library or solve generic MILP problems through the executable.
 \section{Building for shared-memory multiprocessor architecture}
 
 To compile a shared memory version of SYMPHONY, simply use an OpenMP compliant
-compiler. Version 5.1 has been tested with gcc 4.2, and should work by
+compiler. Version \VER has been tested with gcc 4.2, and should work by
 configuring with
 {\color{Brown}
 \begin{verbatim}
@@ -425,8 +425,8 @@ compilers should also be possible. Note that the Windows version has some
 limitations. Detailed timing information is not currently provided. Support is
 only provided for running in sequential mode at this time.
 
-First, download \texttt{SYMPHONY-5.1.zip} and unzip the archive. This will
-create a subdirectory called \texttt{SYMPHONY-5.1} containing all the source
+First, download \texttt{SYMPHONY-\VER.zip} and unzip the archive. This will
+create a subdirectory called \texttt{SYMPHONY-\VER} containing all the source
 files.You now 
 have three options. You can either compile on the command-line using automated 
 MSDEV build system or NMAKE utility or you can use the provided projects and 
@@ -603,7 +603,7 @@ Windows. Let me know if you are interested.
 
 \subsection{Unix}
 
-First, configure and compile SYMPHONY 5.1 as described in
+First, configure and compile SYMPHONY \VER as described in
 Section \ref{build_appl}. This will generate the required library
 and the makefiles for each application. Modify the variables in the 
 SYMPHONY/Applications/USER/Makefile appropriately. 
@@ -618,9 +618,9 @@ Section \ref{SYMPHONY-development}.
 
 \subsection{Microsoft Windows}
 
-First, download \texttt{SYMPHONY-5.1} and unpack the archive if it is 
+First, download \texttt{SYMPHONY-\VER} and unpack the archive if it is 
 required. You now have three options. You can either compile on the 
-command-line using automated MSDEV build system or NMAKE utility or you can 
+command-line using the automated MSDEV build system or NMAKE utility or you can 
 use the provided projects and workspaces. Note that, in Windows, it is not 
 recommended to move USER package from the SYMPHONY package. Otherwise, 
 the user has to redefine all the paths to SYMPHONY and COIN header files 

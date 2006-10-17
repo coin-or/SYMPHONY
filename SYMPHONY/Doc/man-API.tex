@@ -43,7 +43,7 @@ Below is the main menu displayed at the beginning of a fresh session:
 {\color{Brown}
 \begin{verbatim}
  *******************************************************
- *   This is SYMPHONY Version 5.1                      *
+ *   This is SYMPHONY Version 5.1.0                    *
  *   Copyright 2000-2006 Ted Ralphs                    *
  *   All Rights Reserved.                              *
  *   Distributed under the Common Public License 1.0   *
@@ -529,7 +529,7 @@ supports only solvers for linear and mixed-integer linear programs, although a
 new version supporting a wider variety of solvers is currently under
 development.
 
-We have implemented an OSI interface for SYMPHONY 5.1 that allows any solver
+We have implemented an OSI interface for SYMPHONY \VER that allows any solver
 built with SYMPHONY to be accessed through the OSI, including customized
 solvers and those configured to run on parallel architectures. To ease code
 maintenance, for each method in the OSI base class, there is a corresponding
@@ -570,13 +570,13 @@ the OSI is geared primarily toward support of solvers for linear programming
 simplex algorithm support much richer functionality and a wider range of
 interface functions, due to their support of warm starting from previously
 saved checkpoints. This functionality is difficult to provide for MILP
-solvers.  In SYMPHONY 5.1, we have implemented for MILPs some of the same
+solvers.  In SYMPHONY \VER, we have implemented for MILPs some of the same
 functionality that has long been available for LP solvers. As such, our OSI
 interface supports warm starting and sensitivity analysis. The implementations
 of this functionality is straightforward at the moment, but will be improved
 in future versions.
 
-\section{Using Callback Functions}\label{callback}
+\section{Using the Callback Functions}\label{callback}
 
 The user's main avenues for customization of SYMPHONY are the tuning of
 parameters and the implementation of one or more of over 50 user callback

@@ -12,59 +12,57 @@
 %                                                                           %
 %===========================================================================%
 
-\section{Introducing SYMPHONY 5.1}
+\section{Introducing SYMPHONY \VER}
 \label{whats-new}
 
-Welcome to the SYMPHONY Version 5.1 user's manual. Whether you are a new user
-or simply upgrading to 5.1, this manual will help you get started with what we
-hope you will find to be a useful and powerful framework for solving
-mixed-integer linear programs (MILP) either using the generic tools provided
-or by developing a custom brancha and cut algorithm. The subroutines in the
+Welcome to the SYMPHONY Version \VER user's manual. Whether you are a new user
+or simply upgrading, this manual will help you get started with what we hope
+you will find to be a useful and powerful framework for solving mixed-integer
+linear programs (MILP) sequentially or in parallel. The subroutines in the
 \BB\ library comprise a state-of-the-art MILP solver with a modular design
-that is easy to customize for various problem settings. All internal library
-subroutines are generic---their implementation does not depend on the the
-problem setting. SYMPHONY therefore works out of the box as a generic MILP
-solver, with the ability to read both MPS files and GMPL (a subset of AMPL)
-files, as well as interface with more powerful modeling environments, such as
-FlopC++. As a blackbox solver, SYMPHONY can be invoked either from the command
+that makes it easy to customize for various problem settings. SYMPHONY works
+out of the box as a generic MILP solver that can be invoked from the command
 line, through an interactive shell, or by linking to the provided callable
-library. To develop a customized SYMPHONY application, various callbacks can
-be written and parameters set that modify the default behavior of the
-algorithm. The API for these subroutines is described in
-Chapter~\ref{API-overview} and files containing function stubs are provided.
+library (see Section~\ref{callable_library} for an overview of the API).
+Models can be read in MPS or GMPL (a subset of AMPL) format, as well as by
+interfacing with more powerful modeling environments, such as FlopC++. To
+develop a customized SYMPHONY application, various callbacks can be written
+and parameters set that modify the default behavior of the algorithm. An
+overview of the API for these subroutines is described in
+Section~\ref{callback} and files containing function stubs are provided with
+the distribution.
 
-The callable library has both C and C++ interfaces whose look and feel are
-similar to other popular solvers (see Sections \ref{C_Interface} and
-\ref{C++_Interface} for the library routines). The interface is identical for
-SYMPHONY's built-in generic MILP solver (both parallel and sequential
-versions), as well as all custom applications developed by implementing one or
-more of SYMPHONY's user callback functions. SYMPHONY can be built in a wide
-variety of configurations, ranging from fully parallel to completely
-sequential, depending on the user's needs. The library runs serially on almost
-any platform, and can also run in parallel in either a fully distributed
-environment (network of workstations) or a shared-memory environment simply by
-changing a few configuration options (see Chapter~\ref{getting_started}). To
-run in a distributed environment, the user must have installed the {\em
-\htmladdnormallink{Parallel Virtual Machine}{http://www.ccs.ornl.gov/pvm/}}
-(PVM), available for free from Oak Ridge National Laboratories. To run in a
-shared-memory environment, the user must have installed an OpenMP compliant
-compiler (gcc 4.2 is currently the only compiler tested and fully supported).
+The callable library has both C and C++ interfaces with a look and feel
+similar to that of other popular solvers (see Sections \ref{C_Interface} and
+\ref{C++_Interface} for the library routines). SYMPHONY can be built on almost
+any platform and can be configured either for serial computation or in a wide
+variety of parallel modes. The parallel version can be built for either a
+fully distributed environment (network of workstations) or a shared-memory
+environment simply by changing a few configuration options (see
+Chapter~\ref{getting_started}). To run in a distributed environment, the user
+must have installed the {\em \htmladdnormallink{Parallel Virtual
+Machine}{http://www.ccs.ornl.gov/pvm/}} (PVM), available for free from Oak
+Ridge National Laboratories. To run in a shared-memory environment, the user
+must have installed an OpenMP compliant compiler (gcc 4.2 is currently the
+only compiler tested and fully supported).
 
 \section{What's New}
 
-There have been some significant developments since the last version of
-SYMPHONY was released. We have continued to develop some of the more unique
-capabilities SYMPHONY provides, such as the ability to warm start MILP
-computations, the ability to perform simple sensitivity analyses, and the
-ability to solve bicriteria MILPs. Specifically, the new enhancements and
-features include:
+In SYMPHONY 5.0, we introduced a number of new features that make SYMPHONY
+somewhat unique. These include the ability to solve biobjective integer
+programs, the ability to warms start the solution procedure, and the ability
+to perform basic sensitivity analyses. These capabilities have been further
+developed and enhanced in version \VER. Other new features and enhancements
+include:
 
 \begin{itemize}
 
 \item As mentioned above, SYMPHONY now has an interactive optimizer that can
 be used through a command shell. In both the sequential and parallel
 configurations, the user can set parameters, load and solve instances
-interactively, and display results and statistics.
+interactively, and display results and statistics. For Windows users, this
+means that SYMPHONY can be invoked using the familiar procedure of
+``double-clicking'' on the \texttt{symphony.exe} file in Windows Explorer.
 
 \item SYMPHONY now supports automatic configuration using the new COIN-OR build
 system and the GNU autotools.Using autotools utilities, it is now possible to
@@ -83,9 +81,31 @@ the final branch-and-cut tree resulting from a previous solution procedure.
 This partition can include either a number of nodes created first during the
 solution procedure or all of the nodes above a given level of the tree.
 
+\item The COIN-OR repository, the current host of SYMPHONY has
+  recently undergone some significant improvements of its own that have
+  resulted in improved services to users. These include: 
+
+\begin{itemize}
+
+\item SYMPHONY has a new development Web site, where users can submit trouble
+  tickets, browse the source code interactively, and get up-to-date
+  information on development. The address of the new site is
+  \url{https://projects.coin-or.org/SYMPHONY}.
+
+\item SYMPHONY is now hosted on subversion, a version control system with
+  features vastly improved over CVS, the previous hosting system. This has
+  required some reorganization and renaming of the header files.
+
+\item SYMPHONY is now more tightly integrated with other COIN-OR projects. Due
+  to improved procedures for producing stable releases, it will now be much
+  easier for us to determine the exact version of SYMPHONY and all other COIN
+  projects you are using when you report a bug.
+
 \end{itemize}
 
-Two features have also been deprecated and are no longer supported:
+\end{itemize}
+
+Two features have been deprecated and are no longer supported:
 
 \begin{itemize}
 
@@ -98,11 +118,15 @@ functionality than SYMPHONY for implementing branch and price algorithms.
 
 \end{itemize}
 
-There was one minor change to the user callback API from version 5.0 to 5.1.
-The user can now execute a primal heuristic in the
-\ptt{user\_is\_feasible()} callback and return the solution to SYMPHONY.
-Several new subroutines were also added to the callable library API. See the
-\texttt{README} file included with the distribution for more details.
+There were a few minor changes to the API from the previous version of
+SYMPHONY to version \VER. First and foremost, the name of the main header file
+for SYMPHONY has been changed from \texttt{symphony_api.h} to
+\texttt{symphony.h} (though the former has been retained for backword
+compatibility purposes). Second, the user can now execute a primal heuristic
+in the \ptt{user\_is\_feasible()} callback and return the solution to
+SYMPHONY, which required the arguments of this function to be changed
+slightly. Several new subroutines were also added to the callable library API.
+See the \texttt{README} file included with the distribution for more details.
 
 \section{A Brief History}
 \label{history}
