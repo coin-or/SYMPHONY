@@ -448,7 +448,11 @@ int solve(tm_prob *tm)
 
 	 if (tm->par.node_limit >= 0 && tm->stat.analyzed >= 
 	     tm->par.node_limit && termcode != TM_FINISHED){
-	    termcode = TM_NODE_LIMIT_EXCEEDED;
+	    if (tm->active_node_num + tm->samephase_candnum > 0){
+	       termcode = TM_NODE_LIMIT_EXCEEDED;
+	    }else{
+	       termcode = TM_FINISHED;
+	    }
 	    break;
 	 }
 
@@ -514,6 +518,9 @@ int solve(tm_prob *tm)
 }
       }
 }
+      if (tm->samephase_candnum + tm->active_node_num == 0){
+	 termcode = TM_FINISHED;
+      }
       if (tm->nextphase_candnum == 0)
 	 break;
       if (termcode != TM_UNFINISHED)
