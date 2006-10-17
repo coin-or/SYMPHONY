@@ -325,7 +325,7 @@ int solve(tm_prob *tm)
 
    no_work_start = wall_clock(NULL);
 
-   termcode = TM_FINISHED;
+   termcode = TM_UNFINISHED;
    for (; tm->phase <= 1; tm->phase++){
       if (tm->phase == 1 && !tm->par.warm_start){
 	 if ((termcode = tasks_before_phase_two(tm)) ==
@@ -516,7 +516,7 @@ int solve(tm_prob *tm)
 }
       if (tm->nextphase_candnum == 0)
 	 break;
-      if (termcode != TM_FINISHED)
+      if (termcode != TM_UNFINISHED)
 	 break;
    }
    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
