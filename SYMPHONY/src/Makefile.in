@@ -187,8 +187,9 @@ am__libSym_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
@@ -242,8 +243,9 @@ am__libSymAppl_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
@@ -329,15 +331,16 @@ am__libSymAppl_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c Common/timemeas.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	Common/timemeas.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c
 @PSEUDO_COSTS_TRUE@am__objects_41 =  \
 @PSEUDO_COSTS_TRUE@	libSymAppl_lp_la-lp_pseudo_branch.lo
 @PSEUDO_COSTS_FALSE@am__objects_42 = libSymAppl_lp_la-lp_branch.lo
@@ -377,15 +380,16 @@ am__libSymAppl_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c Common/timemeas.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	Common/timemeas.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c
 @PSEUDO_COSTS_TRUE@am__objects_51 =  \
 @PSEUDO_COSTS_TRUE@	libSymAppl_lp_cg_la-lp_pseudo_branch.lo
 @PSEUDO_COSTS_FALSE@am__objects_52 = libSymAppl_lp_cg_la-lp_branch.lo
@@ -429,8 +433,9 @@ am__libSymAppl_m_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -503,8 +508,9 @@ am__libSymAppl_m_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -582,8 +588,9 @@ am__libSymAppl_m_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -663,8 +670,9 @@ am__libSymAppl_m_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -744,8 +752,9 @@ am__libSymAppl_m_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -824,8 +833,9 @@ am__libSymAppl_m_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -902,18 +912,18 @@ am__libSymAppl_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
-	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_157 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_la-lp_varfunc.lo \
@@ -972,18 +982,18 @@ am__libSymAppl_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
-	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_170 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_cp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_cp_la-lp_varfunc.lo \
@@ -1044,18 +1054,18 @@ am__libSymAppl_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
-	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_183 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_la-lp_varfunc.lo \
@@ -1116,18 +1126,18 @@ am__libSymAppl_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
-	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_196 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_cg_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_cg_la-lp_varfunc.lo \
@@ -1188,18 +1198,18 @@ am__libSymAppl_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
-	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_209 = libSymAppl_tm_lp_cg_cp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_cg_cp_la-lp_varfunc.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_cg_cp_la-lp_rowfunc.lo \
@@ -1285,15 +1295,16 @@ am__libSym_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c Common/timemeas.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	Common/timemeas.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c
 @PSEUDO_COSTS_TRUE@am__objects_234 = libSym_lp_la-lp_pseudo_branch.lo
 @PSEUDO_COSTS_FALSE@am__objects_235 = libSym_lp_la-lp_branch.lo
 @SYM_COMPILE_IN_CG_TRUE@am__objects_236 = libSym_lp_la-cg_func.lo \
@@ -1330,15 +1341,16 @@ am__libSym_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c Common/timemeas.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	Common/timemeas.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c
 @PSEUDO_COSTS_TRUE@am__objects_244 =  \
 @PSEUDO_COSTS_TRUE@	libSym_lp_cg_la-lp_pseudo_branch.lo
 @PSEUDO_COSTS_FALSE@am__objects_245 = libSym_lp_cg_la-lp_branch.lo
@@ -1378,8 +1390,9 @@ am__libSym_m_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1449,8 +1462,9 @@ am__libSym_m_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1525,8 +1539,9 @@ am__libSym_m_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1606,8 +1621,9 @@ am__libSym_m_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1687,8 +1703,9 @@ am__libSym_m_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1768,8 +1785,9 @@ am__libSym_m_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h Master/master.c \
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
 	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
@@ -1849,18 +1867,18 @@ am__libSym_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
-	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_350 = libSym_tm_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_la-lp_varfunc.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_la-lp_rowfunc.lo \
@@ -1915,18 +1933,18 @@ am__libSym_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
-	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_363 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_cp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_cp_la-lp_varfunc.lo \
@@ -1984,18 +2002,18 @@ am__libSym_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
-	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_376 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_la-lp_varfunc.lo \
@@ -2053,18 +2071,18 @@ am__libSym_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
-	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_389 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_cg_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_cg_la-lp_varfunc.lo \
@@ -2125,18 +2143,18 @@ am__libSym_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_pack_array.h ../include/sym_pack_cut.h \
 	../include/sym_proccomm.h ../include/sym_proto.h \
 	../include/qsortucb.h ../include/sym_return_values.h \
-	../include/symphony.h ../include/sym_timemeas.h \
-	../include/sym_tm.h ../include/sym_tm_params.h \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
-	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c
+	../include/symphony.h ../include/symphony_api.h \
+	../include/sym_timemeas.h ../include/sym_tm.h \
+	../include/sym_tm_params.h TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_402 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_cg_cp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_cg_cp_la-lp_varfunc.lo \
@@ -2639,6 +2657,7 @@ SYMHEADERS = \
 	../include/qsortucb.h \
 	../include/sym_return_values.h \
 	../include/symphony.h \
+	../include/symphony_api.h \
 	../include/sym_timemeas.h \
 	../include/sym_tm.h \
 	../include/sym_tm_params.h

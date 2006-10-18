@@ -67,6 +67,7 @@ SYMHEADERS = \
 	../include/qsortucb.h \
 	../include/sym_return_values.h \
 	../include/symphony.h \
+	../include/symphony_api.h \
 	../include/sym_timemeas.h \
 	../include/sym_tm.h \
 	../include/sym_tm_params.h
