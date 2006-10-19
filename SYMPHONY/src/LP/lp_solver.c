@@ -2876,17 +2876,24 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 int read_mps(MIPdesc *mip, char *infile, char *probname)
 {
    int j, last_dot = 0, last_dir = 0;
-   char fname[80] = "", ext[10] = "", slash;
+   char fname[80] = "", ext[10] = "";
 
    CoinMpsIO mps;
    int errors;
-    
-#ifdef WIN32
-	slash = '\\';
-#else
-	slash = '/';
-#endif
-	
+   
+   size_t size = 1000;
+   char* buf = 0;
+   while (true) {
+      buf = (char*)malloc(CSIZE*size);
+      if (getcwd(buf, size))
+	 break;
+      FREE(buf);
+      buf = 0;
+      size = 2*size;
+   }
+   char slash = buf[0] == '/' ? '/' : '\\';
+   FREE(buf);
+   
    for (j = 0;; j++){
       if (infile[j] == '\0')
 	 break;
