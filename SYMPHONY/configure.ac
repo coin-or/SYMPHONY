@@ -182,7 +182,6 @@ test $coin_has_xpress = true])
 #                       Add the options                                     #
 #############################################################################
 
-#FIXME! Should we carry this to root config file?
 #---------------------------------------------------------------------------#
 # USE_CGL_CUTS
 #---------------------------------------------------------------------------#
@@ -751,15 +750,15 @@ esac],
 [sym_openmp=false])
 
 if test $sym_openmp = true; then 
-   AC_MSG_CHECKING([GCC version])
+   AC_MSG_CHECKING([G++ version])
    fopenmp_version=4.2
    gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
-   get_gcc_version=`$CC -dumpversion`
+   get_gcc_version=`$CXX -dumpversion`
    gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
    major_gcc_version=`echo ${gcc_version:0:3}`
    AC_MSG_RESULT([$get_gcc_version])
    if test ${major_gcc_version} -lt ${gcc_required_version}; then
-       AC_MSG_ERROR(OpenMP feautures are supported by GCC 4.2.0 or higher.)
+       AC_MSG_ERROR(OpenMP feautures are supported by G++ 4.2.0 or higher.)
    SYMPDEFS="$SYMPDEFS -D_OPENMP"
    SYMDEFS="$SYMDEFS -D_OPENMP"
    fi
@@ -781,11 +780,6 @@ AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
 # In case this is a VPATH configuration we need to make sure that the
 # input files for the examples are available in the VPATH directory.
 
-#AC_COIN_VPATH_LINK(examples/sudoku_sample.csv)
-#AC_COIN_VPATH_LINK(examples/quad.mps)
-#AC_COIN_VPATH_LINK(examples/quad2.mps)
-#AC_COIN_VPATH_LINK(examples/quad2.mps)
-
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
@@ -795,20 +789,6 @@ AC_SUBST(SYMINCDIR)
 AC_SUBST(SYMSRCDIR)
 SYMINCDIR=`cd $srcdir; pwd`/include
 SYMSRCDIR=`cd $srcdir; pwd`/src
-
-dnl SYMSOURCES="\
-dnl 	$SYMSRCDIR/Common      :\
-dnl 	$SYMSRCDIR/LP          :\
-dnl 	$SYMSRCDIR/CutGen      :\
-dnl 	$SYMSRCDIR/CutPool     :\
-dnl 	$SYMSRCDIR/DrawGraph   :\
-dnl 	$SYMSRCDIR/Master      :\
-dnl 	$SYMSRCDIR/../include     :\
-dnl 	$SYMSRCDIR/ :\
-dnl 	$SYMSRCDIR/TreeManager"
-
-dnl VPATH="$SYMSRCDIR/Master"
-dnl AC_SUBST(VPATH)
 
 # To be used in applications: default SYMPHONY defs
 AC_SUBST(SYMDEFS)

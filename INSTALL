@@ -263,7 +263,7 @@ library, together with the header files in 'SYMPHONY\include\', can then be
 used to call SYMPHONY from any C/C++ code. The API for calling SYMPHONY is 
 described in the user's manual.
 
-5. To test the executable, type 
+2. To test the executable, type 
 
    Debug/symphony.exe -F ..\..\SYMPHONY\Datasets\sample.mps
 
@@ -274,7 +274,7 @@ If you want to use the interactive optimizer, simply type
 and then type "help" or "?" to see a list of available commands.
  
 
-2. If SYMPHONY is modified, type 
+3. If SYMPHONY is modified, type 
 
    msdev symphony.dsw /make all /rebuild
 
@@ -305,7 +305,7 @@ The API for calling SYMPHONY is described in the user's manual.
 
 If you want to use the interactive optimizer, simply type  
 
-   symphony.exe 
+   Debug\symphony.exe 
 
 and then type "help" or "?" to see a list of available commands.
  

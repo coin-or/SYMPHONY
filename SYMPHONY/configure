@@ -21584,7 +21584,6 @@ fi
 #                       Add the options                                     #
 #############################################################################
 
-#FIXME! Should we carry this to root config file?
 #---------------------------------------------------------------------------#
 # USE_CGL_CUTS
 #---------------------------------------------------------------------------#
@@ -22489,18 +22488,18 @@ else
 fi;
 
 if test $sym_openmp = true; then
-   echo "$as_me:$LINENO: checking GCC version" >&5
-echo $ECHO_N "checking GCC version... $ECHO_C" >&6
+   echo "$as_me:$LINENO: checking G++ version" >&5
+echo $ECHO_N "checking G++ version... $ECHO_C" >&6
    fopenmp_version=4.2
    gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
-   get_gcc_version=`$CC -dumpversion`
+   get_gcc_version=`$CXX -dumpversion`
    gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
    major_gcc_version=`echo ${gcc_version:0:3}`
    echo "$as_me:$LINENO: result: $get_gcc_version" >&5
 echo "${ECHO_T}$get_gcc_version" >&6
    if test ${major_gcc_version} -lt ${gcc_required_version}; then
-       { { echo "$as_me:$LINENO: error: OpenMP feautures are supported by GCC 4.2.0 or higher." >&5
-echo "$as_me: error: OpenMP feautures are supported by GCC 4.2.0 or higher." >&2;}
+       { { echo "$as_me:$LINENO: error: OpenMP feautures are supported by G++ 4.2.0 or higher." >&5
+echo "$as_me: error: OpenMP feautures are supported by G++ 4.2.0 or higher." >&2;}
    { (exit 1); exit 1; }; }
    SYMPDEFS="$SYMPDEFS -D_OPENMP"
    SYMDEFS="$SYMDEFS -D_OPENMP"
@@ -22532,11 +22531,6 @@ fi
 # In case this is a VPATH configuration we need to make sure that the
 # input files for the examples are available in the VPATH directory.
 
-#AC_COIN_VPATH_LINK(examples/sudoku_sample.csv)
-#AC_COIN_VPATH_LINK(examples/quad.mps)
-#AC_COIN_VPATH_LINK(examples/quad2.mps)
-#AC_COIN_VPATH_LINK(examples/quad2.mps)
-
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
@@ -22546,8 +22540,6 @@ fi
 
 SYMINCDIR=`cd $srcdir; pwd`/include
 SYMSRCDIR=`cd $srcdir; pwd`/src
-
-
 
 # To be used in applications: default SYMPHONY defs
 
