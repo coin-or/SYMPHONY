@@ -5465,7 +5465,12 @@ int sym_test(sym_environment *env)
     }
 
     strcpy(infile, "");
+
+#ifdef WIN32
+    sprintf(infile, "%s%s%s", mps_dir, "\\", mps_files[i]);
+#else
     sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
+#endif     
 
     if( termcode = sym_read_mps(env, infile) < 0)
       return(termcode);
