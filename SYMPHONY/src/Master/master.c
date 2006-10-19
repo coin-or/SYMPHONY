@@ -5447,7 +5447,7 @@ int sym_test(sym_environment *env)
   double tol = 1e-03;
   
   if (strcmp(env->par.test_dir, "") == 0){ 
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN)
      strcpy(mps_dir, "..\\..\\Data\\miplib3");
 #else
      strcpy(mps_dir, "../../Data/miplib3");
@@ -5466,7 +5466,7 @@ int sym_test(sym_environment *env)
 
     strcpy(infile, "");
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN)
     sprintf(infile, "%s%s%s", mps_dir, "\\", mps_files[i]);
 #else
     sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
