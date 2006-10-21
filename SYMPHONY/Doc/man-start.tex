@@ -23,32 +23,37 @@ binary distributions released for different compilers and platforms.
 Each distribution consists of an executable and libraries built from the 
 source code of SYMPHONY version \VER.
  
-\subsection{Downloading}
-You can obtain the SYMPHONY binary distributions from 
+You can obtain the SYMPHONY binary distribution from 
 {\color{Brown}
 \begin{verbatim}
- https://projects.coin-or.org/SYMPHONY/Binaries
+ https://projects.coin-or.org/SYMPHONY
 \end{verbatim}
 }
 
-Note that, these binaries are built with the following default options:
+The binaries are currently available for Linux and Windows. These binaries are
+built with the following default options:
 \begin{itemize}
-\item LP solver = CLP
-\item Cut generation is enabled using CGL
-\item Library type(for Linux) = STATIC
-\item Library linked with = CLP, CGL, COINUTILS, OSI, OSICLP, OSISYM, 
-\item Opt. Level(for Linux) = -O2 
-\item Architecture = Sequential
+\item The LP solver is the COIN LP solver (CLP).
+\item Cut generation with COIN's Cut Generation Library (CGL) is enabled.
+\item All libraries are static.
+%\item Library linked with = CLP, CGL, COINUTILS, OSI, OSICLP, OSISYM, 
+\item The optization level (Linux) is ``O2''. 
+\item Only serial executables are included.
 \end{itemize} 
 
-See Sections \ref{getting_started_unix} and \ref{getting_started_windows} 
-to see how you can build SYMPHONY from source code with other options like 
-having another LP solver, enabling GMPL reader or building SYMPHONY for 
-parallel architectures. 
+Note that by building your own libraries and executables, you get additional
+functionality, since we are not able to distribute an executable that links
+with code distributed under the GNU General Public License, which includes
+several useful libraries SYMPHONY can take advantage of. See Sections
+\ref{getting_started_unix} and \ref{getting_started_windows} for instructions
+for building SYMPHONY from source with other options, including the parallel
+configuration.
+% such as another LP
+%solver, enabling GMPL reader or building SYMPHONY for parallel architectures.
 
-\subsection{Testing for Unix-like environments}
+\subsection{Installation for Unix-like environments}
 \begin{itemize}
-\item Unpack the package with
+\item Unpack the distribution with
 {\color{Brown}
 \begin{verbatim}
  tar xzvf symphony-\VER-XXX.tgz
@@ -58,26 +63,26 @@ where \texttt{XXX} is the platform and the version of
 compiler used to build the distribution. 
 Switch into the root directory of the unpacked distribution. 
 
-\item To test the executable, go to \texttt{bin} directory and type
+\item First, test the executable by going to the \texttt{bin} directory and
+typing 
 {\color{Brown}
 \begin{verbatim}
- symphony -F ../test/sample.mps
+ ./symphony -F ../test/sample.mps
 \end{verbatim}
 }
 \item To test the library, the distribution
-includes sample files in \texttt{test} directory:  
-\begin{itemize}
-\item milp.c: This sample code is an implementation of a basic MILP solver 
-using SYMPHONY's C callable functions with user defined input 
-(see Section \ref{callable_library}). 
-To test the code, go to \texttt{test} directory and type, 
-{\color{Brown}
+includes sample files in \texttt{test} directory:  \\
+\underbar{milp.c}: This sample code is an implementation of a basic MILP
+solver using SYMPHONY's C callable functions with user defined input (see
+Section
+\ref{callable_library}). To test the code, go to \texttt{test} directory and
+type, {\color{Brown}
 \begin{verbatim}
  make milp 
  milp
  \end{verbatim}
 }
-\item milpOsi.c: This sample code is an implementation of a basic MILP 
+\underbar{milpOsi.c}: This sample code is an implementation of a basic MILP 
 solver using SYMPHONY's C++ callable functions (through OsiSym interface)
 with user defined input (see Section \ref{OSI}). To test the code, 
 go to \texttt{test} directory and type, 
@@ -88,8 +93,9 @@ go to \texttt{test} directory and type,
  \end{verbatim}
 }
 \end{itemize}
-\end{itemize}
-\subsection{Testing for Microsoft Visual C++}
+
+
+\subsection{Installation for Microsoft Visual C++}
 Direct support is provided only for MS Visual Studio 6.0. 
 Download and unzip the archive \texttt{symphony-\VER-winv6.zip} 
 \begin{itemize}
