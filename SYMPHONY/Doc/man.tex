@@ -22,6 +22,7 @@
 \setlength{\headwidth}{\textwidth}
 \addtolength{\headwidth}{-4.4444pt}
 \textheight 8.7in
+\setcounter{secnumdepth}{3}
 
 \catcode`\@=11\relax   %allow @ in macro names
 
@@ -50,7 +51,7 @@
 \def\sectionmark##1{\markboth {\uppercase{\ifnum \c@secnumdepth >\z@
     \thesection\hskip 1em\relax \fi ##1}}{}}%
 \def\subsectionmark##1{\markright {\ifnum \c@secnumdepth >\@ne
-          \thesubsection\hskip 1em\relax \fi ##1}}}
+          \thesubsection\hskip 1em\relax \fi ##1}}}%
 \else               % If one-sided printing.
 \def\ps@headings{\let\@mkboth\markboth
 \def\@oddfoot{}\def\@evenfoot{}%     No feet.
@@ -93,7 +94,7 @@
 \def\LPP{{LP Pramaters}}
 \def\CP{{Cut Pool Pramaters}}
 \def\CGP{{Cut Generator Pramaters}}
-\def\VER{{\VER}}
+\def\VER{{5.1.0}}
 \lstloadlanguages{C++}
 
 \newcommand{\be}{\begin{enumerate}}
@@ -110,6 +111,7 @@
 \newcommand{\ev}{\end{verbatim}}
 \newcommand{\functiondef}[1]{\subsubsection{#1}}
 \newcommand{\firstfuncdef}[1]{\subsubsection{#1}}
+\newcommand{\code}[1]{{\color{Brown}\texttt{#1}}}
 %begin{latexonly}
 \renewcommand{\functiondef}[1]{\newpage \item[\Large $\triangleright$] 
 {\color{red}{\bf
@@ -156,7 +158,7 @@
 \frontmatter
 \begin{rawhtml} <H1 ALIGN="CENTER"> 
 \end{rawhtml}
-\title{\huge {\bf \BB\ \VER User's Manual} \thanks{This research was partially
+\title{\huge {\bf \BB\ \VER\  User's Manual} \thanks{This research was partially
 supported by NSF Grants DMS-9527124, DMI-0534862, and DMI-0522796, as well as
 Texas ATP Grant 97-3604-010. A revised version of Chapters
 \ref{SYMPHONY-design} of this manual now appears

@@ -162,8 +162,11 @@ between modules and data must be explicitly passed. IN this case, it is
 sometimes more efficient to maintain in each module only the data necessary to
 perform the functions of that module.
 
-\section{Inter-process Communication for Distributed Computing}
+\section{Inter-process Communication for Parallel Implementation}
+
+\subsection{Distributed-memory Architectures}
 \label{communication}
+
 While the implementation of \BB\ strives to shield the user from having to
 know anything about communications protocols or the specifics of inter-process
 communication, it may be necessary for the user to pass information from one
@@ -197,68 +200,9 @@ to simply copy the send statements into the receive function and change the
 function names. It may then be necessary to add some allocation statements in
 between the receive function calls.
 
-\section{The LP Engine}
-
-\BB\ requires the use of a third-party callable library to solve the LP 
-relaxations once they are formulated. Native interfaces to ILOG's
-\htmladdnormallink{CPLEX}{http://www.cplex.com}$^{\copyright}$
-and IBM's
-\htmladdnormallink{OSL}{http://www-4.ibm.com/software/data/bi/osl/index.html}
-are available. As of Version 4.0, the Open Solver Interface, available from
-\htmladdnormallink{COIN}{http://www.coin-or.org}
-\begin{latexonly} 
-(\texttt{http://www.coin-or.org})
-\end{latexonly}.
-can be used to interface with most commonly available LP solvers. The list of
-solvers with OSI interfaces currently numbers eight and includes both
-commercial and open source alternatives. If the COIN libraries are used, make
-sure to set the proper paths in the SYMPHONY makefile.
-
-\section{Cut Generation}
-
-SYMPHONY now generates generic cutting planes using the Cut Generator Library,
-also available from 
-\htmladdnormallink{COIN}{http://www.coin-or.org}
-\begin{latexonly} 
-COIN (\texttt{http://www.coin-or.org})
-\end{latexonly}.
-The CGL can be used to generate cuts in cases where problem-specific cutting
-planes are not available or not implemented yet. 
-
-\section{Advanced Compilation}
-\label{advanced-compilation}
-
-\subsection{Unix Operating Systems}
-
-Once the callback functions are filled in, all that remains is to compile the
-application. The distribution comes with two makefiles that facilitate this
-process. The primary makefile resides in the {\tt SYMPHONY-\VER/} directory.
-The user makefile resides in the user's subdirectory, initially called
-\texttt{SYMPHONY-\VER/SYMPHONY/Applications/USER/}. This subdirectory can be 
-moved, as well as renamed. There are a number of variables that must be set in 
-the primary make file. To modify the makefiles appropriately, see the 
-instructions in Section \ref{getting_started_unix}.
-
-\paragraph{Working with PVM.}
-\label{PVM}
-To compile a distributed application, it is necessary to install PVM.
-The current version of PVM can be obtained at {\tt
-\htmladdnormallink{http://www.csm.ornl.gov/pvm/}
-{http://www.csm.ornl.gov/pvm/}}. It should compile and install without
-any problem. You will have to make a few modifications to your {\tt
-.cshrc} file, such as defining the {\tt PVM\_ROOT} environment
-variable, but this is all explained clearly in the PVM documentation.
-Note that all executables (or at least a link to them) must reside in
-the {\tt \$PVM\_ROOT/bin/\$PVM\_ARCH} directory in order for parallel
-processes to be spawned correctly. The environment variable {\tt
-PVM\_ARCH} is set in your {\tt .cshrc} file and contains a string
-representing the current architecture type. To run a parallel
-application, you must first start up the daemon on each of the
-machines you plan to use in the computation. How to do this is also
-explained in the PVM documentation.
-
-\paragraph{Communication with Shared Memory.}
+\subsection{Shared-memory Architectures}
 \label{shared}
+
 In the shared memory configuration, it is not necessary to use
 message passing to move information from one module to another since
 memory is globally accessible. In the few cases where the user would
@@ -273,68 +217,153 @@ minimized by looking at the sample applications, especially the VRP solver,
 which works in all configurations, sequential, distributed parallel, and
 shared parallel. 
 
-\paragraph{Configuring the Modules.}
-\label{configuration}
-While configuring SYMPHONY (see Section \ref{configuring}), there 
-are four variables that control which modules run as separate executables and
-which are called directly in serial fashion. The variables are as follows:
-\begin{description}
-        \item [--with-cg:] If set to {\tt yes}, then the cut generator
-        function will be called directly from the LP in serial
-        fashion, instead of running as a separate executable. This is
-        desirable if cut generation is quick and running it in
-        parallel is not worth the price of the communication overhead.
-        \item [--with-cp:] If set to {\tt yes}, then the cut
-        pool(s) will be maintained as a data structure auxiliary to the
-        tree manager. 
-        \item [--with-lp:] If set to {\tt yes}, then the LP
-        functions will be called directly from the tree manager. When
-        running the distributed version, this
-        necessarily implies that there will only be one active
-        subproblem at a time, and hence the code will essentially be
-        running serially. In the shared-memory version, however, the
-        tree manager will be threaded in order to execute subproblems 
-        in parallel.
-        \item [--with-tm:] If set to {\tt yes}, then the tree
-        will be managed directly from the master process. This is only
-        recommended if a single executable is desired (i.e.~the three
-        other variables are also set to true). A single executable is
-        extremely useful for debugging purposes.
-\end{description}
-These variables can be set in virtually any combination, though some
-don't really make much sense. Note that in a few user functions that
-involve process communication, there will be different versions for
-serial and parallel computation. This is accomplished through the use
-of {\tt \#ifdef} statements in the source code. This is well documented
-in the function descriptions and the in the source files containing
-the function stubs. See also Section \ref{shared}.
+%FIXME: Check this
+\section{Building the Application}
 
-\paragraph{Executable Names.}
-\label{exe_names}
-In order to keep track of the various possible configurations, executable and
-their corresponding libraries are named as follows. The name of the master
-module, along with all other modules compiled in with the master, is set in
-the makefile. For the other modules, default names are typically used, since
-these names have to be hard-coded in order for PVM to correctly spawn the
-corresponding processes.  In the fully distributed version, the default names
-are \texttt{tm}, \texttt{lp}, \texttt{cg}, and \texttt{cp}. For other
-configurations, the executable name is a combination of all the modules that
-were compiled together joined by underscores. In other words, if the LP and
-the cut generator modules were compiled together (i.e.~{\tt --with-cg}
-set to {\tt yes}), then the executable name would be ``{\tt lp\_cg}'' and the
-corresponding library file would be called ``{\tt liblp\_cg.a}.'' You can
-rename the executables as you like. However, if you are using PVM to spawn the
-modules, as in the fully distributed version, you must set the parameters {\tt
-*\_exe} in the parameter file to the new executable names. See Section
-\ref{tm_params} for information on setting parameters in the parameter file.
+\subsection{Unix}
+
+First, configure and compile SYMPHONY \VER\  as described in
+Section \ref{build_appl}. This will generate the required library
+and the makefiles for each application. Modify the variables in the 
+SYMPHONY/Applications/USER/Makefile appropriately. 
+Typing "make" in the USER subdirectory should successfully make
+the USER executable. For more information, including the parallel 
+configuration instuctions, see the 
+SYMPHONY/Applications/USER/INSTALL file. 
+After you've successfully compiled the code, you can develop your custom 
+application by following the
+instructions for filling in the user callback functions as described in
+Section \ref{SYMPHONY-development}.
 
 \subsection{Microsoft Windows}
 
-First, follow the instructions for compiling SYMPHONY in Section
-\ref{getting_started_windows} to ensure you have the proper settings. Once the
-stub files in the {\tt SYMPHONY-\VER\bs SYMPHONY\bs Applications \bs USER} 
-hierarchy are filled in, you should be able to compile the new application 
-and run it successfully. 
+First, download \texttt{SYMPHONY-\VER} and unpack the archive if it is 
+required. You now have three options. You can either compile on the 
+command-line using the automated MSDEV build system or NMAKE utility or you can 
+use the provided projects and workspaces. Note that, in Windows, it is not 
+recommended to move USER package from the SYMPHONY package. Otherwise, 
+the user has to redefine all the paths to SYMPHONY and COIN header files 
+as well as the paths to COIN project files. For all of the following options, 
+first go to the \texttt{SYMPHONY\bs Applications\bs USER\bs Win32\bs v6} 
+directory.
+
+\subsection{Using the MSDEV Utility}
+\begin{itemize}
+\item Open a command line terminal and type
+{\color{Brown}
+\begin{verbatim}
+ msdev user.dsw /make all
+\end{verbatim}
+}
+This will create both the debug and release versions of USER application. 
+If you want to compile only one of them, type
+{\color{Brown}
+\begin{verbatim}
+ msdev user.dsw /make "all - debug"
+\end{verbatim}
+}
+or 
+{\color{Brown}
+\begin{verbatim}
+ msdev user.dsw /make "all - release"
+\end{verbatim}
+}
+For each command, the executable \texttt{user} will be created in 
+\texttt{Debug} and/or \texttt{Release}
+directories. 
+
+\item To test the executable, type 
+{\color{Brown}
+\begin{verbatim}
+ Debug\user.exe -F ..\..\sample.user
+\end{verbatim}
+}
+\item If USER source files are modified, type 
+{\color{Brown}
+\begin{verbatim}
+ msdev user.dsw /make all /rebuild
+\end{verbatim}
+}
+in order to clean and rebuild everything.
+\end{itemize} 
+
+\subsection{Using the NMAKE Utility}
+
+\begin{itemize}
+\item 
+Edit the file \texttt{user.mak} to reflect your environment. 
+Only minor edits should be required. An explanation of 
+what has to be set is contained in the comments in the makefile. 
+This basically 
+requires the same routines that one needs to walk through in 
+\texttt{SYMPHONY}'s makefile. 
+See the related parts of \ref{using_nmake} section 
+of \texttt{SYMPHONY} above.
+
+\item Once configuration is done, type 
+{\color{Brown}
+\begin{verbatim}
+  nmake /f user.mak
+\end{verbatim}
+}
+The executable \texttt{user.exe} will be created under the 
+\texttt{Debug} directory.
+\item To test the executable, type 
+{\color{Brown}
+\begin{verbatim}
+ Debug\user.exe -F ..\..\sample.user
+\end{verbatim}
+}
+\end{itemize}
+
+\subsection{Using the MSVC++ Workspace}
+
+\begin{itemize}
+\item Open the workspace 
+\texttt{user.dsw}.
+
+\item 
+The configuration steps are exactly the same with the MSVC++ section of 
+\texttt{SYMPHONY}. The only 
+difference is that, you have the \texttt{user} project instead of the
+\texttt{symphony} project. Go through the related steps of section 
+\ref{getting_started_windows} to see how to get USER executable. 
+
+\item
+Once you have the proper settings, choose \texttt{Build
+user.exe} from the \texttt{Build} menu. This should successfully 
+build the executable.
+
+\item
+To test the executable, right click on the \texttt{user} project, go to the
+\texttt{Debug} tab and set the program arguments to 
+\texttt{-F ..\bs ..\bs sample.mps}. Note that command-line switches are 
+Unix-style.
+
+\item
+Now choose \texttt{Execute} from the build menu and you have a working branch
+and bound solver! After successful compilation, you can fill in the user
+callback functions as describe in Section \ref{SYMPHONY-development}.
+\end{itemize}
+
+%\subsection{Unix Operating Systems}
+
+%Once the callback functions are filled in, all that remains is to compile the
+%application. The distribution comes with two makefiles that facilitate this
+%process. The primary makefile resides in the {\tt SYMPHONY-\VER/} directory.
+%The user makefile resides in the user's subdirectory, initially called
+%\texttt{SYMPHONY-\VER/SYMPHONY/Applications/USER/}. This subdirectory can be
+%moved, as well as renamed. There are a number of variables that must be set in
+%the primary make file. To modify the makefiles appropriately, see the
+%instructions in Section \ref{getting_started_unix}.
+
+%\subsection{Microsoft Windows}
+
+%First, follow the instructions for compiling SYMPHONY in Section
+%\ref{getting_started_windows} to ensure you have the proper settings. Once the
+%stub files in the {\tt SYMPHONY-\VER\bs SYMPHONY\bs Applications \bs USER}
+%hierarchy are filled in, you should be able to compile the new application and
+%run it successfully.
 
 \section{Debugging Your Application}
 
@@ -391,7 +420,7 @@ The makefile is already set up for compiling applications using {\tt
 purify} and {\tt quantify}. Simply set the paths to the executables
 and type ``{\tt make pall}'' or ``{\tt p*}'' where * is the module you
 want to purify. The executable name is the same as described in
-Section \ref{exe_names}, but with a ``p'' in front of it. To tell PVM
+Section \ref{distributed-build}, but with a ``p'' in front of it. To tell PVM
 to launch the purified version of the executables, you must set the
 parameters {\tt *\_exe} in the parameter file to the purified
 executable names. See Section \ref{tm_params} for information on

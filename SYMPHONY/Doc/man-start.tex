@@ -12,8 +12,37 @@
 %                                                                           %
 %===========================================================================%
 
+%FIXME: Where do we put this?
+%\section{The LP Engine}
+
+%SYMPHONY requires the use of a third-party callable library to solve the LP 
+%relaxations once they are formulated. Native interfaces to ILOG's
+%\htmladdnormallink{CPLEX}{http://www.cplex.com}$^{\copyright}$
+%and IBM's
+%\htmladdnormallink{OSL}{http://www-4.ibm.com/software/data/bi/osl/index.html}
+%are available. As of Version 4.0, the Open Solver Interface, available from
+%\htmladdnormallink{COIN}{http://www.coin-or.org}
+%\begin{latexonly} 
+%(\texttt{http://www.coin-or.org})
+%\end{latexonly}.
+%can be used to interface with most commonly available LP solvers. The list of
+%solvers with OSI interfaces currently numbers eight and includes both
+%commercial and open source alternatives. If the COIN libraries are used, make
+%sure to set the proper paths in the SYMPHONY makefile.
+
+%\section{Cut Generation}
+
+%SYMPHONY now generates generic cutting planes using the Cut Generator Library,
+%also available from 
+%\htmladdnormallink{COIN}{http://www.coin-or.org}
+%\begin{latexonly} 
+%COIN (\texttt{http://www.coin-or.org})
+%\end{latexonly}.
+%The CGL can be used to generate cuts in cases where problem-specific cutting
+%planes are not available or not implemented yet. 
+
 This chapter is concerned with detailed instructions for building and
-installing \BB, along with its associated libraries and applications.
+installing SYMPHONY, along with its associated libraries and applications.
 
 \section{Installing the Binary Distribution}
 
@@ -52,6 +81,8 @@ configuration.
 %solver, enabling GMPL reader or building SYMPHONY for parallel architectures.
 
 \subsection{Installation for Unix-like environments}
+\label{building-unix}
+
 \begin{itemize}
 \item Unpack the distribution with
 {\color{Brown}
@@ -59,68 +90,70 @@ configuration.
  tar xzvf symphony-\VER-XXX.tgz
 \end{verbatim}
 }
-where \texttt{XXX} is the platform and the version of 
+where \code{XXX} indicates the platform and the version of 
 compiler used to build the distribution. 
 Switch into the root directory of the unpacked distribution. 
 
-\item First, test the executable by going to the \texttt{bin} directory and
+\item First, test the executable by going to the \code{bin} directory and
 typing 
 {\color{Brown}
 \begin{verbatim}
  ./symphony -F ../test/sample.mps
 \end{verbatim}
 }
-\item To test the library, the distribution
-includes sample files in \texttt{test} directory:  \\
+\item To test the callable library, the distribution
+includes sample files in \code{test} directory:  \\ \\
 \underbar{milp.c}: This sample code is an implementation of a basic MILP
 solver using SYMPHONY's C callable functions with user defined input (see
 Section
-\ref{callable_library}). To test the code, go to \texttt{test} directory and
+\ref{callable_library}). To test the code, go to \code{test} directory and
 type, {\color{Brown}
 \begin{verbatim}
  make milp 
  milp
- \end{verbatim}
-}
+ \end{verbatim}}
 \underbar{milpOsi.c}: This sample code is an implementation of a basic MILP 
 solver using SYMPHONY's C++ callable functions (through OsiSym interface)
 with user defined input (see Section \ref{OSI}). To test the code, 
-go to \texttt{test} directory and type, 
+go to \code{test} directory and type, 
 {\color{Brown}
 \begin{verbatim}
  make milpOsi
  milpOsi
- \end{verbatim}
-}
+ \end{verbatim}}
 \end{itemize}
 
+If everything is working properly, the libraries, executables and header files
+can be installed in appropriate system directories if desired. This must be
+done by hand. This step will be done automatically if building from source
+using the automatic scripts provided (see below).
 
 \subsection{Installation for Microsoft Visual C++}
-Direct support is provided only for MS Visual Studio 6.0. 
-Download and unzip the archive \texttt{symphony-\VER-winv6.zip} 
+
+Direct support is provided only for building in MS Visual Studio 6.0. 
+Download and unpack the archive \code{symphony-\VER-winv6.zip} 
 \begin{itemize}
-\item To test the executable, open a command line terminal,  
-switch into the root directory of the distribution and type, 
-{\color{Brown}
-\begin{verbatim}
- bin\symphony.exe -F Examples\sample.mps
- \end{verbatim}
-}
-\item To test the callable library, the distribution includes sample codes with
-their project files in \texttt{test} directory. 
-\begin{itemize}
-\item milp.c: This sample code is an implementation of a basic MILP solver 
-using SYMPHONY's C callable functions with user defined input 
-(see Section \ref{callable_library}). 
-To test the code, either 
+\item First, test the executable by opening Windows Explorer and double-click
+on {\color{Brown}\texttt{symphony.exe}} in the {\color{Brown}\texttt{bin}}
+directory in the folder in which the distribution was unpacked. This should
+open a Window in which the intereactive solver will appear. Type \code{help}
+or \code{?} to see a list of available commands or see Chapter
+\ref{API-overview} for instructions on using the interactive solver.
+
+\item To test the callable library, the distribution includes sample codes
+along with assocaited project files in the \code{test} directory. \\ \\
+\underbar{milp.c}: This sample code is an implementation of a basic MILP
+solver using SYMPHONY's C callable functions with user defined input (see
+Section \ref{callable_library}). To test the code, either
 
 \begin{itemize}
-\item open the workspace \texttt{milp.dsw}, choose \texttt{Build milp.exe}
-and then choose \texttt{Execute} from the \texttt{Build} menu, 
+\item open the workspace \code{milp.dsw}, choose \code{Build milp.exe}
+and then choose \code{Execute} from the \code{Build} menu, 
 \end{itemize}
 or
 \begin{itemize}
-\item open a command line terminal, and type 
+\item open a command terminal (choose ``Run'' on the Start menu and type
+``\code{cmd}'' in the dialogue box) and type 
 {\color{Brown}
 \begin{verbatim}
  msdev milp.dsw /make "all - debug"
@@ -128,17 +161,18 @@ or
  \end{verbatim}
 }
 \end{itemize}
-\item  milpOsi.c: This sample code is an implementation of a basic MILP 
+\underbar{milpOsi.c}: This sample code is an implementation of a basic MILP 
 solver using SYMPHONY's C++ callable functions (through OsiSym interface)
 with user defined input (see Section \ref{OSI}). To test the code, either 
 \begin{itemize}
-\item open the workspace \texttt{milpOsi.dsw}, 
-choose \texttt{Build milpOsi.exe} and then 
-\texttt{Execute} commands from the \texttt{Build} menu, 
+\item open the workspace \code{milpOsi.dsw}, 
+choose \code{Build milpOsi.exe} and then 
+\code{Execute} commands from the \code{Build} menu, 
 \end{itemize}
 or
 \begin{itemize}
-\item open a command line terminal, and type 
+\item open a command terminal (choose ``Run'' on the Start menu and type
+``\code{cmd}'' in the dialogue box) and type 
 {\color{Brown}
 \begin{verbatim}
  msdev milpOsi.dsw /make "all - debug"
@@ -147,9 +181,12 @@ or
 }
 \end{itemize}
 \end{itemize}
-\end{itemize}
+
+% Applications??????
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Building from source in Unix-like environments}
+
+\section{Building From Source in Unix-like Environments}
 \label{getting_started_unix}
 
 SYMPHONY now uses the COIN-OR build system and the GNU autotools to automate
@@ -176,21 +213,22 @@ source using SVN in most cases:
  svn checkout https://projects.coin-or.org/svn/SYMPHONY/trunk/ COIN-SYMPHONY
 \end{verbatim}
 }
-Alternatively, you can get a daily snapshot of the source code as a tarball
-from the download page of COIN-OR:
+Alternatively, you can get point releases of the source code as a compressed
+file from the download page of COIN-OR:
 {\color{Brown}
 \begin{verbatim}
  http://www.coin-or.org/Tarballs/
 \end{verbatim}
 }
-If the code is obtained as a tarball, unpack the distribution with 
+The latest version of the source code is \VER, so you should download the file
+{\color{Brown}\texttt{SYMPHONY-\VER.tgz}} and unpack the distribution with 
 {\color{Brown}
 \begin{verbatim}
- tar -xzf SYMPHONY_XXX.tgz
+ tar -xzf SYMPHONY-5.1.0.tgz
 \end{verbatim}
-}
-where ``\texttt{XXX}'' is the date the snapshot is taken. This will create a
-subdirectory called \texttt{SYMPHONY\_XXX/} containing the distribution.
+} 
+This will create a subdirectory called \code{SYMPHONY-\VER} containing
+the distribution.
 
 \subsection{Configuring}\label{configuring}
 
@@ -201,12 +239,12 @@ step, switch into the root directory of the distribution and type
 \begin{verbatim}
  ./configure 
 \end{verbatim}
-}
-This will set up the default configuration files. If you want to override the
-default settings, you can either run the configuration script with
+} This will set up the default configuration files. If you want to override
+the default settings, you can either run the configuration script with
 command-line options or else modify the options in the file
-'share/config.site'. A complete list of options with brief
-explanations can be seen both in the file 'share/config.site' and by typing
+{\color{Brown}\texttt{share/config.site}}. A complete list of options with
+brief explanations can be seen both in the file
+{\color{Brown}\texttt{share/config.site}} and by typing 
 {\color{Brown}
 \begin{verbatim}
  ./configure --help=recursive 
@@ -263,7 +301,7 @@ letters (default lpsolver=clp) \\
 \end{figure}
 
 In order to enable or disable an option, either update the file 
-'share/config.site' or add the option as an argument to configuration script. 
+\code{share/config.site} or add the option as an argument to configuration script. 
 As an instance for the second case, running 
 {\color{Brown}
 \begin{verbatim}
@@ -281,20 +319,21 @@ After configuring, the code can be built by typing the commands
  make
  make install
 \end{verbatim}
-}
-This will first create the required libraries and binaries and then will
-install them. By default, the library \texttt{libSym} and the executable
-\texttt{symphony} will be installed to the \texttt{lib/} and \texttt{bin/}
-directories.
+} This will first create the required libraries and binaries and then will
+install them. By default, the library {\color{Brown}\texttt{libSym}} and the
+executable {\color{Brown}\texttt{symphony}} will be installed to the
+{\color{Brown}\texttt{lib/}} and {\color{Brown}\texttt{bin/}} directories. To
+install in another directory, use the option
+{\color{Brown}\texttt{--prefix=DIR}} to the {\color{Brown}\texttt{configure}}
+command.
 
 After compilation, the SYMPHONY library, together with the header files in the
-subdirectory \texttt{include/}, can then be used to call SYMPHONY from any
-C/C++ code. The API for this is described in Chapter~\ref{API-overview}. The
-executable can also be used for solving generic MILP problems in MPS and GMPL
-format. In order to read GMPL files, you will need to have GLPK 
-(\url{http://www.gnu.org/software/glpk/}) installed and
-SYMPHONY must be configured with
-{\color{Brown}
+subdirectory {\color{Brown}\texttt{include/}}, can then be used to call
+SYMPHONY from any C/C++ code. The API for this is described in
+Chapter~\ref{API-overview}. The executable can also be used for solving
+generic MILP problems in MPS and GMPL format. In order to read GMPL files, you
+will need to have GLPK (\url{http://www.gnu.org/software/glpk/}) installed and
+SYMPHONY must be configured with {\color{Brown}
 \begin{verbatim}
  ./configure --with-gmpl --with-glpk-lib[=GLPK library] 
              --with-glpk-incdir[=GLPK include dir] 
@@ -309,32 +348,30 @@ To test SYMPHONY after building, type
 \begin{verbatim}
  make test
 \end{verbatim}
-}
-to execute an automated unit test. To test out the optimizer manually. a
-sample MPS file called "sample.mps" and a sample GMPL/AMPL file called
-"sample.mod" together with its data file "sample.dat" are included with the
-distribution. You can use either the command-line or the interactive
-optimizer. To solve the sample MPS model, type 
-{\color{Brown}
+} to execute an automated unit test. To test out the optimizer manually. a
+sample MPS file called \code{sample.mps} and a sample GMPL/AMPL file called
+{\color{Brown}\texttt{sample.mod}} together with its data file
+{\color{Brown}\texttt{sample.dat}} are included with the distribution. You can
+use either the command-line or the interactive optimizer. To solve the sample
+MPS model, type {\color{Brown}
 \begin{verbatim}
  bin/symphony -F SYMPHONY/Datasets/sample.mps
 \end{verbatim}
-}
-To solve the GMPL model, use the "-F" switch to specify the file
-name and the "-D" for the data file name if the input is in GMPL/AMPL format,
-i.e., type
+} To solve the GMPL model, use the \code{-F} switch to specify the file name
+and the \code{-D} for the data file name if the input is in GMPL/AMPL format,
+i.e., type 
 {\color{Brown}
 \begin{verbatim}
  bin/symphony -F SYMPHONY/Datasets/sample.mod -D SYMPHONY/Datasets/sample.dat
 \end{verbatim}}
 For more MPS data files for further testing, see the MIPLIB library in the
-Data/ subdirectory. To run the interactive optimizer, execute SYMPHONY without
-any command-line arguments, i.e., type
+\code{Data/} subdirectory. To run the interactive optimizer, execute SYMPHONY
+without any command-line arguments, i.e., type
 {\color{Brown}
 \begin{verbatim}
   bin/symphony 
 \end{verbatim}}
-and then type "help" or "?" to see a list of available commands.
+and then type \code{help} or \code{?} to see a list of available commands.
 After the SYMPHONY library and the executable are compiled and tested, you
 can type
 {\color{Brown}
@@ -344,95 +381,179 @@ can type
 if you want to save disk space. That's it! Now you are ready to use SYMPHONY
 callable library or solve generic MILP problems through the executable.
 
-\section{Building for shared-memory multiprocessor architecture}
+\subsection{Building for parallel architectures}
+
+\subsubsection{Shared-memory architectures}
 
 To compile a shared memory version of SYMPHONY, simply use an OpenMP compliant
-compiler. Version \VER has been tested with gcc 4.2, and should work by
+compiler. Version \VER\  has been tested with gcc 4.2, and should work by
 configuring with
 {\color{Brown}
 \begin{verbatim}
- ./configure -enable-openmp
+ ./configure --enable-openmp
 \end{verbatim}
 }
 Follow the instructions above for building and testing. To invoke SYMPHONY
 from the command-line with multiple threads, specify the number of threads
-with the \texttt{-p} option, i.e.,
+with the \code{-p} option, i.e.,
 {\color{Brown}
 \begin{verbatim}
  bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps
 \end{verbatim}
 }
-\section{Building for distribuited-memory architectuires}
 
-If you wish to compile a distributed version of the code, first make sure
-you have PVM installed. You can obtain it from
-\url{http://www.csm.ornl.gov/pvm/}. To configure for a parallel build, invoke
-the configuration script as follows:
-{\color{Brown}
+\subsubsection{Distributed-memory architectures}
+\label{distributed-build}
+
+\paragraph{Installing PVM.}
+\label{PVM}
+To compile a distributed application, it is necessary that PVM be installed
+either in the system path or in the directory pointed to by the environment
+variable \code{PVM\_ROOT} (this can be your homedirectory if PVM is not
+already installed on your network). To install PVM yourself, the current
+version can be obtained at \texttt{
+\htmladdnormallink{http://www.csm.ornl.gov/pvm/}
+{http://www.csm.ornl.gov/pvm/}}. It should compile and install without
+problems on most architectures. You will have to make a few modifications to
+your \code{.cshrc} file, such as defining the \code{PVM\_ROOT} environment
+variable, but this is all explained clearly in the PVM documentation. Note
+that all executables (or at least a link to them) must reside in the \code{\$PVM\_ROOT/bin/\$PVM\_ARCH} directory in order for parallel processes to be
+spawned correctly. The environment variable \code{PVM\_ARCH} is set in your
+\code{.cshrc} file and contains a string representing the current architecture
+type. To run a parallel application, you must first start up the daemon on
+each of the machines you plan to use in the computation. How to do this is
+also explained in the PVM documentation.
+
+\paragraph{Configuring.}
+
+To configure for a parallel build with the default parallel configuration,
+invoke the configuration script as follows: {\color{Brown}
 \begin{verbatim}
  ./configure --with-pvm
 \end{verbatim}
-}
-Be sure that PVM is installed either in system path or that you have the
-environment variable \texttt{PVM\_ROOT} set properly. Note that there are a
-number of different parallel configurations. The default configuration is to
-build two parallel modules. The first one consists of the master, tree
-management, and cut management modules, while the second one consists of the
-node processing, and cut generation modules. For other configuration options,
-see the share/config.site file.
+} 
+Note that there are a number of different parallel configurations (see Chapter
+\ref{SYMPHONY-modules} for an overview of SYMPHONY's parallel modules). The
+default configuration is to build two parallel modules, the first consisting
+of the master, tree management, and cut management modules, while the second
+one consists of the node processing, and cut generation modules. To build in
+another configuration, there are four variables that control which modules run
+as separate executables and which are called directly in serial fashion. The
+variables are as follows:
+\begin{description}
+        \item[] \code{--with-cg}: If set to \code{yes}, then the cut generator
+        function will be called directly from the LP in serial
+        fashion, instead of running as a separate executable. This is
+        desirable if cut generation is quick and running it in
+        parallel is not worth the price of the communication overhead.
+        \item[] \code{--with-cp}: If set to \code{yes}, then the cut
+        pool(s) will be maintained as a data structure auxiliary to the
+        tree manager. 
+        \item[] \code{--with-lp}: If set to \code{yes}, then the LP
+        functions will be called directly from the tree manager. When
+        running the distributed version, this
+        necessarily implies that there will only be one active
+        subproblem at a time, and hence the code will essentially be
+        running serially. In the shared-memory version, however, the
+        tree manager will be threaded in order to execute subproblems 
+        in parallel.
+        \item[] \code{--with-tm}: If set to \code{yes}, then the tree
+        will be managed directly from the master process. This is only
+        recommended if a single executable is desired (i.e.~the three
+        other variables are also set to true). A single executable is
+        extremely useful for debugging purposes.
+\end{description}
+These variables can be set in virtually any combination, though some
+don't really make much sense. Note that in a few user functions that
+involve process communication, there will be different versions for
+serial and parallel computation. This is accomplished through the use
+of \code{\#ifdef} statements in the source code. This is well documented
+in the function descriptions and the in the source files containing
+the function stubs.
 
-Follow the build instructions above to build the code. Note that this will
-also compile the sequential version. Make sure there are links from your
-\texttt{\$PVM\_ROOT/bin/\$PVM\_ARCH} subdirectoryto each of the executables in
-your \texttt{bin/} directory. This is required by PVM.
+\paragraph{Building.}
+
+Once configured, follow the build instructions in Section \ref{building-unix}
+to build the code. Note that this will also compile the sequential version.
+Make sure there are links from your
+\code{\$PVM\_ROOT/bin/\$PVM\_ARCH} subdirectoryto each of the executables in
+your \code{bin/} directory, as required by PVM. In order to keep track of
+the various possible configurations, executable and their corresponding
+libraries are named as follows. The name of the master module, along with all
+other modules compiled in with the master, is set in the makefile. For the
+other modules, default names are typically used, since these names have to be
+hard-coded in order for PVM to correctly spawn the corresponding processes. In
+the fully distributed version, the default names are \code{tm}, \code{lp},
+\code{cg}, and \code{cp}. For other configurations, the executable name is
+a combination of all the modules that were compiled together joined by
+underscores. In other words, if the LP and the cut generator modules were
+compiled together (i.e.,~\code{--with-cg} set to \code{yes}), then the executable
+name would be \code{lp\_cg} and the corresponding library file would be
+called \code{liblp\_cg.a}. You can rename the executables as you like.
+However, if you are using PVM to spawn the modules, as in the fully
+distributed version, you must set the parameters \code{*\_exe} in the parameter
+file to the new executable names. See Section
+\ref{tm_params} for information on setting parameters in the parameter file.
 
 To test the parallel version, first start the PVM daemon by typing
-\texttt{pvm} on the command line and then typing \texttt{quit}. As above,
-invoke SYMPHONY using the sample MPS file called \texttt{sample.mps} included
-with the distribution. To specify the file name, use the \texttt{-F}
+\code{pvm} on the command line and then typing \code{quit}. As above,
+invoke SYMPHONY using the sample MPS file called \code{sample.mps} included
+with the distribution. To specify the file name, use the \code{-F}
 command-line option, i.e., in the root directory, type
 {\color{Brown}
 \begin{verbatim}
- bin/symphony_m\$(EXT) -F SYMPHONY/Datasets/sample.mps 
+ bin/symphony_m_$(EXT) -F SYMPHONY/Datasets/sample.mps 
 \end{verbatim}
-}
-where \texttt{\$(EXT)} is an extension to be added according to the chosen
-module dependencies. To obtain more MPS data files for further testing,
-download the MIPLIB library.
+} where \code{\$(EXT)} is an extension to be added according to the chosen
+configuration of the modules. 
 
-\section{Building a SYMPHONY Application}
+\subsection{Building SYMPHONY Applications}
 \label{build_appl}
-In order to compile SYMPHONY's applications, you must first compile the 
-application-specific library with
-{\color{Brown}
+
+There are a number of sample applications available as examples of how to do
+development with SYMPHONY. These include solvers for the matching problem, the
+set partitioning problem (simple and advanced versions), the vehicle routing
+and traveling salesman problems, the mixed postman problem, multi-criteria
+knapsack problem and, capacitated network routing problem. These applications
+are distributed as separate packages and can be downloaded either from
+\texttt{\htmladdnormallink{http://www.projects.coin-or/SYMPHONY}{http://www.projects.coin-or/SYMPHONY/}} or from 
+\texttt{\htmladdnormallink{http://www.branchandcut.org/SYMPHONY}{http://www.branchandcut.org/SYMPHONY/}}. There is also a white paper that guides the
+user through the development of the matching solver. These applications are
+contained in the \code{SYMPHONY/Applications/} subdirectory in the
+distribution. For instructions on developing your own application with
+SYMPHONY, see Chapter \ref{SYMPHONY-development}.
+
+In order to compile SYMPHONY's applications in Unix-like environments, you
+must first compile a version of the callable library with hooks for the
+callback functions. {\color{Brown}
 \begin{verbatim}
  ./configure --with-applications 
  make 
  make install
 \end{verbatim}
 }
-This will create the application library called 'libSymAppl' to be used while
+This will create the application library called \code{libSymAppl} to be used while
 building custom applications. Note that that sequential version library and
 executable will also be made and installed.
 
 After building the library, go to one of the application subdirectories in the
-\texttt{SYMPHONY/Applications/} directory and type \texttt{make} there. For
+\code{SYMPHONY/Applications/} directory and type \code{make} there. For
 more information, including the parallel configuration instructions, see the
 INSTALL file of the corresponding application.
 
-\section{Building from source Using the Microsoft Visual C++ compiler}
+\section{Building From Source Using Microsoft Visual C++}
 \label{getting_started_windows}
 
-Here is a sketch outline of how to compile \BB\ in MS Windows.
+Here is a sketch outline of how to compile SYMPHONY in MS Windows.
 These instructions will lead you through the steps required to compile
-\BB as a generic MILP solver. Direct support
+SYMPHONY as a generic MILP solver. Direct support
 is provided for compilation with MS Visual Studio 6.0. Compilation for other
 compilers should also be possible. Note that the Windows version has some
 limitations. Detailed timing information is not currently provided. Support is
 only provided for running in sequential mode at this time.
 
-First, download \texttt{SYMPHONY-\VER.zip} and unzip the archive. This will
-create a subdirectory called \texttt{SYMPHONY-\VER} containing all the source
+First, download \code{SYMPHONY-\VER.tgz} and unpack the archive. This will
+create a subdirectory called \code{SYMPHONY-\VER} containing all the source
 files.You now 
 have three options. You can either compile on the command-line using automated 
 MSDEV build system or NMAKE utility or you can use the provided projects and 
@@ -442,8 +563,9 @@ only typing a single command or editing the makefile.
 \subsection{Using the MSDEV Utility}
 \label{using_msdev}
 \begin{itemize}
-\item Open a command line terminal. Go to \texttt{Win32\bs v6} directory and 
-type
+\item Open a command terminal (choose ``Run'' on the Start menu and type
+``\code{cmd}'' in the dialogue box). Go to the \code{Win32\bs v6}
+directory and type 
 {\color{Brown}
 \begin{verbatim}
  msdev symphony.dsw /make all
@@ -462,28 +584,21 @@ or
  msdev symphony.dsw /make "all - release"
 \end{verbatim}
 }
-For each command, the library \texttt{libSymphony.lib} and the executable 
-\texttt{symphony} will be created in \texttt{Debug} and/or \texttt{Release}
+For each command, the library \code{libSymphony.lib} and the executable 
+\code{symphony} will be created in \code{Debug} and/or \code{Release}
 directories.  The library, together with the header files in 
-\texttt{SYMPHONY\bs include\bs}, can then be 
-used to call \BB from any C/C++ code. The API for calling \BB is 
+\code{SYMPHONY\bs include\bs}, can then be 
+used to call SYMPHONY from any C/C++ code. The API for calling SYMPHONY is 
 described in Section \ref{callable_library}.
 
-\item To test the executable, type 
-{\color{Brown}
-\begin{verbatim}
- Debug\symphony.exe -F ..\..\SYMPHONY\Datasets\sample.mps
-\end{verbatim}
-}
-If you want to use the interactive optimizer, simply type
-{\color{Brown}
-\begin{verbatim}
- Debug\symphony.exe
-\end{verbatim}
-}
-and then type "help" or "?" to see a list of available commands.
+\item Test the executable by opening Windows Explorer and double-clicking
+on {\color{Brown}\texttt{symphony.exe}} in the
+{\color{Brown}\texttt{Debug\bs}} subdirectory. This should open a Window in
+which the intereactive solver will appear. Type \code{help} or \code{?} to see
+a list of available commands or see Chapter
+\ref{API-overview} for instructions on using the interactive solver.
 
-\item If SYMPHONY is modified, type 
+\item If you modify the source code of SYMPHONY, type 
 {\color{Brown}
 \begin{verbatim}
  msdev symphony.dsw /make all /rebuild
@@ -491,17 +606,19 @@ and then type "help" or "?" to see a list of available commands.
 }
 in order to clean and rebuild everything.
 \end{itemize} 
+
 \subsection{Using the NMAKE Utility}
 \label{using_nmake}
+
 \begin{itemize}
-\item Go to \texttt{Win32/v6} directory and edit the \texttt{sym.mak} 
+\item Go to \code{Win32/v6} directory and edit the \code{sym.mak} 
 makefile to reflect 
 your environment. This involves specifying the LP solver to be used, 
 assigning some variables and  setting various paths. Only minor edits 
 should be required. An explanation of what has to be set is contained in the 
 comments in the makefile.  Note that, you have to first create the COIN 
 libraries \ptt{Cgl}, \ptt{Clp}, \ptt{Osi}, \ptt{OsiClp} and \ptt{CoinUtils} 
-which reside in \texttt{Win32/v6} directory.
+which reside in \code{Win32/v6} directory.
 
 \item Once configuration is done, open a command line terminal and type 
 {\color{Brown}
@@ -509,55 +626,48 @@ which reside in \texttt{Win32/v6} directory.
  nmake /f sym.mak
 \end{verbatim}
 }
-This will make the SYMPHONY library 'libSymphony.lib' and the executable 
-'symphony' in \texttt{Debug} directory. The library, together with the 
-header files in \texttt{SYMPHONY\bs include\bs}, can then be used to call 
+This will make the SYMPHONY library \code{libSymphony.lib} and the executable 
+\code{symphony} in \code{Debug} directory. The library, together with the 
+header files in \code{SYMPHONY\bs include\bs}, can then be used to call 
 SYMPHONY from any C/C++ code. The API for calling SYMPHONY is described in 
 Section \ref{callable_library}.
 
-\item To test the executable, type 
-{\color{Brown}
-\begin{verbatim}
-  Debug\symphony.exe -F ..\..\SYMPHONY\Datasets\sample.mps
-\end{verbatim}
-}
+\item Test the executable by opening Windows Explorer and double-clicking
+on {\color{Brown}\texttt{symphony.exe}} in the
+{\color{Brown}\texttt{Debug\bs}} subdirectory. This should open a Window in
+which the intereactive solver will appear. Type \code{help} or \code{?} to see
+a list of available commands or see Chapter \ref{API-overview} for
+instructions on using the interactive solver.
 
-If you want to use the interactive optimizer, simply type  
-{\color{Brown}
-\begin{verbatim}
- Debug\symphony.exe 
-\end{verbatim}
-}
-and then type "help" or "?" to see a list of available commands.
 \end{itemize}
 
 \subsection{Using the MSVC++ Workspace}
 
 \begin{itemize}
 
-\item Go to \texttt{Win32\bs v6} directory and open the workspace 
-\texttt{symphony.dsw}. 
+\item Go to \code{Win32\bs v6} directory and open the workspace 
+\code{symphony.dsw}. 
 
 \item Note that there are a number of additional preprocessor definitions that
 control the functionality of SYMPHONY. These definitions are described in
-\texttt{sym.mak}, a Unix-style makefile included in the distribution. To 
+\code{sym.mak}, a Unix-style makefile included in the distribution. To 
 enable the functionality associated with a particular definition, simply add 
-it to the list of definitions of \texttt{libSymphony} project together with 
+it to the list of definitions of \code{libSymphony} project together with 
 the required libraries and paths. For instance, if you 
 want to enable GMPL reader option, you need to
 \begin{itemize}
   \item add the directory of the header files of GLPK to the include 
 files path
-  \item add \texttt{USE\_GLPMPL} to the defines
+  \item add \code{USE\_GLPMPL} to the defines
   \item add the GLPK library to the workspace
 \end{itemize}
-\item Make sure that the project \texttt{symphony} is set as the active 
+\item Make sure that the project \code{symphony} is set as the active 
 project from the Project/Set Active menu. Choose 
-\texttt{Build symphony.exe} from the Build menu. This should successfully 
+\code{Build symphony.exe} from the Build menu. This should successfully 
 build the SYMPHONY library and the corresponding executable.
 
 \item To test the executable, right click on the symphony project, go to the
-\texttt{Debug} tab and set the program arguments to 
+\code{Debug} tab and set the program arguments to 
 {\color{Brown}
 \begin{verbatim}
  -F ..\..\SYMPHONY\Datasets\sample.mps 
@@ -566,10 +676,10 @@ build the SYMPHONY library and the corresponding executable.
 Note that command-line switches are Unix-style. If you want to use the 
 interactive optimizer, leave this tab empty. 
 
-4. Now choose \texttt{Execute} from the Build menu and the solver should 
+4. Now choose \code{Execute} from the Build menu and the solver should 
 solve the given sample problem. If you have not specified the sample problem, 
 then the interactive optimizer should start. In this case, 
-type "help" or "?" to see a list of available commands
+type \code{help} or \code{?} to see a list of available commands
 \end{itemize}
 
 Note that there is some functionality missing from the Windows version. Most
@@ -580,168 +690,5 @@ run in sequential mode for a variety of reasons. However, it should be
 relatively easy to get it running in parallel if you can get PVM working under
 Windows. Let me know if you are interested.
 
-%\section{Using SYMPHONY}
-
-%\subsection{Using the SYMPHONY executable}
-
-%To use SYMPHONY as a generic solver, type the executable name followed by one
-%or more of the command-line switches. There are two required switches. You
-%must specify the location of the input file by using ``-F 'filename'.'' This
-%input file is assumed to be in MPS format, unless the ``-D'' switch is also
-%present, in which case the file will be assumed to be in GMPL model file
-%format with the data file specified after the ``-D'' switch. Some of
-%SYMPHONY's native parameters can also be set on the command line. Below is a
-%list of these parameters. This list can also be obtained by typing the
-%executable name with no command-line arguments. Note that all SYMPHONY
-%parameters are denoted by a lowercase letter. Note that there are dozens of
-%other parameters that can be set with the use of a parameter file. These
-%parameters are listed in the SYMPHONY user's manual.
-
-%\subsection{Using the SYMPHONY callable library}
-
-%To use SYMPHONY as a generic callable library, compile SYMPHONY as described
-%above. The library that is created along with the solver itself can be linked
-%to using the API described Section \ref{callable-library}. As an example of
-%using the callable library in this way, see the multi-criteria knapsack
-%application (MCKP).
-
-\section{Compiling a Custom Application Using Callbacks}
-
-\subsection{Unix}
-
-First, configure and compile SYMPHONY \VER as described in
-Section \ref{build_appl}. This will generate the required library
-and the makefiles for each application. Modify the variables in the 
-SYMPHONY/Applications/USER/Makefile appropriately. 
-Typing "make" in the USER subdirectory should successfully make
-the USER executable. For more information, including the parallel 
-configuration instuctions, see the 
-SYMPHONY/Applications/USER/INSTALL file. 
-After you've successfully compiled the code, you can develop your custom 
-application by following the
-instructions for filling in the user callback functions as described in
-Section \ref{SYMPHONY-development}.
-
-\subsection{Microsoft Windows}
-
-First, download \texttt{SYMPHONY-\VER} and unpack the archive if it is 
-required. You now have three options. You can either compile on the 
-command-line using the automated MSDEV build system or NMAKE utility or you can 
-use the provided projects and workspaces. Note that, in Windows, it is not 
-recommended to move USER package from the SYMPHONY package. Otherwise, 
-the user has to redefine all the paths to SYMPHONY and COIN header files 
-as well as the paths to COIN project files. For all of the following options, 
-first go to the \texttt{SYMPHONY\bs Applications\bs USER\bs Win32\bs v6} 
-directory.
-
-\subsection{Using the MSDEV Utility}
-\begin{itemize}
-\item Open a command line terminal and type
-{\color{Brown}
-\begin{verbatim}
- msdev user.dsw /make all
-\end{verbatim}
-}
-This will create both the debug and release versions of USER application. 
-If you want to compile only one of them, type
-{\color{Brown}
-\begin{verbatim}
- msdev user.dsw /make "all - debug"
-\end{verbatim}
-}
-or 
-{\color{Brown}
-\begin{verbatim}
- msdev user.dsw /make "all - release"
-\end{verbatim}
-}
-For each command, the executable \texttt{user} will be created in 
-\texttt{Debug} and/or \texttt{Release}
-directories. 
-
-\item To test the executable, type 
-{\color{Brown}
-\begin{verbatim}
- Debug\user.exe -F ..\..\sample.user
-\end{verbatim}
-}
-\item If USER source files are modified, type 
-{\color{Brown}
-\begin{verbatim}
- msdev user.dsw /make all /rebuild
-\end{verbatim}
-}
-in order to clean and rebuild everything.
-\end{itemize} 
-
-\subsection{Using the NMAKE Utility}
-
-\begin{itemize}
-\item 
-Edit the file \texttt{user.mak} to reflect your environment. 
-Only minor edits should be required. An explanation of 
-what has to be set is contained in the comments in the makefile. 
-This basically 
-requires the same routines that one needs to walk through in 
-\texttt{SYMPHONY}'s makefile. 
-See the related parts of \ref{using_nmake} section 
-of \texttt{SYMPHONY} above.
-
-\item Once configuration is done, type 
-{\color{Brown}
-\begin{verbatim}
-  nmake /f user.mak
-\end{verbatim}
-}
-The executable \texttt{user.exe} will be created under the 
-\texttt{Debug} directory.
-\item To test the executable, type 
-{\color{Brown}
-\begin{verbatim}
- Debug\user.exe -F ..\..\sample.user
-\end{verbatim}
-}
-\end{itemize}
-
-\subsection{Using the MSVC++ Workspace}
-
-\begin{itemize}
-\item Open the workspace 
-\texttt{user.dsw}.
-
-\item 
-The configuration steps are exactly the same with the MSVC++ section of 
-\texttt{SYMPHONY}. The only 
-difference is that, you have the \texttt{user} project instead of the
-\texttt{symphony} project. Go through the related steps of section 
-\ref{getting_started_windows} to see how to get USER executable. 
-
-\item
-Once you have the proper settings, choose \texttt{Build
-user.exe} from the \texttt{Build} menu. This should successfully 
-build the executable.
-
-\item
-To test the executable, right click on the \texttt{user} project, go to the
-\texttt{Debug} tab and set the program arguments to 
-\texttt{-F ..\bs ..\bs sample.mps}. Note that command-line switches are 
-Unix-style.
-
-\item
-Now choose \texttt{Execute} from the build menu and you have a working branch
-and bound solver! After successful compilation, you can fill in the user
-callback functions as describe in Section \ref{SYMPHONY-development}.
-\end{itemize}
-
-\section{Sample Applications}
-
-There are a number of sample applications available as examples of how to do
-development with \BB. These include solvers for the matching problem, the set
-partitioning problem (simple and advanced versions), the vehicle routing and
-traveling salesman problems, the mixed postman problem, multi-criteria 
-knapsack problem and, capacitated
-network routing problem. These applications are distributed as separate
-packages and can be downloaded either from
-\texttt{\htmladdnormallink{http://www.projects.coin-or/SYMPHONY}{http://www.projects.coin-or/SYMPHONY/}} or from 
-\texttt{\htmladdnormallink{http://www.branchandcut.org/SYMPHONY}{http://www.branchandcut.org/SYMPHONY/}}. There is also a white paper that guides the
-user through the development of the matching solver.
+%FIXME: Do we describe how to build an application?
+%\subsection{Building SYMPHONY Applications}
