@@ -327,6 +327,41 @@ submenu. The followings are all valid commands:
   \end{verbatim}
 \end{itemize}
 }
+
+\section{Using SYMPHONY from the command line}
+
+%\subsection{Controlling Execution and Output}
+%\label{output}
+
+Calling \BB\ with no arguments simply lists all command-line options.  Most of
+the common parameters can be set on the command line. Sometimes, however, it
+may be easier to use a parameter file. To invoke \BB\ with a parameter file
+type ``{\tt master -f filename ...}'' where filename is the name of the
+parameter file. The format of the file is explained in Section
+\ref{parameter_file}. 
+
+The output level can be controlled through the use of the verbosity
+parameter. Setting this parameter at different levels will cause
+different progress messages to be printed out. Level 0 only prints out
+the introductory and solution summary messages, along with status
+messages every 10 minutes. Level 1 prints out a message every time a
+new node is created. Level 3 prints out messages describing each
+iteration of the solution process. Levels beyond 3 print out even more
+detailed information.
+
+There are also two possible graphical interfaces. For graph-based
+problems, the Interactive Graph Drawing Software allows visual display
+of fractional solutions, as well as feasible and optimal solutions
+discovered during the solution process. For all types of problems,
+VBCTOOL creates a visual picture of the branch and cut tree, either
+in real time as the solution process evolves or as an emulation from a
+file created by
+\BB. See Section \ref{tm_params} for information on how to use VBCTOOL
+with SYMPHONY. Binaries for VBCTOOL can be obtained at \\ 
+{\tt \htmladdnormallink
+{http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}
+{http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}}.
+
 \section{Using the Callable Library}\label{callable_library}
 
 SYMPHONY's callable library consists of a complete set of subroutines for
@@ -617,3 +652,4 @@ Bug reports can be submitted to and viewed from
 \begin{center}
 \url{https://projects.coin-or.org/SYMPHONY/report}
 \end{center}
+

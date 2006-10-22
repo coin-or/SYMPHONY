@@ -300,9 +300,9 @@ letters (default lpsolver=clp) \\
 \caption{A list of useful configuration options \label{conf_opts}}
 \end{figure}
 
-In order to enable or disable an option, either update the file 
-\code{share/config.site} or add the option as an argument to configuration script. 
-As an instance for the second case, running 
+In order to enable or disable an option, either modify the file
+\code{share/config.site} or add the option as an argument to configuration
+script. As an instance for the second case, running 
 {\color{Brown}
 \begin{verbatim}
  ./configure --enable-debug
@@ -515,13 +515,11 @@ development with SYMPHONY. These include solvers for the matching problem, the
 set partitioning problem (simple and advanced versions), the vehicle routing
 and traveling salesman problems, the mixed postman problem, multi-criteria
 knapsack problem and, capacitated network routing problem. These applications
-are distributed as separate packages and can be downloaded either from
-\texttt{\htmladdnormallink{http://www.projects.coin-or/SYMPHONY}{http://www.projects.coin-or/SYMPHONY/}} or from 
-\texttt{\htmladdnormallink{http://www.branchandcut.org/SYMPHONY}{http://www.branchandcut.org/SYMPHONY/}}. There is also a white paper that guides the
-user through the development of the matching solver. These applications are
-contained in the \code{SYMPHONY/Applications/} subdirectory in the
-distribution. For instructions on developing your own application with
-SYMPHONY, see Chapter \ref{SYMPHONY-development}.
+are contained in the \code{SYMPHONY/Applications/} subdirectory in the
+distribution. There is also a white paper that guides the user through the
+development of the MATCH solver in the \code{SYMPHONY/Doc/} directory. For
+instructions on developing your own application with SYMPHONY, see Chapter
+\ref{SYMPHONY-development}.
 
 In order to compile SYMPHONY's applications in Unix-like environments, you
 must first compile a version of the callable library with hooks for the
@@ -560,7 +558,7 @@ MSDEV build system or NMAKE utility or you can use the provided projects and
 workspaces. Compiling on the command-line is somewhat easier since it requires 
 only typing a single command or editing the makefile. 
 
-\subsection{Using the MSDEV Utility}
+\subsection{Building with the MSDEV Utility}
 \label{using_msdev}
 \begin{itemize}
 \item Open a command terminal (choose ``Run'' on the Start menu and type
@@ -607,7 +605,7 @@ a list of available commands or see Chapter
 in order to clean and rebuild everything.
 \end{itemize} 
 
-\subsection{Using the NMAKE Utility}
+\subsection{Building with the NMAKE Utility}
 \label{using_nmake}
 
 \begin{itemize}
@@ -641,7 +639,8 @@ instructions on using the interactive solver.
 
 \end{itemize}
 
-\subsection{Using the MSVC++ Workspace}
+\subsection{Building with the MSVC++ Workspace}
+\label{using_msvc}
 
 \begin{itemize}
 
@@ -690,5 +689,117 @@ run in sequential mode for a variety of reasons. However, it should be
 relatively easy to get it running in parallel if you can get PVM working under
 Windows. Let me know if you are interested.
 
-%FIXME: Do we describe how to build an application?
-%\subsection{Building SYMPHONY Applications}
+\subsection{Building SYMPHONY Applications}
+
+There are a number of sample applications available as examples of how to do
+development with SYMPHONY. These include solvers for the matching problem, the
+set partitioning problem (simple and advanced versions), the vehicle routing
+and traveling salesman problems, the mixed postman problem, multi-criteria
+knapsack problem and, capacitated network routing problem. These applications
+are contained in the \code{SYMPHONY/Applications/} subdirectory in the
+distribution. There is also a white paper that guides the user through the
+development of the MATCH solver in the \code{SYMPHONY/Doc/} directory. For
+instructions on developing your own application with SYMPHONY, see Chapter
+\ref{SYMPHONY-development}.
+
+In order to compile SYMPHONY's applications in the Microsoft Visual C++
+environment, download \code{SYMPHONY-\VER} and unpack the archive as
+described eariler. You then have three options. You can either compile on the
+command-line using the automated MSDEV build system or NMAKE utility or you
+can use the provided projects and workspaces. All of the following commands
+should be executed in the \code{SYMPHONY\bs Applications\bs XXX\bs Win32\bs
+v6} directory, where \code{XXX} is the name of the application to be built.
+
+\subsubsection{Using the MSDEV Utility}
+\begin{itemize}
+\item Open a command terminal (choose ``Run'' on the Start menu and type
+``\code{cmd}'' in the dialogue box) and type
+{\color{Brown}
+\begin{verbatim}
+ msdev xxx.dsw /make all
+\end{verbatim}
+} where \code{xxx} is the name of the application. This will create both the
+debug and release versions of the application executable. If you want to
+compile only one of them, type 
+{\color{Brown}
+\begin{verbatim}
+ msdev xxx.dsw /make "all - debug"
+\end{verbatim}
+}
+or 
+{\color{Brown}
+\begin{verbatim}
+ msdev xxx.dsw /make "all - release"
+\end{verbatim}
+}
+For each command, the executable \code{user} will be created in 
+\code{Debug\bs} and/or \code{Release\bs}
+directories. 
+
+\item To test the executable, type 
+{\color{Brown}
+\begin{verbatim}
+ Debug\xxx.exe -F ..\..\sample.xxx
+\end{verbatim}
+}
+\item If the source files for the application are modified, type 
+{\color{Brown}
+\begin{verbatim}
+ msdev user.dsw /make all /rebuild
+\end{verbatim}
+}
+in order to clean and rebuild everything.
+\end{itemize} 
+
+\subsubsection{Using the NMAKE Utility}
+
+\begin{itemize}
+\item 
+Edit the file \code{xxx.mak}, where \code{xxx} is the name of the application,
+to reflect your environment. Only minor edits should be required. An
+explanation of what has to be set is contained in the comments in the
+\code{xxx.mak} file. Also, see the related parts of Section \ref{using_nmake}
+above.
+
+\item Once configuration is done, type 
+{\color{Brown}
+\begin{verbatim}
+  nmake /f xxx.mak
+\end{verbatim}
+}
+The executable \code{xxx.exe} will be created in the \code{Debug/} directory.
+\item To test the executable, type 
+{\color{Brown}
+\begin{verbatim}
+ Debug\xxx.exe -F ..\..\sample.xxx
+\end{verbatim}
+}
+\end{itemize}
+
+\subsubsection{Using the MSVC++ Workspace}
+
+\begin{itemize}
+
+\item Open the workspace \code{xxx.dsw}.
+
+\item The configuration steps are exactly the same as that described in
+  Section \ref{using_msvc}. The only difference is that you are using the
+  \texttt{xxx} project instead of the \texttt{symphony} project. Go through
+  the same steps to configure.
+
+\item Once you have the proper settings, choose \code{Build
+xxx.exe} from the \code{Build} menu. This should successfully 
+build the executable.
+
+\item
+To test the executable, right click on the \code{xxx} project, go to the
+\code{Debug\bs} tab and set the program arguments to 
+\code{-F ..\bs ..\bs sample.xxx}. Note that command-line switches are 
+Unix-style.
+
+\item
+Now choose \code{Execute} from the build menu and you have a working branch
+and bound solver. 
+
+\end{itemize}
+
