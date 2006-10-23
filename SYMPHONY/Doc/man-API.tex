@@ -14,31 +14,47 @@
 
 \section{Using SYMPHONY Interactively}
 
-If you are planning to use the interactive optimizer, it is recommended to run
-the configuration script (see Section \ref{configuring}) with
+\subsection{Unix-like Environments}
+
+If you are planning to use the interactive optimizer in a Unix-like
+environment and you are building SYMPHONY from source, it is recommended that
+you run the configuration script (see Section \ref{configuring}) with the
+command-line argument that enables GNU packages, i.e., 
+{\color{Brown}
 \begin{verbatim}
 ./configure --enable-gnu-packages 
 \end{verbatim}
-This will allow the interactive shell to be able to behave exactly like 
-a Linux terminal command line, i.e., it will keep the history of the used 
-commands, will complete the input word to possible commands, etc. Make sure
-that you have the needed package (readline.h and history.h include files 
-and their libraries) on the system files path. 
+}
+This will allow the interactive shell to behave exactly like a Linux terminal
+command line, i.e., it will keep the history of the used commands, will
+complete the input word to possible commands, etc. Note that you must have the
+required packages (readline and history) installed. 
 
-To use SYMPHONY's Interactive shell, run the executable without any
+To use SYMPHONY's interactive shell, run the executable without any
 command line arguments, i.e., type 
+{\color{Brown}
 \begin{verbatim}
  bin/symphony 
 \end{verbatim}
+}
 You will enter a command shell environment where you will be prompted to
 feed in inputs to use SYMPHONY interactively. The user interface consists 
 of a {\tt main menu}, where an instance is read in and solved, a 
 {\tt set menu}, where parameters are set, and a {\tt display menu}, where 
 results, statistics and parameter values are displayed. 
  
+\subsection{MS Windows}
+
+To invoke SYMPHONY's interactive solver in an MS Windows environment, simply
+double-click on the \code{symphony.exe} file in Windows Explorer. This should
+open a terminal window in which the solver will run. Note that if you built
+SYMPHONY in CYGWIN without the option \code{--enable-dos-compile}, then you
+will have to have the CYGWIN DLL in your path in order for the executable to
+run.
+
 \subsection{Main Menu}
 
-Below is the main menu displayed at the beginning of a fresh session:
+Below is the main menu displayed at the beginning of a new session:
 
 {\color{Brown}
 \begin{verbatim}
@@ -56,7 +72,7 @@ Below is the main menu displayed at the beginning of a fresh session:
  SYMPHONY:
 \end{verbatim}
 }
-When you type {\tt help} or {\tt ?}, a list of main commands is displayed:
+When you type \code{help} or \code{?}, a list of main commands is displayed:
 {\color{Brown}
 \begin{verbatim}
  SYMPHONY: help
@@ -107,11 +123,9 @@ none, you will be prompted to define the input format:
  Coin0002I Problem SAMPLE has 2 rows, 6 columns and 10 elements
  SYMPHONY: 
 \end{verbatim}
-}
-Similary, if the input is in 'ampl/gmpl' format, you will also be prompted to 
-read in the data file 
-(note that, in order to enable GMPL/AMPL reader, you have to 
-configure SYMPHONY with GLPK package - see Section \ref{building}):
+} Similary, if the input is in AMPL/GMPL format, you will also be prompted to
+read in the data file (note that, in order to enable GMPL/AMPL reader, you
+have to configure SYMPHONY with GLPK package - see Section \ref{building}):
 {\color{Brown}
 \begin{verbatim}
  SYMPHONY: load 
@@ -306,61 +320,73 @@ have the same result:
 This flexibility is also enabled for the {\tt load} command and the Set 
 submenu. The followings are all valid commands: 
 {\color{Brown}
-\begin{itemize}
-\item 
   \begin{verbatim}
     SYMPHONY: load sample.mps
   \end{verbatim}
-\item 
   \begin{verbatim}
     SYMPHONY: load sample.mod sample.dat
   \end{verbatim}
-\item 
   \begin{verbatim}
     SYMPHONY: set
     SYMPHONY\Set: verbosity 3
   \end{verbatim}
-\item 
   \begin{verbatim}
     SYMPHONY: set verbosity 3
     SYMPHONY: set param_file my_param
   \end{verbatim}
-\end{itemize}
 }
 
-\section{Using SYMPHONY from the command line}
+\section{Using SYMPHONY from the Command Line}
 
-%\subsection{Controlling Execution and Output}
-%\label{output}
+For batch processing and scripting, SYMPHONY can also be called from the
+command line from a terminal in any operating system (note that in the Windows
+terminal, the path separator is \code{\bs} rather than \code{/}).
+When called from the command line, a number of command-line switches can be
+invoked to specify the file to be read and solved, as well as set parameters.
+Note that the switches are Unix-style, even in Windows). At a minimum, one must
+specify the name of the file to be read and solved. The following is the
+calling sequence to load in an instance file in MPS format and 
+solve it.
+{\color{Brown}
+\begin{verbatim}
+ ./symphony -F sample.mps
+\end{verbatim}
+} 
+To read and solve an GMPL model and associated data file, the command would be
+{\color{Brown}
+\begin{verbatim}
+ ./symphony -F sample.mod -D sample.dat
+\end{verbatim}
+} In addition to specifying the name of the instance file, most of the common
+parameters can also be set on the command line by adding various switches.
+Calling \BB\ with just the argument \code{-h} will list all the options. To
+set paramters that cannot be set on the command line or to save parameter
+setting, it is possible to use a parameter file in which a group of parameters
+can be set. To invoke \BB\ with a parameter file, type \code{./symphony -f
+filename}, where \code{filename} is the name of the parameter file. The format
+of the file and a list of all parameters is given in Section
+\ref{parameter_file}.
 
-Calling \BB\ with no arguments simply lists all command-line options.  Most of
-the common parameters can be set on the command line. Sometimes, however, it
-may be easier to use a parameter file. To invoke \BB\ with a parameter file
-type ``{\tt master -f filename ...}'' where filename is the name of the
-parameter file. The format of the file is explained in Section
-\ref{parameter_file}. 
+The output level can be controlled through the use of the verbosity parameter,
+which can be invoked Setting this parameter at different levels will cause
+different progress messages to be printed out. Level 0 only prints out the
+introductory and solution summary messages, along with status messages every
+10 minutes. Level 1 prints out a message every time a new node is created.
+Level 3 prints out messages describing each iteration of the solution process.
+Levels beyond 3 print out even more detailed information.
 
-The output level can be controlled through the use of the verbosity
-parameter. Setting this parameter at different levels will cause
-different progress messages to be printed out. Level 0 only prints out
-the introductory and solution summary messages, along with status
-messages every 10 minutes. Level 1 prints out a message every time a
-new node is created. Level 3 prints out messages describing each
-iteration of the solution process. Levels beyond 3 print out even more
-detailed information.
-
-There are also two possible graphical interfaces. For graph-based
-problems, the Interactive Graph Drawing Software allows visual display
-of fractional solutions, as well as feasible and optimal solutions
-discovered during the solution process. For all types of problems,
-VBCTOOL creates a visual picture of the branch and cut tree, either
-in real time as the solution process evolves or as an emulation from a
-file created by
-\BB. See Section \ref{tm_params} for information on how to use VBCTOOL
-with SYMPHONY. Binaries for VBCTOOL can be obtained at \\ 
-{\tt \htmladdnormallink
-{http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}
-{http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}}.
+%There are also two possible graphical interfaces. For graph-based
+%problems, the Interactive Graph Drawing Software allows visual display
+%of fractional solutions, as well as feasible and optimal solutions
+%discovered during the solution process. For all types of problems,
+%VBCTOOL creates a visual picture of the branch and cut tree, either
+%in real time as the solution process evolves or as an emulation from a
+%file created by
+%\BB. See Section \ref{tm_params} for information on how to use VBCTOOL
+%with SYMPHONY. Binaries for VBCTOOL can be obtained at \\ 
+%{\tt \htmladdnormallink
+%{http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}
+%{http://www.informatik.uni-koeln.de/ls\_juenger/projects/vbctool.html}}.
 
 \section{Using the Callable Library}\label{callable_library}
 
@@ -431,17 +457,21 @@ C callable library. \label{default_main}}
 \end{figure}
 To read in an MPS file called \texttt{sample.mps} and solve it using 
 this program, the following command would be issued: \\
+{\color{Brown}
 \begin{verbatim}
-symphony -F sample.mps
+ symphony -F sample.mps
 \end{verbatim}
+}
 The user does not have to invoke a command to read the MPS file. During the
 call to \ptt{sym\_parse\_} \ptt{command\_line()}, SYMPHONY determines that the
 user wants to read in an MPS file. During the subsequent call to
 \ptt{sym\_load\_problem()}, the file is read and the problem data stored.
 To read an GMPL file, the user would issue the command
+{\color{Brown}
 \begin{verbatim}
-symphony -F sample.mod -D sample.dat
+ symphony -F sample.mod -D sample.dat
 \end{verbatim}
+}
 Although the same command-line switch is used to specify the model file, the
 additional presence of the \texttt{-D} option indicates to SYMPHONY that the
 model file is in GMPL format and GLPK's GMPL parser is invoked
@@ -619,37 +649,22 @@ functions. The callback functions allow the user to override SYMPHONY's
 default behavior for many of the functions performed as part of its algorithm.
 The user has complete control over branching, cutting plane generation,
 management of the cut pool and the LP relaxation, search and diving
-strategies, and limited column generation. The callback functions are grouped
-by module according to their functionality. The names of the callback
-functions begin with the prefix \ptt{user\_}. For instance, the
-\ptt{user\_find\_cuts()} subroutine is used to implement subroutines for
-finding problem-specific cutting planes and is part of the cut generation
-module. A full list of callbacks is contained in Chapter \ref{API}.
-
-Callbacks in SYMPHONY are implemented slightly differently than in other
-popular libraries. Each user function is called from a SYMPHONY \emph{wrapper
-function} that interprets the user's return value and determines what action
-should be taken. If the user performs the required function, the wrapper
-function normally exits without further action. If the user requests that
-SYMPHONY perform a certain default action, then this is done. Files containing
-default function stubs for all callbacks are provided along with the SYMPHONY
-source code and must be compiled and linked with SYMPHONY's internal library
-functions to obtain an executable. Makefiles and Microsoft Visual C++ project
-files are provided for automatic compilation.
+strategies, etc. More detailed information about using the callback functions
+to develop custom applications is provided in Chapter~\ref{man-SYMPHONY}.
 
 \section{Getting Help}
 \label{resources}
-There is a \BB\ user's list serve for posting questions/comments.
-To subscribe, visit 
-\begin{center}
-\url{http://list.coin-or.org/mailman/listinfo/coin-symphony}
-\end{center}
-There is also a Web site for \BB\ at 
+
+The main point of entry for additiona help, trouble shooting, and
+problem-solving is the SYMPHONY Wiki and development Web site at
 \begin{center}
 \url{https://projects.coin-or.org/SYMPHONY}
 \end{center}
-Bug reports can be submitted to and viewed from 
+There, bug reports can be submitted by clicking on the ``New Ticket'' button
+and also previous bug reports searched. For general questions, there is a \BB\
+also user's mailing list. To subscribe, visit
 \begin{center}
-\url{https://projects.coin-or.org/SYMPHONY/report}
+\url{http://list.coin-or.org/mailman/listinfo/coin-symphony}
 \end{center}
+
 

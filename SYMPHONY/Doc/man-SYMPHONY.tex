@@ -14,67 +14,80 @@
 
 \section{Orienting Yourself}
 
-The easiest way to get oriented is to examine the organization of the source
-files (note that file names will be given Unix-style). When you unpack the
-\BB\ distribution, you will notice that the source files are organized along
-the lines of the modules.  There is a separate directory for each
-module---master ({\tt Master}), tree manager ({\tt TreeManager}), cut
-generator ({\tt CutGen}), cut pool ({\tt CutPool}), and LP solver ({\tt
-LP}). In addition, there is a directory called {\tt DrawGraph} and a directory
-called {\tt Common} that also contain source files. The {\tt DrawGraph}
-directory provides an interface from \BB\ to the {\em Interactive Graph
-Drawing} software package developed by Marta Es\"o. This is an excellent
-utility for graphical display and debugging. The {\tt Common} directory
-contains source code for functions used by multiple modules.
+To develop an applicationwith SYMPHONY, you need to first understand how the
+source files are organized. Note that in this chapter, all path names are
+given Unix-style. When you unpack the \BB\ source distribution, you will
+notice at the root level a number of files associated with the automatic
+configuration system, as well as a number of sudirectories, each of which
+corresponds to a library used by SYMPHONY for some specific functionality. The
+files assocaited with SYMPHONY itself are located in the \code{SYMPHONY}
+subdirectory. Within the SYMPHONY subdirectory are a number of other
+subdirectories, including one called \code{src} containing the source files
+for SYMPHONY itself. Within the \code{src} subdirectory, the files are
+organized along the lines of the modules. There is a separate subdirectory for
+each module---master (\code{Master/}), tree management (\code{TreeManager/}),
+cut generation (\code{CutGen/}), cut management (\code{CutPool/}), and node
+processing (\code{LP/}). In addition, there are directories called
+\code{DrawGraph/} and \code{Common/} that also contain source files. The
+\code{DrawGraph/} directory provides an interface from \BB\ to the
+\emph{Interactive Graph Drawing} software package developed by Marta Es\"o.
+This is an excellent utility for graphical display and debugging. The
+\code{Common/} directory contains source code for functions used by multiple
+modules.
 
-Within each module's directory, there is a primary source file
-containing the function {\tt main()} (named {\tt *.c} where * is the
-module name), a source file containing functions related to
-inter-process communication (named {\tt *\_proccomm.c}) and a file
-containing general subroutines used by the module (named {\tt
-*\_func.c}). The master is the exception and is organized slightly
-differently. The LP process source code is further subdivided due to
+Within each module's directory, there is a primary source file containing the
+function \code{main()} (named \code{*.c} where \code{*} is the module name), a
+source file containing functions related to inter-process communication (named
+\code{*\_proccomm.c}) and a file containing general subroutines used by the
+module (named \code{*\_func.c}). The master is the exception and is organized
+slightly differently. The LP process source code is further subdivided due to
 the sheer number of functions.
 
-The {\tt include} directory contains the header files. Corresponding
-to each module, there are three header files, one containing internal
-data structures and function prototypes associated with the module
-(named {\tt *.h} where * is the module name), one containing the data
-structures for storing the parameters (these are also used by the
-master process), and the third containing the function prototypes for
-the user callbacks (name {\tt *\_u.h}). By looking at the header files, you
-should get a general idea of how things are laid out.
+In the main \code{SYMPHONY/} subdirectory (at the same level as the
+\code{src/} subdirectory), there is also a subdirectory called \code{include/}
+that contains the header files. Corresponding to each module, there are three
+header files, one containing internal data structures and function prototypes
+associated with the module (named \code{sym\_*.h} where * is the module name),
+one containing the data structures for storing the parameters (these are also
+used by the master process), and the third containing the function prototypes
+for the user callbacks (name \code{sym\_*\_u.h}). By looking at the header
+files, you should get a general idea of how things are laid out.
 
-In addition to the subdirectories corresponding to each module, there is a
-subdirectory called \texttt{SYMPHONY-\VER/SYMPHONY/Applications/USER}, which 
-contains the files needed for implementing the callbacks. Before beginning
-customization, it is recommended to make a copy of this directory that will 
-be used as a template for creating your
-customized solver. In this directory and its subdirectories, which mirror the
+Also in the main \code{SYMPHONY/} subdirectory, there is a subdirectory called
+\code{Applications/} (see Sections~\ref{build_app_unix} and
+\ref{build_app_msvc}) for instructions on building the applications). The
+\code{Applications/} subdirectory contains the source code for a number of
+sample applications developed with SYMPHONY, as well as function stubs for
+developing a custom application from scratch using SYMPHONY's callbacks. The
+subdirectory \code{SYMPHONY/Applications/USER} contains the files needed for
+implementing the callbacks and is essentially a template for developing an
+application. In this directory and its subdirectories, which mirror the
 subdirectories of SYMPHONY itself, each file contains function stubs that can
 be filled in to create a new custom application. There is one file for each
-module, initially called 
-\texttt{SYMPHONY-\VER/SYMPHONY/Applications/USER/*/user\_*.c}, where
-\texttt{*} is the name of the module. The primary thing that you, as the user,
-need to understand to build a custom application is how to fill in these
-stubs. That is what the second section of this manual is about.
+module, initially called \code{USER/*/user\_*.c}, where \code{*} is the name
+of the module. The primary thing that you, as the user, need to understand to
+build a custom application is how to fill in these stubs. That is what the
+second part of this capter is about. For information on building your
+application once it is developed, you may want to skip ahead to
+Section~\ref{building_custom_app}.
 
 \section{Writing the Callbacks}
 
-For each module, all callback functions are invoked from so-called \emph{wrapper
-functions} that provide the interface and also performs a default action if
-the user chooses not to override it. Although SYMPHONY is written in C, the
-wrapper functions provide a C++-style interface in which the user can either
-accept the default action or override it. Each wrapper function is named {\tt
-*\_u()} , where {\tt *} is the name of the corresponding callback function, and is
-defined in a file called {\tt *\_wrapper.c}. The wrapper function first
-collects the necessary data and hands it to the user by calling the user
-function. Based on the return value from the user, the wrapper then performs
-any necessary post-processing. All callback functions have default options, so
-that SYMPHONY now acts as a generic MILP solver out of the box.
+For each module, all callback functions are invoked from so-called
+\emph{wrapper functions} that provide the interface and also performs a
+default action if the user chooses not to override it. Although SYMPHONY is
+written in C, the wrapper functions provide a C++-style interface in which the
+user can either accept the default action or override it. Each wrapper
+function is named \code{*\_u()} , where \code{*} is the name of the
+corresponding callback function, and is defined in a file called
+\code{*\_wrapper.c}. The wrapper function first collects the necessary data
+and hands it to the user by calling the user function. Based on the return
+value from the user, the wrapper then performs any necessary post-processing.
+All callback functions have default options, so that SYMPHONY now acts as a
+generic MILP solver out of the box.
 
 In Section \ref{API}, the callback functions are described in
-detail.  The name of every callback function starts with {\tt user\_}.
+detail.  The name of every callback function starts with \code{user\_}.
 There are three kinds of arguments:
 \begin{description}
 \item[\rm IN:] An argument containing information that the user might need
@@ -90,21 +103,21 @@ The return values for most function are as follows:
 
 \begin{tabular}{lp{310pt}} 
 
-{\tt USER\_ERROR} & Error in the user function. Printing an error message is
+\code{USER\_ERROR} & Error in the user function. Printing an error message is
 the user's responsibility. Depending on the work the user function was
-supposed to do, the error might be ignored (and some default option
-used), or the process aborts. \\
+supposed to do, the error might be ignored (and some default option used), or
+the process aborts. \\
 
-{\tt USER\_SUCCESS} & The user function was implemented and executed correctly. \\
+\code{USER\_SUCCESS} & The user function was implemented and executed correctly. \\
 
-{\tt USER\_DEFAULT} & This option means that the user function was not
+\code{USER\_DEFAULT} & This option means that the user function was not
 implemented and that SYMPHONY should either execute a default subroutine (the
 default is one of the built-in options, \BB\ decides which one to use based on
 initial parameter settings and the execution of the algorithm) or else do
 nothing, if execution of the subroutine is optional. \\
 
-{\tt built\_in\_option1 } & \\
-{\tt built\_in\_option2 } ... & The specified built-in option will be used.\\
+\code{built\_in\_option1 } & \\
+\code{built\_in\_option2 } ... & The specified built-in option will be used.\\
 \end{tabular}
 
 \item[Notes:] \hfill
@@ -114,11 +127,11 @@ nothing, if execution of the subroutine is optional. \\
 \item Sometimes an output is optional. This is always noted in the
 function descriptions.
 
-\item If an array has to be returned (i.e., the argument is {\tt type
+\item If an array has to be returned (i.e., the argument is \code{type
 **array}) then (unless otherwise noted) the user has to allocate space for the
-array itself and set {\tt *array} to be the array allocated.  If an output
+array itself and set \code{*array} to be the array allocated.  If an output
 array is optional and the user is not returning any values in that array, then
-the user {\em must not} set {\tt *array} because this is how \BB\ decides
+the user {\em must not} set \code{*array} because this is how \BB\ decides
 which optional arrays are filled up.
 
 \item Some built-in options are implemented so that the user can invoke them
@@ -137,7 +150,7 @@ With few exceptions, the data structures used internally by \BB\
 are undocumented and most users will not need to access them
 directly. However, if such access is desired, a pointer to the main data
 structure used by each of the modules can be obtained simply by calling
-the function {\tt get\_*\_ptr()} where * is the appropriate module (see the
+the function \code{get\_*\_ptr()} where * is the appropriate module (see the
 header files). This function will return a pointer to the data
 structure for the appropriate module. Casual users are advised against
 modifying \BB's internal data structures directly.
@@ -151,7 +164,7 @@ maintained by \BB\ and is passed to the user as an argument to each user
 function. Since \BB\ knows nothing about this data structure, it is up to the
 user to allocate it and maintain it. The user must also implement a function
 to free it. The functions for freeing the user data structures in each module
-are called \texttt{user\_free\_*}, where \texttt{*} is the module. These
+are called \code{user\_free\_*}, where \code{*} is the module. These
 functions are called by SYMPHONY at the time when other data structures for
 the modules are being freed and the module is being closed. By default, for
 sequential computation, there is one common user data structure for all
@@ -175,19 +188,19 @@ the user may want to pass data describing the problem instance to the LP
 process after reading them in from a file in the master process. For the
 purpose of passing user data from the master process to other processes, a
 customization function called
-\texttt{user\_send\_*\_data()} is provided in the master module, along with a
-corresponding function called \texttt{user\_receive\_*\_data()} in the module
-\texttt{*}. These two functions work in tandem to transport the user's data
+\code{user\_send\_*\_data()} is provided in the master module, along with a
+corresponding function called \code{user\_receive\_*\_data()} in the module
+\code{*}. These two functions work in tandem to transport the user's data
 from the maser, where it can be read in from a file, to the proper module for
 processing. There are also a number of other tandem pairs of \emph{send} and
 \emph{receive} functions that are used to transport user data from place to
 place.
 
-All data are sent in the form of arrays of either type {\tt char}, {\tt int},
-or {\tt double}, or as strings. To send an array, the user has simply to
-invoke the function {\tt send\_XXX\_array(XXX *array, int length)} where
-\texttt{XXX} is one of the previously listed types. To receive that array,
-there is a corresponding function called {\tt receive\_?\_array(?  *array, int
+All data are sent in the form of arrays of either type \code{char}, \code{int},
+or \code{double}, or as strings. To send an array, the user has simply to
+invoke the function \code{send\_XXX\_array(XXX *array, int length)} where
+\code{XXX} is one of the previously listed types. To receive that array,
+there is a corresponding function called \code{receive\_?\_array(?  *array, int
 length)}. When receiving an array, the user must first allocate the
 appropriate amount of memory. In cases where variable length arrays need to be
 passed, the user must first pass the length of the array (as a separate array
@@ -219,6 +232,7 @@ shared parallel.
 
 %FIXME: Check this
 \section{Building Your Application}
+\label{building_custom_app}
 
 \subsection{Unix}
 
@@ -231,11 +245,11 @@ instuctions, see the \code{SYMPHONY/Applications/USER/INSTALL} file.
 
 \subsection{Microsoft Windows}
 
-First, download \texttt{SYMPHONY-\VER} and unpack the archive if it is
+First, download \code{SYMPHONY-\VER} and unpack the archive if it is
 required. You now have three options. You can either compile on the
 command-line using the automated MSDEV build system or NMAKE utility or you
 can use the provided projects and workspaces. For all of the following
-options, first go to the \texttt{SYMPHONY\bs Applications\bs USER\bs Win32\bs
+options, first go to the \code{SYMPHONY\bs Applications\bs USER\bs Win32\bs
 v6} directory.
 
 \subsubsection{Using the MSDEV Utility}
@@ -259,8 +273,8 @@ or
  msdev user.dsw /make "all - release"
 \end{verbatim}
 }
-For each command, the executable \texttt{user} will be created in 
-\texttt{Debug} and/or \texttt{Release}
+For each command, the executable \code{user} will be created in 
+\code{Debug} and/or \code{Release}
 directories. 
 
 \item To test the executable, type 
@@ -282,14 +296,14 @@ in order to clean and rebuild everything.
 
 \begin{itemize}
 \item 
-Edit the file \texttt{user.mak} to reflect your environment. 
+Edit the file \code{user.mak} to reflect your environment. 
 Only minor edits should be required. An explanation of 
 what has to be set is contained in the comments in the makefile. 
 This basically 
 requires the same routines that one needs to walk through in 
-\texttt{SYMPHONY}'s makefile. 
+\code{SYMPHONY}'s makefile. 
 See the related parts of \ref{using_nmake} section 
-of \texttt{SYMPHONY} above.
+of \code{SYMPHONY} above.
 
 \item Once configuration is done, type 
 {\color{Brown}
@@ -297,8 +311,8 @@ of \texttt{SYMPHONY} above.
   nmake /f user.mak
 \end{verbatim}
 }
-The executable \texttt{user.exe} will be created under the 
-\texttt{Debug} directory.
+The executable \code{user.exe} will be created under the 
+\code{Debug} directory.
 \item To test the executable, type 
 {\color{Brown}
 \begin{verbatim}
@@ -311,28 +325,28 @@ The executable \texttt{user.exe} will be created under the
 
 \begin{itemize}
 \item Open the workspace 
-\texttt{user.dsw}.
+\code{user.dsw}.
 
 \item 
 The configuration steps are exactly the same with the MSVC++ section of 
-\texttt{SYMPHONY}. The only 
-difference is that, you have the \texttt{user} project instead of the
-\texttt{symphony} project. Go through the related steps of section 
+\code{SYMPHONY}. The only 
+difference is that, you have the \code{user} project instead of the
+\code{symphony} project. Go through the related steps of section 
 \ref{getting_started_windows} to see how to get USER executable. 
 
 \item
-Once you have the proper settings, choose \texttt{Build
-user.exe} from the \texttt{Build} menu. This should successfully 
+Once you have the proper settings, choose \code{Build
+user.exe} from the \code{Build} menu. This should successfully 
 build the executable.
 
 \item
-To test the executable, right click on the \texttt{user} project, go to the
-\texttt{Debug} tab and set the program arguments to 
-\texttt{-F ..\bs ..\bs sample.mps}. Note that command-line switches are 
+To test the executable, right click on the \code{user} project, go to the
+\code{Debug} tab and set the program arguments to 
+\code{-F ..\bs ..\bs sample.mps}. Note that command-line switches are 
 Unix-style.
 
 \item
-Now choose \texttt{Execute} from the build menu and you have a working branch
+Now choose \code{Execute} from the build menu and you have a working branch
 and bound solver! After successful compilation, you can fill in the user
 callback functions as describe in Section \ref{SYMPHONY-development}.
 \end{itemize}
@@ -343,7 +357,7 @@ callback functions as describe in Section \ref{SYMPHONY-development}.
 %application. The distribution comes with two makefiles that facilitate this
 %process. The primary makefile resides in the {\tt SYMPHONY-\VER/} directory.
 %The user makefile resides in the user's subdirectory, initially called
-%\texttt{SYMPHONY-\VER/SYMPHONY/Applications/USER/}. This subdirectory can be
+%\code{SYMPHONY-\VER/SYMPHONY/Applications/USER/}. This subdirectory can be
 %moved, as well as renamed. There are a number of variables that must be set in
 %the primary make file. To modify the makefiles appropriately, see the
 %instructions in Section \ref{getting_started_unix}.
@@ -376,17 +390,17 @@ serially even if you eventually intend to run in a fully distributed
 environment. This does make the coding marginally more complex, but
 believe me, it's worth the effort. The vast majority of your code will
 be the same for either case. Make sure to use the configuration flag to
-``{\tt -enable-debug}'' while configuring (see Section \ref{configuring}). 
+\code{--enable-debug} while configuring (see Section \ref{configuring}). 
 
 \subsection{Debugging with PVM}
 \label{debugging-PVM}
 If you wish to venture into debugging your distributed application,
-then you simply need to set the parameter {\tt *\_debug}, where * is
+then you simply need to set the parameter \code{*\_debug}, where * is
 the name of the module you wish to debug, 
 to the value ``4'' in the parameter file (the number ``4'' is chosen
 by PVM). This will tell PVM to spawn the particular process or
 processes in question under a debugger. What PVM actually does in this
-case is to launch the script {\tt \$PVM\_ROOT/lib/debugger}. You will
+case is to launch the script \code{\$PVM\_ROOT/lib/debugger}. You will
 undoubtedly want to modify this script to launch your preferred
 debugger in the manner you deem fit. If you have trouble with this,
 please send e-mail to the list serve (see Section \ref{resources}).
@@ -398,27 +412,28 @@ processes run in parallel due to varying system loads, process
 priorities, etc. Therefore, it may not always be possible to duplicate
 errors. To force runs that you should be able to reproduce, make sure
 the parameter \ptt{no\_cut\_timeout} appears in the parameter file or
-start \BB\ with the ``{\tt -a}'' option. This will keep the cut
+start \BB\ with the \code{-a} option. This will keep the cut
 generator from timing out, a major source of randomness. Furthermore,
 run with only one active node allowed at a time (set \ptt{
 max\_active\_nodes} to ``1''). This will keep the tree search from
 becoming random. These two steps should allow runs to be reproduced.
 You still have to be careful, but this should make things easier.
 
-\subsection{Using {\tt Purify} and {\tt Quantify}}
+%\subsection{Using \code{Purify} and \code{Quantify}}
 
-The makefile is already set up for compiling applications using {\tt
-purify} and {\tt quantify}. Simply set the paths to the executables
-and type ``{\tt make pall}'' or ``{\tt p*}'' where * is the module you
-want to purify. The executable name is the same as described in
-Section \ref{distributed-build}, but with a ``p'' in front of it. To tell PVM
-to launch the purified version of the executables, you must set the
-parameters {\tt *\_exe} in the parameter file to the purified
-executable names. See Section \ref{tm_params} for information on
-setting parameters in the parameter file.
+%The makefile is already set up for compiling applications using {\tt
+%purify} and {\tt quantify}. Simply set the paths to the executables
+%and type ``{\tt make pall}'' or ``{\tt p*}'' where * is the module you
+%want to purify. The executable name is the same as described in
+%Section \ref{distributed-build}, but with a ``p'' in front of it. To tell PVM
+%to launch the purified version of the executables, you must set the
+%parameters {\tt *\_exe} in the parameter file to the purified
+%executable names. See Section \ref{tm_params} for information on
+%setting parameters in the parameter file.
 
 \subsection{Checking the Validity of Cuts and Tracing the Optimal Path}
 \label{debugging}
+
 Sometimes the only evidence of a bug is the fact that the optimal
 solution to a particular problem is never found. This is usually
 caused by either (1) adding an invalid cut, or (2) performing an
@@ -436,8 +451,8 @@ into the function, the user can check whether the cut is satisfied
 by the feasible solution. If not, then there is a problem! Of course,
 the problem could also be with the checking routine. 
 After filling in this function, the user must configure SYMPHONY
-with the flag \texttt{--enable-cut-check} (see Section \ref{configuring}). 
-Type ``{\tt make clean}'' and then ``{\tt make}.''
+with the flag \code{--enable-cut-check} (see Section \ref{configuring}). 
+Type \code{make clean} and then \code{make}.
 
 Tracing the optimal path can alert the user when the subproblem which
 admits a particular known feasible solution (at least
@@ -453,7 +468,7 @@ branched on, the branch that continues to admit the solution is
 marked. When one of these marked subproblems is pruned, the user is
 notified.
 
-\subsection{Using the {\tt Interactive Graph Drawing} Software}
+\subsection{Using the Interactive Graph Drawing Software}
 \label{IGD}
 The Interactive Graph Drawing (IGD) software package is included with
 \BB\ and \BB\ facilitates its use through interfaces with the
@@ -470,43 +485,44 @@ IGD interface.
 To use IGD, you must have installed PVM since the drawing window runs
 as a separate application and communicates with the user's routines
 through message passing. To compile the graph drawing application,
-type ``{\tt make dg}'' in the \BB\ root directory. The user
-routines in the file {\tt user\_dg.c} can be filled in, but it is not
+type \code{make dg} in the \BB\ root directory. The user
+routines in the file \code{user\_dg.c} can be filled in, but it is not
 necessary to fill anything in for basic applications. 
 
-After compiling {\tt dg}, the user must write some subroutines that
-communicate with {\tt dg} and cause the graph to be drawn.
+After compiling \code{dg}, the user must write some subroutines that
+communicate with \code{dg} and cause the graph to be drawn.
 Regrettably, this is currently a little more complicated than it needs
 to be and is not well documented. However, by looking at the sample
 application, it should be possible to see how it is done. To
 enable graph drawing, put the line {\ptt {do\_draw\_graph 1} into the
-parameter file or use the {\tt -d} command line option. It can be difficult to
+parameter file or use the \code{-d} command line option. It can be difficult to
 get IGD to work. If you are interested in using it and cannot get it to work,
 feel free to contact me.
 
 \subsection{Other Debugging Techniques}
 
-Another useful built-in function is \texttt{write\_mps()}, which will write the
+Another useful built-in function is \code{write\_mps()}, which will write the
 current LP relaxation to a file in MPS format. This file can then be read into
 the LP solver interactively or examined by hand for errors.  Many times, CPLEX
 gives much more explicit error messages interactively than through the
 callable library. The form of the function is
+{\color{Brown}
 \begin{verbatim}
 void write_mps(LPdata *lp_data, char *fname)
 \end{verbatim}
-where \texttt{fname} is the name of the file to be written. If \BB\ is forced
+} where \code{fname} is the name of the file to be written. If \BB\ is forced
 to abandon solution of an LP because the LP solver returns an error code, the
-current LP relaxation is automatically written to the file ``{\tt
-matrix.[bc\_index].[iter\_num].mps}'' where {\em bc\_index} is the index of
-the current subproblem and {\em iter\_num} is the current iteration
-number. The \texttt{write\_mps()} function can be called using breakpoint code
+current LP relaxation is automatically written to the file
+\code{matrix.[bc\_index].[iter\_num].mps} where \code{bc\_index} is the index
+of the current subproblem and \code{iter\_num} is the current iteration
+number. The \code{write\_mps()} function can be called using breakpoint code
 to examine the status of the matrix at any point during execution.
 
 Logging is another useful feature. Logging the state of the search tree can
 help isolate some problems more easily. See Section \ref{tm_params}
 for the appropriate parameter settings to use logging.
 
-\section{Case Study: A Matching Solver}
+\section{Case Study: Implementing a Matching Solver}
 
 This section was contributed by Michael Trick a few years ago and is a
 walkthrough of the steps for developing a very simple application using
@@ -522,14 +538,15 @@ will just formulate this as an integer program with one variable for each
 possible pair that can be matched. Then we will include a set of constraints
 that can be added by cut generation.
 
-We begin with the template code in the \texttt{USER} subdirectory included with
+We begin with the template code in the \code{USER} subdirectory included with
 SYMPHONY. This gives stubs for each user callback routine. First, I need to
 define a data structure for describing an instance of the matching problem. We
-use the template structure \texttt{USER\_PROBLEM} in the file
-\texttt{include/user.h} for this purpose.  To describe an instance, we just
+use the template structure \code{USER\_PROBLEM} in the file
+\code{include/user.h} for this purpose.  To describe an instance, we just
 need the number of nodes and the cost matrix. In addition, we also need a way
 of assigning an index to each possible assignment. Here is the data
 structure: 
+{\color{Brown}
 \begin{verbatim}
 typedef struct USER_PROBLEM{
    int		    numnodes;
@@ -539,27 +556,28 @@ typedef struct USER_PROBLEM{
    int              index[MAXNODES][MAXNODES];
 }user_problem;
 \end{verbatim}
-
-The fields \texttt{match1}, \texttt{match2}, and
-\texttt{index} will be used later in the code in order to map variables to the
+}
+The fields \code{match1}, \code{match2}, and
+\code{index} will be used later in the code in order to map variables to the
 corresponding assignment and vice versa. 
 
 Next, we need to read in the problem instance. We could implement this
-function within the \texttt{user\_io()} callback function (see the file
-\texttt{user\_master.c}). However, in order to show how it can be done
-explicitly, we will define our own function \texttt{match\_read\_data()} in
-\texttt{user\_main.c} to fill in the user data structure and then use
-\texttt{sym\_set\_user\_data()} to pass this structure to SYMPHONY. The
+function within the \code{user\_io()} callback function (see the file
+\code{user\_master.c}). However, in order to show how it can be done
+explicitly, we will define our own function \code{match\_read\_data()} in
+\code{user\_main.c} to fill in the user data structure and then use
+\code{sym\_set\_user\_data()} to pass this structure to SYMPHONY. The
 template code already provides basic command-line options for the user. The
 ``-F'' flag is used to specify the location of a data file, from which we will
 read in the data. The datafile contains first the number of nodes in the graph
-(\texttt{nnodes}) followed by the pairwise cost matrix (nnode by nnode). We
-read the file in with the \texttt{match\_read\_data()} routine in
-\texttt{user\_main.c}:
+(\code{nnodes}) followed by the pairwise cost matrix (nnode by nnode). We
+read the file in with the \code{match\_read\_data()} routine in
+\code{user\_main.c}:
 
 %FIXME: Here, we don't need to pass in the user data structure...just return
 %it. We also don't need to pass in the sym_enviroment 
 
+{\color{Brown}
 \begin{verbatim}
 int match_read_data(user_problem *prob, char *infile)
 {
@@ -579,22 +597,24 @@ int match_read_data(user_problem *prob, char *infile)
    
    return (FUNCTION_TERMINATED_NORMALLY);
 }
-\end{verbatim}   
+\end{verbatim}
+}   
 
 We can now construct the integer program itself. This is done by specifying
 the constraint matrix and the rim vectors in sparse format. We will have a
 variable for each possible assignment $(i,j)$ with $i<j$. We have a constraint
 for each node $i$, so it can only me matched to one other node.
 
-We define the IP in our other helper function \texttt{match\_load\_problem()}
-in \texttt{user\_main.c}. In the first part of this routine, we will build a
+We define the IP in our other helper function \code{match\_load\_problem()}
+in \code{user\_main.c}. In the first part of this routine, we will build a
 description of the IP, and then in the second part, we will load this
 representation to SYMPHONY through
-\texttt{sym\_explicit\_load\_problem()}. Note that we could instead create a
+\code{sym\_explicit\_load\_problem()}. Note that we could instead create a
 description of each subproblem dynamically using the
-\texttt{user\_create\_subproblem()} callback (see \texttt{user\_lp.c}), but
+\code{user\_create\_subproblem()} callback (see \code{user\_lp.c}), but
 this is more complicated and unnecessary here.
 
+{\color{Brown}
 \begin{verbatim}
 int match_load_problem(sym_environment *env, user_problem *prob){
    
@@ -655,13 +675,15 @@ int match_load_problem(sym_environment *env, user_problem *prob){
 
 }
 \end{verbatim}
+}
 
-Now, we are ready to gather everything in the \texttt{main()} routine in 
-\texttt{user\_main()}. This will involve to create a SYMPHONY environment and 
+Now, we are ready to gather everything in the \code{main()} routine in 
+\code{user\_main()}. This will involve to create a SYMPHONY environment and 
 a user data structure, read in the data, create the corresponding IP, 
 load it to the environment and ask SYMPHONY to solve it 
-(\texttt{CALL\_FUNCTION} is just a macro to take care of the return values):  
+(\code{CALL\_FUNCTION} is just a macro to take care of the return values):  
 
+{\color{Brown}
 \begin{verbatim}
 int main(int argc, char **argv)
 {
@@ -684,10 +706,12 @@ int main(int argc, char **argv)
    return(0);
 }
 \end{verbatim}
+}
 
 OK, that's it. That defines an integer program, and if you compile and
 optimize it, the rest of the system will come together to solve this problem.
 Here is a data file to use:
+{\color{Brown}
 \begin{verbatim}
 6
 0 1 1 3 3 3
@@ -697,13 +721,15 @@ Here is a data file to use:
 3 3 3 1 0 1
 3 3 3 1 1 0
 \end{verbatim}
+}
 
 The optimal value is 5. To display the solution, we need to be able to map
-back from variables to the nodes. That was the use of the \texttt{node1} and
-\texttt{node2} parts of the \texttt{USER\_PROBLEM}. We can now use
-\texttt{user\_display\_solution()} in \texttt{user\_master.c} to print 
+back from variables to the nodes. That was the use of the \code{node1} and
+\code{node2} parts of the \code{USER\_PROBLEM}. We can now use
+\code{user\_display\_solution()} in \code{user\_master.c} to print 
 out the solution:
 
+{\color{Brown}
 \begin{verbatim}
 int user_display_solution(void *user, double lpetol, int varnum, int *indices,
                           double *values, double objval)
@@ -725,6 +751,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
    return(USER_SUCCESS);
 }
 \end{verbatim}
+}
 
 We will now update the code to include a crude cut generator. Of course, We
 could go for a Gomory-Hu type odd-set separation (ala Gr\"otschel and Padberg)
@@ -733,6 +760,7 @@ value 1 among them (such a set defines a cut that requires at least one edge
 out of any odd set). We can do this by brute force checking of triples, as
 follows:
 
+{\color{Brown}
 \begin{verbatim}
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
                    int index, double objval, int *indices, double *values,
@@ -776,8 +804,9 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 }
 
 \end{verbatim}
+}
 
-Note the call of \texttt{cg\_add\_explicit\_cut()}, which tells SYMPHONY about
+Note the call of \code{cg\_add\_explicit\_cut()}, which tells SYMPHONY about
 any cuts found. If we now solve the matching problem on the sample data set,
 the number of nodes in the branch and bound tree should just be 1 (rather than
 3 without cut generation).

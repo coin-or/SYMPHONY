@@ -12,10 +12,7 @@
 %                                                                           %
 %===========================================================================%
 
-\section{Introduction to Branch and Cut}
-\label{B&C-intro}
-
-\subsection{Branch and Bound}
+\section{Branch and Bound}
 
 {\em Branch and bound} is the broad class of algorithms from which
 branch, cut, and price is descended. A branch and bound algorithm uses
@@ -52,7 +49,7 @@ active candidates. We continue in this way until the list of active
 subproblems is empty, at which point our current best solution is the
 optimal one.
 
-\subsection{Branch and Cut}
+\section{Branch and Cut}
 \label{branchandcut}
 
 In many applications, the bounding operation is accomplished using the
@@ -483,12 +480,12 @@ module. These functions of the master module implement the following tasks:
         problem modification, and parameter modification.
 \end{itemize}
 
-\subsubsection{The Tree Manager Module}
+\subsubsection{The Tree Management Module}
 
-The {\em tree manager} controls the overall execution of the algorithm. It
+The \emph{tree manager} controls the overall execution of the algorithm. It
 tracks the status of its worker modules, as well as that of the search
-tree, and distributes the subproblems to be processed to the LP
-module(s). Functions performed by the tree manager module are:
+tree, and distributes the subproblems to be processed to the node processing
+module(s). Functions performed by the tree management module are:
 %\underbar{Overall Function:} Start up all the processes and keep
 %track of the current state of the search tree.
 %\noindent \underbar{Specific Functions:} \nobreak
@@ -501,17 +498,17 @@ module(s). Functions performed by the tree manager module are:
         release a subproblem for processing.
         \item Receive branching object information, set up data structures
         for the children, and add them to the list of candidate subproblems.
-        \item Keep track of the global upper bound and notify all LP
-        modules when it changes.
+        \item Keep track of the global upper bound and notify all node
+        processing modules when it changes.
         \item Write current state information out to disk periodically
         to allow a restart in the event of a system crash.
         \item Keep track of run data and send it to the master
         program at termination.
 \end{itemize} 
 
-\subsubsection{The Linear Programming Module}
+\subsubsection{The Node Processing Module}
 
-The {\em linear programming} (LP) module is the most complex and
+The \emph{node processing} (NP) module is the most complex and
 computationally intensive of the five processes. Its job is to perform
 the bounding and branching operations. These operations
 are, of course, central to the performance of the algorithm. Functions
@@ -524,14 +521,14 @@ performed by the LP module are:
         \item Receive a subproblem and process it in conjunction
         with the cut generator and the cut pool.
         \item Decide which cuts should be sent to the global pool to
-        be made available to other LP modules.
+        be made available to other NP modules.
         \item If necessary, choose a branching object and send its
         description back to the tree manager.
         \item Perform the fathoming operation, including generating
         variables. 
 \end{itemize} 
 
-\subsubsection{The Cut Generator Module}
+\subsubsection{The Cut Generation Module}
 
 The {\em cut generator} performs only one function---generating valid
 inequalities violated by the current fractional solution and sending
@@ -543,12 +540,12 @@ performed by the cut generator module:
 \begin{itemize}
         \item Receive an LP solution and attempt to
         separate it from the convex hull of all solutions.
-        \item Send generated valid inequalities back to the LP solver.  
+        \item Send generated valid inequalities back to the NP module.  
         \item When finished processing a solution vector, inform the
-        LP not to expect any more cuts in case it is still waiting.
+        NP module not to expect any more cuts in case it is still waiting.
 \end{itemize}
 
-\subsubsection{The Cut Pool Module}
+\subsubsection{The Cut Management Module}
 
 The concept of a {\em cut pool} was first suggested by Padberg and
 Rinaldi \cite{padb:branc}, and is based on the observation that in BCP, the
@@ -557,7 +554,7 @@ the search tree are also generally valid and potentially useful at
 other nodes. Since generating these cuts is usually a relatively
 expensive operation, the cut pool maintains a list of the ``best'' or
 ``strongest'' cuts found in the tree so far for use in processing
-future subproblems. Hence, the cut pool functions as an auxiliary cut
+future subproblems. Hence, the cut manager functions as an auxiliary cut
 generator. More explicitly, here are the functions of the cut pool
 module:
 %\underbar{Overall Function:} Maintain a list of ``effective'' valid
@@ -598,8 +595,8 @@ which is used to enumerate efficient solutions to a given multicriteria MILP
 (see Section \ref{mc_solve}).
 
 During the solution process, the tree manager functions control the execution
-by maintaining the list of candidate subproblems and sending them to the LP
-modules as they become idle. The LP modules receive nodes from the tree
+by maintaining the list of candidate subproblems and sending them to the NP
+modules as they become idle. The NP modules receive nodes from the tree
 manager, process them, branch (if required), and send back the identity of the
 chosen branching object to the tree manager, which in turn generates the
 children and places them on the list of candidates to be processed (see
@@ -837,18 +834,18 @@ from one iteration to the next. In both cases, we save warm start information
 from the solution of the first ILP in the sequence and use it for each
 subsequent computation.
 
-\subsection{The Linear Programming  Module}
+\subsection{The Node Processing Module}
 
-The LP module is at the core of the algorithm, as it performs the
+The NP module is at the core of the algorithm, as it performs the
 processing and bounding operations for each subproblem. A schematic
-diagram of the LP solver loop is presented in Fig. \ref{LP-loop}.
+diagram of the node processing loop is presented in Fig. \ref{LP-loop}.
 The details of the implementation are discussed in the following
 sections. 
 
 \begin{figure}
 \centering
 \psfig{figure=lploop.eps,width=4.80in}
-\caption{Overview of the LP solver loop}
+\caption{Overview of the node processing loop}
 \label{LP-loop}
 \end{figure}
 
@@ -968,13 +965,13 @@ children, the final branching object is selected, again either by the
 user or by built-in rule. This procedure of using exploratory LP
 information in this manner to select a branching candidate is commonly
 referred to as {\em strong branching}. When the branching object has
-been selected, the LP module sends a description of that object to the
+been selected, the NP module sends a description of that object to the
 tree manager, which then creates the children and adds them to the
 list of candidate nodes. It is then up to the tree manager to specify
-which node the now-idle LP module should process next. This issue is
+which node the now-idle NP module should process next. This issue is
 further discussed below.
 
-\subsection{The Tree Manager Module}
+\subsection{The Tree Management Module}
 \label{tree-management}
 
 \subsubsection{Managing the Search Tree}
@@ -1003,14 +1000,14 @@ below.
 \subsubsection{Search Chains and Diving}
 
 One reason for not strictly enforcing the search order is because it
-is somewhat expensive to construct a search node, send it to the LP
-solver, and set it up for processing. If, after branching, we choose
+is somewhat expensive to construct a search node, send it to an NP
+module, and set it up for processing. If, after branching, we choose
 to continue processing one of the children of the current subproblem,
 we avoid the set-up cost, as well as the cost of communicating the
 node description of the retained child subproblem back to the tree
 manager. This is called {\em diving} and the resulting chain of nodes
 is called a {\em search chain}. There are a number of rules for
-deciding when an LP module should be allowed to dive. One such rule is
+deciding when an NP module should be allowed to dive. One such rule is
 to look at the number of variables in the current LP solution that
 have fractional values. When this number is low, there may be a good
 chance of finding a feasible integer solution quickly by diving. This
@@ -1058,24 +1055,24 @@ more efficient, since there is a high probability that, given the new
 upper bound and cuts, we will be able to prune the parent node and
 avoid the task of processing each child individually.
 
-\subsection{The Cut Generator Module}
+\subsection{The Cut Generation Module}
 
 To implement the cut generator process, the user must provide a
 function that accepts an LP solution and returns cuts violated by that
-solution to the LP module. In parallel configurations, each cut is
-returned immediately to the LP module, rather than being passed back
+solution to the NP module. In parallel configurations, each cut is
+returned immediately to the NP module, rather than being passed back
 as a group once the function exits. This allows the LP to begin adding
 cuts and solving the current relaxation before the cut generator is
 finished if desired. Parameters controlling if and when the LP should
 begin solving the relaxation before the cut generator is finished can
 be set by the user.
 
-\subsection{The Cut Pool Module}
+\subsection{The Cut Management Module}
 
 \subsubsection{Maintaining and Scanning the Pool}
 
-The cut pool's primary job is to receive a solution from an
-LP module and return cuts from the pool that are violated by it. The
+The cut manager's primary job is to receive a solution from an
+NP module and return cuts from the pool that are violated by it. The
 cuts are stored along with two pieces of information---the level of
 the tree on which the cut was generated, known simply as the {\em
 level} of the cut, and the number of times it has been checked for
@@ -1117,19 +1114,18 @@ assigned to another cut pool. After that, it continues to
 serve all the descendants of its assigned node that are not assigned
 to other cut pools.
 
-Initially, the first cut pool is assigned to the root
-node. All other cut pools are unassigned. During execution, when a new
-node is sent to be processed, the tree manager must determine
-which cut pool the node should be serviced by. The default is to use
-the same cut pool as its parent. However, if there is currently an
-idle cut pool process (either it has never been assigned to any node
-or all the descendants of its assigned node have been processed or
-reassigned), then that cut pool is assigned to this new node. All the
-cuts currently in the cut pool of its parent node are copied to the
-new pool to initialize it, after which the two pools operate
-independently on their respective subtrees. When generating cuts, the
-LP process sends the new cuts to the cut pool assigned to
-service the node during whose processing the cuts were generated.
+Initially, the first cut pool is assigned to the root node. All other cut
+pools are unassigned. During execution, when a new node is sent to be
+processed, the tree manager must determine which cut pool the node should be
+serviced by. The default is to use the same cut pool as its parent. However,
+if there is currently an idle cut pool process (either it has never been
+assigned to any node or all the descendants of its assigned node have been
+processed or reassigned), then that cut pool is assigned to this new node. All
+the cuts currently in the cut pool of its parent node are copied to the new
+pool to initialize it, after which the two pools operate independently on
+their respective subtrees. When generating cuts, the NP module sends the new
+cuts to the cut pool assigned to service the node during whose processing the
+cuts were generated.
 
 The primary motivation behind the idea of multiple cut pools is
 two-fold. First, we want simply to limit the size of each pool as
@@ -1203,10 +1199,10 @@ using an OpenMP compliant compiler (see next section).
 As an example, the default distributed configuration includes a
 separate executable for each module type, allowing full parallelism.
 However, if cut generation is fast and not memory-intensive,
-it may not be worthwhile to have the LP solver and its associated cut
+it may not be worthwhile to have the NP module and its associated cut
 generator work independently, as this increases communication
 overhead without much potential benefit. In this case, the cut
-generator functions can be called directly from the LP solver,
+generator functions can be called directly from the NP module,
 creating a single, more efficient executable.
 
 \subsection{Inter-process Communication}
@@ -1228,19 +1224,18 @@ compliant compilers and other resources, visit {\tt http://www.openmp.org}.
 \subsection{Fault Tolerance}
 \label{fault-tolerance} 
 
-Fault tolerance is an important consideration for solving large
-problems on computing networks whose nodes may fail unpredictably. The
-tree manager tracks the status of all processes and can restart them
-as necessary. Since the state of the entire tree is known at all
-times, the most that will be lost if an LP process or cut generator
-process is killed is the work that had been completed on that
-particular search node. To protect against the tree manager itself or
-a cut pool being killed, full logging capabilities have been
-implemented. If desired, the tree manager can write out the entire
-state of the tree to disk periodically, allowing a warm restart if a
-fault occurs. Similarly, the cut pool process can be warm-started from
-a log file. This not only allows for fault tolerance but also for full
-reconfiguration in the middle of solving a long-running problem. Such
-reconfiguration could consist of anything from adding more processors
-to moving the entire solution process to another network.
+Fault tolerance is an important consideration for solving large problems on
+computing networks whose nodes may fail unpredictably. The tree manager tracks
+the status of all processes and can restart them as necessary. Since the state
+of the entire tree is known at all times, the most that will be lost if an NP
+module or cut generator is killed is the work that had been completed on that
+particular search node. To protect against the tree manager itself or a cut
+pool being killed, full logging capabilities have been implemented. If
+desired, the tree manager can write out the entire state of the tree to disk
+periodically, allowing a warm restart if a fault occurs. Similarly, the cut
+pool process can be warm-started from a log file. This not only allows for
+fault tolerance but also for full reconfiguration in the middle of solving a
+long-running problem. Such reconfiguration could consist of anything from
+adding more processors to moving the entire solution process to another
+network.
 
