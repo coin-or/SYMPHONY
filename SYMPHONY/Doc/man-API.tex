@@ -396,6 +396,8 @@ algorithms. The user invokes these subroutines through the API specified in
 the header file \texttt{symphony\_api.h}. Some of the basic commands are 
 described below. For the sake of brevity, the arguments have been left out. 
 
+\subsection{The C API}
+
 \paragraph{\ptt{sym\_open\_environment()}} Opens a new environment, and
 returns a pointer to it. This pointer then has to be passed as an argument to
 all other API subroutines (in the C++ interface, this pointer is maintained
@@ -580,7 +582,7 @@ parameters. These can be used between calls to the solver to change the
 behavior of the algorithm or to modify the instance being solved. These
 modifications are discussed in more detail in Section \ref{warm_solve}.
 
-\section{Using the OSI Interface}\label{OSI}
+\subsection{The C++ API}\label{OSI}
 
 The Open Solver Interface (OSI) is a C++ class that provides a standard API
 for accessing a variety of solvers for mathematical programs. It is provided
@@ -640,6 +642,12 @@ functionality that has long been available for LP solvers. As such, our OSI
 interface supports warm starting and sensitivity analysis. The implementations
 of this functionality is straightforward at the moment, but will be improved
 in future versions.
+
+\subsection{Linking to the Callable Library}
+
+\paragraph{The C Interface.}
+
+\paragraph{The C++ Interface.}
 
 \section{Using the Callback Functions}\label{callback}
 
