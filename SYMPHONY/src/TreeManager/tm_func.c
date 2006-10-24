@@ -3161,8 +3161,8 @@ void sym_catch_c(int num)
    
    while(true) {
       printf("\nDo you want to abort? [y/N]: ");
-   fflush(stdout);   
-      gets(temp);
+      fflush(stdout);   
+      scanf("%s", temp);
       if (temp[0] != ' ') {      
 	 if(temp[1] == 0 && (temp[0] == 'y' || temp[0] == 'Y')){
       c_count++;

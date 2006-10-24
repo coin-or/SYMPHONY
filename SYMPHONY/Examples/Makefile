@@ -27,9 +27,17 @@ COINROOT = ../..
 LP_SOLVER = OSI
 OSI_INTERFACE = CLP
 
-LPINCDIR = $(SYMPHONYROOT)/include
-LPLIBPATHS = $(SYMPHONYROOT)/lib
+##############################################################################
+# If you wish to use SYMPHONY through the SYMPHONY OSI interface, 
+# set USE_OSI_INTERFACE to TRUE below. This will have the examples 
+# to call the OSI SYMPHONY interface routines. 
+##############################################################################
+USE_OSI_INTERFACE = FALSE
+
+LPINCDIR = $(COINROOT)/include
+LPLIBPATHS = $(COINROOT)/lib
 LPLIB = -lSym
+SYMDEFS =
 
 ifeq ($(LP_SOLVER),CPLEX)
        LPINCDIR += /usr/local/include/
@@ -46,7 +54,11 @@ endif
 ifeq ($(LP_SOLVER),OSI)
        LPINCDIR += $(COINROOT)/include
        LPLIBPATHS += $(COINROOT)/lib
-       LPLIB += -lCoinUtils -lOsi -lCgl
+       LPLIB += -lCgl
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+       LPLIB += -lOsiSym
+       SYMDEFS += -DUSE_OSI_INTERFACE    
+endif
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPINCDIR += /usr/local/include/
        LPLIBPATHS += /usr/local/lib/
@@ -67,10 +79,12 @@ ifeq ($(OSI_INTERFACE),GLPK)
        LPLIBPATHS += ${HOME}/GLPK/glpk-4.3/src
        LPLIB += -lOsiGlpk -lglpk
 endif
+       LPLIB += -lOsi -lCoinUtils
 endif
 
 INCDIR        = $(addprefix -I,${LPINCDIR})
 LDFLAGS       = $(addprefix -L,${LPLIBPATHS})
+LDFLAGS      += $(SYMDEFS)
 
 LINKFLAGS += $(addprefix ${SHLINKPREFIX},${LPLIBPATHS})
 
@@ -78,8 +92,6 @@ EXAMPLES = milp milp2 bicriteria sensitivity warm_start1 warm_start2 warm_start3
 
 examples: $(EXAMPLES)
 	true
-
-
 
 milp : milp.c
 

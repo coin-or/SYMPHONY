@@ -225,24 +225,6 @@ fi
 
 AM_CONDITIONAL(USE_GMPL, [test "$sym_gmpl" = yes])
 
-#FIXME! NO WAY TO COMPILE OSISYM! all other packages refer to SYM instead of
-# SYMPHONY
-#---------------------------------------------------------------------------#
-# USE_OSI_INTERFACE
-#---------------------------------------------------------------------------#
-AC_MSG_CHECKING([whether to compile osi interface])
-AC_ARG_WITH([osi-interface],
-[AC_HELP_STRING([--with-osi-interface],
-                [compile with SymOsi interface])],
-		[sym_osi=$withval],[])
-
-if test "$sym_osi" = yes; then
-   AC_MSG_RESULT([yes])
- else
-   AC_MSG_RESULT([no])
- fi
-AM_CONDITIONAL(USE_OSI_INTERFACE, [test "$sym_osi" = yes])
-
 #---------------------------------------------------------------------------#
 # SENSITIVITY_ANALYSIS
 #---------------------------------------------------------------------------#

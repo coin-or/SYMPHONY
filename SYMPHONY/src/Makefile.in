@@ -114,28 +114,27 @@ host_triplet = @host@
 @COIN_HAS_READLINE_TRUE@am__append_30 = -DHAS_READLINE
 @SENSITIVITY_ANALYSIS_TRUE@am__append_31 = -DSENSITIVITY_ANALYSIS
 @USE_CGL_CUTS_TRUE@am__append_32 = -DUSE_CGL_CUTS
-@USE_OSI_INTERFACE_TRUE@am__append_33 = 
-@ROOT_NODE_ONLY_TRUE@am__append_34 = -DROOT_NODE_ONLY
+@ROOT_NODE_ONLY_TRUE@am__append_33 = -DROOT_NODE_ONLY
 
 #if CCMALLOC
 #AM_CPPFLAGS += 
 #endif
-@COMPILE_FRAC_BRANCHING_TRUE@am__append_35 = -DCOMPILE_FRAC_BRANCHING
-@DO_TESTS_TRUE@am__append_36 = -DDO_TESTS
-@TM_BASIS_TESTS_TRUE@am__append_37 = -DTM_BASIS_TESTS
-@TRACE_PATH_TRUE@am__append_38 = -DTRACE_PATH
-@CHECK_CUT_VALIDITY_TRUE@am__append_39 = -DCHECK_CUT_VALIDITY
-@STATISTICS_TRUE@am__append_40 = -DSTATISTICS
-@PSEUDO_COSTS_TRUE@am__append_41 = -DPSEUDO_COSTS
-@DRAWGRAPH_TRUE@am__append_42 = 
+@COMPILE_FRAC_BRANCHING_TRUE@am__append_34 = -DCOMPILE_FRAC_BRANCHING
+@DO_TESTS_TRUE@am__append_35 = -DDO_TESTS
+@TM_BASIS_TESTS_TRUE@am__append_36 = -DTM_BASIS_TESTS
+@TRACE_PATH_TRUE@am__append_37 = -DTRACE_PATH
+@CHECK_CUT_VALIDITY_TRUE@am__append_38 = -DCHECK_CUT_VALIDITY
+@STATISTICS_TRUE@am__append_39 = -DSTATISTICS
+@PSEUDO_COSTS_TRUE@am__append_40 = -DPSEUDO_COSTS
+@DRAWGRAPH_TRUE@am__append_41 = 
 
 #FIXME For now, assume that we have gmpl files, later check for GLPK package
-@USE_GMPL_TRUE@am__append_43 = -DUSE_GLPMPL
-@SYM_PARALLEL_TRUE@am__append_44 = $(AM_CPPFLAGS) $(SYMPDEFS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-@SYM_PARALLEL_TRUE@am__append_45 = $(ALLLDADD) -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
+@USE_GMPL_TRUE@am__append_42 = -DUSE_GLPMPL
+@SYM_PARALLEL_TRUE@am__append_43 = $(AM_CPPFLAGS) $(SYMPDEFS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+@SYM_PARALLEL_TRUE@am__append_44 = $(ALLLDADD) -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
 @SYM_PARALLEL_TRUE@	-lgpvm3 -lpvm3
 
-@SYM_PARALLEL_TRUE@am__append_46 = $(PCPPFLAGS) -DUSE_SYM_APPLICATION
+@SYM_PARALLEL_TRUE@am__append_45 = $(PCPPFLAGS) -DUSE_SYM_APPLICATION
 EXTRA_PROGRAMS = symphony$(EXEEXT) symphony_m$(EXEEXT) \
 	symphony_m_tm$(EXEEXT) symphony_m_tm_lp$(EXEEXT) \
 	symphony_m_tm_cp$(EXEEXT) symphony_m_tm_lp_cg$(EXEEXT) \
@@ -145,10 +144,10 @@ EXTRA_PROGRAMS = symphony$(EXEEXT) symphony_m$(EXEEXT) \
 	symphony_tm_cp$(EXEEXT) symphony_tm_lp$(EXEEXT) \
 	symphony_tm_lp_cg$(EXEEXT) symphony_tm_lp_cg_cp$(EXEEXT)
 bin_PROGRAMS = $(am__EXEEXT_1)
-@STATICEXE_TRUE@am__append_47 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static -static-libgcc\
+@STATICEXE_TRUE@am__append_46 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static -static-libgcc\
 @STATICEXE_TRUE@	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-@STATICEXE_FALSE@am__append_48 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+@STATICEXE_FALSE@am__append_47 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 @STATICEXE_FALSE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 subdir = src
@@ -2548,8 +2547,6 @@ USE_CGL_CUTS_FALSE = @USE_CGL_CUTS_FALSE@
 USE_CGL_CUTS_TRUE = @USE_CGL_CUTS_TRUE@
 USE_GMPL_FALSE = @USE_GMPL_FALSE@
 USE_GMPL_TRUE = @USE_GMPL_TRUE@
-USE_OSI_INTERFACE_FALSE = @USE_OSI_INTERFACE_FALSE@
-USE_OSI_INTERFACE_TRUE = @USE_OSI_INTERFACE_TRUE@
 VERSION = @VERSION@
 VPATH_DISTCLEANFILES = @VPATH_DISTCLEANFILES@
 WHATTOMAKEBINS = @WHATTOMAKEBINS@
@@ -2794,11 +2791,11 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(SYMINCDIR)` $(am__append_16) \
 	$(am__append_32) $(am__append_33) $(am__append_34) \
 	$(am__append_35) $(am__append_36) $(am__append_37) \
 	$(am__append_38) $(am__append_39) $(am__append_40) \
-	$(am__append_41) $(am__append_42) $(am__append_43)
+	$(am__append_41) $(am__append_42)
 SYMCPPFLAGS = $(AM_CPPFLAGS) $(SYMDEFS)
-PCPPFLAGS = $(am__append_44)
+PCPPFLAGS = $(am__append_43)
 APPLCPPFLAGS = $(SYMCPPFLAGS) -DUSE_SYM_APPLICATION
-APPLPCPPFLAGS = $(am__append_46)
+APPLPCPPFLAGS = $(am__append_45)
 LDADD = $(am__append_14) $(am__append_17) $(am__append_20) \
 	$(am__append_22) $(am__append_25) $(am__append_27) \
 	$(am__append_29) $(OSIOBJDIR)/src/libOsi.la \
@@ -2807,7 +2804,7 @@ LDADD = $(am__append_14) $(am__append_17) $(am__append_20) \
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
 ALLLDADD = $(LDADD) $(ADDLIBS)
-PALLLDADD = $(am__append_45)
+PALLLDADD = $(am__append_44)
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
 ########################################################################
@@ -3045,7 +3042,7 @@ CCLD = $(CXX)
 #CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
 
 # Link with g++
-LINK = $(am__append_47) $(am__append_48)
+LINK = $(am__append_46) $(am__append_47)
 
 ########################################################################
 #                Headers that need to be installed                     #
