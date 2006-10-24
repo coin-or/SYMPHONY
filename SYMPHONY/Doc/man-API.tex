@@ -22,7 +22,7 @@ you run the configuration script (see Section \ref{configuring}) with the
 command-line argument that enables GNU packages, i.e., 
 {\color{Brown}
 \begin{verbatim}
-./configure --enable-gnu-packages 
+ ./configure --enable-gnu-packages 
 \end{verbatim}
 }
 This will allow the interactive shell to behave exactly like a Linux terminal
@@ -39,8 +39,8 @@ command line arguments, i.e., type
 }
 You will enter a command shell environment where you will be prompted to
 feed in inputs to use SYMPHONY interactively. The user interface consists 
-of a {\tt main menu}, where an instance is read in and solved, a 
-{\tt set menu}, where parameters are set, and a {\tt display menu}, where 
+of a \emph{main menu}, where an instance is read in and solved, a 
+\emph{set menu}, where parameters are set, and a \emph{display menu}, where 
 results, statistics and parameter values are displayed. 
  
 \subsection{MS Windows}
@@ -144,8 +144,8 @@ have to configure SYMPHONY with GLPK package - see Section \ref{building}):
 Note that, in order to enable GMPL/AMPL reader, you have to 
 configure SYMPHONY with GLPK package (see Section \ref{building}). 
 
-After loading the instance, you are free to type {\tt solve} to solve the 
-corresponding integer program or {\tt lpsolve} to solve its linear
+After loading the instance, you are free to type \code{solve} to solve the 
+corresponding integer program or \code{lpsolve} to solve its linear
 relaxation:
 {\color{Brown}
 \begin{verbatim}
@@ -178,7 +178,7 @@ the termination code of the solution process will be displayed (see Section
 
 \subsection{Set Menu}\label{set_menu}
 Set submenu is used to set SYMPHONY's run-time parameters. 
-To enter this submenu, type {\tt set}: 
+To enter this submenu, type \code{set}: 
 {\color{Brown}
 \begin{verbatim}
 SYMPHONY: set
@@ -190,7 +190,7 @@ You can override the default value of a parameter by typing the name of
 the parameter. You will then be prompted 
 to enter the new value of that parameter. For instance, in order to 
 display more outputs during the solution process, you need to set the 
-{\tt verbosity} parameter (set to -1 by defualt for the interactive shell 
+\code{verbosity} parameter (set to -1 by defualt for the interactive shell 
 routines) to a nonnegative integer: 
 {\color{Brown}
 \begin{verbatim}
@@ -201,19 +201,19 @@ SYMPHONY\Set:
 \end{verbatim}
 }
 A confirmation message will also be displayed. Notice that, typing 
-{\tt help} or {\tt ?} displays only a subset of all 
+\code{help} or \code{?} displays only a subset of all 
 available run-time parameters which are the most commonly used ones. However, 
 you are allowed to set any of the parameters given in Section \ref{params}.
 Additionaly, you can set the values of parameters using a parameter file 
 as an input. In such a file, the new value of each parameter must follow the 
-name of that parameter. As an instance, assume that {\tt my\_param} file  
+name of that parameter. As an instance, assume that \code{my\_param} file  
 consists of the following lines: 
 \begin{verbatim}
  verbosity 3
  node_selection_rule 3
  time_limit 100
 \end{verbatim}
-Then, type {\tt param\_file} to be prompted to read in the parameter file: 
+Then, type \code{param\_file} to be prompted to read in the parameter file: 
 {\color{Brown}
 \begin{verbatim}
  SYMPHONY\Set: param_file
@@ -224,13 +224,13 @@ Then, type {\tt param\_file} to be prompted to read in the parameter file:
  SYMPHONY\Set:
 \end{verbatim}
 }
-At this point, you can return to the main menu by typing {\tt back},  
+At this point, you can return to the main menu by typing \code{back},  
 load an instance and solve it with updated run-time parameters. 
 
 \subsection{Display Menu}
 Display submenu is used to print out results and statistics of the solution 
-process after a {\tt solve} call. To enter this submenu and see available 
-options, type {\tt display} and then {\tt help} or {\tt ?}:  
+process after a \code{solve} call. To enter this submenu and see available 
+options, type \code{display} and then \code{help} or \code{?}:  
 {\color{Brown}
 \begin{verbatim}
  SYMPHONY: display
@@ -251,7 +251,7 @@ options, type {\tt display} and then {\tt help} or {\tt ?}:
 \end{verbatim}
 }
 Clearly, in order to display column solutions and the optimal solution value, 
-you need to type {\tt solution} and then {\tt obj}:
+you need to type \code{solution} and then \code{obj}:
 {\color{Brown}
 \begin{verbatim}
  SYMPHONY\Display: solution
@@ -268,7 +268,7 @@ you need to type {\tt solution} and then {\tt obj}:
 \end{verbatim}
 }
 You can also display the values of SYMPHONY's run-time parameters (see Section
-\ref{params}) by moving into {\tt parameters} submenu: 
+\ref{params}) by moving into \code{parameters} submenu: 
 {\color{Brown}
 \begin{verbatim}
  SYMPHONY\Display: parameter
@@ -276,7 +276,7 @@ You can also display the values of SYMPHONY's run-time parameters (see Section
  SYMPHONY\Display\Parameter:
 \end{verbatim}
 }
-For instance, in order to display the verbosity level, type {\tt verbosity}:
+For instance, in order to display the verbosity level, type \code{verbosity}:
 {\color{Brown}
 \begin{verbatim}
  SYMPHONY\Display\Parameter: verbosity 
@@ -284,7 +284,7 @@ For instance, in order to display the verbosity level, type {\tt verbosity}:
  SYMPHONY\Display\Parameter:
 \end{verbatim}
 }
-As in Set submenu, typing {\tt help} or {\tt ?} will display only a subset of 
+As in Set submenu, typing \code{help} or \code{?} will display only a subset of 
 available run-time parameters. However, you are allowed to display the value of
 any of the parameters given in Section \ref{params}. 
 
@@ -317,7 +317,7 @@ have the same result:
   \end{verbatim}
 \end{itemize}
 }
-This flexibility is also enabled for the {\tt load} command and the Set 
+This flexibility is also enabled for the \code{load} command and the Set 
 submenu. The followings are all valid commands: 
 {\color{Brown}
   \begin{verbatim}
@@ -645,9 +645,13 @@ in future versions.
 
 \subsection{Linking to the Callable Library}
 
-\paragraph{The C Interface.}
-
-\paragraph{The C++ Interface.}
+To link your program to the callable library, make sure you have included the
+header file \code{symphony.h} in all the source files that call SYMPHONY
+functions. Also, make sure that your include path contains the directory where
+all of SYMPHONY's header files are stored. Then simply include the appropriate
+SYMPHONY library in the set of libraries to be linked and make sure that the
+path to the library is in the library path. Example makefiles For Unix-like
+environments are included in the \code{Examples/} directory. 
 
 \section{Using the Callback Functions}\label{callback}
 
