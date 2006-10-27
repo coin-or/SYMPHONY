@@ -269,6 +269,10 @@ int fathom_branch(lp_prob *p)
        case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
        case LP_ABANDONED:
+	 if (p->bc_index==0) {
+	    PRINT(p->par.verbosity, -1, ("Problem seems to be infeasible. Exiting ..."));
+	    return(IP_INFEASIBLE);
+	 }
 	 printf("####### Unexpected termcode: %i \n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
@@ -382,6 +386,7 @@ int fathom_branch(lp_prob *p)
 	    ("\nIn iteration %i, before calling branch()\n", p->iter_num));
       if (cuts == 0){
 	 PRINT(p->par.verbosity, 2, ("... no cuts were added.\n"));
+	 display_lp_solution_u(p, DISP_FINAL_RELAXED_SOLUTION);
 	 if (p->par.verbosity > 4){
 	    printf("Now displaying final relaxed solution...\n\n");
 	    display_lp_solution_u(p, DISP_FINAL_RELAXED_SOLUTION);
@@ -392,6 +397,11 @@ int fathom_branch(lp_prob *p)
       }
       
       comp_times->lp += used_time(&p->tt);
+      double * tmp_x = NULL;
+      if (p->tm->par.node_limit==1) {
+	 tmp_x = (double *) malloc(DSIZE*lp_data->n);
+	 memcpy(tmp_x,lp_data->x,DSIZE*lp_data->n);
+      }
 
       switch (cuts = branch(p, cuts)){
 
@@ -407,6 +417,11 @@ int fathom_branch(lp_prob *p)
 	 break;
 #endif
        case FATHOMED_NODE:
+	 if (p->tm->par.node_limit==1) {
+	    memcpy(lp_data->x,tmp_x,DSIZE*lp_data->n);
+	    display_lp_solution_u(p, DISP_FINAL_RELAXED_SOLUTION);
+	    FREE(tmp_x);
+	 }
 	 comp_times->strong_branching += used_time(&p->tt);
 	 return(FUNCTION_TERMINATED_NORMALLY);
 
@@ -414,6 +429,7 @@ int fathom_branch(lp_prob *p)
 	 return(ERROR__NO_BRANCHING_CANDIDATE);
 	 
        default: /* the return value is the number of cuts added */
+	 FREE(tmp_x);
 	 if (p->par.verbosity > 2){
 	    printf("Continue with this node.");
 	    if (cuts > 0)

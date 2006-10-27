@@ -131,6 +131,7 @@ int main_level = 0; /* 0 - SYMPHONY:
 
 int sym_help(char *line);
 int sym_read_line(char *prompt, char **input);
+int read_constr_file(sym_environment *env);
 
 int main(int argc, char **argv)
 {    
@@ -138,32 +139,51 @@ int main(int argc, char **argv)
    sym_environment *env = sym_open_environment();
    int termcode;
    
-   if (argc > 1){
-   
-      sym_parse_command_line(env, argc, argv);
-      
-      if (env->par.test){
+	if (argc > 1){
 
-	 sym_test(env);
-	 
-      }else{
-	 
-	 if ((termcode = sym_load_problem(env)) < 0){
-	    printf("\nFatal errors encountered. Exiting with code %i.\n\n",
-		   termcode);
-	    exit(termcode);
-	 }
-	 
-	 if ((termcode = sym_find_initial_bounds(env)) < 0){
-	    printf("\nFatal errors encountered. Exiting with code %i.\n\n",
-		   termcode);
-	    exit(termcode);
-	 }
+		sym_parse_command_line(env, argc, argv);
 
-	 sym_solve(env);
-      }
-   
-   } else{
+		if (env->par.solve_lp_only == TRUE) {
+			printf("Solving LP only, with the given branching info\n");
+		}
+
+		if (env->par.test){
+
+			sym_test(env);
+
+		}else{
+
+			if ((termcode = sym_load_problem(env)) < 0){
+				printf("\nFatal errors encountered. Exiting with code %i.\n\n",
+						termcode);
+				exit(termcode);
+			}
+
+			if ((termcode = sym_find_initial_bounds(env)) < 0){
+				printf("\nFatal errors encountered. Exiting with code %i.\n\n",
+						termcode);
+				exit(termcode);
+			}
+
+		   if (strcmp(env->par.constr_file, "")==0) {
+				/* do nothing */
+			} else {
+				read_constr_file(env);
+			}
+			if (env->par.solve_lp_only == TRUE) {
+				char *is_int = env->mip->is_int;
+				env->mip->is_int  = (char *)   calloc(CSIZE, env->mip->n);
+				double start_time = wall_clock(NULL);
+				termcode = sym_solve(env);
+				double finish_time = wall_clock(NULL);
+				env->mip->is_int = is_int;
+				is_int = 0;
+			} else {
+				sym_solve(env);
+			}
+		}
+
+	} else{
 
      FILE *f = NULL;
      char *line = NULL;
@@ -614,7 +634,7 @@ int sym_help(char *line)
 	   "generate_cgl_lift_and_project_cuts : whether or not to use cgl lift and project cuts (default: 0)\n"
 	   "node_selection_rule                : set the node selection rule/search strategy (default: 5)\n"
 	   "strong_branching_candidate_num     : set the stong branching candidates number (default: var)\n"
-	   "compare_candidates_default         : set the rule to compare the candidates (defualt: 2)\n"
+	   "compare_candidates_dafult          : set the rule to compare the candidates (defualt: 2)\n"
 	   "select_child_default               : set the rule to select the children (default: 0)\n"
 	   "diving_threshold                   : set diving threshold (default: 0)\n"
 	   "diving_strategy                    : set diving strategy (default: 0)\n"
@@ -813,4 +833,81 @@ void sym_read_tilde(char input[])
 #endif
 
 
+/*===========================================================================*\
+\*===========================================================================*/
+int read_constr_file(sym_environment *env)
+{
+	char *constr_file = env->par.constr_file;
+	FILE *f = NULL;
+   char st_var[MAX_LINE_LENGTH +1], st_sense[1], st_bound[MAX_LINE_LENGTH +1];
+	char line[MAX_LINE_LENGTH +1];
+	int count = 0;
+	int count2 = 0;
+
+	f = fopen(constr_file, "r");
+	if (f == NULL) {
+		printf("Input file '%s' can't be opened\n", constr_file);
+		exit(112);
+	}
+
+	//printf("Success reading file: %s.\n",constr_file);
+	while (fgets(line, MAX_LINE_LENGTH, f) != NULL){  /* count how many */
+		count++;
+	//	printf("Count = %d, Line = %s\n",count,line);
+	}
+
+	fclose(f);
+	//printf("There seem to %d constraints\n",count);
+	f = fopen(constr_file, "r");
+
+	int *var = (int *) malloc(ISIZE*count);
+	double *bound = (double *)malloc(DSIZE*count);
+	char *sense = (char *)malloc(CSIZE*(count+1));
+	count2 = 0;
+	while (NULL != fgets(line, MAX_LINE_LENGTH, f)){  /* count how many */
+	 printf("count2 = %d, line = %s\n",count2,line);
+	 strcpy(st_var,"");
+	 sscanf(line,"%s%s%s", st_var, st_sense, st_bound);
+	 sscanf(st_var, "%i", &(var[count2]));
+	 sscanf(st_bound, "%lf", &(bound[count2]));
+	 sense[count2] = st_sense[0];
+	 printf("count2 = %d, var = %i, sense = %c, bound = %g\n",count2, var[count2],sense[count2],bound[count2]);
+	 count2++;
+	}
+
+	if (count2 != count) {
+		printf("Errors in input constraint file. Exiting ...\n");
+		exit(111);
+	}
+
+	printf("Applying constraints read from the constraint file %s.\n",constr_file);
+	for (int i=0; i<count; i++) {
+		printf("var[%d] = %d\n",i,var[i]);
+		switch (sense[i]) {
+		 case 'L':
+			printf("Setting lower bound of %f on var %d.\n",bound[i],var[i]);
+			if (env->mip->colname) {
+			   printf("Colname of this variable = %s.\n",env->mip->colname[var[i]]);
+			} else {
+			   printf("Colname not available.\n");
+			}
+			sym_set_col_lower(env,var[i],bound[i]);
+			break;
+		 case 'U':
+			printf("Setting upper bound of %f on var %d.\n",bound[i],var[i]);
+			if (env->mip->colname) {
+			   printf("Colname of this variable = %s.\n",env->mip->colname[var[i]]);
+			} else {
+			   printf("Colname not available.\n");
+			}
+			sym_set_col_upper(env,var[i],bound[i]);
+			break;
+		 default:
+			printf("Warning: difficulty setting constraint ");
+			printf("using line %d in file %s.\n",count,constr_file);
+		}
+	}
+	fclose(f);
+	return 0;
+}
 

@@ -5431,7 +5431,7 @@ int sym_test(sym_environment *env)
   verbosity = sym_get_int_param(env, "verbosity", &verbosity);
 
   sym_set_int_param(env, "verbosity", -10);
-
+  
   int i, file_num = 12;
   char mps_files[12][MAX_FILE_NAME_LENGTH +1] = {
     "air03", "dcmulti", "egout", "flugpl", "khb05250", "l152lav", 
@@ -5443,27 +5443,12 @@ int sym_test(sym_environment *env)
 
   char *mps_dir = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
   char *infile = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
+  char *constr_file = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
   double *obj_val = (double *)calloc(DSIZE,file_num);
   double tol = 1e-03;
 
-  size_t size = 1000;
-  char* buf = 0;
-  while (true) {
-     buf = (char*)malloc(CSIZE*size);
-     if (getcwd(buf, size))
-	break;
-     FREE(buf);
-     buf = 0;
-     size = 2*size;
-  }
-  char dirsep = buf[0] == '/' ? '/' : '\\';
-  FREE(buf);
-  
   if (strcmp(env->par.test_dir, "") == 0){ 
-     if (dirsep == '/')
-	strcpy(mps_dir, "../../Data/miplib3");
-     else 
-	strcpy(mps_dir, "..\\..\\Data\\miplib3");	
+    strcpy(mps_dir, "../../Data/miplib3");
   } else{
     strcpy(mps_dir, env->par.test_dir);
   }
@@ -5477,10 +5462,8 @@ int sym_test(sym_environment *env)
     }
 
     strcpy(infile, "");
-    if (dirsep == '/')
-       sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
-    else
-       sprintf(infile, "%s%s%s", mps_dir, "\\", mps_files[i]);   
+    sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
+
     if( termcode = sym_read_mps(env, infile) < 0)
       return(termcode);
 

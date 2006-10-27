@@ -116,7 +116,21 @@ int readparams_u(sym_environment *env, int argc, char **argv)
 	   }else{
 	     printf("Warning: Missing argument to command-line switch -%c\n",c);
 	   }
-	   break;	     
+	   break;
+	 case 'B':
+		if(i+1 < argc){
+			sscanf(argv[i+1], "%c", &tmp);
+			if(tmp != '-'){
+				strncpy(env->par.constr_file, argv[++i],MAX_FILE_NAME_LENGTH);
+				printf("constraint file = %s\n",env->par.constr_file);
+			}
+		}else{
+			printf("Warning: Missing argument to command-line switch -%c\n",c);
+		}
+		break;
+	 case 'L':
+		env->par.solve_lp_only = TRUE;
+		break;
 	 default:
 	   if (c < 'A'){
 	     printf("Warning: Ignoring unrecognized command-line switch -%c\n",
@@ -625,7 +639,7 @@ int display_solution_u(sym_environment *env, int thread_num)
 
    sol.xlength = 0;
 
-   if (env->par.verbosity < 0){
+   if (env->par.verbosity < -1){
        return(FUNCTION_TERMINATED_NORMALLY);
    }     
    
@@ -677,7 +691,8 @@ int display_solution_u(sym_environment *env, int thread_num)
       return(FUNCTION_TERMINATED_NORMALLY);
     case USER_DEFAULT:
       if (sol.xlength){
-	 if (env->mip->colname){ 
+/*	 if (env->mip->colname)  */
+	 if (FALSE) {
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    printf("Column names and values of nonzeros in the solution\n");
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");

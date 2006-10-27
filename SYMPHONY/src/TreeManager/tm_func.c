@@ -447,10 +447,11 @@ int solve(tm_prob *tm)
 	 }
 
 	 if (tm->par.node_limit >= 0 && tm->stat.analyzed >= 
-	     tm->par.node_limit && termcode != TM_FINISHED){
-	    if (tm->active_node_num + tm->samephase_candnum > 0){
+	     tm->par.node_limit) {
+	    if (tm->active_node_num+tm->samephase_candnum>0){
 	       termcode = TM_NODE_LIMIT_EXCEEDED;
-	    }else{
+	    }
+	    else {
 	       termcode = TM_FINISHED;
 	    }
 	    break;
@@ -518,10 +519,10 @@ int solve(tm_prob *tm)
 }
       }
 }
-      if (tm->samephase_candnum + tm->active_node_num == 0){
-	 termcode = TM_FINISHED;
-      }
-      if (tm->nextphase_candnum == 0)
+   if (tm->samephase_candnum+tm->active_node_num==0) {
+      termcode = TM_FINISHED;
+   }
+   if (tm->nextphase_candnum == 0)
 	 break;
       if (termcode != TM_UNFINISHED)
 	 break;
@@ -3161,7 +3162,7 @@ void sym_catch_c(int num)
    
    while(true) {
       printf("\nDo you want to abort? [y/N]: ");
-      fflush(stdout);   
+      fflush(stdout);
       scanf("%s", temp);
       if (temp[0] != ' ') {      
 	 if(temp[1] == 0 && (temp[0] == 'y' || temp[0] == 'Y')){

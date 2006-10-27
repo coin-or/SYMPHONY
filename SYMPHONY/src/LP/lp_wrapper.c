@@ -846,7 +846,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
    int i, *xind = lp_data->tmp.i1; /* n */
    double tmpd, *xval = lp_data->tmp.d; /* n */
 
-   if (p->par.verbosity < 0) return;
+   if (p->par.verbosity < -5) return;
    
    number = collect_nonzeros(p, x, xind, xval);
 
@@ -908,7 +908,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf("\n");
       break;
     case DISP_FRAC_INT:
-      if (p->mip->colname){ 
+      if (!p->mip->colname){ 
 	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 printf(" Column names and values of fractional vars in solution\n");
 	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
@@ -927,11 +927,13 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	 for (i = 0; i < number; i++){
 	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
 	    tmpd = xval[i];
-	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
-	       printf("%7d %10.7f ", xind[i], tmpd);
-	       if (!(++i & 3)) printf("\n"); /* new line after every four*/
+	    if (p->mip->is_int[xind[i]]){
+	       if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
+		  printf("%7d %10.7f\n", xind[i], tmpd);
+	       }
 	    }
 	 }
+	 printf ("Done printing\n");
       }
       printf("\n");
       break;
@@ -1457,8 +1459,8 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
    if (can->type == CANDIDATE_VARIABLE){
       if (p->mip){
 	 if (p->mip->colname){
-	    printf("Branching on variable %s \n   children: ",
-		   p->mip->colname[p->lp_data->vars[can->position]->userind]);
+	    printf("Branching on variable %s number = %d\n   children: ",
+		   p->mip->colname[p->lp_data->vars[can->position]->userind],p->lp_data->vars[can->position]->userind);
 	 }
       }else{
 	 printf("Branching on variable %i ( %i )\n   children: ",

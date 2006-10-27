@@ -53,6 +53,8 @@ typedef struct PARAMS{
 						  or GNUMP modelfile */
    char       datafile[MAX_FILE_NAME_LENGTH +1]; /* GNUMP datafile */
    char       test_dir[MAX_FILE_NAME_LENGTH +1];  /* Test files directory */
+   char       constr_file[MAX_FILE_NAME_LENGTH +1]; /* For addnl constraints */
+	int        solve_lp_only;
 
    /* Multi-criteria parameters */
    int        multi_criteria;
