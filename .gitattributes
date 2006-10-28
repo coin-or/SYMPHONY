@@ -72,6 +72,9 @@ Win32/v6/libSymphony.dsp -text
 Win32/v6/sym.mak -text
 Win32/v6/symphony.dsp -text
 Win32/v6/symphony.dsw -text
+Win32/v7/libSymphony.vcproj -text
+Win32/v7/symphony.sln -text
+Win32/v7/symphony.vcproj -text
 Win32/v8/libSymphony.vcproj -text
 Win32/v8/symphony.sln -text
 Win32/v8/symphony.vcproj -text
