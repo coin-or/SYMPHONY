@@ -915,7 +915,7 @@ void rotate_odd_hole(int length, int *indices, int *itmp)
       }
    if (indices[(minind-1+length)%length] < indices[(minind+1)%length]) {
       /* reverse cycle */
-      for (i = (int)(floor(length/2)) - 1; i >= 0; i--) {
+      for (i = (int)(floor((double)length/2)) - 1; i >= 0; i--) {
 	 tmp = indices[i];
 	 indices[i] = indices[length - 1 - i];
 	 indices[length - 1 - i] = tmp;
