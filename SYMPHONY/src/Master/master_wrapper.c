@@ -118,10 +118,6 @@ int readparams_u(sym_environment *env, int argc, char **argv)
 	   }
 	   break;	     
 	 default:
-	   if (c < 'A'){
-	     printf("Warning: Ignoring unrecognized command-line switch -%c\n",
-		    c);
-	   }
 	   break;
 	 }	   
 	 if (foundF && foundD){
@@ -161,7 +157,15 @@ int io_u(sym_environment *env)
 
     case USER_DEFAULT: 
 
-      if (strcmp(env->par.datafile, "") == 0){ 
+      if (strcmp(env->par.infile, "") == 0){
+	 printf("\nNo input file specified\n");
+	 return (ERROR__READING_MPS_FILE);
+      }	 
+
+      if (env->par.verbosity >= 0){
+	 printf("Reading input file...\n\n");
+      }
+      if (strcmp(env->par.datafile, "") == 0){
 	 err = read_mps(env->mip, env->par.infile, env->probname);
 	 if (err != 0){
 	    printf("\nErrors in reading mps file\n");

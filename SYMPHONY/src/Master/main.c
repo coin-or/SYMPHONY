@@ -141,6 +141,10 @@ int main(int argc, char **argv)
    if (argc > 1){
    
       sym_parse_command_line(env, argc, argv);
+
+      if (env->par.verbosity >= 0){
+	 version();
+      }
       
       if (env->par.test){
 
@@ -149,14 +153,16 @@ int main(int argc, char **argv)
       }else{
 	 
 	 if ((termcode = sym_load_problem(env)) < 0){
-	    printf("\nFatal errors encountered. Exiting with code %i.\n\n",
+	    printf("\nFatal errors encountered. Exiting with code %i.\n",
 		   termcode);
+	    printf("See sym_return_values.h for meaning of code.\n\n");
 	    exit(termcode);
 	 }
 	 
 	 if ((termcode = sym_find_initial_bounds(env)) < 0){
-	    printf("\nFatal errors encountered. Exiting with code %i.\n\n",
+	    printf("\nFatal errors encountered. Exiting with code %i.\n",
 		   termcode);
+	    printf("See sym_return_values.h for meaning of code.\n\n");
 	    exit(termcode);
 	 }
 
@@ -176,6 +182,7 @@ int main(int argc, char **argv)
      double objval = 0.0, initial_time = 0.0, start_time = 0.0;
      double finish_time = 0.0, dbl_value = 0;
 
+     version();
      printf("***** WELCOME TO SYMPHONY INTERACTIVE MIP SOLVER ******\n\n"
 	    "Please type 'help'/'?' to see the main commands!\n\n");
 

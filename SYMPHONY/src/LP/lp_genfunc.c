@@ -46,7 +46,7 @@ int lp_initialize(lp_prob *p, int master_tid)
 #if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP)
    int s_bufid;
 #endif
-   int i;
+   int i, j;
    row_data *rows;
    var_desc **vars;
 
@@ -92,6 +92,9 @@ int lp_initialize(lp_prob *p, int master_tid)
        p->par.tailoff_obj_backsteps > 1){
       i = MAX(p->par.tailoff_gap_backsteps, p->par.tailoff_obj_backsteps);
       p->obj_history = (double *) malloc((i + 1) * DSIZE);
+      for (j = 0; j <= i; j++){
+	 p->obj_history[j] = -DBL_MAX;
+      }
    }
 #ifndef COMPILE_IN_LP
    if (p->par.use_cg){

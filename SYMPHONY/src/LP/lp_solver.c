@@ -2883,6 +2883,9 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    
    size_t size = 1000;
    char* buf = 0;
+
+   mps.messageHandler()->setLogLevel(0);
+   
    while (true) {
       buf = (char*)malloc(CSIZE*size);
       if (getcwd(buf, size))

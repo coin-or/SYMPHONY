@@ -522,7 +522,7 @@ void cut_ws_tree_index(sym_environment *env, bc_node *root, int index,
   int i;
   
   if (root){
-     if (root->node_status == !NODE_STATUS__CANDIDATE){
+     if (root->node_status != NODE_STATUS__CANDIDATE){
 	stat->analyzed++;
      }
      if(root->bobj.child_num > 0){
@@ -563,7 +563,7 @@ void cut_ws_tree_level(sym_environment *env, bc_node *root, int level,
 
    int i;
    if(root){
-      if (root->node_status == !NODE_STATUS__CANDIDATE){
+      if (root->node_status != NODE_STATUS__CANDIDATE){
 	 stat->analyzed++;
       }
       

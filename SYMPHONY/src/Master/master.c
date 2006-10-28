@@ -67,8 +67,7 @@ sym_environment *sym_open_environment()
    Pvmtmask trace_mask;
 #endif
 
-
-   setvbuf(stdout, (char *)NULL, _IOLBF, 0);
+   setvbuf(stdout, (char *)NULL, _IOLBF, 2);
    
    env = (sym_environment *) calloc(1, sizeof(sym_environment));
 
@@ -82,16 +81,11 @@ sym_environment *sym_open_environment()
 			    this process as output from this process itself*/
 #endif
 #endif
-   
-   printf("\n");
-   printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 5.2-devel                *\n");
-   printf("*   Copyright 2000-2006 Ted Ralphs                    *\n");
-   printf("*   All Rights Reserved.                              *\n");
-   printf("*   Distributed under the Common Public License 1.0   *\n");
-   printf("*******************************************************\n");
-   printf("\n");
 
+#if 0
+   version();
+#endif
+   
    if (initialize_u(env) == FUNCTION_TERMINATED_NORMALLY){
       return(env);
    }else{
@@ -532,6 +526,10 @@ int sym_solve(sym_environment *env)
 
    start_time = wall_clock(NULL);
 
+   if (env->par.verbosity >= 0){
+      printf("Solving...\n\n");
+   }
+   
 #ifndef COMPILE_IN_TM
    /*------------------------------------------------------------------------*\
     * Start the tree manager and send the parameters
@@ -974,7 +972,7 @@ int sym_solve(sym_environment *env)
     * Display the the results and solution data                               
    \*------------------------------------------------------------------------*/
 
-   if (env->par.verbosity >=-1 ){
+   if (env->par.verbosity >= -1 ){
       printf("\n****************************************************\n");
       if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
 	 printf(  "* Optimal Solution Found                           *\n");

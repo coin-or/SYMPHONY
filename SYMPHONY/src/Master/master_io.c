@@ -25,8 +25,6 @@
 #include "sym_master.h"
 #include "sym_master_u.h"
 
-void usage(void);
-
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -79,6 +77,20 @@ void usage(void)
 }
 
 /*===========================================================================*/
+
+void version(void)
+{
+   printf("\n");
+   printf("*******************************************************\n");
+   printf("*   This is SYMPHONY Version 5.2-devel                *\n");
+   printf("*   Copyright 2000-2006 Ted Ralphs and others         *\n");
+   printf("*   All Rights Reserved.                              *\n");
+   printf("*   Distributed under the Common Public License 1.0   *\n");
+   printf("*******************************************************\n");
+   printf("\n");
+}
+
+/*===========================================================================*/
 /*===========================================================================*/
 
 int parse_command_line(sym_environment *env, int argc, char **argv)
@@ -99,16 +111,6 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
       usage();
       exit(0);
    }
-   
-   printf("SYMPHONY was called with the following arguments:\n");
-   printf("%s ", argv[0]);
-   for (i = 1; i < argc; i++){
-      sscanf(argv[i], "%c", &tmp);
-      if (tmp == '-')
-	 printf("\n");
-      printf("%s ", argv[i]);
-   }
-   printf("\n\n");
    
    for (i = 0; i < argc; i++){
       if (!strcmp(argv[i], "-f"))
@@ -376,6 +378,27 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
       if (tmp != '-')
 	 continue;
       switch (c) {
+       case '-':
+	 if (!strcmp(argv[i], "--version")){
+	    version();
+	    exit(0);
+	 }
+	 if (!strcmp(argv[i], "--help")){
+	    usage();
+	    exit(0);
+	 }
+	 if (!strcmp(argv[i], "--args")){
+	    printf("SYMPHONY was called with the following arguments:\n");
+	    printf("%s ", argv[0]);
+	    for (i = 1; i < argc; i++){
+	       sscanf(argv[i], "%c", &tmp);
+	       if (tmp == '-')
+		  printf("\n");
+	       printf("%s ", argv[i]);
+	    }
+	    printf("\n\n");
+	 }
+	 break;
        case 'h':
 	 usage();
 	 exit(0);
