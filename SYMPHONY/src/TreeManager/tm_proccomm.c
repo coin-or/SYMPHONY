@@ -126,14 +126,6 @@ char processes_alive(tm_prob *tm)
       }
    }
 #endif
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   for (i = tm->sp.procnum-1; i>=0; i--){
-      if (pstat(tm->sp.procs[i]) != PROCESS_OK){
-	 printf("\nSP process has died -- halting machine\n\n");
-	 return(FALSE);
-      }
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    return(TRUE);
 }
 
@@ -451,9 +443,6 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
    new_desc = lp[thread_num]->desc = (node_desc *) calloc(1,sizeof(node_desc));
 
    lp[thread_num]->cut_pool = node->cp;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   lp[thread_num]->sol_pool = node->sp;
-   /*___END_EXPERIMENTAL_SECTION___*/
    lp[thread_num]->bc_index = node->bc_index;
    lp[thread_num]->bc_level = node->bc_level;
    lp[thread_num]->lp_data->objval = node->lower_bound;
@@ -494,9 +483,6 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
 
    s_bufid = init_send(DataInPlace);
    send_int_array(&node->cp, 1);
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   send_int_array(&node->sp, 1);
-   /*___END_EXPERIMENTAL_SECTION___*/
    send_int_array(&node->bc_index, 1);
    send_int_array(&node->bc_level, 1);
    send_dbl_array(&node->lower_bound, 1);
@@ -675,10 +661,6 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 #else
 	    tm->nodes_per_cp[find_process_index(&tm->cp, n->cp)]++;
 #endif
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 if (n->sp)
-	    tm->nodes_per_sp[find_process_index(&tm->sp, n->sp)]++;
-	 /*___END_EXPERIMENTAL_SECTION___*/
 	 break;
        case NODE_BRANCHED_ON:
 	 n->node_status = NODE_STATUS__BRANCHED_ON;
@@ -1133,9 +1115,6 @@ int receive_lp_timing(tm_prob *tm)
 	       stop_processes(&tm->lp);
 	       stop_processes(&tm->cg);
 	       stop_processes(&tm->cp);
-	       /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	       stop_processes(&tm->sp);
-	       /*___END_EXPERIMENTAL_SECTION___*/
 #endif
 	       something_died = TRUE;
 	       break;

@@ -39,9 +39,6 @@ int user_receive_feasible_solution PROTO((void *user, int msgtag, double cost,
 int user_send_lp_data PROTO((void *user, void **user_lp));
 int user_send_cg_data PROTO((void *user, void **user_cg));
 int user_send_cp_data PROTO((void *user, void **user_cp));
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-int user_send_sp_data PROTO((void *user));
-/*___END_EXPERIMENTAL_SECTION___*/
 int user_display_solution PROTO((void *user, double lpetol, int varnum,
 				 int *indices, double *values, double objval));
 int user_process_own_messages PROTO((void *user, int msgtag));

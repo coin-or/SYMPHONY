@@ -28,15 +28,15 @@ BEGIN{
    getline;
 }
 
-($1=="/*" && $8=="Common"){
-  getline;
-  printf("/* This software is licensed under the Common Public License Version 1.0.    */\n");
-}
+#($1=="/*" && $8=="Common"){
+#  getline;
+#  printf("/* This software is licensed under the Common Public License Version 1.0.    */\n");
+#}
 
-($1=="/*" && $2=="accompanying"){
-  getline;
-  printf("/* Please see accompanying file for terms.                                   */\n");
-}
+#($1=="/*" && $2=="accompanying"){
+#  getline;
+#  printf("/* Please see accompanying file for terms.                                   */\n");
+#}
 
 ($1!="/*___END_EXPERIMENTAL_SECTION___*/" && $1!="/*__BEGIN_EXPERIMENTAL_SECTION__*/" && $1!="/*UNCOMMENT*/" && $1!="#___END_EXPERIMENTAL_SECTION___#" &&
 $1!="#___END_EXPERIMENTAL_SECTION___#"){

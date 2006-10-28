@@ -239,14 +239,6 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
       tm->cpp = (cut_pool **) calloc(1, sizeof(cut_pool *));
 #endif
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (par->max_sp_num){
-      tm->sp = start_processes(tm, par->max_sp_num, par->sp_exe,
-			       par->sp_debug, par->sp_mach_num, par->sp_machs);
-      tm->nodes_per_sp = (int *) calloc(tm->par.max_sp_num, ISIZE);
-      tm->active_nodes_per_sp = (int *) calloc(tm->par.max_sp_num, ISIZE);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    /*------------------------------------------------------------------------*\
     * Receive the root node and send out initial data to the LP processes
@@ -757,14 +749,6 @@ int start_node(tm_prob *tm, int thread_num)
 		if (tm->nodes_per_cp[ind] + tm->active_nodes_per_cp[ind] == 0)
 		   tm->cp.free_ind[tm->cp.free_num++] = ind;
 	     }
-	     /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	     if (tm->par.do_decomp && tm->par.max_sp_num > 0 && best_node->sp){
-		ind = find_process_index(&tm->sp, best_node->sp);
-		tm->nodes_per_sp[ind]--;
-		if (tm->nodes_per_sp[ind] + tm->active_nodes_per_sp[ind] == 0)
-		   tm->sp.free_ind[tm->sp.free_num++] = ind;
-	     }
-	     /*___END_EXPERIMENTAL_SECTION___*/
 	     best_node->node_status = NODE_STATUS__PRUNED;
 	     best_node->feasibility_status = OVER_UB_PRUNED;
 	 
@@ -815,13 +799,6 @@ int start_node(tm_prob *tm, int thread_num)
 			       tm->active_nodes_per_cp, tm->nodes_per_cp);
    if (best_node->cp < 0) return(NEW_NODE__ERROR);
 
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (tm->par.do_decomp){
-      best_node->sp = assign_pool(tm, best_node->sp, &tm->sp,
-				  tm->active_nodes_per_sp, tm->nodes_per_sp);
-      if (best_node->sp < 0) return(NEW_NODE__ERROR);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    /* It's time to put together the node and send it out */
    tm->active_node_num++;
@@ -1145,9 +1122,6 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 child->node_status = NODE_STATUS__CANDIDATE;
 	 /* child->lp = child->cg = 0;   zeroed out by calloc */
 	 child->cp = node->cp;
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 child->sp = node->sp;
-	 /*___END_EXPERIMENTAL_SECTION___*/
       }
       child->lower_bound = objval[i];
       child->parent = node;
@@ -1320,10 +1294,6 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #else
       tm->nodes_per_cp[find_process_index(&tm->cp, node->cp)] += np_cp;
 #endif
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (node->sp)
-      tm->nodes_per_sp[find_process_index(&tm->sp, node->sp)] += np_sp;
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    return(dive);
 }
@@ -1564,14 +1534,6 @@ void mark_lp_process_free(tm_prob *tm, int lp, int cp)
       if (tm->nodes_per_cp[ind] + tm->active_nodes_per_cp[ind] == 0)
 	 tm->cp.free_ind[tm->cp.free_num++] = ind;
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (tm->sp.procnum > 0){
-      ind = find_process_index(&tm->sp, tm->active_nodes[lp]->sp);
-      tm->active_nodes_per_sp[ind]--;
-      if (tm->nodes_per_sp[ind] + tm->active_nodes_per_sp[ind] == 0)
-	 tm->sp.free_ind[tm->sp.free_num++] = ind;
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    tm->active_nodes[lp] = NULL;
    tm->lp.free_ind[tm->lp.free_num++] = lp;
    tm->active_node_num--;
@@ -2060,14 +2022,7 @@ int tasks_before_phase_two(tm_prob *tm)
 #ifdef DO_TESTS
       if ((!tm->rootnode->lp) ||
 	  (!tm->rootnode->cg && tm->par.use_cg) ||
-	  /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	  (!tm->rootnode->cp && tm->cp.procnum > 0) ||
-	  (!tm->rootnode->sp && tm->sp.procnum > 0)){
-	 /*___END_EXPERIMENTAL_SECTION___*/
-	 /*UNCOMMENT FOR PRPODUCTION CODE*/
-#if 0
 	 (!tm->rootnode->cp && tm->cp.procnum > 0)){
-#endif
 	 printf("When trying to send root for repricing, the root doesn't\n");
 	 printf("   have some process id correctly set!\n\n");
 	 exit(-100);
@@ -2339,10 +2294,6 @@ int trim_subtree(tm_prob *tm, bc_node *n)
 #else
 	 tm->nodes_per_cp[find_process_index(&tm->cp, n->cp)]++;
 #endif
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      if (tm->par.do_decomp && tm->par.max_sp_num > 0 && n->sp)
-	 tm->nodes_per_sp[find_process_index(&tm->sp, n->sp)]++;
-      /*___END_EXPERIMENTAL_SECTION___*/
       /* also put the node on the nextphase list */
       REALLOC(tm->nextphase_cand, bc_node *,
 	      tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
@@ -2387,14 +2338,6 @@ int mark_subtree(tm_prob *tm, bc_node *n)
 	    if (tm->nodes_per_cp[i] + tm->active_nodes_per_cp[i] == 0)
 	       tm->cp.free_ind[tm->cp.free_num++] = i;
 	 }
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 if (tm->par.do_decomp && tm->par.max_sp_num > 0 && n->sp){
-	    i = find_process_index(&tm->sp, n->sp);
-	    tm->nodes_per_sp[i]--;
-	    if (tm->nodes_per_sp[i] + tm->active_nodes_per_sp[i] == 0)
-	       tm->sp.free_ind[tm->sp.free_num++] = i;
-	 }
-	 /*___END_EXPERIMENTAL_SECTION___*/
 	 n->bc_index = -1;
       }else{
 	 /* if it was pruned already the free it now */
@@ -2663,10 +2606,6 @@ int read_node(tm_prob *tm, bc_node *node, FILE *f, int **children)
 #else
 	 tm->nodes_per_cp[find_process_index(&tm->cp, node->cp)]++;
 #endif
-       /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      if (node->sp)
-	 tm->nodes_per_sp[find_process_index(&tm->sp, node->sp)]++;
-      /*___END_EXPERIMENTAL_SECTION___*/
       break;
     case NODE_STATUS__ROOT:
       tm->rootnode = node;
@@ -2972,12 +2911,6 @@ void free_tm(tm_prob *tm)
       FREE(tm->par.cp_machs[0]);
       FREE(tm->par.cp_machs);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (tm->par.sp_machs){
-      FREE(tm->par.sp_machs[0]);
-      FREE(tm->par.sp_machs);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    FREE(tm->lp.procs);
    FREE(tm->lp.free_ind);
    FREE(tm->cg.procs);
@@ -2986,12 +2919,6 @@ void free_tm(tm_prob *tm)
    FREE(tm->cp.free_ind);
    FREE(tm->nodes_per_cp);
    FREE(tm->active_nodes_per_cp);
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   FREE(tm->sp.procs);
-   FREE(tm->sp.free_ind);
-   FREE(tm->nodes_per_sp);
-   FREE(tm->active_nodes_per_sp);
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    FREE(tm->active_nodes);
    FREE(tm->samephase_cand);
@@ -3112,11 +3039,6 @@ int tm_close(tm_prob *tm, int termcode)
 #if defined(DO_TESTS) && 0
    if (tm->cp.free_num != tm->cp.procnum)
       printf(" Something is fishy! tm->cp.freenum != tm->cp.procnum\n");
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (tm->par.do_decomp)
-      if (tm->sp.free_num != tm->sp.procnum)
-	 printf(" Something is fishy! tm->sp.freenum != tm->sp.procnum\n");
-   /*___END_EXPERIMENTAL_SECTION___*/
 #endif
 
    if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
@@ -3135,9 +3057,6 @@ int tm_close(tm_prob *tm, int termcode)
 #ifndef COMPILE_IN_CP
    stop_processes(&tm->cp);
 #endif
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   stop_processes(&tm->sp);
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    /*------------------------------------------------------------------------*\
     * Receive statistics from the cutpools

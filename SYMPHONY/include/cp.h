@@ -71,9 +71,6 @@ void cp_initialize PROTO((cut_pool *cp, int master_tid));
 
 int unsigned_memcmp PROTO((char *coef0, char *coef1, int size));
 int cutcmp PROTO((const void *cut0ptr, const void *cut1ptr));
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-int delete_cuts PROTO((cut_pool *cp, int min_to_delete));
-/*___END_EXPERIMENTAL_SECTION___*/
 int delete_ineffective_cuts PROTO((cut_pool *cp));
 int delete_duplicate_cuts PROTO((cut_pool *cp));
 int which_cut_to_delete PROTO((cut_data *cut1, cut_data *cut2));

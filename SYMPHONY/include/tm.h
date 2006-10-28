@@ -67,9 +67,6 @@ typedef struct TM_PROB{
    process_set     lp;
    process_set     cg;
    process_set     cp;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   process_set     sp;
-   /*___END_EXPERIMENTAL_SECTION___*/
 
 #ifdef COMPILE_IN_LP
    struct LP_PROB **lpp;
@@ -85,11 +82,6 @@ typedef struct TM_PROB{
    int            *nodes_per_cp;        /* for each cut_pool it contains how
 					   many nodes are assigned to it */
    int            *active_nodes_per_cp; /* same for active_nodes */
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int            *nodes_per_sp;        /* for each cut_pool it contains how
-					   many nodes are assigned to it */
-   int            *active_nodes_per_sp; /* same for active_nodes */
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    bc_node        *rootnode;
 

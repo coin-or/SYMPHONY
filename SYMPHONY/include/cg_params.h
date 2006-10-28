@@ -19,17 +19,6 @@
 typedef struct CG_PARAMS{
    int     verbosity;
    int     do_findcuts;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int     do_decomp;
-   int     decomp_sol_pool_check_freq;
-   int     decomp_wait_for_cols;
-   int     decomp_max_col_num_per_iter;
-   int     decomp_col_block_size;
-   int     decomp_mat_block_size;
-   double  decomp_initial_timeout;
-   double  decomp_dynamic_timeout;
-   int     decomp_complete_enum;
-   /*___END_EXPERIMENTAL_SECTION___*/
 }cg_params;
 
 #endif

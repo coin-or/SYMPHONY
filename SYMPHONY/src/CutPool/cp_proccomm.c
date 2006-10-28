@@ -264,11 +264,6 @@ void cut_pool_receive_cuts(cut_pool *cp, int bc_level)
       }else{ 
 	 /* If the maximum number of cuts allowed in the pool is exceeded,
 	    then the pool is purged to make room */
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-	 del_cuts = delete_cuts(cp, MAX(cp->par.min_to_delete, cnt));
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 	 if (!deleted_duplicates){
 	    del_cuts += delete_duplicate_cuts(cp);
 	    deleted_duplicates = TRUE;

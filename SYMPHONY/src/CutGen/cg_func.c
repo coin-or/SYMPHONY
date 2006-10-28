@@ -24,12 +24,6 @@
 #include "BB_macros.h"
 #include "cg.h"
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-#   include "decomp.h"
-#endif
-
-/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -95,13 +89,6 @@ void cg_initialize(cg_prob *p, int master_tid)
    receive_cg_data_u(p);
    
 #endif
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   if (p->par.do_decomp)
-      /* This doesn't work anymore because varnum is not defined */
-      open_decomp_lp(p, varnum);
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
    
    (void) used_time(&p->tt);
 }

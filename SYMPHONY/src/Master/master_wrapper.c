@@ -616,27 +616,6 @@ int send_cp_data_u(sym_environment *env, int sender)
    return(FUNCTION_TERMINATED_NORMALLY);
 }
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-/*===========================================================================*/
-
-int send_sp_data_u(sym_environment *env, int sender)
-{
-#ifdef COMPILE_DECOMP
-   int s_bufid;
-
-   s_bufid = init_send(DataInPlace);
-   send_char_array((char *)(&env->par.sp_par), sizeof(sp_params))
-#ifdef USE_SYM_APPLICATION
-   CALL_USER_FUNCTION( user_send_sp_data(env->user) );
-#endif
-   send_msg(sender, SP_DATA);
-   freebuf(s_bufid);
-#endif
-
-   return(FUNCTION_TERMINATED_NORMALLY);
-}
-
-/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 
 int display_solution_u(sym_environment *env, int thread_num)
