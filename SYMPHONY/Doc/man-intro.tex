@@ -62,7 +62,7 @@ be used through a command shell. In both the sequential and parallel
 configurations, the user can set parameters, load and solve instances
 interactively, and display results and statistics. For Windows users, this
 means that SYMPHONY can be invoked using the familiar procedure of
-``double-clicking'' on the \texttt{symphony.exe} file in Windows Explorer.
+``double-clicking'' on the \code{symphony.exe} file in Windows Explorer.
 
 \item SYMPHONY now supports automatic configuration using the new COIN-OR build
 system and the GNU autotools.Using autotools utilities, it is now possible to
@@ -119,14 +119,21 @@ functionality than SYMPHONY for implementing branch and price algorithms.
 \end{itemize}
 
 There were a few minor changes to the API from the previous version of
-SYMPHONY to version \VER. First and foremost, the name of the main header file
-for SYMPHONY has been changed from \texttt{symphony\_api.h} to
-\texttt{symphony.h} (though the former has been retained for backword
-compatibility purposes). Second, the user can now execute a primal heuristic
-in the \ptt{user\_is\_feasible()} callback and return the solution to
-SYMPHONY, which required the arguments of this function to be changed
-slightly. Several new subroutines were also added to the callable library API.
-See the \texttt{README} file included with the distribution for more details.
+SYMPHONY to version \VER. 
+
+\begin{itemize}
+
+\item First and foremost, the name of the main header file for SYMPHONY has
+been changed from \code{symphony\_api.h} to \code{symphony.h} (though the
+former has been retained for backword compatibility purposes).
+
+\item The user can now execute a primal heuristic in the
+\ptt{user\_is\_feasible()} callback and return the solution to SYMPHONY, which
+required the arguments of this function to be changed slightly.
+
+\item Several new subroutines were added to the callable library API.
+
+\end{itemize}
 
 \section{A Brief History}
 \label{history}
@@ -214,7 +221,7 @@ MILP solvers.
 The manual is divided into six chapters. The first is the introduction, which
 you are reading now. Chapter \ref{getting_started} describes how to install
 SYMPHONY from either a source or binary distribution. If you have already
-managed to get SYMPHONY running using the instructions in the \texttt{README}
+managed to get SYMPHONY running using the instructions in the \code{README}
 file, you might want to skip to the next chapter. However, keep in mind that
 the manual contains additional details for customizing your build.
 \ref{API-overview} contains an overview of how to use in all three major
@@ -237,3 +244,20 @@ environments. Section \ref{API} contains a description of the user callback
 functions. SYMPHONY's parameters are described in Section \ref{params}. For
 reference use, the HTML version of this manual may be more practical, as the
 embedded hyperlinks make it easier to navigate.
+
+\section{Getting Additional Help}
+\label{resources}
+
+The main point of entry for additiona help, trouble shooting, and
+problem-solving is the SYMPHONY Wiki and development Web site at
+\begin{center}
+\url{https://projects.coin-or.org/SYMPHONY}
+\end{center}
+There, bug reports can be submitted by clicking on the ``New Ticket'' button
+and also previous bug reports searched. For general questions, there is a \BB\
+also user's mailing list. To subscribe, visit
+\begin{center}
+\url{http://list.coin-or.org/mailman/listinfo/coin-symphony}
+\end{center}
+
+

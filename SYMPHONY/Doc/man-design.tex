@@ -1067,6 +1067,15 @@ finished if desired. Parameters controlling if and when the LP should
 begin solving the relaxation before the cut generator is finished can
 be set by the user.
 
+SYMPHONY now generates generic cutting planes using the Cut Generator Library,
+also available from 
+\htmladdnormallink{COIN}{https://projects.coin-or.org/Cgl}
+\begin{latexonly} 
+COIN (\url{https://projects.coin-or.org/Cgl})
+\end{latexonly}.
+The CGL can be used to generate cuts in cases where problem-specific cutting
+planes are not available or not implemented yet. 
+
 \subsection{The Cut Management Module}
 
 \subsubsection{Maintaining and Scanning the Pool}

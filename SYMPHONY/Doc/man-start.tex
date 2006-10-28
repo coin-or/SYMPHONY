@@ -12,35 +12,6 @@
 %                                                                           %
 %===========================================================================%
 
-%FIXME: Where do we put this?
-%\section{The LP Engine}
-
-%SYMPHONY requires the use of a third-party callable library to solve the LP 
-%relaxations once they are formulated. Native interfaces to ILOG's
-%\htmladdnormallink{CPLEX}{http://www.cplex.com}$^{\copyright}$
-%and IBM's
-%\htmladdnormallink{OSL}{http://www-4.ibm.com/software/data/bi/osl/index.html}
-%are available. As of Version 4.0, the Open Solver Interface, available from
-%\htmladdnormallink{COIN}{http://www.coin-or.org}
-%\begin{latexonly} 
-%(\texttt{http://www.coin-or.org})
-%\end{latexonly}.
-%can be used to interface with most commonly available LP solvers. The list of
-%solvers with OSI interfaces currently numbers eight and includes both
-%commercial and open source alternatives. If the COIN libraries are used, make
-%sure to set the proper paths in the SYMPHONY makefile.
-
-%\section{Cut Generation}
-
-%SYMPHONY now generates generic cutting planes using the Cut Generator Library,
-%also available from 
-%\htmladdnormallink{COIN}{http://www.coin-or.org}
-%\begin{latexonly} 
-%COIN (\texttt{http://www.coin-or.org})
-%\end{latexonly}.
-%The CGL can be used to generate cuts in cases where problem-specific cutting
-%planes are not available or not implemented yet. 
-
 This chapter is concerned with detailed instructions for building and
 installing SYMPHONY, along with its associated libraries and applications.
 
@@ -103,7 +74,7 @@ typing
 }
 \item To test the callable library, the distribution
 includes sample files in \code{test} directory:  \\ \\
-\underbar{milp.c}: This sample code is an implementation of a basic MILP
+\code{milp.c}: This sample code is an implementation of a basic MILP
 solver using SYMPHONY's C callable functions with user defined input (see
 Section
 \ref{callable_library}). To test the code, go to \code{test} directory and
@@ -112,7 +83,7 @@ type, {\color{Brown}
  make milp 
  milp
  \end{verbatim}}
-\underbar{milpOsi.c}: This sample code is an implementation of a basic MILP 
+\code{milpOsi.c}: This sample code is an implementation of a basic MILP 
 solver using SYMPHONY's C++ callable functions (through OsiSym interface)
 with user defined input (see Section \ref{OSI}). To test the code, 
 go to \code{test} directory and type, 
@@ -182,7 +153,7 @@ or
 \end{itemize}
 \end{itemize}
 
-% Applications??????
+% Applications????
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -204,11 +175,10 @@ provided below.
 \subsection{Downloading}
 
 You can obtain the SYMPHONY source code either via the subversion repository
-or in the form of daily tarballs. The recommended method is to use subversion
-because it makes it easier to obtain updates. In a Unix-like environment (such
-as Linux or CYGWIN), the following command may be used to obtain SYMPHONY from
-source using SVN in most cases:
-{\color{Brown}
+or in the form of fixed releases. The recommended method in Unix is to use
+subversion because it makes it easier to obtain updates. In a Unix-like
+environment (such as Linux or CYGWIN), the following command may be used to
+obtain SYMPHONY from source using SVN in most cases: {\color{Brown}
 \begin{verbatim}
  svn checkout https://projects.coin-or.org/svn/SYMPHONY/trunk/ COIN-SYMPHONY
 \end{verbatim}
@@ -217,7 +187,7 @@ Alternatively, you can get point releases of the source code as a compressed
 file from the download page of COIN-OR:
 {\color{Brown}
 \begin{verbatim}
- http://www.coin-or.org/Tarballs/
+ http://www.coin-or.org/Tarballs/SYMPHONY
 \end{verbatim}
 }
 The latest version of the source code is \VER, so you should download the file
@@ -539,108 +509,26 @@ After building the library, go to one of the application subdirectories in the
 more information, including the parallel configuration instructions, see the
 INSTALL file of the corresponding application.
 
-\section{Building From Source Using Microsoft Visual C++}
+\section{Building From Source Using the Microsoft Visual C++ Compiler}
 \label{getting_started_windows}
 
-Here is a sketch outline of how to compile SYMPHONY in MS Windows.
-These instructions will lead you through the steps required to compile
-SYMPHONY as a generic MILP solver. Direct support
-is provided for compilation with MS Visual Studio 6.0. Compilation for other
-compilers should also be possible. Note that the Windows version has some
-limitations. Detailed timing information is not currently provided. Support is
-only provided for running in sequential mode at this time.
+Here is a sketch outline of how to compile SYMPHONY in MS Windows with the
+MSVC++ compiler. These instructions will lead you through the steps required
+to compile SYMPHONY as a generic MILP solver. Note that the Windows version
+has some limitations. Detailed timing information is not currently provided.
+Support is only provided for running in sequential mode at this time.
 
-First, download \code{SYMPHONY-\VER.tgz} and unpack the archive. This will
-create a subdirectory called \code{SYMPHONY-\VER} containing all the source
-files.You now 
-have three options. You can either compile on the command-line using automated 
-MSDEV build system or NMAKE utility or you can use the provided projects and 
-workspaces. Compiling on the command-line is somewhat easier since it requires 
-only typing a single command or editing the makefile. 
+First, obtain the source code by downloading from
+\url{https://www.coin-or.org/Tarballs/SYMPHONY/}. Unpack the archive to create
+the directory \code{SYMPHONY-\VER\bs}. You now have three options.
+You can either build using the MSVC++ IDE, build on the
+command-line with MSVC++ executable, or use the NMAKE utility. 
 
-\subsection{Building with the MSDEV Utility}
-\label{using_msdev}
-\begin{itemize}
-\item Open a command terminal (choose ``Run'' on the Start menu and type
-``\code{cmd}'' in the dialogue box). Go to the \code{Win32\bs v6}
-directory and type 
-{\color{Brown}
-\begin{verbatim}
- msdev symphony.dsw /make all
-\end{verbatim}
-}
-This will create both the debug and release versions of SYMPHONY. If you 
-want to compile only one of them, type
-{\color{Brown}
-\begin{verbatim}
- msdev symphony.dsw /make "all - debug"
-\end{verbatim}
-}
-or 
-{\color{Brown}
-\begin{verbatim}
- msdev symphony.dsw /make "all - release"
-\end{verbatim}
-}
-For each command, the library \code{libSymphony.lib} and the executable 
-\code{symphony} will be created in \code{Debug} and/or \code{Release}
-directories.  The library, together with the header files in 
-\code{SYMPHONY\bs include\bs}, can then be 
-used to call SYMPHONY from any C/C++ code. The API for calling SYMPHONY is 
-described in Section \ref{callable_library}.
-
-\item Test the executable by opening Windows Explorer and double-clicking
-on {\color{Brown}\texttt{symphony.exe}} in the
-{\color{Brown}\texttt{Debug\bs}} subdirectory. This should open a Window in
-which the intereactive solver will appear. Type \code{help} or \code{?} to see
-a list of available commands or see Chapter
-\ref{API-overview} for instructions on using the interactive solver.
-
-\item If you modify the source code of SYMPHONY, type 
-{\color{Brown}
-\begin{verbatim}
- msdev symphony.dsw /make all /rebuild
-\end{verbatim}
-}
-in order to clean and rebuild everything.
-\end{itemize} 
-
-\subsection{Building with the NMAKE Utility}
-\label{using_nmake}
-
-\begin{itemize}
-\item Go to \code{Win32/v6} directory and edit the \code{sym.mak} 
-makefile to reflect 
-your environment. This involves specifying the LP solver to be used, 
-assigning some variables and  setting various paths. Only minor edits 
-should be required. An explanation of what has to be set is contained in the 
-comments in the makefile.  Note that, you have to first create the COIN 
-libraries \ptt{Cgl}, \ptt{Clp}, \ptt{Osi}, \ptt{OsiClp} and \ptt{CoinUtils} 
-which reside in \code{Win32/v6} directory.
-
-\item Once configuration is done, open a command line terminal and type 
-{\color{Brown}
-\begin{verbatim}
- nmake /f sym.mak
-\end{verbatim}
-}
-This will make the SYMPHONY library \code{libSymphony.lib} and the executable 
-\code{symphony} in \code{Debug} directory. The library, together with the 
-header files in \code{SYMPHONY\bs include\bs}, can then be used to call 
-SYMPHONY from any C/C++ code. The API for calling SYMPHONY is described in 
-Section \ref{callable_library}.
-
-\item Test the executable by opening Windows Explorer and double-clicking
-on {\color{Brown}\texttt{symphony.exe}} in the
-{\color{Brown}\texttt{Debug\bs}} subdirectory. This should open a Window in
-which the intereactive solver will appear. Type \code{help} or \code{?} to see
-a list of available commands or see Chapter \ref{API-overview} for
-instructions on using the interactive solver.
-
-\end{itemize}
-
-\subsection{Building with the MSVC++ Workspace}
+\subsection{Building with the MSVC++ IDE}
 \label{using_msvc}
+
+These instructions are for MSVC++ Version 6. Instructions for other versions
+should be similar.
 
 \begin{itemize}
 
@@ -689,6 +577,94 @@ run in sequential mode for a variety of reasons. However, it should be
 relatively easy to get it running in parallel if you can get PVM working under
 Windows. Let me know if you are interested.
 
+\subsection{Building in a Windows Terminal}
+\label{using_msdev}
+
+These instructions are for MSVC++ Version 6. Instructions for other versions
+should be similar.
+
+\begin{itemize}
+\item Open a command terminal (choose ``Run'' on the Start menu and type
+``\code{cmd}'' in the dialogue box). Go to the \code{Win32\bs v6}
+directory and type 
+{\color{Brown}
+\begin{verbatim}
+ msdev symphony.dsw /make all
+\end{verbatim}
+}
+This will create both the debug and release versions of SYMPHONY. If you 
+want to compile only one of them, type
+{\color{Brown}
+\begin{verbatim}
+ msdev symphony.dsw /make "all - debug"
+\end{verbatim}
+}
+or 
+{\color{Brown}
+\begin{verbatim}
+ msdev symphony.dsw /make "all - release"
+\end{verbatim}
+}
+For each command, the library \code{libSymphony.lib} and the executable 
+\code{symphony} will be created in \code{Debug} and/or \code{Release}
+directories.  The library, together with the header files in 
+\code{SYMPHONY\bs include\bs}, can then be 
+used to call SYMPHONY from any C/C++ code. The API for calling SYMPHONY is 
+described in Section \ref{callable_library}.
+
+\item Test the executable by opening Windows Explorer and double-clicking
+on {\color{Brown}\texttt{symphony.exe}} in the
+{\color{Brown}\texttt{Debug\bs}} subdirectory. This should open a Window in
+which the intereactive solver will appear. Type \code{help} or \code{?} to see
+a list of available commands or see Chapter
+\ref{API-overview} for instructions on using the interactive solver.
+
+\item If you modify the source code of SYMPHONY, type 
+{\color{Brown}
+\begin{verbatim}
+ msdev symphony.dsw /make all /rebuild
+\end{verbatim}
+}
+in order to clean and rebuild everything.
+\end{itemize} 
+
+\subsection{Building with the NMAKE Utility}
+\label{using_nmake}
+
+These instructions are for MSVC++ Version 6. Instructions for other versions
+should be similar.
+
+\begin{itemize}
+\item Go to \code{Win32/v6} directory and edit the \code{sym.mak} 
+makefile to reflect 
+your environment. This involves specifying the LP solver to be used, 
+assigning some variables and  setting various paths. Only minor edits 
+should be required. An explanation of what has to be set is contained in the 
+comments in the makefile.  Note that, you have to first create the COIN 
+libraries \ptt{Cgl}, \ptt{Clp}, \ptt{Osi}, \ptt{OsiClp} and \ptt{CoinUtils} 
+which reside in \code{Win32/v6} directory.
+
+\item Once configuration is done, open a command line terminal and type 
+{\color{Brown}
+\begin{verbatim}
+ nmake /f sym.mak
+\end{verbatim}
+}
+This will make the SYMPHONY library \code{libSymphony.lib} and the executable 
+\code{symphony} in \code{Debug} directory. The library, together with the 
+header files in \code{SYMPHONY\bs include\bs}, can then be used to call 
+SYMPHONY from any C/C++ code. The API for calling SYMPHONY is described in 
+Section \ref{callable_library}.
+
+\item Test the executable by opening Windows Explorer and double-clicking
+on {\color{Brown}\texttt{symphony.exe}} in the
+{\color{Brown}\texttt{Debug\bs}} subdirectory. This should open a Window in
+which the intereactive solver will appear. Type \code{help} or \code{?} to see
+a list of available commands or see Chapter \ref{API-overview} for
+instructions on using the interactive solver.
+
+\end{itemize}
+
 \subsection{Building SYMPHONY Applications}
 \label{build_app_msvc}
 
@@ -704,14 +680,42 @@ directory. For instructions on developing your own application with SYMPHONY,
 see Chapter \ref{SYMPHONY-development}.
 
 In order to compile SYMPHONY's applications in the Microsoft Visual C++
-environment, download \code{SYMPHONY-\VER} and unpack the archive as
-described eariler. You then have three options. You can either compile on the
-command-line using the automated MSDEV build system or NMAKE utility or you
-can use the provided projects and workspaces. All of the following commands
-should be executed in the \code{SYMPHONY\bs Applications\bs XXX\bs Win32\bs
-v6} directory, where \code{XXX} is the name of the application to be built.
+environment, obtain the source code as described eariler. As before, you then
+have three options. You can either build using the MSVC++ IDE, build on the
+command-line with MSVC++ executable, or use the NMAKE utility. The below
+instructions are for MSVC++ Version 6, but building in other versions should
+be similar. All of the following commands should be executed in the
+\code{SYMPHONY-\VER\bs Applications\bs XXX\bs Win32\bs v6} directory, where
+\code{XXX} is the name of the application to be built.
 
-\subsubsection{Using the MSDEV Utility}
+\subsubsection{Building With the MSVC++ IDE}
+
+\begin{itemize}
+
+\item Open the workspace \code{xxx.dsw}.
+
+\item The configuration steps are exactly the same as that described in
+  Section \ref{using_msvc}. The only difference is that you are using the
+  \texttt{xxx} project instead of the \texttt{symphony} project. Go through
+  the same steps to configure.
+
+\item Once you have the proper settings, choose \code{Build
+xxx.exe} from the \code{Build} menu. This should successfully 
+build the executable.
+
+\item
+To test the executable, right click on the \code{xxx} project, go to the
+\code{Debug\bs} tab and set the program arguments to 
+\code{-F ..\bs ..\bs sample.xxx}. Note that command-line switches are 
+Unix-style.
+
+\item
+Now choose \code{Execute} from the build menu and you have a working branch
+and bound solver. 
+
+\end{itemize}
+
+\subsubsection{Building in a Windows Terminal}
 \begin{itemize}
 \item Open a command terminal (choose ``Run'' on the Start menu and type
 ``\code{cmd}'' in the dialogue box) and type
@@ -777,30 +781,17 @@ The executable \code{xxx.exe} will be created in the \code{Debug/} directory.
 }
 \end{itemize}
 
-\subsubsection{Using the MSVC++ Workspace}
+\section{The LP Engine}
 
-\begin{itemize}
-
-\item Open the workspace \code{xxx.dsw}.
-
-\item The configuration steps are exactly the same as that described in
-  Section \ref{using_msvc}. The only difference is that you are using the
-  \texttt{xxx} project instead of the \texttt{symphony} project. Go through
-  the same steps to configure.
-
-\item Once you have the proper settings, choose \code{Build
-xxx.exe} from the \code{Build} menu. This should successfully 
-build the executable.
-
-\item
-To test the executable, right click on the \code{xxx} project, go to the
-\code{Debug\bs} tab and set the program arguments to 
-\code{-F ..\bs ..\bs sample.xxx}. Note that command-line switches are 
-Unix-style.
-
-\item
-Now choose \code{Execute} from the build menu and you have a working branch
-and bound solver. 
-
-\end{itemize}
+SYMPHONY requires the use of a third-party callable library to solve the LP
+relaxations once they are formulated. The LP solver is called through Open
+Solver Interface, also available from
+\htmladdnormallink{COIN}{https://projects.coin-or.org/Osi}
+\begin{latexonly} 
+(\texttt{https://projects.coin-or.org/Osi})
+\end{latexonly}.
+The list of solvers with OSI interfaces currently numbers eight and includes
+both commercial and open source alternatives. By default, SYMPHONY now uses
+the Coin LP solver (Clp). However, if another LP solver is desired, this is
+possible by changing the configuration settings.
 
