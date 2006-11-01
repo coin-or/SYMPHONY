@@ -18,6 +18,9 @@
 #ifdef WIN32
 #include "sym_win32_time.h"
 #else
+#ifdef __DARWIN
+#include <sys/resources.h>
+#else
 #include <sys/time.h>
 #endif
 
