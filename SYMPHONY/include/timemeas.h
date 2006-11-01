@@ -18,7 +18,11 @@
 #ifdef WIN32
 #include "win32_time.h"
 #else
+#ifdef __DARWIN
+#include <sys/resources.h>
+#else
 #include <sys/time.h>
+#endif
 #endif
 
 #include "proto.h"
