@@ -16,13 +16,13 @@
 #define __TIMEMEAS_H
 
 #ifdef WIN32
-#include "win32_time.h"
-#else
-#ifdef __DARWIN
-#include <sys/resources.h>
+#include "sym_win32_time.h"
 #else
 #include <sys/time.h>
 #endif
+
+#ifdef __DARWIN
+#include <sys/resource.h>
 #endif
 
 #include "proto.h"
