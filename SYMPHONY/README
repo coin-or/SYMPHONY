@@ -50,19 +50,23 @@ solution procedure or all of the nodes above a given level of the tree.
 some significant improvements of its own that have resulted in improved 
 services to users. These include: 
 
---SYMPHONY has a new development Web site, where users can submit trouble
+-- SYMPHONY has a new development Web site, where users can submit trouble
   tickets, browse the source code interactively, and get up-to-date
   information on development. The address of the new site is
-  \url{https://projects.coin-or.org/SYMPHONY}.
+  https://projects.coin-or.org/SYMPHONY.
 
---SYMPHONY is now hosted on subversion, a version control system with
-  features vastly improved over CVS, the previous hosting system. This has
+-- SYMPHONY is now hosted using subversion, a version control system with
+  features vastly improved over CVS, the previous hosting software. This has
   required some reorganization and renaming of the header files.
 
---SYMPHONY is now more tightly integrated with other COIN-OR projects. Due
+-- SYMPHONY is now more tightly integrated with other COIN-OR projects. Due
   to improved procedures for producing stable releases, it will now be much
   easier for us to determine the exact version of SYMPHONY and all other COIN
   projects you are using when you report a bug.
+
+-- SYMPHONY is now distributed with all COIN software needed to build a
+  complete solver. Previously, other COIN softrware packages had to be
+  downloaded and installed separately.
 
 Two features have been deprecated and are no longer supported:
 
