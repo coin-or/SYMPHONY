@@ -12,227 +12,76 @@
 %                                                                           %
 %===========================================================================%
 
-\section{Orienting Yourself}
+\section{Navigating the Source Code}
 
-To develop an applicationwith SYMPHONY, you need to first understand how the
+To develop an application with SYMPHONY, you need to first understand how the
 source files are organized. Note that in this chapter, all path names are
 given Unix-style. When you unpack the \BB\ source distribution, you will
 notice at the root level a number of files associated with the automatic
-configuration system, as well as a number of sudirectories, each of which
+configuration system, as well as a number of subdirectories, each of which
 corresponds to a library used by SYMPHONY for some specific functionality. The
-files assocaited with SYMPHONY itself are located in the \code{SYMPHONY}
+files associated with SYMPHONY itself are located in the \code{SYMPHONY}
 subdirectory. Within the SYMPHONY subdirectory are a number of other
 subdirectories, including one called \code{src} containing the source files
-for SYMPHONY itself. Within the \code{src} subdirectory, the files are
-organized along the lines of the modules. There is a separate subdirectory for
-each module---master (\code{Master/}), tree management (\code{TreeManager/}),
-cut generation (\code{CutGen/}), cut management (\code{CutPool/}), and node
-processing (\code{LP/}). In addition, there are directories called
-\code{DrawGraph/} and \code{Common/} that also contain source files. The
-\code{DrawGraph/} directory provides an interface from \BB\ to the
-\emph{Interactive Graph Drawing} software package developed by Marta Es\"o.
-This is an excellent utility for graphical display and debugging. The
-\code{Common/} directory contains source code for functions used by multiple
-modules.
-
-Within each module's directory, there is a primary source file containing the
-function \code{main()} (named \code{*.c} where \code{*} is the module name), a
-source file containing functions related to inter-process communication (named
-\code{*\_proccomm.c}) and a file containing general subroutines used by the
-module (named \code{*\_func.c}). The master is the exception and is organized
-slightly differently. The LP process source code is further subdivided due to
-the sheer number of functions.
-
-In the main \code{SYMPHONY/} subdirectory (at the same level as the
-\code{src/} subdirectory), there is also a subdirectory called \code{include/}
-that contains the header files. Corresponding to each module, there are three
-header files, one containing internal data structures and function prototypes
-associated with the module (named \code{sym\_*.h} where * is the module name),
-one containing the data structures for storing the parameters (these are also
-used by the master process), and the third containing the function prototypes
-for the user callbacks (name \code{sym\_*\_u.h}). By looking at the header
-files, you should get a general idea of how things are laid out.
+for SYMPHONY itself. 
 
 Also in the main \code{SYMPHONY/} subdirectory, there is a subdirectory called
 \code{Applications/} (see Sections~\ref{build_app_unix} and
 \ref{build_app_msvc}) for instructions on building the applications). The
 \code{Applications/} subdirectory contains the source code for a number of
 sample applications developed with SYMPHONY, as well as function stubs for
-developing a custom application from scratch using SYMPHONY's callbacks. The
-subdirectory \code{SYMPHONY/Applications/USER} contains the files needed for
-implementing the callbacks and is essentially a template for developing an
-application. In this directory and its subdirectories, which mirror the
-subdirectories of SYMPHONY itself, each file contains function stubs that can
-be filled in to create a new custom application. There is one file for each
-module, initially called \code{USER/*/user\_*.c}, where \code{*} is the name
-of the module. The primary thing that you, as the user, need to understand to
-build a custom application is how to fill in these stubs. That is what the
-second part of this capter is about. For information on building your
-application once it is developed, you may want to skip ahead to
-Section~\ref{building_custom_app}.
+developing a custom application using SYMPHONY's callbacks. The subdirectory
+\code{SYMPHONY/Applications/USER} contains the files needed for implementing
+the callbacks and is a template for developing an application. In this
+directory and its subdirectories, which mirror the subdirectories of SYMPHONY
+itself, each file contains function stubs that can be filled in to create a
+new custom application. There is a separate subdirectory for each
+module---master (\code{Master/}), tree management (\code{TreeManager/}), cut
+generation (\code{CutGen/}), cut management (\code{CutPool/}), and node
+processing (\code{LP/}). Within each subdirectory, there is a file, initially
+called \code{USER/*/user\_*.c}, where \code{*} is the name of the module. The
+primary thing that you, as the user, need to understand to build a custom
+application is how to fill in these stubs. That is what the second part of
+this chapter is about. Before describing that, however, we will discuss how to
+build your application. 
 
-\section{Writing the Callbacks}
+%Within the \code{src} subdirectory, the files are
+%organized along the lines of the modules. There is a separate subdirectory for
+%each module---master (\code{Master/}), tree management (\code{TreeManager/}),
+%cut generation (\code{CutGen/}), cut management (\code{CutPool/}), and node
+%processing (\code{LP/}). In addition, there are directories called
+%\code{DrawGraph/} and \code{Common/} that also contain source files. The
+%\code{DrawGraph/} directory provides an interface from \BB\ to the
+%\emph{Interactive Graph Drawing} software package developed by Marta Es\"o.
+%This is an excellent utility for graphical display and debugging. The
+%\code{Common/} directory contains source code for functions used by multiple
+%modules.
 
-For each module, all callback functions are invoked from so-called
-\emph{wrapper functions} that provide the interface and also performs a
-default action if the user chooses not to override it. Although SYMPHONY is
-written in C, the wrapper functions provide a C++-style interface in which the
-user can either accept the default action or override it. Each wrapper
-function is named \code{*\_u()} , where \code{*} is the name of the
-corresponding callback function, and is defined in a file called
-\code{*\_wrapper.c}. The wrapper function first collects the necessary data
-and hands it to the user by calling the user function. Based on the return
-value from the user, the wrapper then performs any necessary post-processing.
-All callback functions have default options, so that SYMPHONY now acts as a
-generic MILP solver out of the box.
+%Within each module's directory, there is a primary source file containing the
+%function \code{main()} (named \code{*.c} where \code{*} is the module name), a
+%source file containing functions related to inter-process communication (named
+%\code{*\_proccomm.c}) and a file containing general subroutines used by the
+%module (named \code{*\_func.c}). The master is the exception and is organized
+%slightly differently. The LP process source code is further subdivided due to
+%the sheer number of functions.
 
-In Section \ref{API}, the callback functions are described in
-detail.  The name of every callback function starts with \code{user\_}.
-There are three kinds of arguments:
-\begin{description}
-\item[\rm IN:] An argument containing information that the user might need
-to perform the function.
-\item[\rm OUT:] A pointer to an argument in which the user should
-return a result (requested data, decision, etc.) of the function. 
-\item[\rm INOUT:] An argument which contains information the user might need,
-but also for which the user can change the value.
-\end{description}
-The return values for most function are as follows:
-\begin{description}
-\item[Return values:] \hfill
-
-\begin{tabular}{lp{310pt}} 
-
-\code{USER\_ERROR} & Error in the user function. Printing an error message is
-the user's responsibility. Depending on the work the user function was
-supposed to do, the error might be ignored (and some default option used), or
-the process aborts. \\
-
-\code{USER\_SUCCESS} & The user function was implemented and executed correctly. \\
-
-\code{USER\_DEFAULT} & This option means that the user function was not
-implemented and that SYMPHONY should either execute a default subroutine (the
-default is one of the built-in options, \BB\ decides which one to use based on
-initial parameter settings and the execution of the algorithm) or else do
-nothing, if execution of the subroutine is optional. \\
-
-\code{built\_in\_option1 } & \\
-\code{built\_in\_option2 } ... & The specified built-in option will be used.\\
-\end{tabular}
-
-\item[Notes:] \hfill
-\begin{itemize}
-\vspace{-3ex}
-
-\item Sometimes an output is optional. This is always noted in the
-function descriptions.
-
-\item If an array has to be returned (i.e., the argument is \code{type
-**array}) then (unless otherwise noted) the user has to allocate space for the
-array itself and set \code{*array} to be the array allocated.  If an output
-array is optional and the user is not returning any values in that array, then
-the user {\em must not} set \code{*array} because this is how \BB\ decides
-which optional arrays are filled up.
-
-\item Some built-in options are implemented so that the user can invoke them
-directly from the callback function. This might be useful if, for example,
-the user wants to use different built-in options at different stages
-of the algorithm.
-\end{itemize}
-
-\end{description}
-
-\section{Data Structures}
-
-\subsection{Internal Data Structures}
-
-With few exceptions, the data structures used internally by \BB\
-are undocumented and most users will not need to access them
-directly. However, if such access is desired, a pointer to the main data
-structure used by each of the modules can be obtained simply by calling
-the function \code{get\_*\_ptr()} where * is the appropriate module (see the
-header files). This function will return a pointer to the data
-structure for the appropriate module. Casual users are advised against
-modifying \BB's internal data structures directly.
-
-\subsection{User-defined Data Structures}
-
-The user can define her own data structure for each module to maintain problem
-data and any other information the user needs access to in order to implement
-functions to customize the solver. A pointer to this data structure is
-maintained by \BB\ and is passed to the user as an argument to each user
-function. Since \BB\ knows nothing about this data structure, it is up to the
-user to allocate it and maintain it. The user must also implement a function
-to free it. The functions for freeing the user data structures in each module
-are called \code{user\_free\_*}, where \code{*} is the module. These
-functions are called by SYMPHONY at the time when other data structures for
-the modules are being freed and the module is being closed. By default, for
-sequential computation, there is one common user data structure for all
-modules and the pointer to that data structure is passed to all user
-functions, regardless of the module. This setup should work fine for most
-sequential applications. In parallel, however, pointers cannot be shared
-between modules and data must be explicitly passed. IN this case, it is
-sometimes more efficient to maintain in each module only the data necessary to
-perform the functions of that module.
-
-\section{Parallel Implementation}
-
-\subsection{Distributed-memory Architectures}
-\label{communication}
-
-While the implementation of \BB\ strives to shield the user from having to
-know anything about communications protocols or the specifics of inter-process
-communication, it may be necessary for the user to pass information from one
-module to another in order to implement a parallel application. For instance,
-the user may want to pass data describing the problem instance to the LP
-process after reading them in from a file in the master process. For the
-purpose of passing user data from the master process to other processes, a
-customization function called
-\code{user\_send\_*\_data()} is provided in the master module, along with a
-corresponding function called \code{user\_receive\_*\_data()} in the module
-\code{*}. These two functions work in tandem to transport the user's data
-from the maser, where it can be read in from a file, to the proper module for
-processing. There are also a number of other tandem pairs of \emph{send} and
-\emph{receive} functions that are used to transport user data from place to
-place.
-
-All data are sent in the form of arrays of either type \code{char}, \code{int},
-or \code{double}, or as strings. To send an array, the user has simply to
-invoke the function \code{send\_XXX\_array(XXX *array, int length)} where
-\code{XXX} is one of the previously listed types. To receive that array,
-there is a corresponding function called \code{receive\_?\_array(?  *array, int
-length)}. When receiving an array, the user must first allocate the
-appropriate amount of memory. In cases where variable length arrays need to be
-passed, the user must first pass the length of the array (as a separate array
-of length one) and then the array itself. In the receive function, this allows
-the length to be received first so that the proper amount of space can be
-allocated before receiving the array itself. Note that data must be received
-in exactly the same order as it was passed, as data is read linearly into and
-out of the message buffer. The easiest way to ensure this is done properly is
-to simply copy the send statements into the receive function and change the
-function names. It may then be necessary to add some allocation statements in
-between the receive function calls.
-
-\subsection{Shared-memory Architectures}
-\label{shared}
-
-In the shared memory configuration, it is not necessary to use
-message passing to move information from one module to another since
-memory is globally accessible. In the few cases where the user would
-ordinarily have to pass information using message passing, it is
-easiest and most efficient to simply copy the information to the new
-location. This copying gets done in the {\em send} function and hence
-the {\em receive} function is never actually called. This means that
-the user must perform all necessary initialization, etc. in the send
-function. This makes it a little confusing to write source code which
-will work for all configurations. However, the confusion should be
-minimized by looking at the sample applications, especially the VRP solver,
-which works in all configurations, sequential, distributed parallel, and
-shared parallel. 
+%In the main \code{SYMPHONY/} subdirectory (at the same level as the
+%\code{src/} subdirectory), there is also a subdirectory called \code{include/}
+%that contains the header files. Corresponding to each module, there are three
+%header files, one containing internal data structures and function prototypes
+%associated with the module (named \code{sym\_*.h} where * is the module name),
+%one containing the data structures for storing the parameters (these are also
+%used by the master process), and the third containing the function prototypes
+%for the user callbacks (name \code{sym\_*\_u.h}). By looking at the header
+%files, you should get a general idea of how things are laid out.
 
 %FIXME: Check this
-\section{Building Your Application}
+\section{Building an Application}
 \label{building_custom_app}
+
+Note that the template application can be built and will work without
+modifying any of the source files. In this case, SYMPHONY will behave
+according to default settings. 
 
 \subsection{Unix}
 
@@ -241,9 +90,9 @@ First, download, configure, and compile SYMPHONY as described in Section
 each application. After this, typing \code{make} in the
 \code{SYMPHONY/Applications/USER/} subdirectory should successfully build the
 executable. For more information, including the parallel configuration
-instuctions, see the \code{SYMPHONY/Applications/USER/INSTALL} file.
+instructions, see the \code{SYMPHONY/Applications/USER/INSTALL} file.
 
-\subsection{Microsoft Windows}
+\subsection{Microsoft Visual C++}
 
 First, download \code{SYMPHONY-\VER} and unpack the archive if it is
 required. You now have three options. You can either compile on the
@@ -351,6 +200,153 @@ and bound solver! After successful compilation, you can fill in the user
 callback functions as describe in Section \ref{SYMPHONY-development}.
 \end{itemize}
 
+\section{Writing the Callbacks}
+
+For each module, all callback functions are invoked from so-called
+\emph{wrapper functions} that provide the interface and also performs a
+default action if the user chooses not to override it. Although SYMPHONY is
+written in C, the wrapper functions provide a C++-style interface in which the
+user can either accept the default action or override it. Each wrapper
+function is named \code{*\_u()} , where \code{*} is the name of the
+corresponding callback function, and is defined in a file called
+\code{*\_wrapper.c}. The wrapper function first collects the necessary data
+and hands it to the user by calling the user function. Based on the return
+value from the user, the wrapper then performs any necessary post-processing.
+All callback functions have default options, so that SYMPHONY now acts as a
+generic MILP solver out of the box.
+
+In Section \ref{API}, the callback functions are described in
+detail.  The name of every callback function starts with \code{user\_}.
+There are three kinds of arguments:
+\begin{description}
+\item[\rm IN:] An argument containing information that the user might need
+to perform the function.
+\item[\rm OUT:] A pointer to an argument in which the user should
+return a result (requested data, decision, etc.) of the function. 
+\item[\rm INOUT:] An argument which contains information the user might need,
+but also for which the user can change the value.
+\end{description}
+The return values for most function are as follows:
+\begin{description}
+\item[Return values:] \hfill
+
+\begin{tabular}{lp{310pt}} 
+
+\code{USER\_ERROR} & Error in the user function. Printing an error message is
+the user's responsibility. Depending on the work the user function was
+supposed to do, the error might be ignored (and some default option used), or
+the process aborts. \\
+
+\code{USER\_SUCCESS} & The user function was implemented and executed correctly. \\
+
+\code{USER\_DEFAULT} & This option means that the user function was not
+implemented and that SYMPHONY should either execute a default subroutine (the
+default is one of the built-in options---\BB\ decides which one to use based on
+initial parameter settings and the execution of the algorithm) or else do
+nothing, if execution of the subroutine is optional. \\
+
+\code{built\_in\_option1 } & \\
+\code{built\_in\_option2 } ... & The specified built-in option will be used.\\
+\end{tabular}
+
+\item[Notes:] \hfill
+\begin{itemize}
+\vspace{-3ex}
+
+\item Sometimes an output is optional. This is always noted in the
+function descriptions.
+
+\item If an array has to be returned (i.e., the argument is \code{type
+  **array}), then (unless otherwise noted) the user has to allocate space for
+  the array itself and set \code{*array} to be the array allocated. If an
+  output array is optional and the user is not returning any values in that
+  array, then the user {\em must not} set \code{*array} because this is how
+  \BB\ decides which optional arrays are filled up.
+
+\item Some built-in options are implemented so that the user can invoke them
+directly from the callback function. This might be useful if, for example,
+the user wants to use different built-in options at different stages
+of the algorithm.
+\end{itemize}
+
+\end{description}
+
+\section{Data Structures}
+
+The user can define her own data structure for each module to maintain problem
+data and any other information the user needs access to in order to implement
+functions to customize the solver. A pointer to this data structure is
+maintained by \BB\ and is passed to the user as an argument to each user
+function. The pointer must be initially passed using the
+\ptt{sym\_set\_user\_data()} command. Since \BB\ knows nothing about this data
+structure, it is up to the user to allocate it and maintain it. The user must
+also implement a function to free it. The functions for freeing the user data
+structures in each module are called \code{user\_free\_*}, where \code{*} is
+the module. These functions are called by SYMPHONY at the time when other data
+structures for the modules are being freed and the module is being closed. By
+default, for sequential computation, there is one common user data structure
+for all modules and the pointer to that data structure is passed to all user
+functions, regardless of the module. This setup should work fine for most
+sequential applications. In parallel, however, pointers cannot be shared
+between modules and data must be explicitly passed. In this case, it is
+sometimes more efficient to maintain in each module only the data necessary to
+perform the functions of that module.
+
+\section{Parallel Implementation}
+
+\subsection{Distributed-memory Architectures}
+\label{communication}
+
+While the implementation of \BB\ strives to shield the user from having to
+know anything about communications protocols or the specifics of inter-process
+communication, it may be necessary for the user to pass information from one
+module to another in order to implement a parallel application. For instance,
+the user may want to pass data describing the problem instance to the LP
+process after reading them in from a file in the master process. For the
+purpose of passing user data from the master process to other processes, a
+customization function called
+\code{user\_send\_*\_data()} is provided in the master module, along with a
+corresponding function called \code{user\_receive\_*\_data()} in the module
+\code{*}. These two functions work in tandem to transport the user's data
+from the maser, where it can be read in from a file, to the proper module for
+processing. There are also a number of other tandem pairs of \emph{send} and
+\emph{receive} functions that are used to transport user data from place to
+place.
+
+All data are sent in the form of arrays of either type \code{char}, \code{int},
+or \code{double}, or as strings. To send an array, the user has simply to
+invoke the function \code{send\_XXX\_array(XXX *array, int length)} where
+\code{XXX} is one of the previously listed types. To receive that array,
+there is a corresponding function called \code{receive\_?\_array(?  *array, int
+length)}. When receiving an array, the user must first allocate the
+appropriate amount of memory. In cases where variable length arrays need to be
+passed, the user must first pass the length of the array (as a separate array
+of length one) and then the array itself. In the receive function, this allows
+the length to be received first so that the proper amount of space can be
+allocated before receiving the array itself. Note that data must be received
+in exactly the same order as it was passed, as data is read linearly into and
+out of the message buffer. The easiest way to ensure this is done properly is
+to simply copy the send statements into the receive function and change the
+function names. It may then be necessary to add some allocation statements in
+between the receive function calls.
+
+\subsection{Shared-memory Architectures}
+\label{shared}
+
+In the shared memory configuration, it is not necessary to use
+message passing to move information from one module to another since
+memory is globally accessible. In the few cases where the user would
+ordinarily have to pass information using message passing, it is
+easiest and most efficient to simply copy the information to the new
+location. This copying gets done in the {\em send} function and hence
+the {\em receive} function is never actually called. This means that
+the user must perform all necessary initialization, etc. in the send
+function. This makes it a little confusing to write source code which
+will work for all configurations. However, the confusion should be
+minimized by looking at the sample applications, especially the VRP solver,
+which works in all configurations, sequential, distributed parallel, and
+shared parallel. 
+
 %\subsection{Unix Operating Systems}
 
 %Once the callback functions are filled in, all that remains is to compile the
@@ -394,30 +390,28 @@ be the same for either case. Make sure to use the configuration flag to
 
 \subsection{Debugging with PVM}
 \label{debugging-PVM}
-If you wish to venture into debugging your distributed application,
-then you simply need to set the parameter \code{*\_debug}, where * is
-the name of the module you wish to debug, 
-to the value ``4'' in the parameter file (the number ``4'' is chosen
-by PVM). This will tell PVM to spawn the particular process or
-processes in question under a debugger. What PVM actually does in this
-case is to launch the script \code{\$PVM\_ROOT/lib/debugger}. You will
-undoubtedly want to modify this script to launch your preferred
-debugger in the manner you deem fit. If you have trouble with this,
-please send e-mail to the list serve (see Section \ref{resources}).
+If you wish to venture into debugging your distributed application, then you
+simply need to set the parameter \code{*\_debug}, where * is the name of the
+module you wish to debug, to ``1'' in the parameter file. This will tell PVM
+to spawn the particular process or processes in question under a debugger.
+What PVM actually does in this case is to launch the script
+\code{\$PVM\_ROOT/lib/debugger}. You will undoubtedly want to modify this
+script to launch your preferred debugger in the manner you deem fit. If you
+have trouble with this, please send e-mail to the list serve (see Section
+\ref{resources}).
 
-It's a little tricky to debug interacting parallel processes, but you
-will quickly get the idea. The main difficulty is in that the order of
-operations is difficult to control. Random interactions can occur when
-processes run in parallel due to varying system loads, process
-priorities, etc. Therefore, it may not always be possible to duplicate
-errors. To force runs that you should be able to reproduce, make sure
-the parameter \ptt{no\_cut\_timeout} appears in the parameter file or
-start \BB\ with the \code{-a} option. This will keep the cut
-generator from timing out, a major source of randomness. Furthermore,
-run with only one active node allowed at a time (set \ptt{
-max\_active\_nodes} to ``1''). This will keep the tree search from
-becoming random. These two steps should allow runs to be reproduced.
-You still have to be careful, but this should make things easier.
+It's a little tricky to debug interacting parallel processes. The main
+difficulty is in that the order of operations is difficult to control. Random
+interactions can occur when processes run in parallel due to varying system
+loads, process priorities, etc. Therefore, it may not always be possible to
+duplicate errors. To force runs that you should be able to reproduce, make
+sure the parameter \ptt{no\_cut\_timeout} appears in the parameter file or
+start \BB\ with the \code{-a} option. This will keep the cut generator from
+timing out, a major source of randomness. Furthermore, run with only one
+active node allowed at a time (set \ptt{ max\_active\_nodes} to ``1''). This
+will keep the tree search from becoming random. These two steps should allow
+runs to be reproduced. You still have to be careful, but this should make
+things easier.
 
 %\subsection{Using \code{Purify} and \code{Quantify}}
 
@@ -434,39 +428,37 @@ You still have to be careful, but this should make things easier.
 \subsection{Checking the Validity of Cuts and Tracing the Optimal Path}
 \label{debugging}
 
-Sometimes the only evidence of a bug is the fact that the optimal
-solution to a particular problem is never found. This is usually
-caused by either (1) adding an invalid cut, or (2) performing an
-invalid branching. There are two options available for discovering
-such errors. The first is for checking the validity of added cuts.
-This checking must, of course, be done by the user, but \BB\ can
-facilitate such checking. To do this, the user must fill in the
+Sometimes the only evidence of a bug is the fact that the optimal solution to
+a particular problem is never found. This is usually caused by either (1)
+adding an invalid cut, or (2) performing an invalid branching. There are two
+options available for discovering such errors. The first is for checking the
+validity of added cuts. This checking must, of course, be done by the user,
+but \BB\ can facilitate such checking. To do this, the user must fill in the
 function \hyperref{{\tt user\_check\_validity\_of\_cut()}} {\ptt{
 user\_check\_validity\_of\_cut()} (see Section
-}{)}{user_check_validity_of_cut}. THIS function is called every time a
-cut is passed from the cut generator to the LP and can function as an
-independent verifier. To do this, the user must pass (through her own
-data structures) a known feasible solution. Then for each cut passed
-into the function, the user can check whether the cut is satisfied
-by the feasible solution. If not, then there is a problem! Of course,
-the problem could also be with the checking routine. 
-After filling in this function, the user must configure SYMPHONY
-with the flag \code{--enable-cut-check} (see Section \ref{configuring}). 
-Type \code{make clean} and then \code{make}.
+}{)}{user_check_validity_of_cut}. THIS function is called every time a cut is
+passed from the cut generator to the LP and can function as an independent
+verifier. To do this, the user must pass (through her own data structures) a
+known feasible solution. Then for each cut passed into the function, the user
+can check whether the cut is satisfied by the feasible solution. If not, then
+there is a problem! Of course, the problem could also be with the checking
+routine. To enable this functionality, the user must configure SYMPHONY with
+the flag \code{--enable-cut-check} (see Section \ref{configuring}). 
 
-Tracing the optimal path can alert the user when the subproblem which
-admits a particular known feasible solution (at least
-according to the branching restrictions that have been imposed so far)
-is pruned. This could be due to an invalid branching. Note that this
-option currently only works for branching on binary variables. To use
-this facility, the user must fill in the function \hyperref{{\tt
-user\_send\_feas\_sol()}} {\ptt {user\_send\_feas\_sol()} (see Section
-}{)}{user_send_feas_sol}. All that is required is to pass out an array
-of user indices that are in the feasible solution that you want to
-trace. Each time the subproblem which admits this feasible solution is
-branched on, the branch that continues to admit the solution is
-marked. When one of these marked subproblems is pruned, the user is
-notified.
+Tracing the optimal path can alert the user when the subproblem which admits a
+particular known feasible solution (at least according to the branching
+restrictions that have been imposed so far) is pruned. This could be due to an
+invalid branching. Note that this option currently only works for branching on
+binary variables. To use this facility, the user must fill in the function
+\hyperref{{\tt user\_send\_feas\_sol()}} {\ptt {user\_send\_feas\_sol()} (see
+Section }{)}{user_send_feas_sol}. All that is required is to pass out an array
+of user indices that are in the feasible solution that you want to trace. Each
+time the subproblem which admits this feasible solution is branched on, the
+branch that continues to admit the solution is marked. When one of these
+marked subproblems is pruned, the user is notified. To enable this
+functionality, the user must configure SYMPHONY with the flag
+\code{--enable-trace-path} (see Section \ref{configuring}). 
+
 
 \subsection{Using the Interactive Graph Drawing Software}
 \label{IGD}
@@ -549,10 +541,10 @@ structure:
 {\color{Brown}
 \begin{verbatim}
 typedef struct USER_PROBLEM{
-   int		    numnodes;
-   int		    cost[MAXNODES][MAXNODES];
-   int		    match1[MAXNODES*(MAXNODES-1)/2];
-   int		    match2[MAXNODES*(MAXNODES-1)/2]; 
+   int              numnodes;
+   int              cost[MAXNODES][MAXNODES];
+   int              match1[MAXNODES*(MAXNODES-1)/2];
+   int              match2[MAXNODES*(MAXNODES-1)/2]; 
    int              index[MAXNODES][MAXNODES];
 }user_problem;
 \end{verbatim}
@@ -593,7 +585,7 @@ int match_read_data(user_problem *prob, char *infile)
    fscanf(f,"%d",&(prob->numnodes));
    for (i = 0; i < prob->numnodes; i++)
       for (j = 0; j < prob->numnodes; j++)
-	 fscanf(f, "%d", &(prob->cost[i][j]));
+         fscanf(f, "%d", &(prob->cost[i][j]));
    
    return (FUNCTION_TERMINATED_NORMALLY);
 }
@@ -644,19 +636,19 @@ int match_load_problem(sym_environment *env, user_problem *prob){
    index = 0;
    for (i = 0; i < prob->numnodes; i++) {
       for (j = i+1; j < prob->numnodes; j++) {
-	 prob->match1[index] = i; /*The first component of assignment 'index'*/
-	 prob->match2[index] = j; /*The second component of assignment 'index'*/
-	 /* So we can recover the index later */
-	 prob->index[i][j] = prob->index[j][i] = index;
-	 obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
-	 is_int[index] = TRUE;
-	 matbeg[index] = 2*index;
-	 matval[2*index] = 1;
-	 matval[2*index+1] = 1;
-	 matind[2*index] = i;
-	 matind[2*index+1] = j;
-	 ub[index] = 1.0;
-	 index++;
+         prob->match1[index] = i; /*The first component of assignment 'index'*/
+         prob->match2[index] = j; /*The second component of assignment 'index'*/
+         /* So we can recover the index later */
+         prob->index[i][j] = prob->index[j][i] = index;
+         obj[index] = prob->cost[i][j]; /* Cost of assignment (i, j) */
+         is_int[index] = TRUE;
+         matbeg[index] = 2*index;
+         matval[2*index] = 1;
+         matval[2*index+1] = 1;
+         matind[2*index] = i;
+         matind[2*index+1] = j;
+         ub[index] = 1.0;
+         index++;
       }
    }
    matbeg[n] = 2 * n;
@@ -669,7 +661,7 @@ int match_load_problem(sym_environment *env, user_problem *prob){
    
    /* Load the problem to SYMPHONY */   
    sym_explicit_load_problem(env, n, m, matbeg, matind, matval, lb, ub, 
-			     is_int, obj, 0, sense, rhs, rngval, true);
+                             is_int, obj, 0, sense, rhs, rngval, true);
 			     
    return (FUNCTION_TERMINATED_NORMALLY);
 
@@ -783,20 +775,19 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    
    for (i = 0; i < prob->nnodes; i++){
       for (j = i+1; j < prob->nnodes; j++){
-	 for (k = j+1; k < prob->nnodes; k++) {
-	    if (edge_val[i][j]+edge_val[j][k]+edge_val[i][k] > 1.0 + etol) {
-	       /* Found violated triangle cut */
-	       /* Form the cut as a sparse vector */
-	       cutind[0] = prob->index[i][j];
-	       cutind[1] = prob->index[j][k];
-	       cutind[2] = prob->index[i][k];
-	       cutval[0] = cutval[1] = cutval[2] = 1.0;
-	       cg_add_explicit_cut(3, cutind, cutval, 1.0, 0, 'L',
-				   TRUE, num_cuts, alloc_cuts, cuts);
-	       cutnum++;
-	       
-	    }
-	 }
+         for (k = j+1; k < prob->nnodes; k++) {
+            if (edge_val[i][j]+edge_val[j][k]+edge_val[i][k] > 1.0 + etol) {
+               /* Found violated triangle cut */
+               /* Form the cut as a sparse vector */
+               cutind[0] = prob->index[i][j];
+               cutind[1] = prob->index[j][k];
+               cutind[2] = prob->index[i][k];
+               cutval[0] = cutval[1] = cutval[2] = 1.0;
+               cg_add_explicit_cut(3, cutind, cutval, 1.0, 0, 'L',
+                                   TRUE, num_cuts, alloc_cuts, cuts);
+               cutnum++;
+            }
+         }
       }
    }
 

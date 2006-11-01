@@ -24,11 +24,10 @@ command-line argument that enables GNU packages, i.e.,
 \begin{verbatim}
  ./configure --enable-gnu-packages 
 \end{verbatim}
-}
-This will allow the interactive shell to behave exactly like a Linux terminal
-command line, i.e., it will keep the history of the used commands, will
-complete the input word to possible commands, etc. Note that you must have the
-required packages (readline and history) installed. 
+} This will allow the interactive shell to behave exactly like a Linux
+terminal command line, i.e., it will keep the history of the used commands,
+will do command completion, etc. Note that you must have the required packages
+(\code{readline} and \code{history}) installed.
 
 To use SYMPHONY's interactive shell, run the executable without any
 command line arguments, i.e., type 
@@ -36,21 +35,20 @@ command line arguments, i.e., type
 \begin{verbatim}
  bin/symphony 
 \end{verbatim}
-}
-You will enter a command shell environment where you will be prompted to
-feed in inputs to use SYMPHONY interactively. The user interface consists 
-of a \emph{main menu}, where an instance is read in and solved, a 
-\emph{set menu}, where parameters are set, and a \emph{display menu}, where 
-results, statistics and parameter values are displayed. 
+} You will enter a command shell environment where you will be prompted for
+inputs. The user interface consists of a \emph{main menu}, where an instance
+is read in and solved, a \emph{set menu}, where parameters are set, and a
+\emph{display menu}, where results, statistics and parameter values are
+displayed.
  
-\subsection{MS Windows}
+\subsection{Microsoft Windows}
 
-To invoke SYMPHONY's interactive solver in an MS Windows environment, simply
-double-click on the \code{symphony.exe} file in Windows Explorer. This should
-open a terminal window in which the solver will run. Note that if you built
-SYMPHONY in CYGWIN without the option \code{--enable-dos-compile}, then you
-will have to have the CYGWIN DLL in your path in order for the executable to
-run.
+To invoke SYMPHONY's interactive solver in an Microsoft Windows environment,
+simply double-click on the \code{symphony.exe} file in Windows Explorer. This
+should open a terminal window in which the solver will run. Note that if you
+built SYMPHONY in CYGWIN without the option \code{--enable-dos-compile}, then
+you will have to have the CYGWIN DLL in your path in order for the executable
+to run.
 
 \subsection{Main Menu}
 
@@ -123,9 +121,11 @@ none, you will be prompted to define the input format:
  Coin0002I Problem SAMPLE has 2 rows, 6 columns and 10 elements
  SYMPHONY: 
 \end{verbatim}
-} Similary, if the input is in AMPL/GMPL format, you will also be prompted to
-read in the data file (note that, in order to enable GMPL/AMPL reader, you
-have to configure SYMPHONY with GLPK package - see Section \ref{building}):
+} 
+If the input is in AMPL/GMPL format, you will also be prompted to read in a
+data file (note again that in order to enable GMPL/AMPL reader, you have to
+install GLPK and configure SYMPHONY appropriately---see Section
+\ref{building})): 
 {\color{Brown}
 \begin{verbatim}
  SYMPHONY: load 
@@ -141,10 +141,7 @@ have to configure SYMPHONY with GLPK package - see Section \ref{building}):
  SYMPHONY:
 \end{verbatim}
 }
-Note that, in order to enable GMPL/AMPL reader, you have to 
-configure SYMPHONY with GLPK package (see Section \ref{building}). 
-
-After loading the instance, you are free to type \code{solve} to solve the 
+After loading the instance, type \code{solve} to solve the 
 corresponding integer program or \code{lpsolve} to solve its linear
 relaxation:
 {\color{Brown}
@@ -177,9 +174,8 @@ the termination code of the solution process will be displayed (see Section
 \ref{set_menu} for displaying more output).
 
 \subsection{Set Menu}\label{set_menu}
-Set submenu is used to set SYMPHONY's run-time parameters. 
-To enter this submenu, type \code{set}: 
-{\color{Brown}
+The \code{Set} submenu is used to set SYMPHONY's run-time parameters. To enter
+this submenu, type \code{set}: {\color{Brown}
 \begin{verbatim}
 SYMPHONY: set
 Please type 'help'/'?' to see the list of parameters!
@@ -190,7 +186,7 @@ You can override the default value of a parameter by typing the name of
 the parameter. You will then be prompted 
 to enter the new value of that parameter. For instance, in order to 
 display more outputs during the solution process, you need to set the 
-\code{verbosity} parameter (set to -1 by defualt for the interactive shell 
+\code{verbosity} parameter (set to -1 by default for the interactive shell 
 routines) to a nonnegative integer: 
 {\color{Brown}
 \begin{verbatim}
@@ -199,15 +195,14 @@ Value of the parameter: 3
 Setting verbosity to: 3
 SYMPHONY\Set:
 \end{verbatim}
-}
-A confirmation message will also be displayed. Notice that, typing 
-\code{help} or \code{?} displays only a subset of all 
-available run-time parameters which are the most commonly used ones. However, 
-you are allowed to set any of the parameters given in Section \ref{params}.
-Additionaly, you can set the values of parameters using a parameter file 
-as an input. In such a file, the new value of each parameter must follow the 
-name of that parameter. As an instance, assume that \code{my\_param} file  
-consists of the following lines: 
+} 
+A confirmation message will also be displayed. Note that typing \code{help}
+or \code{?} displays only a subset of the most commonly used run-time
+parameters. However, you are allowed to set any of the parameters given in
+Section \ref{params}. Additionally, you can set the values of parameters using
+a parameter file as an input. In such a file, the new value of each parameter
+must follow the name of that parameter. For instance, suppose that the
+\code{my\_param} file consists of the following lines:
 \begin{verbatim}
  verbosity 3
  node_selection_rule 3
@@ -228,9 +223,10 @@ At this point, you can return to the main menu by typing \code{back},
 load an instance and solve it with updated run-time parameters. 
 
 \subsection{Display Menu}
-Display submenu is used to print out results and statistics of the solution 
-process after a \code{solve} call. To enter this submenu and see available 
-options, type \code{display} and then \code{help} or \code{?}:  
+
+The \code{Display} submenu is used to print out results and statistics of the
+solution process after a \code{solve} call. To enter this submenu and see
+available options, type \code{display} and then \code{help} or \code{?}:
 {\color{Brown}
 \begin{verbatim}
  SYMPHONY: display
@@ -360,7 +356,7 @@ To read and solve an GMPL model and associated data file, the command would be
 } In addition to specifying the name of the instance file, most of the common
 parameters can also be set on the command line by adding various switches.
 Calling \BB\ with just the argument \code{-h} will list all the options. To
-set paramters that cannot be set on the command line or to save parameter
+set parameters that cannot be set on the command line or to save parameter
 setting, it is possible to use a parameter file in which a group of parameters
 can be set. To invoke \BB\ with a parameter file, type \code{./symphony -f
 filename}, where \code{filename} is the name of the parameter file. The format
@@ -394,7 +390,7 @@ all, the verbosity level must be set to -2.
 SYMPHONY's callable library consists of a complete set of subroutines for
 loading and modifying problem data, setting parameters, and invoking solution
 algorithms. The user invokes these subroutines through the API specified in
-the header file \texttt{symphony\_api.h}. Some of the basic commands are 
+the header file \code{symphony\_api.h}. Some of the basic commands are 
 described below. For the sake of brevity, the arguments have been left out. 
 
 \subsection{The C API}
@@ -458,11 +454,11 @@ int main(int argc, char **argv)
 \caption{Implementation of a generic MILP solver with the SYMPHONY
 C callable library. \label{default_main}}
 \end{figure}
-To read in an MPS file called \texttt{sample.mps} and solve it using 
+To read in an MPS file called \code{sample.mps} and solve it using 
 this program, the following command would be issued: \\
 {\color{Brown}
 \begin{verbatim}
- symphony -F sample.mps
+ ./symphony -F sample.mps
 \end{verbatim}
 }
 The user does not have to invoke a command to read the MPS file. During the
@@ -472,11 +468,11 @@ user wants to read in an MPS file. During the subsequent call to
 To read an GMPL file, the user would issue the command
 {\color{Brown}
 \begin{verbatim}
- symphony -F sample.mod -D sample.dat
+ ./symphony -F sample.mod -D sample.dat
 \end{verbatim}
 }
 Although the same command-line switch is used to specify the model file, the
-additional presence of the \texttt{-D} option indicates to SYMPHONY that the
+additional presence of the \code{-D} option indicates to SYMPHONY that the
 model file is in GMPL format and GLPK's GMPL parser is invoked
 \cite{GLPK}. Note that the interface and the code of Figure \ref{default_main}
 is the same for both sequential and parallel computations. The choice between
@@ -568,7 +564,7 @@ int main(int argc, char **argv)
    sym_environment *env = sym_open_environment();
    sym_parse_command_line(env, argc, argv);
    sym_load_problem(env);
-   syn_set_obj2_coeff(env, 0, 1);
+   sym_set_obj2_coeff(env, 0, 1);
    sym_mc_solve(env);
 }
 \end{Verbatim}
@@ -597,7 +593,7 @@ supports only solvers for linear and mixed-integer linear programs, although a
 new version supporting a wider variety of solvers is currently under
 development.
 
-We have implemented an OSI interface for SYMPHONY \VER that allows any solver
+We have implemented an OSI interface for SYMPHONY \VER\ that allows any solver
 built with SYMPHONY to be accessed through the OSI, including customized
 solvers and those configured to run on parallel architectures. To ease code
 maintenance, for each method in the OSI base class, there is a corresponding
@@ -663,5 +659,6 @@ default behavior for many of the functions performed as part of its algorithm.
 The user has complete control over branching, cutting plane generation,
 management of the cut pool and the LP relaxation, search and diving
 strategies, etc. More detailed information about using the callback functions
-to develop custom applications is provided in Chapter~\ref{man-SYMPHONY}.
+to develop custom applications is provided in
+Chapter~\ref{SYMPHONY-development}.
 
