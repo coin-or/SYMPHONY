@@ -42,21 +42,6 @@ int is_same_edge(const void *ed0, const void *ed1)
 
 /*===========================================================================*/
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-/* This comparison function can be used to sort lexicographically */
-/*===========================================================================*/
-
-int is_same_edge(const void *ed0, const void *ed1)
-{
-   return(((edge_data *)ed0)->v0 - ((edge_data *)ed1)->v0 ?
-	  ((edge_data *)ed0)->v0 - ((edge_data *)ed1)->v0 :
-	  ((edge_data *)ed0)->v1 - ((edge_data *)ed1)->v1);
-}
-
-/*===========================================================================*/
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 void delete_dup_edges(small_graph *g)
 {
    edge_data *ed0, *ed1;
@@ -81,42 +66,6 @@ void delete_dup_edges(small_graph *g)
    g->edgenum = pos;
 }
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-/*===========================================================================*/
-
-/*===========================================================================*\
- * This function broadcasts various data that the processes need to
- * compute heuristic solutions.
-\*===========================================================================*/
-
-void broadcast(vrp_problem *vrp, int *tids, int jobs)
-{
-   int s_bufid;
-
-   if (jobs == 0) return;
-   
-   s_bufid = init_send(DataInPlace);
-   send_int_array(&vrp->dist.wtype, 1);
-   send_int_array(&vrp->vertnum, 1);
-   send_int_array(&vrp->depot, 1);
-   send_int_array(&vrp->capacity, 1);
-   send_int_array(vrp->demand, (int)vrp->vertnum);
-   if (vrp->dist.wtype != _EXPLICIT){ /* not EXPLICIT */
-      send_dbl_array(vrp->dist.coordx, vrp->vertnum);
-      send_dbl_array(vrp->dist.coordy, vrp->vertnum);
-      if ((vrp->dist.wtype == _EUC_3D) || (vrp->dist.wtype == _MAX_3D) || 
-	  (vrp->dist.wtype == _MAN_3D))
-	 send_dbl_array(vrp->dist.coordz, vrp->vertnum);
-   }
-   else{ /* EXPLICIT */	
-      send_int_array(vrp->dist.cost, (int)vrp->edgenum);
-   }
-   msend_msg(tids, jobs, VRP_BROADCAST_DATA);
-   
-   freebuf(s_bufid);
-}
-
-/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 
 int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)

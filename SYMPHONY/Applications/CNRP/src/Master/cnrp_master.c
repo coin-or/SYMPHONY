@@ -19,9 +19,6 @@
 #include <string.h>
 
 /* SYMPHONY include files */
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#include "sym_master.h"
-/*___END_EXPERIMENTAL_SECTION___*/
 #include "sym_macros.h"
 #include "sym_constants.h"
 #include "sym_proccomm.h"
@@ -108,12 +105,6 @@ int user_initialize(void **user)
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
    cnrp_problem *cnrp = (cnrp_problem *)user;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-   p->par.lp_par.problem_type = INTEGER_PROBLEM;
-   strcpy(p->par.dg_par.source_path, "/home/tkr/BlackBox/DrawGraph/IGD_1.0/");
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    cnrp_readparams(cnrp, filename, argc, argv);
 
@@ -405,12 +396,6 @@ int user_send_lp_data(void *user, void **user_lp)
    }else{
       cnrp_lp->cur_sol_tree = (int *) calloc (cnrp->vertnum - 1, ISIZE);
    }
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (cnrp_lp->window){
-      copy_node_set(cnrp_lp->window, TRUE, (char *)"Weighted solution");
-      copy_node_set(cnrp_lp->window, TRUE, (char *)"Flow solution");
-   }
-/*___END_EXPERIMENTAL_SECTION___*/
    
 #else
    /* Here, we send that data using message passing and the rest is
@@ -580,15 +565,6 @@ int user_send_cp_data(void *user, void **user_cp)
    return(USER_SUCCESS);
 }
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-/*===========================================================================*/
-
-int user_send_sp_data(void *user)
-{
-   return(USER_SUCCESS);
-}
-
-/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 
 /*===========================================================================*\

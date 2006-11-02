@@ -197,10 +197,6 @@ void vrp_io(vrp_problem *vrp, char *infile)
 	if (strcmp("CVRP", tmp) != 0){
 	   if (strcmp("TSP", tmp) == 0){
 	      vrp->par.tsp_prob = TRUE;
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-	   }else if (strcmp("BPP", tmp) == 0){
-	      vrp->par.bpp_prob = TRUE;
-/*___END_EXPERIMENTAL_SECTION___*/
 	   }else{
 	      fprintf(stderr, "This is not a recognized file type!\n");
 	      exit(1);
@@ -482,17 +478,6 @@ void vrp_io(vrp_problem *vrp, char *infile)
   
   /*calculate all the distances explcitly and then use distance type EXPLICIT*/
   
-  /*__BEGIN_EXPERIMENTAL_SECTION__*/
-  if (vrp->par.bpp_prob){
-    dist->cost = (int *) calloc (vrp->edgenum, sizeof(int));
-    for (i = 1, k = 0; i < vertnum; i++){
-      for (j = 0; j < i; j++){
-        dist->cost[k++] = vrp->demand[i]+vrp->demand[j];
-      }
-    }
-    dist->wtype = _EXPLICIT;
-  }
-  /*___END_EXPERIMENTAL_SECTION___*/
   if (dist->wtype != _EXPLICIT){
     dist->cost = (int *) calloc (vrp->edgenum, sizeof(int));
     for (i = 1, k = 0; i < vertnum; i++){
@@ -526,10 +511,6 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
 {
    int i, j, k;
    char line[LENGTH], key[50], value[50], c, tmp;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int col_size = 0;
-   char v0[10], v1[10];
-   /*___END_EXPERIMENTAL_SECTION___*/
    FILE *f = NULL;
    str_int colgen_str[COLGEN_STR_SIZE] = COLGEN_STR_ARRAY;
    
@@ -725,11 +706,6 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       
       /********************** executable names *******************************/
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-      else if (strcmp(key, "winprog_executable_name") == 0){
-	 strcpy(par->executables.winprog, value);
-      }
-/*___END_EXPERIMENTAL_SECTION___*/
 #ifdef COMPILE_HEURS
       else if (strcmp(key, "heuristics_executable_name") == 0){
 	 strcpy(par->executables.heuristics, value);
@@ -738,12 +714,6 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       
       /******************** debugging parameters *****************************/
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-      else if (strcmp(key, "winprog_debug") == 0){
-	 READ_INT_PAR(par->debug.winprog);
-	 CHECK_DEBUG_PAR(par->debug.winprog, key);
-      }
-/*___END_EXPERIMENTAL_SECTION___*/
 #ifdef COMPILE_HEURS
       else if (strcmp(key, "heuristics_debug") == 0){
 	 READ_INT_PAR(par->debug.heuristics);
@@ -798,23 +768,6 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       else if (strcmp(key, "which_tsp_cuts") == 0){
 	 READ_INT_PAR(cg_par->which_tsp_cuts);
       }
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      else if (strcmp(key, "do_mincut") == 0){
-	 READ_INT_PAR(cg_par->do_mincut);
-      }
-      else if (strcmp(key, "always_do_mincut") == 0){
-	 READ_INT_PAR(cg_par->always_do_mincut);
-      }
-      else if (strcmp(key, "update_contr_above") == 0){
-	 READ_INT_PAR(cg_par->update_contr_above);
-      }
-      else if (strcmp(key, "shrink_one_edges") == 0){
-	 READ_INT_PAR(cg_par->shrink_one_edges);
-      }
-      else if (strcmp(key, "do_extra_checking") == 0){
-	 READ_INT_PAR(cg_par->do_extra_checking);
-      }
-      /*___END_EXPERIMENTAL_SECTION___*/
 #if defined(CHECK_CUT_VALIDITY) || defined(TRACE_PATH)
       else if (strcmp(key, "feasible_solution_edges") == 0){
 	 READ_INT_PAR(vrp->feas_sol_size);
@@ -874,104 +827,6 @@ void vrp_readparams(vrp_problem *vrp, char *filename, int argc, char **argv)
       else if (strcmp(key, "max_num_cuts_in_shrink") == 0){
 	 READ_INT_PAR(cg_par->max_num_cuts_in_shrink);
       }
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-      else if (strcmp(key, "allow_one_routes_in_bfm") == 0){
-	 READ_INT_PAR(cg_par->allow_one_routes_in_bfm);
-      }
-      else if (strcmp(key, "follow_one_edges") == 0){
-	 READ_INT_PAR(cg_par->follow_one_edges);
-      }
-      else if (strcmp(key, "col_gen_grid_size") == 0){
-	 READ_INT_PAR(cg_par->col_gen_par.grid_size);
-      }
-      else if (strcmp(key, "col_gen_lamda") == 0){
-	 READ_FLOAT_PAR(cg_par->col_gen_par.lambda);
-      }
-      else if (strcmp(key, "col_gen_mu") == 0){
-	 READ_FLOAT_PAR(cg_par->col_gen_par.mu);
-      }
-      else if (strcmp(key, "max_num_columns") == 0){
-	 READ_INT_PAR(cg_par->max_num_columns);
-      }
-#endif
-#ifdef COMPILE_OUR_DECOMP
-      else if (strcmp(key, "generate_farkas_cuts") == 0){
-	 READ_INT_PAR(cg_par->generate_farkas_cuts);
-      }
-      else if (strcmp(key, "generate_capacity_cuts") == 0){
-	 READ_INT_PAR(cg_par->generate_capacity_cuts);
-      }
-      else if (strcmp(key, "generate_no_cols_cuts") == 0){
-	 READ_INT_PAR(cg_par->generate_no_cols_cuts);
-      }
-      else if (strcmp(key, "decomp_decompose") == 0){
-	 READ_INT_PAR(cg_par->decomp_decompose);
-      }
-      else if (strcmp(key, "feasible_tours_only") == 0){
-	 READ_INT_PAR(cg_par->feasible_tours_only);
-      }
-      else if (strcmp(key, "graph_density_threshold") == 0){
-	 READ_FLOAT_PAR(cg_par->graph_density_threshold);
-      }
-      else if (strcmp(key, "gap_threshold") == 0){
-	 READ_FLOAT_PAR(cg_par->gap_threshold);
-      }
-      else if (strcmp(key, "do_our_decomp") == 0){
-	 READ_INT_PAR(cg_par->do_our_decomp);
-      }
-      else if (strcmp(key, "do_decomp_once") == 0){
-	 READ_INT_PAR(cg_par->do_decomp_once);
-      }
-#endif
-      /******************** sol pool **************************/
-      else if (strcmp(key, "sol_pool_col_size") == 0){
-	 READ_INT_PAR(col_size);
-      }
-      else if (strcmp(key, "sol_pool_col_num") == 0){
-	 if (col_size == 0){
-	    fprintf(stderr, "Column size is 0 -- exiting\n\n");
-	    exit(1);
-	 }
-	 READ_INT_PAR(vrp->sol_pool_col_num);
-	 vrp->sol_pool_cols = (int *) calloc (2*vrp->sol_pool_col_num*col_size,
-					      sizeof(int));
-	 vrp->sol_pool_col_num = 0;
-      }
-      else if (strcmp(key, "sol_pool_col") == 0){
-	 if (col_size == 0){
-	    fprintf(stderr, "Column size is 0 -- exiting\n\n");
-	    exit(1);
-	 }
-	 for(i = vrp->sol_pool_col_num*2*col_size;
-	     i < (vrp->sol_pool_col_num+1)*2*col_size;
-	     i+=2){
-	    if (!fgets( line, LENGTH, f)){
-	       fprintf(stderr,
-		       "\nVrp I/O: error reading in feasible solution\n\n");
-	       exit(1);
-	    }
-	    strcpy(key,"");
-	    sscanf(line,"%s%s%s", key, v0, v1);
-	    if (strcmp(key,"edge")){
-	       fprintf(stderr,
-		       "\nVrp I/O: error reading in feasible solution\n\n");
-	       exit(1);
-	    }
-	    if (sscanf(v0, "%i", vrp->sol_pool_cols+i) != 1){
-	       fprintf(stderr, "\nVrp I/O: error reading in solution %s\n\n",
-		      key);
-	       exit(1);
-	    }
-	    if (sscanf(v1, "%i", vrp->sol_pool_cols+i+1) != 1){
-	       fprintf(stderr, "\nVrp I/O: error reading in solution %s\n\n",
-		      key);
-	       exit(1);
-	    }
-	 }
-	 vrp->sol_pool_col_num++;
-      }
-/*___END_EXPERIMENTAL_SECTION___*/
    }
 
 EXIT:
@@ -1082,9 +937,6 @@ void vrp_set_defaults(vrp_problem *vrp)
    par->colgen_strat[0] = 0;
    par->colgen_strat[1] = 0;
    par->verbosity = 9;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   par->debug.winprog = 0;
-   /*___END_EXPERIMENTAL_SECTION___*/
 #ifdef COMPILE_HEURS
    par->debug.heuristics = 0;
    par->time_out.ub = 60;
@@ -1137,32 +989,6 @@ void vrp_set_defaults(vrp_problem *vrp)
    cg_par->which_tsp_cuts = NO_TSP_CUTS;
    cg_par->which_connected_routine = BOTH;
    cg_par->max_num_cuts_in_shrink = 200;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   cg_par->do_mincut = 0;
-   cg_par->always_do_mincut = 0;
-   cg_par->update_contr_above = 0;
-   cg_par->shrink_one_edges = 1;
-   cg_par->do_extra_checking = 0;
-#ifdef COMPILE_DECOMP
-   cg_par->generate_farkas_cuts = TRUE;
-   cg_par->generate_no_cols_cuts = TRUE;
-   cg_par->generate_capacity_cuts = TRUE;
-   cg_par->decomp_decompose = FALSE;
-   cg_par->allow_one_routes_in_bfm = TRUE;
-   cg_par->follow_one_edges = TRUE;
-   cg_par->max_num_columns = 1000; 
-   cg_par->col_gen_par.grid_size = 1;
-   cg_par->col_gen_par.lambda = 2;
-   cg_par->col_gen_par.mu = 1;
-#endif
-#ifdef COMPILE_OUR_DECOMP
-   cg_par->feasible_tours_only = FALSE;
-   cg_par->graph_density_threshold = 10;
-   cg_par->gap_threshold = -1;
-   cg_par->do_our_decomp = FALSE;
-   cg_par->do_decomp_once = TRUE;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
       
    return;
 }
