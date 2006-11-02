@@ -24,7 +24,7 @@
 #include "OsiSolverInterface.hpp"
 #include "OsiRowCutDebugger.hpp"
 #include "OsiSymSolverInterface.hpp"
-#include "symphony_api.h"
+#include "symphony.h"
 
 void testingMessage( const char * const msg );
 

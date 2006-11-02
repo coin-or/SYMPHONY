@@ -20,10 +20,13 @@
 #include <stdio.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 #include "qsortucb.h"
-#include "lp_u.h"
+#include "sym_lp_u.h"
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#include "sym_lp.h"
+/*___END_EXPERIMENTAL_SECTION___*/
 
 /* CNRP include files */
 #include "cnrp_lp.h"

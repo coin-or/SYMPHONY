@@ -17,7 +17,7 @@
 #define _CUT_POOL_USER_H
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 
 /* CNRP include files */
 #include "cnrp_cp_params.h"

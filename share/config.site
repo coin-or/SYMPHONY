@@ -151,6 +151,9 @@
 ##############################################################################
 #with_pvm=yes              
 
+# Compile in OpenMp features (requires GCC version 4.2.0 or higher)
+#enable_openmp=yes
+
 ##############################################################################
 #
 # These options are for configuring the modules and have the following

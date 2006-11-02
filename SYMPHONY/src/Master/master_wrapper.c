@@ -20,16 +20,16 @@
 #endif
 
 #include "qsortucb.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "symphony_api.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "master.h"
-#include "master_u.h"
-#include "lp_solver.h"
+#include "sym_messages.h"
+#include "sym_proccomm.h"
+#include "symphony.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_master.h"
+#include "sym_master_u.h"
+#include "sym_lp_solver.h"
 #ifdef COMPILE_IN_TM
-#include "lp.h"
+#include "sym_lp.h"
 #endif
 
 /*===========================================================================*/
@@ -118,10 +118,6 @@ int readparams_u(sym_environment *env, int argc, char **argv)
 	   }
 	   break;	     
 	 default:
-	   if (c < 'A'){
-	     printf("Warning: Ignoring unrecognized command-line switch -%c\n",
-		    c);
-	   }
 	   break;
 	 }	   
 	 if (foundF && foundD){
@@ -161,7 +157,15 @@ int io_u(sym_environment *env)
 
     case USER_DEFAULT: 
 
-      if (strcmp(env->par.datafile, "") == 0){ 
+      if (strcmp(env->par.infile, "") == 0){
+	 printf("\nNo input file specified\n");
+	 return (ERROR__READING_MPS_FILE);
+      }	 
+
+      if (env->par.verbosity >= 0){
+	 printf("Reading input file...\n\n");
+      }
+      if (strcmp(env->par.datafile, "") == 0){
 	 err = read_mps(env->mip, env->par.infile, env->probname);
 	 if (err != 0){
 	    printf("\nErrors in reading mps file\n");

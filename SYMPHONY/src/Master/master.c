@@ -22,20 +22,20 @@
 #include <pvmtev.h>
 #endif
 
-#include "symphony_api.h"
-#include "proccomm.h"
-#include "timemeas.h"
-#include "messages.h"
-#include "BB_macros.h"
-#include "pack_cut.h"
-#include "pack_array.h"
-#include "master.h"
-#include "master_u.h"
-#include "lp_solver.h"
+#include "symphony.h"
+#include "sym_proccomm.h"
+#include "sym_timemeas.h"
+#include "sym_messages.h"
+#include "sym_macros.h"
+#include "sym_pack_cut.h"
+#include "sym_pack_array.h"
+#include "sym_master.h"
+#include "sym_master_u.h"
+#include "sym_lp_solver.h"
 #ifdef COMPILE_IN_TM
-#include "tm.h"
+#include "sym_tm.h"
 #ifdef COMPILE_IN_LP
-#include "lp.h"
+#include "sym_lp.h"
 #endif
 #endif
 
@@ -51,9 +51,9 @@
 #  define TEV_NRECV0  TEV_NRECV
 #endif
 
-/*===========================================================================*/
-/* This file implements the SYMPHONY callable API
-/*===========================================================================*/
+/*===========================================================================*\
+ * This file implements the SYMPHONY callable API
+\*===========================================================================*/
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -67,8 +67,7 @@ sym_environment *sym_open_environment()
    Pvmtmask trace_mask;
 #endif
 
-
-   setvbuf(stdout, (char *)NULL, _IOLBF, 0);
+   setvbuf(stdout, (char *)NULL, _IOLBF, 2);
    
    env = (sym_environment *) calloc(1, sizeof(sym_environment));
 
@@ -82,16 +81,11 @@ sym_environment *sym_open_environment()
 			    this process as output from this process itself*/
 #endif
 #endif
-   
-   printf("\n");
-   printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 5.1                      *\n");
-   printf("*   Copyright 2000-2006 Ted Ralphs                    *\n");
-   printf("*   All Rights Reserved.                              *\n");
-   printf("*   Distributed under the Common Public License 1.0   *\n");
-   printf("*******************************************************\n");
-   printf("\n");
 
+#if 0
+   version();
+#endif
+   
    if (initialize_u(env) == FUNCTION_TERMINATED_NORMALLY){
       return(env);
    }else{
@@ -525,14 +519,17 @@ int sym_solve(sym_environment *env)
 #endif
    double start_time, lb;
    struct timeval timeout = {10, 0};
-   double t = 0, total_time = 0;
-   int thread_num;
+   double total_time = 0;
    
    node_desc *rootdesc = env->rootdesc;
    base_desc *base = env->base;
 
    start_time = wall_clock(NULL);
 
+   if (env->par.verbosity >= 0){
+      printf("Solving...\n\n");
+   }
+   
 #ifndef COMPILE_IN_TM
    /*------------------------------------------------------------------------*\
     * Start the tree manager and send the parameters
@@ -895,6 +892,7 @@ int sym_solve(sym_environment *env)
    env->par.tm_par.warm_start = FALSE;
 
 #ifdef COMPILE_IN_LP
+   int thread_num;
    thread_num = env->tm->opt_thread_num;
    if (env->tm->lpp[thread_num]){
       env->par.lp_par.cgl = env->tm->lpp[thread_num]->par.cgl;
@@ -974,7 +972,7 @@ int sym_solve(sym_environment *env)
     * Display the the results and solution data                               
    \*------------------------------------------------------------------------*/
 
-   if (env->par.verbosity >=-1 ){
+   if (env->par.verbosity >= -1 ){
       printf("\n****************************************************\n");
       if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
 	 printf(  "* Optimal Solution Found                           *\n");
@@ -1228,10 +1226,8 @@ int sym_mc_solve(sym_environment *env)
    int i, cp_num;
    double gamma, gamma0, gamma1, tau, slope;
    double start_time;
-   warm_start_desc *ws, *ws1, *ws2;
-   ws_item *head, *tail, *item, *temp;
-   solution_data utopia1;
-   solution_data utopia2;
+   warm_start_desc *ws = NULL, *ws1 = NULL, *ws2 = NULL;
+   ws_item *head = NULL, *tail = NULL, *item = NULL, *temp = NULL;
    solution_data solutions[MAX_NUM_PAIRS];
    int numsolutions = 0, numprobs = 0, numinfeasible = 0;
    solution_pairs pairs[MAX_NUM_PAIRS];
@@ -1241,8 +1237,6 @@ int sym_mc_solve(sym_environment *env)
    int length, termcode;
    int solution1, solution2;
    double utopia[2];
-   node_desc *root= NULL;
-   base_desc *base = NULL;
    double compare_sol_tol, ub = 0.0;
    int binary_search = FALSE;
    
@@ -1998,10 +1992,10 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 {
    int termcode = 0;   
    double t = 0, inf = SYM_INFINITY;
-   int i, j, k, nonzeros = 0;
+   int i = 0;
 
    if ((!numcols && !numrows) || numcols < 0 || numrows <0){
-      printf("sym_load_problem_user():The given problem is empty or incorrect");
+      printf("sym_explicit_load_problem():The given problem is empty or incorrect ");
       printf("problem description!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
@@ -2047,8 +2041,8 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
       if (colub){
 	 memcpy(env->mip->ub, colub, DSIZE * numcols); 
       }else{
-	 for(j = 0; j<env->mip->n; j++){
-	    env->mip->ub[j] = inf;
+	 for(i = 0; i<env->mip->n; i++){
+	    env->mip->ub[i] = inf;
 	 }
       }
 
@@ -2113,8 +2107,8 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 	 env->mip->ub = colub;
       }else{
 	 env->mip->ub = (double *) calloc(numcols, DSIZE);
-	 for(j = 0; j<env->mip->n; j++){
-	    env->mip->ub[j] = inf;
+	 for(i = 0; i<env->mip->n; i++){
+	    env->mip->ub[i] = inf;
 	 }
       }
 
@@ -2313,7 +2307,6 @@ int sym_get_num_elements(sym_environment *env, int *numelems)
 
 int sym_get_col_lower(sym_environment *env, double *collb)
 {
-   int i;
    if (!env->mip || !env->mip->n || !env->mip->lb){
       printf("sym_get_col_lower():There is no loaded mip description or\n");
       printf("there is no loaded column description!\n");
@@ -2808,8 +2801,6 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
 int sym_set_obj2_coeff(sym_environment *env, int index, double value)
 {
 
-   int i;
-
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
        !env->mip->obj2){
       printf("sym_set_obj_coeff():There is no loaded mip description or\n");
@@ -2867,7 +2858,7 @@ int sym_set_col_upper(sym_environment *env, int index, double value)
 
 int sym_set_row_lower(sym_environment *env, int index, double value)
 {
-   double rhs, range, lower, upper, inf = SYM_INFINITY;
+   double rhs, range, lower = 0, upper = 0, inf = SYM_INFINITY;
    char   sense;
    int i;
 
@@ -2959,7 +2950,7 @@ int sym_set_row_lower(sym_environment *env, int index, double value)
 
 int sym_set_row_upper(sym_environment *env, int index, double value)
 {
-   double rhs, range, lower, upper, inf = SYM_INFINITY;
+   double rhs, range, lower = 0, upper = 0, inf = SYM_INFINITY;
    char   sense;
    int i;
 
@@ -3655,7 +3646,7 @@ int sym_add_row(sym_environment *env, int numelems, int *indices,
 int sym_delete_cols(sym_environment *env, int num, int * indices)
 {
 
-   int i, j, k, l,n, nz, temp = 0, numElements = 0, *matBeg, *matInd, *lengths;
+   int i, j, k, l,n, nz, numElements = 0, *matBeg, *matInd, *lengths;
    //FIXME! how about base varnum? If they are to be deleted???
    int index = 0;
    double *matVal, *colLb, *colUb, *objN;
@@ -3669,8 +3660,8 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   int bvarnum = env->base->varnum, bvar_del = 0, bind = 0;
-   int user_size = env->rootdesc->uind.size, uind_del = 0, uind = 0;
+   int bvarnum = env->base->varnum, bind = 0;
+   int user_size = env->rootdesc->uind.size, uind = 0;
    int * bvar_ind = env->base->userind; 
    int * user_ind = env->rootdesc->uind.list;
    
@@ -3922,7 +3913,7 @@ int sym_write_warm_start_desc(warm_start_desc *ws, char *file)
 {
  
    FILE * f = NULL;
-   int i, j, temp;
+   int i, j;
    cut_data ** cuts;
    problem_stat stat;
    node_times compT;
@@ -4030,7 +4021,7 @@ int sym_write_warm_start_desc(warm_start_desc *ws, char *file)
 warm_start_desc * sym_read_warm_start(char *file)
 {   
    FILE * f;
-   char str[80], str2[80], str3[80], str4[80];
+   char str[80];
    int i=0, j=0, num=0, ch=0;
    int temp =0;
    cut_data *cut;
@@ -4177,7 +4168,6 @@ void sym_delete_warm_start(warm_start_desc *ws)
 warm_start_desc * sym_get_warm_start(sym_environment *env, int copy_warm_start)
 {
    
-   int i, num=0, allocated_cut_num = 0;
    warm_start_desc * ws;
 
    if (!env->warm_start){
@@ -4914,12 +4904,10 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
 int sym_get_dbl_param(sym_environment *env, char *key, double *value)
 {
 
-   double timeout;
-
    tm_params *tm_par = &env->par.tm_par;
    lp_params *lp_par = &env->par.lp_par;
    cg_params *cg_par = &env->par.cg_par;
-   cp_params *cp_par = &env->par.cp_par;
+   //cp_params *cp_par = &env->par.cp_par;
    
    dg_params *dg_par = &env->par.dg_par;
    
@@ -5102,12 +5090,10 @@ int sym_get_dbl_param(sym_environment *env, char *key, double *value)
 int sym_get_str_param(sym_environment *env, char *key, char **value)
 {
 
-   int len, i;
-   
    tm_params *tm_par = &env->par.tm_par;
-   lp_params *lp_par = &env->par.lp_par;
-   cg_params *cg_par = &env->par.cg_par;
-   cp_params *cp_par = &env->par.cp_par;
+   //lp_params *lp_par = &env->par.lp_par;
+   //cg_params *cg_par = &env->par.cg_par;
+   //cp_params *cp_par = &env->par.cp_par;
    
    dg_params *dg_par = &env->par.dg_par;
    
@@ -5443,7 +5429,7 @@ int sym_test(sym_environment *env)
   verbosity = sym_get_int_param(env, "verbosity", &verbosity);
 
   sym_set_int_param(env, "verbosity", -10);
-  
+
   int i, file_num = 12;
   char mps_files[12][MAX_FILE_NAME_LENGTH +1] = {
     "air03", "dcmulti", "egout", "flugpl", "khb05250", "l152lav", 
@@ -5458,8 +5444,24 @@ int sym_test(sym_environment *env)
   double *obj_val = (double *)calloc(DSIZE,file_num);
   double tol = 1e-03;
 
+  size_t size = 1000;
+  char* buf = 0;
+  while (true) {
+     buf = (char*)malloc(CSIZE*size);
+     if (getcwd(buf, size))
+	break;
+     FREE(buf);
+     buf = 0;
+     size = 2*size;
+  }
+  char dirsep = buf[0] == '/' ? '/' : '\\';
+  FREE(buf);
+  
   if (strcmp(env->par.test_dir, "") == 0){ 
-    strcpy(mps_dir, "../../Data/miplib3");
+     if (dirsep == '/')
+	strcpy(mps_dir, "../../Data/miplib3");
+     else 
+	strcpy(mps_dir, "..\\..\\Data\\miplib3");	
   } else{
     strcpy(mps_dir, env->par.test_dir);
   }
@@ -5473,8 +5475,10 @@ int sym_test(sym_environment *env)
     }
 
     strcpy(infile, "");
-    sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
-
+    if (dirsep == '/')
+       sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
+    else
+       sprintf(infile, "%s%s%s", mps_dir, "\\", mps_files[i]);   
     if( termcode = sym_read_mps(env, infile) < 0)
       return(termcode);
 

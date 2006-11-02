@@ -14,9 +14,9 @@
 
 #include <stdlib.h>        /* has malloc() in AIX ... */
 
-#include "BB_constants.h"
-#include "pack_cut.h"
-#include "proccomm.h"
+#include "sym_constants.h"
+#include "sym_pack_cut.h"
+#include "sym_proccomm.h"
 
 /*===========================================================================*/
 

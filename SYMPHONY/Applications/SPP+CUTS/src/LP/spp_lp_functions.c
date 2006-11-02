@@ -21,9 +21,9 @@
 #include <memory.h>
 
 /* SYMPHONY include files */
-#include "BB_types.h"
-#include "BB_macros.h"
-#include "BB_constants.h"
+#include "sym_types.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
 #include "qsortucb.h"
 
 /* SPP include files */
@@ -329,7 +329,7 @@ void cut_to_row(spp_lp_problem *spp, int n, var_desc **vars, cut_data *cut,
  *===========================================================================*/
 
 /* Needed to get access to the LP problem data structure */
-#include "lp.h"
+#include "sym_lp.h"
 
 void lift_cut_in_lp(spp_lp_problem *spp, int from, int n,
 		    var_desc **vars, cut_data **cut, int *plifted_cutnum,

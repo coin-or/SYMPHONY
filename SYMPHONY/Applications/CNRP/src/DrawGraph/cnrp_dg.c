@@ -18,9 +18,9 @@
 #include <math.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "proccomm.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_proccomm.h"
 
 /* CNRP include files */
 #include "cnrp_dg.h"

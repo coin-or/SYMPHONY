@@ -17,7 +17,7 @@
 #define _NETWORK
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 #include "qsortucb.h"
 
 /* VRP include files */
@@ -41,6 +41,16 @@ typedef struct EDGE{
    char scanned;
    char tree_edge;
    char deleted;
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   float q;
+   int row;
+   char can_be_doubled; /* tells whether this edge can potentially be used
+			   for a 1-customer route */
+   struct EDGE  *other_data; 
+#ifdef COMPILE_OUR_DECOMP
+   char status;
+#endif
+   /*___END_EXPERIMENTAL_SECTION___*/
 }edge;
 
 typedef struct ELIST{
@@ -48,6 +58,11 @@ typedef struct ELIST{
    struct EDGE   *data;      /* the data of the edge */
    int            other_end; /* the other end of the edge */
    struct VERTEX *other;
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   char superlink;
+   int edgenum;
+   struct EDGE **edges;
+   /*___END_EXPERIMENTAL_SECTION___*/
 }elist;
 
 typedef struct VERTEX{
@@ -68,6 +83,9 @@ typedef struct VERTEX{
   int           low;
   char          is_art_point;
   char          deleted; 
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+  float         r;
+   /*___END_EXPERIMENTAL_SECTION___*/
 }vertex;
 
 typedef struct NETWORK{
@@ -83,10 +101,20 @@ typedef struct NETWORK{
   int            *compnodes;  /* number of nodes in each component */
   double         *new_demand; /* the amounts of demand for each node that gets
 				 added to it when the network is contracted */
+  /*__BEGIN_EXPERIMENTAL_SECTION__*/
+  struct VERTEX **tnodes; /* a binary tree of the exiisting vertices used by
+			     the min_cut routine */
+  struct VERTEX **enodes; /* a list of the nodes that still exist */
+  /*___END_EXPERIMENTAL_SECTION___*/
 }network;
 
 network *createnet PROTO((int *xind, double *xval, int edgenum, double etol,
 			  int *edges, int *demands, int vertnum));
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+network *createnet2 PROTO((int *xind, double *xval, int edgenum, double etol,
+			   int *edges, int *demands, int vertnum,
+			   char *status));
+/*___END_EXPERIMENTAL_SECTION___*/
 int connected PROTO((network *n, int *compnodes, int *compdemands,
 		   int *compmembers, double *compcuts, double *compdensity));
 void free_net PROTO((network *n));

@@ -27,6 +27,7 @@ options and no post-processing.
 % user_receive_cg_data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \firstfuncdef{user\_receive\_cg\_data}
+\sindex[cf]{user\_receive\_cg\_data}
 \label{user_receive_cg_data}
 \begin{verbatim}
 int user_receive_cg_data (void **user)
@@ -40,8 +41,9 @@ This function only has to be filled out for parallel execution and only if the
 TM, LP, and CG modules are all compiled as separate modules. This would not be
 typical. If needed, the user can use this function to receive problem-specific
 data needed for computation in the CG module. The same data must be received
-here that was sent in the \hyperref{{\tt user\_send\_cg\_data()}}{{\tt
-user\_send\_cg\_data()} (see Section }{)}{user_send_cg_data} function in the
+here that was sent in the \hyperref{{\tt user\_send\_cg\_data()}}
+{\ptt{user\_send\_cg\_data()} (see Section }{)}{user_send_cg_data} 
+function in the
 master module. The user has to allocate space for all the data structures,
 including {\tt user} itself. Note that some or all of this may be done in the
 function {\tt \htmlref{user\_send\_cg\_data()}{user_send_cg_data}} if the Tree
@@ -73,6 +75,7 @@ information.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_receive\_lp\_solution\_cg}
+\sindex[cf]{user\_receive\_lp\_solution\_cg}
 \begin{verbatim}
 int user_receive_lp_solution_cg(void *user)
 \end{verbatim}
@@ -119,6 +122,7 @@ as well as the objective value and upper bound.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_find\_cuts}
+\sindex[cf]{user\_find\_cuts}
 \label{user_find_cuts}
 \begin{verbatim}
 int user_find_cuts(void *user, int varnum, int iter_num, int level,
@@ -138,7 +142,7 @@ shared memory.  The argument of this function is a pointer to the cut to be
 sent. See Section \ref{user-written-lp} for a description of this data
 structure. Each user-defined cut assigned a type and a designated packed
 form. Each user-defined type must be recognized by the user's \hyperref{{\tt
-user\_unpack\_cuts()}}{{\tt user\_unpack\_cuts()}}{}{user_unpack_cuts}
+user\_unpack\_cuts()}}{\ptt{user\_unpack\_cuts()}}{}{user_unpack_cuts}
 function in the master module. If the user wants a user-defined cut to be
 added to the cut pool in case it proves to be effective in the LP, then {\tt
 new\_cut->name} should be set to {\tt CUT\_\_SEND\_TO\_CP}. In this case, the
@@ -167,7 +171,7 @@ or whether it is only to be used locally.\\
 The only output of the \texttt{user\_find\_cuts()} function is the number of
 cuts generated and this value is returned in the last argument. For options to
 generate generic cuts automatically using the COIN Cut Generation Library, see
-the function \hyperref{{\tt user\_generate\_cuts\_in\_lp()}}{{\tt
+the function \hyperref{\ptt{user\_generate\_cuts\_in\_lp()}}{{\tt
 user\_generate\_cuts\_in\_lp()}}{}{user_generate_cuts_in_lp}\\
 \\
 
@@ -215,6 +219,7 @@ and sent to the LP. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{user_check_validity_of_cut}
 \functiondef{user\_check\_validity\_of\_cut}
+\sindex[cf]{user\_check\_validity\_of\_cut}
 \begin{verbatim}
 int user_check_validity_of_cut(void *user, cut_data *new_cut)
 \end{verbatim}
@@ -258,6 +263,7 @@ checked. \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_free\_cg}
+\sindex[cf]{user\_free\_cg}
 \begin{verbatim}
 int user_free_cg(void **user)
 \end{verbatim}

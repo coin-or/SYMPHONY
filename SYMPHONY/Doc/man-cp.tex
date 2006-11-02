@@ -29,6 +29,7 @@ options and no post-processing.
 
 \firstfuncdef{user\_receive\_cp\_data}
 \label{user_receive_cp_data}
+\sindex[cf]{user\_receive\_cp\_data}
 \begin{verbatim}
 int user_receive_cp_data(void **user)
 \end{verbatim}
@@ -38,7 +39,7 @@ int user_receive_cp_data(void **user)
 \item[Description:] \hfill
 
 The user has to receive here all problem-specific information sent
-from \hyperref{{\tt user\_send\_cp\_data()}}{{\tt user\_send\_cp\_data()}
+from \hyperref{{\tt user\_send\_cp\_data()}}{\ptt{user\_send\_cp\_data()}
 (see Section }{)}{user_send_cp_data} function in the master module.
 The user has to allocate space for all the data structures, including
 {\tt user} itself. Note that this function is only called if the
@@ -74,6 +75,7 @@ description of that function for more details.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_receive\_lp\_solution\_cp}
+\sindex[cf]{user\_receive\_lp\_solution\_cp}
 \begin{verbatim}
 void user_receive_lp_solution_cp(void *user)
 \end{verbatim}
@@ -118,6 +120,7 @@ tree node.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_prepare\_to\_check\_cuts}
+\sindex[cf]{user\_prepare\_to\_check\_cuts}
 \label{user_prepare_to_check_cuts}
 \begin{verbatim}
 int user_prepare_to_check_cuts(void *user, int varnum, int *indices, 
@@ -162,6 +165,7 @@ variables. \\
 
 \functiondef{user\_check\_cut}
 \label{user_check_cuts}
+\sindex[cf]{user\_check\_cut}
 \begin{verbatim}
 int user_check_cut(void *user, double lpetol, int varnum, 
                    int *indices, double *values, cut_data *cut,
@@ -220,6 +224,7 @@ the previous function.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_finished\_checking\_cuts}
+\sindex[cf]{user\_finished\_checking\_cuts}
 \begin{verbatim}
 int user_finished_checking_cuts(void *user)
 \end{verbatim}
@@ -258,6 +263,7 @@ if he received and stored the LP solution himself he can delete it now.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_free\_cp}
+\sindex[cf]{user\_free\_cp}
 \begin{verbatim}
 int user_free_cp(void **user)
 \end{verbatim}

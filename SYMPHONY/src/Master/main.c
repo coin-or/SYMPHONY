@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 
 #else
 
-#include "symphony_api.h"
+#include "symphony.h"
 #ifdef HAS_READLINE
 #include <pwd.h>
 #include <readline/readline.h>
@@ -141,6 +141,10 @@ int main(int argc, char **argv)
    if (argc > 1){
    
       sym_parse_command_line(env, argc, argv);
+
+      if (env->par.verbosity >= 0){
+	 version();
+      }
       
       if (env->par.test){
 
@@ -149,14 +153,16 @@ int main(int argc, char **argv)
       }else{
 	 
 	 if ((termcode = sym_load_problem(env)) < 0){
-	    printf("\nFatal errors encountered. Exiting with code %i.\n\n",
+	    printf("\nFatal errors encountered. Exiting with code %i.\n",
 		   termcode);
+	    printf("See sym_return_values.h for meaning of code.\n\n");
 	    exit(termcode);
 	 }
 	 
 	 if ((termcode = sym_find_initial_bounds(env)) < 0){
-	    printf("\nFatal errors encountered. Exiting with code %i.\n\n",
+	    printf("\nFatal errors encountered. Exiting with code %i.\n",
 		   termcode);
+	    printf("See sym_return_values.h for meaning of code.\n\n");
 	    exit(termcode);
 	 }
 
@@ -167,16 +173,16 @@ int main(int argc, char **argv)
 
      FILE *f = NULL;
      char *line = NULL;
-     char *infile = NULL;     
      char args[3][MAX_LINE_LENGTH + 1];
      char param[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH+1];
      char ext[5];     
      int last_dot = 0, j, terminate = FALSE, termcode = 0, int_value = 0;
      int last_level = 0;
      char * is_int = NULL;
-     double *colsol = NULL, objval = 0.0, initial_time = 0.0, start_time = 0.0;
+     double objval = 0.0, initial_time = 0.0, start_time = 0.0;
      double finish_time = 0.0, dbl_value = 0;
 
+     version();
      printf("***** WELCOME TO SYMPHONY INTERACTIVE MIP SOLVER ******\n\n"
 	    "Please type 'help'/'?' to see the main commands!\n\n");
 
@@ -615,7 +621,7 @@ int sym_help(char *line)
 	   "generate_cgl_lift_and_project_cuts : whether or not to use cgl lift and project cuts (default: 0)\n"
 	   "node_selection_rule                : set the node selection rule/search strategy (default: 5)\n"
 	   "strong_branching_candidate_num     : set the stong branching candidates number (default: var)\n"
-	   "compare_candidates_dafult        : set the rule to compare the candidates (defualt: 2)\n"
+	   "compare_candidates_default         : set the rule to compare the candidates (defualt: 2)\n"
 	   "select_child_default               : set the rule to select the children (default: 0)\n"
 	   "diving_threshold                   : set diving threshold (default: 0)\n"
 	   "diving_strategy                    : set diving strategy (default: 0)\n"

@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "proccomm.h"
+#include "sym_proccomm.h"
 
 #ifdef __PVM__
 

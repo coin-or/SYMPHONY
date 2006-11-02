@@ -16,7 +16,7 @@
 #ifndef _COMPUTE_COST_H
 #define _COMPUTE_COST_H
 
-#include "proto.h"
+#include "sym_proto.h"
 #include "vrp_common_types.h"
 
 int compute_icost PROTO((distances *dist, int v0, int v1));

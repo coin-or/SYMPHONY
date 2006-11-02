@@ -24,8 +24,8 @@
 #include <sys/types.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "proccomm.h"
+#include "sym_constants.h"
+#include "sym_proccomm.h"
 #include "qsortucb.h"
 
 /* CNRP include files */
@@ -43,6 +43,21 @@ int is_same_edge(const void *ed0, const void *ed1)
 
 /*===========================================================================*/
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+/* This comparison function can be used to sort lexicographically */
+/*===========================================================================*/
+
+int is_same_edge(const void *ed0, const void *ed1)
+{
+   return(((edge_data *)ed0)->v0 - ((edge_data *)ed1)->v0 ?
+	  ((edge_data *)ed0)->v0 - ((edge_data *)ed1)->v0 :
+	  ((edge_data *)ed0)->v1 - ((edge_data *)ed1)->v1);
+}
+
+/*===========================================================================*/
+#endif
+/*__END_EXPERIMENTAL_SECTION__*/
 void delete_dup_edges(small_graph *g)
 {
    edge_data *ed0, *ed1;

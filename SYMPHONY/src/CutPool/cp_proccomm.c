@@ -16,13 +16,13 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "BB_macros.h"
-#include "BB_constants.h"
-#include "proccomm.h"
-#include "messages.h"
-#include "cp.h"
-#include "pack_cut.h"
-#include "timemeas.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
+#include "sym_proccomm.h"
+#include "sym_messages.h"
+#include "sym_cp.h"
+#include "sym_pack_cut.h"
+#include "sym_timemeas.h"
 
 /*===========================================================================*/
 

@@ -37,10 +37,10 @@ COININCDIR = @abs_include_dir@
 COINLIBDIR = @abs_lib_dir@
 
 # Directoy with SYMPHONY header files 
-SYMLIBDIR = @SYMSRCDIR@
+SYMINCDIR = @SYMINCDIR@
 
 # Directoy with SYMPHONY library
-SYMINCDIR = @SYMINCDIR@
+SYMLIBDIR = @SYMSRCDIR@
 
 #Directory for LP solver
 GLPKINCDIR = @GLPKINCDIR@

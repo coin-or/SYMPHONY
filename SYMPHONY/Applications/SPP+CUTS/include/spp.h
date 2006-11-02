@@ -17,7 +17,7 @@
 #ifndef _SPP_H
 #define _SPP_H
 
-#include "proto.h"
+#include "sym_proto.h"
 
 #include "spp_types.h"
 #include "spp_constants.h"

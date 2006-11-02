@@ -20,8 +20,8 @@
 #include <math.h>
 
 /* SYMPHONY include files */
-#include "BB_macros.h"
-#include "symphony_api.h"
+#include "sym_macros.h"
+#include "symphony.h"
 
 /* CNRP include files */
 #include "cnrp_const.h"

@@ -18,8 +18,8 @@
 #include <stdio.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "cp_u.h"
+#include "sym_constants.h"
+#include "sym_cp_u.h"
 
 /* SPP include files */
 #include "spp.h"

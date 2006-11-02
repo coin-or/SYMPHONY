@@ -42,7 +42,7 @@ AC_COPYRIGHT([
 
 # List one file in the package so that the configure script can test
 # whether the package is actually there
-AC_CONFIG_SRCDIR(include/symphony_api.h)
+AC_CONFIG_SRCDIR(include/symphony.h)
 
 # Where should everything be installed by default?  Here, we want it
 # to be installed directly in 'bin', 'lib', 'include' subdirectories
@@ -182,7 +182,6 @@ test $coin_has_xpress = true])
 #                       Add the options                                     #
 #############################################################################
 
-#FIXME! Should we carry this to root config file?
 #---------------------------------------------------------------------------#
 # USE_CGL_CUTS
 #---------------------------------------------------------------------------#
@@ -225,24 +224,6 @@ else
 fi
 
 AM_CONDITIONAL(USE_GMPL, [test "$sym_gmpl" = yes])
-
-#FIXME! NO WAY TO COMPILE OSISYM! all other packages refer to SYM instead of
-# SYMPHONY
-#---------------------------------------------------------------------------#
-# USE_OSI_INTERFACE
-#---------------------------------------------------------------------------#
-AC_MSG_CHECKING([whether to compile osi interface])
-AC_ARG_WITH([osi-interface],
-[AC_HELP_STRING([--with-osi-interface],
-                [compile with SymOsi interface])],
-		[sym_osi=$withval],[])
-
-if test "$sym_osi" = yes; then
-   AC_MSG_RESULT([yes])
- else
-   AC_MSG_RESULT([no])
- fi
-AM_CONDITIONAL(USE_OSI_INTERFACE, [test "$sym_osi" = yes])
 
 #---------------------------------------------------------------------------#
 # SENSITIVITY_ANALYSIS
@@ -444,6 +425,24 @@ esac],
 
 AM_CONDITIONAL(DRAWGRAPH, [test $sym_graph = true])
 
+#---------------------------------------------------------------------------#
+# STATIC EXECUTABLE
+#---------------------------------------------------------------------------#
+
+AC_ARG_ENABLE([static-executable],
+[AC_HELP_STRING([--enable-static-executable],
+                [create a complete static executable])],
+[case "${enableval}" in
+   yes) sym_static_exe=true
+   ;;
+   no)  sym_static_exe=false
+   ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for --enable-static-executable)
+   ;;
+esac],
+[sym_static_exe=false])
+
+AM_CONDITIONAL(STATICEXE, [test $sym_static_exe = true])
 
 #############################################################################
 #              Check the OS and add default defs                            #
@@ -714,6 +713,41 @@ AC_SUBST(CPEXT)
 AC_SUBST(TMEXT)
 AC_SUBST(MASTEREXT)
 
+##############################################################################
+#                           OPENMP defs                                     #
+##############################################################################
+
+
+AC_ARG_ENABLE([openmp],
+[AC_HELP_STRING([--enable-openmp],
+                [compile in OpenMP features])],
+[case "${enableval}" in
+   yes) sym_openmp=true
+   ;;
+   no)  sym_openmp=false
+   ;;
+   *) AC_MSG_ERROR(Bad value ${enableval} for --enable-openmp)
+   ;;
+esac],
+[sym_openmp=false])
+
+if test $sym_openmp = true; then 
+   AC_MSG_CHECKING([G++ version])
+   fopenmp_version=4.2
+   gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
+   get_gcc_version=`$CXX -dumpversion`
+   gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
+   major_gcc_version=`echo ${gcc_version:0:3}`
+   AC_MSG_RESULT([$get_gcc_version])
+   if test ${major_gcc_version} -lt ${gcc_required_version}; then
+       AC_MSG_ERROR(OpenMP feautures are supported by G++ 4.2.0 or higher.)
+   SYMPDEFS="$SYMPDEFS -D_OPENMP"
+   SYMDEFS="$SYMDEFS -D_OPENMP"
+   fi
+fi      
+
+AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
+
 #############################################################################
 #                       Other third party software                          #
 #############################################################################
@@ -728,11 +762,6 @@ AC_SUBST(MASTEREXT)
 # In case this is a VPATH configuration we need to make sure that the
 # input files for the examples are available in the VPATH directory.
 
-#AC_COIN_VPATH_LINK(examples/sudoku_sample.csv)
-#AC_COIN_VPATH_LINK(examples/quad.mps)
-#AC_COIN_VPATH_LINK(examples/quad2.mps)
-#AC_COIN_VPATH_LINK(examples/quad2.mps)
-
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
@@ -742,20 +771,6 @@ AC_SUBST(SYMINCDIR)
 AC_SUBST(SYMSRCDIR)
 SYMINCDIR=`cd $srcdir; pwd`/include
 SYMSRCDIR=`cd $srcdir; pwd`/src
-
-dnl SYMSOURCES="\
-dnl 	$SYMSRCDIR/Common      :\
-dnl 	$SYMSRCDIR/LP          :\
-dnl 	$SYMSRCDIR/CutGen      :\
-dnl 	$SYMSRCDIR/CutPool     :\
-dnl 	$SYMSRCDIR/DrawGraph   :\
-dnl 	$SYMSRCDIR/Master      :\
-dnl 	$SYMSRCDIR/../include     :\
-dnl 	$SYMSRCDIR/ :\
-dnl 	$SYMSRCDIR/TreeManager"
-
-dnl VPATH="$SYMSRCDIR/Master"
-dnl AC_SUBST(VPATH)
 
 # To be used in applications: default SYMPHONY defs
 AC_SUBST(SYMDEFS)
@@ -769,15 +784,23 @@ SYMAPPLDIR=`pwd`/Applications
 
 #FIXME-Debugging conditional, for now
 
-AM_CONDITIONAL(SYM_DEBUG, [ test $coin_debug_compile = true])
+#AM_CONDITIONAL(SYM_DEBUG, [ test $coin_debug_compile = true])
 
-#FIXME-For now, redefine CFLAGS and CXXFLAGS
-CFLAGS=
-CXXFLAGS=
-if test $coin_debug_compile = true; then
-   CFLAGS="-g -pipe"
-   CXXFLAGS="$CFLAGS"
+#Add openmp flag
+if test $sym_openmp = true; then
+   CXXFLAGS="$CXXFLAGS -fopenmp"
 fi
+
+#Ignore warnings about unrecognized pragma lines, deprecated string conversions
+CXXFLAGS="$CXXFLAGS -Wno-unknown-pragmas -Wno-write-strings"
+
+#Ignore warnings about comparisons of signed and unsigned values and 
+#casting const pointers to ordinary pointers
+CXXFLAGS="$CXXFLAGS -Wno-sign-compare -Wno-cast-qual"
+
+#Set CFLAGS to CXXFLAGS since we are using g++
+CFLAGS=$CXXFLAGS
+
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 

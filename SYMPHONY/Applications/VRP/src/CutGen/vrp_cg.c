@@ -18,16 +18,30 @@
 #include <string.h>
 
 /* SYMPHONY include files */
-#include "BB_macros.h"
-#include "BB_constants.h"
-#include "proccomm.h"
-#include "cg_u.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
+#include "sym_proccomm.h"
+#include "sym_cg_u.h"
 
 /* VRP include files */
 #include "vrp_cg.h"
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_DECOMP
+#include "my_decomp.h"
+#include "decomp.h"
+#endif
+#include "sym_dg_params.h"
+#include "vrp_dg.h"
+/*___END_EXPERIMENTAL_SECTION___*/
 #include "vrp_macros.h"
 #include "vrp_const.h"
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+#include "util.h"
+CCrandstate rand_state;
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
 
 /*===========================================================================*/
 
@@ -81,6 +95,17 @@ int user_receive_cg_data(void **user, int dg_id)
     * Set up some data structures
    \*------------------------------------------------------------------------*/
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_OUR_DECOMP   
+   if (vrp->par.do_our_decomp){
+      vrp->cost = (int *) calloc(edgenum, sizeof(int));
+      receive_int_array(vrp->cost, edgenum);
+      usr_open_decomp_lp( get_cg_ptr(NULL), edgenum );
+   }
+
+   vrp->last_decomp_index = -1;
+#endif   
+/*___END_EXPERIMENTAL_SECTION___*/
    vrp->in_set = (char *) calloc(vrp->vertnum, sizeof(char));
    vrp->ref = (int *) malloc(vrp->vertnum*sizeof(int));
    vrp->new_demand = (int *) malloc(vrp->vertnum*sizeof(int));
@@ -127,6 +152,17 @@ int user_free_cg(void **user)
    if (vrp->feas_sol_size)
       FREE(vrp->feas_sol);
 #endif
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_OUR_DECOMP
+#if !defined(COMPILE_IN_CG) 
+   if (vrp->par.do_our_decomp){
+      close_decomp_lp( get_cg_ptr(NULL) );
+      FREE(vrp->cost);
+   }
+#endif
+   CClp_close();
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
 #pragma omp master
    FREE(vrp->demand);
    FREE(vrp->edges);
@@ -160,6 +196,10 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    vertex *verts = NULL;
    int *compdemands = NULL, *compnodes = NULL, *compnodes_copy = NULL;
    int *compmembers = NULL, comp_num = 0;
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   int *compdemands_copy = NULL;
+   double *compcuts_copy = NULL, *compdensity = NULL, density;
+   /*___END_EXPERIMENTAL_SECTION___*/
    double node_cut, max_node_cut, *compcuts = NULL;
    int rcnt, cur_bins = 0, k;
    char **coef_list;
@@ -176,6 +216,11 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    char *cut_list = vrp->cut_list;
 
    elist *cur_edge1 = NULL, *cur_edge2 = NULL;
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_OUR_DECOMP
+   edge *edge_pt;
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
    int node1 = 0, node2 = 0;
    int *demand = vrp->demand;
    int *new_demand = vrp->new_demand;
@@ -185,7 +230,24 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    char *coef; 
 
    if (iter_num == 1) SRANDOM(1);
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+   CCutil_sprand(1, &rand_state);
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
    
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+
+#if 0   
+   if (vrp->dg_id && vrp->par.verbosity > 3){
+      sprintf(name, "support graph");
+      display_support_graph(vrp->dg_id, (p->cur_sol.xindex == 0 &&
+			    p->cur_sol.xiter_num == 1) ? TRUE: FALSE, name,
+			    varnum, xind, xval,
+			    etol, CTOI_WAIT_FOR_CLICK_AND_REPORT);
+   }      
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
    
    /* This creates a fractional graph representing the LP solution */
    n = createnet(indices, values, varnum, etol, vrp->edges, demand, vertnum);
@@ -206,7 +268,16 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }      
 #endif
    
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+   if (!vrp->par.always_do_mincut){/*user_par.always_do_mincut indicates
+				     whether we should just always do the
+				     min_cut routine or whether we should also
+				     try this routine*/
+/*___END_EXPERIMENTAL_SECTION___*/
+/*UNCOMMENT FOR PRODUCTION CODE*/
+#if 0
    {
+#endif
       verts = n->verts;
       if (which_connected_routine == BOTH)
 	 which_connected_routine = CONNECTED;
@@ -215,6 +286,14 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
       new_cut->size = cut_size;
       compnodes_copy = (int *) malloc((vertnum + 1) * sizeof(int));
       compmembers = (int *) malloc((vertnum + 1) * sizeof(int));
+      /*__BEGIN_EXPERIMENTAL_SECTION__*/
+      compdemands_copy = (int *) calloc(vertnum + 1, sizeof(int));
+      compcuts_copy = (double *) calloc(vertnum + 1, sizeof(double));
+#ifdef COMPILE_OUR_DECOMP
+      compdensity = vrp->par.do_our_decomp ?
+	 (double *) calloc(vertnum+1, sizeof(double)) : NULL;
+#endif
+      /*___END_EXPERIMENTAL_SECTION___*/
       
       do{
 	 compnodes = (int *) calloc(vertnum + 1, sizeof(int));
@@ -228,14 +307,33 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	 rcnt = (which_connected_routine == BICONNECTED ?
 		      biconnected(n, compnodes, compdemands, compcuts) :
 		      connected(n, compnodes, compdemands, compmembers,
+				/*__BEGIN_EXPERIMENTAL_SECTION__*/
+				compcuts, compdensity));
+	                        /*___END_EXPERIMENTAL_SECTION___*/
+	                        /*UNCOMMENT FOR PRODUCTION CODE*/
+#if 0
 				compcuts, NULL));
+#endif
 
 	 /* copy the arrays as they will be needed later */
 	 if (!which_connected_routine &&
+	     /*__BEGIN_EXPERIMENTAL_SECTION__*/
+	     (vrp->par.do_greedy || vrp->par.do_our_decomp)){
+	    /*___END_EXPERIMENTAL_SECTION___*/
+	    /*UNCOMMENT FOR PRODUCTION CODE*/
+#if 0
 	    vrp->par.do_greedy){
+#endif
 	    compnodes_copy = (int *) memcpy((char *)compnodes_copy, 
 					    (char*)compnodes,
 					    (vertnum+1)*sizeof(int));
+	    /*__BEGIN_EXPERIMENTAL_SECTION__*/
+	    compdemands_copy = (int *) memcpy((char *)compdemands_copy,
+				       (char *)compdemands, (vertnum+1)*ISIZE);
+	    compcuts_copy = (double *) memcpy((char *)compcuts_copy,
+					      (char *)compcuts,
+					      (vertnum+1)*DSIZE);
+	    /*___END_EXPERIMENTAL_SECTION___*/
 	    n->compnodes = compnodes_copy;
 	    comp_num = rcnt;
 	 }
@@ -341,7 +439,19 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 	     && which_connected_routine < 2);
    }
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+   if (!*(num_cuts) && vrp->par.do_mincut){
+      min_cut(vrp, n, etol);
+   }
+#endif
+   
+   if (!vrp->par.do_greedy && !vrp->par.do_our_decomp){
+/*___END_EXPERIMENTAL_SECTION___*/
+/*UNCOMMENT FOR PRODUCTION CODE*/
+#if 0
    if (!vrp->par.do_greedy){
+#endif
       free_net(n);
       return(USER_SUCCESS);
    }
@@ -426,6 +536,15 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 			       num_cuts, alloc_cuts); 
       }
    }
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0    
+   if (!(*num_cuts) && comp_num==1){
+      greedy_shrinking2_one(n, capacity, etol, new_cut, in_set,
+			    cut_val, num_routes, new_demand, cuts
+			    num_cuts, alloc_cuts);
+   }
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
 
 #ifdef DO_TSP_CUTS
    if (!(*num_cuts) && vrp->par.which_tsp_cuts){
@@ -434,15 +553,255 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
 #endif
    
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+   FREE(compdemands_copy);
+   FREE(compcuts_copy);
+   density = n->edgenum/n->vertnum;
+/*___END_EXPERIMENTAL_SECTION___*/
    FREE(compmembers);
    FREE(new_cut);
    free_net(n);
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_OUR_DECOMP
+   if (!(*num_cuts) &&  vrp->par.do_our_decomp &&
+       (vrp->last_decomp_index != index ||
+	(vrp->last_decomp_index == index &&
+	 (objval - vrp->last_objval)/ub >= vrp->par.gap_threshold))){
+      if (!vrp->par.decomp_decompose){
+	 comp_num = 1;
+	 compdensity[1] = density;
+	 compnodes_copy[1] = vertnum - 1;
+      }
+      for (i = 1; i <= comp_num; i++){
+	 if (compdensity[i] < vrp->par.graph_density_threshold &&
+	     compnodes_copy[i] > 3){
+	    vrp->last_decomp_index = index;
+	    vrp->last_objval = objval;
+#if 0
+	    ind_sort(indices, values, varnum);*/
+#endif
+	    /*need to recreate the network as it has been altered*/
+	    vrp->n = n = status ? createnet2(indices, values, varnum, etol,
+					     vrp->edges, demand, vertnum,
+					     status) :
+	                          createnet(indices, values, varnum, etol,
+					    vrp->edges, demand, vertnum);
+
+	    /* fill out the cost fields */
+	    for (edge_pt=n->edges+n->edgenum-1; edge_pt >= n->edges; edge_pt--)
+	       edge_pt->cost = vrp->cost[INDEX(edge_pt->v0, edge_pt->v1)];
+	    
+#if 0
+	    aux = n->edgenum-n->verts[0].degree;
+	    aux /= n->vertnum;
+	    printf("Calling decomp: density %f , depot degree %d, obj %f, ",
+		   aux, n->verts[0].degree, p->cur_sol.objval);
+	    printf("level %d  \n", p->cur_sol.xlevel);
+	    fprintf("Calling decomp: density %f , depot degree %d, obj %f, ",
+		    aux, n->verts[0].degree, p->cur_sol.objval);
+	    fprintf("level %d  \n", p->cur_sol.xlevel);
+#endif
+	    vrp_decomp(comp_num, compdensity);
+	    free_net(n);
+	    break;
+	 }
+      }
+   }
+#endif
+
+   FREE(compdensity);
+/*___END_EXPERIMENTAL_SECTION___*/
    FREE(compnodes_copy);
    
    return(USER_SUCCESS);
 }
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+/*This is the original version*/
+int user_find_cuts(void *user, int xlength, int *xind,
+		   double *xval, double etol, int *pnumcuts)
+{
+   vrp_cg_problem *vrp = (vrp_cg_problem *)user;
+   int vertnum = vrp->vertnum;
+   network *n;
+   vertex *verts;
+   int *compdemands = NULL;
+   double *compcuts = NULL, node_cut, max_node_cut;
+   int rcnt, cur_bins = 0, k;
+   char **coef_list, name[20];
+   int i, *compnodes = NULL, max_node;
+   int num_cuts = 0;
+   double cur_slack = 0.0;
+   int capacity = vrp->capacity;
+   int cut_size = (vrp->vertnum >> DELETE_POWER) + 1;
+   cut_data *new_cut;
+   elist *cur_edge = NULL;
+   int which_connected_routine = vrp->par.which_connected_routine;
+   
+   if (vrp->dg_id && vrp->par.verbosity > 3){
+      sprintf(name, "support graph");
+      /*display_support_graph(vrp->dg_id, (p->cur_sol->xindex == 0 &&
+			    p->cur_sol->xiter_num == 1) ? TRUE: FALSE, name,
+			    p->cur_sol->xlength, p->cur_sol->xind,
+			    p->cur_sol->xval,
+			    etol, CTOI_WAIT_FOR_CLICK_AND_REPORT);*/
+   }      
+
+   /*create the solution graph*/
+   n = createnet(xind, xval, xlength, etol, vrp->edges, vrp->demand,
+		 vrp->vertnum);
+   if (n->is_integral){ /*if the network is integral, check for feasibility*/
+      /* Feasibility is already tested in the LP process, thus in this
+       * case we are just checking for connectivity and violation of
+       * capacity constraints*/
+      num_cuts = check_feasibility(n, xind, xval, xlength, etol, capacity,
+				   numroutes);
+      free_net(n);
+      *pnumcuts = num_cuts;
+      return(USER_SUCCESS);
+   }
+   
+   if (!vrp->par.always_do_mincut){/*user_par.always_do_mincut indicates
+				     whether we should just always do the
+				     min_cut routine or whether we should also
+				     try this routine*/
+      verts = n->verts;
+      if (which_connected_routine == BOTH)
+	 which_connected_routine = CONNECTED;
+      
+      new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+      new_cut->size = cut_size;
+      do{
+	 compnodes = (int *) calloc(vertnum + 1, sizeof(int));
+	 compdemands = (int *) calloc(vertnum + 1, sizeof(int));
+	 compcuts = (double *) calloc(vertnum + 1, sizeof(double));
+	 
+	 /*------------------------------------------------------------------*\
+         | Get the connected components of the solution graph without the     |
+	 | depot and see if the number of components is more than one         |
+	 \*------------------------------------------------------------------*/
+	 if ((rcnt = (which_connected_routine == BICONNECTED?
+		      biconnected(n, compnodes, compdemands, compcuts) :
+		      connected(n, compnodes, compdemands, NULL, compcuts))) > 1){
+	    
+	    /*---------------------------------------------------------------*\
+            | If the number of components is more then one, then check each   |
+	    | component to see if it violates a capacity constraint           |
+	    \*---------------------------------------------------------------*/
+	    
+	    coef_list = (char **) calloc(rcnt, sizeof(char *));
+	    coef_list[0] = (char *) calloc(rcnt*cut_size, sizeof(char));
+	    for(i = 1; i<rcnt; i++)
+	       coef_list[i] = coef_list[0]+i*cut_size;
+	    
+	    for(i = 1; i < vertnum; i++)
+	       (coef_list[(verts[i].comp)-1][i >> DELETE_POWER]) |=
+		  (1 << (i & DELETE_AND));
+	    
+	    for (i = 0; i < rcnt; i++){
+	       if (compnodes[i+1] < 2) continue;
+	       /*check ith component to see if it violates a constraint*/
+	       if (vrp->par.which_connected_routine == BOTH &&
+		   which_connected_routine == BICONNECTED && compcuts[i+1]==0)
+		  continue;
+	       if (compcuts[i+1] < 2*BINS(compdemands[i+1], capacity)-etol){
+		  /*the constraint is violated so impose it*/
+		  new_cut->coef = (char *) (coef_list[i]);
+		  new_cut->type = (compnodes[i+1] < vertnum/2 ?
+				 SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
+		  new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?
+				  RHS(compnodes[i+1],compdemands[i+1],
+				      capacity): 2*BINS(compdemands[i+1],
+							capacity));
+		  cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+	       }
+	       else{/*if the constraint is not violated, then try generating a
+		      violated constraint by deleting customers that don't
+		      change the number of trucks required by the customers in
+		      the component but decrease the value of the cut*/
+		  cur_bins = BINS(compdemands[i+1], capacity);/*the current
+						    number of trucks required*/
+		  cur_slack = compcuts[i+1] - 2*cur_bins;/*current slack in the
+							   constraint*/
+		  while (compnodes[i+1]){/*while there are still nodes in the
+					   component*/
+		     for (max_node = 0, max_node_cut = 0, k = 1;
+			  k<vertnum; k++){
+			if (verts[k].comp == i+1){
+			   if (BINS(compdemands[i+1]-verts[k].demand, capacity)
+			       == cur_bins){
+			      /*if the number of trucks doesn't decrese upon
+				deleting this customer*/
+			      for (node_cut = 0, cur_edge = verts[k].first;
+				   cur_edge; cur_edge = cur_edge->next_edge){
+				 node_cut += (cur_edge->other_end ?
+					      -cur_edge->data->weight :
+					      cur_edge->data->weight);
+			      }
+			      if (node_cut > max_node_cut){/*check whether the
+					 value of the cut decrease is the best
+					 seen so far*/
+				 max_node = k;
+				 max_node_cut = node_cut;
+			      }
+			   }
+			}
+		     }
+		     if (!max_node){
+			break;
+		     }
+		     /*delete the customer that exhibited the greatest
+		       decrease in cut value*/
+		     compnodes[i+1]--;
+		     compdemands[i+1] -= verts[max_node].demand;
+		     compcuts[i+1] -= max_node_cut;
+		     cur_slack -= max_node_cut;
+		     verts[max_node].comp = 0;
+		     coef_list[i][max_node >> DELETE_POWER] ^=
+			(1 << (max_node & DELETE_AND));
+		     if (cur_slack < 0){/*if the cut is now violated, impose
+					  it*/
+			new_cut->coef = (char *) (coef_list[i]);
+			new_cut->type = (compnodes[i+1] < vertnum/2 ?
+				       SUBTOUR_ELIM_SIDE:SUBTOUR_ELIM_ACROSS);
+			new_cut->size = cut_size;
+			new_cut->rhs = (new_cut->type == SUBTOUR_ELIM_SIDE ?
+					RHS(compnodes[i+1], compdemands[i+1],
+					    capacity): 2*cur_bins);
+			cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+			break;
+		     }
+		  }
+	       }
+	    }
+	    FREE(coef_list[0]);
+	    FREE(coef_list);
+	 }
+	 which_connected_routine++;
+	 FREE(compnodes);
+	 FREE(compdemands);
+	 FREE(compcuts);
+      }while((!num_cuts || vrp->par.which_connected_routine == BOTH)
+	     && which_connected_routine < 2);
+      FREE(new_cut);
+   }
+   if (num_cuts){/*if we found some cuts using the above routines, then exit*/
+      free_net(n);
+      *pnumcuts = num_cuts;
+      return(USER_SUCCESS);
+   }
+   else{/*if we still haven't found any cuts, then try the min cut routine*/
+      num_cuts = min_cut(vrp, n, etol);/*find cuts using min cut routine*/
+      free_net(n);
+      *pnumcuts = num_cuts;
+      return(USER_SUCCESS);
+   }
+}
+#endif
+
+/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
   
 /*===========================================================================*\
@@ -600,6 +959,29 @@ void check_connectivity(network *n, double etol, int capacity, int numroutes,
     cur_route_start->data->scanned = FALSE;
 }
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+/*===========================================================================*/
+
+#ifdef COMPILE_DECOMP
+void user_send_to_sol_pool(cg_prob *p)
+{
+#if 0
+   int size = p->cur_sol.xlength*sizeof(int);
+   int s_bufid;
+   
+   if (p->sol_pool){
+      s_bufid = init_send(DataInPlace);
+      send_int_array(&size, 1);
+      send_int_array(&p->cur_sol.xlevel, 1);
+      send_char_array((char *)(p->cur_sol.xind), size);
+      send_msg(p->sol_pool, PACKED_COL);
+      freebuf(s_bufid);
+   }
+#endif
+}
+#endif
+
+/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -608,6 +990,10 @@ void check_connectivity(network *n, double etol, int capacity, int numroutes,
 \*===========================================================================*/
 
 #ifdef CHECK_CUT_VALIDITY
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+
+#include "sym_cg.h"
+/*___END_EXPERIMENTAL_SECTION___*/
 
 int user_check_validity_of_cut(void *user, cut_data *new_cut)
 {
@@ -620,6 +1006,15 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
    int i, j, vertnum = vrp->vertnum;
    int size, cliquecount = 0;
    char *clique_array; 
+   /*__BEGIN_EXPERIMENTAL_SECTION__*/
+   
+   int num_arcs, edge_index ; 
+   char *cpt; 
+   int *arcs ;
+   char *indicators;
+   double bigM, *weights ;
+   int jj, num_fracs, fracs;
+   /*___END_EXPERIMENTAL_SECTION___*/
    
    if (vrp->feas_sol_size){
       switch (new_cut->type){
@@ -679,6 +1074,98 @@ int user_check_validity_of_cut(void *user, cut_data *new_cut)
 	    }
 	 }
 	 break;
+       /*__BEGIN_EXPERIMENTAL_SECTION__*/
+
+       case FARKAS:
+	 coef = new_cut->coef;
+	 cpt = coef + ((vertnum >> DELETE_POWER) + 1); 
+	 memcpy((char *)&num_arcs, cpt, ISIZE);
+	 cpt += ISIZE;
+	 arcs = (int *) malloc(num_arcs * ISIZE);
+	 indicators = (char *) malloc(num_arcs);  
+	 memcpy((char *)arcs, cpt, num_arcs * ISIZE);
+	 cpt += num_arcs * ISIZE;
+	 memcpy(indicators, cpt, num_arcs);
+	 cpt += num_arcs;
+	 memcpy((char *)&num_fracs, cpt, ISIZE);
+	 cpt += ISIZE;
+	 weights = (double *) malloc((num_fracs + 1) * DSIZE);
+	 memcpy((char *)weights, cpt, (num_fracs + 1) * DSIZE);
+	 bigM = (*(double *)weights);
+	 weights++;
+	 
+	 for (fracs = 0, i = 0, lhs = 0; i < vrp->feas_sol_size; i++){
+	    v0 = edges[feas_sol[i] << 1];
+	    v1 = edges[(feas_sol[i] << 1) + 1];
+	    edge_index = feas_sol[i];
+	    if (isset(coef, v1) || isset(coef,v0)){
+	       for (jj = 0; jj < num_arcs; jj++){
+		  if (arcs[jj] == edge_index){
+		     lhs += indicators[jj] ? -bigM : weights[fracs++];
+		     break;
+		  }
+	       }
+	       if (jj == num_arcs) lhs += bigM;
+	    }
+	 }
+	 weights--;
+	 FREE(arcs);
+	 FREE(indicators);
+	 FREE(weights);
+	 break;
+	 
+       case NO_COLUMNS:
+	 coef = new_cut->coef;
+	 cpt = coef+ ((vertnum >> DELETE_POWER) + 1); 
+	 memcpy((char *)&num_arcs, cpt, ISIZE);
+	 cpt += ISIZE;
+	 arcs = (int *) malloc(num_arcs * ISIZE);
+	 indicators = (char *) malloc(num_arcs);
+	 memcpy((char *)arcs, cpt, num_arcs * ISIZE);
+	 cpt += num_arcs * ISIZE;
+	 memcpy(indicators, cpt, num_arcs);
+	 
+	 for (i = 0, lhs = 0 ; i < vrp->feas_sol_size; i++){
+	    v0 = vrp->edges[feas_sol[i] << 1];
+	    v1 = vrp->edges[(feas_sol[i] << 1) + 1];
+	    edge_index = feas_sol[i];
+	    if (isset(coef, v1) || isset(coef,v0)){
+	       for (jj = 0; jj < num_arcs; jj++){
+		  if ( arcs[jj] == edge_index){
+		     lhs += indicators[jj] ? 1.0 : 0.0;
+		     break;
+		  }
+	       }
+	       if (jj == num_arcs) lhs -= 1;
+	    }
+	 }
+	 FREE(arcs);
+	 FREE(indicators);
+	 break;
+	 
+       case GENERAL_NONZEROS:
+	 cpt = new_cut->coef;
+	 memcpy((char *)&num_arcs, cpt, ISIZE);
+	 cpt += ISIZE;
+	 arcs = (int *) calloc(num_arcs, ISIZE);
+	 weights = (double *) calloc(num_arcs, DSIZE);
+	 memcpy((char *)arcs, cpt, num_arcs * ISIZE);
+	 cpt += num_arcs * ISIZE;
+	 memcpy((char *)weights, cpt, num_arcs * DSIZE);
+	 
+	 for (i = 0, lhs = 0; i < vrp->feas_sol_size; i++){
+	    edge_index = feas_sol[i];
+	    for (j = 0; j < num_arcs; j++){
+	       if (arcs[j] == edge_index){
+		  lhs += weights[j];
+		  break;
+	       }
+	    }
+	 }
+	 FREE(arcs);
+	 FREE(weights);
+	 break;
+       /*___END_EXPERIMENTAL_SECTION___*/
 	 
        default:
 	 printf("Unrecognized cut type!\n");

@@ -16,10 +16,10 @@
 #include <stdlib.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "dg.h"
-#include "dg_u.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_dg.h"
+#include "sym_dg_u.h"
 
 /*===========================================================================*/
 

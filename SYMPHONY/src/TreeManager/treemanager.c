@@ -20,9 +20,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "tm.h"
-#include "proccomm.h"
-#include "timemeas.h"
+#include "sym_tm.h"
+#include "sym_proccomm.h"
+#include "sym_timemeas.h"
 
 /*===========================================================================*/
 

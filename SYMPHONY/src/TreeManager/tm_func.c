@@ -31,22 +31,22 @@ extern long random PROTO((void));
 #include "omp.h"
 #endif
 
-#include "tm.h"
-#include "BB_constants.h"
-#include "BB_types.h"
-#include "BB_macros.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "timemeas.h"
-#include "pack_cut.h"
-#include "pack_array.h"
+#include "sym_tm.h"
+#include "sym_constants.h"
+#include "sym_types.h"
+#include "sym_macros.h"
+#include "sym_messages.h"
+#include "sym_proccomm.h"
+#include "sym_timemeas.h"
+#include "sym_pack_cut.h"
+#include "sym_pack_array.h"
 #ifdef COMPILE_IN_LP
-#include "lp.h"
+#include "sym_lp.h"
 #endif
 #ifdef COMPILE_IN_TM
-#include "master.h"
+#include "sym_master.h"
 #else
-#include "cp.h"
+#include "sym_cp.h"
 #endif
 
 
@@ -81,7 +81,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #endif
    int s_bufid;
 #endif
-   int termcode = 0, *termcodes = NULL;
+   int *termcodes = NULL;
 #ifndef WIN32
    signal(SIGINT, sym_catch_c);    
 #endif   
@@ -174,7 +174,9 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    tm->lp.free_num = par->max_active_nodes;
    for (i = 0; i < par->max_active_nodes; i++){
       if (termcodes[i] < 0){
-	 return(termcodes[i]);
+	 int tmp = termcodes[i];
+	 FREE(termcodes);
+	 return(tmp);
       }
    }
 #else
@@ -244,6 +246,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
     * Receive the root node and send out initial data to the LP processes
    \*------------------------------------------------------------------------*/
    
+   FREE(termcodes);
    if (tm->par.warm_start){
       if (!tm->rootnode){
 	 if (!(f = fopen(tm->par.warm_start_tree_file_name, "r"))){
@@ -315,7 +318,6 @@ int solve(tm_prob *tm)
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
    double timeout2 = 600, timeout3 = tm->par.logging_interval, timeout4 = 10;
-   struct timeval timeout = {5, 0};
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
@@ -323,7 +325,7 @@ int solve(tm_prob *tm)
 
    no_work_start = wall_clock(NULL);
 
-   termcode = TM_FINISHED;
+   termcode = TM_UNFINISHED;
    for (; tm->phase <= 1; tm->phase++){
       if (tm->phase == 1 && !tm->par.warm_start){
 	 if ((termcode = tasks_before_phase_two(tm)) ==
@@ -438,14 +440,19 @@ int solve(tm_prob *tm)
 	 }
 	 
 	 if (tm->par.time_limit >= 0.0 &&
-	     wall_clock(NULL) - start_time > tm->par.time_limit){
+	     wall_clock(NULL) - start_time > tm->par.time_limit &&
+	     termcode != TM_FINISHED){
 	    termcode = TM_TIME_LIMIT_EXCEEDED;
 	    break;
 	 }
 
 	 if (tm->par.node_limit >= 0 && tm->stat.analyzed >= 
-	     tm->par.node_limit){
-	    termcode = TM_NODE_LIMIT_EXCEEDED;
+	     tm->par.node_limit && termcode != TM_FINISHED){
+	    if (tm->active_node_num + tm->samephase_candnum > 0){
+	       termcode = TM_NODE_LIMIT_EXCEEDED;
+	    }else{
+	       termcode = TM_FINISHED;
+	    }
 	    break;
 	 }
 
@@ -472,6 +479,8 @@ int solve(tm_prob *tm)
 	    break;
 
 #ifndef COMPILE_IN_LP
+
+	 struct timeval timeout = {5, 0};
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
 	 if (r_bufid && !process_messages(tm, r_bufid)){
 	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
@@ -509,9 +518,12 @@ int solve(tm_prob *tm)
 }
       }
 }
+      if (tm->samephase_candnum + tm->active_node_num == 0){
+	 termcode = TM_FINISHED;
+      }
       if (tm->nextphase_candnum == 0)
 	 break;
-      if (termcode != TM_FINISHED)
+      if (termcode != TM_UNFINISHED)
 	 break;
    }
    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
@@ -568,14 +580,15 @@ void write_log_files(tm_prob *tm)
 void print_tree_status(tm_prob *tm)
 {
    int i;
+   double elapsed_time;
+
+#if 0
    int *widths;
    double *gamma;
    int last_full_level = 0, max_width = 0, num_nodes_estimate = 1;
    int first_waist_level = 0, last_waist_level = 0, waist_level = 0;
    double average_node_time, estimated_time_remaining, user_time = 0.0;
-   double elapsed_time;
 
-#if 0
    widths = (int *) calloc (tm->stat.max_depth + 1, ISIZE);
    gamma = (double *) calloc (tm->stat.max_depth + 1, DSIZE);
    
@@ -2944,7 +2957,7 @@ void free_tm(tm_prob *tm)
    FREE(tm->tmp.d);
 
    /*get rid of the added pointers for sens.analysis*/
-   int j,k;
+
    for (i = 0; i < num_threads; i++){
       if(tm->rpath[i])
 	 if(tm->rpath[i][0])
@@ -2957,7 +2970,7 @@ void free_tm(tm_prob *tm)
    FREE(tm->rpath_size);
    FREE(tm->bpath);
    FREE(tm->bpath_size);
-
+   
    FREE(tm);
 }
 
@@ -2979,7 +2992,6 @@ void free_subtree(bc_node *n)
 void free_tree_node(bc_node *n)
 {
 
-   int i;
    FREE(n->sol);
    FREE(n->sol_ind);
 #ifdef SENSITIVITY_ANALYSIS
@@ -3149,8 +3161,8 @@ void sym_catch_c(int num)
    
    while(true) {
       printf("\nDo you want to abort? [y/N]: ");
-   fflush(stdout);   
-      gets(temp);
+      fflush(stdout);   
+      scanf("%s", temp);
       if (temp[0] != ' ') {      
 	 if(temp[1] == 0 && (temp[0] == 'y' || temp[0] == 'Y')){
       c_count++;

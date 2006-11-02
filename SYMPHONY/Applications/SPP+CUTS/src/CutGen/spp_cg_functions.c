@@ -20,11 +20,11 @@
 #include <math.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "pack_cut.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_pack_cut.h"
 #include "qsortucb.h"
-#include "cg.h"
+#include "sym_cg.h"
 
 /* SPP include files */
 #include "spp_constants.h"

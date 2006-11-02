@@ -17,7 +17,7 @@
 #define _VRP_MACROS_H
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 
 #define CHECK_DEBUG_PAR(x, y) \
 if (x != 0 && x != 4) {                                               \

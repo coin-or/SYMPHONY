@@ -19,10 +19,10 @@
 #include <string.h>
 
 /* SYMPHONY include files */
-#include "BB_macros.h"
-#include "BB_constants.h"
-#include "proccomm.h"
-#include "cg_u.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
+#include "sym_proccomm.h"
+#include "sym_cg_u.h"
 
 /* MPP include files */
 #include "mpp.h"

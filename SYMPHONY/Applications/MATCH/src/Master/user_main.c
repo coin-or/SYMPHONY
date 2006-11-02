@@ -29,7 +29,7 @@ if ((termcode = f) < 0){                                                    \
    default. See below for the usage.
 \*===========================================================================*/
 
-#include "symphony_api.h"
+#include "symphony.h"
 #include "user.h"
 
 #include <stdlib.h>

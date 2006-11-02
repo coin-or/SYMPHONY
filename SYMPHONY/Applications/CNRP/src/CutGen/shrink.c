@@ -19,17 +19,23 @@
 #include <string.h>           /* memset() is defined here in LINUX */
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "cg.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_messages.h"
+#include "sym_proccomm.h"
+#include "sym_cg.h"
 
 /* CNRP include files */
 #include "cnrp_cg.h"
 #include "cnrp_macros.h"
 #include "network.h"
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+#include "util.h"
+extern CCrandstate rand_state;
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
 
 /*===========================================================================*/
 
@@ -546,6 +552,11 @@ int greedy_shrinking6(network *n, double capacity, double etol,
 	 set_weight = 0;
          for (i = begin; i < end; i++ ){
 	    if (compmembers[i] == 0) continue;
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+	    r  = CCutil_lprand(&rand_state)/CC_PRANDMAX;
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
 	    r = RANDOM()/denominator;
 	    q = (prob/compnodes[cur_comp]);
 	    if (r < q){
@@ -689,6 +700,11 @@ int greedy_shrinking6_dicut(network *n, double capacity, double etol,
 	 set_cut_val = 0;
          for (i = begin; i < end; i++ ){
 	    if (compmembers[i] == 0) continue;
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+	    r  = CCutil_lprand(&rand_state)/CC_PRANDMAX;
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
 	    r = RANDOM()/denominator;
 	    q = (prob/compnodes[cur_comp]);
 	    if (r < q){
@@ -1027,6 +1043,11 @@ int greedy_shrinking6_one(network *n, double capacity,
       set_weight = 0;
       for (i = 1 ; i < vertnum; i++ ){
 	 if (verts[i].deleted) continue;
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+	 r  = CCutil_lprand(&rand_state)/CC_PRANDMAX;
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
 	 r = RANDOM()/denominator;
 	 q = (prob/vertnum);
 	 if (r < q){

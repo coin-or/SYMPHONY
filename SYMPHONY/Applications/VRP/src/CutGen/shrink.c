@@ -21,17 +21,23 @@
 #include <string.h>           /* memset() is defined here in LINUX */
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "cg.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_messages.h"
+#include "sym_proccomm.h"
+#include "sym_cg.h"
 
 /* VRP include files */
 #include "vrp_cg.h"
 #include "vrp_macros.h"
 #include "network.h"
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+#include "util.h"
+extern CCrandstate rand_state;
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
 
 /*===========================================================================*/
 
@@ -326,6 +332,11 @@ int greedy_shrinking6(network *n, double truck_cap, double etol,
 	 set_demand = 0;
          for (i = begin; i < end; i++ ){
 	    if (compmembers[i] == 0) continue;
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#if 0
+	    r  = CCutil_lprand(&rand_state)/CC_PRANDMAX;
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/
 	    r = (RANDOM()/denominator);
 	    q = (prob/compnodes[cur_comp]);
 	    if (r < q){

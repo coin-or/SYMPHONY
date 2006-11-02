@@ -7,10 +7,10 @@
 #include "decomp_lower_bound.h"
 #include "vrp_macros.h"
 #include "my_decomp.h"
-#include "timemeas.h"
-#include "messages.h"
+#include "sym_timemeas.h"
+#include "sym_messages.h"
 #include "network.h"
-#include "vrp_dg.h"
+#include "vrp_sym_dg.h"
 
 int vrp_decomp(int comp_num, double *compdensity)
 {

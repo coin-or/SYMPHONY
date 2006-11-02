@@ -17,15 +17,13 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "timemeas.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "lp_params.h"
-#include "master.h"
-#include "master_u.h"
-
-void usage(void);
+#include "sym_timemeas.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_types.h"
+#include "sym_lp_params.h"
+#include "sym_master.h"
+#include "sym_master_u.h"
 
 /*===========================================================================*/
 
@@ -79,6 +77,20 @@ void usage(void)
 }
 
 /*===========================================================================*/
+
+void version(void)
+{
+   printf("\n");
+   printf("*******************************************************\n");
+   printf("*   This is SYMPHONY Version 5.2-devel                *\n");
+   printf("*   Copyright 2000-2006 Ted Ralphs and others         *\n");
+   printf("*   All Rights Reserved.                              *\n");
+   printf("*   Distributed under the Common Public License 1.0   *\n");
+   printf("*******************************************************\n");
+   printf("\n");
+}
+
+/*===========================================================================*/
 /*===========================================================================*/
 
 int parse_command_line(sym_environment *env, int argc, char **argv)
@@ -93,22 +105,12 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
    lp_params *lp_par = &env->par.lp_par;
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
-   dg_params *dg_par = &env->par.dg_par;
+   //dg_params *dg_par = &env->par.dg_par;
 
    if (argc < 2){
       usage();
       exit(0);
    }
-   
-   printf("SYMPHONY was called with the following arguments:\n");
-   printf("%s ", argv[0]);
-   for (i = 1; i < argc; i++){
-      sscanf(argv[i], "%c", &tmp);
-      if (tmp == '-')
-	 printf("\n");
-      printf("%s ", argv[i]);
-   }
-   printf("\n\n");
    
    for (i = 0; i < argc; i++){
       if (!strcmp(argv[i], "-f"))
@@ -376,6 +378,27 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
       if (tmp != '-')
 	 continue;
       switch (c) {
+       case '-':
+	 if (!strcmp(argv[i], "--version")){
+	    version();
+	    exit(0);
+	 }
+	 if (!strcmp(argv[i], "--help")){
+	    usage();
+	    exit(0);
+	 }
+	 if (!strcmp(argv[i], "--args")){
+	    printf("SYMPHONY was called with the following arguments:\n");
+	    printf("%s ", argv[0]);
+	    for (i = 1; i < argc; i++){
+	       sscanf(argv[i], "%c", &tmp);
+	       if (tmp == '-')
+		  printf("\n");
+	       printf("%s ", argv[i]);
+	    }
+	    printf("\n\n");
+	 }
+	 break;
        case 'h':
 	 usage();
 	 exit(0);
@@ -699,12 +722,14 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
 {
    double gap = 0.0;
 
+#if 0
    static str_int nfstatus[4] = {
       {"NF_CHECK_ALL"           , NF_CHECK_ALL }
       , {"NF_CHECK_AFTER_LAST"    , NF_CHECK_AFTER_LAST }
       , {"NF_CHECK_UNTIL_LAST"    , NF_CHECK_UNTIL_LAST }
       , {"NF_CHECK_NOTHING"       , NF_CHECK_NOTHING }
    };
+#endif
 
    initial_time += tim->communication;
    initial_time += tim->lp;
@@ -767,7 +792,7 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    }
 
    if (has_ub){
-     gap = abs(100*(ub-lb)/ub);
+     gap = fabs(100*(ub-lb)/ub);
    }
 
    if (obj_sense == SYM_MAXIMIZE){

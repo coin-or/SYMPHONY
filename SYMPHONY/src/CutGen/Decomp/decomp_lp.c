@@ -1,9 +1,9 @@
 #include <malloc.h>
 #include <stdlib.h>
 
-#include "lp_solver.h"
-#include "decomp_lp.h"
-#include "BB_macros.h"
+#include "sym_lp_solver.h"
+#include "decomp_sym_lp.h"
+#include "sym_macros.h"
 
 #if defined(__CPLEX70__) || defined(__CPLEX66__) || defined(__CPLEX65__) || defined(__CPLEX60__) || defined(__CPLEX50__) || defined(__CPLEX40__)
 

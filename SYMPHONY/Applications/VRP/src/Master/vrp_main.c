@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 
 #else
 
-#include "symphony_api.h"
+#include "symphony.h"
 #include "vrp_types.h"
 #include "vrp_const.h"
 

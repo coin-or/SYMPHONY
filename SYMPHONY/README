@@ -9,29 +9,25 @@ of this software if you have not already done so. Registration is free, but
 helps us maintain our funding. Please visit SYMPHONY's registration page at
 http://branchandcut.org/SYMPHONY/license.htm to receive an official copy of
 the distribution. All source code and documentation is Copyright 2000-2006 by
-Ted Ralphs. This README may be redistributed freely.
+Ted Ralphs and others. This README may be redistributed freely.
 
 DOCUMENTATION
 =============
 
 If you have downloaded a source distribution, full documentation is available
 in the SYMPHONY/Doc/ subdirectory. If you have downloaded a binary
-distribution,the manual should be located in the man/ subdirectory. An HTML
-version of the manual can also be viewed at the official SYMPHONY Web site:
+distribution, the manual should be located in the man/ subdirectory. HTML
+or PDF versions of the manual can also be viewed at:
 
-http://www.branchandcut.org/SYMPHONY
-
-or at the SYMPHONY development Web site
-
-https://projects.coin-or.org/SYMPHONY
+http://projects.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
 
-1. SYMPHONY now has an interactive optimizer that can be used through command
-prompt. In both the sequential and parallel configurations, the user can 
-set parameters, load and solve instances interactively, and display 
-results and statistics (see below).  
+1. SYMPHONY now has an interactive optimizer that can be used through a
+command shell. In both the sequential and parallel configurations, the user
+can set parameters, load and solve instances interactively, and display
+results and statistics (see below).
 
 2. SYMPHONY now supports automatic configuration using the new COIN-OR build
 system and the GNU autotools.Using autotools utilities, it is now possible to
@@ -50,20 +46,65 @@ the final branch-and-cut tree resulting from a previous solution procedure.
 This partition can include either a number of nodes created first during the
 solution procedure or all of the nodes above a given level of the tree.
 
-5. The native interfaces to OSL and CPLEX are now deprecated and no longer
+5. The COIN-OR repository, the current host of SYMPHONY has recently undergone 
+some significant improvements of its own that have resulted in improved 
+services to users. These include: 
+
+-- SYMPHONY has a new development Web site, where users can submit trouble
+  tickets, browse the source code interactively, and get up-to-date
+  information on development. The address of the new site is
+  https://projects.coin-or.org/SYMPHONY.
+
+-- SYMPHONY is now hosted using subversion, a version control system with
+  features vastly improved over CVS, the previous hosting software. This has
+  required some reorganization and renaming of the header files.
+
+-- SYMPHONY is now more tightly integrated with other COIN-OR projects. Due
+  to improved procedures for producing stable releases, it will now be much
+  easier for us to determine the exact version of SYMPHONY and all other COIN
+  projects you are using when you report a bug.
+
+-- SYMPHONY is now distributed with all COIN software needed to build a
+  complete solver. Previously, other COIN softrware packages had to be
+  downloaded and installed separately.
+
+Two features have been deprecated and are no longer supported:
+
+1. The native interfaces to OSL and CPLEX are now deprecated and no longer
 supported. These solvers can be called through the COIN-OR OSI interface.
+
+2. Column generation functionality has also been officially deprecated. For
+now, there are a number of other software packages that offer better
+functionality than SYMPHONY for implementing branch and price algorithms.
 
 CHANGES TO THE USER INTERFACE
 =============================
 
-None.
+1. There was one minor change to the user callback API from version 5.0 to 5.1.
+The user can now execute a primal heuristic in the user_is_feasible() callback
+and return the solution to SYMPHONY. The API for the user_is_feasible()
+subroutine is now
+
+int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
+		     double *values, int *feasible, double *objval,
+		     char branching, double *heur_solution)
+
+Any feasible solution can be passed (in dense format) through the last
+argument to this function.
+
+2. Several new subroutines were added to the callable library API.
+
+3. The name of the header file containing the SYMPHONY API has been changed
+from "symphony_api.h" to "symphony.h" (though the former has been retained for
+backword compatibility purposes).
 
 ******************************************************************************
 *                              INSTALLATION                                  *
 ******************************************************************************
 
 If you downloaded a source distribution and would like instructions on
-building SYMPHONY, please see the INSTALL file.
+building SYMPHONY or you downloaded a binary distribution and would like to
+know how to install it, please see the file SYMPHONY-5.1/INSTALL. 
 
 *******************************************************************************
 *                             USING SYMPHONY                                  *
@@ -234,12 +275,12 @@ EXTERNAL COIN-OR LIBRARIES
 SYMPHONY 5.1 works with the following stable versions of other COIN-OR 
 libraries 
 
-BuildTools     0.5.1
-CoinUtils      1.0.0
-Cgl            0.5.0
-Clp            1.3.3
-Osi            r797
-MsVisualStudio 1.0.0
+BuildTools     0.5
+CoinUtils      1.0
+Cgl            0.5
+Clp            1.3
+Osi            0.95
+MsVisualStudio 1.0
 
 *******************************************************************************
 *                                 SUPPORT                                     *
@@ -261,3 +302,5 @@ BUG REPORTS
 To report a bug please file a ticket at 
 
 https://projects.coin-or.org/SYMPHONY/newticket
+
+Please note the version of SYMPHONY you are using when filing the ticket.
