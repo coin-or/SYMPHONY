@@ -213,7 +213,7 @@ BUILDING APPLICATIONS
 1. In order to compile SYMPHONY's applications, you must first compile the 
 application-specific library with
 
-  ./configure --with-applications
+  ./configure --with-application
    make 
    make install
 
