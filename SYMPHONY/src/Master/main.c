@@ -655,6 +655,7 @@ int sym_read_line(char *prompt, char **input)
   while(true){
      strcpy(getl, "");
      printf(prompt);
+      fflush(stdout);
      fgets(getl, MAX_LINE_LENGTH, stdin);
 
      if(getl[0] == '\n' ) {
