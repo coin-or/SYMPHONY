@@ -131,6 +131,7 @@ int main_level = 0; /* 0 - SYMPHONY:
 
 int sym_help(char *line);
 int sym_read_line(char *prompt, char **input);
+int sym_free_env(sym_environment *env);
 
 int main(int argc, char **argv)
 {    
@@ -206,16 +207,6 @@ int main(int argc, char **argv)
 	   sym_help("display_help");
 	 } else  sym_help("main_help");
        } else if (strcmp(args[0], "load") == 0){ 
-	  if(env->mip->n){
-	     free_master_u(env);
-	     env->ub = 0;
-	     env->lb = -MAXDOUBLE;
-	     env->has_ub = FALSE;
-	     env->termcode = TM_NO_SOLUTION;
-	     strcpy(env->par.infile, "");
-	     strcpy(env->par.datafile, "");
-	     env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
-	  }
 
 	 if(strcmp(args[1], "") == 0){
 	   sym_read_line("Name of the file: ", &line);
@@ -230,7 +221,7 @@ int main(int argc, char **argv)
 		  args[1]);
 	   continue;
 	 }
-	 
+
 	 /* check to see if SYMPHONY knows the input type! */
 
 	 last_dot = 0;
@@ -262,10 +253,10 @@ int main(int argc, char **argv)
 	 }
 	 
 	 if (strcmp(ext, "mps") == 0){
-
-	   if(sym_read_mps(env, args[1])){
-	     continue;
-	   }
+	    sym_free_env(env);
+	    if(sym_read_mps(env, args[1])){
+	       continue;
+	    }
 
 	 } else {
 
@@ -283,7 +274,7 @@ int main(int argc, char **argv)
 		    args[2]);
 	     continue;
 	   }
-
+	   sym_free_env(env);
 	   if(sym_read_gmpl(env, args[1], args[2])){
 	     continue;
 	   }
@@ -656,13 +647,31 @@ int sym_read_line(char *prompt, char **input)
 {
 
 #ifndef HAS_READLINE
+  int i;
 
   if (*input) FREE(*input);
-  *input = (char *)malloc(CSIZE* MAX_LINE_LENGTH +1);
+  char * getl = (char *)malloc(CSIZE* (MAX_LINE_LENGTH +1));
+   
+  while(true){
+     strcpy(getl, "");
+     printf(prompt);
+      fflush(stdout);
+     fgets(getl, MAX_LINE_LENGTH, stdin);
 
-  printf(prompt);
-  scanf("%s", *input);
-
+     if(getl[0] == '\n' ) {
+	continue;
+     }else {
+	for (i=0; i<strlen(getl); i++){
+	   if ( getl[i] == '\n' ) {
+	      getl[i] = '\0';
+	      break;
+	   }
+	}
+	break;
+     }
+  }
+  *input = getl;
+  
 #else
 
   if (*input) FREE(*input);
@@ -682,7 +691,22 @@ int sym_read_line(char *prompt, char **input)
   
   return (0);
 }
- 
+
+/*===========================================================================*\
+\*===========================================================================*/
+int sym_free_env(sym_environment *env){
+   if(env->mip->n){
+      free_master_u(env);
+      env->ub = 0;
+      env->lb = -MAXDOUBLE;
+      env->has_ub = FALSE;
+      env->termcode = TM_NO_SOLUTION;
+      strcpy(env->par.infile, "");
+      strcpy(env->par.datafile, "");
+      env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+   }
+   return 0;
+} 
 /*===========================================================================*\
 \*===========================================================================*/
 #ifdef HAS_READLINE
