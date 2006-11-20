@@ -623,11 +623,13 @@ int sym_solve(sym_environment *env)
    env->tm = tm = (tm_prob *) calloc(1, sizeof(tm_prob));
 
    tm->par = env->par.tm_par;
-
+   
    if ((tm->has_ub = env->has_ub))
-      tm->ub = env->ub;
+	tm->ub = env->ub;
    if ((tm->has_ub_estimate = env->has_ub_estimate))
       tm->ub_estimate = env->ub_estimate;
+   tm->lb = env->lb;
+   
    tm->obj_offset = env->mip->obj_offset;
    tm->obj_sense = env->mip->obj_sense;
    tm->master = env->my_tid;
@@ -1057,6 +1059,7 @@ int sym_solve(sym_environment *env)
 
    env->has_ub = FALSE;
    env->ub = 0.0;
+   env->lb = -MAXDOUBLE;
 
    if (env->par.do_draw_graph){
       s_bufid = init_send(DataInPlace);

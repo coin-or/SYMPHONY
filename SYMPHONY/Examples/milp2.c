@@ -39,10 +39,13 @@ int main(int argc, char* argv[]){
    
    sym_environment *env = sym_open_environment();
 
-   int n_cols = 2;
-   double * objective    = new double[n_cols];//the objective coefficients
-   double * col_lb       = new double[n_cols];//the column lower bounds
-   double * col_ub       = new double[n_cols];//the column upper bounds
+   int n_cols = 2; //number of columns
+   double * objective    = 
+      (double *) malloc(sizeof(double) * n_cols);//the objective coefficients
+   double * col_lb       = 
+      (double *) malloc(sizeof(double) * n_cols);//the column lower bounds
+   double * col_ub       = 
+      (double *) malloc(sizeof(double) * n_cols);//the column upper bounds
     
    //Define the objective coefficients.
    //minimize -1 x0 - 1 x1
@@ -58,8 +61,10 @@ int main(int argc, char* argv[]){
    col_ub[1] = sym_get_infinity();
    
    int n_rows = 2;
-   char * row_sense = new char[n_rows]; //the row senses
-   double * row_rhs = new double[n_rows]; //the row right-hand-sides
+   char * row_sense = 
+      (char *) malloc (sizeof(char) * n_rows); //the row senses
+   double * row_rhs = 
+      (double *) malloc (sizeof(double) * n_rows); //the row right-hand-sides
    double * row_range = NULL; //the row ranges   
    row_sense[0] = 'L';
    row_rhs[0] = 3;
@@ -68,9 +73,9 @@ int main(int argc, char* argv[]){
 
    /* Constraint matrix definitions */
    int non_zeros = 4;
-   int * start = new int[n_cols + 1]; 
-   int * index = new int[non_zeros];
-   double * value = new double[non_zeros];
+   int * start = (int *) malloc (sizeof(int) * (n_cols + 1)); 
+   int * index = (int *) malloc (sizeof(int) * non_zeros);
+   double * value = (double *) malloc (sizeof(double) *non_zeros);
 
    start[0] = 0; 
    start[1] = 2;
@@ -88,7 +93,7 @@ int main(int argc, char* argv[]){
 
    //define the integer variables
 
-   char * int_vars = new char[n_cols];
+   char * int_vars = (char *) malloc (sizeof(char) * n_cols);
 
    int_vars[0] = TRUE;
    int_vars[1] = TRUE;
@@ -102,31 +107,31 @@ int main(int argc, char* argv[]){
    sym_solve(env);
    
    //get, print the solution
-   double * solution = new double[n_cols];
+   double * solution = (double *) malloc (sizeof(double) * n_cols);
    double objective_value = 0.0;
 
    sym_get_col_solution(env, solution);
    sym_get_obj_val(env, &objective_value);
 
-   std::cout<<"The optimal solution is"
-	<< " x0 = " << solution[0]
-	<< " x1 = " << solution[1]
-	<< " with objective value = " << objective_value << std::endl;
+   printf("%s\n%s%f\n%s%f\n%s%f\n","The optimal solution is",
+	  " x0 = ",solution[0],
+	  " x1 = ",solution[1],
+	  " with objective value = ",objective_value);
    
    //free the memory
    sym_close_environment(env);
 
-   if(objective != 0)   { delete [] objective; objective = 0; }
-   if(col_lb != 0)      { delete [] col_lb; col_lb = 0; }
-   if(col_ub != 0)      { delete [] col_ub; col_ub = 0; }
-   if(row_rhs != 0)      { delete [] row_rhs; row_rhs = 0; }
-   if(row_sense != 0)      { delete [] row_sense; row_sense = 0; }
-   if(row_range != 0)      { delete [] row_range; row_range = 0; }
-   if(index != 0)      { delete [] index; index = 0; }
-   if(start != 0)      { delete [] start; start = 0; }
-   if(value != 0)      { delete [] value; value = 0; }
-   if(int_vars != 0)      { delete [] int_vars; int_vars = 0; }
-
+   if(objective){FREE(objective);}
+   if(col_lb)   {FREE(col_lb);}
+   if(col_ub)   {FREE(col_ub);}
+   if(row_rhs)  {FREE(row_rhs);}
+   if(row_sense){FREE(row_sense);}
+   if(row_range){FREE(row_range);}
+   if(index)    {FREE(index);}
+   if(start)    {FREE(start);}
+   if(value)    {FREE(value);}
+   if(int_vars) {FREE(int_vars);}
+   if(solution) {FREE(solution);}
    return 0;
 
 };

@@ -21,6 +21,7 @@ MASTERNAME = vrp
 EXE = $(MASTERNAME)@EXEEXT@
 
 # CHANGEME: Additional sources
+# - Names of your additional source files without any extensions
 ADDSOURCES =
 
 # CHANGEME: Additional libraries
@@ -100,6 +101,7 @@ USE_GMPL = @USE_GMPL_TRUE@TRUE
 MASTEREXT = @MASTEREXT@
 LPEXT = @LPEXT@
 TMEXT = @TMEXT@
+ADDOBJS = $(addsuffix .@OBJEXT@, $(ADDSOURCES))
 
 ##############################################################################
 # This section is for listing CNRP source file names
@@ -115,7 +117,7 @@ USER_MASTER_OBJS   = src/Master/vrp_main.@OBJEXT@ \
 	src/Master/vrp_master.@OBJEXT@ src/Master/vrp_io.@OBJEXT@
 USER_MASTER_OBJS  += src/Master/vrp_master_functions.@OBJEXT@ \
 	src/Master/small_graph.@OBJEXT@ $(NET_OBJS) 
-USER_MASTER_OBJS  += $(ADDSOURCES)
+USER_MASTER_OBJS  += $(ADDOBJS)
 USER_MASTER_OBJS  += $(COST_OBJS)
 ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 USER_MASTER_OBJS  += $(USER_TM_OBJS)
@@ -170,7 +172,7 @@ ALL_OBJS =  src/Master/vrp_main.@OBJEXT@ \
 	src/Master/vrp_master.@OBJEXT@ \
 	src/Master/vrp_io.@OBJEXT@ \
 	src/Master/vrp_master_functions.@OBJEXT@ \
-	$(ADDSOURCES) \
+	$(ADDOBJS) \
 	src/Master/small_graph.@OBJEXT@ \
 	$(COST_OBJS) \
 	src/LP/vrp_lp_branch.@OBJEXT@ \

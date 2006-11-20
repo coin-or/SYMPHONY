@@ -82,13 +82,23 @@ endif
        LPLIB += -lOsi -lCoinUtils
 endif
 
+LPOSILIB =
+
+ifneq ($(USE_OSI_INTERFACE),TRUE)
+       LPOSILIB += -lOsiSym $(LPLIB)
+else 
+       LPOSILIB += $(LPLIB)
+endif
+
+
 INCDIR        = $(addprefix -I,${LPINCDIR})
 LDFLAGS       = $(addprefix -L,${LPLIBPATHS})
 LDFLAGS      += $(SYMDEFS)
 
 LINKFLAGS += $(addprefix ${SHLINKPREFIX},${LPLIBPATHS})
 
-EXAMPLES = milp milp2 bicriteria sensitivity warm_start1 warm_start2 warm_start3
+EXAMPLES = milp milp2 milpOsi milpOsi2 bicriteria sensitivity \
+	warm_start1 warm_start2 warm_start3
 
 examples: $(EXAMPLES)
 	true
@@ -100,6 +110,14 @@ milp : milp.c
 milp2 : milp2.c
 
 	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPLIB)
+
+milpOsi : milpOsi.c
+
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPOSILIB)
+
+milpOsi2 : milpOsi2.c
+
+	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPOSILIB)
 
 bicriteria : bicriteria.c
 

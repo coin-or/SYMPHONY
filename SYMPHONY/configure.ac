@@ -466,9 +466,9 @@ case $build in
   *-aix-*)
        SYMDEFS="$SYMDEFS -D__RS6K" 
        ARCH=RS6K ;;
-  *-sun-*)
+  *-sun-*|*solaris2*)
        case $build in
-            *-i86pc-*)	
+            *-i86pc-* | i386-pc*)	
                 SYMDEFS="$SYMDEFS -D__X86SOL2"
 	        ARCH=X86SOL2 ;;
             *-5.-*)
@@ -787,16 +787,23 @@ SYMAPPLDIR=`pwd`/Applications
 #AM_CONDITIONAL(SYM_DEBUG, [ test $coin_debug_compile = true])
 
 #Add openmp flag
-if test $sym_openmp = true; then
-   CXXFLAGS="$CXXFLAGS -fopenmp"
-fi
+case "$CXX" in
+  cl*)
+  ;;
+  *)
+     if test $sym_openmp = true; then
+         CXXFLAGS="$CXXFLAGS -fopenmp"
+     fi
 
-#Ignore warnings about unrecognized pragma lines, deprecated string conversions
-CXXFLAGS="$CXXFLAGS -Wno-unknown-pragmas -Wno-write-strings"
+     #Ignore warnings about unrecognized pragma lines and 
+     #deprecated string conversions
+     CXXFLAGS="$CXXFLAGS -Wno-unknown-pragmas -Wno-write-strings"
 
-#Ignore warnings about comparisons of signed and unsigned values and 
-#casting const pointers to ordinary pointers
-CXXFLAGS="$CXXFLAGS -Wno-sign-compare -Wno-cast-qual"
+     #Ignore warnings about comparisons of signed and unsigned values and 
+     #casting const pointers to ordinary pointers
+     CXXFLAGS="$CXXFLAGS -Wno-sign-compare -Wno-cast-qual"
+   ;; 
+esac
 
 #Set CFLAGS to CXXFLAGS since we are using g++
 CFLAGS=$CXXFLAGS

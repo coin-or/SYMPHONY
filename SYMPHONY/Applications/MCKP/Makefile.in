@@ -100,11 +100,11 @@ CXXFLAGS = @CXXFLAGS@
 CXXLINKFLAGS = @RPATH_FLAGS@
 
 #Include files
-INCL =  -Iinclude -I`$(CYGPATH_W) $(COININCDIR)` \
-	-I`$(CYGPATH_W) $(SYMINCDIR)`
+INCL =  -Iinclude -I`$(CYGPATH_W) $(COININCDIR)` #\
+#	-I`$(CYGPATH_W) $(SYMINCDIR)`
 
 # Libraries necessary to link
-LIBS = -L$(COINLIBDIR) -L$(SYMLIBDIR)
+LIBS = -L$(COINLIBDIR) #-L$(SYMLIBDIR)
 
 ifeq ($(USE_CGL_CUTS),TRUE)
 LIBS += -lCgl `cat @CGLOBJDIR@/cgl_addlibs.txt`

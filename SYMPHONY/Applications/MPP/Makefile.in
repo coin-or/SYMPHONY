@@ -21,6 +21,7 @@ MASTERNAME = mpp
 EXE = $(MASTERNAME)@EXEEXT@
 
 # CHANGEME: Additional sources
+# - Names of your additional source files without any extensions
 ADDSOURCES =
 
 # CHANGEME: Additional libraries
@@ -71,6 +72,7 @@ USE_GMPL = @USE_GMPL_TRUE@TRUE
 MASTEREXT = @MASTEREXT@
 LPEXT = @LPEXT@
 TMEXT = @TMEXT@
+ADDOBJS = $(addsuffix .@OBJEXT@, $(ADDSOURCES))
 
 USER_LP_OBJS      = src/LP/mpp_lp_branch.@OBJEXT@ src/LP/mpp_lp.@OBJEXT@ 
 ifeq ($(SYM_COMPILE_IN_CG),TRUE)
@@ -86,7 +88,7 @@ USER_TM_OBJS      += src/CutPool/mpp_cp.@OBJEXT@
 endif
 
 USER_MASTER_OBJS   = src/Master/mpp_main.@OBJEXT@ \
-	src/Master/mpp_master.@OBJEXT@ $(ADDSOURCES)
+	src/Master/mpp_master.@OBJEXT@ $(ADDOBJS)
 
 ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 USER_MASTER_OBJS  += $(USER_TM_OBJS)
@@ -100,7 +102,7 @@ USER_DG_OBJS       = src/DrawGraph/mpp_dg.@OBJEXT@
 
 
 ALL_OBJS =   src/Master/mpp_main.@OBJEXT@ src/Master/mpp_master.@OBJEXT@\
-	$(ADDSOURCES) src/LP/mpp_lp_branch.@OBJEXT@ src/LP/mpp_lp.@OBJEXT@ \
+	$(ADDOBJS) src/LP/mpp_lp_branch.@OBJEXT@ src/LP/mpp_lp.@OBJEXT@ \
 	$(USER_CG_OBJS) $(USER_CP_OBJS) $(USER_DG_OBJS)
 
 PUSER_MASTER_OBJS = $(addsuffix o, $(USER_MASTER_OBJS))
