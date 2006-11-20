@@ -738,12 +738,12 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    initial_time += tim->pricing;
    initial_time += tim->strong_branching;
    initial_time += tim->cut_pool;
-#ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
+#if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
    printf("======================= CP Timing ===========================\n");
    printf("  Cut Pool                  %.3f\n", tim->cut_pool);
 #endif
    printf("====================== LP/CG Timing =========================\n");
-#ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
+#if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
    printf("  LP Solution Time          %.3f\n", tim->lp);
    printf("  Variable Fixing           %.3f\n", tim->fixing);
    printf("  Pricing                   %.3f\n", tim->pricing);

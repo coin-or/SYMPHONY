@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#ifndef WIN32
+#if !defined(_MSC_VER)
 #include <signal.h>
 #if !defined(HAS_SRANDOM)
 extern int srandom PROTO((unsigned seed));
@@ -82,7 +82,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    int s_bufid;
 #endif
    int *termcodes = NULL;
-#ifndef WIN32
+#if !defined(_MSC_VER)
    signal(SIGINT, sym_catch_c);    
 #endif   
    par = &tm->par;
@@ -3143,7 +3143,7 @@ int tm_close(tm_prob *tm, int termcode)
    
 /*===========================================================================*/
 /*===========================================================================*/
-#ifndef WIN32
+#if !defined(_MSC_VER)
 void sym_catch_c(int num)
 {
 

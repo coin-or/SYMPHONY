@@ -17,7 +17,7 @@
 
 /*-------------------------- Random number generator ------------------------*/
 
-#ifdef WIN32 /* Different function call in Windows */ 
+#if defined(_MSC_VER) /* Different function call in Windows */ 
 #define SRANDOM(seed) srand(seed)
 #define RANDOM() rand()
 #else

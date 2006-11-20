@@ -1,7 +1,7 @@
 #ifndef WIN32_TIME_H
 #define WIN32_TIME_H
 
-#ifdef WIN32
+#if defined(_MSC_VER)
 #include <time.h>
 
 struct timeval {
