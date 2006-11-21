@@ -135,6 +135,16 @@ host_triplet = @host@
 @SYM_PARALLEL_TRUE@	-lgpvm3 -lpvm3
 
 @SYM_PARALLEL_TRUE@am__append_45 = $(PCPPFLAGS) -DUSE_SYM_APPLICATION
+@STATICEXE_TRUE@am__append_46 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static -static-libgcc\
+@STATICEXE_TRUE@	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
+@STATICEXE_FALSE@am__append_47 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+@STATICEXE_FALSE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+
+@USE_CL_TRUE@am__append_48 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
+@USE_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+
+@USE_CL_FALSE@am__append_49 = $(LINK)
 EXTRA_PROGRAMS = symphony$(EXEEXT) symphony_m$(EXEEXT) \
 	symphony_m_tm$(EXEEXT) symphony_m_tm_lp$(EXEEXT) \
 	symphony_m_tm_cp$(EXEEXT) symphony_m_tm_lp_cg$(EXEEXT) \
@@ -144,12 +154,6 @@ EXTRA_PROGRAMS = symphony$(EXEEXT) symphony_m$(EXEEXT) \
 	symphony_tm_cp$(EXEEXT) symphony_tm_lp$(EXEEXT) \
 	symphony_tm_lp_cg$(EXEEXT) symphony_tm_lp_cg_cp$(EXEEXT)
 bin_PROGRAMS = $(am__EXEEXT_1)
-@STATICEXE_TRUE@am__append_46 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static -static-libgcc\
-@STATICEXE_TRUE@	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-
-@STATICEXE_FALSE@am__append_47 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-@STATICEXE_FALSE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-
 subdir = src
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -2381,6 +2385,10 @@ AUTOMAKE = @AUTOMAKE@
 AUX_DIR = @AUX_DIR@
 AWK = @AWK@
 BUILDTOOLSDIR = @BUILDTOOLSDIR@
+
+########################################################################
+########################################################################
+
 # Compile everything with g++
 CC = $(CXX)
 CCDEPMODE = @CCDEPMODE@
@@ -2390,6 +2398,7 @@ CGLOBJDIR = @CGLOBJDIR@
 CGLSRCDIR = @CGLSRCDIR@
 CHECK_CUT_VALIDITY_FALSE = @CHECK_CUT_VALIDITY_FALSE@
 CHECK_CUT_VALIDITY_TRUE = @CHECK_CUT_VALIDITY_TRUE@
+CLLCFLAGS = @CLLCFLAGS@
 CLPOBJDIR = @CLPOBJDIR@
 CLPSRCDIR = @CLPSRCDIR@
 CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
@@ -2545,6 +2554,8 @@ TRACE_PATH_FALSE = @TRACE_PATH_FALSE@
 TRACE_PATH_TRUE = @TRACE_PATH_TRUE@
 USE_CGL_CUTS_FALSE = @USE_CGL_CUTS_FALSE@
 USE_CGL_CUTS_TRUE = @USE_CGL_CUTS_TRUE@
+USE_CL_FALSE = @USE_CL_FALSE@
+USE_CL_TRUE = @USE_CL_TRUE@
 USE_GMPL_FALSE = @USE_GMPL_FALSE@
 USE_GMPL_TRUE = @USE_GMPL_TRUE@
 VERSION = @VERSION@
@@ -2806,6 +2817,16 @@ LDADD = $(am__append_14) $(am__append_17) $(am__append_20) \
 ALLLDADD = $(LDADD) $(ADDLIBS)
 PALLLDADD = $(am__append_44)
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+CCLD = $(CXX)
+
+#Static link
+STATIC_LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -static\
+	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
+
+# Link with g++
+LINK = $(am__append_46) $(am__append_47)
+SYMLINK = $(am__append_48) $(am__append_49)
 
 ########################################################################
 #                               libSym                                 #
@@ -2827,9 +2848,6 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 # Name of the library compiled in this directory.  We want it to be installed
 # in the 'lib' directory
 lib_LTLIBRARIES = $(WHATTOMAKELIBS)
-STATIC_LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -static\
-	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-
 
 # List all source files for this library, including headers
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
@@ -2894,6 +2912,7 @@ symphony_DEPENDENCIES = $(LDADD) libSym.la
 symphony_CPPFLAGS = $(SYMCPPFLAGS)
 symphony_LDADD = libSym.la $(ALLLDADD)
 symphony_LDFLAGS = -rpath $(libdir)
+symphony_LINK = $(SYMLINK)
 symphony_m_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_CPPFLAGS = $(PCPPFLAGS)
@@ -3034,15 +3053,12 @@ libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 ########################################################################
 #                Other stuff                                           #    
 ########################################################################
-COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
-CCLD = $(CXX)
+
+#COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
 # Get rid of warning flags
 #FIXME-Try to have the following later
 #CFLAGS := $(subst $(COIN_WARNINGS), ,$(CFLAGS))
 #CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
-
-# Link with g++
-LINK = $(am__append_46) $(am__append_47)
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -3217,7 +3233,7 @@ clean-binPROGRAMS:
 	done
 symphony$(EXEEXT): $(symphony_OBJECTS) $(symphony_DEPENDENCIES) 
 	@rm -f symphony$(EXEEXT)
-	$(LINK) $(symphony_LDFLAGS) $(symphony_OBJECTS) $(symphony_LDADD) $(LIBS)
+	$(symphony_LINK) $(symphony_LDFLAGS) $(symphony_OBJECTS) $(symphony_LDADD) $(LIBS)
 symphony_cp$(EXEEXT): $(symphony_cp_OBJECTS) $(symphony_cp_DEPENDENCIES) 
 	@rm -f symphony_cp$(EXEEXT)
 	$(LINK) $(symphony_cp_LDFLAGS) $(symphony_cp_OBJECTS) $(symphony_cp_LDADD) $(LIBS)
