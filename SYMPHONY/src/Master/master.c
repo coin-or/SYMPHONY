@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -14,7 +14,6 @@
 
 #define COMPILING_FOR_MASTER
 
-#include <malloc.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,20 +22,20 @@
 #include <pvmtev.h>
 #endif
 
-#include "symphony_api.h"
-#include "proccomm.h"
-#include "timemeas.h"
-#include "messages.h"
-#include "BB_macros.h"
-#include "pack_cut.h"
-#include "pack_array.h"
-#include "master.h"
-#include "master_u.h"
-#include "lp_solver.h"
+#include "symphony.h"
+#include "sym_proccomm.h"
+#include "sym_timemeas.h"
+#include "sym_messages.h"
+#include "sym_macros.h"
+#include "sym_pack_cut.h"
+#include "sym_pack_array.h"
+#include "sym_master.h"
+#include "sym_master_u.h"
+#include "sym_lp_solver.h"
 #ifdef COMPILE_IN_TM
-#include "tm.h"
+#include "sym_tm.h"
 #ifdef COMPILE_IN_LP
-#include "lp.h"
+#include "sym_lp.h"
 #endif
 #endif
 
@@ -52,9 +51,9 @@
 #  define TEV_NRECV0  TEV_NRECV
 #endif
 
-/*===========================================================================*/
-/* This file implements the SYMPHONY callable API
-/*===========================================================================*/
+/*===========================================================================*\
+ * This file implements the SYMPHONY callable API
+\*===========================================================================*/
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -68,8 +67,7 @@ sym_environment *sym_open_environment()
    Pvmtmask trace_mask;
 #endif
 
-
-   setvbuf(stdout, (char *)NULL, _IOLBF, 0);
+   setvbuf(stdout, (char *)NULL, _IOLBF, 2);
    
    env = (sym_environment *) calloc(1, sizeof(sym_environment));
 
@@ -83,16 +81,11 @@ sym_environment *sym_open_environment()
 			    this process as output from this process itself*/
 #endif
 #endif
-   
-   printf("\n");
-   printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 5.2-devel                *\n");
-   printf("*   Copyright 2000-2006 Ted Ralphs                    *\n");
-   printf("*   All Rights Reserved.                              *\n");
-   printf("*   Distributed under the Common Public License 1.0   *\n");
-   printf("*******************************************************\n");
-   printf("\n");
 
+#if 0
+   version();
+#endif
+   
    if (initialize_u(env) == FUNCTION_TERMINATED_NORMALLY){
       return(env);
    }else{
@@ -141,11 +134,6 @@ int sym_set_defaults(sym_environment *env)
    lp_params *lp_par = &env->par.lp_par;
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params *sp_par = &env->par.sp_par;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    dg_params *dg_par = &env->par.dg_par;
 
    /************************* Global defaults ********************************/
@@ -191,20 +179,11 @@ int sym_set_defaults(sym_environment *env)
 #endif
    strcpy(tm_par->cg_exe, "symphony_cg");
    strcpy(tm_par->cp_exe, "symphony_cp");
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   strcpy(tm_par->sp_exe, "symphony_sp");
-   /*___END_EXPERIMENTAL_SECTION___*/
    tm_par->lp_debug = 0;
    tm_par->cg_debug = 0;
    tm_par->cp_debug = 0;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   tm_par->sp_debug = 0;
-   /*___END_EXPERIMENTAL_SECTION___*/
    tm_par->max_active_nodes = 1;
    tm_par->max_cp_num = 1;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   tm_par->max_sp_num = 0;
-   /*___END_EXPERIMENTAL_SECTION___*/
    tm_par->lp_mach_num = 0;
    tm_par->lp_machs = NULL;
    tm_par->cg_mach_num = 0;
@@ -214,9 +193,6 @@ int sym_set_defaults(sym_environment *env)
 
    tm_par->use_cg = FALSE;
    tm_par->random_seed = 17;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   tm_par->do_decomp = FALSE;
-   /*___END_EXPERIMENTAL_SECTION___*/
    tm_par->unconditional_dive_frac = 0;
    tm_par->diving_strategy = BEST_ESTIMATE;
    tm_par->diving_k = 1;
@@ -351,18 +327,6 @@ int sym_set_defaults(sym_environment *env)
    cg_par->verbosity = 0;
    cg_par->do_findcuts = TRUE;
 
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   cg_par->do_decomp = FALSE;
-   cg_par->decomp_sol_pool_check_freq = 10;
-   cg_par->decomp_wait_for_cols = TRUE;
-   cg_par->decomp_max_col_num_per_iter = 1000;
-   cg_par->decomp_col_block_size = 1000;
-   cg_par->decomp_mat_block_size = 100000;
-   cg_par->decomp_initial_timeout = 5;
-   cg_par->decomp_dynamic_timeout = 5;
-   cg_par->decomp_complete_enum = TRUE;
-
-   /*___END_EXPERIMENTAL_SECTION___*/
    /************************** cutpool defaults ******************************/
    cp_par->verbosity = 0;
    cp_par->warm_start = FALSE;
@@ -376,22 +340,6 @@ int sym_set_defaults(sym_environment *env)
    cp_par->min_to_delete = 1000;
    cp_par->check_which = CHECK_ALL_CUTS;
 
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   /************************** solpool defaults ******************************/
-#ifdef COMPILE_DECOMP
-   sp_par->verbosity = 0;
-   sp_par->etol = 0.000001;
-   sp_par->block_size = 1000;
-   sp_par->max_size = 1000000;
-   sp_par->max_number_of_sols = 10000;
-   sp_par->delete_which = DELETE_DUPLICATE_COLS;
-   sp_par->touches_until_deletion = 10;
-   sp_par->min_to_delete = 100;
-   sp_par->compress_num = 10;
-   sp_par->compress_ratio = .01;
-   sp_par->check_which = CHECK_COL_LEVEL_AND_TOUCHES;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    /********************** draw_graph defaults  ******************************/
    strcpy(dg_par->source_path, ".");
    dg_par->echo_commands = FALSE;
@@ -564,9 +512,6 @@ int sym_solve(sym_environment *env)
 
    int s_bufid, r_bufid, bytes, msgtag = 0, sender, termcode = 0, temp, i;
    int lp_data_sent = 0, cg_data_sent = 0, cp_data_sent = 0;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int sp_data_sent = 1; /*for now, we are not using this one*/
-   /*___END_EXPERIMENTAL_SECTION___*/
 #ifndef COMPILE_IN_TM
    char repricing, node_type;
 #else
@@ -574,14 +519,17 @@ int sym_solve(sym_environment *env)
 #endif
    double start_time, lb;
    struct timeval timeout = {10, 0};
-   double t = 0, total_time = 0;
-   int thread_num;
+   double total_time = 0;
    
    node_desc *rootdesc = env->rootdesc;
    base_desc *base = env->base;
 
    start_time = wall_clock(NULL);
 
+   if (env->par.verbosity >= 0){
+      printf("Solving...\n\n");
+   }
+   
 #ifndef COMPILE_IN_TM
    /*------------------------------------------------------------------------*\
     * Start the tree manager and send the parameters
@@ -797,17 +745,9 @@ int sym_solve(sym_environment *env)
    \*------------------------------------------------------------------------*/
    
 #ifdef COMPILE_IN_TM
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
    while (!(lp_data_sent == env->par.tm_par.max_active_nodes) ||
 	  !(cg_data_sent == env->par.tm_par.max_active_nodes) ||
-	  !(cp_data_sent == env->par.tm_par.max_cp_num) || !sp_data_sent){
-   /*___END_EXPERIMENTAL_SECTION___*/
-   /*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
-   while (!(lp_data_sent == env->tm_par.max_active_nodes) ||
-	  !(cg_data_sent == env->tm_par.max_active_nodes) ||
-	  !(cp_data_sent == env->max_cp_num)){
-#endif
+	  !(cp_data_sent == env->par.tm_par.max_cp_num)){
 #else
    do{
 #endif
@@ -859,14 +799,6 @@ int sym_solve(sym_environment *env)
 	 cp_data_sent++;
 	 break;
 
-       /*__BEGIN_EXPERIMENTAL_SECTION__*/
-       case REQUEST_FOR_SP_DATA:
-	 /* An SP process has been started and asks for all necessary data */
-	 CALL_WRAPPER_FUNCTION( send_sp_data_u(env, sender) );
-	 sp_data_sent++;
-	 break;
-
-       /*___END_EXPERIMENTAL_SECTION___*/
        case TM_FIRST_PHASE_FINISHED:
 	 receive_char_array((char *)(&env->comp_times.bc_time),
 			     sizeof(node_times));
@@ -960,6 +892,7 @@ int sym_solve(sym_environment *env)
    env->par.tm_par.warm_start = FALSE;
 
 #ifdef COMPILE_IN_LP
+   int thread_num;
    thread_num = env->tm->opt_thread_num;
    if (env->tm->lpp[thread_num]){
       env->par.lp_par.cgl = env->tm->lpp[thread_num]->par.cgl;
@@ -1039,7 +972,7 @@ int sym_solve(sym_environment *env)
     * Display the the results and solution data                               
    \*------------------------------------------------------------------------*/
 
-   if (env->par.verbosity >=-1 ){
+   if (env->par.verbosity >= -1 ){
       printf("\n****************************************************\n");
       if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
 	 printf(  "* Optimal Solution Found                           *\n");
@@ -1293,10 +1226,8 @@ int sym_mc_solve(sym_environment *env)
    int i, cp_num;
    double gamma, gamma0, gamma1, tau, slope;
    double start_time;
-   warm_start_desc *ws, *ws1, *ws2;
-   ws_item *head, *tail, *item, *temp;
-   solution_data utopia1;
-   solution_data utopia2;
+   warm_start_desc *ws = NULL, *ws1 = NULL, *ws2 = NULL;
+   ws_item *head = NULL, *tail = NULL, *item = NULL, *temp = NULL;
    solution_data solutions[MAX_NUM_PAIRS];
    int numsolutions = 0, numprobs = 0, numinfeasible = 0;
    solution_pairs pairs[MAX_NUM_PAIRS];
@@ -1306,8 +1237,6 @@ int sym_mc_solve(sym_environment *env)
    int length, termcode;
    int solution1, solution2;
    double utopia[2];
-   node_desc *root= NULL;
-   base_desc *base = NULL;
    double compare_sol_tol, ub = 0.0;
    int binary_search = FALSE;
    
@@ -2063,10 +1992,10 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 {
    int termcode = 0;   
    double t = 0, inf = SYM_INFINITY;
-   int i, j, k, nonzeros = 0;
+   int i = 0;
 
    if ((!numcols && !numrows) || numcols < 0 || numrows <0){
-      printf("sym_load_problem_user():The given problem is empty or incorrect");
+      printf("sym_explicit_load_problem():The given problem is empty or incorrect ");
       printf("problem description!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
@@ -2112,8 +2041,8 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
       if (colub){
 	 memcpy(env->mip->ub, colub, DSIZE * numcols); 
       }else{
-	 for(j = 0; j<env->mip->n; j++){
-	    env->mip->ub[j] = inf;
+	 for(i = 0; i<env->mip->n; i++){
+	    env->mip->ub[i] = inf;
 	 }
       }
 
@@ -2178,8 +2107,8 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 	 env->mip->ub = colub;
       }else{
 	 env->mip->ub = (double *) calloc(numcols, DSIZE);
-	 for(j = 0; j<env->mip->n; j++){
-	    env->mip->ub[j] = inf;
+	 for(i = 0; i<env->mip->n; i++){
+	    env->mip->ub[i] = inf;
 	 }
       }
 
@@ -2378,7 +2307,6 @@ int sym_get_num_elements(sym_environment *env, int *numelems)
 
 int sym_get_col_lower(sym_environment *env, double *collb)
 {
-   int i;
    if (!env->mip || !env->mip->n || !env->mip->lb){
       printf("sym_get_col_lower():There is no loaded mip description or\n");
       printf("there is no loaded column description!\n");
@@ -2873,8 +2801,6 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
 int sym_set_obj2_coeff(sym_environment *env, int index, double value)
 {
 
-   int i;
-
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
        !env->mip->obj2){
       printf("sym_set_obj_coeff():There is no loaded mip description or\n");
@@ -2932,7 +2858,7 @@ int sym_set_col_upper(sym_environment *env, int index, double value)
 
 int sym_set_row_lower(sym_environment *env, int index, double value)
 {
-   double rhs, range, lower, upper, inf = SYM_INFINITY;
+   double rhs, range, lower = 0, upper = 0, inf = SYM_INFINITY;
    char   sense;
    int i;
 
@@ -3024,7 +2950,7 @@ int sym_set_row_lower(sym_environment *env, int index, double value)
 
 int sym_set_row_upper(sym_environment *env, int index, double value)
 {
-   double rhs, range, lower, upper, inf = SYM_INFINITY;
+   double rhs, range, lower = 0, upper = 0, inf = SYM_INFINITY;
    char   sense;
    int i;
 
@@ -3720,7 +3646,7 @@ int sym_add_row(sym_environment *env, int numelems, int *indices,
 int sym_delete_cols(sym_environment *env, int num, int * indices)
 {
 
-   int i, j, k, l,n, nz, temp = 0, numElements = 0, *matBeg, *matInd, *lengths;
+   int i, j, k, l,n, nz, numElements = 0, *matBeg, *matInd, *lengths;
    //FIXME! how about base varnum? If they are to be deleted???
    int index = 0;
    double *matVal, *colLb, *colUb, *objN;
@@ -3734,8 +3660,8 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-   int bvarnum = env->base->varnum, bvar_del = 0, bind = 0;
-   int user_size = env->rootdesc->uind.size, uind_del = 0, uind = 0;
+   int bvarnum = env->base->varnum, bind = 0;
+   int user_size = env->rootdesc->uind.size, uind = 0;
    int * bvar_ind = env->base->userind; 
    int * user_ind = env->rootdesc->uind.list;
    
@@ -3987,7 +3913,7 @@ int sym_write_warm_start_desc(warm_start_desc *ws, char *file)
 {
  
    FILE * f = NULL;
-   int i, j, temp;
+   int i, j;
    cut_data ** cuts;
    problem_stat stat;
    node_times compT;
@@ -4095,7 +4021,7 @@ int sym_write_warm_start_desc(warm_start_desc *ws, char *file)
 warm_start_desc * sym_read_warm_start(char *file)
 {   
    FILE * f;
-   char str[80], str2[80], str3[80], str4[80];
+   char str[80];
    int i=0, j=0, num=0, ch=0;
    int temp =0;
    cut_data *cut;
@@ -4242,7 +4168,6 @@ void sym_delete_warm_start(warm_start_desc *ws)
 warm_start_desc * sym_get_warm_start(sym_environment *env, int copy_warm_start)
 {
    
-   int i, num=0, allocated_cut_num = 0;
    warm_start_desc * ws;
 
    if (!env->warm_start){
@@ -4335,11 +4260,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params *sp_par = &env->par.sp_par;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    dg_params *dg_par = &env->par.dg_par;
 
    if (strcmp(key, "verbosity") == 0){
@@ -4350,14 +4270,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = env->par.random_seed;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "do_decomp") == 0 ||
-	    strcmp(key, "CG_do_decomp") == 0 ||
-	    strcmp(key, "TM_do_decomp") == 0){
-      *value = tm_par->do_decomp;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    /***********************************************************************
     ***                    Master params                            ***
@@ -4503,13 +4415,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = tm_par->cp_debug;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "sp_debug") == 0 ||
-	    strcmp(key, "TM_sp_debug") == 0){
-      *value = tm_par->sp_debug;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "max_active_nodes") == 0 ||
 	    strcmp(key, "TM_max_active_nodes") == 0){
       *value = tm_par->max_active_nodes;
@@ -4520,13 +4425,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = tm_par->max_cp_num;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "max_sp_num") == 0 ||
-	    strcmp(key, "TM_max_sp_num") == 0){
-      *value = tm_par->max_sp_num;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "lp_mach_num") == 0 ||
 	    strcmp(key, "TM_lp_mach_num") == 0){
       *value = tm_par->lp_mach_num;
@@ -4939,38 +4837,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = cg_par->do_findcuts;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "decomp_sol_pool_check_freq") == 0 ||
-	    strcmp(key, "CG_decomp_sol_pool_check_freq") == 0){
-      *value = cg_par->decomp_sol_pool_check_freq;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_wait_for_cols") == 0 ||
-	    strcmp(key, "CG_decomp_wait_for_cols") == 0){
-      *value = cg_par->decomp_wait_for_cols;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_max_col_num_per_iter") == 0 ||
-	    strcmp(key, "CG_decomp_max_col_num_per_iter") == 0){
-     *value =  cg_par->decomp_max_col_num_per_iter;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_col_block_size") == 0 ||
-	    strcmp(key, "CG_decomp_col_block_size") == 0){
-      *value = cg_par->decomp_col_block_size;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_mat_block_size") == 0 ||
-	    strcmp(key, "CG_decomp_mat_block_size") == 0){
-      *value = cg_par->decomp_mat_block_size;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_complete_enum") == 0 ||
-	    strcmp(key, "CG_decomp_complete_enum") == 0){
-	 *value = cg_par->decomp_complete_enum;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    /***********************************************************************
     ***                      cutpool params                         ***
@@ -5028,52 +4894,6 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
 	    strcmp(key, "CP_check_which") == 0){
 	 *value = cp_par->check_which;
 		}
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-
-   /***********************************************************************
-    ***                     solpool params                          ***
-    ***********************************************************************/
-#ifdef COMPILE_DECOMP
-   else if (strcmp(key, "SP_verbosity") == 0){
-	 *value = sp_par->verbosity;
-      return(0);
-   }
-   else if (strcmp(key, "SP_block_size") == 0){
-      *value = sp_par->block_size;
-      return(0);
-   }
-   else if (strcmp(key, "SP_max_size") == 0){
-      *value = sp_par->max_size;
-      return(0);
-   }
-   else if (strcmp(key, "max_number_of_sols") == 0 ||
-	    strcmp(key, "SP_max_number_of_sols") == 0){
-      *value = sp_par->max_number_of_sols;
-      return(0);
-   }
-   else if (strcmp(key, "SP_delete_which") == 0){
-      *value = sp_par->delete_which;
-      return(0);
-   }
-   else if (strcmp(key, "SP_touches_until_deletion") == 0){
-      *value = sp_par->touches_until_deletion;
-      return(0);
-   }
-   else if (strcmp(key, "SP_min_to_delete") == 0){
-      *value = sp_par->min_to_delete;
-      return(0);
-   }
-   else if (strcmp(key, "SP_compress_num") == 0){
-      *value = sp_par->compress_num;
-      return(0);
-   }
-   else if (strcmp(key, "SP_check_which") == 0){
-      *value = sp_par->check_which;
-      return(0);
-   }
-#endif
-
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    return (FUNCTION_TERMINATED_ABNORMALLY);
 }
@@ -5084,18 +4904,11 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
 int sym_get_dbl_param(sym_environment *env, char *key, double *value)
 {
 
-   double timeout;
-
    tm_params *tm_par = &env->par.tm_par;
    lp_params *lp_par = &env->par.lp_par;
    cg_params *cg_par = &env->par.cg_par;
-   cp_params *cp_par = &env->par.cp_par;
+   //cp_params *cp_par = &env->par.cp_par;
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params *sp_par = &env->par.sp_par;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    dg_params *dg_par = &env->par.dg_par;
    
    if (strcmp(key, "granularity") == 0){
@@ -5267,35 +5080,6 @@ int sym_get_dbl_param(sym_environment *env, char *key, double *value)
       return(0);
    }
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   /***********************************************************************
-    ***                     cut_gen params                          ***
-    ***********************************************************************/
-   else if (strcmp(key, "decomp_initial_timeout") == 0 ||
-	    strcmp(key, "CG_decomp_initial_timeout") == 0){
-      *value = cg_par->decomp_initial_timeout;
-      return(0);
-   }
-   else if (strcmp(key, "decomp_dynamic_timeout") == 0 ||
-	    strcmp(key, "CG_decomp_dynamic_timeout") == 0){
-      *value = cg_par->decomp_dynamic_timeout;
-      return(0);
-   }
-
-   /***********************************************************************
-    ***                     solpool params                          ***
-    ***********************************************************************/
-#ifdef COMPILE_DECOMP
-   else if (strcmp(key, "SP_etol") == 0){
-      *value = sp_par->etol;
-      return(0);
-   }
-   else if (strcmp(key, "SP_compress_ratio") == 0){
-      *value = sp_par->compress_ratio;
-      return(0);
-   }
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    return (FUNCTION_TERMINATED_ABNORMALLY);
 }
@@ -5306,18 +5090,11 @@ int sym_get_dbl_param(sym_environment *env, char *key, double *value)
 int sym_get_str_param(sym_environment *env, char *key, char **value)
 {
 
-   int len, i;
-   
    tm_params *tm_par = &env->par.tm_par;
-   lp_params *lp_par = &env->par.lp_par;
-   cg_params *cg_par = &env->par.cg_par;
-   cp_params *cp_par = &env->par.cp_par;
+   //lp_params *lp_par = &env->par.lp_par;
+   //cg_params *cg_par = &env->par.cg_par;
+   //cp_params *cp_par = &env->par.cp_par;
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params *sp_par = &env->par.sp_par;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    dg_params *dg_par = &env->par.dg_par;
    
    if (strcmp(key, "problem_name") == 0){      
@@ -5417,15 +5194,6 @@ int sym_get_str_param(sym_environment *env, char *key, char **value)
       *value = tm_par->cp_exe;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "sp_executable_name") == 0 ||
-	    strcmp(key, "sp_exe") == 0 ||
-	    strcmp(key, "TM_sp_exe") == 0 ||
-	    strcmp(key, "TM_sp_executable_name") == 0){
-      *value = tm_par->sp_exe;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    return (FUNCTION_TERMINATED_ABNORMALLY);
 }
 
@@ -5661,7 +5429,7 @@ int sym_test(sym_environment *env)
   verbosity = sym_get_int_param(env, "verbosity", &verbosity);
 
   sym_set_int_param(env, "verbosity", -10);
-  
+
   int i, file_num = 12;
   char mps_files[12][MAX_FILE_NAME_LENGTH +1] = {
     "air03", "dcmulti", "egout", "flugpl", "khb05250", "l152lav", 
@@ -5676,8 +5444,24 @@ int sym_test(sym_environment *env)
   double *obj_val = (double *)calloc(DSIZE,file_num);
   double tol = 1e-03;
 
+  size_t size = 1000;
+  char* buf = 0;
+  while (true) {
+     buf = (char*)malloc(CSIZE*size);
+     if (getcwd(buf, size))
+	break;
+     FREE(buf);
+     buf = 0;
+     size = 2*size;
+  }
+  char dirsep = buf[0] == '/' ? '/' : '\\';
+  FREE(buf);
+  
   if (strcmp(env->par.test_dir, "") == 0){ 
-    strcpy(mps_dir, "../../Data/miplib3");
+     if (dirsep == '/')
+	strcpy(mps_dir, "../../Data/miplib3");
+     else 
+	strcpy(mps_dir, "..\\..\\Data\\miplib3");	
   } else{
     strcpy(mps_dir, env->par.test_dir);
   }
@@ -5691,8 +5475,10 @@ int sym_test(sym_environment *env)
     }
 
     strcpy(infile, "");
-    sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
-
+    if (dirsep == '/')
+       sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
+    else
+       sprintf(infile, "%s%s%s", mps_dir, "\\", mps_files[i]);   
     if( termcode = sym_read_mps(env, infile) < 0)
       return(termcode);
 

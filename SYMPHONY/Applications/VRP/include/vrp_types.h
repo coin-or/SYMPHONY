@@ -17,7 +17,7 @@
 #define _VRP_TYPES2_H
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 
 /* VRP include files */
 #include "vrp_common_types.h"
@@ -75,32 +75,6 @@ typedef struct TIME_OUT_PAR{
 }time_out_par;
 #endif
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-/*---------------------------------------------------------------------------*\
- * Here we store the names of the executables to be used for each part of the
- * code. This way, we can run different versions of each part of the code
- * simply by changing the parameter file
-\*---------------------------------------------------------------------------*/
-
-typedef struct EXEC{
-   char winprog[MAX_FILE_NAME_LENGTH];
-#ifdef COMPILE_HEURS
-   char heuristics[MAX_FILE_NAME_LENGTH];
-#endif
-}exec;
-
-/*---------------------------------------------------------------------------*\
- * This structure contains debugging parameters for PVM. If they are zero,
- * then no debugging window comes up when the process is spawned. If any of
- * them are set at 4, then a debugging window for that process will be
- * launched on the host machine. 0 and 4 are the only two meaningful values
-\*---------------------------------------------------------------------------*/
-
- typedef struct DEBUGGING{
-   int winprog;
-   int heuristics; 
-}debugging;
-/*___END_EXPERIMENTAL_SECTION___*/
 
 /*---------------------------------------------------------------------------*\
  * The "small_graph" data structure is used to store the subset of the
@@ -129,9 +103,6 @@ typedef struct VRP_PARAMS{
    char          infile[MAX_FILE_NAME_LENGTH + 1];
    int           verbosity;
    char          tsp_prob;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   char          bpp_prob;
-   /*___END_EXPERIMENTAL_SECTION___*/
    int           k_closest;
    int           min_closest;
    int           max_closest;
@@ -141,10 +112,6 @@ typedef struct VRP_PARAMS{
    int           use_small_graph;
    char          small_graph_file[MAX_FILE_NAME_LENGTH];
    int           colgen_strat[2];
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   exec          executables;
-   debugging     debug;
-   /*___END_EXPERIMENTAL_SECTION___*/
 #ifdef COMPILE_HEURS
    int          *rand_seed;
    int           tours_to_keep;
@@ -203,10 +170,6 @@ typedef struct VRP_PROBLEM{
 #ifdef COMPILE_HEURS
    bd_times        bd_time;
 #endif
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int             sol_pool_col_num;
-   int            *sol_pool_cols;
-   /*___END_EXPERIMENTAL_SECTION___*/
    int            *zero_vars;
    int             zero_varnum;
 }vrp_problem;

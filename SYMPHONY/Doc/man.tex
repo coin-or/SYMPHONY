@@ -22,6 +22,7 @@
 \setlength{\headwidth}{\textwidth}
 \addtolength{\headwidth}{-4.4444pt}
 \textheight 8.7in
+\setcounter{secnumdepth}{3}
 
 \catcode`\@=11\relax   %allow @ in macro names
 
@@ -50,7 +51,7 @@
 \def\sectionmark##1{\markboth {\uppercase{\ifnum \c@secnumdepth >\z@
     \thesection\hskip 1em\relax \fi ##1}}{}}%
 \def\subsectionmark##1{\markright {\ifnum \c@secnumdepth >\@ne
-          \thesubsection\hskip 1em\relax \fi ##1}}}
+          \thesubsection\hskip 1em\relax \fi ##1}}}%
 \else               % If one-sided printing.
 \def\ps@headings{\let\@mkboth\markboth
 \def\@oddfoot{}\def\@evenfoot{}%     No feet.
@@ -79,6 +80,21 @@
 \usepackage{fancyvrb}
 \usepackage{listings}
 \usepackage{url}
+%\usepackage{splitidx}
+\usepackage[usenames]{color}
+
+%\makeindex
+%\newindex[Index of C API Functions]{f}
+%\newindex[Index of User Callback API Functions]{cf}
+%\newindex[Index of Parameters]{p}
+\def\GP{{Global Pramaters}}
+\def\DP{{Draw Graph Pramaters}}
+\def\MP{{Master Module Pramaters}}
+\def\TP{{Tree Manager Pramaters}}
+\def\LPP{{LP Pramaters}}
+\def\CP{{Cut Pool Pramaters}}
+\def\CGP{{Cut Generator Pramaters}}
+\def\VER{{5.1.0}}
 \lstloadlanguages{C++}
 
 \newcommand{\be}{\begin{enumerate}}
@@ -95,15 +111,18 @@
 \newcommand{\ev}{\end{verbatim}}
 \newcommand{\functiondef}[1]{\subsubsection{#1}}
 \newcommand{\firstfuncdef}[1]{\subsubsection{#1}}
+\newcommand{\code}[1]{{\color{Brown}\texttt{#1}}}
 %begin{latexonly}
-\renewcommand{\functiondef}[1]{\newpage \item[\Large $\triangleright$] {\bf
-\Large #1}}
-\renewcommand{\firstfuncdef}[1]{\item[\Large $\triangleright$] {\bf
-\Large #1}}
+\renewcommand{\functiondef}[1]{\newpage \item[\Large $\triangleright$] 
+{\color{red}{\bf
+\Large #1}}}
+\renewcommand{\firstfuncdef}[1]{\item[\Large $\triangleright$] 
+{\color{red}{\bf 
+\Large #1}}}
 %end{latexonly}
-\newcommand{\describe}{\item[Description:] \hfill}
-\newcommand{\args}{\item[Arguments:] \hfill}
-\newcommand{\returns}{\item[Return values:] \hfill}
+\newcommand{\describe}{\item[{\color{cyan}Description:}] \hfill}
+\newcommand{\args}{\item[{\color{Brown}Arguments:}] \hfill}
+\newcommand{\returns}{\item[{\color{green}Return values:}] \hfill}
 \newcommand{\postp}{\item[Post-processing:] \hfill}
 \newcommand{\nopostp}{\item[Post-processing:] None \hfill}
 
@@ -111,15 +130,24 @@
 \newcommand{\TM}{{\sc TreeManager}}
 \newcommand{\LP}{{\sc LP}}
 \newcommand{\ra}{$\rightarrow$}
-\newcommand{\bs} {\(\backslash\)}
 \newcommand{\vmin}{\mathop{\text{vmin}}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\Q}{\mathbb{Q}}
 \renewcommand{\Re}{\mathbb{R}}
+\newcommand{\ptt}[1]{{\tt {\color{BrickRed} #1}}} 
+\newcommand{\bs}{{$\backslash$}}
 
+\usepackage[latex2html,dvipdfm,colorlinks]{hyperref}
+\hypersetup{
+  linkcolor=blue,
+}
 
 %\htmladdtonavigation{\htmladdnormallink 
 %       {\htmladdimg{contents_motif.gif}}{man.html}}
+
+\setlength{\parindent}{0in}
+\setlength{\parskip}{0.1in}
+
 
 \begin{document}
 
@@ -130,23 +158,24 @@
 \frontmatter
 \begin{rawhtml} <H1 ALIGN="CENTER"> 
 \end{rawhtml}
-\title{\huge {\bf \BB\ 5.1 User's Manual} \thanks{This research was partially
+\title{\huge {\bf \BB\ \VER\  User's Manual} \thanks{This research was partially
 supported by NSF Grants DMS-9527124, DMI-0534862, and DMI-0522796, as well as
 Texas ATP Grant 97-3604-010. A revised version of Chapters
 \ref{SYMPHONY-design} of this manual now appears
 in the Springer-Verlag book {\em Computational Combinatorial Optimization}
-edited by M. J\"unger and D. Naddef, see
-http://link.springer.de/link/service/series/0558/tocs/t2241.htm}
+edited by M. J\"unger and D. Naddef, see \url{
+http://link.springer.de/link/service/series/0558/tocs/t2241.htm}}
 %begin{latexonly}
 \vskip 1.7in
 \LARGE 
 \vskip .2in
 T.K. Ralphs\thanks{Department of Industrial and
-Systems Engineering, Lehigh University, Bethlehem, PA 18017, {\tt
-tkralphs@lehigh.edu}, {\tt http://www.lehigh.edu/\~{ }tkr2}} \\
+Systems Engineering, Lehigh University, Bethlehem, PA 18017, {\tt 
+\htmladdnormallink{tkralphs@lehigh.edu}{mailto:tkralphs@lehigh.edu}}, 
+{\tt \url{http://www.lehigh.edu/\~tkr2}}} \\
 M. G\"uzelsoy\thanks{Department of Industrial and
 Systems Engineering, Lehigh University, Bethlehem, PA 18017, {\tt
-megb@lehigh.edu}, {\tt http://coral.ie.lehigh.edu/\~{ }menal}} \\
+  \htmladdnormallink{megb@lehigh.edu}{mailto:megb@lehigh.edu}}, {\tt \url{http://coral.ie.lehigh.edu/\~menal}}} \\
 %\vskip .5in
 %Interactive Graph Drawing \\
 %Software By \\
@@ -182,7 +211,7 @@ M. G\"uzelsoy \\
 %\end{rawhtml}
 \begin{rawhtml} <P ALIGN="CENTER"> <STRONG> <FONT SIZE="3">
 PDF version available <A
-HREF="ftp://branchandcut.org/pub/reference/SYMPHONY-5.1-Manual.pdf">here</A>
+HREF="https://projects.coin-or.org/SYMPHONY">here</A>
 </FONT></STRONG></P>
 \end{rawhtml}
 \begin{rawhtml} </P> </FONT> </STRONG> 
@@ -233,16 +262,17 @@ D. Naddef.  </FONT></STRONG></P>
 \end{rawhtml}
 \begin{rawhtml} <P> <FONT SIZE="2"> 
 \end{rawhtml}
-First, many thanks are due to Laci Lad\'anyi who worked with me on the
-development of an early precursor of SYMPHONY called COMPSys and who taught me
-much of what I know about programming. Many thanks are due also to Marta
-Es\"o, who wrote a draft of this manual for what was then COMPSys. Thanks are
-also due to Menal Guzelsoy, who was been instrumental in the development of
-SYMPHONY since version 4.0 and who helped update this manual. Thanks to
-Matthew Galati and Ondrej Medek, who also helped with the development of
-SYMPHONY. Finally, thanks to Leslie Trotter, William Cook, Cornell University,
-Rice University, Lehigh University, the National Science Foundation, and the
-state of Texas, all of whom have supported the development of SYMPHONY.
+First and foremost, many thanks are due to Laci Lad\'anyi who worked with me
+on the development of an early precursor of SYMPHONY called COMPSys and who
+taught me much of what I then knew about programming. Many thanks are due also
+to Marta Es\"o, who wrote an early draft of this manual for what was then
+COMPSys. This release would not have been possible without the help of Menal
+G\"uzelsoy, who has been instrumental in the development of SYMPHONY since
+version 4.0. I would also like to thank Matthew Galati and Ondrej Medek, who
+contributed to the development of SYMPHONY over the years. Finally, my sincere
+appreciation goes to Leslie Trotter, William Cook, Cornell University, Rice
+University, Lehigh University, the National Science Foundation, and the state
+of Texas, all of whom have supported the development of SYMPHONY.
 \begin{rawhtml} </P> </FONT> 
 \end{rawhtml}
 
@@ -321,9 +351,12 @@ state of Texas, all of whom have supported the development of SYMPHONY.
 
 \backmatter
 
+\cleardoublepage
+\phantomsection
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliographystyle{plain}
-\bibliography{/home/ted/PAPERS/BIB/bib}
+\bibliography{/home/menal/PAPERS/BIB/bib}
+
 %\input{biblio}
 
 %\newpage
@@ -331,4 +364,10 @@ state of Texas, all of whom have supported the development of SYMPHONY.
 
 %\input{man-consts}
 
+
+\cleardoublepage
+\phantomsection
+%\refstepcounter{chapter}
+\addcontentsline{toc}{chapter}{Index}
+\printindex*
 \end{document}

@@ -19,7 +19,7 @@
 
 /* system include files */
 #include <stdio.h>
-#include <proto.h>
+#include <sym_proto.h>
 
 /* SPP include files */
 #include "spp_constants.h"

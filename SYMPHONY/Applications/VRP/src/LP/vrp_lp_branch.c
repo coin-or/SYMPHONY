@@ -17,24 +17,20 @@
 
 /* system include files */
 #include <math.h>
-#include <malloc.h>
 #include <memory.h>
 #include <stdio.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 #include "qsortucb.h"
-#include "lp_u.h"
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#include "lp.h"
-/*___END_EXPERIMENTAL_SECTION___*/
+#include "sym_lp_u.h"
 
 /* VRP include files */
 #include "vrp_lp.h"
 #include "vrp_macros.h"
 #include "vrp_const.h"
-#include "timemeas.h"
+#include "sym_timemeas.h"
 
 /*===========================================================================*/
 
@@ -285,12 +281,6 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 	       can->branch[1] = ALLOWED_TO_BRANCH_ON;
 	    }
 	    break;
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 case FARKAS:
-	    break;
-	 case NO_COLUMNS:
-	    break;
-	 /*___END_EXPERIMENTAL_SECTION___*/
 	 }
       }
       FREE(pwl);
@@ -374,14 +364,6 @@ double compute_lhs(int number, int *indices, double *values, cut_data *cut,
    int v0, v1;
    double lhs = 0;
    int i;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int num_arcs, edge_index ; 
-   char *cpt; 
-   int *arcs ;
-   char *indicators;
-   double bigM, *weights ;
-   int jj;
-   /*___END_EXPERIMENTAL_SECTION___*/
  
    switch (cut->type){
     
@@ -406,74 +388,6 @@ double compute_lhs(int number, int *indices, double *values, cut_data *cut,
       }
       
       return(lhs);
-    /*__BEGIN_EXPERIMENTAL_SECTION__*/
-
-    case FARKAS:
-      coef = (char *)(cut->coef);
-      arcs = (int *) calloc( ((vertnum*vertnum)/2), sizeof(int));
-      weights = (double *) calloc( ((vertnum*vertnum)/2), sizeof(double)) ;
-      
-      cpt=coef+ ((vertnum >> DELETE_POWER) + 1); 
-      memcpy((char *)&num_arcs, cpt, ISIZE);
-      memcpy((char *)arcs, cpt, ISIZE*(num_arcs +1));
-      arcs++;
-      cpt+=(ISIZE*(num_arcs +1))/CSIZE;
-      memcpy((char *)weights, cpt, DSIZE*(num_arcs +1));
-      bigM=(*(double *)weights);
-      weights++;
-      
-      for (i = 0, lhs=0 ; i<number; i++){
-	 BOTH_ENDS(indices[i], &v1, &v0);
-	 edge_index=indices[i];
-	    
-	 if (isset(coef, v1) || isset(coef,v0)){
-	    for (jj=0; jj<num_arcs; jj++){
-	       if ( arcs[jj]==edge_index){
-		       lhs+=weights[jj]*values[i];
-		       break;
-	       }
-	    }
-	    if (jj==num_arcs) lhs+=bigM*values[i];
-	    
-	 }
-      }
-      arcs--;
-      weights--;
-      FREE(arcs);
-      FREE(weights);
-      return(lhs); 
-     
-      
-    case NO_COLUMNS:
-      coef = (char *)(cut->coef);
-      arcs = (int *) malloc( ((vertnum*vertnum)/2)* sizeof(int));
-      indicators = (char *) malloc( ((vertnum*vertnum)/2)* sizeof(char));
-	
-      cpt=coef+ ((vertnum >> DELETE_POWER) + 1); 
-      memcpy((char *)&num_arcs, cpt, ISIZE);
-      cpt+= ISIZE /CSIZE;
-      memcpy((char *)arcs, cpt, ISIZE*(num_arcs));
-      cpt+=(ISIZE*(num_arcs ))/CSIZE;
-      memcpy((char *)indicators, cpt, CSIZE*(num_arcs));
-	
-      for (i = 0, lhs=0 ; i<number; i++){
-	 BOTH_ENDS(indices[i], &v1, &v0);
-	 edge_index=indices[i];
-	 	 
-	 if (isset(coef, v1) || isset(coef,v0)){
-	    for (jj=0; jj<num_arcs; jj++){
-	       if ( arcs[jj]==edge_index){
-		  lhs+=values[i]* ( indicators[jj] ? 1.0:0.0);
-		  break;
-	       }
-	    }
-	    if (jj==num_arcs) lhs-=values[i];
-	 }
-      }
-      FREE(arcs);
-      FREE(indicators);
-      return(lhs); 
-    /*___END_EXPERIMENTAL_SECTION___*/
       
     default:
       printf("Cut type's not recognized! \n\n");
@@ -481,214 +395,6 @@ double compute_lhs(int number, int *indices, double *values, cut_data *cut,
    }
 }
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-/*===========================================================================*/
-
-int user_select_candidates(lp_prob *p, void *user, double lpetol, int cutnum,
-			   int slacks_in_matrix_num,
-			   cut_data **slacks_im_matrix, int slack_cut_num,
-			   cut_data **slack_cuts, int varnum, var_desc **vars,
-			   double *x, char *status, int *cand_num,
-			   branch_obj ***candidates, int *action)
-
-{
-   return(USER__CLOSE_TO_HALF);
-}
-
-/*===========================================================================*/
-
-int user_select_candidates(lp_prob *p, void *user, double lpetol, int cutnum,
-			   int slacks_in_matrix_num,
-			   cut_data **slacks_im_matrix, int slack_cut_num,
-			   cut_data **slack_cuts, int varnum, var_desc **vars,
-			   double *x, char *status, int *cand_num,
-			   branch_obj ***candidates, int *action)
-
-{
-   vrp_lp_problem *vrp = (vrp_lp_problem *)user;
-   int i;
-   int *sorted_cand_list, j = 0, k = 0;
-   double *sorted_diffs;
-   int cand_num = vrp->par.max_branch_cand;
-   int branch_rule = vrp->par.branching_rule;
-   branch_obj **candidates, *cand;
-
-   candidates =
-      *candidates = (branch_obj **) malloc(cand_num * sizeof(branch_obj *));
-
-   sorted_cand_list = (int *) calloc (varnum, sizeof(int));
-   sorted_diffs     = (double *) calloc (varnum, sizeof(double));
-   for (i = 0; i < varnum; i++){
-      sorted_cand_list[i] = i;
-      sorted_diffs[i] = fabs(x[i] - .5);
-   }
-
-   cand_sort(sorted_cand_list, sorted_diffs, varnum);
-
-   switch(vrp->par.branching_rule){ /* which branching rule to use */
-      
-   case DEPOTS_AT_HALF_BRANCH_RIGHT:
-   case DEPOTS_AT_HALF:
-   case VARS_AT_HALF_PREFER_DEPOT_BRANCH_RIGHT:
-   case VARS_AT_HALF_PREFER_DEPOT:
-      
-      for (i=0, j=0; sorted_diffs[i]<lpetol && i<varnum && j<cand_num; i++){
-	 /* Here we find the depot edges that are at a half*/
-	 if (vrp->edges[(vars[sorted_cand_list[i]]->userind) << 1] == 0){
-	    /* This userind serves the purpose of checking whether the
-	       variable corresponds to an edge connected to the depot */
-	    cand = candidates[i] = (branch_obj *)calloc(1, sizeof(branch_obj));
-	    cand->position = sorted_cand_list[i];
-	    cand->type = CANDIDATE_VARIABLE;
-	    cand->child_num = 2;
-	    cand->sense[0] = 'L';
-	    cand->sense[1] = 'G';
-	    cand->rhs[0] = 0;
-	    cand->rhs[1] = 1;
-	    cand->range[0] = cand->range[1] = 0;
-	 }
-      }
-      if (j && (branch_rule == DEPOTS_AT_HALF_BRANCH_RIGHT ||
-		branch_rule == DEPOTS_AT_HALF)){
-	 *cand_num = j;
-	 break;
-      }
-      for (k = 0; k < i && j < cand_num; k++){
-	 if (vrp->edges[(vars[sorted_cand_list[k]]->userind) << 1] != 0)
-	    cand = candidates[j++] = (branch_obj *)
-	                               calloc(1, sizeof(branch_obj));
-	    cand->position = sorted_cand_list[i];
-	    cand->type = CANDIDATE_VARIABLE;
-	    cand->child_num = 2;
-	    cand->sense[0] = 'L';
-	    cand->sense[1] = 'G';
-	    cand->rhs[0] = 0;
-	    cand->rhs[1] = 1;
-	    cand->range[0] = cand->range[1] = 0;
-      }
-      if (j){
-	 *cand_num = j;
-	 break;
-      }
-      /*otherwise, fall through*/
-
-    case DEPOTS_CLOSEST_TO_HALF:
-    case DEPOTS_CLOSEST_TO_HALF_BRANCH_RIGHT:
-    case VARS_CLOSEST_TO_HALF_PREFER_DEPOT:
-    case VARS_CLOSEST_TO_HALF_PREFER_DEPOT_BRANCH_RIGHT:
-
-      for (i = 0, j = 0;
-	   i < varnum && sorted_diffs[i]<.5-lpetol && j < cand_num; i++){
-	 if (vrp->edges[(vars[sorted_cand_list[i]]->userind) << 1] == 0){
-	    cand = candidates[j++] = (branch_obj *)
-	       calloc(1, sizeof(branch_obj));
-	    cand->position = sorted_cand_list[i];
-	    cand->type = CANDIDATE_VARIABLE;
-	    cand->child_num = 2;
-	    cand->sense[0] = 'L';
-	    cand->sense[1] = 'G';
-	    cand->rhs[0] = 0;
-	    cand->rhs[1] = 1;
-	    cand->range[0] = cand->range[1] = 0;
-	 }
-      }
-      if (j && (branch_rule == DEPOTS_CLOSEST_TO_HALF ||
-		branch_rule == DEPOTS_CLOSEST_TO_HALF_BRANCH_RIGHT)){
-	 *cand_num = j;
-	 break;
-      }
-      for (k = 0; k < i && j < cand_num; k++){
-	 cand = candidates[j++] = (branch_obj *)calloc(1, sizeof(branch_obj));
-	 cand->position = sorted_cand_list[i];
-	 cand->type = CANDIDATE_VARIABLE;
-	 cand->child_num = 2;
-	 cand->sense[0] = 'L';
-	 cand->sense[1] = 'G';
-	 cand->rhs[0] = 0;
-	 cand->rhs[1] = 1;
-	 cand->range[0] = cand->range[1] = 0;
-      }
-
-      if (j){
-	 *cand_num = j;
-	 break;
-      }
-      /*otherwise, fall through*/
-      
-    case VARS_CLOSEST_TO_HALF:
-      
-      for (i = 0, j = 0;
-	   sorted_diffs[i]<.5-lpetol && i < varnum && j < cand_num; i++){
-	 cand = candidates[j++] = (branch_obj *)calloc(1, sizeof(branch_obj));
-	 cand->position = sorted_cand_list[i];
-	 cand->type = CANDIDATE_VARIABLE;
-	 cand->child_num = 2;
-	 cand->sense[0] = 'L';
-	 cand->sense[1] = 'G';
-	 cand->rhs[0] = 0;
-	 cand->rhs[1] = 1;
-	 cand->range[0] = cand->range[1] = 0;
-      }
-      if (j){
-	 *cand_num = j;
-	 break;
-      }
-      /*otherwise, fall through*/
-
-    case BEST_K:
-#if 0
-      for (i = 0, j = 0; i < varnum && j < cand_num; i++){
-	 if (p->lp_data->fixed[sorted_cand_list[i]] == NOT_FIXED){
-	    cand = candidates[j++] = (branch_obj *)
-	                                 calloc(1, sizeof(branch_obj));
-	    cand->position = sorted_cand_list[i];
-	    cand->type = CANDIDATE_VARIABLE;
-	    cand->child_num = 2;
-	    cand->sense[0] = 'L';
-	    cand->sense[1] = 'G';
-	    cand->rhs[0] = 0;
-	    cand->rhs[1] = 1;
-	    cand->range[0] = cand->range[1] = 0;
-	 }
-      }
-
-      *cand_num = j;
-      break;
-#endif
-      *cand_num = 0;
-      break;
-
-    case VARS_AT_HALF:
-
-      for (j = 0; sorted_diffs[j] < lpetol && j < cand_num; j++){
-	 cand = candidates[j++] = (branch_obj *)calloc(1, sizeof(branch_obj));
-	 cand->position = sorted_cand_list[i];
-	 cand->type = CANDIDATE_VARIABLE;
-	 cand->child_num = 2;
-	 cand->sense[0] = 'L';
-	 cand->sense[1] = 'G';
-	 cand->rhs[0] = 0;
-	 cand->rhs[1] = 1;
-	 cand->range[0] = cand->range[1] = 0;
-      }
-
-      *cand_num = j;
-      break;
-
-    default:
-      FREE(sorted_cand_list);
-      FREE(sorted_diffs);
-      return(DEFAULT);
-   }
-   FREE(sorted_cand_list);
-   FREE(sorted_diffs);
-
-   return(USER_SUCCESS);
-}
-#endif
-
-/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 
 /*===========================================================================*\

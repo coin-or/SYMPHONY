@@ -34,7 +34,7 @@ application specific library. Type
 
    cd 
    cd COIN-SYMPHONY
-   ./configure --with-applications
+   ./configure --with-application
    make
    make install
 

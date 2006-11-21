@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -12,18 +12,17 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "BB_macros.h"
-#include "timemeas.h"
-#include "proccomm.h"
+#include "sym_macros.h"
+#include "sym_timemeas.h"
+#include "sym_proccomm.h"
 #include "qsortucb.h"
-#include "messages.h"
-#include "pack_cut.h"
-#include "cp.h"
-#include "BB_constants.h"
+#include "sym_messages.h"
+#include "sym_pack_cut.h"
+#include "sym_cp.h"
+#include "sym_constants.h"
 
 #ifdef CHAR_IS_SIGNED
 #define MEMCMP(c0, c1, s) unsigned_memcmp(c0, c1, s)
@@ -159,56 +158,6 @@ int cutcmp(const void *cut0ptr, const void *cut1ptr)
 }
 
 /*===========================================================================*/
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-/*===========================================================================*\
- * This function purges the cut pool by removing duplicate and
- * ineffective cuts
-\*===========================================================================*/
-
-int delete_cuts(cut_pool *cp, int min_to_delete)
-{
-   int del_cuts = 0;
-   int touches_until_deletion = cp->par.touches_until_deletion;
-   char deleted_duplicates = FALSE;
-
-   switch (cp->par.delete_which){
-
-    case DELETE_DUPLICATES:
-      /* delete duplicate cuts, and if it's not enough, fall through
-       * to delete ineffective ones */
-      del_cuts += delete_duplicate_cuts(cp);
-      if (del_cuts >= min_to_delete || del_cuts == cp->cut_num)
-	 break;
-      if (!touches_until_deletion)
-	 touches_until_deletion = 10;
-      deleted_duplicates = TRUE;
-
-    case DELETE_DUPLICATE_AND_INEFFECTIVE:
-      if (! deleted_duplicates){
-	 del_cuts += delete_duplicate_cuts(cp);
-      }
-#if 0
-      while (del_cuts < min_to_delete && cp->cut_num > 0){
-	 del_cuts += delete_ineffective_cuts(cp, touches_until_deletion,
-					     min_to_delete);
-	 touches_until_deletion--;
-      }
-#endif
-      del_cuts += delete_ineffective_cuts(cp, touches_until_deletion,
-					  min_to_delete);
-      break;
-   }
-
-   if (cp->par.verbosity == 5)
-      printf("******* CUT_POOL : Deleted %i total cuts leaving %i\n",
-	     del_cuts, cp->cut_num);
-
-   return(del_cuts);
-}
-#endif
-/*===========================================================================*/
-/*___END_EXPERIMENTAL_SECTION___*/
 
 int delete_ineffective_cuts(cut_pool *cp)
 {

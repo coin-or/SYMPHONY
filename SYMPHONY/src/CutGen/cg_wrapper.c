@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -12,17 +12,16 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "BB_types.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "proccomm.h"
-#include "messages.h"
-#include "cg.h"
-#include "cg_u.h"
+#include "sym_types.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_proccomm.h"
+#include "sym_messages.h"
+#include "sym_cg.h"
+#include "sym_cg_u.h"
 
 /*===========================================================================*/
 
@@ -80,9 +79,6 @@ int receive_lp_solution_cg_u(cg_prob *p)
 
 int find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
 {
-   cut_data **cuts;
-   int i;
-   int termcode;
    int tmp = p->cuts_to_add_num; 
    
 #ifdef USE_SYM_APPLICATION
@@ -104,7 +100,6 @@ int find_cuts_u(cg_prob *p, LPdata *lp_data, int *num_cuts)
 
 int free_cg_u(cg_prob *p)
 {
-   int termcode;
 
 #ifdef COMPILE_IN_CG
    FREE(p->cuts_to_add);
@@ -126,8 +121,6 @@ int free_cg_u(cg_prob *p)
 #ifdef CHECK_CUT_VALIDITY
 int check_validity_of_cut_u(cg_prob *p, cut_data *new_cut)
 {
-   int termcode;
-
    switch(new_cut->type){
 
     case EXPLICIT_ROW:

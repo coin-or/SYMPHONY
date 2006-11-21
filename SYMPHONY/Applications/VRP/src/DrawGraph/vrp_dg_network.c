@@ -15,12 +15,11 @@
 
 /* system include files */
 #include <string.h>
-#include <malloc.h>
 
 /* SYMPHONY include files */
-#include "BB_macros.h"
-#include "BB_constants.h"
-#include "dg.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
+#include "sym_dg.h"
 
 /* VRP include files */
 #include "vrp_dg.h"

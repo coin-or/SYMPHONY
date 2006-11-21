@@ -1,6 +1,6 @@
 #===========================================================================#
 #                                                                           #
-# This file is part of the SYMPHONY Branch, Cut, and Price Library.         #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
 #                                                                           #
 # SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                        #
@@ -160,6 +160,7 @@ USER_MASTER_OBJS  += src/Master/cnrp_master_functions.@OBJEXT@ \
 USER_MASTER_OBJS += $(ADDSOURCES)
 
 USER_MASTER_OBJS  += $(COST_OBJS)
+USER_MASTER_OBJS  += $(NET_OBJS)
 ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 USER_MASTER_OBJS  += $(USER_TM_OBJS)
 ifneq ($(SYM_COMPILE_IN_LP),TRUE)

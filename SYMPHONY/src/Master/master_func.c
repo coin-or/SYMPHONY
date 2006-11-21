@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -16,7 +16,6 @@
 
 #define COMPILING_FOR_MASTER
 
-#include <malloc.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,20 +24,20 @@
 #include <pvmtev.h>
 #endif
 
-#include "master.h"
-#include "master_u.h"
-#include "BB_macros.h"
-#include "pack_cut.h"
-#include "pack_array.h"
-#include "lp_solver.h"
-/* FIXME remove lp.h after carrying the heuristics to lp_wrapper*/
-/* and from master.h */
-//#include "lp.h"
-#include "tm.h"
+#include "sym_master.h"
+#include "sym_master_u.h"
+#include "sym_macros.h"
+#include "sym_pack_cut.h"
+#include "sym_pack_array.h"
+#include "sym_lp_solver.h"
+/* FIXME remove sym_lp.h after carrying the heuristics to lp_wrapper*/
+/* and from sym_master.h */
+//#include "sym_lp.h"
+#include "sym_tm.h"
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
 /*===========================================================================*/
 /*===========================================================================*/
+
 #if 0
 /* not used now! to be used later!*/
 int resolve_node(sym_environment *env, bc_node *node)
@@ -350,9 +349,9 @@ int resolve_node(sym_environment *env, bc_node *node)
       }
    }
    /*------------------------------------------------------------------------*\
-   /* Add cuts here */
-   /* FIXME! ASSUMING ALL THE CUTS ARE EXPLICIT ROW! */
-   /*----------------------------------------------------------------------- */
+    * Add cuts here 
+    * FIXME! ASSUMING ALL THE CUTS ARE EXPLICIT ROW!
+   \*----------------------------------------------------------------------- */
    desc = new_desc;
 
    if (desc->cutind.size > 0){
@@ -458,17 +457,12 @@ int resolve_node(sym_environment *env, bc_node *node)
 }
 #endif
 
-/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 /*===========================================================================*/
 
 void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 {
-   int i, set_sol = FALSE, new_solution = FALSE;
-   MIPdesc *mip;
-   double upper_bound = 0.0, lpetol = 9.9999999999999995e-07;
-   double obj[2] = {0.0, 0.0}, gamma, tau, objval;
-   lp_sol *best_sol = &(env->warm_start->best_sol);
+   int i;
 		 
    if (root){
       if (root->node_status == NODE_STATUS__PRUNED || 
@@ -525,10 +519,10 @@ void cut_ws_tree_index(sym_environment *env, bc_node *root, int index,
 		       problem_stat *stat, int change_type)
 {
 
-  int i, j;
+  int i;
   
   if (root){
-     if (root->node_status == !NODE_STATUS__CANDIDATE){
+     if (root->node_status != NODE_STATUS__CANDIDATE){
 	stat->analyzed++;
      }
      if(root->bobj.child_num > 0){
@@ -569,7 +563,7 @@ void cut_ws_tree_level(sym_environment *env, bc_node *root, int level,
 
    int i;
    if(root){
-      if (root->node_status == !NODE_STATUS__CANDIDATE){
+      if (root->node_status != NODE_STATUS__CANDIDATE){
 	 stat->analyzed++;
       }
       
@@ -600,9 +594,6 @@ void cut_ws_tree_level(sym_environment *env, bc_node *root, int level,
 {
 
    int i;
-   double upper_bound = 0.0, lpetol = 9.9999999999999995e-07;
-   MIPdesc *mip;
-   lp_sol *best_sol;
 
    if (root == NULL) return;
 
@@ -677,7 +668,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 	    
 	    if(!env->has_mc_ub){
 	       env->has_mc_ub = TRUE;
-	       env->warm_start->has_ub;
+	       env->warm_start->has_ub = TRUE;
 	       best_sol->has_sol = TRUE;
 	    }
 	    
@@ -786,8 +777,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 
 int copy_node(bc_node * n_to, bc_node *n_from)
 {
-   int i, parent = 0, tmp = 0;
-   
+
    if (!n_to || !n_from){
       printf("copy_node(): Empty node_structure(s)!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);;
@@ -800,9 +790,6 @@ int copy_node(bc_node * n_to, bc_node *n_from)
    n_to->cg = n_from->cg;
    n_to->cp = n_from->cp;
 
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/   
-   n_to->sp = n_from->sp;
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    n_to->lower_bound = n_from->lower_bound;
    n_to->opt_estimate = n_from->opt_estimate;
@@ -1028,9 +1015,6 @@ int write_node(bc_node *node, FILE*f)
    fprintf(f," NODE_LP         : %i\n",node->lp);
    fprintf(f," NODE_CG         : %i\n",node->cg);
    fprintf(f," NODE_CP         : %i\n",node->cp);
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   fprintf(f," NODE_SP         : %i\n",node->sp);
-/*___END_EXPERIMENTAL_SECTION___*/
    fprintf(f," OPT_ESTIMATE    : %.4f\n",node->opt_estimate);  
 
 
@@ -1181,9 +1165,8 @@ int write_tree(bc_node *root, FILE *f)
 
 int read_node(bc_node * node, FILE * f)
 {
-  char str[80], str2[80], str3[80], str4[80];
-   int i=0, j=0, num=0, ch=0;
-   int temp =0;
+   char str[80];
+   int i=0, num=0, ch=0;
 
    if (!node || !f){
       printf("read_node(): Empty node or unable to read from file!\n");
@@ -1198,9 +1181,6 @@ int read_node(bc_node * node, FILE * f)
    fscanf(f,"%s %s %i", str, str, &node->lp);
    fscanf(f,"%s %s %i", str, str, &node->cg);
    fscanf(f,"%s %s %i", str, str, &node->cp);
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   fscanf(f,"%s %s %i", str, str, &node->sp);
-   /*___END_EXPERIMENTAL_SECTION___*/
    fscanf(f,"%s %s %lf", str, str, &node->opt_estimate);
 
 #ifdef TRACE_PATH
@@ -1383,11 +1363,6 @@ int set_param(sym_environment *env, char *line)
    lp_params *lp_par = &env->par.lp_par;
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   sp_params *sp_par = &env->par.sp_par;
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
    dg_params *dg_par = &env->par.dg_par;
    
    strcpy(key,"");
@@ -1399,11 +1374,6 @@ int set_param(sym_environment *env, char *line)
    if (strcmp(key, "verbosity") == 0){
       READ_INT_PAR(env->par.verbosity);
       tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-	 sp_par->verbosity =
-#endif 
-	 /*___END_EXPERIMENTAL_SECTION___*/
 	 cp_par->verbosity = env->par.verbosity;
       return(0);
    }
@@ -1421,15 +1391,6 @@ int set_param(sym_environment *env, char *line)
       lp_par->granularity = tm_par->granularity;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "do_decomp") == 0 ||
-	    strcmp(key, "CG_do_decomp") == 0 ||
-	    strcmp(key, "TM_do_decomp") == 0){
-      READ_INT_PAR(tm_par->do_decomp);
-      cg_par->do_decomp = tm_par->do_decomp;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    
       /***********************************************************************
        ***                    Master parameters                            ***
@@ -1682,15 +1643,6 @@ int set_param(sym_environment *env, char *line)
       read_string(tm_par->cp_exe, line, MAX_FILE_NAME_LENGTH);
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "sp_executable_name") == 0 ||
-	    strcmp(key, "sp_exe") == 0 ||
-	    strcmp(key, "TM_sp_exe") == 0 ||
-	    strcmp(key, "TM_sp_executable_name") == 0){
-      read_string(tm_par->sp_exe, line, MAX_FILE_NAME_LENGTH);
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "lp_debug") == 0 ||
 	    strcmp(key, "TM_lp_debug") == 0){
       READ_INT_PAR(tm_par->lp_debug);
@@ -1709,14 +1661,6 @@ int set_param(sym_environment *env, char *line)
       if (tm_par->cp_debug) tm_par->cp_debug = 4;
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "sp_debug") == 0 ||
-	    strcmp(key, "TM_sp_debug") == 0){
-      READ_INT_PAR(tm_par->sp_debug);
-      if (tm_par->sp_debug) tm_par->sp_debug = 4;
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "max_active_nodes") == 0 ||
 	    strcmp(key, "TM_max_active_nodes") == 0){
       READ_INT_PAR(tm_par->max_active_nodes);
@@ -1727,13 +1671,6 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(tm_par->max_cp_num);
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "max_sp_num") == 0 ||
-	    strcmp(key, "TM_max_sp_num") == 0){
-      READ_INT_PAR(tm_par->max_sp_num);
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    else if (strcmp(key, "lp_mach_num") == 0 ||
 	    strcmp(key, "TM_lp_mach_num") == 0){
       READ_INT_PAR(tm_par->lp_mach_num);
@@ -1814,7 +1751,7 @@ int set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "warm_start_node_level") == 0 ||
 	    strcmp(key, "TM_warm_start_node_level") == 0){
-      READ_INT_PAR(tm_par->warm_start_node_level_ratio);
+      READ_INT_PAR(tm_par->warm_start_node_level);
       return(0);
    }
    else if (strcmp(key, "warm_start_node_level_ratio") == 0 ||
@@ -2151,9 +2088,6 @@ int set_param(sym_environment *env, char *line)
       lp_par->first_lp.all_cuts_time_out = 0;
       lp_par->later_lp.first_cut_time_out = 0;
       lp_par->later_lp.all_cuts_time_out = 0;
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      cg_par->decomp_dynamic_timeout = 6000;
-      /*___END_EXPERIMENTAL_SECTION___*/
       return(0);
    }
    else if (strcmp(key, "all_cut_timeout") == 0 ||
@@ -2163,9 +2097,6 @@ int set_param(sym_environment *env, char *line)
       lp_par->first_lp.all_cuts_time_out = timeout;
       lp_par->later_lp.first_cut_time_out= timeout;
       lp_par->later_lp.all_cuts_time_out = timeout;
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      cg_par->decomp_dynamic_timeout = timeout;
-      /*___END_EXPERIMENTAL_SECTION___*/
       return(0);
    }
    
@@ -2387,48 +2318,6 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(cg_par->do_findcuts);
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   else if (strcmp(key, "decomp_sol_pool_check_freq") == 0 ||
-	    strcmp(key, "CG_decomp_sol_pool_check_freq") == 0){
-      READ_INT_PAR(cg_par->decomp_sol_pool_check_freq);
-      return(0);
-   }
-   else if (strcmp(key, "decomp_wait_for_cols") == 0 ||
-	    strcmp(key, "CG_decomp_wait_for_cols") == 0){
-      READ_INT_PAR(cg_par->decomp_wait_for_cols);
-      return(0);
-   }
-   else if (strcmp(key, "decomp_max_col_num_per_iter") == 0 ||
-	    strcmp(key, "CG_decomp_max_col_num_per_iter") == 0){
-      READ_INT_PAR(cg_par->decomp_max_col_num_per_iter);
-      return(0);
-   }
-   else if (strcmp(key, "decomp_col_block_size") == 0 ||
-	    strcmp(key, "CG_decomp_col_block_size") == 0){
-      READ_INT_PAR(cg_par->decomp_col_block_size);
-      return(0);
-   }
-   else if (strcmp(key, "decomp_mat_block_size") == 0 ||
-	    strcmp(key, "CG_decomp_mat_block_size") == 0){
-      READ_INT_PAR(cg_par->decomp_mat_block_size);
-      return(0);
-   }
-   else if (strcmp(key, "decomp_initial_timeout") == 0 ||
-	    strcmp(key, "CG_decomp_initial_timeout") == 0){
-      READ_DBL_PAR(cg_par->decomp_initial_timeout);
-      return(0);
-   }
-   else if (strcmp(key, "decomp_dynamic_timeout") == 0 ||
-	    strcmp(key, "CG_decomp_dynamic_timeout") == 0){
-      READ_DBL_PAR(cg_par->decomp_dynamic_timeout);
-      return(0);
-   }
-   else if (strcmp(key, "decomp_complete_enum") == 0 ||
-	    strcmp(key, "CG_decomp_complete_enum") == 0){
-      READ_INT_PAR(cg_par->decomp_complete_enum);
-      return(0);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    /***********************************************************************
     ***                      cutpool parameters                         ***
@@ -2487,60 +2376,6 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(cp_par->check_which);
       return(0);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   
-   /***********************************************************************
-    ***                     solpool parameters                          ***
-    ***********************************************************************/
-#ifdef COMPILE_DECOMP
-   else if (strcmp(key, "SP_verbosity") == 0){
-      READ_INT_PAR(sp_par->verbosity);
-      return(0);
-   }
-   else if (strcmp(key, "SP_etol") == 0){
-      READ_DBL_PAR(sp_par->etol);
-      return(0);
-   }
-   
-   else if (strcmp(key, "SP_block_size") == 0){
-      READ_INT_PAR(sp_par->block_size);
-      return(0);
-   }
-   else if (strcmp(key, "SP_max_size") == 0){
-      READ_INT_PAR(sp_par->max_size);
-      return(0);
-   }
-   else if (strcmp(key, "max_number_of_sols") == 0 ||
-	    strcmp(key, "SP_max_number_of_sols") == 0){
-      READ_INT_PAR(sp_par->max_number_of_sols);
-      return(0);
-   }
-   else if (strcmp(key, "SP_delete_which") == 0){
-      READ_INT_PAR(sp_par->delete_which);
-      return(0);
-   }
-   else if (strcmp(key, "SP_touches_until_deletion") == 0){
-      READ_INT_PAR(sp_par->touches_until_deletion);
-      return(0);
-   }
-   else if (strcmp(key, "SP_min_to_delete") == 0){
-      READ_INT_PAR(sp_par->min_to_delete);
-      return(0);
-   }
-   else if (strcmp(key, "SP_compress_num") == 0){
-      READ_INT_PAR(sp_par->compress_num);
-      return(0);
-   }
-   else if (strcmp(key, "SP_compress_ratio") == 0){
-      READ_DBL_PAR(sp_par->compress_ratio);
-      return(0);
-   }
-   else if (strcmp(key, "SP_check_which") == 0){
-      READ_INT_PAR(sp_par->check_which);
-      return(0);
-   }
-#endif
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    return(FUNCTION_TERMINATED_ABNORMALLY);
 }
@@ -2731,11 +2566,6 @@ sym_environment *create_copy_environment (sym_environment *env)
    if(par->tm_par.cp_mach_num)
       par->tm_par.cp_machs =
 	 (char**)malloc(sizeof(char*)*par->tm_par.cp_mach_num);
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if(par->tm_par.sp_mach_num)
-      par->tm_par.sp_machs =
-	 (char**)malloc(sizeof(char*)*par->tm_par.sp_mach_num);
-/*___END_EXPERIMENTAL_SECTION___*/   
    for(i = 0; i<par->tm_par.lp_mach_num; i++){
       par->tm_par.lp_machs[i] = 
 	 (char*)malloc(CSIZE*(MACH_NAME_LENGTH+1));
@@ -2757,14 +2587,6 @@ sym_environment *create_copy_environment (sym_environment *env)
 	     CSIZE*(MACH_NAME_LENGTH+1));
    }
    
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   for(i = 0; i<par->tm_par.sp_mach_num; i++){
-      par->tm_par.sp_machs[i] = 
-	 (char*)malloc(CSIZE*(MACH_NAME_LENGTH+1));
-      memcpy(par->tm_par.sp_machs[i], env->par.tm_par.sp_machs[i],
-	     CSIZE*(MACH_NAME_LENGTH+1));
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    /*========================================================================*/
 	

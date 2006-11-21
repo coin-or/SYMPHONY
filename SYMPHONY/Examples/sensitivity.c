@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
 #else
 
-#include "symphony_api.h"
+#include "symphony.h"
   
 int main(int argc, char **argv)
 {    
@@ -55,17 +55,17 @@ int main(int argc, char **argv)
    sym_load_problem(env);
 
    sym_set_int_param(env, "sensitivity_analysis", TRUE);
-
+ 
    sym_solve(env);
 
    int ind[2];
    double val[2];
-   ind[0] = 4; val[0] = 7000;
-   ind[1] = 7; val[1] = 6000;
+   ind[0] = 4; val[0] = 0;
+   ind[1] = 7; val[1] = 0;
    
    double lb, ub; 
    sym_get_lb_for_new_rhs(env, 2, ind, val, &lb);
-   sym_get_ub_for_new_rhs(env, 2, ind, val, &ub);
+   //  sym_get_ub_for_new_rhs(env, 2, ind, val, &ub);
 
    printf("\nBounds for the new rhs:\n lb: %f\n ub: %f \n\n", lb, ub);
 

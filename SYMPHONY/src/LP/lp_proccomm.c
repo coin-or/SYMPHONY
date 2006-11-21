@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -15,19 +15,18 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <math.h>
-#include <malloc.h>
 
-#include "lp.h"
-#include "timemeas.h"
-#include "proccomm.h"
+#include "sym_lp.h"
+#include "sym_timemeas.h"
+#include "sym_proccomm.h"
 #include "qsortucb.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "messages.h"
-#include "pack_cut.h"
-#include "pack_array.h"
-#include "lp_solver.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_types.h"
+#include "sym_messages.h"
+#include "sym_pack_cut.h"
+#include "sym_pack_array.h"
+#include "sym_lp_solver.h"
 
 /*===========================================================================*/
 
@@ -208,9 +207,6 @@ int receive_active_node(lp_prob *p)
    desc = p->desc = (node_desc *) malloc( sizeof(node_desc) );
 
    receive_int_array(&p->cut_pool, 1);
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   receive_int_array(&p->sol_pool, 1);
-   /*___END_EXPERIMENTAL_SECTION___*/
    receive_int_array(&p->bc_index, 1);
    receive_int_array(&p->bc_level, 1);
    receive_dbl_array(&p->lp_data->objval, 1);
@@ -442,7 +438,7 @@ int receive_cuts(lp_prob *p, int first_lp, int no_more_cuts_count)
 	 tvtimeout.tv_sec = 15; tvtimeout.tv_usec = 0;
 	 r_bufid = treceive_msg(ANYONE, YOU_CAN_DIE, &tvtimeout);
 	 if (! r_bufid){
-	    /* well, the cg has really died and the TM did not send a you can
+	    /* well, the sym_cg.has really died and the TM did not send a you can
 	       die message to us. Just comit harakiri. */
 	    printf("   Cut generator died -- halting machine\n\n");
 	    lp_exit(p);
@@ -456,7 +452,7 @@ int receive_cuts(lp_prob *p, int first_lp, int no_more_cuts_count)
 	 tvtimeout.tv_sec = 15; tvtimeout.tv_usec = 0;
 	 r_bufid = treceive_msg(ANYONE, YOU_CAN_DIE, &tvtimeout);
 	 if (! r_bufid){
-	    /* well, the cp has really died and the TM did not send a you can
+	    /* well, the sym_cp.has really died and the TM did not send a you can
 	       die message to us. Just comit harakiri. */
 	    printf("   Cut Pool died -- halting machine\n\n");
 	    lp_exit(p);
@@ -505,12 +501,10 @@ if (newad.size > 0){                                                        \
 
 void send_node_desc(lp_prob *p, char node_type)
 {
-   node_desc *new_lp_desc, *new_tm_desc;
+   node_desc *new_lp_desc = NULL, *new_tm_desc = NULL;
    node_desc *lp_desc = p->desc;
    char repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
    char deal_with_nf;
-   int i, *indices;
-   double *values;
    
    LPdata *lp_data = p->lp_data;
 
@@ -536,6 +530,8 @@ void send_node_desc(lp_prob *p, char node_type)
 #endif	 
 
 #ifdef COMPILE_IN_LP
+   int *indices;
+   double *values;
    if (node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||
        node_type == DISCARDED_NODE || node_type == FEASIBLE_PRUNED){
 
@@ -714,10 +710,6 @@ void send_node_desc(lp_prob *p, char node_type)
 #else	    
 	    tm->nodes_per_cp[find_process_index(&tm->cp, n->cp)]++;
 #endif
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 if (n->sp)
-	    tm->nodes_per_sp[find_process_index(&tm->sp, n->sp)]++;
-	 /*___END_EXPERIMENTAL_SECTION___*/
 	 break;
        case NODE_BRANCHED_ON:
 	 n->node_status = NODE_STATUS__BRANCHED_ON;

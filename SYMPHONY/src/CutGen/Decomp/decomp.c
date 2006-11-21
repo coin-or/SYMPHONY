@@ -2,13 +2,13 @@
 #include <string.h>
 
 #include "decomp.h"
-#include "timemeas.h"
-#include "messages.h"
+#include "sym_timemeas.h"
+#include "sym_messages.h"
 #include "decomp_types.h"
-#include "proccomm.h"
-#include "decomp_lp.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_proccomm.h"
+#include "decomp_sym_lp.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 
 #define FARKAS 3
 

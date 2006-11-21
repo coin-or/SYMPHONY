@@ -17,13 +17,12 @@
 /* system include files */
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <string.h>
 
 /* SYMPHONY include files */
-#include "timemeas.h"
-#include "BB_macros.h"
-#include "BB_constants.h"
+#include "sym_timemeas.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
 
 /* SPP include files */
 #include "spp.h"

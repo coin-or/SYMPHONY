@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 
-#include "proto.h"
+#include "sym_proto.h"
 #include "spp_types.h"
 
 int *spp_lexsort PROTO((col_ordered *matrix));

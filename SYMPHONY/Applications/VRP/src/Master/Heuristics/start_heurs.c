@@ -29,11 +29,11 @@
 #include "receive_rout.h"
 #include "collect_solutions.h"
 #include "lower_bound.h"
-#include "timemeas.h"
+#include "sym_timemeas.h"
 #include "vrp_const.h"
-#include "dg_params.h"
-#include "vrp_dg.h"
-#include "proccomm.h"
+#include "sym_dg_params.h"
+#include "vrp_sym_dg.h"
+#include "sym_proccomm.h"
 #include "vrp_master_functions.h"
 
 void start_heurs(vrp_problem *vrp, heur_params *heur_par, lb_params *lb_par,

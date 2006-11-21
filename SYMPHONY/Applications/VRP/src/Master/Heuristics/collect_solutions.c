@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "BB_constants.h"
-#include "messages.h"
+#include "sym_messages.h"
 #include "collect_solutions.h"
 #include "compute_cost.h"
 #include "vrp_master_functions.h"

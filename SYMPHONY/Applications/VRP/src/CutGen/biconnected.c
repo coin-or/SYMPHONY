@@ -14,10 +14,9 @@
 /*===========================================================================*/
 
 /* system include files */
-#include <malloc.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
+#include "sym_constants.h"
 
 /* VRP include files */
 #include "vrp_cg.h"

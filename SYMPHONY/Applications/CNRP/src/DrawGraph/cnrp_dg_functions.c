@@ -15,14 +15,14 @@
 
 /* system include files */
 #include <stdio.h>
-#include <malloc.h>
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "proccomm.h"
-#include "dg_params.h"
+#include "sym_constants.h"
+#include "sym_proccomm.h"
+#include "sym_dg_params.h"
 #include "qsortucb.h"
 
 /* CNRP include files */

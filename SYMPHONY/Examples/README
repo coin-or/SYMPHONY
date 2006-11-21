@@ -11,6 +11,7 @@ http://www.lehigh.edu/~tkr2/research/talks/SYMPHONY-TUTORIAL-ICS05.pdf
 Current examples repository includes: 
 
 milp         : implementation of a basic MILP solver
+milp2        : implementation of a basic MILP solver with a user defined input
 warm_start1  : usage of warm starting capability on parameter modification
 warm_start2  : usage of warm starting capability on problem modification
 warm_start3  : usage of warm starting that the problem stops every ten

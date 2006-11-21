@@ -16,12 +16,11 @@
 /* system include files */
 #include <stdio.h>
 #include <math.h>
-#include <malloc.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "proccomm.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_proccomm.h"
 
 /* VRP include files */
 #include "vrp_dg.h"

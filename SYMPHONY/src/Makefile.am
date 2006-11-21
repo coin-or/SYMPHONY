@@ -1,6 +1,6 @@
 #===========================================================================#
 #                                                                           #
-# This file is part of the SYMPHONY Branch, Cut, and Price Library.         #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
 #                                                                           #
 # SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                        #
@@ -39,38 +39,41 @@ SUBDIRS =
 ##############################################################################
 ##############################################################################
 
-SYMINCFILES = \
-	../include/SymConfig.h \
-	../include/BB_constants.h \
-	../include/BB_macros.h \
-	../include/BB_types.h \
-	../include/cg.h \
-	../include/cg_params.h \
-	../include/cg_u.h \
-	../include/cp.h \
-	../include/cp_params.h \
-	../include/cp_u.h \
-	../include/dg.h \
-	../include/dg_params.h \
-	../include/dg_u.h \
-	../include/lp.h \
-	../include/lp_params.h \
-	../include/lp_solver.h \
-	../include/lp_u.h \
-	../include/master.h \
-	../include/master_params.h \
-	../include/master_u.h \
-	../include/messages.h \
-	../include/pack_array.h \
-	../include/pack_cut.h \
-	../include/proccomm.h \
-	../include/proto.h \
+SYMHEADERS = \
+	../include/sym_constants.h \
+	../include/sym_macros.h \
+	../include/sym_types.h \
+	../include/sym_cg.h \
+	../include/sym_cg_params.h \
+	../include/sym_cg_u.h \
+	../include/sym_cp.h \
+	../include/sym_cp_params.h \
+	../include/sym_cp_u.h \
+	../include/sym_dg.h \
+	../include/sym_dg_params.h \
+	../include/sym_dg_u.h \
+	../include/sym_lp.h \
+	../include/sym_lp_params.h \
+	../include/sym_lp_solver.h \
+	../include/sym_lp_u.h \
+	../include/sym_master.h \
+	../include/sym_master_params.h \
+	../include/sym_master_u.h \
+	../include/sym_messages.h \
+	../include/sym_pack_array.h \
+	../include/sym_pack_cut.h \
+	../include/sym_proccomm.h \
+	../include/sym_proto.h \
 	../include/qsortucb.h \
-	../include/return_values.h \
+	../include/sym_return_values.h \
+	../include/symphony.h \
 	../include/symphony_api.h \
-	../include/timemeas.h \
-	../include/tm.h \
-	../include/tm_params.h 
+	../include/sym_timemeas.h \
+	../include/sym_tm.h \
+	../include/sym_tm_params.h
+
+#Add SymConfig.h even though it is not used - for COIN compability
+SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 
 if PRIMAL_HEURISTICS
 SYMINCFILES += ../include/rounding.h
@@ -362,10 +365,6 @@ if USE_CGL_CUTS
 AM_CPPFLAGS += -DUSE_CGL_CUTS
 endif
 
-if USE_OSI_INTERFACE
-AM_CPPFLAGS += 
-endif
-
 if ROOT_NODE_ONLY
 AM_CPPFLAGS += -DROOT_NODE_ONLY
 endif
@@ -532,98 +531,98 @@ EXTRA_PROGRAMS = symphony symphony_m symphony_m_tm symphony_m_tm_lp \
 
 bin_PROGRAMS = $(WHATTOMAKEBINS)
 
-symphony_SOURCES = $(MAIN_SRC) symphony_api.h
-symphony_DEPENDENCIES = $(LDADD)
+symphony_SOURCES = $(MAIN_SRC) symphony.h
+symphony_DEPENDENCIES = $(LDADD) libSym.la
 symphony_CPPFLAGS = $(SYMCPPFLAGS)
 symphony_LDADD = libSym.la $(ALLLDADD)
 symphony_LDFLAGS = -rpath $(libdir)
 
-symphony_m_SOURCES = $(MAIN_SRC) symphony_api.h
-symphony_m_DEPENDENCIES = $(LDADD)
+symphony_m_SOURCES = $(MAIN_SRC) symphony.h
+symphony_m_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_LDFLAGS = -rpath $(libdir)
 
-symphony_m_tm_SOURCES = $(MAIN_SRC) symphony_api.h
-symphony_m_tm_DEPENDENCIES = $(LDADD)
+symphony_m_tm_SOURCES = $(MAIN_SRC) symphony.h
+symphony_m_tm_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_LDFLAGS = -rpath $(libdir)
 
-symphony_m_tm_lp_SOURCES = $(MAIN_SRC) symphony_api.h
-symphony_m_tm_lp_DEPENDENCIES = $(LDADD)
+symphony_m_tm_lp_SOURCES = $(MAIN_SRC) symphony.h
+symphony_m_tm_lp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_lp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_lp_LDFLAGS = -rpath $(libdir)
 
-symphony_m_tm_cp_SOURCES = $(MAIN_SRC) symphony_api.h
-symphony_m_tm_cp_DEPENDENCIES = $(LDADD)
+symphony_m_tm_cp_SOURCES = $(MAIN_SRC) symphony.h
+symphony_m_tm_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_cp_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_cp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_cp_LDFLAGS = -rpath $(libdir)
 
-symphony_m_tm_lp_cg_SOURCES = $(MAIN_SRC) symphony_api.h
-symphony_m_tm_lp_cg_DEPENDENCIES = $(LDADD)
+symphony_m_tm_lp_cg_SOURCES = $(MAIN_SRC) symphony.h
+symphony_m_tm_lp_cg_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_cg_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_lp_cg_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_lp_cg_LDFLAGS = -rpath $(libdir)
 
-symphony_m_tm_lp_cg_cp_SOURCES = $(MAIN_SRC) symphony_api.h
-symphony_m_tm_lp_cg_cp_DEPENDENCIES = $(LDADD)
+symphony_m_tm_lp_cg_cp_SOURCES = $(MAIN_SRC) symphony.h
+symphony_m_tm_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
 symphony_m_tm_lp_cg_cp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
 symphony_m_tm_lp_cg_cp_LDFLAGS = -rpath $(libdir)
 
 symphony_tm_SOURCES =
-symphony_tm_DEPENDENCIES = $(LDADD)
+symphony_tm_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_CPPFLAGS = $(PCPPFLAGS)
 symphony_tm_LDADD = libSym_tm$(TMEXT).la $(PALLLDADD)
 symphony_tm_LDFLAGS = -rpath $(libdir)
 
 symphony_tm_lp_SOURCES =
-symphony_tm_lp_DEPENDENCIES = $(LDADD)
+symphony_tm_lp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_lp_CPPFLAGS = $(PCPPFLAGS)
 symphony_tm_lp_LDADD = libSym_tm$(TMEXT).la $(PALLLDADD)
 symphony_tm_lp_LDFLAGS = -rpath $(libdir)
 
 symphony_tm_cp_SOURCES =
-symphony_tm_cp_DEPENDENCIES = $(LDADD)
+symphony_tm_cp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_cp_CPPFLAGS = $(PCPPFLAGS)
 symphony_tm_cp_LDADD = libSym_tm$(TMEXT).la $(PALLLDADD)
 symphony_tm_cp_LDFLAGS = -rpath $(libdir)
 
 symphony_tm_lp_cg_SOURCES =
-symphony_tm_lp_cg_DEPENDENCIES = $(LDADD)
+symphony_tm_lp_cg_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_lp_cg_CPPFLAGS = $(PCPPFLAGS)
 symphony_tm_lp_cg_LDADD = libSym_tm$(TMEXT).la $(PALLLDADD)
 symphony_tm_lp_cg_LDFLAGS = -rpath $(libdir)
 
 symphony_tm_lp_cg_cp_SOURCES =
-symphony_tm_lp_cg_cp_DEPENDENCIES = $(LDADD)
+symphony_tm_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
 symphony_tm_lp_cg_cp_LDADD = libSym_tm$(TMEXT).la $(PALLLDADD)
 symphony_tm_lp_cg_cp_LDFLAGS = -rpath $(libdir)
 
 symphony_cp_SOURCES =
-symphony_cp_DEPENDENCIES = $(LDADD)
+symphony_cp_DEPENDENCIES = $(LDADD) libSym_cp.la
 symphony_cp_CPPFLAGS = $(PCPPFLAGS)
 symphony_cp_LDADD = libSym_cp.la $(PALLLDADD)
 symphony_cp_LDFLAGS = -rpath $(libdir)
 
 symphony_lp_SOURCES =
-symphony_lp_DEPENDENCIES = $(LDADD)
+symphony_lp_DEPENDENCIES = $(LDADD) 
 symphony_lp_CPPFLAGS = $(PCPPFLAGS)
 symphony_lp_LDADD = libSym_lp$(LPEXT).la $(PALLLDADD)
 symphony_lp_LDFLAGS = -rpath $(libdir)
 
 symphony_lp_cg_SOURCES =
-symphony_lp_cg_DEPENDENCIES = $(LDADD)
+symphony_lp_cg_DEPENDENCIES = $(LDADD) libSym_lp$(LPEXT).la 
 symphony_lp_cg__CPPFLAGS = $(PCPPFLAGS)
 symphony_lp_cg_LDADD = libSym_lp$(LPEXT).la $(PALLLDADD)
 symphony_lp_cg_LDFLAGS = -rpath $(libdir)
 
 symphony_lp_cg_cp_SOURCES =
-symphony_lp_cg_cp_DEPENDENCIES = $(LDADD)
+symphony_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym_lp$(LPEXT).la
 symphony_lp_cg_cp__CPPFLAGS = $(PCPPFLAGS)
 symphony_lp_cg_cp_LDADD = libSym_lp$(LPEXT).la $(PALLLDADD)
 symphony_lp_cg_cp_LDFLAGS = -rpath $(libdir)
@@ -708,8 +707,15 @@ CCLD = $(CXX)
 #CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
 
 # Link with g++
-LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+
+LINK =
+if STATICEXE
+LINK +=  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static -static-libgcc\
+	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+else
+LINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+endif
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -717,12 +723,12 @@ LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 
 # Here list all the header files that are required by a user of the library,
 # and that therefore should be installed in 'install'
+# Although SYMPHONY is not using configuration defs file config.sym, we 
+# add it for now for COIN compatibility.  
 
-# They are already in include dir. 
-
-# include_HEADERS = \
-# 	../include/config_sym.h \
-# 	../include/symphony_api.h
+ include_HEADERS = \
+	../include/config_sym.h \
+	$(SYMHEADERS)
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #
@@ -731,17 +737,15 @@ LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 # You only need to adapt the following line
 ConfigHeader = SymConfig.h
 
-# It is already defined in include dir. 
+install-exec-local:
+	echo "#ifndef HAVE_CONFIG_H" >bla
+	echo "#define HAVE_CONFIG_H" >>bla
+	echo "#endif" >> bla
+	cat $(top_srcdir)/include/$(ConfigHeader) >> bla
+	$(install_sh_DATA) bla $(DESTDIR)$(includedir)/$(ConfigHeader)
+	rm -f bla
 
-# install-exec-local:
-# 	echo "#ifndef HAVE_CONFIG_H" >bla
-# 	echo "#define HAVE_CONFIG_H" >>bla
-# 	echo "#endif" >> bla
-# 	cat $(includedir)/$(ConfigHeader) >> bla
-# 	$(install_sh_DATA) bla $(DESTDIR)$(includedir)/$(ConfigHeader)
-# 	rm -f bla
-
-# uninstall-local:
-# 	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
+uninstall-local:
+	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
 
 

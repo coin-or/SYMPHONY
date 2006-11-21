@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -14,16 +14,15 @@
 
 #ifndef COMPILE_IN_CP
 
-#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "timemeas.h"
-#include "proccomm.h"
-#include "messages.h"
-#include "cp.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_timemeas.h"
+#include "sym_proccomm.h"
+#include "sym_messages.h"
+#include "sym_cp.h"
 
 /*===========================================================================*/
 

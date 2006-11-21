@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -16,17 +16,16 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include <malloc.h>
 #include <string.h>
 
-#include "proccomm.h"
+#include "sym_proccomm.h"
 #include "qsortucb.h"
-#include "lp.h"
-#include "messages.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "pack_cut.h"
+#include "sym_lp.h"
+#include "sym_messages.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_types.h"
+#include "sym_pack_cut.h"
 
 /*===========================================================================*/
 
@@ -47,10 +46,9 @@ int lp_initialize(lp_prob *p, int master_tid)
 #if !defined(COMPILE_IN_TM) || !defined(COMPILE_IN_LP)
    int s_bufid;
 #endif
-   int i;
+   int i, j;
    row_data *rows;
    var_desc **vars;
-   int termcode = 0;
 
 #ifdef COMPILE_IN_LP
 
@@ -78,18 +76,7 @@ int lp_initialize(lp_prob *p, int master_tid)
    p->lp_data->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
    
 #pragma omp critical (lp_solver)
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-   {
-#if 0
-      system("/bin/rm -f /usr/lib/.cpxlicense/.tko*");
-#endif
-      open_lp_solver(p->lp_data);
-   }
-/*___END_EXPERIMENTAL_SECTION___*/
-/*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
    open_lp_solver(p->lp_data);
-#endif
 
    (void) used_time(&p->tt);
 
@@ -97,7 +84,7 @@ int lp_initialize(lp_prob *p, int master_tid)
    s_bufid = init_send(DataInPlace);
    send_msg(p->master, REQUEST_FOR_LP_DATA);
    freebuf(s_bufid);
-
+   int termcode; 
    CALL_WRAPPER_FUNCTION( receive_lp_data_u(p) );
 #endif
    
@@ -105,6 +92,9 @@ int lp_initialize(lp_prob *p, int master_tid)
        p->par.tailoff_obj_backsteps > 1){
       i = MAX(p->par.tailoff_gap_backsteps, p->par.tailoff_obj_backsteps);
       p->obj_history = (double *) malloc((i + 1) * DSIZE);
+      for (j = 0; j <= i; j++){
+	 p->obj_history[j] = -DBL_MAX;
+      }
    }
 #ifndef COMPILE_IN_LP
    if (p->par.use_cg){
@@ -142,13 +132,6 @@ int lp_initialize(lp_prob *p, int master_tid)
    }
    
    cg_initialize(p->cgp, p->master);
-   
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   if (p->cgp->dcmp_data.lp_data)
-      p->cgp->dcmp_data.lp_data->cpxenv = p->lp_data->cpxenv;
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
 #endif
 
    return(FUNCTION_TERMINATED_NORMALLY);
@@ -225,7 +208,7 @@ int fathom_branch(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    node_times *comp_times = &p->comp_times;
    char first_in_loop = TRUE;
-   int iterd, termcode, i;
+   int iterd, termcode;
    int cuts, no_more_cuts_count;
    int num_errors = 0;
    int cut_term = 0;
@@ -285,7 +268,6 @@ int fathom_branch(lp_prob *p)
 				     lp_data->objval+ p->mip->obj_offset,
 				     termcode, iterd));
       }
-      exit(0);
       switch (termcode){
        case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
@@ -659,8 +641,7 @@ int repricing(lp_prob *p)
 	 printf("######## Unexpected termcode: %i \n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
-	    printf("######## Trying to recover by resolving from scratch...\n",
-		   termcode);
+	    printf("######## Trying to recover by resolving from scratch...\n");
 	    
 	    continue;
 	 }else{
@@ -1123,7 +1104,7 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
   double *element, *elementByRow;
   int * integerVariable, *isInteger;
   int *row, *column, *columnStart, *rowStart, *columnLength, *rowLength;
-  int i, j, k;
+  int i, j;
 
   get_bounds(lp_data);
   get_x(lp_data);
@@ -1351,7 +1332,7 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
       int i;
       for (i=start[iPass];i<end[iPass];i++) {
 	int iColumn = integerVariable[i];
-	double value=newSolution[iColumn];
+	//double value=newSolution[iColumn];
 	//assert (fabs(floor(value+0.5)-value)<integerTolerance);
 	double cost = direction * objective[iColumn];
 	double move=0.0;

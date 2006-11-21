@@ -13,19 +13,17 @@
 /*                                                                           */
 /*===========================================================================*/
 
+#define COMPILING_FOR_LP
+
 /* system include files */
 #include <math.h>
-#include <malloc.h>
 #include <stdio.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 #include "qsortucb.h"
-#include "lp_u.h"
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#include "lp.h"
-/*___END_EXPERIMENTAL_SECTION___*/
+#include "sym_lp_u.h"
 
 /* CNRP include files */
 #include "cnrp_lp.h"

@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -15,15 +15,14 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
-#include <malloc.h>
 #include <math.h>
 
-#include "lp.h"
-#include "proccomm.h"
+#include "sym_lp.h"
+#include "sym_proccomm.h"
 #include "qsortucb.h"
-#include "BB_types.h"
-#include "BB_macros.h"
-#include "BB_constants.h"
+#include "sym_types.h"
+#include "sym_macros.h"
+#include "sym_constants.h"
 
 /*===========================================================================*/
 
@@ -146,7 +145,7 @@ void tighten_bounds(lp_prob *p)
 {
    LPdata *lp_data = p->lp_data;
    double *dj = lp_data->dj;
-   double *x = lp_data->x;
+   //double *x = lp_data->x;
    char *status = lp_data->status;
    var_desc **vars = lp_data->vars;
    int n = lp_data->n;
@@ -155,9 +154,10 @@ void tighten_bounds(lp_prob *p)
    double gap = 0.0, max_change;
    int i, vars_recently_fixed_to_ub = 0;
    int did_logical_fixing = FALSE,  did_reduced_cost_fixing = FALSE;
-   int lb_vars, perm_lb_vars, ub_vars, perm_ub_vars, del_vars, *delstat;
+   int lb_vars = 0, perm_lb_vars = 0, ub_vars = 0, perm_ub_vars = 0;
+   int del_vars = 0, *delstat = NULL;
 
-   char not_fixed__lb__switch, not_fixed__ub__switch;
+   //char not_fixed__lb__switch, not_fixed__ub__switch;
    int *ind;
    char *lu;
    double *bd, *ub, *lb;

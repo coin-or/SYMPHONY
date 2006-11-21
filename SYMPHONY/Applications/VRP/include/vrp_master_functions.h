@@ -17,7 +17,7 @@
 #define _VRP_MASTER_FUNCTIONS_H
 
 /* SYMPHONY include files */
-#include "proto.h"
+#include "sym_proto.h"
 
 /* VRP include files */
 #include "vrp_types.h"

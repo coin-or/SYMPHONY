@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -15,22 +15,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h>
 
-#include "pack_cut.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "timemeas.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "cg.h"
+#include "sym_pack_cut.h"
+#include "sym_messages.h"
+#include "sym_proccomm.h"
+#include "sym_timemeas.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_cg.h"
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-#   include "decomp.h"
-#endif
-
-/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -96,13 +89,6 @@ void cg_initialize(cg_prob *p, int master_tid)
    receive_cg_data_u(p);
    
 #endif
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef COMPILE_DECOMP
-   if (p->par.do_decomp)
-      /* This doesn't work anymore because varnum is not defined */
-      open_decomp_lp(p, varnum);
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
    
    (void) used_time(&p->tt);
 }

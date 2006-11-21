@@ -1,6 +1,6 @@
 #===========================================================================#
 #                                                                           #
-# This file is part of the SYMPHONY Branch, Cut, and Price Library.         #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
 #                                                                           #
 # SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                        #
@@ -37,10 +37,10 @@ COININCDIR = @abs_include_dir@
 COINLIBDIR = @abs_lib_dir@
 
 # Directoy with SYMPHONY header files 
-SYMLIBDIR = @SYMSRCDIR@
+SYMINCDIR = @SYMINCDIR@
 
 # Directoy with SYMPHONY library
-SYMINCDIR = @SYMINCDIR@
+SYMLIBDIR = @SYMSRCDIR@
 
 #Directory for LP solver
 GLPKINCDIR = @GLPKINCDIR@

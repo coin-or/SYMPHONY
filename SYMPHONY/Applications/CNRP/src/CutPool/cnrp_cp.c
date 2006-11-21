@@ -14,17 +14,16 @@
 /*===========================================================================*/
 
 /* system include files */
-#include <malloc.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "proccomm.h"
-#include "cp_u.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_types.h"
+#include "sym_proccomm.h"
+#include "sym_cp_u.h"
 
 /* CNRP include files */
 #include "cnrp_cp.h"

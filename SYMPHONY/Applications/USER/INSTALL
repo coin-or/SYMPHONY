@@ -34,11 +34,11 @@ application specific library. Type
 
    cd 
    cd COIN-SYMPHONY
-   ./configure --with-applications
+   ./configure --with-application
    make
    make install
 
-This will create the the Makefile of USER application together with 
+This will create the Makefile of USER application together with 
 SYMPHONY's application library called 'libSymAppl' to be used while 
 building USER. Note that, sequential version library and the 
 executable of SYMPHON will also be made and installed. 
@@ -72,11 +72,11 @@ install PVM from http://www.csm.ornl.gov/pvm/.
 
    cd 
    cd COIN-SYMPHONY
-   ./configure --with-applications --with-pvm
+   ./configure --with-application --with-pvm
    make
    make install
 
-This will create the the Makefile of USER application together with 
+This will create the Makefile of USER application together with 
 SYMPHONY's parallel version application libraries to be used while 
 building USER. Note that, sequential version library and the 
 executable of SYMPHON will also be made and installed. 
@@ -86,7 +86,7 @@ the following module dependencies: '--with-cg=yes --with-cp=yes --with-lp=no
 --with-tm=yes' (see the user manual or the file 'share/config.site' for more 
 information). If you configure with
 
-   ./configure --with-applications --with-pvm --with-lp=yes
+   ./configure --with-application --with-pvm --with-lp=yes
 
 then you will end up with the sequential version. Therefore, if you want 
 to override the default set up, you must configure without one or more of 
@@ -199,15 +199,15 @@ want to enable GMPL reader option, you need to
   - add USE_GLPMPL to the defines
   - add the GLPK library to the workspace
 
-2.  Make sure that the project 'user' is set as the active project from the 
+3.  Make sure that the project 'user' is set as the active project from the 
 Project/Set Active menu. Choose "Build user.exe" from the Build menu. This 
 should successfully build the USER executable. 
 
-3. To test the executable, right click on the user project, go to the
+4. To test the executable, right click on the user project, go to the
 "Debug" tab and set the program arguments to "-F ..\..\sample.user". 
 Note that command-line switches are Unix-style. 
 
-4. Now choose "Execute" from the build menu and the solver should solve the
+5. Now choose "Execute" from the build menu and the solver should solve the
 sample problem.
 
 Note that there is some functionality missing from the Windows version. Most

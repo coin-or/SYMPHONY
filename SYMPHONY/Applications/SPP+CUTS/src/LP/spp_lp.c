@@ -16,14 +16,13 @@
 
 /* system include files */
 #include <stdio.h>
-#include <malloc.h>
 #include <memory.h>
 
 /* SYMPHONY include files */
-#include "proccomm.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "lp_u.h"
+#include "sym_proccomm.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_lp_u.h"
 
 /* SPP include files */
 #include "spp_common.h"

@@ -15,16 +15,14 @@
 #include <malloc.h>
 #include <string.h>
 
-#include "proccomm.h"
+#include "sym_proccomm.h"
 #include "qsortucb.h"
-#include "lp.h"
-#include "messages.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "pack_cut.h"
-#include "rounding.h"
-#include "symphony_api.h"
+#include "sym_lp.h"
+#include "sym_messages.h"
+#include "sym_constants.h"
+#include "sym_pack_cut.h"
+#include "sym_rounding.h"
+#include "symphony.h"
 
 
 /*===========================================================================*/
@@ -33,6 +31,7 @@
 int rnd_test(lp_prob *p)
 {
    printf("Rounding: Successfully compiled.\n");
+   rnd_create_rnd_problem(p);
    exit(0);
 }
 

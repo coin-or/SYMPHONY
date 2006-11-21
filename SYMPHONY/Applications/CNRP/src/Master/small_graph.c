@@ -16,7 +16,6 @@
 /* system include files */
 #include <stdio.h>
 #include <stdlib.h>    /* malloc() is here in AIX ... */
-#include <malloc.h>
 #include <string.h>
 
 /* CNRP include files */

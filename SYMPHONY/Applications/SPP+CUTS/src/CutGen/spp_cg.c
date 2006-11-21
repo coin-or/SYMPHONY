@@ -15,17 +15,17 @@
 /*===========================================================================*/
 
 /* system include files */
-#include <malloc.h>
 #include <memory.h>
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 
 /* SYMPHONY include files */
-#include "proccomm.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_proccomm.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 #include "qsortucb.h"
-#include "cg_u.h"
+#include "sym_cg_u.h"
 
 /* SPP include files */
 #include "spp_cg.h"
@@ -915,7 +915,7 @@ void rotate_odd_hole(int length, int *indices, int *itmp)
       }
    if (indices[(minind-1+length)%length] < indices[(minind+1)%length]) {
       /* reverse cycle */
-      for (i = (int)(floor(length/2)) - 1; i >= 0; i--) {
+      for (i = (int)(floor((double)length/2)) - 1; i >= 0; i--) {
 	 tmp = indices[i];
 	 indices[i] = indices[length - 1 - i];
 	 indices[length - 1 - i] = tmp;

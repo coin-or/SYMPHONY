@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -18,26 +18,25 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <math.h>
-#include <malloc.h>
 
-#include "lp.h"
-#include "master.h" 
-#include "proccomm.h"
+#include "sym_lp.h"
+#include "sym_master.h" 
+#include "sym_proccomm.h"
 #include "qsortucb.h"
-#include "messages.h"
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "BB_types.h"
-#include "lp_solver.h"
-#include "rounding.h"
+#include "sym_messages.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_types.h"
+#include "sym_lp_solver.h"
+#include "sym_rounding.h"
 #ifdef USE_CGL_CUTS
-#include "cg.h"
+#include "sym_cg.h"
 #endif
 #if defined (COMPILE_IN_LP) && defined (COMPILE_IN_TM)
-#include "master_u.h"
+#include "sym_master_u.h"
 #endif
 #ifdef COMPILE_IN_CP
-#include "cp.h"
+#include "sym_cp.h"
 #endif
 
 /*===========================================================================*/
@@ -578,7 +577,7 @@ int is_feasible_u(lp_prob *p, char branching)
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
    int *indices;
-   double *values, valuesi, ub, *heur_solution = NULL, *col_sol = NULL;
+   double *values, valuesi, *heur_solution = NULL, *col_sol = NULL;
    int cnt, i;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
@@ -905,7 +904,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
       printf(" User indices (hexa) and values of nonzeros in the solution\n");
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-      for (i = 0; i < number; ){
+      for (i = 0; i < number; i++){
 	 if (xind[i] == p->mip->n) continue; /* For multi-criteria */
 	 printf("%7x %10.7f ", xind[i], xval[i]);
 	 if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
@@ -929,7 +928,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 printf(" User indices and values of fractional vars in solution\n");
 	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < number; ){
+	 for (i = 0; i < number; i++){
 	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
 	    tmpd = xval[i];
 	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
@@ -944,7 +943,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
       printf(" User indices (hexa) and values of frac vars in the solution\n");
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-      for (i = 0; i < number; ){
+      for (i = 0; i < number; i++){
 	 if (xind[i] == p->mip->n) continue; /* For multi-criteria */
 	 tmpd = xval[i];
 	 if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
@@ -974,7 +973,6 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    int user_res, action = USER__BRANCH_IF_MUST;
    LPdata *lp_data = p->lp_data;
    row_data *rows = lp_data->rows;
-   double lpetol = lp_data->lpetol;
    int i, j = 0, m = lp_data->m;
    int *candidate_rows;
    branch_obj *can;
@@ -998,10 +996,11 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 
    /* First decide if we are going to branch or not */
 #ifdef USE_SYM_APPLICATION
-   user_res = user_shall_we_branch(p->user, lpetol, *cuts, j, slacks_in_matrix,
-				   p->slack_cut_num, p->slack_cuts, lp_data->n,
-				   lp_data->vars, lp_data->x, lp_data->status, 
-				   cand_num, candidates, &action);
+   user_res = user_shall_we_branch(p->user, lp_data->lpetol, *cuts, j, 
+				   slacks_in_matrix, p->slack_cut_num, 
+				   p->slack_cuts, lp_data->n, lp_data->vars, 
+				   lp_data->x, lp_data->status, cand_num, 
+				   candidates, &action);
 #else
    user_res = USER_DEFAULT;
 #endif
@@ -1073,7 +1072,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 
    /* OK, so we got to branch */
 #ifdef USE_SYM_APPLICATION
-   user_res = user_select_candidates(p->user, lpetol, *cuts, j,
+   user_res = user_select_candidates(p->user, lp_data->lpetol, *cuts, j,
 				     slacks_in_matrix, p->slack_cut_num,
 				     p->slack_cuts, lp_data->n, lp_data->vars,
 				     lp_data->x, lp_data->status, cand_num,
@@ -1590,9 +1589,9 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
    LPdata *lp_data = p->lp_data;
    int user_res;
    int i, j, k, l = 0, nzcnt, real_nzcnt, explicit_row_num = 0;
-   int *matbeg, *matind;
+   int *matind;
    double *matval;
-   waiting_row **row_list;
+   waiting_row **row_list = NULL;
    
    colind_sort_extra(p);
 
@@ -1869,7 +1868,6 @@ int generate_column_u(lp_prob *p, int lpcutnum, cut_data **cuts,
 		      double *lb, double *ub)
 {
    int real_nextind = nextind;
-   int termcode = 0;
 #ifdef USE_SYM_APPLICATION
    CALL_USER_FUNCTION( user_generate_column(p->user, generate_what,
 					    p->lp_data->m - p->base.cutnum,
@@ -2205,7 +2203,7 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 				    double etol, char branching)
 {
   double obj[2] = {0.0, 0.0};
-  int cuts = 0, i;
+  int i;
   char new_solution = FALSE;
   char continue_with_node = FALSE;
   

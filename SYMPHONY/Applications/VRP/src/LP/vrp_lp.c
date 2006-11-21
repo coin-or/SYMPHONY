@@ -17,18 +17,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 /*#include <sys/param.h>*/
-#include <malloc.h>
 #include <memory.h>
 #include <math.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
-#include "proccomm.h"
-#include "messages.h"
-#include "timemeas.h"
-#include "lp_u.h"
-#include "dg_params.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
+#include "sym_proccomm.h"
+#include "sym_messages.h"
+#include "sym_timemeas.h"
+#include "sym_lp_u.h"
+#include "sym_dg_params.h"
 
 /* VRP include files */
 #include "vrp_lp.h"
@@ -359,16 +358,6 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
   int cliquecount = 0, val;
   char *clique_array;
   
-  /*__BEGIN_EXPERIMENTAL_SECTION__*/
-  int num_fracs, fracs;
-  int  num_arcs, edge_index;
-  char *cpt;
-  int *arcs;
-  char *indicators;
-	
-  double bigM, *weights;
-
-  /*___END_EXPERIMENTAL_SECTION___*/
   *new_row_num = cutnum;
   if (cutnum > 0)
      *new_rows = row_list = (waiting_row **) calloc (cutnum,
@@ -485,113 +474,6 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	cut->deletable = TRUE;
 	break;
 	
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      case FARKAS:
-	matind = (int *) malloc(varnum * ISIZE);
-	matval = (double *) malloc(varnum * DSIZE);
-	
-	cpt = coef + ((vertnum >> DELETE_POWER) + 1); 
-	memcpy((char *)&num_arcs, cpt, ISIZE);
-	cpt += ISIZE;
-	arcs = (int *) malloc(num_arcs * ISIZE);
-	indicators = (char *) malloc(num_arcs);  
-	memcpy((char *)arcs, cpt, num_arcs * ISIZE);
-	cpt += num_arcs * ISIZE;
-	memcpy(indicators, cpt, num_arcs);
-	cpt += num_arcs;
-	memcpy((char *)&num_fracs, cpt, ISIZE);
-	cpt += ISIZE;
-	weights = (double *) malloc((num_fracs + 1) * DSIZE);
-	memcpy((char *)weights, cpt, (num_fracs + 1) * DSIZE);
-	bigM = (*(double *)weights);
-	weights++;
-	
-	for (fracs = 0, i = 0, nzcnt = 0; i < varnum; i++){
-	   edge_index = vars[i]->userind;
-	   v0 = edges[edge_index << 1];
-	   v1 = edges[(edge_index << 1) + 1];
-	   
-	   if (isset(coef, v1) || isset(coef,v0)){
-	      for (jj = 0; jj < num_arcs; jj++){
-		 if (arcs[jj] == edge_index){
-		    matval[nzcnt] = indicators[jj] ? -bigM : weights[fracs++];
-		    break;
-		 }
-	      }
-	      if (jj == num_arcs) matval[nzcnt] = bigM;
-	      matind[nzcnt++] = i;
-	   }
-	}
-	cut->sense = 'G';
-	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
-	--weights;
-	FREE(indicators);
-	FREE(arcs);
-	FREE(weights);
-	break;
-	
-      case NO_COLUMNS:
-	matind = (int *) malloc(varnum * ISIZE);
-	matval = (double *) malloc(varnum * DSIZE);
-	cpt = coef + ((vertnum >> DELETE_POWER) + 1); 
-	memcpy((char *)&num_arcs, cpt, ISIZE);
-	cpt += ISIZE;
-	arcs = (int *) calloc(num_arcs, ISIZE);
-	indicators = (char *) malloc(num_arcs);  
-	memcpy((char *)arcs, cpt, num_arcs * ISIZE);
-	cpt += num_arcs * ISIZE;
-	memcpy(indicators, cpt, num_arcs);
-	
-	for (i = 0, nzcnt = 0; i < varnum; i++){
-	   edge_index = vars[i]->userind;
-	   v0 = edges[edge_index << 1];
-	   v1 = edges[(edge_index << 1) + 1];
-	   
-	   if (isset(coef, v1) || isset(coef, v0)){
-	      for (jj = 0; jj < num_arcs; jj++){
-		 if (arcs[jj] == edge_index){
-		    matval[nzcnt] = (indicators[jj]) ? 1.0 : 0.0;
-		    break;
-		 }
-	      }
-	      if (jj == num_arcs) matval[nzcnt]= -1.0;
-	      if (fabs(matval[nzcnt]) >.5) matind[nzcnt++] = i;
-	   }
-	}
-	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
-	cut->deletable = TRUE;
-	cut->sense = 'L';
-	FREE(indicators);
-	FREE(arcs);
-	break;
-
-      case GENERAL_NONZEROS:
-	cpt = coef;
-	memcpy((char *)&num_arcs, cpt, ISIZE);
-	cpt += ISIZE;
-	matind = (int *) malloc(num_arcs * ISIZE);
-	arcs = (int *) calloc(num_arcs, ISIZE);
-	matval = (double *) malloc(num_arcs * DSIZE);
-	weights = (double *) malloc(num_arcs * DSIZE);
-	memcpy((char *)arcs, cpt, num_arcs * ISIZE);
-	cpt += num_arcs * ISIZE;
-	memcpy((char *)weights, cpt, num_arcs * DSIZE);
-	
-	for (i = 0, nzcnt = 0; i < varnum; i++){
-	   for (jj = 0; jj < num_arcs; jj++){
-	      if (arcs[jj] == (edge_index = vars[i]->userind)){
-		 matind[nzcnt] = i;
-		 matval[nzcnt++] = weights[jj];
-		 break;
-	      }
-	   }
-	}
-	cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
-	cut->deletable = TRUE;
-	FREE(weights);
-	FREE(arcs);
-	break;
-      /*___END_EXPERIMENTAL_SECTION___*/
 	
       default:
 	 break;
@@ -601,14 +483,7 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
      row_list[j]->matind = matind =
 	(int *) realloc((char *)matind, nzcnt*ISIZE);
      row_list[j]->nzcnt = nzcnt;
-     /*__BEGIN_EXPERIMENTAL_SECTION__*/
-     if (cut->type != CLIQUE && cut->type != FARKAS &&
-	 cut->type != NO_COLUMNS && cut->type != GENERAL_NONZEROS){
-     /*___END_EXPERIMENTAL_SECTION___*/
-     /*UNCOMMENT FOR PRODUCTION CODE*/
-#if 0
      if (cut->type != CLIQUE){
-#endif
 	row_list[j]->matval = matval = (double *) malloc(nzcnt * DSIZE);
 	for (i = nzcnt-1; i >= 0; i--)
 	   matval[i] = 1;
@@ -757,14 +632,6 @@ int user_generate_column(void *user, int generate_what, int cutnum,
       int cliquecount = 0, val;
       char *clique_array;
 
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      int num_arcs, edge_index;
-      char *cpt; 
-      int *arcs = (int *) calloc(total_edgenum, sizeof(int));
-      double bigM, *weights = (double *) calloc(total_edgenum, sizeof(double));
-      char *indicators = (char *) malloc(((vertnum*vertnum)/2)* sizeof(char));
-
-      /*___END_EXPERIMENTAL_SECTION___*/
       colval[0] = 1;
       colind[0] = vl; /* supposes vl < vh !!!!!!**********/
       colval[1] = 1;
@@ -808,56 +675,6 @@ int user_generate_column(void *user, int generate_what, int cutnum,
 	    }
 	    break;
 	    
-	  /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	  case FARKAS:
-	    if (isset(coef, vh) || isset(coef,vl)){
-	       cpt = coef + ((vertnum >> DELETE_POWER) + 1); 
-	       memcpy((char *)&num_arcs, cpt, ISIZE);
-	       memcpy((char *)arcs, cpt, ISIZE*(num_arcs + 1));
-	       arcs++;
-	       cpt += (ISIZE * (num_arcs + 1))/CSIZE;
-	       memcpy((char *)weights, cpt, DSIZE*(num_arcs + 1));
-	       bigM = (*(double *)weights);
-	       weights++;
-	       weights = (double *) calloc( total_edgenum, sizeof(double)) ;
-	       edge_index = INDEX(vh, vl); 
-		  
-	       for (j = 0; j < num_arcs; j++){
-		  if ( arcs[j] == edge_index){
-		     colval[nzcnt] = weights[j];
-		     break;
-		  }
-	       }
-	       if (j == num_arcs) colval[nzcnt] = bigM;
-	       colind[nzcnt++] = vertnum + i;
-	       arcs--;
-	       weights--;
-	    }
-	    break;
-	    
-	  case NO_COLUMNS:
-	    if (isset(coef, vh) || isset(coef,vl)){
-	       cpt=coef+ ((vertnum >> DELETE_POWER) + 1); 
-	       memcpy((char *)&num_arcs, cpt, ISIZE);
-	       cpt+= ISIZE /CSIZE;
-	       memcpy((char *)arcs, cpt, ISIZE*(num_arcs));
-	       cpt+=(ISIZE*(num_arcs ))/CSIZE;
-	       memcpy((char *)indicators, cpt, CSIZE*(num_arcs));
-	       edge_index=INDEX(vh, vl);
-	       
-	       for (j = 0; j < num_arcs; j++){
-		  if ( arcs[j]==edge_index){
-		     colval[nzcnt]=(indicators[j]) ? 1.0 : 0.0;
-		     break;
-		  }
-	       }
-	       if (j == num_arcs) colval[nzcnt] = -1.0;
-	       if (fabs(colval[nzcnt]) >.5)  colind[nzcnt++] = i;
-		
-	    }
-	    break;
-	    
-	  /*___END_EXPERIMENTAL_SECTION___*/
 	  default:
 	    printf("Unrecognized cut type %i!\n", cut->type);
 	 }
@@ -879,11 +696,6 @@ int user_generate_column(void *user, int generate_what, int cutnum,
       }
       *collen = nzcnt;
       *obj = vrp->costs[*real_nextind];
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      FREE(indicators);
-      FREE(arcs);
-      FREE(weights); 
-      /*___END_EXPERIMENTAL_SECTION___*/
    }
 
    return(USER_SUCCESS);
@@ -1191,77 +1003,3 @@ void construct_feasible_solution(vrp_lp_problem *vrp, network *n,
    printf("\n\n");
 }
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#ifdef TRACE_PATH
-
-#include "lp.h"
-
-void check_lp(lp_prob *p)
-{
-   LPdata *lp_data = p->lp_data;
-   int i, j, l;
-   tm_prob *tm = p->tm;
-   double *x = (double *) malloc(tm->feas_sol_size * DSIZE), lhs, cost = 0;
-   double *lhs_totals = (double *) calloc(lp_data->m, DSIZE);
-   MakeMPS(lp_data, 0, 0);
-
-   get_x(lp_data);
-
-   printf("Optimal Fractional Solution: %.10f\n", lp_data->lpetol);
-   for (i = 0; i < lp_data->n; i++){
-      if (lp_data->x[i] > lp_data->lpetol){
-	 printf("uind: %i colind: %i value: %.10f cost: %f\n",
-		lp_data->vars[i]->userind, i, lp_data->x[i], lp_data->obj[i]);
-      }
-      cost += lp_data->obj[i]*lp_data->x[i];
-   }
-   printf("Cost: %f\n", cost);
-   
-   printf("\nFeasible Integer Solution:\n");
-   for (cost = 0, i = 0; i < tm->feas_sol_size; i++){
-      printf("uind: %i ", tm->feas_sol[i]);
-      for (j = 0; j < lp_data->n; j++){
-	 if (lp_data->vars[j]->userind == tm->feas_sol[i]){
-	    cost += lp_data->obj[j];
-	    printf("colind: %i lb: %f ub: %f obj: %f\n", j, lp_data->lb[j],
-		   lp_data->ub[j], lp_data->obj[j]);
-	    break;
-	 }
-      }
-      if (j == lp_data->n)
-	 printf("\n\nERROR!!!!!!!!!!!!!!!!\n\n");
-      x[i] = 1.0;
-   }
-   printf("Cost: %f\n", cost);
-
-   printf("\nChecking LP....\n\n");
-   printf("Number of cuts: %i\n", lp_data->m);
-   for (i = 0; i < tm->feas_sol_size; i++){
-      for (j = 0; j < lp_data->n; j++){
-	 if (tm->feas_sol[i] == lp_data->vars[j]->userind)
-	    break;
-      }
-      for (l = lp_data->matbeg[j]; l < lp_data->matbeg[j] + lp_data->matcnt[j];
-	   l++){
-	 lhs_totals[lp_data->matind[l]] += 1;
-      }
-   }
-   for (i = 0; i < p->base.cutnum; i++){
-      printf("Cut %i: %f %c %f\n", i, lhs_totals[i], lp_data->sense[i],
-	     lp_data->rhs[i]);
-   }
-   for (; i < lp_data->m; i++){
-      lhs = compute_lhs(tm->feas_sol_size, tm->feas_sol, x,
-				   lp_data->rows[i].cut, p->base.cutnum);
-      printf("Cut %i: %f %f %c %f\n", i, lhs_totals[i], lhs, lp_data->sense[i],
-	     lp_data->rhs[i]);
-      if (lp_data->rows[i].cut->sense == 'G' ?
-	  lhs < lp_data->rows[i].cut->rhs : lhs > lp_data->rows[i].cut->rhs){
-	 printf("LP: ERROR -- row is violated by feasible solution!!!\n");
-	 sleep(600);
-	 exit(1);
-      }
-   }
-}
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/

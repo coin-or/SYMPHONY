@@ -21,7 +21,7 @@
 #include "exchange_heur.h"
 #include "vrp_master_functions.h"
 #include "vrp_const.h"
-#include "proccomm.h"
+#include "sym_proccomm.h"
 
 void exchange_heur(vrp_problem *vrp, heurs *eh, int trials, int jobs, 
 		   int which, int *tids, int *sent)

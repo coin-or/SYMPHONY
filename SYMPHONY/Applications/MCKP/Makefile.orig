@@ -2,7 +2,7 @@
 ##############################################################################
 #                                                                            #
 # This file is part of a demonstration application for use with the          #
-# SYMPHONY Branch, Cut, and Price Library. This application is a solver for  #
+# SYMPHONY MILP Solver Framework.          This application is a solver for  #
 # multi-criteria knapsack.                                                   #
 #                                                                            #
 # (c) Copyright 2005 Lehigh University. All Rights Reserved.                 #
@@ -69,7 +69,7 @@ ifeq ($(LP_SOLVER),CPLEX)
        LPINCDIR += /usr/local/include/
        LPLIBPATHS = /usr/local/lib/ 
        LPLIBPATHS += $(SYMPHONYROOT)/lib/${ARCH}/$(LP_SOLVER)
-       LPLIB += -lcplex -lpthread
+       LPLIB += -lcplex -sym_lp.hread
 endif
 
 ifeq ($(LP_SOLVER),OSL)
@@ -86,7 +86,7 @@ ifeq ($(LP_SOLVER),OSI)
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPINCDIR += /usr/local/include/
        LPLIBPATHS += /usr/local/lib/
-       LPLIB += -lOsiCpx -lcplex -lpthread
+       LPLIB += -lOsiCpx -lcplex -sym_lp.hread
 endif
 ifeq ($(OSI_INTERFACE),OSL)
        LPINCDIR += $(HOME)/OSL/osllib/include

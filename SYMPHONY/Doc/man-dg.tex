@@ -28,6 +28,7 @@ options and no post-processing.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \firstfuncdef{user\_dg\_process\_message}
+\sindex[cf]{user\_dg\_process\_message}
 \begin{verbatim}
 void user_dg_process_message(void *user, window *win, FILE *write_to)
 			     
@@ -66,6 +67,7 @@ user can directly issue commands there.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_dg\_init\_window}
+\sindex[cf]{user\_dg\_init\_window}
 \begin{verbatim}
 void user_dg_init_window(void **user, window *win) 
 \end{verbatim}
@@ -102,6 +104,7 @@ data structure for receiving and storing display data.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_dg\_free\_window}
+\sindex[cf]{user\_dg\_free\_window}
 \begin{verbatim}
 void user_dg_free_window(void **user, window *win) 
 \end{verbatim}
@@ -135,6 +138,7 @@ The user must free any data structures allocated.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_interpret\_text}
+\sindex[cf]{user\_interpret\_text}
 \begin{verbatim}
 void user_interpret_text(void *user, int text_length,
 			 char *text, int owner_tid)

@@ -39,7 +39,7 @@ purposes. First, it is used to store the description of a generic MILP that is
 either read in from an MPS or AMPL file. More importantly, it is the data
 structure the user must use to pass the subproblem descriptions back to
 SYMPHONY at the time a new search tree node is created in the function
-\hyperref{{\tt user\_create\_subproblem()}} {{\tt user\_create\_subproblem()}
+\hyperref{{\tt user\_create\_subproblem()}} {\ptt {user\_create\_subproblem()}
 (see Section }{)}{user_create_subproblem}. The structure has 14 fields (listed
 below) that must be filled out to describe a subproblem (some fields are
 optional). \\
@@ -148,10 +148,10 @@ set this.
 
 \begin{htmlonly}
 \paragraph{waiting\_row}
-\label{waiting_row}
 \end{htmlonly}
 %\begin{latexonly}
 \functiondef{waiting\_row}
+\label{waiting_row}
 %\end{latexonly}
 
 A closely related data structure is the {\tt waiting\_row},
@@ -206,6 +206,7 @@ current relaxation),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \firstfuncdef{user\_receive\_lp\_data} 
 \label{user_receive_lp_data}
+\sindex[cf]{user\_receive\_lp\_data}
 \begin{verbatim}
 int user_receive_lp_data (void **user)
 \end{verbatim}
@@ -217,14 +218,14 @@ int user_receive_lp_data (void **user)
 This function only has to be filled out for parallel execution and only if
 either the TM or LP modules are configured as separate processes. Otherwise,
 data will have been copied into appropriate locations in the master function
-\hyperref{{\tt user\_send\_lp\_data()}} {{\tt user\_send\_lp\_data()} (see
+\hyperref{{\tt user\_send\_lp\_data()}} {\ptt {user\_send\_lp\_data()} (see
 Section }{)}{user_send_lp_data}. The two cases can be handled by means of {\tt
 \#ifdef} statements. See comments in the source code stubs for more details. \\
 \\
 Here, the user must receive all problem-specific information sent from
 the master, set up necessary data structures, etc. Note that the data must be
 received in exactly the same order as it was sent in \hyperref{{\tt
-user\_send\_lp\_data()}} {{\tt user\_send\_lp\_data()} (see Section
+user\_send\_lp\_data()}} {\ptt {user\_send\_lp\_data()} (see Section
 }{)}{user_send_lp_data}. See Section \ref{communication} for more notes on
 receiving data.
 
@@ -256,6 +257,7 @@ structure. \\
 
 \functiondef{user\_create\_subproblem}
 \label{user_create_subproblem}
+\sindex[cf]{user\_create\_subproblem}
 \begin{verbatim}
 int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
                            int *maxn, int *maxm, int *maxnz)
@@ -278,7 +280,7 @@ subproblem in column-ordered format and pass it back to SYMPHONY by filling
 out the \texttt{MIPdesc} data structure, described \hyperref{here}{in Section
 }{}{MIPdesc}. The user is not responsible for allocating extra memory to allow
 for the addition of dynamically generated cuts and variables. The arrays
-allocated in \texttt{user\_create\_subproblem()} are owned by SYMPHONY after
+allocated in \ptt{user\_create\_subproblem()} are owned by SYMPHONY after
 allocation and are freed as soon as the relaxation is loaded into the
 solver. However, if the user has an idea as to the maximum number of variables
 and constraints that are likely to be generated during processing of the
@@ -287,7 +289,7 @@ subproblem, this information can be passed to SYMPHONY in the variables
 estimates that SYMPHONY can use to perform memory allocation. They do not have
 to be exact numbers. In fact, these estimates need not be provided at all. The
 \texttt{obj\_sense} and \texttt{obj\_offset} fields are set globally in the
-function \hyperref{{\tt user\_initialize\_root\_node()}} {{\tt
+function \hyperref{{\tt user\_initialize\_root\_node()}} {\ptt{
 user\_initialize\_root\_node()} (see
 Section}{)}{user_initialize_root_node}. Setting them here will have no
 effect.\\
@@ -339,6 +341,7 @@ invoked when setting up a the initial search node in a chain.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_is\_feasible}
+\sindex[cf]{user\_is\_feasible}
 \begin{verbatim}
 int user_is_feasible(void *user, double lpetol, int varnum, int
                      *indices, double *values, int *feasible, 
@@ -416,6 +419,7 @@ pre-solving the LP relaxation of a child corresponding to a candidate and from
 
 \functiondef{user\_send\_feasible\_solution}
 \label{user_send_feasible_solution}
+\sindex[cf]{user\_send\_feasible\_solution}
 \begin{verbatim}
 int user_send_feasible_solution(void *user, double lpetol,
                                 int varnum, int *indices, double *values)
@@ -473,6 +477,7 @@ unless overridden by the user.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_display\_lp\_solution}
+\sindex[cf]{user\_display\_lp\_solution}
 \begin{verbatim}
 int user_display_lp_solution(void *user, int which_sol,
                           int varnum, int *indices, double *values)
@@ -541,7 +546,7 @@ DISP\_FINAL\_RELAXED\_SOLUTION}.
 
 \functiondef{user\_shall\_we\_branch}
 \label{user_shall_we_branch}
-
+\sindex[cf]{user\_shall\_we\_branch}
 \begin{verbatim}
 int user_shall_we_branch(void *user, double lpetol, int cutnum, 
                          int slacks_in_matrix_num,
@@ -692,8 +697,12 @@ warning applies here as in the function {\tt
 
 \ed
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% user_select_candidates
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \functiondef{user\_select\_candidates}
 \label{user_select_candidates}
+\sindex[cf]{user\_select\_candidates}
 \begin{verbatim}
 int user_select_candidates(void *user, double lpetol, int cutnum, 
                            int slacks_in_matrix_num,
@@ -838,6 +847,7 @@ values close to one and with low objective function coefficients.\\
 
 \functiondef{user\_compare\_candidates}
 \label{user_compare_candidates}
+\sindex[cf]{user\_compare\_candidates}
 \begin{verbatim}
 int user_compare_candidates(void *user, branch_obj *can1, branch_obj *can2,
                             double ub, double granularity, 
@@ -933,6 +943,7 @@ the LP relaxations of the children have been pre-solved.
 
 \functiondef{user\_select\_child}
 \label{user_select_child}
+\sindex[cf]{user\_select\_child}
 \begin{verbatim}
 int user_select_child(void *user, double ub, branch_obj *can, char *action)
 \end{verbatim}
@@ -1007,6 +1018,7 @@ objective value of their pre-solved LP relaxation.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_print\_branch\_stat}
+\sindex[cf]{user\_print\_branch\_stat}
 \begin{verbatim}
 int user_print_branch_stat(void *user, branch_obj *can, cut_data *cut,
                            int n, var_desc **vars, char *action)
@@ -1057,6 +1069,7 @@ selected, pre-solved, and the action is decided on for the children.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_add\_to\_desc}
+\sindex[cf]{user\_add\_to\_desc}
 \begin{verbatim}
 int user_add_to_desc(void *user, int *desc_size, char **desc)
 \end{verbatim}
@@ -1103,6 +1116,7 @@ node is sent to the tree manager.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_same\_cuts}
+\sindex[cf]{user\_same\_cuts}
 \begin{verbatim}
 int user_same_cuts (void *user, cut_data *cut1, cut_data *cut2, 
                     int *same_cuts)
@@ -1157,6 +1171,7 @@ is different from all the old ones, then it is added to the local pool.
 
 \functiondef{user\_unpack\_cuts}
 \label{user_unpack_cuts}
+\sindex[cf]{user\_unpack\_cuts}
 \begin{verbatim}
 int user_unpack_cuts(void *user, int from, int type, int varnum, 
                      var_desc **vars, int cutnum, cut_data **cuts,
@@ -1176,11 +1191,11 @@ user has to allocate this array) and their number in {\tt *new\_row\_num}. \\
 Note that SYMPHONY has built-in support for cuts generated explicitly as
 matrix rows with no user-defined packed form, i.e., cuts whose indices and
 coefficients are given explicitly (see the function
-\hyperref{{\tt user\_find\_cuts()}} {{\tt user\_find\_cuts()} in Section
+\hyperref{{\tt user\_find\_cuts()}} {\ptt {user\_find\_cuts()} in Section
 }{}{user_find_cuts}. These cuts can be constructed and added using the helper
 function
 \hyperref{\texttt{cg\_add\_explicit\_cut()}} {\texttt{cg\_add\_explicit\_cut()} (see
-the description of \texttt{user\_find\_cuts()} in Section }{)}{user_find_cuts}
+the description of \ptt{user\_find\_cuts()} in Section }{)}{user_find_cuts}
 and are packed and unpacked automatically, so the user does not need to
 implement this function. In post processing, SYMPHONY unpacks explicitly
 defined cuts and internally generated generic cuts.
@@ -1278,6 +1293,7 @@ the corresponding part of {\tt \htmlref{waiting\_row}{waiting_row}}.
 
 \functiondef{user\_send\_lp\_solution} 
 \label{user_send_lp_solution}
+\sindex[cf]{user\_send\_lp\_solution} 
 \begin{verbatim}
 int user_send_lp_solution(void *user, int varnum, var_desc **vars, 
                           double *x, int where)
@@ -1344,6 +1360,7 @@ what he has packed here.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_logical\_fixing}
+\sindex[cf]{user\_logical\_fixing}
 \begin{verbatim}
 int user_logical_fixing(void *user, int varnum, var_desc **vars, 
                         double *x, char *status, int *num_fixed)
@@ -1398,6 +1415,7 @@ by reduced cost (see LP parameter settings).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_generate\_column}
+\sindex[cf]{user\_generate\_column}
 \begin{verbatim}
 int user_generate_column(void *user, int generate_what, int cutnum, 
                          cut_data **cuts, int prevind, int nextind, 
@@ -1486,6 +1504,7 @@ generate\_what} is {\tt GENERATE\_REAL\_NEXTIND}.
 
 \functiondef{user\_generate\_cuts\_in\_lp}
 \label{user_generate_cuts_in_lp}
+\sindex[cf]{user\_generate\_cuts\_in\_lp}
 \begin{verbatim}
 int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
                              var_desc **vars, double *x, int *new_row_num,
@@ -1562,6 +1581,7 @@ valid only and set that field to {\tt CUT\_\_DO\_NOT\_SEND\_TO\_CP}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_print\_stat\_on\_cuts\_added}
+\sindex[cf]{user\_print\_stat\_on\_cuts\_added}
 \begin{verbatim}
 int user_print_stat_on_cuts_added(void *user, int rownum, waiting_row **rows)
 \end{verbatim}
@@ -1602,6 +1622,7 @@ add and after the cuts have been selected from the local pool.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_purge\_waiting\_rows}
+\sindex[cf]{user\_purge\_waiting\_rows}
 \begin{verbatim}
 int user_purge_waiting_rows(void *user, int rownum,
                             waiting_row **rows, char *delete_rows)
@@ -1659,6 +1680,7 @@ The marked rows are deleted.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \functiondef{user\_free\_lp}
+\sindex[cf]{user\_free\_lp}
 \begin{verbatim}
 int user_free_lp(void **user)
 \end{verbatim}

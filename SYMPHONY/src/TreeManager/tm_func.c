@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -14,7 +14,6 @@
 
 #define COMPILING_FOR_TM
 
-#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,22 +31,22 @@ extern long random PROTO((void));
 #include "omp.h"
 #endif
 
-#include "tm.h"
-#include "BB_constants.h"
-#include "BB_types.h"
-#include "BB_macros.h"
-#include "messages.h"
-#include "proccomm.h"
-#include "timemeas.h"
-#include "pack_cut.h"
-#include "pack_array.h"
+#include "sym_tm.h"
+#include "sym_constants.h"
+#include "sym_types.h"
+#include "sym_macros.h"
+#include "sym_messages.h"
+#include "sym_proccomm.h"
+#include "sym_timemeas.h"
+#include "sym_pack_cut.h"
+#include "sym_pack_array.h"
 #ifdef COMPILE_IN_LP
-#include "lp.h"
+#include "sym_lp.h"
 #endif
 #ifdef COMPILE_IN_TM
-#include "master.h"
+#include "sym_master.h"
 #else
-#include "cp.h"
+#include "sym_cp.h"
 #endif
 
 
@@ -82,7 +81,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #endif
    int s_bufid;
 #endif
-   int termcode = 0, *termcodes = NULL;
+   int *termcodes = NULL;
 #ifndef WIN32
    signal(SIGINT, sym_catch_c);    
 #endif   
@@ -175,7 +174,9 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    tm->lp.free_num = par->max_active_nodes;
    for (i = 0; i < par->max_active_nodes; i++){
       if (termcodes[i] < 0){
-	 return(termcodes[i]);
+	 int tmp = termcodes[i];
+	 FREE(termcodes);
+	 return(tmp);
       }
    }
 #else
@@ -240,19 +241,12 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
       tm->cpp = (cut_pool **) calloc(1, sizeof(cut_pool *));
 #endif
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (par->max_sp_num){
-      tm->sp = start_processes(tm, par->max_sp_num, par->sp_exe,
-			       par->sp_debug, par->sp_mach_num, par->sp_machs);
-      tm->nodes_per_sp = (int *) calloc(tm->par.max_sp_num, ISIZE);
-      tm->active_nodes_per_sp = (int *) calloc(tm->par.max_sp_num, ISIZE);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    /*------------------------------------------------------------------------*\
     * Receive the root node and send out initial data to the LP processes
    \*------------------------------------------------------------------------*/
    
+   FREE(termcodes);
    if (tm->par.warm_start){
       if (!tm->rootnode){
 	 if (!(f = fopen(tm->par.warm_start_tree_file_name, "r"))){
@@ -324,7 +318,6 @@ int solve(tm_prob *tm)
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
    double timeout2 = 600, timeout3 = tm->par.logging_interval, timeout4 = 10;
-   struct timeval timeout = {5, 0};
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
@@ -332,7 +325,7 @@ int solve(tm_prob *tm)
 
    no_work_start = wall_clock(NULL);
 
-   termcode = TM_FINISHED;
+   termcode = TM_UNFINISHED;
    for (; tm->phase <= 1; tm->phase++){
       if (tm->phase == 1 && !tm->par.warm_start){
 	 if ((termcode = tasks_before_phase_two(tm)) ==
@@ -447,14 +440,19 @@ int solve(tm_prob *tm)
 	 }
 	 
 	 if (tm->par.time_limit >= 0.0 &&
-	     wall_clock(NULL) - start_time > tm->par.time_limit){
+	     wall_clock(NULL) - start_time > tm->par.time_limit &&
+	     termcode != TM_FINISHED){
 	    termcode = TM_TIME_LIMIT_EXCEEDED;
 	    break;
 	 }
 
 	 if (tm->par.node_limit >= 0 && tm->stat.analyzed >= 
-	     tm->par.node_limit){
-	    termcode = TM_NODE_LIMIT_EXCEEDED;
+	     tm->par.node_limit && termcode != TM_FINISHED){
+	    if (tm->active_node_num + tm->samephase_candnum > 0){
+	       termcode = TM_NODE_LIMIT_EXCEEDED;
+	    }else{
+	       termcode = TM_FINISHED;
+	    }
 	    break;
 	 }
 
@@ -481,6 +479,8 @@ int solve(tm_prob *tm)
 	    break;
 
 #ifndef COMPILE_IN_LP
+
+	 struct timeval timeout = {5, 0};
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
 	 if (r_bufid && !process_messages(tm, r_bufid)){
 	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
@@ -518,9 +518,12 @@ int solve(tm_prob *tm)
 }
       }
 }
+      if (tm->samephase_candnum + tm->active_node_num == 0){
+	 termcode = TM_FINISHED;
+      }
       if (tm->nextphase_candnum == 0)
 	 break;
-      if (termcode != TM_FINISHED)
+      if (termcode != TM_UNFINISHED)
 	 break;
    }
    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
@@ -577,14 +580,15 @@ void write_log_files(tm_prob *tm)
 void print_tree_status(tm_prob *tm)
 {
    int i;
+   double elapsed_time;
+
+#if 0
    int *widths;
    double *gamma;
    int last_full_level = 0, max_width = 0, num_nodes_estimate = 1;
    int first_waist_level = 0, last_waist_level = 0, waist_level = 0;
    double average_node_time, estimated_time_remaining, user_time = 0.0;
-   double elapsed_time;
 
-#if 0
    widths = (int *) calloc (tm->stat.max_depth + 1, ISIZE);
    gamma = (double *) calloc (tm->stat.max_depth + 1, DSIZE);
    
@@ -758,14 +762,6 @@ int start_node(tm_prob *tm, int thread_num)
 		if (tm->nodes_per_cp[ind] + tm->active_nodes_per_cp[ind] == 0)
 		   tm->cp.free_ind[tm->cp.free_num++] = ind;
 	     }
-	     /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	     if (tm->par.do_decomp && tm->par.max_sp_num > 0 && best_node->sp){
-		ind = find_process_index(&tm->sp, best_node->sp);
-		tm->nodes_per_sp[ind]--;
-		if (tm->nodes_per_sp[ind] + tm->active_nodes_per_sp[ind] == 0)
-		   tm->sp.free_ind[tm->sp.free_num++] = ind;
-	     }
-	     /*___END_EXPERIMENTAL_SECTION___*/
 	     best_node->node_status = NODE_STATUS__PRUNED;
 	     best_node->feasibility_status = OVER_UB_PRUNED;
 	 
@@ -816,13 +812,6 @@ int start_node(tm_prob *tm, int thread_num)
 			       tm->active_nodes_per_cp, tm->nodes_per_cp);
    if (best_node->cp < 0) return(NEW_NODE__ERROR);
 
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (tm->par.do_decomp){
-      best_node->sp = assign_pool(tm, best_node->sp, &tm->sp,
-				  tm->active_nodes_per_sp, tm->nodes_per_sp);
-      if (best_node->sp < 0) return(NEW_NODE__ERROR);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    /* It's time to put together the node and send it out */
    tm->active_node_num++;
@@ -1146,9 +1135,6 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 child->node_status = NODE_STATUS__CANDIDATE;
 	 /* child->lp = child->cg = 0;   zeroed out by calloc */
 	 child->cp = node->cp;
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 child->sp = node->sp;
-	 /*___END_EXPERIMENTAL_SECTION___*/
       }
       child->lower_bound = objval[i];
       child->parent = node;
@@ -1321,10 +1307,6 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #else
       tm->nodes_per_cp[find_process_index(&tm->cp, node->cp)] += np_cp;
 #endif
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (node->sp)
-      tm->nodes_per_sp[find_process_index(&tm->sp, node->sp)] += np_sp;
-   /*___END_EXPERIMENTAL_SECTION___*/
    
    return(dive);
 }
@@ -1565,14 +1547,6 @@ void mark_lp_process_free(tm_prob *tm, int lp, int cp)
       if (tm->nodes_per_cp[ind] + tm->active_nodes_per_cp[ind] == 0)
 	 tm->cp.free_ind[tm->cp.free_num++] = ind;
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (tm->sp.procnum > 0){
-      ind = find_process_index(&tm->sp, tm->active_nodes[lp]->sp);
-      tm->active_nodes_per_sp[ind]--;
-      if (tm->nodes_per_sp[ind] + tm->active_nodes_per_sp[ind] == 0)
-	 tm->sp.free_ind[tm->sp.free_num++] = ind;
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    tm->active_nodes[lp] = NULL;
    tm->lp.free_ind[tm->lp.free_num++] = lp;
    tm->active_node_num--;
@@ -2061,14 +2035,7 @@ int tasks_before_phase_two(tm_prob *tm)
 #ifdef DO_TESTS
       if ((!tm->rootnode->lp) ||
 	  (!tm->rootnode->cg && tm->par.use_cg) ||
-	  /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	  (!tm->rootnode->cp && tm->cp.procnum > 0) ||
-	  (!tm->rootnode->sp && tm->sp.procnum > 0)){
-	 /*___END_EXPERIMENTAL_SECTION___*/
-	 /*UNCOMMENT FOR PRPODUCTION CODE*/
-#if 0
 	 (!tm->rootnode->cp && tm->cp.procnum > 0)){
-#endif
 	 printf("When trying to send root for repricing, the root doesn't\n");
 	 printf("   have some process id correctly set!\n\n");
 	 exit(-100);
@@ -2340,10 +2307,6 @@ int trim_subtree(tm_prob *tm, bc_node *n)
 #else
 	 tm->nodes_per_cp[find_process_index(&tm->cp, n->cp)]++;
 #endif
-      /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      if (tm->par.do_decomp && tm->par.max_sp_num > 0 && n->sp)
-	 tm->nodes_per_sp[find_process_index(&tm->sp, n->sp)]++;
-      /*___END_EXPERIMENTAL_SECTION___*/
       /* also put the node on the nextphase list */
       REALLOC(tm->nextphase_cand, bc_node *,
 	      tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
@@ -2388,14 +2351,6 @@ int mark_subtree(tm_prob *tm, bc_node *n)
 	    if (tm->nodes_per_cp[i] + tm->active_nodes_per_cp[i] == 0)
 	       tm->cp.free_ind[tm->cp.free_num++] = i;
 	 }
-	 /*__BEGIN_EXPERIMENTAL_SECTION__*/
-	 if (tm->par.do_decomp && tm->par.max_sp_num > 0 && n->sp){
-	    i = find_process_index(&tm->sp, n->sp);
-	    tm->nodes_per_sp[i]--;
-	    if (tm->nodes_per_sp[i] + tm->active_nodes_per_sp[i] == 0)
-	       tm->sp.free_ind[tm->sp.free_num++] = i;
-	 }
-	 /*___END_EXPERIMENTAL_SECTION___*/
 	 n->bc_index = -1;
       }else{
 	 /* if it was pruned already the free it now */
@@ -2664,10 +2619,6 @@ int read_node(tm_prob *tm, bc_node *node, FILE *f, int **children)
 #else
 	 tm->nodes_per_cp[find_process_index(&tm->cp, node->cp)]++;
 #endif
-       /*__BEGIN_EXPERIMENTAL_SECTION__*/
-      if (node->sp)
-	 tm->nodes_per_sp[find_process_index(&tm->sp, node->sp)]++;
-      /*___END_EXPERIMENTAL_SECTION___*/
       break;
     case NODE_STATUS__ROOT:
       tm->rootnode = node;
@@ -2973,12 +2924,6 @@ void free_tm(tm_prob *tm)
       FREE(tm->par.cp_machs[0]);
       FREE(tm->par.cp_machs);
    }
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (tm->par.sp_machs){
-      FREE(tm->par.sp_machs[0]);
-      FREE(tm->par.sp_machs);
-   }
-   /*___END_EXPERIMENTAL_SECTION___*/
    FREE(tm->lp.procs);
    FREE(tm->lp.free_ind);
    FREE(tm->cg.procs);
@@ -2987,12 +2932,6 @@ void free_tm(tm_prob *tm)
    FREE(tm->cp.free_ind);
    FREE(tm->nodes_per_cp);
    FREE(tm->active_nodes_per_cp);
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   FREE(tm->sp.procs);
-   FREE(tm->sp.free_ind);
-   FREE(tm->nodes_per_sp);
-   FREE(tm->active_nodes_per_sp);
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    FREE(tm->active_nodes);
    FREE(tm->samephase_cand);
@@ -3018,7 +2957,7 @@ void free_tm(tm_prob *tm)
    FREE(tm->tmp.d);
 
    /*get rid of the added pointers for sens.analysis*/
-   int j,k;
+
    for (i = 0; i < num_threads; i++){
       if(tm->rpath[i])
 	 if(tm->rpath[i][0])
@@ -3031,7 +2970,7 @@ void free_tm(tm_prob *tm)
    FREE(tm->rpath_size);
    FREE(tm->bpath);
    FREE(tm->bpath_size);
-
+   
    FREE(tm);
 }
 
@@ -3053,7 +2992,6 @@ void free_subtree(bc_node *n)
 void free_tree_node(bc_node *n)
 {
 
-   int i;
    FREE(n->sol);
    FREE(n->sol_ind);
 #ifdef SENSITIVITY_ANALYSIS
@@ -3113,11 +3051,6 @@ int tm_close(tm_prob *tm, int termcode)
 #if defined(DO_TESTS) && 0
    if (tm->cp.free_num != tm->cp.procnum)
       printf(" Something is fishy! tm->cp.freenum != tm->cp.procnum\n");
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   if (tm->par.do_decomp)
-      if (tm->sp.free_num != tm->sp.procnum)
-	 printf(" Something is fishy! tm->sp.freenum != tm->sp.procnum\n");
-   /*___END_EXPERIMENTAL_SECTION___*/
 #endif
 
    if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
@@ -3136,9 +3069,6 @@ int tm_close(tm_prob *tm, int termcode)
 #ifndef COMPILE_IN_CP
    stop_processes(&tm->cp);
 #endif
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   stop_processes(&tm->sp);
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    /*------------------------------------------------------------------------*\
     * Receive statistics from the cutpools
@@ -3231,8 +3161,8 @@ void sym_catch_c(int num)
    
    while(true) {
       printf("\nDo you want to abort? [y/N]: ");
-   fflush(stdout);   
-      gets(temp);
+      fflush(stdout);   
+      scanf("%s", temp);
       if (temp[0] != ' ') {      
 	 if(temp[1] == 0 && (temp[0] == 'y' || temp[0] == 'Y')){
       c_count++;

@@ -17,7 +17,7 @@
 #ifndef _SPP_LP_FUNCTIONS_H
 #define _SPP_LP_FUNCTIONS_H
 
-#include "proto.h"
+#include "sym_proto.h"
 
 #include "spp.h"
 

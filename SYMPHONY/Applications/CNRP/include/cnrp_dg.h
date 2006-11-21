@@ -17,8 +17,8 @@
 #define _CNRP_DG_H
 
 /* SYMPHONY include files */
-#include "proto.h"
-#include "dg.h"
+#include "sym_proto.h"
+#include "sym_dg.h"
 
 /* Possible scanned stati of dg_net_vertices */
 #define NOT_SCANNED    0 

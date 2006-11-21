@@ -1,6 +1,6 @@
 #===========================================================================#
 #                                                                           #
-# This file is part of the SYMPHONY Branch, Cut, and Price Library.         #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
 #                                                                           #
 # SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                        #
@@ -26,11 +26,15 @@ test_srcdir = $(OSISRCDIR)/test
 
 AM_CPPFLAGS =
 SYMCPPFLAGS =
+SYMPCPPFLAGS =
 APPLCPPFLAGS =
+SYMPALLLDADD =
 LDADD =
 ALLLDADD =
 
 LIBS =
+SYMLIB = 
+SYMPLIB = 
 
 ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
 	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
@@ -138,10 +142,23 @@ AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 
 ALLLDADD += $(LDADD) $(ADDLIBS)
 SYMCPPFLAGS += $(AM_CPPFLAGS) $(SYMDEFS)
+SYMLIB += $(SYMPHONYOBJDIR)/src/libSym.la
+
+SYMPCPPFLAGS += $(AM_CPPFLAGS) $(SYMPDEFS)
+SYMPALLLDADD += $(ALLLDADD)
+
+if SYM_PARALLEL
+SYMPCPPFLAGS += -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+SYMPALLLDADD += -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
+	-lgpvm3 -lpvm3
+SYMPLIB += $(SYMPHONYOBJDIR)/src/libSym$(MASTEREXT).la
+else
+SYMPLIB += $(SYMLIB)
+endif
 
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
-noinst_PROGRAMS = unitTest
+noinst_PROGRAMS = unitTest punitTest
 
 unitTest_SOURCES = \
 	$(test_srcdir)/OsiColCutTest.cpp \
@@ -152,10 +169,24 @@ unitTest_SOURCES = \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
-unitTest_DEPENDENCIES = $(LDADD)
+punitTest_SOURCES = \
+	$(test_srcdir)/OsiColCutTest.cpp \
+	$(test_srcdir)/OsiCutsTest.cpp \
+	$(test_srcdir)/OsiRowCutDebuggerTest.cpp \
+	$(test_srcdir)/OsiRowCutTest.cpp \
+	OsiSolverInterfaceTest.cpp \
+	OsiSymSolverInterfaceTest.cpp \
+	unitTestSym.cpp
+
+unitTest_DEPENDENCIES = $(LDADD) $(SYMLIB)
 unitTest_CPPFLAGS = $(SYMCPPFLAGS)
-unitTest_LDADD = $(SYMPHONYOBJDIR)/src/libSym.la $(ALLLDADD)
+unitTest_LDADD = $(SYMLIB) $(ALLLDADD)
 unitTest_LDFLAGS = -rpath $(libdir)
+
+punitTest_DEPENDENCIES = $(LDADD) $(SYMPLIB)
+punitTest_CPPFLAGS = $(SYMPCPPFLAGS)
+punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD)
+punitTest_LDFLAGS = -rpath $(libdir)
 
 
 # We are using the Cbc solver executable to do the unit test
@@ -163,10 +194,19 @@ unitTest_LDFLAGS = -rpath $(libdir)
 test: unitTest$(EXEEXT)
 	cd ../../Data/miplib3; make uncompress
 	cd ../../Data/Netlib; make uncompress
-	./unitTest$(EXEEXT) -T $(DATAOBJDIR)/miplib3 \
-	-mpsDir=$(DATAOBJDIR)/Sample \
-	-netlibDir=$(DATAOBJDIR)/Netlib
-.PHONY: test
+	./unitTest$(EXEEXT)
+#-T $(DATAOBJDIR)/miplib3 \
+#	-mpsDir=$(DATAOBJDIR)/Sample \
+#	-netlibDir=$(DATAOBJDIR)/Netlib
+
+ptest: punitTest$(EXEEXT)
+	cd ../../Data/miplib3; make uncompress
+	cd ../../Data/Netlib; make uncompress
+	./punitTest$(EXEEXT) -p 2
+#-T $(DATAOBJDIR)/miplib3 \
+#	-mpsDir=$(DATAOBJDIR)/Sample \
+#	-netlibDir=$(DATAOBJDIR)/Netlib
+.PHONY: test ptest
 
 ########################################################################
 #                          Cleaning stuff                              #

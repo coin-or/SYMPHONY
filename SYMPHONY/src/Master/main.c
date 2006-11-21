@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 
 #else
 
-#include "symphony_api.h"
+#include "symphony.h"
 #ifdef HAS_READLINE
 #include <pwd.h>
 #include <readline/readline.h>
@@ -131,6 +131,7 @@ int main_level = 0; /* 0 - SYMPHONY:
 
 int sym_help(char *line);
 int sym_read_line(char *prompt, char **input);
+int sym_free_env(sym_environment *env);
 
 int main(int argc, char **argv)
 {    
@@ -141,6 +142,10 @@ int main(int argc, char **argv)
    if (argc > 1){
    
       sym_parse_command_line(env, argc, argv);
+
+      if (env->par.verbosity >= 0){
+	 version();
+      }
       
       if (env->par.test){
 
@@ -149,14 +154,16 @@ int main(int argc, char **argv)
       }else{
 	 
 	 if ((termcode = sym_load_problem(env)) < 0){
-	    printf("\nFatal errors encountered. Exiting with code %i.\n\n",
+	    printf("\nFatal errors encountered. Exiting with code %i.\n",
 		   termcode);
+	    printf("See sym_return_values.h for meaning of code.\n\n");
 	    exit(termcode);
 	 }
 	 
 	 if ((termcode = sym_find_initial_bounds(env)) < 0){
-	    printf("\nFatal errors encountered. Exiting with code %i.\n\n",
+	    printf("\nFatal errors encountered. Exiting with code %i.\n",
 		   termcode);
+	    printf("See sym_return_values.h for meaning of code.\n\n");
 	    exit(termcode);
 	 }
 
@@ -167,16 +174,16 @@ int main(int argc, char **argv)
 
      FILE *f = NULL;
      char *line = NULL;
-     char *infile = NULL;     
      char args[3][MAX_LINE_LENGTH + 1];
      char param[MAX_LINE_LENGTH +1], value[MAX_LINE_LENGTH+1];
      char ext[5];     
      int last_dot = 0, j, terminate = FALSE, termcode = 0, int_value = 0;
      int last_level = 0;
      char * is_int = NULL;
-     double *colsol = NULL, objval = 0.0, initial_time = 0.0, start_time = 0.0;
+     double objval = 0.0, initial_time = 0.0, start_time = 0.0;
      double finish_time = 0.0, dbl_value = 0;
 
+     version();
      printf("***** WELCOME TO SYMPHONY INTERACTIVE MIP SOLVER ******\n\n"
 	    "Please type 'help'/'?' to see the main commands!\n\n");
 
@@ -200,16 +207,6 @@ int main(int argc, char **argv)
 	   sym_help("display_help");
 	 } else  sym_help("main_help");
        } else if (strcmp(args[0], "load") == 0){ 
-	  if(env->mip->n){
-	     free_master_u(env);
-	     env->ub = 0;
-	     env->lb = -MAXDOUBLE;
-	     env->has_ub = FALSE;
-	     env->termcode = TM_NO_SOLUTION;
-	     strcpy(env->par.infile, "");
-	     strcpy(env->par.datafile, "");
-	     env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
-	  }
 
 	 if(strcmp(args[1], "") == 0){
 	   sym_read_line("Name of the file: ", &line);
@@ -224,7 +221,7 @@ int main(int argc, char **argv)
 		  args[1]);
 	   continue;
 	 }
-	 
+
 	 /* check to see if SYMPHONY knows the input type! */
 
 	 last_dot = 0;
@@ -256,10 +253,10 @@ int main(int argc, char **argv)
 	 }
 	 
 	 if (strcmp(ext, "mps") == 0){
-
-	   if(sym_read_mps(env, args[1])){
-	     continue;
-	   }
+	    sym_free_env(env);
+	    if(sym_read_mps(env, args[1])){
+	       continue;
+	    }
 
 	 } else {
 
@@ -277,7 +274,7 @@ int main(int argc, char **argv)
 		    args[2]);
 	     continue;
 	   }
-
+	   sym_free_env(env);
 	   if(sym_read_gmpl(env, args[1], args[2])){
 	     continue;
 	   }
@@ -615,7 +612,7 @@ int sym_help(char *line)
 	   "generate_cgl_lift_and_project_cuts : whether or not to use cgl lift and project cuts (default: 0)\n"
 	   "node_selection_rule                : set the node selection rule/search strategy (default: 5)\n"
 	   "strong_branching_candidate_num     : set the stong branching candidates number (default: var)\n"
-	   "compare_candidates_dafult        : set the rule to compare the candidates (defualt: 2)\n"
+	   "compare_candidates_default         : set the rule to compare the candidates (defualt: 2)\n"
 	   "select_child_default               : set the rule to select the children (default: 0)\n"
 	   "diving_threshold                   : set diving threshold (default: 0)\n"
 	   "diving_strategy                    : set diving strategy (default: 0)\n"
@@ -650,13 +647,31 @@ int sym_read_line(char *prompt, char **input)
 {
 
 #ifndef HAS_READLINE
+  int i;
 
   if (*input) FREE(*input);
-  *input = (char *)malloc(CSIZE* MAX_LINE_LENGTH +1);
+  char * getl = (char *)malloc(CSIZE* (MAX_LINE_LENGTH +1));
+   
+  while(true){
+     strcpy(getl, "");
+     printf(prompt);
+      fflush(stdout);
+     fgets(getl, MAX_LINE_LENGTH, stdin);
 
-  printf(prompt);
-  scanf("%s", *input);
-
+     if(getl[0] == '\n' ) {
+	continue;
+     }else {
+	for (i=0; i<strlen(getl); i++){
+	   if ( getl[i] == '\n' ) {
+	      getl[i] = '\0';
+	      break;
+	   }
+	}
+	break;
+     }
+  }
+  *input = getl;
+  
 #else
 
   if (*input) FREE(*input);
@@ -676,7 +691,22 @@ int sym_read_line(char *prompt, char **input)
   
   return (0);
 }
- 
+
+/*===========================================================================*\
+\*===========================================================================*/
+int sym_free_env(sym_environment *env){
+   if(env->mip->n){
+      free_master_u(env);
+      env->ub = 0;
+      env->lb = -MAXDOUBLE;
+      env->has_ub = FALSE;
+      env->termcode = TM_NO_SOLUTION;
+      strcpy(env->par.infile, "");
+      strcpy(env->par.datafile, "");
+      env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+   }
+   return 0;
+} 
 /*===========================================================================*\
 \*===========================================================================*/
 #ifdef HAS_READLINE

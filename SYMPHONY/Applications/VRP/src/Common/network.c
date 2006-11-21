@@ -15,13 +15,13 @@
 
 /* system include files */
 #include <math.h>
-#include <malloc.h>
 #include <memory.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 /* SYMPHONY include files */
-#include "BB_constants.h"
-#include "BB_macros.h"
+#include "sym_constants.h"
+#include "sym_macros.h"
 
 /* VRP include files */
 #include "network.h"
@@ -124,142 +124,9 @@ network *createnet(int *xind, double *xval, int edgenum, double etol,
       verts[i].orignodenum = i;
    }
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-   /*allocate memory for existing nodes list and the binary tree used by
-     capforest*/
-   n->enodes = (vertex **) calloc (n->vertnum, sizeof(vertex *));
-   n->tnodes = (vertex **) calloc (n->vertnum, sizeof(vertex *));
-#endif
-   
-/*___END_EXPERIMENTAL_SECTION___*/
    return(n);
 }
 
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-/*===========================================================================*/
-
-network *createnet2(int *xind, double *xval, int edgenum, double etol,
-		   int *edges, int *demand, int vertnum, char *status)
-{
-   register edge *net_edges;
-   network *n;
-   vertex *verts;
-   int nv0, nv1;
-   elist *adjlist;
-   int i;
-   char *stat = status;
-   int *sort_order;
-   double *tmp;
-
-   double *val_low, *val_high, val_aux;
-   int *ind_low, *ind_high, ind_aux;
-
-   /*------------------------------------------------------------------------*\
-    * Allocate the needed memory and set up the data structures
-   \*------------------------------------------------------------------------*/
-   
-   n = (network *) calloc (1, sizeof(network));
-   n->vertnum = vertnum;
-   n->edgenum = edgenum;/*the number of edges is equal to the number
-			  of nonzeros in the LP solution*/
-   n->verts = (vertex *) calloc(n->vertnum, sizeof(vertex));
-   n->adjlist = (elist *) calloc(2*n->edgenum, sizeof(elist));
-   n->edges = (edge *) calloc(n->edgenum, sizeof(edge));
-   net_edges = n->edges;
-   verts = n->verts;
-   adjlist = n->adjlist;
-   n->is_integral = TRUE;
-
-   tmp = (double *) malloc(edgenum*DSIZE);
-   sort_order = (int *) malloc(edgenum*ISIZE);
-   for (i = edgenum - 1; i >= 0; i--)
-      sort_order[edgenum - i -1] = i;
-   memcpy(tmp, xval, edgenum * DSIZE);
-
-   qsortucb_di(tmp, sort_order, edgenum);
-   qsortucb_ic(sort_order, status, edgenum);
-   FREE(tmp);
-   FREE(sort_order);
-   qsortucb_di(xval, xind, edgenum);
-   /* qsortucb_di sorts the array in nondecreasing order;
-      now need to translate it into nonincreasing */
-   
-   for (i = 0, val_low = xval, val_high = xval + edgenum - 1, ind_low = xind,
-	   ind_high = xind + edgenum - 1; i < (edgenum/2); i++){
-      val_aux = *val_low;
-      *val_low++ = *val_high;
-      *val_high-- = val_aux;
-      ind_aux = *ind_low;
-      *ind_low++ = *ind_high;
-      *ind_high-- = ind_aux;
-   }
-
-   
-   /*------------------------------------------------------------------------*\
-    * set up the adjacency list
-   \*------------------------------------------------------------------------*/
-   
-   for (i = 0; i < edgenum; i++, xval++, xind++, stat++){
-      if (*xval < etol) continue;
-      if (fabs(floor(*xval+.5) - *xval) > etol){
-	 n->is_integral = FALSE;
-	 net_edges->weight = *xval;
-      }else{
-	 net_edges->weight = floor(*xval+.5);
-      }
-#ifdef COMPILE_OUR_DECOMP
-      net_edges->status = *stat;
-#endif
-      nv0 = net_edges->v0 = edges[(*xind) << 1];
-      nv1 = net_edges->v1 = edges[((*xind)<< 1) + 1];
-      if (!verts[nv0].first){
-	 verts[nv0].first = verts[nv0].last = adjlist;
-	 verts[nv0].degree++;
-      }
-      else{
-	 verts[nv0].last->next_edge = adjlist;
-	 verts[nv0].last = adjlist;
-	 verts[nv0].degree++;
-      }
-      adjlist->data = net_edges;
-      adjlist->other_end = nv1;
-      adjlist->other = verts + nv1;
-      adjlist++;
-      if (!verts[nv1].first){
-	 verts[nv1].first = verts[nv1].last = adjlist;
-	 verts[nv1].degree++;
-      }
-      else{
-	 verts[nv1].last->next_edge = adjlist;
-	 verts[nv1].last = adjlist;
-	 verts[nv1].degree++;
-      }
-      adjlist->data = net_edges;
-      adjlist->other_end = nv0;
-      adjlist->other = verts + nv0;
-      adjlist++;
-      
-      net_edges++;
-   }
-   
-   /*set the demand for each node*/
-   for (i = 0; i < vertnum; i++){
-      verts[i].demand = demand[i];
-      verts[i].orignodenum = i;
-   }
-
-#if 0
-   /*allocate memory for existing nodes list and the binary tree used by
-     capforest*/
-   n->enodes = (vertex **) calloc (n->vertnum, sizeof(vertex *));
-   n->tnodes = (vertex **) calloc (n->vertnum, sizeof(vertex *));
-#endif
-   
-   return(n);
-}
-
-/*___END_EXPERIMENTAL_SECTION___*/
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -375,12 +242,6 @@ void free_net(network *n)
       free ((char *) n->verts);
     }
     if (n->edges) free((char *) n->edges);
-/*__BEGIN_EXPERIMENTAL_SECTION__*/
-#if 0
-    if (n->tnodes) free((char *)n->tnodes);
-    if (n->enodes) free((char *)n->enodes);
-#endif
-/*___END_EXPERIMENTAL_SECTION___*/
     free((char *) n);
   }
 }
