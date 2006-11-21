@@ -5250,11 +5250,23 @@ int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
 	 return(FUNCTION_TERMINATED_ABNORMALLY);
       }
       else{
-	 *lb_for_new_rhs =  
-	    get_lb_for_new_rhs(env->warm_start->rootnode, env->mip, cnt, 
-			       new_rhs_ind, new_rhs_val);
-	 return(FUNCTION_TERMINATED_NORMALLY);
+	 /* check if we only have the root node, then no need to call 
+	    recursive algorithm */
+	 int i; 
+	 if(env->warm_start->stat.analyzed == 1) {
+	    *lb_for_new_rhs =  env->warm_start->rootnode->lower_bound;
+	    for(i=0; i<cnt; i++){ 
+	       *lb_for_new_rhs += 
+		  env->warm_start->rootnode->duals[new_rhs_ind[i]]*
+		  (new_rhs_val[i] - env->mip->rhs[new_rhs_ind[i]]);
+	    }	    
+	 } else {
+	    *lb_for_new_rhs =  
+	       get_lb_for_new_rhs(env->warm_start->rootnode, env->mip, cnt, 
+				  new_rhs_ind, new_rhs_val);
+	 }
       }
+      return(FUNCTION_TERMINATED_NORMALLY);	 
    }
 #endif
 #else
