@@ -674,7 +674,7 @@ int is_feasible_u(lp_prob *p, char branching)
    }    
 
 
-   rnd_test();
+   rnd_test(p);
    
    if (feasible == IP_FEASIBLE && p->par.multi_criteria){
       if (analyze_multicriteria_solution(p, indices, values, cnt,

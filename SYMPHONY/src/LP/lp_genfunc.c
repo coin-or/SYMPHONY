@@ -285,6 +285,7 @@ int fathom_branch(lp_prob *p)
 				     lp_data->objval+ p->mip->obj_offset,
 				     termcode, iterd));
       }
+      exit(0);
       switch (termcode){
        case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
