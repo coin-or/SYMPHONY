@@ -58,11 +58,13 @@ int rnd_initialize_data(rounding_problem *rp, lp_prob *p);
 int rnd_find_row_bounds(rounding_problem *rp);
 int rnd_initialize_rp(rounding_problem *rp, lp_prob *p);
 int rnd_delete_rp(rounding_problem *rp);
-int rnd_is_constr_feas(int n, int m, double *rowActivity, const double *rowLower, const double *rowUpper, double lpetol, int verbosity);
-int rnd_is_integral(int n, int *intvars, double *xval, double lpetol, int verbosity);
+int rnd_is_constr_feas(rounding_problem *rp);
+int rnd_grp_is_integral(int n, int *intvars, double *xval, double lpetol, int verbosity);
 int rnd_lexicographic(rounding_problem *rp, lp_prob *p);
-int rnd_find_feas_rounding(rounding_problem *rp, int grp_cnt, int *var_search_grp, int varnum);
+int rnd_find_feas_rounding(rounding_problem *rp, int grp_cnt, int *var_search_grp, int varnum, int recur_level);
 int rnd_update_rp(rounding_problem *rp, int xind, double newval, double newlb, double newub);
 int rnd_if_feas_impossible(int m, double *rowActivity, const double *rowLower, const double *rowUpper, double *rowMax, double *rowMin, double lpetol, int verbosity);
 int sym_rnd_order(rounding_problem *rp, int **var_list, int *rn);
+int rnd_free_rounding_problem(rounding_problem *rp);
+int rnd_is_fully_integral(rounding_problem *rp);
 #endif

@@ -32,7 +32,6 @@ int rnd_test(lp_prob *p)
 {
    printf("Rounding: Successfully compiled.\n");
    rnd_create_rnd_problem(p);
-   exit(0);
 }
 
 /*===========================================================================*/
@@ -56,13 +55,13 @@ int rnd_create_rnd_problem(lp_prob *p)
    int group_size = 10;
    int rn;
    int *var_search_grp = (int *)malloc(group_size*ISIZE);
-   printf("Entering rnd_order\n");
    sym_rnd_order(rp, var_list, &rn);
-   printf("Exiting rnd_orderaslfjasdflksdjflaksdjflkajk\n");
    int grp_first_ind = 0;
    int grp_last_ind;
    int grp_cnt;
    int num_fixed_vars = 0;
+
+   int is_successful = TRUE;
    while(grp_first_ind<rn) {
       grp_cnt = group_size;
       grp_last_ind = grp_first_ind+group_size-1;
@@ -70,15 +69,34 @@ int rnd_create_rnd_problem(lp_prob *p)
 	grp_last_ind = rn-1;
 	grp_cnt = grp_last_ind-grp_first_ind+1;
       }
+      PRINT(rp->verbosity,15,("rounding: subgroup has %d vars\n",grp_cnt));
       memcpy(var_search_grp,&(*var_list)[grp_first_ind],grp_cnt*ISIZE);
-      printf("FOOBARSDLI:FJ\n");
-      if (rnd_find_feas_rounding(rp, grp_cnt, var_search_grp, 0) == 
-	    SYM_RND_FAIL) {
+      if (rnd_find_feas_rounding(rp, grp_cnt, var_search_grp, 0,0) == 
+	    FALSE) {
+	 is_successful = FALSE;
 	 break;
+      } else {
+	 PRINT(rp->verbosity,-1,("rounding: subgroup is integer feasible\n"));
       }
       grp_first_ind = grp_first_ind+grp_cnt;
       num_fixed_vars = num_fixed_vars+grp_cnt;
    }
+
+   if (is_successful) {
+      PRINT(rp->verbosity,-1,("rounding: successfully fixed integer variables. Checking feasibility\n"));
+      if (rnd_is_constr_feas(rp) && rnd_is_fully_integral(rp)) {
+	 PRINT(rp->verbosity,-1,("Rounding Successful!\n"));
+      }
+      else {
+	 PRINT(rp->verbosity,-1,("Solving an LP to restore Feasibility\n"));
+      }
+   }
+
+   free(*var_list);
+   free(var_list);
+   free(var_search_grp);
+   rnd_free_rounding_problem(rp);
+   free(rp);
    return 0;
 }
 
@@ -88,7 +106,7 @@ int rnd_create_rnd_problem(lp_prob *p)
  * feasibiliy. we start rounding variables varnum, varnum+1 ... till we
  * completly scan the whole var_search_grp.
 */
-int rnd_find_feas_rounding(rounding_problem *rp, int grp_cnt, int *var_search_grp, int varnum)
+int rnd_find_feas_rounding(rounding_problem *rp, int grp_cnt, int *var_search_grp, int varnum, int recur_level)
 {
    int n = rp->n;
    int m = rp->m;
@@ -109,18 +127,22 @@ int rnd_find_feas_rounding(rounding_problem *rp, int grp_cnt, int *var_search_gr
    double *ub = rp->ub;
    int verbosity = rp->verbosity;
 
-   int xind = var_search_grp[varnum];
-   printf("rounding: inside find_feas_rounding\n"); 
    /* find if already feasible or if beyond any repairs*/
-   if (rnd_is_integral(grp_cnt, var_search_grp, xval, lpetol, verbosity) == TRUE
-	 && rnd_is_constr_feas(n, m, rowActivity, rowLower, rowUpper, lpetol, 
-	    verbosity) == TRUE) {
+   if (rnd_grp_is_integral(grp_cnt, var_search_grp, xval, lpetol, verbosity) 
+	 == TRUE && rnd_is_constr_feas(rp) == TRUE) {
+      PRINT(verbosity,-1,("rounding: group feasibility reached at recursion level %d\n", recur_level));
       return TRUE;
    } else if (rnd_if_feas_impossible(m, rowActivity, rowLower, rowUpper, rowMax, rowMin, lpetol, verbosity)){
+      PRINT(verbosity,-1,("rounding: infeasible beyond repair at recursion level %d\n", recur_level));
       return FALSE;
    } else if (varnum>=grp_cnt) {
-      return FALSE;
+      PRINT(verbosity,-1,("rounding: group exhausted at recursion level %d\n", recur_level));
+      return TRUE;
+   } else {
+      PRINT(verbosity,-1,("rounding: continuting at recursion level %d\n", recur_level));
    }
+   int xind = var_search_grp[varnum];
+   printf("rounding: find_feas_rounding recursion level %d, varnum = %d value = %f\n",recur_level, varnum, xval[xind]); 
 
    double tmplb = lb[xind];
    double tmpub = ub[xind];
@@ -134,10 +156,13 @@ int rnd_find_feas_rounding(rounding_problem *rp, int grp_cnt, int *var_search_gr
       tmpint = TRUE;
       fixedval = floor(tmpx+0.5);
       if (fixedval<tmpub+lpetol && fixedval>tmplb-lpetol) {
+	 PRINT(verbosity,-1,("rounding: fixing variable %d at %f\n",xind,fixedval));
 	 rnd_update_rp(rp, xind, fixedval, fixedval, fixedval); 
-	 if (rnd_find_feas_rounding(rp,grp_cnt,var_search_grp,varnum+1)==TRUE) {
+	 if (rnd_find_feas_rounding(rp,grp_cnt,var_search_grp,varnum+1,recur_level+1)==TRUE) {
 	    return TRUE;
 	 }
+      } else {
+	 PRINT(verbosity,-1,("rounding: variable %d has bad value: %f %f %f\n",xind,fixedval,lb[xind],ub[xind]));
       }
    }
    
@@ -148,10 +173,13 @@ int rnd_find_feas_rounding(rounding_problem *rp, int grp_cnt, int *var_search_gr
       fixedval = floor(tmpx);
    }
    if (fixedval<tmpub+lpetol && fixedval>tmplb-lpetol) {
+      PRINT(verbosity,-1,("rounding: fixing variable %d at %f\n",xind,fixedval));
       rnd_update_rp(rp, xind, fixedval, fixedval, fixedval); 
-      if (rnd_find_feas_rounding(rp,grp_cnt,var_search_grp,varnum+1)==TRUE) {
+      if (rnd_find_feas_rounding(rp,grp_cnt,var_search_grp,varnum+1,recur_level+1)==TRUE) {
 	 return TRUE;
       }
+   } else {
+      PRINT(verbosity,-1,("rounding: rounddown is out of range for variable %d\n",varnum));
    }
 
    /* round up */
@@ -161,11 +189,15 @@ int rnd_find_feas_rounding(rounding_problem *rp, int grp_cnt, int *var_search_gr
       fixedval = ceil(tmpx);
    }
    if (fixedval<tmpub+lpetol && fixedval>tmplb-lpetol) {
+      PRINT(verbosity,-1,("rounding: fixing variable %d at %f\n",xind,fixedval));
       rnd_update_rp(rp, xind, fixedval, fixedval, fixedval); 
-      if (rnd_find_feas_rounding(rp,grp_cnt,var_search_grp,varnum+1)==TRUE) {
+      if (rnd_find_feas_rounding(rp,grp_cnt,var_search_grp,varnum+1,recur_level+1)==TRUE) {
 	 return TRUE;
       }
+   } else {
+      PRINT(verbosity,-1,("rounding: roundup is out of range for variable %d %f %f %f\n",varnum,tmpub,tmplb,fixedval));
    }
+
 
    /* restore */
    rnd_update_rp(rp,xind, tmpx, tmplb, tmpub);
@@ -228,8 +260,8 @@ int rnd_update_rp(rounding_problem *rp, int xind, double newval, double newlb, d
 int rnd_if_feas_impossible(int m, double *rowActivity, const double *rowLower, const double *rowUpper, double *rowMax, double *rowMin, double lpetol, int verbosity)
 {
    for (int i=0; i<m; i++) {
-      printf("%f\t%f\t%f\t%f\n",rowLower[i], rowUpper[i], rowMax[i], rowMin[i]);
       if (rowMax[i]<rowLower[i]-lpetol || rowMin[i]>rowUpper[i]+lpetol) {
+	 PRINT(verbosity,-1,("%f\t%f\t%f\t%f\n",rowLower[i], rowUpper[i], rowMax[i], rowMin[i]));
 	 return TRUE;
       }
    }
@@ -269,14 +301,14 @@ int rnd_find_row_bounds(rounding_problem *rp)
 	       rowMax[row] = rowMax[row]+rowVal[index]*ub[col];
 	    }
 	    if (rowMin[row]>-tmp_infinity && lb[col]>-tmp_infinity) {
-	       rowMin[row] = rowMin[row]+colVal[index]*lb[col];
+	       rowMin[row] = rowMin[row]+rowVal[index]*lb[col];
 	    }
-	 } else if (colVal[index]<-lpetol) {
+	 } else if (rowVal[index]<-lpetol) {
 	    if (rowMax[row]<tmp_infinity && lb[col]>-tmp_infinity) {
-	       rowMax[row] = rowMax[row]+colVal[index]*lb[col];
+	       rowMax[row] = rowMax[row]+rowVal[index]*lb[col];
 	    }
 	    if (rowMin[row]>-tmp_infinity && ub[col]<tmp_infinity) {
-	       rowMin[row] = rowMin[row]+colVal[index]*ub[col];
+	       rowMin[row] = rowMin[row]+rowVal[index]*ub[col];
 	    }
 	 }
       }
@@ -284,13 +316,12 @@ int rnd_find_row_bounds(rounding_problem *rp)
 }
 
 /*===========================================================================*/
-int rnd_is_constr_feas(int n, int m, double *rowActivity, const double 
-      *rowLower, const double *rowUpper, double lpetol, int verbosity)
+int rnd_is_constr_feas(rounding_problem *rp)
 {
-   for (int row=0; row<m; row++) {
-      if (rowActivity[row]>rowUpper[row]+lpetol || 
-	    rowActivity[row]<rowLower[row]-lpetol) {
-	 PRINT(verbosity,-1,("Rounding: constraint %d has lb %f, ub %f, activity %f\n.",row, rowLower[row], rowUpper[row], rowActivity[row]));
+   for (int row=0; row<rp->m; row++) {
+      if (rp->rowActivity[row]>rp->rowUpper[row]+rp->lpetol || 
+	    rp->rowActivity[row]<rp->rowLower[row]-rp->lpetol) {
+	 PRINT(rp->verbosity,-1,("Rounding: constraint %d has lb %f, ub %f, activity %f\n.",row, rp->rowLower[row], rp->rowUpper[row], rp->rowActivity[row]));
 	 return FALSE;
       }
    }
@@ -298,9 +329,14 @@ int rnd_is_constr_feas(int n, int m, double *rowActivity, const double
 }
 
 /*===========================================================================*/
-int rnd_is_integral(int n, int *intvars, double *xval, double lpetol, int verbosity) 
+int rnd_grp_is_integral(int n, int *intvars, double *xval, double lpetol, int verbosity) 
 {
-
+   for (int i=0; i<n; i++) {
+      if (fabs(xval[i]-floor(xval[i]+0.5))>lpetol) {
+	 return FALSE;
+      }
+   }
+   return TRUE;
 }
 
 
@@ -336,7 +372,6 @@ int rnd_initialize_data(rounding_problem *rp, lp_prob *p)
    rp->lpetol = lp_data->lpetol;
    rp->verbosity = p->par.verbosity;
 
-   printf("Hellow orld\n");
    /* query lp solver to retrieve bounds, rowActivities, etc. */
    get_bounds(lp_data);
    memcpy(rp->lb,lp_data->lb,rp->n*DSIZE);
@@ -361,6 +396,8 @@ int rnd_initialize_data(rounding_problem *rp, lp_prob *p)
       rp->rowStart[i+1] = rp->rowStart[i] + rp->rowLength[i];
    }
 
+   memcpy(rp->rowActivity, p->lp_data->si->getRowActivity(),DSIZE*rp->m);
+
    for (int j=0; j<rp->n; j++) {
       /* search for integer variables */
       if (vars[j]->is_int) {
@@ -369,8 +406,10 @@ int rnd_initialize_data(rounding_problem *rp, lp_prob *p)
       }
    }
 
-   PRINT(p->par.verbosity,-1,("Rounding: number of integer variables = %d\n",rp->num_ints));
-   printf("foobar\n");
+   get_x(p->lp_data);
+   memcpy(rp->xval,lp_data->x,DSIZE*rp->n);
+
+   PRINT(rp->verbosity,-1,("rounding: Problem has %d variables, %d integer, %d constraints\n",rp->n,rp->num_ints,rp->m));
    return 0;
    /* Initialization complete */
 }
@@ -381,14 +420,13 @@ int sym_rnd_order(rounding_problem *rp, int **var_list, int *rn)
 {
 
    /* for now we include all ints in lex. order */
-   printf("rounding: inside order\nfoasdfasdf\n");
+   printf("rounding: inside order\n");
    int order_type = 0;
    switch(order_type) {
     case 0:
       int count = 0;
       *rn = rp->num_ints;
       int *vlist = (int *)malloc(rp->n*ISIZE);
-      printf ("SDLJF\n");
       for (int j=0; j<rp->n; j++) {
 	 if (rp->is_int[j]) {
 	    vlist[count] = j;
@@ -406,3 +444,38 @@ int sym_rnd_order(rounding_problem *rp, int **var_list, int *rn)
    return 0;
 }
 
+/*===========================================================================*/
+int rnd_free_rounding_problem(rounding_problem *rp)
+{
+   free(rp->is_int);
+   free(rp->xval);
+   free(rp->obj);
+   free(rp->rowActivity);
+   free(rp->rowLower);
+   free(rp->rowUpper);
+   free(rp->rowMin);
+   free(rp->rowMax);
+   free(rp->rowStart);
+   free(rp->rowIndex);
+   free(rp->rowLength);
+   free(rp->rowVal);
+   free(rp->colStart);
+   free(rp->colIndex);
+   free(rp->colLength);
+   free(rp->colVal);
+   free(rp->lb);
+   free(rp->ub);
+}
+
+
+/*===========================================================================*/
+int rnd_is_fully_integral(rounding_problem *rp)
+{
+   for (int i=0; i<rp->n; i++) {
+      if (rp->is_int[i] && fabs(rp->xval[i]-floor(rp->xval[i]+0.5))>rp->lpetol) {
+	 PRINT(rp->verbosity,-1,("rounding: rp is not fully integral.\n"));
+	 return FALSE;
+      }
+   }
+   return TRUE;
+}
