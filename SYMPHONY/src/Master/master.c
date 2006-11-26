@@ -445,7 +445,7 @@ int sym_load_problem(sym_environment *env)
    CALL_WRAPPER_FUNCTION( io_u(env) );
 
    /* Start up the graphics window*/
-#ifndef WIN32
+#if !defined(_MSC_VER)
    CALL_WRAPPER_FUNCTION( init_draw_graph_u(env) );
 #endif
 
@@ -480,7 +480,7 @@ int sym_find_initial_bounds(sym_environment *env)
       printf(  "****************************************************\n\n");
       total_time += env->comp_times.ub_overhead + env->comp_times.ub_heurtime;
       total_time += env->comp_times.lb_overhead + env->comp_times.lb_heurtime;
-#ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
+#if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
       printf( "  Problem IO     %.3f\n", env->comp_times.readtime);
       printf( "  Overhead: UB   %.3f\n", env->comp_times.ub_overhead);
       printf( "            LB   %.3f\n", env->comp_times.lb_overhead);
@@ -623,11 +623,13 @@ int sym_solve(sym_environment *env)
    env->tm = tm = (tm_prob *) calloc(1, sizeof(tm_prob));
 
    tm->par = env->par.tm_par;
-
+   
    if ((tm->has_ub = env->has_ub))
-      tm->ub = env->ub;
+	tm->ub = env->ub;
    if ((tm->has_ub_estimate = env->has_ub_estimate))
       tm->ub_estimate = env->ub_estimate;
+   tm->lb = env->lb;
+   
    tm->obj_offset = env->mip->obj_offset;
    tm->obj_sense = env->mip->obj_sense;
    tm->master = env->my_tid;
@@ -1007,7 +1009,7 @@ int sym_solve(sym_environment *env)
 	 total_time += env->comp_times.ub_overhead + env->comp_times.ub_heurtime;
 	 total_time += env->comp_times.lb_overhead + env->comp_times.lb_heurtime;
    
-#ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
+#if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
 	 printf( "====================== Misc Timing =========================\n");
 	 printf( "  Problem IO        %.3f\n", env->comp_times.readtime);
 #if 0
@@ -1057,6 +1059,7 @@ int sym_solve(sym_environment *env)
 
    env->has_ub = FALSE;
    env->ub = 0.0;
+   env->lb = -MAXDOUBLE;
 
    if (env->par.do_draw_graph){
       s_bufid = init_send(DataInPlace);
@@ -2133,7 +2136,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
    }
 
    /* Start up the graphics window*/
-#ifndef WIN32
+#if !defined(_MSC_VER)
    CALL_WRAPPER_FUNCTION( init_draw_graph_u(env) );   
 #endif
    
@@ -5247,11 +5250,23 @@ int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
 	 return(FUNCTION_TERMINATED_ABNORMALLY);
       }
       else{
-	 *lb_for_new_rhs =  
-	    get_lb_for_new_rhs(env->warm_start->rootnode, env->mip, cnt, 
-			       new_rhs_ind, new_rhs_val);
-	 return(FUNCTION_TERMINATED_NORMALLY);
+	 /* check if we only have the root node, then no need to call 
+	    recursive algorithm */
+	 int i; 
+	 if(env->warm_start->stat.analyzed == 1) {
+	    *lb_for_new_rhs =  env->warm_start->rootnode->lower_bound;
+	    for(i=0; i<cnt; i++){ 
+	       *lb_for_new_rhs += 
+		  env->warm_start->rootnode->duals[new_rhs_ind[i]]*
+		  (new_rhs_val[i] - env->mip->rhs[new_rhs_ind[i]]);
+	    }	    
+	 } else {
+	    *lb_for_new_rhs =  
+	       get_lb_for_new_rhs(env->warm_start->rootnode, env->mip, cnt, 
+				  new_rhs_ind, new_rhs_val);
+	 }
       }
+      return(FUNCTION_TERMINATED_NORMALLY);	 
    }
 #endif
 #else

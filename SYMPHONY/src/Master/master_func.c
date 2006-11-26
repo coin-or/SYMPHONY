@@ -2777,20 +2777,16 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 	    }			    
 	    else if (child->feasibility_status == INFEASIBLE_PRUNED){
 	       
+	       child->B_IP = SYM_INFINITY;
 	       retval = check_feasibility_new_rhs(child, mip, cnt, ind, val);
-	       if(retval == LP_D_UNBOUNDED || retval == LP_ABANDONED || 
-		  retval == LP_D_INFEASIBLE){
-		  child->B_IP = SYM_INFINITY;
-	       }
-
+	       /* if(retval == LP_D_UNBOUNDED || retval == LP_ABANDONED || 
+		   retval == LP_D_INFEASIBLE){
+		   child->B_IP = SYM_INFINITY;
+	       } */
 	       if(retval == LP_OPTIMAL || retval == LP_D_OBJLIM || 
 		  retval == LP_D_ITLIM){
 		  child->B_IP = -SYM_INFINITY;
-
 	       }
-
-	       child->B_IP = SYM_INFINITY;
-
 	    }
 	    else {
 	       printf("get_lb_for_new_rhs(): Unknown error!\n");

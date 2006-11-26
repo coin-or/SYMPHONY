@@ -419,6 +419,35 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 LT_LDFLAGS += -rpath $(libdir)
 
 ########################################################################
+########################################################################
+
+# Compile everything with g++
+CC = $(CXX)
+CCLD = $(CXX)
+
+#Static link
+STATIC_LINK =  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -static\
+	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
+# Link with g++
+LINK =
+if STATICEXE
+LINK +=  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static -static-libgcc\
+	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+else
+LINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+endif
+
+SYMLINK =
+if USE_CL
+SYMLINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+else
+SYMLINK += $(LINK)
+endif
+
+########################################################################
 #                               libSym                                 #
 ########################################################################
 
@@ -439,9 +468,6 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 # in the 'lib' directory
 
 lib_LTLIBRARIES = $(WHATTOMAKELIBS)
-
-STATIC_LINK =  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -static\
-	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 # List all source files for this library, including headers
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
@@ -525,6 +551,7 @@ symphony_DEPENDENCIES = $(LDADD) libSym.la
 symphony_CPPFLAGS = $(SYMCPPFLAGS)
 symphony_LDADD = libSym.la $(ALLLDADD)
 symphony_LDFLAGS = -rpath $(libdir)
+symphony_LINK = $(SYMLINK)
 
 symphony_m_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
@@ -686,25 +713,12 @@ libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 #                Other stuff                                           #    
 ########################################################################
 
-COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
-# Compile everything with g++
-CC = $(CXX)
-CCLD = $(CXX)
+#COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
 # Get rid of warning flags
 #FIXME-Try to have the following later
 #CFLAGS := $(subst $(COIN_WARNINGS), ,$(CFLAGS))
 #CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
 
-# Link with g++
-
-LINK =
-if STATICEXE
-LINK +=  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static -static-libgcc\
-	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-else
-LINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-endif
 
 ########################################################################
 #                Headers that need to be installed                     #
