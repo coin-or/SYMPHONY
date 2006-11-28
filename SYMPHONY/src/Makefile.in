@@ -141,10 +141,12 @@ host_triplet = @host@
 @STATICEXE_FALSE@am__append_47 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 @STATICEXE_FALSE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-@USE_CL_TRUE@am__append_48 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
+@USE_CL_TRUE@am__append_48 = cp -f main.$(OBJEXT) symphony-main.$(OBJEXT); $(LIBTOOL) \
+@USE_CL_TRUE@	--tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
 @USE_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-@USE_CL_FALSE@am__append_49 = $(LINK)
+@USE_CL_TRUE@am__append_49 = main.$(OBJEXT) 
+@USE_CL_FALSE@am__append_50 = $(LINK)
 EXTRA_PROGRAMS = symphony$(EXEEXT) symphony_m$(EXEEXT) \
 	symphony_m_tm$(EXEEXT) symphony_m_tm_lp$(EXEEXT) \
 	symphony_m_tm_cp$(EXEEXT) symphony_m_tm_lp_cg$(EXEEXT) \
@@ -2826,7 +2828,8 @@ STATIC_LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -static\
 
 # Link with g++
 LINK = $(am__append_46) $(am__append_47)
-SYMLINK = $(am__append_48) $(am__append_49)
+SYMLINK = $(am__append_48) $(am__append_50)
+SYMLDADD = $(LDADD) $(am__append_49)
 
 ########################################################################
 #                               libSym                                 #
@@ -2908,7 +2911,7 @@ libSym_tm_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
 libSym_tm_lp_cg_cp_la_LDFLAGS = $(LT_LDFLAGS)
 libSym_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
 symphony_SOURCES = $(MAIN_SRC) symphony.h
-symphony_DEPENDENCIES = $(LDADD) libSym.la
+symphony_DEPENDENCIES = $(SYMLDADD) libSym.la
 symphony_CPPFLAGS = $(SYMCPPFLAGS)
 symphony_LDADD = libSym.la $(ALLLDADD)
 symphony_LDFLAGS = -rpath $(libdir)
@@ -3049,16 +3052,6 @@ libSymAppl_tm_lp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
-
-########################################################################
-#                Other stuff                                           #    
-########################################################################
-
-#COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
-# Get rid of warning flags
-#FIXME-Try to have the following later
-#CFLAGS := $(subst $(COIN_WARNINGS), ,$(CFLAGS))
-#CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -10457,6 +10450,19 @@ uninstall-info: uninstall-info-recursive
 	uninstall-binPROGRAMS uninstall-includeHEADERS \
 	uninstall-info-am uninstall-libLTLIBRARIES uninstall-local
 
+
+########################################################################
+#                Other stuff                                           #    
+########################################################################
+
+#COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
+# Get rid of warning flags
+#FIXME-Try to have the following later
+#CFLAGS := $(subst $(COIN_WARNINGS), ,$(CFLAGS))
+#CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
+
+rename_obj:
+	mv main.obj symphony-main.obj
 
 install-exec-local:
 	echo "#ifndef HAVE_CONFIG_H" >bla
