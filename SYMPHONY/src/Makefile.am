@@ -72,6 +72,10 @@ SYMHEADERS = \
 	../include/sym_tm.h \
 	../include/sym_tm_params.h
 
+if USE_CL
+ SYMHEADERS += ../include/sym_win32_time.h
+endif
+
 
 #Add SymConfig.h even though it is not used - for COIN compability
 SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
