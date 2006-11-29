@@ -72,6 +72,10 @@ SYMHEADERS = \
 	../include/sym_tm.h \
 	../include/sym_tm_params.h
 
+if USE_CL
+ SYMHEADERS += ../include/sym_win32_time.h
+endif
+
 
 #Add SymConfig.h even though it is not used - for COIN compability
 SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
@@ -440,9 +444,12 @@ LINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 endif
 
 SYMLINK =
+SYMLDADD = $(LDADD)
 if USE_CL
-SYMLINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
+SYMLINK += cp -f main.$(OBJEXT) symphony-main.$(OBJEXT); $(LIBTOOL) \
+	--tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+SYMLDADD += main.$(OBJEXT) 
 else
 SYMLINK += $(LINK)
 endif
@@ -547,7 +554,7 @@ EXTRA_PROGRAMS = symphony symphony_m symphony_m_tm symphony_m_tm_lp \
 bin_PROGRAMS = $(WHATTOMAKEBINS)
 
 symphony_SOURCES = $(MAIN_SRC) symphony.h
-symphony_DEPENDENCIES = $(LDADD) libSym.la
+symphony_DEPENDENCIES = $(SYMLDADD) libSym.la
 symphony_CPPFLAGS = $(SYMCPPFLAGS)
 symphony_LDADD = libSym.la $(ALLLDADD)
 symphony_LDFLAGS = -rpath $(libdir)
@@ -719,6 +726,8 @@ libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 #CFLAGS := $(subst $(COIN_WARNINGS), ,$(CFLAGS))
 #CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
 
+rename_obj:
+	mv main.obj symphony-main.obj
 
 ########################################################################
 #                Headers that need to be installed                     #
