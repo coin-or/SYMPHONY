@@ -2886,6 +2886,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
 
    mps.messageHandler()->setLogLevel(0);
    
+#if 0
    while (true) {
       buf = (char*)malloc(CSIZE*size);
       if (getcwd(buf, size))
@@ -2915,11 +2916,11 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    else{
 	   memcpy(fname, infile, CSIZE*j);
    }
-
+#endif
 
    mps.setInfinity(mps.getInfinity());
-   
-   if (errors = mps.readMps(fname,ext)){
+
+   if (errors = mps.readMps(infile,"")){
       return(errors);
    }
    

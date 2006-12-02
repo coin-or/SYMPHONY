@@ -15,7 +15,7 @@
 #ifndef __TIMEMEAS_H
 #define __TIMEMEAS_H
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #include "sym_win32_time.h"
 #else
 #include <sys/time.h>
