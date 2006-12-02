@@ -176,7 +176,7 @@ TestLDADD += OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
 	OsiSolverInterfaceTest.$(OBJEXT) OsiSymSolverInterfaceTest.$(OBJEXT) \
 	 unitTestSym.$(OBJEXT)
 else 
-TestLINK += $(LINK)
+TestLINK += $(CXXLINK)
 endif
 
 noinst_PROGRAMS = unitTest punitTest

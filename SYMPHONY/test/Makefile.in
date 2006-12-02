@@ -110,7 +110,7 @@ host_triplet = @host@
 @USE_CL_TRUE@	OsiSolverInterfaceTest.$(OBJEXT) OsiSymSolverInterfaceTest.$(OBJEXT) \
 @USE_CL_TRUE@	 unitTestSym.$(OBJEXT)
 
-@USE_CL_FALSE@am__append_23 = $(LINK)
+@USE_CL_FALSE@am__append_23 = $(CXXLINK)
 noinst_PROGRAMS = unitTest$(EXEEXT) punitTest$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
