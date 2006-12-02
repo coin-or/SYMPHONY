@@ -62,20 +62,20 @@ int main (int argc, const char *argv[])
    if (parms.find("-mpsDir") != parms.end())
       mpsDir=parms["-mpsDir"] + dirsep;
    else {
-#ifdef _MSC_VER
-      mpsDir = "..\\..\\Data\\Sample\\";
-#else
+      //#ifdef _MSC_VER
+      //      mpsDir = "..\\..\\Data\\Sample\\";
+      //#else
       mpsDir = dirsep =='/' ? "../../Data/Sample/" : "..\\..\\Data\\Sample\\";
-#endif  
+      //#endif  
 } 
    if (parms.find("-netlibDir") != parms.end())
       netlibDir=parms["-netlibDir"] + dirsep;
    else 
-#ifdef _MSC_VER
-     netlibDir = "..\\..\\Data\\Netlib\\";
-#else
+      //#ifdef _MSC_VER
+      //     netlibDir = "..\\..\\Data\\Netlib\\";
+      //#else
       netlibDir = dirsep == '/' ? "../../Data/Netlib/" : "..\\..\\Data\\Netlib\\";
-#endif
+   //#endif
     {
     OsiSymSolverInterface symSi;
     testingMessage( "Testing OsiRowCut with OsiSymSolverInterface\n" );

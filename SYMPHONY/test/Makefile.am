@@ -218,7 +218,7 @@ test: unitTest$(EXEEXT)
 	cd ../../Data/Netlib; make uncompress
 	./unitTest$(EXEEXT)
 #-T $(DATAOBJDIR)/miplib3 \
-#	-mpsDir=$(DATAOBJDIR)/Sample \
+#	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 
 ptest: punitTest$(EXEEXT)
@@ -226,7 +226,7 @@ ptest: punitTest$(EXEEXT)
 	cd ../../Data/Netlib; make uncompress
 	./punitTest$(EXEEXT) -p 2
 #-T $(DATAOBJDIR)/miplib3 \
-#	-mpsDir=$(DATAOBJDIR)/Sample \
+#	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 .PHONY: test ptest
 

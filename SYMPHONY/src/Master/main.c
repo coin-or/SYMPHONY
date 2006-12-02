@@ -135,7 +135,7 @@ int sym_free_env(sym_environment *env);
 
 int main(int argc, char **argv)
 {    
-     
+
    sym_environment *env = sym_open_environment();
    int termcode;
    
