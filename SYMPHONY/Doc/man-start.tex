@@ -126,7 +126,7 @@ or
 \code{cmd} in the dialogue box) and type 
 {\color{Brown}
 \begin{verbatim}
- msdev milp.dsw /make "all - debug"
+ devenv milp.sln /make "all - debug"
  Debug/milp.exe
  \end{verbatim}
 }
@@ -145,7 +145,7 @@ or
 \code{cmd} in the dialogue box) and type 
 {\color{Brown}
 \begin{verbatim}
- msdev milpOsi.dsw /make "all - debug"
+ devenv milpOsi.slb /make "all - debug"
  Debug/milpOsi.exe
  \end{verbatim}
 }
@@ -646,7 +646,7 @@ a list of available commands or see Chapter
 \item If you modify the source code of SYMPHONY, type 
 {\color{Brown}
 \begin{verbatim}
- msdev symphony.dsw /make all /rebuild
+ devenv symphony.dsw /make all /rebuild
 \end{verbatim}
 }
 in order to clean and rebuild everything.
@@ -754,20 +754,20 @@ and bound solver.
 \code{cmd} in the dialogue box) and type
 {\color{Brown}
 \begin{verbatim}
- msdev xxx.dsw /make all
+ devenv xxx.sln /make all
 \end{verbatim}
 } where \code{xxx} is the name of the application. This will create both the
 debug and release versions of the application executable. If you want to
 compile only one of them, type 
 {\color{Brown}
 \begin{verbatim}
- msdev xxx.dsw /make "all - debug"
+ devenv xxx.sln /make "all - debug"
 \end{verbatim}
 }
 or 
 {\color{Brown}
 \begin{verbatim}
- msdev xxx.dsw /make "all - release"
+ devenv xxx.sln /make "all - release"
 \end{verbatim}
 }
 For each command, the executable \code{user} will be created in 
@@ -783,7 +783,7 @@ directories.
 \item If the source files for the application are modified, type 
 {\color{Brown}
 \begin{verbatim}
- msdev user.dsw /make all /rebuild
+ devenv user.sln /make all /rebuild
 \end{verbatim}
 }
 in order to clean and rebuild everything.
