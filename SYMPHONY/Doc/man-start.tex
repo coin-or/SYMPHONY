@@ -34,7 +34,7 @@ functionality available when building from source.
 You can obtain the SYMPHONY binary distribution by visiting 
 {\color{Brown}
 \begin{verbatim}
- https://www.coin-or.org/download/binary/SYMPHONY
+ \url{https://www.coin-or.org/download/binary/SYMPHONY}
 \end{verbatim}
 }
 The binaries are currently available for Linux and Windows. These binaries are
@@ -176,7 +176,7 @@ Chapter~\ref{SYMPHONY-development}.
 
 \subsection{External Dependencies}
 
-\paragraph{The LP Engine.} SYMPHONY requires the use of a third-party
+\subsubsection{The LP Engine.} SYMPHONY requires the use of a third-party
   callable library to solve the LP relaxations once they are formulated. The
 LP solver is called through Open Solver Interface, also available from
 \htmladdnormallink{COIN}{https://projects.coin-or.org/Osi}
@@ -188,17 +188,17 @@ both commercial and open source alternatives. By default, SYMPHONY now uses
 the COIN LP solver (Clp). However, if another LP solver is desired, this is
 possible by changing the configuration settings.
 
-\paragraph{GMPL Parser.} If you would like to be able to parse GMPL models
+\subsubsection{GMPL Parser.} If you would like to be able to parse GMPL models
 (GMPL is a subset of AMPL), you will need to install GLPK
 (\url{http://www.gnu.org/software/glpk/}) and configure SYMPHONY appropriately
 (see below).
 
-\paragraph{COIN Libraries.} SYMPHONY uses other COIN libraries for certain
+\subsubsection{COIN Libraries.} SYMPHONY uses other COIN libraries for certain
 functionality, such as parsing MPS files, solving linear programs, generating
 valid inequalities, and for general matrix utilities. The libraries required
 for this functionality are now included with the distribution.
 
-\paragraph{GNU Libraries.} If the \code{readline} and \code{history} libraries
+\subsubsection{GNU Libraries.} If the \code{readline} and \code{history} libraries
 are available, the interactive solver will have command history and command
 completion available. This functionality is only available in Unix-like
 environments by configuring with the \code{--enable-gnu-packages} option (see
@@ -222,7 +222,7 @@ Alternatively, you can get point releases of the source code as a compressed
 file by visiting
 {\color{Brown}
 \begin{verbatim}
- https://www.coin-or.org/download/source/SYMPHONY
+ \url{https://www.coin-or.org/download/source/SYMPHONY}
 \end{verbatim}
 }
 The latest version of the source code is \VER, so you should download the file
