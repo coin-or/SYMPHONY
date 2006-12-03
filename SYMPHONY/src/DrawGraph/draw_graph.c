@@ -14,7 +14,7 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined (__MNO_CYGWIN)
 #include <io.h>
 #define execlp _execlp
 #include <process.h>
@@ -77,11 +77,11 @@ int start_child(char *cmd, FILE **readpipe, FILE **writepipe)
 
    /* FIXME: Doesn't seem to work for Windows */
    
-#if !defined(_MSC_VER) 
+#if !defined(_MSC_VER) && !defined (__MNO_CYGWIN)
 
    int childpid, pipe1[2], pipe2[2];
 
-#if !defined(_MSC_VER) 
+#if !defined(_MSC_VER) && !defined (__MNO_CYGWIN)
    if ((pipe(pipe1) < 0) || (pipe(pipe2) < 0)){
       perror("pipe");
       exit(-1);

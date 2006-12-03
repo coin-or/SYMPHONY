@@ -445,7 +445,7 @@ int sym_load_problem(sym_environment *env)
    CALL_WRAPPER_FUNCTION( io_u(env) );
 
    /* Start up the graphics window*/
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) && !defined (__MNO_CYGWIN)
    CALL_WRAPPER_FUNCTION( init_draw_graph_u(env) );
 #endif
 
@@ -480,7 +480,7 @@ int sym_find_initial_bounds(sym_environment *env)
       printf(  "****************************************************\n\n");
       total_time += env->comp_times.ub_overhead + env->comp_times.ub_heurtime;
       total_time += env->comp_times.lb_overhead + env->comp_times.lb_heurtime;
-#if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
+#if !defined(_MSC_VER) && !defined (__MNO_CYGWIN) /* FIXME: CPU timing doesn't work in Windows */
       printf( "  Problem IO     %.3f\n", env->comp_times.readtime);
       printf( "  Overhead: UB   %.3f\n", env->comp_times.ub_overhead);
       printf( "            LB   %.3f\n", env->comp_times.lb_overhead);
@@ -1009,7 +1009,7 @@ int sym_solve(sym_environment *env)
 	 total_time += env->comp_times.ub_overhead + env->comp_times.ub_heurtime;
 	 total_time += env->comp_times.lb_overhead + env->comp_times.lb_heurtime;
    
-#if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
+#if !defined(_MSC_VER) && defined (__MNO_CYGWIN) /* FIXME: CPU timing doesn't work in Windows */
 	 printf( "====================== Misc Timing =========================\n");
 	 printf( "  Problem IO        %.3f\n", env->comp_times.readtime);
 #if 0
@@ -2136,7 +2136,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
    }
 
    /* Start up the graphics window*/
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) && !defined (__MNO_CYGWIN)
    CALL_WRAPPER_FUNCTION( init_draw_graph_u(env) );   
 #endif
    

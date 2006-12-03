@@ -12,7 +12,7 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#if !defined (_MSC_VER) && !defined __DARWIN
+#if !defined (_MSC_VER) && !defined (__DARWIN) && !defined (__MNO_CYGWIN)
 #include <sys/resource.h>
 #endif
 #include <stdio.h>
@@ -27,7 +27,7 @@ double used_time(double *T)
    double t, oldT =  T ? *T : 0;
    struct timeval tp;
 
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER) || defined(__MNO_CYGWIN) 
    clock_t tp_clock;
    long tp_long;
    tp_clock = clock();
@@ -45,7 +45,7 @@ double used_time(double *T)
 
    /* FIXME: Windows CPU timing does not currently work */
 
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER) || defined (__MNO_CYGWIN)
    return (0);
 #else
    
@@ -69,7 +69,7 @@ double wall_clock(double *T)
    double t, oldT =  T ? *T : 0;
    struct timeval tp;
 
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER) || defined (__MNO_CYGWIN)
    clock_t tp_clock;
    long tp_long;
    tp_clock = clock();

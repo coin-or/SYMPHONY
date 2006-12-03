@@ -449,10 +449,15 @@ AM_CONDITIONAL(STATICEXE, [test $sym_static_exe = true])
 #############################################################################
 
 SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM -D__NONE__'
+
 ARCH=
 case $build in
   *-cygwin* | *-mingw*) 
-       SYMDEFS="$SYMDEFS -D__CYGWIN" 
+       if test "$enable_doscompile" = yes; then 
+           SYMDEFS="$SYMDEFS -D__MNO_CYGWIN" 
+       else 
+           SYMDEFS="$SYMDEFS -D__CYGWIN" 
+       fi
        ARCH=CYGWIN ;;
   *-darwin*) 
        SYMDEFS="$SYMDEFS -D__DARWIN"
