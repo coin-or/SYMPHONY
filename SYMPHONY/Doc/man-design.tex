@@ -1222,13 +1222,13 @@ SYMPHONY through a separate communications API. Currently, PVM \cite{PVMbook}
 is the only message-passing protocol supported, but interfacing with another
 protocol is a straightforward exercise.
 
-Additionally, it is possible to configure the code to run in parallel
-using threading to process multiple search tree nodes simultaneously.
-Currently, this is implemented using OpenMP compiler directives to
-specify the parallel regions of the code and perform memory locking
-functions. Compiling the code with an OpenMP compliant compiler will
-result in a shared-memory parallel executable. For a list of OpenMP
-compliant compilers and other resources, visit {\tt http://www.openmp.org}.
+Additionally, it is possible to configure the code to run in parallel using
+threading to process multiple search tree nodes simultaneously. Currently,
+this is implemented using OpenMP compiler directives to specify the parallel
+regions of the code and perform memory locking functions. Compiling the code
+with an OpenMP compliant compiler will result in a shared-memory parallel
+executable. For a list of OpenMP compliant compilers and other resources,
+visit \code{\url{http://www.openmp.org}}.
 
 \subsection{Fault Tolerance}
 \label{fault-tolerance} 
