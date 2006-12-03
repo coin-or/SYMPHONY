@@ -229,7 +229,7 @@ The latest version of the source code is \VER, so you should download the file
 {\color{Brown}\texttt{SYMPHONY-\VER.tgz}} and unpack the distribution with 
 {\color{Brown}
 \begin{verbatim}
- tar -xzf SYMPHONY-5.1.0.tgz
+ tar -xzf SYMPHONY-5.1.1.tgz
 \end{verbatim}
 } 
 This will create a subdirectory called \code{SYMPHONY-\VER} containing
@@ -314,7 +314,15 @@ script. For instance, running
 \end{verbatim}
 }
 will compile the source files with the debugging flag.
-flag. 
+
+It is possible to use compilers oter than the default (which is \code{g++}).
+For example, to perform at automated build of SYMPHONY using the MSVC++
+compiler \code{cl} with GNU autotools in the CYGWIN environment configure with
+{\color{Brown}
+\begin{verbatim}
+ ./configure CC=cl CXX=cl
+\end{verbatim}
+}
 
 \subsubsection{Building}\label{building}
 
@@ -552,13 +560,13 @@ compiler, or use the NMAKE utility.
 \subsubsection{Building with the MSVC++ Graphical Interface}
 \label{using_msvc}
 
-These instructions are for MSVC++ Version 6. Instructions for other versions
+These instructions are for MSVC++ Version 8. Instructions for other versions
 should be similar.
 
 \begin{itemize}
 
-\item Go to \code{Win32\bs v6} directory and open the workspace 
-\code{symphony.dsw}. 
+\item Go to \code{Win32\bs v8} directory and open the solution file
+\code{symphony.sln}. 
 
 \item Note that there are a number of additional preprocessor definitions that
 control the functionality of SYMPHONY. These definitions are described in
@@ -573,25 +581,18 @@ files path
   \item add \code{USE\_GLPMPL} to the defines
   \item add the GLPK library to the workspace
 \end{itemize}
-\item Make sure that the project \code{symphony} is set as the active 
-project from the Project/Set Active menu. Choose 
-\code{Build symphony.exe} from the Build menu. This should successfully 
-build the SYMPHONY library and the corresponding executable.
+\item Make sure that the project \code{symphony} is set as the startup project
+by choosing \code{Set as Startup Project} from the \code{Project} menu after
+selecting the \code{symphony} project in the Solution Explorer. Choose
+\code{Build Solution} from the Build menu. This should successfully build
+the SYMPHONY library and the corresponding executable.
 
-\item To test the executable, right click on the symphony project, go to the
-\code{Debug} tab and set the program arguments to 
-{\color{Brown}
-\begin{verbatim}
- -F ..\..\SYMPHONY\Datasets\sample.mps 
-\end{verbatim}
-}
-Note that command-line switches are Unix-style. If you want to use the 
-interactive optimizer, leave this tab empty. 
+\item To test the executable, go to the \code{Debug} tab and choose
+\code{Start Without Debugging}. This should open a Window in which the
+interactive solver will appear. Type \code{help} or \code{?} to see a list of
+available commands or see Chapter \ref{API-overview} for instructions on using
+the interactive solver.
 
-4. Now choose \code{Execute} from the Build menu and the solver should 
-solve the given sample problem. If you have not specified the sample problem, 
-then the interactive optimizer should start. In this case, 
-type \code{help} or \code{?} to see a list of available commands
 \end{itemize}
 
 Note that there is some functionality missing from the Windows version. Most
@@ -603,29 +604,29 @@ working under Windows.
 \subsubsection{Building in a Windows Terminal}
 \label{using_msdev}
 
-These instructions are for MSVC++ Version 6. Instructions for other versions
+These instructions are for MSVC++ Version 8. Instructions for other versions
 should be similar.
 
 \begin{itemize}
 \item Open a command terminal (choose \code{Run} on the Start menu and type
-\code{cmd} in the dialogue box). Go to the \code{Win32\bs v6}
+\code{cmd} in the dialogue box). Go to the \code{Win32\bs v8}
 directory and type 
 {\color{Brown}
 \begin{verbatim}
- msdev symphony.dsw /make all
+ devenv symphony.sln /build all
 \end{verbatim}
 }
 This will create both the debug and release versions of SYMPHONY. If you 
 want to compile only one of them, type
 {\color{Brown}
 \begin{verbatim}
- msdev symphony.dsw /make "all - debug"
+ devenv symphony.sln /build "all - debug"
 \end{verbatim}
 }
 or 
 {\color{Brown}
 \begin{verbatim}
- msdev symphony.dsw /make "all - release"
+ devenv symphony.sln /build "all - release"
 \end{verbatim}
 }
 For each command, the library \code{libSymphony.lib} and the executable 
@@ -651,14 +652,23 @@ a list of available commands or see Chapter
 in order to clean and rebuild everything.
 \end{itemize} 
 
+\subsubsection{Building with the MSVC++ compiler in CYGWIN}
+
+It is possible to perform at automated build of SYMPHONY using the MSVC++
+compiler \code{cl} with GNU autotools in the CYGWIN environment. To do so,
+follow the instuctions for building in Unix-like environments (see Section
+\ref{getting_started_unix}), except when configuring, use the command
+
+{\color{Brown}
+\begin{verbatim}
+ ./configure CC=cl CXX=cl
+\end{verbatim}}
+
 \subsubsection{Building with the NMAKE Utility}
 \label{using_nmake}
 
-These instructions are for MSVC++ Version 6. Instructions for other versions
-should be similar.
-
 \begin{itemize}
-\item Go to \code{Win32/v6} directory and edit the \code{sym.mak} 
+\item Go to \code{Win32} directory and edit the \code{sym.mak} 
 makefile to reflect 
 your environment. This involves specifying the LP solver to be used, 
 assigning some variables and  setting various paths. Only minor edits 
@@ -670,7 +680,7 @@ which reside in \code{Win32/v6} directory.
 \item Once configuration is done, open a command line terminal and type 
 {\color{Brown}
 \begin{verbatim}
- nmake /f sym.mak
+ nmake sym.mak
 \end{verbatim}
 }
 This will make the SYMPHONY library \code{libSymphony.lib} and the executable 

@@ -37,14 +37,14 @@
 # variable to the correct path.
 ##############################################################################
 
-SYMPHONYROOT=..\..\SYMPHONY
+SYMPHONYROOT=..\SYMPHONY
 
 ##############################################################################
 # COINROOT is the path to the root directory of the COIN libraries. Many of
 # the new features of COIN require the COIN libraries to be installed.
 ##############################################################################
 
-COINROOT = ..\..\
+COINROOT = ..\
 
 ##############################################################################
 # OUTDIR variable specifies where to create the executable file, 
@@ -106,56 +106,56 @@ OSI_INTERFACE = CLP
 
 !IF "$(LP_SOLVER)" == "OSI"
 LPINCDIR = \
-	"$(COINROOT)\CoinUtils\include" /I\
-	"$(COINROOT)\Osi\include"
+	"$(COINROOT)\CoinUtils\src" /I\
+	"$(COINROOT)\Osi\src"
 LPLIB = \
-	"$(COINROOT)\Win32\libCoin\Debug\libCoin.lib" \
-	"$(COINROOT)\Win32\libOsi\Debug\libOsi.lib"
+	"$(COINROOT)\Win32\v8\CoinUtils\libCoinUtils\Debug\libCoinUtils.lib" \
+	"$(COINROOT)\Win32\v8\Osi\libOsi\Debug\libOsi.lib"
 !ENDIF
 
 
 !IF "$(OSI_INTERFACE)" == "CPLEX"
 LPINCDIR = $(LPINCDIR) /I\
 	"C:\ILOG\cplex81\include\ilcplex" /I\
-	"$(COINROOT)\Osi\src\OsiCpx\include"
+	"$(COINROOT)\Osi\src\OsiCpx"
 LPLIB = $(LPLIB) \
 	"C:\ILOG\cplex81\lib\msvc6\stat_sta\cplex81.lib" \
-	"$(COINROOT)\Win32\Osi\libOsiCpx\Debug\libOsiCpx.lib"
+	"$(COINROOT)\Win32\v8\Osi\libOsiCpx\Debug\libOsiCpx.lib"
 !ENDIF
 
 
 !IF "$(OSI_INTERFACE)" == "OSL"
 LPINCDIR = $(LPINCDIR) /I\
 	"C:\Program Files\IbmOslV3Lib\osllib\include" /I\
-	"$(COINROOT)\Osi\src\OsiOsl\include"
+	"$(COINROOT)\Osi\src\OsiOsl"
 LPLIB = $(LPLIB) \
 	"C:\Program Files\IbmOslV3Lib\osllib\lib\oslmd6030.lib" \
-        "$(COINROOT)\Win32\Osi\libOsiOsl\Debug\libOsiOsl.lib"
+        "$(COINROOT)\Win32\v8\Osi\libOsiOsl\Debug\libOsiOsl.lib"
 !ENDIF
 
 
 !IF "$(OSI_INTERFACE)" == "CLP"
 LPINCDIR = $(LPINCDIR) /I\
-	"$(COINROOT)\Clp\include" /I\
-	"$(COINROOT)\Osi\src\OsiClp\include"
+	"$(COINROOT)\Clp\src" /I\
+	"$(COINROOT)\Osi\src\OsiClp"
 LPLIB = $(LPLIB) \
-	"$(COINROOT)\Win32\clpLib\Debug\clpLib.lib" \
-	"$(COINROOT)\Win32\Osi\libOsiClp\Debug\libOsiClp.lib"
+	"$(COINROOT)\Win32\v8\Clp\libClp\Debug\libClp.lib" \
+	"$(COINROOT)\Win32\v8\Osi\libOsiClp\Debug\libOsiClp.lib"
 !ENDIF
 
 !IF "$(OSI_INTERFACE)" == "XPRESS"
 LPINCDIR = $(LPINCDIR) /I\
 	"C:\" /I\
-	"$(COINROOT)\Osi\src\OsiXpr\include"
+	"$(COINROOT)\Osi\src\OsiXpr"
 LPLIB = $(LPLIB) \
 	"C:\" \
-	"$(COINROOT)\Win32\Osi\libOsiXpr\Debug\libOsiXpr.lib"
+	"$(COINROOT)\Win32\v8\Osi\libOsiXpr\Debug\libOsiXpr.lib"
 !ENDIF
 
 !IF "$(OSI_INTERFACE)" == "SOPLEX"
 LPINCDIR = $(LPINCDIR) /I\
 	"C:\" /I\
-	"$(COINROOT)\Osi\OsiSpx\include"
+	"$(COINROOT)\Osi\OsiSpx"
 LPLIB = $(LPLIB) \
 	"C:\" \
 	"$(COINROOT)\Win\osiSpxLib\Debug\osiSpxLib.lib"
@@ -164,20 +164,20 @@ LPLIB = $(LPLIB) \
 !IF "$(OSI_INTERFACE)" == "DYLP"
 LPINCDIR = $(LPINCDIR) /I\
 	"C:\" /I\
-	"$(COINROOT)\Osi\src\OsiDylp\include"
+	"$(COINROOT)\Osi\src\OsiDylp"
 LPLIB = $(LPLIB) \
 	"C:\" \
-	"$(COINROOT)\Win32\libOsiDylp\Debug\libOsiDylp.lib"
+	"$(COINROOT)\Win32\v8\libOsiDylp\Debug\libOsiDylp.lib"
 !ENDIF
 
 
 !IF "$(OSI_INTERFACE)" == "GLPK"
 LPINCDIR = $(LPINCDIR) /I\
 	"C:\GLPK\glpk-4.0\include" /I\
-	"$(COINROOT)\Osi\src\OsiGlpk\include"
+	"$(COINROOT)\Osi\src\OsiGlpk"
 LPLIB = $(LPLIB) \
 	"C:\GLPK\glpk-4.0\glpk.lib" \
-	"$(COINROOT)\Win32\libOsiGlpk\Debug\libOsiGlpk.lib"
+	"$(COINROOT)\Win32\v8\libOsiGlpk\Debug\libOsiGlpk.lib"
 !ENDIF
 
 
@@ -207,7 +207,7 @@ DEFINITIONS ="__$(LP_SOLVER)__"
 # Note that, the user has to also set the paths to GLPK packages. 
 ##############################################################################
 
-USE_GLPMPL = TRUE
+USE_GLPMPL = FALSE
 
 !IF "$(USE_GLPMPL)" == "TRUE"
 LPINCDIR = $(LPINCDIR) /I\
@@ -215,7 +215,7 @@ LPINCDIR = $(LPINCDIR) /I\
 	"$(COINROOT)\Osi\src\OsiGlpk\include"
 LPLIB = $(LPLIB) \
 	"C:\GLPK\glpk-4.0\glpk.lib" \
-	"$(COINROOT)\Win32\libOsiGlpk\Debug\libOsiGlpk.lib"
+	"$(COINROOT)\Win32\v8\libOsiGlpk\Debug\libOsiGlpk.lib"
 !ENDIF
 
 
@@ -236,7 +236,7 @@ USE_CGL_CUTS = TRUE
 
 !IF "$(USE_CGL_CUTS)" == "TRUE"
 LPINCDIR = $(LPINCDIR) /I "$(COINROOT)\Cgl\include"
-LPLIB = $(LPLIB) "$(COINROOT)\Win32\libCg\Debug\libCgl.lib"
+LPLIB = $(LPLIB) "$(COINROOT)\Win32\v8\Cgl\libCgl\Debug\libCgl.lib"
 DEFINITIONS= $(DEFINITIONS) /D "USE_CGL_CUTS"
 !ENDIF
 
@@ -251,12 +251,11 @@ USE_OSI_INTERFACE = FALSE
 
 !IF "$(USE_OSI_INTERFACE)" == "TRUE"
 ALL_INCDIR = $(LPINCDIR) /I "$(COINROOT)\Osi\src\OsiSym\include"
-ALL_LIB = $(LPLIB) "$(COINROOT)\Win32\Osi\libOsiSym\Debug\libOsiSym.lib"
+ALL_LIB = $(LPLIB) "$(COINROOT)\Win32\v8\Osi\libOsiSym\Debug\libOsiSym.lib"
 !ELSE
 ALL_INCDIR = $(LPINCDIR)
 ALL_LIB = $(LPLIB)
 !ENDIF
-
 
 ##############################################################################
 ##############################################################################
@@ -266,24 +265,44 @@ ALL_LIB = $(LPLIB)
 ##############################################################################
 ##############################################################################
 
+ALL_LIB = $(ALL_LIB) ".\Debug\libSymphony.lib"
+
 DEFINITIONS = $(DEFINITIONS) /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" \
 	/D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" \
 	/D "COMPILE_IN_TM"
 
-ALL_INCDIR =$(ALL_INCDIR) /I "$(SYMPHONYROOT)\include"
+ALL_INCDIR = $(ALL_INCDIR) /I "$(SYMPHONYROOT)\include" \
+/I "$(COINROOT)\BuildTools\headers" \
+/I "$(COINROOT)\Cgl\src" \
+/I "$(COINROOT)\Cgl\src\CglClique" \
+/I "$(COINROOT)\Cgl\src\CglDuplicateRow" \
+/I "$(COINROOT)\Cgl\src\CglFlowCover" \
+/I "$(COINROOT)\Cgl\src\CglGomory" \
+/I "$(COINROOT)\Cgl\src\CglKnapsackCover" \
+/I "$(COINROOT)\Cgl\src\CglLiftAndProject" \
+/I "$(COINROOT)\Cgl\src\CglMixedIntegerRounding" \
+/I "$(COINROOT)\Cgl\src\CglMixedIntegerRounding2" \
+/I "$(COINROOT)\Cgl\src\CglOddHole" \
+/I "$(COINROOT)\Cgl\src\CglPreProcess" \
+/I "$(COINROOT)\Cgl\src\CglProbing" \
+/I "$(COINROOT)\Cgl\src\CglRedSplit" \
+/I "$(COINROOT)\Cgl\src\CglSimpleRounding" \
+/I "$(COINROOT)\Cgl\src\CglTwoMir" \
+/I "$(COINROOT)\CoinUtils\src"
 
 .SILENT:
 
-CPP=cl.exe
-CPPFLAGS= /nologo /MLd /W2 /GR /Gm /YX /GX /ZI /Od \
-	/I $(ALL_INCDIR) /D $(DEFINITIONS) \
-	/Fp"$(OUTDIR)\sym.pch" /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\sym.pdb" \
-	/FD /GZ /c /Tp
+CPP=cl.exe 
+CPPFLAGS= /I $(ALL_INCDIR) /D $(DEFINITIONS) \
+/D "_CRT_SECURE_NO_DEPRECATE" /D "_VC80_UPGRADE=0x0600" \
+/D "_MBCS" /Gm /EHsc /RTC1 /MTd /Fp"$(OUTDIR)/symphony.pch" /Fo"$(OUTDIR)\\" \
+/Fd"$(OUTDIR)\sym.pdb" /W2 /nologo /c /ZI /TP /errorReport:prompt
 
-CFLAGS= /nologo /MLd /W2 /GR /Gm /YX /GX /ZI /Od \
-	/D $(DEFINITIONS) \
-	/Fp"$(OUTDIR)\sym.pch" /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\sym.pdb" \
-	/FD /GZ /c
+CFLAGS= /I $(ALL_INCDIR) /D $(DEFINITIONS) \
+/D "_CRT_SECURE_NO_DEPRECATE" /D "_VC80_UPGRADE=0x0600" \
+/D "_MBCS" /Gm /EHsc /RTC1 /MTd /Fp"$(OUTDIR)/symphony.pch" /Fo"$(OUTDIR)" \
+/Fd"$(OUTDIR)\sym.pdb" /W2 /nologo /c /ZI /errorReport:prompt
+
 .c.obj: 
 	$(CPP) $(CPPFLAGS) "$*.c"
 	 
@@ -295,7 +314,7 @@ ALL : "$(OUTDIR)" "LIB_MESSAGE" sym_lib "SYMPHONY_MESSAGE" "OBJECTS" sym_exe
 CLEAN:
 	del /Q $(OUTDIR)\*.obj
 	del /Q $(OUTDIR)\symphony.exe 
-	del /Q $(OUTDIR)\symphonyLib.lib
+	del /Q $(OUTDIR)\libSymphony.lib
 	del /Q $(OUTDIR)\sym.idb
 	del /Q $(OUTDIR)\sym.pdb
 	del /Q $(OUTDIR)\sym.pch
@@ -344,19 +363,19 @@ sym_lib : \
 	$(SYMPHONYROOT)\src\TreeManager\tm_func.obj \
 	$(SYMPHONYROOT)\src\TreeManager\tm_proccomm.obj \
 	$(SYMPHONYROOT)\src\TreeManager\treemanager.obj
-	lib.exe /nologo /out:$(OUTDIR)\symphonyLib.lib $(OUTDIR)\*.obj
-	echo "symphonyLib.lib" created successfully...
+	lib.exe /nologo /out:$(OUTDIR)\libSymphony.lib $(OUTDIR)\*.obj
+	echo "libSymphony.lib" created successfully...
 	echo ...
 
-LINK_OBJECTS= \
-	$(OUTDIR)\main.obj
+LINK_OBJECTS = $(OUTDIR)\main.obj
 
 OBJECTS : \
 	$(SYMPHONYROOT)\src\Master\main.obj
 	echo main compiled successfully...
 	echo ...	
                	          
-sym_exe : $(LINK_OBJECTS) $(OUTDIR)\symphonyLib.lib
+sym_exe : $(LINK_OBJECTS) $(OUTDIR)\libSymphony.lib
 	echo Linking...
-	$(CPP) /nologo /W3 /Fe"$(OUTDIR)\symphony.exe" $(ALL_LIB) $**
+	$(CPP) /nologo /W3 /Fe"$(OUTDIR)\symphony.exe" \
+	$(ALL_LIB) $**
 	echo "symphony.exe" created successfully...

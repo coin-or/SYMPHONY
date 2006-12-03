@@ -24,6 +24,20 @@ http://projects.coin-or.org/SYMPHONY/
 WHAT'S NEW
 ==========
 
+Release 5.1.1:
+
+1. Fixes for building in the Solaris operating system.
+
+2. Fixes for using the GNU autotools to build with the cl compiler.
+
+2. Fixes for sym.mak file in order to allow building with MSVC++ nmake utility.
+
+4. Fixes for building the unit test in the MSVC++ IDE.
+
+5. Updated documentation
+
+Release 5.1.0:
+
 1. SYMPHONY now has an interactive optimizer that can be used through a
 command shell. In both the sequential and parallel configurations, the user
 can set parameters, load and solve instances interactively, and display
@@ -77,8 +91,8 @@ supported. These solvers can be called through the COIN-OR OSI interface.
 now, there are a number of other software packages that offer better
 functionality than SYMPHONY for implementing branch and price algorithms.
 
-CHANGES TO THE USER INTERFACE
-=============================
+CHANGES TO THE USER INTERFACE (FROM SYMPHONY 5.0)
+=================================================
 
 1. There was one minor change to the user callback API from version 5.0 to 5.1.
 The user can now execute a primal heuristic in the user_is_feasible() callback
@@ -223,8 +237,11 @@ CONFIGURATIONS
 
 SEQUENTIAL
 
-- Builds and passes unit test with gcc 4.1 and CLP on LINUX and CYGWIN. 
-- Builds and passes unit test in Microsoft Visual C++ v6 with CLP
+- Builds and passes unit test with gcc 4.1 LINUX with CLP.
+- Builds and passes the unit test with gcc 3.4.4 in CYGWIN with CLP.
+- Builds and passes the unit test with MSVC++ Version 8 compiler in CYGWIN 
+using the autotools with CLP.
+- Builds and passes unit test in Microsoft Visual C++ Version 8 with CLP.
 
 SHARED MEMORY PARLLEL (OpenMP)
 
