@@ -23,7 +23,7 @@
  * process of the black box model.
 \*===========================================================================*/
 
-#ifndef _MSC_VER
+#if !defined (_MSC_VER)
 #include <unistd.h>            /* this defines sleep() */
 #endif
 

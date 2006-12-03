@@ -1,3 +1,6 @@
+#ifndef HAVE_CONFIG_H
+#define HAVE_CONFIG_H
+#endif
 /*
  * Include file for the configuration of SYMPHONY.
  *
