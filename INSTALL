@@ -81,7 +81,7 @@ It is possible to use compilers oter than the default (which is g++). For
 example, to perform at automated build of SYMPHONY using the MSVC++ compiler
 'cl' with GNU autotools in the CYGWIN environment configure with
 
- ./configure CC=cl CXX=cl
+ ./configure CC=cl CXX=cl LD=link
 
 BUILDING
 ========
@@ -341,7 +341,7 @@ compiler 'cl' with GNU autotools in the CYGWIN environment. To do so, follow
 the instuctions for building in Unix-like environments, except when
 configuring, use the command
 
- ./configure CC=cl CXX=cl
+ ./configure CC=cl CXX=cl LD=link
 
 ******************** Building With the NMAKE Utility **************************
 
