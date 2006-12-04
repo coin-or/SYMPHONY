@@ -258,6 +258,8 @@ See Figure \ref{conf_opts} for a list of options the user may want to set.
 \hline
 \texttt{--enable-debug} & compile all projects with debug options set \\
 \texttt{--enable-debug-symphony} & compile only SYMPHONY project with debug options \\
+\texttt{--enable-doscompile} & Under Cygwin, compile so that executables do
+not depend on the CYGWIN DLL \\
 \texttt{--enable-static} & build static libraries \\
 \texttt{--enable-static-executable} &  create a complete static executable \\
 \texttt{--enable-gnu-packages} & compile with GNU packages \\ 
@@ -316,7 +318,7 @@ For example, to perform at automated build of SYMPHONY using the MSVC++
 compiler \code{cl} with GNU autotools in the CYGWIN environment configure with
 {\color{Brown}
 \begin{verbatim}
- ./configure CC=cl CXX=cl
+ ./configure CC=cl CXX=cl LD=link
 \end{verbatim}
 }
 
@@ -657,7 +659,7 @@ follow the instuctions for building in Unix-like environments (see Section
 
 {\color{Brown}
 \begin{verbatim}
- ./configure CC=cl CXX=cl
+ ./configure CC=cl CXX=cl LD=link
 \end{verbatim}}
 
 \subsubsection{Building with the NMAKE Utility}
