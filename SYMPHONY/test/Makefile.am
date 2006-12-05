@@ -49,7 +49,7 @@ endif
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSym`
 
-AM_CPPFLAGS += -DCOIN_HAS_SYM
+AM_CPPFLAGS += -DCOIN_HAS_SYMPHONY
 
 # List all additionally required solver and Osi libraries
 
