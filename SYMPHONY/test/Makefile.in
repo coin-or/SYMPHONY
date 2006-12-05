@@ -451,7 +451,7 @@ test_srcdir = $(OSISRCDIR)/test
 # "top_srcdir" refers to the basic directory for the main package that is
 # being compiled.
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(SYMINCDIR)` -I`$(CYGPATH_W) \
-	$(OSISRCDIR)/src/OsiSym` -DCOIN_HAS_SYM $(am__append_3) \
+	$(OSISRCDIR)/src/OsiSym` -DCOIN_HAS_SYMPHONY $(am__append_3) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
 	$(am__append_11) $(am__append_13) $(am__append_15) \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` -I`$(CYGPATH_W) \
