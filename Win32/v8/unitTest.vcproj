@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\Osi\src;..\..\Osi\src\OsiClp;..\..\Osi\src\OsiSym;..\..\Clp\src;..\..\CoinUtils\src;..\..\Cgl\src;..\..\Cgl\src\CglLiftAndProject;..\..\Cgl\src\CglFlowCover;..\..\Cgl\src\CglMixedIntegerRounding;..\..\Cgl\src\CglClique;..\..\Cgl\src\CglOddHole;..\..\Cgl\src\CglKnapsackCover;..\..\Cgl\src\CglGomory;..\..\Cgl\src\CglSimpleRounding;..\..\Cgl\src\CglProbing;..\..\BuildTools\headers;..\..\SYMPHONY\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE;COIN_HAS_SYMPHONY"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
