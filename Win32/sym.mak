@@ -29,6 +29,8 @@
 # the following variables.
 # (you can download nmake.exe from  "http://download.microsoft.com/download/
 # vc15/Patch/1.52/W95/EN-US/Nmake15.exe" if you need that.)
+# Note that the options here are for the compiler that comes with MSVC++
+# Version 8. They may not work with earlier versions.
 ##############################################################################
 
 ##############################################################################
