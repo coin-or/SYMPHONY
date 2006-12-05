@@ -104,6 +104,7 @@ Win32/v7/symphony.vcproj -text
 Win32/v8/libSymphony.vcproj -text
 Win32/v8/symphony.sln -text
 Win32/v8/symphony.vcproj -text
+Win32/v8/unitTest.sln -text
 Win32/v8/unitTest.vcproj -text
 /compile -text
 /config.guess -text
