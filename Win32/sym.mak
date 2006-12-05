@@ -6,7 +6,7 @@
 # SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and     #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                         #
 #                                                                            #
-# (c) Copyright 2005 Ted Ralphs. All Rights Reserved.                        #
+# (c) Copyright 2005-2006 Ted Ralphs. All Rights Reserved.                   #
 #                                                                            #
 # This software is licensed under the Common Public License. Please see      #
 # accompanying file for terms.                                               #
@@ -29,6 +29,8 @@
 # the following variables.
 # (you can download nmake.exe from  "http://download.microsoft.com/download/
 # vc15/Patch/1.52/W95/EN-US/Nmake15.exe" if you need that.)
+# Note that the options here are for the compiler that comes with MSVC++
+# Version 8. They may not work with earlier versions.
 ##############################################################################
 
 ##############################################################################
