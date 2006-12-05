@@ -56,7 +56,7 @@
 #ifdef COIN_HAS_CLP
 #include "OsiClpSolverInterface.hpp"
 #endif
-#ifdef COIN_HAS_SYM
+#ifdef COIN_HAS_SYMPHONY
 #include "OsiSymSolverInterface.hpp"
 #endif
 #ifdef COIN_HAS_FMP
@@ -1470,7 +1470,7 @@ void OsiSolverInterfaceMpsUnitTest
         } else {
 	   if (vecSiP[i]->isProvenPrimalInfeasible()) 
 	      std::cerr << "error; primal infeasible" ;
-#ifndef COIN_HAS_SYM 
+#ifndef COIN_HAS_SYMPHONY 
 	   else if (vecSiP[i]->isProvenDualInfeasible())
 	      std::cerr << "error; dual infeasible" ;
 #endif
@@ -1740,7 +1740,7 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
   // Determine if this is the emptySi is an OsiSymSolverInterface
   bool symSolverInterface UNUSED = false;
   {
-#ifdef COIN_HAS_SYM
+#ifdef COIN_HAS_SYMPHONY
      const OsiSymSolverInterface * si =
 	dynamic_cast<const OsiSymSolverInterface *>(emptySi);
      if ( si != NULL ) symSolverInterface = true;
