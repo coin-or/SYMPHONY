@@ -230,28 +230,37 @@ Well tested: CPLEX, OSL, CLP
 
 Well tested, but have some stability or other issues: GLPK
 
-Compiled, but not well-tested: SPX
+Compiled, but not well tested: SPX
 
-CONFIGURATIONS
-==============
+TESTED CONFIGURATIONS
+=====================
 
 SEQUENTIAL
 
-- Builds and passes unit test with gcc 4.1 LINUX with CLP.
-- Builds and passes the unit test with gcc 3.4.4 in CYGWIN with CLP.
-- Builds and passes the unit test with MSVC++ Version 8 compiler in CYGWIN 
-using the autotools with CLP.
-- Builds and passes unit test in Microsoft Visual C++ Version 8 with CLP.
+Known configurations that build and pass unit test
+
+- gcc 4.1 on LINUX
+- gcc 3.4 on LINUX
+- gcc 3.4.4 on CYGWIN in Windows XP
+- gcc 3.4.4 on CYGWIN in Windows XP (-mno-cygwin)
+- MSVC++ Version 8 compiler in CYGWIN using the autotools 
+- MSVC++ Version 8 IDE
+- MSVC++ nmake Utility with Version 8 compiler
+- gcc 4.0 on Mac OSX 10.4.8
+- gcc 4.1 on Solaris x86
 
 SHARED MEMORY PARLLEL (OpenMP)
 
-- Builds and passes unit test with gcc 4.2 and CLP on LINUX (note: earlier 
-  versions of GCC do not support OpenMP and cannot be used to build a 
-  shared-memory version of SYMPHONY) 
+Builds and passes unit test with pre-release version of gcc 4.2 and CLP on
+LINUX (earlier versions of GCC do not support OpenMP and cannot be used to
+build a shared-memory version of SYMPHONY)
 
 DISTRIBUTED MEMORY PARALLEL (PVM)
 
-- Builds and passes unit test with gcc 4.1 and PVM 3.4 on LINUX
+Known configurations that build and pass unit test
+
+- gcc 4.1 on LINUX with PVM
+- gcc 3.4 on LINUX with PVM
 
 APPLICATIONS
 ============
