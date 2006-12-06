@@ -1012,7 +1012,7 @@ void get_row(LPdata *lp_data, int i,
 int get_proof_of_infeas(LPdata *lp_data, int *infind)
 {
   fprintf(stderr, "Function not implemented yet.");
-  exit(-1);
+  return(0);
 }
 
 /*===========================================================================*\
@@ -2542,7 +2542,7 @@ void get_row(LPdata *lp_data, int i,
 int get_proof_of_infeas(LPdata *lp_data, int *infind)
 {
    fprintf(stderr, "Function not implemented yet.");
-   exit(-1);
+   return(0);
 }
 
 /*===========================================================================*/
