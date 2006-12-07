@@ -800,7 +800,7 @@ case "$CXX" in
      CXXFLAGS="$CXXFLAGS -TP"
      sym_use_cl=true
   ;;
-  *g++)
+  g++*)
      if test $sym_openmp = true; then
          CXXFLAGS="$CXXFLAGS -fopenmp"
      fi
