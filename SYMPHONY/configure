@@ -22560,12 +22560,12 @@ SYMAPPLDIR=`pwd`/Applications
 sym_use_cl=false
 CLLCFLAGS=
 case "$CXX" in
-  cl*)
+  cl* | *\cl* | */cl*)
      CLLCFLAGS=$CXXFLAGS
      CXXFLAGS="$CXXFLAGS -TP"
      sym_use_cl=true
   ;;
-  g++*)
+  g++* | *\g++* | */g++*)
      if test $sym_openmp = true; then
          CXXFLAGS="$CXXFLAGS -fopenmp"
      fi
