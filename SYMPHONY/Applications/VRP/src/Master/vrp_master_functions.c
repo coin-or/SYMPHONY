@@ -226,6 +226,8 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
       }
       /*Now, we have exhausted the small graph so just add all non-zero
 	edges*/
+      while (j < zero_varnum && k > zero_vars[j])
+	 j++;
       for (; k<total_edgenum && j<zero_varnum; k++)
 	 if (k < zero_vars[j])
 	    uind[(*varnum)++] = k;
