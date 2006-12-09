@@ -3,7 +3,7 @@ Data/Sample        https://projects.coin-or.org/svn/Data/releases/1.0.1/Sample
 Data/miplib3       https://projects.coin-or.org/svn/Data/releases/1.0.1/miplib3
 Data/Netlib        https://projects.coin-or.org/svn/Data/releases/1.0.1/Netlib
 CoinUtils          https://projects.coin-or.org/svn/CoinUtils/releases/1.0.3/CoinUtils
-Cgl -r355          https://projects.coin-or.org/svn/Cgl/stable/0.5/Cgl
+Cgl                https://projects.coin-or.org/svn/Cgl/releases/0.5.1/Cgl
 Clp -r882          https://projects.coin-or.org/svn/Clp/stable/1.3/Clp
 Osi                https://projects.coin-or.org/svn/Osi/releases/0.95.2/Osi
 Win32/v6/CoinUtils https://projects.coin-or.org/svn/MSVisualStudio/releases/1.0.1/v6/CoinUtils
