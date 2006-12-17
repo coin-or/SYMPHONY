@@ -430,14 +430,13 @@ CC = $(CXX)
 CCLD = $(CXX)
 
 #Static link
-STATIC_LINK =  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -static\
+STATIC_LINK =  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static\
 	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 # Link with g++
 LINK =
 if STATICEXE
-LINK +=  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static -static-libgcc\
-	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+LINK +=  $(STATIC_LINK) 
 else
 LINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@

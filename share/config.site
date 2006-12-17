@@ -2,7 +2,7 @@
 ##############################################################################
 ##############################################################################
 #                                                                            #
-# This file is part of the SYMPHONY MILP Solver Framework.                   #
+# This file is part of the SYMPHONY Branch, Cut, and Price Library.          #
 #                                                                            #
 # SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and     #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                         #
@@ -49,7 +49,7 @@
 # by SYMPHONY parameters (see the user's manual). 
 ##############################################################################
 ##############################################################################
-#enable_cgl_cuts=no      
+#enable_cgl_cuts=no
 
 ##############################################################################
 # Compile in the sensitivity analysis features
@@ -114,8 +114,8 @@
 #with_cplex_incdir 
 #with_cplex_lib 
 
-#with_glpk_incdir
-#with_glpk_lib
+#with_glpk_incdir=/home/menal/GLPK/glpk-4.11/include 
+#with_glpk_lib=/home/menal/GLPK/glpk-4.11/src/libglpk.a 
 
 #with_osl_incdir 
 #with_osl_lib 
@@ -150,9 +150,6 @@
 # system path or the bash variable PVM_ROOT is defined.) 
 ##############################################################################
 #with_pvm=yes              
-
-# Compile in OpenMp features (requires GCC version 4.2.0 or higher)
-#enable_openmp=yes
 
 ##############################################################################
 #

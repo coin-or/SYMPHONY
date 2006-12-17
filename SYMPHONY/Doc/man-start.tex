@@ -289,7 +289,6 @@ letters (default lpsolver=clp) \\
 \texttt{ --with-gmpl} &  compile with GMPL reader (requires 
 \texttt{--with-glpk-incdir} and \\ &
 \texttt{--with-glpk-lib} options to be set) \\
-\texttt{--with-osi-interface} &  compile with SymOsi interface \\
 \texttt{--with-application} &  compile the application library \\
 \hline
 \texttt{--enable-openmp} &   compile in OpenMP features \\
@@ -346,10 +345,14 @@ generic MILP problems in MPS and GMPL format. In order to read GMPL files, you
 will need to have GLPK (\url{http://www.gnu.org/software/glpk/}) installed and
 SYMPHONY must be configured with {\color{Brown}
 \begin{verbatim}
- ./configure --with-gmpl --with-glpk-lib[=GLPK library location] 
-             --with-glpk-incdir[=GLPK include dir] 
+ ./configure --with-gmpl --with-glpk-lib="-L/usr/lib -lglpk"
+             --with-glpk-incdir=/usr/include
 \end{verbatim}
 }
+assuming that the GLPK library and header files are located in 
+{\color{Brown}\texttt{/usr/lib} and {\color{Brown}\texttt{/usr/include} 
+directories. 
+
 For a more powerful modeling interface, FlopC++ can also be used to obtain a
 capability similar to ILOG's Concert technology for building math programming
 models (see SYMPHONY/Examples/FLOPC++). 
