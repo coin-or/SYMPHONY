@@ -436,6 +436,7 @@ int solve(tm_prob *tm)
 
 	 if (c_count > 0){
 	    termcode = TM_SIGNAL_CAUGHT;
+	    c_count = 0;
 	    break;
 	 }
 	 
@@ -3154,26 +3155,26 @@ void sym_catch_c(int num)
    signal(SIGINT, sym_catch_c);
 
    char temp [MAX_LINE_LENGTH + 1];
-   strcpy(temp, "");
    
    sigfillset(&mask_set);
    sigprocmask(SIG_SETMASK, &mask_set, &old_set);
    
-   while(true) {
-      printf("\nDo you want to abort? [y/N]: ");
-      fflush(stdout);   
-      scanf("%s", temp);
-      if (temp[0] != ' ') {      
-	 if(temp[1] == 0 && (temp[0] == 'y' || temp[0] == 'Y')){
-      c_count++;
+   strcpy(temp, "");
+   printf("\nDo you want to exit the program/abort the instance? [e/a/N]: ");
+   fflush(stdout);   
+   fgets(temp, MAX_LINE_LENGTH, stdin);
+   if(temp[1] == '\n' && (temp[0] == 'e' || temp[0] == 'E')){
+      printf("\nTerminating...\n");
+      fflush(stdout);
+      exit(0);
+   }else if(temp[1] == '\n' && (temp[0] == 'a' || temp[0] == 'A')){    
+      c_count++;	    
    } else{
       printf("\nContinuing...\n");
       fflush(stdout);
       c_count = 0;      
    }
-	 break;
-      } else continue;
-   }
+
 }
 #endif
 /*===========================================================================*/

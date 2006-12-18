@@ -2723,7 +2723,7 @@ rm -f conftest.err conftest.$ac_objext \
           cl* | */cl*)
             coin_opt_cflags='-O2'
             coin_add_cflags='-nologo'
-            coin_dbg_cflags='-Yd'
+            coin_dbg_cflags='-MTd'
             ;;
         esac
         ;;
@@ -3513,7 +3513,7 @@ rm -f conftest.err conftest.$ac_objext \
           cl* | */cl*)
             coin_opt_cxxflags='-O2'
             coin_add_cxxflags='-nologo -EHsc -GR -MT'
-            coin_dbg_cxxflags='-Yd'
+            coin_dbg_cxxflags='-MTd'
             ;;
         esac
         ;;
@@ -22025,7 +22025,13 @@ fi
 if test "${enable_static_executable+set}" = set; then
   enableval="$enable_static_executable"
   case "${enableval}" in
-   yes) sym_static_exe=true
+   yes)
+      if test "$enable_shared" = yes; then
+        { { echo "$as_me:$LINENO: error: static executable requires static COIN libraries: use with --enable-shared=no flag" >&5
+echo "$as_me: error: static executable requires static COIN libraries: use with --enable-shared=no flag" >&2;}
+   { (exit 1); exit 1; }; }
+      fi
+      sym_static_exe=true
    ;;
    no)  sym_static_exe=false
    ;;

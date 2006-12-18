@@ -82,7 +82,6 @@ AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
 AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
 AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
 
-
 #############################################################################
 #                      Check for the LP solver                              #
 #############################################################################
@@ -99,6 +98,7 @@ else
     AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(ADD_CLP, [test $sym_lp_solver = clp])
+
 #############################################################################
 #                            Check SYMPHONY                                 #
 #############################################################################

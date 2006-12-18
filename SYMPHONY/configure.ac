@@ -433,7 +433,11 @@ AC_ARG_ENABLE([static-executable],
 [AC_HELP_STRING([--enable-static-executable],
                 [create a complete static executable])],
 [case "${enableval}" in
-   yes) sym_static_exe=true
+   yes) 
+      if test "$enable_shared" = yes; then 
+        AC_MSG_ERROR(static executable requires static COIN libraries: use with --enable-shared=no flag)
+      fi
+      sym_static_exe=true
    ;;
    no)  sym_static_exe=false
    ;;
