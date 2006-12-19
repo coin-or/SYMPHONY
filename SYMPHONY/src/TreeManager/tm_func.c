@@ -3160,14 +3160,14 @@ void sym_catch_c(int num)
    sigprocmask(SIG_SETMASK, &mask_set, &old_set);
    
    strcpy(temp, "");
-   printf("\nDo you want to exit the program/abort the instance? [e/a/N]: ");
+   printf("\nDo you want to abort immediately, exit gracefully, or continue? [a/e/c]: ");
    fflush(stdout);   
    fgets(temp, MAX_LINE_LENGTH, stdin);
-   if(temp[1] == '\n' && (temp[0] == 'e' || temp[0] == 'E')){
+   if(temp[1] == '\n' && (temp[0] == 'a' || temp[0] == 'A')){
       printf("\nTerminating...\n");
       fflush(stdout);
       exit(0);
-   }else if(temp[1] == '\n' && (temp[0] == 'a' || temp[0] == 'A')){    
+   }else if(temp[1] == '\n' && (temp[0] == 'e' || temp[0] == 'E')){    
       c_count++;	    
    } else{
       printf("\nContinuing...\n");
