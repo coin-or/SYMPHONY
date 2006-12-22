@@ -297,7 +297,7 @@ int fathom_branch(lp_prob *p)
 	 }
 	 if (termcode == LP_D_UNBOUNDED){
 	    PRINT(p->par.verbosity, 1, ("Feasibility lost -- "));
-#if 0
+#if 1
 	    char name[50] = "";
 	    sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
 	    write_mps(lp_data, name);

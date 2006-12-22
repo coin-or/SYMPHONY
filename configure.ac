@@ -58,6 +58,7 @@ AC_PREFIX_DEFAULT([`pwd`])
 
 # Initialize automake
 AC_COIN_INIT_AUTOMAKE
+AC_COIN_CREATE_LIBTOOL
 
 #############################################################################
 #                  Check which subprojects are there                        #
