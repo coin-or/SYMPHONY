@@ -1,4 +1,4 @@
-BuildTools         https://projects.coin-or.org/svn/BuildTools/trunk
+BuildTools         https://projects.coin-or.org/svn/BuildTools/stable/0.5
 Data/Sample        https://projects.coin-or.org/svn/Data/stable/1.0/Sample
 Data/miplib3       https://projects.coin-or.org/svn/Data/stable/1.0/miplib3
 Data/Netlib        https://projects.coin-or.org/svn/Data/stable/1.0/Netlib
