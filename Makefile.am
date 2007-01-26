@@ -32,7 +32,7 @@ if ADD_CLP
 SUBDIRS += Clp
 endif 
 
-SUBDIRS += SYMPHONY
+SUBDIRS += SYMPHONY FlopC++
 
 ########################################################################
 #                           Extra Targets                              #

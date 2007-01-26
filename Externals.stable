@@ -18,3 +18,4 @@ Win32/v8/CoinUtils https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v8
 Win32/v8/Cgl       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v8/Cgl
 Win32/v8/Clp       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v8/Clp
 Win32/v8/Osi       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v8/Osi
+FlopC++            https://projects.coin-or.org/svn/FlopC++/stable/1.0/FlopCpp
