@@ -3708,7 +3708,7 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
    }
 	 
 
-   if (k < num){
+   if (j < num){
       printf("sym_delete_cols() Error: Column index may be out of range.\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
@@ -3875,7 +3875,7 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    }
    
    for (new_num_elements = 0, i = 0, j = 0; i < n; i++){
-      for (k = 0; j < matBeg[i+1]; j++){
+      for (; j < matBeg[i+1]; j++){
 	 if (new_rows[matInd[j]] < 0){	    
 	    continue;
 	 }else{
@@ -3886,7 +3886,7 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
       j = matBeg[i+1];
       matBeg[i+1] = new_num_elements;
    }
-   matBeg[n] = new_num_elements;
+   //   matBeg[n] = new_num_elements;
 
    for (i = 0; i < m; i++){
       if (new_rows[i] > 0){
