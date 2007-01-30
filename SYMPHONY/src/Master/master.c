@@ -3646,15 +3646,20 @@ int sym_add_row(sym_environment *env, int numelems, int *indices,
 /*===========================================================================*/
 /*===========================================================================*/
 
+/* Important: The indices given here are with respect to the current
+   not the original user indices! */
+
 int sym_delete_cols(sym_environment *env, int num, int * indices)
 {
 
-   int i, j, k, l,n, nz, numElements = 0, *matBeg, *matInd, *lengths;
+   int i, j, k, n, nz, num_to_delete = 0, *matBeg, *matInd, *lengths;
    //FIXME! how about base varnum? If they are to be deleted???
-   int index = 0;
    double *matVal, *colLb, *colUb, *objN;
    char *isInt;
 
+   if (num <= 0){
+      return(FUNCTION_TERMINATED_NORMALLY);
+   }
 
    if (!env->mip || !env->mip->n || !env->base || !env->rootdesc || 
        num > env->mip->n){
@@ -3665,90 +3670,99 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
 
    int bvarnum = env->base->varnum, bind = 0;
    int user_size = env->rootdesc->uind.size, uind = 0;
-   int * bvar_ind = env->base->userind; 
-   int * user_ind = env->rootdesc->uind.list;
+   int *bvar_ind = env->base->userind; 
+   int *user_ind = env->rootdesc->uind.list;
    
    /* sort the indices in case they are not given sorted! */
 
    qsortucb_i(indices, num);
    
+   /* First, adjust the index lists */
+   
    n = env->mip->n;
-   nz = env->mip->nz;
 
-   for(i = 0, j = 0, k = 0, l = 0, index = 0; i<n; i++){
-	 if(j < bvarnum){
-	    if(bvar_ind[j] == i){
-	       if(l < num){
-		  if(indices[l] == i){
-		     l++;
-		  }
-		  else{
-		     bvar_ind[bind++] = index++;
-		  }  
-	       }
-	       else{
-		  bvar_ind[bind++] = index++;
-	       }
-	       j++; 
-	    }
-	 }     
-	 if(k < user_size){
-	    if(user_ind[k] == i){
-	       if(l < num){
-		  if(indices[l] == i){
-		     l++;
-		  }
-		  else{
-		     user_ind[uind++] = index++;		     
-		  }
-	       }
-	       else{
-		  user_ind[uind++] = index++;
-	       }
-	       k++;
-	    }
-	 }
+   for (i = 0, j = 0; i < bvarnum && j < num; i++){
+      if (indices[j] == i){
+	 j++;
+      }else{
+	 bvar_ind[bind++] = bvar_ind[i];
+      }
    }
 
-   if(j + k != n){
-      printf("sym_delete_cols(): Unknown problem!\n");
+   if (j == num){
+      for (; i < bvarnum; i++){
+	 bvar_ind[bind++] = bvar_ind[i];
+      }
+      uind = user_size;
+   }else{
+      for (; i < n && j < num; i++){
+	 if (indices[j] == i){
+	    j++;
+	 }else{
+	    user_ind[uind++] = user_ind[i-bvarnum];
+	 } 
+      }
+      for (; i < n; i++){
+	 user_ind[uind++] = user_ind[i-bvarnum];
+      }
+   }
+	 
+
+   if (k < num){
+      printf("sym_delete_cols() Error: Column index may be out of range.\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
+      
+   
+#if 0
+   if(i + j != n){
+      printf("sym_delete_cols() Error: Unknown problem!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+#endif
 
-   if(bind){
-      FREE(env->base->userind);
-      env->base->userind = (int *) malloc (ISIZE * bind);
-      memcpy(env->base->userind, bvar_ind, ISIZE * bind);
+   if (bind == bvarnum && uind == user_size){
+      printf("sym_delete_cols() Warning: No columns deleted.\n");
+      return (FUNCTION_TERMINATED_NORMALLY);
+   }
+   
+   if (bind < bvarnum){
+      env->base->userind = (int *) realloc (bvar_ind, ISIZE * bind);
       env->base->varnum = bind;
    }
-   if(uind){
-      FREE(env->rootdesc->uind.list);
-      env->rootdesc->uind.list = 
-	 (int *) malloc (ISIZE * uind);
-      memcpy(env->rootdesc->uind.list, user_ind, ISIZE * uind);
+   if (uind < user_size){
+      env->rootdesc->uind.list = (int *) realloc (user_ind, ISIZE * uind);
       env->rootdesc->uind.size = uind;
    }
 
+   if (!env->mip->matbeg){
+      /* We don't have a generic MIP description */
+      return (FUNCTION_TERMINATED_NORMALLY);
+   }
+
+   /* Now adjust the MIP description, if it exists */
+   
    lengths = (int*) malloc (ISIZE*n);
 
-   for(i = 0; i<n; i++){     
+   for (i = 0; i < n; i++){     
       lengths[i] = env->mip->matbeg[i+1] - env->mip->matbeg[i];
    }
 
-   for( i = 0; i<num; i++){
-      if (indices[i]<n){
-	 numElements += lengths[indices[i]];
-      }
-      else{
+   nz = env->mip->nz;
+   
+   for (i = 0; i < num; i++){
+      if (indices[i] < n){
+	 num_to_delete += lengths[indices[i]];
+      }else{
 	 /*FIXME*/
-	 printf("sym_delete_cols(): Column index is out of range!\n");
+	 printf("sym_delete_cols(): Error. Column index is out of range!\n");
 	 return(FUNCTION_TERMINATED_ABNORMALLY);
       }
    }
 
    matBeg = (int*) malloc(ISIZE*(n-num+1));
-   matInd = (int*) malloc(ISIZE*(nz-numElements));
-   matVal = (double*) malloc(DSIZE*(nz-numElements));
+   matInd = (int*) malloc(ISIZE*(nz-num_to_delete));
+   matVal = (double*) malloc(DSIZE*(nz-num_to_delete));
    colLb = (double*) malloc(DSIZE*(n-num));
    colUb = (double*) malloc(DSIZE*(n-num));
    objN = (double*) malloc(DSIZE*(n-num));
@@ -3784,15 +3798,8 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
    FREE(env->mip->is_int);
    FREE(lengths);
 
-   if(bind){
-      FREE(bvar_ind);
-   }
-   if(uind){
-      FREE(user_ind);
-   }
-
    env->mip->n = n-num;
-   env->mip->nz = nz - numElements;
+   env->mip->nz = nz - num_to_delete;
    env->mip->matbeg = matBeg;
    env->mip->matind = matInd;
    env->mip->matval = matVal;
@@ -3810,10 +3817,14 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
 int sym_delete_rows(sym_environment *env, int num, int * indices)
 {
 
-   int i, j = 0, k, n, m, nz, numElements = 0, numRows = 0, *matBeg, *matInd; 
-   int deletedRows, deleted;
+   int i, j, k, n, m, nz, new_num_elements = 0, new_num_rows = 0;
+   int *matBeg, *matInd, *new_rows; 
    double *matVal, *rhs, *range;
    char *sense;
+
+   if (num <= 0){
+      return(FUNCTION_TERMINATED_NORMALLY);
+   }
 
    if (!env->mip || !env->mip->m || !env->base || num > env->mip->m){
       printf("sym_delete_rows():There is no loaded mip or base description \n");
@@ -3824,6 +3835,11 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    //FIXME!
    env->base->cutnum -= num;
 
+   if (!env->mip->matbeg){
+      /* We don't have a generic MIP description */
+      return (FUNCTION_TERMINATED_NORMALLY);
+   }
+   
    n = env->mip->n;
    m = env->mip->m;
    nz = env->mip->nz;
@@ -3839,72 +3855,61 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
 
    qsortucb_i(indices, num);
 
-   for(i = 0; i<n; i++){
-      for(; j<matBeg[i+1]; j++){
-	 for( k = 0, deleted = 0, deletedRows = 0; k<num; k++){
-	    if (matInd[j] == indices[k]){	    
-	       deleted = 1;
-	       break;
-	    }
-	    if (matInd[j] > indices[k]){
-	       deletedRows++;
-	    }
-	 }
-	 if (!deleted){
-	    matInd[numElements] = matInd[j] - deletedRows;
-	    matVal[numElements] = matVal[j];
-	    numElements++;
+   new_rows = (int *) malloc(m*ISIZE);
+   for (new_num_rows = 0, i = 0, k = 0; i < m && k < num; i++){
+      if (indices[k] == i){
+	 new_rows[i] = -1;
+	 k++;
+      }else{
+	 new_rows[i] = new_num_rows++;
+      }
+   }
+
+   for (; i < m; i++){
+      new_rows[i] = new_num_rows++;
+   }
+
+   if (k < num){
+      printf("sym_delete_rows() Error: Row index may be out of range.\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+   
+   for (new_num_elements = 0, i = 0, j = 0; i < n; i++){
+      for (k = 0; j < matBeg[i+1]; j++){
+	 if (new_rows[matInd[j]] < 0){	    
+	    continue;
+	 }else{
+	    matInd[new_num_elements] = new_rows[matInd[j]];
+	    matVal[new_num_elements++] = matVal[j];
 	 }
       }
       j = matBeg[i+1];
-      matBeg[i+1] = numElements;      
+      matBeg[i+1] = new_num_elements;
    }
+   matBeg[n] = new_num_elements;
 
-   for(i = 0; i<m; i++){
-      for( k = 0, deleted = 0; k<num; k++){
-	 if (i == k){	    
-	    deleted = 1;
-	    break;
-	 }
-      }
-      if (!deleted){
-	 sense[numRows] = sense[i];
-	 rhs[numRows] = rhs[i];
-	 range[numRows] = range[i];
-	 numRows++;
+   for (i = 0; i < m; i++){
+      if (new_rows[i] > 0){
+	 sense[new_rows[i]] = sense[i];
+	 rhs[new_rows[i]] = rhs[i];
+	 range[new_rows[i]] = range[i];
       }
    }
 
-   if (numRows != m - num){
+   if (new_num_rows != m - num){
       printf("sym_delete_rows(): Unknown error!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-
-   env->mip->m  = numRows;
-   env->mip->nz = numElements;
+   env->mip->m  = new_num_rows;
+   env->mip->nz = new_num_elements;
    
-   env->mip->rhs    = (double *) malloc(DSIZE * numRows);
-   env->mip->sense  = (char *)   malloc(CSIZE * numRows);
-   env->mip->rngval = (double *) malloc(DSIZE * numRows);
+   env->mip->rhs    = (double *) realloc(rhs, DSIZE * new_num_rows);
+   env->mip->sense  = (char *)   realloc(sense, CSIZE * new_num_rows);
+   env->mip->rngval = (double *) realloc(range, DSIZE * new_num_rows);
    
-   env->mip->matval = (double *) malloc(DSIZE*matBeg[n]);
-   env->mip->matind = (int *)    malloc(ISIZE*matBeg[n]);
-
-
-   memcpy(env->mip->rhs, rhs, DSIZE*numRows);
-   memcpy(env->mip->rngval, range, DSIZE*numRows);
-   memcpy(env->mip->sense, sense, CSIZE*numRows);
-   
-   memcpy(env->mip->matval, matVal, DSIZE * matBeg[n]);  
-   memcpy(env->mip->matind, matInd, ISIZE * matBeg[n]);
-
-
-   FREE(matVal);
-   FREE(matInd);
-   FREE(sense);
-   FREE(rhs);
-   FREE(range);
+   env->mip->matval = (double *) realloc(matVal, DSIZE*new_num_elements);
+   env->mip->matind = (int *)    realloc(matInd, ISIZE*new_num_elements);
 
    return(FUNCTION_TERMINATED_NORMALLY);      
 }
