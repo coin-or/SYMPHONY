@@ -3654,17 +3654,16 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
 
    int i, j, k, n, nz, num_to_delete = 0, *matBeg, *matInd, *lengths;
    //FIXME! how about base varnum? If they are to be deleted???
-   double *matVal, *colLb, *colUb, *objN;
-   char *isInt;
+   double *matVal, *colLb, *colUb, *objN, *obj1N, *obj2N;
+   char *isInt, **colName;
 
    if (num <= 0){
       return(FUNCTION_TERMINATED_NORMALLY);
    }
 
    if (!env->mip || !env->mip->n || !env->base || !env->rootdesc || 
-       num > env->mip->n){
-      printf("sym_delete_cols():There is no loaded mip, base or \n"); 
-      printf("root description or num exceeds the real column number\n"); 
+       num > env->mip->n || !env->mip->matbeg){
+      printf("sym_delete_cols(): No mip description has been loaded\n"); 
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3678,6 +3677,9 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
    qsortucb_i(indices, num);
    
    /* First, adjust the index lists */
+   /* Warning: This resets the user indices to be equal to the real indices.
+      This is usually fine for generic MIPS, but may not work for applications.
+      Names stay the same, however */
    
    n = env->mip->n;
 
@@ -3685,13 +3687,13 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
       if (indices[j] == i){
 	 j++;
       }else{
-	 bvar_ind[bind++] = bvar_ind[i];
+	 bvar_ind[bind++] = bind;
       }
    }
 
    if (j == num){
       for (; i < bvarnum; i++){
-	 bvar_ind[bind++] = bvar_ind[i];
+	 bvar_ind[bind++] = bind;
       }
       uind = user_size;
    }else{
@@ -3699,20 +3701,18 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
 	 if (indices[j] == i){
 	    j++;
 	 }else{
-	    user_ind[uind++] = user_ind[i-bvarnum];
+	    user_ind[uind++] = uind+bind;
 	 } 
       }
       for (; i < n; i++){
-	 user_ind[uind++] = user_ind[i-bvarnum];
+	 user_ind[uind++] = uind+bind;
       }
    }
 	 
-
    if (j < num){
       printf("sym_delete_cols() Error: Column index may be out of range.\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
-      
    
 #if 0
    if(i + j != n){
@@ -3735,12 +3735,7 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
       env->rootdesc->uind.size = uind;
    }
 
-   if (!env->mip->matbeg){
-      /* We don't have a generic MIP description */
-      return (FUNCTION_TERMINATED_NORMALLY);
-   }
-
-   /* Now adjust the MIP description, if it exists */
+   /* Now adjust the MIP description */
    
    lengths = (int*) malloc (ISIZE*n);
 
@@ -3760,54 +3755,99 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
       }
    }
 
-   matBeg = (int*) malloc(ISIZE*(n-num+1));
-   matInd = (int*) malloc(ISIZE*(nz-num_to_delete));
-   matVal = (double*) malloc(DSIZE*(nz-num_to_delete));
-   colLb = (double*) malloc(DSIZE*(n-num));
-   colUb = (double*) malloc(DSIZE*(n-num));
-   objN = (double*) malloc(DSIZE*(n-num));
-   isInt = (char*) calloc(CSIZE, (n-num));
+   matBeg =  env->mip->matbeg;
+   matInd =  env->mip->matind;
+   matVal =  env->mip->matval;
+   colLb =   env->mip->lb;
+   colUb =   env->mip->ub;
+   objN =    env->mip->obj;
+   obj1N =   env->mip->obj1;
+   obj2N =   env->mip->obj2;
+   isInt =   env->mip->is_int;
+   colName = env->mip->colname;
 
    matBeg[0] = 0;
 
-   for(i = 0, j = 0, k = 0; i < n; i++){
-      if( j < num){
+   for(i = 0, j = 0, k = 0; j < num; i++){
+      if (indices[j] == i){
+	 j++;
+	 continue;
+      }
+      matBeg[k+1] = matBeg[k] + lengths[i];
+      memmove(matInd + matBeg[k], matInd + matBeg[i], ISIZE * lengths[i]); 
+      memmove(matVal + matBeg[k], matVal + matBeg[i], DSIZE * lengths[i]); 
+      colLb[k] = colLb[i];
+      colUb[k] = colUb[i];
+      objN[k] = objN[i];
+      isInt[k] = isInt[i];
+      colName[k] = colName[i];
+      k++;
+   }
+
+   for(; i < n; i++, k++){
+      if (indices[j] == i){
+	 j++;
+	 continue;
+      }
+      matBeg[k+1] = matBeg[k] + lengths[i];
+      memmove(matInd + matBeg[k], matInd + matBeg[i], ISIZE * lengths[i]); 
+      memmove(matVal + matBeg[k], matVal + matBeg[i], DSIZE * lengths[i]); 
+      colLb[k] = colLb[i];
+      colUb[k] = colUb[i];
+      objN[k] = objN[i];
+      isInt[k] = isInt[i];
+      colName[k] = colName[i];
+   }
+
+   if (obj1N){
+      for(i = 0, j = 0, k = 0; j < num; i++){
 	 if (indices[j] == i){
 	    j++;
 	    continue;
 	 }
+	 obj1N[k] = obj1N[i];
+	 k++;
       }
-      matBeg[k+1] = matBeg[k] + lengths[i];
-      memcpy(matInd + matBeg[k], env->mip->matind + env->mip->matbeg[i], 
-	     ISIZE * lengths[i]); 
-      memcpy(matVal + matBeg[k], env->mip->matval + env->mip->matbeg[i], 
-	     DSIZE * lengths[i]); 
-      colLb[k] = env->mip->lb[i];
-      colUb[k] = env->mip->ub[i];
-      objN[k] = env->mip->obj[i];
-      isInt[k] = env->mip->is_int[i];
-      k++;
+      
+      for(; i < n; i++, k++){
+	 if (indices[j] == i){
+	    j++;
+	    continue;
+	 }
+	 obj1N[k] = obj1N[i];
+      }
    }
-
-   FREE(env->mip->matbeg);
-   FREE(env->mip->matind);
-   FREE(env->mip->matval);
-   FREE(env->mip->lb);
-   FREE(env->mip->ub);
-   FREE(env->mip->obj);
-   FREE(env->mip->is_int);
-   FREE(lengths);
-
-   env->mip->n = n-num;
-   env->mip->nz = nz - num_to_delete;
-   env->mip->matbeg = matBeg;
-   env->mip->matind = matInd;
-   env->mip->matval = matVal;
-   env->mip->lb =  colLb;
-   env->mip->ub = colUb;
-   env->mip->obj = objN;
-   env->mip->is_int = isInt;   
-
+   
+   if (obj2N){
+      for(i = 0, j = 0, k = 0; j < num; i++){
+	 if (indices[j] == i){
+	    j++;
+	    continue;
+	 }
+	 obj2N[k] = obj2N[i];
+	 k++;
+      }
+      
+      for(; i < n; i++, k++){
+	 if (indices[j] == i){
+	    j++;
+	    continue;
+	 }
+	 obj2N[k] = obj2N[i];
+      }
+   }
+   
+   n = env->mip->n = n - num;
+   nz = env->mip->nz = nz - num_to_delete;
+   env->mip->matbeg = (int *) realloc(matBeg, n*ISIZE);
+   env->mip->matind = (int *) realloc(matInd, nz*ISIZE);
+   env->mip->matval = (double *) realloc(matVal, nz*DSIZE);
+   env->mip->lb = (double *) realloc(colLb, n*DSIZE);
+   env->mip->ub = (double *) realloc(colUb, n*DSIZE);
+   env->mip->obj = (double *) realloc(objN, n*DSIZE);
+   env->mip->is_int = (char *) realloc(isInt, n*CSIZE);
+   env->mip->colname = (char **) realloc(colName, n*sizeof(char *));
+   
    return(FUNCTION_TERMINATED_NORMALLY);      
 
 }
