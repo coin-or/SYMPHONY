@@ -17,11 +17,11 @@
 ##############################################################################
 
 CC = g++
-OPT = -O #-fPIC
+OPT = -g #-fPIC
 SHLINKPREFIX = -Wl,-rpath,
 
 SYMPHONYROOT = ..
-COINROOT = ../..
+COINROOT = ../../build
 
 
 LP_SOLVER = OSI
@@ -36,7 +36,7 @@ USE_OSI_INTERFACE = FALSE
 
 LPINCDIR = $(COINROOT)/include
 LPLIBPATHS = $(COINROOT)/lib
-LPLIB = -lSym
+LPLIB = -lSym #-L$(HOME)/src/glpk-4.9/src/ -lglpk
 SYMDEFS =
 
 ifeq ($(LP_SOLVER),CPLEX)
