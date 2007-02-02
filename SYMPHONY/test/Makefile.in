@@ -993,16 +993,16 @@ uninstall-am: uninstall-info-am
 # We are using the Cbc solver executable to do the unit test
 
 test: unitTest$(EXEEXT)
-	cd ../../Data/miplib3; make uncompress
-	cd ../../Data/Netlib; make uncompress
+	cd ../../Data/miplib3; $(MAKE) uncompress
+	cd ../../Data/Netlib; $(MAKE) uncompress
 	./unitTest$(EXEEXT)
 #-T $(DATAOBJDIR)/miplib3 \
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 
 ptest: punitTest$(EXEEXT)
-	cd ../../Data/miplib3; make uncompress
-	cd ../../Data/Netlib; make uncompress
+	cd ../../Data/miplib3; $(MAKE) uncompress
+	cd ../../Data/Netlib; $(MAKE) uncompress
 	./punitTest$(EXEEXT) -p 2
 #-T $(DATAOBJDIR)/miplib3 \
 #	-mpsDir=$(DATASRCDIR)/Sample \
