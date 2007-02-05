@@ -469,7 +469,7 @@ case $build in
   *-linux-*)
        SYMDEFS="$SYMDEFS -D__LINUX" 
        case $build in 	     
-	     *ppc*)  
+	     ppc*|powerpc*)  
 	     ARCH=LINUXPPC ;;
 	     *)
              ARCH=LINUX ;;
