@@ -472,8 +472,9 @@ case $build in
 	     *ppc*)  
 	     ARCH=LINUXPPC ;;
 	     *)
-             ARCH=LINUX;;
-	esac
+             ARCH=LINUX ;;
+       esac
+       ;;
   *-alpha-*)
        SYMDEFS="$SYMDEFS -D__ALPHA"
        ARCH=ALPHA ;;
