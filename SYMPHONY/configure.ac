@@ -468,7 +468,12 @@ case $build in
        ARCH=DARWIN ;;
   *-linux-*)
        SYMDEFS="$SYMDEFS -D__LINUX" 
-       ARCH=LINUX ;;
+       case $build in 	     
+	     *ppc*)  
+	     ARCH=LINUXPPC ;;
+	     *)
+             ARCH=LINUX;;
+	esac
   *-alpha-*)
        SYMDEFS="$SYMDEFS -D__ALPHA"
        ARCH=ALPHA ;;
