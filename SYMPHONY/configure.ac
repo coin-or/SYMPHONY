@@ -145,13 +145,13 @@ case $sym_lp_solver in
    ;; 
    soplex)
          AC_MSG_RESULT(Soplex)
-     if test $coin_has_soplex = false; then 
+     if test $coin_has_spx = false; then 
          found_package=false
       fi
    ;; 
    xpress)
          AC_MSG_RESULT(Xpress)
-     if test $coin_has_xpress = false; then 
+     if test $coin_has_xpr = false; then 
          found_package=false
       fi
    ;; 
@@ -172,11 +172,11 @@ test $coin_has_glpk = true])
 AM_CONDITIONAL(OSL_LP_SOLVER,[test $sym_lp_solver = osl &&
 test $coin_has_osl = true])
 AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $sym_lp_solver = cplex&&
-test $coin_has_cplex = true])
+test $coin_has_cpx = true])
 AM_CONDITIONAL(SOPLEX_LP_SOLVER,[test $sym_lp_solver = soplex &&
-test $coin_has_soplex = true])
+test $coin_has_spx = true])
 AM_CONDITIONAL(XPRESS_LP_SOLVER,[test $sym_lp_solver = xpress &&
-test $coin_has_xpress = true])
+test $coin_has_xpr = true])
 
 #############################################################################
 #                       Add the options                                     #

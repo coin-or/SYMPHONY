@@ -21752,14 +21752,14 @@ echo "${ECHO_T}Osl" >&6
    soplex)
          echo "$as_me:$LINENO: result: Soplex" >&5
 echo "${ECHO_T}Soplex" >&6
-     if test $coin_has_soplex = false; then
+     if test $coin_has_spx = false; then
          found_package=false
       fi
    ;;
    xpress)
          echo "$as_me:$LINENO: result: Xpress" >&5
 echo "${ECHO_T}Xpress" >&6
-     if test $coin_has_xpress = false; then
+     if test $coin_has_xpr = false; then
          found_package=false
       fi
    ;;
@@ -21813,7 +21813,7 @@ fi
 
 
 if test $sym_lp_solver = cplex&&
-test $coin_has_cplex = true; then
+test $coin_has_cpx = true; then
   CPLEX_LP_SOLVER_TRUE=
   CPLEX_LP_SOLVER_FALSE='#'
 else
@@ -21824,7 +21824,7 @@ fi
 
 
 if test $sym_lp_solver = soplex &&
-test $coin_has_soplex = true; then
+test $coin_has_spx = true; then
   SOPLEX_LP_SOLVER_TRUE=
   SOPLEX_LP_SOLVER_FALSE='#'
 else
@@ -21835,7 +21835,7 @@ fi
 
 
 if test $sym_lp_solver = xpress &&
-test $coin_has_xpress = true; then
+test $coin_has_xpr = true; then
   XPRESS_LP_SOLVER_TRUE=
   XPRESS_LP_SOLVER_FALSE='#'
 else

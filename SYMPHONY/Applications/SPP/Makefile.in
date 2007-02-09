@@ -162,26 +162,26 @@ endif
 
 ifeq ($(CPLEX_LP_SOLVER),TRUE)
 INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
-LIBS += -l OsiCpx -lcplex
+LIBS += -lOsiCpx #-lcplex
 ADDINCFLAGS += -D__OSI_CPLEX__
 endif
 
 ifeq ($(OSL_LP_SOLVER),TRUE)
 INCL += -I`$(CYGPATH_W) $(OSLINCDIR)`
-LIBS += -l OsiOsl -losl
+LIBS += -lOsiOsl #-losl
 ADDINCFLAGS += -D__OSI_OSL__
 endif
 
 ifeq ($(SOPLEX_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
-LIBS += -l
-ADDINCFLAGS += -D__OSI_SPX__
+INCL += -I`$(CYGPATH_W) $(SPXINCDIR)`
+LIBS += -lOsiSpx #-l
+ADDINCFLAGS += -D__OSI_SOPLEX__
 endif
 
 ifeq ($(XPRESS_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
-LIBS += -l
-ADDINCFLAGS += -D__OSI_SPX__
+INCL += -I`$(CYGPATH_W) $(XPRINCDIR)`
+LIBS += -lOsiXpr #-l
+ADDINCFLAGS += -D__OSI_XPRESS__
 endif
 
 ADDLIBS += @ADDLIBS@
