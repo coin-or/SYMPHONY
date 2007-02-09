@@ -21738,7 +21738,7 @@ echo "${ECHO_T}Glpk" >&6
    cplex)
      echo "$as_me:$LINENO: result: Cplex" >&5
 echo "${ECHO_T}Cplex" >&6
-     if test $coin_has_cplex = false; then
+     if test $coin_has_cpx = false; then
          found_package=false
       fi
    ;;
@@ -21813,7 +21813,7 @@ fi
 
 
 if test $sym_lp_solver = cplex&&
-test $coin_has_cplex = true; then
+test $coin_has_cpx = true; then
   CPLEX_LP_SOLVER_TRUE=
   CPLEX_LP_SOLVER_FALSE='#'
 else

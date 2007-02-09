@@ -133,7 +133,7 @@ case $sym_lp_solver in
    ;; 
    cplex)
      AC_MSG_RESULT(Cplex)
-     if test $coin_has_cplex = false; then 
+     if test $coin_has_cpx = false; then 
          found_package=false
       fi
    ;; 
@@ -172,7 +172,7 @@ test $coin_has_glpk = true])
 AM_CONDITIONAL(OSL_LP_SOLVER,[test $sym_lp_solver = osl &&
 test $coin_has_osl = true])
 AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $sym_lp_solver = cplex&&
-test $coin_has_cplex = true])
+test $coin_has_cpx = true])
 AM_CONDITIONAL(SOPLEX_LP_SOLVER,[test $sym_lp_solver = soplex &&
 test $coin_has_soplex = true])
 AM_CONDITIONAL(XPRESS_LP_SOLVER,[test $sym_lp_solver = xpress &&
