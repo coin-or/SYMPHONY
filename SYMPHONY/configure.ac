@@ -96,7 +96,7 @@ AC_COIN_HAS_PROJECT(Cgl)
 
 # Check which third party solvers are available ToDo!
 AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
-AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h])#,[glp_lpx_simplex])
+AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h],[glp_lpx_simplex])
 AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
 AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
 AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
@@ -145,13 +145,13 @@ case $sym_lp_solver in
    ;; 
    soplex)
          AC_MSG_RESULT(Soplex)
-     if test $coin_has_soplex = false; then 
+     if test $coin_has_spx = false; then 
          found_package=false
       fi
    ;; 
    xpress)
          AC_MSG_RESULT(Xpress)
-     if test $coin_has_xpress = false; then 
+     if test $coin_has_xpr = false; then 
          found_package=false
       fi
    ;; 
@@ -174,9 +174,9 @@ test $coin_has_osl = true])
 AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $sym_lp_solver = cplex&&
 test $coin_has_cpx = true])
 AM_CONDITIONAL(SOPLEX_LP_SOLVER,[test $sym_lp_solver = soplex &&
-test $coin_has_soplex = true])
+test $coin_has_spx = true])
 AM_CONDITIONAL(XPRESS_LP_SOLVER,[test $sym_lp_solver = xpress &&
-test $coin_has_xpress = true])
+test $coin_has_xpr = true])
 
 #############################################################################
 #                       Add the options                                     #
