@@ -21175,6 +21175,78 @@ fi
 
   # Check if the symbol is provided in the library
   # ToDo: FOR NOW WE ASSUME THAT WE ARE USING THE C++ COMPILER
+  if test x"$glpk_libcheck" != xno; then
+                    coin_save_LIBS="$LIBS"
+                    LIBS="$GLPKLIB $ADDLIBS"
+		    echo "$as_me:$LINENO: checking whether symbol glp_lpx_simplex is available with GLPK" >&5
+echo $ECHO_N "checking whether symbol glp_lpx_simplex is available with GLPK... $ECHO_C" >&6
+                    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+# ToDo find out what to do about extern "C"
+#                    AC_TRY_LINK([extern "C" {void glp_lpx_simplex();}],[glp_lpx_simplex()],
+                    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+void glp_lpx_simplex();
+int
+main ()
+{
+glp_lpx_simplex()
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+                                 { { echo "$as_me:$LINENO: error: Cannot find symbol glp_lpx_simplex with GLPK" >&5
+echo "$as_me: error: Cannot find symbol glp_lpx_simplex with GLPK" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+                    ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+                    LIBS="$coin_save_LIBS"
+                  fi
 
   ADDLIBS="$GLPKLIB $ADDLIBS"
 
@@ -21199,7 +21271,7 @@ else
   COIN_HAS_GLPK_FALSE=
 fi
 
-#,[glp_lpx_simplex])
+
 
 echo "$as_me:$LINENO: checking if user provides library for Osl" >&5
 echo $ECHO_N "checking if user provides library for Osl... $ECHO_C" >&6
@@ -21738,7 +21810,7 @@ echo "${ECHO_T}Glpk" >&6
    cplex)
      echo "$as_me:$LINENO: result: Cplex" >&5
 echo "${ECHO_T}Cplex" >&6
-     if test $coin_has_cplex = false; then
+     if test $coin_has_cpx = false; then
          found_package=false
       fi
    ;;

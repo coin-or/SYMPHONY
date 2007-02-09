@@ -96,7 +96,7 @@ AC_COIN_HAS_PROJECT(Cgl)
 
 # Check which third party solvers are available ToDo!
 AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
-AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h])#,[glp_lpx_simplex])
+AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h],[glp_lpx_simplex])
 AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
 AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
 AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
@@ -133,7 +133,7 @@ case $sym_lp_solver in
    ;; 
    cplex)
      AC_MSG_RESULT(Cplex)
-     if test $coin_has_cplex = false; then 
+     if test $coin_has_cpx = false; then 
          found_package=false
       fi
    ;; 
