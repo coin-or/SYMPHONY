@@ -317,7 +317,7 @@ int solve(tm_prob *tm)
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
-   double timeout2 = 600, timeout3 = tm->par.logging_interval, timeout4 = 10;
+   double timeout2 = 5, timeout3 = tm->par.logging_interval, timeout4 = 10;
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
@@ -640,18 +640,18 @@ void print_tree_status(tm_prob *tm)
 
 #endif
    
-   printf("\nCurrent number of candidate nodes: %i\n", tm->samephase_candnum);
+   printf("candidates: %i ", tm->samephase_candnum);
    if (tm->has_ub){
       if (tm->obj_sense == SYM_MAXIMIZE){
-	 printf("Current lower bound:               %.2f\n", -tm->ub);
+	 printf("lb: %.2f ", -tm->ub);
       }else{
-	 printf("Current upper bound:               %.2f\n", tm->ub);
+	 printf("ub: %.2f ", tm->ub);
       }
    }else{
       if (tm->obj_sense == SYM_MAXIMIZE){
-	 printf("No lower bound found yet...\n");
+	 printf("lb: ?? ");
       }else{
-	 printf("No upper bound found yet...\n");
+	 printf("ub: ?? ");
       }
    }
    if (tm->samephase_candnum == 0){
@@ -666,16 +666,16 @@ void print_tree_status(tm_prob *tm)
       tm->lb = tm->ub;
    }
    if (tm->obj_sense == SYM_MAXIMIZE){
-      printf("Current upper bound:               %.2f\n", -tm->lb);
+      printf("ub: %.2f ", -tm->lb);
    }else{
-      printf("Current lower bound:               %.2f\n", tm->lb);
+      printf("lb: %.2f ", tm->lb);
    }
       
    if (tm->has_ub && tm->ub){
-      printf("Current gap percentage:            %.2f\n",
+      printf("gap: %.2f ",
 	     fabs(100*(tm->ub-tm->lb)/tm->ub));
    }
-   printf("Elapsed time:                      %i\n", (int)(elapsed_time));
+   printf("time: %i\n", (int)(elapsed_time));
 #if 0
    printf("Estimated nodes remaining:         %i\n", num_nodes_estimate);
    printf("Estimated time remaining:          %i\n",
