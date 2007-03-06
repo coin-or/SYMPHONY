@@ -30,6 +30,7 @@ typedef struct ROUNDING_PROB {
    int          *is_int;
    double 	*xval;
    double       *obj;
+   double       objval;
    double 	*rowActivity;
    double	*rowLower;
    double	*rowUpper;
@@ -53,7 +54,7 @@ typedef struct ROUNDING_PROB {
 }rounding_problem;
 
 int rnd_test(lp_prob *p);
-int rnd_create_rnd_problem(lp_prob *p);
+int rnd_simple_backtrack(lp_prob *p);
 int rnd_initialize_data(rounding_problem *rp, lp_prob *p);
 int rnd_find_row_bounds(rounding_problem *rp);
 int rnd_initialize_rp(rounding_problem *rp, lp_prob *p);
@@ -67,4 +68,5 @@ int rnd_if_feas_impossible(int m, double *rowActivity, const double *rowLower, c
 int sym_rnd_order(rounding_problem *rp, int **var_list, int *rn);
 int rnd_free_rounding_problem(rounding_problem *rp);
 int rnd_is_fully_integral(rounding_problem *rp);
+int rnd_calculate_obj(rounding_problem *rp);
 #endif

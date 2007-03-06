@@ -31,7 +31,7 @@
 int rnd_test(lp_prob *p)
 {
    printf("Rounding: Successfully compiled.\n");
-   rnd_create_rnd_problem(p);
+   rnd_simple_backtrack(p);
 }
 
 /*===========================================================================*/
@@ -43,7 +43,7 @@ int rnd_test(lp_prob *p)
  * TODO: rename this function
 */
 
-int rnd_create_rnd_problem(lp_prob *p)
+int rnd_simple_backtrack(lp_prob *p)
 {
 
    rounding_problem *rp = (rounding_problem*) malloc(sizeof(rounding_problem));
@@ -85,6 +85,9 @@ int rnd_create_rnd_problem(lp_prob *p)
    if (is_successful) {
       PRINT(rp->verbosity,-1,("rounding: successfully fixed integer variables. Checking feasibility\n"));
       if (rnd_is_constr_feas(rp) && rnd_is_fully_integral(rp)) {
+	 PRINT(rp->verbosity,-1,("Rounding Successful!\n"));
+	 rnd_calculate_obj(rp);
+	 PRINT(rp->verbosity,-1,("Found a heuristic solution with value %f\n",rp->objval));
 	 PRINT(rp->verbosity,-1,("Rounding Successful!\n"));
       }
       else {
@@ -128,13 +131,12 @@ int rnd_find_feas_rounding(rounding_problem *rp, int grp_cnt, int *var_search_gr
    int verbosity = rp->verbosity;
 
    /* find if already feasible or if beyond any repairs*/
-   if (rnd_grp_is_integral(grp_cnt, var_search_grp, xval, lpetol, verbosity) 
-	 == TRUE && rnd_is_constr_feas(rp) == TRUE) {
-      PRINT(verbosity,-1,("rounding: group feasibility reached at recursion level %d\n", recur_level));
-      return TRUE;
-   } else if (rnd_if_feas_impossible(m, rowActivity, rowLower, rowUpper, rowMax, rowMin, lpetol, verbosity)){
+   if (rnd_if_feas_impossible(m, rowActivity, rowLower, rowUpper, rowMax, rowMin, lpetol, verbosity)){
       PRINT(verbosity,-1,("rounding: infeasible beyond repair at recursion level %d\n", recur_level));
       return FALSE;
+   } else if (rnd_grp_is_integral(grp_cnt, var_search_grp, xval, lpetol, verbosity) == TRUE && rnd_is_constr_feas(rp) == TRUE) {
+      PRINT(verbosity,-1,("rounding: group feasibility reached at recursion level %d\n", recur_level));
+      return TRUE;
    } else if (varnum>=grp_cnt) {
       PRINT(verbosity,-1,("rounding: group exhausted at recursion level %d\n", recur_level));
       return TRUE;
@@ -300,15 +302,25 @@ int rnd_find_row_bounds(rounding_problem *rp)
 	    if (rowMax[row]<tmp_infinity && ub[col]<tmp_infinity) {
 	       rowMax[row] = rowMax[row]+rowVal[index]*ub[col];
 	    }
+	    else {
+	       rowMax[row] = tmp_infinity;
+	    }
 	    if (rowMin[row]>-tmp_infinity && lb[col]>-tmp_infinity) {
 	       rowMin[row] = rowMin[row]+rowVal[index]*lb[col];
+	    }
+	    else {
+	       rowMin[row] = tmp_infinity;
 	    }
 	 } else if (rowVal[index]<-lpetol) {
 	    if (rowMax[row]<tmp_infinity && lb[col]>-tmp_infinity) {
 	       rowMax[row] = rowMax[row]+rowVal[index]*lb[col];
+	    } else {
+	       rowMax[row] = tmp_infinity;
 	    }
 	    if (rowMin[row]>-tmp_infinity && ub[col]<tmp_infinity) {
 	       rowMin[row] = rowMin[row]+rowVal[index]*ub[col];
+	    } else {
+	       rowMin[row] = -tmp_infinity;
 	    }
 	 }
       }
@@ -478,4 +490,15 @@ int rnd_is_fully_integral(rounding_problem *rp)
       }
    }
    return TRUE;
+}
+
+
+/*===========================================================================*/
+int rnd_calculate_obj(rounding_problem *rp)
+{
+   rp->objval=0;
+   for (int i=0; i<rp->n; i++) {
+      rp->objval += rp->obj[i]*rp->xval[i];
+   }
+   return 0;
 }

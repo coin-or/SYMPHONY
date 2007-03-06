@@ -70,13 +70,13 @@ SYMHEADERS = \
 	../include/symphony_api.h \
 	../include/sym_timemeas.h \
 	../include/sym_tm.h \
-	../include/sym_tm_params.h
+	../include/sym_tm_params.h 
 
 #Add SymConfig.h even though it is not used - for COIN compability
 SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 
 if PRIMAL_HEURISTICS
-SYMINCFILES += ../include/rounding.h
+SYMINCFILES += ../include/sym_rounding.h
 endif
 
 SYM_MASTER_SRC	= Master/master.c Master/master_wrapper.c Master/master_io.c \
