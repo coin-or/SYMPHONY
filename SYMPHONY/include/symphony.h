@@ -147,5 +147,5 @@ MIPdesc *sym_create_copy_mip_desc PROTO((sym_environment *env));
 sym_environment * sym_create_copy_environment PROTO((sym_environment *env));
 
 int sym_test PROTO((sym_environment *env));
-
+int sym_preprocess PROTO((sym_environment *env));
 #endif

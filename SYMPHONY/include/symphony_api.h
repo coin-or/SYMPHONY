@@ -148,4 +148,5 @@ sym_environment * sym_create_copy_environment PROTO((sym_environment *env));
 
 int sym_test PROTO((sym_environment *env));
 
+int sym_preprocess_problem PROTO((sym_environment *env));
 #endif

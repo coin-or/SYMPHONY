@@ -135,6 +135,9 @@ int sym_set_defaults(sym_environment *env)
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
    dg_params *dg_par = &env->par.dg_par;
+#ifdef SYM_COMPILE_IN_PREPROCESSOR
+   prep_params *prep_par = &env->par.prep_par;
+#endif
 
    /************************* Global defaults ********************************/
    env->ub = 0;
@@ -362,6 +365,16 @@ int sym_set_defaults(sym_environment *env)
 	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
    strcpy(dg_par->edgeweight_font,
 	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
+
+#ifdef SYM_COMPILE_IN_PREPROCESSOR
+   /********************* preprocessor defaults ******************************/
+   prep_par->do_prep = 1;
+   prep_par->do_probe = 1;
+   prep_par->prep_verbosity = 0;
+   prep_par->probe_verbosity = 0;
+   prep_par->probe_level = 1;
+   prep_par->display_stats = 1;
+#endif
 
    return(termcode);
 }

@@ -22,6 +22,9 @@
 #include "sym_types.h"
 #include "sym_macros.h"
 #include "sym_master_params.h"
+#ifdef SYM_COMPILE_IN_PREPROCESSOR
+#include "sym_prep_params.h"
+#endif
 #ifdef COMPILE_IN_TM
 #include "sym_tm.h"
 #endif

@@ -49,6 +49,9 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony.h"
+#ifdef SYM_COMPILE_IN_PREPROCESSOR
+#include "sym_preprocessor.h"
+#endif
 #ifdef HAS_READLINE
 #include <pwd.h>
 #include <readline/readline.h>
@@ -159,6 +162,14 @@ int main(int argc, char **argv)
 	    printf("See sym_return_values.h for meaning of code.\n\n");
 	    exit(termcode);
 	 }
+#ifdef SYM_COMPILE_IN_PREPROCESSOR
+	 if ((termcode = sym_preprocess(env)) < 0){
+	    printf("\nFatal errors encountered. Exiting with code %i.\n",
+		  termcode);
+	    printf("See sym_return_values.h for meaning of code.\n\n");
+	    exit(termcode);
+	 }
+#endif
 	 
 	 if ((termcode = sym_find_initial_bounds(env)) < 0){
 	    printf("\nFatal errors encountered. Exiting with code %i.\n",

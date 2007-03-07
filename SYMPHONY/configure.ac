@@ -623,6 +623,13 @@ AC_ARG_WITH([tm],
 [in_tm=$withval],[in_tm=yes])
 AM_CONDITIONAL(SYM_COMPILE_IN_TM, [test "$in_tm" = yes])
 
+#AC_MSG_CHECKING([whether to compile in preprocessor])
+AC_ARG_WITH([preprocessor],
+[AC_HELP_STRING([--with-preprocessor],
+                [compile with preprocessor (default=yes)])],
+[in_preprocessor=$withval],[in_preprocessor=yes])
+AM_CONDITIONAL(SYM_COMPILE_IN_PREPROCESSOR, [test "$in_preprocessor" = yes])
+
 #sym_def_pconfig=true;
 sym_enable_parallel=false;
 if [test $in_cg = no || test $in_cp = no ||  
@@ -650,7 +657,9 @@ LIBNAME=
 SYMPDEFS="$SYMDEFS"
 
 SYMDEFS="$SYMDEFS -DCOMPILE_IN_CG -DCOMPILE_IN_CP -DCOMPILE_IN_LP -DCOMPILE_IN_TM"
-
+if test $in_preprocessor = yes; then
+   SYMDEFS="$SYMDEFS -DSYM_COMPILE_IN_PREPROCESSOR"
+fi
 if test $in_cg = yes; then 
    LPEXT=_cg
    SYMPDEFS="$SYMPDEFS -DCOMPILE_IN_CG"

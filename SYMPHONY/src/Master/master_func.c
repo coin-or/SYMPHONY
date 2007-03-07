@@ -1364,7 +1364,10 @@ int set_param(sym_environment *env, char *line)
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
    dg_params *dg_par = &env->par.dg_par;
-   
+#ifdef SYM_COMPILE_IN_PREPROCESSOR
+   prep_params *prep_par = &env->par.prep_par;
+#endif
+
    strcpy(key,"");
    sscanf(line,"%s%s", key, value);
    
@@ -2376,6 +2379,36 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(cp_par->check_which);
       return(0);
    }
+#ifdef SYM_COMPILE_IN_PREPROCESSOR
+   /*************************************************************************
+    ***                     preprocessing - parameters                    ***
+    *************************************************************************/ 
+
+   if (strcmp(key, "prep_do_preprocessing") == 0){
+      READ_INT_PAR(prep_par->do_prep);
+      return(0);
+   }
+   else if (strcmp(key, "prep_do_probing") == 0){
+      READ_INT_PAR(prep_par->do_probe);
+      return(0);
+   }
+   if (strcmp(key, "prep_verbosity") == 0){
+      READ_INT_PAR(prep_par->prep_verbosity);
+      return(0);
+   }
+   if (strcmp(key, "prep_probing_verbosity") == 0){
+      READ_INT_PAR(prep_par->probe_verbosity);
+      return(0);
+   }
+   if (strcmp(key, "prep_probing_level") == 0){
+      READ_INT_PAR(prep_par->probe_level);
+      return(0);
+   }
+   if (strcmp(key, "prep_display_stats") == 0){
+      READ_INT_PAR(prep_par->display_stats);
+      return(0);
+   }
+#endif
 
    return(FUNCTION_TERMINATED_ABNORMALLY);
 }

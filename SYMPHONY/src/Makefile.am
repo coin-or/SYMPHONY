@@ -72,6 +72,11 @@ SYMHEADERS = \
 	../include/sym_tm.h \
 	../include/sym_tm_params.h
 
+if SYM_COMPILE_IN_PREPROCESSOR
+ SYMHEADERS +=	../include/sym_preprocessor.h  \
+		../include/sym_prep_params.h
+endif
+
 if USE_CL
  SYMHEADERS += ../include/sym_win32_time.h
 endif
@@ -142,6 +147,10 @@ endif
 
 if SYM_COMPILE_IN_CG
 LP_SRC         += CutGen/cg_func.c CutGen/cg_wrapper.c
+endif
+
+if SYM_COMPILE_IN_PREPROCESSOR
+SYM_MASTER_SRC     += Preprocessor/preprocessor.c Preprocessor/preprocessor_basic.c Preprocessor/preprocessor_func.c 
 endif
 
 CP_SRC		= CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \

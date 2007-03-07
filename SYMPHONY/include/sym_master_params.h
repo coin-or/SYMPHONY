@@ -21,6 +21,8 @@
 #include "sym_lp_params.h"
 #include "sym_dg_params.h"
 
+#include "sym_prep_params.h"
+
 /*===========================================================================*\
  * The params structure contains all of the user-specified parameters
  * to be read in from the parameter file. See the README file for an
@@ -37,6 +39,8 @@ typedef struct PARAMS{
    lp_params  lp_par;
    tm_params  tm_par;
    dg_params  dg_par;
+   prep_params  prep_par;
+
    char       tm_exe[MAX_FILE_NAME_LENGTH +1];
    char       dg_exe[MAX_FILE_NAME_LENGTH +1];
    int        tm_debug;
