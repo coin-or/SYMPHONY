@@ -1,0 +1,60 @@
+		    SYMPHONY PRE(historic)PROCESSOR README
+                                                                            
+HOW TO INSTALL
+--------------
+Just type make after editing the Makefile so that the config directory and the
+location of SYMPHONY are proper.
+
+Read file LICENSE for license and copyright information.
+
+
+WHAT HAPPENS ON MAKE
+---------------------
+On typing make, the following files of SYMPHONY are replaced to accomodate the
+preprocessor: master.c, master_func.c, master_params.h, master.h, Makefile
+[Symphony's Makefile]. Original files are copied into symphony_backup. If you
+make more than once, you will invariably need to answer 'no' to all overwrite
+queries.
+
+To restore files run 'make unmake'. You will have to make symphony again after
+that. 
+
+
+HOW TO USE
+------------
+Preprocessing options may be changed in the options file given to symphony.
+(./symphony -f options.file -F file.mps)
+
+NAME OF PARAMETER		DEFAULT VALUE
+prep_do_preprocessing		1
+prep_do_probing			1
+prep_verbosity			0
+prep_probing_verbosity		0
+prep_probing_level		1
+prep_display_stats		1
+
+
+WHAT IS A PREPROCESSOR
+-----------------------
+The primary purpose of a preprocessor is to simplify an integer programming
+problem (IP) as much as possible, without solving LPs. It tries to remove
+redundant constraints, fix variables, tighten bounds etc.
+
+Probing, on the other hand, tries to find relations between two (binary
+variables). This may be used to fix variables and to find logical implications.
+Logical implications may be used for clique-cuts, disaggregation etc. Probing
+can also be carried out on constraints.
+
+Current preprocessor stops after finding logical implications. No
+cuts/constraints/inequalities are added based on these. Read TODO for more
+information. 
+
+
+WHY prehistoric?
+------------------
+There are several reasons for this:
+1. Preprocessing has been there in other solvers for years now.
+2. It took more than 1 year to make this preprocessor and is still incomplete.
+3. Coding and debugging style are pretty pre-historic. So is the computer on
+   which this was written. Also the author has a pre-disposition for pre-hisoric
+   life-style. 

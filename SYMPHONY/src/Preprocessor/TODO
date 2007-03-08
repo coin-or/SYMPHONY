@@ -1,0 +1,11 @@
+				     TODO
+				   --------
+
+Use Logical implications for:
+   Implement: clique inequalities
+   Implement: elimination of variables
+
+Implement: probing constraints
+
+Use Preprocessor down the tree rather than just at the root.
+

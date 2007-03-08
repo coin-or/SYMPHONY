@@ -3963,7 +3963,7 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    
    env->mip->matval = (double *) realloc(matVal, DSIZE*new_num_elements);
    env->mip->matind = (int *)    realloc(matInd, ISIZE*new_num_elements);
-
+   free(new_rows);
    return(FUNCTION_TERMINATED_NORMALLY);      
 }
 
