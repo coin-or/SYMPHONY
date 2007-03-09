@@ -83,8 +83,9 @@ int prep_basic(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 	 printf("Tightening bounds\n");
       }
       vars_fixed = 0;
+      //termstatus = 0;
       termstatus = prep_tighten_bounds(P, row_P, lhs, -1, bounds_tightened, 
-	    vars_fixed, verbosity);
+          vars_fixed, verbosity);
       switch (termstatus) {
        case PREP_MODIFIED:
 	 iterate_more = 1;
@@ -106,6 +107,7 @@ int prep_basic(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
       if (verbosity>=1) {
 	 printf("Checking redundancy\n");
       }
+      //termstatus = 0;
       termstatus = prep_check_redundancy(P, row_P, lhs, verbosity); 
       switch (termstatus) {
        case PREP_MODIFIED:
@@ -127,6 +129,7 @@ int prep_basic(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 	 printf("Fixing variables\n");
       }      
       vars_fixed = 0;
+      termstatus = 0;
       termstatus = prep_fix_variables(P, row_P, lhs, vars_fixed, verbosity);
       switch (termstatus) {
        case PREP_MODIFIED:
@@ -149,8 +152,9 @@ int prep_basic(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 	 printf("Improving Binary Coefficients\n");
       } 
       coeffs_changed = 0;
+      termstatus = 0;
       termstatus = prep_BinImproveCoeffs(P, row_P, lhs, coeffs_changed,
-					 verbosity);
+				 verbosity);
       switch (termstatus) {
        case PREP_MODIFIED:
 	 iterate_more = 1;

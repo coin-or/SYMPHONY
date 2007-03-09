@@ -48,8 +48,6 @@ int prep_integerize_bounds(MIPdesc *P, int & bounds_integerized, int verbosity)
 {
    /* Change the bounds of integer variables to floor/ceiling appropriately */
    int var_num = 0;
-   double ceil_bound = 0;
-   double floor_bound = 0;
    for (var_num=0;var_num<P->n;var_num++) {
       if (P->is_int[var_num]==TRUE) {
 	 if (P->ub[var_num]<DBL_MAX) {
@@ -85,12 +83,9 @@ int prep_create_row_rep(MIPdesc *P, rowpackedarray *row_P)
    */ 
    int row_num = 0;		/* the number of the constraint which is being
 				   added to the matrices */ 
-   int row_start_index = 0; 	/* start index, of the current row, in the
-				   array row_matval and row_matind*/ 
    int num_var_in_row = 0; 	/* number of variables with nonzero coeffs in
 				   the current row.*/ 
    int row_matind_index = 0;	/* index of the array row_matind */
-   int i = 0;			/* counter for loops */
    
    /* allocate space for different arrays */
    row_P->matval = (double *)malloc(P->nz*DSIZE); 
@@ -107,7 +102,6 @@ int prep_create_row_rep(MIPdesc *P, rowpackedarray *row_P)
 	each column
       */  
       int col_num = 0; 
-      int j = 0; 
       num_var_in_row = 0; 
       while (col_num<P->n) {	/* columns 0 to (n-1) */
  	 int j = 0;
@@ -141,7 +135,6 @@ int prep_find_lhs_params(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs)
      allocate fresh space for lhs structures
    */ 
    int row_num;			/* counter */
-   int i;			/* counter */
    /* initialize lhs */
    lhs->ub_is_infinite = (int *)calloc(P->m, ISIZE);
    lhs->lb_is_infinite = (int *)calloc(P->m, ISIZE);
@@ -418,7 +411,6 @@ int prep_tighten_bounds(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 			if (P->is_int[var_num]==TRUE) {
 			   /* if its an integer, take the floor of the bound */
 			   new_bound = floor(new_bound);
-			   printf("Taking floor\n");
 			}
 			
 			prep_update_const_bounds(P, row_P, lhs, 'U', var_num,
@@ -742,7 +734,6 @@ int prep_find_imp_sibling(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 {
    int col_start, col_stop, col_index, col_num2;
    int row_start, row_stop, row_index, row_num;
-   int termstatus;
    int termcode = PREP_UNMODIFIED;
    double rhs_val;
 
@@ -776,8 +767,7 @@ int prep_find_imp_sibling(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 		  P->ub[col_num2] = 0;
 		  termcode = PREP_MODIFIED;
 		  if (verbosity >= 2) {
-		     printf ("variable %d fixed at %f after fixing variable");
-		     printf (" %d\n", col_num2, P->ub[col_num2], col_num);
+		     printf ("variable %d fixed at %f after fixing variable %d\n", col_num2, P->ub[col_num2], col_num);
 		  }
 	       }
 	    }
@@ -788,8 +778,7 @@ int prep_find_imp_sibling(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 		  P->lb[col_num2] = 1;
 		  termcode = PREP_MODIFIED;
 		  if (verbosity >= 2) {
-		     printf ("variable %d fixed at %f after fixing variable");
-		     printf (" %d\n", col_num2, P->ub[col_num2], col_num);
+		     printf ("variable %d fixed at %f after fixing variable %d\n", col_num2, P->ub[col_num2], col_num);
 		  }
 	       }
 	    }
@@ -818,8 +807,7 @@ int prep_find_imp_sibling(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 		  P->lb[col_num2] = 1;
 		  termcode = PREP_MODIFIED;
 		  if (verbosity >= 2) {
-		     printf ("variable %d fixed at %f after fixing variable");
-		     printf ("%d\n", col_num2, P->ub[col_num2], col_num);
+		     printf ("variable %d fixed at %f after fixing variable %d\n", col_num2, P->ub[col_num2], col_num);
 		  }
 	       }
 	    }
@@ -830,8 +818,7 @@ int prep_find_imp_sibling(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 		  P->ub[col_num2] = 0;
 		  termcode = PREP_MODIFIED;
 		  if (verbosity >= 2) {
-		     printf ("variable %d fixed at %f after fixing variable");
-		     printf (" %d\n", col_num2, P->ub[col_num2], col_num);
+		     printf ("variable %d fixed at %f after fixing variable %d\n", col_num2, P->ub[col_num2], col_num);
 		  }
 	       }
 	    }
@@ -848,7 +835,6 @@ int prep_check_feas(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs)
 {
    int row_num = 0;
    int termcode = PREP_UNMODIFIED;
-   int termstatus = 0;
 
    /* for each row, check if the lhs bounds are in harmony with the rhs val */
    for (row_num=0; row_num<P->m; row_num++) {
@@ -1124,7 +1110,6 @@ int prep_purge_del_rows(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 			int & rows_purged)
 {
    /* deletes all the rows marked deleted from the MIP structures */
-   int vals_deleted = 0;	/* number of values deleted from P->matval */
    
    int    *new_row_matbeg;	/* to replace row_matbeg */
    int    *new_row_matind;	/* to replace row_matind */
@@ -1141,13 +1126,9 @@ int prep_purge_del_rows(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
    int    *new_lhs_ub_infinite;	/* to replace lhs->ub_is_infinite */
    int    *new_lhs_lb_inf_var;	/* to replace lhs->lb_inf_var */
    int    *new_lhs_ub_inf_var;	/* to replace lhs->ub_inf_var */
-   int    *deleted_rows;	/* array of row numbers to be deleted */
-   int length_row = 0;		/* number of coefficients in row which is
-				   being deleted */
+   
    int col_num = 0;		/* the column number*/ 
    int row_num = 0;		/* the row number*/ 
-   int col_index;		/* indices of col_num in P->matind */
-   int row_index;		/* indices of row_num in row_P->matind */
    int elems_to_delete = 0;	/* number of elements to delete */
    int row_count = 0;
    int new_m = P->m-row_P->rows_deleted; /* the new no. of rows */
@@ -1857,6 +1838,7 @@ int prep_update_const_bounds(MIPdesc *P, rowpackedarray *row_P,
 	 } /* end switch bnd_sense */
       }	/* end if (coeff<0) */
    }
+   return 0;
 }
 
 
@@ -1904,10 +1886,9 @@ int prep_BinImproveCoeffs(MIPdesc *P, rowpackedarray *row_P, lhsparams
 	       /* this var. is binary. try changing its coefficient and the
 		  corresponding rhs */
 	       coeff = row_P->matval[row_index];
-	       zk = lhs->ubound[row_num] - coeff;
-
-	       if ( zk < P->rhs[row_num]) { 
-		  if (coeff>0) {
+	       if (coeff>0) {
+		  zk = lhs->ubound[row_num] - coeff;
+		  if ( zk < P->rhs[row_num]) { 
 		     /* x[col_num]=0 makes this constraint redundant */ 
 		     delta = P->rhs[row_num] - zk; 
 		     newCoeff = coeff - delta;
@@ -1923,9 +1904,11 @@ int prep_BinImproveCoeffs(MIPdesc *P, rowpackedarray *row_P, lhsparams
 			constraint */
 		     prep_changeCoeff(P, row_P, lhs, col_num, row_num,
 				      newCoeff, newRhs);
-		  } 
-		   
-		  else if (coeff<0) {
+		  }
+	       }
+	       else if (coeff<0) {
+		  zk = lhs->ubound[row_num] + coeff;
+		  if ( zk < P->rhs[row_num]) { 
 		     /* x[col_num]=1 makes this constraint redundant */
 		     delta = P->rhs[row_num] - zk;
 		     newCoeff = coeff + delta;
@@ -1960,9 +1943,10 @@ int prep_BinImproveCoeffs(MIPdesc *P, rowpackedarray *row_P, lhsparams
 	       /* this var. is binary. try changing its coefficient and the
 		  corresponding rhs */
 	       coeff = row_P->matval[row_index];
-	       zk = lhs->lbound[row_num] + coeff;
-	       if ( zk > P->rhs[row_num]) {
-		  if (coeff>0) {
+	       
+	       if (coeff>0) {
+		  zk = lhs->lbound[row_num] + coeff;
+		  if ( zk > P->rhs[row_num]) {
 		     /* x[col_num]=1 makes this constraint redundant */ 
 		     delta = zk - P->rhs[row_num]; 
 		     newCoeff = coeff - delta;
@@ -1979,12 +1963,14 @@ int prep_BinImproveCoeffs(MIPdesc *P, rowpackedarray *row_P, lhsparams
 		     prep_changeCoeff(P, row_P, lhs, col_num, row_num,
 				      newCoeff, newRhs);
 		  }
-		  else if (coeff < 0) {
-		     zk = lhs->lbound[row_num];
+	       }
+	       else if (coeff < 0) {
+		  zk = lhs->lbound[row_num] - coeff;
+		  if ( zk > P->rhs[row_num]) {
 		     /* x[col_num]=0 makes this constraint redundant */
 		     delta = zk - P->rhs[row_num];
 		     newCoeff = coeff + delta;
-		     newRhs = zk; /* new and old are same */
+		     newRhs = zk; /* rhs has changed */
 		     coeffs_changed++;
 		     termcode = PREP_MODIFIED;
 		     if (verbosity >= 2) {
@@ -2084,11 +2070,10 @@ void prep_coeffChangeBounds (MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
       else.
    */ 
 
-   int row_index;			/* row index */ 
    int col_index;			/* column index */
 
    /* first find the position of the element in P  */
-   for (col_index=P->matbeg[col_num]; col_index<P->matbeg[col_num];
+   for (col_index=P->matbeg[col_num]; col_index<P->matbeg[col_num+1];
 	col_index++){ 
       if (P->matind[col_index]==row_num) { 
  	 break; 
@@ -2096,20 +2081,20 @@ void prep_coeffChangeBounds (MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
    } 
       
    /* eleminate the contribution of old coefficient  */
-   if(oldCoeff>0) { 
+   if (oldCoeff>0) { 
       if (!(lhs->lb_is_infinite[row_num])) {
-	 lhs->lbound[row_num] - oldCoeff*P->lb[col_num];
+	 lhs->lbound[row_num] = lhs->lbound[row_num] - oldCoeff*P->lb[col_num];
       }
       if (!(lhs->ub_is_infinite[row_num])) {
-	 lhs->ubound[row_num] - oldCoeff*P->ub[col_num];
+	 lhs->ubound[row_num] = lhs->ubound[row_num] - oldCoeff*P->ub[col_num];
       }
    } 
    else if (oldCoeff < 0){ 
       if (!(lhs->lb_is_infinite[row_num])) {
-	 lhs->lbound[row_num] - oldCoeff*P->ub[col_num];
+	 lhs->lbound[row_num] = lhs->lbound[row_num] - oldCoeff*P->ub[col_num];
       }
       if (!(lhs->ub_is_infinite[row_num])) {
-	 lhs->ubound[row_num] - oldCoeff*P->lb[col_num];
+	 lhs->ubound[row_num] = lhs->ubound[row_num] - oldCoeff*P->lb[col_num];
       }
    } 
 
@@ -2117,18 +2102,18 @@ void prep_coeffChangeBounds (MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
    /* add in the contribution of new coefficient  */
    if(newCoeff>0) { 
       if (!(lhs->lb_is_infinite[row_num])) {
-	 lhs->lbound[row_num] + newCoeff*P->lb[col_num];
+	 lhs->lbound[row_num] = lhs->lbound[row_num] + newCoeff*P->lb[col_num];
       }
       if (!(lhs->ub_is_infinite[row_num])) {
-	 lhs->ubound[row_num] + newCoeff*P->ub[col_num];
+	 lhs->ubound[row_num] = lhs->ubound[row_num] + newCoeff*P->ub[col_num];
       }
    } 
    else if (newCoeff < 0){ 
       if (!(lhs->lb_is_infinite[row_num])) {
-	 lhs->lbound[row_num] + newCoeff*P->ub[col_num];
+	 lhs->lbound[row_num] = lhs->lbound[row_num] + newCoeff*P->ub[col_num];
       }
       if (!(lhs->ub_is_infinite[row_num])) {
-	 lhs->ubound[row_num] + newCoeff*P->lb[col_num];
+	 lhs->ubound[row_num] = lhs->ubound[row_num] + newCoeff*P->lb[col_num];
       }
    } 
 }
@@ -2152,6 +2137,7 @@ int prep_delete_structs (MIPdesc *fP, rowpackedarray *row_fP, lhsparams *flhs,
    free(flhs);
 
    free(stats);
+   return 0;
 } 
 
 
@@ -2185,6 +2171,7 @@ int prep_disp_stats (prep_stats *stats)
    printf ("Coefficients changed: %d\n", stats->coeffs_changed);
    printf ("Bounds Tightened: %d\n", stats->bounds_tightened);
    printf ("============================================== \n");
+   return 0;
 }
 
 
@@ -2275,11 +2262,13 @@ int prep_display_mip(MIPdesc *current_mip)
    printf("}\n");
 
    /* Array column names */
+   /*
    printf ("\nColumn names: ");
    for (i=0;i<current_mip->n;i++) {
       printf(current_mip->colname[i]);
       printf(" ");
    }
+   */
 
    /* sense of constraints */
    printf("\nSense of constraints:");

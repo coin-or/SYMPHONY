@@ -23,6 +23,8 @@
 #include "sym_master_params.h"
 #include "sym_master.h" 
 #include "sym_constants.h" 
+#include "symphony_api.h"
+#include "symphony.h"
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -60,6 +62,7 @@ int sym_preprocess (sym_environment *env)
    stats->coeffs_changed = 0;
    stats->bounds_tightened = 0;
 
+   prep_display_mip(env->mip);
    /* Integerize variable bounds for Int Variables */
    termstatus = prep_integerize_bounds(P, bounds_integerized, verbosity);
    //stats->bounds_tightened = bounds_integerized;
@@ -113,9 +116,35 @@ int sym_preprocess (sym_environment *env)
 	    return PREP_SOLVED;
 	 }
       }/* advanced preprocessing */
+      
+      /* new environment */
+      sym_environment *env2 = sym_open_environment();
+      sym_explicit_load_problem(env2, P->n, P->m, P->matbeg, P->matind, P->matval, P->lb, P->ub, P->is_int, P->obj, P->obj2, P->sense, P->rhs, P->rngval, TRUE);
+      prep_display_mip(env2->mip);
+      
+      /* Comment out these lines to see magic */
+      int *indices = (int *)malloc(ISIZE);
+      indices[0] = 2;
+      termcode = sym_delete_rows(env2, 1, indices);
+      printf("tercode from delete_rows = %d\n", termcode);
+      prep_display_mip(env2->mip);
+      sym_set_int_param(env2,"verbosity",0);
+      sym_solve(env2);
+      sym_close_environment(env2);
+      exit(0);
+      /* end new environment */
+      
+      /* old environment */
+      /*
       free_mip_desc(env->mip);
-      sym_explicit_load_problem(env, P->n, P->m, P->matbeg, P->matind, P->matval, P->lb, P->ub, P->is_int, P->obj, P->obj2, P->sense, P->rhs, P->rngval, TRUE);
-      prep_purge_del_rows2(env, P, row_P, rows_purged);
+      free(env->base);
+      free(env->rootdesc->uind.list);
+      free(env->rootdesc);
+      sym_explicit_load_problem(env2, P->n, P->m, P->matbeg, P->matind, P->matval, P->lb, P->ub, P->is_int, P->obj, P->obj2, P->sense, P->rhs, P->rngval, TRUE);
+      prep_purge_del_rows2(env2, P, row_P, rows_purged);
+      */
+      /* end old environment */
+      
       stats->rows_deleted = stats->rows_deleted + rows_purged;
    } /* preprocessing ends */
 
