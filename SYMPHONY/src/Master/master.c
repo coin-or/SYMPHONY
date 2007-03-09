@@ -3969,7 +3969,7 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    //   matBeg[n] = new_num_elements;
 
    for (i = 0; i < m; i++){
-      if (new_rows[i] > 0){
+      if (new_rows[i] >= 0){
 	 sense[new_rows[i]] = sense[i];
 	 rhs[new_rows[i]] = rhs[i];
 	 range[new_rows[i]] = range[i];
