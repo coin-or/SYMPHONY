@@ -739,11 +739,10 @@ int start_node(tm_prob *tm, int thread_num)
       if ((best_node = del_best_node(tm)) == NULL)
 	 return(NEW_NODE__NONE);
 
-      /*
       if (best_node->node_status == NODE_STATUS__WARM_STARTED){
-	 break;
+	 if(best_node->lower_bound >= MAXDOUBLE) 
+	    break;
       }
-      */
       
       /* if no UB yet or lb is lower than UB then go ahead */
       if (!tm->has_ub ||
