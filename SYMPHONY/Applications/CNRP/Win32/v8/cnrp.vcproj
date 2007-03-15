@@ -133,8 +133,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="4"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\..\..\..\include,..\..\include,..\..\..\..\..\Osi\src,..\..\..\..\..\CoinUtils\src,..\..\..\..\..\Clp\src,..\..\..\..\..\Cgl\src,..\..\..\..\..\Cgl\src\CglLiftAndProject,..\..\..\..\..\Cgl\src\CglGomory,..\..\..\..\..\Cgl\src\CglClique,..\..\..\..\..\Cgl\src\CglKnapsackCover,..\..\..\..\..\Cgl\src\CglProbing,..\..\..\..\..\Cgl\src\CglFlowCover,..\..\..\..\..\Cgl\src\CglOddHole,..\..\..\..\..\Cgl\src\CglMixedIntegerRounding,..\..\..\..\..\Cgl\src\CglSimpleRounding,..\..\..\..\..\Osi\src\OsiClp,..\..\..\..\..\BuildTools\headers"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;DIRECTED_X_VARS;ADD_FLOW_VARS;SAVE_CUT_POOL;MULTI_CRITERIA;_CRT_SECURE_NO_DEPRECATE"
+				StringPooling="true"
 				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
 				PrecompiledHeaderFile=".\Release/cnrp.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
@@ -153,7 +158,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
 				OutputFile=".\Release/cnrp.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -212,6 +216,14 @@
 							CompileAs="2"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\Common\compute_cost.c"
@@ -226,6 +238,14 @@
 							CompileAs="2"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\Common\network.c"
@@ -237,6 +257,14 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
 							CompileAs="2"
 						/>
 					</FileConfiguration>
@@ -258,6 +286,14 @@
 							CompileAs="2"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter
@@ -276,6 +312,14 @@
 							CompileAs="2"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\CutGen\cnrp_cg.c"
@@ -290,6 +334,14 @@
 							CompileAs="2"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\CutGen\shrink.c"
@@ -301,6 +353,14 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
 							CompileAs="2"
 						/>
 					</FileConfiguration>
@@ -322,6 +382,14 @@
 							CompileAs="2"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\Master\cnrp_main.c"
@@ -333,6 +401,14 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
 							CompileAs="2"
 						/>
 					</FileConfiguration>
@@ -350,6 +426,14 @@
 							CompileAs="2"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\Master\cnrp_master_functions.c"
@@ -364,6 +448,14 @@
 							CompileAs="2"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\Master\small_graph.c"
@@ -375,6 +467,14 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
 							CompileAs="2"
 						/>
 					</FileConfiguration>
@@ -396,6 +496,14 @@
 							CompileAs="2"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter
@@ -414,6 +522,14 @@
 							CompileAs="2"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\LP\cnrp_lp_branch.c"
@@ -425,6 +541,14 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
 							CompileAs="2"
 						/>
 					</FileConfiguration>
