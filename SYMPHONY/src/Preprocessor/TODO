@@ -7,5 +7,7 @@ Use Logical implications for:
 
 Implement: probing constraints
 
+Make advanced preprocessing functional
+
 Use Preprocessor down the tree rather than just at the root.
 

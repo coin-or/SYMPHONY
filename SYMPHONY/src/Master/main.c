@@ -170,10 +170,6 @@ int main(int argc, char **argv)
 	    exit(termcode);
 	 }
 #endif
-	 int *indices = (int *)malloc(ISIZE);
-	 indices[0] = 2;
-	 termcode = sym_delete_rows(env, 1, indices);
-	 printf("tercode from delete_rows = %d\n", termcode);
 	 
 	 if ((termcode = sym_find_initial_bounds(env)) < 0){
 	    printf("\nFatal errors encountered. Exiting with code %i.\n",

@@ -373,7 +373,7 @@ int sym_set_defaults(sym_environment *env)
    prep_par->prep_verbosity = 0;
    prep_par->probe_verbosity = 0;
    prep_par->probe_level = 1;
-   prep_par->display_stats = 1;
+   prep_par->display_stats = 0;
 #endif
 
    return(termcode);

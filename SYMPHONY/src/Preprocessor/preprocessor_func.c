@@ -1380,7 +1380,6 @@ int prep_purge_del_rows2(sym_environment *env, MIPdesc *P, rowpackedarray *row_P
    }
    sym_delete_rows(env, r_count, r_indices);
    rows_purged = r_count;
-   printf("Purged %d rows\n.",r_count);
    free(r_indices);
    return 0;
 }
