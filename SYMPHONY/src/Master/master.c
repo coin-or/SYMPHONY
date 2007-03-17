@@ -219,6 +219,7 @@ int sym_set_defaults(sym_environment *env)
    tm_par->time_limit = lp_par->time_limit = -1.0;
    tm_par->node_limit = -1;
    tm_par->gap_limit = -1.0;
+   // tm_par->gap_limit = 0.0;
    tm_par->find_first_feasible = FALSE;
    tm_par->sensitivity_analysis = FALSE;
    
@@ -1106,15 +1107,18 @@ int sym_warm_solve(sym_environment *env)
       if(env->mip->change_num){
 	 env->has_ub = FALSE;
 	 env->ub = 0.0;
+	 env->lb = -MAXDOUBLE;
 
 	 env->warm_start->has_ub = env->best_sol.has_sol = 
 	    env->warm_start->best_sol.has_sol = FALSE;
 	 env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
+	 env->warm_start->lb = -MAXDOUBLE;
 	 FREE(env->warm_start->best_sol.xind);
 	 FREE(env->warm_start->best_sol.xval);
       }else {
 	 env->has_ub = env->warm_start->has_ub;
 	 env->ub = env->warm_start->ub;
+	 env->lb = env->warm_start->lb;
       }
 
       if(env->par.multi_criteria){
@@ -1124,19 +1128,19 @@ int sym_warm_solve(sym_environment *env)
       
       for(i = 0; i < env->mip->change_num; i++){
 	 change_type = env->mip->change_type[i];
-	 if(change_type == RHS_CHANGED || change_type == OBJ_COEFF_CHANGED){
-	    if(change_type == RHS_CHANGED){
-	       if(env->par.lp_par.cgl.generate_cgl_cuts){
-		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
-		  printf("rhs change when cuts exist, for now!\n"); 
-		  return(FUNCTION_TERMINATED_ABNORMALLY);	    
-	       }
-	    } else{
+	 if(change_type == RHS_CHANGED || change_type == COL_BOUNDS_CHANGED || change_type == OBJ_COEFF_CHANGED){
+	    if(change_type == OBJ_COEFF_CHANGED){
 	       if(env->par.lp_par.do_reduced_cost_fixing && !env->par.multi_criteria){		 
 		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
 		  printf("obj coeff change when reduced cost fixing is on,"); 
 		  printf("for now!\n"); 
 		  return(FUNCTION_TERMINATED_ABNORMALLY);   
+	       }
+	    } else{
+	       if(env->par.lp_par.cgl.generate_cgl_cuts){
+		  printf("sym_warm_solve(): SYMPHONY can not resolve for the\n");
+		  printf("rhs or column bounds change when cuts exist, for now!\n"); 
+		  return(FUNCTION_TERMINATED_ABNORMALLY);
 	       } 
 	    }
 
@@ -1167,6 +1171,7 @@ int sym_warm_solve(sym_environment *env)
 	    update_tree_bound(env, env->warm_start->rootnode, change_type);
 	    /* FIXME: Cannot warm start for more than 1 modificaiton */
 	    env->mip->change_num = 0;
+	    env->mip->var_type_modified = FALSE;
 	 } else{
 	    printf("sym_warm_solve():");
 	    printf("Unable to re-solve this type of modification,for now!\n");
@@ -2827,6 +2832,8 @@ int sym_set_obj2_coeff(sym_environment *env, int index, double value)
 
 int sym_set_col_lower(sym_environment *env, int index, double value)
 {
+   int i;
+
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 ||
        !env->mip->lb){
       printf("sym_set_col_lower():There is no loaded mip description or\n");
@@ -2836,6 +2843,20 @@ int sym_set_col_lower(sym_environment *env, int index, double value)
 
    env->mip->lb[index] = value;
 
+   if (env->mip->change_num){
+      for(i = env->mip->change_num - 1 ; i >=0 ; i--){
+	 if (env->mip->change_type[i] == COL_BOUNDS_CHANGED){
+	    break;
+	 }
+      }
+      if (i < 0 ){
+	 env->mip->change_type[env->mip->change_num++] = COL_BOUNDS_CHANGED;
+      }
+   }
+   else{
+      env->mip->change_type[env->mip->change_num++] = COL_BOUNDS_CHANGED;
+   }
+
    return(FUNCTION_TERMINATED_NORMALLY);
 }
 
@@ -2844,6 +2865,8 @@ int sym_set_col_lower(sym_environment *env, int index, double value)
 
 int sym_set_col_upper(sym_environment *env, int index, double value)
 {
+   int i;
+
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 ||
        !env->mip->ub){
       printf("sym_set_col_upper():There is no loaded mip description!\n");
@@ -2852,6 +2875,20 @@ int sym_set_col_upper(sym_environment *env, int index, double value)
    }
 
    env->mip->ub[index] = value;
+
+   if (env->mip->change_num){
+      for(i = env->mip->change_num - 1 ; i >=0 ; i--){
+	 if (env->mip->change_type[i] == COL_BOUNDS_CHANGED){
+	    break;
+	 }
+      }
+      if (i < 0 ){
+	 env->mip->change_type[env->mip->change_num++] = COL_BOUNDS_CHANGED;
+      }
+   }
+   else{
+      env->mip->change_type[env->mip->change_num++] = COL_BOUNDS_CHANGED;
+   }
  
    return(FUNCTION_TERMINATED_NORMALLY);
 }
@@ -3300,6 +3337,8 @@ int sym_set_continuous(sym_environment *env, int index)
 
 int sym_set_integer(sym_environment *env, int index)
 {
+   int i;
+
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
        !env->mip->is_int){
       printf("sym_set_integer():There is no loaded mip description or\n");
@@ -3308,6 +3347,7 @@ int sym_set_integer(sym_environment *env, int index)
    }
 
    env->mip->is_int[index] = TRUE;
+   env->mip->var_type_modified = TRUE;
 
    return(FUNCTION_TERMINATED_NORMALLY);      
 }
@@ -3858,7 +3898,7 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
 {
 
    int i, j, k, n, m, nz, new_num_elements = 0, new_num_rows = 0;
-   int *matBeg, *matInd, *new_rows; 
+   int *matBeg, *matInd, *new_rows = 0; 
    double *matVal, *rhs, *range;
    char *sense;
 
@@ -3929,7 +3969,7 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    //   matBeg[n] = new_num_elements;
 
    for (i = 0; i < m; i++){
-      if (new_rows[i] > 0){
+      if (new_rows[i] >= 0){
 	 sense[new_rows[i]] = sense[i];
 	 rhs[new_rows[i]] = rhs[i];
 	 range[new_rows[i]] = range[i];
@@ -3950,6 +3990,8 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    
    env->mip->matval = (double *) realloc(matVal, DSIZE*new_num_elements);
    env->mip->matind = (int *)    realloc(matInd, ISIZE*new_num_elements);
+
+   FREE(new_rows);
 
    return(FUNCTION_TERMINATED_NORMALLY);      
 }

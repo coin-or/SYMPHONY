@@ -136,7 +136,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="..\..\..\..\include,..\..\include,..\..\..\..\..\Osi\src,..\..\..\..\..\CoinUtils\src,..\..\..\..\..\Clp\src,..\..\..\..\..\Cgl\src,..\..\..\..\..\Cgl\src\CglLiftAndProject,..\..\..\..\..\Cgl\src\CglGomory,..\..\..\..\..\Cgl\src\CglClique,..\..\..\..\..\Cgl\src\CglKnapsackCover,..\..\..\..\..\Cgl\src\CglProbing,..\..\..\..\..\Cgl\src\CglFlowCover,..\..\..\..\..\Cgl\src\CglOddHole,..\..\..\..\..\Cgl\src\CglMixedIntegerRounding,..\..\..\..\..\Cgl\src\CglSimpleRounding,..\..\..\..\..\Osi\src\OsiClp,..\..\..\..\..\BuildTools\headers"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -160,7 +161,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
 				OutputFile=".\Release/spp_with_cuts.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -224,6 +224,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -250,6 +251,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -272,6 +274,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -294,6 +297,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -320,6 +324,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -346,6 +351,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -372,6 +378,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -394,6 +401,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -416,6 +424,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -442,6 +451,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -464,6 +474,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>
@@ -486,6 +497,7 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							PreprocessorDefinitions=""
+							CompileAs="2"
 						/>
 					</FileConfiguration>
 				</File>

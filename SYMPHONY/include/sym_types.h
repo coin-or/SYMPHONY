@@ -395,6 +395,7 @@ typedef struct MIPDESC{
    int       *row_matind;      /* nz */
    double    *row_matval;      /* nz */
    int       *row_lengths;  
+   int        var_type_modified;  /* number of updates on the mip desc */
    int        change_num;  /* number of updates on the mip desc */
    int        change_type[MAX_CHANGE_NUM];  /* type of the mip desc. changes */
 
