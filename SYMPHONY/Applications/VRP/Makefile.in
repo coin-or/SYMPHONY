@@ -185,6 +185,10 @@ ALL_OBJS =  src/Master/vrp_main.@OBJEXT@ \
 	src/CutGen/shrink.@OBJEXT@ \
 	src/CutPool/vrp_cp.@OBJEXT@
 
+ifeq ($(DO_CONCORDE_CUTS),TRUE)
+ALL_OBJS += src/CutGen/tsp.@OBJEXT@ # $(TSP_OBJS)
+endif
+
 PUSER_MASTER_OBJS = $(addsuffix o, $(USER_MASTER_OBJS))
 PUSER_LP_OBJS = $(addsuffix o, $(USER_LP_OBJS))
 PUSER_CG_OBJS = $(addsuffix o, $(USER_CG_OBJS))
