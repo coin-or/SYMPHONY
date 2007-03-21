@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
 /*                                                                           */
@@ -200,7 +200,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #ifdef DO_TSP_CUTS
    if (vrp->par.which_tsp_cuts && vrp->par.tsp_prob){
       tsp_cuts(n, vrp->par.verbosity, vrp->par.tsp_prob,
-			   vrp->par.which_tsp_cuts, num_cuts, alloc_cuts, cuts);
+	       vrp->par.which_tsp_cuts, cuts, num_cuts, alloc_cuts);
       free_net(n);
       return(USER_SUCCESS);
    }      
