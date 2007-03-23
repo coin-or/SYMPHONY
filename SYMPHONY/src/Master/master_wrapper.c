@@ -478,11 +478,14 @@ int send_lp_data_u(sym_environment *env, int sender)
       tm->lpp[i]->draw_graph = env->dg_tid;
       tm->lpp[i]->base = *(env->base);
       tm->lpp[i]->mip = env->mip;
+   }
 
 #ifdef USE_SYM_APPLICATION
+   for (i = 0; i < tm->par.max_active_nodes; i ++){
       CALL_USER_FUNCTION( user_send_lp_data(env->user, &(tm->lpp[i]->user)) );
-#endif
    }
+#endif
+
 #else   
    int s_bufid;
 
@@ -568,11 +571,13 @@ int send_cg_data_u(sym_environment *env, int sender)
       tm->cgp[i]->par = env->par.cg_par;
       
       tm->cgp[i]->draw_graph = env->dg_tid;
+   }
 #ifdef USE_SYM_APPLICATION      
+   for (i = 0; i < tm->par.max_active_nodes; i++){
       CALL_USER_FUNCTION( user_send_cg_data(env->user,
 					    &(tm->lpp[i]->cgp->user)) );
-#endif
    }
+#endif
 #else
    int s_bufid;
 
