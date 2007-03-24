@@ -275,7 +275,7 @@ Whether to use a cut generator or not.
 \sindex[p]{\TP!TM\_random\_seed}
 The random seed used in the TM.
 
-\item[\ptt{unconditional\_dive\_frac} -- double (0.1).] 
+\item[\ptt{unconditional\_dive\_frac} -- double (0.0).] 
 \sindex[p]{\TP!unconditional\_dive\_frac}
 The fraction of the nodes on which \BB\ randomly dives
 unconditionally into one of the children.
@@ -310,7 +310,7 @@ Note that fractional diving settings can override these strategies.
 See \htmlref{below}{fractional_diving}.
 
 \label{diving}
-\item[\ptt{diving\_k, diving\_threshold} -- integer, double (1, 0.0).] 
+\item[\ptt{diving\_k, diving\_threshold} -- integer, double (1, 0.05).] 
 \sindex[p]{\TP!diving\_k}
 \sindex[p]{\TP!diving\_threshold}
 See above.
@@ -753,7 +753,7 @@ strong branching.
 \item[\ptt{strong\_branching\_cand\_num\_max},]
 \item[\ptt{strong\_branching\_cand\_num\_min},]
 \item[\ptt{strong\_branching\_red\_ratio} --
-{\bf integer (25, 5, 1)}.]
+{\bf integer (10, 5, 1)}.]
 \sindex[p]{\LPP!strong\_branching\_cand\_num\_max}
 \sindex[p]{\LPP!strong\_branching\_cand\_num\_min}
 \sindex[p]{\LPP!strong\_branching\_red\_ratio}
@@ -803,7 +803,7 @@ parameter is provided so that the user can change the default behavior
 without recompiling.
 
 \item[\ptt{select\_candidates\_default} -- integer ({\tt
-USER\_\_CLOSE\_TO\_HALF\_AND\_EXPENSIVE}\{11\}).] 
+USER\_\_CLOSE\_TO\_HALF\_AND\_EXPENSIVE}\{10\}).] 
 \sindex[p]{\LPP!select\_candidates\_default}
 Determines the default rule for selecting strong branching candidates.
 Other values are {\tt USER\_\_CLOSE\_TO\_HALF}\{10\} and 
@@ -812,7 +812,7 @@ parameter is provided so that the user can change the default behavior
 without recompiling.
 
 \item[\ptt{compare\_candidates\_default} -- integer 
-({\tt LOWEST\_LOW\_OBJ}\{1\}).] 
+({\tt HIGHEST\_LOW\_OBJ}\{2\}).] 
 \sindex[p]{\LPP!compare\_candidates\_default}
 Determines the default rule for comparing candidates. See the
 description of \htmlref{\texttt{user\_compare\_candidates()}}
