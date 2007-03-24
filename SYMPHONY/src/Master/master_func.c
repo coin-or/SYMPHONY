@@ -30,9 +30,6 @@
 #include "sym_pack_cut.h"
 #include "sym_pack_array.h"
 #include "sym_lp_solver.h"
-#include "sym_lp.h"
-/* FIXME remove sym_lp.h after carrying the heuristics to lp_wrapper*/
-/* and from sym_master.h */
 //#include "sym_lp.h"
 #include "sym_tm.h"
 
@@ -51,9 +48,9 @@ int resolve_node(sym_environment *env, bc_node *node)
    bc_node **path, *n;
    int level = node->bc_level;
 
-   int *matbeg = 0, *matind= 0, size, nzcnt, return_value, iterd = 0;
+   int *matbeg = 0, *matind= 0, size, nzcnt = 0, return_value, iterd = 0;
    double *matval = 0, colsol;
-   int i, j, cnt = 0, *xind = 0;
+   int i, j = 0, cnt = 0, *xind = 0;
    double *xval = 0, *rhs = 0, lpetol = 9.9999999999999995e-07;
    char *sense = 0;
    cut_data *cut;
@@ -496,7 +493,30 @@ int resolve_node(sym_environment *env, bc_node *node)
    FREE(matind);
    FREE(matbeg);
    FREE(matval);
-   free_node_desc(&desc);
+   /* FIXME- for now just copy free_node_desc here. Decide where to carry 
+      resolve_node() */
+   //   free_node_desc(&desc);
+     if (desc){
+      node_desc *n = desc;
+      FREE(n->cutind.list);
+      FREE(n->uind.list);
+      if (n->nf_status == NF_CHECK_AFTER_LAST ||
+	  n->nf_status == NF_CHECK_UNTIL_LAST)
+	 FREE(n->not_fixed.list);
+      if (n->basis.basis_exists){
+	 FREE(n->basis.basevars.list);
+	 FREE(n->basis.basevars.stat);
+	 FREE(n->basis.extravars.list);
+	 FREE(n->basis.extravars.stat);
+	 FREE(n->basis.baserows.list);
+	 FREE(n->basis.baserows.stat);
+	 FREE(n->basis.extrarows.list);
+	 FREE(n->basis.extrarows.stat);
+      }
+      if (n->desc_size > 0)
+	 FREE(n->desc);
+      FREE(desc);
+   }
    node->lower_bound = lp_data->objval;
    free_mip_desc(lp_data->mip);
    free_lp_arrays(lp_data);
