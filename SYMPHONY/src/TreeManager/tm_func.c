@@ -640,7 +640,8 @@ void print_tree_status(tm_prob *tm)
 
 #endif
    
-   printf("candidates: %i ", tm->samephase_candnum);
+   printf("done: %i ", tm->stat.analyzed);
+   printf("left: %i ", tm->samephase_candnum);
    if (tm->has_ub){
       if (tm->obj_sense == SYM_MAXIMIZE){
 	 printf("lb: %.2f ", -tm->ub);
