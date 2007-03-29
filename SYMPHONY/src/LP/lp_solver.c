@@ -1726,6 +1726,22 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }
    return(term);
 }
+/*===========================================================================*/
+int solve_hot(LPdata *lp_data, int *iterd) {
+      /* this function hasnt been implemented yet */
+      return(dual_simplex(lp_data, iterd));
+}
+/*===========================================================================*/
+void mark_hotstart(LPdata *lp_data) {
+      return;
+}
+
+/*===========================================================================*/
+void unmark_hotstart(LPdata *lp_data) {
+      return;
+}
+
+/*===========================================================================*/
 
 /*===========================================================================*/
 
