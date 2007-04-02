@@ -2353,12 +2353,12 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    
    if (lp_data->si->isProvenDualInfeasible())
       term = LP_D_INFEASIBLE;
+   else if (lp_data->si->isDualObjectiveLimitReached())
+      term = LP_D_OBJLIM;
    else if (lp_data->si->isProvenPrimalInfeasible())
       term = LP_D_UNBOUNDED;
    else if (lp_data->si->isProvenOptimal())
       term = LP_OPTIMAL;
-   else if (lp_data->si->isDualObjectiveLimitReached())
-      term = LP_D_OBJLIM;
    else if (lp_data->si->isIterationLimitReached())
       term = LP_D_ITLIM;
    else if (lp_data->si->isAbandoned())
