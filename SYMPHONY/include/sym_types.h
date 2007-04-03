@@ -322,14 +322,14 @@ typedef struct BC_NODE{
 			       defined in "sym_types.h" */
    char       node_status;
 
-   int          feasibility_status;
-   int          sol_size;
-   int         *sol_ind;
-   double      *sol;
+   int        feasibility_status;
+   int        sol_size;
+   int       *sol_ind;
+   double    *sol;
 #ifdef SENSITIVITY_ANALYSIS
-   double      *duals;
-   double       C_LP;
-   double       B_IP;
+   double    *duals;
+   double     C_LP;
+   double     B_IP;
 #endif
 
 #ifdef TRACE_PATH

@@ -713,7 +713,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	    memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
 	    if(!p->best_sol.has_sol)
 	       p->best_sol.has_sol = TRUE;
-	    PRINT(p->par.verbosity, 1,
+	    PRINT(p->par.verbosity, 0,
 		  ("\n****** Found Better Feasible Solution !\n"));
 	    if (feasible == IP_HEUR_FEASIBLE){
 	      PRINT(p->par.verbosity, 2,

@@ -349,12 +349,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		case IP_FEASIBLE:
 		  can->termcode[j] = LP_OPT_FEASIBLE;
 		  can->feasible[j] = TRUE;
-		  if (p->par.keep_description_of_pruned ==
-		      KEEP_IN_MEMORY){
-		     can->solutions[j] = (double *) malloc (DSIZE*
-							    lp_data->n);
-		     memcpy(can->solutions[j], lp_data->x, DSIZE*
-			    lp_data->n);
+		  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+		     can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 		  }
 		  break;
 		  
@@ -362,8 +359,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
 		  can->feasible[j] = TRUE;
 		  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		     can->solutions[j] = (double *) malloc (DSIZE*
-							    lp_data->n);
+		     can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
 		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
 		  }
 		  break;
@@ -634,7 +630,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       free_candidate(candidates + i);
    }
    FREE(candidates);
-   if(p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+   if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
       indices = lp_data->tmp.i1;
       values = lp_data->tmp.d;
       for (k = best_can->child_num - 1; k >= 0; k--){

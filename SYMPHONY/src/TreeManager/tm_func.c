@@ -1081,7 +1081,8 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    PRINT_TIME2(tm, f);
 	    char *reason = (char *)malloc(30*CSIZE);
 	    char branch_dir = 'M';
-	    sprintf (reason, "%s %i %i", "candidate", child->bc_index+1, node->bc_index+1);
+	    sprintf (reason, "%s %i %i", "candidate", child->bc_index+1,
+		     node->bc_index+1);
 	    if (node->children[0]==child) {
 	       branch_dir = bobj->sense[0];
 	    } else {
@@ -1107,6 +1108,8 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #endif
       tm->stat.created++;
 #ifndef ROOT_NODE_ONLY
+      child->lower_bound = objval[i];
+      child->parent = node;
       if (action[i] == PRUNE_THIS_CHILD ||
 	  action[i] == PRUNE_THIS_CHILD_FATHOMABLE ||
 	  action[i] == PRUNE_THIS_CHILD_INFEASIBLE ||
@@ -1114,7 +1117,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	   node->desc.nf_status == NF_CHECK_NOTHING)){
 	 /* this last can happen if the TM got the new bound but it hasn't
 	   * been propagated to the LP yet */
-#else /*We only want to process the root node in this caes -- discard others*/
+#else /*We only want to process the root node in this case - discard others*/
       if (TRUE){	 
 #endif
 	 if (tm->par.verbosity > 0){
@@ -1184,8 +1187,6 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 /* child->lp = child->cg = 0;   zeroed out by calloc */
 	 child->cp = node->cp;
       }
-      child->lower_bound = objval[i];
-      child->parent = node;
 #ifdef DO_TESTS
       if (child->lower_bound < child->parent->lower_bound - .01){
 	 printf("#######Error: Child's lower bound (%.3f) is less than ",
@@ -1505,8 +1506,9 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
    if (tm->par.vbc_emulation != VBC_EMULATION_FILE_NEW && 
 	 (category == VBC_PRUNED_INFEASIBLE || category == VBC_PRUNED_FATHOMED 
 	  || category == VBC_IGNORE)) {
-      printf ("Error in purge_pruned_nodes.");
-      printf ("category refers to VBC_EMULATION_FILE_NEW when it is not used.\n");
+      printf("Error in purge_pruned_nodes.");
+      printf("category refers to VBC_EMULATION_FILE_NEW");
+      printf("when it is not used.\n");
       exit(456);
    }
 
@@ -1514,7 +1516,8 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
       switch (category) {
        case VBC_PRUNED_INFEASIBLE:
 	 sprintf(reason,"%s","infeasible");
-	 sprintf(reason,"%s %i %i",reason, node->bc_index+1, node->parent->bc_index+1);
+	 sprintf(reason,"%s %i %i",reason, node->bc_index+1,
+		 node->parent->bc_index+1);
 	 if (node->parent->children[0]==node) {
 	    branch_dir = bobj->sense[0];
 	 } else {
@@ -1527,7 +1530,8 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 break;
        case VBC_PRUNED_FATHOMED:
 	 sprintf(reason,"%s","fathomed");
-	 sprintf(reason,"%s %i %i",reason, node->bc_index+1, node->parent->bc_index+1);
+	 sprintf(reason,"%s %i %i",reason, node->bc_index+1,
+		 node->parent->bc_index+1);
 	 if (node->parent->children[0]==node) {
 	    branch_dir = bobj->sense[0];
 	 } else {
@@ -1540,7 +1544,8 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 break;
        case VBC_FEAS_SOL_FOUND:
 	 sprintf(reason,"%s","integer");
-	 sprintf(reason,"%s %i %i",reason, node->bc_index+1, node->parent->bc_index+1);
+	 sprintf(reason,"%s %i %i", reason, node->bc_index+1,
+		 node->parent->bc_index+1);
 	 if (node->parent->children[0]==node) {
 	    branch_dir = bobj->sense[0];
 	 } else {
@@ -1550,7 +1555,7 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	    branch_dir = 'R';
 	 }
 	 sprintf(reason,"%s %c", reason, branch_dir);
-	 sprintf(reason,"%s %.6f", reason, node->lower_bound);
+	 sprintf(reason,"%s %.6f", reason, tm->ub);
 	 break;
        default:
 	 sprintf(reason,"%s %i %i","unknown", node->bc_index+1, category);
@@ -1562,7 +1567,8 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
       return(1);
    }
    if (category == VBC_IGNORE) {
-      PRINT(tm->par.verbosity, 1, ("ignoring vbc update in purge_pruned_nodes"));
+      PRINT(tm->par.verbosity, 1,
+	    ("ignoring vbc update in purge_pruned_nodes"));
    } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
       FILE *f;
 #pragma omp critical(write_vbc_emulation_file)

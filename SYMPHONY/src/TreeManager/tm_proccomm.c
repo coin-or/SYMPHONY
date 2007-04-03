@@ -702,7 +702,8 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	       printf("\nError opening vbc emulation file\n\n");
 	    }else{
 	       PRINT_TIME2(tm, f);
-	       fprintf(f, "branched %i %i\n", n->bc_index + 1, VBC_INTERIOR_NODE);
+	       fprintf(f, "branched %i %i\n", n->bc_index + 1,
+		       VBC_INTERIOR_NODE);
 	       fclose(f);
 	    }
 	 }
