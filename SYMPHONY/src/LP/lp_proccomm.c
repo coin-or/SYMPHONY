@@ -582,8 +582,27 @@ void send_node_desc(lp_prob *p, char node_type)
       if (tm->par.keep_description_of_pruned == DISCARD ||
 	  tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
 #pragma omp critical (tree_update)
-	 purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-			    VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+	    int vbc_node_pr_reason;
+	    switch (node_type) {
+	     case INFEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_INFEASIBLE;
+	       break;
+	     case OVER_UB_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_FATHOMED;
+	       break;
+	     case FEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
+	       break;
+	     default:
+	       vbc_node_pr_reason = VBC_PRUNED;
+	    }
+	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
+	 } else {
+	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
+		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 }
+
 	 if (!repricing)
 	    return;
       }
@@ -721,6 +740,51 @@ void send_node_desc(lp_prob *p, char node_type)
 	    }else{
 	       PRINT_TIME(p->tm, f);
 	       fprintf(f, "P %i %i\n", n->bc_index + 1, VBC_INTERIOR_NODE);
+	       fclose(f); 
+	    }
+	 } else if (p->tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
+	    FILE *f;
+#pragma omp critical(write_vbc_emulation_file)
+	    if (!(f = fopen(p->tm->par.vbc_emulation_file_name, "a"))){
+	       printf("\nError opening vbc emulation file\n\n");
+	    }else{
+	       /* calculate measures of infeasibility */
+	       double sum_inf = 0;
+	       int num_inf = 0;
+
+               for (int i=0;i<lp_data->n;i++) {
+                  double v = lp_data->x[i];
+		  if (lp_data->vars[i]->is_int) {
+		     if (fabs(v-floor(v+0.5))>lp_data->lpetol) {
+			num_inf++;
+			sum_inf = sum_inf + fabs(v-floor(v+0.5));
+		     }
+		  }
+	       }
+
+	       char *reason = (char *)malloc(50*CSIZE);
+	       PRINT_TIME2(p->tm, f);
+	       sprintf(reason, "%s %i", "branched", n->bc_index + 1);
+	       if (n->bc_index==0) {
+		  sprintf(reason, "%s %i", reason, 0);
+	       } else {
+		  sprintf(reason, "%s %i", reason, n->parent->bc_index + 1);
+	       }
+
+	       char branch_dir='M';
+	       if (n->bc_index>0) {
+		  if (n->parent->children[0]==n) {
+		     branch_dir = n->parent->bobj.sense[0];
+		  } else {
+		     branch_dir = n->parent->bobj.sense[1];
+		  }
+		  if (branch_dir == 'G') {
+		     branch_dir = 'R';
+		  }
+	       }
+	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir, lp_data->objval+p->mip->obj_offset, sum_inf, num_inf);
+	       fprintf(f, "%s\n", reason);
+	       FREE(reason);
 	       fclose(f); 
 	    }
 	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_LIVE){

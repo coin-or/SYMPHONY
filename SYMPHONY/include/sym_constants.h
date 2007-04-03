@@ -138,6 +138,9 @@
 #define VBC_ACTIVE_NODE         3 /*White*/
 #define VBC_CAND_NODE           4 /*Light Red*/
 #define VBC_FEAS_SOL_FOUND      5 /*Blue*/
+#define VBC_PRUNED_INFEASIBLE   6 /*color ??, used only when vbc_emulation = 3*/
+#define VBC_PRUNED_FATHOMED     7 /*do*/
+#define VBC_IGNORE              8 /*do*/
 
 
 /*------------------ what to do with pruned nodes in the TM -----------------*/
@@ -155,6 +158,7 @@
 #define NO_VBC_EMULATION         0
 #define VBC_EMULATION_FILE       1
 #define VBC_EMULATION_LIVE       2
+#define VBC_EMULATION_FILE_NEW   3
 
 /*------------ search order options for multi-criteria problems -------------*/
 #define MC_FIFO                  0

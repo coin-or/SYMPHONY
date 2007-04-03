@@ -778,7 +778,11 @@ int start_node(tm_prob *tm, int thread_num)
 		 tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL){
 #pragma omp critical (write_pruned_node_file)
 		write_pruned_nodes(tm, best_node);
-		purge_pruned_nodes(tm, best_node, VBC_PRUNED);
+		if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+		   purge_pruned_nodes(tm, best_node, VBC_PRUNED_FATHOMED);
+		} else {
+		   purge_pruned_nodes(tm, best_node, VBC_PRUNED);
+		}
 	     }
 	     break;
 	  }
@@ -1064,9 +1068,31 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }else{
 	    PRINT_TIME(tm, f);
 	    fprintf(f, "N %i %i %i\n", node->bc_index+1, child->bc_index+1,
-		    feasible[i] ? VBC_FEAS_SOL_FOUND :
-		    ((dive != DO_NOT_DIVE && *keep == i) ?
-		     VBC_ACTIVE_NODE : VBC_CAND_NODE));
+		  feasible[i] ? VBC_FEAS_SOL_FOUND :
+		  ((dive != DO_NOT_DIVE && *keep == i) ?
+		   VBC_ACTIVE_NODE : VBC_CAND_NODE));
+	 }
+      } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+	 FILE *f;
+#pragma omp critical(write_vbc_emulation_file)
+	 if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
+	    printf("\nError opening vbc emulation file\n\n");
+	 }else{
+	    PRINT_TIME2(tm, f);
+	    char *reason = (char *)malloc(30*CSIZE);
+	    char branch_dir = 'M';
+	    sprintf (reason, "%s %i %i", "candidate", child->bc_index+1, node->bc_index+1);
+	    if (node->children[0]==child) {
+	       branch_dir = bobj->sense[0];
+	    } else {
+	       branch_dir = bobj->sense[1];
+	    }
+	    if (branch_dir == 'G') {
+	       branch_dir = 'R';
+	    }
+	    sprintf(reason,"%s %c", reason, branch_dir);
+	    fprintf(f,"%s\n",reason);
+	    FREE(reason);
 	    fclose(f);
 	 }
       }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
@@ -1119,8 +1145,27 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #pragma omp critical (write_pruned_node_file)
 	       write_pruned_nodes(tm, child);
 #pragma omp critical (tree_update)
-	    purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
-			       VBC_PRUNED);
+	    if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+	       int vbc_node_pr_reason;
+	       switch (action[i]) {
+		case PRUNE_THIS_CHILD_INFEASIBLE:
+		  vbc_node_pr_reason = VBC_PRUNED_INFEASIBLE;
+		  break;
+		case PRUNE_THIS_CHILD_FATHOMABLE:
+		  vbc_node_pr_reason = VBC_PRUNED_FATHOMED;
+		  break;
+		default:
+		  vbc_node_pr_reason = VBC_PRUNED;
+	       }
+	       if (feasible[i]) {
+		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
+	       }
+	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
+	    } else {
+	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
+		     VBC_PRUNED);
+	    }
+
 	    if (--child_num == 0){
 	       *keep = -1;
 	       return(DO_NOT_DIVE);
@@ -1265,8 +1310,27 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #pragma omp critical (write_pruned_node_file)
 	    write_pruned_nodes(tm, child);
 #pragma omp critical (tree_update)
-	    purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
-			       VBC_PRUNED);
+	    if (tm->par.vbc_emulation== VBC_EMULATION_FILE_NEW) {
+	       int vbc_node_pr_reason;
+	       switch (action[i]) {
+		case PRUNE_THIS_CHILD_INFEASIBLE:
+		  vbc_node_pr_reason = VBC_PRUNED_INFEASIBLE;
+		  break;
+		case PRUNE_THIS_CHILD_FATHOMABLE:
+		  vbc_node_pr_reason = VBC_PRUNED_FATHOMED;
+		  break;
+		default:
+		  vbc_node_pr_reason = VBC_PRUNED;
+	       }
+	       if (feasible[i]) {
+		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
+	       }
+	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
+	    } else {
+	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
+		     VBC_PRUNED);
+	    }
+
 	    if (--child_num == 0){
 	       *keep = -1;
 	       return(DO_NOT_DIVE);
@@ -1435,12 +1499,71 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 {
    int i, new_child_num;
    branch_obj *bobj = &node->parent->bobj;
+   char *reason = (char *)malloc(30*CSIZE);
+   char branch_dir = 'M';
+
+   if (tm->par.vbc_emulation != VBC_EMULATION_FILE_NEW && 
+	 (category == VBC_PRUNED_INFEASIBLE || category == VBC_PRUNED_FATHOMED 
+	  || category == VBC_IGNORE)) {
+      printf ("Error in purge_pruned_nodes.");
+      printf ("category refers to VBC_EMULATION_FILE_NEW when it is not used.\n");
+      exit(456);
+   }
+
+   if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+      switch (category) {
+       case VBC_PRUNED_INFEASIBLE:
+	 sprintf(reason,"%s","infeasible");
+	 sprintf(reason,"%s %i %i",reason, node->bc_index+1, node->parent->bc_index+1);
+	 if (node->parent->children[0]==node) {
+	    branch_dir = bobj->sense[0];
+	 } else {
+	    branch_dir = bobj->sense[1];
+	 }
+	 if (branch_dir == 'G') {
+	    branch_dir = 'R';
+	 }
+	 sprintf(reason,"%s %c", reason, branch_dir);
+	 break;
+       case VBC_PRUNED_FATHOMED:
+	 sprintf(reason,"%s","fathomed");
+	 sprintf(reason,"%s %i %i",reason, node->bc_index+1, node->parent->bc_index+1);
+	 if (node->parent->children[0]==node) {
+	    branch_dir = bobj->sense[0];
+	 } else {
+	    branch_dir = bobj->sense[1];
+	 }
+	 if (branch_dir == 'G') {
+	    branch_dir = 'R';
+	 }
+	 sprintf(reason,"%s %c", reason, branch_dir);
+	 break;
+       case VBC_FEAS_SOL_FOUND:
+	 sprintf(reason,"%s","integer");
+	 sprintf(reason,"%s %i %i",reason, node->bc_index+1, node->parent->bc_index+1);
+	 if (node->parent->children[0]==node) {
+	    branch_dir = bobj->sense[0];
+	 } else {
+	    branch_dir = bobj->sense[1];
+	 }
+	 if (branch_dir == 'G') {
+	    branch_dir = 'R';
+	 }
+	 sprintf(reason,"%s %c", reason, branch_dir);
+	 sprintf(reason,"%s %.6f", reason, node->lower_bound);
+	 break;
+       default:
+	 sprintf(reason,"%s %i %i","unknown", node->bc_index+1, category);
+	 break;
+      }
+   }
    
    if (node->parent == NULL){
       return(1);
    }
-   
-   if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
+   if (category == VBC_IGNORE) {
+      PRINT(tm->par.verbosity, 1, ("ignoring vbc update in purge_pruned_nodes"));
+   } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
       FILE *f;
 #pragma omp critical(write_vbc_emulation_file)
       if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
@@ -1450,12 +1573,26 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 fprintf(f, "P %i %i\n", node->bc_index+1, category);
 	 fclose(f);
       }
-   }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
+   } else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
       printf("$P %i %i\n", node->bc_index+1, category);
+   } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+      FILE *f;
+#pragma omp critical(write_vbc_emulation_file)
+      if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
+	 printf("\nError opening vbc emulation file\n\n");
+      }else{
+	 PRINT_TIME2(tm, f);
+	 fprintf(f, "%s\n", reason);
+	 fclose(f);
+      }
    }
    
    if ((new_child_num = --bobj->child_num) == 0){
-      purge_pruned_nodes(tm, node->parent, category);
+      if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+	 purge_pruned_nodes(tm, node->parent, VBC_IGNORE);
+      } else {
+	 purge_pruned_nodes(tm, node->parent, category);
+      }
    }else{
       for (i = 0; i <= bobj->child_num; i++){
 	 if (node->parent->children[i] == node){
@@ -1473,7 +1610,7 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
    }
 
    free_tree_node(node);
-
+   FREE(reason);
    return(1);
 }
 

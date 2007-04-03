@@ -39,10 +39,11 @@ void usage(void)
    printf("master [ -hagrtbd ] [ -u ub ] [ -p procs ] [ -n rule ]\n\t"
 	  "[ -v level ] [ -s cands ] [ -c rule ] [ -k rule ] \n\t"
 	  "[ -m max ] [ -l pools ] [ -i iters ] "
-	  "[ -f parameter_file_name ] [-j 0/1]"
+	  "[ -f parameter_file_name ] [-j 0/1] \n\t"
+	  "[-o tree_out_file]"
 	  "\n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
-	  "\t%s\n\t%s\n\t%s\n\t%s\n\n",
+	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
 	  "-h: help",
 	  "-a: no cut timeout",
 	  "-d: enable graph drawing",
@@ -63,7 +64,8 @@ void usage(void)
 	  "-i n: allow a max of 'n' iterations in presolve",
 	  "-f file: read parameters from parameter file 'file'",
 	  "-j 0/1: whether or not to generate cgl cuts",
-	  "-z n: set diving threshold to 'n'");
+	  "-z n: set diving threshold to 'n'",
+	  "-o file: output vbc-like tree information to file 'file'");
    printf("Solver-specific switches:\n\n");
 #ifdef USE_SYM_APPLICATION
    user_usage();
@@ -274,7 +276,8 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
       }
       else if (strcmp(key, "vbc_emulation") == 0 ||
 	       strcmp(key, "TM_vbc_emulation") == 0){
-	 if (tm_par->vbc_emulation == VBC_EMULATION_FILE){
+	 if (tm_par->vbc_emulation == VBC_EMULATION_FILE || 
+	       tm_par->vbc_emulation == VBC_EMULATION_FILE_NEW){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No vbc emulation file!\n\n");
 	       return(ERROR__PARSING_PARAM_FILE);
@@ -294,6 +297,9 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	       fprintf(f1, "#BOUNDS: NONE\n");
 	       fprintf(f1, "#INFORMATION: STANDARD\n");
 	       fprintf(f1, "#NODE_NUMBER: NONE\n");
+	       if (tm_par->vbc_emulation == VBC_EMULATION_FILE_NEW) {
+		  fprintf(f1, "# ");
+	       }
 	       fprintf(f1, "00:00:00.00 N 0 1 %i\n", VBC_CAND_NODE);
 	       fclose(f1);
 	    }
@@ -637,6 +643,22 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	    }else{
 	       i++;
 	       tm_par->diving_threshold = tmpd;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 break;
+       case 'o':
+	 if (i < argc - 1){
+	    sscanf(argv[i+1], "%c", &tmp);
+	    if (tmp== '-') {
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       strncpy(tm_par->vbc_emulation_file_name, argv[i+1], MAX_FILE_NAME_LENGTH);
+	       tm_par->vbc_emulation = VBC_EMULATION_FILE_NEW;
+	       i++;
+	       printf("%s %i\n",tm_par->vbc_emulation_file_name, tm_par->vbc_emulation);
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);

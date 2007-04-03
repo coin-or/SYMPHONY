@@ -40,6 +40,12 @@
    fprintf(f, "%.2d:%.2d:%.2d:%.2d ", hours, minutes, seconds, msec);         \
 }
 
+/* PRINT_TIME function when vbc_emulation = 3 */
+#define PRINT_TIME2(tm, f) { /* Print the elapsed time in vbctool format*/    \
+   double elapsed_t = wall_clock(NULL) - tm->start_time;                       \
+   fprintf(f, "%10.6f ", elapsed_t);         \
+}
+
 #define	TVCLEAR(tvp)	(tvp.tv_sec = tvp.tv_usec = 0)
 #define	PTVCLEAR(tvp)	((tvp)->tv_sec = (tvp)->tv_usec = 0)
 

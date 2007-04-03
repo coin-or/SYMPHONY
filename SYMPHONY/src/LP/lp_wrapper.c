@@ -739,10 +739,25 @@ int is_feasible_u(lp_prob *p, char branching)
 	    }else{
 	       PRINT_TIME(p->tm, f);
 	       fprintf(f, "U %.2f\n", p->ub);
-	       fclose(f); 
+	       fclose(f);
 	    }
 	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_LIVE){
 	    printf("$U %.2f\n", p->ub);
+	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
+	    FILE *f;
+#pragma omp critical(write_vbc_emulation_file)
+	    if (feasible == IP_HEUR_FEASIBLE) {
+	       if (!(f = fopen(p->tm->par.vbc_emulation_file_name, "a"))){
+		  printf("\nError opening vbc emulation file\n\n");
+	       }else{
+		  char *reason = (char *)malloc(30*CSIZE);
+		  sprintf (reason, "%s %f", "heuristic", p->ub);
+		  PRINT_TIME2(p->tm, f);
+		  fprintf(f, "%s %.6f %i\n", reason, p->ub, p->bc_index+1);
+		  FREE(reason);
+	       }
+	       fclose(f);
+	    }
 	 }
 #else
 	 s_bufid = init_send(DataInPlace);

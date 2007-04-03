@@ -575,8 +575,26 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	 write_pruned_nodes(tm, n);
       if (tm->par.keep_description_of_pruned == DISCARD ||
 	  tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
-	 purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-			    VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
+	    int vbc_node_pr_reason;
+	    switch (node_type) {
+	     case INFEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_INFEASIBLE;
+	       break;
+	     case OVER_UB_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_FATHOMED;
+	       break;
+	     case FEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
+	       break;
+	     default:
+	       vbc_node_pr_reason = VBC_PRUNED;
+	    }
+	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
+	 } else {
+	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
+		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 }
       }
       return;
    }
@@ -675,8 +693,18 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 		       VBC_INTERIOR_NODE);
 	       fclose(f); 
 	    }
-	 }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
+	 } else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
 	    printf("$P %i %i\n", n->bc_index + 1, VBC_INTERIOR_NODE);
+	 } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+	    FILE *f;
+#pragma omp critical(write_vbc_emulation_file)
+	    if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
+	       printf("\nError opening vbc emulation file\n\n");
+	    }else{
+	       PRINT_TIME2(tm, f);
+	       fprintf(f, "branched %i %i\n", n->bc_index + 1, VBC_INTERIOR_NODE);
+	       fclose(f);
+	    }
 	 }
 	 break;
        case ROOT_NODE:
@@ -710,8 +738,27 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL ||
 	  tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
 	 write_pruned_nodes(tm, n);
-	 purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-			    VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+	    int vbc_node_pr_reason;
+	    switch (node_type) {
+	     case INFEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_INFEASIBLE;
+	       break;
+	     case OVER_UB_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_FATHOMED;
+	       break;
+	     case FEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
+	       break;
+	     default:
+	       vbc_node_pr_reason = VBC_PRUNED;
+	    }
+	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
+	 }
+	 else {
+	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
+		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 }
       }
    }
 }
