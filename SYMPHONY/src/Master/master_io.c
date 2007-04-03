@@ -658,7 +658,6 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	       strncpy(tm_par->vbc_emulation_file_name, argv[i+1], MAX_FILE_NAME_LENGTH);
 	       tm_par->vbc_emulation = VBC_EMULATION_FILE_NEW;
 	       i++;
-	       printf("%s %i\n",tm_par->vbc_emulation_file_name, tm_par->vbc_emulation);
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
