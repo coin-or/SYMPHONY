@@ -746,17 +746,31 @@ int is_feasible_u(lp_prob *p, char branching)
 	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
 	    FILE *f;
 #pragma omp critical(write_vbc_emulation_file)
-	    if (feasible == IP_HEUR_FEASIBLE) {
+	    if ((feasible == IP_FEASIBLE && branching) || (feasible == IP_HEUR_FEASIBLE)) {
 	       if (!(f = fopen(p->tm->par.vbc_emulation_file_name, "a"))){
 		  printf("\nError opening vbc emulation file\n\n");
 	       }else{
-		  char *reason = (char *)malloc(30*CSIZE);
-		  sprintf (reason, "%s %f", "heuristic", p->ub);
 		  PRINT_TIME2(p->tm, f);
-		  fprintf(f, "%s %.6f %i\n", reason, p->ub, p->bc_index+1);
-		  FREE(reason);
+		  fprintf(f, "%s %f %i\n", "heuristic", p->ub, p->bc_index+1);
 	       }
 	       fclose(f);
+	    } else if (feasible == IP_FEASIBLE && !branching) {
+	       if (!(f = fopen(p->tm->par.vbc_emulation_file_name, "a"))){
+		  printf("\nError opening vbc emulation file\n\n");
+	       }else{
+		  bc_node *node = p->tm->active_nodes[p->proc_index];
+		  char branch_dir = 'M';
+		  if (node->parent->children[0]==node){
+		     branch_dir = node->parent->bobj.sense[0];
+		  } else {
+		     branch_dir = node->parent->bobj.sense[1];
+		  }
+		  if (branch_dir=='G') {
+		     branch_dir = 'R';
+		  }
+		  PRINT_TIME2(p->tm, f);
+		  fprintf (f, "%s %i %i %c %f\n", "integer", node->bc_index+1, node->parent->bc_index+1, branch_dir, p->ub);
+	       }
 	    }
 	 }
 #else

@@ -693,19 +693,53 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 		       VBC_INTERIOR_NODE);
 	       fclose(f); 
 	    }
-	 } else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
-	    printf("$P %i %i\n", n->bc_index + 1, VBC_INTERIOR_NODE);
-	 } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+	 } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
 	    FILE *f;
 #pragma omp critical(write_vbc_emulation_file)
 	    if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
 	       printf("\nError opening vbc emulation file\n\n");
 	    }else{
+	       /* calculate measures of infeasibility */
+	       double sum_inf = 0;
+	       int num_inf = 0;
+
+               for (int i=0;i<tm->lpp[n->lp]->lp_data->n;i++) {
+                  double v = tm->lpp[n->lp]->lp_data->x[i];
+		  if (tm->lpp[n->lp]->lp_data->vars[i]->is_int) {
+		     if (fabs(v-floor(v+0.5))>tm->lpp[n->lp]->lp_data->lpetol) {
+			num_inf++;
+			sum_inf = sum_inf + fabs(v-floor(v+0.5));
+		     }
+		  }
+	       }
+
+	       char *reason = (char *)malloc(50*CSIZE);
 	       PRINT_TIME2(tm, f);
-	       fprintf(f, "branched %i %i\n", n->bc_index + 1,
-		       VBC_INTERIOR_NODE);
-	       fclose(f);
+	       sprintf(reason, "%s %i", "branched", n->bc_index + 1);
+	       if (n->bc_index==0) {
+		  sprintf(reason, "%s %i", reason, 0);
+	       } else {
+		  sprintf(reason, "%s %i", reason, n->parent->bc_index + 1);
+	       }
+
+	       char branch_dir='M';
+	       if (n->bc_index>0) {
+		  if (n->parent->children[0]==n) {
+		     branch_dir = n->parent->bobj.sense[0];
+		  } else {
+		     branch_dir = n->parent->bobj.sense[1];
+		  }
+		  if (branch_dir == 'G') {
+		     branch_dir = 'R';
+		  }
+	       }
+	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir, tm->lpp[0]->lp_data->objval+tm->lpp[0]->mip->obj_offset, sum_inf, num_inf);
+	       fprintf(f, "%s\n", reason);
+	       FREE(reason);
+	       fclose(f); 
 	    }
+	 } else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
+	    printf("$P %i %i\n", n->bc_index + 1, VBC_INTERIOR_NODE);
 	 }
 	 break;
        case ROOT_NODE:

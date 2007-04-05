@@ -1526,7 +1526,7 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 if (branch_dir == 'G') {
 	    branch_dir = 'R';
 	 }
-	 sprintf(reason,"%s %c", reason, branch_dir);
+	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
 	 break;
        case VBC_PRUNED_FATHOMED:
 	 sprintf(reason,"%s","fathomed");
@@ -1540,9 +1540,15 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 if (branch_dir == 'G') {
 	    branch_dir = 'R';
 	 }
-	 sprintf(reason,"%s %c", reason, branch_dir);
+	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
 	 break;
        case VBC_FEAS_SOL_FOUND:
+         /* 
+	  * this case should not be dealt with any more because we print the
+	  * following data in lp_wrapper.c [is_feasible_u()]
+	  */
+
+	 /*
 	 sprintf(reason,"%s","integer");
 	 sprintf(reason,"%s %i %i", reason, node->bc_index+1,
 		 node->parent->bc_index+1);
@@ -1556,6 +1562,8 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 }
 	 sprintf(reason,"%s %c", reason, branch_dir);
 	 sprintf(reason,"%s %.6f", reason, tm->ub);
+	 */
+	 category = VBC_IGNORE;
 	 break;
        default:
 	 sprintf(reason,"%s %i %i","unknown", node->bc_index+1, category);
@@ -1588,7 +1596,7 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 printf("\nError opening vbc emulation file\n\n");
       }else{
 	 PRINT_TIME2(tm, f);
-	 fprintf(f, "%s\n", reason);
+	 fprintf(f, "%s", reason);
 	 fclose(f);
       }
    }

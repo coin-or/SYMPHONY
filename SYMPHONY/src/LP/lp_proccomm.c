@@ -932,8 +932,26 @@ void send_node_desc(lp_prob *p, char node_type)
 #pragma omp critical (write_pruned_node_file)
 	 write_pruned_nodes(tm, n);
 #pragma omp critical (tree_update)
-	 purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-			    VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+	    int vbc_node_pr_reason;
+	    switch (node_type) {
+	     case INFEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_INFEASIBLE;
+	       break;
+	     case OVER_UB_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_FATHOMED;
+	       break;
+	     case FEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
+	       break;
+	     default:
+	       vbc_node_pr_reason = VBC_PRUNED;
+	    }
+	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
+	 } else {
+	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
+		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 }
       }
    }
 #else
