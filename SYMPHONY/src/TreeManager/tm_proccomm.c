@@ -733,7 +733,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 		     branch_dir = 'R';
 		  }
 	       }
-	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir, tm->lpp[0]->lp_data->objval+tm->lpp[0]->mip->obj_offset, sum_inf, num_inf);
+	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir, tm->lpp[n->lp]->lp_data->objval+tm->lpp[n->lp]->mip->obj_offset, sum_inf, num_inf);
 	       fprintf(f, "%s\n", reason);
 	       FREE(reason);
 	       fclose(f); 
