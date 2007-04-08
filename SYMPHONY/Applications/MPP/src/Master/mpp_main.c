@@ -67,6 +67,8 @@ int main(int argc, char **argv)
 
    sym_environment *env = sym_open_environment();
 
+   version();
+   
    CALL_FUNCTION( sym_get_user_data(env, (void **)&mpp) );
 
    CALL_FUNCTION( sym_parse_command_line(env, argc, argv) );

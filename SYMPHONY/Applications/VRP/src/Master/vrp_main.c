@@ -64,6 +64,8 @@ int main(int argc, char **argv)
 
    sym_environment *env = sym_open_environment();
 
+   version();
+
    sym_parse_command_line(env, argc, argv);
 
    sym_get_user_data(env, (void**)&vrp);

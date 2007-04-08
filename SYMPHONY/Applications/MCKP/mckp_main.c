@@ -63,6 +63,8 @@ int main(int argc, char **argv)
 
    sym_environment *env = sym_open_environment();
 
+   version();
+
    sym_parse_command_line(env, argc, argv);
 
    mckp_parse_command_line(argc, argv, infile, &num_items, &num_constraints,
