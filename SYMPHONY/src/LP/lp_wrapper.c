@@ -743,35 +743,98 @@ int is_feasible_u(lp_prob *p, char branching)
 	    }
 	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_LIVE){
 	    printf("$U %.2f\n", p->ub);
-	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
+	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW &&
+		   (feasible == IP_FEASIBLE || feasible == IP_HEUR_FEASIBLE)){
 	    FILE *f;
+	    char reason[30];
+	    char branch_dir = 'M';
+	    bc_node *node, *temp, **list;
+	    int rule, pos, prev_pos, last;
+	    if (!(f = fopen(p->tm->par.vbc_emulation_file_name, "a"))){
+	       printf("\nError opening vbc emulation file\n\n");
+	    }else if ((feasible == IP_FEASIBLE && branching) ||
+		      (feasible == IP_HEUR_FEASIBLE)) {
 #pragma omp critical(write_vbc_emulation_file)
-	    if ((feasible == IP_FEASIBLE && branching) || (feasible == IP_HEUR_FEASIBLE)) {
-	       if (!(f = fopen(p->tm->par.vbc_emulation_file_name, "a"))){
-		  printf("\nError opening vbc emulation file\n\n");
-	       }else{
-		  PRINT_TIME2(p->tm, f);
-		  fprintf(f, "%s %f %i\n", "heuristic", p->ub, p->bc_index+1);
+	       PRINT_TIME2(p->tm, f);
+	       fprintf(f, "%s %f %i\n", "heuristic", p->ub, p->bc_index+1);
+	    }else if (feasible == IP_FEASIBLE && !branching){
+	       node = p->tm->active_nodes[p->proc_index];
+	       if (node->parent->children[0]==node){
+		  branch_dir = 'L';
+	       } else {
+		  branch_dir = 'R';
 	       }
+	       PRINT_TIME2(p->tm, f);
+	       fprintf (f, "%s %i %i %c %f\n", "integer", node->bc_index+1,
+			node->parent->bc_index+1, branch_dir, p->ub);
+	    }
+	    if (f){
+#if 0
+	       for (i = 1; i <= p->tm->samephase_candnum; i++){
+		  node = p->tm->samephase_cand[i];
+		  if (p->tm->has_ub &&
+		      node->lower_bound >= p->tm->ub-p->tm->par.granularity){
+		     sprintf(reason,"%s","fathomed");
+		     sprintf(reason,"%s %i %i",reason, node->bc_index+1,
+			     node->parent->bc_index+1);
+		     if (node->parent->children[0]==node) {
+			branch_dir = 'L';
+		     } else {
+			branch_dir = 'R';
+		     }
+		     sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
+		     PRINT_TIME2(p->tm, f);
+		     fprintf(f, "%s", reason);
+		  }
+	       }
+#endif
 	       fclose(f);
-	    } else if (feasible == IP_FEASIBLE && !branching) {
-	       if (!(f = fopen(p->tm->par.vbc_emulation_file_name, "a"))){
-		  printf("\nError opening vbc emulation file\n\n");
-	       }else{
-		  bc_node *node = p->tm->active_nodes[p->proc_index];
-		  char branch_dir = 'M';
-		  if (node->parent->children[0]==node){
-		     branch_dir = node->parent->bobj.sense[0];
-		  } else {
-		     branch_dir = node->parent->bobj.sense[1];
+	    }
+	    rule = p->tm->par.node_selection_rule;
+	    list = p->tm->samephase_cand;
+	    for (last = i = p->tm->samephase_candnum; i > 0; i--){
+	       node = list[i];
+	       if (p->tm->has_ub &&
+		   node->lower_bound >= p->tm->ub-p->tm->par.granularity){
+		  if (i != last){
+		     list[i] = list[last];
+		     for (prev_pos = i, pos = i/2; pos >= 1;
+			  prev_pos = pos, pos /= 2){
+			if (node_compar(rule, list[pos], list[prev_pos])){
+			   temp = list[prev_pos];
+			   list[prev_pos] = list[pos];
+			   list[pos] = temp;
+			}else{
+			   break;
+			}
+		     }
 		  }
-		  if (branch_dir=='G') {
-		     branch_dir = 'R';
+		  p->tm->samephase_cand[last] = NULL;
+		  last--;
+		  if (p->tm->par.verbosity > 0){
+		     printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		     printf("+ TM: Pruning NODE %i LEVEL %i after new incumbent.\n",
+			    node->bc_index, node->bc_level);
+		     printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 		  }
-		  PRINT_TIME2(p->tm, f);
-		  fprintf (f, "%s %i %i %c %f\n", "integer", node->bc_index+1, node->parent->bc_index+1, branch_dir, p->ub);
+		  if (p->tm->par.keep_description_of_pruned == DISCARD ||
+		      p->tm->par.keep_description_of_pruned ==
+		      KEEP_ON_DISK_VBC_TOOL){
+		     if (p->tm->par.keep_description_of_pruned ==
+			 KEEP_ON_DISK_VBC_TOOL)
+#pragma omp critical (write_pruned_node_file)
+			write_pruned_nodes(p->tm, node);
+#pragma omp critical (tree_update)
+		     if (p->tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+			purge_pruned_nodes(p->tm, node,
+					   VBC_PRUNED_FATHOMED);
+		     } else {
+			purge_pruned_nodes(p->tm, node, VBC_PRUNED);
+		     }
+		  }
 	       }
 	    }
+	    p->tm->samephase_candnum = last;
 	 }
 #else
 	 s_bufid = init_send(DataInPlace);
@@ -1368,19 +1431,19 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
 
    for (ind = -1, i = 0; i < can->child_num; i++){
       action[i] = RETURN_THIS_CHILD;
-      if (p->lp_data->nf_status == NF_CHECK_NOTHING && p->has_ub){
-	 if (can->objval[i] > p->ub - p->par.granularity){
-	    //action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
-
-	    /*see which one is infeasible!*/
-	    if(can->termcode[i] == LP_OPTIMAL || 
-	       can->termcode[i] == LP_D_ITLIM || 
-	       can->termcode[i] == LP_OPT_FEASIBLE||
-	       can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE){	       
+      if (p->lp_data->nf_status == NF_CHECK_NOTHING){
+	 /*see which one is infeasible!*/
+	 if (can->termcode[i] == LP_OPTIMAL || 
+	     can->termcode[i] == LP_D_ITLIM){
+	    if (p->has_ub &&
+		can->objval[i] > p->ub - p->par.granularity){
 	       action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
-	    }else{
-	       action[i] = PRUNE_THIS_CHILD_INFEASIBLE;
 	    }
+	 }else if (can->termcode[i] == LP_OPT_FEASIBLE ||
+		   can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE){	       
+	    action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
+	 }else{
+	    action[i] = PRUNE_THIS_CHILD_INFEASIBLE;
 	 }
       }
    }

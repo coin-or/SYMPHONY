@@ -713,7 +713,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 		  }
 	       }
 
-	       char *reason = (char *)malloc(50*CSIZE);
+	       char reason[50];
 	       PRINT_TIME2(tm, f);
 	       sprintf(reason, "%s %i", "branched", n->bc_index + 1);
 	       if (n->bc_index==0) {
@@ -725,17 +725,15 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	       char branch_dir='M';
 	       if (n->bc_index>0) {
 		  if (n->parent->children[0]==n) {
-		     branch_dir = n->parent->bobj.sense[0];
+		     branch_dir = 'L';
 		  } else {
-		     branch_dir = n->parent->bobj.sense[1];
-		  }
-		  if (branch_dir == 'G') {
 		     branch_dir = 'R';
 		  }
 	       }
-	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir, tm->lpp[n->lp]->lp_data->objval+tm->lpp[n->lp]->mip->obj_offset, sum_inf, num_inf);
+	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir,
+		       tm->lpp[n->lp]->lp_data->objval+
+		       tm->lpp[n->lp]->mip->obj_offset, sum_inf, num_inf);
 	       fprintf(f, "%s\n", reason);
-	       FREE(reason);
 	       fclose(f); 
 	    }
 	 } else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
@@ -993,7 +991,7 @@ char process_messages(tm_prob *tm, int r_bufid)
 
 void process_ub_message(tm_prob *tm)
 {
-   int s_bufid;
+   int s_bufid, i;
    double new_ub;
    /* A new best solution has been found. The solution is sent
     * to the master, but the bound comes here, too.*/
@@ -1018,6 +1016,33 @@ void process_ub_message(tm_prob *tm)
       }
    }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
       printf("$U %.2f\n", tm->ub);
+   }else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
+      FILE *f;
+#pragma omp critical(write_vbc_emulation_file)
+      if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
+	 printf("\nError opening vbc emulation file\n\n");
+      }else{
+	 char reason[30];
+	 char branch_dir = 'M';
+	 bc_node *node;
+	 for (i = 1; i <= tm->samephase_candnum; i++){
+	    node = tm->samephase_cand[i];
+	    if (tm->has_ub && node->lower_bound<tm->ub-tm->par.granularity){
+	       sprintf(reason,"%s","fathomed");
+	       sprintf(reason,"%s %i %i",reason, node->bc_index+1,
+		       node->parent->bc_index+1);
+	       if (node->parent->children[0]==node) {
+		  branch_dir = 'L';
+	       } else {
+		  branch_dir = 'R';
+	       }
+	       sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
+	       PRINT_TIME2(tm, f);
+	       fprintf(f, "%s", reason);
+	    }
+	 }
+	 fclose(f);
+      }
    }
 }
 

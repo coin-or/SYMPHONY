@@ -782,7 +782,8 @@ void send_node_desc(lp_prob *p, char node_type)
 		     branch_dir = 'R';
 		  }
 	       }
-	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir, lp_data->objval+p->mip->obj_offset, sum_inf, num_inf);
+	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir,
+		       lp_data->objval+p->mip->obj_offset, sum_inf, num_inf);
 	       fprintf(f, "%s\n", reason);
 	       FREE(reason);
 	       fclose(f); 
