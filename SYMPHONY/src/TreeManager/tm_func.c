@@ -790,7 +790,7 @@ int start_node(tm_prob *tm, int thread_num)
 		   purge_pruned_nodes(tm, best_node, VBC_PRUNED);
 		}
 #else
-		   purge_pruned_nodes(tm, best_node, VBC_IGNORE);
+		   purge_pruned_nodes(tm, best_node, VBC_PRUNED);
 #endif
 	     }
 	     break;
