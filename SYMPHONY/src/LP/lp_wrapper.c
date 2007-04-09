@@ -693,180 +693,80 @@ int is_feasible_u(lp_prob *p, char branching)
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE ||
        feasible == IP_HEUR_FEASIBLE){
       /* Send the solution value to the treemanager */
-      if (!p->has_ub || true_objval < p->ub - p->par.granularity){
-	 p->has_ub = TRUE;
-	 p->ub = true_objval;
-	 if (p->par.set_obj_upper_lim)
-	    set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
-	 if (!p->par.multi_criteria){
-	    p->best_sol.xlevel = p->bc_level;
-	    p->best_sol.xindex = p->bc_index;
-	    p->best_sol.xiter_num = p->iter_num;
-	    p->best_sol.xlength = cnt;
-	    p->best_sol.lpetol = lpetol;
-	    p->best_sol.objval = true_objval;
-	    FREE(p->best_sol.xind);
-	    FREE(p->best_sol.xval);
-	    p->best_sol.xind = (int *) malloc(cnt*ISIZE);
-	    p->best_sol.xval = (double *) malloc(cnt*DSIZE);
-	    memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
-	    memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
-	    if(!p->best_sol.has_sol)
-	       p->best_sol.has_sol = TRUE;
-	    PRINT(p->par.verbosity, 0,
-		  ("\n****** Found Better Feasible Solution !\n"));
-	    if (feasible == IP_HEUR_FEASIBLE){
-	      PRINT(p->par.verbosity, 2,
-		    ("****** After Calling Heuristics !\n"));
-	    }
-	    if (p->mip->obj_sense == SYM_MAXIMIZE){
-	       PRINT(p->par.verbosity, 1, ("****** Cost: %f\n\n", -true_objval
-					    + p->mip->obj_offset));
-	    }else{
-	       PRINT(p->par.verbosity, 1, ("****** Cost: %f\n\n", true_objval
-					    + p->mip->obj_offset));
-	    }
+      if (p->has_ub && true_objval >= p->ub - p->par.granularity){
+	 FREE(heur_solution);
+	 FREE(col_sol);
+	 return(feasible);
+      }
+      p->has_ub = TRUE;
+      p->ub = true_objval;
+      if (p->par.set_obj_upper_lim)
+	 set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
+      if (!p->par.multi_criteria){
+	 p->best_sol.xlevel = p->bc_level;
+	 p->best_sol.xindex = p->bc_index;
+	 p->best_sol.xiter_num = p->iter_num;
+	 p->best_sol.xlength = cnt;
+	 p->best_sol.lpetol = lpetol;
+	 p->best_sol.objval = true_objval;
+	 FREE(p->best_sol.xind);
+	 FREE(p->best_sol.xval);
+	 p->best_sol.xind = (int *) malloc(cnt*ISIZE);
+	 p->best_sol.xval = (double *) malloc(cnt*DSIZE);
+	 memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
+	 memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
+	 if(!p->best_sol.has_sol)
+	    p->best_sol.has_sol = TRUE;
+	 PRINT(p->par.verbosity, 0,
+	       ("\n****** Found Better Feasible Solution !\n"));
+	 if (feasible == IP_HEUR_FEASIBLE){
+	    PRINT(p->par.verbosity, 2,
+		  ("****** After Calling Heuristics !\n"));
 	 }
+	 if (p->mip->obj_sense == SYM_MAXIMIZE){
+	    PRINT(p->par.verbosity, 1, ("****** Cost: %f\n\n", -true_objval
+					+ p->mip->obj_offset));
+	 }else{
+	    PRINT(p->par.verbosity, 1, ("****** Cost: %f\n\n", true_objval
+					+ p->mip->obj_offset));
+	 }
+      }
 #ifdef COMPILE_IN_LP
-	 p->tm->has_ub = TRUE;
-	 p->tm->ub = p->ub;
-	 p->tm->opt_thread_num = p->proc_index;
-	 if (p->tm->par.vbc_emulation == VBC_EMULATION_FILE){
-	    FILE *f;
-#pragma omp critical(write_vbc_emulation_file)
-	    if (!(f = fopen(p->tm->par.vbc_emulation_file_name, "a"))){
-	       printf("\nError opening vbc emulation file\n\n");
-	    }else{
-	       PRINT_TIME(p->tm, f);
-	       fprintf(f, "U %.2f\n", p->ub);
-	       fclose(f);
-	    }
-	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_LIVE){
-	    printf("$U %.2f\n", p->ub);
-	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW &&
-		   (feasible == IP_FEASIBLE || feasible == IP_HEUR_FEASIBLE)){
-	    FILE *f;
-	    char reason[30];
-	    char branch_dir = 'M';
-	    bc_node *node, *temp, **list;
-	    int rule, pos, prev_pos, last;
-	    if (!(f = fopen(p->tm->par.vbc_emulation_file_name, "a"))){
-	       printf("\nError opening vbc emulation file\n\n");
-	    }else if ((feasible == IP_FEASIBLE && branching) ||
-		      (feasible == IP_HEUR_FEASIBLE)) {
-#pragma omp critical(write_vbc_emulation_file)
-	       PRINT_TIME2(p->tm, f);
-	       fprintf(f, "%s %f %i\n", "heuristic", p->ub, p->bc_index+1);
-	    }else if (feasible == IP_FEASIBLE && !branching){
-	       node = p->tm->active_nodes[p->proc_index];
-	       if (node->parent->children[0]==node){
-		  branch_dir = 'L';
-	       } else {
-		  branch_dir = 'R';
-	       }
-	       PRINT_TIME2(p->tm, f);
-	       fprintf (f, "%s %i %i %c %f\n", "integer", node->bc_index+1,
-			node->parent->bc_index+1, branch_dir, p->ub);
-	    }
-	    if (f){
-#if 0
-	       for (i = 1; i <= p->tm->samephase_candnum; i++){
-		  node = p->tm->samephase_cand[i];
-		  if (p->tm->has_ub &&
-		      node->lower_bound >= p->tm->ub-p->tm->par.granularity){
-		     sprintf(reason,"%s","fathomed");
-		     sprintf(reason,"%s %i %i",reason, node->bc_index+1,
-			     node->parent->bc_index+1);
-		     if (node->parent->children[0]==node) {
-			branch_dir = 'L';
-		     } else {
-			branch_dir = 'R';
-		     }
-		     sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
-		     PRINT_TIME2(p->tm, f);
-		     fprintf(f, "%s", reason);
-		  }
-	       }
-#endif
-	       fclose(f);
-	    }
-	    rule = p->tm->par.node_selection_rule;
-	    list = p->tm->samephase_cand;
-	    for (last = i = p->tm->samephase_candnum; i > 0; i--){
-	       node = list[i];
-	       if (p->tm->has_ub &&
-		   node->lower_bound >= p->tm->ub-p->tm->par.granularity){
-		  if (i != last){
-		     list[i] = list[last];
-		     for (prev_pos = i, pos = i/2; pos >= 1;
-			  prev_pos = pos, pos /= 2){
-			if (node_compar(rule, list[pos], list[prev_pos])){
-			   temp = list[prev_pos];
-			   list[prev_pos] = list[pos];
-			   list[pos] = temp;
-			}else{
-			   break;
-			}
-		     }
-		  }
-		  p->tm->samephase_cand[last] = NULL;
-		  last--;
-		  if (p->tm->par.verbosity > 0){
-		     printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-		     printf("+ TM: Pruning NODE %i LEVEL %i after new incumbent.\n",
-			    node->bc_index, node->bc_level);
-		     printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-		  }
-		  if (p->tm->par.keep_description_of_pruned == DISCARD ||
-		      p->tm->par.keep_description_of_pruned ==
-		      KEEP_ON_DISK_VBC_TOOL){
-		     if (p->tm->par.keep_description_of_pruned ==
-			 KEEP_ON_DISK_VBC_TOOL)
-#pragma omp critical (write_pruned_node_file)
-			write_pruned_nodes(p->tm, node);
-#pragma omp critical (tree_update)
-		     if (p->tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
-			purge_pruned_nodes(p->tm, node,
-					   VBC_PRUNED_FATHOMED);
-		     } else {
-			purge_pruned_nodes(p->tm, node, VBC_PRUNED);
-		     }
-		  }
-	       }
-	    }
-	    p->tm->samephase_candnum = last;
-	 }
+      install_new_ub(p->tm, p->ub, p->proc_index, p->bc_index, branching,
+		     feasible);
 #else
-	 s_bufid = init_send(DataInPlace);
-	 send_dbl_array(&true_objval, 1);
-	 send_msg(p->tree_manager, UPPER_BOUND);
-	 freebuf(s_bufid);
+      s_bufid = init_send(DataInPlace);
+      send_dbl_array(&true_objval, 1);
+      send_int_array(&(p->bc_index), 1);
+      send_int_array(&feasible, 1);
+      send_char_array(&branching, 1);
+      send_msg(p->tree_manager, UPPER_BOUND);
+      freebuf(s_bufid);
 #endif
 #if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_TM)
-	 send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
-				  lpetol, true_objval, cnt, indices, values);
+      send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
+			       lpetol, true_objval, cnt, indices, values);
 #endif
-      }else{
-	 if (!p->par.multi_criteria){
-	    PRINT(p->par.verbosity, 0,
-		  ("\n* Found Another Feasible Solution.\n"));
-	    if (p->mip->obj_sense == SYM_MAXIMIZE){
-	       PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
-					   + p->mip->obj_offset));
-	    }else{
-	       PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
-					   + p->mip->obj_offset));
-	    }
+   }else{
+      if (!p->par.multi_criteria){
+	 PRINT(p->par.verbosity, 0,
+	       ("\n* Found Another Feasible Solution.\n"));
+	 if (p->mip->obj_sense == SYM_MAXIMIZE){
+	    PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
+					+ p->mip->obj_offset));
+	 }else{
+	    PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
+					+ p->mip->obj_offset));
 	 }
       }
-      if (!p->par.multi_criteria){
-	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);
-      }
-      if (feasible == IP_FEASIBLE){
-	 lp_data->termcode = LP_OPT_FEASIBLE;
-      }
    }
-   
+   if (!p->par.multi_criteria){
+      display_lp_solution_u(p, DISP_FEAS_SOLUTION);
+   }
+   if (feasible == IP_FEASIBLE){
+      lp_data->termcode = LP_OPT_FEASIBLE;
+   }
+
    FREE(heur_solution);
    FREE(col_sol);
    return(feasible);

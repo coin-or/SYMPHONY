@@ -1715,6 +1715,108 @@ int add_cut_to_list(tm_prob *tm, cut_data *cut)
 /*===========================================================================*/
 
 /*===========================================================================*\
+ * Installs a new upper bound and cleans up the candidate list
+\*===========================================================================*/
+
+void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
+		    int bc_index, char branching, int feasible){
+   bc_node *node, *temp, **list;
+   int rule, pos, prev_pos, last, i;
+
+   tm->has_ub = TRUE;
+   tm->ub = new_ub;
+   tm->opt_thread_num = opt_thread_num;
+   if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
+      FILE *f;
+#pragma omp critical(write_vbc_emulation_file)
+      if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
+	 printf("\nError opening vbc emulation file\n\n");
+      }else{
+	 PRINT_TIME(tm, f);
+	 fprintf(f, "U %.2f\n", new_ub);
+	 fclose(f);
+      }
+   }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
+      printf("$U %.2f\n", new_ub);
+   }else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW &&
+	     (feasible == IP_FEASIBLE || feasible == IP_HEUR_FEASIBLE)){
+      FILE *f;
+      char reason[30];
+      char branch_dir = 'M';
+      if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
+	 printf("\nError opening vbc emulation file\n\n");
+      }else if ((feasible == IP_FEASIBLE && branching) ||
+		(feasible == IP_HEUR_FEASIBLE)) {
+#pragma omp critical(write_vbc_emulation_file)
+	 PRINT_TIME2(tm, f);
+	 fprintf(f, "%s %f %i\n", "heuristic", new_ub, bc_index+1);
+      }else if (feasible == IP_FEASIBLE && !branching){
+	 node = tm->active_nodes[opt_thread_num];
+	 if (node->parent->children[0]==node){
+	    branch_dir = 'L';
+	 } else {
+	    branch_dir = 'R';
+	 }
+	 PRINT_TIME2(tm, f);
+	 fprintf (f, "%s %i %i %c %f\n", "integer", node->bc_index+1,
+		  node->parent->bc_index+1, branch_dir, new_ub);
+      }
+      if (f){
+	 fclose(f);
+      }
+   }
+
+   /* Remove nodes that can now be fathomed from the list */
+   rule = tm->par.node_selection_rule;
+   list = tm->samephase_cand;
+   for (last = i = tm->samephase_candnum; i > 0; i--){
+      node = list[i];
+      if (tm->has_ub &&
+	  node->lower_bound >= tm->ub-tm->par.granularity){
+	 if (i != last){
+	    list[i] = list[last];
+	    for (prev_pos = i, pos = i/2; pos >= 1;
+		 prev_pos = pos, pos /= 2){
+	       if (node_compar(rule, list[pos], list[prev_pos])){
+		  temp = list[prev_pos];
+		  list[prev_pos] = list[pos];
+		  list[pos] = temp;
+	       }else{
+		  break;
+	       }
+	    }
+	 }
+	 tm->samephase_cand[last] = NULL;
+	 last--;
+	 if (tm->par.verbosity > 0){
+	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf("+ TM: Pruning NODE %i LEVEL %i after new incumbent.\n",
+		   node->bc_index, node->bc_level);
+	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	 }
+	 if (tm->par.keep_description_of_pruned == DISCARD ||
+	     tm->par.keep_description_of_pruned ==
+	     KEEP_ON_DISK_VBC_TOOL){
+	    if (tm->par.keep_description_of_pruned ==
+		KEEP_ON_DISK_VBC_TOOL)
+#pragma omp critical (write_pruned_node_file)
+	       write_pruned_nodes(tm, node);
+#pragma omp critical (tree_update)
+	    if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+	       purge_pruned_nodes(tm, node,
+				  VBC_PRUNED_FATHOMED);
+	    } else {
+	       purge_pruned_nodes(tm, node, VBC_PRUNED);
+	    }
+	 }
+      }
+   }
+   tm->samephase_candnum = last;
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
  * This routine takes the description of the node after processing and
  * compares it to the description before processing. Then it updates
  * data structures appropriately. The other functions below are all

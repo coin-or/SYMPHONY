@@ -70,10 +70,10 @@ void free_col_set(our_col_set **colset)
 
 void free_candidate(branch_obj **cand)
 {
+   int i;
    if (*cand){
       branch_obj *can = *cand;
 #ifdef COMPILE_FRAC_BRANCHING
-      int i;
       for (i = can->child_num-1; i >= 0; i--){
 	 if (can->frac_num[i]){
 	    FREE(can->frac_ind[i]);
@@ -82,7 +82,6 @@ void free_candidate(branch_obj **cand)
       }
 #endif
       free_waiting_row(&(can->row));
-      int i;
 #ifndef MAX_CHILDREN_NUM
       FREE(can->sense); FREE(can->rhs); FREE(can->range); FREE(can->branch);
 

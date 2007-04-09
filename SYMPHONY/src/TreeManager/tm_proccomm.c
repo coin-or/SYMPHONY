@@ -991,58 +991,22 @@ char process_messages(tm_prob *tm, int r_bufid)
 
 void process_ub_message(tm_prob *tm)
 {
-   int s_bufid, i;
+   int s_bufid, bc_index, feasible;
    double new_ub;
+   char branching;
+      
    /* A new best solution has been found. The solution is sent
     * to the master, but the bound comes here, too.*/
    receive_dbl_array(&new_ub, 1);
+   receive_int_array(&bc_index, 1);
+   receive_int_array(&feasible, 1);
+   receive_char_array(&branching, 1);
    if ((!tm->has_ub) || (tm->has_ub && new_ub < tm->ub)){
-      tm->has_ub = TRUE;
-      tm->ub = new_ub;
+      install_new_ub(tm, new_ub, 0, bc_index, branching, feasible);
       s_bufid = init_send(DataInPlace);
       send_dbl_array(&tm->ub, 1);
       msend_msg(tm->lp.procs, tm->lp.procnum, UPPER_BOUND);
       freebuf(s_bufid);
-   }
-   if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
-      FILE *f;
-#pragma omp critical(write_vbc_emulation_file)
-      if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
-	 printf("\nError opening vbc emulation file\n\n");
-      }else{
-	 PRINT_TIME(tm, f);
-	 fprintf(f, "U %.2f \n", tm->ub);
-	 fclose(f); 
-      }
-   }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
-      printf("$U %.2f\n", tm->ub);
-   }else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
-      FILE *f;
-#pragma omp critical(write_vbc_emulation_file)
-      if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
-	 printf("\nError opening vbc emulation file\n\n");
-      }else{
-	 char reason[30];
-	 char branch_dir = 'M';
-	 bc_node *node;
-	 for (i = 1; i <= tm->samephase_candnum; i++){
-	    node = tm->samephase_cand[i];
-	    if (tm->has_ub && node->lower_bound<tm->ub-tm->par.granularity){
-	       sprintf(reason,"%s","fathomed");
-	       sprintf(reason,"%s %i %i",reason, node->bc_index+1,
-		       node->parent->bc_index+1);
-	       if (node->parent->children[0]==node) {
-		  branch_dir = 'L';
-	       } else {
-		  branch_dir = 'R';
-	       }
-	       sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
-	       PRINT_TIME2(tm, f);
-	       fprintf(f, "%s", reason);
-	    }
-	 }
-	 fclose(f);
-      }
    }
 }
 
