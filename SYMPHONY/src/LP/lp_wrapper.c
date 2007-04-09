@@ -696,6 +696,17 @@ int is_feasible_u(lp_prob *p, char branching)
       if (p->has_ub && true_objval >= p->ub - p->par.granularity){
 	 FREE(heur_solution);
 	 FREE(col_sol);
+	 if (!p->par.multi_criteria){
+	    PRINT(p->par.verbosity, 0,
+		  ("\n* Found Another Feasible Solution.\n"));
+	    if (p->mip->obj_sense == SYM_MAXIMIZE){
+	       PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
+			+ p->mip->obj_offset));
+	    }else{
+	       PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
+			+ p->mip->obj_offset));
+	    }
+	 }
 	 return(feasible);
       }
       p->has_ub = TRUE;
@@ -747,18 +758,6 @@ int is_feasible_u(lp_prob *p, char branching)
       send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
 			       lpetol, true_objval, cnt, indices, values);
 #endif
-   }else{
-      if (!p->par.multi_criteria){
-	 PRINT(p->par.verbosity, 0,
-	       ("\n* Found Another Feasible Solution.\n"));
-	 if (p->mip->obj_sense == SYM_MAXIMIZE){
-	    PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
-					+ p->mip->obj_offset));
-	 }else{
-	    PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
-					+ p->mip->obj_offset));
-	 }
-      }
    }
    if (!p->par.multi_criteria){
       display_lp_solution_u(p, DISP_FEAS_SOLUTION);

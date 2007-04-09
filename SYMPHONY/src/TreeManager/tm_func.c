@@ -1771,7 +1771,9 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
    /* Remove nodes that can now be fathomed from the list */
    rule = tm->par.node_selection_rule;
    list = tm->samephase_cand;
+   char has_exchanged = FALSE;
    for (last = i = tm->samephase_candnum; i > 0; i--){
+      has_exchanged = FALSE;
       node = list[i];
       if (tm->has_ub &&
 	  node->lower_bound >= tm->ub-tm->par.granularity){
@@ -1783,6 +1785,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 		  temp = list[prev_pos];
 		  list[prev_pos] = list[pos];
 		  list[pos] = temp;
+		  has_exchanged = TRUE;
 	       }else{
 		  break;
 	       }
@@ -1811,6 +1814,13 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	       purge_pruned_nodes(tm, node, VBC_PRUNED);
 	    }
 	 }
+      }
+      if (has_exchanged) {
+	 /*
+	  * if exchanges have taken place, node[i] should be
+	  * checked again for pruning
+	  */
+	 i++;
       }
    }
    tm->samephase_candnum = last;
