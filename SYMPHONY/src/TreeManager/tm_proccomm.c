@@ -693,7 +693,10 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 		       VBC_INTERIOR_NODE);
 	       fclose(f); 
 	    }
-	 } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
+	 }
+#ifdef COMPILE_IN_LP
+	 /* FIXME: This currently only works in sequential mode */
+	 else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
 	    FILE *f;
 #pragma omp critical(write_vbc_emulation_file)
 	    if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
@@ -706,7 +709,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
                for (int i=0;i<tm->lpp[n->lp]->lp_data->n;i++) {
                   double v = tm->lpp[n->lp]->lp_data->x[i];
 		  if (tm->lpp[n->lp]->lp_data->vars[i]->is_int) {
-		     if (fabs(v-floor(v+0.5))>tm->lpp[n->lp]->lp_data->lpetol) {
+		     if (fabs(v-floor(v+0.5))>tm->lpp[n->lp]->lp_data->lpetol){
 			num_inf++;
 			sum_inf = sum_inf + fabs(v-floor(v+0.5));
 		     }
@@ -736,7 +739,9 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	       fprintf(f, "%s\n", reason);
 	       fclose(f); 
 	    }
-	 } else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
+	 }
+#endif
+	 else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
 	    printf("$P %i %i\n", n->bc_index + 1, VBC_INTERIOR_NODE);
 	 }
 	 break;

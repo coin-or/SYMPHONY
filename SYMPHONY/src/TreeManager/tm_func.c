@@ -1725,7 +1725,9 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 
    tm->has_ub = TRUE;
    tm->ub = new_ub;
+#ifdef COMPILE_IN_LP
    tm->opt_thread_num = opt_thread_num;
+#endif
    if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
       FILE *f;
 #pragma omp critical(write_vbc_emulation_file)
