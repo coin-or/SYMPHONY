@@ -1549,7 +1549,10 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
 	 break;
        case VBC_FEAS_SOL_FOUND:
-	 sprintf(reason,"%s","integer");
+	 /* This case has already been dealt in install_new_ub(), hence
+	  * commented out
+	  */
+/*	 sprintf(reason,"%s","integer");
 	 sprintf(reason,"%s %i %i",reason, node->bc_index+1,
 		 node->parent->bc_index+1);
 	 if (node->parent->children[0]==node) {
@@ -1559,6 +1562,7 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 }
 	 sprintf(reason,"%s %c %f\n", reason, branch_dir, tm->ub);
 	 break;
+ */
        default:
 	 category = VBC_IGNORE;
 	 break;
