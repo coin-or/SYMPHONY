@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2006-2007 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -59,63 +59,74 @@ int main (int argc, const char *argv[])
    std::string mpsDir;
    std::string netlibDir;
    
-   if (parms.find("-mpsDir") != parms.end())
+   if (parms.find("-mpsDir") != parms.end()){
       mpsDir=parms["-mpsDir"] + dirsep;
-   else {
+   }else{
       //#ifdef _MSC_VER
       //      mpsDir = "..\\..\\Data\\Sample\\";
       //#else
       mpsDir = dirsep =='/' ? "../../Data/Sample/" : "..\\..\\Data\\Sample\\";
       //#endif  
-} 
-   if (parms.find("-netlibDir") != parms.end())
+   } 
+   if (parms.find("-netlibDir") != parms.end()){
       netlibDir=parms["-netlibDir"] + dirsep;
-   else 
+   }else{ 
       //#ifdef _MSC_VER
       //     netlibDir = "..\\..\\Data\\Netlib\\";
       //#else
-      netlibDir = dirsep == '/' ? "../../Data/Netlib/" : "..\\..\\Data\\Netlib\\";
+      netlibDir = dirsep == '/' ? "../../Data/Netlib/" : 
+	 "..\\..\\Data\\Netlib\\";
    //#endif
-    {
-    OsiSymSolverInterface symSi;
-    testingMessage( "Testing OsiRowCut with OsiSymSolverInterface\n" );
-    OsiRowCutUnitTest(&symSi,mpsDir);
-  }
-  {
-    OsiSymSolverInterface symSi;
-    testingMessage( "Testing OsiColCut with OsiSymSolverInterface\n" );
-    OsiColCutUnitTest(&symSi,mpsDir);
-  }
-  {
-    OsiSymSolverInterface symSi;
-    testingMessage( "Testing OsiRowCutDebugger with OsiSymSolverInterface\n" );
-    OsiRowCutDebuggerUnitTest(&symSi,mpsDir);
-  }
+   }
 
-  testingMessage( "Testing OsiSymSolverInterface\n" );
-  OsiSymSolverInterfaceUnitTest(mpsDir,netlibDir);
+   {
+      OsiSymSolverInterface symSi;
+      symSi.setSymParam(OsiSymVerbosity, -1);
+      testingMessage( "Now testing the OsiRowCut class with " );
+      testingMessage( "OsiSymSolverInterface\n\n" );
+      OsiRowCutUnitTest(&symSi,mpsDir);
+   }
+   {
+      OsiSymSolverInterface symSi;
+      symSi.setSymParam(OsiSymVerbosity, -1);
+      testingMessage( "Now testing the OsiColCut class with " );
+      testingMessage( "OsiSymSolverInterface\n\n" );
+      OsiColCutUnitTest(&symSi,mpsDir);
+   }
 
-  // Create vector of solver interfaces
-  std::vector<OsiSolverInterface*> vecSi;
+   {
+      OsiSymSolverInterface symSi;
+      symSi.setSymParam(OsiSymVerbosity, -1);
+      testingMessage( "Now testing the OsiRowCutDebugger class with " );
+      testingMessage( "OsiSymSolverInterface\n\n" );
+      OsiRowCutDebuggerUnitTest(&symSi,mpsDir);
+   }
 
-  OsiSolverInterface * symSi = new OsiSymSolverInterface;
-  vecSi.push_back(symSi);
+   testingMessage( "Now testing OsiSymSolverInterface\n\n" );
+   OsiSymSolverInterfaceUnitTest(mpsDir,netlibDir);
 
-  testingMessage( "Testing OsiSolverInterface\n" );
-  OsiSolverInterfaceMpsUnitTest(vecSi,netlibDir);
+   // Create vector of solver interfaces
+   std::vector<OsiSolverInterface*> vecSi;
 
-  for (i=0; i<vecSi.size(); i++)
-     delete vecSi[i];
- 
-  testingMessage( "Testing MIPLIB files\n" );
-
-  sym_environment *env = sym_open_environment();
-  
-  sym_test(env);
+   OsiSolverInterface * symSi = new OsiSymSolverInterface;
+   vecSi.push_back(symSi);
    
-  testingMessage( "All tests completed successfully\n" );
+   testingMessage( "Testing OsiSolverInterface\n" );
+   OsiSolverInterfaceMpsUnitTest(vecSi,netlibDir);
+   
+   for (i=0; i<vecSi.size(); i++){
+      delete vecSi[i];
+   }
+   
+   testingMessage( "Testing MIPLIB files\n" );
+
+   sym_environment *env = sym_open_environment();
   
-  return 0;
+   sym_test(env);
+   
+   testingMessage( "All tests completed successfully\n" );
+  
+   return 0;
 }
 
 void testingMessage( const char * const msg )
