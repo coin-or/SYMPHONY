@@ -1172,9 +1172,14 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		default:
 		  vbc_node_pr_reason = VBC_PRUNED;
 	       }
+	       /* following is no longer needed because this care is taken
+		* care of in install_new_ub
+		*/
+	       /*
 	       if (feasible[i]) {
 		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
 	       }
+	       */
 	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
 	    } else {
 	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
@@ -1335,9 +1340,14 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		default:
 		  vbc_node_pr_reason = VBC_PRUNED;
 	       }
-	       if (feasible[i]) {
+	       /* following is no longer needed because this care is taken
+		* care of in install_new_ub
+		*/
+	       /*
+		  if (feasible[i]) {
 		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
 	       }
+	       */
 	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
 	    } else {
 	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
