@@ -149,6 +149,8 @@ int purge_pruned_nodes PROTO((tm_prob *tm, bc_node *node, int category));
 int find_process_index PROTO((process_set *pset, int tid));
 void mark_lp_process_free PROTO((tm_prob *tm, int lp, int cp));
 int add_cut_to_list PROTO((tm_prob *tm, cut_data *cut));
+void install_new_ub PROTO((tm_prob *tm, double new_ub, int opt_thread_num,
+			   int bc_index, char branching, int feasible));
 
 /*--------------- Function related to merging descriptions ------------------*/
 
