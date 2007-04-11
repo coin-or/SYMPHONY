@@ -1095,10 +1095,17 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    char branch_dir = 'M';
 	    sprintf (reason, "%s %i %i", "candidate", child->bc_index+1,
 		     node->bc_index+1);
-	    if (node->children[0]==child) {
-	       branch_dir = 'L';
-	    } else {
-	       branch_dir = 'R';
+	    if (node->bc_index>0){
+	       if (node->children[0]==child) {
+		  branch_dir = node->bobj.sense[0];
+		  /*branch_dir = 'L';*/
+	       } else {
+		  branch_dir = node->bobj.sense[1];
+		  /*branch_dir = 'R';*/
+	       }
+	       if (branch_dir == 'G') {
+		  branch_dir = 'R';
+	       }
 	    }
 	    if (action[i] == PRUNE_THIS_CHILD_FATHOMABLE ||
 		action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
@@ -1539,11 +1546,18 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
        case VBC_PRUNED_INFEASIBLE:
 	 sprintf(reason,"%s","infeasible");
 	 sprintf(reason,"%s %i %i",reason, node->bc_index+1,
-		 node->parent->bc_index+1);
-	 if (node->parent->children[0]==node) {
-	    branch_dir = 'L';
-	 } else {
-	    branch_dir = 'R';
+	       node->parent->bc_index+1);
+	 if (node->bc_index>0) {
+	    if (node->parent->children[0]==node) {
+	       branch_dir = node->parent->bobj.sense[0];
+	       /*branch_dir = 'L';*/
+	    } else {
+	       branch_dir = node->parent->bobj.sense[1];
+	       /*branch_dir = 'R';*/
+	    }
+	    if (branch_dir == 'G') {
+	       branch_dir = 'R';
+	    }
 	 }
 	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
 	 break;
@@ -1551,10 +1565,17 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 sprintf(reason,"%s","fathomed");
 	 sprintf(reason,"%s %i %i",reason, node->bc_index+1,
 		 node->parent->bc_index+1);
-	 if (node->parent->children[0]==node) {
-	    branch_dir = 'L';
-	 } else {
-	    branch_dir = 'R';
+	 if (node->bc_index>0) {
+	    if (node->parent->children[0]==node) {
+	       branch_dir = node->parent->bobj.sense[0];
+	       /*branch_dir = 'L';*/
+	    } else {
+	       branch_dir = node->parent->bobj.sense[1];
+	       /*branch_dir = 'R';*/
+	    }
+	    if (branch_dir == 'G') {
+	       branch_dir = 'R';
+	    }
 	 }
 	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
 	 break;
@@ -1768,10 +1789,17 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	 fprintf(f, "%s %f %i\n", "heuristic", new_ub, bc_index+1);
       }else if (feasible == IP_FEASIBLE && !branching){
 	 node = tm->active_nodes[opt_thread_num];
-	 if (node->parent->children[0]==node){
-	    branch_dir = 'L';
-	 } else {
-	    branch_dir = 'R';
+	 if (node->bc_index>0) {
+	    if (node->parent->children[0]==node) {
+	       branch_dir = node->parent->bobj.sense[0];
+	       /*branch_dir = 'L';*/
+	    } else {
+	       branch_dir = node->parent->bobj.sense[1];
+	       /*branch_dir = 'R';*/
+	    }
+	    if (branch_dir == 'G') {
+	       branch_dir = 'R';
+	    }
 	 }
 	 PRINT_TIME2(tm, f);
 	 fprintf (f, "%s %i %i %c %f\n", "integer", node->bc_index+1,
