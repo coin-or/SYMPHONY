@@ -32,24 +32,30 @@ typedef struct CGL_PARAMS{
    /* Cut generation in LP */
    int               generate_cgl_cuts;
    int               generate_cgl_gomory_cuts;
+   int               generate_cgl_redsplit_cuts;
    int               generate_cgl_knapsack_cuts;
    int               generate_cgl_oddhole_cuts;
    int               generate_cgl_probing_cuts;
    int               generate_cgl_mir_cuts;
+   int               generate_cgl_twomir_cuts;
    int               generate_cgl_clique_cuts;
    int               generate_cgl_flow_and_cover_cuts;
    int               generate_cgl_rounding_cuts;
    int               generate_cgl_lift_and_project_cuts;
+   int               generate_cgl_landp_cuts;
 
    int               gomory_generated_in_root;
+   int               redsplit_generated_in_root;
    int               knapsack_generated_in_root;
    int               oddhole_generated_in_root;
    int               probing_generated_in_root;
    int               mir_generated_in_root;
+   int               twomir_generated_in_root;
    int               clique_generated_in_root;
    int               flow_and_cover_generated_in_root;
    int               rounding_generated_in_root;
    int               lift_and_project_generated_in_root;
+   int               landp_generated_in_root;
 }cgl_params;
 
 typedef struct LP_PARAMS{

@@ -66,9 +66,10 @@ void OSL_check_error PROTO((const char *erring_func));
 #include "CglKnapsackCover.hpp"
 #include "CglProbing.hpp"
 #include "CglFlowCover.hpp"
+#include "CglTwomir.hpp"
+#include "CglLandP.hpp"
+#include "CglRedSplit.hpp"
 #endif
-
-
 
 #ifdef __OSI_CPLEX__
 #include "OsiCpxSolverInterface.hpp"

@@ -1778,7 +1778,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
    }else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW &&
 	     (feasible == IP_FEASIBLE || feasible == IP_HEUR_FEASIBLE)){
       FILE *f;
-      char reason[30];
+      //      char reason[30];
       char branch_dir = 'M';
       if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
 	 printf("\nError opening vbc emulation file\n\n");

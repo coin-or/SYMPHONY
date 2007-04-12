@@ -2396,6 +2396,12 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
 
+   else if (strcmp(key, "generate_cgl_twomir_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_twomir_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts);
+      return(0);
+   }
+
 
    else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts") == 0){
@@ -2412,6 +2418,12 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "generate_cgl_lift_and_project_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts") == 0){
       READ_INT_PAR(lp_par->cgl.generate_cgl_lift_and_project_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_landp_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_landp_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts);
       return(0);
    }
 
