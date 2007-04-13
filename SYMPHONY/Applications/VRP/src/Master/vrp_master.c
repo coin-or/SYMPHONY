@@ -65,10 +65,10 @@
 \*===========================================================================*/
 
 void user_usage(void){
-   printf("master [ -HEPT ] [ -S file ] [ -F file ] [ -B rule ]\n\t"
+   printf("vrp [ -HEPT ] [ -S file ] [ -F file ] [ -B rule ]\n\t"
 	  "[ -V sel ] [ -K closest ] [ -N routes ] [ -C capacity ]\n"
 	  "\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
-	  "\t%s\n\t%s\n"
+	  "\t%s\n\t%s\n\t%s\n"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
           "\t%s\n"
 /*___END_EXPERIMENTAL_SECTION___*/
@@ -366,7 +366,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 			      int *colgen_strat)
 {
    vrp_problem *vrp = (vrp_problem *)user;
-   int cap_check, total_demand = 0, base_varnum = 0, v1, v0;
+   int base_varnum = 0;
    int i, j, k, l;
    int zero_varnum, *zero_vars;
    int vertnum = vrp->vertnum;
@@ -523,17 +523,14 @@ int user_send_lp_data(void *user, void **user_lp)
       the LP is not running separately. This code should be virtually
       identical to that of user_receive_lp_data() in the LP process.*/
    
-   vrp_lp_problem *vrp_lp = (vrp_lp_problem *) calloc(1, sizeof(vrp_lp_problem));
-   int zero_varnum = vrp->zero_varnum;
-   int *zero_vars = vrp->zero_vars;
-   int vertnum, i, j, k, l;
-
+   vrp_lp_problem *vrp_lp = (vrp_lp_problem *) calloc(1,
+						      sizeof(vrp_lp_problem));
    *user_lp = (void *)vrp_lp;
    
    vrp_lp->par = vrp->lp_par;
    vrp_lp->window = vrp->dg_id;
    vrp_lp->numroutes = vrp->numroutes;
-   vertnum = vrp_lp->vertnum = vrp->vertnum;
+   vrp_lp->vertnum = vrp->vertnum;
    vrp_lp->edges = vrp->edges;
    vrp_lp->demand = vrp->demand;
    vrp_lp->capacity = vrp->capacity;
@@ -934,9 +931,6 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 int user_free_master(void **user)
 {
    vrp_problem *vrp = (vrp_problem *)(*user);
-   /*__BEGIN_EXPERIMENTAL_SECTION__*/
-   int i;
-   /*___END_EXPERIMENTAL_SECTION___*/
 
    if (vrp->cur_tour){
       FREE(vrp->cur_tour->tour);

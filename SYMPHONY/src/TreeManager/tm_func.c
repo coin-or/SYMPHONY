@@ -1802,8 +1802,13 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	    }
 	 }
 	 PRINT_TIME2(tm, f);
-	 fprintf (f, "%s %i %i %c %f\n", "integer", node->bc_index+1,
-		  node->parent->bc_index+1, branch_dir, new_ub);
+	 if (node->bc_index){
+	    fprintf (f, "%s %i %i %c %f\n", "integer", node->bc_index+1,
+		     node->parent->bc_index+1, branch_dir, new_ub);
+	 }else{
+	    fprintf (f, "%s %i %i %c %f\n", "integer", 1, 0, 'M', new_ub);
+	 }
+	    
       }
       if (f){
 	 fclose(f);
