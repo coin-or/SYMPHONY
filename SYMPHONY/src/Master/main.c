@@ -89,14 +89,17 @@ COMMAND parameter_commands[] = {
   { "find_first_feasible" },
   { "generate_cgl_cuts" },
   { "generate_cgl_gomory_cuts" },
+  { "generate_cgl_redsplit_cuts" },
   { "generate_cgl_knapsack_cuts" },
   { "generate_cgl_oddhole_cuts" },
   { "generate_cgl_probing_cuts" },
   { "generate_cgl_clique_cuts" },
   { "generate_cgl_mir_cuts" },
+  { "generate_cgl_twomir_cuts" },
   { "generate_cgl_flow_and_cover_cuts" },
   { "generate_cgl_rounding_cuts" },
   { "generate_cgl_lift_and_project_cuts" },
+  { "generate_cgl_landp_cuts" },
   { "node_selection_rule" },
   { "strong_branching_candidate_num" },
   { "compare_candidadates_dafult" },
@@ -413,10 +416,10 @@ int main(int argc, char **argv)
 	       
 	       print_statistics(&(env->warm_start->comp_times), 
 				&(env->warm_start->stat),
-				env->ub, env->lb, initial_time, 
-				start_time, finish_time,
+				env->warm_start->ub, env->warm_start->lb, 
+				initial_time, start_time, finish_time,
 				env->mip->obj_offset, env->mip->obj_sense,
-				env->has_ub);
+				env->warm_start->has_ub);
 	       printf("\n");	       
 	     }
 	     strcpy(args[1], "");	       
@@ -601,15 +604,19 @@ int sym_help(char *line)
 	   "                                     to solve the optimality (default: 0) \n"
 	   "generate_cgl_cuts                  : whether or not to use cgl cuts (default: 1)\n"
 	   "generate_cgl_gomory_cuts           : whether or not to use cgl gomory cuts (default: 1)\n"
+	   "generate_cgl_redsplit_cuts         : whether or not to use cgl redsplit cuts (default: 1)\n"
 	   "generate_cgl_knapsack_cuts         : whether or not to use cgl knapsack cuts (default: 1)\n"
 	   "generate_cgl_oddhole_cuts          : whether or not to use cgl oddhole cuts (default: 1)\n"
 	   "generate_cgl_probing_cuts          : whether or not to use cgl probing cuts (default: 1)\n"
 	   "generate_cgl_clique_cuts           : whether or not to use cgl clique cuts (default: 1)\n"	   
 	   "generate_cgl_mir_cuts              : whether or not to use cgl mixed integer rounding cuts\n" 
            "                                     (default: 0)\n"
+	   "generate_cgl_twomir_cuts            : whether or not to use cgl two-step mixed integer rounding cuts\n" 
+           "                                     (default: 0)\n"
  	   "generate_cgl_flow_and_cover_cuts   : whether or not to use cgl flow and cover cuts (default: 1)\n"
 	   "generate_cgl_rounding_cuts         : whether or not to use cgl rounding cuts (default: 0)\n"
 	   "generate_cgl_lift_and_project_cuts : whether or not to use cgl lift and project cuts (default: 0)\n"
+	   "generate_cgl_landp_cuts            : whether or not to use cgl lift and project cuts (default: 0)\n"
 	   "node_selection_rule                : set the node selection rule/search strategy (default: 5)\n"
 	   "strong_branching_candidate_num     : set the stong branching candidates number (default: var)\n"
 	   "compare_candidates_default         : set the rule to compare the candidates (defualt: 2)\n"

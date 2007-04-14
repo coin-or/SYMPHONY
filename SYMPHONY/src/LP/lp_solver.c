@@ -3025,7 +3025,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    int *matind;
    double *matval;
    cgl_params *par = &(lp_data->cgl);
-   int cut_num = 0;
+   int termcode, iterd, cut_num = 0;
 
 #ifndef COMPILE_IN_LP
    par->probing_generated_in_root = TRUE;
@@ -3091,18 +3091,20 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
    /* create CGL redsplit cuts */
    if(par->generate_cgl_redsplit_cuts > -1){
-     if(par->generate_cgl_redsplit_cuts == GENERATE_ALWAYS ||
+      if(par->generate_cgl_redsplit_cuts == GENERATE_ALWAYS ||
 	is_rootnode || par->redsplit_generated_in_root){
-       CglRedSplit *redsplit = new CglRedSplit;
-       redsplit->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_redsplit_cuts != GENERATE_ALWAYS ||
-	   !par->redsplit_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->redsplit_generated_in_root = TRUE;
-	 }
-       }
-       cut_num = cutlist.sizeRowCuts();       
-       delete redsplit;
+	/* make basis ready first */
+	//termcode = dual_simplex(lp_data, &iterd);	
+	CglRedSplit *redsplit = new CglRedSplit;
+	redsplit->generateCuts(*(lp_data->si), cutlist);
+	if (par->generate_cgl_redsplit_cuts != GENERATE_ALWAYS ||
+	    !par->redsplit_generated_in_root){
+	   if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	      par->redsplit_generated_in_root = TRUE;
+	   }
+	}
+	cut_num = cutlist.sizeRowCuts();       
+	delete redsplit;
      }
    }
 
@@ -3253,6 +3255,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    if(par->generate_cgl_landp_cuts > -1){
      if(par->generate_cgl_landp_cuts == GENERATE_ALWAYS || 
 	is_rootnode || par->landp_generated_in_root){
+	/* make basis ready first */
+	//	termcode = dual_simplex(lp_data, &iterd);
        CglLandP *landp = new CglLandP;
        landp->generateCuts(*(lp_data->si), cutlist);
        if (par->generate_cgl_landp_cuts != GENERATE_ALWAYS || 

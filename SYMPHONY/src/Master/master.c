@@ -779,7 +779,7 @@ int sym_solve(sym_environment *env)
        case FEASIBLE_SOLUTION_NONZEROS:
        case FEASIBLE_SOLUTION_USER:
 	 CALL_WRAPPER_FUNCTION( receive_feasible_solution_u(env, msgtag) );
-	 if (env->par.verbosity > 0){
+	 if (env->par.verbosity >= -1){
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
 	    CALL_WRAPPER_FUNCTION( display_solution_u(env,
 						env->tm->opt_thread_num) );
