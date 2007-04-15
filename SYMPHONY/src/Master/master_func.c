@@ -36,9 +36,6 @@
 /*===========================================================================*/
 /*===========================================================================*/
 
-#if 0
-/* FIXME: This doesn;t build in parallel since it calls free_node_desc() from
-   the LP module. */
 /* not used now! to be used later!*/
 int resolve_node(sym_environment *env, bc_node *node)
 {
@@ -530,7 +527,6 @@ int resolve_node(sym_environment *env, bc_node *node)
 
    return(FUNCTION_TERMINATED_NORMALLY);
 }
-#endif
 
 /*===========================================================================*/
 /*===========================================================================*/
