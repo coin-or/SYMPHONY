@@ -22327,7 +22327,7 @@ SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM -D__NONE__'
 ARCH=
 case $build in
   *-cygwin* | *-mingw*)
-       if test "$enable_doscompile" = yes; then
+       if test "$enable_doscompile" = mingw; then
            SYMDEFS="$SYMDEFS -D__MNO_CYGWIN"
        else
            SYMDEFS="$SYMDEFS -D__CYGWIN"
