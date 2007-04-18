@@ -745,6 +745,9 @@ int is_feasible_u(lp_prob *p, char branching)
 #ifdef COMPILE_IN_LP
       install_new_ub(p->tm, p->ub, p->proc_index, p->bc_index, branching,
 		     feasible);
+      if (!p->par.multi_criteria){
+	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);
+      }
 #else
       s_bufid = init_send(DataInPlace);
       send_dbl_array(&true_objval, 1);
@@ -759,9 +762,7 @@ int is_feasible_u(lp_prob *p, char branching)
 			       lpetol, true_objval, cnt, indices, values);
 #endif
    }
-   if (!p->par.multi_criteria){
-      display_lp_solution_u(p, DISP_FEAS_SOLUTION);
-   }
+   
    if (feasible == IP_FEASIBLE){
       lp_data->termcode = LP_OPT_FEASIBLE;
    }
@@ -2021,7 +2022,8 @@ int generate_cuts_in_lp_u(lp_prob *p)
       /* Add to the user's list of cuts */
 #ifdef USE_CGL_CUTS
       if (p->par.cgl.generate_cgl_cuts){
-	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE, p->bc_index < 1 ? TRUE: FALSE);
+	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
+			   p->bc_index < 1 ? TRUE: FALSE, p->par.verbosity);
 	 if(p->bc_index < 1){
 	    p->par.cgl = 
 	       lp_data->cgl;

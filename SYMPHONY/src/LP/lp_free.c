@@ -71,6 +71,7 @@ void free_col_set(our_col_set **colset)
 void free_candidate(branch_obj **cand)
 {
    int i;
+
    if (*cand){
       branch_obj *can = *cand;
 #ifdef COMPILE_FRAC_BRANCHING

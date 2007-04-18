@@ -23,6 +23,11 @@
 #include "sym_constants.h"
 #include "sym_macros.h"
 
+#ifdef PRINT
+#undef PRINT
+#endif
+#define PRINT(a, b, c) \
+   if ((a) > (b)) printf c
 
 /*===========================================================================*/
 
@@ -3017,7 +3022,7 @@ void write_sav(LPdata *lp_data, char *fname)
 #include "qsortucb.h"
 
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
-		       char send_to_pool, int is_rootnode)
+		       char send_to_pool, int is_rootnode, int verbosity)
 {
    OsiCuts cutlist;
    OsiRowCut cut;
@@ -3026,6 +3031,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    double *matval;
    cgl_params *par = &(lp_data->cgl);
    int termcode, iterd, cut_num = 0;
+   int new_cut_num = 0;
 
 #ifndef COMPILE_IN_LP
    par->probing_generated_in_root = TRUE;
@@ -3061,11 +3067,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
        probe->setRowCuts(3);
        //#endif
        probe->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_probing_cuts != GENERATE_ALWAYS &&
-	   !par->probing_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->probing_generated_in_root = TRUE;
-	 }
+       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_probing_cuts != GENERATE_ALWAYS &&
+	      !par->probing_generated_in_root){
+	     par->probing_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i probing cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();
        delete probe;
@@ -3078,11 +3086,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	is_rootnode || par->gomory_generated_in_root){
        CglGomory *gomory = new CglGomory;
        gomory->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_gomory_cuts != GENERATE_ALWAYS && 
-	   !par->gomory_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->gomory_generated_in_root = TRUE;
-	 }
+       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_gomory_cuts != GENERATE_ALWAYS && 
+	      !par->gomory_generated_in_root){
+	     par->gomory_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i Gomory cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();       
        delete gomory;
@@ -3097,11 +3107,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	//termcode = dual_simplex(lp_data, &iterd);	
 	CglRedSplit *redsplit = new CglRedSplit;
 	redsplit->generateCuts(*(lp_data->si), cutlist);
-	if (par->generate_cgl_redsplit_cuts != GENERATE_ALWAYS ||
-	    !par->redsplit_generated_in_root){
-	   if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	   if (par->generate_cgl_redsplit_cuts != GENERATE_ALWAYS ||
+	       !par->redsplit_generated_in_root){
 	      par->redsplit_generated_in_root = TRUE;
 	   }
+	   PRINT(verbosity, 5,
+		 ("%i reduce and split cuts added\n", new_cut_num));
 	}
 	cut_num = cutlist.sizeRowCuts();       
 	delete redsplit;
@@ -3114,11 +3126,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	is_rootnode || par->knapsack_generated_in_root){
        CglKnapsackCover *knapsack = new CglKnapsackCover;
        knapsack->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_knapsack_cuts != GENERATE_ALWAYS ||
-	   !par->knapsack_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->knapsack_generated_in_root = TRUE;
-	 }
+       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_knapsack_cuts != GENERATE_ALWAYS ||
+	      !par->knapsack_generated_in_root){
+	     par->knapsack_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i knapsack cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();       
        delete knapsack;
@@ -3136,11 +3150,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
        oddhole->setMaximumEntries(200);
        //#endif
        oddhole->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_oddhole_cuts != GENERATE_ALWAYS || 
-	   !par->oddhole_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->oddhole_generated_in_root = TRUE;
-	 }
+       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_oddhole_cuts != GENERATE_ALWAYS || 
+	      !par->oddhole_generated_in_root){
+	     par->oddhole_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i odd hole cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();       
        delete oddhole;
@@ -3153,11 +3169,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	is_rootnode || par->mir_generated_in_root){
        CglMixedIntegerRounding *mir = new CglMixedIntegerRounding;
        mir->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_mir_cuts != GENERATE_ALWAYS || 
-	   !par->mir_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->mir_generated_in_root = TRUE;
-	 }
+       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_mir_cuts != GENERATE_ALWAYS || 
+	      !par->mir_generated_in_root){
+	     par->mir_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i MIR cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();       
        delete mir;
@@ -3170,11 +3188,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	is_rootnode || par->twomir_generated_in_root){
        CglTwomir *twomir = new CglTwomir;
        twomir->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_twomir_cuts != GENERATE_ALWAYS || 
-	   !par->twomir_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->twomir_generated_in_root = TRUE;
-	 }
+       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_twomir_cuts != GENERATE_ALWAYS || 
+	      !par->twomir_generated_in_root){
+	     par->twomir_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i 2-MIR cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();       
        delete twomir;
@@ -3187,11 +3207,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	is_rootnode || par->clique_generated_in_root){
        CglClique *clique = new CglClique;
        clique->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_clique_cuts != GENERATE_ALWAYS ||
-	   !par->clique_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->clique_generated_in_root = TRUE;
-	 }
+       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_clique_cuts != GENERATE_ALWAYS ||
+	      !par->clique_generated_in_root){
+	     par->clique_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i clique cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();       
        delete clique;
@@ -3204,11 +3226,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	is_rootnode || par->flow_and_cover_generated_in_root){
        CglFlowCover *flow = new CglFlowCover;
        flow->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_flow_and_cover_cuts != GENERATE_ALWAYS || 
-	   !par->flow_and_cover_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->flow_and_cover_generated_in_root = TRUE;
-	 }
+       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_flow_and_cover_cuts != GENERATE_ALWAYS || 
+	      !par->flow_and_cover_generated_in_root){
+	     par->flow_and_cover_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i flow cover cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();       
        delete flow;
@@ -3222,11 +3246,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	is_rootnode || par->rounding_generated_in_root){
        CglSimpleRounding * rounding = new CglSimpleRounding;
        rounding->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_rounding_cuts != GENERATE_ALWAYS || 
-	   !par->rounding_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->rounding_generated_in_root = TRUE;
-	 }
+       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_rounding_cuts != GENERATE_ALWAYS || 
+	      !par->rounding_generated_in_root){
+	     par->rounding_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i rounding cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();       
        delete rounding;
@@ -3240,11 +3266,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	is_rootnode || par->lift_and_project_generated_in_root){
        CglLiftAndProject *liftandproject = new CglLiftAndProject;
        liftandproject->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_lift_and_project_cuts != GENERATE_ALWAYS || 
-	   !par->lift_and_project_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->lift_and_project_generated_in_root = TRUE;
-	 }
+       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_lift_and_project_cuts != GENERATE_ALWAYS || 
+	      !par->lift_and_project_generated_in_root){
+	     par->lift_and_project_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i list and project cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();       
        delete liftandproject;
@@ -3259,11 +3287,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	//	termcode = dual_simplex(lp_data, &iterd);
        CglLandP *landp = new CglLandP;
        landp->generateCuts(*(lp_data->si), cutlist);
-       if (par->generate_cgl_landp_cuts != GENERATE_ALWAYS || 
-	   !par->landp_generated_in_root){
-	 if ((cutlist.sizeRowCuts() - cut_num) > 0) {
-	   par->landp_generated_in_root = TRUE;
-	 }
+       if ((cutlist.sizeRowCuts() - cut_num) > 0) {
+	  if (par->generate_cgl_landp_cuts != GENERATE_ALWAYS || 
+	      !par->landp_generated_in_root){
+	     par->landp_generated_in_root = TRUE;
+	  }
+	  PRINT(verbosity, 5,
+		("%i landp cuts added\n", new_cut_num));
        }
        cut_num = cutlist.sizeRowCuts();       
        delete landp;
@@ -3280,6 +3310,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 *cuts = (cut_data **)malloc(cutlist.sizeRowCuts()*sizeof(cut_data *));
       }
       for (i = 0, j = *num_cuts; i < cutlist.sizeRowCuts(); i++){
+	 PRINT(verbosity, 12, ("Cut #%i: \n", i));
 	 int num_elements;
 	 int *indices;
 	 double *elements;
@@ -3301,7 +3332,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 matind = (int *) ((*cuts)[j]->coef + ISIZE);
 	 for (k = 0; k < num_elements; k++){
 	    matind[k] = lp_data->vars[indices[k]]->userind;
+	    PRINT(verbosity, 12, ("%i\t %.2f\n", matind[k], elements[k]));
 	 }
+	 PRINT(verbosity, 12, ("rhs\t %.2f\n", cut.rhs()));
 	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
 	 memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
 	 qsortucb_id(matind, matval, num_elements);
