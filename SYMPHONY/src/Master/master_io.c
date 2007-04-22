@@ -70,10 +70,11 @@ void usage(void)
 #ifdef USE_SYM_APPLICATION
    user_usage();
 #else
-   printf("master [ -H ] [ -F file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
+   printf("master [ -H ] [ -FL file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
 	  "-H: help (solver-specific switches)",
 	  "-F model: model should be read in from file 'model'",
 	  "          (MPS format is assumed unless -D is also present)",
+	  "-L model: LP format model should be read in from file 'model'",
 	  "-D data: model is in AMPL format and data is in file 'data'");
 #endif   
 }

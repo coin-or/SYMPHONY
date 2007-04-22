@@ -92,6 +92,11 @@
 #define INTEGER_PROBLEM          1
 #define MIXED_INTEGER_PROBLEM    2
 
+/*---------------------------- input format ---------------------------------*/
+#define MPS_FORMAT               0 
+#define LP_FORMAT                1 
+#define GMPL_FORMAT              2 
+
 /*--------------------------- modes of giving a list ------------------------*/
 #define WRT_PARENT               0
 #define EXPLICIT_LIST            1

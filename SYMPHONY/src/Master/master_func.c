@@ -2398,7 +2398,7 @@ int set_param(sym_environment *env, char *line)
 
    else if (strcmp(key, "generate_cgl_twomir_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_twomir_cuts") == 0){
-      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_twomir_cuts);
       return(0);
    }
 
@@ -2423,7 +2423,7 @@ int set_param(sym_environment *env, char *line)
 
    else if (strcmp(key, "generate_cgl_landp_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_landp_cuts") == 0){
-      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts);
       return(0);
    }
 

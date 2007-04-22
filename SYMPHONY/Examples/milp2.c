@@ -57,7 +57,7 @@ int main(int argc, char* argv[]){
    // x1 >= 0   =>  0 <= x1 <= infinity
    col_lb[0] = 0.0;
    col_lb[1] = 0.0;
-   col_ub[0] = sym_get_infinity();
+   col_ub[0] = 1.0e30;//DBL_MAX; //sym_get_infinity();
    col_ub[1] = sym_get_infinity();
    
    int n_rows = 2;
@@ -102,8 +102,8 @@ int main(int argc, char* argv[]){
    sym_explicit_load_problem(env, n_cols, n_rows, start, index, value, col_lb, 
 			     col_ub, int_vars, objective, NULL, row_sense, 
 			     row_rhs, row_range, TRUE);
- 
-   //solve the integer program
+
+    //solve the integer program
    sym_solve(env);
    
    //get, print the solution

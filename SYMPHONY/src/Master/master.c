@@ -418,8 +418,20 @@ int sym_get_user_data(sym_environment *env, void **user)
 int sym_read_mps(sym_environment *env, char *infile)
 {  
    
-  strncpy(env->par.infile, infile,MAX_FILE_NAME_LENGTH);
+  strncpy(env->par.infile, infile, MAX_FILE_NAME_LENGTH);
   strcpy(env->par.datafile, "");
+  return(sym_load_problem(env));
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_read_lp(sym_environment *env, char *infile)
+{  
+   
+  strncpy(env->par.infile, infile, MAX_FILE_NAME_LENGTH);
+  strcpy(env->par.datafile, "");
+  env->par.file_type = LP_FORMAT;
   return(sym_load_problem(env));
 }
 
@@ -431,6 +443,26 @@ int sym_read_gmpl(sym_environment *env, char *modelfile, char *datafile)
   strncpy(env->par.infile, modelfile, MAX_FILE_NAME_LENGTH);
   strncpy(env->par.datafile, datafile, MAX_FILE_NAME_LENGTH);
   return(sym_load_problem(env));
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_write_mps(sym_environment *env, char *infile)
+{  
+   write_mip_desc_mps(env->mip, infile);
+   return 0;
+}
+
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_write_lp(sym_environment *env, char *infile)
+{  
+   write_mip_desc_lp(env->mip, infile);
+   return 0;
+   
 }
 
 /*===========================================================================*/
@@ -4833,7 +4865,7 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
    }
    else if (strcmp(key, "generate_cgl_twomir_cuts") == 0 ||
             strcmp(key, "LP_generate_cgl_twomir_cuts") == 0){
-     *value = lp_par->cgl.generate_cgl_mir_cuts;
+     *value = lp_par->cgl.generate_cgl_twomir_cuts;
      return(0);
    }
    else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
@@ -4853,7 +4885,7 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
    }
    else if (strcmp(key, "generate_cgl_landp_cuts") == 0 ||
             strcmp(key, "LP_generate_cgl_landp_cuts") == 0){
-     *value = lp_par->cgl.generate_cgl_mir_cuts;
+     *value = lp_par->cgl.generate_cgl_landp_cuts;
      return(0);
    }
    else if (strcmp(key, "max_presolve_iter") == 0 ||
