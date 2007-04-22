@@ -57,7 +57,7 @@ int main(int argc, char* argv[]){
    // x1 >= 0   =>  0 <= x1 <= infinity
    col_lb[0] = 0.0;
    col_lb[1] = 0.0;
-   col_ub[0] = 1.0e30;//DBL_MAX; //sym_get_infinity();
+   col_ub[0] = sym_get_infinity();
    col_ub[1] = sym_get_infinity();
    
    int n_rows = 2;

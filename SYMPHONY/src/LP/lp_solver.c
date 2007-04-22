@@ -2698,7 +2698,6 @@ void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 {
   double *rhs = lp_data->tmp.d; 
   double *range = (double *) calloc(cnt, DSIZE);
-  char range_used = FALSE;
   int i; 
 
   for (i = 0; i < cnt; i++){
@@ -2707,11 +2706,9 @@ void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 	range[i] = lp_data->si->getRowRange()[index[i]];
   }
 
-  if (!range_used){
-     FREE(range);
-  }
-  
   lp_data->si->setRowSetTypes(index, index + cnt, sense, rhs, range);
+
+  FREE(range);
 }
 
 /*===========================================================================*/
@@ -2865,7 +2862,6 @@ void free_row_set(LPdata *lp_data, int length, int *index)
    char *sense = lp_data->tmp.c; /* m (now) */
    double *rhs = lp_data->tmp.d; /* m */
    double *range = (double *) calloc(length, DSIZE);
-   char range_used = FALSE;
    int i; 
    
    for (i = 0; i < length; i++){
@@ -2888,18 +2884,15 @@ void free_row_set(LPdata *lp_data, int length, int *index)
        break;
      case 'R':
        range[i] = 2*lp_data->si->getInfinity();
-       range_used = TRUE;
        break;
      case 'G':
        rhs[i] = -lp_data->si->getInfinity();
       }
    }
-   if(range_used){
-      lp_data->si->setRowSetTypes(index, index + length, sense, rhs, range);
-   }else{
-      lp_data->si->setRowSetTypes(index, index + length, sense, rhs, NULL);
-   }
-     FREE(range);
+
+   lp_data->si->setRowSetTypes(index, index + length, sense, rhs, range);
+   
+   FREE(range);
 }
 
 /*===========================================================================*/
@@ -2911,7 +2904,6 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    double *range = (double *) calloc(length, DSIZE);
    row_data *rows = lp_data->rows;
    cut_data *cut;
-   char range_used = FALSE;
    int i;
    
    for (i = length - 1; i >= 0; i--){
@@ -2919,7 +2911,6 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
       rhs[i] = cut->rhs;  
       if ((sense[i] = cut->sense) == 'R'){
 	 range[i] = cut->range;
-	 range_used = TRUE;
       }
    }
 

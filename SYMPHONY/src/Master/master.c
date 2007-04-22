@@ -420,6 +420,7 @@ int sym_read_mps(sym_environment *env, char *infile)
    
   strncpy(env->par.infile, infile, MAX_FILE_NAME_LENGTH);
   strcpy(env->par.datafile, "");
+  env->par.file_type = MPS_FORMAT;
   return(sym_load_problem(env));
 }
 
@@ -442,6 +443,7 @@ int sym_read_gmpl(sym_environment *env, char *modelfile, char *datafile)
 {  
   strncpy(env->par.infile, modelfile, MAX_FILE_NAME_LENGTH);
   strncpy(env->par.datafile, datafile, MAX_FILE_NAME_LENGTH);
+  env->par.file_type = GMPL_FORMAT;
   return(sym_load_problem(env));
 }
 
