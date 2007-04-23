@@ -3238,7 +3238,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    cgl_params *par = &(lp_data->cgl);
    int termcode, iterd, cut_num = 0;
    int new_cut_num = 0;
-
+   int is_top_iter = lp_data->lp_count == 1 ? TRUE: FALSE; 
+   
 #ifndef COMPILE_IN_LP
    par->probing_generated_in_root = TRUE;
    par->gomory_generated_in_root = TRUE;
@@ -3253,6 +3254,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    par->landp_generated_in_root = TRUE;
 #endif
       
+   if (par->generate_cgl_cuts_freq < 1)      
+      return;
 
    /* Set proper variables to be integer */
    for (i = 0; i < lp_data->n; i++) {
@@ -3260,41 +3263,53 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 lp_data->si->setInteger(i);
       }
    }  
-
+   
    /* create CGL probing cuts */
    if(par->generate_cgl_probing_cuts > -1){
-     if(par->generate_cgl_probing_cuts == GENERATE_ALWAYS || 
-	is_rootnode || par->probing_generated_in_root){
-       CglProbing *probe = new CglProbing;
-       //#if 0
-       probe->setUsingObjective(true);
-       probe->setMaxPass(3);
-       probe->setMaxLook(50);
-       probe->setRowCuts(3);
-       //#endif
-       probe->generateCuts(*(lp_data->si), cutlist);
-       if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	  if (par->generate_cgl_probing_cuts != GENERATE_ALWAYS &&
-	      !par->probing_generated_in_root){
-	     par->probing_generated_in_root = TRUE;
-	  }
-	  PRINT(verbosity, 5,
-		("%i probing cuts added\n", new_cut_num));
-       }
-       cut_num = cutlist.sizeRowCuts();
-       delete probe;
+      if(par->generate_cgl_probing_cuts == GENERATE_ALWAYS || 
+	 (par->generate_cgl_probing_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->probing_generated_in_root) || 
+	 ((par->generate_cgl_probing_cuts == GENERATE_DEFAULT ||
+	   par->generate_cgl_probing_cuts == GENERATE_IF_IN_ROOT) &&
+	  par->probing_generated_in_root) ||
+	 (par->generate_cgl_probing_cuts == GENERATE_PERIODICALLY &&
+	  (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){	 
+	CglProbing *probe = new CglProbing;
+	//#if 0
+	probe->setUsingObjective(true);
+	probe->setMaxPass(3);
+	probe->setMaxLook(50);
+	probe->setRowCuts(3);
+	//#endif
+	probe->generateCuts(*(lp_data->si), cutlist);
+	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+	   if (is_top_iter){
+	      par->probing_generated_in_root = TRUE;
+	   }
+	   PRINT(verbosity, 5,
+		 ("%i probing cuts added\n", new_cut_num));
+	}
+	cut_num = cutlist.sizeRowCuts();
+	delete probe;
      }
    }
 
    /* create CGL gomory cuts */
    if(par->generate_cgl_gomory_cuts > -1){
-     if(par->generate_cgl_gomory_cuts == GENERATE_ALWAYS || 
-	is_rootnode || par->gomory_generated_in_root){
-       CglGomory *gomory = new CglGomory;
-       gomory->generateCuts(*(lp_data->si), cutlist);
+      if(par->generate_cgl_gomory_cuts == GENERATE_ALWAYS || 
+	 (par->generate_cgl_gomory_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->gomory_generated_in_root) || 
+	((par->generate_cgl_gomory_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_gomory_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->gomory_generated_in_root) ||
+	(par->generate_cgl_gomory_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	is_top_iter){				     
+	CglGomory *gomory = new CglGomory;
+	gomory->generateCuts(*(lp_data->si), cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	  if (par->generate_cgl_gomory_cuts != GENERATE_ALWAYS && 
-	      !par->gomory_generated_in_root){
+	  if (is_top_iter){
 	     par->gomory_generated_in_root = TRUE;
 	  }
 	  PRINT(verbosity, 5,
@@ -3307,15 +3322,22 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
    /* create CGL redsplit cuts */
    if(par->generate_cgl_redsplit_cuts > -1){
-      if(par->generate_cgl_redsplit_cuts == GENERATE_ALWAYS ||
-	is_rootnode || par->redsplit_generated_in_root){
+     if(par->generate_cgl_redsplit_cuts == GENERATE_ALWAYS || 
+	 (par->generate_cgl_redsplit_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->redsplit_generated_in_root) || 
+	((par->generate_cgl_redsplit_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_redsplit_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->redsplit_generated_in_root) ||
+	(par->generate_cgl_redsplit_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){
+
 	/* make basis ready first */
 	//termcode = dual_simplex(lp_data, &iterd);	
 	CglRedSplit *redsplit = new CglRedSplit;
 	redsplit->generateCuts(*(lp_data->si), cutlist);
 	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	   if (par->generate_cgl_redsplit_cuts != GENERATE_ALWAYS ||
-	       !par->redsplit_generated_in_root){
+	   if (is_top_iter){
 	      par->redsplit_generated_in_root = TRUE;
 	   }
 	   PRINT(verbosity, 5,
@@ -3328,13 +3350,19 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
    /* create CGL knapsack cuts */
    if(par->generate_cgl_knapsack_cuts > -1){
-     if(par->generate_cgl_knapsack_cuts == GENERATE_ALWAYS ||
-	is_rootnode || par->knapsack_generated_in_root){
-       CglKnapsackCover *knapsack = new CglKnapsackCover;
-       knapsack->generateCuts(*(lp_data->si), cutlist);
+     if(par->generate_cgl_knapsack_cuts == GENERATE_ALWAYS || 
+	 (par->generate_cgl_knapsack_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->knapsack_generated_in_root) || 
+	((par->generate_cgl_knapsack_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_knapsack_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->knapsack_generated_in_root) ||
+	(par->generate_cgl_knapsack_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){	
+	CglKnapsackCover *knapsack = new CglKnapsackCover;
+	knapsack->generateCuts(*(lp_data->si), cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	  if (par->generate_cgl_knapsack_cuts != GENERATE_ALWAYS ||
-	      !par->knapsack_generated_in_root){
+	  if (is_top_iter){
 	     par->knapsack_generated_in_root = TRUE;
 	  }
 	  PRINT(verbosity, 5,
@@ -3347,8 +3375,16 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
    /* create CGL odd hole cuts */
    if(par->generate_cgl_oddhole_cuts > -1){
-     if(par->generate_cgl_oddhole_cuts == GENERATE_ALWAYS ||
-	is_rootnode || par->oddhole_generated_in_root){
+     if(par->generate_cgl_oddhole_cuts == GENERATE_ALWAYS || 
+	 (par->generate_cgl_oddhole_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->oddhole_generated_in_root) || 
+	((par->generate_cgl_oddhole_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_oddhole_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->oddhole_generated_in_root) ||
+	(par->generate_cgl_oddhole_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){
+				     
        CglOddHole *oddhole = new CglOddHole;
        //#if 0
        oddhole->setMinimumViolation(0.005);
@@ -3357,8 +3393,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
        //#endif
        oddhole->generateCuts(*(lp_data->si), cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	  if (par->generate_cgl_oddhole_cuts != GENERATE_ALWAYS || 
-	      !par->oddhole_generated_in_root){
+	  if (is_top_iter){ 
 	     par->oddhole_generated_in_root = TRUE;
 	  }
 	  PRINT(verbosity, 5,
@@ -3371,13 +3406,20 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
    /* create CGL mir cuts */
    if(par->generate_cgl_mir_cuts > -1){
-      if(par->generate_cgl_mir_cuts == GENERATE_ALWAYS || 
-	 is_rootnode || par->mir_generated_in_root){
+     if(par->generate_cgl_mir_cuts == GENERATE_ALWAYS || 
+	 (par->generate_cgl_mir_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->mir_generated_in_root) || 
+	((par->generate_cgl_mir_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_mir_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->mir_generated_in_root) ||
+	(par->generate_cgl_mir_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){
+				     
 	 CglMixedIntegerRounding *mir = new CglMixedIntegerRounding;
 	 mir->generateCuts(*(lp_data->si), cutlist);
 	 if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	    if (par->generate_cgl_mir_cuts != GENERATE_ALWAYS || 
-		!par->mir_generated_in_root){
+	    if (is_top_iter){
 	       par->mir_generated_in_root = TRUE;
 	    }
 	    PRINT(verbosity, 5,
@@ -3391,12 +3433,19 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    /* create CGL twomir cuts */
    if(par->generate_cgl_twomir_cuts > -1){
      if(par->generate_cgl_twomir_cuts == GENERATE_ALWAYS || 
-	is_rootnode || par->twomir_generated_in_root){
+	 (par->generate_cgl_twomir_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->twomir_generated_in_root) || 
+	((par->generate_cgl_twomir_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_twomir_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->twomir_generated_in_root) ||
+	(par->generate_cgl_twomir_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){
+				     
        CglTwomir *twomir = new CglTwomir;
        twomir->generateCuts(*(lp_data->si), cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	  if (par->generate_cgl_twomir_cuts != GENERATE_ALWAYS || 
-	      !par->twomir_generated_in_root){
+	  if (is_top_iter){
 	     par->twomir_generated_in_root = TRUE;
 	  }
 	  PRINT(verbosity, 5,
@@ -3410,12 +3459,21 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    /* create CGL clique cuts */
    if(par->generate_cgl_clique_cuts > -1){
      if(par->generate_cgl_clique_cuts == GENERATE_ALWAYS || 
-	is_rootnode || par->clique_generated_in_root){
+	 (par->generate_cgl_clique_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->clique_generated_in_root) || 
+	((par->generate_cgl_clique_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_clique_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->clique_generated_in_root) ||
+	(par->generate_cgl_clique_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){
+				     
        CglClique *clique = new CglClique;
+       clique->setStarCliqueReport(FALSE);
+       clique->setRowCliqueReport(FALSE);
        clique->generateCuts(*(lp_data->si), cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	  if (par->generate_cgl_clique_cuts != GENERATE_ALWAYS ||
-	      !par->clique_generated_in_root){
+	  if (is_top_iter){
 	     par->clique_generated_in_root = TRUE;
 	  }
 	  PRINT(verbosity, 5,
@@ -3429,12 +3487,19 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    /* create CGL flow cover cuts */
    if(par->generate_cgl_flow_and_cover_cuts > -1){
      if(par->generate_cgl_flow_and_cover_cuts == GENERATE_ALWAYS || 
-	is_rootnode || par->flow_and_cover_generated_in_root){
+	 (par->generate_cgl_flow_and_cover_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->flow_and_cover_generated_in_root) || 
+	((par->generate_cgl_flow_and_cover_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_flow_and_cover_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->flow_and_cover_generated_in_root) ||
+	(par->generate_cgl_flow_and_cover_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){
+				     
        CglFlowCover *flow = new CglFlowCover;
        flow->generateCuts(*(lp_data->si), cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	  if (par->generate_cgl_flow_and_cover_cuts != GENERATE_ALWAYS || 
-	      !par->flow_and_cover_generated_in_root){
+	  if (is_top_iter){
 	     par->flow_and_cover_generated_in_root = TRUE;
 	  }
 	  PRINT(verbosity, 5,
@@ -3449,12 +3514,19 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    /* create CGL simple rounding cuts */
    if(par->generate_cgl_rounding_cuts > -1){
      if(par->generate_cgl_rounding_cuts == GENERATE_ALWAYS || 
-	is_rootnode || par->rounding_generated_in_root){
+	 (par->generate_cgl_rounding_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->rounding_generated_in_root) || 
+	((par->generate_cgl_rounding_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_rounding_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->rounding_generated_in_root) ||
+	(par->generate_cgl_rounding_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){
+				     
        CglSimpleRounding * rounding = new CglSimpleRounding;
        rounding->generateCuts(*(lp_data->si), cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	  if (par->generate_cgl_rounding_cuts != GENERATE_ALWAYS || 
-	      !par->rounding_generated_in_root){
+	  if (is_top_iter){
 	     par->rounding_generated_in_root = TRUE;
 	  }
 	  PRINT(verbosity, 5,
@@ -3469,12 +3541,19 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    /* create CGL liftandproject cuts (currently buggy) */     
    if(par->generate_cgl_lift_and_project_cuts > -1){
      if(par->generate_cgl_lift_and_project_cuts == GENERATE_ALWAYS || 
-	is_rootnode || par->lift_and_project_generated_in_root){
+	 (par->generate_cgl_lift_and_project_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->lift_and_project_generated_in_root) || 
+	((par->generate_cgl_lift_and_project_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_lift_and_project_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->lift_and_project_generated_in_root) ||
+	(par->generate_cgl_lift_and_project_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){
+				     
        CglLiftAndProject *liftandproject = new CglLiftAndProject;
        liftandproject->generateCuts(*(lp_data->si), cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	  if (par->generate_cgl_lift_and_project_cuts != GENERATE_ALWAYS || 
-	      !par->lift_and_project_generated_in_root){
+	  if (is_top_iter){
 	     par->lift_and_project_generated_in_root = TRUE;
 	  }
 	  PRINT(verbosity, 5,
@@ -3488,7 +3567,15 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    /* create CGL LandP cuts */
    if(par->generate_cgl_landp_cuts > -1){
      if(par->generate_cgl_landp_cuts == GENERATE_ALWAYS || 
-	is_rootnode || par->landp_generated_in_root){
+	 (par->generate_cgl_landp_cuts == GENERATE_ONLY_IN_ROOT &&
+	  is_rootnode && par->landp_generated_in_root) || 
+	((par->generate_cgl_landp_cuts == GENERATE_DEFAULT ||
+	  par->generate_cgl_landp_cuts == GENERATE_IF_IN_ROOT) &&
+	 par->landp_generated_in_root) ||
+	(par->generate_cgl_landp_cuts == GENERATE_PERIODICALLY &&
+	 (lp_data->lp_count % par->generate_cgl_cuts_freq == 0)) ||
+	 is_top_iter){
+				     
 	/* make basis ready first */
 	//lp_data->si->initialSolve(); 
 	//termcode = dual_simplex(lp_data, &iterd); 
@@ -3501,8 +3588,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	CglLandP *landp = new CglLandP;
        landp->generateCuts(*(lp_data->si), cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	  if (par->generate_cgl_landp_cuts != GENERATE_ALWAYS || 
-	      !par->landp_generated_in_root){
+	  if (is_top_iter){
 	     par->landp_generated_in_root = TRUE;
 	  }
 	  PRINT(verbosity, 5,

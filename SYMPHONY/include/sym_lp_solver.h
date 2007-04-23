@@ -204,7 +204,7 @@ typedef struct LPDATA{
    double     *pseudo_costs_one;
    double     *pseudo_costs_zero;
 #endif
-
+   int         lp_count;
    cgl_params  cgl;
 
 }LPdata;

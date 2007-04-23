@@ -239,6 +239,7 @@ int fathom_branch(lp_prob *p)
 
       p->iter_num++;
       p->node_iter_num++;
+      lp_data->lp_count++;
 
       PRINT(p->par.verbosity, 2,
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));

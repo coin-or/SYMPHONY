@@ -2023,8 +2023,9 @@ int generate_cuts_in_lp_u(lp_prob *p)
 #ifdef USE_CGL_CUTS
       if (p->par.cgl.generate_cgl_cuts){
 	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
-			   p->bc_index < 1 ? TRUE: FALSE, p->par.verbosity);
-	 if(p->bc_index < 1){
+			   (p->bc_index < 1)? TRUE: FALSE, 
+			   p->par.verbosity);
+	 if(p->bc_index < 1 && p->iter_num == 1 ){
 	    p->par.cgl = 
 	       lp_data->cgl;
 	 }

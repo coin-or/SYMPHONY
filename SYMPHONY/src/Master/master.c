@@ -277,15 +277,16 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fixed_to_ub_frac_before_logical_fixing = .01;
 
    lp_par->cgl.generate_cgl_cuts = TRUE;
+   lp_par->cgl.generate_cgl_cuts_freq = 5; 
    lp_par->cgl.generate_cgl_gomory_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_redsplit_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_knapsack_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_oddhole_cuts = GENERATE_DEFAULT;
-   lp_par->cgl.generate_cgl_clique_cuts = DO_NOT_GENERATE;
+   lp_par->cgl.generate_cgl_clique_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_probing_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_mir_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_twomir_cuts = DO_NOT_GENERATE;
-   lp_par->cgl.generate_cgl_flow_and_cover_cuts = DO_NOT_GENERATE;
+   lp_par->cgl.generate_cgl_flow_and_cover_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_rounding_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_lift_and_project_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_landp_cuts = DO_NOT_GENERATE;
@@ -4826,7 +4827,12 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       return(0);
    }
    else if (strcmp(key, "generate_cgl_cuts") == 0 ||
-	    strcmp(key, "generate_cgl_cuts") == 0){
+	    strcmp(key, "LP_generate_cgl_cuts") == 0){
+      *value = cg_par->do_findcuts;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_cuts_freq") == 0){
       *value = cg_par->do_findcuts;
       return(0);
    }

@@ -31,6 +31,7 @@ typedef struct CUT_TIME_OUT{
 typedef struct CGL_PARAMS{
    /* Cut generation in LP */
    int               generate_cgl_cuts;
+   int               generate_cgl_cuts_freq;
    int               generate_cgl_gomory_cuts;
    int               generate_cgl_redsplit_cuts;
    int               generate_cgl_knapsack_cuts;

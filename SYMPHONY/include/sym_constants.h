@@ -504,9 +504,10 @@
 /*-------------------- xxx_cuts_generation_levels ---------------------------*/
 #define DO_NOT_GENERATE        -1
 #define GENERATE_DEFAULT        0
-#define GENERATE_IF_IN_ROOT     1    /*default*/
-#define GENERATE_ALWAYS         2 
-#define GENERATE_PERIODICALLY   3
+#define GENERATE_ONLY_IN_ROOT   1
+#define GENERATE_IF_IN_ROOT     2    /*default*/
+#define GENERATE_ALWAYS         3 
+#define GENERATE_PERIODICALLY   4
 
 /*****************************************************************************
  *****************************************************************************
