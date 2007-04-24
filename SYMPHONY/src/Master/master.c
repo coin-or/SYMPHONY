@@ -291,6 +291,19 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.generate_cgl_lift_and_project_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_landp_cuts = DO_NOT_GENERATE;
 
+   lp_par->cgl.generate_cgl_gomory_cuts_freq = 
+      lp_par->cgl.generate_cgl_redsplit_cuts_freq = 
+      lp_par->cgl.generate_cgl_knapsack_cuts_freq = 
+      lp_par->cgl.generate_cgl_oddhole_cuts_freq = 
+      lp_par->cgl.generate_cgl_clique_cuts_freq = 
+      lp_par->cgl.generate_cgl_probing_cuts_freq = 
+      lp_par->cgl.generate_cgl_mir_cuts_freq = 
+      lp_par->cgl.generate_cgl_twomir_cuts_freq = 
+      lp_par->cgl.generate_cgl_flow_and_cover_cuts_freq = 
+      lp_par->cgl.generate_cgl_rounding_cuts_freq = 
+      lp_par->cgl.generate_cgl_lift_and_project_cuts_freq = 
+      lp_par->cgl.generate_cgl_landp_cuts_freq = 5;
+   
    lp_par->cgl.gomory_generated_in_root = FALSE;
    lp_par->cgl.redsplit_generated_in_root = FALSE;
    lp_par->cgl.knapsack_generated_in_root = FALSE;

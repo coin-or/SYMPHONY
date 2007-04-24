@@ -45,6 +45,19 @@ typedef struct CGL_PARAMS{
    int               generate_cgl_lift_and_project_cuts;
    int               generate_cgl_landp_cuts;
 
+   int               generate_cgl_gomory_cuts_freq;
+   int               generate_cgl_redsplit_cuts_freq;
+   int               generate_cgl_knapsack_cuts_freq;
+   int               generate_cgl_oddhole_cuts_freq;
+   int               generate_cgl_probing_cuts_freq;
+   int               generate_cgl_mir_cuts_freq;
+   int               generate_cgl_twomir_cuts_freq;
+   int               generate_cgl_clique_cuts_freq;
+   int               generate_cgl_flow_and_cover_cuts_freq;
+   int               generate_cgl_rounding_cuts_freq;
+   int               generate_cgl_lift_and_project_cuts_freq;
+   int               generate_cgl_landp_cuts_freq;
+
    int               gomory_generated_in_root;
    int               redsplit_generated_in_root;
    int               knapsack_generated_in_root;
