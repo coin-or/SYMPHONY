@@ -1027,56 +1027,61 @@ int check_tailoff(lp_prob *p)
    double sum, ub;
    int maxsteps = MAX(gap_backsteps, obj_backsteps);
 
-   if (gap_backsteps < 1 && obj_backsteps < 2)
-      /* The user asks for tailoff (since we came to this
-	 function) yet doesn't want to check any kind of tailoff (since this
-	 condition is true). Report no tailoff. */
-      return(FALSE);
+   if (gap_backsteps >= 1 || obj_backsteps >= 2) {
 
-   /* shift the data in obj_hist by one to the right and insert the
-      most recent objval to be the 0th */
-   for (i = MIN(p->node_iter_num-1, maxsteps) - 1; i >= 0; i--)
-      obj_hist[i+1] = obj_hist[i];
-   obj_hist[0] = p->lp_data->objval;
+      /* shift the data in obj_hist by one to the right and insert the
+	 most recent objval to be the 0th */
+      for (i = MIN(p->node_iter_num-1, maxsteps) - 1; i >= 0; i--)
+	 obj_hist[i+1] = obj_hist[i];
+      obj_hist[0] = p->lp_data->objval;
 
-   /* If the history is not long enough then just return */
-   if (p->node_iter_num <= MIN(gap_backsteps, obj_backsteps))
-      return(FALSE);
+      /* if there is an upper bound and we want gap based tailoff:
+	 tailoff_gap is false if the average of the consecutive gap ratios is
+	 less than gap_frac */
+      if (p->node_iter_num>gap_backsteps && p->has_ub && gap_backsteps > 0) {
+	 ub = p->ub;
+	 for (i = 1, sum = 0; i <= gap_backsteps; i++)
+	    sum += (ub - obj_hist[i-1]) / (ub - obj_hist[i]);
+	 if (sum / gap_backsteps > p->par.tailoff_gap_frac)
+	    PRINT(p->par.verbosity, 3, ("Branching because of tailoff in gap!\n"));
+	 return(TRUE); /* there is tailoff */
+      }
 
-   /* if there is an upper bound and we want gap based tailoff:
-      tailoff_gap is false if the average of the consecutive gap ratios is
-      less than gap_frac */
-   if (p->has_ub && gap_backsteps > 0) {
-      ub = p->ub;
-      for (i = 1, sum = 0; i <= gap_backsteps; i++)
-	 sum += (ub - obj_hist[i-1]) / (ub - obj_hist[i]);
-      if (sum / gap_backsteps < p->par.tailoff_gap_frac)
-	 return(FALSE); /* no tailoff */
-   }
-
-   /* if we want objective value based tailoff:
-      tailoff_obj is false if the average of the objective difference ratios
-      is greater than obj_frac */
-   if (obj_backsteps > 1){
-      for (i = 2, sum = 0; i <= obj_backsteps; i++){
-	 if (obj_hist[i-1] - obj_hist[i] > p->lp_data->lpetol){
-	    sum += (obj_hist[i-2]-obj_hist[i-1]) / (obj_hist[i-1]-obj_hist[i]);
-	 }else if (obj_hist[i-2] - obj_hist[i-1] > p->lp_data->lpetol){
-	    sum += 1;
+      /* if we want objective value based tailoff:
+	 tailoff_obj is true if the average of the objective difference
+	 ratios is smaller than par.tailoff_obj_frac */
+      if (p->node_iter_num>=obj_backsteps){
+	 for (i = 2, sum = 0; i <= obj_backsteps; i++){
+	    if (obj_hist[i-1] - obj_hist[i] > p->lp_data->lpetol){
+	       sum += (obj_hist[i-2]-obj_hist[i-1]) / (obj_hist[i-1]-obj_hist[i]);
+	    }else if (obj_hist[i-2] - obj_hist[i-1] > p->lp_data->lpetol){
+	       sum += 1;
+	    }
+	 }
+	 if (sum / (obj_backsteps - 1) < p->par.tailoff_obj_frac){
+	    PRINT(p->par.verbosity, 3, ("Branching because of tailoff in objective function!\n"));
+	    return(TRUE); /* there is tailoff */
 	 }
       }
-      if (sum / (obj_backsteps - 1) > p->par.tailoff_obj_frac){
-	 return(FALSE); /* no tailoff */
+
+      /* Another check. All other checks seem to show that there is no
+       * tailoff yet. 
+       */
+      if (p->node_iter_num>1 && 
+	    obj_hist[0] - obj_hist[1] < p->par.tailoff_absolute){
+	 PRINT(p->par.verbosity, 3, ("Branching because of tailoff in value of objective function!\n"));
+	 return(TRUE);
       }
+
+   } else {
+      /* Both gap_backsteps and obj_backsteps are too small to procede with
+         check_tailoff. The user asks for tailoff (since we came to this
+	 function) yet doesn't want to check any kind of tailoff (since this
+	 condition is true). Report no tailoff. */
+      return(FALSE); /* no tailoff */
    }
 
-   if (obj_hist[0] - obj_hist[1] > p->par.tailoff_absolute){
-      return(FALSE);
-   }
-   
-   PRINT(p->par.verbosity, 3, ("Branching because of tailoff!\n"));
-
-   return(TRUE); /* gone thru everything ==> tailoff */
+   return(FALSE); /* gone thru everything ==> no tailoff */
 }
 
 /*===========================================================================*/
