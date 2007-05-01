@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -575,8 +575,26 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	 write_pruned_nodes(tm, n);
       if (tm->par.keep_description_of_pruned == DISCARD ||
 	  tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
-	 purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-			    VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
+	    int vbc_node_pr_reason;
+	    switch (node_type) {
+	     case INFEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_INFEASIBLE;
+	       break;
+	     case OVER_UB_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_FATHOMED;
+	       break;
+	     case FEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
+	       break;
+	     default:
+	       vbc_node_pr_reason = VBC_PRUNED;
+	    }
+	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
+	 } else {
+	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
+		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 }
       }
       return;
    }
@@ -675,7 +693,55 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 		       VBC_INTERIOR_NODE);
 	       fclose(f); 
 	    }
-	 }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
+	 }
+#ifdef COMPILE_IN_LP
+	 /* FIXME: This currently only works in sequential mode */
+	 else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW){
+	    FILE *f;
+#pragma omp critical(write_vbc_emulation_file)
+	    if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
+	       printf("\nError opening vbc emulation file\n\n");
+	    }else{
+	       /* calculate measures of infeasibility */
+	       double sum_inf = 0;
+	       int num_inf = 0;
+
+               for (int i=0;i<tm->lpp[n->lp]->lp_data->n;i++) {
+                  double v = tm->lpp[n->lp]->lp_data->x[i];
+		  if (tm->lpp[n->lp]->lp_data->vars[i]->is_int) {
+		     if (fabs(v-floor(v+0.5))>tm->lpp[n->lp]->lp_data->lpetol){
+			num_inf++;
+			sum_inf = sum_inf + fabs(v-floor(v+0.5));
+		     }
+		  }
+	       }
+
+	       char reason[50];
+	       PRINT_TIME2(tm, f);
+	       sprintf(reason, "%s %i", "branched", n->bc_index + 1);
+	       if (n->bc_index==0) {
+		  sprintf(reason, "%s %i", reason, 0);
+	       } else {
+		  sprintf(reason, "%s %i", reason, n->parent->bc_index + 1);
+	       }
+
+	       char branch_dir='M';
+	       if (n->bc_index>0) {
+		  if (n->parent->children[0]==n) {
+		     branch_dir = 'L';
+		  } else {
+		     branch_dir = 'R';
+		  }
+	       }
+	       sprintf(reason, "%s %c %f %f %i", reason, branch_dir,
+		       tm->lpp[n->lp]->lp_data->objval+
+		       tm->lpp[n->lp]->mip->obj_offset, sum_inf, num_inf);
+	       fprintf(f, "%s\n", reason);
+	       fclose(f); 
+	    }
+	 }
+#endif
+	 else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
 	    printf("$P %i %i\n", n->bc_index + 1, VBC_INTERIOR_NODE);
 	 }
 	 break;
@@ -710,8 +776,27 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_FULL ||
 	  tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
 	 write_pruned_nodes(tm, n);
-	 purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-			    VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+	    int vbc_node_pr_reason;
+	    switch (node_type) {
+	     case INFEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_INFEASIBLE;
+	       break;
+	     case OVER_UB_PRUNED:
+	       vbc_node_pr_reason = VBC_PRUNED_FATHOMED;
+	       break;
+	     case FEASIBLE_PRUNED:
+	       vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
+	       break;
+	     default:
+	       vbc_node_pr_reason = VBC_PRUNED;
+	    }
+	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
+	 }
+	 else {
+	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
+		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+	 }
       }
    }
 }
@@ -911,31 +996,22 @@ char process_messages(tm_prob *tm, int r_bufid)
 
 void process_ub_message(tm_prob *tm)
 {
-   int s_bufid;
+   int s_bufid, bc_index, feasible;
    double new_ub;
+   char branching;
+      
    /* A new best solution has been found. The solution is sent
     * to the master, but the bound comes here, too.*/
    receive_dbl_array(&new_ub, 1);
+   receive_int_array(&bc_index, 1);
+   receive_int_array(&feasible, 1);
+   receive_char_array(&branching, 1);
    if ((!tm->has_ub) || (tm->has_ub && new_ub < tm->ub)){
-      tm->has_ub = TRUE;
-      tm->ub = new_ub;
+      install_new_ub(tm, new_ub, 0, bc_index, branching, feasible);
       s_bufid = init_send(DataInPlace);
       send_dbl_array(&tm->ub, 1);
       msend_msg(tm->lp.procs, tm->lp.procnum, UPPER_BOUND);
       freebuf(s_bufid);
-   }
-   if (tm->par.vbc_emulation == VBC_EMULATION_FILE){
-      FILE *f;
-#pragma omp critical(write_vbc_emulation_file)
-      if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
-	 printf("\nError opening vbc emulation file\n\n");
-      }else{
-	 PRINT_TIME(tm, f);
-	 fprintf(f, "U %.2f \n", tm->ub);
-	 fclose(f); 
-      }
-   }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
-      printf("$U %.2f\n", tm->ub);
    }
 }
 

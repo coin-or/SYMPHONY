@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
 /*                                                                           */
@@ -175,6 +175,8 @@ int *create_edge_list(vrp_problem *vrp, int *varnum, char which_edges)
       }
       /*Now, we have exhausted the small graph so just add all non-zero
 	edges*/
+      while (j < zero_varnum && k > zero_vars[j])
+	 j++;
       for (; k<total_edgenum && j<zero_varnum; k++)
 	 if (k < zero_vars[j])
 	    uind[(*varnum)++] = k;

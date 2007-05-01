@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -46,6 +46,9 @@ int main(int argc, char **argv)
    /* Create a SYMPHONY environment */
    sym_environment *env = sym_open_environment();
 
+   /* Print version info */
+   version();
+   
    /* Create the data structure for storing the problem instance.*/
    user_problem *prob = (user_problem *)calloc(1, sizeof(user_problem));
    
@@ -55,7 +58,7 @@ int main(int argc, char **argv)
 
    if(prob->par.test){
 
-     match_test (env);
+      match_test (env);
 
    } else {
     

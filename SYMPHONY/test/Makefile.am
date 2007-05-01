@@ -49,7 +49,7 @@ endif
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSym`
 
-AM_CPPFLAGS += -DCOIN_HAS_SYM
+AM_CPPFLAGS += -DCOIN_HAS_SYMPHONY
 
 # List all additionally required solver and Osi libraries
 
@@ -158,6 +158,27 @@ endif
 
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 
+TestLDADD = $(LDADD)
+TestLINK = 
+if USE_CL
+TestLINK += cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
+	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
+	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
+	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
+	cp -f OsiSolverInterfaceTest.$(OBJEXT) unitTest-OsiSolverInterfaceTest.$(OBJEXT); \
+	cp -f OsiSymSolverInterfaceTest.$(OBJEXT) unitTest-OsiSymSolverInterfaceTest.$(OBJEXT); \
+	cp -f unitTestSym.$(OBJEXT) unitTest-unitTestSym.$(OBJEXT); \
+	$(LIBTOOL) \
+	--tag=CXX --mode=link $(CXX) $(AM_CFLAGS) $(CCLCFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+TestLDADD += OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
+	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
+	OsiSolverInterfaceTest.$(OBJEXT) OsiSymSolverInterfaceTest.$(OBJEXT) \
+	 unitTestSym.$(OBJEXT)
+else 
+TestLINK += $(CXXLINK)
+endif
+
 noinst_PROGRAMS = unitTest punitTest
 
 unitTest_SOURCES = \
@@ -169,6 +190,7 @@ unitTest_SOURCES = \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
+
 punitTest_SOURCES = \
 	$(test_srcdir)/OsiColCutTest.cpp \
 	$(test_srcdir)/OsiCutsTest.cpp \
@@ -178,10 +200,11 @@ punitTest_SOURCES = \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
-unitTest_DEPENDENCIES = $(LDADD) $(SYMLIB)
+unitTest_DEPENDENCIES = $(TestLDADD) $(SYMLIB)
 unitTest_CPPFLAGS = $(SYMCPPFLAGS)
 unitTest_LDADD = $(SYMLIB) $(ALLLDADD)
 unitTest_LDFLAGS = -rpath $(libdir)
+unitTest_LINK = $(TestLINK)
 
 punitTest_DEPENDENCIES = $(LDADD) $(SYMPLIB)
 punitTest_CPPFLAGS = $(SYMPCPPFLAGS)
@@ -192,19 +215,19 @@ punitTest_LDFLAGS = -rpath $(libdir)
 # We are using the Cbc solver executable to do the unit test
 
 test: unitTest$(EXEEXT)
-	cd ../../Data/miplib3; make uncompress
-	cd ../../Data/Netlib; make uncompress
+	cd ../../Data/miplib3; $(MAKE) uncompress
+	cd ../../Data/Netlib; $(MAKE) uncompress
 	./unitTest$(EXEEXT)
 #-T $(DATAOBJDIR)/miplib3 \
-#	-mpsDir=$(DATAOBJDIR)/Sample \
+#	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 
 ptest: punitTest$(EXEEXT)
-	cd ../../Data/miplib3; make uncompress
-	cd ../../Data/Netlib; make uncompress
+	cd ../../Data/miplib3; $(MAKE) uncompress
+	cd ../../Data/Netlib; $(MAKE) uncompress
 	./punitTest$(EXEEXT) -p 2
 #-T $(DATAOBJDIR)/miplib3 \
-#	-mpsDir=$(DATAOBJDIR)/Sample \
+#	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 .PHONY: test ptest
 

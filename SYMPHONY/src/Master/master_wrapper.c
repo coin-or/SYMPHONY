@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -78,6 +78,8 @@ int readparams_u(sym_environment *env, int argc, char **argv)
 	 if (tmp != '-')
 	    continue;
 	 switch (c) {
+	  case 'L':  
+	    env->par.file_type = LP_FORMAT;
 	  case 'F':
 	    if (i < argc - 1){
 	      sscanf(argv[i+1], "%c", &tmp); 
@@ -166,15 +168,25 @@ int io_u(sym_environment *env)
 	 printf("Reading input file...\n\n");
       }
       if (strcmp(env->par.datafile, "") == 0){
-	 err = read_mps(env->mip, env->par.infile, env->probname);
-	 if (err != 0){
-	    printf("\nErrors in reading mps file\n");
-	    return (ERROR__READING_MPS_FILE);
+	 if (env->par.file_type == LP_FORMAT){
+	    err = read_lp(env->mip, env->par.infile, env->probname);
+	    env->par.file_type == 0;
+	    if (err != 0){
+	       printf("\nErrors in reading LP file\n");
+	       return (ERROR__READING_LP_FILE);
+	    }
+	 }else {
+	    err = read_mps(env->mip, env->par.infile, env->probname);
+	    if (err != 0){
+	       printf("\nErrors in reading mps file\n");
+	       return (ERROR__READING_MPS_FILE);
+	    }
 	 }
       }else{
 #ifdef USE_GLPMPL
 	 err = read_gmpl(env->mip, env->par.infile, 
 			 env->par.datafile, env->probname);
+	 env->par.file_type == 0;
 	 if(!err){
 	    printf("\nErrors in reading gmpl file\n");
 	    return (ERROR__READING_GMPL_FILE);
@@ -478,11 +490,14 @@ int send_lp_data_u(sym_environment *env, int sender)
       tm->lpp[i]->draw_graph = env->dg_tid;
       tm->lpp[i]->base = *(env->base);
       tm->lpp[i]->mip = env->mip;
+   }
 
 #ifdef USE_SYM_APPLICATION
+   for (i = 0; i < tm->par.max_active_nodes; i ++){
       CALL_USER_FUNCTION( user_send_lp_data(env->user, &(tm->lpp[i]->user)) );
-#endif
    }
+#endif
+
 #else   
    int s_bufid;
 
@@ -568,11 +583,13 @@ int send_cg_data_u(sym_environment *env, int sender)
       tm->cgp[i]->par = env->par.cg_par;
       
       tm->cgp[i]->draw_graph = env->dg_tid;
+   }
 #ifdef USE_SYM_APPLICATION      
+   for (i = 0; i < tm->par.max_active_nodes; i++){
       CALL_USER_FUNCTION( user_send_cg_data(env->user,
 					    &(tm->lpp[i]->cgp->user)) );
-#endif
    }
+#endif
 #else
    int s_bufid;
 
@@ -629,7 +646,7 @@ int display_solution_u(sym_environment *env, int thread_num)
 
    sol.xlength = 0;
 
-   if (env->par.verbosity < 0){
+   if (env->par.verbosity < -1){
        return(FUNCTION_TERMINATED_NORMALLY);
    }     
    
@@ -676,50 +693,52 @@ int display_solution_u(sym_environment *env, int thread_num)
    user_res = USER_DEFAULT;
 #endif
 
-   switch(user_res){
-    case USER_SUCCESS:
-      return(FUNCTION_TERMINATED_NORMALLY);
-    case USER_DEFAULT:
-      if (sol.xlength){
-	 if (env->mip->colname){ 
-	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    printf("Column names and values of nonzeros in the solution\n");
-	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    for (i = 0; i < sol.xlength; i++){
-	       if (sol.xind[i] == env->mip->n){
-		  continue;
-	       }
-	       printf("%8s %10.3f\n", env->mip->colname[sol.xind[i]],
-		      sol.xval[i]);
-	    }
-	    printf("\n");
-	 }else{
-	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    printf("User indices and values of nonzeros in the solution\n");
-	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    for (i = 0; i < sol.xlength; i++){
-	       if (sol.xind[i] == env->mip->n){
-		  continue;
-	       }
-	       printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
-	    }
-	    printf("\n");
-	 }
-	 
-	 return(FUNCTION_TERMINATED_NORMALLY);
-      }else{
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf("All columns are zero in the solution!\n");
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 return(FUNCTION_TERMINATED_NORMALLY);
+   if (env->par.verbosity > -1){
+      switch(user_res){
+       case USER_SUCCESS:
+	  return(FUNCTION_TERMINATED_NORMALLY);
+       case USER_DEFAULT:
+	  if (sol.xlength){
+	     if (env->mip->colname){ 
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		printf("Column names and values of nonzeros in the solution\n");
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		for (i = 0; i < sol.xlength; i++){
+		   if (sol.xind[i] == env->mip->n){
+		      continue;
+		   }
+		   printf("%8s %10.3f\n", env->mip->colname[sol.xind[i]],
+			  sol.xval[i]);
+		}
+		printf("\n");
+	     }else{
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		printf("User indices and values of nonzeros in the solution\n");
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		for (i = 0; i < sol.xlength; i++){
+		   if (sol.xind[i] == env->mip->n){
+		      continue;
+		   }
+		   printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+		}
+		printf("\n");
+	     }
+	     
+	     return(FUNCTION_TERMINATED_NORMALLY);
+	  }else{
+	     printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	     printf("All columns are zero in the solution!\n");
+	     printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	     return(FUNCTION_TERMINATED_NORMALLY);
+	  }
+       case USER_ERROR:
+	  return(FUNCTION_TERMINATED_NORMALLY);
+	  
+       default:
+	  return(FUNCTION_TERMINATED_NORMALLY);
       }
-    case USER_ERROR:
-      return(FUNCTION_TERMINATED_NORMALLY);
-      
-    default:
-      return(FUNCTION_TERMINATED_NORMALLY);
    }
-
+   
    return(FUNCTION_TERMINATED_NORMALLY);
 }
 

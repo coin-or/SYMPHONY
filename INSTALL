@@ -1,7 +1,7 @@
 BUILDING AND INSTALLING SYMPHONY Version 5.1
 ============================================
 
-The following are brief instricutions that should be sufficient to install
+The following are brief instructions that should be sufficient to install
 SYMPHONY with default configuration settings in most cases. For more detailed
 installation instructions and for more information on custom configurations,
 please see the SYMPHONY user's manual, which can be downloaded from
@@ -38,7 +38,7 @@ obtain SYMPHONY from source using SVN in most cases:
 Alternatively, you can download release versions of the source code 
 from  the download page of COIN-OR:
 
-  http://www.coin-or.org/Tarballs/SYMPHONY/
+  http://www.coin-or.org/download/source/SYMPHONY
 
 If the code is obtained as a tarball, unpack the distribution with "tar -xzf
 SYMPHONY-XX.tgz" where XX is the version number. This will
@@ -74,8 +74,17 @@ flag.
 In order to read GMPL files, you need to have the GLPK package and SYMPHONY
 has to be configured with
 
-  ./configure --with-gmpl --with-glpk-lib[=GLPK library] 
-              --with-glpk-incdir[=GLPK include dir] 
+  ./configure --with-gmpl --with-glpk-lib="-L/usr/lib -lglpk" 
+              --with-glpk-incdir=/usr/include 
+
+assuming that the GLPK library and header files are located in 
+/usr/lib and /usr/include directories. 
+
+It is possible to use compilers oter than the default (which is g++). For
+example, to perform at automated build of SYMPHONY using the MSVC++ compiler
+'cl' with GNU autotools in the CYGWIN environment configure with
+
+ ./configure CC=cl CXX=cl LD=link
 
 BUILDING
 ========
@@ -251,10 +260,10 @@ command-line with MSVC++ executable, or use the NMAKE utility.
 
 ******************** Building With the MSVC++ IDE ****************************
 
-These instructions are for MSVC++ Version 6. Instructions for other versions
+These instructions are for MSVC++ Version 8. Instructions for other versions
 should be similar.
 
-1. Go to 'Win32/v6' directory and open the workspace 'symphony.dsw'. 
+1. Go to 'Win32/v8' directory and open the solution file 'symphony.sln'. 
 
 2. Note that there are a number of additional preprocessor definitions that
 control the functionality of SYMPHONY. These definitions are described in
@@ -268,21 +277,14 @@ want to enable GMPL reader option, you need to
   - add USE_GLPMPL to the defines
   - add the GLPK library to the workspace
 
-2.  Make sure that the project 'symphony' is set as the active project from 
-the Project/Set Active menu. Choose "Build symphony.exe" from the Build menu. 
-This should successfully build the SYMPHONY library and the corresponding 
-executable.
+2. Make sure that the project 'symphony' is set as the startup project by
+choosing "Set as Startup Project" from the Project menu after selecting the
+symphony project in the Solution Explorer. Choose "Build Solution" from the
+Build menu. This should successfully build the SYMPHONY library and the
+corresponding executable.
 
-3. To test the executable, right click on the symphony project, go to the
-"Debug" tab and set the program arguments to 
-"-F ..\..\SYMPHONY\Datasets\sample.mps". 
-Note that command-line switches are Unix-style. If you want to use the 
-interactive optimizer, leave this tab empty. 
-
-4. Now choose "Execute" from the build menu and the solver should solve the
-given sample problem. If you have not specified the sample problem, then 
-the interactive optimizer should start. In this case, type "help" or "?" to 
-see a list of available commands
+3. To test the executable, go to the "Debug" tab and choose "Start Without
+Debugging." and then type "help" or "?" to see a list of available commands.
 
 Note that there is some functionality missing from the Windows version. Most
 prominently, the timing functions do not work. In addition, the Windows
@@ -296,21 +298,21 @@ LP solvers.
 
 ***************** Building in a Windows Terminal ***************************
 
-These instructions are for MSVC++ Version 6. Instructions for other versions
+These instructions are for MSVC++ Version 8. Instructions for other versions
 should be similar.
 
 1. Open a command line terminal. Go to 'Win32/v6' directory and type 
 
-   msdev symphony.dsw /make all    
+   devenv symphony.sln /build all    
 
 This will create both the debug and release versions of SYMPHONY. If you 
 want to compile only one of them, type 
  
-   msdev symphony.dsw /make "all - debug" 
+   devenv symphony.sln /build "all - debug" 
 
 or 
 
-   msdev symphony.dsw /make "all - release" 
+   devenv symphony.sln /build "all - release" 
 
 For each command, the library 'libSymphony.lib' and the executable 
 'symphony' will be created in 'Debug' and/or 'Release' directories.  The 
@@ -331,26 +333,32 @@ and then type "help" or "?" to see a list of available commands.
 
 3. If SYMPHONY is modified, type 
 
-   msdev symphony.dsw /make all /rebuild
+   devenv symphony.sln /rebuild all 
 
 in order to clean and rebuild everything. 
 
+*************** Building With the MSVC++ compiler in CYGWIN *******************
+
+It is possible to perform at automated build of SYMPHONY using the MSVC++
+compiler 'cl' with GNU autotools in the CYGWIN environment. To do so, follow
+the instuctions for building in Unix-like environments, except when
+configuring, use the command
+
+ ./configure CC=cl CXX=cl LD=link
+
 ******************** Building With the NMAKE Utility **************************
 
-These instructions are for MSVC++ Version 6. Instructions for other versions
-should be similar.
-
-1.  Go to 'Win32/v6' directory and edit the 'sym.mak' makefile to reflect 
+1.  Go to 'Win32' directory and edit the 'sym.mak' makefile to reflect 
 your environment. This involves specifying the LP solver to be used, 
 assigning some variables and  setting various paths. Only minor edits 
 should be required. An explanation of what has to be set is contained in the 
 comments in the makefile.  Note that, you have to first create the COIN 
-libraries Cgl, Clp, Osi, OsiClp and CoinUtils which reside in Win32/v6 
+libraries Cgl, Clp, Osi, OsiClp and CoinUtils which reside in Win32/v8 
 directory.
 
 2. Once configuration is done, open a command line terminal and type 
 
-   nmake /f sym.mak
+   nmake sym.mak
 
 This will make the SYMPHONY library 'libSymphony.lib' and the executable 
 'symphony' in 'Debug' directory. The library, together with the header files 

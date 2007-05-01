@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
 /*                                                                           */
@@ -16,10 +16,11 @@
 /* system include files */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <math.h>
 
 /* SYMPHONY include files */
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#include "sym_master.h"
+/*___END_EXPERIMENTAL_SECTION___*/
 #include "sym_macros.h"
 #include "sym_constants.h"
 #include "sym_proccomm.h"
@@ -59,10 +60,10 @@
 \*===========================================================================*/
 
 void user_usage(void){
-   printf("master [ -HEPT ] [ -S file ] [ -F file ] [ -B rule ]\n\t"
+   printf("vrp [ -HEPT ] [ -S file ] [ -F file ] [ -B rule ]\n\t"
 	  "[ -V sel ] [ -K closest ] [ -N routes ] [ -C capacity ]\n"
 	  "\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
-	  "\t%s\n\t%s\n"
+	  "\t%s\n\t%s\n\t%s\n"
           "\n",
 	  "-H: help",
 	  "-E: use sparse edge set",
@@ -339,7 +340,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
 			      int *colgen_strat)
 {
    vrp_problem *vrp = (vrp_problem *)user;
-   int cap_check, total_demand = 0, base_varnum = 0, v1, v0;
+   int base_varnum = 0;
    int i, j, k, l;
    int zero_varnum, *zero_vars;
    int vertnum = vrp->vertnum;
@@ -489,17 +490,14 @@ int user_send_lp_data(void *user, void **user_lp)
       the LP is not running separately. This code should be virtually
       identical to that of user_receive_lp_data() in the LP process.*/
    
-   vrp_lp_problem *vrp_lp = (vrp_lp_problem *) calloc(1, sizeof(vrp_lp_problem));
-   int zero_varnum = vrp->zero_varnum;
-   int *zero_vars = vrp->zero_vars;
-   int vertnum, i, j, k, l;
-
+   vrp_lp_problem *vrp_lp = (vrp_lp_problem *) calloc(1,
+						      sizeof(vrp_lp_problem));
    *user_lp = (void *)vrp_lp;
    
    vrp_lp->par = vrp->lp_par;
    vrp_lp->window = vrp->dg_id;
    vrp_lp->numroutes = vrp->numroutes;
-   vertnum = vrp_lp->vertnum = vrp->vertnum;
+   vrp_lp->vertnum = vrp->vertnum;
    vrp_lp->edges = vrp->edges;
    vrp_lp->demand = vrp->demand;
    vrp_lp->capacity = vrp->capacity;

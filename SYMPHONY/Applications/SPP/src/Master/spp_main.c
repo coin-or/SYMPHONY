@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2005-2006 Ted Ralphs. All Rights Reserved.             */
+/* (c) Copyright 2000-2005-2007 Ted Ralphs. All Rights Reserved.             */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -68,6 +68,8 @@ int main(int argc, char **argv)
 
    sym_environment *env = sym_open_environment();
 
+   version();
+      
    CALL_FUNCTION( sym_parse_command_line(env, argc, argv) );
 
    CALL_FUNCTION( sym_get_user_data(env, (void **)&spp) );

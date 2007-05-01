@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
 /*                                                                           */
@@ -1003,3 +1003,77 @@ void construct_feasible_solution(vrp_lp_problem *vrp, network *n,
    printf("\n\n");
 }
 
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef TRACE_PATH
+
+#include "sym_lp.h"
+
+void check_lp(lp_prob *p)
+{
+   LPdata *lp_data = p->lp_data;
+   int i, j, l;
+   tm_prob *tm = p->tm;
+   double *x = (double *) malloc(tm->feas_sol_size * DSIZE), lhs, cost = 0;
+   double *lhs_totals = (double *) calloc(lp_data->m, DSIZE);
+   MakeMPS(lp_data, 0, 0);
+
+   get_x(lp_data);
+
+   printf("Optimal Fractional Solution: %.10f\n", lp_data->lpetol);
+   for (i = 0; i < lp_data->n; i++){
+      if (lp_data->x[i] > lp_data->lpetol){
+	 printf("uind: %i colind: %i value: %.10f cost: %f\n",
+		lp_data->vars[i]->userind, i, lp_data->x[i], lp_data->obj[i]);
+      }
+      cost += lp_data->obj[i]*lp_data->x[i];
+   }
+   printf("Cost: %f\n", cost);
+   
+   printf("\nFeasible Integer Solution:\n");
+   for (cost = 0, i = 0; i < tm->feas_sol_size; i++){
+      printf("uind: %i ", tm->feas_sol[i]);
+      for (j = 0; j < lp_data->n; j++){
+	 if (lp_data->vars[j]->userind == tm->feas_sol[i]){
+	    cost += lp_data->obj[j];
+	    printf("colind: %i lb: %f ub: %f obj: %f\n", j, lp_data->lb[j],
+		   lp_data->ub[j], lp_data->obj[j]);
+	    break;
+	 }
+      }
+      if (j == lp_data->n)
+	 printf("\n\nERROR!!!!!!!!!!!!!!!!\n\n");
+      x[i] = 1.0;
+   }
+   printf("Cost: %f\n", cost);
+
+   printf("\nChecking LP....\n\n");
+   printf("Number of cuts: %i\n", lp_data->m);
+   for (i = 0; i < tm->feas_sol_size; i++){
+      for (j = 0; j < lp_data->n; j++){
+	 if (tm->feas_sol[i] == lp_data->vars[j]->userind)
+	    break;
+      }
+      for (l = lp_data->matbeg[j]; l < lp_data->matbeg[j] + lp_data->matcnt[j];
+	   l++){
+	 lhs_totals[lp_data->matind[l]] += 1;
+      }
+   }
+   for (i = 0; i < p->base.cutnum; i++){
+      printf("Cut %i: %f %c %f\n", i, lhs_totals[i], lp_data->sense[i],
+	     lp_data->rhs[i]);
+   }
+   for (; i < lp_data->m; i++){
+      lhs = compute_lhs(tm->feas_sol_size, tm->feas_sol, x,
+				   lp_data->rows[i].cut, p->base.cutnum);
+      printf("Cut %i: %f %f %c %f\n", i, lhs_totals[i], lhs, lp_data->sense[i],
+	     lp_data->rhs[i]);
+      if (lp_data->rows[i].cut->sense == 'G' ?
+	  lhs < lp_data->rows[i].cut->rhs : lhs > lp_data->rows[i].cut->rhs){
+	 printf("LP: ERROR -- row is violated by feasible solution!!!\n");
+	 sleep(600);
+	 exit(1);
+      }
+   }
+}
+#endif
+/*___END_EXPERIMENTAL_SECTION___*/

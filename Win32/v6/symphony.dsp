@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MLd /W2 /Gm /GR /GX /ZI /Od /I "..\..\Osi\src" /I "..\..\Osi\src\OsiClp" /I "..\..\Clp\src" /I "..\..\CoinUtils\src" /I "..\..\Cgl\src" /I "..\..\Cgl\src\CglLiftAndProject" /I "..\..\Cgl\src\CglFlowCover" /I "..\..\Cgl\src\CglMixedIntegerRounding" /I "..\..\Cgl\src\CglClique" /I "..\..\Cgl\src\CglOddHole" /I "..\..\Cgl\src\CglKnapsackCover" /I "..\..\Cgl\src\CglGomory" /I "..\..\Cgl\src\CglSimpleRounding" /I "..\..\Cgl\src\CglProbing" /I "..\..\BuildTools\headers" /I "..\..\SYMPHONY\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c /Tp
+# ADD CPP /nologo /W2 /GR /GX /O2 /I "..\..\Osi\src" /I "..\..\Osi\src\OsiClp" /I "..\..\Clp\src" /I "..\..\CoinUtils\src" /I "..\..\Cgl\src" /I "..\..\Cgl\src\CglLiftAndProject" /I "..\..\Cgl\src\CglFlowCover" /I "..\..\Cgl\src\CglMixedIntegerRounding" /I "..\..\Cgl\src\CglClique" /I "..\..\Cgl\src\CglOddHole" /I "..\..\Cgl\src\CglKnapsackCover" /I "..\..\Cgl\src\CglGomory" /I "..\..\Cgl\src\CglSimpleRounding" /I "..\..\Cgl\src\CglProbing" /I "..\..\BuildTools\headers" /I "..\..\SYMPHONY\include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /YX /FD /c /Tp
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -64,7 +64,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\Osi\src" /I "..\..\Osi\src\OsiClp" /I "..\..\Clp\src" /I "..\..\CoinUtils\src" /I "..\..\Cgl\src" /I "..\..\Cgl\src\CglLiftAndProject" /I "..\..\Cgl\src\CglFlowCover" /I "..\..\Cgl\src\CglMixedIntegerRounding" /I "..\..\Cgl\src\CglClique" /I "..\..\Cgl\src\CglOddHole" /I "..\..\Cgl\src\CglKnapsackCover" /I "..\..\Cgl\src\CglGomory" /I "..\..\Cgl\src\CglSimpleRounding" /I "..\..\Cgl\src\CglProbing" /I "..\..\BuildTools\headers" /I "..\..\SYMPHONY\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /FD /GZ /c /Tp
+# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\Osi\src" /I "..\..\Osi\src\OsiClp" /I "..\..\Clp\src" /I "..\..\CoinUtils\src" /I "..\..\Cgl\src" /I "..\..\Cgl\src\CglLiftAndProject" /I "..\..\Cgl\src\CglFlowCover" /I "..\..\Cgl\src\CglMixedIntegerRounding" /I "..\..\Cgl\src\CglClique" /I "..\..\Cgl\src\CglOddHole" /I "..\..\Cgl\src\CglKnapsackCover" /I "..\..\Cgl\src\CglGomory" /I "..\..\Cgl\src\CglSimpleRounding" /I "..\..\Cgl\src\CglProbing" /I "..\..\BuildTools\headers" /I "..\..\SYMPHONY\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /FR /YX /FD /GZ /c /Tp
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe

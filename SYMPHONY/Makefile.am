@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+# (c) Copyright 2006-2007 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Common Public License. Please see     #
 # accompanying file for terms.                                              #
@@ -47,20 +47,20 @@ endif
 ########################################################################
 
  test: all
-	cd test; make test
+	cd test; $(MAKE) test
 
  unitTest: test
 
  ptest: all
-	cd test; make ptest
+	cd test; $(MAKE) ptest
 
  punitTest: ptest
 
  clean-local:
-	if test -r test/Makefile; then cd test; make clean; fi
+	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
 
  distclean-local:
-	if test -r test/Makefile; then cd test; make distclean; fi
+	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
 
  .PHONY: test unitTest ptest punitTest
 

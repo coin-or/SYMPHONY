@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* The OSI interface in this file was written by Menal Guzelsoy.             */
 /* The OSL interface was written by Ondrej Medek.                            */
@@ -697,88 +697,80 @@ int is_feasible_u(lp_prob *p, char branching)
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE ||
        feasible == IP_HEUR_FEASIBLE){
       /* Send the solution value to the treemanager */
-      if (!p->has_ub || true_objval < p->ub - p->par.granularity){
-	 p->has_ub = TRUE;
-	 p->ub = true_objval;
-	 if (p->par.set_obj_upper_lim)
-	    set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
-	 if (!p->par.multi_criteria){
-	    p->best_sol.xlevel = p->bc_level;
-	    p->best_sol.xindex = p->bc_index;
-	    p->best_sol.xiter_num = p->iter_num;
-	    p->best_sol.xlength = cnt;
-	    p->best_sol.lpetol = lpetol;
-	    p->best_sol.objval = true_objval;
-	    FREE(p->best_sol.xind);
-	    FREE(p->best_sol.xval);
-	    p->best_sol.xind = (int *) malloc(cnt*ISIZE);
-	    p->best_sol.xval = (double *) malloc(cnt*DSIZE);
-	    memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
-	    memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
-	    if(!p->best_sol.has_sol)
-	       p->best_sol.has_sol = TRUE;
-	    PRINT(p->par.verbosity, -1,
-		  ("\n****** Found Better Feasible Solution !\n"));
-	    if (feasible == IP_HEUR_FEASIBLE){
-	      PRINT(p->par.verbosity, 2,
-		    ("****** After Calling Heuristics !\n"));
-	    }
-	    if (p->mip->obj_sense == SYM_MAXIMIZE){
-	       PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", -true_objval
-					    + p->mip->obj_offset));
-	    }else{
-	       PRINT(p->par.verbosity, -1, ("****** Cost: %f\n\n", true_objval
-					    + p->mip->obj_offset));
-	    }
-	 }
-#ifdef COMPILE_IN_LP
-	 p->tm->has_ub = TRUE;
-	 p->tm->ub = p->ub;
-	 p->tm->opt_thread_num = p->proc_index;
-	 if (p->tm->par.vbc_emulation == VBC_EMULATION_FILE){
-	    FILE *f;
-#pragma omp critical(write_vbc_emulation_file)
-	    if (!(f = fopen(p->tm->par.vbc_emulation_file_name, "a"))){
-	       printf("\nError opening vbc emulation file\n\n");
-	    }else{
-	       PRINT_TIME(p->tm, f);
-	       fprintf(f, "U %.2f\n", p->ub);
-	       fclose(f); 
-	    }
-	 }else if (p->tm->par.vbc_emulation == VBC_EMULATION_LIVE){
-	    printf("$U %.2f\n", p->ub);
-	 }
-#else
-	 s_bufid = init_send(DataInPlace);
-	 send_dbl_array(&true_objval, 1);
-	 send_msg(p->tree_manager, UPPER_BOUND);
-	 freebuf(s_bufid);
-#endif
-#if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_TM)
-	 send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
-				  lpetol, true_objval, cnt, indices, values);
-#endif
-      }else{
+      if (p->has_ub && true_objval >= p->ub - p->par.granularity){
+	 FREE(heur_solution);
+	 FREE(col_sol);
 	 if (!p->par.multi_criteria){
 	    PRINT(p->par.verbosity, 0,
 		  ("\n* Found Another Feasible Solution.\n"));
 	    if (p->mip->obj_sense == SYM_MAXIMIZE){
 	       PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
-					   + p->mip->obj_offset));
+			+ p->mip->obj_offset));
 	    }else{
 	       PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
-					   + p->mip->obj_offset));
+			+ p->mip->obj_offset));
 	    }
 	 }
+	 return(feasible);
       }
+      p->has_ub = TRUE;
+      p->ub = true_objval;
+      if (p->par.set_obj_upper_lim)
+	 set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
+      if (!p->par.multi_criteria){
+	 p->best_sol.xlevel = p->bc_level;
+	 p->best_sol.xindex = p->bc_index;
+	 p->best_sol.xiter_num = p->iter_num;
+	 p->best_sol.xlength = cnt;
+	 p->best_sol.lpetol = lpetol;
+	 p->best_sol.objval = true_objval;
+	 FREE(p->best_sol.xind);
+	 FREE(p->best_sol.xval);
+	 p->best_sol.xind = (int *) malloc(cnt*ISIZE);
+	 p->best_sol.xval = (double *) malloc(cnt*DSIZE);
+	 memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
+	 memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
+	 if(!p->best_sol.has_sol)
+	    p->best_sol.has_sol = TRUE;
+	 PRINT(p->par.verbosity, 0,
+	       ("\n****** Found Better Feasible Solution !\n"));
+	 if (feasible == IP_HEUR_FEASIBLE){
+	    PRINT(p->par.verbosity, 2,
+		  ("****** After Calling Heuristics !\n"));
+	 }
+	 if (p->mip->obj_sense == SYM_MAXIMIZE){
+	    PRINT(p->par.verbosity, 1, ("****** Cost: %f\n\n", -true_objval
+					+ p->mip->obj_offset));
+	 }else{
+	    PRINT(p->par.verbosity, 1, ("****** Cost: %f\n\n", true_objval
+					+ p->mip->obj_offset));
+	 }
+      }
+#ifdef COMPILE_IN_LP
+      install_new_ub(p->tm, p->ub, p->proc_index, p->bc_index, branching,
+		     feasible);
       if (!p->par.multi_criteria){
 	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);
       }
-      if (feasible == IP_FEASIBLE){
-	 lp_data->termcode = LP_OPT_FEASIBLE;
-      }
+#else
+      s_bufid = init_send(DataInPlace);
+      send_dbl_array(&true_objval, 1);
+      send_int_array(&(p->bc_index), 1);
+      send_int_array(&feasible, 1);
+      send_char_array(&branching, 1);
+      send_msg(p->tree_manager, UPPER_BOUND);
+      freebuf(s_bufid);
+#endif
+#if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_TM)
+      send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
+			       lpetol, true_objval, cnt, indices, values);
+#endif
    }
    
+   if (feasible == IP_FEASIBLE){
+      lp_data->termcode = LP_OPT_FEASIBLE;
+   }
+
    FREE(heur_solution);
    FREE(col_sol);
    return(feasible);
@@ -1343,19 +1335,19 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
 
    for (ind = -1, i = 0; i < can->child_num; i++){
       action[i] = RETURN_THIS_CHILD;
-      if (p->lp_data->nf_status == NF_CHECK_NOTHING && p->has_ub){
-	 if (can->objval[i] > p->ub - p->par.granularity){
-	    //action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
-
-	    /*see which one is infeasible!*/
-	    if(can->termcode[i] == LP_OPTIMAL || 
-	       can->termcode[i] == LP_D_ITLIM || 
-	       can->termcode[i] == LP_OPT_FEASIBLE||
-	       can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE){	       
+      if (p->lp_data->nf_status == NF_CHECK_NOTHING){
+	 /*see which one is infeasible!*/
+	 if (can->termcode[i] == LP_OPTIMAL || 
+	     can->termcode[i] == LP_D_ITLIM){
+	    if (p->has_ub &&
+		can->objval[i] > p->ub - p->par.granularity){
 	       action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
-	    }else{
-	       action[i] = PRUNE_THIS_CHILD_INFEASIBLE;
 	    }
+	 }else if (can->termcode[i] == LP_OPT_FEASIBLE ||
+		   can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE){	       
+	    action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
+	 }else{
+	    action[i] = PRUNE_THIS_CHILD_INFEASIBLE;
 	 }
       }
    }
@@ -2034,8 +2026,10 @@ int generate_cuts_in_lp_u(lp_prob *p)
       /* Add to the user's list of cuts */
 #ifdef USE_CGL_CUTS
       if (p->par.cgl.generate_cgl_cuts){
-	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE, p->bc_index < 1 ? TRUE: FALSE);
-	 if(p->bc_index < 1){
+	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
+			   (p->bc_index < 1)? TRUE: FALSE, 
+			   p->par.verbosity);
+	 if(p->bc_index < 1 && p->iter_num == 1 ){
 	    p->par.cgl = 
 	       lp_data->cgl;
 	 }
@@ -2225,13 +2219,15 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	if (!p->has_mc_ub || (obj[0] < p->obj[0] - etol ||
 			      (obj[0] >= p->obj[0] - etol
 			       && obj[1] < p->obj[1] - etol))){
-	    printf("\nBetter Solution Found:\n");
-	    if(p->mip->obj_sense == SYM_MAXIMIZE){
-	       printf("First Objective Cost: %.1f\n", -obj[0]);
-	       printf("Second Objective Cost: %.1f\n", -obj[1]);
-	    }else{
-	       printf("First Objective Cost: %.1f\n", obj[0]);
-	       printf("Second Objective Cost: %.1f\n", obj[1]);
+	    if (p->par.verbosity >= 1){
+	       printf("\nBetter Solution Found:\n");
+	       if(p->mip->obj_sense == SYM_MAXIMIZE){
+		  printf("First Objective Cost: %.1f\n", -obj[0]);
+		  printf("Second Objective Cost: %.1f\n", -obj[1]);
+	       }else{
+		  printf("First Objective Cost: %.1f\n", obj[0]);
+		  printf("Second Objective Cost: %.1f\n", obj[1]);
+	       }
 	    }
 	    p->obj[1] = obj[1];
 	    p->obj[0] = obj[0];
@@ -2261,14 +2257,16 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	if (!p->has_mc_ub || (obj[1] < p->obj[1] - etol ||
 			      (obj[1] >= p->obj[1] - etol
 			       && obj[0] < p->obj[0] - etol))){
-	   printf("\nBetter Solution Found:\n");
-	    if(p->mip->obj_sense == SYM_MAXIMIZE){
-	       printf("First Objective Cost: %.1f\n", -obj[0]);
-	       printf("Second Objective Cost: %.1f\n", -obj[1]);
-	    }else{
-	       printf("First Objective Cost: %.1f\n", obj[0]);
-	       printf("Second Objective Cost: %.1f\n", obj[1]);
-	    }
+	   if (p->par.verbosity >= 1){
+	      printf("\nBetter Solution Found:\n");
+	      if(p->mip->obj_sense == SYM_MAXIMIZE){
+		 printf("First Objective Cost: %.1f\n", -obj[0]);
+		 printf("Second Objective Cost: %.1f\n", -obj[1]);
+	      }else{
+		 printf("First Objective Cost: %.1f\n", obj[0]);
+		 printf("Second Objective Cost: %.1f\n", obj[1]);
+	      }
+	   }
 	   p->obj[1] = obj[1];
 	   p->obj[0] = obj[0];
 	   p->mc_ub = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
@@ -2300,13 +2298,15 @@ char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	  obj[1] < p->obj[1] + etol + MIN(p->par.mc_gamma, p->par.mc_tau)) ||
 	 (obj[1] < p->obj[1] - etol &&
 	  obj[0] < p->obj[0] + etol + MIN(p->par.mc_gamma, p->par.mc_tau))){
-	printf("\nBetter Solution Found:\n");
-	if(p->mip->obj_sense == SYM_MAXIMIZE){
-	   printf("First Objective Cost: %.1f\n", -obj[0]);
-	   printf("Second Objective Cost: %.1f\n", -obj[1]);
-	}else{
-	   printf("First Objective Cost: %.1f\n", obj[0]);
-	   printf("Second Objective Cost: %.1f\n", obj[1]);
+	if (p->par.verbosity >= 1){
+	   printf("\nBetter Solution Found:\n");
+	   if(p->mip->obj_sense == SYM_MAXIMIZE){
+	      printf("First Objective Cost: %.1f\n", -obj[0]);
+	      printf("Second Objective Cost: %.1f\n", -obj[1]);
+	   }else{
+	      printf("First Objective Cost: %.1f\n", obj[0]);
+	      printf("Second Objective Cost: %.1f\n", obj[1]);
+	   }
 	}
 	p->obj[1] = obj[1];
 	p->obj[0] = obj[0];

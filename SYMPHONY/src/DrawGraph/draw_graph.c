@@ -7,14 +7,14 @@
 /*                                                                           */
 /* The Interactive Graph Drawing application was developed by Marta Eso.     */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
 
-#ifdef WIN32
+#if defined(_MSC_VER) || defined (__MNO_CYGWIN)
 #include <io.h>
 #define execlp _execlp
 #include <process.h>
@@ -77,11 +77,11 @@ int start_child(char *cmd, FILE **readpipe, FILE **writepipe)
 
    /* FIXME: Doesn't seem to work for Windows */
    
-#ifndef WIN32 
+#if !defined(_MSC_VER) && !defined (__MNO_CYGWIN)
 
    int childpid, pipe1[2], pipe2[2];
 
-#ifndef WIN32 
+#if !defined(_MSC_VER) && !defined (__MNO_CYGWIN)
    if ((pipe(pipe1) < 0) || (pipe(pipe2) < 0)){
       perror("pipe");
       exit(-1);

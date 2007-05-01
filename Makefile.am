@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+# (c) Copyright 2006-2007 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Common Public License. Please see     #
 # accompanying file for terms.                                              #
@@ -39,10 +39,10 @@ SUBDIRS += SYMPHONY
 ########################################################################
 
 test: all
-	cd SYMPHONY; make test
+	cd SYMPHONY; $(MAKE) test
 
 ptest: all
-	cd SYMPHONY; make ptest
+	cd SYMPHONY; $(MAKE) ptest
 
 unitTest: test
 
@@ -51,7 +51,7 @@ punitTest: ptest
 tests: all
 	for dir in $(SUBDIRS); do \
 	  if test -r $$dir/test/Makefile; then \
-	    (cd $$dir; make test) \
+	    (cd $$dir; $(MAKE) test) \
 	  fi; \
 	done
 

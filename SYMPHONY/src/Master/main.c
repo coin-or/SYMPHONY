@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -89,14 +89,17 @@ COMMAND parameter_commands[] = {
   { "find_first_feasible" },
   { "generate_cgl_cuts" },
   { "generate_cgl_gomory_cuts" },
+  { "generate_cgl_redsplit_cuts" },
   { "generate_cgl_knapsack_cuts" },
   { "generate_cgl_oddhole_cuts" },
   { "generate_cgl_probing_cuts" },
   { "generate_cgl_clique_cuts" },
   { "generate_cgl_mir_cuts" },
+  { "generate_cgl_twomir_cuts" },
   { "generate_cgl_flow_and_cover_cuts" },
   { "generate_cgl_rounding_cuts" },
   { "generate_cgl_lift_and_project_cuts" },
+  { "generate_cgl_landp_cuts" },
   { "node_selection_rule" },
   { "strong_branching_candidate_num" },
   { "compare_candidadates_dafult" },
@@ -135,7 +138,7 @@ int sym_free_env(sym_environment *env);
 
 int main(int argc, char **argv)
 {    
-     
+
    sym_environment *env = sym_open_environment();
    int termcode;
    
@@ -238,11 +241,13 @@ int main(int argc, char **argv)
 	    strcpy(ext, ""); 
 	 }
 
-	 if(!(strcmp(ext, "mod") == 0 || strcmp(ext, "mps") == 0)){
-	   while(true){
-	     sym_read_line("Type of the file ('mps'/'ampl'/'gmpl'): ", &line);
+	 if(!(strcmp(ext, "mod") == 0 || strcmp(ext, "mps") == 0 || strcmp(ext, "lpt") == 0
+	      || strcmp(ext, "lp") == 0)){
+	    while(true){
+	     sym_read_line("Type of the file ('mps'/'ampl'/'gmpl'/'lp'): ", &line);
 	     if(!(strcmp(line, "mps") == 0 || strcmp(line, "ampl") == 0 ||
-		  strcmp(line, "gmpl") == 0)){
+		  strcmp(line, "gmpl") == 0 || strcmp(line, "lp") == 0 || 
+		  strcmp(line, "lpt") == 0)){
 	       printf("Unknown type!\n");
 	       continue; 
 	     } else {
@@ -257,9 +262,12 @@ int main(int argc, char **argv)
 	    if(sym_read_mps(env, args[1])){
 	       continue;
 	    }
-
-	 } else {
-
+	 }else if (strcmp(ext, "lp") == 0 || strcmp(ext, "lpt") == 0){
+	    sym_free_env(env);
+	    if(sym_read_lp(env, args[1])){
+	       continue;
+	    } 
+	 }else {
 	   if(strcmp(args[2], "") == 0){
 	     sym_read_line("Name of the data file: ", &line);
 	     strcpy(args[2], line);
@@ -413,10 +421,10 @@ int main(int argc, char **argv)
 	       
 	       print_statistics(&(env->warm_start->comp_times), 
 				&(env->warm_start->stat),
-				env->ub, env->lb, initial_time, 
-				start_time, finish_time,
+				env->warm_start->ub, env->warm_start->lb, 
+				initial_time, start_time, finish_time,
 				env->mip->obj_offset, env->mip->obj_sense,
-				env->has_ub);
+				env->warm_start->has_ub);
 	       printf("\n");	       
 	     }
 	     strcpy(args[1], "");	       
@@ -582,7 +590,7 @@ int sym_help(char *line)
   if(strcmp(line, "main_help") == 0){
 
     printf("\nList of main commands: \n\n");
-    printf("load      : read a problem in mps or ampl format\n"
+    printf("load      : read a problem in mps, ampl or lp format\n"
 	   "solve     : solve the problem\n"
 	   "lpsolve   : solve the lp relaxation of the problem\n"
 	   "set       : set a parameter\n"
@@ -600,16 +608,20 @@ int sym_help(char *line)
 	   "find_first_feasible                : whether to find the first feasible solution or\n"
 	   "                                     to solve the optimality (default: 0) \n"
 	   "generate_cgl_cuts                  : whether or not to use cgl cuts (default: 1)\n"
-	   "generate_cgl_gomory_cuts           : whether or not to use cgl gomory cuts (default: 1)\n"
-	   "generate_cgl_knapsack_cuts         : whether or not to use cgl knapsack cuts (default: 1)\n"
-	   "generate_cgl_oddhole_cuts          : whether or not to use cgl oddhole cuts (default: 1)\n"
-	   "generate_cgl_probing_cuts          : whether or not to use cgl probing cuts (default: 1)\n"
-	   "generate_cgl_clique_cuts           : whether or not to use cgl clique cuts (default: 1)\n"	   
-	   "generate_cgl_mir_cuts              : whether or not to use cgl mixed integer rounding cuts\n" 
-           "                                     (default: 0)\n"
- 	   "generate_cgl_flow_and_cover_cuts   : whether or not to use cgl flow and cover cuts (default: 1)\n"
-	   "generate_cgl_rounding_cuts         : whether or not to use cgl rounding cuts (default: 0)\n"
-	   "generate_cgl_lift_and_project_cuts : whether or not to use cgl lift and project cuts (default: 0)\n"
+	   "generate_cgl_gomory_cuts           : set generation level of cgl gomory cuts (default: 0)\n"
+	   "generate_cgl_redsplit_cuts         : set generation level of cgl redsplit cuts (default: -1)\n"
+	   "generate_cgl_knapsack_cuts         : set generation level of cgl knapsack cuts (default: 0)\n"
+	   "generate_cgl_oddhole_cuts          : set generation level of cgl oddhole cuts (default: 0)\n"
+	   "generate_cgl_probing_cuts          : set generation level of cgl probing cuts (default: 0)\n"
+	   "generate_cgl_clique_cuts           : set generation level of cgl clique cuts (default: 0)\n"	   
+	   "generate_cgl_mir_cuts              : set generation level of cgl mixed integer rounding cuts\n" 
+           "                                     (default: -1)\n"
+	   "generate_cgl_twomir_cuts            : set generation level of cgl two-step mixed integer rounding cuts\n" 
+           "                                     (default: -1)\n"
+ 	   "generate_cgl_flow_and_cover_cuts   : set generation level of cgl flow and cover cuts (default: 0)\n"
+	   "generate_cgl_rounding_cuts         : set generation level of cgl rounding cuts (default: -1)\n"
+	   "generate_cgl_lift_and_project_cuts : set generation level of cgl lift and project cuts (default: -1)\n"
+	   "generate_cgl_landp_cuts            : set generation level of cgl lift and project cuts (default: -1)\n"
 	   "node_selection_rule                : set the node selection rule/search strategy (default: 5)\n"
 	   "strong_branching_candidate_num     : set the stong branching candidates number (default: var)\n"
 	   "compare_candidates_default         : set the rule to compare the candidates (defualt: 2)\n"
@@ -655,7 +667,7 @@ int sym_read_line(char *prompt, char **input)
   while(true){
      strcpy(getl, "");
      printf(prompt);
-      fflush(stdout);
+     fflush(stdout);
      fgets(getl, MAX_LINE_LENGTH, stdin);
 
      if(getl[0] == '\n' ) {

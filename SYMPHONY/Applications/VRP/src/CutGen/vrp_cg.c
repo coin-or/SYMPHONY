@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
 /*                                                                           */
@@ -25,6 +25,14 @@
 
 /* VRP include files */
 #include "vrp_cg.h"
+/*__BEGIN_EXPERIMENTAL_SECTION__*/
+#ifdef COMPILE_DECOMP
+#include "my_decomp.h"
+#include "decomp.h"
+#endif
+#include "sym_dg_params.h"
+#include "vrp_dg.h"
+/*___END_EXPERIMENTAL_SECTION___*/
 #include "vrp_macros.h"
 #include "vrp_const.h"
 
@@ -200,7 +208,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 #ifdef DO_TSP_CUTS
    if (vrp->par.which_tsp_cuts && vrp->par.tsp_prob){
       tsp_cuts(n, vrp->par.verbosity, vrp->par.tsp_prob,
-			   vrp->par.which_tsp_cuts, num_cuts, alloc_cuts, cuts);
+	       vrp->par.which_tsp_cuts, cuts, num_cuts, alloc_cuts);
       free_net(n);
       return(USER_SUCCESS);
    }      
@@ -609,6 +617,12 @@ void check_connectivity(network *n, double etol, int capacity, int numroutes,
 
 #ifdef CHECK_CUT_VALIDITY
 
+<<<<<<< .working
+=======
+#include "sym_cg.h"
+/*___END_EXPERIMENTAL_SECTION___*/
+
+>>>>>>> .merge-right.r1068
 int user_check_validity_of_cut(void *user, cut_data *new_cut)
 {
    vrp_cg_problem *vrp = (vrp_cg_problem *)user;

@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -39,10 +39,11 @@ void usage(void)
    printf("master [ -hagrtbd ] [ -u ub ] [ -p procs ] [ -n rule ]\n\t"
 	  "[ -v level ] [ -s cands ] [ -c rule ] [ -k rule ] \n\t"
 	  "[ -m max ] [ -l pools ] [ -i iters ] "
-	  "[ -f parameter_file_name ] [-j 0/1]"
+	  "[ -f parameter_file_name ] [-j 0/1] \n\t"
+	  "[-o tree_out_file]"
 	  "\n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
-	  "\t%s\n\t%s\n\t%s\n\t%s\n\n",
+	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
 	  "-h: help",
 	  "-a: no cut timeout",
 	  "-d: enable graph drawing",
@@ -63,15 +64,17 @@ void usage(void)
 	  "-i n: allow a max of 'n' iterations in presolve",
 	  "-f file: read parameters from parameter file 'file'",
 	  "-j 0/1: whether or not to generate cgl cuts",
-	  "-z n: set diving threshold to 'n'");
+	  "-z n: set diving threshold to 'n'",
+	  "-o file: output vbc-like tree information to file 'file'");
    printf("Solver-specific switches:\n\n");
 #ifdef USE_SYM_APPLICATION
    user_usage();
 #else
-   printf("master [ -H ] [ -F file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
+   printf("master [ -H ] [ -FL file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
 	  "-H: help (solver-specific switches)",
 	  "-F model: model should be read in from file 'model'",
 	  "          (MPS format is assumed unless -D is also present)",
+	  "-L model: LP format model should be read in from file 'model'",
 	  "-D data: model is in AMPL format and data is in file 'data'");
 #endif   
 }
@@ -82,8 +85,8 @@ void version(void)
 {
    printf("\n");
    printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 5.1.0                    *\n");
-   printf("*   Copyright 2000-2006 Ted Ralphs and others         *\n");
+   printf("*   This is SYMPHONY Version 5.2-devel                *\n");
+   printf("*   Copyright 2000-2007 Ted Ralphs and others         *\n");
    printf("*   All Rights Reserved.                              *\n");
    printf("*   Distributed under the Common Public License 1.0   *\n");
    printf("*******************************************************\n");
@@ -274,7 +277,8 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
       }
       else if (strcmp(key, "vbc_emulation") == 0 ||
 	       strcmp(key, "TM_vbc_emulation") == 0){
-	 if (tm_par->vbc_emulation == VBC_EMULATION_FILE){
+	 if (tm_par->vbc_emulation == VBC_EMULATION_FILE || 
+	       tm_par->vbc_emulation == VBC_EMULATION_FILE_NEW){
 	    if (fgets(line, MAX_LINE_LENGTH, f) == NULL){
 	       printf("No vbc emulation file!\n\n");
 	       return(ERROR__PARSING_PARAM_FILE);
@@ -294,6 +298,9 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	       fprintf(f1, "#BOUNDS: NONE\n");
 	       fprintf(f1, "#INFORMATION: STANDARD\n");
 	       fprintf(f1, "#NODE_NUMBER: NONE\n");
+	       if (tm_par->vbc_emulation == VBC_EMULATION_FILE_NEW) {
+		  fprintf(f1, "# ");
+	       }
 	       fprintf(f1, "00:00:00.00 N 0 1 %i\n", VBC_CAND_NODE);
 	       fclose(f1);
 	    }
@@ -406,10 +413,11 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 #ifdef USE_SYM_APPLICATION
 	  user_usage();
 #else
-	  printf("master [ -H ] [ -F file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
+	  printf("master [ -H ] [ -F file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
 		 "-H: help (solver-specific switches)",
 		 "-F model: model should be read in from file 'model'",
 		 "          (MPS format is assumed unless -D is also present)",
+		 "-L model: LP format model should be read in from file 'model'",
 		 "-D data: model is in AMPL format and data is in file 'data'");
 #endif 
 	  exit(0);
@@ -642,6 +650,29 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
 	 }
 	 break;
+       case 'o':
+	 if (i < argc - 1){
+	    sscanf(argv[i+1], "%c", &tmp);
+	    if (tmp== '-') {
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       strncpy(tm_par->vbc_emulation_file_name, argv[i+1], MAX_FILE_NAME_LENGTH);
+	       tm_par->vbc_emulation = VBC_EMULATION_FILE_NEW;
+	       i++;
+	       FILE *f2;
+	       if (!(f2 = fopen(tm_par->vbc_emulation_file_name, "w"))){
+		  printf("\nError opening vbc emulation file\n\n");
+	       }else{
+		  fprintf(f2,"# ");
+		  fprintf(f2, "file created\n");
+		  fclose(f2); 
+	       }
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 break;
        default:
 	 if (c < 'A'){
 	    printf("Warning: Ignoring unrecognized command-line switch -%c\n",
@@ -738,12 +769,12 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    initial_time += tim->pricing;
    initial_time += tim->strong_branching;
    initial_time += tim->cut_pool;
-#ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
+#if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
    printf("======================= CP Timing ===========================\n");
    printf("  Cut Pool                  %.3f\n", tim->cut_pool);
 #endif
    printf("====================== LP/CG Timing =========================\n");
-#ifndef WIN32  /* FIXME: CPU timing doesn't work in Windows */
+#if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
    printf("  LP Solution Time          %.3f\n", tim->lp);
    printf("  Variable Fixing           %.3f\n", tim->fixing);
    printf("  Pricing                   %.3f\n", tim->pricing);

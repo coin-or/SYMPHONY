@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+# (c) Copyright 2006-2007 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Common Public License. Please see     #
 # accompanying file for terms.                                              #
@@ -70,7 +70,11 @@ SYMHEADERS = \
 	../include/symphony_api.h \
 	../include/sym_timemeas.h \
 	../include/sym_tm.h \
-	../include/sym_tm_params.h 
+	../include/sym_tm_params.h
+
+if USE_CL
+ SYMHEADERS += ../include/sym_win32_time.h
+endif
 
 #Add SymConfig.h even though it is not used - for COIN compability
 SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
@@ -78,6 +82,7 @@ SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 if PRIMAL_HEURISTICS
 SYMINCFILES += ../include/sym_rounding.h
 endif
+
 
 SYM_MASTER_SRC	= Master/master.c Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c
@@ -306,7 +311,7 @@ if SOPLEX_LP_SOLVER
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
   LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
-AM_CPPFLAGS += -D__OSI_SPX__
+AM_CPPFLAGS += -D__OSI_SOPLEX__
 endif
 
 if XPRESS_LP_SOLVER
@@ -334,6 +339,7 @@ AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLandP` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
@@ -430,6 +436,37 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 LT_LDFLAGS += -rpath $(libdir)
 
 ########################################################################
+########################################################################
+
+# Compile everything with g++
+CC = $(CXX)
+CCLD = $(CXX)
+
+#Static link
+STATIC_LINK =  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static\
+	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
+# Link with g++
+LINK =
+if STATICEXE
+LINK +=  $(STATIC_LINK) 
+else
+LINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+endif
+
+SYMLINK =
+SYMLDADD = $(LDADD)
+if USE_CL
+SYMLINK += cp -f main.$(OBJEXT) symphony-main.$(OBJEXT); $(LIBTOOL) \
+	--tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+SYMLDADD += main.$(OBJEXT) 
+else
+SYMLINK += $(LINK)
+endif
+
+########################################################################
 #                               libSym                                 #
 ########################################################################
 
@@ -450,9 +487,6 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 # in the 'lib' directory
 
 lib_LTLIBRARIES = $(WHATTOMAKELIBS)
-
-STATIC_LINK =  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -static\
-	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 # List all source files for this library, including headers
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
@@ -532,10 +566,11 @@ EXTRA_PROGRAMS = symphony symphony_m symphony_m_tm symphony_m_tm_lp \
 bin_PROGRAMS = $(WHATTOMAKEBINS)
 
 symphony_SOURCES = $(MAIN_SRC) symphony.h
-symphony_DEPENDENCIES = $(LDADD) libSym.la
+symphony_DEPENDENCIES = $(SYMLDADD) libSym.la
 symphony_CPPFLAGS = $(SYMCPPFLAGS)
 symphony_LDADD = libSym.la $(ALLLDADD)
 symphony_LDFLAGS = -rpath $(libdir)
+symphony_LINK = $(SYMLINK)
 
 symphony_m_SOURCES = $(MAIN_SRC) symphony.h
 symphony_m_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
@@ -697,25 +732,14 @@ libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 #                Other stuff                                           #    
 ########################################################################
 
-COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
-# Compile everything with g++
-CC = $(CXX)
-CCLD = $(CXX)
+#COIN_WARNINGS = -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion
 # Get rid of warning flags
 #FIXME-Try to have the following later
 #CFLAGS := $(subst $(COIN_WARNINGS), ,$(CFLAGS))
 #CXXFLAGS := $(subst $(COIN_WARNINGS), ,$(CXXFLAGS))
 
-# Link with g++
-
-LINK =
-if STATICEXE
-LINK +=  $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static -static-libgcc\
-	$(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-else
-LINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-endif
+rename_obj:
+	mv main.obj symphony-main.obj
 
 ########################################################################
 #                Headers that need to be installed                     #

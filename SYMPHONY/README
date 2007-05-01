@@ -8,7 +8,7 @@ through usage statistics. Therefore, we ask that you become a registered user
 of this software if you have not already done so. Registration is free, but
 helps us maintain our funding. Please visit SYMPHONY's registration page at
 http://branchandcut.org/SYMPHONY/license.htm to receive an official copy of
-the distribution. All source code and documentation is Copyright 2000-2006 by
+the distribution. All source code and documentation is Copyright 2000-2007 by
 Ted Ralphs and others. This README may be redistributed freely.
 
 DOCUMENTATION
@@ -23,6 +23,34 @@ http://projects.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
+
+Release 5.1.3:
+
+1. Support for building static executables in Unix-like environments.
+
+2. Improved signal-catching behavior in Unix-like environments.
+
+3. Updated documentation.
+
+Release 5.1.2:
+
+1. Update of externals.
+
+2. Updated documentation.
+
+Release 5.1.1:
+
+1. Fixes for building in the Solaris operating system.
+
+2. Fixes for using the GNU autotools to build with the cl compiler.
+
+2. Fixes for sym.mak file in order to allow building with MSVC++ nmake utility.
+
+4. Fixes for building the unit test in the MSVC++ IDE.
+
+5. Updated documentation
+
+Release 5.1.0:
 
 1. SYMPHONY now has an interactive optimizer that can be used through a
 command shell. In both the sequential and parallel configurations, the user
@@ -77,8 +105,8 @@ supported. These solvers can be called through the COIN-OR OSI interface.
 now, there are a number of other software packages that offer better
 functionality than SYMPHONY for implementing branch and price algorithms.
 
-CHANGES TO THE USER INTERFACE
-=============================
+CHANGES TO THE USER INTERFACE (FROM SYMPHONY 5.0)
+=================================================
 
 1. There was one minor change to the user callback API from version 5.0 to 5.1.
 The user can now execute a primal heuristic in the user_is_feasible() callback
@@ -216,25 +244,37 @@ Well tested: CPLEX, OSL, CLP
 
 Well tested, but have some stability or other issues: GLPK
 
-Compiled, but not well-tested: SPX
+Compiled, but not well tested: SPX
 
-CONFIGURATIONS
-==============
+TESTED CONFIGURATIONS
+=====================
 
 SEQUENTIAL
 
-- Builds and passes unit test with gcc 4.1 and CLP on LINUX and CYGWIN. 
-- Builds and passes unit test in Microsoft Visual C++ v6 with CLP
+Known configurations that build and pass unit test
+
+- gcc 4.1 on LINUX
+- gcc 3.4 on LINUX
+- gcc 3.4.4 on CYGWIN in Windows XP
+- gcc 3.4.4 on CYGWIN in Windows XP (-mno-cygwin)
+- MSVC++ Version 8 compiler in CYGWIN using the autotools 
+- MSVC++ Version 8 IDE
+- MSVC++ nmake Utility with Version 8 compiler
+- gcc 4.0 on Mac OSX 10.4.8
+- gcc 4.1 on Solaris x86
 
 SHARED MEMORY PARLLEL (OpenMP)
 
-- Builds and passes unit test with gcc 4.2 and CLP on LINUX (note: earlier 
-  versions of GCC do not support OpenMP and cannot be used to build a 
-  shared-memory version of SYMPHONY) 
+Builds and passes unit test with pre-release version of gcc 4.2 and CLP on
+LINUX (earlier versions of GCC do not support OpenMP and cannot be used to
+build a shared-memory version of SYMPHONY)
 
 DISTRIBUTED MEMORY PARALLEL (PVM)
 
-- Builds and passes unit test with gcc 4.1 and PVM 3.4 on LINUX
+Known configurations that build and pass unit test
+
+- gcc 4.1 on LINUX with PVM
+- gcc 3.4 on LINUX with PVM
 
 APPLICATIONS
 ============

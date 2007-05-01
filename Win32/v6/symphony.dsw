@@ -63,7 +63,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "libSymphony"=".\libSymphony\libSymphony.dsp" - Package Owner=<4>
+Project: "libSymphony"=".\libSymphony.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{

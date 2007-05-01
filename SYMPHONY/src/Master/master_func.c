@@ -7,7 +7,7 @@
 /*                                                                           */
 /* This file was developed by Menal Guzelsoy for the SYMPHONY OSI interface. */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -30,32 +30,29 @@
 #include "sym_pack_cut.h"
 #include "sym_pack_array.h"
 #include "sym_lp_solver.h"
-/* FIXME remove sym_lp.h after carrying the heuristics to lp_wrapper*/
-/* and from sym_master.h */
 //#include "sym_lp.h"
 #include "sym_tm.h"
 
 /*===========================================================================*/
 /*===========================================================================*/
 
-#if 0
 /* not used now! to be used later!*/
 int resolve_node(sym_environment *env, bc_node *node)
 {
    node_desc * desc = &node->desc;
    LPdata *lp_data = (LPdata*)calloc(1, sizeof(LPdata));
    lp_data->mip = create_copy_mip_desc(env->mip); //FIXME!!!
+   lp_sol *best_sol = &(env->warm_start->best_sol);
    branch_desc *bpath;
    branch_obj *bobj;
    bc_node **path, *n;
    int level = node->bc_level;
 
-   int *matbeg, *matind, size, nzcnt, return_value, iterd = 0;
-   double *matval, colsol;
-   int i, j;
-
-   double *rhs;
-   char *sense;
+   int *matbeg = 0, *matind= 0, size, nzcnt = 0, return_value, iterd = 0;
+   double *matval = 0, colsol;
+   int i, j = 0, cnt = 0, *xind = 0;
+   double *xval = 0, *rhs = 0, lpetol = 9.9999999999999995e-07;
+   char *sense = 0;
    cut_data *cut;
 
    /*------------------------------------------------------------------------*\
@@ -344,10 +341,11 @@ int resolve_node(sym_environment *env, bc_node *node)
 	    }
 	 }else{ /* BRANCHING_CUT */
 	    j = bpath->name;
-	    change_row(lp_data, j, bpath->sense, bpath->rhs, bpath->range);
+	    change_row(lp_data, j, bpath->sense, bpath->rhs,bpath->range);
 	 }
       }
    }
+   bpath=bpath-level;
    /*------------------------------------------------------------------------*\
     * Add cuts here 
     * FIXME! ASSUMING ALL THE CUTS ARE EXPLICIT ROW!
@@ -361,30 +359,32 @@ int resolve_node(sym_environment *env, bc_node *node)
       matbeg = (int *) calloc(size + 1, ISIZE);
       matbeg[0] = 0;
 
-      for (i = 0, j = 0; i<env->warm_start->cut_num, j<desc->cutind.size; i++){
-	 if (i == desc->cutind.list[j]){
-	    cut = env->warm_start->cuts[i];
-	    nzcnt = ((int *) (cut->coef))[0];
-	    sense[j] = cut->sense;
-	    rhs[j] = cut->rhs;
-	    matbeg[j+1] = matbeg[j++] + nzcnt;
+      for (i = 0; i<env->warm_start->cut_num; i++){
+	 for(j=0; j<desc->cutind.size; j++){
+	    if (i == desc->cutind.list[j]){
+	       cut = env->warm_start->cuts[i];
+	       nzcnt = ((int *) (cut->coef))[0];
+	       sense[j] = cut->sense;
+	       rhs[j] = cut->rhs;
+	       matbeg[j+1] = matbeg[j] + nzcnt;
+	    }
 	 }
       }
-
 
       matind = (int *) malloc(nzcnt*ISIZE);
       matval = (double *) malloc(nzcnt*DSIZE);
 
-      for (i = 0, j = 0; i<env->warm_start->cut_num, j<desc->cutind.size; i++){
-	 if (i == desc->cutind.list[j]){
-	    cut = env->warm_start->cuts[i];
-	    nzcnt = matbeg[j+1] - matbeg[j];
-	    memcpy(matind + matbeg[j], (int *) (cut->coef + ISIZE), 
-		   ISIZE * nzcnt);
-	    memcpy(matval + matbeg[j], 
-		   (double *) (cut->coef + (1 + nzcnt) * ISIZE), 
-		   DSIZE * nzcnt);
-	    j++;
+      for (i = 0; i<env->warm_start->cut_num; i++){
+	 for(j=0; j<desc->cutind.size; j++){
+	    if (i == desc->cutind.list[j]){
+	       cut = env->warm_start->cuts[i];
+	       nzcnt = matbeg[j+1] - matbeg[j];
+	       memcpy(matind + matbeg[j], (int *) (cut->coef + ISIZE), 
+		      ISIZE * nzcnt);
+	       memcpy(matval + matbeg[j], 
+		      (double *) (cut->coef + (1 + nzcnt) * ISIZE), 
+		      DSIZE * nzcnt);
+	    }
 	 }
       }
       nzcnt = matbeg[j];
@@ -422,98 +422,262 @@ int resolve_node(sym_environment *env, bc_node *node)
       load_basis(lp_data, cstat, rstat);
    }
    
-
-
    return_value = dual_simplex(lp_data, &iterd);
    
    if(return_value == LP_D_UNBOUNDED || return_value == LP_ABANDONED || 
       return_value == LP_D_INFEASIBLE){
-      printf("resolve_node(): Unknown problem!\n");
-      return TM_ERROR__ILLEGAL_RETURN_CODE;
-   }      
+      node->feasibility_status = INFEASIBLE_PRUNED;
+      node->node_status = NODE_STATUS__PRUNED;
+   }
 
    if(return_value == LP_OPTIMAL || return_value == LP_D_OBJLIM || 
       return_value == LP_D_ITLIM){
+      lp_data->x = (double *)malloc(DSIZE*lp_data->n);
       get_x(lp_data);
       for(i = lp_data->n; i>=0; i--){
 	 colsol = lp_data->x[i];
-	 if(colsol-floor(colsol) > env->par.lp_par.granularity &&
-	    ceil(colsol)-colsol > env->par.lp_par.granularity){
-	    break;
+	 if(lp_data->mip->is_int[i]){
+	    if(colsol-floor(colsol) > env->par.lp_par.granularity &&
+	       ceil(colsol)-colsol > env->par.lp_par.granularity){
+	       break;
+	    }
 	 }
       }
       if(i<0){
+	 node->node_status = NODE_STATUS__PRUNED;
 	 node->feasibility_status = FEASIBLE_PRUNED;
+
+	 if((env->warm_start->has_ub && 
+	     lp_data->objval < env->warm_start->ub)||
+	    !env->warm_start->has_ub){
+	    
+	    if(!env->warm_start->has_ub){
+	       env->warm_start->has_ub = TRUE;
+	       best_sol->has_sol = TRUE;
+	    }
+
+	    env->warm_start->ub = best_sol->objval = lp_data->objval;
+	    
+	    FREE(best_sol->xind);
+	    FREE(best_sol->xval);
+	    
+	    xind = (int *)malloc(ISIZE*lp_data->n);
+	    xval = (double *)malloc(DSIZE*lp_data->n);	    
+	    	    
+	    for (i = 0; i < lp_data->n; i++){
+	       if (lp_data->x[i] > lpetol || lp_data->x[i] < -lpetol){
+		  xind[cnt] = i;
+		  xval[cnt++] = lp_data->x[i];
+	       }
+	    }
+	    best_sol->xind = (int *)malloc(ISIZE*cnt);
+	    best_sol->xval = (double *)malloc(DSIZE*cnt);	    
+	    memcpy(best_sol->xind, xind, ISIZE*cnt);
+	    memcpy(best_sol->xval, xval, DSIZE*cnt);    
+	    best_sol->xlength = cnt;
+	    best_sol->xlevel = node->bc_level;
+	    best_sol->xindex = node->bc_index;
+	    best_sol->lpetol = lpetol;
+	 }  	 
       }
    }
-     
+
+   for(i = 0; i < 2*(level+1)+BB_BUNCH; i++){
+      path[i]=0;
+   }
+   
+   FREE(path);   
+   FREE(bpath);
+   FREE(sense);
+   FREE(rhs);
+   FREE(matind);
+   FREE(matbeg);
+   FREE(matval);
+   /* FIXME- for now just copy free_node_desc here. Decide where to carry 
+      resolve_node() */
+   //   free_node_desc(&desc);
+     if (desc){
+      node_desc *n = desc;
+      FREE(n->cutind.list);
+      FREE(n->uind.list);
+      if (n->nf_status == NF_CHECK_AFTER_LAST ||
+	  n->nf_status == NF_CHECK_UNTIL_LAST)
+	 FREE(n->not_fixed.list);
+      if (n->basis.basis_exists){
+	 FREE(n->basis.basevars.list);
+	 FREE(n->basis.basevars.stat);
+	 FREE(n->basis.extravars.list);
+	 FREE(n->basis.extravars.stat);
+	 FREE(n->basis.baserows.list);
+	 FREE(n->basis.baserows.stat);
+	 FREE(n->basis.extrarows.list);
+	 FREE(n->basis.extrarows.stat);
+      }
+      if (n->desc_size > 0)
+	 FREE(n->desc);
+      FREE(desc);
+   }
    node->lower_bound = lp_data->objval;
    free_mip_desc(lp_data->mip);
    free_lp_arrays(lp_data);
-   close_lp_solver(lp_data);
+   close_lp_solver(lp_data);  
+   FREE(xind);
+   FREE(xval);
    FREE(lp_data);
 
    return(FUNCTION_TERMINATED_NORMALLY);
 }
-#endif
 
 /*===========================================================================*/
 /*===========================================================================*/
 
 void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 {
-   int i;
+
+   int i, resolve = 0;
 		 
    if (root){
       if (root->node_status == NODE_STATUS__PRUNED || 
-	  root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
+	  root->node_status == NODE_STATUS__INTERRUPTED || 
+	  root->feasibility_status == PRUNED_HAS_CAN_SOLUTION || 
 	  root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
-	 if(change_type == OBJ_COEFF_CHANGED){      
+	 if(change_type == OBJ_COEFF_CHANGED || change_type == RHS_CHANGED || COL_BOUNDS_CHANGED){      
 	   if (root->feasibility_status == FEASIBLE_PRUNED ||
 	       root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
 	       root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
 	      
-	      check_better_solution(env, root, FALSE, OBJ_COEFF_CHANGED);
+	      check_better_solution(env, root, FALSE, change_type);
 	   }
 
-	   if (root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
-	      if(root->bobj.child_num > 0){
-		 for(i = 0; i<root->bobj.child_num; i++){
-		    update_tree_bound(env, root->children[i], change_type);
-		 }
-	      } else{
-		 root->node_status = NODE_STATUS__WARM_STARTED;	
+	   if (root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION && 
+	       root->bobj.child_num > 0){
+	      if(change_type == COL_BOUNDS_CHANGED && root->bobj.child_num > 0){
+		 update_branching_decisions(env, root, change_type);
 	      }
-	   } else {
-	      if(root->node_status == NODE_STATUS__PRUNED){
-		 root->node_status = NODE_STATUS__WARM_STARTED;	
+	      for(i = 0; i<root->bobj.child_num; i++){
+		 update_tree_bound(env, root->children[i], change_type);
+	      }
+	   } else{
+	      root->node_status = NODE_STATUS__WARM_STARTED;	      
+	      if(resolve == 0){
+		 root->lower_bound = MAXDOUBLE;
+	      }else{
+		 resolve_node(env, root);
 	      }
 	   }
-	 } else if(change_type == RHS_CHANGED){      
-	    if (root->feasibility_status == FEASIBLE_PRUNED ||
-		root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
-		root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
-	       
-	       check_better_solution(env, root, FALSE, RHS_CHANGED);
-	    }
-
-	    if(root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
+	 }
+      } else{
+	 if(root->bobj.child_num > 0){
+	    if (env->mip->var_type_modified){
+	       if(!env->mip->is_int[root->children[0]->bobj.name]){ 
+		  for(i = 0; i<root->bobj.child_num; i++){
+		     ws_free_subtree(env, root->children[i], change_type, TRUE, TRUE);
+		  }
+		  root->bobj.child_num = 0;
+		  root->node_status = NODE_STATUS__WARM_STARTED;
+		  if(resolve == 0){
+		     root->lower_bound = MAXDOUBLE;
+		  }else{
+		     resolve_node(env, root);
+		  }		  
+	       }
+	    } else {	       
+	       if(change_type == COL_BOUNDS_CHANGED && root->bobj.child_num > 0){
+		  update_branching_decisions(env, root, change_type);
+	       }
 	       for(i = 0; i<root->bobj.child_num; i++){
 		  update_tree_bound(env, root->children[i], change_type);
 	       }
-	    } else {
-	       root->node_status = NODE_STATUS__WARM_STARTED;
 	    }
-	 }	 
-      } else{
-	 for(i = 0; i<root->bobj.child_num; i++){
-	    update_tree_bound(env, root->children[i], change_type);
+	 }else{ 
+	    root->node_status = NODE_STATUS__WARM_STARTED;
+	    if(resolve == 0){
+	       root->lower_bound = MAXDOUBLE;
+	    }else{
+	       resolve_node(env, root);
+	    }
 	 }
       }
    }
 }
 /*===========================================================================*/
 /*===========================================================================*/
+void update_branching_decisions(sym_environment *env, bc_node *root, int change_type)
+{
+   int i;
+   int type = 1;
+   int resolve = 0;
+   int deleted = 0;
+
+   if(change_type == COL_BOUNDS_CHANGED && root->bobj.child_num > 0){
+      for(i = 0; i<root->bobj.child_num; i++){
+	 if(root->bobj.type == BRANCHING_VARIABLE){	    
+	    switch (root->bobj.sense[i]){
+	     case 'E':
+		printf("error1-update_warm_start_tree\n");
+		exit(0);
+	     case 'L':
+		if(type == 0){
+		   if(root->bobj.rhs[i] < env->mip->lb[root->bobj.name]){
+		      root->bobj.rhs[i] = ceil(env->mip->lb[root->bobj.name]);
+		   }
+		   else if(root->bobj.rhs[i] > env->mip->ub[root->bobj.name]){
+		      root->bobj.rhs[i] = ceil(env->mip->ub[root->bobj.name]) - 1;
+		   }
+		}else {
+		   if(root->bobj.rhs[i] < env->mip->lb[root->bobj.name]){
+		      ws_free_subtree(env, root->children[i], change_type, FALSE, TRUE);
+		      deleted++;
+		   }
+		   else if(root->bobj.rhs[i] > env->mip->ub[root->bobj.name]){
+		      root->bobj.rhs[i] = floor(env->mip->ub[root->bobj.name]);
+		   } 
+		}		  
+		break;
+	     case 'G':
+
+		if(type == 0){
+		   if(root->bobj.rhs[i] > env->mip->ub[root->bobj.name]){
+		      root->bobj.rhs[i] = floor(env->mip->ub[root->bobj.name]);
+		   }
+		   else if(root->bobj.rhs[i] < env->mip->lb[root->bobj.name]){
+		      root->bobj.rhs[i] = floor(env->mip->lb[root->bobj.name]) + 1;
+		   }
+		}else {
+		   if(root->bobj.rhs[i] > env->mip->ub[root->bobj.name]){
+		      ws_free_subtree(env, root->children[i], change_type, FALSE, TRUE);
+		      deleted++;
+		   }
+		   else if(root->bobj.rhs[i] < env->mip->lb[root->bobj.name]){
+		      root->bobj.rhs[i] = ceil(env->mip->lb[root->bobj.name]);
+		   }		   
+		}
+
+		break;
+	     case 'R':
+		printf("error2-update_warm_start_tree\n");		     
+		exit(0);		
+	    }
+	 } else {
+	    printf("error3-update_warm_start_tree\n");		     
+	    exit(0);
+	 }	
+      }
+      root->bobj.child_num -= deleted;
+      if(root->bobj.child_num <= 0){
+	 root->node_status = NODE_STATUS__WARM_STARTED;
+	 if(resolve == 0){
+	    root->lower_bound = MAXDOUBLE;
+	 }else{
+	    resolve_node(env, root);
+	 }
+      }
+   }     
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 
 void cut_ws_tree_index(sym_environment *env, bc_node *root, int index, 
 		       problem_stat *stat, int change_type)
@@ -543,7 +707,7 @@ void cut_ws_tree_index(sym_environment *env, bc_node *root, int index,
 	   }       
 	} else{	
 	   for (i = root->bobj.child_num - 1; i >= 0; i--)
-	      ws_free_subtree(env, root->children[i], change_type);
+	      ws_free_subtree(env, root->children[i], change_type, TRUE, FALSE);
 	   root->bobj.child_num = 0;
 	
 	   if (root->node_status == NODE_STATUS__BRANCHED_ON){
@@ -578,7 +742,7 @@ void cut_ws_tree_level(sym_environment *env, bc_node *root, int level,
       }
       if(root->bc_level == level){
 	 for (i = root->bobj.child_num - 1; i >= 0; i--)
-	    ws_free_subtree(env, root->children[i], change_type);
+	    ws_free_subtree(env, root->children[i], change_type, TRUE, FALSE);
 	 root->bobj.child_num = 0;
 	 
 	 if (root->node_status == NODE_STATUS__BRANCHED_ON){
@@ -590,25 +754,31 @@ void cut_ws_tree_level(sym_environment *env, bc_node *root, int level,
 
 /*===========================================================================*/
 /*===========================================================================*/
- void ws_free_subtree(sym_environment *env, bc_node *root, int change_type)
+
+void ws_free_subtree(sym_environment *env, bc_node *root, int change_type, int check_solution, 
+		     int update_stats)
 {
 
    int i;
 
    if (root == NULL) return;
 
-   if (root->feasibility_status == FEASIBLE_PRUNED ||
-       root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
-       root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
-      if(change_type == OBJ_COEFF_CHANGED){ 
-	 check_better_solution(env, root, TRUE, OBJ_COEFF_CHANGED);
-      }else if(change_type == RHS_CHANGED){ 
-	 check_better_solution(env, root, TRUE, RHS_CHANGED);
+   if(check_solution){
+      if (root->feasibility_status == FEASIBLE_PRUNED ||
+	  root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
+	  root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
+	 check_better_solution(env, root, TRUE, change_type);
       }
    }
    
    for (i = root->bobj.child_num - 1; i >= 0; i--){
-      ws_free_subtree(env, root->children[i], change_type);
+      ws_free_subtree(env, root->children[i], change_type, check_solution, update_stats);
+   }
+
+   if(update_stats){
+      env->warm_start->stat.analyzed--;
+      env->warm_start->stat.created--;
+      env->warm_start->stat.tree_size--;
    }
    
    free_tree_node(root);
@@ -620,7 +790,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
 			   int change_type){
  
    int i, j, new_solution = FALSE;
-   double upper_bound = 0.0, lpetol = 9.9999999999999995e-07;
+   double upper_bound = 0.0, lpetol = 9.9999999999999995e-07, valuesi=0;
    double obj[2] = {0.0, 0.0}, gamma, tau, objval;
    int *matbeg, *matind;
    double *rowact = NULL, *matval, *colsol = NULL; 
@@ -629,122 +799,169 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
    MIPdesc *mip = env->mip;
    lp_sol *best_sol = &(env->warm_start->best_sol);
 
-   if(change_type == OBJ_COEFF_CHANGED){
-      if(!env->par.mc_warm_start){
-	 for(i = 0; i<root->sol_size; i++){
-	    upper_bound += mip->obj[root->sol_ind[i]] * root->sol[i];
-	 }	    	       
-	 if((env->warm_start->has_ub && 
-	     upper_bound<env->warm_start->ub)||
-	    !env->warm_start->has_ub){
+   
+   if(env->mip->var_type_modified == TRUE) {
+      for(i = root->sol_size; i >=0; i++){
+	 if(mip->is_int[root->sol_ind[i]]){
+	    valuesi = root->sol[i];
+	    if (valuesi-floor(valuesi) > lpetol &&
+		ceil(valuesi)-valuesi > lpetol){
+	       break;
+	    }
+	 }
+      }
+      feasible = i < 0 ? TRUE : FALSE;
+   }
+
+   if(feasible){
+      if(change_type == OBJ_COEFF_CHANGED){
+	 if(!env->par.mc_warm_start){
+	    for(i = 0; i<root->sol_size; i++){
+	       upper_bound += mip->obj[root->sol_ind[i]] * root->sol[i];
+	    }	    	       
+	    if((env->warm_start->has_ub && 
+		upper_bound<env->warm_start->ub)||
+	       !env->warm_start->has_ub){
+	       
+	       if(!env->warm_start->has_ub){
+		  env->warm_start->has_ub = TRUE;
+		  best_sol->has_sol = TRUE;
+	       }
+	       
+	       env->warm_start->ub = upper_bound;
+	       best_sol->objval = upper_bound;
+	       new_solution = true;
+	    }
+	 
+	 } else {
 	    
-	 if(!env->warm_start->has_ub){
-	    env->warm_start->has_ub = TRUE;
-	    best_sol->has_sol = TRUE;
-	 }
-	 
-	 env->warm_start->ub = upper_bound;
-	 best_sol->objval = upper_bound;
-	 new_solution = true;
-	 }
-      } else {
-	 
-	 gamma = env->par.lp_par.mc_gamma;
-	 tau = env->par.lp_par.mc_tau;
-	 
-	 for(i = 0; i<root->sol_size; i++){
-	    obj[0] += mip->obj1[root->sol_ind[i]]*root->sol[i];
-	    obj[1] += mip->obj2[root->sol_ind[i]]*root->sol[i];
-	 }
-	 
-	 if(gamma != -1.0){
+	    gamma = env->par.lp_par.mc_gamma;
+	    tau = env->par.lp_par.mc_tau;
+	    
+	    for(i = 0; i<root->sol_size; i++){
+	       obj[0] += mip->obj1[root->sol_ind[i]]*root->sol[i];
+	       obj[1] += mip->obj2[root->sol_ind[i]]*root->sol[i];
+	    }
+	    
+	    if(gamma != -1.0){
 	    objval = gamma*obj[0] + tau*obj[1];
-	 } else{
-	    objval = tau*obj[1];
-	 }
-	 if ((env->has_mc_ub &&  (objval < env->mc_ub - lpetol - 
-				  MAX(0, MIN(gamma, tau)))) ||
-	     !env->has_mc_ub){
-	    
-	    if(!env->has_mc_ub){
+	    } else{
+	       objval = tau*obj[1];
+	    }
+	    if ((env->has_mc_ub &&  (objval < env->mc_ub - lpetol - 
+				     MAX(0, MIN(gamma, tau)))) ||
+		!env->has_mc_ub){
+	       
+	       if(!env->has_mc_ub){
 	       env->has_mc_ub = TRUE;
 	       env->warm_start->has_ub = TRUE;
 	       best_sol->has_sol = TRUE;
+	       }
+	       
+	       env->mc_ub = env->warm_start->ub = best_sol->objval = objval;
+	       env->obj[0] = obj[0];
+	       env->obj[1] = obj[1];
+	       new_solution = TRUE;
+	    }
+	 }    
+      }else if(change_type == RHS_CHANGED){
+	 
+	 colsol = (double*)calloc(env->mip->n, DSIZE);
+	 rowact = (double*) calloc(env->mip->m, DSIZE);
+	 matbeg = env->mip->matbeg;
+	 matval = env->mip->matval;
+	 matind = env->mip->matind;
+	 
+	 for(i = 0; i<root->sol_size; i++){
+	    upper_bound += mip->obj[root->sol_ind[i]] * root->sol[i];
+	    colsol[root->sol_ind[i]] = root->sol[i];
+	 }   
+	 
+	 for(i = 0; i < env->mip->n; i++){
+	    for(j = matbeg[i]; j<matbeg[i+1]; j++){
+	       rowact[matind[j]] += matval[j] * colsol[i];
+	    }
+	 }	 
+	 
+	 for(i = 0; i < env->mip->m; i++){
+	    switch(env->mip->sense[i]){
+	     case 'L': 
+		if (rowact[i] > env->mip->rhs[i] + lpetol)
+		   feasible = FALSE;
+		break;
+	     case 'G':
+		if (rowact[i] < env->mip->rhs[i] - lpetol)
+		   feasible = FALSE;
+		break;
+	     case 'E':
+		if (!((rowact[i] > env->mip->rhs[i] - lpetol) && 
+		      (rowact[i] < env->mip->rhs[i] + lpetol)))
+		   feasible = FALSE;
+		break;
+	     case 'R':
+		if (rowact[i] > env->mip->rhs[i] + lpetol || 
+		    rowact[i] < env->mip->rhs[i] - env->mip->rngval[i] - lpetol)
+		   feasible = FALSE;
+		break;
+	     case 'N':
+	     default:
+		break;
 	    }
 	    
-	    env->mc_ub = env->warm_start->ub = best_sol->objval = objval;
-	    env->obj[0] = obj[0];
-	    env->obj[1] = obj[1];
-	    new_solution = TRUE;
-	 }
-      }    
-   }else if(change_type == RHS_CHANGED){
- 
-      colsol = (double*)calloc(env->mip->n, DSIZE);
-      rowact = (double*) calloc(env->mip->m, DSIZE);
-      matbeg = env->mip->matbeg;
-      matval = env->mip->matval;
-      matind = env->mip->matind;
-
-      for(i = 0; i<root->sol_size; i++){
-	 upper_bound += mip->obj[root->sol_ind[i]] * root->sol[i];
-	 colsol[root->sol_ind[i]] = root->sol[i];
-      }   
-
-      for(i = 0; i < env->mip->n; i++){
-	 for(j = matbeg[i]; j<matbeg[i+1]; j++){
-	    rowact[matind[j]] += matval[j] * colsol[i];
-	 }
-      }	 
- 
-      for(i = 0; i < env->mip->m; i++){
-	 switch(env->mip->sense[i]){
-	  case 'L': 
-	     if (rowact[i] > env->mip->rhs[i] + lpetol)
-		feasible = FALSE;
-	     break;
-	  case 'G':
-	     if (rowact[i] < env->mip->rhs[i] - lpetol)
-		feasible = FALSE;
-	     break;
-	  case 'E':
-	     if (!((rowact[i] > env->mip->rhs[i] - lpetol) && 
-		   (rowact[i] < env->mip->rhs[i] + lpetol)))
-		feasible = FALSE;
-	     break;
-	  case 'R':
-	     if (rowact[i] > env->mip->rhs[i] + lpetol || 
-		 rowact[i] < env->mip->rhs[i] - env->mip->rngval[i] - lpetol)
-		feasible = FALSE;
-	     break;
-	  case 'N':
-	  default:
-	     break;
+	    if (!feasible) 
+	       break;
 	 }
 	 
-	 if (!feasible) 
-	    break;
-      }
-   
-      if(feasible) {
-	 if((env->warm_start->has_ub && 
-	     upper_bound<env->warm_start->ub)||
+	 if(feasible) {
+	    if((env->warm_start->has_ub && 
+		upper_bound<env->warm_start->ub)||
 	    !env->warm_start->has_ub){
-	    
-	    if(!env->warm_start->has_ub){
-	       env->warm_start->has_ub = TRUE;
-	       best_sol->has_sol = TRUE;
-	    }
-	    
+	       
+	       if(!env->warm_start->has_ub){
+		  env->warm_start->has_ub = TRUE;
+		  best_sol->has_sol = TRUE;
+	       }
+	       
 	    env->warm_start->ub = upper_bound;
 	    best_sol->objval = upper_bound;
 	    new_solution = true;
+	    }
+	 }
+      }else if(change_type == COL_BOUNDS_CHANGED){
+	 
+	 colsol = (double*)calloc(env->mip->n, DSIZE);
+	 
+	 for(i = 0; i<root->sol_size; i++){
+	    upper_bound += mip->obj[root->sol_ind[i]] * root->sol[i];
+	    colsol[root->sol_ind[i]] = root->sol[i];
+	 }
+	 
+	 for(i = 0; i < env->mip->n; i++){
+	    if ((colsol[i] < env->mip->lb[i] - lpetol) || 
+		(colsol[i] > env->mip->ub[i] + lpetol))
+	       feasible = FALSE;
+	 }
+	 
+	 if(feasible) {
+	    if((env->warm_start->has_ub && 
+		upper_bound < env->warm_start->ub)||
+	       !env->warm_start->has_ub){
+	       
+	       if(!env->warm_start->has_ub){
+		  env->warm_start->has_ub = TRUE;
+		  best_sol->has_sol = TRUE;
+	       }
+	       
+	       env->warm_start->ub = upper_bound;
+	       best_sol->objval = upper_bound;
+	       new_solution = true;
+	    }
 	 }
       }
    }
-   
-   if(new_solution){
 
+   if(new_solution){
+      
       best_sol->xlevel = root->bc_level;
       best_sol->xindex = root->bc_index;
       best_sol->xlength = root->sol_size;
@@ -753,17 +970,17 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
       FREE(best_sol->xind);
       FREE(best_sol->xval);
 
-      if(delete_node){
-	 best_sol->xind = root->sol_ind;
-	 best_sol->xval = root->sol;
-	 root->sol_ind = 0;
-	 root->sol = 0;
-      } else {
-	 best_sol->xind = (int *)malloc(ISIZE*root->sol_size);
-	 best_sol->xval = (double *)malloc(DSIZE*root->sol_size);
-	 memcpy(best_sol->xind, root->sol_ind, ISIZE*root->sol_size);
-	 memcpy(best_sol->xval, root->sol, DSIZE* root->sol_size);
-      }
+      //      if(delete_node){
+      best_sol->xind = root->sol_ind;
+      best_sol->xval = root->sol;
+      root->sol_ind = 0;
+      root->sol = 0;
+	 //      } else {
+	 //	 best_sol->xind = (int *)malloc(ISIZE*root->sol_size);
+	 //	 best_sol->xval = (double *)malloc(DSIZE*root->sol_size);
+	 //	 memcpy(best_sol->xind, root->sol_ind, ISIZE*root->sol_size);
+	 //	 memcpy(best_sol->xval, root->sol, DSIZE* root->sol_size);   
+      //}
    }  
    FREE(rowact);
    FREE(colsol);
@@ -2139,7 +2356,7 @@ int set_param(sym_environment *env, char *line)
    }
    
    else if (strcmp(key, "generate_cgl_cuts") == 0 ||
-	    strcmp(key, "CG_generate_cgl_cuts") == 0){
+	    strcmp(key, "LP_generate_cgl_cuts") == 0){
       READ_INT_PAR(lp_par->cgl.generate_cgl_cuts);
       return(0);
    }
@@ -2180,6 +2397,11 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
 
+   else if (strcmp(key, "generate_cgl_twomir_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_twomir_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_twomir_cuts);
+      return(0);
+   }
 
    else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts") == 0){
@@ -2196,6 +2418,78 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "generate_cgl_lift_and_project_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts") == 0){
       READ_INT_PAR(lp_par->cgl.generate_cgl_lift_and_project_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_landp_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_landp_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_gomory_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_gomory_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_gomory_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_knapsack_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_knapsack_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_knapsack_cuts_freq);
+      return(0);
+   }
+   
+   else if (strcmp(key, "generate_cgl_oddhole_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_oddhole_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_oddhole_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_probing_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_probing_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_probing_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_clique_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_clique_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_clique_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_mir_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_mir_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_twomir_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_twomir_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_twomir_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_flow_and_cover_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_flow_and_cover_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_rounding_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_rounding_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_rounding_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_lift_and_project_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_lift_and_project_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_landp_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_landp_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts_freq);
       return(0);
    }
 
@@ -2777,20 +3071,16 @@ double get_lb_for_new_rhs(bc_node *root, MIPdesc *mip, int cnt, int *ind,
 	    }			    
 	    else if (child->feasibility_status == INFEASIBLE_PRUNED){
 	       
+	       child->B_IP = SYM_INFINITY;
 	       retval = check_feasibility_new_rhs(child, mip, cnt, ind, val);
-	       if(retval == LP_D_UNBOUNDED || retval == LP_ABANDONED || 
-		  retval == LP_D_INFEASIBLE){
-		  child->B_IP = SYM_INFINITY;
-	       }
-
+	       /* if(retval == LP_D_UNBOUNDED || retval == LP_ABANDONED || 
+		   retval == LP_D_INFEASIBLE){
+		   child->B_IP = SYM_INFINITY;
+	       } */
 	       if(retval == LP_OPTIMAL || retval == LP_D_OBJLIM || 
 		  retval == LP_D_ITLIM){
 		  child->B_IP = -SYM_INFINITY;
-
 	       }
-
-	       child->B_IP = SYM_INFINITY;
-
 	    }
 	    else {
 	       printf("get_lb_for_new_rhs(): Unknown error!\n");

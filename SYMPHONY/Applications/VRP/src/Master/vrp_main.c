@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Vehicle Routing Problem and the Traveling Salesman Problem.           */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
 /*                                                                           */
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 
    //si.setSymParam(OsiSymVerbosity, 3);
    si.setSymParam(OsiSymGranularity, 0.9999); 
-   si.setSymParam(OsiSymGenerateMipCuts, false);
+   si.setSymParam("generate_cgl_cuts", FALSE);
    si.setSymParam("lp_executable_name", "vrp_lp_cg");
    si.setSymParam("cp_executable_name", "vrp_cp");
    
@@ -63,6 +63,8 @@ int main(int argc, char **argv)
    vrp_problem *vrp;
 
    sym_environment *env = sym_open_environment();
+
+   version();
 
    sym_parse_command_line(env, argc, argv);
 

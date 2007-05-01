@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* Capacitated Network Routing Problems.                                     */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
 /*                                                                           */
@@ -48,10 +48,13 @@ int main(int argc, char **argv)
    /* Open the SYMPHONY environemt */
    sym_environment *env = sym_open_environment();
 
+   /* Print version info */
+   version();
+   
    /* Parse the command line arguments */
    sym_parse_command_line(env, argc, argv);
 
-   /* Tell SYMPHONY where the user data is stored, so that this pointer can be
+  /* Tell SYMPHONY where the user data is stored, so that this pointer can be
       made available for user callbacks. */
    sym_set_user_data(env, cnrp);
 

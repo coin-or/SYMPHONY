@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+# (c) Copyright 2006-2007 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Common Public License. Please see     #
 # accompanying file for terms.                                              #
@@ -22,7 +22,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([SYMPHONY],[5.1],[coin-symphony@list.coin-or.org])
+AC_INIT([SYMPHONY],[5.2-devel],[coin-symphony@list.coin-or.org])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
@@ -32,7 +32,7 @@ AC_COPYRIGHT([
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -96,7 +96,7 @@ AC_COIN_HAS_PROJECT(Cgl)
 
 # Check which third party solvers are available ToDo!
 AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
-AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h])#,[glp_lpx_simplex])
+AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h],[glp_lpx_simplex])
 AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
 AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
 AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
@@ -133,7 +133,7 @@ case $sym_lp_solver in
    ;; 
    cplex)
      AC_MSG_RESULT(Cplex)
-     if test $coin_has_cplex = false; then 
+     if test $coin_has_cpx = false; then 
          found_package=false
       fi
    ;; 
@@ -145,13 +145,13 @@ case $sym_lp_solver in
    ;; 
    soplex)
          AC_MSG_RESULT(Soplex)
-     if test $coin_has_soplex = false; then 
+     if test $coin_has_spx = false; then 
          found_package=false
       fi
    ;; 
    xpress)
          AC_MSG_RESULT(Xpress)
-     if test $coin_has_xpress = false; then 
+     if test $coin_has_xpr = false; then 
          found_package=false
       fi
    ;; 
@@ -172,11 +172,11 @@ test $coin_has_glpk = true])
 AM_CONDITIONAL(OSL_LP_SOLVER,[test $sym_lp_solver = osl &&
 test $coin_has_osl = true])
 AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $sym_lp_solver = cplex&&
-test $coin_has_cplex = true])
+test $coin_has_cpx = true])
 AM_CONDITIONAL(SOPLEX_LP_SOLVER,[test $sym_lp_solver = soplex &&
-test $coin_has_soplex = true])
+test $coin_has_spx = true])
 AM_CONDITIONAL(XPRESS_LP_SOLVER,[test $sym_lp_solver = xpress &&
-test $coin_has_xpress = true])
+test $coin_has_xpr = true])
 
 #############################################################################
 #                       Add the options                                     #
@@ -440,7 +440,6 @@ AC_ARG_ENABLE([primal-heuristics],
    ;;
 esac],
 [sym_primal_heuristics=false])
-
 AM_CONDITIONAL(PRIMAL_HEURISTICS, [test $sym_primal_heuristics = true])
 
 #---------------------------------------------------------------------------#
@@ -450,7 +449,11 @@ AC_ARG_ENABLE([static-executable],
 [AC_HELP_STRING([--enable-static-executable],
                 [create a complete static executable])],
 [case "${enableval}" in
-   yes) sym_static_exe=true
+   yes) 
+      if test "$enable_shared" = yes; then 
+        AC_MSG_ERROR(static executable requires static COIN libraries: use with --enable-shared=no flag)
+      fi
+      sym_static_exe=true
    ;;
    no)  sym_static_exe=false
    ;;
@@ -466,26 +469,37 @@ AM_CONDITIONAL(STATICEXE, [test $sym_static_exe = true])
 #############################################################################
 
 SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM -D__NONE__'
+
 ARCH=
 case $build in
   *-cygwin* | *-mingw*) 
-       SYMDEFS="$SYMDEFS -D__CYGWIN" 
+       if test "$enable_doscompile" = mingw; then 
+           SYMDEFS="$SYMDEFS -D__MNO_CYGWIN" 
+       else 
+           SYMDEFS="$SYMDEFS -D__CYGWIN" 
+       fi
        ARCH=CYGWIN ;;
   *-darwin*) 
        SYMDEFS="$SYMDEFS -D__DARWIN"
        ARCH=DARWIN ;;
   *-linux-*)
        SYMDEFS="$SYMDEFS -D__LINUX" 
-       ARCH=LINUX ;;
+       case $build in 	     
+	     ppc*|powerpc*)  
+	     ARCH=LINUXPPC ;;
+	     *)
+             ARCH=LINUX ;;
+       esac
+       ;;
   *-alpha-*)
        SYMDEFS="$SYMDEFS -D__ALPHA"
        ARCH=ALPHA ;;
   *-aix-*)
        SYMDEFS="$SYMDEFS -D__RS6K" 
        ARCH=RS6K ;;
-  *-sun-*)
+  *-sun-*|*solaris2*)
        case $build in
-            *-i86pc-*)	
+            *-i86pc-* | i386-pc*)	
                 SYMDEFS="$SYMDEFS -D__X86SOL2"
 	        ARCH=X86SOL2 ;;
             *-5.-*)
@@ -803,13 +817,30 @@ SYMAPPLDIR=`pwd`/Applications
 
 #AM_CONDITIONAL(SYM_DEBUG, [ test $coin_debug_compile = true])
 
-#Add openmp flag
-if test $sym_openmp = true; then
-   CXXFLAGS="$CXXFLAGS -fopenmp"
-fi
+#Add openmp flag and take care of cl flags
+sym_use_cl=false
+CLLCFLAGS=
+case "$CXX" in
+  cl* | *\cl* | */cl*)
+     CLLCFLAGS=$CXXFLAGS
+     CXXFLAGS="$CXXFLAGS -TP"
+     sym_use_cl=true
+  ;;
+  g++* | *\g++* | */g++*)
+     if test $sym_openmp = true; then
+         CXXFLAGS="$CXXFLAGS -fopenmp"
+     fi
 
-#Ignore warnings about unrecognized pragma lines, deprecated string conversions
-CXXFLAGS="$CXXFLAGS -Wno-unknown-pragmas -Wno-write-strings"
+     #Ignore warnings about unrecognized pragma lines and 
+     #deprecated string conversions
+     CXXFLAGS="$CXXFLAGS -Wno-unknown-pragmas -Wno-write-strings"
+
+     #Ignore warnings about comparisons of signed and unsigned values and 
+     #casting const pointers to ordinary pointers
+     CXXFLAGS="$CXXFLAGS -Wno-sign-compare -Wno-cast-qual"
+   ;; 
+esac
+
 
 #Ignore warnings about comparisons of signed and unsigned values and 
 #casting const pointers to ordinary pointers
@@ -820,6 +851,8 @@ CFLAGS=$CXXFLAGS
 
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
+AC_SUBST(CLLCFLAGS)
+AM_CONDITIONAL(USE_CL, [test $sym_use_cl = true])
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
