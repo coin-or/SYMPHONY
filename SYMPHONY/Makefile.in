@@ -23,7 +23,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+# (c) Copyright 2006-2007 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Common Public License. Please see     #
 # accompanying file for terms.                                              #
@@ -153,6 +153,7 @@ CGLOBJDIR = @CGLOBJDIR@
 CGLSRCDIR = @CGLSRCDIR@
 CHECK_CUT_VALIDITY_FALSE = @CHECK_CUT_VALIDITY_FALSE@
 CHECK_CUT_VALIDITY_TRUE = @CHECK_CUT_VALIDITY_TRUE@
+CLLCFLAGS = @CLLCFLAGS@
 CLPOBJDIR = @CLPOBJDIR@
 CLPSRCDIR = @CLPSRCDIR@
 CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
@@ -310,6 +311,8 @@ TRACE_PATH_FALSE = @TRACE_PATH_FALSE@
 TRACE_PATH_TRUE = @TRACE_PATH_TRUE@
 USE_CGL_CUTS_FALSE = @USE_CGL_CUTS_FALSE@
 USE_CGL_CUTS_TRUE = @USE_CGL_CUTS_TRUE@
+USE_CL_FALSE = @USE_CL_FALSE@
+USE_CL_TRUE = @USE_CL_TRUE@
 USE_GMPL_FALSE = @USE_GMPL_FALSE@
 USE_GMPL_TRUE = @USE_GMPL_TRUE@
 VERSION = @VERSION@
@@ -324,12 +327,14 @@ abs_bin_dir = @abs_bin_dir@
 abs_include_dir = @abs_include_dir@
 abs_lib_dir = @abs_lib_dir@
 abs_source_dir = @abs_source_dir@
+ac_c_preproc_warn_flag = @ac_c_preproc_warn_flag@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
+ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -873,20 +878,20 @@ uninstall-info: uninstall-info-recursive
 ########################################################################
 
  test: all
-	cd test; make test
+	cd test; $(MAKE) test
 
  unitTest: test
 
  ptest: all
-	cd test; make ptest
+	cd test; $(MAKE) ptest
 
  punitTest: ptest
 
  clean-local:
-	if test -r test/Makefile; then cd test; make clean; fi
+	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
 
  distclean-local:
-	if test -r test/Makefile; then cd test; make distclean; fi
+	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
 
  .PHONY: test unitTest ptest punitTest
 

@@ -94,6 +94,23 @@ host_triplet = @host@
 
 @SYM_PARALLEL_TRUE@am__append_19 = $(SYMPHONYOBJDIR)/src/libSym$(MASTEREXT).la
 @SYM_PARALLEL_FALSE@am__append_20 = $(SYMLIB)
+@USE_CL_TRUE@am__append_21 = cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
+@USE_CL_TRUE@	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
+@USE_CL_TRUE@	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
+@USE_CL_TRUE@	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
+@USE_CL_TRUE@	cp -f OsiSolverInterfaceTest.$(OBJEXT) unitTest-OsiSolverInterfaceTest.$(OBJEXT); \
+@USE_CL_TRUE@	cp -f OsiSymSolverInterfaceTest.$(OBJEXT) unitTest-OsiSymSolverInterfaceTest.$(OBJEXT); \
+@USE_CL_TRUE@	cp -f unitTestSym.$(OBJEXT) unitTest-unitTestSym.$(OBJEXT); \
+@USE_CL_TRUE@	$(LIBTOOL) \
+@USE_CL_TRUE@	--tag=CXX --mode=link $(CXX) $(AM_CFLAGS) $(CCLCFLAGS) \
+@USE_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+
+@USE_CL_TRUE@am__append_22 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
+@USE_CL_TRUE@	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
+@USE_CL_TRUE@	OsiSolverInterfaceTest.$(OBJEXT) OsiSymSolverInterfaceTest.$(OBJEXT) \
+@USE_CL_TRUE@	 unitTestSym.$(OBJEXT)
+
+@USE_CL_FALSE@am__append_23 = $(CXXLINK)
 noinst_PROGRAMS = unitTest$(EXEEXT) punitTest$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -198,6 +215,7 @@ CGLOBJDIR = @CGLOBJDIR@
 CGLSRCDIR = @CGLSRCDIR@
 CHECK_CUT_VALIDITY_FALSE = @CHECK_CUT_VALIDITY_FALSE@
 CHECK_CUT_VALIDITY_TRUE = @CHECK_CUT_VALIDITY_TRUE@
+CLLCFLAGS = @CLLCFLAGS@
 CLPOBJDIR = @CLPOBJDIR@
 CLPSRCDIR = @CLPSRCDIR@
 CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
@@ -355,6 +373,8 @@ TRACE_PATH_FALSE = @TRACE_PATH_FALSE@
 TRACE_PATH_TRUE = @TRACE_PATH_TRUE@
 USE_CGL_CUTS_FALSE = @USE_CGL_CUTS_FALSE@
 USE_CGL_CUTS_TRUE = @USE_CGL_CUTS_TRUE@
+USE_CL_FALSE = @USE_CL_FALSE@
+USE_CL_TRUE = @USE_CL_TRUE@
 USE_GMPL_FALSE = @USE_GMPL_FALSE@
 USE_GMPL_TRUE = @USE_GMPL_TRUE@
 VERSION = @VERSION@
@@ -369,12 +389,14 @@ abs_bin_dir = @abs_bin_dir@
 abs_include_dir = @abs_include_dir@
 abs_lib_dir = @abs_lib_dir@
 abs_source_dir = @abs_source_dir@
+ac_c_preproc_warn_flag = @ac_c_preproc_warn_flag@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
+ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -433,7 +455,7 @@ test_srcdir = $(OSISRCDIR)/test
 # "top_srcdir" refers to the basic directory for the main package that is
 # being compiled.
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(SYMINCDIR)` -I`$(CYGPATH_W) \
-	$(OSISRCDIR)/src/OsiSym` -DCOIN_HAS_SYM $(am__append_3) \
+	$(OSISRCDIR)/src/OsiSym` -DCOIN_HAS_SYMPHONY $(am__append_3) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
 	$(am__append_11) $(am__append_13) $(am__append_15) \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` -I`$(CYGPATH_W) \
@@ -472,6 +494,8 @@ ALLLDADD = $(LDADD) $(ADDLIBS)
 SYMLIB = $(SYMPHONYOBJDIR)/src/libSym.la
 SYMPLIB = $(am__append_19) $(am__append_20)
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+TestLDADD = $(LDADD) $(am__append_22)
+TestLINK = $(am__append_21) $(am__append_23)
 unitTest_SOURCES = \
 	$(test_srcdir)/OsiColCutTest.cpp \
 	$(test_srcdir)/OsiCutsTest.cpp \
@@ -490,10 +514,11 @@ punitTest_SOURCES = \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
-unitTest_DEPENDENCIES = $(LDADD) $(SYMLIB)
+unitTest_DEPENDENCIES = $(TestLDADD) $(SYMLIB)
 unitTest_CPPFLAGS = $(SYMCPPFLAGS)
 unitTest_LDADD = $(SYMLIB) $(ALLLDADD)
 unitTest_LDFLAGS = -rpath $(libdir)
+unitTest_LINK = $(TestLINK)
 punitTest_DEPENDENCIES = $(LDADD) $(SYMPLIB)
 punitTest_CPPFLAGS = $(SYMPCPPFLAGS)
 punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD)
@@ -551,7 +576,7 @@ punitTest$(EXEEXT): $(punitTest_OBJECTS) $(punitTest_DEPENDENCIES)
 	$(CXXLINK) $(punitTest_LDFLAGS) $(punitTest_OBJECTS) $(punitTest_LDADD) $(LIBS)
 unitTest$(EXEEXT): $(unitTest_OBJECTS) $(unitTest_DEPENDENCIES) 
 	@rm -f unitTest$(EXEEXT)
-	$(CXXLINK) $(unitTest_LDFLAGS) $(unitTest_OBJECTS) $(unitTest_LDADD) $(LIBS)
+	$(unitTest_LINK) $(unitTest_LDFLAGS) $(unitTest_OBJECTS) $(unitTest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -972,19 +997,19 @@ uninstall-am: uninstall-info-am
 # We are using the Cbc solver executable to do the unit test
 
 test: unitTest$(EXEEXT)
-	cd ../../Data/miplib3; make uncompress
-	cd ../../Data/Netlib; make uncompress
+	cd ../../Data/miplib3; $(MAKE) uncompress
+	cd ../../Data/Netlib; $(MAKE) uncompress
 	./unitTest$(EXEEXT)
 #-T $(DATAOBJDIR)/miplib3 \
-#	-mpsDir=$(DATAOBJDIR)/Sample \
+#	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 
 ptest: punitTest$(EXEEXT)
-	cd ../../Data/miplib3; make uncompress
-	cd ../../Data/Netlib; make uncompress
+	cd ../../Data/miplib3; $(MAKE) uncompress
+	cd ../../Data/Netlib; $(MAKE) uncompress
 	./punitTest$(EXEEXT) -p 2
 #-T $(DATAOBJDIR)/miplib3 \
-#	-mpsDir=$(DATAOBJDIR)/Sample \
+#	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 .PHONY: test ptest
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

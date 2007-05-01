@@ -96,6 +96,7 @@ SYMPHONY/include/config_sym.h.in -text
 SYMPHONY/include/sym_rounding.h -text
 SYMPHONY/scripts/publish2 -text
 SYMPHONY/src/Heuristics/rounding.c -text
+SYMPHONY/src/Heuristics/warm_search.c -text
 SYMPHONY/src/Makefile.am -text
 SYMPHONY/src/Makefile.in -text
 SYMPHONY/sym_addlibs.txt.in -text
