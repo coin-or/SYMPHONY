@@ -85,6 +85,9 @@ SYMPHONY/Applications/VRP/Win32/v8/libSymphony.vcproj -text
 SYMPHONY/Applications/VRP/Win32/v8/vrp.sln -text
 SYMPHONY/Applications/VRP/Win32/v8/vrp.suo -text
 SYMPHONY/Applications/VRP/Win32/v8/vrp.vcproj -text
+SYMPHONY/Examples/milp2.c -text
+SYMPHONY/Examples/milpOsi.c -text
+SYMPHONY/Examples/milpOsi2.c -text
 SYMPHONY/Makefile.am -text
 SYMPHONY/Makefile.in -text
 SYMPHONY/configure -text
