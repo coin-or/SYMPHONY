@@ -231,7 +231,7 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
 	    p->tm->par.warm_search_fix_fraction = p->tm->par.warm_search_fix_fraction*(1.0-p->tm->par.warm_search_fix_frac_decr);
 	 } 
       } else {
-	 PRINT(p->par.verbosity,-1,("warm_search: bad soln %f", new_obj_val));
+	 PRINT(p->par.verbosity,-1,("warm_search: bad soln %f\n", new_obj_val));
       }
    } else {
       PRINT(p->par.verbosity,-1,("warm_search: insufficient fixation (%d,%f) in warm_search. Leaving without doing anything.\n",num_fixable,p->tm->par.warm_search_fix_fraction*num_ints));

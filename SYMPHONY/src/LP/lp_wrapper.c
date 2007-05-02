@@ -684,7 +684,7 @@ int is_feasible_u(lp_prob *p, char branching)
       if (p->tm->par.warm_search_enabled>0) {
 	 sp_add_solution(p, cnt, indices, values, p->lp_data->objval, p->bc_index);
       }
-   } else if (p->tm->par.warm_search_enabled>0) {
+   } else if (p->tm->par.warm_search_enabled>0 && !branching) {
       int termcode = warm_search (p, indices, values, cnt, lpetol, heur_solution, new_obj_val, is_feasible);
       if (termcode == IP_HEUR_FEASIBLE) {
 	 feasible = IP_HEUR_FEASIBLE;

@@ -964,7 +964,9 @@ int sym_solve(sym_environment *env)
 
 #ifdef PRIMAL_HEURISTICS
    if (tm->par.warm_search_enabled > 0) {
-      sym_close_environment(tm->warm_search_env);
+      if (tm->par.warm_search_enabled == 1) {
+	 sym_close_environment(tm->warm_search_env);
+      }
       sp_free_sp(tm->sp);
       FREE(tm->sp);
    }
