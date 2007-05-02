@@ -952,10 +952,12 @@ int sym_solve(sym_environment *env)
    tm->stat.warm_search_time = 0;
    tm->stat.warm_search_tl_reached = 0;
 
-   if (tm->par.warm_search_enabled > 0) {
+   if (tm->par.warm_search_enabled == 1) {
       tm->warm_search_env = sym_create_copy_environment(env);
    }
-   sp_initialize(tm);
+   if (tm->par.warm_search_enabled>0) {
+      sp_initialize(tm);
+   }
 
 #endif
    termcode = solve(tm);
@@ -963,6 +965,8 @@ int sym_solve(sym_environment *env)
 #ifdef PRIMAL_HEURISTICS
    if (tm->par.warm_search_enabled > 0) {
       sym_close_environment(tm->warm_search_env);
+      sp_free_sp(tm->sp);
+      FREE(tm->sp);
    }
    //sp_close(tm); TODO
 #endif

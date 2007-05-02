@@ -19,6 +19,6 @@
 #define _WARMSEARCH_H_
 /* rounding related */
 #define  SYM_RND_FAIL  10
-int warm_search(lp_prob *p, int * indices, double *values, int cnt, double lpetol, double *heur_solution, double &new_obj_val, int is_feasible);
+int warm_search(lp_prob *p, int * indices, double *values, int cnt, double lpetol, double *heur_solution, double &new_obj_val, int &is_feasible);
 bool var_is_non_zero(int i, int *indices, int varnum, int &var_index);
 #endif

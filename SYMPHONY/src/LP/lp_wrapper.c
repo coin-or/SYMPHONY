@@ -676,17 +676,19 @@ int is_feasible_u(lp_prob *p, char branching)
       }
    }    
 
-
    //rnd_test(p);
    double new_obj_val;
    int is_feasible = FALSE;
 #ifdef PRIMAL_HEURISTICS
    if (feasible == IP_FEASIBLE) {
-      sp_add_solution(p, cnt, indices, values, p->lp_data->objval, p->bc_index);
+      if (p->tm->par.warm_search_enabled>0) {
+	 sp_add_solution(p, cnt, indices, values, p->lp_data->objval, p->bc_index);
+      }
    } else if (p->tm->par.warm_search_enabled>0) {
       int termcode = warm_search (p, indices, values, cnt, lpetol, heur_solution, new_obj_val, is_feasible);
       if (termcode == IP_HEUR_FEASIBLE) {
 	 feasible = IP_HEUR_FEASIBLE;
+	 true_objval = new_obj_val;
       }
    }
 #endif
