@@ -170,7 +170,6 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
       /* fix only to_be_fixed no. of variables */
       if (p->tm->par.warm_search_enabled==1) {
 	 for (int i=0;i<n;i++) {
-<<<<<<< .mine
 	 /* first reset all variable bounds */
 	 sym_set_col_lower(env2,i,p->mip->lb[i]);
 	 sym_set_col_upper(env2,i,p->mip->ub[i]);
