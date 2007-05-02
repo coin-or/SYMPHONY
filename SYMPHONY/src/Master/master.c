@@ -51,6 +51,11 @@
 #  define TEV_NRECV0  TEV_NRECV
 #endif
 
+#ifdef PRIMAL_HEURISTICS
+#include "sym_sp.h"
+#endif
+
+
 /*===========================================================================*\
  * This file implements the SYMPHONY callable API
 \*===========================================================================*/
@@ -226,6 +231,14 @@ int sym_set_defaults(sym_environment *env)
    // tm_par->gap_limit = 0.0;
    tm_par->find_first_feasible = FALSE;
    tm_par->sensitivity_analysis = FALSE;
+
+   tm_par->warm_search_enabled = FALSE;
+   tm_par->warm_search_frequency = 500;
+   tm_par->warm_search_fix_fraction = 0.7;
+   tm_par->warm_search_time_limit = 50;
+   tm_par->warm_search_fix_frac_incr = 0.2;
+   tm_par->warm_search_fix_frac_decr = 0.4;
+ 
    
    /************************** lp defaults ***********************************/
    lp_par->verbosity = 0;
@@ -932,7 +945,26 @@ int sym_solve(sym_environment *env)
 
    tm->start_time += start_time;
 
+#ifdef PRIMAL_HEURISTICS
+   tm->stat.warm_search_calls = 0;
+   tm->stat.warm_search_successes = 0;
+   tm->stat.warm_search_time = 0;
+   tm->stat.warm_search_tl_reached = 0;
+
+   if (tm->par.warm_search_enabled > 0) {
+      tm->warm_search_env = sym_create_copy_environment(env);
+   }
+   sp_initialize(tm);
+
+#endif
    termcode = solve(tm);
+
+#ifdef PRIMAL_HEURISTICS
+   if (tm->par.warm_search_enabled > 0) {
+      sym_close_environment(tm->warm_search_env);
+   }
+   //sp_close(tm); TODO
+#endif
 
    tm_close(tm, termcode);
 
@@ -4681,6 +4713,14 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
       *value = tm_par->sensitivity_analysis;
       return(0);
    }
+#ifdef PRIMAL_HEURISTICS
+   else if (strcmp(key, "warm_search_frequency") == 0 ||
+	 strcmp(key, "TM_sensitivity_analysis") == 0 ){
+      *value = tm_par->sensitivity_analysis;
+      return(0);
+   } /* TODO */
+#endif
+
      
    /***********************************************************************
     ***                      LP params                              ***

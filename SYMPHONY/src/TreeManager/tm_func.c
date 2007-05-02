@@ -49,6 +49,9 @@ extern long random PROTO((void));
 #include "sym_cp.h"
 #endif
 
+#ifdef PRIMAL_HEURISTICS
+#include "sym_sp.h"
+#endif
 
 int c_count = 0;
 
@@ -318,7 +321,7 @@ int solve(tm_prob *tm)
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
    double timeout2 = 5, timeout3 = tm->par.logging_interval, timeout4 = 10;
-
+  
    /*------------------------------------------------------------------------*\
     * The Main Loop
    \*------------------------------------------------------------------------*/

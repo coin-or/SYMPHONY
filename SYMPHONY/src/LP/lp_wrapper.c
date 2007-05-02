@@ -28,7 +28,6 @@
 #include "sym_macros.h"
 #include "sym_types.h"
 #include "sym_lp_solver.h"
-#include "sym_rounding.h"
 #ifdef USE_CGL_CUTS
 #include "sym_cg.h"
 #endif
@@ -37,6 +36,11 @@
 #endif
 #ifdef COMPILE_IN_CP
 #include "sym_cp.h"
+#endif
+#ifdef PRIMAL_HEURISTICS
+#include "sym_rounding.h"
+#include "sym_warm_search.h"
+#include "sym_sp.h"
 #endif
 
 /*===========================================================================*/
@@ -673,7 +677,19 @@ int is_feasible_u(lp_prob *p, char branching)
    }    
 
 
-   rnd_test(p);
+   //rnd_test(p);
+   double new_obj_val;
+   int is_feasible = FALSE;
+#ifdef PRIMAL_HEURISTICS
+   if (feasible == IP_FEASIBLE) {
+      sp_add_solution(p, cnt, indices, values, p->lp_data->objval, p->bc_index);
+   } else if (p->tm->par.warm_search_enabled>0) {
+      int termcode = warm_search (p, indices, values, cnt, lpetol, heur_solution, new_obj_val, is_feasible);
+      if (termcode == IP_HEUR_FEASIBLE) {
+	 feasible = IP_HEUR_FEASIBLE;
+      }
+   }
+#endif
    
    if (feasible == IP_FEASIBLE && p->par.multi_criteria){
       if (analyze_multicriteria_solution(p, indices, values, cnt,
@@ -693,7 +709,7 @@ int is_feasible_u(lp_prob *p, char branching)
    if (feasible == IP_HEUR_FEASIBLE){
       cnt = collect_nonzeros(p, heur_solution, indices, values);        
    }
-   
+
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE ||
        feasible == IP_HEUR_FEASIBLE){
       /* Send the solution value to the treemanager */
@@ -701,7 +717,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	 FREE(heur_solution);
 	 FREE(col_sol);
 	 if (!p->par.multi_criteria){
-	    PRINT(p->par.verbosity, 0,
+	    PRINT(p->par.verbosity, -1,
 		  ("\n* Found Another Feasible Solution.\n"));
 	    if (p->mip->obj_sense == SYM_MAXIMIZE){
 	       PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval

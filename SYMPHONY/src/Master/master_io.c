@@ -843,4 +843,12 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
        printf("\nCurrent Lower Bound:         %.3f\n", lb + obj_offset);
      }
    }
+#ifdef PRIMAL_HEURISTICS
+   printf ("\n====================== Warm Search ========================\n");
+   printf ("Number of times warm search called:             %i\n",stat->warm_search_calls);
+   printf ("Number of times warm search successful:         %i\n",stat->warm_search_successes);
+   printf ("Number of times warm search reached time limit: %i\n",stat->warm_search_tl_reached);
+   printf ("Number of time warm search infeasible:          %i\n",stat->warm_search_infeasible);
+   printf ("Time spent warm search:                         %f\n",stat->warm_search_time); 
+#endif
 }

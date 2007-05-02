@@ -2049,6 +2049,32 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(tm_par->find_first_feasible);
       return(0);
    }
+#ifdef PRIMAL_HEURISTICS
+   else if (strcmp(key, "warm_search_enabled") == 0){
+      READ_INT_PAR(tm_par->warm_search_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "warm_search_frequency") == 0){
+      READ_INT_PAR(tm_par->warm_search_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "warm_search_time_limit") == 0){
+      READ_DBL_PAR(tm_par->warm_search_time_limit);
+      return(0);
+   }
+   else if (strcmp(key, "warm_search_fix_fraction") == 0){
+      READ_DBL_PAR(tm_par->warm_search_fix_fraction);
+      return(0);
+   }
+   else if (strcmp(key, "warm_search_fix_frac_incr") == 0){
+      READ_DBL_PAR(tm_par->warm_search_fix_frac_incr);
+      return(0);
+   }
+   else if (strcmp(key, "warm_search_fix_frac_decr") == 0){
+      READ_DBL_PAR(tm_par->warm_search_fix_frac_decr);
+      return(0);
+   }
+#endif
    else if (strcmp(key, "sensitivity_analysis") == 0 ||
 	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
 #ifdef SENSITIVITY_ANALYSIS
@@ -2067,7 +2093,7 @@ int set_param(sym_environment *env, char *line)
 #endif
       return(0);
    }
-   
+
    /***********************************************************************
     ***                      LP parameters                              ***
     ***********************************************************************/

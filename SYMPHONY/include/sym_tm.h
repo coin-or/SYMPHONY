@@ -25,7 +25,6 @@
 #ifdef COMPILE_IN_CP
 #include "sym_cp.h"
 #endif
-
 /*===========================================================================*/
 
 typedef struct PROCESS_SET{
@@ -51,6 +50,7 @@ typedef struct TM_TEMP{
 \*===========================================================================*/
 
 struct LP_PROB;
+struct SYM_ENVIRONMENT;
 
 typedef struct TM_PROB{
    tm_params       par;
@@ -124,6 +124,10 @@ typedef struct TM_PROB{
 #endif
 
    tm_temp         tmp;
+
+   /*warm-search related structure*/
+  struct SYM_ENVIRONMENT *warm_search_env;
+  sp_desc  *sp;
 }tm_prob;
 
 /*===========================================================================*/

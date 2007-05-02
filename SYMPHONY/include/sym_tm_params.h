@@ -80,7 +80,16 @@ typedef struct TM_PARAMS{
    int         find_first_feasible;
 
    int         sensitivity_analysis;
-   
+
+#ifdef PRIMAL_HEURISTICS
+   int         warm_search_enabled;
+   int         warm_search_frequency;
+   double      warm_search_fix_fraction;
+   double      warm_search_time_limit;
+   double      warm_search_fix_frac_incr;
+   double      warm_search_fix_frac_decr;
+#endif
+
 }tm_params;
 
 #endif
