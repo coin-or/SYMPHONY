@@ -418,6 +418,10 @@ if USE_GMPL
 AM_CPPFLAGS += -DUSE_GLPMPL
 endif
 
+if PRIMAL_HEURISTICS
+AM_CPPFLAGS += -DPRIMAL_HEURISTICS
+endif
+
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
 

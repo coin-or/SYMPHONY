@@ -232,13 +232,14 @@ int sym_set_defaults(sym_environment *env)
    tm_par->find_first_feasible = FALSE;
    tm_par->sensitivity_analysis = FALSE;
 
+#ifdef PRIMAL_HEURISTICS
    tm_par->warm_search_enabled = FALSE;
    tm_par->warm_search_frequency = 500;
    tm_par->warm_search_fix_fraction = 0.7;
    tm_par->warm_search_time_limit = 50;
    tm_par->warm_search_fix_frac_incr = 0.2;
    tm_par->warm_search_fix_frac_decr = 0.4;
- 
+#endif 
    
    /************************** lp defaults ***********************************/
    lp_par->verbosity = 0;

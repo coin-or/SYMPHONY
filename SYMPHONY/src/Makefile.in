@@ -136,21 +136,22 @@ host_triplet = @host@
 
 #FIXME For now, assume that we have gmpl files, later check for GLPK package
 @USE_GMPL_TRUE@am__append_44 = -DUSE_GLPMPL
-@SYM_PARALLEL_TRUE@am__append_45 = $(AM_CPPFLAGS) $(SYMPDEFS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-@SYM_PARALLEL_TRUE@am__append_46 = $(ALLLDADD) -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
+@PRIMAL_HEURISTICS_TRUE@am__append_45 = -DPRIMAL_HEURISTICS
+@SYM_PARALLEL_TRUE@am__append_46 = $(AM_CPPFLAGS) $(SYMPDEFS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+@SYM_PARALLEL_TRUE@am__append_47 = $(ALLLDADD) -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
 @SYM_PARALLEL_TRUE@	-lgpvm3 -lpvm3
 
-@SYM_PARALLEL_TRUE@am__append_47 = $(PCPPFLAGS) -DUSE_SYM_APPLICATION
-@STATICEXE_TRUE@am__append_48 = $(STATIC_LINK) 
-@STATICEXE_FALSE@am__append_49 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+@SYM_PARALLEL_TRUE@am__append_48 = $(PCPPFLAGS) -DUSE_SYM_APPLICATION
+@STATICEXE_TRUE@am__append_49 = $(STATIC_LINK) 
+@STATICEXE_FALSE@am__append_50 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 @STATICEXE_FALSE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-@USE_CL_TRUE@am__append_50 = cp -f main.$(OBJEXT) symphony-main.$(OBJEXT); $(LIBTOOL) \
+@USE_CL_TRUE@am__append_51 = cp -f main.$(OBJEXT) symphony-main.$(OBJEXT); $(LIBTOOL) \
 @USE_CL_TRUE@	--tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
 @USE_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-@USE_CL_TRUE@am__append_51 = main.$(OBJEXT) 
-@USE_CL_FALSE@am__append_52 = $(LINK)
+@USE_CL_TRUE@am__append_52 = main.$(OBJEXT) 
+@USE_CL_FALSE@am__append_53 = $(LINK)
 EXTRA_PROGRAMS = symphony$(EXEEXT) symphony_m$(EXEEXT) \
 	symphony_m_tm$(EXEEXT) symphony_m_tm_lp$(EXEEXT) \
 	symphony_m_tm_cp$(EXEEXT) symphony_m_tm_lp_cg$(EXEEXT) \
@@ -2963,11 +2964,11 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(SYMINCDIR)` $(am__append_18) \
 	$(am__append_34) $(am__append_35) $(am__append_36) \
 	$(am__append_37) $(am__append_38) $(am__append_39) \
 	$(am__append_40) $(am__append_41) $(am__append_42) \
-	$(am__append_43) $(am__append_44)
+	$(am__append_43) $(am__append_44) $(am__append_45)
 SYMCPPFLAGS = $(AM_CPPFLAGS) $(SYMDEFS)
-PCPPFLAGS = $(am__append_45)
+PCPPFLAGS = $(am__append_46)
 APPLCPPFLAGS = $(SYMCPPFLAGS) -DUSE_SYM_APPLICATION
-APPLPCPPFLAGS = $(am__append_47)
+APPLPCPPFLAGS = $(am__append_48)
 LDADD = $(am__append_16) $(am__append_19) $(am__append_22) \
 	$(am__append_24) $(am__append_27) $(am__append_29) \
 	$(am__append_31) $(OSIOBJDIR)/src/libOsi.la \
@@ -2976,7 +2977,7 @@ LDADD = $(am__append_16) $(am__append_19) $(am__append_22) \
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
 ALLLDADD = $(LDADD) $(ADDLIBS)
-PALLLDADD = $(am__append_46)
+PALLLDADD = $(am__append_47)
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 CCLD = $(CXX)
 
@@ -2986,9 +2987,9 @@ STATIC_LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static\
 
 
 # Link with g++
-LINK = $(am__append_48) $(am__append_49)
-SYMLINK = $(am__append_50) $(am__append_52)
-SYMLDADD = $(LDADD) $(am__append_51)
+LINK = $(am__append_49) $(am__append_50)
+SYMLINK = $(am__append_51) $(am__append_53)
+SYMLDADD = $(LDADD) $(am__append_52)
 
 ########################################################################
 #                               libSym                                 #

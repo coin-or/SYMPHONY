@@ -124,10 +124,11 @@ typedef struct TM_PROB{
 #endif
 
    tm_temp         tmp;
-
+#ifdef PRIMAL_HEURISTICS
    /*warm-search related structure*/
   struct SYM_ENVIRONMENT *warm_search_env;
   sp_desc  *sp;
+#endif
 }tm_prob;
 
 /*===========================================================================*/
