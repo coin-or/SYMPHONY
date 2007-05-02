@@ -2935,6 +2935,7 @@ sym_environment *create_copy_environment (sym_environment *env)
 
    /* copy mip */
    if (env->mip){
+      free_mip_desc(env_copy->mip);
       env_copy->mip = create_copy_mip_desc(env->mip);
    }
 
