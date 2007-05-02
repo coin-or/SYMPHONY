@@ -541,7 +541,7 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 	  root->node_status == NODE_STATUS__INTERRUPTED || 
 	  root->feasibility_status == PRUNED_HAS_CAN_SOLUTION || 
 	  root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
-	 if(change_type == OBJ_COEFF_CHANGED || change_type == RHS_CHANGED || COL_BOUNDS_CHANGED){      
+	 if(change_type == OBJ_COEFF_CHANGED || change_type == RHS_CHANGED || change_type == COL_BOUNDS_CHANGED){      
 	   if (root->feasibility_status == FEASIBLE_PRUNED ||
 	       root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
 	       root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
@@ -558,7 +558,8 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 		 update_tree_bound(env, root->children[i], change_type);
 	      }
 	   } else{
-	      root->node_status = NODE_STATUS__WARM_STARTED;	      
+	      if(root->node_status == NODE_STATUS__WSPRUNED) root->node_status = NODE_STATUS__PRUNED;		 
+	      else root->node_status = NODE_STATUS__WARM_STARTED; 
 	      if(resolve == 0){
 		 root->lower_bound = MAXDOUBLE;
 	      }else{
@@ -590,7 +591,8 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 	       }
 	    }
 	 }else{ 
-	    root->node_status = NODE_STATUS__WARM_STARTED;
+	    if(root->node_status == NODE_STATUS__WSPRUNED) root->node_status = NODE_STATUS__PRUNED;
+	    else root->node_status = NODE_STATUS__WARM_STARTED;
 	    if(resolve == 0){
 	       root->lower_bound = MAXDOUBLE;
 	    }else{
@@ -604,7 +606,7 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 /*===========================================================================*/
 void update_branching_decisions(sym_environment *env, bc_node *root, int change_type)
 {
-   int i;
+   int i, j;
    int type = 1;
    int resolve = 0;
    int deleted = 0;
@@ -626,8 +628,12 @@ void update_branching_decisions(sym_environment *env, bc_node *root, int change_
 		   }
 		}else {
 		   if(root->bobj.rhs[i] < env->mip->lb[root->bobj.name]){
-		      ws_free_subtree(env, root->children[i], change_type, FALSE, TRUE);
-		      deleted++;
+		      root->children[i]->node_status = NODE_STATUS__WSPRUNED;		      
+		      root->children[i]->feasibility_status = INFEASIBLE_PRUNED;
+		      for(j = 0; j<root->children[i]->bobj.child_num; j++){
+			 ws_free_subtree(env, root->children[i]->children[j], change_type, FALSE, TRUE);
+		      }
+		      root->children[i]->bobj.child_num = 0;
 		   }
 		   else if(root->bobj.rhs[i] > env->mip->ub[root->bobj.name]){
 		      root->bobj.rhs[i] = floor(env->mip->ub[root->bobj.name]);
@@ -645,8 +651,12 @@ void update_branching_decisions(sym_environment *env, bc_node *root, int change_
 		   }
 		}else {
 		   if(root->bobj.rhs[i] > env->mip->ub[root->bobj.name]){
-		      ws_free_subtree(env, root->children[i], change_type, FALSE, TRUE);
-		      deleted++;
+		      root->children[i]->node_status = NODE_STATUS__WSPRUNED;		      
+		      root->children[i]->feasibility_status = INFEASIBLE_PRUNED;
+		      for(j = 0; j<root->children[i]->bobj.child_num; j++){
+			 ws_free_subtree(env, root->children[i]->children[j], change_type, FALSE, TRUE);
+		      }
+		      root->children[i]->bobj.child_num = 0;
 		   }
 		   else if(root->bobj.rhs[i] < env->mip->lb[root->bobj.name]){
 		      root->bobj.rhs[i] = ceil(env->mip->lb[root->bobj.name]);
@@ -665,7 +675,8 @@ void update_branching_decisions(sym_environment *env, bc_node *root, int change_
       }
       root->bobj.child_num -= deleted;
       if(root->bobj.child_num <= 0){
-	 root->node_status = NODE_STATUS__WARM_STARTED;
+	 if(root->node_status !=NODE_STATUS__WSPRUNED)
+	    root->node_status = NODE_STATUS__WARM_STARTED;
 	 if(resolve == 0){
 	    root->lower_bound = MAXDOUBLE;
 	 }else{

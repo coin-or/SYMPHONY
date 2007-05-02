@@ -151,13 +151,14 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
       double rand01;
       num_fixed = 0;
 
-
+      for (int i=0;i<n;i++) {
+	 /* first reset all variable bounds */
+	 sym_set_col_lower(env2,i,p->mip->lb[i]);
+	 sym_set_col_upper(env2,i,p->mip->ub[i]);
+      }
       /* fix only to_be_fixed no. of variables */
       while (num_fixed<to_be_fixed) {
 	 for (int i=0;i<n;i++) {
-	    /* first reset all variable bounds */
-	    sym_set_col_lower(env2,i,p->mip->lb[i]);
-	    sym_set_col_upper(env2,i,p->mip->ub[i]);
 	    int j = vars[i]->userind;
 	    if (vars[i]->is_int && may_be_fixed[i] && (double)num_fixed/to_be_fixed <= CoinDrand48() && num_fixed<to_be_fixed) {
 	       sym_set_col_lower(env2, j, fixed_val[i]);

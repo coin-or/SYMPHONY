@@ -110,6 +110,7 @@
 #define NODE_STATUS__PRUNED       4
 #define NODE_STATUS__INTERRUPTED  5
 #define NODE_STATUS__WARM_STARTED 6
+#define NODE_STATUS__WSPRUNED     7
 /*------------------------------ not_fixed stati ----------------------------*/
 #define NF_CHECK_ALL             0x00
 #define NF_CHECK_AFTER_LAST      0x01
