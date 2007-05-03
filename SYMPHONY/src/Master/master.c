@@ -234,11 +234,13 @@ int sym_set_defaults(sym_environment *env)
 
 #ifdef PRIMAL_HEURISTICS
    tm_par->warm_search_enabled = FALSE;
-   tm_par->warm_search_frequency = 500;
+   tm_par->warm_search_frequency = 20;
    tm_par->warm_search_fix_fraction = 0.7;
    tm_par->warm_search_time_limit = 50;
    tm_par->warm_search_fix_frac_incr = 0.2;
-   tm_par->warm_search_fix_frac_decr = 0.4;
+   tm_par->warm_search_fix_frac_decr = 0.1;
+   tm_par->warm_search_min_gap = 0.2;
+   tm_par->warm_search_max_time_frac = 0.1;
 #endif 
    
    /************************** lp defaults ***********************************/

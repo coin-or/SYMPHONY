@@ -2085,6 +2085,14 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(tm_par->warm_search_fix_frac_decr);
       return(0);
    }
+   else if (strcmp(key, "warm_search_min_gap") == 0){
+      READ_DBL_PAR(tm_par->warm_search_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "warm_search_max_time_frac") == 0){
+      READ_DBL_PAR(tm_par->warm_search_max_time_frac);
+      return(0);
+   }
 #endif
    else if (strcmp(key, "sensitivity_analysis") == 0 ||
 	    strcmp(key, "TM_sensitivity_analysis") == 0 ){

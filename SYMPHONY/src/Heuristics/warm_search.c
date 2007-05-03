@@ -55,12 +55,29 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
     * p->tm->par.time_limit; 
     */
    tm_prob *tm = p->tm;
-   double gap = (tm->has_ub)?fabs((tm->ub-tm->lb)/tm->ub):10;
+   double gap = (tm->has_ub)?fabs((tm->ub-tm->lb)/(fabs(tm->ub)+lpetol)):10;
+   double elapsed_time = wall_clock(NULL) - tm->start_time;
    sp_desc *sp = p->tm->sp;
 
 
    double start_time = wall_clock(NULL);
-   if (tm->stat.analyzed%p->tm->par.warm_search_frequency != 1 || is_feasible) {
+   if (p->bc_index%p->tm->par.warm_search_frequency != 1 || p->node_iter_num != 1 || is_feasible) {
+      /* use this heuristic only when bc_index is a multiple of
+       * warm_search_frequency and we are doing first iteration on that node
+       * and the solution is not IP feasible.
+       */
+      return IP_INFEASIBLE;
+   }
+
+   if (gap<p->tm->par.warm_search_min_gap) {
+      /* Use this heuristic only when gap is large */
+      return IP_INFEASIBLE;
+   }
+
+   if (tm->stat.warm_search_time/elapsed_time>p->tm->par.warm_search_max_time_frac) {
+      /* Use this heuristic only when a small amount of time has been spent on
+       * this heuristic so far.
+       */
       return IP_INFEASIBLE;
    }
 
@@ -69,48 +86,48 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
    int n;
    MIPdesc *mip2;
    sym_environment *env2;
-   
-   if (p->tm->par.warm_search_enabled==2) {
-      env2 = sym_open_environment();
-      mip2 = create_copy_mip_desc (p->mip);
-      sym_explicit_load_problem(env2, mip2->n, mip2->m, mip2->matbeg, 
-	    mip2->matind, mip2->matval, mip2->lb, mip2->ub, mip2->is_int, 
-	    mip2->obj, mip2->obj2, mip2->sense, mip2->rhs, mip2->rngval, 
-	    TRUE);
-   } else {
-      env2 = p->tm->warm_search_env;
-      mip2 = env2->mip;
-      sym_set_int_param(env2,"keep_warm_start", TRUE);
-      sym_set_int_param(env2,"generate_cgl_cuts", FALSE);
-      sym_set_int_param(env2,"warm_search_enabled", FALSE);
-   }
-   n = mip2->n;
- 
-   /* we have a solution to lp relaxation which is not IP feasible. We explore
-      its nbhd. */
-   vars = current_lp->vars;
-
-   /* if we want to use the original MIP while searching */
-   num_ints=0;
-   for (int i=0;i<n;i++) {
-      if (mip2->is_int[i]) {
-	 num_ints++;
-      }
-   }
 
    /* see if we can use a reference solution from the solution pool */
    if (sp->num_solutions>0) {
       reference_solution = sp->solutions[sp->num_solutions-1];
       have_reference = TRUE;
-      PRINT(p->par.verbosity,-1,("warm_search: reference solution value = %f\n", reference_solution->objval));
-      PRINT(p->par.verbosity,-1,("warm_search: reference solution length = %i\n", reference_solution->xlength));
-      
+      PRINT(p->par.verbosity,1,("warm_search: reference solution value = %f\n", reference_solution->objval));
+      PRINT(p->par.verbosity,1,("warm_search: reference solution length = %i\n", reference_solution->xlength));
+
    }
 
    if (have_reference) {
       /* we have a reference solution and an LP solution. Fix those variables
        * which have the same value in both
        */
+      if (p->tm->par.warm_search_enabled==2) {
+	 env2 = sym_open_environment();
+	 mip2 = create_copy_mip_desc (p->mip);
+	 sym_explicit_load_problem(env2, mip2->n, mip2->m, mip2->matbeg, 
+	       mip2->matind, mip2->matval, mip2->lb, mip2->ub, mip2->is_int, 
+	       mip2->obj, mip2->obj2, mip2->sense, mip2->rhs, mip2->rngval, 
+	       TRUE);
+      } else {
+	 env2 = p->tm->warm_search_env;
+	 mip2 = env2->mip;
+	 sym_set_int_param(env2,"keep_warm_start", TRUE);
+	 sym_set_int_param(env2,"generate_cgl_cuts", FALSE);
+	 sym_set_int_param(env2,"warm_search_enabled", FALSE);
+      }
+      n = mip2->n;
+
+      /* we have a solution to lp relaxation which is not IP feasible. We explore
+	 its nbhd. */
+      vars = current_lp->vars;
+
+      /* if we want to use the original MIP while searching */
+      num_ints=0;
+      for (int i=0;i<n;i++) {
+	 if (mip2->is_int[i]) {
+	    num_ints++;
+	 }
+      }
+
       int c1, c2;
       c1=c2=0;
       fixed_val = (double *)malloc(n*DSIZE);
@@ -151,101 +168,104 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
 	    }
 	 }
       }
-   } else {
-      PRINT(p->par.verbosity,10,("Dont know what to do, no reference solution exists\n"));
-      return(0);
-   }
 
-   PRINT(p->par.verbosity,-1,("warm_search: warm_search_fix_fraction = %f\n",p->tm->par.warm_search_fix_fraction));
+      PRINT(p->par.verbosity,-1,("warm_search: warm_search_fix_fraction = %f\n",p->tm->par.warm_search_fix_fraction));
 
-   if (num_fixable >= p->tm->par.warm_search_fix_fraction*num_ints) {
-      int to_be_fixed = (int) floor(p->tm->par.warm_search_fix_fraction*num_ints);
-      num_fixed = 0;
+      if (num_fixable >= p->tm->par.warm_search_fix_fraction*num_ints) {
+	 int to_be_fixed = (int) floor(p->tm->par.warm_search_fix_fraction*num_ints);
+	 num_fixed = 0;
 
-      for (int i=0;i<n;i++) {
-	 /* first reset all variable bounds */
-	 sym_set_col_lower(env2,i,p->mip->lb[i]);
-	 sym_set_col_upper(env2,i,p->mip->ub[i]);
-      }
-      /* fix only to_be_fixed no. of variables */
-      if (p->tm->par.warm_search_enabled==1) {
 	 for (int i=0;i<n;i++) {
-	 /* first reset all variable bounds */
-	 sym_set_col_lower(env2,i,p->mip->lb[i]);
-	 sym_set_col_upper(env2,i,p->mip->ub[i]);
+	    /* first reset all variable bounds */
+	    sym_set_col_lower(env2,i,p->mip->lb[i]);
+	    sym_set_col_upper(env2,i,p->mip->ub[i]);
 	 }
-      }
-      
-      /* fix first to_be_fixed variables which can be fixed */
-      for (int i=0;i<n;i++) {
-	 int ui = vars[i]->userind;
-	 if (vars[i]->is_int && may_be_fixed[ui]) {
-	    sym_set_col_lower(env2, ui, fixed_val[ui]);
-	    sym_set_col_upper(env2, ui, fixed_val[ui]);
-	    num_fixed++;
-	    if (num_fixed>=to_be_fixed) {
-	       break;
+	 /* fix only to_be_fixed no. of variables */
+	 if (p->tm->par.warm_search_enabled==1) {
+	    for (int i=0;i<n;i++) {
+	       /* first reset all variable bounds */
+	       sym_set_col_lower(env2,i,p->mip->lb[i]);
+	       sym_set_col_upper(env2,i,p->mip->ub[i]);
 	    }
 	 }
-      }
-      /* TODO: randomize or select best candidates rather than first
-       * to_be_fixed variables for fixing
-       */
 
-      PRINT(p->par.verbosity,-1,("warm_search: fixed %d out of %d fixable and %d total ints.\n",num_fixed,num_fixable,num_ints));
-      
-      /* update usage statistic */
-      /* TODO */
-      /* solve the small mip */
-      tm->stat.warm_search_calls++;
-      PRINT(p->par.verbosity,-1,("warm search: current upper bound = %f\n",current_ub));
-      //sym_set_primal_bound(env2, current_ub);
-      sym_set_int_param(env2, "verbosity", -1);
-      sym_set_dbl_param(env2, "time_limit", p->tm->par.warm_search_time_limit);
-      double solve_start_time = wall_clock(NULL);
-      sym_warm_solve(env2);
-      double solve_stop_time = wall_clock(NULL);
-      PRINT(p->par.verbosity,-1,("warm_search: Time taken = %f\n",solve_stop_time-solve_start_time));
-      termstatus = sym_get_status(env2);
-      if ((sym_get_obj_val(env2, &new_obj_val) == FUNCTION_TERMINATED_NORMALLY) 
-	    && (new_obj_val < current_ub - p->par.granularity))  {
-	 /* heur_solution is sent back to lp_wrapper.c in symphony */
-	 sym_get_col_solution(env2, heur_solution);
-	 termcode = IP_HEUR_FEASIBLE;
-	 PRINT(p->par.verbosity,-1,("warm_search: found better soln: %12.8f, %f\n", new_obj_val,p->par.granularity));
-	 int *indices2 = p->lp_data->tmp.i1; /* n */
-	 double *values2 = p->lp_data->tmp.d; /* n */
-	 int cnt = collect_nonzeros(p, heur_solution, indices2, values2);
-	 sp_add_solution(p,cnt,indices2,values2,new_obj_val,p->bc_index);
-	 p->tm->stat.warm_search_successes++;
-      } else if (termstatus==TM_TIME_LIMIT_EXCEEDED) {
-	 /*
-	   this means that the time ran out before a solution could be found.
-	 */
-	 PRINT(p->par.verbosity,-1,("warm_search: Time limit reached.\n"));
-	 p->tm->stat.warm_search_tl_reached++;
-	 p->tm->par.warm_search_fix_fraction *= (1+p->tm->par.warm_search_fix_frac_incr);
-      } else if (termstatus==TM_NO_SOLUTION) {
-	 PRINT(p->par.verbosity,-1,("warm_search: no soln found"));
-	 if (solve_stop_time-solve_start_time<0.5*p->tm->par.warm_search_time_limit) {
-	    p->tm->par.warm_search_fix_fraction = p->tm->par.warm_search_fix_fraction*(1.0-p->tm->par.warm_search_fix_frac_decr);
-	 } 
+	 /* fix first to_be_fixed variables which can be fixed */
+	 for (int i=0;i<n;i++) {
+	    int ui = vars[i]->userind;
+	    if (vars[i]->is_int && may_be_fixed[ui]) {
+	       sym_set_col_lower(env2, ui, fixed_val[ui]);
+	       sym_set_col_upper(env2, ui, fixed_val[ui]);
+	       num_fixed++;
+	       if (num_fixed>=to_be_fixed) {
+		  break;
+	       }
+	    }
+	 }
+	 /* TODO: randomize or select best candidates rather than first
+	  * to_be_fixed variables for fixing
+	  */
+
+	 PRINT(p->par.verbosity,-1,("warm_search: fixed %d out of %d fixable and %d total ints.\n",num_fixed,num_fixable,num_ints));
+
+	 /* update usage statistic */
+	 /* TODO */
+	 /* solve the small mip */
+	 tm->stat.warm_search_calls++;
+	 PRINT(p->par.verbosity,1,("warm search: current upper bound = %f\n",current_ub));
+	 if (p->tm->par.warm_search_enabled==2) {
+	    sym_set_primal_bound(env2, current_ub);
+	 }
+	 sym_set_int_param(env2, "verbosity", -5);
+	 sym_set_dbl_param(env2, "time_limit", p->tm->par.warm_search_time_limit);
+	 double solve_start_time = wall_clock(NULL);
+	 sym_warm_solve(env2);
+	 double solve_stop_time = wall_clock(NULL);
+	 PRINT(p->par.verbosity,-1,("warm_search: Time taken = %f\n",solve_stop_time-solve_start_time));
+	 termstatus = sym_get_status(env2);
+	 if ((sym_get_obj_val(env2, &new_obj_val) == FUNCTION_TERMINATED_NORMALLY) 
+	       && (new_obj_val < current_ub - p->par.granularity))  {
+	    /* heur_solution is sent back to lp_wrapper.c in symphony */
+	    sym_get_col_solution(env2, heur_solution);
+	    termcode = IP_HEUR_FEASIBLE;
+	    PRINT(p->par.verbosity,-1,("warm_search: found better soln: %12.8f, %f\n", new_obj_val,p->par.granularity));
+	    int *indices2 = p->lp_data->tmp.i1; /* n */
+	    double *values2 = p->lp_data->tmp.d; /* n */
+	    int cnt = collect_nonzeros(p, heur_solution, indices2, values2);
+	    sp_add_solution(p,cnt,indices2,values2,new_obj_val,p->bc_index);
+	    p->tm->stat.warm_search_successes++;
+	 } else if (termstatus==TM_TIME_LIMIT_EXCEEDED) {
+	    /*
+	       this means that the time ran out before a solution could be found.
+	       */
+	    PRINT(p->par.verbosity,-1,("warm_search: Time limit reached.\n"));
+	    p->tm->stat.warm_search_tl_reached++;
+	    p->tm->par.warm_search_fix_fraction *= (1+p->tm->par.warm_search_fix_frac_incr);
+	 } else if (termstatus==TM_NO_SOLUTION) {
+	    PRINT(p->par.verbosity,-1,("warm_search: no soln found\n"));
+	    if (solve_stop_time-solve_start_time<0.5*p->tm->par.warm_search_time_limit) {
+	       p->tm->par.warm_search_fix_fraction = p->tm->par.warm_search_fix_fraction*(1.0-p->tm->par.warm_search_fix_frac_decr);
+	    } 
+	 } else {
+	    PRINT(p->par.verbosity,-1,("warm_search: bad soln %f\n", new_obj_val));
+	 }
       } else {
-	 PRINT(p->par.verbosity,-1,("warm_search: bad soln %f\n", new_obj_val));
+	 PRINT(p->par.verbosity,-1,("warm_search: insufficient fixation (%d,%f) in warm_search. Leaving without doing anything.\n",num_fixable,p->tm->par.warm_search_fix_fraction*num_ints));
+	 p->tm->par.warm_search_fix_fraction = p->tm->par.warm_search_fix_fraction*(1.0-p->tm->par.warm_search_fix_frac_decr/10);
+      }
+
+      PRINT(p->par.verbosity,-1,("warm_search: new warm_search_fix_fraction = %f\n",p->tm->par.warm_search_fix_fraction));
+
+      /* free the data structures */
+      FREE(fixed_val);
+      FREE(may_be_fixed);
+      if (p->tm->par.warm_search_enabled==2) {
+	 sym_close_environment(env2);
+	 free_mip_desc(mip2);
+	 FREE(mip2);
       }
    } else {
-      PRINT(p->par.verbosity,-1,("warm_search: insufficient fixation (%d,%f) in warm_search. Leaving without doing anything.\n",num_fixable,p->tm->par.warm_search_fix_fraction*num_ints));
-      p->tm->par.warm_search_fix_fraction = p->tm->par.warm_search_fix_fraction*(1.0-p->tm->par.warm_search_fix_frac_decr/10);
-   }
-
-   PRINT(p->par.verbosity,-1,("warm_search: new warm_search_fix_fraction = %f\n",p->tm->par.warm_search_fix_fraction));
-   
-   /* free the data structures */
-   FREE(fixed_val);
-   FREE(may_be_fixed);
-   if (p->tm->par.warm_search_enabled==2) {
-      sym_close_environment(env2);
-      free_mip_desc(mip2);
+      PRINT(p->par.verbosity,10,("Dont know what to do, no reference solution exists\n"));
+      termcode = IP_INFEASIBLE;
    }
    
    p->tm->stat.warm_search_time = p->tm->stat.warm_search_time+wall_clock(NULL)-start_time;

@@ -88,6 +88,8 @@ typedef struct TM_PARAMS{
    double      warm_search_time_limit;
    double      warm_search_fix_frac_incr;
    double      warm_search_fix_frac_decr;
+   double      warm_search_min_gap;
+   double      warm_search_max_time_frac;
 #endif
 
 }tm_params;
