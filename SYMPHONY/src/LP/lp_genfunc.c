@@ -1031,8 +1031,9 @@ int check_tailoff(lp_prob *p)
 
       /* shift the data in obj_hist by one to the right and insert the
 	 most recent objval to be the 0th */
-      for (i = MIN(p->node_iter_num-1, maxsteps) - 1; i >= 0; i--)
+      for (i = MIN(p->node_iter_num-1, maxsteps) - 1; i >= 0; i--) {
 	 obj_hist[i+1] = obj_hist[i];
+      }
       obj_hist[0] = p->lp_data->objval;
 
       /* if there is an upper bound and we want gap based tailoff:
@@ -1040,11 +1041,13 @@ int check_tailoff(lp_prob *p)
 	 less than gap_frac */
       if (p->node_iter_num>gap_backsteps && p->has_ub && gap_backsteps > 0) {
 	 ub = p->ub;
-	 for (i = 1, sum = 0; i <= gap_backsteps; i++)
+	 for (i = 1, sum = 0; i <= gap_backsteps; i++) {
 	    sum += (ub - obj_hist[i-1]) / (ub - obj_hist[i]);
-	 if (sum / gap_backsteps > p->par.tailoff_gap_frac)
+	 }
+	 if (sum / gap_backsteps > p->par.tailoff_gap_frac) {
 	    PRINT(p->par.verbosity, 3, ("Branching because of tailoff in gap!\n"));
-	 return(TRUE); /* there is tailoff */
+	    return(TRUE); /* there is tailoff */
+	 }
       }
 
       /* if we want objective value based tailoff:
