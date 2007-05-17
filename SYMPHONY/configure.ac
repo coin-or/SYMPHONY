@@ -464,7 +464,7 @@ case $build in
        fi
        ARCH=CYGWIN ;;
   *-mingw*)
-       SYMDEFS="$SYMDEFS -D__MNO_CYGWIN	
+       SYMDEFS="$SYMDEFS -D__MNO_CYGWIN"
        ARCH=CYGWIN ;;
   *-darwin*) 
        SYMDEFS="$SYMDEFS -D__DARWIN"
