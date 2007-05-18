@@ -45,7 +45,8 @@ switch {\tt -H} automatically calls the user's usage subroutine. The switch
 command-line switch \texttt{-F} is used to specify the file in which the
 instance data is contained (either an MPS file or an GMPL/AMPL file). The
 \texttt{-D} switch is used to specify the data file if an GMPL/AMPL file is
-being read in (see the README file).
+being read in (see the README file). The \texttt{-L} switch is used to specify
+the data file if a file in LP format is being read in
 
 \ed
 
@@ -118,10 +119,11 @@ settings. A shell for doing this is also set up in the file
 user-defined command line switches. The switch {\tt -H} is reserved for help
 and calls the user's usage subroutine (see \hyperref{\texttt{user_usage}}
 {\texttt{user\_usage()}}{}{user_usage}). If the user returns 
-`\texttt{USER\_DEFAULT}', then \BB\ will look for the command-line switch 
+`\texttt{USER\_DEFAULT}', then \BB\ will look for the command-line switches 
 \texttt{-F} to specify the file name for reading in the model from either an 
-MPS or a GMPL/AMPL file. The \texttt{-D} command-line switch is used to 
-specify an additional data file for GMPL/AMPL models. If the \texttt{-D} 
+MPS or a GMPL/AMPL file or \texttt{-L} to specify the file name for reading in
+the model from an LP format file. The \texttt{-D} command-line switch is used
+to specify an additional data file for GMPL/AMPL models. If the \texttt{-D}
 option is not present, SYMPHONY assumes the file is an MPS file.
 
 \args
@@ -134,12 +136,11 @@ option is not present, SYMPHONY assumes the file is an MPS file.
 \returns
 
 \bt{lp{300pt}}
-{\tt USER\_ERROR} & Error. \BB\ stops. \\
-{\tt USER\_SUCCESS} & User parameters were read successfully. \\
-{\tt USER\_DEFAULT} & SYMPHONY will read in the problem instance from either
-an MPS or an GMPL/AMPL file. The command-line switches \texttt{-F} and
-\texttt{-D} will be used to specify the model file and (in the case of
-GMPL/AMPL) the data file.  \\
+{\tt USER\_ERROR} & Error. \BB\ stops. \\ {\tt USER\_SUCCESS} & User
+parameters were read successfully. \\ {\tt USER\_DEFAULT} & SYMPHONY will read
+in the problem instance from either an MPS, LP, or GMPL/AMPL file. The
+command-line switches \texttt{-F}, \texttt{-L}, and \texttt{-D} (as
+appropriate) will be used to specify the model file. \\
 \et
 
 \ed

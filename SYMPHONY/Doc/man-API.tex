@@ -348,12 +348,19 @@ solve it.
  ./symphony -F sample.mps
 \end{verbatim}
 } 
-To read and solve an GMPL model and associated data file, the command would be
+To read and solve a model in LP format, the command would be
+{\color{Brown}
+\begin{verbatim}
+ ./symphony -L sample.lp
+\end{verbatim}
+} 
+To read and solve a GMPL model and associated data file, the command would be
 {\color{Brown}
 \begin{verbatim}
  ./symphony -F sample.mod -D sample.dat
 \end{verbatim}
-} In addition to specifying the name of the instance file, most of the common
+} 
+In addition to specifying the name of the instance file, most of the common
 parameters can also be set on the command line by adding various switches.
 Calling \BB\ with just the argument \code{-h} will list all the options. To
 set parameters that cannot be set on the command line or to save parameter
@@ -461,7 +468,13 @@ this program, the following command would be issued: \\
  ./symphony -F sample.mps
 \end{verbatim}
 }
-The user does not have to invoke a command to read the MPS file. During the
+To read and solve a model in LP format, the command would be
+{\color{Brown}
+\begin{verbatim}
+ ./symphony -L sample.lp
+\end{verbatim}
+} 
+The user does not have to invoke a command to read the input file. During the
 call to \ptt{sym\_parse\_} \ptt{command\_line()}, SYMPHONY determines that the
 user wants to read in an MPS file. During the subsequent call to
 \ptt{sym\_load\_problem()}, the file is read and the problem data stored.

@@ -106,11 +106,11 @@ int sym_parse_command_line(sym_environment *env, int argc, char **argv)
 
 This routine parses the command line arguments. It must be called whenever the
 user specifies any of SYMPHONY's built-in command-line switches. For instance,
-this is the case when the user specifies the location of an MPS or GMPL file
-using the \texttt{-F} switch or when the user specifies the location of a
-parameter file with the \texttt{-f} switch. This command also invokes the user
-callback function \hyperref{{\tt user\_readparams()}} {{\tt
-user\_readparams()} (see Section }{)}{user_readparams}.
+this is the case when the user specifies the location of an MPS, LP, or GMPL
+file using the \texttt{-F} or \texttt{-L} switch or when the user specifies
+the location of a parameter file with the \texttt{-f} switch. This command
+also invokes the user callback function \hyperref{{\tt user\_readparams()}}
+{{\tt user\_readparams()} (see Section }{)}{user_readparams}.
 
 \args
 
