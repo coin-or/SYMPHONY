@@ -253,7 +253,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->mat_row_compress_ratio = .05;
    lp_par->tailoff_gap_backsteps = 2;
    lp_par->tailoff_gap_frac = .99;
-   lp_par->tailoff_obj_backsteps = 3;
+   lp_par->tailoff_obj_backsteps = 4;
    lp_par->tailoff_obj_frac = .75;
    lp_par->tailoff_absolute = 0.0001;
    lp_par->ineff_cnt_to_delete = 0;
