@@ -1366,6 +1366,32 @@ int read_mps(MIPdesc *desc, char *infile, char *probname)
 
 /*===========================================================================*/
 
+int read_lp(MIPdesc *desc, char *infile, char *probname)
+{
+   printf("\nLP-format file can be read only through OSI interface.\n");
+
+   return(1);
+}
+
+/*===========================================================================*/
+
+void write_mip_desc_mps(MIPdesc *mip, char *fname)
+{
+   fprintf(stderr, "Function not implemented yet.");
+   exit(-1);
+}
+
+
+/*===========================================================================*/
+
+void write_mip_desc_lp(MIPdesc *mip, char *fname)
+{
+   fprintf(stderr, "Function not implemented yet.");
+   exit(-1);
+}
+
+/*===========================================================================*/
+
 void write_mps(LPdata *lp_data, char *fname)
 {
    osllib_status = ekk_exportModel(lp_data->lp, fname, 1, 2);
@@ -2129,6 +2155,31 @@ int read_mps(MIPdesc *desc, char *infile, char *probname)
 
 /*===========================================================================*/
 
+int read_lp(MIPdesc *desc, char *infile, char *probname)
+{
+   printf("\nLP-format file can be read only through OSI interface.\n");
+
+   return(1);
+}
+
+/*===========================================================================*/
+
+void write_mip_desc_mps(MIPdesc *mip, char *fname)
+{
+   fprintf(stderr, "Function not implemented yet.");
+   exit(-1);
+}
+
+/*===========================================================================*/
+
+void write_mip_desc_lp(MIPdesc *mip, char *fname)
+{
+   fprintf(stderr, "Function not implemented yet.");
+   exit(-1);
+}
+
+/*===========================================================================*/
+
 void write_mps(LPdata *lp_data, char *fname)
 {
    cpx_status = CPXmpswrite(lp_data->cpxenv, lp_data->lp, fname);
@@ -2642,7 +2693,6 @@ void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 {
   double *rhs = lp_data->tmp.d; 
   double *range = (double *) calloc(cnt, DSIZE);
-  char range_used = FALSE;
   int i; 
 
   for (i = 0; i < cnt; i++){
@@ -2651,11 +2701,9 @@ void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 	range[i] = lp_data->si->getRowRange()[index[i]];
   }
 
-  if (!range_used){
-     FREE(range);
-  }
-  
   lp_data->si->setRowSetTypes(index, index + cnt, sense, rhs, range);
+
+  FREE(range);
 }
 
 /*===========================================================================*/
@@ -2809,7 +2857,6 @@ void free_row_set(LPdata *lp_data, int length, int *index)
    char *sense = lp_data->tmp.c; /* m (now) */
    double *rhs = lp_data->tmp.d; /* m */
    double *range = (double *) calloc(length, DSIZE);
-   char range_used = FALSE;
    int i; 
    
    for (i = 0; i < length; i++){
@@ -2832,7 +2879,6 @@ void free_row_set(LPdata *lp_data, int length, int *index)
        break;
      case 'R':
        range[i] = 2*lp_data->si->getInfinity();
-       range_used = TRUE;
        break;
      case 'G':
        rhs[i] = -lp_data->si->getInfinity();
@@ -2840,8 +2886,8 @@ void free_row_set(LPdata *lp_data, int length, int *index)
    }
 
    lp_data->si->setRowSetTypes(index, index + length, sense, rhs, range);
-
-     FREE(range);
+   
+   FREE(range);
 }
 
 /*===========================================================================*/
@@ -2853,7 +2899,6 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
    double *range = (double *) calloc(length, DSIZE);
    row_data *rows = lp_data->rows;
    cut_data *cut;
-   char range_used = FALSE;
    int i;
    
    for (i = length - 1; i >= 0; i--){
@@ -2861,7 +2906,6 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
       rhs[i] = cut->rhs;  
       if ((sense[i] = cut->sense) == 'R'){
 	 range[i] = cut->range;
-	 range_used = TRUE;
       }
    }
 
@@ -2988,6 +3032,78 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
 
 /*===========================================================================*/
 
+int read_lp(MIPdesc *mip, char *infile, char *probname)
+{
+
+   int j;
+   CoinLpIO lp;
+
+   lp.readLp(infile);
+   
+   strncpy(probname, const_cast<char *>(lp.getProblemName()), 80);
+   
+   mip->m  = lp.getNumRows();
+   mip->n  = lp.getNumCols();
+   mip->nz = lp.getNumElements();
+   
+   mip->obj    = (double *) malloc(DSIZE * mip->n);
+   mip->obj1   = (double *) calloc(mip->n, DSIZE);
+   mip->obj2   = (double *) calloc(mip->n, DSIZE);
+   mip->rhs    = (double *) malloc(DSIZE * mip->m);
+   mip->sense  = (char *)   malloc(CSIZE * mip->m);
+   mip->rngval = (double *) malloc(DSIZE * mip->m);
+   mip->ub     = (double *) malloc(DSIZE * mip->n);
+   mip->lb     = (double *) malloc(DSIZE * mip->n);
+   mip->is_int = (char *)   calloc(CSIZE, mip->n);
+   
+   memcpy(mip->obj, const_cast <double *> (lp.getObjCoefficients()),
+	  DSIZE * mip->n); 
+   memcpy(mip->rhs, const_cast <double *> (lp.getRightHandSide()),
+	  DSIZE * mip->m); 
+   memcpy(mip->sense, const_cast <char *> (lp.getRowSense()),
+	  CSIZE * mip->m); 
+   memcpy(mip->rngval, const_cast <double *> (lp.getRowRange()),
+	  DSIZE * mip->m); 
+   memcpy(mip->ub, const_cast <double *> (lp.getColUpper()),
+	  DSIZE * mip->n); 
+   memcpy(mip->lb, const_cast <double *> (lp.getColLower()),
+	  DSIZE * mip->n); 
+   
+   //user defined matind, matval, matbeg--fill as column ordered
+   
+   const CoinPackedMatrix * matrixByCol= lp.getMatrixByCol();
+   
+   mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
+   memcpy(mip->matbeg, const_cast<int *>(matrixByCol->getVectorStarts()),
+	  ISIZE * (mip->n + 1));
+   
+   mip->matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
+   mip->matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
+   
+   memcpy(mip->matval, const_cast<double *> (matrixByCol->getElements()),
+	  DSIZE * mip->matbeg[mip->n]);  
+   memcpy(mip->matind, const_cast<int *> (matrixByCol->getIndices()), 
+	  ISIZE * mip->matbeg[mip->n]);  
+   
+   for (j = 0; j < mip->n; j++){
+      mip->is_int[j] = lp.isInteger(j);
+   }
+
+   mip->obj_offset = -lp.objectiveOffset();
+
+   mip->colname = (char **) malloc(sizeof(char *) * mip->n);   
+   
+   for (j = 0; j < mip->n; j++){
+      mip->colname[j] = (char *) malloc(CSIZE * 9);
+      strncpy(mip->colname[j], const_cast<char*>(lp.columnName(j)), 9);
+      mip->colname[j][8] = 0;
+   }
+   
+   return 0;
+}
+
+/*===========================================================================*/
+
 void write_mps(LPdata *lp_data, char *fname)
 {
    char * extension = "MPS";
@@ -3000,6 +3116,96 @@ void write_mps(LPdata *lp_data, char *fname)
 
    lp_data->si->writeMps(fname, extension, ObjSense);
 }
+
+/*===========================================================================*/
+
+void write_mip_desc_mps(MIPdesc *mip, char *fname)
+{
+   int i;
+   double * obj; 
+   char filename[80] = "";
+   CoinMpsIO mps;
+   CoinPackedMatrix mip_matrix(true, mip->m, mip->n, mip->nz, mip->matval, 
+			       mip->matind, mip->matbeg, 0);
+
+   obj = (double *) malloc(DSIZE*mip->n);
+   memcpy(obj, mip->obj, DSIZE*mip->n);
+   if (mip->obj_sense == SYM_MAXIMIZE){
+      for (i = 0; i < mip->n; i++){
+	 obj[i] *= -1.0;
+      }
+   }
+
+   mps.setMpsData(mip_matrix, mps.getInfinity(), mip->lb, mip->ub, obj, 
+		  mip->is_int, mip->sense, mip->rhs, mip->rngval, 
+		  mip->colname, NULL);
+   mps.setObjectiveOffset(mip->obj_offset); 
+
+   sprintf(filename, "%s%s%s", fname, ".","MPS");
+   mps.writeMps(filename);
+   FREE(obj);
+}
+
+/*===========================================================================*/
+
+void write_mip_desc_lp(MIPdesc *mip, char *fname)
+{
+   int i;
+   double * obj, * rlb, * rub, infinity; 
+   char filename[80] = "";
+   CoinLpIO lp;
+   CoinPackedMatrix mip_matrix(true, mip->m, mip->n, mip->nz, mip->matval, 
+			       mip->matind, mip->matbeg, 0);
+
+   obj = (double *) malloc(DSIZE*mip->n);
+   memcpy(obj, mip->obj, DSIZE*mip->n);
+   if (mip->obj_sense == SYM_MAXIMIZE){
+      for (i = 0; i < mip->n; i++){
+	 obj[i] *= -1.0;
+      }
+   }
+
+   rlb = (double *) malloc(DSIZE*mip->m);
+   rub = (double *) malloc(DSIZE*mip->m);
+   infinity = lp.getInfinity();
+
+   /* convert sense to bound */
+   for(i = 0; i < mip->m; i++){
+      switch (mip->sense[i]){
+       case 'E':
+	  rlb[i] = rub[i] = mip->rhs[i];
+	  break;
+       case 'L':
+	  rlb[i] = -infinity;
+	  rub[i] = mip->rhs[i];
+	  break;
+       case 'G':
+	  rlb[i] = mip->rhs[i];
+	  rub[i] = infinity;
+	  break;
+       case 'R':
+	  rlb[i] = mip->rhs[i] - mip->rngval[i];
+	  rub[i] = mip->rhs[i];
+	  break;
+       case 'N':
+	  rlb[i] = -infinity;
+	  rub[i] = infinity;
+	  break;
+      }
+   }
+   
+   lp.setLpDataWithoutRowAndColNames(mip_matrix, mip->lb, mip->ub, obj, 
+				     mip->is_int, rlb, rub);
+   lp.setObjectiveOffset(mip->obj_offset); 
+   lp.setLpDataRowAndColNames(NULL, mip->colname);
+   sprintf(filename, "%s%s%s", fname, ".","LPT");
+   lp.writeLp(filename);
+
+   FREE(obj);
+   FREE(rlb);
+   FREE(rub);
+}
+
 
 /*===========================================================================*/
 
@@ -3020,7 +3226,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 {
    OsiCuts cutlist;
    OsiRowCut cut;
-   int i = 0, j = 0, k = 0; 
+   int i = 0, j = 0, k = 0, l = 0; 
    int *matind;
    double *matval;
    cgl_params *par = &(lp_data->cgl);
@@ -3204,11 +3410,23 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 int num_elements;
 	 int *indices;
 	 double *elements;
+	 int *ignorable, ign_num = 0;
 	 cut = cutlist.rowCut(i);
 	 (*cuts)[j] =  (cut_data *) calloc(1, sizeof(cut_data));
 	 num_elements = cut.row().getNumElements();
 	 indices = const_cast<int *> (cut.row().getIndices());
 	 elements = const_cast<double *> (cut.row().getElements());
+	 ignorable = (int *) calloc(ISIZE, num_elements);
+	 /* check elements and see if they can be set to 0 */ 
+	 for (k = 0; k < num_elements; k++){
+	    if(fabs(elements[k]) < lp_data->lpetol){
+	       ignorable[k] = TRUE;
+	       ign_num++;
+	    }
+	 }
+	 if(ign_num > 0) {
+	    num_elements -= ign_num; 
+	 }
 	 (*cuts)[j]->type = EXPLICIT_ROW;
 	 if (((*cuts)[j]->sense = cut.sense()) == 'R'){
 	    FREE((*cuts)[j]);
@@ -3220,11 +3438,16 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 (*cuts)[j]->coef = (char *) malloc ((*cuts)[j]->size);
 	 ((int *) ((*cuts)[j]->coef))[0] = num_elements;
 	 matind = (int *) ((*cuts)[j]->coef + ISIZE);
-	 for (k = 0; k < num_elements; k++){
-	    matind[k] = lp_data->vars[indices[k]]->userind;
-	 }
 	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
-	 memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
+	 for (l=0, k = 0; k < num_elements + ign_num; k++){
+	    if(!ignorable[k]){
+	       matind[l] = lp_data->vars[indices[k]]->userind;
+	       matval[l] = elements[k];
+	       l++;
+	    }
+	 }
+	 //matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
+	 //memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
 	 qsortucb_id(matind, matval, num_elements);
 	 (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	 (*cuts)[j]->deletable = TRUE;

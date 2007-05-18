@@ -238,11 +238,11 @@ int main(int argc, char **argv)
 	    strcpy(ext, ""); 
 	 }
 
-	 if(!(strcmp(ext, "mod") == 0 || strcmp(ext, "mps") == 0)){
+	 if(!(strcmp(ext, "mod") == 0 || strcmp(ext, "mps") == 0 || strcmp(ext, "lpt") == 0)){
 	   while(true){
-	     sym_read_line("Type of the file ('mps'/'ampl'/'gmpl'): ", &line);
+	     sym_read_line("Type of the file ('mps'/'ampl'/'gmpl'/'lpt'): ", &line);
 	     if(!(strcmp(line, "mps") == 0 || strcmp(line, "ampl") == 0 ||
-		  strcmp(line, "gmpl") == 0)){
+		  strcmp(line, "gmpl") == 0 || strcmp(line, "lpt") == 0 )){
 	       printf("Unknown type!\n");
 	       continue; 
 	     } else {
@@ -257,9 +257,12 @@ int main(int argc, char **argv)
 	    if(sym_read_mps(env, args[1])){
 	       continue;
 	    }
-
-	 } else {
-
+	 }else if (strcmp(ext, "lpt") == 0){
+	    sym_free_env(env);
+	    if(sym_read_lp(env, args[1])){
+	       continue;
+	    } 
+	 }else {
 	   if(strcmp(args[2], "") == 0){
 	     sym_read_line("Name of the data file: ", &line);
 	     strcpy(args[2], line);
@@ -582,7 +585,7 @@ int sym_help(char *line)
   if(strcmp(line, "main_help") == 0){
 
     printf("\nList of main commands: \n\n");
-    printf("load      : read a problem in mps or ampl format\n"
+    printf("load      : read a problem in mps, ampl or lp format\n"
 	   "solve     : solve the problem\n"
 	   "lpsolve   : solve the lp relaxation of the problem\n"
 	   "set       : set a parameter\n"

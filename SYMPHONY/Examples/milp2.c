@@ -102,8 +102,8 @@ int main(int argc, char* argv[]){
    sym_explicit_load_problem(env, n_cols, n_rows, start, index, value, col_lb, 
 			     col_ub, int_vars, objective, NULL, row_sense, 
 			     row_rhs, row_range, TRUE);
- 
-   //solve the integer program
+
+    //solve the integer program
    sym_solve(env);
    
    //get, print the solution

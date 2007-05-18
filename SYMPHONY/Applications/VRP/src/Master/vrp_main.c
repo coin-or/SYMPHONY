@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 
    //si.setSymParam(OsiSymVerbosity, 3);
    si.setSymParam(OsiSymGranularity, 0.9999); 
-   si.setSymParam(OsiSymGenerateMipCuts, false);
+   si.setSymParam("generate_cgl_cuts", FALSE);
    si.setSymParam("lp_executable_name", "vrp_lp_cg");
    si.setSymParam("cp_executable_name", "vrp_cp");
    

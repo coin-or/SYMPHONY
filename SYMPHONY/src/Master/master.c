@@ -413,8 +413,21 @@ int sym_get_user_data(sym_environment *env, void **user)
 int sym_read_mps(sym_environment *env, char *infile)
 {  
    
-  strncpy(env->par.infile, infile,MAX_FILE_NAME_LENGTH);
+  strncpy(env->par.infile, infile, MAX_FILE_NAME_LENGTH);
   strcpy(env->par.datafile, "");
+  env->par.file_type = MPS_FORMAT;
+  return(sym_load_problem(env));
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_read_lp(sym_environment *env, char *infile)
+{  
+   
+  strncpy(env->par.infile, infile, MAX_FILE_NAME_LENGTH);
+  strcpy(env->par.datafile, "");
+  env->par.file_type = LP_FORMAT;
   return(sym_load_problem(env));
 }
 
@@ -425,7 +438,28 @@ int sym_read_gmpl(sym_environment *env, char *modelfile, char *datafile)
 {  
   strncpy(env->par.infile, modelfile, MAX_FILE_NAME_LENGTH);
   strncpy(env->par.datafile, datafile, MAX_FILE_NAME_LENGTH);
+  env->par.file_type = GMPL_FORMAT;
   return(sym_load_problem(env));
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_write_mps(sym_environment *env, char *infile)
+{  
+   write_mip_desc_mps(env->mip, infile);
+   return 0;
+}
+
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_write_lp(sym_environment *env, char *infile)
+{  
+   write_mip_desc_lp(env->mip, infile);
+   return 0;
+   
 }
 
 /*===========================================================================*/
