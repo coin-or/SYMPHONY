@@ -3456,6 +3456,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 }else{
 	    (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
 	 }	    
+	 FREE(ignorable);
       }
       *num_cuts = j;
    }
