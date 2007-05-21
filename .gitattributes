@@ -1,10 +1,4 @@
 * text=auto !eol
-/AUTHORS -text
-/Externals -text
-/LICENSE -text
-/Makefile.am -text
-/Makefile.in -text
-/README -text
 SYMPHONY/Applications/CNRP/Makefile.in -text
 SYMPHONY/Applications/CNRP/Makefile.orig -text
 SYMPHONY/Applications/MATCH/Makefile.in -text
@@ -36,13 +30,4 @@ Win32/v6/libSymphony.dsp -text
 Win32/v6/sym.mak -text
 Win32/v6/symphony.dsp -text
 Win32/v6/symphony.dsw -text
-/compile -text
-/config.guess -text
-/config.sub -text
-/configure -text
-/configure.ac -text
-/depcomp -text
-/install-sh -text
-/ltmain.sh -text
-/missing -text
 share/config.site -text
