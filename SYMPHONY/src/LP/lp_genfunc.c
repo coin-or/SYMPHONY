@@ -1052,7 +1052,7 @@ int check_tailoff(lp_prob *p)
       /* if we want objective value based tailoff:
 	 tailoff_obj is true if the average of the objective difference
 	 ratios is smaller than par.tailoff_obj_frac */
-      if (p->node_iter_num>=obj_backsteps){
+      if (p->node_iter_num>obj_backsteps){
 	 for (i = 2, sum = 0; i <= obj_backsteps; i++){
 	    if (obj_hist[i-1] - obj_hist[i] > p->lp_data->lpetol){
 	       sum += (obj_hist[i-2]-obj_hist[i-1]) / (obj_hist[i-1]-obj_hist[i]);
@@ -1062,6 +1062,7 @@ int check_tailoff(lp_prob *p)
 	 }
 	 if (sum / (obj_backsteps - 1) < p->par.tailoff_obj_frac){
 	    PRINT(p->par.verbosity, 3, ("Branching because of tailoff in objective function!\n"));
+	    PRINT(p->par.verbosity, 3, ("sum/n = %f, tailoff_obj_frac = %f\n",sum / (obj_backsteps - 1) , p->par.tailoff_obj_frac));
 	    return(TRUE); /* there is tailoff */
 	 }
       }
