@@ -1,10 +1,20 @@
-# Copyright (C) 2006 International Business Machines and others.
-# All Rights Reserved.
-# This file is distributed under the Common Public License.
+#===========================================================================#
+#                                                                           #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
+#                                                                           #
+# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
+# Laci Ladanyi (ladanyi@us.ibm.com).                                        #
+#                                                                           #
+# The author of this file is Menal Guzelsoy                                 #
+#                                                                           #
+# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+#                                                                           #
+# This software is licensed under the Common Public License. Please see     #
+# accompanying file for terms.                                              #
+#                                                                           #
+#===========================================================================#
 
 ## $Id$
-
-# Author:  Andreas Waechter           IBM    2006-04-13
 
 AUTOMAKE_OPTIONS = foreign
 
@@ -16,36 +26,38 @@ EXTRA_DIST =
 
 # subdirs is set by configure as the list of all subdirectories to recurse
 # into
-SUBDIRS = CoinUtils Osi Cgl 
+SUBDIRS = CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl 
 
 if ADD_CLP
 SUBDIRS += Clp
 endif 
 
-SUBDIRS += SYMPHONY
+SUBDIRS += SYMPHONY FlopC++
 
 ########################################################################
 #                           Extra Targets                              #
 ########################################################################
 
-#test: all
-#	cd Cbc; make test
+test: all
+	cd SYMPHONY; make test
 
-#unitTest: test
+ptest: all
+	cd SYMPHONY; make ptest
 
-#symphony: all
-#	make; cd SYMPHONY; make
+unitTest: test
 
-#tests: all
-#	for dir in $(subdirs); do \
-#	  if test -r $$dir/test/Makefile; then \
-#	    (cd $$dir; make test) \
-#	  fi; \
-#	done
+punitTest: ptest
 
-#unitTests: tests
+tests: all
+	for dir in $(SUBDIRS); do \
+	  if test -r $$dir/test/Makefile; then \
+	    (cd $$dir; make test) \
+	  fi; \
+	done
 
-#.PHONY: tests unitTests
+unitTests: tests
+
+.PHONY: test unitTest ptest punitTest tests unitTests
 
 ########################################################################
 #                         Maintainer Stuff                             #

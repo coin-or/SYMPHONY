@@ -1,10 +1,20 @@
-# Copyright (C) 2006 International Business Machines.
-# All Rights Reserved.
-# This file is distributed under the Common Public License.
+#===========================================================================#
+#                                                                           #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
+#                                                                           #
+# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
+# Laci Ladanyi (ladanyi@us.ibm.com).                                        #
+#                                                                           #
+# The author of this file is Menal Guzelsoy                                 #
+#                                                                           #
+# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+#                                                                           #
+# This software is licensed under the Common Public License. Please see     #
+# accompanying file for terms.                                              #
+#                                                                           #
+#===========================================================================#
 
 ## $Id$
-
-# Author:  Andreas Waechter            IBM    2006-04-13
 
 #############################################################################
 #                       Names and other basic things                        #
@@ -12,17 +22,17 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([SYMPHONY],[5.1],[coin-symphony@lists.coin-or.org])
+AC_INIT([SYMPHONY],[5.1.3],[coin-symphony@lists.coin-or.org])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2005 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2006 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -54,9 +64,13 @@ AC_COIN_INIT_AUTOMAKE
 #############################################################################
 
 AC_COIN_MAIN_SUBDIRS(CoinUtils)
+AC_COIN_MAIN_SUBDIRS(Data/Sample)
+AC_COIN_MAIN_SUBDIRS(Data/miplib3)
+AC_COIN_MAIN_SUBDIRS(Data/Netlib)
 AC_COIN_MAIN_SUBDIRS(Osi)
 AC_COIN_MAIN_SUBDIRS(Cgl)
 AC_COIN_MAIN_SUBDIRS(Clp)
+AC_COIN_MAIN_SUBDIRS(FlopC++)
 
 #############################################################################
 #                            Third party solvers                            #
@@ -68,7 +82,6 @@ AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h])#,[glp_lpx_simplex])
 AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
 AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
 AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
-
 
 #############################################################################
 #                      Check for the LP solver                              #
@@ -86,6 +99,7 @@ else
     AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(ADD_CLP, [test $sym_lp_solver = clp])
+
 #############################################################################
 #                            Check SYMPHONY                                 #
 #############################################################################
