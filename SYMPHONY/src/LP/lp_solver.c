@@ -3410,23 +3410,11 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 int num_elements;
 	 int *indices;
 	 double *elements;
-	 int *ignorable, ign_num = 0;
 	 cut = cutlist.rowCut(i);
 	 (*cuts)[j] =  (cut_data *) calloc(1, sizeof(cut_data));
 	 num_elements = cut.row().getNumElements();
 	 indices = const_cast<int *> (cut.row().getIndices());
 	 elements = const_cast<double *> (cut.row().getElements());
-	 ignorable = (int *) calloc(ISIZE, num_elements);
-	 /* check elements and see if they can be set to 0 */ 
-	 for (k = 0; k < num_elements; k++){
-	    if(fabs(elements[k]) < lp_data->lpetol){
-	       ignorable[k] = TRUE;
-	       ign_num++;
-	    }
-	 }
-	 if(ign_num > 0) {
-	    num_elements -= ign_num; 
-	 }
 	 (*cuts)[j]->type = EXPLICIT_ROW;
 	 if (((*cuts)[j]->sense = cut.sense()) == 'R'){
 	    FREE((*cuts)[j]);
@@ -3438,16 +3426,11 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 (*cuts)[j]->coef = (char *) malloc ((*cuts)[j]->size);
 	 ((int *) ((*cuts)[j]->coef))[0] = num_elements;
 	 matind = (int *) ((*cuts)[j]->coef + ISIZE);
-	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
-	 for (l=0, k = 0; k < num_elements + ign_num; k++){
-	    if(!ignorable[k]){
-	       matind[l] = lp_data->vars[indices[k]]->userind;
-	       matval[l] = elements[k];
-	       l++;
-	    }
+	 for (k = 0; k < num_elements; k++){
+	    matind[k] = lp_data->vars[indices[k]]->userind;
 	 }
-	 //matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
-	 //memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
+	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
+	 memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
 	 qsortucb_id(matind, matval, num_elements);
 	 (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
 	 (*cuts)[j]->deletable = TRUE;
@@ -3456,7 +3439,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 }else{
 	    (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
 	 }	    
-	 FREE(ignorable);
       }
       *num_cuts = j;
    }
