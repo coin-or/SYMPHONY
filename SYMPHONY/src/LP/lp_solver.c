@@ -22,6 +22,7 @@
 #include "sym_lp_solver.h"
 #include "sym_constants.h"
 #include "sym_macros.h"
+#include "sym_lp.h"
 
 
 /*===========================================================================*/
@@ -3231,6 +3232,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    double *matval;
    cgl_params *par = &(lp_data->cgl);
    int cut_num = 0;
+   int num_discarded_cuts = 0;
 
 #ifndef COMPILE_IN_LP
    par->probing_generated_in_root =
@@ -3410,6 +3412,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 int num_elements;
 	 int *indices;
 	 double *elements;
+	 double min_coeff = DBL_MAX;
+	 double max_coeff = 0;
+	 int discard_cut = FALSE;
 	 cut = cutlist.rowCut(i);
 	 (*cuts)[j] =  (cut_data *) calloc(1, sizeof(cut_data));
 	 num_elements = cut.row().getNumElements();
@@ -3432,15 +3437,49 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
 	 memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
 	 qsortucb_id(matind, matval, num_elements);
-	 (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
-	 (*cuts)[j]->deletable = TRUE;
-	 if (send_to_pool){
-	    (*cuts)[j++]->name = CUT__SEND_TO_CP;
-	 }else{
-	    (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
-	 }	    
+	 /* Find the largest and the smallest non-zero coeffs to test the
+	  * numerical stability of the cut
+	  */
+	 for (int el_num=0; el_num<num_elements; el_num++) {
+	    if (fabs(matval[el_num])>max_coeff) {
+	       max_coeff = fabs(matval[el_num]);
+	    }
+	    if (fabs(matval[el_num]) < min_coeff) {
+	       min_coeff = fabs(matval[el_num]);
+	    }
+	 }
+	 /*
+	 for (int el_num=0; el_num<num_elements; el_num++) {
+	    printf("%d\t%10.9f\n",matind[el_num],matval[el_num]);
+	 }
+	 */
+	 PRINT(0,5,("generate_cgl_cuts: Number of Coefficients = %d\tMax = %f, Min = %f\n",num_elements,max_coeff, min_coeff));
+
+	 if (num_elements>0) {
+	    if (max_coeff > 0 && min_coeff/max_coeff < lp_data->lpetol/10) {
+	       PRINT(0,5,("generate_cgl_cuts: Threw cut out because ratio of min to max is %10.9f\n",min_coeff/max_coeff));
+	       discard_cut = TRUE;
+	    }
+	 }
+	 if (discard_cut == TRUE) {
+	    (*cuts)[j]->size = 0;
+	    FREE((*cuts)[j]->coef);
+	    FREE((*cuts)[j]);
+	    num_discarded_cuts++;
+	 } else {
+	    (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+	    (*cuts)[j]->deletable = TRUE;
+	    if (send_to_pool){
+	       (*cuts)[j++]->name = CUT__SEND_TO_CP;
+	    }else{
+	       (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
+	    }	    
+	 }
       }
       *num_cuts = j;
+      if (num_discarded_cuts>0) {
+	 PRINT(5,10,("generate_cgl_cuts: Number of discarded cuts = %d\n",num_discarded_cuts));
+      }
    }
    
    return;
