@@ -3333,7 +3333,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 is_top_iter){
 
 	/* make basis ready first */
-	//termcode = dual_simplex(lp_data, &iterd);	
+	termcode = dual_simplex(lp_data, &iterd);	
 	CglRedSplit *redsplit = new CglRedSplit;
 	redsplit->generateCuts(*(lp_data->si), cutlist);
 	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
@@ -3602,7 +3602,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
  	} */
 	CglLandP *landp = new CglLandP;
 	//landp->parameter().pivotLimit = 10;
-	landp->parameter().maxCutPerRound = 10;
+	landp->parameter().maxCutPerRound = 30;
 	landp->generateCuts(*(lp_data->si), cutlist);
 	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	   if (is_top_iter){
@@ -3625,18 +3625,21 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       }else{
 	 *cuts = (cut_data **)malloc(cutlist.sizeRowCuts()*sizeof(cut_data *));
       }
+      
+      int *ignorable  = (int *) calloc(ISIZE, lp_data->mip->n);
+
       for (i = 0, j = *num_cuts; i < cutlist.sizeRowCuts(); i++){
 	 PRINT(verbosity, 12, ("Cut #%i: \n", i));
 	 int num_elements;
 	 int *indices;
 	 double *elements;
-	 int *ignorable, ign_num = 0;
+	 int ign_num = 0;
 	 cut = cutlist.rowCut(i);
 	 (*cuts)[j] =  (cut_data *) calloc(1, sizeof(cut_data));
 	 num_elements = cut.row().getNumElements();
 	 indices = const_cast<int *> (cut.row().getIndices());
 	 elements = const_cast<double *> (cut.row().getElements());
-	 ignorable = (int *) calloc(ISIZE, num_elements);
+	 memset(ignorable, FALSE, ISIZE*lp_data->mip->n); 
 	 /* check elements and see if they can be set to 0 */ 
 	 for (k = 0; k < num_elements; k++){
 	    if(fabs(elements[k]) < lp_data->lpetol){
@@ -3677,9 +3680,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	    (*cuts)[j++]->name = CUT__SEND_TO_CP;
 	 }else{
 	    (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
-	 }	    
+	 }
       }
       *num_cuts = j;
+      FREE(ignorable);
    }
    
    return;

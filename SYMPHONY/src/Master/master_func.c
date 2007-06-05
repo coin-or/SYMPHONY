@@ -2830,12 +2830,11 @@ sym_environment *create_copy_environment (sym_environment *env)
       return(NULL);
    }
    env_copy = (sym_environment*) calloc(1, sizeof(sym_environment));
+
+   /* no need for this */
+   /* initialize_u(env_copy);*/
+
    memcpy(env_copy, env, sizeof(sym_environment));
-   
-   par = &(env_copy->par);
-
-
-   initialize_u(env_copy);
 
    /* Note that, if some modifications on the user function have been done
       after initialization, it will not be reflected here, since SYMPHONY
@@ -2849,6 +2848,8 @@ sym_environment *create_copy_environment (sym_environment *env)
 
    /*========================================================================*/
    /*   copy params */
+
+   par = &(env_copy->par);
 
    if(par->tm_par.lp_mach_num)
       par->tm_par.lp_machs = 
@@ -2897,6 +2898,7 @@ sym_environment *create_copy_environment (sym_environment *env)
 
    /* copy mip */
    if (env->mip){
+      // free_mip_desc(env_copy->mip);
       env_copy->mip = create_copy_mip_desc(env->mip);
    }
 
