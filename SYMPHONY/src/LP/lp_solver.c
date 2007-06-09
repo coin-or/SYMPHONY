@@ -3619,6 +3619,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
 
    if (cutlist.sizeRowCuts() > 0){
+      int num_discarded_cuts = 0;
       if (*cuts){
 	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+cutlist.sizeRowCuts())
 				      * sizeof(cut_data *));
@@ -3626,7 +3627,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 *cuts = (cut_data **)malloc(cutlist.sizeRowCuts()*sizeof(cut_data *));
       }
       
-      int num_discarded_cuts = 0;
 
       for (i = 0, j = *num_cuts; i < cutlist.sizeRowCuts(); i++){
 	 int num_elements;
