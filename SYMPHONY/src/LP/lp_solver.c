@@ -3402,12 +3402,15 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
 
    if (cutlist.sizeRowCuts() > 0){
+      int num_discarded_cuts = 0;
       if (*cuts){
 	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+cutlist.sizeRowCuts())
 				      * sizeof(cut_data *));
       }else{
 	 *cuts = (cut_data **)malloc(cutlist.sizeRowCuts()*sizeof(cut_data *));
       }
+      
+
       for (i = 0, j = *num_cuts; i < cutlist.sizeRowCuts(); i++){
 	 int num_elements;
 	 int *indices;
@@ -3431,13 +3434,23 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 (*cuts)[j]->coef = (char *) malloc ((*cuts)[j]->size);
 	 ((int *) ((*cuts)[j]->coef))[0] = num_elements;
 	 matind = (int *) ((*cuts)[j]->coef + ISIZE);
+	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
 	 for (k = 0; k < num_elements; k++){
 	    matind[k] = lp_data->vars[indices[k]]->userind;
 	 }
-	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
 	 memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
 	 qsortucb_id(matind, matval, num_elements);
-	 /* Find the largest and the smallest non-zero coeffs to test the
+	 /*
+	  * display the cut
+	  */
+	 if (10>11) { /* this condition should be replaced by verbosity */
+	    PRINT(12, 11, ("Cut #%i: \n", i));
+	    for (int el_num=0; el_num<num_elements; el_num++) {
+	       PRINT(12,11,("%d\t%f\n",matind[el_num],matval[el_num]));
+	    }
+	 }
+	 /* 
+	  * Find the largest and the smallest non-zero coeffs to test the
 	  * numerical stability of the cut
 	  */
 	 for (int el_num=0; el_num<num_elements; el_num++) {
@@ -3448,26 +3461,27 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	       min_coeff = fabs(matval[el_num]);
 	    }
 	 }
-	 /*
-	 for (int el_num=0; el_num<num_elements; el_num++) {
-	    printf("%d\t%10.9f\n",matind[el_num],matval[el_num]);
-	 }
-	 */
-	 PRINT(0,5,("generate_cgl_cuts: Number of Coefficients = %d\tMax = %f, Min = %f\n",num_elements,max_coeff, min_coeff));
+
+	 PRINT(0,5,("generate_cgl_cuts: Number of Coefficients = %d\tMax = %f, "
+		  "Min = %f\n",num_elements,max_coeff, min_coeff));
 
 	 if (num_elements>0) {
-	    if (max_coeff > 0 && min_coeff/max_coeff < lp_data->lpetol/10) {
-	       PRINT(0,5,("generate_cgl_cuts: Threw cut out because ratio of min to max is %10.9f\n",min_coeff/max_coeff));
+	    if (max_coeff > 0 && min_coeff/max_coeff < lp_data->lpetol) {
+	       num_discarded_cuts++;
 	       discard_cut = TRUE;
 	    }
 	 }
-	 if (discard_cut == TRUE) {
+
+	 if (discard_cut==TRUE) {
+	    PRINT(0,5,("generate_cgl_cuts: Threw cut out. Ratio of "
+		     "min to max coeff. = %10.6f\n",min_coeff/max_coeff));
 	    (*cuts)[j]->size = 0;
 	    FREE((*cuts)[j]->coef);
 	    FREE((*cuts)[j]);
 	    num_discarded_cuts++;
 	 } else {
 	    (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+
 	    (*cuts)[j]->deletable = TRUE;
 	    if (send_to_pool){
 	       (*cuts)[j++]->name = CUT__SEND_TO_CP;
@@ -3478,10 +3492,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       }
       *num_cuts = j;
       if (num_discarded_cuts>0) {
-	 PRINT(5,10,("generate_cgl_cuts: Number of discarded cuts = %d\n",num_discarded_cuts));
+	 PRINT(0,3,("generate_cgl_cuts: Number of discarded cuts = %d\n",num_discarded_cuts));
       }
    }
-   
    return;
 }
 #endif
