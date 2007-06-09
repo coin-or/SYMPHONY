@@ -3588,7 +3588,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
 #ifndef __OSI_CLP__
 	PRINTF(verbosity, -1, 
-	       ("LandP cuts can be generated only with Clp...Skipping LandP cut generation...");
+	       ("LandP cuts can be generated only with Clp...Skipping LandP cut generation..."));
 	       }		
 	par->generate_cgl_landp_cuts == DO_NOT_GENERATE;
 #else
@@ -3626,30 +3626,20 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 *cuts = (cut_data **)malloc(cutlist.sizeRowCuts()*sizeof(cut_data *));
       }
       
-      int *ignorable  = (int *) calloc(ISIZE, lp_data->mip->n);
+      int num_discarded_cuts = 0;
 
       for (i = 0, j = *num_cuts; i < cutlist.sizeRowCuts(); i++){
-	 PRINT(verbosity, 12, ("Cut #%i: \n", i));
 	 int num_elements;
 	 int *indices;
 	 double *elements;
-	 int ign_num = 0;
+	 double min_coeff = DBL_MAX;
+	 double max_coeff = 0;
+	 int discard_cut = FALSE;
 	 cut = cutlist.rowCut(i);
 	 (*cuts)[j] =  (cut_data *) calloc(1, sizeof(cut_data));
 	 num_elements = cut.row().getNumElements();
 	 indices = const_cast<int *> (cut.row().getIndices());
 	 elements = const_cast<double *> (cut.row().getElements());
-	 memset(ignorable, FALSE, ISIZE*lp_data->mip->n); 
-	 /* check elements and see if they can be set to 0 */ 
-	 for (k = 0; k < num_elements; k++){
-	    if(fabs(elements[k]) < lp_data->lpetol){
-	       ignorable[k] = TRUE;
-	       ign_num++;
-	    }
-	 }
-	 if(ign_num > 0) {
-	    num_elements -= ign_num; 
-	 }
 	 (*cuts)[j]->type = EXPLICIT_ROW;
 	 if (((*cuts)[j]->sense = cut.sense()) == 'R'){
 	    FREE((*cuts)[j]);
@@ -3662,30 +3652,66 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 ((int *) ((*cuts)[j]->coef))[0] = num_elements;
 	 matind = (int *) ((*cuts)[j]->coef + ISIZE);
 	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
-	 for (l=0, k = 0; k < num_elements + ign_num; k++){
-	    if(!ignorable[k]){
-	       matind[l] = lp_data->vars[indices[k]]->userind;
-	       matval[l] = elements[k];
-	       PRINT(verbosity, 12, ("%i\t %.2f\n", matind[l], matval[l]));
-	       l++;
+	 for (k = 0; k < num_elements; k++){
+	    matind[k] = lp_data->vars[indices[k]]->userind;
+	 }
+	 memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
+	 qsortucb_id(matind, matval, num_elements);
+	 /*
+	  * display the cut
+	  */
+	 if (verbosity>11) {
+	    PRINT(12, 11, ("Cut #%i: \n", i));
+	    for (int el_num=0; el_num<num_elements; el_num++) {
+	       PRINT(12,11,("%d\t%f\n",matind[el_num],matval[el_num]));
 	    }
 	 }
-	 PRINT(verbosity, 12, ("rhs\t %.2f\n", cut.rhs()));
-	 //matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
-	 //memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
-	 qsortucb_id(matind, matval, num_elements);
-	 (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
-	 (*cuts)[j]->deletable = TRUE;
-	 if (send_to_pool){
-	    (*cuts)[j++]->name = CUT__SEND_TO_CP;
-	 }else{
-	    (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
+	 /* 
+	  * Find the largest and the smallest non-zero coeffs to test the
+	  * numerical stability of the cut
+	  */
+	 for (int el_num=0; el_num<num_elements; el_num++) {
+	    if (fabs(matval[el_num])>max_coeff) {
+	       max_coeff = fabs(matval[el_num]);
+	    }
+	    if (fabs(matval[el_num]) < min_coeff) {
+	       min_coeff = fabs(matval[el_num]);
+	    }
+	 }
+
+	 PRINT(0,5,("generate_cgl_cuts: Number of Coefficients = %d\tMax = %f, "
+		  "Min = %f\n",num_elements,max_coeff, min_coeff));
+
+	 if (num_elements>0) {
+	    if (max_coeff > 0 && min_coeff/max_coeff < lp_data->lpetol) {
+	       num_discarded_cuts++;
+	       discard_cut = TRUE;
+	    }
+	 }
+
+	 if (discard_cut==TRUE) {
+	    PRINT(0,5,("generate_cgl_cuts: Threw cut out. Ratio of "
+		     "min to max coeff. = %10.6f\n",min_coeff/max_coeff));
+	    (*cuts)[j]->size = 0;
+	    FREE((*cuts)[j]->coef);
+	    FREE((*cuts)[j]);
+	    num_discarded_cuts++;
+	 } else {
+	    (*cuts)[j]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+
+	    (*cuts)[j]->deletable = TRUE;
+	    if (send_to_pool){
+	       (*cuts)[j++]->name = CUT__SEND_TO_CP;
+	    }else{
+	       (*cuts)[j++]->name = CUT__DO_NOT_SEND_TO_CP;
+	    }	    
 	 }
       }
       *num_cuts = j;
-      FREE(ignorable);
+      if (num_discarded_cuts>0) {
+	 PRINT(verbosity,3,("generate_cgl_cuts: Number of discarded cuts = %d\n",num_discarded_cuts));
+      }
    }
-   
    return;
 }
 #endif

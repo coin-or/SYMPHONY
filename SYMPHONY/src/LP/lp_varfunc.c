@@ -232,7 +232,7 @@ void tighten_bounds(lp_prob *p)
 	       }
 	       ind[cnt] = i;
 	       lu[cnt] = 'L';
-	       bd[cnt++] = vars[i]->is_int ? floor(ub[i] + max_change) :
+	       bd[cnt++] = vars[i]->is_int ? ceil(ub[i] + max_change) :
 		  ub[i] + max_change;
 	       if (! (status[i] & NOT_REMOVABLE) && lb[i] == 0 &&
 		   lb[i] == ub[i]){
