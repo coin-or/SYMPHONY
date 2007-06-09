@@ -659,8 +659,9 @@ void print_tree_status(tm_prob *tm)
       tm->lb = tm->ub;
    }else{
       for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-	 if (tm->samephase_cand[i]->lower_bound < tm->lb)
-	    tm->lb = tm->samephase_cand[i]->lower_bound;
+	 if (tm->samephase_cand[i]->parent->lower_bound < tm->lb){
+	    tm->lb = tm->samephase_cand[i]->parent->lower_bound;
+	 }
       }
    }
    if (tm->lb >= MAXDOUBLE / 2 || (tm->has_ub && tm->lb > tm->ub)){
