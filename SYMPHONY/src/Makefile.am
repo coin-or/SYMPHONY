@@ -399,6 +399,10 @@ if DRAWGRAPH
 AM_CPPFLAGS += 
 endif
 
+if SIGHANDLER
+AM_CPPFLAGS += -DSIGHANDLER
+endif
+
 #FIXME For now, assume that we have gmpl files, later check for GLPK package
 if USE_GMPL
 AM_CPPFLAGS += -DUSE_GLPMPL

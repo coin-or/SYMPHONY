@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN)
+#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN) && defined(SIGHANDLER)
 #include <signal.h>
 #if !defined(HAS_SRANDOM)
 extern int srandom PROTO((unsigned seed));
@@ -82,7 +82,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    int s_bufid;
 #endif
    int *termcodes = NULL;
-#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN)
+#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN) && defined(SIGHANDLER)
    signal(SIGINT, sym_catch_c);    
 #endif   
    par = &tm->par;
@@ -3454,7 +3454,7 @@ int tm_close(tm_prob *tm, int termcode)
    
 /*===========================================================================*/
 /*===========================================================================*/
-#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN)
+#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN) && defined(SIGHANDLER)
 void sym_catch_c(int num)
 {
 
