@@ -448,6 +448,25 @@ esac],
 
 AM_CONDITIONAL(STATICEXE, [test $sym_static_exe = true])
 
+#---------------------------------------------------------------------------#
+# DRAWGRAPH
+#---------------------------------------------------------------------------#
+
+AC_ARG_ENABLE([signal-handler],
+[AC_HELP_STRING([--disable-signal-handler],
+                [disable signal handler])],
+[case "${enableval}" in
+   yes) sym_sig_catch=true
+   ;;
+   no)  sym_sig_catch=false
+   ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for --disable-signal-handler)
+   ;;
+esac],
+[sym_sig_catch=true])
+
+AM_CONDITIONAL(SIGHANDLER, [test $sym_sig_catch = true])
+
 #############################################################################
 #              Check the OS and add default defs                            #
 #############################################################################
