@@ -5,6 +5,7 @@
 /Makefile.am -text
 /Makefile.in -text
 /README -text
+SYMPHONY/AUTHORS -text
 SYMPHONY/Applications/CNRP/Makefile.in -text
 SYMPHONY/Applications/CNRP/Makefile.orig -text
 SYMPHONY/Applications/CNRP/Win32/v6/cnrp.dsp -text
