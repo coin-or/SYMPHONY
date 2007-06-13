@@ -1,5 +1,5 @@
-SYMPHONY Version 5.1 README
-===========================
+SYMPHONY Version 5.1.4 README
+=============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Common Public License
 Version 1.0 and is freely redistributable. However, it is vital to the
@@ -23,6 +23,30 @@ http://projects.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
+
+Release 5.1.4:
+
+1. Added ability to read files in LP format.
+
+2. Additional configuration options.
+
+3. Support for new classes of cutting planes.
+
+4. Improved algorithm control mechanism.
+
+5. Improved output format and additional output options.
+
+6. Improved signal handling.
+
+7. Shared memory parallel version tested with OpenMP in Linux and Windows.
+
+8. Added release configuration to MSVC++ build files.
+
+9. Improved warm starting.
+
+10. Fixes for configuration with SoPlex and Xpress.
+
+11. Fixed configuration on PowerPC architectures.
 
 Release 5.1.3:
 
