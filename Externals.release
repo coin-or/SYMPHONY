@@ -1,10 +1,10 @@
-BuildTools         https://projects.coin-or.org/svn/BuildTools/releases/0.5.3
+BuildTools         https://projects.coin-or.org/svn/BuildTools/releases/0.5.7
 Data/Sample        https://projects.coin-or.org/svn/Data/releases/1.0.1/Sample
 Data/miplib3       https://projects.coin-or.org/svn/Data/releases/1.0.1/miplib3
 Data/Netlib        https://projects.coin-or.org/svn/Data/releases/1.0.1/Netlib
-CoinUtils          https://projects.coin-or.org/svn/CoinUtils/releases/1.0.4/CoinUtils
+CoinUtils          https://projects.coin-or.org/svn/CoinUtils/releases/1.1.0/CoinUtils
 Cgl                https://projects.coin-or.org/svn/Cgl/releases/0.5.1/Cgl
-Clp -r882          https://projects.coin-or.org/svn/Clp/stable/1.3/Clp
+Clp -r1016         https://projects.coin-or.org/svn/Clp/stable/1.3/Clp
 Osi                https://projects.coin-or.org/svn/Osi/releases/0.95.3/Osi
 Win32/v6/CoinUtils https://projects.coin-or.org/svn/MSVisualStudio/releases/1.0.1/v6/CoinUtils
 Win32/v6/Cgl       https://projects.coin-or.org/svn/MSVisualStudio/releases/1.0.1/v6/Cgl
@@ -18,4 +18,4 @@ Win32/v8/CoinUtils https://projects.coin-or.org/svn/MSVisualStudio/releases/1.0.
 Win32/v8/Cgl       https://projects.coin-or.org/svn/MSVisualStudio/releases/1.0.1/v8/Cgl
 Win32/v8/Clp       https://projects.coin-or.org/svn/MSVisualStudio/releases/1.0.1/v8/Clp
 Win32/v8/Osi       https://projects.coin-or.org/svn/MSVisualStudio/releases/1.0.1/v8/Osi
-FlopC++            https://projects.coin-or.org/svn/FlopC++/stable/1.0/FlopCpp
+FlopC++            https://projects.coin-or.org/svn/FlopC++/releases/1.0.1/FlopCpp
