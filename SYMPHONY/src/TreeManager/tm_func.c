@@ -458,6 +458,7 @@ int solve(tm_prob *tm)
 	 }
 
 	 if (tm->par.find_first_feasible && tm->has_ub){
+	    termcode = TM_FINISHED;
 	    break;
 	 }
 
