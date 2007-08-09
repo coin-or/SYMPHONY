@@ -1,0 +1,249 @@
+#===========================================================================#
+#                                                                           #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
+#                                                                           #
+# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
+# Laci Ladanyi (ladanyi@us.ibm.com).                                        #
+#                                                                           #
+# The author of this file is Menal Guzelsoy                                 #
+#                                                                           #
+# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+#                                                                           #
+# This software is licensed under the Common Public License. Please see     #
+# accompanying file for terms.                                              #
+#                                                                           #
+#===========================================================================#
+
+# $Id: Makefile.in 726 2006-04-17 04:16:00Z andreasw $
+
+MASTERNAME = mckp
+
+EXE = $(MASTERNAME)@EXEEXT@
+
+# CHANGEME: Additional sources
+ADDSOURCES =
+
+# CHANGEME: Additional libraries
+ADDLIBS =
+
+# CHANGEME: Additional flags for compilation (e.g., include flags)
+ADDINCFLAGS = 
+
+
+# Directory with COIN header files
+COININCDIR = @abs_include_dir@
+
+# Directory with COIN libraries
+COINLIBDIR = @abs_lib_dir@
+
+# Directoy with SYMPHONY header files 
+#SYMINCDIR = @SYMINCDIR@
+
+# Directoy with SYMPHONY library
+#SYMLIBDIR = @SYMSRCDIR@
+
+#Directory for LP solver
+GLPKINCDIR = @GLPKINCDIR@
+CPXINCDIR = @CPXINCDIR@
+OSLINCDIR = @OSLINCDIR@
+SPXINCDIR = @SPXINCDIR@
+XPRINCDIR = @XPRINCDIR@
+
+##########################################################################
+#  Usually, you don't have to change anything below.  Note that if you   #
+#  change certain compiler options, you might have to recompile the      #
+#  COIN package.                                                         #
+##########################################################################
+
+SYM_COMPILE_IN_TM = @SYM_COMPILE_IN_TM_TRUE@TRUE
+SYM_COMPILE_IN_LP = @SYM_COMPILE_IN_LP_TRUE@TRUE
+SYM_COMPILE_IN_CP = @SYM_COMPILE_IN_CP_TRUE@TRUE
+SYM_COMPILE_IN_CG = @SYM_COMPILE_IN_CG_TRUE@TRUE
+USE_CGL_CUTS = @USE_CGL_CUTS_TRUE@TRUE
+CLP_LP_SOLVER = @CLP_LP_SOLVER_TRUE@TRUE
+GLPK_LP_SOLVER = @GLPK_LP_SOLVER_TRUE@TRUE
+CPLEX_LP_SOLVER = @CPLEX_LP_SOLVER_TRUE@TRUE
+OSL_LP_SOLVER = @OSL_LP_SOLVER_TRUE@TRUE
+SOPLEX_LP_SOLVER = @SOPLEX_LP_SOLVER_TRUE@TRUE
+XPRESS_LP_SOLVER = @XPRESS_LP_SOLVER_TRUE@TRUE
+SYM_PARALLEL = @SYM_PARALLEL_TRUE@TRUE
+USE_GMPL = @USE_GMPL_TRUE@TRUE
+MASTEREXT = @MASTEREXT@
+LPEXT = @LPEXT@
+TMEXT = @TMEXT@
+
+
+USER_MASTER_OBJS = mckp_main.@OBJEXT@ $(ADDSOURCES)
+USER_LP_OBJS =
+USER_CG_OBJS =
+USER_CP_OBJS =
+USER_TM_OBJS =
+
+ALL_OBJS = $(USER_MASTER_OBJS)
+
+PUSER_MASTER_OBJS = $(addsuffix o, $(USER_MASTER_OBJS))
+PUSER_LP_OBJS = $(addsuffix o, $(USER_LP_OBJS))
+PUSER_CG_OBJS = $(addsuffix o, $(USER_CG_OBJS))
+PUSER_CP_OBJS = $(addsuffix o, $(USER_CP_OBJS))
+PUSER_TM_OBJS = $(addsuffix o, $(USER_TM_OBJS))
+
+PALL_OBJS = $(PUSER_MASTER_OBJS) $(PUSER_LP_OBJS) $(PUSER_CP_OBJS) \
+	$(PUSER_TM_OBJS)
+
+# C++ Compiler command
+CXX = @CXX@
+
+# C++ Compiler options
+CXXFLAGS = @CXXFLAGS@
+
+# additional C++ Compiler options for linking
+CXXLINKFLAGS = @RPATH_FLAGS@
+
+#Include files
+INCL =  -Iinclude -I`$(CYGPATH_W) $(COININCDIR)` #\
+#	-I`$(CYGPATH_W) $(SYMINCDIR)`
+
+# Libraries necessary to link
+LIBS = -L$(COINLIBDIR) #-L$(SYMLIBDIR)
+
+ifeq ($(USE_CGL_CUTS),TRUE)
+LIBS += -lCgl `cat @CGLOBJDIR@/cgl_addlibs.txt`
+ADDINCFLAGS += -DUSE_CGL_CUTS
+endif
+
+ifeq ($(CLP_LP_SOLVER),TRUE)
+LIBS += -lOsiClp -lClp `cat @CLPOBJDIR@/clp_addlibs.txt`
+ADDINCFLAGS += -D__OSI_CLP__
+endif
+
+ifeq ($(GLPK_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+LIBS += -lOsiGlpk #-lglpk
+ADDINCFLAGS += -D__OSI_GLPK__
+else
+ifeq ($(USE_GMPL), TRUE)
+INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+ADDINCFLAGS += -DUSE_GLPMPL
+endif
+endif
+
+ifeq ($(CPLEX_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
+LIBS += -lOsiCpx #-lcplex
+ADDINCFLAGS += -D__OSI_CPLEX__
+endif
+
+ifeq ($(OSL_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(OSLINCDIR)`
+LIBS += -lOsiOsl #-losl
+ADDINCFLAGS += -D__OSI_OSL__
+endif
+
+ifeq ($(SOPLEX_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(SPXINCDIR)`
+LIBS += -lOsiSpx #-l
+ADDINCFLAGS += -D__OSI_SOPLEX__
+endif
+
+ifeq ($(XPRESS_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(XPRINCDIR)`
+LIBS += -lOsiXpr #-l
+ADDINCFLAGS += -D__OSI_XPRESS__
+endif
+
+ADDLIBS += @ADDLIBS@
+
+LIBS += -lOsi -lCoinUtils `cat @OSIOBJDIR@/osi_addlibs.txt` \
+	`cat @COINUTILSOBJDIR@/coinutils_addlibs.txt` $(ADDLIBS)
+
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
+
+WHATTOMAKE = $(EXE)
+
+ifeq ($(SYM_PARALLEL),TRUE)
+WHATTOMAKE += $(MASTERNAME)$(MASTEREXT)
+endif
+
+ifneq ($(SYM_COMPILE_IN_LP),TRUE)
+WHATTOMAKE  += $(MASTERNAME)_lp$(LPEXT)
+endif
+
+ifneq ($(SYM_COMPILE_IN_CP),TRUE)
+WHATTOMAKE += $(MASTERNAME)_cp
+endif
+
+ifneq ($(SYM_COMPILE_IN_CG),TRUE)
+WHATTOMAKE += $(MASTERNAME)_cg
+endif
+
+ifneq ($(SYM_COMPILE_IN_TM),TRUE)
+WHATTOMAKE += $(MASTERNAME)_tm$(TMEXT)
+endif
+
+ADDFLAGS += $(ADDINCFLAGS) @SYMDEFS@
+ADDPFLAGS += $(ADDINCFLAGS) @SYMPDEFS@
+
+INCL += -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+SYMLIBS = -lSym $(LIBS) 
+PSYMLIBS = -L$(PVM_ROOT)/lib/@ARCH@ -lgpvm3 -lpvm3 $(LIBS) 
+
+all: $(APPL_PARALLEL) $(WHATTOMAKE)
+
+.c.o:
+	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+.c.obj:
+	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
+
+.c.oo:
+	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+.c.objo:
+	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
+
+$(EXE): $(ALL_OBJS)
+	bla=;\
+	for file in $(ALL_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(SYMLIBS)
+
+$(MASTERNAME)$(MASTEREXT) : $(PUSER_MASTER_OBJS)
+	bla=;\
+	for file in $(PUSER_MASTER_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla \
+	-lSym$(MASTEREXT) $(PSYMLIBS)
+
+$(MASTERNAME)_lp$(LPEXT) : $(PUSER_LP_OBJS)
+	bla=;\
+	for file in $(PUSER_LP_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla \
+	-lSym_lp$(LPEXT) $(PSYMLIBS)
+
+$(MASTERNAME)_cp : $(PUSER_CP_OBJS)
+	bla=;\
+	for file in $(PUSER_CP_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
+	-lSym_cp $(PSYMLIBS)
+
+$(MASTERNAME)_cg : $(PUSER_CG_OBJS)
+	bla=;\
+	for file in $(PUSER_CG_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  $(PSYMLIBS) \
+	-lSym_cg
+
+$(MASTERNAME)_tm$(TMEXT) : $(PUSER_TM_OBJS)
+	bla=;\
+	for file in $(PUSER_TM_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
+	-lSym_tm$(TMEXT) $(PSYMLIBS)
+
+.SUFFIXES: .cpp .c .o .obj .oo .objo
+
+clean:
+	rm -rf $(WHATTOMAKE) $(ALL_OBJS) $(PALL_OBJS)

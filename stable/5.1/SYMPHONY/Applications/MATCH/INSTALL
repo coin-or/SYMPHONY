@@ -1,0 +1,223 @@
+SYMPHONY MATCH-5.1 APPLICATION INSTALLATION
+==========================================
+
+*******************************************************************************
+*             COMPILING THE SYMPHONY MATCH APPLICATION (Unix)                 *
+*******************************************************************************
+
+Although MATCH application is designed to work stand alone, it requires to be  
+configured with SYMPHONY. Therefore, you have to get this application 
+within SYMPHONY package and follow the configuration steps of SYMPHONY.   
+
+1. You can obtain the SYMPHONY source code either via the subversion 
+repository or in the form of daily tarballs. 
+
+The recommended method is to use subversion because it makes it easier to 
+obtain updates. In a Unix-like environment (such as Linux or CYGWIN), 
+the following command may be used to obtain SYMPHONY from 
+source using SVN in most cases:
+
+   svn checkout https://projects.coin-or.org/svn/SYMPHONY/trunk/ COIN-SYMPHONY
+
+The alternative way is to get a daily snapshot of the source code as a tarball 
+from  the download page of COIN-OR:
+
+   http://www.coin-or.org/Tarballs/
+
+2. If the code is obtained as a tarball, unpack the distribution with 
+"tar -xzf SYMPHONY_XXX.tgz" where XXX is the date the snapshot is taken. 
+This will create a subdirectory called SYMPHONY_XXX containing the 
+distribution.
+
+3. In order to compile SYMPHONY's applications, you must first compile the 
+application specific library. Type
+
+   cd 
+   cd COIN-SYMPHONY
+   ./configure --with-application
+   make
+   make install
+
+This will create the the Makefile of MATCH application together with 
+SYMPHONY's application library called 'libSymAppl' to be used while 
+building MATCH. Note that, sequential version library and the 
+executable of SYMPHON will also be made and installed. 
+
+4. Now you are free to move the application directory to wherever you want. 
+Go to MATCH directory, (go to SYMPHONY/Applications/MATCH, if the package 
+was not moved) and modify the variables in the Makefile if you want to add
+your own defines, source and library files. Then, type    
+
+   make
+
+The executable "match" should be successfully made here. 
+
+4. Test MATCH, using the sample file called sample.match included
+with the distribution. To specify the file name, use the "-F" command-line
+option, i.e., type
+
+   match -F sample.match 
+
+COMPILING FOR DISTRIBUTED NETWORKS
+==================================
+
+PLEASE NOTE THAT THE DISTRIBUTED MEMORY PARALLEL VERSION HAS NOT BEEN TESTED
+IN VERSION 5.0 AND MAY BE BROKEN. PLEASE LET ME KNOW IF YOU WANT TO USE IT AND
+I WILL GET IT WORKING.
+
+1. If you wish to compile a distributed version of the code, obtain and
+install PVM from http://www.csm.ornl.gov/pvm/.
+
+2. Type, 
+
+   cd 
+   cd COIN-SYMPHONY
+   ./configure --with-application --with-pvm
+   make
+   make install
+
+This will create the the Makefile of MATCH application together with 
+SYMPHONY's parallel version application libraries to be used while 
+building MATCH. Note that, sequential version library and the 
+executable of SYMPHON will also be made and installed. 
+Be sure that, you have PVM installed either in system path or PVM_ROOT
+set as a bash environment variable. By default, configuration will assume
+the following module dependencies: '--with-cg=yes --with-cp=yes --with-lp=no 
+--with-tm=yes' (see the user manual or the file 'share/config.site' for more 
+information). If you configure with
+
+   ./configure --with-application --with-pvm --with-lp=yes
+
+then you will end up with the sequential version. Therefore, if you want 
+to override the default set up, you must configure without one or more of 
+module dependencies. 
+
+3. Now you are free to move the application directory to wherever you want. 
+Go to MATCH directory, (go to SYMPHONY/Applications/MATCH, if the package 
+was not moved) and modify the variables in the Makefile if you want to add
+your own defines, source and library files. Then, type    
+
+   make
+
+The executable "match_m$(EXT)", where $(EXT) is an extension to be added 
+according to the chosen module dependencies, should be successfully made here. 
+
+4. Make sure there are links from your '$PVM_ROOT/bin/$PVM_ARCH/' subdirectory 
+to each of the executables in your 'bin/' directory. This is required by PVM.
+
+5. Start the PVM daemon by typing "pvm" on the command line and then typing
+"quit".
+
+6. Test MATCH, using the sample file called sample.match included
+with the distribution. To specify the file name, use the "-F" command-line
+option, i.e., type 
+
+   match_m$(EXT) -F sample.match 
+
+*******************************************************************************
+*            COMPILING THE SYMPHONY MATCH APPLICATION (Windows)                *
+*******************************************************************************
+
+Here is a sketch outline of how to compile the SYMPHONY MATCH
+application in Microsoft Windows. For information on developing your own
+applications, please see the quick start guide below or the detailed
+explanation in the user's manual. Direct support is provided for compilation
+under MS Visual Studio 6.0. Compilation for other compilers should also be
+possible. Note that the Windows version has some limitations. Detailed timing
+information is not currently provided.  Support is only provided for running
+in sequential mode at this time.
+
+First, download SYMPHONY and unpack the archive if it is required. 
+You now have three options. You can either compile on the command-line using 
+automated MSDEV build system or NMAKE utility or you can use the provided 
+projects and workspaces. Note that, in Windows, it is not recommended to 
+move MATCH package from the SYMPHONY package. Otherwise, the user has 
+to redefine all the paths to SYMPHONY and COIN header files as well as 
+the paths to COIN project files. For all of the following options, first 
+go to the SYMPHONY/Appliacations/MATCH/Win32/v6 directory. 
+
+************************ Using MSDEV Utility *********************************
+
+1. Open a command line terminal and type
+
+   msdev match.dsw /make all    
+
+This will create both the debug and release versions of SYMPHONY. If you 
+want to compile only one of them, type 
+ 
+   msdev match.dsw /make "all - debug" 
+
+or 
+
+   msdev match.dsw /make "all - release" 
+
+For each command, the executable 'match.exe' will be created in 'Debug' 
+and/or 'Release' directories.
+
+2. To test the executable, type 
+
+   Debug/match.exe -F ..\..\sample.match
+
+3. If MATCH is modified, type 
+
+   msdev match.dsw /make all /rebuild
+
+in order to clean and rebuild everything. 
+
+******************** Using the NMAKE Utility *********************************
+
+1. Edit the file Win32\v6\match.mak to reflect your environment. This involves 
+specifying the LP solver to be used and various paths. Only minor edits should 
+be required. An explanation of what has to be set is contained in the comments 
+in the makefile. Note that, you have to first create the COIN libraries
+Cgl, Clp, Osi, OsiClp and CoinUtils which reside in Win32 directory of the 
+root directory of SYMPHONY package.
+
+2. Once configuration is done, open a command line terminal and type
+
+   nmake /f match.mak
+
+   The executable "match.exe" will be created in the Debug directory.
+
+3. To test the executable, type 
+
+   match.exe -F ..\..\sample.match
+
+******************** Using the MSVC++ Workspace ******************************
+
+1. Open the workspace 'match.dsw'. 
+
+2. Note that there are a number of additional preprocessor definitions that
+control the functionality of SYMPHONY. These definitions are described in
+"match.mak", a Unix-style makefile included in the distribution. To 
+enable the functionality associated with a particular definition, simply add 
+it to the list of definitions of "libSymphony" project together with the 
+required libraries and paths. For instance, if you 
+want to enable GMPL reader option, you need to
+
+  - add the directory of the header files of GLPK to the include files path
+  - add USE_GLPMPL to the defines
+  - add the GLPK library to the workspace
+
+2.  Make sure that the project 'match' is set as the active project from the 
+Project/Set Active menu. Choose "Build match.exe" from the Build menu. This 
+should successfully build the MATCH executable. 
+
+3. To test the executable, right click on the match project, go to the
+"Debug" tab and set the program arguments to "-F ..\..\sample.match". 
+Note that command-line switches are Unix-style. 
+
+4. Now choose "Execute" from the build menu and the solver should solve the
+sample problem.
+
+Note that there is some functionality missing from the Windows version. Most
+prominently, the timing functions do not work. This functionality should be
+easy to add -- let me know if you are interested in doing it and I will give
+you all the help I can. In addition, the Windows version will only run in
+sequential mode for a variety of reasons. However, it should be relatively
+easy to get it running in parallel if you can get PVM working under
+Windows. Let me know if you are interested. Finally, only CLP LP solver 
+is maintained in current release. If you need to work with any other 
+LP solver; although support for other LP solvers will be added later, I can 
+send you simple instructions for configuring SYMPHONY's Windows version 
+with other LP solvers. 

@@ -1,0 +1,361 @@
+#===========================================================================#
+#                                                                           #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
+#                                                                           #
+# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
+# Laci Ladanyi (ladanyi@us.ibm.com).                                        #
+#                                                                           #
+# The author of this file is Menal Guzelsoy                                 #
+#                                                                           #
+# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+#                                                                           #
+# This software is licensed under the Common Public License. Please see     #
+# accompanying file for terms.                                              #
+#                                                                           #
+#===========================================================================#
+
+# $Id: Makefile.in 726 2006-04-17 04:16:00Z andreasw $
+
+MASTERNAME = vrp
+
+EXE = $(MASTERNAME)@EXEEXT@
+
+# CHANGEME: Additional sources
+# - Names of your additional source files without any extensions
+ADDSOURCES =
+
+# CHANGEME: Additional libraries
+ADDLIBS =
+
+# CHANGEME: Additional flags for compilation (e.g., include flags)
+ADDINCFLAGS = 
+
+# Directory with COIN header files
+COININCDIR = @abs_include_dir@
+
+# Directory with COIN libraries
+COINLIBDIR = @abs_lib_dir@
+
+# Directoy with SYMPHONY header files 
+SYMLIBDIR = @SYMSRCDIR@
+
+# Directoy with SYMPHONY library
+SYMINCDIR = @SYMINCDIR@
+
+#Directory for LP solver
+GLPKINCDIR = @GLPKINCDIR@
+CPXINCDIR = @CPXINCDIR@
+OSLINCDIR = @OSLINCDIR@
+SPXINCDIR = @SPXINCDIR@
+XPRINCDIR = @XPRINCDIR@
+
+# CHANGEME: Additional options
+
+##############################################################################
+# This section is for CONCORDE
+##############################################################################
+
+##############################################################################
+# This solver can use separation routines from CONCORDE, the
+# TSP solver of Applegate, Bixby, Chvatal, and Cook. To enable this option:
+# 1. set the variables DO_CONCORDE_CUTS to TRUE. 
+# 2. Download the source code for CONCORDE and the qsopt LP solver from 
+#    http://www.tsp.gatech.edu.
+# 3. Put qsopt.a and qsopt.h in ~/lib (make the directory if it doesn't exist).
+# 4. Put a copy of qsopt.h in ~/include (make this directory if it doesn't 
+#    exist).
+#.5. Rename qsopt.a libqsopt.a (so it is detected as a library).
+# 6. Build concorde with qsopt as the LP solver (configure --with-qsopt=~/lib).
+# 7. Move the resulting library concorde.a to ~/lib and rename it 
+#    libconcorde.a (or create a soft link).
+# 8. Put a copy of concorde.h in ~/include (or create a soft link).
+# 9. Make the CNRP application as usual.
+##############################################################################
+
+DO_CONCORDE_CUTS = FALSE
+
+ifeq ($(DO_CONCORDE_CUTS),TRUE)
+ADDLIBS += -L${HOME}/lib -lconcorde -lqsopt
+ADDINCFLAGS += -I${HOME}/include 
+endif
+
+##########################################################################
+#  Usually, you don't have to change anything below.  Note that if you   #
+#  change certain compiler options, you might have to recompile the      #
+#  COIN package.                                                         #
+##########################################################################
+
+SYM_COMPILE_IN_TM = @SYM_COMPILE_IN_TM_TRUE@TRUE
+SYM_COMPILE_IN_LP = @SYM_COMPILE_IN_LP_TRUE@TRUE
+SYM_COMPILE_IN_CP = @SYM_COMPILE_IN_CP_TRUE@TRUE
+SYM_COMPILE_IN_CG = @SYM_COMPILE_IN_CG_TRUE@TRUE
+USE_CGL_CUTS = @USE_CGL_CUTS_TRUE@TRUE
+CLP_LP_SOLVER = @CLP_LP_SOLVER_TRUE@TRUE
+GLPK_LP_SOLVER = @GLPK_LP_SOLVER_TRUE@TRUE
+CPLEX_LP_SOLVER = @CPLEX_LP_SOLVER_TRUE@TRUE
+OSL_LP_SOLVER = @OSL_LP_SOLVER_TRUE@TRUE
+SOPLEX_LP_SOLVER = @SOPLEX_LP_SOLVER_TRUE@TRUE
+XPRESS_LP_SOLVER = @XPRESS_LP_SOLVER_TRUE@TRUE
+SYM_PARALLEL = @SYM_PARALLEL_TRUE@TRUE
+USE_GMPL = @USE_GMPL_TRUE@TRUE
+MASTEREXT = @MASTEREXT@
+LPEXT = @LPEXT@
+TMEXT = @TMEXT@
+ADDOBJS = $(addsuffix .@OBJEXT@, $(ADDSOURCES))
+
+##############################################################################
+# This section is for listing CNRP source file names
+##############################################################################
+
+
+MACROS_OBJS        = src/Common/vrp_macros.@OBJEXT@
+COST_OBJS          = src/Common/compute_cost.@OBJEXT@
+NET_OBJS           = src/Common/network.@OBJEXT@
+DG_FUNC_OBJS       = src/DrawGraph/vrp_dg_functions.@OBJEXT@
+
+USER_MASTER_OBJS   = src/Master/vrp_main.@OBJEXT@ \
+	src/Master/vrp_master.@OBJEXT@ src/Master/vrp_io.@OBJEXT@
+USER_MASTER_OBJS  += src/Master/vrp_master_functions.@OBJEXT@ \
+	src/Master/small_graph.@OBJEXT@ $(NET_OBJS) 
+USER_MASTER_OBJS  += $(ADDOBJS)
+USER_MASTER_OBJS  += $(COST_OBJS)
+ifeq ($(SYM_COMPILE_IN_TM),TRUE)
+USER_MASTER_OBJS  += $(USER_TM_OBJS)
+ifneq ($(SYM_COMPILE_IN_LP),TRUE)
+USER_MASTER_OBJS  += $(MACROS_OBJS) $(DG_FUNC_OBJS)
+endif
+else
+USER_MASTER_OBJS  += $(MACROS_OBJS) $(DG_FUNC_OBJS)
+endif
+
+ifeq ($(SYM_COMPILE_IN_LP),TRUE)
+USER_TM_OBJS       = $(USER_LP_OBJS) 
+endif
+ifeq ($(SYM_COMPILE_IN_CP),TRUE)
+USER_TM_OBJS      += src/CutPool/vrp_cp.@OBJEXT@ 
+endif
+
+USER_LP_OBJS       = src/LP/vrp_lp_branch.@OBJEXT@ \
+	src/LP/vrp_lp.@OBJEXT@ 
+USER_LP_OBJS      += $(MACROS_OBJS) $(DG_FUNC_OBJS)
+ifneq ($(SYM_COMPILE_IN_LP),TRUE)
+USER_LP_OBJS      += $(NET_OBJS)
+endif
+
+ifeq ($(SYM_COMPILE_IN_CG),TRUE)
+USER_LP_OBJS      += src/CutGen/vrp_cg.@OBJEXT@ \
+	src/CutGen/biconnected.@OBJEXT@ src/CutGen/shrink.@OBJEXT@
+endif
+
+USER_CG_OBJS       = src/CutGen/vrp_cg.@OBJEXT@ \
+	src/CutGen/biconnected.@OBJEXT@ 
+USER_CG_OBJS      += src/Common/compute_cost.@OBJEXT@ \
+	src/CutGen/shrink.@OBJEXT@ $(DG_FUNC_OBJS)
+USER_CG_OBJS      += $(MACROS_OBJS) $(NET_OBJS)
+
+USER_CP_OBJS       = src/CutPool/vrp_cp.@OBJEXT@ $(MACROS_OBJS)
+
+USER_DG_OBJS       = src/DrawGraph/vrp_dg.@OBJEXT@ \
+	src/DrawGraph/vrp_dg_network.@OBJEXT@ $(MACROS_OBJS)
+
+USER_SRCDIR       =
+USER_INCDIR       =
+
+ifeq ($(DO_CONCORDE_CUTS),TRUE)
+ifeq ($(SYM_COMPILE_IN_CG),TRUE)
+USER_LP_OBJS      += src/CutGen/tsp.@OBJEXT@ # $(TSP_OBJS)
+endif
+USER_CG_OBJS      += src/CutGen/tsp.@OBJEXT@ # $(TSP_OBJS)
+endif
+
+ALL_OBJS =  src/Master/vrp_main.@OBJEXT@ \
+	src/Master/vrp_master.@OBJEXT@ \
+	src/Master/vrp_io.@OBJEXT@ \
+	src/Master/vrp_master_functions.@OBJEXT@ \
+	$(ADDOBJS) \
+	src/Master/small_graph.@OBJEXT@ \
+	$(COST_OBJS) \
+	src/LP/vrp_lp_branch.@OBJEXT@ \
+	src/LP/vrp_lp.@OBJEXT@ \
+	$(MACROS_OBJS) \
+	$(NET_OBJS) \
+	$(DG_FUNC_OBJS) \
+	src/CutGen/vrp_cg.@OBJEXT@ \
+	src/CutGen/biconnected.@OBJEXT@ \
+	src/CutGen/shrink.@OBJEXT@ \
+	src/CutPool/vrp_cp.@OBJEXT@
+
+ifeq ($(DO_CONCORDE_CUTS),TRUE)
+ALL_OBJS += src/CutGen/tsp.@OBJEXT@ # $(TSP_OBJS)
+endif
+
+PUSER_MASTER_OBJS = $(addsuffix o, $(USER_MASTER_OBJS))
+PUSER_LP_OBJS = $(addsuffix o, $(USER_LP_OBJS))
+PUSER_CG_OBJS = $(addsuffix o, $(USER_CG_OBJS))
+PUSER_CP_OBJS = $(addsuffix o, $(USER_CP_OBJS))
+PUSER_TM_OBJS = $(addsuffix o, $(USER_TM_OBJS))
+
+PALL_OBJS = $(PUSER_MASTER_OBJS) $(PUSER_LP_OBJS) $(PUSER_CP_OBJS) \
+	$(PUSER_TM_OBJS)
+
+ifeq ($(DO_CONCORDE_CUTS),TRUE)
+ADDINCFLAGS += -DDO_TSP_CUTS
+endif
+
+# C++ Compiler command
+CXX = @CXX@
+
+# C++ Compiler options
+CXXFLAGS = @CXXFLAGS@
+
+# additional C++ Compiler options for linking
+CXXLINKFLAGS = @RPATH_FLAGS@
+
+#Include files
+INCL =  -Iinclude -I`$(CYGPATH_W) $(COININCDIR)` \
+	-I`$(CYGPATH_W) $(SYMINCDIR)`
+
+# Libraries necessary to link
+LIBS = -L$(COINLIBDIR) -L$(SYMLIBDIR)
+
+ifeq ($(USE_CGL_CUTS),TRUE)
+LIBS += -lCgl `cat @CGLOBJDIR@/cgl_addlibs.txt`
+ADDINCFLAGS += -DUSE_CGL_CUTS
+endif
+
+ifeq ($(CLP_LP_SOLVER),TRUE)
+LIBS += -lOsiClp -lClp `cat @CLPOBJDIR@/clp_addlibs.txt`
+ADDINCFLAGS += -D__OSI_CLP__
+endif
+
+ifeq ($(GLPK_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+LIBS += -lOsiGlpk #-lglpk
+ADDINCFLAGS += -D__OSI_GLPK__
+else
+ifeq ($(USE_GMPL), TRUE)
+INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+ADDINCFLAGS += -DUSE_GLPMPL
+endif
+endif
+
+ifeq ($(CPLEX_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
+LIBS += -lOsiCpx #-lcplex
+ADDINCFLAGS += -D__OSI_CPLEX__
+endif
+
+ifeq ($(OSL_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(OSLINCDIR)`
+LIBS += -lOsiOsl #-losl
+ADDINCFLAGS += -D__OSI_OSL__
+endif
+
+ifeq ($(SOPLEX_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(SPXINCDIR)`
+LIBS += -lOsiSpx #-l
+ADDINCFLAGS += -D__OSI_SOPLEX__
+endif
+
+ifeq ($(XPRESS_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(XPRINCDIR)`
+LIBS += -lOsiXpr #-l
+ADDINCFLAGS += -D__OSI_XPRESS__
+endif
+
+ADDLIBS += @ADDLIBS@
+
+LIBS += -lOsi -lCoinUtils `cat @OSIOBJDIR@/osi_addlibs.txt` \
+	`cat @COINUTILSOBJDIR@/coinutils_addlibs.txt` $(ADDLIBS)
+
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
+
+WHATTOMAKE = $(EXE)
+
+ifeq ($(SYM_PARALLEL),TRUE)
+WHATTOMAKE += $(MASTERNAME)$(MASTEREXT)
+endif
+
+ifneq ($(SYM_COMPILE_IN_LP),TRUE)
+WHATTOMAKE  += $(MASTERNAME)_lp$(LPEXT)
+endif
+
+ifneq ($(SYM_COMPILE_IN_CP),TRUE)
+WHATTOMAKE += $(MASTERNAME)_cp
+endif
+
+ifneq ($(SYM_COMPILE_IN_CG),TRUE)
+WHATTOMAKE += $(MASTERNAME)_cg
+endif
+
+ifneq ($(SYM_COMPILE_IN_TM),TRUE)
+WHATTOMAKE += $(MASTERNAME)_tm$(TMEXT)
+endif
+
+ADDFLAGS += $(ADDINCFLAGS) @SYMDEFS@
+ADDPFLAGS += $(ADDINCFLAGS) @SYMPDEFS@
+
+INCL += -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+SYMLIBS = -lSymAppl $(LIBS) 
+PSYMLIBS = -L$(PVM_ROOT)/lib/@ARCH@ -lgpvm3 -lpvm3 $(LIBS) 
+
+all: $(APPL_PARALLEL) $(WHATTOMAKE)
+
+.c.o:
+	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+.c.obj:
+	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
+
+.c.oo:
+	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+.c.objo:
+	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
+
+$(EXE): $(ALL_OBJS)
+	bla=;\
+	for file in $(ALL_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  $(SYMLIBS)
+
+$(MASTERNAME)$(MASTEREXT) : $(PUSER_MASTER_OBJS)
+	bla=;\
+	for file in $(PUSER_MASTER_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
+	-lSymAppl$(MASTEREXT) $(PSYMLIBS)
+
+$(MASTERNAME)_lp$(LPEXT) : $(PUSER_LP_OBJS)
+	bla=;\
+	for file in $(PUSER_LP_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
+	-lSymAppl_lp$(LPEXT) $(PSYMLIBS)
+
+$(MASTERNAME)_cp : $(PUSER_CP_OBJS)
+	bla=;\
+	for file in $(PUSER_CP_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
+	-lSymAppl_cp $(PSYMLIBS)
+
+$(MASTERNAME)_cg : $(PUSER_CG_OBJS)
+	bla=;\
+	for file in $(PUSER_CG_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  $(PSYMLIBS) \
+	-lSymAppl_cg
+
+$(MASTERNAME)_tm$(TMEXT) : $(PUSER_TM_OBJS)
+	bla=;\
+	for file in $(PUSER_TM_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
+	done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
+	-lSymAppl_tm$(TMEXT) $(PSYMLIBS)
+
+.SUFFIXES: .cpp .c .o .obj .oo .objo
+
+clean:
+	rm -rf $(WHATTOMAKE) $(ALL_OBJS) $(PALL_OBJS)
