@@ -59,6 +59,13 @@ AC_PREFIX_DEFAULT([`pwd`])
 # Initialize automake
 AC_COIN_CREATE_LIBTOOL
 
+
+#############################################################################
+#                  Third party packages from COIN repos.                    #
+#############################################################################
+
+AC_COIN_THIRDPARTY_SUBDIRS([Glpk],[ThirdParty/Glpk],[glpk/src/glplpx01.c])
+
 #############################################################################
 #                  Check which subprojects are there                        #
 #############################################################################
@@ -97,7 +104,19 @@ if test $sym_lp_solver = clp; then
 else
     AC_MSG_RESULT(no)
 fi
+
 AM_CONDITIONAL(ADD_CLP, [test $sym_lp_solver = clp])
+
+use_tp_glpk=false
+for dir in $subdirs; do
+    if test "$dir" = "ThirdParty/Glpk"; then
+      use_tp_glpk=true
+    fi
+done
+
+
+AM_CONDITIONAL(ADD_GLPK, [test $use_tp_glpk = true])
+
 
 #############################################################################
 #                            Check SYMPHONY                                 #

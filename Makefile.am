@@ -26,13 +26,20 @@ EXTRA_DIST =
 
 # subdirs is set by configure as the list of all subdirectories to recurse
 # into
-SUBDIRS = CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl 
 
-if ADD_CLP
-SUBDIRS += Clp
-endif 
+SUBDIRS = $(subdirs)
 
-SUBDIRS += SYMPHONY
+#if ADD_GLPK
+#   SUBDIRS += ThirdParty/Glpk
+#endif
+
+#SUBDIRS += CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl 
+
+#if ADD_CLP
+#   SUBDIRS += Clp
+#endif 
+
+#SUBDIRS += SYMPHONY
 
 ########################################################################
 #                           Extra Targets                              #

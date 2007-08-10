@@ -3573,7 +3573,12 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
    
    /* create CGL LandP cuts */
-
+#ifndef __OSI_CLP__
+	//	PRINTF(verbosity, -1, 
+	//      ("LandP cuts can be generated only with Clp...Skipping LandP cut generation..."));
+	//       }		
+	par->generate_cgl_landp_cuts == DO_NOT_GENERATE;
+#else
    if(par->generate_cgl_landp_cuts > -1 && 
       par->generate_cgl_landp_cuts_freq > 0){
      if(par->generate_cgl_landp_cuts == GENERATE_ALWAYS || 
@@ -3586,12 +3591,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 (lp_data->lp_count % par->generate_cgl_landp_cuts_freq == 0)) ||
 	 is_top_iter){
 
-#ifndef __OSI_CLP__
-	PRINTF(verbosity, -1, 
-	       ("LandP cuts can be generated only with Clp...Skipping LandP cut generation..."));
-	       }		
-	par->generate_cgl_landp_cuts == DO_NOT_GENERATE;
-#else
+
+
 	/* make basis ready first */
 	termcode = dual_simplex(lp_data, &iterd); 
 	/* 	if(termcode != 0){ 
