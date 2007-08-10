@@ -3263,7 +3263,7 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
       assert(!exists ^ testIntParam(si, i, 0));
       assert(!exists ^ testIntParam(si, i, 1));
       assert(!exists ^ testIntParam(si, i, 9999999));
-      assert(!exists ^ testIntParam(si, i, INT_MAX));
+      assert(!exists ^ testIntParam(si, i, COIN_INT_MAX));
       if (exists)
         assert(si->getIntParam(static_cast<OsiIntParam>(i), ival));
     }
