@@ -22,7 +22,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Osi\src,..\..\Osi\src\OsiClp,..\..\Clp\src,..\..\CoinUtils\src,..\..\Cgl\src,..\..\Cgl\src\CglLiftAndProject,..\..\Cgl\src\CglFlowCover,..\..\Cgl\src\CglMixedIntegerRounding,..\..\Cgl\src\CglClique,..\..\Cgl\src\CglOddHole,..\..\Cgl\src\CglKnapsackCover,..\..\Cgl\src\CglGomory,..\..\Cgl\src\CglSimpleRounding,..\..\Cgl\src\CglProbing,..\..\BuildTools\headers,..\..\SYMPHONY\include"
+				AdditionalIncludeDirectories="..\..\..\Osi\src,..\..\..\Osi\src\OsiClp,..\..\..\Clp\src,..\..\..\CoinUtils\src,..\..\..\Cgl\src,..\..\..\Cgl\src\CglLiftAndProject,..\..\..\Cgl\src\CglLandP,..\..\..\Cgl\src\CglFlowCover,..\..\..\Cgl\src\CglMixedIntegerRounding,..\..\..\Cgl\src\CglClique,..\..\..\Cgl\src\CglOddHole,..\..\..\Cgl\src\CglKnapsackCover,..\..\..\Cgl\src\CglGomory,..\..\..\Cgl\src\CglSimpleRounding,..\..\..\Cgl\src\CglTwomir,..\..\..\Cgl\src\CglProbing,..\..\..\Cgl\src\CglRedSplit,..\..\..\BuildTools\headers,..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
@@ -73,7 +73,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Osi\src,..\..\Osi\src\OsiClp,..\..\Clp\src,..\..\CoinUtils\src,..\..\Cgl\src,..\..\Cgl\src\CglLiftAndProject,..\..\Cgl\src\CglFlowCover,..\..\Cgl\src\CglMixedIntegerRounding,..\..\Cgl\src\CglClique,..\..\Cgl\src\CglOddHole,..\..\Cgl\src\CglKnapsackCover,..\..\Cgl\src\CglGomory,..\..\Cgl\src\CglSimpleRounding,..\..\Cgl\src\CglProbing,..\..\BuildTools\headers,..\..\SYMPHONY\include"
+				AdditionalIncludeDirectories="..\..\..\Osi\src,..\..\..\Osi\src\OsiClp,..\..\..\Clp\src,..\..\..\CoinUtils\src,..\..\..\Cgl\src,..\..\..\Cgl\src\CglLiftAndProject,..\..\..\Cgl\src\CglLandP,..\..\..\Cgl\src\CglFlowCover,..\..\..\Cgl\src\CglMixedIntegerRounding,..\..\..\Cgl\src\CglClique,..\..\..\Cgl\src\CglOddHole,..\..\..\Cgl\src\CglKnapsackCover,..\..\..\Cgl\src\CglGomory,..\..\..\Cgl\src\CglSimpleRounding,..\..\..\Cgl\src\CglTwomir,..\..\..\Cgl\src\CglProbing,..\..\..\Cgl\src\CglRedSplit,..\..\..\BuildTools\headers,..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
@@ -124,7 +124,7 @@
 				Name="Common"
 				Filter="">
 				<File
-					RelativePath="..\..\SYMPHONY\src\Common\pack_array.c">
+					RelativePath="..\..\src\Common\pack_array.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -147,7 +147,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Common\pack_cut.c">
+					RelativePath="..\..\src\Common\pack_cut.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -170,7 +170,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Common\proccomm.c">
+					RelativePath="..\..\src\Common\proccomm.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -193,7 +193,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Common\qsortucb.c">
+					RelativePath="..\..\src\Common\qsortucb.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -216,7 +216,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Common\qsortucb_di.c">
+					RelativePath="..\..\src\Common\qsortucb_di.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -239,7 +239,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Common\qsortucb_i.c">
+					RelativePath="..\..\src\Common\qsortucb_i.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -262,7 +262,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Common\qsortucb_ic.c">
+					RelativePath="..\..\src\Common\qsortucb_ic.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -285,7 +285,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Common\qsortucb_id.c">
+					RelativePath="..\..\src\Common\qsortucb_id.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -308,7 +308,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Common\qsortucb_ii.c">
+					RelativePath="..\..\src\Common\qsortucb_ii.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -331,7 +331,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Common\timemeas.c">
+					RelativePath="..\..\src\Common\timemeas.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -358,7 +358,7 @@
 				Name="CutGen"
 				Filter="">
 				<File
-					RelativePath="..\..\SYMPHONY\src\CutGen\cg_func.c">
+					RelativePath="..\..\src\CutGen\cg_func.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -381,7 +381,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\CutGen\cg_proccomm.c">
+					RelativePath="..\..\src\CutGen\cg_proccomm.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -404,7 +404,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\CutGen\cg_wrapper.c">
+					RelativePath="..\..\src\CutGen\cg_wrapper.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -427,7 +427,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\CutGen\cut_gen.c">
+					RelativePath="..\..\src\CutGen\cut_gen.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -454,7 +454,7 @@
 				Name="CutPool"
 				Filter="">
 				<File
-					RelativePath="..\..\SYMPHONY\src\CutPool\cp_func.c">
+					RelativePath="..\..\src\CutPool\cp_func.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -477,7 +477,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\CutPool\cp_proccomm.c">
+					RelativePath="..\..\src\CutPool\cp_proccomm.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -500,7 +500,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\CutPool\cp_wrapper.c">
+					RelativePath="..\..\src\CutPool\cp_wrapper.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -523,7 +523,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\CutPool\cut_pool.c">
+					RelativePath="..\..\src\CutPool\cut_pool.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -550,7 +550,7 @@
 				Name="LP"
 				Filter="">
 				<File
-					RelativePath="..\..\SYMPHONY\src\LP\lp.c">
+					RelativePath="..\..\src\LP\lp.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -573,7 +573,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\LP\lp_branch.c">
+					RelativePath="..\..\src\LP\lp_branch.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -596,7 +596,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\LP\lp_free.c">
+					RelativePath="..\..\src\LP\lp_free.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -619,7 +619,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\LP\lp_genfunc.c">
+					RelativePath="..\..\src\LP\lp_genfunc.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -642,7 +642,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\LP\lp_proccomm.c">
+					RelativePath="..\..\src\LP\lp_proccomm.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -665,7 +665,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\LP\lp_rowfunc.c">
+					RelativePath="..\..\src\LP\lp_rowfunc.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -688,7 +688,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\LP\lp_solver.c">
+					RelativePath="..\..\src\LP\lp_solver.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -711,7 +711,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\LP\lp_varfunc.c">
+					RelativePath="..\..\src\LP\lp_varfunc.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -734,7 +734,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\LP\lp_wrapper.c">
+					RelativePath="..\..\src\LP\lp_wrapper.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -761,7 +761,7 @@
 				Name="Master"
 				Filter="">
 				<File
-					RelativePath="..\..\SYMPHONY\src\Master\master.c">
+					RelativePath="..\..\src\Master\master.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -784,7 +784,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Master\master_func.c">
+					RelativePath="..\..\src\Master\master_func.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -807,7 +807,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Master\master_io.c">
+					RelativePath="..\..\src\Master\master_io.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -830,7 +830,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\Master\master_wrapper.c">
+					RelativePath="..\..\src\Master\master_wrapper.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -857,7 +857,7 @@
 				Name="TreeManager"
 				Filter="">
 				<File
-					RelativePath="..\..\SYMPHONY\src\TreeManager\tm_func.c">
+					RelativePath="..\..\src\TreeManager\tm_func.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
@@ -880,7 +880,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\SYMPHONY\src\TreeManager\tm_proccomm.c">
+					RelativePath="..\..\src\TreeManager\tm_proccomm.c">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool

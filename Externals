@@ -6,15 +6,3 @@ CoinUtils          https://projects.coin-or.org/svn/CoinUtils/trunk/CoinUtils
 Cgl                https://projects.coin-or.org/svn/Cgl/trunk/Cgl
 Clp                https://projects.coin-or.org/svn/Clp/trunk/Clp
 Osi                https://projects.coin-or.org/svn/Osi/trunk/Osi
-Win32/v6/CoinUtils https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v6/CoinUtils
-Win32/v6/Cgl       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v6/Cgl
-Win32/v6/Clp       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v6/Clp
-Win32/v6/Osi       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v6/Osi
-Win32/v7/CoinUtils https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v7/CoinUtils
-Win32/v7/Cgl       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v7/Cgl
-Win32/v7/Clp       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v7/Clp
-Win32/v7/Osi       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v7/Osi
-Win32/v8/CoinUtils https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v8/CoinUtils
-Win32/v8/Cgl       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v8/Cgl
-Win32/v8/Clp       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v8/Clp
-Win32/v8/Osi       https://projects.coin-or.org/svn/MSVisualStudio/stable/1.0/v8/Osi

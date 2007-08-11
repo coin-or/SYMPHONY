@@ -1,21 +1,21 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCgl", "Cgl\libCgl\libCgl.vcproj", "{7BBD9DED-1310-439C-9516-3C68E16BB7BA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCgl", "..\..\..\Cgl\MSVisualStudio\v7\libCgl\libCgl.vcproj", "{7BBD9DED-1310-439C-9516-3C68E16BB7BA}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libClp", "Clp\libClp\libClp.vcproj", "{A2CB8DCB-5266-47A2-A18F-650C2FA5FB6C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libClp", "..\..\..\Clp\MSVisualStudio\v7\libClp\libClp.vcproj", "{A2CB8DCB-5266-47A2-A18F-650C2FA5FB6C}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCoinUtils", "CoinUtils\libCoinUtils\libCoinUtils.vcproj", "{AB3C8471-AA78-487F-84D4-E11E8546C2EF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCoinUtils", "..\..\..\CoinUtils\MSVisualStudio\v7\libCoinUtils\libCoinUtils.vcproj", "{AB3C8471-AA78-487F-84D4-E11E8546C2EF}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsi", "Osi\libOsi\libOsi.vcproj", "{D65A6945-406E-4A5B-9837-9E655C31892A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsi", "..\..\..\Osi\MSVisualStudio\v7\libOsi\libOsi.vcproj", "{D65A6945-406E-4A5B-9837-9E655C31892A}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiClp", "Osi\libOsiClp\libOsiClp.vcproj", "{7EDB170E-DF1D-4933-84C0-58D0635878C6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiClp", "..\..\..\Osi\MSVisualStudio\v7\libOsiClp\libOsiClp.vcproj", "{7EDB170E-DF1D-4933-84C0-58D0635878C6}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject

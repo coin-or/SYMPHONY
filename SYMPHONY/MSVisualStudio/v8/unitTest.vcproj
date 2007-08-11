@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Osi\src;..\..\Osi\src\OsiClp;..\..\Osi\src\OsiSym;..\..\Clp\src;..\..\CoinUtils\src;..\..\Cgl\src;..\..\Cgl\src\CglLiftAndProject;..\..\Cgl\src\CglFlowCover;..\..\Cgl\src\CglMixedIntegerRounding;..\..\Cgl\src\CglClique;..\..\Cgl\src\CglOddHole;..\..\Cgl\src\CglKnapsackCover;..\..\Cgl\src\CglGomory;..\..\Cgl\src\CglSimpleRounding;..\..\Cgl\src\CglProbing;..\..\BuildTools\headers;..\..\SYMPHONY\include"
+				AdditionalIncludeDirectories="..\..\..\Osi\src;..\..\..\Osi\src\OsiClp;..\..\..\Osi\src\OsiSym;..\..\..\Clp\src;..\..\..\CoinUtils\src;..\..\..\Cgl\src;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\BuildTools\headers;..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE;COIN_HAS_SYMPHONY"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -176,31 +176,31 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\Osi\test\OsiColCutTest.cpp"
+				RelativePath="..\..\..\Osi\test\OsiColCutTest.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Osi\test\OsiCutsTest.cpp"
+				RelativePath="..\..\..\Osi\test\OsiCutsTest.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Osi\test\OsiRowCutDebuggerTest.cpp"
+				RelativePath="..\..\..\Osi\test\OsiRowCutDebuggerTest.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Osi\test\OsiRowCutTest.cpp"
+				RelativePath="..\..\..\Osi\test\OsiRowCutTest.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\SYMPHONY\test\OsiSolverInterfaceTest.cpp"
+				RelativePath="..\..\test\OsiSolverInterfaceTest.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\SYMPHONY\test\OsiSymSolverInterfaceTest.cpp"
+				RelativePath="..\..\test\OsiSymSolverInterfaceTest.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\SYMPHONY\test\unitTestSym.cpp"
+				RelativePath="..\..\test\unitTestSym.cpp"
 				>
 			</File>
 		</Filter>

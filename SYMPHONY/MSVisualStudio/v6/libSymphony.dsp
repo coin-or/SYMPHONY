@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /MLd /W2 /Gm /GR /GX /ZI /Od /I "..\..\Osi\src" /I "..\..\Osi\src\OsiClp" /I "..\..\Clp\src" /I "..\..\CoinUtils\src" /I "..\..\Cgl\src" /I "..\..\Cgl\src\CglLiftAndProject" /I "..\..\Cgl\src\CglFlowCover" /I "..\..\Cgl\src\CglMixedIntegerRounding" /I "..\..\Cgl\src\CglClique" /I "..\..\Cgl\src\CglOddHole" /I "..\..\Cgl\src\CglKnapsackCover" /I "..\..\Cgl\src\CglGomory" /I "..\..\Cgl\src\CglSimpleRounding" /I "..\..\Cgl\src\CglProbing" /I "..\..\BuildTools\headers" /I "..\..\SYMPHONY\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c /Tp
+# ADD CPP /nologo /MLd /W2 /Gm /GR /GX /ZI /Od /I "..\..\..\Osi\src" /I "..\..\..\Osi\src\OsiClp" /I "..\..\..\Clp\src" /I "..\..\..\CoinUtils\src" /I "..\..\..\Cgl\src" /I "..\..\..\Cgl\src\CglLiftAndProject" /I "..\..\..\Cgl\src\CglLandP" /I "..\..\..\Cgl\src\CglFlowCover" /I "..\..\..\Cgl\src\CglMixedIntegerRounding" /I "..\..\..\Cgl\src\CglClique" /I "..\..\..\Cgl\src\CglOddHole" /I "..\..\..\Cgl\src\CglKnapsackCover" /I "..\..\..\Cgl\src\CglGomory" /I "..\..\..\Cgl\src\CglSimpleRounding" /I "..\..\..\Cgl\src\CglProbing" /I "..\..\..\BuildTools\headers" /I "..\..\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c /Tp
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\Osi\src" /I "..\..\Osi\src\OsiClp" /I "..\..\Clp\src" /I "..\..\CoinUtils\src" /I "..\..\Cgl\src" /I "..\..\Cgl\src\CglLiftAndProject" /I "..\..\Cgl\src\CglFlowCover" /I "..\..\Cgl\src\CglMixedIntegerRounding" /I "..\..\Cgl\src\CglClique" /I "..\..\Cgl\src\CglOddHole" /I "..\..\Cgl\src\CglKnapsackCover" /I "..\..\Cgl\src\CglGomory" /I "..\..\Cgl\src\CglSimpleRounding" /I "..\..\Cgl\src\CglProbing" /I "..\..\BuildTools\headers" /I "..\..\SYMPHONY\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /FD /GZ /c /Tp
+# ADD CPP /nologo /W2 /Gm /GR /GX /ZI /Od /I "..\..\..\Osi\src" /I "..\..\..\Osi\src\OsiClp" /I "..\..\..\Clp\src" /I "..\..\..\CoinUtils\src" /I "..\..\..\Cgl\src" /I "..\..\..\Cgl\src\CglLiftAndProject" /I "..\..\..\Cgl\src\CglLandP" /I "..\..\..\Cgl\src\CglFlowCover" /I "..\..\..\Cgl\src\CglMixedIntegerRounding" /I "..\..\..\Cgl\src\CglClique" /I "..\..\..\Cgl\src\CglOddHole" /I "..\..\..\Cgl\src\CglKnapsackCover" /I "..\..\..\Cgl\src\CglGomory" /I "..\..\..\Cgl\src\CglSimpleRounding" /I "..\..\..\Cgl\src\CglTwomir" /I "..\..\..\Cgl\src\CglProbing" /I "..\..\..\Cgl\src\CglRedSplit" /I "..\..\..\BuildTools\headers" /I "..\..\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "INTEL" /D "COMPILE_IN_CG" /D "COMPILE_IN_CP" /D "COMPILE_IN_LP" /D "COMPILE_IN_TM" /D "__OSI_CLP__" /D "USE_CGL_CUTS" /FD /GZ /c /Tp
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -88,43 +88,43 @@ LIB32=link.exe -lib
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Common\pack_array.c
+SOURCE=..\..\src\Common\pack_array.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Common\pack_cut.c
+SOURCE=..\..\src\Common\pack_cut.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Common\proccomm.c
+SOURCE=..\..\src\Common\proccomm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Common\qsortucb.c
+SOURCE=..\..\src\Common\qsortucb.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Common\qsortucb_di.c
+SOURCE=..\..\src\Common\qsortucb_di.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Common\qsortucb_i.c
+SOURCE=..\..\src\Common\qsortucb_i.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Common\qsortucb_ic.c
+SOURCE=..\..\src\Common\qsortucb_ic.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Common\qsortucb_id.c
+SOURCE=..\..\src\Common\qsortucb_id.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Common\qsortucb_ii.c
+SOURCE=..\..\src\Common\qsortucb_ii.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Common\timemeas.c
+SOURCE=..\..\src\Common\timemeas.c
 # End Source File
 # End Group
 # Begin Group "CutGen"
@@ -132,19 +132,19 @@ SOURCE=..\..\SYMPHONY\src\Common\timemeas.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\CutGen\cg_func.c
+SOURCE=..\..\src\CutGen\cg_func.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\CutGen\cg_proccomm.c
+SOURCE=..\..\src\CutGen\cg_proccomm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\CutGen\cg_wrapper.c
+SOURCE=..\..\src\CutGen\cg_wrapper.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\CutGen\cut_gen.c
+SOURCE=..\..\src\CutGen\cut_gen.c
 # End Source File
 # End Group
 # Begin Group "CutPool"
@@ -152,19 +152,19 @@ SOURCE=..\..\SYMPHONY\src\CutGen\cut_gen.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\CutPool\cp_func.c
+SOURCE=..\..\src\CutPool\cp_func.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\CutPool\cp_proccomm.c
+SOURCE=..\..\src\CutPool\cp_proccomm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\CutPool\cp_wrapper.c
+SOURCE=..\..\src\CutPool\cp_wrapper.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\CutPool\cut_pool.c
+SOURCE=..\..\src\CutPool\cut_pool.c
 # End Source File
 # End Group
 # Begin Group "LP"
@@ -172,39 +172,39 @@ SOURCE=..\..\SYMPHONY\src\CutPool\cut_pool.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\LP\lp.c
+SOURCE=..\..\src\LP\lp.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\LP\lp_branch.c
+SOURCE=..\..\src\LP\lp_branch.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\LP\lp_free.c
+SOURCE=..\..\src\LP\lp_free.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\LP\lp_genfunc.c
+SOURCE=..\..\src\LP\lp_genfunc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\LP\lp_proccomm.c
+SOURCE=..\..\src\LP\lp_proccomm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\LP\lp_rowfunc.c
+SOURCE=..\..\src\LP\lp_rowfunc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\LP\lp_solver.c
+SOURCE=..\..\src\LP\lp_solver.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\LP\lp_varfunc.c
+SOURCE=..\..\src\LP\lp_varfunc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\LP\lp_wrapper.c
+SOURCE=..\..\src\LP\lp_wrapper.c
 # End Source File
 # End Group
 # Begin Group "Master"
@@ -212,19 +212,19 @@ SOURCE=..\..\SYMPHONY\src\LP\lp_wrapper.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Master\master.c
+SOURCE=..\..\src\Master\master.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Master\master_func.c
+SOURCE=..\..\src\Master\master_func.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Master\master_io.c
+SOURCE=..\..\src\Master\master_io.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\Master\master_wrapper.c
+SOURCE=..\..\src\Master\master_wrapper.c
 # End Source File
 # End Group
 # Begin Group "TreeManager"
@@ -232,11 +232,11 @@ SOURCE=..\..\SYMPHONY\src\Master\master_wrapper.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\TreeManager\tm_func.c
+SOURCE=..\..\src\TreeManager\tm_func.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\SYMPHONY\src\TreeManager\tm_proccomm.c
+SOURCE=..\..\src\TreeManager\tm_proccomm.c
 # End Source File
 # End Group
 # End Group

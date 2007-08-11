@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Osi\src,..\..\Osi\src\OsiClp,..\..\Clp\src,..\..\CoinUtils\src,..\..\Cgl\src,..\..\Cgl\src\CglLiftAndProject,..\..\Cgl\src\CglFlowCover,..\..\Cgl\src\CglMixedIntegerRounding,..\..\Cgl\src\CglClique,..\..\Cgl\src\CglOddHole,..\..\Cgl\src\CglKnapsackCover,..\..\Cgl\src\CglGomory,..\..\Cgl\src\CglSimpleRounding,..\..\Cgl\src\CglProbing,..\..\BuildTools\headers,..\..\SYMPHONY\include"
+				AdditionalIncludeDirectories="..\..\..\Osi\src;..\..\..\Osi\src\OsiClp;..\..\..\Clp\src;..\..\..\CoinUtils\src;..\..\..\Cgl\src;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\BuildTools\headers;..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -137,7 +137,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\Osi\src,..\..\Osi\src\OsiClp,..\..\Clp\src,..\..\CoinUtils\src,..\..\Cgl\src,..\..\Cgl\src\CglLiftAndProject,..\..\Cgl\src\CglFlowCover,..\..\Cgl\src\CglMixedIntegerRounding,..\..\Cgl\src\CglClique,..\..\Cgl\src\CglOddHole,..\..\Cgl\src\CglKnapsackCover,..\..\Cgl\src\CglGomory,..\..\Cgl\src\CglSimpleRounding,..\..\Cgl\src\CglProbing,..\..\BuildTools\headers,..\..\SYMPHONY\include"
+				AdditionalIncludeDirectories="..\..\..\Osi\src,..\..\..\Osi\src\OsiClp,..\..\..\Clp\src,..\..\..\CoinUtils\src,..\..\..\Cgl\src,..\..\..\Cgl\src\CglLiftAndProject,..\..\..\Cgl\src\CglFlowCover,..\..\..\Cgl\src\CglMixedIntegerRounding,..\..\..\Cgl\src\CglClique,..\..\..\Cgl\src\CglOddHole,..\..\..\Cgl\src\CglKnapsackCover,..\..\..\Cgl\src\CglGomory,..\..\..\Cgl\src\CglSimpleRounding,..\..\..\Cgl\src\CglProbing,..\..\..\BuildTools\headers,..\..\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -210,7 +210,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\..\SYMPHONY\src\Master\main.c"
+				RelativePath="..\..\src\Master\main.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

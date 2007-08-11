@@ -39,14 +39,14 @@
 # variable to the correct path.
 ##############################################################################
 
-SYMPHONYROOT=..\SYMPHONY
+SYMPHONYROOT=..\
 
 ##############################################################################
 # COINROOT is the path to the root directory of the COIN libraries. Many of
 # the new features of COIN require the COIN libraries to be installed.
 ##############################################################################
 
-COINROOT = ..\
+COINROOT = ..\..\
 
 ##############################################################################
 # OUTDIR variable specifies where to create the executable file, 
@@ -111,8 +111,8 @@ LPINCDIR = \
 	"$(COINROOT)\CoinUtils\src" /I\
 	"$(COINROOT)\Osi\src"
 LPLIB = \
-	"$(COINROOT)\Win32\v8\CoinUtils\libCoinUtils\Debug\libCoinUtils.lib" \
-	"$(COINROOT)\Win32\v8\Osi\libOsi\Debug\libOsi.lib"
+	"$(COINROOT)\CoinUtils\MSVisualStudio\v8\libCoinUtils\Debug\libCoinUtils.lib" \
+	"$(COINROOT)\Osi\MSVisualStudio\v8\libOsi\Debug\libOsi.lib"
 !ENDIF
 
 
@@ -122,7 +122,7 @@ LPINCDIR = $(LPINCDIR) /I\
 	"$(COINROOT)\Osi\src\OsiCpx"
 LPLIB = $(LPLIB) \
 	"C:\ILOG\cplex81\lib\msvc6\stat_sta\cplex81.lib" \
-	"$(COINROOT)\Win32\v8\Osi\libOsiCpx\Debug\libOsiCpx.lib"
+	"$(COINROOT)\Osi\MSVisualStudio\v8\libOsiCpx\Debug\libOsiCpx.lib"
 !ENDIF
 
 
@@ -132,7 +132,7 @@ LPINCDIR = $(LPINCDIR) /I\
 	"$(COINROOT)\Osi\src\OsiOsl"
 LPLIB = $(LPLIB) \
 	"C:\Program Files\IbmOslV3Lib\osllib\lib\oslmd6030.lib" \
-        "$(COINROOT)\Win32\v8\Osi\libOsiOsl\Debug\libOsiOsl.lib"
+        "$(COINROOT)\Osi\MSVisualStudio\v8\libOsiOsl\Debug\libOsiOsl.lib"
 !ENDIF
 
 
@@ -141,8 +141,8 @@ LPINCDIR = $(LPINCDIR) /I\
 	"$(COINROOT)\Clp\src" /I\
 	"$(COINROOT)\Osi\src\OsiClp"
 LPLIB = $(LPLIB) \
-	"$(COINROOT)\Win32\v8\Clp\libClp\Debug\libClp.lib" \
-	"$(COINROOT)\Win32\v8\Osi\libOsiClp\Debug\libOsiClp.lib"
+	"$(COINROOT)\Clp\MSVisualStudio\v8\libClp\Debug\libClp.lib" \
+	"$(COINROOT)\Osi\MSVisualStudio\v8\libOsiClp\Debug\libOsiClp.lib"
 !ENDIF
 
 !IF "$(OSI_INTERFACE)" == "XPRESS"
@@ -151,16 +151,16 @@ LPINCDIR = $(LPINCDIR) /I\
 	"$(COINROOT)\Osi\src\OsiXpr"
 LPLIB = $(LPLIB) \
 	"C:\" \
-	"$(COINROOT)\Win32\v8\Osi\libOsiXpr\Debug\libOsiXpr.lib"
+	"$(COINROOT)\Osi\MSVisualStudio\v8\libOsiXpr\Debug\libOsiXpr.lib"
 !ENDIF
 
 !IF "$(OSI_INTERFACE)" == "SOPLEX"
 LPINCDIR = $(LPINCDIR) /I\
 	"C:\" /I\
-	"$(COINROOT)\Osi\OsiSpx"
+	"$(COINROOT)\Osi\src\OsiSpx"
 LPLIB = $(LPLIB) \
 	"C:\" \
-	"$(COINROOT)\Win\osiSpxLib\Debug\osiSpxLib.lib"
+	"$(COINROOT)\Osi\MSVisualStudio\v8\libOsiSpx\Debug\libOsiSpx.lib"
 !ENDIF
 
 !IF "$(OSI_INTERFACE)" == "DYLP"
@@ -169,7 +169,7 @@ LPINCDIR = $(LPINCDIR) /I\
 	"$(COINROOT)\Osi\src\OsiDylp"
 LPLIB = $(LPLIB) \
 	"C:\" \
-	"$(COINROOT)\Win32\v8\libOsiDylp\Debug\libOsiDylp.lib"
+	"$(COINROOT)\Osi\MSVisualStudio\v8\libOsiDylp\Debug\libOsiDylp.lib"
 !ENDIF
 
 
@@ -179,7 +179,7 @@ LPINCDIR = $(LPINCDIR) /I\
 	"$(COINROOT)\Osi\src\OsiGlpk"
 LPLIB = $(LPLIB) \
 	"C:\GLPK\glpk-4.0\glpk.lib" \
-	"$(COINROOT)\Win32\v8\libOsiGlpk\Debug\libOsiGlpk.lib"
+	"$(COINROOT)\Osi\MSVisualStudio\v8\libOsiGlpk\Debug\libOsiGlpk.lib"
 !ENDIF
 
 
@@ -217,7 +217,7 @@ LPINCDIR = $(LPINCDIR) /I\
 	"$(COINROOT)\Osi\src\OsiGlpk\include"
 LPLIB = $(LPLIB) \
 	"C:\GLPK\glpk-4.0\glpk.lib" \
-	"$(COINROOT)\Win32\v8\libOsiGlpk\Debug\libOsiGlpk.lib"
+	"$(COINROOT)\Osi\MSVisualStudio\v8\libOsiGlpk\Debug\libOsiGlpk.lib"
 !ENDIF
 
 
@@ -238,7 +238,7 @@ USE_CGL_CUTS = TRUE
 
 !IF "$(USE_CGL_CUTS)" == "TRUE"
 LPINCDIR = $(LPINCDIR) /I "$(COINROOT)\Cgl\include"
-LPLIB = $(LPLIB) "$(COINROOT)\Win32\v8\Cgl\libCgl\Debug\libCgl.lib"
+LPLIB = $(LPLIB) "$(COINROOT)\Cgl\MSVisualStudio\v8\libCgl\Debug\libCgl.lib"
 DEFINITIONS= $(DEFINITIONS) /D "USE_CGL_CUTS"
 !ENDIF
 
@@ -253,7 +253,7 @@ USE_OSI_INTERFACE = FALSE
 
 !IF "$(USE_OSI_INTERFACE)" == "TRUE"
 ALL_INCDIR = $(LPINCDIR) /I "$(COINROOT)\Osi\src\OsiSym\include"
-ALL_LIB = $(LPLIB) "$(COINROOT)\Win32\v8\Osi\libOsiSym\Debug\libOsiSym.lib"
+ALL_LIB = $(LPLIB) "$(COINROOT)\Osi\MSVisualStudio\v8\libOsiSym\Debug\libOsiSym.lib"
 !ELSE
 ALL_INCDIR = $(LPINCDIR)
 ALL_LIB = $(LPLIB)
@@ -276,11 +276,13 @@ DEFINITIONS = $(DEFINITIONS) /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" \
 ALL_INCDIR = $(ALL_INCDIR) /I "$(SYMPHONYROOT)\include" \
 /I "$(COINROOT)\BuildTools\headers" \
 /I "$(COINROOT)\Cgl\src" \
+/I "$(COINROOT)\Cgl\src\CglAllDifferent" \
 /I "$(COINROOT)\Cgl\src\CglClique" \
 /I "$(COINROOT)\Cgl\src\CglDuplicateRow" \
 /I "$(COINROOT)\Cgl\src\CglFlowCover" \
 /I "$(COINROOT)\Cgl\src\CglGomory" \
 /I "$(COINROOT)\Cgl\src\CglKnapsackCover" \
+/I "$(COINROOT)\Cgl\src\CglLandP" \
 /I "$(COINROOT)\Cgl\src\CglLiftAndProject" \
 /I "$(COINROOT)\Cgl\src\CglMixedIntegerRounding" \
 /I "$(COINROOT)\Cgl\src\CglMixedIntegerRounding2" \

@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "libCgl"=".\Cgl\libCgl\libCgl.dsp" - Package Owner=<4>
+Project: "libCgl"="..\..\..\Cgl\MSVisualStudio\v6\libCgl\libCgl.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -15,7 +15,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "libClp"=".\Clp\libClp\libClp.dsp" - Package Owner=<4>
+Project: "libClp"="..\..\..\Clp\MSVisualStudio\v6\libClp\libClp.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -27,7 +27,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "libCoinUtils"=".\CoinUtils\libCoinUtils\libCoinUtils.dsp" - Package Owner=<4>
+Project: "libCoinUtils"="..\..\..\CoinUtils\MSVisualStudio\v6\libCoinUtils\libCoinUtils.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -39,7 +39,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "libOsi"=".\Osi\libOsi\libOsi.dsp" - Package Owner=<4>
+Project: "libOsi"="..\..\..\Osi\MSVisualStudio\v6\libOsi\libOsi.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -51,7 +51,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "libOsiClp"=".\Osi\libOsiClp\libOsiClp.dsp" - Package Owner=<4>
+Project: "libOsiClp"="..\..\..\Osi\MSVisualStudio\v6\libOsiClp\libOsiClp.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
