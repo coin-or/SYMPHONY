@@ -106,24 +106,26 @@ int main (int argc, const char *argv[])
    OsiSymSolverInterfaceUnitTest(mpsDir,netlibDir);
 
    // Create vector of solver interfaces
-   std::vector<OsiSolverInterface*> vecSi;
+   //   std::vector<OsiSolverInterface*> vecSi;
 
-   OsiSolverInterface * symSi = new OsiSymSolverInterface;
-   vecSi.push_back(symSi);
+   //   OsiSolverInterface * symSi = new OsiSymSolverInterface;
+   //   vecSi.push_back(symSi);
    
-   testingMessage( "Testing OsiSolverInterface\n" );
-   OsiSolverInterfaceMpsUnitTest(vecSi,netlibDir);
+   //   testingMessage( "Testing OsiSolverInterface\n" );
+   //   OsiSolverInterfaceMpsUnitTest(vecSi,netlibDir);
    
-   for (i=0; i<vecSi.size(); i++){
-      delete vecSi[i];
+   //   for (i=0; i<vecSi.size(); i++){
+   //      delete vecSi[i];
+   //   }
+
+   if (parms.find("-T") != parms.end()){
+      testingMessage( "Testing MIPLIB files\n" );
+
+      sym_environment *env = sym_open_environment();
+      sym_parse_command_line(env, argc, const_cast<char**>(argv));
+      sym_test(env);
    }
-   
-   testingMessage( "Testing MIPLIB files\n" );
 
-   sym_environment *env = sym_open_environment();
-  
-   sym_test(env);
-   
    testingMessage( "All tests completed successfully\n" );
   
    return 0;

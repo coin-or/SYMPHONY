@@ -716,8 +716,14 @@ uninstall-info: uninstall-info-recursive
 test: all
 	cd SYMPHONY; $(MAKE) test
 
+fulltest: all
+	cd SYMPHONY; $(MAKE) fulltest
+
 ptest: all
 	cd SYMPHONY; $(MAKE) ptest
+
+pfulltest: all
+	cd SYMPHONY; $(MAKE) pfulltest
 
 unitTest: test
 
@@ -732,7 +738,7 @@ tests: all
 
 unitTests: tests
 
-.PHONY: test unitTest ptest punitTest tests unitTests
+.PHONY: test unitTest ptest punitTest tests unitTests fulltest pfulltest
 
 # Make sure acinclude is using most recent coin.m4
 @MAINTAINER_MODE_TRUE@$(srcdir)/acinclude.m4: $(BUILDTOOLSDIR)/coin.m4

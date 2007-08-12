@@ -48,8 +48,14 @@ SUBDIRS = $(subdirs)
 test: all
 	cd SYMPHONY; $(MAKE) test
 
+fulltest: all
+	cd SYMPHONY; $(MAKE) fulltest
+
 ptest: all
 	cd SYMPHONY; $(MAKE) ptest
+
+pfulltest: all
+	cd SYMPHONY; $(MAKE) pfulltest
 
 unitTest: test
 
@@ -64,7 +70,7 @@ tests: all
 
 unitTests: tests
 
-.PHONY: test unitTest ptest punitTest tests unitTests
+.PHONY: test unitTest ptest punitTest tests unitTests fulltest pfulltest
 
 ########################################################################
 #                         Maintainer Stuff                             #
