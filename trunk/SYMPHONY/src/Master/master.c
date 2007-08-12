@@ -4351,7 +4351,7 @@ int sym_set_warm_start (sym_environment *env, warm_start_desc *ws)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_int_param(sym_environment *env, char *key, int value)
+int sym_set_int_param(sym_environment *env, const char *key, int value)
 {
    int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
@@ -4365,7 +4365,7 @@ int sym_set_int_param(sym_environment *env, char *key, int value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_dbl_param(sym_environment *env, char *key, double value)
+int sym_set_dbl_param(sym_environment *env, const char *key, double value)
 {
    int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
@@ -4379,7 +4379,7 @@ int sym_set_dbl_param(sym_environment *env, char *key, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_str_param(sym_environment *env, char *key, char *value)
+int sym_set_str_param(sym_environment *env, const char *key, const char *value)
 {
    int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
@@ -4393,7 +4393,7 @@ int sym_set_str_param(sym_environment *env, char *key, char *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_int_param(sym_environment *env,  char *key, int *value)
+int sym_get_int_param(sym_environment *env, const char *key, int *value)
 {
 
    tm_params *tm_par = &env->par.tm_par;
@@ -5117,7 +5117,7 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_dbl_param(sym_environment *env, char *key, double *value)
+int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
 {
 
    tm_params *tm_par = &env->par.tm_par;
@@ -5303,7 +5303,7 @@ int sym_get_dbl_param(sym_environment *env, char *key, double *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_str_param(sym_environment *env, char *key, char **value)
+int sym_get_str_param(sym_environment *env, const char *key, char **value)
 {
 
    tm_params *tm_par = &env->par.tm_par;
