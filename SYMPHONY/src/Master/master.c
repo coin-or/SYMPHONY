@@ -3778,13 +3778,15 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
       if (indices[j] == i){
 	 j++;
       }else{
-	 bvar_ind[bind++] = bind;
+	 bvar_ind[bind] = bind;
+	 bind++;
       }
    }
 
    if (j == num){
       for (; i < bvarnum; i++){
-	 bvar_ind[bind++] = bind;
+	 bvar_ind[bind] = bind;
+	 bind++;
       }
       uind = user_size;
    }else{
@@ -3792,11 +3794,13 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
 	 if (indices[j] == i){
 	    j++;
 	 }else{
-	    user_ind[uind++] = uind+bind;
+	    user_ind[uind] = uind+bind;
+	    uind++;
 	 } 
       }
       for (; i < n; i++){
-	 user_ind[uind++] = uind+bind;
+	 user_ind[uind] = uind+bind;
+	 uind++;
       }
    }
 	 
