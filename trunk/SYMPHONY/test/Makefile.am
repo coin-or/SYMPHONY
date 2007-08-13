@@ -217,28 +217,36 @@ testFILES = air03 dcmulti egout flugpl khb05250 l152lav \
 	lseu mod010 p0033 p0201 stein27 vpm1
 
 test: unitTest$(EXEEXT)
-	cd ../../Data/Netlib; $(MAKE) uncompress
-	./unitTest$(EXEEXT)
+	if test x"$(DIRNETLIB)" != x; then \
+		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	fi;
+	./unitTest$(EXEEXT) $$NETLIBARG
 #-T $(DATAOBJDIR)/miplib3 \
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 
 fulltest: check_files unitTest$(EXEEXT)
-	cd ../../Data/Netlib; $(MAKE) uncompress
-	./unitTest$(EXEEXT) -T $(DATASRCDIR)/miplib3
+	if test x"$(DIRNETLIB)" != x; then \
+		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	fi;
+	./unitTest$(EXEEXT) $$NETLIBARG -T $(DATASRCDIR)/miplib3
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 
 ptest: punitTest$(EXEEXT)
-	cd ../../Data/Netlib; $(MAKE) uncompress
-	./punitTest$(EXEEXT) -p 2
+	if test x"$(DIRNETLIB)" != x; then \
+		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	fi;
+	./punitTest$(EXEEXT) $$NETLIBARG -p 2
 #-T $(DATAOBJDIR)/miplib3 \
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 
 pfulltest: check_files punitTest$(EXEEXT)
-	cd ../../Data/Netlib; $(MAKE) uncompress
-	./punitTest$(EXEEXT) -p 2 -T $(DATAOBJDIR)/miplib3
+	if test x"$(DIRNETLIB)" != x; then \
+		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	fi;
+	./punitTest$(EXEEXT) $$NETLIBARG -T $(DATAOBJDIR)/miplib3 -p 2
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 
