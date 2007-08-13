@@ -51,10 +51,16 @@ endif
 
  unitTest: test
 
+ fulltest: all
+	cd test; $(MAKE) fulltest
+
  ptest: all
 	cd test; $(MAKE) ptest
 
  punitTest: ptest
+
+ pfulltest: all
+	cd test; $(MAKE) pfulltest
 
  clean-local:
 	if test -r test/Makefile; then cd test; $(MAKE) clean; fi

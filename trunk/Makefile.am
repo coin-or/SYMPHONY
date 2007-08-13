@@ -26,13 +26,20 @@ EXTRA_DIST =
 
 # subdirs is set by configure as the list of all subdirectories to recurse
 # into
-SUBDIRS = CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl 
 
-if ADD_CLP
-SUBDIRS += Clp
-endif 
+SUBDIRS = $(subdirs)
 
-SUBDIRS += SYMPHONY
+#if ADD_GLPK
+#   SUBDIRS += ThirdParty/Glpk
+#endif
+
+#SUBDIRS += CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl 
+
+#if ADD_CLP
+#   SUBDIRS += Clp
+#endif 
+
+#SUBDIRS += SYMPHONY
 
 ########################################################################
 #                           Extra Targets                              #
@@ -41,8 +48,14 @@ SUBDIRS += SYMPHONY
 test: all
 	cd SYMPHONY; $(MAKE) test
 
+fulltest: all
+	cd SYMPHONY; $(MAKE) fulltest
+
 ptest: all
 	cd SYMPHONY; $(MAKE) ptest
+
+pfulltest: all
+	cd SYMPHONY; $(MAKE) pfulltest
 
 unitTest: test
 
@@ -57,7 +70,7 @@ tests: all
 
 unitTests: tests
 
-.PHONY: test unitTest ptest punitTest tests unitTests
+.PHONY: test unitTest ptest punitTest tests unitTests fulltest pfulltest
 
 ########################################################################
 #                         Maintainer Stuff                             #
