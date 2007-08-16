@@ -1377,7 +1377,7 @@ int sym_mc_solve(sym_environment *env)
    /* Solve */
    env->utopia[0] = 0;
    env->utopia[1] = -MAXINT;
-   if ((termcode = sym_solve(env) < 0)){
+   if ((termcode = sym_solve(env)) < 0){
       env->base->cutnum -=2;
       env->rootdesc->uind.size--;
       return(termcode);
@@ -1442,7 +1442,7 @@ int sym_mc_solve(sym_environment *env)
 
       if (env->par.mc_warm_start && env->par.mc_warm_start_rule == 0){
 	 sym_set_warm_start(env, ws);
-	 if ((termcode = sym_warm_solve(env) < 0)){
+	 if ((termcode = sym_warm_solve(env)) < 0){
 	    switch(env->par.mc_warm_start_rule){
 	     case 0:
 		sym_delete_warm_start(ws);
@@ -1455,12 +1455,12 @@ int sym_mc_solve(sym_environment *env)
 	    return(termcode);
 	 }
       }else{
-	 if ((termcode = sym_solve(env) < 0)){
+	 if ((termcode = sym_solve(env)) < 0){
 	    return(termcode);
 	 }
       }
    }else{
-      if ((termcode = sym_solve(env) < 0)){
+      if ((termcode = sym_solve(env)) < 0){
 	 env->base->cutnum -=2;
 	 env->rootdesc->uind.size--;
 	 return(termcode);
@@ -1656,7 +1656,7 @@ int sym_mc_solve(sym_environment *env)
 		break;
 	    }
 	    
-	    if ((termcode = sym_warm_solve(env) < 0)){
+	    if ((termcode = sym_warm_solve(env)) < 0){
 
 	       /* FIXME! copy best_sol.xind and .xval from env to warm_start*/
 	       memset(&(env->best_sol), 0, sizeof(lp_sol));
@@ -1690,12 +1690,12 @@ int sym_mc_solve(sym_environment *env)
 	       return(termcode);
 	    }
 	 }else{
-	    if ((termcode = sym_solve(env) < 0)){
+	    if ((termcode = sym_solve(env)) < 0){
 	       return(termcode);
 	    }
 	 }
       } else{
-	 if ((termcode = sym_solve(env) < 0)){
+	 if ((termcode = sym_solve(env)) < 0){
 	    env->base->cutnum -=2;
 	    env->rootdesc->uind.size--;
 	    return(termcode);
@@ -5711,12 +5711,12 @@ int sym_test(sym_environment *env)
        sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
     else
        sprintf(infile, "%s%s%s", mps_dir, "\\", mps_files[i]);   
-    if( (termcode = sym_read_mps(env, infile) < 0) )
+    if((termcode = sym_read_mps(env, infile)) < 0)
       return(termcode);
 
     printf("\nSolving %s...\n\n", mps_files[i]);
     
-    if((termcode = sym_solve(env) < 0) )
+    if((termcode = sym_solve(env)) < 0)
       return(termcode);
 
     sym_get_obj_val(env, &obj_val[i]);
