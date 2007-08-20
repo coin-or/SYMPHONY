@@ -941,7 +941,7 @@ int sym_solve(sym_environment *env)
    env->warm_start->stat = tm->stat;
    env->warm_start->phase = tm->phase;
    env->warm_start->lb = tm->lb;
-   if (env->warm_start->has_ub = tm->has_ub){
+   if ((env->warm_start->has_ub = tm->has_ub)!=0){
       env->warm_start->ub = tm->ub;
    }
    env->par.tm_par.warm_start = FALSE;
@@ -1377,7 +1377,7 @@ int sym_mc_solve(sym_environment *env)
    /* Solve */
    env->utopia[0] = 0;
    env->utopia[1] = -MAXINT;
-   if (termcode = sym_solve(env) < 0){
+   if ((termcode = sym_solve(env)) < 0){
       env->base->cutnum -=2;
       env->rootdesc->uind.size--;
       return(termcode);
@@ -1442,7 +1442,7 @@ int sym_mc_solve(sym_environment *env)
 
       if (env->par.mc_warm_start && env->par.mc_warm_start_rule == 0){
 	 sym_set_warm_start(env, ws);
-	 if (termcode = sym_warm_solve(env) < 0){
+	 if ((termcode = sym_warm_solve(env)) < 0){
 	    switch(env->par.mc_warm_start_rule){
 	     case 0:
 		sym_delete_warm_start(ws);
@@ -1455,12 +1455,12 @@ int sym_mc_solve(sym_environment *env)
 	    return(termcode);
 	 }
       }else{
-	 if (termcode = sym_solve(env) < 0){
+	 if ((termcode = sym_solve(env)) < 0){
 	    return(termcode);
 	 }
       }
    }else{
-      if (termcode = sym_solve(env) < 0){
+      if ((termcode = sym_solve(env)) < 0){
 	 env->base->cutnum -=2;
 	 env->rootdesc->uind.size--;
 	 return(termcode);
@@ -1656,7 +1656,7 @@ int sym_mc_solve(sym_environment *env)
 		break;
 	    }
 	    
-	    if (termcode = sym_warm_solve(env) < 0){
+	    if ((termcode = sym_warm_solve(env)) < 0){
 
 	       /* FIXME! copy best_sol.xind and .xval from env to warm_start*/
 	       memset(&(env->best_sol), 0, sizeof(lp_sol));
@@ -1690,12 +1690,12 @@ int sym_mc_solve(sym_environment *env)
 	       return(termcode);
 	    }
 	 }else{
-	    if (termcode = sym_solve(env) < 0){
+	    if ((termcode = sym_solve(env)) < 0){
 	       return(termcode);
 	    }
 	 }
       } else{
-	 if (termcode = sym_solve(env) < 0){
+	 if ((termcode = sym_solve(env)) < 0){
 	    env->base->cutnum -=2;
 	    env->rootdesc->uind.size--;
 	    return(termcode);
@@ -4355,7 +4355,7 @@ int sym_set_warm_start (sym_environment *env, warm_start_desc *ws)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_int_param(sym_environment *env, char *key, int value)
+int sym_set_int_param(sym_environment *env, const char *key, int value)
 {
    int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
@@ -4369,7 +4369,7 @@ int sym_set_int_param(sym_environment *env, char *key, int value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_dbl_param(sym_environment *env, char *key, double value)
+int sym_set_dbl_param(sym_environment *env, const char *key, double value)
 {
    int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
@@ -4383,7 +4383,7 @@ int sym_set_dbl_param(sym_environment *env, char *key, double value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_set_str_param(sym_environment *env, char *key, char *value)
+int sym_set_str_param(sym_environment *env, const char *key, const char *value)
 {
    int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
@@ -4397,7 +4397,7 @@ int sym_set_str_param(sym_environment *env, char *key, char *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_int_param(sym_environment *env,  char *key, int *value)
+int sym_get_int_param(sym_environment *env, const char *key, int *value)
 {
 
    tm_params *tm_par = &env->par.tm_par;
@@ -5121,7 +5121,7 @@ int sym_get_int_param(sym_environment *env,  char *key, int *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_dbl_param(sym_environment *env, char *key, double *value)
+int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
 {
 
    tm_params *tm_par = &env->par.tm_par;
@@ -5307,7 +5307,7 @@ int sym_get_dbl_param(sym_environment *env, char *key, double *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_get_str_param(sym_environment *env, char *key, char **value)
+int sym_get_str_param(sym_environment *env, const char *key, char **value)
 {
 
    tm_params *tm_par = &env->par.tm_par;
@@ -5711,12 +5711,12 @@ int sym_test(sym_environment *env)
        sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);
     else
        sprintf(infile, "%s%s%s", mps_dir, "\\", mps_files[i]);   
-    if( termcode = sym_read_mps(env, infile) < 0)
+    if((termcode = sym_read_mps(env, infile)) < 0)
       return(termcode);
 
     printf("\nSolving %s...\n\n", mps_files[i]);
     
-    if(termcode = sym_solve(env) < 0 )
+    if((termcode = sym_solve(env)) < 0)
       return(termcode);
 
     sym_get_obj_val(env, &obj_val[i]);
