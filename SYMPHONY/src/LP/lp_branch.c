@@ -1056,3 +1056,129 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
    }
 }
 
+/*===========================================================================*/
+/*===========================================================================*/
+/*****************************************************************************/
+/* 
+ * Solve a MIP to see if a disjunction that could prove the current problem
+ * infeasible can be found 
+ */
+/*****************************************************************************/
+
+int solve_branch_feas_mip(lp_prob *p) 
+{
+   int verbosity = p->par.verbosity;
+   OsiXSolverInterface * si = p->lp_data->si;
+   int n = si->getNumCols();
+   int m = si->getNumRows();
+   int nz = si->getNumElements();
+   const CoinPackedMatrix *t = si->getMatrixByCol();
+   /*
+   CoinPackedMatrix * coin_col_A = (CoinPackedMatrix *)malloc(
+         sizeof(CoinPackedMatrix));
+   coin_col_A->copyOf(*t);
+   */
+   CoinPackedMatrix coin_col_A = CoinPackedMatrix(*t);
+   CoinPackedMatrix mip_A = CoinPackedMatrix(*t);
+   CoinPackedMatrix *tmp_mip_A;
+   CoinPackedVector *tmp_vector;
+   const double* row_upper = si->getRowUpper();
+   const double* row_lower = si->getRowLower();
+   const double* row_range = si->getRowRange();
+   const char*   row_sense = si->getRowSense();
+   const double* col_upper = si->getColUpper();
+   const double* col_lower = si->getColLower();
+
+   int   mip_m = 2*n+2;
+   int   mip_n = 2*m+n+1;
+   double *mip_c = (double *)malloc(mip_n*DSIZE);
+   double *mip_b = (double *)calloc(mip_m,DSIZE);
+   double *zero_vec = (double *)calloc(n,DSIZE);
+   double *tmp_array = (double *)calloc(mip_n,DSIZE);
+
+   mip_b[mip_m-1] = 1.0;
+
+   int i,j,k;
+   PRINT(verbosity, -5, ("Setting up MIP to solve branching problem.\n"));
+   PRINT(verbosity, -5, ("cols = %d, rows = %d, nz = %d\n",n,m,nz));
+   
+   /* get the transpose and retain column order */
+   mip_A.transpose();
+   mip_A.reverseOrdering();
+   coin_col_A.transpose();
+   coin_col_A.reverseOrdering();
+
+   for (i=0;i<m;i++) {
+      if (row_sense[i]=='R') {
+         PRINT(verbosity, -5, ("row ranges not yet implemented for branching-mip. exiting\n"));
+         exit(383);
+      } else if (row_sense[i]=='L') {
+         tmp_array[i] = -1*row_upper[i];
+      } else if (row_sense[i]=='G') {
+         tmp_array[i] = -1*row_lower[i];
+      }
+   }
+
+   /* 
+    * New A matrix will look like:
+    *  A'  0  -I   0
+    *  0  -A'  I   0
+    * -b   0   0   1
+    *  b   0   0  -1
+    *  the columns correspond to u,v,pi,pi_0 respectively
+    *  We will add columns to A to make the first 'row' of the above
+    *  representation. then add rows to add the rest of the rows.
+    */
+   tmp_vector = new CoinPackedVector(n,zero_vec);
+   for (i=0;i<m;i++) {
+      mip_A.appendCol(*(tmp_vector));
+   } 
+
+   for (i=0;i<n;i++) {
+      tmp_vector->setElement(i,-1.0);
+      mip_A.appendCol(*(tmp_vector));
+      tmp_vector->setElement(i,0.0);
+   }
+   tmp_vector->clear();
+   mip_A.appendCol(*(tmp_vector));
+
+   tmp_mip_A = new CoinPackedMatrix();
+   for (i=0;i<m;i++){
+      tmp_mip_A->appendCol(*tmp_vector);
+   }
+   delete tmp_vector;
+
+   tmp_vector = new CoinPackedVector(mip_n,tmp_array);
+   tmp_vector->setElement(mip_n-1,1.0);
+   mip_A.appendRow(*(tmp_vector));
+   delete tmp_vector;
+
+   for (i=0;i<m;i++){
+      tmp_array[i] = -1*tmp_array[i];
+   }
+   tmp_vector = new CoinPackedVector(mip_n,tmp_array);
+   tmp_vector->setElement(mip_n-1,-1.0);
+   mip_A.appendRow(*(tmp_vector));
+   delete tmp_vector;
+
+   /* 
+    * set up the mip
+    * min vb - ub
+    * s.t 
+    *  uA - pi   \leq 0
+    * -vA + pi   \leq 0
+    * -ub + pi_0    < 0
+    *  vb - pi_0    < 1
+    */
+
+
+
+   /* solve the mip */
+
+   /* get info */
+   exit(0);
+   return 0;
+}
+/*===========================================================================*/
+/*===========================================================================*/
+

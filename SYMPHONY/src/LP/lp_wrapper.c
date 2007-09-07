@@ -971,6 +971,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    row_data *rows = lp_data->rows;
    int i, j = 0, m = lp_data->m;
    int *candidate_rows;
+   int opt_branch_status;
    branch_obj *can;
    cut_data **slacks_in_matrix = NULL; /* just to keep gcc quiet */
 
@@ -1026,6 +1027,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
       but only those where maxn plays any role in the size. Therefore tmp.i2
       and tmp.p2 do NOT change. Phew... */
 
+   opt_branch_status = solve_branch_feas_mip(p);
    if (action == DO_NOT_BRANCH__FATHOMED)
       return(DO_NOT_BRANCH__FATHOMED);
 
