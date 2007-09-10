@@ -1027,7 +1027,9 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
       but only those where maxn plays any role in the size. Therefore tmp.i2
       and tmp.p2 do NOT change. Phew... */
 
-   opt_branch_status = solve_branch_feas_mip(p);
+   if (p->par.should_solve_branch_feas_mip) {
+      opt_branch_status = solve_branch_feas_mip(p);
+   }
    if (action == DO_NOT_BRANCH__FATHOMED)
       return(DO_NOT_BRANCH__FATHOMED);
 

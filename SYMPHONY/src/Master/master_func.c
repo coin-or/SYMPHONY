@@ -2305,6 +2305,10 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(lp_par->mc_rho);
       return(0);
    }
+   else if (strcmp(key, "should_solve_branch_feas_mip") == 0){
+      READ_INT_PAR(lp_par->should_solve_branch_feas_mip);
+      return(0);
+   }
 
    /***********************************************************************
     ***                     cut_gen parameters                          ***

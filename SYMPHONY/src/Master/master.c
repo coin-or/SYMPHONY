@@ -303,7 +303,8 @@ int sym_set_defaults(sym_environment *env)
    lp_par->mc_gamma = 1;       /* Determines the weight on objective 1 */
    lp_par->mc_tau   = 0;       /* Determines the weight on objective 2 */
    lp_par->mc_rho   = 0.00001; /* For augmented Chebyshev norm */
-   
+   lp_par->should_solve_branch_feas_mip = TRUE;
+
 #ifdef __OSI_GLPK__
    lp_par->max_presolve_iter = -1;
 #else
