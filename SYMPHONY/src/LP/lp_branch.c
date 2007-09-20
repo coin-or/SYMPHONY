@@ -1109,6 +1109,7 @@ int solve_branch_feas_mip(lp_prob *p)
    double *colsol     = (double *)calloc(mip_n,DSIZE);
    double infinity   = sym_get_infinity();
    int i,j,k;
+   var_desc **vars   = p->lp_data->vars;
 
    sym_environment *sym_env;
 
@@ -1135,10 +1136,10 @@ int solve_branch_feas_mip(lp_prob *p)
     * min 0
     * s.t. 
     * pA + g  + h  + \pi   = 0
-    * pb + gl + hu - \pi_0 > 0
+    * pb + gl + hu + \pi_0 < 0
     * p                   <= 0
-    * h                   >= 0
     * g                   <= 0
+    * h                   >= 0
     *
     * Similarly, dual of the LP with obj function: max (\pi x) is:
     * min 0
@@ -1153,10 +1154,12 @@ int solve_branch_feas_mip(lp_prob *p)
     * 
     *  A'  0   I   0   I   0   I   0      (n rows)
     *  0   A'  0   I   0   I  -I   0      (n rows)
-    *  b   0   l   0   u   0   0  -1      (1 rows)
+    *  b   0   l   0   u   0   0  +1      (1 rows)
     *  0   b   0   l   0   u   0  -1      (1 rows)
     *  the columns correspond to p1, p2, g1, g2, h1, h2, \pi, \pi_0 
     *  respectively
+    *
+    *  also, p_i = 0 if x_i is continuous.
     */
 
    /* create zero arrays */
@@ -1179,7 +1182,7 @@ int solve_branch_feas_mip(lp_prob *p)
    /* create -I vector */
    I_nxn_m     = new CoinPackedMatrix(*I_nxn);
    for (i=0;i<n;i++) {
-      I_nxn->modifyCoefficient(i,i,-1.0,FALSE);
+      I_nxn_m->modifyCoefficient(i,i,-1.0,FALSE);
    }
    printf("modified2\n");
    /*
@@ -1248,12 +1251,22 @@ int solve_branch_feas_mip(lp_prob *p)
          exit(383);
          break;
        case 'L':
-         tmp_array[i]  = row_upper[i];
-         tmp_array2[m+i] = row_upper[i];
+         if (row_upper[i]>=infinity) {
+            tmp_array[i] = 0;
+            tmp_array2[m+i] = 0;
+         } else {
+            tmp_array[i]  = row_upper[i];
+            tmp_array2[m+i] = row_upper[i];
+         }
          break;
        case 'G':
-         tmp_array[i] = row_lower[i];
-         tmp_array2[m+i] = row_lower[i];
+         if (row_lower[i]<=-infinity) {
+            tmp_array[i] = 0;
+            tmp_array2[m+i] = 0;
+         } else {
+            tmp_array[i] = row_lower[i];
+            tmp_array2[m+i] = row_lower[i];
+         }
          break;
        case 'E':
          tmp_array[i] = row_lower[i];
@@ -1277,8 +1290,18 @@ int solve_branch_feas_mip(lp_prob *p)
          tmp_array2[i+2*m+3*n] = col_upper[i];
       }
    }
-   tmp_array[mip_n-1] = -1;
+   /* coeffs of pi_0 */
+   tmp_array[mip_n-1] = 1;
    tmp_array2[mip_n-1] = -1;
+
+   for (i=0;i<mip_n;i++) {
+      if (fabs(tmp_array[i])>=infinity) {
+         printf("var %d has inf coeff in tmp\n",i);
+      }
+      if (fabs(tmp_array2[i])>=infinity) {
+         printf("var %d has inf coeff in tmp2\n",i);
+      }
+   }
    tmp_vector = new CoinPackedVector(mip_n,tmp_array);
    mip_A->appendRow(*tmp_vector);
    delete tmp_vector;
@@ -1304,15 +1327,32 @@ int solve_branch_feas_mip(lp_prob *p)
          colub[i]   =  infinity;
          collb[i+m] =  0;
          colub[i+m] =  infinity;
+         if (row_upper[i]>=infinity) {
+            colub[i] = 0;
+            colub[i+m] = 0;
+         }
          break;
        case 'G':
          collb[i]   = -infinity;
          colub[i]   =  0;
          collb[i+m] = -infinity;
          colub[i+m] =  0;
+         if (row_lower[i]<=-infinity) {
+            collb[i] = 0;
+            collb[i+m] = 0;
+         }
          break;
        default:
+         /* row may be of type 'N' */
+         collb[i] = colub[i] = 0;
+         collb[i+m] = colub[i+m] = 0;
          break;
+      }
+      if (collb[i]>colub[i]) {
+         printf("bad bounds for var %d\n",i);
+      }
+      if (collb[i+m]>colub[i+m]) {
+         printf("bad bounds for var %d\n",i+m);
       }
    }
 
@@ -1339,8 +1379,13 @@ int solve_branch_feas_mip(lp_prob *p)
          colub[i+2*m+3*n] = infinity;
       }
       /* \pi */
-      collb[i+2*m+4*n] =  -infinity;
-      colub[i+2*m+4*n] =  infinity;
+      if (vars[i]->is_int == TRUE) {
+         collb[i+2*m+4*n] =  -infinity;
+         colub[i+2*m+4*n] =  infinity;
+      } else {
+         collb[i+2*m+4*n] =  0;
+         colub[i+2*m+4*n] =  0;
+      }
    }
    /* \pi_0 */
    collb[mip_n-1] =  0;
@@ -1350,7 +1395,7 @@ int solve_branch_feas_mip(lp_prob *p)
    for (i=0;i<mip_m-2;i++) {
       rowsen[i]='E';
    }
-   rowsen[mip_m-2] = 'G';
+   rowsen[mip_m-2] = 'L';
    rowsen[mip_m-1] = 'L';
 
    /* only \pi, \pi_0 are int */
@@ -1359,8 +1404,13 @@ int solve_branch_feas_mip(lp_prob *p)
    }
 
    /* row rhs */
-   rowrhs[mip_m-2] = 0.001;
+   rowrhs[mip_m-2] = -0.001;
    rowrhs[mip_m-1] = 1-0.001;
+
+   /* obj */
+   obj[mip_n-1] = 1;
+   //obj[2*m+4*n] = 1;
+   //collb[2*m+4*n] = 0;
 
    /* solve the mip */
    sym_env = sym_open_environment();
@@ -1369,14 +1419,15 @@ int solve_branch_feas_mip(lp_prob *p)
          mip_A->getElements(), collb, colub, is_int, obj, NULL, rowsen,
          rowrhs, NULL, TRUE);
    sym_set_int_param (sym_env, "should_solve_branch_feas_mip", FALSE);
-   sym_set_int_param (sym_env, "verbosity", 1);
+   sym_set_int_param (sym_env, "verbosity", 10);
    sym_set_int_param (sym_env, "node_limit", 100);
+   sym_set_obj_sense (sym_env, 1);
    sym_solve(sym_env);
    if (sym_is_proven_optimal(sym_env)) {
       sym_get_col_solution(sym_env, colsol);
       for (i=0;i<n;i++) {
          if (fabs(colsol[2*m+4*n+i])>0.001) {
-            printf("%5d\t%20.10f\n",i,colsol[2*m+4*n+i]);
+            printf("pi%5d\t%20.10f\n",i,colsol[2*m+4*n+i]);
          }
       }
       printf("%5d\t%20.10f\n",n,colsol[mip_n-1]);
@@ -1400,6 +1451,7 @@ int solve_branch_feas_mip(lp_prob *p)
    FREE(rowsen);
    FREE(rowrhs);
    FREE(colsol);
+   exit(0);
    return 0;
 }
 /*===========================================================================*/
