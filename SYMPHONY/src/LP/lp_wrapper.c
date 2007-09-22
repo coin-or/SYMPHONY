@@ -629,8 +629,7 @@ int is_feasible_u(lp_prob *p, char branching)
 	 if (!lp_data->vars[i]->is_int)
 	    continue; /* Not an integer variable */
 	 valuesi = lp_data->x[i];
-	 if (valuesi > lp_data->vars[i]->lb && valuesi < lp_data->vars[i]->ub
-	     && valuesi-floor(valuesi) > lpetol &&
+	 if (valuesi-floor(valuesi) > lpetol &&
 	     ceil(valuesi)-valuesi > lpetol){
 	    break;
 	 }
