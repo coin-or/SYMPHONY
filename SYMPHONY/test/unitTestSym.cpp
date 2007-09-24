@@ -37,7 +37,8 @@ int main (int argc, const char *argv[])
    std::set<std::string> definedKeyWords;
    definedKeyWords.insert("-mpsDir");
    definedKeyWords.insert("-netlibDir");
-   
+   definedKeyWords.insert("-testOsiSolverInterface");
+
    std::map<std::string,std::string> parms;
    for ( i=1; i<argc; i++ ) {
       std::string parm(argv[i]);
@@ -101,29 +102,36 @@ int main (int argc, const char *argv[])
       testingMessage( "OsiSymSolverInterface\n\n" );
       OsiRowCutDebuggerUnitTest(&symSi,mpsDir);
    }
-
+   
    testingMessage( "Now testing OsiSymSolverInterface\n\n" );
    OsiSymSolverInterfaceUnitTest(mpsDir,netlibDir);
-
-   // Create vector of solver interfaces
-   std::vector<OsiSolverInterface*> vecSi;
-
-   OsiSolverInterface * symSi = new OsiSymSolverInterface;
-   vecSi.push_back(symSi);
    
-   testingMessage( "Testing OsiSolverInterface\n" );
-   OsiSolverInterfaceMpsUnitTest(vecSi,netlibDir);
    
-   for (i=0; i<vecSi.size(); i++){
-      delete vecSi[i];
+   if (parms.find("-testOsiSolverInterface") != parms.end()) {
+      
+      // Create vector of solver interfaces
+      std::vector<OsiSolverInterface*> vecSi;
+      
+      OsiSolverInterface * symSi = new OsiSymSolverInterface;
+      vecSi.push_back(symSi);
+      
+      testingMessage( "Testing OsiSolverInterface\n" );
+      OsiSolverInterfaceMpsUnitTest(vecSi,netlibDir);
+
+      for (i=0; i<vecSi.size(); i++){
+	 delete vecSi[i];
+      }
+            
+   }     
+
+   if (parms.find("-T") != parms.end()){
+      testingMessage( "Testing MIPLIB files\n" );
+
+      sym_environment *env = sym_open_environment();
+      sym_parse_command_line(env, argc, const_cast<char**>(argv));
+      sym_test(env);
    }
-   
-   testingMessage( "Testing MIPLIB files\n" );
 
-   sym_environment *env = sym_open_environment();
-  
-   sym_test(env);
-   
    testingMessage( "All tests completed successfully\n" );
   
    return 0;

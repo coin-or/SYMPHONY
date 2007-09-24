@@ -87,16 +87,16 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 AC_COIN_HAS_PROJECT(SYMPHONY)
 AC_COIN_HAS_PROJECT(CoinUtils)
 AC_COIN_HAS_PROJECT(Data)
+AC_COIN_HAS_PROJECT(Clp)
 AC_COIN_HAS_PROJECT(Osi)
 AC_COIN_HAS_PROJECT(Cgl)
-
 #############################################################################
 #                            Third party solvers                            #
 #############################################################################
 
 # Check which third party solvers are available ToDo!
 AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
-AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h],[glp_lpx_simplex])
+AC_COIN_HAS_GLPK(Glpk)
 AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
 AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
 AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
@@ -119,7 +119,7 @@ found_package=true
 case $sym_lp_solver in 
    clp)
     AC_MSG_RESULT(Clp) 
-    AC_COIN_HAS_PROJECT(Clp)
+#    AC_COIN_HAS_PROJECT(Clp)
      if [test $coin_has_clp = unavailable ||
                 test $coin_has_clp = skipping]; then
          found_package=false

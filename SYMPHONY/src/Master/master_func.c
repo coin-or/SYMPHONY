@@ -1946,13 +1946,14 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
    else if(strcmp(key, "keep_warm_start") == 0){
-      if (value){
+      READ_INT_PAR(tm_par->keep_description_of_pruned);
+      if (tm_par->keep_description_of_pruned){
 	 tm_par->keep_description_of_pruned = 
-	   lp_par->keep_description_of_pruned = KEEP_IN_MEMORY;
+	    lp_par->keep_description_of_pruned = KEEP_IN_MEMORY;
          return(0);
-   } else
+      } else
 	 tm_par->keep_description_of_pruned = 
-	   lp_par->keep_description_of_pruned = DISCARD;
+	    lp_par->keep_description_of_pruned = DISCARD;
       return(0);
    }
    else if (strcmp(key, "warm_start") == 0 ||

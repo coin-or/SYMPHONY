@@ -161,6 +161,8 @@ CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
 CLP_LP_SOLVER_TRUE = @CLP_LP_SOLVER_TRUE@
 COINUTILSOBJDIR = @COINUTILSOBJDIR@
 COINUTILSSRCDIR = @COINUTILSSRCDIR@
+COIN_BUILD_GLPK_FALSE = @COIN_BUILD_GLPK_FALSE@
+COIN_BUILD_GLPK_TRUE = @COIN_BUILD_GLPK_TRUE@
 COIN_HAS_CGL_FALSE = @COIN_HAS_CGL_FALSE@
 COIN_HAS_CGL_TRUE = @COIN_HAS_CGL_TRUE@
 COIN_HAS_CLP = @COIN_HAS_CLP@
@@ -883,10 +885,16 @@ uninstall-info: uninstall-info-recursive
 
  unitTest: test
 
+ fulltest: all
+	cd test; $(MAKE) fulltest
+
  ptest: all
 	cd test; $(MAKE) ptest
 
  punitTest: ptest
+
+ pfulltest: all
+	cd test; $(MAKE) pfulltest
 
  clean-local:
 	if test -r test/Makefile; then cd test; $(MAKE) clean; fi

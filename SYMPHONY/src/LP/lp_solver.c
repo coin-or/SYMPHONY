@@ -2965,7 +2965,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
 
    mps.setInfinity(mps.getInfinity());
 
-   if (errors = mps.readMps(infile,"")){
+   if ((errors = mps.readMps(infile,""))){
       return(errors);
    }
    
@@ -3227,7 +3227,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 {
    OsiCuts cutlist;
    OsiRowCut cut;
-   int i = 0, j = 0, k = 0, l = 0; 
+   int i = 0, j = 0, k = 0; 
    int *matind;
    double *matval;
    cgl_params *par = &(lp_data->cgl);

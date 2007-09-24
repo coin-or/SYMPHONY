@@ -222,6 +222,8 @@ CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
 CLP_LP_SOLVER_TRUE = @CLP_LP_SOLVER_TRUE@
 COINUTILSOBJDIR = @COINUTILSOBJDIR@
 COINUTILSSRCDIR = @COINUTILSSRCDIR@
+COIN_BUILD_GLPK_FALSE = @COIN_BUILD_GLPK_FALSE@
+COIN_BUILD_GLPK_TRUE = @COIN_BUILD_GLPK_TRUE@
 COIN_HAS_CGL_FALSE = @COIN_HAS_CGL_FALSE@
 COIN_HAS_CGL_TRUE = @COIN_HAS_CGL_TRUE@
 COIN_HAS_CLP = @COIN_HAS_CLP@
@@ -523,6 +525,11 @@ punitTest_DEPENDENCIES = $(LDADD) $(SYMPLIB)
 punitTest_CPPFLAGS = $(SYMPCPPFLAGS)
 punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD)
 punitTest_LDFLAGS = -rpath $(libdir)
+
+# We are using the Cbc solver executable to do the unit test
+testFILES = air03 dcmulti egout flugpl khb05250 l152lav \
+	lseu mod010 p0033 p0201 stein27 vpm1
+
 
 ########################################################################
 #                          Cleaning stuff                              #
@@ -994,24 +1001,59 @@ uninstall-am: uninstall-info-am
 	uninstall-info-am
 
 
-# We are using the Cbc solver executable to do the unit test
-
 test: unitTest$(EXEEXT)
-	cd ../../Data/miplib3; $(MAKE) uncompress
-	cd ../../Data/Netlib; $(MAKE) uncompress
-	./unitTest$(EXEEXT)
+	if test x"$(DIRNETLIB)" != x; then \
+		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	fi;
+	./unitTest$(EXEEXT) $$NETLIBARG
 #-T $(DATAOBJDIR)/miplib3 \
+#	-mpsDir=$(DATASRCDIR)/Sample \
+#	-netlibDir=$(DATAOBJDIR)/Netlib
+
+fulltest: check_files unitTest$(EXEEXT)
+	if test x"$(DIRNETLIB)" != x; then \
+		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	fi;
+	./unitTest$(EXEEXT) $$NETLIBARG -T $(DATASRCDIR)/miplib3
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
 
 ptest: punitTest$(EXEEXT)
-	cd ../../Data/miplib3; $(MAKE) uncompress
-	cd ../../Data/Netlib; $(MAKE) uncompress
-	./punitTest$(EXEEXT) -p 2
+	if test x"$(DIRNETLIB)" != x; then \
+		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	fi;
+	./punitTest$(EXEEXT) $$NETLIBARG -p 2
 #-T $(DATAOBJDIR)/miplib3 \
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
-.PHONY: test ptest
+
+pfulltest: check_files punitTest$(EXEEXT)
+	if test x"$(DIRNETLIB)" != x; then \
+		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	fi;
+	./punitTest$(EXEEXT) $$NETLIBARG -T $(DATAOBJDIR)/miplib3 -p 2
+#	-mpsDir=$(DATASRCDIR)/Sample \
+#	-netlibDir=$(DATAOBJDIR)/Netlib
+
+check_files:
+	  if test -r $(DATASRCDIR)/miplib3; then \
+	   echo "MIBLIB3 directory found..."; \
+	  else \
+	   echo "Downloading required test files"; \
+	   mkdir $(DATASRCDIR)/miplib3; \
+	   for file in $(testFILES); do \
+	       (echo $$file; svn cat https://projects.coin-or.org/svn/Data/stable/1.0/miplib3/$$file.gz >> $(DATASRCDIR)/miplib3/$$file.gz) \
+	   done; \
+	  fi; \
+	  echo "Uncompressing files"; \
+	  cd $(DATASRCDIR)/miplib3; \
+	  for file in $(testFILES); do \
+	   if test -r $$file.gz; then \
+		(gzip -d $$file.gz) \
+	   fi \
+	  done
+
+.PHONY: test ptest fulltest pfulltest check_files
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

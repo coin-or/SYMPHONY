@@ -61,14 +61,13 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ADD_CLP_TRUE@am__append_1 = Clp
 DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS INSTALL \
 	compile config.guess config.sub depcomp install-sh ltmain.sh \
 	missing
-@HAVE_EXTERNALS_TRUE@am__append_2 = Externals
-@HAVE_EXTERNALS_TRUE@am__append_3 = .Externals-stamp
+@HAVE_EXTERNALS_TRUE@am__append_1 = Externals
+@HAVE_EXTERNALS_TRUE@am__append_2 = .Externals-stamp
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -89,8 +88,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl \
-	Clp SYMPHONY FlopC++
+DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -109,6 +107,8 @@ ADD_CLP_FALSE = @ADD_CLP_FALSE@
 ADD_CLP_TRUE = @ADD_CLP_TRUE@
 ADD_CXXFLAGS = @ADD_CXXFLAGS@
 ADD_FFLAGS = @ADD_FFLAGS@
+ADD_GLPK_FALSE = @ADD_GLPK_FALSE@
+ADD_GLPK_TRUE = @ADD_GLPK_TRUE@
 ALWAYS_FALSE_FALSE = @ALWAYS_FALSE_FALSE@
 ALWAYS_FALSE_TRUE = @ALWAYS_FALSE_TRUE@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -262,7 +262,7 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
-EXTRA_DIST = $(am__append_2)
+EXTRA_DIST = $(am__append_1)
 
 ########################################################################
 #                          Subdirectories                              #
@@ -270,15 +270,14 @@ EXTRA_DIST = $(am__append_2)
 
 # subdirs is set by configure as the list of all subdirectories to recurse
 # into
-SUBDIRS = CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl \
-	$(am__append_1) SYMPHONY FlopC++
+SUBDIRS = $(subdirs) SYMPHONY FlopC++
 
 ########################################################################
 #                         Maintainer Stuff                             #
 ########################################################################
 
 # Files that are generated and should be cleaned with make distclean
-DISTCLEANFILES = $(am__append_3) $(VPATH_DISTCLEANFILES)
+DISTCLEANFILES = $(am__append_2) $(VPATH_DISTCLEANFILES)
 all: all-recursive
 
 .SUFFIXES:
@@ -697,6 +696,17 @@ uninstall-info: uninstall-info-recursive
 	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am uninstall-info-am
 
+#if ADD_GLPK
+#   SUBDIRS += ThirdParty/Glpk
+#endif
+
+#SUBDIRS += CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl 
+
+#if ADD_CLP
+#   SUBDIRS += Clp
+#endif 
+
+#SUBDIRS += SYMPHONY
 
 ########################################################################
 #                           Extra Targets                              #
@@ -705,8 +715,14 @@ uninstall-info: uninstall-info-recursive
 test: all
 	cd SYMPHONY; $(MAKE) test
 
+fulltest: all
+	cd SYMPHONY; $(MAKE) fulltest
+
 ptest: all
 	cd SYMPHONY; $(MAKE) ptest
+
+pfulltest: all
+	cd SYMPHONY; $(MAKE) pfulltest
 
 unitTest: test
 
@@ -721,7 +737,7 @@ tests: all
 
 unitTests: tests
 
-.PHONY: test unitTest ptest punitTest tests unitTests
+.PHONY: test unitTest ptest punitTest tests unitTests fulltest pfulltest
 
 # Make sure acinclude is using most recent coin.m4
 @MAINTAINER_MODE_TRUE@$(srcdir)/acinclude.m4: $(BUILDTOOLSDIR)/coin.m4

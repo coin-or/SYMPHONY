@@ -260,13 +260,14 @@ AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)`
 
 # List all additionally required solver and Osi libraries
 
-if CLP_LP_SOLVER
+#if CLP_LP_SOLVER
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
 	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
   LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
 	$(CLPOBJDIR)/src/libClp.la
   ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
+if CLP_LP_SOLVER
   AM_CPPFLAGS += -D__OSI_CLP__
 endif
 

@@ -119,13 +119,13 @@ warm_start_desc *sym_get_warm_start PROTO((sym_environment *env,
 
 int sym_set_warm_start PROTO((sym_environment *env, warm_start_desc *ws));
 
-int sym_set_int_param PROTO((sym_environment *env,  char *key, int value));
-int sym_set_dbl_param PROTO((sym_environment *env,  char *key, double value));
-int sym_set_str_param PROTO((sym_environment *env,  char *key, char *value));
+int sym_set_int_param PROTO((sym_environment *env, const char *key, int value));
+int sym_set_dbl_param PROTO((sym_environment *env, const char *key, double value));
+int sym_set_str_param PROTO((sym_environment *env, const char *key, const char *value));
 
-int sym_get_int_param PROTO((sym_environment *env,  char *key, int *value));
-int sym_get_dbl_param PROTO((sym_environment *env,  char *key, double *value));
-int sym_get_str_param PROTO((sym_environment *env,  char *key, char **value));
+int sym_get_int_param PROTO((sym_environment *env, const char *key, int *value));
+int sym_get_dbl_param PROTO((sym_environment *env, const char *key, double *value));
+int sym_get_str_param PROTO((sym_environment *env, const char *key, char **value));
 
 int sym_get_lb_for_new_rhs PROTO((sym_environment *env, int cnt, 
 				  int *new_rhs_ind, double *new_rhs_val,
