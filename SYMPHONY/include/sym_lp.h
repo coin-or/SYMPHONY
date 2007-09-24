@@ -301,4 +301,5 @@ char analyze_multicriteria_solution PROTO((lp_prob *p, int *indices,
 					   double *values, int length,
 					   double *true_objval, double etol,
 					   char branching));
+int solve_branch_feas_mip(lp_prob *p);
 #endif

@@ -1069,7 +1069,12 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
 int solve_branch_feas_mip(lp_prob *p) 
 {
    int verbosity = p->par.verbosity;
+   /*
+   // clone
+   OsiXSolverInterface * si = new OsiXSolverInterface(*(p->lp_data->si));
+   */
    OsiXSolverInterface * si = p->lp_data->si;
+   OsiClpSolverInterface * si2 = new OsiClpSolverInterface();
    int n = si->getNumCols();
    int m = si->getNumRows();
    int nz = si->getNumElements();
@@ -1130,7 +1135,7 @@ int solve_branch_feas_mip(lp_prob *p)
     * max -\pi x
     * s.t.
     *      Ax >= b
-    * L <=  x <= U
+    * l <=  x <= u
     * 
     * The dual is:
     * min 0
@@ -1168,7 +1173,7 @@ int solve_branch_feas_mip(lp_prob *p)
    zeros_nxn = new CoinPackedMatrix();
    for (i=0;i<n;i++) {
       zeros_nxn->appendCol(*tmp_vector);
-      printf("appended %d\n", i);
+      //printf("appended %d\n", i);
    } 
    printf("appended\n");
 
@@ -1270,7 +1275,7 @@ int solve_branch_feas_mip(lp_prob *p)
          break;
        case 'E':
          tmp_array[i] = row_lower[i];
-         tmp_array2[m+i] = row_lower[i];
+         tmp_array[m+i] = row_lower[i];
          break;
        default:
          break;
@@ -1380,8 +1385,14 @@ int solve_branch_feas_mip(lp_prob *p)
       }
       /* \pi */
       if (vars[i]->is_int == TRUE) {
+         /*
+          * TODO:
+          * find a good infinity
          collb[i+2*m+4*n] =  -infinity;
          colub[i+2*m+4*n] =  infinity;
+         */
+         collb[i+2*m+4*n] =  -6;
+         colub[i+2*m+4*n] =  6;
       } else {
          collb[i+2*m+4*n] =  0;
          colub[i+2*m+4*n] =  0;
@@ -1389,7 +1400,7 @@ int solve_branch_feas_mip(lp_prob *p)
    }
    /* \pi_0 */
    collb[mip_n-1] =  0;
-   colub[mip_n-1] =  infinity;
+   colub[mip_n-1] =  10;
 
    /* row sense */
    for (i=0;i<mip_m-2;i++) {
@@ -1411,6 +1422,9 @@ int solve_branch_feas_mip(lp_prob *p)
    obj[mip_n-1] = 1;
    //obj[2*m+4*n] = 1;
    //collb[2*m+4*n] = 0;
+   
+   /* write mps file */
+   //CoinModel *dual_form = new CoinModel();
 
    /* solve the mip */
    sym_env = sym_open_environment();
@@ -1419,9 +1433,58 @@ int solve_branch_feas_mip(lp_prob *p)
          mip_A->getElements(), collb, colub, is_int, obj, NULL, rowsen,
          rowrhs, NULL, TRUE);
    sym_set_int_param (sym_env, "should_solve_branch_feas_mip", FALSE);
-   sym_set_int_param (sym_env, "verbosity", 10);
-   sym_set_int_param (sym_env, "node_limit", 100);
-   sym_set_obj_sense (sym_env, 1);
+   sym_set_int_param (sym_env, "verbosity", 0);
+   //sym_set_int_param (sym_env, "node_limit", 100);
+   //sym_set_obj_sense (sym_env, 1);
+
+   /* write the mps file */
+   printf("infinity = %g\n",si2->getInfinity());
+   const double *elem2 = mip_A->getElements();
+   const int *rows2 = mip_A->getIndices();
+   const int *starts2 = mip_A->getVectorStarts();
+   const int *len2 = mip_A->getVectorLengths();
+   /*
+   for (i=0;i<mip_n;i++) {
+      si2->addCol(len2[i], &(rows2[starts2[i]]), &(elem2[starts2[i]]), 
+            collb[i], colub[i], obj[i]);
+   }
+   const double *rng2 = (double *)calloc(mip_m, DSIZE);
+   si2->loadProblem(*mip_A, collb, colub, obj, rowsen, rowrhs, rng2);
+   for (i=2*m+4*n;i<mip_n;i++) {
+      si2->setInteger(i);
+   }
+   si2->writeMps("branch.mps", "", si2->getObjSense());
+   exit(0);
+   */
+
+   /* find max and min coeffs */
+   double mx = -infinity;
+   double mn = infinity;
+   for (i=0;i<mip_A->getNumElements();i++) {
+      if (elem2[i]>mx) {
+         mx = elem2[i];
+      }
+      if (elem2[i]<mn) {
+         mn = elem2[i];
+      }
+   }
+   printf ("max = %g\t min = %g\n",mx, mn);
+
+   mx = -infinity;
+   mn = infinity;
+   elem2 = A_matrix->getElements();
+   for (i=0;i<n;i++) {
+      for (j=A_matrix->getVectorStarts()[i];j<A_matrix->getVectorStarts()[i]+A_matrix->getVectorSize(i);j++) {
+         if (elem2[j]>mx) {
+            mx = elem2[j];
+         }
+         if (elem2[j]<mn) {
+            mn = elem2[j];
+         }
+      }
+   }
+   printf ("max = %g\t min = %g\n",mx, mn);
+
    sym_solve(sym_env);
    if (sym_is_proven_optimal(sym_env)) {
       sym_get_col_solution(sym_env, colsol);
@@ -1437,6 +1500,7 @@ int solve_branch_feas_mip(lp_prob *p)
    /* get info */
 
    /* free */
+   //delete dual_form;
    delete mip_A;
    delete tmp_vector;
    FREE(mip_c);

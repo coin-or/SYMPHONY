@@ -150,6 +150,8 @@ typedef struct LP_PARAMS{
 
    int               sensitivity_analysis;
 
+   int               should_solve_branch_feas_mip;
+
 }lp_params;
 
 #endif
