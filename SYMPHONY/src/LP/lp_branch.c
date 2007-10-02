@@ -1118,6 +1118,12 @@ int solve_branch_feas_mip(lp_prob *p)
 
    sym_environment *sym_env;
 
+   /* params */
+   double br_mip_intlb = -10;
+   double br_mip_intub = 10;
+   int br_mip_node_limit = 10;
+   int br_mip_obj_sense = 1; /* 1 for minimize, -1 for maxmize */
+
    mip_b[mip_m-1] = 1.0;
 
    PRINT(verbosity, -5, ("Setting up MIP to solve branching problem.\n"));
@@ -1134,7 +1140,7 @@ int solve_branch_feas_mip(lp_prob *p)
     *
     * max -\pi x
     * s.t.
-    *      Ax >= b
+    *      Ax = b
     * l <=  x <= u
     * 
     * The dual is:
@@ -1142,7 +1148,7 @@ int solve_branch_feas_mip(lp_prob *p)
     * s.t. 
     * pA + g  + h  + \pi   = 0
     * pb + gl + hu + \pi_0 < 0
-    * p                   <= 0
+    * p                   free
     * g                   <= 0
     * h                   >= 0
     *
@@ -1151,7 +1157,7 @@ int solve_branch_feas_mip(lp_prob *p)
     * s.t.
     * pA + g  + h  - \pi   = 0
     * pb + gl + hu - \pi_0 < 1
-    * p                   <= 0
+    * p                   free
     * g                   <= 0
     * h                   >= 0
     *
@@ -1170,11 +1176,22 @@ int solve_branch_feas_mip(lp_prob *p)
    /* create zero arrays */
    /* TODO: This is extremely slow */
    tmp_vector = new CoinPackedVector(n,zeros_n);
+   /*
    zeros_nxn = new CoinPackedMatrix();
    for (i=0;i<n;i++) {
       zeros_nxn->appendCol(*tmp_vector);
-      //printf("appended %d\n", i);
+      printf("appended %d\n", i);
    } 
+   printf("appended\n");
+   */
+
+   int int_zero = 0;
+   int *lengths = (int *) calloc(n,ISIZE);
+   int *starts = (int *) calloc(n,ISIZE);
+   int *mlengths = (int *) calloc(m,ISIZE);
+   int *mstarts = (int *) calloc(m,ISIZE);
+   zeros_nxn = new CoinPackedMatrix(TRUE, n, n, 0, NULL, NULL, starts, lengths);
+   CoinPackedMatrix *zeros_nxm = new CoinPackedMatrix(TRUE, n, m, 0, NULL, NULL, mstarts, lengths);
    printf("appended\n");
 
    /* create I vector */
@@ -1196,9 +1213,13 @@ int solve_branch_feas_mip(lp_prob *p)
     */
 
    /* C2 row 1 */
+   /*
    for (i=0;i<m;i++) {
       mip_A->appendCol(*tmp_vector);
+      //printf("appended\n");
    } 
+   */
+   mip_A->rightAppendPackedMatrix(*zeros_nxm);
    printf("appended\n");
 
    /* C3 row 1 */
@@ -1226,11 +1247,15 @@ int solve_branch_feas_mip(lp_prob *p)
    printf("C8R1\n");
 
    /* create row 2 now */
-   mip_A_row2 = new CoinPackedMatrix();
    /* C1 R2 */
+   /*
+   mip_A_row2 = new CoinPackedMatrix();
    for (i=0;i<m;i++) {
       mip_A_row2->appendCol(*tmp_vector);
    } 
+   */
+   mip_A_row2 = new CoinPackedMatrix(*zeros_nxm);
+
    mip_A_row2->rightAppendPackedMatrix(*A_trans);     /* C2 R2 */
    mip_A_row2->rightAppendPackedMatrix(*zeros_nxn);   /* C3 R2 */
    mip_A_row2->rightAppendPackedMatrix(*I_nxn);       /* C4 R2 */
@@ -1275,7 +1300,7 @@ int solve_branch_feas_mip(lp_prob *p)
          break;
        case 'E':
          tmp_array[i] = row_lower[i];
-         tmp_array[m+i] = row_lower[i];
+         tmp_array2[m+i] = row_lower[i];
          break;
        default:
          break;
@@ -1313,7 +1338,9 @@ int solve_branch_feas_mip(lp_prob *p)
    tmp_vector = new CoinPackedVector(mip_n,tmp_array2);
    mip_A->appendRow(*tmp_vector);
    mip_A->removeGaps();
-   printf("mip_A has %d rows %d cols\n",mip_A->getNumRows(), mip_A->getNumCols());
+   printf("Number of zeros removed = %d\n",mip_A->compress(0.000001));
+   printf("mip_A has %d rows %d cols %d non-zeros\n",mip_A->getNumRows(), 
+         mip_A->getNumCols(), mip_A->getNumElements());
 
    /* 
     * The mip_A matrix is all set. now set variable bounds, and cost vectors
@@ -1349,8 +1376,12 @@ int solve_branch_feas_mip(lp_prob *p)
          break;
        default:
          /* row may be of type 'N' */
-         collb[i] = colub[i] = 0;
-         collb[i+m] = colub[i+m] = 0;
+         collb[i] = -infinity;
+         colub[i] = infinity;
+         collb[i+m] = -infinity;
+         colub[i+m] = infinity;
+         printf ("exiting on N row, %d\n",i);
+         exit(0);
          break;
       }
       if (collb[i]>colub[i]) {
@@ -1362,6 +1393,7 @@ int solve_branch_feas_mip(lp_prob *p)
    }
 
    /* variables g, h */
+   j = 0; //count ints
    for (i=0; i<n; i++) {
       /* g */
       colub[i+2*m] = 0;
@@ -1384,6 +1416,11 @@ int solve_branch_feas_mip(lp_prob *p)
          colub[i+2*m+3*n] = infinity;
       }
       /* \pi */
+      /*
+      if (!(i==vars[i]->userind)) {
+         printf("discrepancy: var[%d] = %d\n",i,vars[i]->userind);
+      }
+      */
       if (vars[i]->is_int == TRUE) {
          /*
           * TODO:
@@ -1391,16 +1428,18 @@ int solve_branch_feas_mip(lp_prob *p)
          collb[i+2*m+4*n] =  -infinity;
          colub[i+2*m+4*n] =  infinity;
          */
-         collb[i+2*m+4*n] =  -6;
-         colub[i+2*m+4*n] =  6;
+         collb[i+2*m+4*n] =  br_mip_intlb;
+         colub[i+2*m+4*n] =  br_mip_intub;
+         j++;
       } else {
          collb[i+2*m+4*n] =  0;
          colub[i+2*m+4*n] =  0;
       }
    }
+   printf("num of integers = %d\n",j);
    /* \pi_0 */
-   collb[mip_n-1] =  0;
-   colub[mip_n-1] =  10;
+   collb[mip_n-1] =  br_mip_intlb;
+   colub[mip_n-1] =  br_mip_intub;
 
    /* row sense */
    for (i=0;i<mip_m-2;i++) {
@@ -1415,17 +1454,12 @@ int solve_branch_feas_mip(lp_prob *p)
    }
 
    /* row rhs */
-   rowrhs[mip_m-2] = -0.001;
-   rowrhs[mip_m-1] = 1-0.001;
+   rowrhs[mip_m-2] = -0.01;
+   rowrhs[mip_m-1] = 1-0.01;
 
    /* obj */
    obj[mip_n-1] = 1;
-   //obj[2*m+4*n] = 1;
-   //collb[2*m+4*n] = 0;
    
-   /* write mps file */
-   //CoinModel *dual_form = new CoinModel();
-
    /* solve the mip */
    sym_env = sym_open_environment();
    sym_explicit_load_problem(sym_env, mip_n, mip_m, (int *)
@@ -1434,16 +1468,16 @@ int solve_branch_feas_mip(lp_prob *p)
          rowrhs, NULL, TRUE);
    sym_set_int_param (sym_env, "should_solve_branch_feas_mip", FALSE);
    sym_set_int_param (sym_env, "verbosity", 0);
-   //sym_set_int_param (sym_env, "node_limit", 100);
-   //sym_set_obj_sense (sym_env, 1);
+   sym_set_int_param (sym_env, "node_limit", br_mip_node_limit);
+   sym_set_obj_sense (sym_env, br_mip_obj_sense);
 
    /* write the mps file */
+   /*
    printf("infinity = %g\n",si2->getInfinity());
    const double *elem2 = mip_A->getElements();
    const int *rows2 = mip_A->getIndices();
    const int *starts2 = mip_A->getVectorStarts();
    const int *len2 = mip_A->getVectorLengths();
-   /*
    for (i=0;i<mip_n;i++) {
       si2->addCol(len2[i], &(rows2[starts2[i]]), &(elem2[starts2[i]]), 
             collb[i], colub[i], obj[i]);
@@ -1458,6 +1492,7 @@ int solve_branch_feas_mip(lp_prob *p)
    */
 
    /* find max and min coeffs */
+   /*
    double mx = -infinity;
    double mn = infinity;
    for (i=0;i<mip_A->getNumElements();i++) {
@@ -1484,8 +1519,10 @@ int solve_branch_feas_mip(lp_prob *p)
       }
    }
    printf ("max = %g\t min = %g\n",mx, mn);
+   */
 
    sym_solve(sym_env);
+   //exit(0);
    if (sym_is_proven_optimal(sym_env)) {
       sym_get_col_solution(sym_env, colsol);
       for (i=0;i<n;i++) {
@@ -1497,7 +1534,43 @@ int solve_branch_feas_mip(lp_prob *p)
    }
    sym_close_environment(sym_env);
 
+   /* check */
+   /* row activity of last row */
+   /*
+   double row_activity = 0;
+   for (i=0;i<mip_n;i++) {
+      row_activity += colsol[i]*mip_A->getCoefficient(mip_m-1, i);
+   }
+   printf("max = %10.8f\n",row_activity);
+   row_activity = 0;
+   for (i=0;i<mip_n;i++) {
+      row_activity += colsol[i]*mip_A->getCoefficient(mip_m-2, i);
+   }
+   printf("min = %10.8f\n",row_activity);
+   */
+
    /* get info */
+   /* original A: */
+   /*
+   for (j=0;j<m;j++) {
+      for (i=0;i<n;i++) {
+         printf("%5.2f\t",A_matrix->getCoefficient(j,i));
+      }
+      printf("\n");
+   }
+   */
+
+   /* dual form */
+   /*
+   printf("dual form:\n");
+   for (j=0;j<mip_m;j++) {
+      for (i=0;i<mip_n;i++) {
+         printf("%5.2f\t",mip_A->getCoefficient(j,i));
+      }
+      printf("\n");
+   }
+   */
+
 
    /* free */
    //delete dual_form;
