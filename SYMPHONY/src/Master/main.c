@@ -453,13 +453,13 @@ int main(int argc, char **argv)
 		 terminate = TRUE;
 		 break;
 	       } else {
-		 /* if (sym_get_int_param(env, args[2], &int_value) == 0){ */
-/* 		   printf("The value of %s: %i\n", args[2], int_value); */
-/* 		 } else if ( sym_get_dbl_param(env, args[2], &dbl_value) == 0){ */
-/* 		   printf("The value of %s: %f\n", args[2], dbl_value); */
-/* 		 }else { */
-		   printf("Unknown parameter/command!\n");		   
-		   //		 }
+		  if (sym_get_int_param(env, args[2], &int_value) == 0){
+		     printf("The value of %s: %i\n", args[2], int_value);
+		  } else if ( sym_get_dbl_param(env, args[2], &dbl_value) == 0){
+		     printf("The value of %s: %f\n", args[2], dbl_value);
+		  }else {
+		     printf("Unknown parameter/command!\n");		   
+		  }
 	       }
 	       strcpy(args[1], "");
 	       strcpy(args[2], "");
