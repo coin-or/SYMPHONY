@@ -535,20 +535,24 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 {
 
    int i, resolve = 0;
-		 
+
    if (root){
+      if(env->warm_start->trim_tree){
+	 check_trim_tree(env, root, change_type);
+      }
       if (root->node_status == NODE_STATUS__PRUNED || 
 	  root->node_status == NODE_STATUS__INTERRUPTED || 
 	  root->feasibility_status == PRUNED_HAS_CAN_SOLUTION || 
 	  root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
-	 if(change_type == OBJ_COEFF_CHANGED || change_type == RHS_CHANGED || change_type == COL_BOUNDS_CHANGED){      
+	 if(change_type == OBJ_COEFF_CHANGED || change_type == RHS_CHANGED || 
+	    change_type == COL_BOUNDS_CHANGED ||  change_type == COLS_ADDED){
 	   if (root->feasibility_status == FEASIBLE_PRUNED ||
 	       root->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
 	       root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
 	      
 	      check_better_solution(env, root, FALSE, change_type);
 	   }
-
+	   
 	   if (root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION && 
 	       root->bobj.child_num > 0){
 	      if(change_type == COL_BOUNDS_CHANGED && root->bobj.child_num > 0){
@@ -558,14 +562,17 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 		 update_tree_bound(env, root->children[i], change_type);
 	      }
 	   } else{
-	      if(root->node_status == NODE_STATUS__WSPRUNED) root->node_status = NODE_STATUS__PRUNED;		 
-	      else root->node_status = NODE_STATUS__WARM_STARTED; 
+	      if(root->node_status == NODE_STATUS__WSPRUNED) 
+		 root->node_status = NODE_STATUS__PRUNED;		 
+	      else 
+		 root->node_status = NODE_STATUS__WARM_STARTED; 
 	      if(resolve == 0){
-		 root->lower_bound = MAXDOUBLE;
+		 root->lower_bound = -MAXDOUBLE;
 	      }else{
-		 resolve_node(env, root);
+		 resolve_node(env, root);		 
 	      }
 	   }
+	   root->feasibility_status = 0; // or? ROOT_NODE;
 	 }
       } else{
 	 if(root->bobj.child_num > 0){
@@ -577,7 +584,7 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 		  root->bobj.child_num = 0;
 		  root->node_status = NODE_STATUS__WARM_STARTED;
 		  if(resolve == 0){
-		     root->lower_bound = MAXDOUBLE;
+		     root->lower_bound = -MAXDOUBLE;
 		  }else{
 		     resolve_node(env, root);
 		  }		  
@@ -591,23 +598,76 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 	       }
 	    }
 	 }else{ 
-	    if(root->node_status == NODE_STATUS__WSPRUNED) root->node_status = NODE_STATUS__PRUNED;
-	    else root->node_status = NODE_STATUS__WARM_STARTED;
+	    if(root->node_status == NODE_STATUS__WSPRUNED) 
+	       root->node_status = NODE_STATUS__PRUNED;
+	    else 
+	       root->node_status = NODE_STATUS__WARM_STARTED;
 	    if(resolve == 0){
-	       root->lower_bound = MAXDOUBLE;
+	       root->lower_bound = -MAXDOUBLE;
 	    }else{
 	       resolve_node(env, root);
 	    }
 	 }
       }
+      /* should be before resolve!!!*/
+      if(change_type == COLS_ADDED){
+	 update_node_desc(env, root, change_type);
+      }
    }
 }
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+void update_node_desc(sym_environment *env, bc_node *root, int change_type){
+
+   node_desc *desc = &(root->desc); 
+   int i, tmp_size, colnum = env->mip->n;
+   int added_colnum = env->mip->new_col_num;
+   int old_colnum = colnum - added_colnum;
+
+   if(change_type == COLS_ADDED && added_colnum > 0){
+      if(desc->uind.type == EXPLICIT_LIST){
+	 tmp_size = desc->uind.size;
+	 if(tmp_size < colnum){
+	    desc->uind.list = (int *) realloc((int *)desc->uind.list,
+					      (tmp_size + added_colnum) * ISIZE);
+	    for(i = 0; i < added_colnum; i++){
+	       desc->uind.list[tmp_size + i] = old_colnum + i;
+	    }
+	    desc->uind.size += added_colnum;
+	 }
+      }
+      if(desc->basis.basis_exists && 
+	 desc->basis.extravars.type == EXPLICIT_LIST){
+	 tmp_size = desc->basis.extravars.size;
+	 if(tmp_size < colnum){
+	   /*  if(desc->basis.extravars.list){ */
+/* 	       desc->basis.extravars.list =  */
+/* 		  (int*)realloc((int*)desc->basis.extravars.list,  */
+/* 				(tmp_size + added_colnum) *ISIZE); */
+/* 	       for(i = 0; i < added_colnum; i++){ */
+/* 		  desc->basis.extravars.list[tmp_size + i] = old_colnum + i; */
+/* 	       } */
+/* 	    } */
+	    desc->basis.extravars.stat = 
+	       (int*)realloc((int*)desc->basis.extravars.stat, 
+			     (tmp_size + added_colnum) *ISIZE);	 
+	    for(i = 0; i < added_colnum; i++){
+	       desc->basis.extravars.stat[tmp_size + i] = VAR_AT_LB;
+	    }
+	    desc->basis.extravars.size += added_colnum;
+	 }
+      }
+   }   					    
+}
+
 /*===========================================================================*/
 /*===========================================================================*/
 void update_branching_decisions(sym_environment *env, bc_node *root, int change_type)
 {
    int i, j;
-   int type = 1;
+   int type = 0;
    int resolve = 0;
    int deleted = 0;
 
@@ -633,7 +693,7 @@ void update_branching_decisions(sym_environment *env, bc_node *root, int change_
 		      for(j = 0; j<root->children[i]->bobj.child_num; j++){
 			 ws_free_subtree(env, root->children[i]->children[j], change_type, FALSE, TRUE);
 		      }
-		      root->children[i]->bobj.child_num = 0;
+		      root->children[i]->bobj.child_num = 0;		      
 		   }
 		   else if(root->bobj.rhs[i] > env->mip->ub[root->bobj.name]){
 		      root->bobj.rhs[i] = floor(env->mip->ub[root->bobj.name]);
@@ -688,7 +748,58 @@ void update_branching_decisions(sym_environment *env, bc_node *root, int change_
 
 /*===========================================================================*/
 /*===========================================================================*/
+void check_trim_tree(sym_environment *env, bc_node *root, int change_type)
+{
+   int i;
+   char trim_type = env->warm_start->trim_tree;
+   int level = env->warm_start->trim_tree_level;
+   int index = env->warm_start->trim_tree_index;
+   problem_stat *stat = &(env->warm_start->stat);   
 
+   if (root->node_status != NODE_STATUS__CANDIDATE){
+      stat->analyzed++;
+   }
+   
+   if(trim_type == TRIM_INDEX){	    
+      if(root->bobj.child_num > 0){
+	 for (i = 0; i < root->bobj.child_num; i++){	
+	    if(root->children[i]->bc_index <= index){
+	       break;
+	    }
+	 }
+	 if(i < root->bobj.child_num){
+	    for (i = 0; i < root->bobj.child_num; i++){	
+	       root->children[i]->bc_index = ++stat->tree_size;
+	       stat->created++;	    
+	    }
+	 } else{	
+	    for (i = root->bobj.child_num - 1; i >= 0; i--)
+	       ws_free_subtree(env, root->children[i], change_type, TRUE, FALSE);
+	    root->bobj.child_num = 0;
+	    if (root->node_status == NODE_STATUS__BRANCHED_ON){
+	       root->node_status = NODE_STATUS__WARM_STARTED;
+	    }	    
+	 }
+      }
+   } else {
+      if(root->bc_level < level){
+	 for (i = 0; i < root->bobj.child_num; i++){	
+	    root->children[i]->bc_index = ++stat->tree_size;
+	    stat->created++;	    
+	 }
+      }else if(root->bc_level == level){
+	 for (i = root->bobj.child_num - 1; i >= 0; i--)
+	    ws_free_subtree(env, root->children[i], change_type, TRUE, FALSE);
+	 root->bobj.child_num = 0;
+	 if (root->node_status == NODE_STATUS__BRANCHED_ON){
+	    root->node_status = NODE_STATUS__WARM_STARTED;
+	 }	 
+      }
+   }
+   
+}
+/*===========================================================================*/
+/*===========================================================================*/
 
 void cut_ws_tree_index(sym_environment *env, bc_node *root, int index, 
 		       problem_stat *stat, int change_type)
@@ -825,7 +936,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
    }
 
    if(feasible){
-      if(change_type == OBJ_COEFF_CHANGED){
+      if(change_type == OBJ_COEFF_CHANGED || change_type == COLS_ADDED){
 	 if(!env->par.mc_warm_start){
 	    for(i = 0; i<root->sol_size; i++){
 	       upper_bound += mip->obj[root->sol_ind[i]] * root->sol[i];
@@ -1028,11 +1139,12 @@ int copy_node(bc_node * n_to, bc_node *n_from)
    if (n_from->feasibility_status == FEASIBLE_PRUNED ||
        n_from->feasibility_status == PRUNED_HAS_CAN_SOLUTION ||
        n_from->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
-      
-      n_to->sol = (double *)malloc(n_from->sol_size*DSIZE);
-      n_to->sol_ind = (int *)malloc(n_from->sol_size*ISIZE);
-      memcpy(n_to->sol, n_from->sol, n_from->sol_size * DSIZE);
-      memcpy(n_to->sol_ind, n_from->sol_ind, n_from->sol_size * ISIZE);
+      if(n_from->sol){
+	 n_to->sol = (double *)malloc(n_from->sol_size*DSIZE);
+	 n_to->sol_ind = (int *)malloc(n_from->sol_size*ISIZE);
+	 memcpy(n_to->sol, n_from->sol, n_from->sol_size * DSIZE);
+	 memcpy(n_to->sol_ind, n_from->sol_ind, n_from->sol_size * ISIZE);
+      }
    }
   
 #ifdef TRACE_PATH
@@ -1112,69 +1224,69 @@ int copy_node(bc_node * n_to, bc_node *n_from)
       memcpy( n_to->desc.uind.list,  n_from->desc.uind.list, 
 	      n_to->desc.uind.size*ISIZE);
    }
-
-   if (n_to->desc.basis.basevars.size){
-      n_to->desc.basis.basevars.stat = 
-	 (int *) malloc(n_to->desc.basis.basevars.size*ISIZE);
-      memcpy( n_to->desc.basis.basevars.stat,  
-	      n_from->desc.basis.basevars.stat,
-	      n_to->desc.basis.basevars.size*ISIZE);	  
-      if (n_to->desc.basis.basevars.type == WRT_PARENT){         
-	 n_to->desc.basis.basevars.list = 
+   if(n_to->desc.basis.basis_exists){
+      if (n_to->desc.basis.basevars.size){
+	 n_to->desc.basis.basevars.stat = 
 	    (int *) malloc(n_to->desc.basis.basevars.size*ISIZE);
-	 memcpy( n_to->desc.basis.basevars.list,  
-		 n_from->desc.basis.basevars.list,
-		 n_to->desc.basis.basevars.size*ISIZE);	  		 
+	 memcpy( n_to->desc.basis.basevars.stat,  
+		 n_from->desc.basis.basevars.stat,
+		 n_to->desc.basis.basevars.size*ISIZE);	  
+	 if (n_to->desc.basis.basevars.type == WRT_PARENT){         
+	    n_to->desc.basis.basevars.list = 
+	       (int *) malloc(n_to->desc.basis.basevars.size*ISIZE);
+	    memcpy( n_to->desc.basis.basevars.list,  
+		    n_from->desc.basis.basevars.list,
+		    n_to->desc.basis.basevars.size*ISIZE);	  		 
+	 }
       }
-   }
-
-   if (n_to->desc.basis.extravars.size){
-      n_to->desc.basis.extravars.stat = 
-	 (int *) malloc(n_to->desc.basis.extravars.size*ISIZE);
-      memcpy( n_to->desc.basis.extravars.stat,  
-	      n_from->desc.basis.extravars.stat,
-	      n_to->desc.basis.extravars.size*ISIZE);	  
-      if (n_to->desc.basis.extravars.type == WRT_PARENT){         
-	 n_to->desc.basis.extravars.list = 
+      
+      if (n_to->desc.basis.extravars.size){
+	 n_to->desc.basis.extravars.stat = 
 	    (int *) malloc(n_to->desc.basis.extravars.size*ISIZE);
-	 memcpy( n_to->desc.basis.extravars.list,  
-		 n_from->desc.basis.extravars.list,
-		 n_to->desc.basis.extravars.size*ISIZE);	        
+	 memcpy( n_to->desc.basis.extravars.stat,  
+		 n_from->desc.basis.extravars.stat,
+		 n_to->desc.basis.extravars.size*ISIZE);	  
+	 if (n_to->desc.basis.extravars.type == WRT_PARENT){         
+	    n_to->desc.basis.extravars.list = 
+	       (int *) malloc(n_to->desc.basis.extravars.size*ISIZE);
+	    memcpy( n_to->desc.basis.extravars.list,  
+		    n_from->desc.basis.extravars.list,
+		    n_to->desc.basis.extravars.size*ISIZE);	        
+	 }
       }
-   }
-
-   if (n_to->desc.basis.baserows.size){
-      n_to->desc.basis.baserows.stat = 
-	 (int *) malloc(n_to->desc.basis.baserows.size*ISIZE);
-      memcpy( n_to->desc.basis.baserows.stat,  
-	      n_from->desc.basis.baserows.stat,
-	      n_to->desc.basis.baserows.size*ISIZE);	  
-      if (n_to->desc.basis.baserows.type == WRT_PARENT){         
-	 n_to->desc.basis.baserows.list = 
+      
+      if (n_to->desc.basis.baserows.size){
+	 n_to->desc.basis.baserows.stat = 
 	    (int *) malloc(n_to->desc.basis.baserows.size*ISIZE);
-	 memcpy( n_to->desc.basis.baserows.list,  
-		 n_from->desc.basis.baserows.list,
+	 memcpy( n_to->desc.basis.baserows.stat,  
+		 n_from->desc.basis.baserows.stat,
 		 n_to->desc.basis.baserows.size*ISIZE);	  
+	 if (n_to->desc.basis.baserows.type == WRT_PARENT){         
+	    n_to->desc.basis.baserows.list = 
+	       (int *) malloc(n_to->desc.basis.baserows.size*ISIZE);
+	    memcpy( n_to->desc.basis.baserows.list,  
+		    n_from->desc.basis.baserows.list,
+		    n_to->desc.basis.baserows.size*ISIZE);	  
+	 }
       }
-   }
-
-   if (n_to->desc.basis.extrarows.size){
-      n_to->desc.basis.extrarows.stat = 
-	 (int *) malloc(n_to->desc.basis.extrarows.size*ISIZE);   
-      memcpy( n_to->desc.basis.extrarows.stat,  
-	      n_from->desc.basis.extrarows.stat,
-	      n_to->desc.basis.extrarows.size*ISIZE);	  
-      if (n_to->desc.basis.extrarows.type == WRT_PARENT){         
-	 n_to->desc.basis.extrarows.list = 
-	    (int *) malloc(n_to->desc.basis.extrarows.size*ISIZE);
-	 memcpy( n_to->desc.basis.extrarows.list,  
-		 n_from->desc.basis.extrarows.list,
+      
+      if (n_to->desc.basis.extrarows.size){
+	 n_to->desc.basis.extrarows.stat = 
+	    (int *) malloc(n_to->desc.basis.extrarows.size*ISIZE);   
+	 memcpy( n_to->desc.basis.extrarows.stat,  
+		 n_from->desc.basis.extrarows.stat,
 		 n_to->desc.basis.extrarows.size*ISIZE);	  
-      }
-   }      
-
+	 if (n_to->desc.basis.extrarows.type == WRT_PARENT){         
+	    n_to->desc.basis.extrarows.list = 
+	       (int *) malloc(n_to->desc.basis.extrarows.size*ISIZE);
+	    memcpy( n_to->desc.basis.extrarows.list,  
+		    n_from->desc.basis.extrarows.list,
+		    n_to->desc.basis.extrarows.size*ISIZE);	  
+	 }
+      }      
+   }
    if (n_to->desc.not_fixed.size){
-      n_to->desc.not_fixed.list = 
+	 n_to->desc.not_fixed.list = 
 	 (int *) malloc(n_to->desc.not_fixed.size*ISIZE);	 
       memcpy( n_to->desc.not_fixed.list,  n_from->desc.not_fixed.list, 
 	      n_to->desc.not_fixed.size*ISIZE);

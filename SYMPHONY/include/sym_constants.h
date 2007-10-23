@@ -505,8 +505,8 @@
 /*-------------------- xxx_cuts_generation_levels ---------------------------*/
 #define DO_NOT_GENERATE        -1
 #define GENERATE_DEFAULT        0
-#define GENERATE_ONLY_IN_ROOT   1
-#define GENERATE_IF_IN_ROOT     2    /*default*/
+#define GENERATE_IF_IN_ROOT     1    /*default*/
+#define GENERATE_ONLY_IN_ROOT   2
 #define GENERATE_ALWAYS         3 
 #define GENERATE_PERIODICALLY   4
 
@@ -573,4 +573,10 @@
 #define COL_BOUNDS_CHANGED                4  
 #define OBJ_SENSE_CHANGED                 5
 #define RHS_SENSE_CHANGED                 6 
+#define COLS_ADDED                        7
+
+/*--------------- parameter values for restart/sens analysis ----------------*/
+#define DO_NOT_TRIM          0
+#define TRIM_LEVEL           1
+#define TRIM_INDEX           2
 #endif

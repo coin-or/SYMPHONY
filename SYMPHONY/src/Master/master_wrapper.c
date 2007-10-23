@@ -170,7 +170,7 @@ int io_u(sym_environment *env)
       if (strcmp(env->par.datafile, "") == 0){
 	 if (env->par.file_type == LP_FORMAT){
 	    err = read_lp(env->mip, env->par.infile, env->probname);
-	    env->par.file_type == 0;
+	    env->par.file_type = 0;
 	    if (err != 0){
 	       printf("\nErrors in reading LP file\n");
 	       return (ERROR__READING_LP_FILE);
@@ -186,7 +186,7 @@ int io_u(sym_environment *env)
 #ifdef USE_GLPMPL
 	 err = read_gmpl(env->mip, env->par.infile, 
 			 env->par.datafile, env->probname);
-	 env->par.file_type == 0;
+	 env->par.file_type = 0;
 	 if(!err){
 	    printf("\nErrors in reading gmpl file\n");
 	    return (ERROR__READING_GMPL_FILE);
@@ -785,6 +785,10 @@ int free_master_u(sym_environment *env)
 #ifdef COMPILE_IN_TM
    if (env->warm_start){
       free_subtree(env->warm_start->rootnode);
+      if(env->warm_start->best_sol.has_sol){
+	 FREE(env->warm_start->best_sol.xind);
+	 FREE(env->warm_start->best_sol.xval);
+      }
       if (env->warm_start->cuts){
 	 for (i = env->warm_start->cut_num - 1; i >= 0; i--){
 	    if (env->warm_start->cuts[i]){

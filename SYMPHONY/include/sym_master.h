@@ -110,8 +110,11 @@ int process_own_messages_u PROTO((sym_environment *env, int msgtag));
 int resolve_node PROTO((sym_environment *env, bc_node * node));
 void update_tree_bound PROTO((sym_environment *env, bc_node *root, 
 			      int change_type));
+void update_node_desc PROTO((sym_environment *env, bc_node *root, 
+			     int change_type));
 void update_branching_decisions PROTO((sym_environment *env, bc_node *root, 
 			      int change_type));
+void check_trim_tree PROTO((sym_environment *env, bc_node *root, int change_type));
 void cut_ws_tree_index PROTO((sym_environment *env, bc_node *root, int index,  
 			      problem_stat * stat, int change_type));
 void cut_ws_tree_level PROTO((sym_environment *env, bc_node *root, int level,

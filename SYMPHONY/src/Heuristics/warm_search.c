@@ -110,6 +110,7 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
       } else {
 	 env2 = p->tm->warm_search_env;
 	 mip2 = env2->mip;
+	 sym_set_dbl_param(env2,"warm_start_node_level_ratio", 0.25);
 	 sym_set_int_param(env2,"keep_warm_start", TRUE);
 	 sym_set_int_param(env2,"generate_cgl_cuts", FALSE);
 	 sym_set_int_param(env2,"warm_search_enabled", FALSE);

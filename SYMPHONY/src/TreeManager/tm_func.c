@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN)
+#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN) && defined(SIGHANDLER)
 #include <signal.h>
 #if !defined(HAS_SRANDOM)
 extern int srandom PROTO((unsigned seed));
@@ -49,9 +49,6 @@ extern long random PROTO((void));
 #include "sym_cp.h"
 #endif
 
-#ifdef PRIMAL_HEURISTICS
-#include "sym_sp.h"
-#endif
 
 int c_count = 0;
 
@@ -85,7 +82,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    int s_bufid;
 #endif
    int *termcodes = NULL;
-#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN)
+#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN) && defined(SIGHANDLER)
    signal(SIGINT, sym_catch_c);    
 #endif   
    par = &tm->par;
@@ -321,7 +318,7 @@ int solve(tm_prob *tm)
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
    double timeout2 = 5, timeout3 = tm->par.logging_interval, timeout4 = 10;
-  
+
    /*------------------------------------------------------------------------*\
     * The Main Loop
    \*------------------------------------------------------------------------*/
@@ -461,6 +458,7 @@ int solve(tm_prob *tm)
 	 }
 
 	 if (tm->par.find_first_feasible && tm->has_ub){
+	    termcode = TM_FINISHED;
 	    break;
 	 }
 
@@ -662,8 +660,9 @@ void print_tree_status(tm_prob *tm)
       tm->lb = tm->ub;
    }else{
       for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-	 if (tm->samephase_cand[i]->lower_bound < tm->lb)
-	    tm->lb = tm->samephase_cand[i]->lower_bound;
+	 if (tm->samephase_cand[i]->parent->lower_bound < tm->lb){
+	    tm->lb = tm->samephase_cand[i]->parent->lower_bound;
+	 }
       }
    }
    if (tm->lb >= MAXDOUBLE / 2 || (tm->has_ub && tm->lb > tm->ub)){
@@ -3456,7 +3455,7 @@ int tm_close(tm_prob *tm, int termcode)
    
 /*===========================================================================*/
 /*===========================================================================*/
-#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN)
+#if !defined(_MSC_VER) && !defined(__MNO_CYGWIN) && defined(SIGHANDLER)
 void sym_catch_c(int num)
 {
 
