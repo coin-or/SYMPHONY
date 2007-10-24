@@ -973,6 +973,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    int opt_branch_status;
    branch_obj *can;
    cut_data **slacks_in_matrix = NULL; /* just to keep gcc quiet */
+   int is_proven_inf = FALSE;
 
    /* If the user might need to generate rows, we better have the
     * columns COLIND_ORDERED */
@@ -1026,9 +1027,6 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
       but only those where maxn plays any role in the size. Therefore tmp.i2
       and tmp.p2 do NOT change. Phew... */
 
-   if (p->par.should_solve_branch_feas_mip) {
-      opt_branch_status = solve_branch_feas_mip(p);
-   }
    if (action == DO_NOT_BRANCH__FATHOMED)
       return(DO_NOT_BRANCH__FATHOMED);
 
@@ -1066,6 +1064,15 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
       return(DO_NOT_BRANCH);
 
    /* So the action from col_gen_before_branch is DO_BRANCH */
+
+   if (p->par.should_solve_branch_feas_mip) {
+      //opt_branch_status = solve_branch_feas_mip(p, is_proven_inf);
+      opt_branch_status = solve_branch_obj_mip(p, is_proven_inf);
+   }
+   if (is_proven_inf==TRUE) {
+      printf("provably infeasible. \n");
+      return(DO_NOT_BRANCH__FATHOMED);
+   }
 
    action = USER__DO_BRANCH;
 

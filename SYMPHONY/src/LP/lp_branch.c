@@ -1066,7 +1066,7 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
  */
 /*****************************************************************************/
 
-int solve_branch_feas_mip(lp_prob *p) 
+int solve_branch_feas_mip(lp_prob *p, int &is_proven_inf) 
 {
    int verbosity = p->par.verbosity;
    /*
@@ -1121,8 +1121,10 @@ int solve_branch_feas_mip(lp_prob *p)
    /* params */
    double br_mip_intlb = -10;
    double br_mip_intub = 10;
-   int br_mip_node_limit = 10;
+   int br_mip_node_limit = 100;
    int br_mip_obj_sense = 1; /* 1 for minimize, -1 for maxmize */
+
+   is_proven_inf = FALSE;
 
    mip_b[mip_m-1] = 1.0;
 
@@ -1191,7 +1193,7 @@ int solve_branch_feas_mip(lp_prob *p)
    int *mlengths = (int *) calloc(m,ISIZE);
    int *mstarts = (int *) calloc(m,ISIZE);
    zeros_nxn = new CoinPackedMatrix(TRUE, n, n, 0, NULL, NULL, starts, lengths);
-   CoinPackedMatrix *zeros_nxm = new CoinPackedMatrix(TRUE, n, m, 0, NULL, NULL, mstarts, lengths);
+   CoinPackedMatrix *zeros_nxm = new CoinPackedMatrix(TRUE, n, m, 0, NULL, NULL, mstarts, mlengths);
    printf("appended\n");
 
    /* create I vector */
@@ -1313,11 +1315,13 @@ int solve_branch_feas_mip(lp_prob *p)
       } else {
          tmp_array[i+2*m] = col_lower[i];
          tmp_array2[i+2*m+n] = col_lower[i];
+         printf("col_lower = %g\n",col_lower[i]);
       }
       if (col_upper[i] >= infinity) {
       } else {
          tmp_array[i+2*m+2*n] = col_upper[i];
          tmp_array2[i+2*m+3*n] = col_upper[i];
+         printf("col_upper = %g\n",col_upper[i]);
       }
    }
    /* coeffs of pi_0 */
@@ -1326,10 +1330,10 @@ int solve_branch_feas_mip(lp_prob *p)
 
    for (i=0;i<mip_n;i++) {
       if (fabs(tmp_array[i])>=infinity) {
-         printf("var %d has inf coeff in tmp\n",i);
+         printf("var %d has inf coeff of %g in tmp\n",i,tmp_array[i] );
       }
       if (fabs(tmp_array2[i])>=infinity) {
-         printf("var %d has inf coeff in tmp2\n",i);
+         printf("var %d has inf coeff of %g in tmp2\n",i,tmp_array2[i]);
       }
    }
    tmp_vector = new CoinPackedVector(mip_n,tmp_array);
@@ -1376,12 +1380,11 @@ int solve_branch_feas_mip(lp_prob *p)
          break;
        default:
          /* row may be of type 'N' */
-         collb[i] = -infinity;
-         colub[i] = infinity;
-         collb[i+m] = -infinity;
-         colub[i+m] = infinity;
-         printf ("exiting on N row, %d\n",i);
-         exit(0);
+         collb[i] = 0;
+         colub[i] = 0;
+         collb[i+m] = 0;
+         colub[i+m] = 0;
+         printf ("N row: %d\n",i);
          break;
       }
       if (collb[i]>colub[i]) {
@@ -1458,7 +1461,7 @@ int solve_branch_feas_mip(lp_prob *p)
    rowrhs[mip_m-1] = 1-0.01;
 
    /* obj */
-   obj[mip_n-1] = 1;
+   obj[mip_n-1] = 0;
    
    /* solve the mip */
    sym_env = sym_open_environment();
@@ -1524,6 +1527,7 @@ int solve_branch_feas_mip(lp_prob *p)
    sym_solve(sym_env);
    //exit(0);
    if (sym_is_proven_optimal(sym_env)) {
+      is_proven_inf = TRUE;
       sym_get_col_solution(sym_env, colsol);
       for (i=0;i<n;i++) {
          if (fabs(colsol[2*m+4*n+i])>0.001) {
@@ -1531,6 +1535,590 @@ int solve_branch_feas_mip(lp_prob *p)
          }
       }
       printf("%5d\t%20.10f\n",n,colsol[mip_n-1]);
+   }
+   sym_close_environment(sym_env);
+
+   /* check */
+   /* row activity of last row */
+   /*
+   double row_activity = 0;
+   for (i=0;i<mip_n;i++) {
+      row_activity += colsol[i]*mip_A->getCoefficient(mip_m-1, i);
+   }
+   printf("max = %10.8f\n",row_activity);
+   row_activity = 0;
+   for (i=0;i<mip_n;i++) {
+      row_activity += colsol[i]*mip_A->getCoefficient(mip_m-2, i);
+   }
+   printf("min = %10.8f\n",row_activity);
+   */
+
+   /* get info */
+   /* original A: */
+   /*
+   for (j=0;j<m;j++) {
+      for (i=0;i<n;i++) {
+         printf("%5.2f\t",A_matrix->getCoefficient(j,i));
+      }
+      printf("\n");
+   }
+   */
+
+   /* dual form */
+   /*
+   printf("dual form:\n");
+   for (j=0;j<mip_m;j++) {
+      for (i=0;i<mip_n;i++) {
+         printf("%5.2f\t",mip_A->getCoefficient(j,i));
+      }
+      printf("\n");
+   }
+   */
+
+
+   /* free */
+   //delete dual_form;
+   delete mip_A;
+   delete tmp_vector;
+   FREE(mip_c);
+   FREE(mip_b);
+   FREE(zeros_n);
+   FREE(tmp_array);
+   FREE(tmp_array2);
+   FREE(collb);
+   FREE(colub);
+   FREE(is_int);
+   FREE(obj);
+   FREE(rowsen);
+   FREE(rowrhs);
+   FREE(colsol);
+   exit(0);
+   return 0;
+}
+/*===========================================================================*/
+/*===========================================================================*/
+
+int solve_branch_obj_mip(lp_prob *p, int &is_proven_inf) 
+{
+   int verbosity = p->par.verbosity;
+   /*
+   // clone
+   OsiXSolverInterface * si = new OsiXSolverInterface(*(p->lp_data->si));
+   */
+   OsiXSolverInterface * si = p->lp_data->si;
+   OsiClpSolverInterface * si2 = new OsiClpSolverInterface();
+   int n = si->getNumCols();
+   int m = si->getNumRows();
+   int nz = si->getNumElements();
+   const int *vec_starts, *vec_lengths, *vec_index;
+
+   const CoinPackedMatrix *A_matrix = si->getMatrixByCol();
+   CoinPackedMatrix *A_trans = new CoinPackedMatrix(*A_matrix);
+   CoinPackedMatrix *mip_A;
+   CoinPackedMatrix *A_minus;
+   CoinPackedMatrix *mip_A_row2;
+   CoinPackedMatrix *zeros_nxn;
+   CoinPackedMatrix *I_nxn;
+   CoinPackedMatrix *I_nxn_m;
+   CoinPackedVector *tmp_vector;
+   const double* row_upper = si->getRowUpper();
+   const double* row_lower = si->getRowLower();
+   const double* row_range = si->getRowRange();
+   const char*   LP_row_sense = si->getRowSense();
+   const double* col_upper = si->getColUpper();
+   const double* col_lower = si->getColLower();
+   const double* obj_coeff = si->getObjCoefficients();
+   const double* elements;
+   double*       elements_neg;
+
+   int   mip_m = 2*n+2;
+   int   mip_n = 2*m+5*n+2;
+   double *mip_c = (double *)malloc(mip_n*DSIZE);
+   double *mip_b = (double *)calloc(mip_m,DSIZE);
+   double *zeros_n = (double *)calloc(n,DSIZE);
+   double *tmp_array = (double *)calloc(mip_n,DSIZE);
+   double *tmp_array2 = (double *)calloc(mip_n,DSIZE);
+   double *collb     = (double *)malloc(mip_n*DSIZE);
+   double *colub     = (double *)malloc(mip_n*DSIZE);
+   char *is_int     = (char *)calloc(mip_n,CSIZE);
+   double *obj     = (double *)calloc(mip_n,DSIZE);
+   char *rowsen     = (char *)malloc(mip_m*CSIZE);
+   double *rowrhs     = (double *)calloc(mip_m,DSIZE);
+   double *colsol     = (double *)calloc(mip_n,DSIZE);
+   double infinity   = sym_get_infinity();
+   int i,j,k;
+   double new_obj_val = 0;
+   var_desc **vars   = p->lp_data->vars;
+
+   sym_environment *sym_env;
+
+   /* params */
+   double br_mip_intlb = -10;
+   double br_mip_intub = 10;
+   int br_mip_node_limit = 5000;
+   int br_mip_time_limit = 1800;
+   int br_mip_obj_sense = -1; /* 1 for minimize, -1 for maximize */
+
+   is_proven_inf = FALSE;
+
+   mip_b[mip_m-1] = 1.0;
+
+   PRINT(verbosity, -5, ("Setting up MIP to solve branching problem.\n"));
+   PRINT(verbosity, -5, ("cols = %d, rows = %d, nz = %d\n",n,m,nz));
+   
+   /* get the transpose and retain column order */
+   A_trans->transpose();
+   A_trans->reverseOrdering();
+   mip_A = new CoinPackedMatrix(*A_trans);
+   printf("mip_A has %d rows %d cols\n",mip_A->getNumRows(), mip_A->getNumCols());
+
+   /* 
+    * we have LP of the form
+    *
+    * min cx
+    * s.t.
+    *      Ax  = b
+    *   \pi x <= \pi_0
+    * l <=  x <= u
+    * 
+    * The dual is:
+    * max ub + gl + hu - \pi_0
+    * s.t. 
+    * uA + g  + h  - \pi   = c
+    * p                   free
+    * g                   >= 0
+    * h                   <= 0
+    *
+    * Similarly, dual of the LP:
+    * min cx
+    * s.t.
+    *      Ax  = b
+    *   \pi x => \pi_0+1
+    * l <=  x <= u
+    *
+    * min vb + gl + hu + \pi_0 + 1
+    * s.t.
+    * vA + g  + h  + \pi   = c
+    * p                   free
+    * g                   >= 0
+    * h                   <= 0
+    *
+    * Combining these two into a single LP, the new A matrix will look like:
+    * 
+    * max z
+    * uA + g  + h  - \pi   = c
+    * vA + g  + h  + \pi   = c
+    * z - ub - g1l - h1u + \pi_0 \leq 0
+    * z - vb - g2l - h2u - \pi_0 \leq 1
+    * 0 <= \pi x* - \pi_0 <= 1
+    *
+    *
+    *  A'  0   I   0   I   0  -I   0   0   (n rows)
+    *  0   A'  0   I   0   I   I   0   0   (n rows)
+    *  -b  0  -l   0  -u   0   0  +1   1   (1 rows)
+    *  0  -b   0  -l   0  -u   0  -1   1   (1 rows)
+    *  0   0   0   0   0   0   x* -1   0   (1 rows)
+    *  the columns correspond to u, v, g1, g2, h1, h2, \pi, \pi_0, z
+    *  respectively
+    *
+    *  also, p_i = 0 if x_i is continuous.
+    */
+
+   /* create zero arrays */
+   /* TODO: This is extremely slow */
+   tmp_vector = new CoinPackedVector(n,zeros_n);
+   /*
+   zeros_nxn = new CoinPackedMatrix();
+   for (i=0;i<n;i++) {
+      zeros_nxn->appendCol(*tmp_vector);
+      printf("appended %d\n", i);
+   } 
+   printf("appended\n");
+   */
+
+   int int_zero = 0;
+   int *lengths = (int *) calloc(n,ISIZE);
+   int *starts = (int *) calloc(n,ISIZE);
+   int *mlengths = (int *) calloc(m,ISIZE);
+   int *mstarts = (int *) calloc(m,ISIZE);
+   zeros_nxn = new CoinPackedMatrix(TRUE, n, n, 0, NULL, NULL, starts, lengths);
+   CoinPackedMatrix *zeros_nxm = new CoinPackedMatrix(TRUE, n, m, 0, NULL, NULL, mstarts, mlengths);
+   printf("appended\n");
+
+   /* create I vector */
+   I_nxn     = new CoinPackedMatrix(*zeros_nxn);
+   for (i=0;i<n;i++) {
+      I_nxn->modifyCoefficient(i,i,1.0,FALSE);
+   }
+   printf("modified\n");
+
+   /* create -I vector */
+   I_nxn_m     = new CoinPackedMatrix(*I_nxn);
+   for (i=0;i<n;i++) {
+      I_nxn_m->modifyCoefficient(i,i,-1.0,FALSE);
+   }
+   printf("modified2\n");
+   /*
+    *  We will add columns to A to make the first 'row' of the above
+    *  representation. then add rows to add the rest of the rows.
+    */
+
+   /* C2 row 1 */
+   /*
+   for (i=0;i<m;i++) {
+      mip_A->appendCol(*tmp_vector);
+      //printf("appended\n");
+   } 
+   */
+   mip_A->rightAppendPackedMatrix(*zeros_nxm);
+   printf("appended\n");
+
+   /* C3 row 1 */
+   mip_A->rightAppendPackedMatrix(*I_nxn);
+   printf("rightappended\n");
+
+   /* C4 R1 */
+   mip_A->rightAppendPackedMatrix(*zeros_nxn);
+   printf("C4R1\n");
+
+   /* C5 R1 */
+   mip_A->rightAppendPackedMatrix(*I_nxn);
+   printf("C5R1\n");
+
+   /* C6 R1 */
+   mip_A->rightAppendPackedMatrix(*zeros_nxn);
+   printf("C6R1\n");
+
+   /* C7 R1 */
+   mip_A->rightAppendPackedMatrix(*I_nxn_m);
+   printf("C7R1\n");
+
+   /* C8 R1 */
+   mip_A->appendCol(*tmp_vector);
+   printf("C8R1\n");
+
+   /* C9 R1 */
+   mip_A->appendCol(*tmp_vector);
+   printf("C9R1\n");
+
+   /* create row 2 now */
+   /* C1 R2 */
+   /*
+   mip_A_row2 = new CoinPackedMatrix();
+   for (i=0;i<m;i++) {
+      mip_A_row2->appendCol(*tmp_vector);
+   } 
+   */
+   mip_A_row2 = new CoinPackedMatrix(*zeros_nxm);
+
+   mip_A_row2->rightAppendPackedMatrix(*A_trans);     /* C2 R2 */
+   mip_A_row2->rightAppendPackedMatrix(*zeros_nxn);   /* C3 R2 */
+   mip_A_row2->rightAppendPackedMatrix(*I_nxn);       /* C4 R2 */
+   mip_A_row2->rightAppendPackedMatrix(*zeros_nxn);   /* C5 R2 */
+   mip_A_row2->rightAppendPackedMatrix(*I_nxn);       /* C6 R2 */
+   mip_A_row2->rightAppendPackedMatrix(*I_nxn);     /* C7 R2 */
+   mip_A_row2->appendCol(*tmp_vector);                /* C8 R2 */
+   mip_A_row2->appendCol(*tmp_vector);                /* C9 R2 */
+
+   mip_A->bottomAppendPackedMatrix(*mip_A_row2);
+   delete A_trans;
+   delete I_nxn;
+   delete I_nxn_m;
+   delete zeros_nxn;
+   delete mip_A_row2;
+   delete tmp_vector;
+
+   /* create row 3,4 now. Its a vector of size mip_n */
+   /* b vector */
+   for (i=0;i<m;i++) {
+      switch (LP_row_sense[i]) {
+       case 'R':
+         PRINT(verbosity, -5, ("row ranges not yet implemented for branching-mip. exiting\n"));
+         exit(383);
+         break;
+       case 'L':
+         if (row_upper[i]>=infinity) {
+            tmp_array[i]    = 0;
+            tmp_array2[m+i] = 0;
+         } else {
+            tmp_array[i]    = -row_upper[i];
+            tmp_array2[m+i] = -row_upper[i];
+         }
+         break;
+       case 'G':
+         if (row_lower[i]<=-infinity) {
+            tmp_array[i]    = 0;
+            tmp_array2[m+i] = 0;
+         } else {
+            tmp_array[i]    = -row_lower[i];
+            tmp_array2[m+i] = -row_lower[i];
+         }
+         break;
+       case 'E':
+         tmp_array[i]       = -row_lower[i];
+         tmp_array2[m+i]    = -row_lower[i];
+         break;
+       default:
+         break;
+      }
+   }
+   
+   /* l and u */
+   for (i=0;i<n;i++) {
+      if (col_lower[i] <= -infinity) {
+      } else {
+         tmp_array[i+2*m]    = -col_lower[i];
+         tmp_array2[i+2*m+n] = -col_lower[i];
+         printf("col_lower = %g\n",col_lower[i]);
+      }
+      if (col_upper[i] >= infinity) {
+      } else {
+         tmp_array[i+2*m+2*n]  = -col_upper[i];
+         tmp_array2[i+2*m+3*n] = -col_upper[i];
+         printf("col_upper = %g\n",col_upper[i]);
+      }
+   }
+   /* coeffs of pi_0 */
+   tmp_array[mip_n-2]  = +1;
+   tmp_array2[mip_n-2] = -1;
+
+   /* coeffs of z */
+   tmp_array[mip_n-1]  =  1;
+   tmp_array2[mip_n-1] =  1;
+
+   for (i=0;i<mip_n;i++) {
+      if (fabs(tmp_array[i])>=infinity) {
+         printf("var %d has inf coeff of %g in tmp\n",i,tmp_array[i] );
+      }
+      if (fabs(tmp_array2[i])>=infinity) {
+         printf("var %d has inf coeff of %g in tmp2\n",i,tmp_array2[i]);
+      }
+   }
+   tmp_vector = new CoinPackedVector(mip_n,tmp_array);
+   mip_A->appendRow(*tmp_vector);
+   delete tmp_vector;
+   tmp_vector = new CoinPackedVector(mip_n,tmp_array2);
+   mip_A->appendRow(*tmp_vector);
+
+   /* the last row */
+   /* TODO: put this in
+   memset (tmp_array,0,DSIZE*mip_n);
+   for (i=0;i<n;i++) {
+
+   }
+   tmp_vector = new CoinPackedVector(mip_n,tmp_array);
+   mip_A->appendRow(*tmp_vector);
+   */
+
+
+   mip_A->removeGaps();
+   printf("Number of zeros removed = %d\n",mip_A->compress(0.000001));
+   printf("mip_A has %d rows %d cols %d non-zeros\n",mip_A->getNumRows(), 
+         mip_A->getNumCols(), mip_A->getNumElements());
+
+
+   /* 
+    * The mip_A matrix is all set. now set variable bounds, and cost vectors
+    * for variables u, v
+    */
+   for (i=0; i<m; i++) {
+      switch (LP_row_sense[i]) {
+       case 'E':
+         collb[i]   = -infinity;
+         colub[i]   =  infinity;
+         collb[i+m] = -infinity;
+         colub[i+m] =  infinity;
+         break;
+       case 'L':
+         collb[i]   =  -infinity;
+         colub[i]   =  0;
+         collb[i+m] =  -infinity;
+         colub[i+m] =  0;
+         if (row_upper[i]>=infinity) {
+            collb[i] = 0;
+            collb[i+m] = 0;
+         }
+         break;
+       case 'G':
+         collb[i]   =  0;
+         colub[i]   =  infinity;
+         collb[i+m] =  0;
+         colub[i+m] =  infinity;
+         if (row_lower[i]<=-infinity) {
+            colub[i] = 0;
+            colub[i+m] = 0;
+         }
+         break;
+       default:
+         /* row may be of type 'N' */
+         collb[i] = 0;
+         colub[i] = 0;
+         collb[i+m] = 0;
+         colub[i+m] = 0;
+         printf ("N row: %d\n",i);
+         break;
+      }
+      if (collb[i]>colub[i]) {
+         printf("bad bounds for var %d\n",i);
+      }
+      if (collb[i+m]>colub[i+m]) {
+         printf("bad bounds for var %d\n",i+m);
+      }
+   }
+
+   /* variables g, h */
+   j = 0; //count ints
+   for (i=0; i<n; i++) {
+      /* g */
+      collb[i+2*m] = 0;
+      collb[i+2*m+n] = 0;
+      if (col_lower[i]<=-infinity) {
+         colub[i+2*m] = 0;
+         colub[i+2*m+n] = 0;
+      } else {
+         colub[i+2*m]   = infinity;
+         colub[i+2*m+n] = infinity;
+      }
+      /* h */
+      colub[i+2*m+2*n] = 0;
+      colub[i+2*m+3*n] = 0;
+      if (col_upper[i]>=infinity) {
+         collb[i+2*m+2*n] = 0;
+         collb[i+2*m+3*n] = 0;
+      } else {
+         collb[i+2*m+2*n] = -infinity;
+         collb[i+2*m+3*n] = -infinity;
+      }
+      /* \pi */
+      /*
+      if (!(i==vars[i]->userind)) {
+         printf("discrepancy: var[%d] = %d\n",i,vars[i]->userind);
+      }
+      */
+      if (vars[i]->is_int == TRUE) {
+         /*
+          * TODO:
+          * find a good infinity
+         collb[i+2*m+4*n] =  -infinity;
+         colub[i+2*m+4*n] =  infinity;
+         */
+         collb[i+2*m+4*n] =  br_mip_intlb;
+         colub[i+2*m+4*n] =  br_mip_intub;
+         j++;
+      } else {
+         collb[i+2*m+4*n] =  0;
+         colub[i+2*m+4*n] =  0;
+      }
+   }
+   printf("num of integers = %d\n",j);
+   /* \pi_0 */
+   collb[2*m+5*n] =  br_mip_intlb;
+   colub[2*m+5*n] =  br_mip_intub;
+
+   /* z */
+   collb[2*m+5*n+1] =  -infinity;
+   colub[2*m+5*n+1] =   infinity;
+
+   /* row sense */
+   for (i=0;i<2*n;i++) {
+      rowsen[i]='E';
+   }
+   rowsen[2*n]   = 'L';
+   rowsen[2*n+1] = 'L';
+
+   /* only \pi, \pi_0 are int */
+   for (i=2*m+4*n;i<2*m+5*n+1;i++) {
+      is_int[i] = TRUE;
+   }
+
+   /* row rhs */
+   for (i=0;i<n;i++) {
+      rowrhs[i]   = obj_coeff[i];
+      rowrhs[n+i] = obj_coeff[i];
+   }
+   rowrhs[2*n]   = 0;
+   rowrhs[2*n+1] = 1;
+
+   /* obj */
+   obj[2*m+5*n+1] = 1;
+   
+   /* solve the mip */
+   sym_env = sym_open_environment();
+   sym_explicit_load_problem(sym_env, mip_n, mip_m, (int *)
+         mip_A->getVectorStarts(), (int *) mip_A->getIndices(), (double *)
+         mip_A->getElements(), collb, colub, is_int, obj, NULL, rowsen,
+         rowrhs, NULL, TRUE);
+   sym_set_int_param (sym_env, "should_solve_branch_feas_mip", FALSE);
+   sym_set_int_param (sym_env, "verbosity", -1);
+   sym_set_int_param (sym_env, "node_limit", br_mip_node_limit);
+   sym_set_int_param (sym_env, "time_limit", br_mip_time_limit);
+   sym_set_obj_sense (sym_env, br_mip_obj_sense);
+
+   /* write the mps file */
+   /*
+   printf("infinity = %g\n",si2->getInfinity());
+   const double *elem2 = mip_A->getElements();
+   const int *rows2 = mip_A->getIndices();
+   const int *starts2 = mip_A->getVectorStarts();
+   const int *len2 = mip_A->getVectorLengths();
+   for (i=0;i<mip_n;i++) {
+      si2->addCol(len2[i], &(rows2[starts2[i]]), &(elem2[starts2[i]]), 
+            collb[i], colub[i], obj[i]);
+   }
+   const double *rng2 = (double *)calloc(mip_m, DSIZE);
+   si2->loadProblem(*mip_A, collb, colub, obj, rowsen, rowrhs, rng2);
+   for (i=2*m+4*n;i<mip_n;i++) {
+      si2->setInteger(i);
+   }
+   si2->writeMps("branch.mps", "", si2->getObjSense());
+   exit(0);
+   */
+
+   /* find max and min coeffs */
+   /*
+   double mx = -infinity;
+   double mn = infinity;
+   for (i=0;i<mip_A->getNumElements();i++) {
+      if (elem2[i]>mx) {
+         mx = elem2[i];
+      }
+      if (elem2[i]<mn) {
+         mn = elem2[i];
+      }
+   }
+   printf ("max = %g\t min = %g\n",mx, mn);
+
+   mx = -infinity;
+   mn = infinity;
+   elem2 = A_matrix->getElements();
+   for (i=0;i<n;i++) {
+      for (j=A_matrix->getVectorStarts()[i];j<A_matrix->getVectorStarts()[i]+A_matrix->getVectorSize(i);j++) {
+         if (elem2[j]>mx) {
+            mx = elem2[j];
+         }
+         if (elem2[j]<mn) {
+            mn = elem2[j];
+         }
+      }
+   }
+   printf ("max = %g\t min = %g\n",mx, mn);
+   */
+
+   sym_solve(sym_env);
+   //exit(0);
+   if (sym_is_proven_optimal(sym_env)) {
+      is_proven_inf = TRUE;
+      sym_get_col_solution(sym_env, colsol);
+      for (i=0;i<n;i++) {
+         if (fabs(colsol[2*m+4*n+i])>0.001) {
+            printf("pi%5d\t%20.10f\n",i,colsol[2*m+4*n+i]);
+         }
+      }
+      printf("obj value = \t%20.10f\n",colsol[mip_n-1]);
+   }
+   if ((sym_get_obj_val(sym_env, &new_obj_val) !=
+            FUNCTION_TERMINATED_NORMALLY)) {
+      printf("br: branching hyperplane not found.\n");
    }
    sym_close_environment(sym_env);
 
