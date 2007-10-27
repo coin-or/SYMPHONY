@@ -29,7 +29,7 @@ EXTRA_DIST =
 
 SUBDIRS = $(subdirs)
 
-SUBDIRS += SYMPHONY FlopC++
+SUBDIRS += SYMPHONY
 #if ADD_GLPK
 #   SUBDIRS += ThirdParty/Glpk
 #endif

@@ -270,7 +270,7 @@ EXTRA_DIST = $(am__append_1)
 
 # subdirs is set by configure as the list of all subdirectories to recurse
 # into
-SUBDIRS = $(subdirs) SYMPHONY FlopC++
+SUBDIRS = $(subdirs) SYMPHONY
 
 ########################################################################
 #                         Maintainer Stuff                             #
