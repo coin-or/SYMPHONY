@@ -482,7 +482,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS LT_LDFLAGS COIN_HAS_READLINE_TRUE COIN_HAS_READLINE_FALSE SYMPHONYSRCDIR SYMPHONYOBJDIR COIN_HAS_SYMPHONY_TRUE COIN_HAS_SYMPHONY_FALSE COINUTILSSRCDIR COINUTILSOBJDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE DATASRCDIR DATAOBJDIR COIN_HAS_DATA_TRUE COIN_HAS_DATA_FALSE CLPSRCDIR CLPOBJDIR COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE OSISRCDIR OSIOBJDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CGLSRCDIR CGLOBJDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CPXINCDIR CPXLIB COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE GLPKINCDIR GLPKLIB COIN_HAS_GLPK_TRUE COIN_HAS_GLPK_FALSE COIN_BUILD_GLPK_TRUE COIN_BUILD_GLPK_FALSE OSLINCDIR OSLLIB COIN_HAS_OSL_TRUE COIN_HAS_OSL_FALSE SPXINCDIR SPXLIB COIN_HAS_SPX_TRUE COIN_HAS_SPX_FALSE XPRINCDIR XPRLIB COIN_HAS_XPR_TRUE COIN_HAS_XPR_FALSE CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE GLPK_LP_SOLVER_TRUE GLPK_LP_SOLVER_FALSE OSL_LP_SOLVER_TRUE OSL_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE SOPLEX_LP_SOLVER_TRUE SOPLEX_LP_SOLVER_FALSE XPRESS_LP_SOLVER_TRUE XPRESS_LP_SOLVER_FALSE USE_CGL_CUTS_TRUE USE_CGL_CUTS_FALSE USE_GMPL_TRUE USE_GMPL_FALSE SENSITIVITY_ANALYSIS_TRUE SENSITIVITY_ANALYSIS_FALSE ROOT_NODE_ONLY_TRUE ROOT_NODE_ONLY_FALSE COMPILE_FRAC_BRANCHING_TRUE COMPILE_FRAC_BRANCHING_FALSE DO_TESTS_TRUE DO_TESTS_FALSE TM_BASIS_TESTS_TRUE TM_BASIS_TESTS_FALSE TRACE_PATH_TRUE TRACE_PATH_FALSE CHECK_CUT_VALIDITY_TRUE CHECK_CUT_VALIDITY_FALSE STATISTICS_TRUE STATISTICS_FALSE PSEUDO_COSTS_TRUE PSEUDO_COSTS_FALSE DRAWGRAPH_TRUE DRAWGRAPH_FALSE STATICEXE_TRUE STATICEXE_FALSE SIGHANDLER_TRUE SIGHANDLER_FALSE SYM_WITH_APPL_TRUE SYM_WITH_APPL_FALSE SYM_COMPILE_IN_CG_TRUE SYM_COMPILE_IN_CG_FALSE SYM_COMPILE_IN_CP_TRUE SYM_COMPILE_IN_CP_FALSE SYM_COMPILE_IN_LP_TRUE SYM_COMPILE_IN_LP_FALSE SYM_COMPILE_IN_TM_TRUE SYM_COMPILE_IN_TM_FALSE SYM_PARALLEL_TRUE SYM_PARALLEL_FALSE WHATTOMAKELIBS WHATTOMAKEBINS LPEXT CPEXT TMEXT MASTEREXT OPENMP_TRUE OPENMP_FALSE SYMINCDIR SYMSRCDIR SYMDEFS SYMPDEFS ARCH COIN_HAS_CLP SYMAPPLDIR CLLCFLAGS USE_CL_TRUE USE_CL_FALSE LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS LT_LDFLAGS COIN_HAS_READLINE_TRUE COIN_HAS_READLINE_FALSE SYMPHONYSRCDIR SYMPHONYOBJDIR COIN_HAS_SYMPHONY_TRUE COIN_HAS_SYMPHONY_FALSE COINUTILSSRCDIR COINUTILSOBJDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE DATASRCDIR DATAOBJDIR COIN_HAS_DATA_TRUE COIN_HAS_DATA_FALSE OSISRCDIR OSIOBJDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CGLSRCDIR CGLOBJDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CPXINCDIR CPXLIB COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE OSLINCDIR OSLLIB COIN_HAS_OSL_TRUE COIN_HAS_OSL_FALSE SPXINCDIR SPXLIB COIN_HAS_SPX_TRUE COIN_HAS_SPX_FALSE XPRINCDIR XPRLIB COIN_HAS_XPR_TRUE COIN_HAS_XPR_FALSE GLPKINCDIR GLPKLIB COIN_HAS_GLPK_TRUE COIN_HAS_GLPK_FALSE COIN_BUILD_GLPK_TRUE COIN_BUILD_GLPK_FALSE COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE CLPSRCDIR CLPOBJDIR CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE GLPK_LP_SOLVER_TRUE GLPK_LP_SOLVER_FALSE OSL_LP_SOLVER_TRUE OSL_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE SOPLEX_LP_SOLVER_TRUE SOPLEX_LP_SOLVER_FALSE XPRESS_LP_SOLVER_TRUE XPRESS_LP_SOLVER_FALSE USE_CGL_CUTS_TRUE USE_CGL_CUTS_FALSE USE_GMPL_TRUE USE_GMPL_FALSE SENSITIVITY_ANALYSIS_TRUE SENSITIVITY_ANALYSIS_FALSE ROOT_NODE_ONLY_TRUE ROOT_NODE_ONLY_FALSE COMPILE_FRAC_BRANCHING_TRUE COMPILE_FRAC_BRANCHING_FALSE DO_TESTS_TRUE DO_TESTS_FALSE TM_BASIS_TESTS_TRUE TM_BASIS_TESTS_FALSE TRACE_PATH_TRUE TRACE_PATH_FALSE CHECK_CUT_VALIDITY_TRUE CHECK_CUT_VALIDITY_FALSE STATISTICS_TRUE STATISTICS_FALSE PSEUDO_COSTS_TRUE PSEUDO_COSTS_FALSE DRAWGRAPH_TRUE DRAWGRAPH_FALSE STATICEXE_TRUE STATICEXE_FALSE SIGHANDLER_TRUE SIGHANDLER_FALSE SYM_WITH_APPL_TRUE SYM_WITH_APPL_FALSE SYM_COMPILE_IN_CG_TRUE SYM_COMPILE_IN_CG_FALSE SYM_COMPILE_IN_CP_TRUE SYM_COMPILE_IN_CP_FALSE SYM_COMPILE_IN_LP_TRUE SYM_COMPILE_IN_LP_FALSE SYM_COMPILE_IN_TM_TRUE SYM_COMPILE_IN_TM_FALSE SYM_PARALLEL_TRUE SYM_PARALLEL_FALSE WHATTOMAKELIBS WHATTOMAKEBINS LPEXT CPEXT TMEXT MASTEREXT OPENMP_TRUE OPENMP_FALSE SYMINCDIR SYMSRCDIR SYMDEFS SYMPDEFS ARCH COIN_HAS_CLP SYMAPPLDIR CLLCFLAGS USE_CL_TRUE USE_CL_FALSE LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1105,8 +1105,6 @@ Optional Features:
   --enable-gnu-packages   compile with GNU packages (disabled by default)
   --enable-cplex-libcheck use disable-cplex-libcheck to skip the
                           link check at configuration time
-  --enable-glpk-libcheck use disable-glpk-libcheck to skip the
-                          link check at configuration time
   --enable-osl-libcheck use disable-osl-libcheck to skip the link
                           check at configuration time
   --enable-soplex-libcheck
@@ -1114,6 +1112,8 @@ Optional Features:
                           link check at configuration time
   --enable-xpress-libcheck
                           use disable-xpress-libcheck to skip the
+                          link check at configuration time
+  --enable-glpk-libcheck use disable-glpk-libcheck to skip the
                           link check at configuration time
   --disable-cgl-cuts      disable generic cut generation
   --enable-sensitivity-analysis
@@ -1150,14 +1150,14 @@ Optional Packages:
                           include additional configurations [automatic]
   --with-cplex-incdir specify the header file directory for library Cplex
   --with-cplex-lib specify the flags used to link with the library Cplex
-  --with-glpk-incdir specify the header file directory for library Glpk
-  --with-glpk-lib specify the flags used to link with the library Glpk
   --with-osl-incdir specify the header file directory for library Osl
   --with-osl-lib specify the flags used to link with the library Osl
   --with-soplex-incdir specify the header file directory for library Soplex
   --with-soplex-lib specify the flags used to link with the library Soplex
   --with-xpress-incdir specify the header file directory for library Xpress
   --with-xpress-lib specify the flags used to link with the library Xpress
+  --with-glpk-incdir specify the header file directory for library Glpk
+  --with-glpk-lib specify the flags used to link with the library Glpk
   --with-lp-solver[=lpsolver]
                           specify the LP solver in small letters(default
                           lpsolver=clp)
@@ -20781,62 +20781,6 @@ fi
 echo "$as_me:$LINENO: result: $coin_has_data" >&5
 echo "${ECHO_T}$coin_has_data" >&6
 
-echo "$as_me:$LINENO: checking for COIN project Clp" >&5
-echo $ECHO_N "checking for COIN project Clp... $ECHO_C" >&6
-
-# First check, if the sub-project is actually available (ToDo: allow
-# other locations)
-
-coin_has_clp=unavailable
-if test x"$COIN_SKIP_PROJECTS" != x; then
-  for dir in $COIN_SKIP_PROJECTS; do
-    if test $dir = Clp; then
-      coin_has_clp=skipping
-    fi
-  done
-fi
-
-if test $coin_has_clp != skipping; then
-  if test $PACKAGE_TARNAME = clp; then
-    coin_has_clp=.
-  else
-    if test -d $srcdir/../Clp; then
-      coin_has_clp=../Clp
-    fi
-  fi
-fi
-
-if test $coin_has_clp != unavailable &&
-   test $coin_has_clp != skipping; then
-  # Set the #define if the component is available
-
-cat >>confdefs.h <<\_ACEOF
-#define COIN_HAS_CLP 1
-_ACEOF
-
-
-  # Set the variables for source and object code location
-
-  CLPSRCDIR=`cd $srcdir/$coin_has_clp; pwd`
-
-  CLPOBJDIR=`pwd`/$coin_has_clp
-fi
-
-  # Define the Makefile conditional
-
-
-if test $coin_has_clp != unavailable &&
-                test $coin_has_clp != skipping; then
-  COIN_HAS_CLP_TRUE=
-  COIN_HAS_CLP_FALSE='#'
-else
-  COIN_HAS_CLP_TRUE='#'
-  COIN_HAS_CLP_FALSE=
-fi
-
-echo "$as_me:$LINENO: result: $coin_has_clp" >&5
-echo "${ECHO_T}$coin_has_clp" >&6
-
 echo "$as_me:$LINENO: checking for COIN project Osi" >&5
 echo $ECHO_N "checking for COIN project Osi... $ECHO_C" >&6
 
@@ -20948,6 +20892,7 @@ fi
 
 echo "$as_me:$LINENO: result: $coin_has_cgl" >&5
 echo "${ECHO_T}$coin_has_cgl" >&6
+
 
 #############################################################################
 #                            Third party solvers                            #
@@ -21138,6 +21083,8 @@ fi
 
 
 
+<<<<<<< .mine
+=======
 if test "$PACKAGE_NAME" = ThirdPartyGlpk; then
   coin_glpkobjdir=../Glpk
 else
@@ -21399,6 +21346,7 @@ fi
 
 
 
+>>>>>>> .r1156
   echo "$as_me:$LINENO: checking if user provides library for Osl" >&5
 echo $ECHO_N "checking if user provides library for Osl... $ECHO_C" >&6
 
@@ -21901,7 +21849,62 @@ case $sym_lp_solver in
    clp)
     echo "$as_me:$LINENO: result: Clp" >&5
 echo "${ECHO_T}Clp" >&6
-#    AC_COIN_HAS_PROJECT(Clp)
+    echo "$as_me:$LINENO: checking for COIN project Clp" >&5
+echo $ECHO_N "checking for COIN project Clp... $ECHO_C" >&6
+
+# First check, if the sub-project is actually available (ToDo: allow
+# other locations)
+
+coin_has_clp=unavailable
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = Clp; then
+      coin_has_clp=skipping
+    fi
+  done
+fi
+
+if test $coin_has_clp != skipping; then
+  if test $PACKAGE_TARNAME = clp; then
+    coin_has_clp=.
+  else
+    if test -d $srcdir/../Clp; then
+      coin_has_clp=../Clp
+    fi
+  fi
+fi
+
+if test $coin_has_clp != unavailable &&
+   test $coin_has_clp != skipping; then
+  # Set the #define if the component is available
+
+cat >>confdefs.h <<\_ACEOF
+#define COIN_HAS_CLP 1
+_ACEOF
+
+
+  # Set the variables for source and object code location
+
+  CLPSRCDIR=`cd $srcdir/$coin_has_clp; pwd`
+
+  CLPOBJDIR=`pwd`/$coin_has_clp
+fi
+
+  # Define the Makefile conditional
+
+
+if test $coin_has_clp != unavailable &&
+                test $coin_has_clp != skipping; then
+  COIN_HAS_CLP_TRUE=
+  COIN_HAS_CLP_FALSE='#'
+else
+  COIN_HAS_CLP_TRUE='#'
+  COIN_HAS_CLP_FALSE=
+fi
+
+echo "$as_me:$LINENO: result: $coin_has_clp" >&5
+echo "${ECHO_T}$coin_has_clp" >&6
+
      if test $coin_has_clp = unavailable ||
                 test $coin_has_clp = skipping; then
          found_package=false
@@ -23384,13 +23387,6 @@ echo "$as_me: error: conditional \"COIN_HAS_DATA\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${COIN_HAS_CLP_TRUE}" && test -z "${COIN_HAS_CLP_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_CLP\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"COIN_HAS_CLP\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${COIN_HAS_OSI_TRUE}" && test -z "${COIN_HAS_OSI_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_OSI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -23412,27 +23408,6 @@ echo "$as_me: error: conditional \"COIN_HAS_CPX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${COIN_HAS_GLPK_TRUE}" && test -z "${COIN_HAS_GLPK_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_GLPK\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"COIN_HAS_GLPK\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${COIN_HAS_GLPK_TRUE}" && test -z "${COIN_HAS_GLPK_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_GLPK\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"COIN_HAS_GLPK\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${COIN_BUILD_GLPK_TRUE}" && test -z "${COIN_BUILD_GLPK_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"COIN_BUILD_GLPK\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"COIN_BUILD_GLPK\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${COIN_HAS_OSL_TRUE}" && test -z "${COIN_HAS_OSL_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_OSL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -23451,6 +23426,13 @@ if test -z "${COIN_HAS_XPR_TRUE}" && test -z "${COIN_HAS_XPR_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_XPR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"COIN_HAS_XPR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COIN_HAS_CLP_TRUE}" && test -z "${COIN_HAS_CLP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_CLP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COIN_HAS_CLP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -24327,10 +24309,6 @@ s,@DATASRCDIR@,$DATASRCDIR,;t t
 s,@DATAOBJDIR@,$DATAOBJDIR,;t t
 s,@COIN_HAS_DATA_TRUE@,$COIN_HAS_DATA_TRUE,;t t
 s,@COIN_HAS_DATA_FALSE@,$COIN_HAS_DATA_FALSE,;t t
-s,@CLPSRCDIR@,$CLPSRCDIR,;t t
-s,@CLPOBJDIR@,$CLPOBJDIR,;t t
-s,@COIN_HAS_CLP_TRUE@,$COIN_HAS_CLP_TRUE,;t t
-s,@COIN_HAS_CLP_FALSE@,$COIN_HAS_CLP_FALSE,;t t
 s,@OSISRCDIR@,$OSISRCDIR,;t t
 s,@OSIOBJDIR@,$OSIOBJDIR,;t t
 s,@COIN_HAS_OSI_TRUE@,$COIN_HAS_OSI_TRUE,;t t
@@ -24343,12 +24321,6 @@ s,@CPXINCDIR@,$CPXINCDIR,;t t
 s,@CPXLIB@,$CPXLIB,;t t
 s,@COIN_HAS_CPX_TRUE@,$COIN_HAS_CPX_TRUE,;t t
 s,@COIN_HAS_CPX_FALSE@,$COIN_HAS_CPX_FALSE,;t t
-s,@GLPKINCDIR@,$GLPKINCDIR,;t t
-s,@GLPKLIB@,$GLPKLIB,;t t
-s,@COIN_HAS_GLPK_TRUE@,$COIN_HAS_GLPK_TRUE,;t t
-s,@COIN_HAS_GLPK_FALSE@,$COIN_HAS_GLPK_FALSE,;t t
-s,@COIN_BUILD_GLPK_TRUE@,$COIN_BUILD_GLPK_TRUE,;t t
-s,@COIN_BUILD_GLPK_FALSE@,$COIN_BUILD_GLPK_FALSE,;t t
 s,@OSLINCDIR@,$OSLINCDIR,;t t
 s,@OSLLIB@,$OSLLIB,;t t
 s,@COIN_HAS_OSL_TRUE@,$COIN_HAS_OSL_TRUE,;t t
@@ -24361,6 +24333,16 @@ s,@XPRINCDIR@,$XPRINCDIR,;t t
 s,@XPRLIB@,$XPRLIB,;t t
 s,@COIN_HAS_XPR_TRUE@,$COIN_HAS_XPR_TRUE,;t t
 s,@COIN_HAS_XPR_FALSE@,$COIN_HAS_XPR_FALSE,;t t
+s,@GLPKINCDIR@,$GLPKINCDIR,;t t
+s,@GLPKLIB@,$GLPKLIB,;t t
+s,@COIN_HAS_GLPK_TRUE@,$COIN_HAS_GLPK_TRUE,;t t
+s,@COIN_HAS_GLPK_FALSE@,$COIN_HAS_GLPK_FALSE,;t t
+s,@COIN_BUILD_GLPK_TRUE@,$COIN_BUILD_GLPK_TRUE,;t t
+s,@COIN_BUILD_GLPK_FALSE@,$COIN_BUILD_GLPK_FALSE,;t t
+s,@COIN_HAS_CLP_TRUE@,$COIN_HAS_CLP_TRUE,;t t
+s,@COIN_HAS_CLP_FALSE@,$COIN_HAS_CLP_FALSE,;t t
+s,@CLPSRCDIR@,$CLPSRCDIR,;t t
+s,@CLPOBJDIR@,$CLPOBJDIR,;t t
 s,@CLP_LP_SOLVER_TRUE@,$CLP_LP_SOLVER_TRUE,;t t
 s,@CLP_LP_SOLVER_FALSE@,$CLP_LP_SOLVER_FALSE,;t t
 s,@GLPK_LP_SOLVER_TRUE@,$GLPK_LP_SOLVER_TRUE,;t t

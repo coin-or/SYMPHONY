@@ -71,20 +71,16 @@ As an instance for the second case, running
 will set the configuration to compile the source files with debugging
 flag. 
 
-In order to read GMPL files, you need to have the GLPK package and SYMPHONY
-has to be configured with
-
-  ./configure --with-gmpl --with-glpk-lib="-L/usr/lib -lglpk" 
-              --with-glpk-incdir=/usr/include 
-
-assuming that the GLPK library and header files are located in 
-/usr/lib and /usr/include directories. 
+In order to read GMPL files, you need to have the GLPK package install. To
+install itautomatically, run the "get.Glpk" script in the
+ThirdParty/Glpk directory. After that, Glpk should be built and
+linked automatically, enabling the ability to read GMPL files.
 
 It is possible to use compilers oter than the default (which is g++). For
 example, to perform at automated build of SYMPHONY using the MSVC++ compiler
 'cl' with GNU autotools in the CYGWIN environment configure with
 
- ./configure CC=cl CXX=cl LD=link
+ ./configure --enable-doscompile=msvc
 
 BUILDING
 ========
@@ -102,16 +98,14 @@ install SYMPHONY. By default, the library 'libSym' and the executable
 'include/', can then be used to call SYMPHONY from any C/C++ code. The API for
 this is described in the user's manual. The executable can also be used for
 solving generic MILP problems in MPS or GMPL format. In order to read GMPL
-files, you need to have the GLPK package and SYMPHONY has to be configured
-with
+files, you need to have the GLPK package install. To install itautomatically,
+run the "get.Glpk" script in the ThirdParty/Glpk directory. After that, Glpk
+should be built and linked automatically, enabling the ability to read GMPL
+files.
 
-  ./configure --with-gmpl --with-glpk-lib[=GLPK library] 
-              --with-glpk-incdir[=GLPK include dir] 
-
-
-For more pwerful modeling interface, FlopC++ can also be used to obtain a
+For a more powerful modeling interface, FlopC++ can also be used to obtain a
 capability similar to ILOG's Concert technology for building math programming
-models (see SYMPHONY/Examples/FLOPC++). 
+models (see SYMPHONY/Examples/FLOPC++).
 
 If you are planning to use the interactive optimizer, it is recommended to run
 the configuration script with
@@ -344,7 +338,7 @@ compiler 'cl' with GNU autotools in the CYGWIN environment. To do so, follow
 the instuctions for building in Unix-like environments, except when
 configuring, use the command
 
- ./configure CC=cl CXX=cl LD=link
+ ./configure --enable-doscompile=msvc
 
 ******************** Building With the NMAKE Utility **************************
 
