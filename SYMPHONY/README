@@ -1,4 +1,4 @@
-SYMPHONY Version 5.1.4 README
+SYMPHONY Version 5.1.5 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Common Public License
@@ -23,6 +23,12 @@ http://projects.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
+
+Release 5.1.5:
+
+1. Added support for automatic download and build of Glpk.
+
+2. Minor bugs fixed and compiler warnings eliminated.
 
 Release 5.1.4:
 
