@@ -1,0 +1,122 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "libCgl"="..\..\..\..\..\Win32\v6\Cgl\libCgl\libCgl.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "libClp"="..\..\..\..\..\Win32\v6\Clp\libClp\libClp.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "libCoinUtils"="..\..\..\..\..\Win32\v6\CoinUtils\libCoinUtils\libCoinUtils.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "libOsi"="..\..\..\..\..\Win32\v6\Osi\libOsi\libOsi.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "libOsiClp"="..\..\..\..\..\Win32\v6\Osi\libOsiClp\libOsiClp.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "libSymphony"=".\libSymphony.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "spp"=".\spp.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libCgl
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name libClp
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name libCoinUtils
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name libOsi
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name libOsiClp
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name symphonyLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name libSymphony
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+
