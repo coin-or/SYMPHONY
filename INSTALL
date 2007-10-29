@@ -257,7 +257,8 @@ command-line with MSVC++ executable, or use the NMAKE utility.
 These instructions are for MSVC++ Version 8. Instructions for other versions
 should be similar.
 
-1. Go to 'Win32/v8' directory and open the solution file 'symphony.sln'. 
+1. Go to 'MSVisualStudio/v8' directory and open the solution file
+'symphony.sln'.
 
 2. Note that there are a number of additional preprocessor definitions that
 control the functionality of SYMPHONY. These definitions are described in
@@ -295,7 +296,7 @@ LP solvers.
 These instructions are for MSVC++ Version 8. Instructions for other versions
 should be similar.
 
-1. Open a command line terminal. Go to 'Win32/v6' directory and type 
+1. Open a command line terminal. Go to 'MSVisualStudio/v8' directory and type 
 
    devenv symphony.sln /build all    
 
@@ -342,13 +343,12 @@ configuring, use the command
 
 ******************** Building With the NMAKE Utility **************************
 
-1.  Go to 'Win32' directory and edit the 'sym.mak' makefile to reflect 
-your environment. This involves specifying the LP solver to be used, 
-assigning some variables and  setting various paths. Only minor edits 
-should be required. An explanation of what has to be set is contained in the 
-comments in the makefile.  Note that, you have to first create the COIN 
-libraries Cgl, Clp, Osi, OsiClp and CoinUtils which reside in Win32/v8 
-directory.
+1. Go to 'MSVisualStudio' directory and edit the 'sym.mak' makefile to reflect
+your environment. This involves specifying the LP solver to be used, assigning
+some variables and setting various paths. Only minor edits should be required.
+An explanation of what has to be set is contained in the comments in the
+makefile. Note that, you have to first create the COIN libraries Cgl, Clp,
+Osi, OsiClp and CoinUtils which reside in MSVisualStudio/v8 directory.
 
 2. Once configuration is done, open a command line terminal and type 
 

@@ -122,34 +122,34 @@ Here is a sketch outline of how to compile the SYMPHONY USER
 application in Microsoft Windows. For information on developing your own
 applications, please see the quick start guide below or the detailed
 explanation in the user's manual. Direct support is provided for compilation
-under MS Visual Studio 6.0. Compilation for other compilers should also be
+under MS Visual Studio 8. Compilation for other compilers should also be
 possible. Note that the Windows version has some limitations. Detailed timing
 information is not currently provided.  Support is only provided for running
 in sequential mode at this time.
 
 First, download SYMPHONY and unpack the archive if it is required. 
 You now have three options. You can either compile on the command-line using 
-automated MSDEV build system or NMAKE utility or you can use the provided 
+automated DEVENV build system or NMAKE utility or you can use the provided 
 projects and workspaces. Note that, in Windows, it is not recommended to 
 move USER package from the SYMPHONY package. Otherwise, the user has 
 to redefine all the paths to SYMPHONY and COIN header files as well as 
 the paths to COIN project files. For all of the following options, first 
-go to the SYMPHONY/Appliacations/USER/Win32/v6 directory. 
+go to the SYMPHONY/Applications/USER/MSVisualStudio/v8 directory. 
 
-************************ Using MSDEV Utility *********************************
+***************** Building in a Windows Terminal ***************************
 
 1. Open a command line terminal and type
 
-   msdev user.dsw /make all    
+   devenv user.dsw /make all    
 
 This will create both the debug and release versions of SYMPHONY. If you 
 want to compile only one of them, type 
  
-   msdev user.dsw /make "all - debug" 
+   devenv user.dsw /make "all - debug" 
 
 or 
 
-   msdev user.dsw /make "all - release" 
+   devenv user.dsw /make "all - release" 
 
 For each command, the executable 'user.exe' will be created in 'Debug' 
 and/or 'Release' directories.
@@ -160,18 +160,18 @@ and/or 'Release' directories.
 
 3. If USER is modified, type 
 
-   msdev user.dsw /make all /rebuild
+   devenv user.dsw /make all /rebuild
 
 in order to clean and rebuild everything. 
 
 ******************** Using the NMAKE Utility *********************************
 
-1. Edit the file Win32\v6\user.mak to reflect your environment. This involves 
-specifying the LP solver to be used and various paths. Only minor edits should 
-be required. An explanation of what has to be set is contained in the comments 
-in the makefile.  Note that, you have to first create the COIN libraries
-Cgl, Clp, Osi, OsiClp and CoinUtils which reside in Win32 directory of the 
-root directory of SYMPHONY package.
+1. Edit the file MSVisualStudio\v8\user.mak to reflect your environment. This
+involves specifying the LP solver to be used and various paths. Only minor
+edits should be required. An explanation of what has to be set is contained in
+the comments in the makefile. Note that, you have to first create the COIN
+libraries Cgl, Clp, Osi, OsiClp and CoinUtils which reside in MSVisualStudio
+directory of the root directory of SYMPHONY package.
 
 2. Once configuration is done, open a command line terminal and type
 

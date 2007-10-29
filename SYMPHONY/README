@@ -26,9 +26,14 @@ WHAT'S NEW
 
 Release 5.1.5:
 
-1. Added support for automatic download and build of Glpk.
+1. Added support for automatic download and build of Glpk (for reading of GMPL
+files).
 
 2. Minor bugs fixed and compiler warnings eliminated.
+
+3. Updates to MS Visual Studio files.
+
+4. Added short installation verification test.
 
 Release 5.1.4:
 
