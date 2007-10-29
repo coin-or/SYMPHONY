@@ -1,7 +1,7 @@
-BuildTools  https://projects.coin-or.org/svn/BuildTools/releases/0.5.16
-Data/Sample  https://projects.coin-or.org/svn/Data/releases/1.0.4/Sample
-CoinUtils  https://projects.coin-or.org/svn/CoinUtils/releases/2.1.2/CoinUtils
-Cgl  https://projects.coin-or.org/svn/Cgl/releases/0.51.0/Cgl
-Clp  https://projects.coin-or.org/svn/Clp/releases/1.6.0/Clp
-Osi  https://projects.coin-or.org/svn/Osi/releases/0.97.0/Osi
-ThirdParty/Glpk  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Glpk/releases/1.1.1
+BuildTools  https://projects.coin-or.org/svn/BuildTools/stable/0.5
+Data/Sample  https://projects.coin-or.org/svn/Data/stable/1.0/Sample
+CoinUtils  https://projects.coin-or.org/svn/CoinUtils/stable/2.1/CoinUtils
+Cgl  https://projects.coin-or.org/svn/Cgl/stable/0.51/Cgl
+Clp  https://projects.coin-or.org/svn/Clp/stable/1.6/Clp
+Osi  https://projects.coin-or.org/svn/Osi/stable/0.97/Osi
+ThirdParty/Glpk  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Glpk/stable/1.1
