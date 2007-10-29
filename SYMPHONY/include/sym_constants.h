@@ -579,4 +579,5 @@
 #define DO_NOT_TRIM          0
 #define TRIM_LEVEL           1
 #define TRIM_INDEX           2
+#define ON_CRU_VARS          3
 #endif

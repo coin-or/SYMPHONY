@@ -408,6 +408,8 @@ typedef struct MIPDESC{
    int        change_num;  /* number of updates on the mip desc */
    int        change_type[MAX_CHANGE_NUM];  /* type of the mip desc. changes */
    int        new_col_num; /* used only when new cols added */
+   int        cru_vars_num;
+   int       *cru_vars; 
 }MIPdesc;
 
 /*===========================================================================*\

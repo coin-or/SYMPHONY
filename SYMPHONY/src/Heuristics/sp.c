@@ -32,7 +32,7 @@ int sp_add_solution (lp_prob *p, int cnt, int *indices, double *values, double o
       /* delete first solution and move everything up by 1 */
       sp_delete_solution(sp,0);
       for (int i=0;i<(sp->max_solutions-1);i++) {
-	 sp->solutions[i] = sp->solutions[i+1];
+         sp->solutions[i] = sp->solutions[i+1];
       }
    }
    sp_solution *sol = sp->solutions[sp->num_solutions];

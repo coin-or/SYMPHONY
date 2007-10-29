@@ -682,7 +682,7 @@ int is_feasible_u(lp_prob *p, char branching)
 #ifdef PRIMAL_HEURISTICS
    if (feasible == IP_FEASIBLE) {
       if (p->tm->par.warm_search_enabled>0) {
-	 sp_add_solution(p, cnt, indices, values, p->lp_data->objval, p->bc_index);
+         sp_add_solution(p, cnt, indices, values, p->lp_data->objval, p->bc_index);
       }
    } else if (p->tm->par.warm_search_enabled>0 && !branching) {
       int termcode = warm_search (p, indices, values, cnt, lpetol, heur_solution, new_obj_val, is_feasible);
@@ -713,62 +713,66 @@ int is_feasible_u(lp_prob *p, char branching)
    }
 
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE ||
-       feasible == IP_HEUR_FEASIBLE){
+         feasible == IP_HEUR_FEASIBLE){
       /* Send the solution value to the treemanager */
       if (p->has_ub && true_objval >= p->ub - p->par.granularity){
-	 FREE(heur_solution);
-	 FREE(col_sol);
-	 if (!p->par.multi_criteria){
-	    PRINT(p->par.verbosity, -1,
-		  ("\n* Found Another Feasible Solution.\n"));
-	    if (p->mip->obj_sense == SYM_MAXIMIZE){
-	       PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
-			+ p->mip->obj_offset));
-	    }else{
-	       PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
-			+ p->mip->obj_offset));
-	    }
-	 }
-	 return(feasible);
+         FREE(heur_solution);
+         FREE(col_sol);
+         if (!p->par.multi_criteria){
+            PRINT(p->par.verbosity, -1,
+                  ("\n* Found Another Feasible Solution.\n"));
+            if (p->mip->obj_sense == SYM_MAXIMIZE){
+               PRINT(p->par.verbosity, 0, ("* Cost: %f\n\n", -true_objval
+                        + p->mip->obj_offset));
+            }else{
+               PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
+                        + p->mip->obj_offset));
+            }
+         }
+         return(feasible);
       }
       p->has_ub = TRUE;
       p->ub = true_objval;
       if (p->par.set_obj_upper_lim)
-	 set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
+         set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
       if (!p->par.multi_criteria){
-	 p->best_sol.xlevel = p->bc_level;
-	 p->best_sol.xindex = p->bc_index;
-	 p->best_sol.xiter_num = p->iter_num;
-	 p->best_sol.xlength = cnt;
-	 p->best_sol.lpetol = lpetol;
-	 p->best_sol.objval = true_objval;
-	 FREE(p->best_sol.xind);
-	 FREE(p->best_sol.xval);
-	 p->best_sol.xind = (int *) malloc(cnt*ISIZE);
-	 p->best_sol.xval = (double *) malloc(cnt*DSIZE);
-	 memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
-	 memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
-	 if(!p->best_sol.has_sol)
-	    p->best_sol.has_sol = TRUE;
-	 PRINT(p->par.verbosity, 0,
-	       ("\n****** Found Better Feasible Solution !\n"));
-	 if (feasible == IP_HEUR_FEASIBLE){
-	    PRINT(p->par.verbosity, 2,
-		  ("****** After Calling Heuristics !\n"));
-	 }
-	 if (p->mip->obj_sense == SYM_MAXIMIZE){
-	    PRINT(p->par.verbosity, 1, ("****** Cost: %f\n\n", -true_objval
-					+ p->mip->obj_offset));
-	 }else{
-	    PRINT(p->par.verbosity, 1, ("****** Cost: %f\n\n", true_objval
-					+ p->mip->obj_offset));
-	 }
+         p->best_sol.xlevel = p->bc_level;
+         p->best_sol.xindex = p->bc_index;
+         p->best_sol.xiter_num = p->iter_num;
+         p->best_sol.xlength = cnt;
+         p->best_sol.lpetol = lpetol;
+         p->best_sol.objval = true_objval;
+         FREE(p->best_sol.xind);
+         FREE(p->best_sol.xval);
+         p->best_sol.xind = (int *) malloc(cnt*ISIZE);
+         p->best_sol.xval = (double *) malloc(cnt*DSIZE);
+         memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
+         memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
+         if(!p->best_sol.has_sol)
+            p->best_sol.has_sol = TRUE;
+         if (feasible == IP_HEUR_FEASIBLE) {
+            PRINT(p->par.verbosity,-1,("heuristic: "));
+         } else {
+            PRINT(p->par.verbosity,-1,("lp: "));
+         }
+         PRINT(p->par.verbosity, -1,
+               (" Found Better Feasible Solution ! "));
+         if (feasible == IP_HEUR_FEASIBLE){
+            PRINT(p->par.verbosity, 2,
+                  ("****** After Calling Heuristics !\n"));
+         }
+         if (p->mip->obj_sense == SYM_MAXIMIZE){
+            PRINT(p->par.verbosity, -1, ("****** Cost: %f time = %f\n\n", -true_objval+ p->mip->obj_offset, wall_clock(NULL) - p->tm->start_time ));
+         }else{
+            PRINT(p->par.verbosity, -1, ("****** Cost: %f time = %f\n\n", true_objval
+                     + p->mip->obj_offset, wall_clock(NULL) - p->tm->start_time ));
+         }
       }
 #ifdef COMPILE_IN_LP
       install_new_ub(p->tm, p->ub, p->proc_index, p->bc_index, branching,
-		     feasible);
+            feasible);
       if (!p->par.multi_criteria){
-	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);
+         display_lp_solution_u(p, DISP_FEAS_SOLUTION);
       }
 #else
       s_bufid = init_send(DataInPlace);

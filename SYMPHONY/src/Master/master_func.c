@@ -531,15 +531,17 @@ int resolve_node(sym_environment *env, bc_node *node)
 /*===========================================================================*/
 /*===========================================================================*/
 
-void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
+int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num, int *cuts_ind, char *cru_vars, 
+		      int change_type)
 {
 
    int i, resolve = 0;
+   char deletable = TRUE;   
 
    if (root){
-      if(env->warm_start->trim_tree){
-	 check_trim_tree(env, root, change_type);
-      }
+
+      check_trim_tree(env, root, cut_num, cuts_ind, change_type);
+      
       if (root->node_status == NODE_STATUS__PRUNED || 
 	  root->node_status == NODE_STATUS__INTERRUPTED || 
 	  root->feasibility_status == PRUNED_HAS_CAN_SOLUTION || 
@@ -555,12 +557,15 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 	   
 	   if (root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION && 
 	       root->bobj.child_num > 0){
+	      for(i = 0; i<root->bobj.child_num; i++){
+		 if(!update_tree_bound(env, root->children[i], cut_num, cuts_ind, cru_vars, change_type)){
+		    deletable = FALSE;
+		 }
+	      }
 	      if(change_type == COL_BOUNDS_CHANGED && root->bobj.child_num > 0){
 		 update_branching_decisions(env, root, change_type);
-	      }
-	      for(i = 0; i<root->bobj.child_num; i++){
-		 update_tree_bound(env, root->children[i], change_type);
-	      }
+	      }	      
+
 	   } else{
 	      if(root->node_status == NODE_STATUS__WSPRUNED) 
 		 root->node_status = NODE_STATUS__PRUNED;		 
@@ -588,14 +593,16 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 		  }else{
 		     resolve_node(env, root);
 		  }		  
-	       }
-	    } else {	       
+	       } 
+	    } else {		              
 	       if(change_type == COL_BOUNDS_CHANGED && root->bobj.child_num > 0){
 		  update_branching_decisions(env, root, change_type);
 	       }
 	       for(i = 0; i<root->bobj.child_num; i++){
-		  update_tree_bound(env, root->children[i], change_type);
-	       }
+		  if(!update_tree_bound(env, root->children[i], cut_num, cuts_ind, cru_vars, change_type)){
+		     deletable = FALSE;
+		  }
+	       }	    
 	    }
 	 }else{ 
 	    if(root->node_status == NODE_STATUS__WSPRUNED) 
@@ -609,9 +616,63 @@ void update_tree_bound(sym_environment *env, bc_node *root, int change_type)
 	    }
 	 }
       }
+
       /* should be before resolve!!!*/
       if(change_type == COLS_ADDED){
 	 update_node_desc(env, root, change_type);
+      }
+      
+      if(env->warm_start->trim_tree == ON_CRU_VARS){
+	 if(deletable && root->bobj.child_num){
+	    for(i = 0; i<root->bobj.child_num; i++){
+	       ws_free_subtree(env, root->children[i], change_type, FALSE, TRUE);
+	    }
+	    root->node_status = NODE_STATUS__WARM_STARTED; 
+	    if(resolve == 0){
+	       root->lower_bound = -MAXDOUBLE;
+	    }else{
+	       resolve_node(env, root);
+	    }
+	    root->bobj.child_num = 0;
+	    if(root->bc_level){
+	       if(cru_vars[root->parent->bobj.name]){
+		  deletable = FALSE;
+	       }
+	    }
+	 }
+	 if(!deletable && root->bobj.child_num){
+	    for(i = 0; i<root->bobj.child_num; i++){
+	       register_cuts(root->children[i], cut_num, cuts_ind);
+	    }
+	 }
+	 if(root->bc_level){
+	    if(cru_vars[root->parent->bobj.name]){
+	       deletable = FALSE;
+	    }
+	 }
+      }
+   }
+   return deletable;
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+
+void register_cuts(bc_node *root, int *cut_num,  int *cuts_ind){
+
+   int i, r_cnum = root->desc.cutind.size;
+   int *c_list = root->desc.cutind.list;
+   int c_ind; 
+   if(r_cnum > 0){
+      for(i = 0; i < r_cnum; i++){
+	 c_ind = c_list[i];
+	 if(cuts_ind[c_ind] < 0){
+	    cuts_ind[c_ind] = c_list[i] = *cut_num;
+	    (*cut_num)++;
+	 }else{
+	    c_list[i] = cuts_ind[c_ind];
+	 }
       }
    }
 }
@@ -748,16 +809,18 @@ void update_branching_decisions(sym_environment *env, bc_node *root, int change_
 
 /*===========================================================================*/
 /*===========================================================================*/
-void check_trim_tree(sym_environment *env, bc_node *root, int change_type)
+void check_trim_tree(sym_environment *env, bc_node *root, int *cut_num, 
+		     int *cuts_ind, int change_type)		     
 {
    int i;
    char trim_type = env->warm_start->trim_tree;
    int level = env->warm_start->trim_tree_level;
    int index = env->warm_start->trim_tree_index;
    problem_stat *stat = &(env->warm_start->stat);   
+   int trim_subtree = FALSE;
 
-   if (root->node_status != NODE_STATUS__CANDIDATE){
-      stat->analyzed++;
+   if(trim_type){
+      register_cuts(root, cut_num, cuts_ind);
    }
    
    if(trim_type == TRIM_INDEX){	    
@@ -767,36 +830,31 @@ void check_trim_tree(sym_environment *env, bc_node *root, int change_type)
 	       break;
 	    }
 	 }
-	 if(i < root->bobj.child_num){
-	    for (i = 0; i < root->bobj.child_num; i++){	
-	       root->children[i]->bc_index = ++stat->tree_size;
-	       stat->created++;	    
-	    }
-	 } else{	
-	    for (i = root->bobj.child_num - 1; i >= 0; i--)
-	       ws_free_subtree(env, root->children[i], change_type, TRUE, FALSE);
-	    root->bobj.child_num = 0;
-	    if (root->node_status == NODE_STATUS__BRANCHED_ON){
-	       root->node_status = NODE_STATUS__WARM_STARTED;
-	    }	    
+	 if(i >= root->bobj.child_num){
+	    trim_subtree = TRUE;
 	 }
       }
-   } else {
-      if(root->bc_level < level){
-	 for (i = 0; i < root->bobj.child_num; i++){	
-	    root->children[i]->bc_index = ++stat->tree_size;
-	    stat->created++;	    
-	 }
-      }else if(root->bc_level == level){
-	 for (i = root->bobj.child_num - 1; i >= 0; i--)
-	    ws_free_subtree(env, root->children[i], change_type, TRUE, FALSE);
-	 root->bobj.child_num = 0;
-	 if (root->node_status == NODE_STATUS__BRANCHED_ON){
-	    root->node_status = NODE_STATUS__WARM_STARTED;
-	 }	 
+   }else if(trim_type == TRIM_LEVEL){
+      if(root->bc_level >= level){
+	 trim_subtree = TRUE;
       }
    }
    
+   if(trim_subtree && root->bobj.child_num){
+      for (i = 0; i < root->bobj.child_num; i++){	
+	 ws_free_subtree(env, root->children[i], change_type, TRUE, FALSE);
+      }
+      root->bobj.child_num = 0;
+   }else{      
+      for (i = 0; i < root->bobj.child_num; i++){	
+	 root->children[i]->bc_index = stat->tree_size++;
+	 stat->created++;	    
+      }
+   }
+
+   if (root->node_status == NODE_BRANCHED_ON && root->bobj.child_num){
+      stat->analyzed++;
+   }  
 }
 /*===========================================================================*/
 /*===========================================================================*/
@@ -2204,6 +2262,10 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "warm_search_max_time_frac") == 0){
       READ_DBL_PAR(tm_par->warm_search_max_time_frac);
       return(0);
+   }
+   else if (strcmp(key, "warm_search_node_level_ratio") == 0){
+     READ_DBL_PAR(tm_par->warm_search_node_level_ratio);
+     return(0);
    }
 #endif
    else if (strcmp(key, "sensitivity_analysis") == 0 ||

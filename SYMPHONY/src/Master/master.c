@@ -235,8 +235,9 @@ int sym_set_defaults(sym_environment *env)
    tm_par->warm_search_time_limit = 50;
    tm_par->warm_search_fix_frac_incr = 0.2;
    tm_par->warm_search_fix_frac_decr = 0.1;
-   tm_par->warm_search_min_gap = 0.2;
+   tm_par->warm_search_min_gap = 0.01;
    tm_par->warm_search_max_time_frac = 0.1;
+   tm_par->warm_search_node_level_ratio = 0.2;
 #endif 
    
    /************************** lp defaults ***********************************/
@@ -1209,8 +1210,11 @@ int sym_warm_solve(sym_environment *env)
 
   int i, change_type, node_limit, analyzed, depth, index, rated, level, level_rated;
   cut_data * cut;
+  cut_data **upd_cuts;
+  int loc, ws_cnum, cut_num = 0, *cut_ind = NULL, *tmp_ind = NULL;
    /* first check for the updates! */
-
+  char *cru_vars = NULL; 
+  double etol = 1e-04;
   if(env->par.tm_par.keep_description_of_pruned != KEEP_IN_MEMORY){
 
      return(sym_solve(env));
@@ -1227,7 +1231,7 @@ int sym_warm_solve(sym_environment *env)
 	 env->has_ub = FALSE;
 	 env->ub = 0.0;
 	 env->lb = -MAXDOUBLE;
-
+	 
 	 env->warm_start->has_ub = env->best_sol.has_sol = 
 	    env->warm_start->best_sol.has_sol = FALSE;
 	 env->warm_start->ub = env->warm_start->best_sol.objval = 0.0;
@@ -1264,38 +1268,94 @@ int sym_warm_solve(sym_environment *env)
 		  return(FUNCTION_TERMINATED_ABNORMALLY);
 	       } 
 	    }
-
-	    analyzed = env->warm_start->stat.analyzed;
-	    depth = env->warm_start->stat.max_depth;
-	    rated = (int)(env->par.tm_par.warm_start_node_ratio * analyzed);
-	    level_rated = (int)(env->par.tm_par.warm_start_node_level_ratio * depth); 
-	    node_limit = env->par.tm_par.warm_start_node_limit;      
-	    level = env->par.tm_par.warm_start_node_level;
-	    index = node_limit <= rated ? node_limit : rated ;
-	    level = level <= level_rated ? level : level_rated;
-
-	    if ((level > 0 && level < depth) || index > 0) {
-	       if ( level > 0 && level < depth) {
-		  env->warm_start->trim_tree = TRIM_LEVEL;		  
-		  env->warm_start->trim_tree_level = level;
-		  //cut_ws_tree_level(env, env->warm_start->rootnode, level, 
-		  //	    &(env->warm_start->stat), change_type);	 
-		  env->warm_start->stat.max_depth = level;
-	       } else {
-		  if (index < analyzed) {
-		     if (!index) index = 1; 
-		     env->warm_start->trim_tree = TRIM_INDEX;		  
-		     env->warm_start->trim_tree_index = index;
-		     //   cut_ws_tree_index(env, env->warm_start->rootnode, index,
-		     //	       &(env->warm_start->stat), change_type);
-		  }
-	       }	    
-	       env->warm_start->stat.analyzed = env->warm_start->stat.created =
-		  env->warm_start->stat.tree_size = 0;
-	    }	       
+	    if(!env->mip->cru_vars_num){
+	       analyzed = env->warm_start->stat.analyzed;
+	       depth = env->warm_start->stat.max_depth;
+	       rated = (int)(env->par.tm_par.warm_start_node_ratio * analyzed);
+	       level_rated = (int)(env->par.tm_par.warm_start_node_level_ratio * depth); 
+	       node_limit = env->par.tm_par.warm_start_node_limit;      
+	       level = env->par.tm_par.warm_start_node_level;
+	       index = node_limit <= rated ? node_limit : rated ;
+	       level = level <= level_rated ? level : level_rated;
+	       
+	       if ((level > 0 && level < depth) || index > 0) {
+		  if ( level > 0 && level < depth) {
+		     env->warm_start->trim_tree = TRIM_LEVEL;		  
+		     env->warm_start->trim_tree_level = level;
+		     //cut_ws_tree_level(env, env->warm_start->rootnode, level, 
+		     //	    &(env->warm_start->stat), change_type);	 
+		     env->warm_start->stat.max_depth = level;
+		  } else {
+		     if (index < analyzed) {
+			if (!index) index = 1; 
+			env->warm_start->trim_tree = TRIM_INDEX;		  
+			env->warm_start->trim_tree_index = index;
+			//   cut_ws_tree_index(env, env->warm_start->rootnode, index,
+			//	       &(env->warm_start->stat), change_type);
+		     }
+		  }	    
+	       }	       
+	    }else{
+	       env->warm_start->trim_tree = ON_CRU_VARS;
+	       cru_vars = (char *)calloc(CSIZE,env->mip->n);
+	       for(i = 0; i < env->mip->cru_vars_num; i++){
+		  cru_vars[env->mip->cru_vars[i]] = TRUE;
+	       }	       
+	    }
 	    
-	    update_tree_bound(env, env->warm_start->rootnode, change_type);
-	    /* FIXME: Cannot warm start for more than 1 modificaiton */
+	    ws_cnum = env->warm_start->cut_num; 
+	    if(env->warm_start->trim_tree && ws_cnum){
+	       cut_ind = (int *)malloc(ISIZE*ws_cnum);
+	       memset(cut_ind, -1, ISIZE*ws_cnum);
+	    }
+	    env->warm_start->stat.analyzed = 
+	       env->warm_start->stat.created =
+	       env->warm_start->stat.tree_size = 1; //for root node */	   
+
+	    update_tree_bound(env, env->warm_start->rootnode, &cut_num, cut_ind, cru_vars, change_type);
+
+	    /* FIXME!!!! feasible solutions are getting lost in a sequence of warm-solve---
+	       for a temporary fix, increase ub a litte... */
+	    if(env->warm_start->has_ub){
+	       env->warm_start->ub += etol;
+	    }
+	    
+	    if(cut_num > 0){
+	       upd_cuts = (cut_data **)malloc(sizeof(cut_data *)*env->warm_start->allocated_cut_num);
+	       tmp_ind = (int *)malloc(ISIZE*ws_cnum);
+	       for(i = 0; i < ws_cnum; i++){
+		  tmp_ind[i] = i;
+	       }
+	       qsortucb_ii(cut_ind, tmp_ind, ws_cnum);
+	       
+	       for(i = 0; i < cut_num; i++){
+		  loc = tmp_ind[ws_cnum - cut_num + i];
+		  upd_cuts[i] = env->warm_start->cuts[loc];
+		  upd_cuts[i]->name = i;
+		  env->warm_start->cuts[loc] = 0;
+	       }
+	       for (i = env->warm_start->cut_num - 1; i >= 0; i--){
+		  if (env->warm_start->cuts[i]){
+		     FREE(env->warm_start->cuts[i]->coef);
+		  }
+		  FREE(env->warm_start->cuts[i]);
+	       }
+	       FREE(env->warm_start->cuts);
+	       env->warm_start->cuts = upd_cuts; 
+	       env->warm_start->cut_num = cut_num;
+	    } else{
+	       if(env->warm_start->trim_tree && env->warm_start->cut_num){	    
+		  for (i = env->warm_start->cut_num - 1; i >= 0; i--){
+		     if (env->warm_start->cuts[i]){
+			FREE(env->warm_start->cuts[i]->coef);
+		     }
+		     FREE(env->warm_start->cuts[i]);
+		  }
+		  //	  FREE(env->warm_start->cuts);
+		  //env->warm_start->cuts = 0; 
+		  env->warm_start->cut_num = 0;		  
+	       }
+	    }
 
 #ifdef USE_SYM_APPLICATION 
 	    if(change_type == COLS_ADDED){
@@ -1312,6 +1372,10 @@ int sym_warm_solve(sym_environment *env)
 	    env->mip->change_num = 0;
 	    env->mip->var_type_modified = FALSE;
 	    env->mip->new_col_num = 0;
+	    if(env->mip->cru_vars_num){
+	       FREE(env->mip->cru_vars);
+	       env->mip->cru_vars_num = 0;
+	    }
 	 } else{
 	    printf("sym_warm_solve():");
 	    printf("Unable to re-solve this type of modification,for now!\n");
@@ -1326,6 +1390,10 @@ int sym_warm_solve(sym_environment *env)
       trim_warm_tree(env, env->warm_start->rootnode);
    }
 #endif
+
+   FREE(cru_vars);
+   FREE(cut_ind);
+   FREE(tmp_ind);
    
    return(sym_solve(env));
 }
