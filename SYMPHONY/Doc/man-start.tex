@@ -97,7 +97,7 @@ using the automatic scripts provided (see below).
 
 \subsection{Installation for Use With Microsoft Visual C++}
 
-These instructions are for use with Microsoft Visual Studio 6.0. The procedure
+These instructions are for use with Microsoft Visual Studio 8. The procedure
 for other version of Visual Studio should be similar. Download and unpack the
 archive \code{symphony-\VER-win32-msvc6.zip}
 \begin{itemize}
@@ -115,7 +115,7 @@ solver using SYMPHONY's C callable functions with user defined input (see
 Section \ref{callable_library}). To test the code, either
 
 \begin{itemize}
-\item open the workspace \code{milp.dsw}, choose \code{Build milp.exe}
+\item open the solution file \code{milp.sln}, choose \code{Build milp.exe}
 and then choose \code{Execute} from the \code{Build} menu, 
 \end{itemize}
 or
@@ -133,7 +133,7 @@ or
 solver using SYMPHONY's C++ callable functions (through OsiSym interface)
 with user defined input (see Section \ref{OSI}). To test the code, either 
 \begin{itemize}
-\item open the workspace \code{milpOsi.dsw}, 
+\item open the solution file \code{milpOsi.sln}, 
 choose \code{Build milpOsi.exe} and then 
 \code{Execute} commands from the \code{Build} menu, 
 \end{itemize}
@@ -559,7 +559,7 @@ should be similar.
 
 \begin{itemize}
 
-\item Go to \code{Win32\bs v8} directory and open the solution file
+\item Go to \code{MSVisualStudio\bs v8} directory and open the solution file
 \code{symphony.sln}. 
 
 \item Note that there are a number of additional preprocessor definitions that
@@ -573,7 +573,7 @@ want to enable GMPL reader option, you need to
   \item add the directory of the header files of GLPK to the include 
 files path
   \item add \code{USE\_GLPMPL} to the defines
-  \item add the GLPK library to the workspace
+  \item add the GLPK library to the solution
 \end{itemize}
 \item Make sure that the project \code{symphony} is set as the startup project
 by choosing \code{Set as Startup Project} from the \code{Project} menu after
@@ -603,7 +603,7 @@ should be similar.
 
 \begin{itemize}
 \item Open a command terminal (choose \code{Run} on the Start menu and type
-\code{cmd} in the dialogue box). Go to the \code{Win32\bs v8}
+\code{cmd} in the dialogue box). Go to the \code{MSVisualStudio\bs v8}
 directory and type 
 {\color{Brown}
 \begin{verbatim}
@@ -640,7 +640,7 @@ a list of available commands or see Chapter
 \item If you modify the source code of SYMPHONY, type 
 {\color{Brown}
 \begin{verbatim}
- devenv symphony.dsw /make all /rebuild
+ devenv symphony.sln /make all /rebuild
 \end{verbatim}
 }
 in order to clean and rebuild everything.
@@ -662,14 +662,13 @@ follow the instuctions for building in Unix-like environments (see Section
 \label{using_nmake}
 
 \begin{itemize}
-\item Go to \code{Win32} directory and edit the \code{sym.mak} 
+\item Go to \code{MSVisualStudio} directory and edit the \code{sym.mak} 
 makefile to reflect 
 your environment. This involves specifying the LP solver to be used, 
 assigning some variables and  setting various paths. Only minor edits 
 should be required. An explanation of what has to be set is contained in the 
 comments in the makefile.  Note that, you have to first create the COIN 
-libraries \ptt{Cgl}, \ptt{Clp}, \ptt{Osi}, \ptt{OsiClp} and \ptt{CoinUtils} 
-which reside in \code{Win32/v6} directory.
+libraries \ptt{Cgl}, \ptt{Clp}, \ptt{Osi}, \ptt{OsiClp} and \ptt{CoinUtils}.
 
 \item Once configuration is done, open a command line terminal and type 
 {\color{Brown}
@@ -712,14 +711,14 @@ have three options. You can either build using the MSVC++ IDE, build on the
 command-line with MSVC++ executable, or use the NMAKE utility. The below
 instructions are for MSVC++ Version 6, but building in other versions should
 be similar. All of the following commands should be executed in the
-\code{SYMPHONY-\VER\bs Applications\bs XXX\bs Win32\bs v6} directory, where
-\code{XXX} is the name of the application to be built.
+\code{SYMPHONY-\VER\bs Applications\bs XXX\bs MSVisualStudio\bs v8} directory,
+where \code{XXX} is the name of the application to be built.
 
 \subsubsection{Building With the MSVC++ IDE}
 
 \begin{itemize}
 
-\item Open the workspace \code{xxx.dsw}.
+\item Open the solution file \code{xxx.sln}.
 
 \item The configuration steps are exactly the same as that described in
   Section \ref{using_msvc}. The only difference is that you are using the

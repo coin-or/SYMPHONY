@@ -96,30 +96,30 @@ instructions, see the \code{SYMPHONY/Applications/USER/INSTALL} file.
 
 First, download \code{SYMPHONY-\VER} and unpack the archive if it is
 required. You now have three options. You can either compile on the
-command-line using the automated MSDEV build system or NMAKE utility or you
-can use the provided projects and workspaces. For all of the following
-options, first go to the \code{SYMPHONY\bs Applications\bs USER\bs Win32\bs
-v6} directory.
+command-line using the automated DEVENV build system or NMAKE utility or you
+can use the provided project and solution files. For all of the following
+options, first go to the \code{SYMPHONY\bs Applications\bs USER\bs
+MSVisualStudio \bs v8} directory.
 
 \subsubsection{Using the MSDEV Utility}
 \begin{itemize}
 \item Open a command line terminal and type
 {\color{Brown}
 \begin{verbatim}
- msdev user.dsw /make all
+ devenv user.sln /make all
 \end{verbatim}
 }
 This will create both the debug and release versions of USER application. 
 If you want to compile only one of them, type
 {\color{Brown}
 \begin{verbatim}
- msdev user.dsw /make "all - debug"
+ devenv user.sln /make "all - debug"
 \end{verbatim}
 }
 or 
 {\color{Brown}
 \begin{verbatim}
- msdev user.dsw /make "all - release"
+ devenv user.sln /make "all - release"
 \end{verbatim}
 }
 For each command, the executable \code{user} will be created in 
@@ -135,7 +135,7 @@ directories.
 \item If USER source files are modified, type 
 {\color{Brown}
 \begin{verbatim}
- msdev user.dsw /make all /rebuild
+ devenv user.sln /make all /rebuild
 \end{verbatim}
 }
 in order to clean and rebuild everything.
@@ -170,11 +170,10 @@ The executable \code{user.exe} will be created under the
 }
 \end{itemize}
 
-\subsubsection{Using the MSVC++ Workspace}
+\subsubsection{Using the MSVC++ IDE}
 
 \begin{itemize}
-\item Open the workspace 
-\code{user.dsw}.
+\item Open the solution file \code{user.sln}.
 
 \item 
 The configuration steps are exactly the same with the MSVC++ section of 
