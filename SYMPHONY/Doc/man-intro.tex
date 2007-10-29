@@ -47,33 +47,33 @@ compiler (gcc 4.2 is currently the only compiler tested and fully supported).
 
 \section{What's New}
 
-In SYMPHONY 5.0, we introduced a number of new features that give SYMPHONY
-some unique capabilities. These include the ability to solve biobjective
-integer programs, the ability to warms start the solution procedure, and the
-ability to perform basic sensitivity analyses. These capabilities have been
-further developed and enhanced in Version \VER. Other new features and
-enhancements are listed below.
+Startiong in SYMPHONY 5.0, we introduced a number of new features that give
+SYMPHONY some unique capabilities. These include the ability to solve
+biobjective integer programs, the ability to warms start the solution
+procedure, and the ability to perform basic sensitivity analyses. These
+capabilities have been further developed and enhanced with the introduction of
+Version 5.1. Other new features and enhancements are listed below.
 
 \begin{itemize}
 
-\item SYMPHONY now has an interactive optimizer that can be used through a
+\item SYMPHONY has an interactive optimizer that can be used through a
 command shell. In both the sequential and parallel configurations, the user
 can set parameters, load and solve instances interactively, and display
 results and statistics. For Windows users, this means that SYMPHONY can be
 invoked using the familiar procedure of ``double-clicking'' on the
 \code{symphony.exe} file in Windows Explorer.
 
-\item SYMPHONY now supports automatic configuration using the new COIN-OR
+\item SYMPHONY supports automatic configuration using the new COIN-OR
 build system and the GNU autotools. Using the autotools, it is now possible to
 build SYMPHONY in most operating systems and with most common compilers
 without user intervention.
 
-\item Both the distributed and shared memory parallel configurations are once
-  again fully implemented, tested, and supported. The user can now build and
-  execute custom SYMPHONY applications in parallel, as well as solving generic
-  MILPs in parallel "out of the box."
+\item Both the distributed and shared memory parallel configurations are fully
+ implemented, tested, and supported. The user can now build and execute custom
+ SYMPHONY applications in parallel, as well as solving generic MILPs in
+ parallel "out of the box."
 
-\item There are now additional options for warm starting. The user can trim the
+\item There are additional options for warm starting. The user can trim the
 warm starting tree before starting to resolve a problem. More specifically,
 the user can decide to initiate warm starting with a predefined partition of
 the final branch-and-cut tree resulting from a previous solution procedure.
@@ -86,21 +86,21 @@ solution procedure or all of the nodes above a given level of the tree.
 
 \begin{itemize}
 
-\item SYMPHONY has a new development Web site, where users can submit trouble
-  tickets, browse the source code interactively, and get up-to-date
+\item SYMPHONY has a project management Web site, where users can submit
+  trouble tickets, browse the source code interactively, and get up-to-date
   information on development. The address of the new site is
   \url{https://projects.coin-or.org/SYMPHONY}.
 
-\item SYMPHONY is now hosted using subversion, a version control system with
+\item SYMPHONY is hosted using subversion, a version control system with
   features vastly improved over CVS, the previous hosting software. This has
   required some reorganization and renaming of the header files.
 
-\item SYMPHONY is now more tightly integrated with other COIN-OR projects. Due
+\item SYMPHONY is tightly integrated with other COIN-OR projects. Due
   to improved procedures for producing stable releases, it will now be much
   easier for us to determine the exact version of SYMPHONY and all other COIN
   projects you are using when you report a bug.
 
-\item SYMPHONY is now distributed with all COIN software needed to build a
+\item SYMPHONY is distributed with all COIN software needed to build a
   complete solver. Previously, other COIN software packages had to be
   downloaded and installed separately.
 
@@ -121,22 +121,8 @@ functionality than SYMPHONY for implementing branch and price algorithms.
 
 \end{itemize}
 
-There were a few minor changes to the API from the previous version of
-SYMPHONY to version \VER. 
-
-\begin{itemize}
-
-\item First and foremost, the name of the main header file for SYMPHONY has
-been changed from \code{symphony\_api.h} to \code{symphony.h} (though the
-former has been retained for backward compatibility purposes).
-
-\item The user can now execute a primal heuristic in the
-\ptt{user\_is\_feasible()} callback and return the solution to SYMPHONY, which
-required the arguments of this function to be changed slightly.
-
-\item Several new subroutines were added to the callable library API.
-
-\end{itemize}
+For what's new specifically in Version \VER, please check the \texttt{README}
+file that comes with the distribution.
 
 \section{A Brief History}
 \label{history}

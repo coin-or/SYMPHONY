@@ -270,7 +270,7 @@ want to enable GMPL reader option, you need to
 
   - add the directory of the header files of GLPK to the include files path
   - add USE_GLPMPL to the defines
-  - add the GLPK library to the workspace
+  - add the GLPK library to the solution
 
 2. Make sure that the project 'symphony' is set as the startup project by
 choosing "Set as Startup Project" from the Project menu after selecting the
