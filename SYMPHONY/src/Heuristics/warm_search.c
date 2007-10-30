@@ -56,11 +56,18 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
     */
    tm_prob *tm = p->tm;
    double gap = (tm->has_ub)?fabs((tm->ub-tm->lb)/(fabs(tm->ub)+lpetol)):10;
-   double elapsed_time = wall_clock(NULL) - tm->start_time;
+   double elapsed_time, solve_stop_time;
    sp_desc *sp = p->tm->sp;
 
 
    double start_time = wall_clock(NULL);
+   double current_ub=p->tm->ub;
+   double solve_start_time = wall_clock(NULL);
+   int n, cnt2, ui, to_be_fixed, i;
+   MIPdesc *mip2;
+   sym_environment *env2;
+   int *indices2;
+   double *values2;
    if (p->bc_index%p->tm->par.warm_search_frequency != 1 || p->node_iter_num != 1 || is_feasible) {
       /* use this heuristic only when bc_index is a multiple of
        * warm_search_frequency and we are doing first iteration on that node
@@ -68,24 +75,24 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
        */
       return IP_INFEASIBLE;
    }
+   //printf("feasible\n");
 
    if (gap<p->tm->par.warm_search_min_gap) {
       /* Use this heuristic only when gap is large */
       return IP_INFEASIBLE;
    }
+   //printf("min gap\n");
 
+   elapsed_time = wall_clock(NULL) - tm->start_time;
    if (tm->stat.warm_search_time/elapsed_time>p->tm->par.warm_search_max_time_frac) {
       /* Use this heuristic only when a small amount of time has been spent on
        * this heuristic so far.
        */
+      //printf("min time");
       return IP_INFEASIBLE;
    }
 
-   PRINT(p->par.verbosity,15,("warm_search: entering warm_search\n"));
-   double current_ub=p->tm->ub;
-   int n;
-   MIPdesc *mip2;
-   sym_environment *env2;
+   PRINT(p->par.verbosity,1,("warm_search: entering warm_search\n"));
 
    /* see if we can use a reference solution from the solution pool */
    if (sp->num_solutions>0) {
@@ -124,14 +131,12 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
 
       /* if we want to use the original MIP while searching */
       num_ints=0;
-      for (int i=0;i<n;i++) {
+      for (i=0;i<n;i++) {
          if (mip2->is_int[i]) {
             num_ints++;
          }
       }
 
-      int c1, c2;
-      c1=c2=0;
       fixed_val = (double *)malloc(n*DSIZE);
       may_be_fixed = (char *)calloc(n,CSIZE);
       /*    print indices */
@@ -144,7 +149,7 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
       /*    } */
 
       /* see which variables can be fixed */
-      for (int i=0;i<p->lp_data->n;i++) {
+      for (i=0;i<p->lp_data->n;i++) {
          if (vars[i]->is_int) {
             /* fix the variable if it has the same value in the reference
              * solution
@@ -163,7 +168,7 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
             } else {
                /* fix zero variables also */
                fixed_val[vars[i]->userind]=0;
-               if (!is_feasible && !var_is_non_zero(vars[i]->userind, reference_solution->xind, reference_solution->xlength, var_index2)) {
+               if (!var_is_non_zero(vars[i]->userind, reference_solution->xind, reference_solution->xlength, var_index2)) {
                   may_be_fixed[vars[i]->userind] = TRUE;
                   num_fixable++;
                }
@@ -174,17 +179,17 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
       PRINT(p->par.verbosity,1,("warm_search: warm_search_fix_fraction = %f\n",p->tm->par.warm_search_fix_fraction));
 
       if (num_fixable >= p->tm->par.warm_search_fix_fraction*num_ints) {
-         int to_be_fixed = (int) floor(p->tm->par.warm_search_fix_fraction*num_ints);
+         to_be_fixed = (int) floor(p->tm->par.warm_search_fix_fraction*num_ints);
          num_fixed = 0;
 
-         for (int i=0;i<n;i++) {
+         for (i=0;i<n;i++) {
             /* first reset all variable bounds */
             sym_set_col_lower(env2,i,p->mip->lb[i]);
             sym_set_col_upper(env2,i,p->mip->ub[i]);
          }
          /* fix only to_be_fixed no. of variables */
          if (p->tm->par.warm_search_enabled==1) {
-            for (int i=0;i<n;i++) {
+            for (i=0;i<n;i++) {
                /* first reset all variable bounds */
                sym_set_col_lower(env2,i,p->mip->lb[i]);
                sym_set_col_upper(env2,i,p->mip->ub[i]);
@@ -192,8 +197,8 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
          }
 
          /* fix first to_be_fixed variables which can be fixed */
-         for (int i=0;i<n;i++) {
-            int ui = vars[i]->userind;
+         for (i=0;i<n;i++) {
+            ui = vars[i]->userind;
             if (vars[i]->is_int && may_be_fixed[ui]) {
                sym_set_col_lower(env2, ui, fixed_val[ui]);
                sym_set_col_upper(env2, ui, fixed_val[ui]);
@@ -219,21 +224,22 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
          }
          sym_set_int_param(env2, "verbosity", -5);
          sym_set_dbl_param(env2, "time_limit", p->tm->par.warm_search_time_limit);
-         double solve_start_time = wall_clock(NULL);
+         solve_start_time = wall_clock(NULL);
          sym_warm_solve(env2);
-         double solve_stop_time = wall_clock(NULL);
+         solve_stop_time = wall_clock(NULL);
          PRINT(p->par.verbosity,1,("warm_search: Time taken = %f\n",solve_stop_time-solve_start_time));
          termstatus = sym_get_status(env2);
-         if ((sym_get_obj_val(env2, &new_obj_val) == FUNCTION_TERMINATED_NORMALLY) 
-               && (new_obj_val < current_ub - p->par.granularity))  {
+         if ((sym_get_obj_val(env2, &new_obj_val) ==
+                  FUNCTION_TERMINATED_NORMALLY) && (new_obj_val < current_ub -
+                     p->par.granularity))  {
             /* heur_solution is sent back to lp_wrapper.c in symphony */
             sym_get_col_solution(env2, heur_solution);
             termcode = IP_HEUR_FEASIBLE;
-            PRINT(p->par.verbosity,-1,("warm_search: found better soln: %12.8f, %f\n", new_obj_val,p->par.granularity));
-            int *indices2 = p->lp_data->tmp.i1; /* n */
-            double *values2 = p->lp_data->tmp.d; /* n */
-            int cnt = collect_nonzeros(p, heur_solution, indices2, values2);
-            sp_add_solution(p,cnt,indices2,values2,new_obj_val,p->bc_index);
+            PRINT(p->par.verbosity,1,("warm_search: found better soln: %12.8f, %f\n", new_obj_val,p->par.granularity));
+            indices2 = p->lp_data->tmp.i1; /* n */
+            values2 = p->lp_data->tmp.d; /* n */
+            cnt2 = collect_nonzeros(p, heur_solution, indices2, values2);
+            sp_add_solution(p,cnt2,indices2,values2,new_obj_val,p->bc_index);
             p->tm->stat.warm_search_successes++;
          } else if (termstatus==TM_TIME_LIMIT_EXCEEDED) {
             /*
@@ -271,7 +277,7 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt, double lpet
    }
 
    p->tm->stat.warm_search_time = p->tm->stat.warm_search_time+wall_clock(NULL)-start_time;
-   PRINT(p->par.verbosity,15,("Leaving warm_search\n"));
+   PRINT(p->par.verbosity,1,("Leaving warm_search\n"));
    return termcode;
 }
 
@@ -283,8 +289,9 @@ bool var_is_non_zero(int i, int *indices, int varnum, int &var_index)
    /* Return true if i is in indices else false */
    bool termcode = FALSE;
    var_index = -1;
+   int j;
 
-   for (int j=0;j<varnum;j++) {
+   for (j=0;j<varnum;j++) {
       if (i==indices[j]) {
          var_index = j;
          termcode = TRUE;
@@ -293,6 +300,5 @@ bool var_is_non_zero(int i, int *indices, int varnum, int &var_index)
    }
    return termcode;
 }
-
 
 
