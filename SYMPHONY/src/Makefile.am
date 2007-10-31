@@ -82,7 +82,8 @@ SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 if PRIMAL_HEURISTICS
 SYMINCFILES += ../include/sym_rounding.h \
 	       ../include/sym_warm_search.h \
-	       ../include/sym_sp.h
+	       ../include/sym_sp.h \
+	       ../include/sym_feasibility_pump.h
 endif
 
 
@@ -161,7 +162,8 @@ CG_SRC		= CutGen/cut_gen.c CutGen/cg_proccomm.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c
 
 if PRIMAL_HEURISTICS
-PH_SRC          = Heuristics/rounding.c Heuristics/warm_search.c Heuristics/sp.c
+PH_SRC          = Heuristics/rounding.c Heuristics/warm_search.c \
+		  Heuristics/sp.c Heuristics/feasibility_pump.c
 endif
 
 QSORT_SRC	= Common/qsortucb.c Common/qsortucb_i.c Common/qsortucb_ii.c \

@@ -262,6 +262,10 @@ void get_ub PROTO((LPdata *lp_data, int j, double *ub));
 void get_lb PROTO((LPdata *lp_data, int j, double *lb));
 void get_bounds PROTO((LPdata *lp_data));
 void get_objcoef PROTO((LPdata *lp_data, int j, double *objcoef));
+void get_objcoeffs PROTO((LPdata *lp_data));
+void change_objcoeff PROTO((LPdata *lp_data, const int* indexFirst, 
+      const int* indexLast, double *coeffs));
+void get_rhs_rng_sense(LPdata *lp_data);
 void delete_rows PROTO((LPdata *lp_data, int deletable, int *free_rows));
 int delete_cols PROTO((LPdata *lp_data, int delnum, int *delstat));
 void release_var PROTO((LPdata *lp_data, int j, int where_to_move));

@@ -57,7 +57,8 @@ host_triplet = @host@
 @USE_CL_TRUE@am__append_1 = ../include/sym_win32_time.h
 @PRIMAL_HEURISTICS_TRUE@am__append_2 = ../include/sym_rounding.h \
 @PRIMAL_HEURISTICS_TRUE@	       ../include/sym_warm_search.h \
-@PRIMAL_HEURISTICS_TRUE@	       ../include/sym_sp.h
+@PRIMAL_HEURISTICS_TRUE@	       ../include/sym_sp.h \
+@PRIMAL_HEURISTICS_TRUE@	       ../include/sym_feasibility_pump.h
 
 @PSEUDO_COSTS_TRUE@am__append_3 = LP/lp_pseudo_branch.c
 @PSEUDO_COSTS_FALSE@am__append_4 = LP/lp_branch.c
@@ -201,8 +202,9 @@ am__libSym_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c TreeManager/tm_func.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
 	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
@@ -212,7 +214,8 @@ am__libSym_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
 	Common/qsortucb_ic.c Common/proccomm.c Common/pack_cut.c \
 	Common/pack_array.c Heuristics/rounding.c \
-	Heuristics/warm_search.c Heuristics/sp.c
+	Heuristics/warm_search.c Heuristics/sp.c \
+	Heuristics/feasibility_pump.c
 am__objects_1 =
 am__objects_2 = $(am__objects_1)
 am__objects_3 = $(am__objects_2) $(am__objects_1)
@@ -237,7 +240,8 @@ am__objects_14 = libSym_la-pack_cut.lo
 am__objects_15 = libSym_la-pack_array.lo
 @PRIMAL_HEURISTICS_TRUE@am__objects_16 = libSym_la-rounding.lo \
 @PRIMAL_HEURISTICS_TRUE@	libSym_la-warm_search.lo \
-@PRIMAL_HEURISTICS_TRUE@	libSym_la-sp.lo
+@PRIMAL_HEURISTICS_TRUE@	libSym_la-sp.lo \
+@PRIMAL_HEURISTICS_TRUE@	libSym_la-feasibility_pump.lo
 am__objects_17 = $(am__objects_4) $(am__objects_5) $(am__objects_8) \
 	$(am__objects_9) $(am__objects_10) $(am__objects_11) \
 	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
@@ -263,8 +267,9 @@ am__libSymAppl_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c TreeManager/tm_func.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
 	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
@@ -274,7 +279,8 @@ am__libSymAppl_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
 	Common/qsortucb_ic.c Common/proccomm.c Common/pack_cut.c \
 	Common/pack_array.c Heuristics/rounding.c \
-	Heuristics/warm_search.c Heuristics/sp.c
+	Heuristics/warm_search.c Heuristics/sp.c \
+	Heuristics/feasibility_pump.c
 am__objects_18 = libSymAppl_la-master.lo \
 	libSymAppl_la-master_wrapper.lo libSymAppl_la-master_io.lo \
 	libSymAppl_la-master_func.lo
@@ -298,7 +304,8 @@ am__objects_28 = libSymAppl_la-pack_cut.lo
 am__objects_29 = libSymAppl_la-pack_array.lo
 @PRIMAL_HEURISTICS_TRUE@am__objects_30 = libSymAppl_la-rounding.lo \
 @PRIMAL_HEURISTICS_TRUE@	libSymAppl_la-warm_search.lo \
-@PRIMAL_HEURISTICS_TRUE@	libSymAppl_la-sp.lo
+@PRIMAL_HEURISTICS_TRUE@	libSymAppl_la-sp.lo \
+@PRIMAL_HEURISTICS_TRUE@	libSymAppl_la-feasibility_pump.lo
 am__objects_31 = $(am__objects_18) $(am__objects_19) $(am__objects_22) \
 	$(am__objects_23) $(am__objects_24) $(am__objects_25) \
 	$(am__objects_26) $(am__objects_27) $(am__objects_28) \
@@ -324,11 +331,12 @@ am__libSymAppl_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h CutGen/cut_gen.c CutGen/cg_proccomm.c \
-	CutGen/cg_func.c CutGen/cg_wrapper.c Common/timemeas.c \
-	Common/qsortucb.c Common/qsortucb_i.c Common/qsortucb_ii.c \
-	Common/qsortucb_id.c Common/qsortucb_di.c Common/qsortucb_ic.c \
-	Common/proccomm.c Common/pack_cut.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	CutGen/cut_gen.c CutGen/cg_proccomm.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c Common/timemeas.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
+	Common/pack_cut.c
 am__objects_32 = libSymAppl_cg_la-cut_gen.lo \
 	libSymAppl_cg_la-cg_proccomm.lo libSymAppl_cg_la-cg_func.lo \
 	libSymAppl_cg_la-cg_wrapper.lo
@@ -363,11 +371,12 @@ am__libSymAppl_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h CutPool/cut_pool.c CutPool/cp_proccomm.c \
-	CutPool/cp_func.c CutPool/cp_wrapper.c Common/timemeas.c \
-	Common/qsortucb.c Common/qsortucb_i.c Common/qsortucb_ii.c \
-	Common/qsortucb_id.c Common/qsortucb_di.c Common/qsortucb_ic.c \
-	Common/proccomm.c Common/pack_cut.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
+	Common/pack_cut.c
 am__objects_38 = libSymAppl_cp_la-cut_pool.lo \
 	libSymAppl_cp_la-cp_proccomm.lo libSymAppl_cp_la-cp_func.lo \
 	libSymAppl_cp_la-cp_wrapper.lo
@@ -402,14 +411,14 @@ am__libSymAppl_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	Common/timemeas.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c Common/timemeas.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c
 @PSEUDO_COSTS_TRUE@am__objects_44 =  \
 @PSEUDO_COSTS_TRUE@	libSymAppl_lp_la-lp_pseudo_branch.lo
 @PSEUDO_COSTS_FALSE@am__objects_45 = libSymAppl_lp_la-lp_branch.lo
@@ -453,14 +462,14 @@ am__libSymAppl_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	Common/timemeas.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c Common/timemeas.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c
 @PSEUDO_COSTS_TRUE@am__objects_54 =  \
 @PSEUDO_COSTS_TRUE@	libSymAppl_lp_cg_la-lp_pseudo_branch.lo
 @PSEUDO_COSTS_FALSE@am__objects_55 = libSymAppl_lp_cg_la-lp_branch.lo
@@ -508,11 +517,12 @@ am__libSymAppl_m_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -584,11 +594,12 @@ am__libSymAppl_m_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -665,11 +676,12 @@ am__libSymAppl_m_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -748,11 +760,12 @@ am__libSymAppl_m_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -831,11 +844,12 @@ am__libSymAppl_m_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -913,11 +927,12 @@ am__libSymAppl_m_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -993,16 +1008,17 @@ am__libSymAppl_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h TreeManager/treemanager.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
+	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_160 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_la-lp_varfunc.lo \
@@ -1065,16 +1081,17 @@ am__libSymAppl_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h TreeManager/treemanager.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
+	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_173 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_cp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_cp_la-lp_varfunc.lo \
@@ -1139,16 +1156,17 @@ am__libSymAppl_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h TreeManager/treemanager.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
+	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_186 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_la-lp_varfunc.lo \
@@ -1213,16 +1231,17 @@ am__libSymAppl_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h TreeManager/treemanager.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
+	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_199 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_cg_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_cg_la-lp_varfunc.lo \
@@ -1287,16 +1306,17 @@ am__libSymAppl_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h TreeManager/treemanager.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
+	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_212 = libSymAppl_tm_lp_cg_cp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_cg_cp_la-lp_varfunc.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSymAppl_tm_lp_cg_cp_la-lp_rowfunc.lo \
@@ -1360,11 +1380,12 @@ am__libSym_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h CutGen/cut_gen.c CutGen/cg_proccomm.c \
-	CutGen/cg_func.c CutGen/cg_wrapper.c Common/timemeas.c \
-	Common/qsortucb.c Common/qsortucb_i.c Common/qsortucb_ii.c \
-	Common/qsortucb_id.c Common/qsortucb_di.c Common/qsortucb_ic.c \
-	Common/proccomm.c Common/pack_cut.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	CutGen/cut_gen.c CutGen/cg_proccomm.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c Common/timemeas.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
+	Common/pack_cut.c
 am__objects_225 = libSym_cg_la-cut_gen.lo libSym_cg_la-cg_proccomm.lo \
 	libSym_cg_la-cg_func.lo libSym_cg_la-cg_wrapper.lo
 am__objects_226 = libSym_cg_la-timemeas.lo
@@ -1396,11 +1417,12 @@ am__libSym_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h CutPool/cut_pool.c CutPool/cp_proccomm.c \
-	CutPool/cp_func.c CutPool/cp_wrapper.c Common/timemeas.c \
-	Common/qsortucb.c Common/qsortucb_i.c Common/qsortucb_ii.c \
-	Common/qsortucb_id.c Common/qsortucb_di.c Common/qsortucb_ic.c \
-	Common/proccomm.c Common/pack_cut.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \
+	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
+	Common/pack_cut.c
 am__objects_231 = libSym_cp_la-cut_pool.lo libSym_cp_la-cp_proccomm.lo \
 	libSym_cp_la-cp_func.lo libSym_cp_la-cp_wrapper.lo
 am__objects_232 = libSym_cp_la-timemeas.lo
@@ -1432,14 +1454,14 @@ am__libSym_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	Common/timemeas.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c Common/timemeas.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c
 @PSEUDO_COSTS_TRUE@am__objects_237 = libSym_lp_la-lp_pseudo_branch.lo
 @PSEUDO_COSTS_FALSE@am__objects_238 = libSym_lp_la-lp_branch.lo
 @SYM_COMPILE_IN_CG_TRUE@am__objects_239 = libSym_lp_la-cg_func.lo \
@@ -1480,14 +1502,14 @@ am__libSym_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h LP/lp_solver.c LP/lp_varfunc.c \
-	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
-	LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_pseudo_branch.c \
-	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
-	Common/timemeas.c Common/qsortucb.c Common/qsortucb_i.c \
-	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
-	Common/qsortucb_ic.c Common/proccomm.c Common/pack_cut.c \
-	Common/pack_array.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c \
+	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
+	CutGen/cg_wrapper.c Common/timemeas.c Common/qsortucb.c \
+	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
+	Common/qsortucb_di.c Common/qsortucb_ic.c Common/proccomm.c \
+	Common/pack_cut.c Common/pack_array.c
 @PSEUDO_COSTS_TRUE@am__objects_247 =  \
 @PSEUDO_COSTS_TRUE@	libSym_lp_cg_la-lp_pseudo_branch.lo
 @PSEUDO_COSTS_FALSE@am__objects_248 = libSym_lp_cg_la-lp_branch.lo
@@ -1531,11 +1553,12 @@ am__libSym_m_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -1604,11 +1627,12 @@ am__libSym_m_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -1682,11 +1706,12 @@ am__libSym_m_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -1765,11 +1790,12 @@ am__libSym_m_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -1848,11 +1874,12 @@ am__libSym_m_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -1931,11 +1958,12 @@ am__libSym_m_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h Master/master.c Master/master_wrapper.c \
-	Master/master_io.c Master/master_func.c LP/lp_solver.c \
-	TreeManager/treemanager.c TreeManager/tm_func.c \
-	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	Master/master.c Master/master_wrapper.c Master/master_io.c \
+	Master/master_func.c LP/lp_solver.c TreeManager/treemanager.c \
+	TreeManager/tm_func.c TreeManager/tm_proccomm.c \
+	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
+	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
 	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c Common/timemeas.c Common/qsortucb.c \
@@ -2014,16 +2042,17 @@ am__libSym_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h TreeManager/treemanager.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
+	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_353 = libSym_tm_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_la-lp_varfunc.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_la-lp_rowfunc.lo \
@@ -2082,16 +2111,17 @@ am__libSym_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h TreeManager/treemanager.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
+	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_366 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_cp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_cp_la-lp_varfunc.lo \
@@ -2153,16 +2183,17 @@ am__libSym_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h TreeManager/treemanager.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
+	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_379 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_la-lp_varfunc.lo \
@@ -2224,16 +2255,17 @@ am__libSym_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h TreeManager/treemanager.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
+	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_392 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_cg_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_cg_la-lp_varfunc.lo \
@@ -2298,16 +2330,17 @@ am__libSym_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_timemeas.h ../include/sym_tm.h \
 	../include/sym_tm_params.h ../include/sym_win32_time.h \
 	../include/sym_rounding.h ../include/sym_warm_search.h \
-	../include/sym_sp.h TreeManager/treemanager.c \
-	TreeManager/tm_func.c TreeManager/tm_proccomm.c LP/lp_solver.c \
-	LP/lp_varfunc.c LP/lp_rowfunc.c LP/lp_genfunc.c \
-	LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
-	LP/lp_pseudo_branch.c LP/lp_branch.c CutGen/cg_func.c \
-	CutGen/cg_wrapper.c CutPool/cp_proccomm.c CutPool/cp_func.c \
-	CutPool/cp_wrapper.c Common/timemeas.c Common/proccomm.c \
-	Common/pack_cut.c Common/pack_array.c Common/qsortucb.c \
-	Common/qsortucb_i.c Common/qsortucb_ii.c Common/qsortucb_id.c \
-	Common/qsortucb_di.c Common/qsortucb_ic.c
+	../include/sym_sp.h ../include/sym_feasibility_pump.h \
+	TreeManager/treemanager.c TreeManager/tm_func.c \
+	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
+	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
+	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
+	LP/lp_branch.c CutGen/cg_func.c CutGen/cg_wrapper.c \
+	CutPool/cp_proccomm.c CutPool/cp_func.c CutPool/cp_wrapper.c \
+	Common/timemeas.c Common/proccomm.c Common/pack_cut.c \
+	Common/pack_array.c Common/qsortucb.c Common/qsortucb_i.c \
+	Common/qsortucb_ii.c Common/qsortucb_id.c Common/qsortucb_di.c \
+	Common/qsortucb_ic.c
 @SYM_COMPILE_IN_LP_TRUE@am__objects_405 =  \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_cg_cp_la-lp_solver.lo \
 @SYM_COMPILE_IN_LP_TRUE@	libSym_tm_lp_cg_cp_la-lp_varfunc.lo \
@@ -2866,7 +2899,9 @@ CP_SRC = CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 CG_SRC = CutGen/cut_gen.c CutGen/cg_proccomm.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c
 
-@PRIMAL_HEURISTICS_TRUE@PH_SRC = Heuristics/rounding.c Heuristics/warm_search.c Heuristics/sp.c
+@PRIMAL_HEURISTICS_TRUE@PH_SRC = Heuristics/rounding.c Heuristics/warm_search.c \
+@PRIMAL_HEURISTICS_TRUE@		  Heuristics/sp.c Heuristics/feasibility_pump.c
+
 QSORT_SRC = Common/qsortucb.c Common/qsortucb_i.c Common/qsortucb_ii.c \
 	Common/qsortucb_id.c Common/qsortucb_di.c Common/qsortucb_ic.c
 
@@ -3470,6 +3505,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-cp_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-cp_proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-cp_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-feasibility_pump.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_branch.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_free.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-lp_genfunc.Plo@am__quote@
@@ -3894,6 +3930,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-cp_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-cp_proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-cp_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-feasibility_pump.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-lp_branch.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-lp_free.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-lp_genfunc.Plo@am__quote@
@@ -4547,6 +4584,13 @@ libSym_la-sp.lo: Heuristics/sp.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_la-sp.lo `test -f 'Heuristics/sp.c' || echo '$(srcdir)/'`Heuristics/sp.c
 
+libSym_la-feasibility_pump.lo: Heuristics/feasibility_pump.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_la-feasibility_pump.lo -MD -MP -MF "$(DEPDIR)/libSym_la-feasibility_pump.Tpo" -c -o libSym_la-feasibility_pump.lo `test -f 'Heuristics/feasibility_pump.c' || echo '$(srcdir)/'`Heuristics/feasibility_pump.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_la-feasibility_pump.Tpo" "$(DEPDIR)/libSym_la-feasibility_pump.Plo"; else rm -f "$(DEPDIR)/libSym_la-feasibility_pump.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Heuristics/feasibility_pump.c' object='libSym_la-feasibility_pump.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_la-feasibility_pump.lo `test -f 'Heuristics/feasibility_pump.c' || echo '$(srcdir)/'`Heuristics/feasibility_pump.c
+
 libSymAppl_la-master.lo: Master/master.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-master.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-master.Tpo" -c -o libSymAppl_la-master.lo `test -f 'Master/master.c' || echo '$(srcdir)/'`Master/master.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-master.Tpo" "$(DEPDIR)/libSymAppl_la-master.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-master.Tpo"; exit 1; fi
@@ -4777,6 +4821,13 @@ libSymAppl_la-sp.lo: Heuristics/sp.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Heuristics/sp.c' object='libSymAppl_la-sp.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-sp.lo `test -f 'Heuristics/sp.c' || echo '$(srcdir)/'`Heuristics/sp.c
+
+libSymAppl_la-feasibility_pump.lo: Heuristics/feasibility_pump.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-feasibility_pump.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-feasibility_pump.Tpo" -c -o libSymAppl_la-feasibility_pump.lo `test -f 'Heuristics/feasibility_pump.c' || echo '$(srcdir)/'`Heuristics/feasibility_pump.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-feasibility_pump.Tpo" "$(DEPDIR)/libSymAppl_la-feasibility_pump.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-feasibility_pump.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Heuristics/feasibility_pump.c' object='libSymAppl_la-feasibility_pump.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-feasibility_pump.lo `test -f 'Heuristics/feasibility_pump.c' || echo '$(srcdir)/'`Heuristics/feasibility_pump.c
 
 libSymAppl_cg_la-cut_gen.lo: CutGen/cut_gen.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_cg_la-cut_gen.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_cg_la-cut_gen.Tpo" -c -o libSymAppl_cg_la-cut_gen.lo `test -f 'CutGen/cut_gen.c' || echo '$(srcdir)/'`CutGen/cut_gen.c; \

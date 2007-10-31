@@ -370,6 +370,10 @@ typedef struct PROBLEM_STAT{
    double      warm_search_time;
    int         warm_search_tl_reached;
    int         warm_search_infeasible;
+
+   double      fp_time;
+   int         fp_instances;
+   int         fp_successes;
 #endif
 
 }problem_stat;

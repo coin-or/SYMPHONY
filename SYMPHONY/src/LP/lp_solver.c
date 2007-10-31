@@ -2781,14 +2781,49 @@ void get_bounds(LPdata *lp_data)
 }
 
 /*===========================================================================*/
-
 void get_objcoef(LPdata *lp_data, int j, double *objcoef)
 {
    *objcoef=lp_data->si->getObjCoefficients()[j];
 }
 
 /*===========================================================================*/
+void get_objcoeffs(LPdata *lp_data)
+{
+   const double *si_objcoeffs = lp_data->si->getObjCoefficients();
+   memcpy (lp_data->mip->obj,si_objcoeffs,lp_data->n*DSIZE);
+}
 
+/*===========================================================================*/
+void change_objcoeff(LPdata *lp_data, const int* indexFirst, 
+      const int* indexLast, double *coeffs)
+{
+   lp_data->si->setObjCoeffSet(indexFirst, indexLast, coeffs);
+}
+
+/*===========================================================================*/
+void get_rhs_rng_sense(LPdata *lp_data)
+{
+   const double *rowub = lp_data->si->getRowUpper();
+   const double *rowlb = lp_data->si->getRowLower();
+
+   for (int i=0;i<lp_data->m;i++) {
+      if (rowub[i]>=SYM_INFINITY) {
+         lp_data->mip->sense[i] = 'G';
+         lp_data->mip->rhs[i] = rowlb[i];
+      }
+      else if (rowlb[i]<=-SYM_INFINITY) {
+         lp_data->mip->sense[i] = 'L';
+         lp_data->mip->rhs[i] = rowub[i];
+      }
+      else {
+         lp_data->mip->sense[i] = 'R';
+         lp_data->mip->rhs[i] = rowub[i];
+         lp_data->mip->rngval[i] = rowub[i]-rowlb[i];
+      }
+   }
+}
+
+/*===========================================================================*/
 void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 {
    

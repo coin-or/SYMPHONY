@@ -40,6 +40,7 @@
 #ifdef PRIMAL_HEURISTICS
 #include "sym_rounding.h"
 #include "sym_warm_search.h"
+#include "sym_feasibility_pump.h"
 #include "sym_sp.h"
 #endif
 
@@ -583,6 +584,8 @@ int is_feasible_u(lp_prob *p, char branching)
    int *indices;
    double *values, valuesi, *heur_solution = NULL, *col_sol = NULL;
    int cnt, i;
+   double new_obj_val;
+   int termcode, is_feasible;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
@@ -677,18 +680,19 @@ int is_feasible_u(lp_prob *p, char branching)
    }    
 
    //rnd_test(p);
-   double new_obj_val;
-   int is_feasible = FALSE;
+   //TODO: move these defns up
+   is_feasible = FALSE;
 #ifdef PRIMAL_HEURISTICS
+   termcode = feasibility_pump (p, new_obj_val, heur_solution);
    if (feasible == IP_FEASIBLE) {
       if (p->tm->par.warm_search_enabled>0) {
          sp_add_solution(p, cnt, indices, values, p->lp_data->objval, p->bc_index);
       }
    } else if (p->tm->par.warm_search_enabled>0 && !branching) {
-      int termcode = warm_search (p, indices, values, cnt, lpetol, heur_solution, new_obj_val, is_feasible);
+      termcode = warm_search (p, indices, values, cnt, lpetol, heur_solution, new_obj_val, is_feasible);
       if (termcode == IP_HEUR_FEASIBLE) {
-	 feasible = IP_HEUR_FEASIBLE;
-	 true_objval = new_obj_val;
+         feasible = IP_HEUR_FEASIBLE;
+         true_objval = new_obj_val;
       }
    }
 #endif

@@ -359,6 +359,9 @@ int sym_set_defaults(sym_environment *env)
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
    lp_par->sensitivity_analysis = FALSE;
 
+   lp_par->fp_max_cycles = 10;
+   lp_par->fp_time_limit = 100;
+   lp_par->fp_flip_fraction = 0.2;
    /************************** cut_gen defaults *****************************/
    cg_par->verbosity = 0;
    cg_par->do_findcuts = TRUE;
@@ -968,21 +971,17 @@ int sym_solve(sym_environment *env)
    if (tm->par.warm_search_enabled == 1) {
       tm->warm_search_env = sym_create_copy_environment(env);
    }
-   if (tm->par.warm_search_enabled>0) {
-      sp_initialize(tm);
-   }
+   sp_initialize(tm);
 
 #endif
    termcode = solve(tm);
 
 #ifdef PRIMAL_HEURISTICS
-   if (tm->par.warm_search_enabled > 0) {
-      if (tm->par.warm_search_enabled == 1) {
-	 sym_close_environment(tm->warm_search_env);
-      }
-      sp_free_sp(tm->sp);
-      FREE(tm->sp);
+   if (tm->par.warm_search_enabled == 1) {
+      sym_close_environment(tm->warm_search_env);
    }
+   sp_free_sp(tm->sp);
+   FREE(tm->sp);
    //sp_close(tm); TODO
 #endif
 
