@@ -100,6 +100,7 @@ int sp_initialize(tm_prob *tm)
 
    /* TODO: put the above as parameters */
 
+   return 0;
 }
 
 /*===========================================================================*/
@@ -111,7 +112,6 @@ int sp_free_sp(sp_desc *sp)
       sp_delete_solution(sp,i);
    }
    for (i=sp->max_solutions-1; i>-1; i--) {
-      printf("i=%d\n",i);
       FREE(sp->solutions[i]);
    }
    FREE(sp->solutions);

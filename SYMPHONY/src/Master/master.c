@@ -359,9 +359,12 @@ int sym_set_defaults(sym_environment *env)
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
    lp_par->sensitivity_analysis = FALSE;
 
-   lp_par->fp_max_cycles = 10;
+   lp_par->fp_enabled = FALSE;
+   lp_par->fp_max_cycles = 20;
    lp_par->fp_time_limit = 100;
    lp_par->fp_flip_fraction = 0.2;
+   lp_par->fp_frequency = 10;
+   lp_par->fp_max_total_time = 200;
    /************************** cut_gen defaults *****************************/
    cg_par->verbosity = 0;
    cg_par->do_findcuts = TRUE;
@@ -963,7 +966,10 @@ int sym_solve(sym_environment *env)
    tm->start_time += start_time;
 
 #ifdef PRIMAL_HEURISTICS
-   tm->stat.warm_search_calls = 0;
+   tm->stat.fp_calls = 0;
+   tm->stat.fp_successes = 0;
+   tm->stat.fp_time = 0;
+
    tm->stat.warm_search_successes = 0;
    tm->stat.warm_search_time = 0;
    tm->stat.warm_search_tl_reached = 0;

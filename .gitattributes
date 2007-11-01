@@ -93,10 +93,12 @@ SYMPHONY/configure -text
 SYMPHONY/configure.ac -text
 SYMPHONY/include/SymConfig.h -text
 SYMPHONY/include/config_sym.h.in -text
+SYMPHONY/include/sym_feasibility_pump.h -text
 SYMPHONY/include/sym_rounding.h -text
 SYMPHONY/include/sym_sp.h -text
 SYMPHONY/include/sym_warm_search.h -text
 SYMPHONY/scripts/publish2 -text
+SYMPHONY/src/Heuristics/feasibility_pump.c -text
 SYMPHONY/src/Heuristics/rounding.c -text
 SYMPHONY/src/Heuristics/sp.c -text
 SYMPHONY/src/Heuristics/warm_search.c -text

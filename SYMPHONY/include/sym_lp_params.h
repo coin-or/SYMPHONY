@@ -170,9 +170,12 @@ typedef struct LP_PARAMS{
    int               sensitivity_analysis;
 
    /* feasibility pump parameters */
+   int               fp_enabled;
+   int               fp_frequency;
    int               fp_max_cycles;
    double            fp_time_limit;
    double            fp_flip_fraction;
+   double            fp_max_total_time;
 }lp_params;
 
 #endif

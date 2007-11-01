@@ -51,7 +51,7 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt,
    tm_prob *tm = p->tm;
    tm_params tm_par = tm->par;
    double gap = (tm->has_ub)?fabs((tm->ub-tm->lb)/(fabs(tm->ub)+lpetol)):10;
-   double elapsed_time, solve_stop_time;
+   double elapsed_time, solve_stop_time, real_obj_value;
    sp_desc *sp = tm->sp;
    double start_time = wall_clock(NULL);
    double current_ub=tm->ub;
@@ -71,7 +71,7 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt,
        */
       return IP_INFEASIBLE;
    }
-   //printf("feasible\n");
+  //printf("feasible\n");
 
    if (gap<tm_par.warm_search_min_gap) {
       /* Use this heuristic only when gap is large */
@@ -248,6 +248,16 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt,
             cnt2 = collect_nonzeros(p, heur_solution, indices2, values2);
             sp_add_solution(p,cnt2,indices2,values2,new_obj_val,p->bc_index);
             tm->stat.warm_search_successes++;
+
+            if (p->mip->obj_sense == SYM_MAXIMIZE){
+               real_obj_value=-new_obj_val+p->mip->obj_offset;
+            } else {
+               real_obj_value=new_obj_val+p->mip->obj_offset;
+            }
+            elapsed_time = wall_clock(NULL)-p->tm->start_time;
+            PRINT(verbosity,-1,("warm search: found solution = %10.2f time = "
+                     "%10.2f\n", real_obj_value,elapsed_time));
+
          } else if (termstatus==TM_TIME_LIMIT_EXCEEDED) {
             /*
              * this means that the time ran out before a solution could be
@@ -288,7 +298,7 @@ int warm_search (lp_prob *p, int * indices, double *values, int cnt,
          FREE(mip2);
       }
    } else {
-      PRINT(verbosity,10,("Dont know what to do, no reference solution "
+      PRINT(verbosity,1,("Dont know what to do, no reference solution "
                "exists\n"));
       termcode = IP_INFEASIBLE;
    }

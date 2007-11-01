@@ -48,13 +48,13 @@
 
 /*===========================================================================*\
  * This file contains LP wrapper functions that interface with the user.
-\*===========================================================================*/
+ \*===========================================================================*/
 
 /*===========================================================================*\
  * This function invokes the user written function user_receive_lp_data that
  * receives the initial data from the Master process. Returns TRUE if
  * succeeded, FALSE otherwise.
-\*===========================================================================*/
+ \*===========================================================================*/
 
 int receive_lp_data_u(lp_prob *p)
 {
@@ -74,10 +74,10 @@ int receive_lp_data_u(lp_prob *p)
    if(p->par.multi_criteria){
       receive_char_array(&p->has_mc_ub, 1);
       if (p->has_mc_ub){
-	 receive_dbl_array(&p->mc_ub, 1);
-	 receive_dbl_array(p->obj, 2);
+         receive_dbl_array(&p->mc_ub, 1);
+         receive_dbl_array(p->obj, 2);
       }else{
-	 p->mc_ub = - (MAXDOUBLE / 2);
+         p->mc_ub = - (MAXDOUBLE / 2);
       }
       receive_dbl_array(p->utopia, 2);
    }
@@ -103,8 +103,8 @@ int receive_lp_data_u(lp_prob *p)
       mip->matval = (double *) malloc(DSIZE * mip->nz);
       mip->obj    = (double *) malloc(DSIZE * mip->n);
       if (p->par.multi_criteria){
-	 mip->obj1    = (double *) malloc(DSIZE * mip->n);
-	 mip->obj2    = (double *) malloc(DSIZE * mip->n);
+         mip->obj1    = (double *) malloc(DSIZE * mip->n);
+         mip->obj2    = (double *) malloc(DSIZE * mip->n);
       }
       mip->rhs    = (double *) malloc(DSIZE * mip->m);
       mip->sense  = (char *)   malloc(CSIZE * mip->m);
@@ -119,8 +119,8 @@ int receive_lp_data_u(lp_prob *p)
       receive_dbl_array(mip->matval, mip->nz);
       receive_dbl_array(mip->obj, mip->n);
       if (p->par.multi_criteria){
-	 receive_dbl_array(mip->obj1, mip->n);
-	 receive_dbl_array(mip->obj2, mip->n);
+         receive_dbl_array(mip->obj1, mip->n);
+         receive_dbl_array(mip->obj2, mip->n);
       }
       receive_dbl_array(mip->rhs, mip->m);
       receive_char_array(mip->sense, mip->m);
@@ -130,12 +130,12 @@ int receive_lp_data_u(lp_prob *p)
       receive_char_array(mip->is_int, mip->n);
       receive_char_array(&has_colnames, 1);
       if (has_colnames){
-	 mip->colname = (char **) malloc(sizeof(char *) * mip->n);   
-	 for (i = 0; i < mip->n; i++){
-	    mip->colname[i] = (char *) malloc(CSIZE * 9);
-	    receive_char_array(mip->colname[i], 8);
-	    mip->colname[i][8] = 0;
-	 }
+         mip->colname = (char **) malloc(sizeof(char *) * mip->n);   
+         for (i = 0; i < mip->n; i++){
+            mip->colname[i] = (char *) malloc(CSIZE * 9);
+            receive_char_array(mip->colname[i], 8);
+            mip->colname[i][8] = 0;
+         }
       }
    }
 
@@ -171,7 +171,7 @@ int comp_cut_name(const void *c0, const void *c1)
 /*===========================================================================*\
  * This function invokes the user written function user_create_subproblem that
  * creates the problem matrix.
-\*===========================================================================*/
+ \*===========================================================================*/
 
 int create_subproblem_u(lp_prob *p)
 {
@@ -203,37 +203,37 @@ int create_subproblem_u(lp_prob *p)
 
    lp_data->n = bvarnum + desc->uind.size;
    lp_data->m = bcutnum + desc->cutind.size;
-   
+
    maxm = lp_data->maxm;
    maxn = lp_data->maxn;
    maxnz = lp_data->maxnz;
 
    lp_data->nf_status = desc->nf_status;
    if (desc->nf_status == NF_CHECK_AFTER_LAST ||
-       desc->nf_status == NF_CHECK_UNTIL_LAST){
+         desc->nf_status == NF_CHECK_UNTIL_LAST){
       lp_data->not_fixed_num = desc->not_fixed.size;
       memcpy(lp_data->not_fixed, desc->not_fixed.list,
-	     lp_data->not_fixed_num * ISIZE);
+            lp_data->not_fixed_num * ISIZE);
    }
 
    if (desc->uind.size > 0){ /* fill up the rest of lp_data->vars */
       if (MAX(maxn, bvarnum) < lp_data->n){
-	 vars = lp_data->vars = (var_desc **)
-	    realloc(lp_data->vars, lp_data->n * sizeof(var_desc *));
-	 for (i = lp_data->n - 1; i >= MAX(maxn, bvarnum); i--){
-	    vars[i] = (var_desc *) malloc(sizeof(var_desc) );
-	 }	  
+         vars = lp_data->vars = (var_desc **)
+            realloc(lp_data->vars, lp_data->n * sizeof(var_desc *));
+         for (i = lp_data->n - 1; i >= MAX(maxn, bvarnum); i--){
+            vars[i] = (var_desc *) malloc(sizeof(var_desc) );
+         }	  
       }
       vars = lp_data->vars;
       d_uind = desc->uind.list;
       for (i = desc->uind.size - 1; i >= 0; i--){
-	 vars[i + bvarnum]->userind = d_uind[i];
-	 vars[i + bvarnum]->colind = bvarnum + i;
+         vars[i + bvarnum]->userind = d_uind[i];
+         vars[i + bvarnum]->colind = bvarnum + i;
       }
 
       if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
-	 vars[lp_data->n - 1]->userind = p->mip->n;
-	 vars[lp_data->n - 1]->colind  = lp_data->n - 1;
+         vars[lp_data->n - 1]->userind = p->mip->n;
+         vars[lp_data->n - 1]->colind  = lp_data->n - 1;
       }
    }
    lp_data->ordering = COLIND_AND_USERIND_ORDERED;
@@ -247,35 +247,35 @@ int create_subproblem_u(lp_prob *p)
    for (i = lp_data->n - 1; i >= 0; --i){
       userind[i] = vars[i]->userind;
    }
-   
+
 #ifdef USE_SYM_APPLICATION
    user_res = user_create_subproblem(p->user,
-       /* list of base and extra variables */
-       userind,
-       /* description of the LP relaxation to be filled out by the user */
-       lp_data->mip, 
-       /* max sizes (estimated by the user) */
-       &maxn, &maxm, &maxnz);
+         /* list of base and extra variables */
+         userind,
+         /* description of the LP relaxation to be filled out by the user */
+         lp_data->mip, 
+         /* max sizes (estimated by the user) */
+         &maxn, &maxm, &maxnz);
 #else
    user_res = USER_DEFAULT;
 #endif
 
    switch (user_res){
-      
+
     case USER_DEFAULT:
-       
+
       if (!p->mip->matbeg){
-	 printf("Illegal return code.\n");
-	 printf("Trying to use default user_create_subproblem without");
-	 printf("reading an MPS or AMPL file. Exiting...\n\n");
-	 return(ERROR__ILLEGAL_RETURN_CODE);
+         printf("Illegal return code.\n");
+         printf("Trying to use default user_create_subproblem without");
+         printf("reading an MPS or AMPL file. Exiting...\n\n");
+         return(ERROR__ILLEGAL_RETURN_CODE);
       }
 
       lp_data->mip->nz = p->mip->nz;
       if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
-	 lp_data->mip->nz += 2 * lp_data->n;
+         lp_data->mip->nz += 2 * lp_data->n;
       }
-      
+
       /* Allocate the arrays.*/
       lp_data->mip->matbeg  = (int *) malloc((lp_data->mip->n + 1) * ISIZE);
       lp_data->mip->matind  = (int *) malloc((lp_data->mip->nz) * ISIZE);
@@ -291,52 +291,52 @@ int create_subproblem_u(lp_prob *p)
       /* Fill out the appropriate data structures*/
       lp_data->mip->matbeg[0] = 0;
       for (j = 0, i = 0; i < lp_data->mip->n; i++){
-	 if (userind[i] == p->mip->n){
-	    /* We should only be here with multi-criteria problems. */
-	    /* This is the artifical variable added for finding nondominated */
-	    /* solutions. */
-	    lp_data->mip->is_int[i]    = FALSE;
-	    lp_data->mip->ub[i]        = MAXINT;
-	    lp_data->mip->lb[i]         = -MAXINT;
-	    lp_data->mip->obj[i]       = 1.0;
-	    lp_data->mip->matval[j]    = -1.0;
-	    lp_data->mip->matind[j++]  = bcutnum - 2;
-	    lp_data->mip->matval[j]    = -1.0;
-	    lp_data->mip->matind[j++]  = bcutnum - 1;
-	    lp_data->mip->matbeg[i+1]  = j;
-	    continue;
-	 }
-	 lp_data->mip->ub[i] = p->mip->ub[userind[i]];
-	 lp_data->mip->lb[i] = p->mip->lb[userind[i]];
-	 lp_data->mip->is_int[i] = p->mip->is_int[userind[i]];
-	 for (k = p->mip->matbeg[userind[i]]; k < p->mip->matbeg[userind[i]+1];
-	      k++){
-	    lp_data->mip->matind[j]   = p->mip->matind[k];
-	    lp_data->mip->matval[j++] = p->mip->matval[k];
-	 }
-	 if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
-	    lp_data->mip->obj[i] = p->par.mc_rho*(p->mip->obj1[userind[i]] +
-						  p->mip->obj2[userind[i]]);
-	    lp_data->mip->matval[j] = p->par.mc_gamma*p->mip->obj1[userind[i]];
-	    lp_data->mip->matind[j++] = bcutnum - 2;
-	    lp_data->mip->matval[j] = p->par.mc_tau*p->mip->obj2[userind[i]];
-	    lp_data->mip->matind[j++] = bcutnum - 1;
-	 }else{
-	    lp_data->mip->obj[i] = p->mip->obj[userind[i]];
-	 }
-	 lp_data->mip->matbeg[i+1] = j;
+         if (userind[i] == p->mip->n){
+            /* We should only be here with multi-criteria problems. */
+            /* This is the artifical variable added for finding nondominated */
+            /* solutions. */
+            lp_data->mip->is_int[i]    = FALSE;
+            lp_data->mip->ub[i]        = MAXINT;
+            lp_data->mip->lb[i]         = -MAXINT;
+            lp_data->mip->obj[i]       = 1.0;
+            lp_data->mip->matval[j]    = -1.0;
+            lp_data->mip->matind[j++]  = bcutnum - 2;
+            lp_data->mip->matval[j]    = -1.0;
+            lp_data->mip->matind[j++]  = bcutnum - 1;
+            lp_data->mip->matbeg[i+1]  = j;
+            continue;
+         }
+         lp_data->mip->ub[i] = p->mip->ub[userind[i]];
+         lp_data->mip->lb[i] = p->mip->lb[userind[i]];
+         lp_data->mip->is_int[i] = p->mip->is_int[userind[i]];
+         for (k = p->mip->matbeg[userind[i]]; k < p->mip->matbeg[userind[i]+1];
+               k++){
+            lp_data->mip->matind[j]   = p->mip->matind[k];
+            lp_data->mip->matval[j++] = p->mip->matval[k];
+         }
+         if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
+            lp_data->mip->obj[i] = p->par.mc_rho*(p->mip->obj1[userind[i]] +
+                  p->mip->obj2[userind[i]]);
+            lp_data->mip->matval[j] = p->par.mc_gamma*p->mip->obj1[userind[i]];
+            lp_data->mip->matind[j++] = bcutnum - 2;
+            lp_data->mip->matval[j] = p->par.mc_tau*p->mip->obj2[userind[i]];
+            lp_data->mip->matind[j++] = bcutnum - 1;
+         }else{
+            lp_data->mip->obj[i] = p->mip->obj[userind[i]];
+         }
+         lp_data->mip->matbeg[i+1] = j;
       }
       lp_data->mip->nz = j;
       for (i = 0; i < p->mip->m; i++){
-	 lp_data->mip->rhs[i] = p->mip->rhs[i];
-	 lp_data->mip->sense[i] = p->mip->sense[i];
-	 lp_data->mip->rngval[i] = p->mip->rngval[i];
+         lp_data->mip->rhs[i] = p->mip->rhs[i];
+         lp_data->mip->sense[i] = p->mip->sense[i];
+         lp_data->mip->rngval[i] = p->mip->rngval[i];
       }
       if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
-	 lp_data->mip->rhs[bcutnum - 2] = p->par.mc_gamma * p->utopia[0]; 
-	 lp_data->mip->sense[bcutnum - 2] = 'L';
-	 lp_data->mip->rhs[bcutnum - 1] = p->par.mc_tau * p->utopia[1]; 
-	 lp_data->mip->sense[bcutnum - 1] = 'L';
+         lp_data->mip->rhs[bcutnum - 2] = p->par.mc_gamma * p->utopia[0]; 
+         lp_data->mip->sense[bcutnum - 2] = 'L';
+         lp_data->mip->rhs[bcutnum - 1] = p->par.mc_tau * p->utopia[1]; 
+         lp_data->mip->sense[bcutnum - 1] = 'L';
       }
       maxm = lp_data->m;
       maxn = lp_data->n;
@@ -346,23 +346,23 @@ int create_subproblem_u(lp_prob *p)
       lp_data->nz = lp_data->mip->nz;
       break;
     case USER_SUCCESS:
-       /* Fall through to next case */
+      /* Fall through to next case */
     case USER_AND_PP:
     case USER_NO_PP:
-       
+
       /* User function terminated without problems. In the post-processing
        * the extra cuts are added. HOWEVER, this might not be done until the
        * problem is loaded into the lp solver (for cplex it is not possible).
        * So for now just reset lp_data->m, do everything to load in the
        * stuff into the lp solver then come back to adding the cuts. */
 
-       /* change obj coeff only if the obj funct. was created through 
-	  user_create_subproblem() */
+      /* change obj coeff only if the obj funct. was created through 
+         user_create_subproblem() */
 
       if (p->mip->obj_sense == SYM_MAXIMIZE){
          for (i = 0; i < lp_data->mip->n; i++){
-	    lp_data->mip->obj[i] *= -1.0;
-	 }
+            lp_data->mip->obj[i] *= -1.0;
+         }
       }
 
       lp_data->m = bcutnum;
@@ -370,13 +370,13 @@ int create_subproblem_u(lp_prob *p)
       break;
 
     case USER_ERROR:
-       
+
       /* Error. The search tree node will not be processed. */
       FREE(userind);
       return(ERROR__USER);
-      
+
     default:
-       
+
       /* Unexpected return value. Do something!! */
       FREE(userind);
       return(ERROR__USER);
@@ -386,7 +386,7 @@ int create_subproblem_u(lp_prob *p)
 
    /*------------------------------------------------------------------------*\
     * Let's see about reallocing...
-   \*----------------------------------------------------------------------- */
+    \*----------------------------------------------------------------------- */
 
    if (maxm  < lp_data->m)  maxm  = lp_data->m;
    if (maxn  < lp_data->n)  maxn  = lp_data->n;
@@ -396,12 +396,12 @@ int create_subproblem_u(lp_prob *p)
 
    if (lp_data->maxn > lp_data->n){
       vars = lp_data->vars = (var_desc **)
-	 realloc(lp_data->vars, lp_data->maxn * sizeof(var_desc *));
+         realloc(lp_data->vars, lp_data->maxn * sizeof(var_desc *));
       for (i = lp_data->n; i < lp_data->maxn; i++){
-	 vars[i] = (var_desc *) malloc( sizeof(var_desc) );
+         vars[i] = (var_desc *) malloc( sizeof(var_desc) );
       }
    }
-   
+
    /* Default status of every variable is NOT_FIXED */
    if (bvarnum > 0)
       memset(lp_data->status, NOT_FIXED | BASE_VARIABLE, bvarnum);
@@ -410,7 +410,7 @@ int create_subproblem_u(lp_prob *p)
 
    /*------------------------------------------------------------------------*\
     * Set the necessary fields in rows
-   \*----------------------------------------------------------------------- */
+    \*----------------------------------------------------------------------- */
 
    rows = lp_data->rows;
    rhs = lp_data->mip->rhs;
@@ -422,7 +422,7 @@ int create_subproblem_u(lp_prob *p)
       cut->rhs = rhs[i];
       cut->range = rngval[i];
       cut->branch = (((cut->sense = sense[i]) != 'E') ?
-		     ALLOWED_TO_BRANCH_ON : DO_NOT_BRANCH_ON_THIS_ROW);
+            ALLOWED_TO_BRANCH_ON : DO_NOT_BRANCH_ON_THIS_ROW);
       cut->size = 0;
       row->eff_cnt = 1;
       row->free = FALSE;
@@ -432,7 +432,7 @@ int create_subproblem_u(lp_prob *p)
 
    /*------------------------------------------------------------------------*\
     * Set the upper and lower bounds and integer status
-   \*----------------------------------------------------------------------- */
+    \*----------------------------------------------------------------------- */
 
    lb = lp_data->mip->lb;
    ub = lp_data->mip->ub;
@@ -444,10 +444,10 @@ int create_subproblem_u(lp_prob *p)
       vars[i]->ub = ub[i];
       vars[i]->is_int = is_int[i];
    }
-   
+
    /*------------------------------------------------------------------------*\
     * Load the lp problem (load_lp is an lp solver dependent routine).
-   \*----------------------------------------------------------------------- */
+    \*----------------------------------------------------------------------- */
 
    load_lp_prob(lp_data, p->par.scaling, p->par.fastmip);
 
@@ -456,7 +456,7 @@ int create_subproblem_u(lp_prob *p)
 
    if (desc->cutind.size > 0){
       unpack_cuts_u(p, CUT_FROM_TM, UNPACK_CUTS_SINGLE,
-		    desc->cutind.size, desc->cuts, &new_row_num, &new_rows);
+            desc->cutind.size, desc->cuts, &new_row_num, &new_rows);
       add_row_set(p, new_rows, new_row_num);
       FREE(new_rows);
    }
@@ -473,7 +473,7 @@ int create_subproblem_u(lp_prob *p)
 
    /*------------------------------------------------------------------------*\
     * Now go through the branching stuff
-   \*----------------------------------------------------------------------- */
+    \*----------------------------------------------------------------------- */
 
    d_cind = desc->cutind.list;
    vars = lp_data->vars;
@@ -481,55 +481,55 @@ int create_subproblem_u(lp_prob *p)
    if (p->bc_level){
       status = lp_data->status;
       for (i = 0; i < p->bc_level; i++){
-	 bobj = p->bdesc + i;
-	 if (bobj->type == BRANCHING_VARIABLE){
-	    j = bobj->name < 0 ? /* base variable : extra variable */
-	       -bobj->name-1 :
-	       bfind(bobj->name, d_uind, desc->uind.size) + bvarnum;
-	    switch (bobj->sense){
-	     case 'E':
-	       change_lbub(lp_data, j, bobj->rhs, bobj->rhs);
-	       vars[j]->lb = vars[j]->ub = bobj->rhs;
-	       break;
-	     case 'L':
-	       change_ub(lp_data, j, bobj->rhs);
-	       vars[j]->ub = bobj->rhs;
-	       break;
-	     case 'G':
-	       change_lb(lp_data, j, bobj->rhs);
-	       vars[j]->lb = bobj->rhs;
-	       break;
-	     case 'R':
-	       change_lbub(lp_data, j, bobj->rhs, bobj->rhs + bobj->range);
-	       vars[j]->lb = bobj->rhs;
-	       vars[j]->ub = bobj->rhs + bobj->range;
-	       break;
-	    }
-	    status[j] |= VARIABLE_BRANCHED_ON;
-	 }else{ /* BRANCHING_CUT */
-	    j = bobj->name < 0 ? /* base constraint : extra constraint */
-	       -bobj->name-1 :
-	       bfind(bobj->name, d_cind, desc->cutind.size) + bcutnum;
-	    change_row(lp_data, j, bobj->sense, bobj->rhs, bobj->range);
+         bobj = p->bdesc + i;
+         if (bobj->type == BRANCHING_VARIABLE){
+            j = bobj->name < 0 ? /* base variable : extra variable */
+               -bobj->name-1 :
+               bfind(bobj->name, d_uind, desc->uind.size) + bvarnum;
+            switch (bobj->sense){
+             case 'E':
+               change_lbub(lp_data, j, bobj->rhs, bobj->rhs);
+               vars[j]->lb = vars[j]->ub = bobj->rhs;
+               break;
+             case 'L':
+               change_ub(lp_data, j, bobj->rhs);
+               vars[j]->ub = bobj->rhs;
+               break;
+             case 'G':
+               change_lb(lp_data, j, bobj->rhs);
+               vars[j]->lb = bobj->rhs;
+               break;
+             case 'R':
+               change_lbub(lp_data, j, bobj->rhs, bobj->rhs + bobj->range);
+               vars[j]->lb = bobj->rhs;
+               vars[j]->ub = bobj->rhs + bobj->range;
+               break;
+            }
+            status[j] |= VARIABLE_BRANCHED_ON;
+         }else{ /* BRANCHING_CUT */
+            j = bobj->name < 0 ? /* base constraint : extra constraint */
+               -bobj->name-1 :
+               bfind(bobj->name, d_cind, desc->cutind.size) + bcutnum;
+            change_row(lp_data, j, bobj->sense, bobj->rhs, bobj->range);
 #ifdef COMPILE_IN_LP
-	    /* Because these cuts are shared with the treemanager, we have to
-	       make a copy before changing them if the LP is compiled in */
-	    cut = (cut_data *) malloc(sizeof(cut_data));
-	    memcpy((char *)cut, (char *)rows[j].cut, sizeof(cut_data));
-	    if (cut->size){
-	       cut->coef = (char *) malloc(cut->size);
-	       memcpy((char *)cut->coef, (char *)rows[j].cut->coef,
-		      cut->size);
-	    }
-	    rows[j].cut = cut;
+            /* Because these cuts are shared with the treemanager, we have to
+               make a copy before changing them if the LP is compiled in */
+            cut = (cut_data *) malloc(sizeof(cut_data));
+            memcpy((char *)cut, (char *)rows[j].cut, sizeof(cut_data));
+            if (cut->size){
+               cut->coef = (char *) malloc(cut->size);
+               memcpy((char *)cut->coef, (char *)rows[j].cut->coef,
+                     cut->size);
+            }
+            rows[j].cut = cut;
 #else      
-	    cut = rows[j].cut;
+            cut = rows[j].cut;
 #endif
-	    cut->rhs = bobj->rhs;
-	    cut->range = bobj->range;
-	    cut->sense = bobj->sense;
-	    cut->branch |= CUT_BRANCHED_ON;
-	 }
+            cut->rhs = bobj->rhs;
+            cut->range = bobj->range;
+            cut->sense = bobj->sense;
+            cut->branch |= CUT_BRANCHED_ON;
+         }
       }
    }
 
@@ -537,31 +537,31 @@ int create_subproblem_u(lp_prob *p)
     * The final step: load in the basis.
     * This is cplex style. sorry about it... Still, it
     * might be ok if {VAR,SLACK}_{B,LB,UB} are properly defined
-   \*----------------------------------------------------------------------- */
+    \*----------------------------------------------------------------------- */
 
    if (desc->basis.basis_exists == TRUE){
       int *rstat, *cstat;
       if (desc->basis.extravars.size == 0){
-	 cstat = desc->basis.basevars.stat;
+         cstat = desc->basis.basevars.stat;
       }else if (desc->basis.basevars.size == 0){
-	 cstat = desc->basis.extravars.stat;
+         cstat = desc->basis.extravars.stat;
       }else{ /* neither is zero */
-	 cstat = lp_data->tmp.i1; /* n */
-	 memcpy(cstat,
-		desc->basis.basevars.stat, desc->basis.basevars.size *ISIZE);
-	 memcpy(cstat + desc->basis.basevars.size,
-		desc->basis.extravars.stat, desc->basis.extravars.size *ISIZE);
+         cstat = lp_data->tmp.i1; /* n */
+         memcpy(cstat,
+               desc->basis.basevars.stat, desc->basis.basevars.size *ISIZE);
+         memcpy(cstat + desc->basis.basevars.size,
+               desc->basis.extravars.stat, desc->basis.extravars.size *ISIZE);
       }
       if (desc->basis.extrarows.size == 0){
-	 rstat = desc->basis.baserows.stat;
+         rstat = desc->basis.baserows.stat;
       }else if (desc->basis.baserows.size == 0){
-	 rstat = desc->basis.extrarows.stat;
+         rstat = desc->basis.extrarows.stat;
       }else{ /* neither is zero */
-	 rstat = lp_data->tmp.i2; /* m */
-	 memcpy(rstat,
-		desc->basis.baserows.stat, desc->basis.baserows.size *ISIZE);
-	 memcpy(rstat + desc->basis.baserows.size,
-		desc->basis.extrarows.stat, desc->basis.extrarows.size *ISIZE);
+         rstat = lp_data->tmp.i2; /* m */
+         memcpy(rstat,
+               desc->basis.baserows.stat, desc->basis.baserows.size *ISIZE);
+         memcpy(rstat + desc->basis.baserows.size,
+               desc->basis.extrarows.stat, desc->basis.extrarows.size *ISIZE);
       }
       load_basis(lp_data, cstat, rstat);
    }
@@ -586,6 +586,7 @@ int is_feasible_u(lp_prob *p, char branching)
    int cnt, i;
    double new_obj_val;
    int termcode, is_feasible;
+   double elapsed_time;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
@@ -595,11 +596,11 @@ int is_feasible_u(lp_prob *p, char branching)
    cnt = collect_nonzeros(p, lp_data->x, indices, values);
 
    heur_solution = (double *) malloc(lp_data->n*DSIZE);
-   
+
 #ifdef USE_SYM_APPLICATION
    user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
-			       &feasible, &true_objval, branching,
-			       heur_solution);
+         &feasible, &true_objval, branching,
+         heur_solution);
 #else
    user_res = USER_DEFAULT;
 #endif
@@ -614,9 +615,9 @@ int is_feasible_u(lp_prob *p, char branching)
     case USER_DEFAULT: /* set the default */
       user_res = TEST_INTEGRALITY;
       if (feasible != IP_INFEASIBLE){
-	 printf("Warning: User set feasibility status of solution, but\n");
-	 printf("SYMPHONY to check feasibility. Ignoring request.");
-	 user_res = USER_SUCCESS;
+         printf("Warning: User set feasibility status of solution, but\n");
+         printf("SYMPHONY to check feasibility. Ignoring request.");
+         user_res = USER_SUCCESS;
       }
       break;
     default:
@@ -625,23 +626,23 @@ int is_feasible_u(lp_prob *p, char branching)
 
    switch (user_res){
     case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
-       for (i=cnt-1; i>=0; i--){
-	 if (!lp_data->vars[i]->is_int)
-	    continue; /* Not an integer variable */
-	 if (values[i] < lpetol1) break;
-       }
+      for (i=cnt-1; i>=0; i--){
+         if (!lp_data->vars[i]->is_int)
+            continue; /* Not an integer variable */
+         if (values[i] < lpetol1) break;
+      }
       feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
       break;
     case TEST_INTEGRALITY:
       for (i = lp_data->n - 1; i >= 0; i--){
-	 if (!lp_data->vars[i]->is_int)
-	    continue; /* Not an integer variable */
-	 valuesi = lp_data->x[i];
-	 if (valuesi > lp_data->vars[i]->lb && valuesi < lp_data->vars[i]->ub
-	     && valuesi-floor(valuesi) > lpetol &&
-	     ceil(valuesi)-valuesi > lpetol){
-	    break;
-	 }
+         if (!lp_data->vars[i]->is_int)
+            continue; /* Not an integer variable */
+         valuesi = lp_data->x[i];
+         if (valuesi > lp_data->vars[i]->lb && valuesi < lp_data->vars[i]->ub
+               && valuesi-floor(valuesi) > lpetol &&
+               ceil(valuesi)-valuesi > lpetol){
+            break;
+         }
       }
       feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
       break;
@@ -651,31 +652,31 @@ int is_feasible_u(lp_prob *p, char branching)
 
    /* try rounding */
    if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE && 
-       p->par.do_primal_heuristic &&
-       !p->par.multi_criteria){
+         p->par.do_primal_heuristic &&
+         !p->par.multi_criteria){
       if (feasible == IP_INFEASIBLE){ 
-	 true_objval = SYM_INFINITY;
+         true_objval = SYM_INFINITY;
       }
       if (p->has_ub){
-	 true_objval = p->ub;      
-	 if (round_solution(p, &true_objval, heur_solution)){
-	    feasible = IP_HEUR_FEASIBLE;
-	 }
-	 col_sol = (double *)calloc(DSIZE, lp_data->n);
-	 if (feasible == IP_HEUR_FEASIBLE){
-	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	 }else{
-	    for(i = 0; i< p->best_sol.xlength; i++) {
-	       col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
-	    }
-	 }
-	 if (local_search(p, &true_objval, col_sol, heur_solution)){
-	    feasible = IP_HEUR_FEASIBLE;
-	 }
+         true_objval = p->ub;      
+         if (round_solution(p, &true_objval, heur_solution)){
+            feasible = IP_HEUR_FEASIBLE;
+         }
+         col_sol = (double *)calloc(DSIZE, lp_data->n);
+         if (feasible == IP_HEUR_FEASIBLE){
+            memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+         }else{
+            for(i = 0; i< p->best_sol.xlength; i++) {
+               col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
+            }
+         }
+         if (local_search(p, &true_objval, col_sol, heur_solution)){
+            feasible = IP_HEUR_FEASIBLE;
+         }
       }else{
-	 if (round_solution(p, &true_objval, heur_solution)){
-	    feasible = IP_HEUR_FEASIBLE;
-	 }
+         if (round_solution(p, &true_objval, heur_solution)){
+            feasible = IP_HEUR_FEASIBLE;
+         }
       }
    }    
 
@@ -683,35 +684,45 @@ int is_feasible_u(lp_prob *p, char branching)
    //TODO: move these defns up
    is_feasible = FALSE;
 #ifdef PRIMAL_HEURISTICS
-   termcode = feasibility_pump (p, new_obj_val, heur_solution);
    if (feasible == IP_FEASIBLE) {
       if (p->tm->par.warm_search_enabled>0) {
-         sp_add_solution(p, cnt, indices, values, p->lp_data->objval, p->bc_index);
+         sp_add_solution(p, cnt, indices, values, p->lp_data->objval, 
+               p->bc_index);
       }
+
+   } else if (fp_should_call_fp(p,branching)) {
+      termcode    = feasibility_pump (p, new_obj_val, heur_solution);
+      if (termcode==IP_HEUR_FEASIBLE) {
+         feasible    = IP_HEUR_FEASIBLE;
+         true_objval = new_obj_val;
+      }
+
+      //TODO: put all warm search conditions here
    } else if (p->tm->par.warm_search_enabled>0 && !branching) {
-      termcode = warm_search (p, indices, values, cnt, lpetol, heur_solution, new_obj_val, is_feasible);
+      termcode = warm_search (p, indices, values, cnt, lpetol, heur_solution, 
+            new_obj_val, is_feasible);
       if (termcode == IP_HEUR_FEASIBLE) {
          feasible = IP_HEUR_FEASIBLE;
          true_objval = new_obj_val;
       }
    }
 #endif
-   
+
    if (feasible == IP_FEASIBLE && p->par.multi_criteria){
       if (analyze_multicriteria_solution(p, indices, values, cnt,
-					 &true_objval, lpetol, branching) > 0){
-	 if(feasible == IP_FEASIBLE){
-	    if (p->par.mc_add_optimality_cuts || branching){
-	       feasible = IP_FEASIBLE_BUT_CONTINUE;
-	    }else{
-	       feasible = IP_FEASIBLE;
-	    }
-	 }else{
-	    feasible = IP_FEASIBLE;
-	 }
+               &true_objval, lpetol, branching) > 0){
+         if(feasible == IP_FEASIBLE){
+            if (p->par.mc_add_optimality_cuts || branching){
+               feasible = IP_FEASIBLE_BUT_CONTINUE;
+            }else{
+               feasible = IP_FEASIBLE;
+            }
+         }else{
+            feasible = IP_FEASIBLE;
+         }
       }
    }
-   
+
    if (feasible == IP_HEUR_FEASIBLE){
       cnt = collect_nonzeros(p, heur_solution, indices, values);        
    }
@@ -754,9 +765,7 @@ int is_feasible_u(lp_prob *p, char branching)
          memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
          if(!p->best_sol.has_sol)
             p->best_sol.has_sol = TRUE;
-         if (feasible == IP_HEUR_FEASIBLE) {
-            PRINT(p->par.verbosity,-1,("heuristic: "));
-         } else {
+         if (feasible==IP_FEASIBLE) {
             PRINT(p->par.verbosity,-1,("lp: "));
          }
          PRINT(p->par.verbosity, -1,
@@ -789,10 +798,10 @@ int is_feasible_u(lp_prob *p, char branching)
 #endif
 #if !defined(COMPILE_IN_LP) || !defined(COMPILE_IN_TM)
       send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
-			       lpetol, true_objval, cnt, indices, values);
+            lpetol, true_objval, cnt, indices, values);
 #endif
    }
-   
+
    if (feasible == IP_FEASIBLE){
       lp_data->termcode = LP_OPT_FEASIBLE;
    }
@@ -801,12 +810,12 @@ int is_feasible_u(lp_prob *p, char branching)
    FREE(col_sol);
    return(feasible);
 }
-   
+
 /*===========================================================================*/
 
 void send_feasible_solution_u(lp_prob *p, int xlevel, int xindex,
-			      int xiter_num, double lpetol, double new_ub,
-			      int cnt, int *xind, double *xval)
+      int xiter_num, double lpetol, double new_ub,
+      int cnt, int *xind, double *xval)
 {
    int s_bufid, msgtag, user_res;
 
@@ -835,7 +844,7 @@ void send_feasible_solution_u(lp_prob *p, int xlevel, int xindex,
       break;
     case USER_ERROR: /* Error. Do the default */
     case USER_DEFAULT: /* set the default */
-	 user_res = p->par.send_feasible_solution_default;
+      user_res = p->par.send_feasible_solution_default;
       break;
    }
    switch (user_res){
@@ -855,7 +864,7 @@ void send_feasible_solution_u(lp_prob *p, int xlevel, int xindex,
 /*===========================================================================*\
  * This function invokes the user written function user_display_solution
  * that (graphically) displays the current solution. 
-\*===========================================================================*/
+ \*===========================================================================*/
 
 void display_lp_solution_u(lp_prob *p, int which_sol)
 {
@@ -869,7 +878,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
    double tmpd, *xval = lp_data->tmp.d; /* n */
 
    if (p->par.verbosity < 0) return;
-   
+
    number = collect_nonzeros(p, x, xind, xval);
 
    /* Invoke user written function. */
@@ -899,23 +908,23 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       break;
     case DISP_NZ_INT:
       if (p->mip->colname){ 
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf(" Column names and values of nonzeros in the solution\n");
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < number; i++){
-	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	    printf("%8s %10.7f\n", p->mip->colname[xind[i]], xval[i]);
-	 }
-	 printf("\n");
+         printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+         printf(" Column names and values of nonzeros in the solution\n");
+         printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+         for (i = 0; i < number; i++){
+            if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+            printf("%8s %10.7f\n", p->mip->colname[xind[i]], xval[i]);
+         }
+         printf("\n");
       }else{
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf(" User indices and values of nonzeros in the solution\n");
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < number; i++){
-	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	    printf("%7d %10.7f\n", xind[i], xval[i]);
-	 }
-	 printf("\n");
+         printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+         printf(" User indices and values of nonzeros in the solution\n");
+         printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+         for (i = 0; i < number; i++){
+            if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+            printf("%7d %10.7f\n", xind[i], xval[i]);
+         }
+         printf("\n");
       }
       break;
     case DISP_NZ_HEXA:
@@ -923,37 +932,37 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf(" User indices (hexa) and values of nonzeros in the solution\n");
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
       for (i = 0; i < number; i++){
-	 if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	 printf("%7x %10.7f ", xind[i], xval[i]);
-	 if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
+         if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+         printf("%7x %10.7f ", xind[i], xval[i]);
+         if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
       }
       printf("\n");
       break;
     case DISP_FRAC_INT:
       if (p->mip->colname){ 
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf(" Column names and values of fractional vars in solution\n");
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < number; i++){
-	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	    tmpd = xval[i];
-	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
-	       printf("%8s %10.7f\n", p->mip->colname[xind[i]], tmpd);
-	    }
-	 }
-	 printf("\n");
+         printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+         printf(" Column names and values of fractional vars in solution\n");
+         printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+         for (i = 0; i < number; i++){
+            if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+            tmpd = xval[i];
+            if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
+               printf("%8s %10.7f\n", p->mip->colname[xind[i]], tmpd);
+            }
+         }
+         printf("\n");
       }else{
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf(" User indices and values of fractional vars in solution\n");
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < number; i++){
-	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	    tmpd = xval[i];
-	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
-	       printf("%7d %10.7f ", xind[i], tmpd);
-	       if (!(++i & 3)) printf("\n"); /* new line after every four*/
-	    }
-	 }
+         printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+         printf(" User indices and values of fractional vars in solution\n");
+         printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+         for (i = 0; i < number; i++){
+            if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+            tmpd = xval[i];
+            if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
+               printf("%7d %10.7f ", xind[i], tmpd);
+               if (!(++i & 3)) printf("\n"); /* new line after every four*/
+            }
+         }
       }
       printf("\n");
       break;
@@ -962,12 +971,12 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
       printf(" User indices (hexa) and values of frac vars in the solution\n");
       printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
       for (i = 0; i < number; i++){
-	 if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	 tmpd = xval[i];
-	 if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
-	    printf("%7x %10.7f ", xind[i], tmpd);
-	    if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
-	 }
+         if (xind[i] == p->mip->n) continue; /* For multi-criteria */
+         tmpd = xval[i];
+         if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
+            printf("%7x %10.7f ", xind[i], tmpd);
+            if (!(++i & 3)) printf("\n"); /* new line after every four pair*/
+         }
       }
       printf("\n");
       break;
@@ -983,10 +992,10 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
  * This function invokes the user written function user_branch that selects
  * candidates to branch on. It receives a number of arguments:
  *  sim_num : slacks in matrix number (the 
-\*===========================================================================*/
+ \*===========================================================================*/
 
 int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
-			int *cand_num, branch_obj ***candidates)
+      int *cand_num, branch_obj ***candidates)
 {
    int user_res, action = USER__BRANCH_IF_MUST;
    LPdata *lp_data = p->lp_data;
@@ -1005,20 +1014,20 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
       slacks_in_matrix = (cut_data **)lp_data->tmp.p2; /* m */
       /* get a list of row that are candidates for branching */
       for (i=0; i<m; i++){ /* can't branch on original rows */
-	 if ((rows[i].cut->branch & CANDIDATE_FOR_BRANCH)){
-	    slacks_in_matrix[j] = rows[i].cut;
-	    candidate_rows[j++] = i;
-	 }
+         if ((rows[i].cut->branch & CANDIDATE_FOR_BRANCH)){
+            slacks_in_matrix[j] = rows[i].cut;
+            candidate_rows[j++] = i;
+         }
       }
    }
 
    /* First decide if we are going to branch or not */
 #ifdef USE_SYM_APPLICATION
    user_res = user_shall_we_branch(p->user, lp_data->lpetol, *cuts, j, 
-				   slacks_in_matrix, p->slack_cut_num, 
-				   p->slack_cuts, lp_data->n, lp_data->vars, 
-				   lp_data->x, lp_data->status, cand_num, 
-				   candidates, &action);
+         slacks_in_matrix, p->slack_cut_num, 
+         p->slack_cuts, lp_data->n, lp_data->vars, 
+         lp_data->x, lp_data->status, cand_num, 
+         candidates, &action);
 #else
    user_res = USER_DEFAULT;
 #endif
@@ -1035,12 +1044,12 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    }
 
    if (p->bc_level <= p->par.load_balance_level &&
-       p->node_iter_num >= p->par.load_balance_iterations)
+         p->node_iter_num >= p->par.load_balance_iterations)
       action = USER__DO_BRANCH;
 
    if ((action == USER__DO_NOT_BRANCH) ||
-       (action == USER__BRANCH_IF_TAILOFF && *cuts > 0 && !check_tailoff(p)) ||
-       (action == USER__BRANCH_IF_MUST && *cuts > 0))
+         (action == USER__BRANCH_IF_TAILOFF && *cuts > 0 && !check_tailoff(p)) ||
+         (action == USER__BRANCH_IF_MUST && *cuts > 0))
       return(DO_NOT_BRANCH);
 
    action = col_gen_before_branch(p, new_vars);
@@ -1057,26 +1066,26 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    if (*new_vars > 0 && *cand_num > 0){
       cut_data **regen_cuts = (cut_data **) malloc(*cand_num*sizeof(cut_data));
       for (j = 0, i = 0; i < *cand_num; i++){
-	 can = (*candidates)[i];
-	 if (can->type == VIOLATED_SLACK ||
-	     can->type == CANDIDATE_CUT_NOT_IN_MATRIX){
-	    regen_cuts[j++] = can->row->cut;
-	 }
+         can = (*candidates)[i];
+         if (can->type == VIOLATED_SLACK ||
+               can->type == CANDIDATE_CUT_NOT_IN_MATRIX){
+            regen_cuts[j++] = can->row->cut;
+         }
       }
       if (j > 0){
-	 int new_row_num;
-	 waiting_row **new_rows;
-	 unpack_cuts_u(p, CUT_FROM_TM, UNPACK_CUTS_SINGLE,
-		       j, regen_cuts, &new_row_num, &new_rows);
-	 for (j = 0, i = 0; i < *cand_num; i++){
-	    can = (*candidates)[i];
-	    if (can->type == VIOLATED_SLACK ||
-		can->type == CANDIDATE_CUT_NOT_IN_MATRIX){
-	       free_waiting_row(&can->row);
-	       can->row = new_rows[j++];
-	    }
-	 }
-	 FREE(new_rows);
+         int new_row_num;
+         waiting_row **new_rows;
+         unpack_cuts_u(p, CUT_FROM_TM, UNPACK_CUTS_SINGLE,
+               j, regen_cuts, &new_row_num, &new_rows);
+         for (j = 0, i = 0; i < *cand_num; i++){
+            can = (*candidates)[i];
+            if (can->type == VIOLATED_SLACK ||
+                  can->type == CANDIDATE_CUT_NOT_IN_MATRIX){
+               free_waiting_row(&can->row);
+               can->row = new_rows[j++];
+            }
+         }
+         FREE(new_rows);
       }
       FREE(regen_cuts);
    }
@@ -1091,10 +1100,10 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    /* OK, so we got to branch */
 #ifdef USE_SYM_APPLICATION
    user_res = user_select_candidates(p->user, lp_data->lpetol, *cuts, j,
-				     slacks_in_matrix, p->slack_cut_num,
-				     p->slack_cuts, lp_data->n, lp_data->vars,
-				     lp_data->x, lp_data->status, cand_num,
-				     candidates, &action, p->bc_level);
+         slacks_in_matrix, p->slack_cut_num,
+         p->slack_cuts, lp_data->n, lp_data->vars,
+         lp_data->x, lp_data->status, cand_num,
+         candidates, &action, p->bc_level);
 #else
    user_res = USER_DEFAULT;
 #endif
@@ -1103,26 +1112,26 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
     * and rewrite the position of the CANDIDATE_CUT_IN_MATRIX ones */
    if (p->par.branch_on_cuts){
       for (i = 0; i < *cand_num; ){
-	 can = (*candidates)[i];
-	 switch (can->type){
-	  case CANDIDATE_VARIABLE:
-	    i++;
-	    break;
-	  case CANDIDATE_CUT_IN_MATRIX:
-	    can->position = candidate_rows[can->position];
-	    i++;
-	    break;
-	  case VIOLATED_SLACK:
-	  case CANDIDATE_CUT_NOT_IN_MATRIX:
-	    free_cut(p->slack_cuts + can->position);
-	    i++;
-	    break;
-	  case SLACK_TO_BE_DISCARDED:
-	    free_cut(p->slack_cuts + can->position);
-	    free_candidate(*candidates + i);
-	    (*candidates)[i] = (*candidates)[--(*cand_num)];
-	    break;
-	 }
+         can = (*candidates)[i];
+         switch (can->type){
+          case CANDIDATE_VARIABLE:
+            i++;
+            break;
+          case CANDIDATE_CUT_IN_MATRIX:
+            can->position = candidate_rows[can->position];
+            i++;
+            break;
+          case VIOLATED_SLACK:
+          case CANDIDATE_CUT_NOT_IN_MATRIX:
+            free_cut(p->slack_cuts + can->position);
+            i++;
+            break;
+          case SLACK_TO_BE_DISCARDED:
+            free_cut(p->slack_cuts + can->position);
+            free_candidate(*candidates + i);
+            (*candidates)[i] = (*candidates)[--(*cand_num)];
+            break;
+         }
       }
       compress_slack_cuts(p);
    }
@@ -1135,8 +1144,8 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
     case USER_AND_PP:
     case USER_NO_PP:
       if (! *cand_num){
-	 printf("Error! User didn't select branching candidates!\n");
-	 return(ERROR__NO_BRANCHING_CANDIDATE);
+         printf("Error! User didn't select branching candidates!\n");
+         return(ERROR__NO_BRANCHING_CANDIDATE);
       }
       return(DO_BRANCH);
     case USER_ERROR:    /* In case of error, default is used. */
@@ -1148,7 +1157,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    }
 
    i = (int) (p->par.strong_branching_cand_num_max -
-      p->par.strong_branching_red_ratio * p->bc_level);
+         p->par.strong_branching_red_ratio * p->bc_level);
    i = MAX(i, p->par.strong_branching_cand_num_min);
 
    switch(user_res){
@@ -1169,7 +1178,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 
    if (! *cand_num){
       PRINT(p->par.verbosity, 2,
-	    ("No branching candidates found using default rule...\n"));
+            ("No branching candidates found using default rule...\n"));
       return(DO_NOT_BRANCH);
    }
    return(DO_BRANCH);
@@ -1180,10 +1189,10 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 /*===========================================================================*\
  * This function invokes the user written function user_compare_candidates
  * that compares to branching candidates. 
-\*===========================================================================*/
+ \*===========================================================================*/
 
 int compare_candidates_u(lp_prob *p, double oldobjval,
-			 branch_obj *best, branch_obj *can)
+      branch_obj *best, branch_obj *can)
 {
    int user_res;
    int i;
@@ -1196,24 +1205,24 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
        case LP_OPTIMAL:
        case LP_OPT_FEASIBLE_BUT_CONTINUE:
 #ifdef DO_TESTS
-	 if (can->objval[i] < oldobjval - .01){
-	    printf("#####Error: Branching candidate has lower objval ");
-	    printf("(%.3f) than parent (%.3f)\n", can->objval[i],  oldobjval);
-	 }
+         if (can->objval[i] < oldobjval - .01){
+            printf("#####Error: Branching candidate has lower objval ");
+            printf("(%.3f) than parent (%.3f)\n", can->objval[i],  oldobjval);
+         }
 #endif
-	 break;
+         break;
        case LP_OPT_FEASIBLE:
        case LP_D_UNBOUNDED:
        case LP_D_OBJLIM:
-	 can->objval[i] = MAXDOUBLE / 2;
-	 break;
+         can->objval[i] = MAXDOUBLE / 2;
+         break;
        case LP_D_ITLIM:
-	 can->objval[i] = MAX(can->objval[i], oldobjval);
-	 break;
+         can->objval[i] = MAX(can->objval[i], oldobjval);
+         break;
        case LP_D_INFEASIBLE:
        case LP_ABANDONED:
-	 can->objval[i] = oldobjval;
-	 break;
+         can->objval[i] = oldobjval;
+         break;
       }
    }
 
@@ -1223,19 +1232,19 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
     * so we select cand and force branching on it.
     *
     * MAYBE THIS SHOULD BE LEFT TO THE USER ?????????????????
-   \*------------------------------------------------------------------------*/
+    \*------------------------------------------------------------------------*/
 
    for (i = can->child_num-1; i >= 0; i--){
       if (! (can->termcode[i] == LP_D_UNBOUNDED ||
-	     can->termcode[i] == LP_D_OBJLIM ||
-	     can->termcode[i] == LP_OPT_FEASIBLE ||
-	     can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE ||
-	     (can->termcode[i] == LP_OPTIMAL && p->has_ub &&
-	      can->objval[i] > p->ub - p->par.granularity))){
-	 break;
+               can->termcode[i] == LP_D_OBJLIM ||
+               can->termcode[i] == LP_OPT_FEASIBLE ||
+               can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE ||
+               (can->termcode[i] == LP_OPTIMAL && p->has_ub &&
+                can->objval[i] > p->ub - p->par.granularity))){
+         break;
       }
    }
-   
+
    if (i < 0){
       /* i.e., we did not break, i.e., we'll select this cand */
       return(SECOND_CANDIDATE_BETTER_AND_BRANCH_ON_IT);
@@ -1249,7 +1258,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
    /* Otherwise, first give the choice to the user */
 #ifdef USE_SYM_APPLICATION
    user_res = user_compare_candidates(p->user, best, can, p->ub,
-				      p->par.granularity, &i);
+         p->par.granularity, &i);
 
 #else
    user_res = USER_DEFAULT;
@@ -1259,7 +1268,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
     case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
-       /* User function terminated without problems. No post-processing. */
+      /* User function terminated without problems. No post-processing. */
       return(i);
     case USER_ERROR:
       /* In case of error, default is used. */
@@ -1276,7 +1285,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
     * can, then prefer to choose something else. */
    for (i = can->child_num-1; i >= 0; i--)
       if (can->termcode[i] == LP_ABANDONED)
-	 return(FIRST_CANDIDATE_BETTER);
+         return(FIRST_CANDIDATE_BETTER);
 
    /* OK, so all descendants in can finished fine. Just do whatever
     * built-in was asked */
@@ -1340,7 +1349,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
 /*===========================================================================*\
  * This function invokes the user written function user_select_child that
  * selects one of the candidates after branching for further processing.
-\*===========================================================================*/
+ \*===========================================================================*/
 
 int select_child_u(lp_prob *p, branch_obj *can, char *action)
 {
@@ -1352,9 +1361,9 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
    for (i = can->child_num-1; i >= 0; i--){
       sense = can->sense[i];
       if (sense != 'E' && sense != 'L' && sense != 'G' && sense != 'R'){
-	 printf("Error! The sense of a child doesn't make sense!");
-	 printf("(nonexistent)\n\n");
-	 return(ERROR__ILLEGAL_BRANCHING);
+         printf("Error! The sense of a child doesn't make sense!");
+         printf("(nonexistent)\n\n");
+         return(ERROR__ILLEGAL_BRANCHING);
       }
    }
 #endif
@@ -1362,19 +1371,19 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
    for (ind = -1, i = 0; i < can->child_num; i++){
       action[i] = RETURN_THIS_CHILD;
       if (p->lp_data->nf_status == NF_CHECK_NOTHING){
-	 /*see which one is infeasible!*/
-	 if (can->termcode[i] == LP_OPTIMAL || 
-	     can->termcode[i] == LP_D_ITLIM){
-	    if (p->has_ub &&
-		can->objval[i] > p->ub - p->par.granularity){
-	       action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
-	    }
-	 }else if (can->termcode[i] == LP_OPT_FEASIBLE ||
-		   can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE){	       
-	    action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
-	 }else{
-	    action[i] = PRUNE_THIS_CHILD_INFEASIBLE;
-	 }
+         /*see which one is infeasible!*/
+         if (can->termcode[i] == LP_OPTIMAL || 
+               can->termcode[i] == LP_D_ITLIM){
+            if (p->has_ub &&
+                  can->objval[i] > p->ub - p->par.granularity){
+               action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
+            }
+         }else if (can->termcode[i] == LP_OPT_FEASIBLE ||
+               can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE){	       
+            action[i] = PRUNE_THIS_CHILD_FATHOMABLE;
+         }else{
+            action[i] = PRUNE_THIS_CHILD_INFEASIBLE;
+         }
       }
    }
 
@@ -1401,54 +1410,54 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
    switch(user_res){
     case PREFER_LOWER_OBJ_VALUE:
       for (ind = 0, i = can->child_num-1; i; i--){
-	 if (can->objval[i] < can->objval[ind])
-	    ind = i;
+         if (can->objval[i] < can->objval[ind])
+            ind = i;
       }
       if (!p->has_ub ||
-	  (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
-	 action[ind] = KEEP_THIS_CHILD;
+            (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
+         action[ind] = KEEP_THIS_CHILD;
       /* Note that if the lowest objval child is fathomed then everything is */
       break;
 
     case PREFER_HIGHER_OBJ_VALUE:
       for (ind = 0, i = can->child_num-1; i; i--){
-	 if ((can->objval[i] > can->objval[ind]) &&
-	     (! p->has_ub ||
-	      (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
-	    ind = i;
+         if ((can->objval[i] > can->objval[ind]) &&
+               (! p->has_ub ||
+                (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
+            ind = i;
       }
       if (! p->has_ub ||
-	  (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
-	 action[ind] = KEEP_THIS_CHILD;
+            (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
+         action[ind] = KEEP_THIS_CHILD;
       /* Note that this selects the highest objval child NOT FATHOMED, thus
        * if the highest objval child is fathomed then so is everything */
       break;
-      
+
 #ifdef COMPILE_FRAC_BRANCHING
     case PREFER_MORE_FRACTIONAL:
       for (ind = 0, i = can->child_num-1; i; i--){
-	 if ((can->frac_num[i] > can->frac_num[ind]) &&
-	     (! p->has_ub ||
-	      (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
-	    ind = i;
+         if ((can->frac_num[i] > can->frac_num[ind]) &&
+               (! p->has_ub ||
+                (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
+            ind = i;
       }
       if (! p->has_ub ||
-	  (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
-	 action[ind] = KEEP_THIS_CHILD;
+            (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
+         action[ind] = KEEP_THIS_CHILD;
       /* Note that this selects the most fractional child NOT FATHOMED, thus
        * if that child is fathomed then so is everything */
       break;
 
     case PREFER_LESS_FRACTIONAL:
       for (ind = 0, i = can->child_num-1; i; i--){
-	 if ((can->frac_num[i] < can->frac_num[ind]) &&
-	     (! p->has_ub ||
-	      (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
-	    ind = i;
+         if ((can->frac_num[i] < can->frac_num[ind]) &&
+               (! p->has_ub ||
+                (p->has_ub && can->objval[i] < p->ub - p->par.granularity)))
+            ind = i;
       }
       if (! p->has_ub ||
-	  (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
-	 action[ind] = KEEP_THIS_CHILD;
+            (p->has_ub && can->objval[ind] < p->ub - p->par.granularity))
+         action[ind] = KEEP_THIS_CHILD;
       /* Note that this selects the least fractional child NOT FATHOMED, thus
        * if that child is fathomed then so is everything */
       break;
@@ -1470,37 +1479,37 @@ int select_child_u(lp_prob *p, branch_obj *can, char *action)
 
 /*===========================================================================*\
  * This function prints whatever statistics we want on branching
-\*===========================================================================*/
+ \*===========================================================================*/
 
 void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
 {
    int i;
-   
+
    if (can->type == CANDIDATE_VARIABLE){
       if (p->mip){
-	 if (p->mip->colname){
-	    printf("Branching on variable %s \n   children: ",
-		   p->mip->colname[p->lp_data->vars[can->position]->userind]);
-	 }
+         if (p->mip->colname){
+            printf("Branching on variable %s \n   children: ",
+                  p->mip->colname[p->lp_data->vars[can->position]->userind]);
+         }
       }else{
-	 printf("Branching on variable %i ( %i )\n   children: ",
-		can->position, p->lp_data->vars[can->position]->userind);
+         printf("Branching on variable %i ( %i )\n   children: ",
+               can->position, p->lp_data->vars[can->position]->userind);
       }
    }else{ /* must be CANDIDATE_CUT_IN_MATRIX */
       printf("Branching on a cut %i\n   children: ",
-	     p->lp_data->rows[can->position].cut->name);
+            p->lp_data->rows[can->position].cut->name);
    }
    for (i=0; i<can->child_num; i++){
       if (can->objval[i] != MAXDOUBLE / 2){
-	 if (p->mip->obj_sense == SYM_MAXIMIZE){
-	    printf("[%.3f, %i,%i]  ", -can->objval[i] + p->mip->obj_offset,
-		   can->termcode[i], can->iterd[i]);
-	 }else{
-	    printf("[%.3f, %i,%i]  ", can->objval[i] + p->mip->obj_offset,
-		   can->termcode[i], can->iterd[i]);
-	 }
+         if (p->mip->obj_sense == SYM_MAXIMIZE){
+            printf("[%.3f, %i,%i]  ", -can->objval[i] + p->mip->obj_offset,
+                  can->termcode[i], can->iterd[i]);
+         }else{
+            printf("[%.3f, %i,%i]  ", can->objval[i] + p->mip->obj_offset,
+                  can->termcode[i], can->iterd[i]);
+         }
       }else{
-	 printf("[*, %i,%i]  ", can->termcode[i], can->iterd[i]);
+         printf("[*, %i,%i]  ", can->termcode[i], can->iterd[i]);
       }
    }
    printf("\n");
@@ -1508,11 +1517,11 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
 #ifdef USE_SYM_APPLICATION
    if (can->type == CANDIDATE_VARIABLE){
       user_print_branch_stat(p->user, can, NULL,
-			     p->lp_data->n, p->lp_data->vars, action);
+            p->lp_data->n, p->lp_data->vars, action);
    }else{
       user_print_branch_stat(p->user, can,
-			     p->lp_data->rows[can->position].cut,
-			     p->lp_data->n, p->lp_data->vars, action);
+            p->lp_data->rows[can->position].cut,
+            p->lp_data->n, p->lp_data->vars, action);
    }
 #endif
 }
@@ -1522,7 +1531,7 @@ void print_branch_stat_u(lp_prob *p, branch_obj *can, char *action)
 /*===========================================================================*\
  * Append additional information to the description of an active node 
  * before it is sent back to the tree manager. 
-\*===========================================================================*/
+ \*===========================================================================*/
 
 void add_to_desc_u(lp_prob *p, node_desc *desc)
 {
@@ -1530,7 +1539,7 @@ void add_to_desc_u(lp_prob *p, node_desc *desc)
    desc->desc = NULL;
 #ifdef USE_SYM_APPLICATION
    user_add_to_desc(p->user, &desc->desc_size,
-		    &desc->desc);
+         &desc->desc);
 #endif
 }
 
@@ -1558,25 +1567,25 @@ int same_cuts_u(lp_prob *p, waiting_row *wrow1, waiting_row *wrow2)
       rcut1 = wrow1->cut;
       rcut2 = wrow2->cut;
       if (rcut1->type != rcut2->type || rcut1->sense != rcut2->sense ||
-	  rcut1->size != rcut2->size ||
-	  memcmp(rcut1->coef, rcut2->coef, rcut1->size))
-	 break; /* if LHS is different, then just break out. */
+            rcut1->size != rcut2->size ||
+            memcmp(rcut1->coef, rcut2->coef, rcut1->size))
+         break; /* if LHS is different, then just break out. */
 
       /* Otherwise the two cuts have the same left hand side. Test which
        * one is stronger */
       /********* something should be done about ranged constraints ***********/
       /* FIXME! */
       if (rcut1->sense == 'L'){
-	 same_cuts = rcut1->rhs > rcut2->rhs - p->lp_data->lpetol ?
-	    SECOND_CUT_BETTER : FIRST_CUT_BETTER;
-	 break;
+         same_cuts = rcut1->rhs > rcut2->rhs - p->lp_data->lpetol ?
+            SECOND_CUT_BETTER : FIRST_CUT_BETTER;
+         break;
       }else if (rcut1->sense == 'G'){
-	 same_cuts = rcut1->rhs < rcut2->rhs + p->lp_data->lpetol ?
-	    SECOND_CUT_BETTER : FIRST_CUT_BETTER;
-	 break;
+         same_cuts = rcut1->rhs < rcut2->rhs + p->lp_data->lpetol ?
+            SECOND_CUT_BETTER : FIRST_CUT_BETTER;
+         break;
       }
       same_cuts = wrow1->source_pid < wrow2->source_pid ?
-	 SECOND_CUT_BETTER : FIRST_CUT_BETTER;
+         SECOND_CUT_BETTER : FIRST_CUT_BETTER;
       break;
    }
 
@@ -1601,8 +1610,8 @@ int same_cuts_u(lp_prob *p, waiting_row *wrow1, waiting_row *wrow2)
 /*===========================================================================*/
 
 void unpack_cuts_u(lp_prob *p, int from, int type,
-		   int cut_num, cut_data **cuts,
-		   int *new_row_num, waiting_row ***new_rows)
+      int cut_num, cut_data **cuts,
+      int *new_row_num, waiting_row ***new_rows)
 {
    LPdata *lp_data = p->lp_data;
    int user_res;
@@ -1610,7 +1619,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
    int *matind;
    double *matval;
    waiting_row **row_list = NULL;
-   
+
    colind_sort_extra(p);
 
    if (cut_num > 0)
@@ -1620,104 +1629,104 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
    for (i = 0; i < cut_num; i++){
 
       switch (cuts[i]->type){
-	 
-      case EXPLICIT_ROW:
-	 real_nzcnt = 0;
-	 row_list[explicit_row_num] =
-	    (waiting_row *) malloc(sizeof(waiting_row));
-	 row_list[explicit_row_num]->cut = cuts[i];
-	 nzcnt = ((int *) (cuts[i]->coef))[0];
-	 matind = (int *) (cuts[i]->coef + ISIZE);
-	 matval = (double *) (cuts[i]->coef + (1 + nzcnt) * ISIZE);
-	 row_list[explicit_row_num]->matind = (int *) malloc(nzcnt * ISIZE);
-	 row_list[explicit_row_num]->matval = (double *) malloc(nzcnt * DSIZE);
-	 for (j = 0; j < lp_data->n; j++){
-	    for (k = 0; k < nzcnt; k++){
-	       if (matind[k] == lp_data->vars[j]->userind){
-		  row_list[explicit_row_num]->matind[real_nzcnt] = j;
-		  row_list[explicit_row_num]->matval[real_nzcnt++] = matval[k];
-	       }
-	    }
-	 }
-	 row_list[explicit_row_num++]->nzcnt = real_nzcnt;
-	 cuts[i] = NULL;
-	 break;
-	 
-      case OPTIMALITY_CUT_FIRST:
-	 row_list[explicit_row_num] =
-	    (waiting_row *) malloc(sizeof(waiting_row));
-	 row_list[explicit_row_num]->matind =
-	    (int *) malloc (lp_data->n * ISIZE);
-	 row_list[explicit_row_num]->matval =
-	    (double *) malloc (lp_data->n * DSIZE);
-	 row_list[explicit_row_num]->cut = cuts[i];
-	 for (nzcnt = 0, j = 0; j < lp_data->n; j++){
-	    if (lp_data->vars[j]->userind == p->mip->n)
-	       continue;
-	    row_list[explicit_row_num]->matind[nzcnt] = j;
-	    row_list[explicit_row_num]->matval[nzcnt++] =
-	       p->mip->obj1[lp_data->vars[j]->userind];
-	 }
-	 cuts[i]->sense = 'L';
-	 cuts[i]->deletable = FALSE;
-	 cuts[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
-         row_list[explicit_row_num++]->nzcnt = nzcnt;
-	 cuts[i] = NULL;
-	 break;
 
-      case OPTIMALITY_CUT_SECOND:
-	 row_list[explicit_row_num] =
-	    (waiting_row *) malloc(sizeof(waiting_row));
-	 row_list[explicit_row_num]->matind =
-	    (int *) malloc (lp_data->n * ISIZE);
-	 row_list[explicit_row_num]->matval =
-	    (double *) malloc (lp_data->n * DSIZE);
-	 row_list[explicit_row_num]->cut = cuts[i];
-	 for (nzcnt = 0, j = 0; j < lp_data->n; j++){
-	    if (lp_data->vars[j]->userind == p->mip->n)
-	       continue;
-	    row_list[explicit_row_num]->matind[nzcnt] = j;
-	    row_list[explicit_row_num]->matval[nzcnt++] =
-	       p->mip->obj2[lp_data->vars[j]->userind];
-	 }
-	 cuts[i]->sense = 'L';
-	 cuts[i]->deletable = FALSE;
-	 cuts[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+       case EXPLICIT_ROW:
+         real_nzcnt = 0;
+         row_list[explicit_row_num] =
+            (waiting_row *) malloc(sizeof(waiting_row));
+         row_list[explicit_row_num]->cut = cuts[i];
+         nzcnt = ((int *) (cuts[i]->coef))[0];
+         matind = (int *) (cuts[i]->coef + ISIZE);
+         matval = (double *) (cuts[i]->coef + (1 + nzcnt) * ISIZE);
+         row_list[explicit_row_num]->matind = (int *) malloc(nzcnt * ISIZE);
+         row_list[explicit_row_num]->matval = (double *) malloc(nzcnt * DSIZE);
+         for (j = 0; j < lp_data->n; j++){
+            for (k = 0; k < nzcnt; k++){
+               if (matind[k] == lp_data->vars[j]->userind){
+                  row_list[explicit_row_num]->matind[real_nzcnt] = j;
+                  row_list[explicit_row_num]->matval[real_nzcnt++] = matval[k];
+               }
+            }
+         }
+         row_list[explicit_row_num++]->nzcnt = real_nzcnt;
+         cuts[i] = NULL;
+         break;
+
+       case OPTIMALITY_CUT_FIRST:
+         row_list[explicit_row_num] =
+            (waiting_row *) malloc(sizeof(waiting_row));
+         row_list[explicit_row_num]->matind =
+            (int *) malloc (lp_data->n * ISIZE);
+         row_list[explicit_row_num]->matval =
+            (double *) malloc (lp_data->n * DSIZE);
+         row_list[explicit_row_num]->cut = cuts[i];
+         for (nzcnt = 0, j = 0; j < lp_data->n; j++){
+            if (lp_data->vars[j]->userind == p->mip->n)
+               continue;
+            row_list[explicit_row_num]->matind[nzcnt] = j;
+            row_list[explicit_row_num]->matval[nzcnt++] =
+               p->mip->obj1[lp_data->vars[j]->userind];
+         }
+         cuts[i]->sense = 'L';
+         cuts[i]->deletable = FALSE;
+         cuts[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
          row_list[explicit_row_num++]->nzcnt = nzcnt;
-	 cuts[i] = NULL;
-	 break;
+         cuts[i] = NULL;
+         break;
+
+       case OPTIMALITY_CUT_SECOND:
+         row_list[explicit_row_num] =
+            (waiting_row *) malloc(sizeof(waiting_row));
+         row_list[explicit_row_num]->matind =
+            (int *) malloc (lp_data->n * ISIZE);
+         row_list[explicit_row_num]->matval =
+            (double *) malloc (lp_data->n * DSIZE);
+         row_list[explicit_row_num]->cut = cuts[i];
+         for (nzcnt = 0, j = 0; j < lp_data->n; j++){
+            if (lp_data->vars[j]->userind == p->mip->n)
+               continue;
+            row_list[explicit_row_num]->matind[nzcnt] = j;
+            row_list[explicit_row_num]->matval[nzcnt++] =
+               p->mip->obj2[lp_data->vars[j]->userind];
+         }
+         cuts[i]->sense = 'L';
+         cuts[i]->deletable = FALSE;
+         cuts[i]->branch = DO_NOT_BRANCH_ON_THIS_ROW;
+         row_list[explicit_row_num++]->nzcnt = nzcnt;
+         cuts[i] = NULL;
+         break;
 
        default: /* A user cut type */
 #if defined(COMPILE_IN_CG) && defined(CHECK_CUT_VALIDITY)
-	  check_validity_of_cut_u(p->cgp, cuts[i]);
+         check_validity_of_cut_u(p->cgp, cuts[i]);
 #endif
-	  if (l != i){
-	     cuts[l++] = cuts[i];
-	     cuts[i] = NULL;
-	  }else{
-	     l++;
-	  }
-	 break;
+         if (l != i){
+            cuts[l++] = cuts[i];
+            cuts[i] = NULL;
+         }else{
+            l++;
+         }
+         break;
       }
    }
 
    *new_row_num = 0;
-      
+
 #ifdef USE_SYM_APPLICATION
    user_res = user_unpack_cuts(p->user, from, type,
-			       lp_data->n, lp_data->vars,
-			       l, cuts, new_row_num, new_rows);
+         lp_data->n, lp_data->vars,
+         l, cuts, new_row_num, new_rows);
 #else
    user_res = USER_DEFAULT;
 #endif
 
    for (i = 0; i < l; i++){
       if (cuts[i]){
-	 (*new_rows)[i]->cut = cuts[i];
-	 cuts[i] = NULL;
+         (*new_rows)[i]->cut = cuts[i];
+         cuts[i] = NULL;
       }
    }
-       
+
    switch(user_res){
     case USER_SUCCESS:
     case USER_AND_PP:
@@ -1726,28 +1735,28 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 
       /* Combine the user's rows with SYMPHONY's rows */ 
       if (*new_row_num == 0 && explicit_row_num == 0){
-	 FREE(row_list);
-	 *new_row_num = 0;
-	 *new_rows = NULL;
+         FREE(row_list);
+         *new_row_num = 0;
+         *new_rows = NULL;
       }else if (*new_row_num == 0 && explicit_row_num > 0){
-	 *new_row_num = explicit_row_num;
-	 *new_rows = row_list;
+         *new_row_num = explicit_row_num;
+         *new_rows = row_list;
       }else if (*new_row_num > 0 && explicit_row_num > 0){
-	 if (*new_row_num + explicit_row_num > cut_num){
-	    row_list = (waiting_row **) realloc(row_list, *new_row_num +
-						explicit_row_num);
-	 }
-	 for (i = explicit_row_num; i < *new_row_num + explicit_row_num; i++){
-	    row_list[i] = (*new_rows)[i - explicit_row_num];
-	 }
-	 
-	 FREE(*new_rows);
-	 *new_row_num += explicit_row_num;
-	 *new_rows = row_list;
+         if (*new_row_num + explicit_row_num > cut_num){
+            row_list = (waiting_row **) realloc(row_list, *new_row_num +
+                  explicit_row_num);
+         }
+         for (i = explicit_row_num; i < *new_row_num + explicit_row_num; i++){
+            row_list[i] = (*new_rows)[i - explicit_row_num];
+         }
+
+         FREE(*new_rows);
+         *new_row_num += explicit_row_num;
+         *new_rows = row_list;
       }else{
-	 FREE(row_list);
+         FREE(row_list);
       }
-      
+
       break;
 
     case USER_ERROR: /* Error. ??? what will happen ??? */
@@ -1755,7 +1764,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
       FREE(*new_rows);
 
       break;
-       
+
     default: /* No builtin possibility. Counts as ERROR. */
       break;
    }
@@ -1771,7 +1780,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
  * Default options: SEND_NONZEROS, SEND_FRACTIONS.
  * The function return 1 or 0, depending on whether the sending of the
  * lp solution was successful or not.
-\*===========================================================================*/
+ \*===========================================================================*/
 
 int send_lp_solution_u(lp_prob *p, int tid)
 {
@@ -1790,20 +1799,20 @@ int send_lp_solution_u(lp_prob *p, int tid)
       send_dbl_array(&lp_data->objval, 1);
       send_char_array(&p->has_ub, 1);
       if (p->has_ub)
-	 send_dbl_array(&p->ub, 1);
+         send_dbl_array(&p->ub, 1);
    }
    colind_sort_extra(p);
 #ifdef USE_SYM_APPLICATION
    user_res = user_send_lp_solution(p->user, lp_data->n, lp_data->vars, x,
-				    tid == p->cut_gen ?
-				    LP_SOL_TO_CG : LP_SOL_TO_CP);
+         tid == p->cut_gen ?
+         LP_SOL_TO_CG : LP_SOL_TO_CP);
 #else
    user_res = USER_DEFAULT;
 #endif
-   
+
    switch (user_res){
     case USER_ERROR: /* Error. Consider as couldn't send to cut_gen, i.e.,
-		   equivalent to NO_MORE_CUTS_FOUND */
+                        equivalent to NO_MORE_CUTS_FOUND */
       freebuf(s_bufid);
       return(0);
     case USER_SUCCESS:
@@ -1856,7 +1865,7 @@ void logical_fixing_u(lp_prob *p)
 
 #ifdef USE_SYM_APPLICATION
    user_res = user_logical_fixing(p->user, p->lp_data->n, p->lp_data->vars,
-				  p->lp_data->x, status, &fixed_num);
+         p->lp_data->x, status, &fixed_num);
 #else
    user_res = USER_DEFAULT;
 #endif
@@ -1866,12 +1875,12 @@ void logical_fixing_u(lp_prob *p)
     case USER_AND_PP:
     case USER_NO_PP:
       if (fixed_num > 0){
-	 while (status != laststat) {
-	    *lpstatus &= NOT_REMOVABLE;
-	    *lpstatus++ |= (*status++ & (NOT_FIXED |
-					 TEMP_FIXED_TO_LB | TEMP_FIXED_TO_UB |
-					 PERM_FIXED_TO_LB | PERM_FIXED_TO_UB));
-	 }
+         while (status != laststat) {
+            *lpstatus &= NOT_REMOVABLE;
+            *lpstatus++ |= (*status++ & (NOT_FIXED |
+                     TEMP_FIXED_TO_LB | TEMP_FIXED_TO_UB |
+                     PERM_FIXED_TO_LB | PERM_FIXED_TO_UB));
+         }
       }
     case USER_DEFAULT:
       break;
@@ -1881,17 +1890,17 @@ void logical_fixing_u(lp_prob *p)
 /*===========================================================================*/
 
 int generate_column_u(lp_prob *p, int lpcutnum, cut_data **cuts,
-		      int prevind, int nextind, int generate_what,
-		      double *colval, int *colind, int *collen, double *obj,
-		      double *lb, double *ub)
+      int prevind, int nextind, int generate_what,
+      double *colval, int *colind, int *collen, double *obj,
+      double *lb, double *ub)
 {
    int real_nextind = nextind;
 #ifdef USE_SYM_APPLICATION
    CALL_USER_FUNCTION( user_generate_column(p->user, generate_what,
-					    p->lp_data->m - p->base.cutnum,
-					    cuts, prevind, nextind,
-					    &real_nextind, colval, colind,
-					    collen, obj, lb, ub) );
+            p->lp_data->m - p->base.cutnum,
+            cuts, prevind, nextind,
+            &real_nextind, colval, colind,
+            collen, obj, lb, ub) );
 #endif
    return(real_nextind);
 }
@@ -1907,9 +1916,9 @@ int generate_cuts_in_lp_u(lp_prob *p)
    char deleted_cut;
    cut_data **cuts = NULL;
    int i, j;
-   
+
    colind_sort_extra(p);
-   
+
 #if defined(COMPILE_IN_CG) || defined(COMPILE_IN_CP) 
    {
 #ifdef COMPILE_IN_CP
@@ -1926,123 +1935,123 @@ int generate_cuts_in_lp_u(lp_prob *p)
 
 #ifdef USE_SYM_APPLICATION
       user_res2 = user_send_lp_solution(p->user,
-					lp_data->n, lp_data->vars, x,
-					LP_SOL_WITHIN_LP);
+            lp_data->n, lp_data->vars, x,
+            LP_SOL_WITHIN_LP);
 #else
       user_res2 = USER_DEFAULT;
 #endif
-      
+
       if (user_res2 == USER_DEFAULT)
-	 user_res2 = p->par.pack_lp_solution_default;
-      
+         user_res2 = p->par.pack_lp_solution_default;
+
       switch (user_res2){
        case USER_ERROR: 
-	 return(ERROR__USER);
+         return(ERROR__USER);
        case USER_SUCCESS:
        case USER_AND_PP:
        case USER_NO_PP:
-	 break;
+         break;
        case SEND_NONZEROS:
        case SEND_FRACTIONS:
-	 cur_sol->xind = xind = lp_data->tmp.i1; /* n */
-	 cur_sol->xval = xval = lp_data->tmp.d; /* n */
-	 cur_sol->lpetol = lpetol = lp_data->lpetol;
-	 cur_sol->xlevel = p->bc_level;
-	 cur_sol->xindex = p->bc_index;
-	 cur_sol->xiter_num = p->iter_num;
-	 cur_sol->objval = lp_data->objval;
-	 if (p->has_ub)
-	    p->cgp->ub = p->ub;
-	 cur_sol->xlength = xlength = user_res2 == SEND_NONZEROS ?
-	                             collect_nonzeros(p, x, xind, xval) :
-		                     collect_fractions(p, x, xind, xval);
-	 break;
+         cur_sol->xind = xind = lp_data->tmp.i1; /* n */
+         cur_sol->xval = xval = lp_data->tmp.d; /* n */
+         cur_sol->lpetol = lpetol = lp_data->lpetol;
+         cur_sol->xlevel = p->bc_level;
+         cur_sol->xindex = p->bc_index;
+         cur_sol->xiter_num = p->iter_num;
+         cur_sol->objval = lp_data->objval;
+         if (p->has_ub)
+            p->cgp->ub = p->ub;
+         cur_sol->xlength = xlength = user_res2 == SEND_NONZEROS ?
+            collect_nonzeros(p, x, xind, xval) :
+            collect_fractions(p, x, xind, xval);
+         break;
       }
 #ifdef COMPILE_IN_CG      
       if (p->cgp->par.do_findcuts && !new_row_num)
-	 find_cuts_u(p->cgp, p->lp_data, &cg_new_row_num);
+         find_cuts_u(p->cgp, p->lp_data, &cg_new_row_num);
 #endif
 
       if (p->cgp->cuts_to_add_num){
-	 unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
-		       p->cgp->cuts_to_add_num, p->cgp->cuts_to_add,
-		       &cg_new_row_num, &cg_new_rows);
-	 p->cgp->cuts_to_add_num = 0;
-	 if (cg_new_row_num){
-	    for (i = 0; i < cg_new_row_num; i++){
-	       if (cg_new_rows[i]->cut->name != CUT__SEND_TO_CP)
-		  cg_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
-	       cg_new_rows[i]->source_pid = INTERNAL_CUT_GEN;
-	       for (j = p->waiting_row_num - 1; j >= 0; j--){
-		  if (same_cuts_u(p, p->waiting_rows[j],
-				  cg_new_rows[i]) !=
-		      DIFFERENT_CUTS){
-		     free_waiting_row(cg_new_rows+i);
-		     break;
-		  }
-	       }
-	       if (j < 0){
-		  add_new_rows_to_waiting_rows(p, cg_new_rows+i, 1);
-	       }
-	    }
-	    FREE(cg_new_rows);
-	 }
+         unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
+               p->cgp->cuts_to_add_num, p->cgp->cuts_to_add,
+               &cg_new_row_num, &cg_new_rows);
+         p->cgp->cuts_to_add_num = 0;
+         if (cg_new_row_num){
+            for (i = 0; i < cg_new_row_num; i++){
+               if (cg_new_rows[i]->cut->name != CUT__SEND_TO_CP)
+                  cg_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
+               cg_new_rows[i]->source_pid = INTERNAL_CUT_GEN;
+               for (j = p->waiting_row_num - 1; j >= 0; j--){
+                  if (same_cuts_u(p, p->waiting_rows[j],
+                           cg_new_rows[i]) !=
+                        DIFFERENT_CUTS){
+                     free_waiting_row(cg_new_rows+i);
+                     break;
+                  }
+               }
+               if (j < 0){
+                  add_new_rows_to_waiting_rows(p, cg_new_rows+i, 1);
+               }
+            }
+            FREE(cg_new_rows);
+         }
       }
 #if defined(COMPILE_IN_CP) && defined(COMPILE_IN_LP)
-      
+
       if ((p->iter_num == 1 && (p->bc_level > 0 || p->phase==1)) ||
-	  (p->iter_num % p->par.cut_pool_check_freq == 0) ||
-	  (!cg_new_row_num)){
-	 cut_pool *cp = p->tm->cpp[p->cut_pool];
-	 p->comp_times.separation += used_time(&p->tt);
-	 cur_sol->lp = 0;
+            (p->iter_num % p->par.cut_pool_check_freq == 0) ||
+            (!cg_new_row_num)){
+         cut_pool *cp = p->tm->cpp[p->cut_pool];
+         p->comp_times.separation += used_time(&p->tt);
+         cur_sol->lp = 0;
 #pragma omp critical(cut_pool)
-	 if (cp){
-	    cp_new_row_num = check_cuts_u(cp, cur_sol);
-	    if (++cp->reorder_count % 10 == 0){
-	       delete_duplicate_cuts(cp);
-	       order_cuts_by_quality(cp);
-	       cp->reorder_count = 0;
-	    }
-	    if (cp_new_row_num){
-	       unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
-			     cp->cuts_to_add_num, cp->cuts_to_add,
-			     &cp_new_row_num, &cp_new_rows);
-	       cp->cuts_to_add_num = 0;
-	    }
-	 }
-	 if (cp_new_row_num){
-	    for (i = 0; i < cp_new_row_num; i++){
-	       if (cp_new_rows[i]->cut->name != CUT__SEND_TO_CP)
-		  cp_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
-	       cp_new_rows[i]->source_pid = INTERNAL_CUT_POOL;
-	       for (j = p->waiting_row_num - 1; j >= 0; j--){
-		  if (same_cuts_u(p, p->waiting_rows[j], cp_new_rows[i]) !=
-		      DIFFERENT_CUTS){
-		     free_waiting_row(cp_new_rows+i);
-		     break;
-		  }
-	       }
-	       if (j < 0){
-		  add_new_rows_to_waiting_rows(p, cp_new_rows+i, 1);
-	       }
-	    }
-	    FREE(cp_new_rows);
-	 }
-	 p->comp_times.cut_pool += used_time(&p->tt);
+         if (cp){
+            cp_new_row_num = check_cuts_u(cp, cur_sol);
+            if (++cp->reorder_count % 10 == 0){
+               delete_duplicate_cuts(cp);
+               order_cuts_by_quality(cp);
+               cp->reorder_count = 0;
+            }
+            if (cp_new_row_num){
+               unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
+                     cp->cuts_to_add_num, cp->cuts_to_add,
+                     &cp_new_row_num, &cp_new_rows);
+               cp->cuts_to_add_num = 0;
+            }
+         }
+         if (cp_new_row_num){
+            for (i = 0; i < cp_new_row_num; i++){
+               if (cp_new_rows[i]->cut->name != CUT__SEND_TO_CP)
+                  cp_new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
+               cp_new_rows[i]->source_pid = INTERNAL_CUT_POOL;
+               for (j = p->waiting_row_num - 1; j >= 0; j--){
+                  if (same_cuts_u(p, p->waiting_rows[j], cp_new_rows[i]) !=
+                        DIFFERENT_CUTS){
+                     free_waiting_row(cp_new_rows+i);
+                     break;
+                  }
+               }
+               if (j < 0){
+                  add_new_rows_to_waiting_rows(p, cp_new_rows+i, 1);
+               }
+            }
+            FREE(cp_new_rows);
+         }
+         p->comp_times.cut_pool += used_time(&p->tt);
       }
 #endif
    }
 #endif      
-   
+
 #ifdef USE_SYM_APPLICATION
    user_res = user_generate_cuts_in_lp(p->user, lp_data, lp_data->n,
-				       lp_data->vars, x,
-				       &new_row_num, &cuts);
+         lp_data->vars, x,
+         &new_row_num, &cuts);
 #else
    user_res = GENERATE_CGL_CUTS;
 #endif
-  
+
    switch(user_res){
     case USER_ERROR:
       FREE(cuts);
@@ -2052,51 +2061,51 @@ int generate_cuts_in_lp_u(lp_prob *p)
       /* Add to the user's list of cuts */
 #ifdef USE_CGL_CUTS
       if (p->par.cgl.generate_cgl_cuts){
-	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
-			   (p->bc_index < 1)? TRUE: FALSE, 
-			   p->par.verbosity);
-	 if(p->bc_index < 1 && p->iter_num == 1 ){
-	    p->par.cgl = 
-	       lp_data->cgl;
-	 }
+         generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
+               (p->bc_index < 1)? TRUE: FALSE, 
+               p->par.verbosity);
+         if(p->bc_index < 1 && p->iter_num == 1 ){
+            p->par.cgl = 
+               lp_data->cgl;
+         }
       }
 #endif
       /* Fall through to next case */
-      
+
     case DO_NOT_GENERATE_CGL_CUTS:
     case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
       /* Process the generated cuts */
       if (new_row_num){
-	 unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
-		       new_row_num, cuts, &new_row_num, &new_rows);
-	 for (i = 0; i < new_row_num; i++){
-	    if (new_rows[i]->cut->name != CUT__SEND_TO_CP)
-	       new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
-	    new_rows[i]->source_pid = INTERNAL_CUT_GEN;
-	 }
+         unpack_cuts_u(p, CUT_FROM_CG, UNPACK_CUTS_MULTIPLE,
+               new_row_num, cuts, &new_row_num, &new_rows);
+         for (i = 0; i < new_row_num; i++){
+            if (new_rows[i]->cut->name != CUT__SEND_TO_CP)
+               new_rows[i]->cut->name = CUT__DO_NOT_SEND_TO_CP;
+            new_rows[i]->source_pid = INTERNAL_CUT_GEN;
+         }
       }
       /* Test whether any of the new cuts are identical to any of
          the old ones. */
       if (p->waiting_row_num && new_row_num){
-	 for (i = 0, deleted_cut = FALSE; i < new_row_num;
-	      deleted_cut = FALSE){
-	    for (j = p->waiting_row_num - 1; j >= 0; j--){
-	       if (same_cuts_u(p, p->waiting_rows[j], new_rows[i]) !=
-		   DIFFERENT_CUTS){
-		  free_waiting_row(new_rows+i);
-		  new_rows[i] = new_rows[--new_row_num];
-		  deleted_cut = TRUE;
-		  break;
-	       }
-	    }
-	    if (!deleted_cut) i++;
-	 }
+         for (i = 0, deleted_cut = FALSE; i < new_row_num;
+               deleted_cut = FALSE){
+            for (j = p->waiting_row_num - 1; j >= 0; j--){
+               if (same_cuts_u(p, p->waiting_rows[j], new_rows[i]) !=
+                     DIFFERENT_CUTS){
+                  free_waiting_row(new_rows+i);
+                  new_rows[i] = new_rows[--new_row_num];
+                  deleted_cut = TRUE;
+                  break;
+               }
+            }
+            if (!deleted_cut) i++;
+         }
       }
       if (new_row_num){
-	 add_new_rows_to_waiting_rows(p, new_rows, new_row_num);
-	 FREE(new_rows);
+         add_new_rows_to_waiting_rows(p, new_rows, new_row_num);
+         FREE(new_rows);
       }
       FREE(cuts);
       return(FUNCTION_TERMINATED_NORMALLY);
@@ -2112,10 +2121,10 @@ int generate_cuts_in_lp_u(lp_prob *p)
 void print_stat_on_cuts_added_u(lp_prob *p, int added_rows)
 {
    int user_res;
-   
+
 #ifdef USE_SYM_APPLICATION
    user_res = user_print_stat_on_cuts_added(p->user, added_rows,
-					    p->waiting_rows);
+         p->waiting_rows);
 #else
    user_res = USER_DEFAULT;
 #endif
@@ -2125,7 +2134,7 @@ void print_stat_on_cuts_added_u(lp_prob *p, int added_rows)
     case USER_DEFAULT:
       /* print out how many cuts have been added */
       PRINT(p->par.verbosity, 5,
-	    ("Number of cuts added to the problem: %i\n", added_rows));
+            ("Number of cuts added to the problem: %i\n", added_rows));
       break;
     case USER_SUCCESS:
     case USER_AND_PP:
@@ -2147,7 +2156,7 @@ void purge_waiting_rows_u(lp_prob *p)
    char *delete_rows;
 
    REMALLOC(p->lp_data->tmp.cv, char, p->lp_data->tmp.cv_size, wrow_num,
-	    BB_BUNCH);
+         BB_BUNCH);
    delete_rows = p->lp_data->tmp.cv; /* wrow_num */
 
    memset(delete_rows, 0, wrow_num);
@@ -2164,22 +2173,22 @@ void purge_waiting_rows_u(lp_prob *p)
       p->waiting_row_num = 0;
       break;
     case USER_DEFAULT: /* the only default is to keep enough for one
-			  iteration */
+                          iteration */
       if (wrow_num - p->par.max_cut_num_per_iter > 0){
-	 free_waiting_rows(wrows + p->par.max_cut_num_per_iter,
-			   wrow_num-p->par.max_cut_num_per_iter);
-	 p->waiting_row_num = p->par.max_cut_num_per_iter;
+         free_waiting_rows(wrows + p->par.max_cut_num_per_iter,
+               wrow_num-p->par.max_cut_num_per_iter);
+         p->waiting_row_num = p->par.max_cut_num_per_iter;
       }
       break;
     case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
       for (i = j = 0; i < wrow_num; i++){
-	 if (delete_rows[i]){
-	    free_waiting_row(wrows + i);
-	 }else{
-	    wrows[j++] = wrows[i];
-	 }
+         if (delete_rows[i]){
+            free_waiting_row(wrows + i);
+         }else{
+            wrows[j++] = wrows[i];
+         }
       }
       p->waiting_row_num = j;
       break;
@@ -2194,7 +2203,7 @@ void purge_waiting_rows_u(lp_prob *p)
  * This function invokes the user written function user_free_prob_dependent
  * that deallocates the user defined part of the data structure. Returns TRUE
  * if succeeded, FALSE otherwise.
-\*===========================================================================*/
+ \*===========================================================================*/
 
 void free_prob_dependent_u(lp_prob *p)
 {
@@ -2219,191 +2228,191 @@ void free_prob_dependent_u(lp_prob *p)
 /*===========================================================================*/
 
 char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
-				    int length, double *true_objval,
-				    double etol, char branching)
+      int length, double *true_objval,
+      double etol, char branching)
 {
-  double obj[2] = {0.0, 0.0};
-  int i;
-  char new_solution = FALSE;
-  char continue_with_node = FALSE;
-  
-  for (i = 0; i < length; i++){
-     if (indices[i] == p->mip->n){
-	continue;
-     }
-     obj[0] += p->mip->obj1[indices[i]]*values[i];
-     obj[1] += p->mip->obj2[indices[i]]*values[i];
-  }
+   double obj[2] = {0.0, 0.0};
+   int i;
+   char new_solution = FALSE;
+   char continue_with_node = FALSE;
 
-  if (p->has_mc_ub && *true_objval-p->par.mc_rho*(obj[0]+obj[1]) >
-      p->mc_ub + etol + MAX(0, MIN(p->par.mc_gamma, p->par.mc_tau))){
-     return(FALSE);
-  }
+   for (i = 0; i < length; i++){
+      if (indices[i] == p->mip->n){
+         continue;
+      }
+      obj[0] += p->mip->obj1[indices[i]]*values[i];
+      obj[1] += p->mip->obj2[indices[i]]*values[i];
+   }
 
-  if (p->par.mc_gamma == 1.0){
-     if (!p->has_mc_ub || obj[0] < p->obj[0] + etol){
-	if (!p->has_mc_ub || (obj[0] < p->obj[0] - etol ||
-			      (obj[0] >= p->obj[0] - etol
-			       && obj[1] < p->obj[1] - etol))){
-	    if (p->par.verbosity >= 1){
-	       printf("\nBetter Solution Found:\n");
-	       if(p->mip->obj_sense == SYM_MAXIMIZE){
-		  printf("First Objective Cost: %.1f\n", -obj[0]);
-		  printf("Second Objective Cost: %.1f\n", -obj[1]);
-	       }else{
-		  printf("First Objective Cost: %.1f\n", obj[0]);
-		  printf("Second Objective Cost: %.1f\n", obj[1]);
-	       }
-	    }
-	    p->obj[1] = obj[1];
-	    p->obj[0] = obj[0];
-	    p->mc_ub = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
-	    p->has_mc_ub = TRUE;
-	    new_solution = TRUE;
-	 }
-	/* Add an optimality cut for the second objective */
-	 if (!branching && p->par.mc_add_optimality_cuts){
-	    cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
-	    new_cut->coef = NULL;
-	    new_cut->rhs = obj[1] - 1 + etol;
-	    new_cut->size = 0;
-	    new_cut->type = OPTIMALITY_CUT_SECOND;
-	    new_cut->name = CUT__DO_NOT_SEND_TO_CP;
-	    continue_with_node = cg_add_user_cut(new_cut,
-						 &p->cgp->cuts_to_add_num,
-						 &p->cgp->cuts_to_add_size,
-						 &p->cgp->cuts_to_add);
-	    FREE(new_cut);
-	 }else{
-	    continue_with_node = TRUE;
-	 }
-     }
-  }else if (p->par.mc_tau == 1.0){
-     if (!p->has_mc_ub || obj[1] < p->obj[1] + etol){
-	if (!p->has_mc_ub || (obj[1] < p->obj[1] - etol ||
-			      (obj[1] >= p->obj[1] - etol
-			       && obj[0] < p->obj[0] - etol))){
-	   if (p->par.verbosity >= 1){
-	      printf("\nBetter Solution Found:\n");
-	      if(p->mip->obj_sense == SYM_MAXIMIZE){
-		 printf("First Objective Cost: %.1f\n", -obj[0]);
-		 printf("Second Objective Cost: %.1f\n", -obj[1]);
-	      }else{
-		 printf("First Objective Cost: %.1f\n", obj[0]);
-		 printf("Second Objective Cost: %.1f\n", obj[1]);
-	      }
-	   }
-	   p->obj[1] = obj[1];
-	   p->obj[0] = obj[0];
-	   p->mc_ub = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
-	   p->has_mc_ub = TRUE;
-	   new_solution = TRUE;
-	}
-	/* Add an optimality cut for the second objective */
-	if (!branching && p->par.mc_add_optimality_cuts){
-	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
-	   new_cut->coef = NULL;
-	   new_cut->rhs = obj[0] - 1 + etol;
-	   new_cut->size = 0;
-	   new_cut->type = OPTIMALITY_CUT_FIRST;
-	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
-	   continue_with_node = cg_add_user_cut(new_cut,
-						&p->cgp->cuts_to_add_num,
-						&p->cgp->cuts_to_add_size,
-						&p->cgp->cuts_to_add);
-	   FREE(new_cut);
-	}else{
-	   continue_with_node = TRUE;
-	}
-     }
-  }else{
-     if (!p->has_mc_ub ||
-	 (p->has_mc_ub && *true_objval-p->par.mc_rho*(obj[0]+obj[1]) <
-	  p->mc_ub - MIN(p->par.mc_gamma, p->par.mc_tau) + 100*etol) ||
-	 (obj[0] < p->obj[0] - etol &&
-	  obj[1] < p->obj[1] + etol + MIN(p->par.mc_gamma, p->par.mc_tau)) ||
-	 (obj[1] < p->obj[1] - etol &&
-	  obj[0] < p->obj[0] + etol + MIN(p->par.mc_gamma, p->par.mc_tau))){
-	if (p->par.verbosity >= 1){
-	   printf("\nBetter Solution Found:\n");
-	   if(p->mip->obj_sense == SYM_MAXIMIZE){
-	      printf("First Objective Cost: %.1f\n", -obj[0]);
-	      printf("Second Objective Cost: %.1f\n", -obj[1]);
-	   }else{
-	      printf("First Objective Cost: %.1f\n", obj[0]);
-	      printf("Second Objective Cost: %.1f\n", obj[1]);
-	   }
-	}
-	p->obj[1] = obj[1];
-	p->obj[0] = obj[0];
-	p->mc_ub = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
-	p->has_mc_ub = TRUE;
-	new_solution = TRUE;
-     }
-     if (!branching && !p->par.mc_find_supported_solutions &&
-	 p->par.mc_add_optimality_cuts){
-	if (p->par.mc_gamma*(obj[0] - p->utopia[0]) >
-	    *true_objval-p->par.mc_rho*(obj[0]+obj[1])-etol){
-	   /* Add an optimality cut for the second objective */
-	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
-	   new_cut->coef = NULL;
-	   new_cut->rhs = obj[1] - 1 + etol;
-	   new_cut->size = 0;
-	   new_cut->type = OPTIMALITY_CUT_SECOND;
-	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
-	   continue_with_node = cg_add_user_cut(new_cut,
-						&p->cgp->cuts_to_add_num,
-						&p->cgp->cuts_to_add_size,
-						&p->cgp->cuts_to_add);
-	   FREE(new_cut);
-	}else if (!p->par.mc_find_supported_solutions &&
-		  p->par.mc_add_optimality_cuts){
-	   /* Add an optimality cut for the second objective */
-	   cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
-	   new_cut->coef = NULL;
-	   new_cut->rhs = obj[0] - 1 + etol;
-	   new_cut->size = 0;
-	   new_cut->type = OPTIMALITY_CUT_FIRST;
-	   new_cut->name = CUT__DO_NOT_SEND_TO_CP;
-	   continue_with_node = cg_add_user_cut(new_cut,
-						&p->cgp->cuts_to_add_num,
-						&p->cgp->cuts_to_add_size,
-						&p->cgp->cuts_to_add);
-	   FREE(new_cut);
-	}
-     }else if (branching){
-	continue_with_node = TRUE;
-     }
-  }
+   if (p->has_mc_ub && *true_objval-p->par.mc_rho*(obj[0]+obj[1]) >
+         p->mc_ub + etol + MAX(0, MIN(p->par.mc_gamma, p->par.mc_tau))){
+      return(FALSE);
+   }
 
-  if (!new_solution){
-     return(continue_with_node);
-  }
+   if (p->par.mc_gamma == 1.0){
+      if (!p->has_mc_ub || obj[0] < p->obj[0] + etol){
+         if (!p->has_mc_ub || (obj[0] < p->obj[0] - etol ||
+                  (obj[0] >= p->obj[0] - etol
+                   && obj[1] < p->obj[1] - etol))){
+            if (p->par.verbosity >= 1){
+               printf("\nBetter Solution Found:\n");
+               if(p->mip->obj_sense == SYM_MAXIMIZE){
+                  printf("First Objective Cost: %.1f\n", -obj[0]);
+                  printf("Second Objective Cost: %.1f\n", -obj[1]);
+               }else{
+                  printf("First Objective Cost: %.1f\n", obj[0]);
+                  printf("Second Objective Cost: %.1f\n", obj[1]);
+               }
+            }
+            p->obj[1] = obj[1];
+            p->obj[0] = obj[0];
+            p->mc_ub = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
+            p->has_mc_ub = TRUE;
+            new_solution = TRUE;
+         }
+         /* Add an optimality cut for the second objective */
+         if (!branching && p->par.mc_add_optimality_cuts){
+            cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+            new_cut->coef = NULL;
+            new_cut->rhs = obj[1] - 1 + etol;
+            new_cut->size = 0;
+            new_cut->type = OPTIMALITY_CUT_SECOND;
+            new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+            continue_with_node = cg_add_user_cut(new_cut,
+                  &p->cgp->cuts_to_add_num,
+                  &p->cgp->cuts_to_add_size,
+                  &p->cgp->cuts_to_add);
+            FREE(new_cut);
+         }else{
+            continue_with_node = TRUE;
+         }
+      }
+   }else if (p->par.mc_tau == 1.0){
+      if (!p->has_mc_ub || obj[1] < p->obj[1] + etol){
+         if (!p->has_mc_ub || (obj[1] < p->obj[1] - etol ||
+                  (obj[1] >= p->obj[1] - etol
+                   && obj[0] < p->obj[0] - etol))){
+            if (p->par.verbosity >= 1){
+               printf("\nBetter Solution Found:\n");
+               if(p->mip->obj_sense == SYM_MAXIMIZE){
+                  printf("First Objective Cost: %.1f\n", -obj[0]);
+                  printf("Second Objective Cost: %.1f\n", -obj[1]);
+               }else{
+                  printf("First Objective Cost: %.1f\n", obj[0]);
+                  printf("Second Objective Cost: %.1f\n", obj[1]);
+               }
+            }
+            p->obj[1] = obj[1];
+            p->obj[0] = obj[0];
+            p->mc_ub = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
+            p->has_mc_ub = TRUE;
+            new_solution = TRUE;
+         }
+         /* Add an optimality cut for the second objective */
+         if (!branching && p->par.mc_add_optimality_cuts){
+            cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+            new_cut->coef = NULL;
+            new_cut->rhs = obj[0] - 1 + etol;
+            new_cut->size = 0;
+            new_cut->type = OPTIMALITY_CUT_FIRST;
+            new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+            continue_with_node = cg_add_user_cut(new_cut,
+                  &p->cgp->cuts_to_add_num,
+                  &p->cgp->cuts_to_add_size,
+                  &p->cgp->cuts_to_add);
+            FREE(new_cut);
+         }else{
+            continue_with_node = TRUE;
+         }
+      }
+   }else{
+      if (!p->has_mc_ub ||
+            (p->has_mc_ub && *true_objval-p->par.mc_rho*(obj[0]+obj[1]) <
+             p->mc_ub - MIN(p->par.mc_gamma, p->par.mc_tau) + 100*etol) ||
+            (obj[0] < p->obj[0] - etol &&
+             obj[1] < p->obj[1] + etol + MIN(p->par.mc_gamma, p->par.mc_tau)) ||
+            (obj[1] < p->obj[1] - etol &&
+             obj[0] < p->obj[0] + etol + MIN(p->par.mc_gamma, p->par.mc_tau))){
+         if (p->par.verbosity >= 1){
+            printf("\nBetter Solution Found:\n");
+            if(p->mip->obj_sense == SYM_MAXIMIZE){
+               printf("First Objective Cost: %.1f\n", -obj[0]);
+               printf("Second Objective Cost: %.1f\n", -obj[1]);
+            }else{
+               printf("First Objective Cost: %.1f\n", obj[0]);
+               printf("Second Objective Cost: %.1f\n", obj[1]);
+            }
+         }
+         p->obj[1] = obj[1];
+         p->obj[0] = obj[0];
+         p->mc_ub = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
+         p->has_mc_ub = TRUE;
+         new_solution = TRUE;
+      }
+      if (!branching && !p->par.mc_find_supported_solutions &&
+            p->par.mc_add_optimality_cuts){
+         if (p->par.mc_gamma*(obj[0] - p->utopia[0]) >
+               *true_objval-p->par.mc_rho*(obj[0]+obj[1])-etol){
+            /* Add an optimality cut for the second objective */
+            cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+            new_cut->coef = NULL;
+            new_cut->rhs = obj[1] - 1 + etol;
+            new_cut->size = 0;
+            new_cut->type = OPTIMALITY_CUT_SECOND;
+            new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+            continue_with_node = cg_add_user_cut(new_cut,
+                  &p->cgp->cuts_to_add_num,
+                  &p->cgp->cuts_to_add_size,
+                  &p->cgp->cuts_to_add);
+            FREE(new_cut);
+         }else if (!p->par.mc_find_supported_solutions &&
+               p->par.mc_add_optimality_cuts){
+            /* Add an optimality cut for the second objective */
+            cut_data *new_cut = (cut_data *) calloc(1, sizeof(cut_data));
+            new_cut->coef = NULL;
+            new_cut->rhs = obj[0] - 1 + etol;
+            new_cut->size = 0;
+            new_cut->type = OPTIMALITY_CUT_FIRST;
+            new_cut->name = CUT__DO_NOT_SEND_TO_CP;
+            continue_with_node = cg_add_user_cut(new_cut,
+                  &p->cgp->cuts_to_add_num,
+                  &p->cgp->cuts_to_add_size,
+                  &p->cgp->cuts_to_add);
+            FREE(new_cut);
+         }
+      }else if (branching){
+         continue_with_node = TRUE;
+      }
+   }
 
-  p->best_sol.xlevel = p->bc_level;
-  p->best_sol.xindex = p->bc_index;
-  p->best_sol.xiter_num = p->iter_num;
-  p->best_sol.xlength = length;
-  p->best_sol.lpetol = etol;
-  p->best_sol.objval = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
-  FREE(p->best_sol.xind);
-  FREE(p->best_sol.xval);
-  p->best_sol.xind = (int *) malloc(length*ISIZE);
-  p->best_sol.xval = (double *) malloc(length*DSIZE);
-  memcpy((char *)p->best_sol.xind, (char *)indices, length * ISIZE);
-  memcpy((char *)p->best_sol.xval, (char *)values, length * DSIZE);
+   if (!new_solution){
+      return(continue_with_node);
+   }
 
-  if(!p->best_sol.has_sol){
-     p->best_sol.has_sol = TRUE;
-  }
+   p->best_sol.xlevel = p->bc_level;
+   p->best_sol.xindex = p->bc_index;
+   p->best_sol.xiter_num = p->iter_num;
+   p->best_sol.xlength = length;
+   p->best_sol.lpetol = etol;
+   p->best_sol.objval = *true_objval-p->par.mc_rho*(obj[0]+obj[1]);
+   FREE(p->best_sol.xind);
+   FREE(p->best_sol.xval);
+   p->best_sol.xind = (int *) malloc(length*ISIZE);
+   p->best_sol.xval = (double *) malloc(length*DSIZE);
+   memcpy((char *)p->best_sol.xind, (char *)indices, length * ISIZE);
+   memcpy((char *)p->best_sol.xval, (char *)values, length * DSIZE);
+
+   if(!p->best_sol.has_sol){
+      p->best_sol.has_sol = TRUE;
+   }
 
 #ifndef COMPILE_IN_TM
-  send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
-			   lpetol, *true_objval-p->par.mc_rho*(obj[0]+obj[1]),
-			   length, indices, values);
+   send_feasible_solution_u(p, p->bc_level, p->bc_index, p->iter_num,
+         lpetol, *true_objval-p->par.mc_rho*(obj[0]+obj[1]),
+         length, indices, values);
 #endif
-  display_lp_solution_u(p, DISP_FEAS_SOLUTION);
-  
-  return(continue_with_node);
+   display_lp_solution_u(p, DISP_FEAS_SOLUTION);
+
+   return(continue_with_node);
 
 }

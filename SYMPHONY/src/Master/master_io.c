@@ -850,5 +850,9 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    printf ("Number of times warm search reached time limit: %i\n",stat->warm_search_tl_reached);
    printf ("Number of time warm search infeasible:          %i\n",stat->warm_search_infeasible);
    printf ("Time spent warm search:                         %f\n",stat->warm_search_time); 
+   printf ("\n==================== Feasibility Pump =====================\n");
+   printf ("Number of times feasibility pump called:        %i\n",stat->fp_calls);
+   printf ("Number of times feasibility pump successful:    %i\n",stat->fp_successes);
+   printf ("Time spent in feasibility pump:                 %f\n",stat->fp_time); 
 #endif
 }
