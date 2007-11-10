@@ -102,6 +102,9 @@ void free_mip_desc(MIPdesc *mip)
       }
       FREE(mip->colname);
    }
+   if(mip->cru_vars_num){
+      FREE(mip->cru_vars);
+   }
 }
 
 /*===========================================================================*/
@@ -211,7 +214,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 {
    MPL * mpl;         
    int errors;
-   int i, j, k, obj_index, length, type, count, nonzeros;
+   int i, j, k, obj_index = 0, length, type, count, nonzeros;
    double *matval;
    int *matind;
    int * matbeg;
@@ -3577,7 +3580,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	//	PRINTF(verbosity, -1, 
 	//      ("LandP cuts can be generated only with Clp...Skipping LandP cut generation..."));
 	//       }		
-	par->generate_cgl_landp_cuts == DO_NOT_GENERATE;
+	par->generate_cgl_landp_cuts = DO_NOT_GENERATE;
 #else
    if(par->generate_cgl_landp_cuts > -1 && 
       par->generate_cgl_landp_cuts_freq > 0){

@@ -785,6 +785,10 @@ int free_master_u(sym_environment *env)
 #ifdef COMPILE_IN_TM
    if (env->warm_start){
       free_subtree(env->warm_start->rootnode);
+      if(env->warm_start->best_sol.has_sol){
+	 FREE(env->warm_start->best_sol.xind);
+	 FREE(env->warm_start->best_sol.xval);
+      }
       if (env->warm_start->cuts){
 	 for (i = env->warm_start->cut_num - 1; i >= 0; i--){
 	    if (env->warm_start->cuts[i]){
