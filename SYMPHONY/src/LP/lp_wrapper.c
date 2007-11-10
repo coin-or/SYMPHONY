@@ -721,10 +721,12 @@ int is_feasible_u(lp_prob *p, char branching)
 	 p->best_sol.objval = true_objval;
 	 FREE(p->best_sol.xind);
 	 FREE(p->best_sol.xval);
-	 p->best_sol.xind = (int *) malloc(cnt*ISIZE);
-	 p->best_sol.xval = (double *) malloc(cnt*DSIZE);
-	 memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
-	 memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
+	 if(cnt){
+	    p->best_sol.xind = (int *) malloc(cnt*ISIZE);
+	    p->best_sol.xval = (double *) malloc(cnt*DSIZE);
+	    memcpy((char *)p->best_sol.xind, (char *)indices, cnt*ISIZE);
+	    memcpy((char *)p->best_sol.xval, (char *)values, cnt*DSIZE);
+	 }
 	 if(!p->best_sol.has_sol)
 	    p->best_sol.has_sol = TRUE;
 	 PRINT(p->par.verbosity, 0,

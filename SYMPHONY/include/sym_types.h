@@ -398,7 +398,9 @@ typedef struct MIPDESC{
    int        var_type_modified;  /* number of updates on the mip desc */
    int        change_num;  /* number of updates on the mip desc */
    int        change_type[MAX_CHANGE_NUM];  /* type of the mip desc. changes */
-
+   int        new_col_num; /* used only when new cols added */
+   int        cru_vars_num;
+   int       *cru_vars; 
 }MIPdesc;
 
 /*===========================================================================*\
@@ -418,6 +420,8 @@ typedef struct WARM_START_DESC{
    char           has_ub;
    double         ub;
    lp_sol         best_sol;
+   char           trim_tree;
+   int            trim_tree_level;
+   int            trim_tree_index;
 }warm_start_desc;
-
 #endif

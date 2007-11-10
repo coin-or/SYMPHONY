@@ -110,6 +110,7 @@
 #define NODE_STATUS__PRUNED       4
 #define NODE_STATUS__INTERRUPTED  5
 #define NODE_STATUS__WARM_STARTED 6
+#define NODE_STATUS__WSPRUNED     7
 /*------------------------------ not_fixed stati ----------------------------*/
 #define NF_CHECK_ALL             0x00
 #define NF_CHECK_AFTER_LAST      0x01
@@ -572,4 +573,11 @@
 #define COL_BOUNDS_CHANGED                4  
 #define OBJ_SENSE_CHANGED                 5
 #define RHS_SENSE_CHANGED                 6 
+#define COLS_ADDED                        7
+
+/*--------------- parameter values for restart/sens analysis ----------------*/
+#define DO_NOT_TRIM          0
+#define TRIM_LEVEL           1
+#define TRIM_INDEX           2
+#define ON_CRU_VARS          3
 #endif
