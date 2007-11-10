@@ -114,12 +114,12 @@ int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
    for (i = mip->n - 1; i >= 0; --i){
       mip->is_int[i] = TRUE;
       mip->ub[i] = 1.0;
-         /* mip->lb[i] = 0.0; */ /* Set by calloc */
+      /* mip->lb[i] = 0.0; */ /* Set by calloc */
    }
 
    for (i = mip->m - 1; i >= 0; i--) {
       mip->rhs[i] = 1.0;
-      mip->sense[i] = 'L';
+      mip->sense[i] = 'E';
    }
 
    return(USER_SUCCESS);
