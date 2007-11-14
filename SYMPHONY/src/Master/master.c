@@ -27,6 +27,7 @@
 #include "sym_timemeas.h"
 #include "sym_messages.h"
 #include "sym_macros.h"
+#include "sym_qsort.h"
 #include "sym_pack_cut.h"
 #include "sym_pack_array.h"
 #include "sym_master.h"
@@ -38,8 +39,6 @@
 #include "sym_lp.h"
 #endif
 #endif
-
-#include "qsortucb.h"
 
 #ifndef TEV_INIT_MASK
 /* We must have pvm3.4 where it is called TEV_MASK_INIT */
@@ -3570,7 +3569,7 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
 
    /* order the indices! */
    if(numelems){
-      qsortucb_id(indices, elements, numelems);
+      qsort_id(indices, elements, numelems);
    }
    
    if(!env->mip->n && !env->mip->m){
@@ -3743,7 +3742,7 @@ int sym_add_row(sym_environment *env, int numelems, int *indices,
 
    /* order the indices */
    if(numelems){
-      qsortucb_id(indices, elements, numelems);
+      qsort_id(indices, elements, numelems);
    }
 
 
@@ -3900,7 +3899,7 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
    
    /* sort the indices in case they are not given sorted! */
 
-   qsortucb_i(indices, num);
+   qsort_i(indices, num);
    
    /* First, adjust the index lists */
    /* Warning: This resets the user indices to be equal to the real indices.
@@ -4123,7 +4122,7 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
 
    /* sort the indices in case they are not given sorted! */
 
-   qsortucb_i(indices, num);
+   qsort_i(indices, num);
 
    new_rows = (int *) malloc(m*ISIZE);
    for (new_num_rows = 0, i = 0, k = 0; i < m && k < num; i++){

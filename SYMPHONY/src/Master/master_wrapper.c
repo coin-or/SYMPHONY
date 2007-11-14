@@ -19,7 +19,7 @@
 #include "omp.h"
 #endif
 
-#include "qsortucb.h"
+#include "sym_qsort.h"
 #include "sym_messages.h"
 #include "sym_proccomm.h"
 #include "symphony.h"
@@ -321,9 +321,9 @@ int initialize_root_node_u(sym_environment *env)
     case USER_NO_PP:
     case USER_AND_PP:  
       if (base->varnum)
-	 qsortucb_i(base->userind, base->varnum);
+	 qsort_i(base->userind, base->varnum);
       if (root->uind.size && !env->par.warm_start)
-	 qsortucb_i(root->uind.list, root->uind.size);
+	 qsort_i(root->uind.list, root->uind.size);
       env->mip->n = base->varnum + root->uind.size;
       env->mip->m = base->cutnum;
 #if 0
@@ -373,10 +373,10 @@ int initialize_root_node_u(sym_environment *env)
 
 #if 0
       if (base->varnum){
-	 qsortucb_i(base->userind, base->varnum);
+	 qsort_i(base->userind, base->varnum);
       }
       if (root->uind.size && !env->par.warm_start){
-	 qsortucb_i(root->uind.list, root->uind.size);
+	 qsort_i(root->uind.list, root->uind.size);
       }
 #endif
       
@@ -683,7 +683,7 @@ int display_solution_u(sym_environment *env, int thread_num)
 	     sol.objval + env->mip->obj_offset : 
 	     -sol.objval + env->mip->obj_offset);
    }
-   qsortucb_id(sol.xind, sol.xval, sol.xlength);
+   qsort_id(sol.xind, sol.xval, sol.xlength);
 
 #ifdef USE_SYM_APPLICATION   
    user_res = user_display_solution(env->user, sol.lpetol, sol.xlength,

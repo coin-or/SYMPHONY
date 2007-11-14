@@ -17,7 +17,7 @@
 #include <stdlib.h>
 
 #include "sym_lp.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 #include "sym_proccomm.h"
 #include "sym_messages.h"
 #include "sym_constants.h"
@@ -892,7 +892,7 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
       }
       /*}*/
    }
-   qsortucb_di(xval, xind, cnt);
+   qsort_di(xval, xind, cnt);
 
    for (j = 0, i = 0; i < cnt;){
       if (xval[i] > lim[j]){
@@ -950,7 +950,7 @@ void branch_close_to_half_and_expensive(lp_prob *p, int max_cand_num,
 	 xval[cnt++] = fabs(fracx - .5);
        }
    }
-   qsortucb_di(xval, xind, cnt);
+   qsort_di(xval, xind, cnt);
 
    for (j=0, i=0; i<cnt; i++){
       if (xval[i] > lim[j]){
@@ -970,7 +970,7 @@ void branch_close_to_half_and_expensive(lp_prob *p, int max_cand_num,
 	 get_objcoef(p->lp_data, xind[i], xval+i);
 	 xval[i] *= -1;
       }
-      qsortucb_di(xval, xind, cnt);
+      qsort_di(xval, xind, cnt);
       *cand_num = max_cand_num;
    }
 
@@ -1014,7 +1014,7 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
 	 xval[cnt++] = 1 - x[i];
       }
    }
-   qsortucb_di(xval, xind, cnt);
+   qsort_di(xval, xind, cnt);
 
    for (j=0, i=0; i<cnt; i++){
       if (xval[i] > lim[j]){
@@ -1033,7 +1033,7 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
       for (i=cnt-1; i>=0; i--){
 	 get_objcoef(p->lp_data, xind[i], xval+i);
       }
-      qsortucb_di(xval, xind, cnt);
+      qsort_di(xval, xind, cnt);
       *cand_num = max_cand_num;
    }
 

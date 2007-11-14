@@ -104,7 +104,9 @@ SYMPHONY/configure -text
 SYMPHONY/configure.ac -text
 SYMPHONY/include/SymConfig.h -text
 SYMPHONY/include/config_sym.h.in -text
+SYMPHONY/include/sym_qsort.h -text
 SYMPHONY/scripts/publish2 -text
+SYMPHONY/src/Common/sym_qsort.c -text
 SYMPHONY/src/Makefile.am -text
 SYMPHONY/src/Makefile.in -text
 SYMPHONY/sym_addlibs.txt.in -text

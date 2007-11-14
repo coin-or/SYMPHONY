@@ -3228,7 +3228,7 @@ void write_sav(LPdata *lp_data, char *fname)
 
 #ifdef USE_CGL_CUTS
 
-#include "qsortucb.h"
+#include "sym_qsort.h"
 
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 		       char send_to_pool, int is_rootnode, int verbosity)
@@ -3660,7 +3660,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	    matind[k] = lp_data->vars[indices[k]]->userind;
 	 }
 	 memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
-	 qsortucb_id(matind, matval, num_elements);
+	 qsort_id(matind, matval, num_elements);
 	 /*
 	  * display the cut
 	  */
