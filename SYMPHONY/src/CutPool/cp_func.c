@@ -18,7 +18,7 @@
 #include "sym_macros.h"
 #include "sym_timemeas.h"
 #include "sym_proccomm.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 #include "sym_messages.h"
 #include "sym_pack_cut.h"
 #include "sym_cp.h"
@@ -135,7 +135,7 @@ void order_cuts_by_quality(cut_pool *cp)
    cp_cut_data **cuts = cp->cuts;
 
    /* order the cuts according to the function "cutcmp" */
-   qsortucb((char *)cuts, cp->cut_num, sizeof(cp_cut_data *), cut_quality_cmp);
+   qsort(cuts, cp->cut_num, sizeof(cp_cut_data *), cut_quality_cmp);
 }
 
 /*===========================================================================*/
@@ -233,7 +233,7 @@ int delete_duplicate_cuts(cut_pool *cp)
    int touches, level;
    
    /* order the cuts according to the function "cutcmp" */
-   qsortucb((char *)cuts, cp->cut_num, sizeof(cp_cut_data *), cutcmp);
+   qsort(cuts, cp->cut_num, sizeof(cp_cut_data *), cutcmp);
    /* go through and remove duplicates */
    for(num = cp->cut_num-1, cp_cut1 = cuts, cp_cut2 = cp_cut1 + 1;
        num > 0; cp_cut2++, num--){

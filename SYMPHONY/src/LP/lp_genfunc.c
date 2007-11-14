@@ -19,7 +19,7 @@
 #include <string.h>
 
 #include "sym_proccomm.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 #include "sym_lp.h"
 #include "sym_messages.h"
 #include "sym_constants.h"
@@ -811,7 +811,7 @@ int collect_nonzeros(lp_prob *p, double *x, int *tind, double *tx)
       }
    }
    /* order indices and values according to indices */
-   qsortucb_id(tind, tx, cnt);
+   qsort_id(tind, tx, cnt);
    return(cnt);
 }
 
@@ -833,7 +833,7 @@ int collect_fractions(lp_prob *p, double *x, int *tind, double *tx)
       }
    }
    /* order indices and values according to indices */
-   qsortucb_id(tind, tx, cnt);
+   qsort_id(tind, tx, cnt);
    return(cnt);
 }
 
@@ -920,7 +920,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
       for (i = extravarnum - 1; i >= 0; i--)
 	 ulist[i] = extravars[i]->userind;
       if (lp_data->ordering == COLIND_ORDERED)
-	 qsortucb_ii(ulist, ecstat, extravarnum);
+	 qsort_ii(ulist, ecstat, extravarnum);
    }else{
       desc->uind.list = NULL;
       desc->basis.extravars.stat = NULL;
@@ -991,7 +991,7 @@ node_desc *create_explicit_node_desc(lp_prob *p)
 	    erstat[cutindsize++] = rstat[i];
 	 }
       }
-      qsortucb_ii(clist, erstat, cutindsize);
+      qsort_ii(clist, erstat, cutindsize);
    }else{
       desc->cutind.list = NULL;
       desc->basis.extrarows.stat = NULL;

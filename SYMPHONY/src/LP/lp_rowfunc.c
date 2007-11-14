@@ -17,7 +17,6 @@
 #include <string.h>
 
 #include "sym_lp.h"
-#include "qsortucb.h"
 #include "sym_constants.h"
 #include "sym_macros.h"
 #include "sym_types.h"
@@ -343,8 +342,8 @@ int add_best_waiting_rows(lp_prob *p)
 
    added_rows = MIN(p->par.max_cut_num_per_iter, p->waiting_row_num);
    if (added_rows < p->waiting_row_num)
-      qsortucb((char *)p->waiting_rows, p->waiting_row_num,
-	       sizeof(waiting_row *), waiting_row_comp);
+      qsort((char *)p->waiting_rows, p->waiting_row_num,
+	    sizeof(waiting_row *), waiting_row_comp);
    if (added_rows){
       print_stat_on_cuts_added_u(p, added_rows);
       add_row_set(p, p->waiting_rows, added_rows);

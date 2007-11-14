@@ -15,11 +15,13 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <math.h>
+#if !defined (_MSC_VER)
+#include <unistd.h>            /* this defines sleep() */
+#endif
 
 #include "sym_lp.h"
 #include "sym_timemeas.h"
 #include "sym_proccomm.h"
-#include "qsortucb.h"
 #include "sym_constants.h"
 #include "sym_macros.h"
 #include "sym_types.h"

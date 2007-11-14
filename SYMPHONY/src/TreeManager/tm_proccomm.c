@@ -17,6 +17,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if !defined (_MSC_VER)
+#include <unistd.h>            /* this defines sleep() */
+#endif
 
 #include "sym_tm.h"
 #include "sym_constants.h"

@@ -19,7 +19,6 @@
 
 #include "sym_lp.h"
 #include "sym_proccomm.h"
-#include "qsortucb.h"
 #include "sym_types.h"
 #include "sym_macros.h"
 #include "sym_constants.h"
@@ -983,9 +982,9 @@ void userind_sort_extra(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    if (lp_data->n > p->base.varnum + 1){
       if (lp_data->ordering == COLIND_ORDERED){
-	 qsortucb((char *)(lp_data->vars + p->base.varnum),
-		  lp_data->n - p->base.varnum,
-		  sizeof(var_desc *), var_uind_comp);
+	 qsort((char *)(lp_data->vars + p->base.varnum),
+	       lp_data->n - p->base.varnum,
+	       sizeof(var_desc *), var_uind_comp);
 	 lp_data->ordering = USERIND_ORDERED;
       }
    }else{
@@ -1000,9 +999,9 @@ void colind_sort_extra(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    if (lp_data->n > p->base.varnum + 1){
       if (lp_data->ordering == USERIND_ORDERED){
-	 qsortucb((char *)(lp_data->vars + p->base.varnum),
-		  lp_data->n - p->base.varnum,
-		  sizeof(var_desc *), var_cind_comp);
+	 qsort((char *)(lp_data->vars + p->base.varnum),
+	       lp_data->n - p->base.varnum,
+	       sizeof(var_desc *), var_cind_comp);
 	 lp_data->ordering = COLIND_ORDERED;
       }
    }else{
