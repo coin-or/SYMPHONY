@@ -1283,7 +1283,7 @@ int sym_warm_solve(sym_environment *env)
 	       for(i = 0; i < ws_cnum; i++){
 		  tmp_ind[i] = i;
 	       }
-	       qsortucb_ii(cut_ind, tmp_ind, ws_cnum);
+	       qsort_ii(cut_ind, tmp_ind, ws_cnum);
 	       
 	       for(i = 0; i < cut_num; i++){
 		  loc = tmp_ind[ws_cnum - cut_num + i];
