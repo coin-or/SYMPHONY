@@ -25,7 +25,6 @@
 #include "sym_macros.h"
 #include "sym_constants.h"
 #include "sym_proccomm.h"
-#include "qsortucb.h"
 #include "sym_dg_params.h"
 #include "sym_master_u.h"
 

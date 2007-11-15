@@ -23,7 +23,7 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 #include "sym_lp_u.h"
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
 #include "sym_lp.h"
@@ -313,7 +313,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 		  xval[cnt++] = fabs(fracx - .5);
 	       }
 	    }
-	    qsortucb_di(xval, xind, cnt);
+	    qsort_di(xval, xind, cnt);
 
 	    candnum = vrp->par.strong_branching_cand_num_max -
 	       vrp->par.strong_branching_red_ratio * bc_level;

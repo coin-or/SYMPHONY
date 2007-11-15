@@ -24,7 +24,7 @@
 #include "sym_proccomm.h"
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 #include "sym_cg_u.h"
 
 /* SPP include files */
@@ -829,7 +829,7 @@ void extend_clique_on_fgraph(spp_cg_problem *spp, cut_data *new_cut,
    /* if some nodes were added to the clique ... */
    if (old_coef_num < coef_num) {
       new_cut->size = coef_num * ISIZE;
-      qsortucb_i(indices, coef_num);
+      qsort_i(indices, coef_num);
       memcpy(new_cut->coef, indices, new_cut->size);
       *pviolation = lhs - 1;
    }
@@ -884,7 +884,7 @@ void translate_cut_to_indices(spp_cg_problem *spp, cut_data *cut)
     case CLIQUE:
     case ORTHOCUT:
     case OTHER_CUT:
-      qsortucb_i(names, coef_num);
+      qsort_i(names, coef_num);
       break;
 
     case ODD_HOLE:

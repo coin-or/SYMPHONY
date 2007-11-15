@@ -18,7 +18,6 @@
 
 /* SYMPHONY include files */
 #include "sym_proto.h"
-#include "qsortucb.h"
 
 /* VRP include files */
 #include "vrp_const.h"

@@ -26,7 +26,7 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_proccomm.h"
-#include "qsortucb.h"
+#include "sym_qsort"
 
 /* CNRP include files */
 #include "cnrp_const.h"
@@ -435,7 +435,7 @@ int *create_edge_list(cnrp_problem *cnrp, int *varnum, char which_edges)
       }
       break;
    }
-   qsortucb_i(uind, *varnum);
+   qsort_i(uind, *varnum);
 
    return(uind);
 }

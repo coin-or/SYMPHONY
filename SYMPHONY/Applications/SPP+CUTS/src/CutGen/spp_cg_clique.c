@@ -23,7 +23,7 @@
 #include "sym_macros.h"
 #include "sym_constants.h"
 #include "sym_pack_cut.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 #include "sym_cg.h"
 
 /* SPP include files */
@@ -188,7 +188,7 @@ int find_violated_star_cliques(spp_cg_problem *spp, double etol)
 	 } else {
 	    /* greedily find if v_deg is too big */
 	    /* order nodes in *decreasing* order of their degrees in star */
-	    qsortucb_ii(star_deg, star, star_length);
+	    qsort_ii(star_deg, star, star_length);
 	    for (i = star_length / 2 - 1; i >= 0; i--) {
 	       tmp = star[i];
 	       star[i] = star[star_length - i - 1];
@@ -431,7 +431,7 @@ int find_violated_row_cliques(spp_cg_problem *spp, double etol)
 	       copy first 'row' then 'indices' into itmp */
 	    for (i = 0; i < length; i++)
 	       degrees[i] = - nodes[indices[i]].degree;
-	    qsortucb_ii(degrees, indices, length);
+	    qsort_ii(degrees, indices, length);
 	    for (i = 0; i < len; i++) itmp[i] = row[i];
 	    for (i = 0, k = len; i < length; i++) itmp[k++] = indices[i];
 	    clique_count += greedy_maximal_clique(spp, new_cut, k, itmp, len,
@@ -560,7 +560,7 @@ int enumerate_maximal_cliques(spp_cg_problem *spp, int pos, double etol)
       /* transform relative indices into user indices and order them */
       for (j = cnt - 1; j >= 0; j--)
 	 coef[j] = nodes[coef[j]].ind;
-      qsortucb_i(coef, cnt);
+      qsort_i(coef, cnt);
       memcpy(new_cut->coef, coef, cnt * ISIZE);
       new_cut->type = CLIQUE;
       new_cut->size = cnt * ISIZE;
@@ -620,7 +620,7 @@ int greedy_maximal_clique(spp_cg_problem *spp, cut_data *new_cut,
    if (is_violated) {
       for (j = 0; j < num; j++)
 	 indices[j] = nodes[indices[j]].ind;
-      qsortucb_i(indices, num);
+      qsort_i(indices, num);
       memcpy(new_cut->coef, (char *)indices, num * ISIZE);
       new_cut->type = CLIQUE;
       new_cut->size = num * ISIZE;

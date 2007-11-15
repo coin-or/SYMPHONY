@@ -21,7 +21,6 @@
 
 /* CNRP include files */
 #include "cnrp_const.h"
-#include "qsortucb.h"
 
 #define NOT_INTEGRAL -1
 #define OTHER_END(cur_edge, v) \
