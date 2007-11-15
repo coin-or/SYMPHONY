@@ -22,6 +22,7 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
+#include "sym_qsort.h"
 
 /* CNRP include files */
 #include "network.h"

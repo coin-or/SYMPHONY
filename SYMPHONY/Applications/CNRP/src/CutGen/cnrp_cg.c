@@ -21,7 +21,6 @@
 #include "sym_macros.h"
 #include "sym_constants.h"
 #include "sym_proccomm.h"
-#include "qsortucb.h"
 #include "sym_cg_u.h"
 
 /* CNRP include files */

@@ -22,7 +22,7 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 #include "sym_lp_u.h"
 
 /* CNRP include files */
@@ -149,7 +149,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
    }
 #endif
    
-   qsortucb_di(xval, xind, cnt);
+   qsort_di(xval, xind, cnt);
 
    for (j = 0, i = 0; i < cnt;){
       if (xval[i] > lim[j]){
@@ -208,7 +208,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 	    cnt++;
       }
    }
-   qsortucb_di(xval, xind, nz);
+   qsort_di(xval, xind, nz);
    
    candnum = cnrp->par.strong_branching_cand_num_max;
    candnum = MAX(candnum, cnrp->par.strong_branching_cand_num_min);
@@ -406,7 +406,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 		  xval[cnt++] = fabs(fracx - .5);
 	       }
 	    }
-	    qsortucb_di(xval, xind, cnt);
+	    qsort_di(xval, xind, cnt);
 
 	    candnum = cnrp->par.strong_branching_cand_num_max -
 	       cnrp->par.strong_branching_red_ratio * bc_level;

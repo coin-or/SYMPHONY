@@ -22,6 +22,7 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
+#include "sym_qsort.h"
 
 /* VRP include files */
 #include "network.h"
@@ -59,8 +60,8 @@ network *createnet(int *xind, double *xval, int edgenum, double etol,
    adjlist = n->adjlist;
    n->is_integral = TRUE;
    
-   qsortucb_di(xval, xind, edgenum);
-   /* qsortucb_di sorts the array in nondecreasing order;
+   qsort_di(xval, xind, edgenum);
+   /* qsort_di sorts the array in nondecreasing order;
       now need to translate it into nonincreasing */
    
    for (i = 0, val_low = xval, val_high = xval + edgenum - 1, ind_low = xind,

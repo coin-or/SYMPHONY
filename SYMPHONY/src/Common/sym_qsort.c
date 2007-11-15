@@ -18,7 +18,7 @@
 /*===========================================================================*/
 
 static int cmpint(const void *p1, const void *p2){
-   return (*((int *) p1) - *((int *) p2));
+   return (*((int *)p1) - *((int *)p2));
 }
 
 /*===========================================================================*/
@@ -26,7 +26,7 @@ static int cmpint(const void *p1, const void *p2){
 
 void qsort_i(int *bot, int nmemb)
 {
-   qsort (bot, nmemb, sizeof(int), cmpint);
+  qsort (bot, nmemb, sizeof(int), cmpint);
 }
 
 /*===========================================================================*/

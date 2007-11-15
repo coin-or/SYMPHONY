@@ -23,7 +23,7 @@
 #include "sym_constants.h"
 #include "sym_macros.h"
 #include "sym_pack_cut.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 #include "sym_cg.h"
 
 /* SPP include files */
@@ -463,7 +463,7 @@ double lift_nonviolated_odd_hole(spp_cg_problem *spp, int oh_len, int *oh,
       in decr order of their num_nbrs values */
    for (k = 0; k < nodenum; k++)
       hubs[k] = k;
-   qsortucb_ii(num_nbrs, hubs, nodenum);
+   qsort_ii(num_nbrs, hubs, nodenum);
    spp_reverse_int_string(nodenum, num_nbrs); /* qsort orders into incr */
    spp_reverse_int_string(nodenum, hubs);
    for (k = 0; k < nodenum && num_nbrs[k]; k++);  /* k is pos of first 0 */
@@ -480,7 +480,7 @@ double lift_nonviolated_odd_hole(spp_cg_problem *spp, int oh_len, int *oh,
 	 dtmp[k] = -1;
       }
    }
-   qsortucb_di(dtmp, hubs, nodenum);
+   qsort_di(dtmp, hubs, nodenum);
    spp_reverse_double_string(nodenum, dtmp);
    spp_reverse_int_string(nodenum, hubs);
    for (k = 0; k < nodenum && dtmp[k] >= 0; k++);
@@ -604,7 +604,7 @@ int max_lhs_of_lifted_odd_hole(spp_cg_problem *spp, int oh_len, int *oh,
 	 oh_label[i] = TRUE;
 	 perm[i] = i;
       }
-      qsortucb_ii(oh_clone, perm, oh_len);
+      qsort_ii(oh_clone, perm, oh_len);
       for (j = 0; j < hub_len; j++)
 	 if (label[j]) {
 	    /* need to set oh_label to FALSE for every index common in oh
@@ -632,7 +632,7 @@ int max_lhs_of_lifted_odd_hole(spp_cg_problem *spp, int oh_len, int *oh,
 	    i--;
 	 }
       /* permute back oh_label */
-      qsortucb_ic(perm, oh_label, oh_len);
+      qsort_ic(perm, oh_label, oh_len);
 
       /* now compute the max value of the lhs: coeffs of hubs at 1 +
 	 ceil(|S|/2) for each segment of the oh (segments: cont sequence

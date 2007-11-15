@@ -23,7 +23,7 @@
 #include "sym_constants.h"
 #include "sym_proccomm.h"
 #include "sym_dg_params.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 
 /* CNRP include files */
 #include "cnrp_messages.h"
@@ -315,7 +315,7 @@ void display_support_graph(int dg_id, int clone, char *name,
       }
    }
 
-   qsortucb_di(weights, inds, edgenum);
+   qsort_di(weights, inds, edgenum);
 	   
    if (dg_id){
       copy_node_set(dg_id, clone, name);
@@ -376,7 +376,7 @@ void display_support_graph_flow(int dg_id, int clone, char *name,
       }
    }
 
-   qsortucb_di(flow_vals, inds, flow_start);
+   qsort_di(flow_vals, inds, flow_start);
 	   
    for (tmp = 0; flow_vals[tmp] < etol; tmp++);
    
