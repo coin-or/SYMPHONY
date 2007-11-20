@@ -2776,7 +2776,7 @@ int sym_is_binary(sym_environment *env, int index, int *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_integer(sym_environment *env, int index, int *value)
+int sym_is_integer(sym_environment *env, int index, char *value)
 {
    if (!env->mip || index < 0 || index >= env->mip->n){
       printf("sym_is_binary(): Index out of range\n");

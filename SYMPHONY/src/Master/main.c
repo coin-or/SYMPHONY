@@ -49,6 +49,8 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony.h"
+#include "sym_master.h"
+#include "sym_messages.h"
 #ifdef HAS_READLINE
 #include <pwd.h>
 #include <readline/readline.h>

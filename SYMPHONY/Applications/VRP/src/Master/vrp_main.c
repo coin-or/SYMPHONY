@@ -53,6 +53,7 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony.h"
+#include "sym_master.h"
 #include "vrp_types.h"
 #include "vrp_const.h"
 

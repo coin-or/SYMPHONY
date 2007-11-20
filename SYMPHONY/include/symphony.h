@@ -17,9 +17,55 @@
 
 #define COMPILING_FOR_MASTER
 
-#include "sym_proto.h"
-#include "sym_master.h"
-#include "sym_messages.h"
+#ifdef PROTO
+#undef PROTO
+#endif
+#define PROTO(x) x
+
+/*****************************************************************************
+ *****************************************************************************
+ *************                                                      **********
+ *************                  Return Values                       **********
+ *************                                                      **********
+ *****************************************************************************
+ *****************************************************************************/
+
+/*----------------------- Global return codes -------------------------------*/
+#define FUNCTION_TERMINATED_NORMALLY      0
+#define FUNCTION_TERMINATED_ABNORMALLY   -1
+#define ERROR__USER                      -100
+
+/*-------------- Return codes for sym_parse_comand_line() -------------------*/
+#define ERROR__OPENING_PARAM_FILE        -110
+#define ERROR__PARSING_PARAM_FILE        -111
+
+/*----------------- Return codes for sym_load_problem() ---------------------*/
+#define ERROR__READING_GMPL_FILE         -120
+#define ERROR__READING_WARM_START_FILE   -121
+#define ERROR__READING_MPS_FILE          -122
+#define ERROR__READING_LP_FILE           -123
+
+/*-------------------- Return codes for sym_solve() -------------------------*/
+#define TM_NO_PROBLEM                     225
+#define TM_NO_SOLUTION                    226
+#define TM_OPTIMAL_SOLUTION_FOUND         227
+#define TM_TIME_LIMIT_EXCEEDED            228
+#define TM_NODE_LIMIT_EXCEEDED            229
+#define TM_TARGET_GAP_ACHIEVED            230
+#define TM_FOUND_FIRST_FEASIBLE           231
+#define TM_FINISHED                       232
+#define TM_UNFINISHED                     233
+#define TM_FEASIBLE_SOLUTION_FOUND        234
+#define TM_SIGNAL_CAUGHT                  235
+#define TM_ERROR__NO_BRANCHING_CANDIDATE -250
+#define TM_ERROR__ILLEGAL_RETURN_CODE    -251
+#define TM_ERROR__NUMERICAL_INSTABILITY  -252
+#define TM_ERROR__COMM_ERROR             -253
+#define TM_ERROR__USER                   -275
+
+typedef struct MIPDESC MIPdesc;
+typedef struct WARM_START_DESC warm_start_desc;
+typedef struct SYM_ENVIRONMENT sym_environment;
 
 /*===========================================================================*/
 /*===================== Interface functions (master.c) ======================*/
@@ -81,7 +127,7 @@ int sym_get_obj_sense PROTO((sym_environment *env, int *sense));
 
 int sym_is_continuous PROTO((sym_environment *env, int index, int *value));
 int sym_is_binary PROTO((sym_environment *env, int index, int *value));
-int sym_is_integer PROTO((sym_environment *env, int index, int *value));
+int sym_is_integer PROTO((sym_environment *env, int index, char *value));
 
 double sym_get_infinity PROTO(());
 

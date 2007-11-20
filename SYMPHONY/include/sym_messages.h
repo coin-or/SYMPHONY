@@ -80,9 +80,6 @@
 #define TM_ROOT_DESCRIPTION              211
 #define TM_FIRST_PHASE_FINISHED          212
 
-/* there are message codes here, too. reserve 225-300 for these */
-#include "sym_return_values.h"
-
 /*===========================================================================*
  * treemanager-->lp messages
  *===========================================================================*/

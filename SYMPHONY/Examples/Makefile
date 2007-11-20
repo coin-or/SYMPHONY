@@ -34,10 +34,19 @@ OSI_INTERFACE = CLP
 ##############################################################################
 USE_OSI_INTERFACE = FALSE
 
-LPINCDIR = $(COINROOT)/include
-LPLIBPATHS = $(COINROOT)/lib
-LPLIB = -lSym #-L$(HOME)/src/glpk-4.9/src/ -lglpk
+LPINCDIR = 
+LPLIBPATHS = 
+LPLIB = 
 SYMDEFS =
+
+ifeq ($(LP_SOLVER),OSI)
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+       LPLIB += -lOsiSym
+       SYMDEFS += -DUSE_OSI_INTERFACE    
+endif
+endif
+
+LPLIB += -lSym #-L$(HOME)/src/glpk-4.9/src/ -lglpk
 
 ifeq ($(LP_SOLVER),CPLEX)
        LPINCDIR += /usr/local/include/
@@ -55,10 +64,6 @@ ifeq ($(LP_SOLVER),OSI)
        LPINCDIR += $(COINROOT)/include
        LPLIBPATHS += $(COINROOT)/lib
        LPLIB += -lCgl
-ifeq ($(USE_OSI_INTERFACE),TRUE)
-       LPLIB += -lOsiSym
-       SYMDEFS += -DUSE_OSI_INTERFACE    
-endif
 ifeq ($(OSI_INTERFACE),CPLEX)
        LPINCDIR += /usr/local/include/
        LPLIBPATHS += /usr/local/lib/
@@ -79,7 +84,7 @@ ifeq ($(OSI_INTERFACE),GLPK)
        LPLIBPATHS += ${HOME}/GLPK/glpk-4.3/src
        LPLIB += -lOsiGlpk -lglpk
 endif
-       LPLIB += -lOsi -lCoinUtils
+       LPLIB += -lOsi -lCoinUtils 
 endif
 
 LPOSILIB =
@@ -144,4 +149,4 @@ clean :
 
 	rm -rf $(EXAMPLES)
 
-.SILENT:
+#.SILENT:

@@ -55,6 +55,7 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony.h"
+#include "sym_master.h"
 #include "mpp.h"
 #include <stdlib.h>
 
