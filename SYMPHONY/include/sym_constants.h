@@ -15,6 +15,8 @@
 #ifndef _BB_CONSTANTS_H
 #define _BB_CONSTANTS_H
 
+#include "symphony.h"
+
 #define BB_BUNCH 127 * sizeof(double)
 
 /*----------------- Error codes for process_chain() ------------------------*/
@@ -23,59 +25,6 @@
 #define ERROR__NUMERICAL_INSTABILITY   -103
 #define ERROR__ILLEGAL_BRANCHING       -104
 #define ERROR__COMM_ERROR              -105
-
-/*****************************************************************************
- *****************************************************************************
- *************                                                      **********
- *************                  General Constants                   **********
- *************                                                      **********
- *****************************************************************************
- *****************************************************************************/
-
-#ifndef TRUE
-#define TRUE  1
-#endif
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef ANYONE
-#define ANYONE   -1
-#endif
-#ifndef ANYTHING
-#define ANYTHING -1
-#endif
-
-#define DSIZE sizeof(double)
-#define ISIZE sizeof(int)
-#define CSIZE sizeof(char)
-
-#ifndef BITSPERBYTE
-#define	BITSPERBYTE 8
-#endif
-#ifndef BITS
-#define	BITS(type) (BITSPERBYTE * (int)sizeof (type))
-#endif
-
-#ifdef  HIBITI
-#undef  HIBITI
-#endif
-#define	HIBITI (1U << (BITS(int) - 1))
-#ifdef  MAXINT
-#undef  MAXINT
-#endif
-#define	MAXINT ((int)(~(HIBITI)))
-#ifdef MAXDOUBLE
-#undef MAXDOUBLE
-#endif
-#define	MAXDOUBLE 1.79769313486231570e+308
-
-/*--------------------- return values for user-written functions ------------*/
-#define USER_ERROR              -5
-#define USER_SUCCESS            -4
-#define USER_NO_PP              -3
-#define USER_AND_PP             -2
-#define USER_DEFAULT            -1
 
 /*---------------------------- type of the problem --------------------------*/
 #define ZERO_ONE_PROBLEM         0
@@ -177,12 +126,6 @@
 /*****************************************************************************/
 /*******         Constants related to solving of an lp                 *******/
 /*****************************************************************************/
-
-#define SYM_INFINITY                 100000000
-#define BIG_DBL                  1e40
-
-#define SYM_MINIMIZE                 0
-#define SYM_MAXIMIZE                 1 
 
 /*--------------------- Constants related to the basis ----------------------*/
 #  define INVALID_BASIS_STATUS 255

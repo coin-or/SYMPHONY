@@ -49,7 +49,8 @@ typedef struct SYM_ENVIRONMENT{
    double           utopia[2];
    char             has_ub_estimate;
    double           ub_estimate;
-   double           lb;
+   double           lb;   
+   double           obj_offset;
 
    MIPdesc         *mip; /*For holding the description when read in from MPS */
 

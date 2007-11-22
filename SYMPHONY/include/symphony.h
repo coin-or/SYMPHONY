@@ -63,6 +63,66 @@
 #define TM_ERROR__COMM_ERROR             -253
 #define TM_ERROR__USER                   -275
 
+/*****************************************************************************
+ *****************************************************************************
+ *************                                                      **********
+ *************                  General Constants                   **********
+ *************                                                      **********
+ *****************************************************************************
+ *****************************************************************************/
+
+#ifndef TRUE
+#define TRUE  1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef ANYONE
+#define ANYONE   -1
+#endif
+#ifndef ANYTHING
+#define ANYTHING -1
+#endif
+
+#define DSIZE sizeof(double)
+#define ISIZE sizeof(int)
+#define CSIZE sizeof(char)
+
+#ifndef BITSPERBYTE
+#define	BITSPERBYTE 8
+#endif
+#ifndef BITS
+#define	BITS(type) (BITSPERBYTE * (int)sizeof (type))
+#endif
+
+#ifdef  HIBITI
+#undef  HIBITI
+#endif
+#define	HIBITI (1U << (BITS(int) - 1))
+#ifdef  MAXINT
+#undef  MAXINT
+#endif
+#define	MAXINT ((int)(~(HIBITI)))
+#ifdef MAXDOUBLE
+#undef MAXDOUBLE
+#endif
+#define	MAXDOUBLE 1.79769313486231570e+308
+
+#define SYM_INFINITY                 100000000
+
+#define BIG_DBL                      1e40
+
+#define SYM_MINIMIZE                 0
+#define SYM_MAXIMIZE                 1 
+
+/*--------------------- return values for user-written functions ------------*/
+#define USER_ERROR              -5
+#define USER_SUCCESS            -4
+#define USER_NO_PP              -3
+#define USER_AND_PP             -2
+#define USER_DEFAULT            -1
+
 typedef struct MIPDESC MIPdesc;
 typedef struct WARM_START_DESC warm_start_desc;
 typedef struct SYM_ENVIRONMENT sym_environment;
