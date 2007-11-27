@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 
+#include "symphony.h"
 #include "sym_types.h"
 #include "sym_macros.h"
 #include "sym_master_params.h"
@@ -48,7 +49,8 @@ typedef struct SYM_ENVIRONMENT{
    double           utopia[2];
    char             has_ub_estimate;
    double           ub_estimate;
-   double           lb;
+   double           lb;   
+   double           obj_offset;
 
    MIPdesc         *mip; /*For holding the description when read in from MPS */
 

@@ -26,7 +26,7 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_proccomm.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 
 /* CNRP include files */
 #include "cnrp_const.h"
@@ -63,7 +63,8 @@ void delete_dup_edges(small_graph *g)
    edge_data *ed0, *ed1;
    int pos;
    
-   qsort((char *)g->edges, g->edgenum, sizeof(edge_data), is_same_edge);
+   qsort((char *)g->edges, g->edgenum, sizeof(edge_data), 
+	 is_same_edge);
    for (pos=0, ed0=ed1=g->edges ; pos < g->edgenum; pos++, ed1++){
       if ( memcmp((char *)ed0, (char *)ed1, 2*sizeof(int)) ){
 	 ed0++;
@@ -435,7 +436,7 @@ int *create_edge_list(cnrp_problem *cnrp, int *varnum, char which_edges)
       }
       break;
    }
-   qsortucb_i(uind, *varnum);
+   qsort_i(uind, *varnum);
 
    return(uind);
 }

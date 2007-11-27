@@ -64,7 +64,7 @@ SYMHEADERS = \
 	../include/sym_pack_cut.h \
 	../include/sym_proccomm.h \
 	../include/sym_proto.h \
-	../include/qsortucb.h \
+	../include/sym_qsort.h \
 	../include/sym_return_values.h \
 	../include/symphony.h \
 	../include/symphony_api.h \
@@ -150,8 +150,7 @@ CP_SRC		= CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 CG_SRC		= CutGen/cut_gen.c CutGen/cg_proccomm.c CutGen/cg_func.c \
 	CutGen/cg_wrapper.c
 
-QSORT_SRC	= Common/qsortucb.c Common/qsortucb_i.c Common/qsortucb_ii.c \
-	Common/qsortucb_id.c Common/qsortucb_di.c Common/qsortucb_ic.c
+QSORT_SRC	= Common/sym_qsort.c 
 TIME_SRC	= Common/timemeas.c
 PROCCOMM_SRC	= Common/proccomm.c
 PACKCUT_SRC	= Common/pack_cut.c
@@ -745,7 +744,8 @@ rename_obj:
 
  include_HEADERS = \
 	../include/config_sym.h \
-	$(SYMHEADERS)
+	../include/symphony.h
+#	$(SYMHEADERS)
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #

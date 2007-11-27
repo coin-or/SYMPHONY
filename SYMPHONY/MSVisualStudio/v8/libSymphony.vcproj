@@ -118,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\Osi\src,..\..\..\Osi\src\OsiClp,..\..\..\Clp\src,..\..\..\CoinUtils\src,..\..\..\Cgl\src,..\..\..\Cgl\src\CglLiftAndProject,..\..\..\Cgl\src\CglLandP,..\..\..\Cgl\src\CglFlowCover,..\..\..\Cgl\src\CglMixedIntegerRounding,..\..\..\Cgl\src\CglClique,..\..\..\Cgl\src\CglOddHole,..\..\..\Cgl\src\CglKnapsackCover,..\..\..\Cgl\src\CglGomory,..\..\..\Cgl\src\CglSimpleRounding,..\..\..\Cgl\src\CglProbing,..\..\..\BuildTools\headers,..\..\include"
+				AdditionalIncludeDirectories="..\..\..\Osi\src;..\..\..\Osi\src\OsiClp;..\..\..\Clp\src;..\..\..\CoinUtils\src;..\..\..\Cgl\src;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglProbing;..\..\..\BuildTools\headers;..\..\include;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglTwomir"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -252,15 +252,13 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\src\Common\qsortucb.c"
+					RelativePath="..\..\src\Common\sym_qsort.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
 							CompileAs="2"
 						/>
 					</FileConfiguration>
@@ -269,128 +267,6 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\src\Common\qsortucb_di.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\src\Common\qsortucb_i.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\src\Common\qsortucb_ic.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\src\Common\qsortucb_id.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\src\Common\qsortucb_ii.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
 							CompileAs="2"
 						/>
 					</FileConfiguration>

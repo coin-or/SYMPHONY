@@ -24,7 +24,7 @@
 #include "sym_types.h"
 #include "sym_macros.h"
 #include "sym_constants.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 
 /* SPP include files */
 #include "spp_constants.h"
@@ -478,7 +478,7 @@ char lift_clique(spp_lp_problem *spp, int n, var_desc **vars, double *dj,
    }
 
    /* order indices */
-   qsortucb_i(indices, length);
+   qsort_i(indices, length);
 
    if (strategy == MAY_CHANGE_CUT) {
       for (i = 0, j = 0, pos_ind = 0, pos_cl = 0; i<length && j<cl_length; )
@@ -546,7 +546,7 @@ char lift_clique(spp_lp_problem *spp, int n, var_desc **vars, double *dj,
    /* fill out new_cut */
    memcpy(indices + length, cl_indices, cl_length * ISIZE);
    length += cl_length;
-   qsortucb_i(indices, length);
+   qsort_i(indices, length);
 
    new_cut->type = CLIQUE_LIFTED;
    new_cut->size = length * ISIZE;

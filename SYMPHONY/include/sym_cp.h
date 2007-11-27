@@ -15,6 +15,7 @@
 #ifndef _CUT_POOL_H
 #define _CUT_POOL_H
 
+#include "symphony.h"
 #include "sym_proto.h"
 #include "sym_types.h"
 #include "sym_cp_params.h"

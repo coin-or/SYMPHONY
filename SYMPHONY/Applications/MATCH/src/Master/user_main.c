@@ -30,6 +30,7 @@ if ((termcode = f) < 0){                                                    \
 \*===========================================================================*/
 
 #include "symphony.h"
+#include "sym_master.h"
 #include "user.h"
 
 #include <stdlib.h>

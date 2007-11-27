@@ -25,7 +25,6 @@
 #include "sym_macros.h"
 #include "sym_constants.h"
 #include "sym_proccomm.h"
-#include "qsortucb.h"
 #include "sym_dg_params.h"
 #include "sym_master_u.h"
 
@@ -857,6 +856,20 @@ int user_free_master(void **user)
 
    return(USER_SUCCESS);
 }
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * This function is used to lift the user created cuts during warm starting *
+/*===========================================================================*/
+
+int user_ws_update_cuts (void *user, int *size, char **coef, double * rhs, 
+			 char *sense, char type, int new_col_num, 
+			 int change_type)
+{
+   return(USER_DEFAULT);
+}
+
+/*===========================================================================*/
 
 
 

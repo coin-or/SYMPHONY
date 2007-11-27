@@ -22,7 +22,6 @@
 #include "sym_lp.h"
 #include "sym_master.h" 
 #include "sym_proccomm.h"
-#include "qsortucb.h"
 #include "sym_messages.h"
 #include "sym_constants.h"
 #include "sym_macros.h"

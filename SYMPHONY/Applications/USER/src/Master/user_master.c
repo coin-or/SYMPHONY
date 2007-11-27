@@ -480,9 +480,17 @@ int user_free_master(void **user)
 
    return(USER_SUCCESS);
 }
+/*===========================================================================*/
 
+/*===========================================================================*\
+ * This function is used to lift the user created cuts during warm starting *
+/*===========================================================================*/
 
-
-
-
+int user_ws_update_cuts (void *user, int *size, char **coef, double * rhs, 
+			 char *sense, char type, int new_col_num, 
+			 int change_type)
+{
+   return(USER_DEFAULT);
+}
+/*===========================================================================*/
 

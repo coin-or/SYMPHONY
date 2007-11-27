@@ -24,7 +24,7 @@
 #include "sym_macros.h"
 #include "sym_constants.h"
 #include "sym_proccomm.h"
-#include "qsortucb.h"
+#include "sym_qsort.h"
 #include "sym_dg_params.h"
 #include "sym_master_u.h"
 
@@ -764,7 +764,7 @@ int user_send_sp_data(void *user)
 	 }
       }
 
-      qsortucb_i(coef, size/sizeof(int));
+      qsort_i(coef, size/sizeof(int));
       
       send_int_array(&size, 1);
       send_char_array((char *)coef, size);
@@ -776,7 +776,7 @@ int user_send_sp_data(void *user)
 	 v1 = vrp->sol_pool_cols[2*i*size/ISIZE + j + 1];
 	 coef[j/2] = INDEX(v0, v1);
       }
-      qsortucb_i(coef, size/ISIZE);
+      qsort_i(coef, size/ISIZE);
       
       send_int_array(&size, 1);
       send_char_array((char *)coef, size);
@@ -976,6 +976,20 @@ int user_free_master(void **user)
    return(USER_SUCCESS);
 }
 
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * This function is used to lift the user created cuts during warm starting *
+/*===========================================================================*/
+
+int user_ws_update_cuts (void *user, int *size, char **coef, double * rhs, 
+			 char *sense, char type, int new_col_num, 
+			 int change_type)
+{
+   return(USER_DEFAULT);
+}
+
+/*===========================================================================*/
 
 
 

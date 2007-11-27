@@ -17,6 +17,7 @@
 
 #define COMPILING_FOR_TM
 
+#include "symphony.h"
 #include "sym_tm_params.h"
 #include "sym_types.h"
 #ifdef COMPILE_IN_CG

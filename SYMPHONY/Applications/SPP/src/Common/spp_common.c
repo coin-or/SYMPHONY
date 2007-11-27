@@ -21,7 +21,6 @@
 /* SYMPHONY include files */
 #include "sym_constants.h"
 #include "sym_macros.h"
-#include "qsortucb.h"
 
 /* SPP include files */
 #include "spp_constants.h"
@@ -49,7 +48,7 @@ int *spp_lexsort(col_ordered *matrix)
 
    lexsort_matrix = matrix;
 
-   qsortucb((char *)order, matrix->colnum, ISIZE, spp_lexcompare);
+   qsort(order, matrix->colnum, ISIZE, spp_lexcompare);
 
    return(order);
 

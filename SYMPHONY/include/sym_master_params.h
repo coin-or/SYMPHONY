@@ -54,6 +54,7 @@ typedef struct PARAMS{
    int        file_type; 
    char       datafile[MAX_FILE_NAME_LENGTH +1]; /* GNUMP datafile */
    char       test_dir[MAX_FILE_NAME_LENGTH +1];  /* Test files directory */
+   double     obj_offset;
 
    /* Multi-criteria parameters */
    int        multi_criteria;

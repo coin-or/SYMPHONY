@@ -15,6 +15,7 @@
 #ifndef _CUT_GEN_H
 #define _CUT_GEN_H
 
+#include "symphony.h"
 #include "sym_types.h"
 #include "sym_cg_params.h"
 #include "sym_cg_u.h"

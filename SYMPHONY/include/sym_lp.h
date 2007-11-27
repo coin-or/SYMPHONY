@@ -17,6 +17,7 @@
 
 #define COMPILING_FOR_LP
 
+#include "symphony.h"
 #include "sym_timemeas.h"
 #include "sym_lp_params.h"
 #include "sym_types.h"

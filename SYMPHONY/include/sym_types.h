@@ -365,6 +365,22 @@ typedef struct PROBLEM_STAT{
 				      repricing */
 }problem_stat;
 
+typedef MIPINFO{ 
+   int prob_type; /* mixed, pure(not binary), binary... */
+   int *row_int_type; /* same above -considering the type of variables*/
+   int *row_bound_type; /* all_bounded, mixed 
+			   - considering the bounds of variables */
+   int *row_coef_type; /* all integer, all binary, fractional
+			  - considering the type of coefficients*/
+   int *col_coef_type; /* all integer, all binary, fractional
+			  - considering the type of coefficients*/
+   int *row_entries_type; /* all_pos, all_neg, mixed */ 
+   int *col_entries_type; /* same above */
+
+   /* will be evaluated only if preprocessor is used */
+   int *row_ub; /* calculated using variable bounds */
+   int *row_lb; /* same above */
+}MIPinfo; 
 
 /* This structure stores the user's description of the model */
 
@@ -387,8 +403,8 @@ typedef struct MIPDESC{
    char     **colname;     /* column names */
    double     obj_offset;  /* constant to be added to the objective function.*/
    char       obj_sense;   /* objective sense. */
-
-/* Only to be allocated and used by SYMPHONY */
+   
+   /* Only to be allocated and used by SYMPHONY */
 
    int       *col_lengths;   
    int       *row_matbeg;      /* m */  /* a row ordered desc for heuristics */
@@ -401,6 +417,9 @@ typedef struct MIPDESC{
    int        new_col_num; /* used only when new cols added */
    int        cru_vars_num;
    int       *cru_vars; 
+
+   /* mip info */
+   MIPinfo   *mip_inf; 
 }MIPdesc;
 
 /*===========================================================================*\

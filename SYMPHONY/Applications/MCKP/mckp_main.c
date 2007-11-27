@@ -21,6 +21,7 @@
 /* SYMPHONY include files */
 #include "sym_macros.h"
 #include "symphony.h"
+#include "sym_master.h"
 
 #define LENGTH 100
 
