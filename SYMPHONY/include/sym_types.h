@@ -365,7 +365,7 @@ typedef struct PROBLEM_STAT{
 				      repricing */
 }problem_stat;
 
-typedef MIPINFO{ 
+typedef struct MIPINFO{ 
    int prob_type; /* mixed, pure(not binary), binary... */
    int *row_int_type; /* same above -considering the type of variables*/
    int *row_bound_type; /* all_bounded, mixed 
