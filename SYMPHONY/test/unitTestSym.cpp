@@ -132,7 +132,7 @@ int main (int argc, const char *argv[])
       sym_test(env);
    }
 
-   testingMessage( "All tests completed successfully\n" );
+   testingMessage( "All tests completed.\n" );
   
    return 0;
 }

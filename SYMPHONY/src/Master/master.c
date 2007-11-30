@@ -5880,11 +5880,6 @@ int sym_test(sym_environment *env)
 {
 
   int termcode = 0, verbosity;
-  
-  verbosity = sym_get_int_param(env, "verbosity", &verbosity);
-
-  sym_set_int_param(env, "verbosity", -10);
-
   int i, file_num = 12;
   char mps_files[12][MAX_FILE_NAME_LENGTH +1] = {
     "air03", "dcmulti", "egout", "flugpl", "khb05250", "l152lav", 
@@ -5901,6 +5896,9 @@ int sym_test(sym_environment *env)
 
   size_t size = 1000;
   char* buf = 0;
+  
+  verbosity = sym_get_int_param(env, "verbosity", &verbosity);
+
   while (true) {
      buf = (char*)malloc(CSIZE*size);
      if (getcwd(buf, size))
@@ -5927,6 +5925,8 @@ int sym_test(sym_environment *env)
       free_master_u(env);
       strcpy(env->par.infile, "");
       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+      sym_set_defaults (env);
+      sym_set_int_param(env, "verbosity", -10);
     }
 
     strcpy(infile, "");
