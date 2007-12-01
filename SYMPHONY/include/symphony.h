@@ -256,6 +256,6 @@ warm_start_desc *sym_create_copy_warm_start PROTO((warm_start_desc * ws));
 MIPdesc *sym_create_copy_mip_desc PROTO((sym_environment *env));
 sym_environment * sym_create_copy_environment PROTO((sym_environment *env));
 
-int sym_test PROTO((sym_environment *env));
+int sym_test PROTO((sym_environment *env, int *test_status));
 
 #endif

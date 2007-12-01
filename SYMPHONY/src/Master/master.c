@@ -5876,7 +5876,7 @@ int sym_get_ub_for_new_obj(sym_environment *env, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_test(sym_environment *env)
+int sym_test(sym_environment *env, int *test_status)
 {
 
   int termcode = 0, verbosity;
@@ -5897,6 +5897,7 @@ int sym_test(sym_environment *env)
   size_t size = 1000;
   char* buf = 0;
   
+  *test_status = 0;
   verbosity = sym_get_int_param(env, "verbosity", &verbosity);
 
   while (true) {
@@ -5950,6 +5951,7 @@ int sym_test(sym_environment *env)
     } else {
        printf("\nFailure! Solver returned solution value: %f", obj_val[i]);
        printf("\n         True solution value is:         %f\n\n", sol[i]);
+       *test_status = 1;
     }
   }
 

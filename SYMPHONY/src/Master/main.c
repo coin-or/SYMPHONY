@@ -143,6 +143,7 @@ int main(int argc, char **argv)
 
    sym_environment *env = sym_open_environment();
    int termcode;
+
    
    if (argc > 1){
    
@@ -154,7 +155,7 @@ int main(int argc, char **argv)
       
       if (env->par.test){
 
-	 sym_test(env);
+	 sym_test(env, &termcode);
 	 
       }else{
 	 
