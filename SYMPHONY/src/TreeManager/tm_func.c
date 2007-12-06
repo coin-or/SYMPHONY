@@ -1425,16 +1425,24 @@ char shall_we_dive(tm_prob *tm, double objval)
 {
    char dive;
    int i, k;
-   double rand_num, average_lb;
+   double rand_num, average_lb, lb=tm->lb;
    double cutoff = 0;
+   bc_node **samephase_cand = tm->samephase_cand;
 
-   for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-      if (tm->samephase_cand[i]->lower_bound < tm->lb)
-	 tm->lb = tm->samephase_cand[i]->lower_bound;
+   if (tm->par.node_selection_rule==LOWEST_LP_FIRST) {
+      if (tm->samephase_candnum>0) {
+         lb = samephase_cand[1]->lower_bound; /* [0] is a dummy */
+      } /* else its same as tm->lb */
+   } else {
+      for (i = tm->samephase_candnum, lb = MAXDOUBLE; i >= 1; i--){
+         if (samephase_cand[i]->lower_bound < lb)
+            lb = samephase_cand[i]->lower_bound;
+      }
+      if (lb >= MAXDOUBLE / 2){
+         lb = tm->ub;
+      }
    }
-   if (tm->lb >= MAXDOUBLE / 2){
-      tm->lb = tm->ub;
-   }
+   tm->lb = lb;
    
    if (tm->par.time_limit >= 0.0 &&
 	wall_clock(NULL) - tm->start_time >= tm->par.time_limit){
