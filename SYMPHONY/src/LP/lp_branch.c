@@ -233,7 +233,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    /* Set the iteration limit */
    if (p->par.max_presolve_iter > 0)
       set_itlim(lp_data, p->par.max_presolve_iter);
-
+   if (!p->par.branch_on_cuts) {
+      mark_hotstart(lp_data);
+   }
    vars = lp_data->vars;
 
    /* Look at the candidates one-by-one and presolve them. */
@@ -300,6 +302,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    printf("SYMPHONY has encountered numerical difficulties \n");
 	    printf("With the LP solver. Exiting...\n\n");
 	 }
+         /* } to unconfuse vi*/
 #endif
 	 lb = vars[branch_var]->lb;
 	 ub = vars[branch_var]->ub;
@@ -321,7 +324,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    }
 	    check_ub(p);
 	    /* The original basis is in lp_data->lpbas */
-	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+            if (p->par.branch_on_cuts) {
+               can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+            } else {
+               can->termcode[j] = solve_hot(lp_data, can->iterd+j);
+            }
 	    can->objval[j] = lp_data->objval;
 	    get_x(lp_data);
 
@@ -591,6 +598,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       if ((j & BRANCH_ON_IT)){
 	 break;
       }
+   }
+
+   if (!p->par.branch_on_cuts) {
+      unmark_hotstart(lp_data);
    }
 
 #if 0
