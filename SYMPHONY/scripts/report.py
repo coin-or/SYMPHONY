@@ -95,6 +95,7 @@ for i in range(0,len(sys.argv)):
 a = []
 fl0 = 0.0
 in0 = 0
+error = []
 
 flist=open(INST_LIST,'r')
 a=flist.read().split()
@@ -102,7 +103,7 @@ flist.close()
 a.sort()
 #print "### Instance set:", INST_SET
 print "### Reading from directory:", OUTPUT_DIR
-print "%16s"%"Instance","%14s"%"best ub","%3s"%"opt","%14s"%"ub","%14s"%"lb","%5s"%"gap","%8s"%"time","%8s"%"cut","%8s"%"branch","%8s"%"lp"
+print "%16s"%"Instance","%14s"%"best ub","%3s"%"opt","%14s"%"ub","%14s"%"lb","%6s"%"gap","%8s"%"time","%8s"%"cut","%8s"%"branch","%8s"%"lp","%7s"%"nodes-c","%7s"%"nodes-a"
 for instance in a:
 	print "%16s"%instance,
 
@@ -122,6 +123,8 @@ for instance in a:
 	whole_file=fil.read().split('\n')
 	fil.close()
 
+	gave_wrong_result = 0
+
 	# check if claims optimal
 	claims_optimal = 0
 	find = find_str(whole_file,'Optimal Solution Found')
@@ -132,16 +135,20 @@ for instance in a:
 	print "%3d"%claims_optimal,
 
 	if (claims_optimal==1):
+		lb = INFTY
 		ub = INFTY
+		gap = INFTY
 		find,ub=find_float(whole_file,'Solution Cost:',ub)
 		if (find<0 or ub >= INFTY):
 			print  "%14s"%"NF", #ub
 			print  "%14s"%"NF", #lb
-			print  "%5s"%"NF", #gap
+			print  "%6s"%"NF", #gap
 		else:
+			gap = 0.0
+			lb = ub
 			print  "%14.2f"%ub,
-			print  "%14.2f"%ub,
-			print  "%5.2f"%0.00,
+			print  "%14.2f"%lb,
+			print  "%6.2f"%gap,
 	else:
 		ub = INFTY
 		find,ub=find_float(whole_file,'Current Upper Bound',ub)
@@ -160,10 +167,19 @@ for instance in a:
 		gap = INFTY
 		find,gap=find_float(whole_file,'Gap Percentage',gap)
 		if (find<0 or gap >= INFTY):
-			print  "%5s"%"NF",
+			print  "%6s"%"NF",
 		else:
-			print  "%5.2f"%gap,
+			print  "%6.2f"%gap,
 	
+	if (claims_optimal==1 and best_ub < INFTY and abs(best_ub-ub)>EPS_UB):
+		error = error+instance
+
+	if (best_ub < INFTY and ub < INFTY and best_ub-ub>EPS_UB):
+		error.append(instance)
+
+	if (best_ub < INFTY and lb-best_ub>EPS_UB):
+		error.append(instance)
+
 	totalTime = INFTY
 	find,totalTime=find_float(whole_file,'Total Wallclock Time',totalTime)
 	if (find<0 or totalTime >= INFTY):
@@ -196,6 +212,20 @@ for instance in a:
 			lp_time = EPS_TIME
 		print  "%8.2f"%lp_time,
 
+	nodes_c = INFTY
+	find,nodes_c=find_int(whole_file,'Number of created nodes',nodes_c)
+	if (find<0 or nodes_c >= INFTY):
+		print  "%7s"%"NF",
+	else:
+		print  "%7d"%nodes_c,
+		
+	nodes_a = INFTY
+	find,nodes_a=find_int(whole_file,'Number of analyzed nodes',nodes_a)
+	if (find<0 or nodes_a >= INFTY):
+		print  "%7s"%"NF",
+	else:
+		print  "%7d"%nodes_a,
+		
 	'''
 	noWSTime = INFTY
 	find,noWSTime=find_float(whole_file,'Total nonWS solution time:',noWSTime)
@@ -241,7 +271,7 @@ for instance in a:
 		print delim, "%9s"%"NF",
 	else:
 		print delim, "%9.2f"%L2NoWS,
-
 	'''
 	print ''
 
+print "## errors:",error
