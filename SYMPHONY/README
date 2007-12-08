@@ -1,4 +1,4 @@
-SYMPHONY Version 5.1.5 README
+SYMPHONY Version 5.1.6 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Common Public License
@@ -23,6 +23,15 @@ http://projects.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
+
+Release 5.1.6:
+
+1. Only a single header file (symphony.h) needs to be installed and user 
+applications only need to be able to find this one header file.
+
+2. Fixes to MSVC++ project files.
+
+3. Removed dependence on qsortucb routines.
 
 Release 5.1.5:
 
