@@ -743,7 +743,8 @@ rename_obj:
 
  include_HEADERS = \
 	../include/config_sym.h \
-	$(SYMHEADERS)
+	../include/symphony.h
+#	$(SYMHEADERS)
 
 #############################################################################
 # Create the Config.h file that always defines HAVE_CONFIG_H and install it #

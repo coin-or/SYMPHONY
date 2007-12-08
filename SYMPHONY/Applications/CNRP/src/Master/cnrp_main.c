@@ -22,6 +22,7 @@
 /* SYMPHONY include files */
 #include "sym_macros.h"
 #include "symphony.h"
+#include "sym_master.h"
 
 /* CNRP include files */
 #include "cnrp_const.h"

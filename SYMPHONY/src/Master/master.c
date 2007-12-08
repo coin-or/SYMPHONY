@@ -663,6 +663,10 @@ int sym_solve(sym_environment *env)
    if ((tm->has_ub_estimate = env->has_ub_estimate))
       tm->ub_estimate = env->ub_estimate;
    tm->lb = env->lb;
+
+   if(env->obj_offset){
+      env->mip->obj_offset = env->obj_offset;
+   }
    
    tm->obj_offset = env->mip->obj_offset;
    tm->obj_sense = env->mip->obj_sense;
@@ -2304,7 +2308,9 @@ int sym_get_num_cols(sym_environment *env, int *numcols)
 {
 
    if (!env->mip){
-      printf("sym_get_num_cols():There is no loaded mip description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_num_cols():There is no loaded mip description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2319,7 +2325,9 @@ int sym_get_num_cols(sym_environment *env, int *numcols)
 int sym_get_num_rows(sym_environment *env, int *numrows)
 {
    if (!env->mip){
-      printf("sym_get_num_rows():There is no loaded mip description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_num_rows():There is no loaded mip description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2334,7 +2342,9 @@ int sym_get_num_rows(sym_environment *env, int *numrows)
 int sym_get_num_elements(sym_environment *env, int *numelems)
 {
    if (!env->mip){
-      printf("sym_get_num_elements():There is no loaded mip description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_num_elements():There is no loaded mip description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    
@@ -2349,8 +2359,10 @@ int sym_get_num_elements(sym_environment *env, int *numelems)
 int sym_get_col_lower(sym_environment *env, double *collb)
 {
    if (!env->mip || !env->mip->n || !env->mip->lb){
-      printf("sym_get_col_lower():There is no loaded mip description or\n");
-      printf("there is no loaded column description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_col_lower():There is no loaded mip description or\n");
+	 printf("there is no loaded column description!\n");
+      }
      return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2365,8 +2377,10 @@ int sym_get_col_lower(sym_environment *env, double *collb)
 int sym_get_col_upper(sym_environment *env, double *colub)
 {
    if (!env->mip || !env->mip->n || !env->mip->ub){
-      printf("sym_get_col_upper():There is no loaded mip description or\n");
-      printf("there is no loaded column description!\n");  
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_col_upper():There is no loaded mip description or\n");
+	 printf("there is no loaded column description!\n");  
+      }
     return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2381,8 +2395,10 @@ int sym_get_col_upper(sym_environment *env, double *colub)
 int sym_get_row_sense(sym_environment *env, char *rowsen)
 {
    if (!env->mip || !env->mip->m || !env->mip->sense){
-      printf("sym_get_row_sense():There is no loaded mip description or\n");
-      printf("there is no loaded row description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_row_sense():There is no loaded mip description or\n");
+	 printf("there is no loaded row description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2398,8 +2414,10 @@ int sym_get_row_sense(sym_environment *env, char *rowsen)
 int sym_get_rhs(sym_environment *env, double *rowrhs)
 {
    if (!env->mip || !env->mip->m || !env->mip->rhs){
-      printf("sym_get_rhs():There is no loaded mip description or\n");
-      printf("there is no loaded row description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_rhs():There is no loaded mip description or\n");
+	 printf("there is no loaded row description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2416,8 +2434,10 @@ int sym_get_matrix(sym_environment *env, int *nz, int *matbeg, int *matind,
 		   double *matval)
 {
    if (!env->mip || !env->mip->m || !env->mip->n || !env->mip->matbeg){   
-      printf("sym_get_rhs():There is no loaded mip description or\n");
-      printf("there is no loaded matrix description!\n");      
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_rhs():There is no loaded mip description or\n");
+	 printf("there is no loaded matrix description!\n");      
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    
@@ -2435,9 +2455,11 @@ int sym_get_matrix(sym_environment *env, int *nz, int *matbeg, int *matind,
 
 int sym_get_row_range(sym_environment *env, double *rowrng)
 {
-   if (!env->mip || !env->mip->m || !env->mip->rngval){
-      printf("sym_get_row_range():There is no loaded mip description or\n");
-      printf("there is no loaded row description!\n"); 
+   if (!env->mip || !env->mip->m){
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_row_range():There is no loaded mip description or\n");
+	 printf("there is no loaded row description!\n"); 
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2453,8 +2475,10 @@ int sym_get_row_range(sym_environment *env, double *rowrng)
 int sym_get_row_lower(sym_environment *env, double *rowlb)
 {
    if (!env->mip || !env->mip->m || !env->mip->rhs){
-      printf("sym_get_row_lower():There is no loaded mip description or\n");
-      printf("there is no loaded row description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_row_lower():There is no loaded mip description or\n");
+	 printf("there is no loaded row description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    
@@ -2501,8 +2525,10 @@ int sym_get_row_lower(sym_environment *env, double *rowlb)
 int sym_get_row_upper(sym_environment *env, double *rowub)
 {
    if (!env->mip || !env->mip->m || !env->mip->rhs){
-      printf("sym_get_row_upper():There is no loaded mip description or\n");
-      printf("there is no loaded row description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_row_upper():There is no loaded mip description or\n");
+	 printf("there is no loaded row description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2550,8 +2576,10 @@ int sym_get_row_upper(sym_environment *env, double *rowub)
 int sym_get_obj_coeff(sym_environment *env, double *obj)
 {
    if (!env->mip || !env->mip->n || !env->mip->obj){
-      printf("sym_get_obj_coeff():There is no loaded mip description or\n");
-      printf("there is no loaded obj vector description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_obj_coeff():There is no loaded mip description or\n");
+	 printf("there is no loaded obj vector description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2566,8 +2594,10 @@ int sym_get_obj_coeff(sym_environment *env, double *obj)
 int sym_get_obj2_coeff(sym_environment *env, double *obj2)
 {
    if (!env->mip || !env->mip->n || !env->mip->obj2){
-      printf("sym_get_obj2_coeff():There is no loaded mip description or\n");
-      printf("or there is no loaded second obj vector description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_obj2_coeff():There is no loaded mip description or\n");
+	 printf("or there is no loaded second obj vector description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
   
@@ -2582,7 +2612,9 @@ int sym_get_obj2_coeff(sym_environment *env, double *obj2)
 int sym_get_obj_sense(sym_environment *env, int *sense)
 {
    if (!env->mip){
-      printf("sym_get_obj_sense():There is no loaded mip description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_obj_sense():There is no loaded mip description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2602,8 +2634,10 @@ int sym_is_continuous(sym_environment *env, int index, int *value)
 {
    if (!env->mip || index < 0 || index > env->mip->n || !env->mip->n ||
        !env->mip->is_int){
-      printf("sym_is_continuous():There is no loaded mip description or\n");
-      printf("index is out of range or no column description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_is_continuous():There is no loaded mip description or\n");
+	 printf("index is out of range or no column description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2622,11 +2656,15 @@ int sym_is_continuous(sym_environment *env, int index, int *value)
 int sym_is_binary(sym_environment *env, int index, int *value)
 {
    if (!env->mip || index < 0 || index >= env->mip->n){
-      printf("sym_is_binary(): Index out of range\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_is_binary(): Index out of range\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    if (!env->mip->n || !env->mip->is_int || !env->mip->ub || !env->mip->lb){
-      printf("sym_is_binary(): There is no loaded mip description\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_is_binary(): There is no loaded mip description\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2643,14 +2681,18 @@ int sym_is_binary(sym_environment *env, int index, int *value)
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_is_integer(sym_environment *env, int index, int *value)
+int sym_is_integer(sym_environment *env, int index, char *value)
 {
    if (!env->mip || index < 0 || index >= env->mip->n){
-      printf("sym_is_binary(): Index out of range\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_is_binary(): Index out of range\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    if (!env->mip->n || !env->mip->is_int){
-      printf("sym_is_binary(): There is no loaded mip description\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_is_binary(): There is no loaded mip description\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2679,7 +2721,9 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
    sol = env->best_sol;
 
    if (!sol.has_sol || (sol.xlength && (!sol.xind || !sol.xval))){
-      printf("sym_get_col_solution(): There is no solution!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_col_solution(): There is no solution!\n");
+      }
       if(env->mip->n){
 	 memcpy(colsol, env->mip->lb, DSIZE*env->mip->n);
       }
@@ -2711,8 +2755,10 @@ int sym_get_row_activity(sym_environment *env, double *rowact)
 
 
    if (!env->mip || !env->mip->n){
-      printf("sym_get_row_activity():There is no loaded mip description or\n");
-      printf("no column description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_row_activity():There is no loaded mip description or\n");
+	 printf("no column description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2747,7 +2793,9 @@ int sym_get_obj_val(sym_environment *env, double *objval)
       *objval = (env->mip->obj_sense == SYM_MINIMIZE ? env->best_sol.objval :
 		 -env->best_sol.objval) + env->mip->obj_offset;
    }else{ 
-      printf("sym_get_obj_val(): There is no solution!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_obj_val(): There is no solution!\n");
+      }
       /* return collb * objcoeff! */
       *objval = 0;
       for(i = 0; i<env->mip->n; i++){
@@ -2768,7 +2816,9 @@ int sym_get_primal_bound(sym_environment *env, double *ub)
 {
 
    if (!env->mip){
-      printf("sym_get_primal_bound():There is no loaded mip description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_primal_bound():There is no loaded mip description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    } 
 
@@ -2787,8 +2837,10 @@ int sym_get_primal_bound(sym_environment *env, double *ub)
 int sym_get_iteration_count(sym_environment *env, int *numnodes)
 {
    if (!env->warm_start){
-      printf("sym_get_iteration_count():");
-      printf("There is no post-solution information available!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_get_iteration_count():");
+	 printf("There is no post-solution information available!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    
@@ -2807,8 +2859,10 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
 
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
        !env->mip->obj){
-      printf("sym_set_obj_coeff():There is no loaded mip description or\n");
-      printf("index is out of range or no column description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_obj_coeff():There is no loaded mip description or\n");
+	 printf("index is out of range or no column description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2844,8 +2898,10 @@ int sym_set_obj2_coeff(sym_environment *env, int index, double value)
 
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
        !env->mip->obj2){
-      printf("sym_set_obj_coeff():There is no loaded mip description or\n");
-      printf("index is out of range or no column description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_obj_coeff():There is no loaded mip description or\n");
+	 printf("index is out of range or no column description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2869,8 +2925,10 @@ int sym_set_col_lower(sym_environment *env, int index, double value)
 
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 ||
        !env->mip->lb){
-      printf("sym_set_col_lower():There is no loaded mip description or\n");
-      printf("index is out of range or no column description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_col_lower():There is no loaded mip description or\n");
+	 printf("index is out of range or no column description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2902,8 +2960,10 @@ int sym_set_col_upper(sym_environment *env, int index, double value)
 
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 ||
        !env->mip->ub){
-      printf("sym_set_col_upper():There is no loaded mip description!\n");
-      printf("index is out of range or no column description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_col_upper():There is no loaded mip description!\n");
+	 printf("index is out of range or no column description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -2937,8 +2997,10 @@ int sym_set_row_lower(sym_environment *env, int index, double value)
 
    if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
        !env->mip->rhs){
-      printf("sym_set_row_lower():There is no loaded mip description or\n");
-      printf("index is out of range or no row description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_row_lower():There is no loaded mip description or\n");
+	 printf("index is out of range or no row description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3029,8 +3091,10 @@ int sym_set_row_upper(sym_environment *env, int index, double value)
 
    if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
        !env->mip->rhs){
-      printf("sym_set_row_upper():There is no loaded mip description or\n");
-      printf("index is out of range or no row description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_row_upper():There is no loaded mip description or\n");
+	 printf("index is out of range or no row description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3127,8 +3191,10 @@ int sym_set_row_type(sym_environment *env, int index, char rowsense,
 
    if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
        !env->mip->rhs){
-      printf("sym_set_row_type():There is no loaded mip description or\n");
-      printf("index is out of range or no row description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_row_type():There is no loaded mip description or\n");
+	 printf("index is out of range or no row description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3167,7 +3233,9 @@ int sym_set_obj_sense(sym_environment *env, int sense)
    int i;
 
    if (!env->mip){
-      printf("sym_set_obj_type():There is no loaded mip description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_obj_type():There is no loaded mip description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3204,7 +3272,9 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    lp_sol * sol;
 
    if (!env->mip || !env->mip->n){
-      printf("sym_set_col_solution(): There is no loaded mip description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_col_solution(): There is no loaded mip description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3334,7 +3404,9 @@ int sym_set_primal_bound(sym_environment *env, double bound)
 {
 
    if (!env->mip){
-      printf("sym_set_primal_bound():There is no loaded mip description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_primal_bound():There is no loaded mip description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3355,8 +3427,10 @@ int sym_set_continuous(sym_environment *env, int index)
 {
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
        !env->mip->is_int){
-      printf("sym_set_continuous():There is no loaded mip description or\n");
-      printf("index is out of range or no row description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_continuous():There is no loaded mip description or\n");
+	 printf("index is out of range or no row description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3374,8 +3448,10 @@ int sym_set_integer(sym_environment *env, int index)
 
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
        !env->mip->is_int){
-      printf("sym_set_integer():There is no loaded mip description or\n");
-      printf("index is out of range or no row description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_integer():There is no loaded mip description or\n");
+	 printf("index is out of range or no row description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3392,8 +3468,10 @@ int sym_set_col_names(sym_environment * env, char **colname)
    int j;
 
    if (!env->mip || !env->mip->n || !colname){
-      printf("sym_set_col_names():There is no loaded mip description or");
-      printf("an empty name array given!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_set_col_names():There is no loaded mip description or");
+	 printf("an empty name array given!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3431,7 +3509,9 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
    int * user_indices, *user_size;
 
    if ((numelems && !indices) || numelems < 0){
-      printf("sym_add_col(): Incorrect column description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_add_col(): Incorrect column description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3584,7 +3664,9 @@ int sym_add_row(sym_environment *env, int numelems, int *indices,
    char *sense;
    
    if ((numelems && !indices) || numelems < 0){
-      printf("sym_add_row():Incorrect row description!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_add_row():Incorrect row description!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3736,7 +3818,9 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
 
    if (!env->mip || !env->mip->n || !env->base || !env->rootdesc || 
        num > env->mip->n || !env->mip->matbeg){
-      printf("sym_delete_cols(): No mip description has been loaded\n"); 
+      if(env->par.verbosity >= 1){
+	 printf("sym_delete_cols(): No mip description has been loaded\n"); 
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -3944,8 +4028,10 @@ int sym_delete_rows(sym_environment *env, int num, int * indices)
    }
 
    if (!env->mip || !env->mip->m || !env->base || num > env->mip->m){
-      printf("sym_delete_rows():There is no loaded mip or base description \n");
-      printf("or the number of rows or num exceeds the real row number!\n");
+      if(env->par.verbosity >= 1){
+	 printf("sym_delete_rows():There is no loaded mip or base description \n");
+	 printf("or the number of rows or num exceeds the real row number!\n");
+      }
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
@@ -4355,7 +4441,7 @@ int sym_set_dbl_param(sym_environment *env, const char *key, double value)
 {
    int termcode;
    char *line = (char*)malloc(CSIZE*(MAX_LINE_LENGTH+1));
-   sprintf(line, "%s %f", key, value);  
+   sprintf(line, "%s %.30f", key, value);  
    termcode = set_param(env, line);
    FREE(line);
 
@@ -5057,6 +5143,11 @@ int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
       *value = env->lb;
       return(0);
    }
+   else if (strcmp(key, "obj_offset") == 0 ||
+	    strcmp(key, "M_obj_offset") == 0){
+      *value = env->obj_offset;
+      return(0);
+   }
    else if (strcmp(key, "scale_factor") == 0 ||
 	    strcmp(key, "DG_scale_factor") == 0){
       *value = dg_par->scale_factor;
@@ -5560,15 +5651,10 @@ int sym_get_ub_for_new_obj(sym_environment *env, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_test(sym_environment *env)
+int sym_test(sym_environment *env, int *test_status)
 {
 
   int termcode = 0, verbosity;
-  
-  verbosity = sym_get_int_param(env, "verbosity", &verbosity);
-
-  sym_set_int_param(env, "verbosity", -10);
-
   int i, file_num = 12;
   char mps_files[12][MAX_FILE_NAME_LENGTH +1] = {
     "air03", "dcmulti", "egout", "flugpl", "khb05250", "l152lav", 
@@ -5585,6 +5671,10 @@ int sym_test(sym_environment *env)
 
   size_t size = 1000;
   char* buf = 0;
+  
+  *test_status = 0;
+  verbosity = sym_get_int_param(env, "verbosity", &verbosity);
+
   while (true) {
      buf = (char*)malloc(CSIZE*size);
      if (getcwd(buf, size))
@@ -5611,6 +5701,8 @@ int sym_test(sym_environment *env)
       free_master_u(env);
       strcpy(env->par.infile, "");
       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+      sym_set_defaults (env);
+      sym_set_int_param(env, "verbosity", -10);
     }
 
     strcpy(infile, "");
@@ -5634,6 +5726,7 @@ int sym_test(sym_environment *env)
     } else {
        printf("\nFailure! Solver returned solution value: %f", obj_val[i]);
        printf("\n         True solution value is:         %f\n\n", sol[i]);
+       *test_status = 1;
     }
   }
 

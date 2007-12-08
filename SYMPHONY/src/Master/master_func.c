@@ -1628,7 +1628,11 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(env->lb);
       return(0);
    }
-   
+   else if (strcmp(key, "obj_offset") == 0 ||
+	    strcmp(key, "M_obj_offset") == 0){
+      READ_DBL_PAR(env->obj_offset);
+      return(0);
+   }   
    else if (strcmp(key, "M_verbosity") == 0){
       READ_INT_PAR(env->par.verbosity);
       return(0);

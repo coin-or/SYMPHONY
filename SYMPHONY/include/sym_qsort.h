@@ -15,8 +15,8 @@
 #ifndef _QSORT_H
 #define _QSORT_H
 
-void qsort(char *bot, unsigned int nmemb, int size,
-	   int (*compar)(const void *, const void *));
+//void qsort(char *bot, unsigned int nmemb, int size,
+//	   int (*compar)(const void *, const void *));
 
 void qsort_i(int *bot, int nmemb);
 void qsort_id(int *bot, double *botd, int nmemb);
