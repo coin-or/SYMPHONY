@@ -137,7 +137,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\Osi\src,..\..\..\Osi\src\OsiClp,..\..\..\Clp\src,..\..\..\CoinUtils\src,..\..\..\Cgl\src,..\..\..\Cgl\src\CglLiftAndProject,..\..\..\Cgl\src\CglFlowCover,..\..\..\Cgl\src\CglMixedIntegerRounding,..\..\..\Cgl\src\CglClique,..\..\..\Cgl\src\CglOddHole,..\..\..\Cgl\src\CglKnapsackCover,..\..\..\Cgl\src\CglGomory,..\..\..\Cgl\src\CglSimpleRounding,..\..\..\Cgl\src\CglProbing,..\..\..\BuildTools\headers,..\..\include"
+				AdditionalIncludeDirectories="..\..\..\Osi\src;..\..\..\Osi\src\OsiClp;..\..\..\Clp\src;..\..\..\CoinUtils\src;..\..\..\Cgl\src;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglProbing;..\..\..\BuildTools\headers;..\..\include;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglTwomir;..\..\..\Cgl\src\CglRedSplit"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -166,7 +166,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
 				OutputFile=".\Release/symphony.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
