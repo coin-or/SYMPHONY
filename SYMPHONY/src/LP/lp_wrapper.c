@@ -577,6 +577,7 @@ int is_feasible_u(lp_prob *p, char branching)
    int *indices;
    double *values, valuesi, *heur_solution = NULL, *col_sol = NULL;
    int cnt, i;
+   var_desc **vars = lp_data->vars;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
@@ -617,7 +618,7 @@ int is_feasible_u(lp_prob *p, char branching)
    switch (user_res){
     case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
        for (i=cnt-1; i>=0; i--){
-	 if (!lp_data->vars[i]->is_int)
+	 if (!vars[i]->is_int)
 	    continue; /* Not an integer variable */
 	 if (values[i] < lpetol1) break;
        }
@@ -625,11 +626,12 @@ int is_feasible_u(lp_prob *p, char branching)
       break;
     case TEST_INTEGRALITY:
       for (i = lp_data->n - 1; i >= 0; i--){
-	 if (!lp_data->vars[i]->is_int)
+	 if (!vars[i]->is_int)
 	    continue; /* Not an integer variable */
 	 valuesi = lp_data->x[i];
 	 if (valuesi-floor(valuesi) > lpetol &&
-	     ceil(valuesi)-valuesi > lpetol){
+	     ceil(valuesi)-valuesi > lpetol &&
+             valuesi>vars[i]->lb-lpetol && valuesi<vars[i]->ub+lpetol){
 	    break;
 	 }
       }
