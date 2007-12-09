@@ -235,6 +235,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       set_itlim(lp_data, p->par.max_presolve_iter);
    if (!p->par.branch_on_cuts) {
       mark_hotstart(lp_data);
+      set_itlim_hotstart(lp_data, p->par.max_presolve_iter);
    }
    vars = lp_data->vars;
 
@@ -327,7 +328,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             if (p->par.branch_on_cuts) {
                can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
             } else {
-               can->termcode[j] = solve_hot(lp_data, can->iterd+j);
+               can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
             }
 	    can->objval[j] = lp_data->objval;
 	    get_x(lp_data);

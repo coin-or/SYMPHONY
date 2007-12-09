@@ -884,7 +884,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 }
 
 /*===========================================================================*/
-int solve_hot(LPdata *lp_data, int *iterd)
+int solve_hotstart(LPdata *lp_data, int *iterd)
 {
    return(dual_simplex(lp_data,iterd));
 }
@@ -1002,6 +1002,12 @@ void set_itlim(LPdata *lp_data, int itlim)
    if (itlim < 0) itlim = LP_MAX_ITER;
    osllib_status = ekk_setImaxiter(lp_data->lp, itlim);
    OSL_check_error("set_itlim - ekk_setImaxiter");
+}
+
+/*===========================================================================*/
+void set_itlim_hotstart(LPdata *lp_data, int itlim)
+{
+   /* read being and nothingness -- Jean Paul Sartre */
 }
 
 /*===========================================================================*/
@@ -1767,7 +1773,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 }
 
 /*===========================================================================*/
-int solve_hot(LPdata *lp_data, int *iterd)
+int solve_hotstart(LPdata *lp_data, int *iterd)
 {
    return(dual_simplex(lp_data,iterd));
 }
@@ -1848,6 +1854,12 @@ void set_itlim(LPdata *lp_data, int itlim)
    cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, itlim);
    CPX_check_error("set_itlim - CPXsetintparam");
 }
+/*===========================================================================*/
+void set_itlim_hotstart(LPdata *lp_data, int itlim)
+{
+   /* read being and nothingness -- Jean Paul Sartre */
+}
+
 
 /*===========================================================================*/
 
@@ -2493,7 +2505,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
  * branching
  */
 /*===========================================================================*/
-int solve_hot(LPdata *lp_data, int *iterd)
+int solve_hotstart(LPdata *lp_data, int *iterd)
 {
    
    //int term = LP_ABANDONED;
@@ -2644,6 +2656,17 @@ void set_itlim(LPdata *lp_data, int itlim)
    if (itlim < 0) itlim = LP_MAX_ITER;
 
    OsiIntParam key = OsiMaxNumIteration;
+   
+   retval = lp_data->si->setIntParam(key, itlim);
+}
+
+/*===========================================================================*/
+
+void set_itlim_hotstart(LPdata *lp_data, int itlim)
+{
+   if (itlim < 0) itlim = LP_MAX_ITER;
+
+   OsiIntParam key = OsiMaxNumIterationHotStart;
    
    retval = lp_data->si->setIntParam(key, itlim);
 }
