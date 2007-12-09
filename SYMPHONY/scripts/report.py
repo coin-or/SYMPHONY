@@ -53,10 +53,10 @@ def find_float_1(arr0,st0,fl0):
 			find = re.search('-*[0-9]+\.[0-9]+',line)
 			if (find>=0):
 				l = re.findall('-*[0-9]+\.[0-9]+',line)
-				if (len(l)<3):
+				if (len(l)<1):
 					return -1,fl0
 				else:
-					fl0 = float(l[2])
+					fl0 = float(l[len(l)-1])
 					return 1,fl0
 			else:
 				return -1,fl0
@@ -112,7 +112,7 @@ for instance in a:
 	fil.close()
 
 	best_ub = INFTY
-	find,best_ub=find_float(whole_file,instance,best_ub)
+	find,best_ub=find_float_1(whole_file,instance,best_ub)
 	if (find<0 or best_ub>=INFTY):
 		print  "%14s"%"NF",
 	else:
