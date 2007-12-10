@@ -61,6 +61,7 @@ SYMPHONY/MSVisualStudio/v8/unitTest.suo -text
 SYMPHONY/MSVisualStudio/v8/unitTest.vcproj -text
 SYMPHONY/Makefile.am -text
 SYMPHONY/Makefile.in -text
+SYMPHONY/TODO -text
 SYMPHONY/configure -text
 SYMPHONY/configure.ac -text
 SYMPHONY/include/SymConfig.h -text
