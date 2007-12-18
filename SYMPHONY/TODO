@@ -9,6 +9,9 @@
    5.2 hotstart (A) D
  6 Node selection (A)
  7 R.C. fixing (including root stuff) (A)
+   7.1 carry rc fixing to child nodes (A)
+   7.2 make loops for calculating tm->lb more efficient (A)
+   7.3 print correct lb in print_tm_status (A)
  8 conflict graphs + implications (A,M)
  9 sos branching (A)
 10 scripts (A)
@@ -21,3 +24,4 @@
 17 tail off (A)
 18 priority lists (M)
 19 memory overflow (A)
+20 why are 15x slower than cplex (A)

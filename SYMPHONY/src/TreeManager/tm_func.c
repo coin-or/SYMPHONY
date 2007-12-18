@@ -317,10 +317,11 @@ int solve(tm_prob *tm)
 #endif
    int termcode = 0, i;
    double start_time = tm->start_time;
-   double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
+   double no_work_start, ramp_up_tm = 0, ramp_down_time = 0, lb;
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
    double timeout2 = 5, timeout3 = tm->par.logging_interval, timeout4 = 10;
+   bc_node **samephase_cand;
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
@@ -488,10 +489,22 @@ int solve(tm_prob *tm)
 	 struct timeval timeout = {5, 0};
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
 	 if (r_bufid && !process_messages(tm, r_bufid)){
-	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-	       if (tm->samephase_cand[i]->lower_bound < tm->lb)
-		  tm->lb = tm->samephase_cand[i]->lower_bound;
-	    }
+            lb = tm->ub;
+            if (tm->par.node_selection_rule==LOWEST_LP_FIRST) {
+               if (tm->samephase_candnum>0) {
+                  lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
+               } /* else its same as tm->lb */
+            } else {
+               samephase_cand = tm->samephase_cand;
+               for (i = tm->samephase_candnum, lb = MAXDOUBLE; i >= 1; i--){
+                  if (samephase_cand[i]->lower_bound < lb)
+                     lb = samephase_cand[i]->lower_bound;
+               }
+               if (lb >= MAXDOUBLE / 2){
+                  lb = tm->ub;
+               }
+            }
+            tm->lb = lb;
 	    termcode = SOMETHING_DIED;
 	    break;
 	 }
@@ -499,10 +512,23 @@ int solve(tm_prob *tm)
 	 now = wall_clock(NULL);
 	 if (now - then > timeout4){
 	    if (!processes_alive(tm)){
-	       for (i=tm->samephase_candnum, tm->lb=MAXDOUBLE; i >= 1; i--){
-		  if (tm->samephase_cand[i]->lower_bound < tm->lb)
-		     tm->lb = tm->samephase_cand[i]->lower_bound;
-	       }
+               lb = tm->ub;
+               if (tm->par.node_selection_rule==LOWEST_LP_FIRST) {
+                  if (tm->samephase_candnum>0) {
+                     lb = tm->samephase_cand[1]->lower_bound; 
+                     /* [0] is a dummy */
+                  } /* else its same as tm->ub */
+               } else {
+                  samephase_cand = tm->samephase_cand;
+                  for (i = tm->samephase_candnum, lb = MAXDOUBLE; i >= 1; i--){
+                     if (samephase_cand[i]->lower_bound < lb)
+                        lb = samephase_cand[i]->lower_bound;
+                  }
+                  if (lb >= MAXDOUBLE / 2){
+                     lb = tm->ub;
+                  }
+               }
+               tm->lb = lb;
 	       termcode = SOMETHING_DIED;
 	       break;
 	    }
@@ -531,13 +557,24 @@ int solve(tm_prob *tm)
       if (termcode != TM_UNFINISHED)
 	 break;
    }
-   for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-      if (tm->samephase_cand[i]->lower_bound < tm->lb)
-	 tm->lb = tm->samephase_cand[i]->lower_bound;
+
+   lb = tm->ub;
+   if (tm->par.node_selection_rule==LOWEST_LP_FIRST) {
+      if (tm->samephase_candnum>0) {
+         lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
+      } /* else its same as tm->ub */
+   } else {
+      samephase_cand = tm->samephase_cand;
+      for (i = tm->samephase_candnum, lb = MAXDOUBLE; i >= 1; i--){
+         if (samephase_cand[i]->lower_bound < lb)
+            lb = samephase_cand[i]->lower_bound;
+      }
+      if (lb >= MAXDOUBLE / 2){
+         lb = tm->ub;
+      }
    }
-   if (tm->lb >= MAXDOUBLE / 2){
-      tm->lb = tm->ub;
-   }
+   tm->lb = lb;
+
    tm->comp_times.ramp_up_tm = ramp_up_tm;
    tm->comp_times.ramp_down_time = ramp_down_time;
    write_log_files(tm);
@@ -585,7 +622,8 @@ void write_log_files(tm_prob *tm)
 void print_tree_status(tm_prob *tm)
 {
    int i;
-   double elapsed_time;
+   double elapsed_time, lb;
+   bc_node **samephase_cand;
 
 #if 0
    int *widths;
@@ -659,15 +697,24 @@ void print_tree_status(tm_prob *tm)
 	 printf("ub: ?? ");
       }
    }
-   if (tm->samephase_candnum == 0){
-      tm->lb = tm->ub;
-   }else{
-      for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-	 if (tm->samephase_cand[i]->parent->lower_bound < tm->lb){
-	    tm->lb = tm->samephase_cand[i]->parent->lower_bound;
-	 }
+
+   lb = tm->ub;
+   if (tm->par.node_selection_rule==LOWEST_LP_FIRST) {
+      if (tm->samephase_candnum>0) {
+         lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
+      } /* else its same as tm->ub */
+   } else {
+      for (i = tm->samephase_candnum, lb = MAXDOUBLE; i >= 1; i--){
+         samephase_cand = tm->samephase_cand;
+         if (samephase_cand[i]->lower_bound < lb)
+            lb = samephase_cand[i]->lower_bound;
+      }
+      if (lb >= MAXDOUBLE / 2){
+         lb = tm->ub;
       }
    }
+   tm->lb = lb;
+
    if (tm->lb >= MAXDOUBLE / 2 || (tm->has_ub && tm->lb > tm->ub)){
       tm->lb = tm->ub;
    }
@@ -1425,16 +1472,17 @@ char shall_we_dive(tm_prob *tm, double objval)
 {
    char dive;
    int i, k;
-   double rand_num, average_lb, lb=tm->lb;
+   double rand_num, average_lb, lb=tm->ub;
    double cutoff = 0;
-   bc_node **samephase_cand = tm->samephase_cand;
+   bc_node **samephase_cand;
 
    if (tm->par.node_selection_rule==LOWEST_LP_FIRST) {
       if (tm->samephase_candnum>0) {
-         lb = samephase_cand[1]->lower_bound; /* [0] is a dummy */
-      } /* else its same as tm->lb */
+         lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
+      } /* else its same as tm->ub */
    } else {
       for (i = tm->samephase_candnum, lb = MAXDOUBLE; i >= 1; i--){
+         samephase_cand = tm->samephase_cand;
          if (samephase_cand[i]->lower_bound < lb)
             lb = samephase_cand[i]->lower_bound;
       }
@@ -3370,6 +3418,8 @@ int tm_close(tm_prob *tm, int termcode)
    double new_time;
 #endif
    int i;
+   double lb;
+   bc_node **samephase_cand;
    
 #if defined(DO_TESTS) && 0
    if (tm->cp.free_num != tm->cp.procnum)
@@ -3435,13 +3485,22 @@ int tm_close(tm_prob *tm, int termcode)
 #endif
    
    tm->stat.root_lb = tm->rootnode->lower_bound;
-   for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-      if (tm->samephase_cand[i]->lower_bound < tm->lb)
-	 tm->lb = tm->samephase_cand[i]->lower_bound;
+   lb = tm->ub;
+   if (tm->par.node_selection_rule==LOWEST_LP_FIRST) {
+      if (tm->samephase_candnum>0) {
+         lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
+      } /* else its same as tm->ub */
+   } else {
+      samephase_cand = tm->samephase_cand;
+      for (i = tm->samephase_candnum, lb = MAXDOUBLE; i >= 1; i--){
+         if (samephase_cand[i]->lower_bound < lb)
+            lb = samephase_cand[i]->lower_bound;
+      }
+      if (lb >= MAXDOUBLE / 2){
+         lb = tm->ub;
+      }
    }
-   if (tm->lb >= MAXDOUBLE / 2){
-      tm->lb = tm->ub;
-   }
+   tm->lb = lb;
 
    return(termcode);
 
