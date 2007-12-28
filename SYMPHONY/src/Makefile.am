@@ -738,11 +738,11 @@ rename_obj:
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'install'
+# and that therefore should be installed in 'install/coin'
 # Although SYMPHONY is not using configuration defs file config.sym, we 
 # add it for now for COIN compatibility.  
-
- include_HEADERS = \
+includecoindir = $(includedir)/coin
+includecoin_HEADERS = \
 	../include/config_sym.h \
 	../include/symphony.h
 #	$(SYMHEADERS)
@@ -759,10 +759,10 @@ install-exec-local:
 	echo "#define HAVE_CONFIG_H" >>bla
 	echo "#endif" >> bla
 	cat $(top_srcdir)/include/$(ConfigHeader) >> bla
-	$(install_sh_DATA) bla $(DESTDIR)$(includedir)/$(ConfigHeader)
+	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
 	rm -f bla
 
 uninstall-local:
-	rm -f $(DESTDIR)$(includedir)/$(ConfigHeader)
+	rm -f $(DESTDIR)$(includecoindir)/$(ConfigHeader)
 
 
