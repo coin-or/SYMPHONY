@@ -5921,15 +5921,10 @@ int sym_get_ub_for_new_obj(sym_environment *env, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_test(sym_environment *env)
+int sym_test(sym_environment *env, int *test_status)
 {
 
   int termcode = 0, verbosity;
-  
-  verbosity = sym_get_int_param(env, "verbosity", &verbosity);
-
-  sym_set_int_param(env, "verbosity", -10);
-
   int i, file_num = 12;
   char mps_files[12][MAX_FILE_NAME_LENGTH +1] = {
     "air03", "dcmulti", "egout", "flugpl", "khb05250", "l152lav", 
@@ -5946,6 +5941,10 @@ int sym_test(sym_environment *env)
 
   size_t size = 1000;
   char* buf = 0;
+  
+  *test_status = 0;
+  verbosity = sym_get_int_param(env, "verbosity", &verbosity);
+
   while (true) {
      buf = (char*)malloc(CSIZE*size);
      if (getcwd(buf, size))
@@ -5972,6 +5971,8 @@ int sym_test(sym_environment *env)
       free_master_u(env);
       strcpy(env->par.infile, "");
       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+      sym_set_defaults (env);
+      sym_set_int_param(env, "verbosity", -10);
     }
 
     strcpy(infile, "");
@@ -5995,6 +5996,7 @@ int sym_test(sym_environment *env)
     } else {
        printf("\nFailure! Solver returned solution value: %f", obj_val[i]);
        printf("\n         True solution value is:         %f\n\n", sol[i]);
+       *test_status = 1;
     }
   }
 

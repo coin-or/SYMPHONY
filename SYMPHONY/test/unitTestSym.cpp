@@ -32,6 +32,7 @@ int main (int argc, const char *argv[])
 {
    int i;
    const char dirsep =  CoinFindDirSeparator();
+   int test_status = 0;
    
    // define valid parameter keywords
    std::set<std::string> definedKeyWords;
@@ -129,7 +130,11 @@ int main (int argc, const char *argv[])
 
       sym_environment *env = sym_open_environment();
       sym_parse_command_line(env, argc, const_cast<char**>(argv));
-      sym_test(env);
+      sym_test(env, &test_status);
+      if (test_status>0) {
+         testingMessage( "warning: some instances may not have returned a ");
+         testingMessage( "correct solution\n" );
+      }
    }
 
    testingMessage( "All tests completed successfully\n" );
