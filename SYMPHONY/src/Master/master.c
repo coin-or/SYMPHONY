@@ -33,6 +33,7 @@
 #include "sym_master.h"
 #include "sym_master_u.h"
 #include "sym_lp_solver.h"
+#include "sym_primal_heuristics.h"
 #ifdef COMPILE_IN_TM
 #include "sym_tm.h"
 #ifdef COMPILE_IN_LP
@@ -340,6 +341,15 @@ int sym_set_defaults(sym_environment *env)
    lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
    lp_par->sensitivity_analysis = FALSE;
+
+   /* feasibility pump */
+   lp_par->fp_enabled        = FALSE;
+   lp_par->fp_max_cycles     = 50;
+   lp_par->fp_time_limit     = 100;
+   lp_par->fp_flip_fraction  = 0.2;
+   lp_par->fp_frequency      = 10;
+   lp_par->fp_max_total_time = 200;
+   lp_par->fp_min_gap        = 1;                   /* 1% gap */
 
    /************************** cut_gen defaults *****************************/
    cg_par->verbosity = 0;
@@ -942,10 +952,17 @@ int sym_solve(sym_environment *env)
    /*------------------------------------------------------------------------*\
     * Solve the problem and receive solutions                         
    \*------------------------------------------------------------------------*/
+   tm->stat.fp_calls    = 0;
+   tm->stat.fp_num_sols = 0;
+   tm->stat.fp_time     = 0;
+
+   sp_initialize(tm);
 
    tm->start_time += start_time;
 
    termcode = solve(tm);
+   sp_free_sp(tm->sp);
+   FREE(tm->sp);
 
    tm_close(tm, termcode);
 
@@ -5262,6 +5279,18 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
       *value = lp_par->mc_add_optimality_cuts;
       return(0);
    }
+   else if (strcmp(key, "fp_enabled") == 0) {
+      *value = lp_par->fp_enabled;
+      return(0);
+   }
+   else if (strcmp(key, "fp_frequency") == 0) {
+      *value = lp_par->fp_frequency;
+      return(0);
+   }
+   else if (strcmp(key, "fp_max_cycles") == 0) {
+      *value = lp_par->fp_max_cycles;
+      return(0);
+   }
    
    /***********************************************************************
     ***                     cut_gen params                          ***
@@ -5328,10 +5357,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
       *value = cp_par->min_to_delete;
       return(0);
    }
-      else if (strcmp(key, "check_which") == 0 ||
-	    strcmp(key, "CP_check_which") == 0){
-	 *value = cp_par->check_which;
-		}
+   else if (strcmp(key, "check_which") == 0 ||
+         strcmp(key, "CP_check_which") == 0){
+      *value = cp_par->check_which;
+   }
 
    return (FUNCTION_TERMINATED_ABNORMALLY);
 }
@@ -5520,6 +5549,22 @@ int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
    else if (strcmp(key, "mc_rho") == 0 ||
 	    strcmp(key, "LP_mc_rho") == 0 ){
       *value = lp_par->mc_rho;
+      return(0);
+   }
+   else if (strcmp(key, "fp_time_limit") == 0) {
+      *value = lp_par->fp_time_limit;
+      return(0);
+   }
+   else if (strcmp(key, "fp_flip_fraction") == 0) {
+      *value = lp_par->fp_flip_fraction;
+      return(0);
+   }
+   else if (strcmp(key, "fp_max_total_time") == 0) {
+      *value = lp_par->fp_max_total_time;
+      return(0);
+   }
+   else if (strcmp(key, "fp_min_gap") == 0) {
+      *value = lp_par->fp_min_gap;
       return(0);
    }
    

@@ -70,7 +70,8 @@ SYMHEADERS = \
 	../include/symphony_api.h \
 	../include/sym_timemeas.h \
 	../include/sym_tm.h \
-	../include/sym_tm_params.h
+	../include/sym_tm_params.h \
+	../include/sym_primal_heuristics.h
 
 if USE_CL
  SYMHEADERS += ../include/sym_win32_time.h
@@ -155,16 +156,17 @@ TIME_SRC	= Common/timemeas.c
 PROCCOMM_SRC	= Common/proccomm.c
 PACKCUT_SRC	= Common/pack_cut.c
 PACKARRAY_SRC	= Common/pack_array.c
+PRIMALHEUR_SRC  = PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 
 BB_SRC = $(MASTER_SRC) $(DG_SRC) $(TM_SRC) $(LP_SRC) $(CP_SRC) $(CG_SRC) \
 	 $(QSORT_SRC) $(TIME_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
-	 $(PACKARRAY_SRC)
+	 $(PACKARRAY_SRC) $(PRIMALHEUR_SRC)
 
 ALL_SRC = $(BB_SRC)
 
 ALL_SYM_MASTER = $(SYM_MASTER_SRC) $(SYM_TM_SRC) $(SYM_LP_SRC) $(SYM_CG_SRC) \
 	$(SYM_CP_SRC) $(TIME_SRC) $(QSORT_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
-	$(PACKARRAY_SRC)
+	$(PACKARRAY_SRC) $(PRIMALHEUR_SRC)
 
 ALL_MASTER	 = $(MASTER_SRC)
 ALL_MASTER 	+= $(TIME_SRC)
@@ -172,6 +174,7 @@ ALL_MASTER 	+= $(QSORT_SRC)
 ALL_MASTER 	+= $(PROCCOMM_SRC)
 ALL_MASTER 	+= $(PACKCUT_SRC)
 ALL_MASTER 	+= $(PACKARRAY_SRC)
+ALL_MASTER 	+= $(PRIMALHEUR_SRC)
 
 ALL_LP	 = $(LP_SRC)
 ALL_LP 	+= $(TIME_SRC)

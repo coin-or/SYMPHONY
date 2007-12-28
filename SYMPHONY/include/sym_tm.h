@@ -125,6 +125,8 @@ typedef struct TM_PROB{
 #endif
 
    tm_temp         tmp;
+   /* solution pool */
+   sp_desc  *sp;
 }tm_prob;
 
 /*===========================================================================*/

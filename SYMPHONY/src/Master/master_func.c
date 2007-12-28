@@ -2784,6 +2784,34 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(lp_par->mc_rho);
       return(0);
    }
+   else if (strcmp(key, "fp_enabled") == 0) {
+      READ_INT_PAR(lp_par->fp_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "fp_frequency") == 0) {
+      READ_INT_PAR(lp_par->fp_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "fp_max_cycles") == 0) {
+      READ_INT_PAR(lp_par->fp_max_cycles);
+      return(0);
+   }
+   else if (strcmp(key, "fp_time_limit") == 0) {
+      READ_DBL_PAR(lp_par->fp_time_limit);
+      return(0);
+   }
+   else if (strcmp(key, "fp_flip_fraction") == 0) {
+      READ_DBL_PAR(lp_par->fp_flip_fraction);
+      return(0);
+   }
+   else if (strcmp(key, "fp_max_total_time") == 0) {
+      READ_DBL_PAR(lp_par->fp_max_total_time);
+      return(0);
+   }
+   else if (strcmp(key, "fp_min_gap") == 0) {
+      READ_INT_PAR(lp_par->fp_min_gap);
+      return(0);
+   }
 
    /***********************************************************************
     ***                     cut_gen parameters                          ***

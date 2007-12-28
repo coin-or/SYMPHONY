@@ -363,6 +363,11 @@ typedef struct PROBLEM_STAT{
 				      after the first phase */
    char        nf_status;          /* nf_status of the root node after
 				      repricing */
+
+   /* feasibility pump */
+   double      fp_time;
+   int         fp_calls;
+   int         fp_num_sols;
 }problem_stat;
 
 typedef struct MIPINFO{ 
@@ -443,4 +448,27 @@ typedef struct WARM_START_DESC{
    int            trim_tree_level;
    int            trim_tree_index;
 }warm_start_desc;
+
+/* solution pool */
+typedef struct SP_SOLUTION_DESC{
+   double         objval;
+   int            xlength;
+   int           *xind;
+   double        *xval;
+  
+   /* The bnb node where this solution was discoverd*/
+   int            node_index;
+  
+   /* The level of the node in bnb tree where this solution was discovered */
+    int            node_level;  
+}sp_solution;
+
+typedef struct SP_DESC{
+   /* max. no. of solutions in the pool */
+   int            max_solutions; 
+   /* no. of solutions in the pool */
+   int            num_solutions;
+   /* array of those solutions */
+   sp_solution    **solutions;
+}sp_desc;
 #endif

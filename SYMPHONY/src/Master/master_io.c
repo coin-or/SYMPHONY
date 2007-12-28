@@ -801,6 +801,7 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
    printf("Number of analyzed nodes:       %i\n", stat->analyzed);
    printf("Depth of tree:                  %i\n", stat->max_depth);
    printf("Size of the tree:               %i\n", stat->tree_size);
+
 #if 0
    printf("Leaves before trimming:         %i\n",
 	  stat->leaves_before_trimming);
@@ -821,6 +822,14 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
 		stat->root_lb + obj_offset);
       }
    }
+
+   printf ("\n==================== Feasibility Pump =====================\n");
+   printf ("Number of times feasibility pump called:        %i\n",
+         stat->fp_calls);
+   printf ("Number of solutions found by feasibility pump:  %i\n",
+         stat->fp_num_sols);
+   printf ("Time spent in feasibility pump:                 %f\n",
+         stat->fp_time); 
 
    if (has_ub){
      gap = fabs(100*(ub-lb)/ub);

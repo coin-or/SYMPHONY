@@ -2918,6 +2918,92 @@ void get_objcoef(LPdata *lp_data, int j, double *objcoef)
 }
 
 /*===========================================================================*/
+void get_objcoeffs(LPdata *lp_data)
+{
+   const double *si_objcoeffs = lp_data->si->getObjCoefficients();
+   memcpy (lp_data->mip->obj,si_objcoeffs,lp_data->n*DSIZE);
+}
+
+/*===========================================================================*/
+void change_objcoeff(LPdata *lp_data, const int* indexFirst, 
+      const int* indexLast, double *coeffs)
+{
+   lp_data->si->setObjCoeffSet(indexFirst, indexLast, coeffs);
+}
+
+/*===========================================================================*/
+void get_rhs_rng_sense(LPdata *lp_data)
+{
+   const double *rowub = lp_data->si->getRowUpper();
+   const double *rowlb = lp_data->si->getRowLower();
+
+   for (int i=0;i<lp_data->m;i++) {
+      if (rowub[i]>=SYM_INFINITY) {
+         lp_data->mip->sense[i] = 'G';
+         lp_data->mip->rhs[i] = rowlb[i];
+      }
+      else if (rowlb[i]<=-SYM_INFINITY) {
+         lp_data->mip->sense[i] = 'L';
+         lp_data->mip->rhs[i] = rowub[i];
+      }
+      else {
+         lp_data->mip->sense[i] = 'R';
+         lp_data->mip->rhs[i] = rowub[i];
+         lp_data->mip->rngval[i] = rowub[i]-rowlb[i];
+      }
+   }
+}
+
+/*===========================================================================*/
+/* 
+ * copy everything from lp_data into new_data. it is assumed that new_data is
+ * already mallocced.
+ */
+int copy_lp_data(LPdata *lp_data, LPdata *new_data)
+{
+   int termcode = FUNCTION_TERMINATED_NORMALLY;
+   int n = lp_data->n;
+   int m = lp_data->m;
+   double *lb, *ub;
+
+   if (!new_data) {
+      return FUNCTION_TERMINATED_ABNORMALLY;
+   }
+
+   new_data->lpetol = lp_data->lpetol;
+   new_data->n = n;
+   new_data->m = m;
+   new_data->nz = lp_data->nz;
+   new_data->maxn = lp_data->maxn;
+   new_data->maxm = lp_data->maxm;
+   new_data->maxnz = lp_data->maxnz;
+
+   lb = (double *)malloc(n*DSIZE);
+   ub = (double *)malloc(n*DSIZE);
+   new_data->x = (double *) malloc(n*DSIZE);
+
+   open_lp_solver(new_data);
+   new_data->si->loadProblem(*(lp_data->si->getMatrixByRow()),
+                             lp_data->si->getColLower(),
+                             lp_data->si->getColUpper(),
+                             lp_data->si->getObjCoefficients(),
+                             lp_data->si->getRowLower(),
+                             lp_data->si->getRowUpper()
+                             );
+   /* get_bounds just returns a const pointer to si->ub, si->lb. we need to
+    * memcpy because these pointers get changed when addCols is used */
+   get_bounds(new_data);
+   memcpy(lb,new_data->lb,DSIZE*n);
+   memcpy(ub,new_data->ub,DSIZE*n);
+
+   new_data->lb = lb;
+   new_data->ub = ub;
+
+
+   return termcode;
+}
+
+/*===========================================================================*/
 
 void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
 {
