@@ -61,7 +61,7 @@ ifeq ($(LP_SOLVER),OSL)
 endif
 
 ifeq ($(LP_SOLVER),OSI)
-       LPINCDIR += $(COINROOT)/include
+       LPINCDIR += $(COINROOT)/include/coin
        LPLIBPATHS += $(COINROOT)/lib
        LPLIB += -lCgl
 ifeq ($(OSI_INTERFACE),CPLEX)
