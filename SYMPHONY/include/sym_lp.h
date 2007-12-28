@@ -105,6 +105,7 @@ typedef struct LP_PROB{
    
    double        tt;
    node_times    comp_times;
+   lp_stat_desc  lp_stat;
 
    node_desc    *desc;
    int           bc_index;

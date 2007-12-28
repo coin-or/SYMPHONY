@@ -3444,13 +3444,15 @@ void write_sav(LPdata *lp_data, char *fname)
 #include "sym_qsort.h"
 
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
-		       char send_to_pool, int is_rootnode, int verbosity)
+		       char send_to_pool, int is_rootnode, 
+                       lp_stat_desc *lp_stat, node_times *comp_times,
+                       int verbosity)
 {
    OsiCuts cutlist;
    OsiRowCut cut;
    int i = 0, j = 0, k = 0; 
    int *matind;
-   double *matval;
+   double *matval, total_time = 0, cut_time = 0;
    cgl_params *par = &(lp_data->cgl);
    int termcode, iterd, cut_num = 0;
    int new_cut_num = 0;
@@ -3477,6 +3479,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       }
    }  
    
+   /* twice is necessary */
+   cut_time = used_time(&total_time);
+   cut_time = used_time(&total_time);
+
    /* create CGL probing cuts */
    if(par->generate_cgl_probing_cuts > -1 && 
       par->generate_cgl_probing_cuts_freq > 0){
@@ -3503,9 +3509,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	   }
 	   PRINT(verbosity, 5,
 		 ("%i probing cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->probing_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->probing_cuts_root   += new_cut_num;
+           }
 	}
 	cut_num = cutlist.sizeRowCuts();
 	delete probe;
+        cut_time = used_time(&total_time);
+        comp_times->cuts += cut_time;
+        comp_times->probing_cuts += cut_time;
      }
    }
 
@@ -3529,9 +3544,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	  }
 	  PRINT(verbosity, 5,
 		("%i Gomory cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->gomory_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->gomory_cuts_root += new_cut_num;
+           }
        }
        cut_num = cutlist.sizeRowCuts();       
        delete gomory;
+       cut_time = used_time(&total_time);
+       comp_times->cuts += cut_time;
+       comp_times->gomory_cuts += cut_time;
      }
    }
 
@@ -3558,9 +3582,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	   }
 	   PRINT(verbosity, 5,
 		 ("%i reduce and split cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->redsplit_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->redsplit_cuts_root += new_cut_num;
+           }
 	}
 	cut_num = cutlist.sizeRowCuts();       
 	delete redsplit;
+        cut_time = used_time(&total_time);
+        comp_times->cuts += cut_time;
+        comp_times->redsplit_cuts += cut_time;
      }
    }
 
@@ -3584,9 +3617,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	  }
 	  PRINT(verbosity, 5,
 		("%i knapsack cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->knapsack_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->knapsack_cuts_root += new_cut_num;
+           }
        }
        cut_num = cutlist.sizeRowCuts();       
        delete knapsack;
+       cut_time = used_time(&total_time);
+       comp_times->cuts += cut_time;
+       comp_times->knapsack_cuts += cut_time;
      }
    }
 
@@ -3616,9 +3658,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	  }
 	  PRINT(verbosity, 5,
 		("%i odd hole cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->oddhole_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->oddhole_cuts_root += new_cut_num;
+           }
        }
        cut_num = cutlist.sizeRowCuts();       
        delete oddhole;
+       cut_time = used_time(&total_time);
+       comp_times->cuts += cut_time;
+       comp_times->oddhole_cuts += cut_time;
      }
    }
 
@@ -3643,9 +3694,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	    }
 	    PRINT(verbosity, 5,
 		  ("%i MIR cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->mir_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->mir_cuts_root += new_cut_num;
+           }
 	 }
 	 cut_num = cutlist.sizeRowCuts();       
 	 delete mir;
+         cut_time = used_time(&total_time);
+         comp_times->cuts += cut_time;
+         comp_times->mir_cuts += cut_time;
       }
    }
 
@@ -3670,9 +3730,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	  }
 	  PRINT(verbosity, 5,
 		("%i 2-MIR cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->twomir_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->twomir_cuts_root += new_cut_num;
+           }
        }
        cut_num = cutlist.sizeRowCuts();       
        delete twomir;
+       cut_time = used_time(&total_time);
+       comp_times->cuts += cut_time;
+       comp_times->twomir_cuts += cut_time;
      }
    }
 
@@ -3699,9 +3768,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	  }
 	  PRINT(verbosity, 5,
 		("%i clique cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->clique_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->clique_cuts_root += new_cut_num;
+           }
        }
        cut_num = cutlist.sizeRowCuts();       
        delete clique;
+       cut_time = used_time(&total_time);
+       comp_times->cuts += cut_time;
+       comp_times->clique_cuts += cut_time;
      }
    }
    
@@ -3726,9 +3804,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	  }
 	  PRINT(verbosity, 5,
 		("%i flow cover cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->flow_and_cover_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->flow_and_cover_cuts_root += new_cut_num;
+           }
        }
        cut_num = cutlist.sizeRowCuts();       
        delete flow;
+       cut_time = used_time(&total_time);
+       comp_times->cuts += cut_time;
+       comp_times->flow_and_cover_cuts += cut_time;
       //printf("%i\n", cutlist.sizeRowCuts());
      }
    }
@@ -3754,10 +3841,19 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	  }
 	  PRINT(verbosity, 5,
 		("%i rounding cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->rounding_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->rounding_cuts_root += new_cut_num;
+           }
        }
        cut_num = cutlist.sizeRowCuts();       
        delete rounding;
        //printf("%i\n", cutlist.sizeRowCuts());
+       cut_time = used_time(&total_time);
+       comp_times->cuts += cut_time;
+       comp_times->rounding_cuts += cut_time;
      }
    }
    
@@ -3782,9 +3878,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	   }
 	   PRINT(verbosity, 5,
 		 ("%i lift and project cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->lift_and_project_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->lift_and_project_cuts_root += new_cut_num;
+           }
 	}
 	cut_num = cutlist.sizeRowCuts();       
 	delete liftandproject;
+        cut_time = used_time(&total_time);
+        comp_times->cuts += cut_time;
+        comp_times->lift_and_project_cuts += cut_time;
      }
    }
    
@@ -3827,9 +3932,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	   }
 	   PRINT(verbosity, 5,
 		 ("%i landp cuts added\n", new_cut_num));
+           lp_stat->cuts_generated += new_cut_num;
+           lp_stat->landp_cuts_generated += new_cut_num;
+           if (is_rootnode) {
+              lp_stat->cuts_root   += new_cut_num;
+              lp_stat->landp_cuts_root += new_cut_num;
+           }
 	}
 	cut_num = cutlist.sizeRowCuts();       
 	delete landp;
+        cut_time = used_time(&total_time);
+        comp_times->cuts += cut_time;
+        comp_times->landp_cuts += cut_time;
      }
    }
 #endif
@@ -3928,6 +4042,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       if (num_discarded_cuts>0) {
 	 PRINT(verbosity,3,("generate_cgl_cuts: Number of discarded cuts = %d\n",num_discarded_cuts));
       }
+      lp_stat->cuts_discarded += num_discarded_cuts;
    }
    return;
 }

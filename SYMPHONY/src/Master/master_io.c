@@ -746,7 +746,8 @@ void read_string(char *target, char *line, int maxlen)
 /*===========================================================================*/
 /*===========================================================================*/
 
-void print_statistics(node_times *tim, problem_stat *stat, double ub,
+void print_statistics(node_times *tim, problem_stat *stat, 
+                      lp_stat_desc *lp_stat, double ub,
 		      double lb, double initial_time, double start_time,
 		      double finish_time, double obj_offset, char obj_sense, 
 		      char has_ub)
@@ -823,14 +824,101 @@ void print_statistics(node_times *tim, problem_stat *stat, double ub,
       }
    }
 
-   printf ("\n==================== Feasibility Pump =====================\n");
-   printf ("Number of times feasibility pump called:        %i\n",
-         stat->fp_calls);
-   printf ("Number of solutions found by feasibility pump:  %i\n",
-         stat->fp_num_sols);
-   printf ("Time spent in feasibility pump:                 %f\n",
-         stat->fp_time); 
+   if (lp_stat) {
+      printf ("\n==================== Feasibility Pump =====================");
+      printf ("\n");
+      printf ("Number of times feasibility pump called:        ");
+      printf("%i\n", lp_stat->fp_calls);
+      printf ("Number of solutions found by feasibility pump:  ");
+      printf("%i\n", lp_stat->fp_num_sols);
+      printf ("Time spent in feasibility pump:                 %.2f\n", 
+            tim->fp); 
 
+      printf ("\n=========================== Cuts ==========================");
+      printf ("\n");
+      printf ("total cuts generated:                  %d\n",
+            lp_stat->cuts_generated);
+      printf ("total gomory cuts generated:           %d\n",
+            lp_stat->gomory_cuts_generated);
+      printf ("total knapsack cuts generated:         %d\n",
+            lp_stat->knapsack_cuts_generated);
+      printf ("total oddhole cuts generated:          %d\n",
+            lp_stat->oddhole_cuts_generated);
+      printf ("total clique cuts generated:           %d\n",
+            lp_stat->clique_cuts_generated);
+      printf ("total probing cuts generated:          %d\n",
+            lp_stat->probing_cuts_generated);
+      printf ("total mir cuts generated:              %d\n",
+            lp_stat->mir_cuts_generated);
+      printf ("total twomir cuts generated:           %d\n",
+            lp_stat->twomir_cuts_generated);
+      printf ("total flow and cover cuts generated:   %d\n",
+            lp_stat->flow_and_cover_cuts_generated);
+      printf ("total rounding cuts generated:         %d\n",
+            lp_stat->rounding_cuts_generated);
+      printf ("total lift and project cuts generated: %d\n",
+            lp_stat->lift_and_project_cuts_generated);
+      printf ("total landp cuts generated:            %d\n",
+            lp_stat->landp_cuts_generated);
+     
+      printf ("\n");
+
+      printf ("cuts in root:                          %d\n",
+            lp_stat->cuts_root);
+      printf ("gomory cuts in root:                   %d\n",
+            lp_stat->gomory_cuts_root);
+      printf ("knapsack cuts in root:                 %d\n",
+            lp_stat->knapsack_cuts_root);
+      printf ("oddhole cuts in root:                  %d\n",
+            lp_stat->oddhole_cuts_root);
+      printf ("clique cuts in root:                   %d\n",
+            lp_stat->clique_cuts_root);
+      printf ("probing cuts in root:                  %d\n",
+            lp_stat->probing_cuts_root);
+      printf ("mir cuts in root:                      %d\n",
+            lp_stat->mir_cuts_root);
+      printf ("twomir cuts in root:                   %d\n",
+            lp_stat->twomir_cuts_root);
+      printf ("flow and cover cuts in root:           %d\n",
+            lp_stat->flow_and_cover_cuts_root);
+      printf ("rounding cuts in root:                 %d\n",
+            lp_stat->rounding_cuts_root);
+      printf ("lift and project cuts in root:         %d\n",
+            lp_stat->lift_and_project_cuts_root);
+      printf ("landp cuts in root:                    %d\n",
+            lp_stat->landp_cuts_root);
+     
+      printf ("total cuts discarded:                  %d\n",
+            lp_stat->cuts_discarded);
+      
+      printf ("\n");
+      
+      printf ("time in cut generation:                %.2f\n", tim->cuts);
+      printf ("time in gomory cuts:                   %.2f\n", 
+            tim->gomory_cuts);
+      printf ("time in knapsack cuts:                 %.2f\n",
+            tim->knapsack_cuts);
+      printf ("time in oddhole cuts:                  %.2f\n", 
+            tim->oddhole_cuts);
+      printf ("time in clique cuts:                   %.2f\n", 
+            tim->clique_cuts);
+      printf ("time in probing cuts:                  %.2f\n", 
+            tim->probing_cuts);
+      printf ("time in mir cuts:                      %.2f\n", tim->mir_cuts);
+      printf ("time in twomir cuts:                   %.2f\n", 
+            tim->twomir_cuts);
+      printf ("time in flow and cover cuts:           %.2f\n",
+            tim->flow_and_cover_cuts);
+      printf ("time in rounding cuts:                 %.2f\n",
+            tim->rounding_cuts);
+      printf ("time in lift and project cuts:         %.2f\n",
+            tim->lift_and_project_cuts);
+      printf ("time in landp cuts:                    %.2f\n", 
+            tim->landp_cuts);
+      printf ("time in redsplit cuts:                 %.2f\n", 
+            tim->redsplit_cuts);
+     
+   }
    if (has_ub){
      gap = fabs(100*(ub-lb)/ub);
    }

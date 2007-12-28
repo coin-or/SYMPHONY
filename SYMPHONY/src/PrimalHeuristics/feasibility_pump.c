@@ -53,7 +53,6 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    /* no. of max pumping cycles */
    int                      MaxIter     = p->par.fp_max_cycles;
    int                      n           = lp_data->n;
-   double                   pump_start_time = wall_clock(NULL);
    /* use OSI to get lp data */
    OsiSolverInterface      *model       = p->lp_data->si;
    const CoinPackedMatrix  *matrix      = model->getMatrixByRow();
@@ -71,11 +70,19 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    /* rounding of an lp sol */
    double                  *x_ip = (double *) malloc(n*DSIZE);
    double                  *x_temp = (double *) malloc(n*DSIZE);
-   double                   elapsed_time, real_obj_value, target_ub;
+   double                   fp_time, real_obj_value, target_ub;
    FPvars                 **vars;
    int                      min_verbosity = 5;
    double                   gap           = model->getInfinity();
    double                   obj_lb        = lp_data->objval;
+   double                   total_time    = 0;
+
+   fp_time                                = used_time(&total_time);
+   /* total_time and fp_time both now have total time used by symphony's lp
+    * process */
+
+   fp_time                                = used_time(&total_time);
+   /* fp_time should now be zero and total_time be still the same */
 
 
    *found_better_solution = FALSE;
@@ -97,8 +104,8 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    fp_round(x_lp,x_ip,vars,n);
 
    /* do the following MaxIter times */
-   for (iter=0; iter<MaxIter &&
-         wall_clock(NULL)-pump_start_time<p->par.fp_time_limit; iter++) {
+   fp_time += used_time(&total_time);
+   for (iter=0; iter<MaxIter && fp_time<p->par.fp_time_limit; iter++) {
       PRINT(verbosity,min_verbosity,("fp: iteration %d\n",iter));
       if (fp_is_feasible(new_lp_data, x_ip, matrix, lp_r_low, lp_r_up,
                fp_data)) { 
@@ -114,7 +121,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
          values  = p->lp_data->tmp.d;           /* n */
          cnt     = collect_nonzeros(p, betterSolution, indices, values);
          gap     = (solution_value - obj_lb)/(fabs(solution_value)+0.001)*100;
-         p->tm->stat.fp_num_sols++;
+         p->lp_stat.fp_num_sols++;
          PRINT(verbosity,min_verbosity,("fp: found solution with value = %f\n",
                   solution_value));
          PRINT(verbosity,min_verbosity,("fp: gap = %f\n", gap));
@@ -156,6 +163,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
             //printf("\n");
          }
       }
+      fp_time += used_time(&total_time);
    }
    close_lp_solver(new_lp_data);
    /* free all the allocated memory */
@@ -180,17 +188,18 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    FREE(fp_data);
 
    /* update stats */
-   p->tm->stat.fp_time += wall_clock(NULL)-pump_start_time;
-   p->tm->stat.fp_calls++;
+   fp_time                        += used_time(&total_time);
+   p->comp_times.fp               += fp_time;
+   p->comp_times.primal_heur      += fp_time;
+   p->lp_stat.fp_calls++;
    if (*found_better_solution==TRUE) {
       if (p->mip->obj_sense == SYM_MAXIMIZE){
          real_obj_value=-solution_value+p->mip->obj_offset;
       } else {
          real_obj_value=solution_value+p->mip->obj_offset;
       }
-      elapsed_time = wall_clock(NULL)-p->tm->start_time;
       PRINT(verbosity,-1,("fp: found solution = %10.2f time = %10.2f\n",
-               real_obj_value,elapsed_time));
+               real_obj_value,total_time));
    }
 
    PRINT(verbosity,min_verbosity,("Leaving Feasibility Pump.\n"));
@@ -587,9 +596,9 @@ int fp_should_call_fp(lp_prob *p, int branching)
 
    if (p->par.fp_enabled>0 && 
        !branching &&
-       p->bc_index%p->par.fp_frequency == 1 &&
+       p->bc_index%p->par.fp_frequency == 0 &&
        p->has_ub==FALSE  &&
-       p->tm->stat.fp_time < p->par.fp_max_total_time) {
+       p->comp_times.fp < p->par.fp_max_total_time) {
       /*
        * check if it has ints
        * TODO: remove this check. make fp work for general ints

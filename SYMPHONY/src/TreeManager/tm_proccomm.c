@@ -1180,6 +1180,8 @@ int receive_lp_timing(tm_prob *tm)
 	       tm->comp_times.idle_names       += tim.idle_names;
 	       tm->comp_times.idle_cuts        += tim.idle_cuts;
 	       tm->comp_times.cut_pool         += tim.cut_pool;
+	       tm->comp_times.fp               += tim.fp;
+	       tm->comp_times.primal_heur      += tim.primal_heur;
 	       break;
 
 	     default:

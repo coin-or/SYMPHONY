@@ -1909,6 +1909,63 @@ void lp_close(lp_prob *p)
    p->tm->comp_times.fixing           += p->comp_times.fixing;
    p->tm->comp_times.pricing          += p->comp_times.pricing;
    p->tm->comp_times.strong_branching += p->comp_times.strong_branching;
+   p->tm->comp_times.fp               += p->comp_times.fp;
+   p->tm->comp_times.primal_heur      += p->comp_times.primal_heur;
+
+   p->tm->comp_times.cuts             += p->comp_times.cuts;
+   p->tm->comp_times.gomory_cuts      += p->comp_times.gomory_cuts;
+   p->tm->comp_times.knapsack_cuts    += p->comp_times.knapsack_cuts;
+   p->tm->comp_times.oddhole_cuts     += p->comp_times.oddhole_cuts;
+   p->tm->comp_times.clique_cuts      += p->comp_times.clique_cuts;
+   p->tm->comp_times.probing_cuts     += p->comp_times.probing_cuts;
+   p->tm->comp_times.mir_cuts         += p->comp_times.mir_cuts;
+   p->tm->comp_times.twomir_cuts      += p->comp_times.twomir_cuts;
+   p->tm->comp_times.rounding_cuts    += p->comp_times.rounding_cuts;
+   p->tm->comp_times.landp_cuts       += p->comp_times.landp_cuts;
+   p->tm->comp_times.flow_and_cover_cuts += p->comp_times.flow_and_cover_cuts;
+   p->tm->comp_times.lift_and_project_cuts += 
+      p->comp_times.lift_and_project_cuts;
+   p->tm->comp_times.redsplit_cuts += 
+      p->comp_times.redsplit_cuts;
+
+   p->tm->lp_stat.cuts_generated          += p->lp_stat.cuts_generated;
+   p->tm->lp_stat.gomory_cuts_generated   += p->lp_stat.gomory_cuts_generated;
+   p->tm->lp_stat.knapsack_cuts_generated += p->lp_stat.knapsack_cuts_generated;
+   p->tm->lp_stat.oddhole_cuts_generated  += p->lp_stat.oddhole_cuts_generated;
+   p->tm->lp_stat.clique_cuts_generated   += p->lp_stat.clique_cuts_generated;
+   p->tm->lp_stat.probing_cuts_generated  += p->lp_stat.probing_cuts_generated;
+   p->tm->lp_stat.mir_cuts_generated      += p->lp_stat.mir_cuts_generated;
+   p->tm->lp_stat.twomir_cuts_generated   += p->lp_stat.twomir_cuts_generated;
+   p->tm->lp_stat.rounding_cuts_generated += p->lp_stat.rounding_cuts_generated;
+   p->tm->lp_stat.landp_cuts_generated    += p->lp_stat.landp_cuts_generated;
+   p->tm->lp_stat.flow_and_cover_cuts_generated += 
+      p->lp_stat.flow_and_cover_cuts_generated;
+   p->tm->lp_stat.lift_and_project_cuts_generated += 
+      p->lp_stat.lift_and_project_cuts_generated;
+   p->tm->lp_stat.redsplit_cuts_generated += 
+      p->lp_stat.redsplit_cuts_generated;
+
+   p->tm->lp_stat.cuts_root               += p->lp_stat.cuts_root;
+   p->tm->lp_stat.gomory_cuts_root        += p->lp_stat.gomory_cuts_root;
+   p->tm->lp_stat.knapsack_cuts_root      += p->lp_stat.knapsack_cuts_root;
+   p->tm->lp_stat.oddhole_cuts_root       += p->lp_stat.oddhole_cuts_root;
+   p->tm->lp_stat.clique_cuts_root        += p->lp_stat.clique_cuts_root;
+   p->tm->lp_stat.probing_cuts_root       += p->lp_stat.probing_cuts_root;
+   p->tm->lp_stat.mir_cuts_root           += p->lp_stat.mir_cuts_root;
+   p->tm->lp_stat.twomir_cuts_root        += p->lp_stat.twomir_cuts_root;
+   p->tm->lp_stat.rounding_cuts_root      += p->lp_stat.rounding_cuts_root;
+   p->tm->lp_stat.landp_cuts_root         += p->lp_stat.landp_cuts_root;
+   p->tm->lp_stat.flow_and_cover_cuts_root += 
+      p->lp_stat.flow_and_cover_cuts_root;
+   p->tm->lp_stat.lift_and_project_cuts_root += 
+      p->lp_stat.lift_and_project_cuts_root;
+   p->tm->lp_stat.redsplit_cuts_root += 
+      p->lp_stat.redsplit_cuts_root;
+
+   p->tm->lp_stat.cuts_discarded          += p->lp_stat.cuts_discarded;
+
+   p->tm->lp_stat.fp_calls                += p->lp_stat.fp_calls;
+   p->tm->lp_stat.fp_num_sols             += p->lp_stat.fp_num_sols;
 }
 #endif
 #ifdef COMPILE_IN_CG
