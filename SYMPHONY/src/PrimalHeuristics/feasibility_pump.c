@@ -127,6 +127,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
          PRINT(verbosity,min_verbosity,("fp: gap = %f\n", gap));
          sp_add_solution(p,cnt,indices,values,solution_value,p->bc_index);
          if (gap <= p->par.fp_min_gap) {
+            *found_better_solution = TRUE;
             break;
          }
          target_ub = (obj_lb + solution_value)/2;
