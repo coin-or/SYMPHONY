@@ -14,7 +14,6 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include <malloc.h>
 #include <string.h>
 
 #include "sym_proccomm.h"
@@ -58,73 +57,64 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    const CoinPackedMatrix  *matrix      = model->getMatrixByRow();
    const double            *lp_r_low    = model->getRowLower();
    const double            *lp_r_up     = model->getRowUpper();
-   const double            *mip_obj     = model->getObjCoefficients();
-   int                      count,i,r,iter,cnt;
-   int                      verbosity = p->par.verbosity;
-   int                     *indexList, *indices;
+   int                      count, i, r, iter, cnt, verbosity;
+   int                     *indices;
    double                  *values;
    int                      flip_rand = FALSE;
-   /* x_* has only n original values. */
-   /* solution of an lp */
-   double                  *x_lp = (double *) calloc(n,DSIZE);
-   /* rounding of an lp sol */
-   double                  *x_ip = (double *) malloc(n*DSIZE);
-   double                  *x_temp = (double *) malloc(n*DSIZE);
    double                   fp_time, real_obj_value, target_ub;
    FPvars                 **vars;
-   int                      min_verbosity = 5;
    double                   gap           = model->getInfinity();
    double                   obj_lb        = lp_data->objval;
    double                   total_time    = 0;
+   const double            *mip_obj       = model->getObjCoefficients();
+   char                     is_feasible   = FALSE;
+   double                  *x_ip,*x_lp;
 
    fp_time                                = used_time(&total_time);
    /* total_time and fp_time both now have total time used by symphony's lp
     * process */
-
    fp_time                                = used_time(&total_time);
    /* fp_time should now be zero and total_time be still the same */
 
-
    *found_better_solution = FALSE;
+   verbosity = fp_data->verbosity     = p->par.verbosity;
+   fp_data->mip_obj       = (double *)malloc(n*DSIZE);
+   fp_data->flip_fraction = p->par.fp_flip_fraction;
+   memcpy(fp_data->mip_obj,mip_obj,n*DSIZE);
 
    /* initialize the lp solver. load the current basis */
-   fp_initialize_lp_solver(lp_data, new_lp_data, fp_data);
-   indexList = (int *) malloc(new_lp_data->n*ISIZE);
-   for (i=0;i<n;i++) {
-      x_lp[i]=lp_data->x[i];
-      /* initialize the indexList */
-      indexList[i]=i;
-   }
-   for (i=n;i<new_lp_data->n;i++) {
-      indexList[i]=i;
-   }
+   fp_initialize_lp_solver(p, new_lp_data, fp_data);
+   x_ip = fp_data->x_ip;
+   x_lp = fp_data->x_lp;
 
    /* round the x_lp and store as x_ip, it will usually become infeasible */
    vars = fp_data->fp_vars;
-   fp_round(x_lp,x_ip,vars,n);
 
    /* do the following MaxIter times */
    fp_time += used_time(&total_time);
    for (iter=0; iter<MaxIter && fp_time<p->par.fp_time_limit; iter++) {
-      PRINT(verbosity,min_verbosity,("fp: iteration %d\n",iter));
-      if (fp_is_feasible(new_lp_data, x_ip, matrix, lp_r_low, lp_r_up,
-               fp_data)) { 
+      PRINT(verbosity,5,("fp: iteration %d\n",iter));
+      is_feasible = FALSE;
+      /* solve an lp */
+      fp_round(fp_data, new_lp_data);
+      fp_is_feasible (lp_data, matrix, lp_r_low, lp_r_up, fp_data, &is_feasible);
+
+      if (is_feasible == TRUE) {
          /* we found what we wanted */
          memcpy(betterSolution, x_ip, n*DSIZE);
 
          solution_value = 0;
          for (i=0;i<n;i++) {
-            solution_value = solution_value+
-               betterSolution[i]*mip_obj[i];
+            solution_value = solution_value + betterSolution[i]*mip_obj[i];
          }
          indices = p->lp_data->tmp.i1;          /* n */
          values  = p->lp_data->tmp.d;           /* n */
          cnt     = collect_nonzeros(p, betterSolution, indices, values);
          gap     = (solution_value - obj_lb)/(fabs(solution_value)+0.001)*100;
          p->lp_stat.fp_num_sols++;
-         PRINT(verbosity,min_verbosity,("fp: found solution with value = %f\n",
+         PRINT(verbosity,5,("fp: found solution with value = %f\n",
                   solution_value));
-         PRINT(verbosity,min_verbosity,("fp: gap = %f\n", gap));
+         PRINT(verbosity,5,("fp: gap = %f\n", gap));
          sp_add_solution(p,cnt,indices,values,solution_value,p->bc_index);
          if (gap <= p->par.fp_min_gap) {
             *found_better_solution = TRUE;
@@ -142,37 +132,16 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
          }
       } 
 
-      /* solve an lp */
-      if (fp_solve_lp(x_lp,x_ip,flip_rand,p->par.fp_flip_fraction,
-               new_lp_data,indexList, fp_data) != FUNCTION_TERMINATED_NORMALLY
-         ) {
+      if (fp_solve_lp(new_lp_data, fp_data, &is_feasible) != 
+            FUNCTION_TERMINATED_NORMALLY) {
          break;
       }
-      
-      memcpy(x_temp,x_ip,n*DSIZE);
-      fp_round(x_lp,x_ip,vars,n);
-      flip_rand = TRUE;
-      //      printf("DIFFS: \n\n");
-      for (i=0;i<n;i++) {
-         //printf ("%d\t%f\t%f\t",i,x_temp[i],x_ip[i]);
-         if (vars[i]->isInt && x_temp[i]!=x_ip[i]) {
-            flip_rand = FALSE;
-            //printf("different\n");
-         } else if (vars[i]->isInt) {
-            //printf("same\n");
-         } else {
-            //printf("\n");
-         }
-      }
+
+      fp_data->iter++;
       fp_time += used_time(&total_time);
    }
    close_lp_solver(new_lp_data);
    /* free all the allocated memory */
-   FREE(x_lp);
-   FREE(x_ip);
-   FREE(x_temp);
-   FREE(indexList);
-   FREE(x_temp);
    FREE(new_lp_data->x);
    FREE(new_lp_data->lb);
    FREE(new_lp_data->ub);
@@ -181,11 +150,29 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    FREE(new_lp_data->dj);
    FREE(new_lp_data->slacks);
    FREE(new_lp_data->tmp.c);
+   FREE(new_lp_data->tmp.d);
+   FREE(new_lp_data->tmp.i1);
    FREE(new_lp_data);
    for (i=0;i<n;i++) {
       FREE(fp_data->fp_vars[i]);
    }
+   for (i=0;i<fp_data->iter;i++) {
+      FREE(fp_data->x_bar_val[i]);
+      FREE(fp_data->x_bar_ind[i]);
+   }
+   FREE(fp_data->x_bar_val);
+   FREE(fp_data->x_bar_ind);
+   FREE(fp_data->x_bar_len);
    FREE(fp_data->fp_vars);
+   FREE(fp_data->obj);
+   FREE(fp_data->mip_obj);
+   FREE(fp_data->x_lp);
+   FREE(fp_data->x_ip);
+   FREE(fp_data->index_list);
+   FREE(fp_data->x_bar_len);
+   FREE(fp_data->x_bar_val);
+   FREE(fp_data->x_bar_ind);
+   FREE(fp_data->alpha_p);
    FREE(fp_data);
 
    /* update stats */
@@ -203,33 +190,32 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
                real_obj_value,total_time));
    }
 
-   PRINT(verbosity,min_verbosity,("Leaving Feasibility Pump.\n"));
+   PRINT(verbosity,5,("Leaving Feasibility Pump.\n"));
     //exit(0);
    return termcode;
 }
 
 
 /*===========================================================================*/
-int fp_round (double *x_lp, double *x_ip, FPvars **vars, const int n)
+int fp_round (FPdata *fp_data, LPdata *lp_data)
 {
-   int i;
+   int      i;
+   int      n    = fp_data->n;
+   FPvars **vars = fp_data->fp_vars;
+   double  *x_ip = fp_data->x_ip;
+   double  *x_lp = fp_data->x_lp;
+
    /* rounds x_lp and returns value as x_ip */
-   for (i=0;i<n;i++) {
-      if (vars[i]->isInt) {
-         /* round x_lp[i] and put into x_ip[i] */
-         x_ip[i]=rint(x_lp[i]);
-      }
-      else {
-         x_ip[i]=x_lp[i];
-      }
-   }
+   /* add x_ip to list of solutions */
+   fp_add_rounded_point(fp_data, lp_data);
    return 0;
 }
 
 /*===========================================================================*/
-int fp_is_feasible (LPdata *lp_data, double *x, const CoinPackedMatrix *matrix, const double *r_low, const double *r_up, FPdata *fp_data )
+int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const double *r_low, const double *r_up, FPdata *fp_data, char *is_feasible )
 {
    /* check if x is a integer feasible solution to problem in p */
+   int termcode = FUNCTION_TERMINATED_NORMALLY;
    double lpetol = lp_data->lpetol;
    int n = fp_data->n0;
    int m = fp_data->m0;
@@ -240,14 +226,16 @@ int fp_is_feasible (LPdata *lp_data, double *x, const CoinPackedMatrix *matrix, 
    const int *r_matlen = matrix->getVectorLengths();
    const int *r_matind = matrix->getIndices();
    const double *r_matval = matrix->getElements();
+   double *x = fp_data->x_ip;
 
+   *is_feasible = TRUE;
    for (i=0;i<n;i++) {
       if (vars[i]->isInt) {
          if (x[i]-floor(x[i])>lpetol && ceil(x[i])-x[i]>lpetol) {
             /* some int variable is non-integral */
             /* is not possible, since this function is called after rounding */
             printf("Bok!\n");
-            return FALSE;
+            return termcode;
          }
       }
    }
@@ -264,15 +252,16 @@ int fp_is_feasible (LPdata *lp_data, double *x, const CoinPackedMatrix *matrix, 
       if (Ractivity>r_up[i]+lpetol || Ractivity<r_low[i]-lpetol) {
          /* constraint infeasibility is possible since we call this func. after
             rounding */
-         return FALSE;
+         *is_feasible = FALSE;
+         break;
       }
    }
 
-   return TRUE;
+   return termcode;
 }
 
 /*===========================================================================*/
-int fp_initialize_lp_solver(LPdata *lp_data, LPdata *new_data, FPdata *fp_data)
+int fp_initialize_lp_solver(lp_prob *p, LPdata *new_data, FPdata *fp_data)
 {
    /*
       create a copy of lp_data into new_data
@@ -281,6 +270,7 @@ int fp_initialize_lp_solver(LPdata *lp_data, LPdata *new_data, FPdata *fp_data)
       */
 
    /* first create an exact copy of lp_data */
+   LPdata *lp_data  = p->lp_data;
    new_data->lpetol = lp_data->lpetol;
    int n = lp_data->n;
    int m = lp_data->m;
@@ -303,22 +293,41 @@ int fp_initialize_lp_solver(LPdata *lp_data, LPdata *new_data, FPdata *fp_data)
    double *x = lp_data->x;
    double *lp_lb;
    double *lp_ub;
-   
+   double norm_c = 0;
+   double *mip_obj = fp_data->mip_obj;
+   int verbosity = fp_data->verbosity;
+   int *index_list;
+
    /* used because we can not call si directly */
    copy_lp_data(lp_data,new_data);
    lp_lb = new_data->lb;
    lp_ub = new_data->ub;
 
    /* set up fp_data */
-   fp_data->n0 = n;
-   fp_data->m0 = m;
+   fp_data->alpha         = 0.8;
+   fp_data->alpha_decr    = 0.7;
+   fp_data->n0            = n;
+   fp_data->m0            = m;
+   fp_data->iter          = 0;
 
    /* count how many binary variables */
-   fp_data->fp_vars = (FPvars **) malloc(sizeof(FPvars *)*n);
-   FPvars **fp_vars = fp_data->fp_vars;
+   fp_data->fp_vars       = (FPvars **) malloc(sizeof(FPvars *)*n);
+   fp_data->x_ip          = (double *) calloc(n,DSIZE);
+   fp_data->x_lp          = (double *) calloc(n,DSIZE);
+   fp_data->index_list    = (int *)    calloc(n,DSIZE);
+   fp_data->x_bar_ind     = (int **)   calloc(p->par.fp_max_cycles,
+                                              sizeof(int*));
+   fp_data->x_bar_val     = (double **)calloc(p->par.fp_max_cycles,
+                                              sizeof(double*));
+   fp_data->x_bar_len     = (int *)    calloc(p->par.fp_max_cycles,ISIZE);
+   fp_data->alpha_p       = (double *) malloc(p->par.fp_max_cycles*DSIZE);
+   FPvars **fp_vars       = fp_data->fp_vars;
    fp_data->numNonBinInts = 0;
-   fp_data->numInts = 0;
+   fp_data->numInts       = 0;
+   
+   index_list = fp_data->index_list;
    for (i=0;i<n;i++) {
+      index_list[i]=i;
       fp_vars[i] = (FPvars *)malloc(sizeof(FPvars));
       if (lp_data->vars[i]->is_int) {
          fp_data->numInts++;
@@ -333,11 +342,24 @@ int fp_initialize_lp_solver(LPdata *lp_data, LPdata *new_data, FPdata *fp_data)
       } else {
          fp_vars[i]->isInt = fp_vars[i]->isBin = FALSE;
       }
+      /* calculate ||C|| */
+      norm_c += mip_obj[i]*mip_obj[i];
    }
+   
+   norm_c = sqrt(norm_c);
+   PRINT(verbosity, 20, ("fp: norm_c = %f\n",norm_c));
 
-   newn = n+2*fp_data->numNonBinInts;
-   newm = m+fp_data->numNonBinInts;
+   fp_data->n       = n+2*fp_data->numNonBinInts;
+   fp_data->m       = m;
+   fp_data->obj     = (double *)malloc(n*DSIZE);
 
+   if (norm_c>lpetol) {
+      for (i=0;i<n;i++) {
+         mip_obj[i] = mip_obj[i]/norm_c;
+      }
+   }
+   
+   /* load basis */
    rstat = (int *) malloc(m * ISIZE);
    cstat = (int *) malloc(n * ISIZE);
 
@@ -346,6 +368,8 @@ int fp_initialize_lp_solver(LPdata *lp_data, LPdata *new_data, FPdata *fp_data)
 
    FREE(rstat);
    FREE(cstat);
+
+#if 0
 
    /* add 2 columns for each nonBinary Integer */
    rmatbeg[0] = 0;
@@ -396,8 +420,11 @@ int fp_initialize_lp_solver(LPdata *lp_data, LPdata *new_data, FPdata *fp_data)
          add_rows(new_data, 1, 3, &rhs, &sense, rmatbeg, rmatind, rmatval);
       }
    }
-
+#endif
+   /* used by change_rhs */
    new_data->tmp.c = (char *)malloc(2*CSIZE);
+   new_data->tmp.d = (double *)malloc(DSIZE*n);
+   new_data->tmp.i1 = (int *)malloc(ISIZE*n);
 
    FREE(rmatval);
    FREE(rmatind);
@@ -408,38 +435,39 @@ int fp_initialize_lp_solver(LPdata *lp_data, LPdata *new_data, FPdata *fp_data)
 }
 
 /*===========================================================================*/
-int fp_solve_lp(double *x_lp, double *x_ip, int flip_rand, double flip_fraction, LPdata *lp_data, int* indexList, FPdata *fp_data) 
+int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible) 
 {
    /* construct an lp based on x_ip. solve it. store the result in x_lp */
-
-   /* construct new objcoeff */
-   //TODO: remove this
-   double *coeffList= (double *) calloc(lp_data->n,DSIZE);
-   int n = lp_data->n;
+   double *objcoeff= fp_data->obj;
+   int n = fp_data->n;
    int iterd;
    int termstatus;
    int i;
    double delta_x;
+   double norm = 0;
+   FPvars **fp_vars = fp_data->fp_vars;
+   double *mip_obj  = fp_data->mip_obj;
+   int verbosity = fp_data->verbosity;
+   double flip_fraction = fp_data->flip_fraction;
+   char flip_rand = FALSE;
+   int  *index_list = fp_data->index_list;
+   double *x_ip = fp_data->x_ip;
+   double *x_lp = fp_data->x_lp;
+   double alpha = fp_data->alpha;
 
-   /* TODO: make this more efficient */
-
-   /*
-   if (flip_rand) {
-      PRINT(5,0,("flipping\n"));
-   }
-   */
-
+   is_feasible = FALSE;
+   memset ((char *)(objcoeff),0,DSIZE*n);
    for (i=0;i<fp_data->n0;i++) {
-      if (fp_data->fp_vars[i]->isInt) {
-         if (fp_data->fp_vars[i]->isBin) {
+      if (fp_vars[i]->isInt) {
+         if (fp_vars[i]->isBin) {
             if (flip_rand && CoinDrand48()<flip_fraction) {
                x_ip[i]=1-x_ip[i];
             }
             if (x_ip[i]==0) {
-               coeffList[i] = 1.0;
+               objcoeff[i] = 1.0;
             }
             else if (x_ip[i]==1) {
-               coeffList[i] = -1.0;
+               objcoeff[i] = -1.0;
             }
          }
          else {
@@ -458,26 +486,33 @@ int fp_solve_lp(double *x_lp, double *x_ip, int flip_rand, double flip_fraction,
                }
             }
             if (x_ip[i]!=lp_data->ub[i]) {
-               coeffList[fp_data->fp_vars[i]->xplus] = 1;
+               objcoeff[fp_vars[i]->xplus] = 1;
             }
             if (x_ip[i]!=lp_data->lb[i]) {
-               coeffList[fp_data->fp_vars[i]->xminus] = 1;
+               objcoeff[fp_vars[i]->xminus] = 1;
             }
          }
       }
+      /* calculate ||coeff||, norm is not zero because otherwise x_ip is
+       * feasible */
+      norm += objcoeff[i]*objcoeff[i];
    }
 
-   change_objcoeff(lp_data, indexList, &indexList[n-1], coeffList);
+   norm = sqrt(norm);
+   //norm = 0;
+   PRINT(verbosity, 15, ("fp: norm = %f\n",norm));
+   for (i=0;i<fp_data->n0;i++) {
+      objcoeff[i] = (1-alpha)*objcoeff[i]+alpha*mip_obj[i]*norm;
+   }
+   alpha = alpha*fp_data->alpha_decr;
+
+   change_objcoeff(lp_data, index_list, &index_list[n-1], objcoeff);
    termstatus = dual_simplex(lp_data, &iterd);
    if (termstatus != LP_OPTIMAL) {
-      printf("Feasibility Pump: Unable to solve LP. Pump malfunction.\n");
-      FREE(coeffList);
+      PRINT(verbosity,0,("Feasibility Pump: Unable to solve LP. Pump malfunction.\n"));
       return FUNCTION_TERMINATED_ABNORMALLY;
    }
 
-   //TODO: remove this
-   FREE(lp_data->x);
-   lp_data->x = (double *) malloc(lp_data->n*DSIZE);
    get_x(lp_data);
 
    delta_x = 0;
@@ -487,9 +522,7 @@ int fp_solve_lp(double *x_lp, double *x_ip, int flip_rand, double flip_fraction,
          delta_x = delta_x+fabs(x_lp[i]-x_ip[i]);
       }
    }
-   //PRINT(5,1,("delta_x = %f\n",delta_x));
-
-   FREE(coeffList);
+   PRINT(verbosity, 15, ("fp: delta_x = %f\n",delta_x));
 
    return 0;
 }
@@ -619,4 +652,100 @@ int fp_should_call_fp(lp_prob *p, int branching)
 }
 
 /*===========================================================================*/
+int fp_add_rounded_point(FPdata *fp_data, LPdata *lp_data)
+{
+   int termcode = FUNCTION_TERMINATED_NORMALLY;
+   double *x_ip = fp_data->x_ip;
+   double *x_lp = fp_data->x_lp;
+   int i,j, has_changed;
+   int n = fp_data->n;
+   double lpetol = lp_data->lpetol;
+   int *tind = lp_data->tmp.i1; /* n */
+   double *tx = lp_data->tmp.d; /* n */
+   int cnt = 0;
+   int *index = fp_data->index_list;
+   double **x_bar_val = fp_data->x_bar_val;
+   int **x_bar_ind = fp_data->x_bar_ind;
+   int *x_bar_len = fp_data->x_bar_len;
+   double flip_fraction = fp_data->flip_fraction;
+   FPvars **vars = fp_data->fp_vars;
+
+   for (i=0;i<n;i++) {
+      if (vars[i]->isInt) {
+         /* round x_lp[i] and put into x_ip[i] */
+         x_ip[i]=floor(x_lp[i]+0.5);
+      }
+      else {
+         x_ip[i]=x_lp[i];
+      }
+   }
+
+   // TODO: make it work for '0'
+   //       remove randomness
+   while (1) {
+      cnt = 0;
+      for (i = 0; i < n; i++){
+         if (x_ip[i] > lpetol || x_ip[i] < -lpetol){
+            tind[cnt] = index[i];
+            tx[cnt++] = x_ip[i];
+         }
+      }
+      /* order indices and values according to indices */
+      qsort_id(tind, tx, cnt);
+
+      /* go through all 'iter' points and check if x_ip already exists */
+      for (i=0; i<fp_data->iter; i++) {
+         if (fp_data->x_bar_len[i] == cnt && fp_data->alpha_p[i] < 0.08) {
+            for (j=0; j<cnt; j++) {
+               if (tind[j]!=x_bar_ind[i][j] || fabs(tx[j]-x_bar_val[i][j])>lpetol) {
+                  break;
+               }
+            }
+            if (j==cnt) {
+               PRINT(fp_data->verbosity,15,("fp: same as %d\n",i));
+               break; //its same
+            }
+         }
+      }
+      if (i<fp_data->iter) {
+         /* flip some vars in x_ip */
+         int num_flipped = 0;
+         has_changed = FALSE;
+         PRINT(fp_data->verbosity,15,("fp: flipping\n"));
+         for (j=0; j<n; j++) {
+            if (CoinDrand48()<flip_fraction && vars[j]->isBin) {
+               x_ip[j] = 1-x_ip[j];
+               num_flipped++;
+            }
+         }
+         PRINT(fp_data->verbosity,15,("fp: flipping %d\n", num_flipped));
+      } else {
+         break;
+      }
+   }
+
+   fp_data->x_bar_ind[fp_data->iter] = (int *)malloc(ISIZE*cnt);
+   fp_data->x_bar_val[fp_data->iter] = (double *)malloc(DSIZE*cnt);
+   fp_data->x_bar_len[fp_data->iter] = cnt;
+   memcpy(fp_data->x_bar_ind[fp_data->iter],tind,ISIZE*cnt);
+   memcpy(fp_data->x_bar_val[fp_data->iter],tx,DSIZE*cnt);
+   fp_data->alpha = fp_data->alpha*fp_data->alpha_decr;
+   if (fp_data->alpha<0.08) {
+      fp_data->alpha = 0;
+   }
+   fp_data->alpha_p[fp_data->iter] = fp_data->alpha;
+   return (termcode);
+}
+
 /*===========================================================================*/
+int fp_should_change_int_point(FPdata *fp_data)
+{
+   int termcode = FUNCTION_TERMINATED_NORMALLY;
+   int i;
+
+
+   return termcode;
+}
+/*===========================================================================*/
+/*===========================================================================*/
+

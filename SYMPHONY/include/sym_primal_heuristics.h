@@ -32,11 +32,28 @@ typedef struct FP_VARS {
 }FPvars;
 
 typedef struct FP_DATA {
-   FPvars        **fp_vars;	/* an array of fp_vars */
-   int           n0;		/* no. of vars in orignial lp */
+   FPvars      **fp_vars;       /* an array of fp_vars */
+   int           n0;            /* no. of vars in orignial lp */
    int           m0;
+   int           n;             /* no. of vars in pumping lp */
+   int           m;             /* no. of constraints in pumping lp */
+   int           iter;
    int           numNonBinInts;
    int           numInts;
+   int          *index_list;
+   int         **x_bar_ind;     /* array containing previous x_bars */
+   double      **x_bar_val;     /* array containing previous x_bars */
+   int          *x_bar_len;     /* rounded x_lp */
+   double       *alpha_p;       /* previous alphas */
+   double       *x_lp;          /* solution of pumpling lp */
+   double       *x_ip;          /* rounded x_lp */
+   double       *mip_obj;       /* normalized original obj */
+   double       *obj;           /* obj function for pumping lp */
+   double        norm_c;        /* norm of mip_obj */
+   double        alpha;
+   double        alpha_decr;
+   int           verbosity;
+   double        flip_fraction;
 }FPdata;
 
 /*  solution pool */
@@ -48,11 +65,12 @@ int sp_free_sp(sp_desc *sp);
 
 /* feasibility pump */
 int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_value, double *betterSolution);
-int fp_round (double *x_lp, double *x_ip, FPvars **vars, const int n);
-int fp_is_feasible (LPdata *lp_data, double *x, const CoinPackedMatrix *matrix,  const double *r_low, const double *r_up, FPdata *fp_data );
-int fp_initialize_lp_solver(LPdata *lp_data, LPdata *new_lp_data, FPdata *fp_data);
-int fp_solve_lp(double *x_lp, double *x_ip, int flip_rand, double T, LPdata *lp_data, int* indexList, FPdata *fp_data) ;
+int fp_round (FPdata *fp_data, LPdata *lp_data);
+int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const double *r_low, const double *r_up, FPdata *fp_data, char *is_feasible );
+int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data);
+int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char *is_feasible) ;
 int fp_get_mip_desc(LPdata *lp_data, LPdata *newdata);
 int fp_should_call_fp(lp_prob *p, int branching);
 int fp_add_obj_row(LPdata *new_lp_data, int n, const double *obj, double rhs);
+int fp_add_rounded_point(FPdata *fp_data, LPdata *lp_data);
 #endif
