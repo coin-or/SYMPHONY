@@ -77,7 +77,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    /* fp_time should now be zero and total_time be still the same */
 
    *found_better_solution = FALSE;
-   verbosity = fp_data->verbosity     = p->par.verbosity;
+   verbosity = fp_data->verbosity     = 111; //p->par.verbosity;
    fp_data->mip_obj       = (double *)malloc(n*DSIZE);
    fp_data->flip_fraction = p->par.fp_flip_fraction;
    memcpy(fp_data->mip_obj,mip_obj,n*DSIZE);
@@ -324,6 +324,9 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_data, FPdata *fp_data)
    FPvars **fp_vars       = fp_data->fp_vars;
    fp_data->numNonBinInts = 0;
    fp_data->numInts       = 0;
+
+   // TODO: make this work when new cols are added
+   memcpy(fp_data->x_lp,p->lp_data->x,DSIZE*n);
    
    index_list = fp_data->index_list;
    for (i=0;i<n;i++) {
