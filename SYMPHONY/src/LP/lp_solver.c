@@ -2980,7 +2980,6 @@ int copy_lp_data(LPdata *lp_data, LPdata *new_data)
 
    lb = (double *)malloc(n*DSIZE);
    ub = (double *)malloc(n*DSIZE);
-   new_data->x = (double *) malloc(n*DSIZE);
 
    open_lp_solver(new_data);
    new_data->si->loadProblem(*(lp_data->si->getMatrixByRow()),

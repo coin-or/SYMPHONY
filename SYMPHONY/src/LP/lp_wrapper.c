@@ -581,6 +581,7 @@ int is_feasible_u(lp_prob *p, char branching)
    int cnt, i, termcode;
    var_desc **vars = lp_data->vars;
    char found_better_solution;
+   int should_call_fp = FALSE;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
@@ -644,16 +645,18 @@ int is_feasible_u(lp_prob *p, char branching)
       break;
    }
 
-   if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE && 
-         fp_should_call_fp(p,branching)) {
-      termcode    = feasibility_pump (p, &found_better_solution, new_obj_val, 
-            heur_solution);
-      if (termcode!=FUNCTION_TERMINATED_NORMALLY) {
-         PRINT(p->par.verbosity,0,("warning: feasibility pump faced some "
-                  "difficulties.\n"));
-      } else if (found_better_solution) {
-         feasible    = IP_HEUR_FEASIBLE;
-         true_objval = new_obj_val;
+   if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
+      fp_should_call_fp(p,branching,&should_call_fp); 
+      if (should_call_fp==TRUE) {
+         termcode    = feasibility_pump (p, &found_better_solution, new_obj_val, 
+               heur_solution);
+         if (termcode!=FUNCTION_TERMINATED_NORMALLY) {
+            PRINT(p->par.verbosity,0,("warning: feasibility pump faced some "
+                     "difficulties.\n"));
+         } else if (found_better_solution) {
+            feasible    = IP_HEUR_FEASIBLE;
+            true_objval = new_obj_val;
+         }
       }
    }
 

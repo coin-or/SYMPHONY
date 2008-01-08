@@ -25,8 +25,8 @@
 
 /* feasibility pump */
 typedef struct FP_VARS {
-   char          isBin;
-   char          isInt;
+   char          is_bin;
+   char          is_int;
    int           xplus;
    int           xminus;
 }FPvars;
@@ -69,8 +69,6 @@ int fp_round (FPdata *fp_data, LPdata *lp_data);
 int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const double *r_low, const double *r_up, FPdata *fp_data, char *is_feasible );
 int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data);
 int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char *is_feasible) ;
-int fp_get_mip_desc(LPdata *lp_data, LPdata *newdata);
-int fp_should_call_fp(lp_prob *p, int branching);
+int fp_should_call_fp(lp_prob *p, int branching, int *should_call);
 int fp_add_obj_row(LPdata *new_lp_data, int n, const double *obj, double rhs);
-int fp_add_rounded_point(FPdata *fp_data, LPdata *lp_data);
 #endif

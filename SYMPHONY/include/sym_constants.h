@@ -530,4 +530,9 @@
 #define ALL_POS_VEC              1
 #define ALL_NEG_VEC              2
 
+/*--------------- parameter values for primal heuristics --------------------*/
+#define SYM_FEAS_PUMP_DEFAULT    1       /* use fp using the default rules   */
+#define SYM_FEAS_PUMP_REPEATED   2       /* use fp till the end of solve     */
+#define SYM_FEAS_PUMP_TILL_SOL   3       /* use fp till a solution is found  */
+
 #endif

@@ -519,6 +519,7 @@ typedef struct SP_DESC{
    int            max_solutions; 
    /* no. of solutions in the pool */
    int            num_solutions;
+   int            total_num_sols_found;
    /* array of those solutions */
    sp_solution    **solutions;
 }sp_desc;

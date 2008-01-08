@@ -48,6 +48,7 @@ int sp_add_solution (lp_prob *p, int cnt, int *indices, double *values,
    memcpy(sol->xval,values,DSIZE*cnt);
    sol->node_index = bc_index;
    sp->num_solutions++;
+   sp->total_num_sols_found++;
    PRINT(p->par.verbosity,-1,("sp: solution pool size = %d \n", 
             sp->num_solutions));
    return 0;
@@ -94,6 +95,7 @@ int sp_initialize(tm_prob *tm)
    sp_desc *sp = tm->sp;
    sp->max_solutions = 10;
    sp->num_solutions = 0;
+   sp->total_num_sols_found = 0;
    sp->solutions = (sp_solution **) malloc(sp->max_solutions*sizeof(sp_solution*));
    for (i=0;i<sp->max_solutions;i++) {
       sp->solutions[i] = (sp_solution *) malloc(sizeof(sp_solution));
@@ -109,6 +111,9 @@ int sp_initialize(tm_prob *tm)
 int sp_free_sp(sp_desc *sp)
 {
    int i;
+
+   //TODO: move this to master_io()
+   printf("Total number of solutions found = %d\n",sp->total_num_sols_found);
    for (i=sp->num_solutions-1; i>=0; i--) {
       sp_delete_solution(sp,i);
    }
