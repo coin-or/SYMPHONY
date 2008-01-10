@@ -172,7 +172,7 @@ int create_subproblem_u(lp_prob *p)
    node_desc *desc = p->desc;
 
    LPdata *lp_data = p->lp_data;
-   int i, j, k, maxm, maxn, maxnz;
+   int i, j, k, maxm, maxn, maxnz, i2, j2;
    row_data *row, *rows;
 
    int bvarnum = p->base.varnum;
@@ -185,6 +185,11 @@ int create_subproblem_u(lp_prob *p)
    char *sense, *status;
    cut_data *cut;
    branch_desc *bobj;
+   rc_change_desc **rc_change = p->path_rc_changes;
+   int *rc_index;
+   double *rc_value;
+   char *rc_ub_lb;
+   int   rc_num_c;
 
    int new_row_num;
    waiting_row **new_rows;
@@ -524,6 +529,27 @@ int create_subproblem_u(lp_prob *p)
 	    cut->sense = bobj->sense;
 	    cut->branch |= CUT_BRANCHED_ON;
 	 }
+         /* changes in bounds due to reduced cost heuristics */
+         if (rc_change[i]) {
+            rc_index = rc_change[i]->index;
+            rc_value = rc_change[i]->value;
+            rc_ub_lb = rc_change[i]->ub_lb;
+            rc_num_c = rc_change[i]->num_changes;
+            for (i2=0;i2<rc_num_c;i2++) {
+	       bfind(bobj->name, d_uind, desc->uind.size) + bvarnum;
+               j2 = bfind(rc_index[i2],d_uind,desc->uind.size);
+               if (vars[j2]->userind != rc_index[i2]) {
+                  exit(0);
+               }
+               if (rc_ub_lb[i2]=='L' && rc_value[i2]>vars[j2]->lb) {
+                  change_lb(lp_data, j2, rc_value[i2]);
+                  vars[j2]->lb = rc_value[i2];
+               } else if (rc_ub_lb[i2]=='U' && rc_value[i2]<vars[j2]->ub) {
+                  change_ub(lp_data, j2, rc_value[i2]);
+                  vars[j2]->ub = rc_value[i2];
+               }
+            }
+         }
       }
    }
 

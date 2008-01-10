@@ -160,6 +160,19 @@ typedef struct BASIS_DESC{
    double_array_desc   extrarows;
 }basis_desc;
 
+typedef struct RC_CHANGE_DESC{
+   /*========================================================================*\
+    * changes due to reduced-cost based heuristics are stored here.
+    * Only the changes pertaining to this node are stored here. changes in
+    * parents are not stored with children.
+    * for now there will only be changes in bounds
+   \*========================================================================*/
+   int                 num_changes;
+   int                *index;
+   char               *ub_lb;
+   double             *value;
+}rc_change_desc;
+
 typedef struct NODE_DESC{
    /*========================================================================*\
     * The userindices of variables in this node (but not for the base
@@ -353,6 +366,7 @@ typedef struct BC_NODE{
 #ifdef TRACE_PATH
    char       optimal_path;
 #endif 
+   rc_change_desc *rc_change;
 }bc_node;
 
 /*===========================================================================*\

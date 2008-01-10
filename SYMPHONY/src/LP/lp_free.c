@@ -224,6 +224,14 @@ void free_node_dependent(lp_prob *p)
       free_cuts(p->slack_cuts, p->slack_cut_num);
       p->slack_cut_num = 0;
    }
+
+   if (p->rc_change) {
+      FREE(p->rc_change->index);
+      FREE(p->rc_change->ub_lb);
+      FREE(p->rc_change->value);
+      FREE(p->rc_change);
+      p->rc_change = NULL;
+   }
    unload_lp_prob(lp_data);
 }
 
@@ -264,6 +272,14 @@ void free_lp(lp_prob *p)
       FREE(p->slack_cuts);
    }
    FREE(p->obj_history);
+
+   if (p->rc_change) {
+      FREE(p->rc_change->index);
+      FREE(p->rc_change->ub_lb);
+      FREE(p->rc_change->value);
+      FREE(p->rc_change);
+   }
+   FREE(p->path_rc_changes);
    FREE(p);
 }
 

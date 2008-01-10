@@ -145,6 +145,9 @@ typedef struct LP_PROB{
    int         slack_cut_num;
    cut_data  **slack_cuts;
    int         slack_cuts_size;
+
+   rc_change_desc **path_rc_changes;
+   rc_change_desc *rc_change;
 }lp_prob;
 
 /*===========================================================================*/

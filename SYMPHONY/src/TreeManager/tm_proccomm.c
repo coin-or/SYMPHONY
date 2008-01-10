@@ -391,6 +391,11 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
 	 modify_list(&not_fixed, &path[i]->desc.not_fixed);
    }
 
+#ifdef COMPILE_IN_LP
+      FREE(lp[thread_num]->path_rc_changes);
+      lp[thread_num]->path_rc_changes = (rc_change_desc **)
+         calloc(level+1,sizeof(rc_change_desc *));
+#endif
    for (bpath = branch_path, i = 0; i < level; i++, bpath++){
       for (j = path[i]->bobj.child_num - 1; j >= 0; j--)
 	 if (path[i]->children[j] == path[i+1])
@@ -402,6 +407,10 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
       bpath->rhs = bobj->rhs[j];
       bpath->range = bobj->range[j];
       bpath->branch = bobj->branch[j];
+
+#ifdef COMPILE_IN_LP
+      lp[thread_num]->path_rc_changes[i] = path[i]->rc_change;
+#endif
    }
    
 #ifdef COMPILE_IN_LP

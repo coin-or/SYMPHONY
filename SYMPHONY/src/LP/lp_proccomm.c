@@ -507,6 +507,7 @@ void send_node_desc(lp_prob *p, char node_type)
    node_desc *lp_desc = p->desc;
    char repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
    char deal_with_nf;
+   int num_changes;
    
    LPdata *lp_data = p->lp_data;
 
@@ -688,6 +689,30 @@ void send_node_desc(lp_prob *p, char node_type)
       
       merge_descriptions(tm_desc, new_tm_desc);
       free_node_desc(&new_tm_desc);
+
+      /* asm4: copy bound changes because of rc-based heuristics from p to n */
+      if (p->rc_change) {
+         rc_change_desc *rc_change_n = (rc_change_desc *)
+            malloc(sizeof(rc_change_desc));
+         rc_change_desc *rc_change_p = p->rc_change;
+         num_changes = rc_change_p->num_changes;
+         rc_change_n->num_changes = num_changes;
+         rc_change_n->index = (int *)malloc(ISIZE*num_changes);
+         rc_change_n->ub_lb = (char *)malloc(CSIZE*num_changes);
+         rc_change_n->value = (double *)malloc(DSIZE*num_changes);
+         memcpy(rc_change_n->index, rc_change_p->index, ISIZE*num_changes);
+         memcpy(rc_change_n->ub_lb, rc_change_p->ub_lb, CSIZE*num_changes);
+         memcpy(rc_change_n->value, rc_change_p->value, DSIZE*num_changes);
+         FREE(rc_change_p->index);
+         FREE(rc_change_p->value);
+         FREE(rc_change_p->ub_lb);
+         FREE(rc_change_p);
+         p->rc_change = NULL;
+         n->rc_change = rc_change_n;
+      } else {
+         n->rc_change = NULL;
+      }
+
       
       if (p->par.verbosity > 10){
 	 printf("TM: node %4i: ", n->bc_index);

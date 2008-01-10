@@ -161,6 +161,7 @@ void tighten_bounds(lp_prob *p)
    char *lu;
    double *bd, *ub, *lb;
    int cnt = 0;
+   int old_num_changes;
 
    colind_sort_extra(p);
 
@@ -247,6 +248,22 @@ void tighten_bounds(lp_prob *p)
    }
    if (cnt > 0){
       change_bounds(lp_data, cnt, ind, lu, bd);
+      if (!p->rc_change) {
+         p->rc_change = (rc_change_desc *)calloc(1,sizeof(rc_change_desc));
+      } 
+      old_num_changes = p->rc_change->num_changes;
+      p->rc_change->index = (int *)realloc((char *)p->rc_change->index, 
+            ISIZE*(old_num_changes+cnt));
+      p->rc_change->ub_lb = (char *)realloc((char *)p->rc_change->ub_lb, 
+            CSIZE*(old_num_changes+cnt));
+      p->rc_change->value = (double *)realloc((char *)p->rc_change->value, 
+            DSIZE*(old_num_changes+cnt));
+      p->rc_change->num_changes += cnt;
+      memcpy(p->rc_change->ub_lb+old_num_changes, lu, CSIZE*cnt);
+      memcpy(p->rc_change->value+old_num_changes, bd, DSIZE*cnt);
+      for (i=0;i<cnt;i++) {
+         p->rc_change->index[i+old_num_changes] = vars[ind[i]]->userind;
+      }
    }
 
    /*========================================================================*\
