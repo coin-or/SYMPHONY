@@ -1,11 +1,40 @@
 // Copyright (C) 2000, International Business Machines
 // Corporation and others.  All Rights Reserved.
+
+/*
+		!!  MAINTAINERS  PLEASE  READ  !!
+
+The OSI unit test is gradually undergoing a conversion.
+
+The current approach is to use asserts in tests; the net effect is that the
+unit test chokes and dies as soon as something goes wrong. The new approach is
+to soldier on until it becomes pointless (i.e., something has gone wrong which
+makes further testing pointless). The general idea is to return the maximum
+amount of useful information with each run.
+
+If you work on this code, please keep these conventions in mind:
+
+  * Tests should be encapsulated in subroutines. If you have a moment, factor
+    something out of the main routine --- it'd be nice to get it down under
+    500 lines.
+
+  * All test routines should be defined in the file-local namespace.
+
+  * Test routines should return 0 if there are no issues, a positive count if
+    the test uncovered nonfatal problems, and a negative count if the test
+    uncovered fatal problems (in the sense that further testing is pointless).
+
+  -- lh, 08.01.07 --
+*/
+
+
+
 #if defined(_MSC_VER)
 // Turn off compiler warning about long names
 #  pragma warning(disable:4786)
 #endif
 
-//#include "OsiConfig.h"
+#include "OsiConfig.h"
 
 #ifdef NDEBUG
 #undef NDEBUG
@@ -15,6 +44,7 @@
 #include <cassert>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <cstdio>
 
@@ -38,8 +68,10 @@
 #ifdef COIN_HAS_DYLP
 #include "OsiDylpSolverInterface.hpp"
 #endif
+#if 0
 #ifdef COIN_HAS_GLPK
 #include "OsiGlpkSolverInterface.hpp"
+#endif
 #endif
 #ifdef COIN_HAS_XPR
 #include "OsiXprSolverInterface.hpp"
@@ -122,13 +154,12 @@ void testingMessage( const char * const msg )
 //#############################################################################
 
 // A helper function to compare the equivalence of two vectors
-static bool
-equivalentVectors(const OsiSolverInterface * si1,
-		  const OsiSolverInterface * si2,
-		  double tol,
-		  const double * v1,
-		  const double * v2,
-		  int size)
+bool equivalentVectors (const OsiSolverInterface * si1,
+			const OsiSolverInterface * si2,
+			double tol,
+			const double * v1,
+			const double * v2,
+			int size)
 {
   bool retVal = true;
   CoinRelFltEq eq(tol);
@@ -189,6 +220,17 @@ CoinPackedMatrix &BuildExmip1Mtx ()
 // Short tests contributed by Vivian DeSmedt. Thanks!
 //#############################################################################
 
+/*
+  DeSmedt Problem #1
+
+  Initially, max 3*x1 +   x2			x* = [  5 0 ]
+		 2*x1 +   x2 <= 10	   row_act = [ 10 5 ]
+		   x1 + 3*x2 <= 15
+
+  Test for solver status, expected solution, row activity. Then change
+  objective to [1 1], resolve, check again for solver status, expected
+  solution [3 4] and expected row activity [10 15].
+*/
 bool test1VivianDeSmedt(OsiSolverInterface *s)
 {
 	bool ret = true;
@@ -260,15 +302,6 @@ bool test1VivianDeSmedt(OsiSolverInterface *s)
 	s->setObjCoeff(1, 1);
 
 	s->resolve();
-	// Check that status of rows is atUpperBound
-	const CoinWarmStartBasis* basis =
-	  dynamic_cast <const CoinWarmStartBasis*>(s->getWarmStart()) ;
-	if (basis) {
-	  //assert (basis->getArtifStatus(0)==CoinWarmStartBasis::atUpperBound);
-	  if (basis->getArtifStatus(0)!=CoinWarmStartBasis::atUpperBound)
-	    printf("Testing issue - should tight L row give atUpper or atLower status\n");
-	  delete basis ;
-	} 
 
 	ret = ret && s->isProvenOptimal();
 	ret = ret && !s->isProvenPrimalInfeasible();
@@ -1216,7 +1249,7 @@ void testNames (const OsiSolverInterface *emptySi, std::string fn)
 */
   std::string solverName = "Unknown solver" ;
   boolResult = si->getStrParam(OsiSolverName,solverName) ;
-  if (boolResult = false)
+  if (boolResult == false)
   { failureMessage(solverName,"OsiSolverName parameter get.") ;
     allOK = false ; }
 /*
@@ -2051,27 +2084,59 @@ bool testHintParam(OsiSolverInterface * si, int k, bool sense,
 
 
 /*
-  Test whether the solver handles a constant in the objecitive function, and
-  whether the dual and primal objective limit methods return the right values.
-  The routine does NOT test whether they are capable of stopping the solver
-  at the limits, before optimality is reached.
+  Test functionality related to the objective function:
+    * Does the solver properly handle a constant offset?
+    * Does the solver properly handle primal and dual objective limits? This
+      routine only checks for the correct answers. It does not check whether
+      the solver stops early due to objective limits.
+    * Does the solver properly handle minimisation / maximisation via
+      setObjSense?
+
+  The return value is the number of failures recorded by the routine.
 */
 
-void testObjOffsetAndLimits (const OsiSolverInterface *emptySi,
-			     const std::string &mpsDir)
+int testObjFunctions (const OsiSolverInterface *emptySi,
+		       const std::string &mpsDir)
 
 { OsiSolverInterface *si = emptySi->clone() ;
-  CoinRelFltEq eq;
+  CoinRelFltEq eq ;
+  int errCnt = 0 ;
+  int i ;
+
+  std::cout
+    << "Testing functionality related to the objective." << std::endl ;
 
   std::string solverName = "Unknown solver" ;
   si->getStrParam(OsiSolverName,solverName) ;
-
+/*
+  Check for default objective sense. This should be minimisation.
+*/
+  double dfltSense = si->getObjSense() ;
+  if (dfltSense != 1.0)
+  { if (dfltSense == -1.0)
+    { std::cout
+	<< "Warning: solver's default objective sense is maximisation."
+	<< std::endl ; }
+    else
+    { std::cout
+	<< "Warning: solver's default objective sense is " << dfltSense
+	<< ", an indeterminate value." << std::endl ; }
+    failureMessage(solverName,
+      "Default objective sense is not minimisation.") ;
+    errCnt++ ; }
 /*
   Read in e226; chosen because it has an offset defined in the mps file.
+  We can't continue if we can't read the test problem.
 */
   std::string fn = mpsDir+"e226" ;
   int mpsRc = si->readMps(fn.c_str(),"mps") ;
-  assert(mpsRc == 0) ;
+  if (mpsRc != 0)
+  { std::cout
+      << "testObjFunctions: failed to read test problem e226." << std::endl ;
+    failureMessage(solverName, "read test problem e226") ;
+    errCnt++ ;
+    delete si ;
+    return (errCnt) ; }
 /*
   Solve and test for the correct objective value.
 */
@@ -2081,44 +2146,243 @@ void testObjOffsetAndLimits (const OsiSolverInterface *emptySi,
   double objOffset = +7.113 ;
   if (!eq(objValue,(objNoOffset+objOffset)))
   { std::cout
-      << "Solver returned obj = " << objValue
-      << ", expected " << objNoOffset+objOffset << "." << std::endl ;
+      << "testObjFunctions: Solver returned obj = " << objValue
+      << ", expected " << objNoOffset << "+" << objOffset
+      << " = " << objNoOffset+objOffset << "." << std::endl ;
     failureMessage(solverName,
-		   "getObjValue with constant in objective function") ; }
+		   "getObjValue with constant in objective function") ;
+    errCnt++ ; }
 /*
-  Test objective limit methods. There's no attempt to use either to stop the
-  solver early. All we're doing here is checking that the routines return the
-  correct value when the limits are exceeded. The primal limit represents an
-  acceptable level of `goodness'; to be true, we should be below it. The dual
-  limit represents an unacceptable level of `badness'; to be true, we should be
-  above it. Note that the limits specified below are contradictory.
+  Test objective limit methods. If no limit has been specified, they should
+  return false.
 */
   if (si->isPrimalObjectiveLimitReached())
   { failureMessage(solverName,
       "false positive, isPrimalObjectiveLimitReached, "
-      "default (no) limit") ; }
+      "default (no) limit") ;
+    errCnt++ ; }
 #if 0
   if (si->isDualObjectiveLimitReached())
   { failureMessage(solverName,
       "false positive, isDualObjectiveLimitReached, "
-      "default (no) limit") ; }
-  double primalObjLim = -5.0 ;
-  double dualObjLim = -15.0 ;
-  si->setDblParam(OsiPrimalObjectiveLimit,primalObjLim) ;
-  si->setDblParam(OsiDualObjectiveLimit,dualObjLim) ;
-  if (!si->isPrimalObjectiveLimitReached())
-  { std::cout
-      << "Objective " << objValue << ", primal limit " << primalObjLim
-      << "." << std::endl ;
-    failureMessage(solverName,
-      "false negative, isPrimalObjectiveLimitReached.") ; }
-  if (!si->isDualObjectiveLimitReached())
-  { std::cout
-      << "Objective " << objValue << ", dual limit " << dualObjLim
-      << "." << std::endl ;
-    failureMessage(solverName,
-      "false negative, isDualObjectiveLimitReached.") ; }
+      "default (no) limit") ;
+    errCnt++ ; }
 #endif
+/*
+  Test objective limit methods. There's no attempt to see if the solver stops
+  early when given a limit that's tighter than the optimal objective.  All
+  we're doing here is checking that the routines return the correct value
+  when the limits are exceeded. For minimisation (maximisation) the primal
+  limit represents an acceptable level of `goodness'; to be true, we should
+  be below (above) it. The dual limit represents an unacceptable level of
+  `badness'; to be true, we should be above (below) it.
+
+  The loop performs two iterations, first for maximisation, then for
+  minimisation. For maximisation, z* = 111.65096. The second iteration is
+  sort of redundant, but it does test the ability to switch back to
+  minimisation.
+*/
+  double expectedObj[2] = { 111.650960689, objNoOffset+objOffset } ;
+#if 0
+  double primalObjLim[2] = { 100.0, -5.0 } ;
+  double dualObjLim[2] = { 120.0, -15.0 } ;
+#endif
+  double optSense[2] = { -1.0, 1.0 } ;
+  std::string maxmin[2] = { "max", "min" } ;
+  for (i = 0 ; i <= 1 ; i++)
+  { si->setObjSense(optSense[i]) ;
+    si->initialSolve() ;
+    objValue = si->getObjValue() ;
+    if (!eq(objValue,expectedObj[i]))
+    { std::cout
+	<< maxmin[i] << "(e226) = " << objValue
+	<< ", expected " << expectedObj[i]
+	<< ", err = " << objValue-expectedObj[i] << "." << std::endl ;
+      failureMessage(solverName,
+	"incorrect objective during max/min switch") ;
+      errCnt++ ; }
+#if 0
+    si->setDblParam(OsiPrimalObjectiveLimit,primalObjLim[i]) ;
+    si->setDblParam(OsiDualObjectiveLimit,dualObjLim[i]) ;
+    if (!si->isPrimalObjectiveLimitReached())
+    { std::cout
+	<< maxmin[i] << "(e226) z* = " << objValue
+	<< ", primal limit " << primalObjLim[i]
+	<< "." << std::endl ;
+      failureMessage(solverName,
+	"false negative, isPrimalObjectiveLimitReached.") ;
+      errCnt++ ; }
+    if (!si->isDualObjectiveLimitReached())
+    { std::cout
+	<< maxmin[i] << "(e226) z* = " << objValue
+	<< ", dual limit " << dualObjLim[i]
+	<< "." << std::endl ;
+      failureMessage(solverName,
+	"false negative, isDualObjectiveLimitReached.") ;
+      errCnt++ ; }
+#endif 
+  }
+
+  delete si ;
+  si = 0 ;
+
+/*
+  Finally, check that the objective sense is treated as a parameter of the
+  solver, not a property of the problem. The test clones emptySi, inverts the
+  default objective sense, clones a second solver, then loads and optimises
+  e226.
+*/
+  si = emptySi->clone() ;
+  dfltSense = si->getObjSense() ;
+  dfltSense = -dfltSense ;
+  si->setObjSense(dfltSense) ;
+  OsiSolverInterface *si2 = si->clone() ;
+  delete si ;
+  si = 0 ;
+  if (si2->getObjSense() != dfltSense)
+  { std::cout
+      << "objective sense is not preserved by clone." << std::endl ;
+    failureMessage(solverName,"objective sense is not preserved by clone") ;
+    errCnt++ ; }
+  mpsRc = si2->readMps(fn.c_str(),"mps") ;
+  if (mpsRc != 0)
+  { std::cout
+      << "testObjFunctions: failed 2nd read test problem e226." << std::endl ;
+    failureMessage(solverName, "2nd read test problem e226") ;
+    errCnt++ ;
+    delete si2 ;
+    return (errCnt+1) ; }
+  if (si2->getObjSense() != dfltSense)
+  { std::cout
+      << "objective sense is not preserved by problem load." << std::endl ;
+    failureMessage(solverName,
+      "objective sense is not preserved by problem load") ;
+    errCnt++ ; }
+  si2->initialSolve() ;
+  if (dfltSense < 0)
+  { i = 0 ; }
+  else
+  { i = 1 ; }
+  objValue = si2->getObjValue() ;
+  if (!eq(objValue,expectedObj[i]))
+  { std::cout
+      << maxmin[i] << "(e226) = " << objValue
+      << ", expected " << expectedObj[i] << "." << std::endl ;
+    failureMessage(solverName,
+      "incorrect objective, load problem after set objective sense ") ;
+    errCnt++ ; }
+  
+  delete si2 ;
+
+  return (errCnt) ; }
+
+
+/*
+  Check that solver returns the proper status for artificial variables. The OSI
+  convention is that this status should be reported as if the artificial uses a
+  positive coefficient. Specifically:
+
+  ax <= b  ==>  ax + s = b,       0 <= s <= infty
+  ax >= b  ==>  ax + s = b,  -infty <= s <= 0
+
+  If the constraint is tight at optimum, then for a minimisation problem the
+  status should be atLowerBound for a <= constraint, atUpperBound for a >=
+  constraint. The test problem is
+
+  	    min -x1 + x2
+	    s.t. x1      <=  2	(c0)
+		      x2 >= 44	(c1)
+  
+  At optimum, z* = 42
+	      artifStatus[c0] = atLowerBound
+	      artifStatus[c1] = atUpperBound
+*/
+
+void testArtifStatus (const OsiSolverInterface *emptySi)
+
+{ OsiSolverInterface *si = emptySi->clone() ;
+  double infty = si->getInfinity() ;
+
+  testingMessage("Testing status for artificial variables.\n") ;
+/*
+  Set up the example problem in packed column-major vector format and load it
+  into the solver.
+*/
+  int colCnt = 2 ;
+  int rowCnt = 2 ;
+  int indices[] = {0, 1} ;
+  double coeffs[] = {1.0, 1.0} ;
+  CoinBigIndex starts[] = {0, 1, 2} ;
+  double obj[] = {-1.0, 1.0} ;
+
+  double vubs[2] ;
+  double vlbs[2] ;
+
+  vubs[0] = infty ;
+  vubs[1] = infty ;
+  vlbs[0] = -infty ;
+  vlbs[1] = -infty ;
+
+  double rubs[2] ;
+  double rlbs[2] ;
+
+  rubs[0] = 2.0 ;
+  rubs[1] = infty ;
+  rlbs[0] = -infty ;
+  rlbs[1] = 44 ;
+
+  si->loadProblem(colCnt,rowCnt,
+		  starts,indices,coeffs,vlbs,vubs,obj,rlbs,rubs) ;
+/*
+  Solve and ask for a warm start, then check the status of artificials.
+*/
+  si->initialSolve() ;
+  if (!si->isProvenOptimal())
+  { std::cout
+      << "Solver failed to find optimal solution." << std::endl ;
+    failureMessage(*si,"testArtifStatus: no optimal solution.") ;
+    return ; }
+
+  double z = si->getObjValue() ;
+  CoinRelFltEq eq ;
+  if (!eq(z,42.0))
+  { std::cout
+      << "Incorrect objective " << z << "; expected 42." << std::endl ;
+    failureMessage(*si,"testArtifStatus: incorrect optimal objective.") ;
+    return ; }
+
+  CoinWarmStart *ws = si->getWarmStart() ;
+  CoinWarmStartBasis *wsb = dynamic_cast<CoinWarmStartBasis *>(ws) ;
+
+  if (wsb == 0)
+  { std::cout << "No basis!" << std::endl ;
+    failureMessage(*si,"testArtifStatus: no basis.") ;
+    return ; }
+
+  CoinWarmStartBasis::Status stat0,stat1 ;
+/*
+  Finally, the point of the exercise. We should have stat0 = atLowerBound and
+  stat1 = atUpperBound.
+*/
+  stat0 = wsb->getArtifStatus(0) ;
+  stat1 = wsb->getArtifStatus(1) ;
+  if (stat0 != CoinWarmStartBasis::atLowerBound)
+  { std::cout
+      << "Incorrect status " << stat0 << " for tight <= constraint."
+      << " Expected " << CoinWarmStartBasis::atLowerBound << "." << std::endl ;
+    failureMessage(*si,
+	"testArtifStatus: incorrect status for tight <= constraint.") ; }
+
+  if (stat1 != CoinWarmStartBasis::atUpperBound)
+  { std::cout
+      << "Incorrect status " << stat1 << " for tight >= constraint."
+      << " Expected " << CoinWarmStartBasis::atUpperBound << "." << std::endl ;
+    failureMessage(*si,
+	"testArtifStatus: incorrect status for tight >= constraint.") ; }
+/*
+  Clean up.
+*/
+  delete wsb ;
   delete si ;
 
   return ; }
@@ -2136,7 +2400,7 @@ void testObjOffsetAndLimits (const OsiSolverInterface *emptySi,
 void testWriteMps (const OsiSolverInterface *emptySi, std::string fn)
 
 {
-  testingMessage("Testing writeMps and writeMpsNative.") ;
+  testingMessage("Testing writeMps and writeMpsNative.\n") ;
 
   CoinRelFltEq eq(1.0e-8) ;
 
@@ -2213,7 +2477,7 @@ void testWriteMps (const OsiSolverInterface *emptySi, std::string fn)
 void testWriteLp (const OsiSolverInterface *emptySi, std::string fn)
 
 {
-  testingMessage("Testing writeLp and writeLpNative.") ;
+  testingMessage("Testing writeLp and writeLpNative.\n") ;
 
   CoinRelFltEq eq(1.0e-8) ;
 
@@ -2289,7 +2553,7 @@ void testLoadAndAssignProblem (const OsiSolverInterface *emptySi,
   thorough, we should do another eight ...
 */
   {
-    testingMessage("Testing loadProblem and assignProblem methods.") ;
+    testingMessage("Testing loadProblem and assignProblem methods.\n") ;
     OsiSolverInterface * base = exmip1Si->clone();
     OsiSolverInterface *  si1 = emptySi->clone();
     OsiSolverInterface *  si2 = emptySi->clone();
@@ -2835,7 +3099,8 @@ void testAddToEmptySystem (const OsiSolverInterface *emptySi,
     {
       // Add empty columns
       for (i=0;i<3;i++)
-	si->addCol(CoinPackedVector(),0.0,10.0,objective[i]);
+      { const CoinPackedVector reqdBySunCC ;
+	si->addCol(reqdBySunCC,0.0,10.0,objective[i]) ; }
 
       // Add rows
       si->addRow(row1,2.0,100.0);
@@ -2873,7 +3138,8 @@ void testAddToEmptySystem (const OsiSolverInterface *emptySi,
     {
       // Add empty columns
       for (i=0;i<3;i++)
-	si->addCol(CoinPackedVector(),0.0,10.0,objective[i]);
+      { const CoinPackedVector reqdBySunCC ;
+	si->addCol(reqdBySunCC,0.0,10.0,objective[i]) ; }
       
       // Add rows
       si->addRows(2,starts,column,row12E,NULL,ub);
@@ -2916,7 +3182,8 @@ void testAddToEmptySystem (const OsiSolverInterface *emptySi,
     {
       // Add empty rows
       for (i=0;i<2;i++)
-	si->addRow(CoinPackedVector(),2.0,100.0);
+      { const CoinPackedVector reqdBySunCC ;
+	si->addRow(reqdBySunCC,2.0,100.0) ; }
 
       // Add columns
       if ( volSolverInterface ) {
@@ -2959,7 +3226,8 @@ void testAddToEmptySystem (const OsiSolverInterface *emptySi,
     {
       // Add empty rows
       for (i=0;i<2;i++)
-	si->addRow(CoinPackedVector(),2.0,100.0);
+      { const CoinPackedVector reqdBySunCC ;
+	si->addRow(reqdBySunCC,2.0,100.0) ; }
       
       // Add columns
       if ( volSolverInterface ) {
@@ -2985,6 +3253,128 @@ void testAddToEmptySystem (const OsiSolverInterface *emptySi,
   }
 }
 
+/*
+  OsiPresolve has the property that it will report the correct (untransformed)
+  objective for the presolved problem.
+
+  Test OsiPresolve by checking the objective that we get by optimising the
+  presolved problem. Then postsolve to get back to the original problem
+  statement and check that we have the same objective without further
+  iterations. The problems are a selection of problems from
+  Data/Sample. In particular, e226 is in the list by virtue of having a
+  constant offset (7.113) defined for the objective, and p0201 is in the list
+  because presolve (as of 071015) finds no reductions.
+
+  The objective for finnis (1.7279106559e+05) is not the same as the
+  objective used by Netlib (1.7279096547e+05), but solvers clp, dylp,
+  glpk, and cplex agree that it's correct.
+
+  This test could be made stronger, but more brittle, by checking for the
+  expected size of the constraint system after presolve.
+
+  Returns the number of errors encountered.
+*/
+int testOsiPresolve (const OsiSolverInterface *emptySi,
+		   const std::string &sampleDir)
+
+{ typedef std::pair<std::string,double> probPair ;
+  std::vector<probPair> sampleProbs ;
+
+  sampleProbs.push_back(probPair("brandy",1.5185098965e+03)) ;
+  sampleProbs.push_back(probPair("e226",(-18.751929066+7.113))) ;
+  sampleProbs.push_back(probPair("finnis",1.7279106559e+05)) ;
+  sampleProbs.push_back(probPair("p0201",6875)) ;
+
+  CoinRelFltEq eq(1.0e-8) ;
+
+  int errs = 0 ;
+
+  std::string solverName = "Unknown solver" ;
+  bool boolResult = emptySi->getStrParam(OsiSolverName,solverName) ;
+  if (boolResult == false)
+  { failureMessage(solverName,"OsiSolverName parameter get.") ;
+    errs++ ; }
+
+  std::cout << "Testing OsiPresolve ... " << std::endl ;
+
+  for (unsigned i = 0 ; i < sampleProbs.size() ; i++)
+  { OsiSolverInterface * si = emptySi->clone();
+
+    std::string mpsName = sampleProbs[i].first ;
+    double correctObj = sampleProbs[i].second ;
+
+    std::string fn = sampleDir+mpsName ;
+    int mpsErrs = si->readMps(fn.c_str(),"mps") ;
+    if (mpsErrs != 0)
+    { std::cout << "Could not read " << fn << "; skipping." << std::endl ;
+      delete si ;
+      errs++ ;
+      continue ; }
+/*
+  Set up for presolve. Allow very slight (1.0e-8) bound relaxation to retain
+  feasibility. Discard integrality information (false) and limit the number of
+  presolve passes to 5.
+*/
+    OsiSolverInterface *presolvedModel ;
+    OsiPresolve pinfo ;
+    presolvedModel = pinfo.presolvedModel(*si,1.0e-8,false,5) ;
+    if (presolvedModel == 0)
+    { std::cout
+	<< "No presolved model produced for " << mpsName
+	<< "; skipping." << std::endl ;
+      delete si ;
+      errs++ ;
+      continue ; }
+/*
+  Optimise the presolved model and check the objective.  We need to turn off
+  any native presolve, which may or may not affect the objective.
+*/
+    presolvedModel->setHintParam(OsiDoPresolveInInitial,false) ;
+    presolvedModel->initialSolve() ;
+    double objValue = presolvedModel->getObjValue() ;
+    int iters = presolvedModel->getIterationCount() ;
+    if (!eq(correctObj,objValue))
+    { int oldprec = std::cout.precision(12) ;
+      std::cout
+	<< "Incorrect presolve objective " << objValue << " for " << mpsName
+	<< " in " << iters << " iterations; expected " << correctObj
+	<< ", |error| = " << CoinAbs(correctObj-objValue) << "." << std::endl ;
+      std::cout.precision(oldprec) ;
+      delete si ;
+      errs++ ;
+      continue ; }
+/*
+  Postsolve to return to the original formulation. The presolvedModel should
+  no longer be needed once we've executed postsolve. Check that we get the
+  correct objective wihout iterations. As before, turn off any native
+  presolve.
+*/
+    pinfo.postsolve(true) ;
+    delete presolvedModel ;
+    si->setHintParam(OsiDoPresolveInResolve,false) ;
+    si->resolve() ;
+    objValue = si->getObjValue() ;
+    iters = si->getIterationCount() ;
+    if (!eq(correctObj,objValue))
+    { std::cout
+	<< "Incorrect postsolve objective " << objValue << " for " << mpsName
+	<< " in " << iters << " iterations; expected " << correctObj
+	<< ", |error| = " << CoinAbs(correctObj-objValue) << "." << std::endl ;
+      errs++ ; }
+    if (iters != 0)
+    { std::cout
+	<< "Postsolve for " << mpsName << " required "
+	<< iters << " iterations; expected 0. Possible problem." << std::endl ;
+      errs++ ; }
+
+    delete si ; }
+
+  if (errs == 0)
+  { std::cout << " ok." << std::endl ; }
+  else
+  { failureMessage(solverName,"errors during OsiPresolve test.") ; }
+
+  return (errs) ; }
 
 /*
   Test the simplex portion of the OSI interface.
@@ -3105,7 +3495,7 @@ void testSimplex (const OsiSolverInterface *emptySi, std::string mpsDir)
   limitations of the volume solver, it must be the last solver in vecEmptySiP.
 */
 
-void OsiSolverInterfaceMpsUnitTest
+int OsiSolverInterfaceMpsUnitTest
   (const std::vector<OsiSolverInterface*> & vecEmptySiP,
    const std::string & mpsDir)
 
@@ -3493,6 +3883,8 @@ void OsiSolverInterfaceMpsUnitTest
       <<" seconds."
       <<std::endl;
   }
+
+  return (0) ;
 }
 
 
@@ -3500,29 +3892,51 @@ void OsiSolverInterfaceMpsUnitTest
 // The main event
 //#############################################################################
 
-void
+
+/*
+  The order of tests should be examined. As it stands, we test immediately for
+  the ability to read an mps file and bail if we can't do it. But quite a few
+  tests could be performed without reading an mps file.  -- lh, 080107 --
+*/
+
+int
 OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
 				 const std::string & mpsDir,
 				 const std::string & netlibDir)
 {
 
-  int i;
-  CoinRelFltEq eq;
+  CoinRelFltEq eq ;
+  int intResult ;
+  int errCnt = 0 ;
 
-  std::string fn = mpsDir+"exmip1";
-  OsiSolverInterface * exmip1Si = emptySi->clone();
-  exmip1Si->readMps(fn.c_str(),"mps");
-
-  // Test that solverInterface knows its name.
-  // The name is used for displaying messages when testing
-  std::string solverName;
+/*
+  Test if the si knows its name. The name will be used for displaying messages
+  when testing.
+*/
+  std::string solverName ;
   {
-    OsiSolverInterface * si = emptySi->clone();
-    bool supportsSolverName = si->getStrParam(OsiSolverName,solverName);
-    assert( supportsSolverName );
-    assert( solverName != "Unknown Solver" );
-    delete si;
+    OsiSolverInterface *si = emptySi->clone() ;
+    bool supportsSolverName = si->getStrParam(OsiSolverName,solverName) ;
+    if (!supportsSolverName)
+    { solverName = "Unknown Solver" ;
+      failureMessage(solverName,"getStrParam(OsiSolverName)") ;
+      errCnt++ ; }
+    else
+    if (solverName == "Unknown Solver")
+    { failureMessage(solverName,"solver does not know its own name") ;
+      errCnt++ ; }
+    delete si ;
   }
+/*
+  See if we can read an MPS file. We're dead in the water if we can't do this.
+*/
+  std::string fn = mpsDir+"exmip1" ;
+  OsiSolverInterface *exmip1Si = emptySi->clone() ;
+  intResult = exmip1Si->readMps(fn.c_str(),"mps") ;
+  if (intResult != 0)
+  { failureMessage(*exmip1Si,"readMps failed to read exmip1 example") ;
+    errCnt += intResult ;
+    return (errCnt) ; }
 
   // Test that the solver correctly handles row and column names.
 
@@ -3558,6 +3972,7 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
 #endif
   }
 
+#if 0
   // Determine if this emptySi is an OsiGlpkSolverInterface
   bool glpkSolverInterface UNUSED = false;
   {
@@ -3567,7 +3982,7 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
     if ( si != NULL ) glpkSolverInterface = true;
 #endif
   }
-
+#endif
   // Determine if this emptySi is an OsiFmpSolverInterface
   bool fmpSolverInterface UNUSED = false;
   {
@@ -3599,12 +4014,15 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
   }
 
   // Test constants in objective function, dual and primal objective limit
-  // functions.
+  // functions, objective sense (max/min).
   // Do not perform test if Vol solver, because it requires problems of a
   // special form and can not solve netlib e226.
 
   if ( !volSolverInterface )
-  { testObjOffsetAndLimits(emptySi,mpsDir) ; }
+  { intResult = testObjFunctions(emptySi,mpsDir) ;
+    if (intResult < 0)
+    { errCnt -= intResult ;
+      return (-errCnt) ; } }
 
   // Test that values returned from an empty solverInterface
   {
@@ -4107,6 +4525,7 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
       assert( fi[1]==3 );
     }
 #endif
+
     // Change data so column 2 & 3 are integerNonBinary
     fim.setColUpper(2,5.0);
     assert( eq(fim.getColUpper()[2],5.0) );
@@ -4200,7 +4619,10 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
     CoinPackedMatrix pm1 = *(si->getMatrixByRow());
 
     // Get a row of the matrix to make a cut
-    CoinPackedVector pv =exmip1Si->getMatrixByRow()->getVector(1);
+    const CoinShallowPackedVector neededBySunCC =
+				exmip1Si->getMatrixByRow()->getVector(1) ;
+    CoinPackedVector pv = neededBySunCC ;
+
     pv.setElement(0,3.14*pv.getElements()[0]);
 
     OsiRowCut rc;
@@ -4218,7 +4640,9 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
     assert(pm1.getNumRows()==pm2.getNumRows()-1);
     int i;
     for( i=0; i<pm1.getNumRows(); ++i ) {
-      assert( pm1.getVector(i) == pm2.getVector(i) );
+      const CoinShallowPackedVector neededBySunCC1 = pm1.getVector(i) ;
+      const CoinShallowPackedVector neededBySunCC2 = pm2.getVector(i) ;
+      assert( neededBySunCC1 ==  neededBySunCC2 );
     }
     // Test that last row of pm2 is same as added cut
     assert( pm2.getVector(pm2.getNumRows()-1).isEquivalent(pv) );
@@ -4239,7 +4663,9 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
     CoinPackedMatrix pm1 = *(si->getMatrixByCol());
 
     // Get a row of the matrix to make a cut
-    CoinPackedVector pv =exmip1Si->getMatrixByRow()->getVector(1);
+    const CoinShallowPackedVector neededBySunCC =
+				exmip1Si->getMatrixByRow()->getVector(1) ;
+    CoinPackedVector pv = neededBySunCC ;
     pv.setElement(0,3.14*pv.getElements()[0]);
 
     OsiRowCut rc;
@@ -4271,7 +4697,9 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
 
     int i;
     for( i=0; i<pm1ByRow.getNumRows(); ++i ) {
-      assert( pm1ByRow.getVector(i) == pm2ByRow.getVector(i) );
+      const CoinShallowPackedVector neededBySunCC1 = pm1ByRow.getVector(i) ;
+      const CoinShallowPackedVector neededBySunCC2 = pm2ByRow.getVector(i) ;
+      assert( neededBySunCC1 ==  neededBySunCC2 );
     }
     // Test that last row of pm2 is same as added cut
     assert( pm2ByRow.getVector(pm2ByRow.getNumRows()-1).isEquivalent(pv) );
@@ -4401,46 +4829,22 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
     delete s;
   }
 
-  // Test presolve
-  if ( !volSolverInterface /*&& !fmpSolverInterface*/ && !symSolverInterface ) {
-#if 1
-    printf("\
-*** WARNING *** ACHTUNG *** FIGYELEM ***\n\
-    Test presolve needs to be changed to use a problem that's already\n\
-    in Data/Sample.\n\
-*** WARNING *** ACHTUNG *** FIGYELEM ***\n");
-#else
-    OsiSolverInterface * si = emptySi->clone();
-    std::string fn = netlibDir+"25fv47";
-    si->readMps(fn.c_str(),"mps");
-    OsiSolverInterface * presolvedModel;
-    OsiPresolve pinfo;
-    int numberPasses=5; // can change this
-    /* Use a tolerance of 1.0e-8 for feasibility, treat problem as
-       not being integer, do "numberpasses" passes */
-    presolvedModel = pinfo.presolvedModel(*si,1.0e-8,false,numberPasses);
-    assert(presolvedModel);
-    // switch off any native presolve
-    presolvedModel->setHintParam(OsiDoPresolveInInitial,false);
-    presolvedModel->initialSolve();
-    double objValue = presolvedModel->getObjValue();
-    if( !eq(objValue,5.5018458883e+03) )
-      failureMessage(solverName,"OsiPresolved model has wrong objective");
-    pinfo.postsolve(true);
+/*
+  Test OsiPresolve. This is a `bolt on' presolve, distinct from any presolve
+  that might be innate to the solver.
 
-
-    delete presolvedModel;
-    si->setHintParam(OsiDoPresolveInResolve,false);
-    si->setHintParam(OsiDoDualInResolve,false);
-    si->resolve();
-    objValue = si->getObjValue();
-    if( !eq(objValue,5.5018458883e+03) )
-      failureMessage(solverName,"OsiPresolve - final objective wrong");
-    if (si->getIterationCount())
-      failureMessage(solverName,"OsiPresolve - minor error, needs iterations");
-    delete si;
-#endif
-  }
+  The conditional here used to exclude OsiFmp. Perhaps it should again, but no
+  one's tested it since OsiFmp was originally developed.
+*/
+  if ( !volSolverInterface && !symSolverInterface )
+    testOsiPresolve(emptySi,mpsDir) ;
+/*
+  Do a check to see if the solver returns the correct status for artificial
+  variables. See the routine for detailed comments. Vol has no basis, hence no
+  status.
+*/
+  if (!volSolverInterface && !symSolverInterface)
+    testArtifStatus(emptySi) ;
 
   // Perform tests that are embodied in functions
   if ( !volSolverInterface && !symSolverInterface)
@@ -4478,7 +4882,7 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
   }
   /*
     Orphan comment? If anyone happens to poke at the code that this belongs
-    to, move it. My guess is it should go somewhere in the deSmedt tests.
+    to, move it. My (lh) guess is it should go somewhere in the deSmedt tests.
 
     With this matrix we have a primal/dual infeas problem. Leaving the first
     row makes it primal feas, leaving the first col makes it dual feas.
@@ -4493,4 +4897,3 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
           2 -4  0  6  0  >=  5
   */
 }
-
