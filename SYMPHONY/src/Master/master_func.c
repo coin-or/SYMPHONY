@@ -2065,7 +2065,12 @@ int set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "max_active_nodes") == 0 ||
 	    strcmp(key, "TM_max_active_nodes") == 0){
+#if !defined(COMPILE_IN_LP) || defined _OPENMP
       READ_INT_PAR(tm_par->max_active_nodes);
+#else
+      printf("\nWarning: Trying to use multiple processors with ");
+      printf("sequential build...\n");
+#endif
       return(0);
    }
    else if (strcmp(key, "max_cp_num") == 0 ||
