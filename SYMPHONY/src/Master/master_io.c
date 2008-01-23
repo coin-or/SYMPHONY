@@ -473,7 +473,12 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
+#if !defined(COMPILE_IN_LP) || defined _OPENMP
 	       tm_par->max_active_nodes = tmpi;
+#else
+	       printf("\nWarning: Trying to use multiple processors with ");
+	       printf("sequential build...\n");
+#endif
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
