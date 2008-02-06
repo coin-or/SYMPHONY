@@ -20,6 +20,8 @@ MASTERNAME = cnrp
 
 EXE = $(MASTERNAME)@EXEEXT@
 
+SYMAPPLNAME = CNRP
+
 # CHANGEME: Additional sources
 # - Names of your additional source files without any extensions
 ADDSOURCES =
@@ -41,6 +43,12 @@ SYMLIBDIR = @SYMSRCDIR@
 
 # Directoy with SYMPHONY library
 SYMINCDIR = @SYMINCDIR@
+
+# Directory with Application files
+SYMAPPLDIR = @SYMSRCDIR@/../Applications/$(SYMAPPLNAME)
+
+# Directory for application obj files
+SYMAPPLOBJDIR =./src
 
 #Directory for LP solver
 GLPKINCDIR = @GLPKINCDIR@
@@ -148,16 +156,23 @@ ADDOBJS = $(addsuffix .@OBJEXT@, $(ADDSOURCES))
 # This section is for listing CNRP source file names
 ##############################################################################
 
+VPATH = \
+	$(SYMAPPLDIR)/src/Common \
+	$(SYMAPPLDIR)/src/DrawGraph \
+	$(SYMAPPLDIR)/src/Master \
+	$(SYMAPPLDIR)/src/CutPool \
+	$(SYMAPPLDIR)/src/CutGen \
+	$(SYMAPPLDIR)/src/LP
 
-MACROS_OBJS        = src/Common/cnrp_macros.@OBJEXT@
-COST_OBJS          = src/Common/compute_cost.@OBJEXT@
-NET_OBJS           = src/Common/network.@OBJEXT@
-DG_FUNC_OBJS       = src/DrawGraph/cnrp_dg_functions.@OBJEXT@
+MACROS_OBJS        = cnrp_macros.@OBJEXT@
+COST_OBJS          = compute_cost.@OBJEXT@
+NET_OBJS           = network.@OBJEXT@
+DG_FUNC_OBJS       = cnrp_dg_functions.@OBJEXT@
 
-USER_MASTER_OBJS   = src/Master/cnrp_main.@OBJEXT@ \
-	src/Master/cnrp_master.@OBJEXT@ src/Master/cnrp_io.@OBJEXT@
-USER_MASTER_OBJS  += src/Master/cnrp_master_functions.@OBJEXT@ \
-	src/Master/small_graph.@OBJEXT@
+USER_MASTER_OBJS   = cnrp_main.@OBJEXT@ \
+	cnrp_master.@OBJEXT@ cnrp_io.@OBJEXT@
+USER_MASTER_OBJS  += cnrp_master_functions.@OBJEXT@ \
+	small_graph.@OBJEXT@
 
 USER_MASTER_OBJS += $(ADDOBJS)
 
@@ -176,60 +191,62 @@ ifeq ($(SYM_COMPILE_IN_LP),TRUE)
 USER_TM_OBJS       = $(USER_LP_OBJS) 
 endif
 ifeq ($(SYM_COMPILE_IN_CP),TRUE)
-USER_TM_OBJS      += src/CutPool/cnrp_cp.@OBJEXT@ 
+USER_TM_OBJS      += cnrp_cp.@OBJEXT@ 
 endif
 
-USER_LP_OBJS       = src/LP/cnrp_lp_branch.@OBJEXT@ \
-	src/LP/cnrp_lp.@OBJEXT@ 
+USER_LP_OBJS       = cnrp_lp_branch.@OBJEXT@ \
+	cnrp_lp.@OBJEXT@ 
 USER_LP_OBJS      += $(MACROS_OBJS) $(NET_OBJS) $(DG_FUNC_OBJS)
 ifeq ($(SYM_COMPILE_IN_CG),TRUE)
-USER_LP_OBJS      += src/CutGen/cnrp_cg.@OBJEXT@ \
-	src/CutGen/biconnected.@OBJEXT@ src/CutGen/shrink.@OBJEXT@
+USER_LP_OBJS      += cnrp_cg.@OBJEXT@ \
+	biconnected.@OBJEXT@ shrink.@OBJEXT@
 endif
 
-USER_CG_OBJS       = src/CutGen/cnrp_cg.@OBJEXT@ \
-	src/CutGen/biconnected.@OBJEXT@ 
-USER_CG_OBJS      += src/Common/compute_cost.@OBJEXT@ \
-	src/CutGen/shrink.@OBJEXT@ $(DG_FUNC_OBJS)
+USER_CG_OBJS       = cnrp_cg.@OBJEXT@ \
+	biconnected.@OBJEXT@ 
+USER_CG_OBJS      += compute_cost.@OBJEXT@ \
+	shrink.@OBJEXT@ $(DG_FUNC_OBJS)
 USER_CG_OBJS      += $(MACROS_OBJS) $(NET_OBJS)
 
-USER_CP_OBJS       = src/CutPool/cnrp_cp.@OBJEXT@ $(MACROS_OBJS)
+USER_CP_OBJS       = cnrp_cp.@OBJEXT@ $(MACROS_OBJS)
 
-USER_DG_OBJS       = src/DrawGraph/cnrp_dg.@OBJEXT@ \
-	src/DrawGraph/cnrp_dg_network.@OBJEXT@ $(MACROS_OBJS)
+USER_DG_OBJS       = cnrp_dg.@OBJEXT@ \
+	cnrp_dg_network.@OBJEXT@ $(MACROS_OBJS)
 
 USER_SRCDIR       =
 USER_INCDIR       =
 
 ifeq ($(DO_CONCORDE_CUTS),TRUE)
 ifeq ($(SYM_COMPILE_IN_CG),TRUE)
-USER_LP_OBJS      += src/CutGen/tsp.@OBJEXT@ # $(TSP_OBJS)
+USER_LP_OBJS      += tsp.@OBJEXT@ # $(TSP_OBJS)
 endif
-USER_CG_OBJS      += src/CutGen/tsp.@OBJEXT@ # $(TSP_OBJS)
+USER_CG_OBJS      += tsp.@OBJEXT@ # $(TSP_OBJS)
 endif
 
-ALL_OBJS =  src/Master/cnrp_main.@OBJEXT@ \
-	src/Master/cnrp_master.@OBJEXT@ \
-	src/Master/cnrp_io.@OBJEXT@ \
-	src/Master/cnrp_master_functions.@OBJEXT@ \
+ALL_OBJS_B = cnrp_main.@OBJEXT@ \
+	cnrp_master.@OBJEXT@ \
+	cnrp_io.@OBJEXT@ \
+	cnrp_master_functions.@OBJEXT@ \
 	$(ADDOBJS) \
-	src/Master/small_graph.@OBJEXT@ \
+	small_graph.@OBJEXT@ \
 	$(COST_OBJS) \
-	src/LP/cnrp_lp_branch.@OBJEXT@ \
-	src/LP/cnrp_lp.@OBJEXT@ \
+	cnrp_lp_branch.@OBJEXT@ \
+	cnrp_lp.@OBJEXT@ \
 	$(MACROS_OBJS) \
 	$(NET_OBJS) \
 	$(DG_FUNC_OBJS) \
-	src/CutGen/cnrp_cg.@OBJEXT@ \
-	src/CutGen/biconnected.@OBJEXT@ \
-	src/CutGen/shrink.@OBJEXT@ \
-	src/CutPool/cnrp_cp.@OBJEXT@
+	cnrp_cg.@OBJEXT@ \
+	biconnected.@OBJEXT@ \
+	shrink.@OBJEXT@ \
+	cnrp_cp.@OBJEXT@
 
-PUSER_MASTER_OBJS = $(addsuffix o, $(USER_MASTER_OBJS))
-PUSER_LP_OBJS = $(addsuffix o, $(USER_LP_OBJS))
-PUSER_CG_OBJS = $(addsuffix o, $(USER_CG_OBJS))
-PUSER_CP_OBJS = $(addsuffix o, $(USER_CP_OBJS))
-PUSER_TM_OBJS = $(addsuffix o, $(USER_TM_OBJS))
+ALL_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(ALL_OBJS_B))
+
+PUSER_MASTER_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_MASTER_OBJS)))
+PUSER_LP_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_LP_OBJS)))
+PUSER_CG_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_CG_OBJS)))
+PUSER_CP_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_CP_OBJS)))
+PUSER_TM_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_TM_OBJS)))
 
 PALL_OBJS = $(PUSER_MASTER_OBJS) $(PUSER_LP_OBJS) $(PUSER_CP_OBJS) \
 	$(PUSER_TM_OBJS)
@@ -271,7 +288,7 @@ CXXFLAGS = @CXXFLAGS@
 CXXLINKFLAGS = @RPATH_FLAGS@
 
 #Include files
-INCL =  -Iinclude -I`$(CYGPATH_W) $(COININCDIR)` \
+INCL =  -I$(SYMAPPLDIR)/include -I`$(CYGPATH_W) $(COININCDIR)` \
 	-I`$(CYGPATH_W) $(SYMINCDIR)`
 
 # Libraries necessary to link
@@ -361,16 +378,20 @@ PSYMLIBS = -L$(PVM_ROOT)/lib/@ARCH@ -lgpvm3 -lpvm3 $(LIBS)
 
 all: $(APPL_PARALLEL) $(WHATTOMAKE)
 
-.c.o:
+$(SYMAPPLOBJDIR)/%.o : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
 
-.c.obj:
+$(SYMAPPLOBJDIR)/%.obj : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
 
-.c.oo:
+$(SYMAPPLOBJDIR)/%.oo : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
 
-.c.objo:
+$(SYMAPPLOBJDIR)/%.objo : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
 
 $(EXE): $(ALL_OBJS)
