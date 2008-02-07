@@ -17,7 +17,7 @@
 #ifdef USE_OSI_INTERFACE
 
 #include "OsiSymSolverInterface.hpp"
-
+#include <iostream>
 int main(int argc, char **argv)
 {
 
@@ -46,6 +46,7 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony.h"
+#include <iostream>
   
 int main(int argc, char **argv)
 {    
@@ -63,7 +64,7 @@ int main(int argc, char **argv)
    ind[0] = 4; val[0] = 0;
    ind[1] = 7; val[1] = 0;
    
-   double lb, ub; 
+   double lb = 0.0, ub =0.0; 
    sym_get_lb_for_new_rhs(env, 2, ind, val, &lb);
    //  sym_get_ub_for_new_rhs(env, 2, ind, val, &ub);
 

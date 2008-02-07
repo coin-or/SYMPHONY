@@ -14,30 +14,6 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifdef USE_OSI_INTERFACE
-
-#include "OsiSymSolverInterface.hpp"
-
-int main(int argc, char **argv)
-{
-
-   /* Create an OsiSym object */
-   OsiSymSolverInterface si;
-
-   /* Parse the command line */
-   si.parseCommandLine(argc, argv);
-   
-   /* Read in the problem */
-   si.loadProblem();
-
-   /* Solve the problem */
-   si.branchAndBound();
-
-   return(0);
-}
-
-#else
-
 #include "symphony.h"
   
 int main(int argc, char **argv)
@@ -55,5 +31,3 @@ int main(int argc, char **argv)
    
    return(0);
 }  
-
-#endif

@@ -17,12 +17,13 @@
 #ifdef USE_OSI_INTERFACE
 
 #include "OsiSymSolverInterface.hpp"
+#include <iostream>
 
 int main(int argc, char **argv)
 {
 
   OsiSymSolverInterface si;
-  CoinWarmStart ws;
+  CoinWarmStart *ws;
 
   si.parseCommandLine(argc, argv);
   si.loadProblem();

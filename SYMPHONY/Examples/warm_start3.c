@@ -17,7 +17,7 @@
 #ifdef USE_OSI_INTERFACE
 
 #include "OsiSymSolverInterface.hpp"
-
+#include <iostream>
 int main(int argc, char **argv)
 {
    int termcode;
@@ -27,12 +27,14 @@ int main(int argc, char **argv)
    si.loadProblem();
 
    si.setSymParam(OsiSymTimeLimit, 10);
-   si.setSymParam(OsiKeepWarmStart, 1);
-   termcode = si.initialSolve();
+   si.setSymParam(OsiSymKeepWarmStart, 1);
+   si.initialSolve();
+   termcode = si.isProvenOptimal();
 
-   while (termcode != TM_OPTIMAL_SOLUTION_FOUND){
+   while (!termcode){
       printf("Starting problem again from warm start...\n");
-      termcode = si.resolve();
+      si.resolve();
+      termcode = si.isProvenOptimal();
    }
 
    return(0);
@@ -41,6 +43,7 @@ int main(int argc, char **argv)
 #else
 
 #include "symphony.h"
+#include <iostream>
   
 int main(int argc, char **argv)
 {

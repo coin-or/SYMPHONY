@@ -121,18 +121,18 @@ int main(int argc, char* argv[]){
    //free the memory
    sym_close_environment(env);
 
-   if(objective){FREE(objective);}
-   if(col_lb)   {FREE(col_lb);}
-   if(col_ub)   {FREE(col_ub);}
-   if(row_rhs)  {FREE(row_rhs);}
-   if(row_sense){FREE(row_sense);}
-   if(row_range){FREE(row_range);}
-   if(index)    {FREE(index);}
-   if(start)    {FREE(start);}
-   if(value)    {FREE(value);}
-   if(int_vars) {FREE(int_vars);}
-   if(solution) {FREE(solution);}
+   if(objective){free(objective);}
+   if(col_lb)   {free(col_lb);}
+   if(col_ub)   {free(col_ub);}
+   if(row_rhs)  {free(row_rhs);}
+   if(row_sense){free(row_sense);}
+   if(row_range){free(row_range);}
+   if(index)    {free(index);}
+   if(start)    {free(start);}
+   if(value)    {free(value);}
+   if(int_vars) {free(int_vars);}
+   if(solution) {free(solution);}
    return 0;
 
-};
+}
 
