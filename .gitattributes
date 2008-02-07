@@ -49,6 +49,7 @@ SYMPHONY/Applications/VRP/MSVisualStudio/v8/vrp.suo -text
 SYMPHONY/Applications/VRP/MSVisualStudio/v8/vrp.vcproj -text
 SYMPHONY/Applications/VRP/Makefile.in -text
 SYMPHONY/Applications/VRP/Makefile.orig -text
+SYMPHONY/Examples/Makefile.in -text
 SYMPHONY/Examples/milp2.c -text
 SYMPHONY/Examples/milpOsi.c -text
 SYMPHONY/Examples/milpOsi2.c -text

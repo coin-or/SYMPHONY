@@ -20,6 +20,8 @@ MASTERNAME = mckp
 
 EXE = $(MASTERNAME)@EXEEXT@
 
+SYMAPPLNAME = MCKP
+
 # CHANGEME: Additional sources
 ADDSOURCES =
 
@@ -37,10 +39,13 @@ COININCDIR = @abs_include_dir@/coin
 COINLIBDIR = @abs_lib_dir@
 
 # Directoy with SYMPHONY header files 
-#SYMINCDIR = @SYMINCDIR@
+SYMINCDIR = @SYMINCDIR@
 
 # Directoy with SYMPHONY library
-#SYMLIBDIR = @SYMSRCDIR@
+SYMLIBDIR = @SYMSRCDIR@
+
+# Directory with Application files
+SYMAPPLDIR = @SYMSRCDIR@/../Applications/$(SYMAPPLNAME)
 
 #Directory for LP solver
 GLPKINCDIR = @GLPKINCDIR@
@@ -72,6 +77,8 @@ MASTEREXT = @MASTEREXT@
 LPEXT = @LPEXT@
 TMEXT = @TMEXT@
 
+VPATH = \
+	$(SYMAPPLDIR)
 
 USER_MASTER_OBJS = mckp_main.@OBJEXT@ $(ADDSOURCES)
 USER_LP_OBJS =
@@ -100,8 +107,8 @@ CXXFLAGS = @CXXFLAGS@
 CXXLINKFLAGS = @RPATH_FLAGS@
 
 #Include files
-INCL =  -Iinclude -I`$(CYGPATH_W) $(COININCDIR)` #\
-#	-I`$(CYGPATH_W) $(SYMINCDIR)`
+INCL =  -I$(SYMAPPLDIR)/include -I`$(CYGPATH_W) $(COININCDIR)` \
+	-I`$(CYGPATH_W) $(SYMINCDIR)`
 
 # Libraries necessary to link
 LIBS = -L$(COINLIBDIR) #-L$(SYMLIBDIR)

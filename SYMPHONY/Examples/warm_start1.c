@@ -26,12 +26,14 @@ int main(int argc, char **argv)
   si.loadProblem();
   si.setSymParam(OsiSymKeepWarmStart, true);
   si.setSymParam(OsiSymFindFirstFeasible, true);
-  si.setSymParam(OsiSymSearchStrategy, DEPTH_FIRST_SEARCH);
+   /* set node selection rule to DEPTH_FIRST_SEARCH */
+  si.setSymParam(OsiSymSearchStrategy, 3);
 
   si.initialSolve();
 
   si.setSymParam(OsiSymFindFirstFeasible, false);
-  si.setSymParam(OsiSymSearchStrategy, BEST_FIRST_SEARCH);
+   /* set node selection rule to BEST_FIRST_SEARCH */
+  si.setSymParam(OsiSymSearchStrategy, 4);
 
   si.resolve();
   
@@ -50,15 +52,17 @@ int main(int argc, char **argv)
    sym_parse_command_line(env, argc, argv);   
    sym_load_problem(env);
    
-   sym_set_int_param(env, "keep_warm_start", TRUE);
+   sym_set_int_param(env, "keep_warm_start", true);
+   sym_set_int_param(env, "find_first_feasible", true);
 
-   sym_set_int_param(env, "find_first_feasible", TRUE);
-   sym_set_int_param(env, "node_selection_rule", DEPTH_FIRST_SEARCH);
+   /* set node selection rule to DEPTH_FIRST_SEARCH */
+   sym_set_int_param(env, "node_selection_rule", 3);
 
    sym_solve(env);
 
-   sym_set_int_param(env, "find_first_feasible", FALSE);
-   sym_set_int_param(env, "node_selection_rule", BEST_FIRST_SEARCH);
+   sym_set_int_param(env, "find_first_feasible", true);
+   /* set node selection rule to BEST_FIRST_SEARCH */
+   sym_set_int_param(env, "node_selection_rule", 4);
 
 
    sym_warm_solve(env);

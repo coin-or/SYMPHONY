@@ -21,7 +21,7 @@ OPT = -g #-fPIC
 SHLINKPREFIX = -Wl,-rpath,
 
 SYMPHONYROOT = ..
-COINROOT = ../../build
+COINROOT = ../../build/coin
 
 
 LP_SOLVER = OSI

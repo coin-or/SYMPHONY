@@ -1,0 +1,160 @@
+#===========================================================================#
+#                                                                           #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
+#                                                                           #
+# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
+# Laci Ladanyi (ladanyi@us.ibm.com).                                        #
+#                                                                           #
+# The author of this file is Menal Guzelsoy                                 #
+#                                                                           #
+# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+#                                                                           #
+# This software is licensed under the Common Public License. Please see     #
+# accompanying file for terms.                                              #
+#                                                                           #
+#===========================================================================#
+
+# $Id: Makefile.in 726 2006-04-17 04:16:00Z andreasw $
+
+EXAMPLES = milp milp2 bicriteria sensitivity \
+	warm_start1 warm_start2 warm_start3
+
+##############################################################################
+# If you wish to use SYMPHONY through the SYMPHONY OSI interface, 
+# set USE_OSI_INTERFACE to TRUE below. This will have the examples 
+# to call the OSI SYMPHONY interface routines. 
+##############################################################################
+
+USE_OSI_INTERFACE = FALSE
+
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+EXAMPLES += milpOsi milpOsi2
+endif
+
+# Directory with COIN header files
+COININCDIR = @abs_include_dir@/coin
+
+# Directory with COIN libraries
+COINLIBDIR = @abs_lib_dir@
+
+# Directoy with SYMPHONY header files 
+#SYMINCDIR = @SYMINCDIR@
+
+# Directoy with SYMPHONY library
+#SYMLIBDIR = @SYMSRCDIR@
+
+# Directory with Application files
+SYMEXDIR = @SYMSRCDIR@/../Examples
+
+#Directory for LP solver
+GLPKINCDIR = @GLPKINCDIR@
+CPXINCDIR = @CPXINCDIR@
+OSLINCDIR = @OSLINCDIR@
+SPXINCDIR = @SPXINCDIR@
+XPRINCDIR = @XPRINCDIR@
+
+##########################################################################
+#  Usually, you don't have to change anything below.  Note that if you   #
+#  change certain compiler options, you might have to recompile the      #
+#  COIN package.                                                         #
+##########################################################################
+USE_CGL_CUTS = @USE_CGL_CUTS_TRUE@TRUE
+CLP_LP_SOLVER = @CLP_LP_SOLVER_TRUE@TRUE
+GLPK_LP_SOLVER = @GLPK_LP_SOLVER_TRUE@TRUE
+CPLEX_LP_SOLVER = @CPLEX_LP_SOLVER_TRUE@TRUE
+OSL_LP_SOLVER = @OSL_LP_SOLVER_TRUE@TRUE
+SOPLEX_LP_SOLVER = @SOPLEX_LP_SOLVER_TRUE@TRUE
+XPRESS_LP_SOLVER = @XPRESS_LP_SOLVER_TRUE@TRUE
+
+VPATH = \
+	$(SYMEXDIR)
+
+WHATTOMAKE = $(addsuffix @EXEEXT@, $(EXAMPLES))
+
+# C++ Compiler command
+CXX = @CXX@
+
+# C++ Compiler options
+CXXFLAGS = @CXXFLAGS@
+
+# additional C++ Compiler options for linking
+CXXLINKFLAGS = @RPATH_FLAGS@
+
+#Include files
+INCL =  -I`$(CYGPATH_W) $(COININCDIR)`
+
+# Libraries necessary to link
+LIBS = 
+
+# Additional flags
+ADDINCFLAGS =
+
+ifeq ($(USE_CGL_CUTS),TRUE)
+LIBS += -lCgl `cat @CGLDOCDIR@/cgl_addlibs.txt`
+#ADDINCFLAGS += -DUSE_CGL_CUTS
+endif
+
+ifeq ($(CLP_LP_SOLVER),TRUE)
+LIBS += -lOsiClp -lClp `cat @CLPDOCDIR@/clp_addlibs.txt`
+#ADDINCFLAGS += -D__OSI_CLP__
+endif
+
+ifeq ($(GLPK_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+LIBS += -lOsiGlpk #-lglpk
+#ADDINCFLAGS += -D__OSI_GLPK__
+else
+ifeq ($(USE_GMPL), TRUE)
+INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+#ADDINCFLAGS += -DUSE_GLPMPL
+endif
+endif
+
+ifeq ($(CPLEX_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
+LIBS += -lOsiCpx #-lcplex
+#ADDINCFLAGS += -D__OSI_CPLEX__
+endif
+
+ifeq ($(OSL_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(OSLINCDIR)`
+LIBS += -lOsiOsl #-losl
+#ADDINCFLAGS += -D__OSI_OSL__
+endif
+
+ifeq ($(SOPLEX_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(SPXINCDIR)`
+LIBS += -lOsiSpx #-l
+#ADDINCFLAGS += -D__OSI_SOPLEX__
+endif
+
+ifeq ($(XPRESS_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(XPRINCDIR)`
+LIBS += -lOsiXpr #-l
+#ADDINCFLAGS += -D__OSI_XPRESS__
+endif
+
+ADDLIBS += @ADDLIBS@
+
+LIBS += -lOsi -lCoinUtils `cat @OSIDOCDIR@/osi_addlibs.txt` \
+	`cat @COINUTILSDOCDIR@/coinutils_addlibs.txt` $(ADDLIBS)
+
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
+
+SYMLIBS = -L$(COINLIBDIR) #-L$(SYMLIBDIR)
+
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+SYMLIBS += -lOsiSym
+ADDINCFLAGS += -DUSE_OSI_INTERFACE
+endif
+
+SYMLIBS += -lSym $(LIBS) 
+
+all: $(WHATTOMAKE)
+
+%: %.c
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) $(INCL) $(ADDINCFLAGS) $< -o $@ $(SYMLIBS)
+
+clean:
+	rm -rf $(WHATTOMAKE)

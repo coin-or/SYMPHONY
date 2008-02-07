@@ -20,6 +20,8 @@ MASTERNAME = spp
 
 EXE = $(MASTERNAME)@EXEEXT@
 
+SYMAPPLNAME = SPP
+
 # CHANGEME: Additional sources
 # - Names of your additional source files without any extensions
 ADDSOURCES =
@@ -42,6 +44,12 @@ SYMLIBDIR = @SYMSRCDIR@
 
 # Directoy with SYMPHONY library
 SYMINCDIR = @SYMINCDIR@
+
+# Directory with Application files
+SYMAPPLDIR = @SYMSRCDIR@/../Applications/$(SYMAPPLNAME)
+
+# Directory for application obj files
+SYMAPPLOBJDIR =./src
 
 #Directory for LP solver
 GLPKINCDIR = @GLPKINCDIR@
@@ -74,18 +82,26 @@ LPEXT = @LPEXT@
 TMEXT = @TMEXT@
 ADDOBJS = $(addsuffix .@OBJEXT@, $(ADDSOURCES))
 
-USER_COMMON_OBJS   = src/Common/spp_common.@OBJEXT@
+VPATH = \
+	$(SYMAPPLDIR)/src/Common \
+	$(SYMAPPLDIR)/src/DrawGraph \
+	$(SYMAPPLDIR)/src/Master \
+	$(SYMAPPLDIR)/src/CutPool \
+	$(SYMAPPLDIR)/src/CutGen \
+	$(SYMAPPLDIR)/src/LP
 
-USER_CG_OBJS       = src/CutGen/spp_cg.@OBJEXT@
+USER_COMMON_OBJS   = spp_common.@OBJEXT@
 
-USER_CP_OBJS       = src/CutPool/spp_cp.@OBJEXT@
+USER_CG_OBJS       = spp_cg.@OBJEXT@
 
-USER_DG_OBJS       = src/DrawGraph/spp_dg.@OBJEXT@
+USER_CP_OBJS       = spp_cp.@OBJEXT@
+
+USER_DG_OBJS       = spp_dg.@OBJEXT@
 
 ifeq ($(SYM_COMPILE_IN_LP),FALSE)
-USER_LP_OBJS       = src/LP/spp_lp_branch.@OBJEXT@ src/LP/spp_lp.@OBJEXT@ 
+USER_LP_OBJS       = spp_lp_branch.@OBJEXT@ spp_lp.@OBJEXT@ 
 else
-USER_LP_OBJS       = src/LP/spp_lp_branch.@OBJEXT@ src/LP/spp_lp.@OBJEXT@ $(USER_COMMON_OBJS)
+USER_LP_OBJS       = spp_lp_branch.@OBJEXT@ spp_lp.@OBJEXT@ $(USER_COMMON_OBJS)
 endif
 
 ifeq ($(SYM_COMPILE_IN_CG),TRUE)
@@ -100,25 +116,27 @@ ifeq ($(SYM_COMPILE_IN_CP),TRUE)
 USER_TM_OBJS      += $(USER_CP_OBJS)
 endif
 
-USER_MASTER_OBJS   = src/Master/spp_main.@OBJEXT@ \
-	src/Master/spp_master.@OBJEXT@ \
-	src/Master/spp_master_functions.@OBJEXT@ \
+USER_MASTER_OBJS   = spp_main.@OBJEXT@ \
+	spp_master.@OBJEXT@ \
+	spp_master_functions.@OBJEXT@ \
 	$(USER_COMMON_OBJS) $(ADDOBJS)
 
 ifeq ($(SYM_COMPILE_IN_TM),TRUE)
 USER_MASTER_OBJS  += $(USER_TM_OBJS)
 endif
 
-ALL_OBJS =   src/Master/spp_main.@OBJEXT@ src/Master/spp_master.@OBJEXT@\
-	src/Master/spp_master_functions.@OBJEXT@ $(ADDOBJS) \
-	src/LP/spp_lp_branch.@OBJEXT@ src/LP/spp_lp.@OBJEXT@ \
+ALL_OBJS_B =   spp_main.@OBJEXT@ spp_master.@OBJEXT@\
+	spp_master_functions.@OBJEXT@ $(ADDOBJS) \
+	spp_lp_branch.@OBJEXT@ spp_lp.@OBJEXT@ \
 	$(USER_COMMON_OBJS) $(USER_CG_OBJS) $(USER_CP_OBJS) $(USER_DG_OBJS)
 
-PUSER_MASTER_OBJS = $(addsuffix o, $(USER_MASTER_OBJS))
-PUSER_LP_OBJS = $(addsuffix o, $(USER_LP_OBJS))
-PUSER_CG_OBJS = $(addsuffix o, $(USER_CG_OBJS))
-PUSER_CP_OBJS = $(addsuffix o, $(USER_CP_OBJS))
-PUSER_TM_OBJS = $(addsuffix o, $(USER_TM_OBJS))
+ALL_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(ALL_OBJS_B))
+
+PUSER_MASTER_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_MASTER_OBJS)))
+PUSER_LP_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_LP_OBJS)))
+PUSER_CG_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_CG_OBJS)))
+PUSER_CP_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_CP_OBJS)))
+PUSER_TM_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_TM_OBJS)))
 
 PALL_OBJS = $(PUSER_MASTER_OBJS) $(PUSER_LP_OBJS) $(PUSER_CP_OBJS) \
 	$(PUSER_TM_OBJS)
@@ -133,7 +151,7 @@ CXXFLAGS = @CXXFLAGS@
 CXXLINKFLAGS = @RPATH_FLAGS@
 
 #Include files
-INCL =  -Iinclude -I`$(CYGPATH_W) $(COININCDIR)` \
+INCL =  -I$(SYMAPPLDIR)/include -I`$(CYGPATH_W) $(COININCDIR)` \
 	-I`$(CYGPATH_W) $(SYMINCDIR)`
 
 # Libraries necessary to link
@@ -223,17 +241,21 @@ PSYMLIBS = -L$(PVM_ROOT)/lib/@ARCH@ -lgpvm3 -lpvm3 $(LIBS)
 
 all: $(APPL_PARALLEL) $(WHATTOMAKE)
 
-.c.o:
+$(SYMAPPLOBJDIR)/%.o : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
 
-.c.obj:
+$(SYMAPPLOBJDIR)/%.obj : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
 
-.c.oo:
+$(SYMAPPLOBJDIR)/%.oo : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
 
-.c.objo:
-	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
+$(SYMAPPLOBJDIR)/%.objo : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
+	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
 
 $(EXE): $(ALL_OBJS)
 	bla=;\
