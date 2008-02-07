@@ -23251,11 +23251,11 @@ fi
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                        ac_config_files="$ac_config_files Makefile src/Makefile test/Makefile Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile sym_addlibs.txt"
+                                                                                                                                  ac_config_files="$ac_config_files Makefile src/Makefile test/Makefile Examples/Makefile Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile sym_addlibs.txt"
 
 
 if test `cd $srcdir; pwd` != `pwd`; then
-                                                                                ac_config_files="$ac_config_files $srcdir/Applications/CNRP/Makefile:Applications/CNRP/Makefile $srcdir/Applications/MATCH/Makefile:Applications/MATCH/Makefile $srcdir/Applications/MCKP/Makefile:Applications/MCKP/Makefile $srcdir/Applications/MPP/Makefile:Applications/MPP/Makefile $srcdir/Applications/SPP/Makefile:Applications/SPP/Makefile $srcdir/Applications/SPP+CUTS/Makefile:Applications/SPP+CUTS/Makefile $srcdir/Applications/USER/Makefile:Applications/USER/Makefile $srcdir/Applications/VRP/Makefile:Applications/VRP/Makefile"
+                                                                                          ac_config_files="$ac_config_files $srcdir/Applications/CNRP/Makefile:Applications/CNRP/Makefile $srcdir/Applications/MATCH/Makefile:Applications/MATCH/Makefile $srcdir/Applications/MCKP/Makefile:Applications/MCKP/Makefile $srcdir/Applications/MPP/Makefile:Applications/MPP/Makefile $srcdir/Applications/SPP/Makefile:Applications/SPP/Makefile $srcdir/Applications/SPP+CUTS/Makefile:Applications/SPP+CUTS/Makefile $srcdir/Applications/USER/Makefile:Applications/USER/Makefile $srcdir/Applications/VRP/Makefile:Applications/VRP/Makefile $srcdir/Examples/Makefile:Examples/Makefile"
 
 fi
 
@@ -24209,6 +24209,7 @@ do
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
+  "Examples/Makefile" ) CONFIG_FILES="$CONFIG_FILES Examples/Makefile" ;;
   "Applications/CNRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/CNRP/Makefile" ;;
   "Applications/MATCH/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MATCH/Makefile" ;;
   "Applications/MCKP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MCKP/Makefile" ;;
@@ -24226,6 +24227,7 @@ do
   "$srcdir/Applications/SPP+CUTS/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/SPP+CUTS/Makefile:Applications/SPP+CUTS/Makefile" ;;
   "$srcdir/Applications/USER/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/USER/Makefile:Applications/USER/Makefile" ;;
   "$srcdir/Applications/VRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/VRP/Makefile:Applications/VRP/Makefile" ;;
+  "$srcdir/Examples/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Examples/Makefile:Examples/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/config_sym.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config_sym.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

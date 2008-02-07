@@ -861,6 +861,7 @@ AM_CONDITIONAL(USE_CL, [test $sym_use_cl = true])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  test/Makefile
+		 Examples/Makefile
                  Applications/CNRP/Makefile
 		 Applications/MATCH/Makefile
 		 Applications/MCKP/Makefile
@@ -880,7 +881,8 @@ AC_CONFIG_FILES([
 	$srcdir/Applications/SPP/Makefile:Applications/SPP/Makefile
 	$srcdir/Applications/SPP+CUTS/Makefile:Applications/SPP+CUTS/Makefile
 	$srcdir/Applications/USER/Makefile:Applications/USER/Makefile
-	$srcdir/Applications/VRP/Makefile:Applications/VRP/Makefile])
+	$srcdir/Applications/VRP/Makefile:Applications/VRP/Makefile
+	$srcdir/Examples/Makefile:Examples/Makefile])
 fi
 
 # Here put the location and name of the configuration header file
