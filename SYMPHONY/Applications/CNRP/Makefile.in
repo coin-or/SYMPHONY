@@ -295,12 +295,12 @@ INCL =  -I$(SYMAPPLDIR)/include -I`$(CYGPATH_W) $(COININCDIR)` \
 LIBS = -L$(COINLIBDIR) -L$(SYMLIBDIR)
 
 ifeq ($(USE_CGL_CUTS),TRUE)
-LIBS += -lCgl `cat @CGLOBJDIR@/cgl_addlibs.txt`
+LIBS += -lCgl `cat @CGLDOCDIR@/cgl_addlibs.txt`
 ADDINCFLAGS += -DUSE_CGL_CUTS
 endif
 
 ifeq ($(CLP_LP_SOLVER),TRUE)
-LIBS += -lOsiClp -lClp `cat @CLPOBJDIR@/clp_addlibs.txt`
+LIBS += -lOsiClp -lClp `cat @CLPDOCDIR@/clp_addlibs.txt`
 ADDINCFLAGS += -D__OSI_CLP__
 endif
 
@@ -341,8 +341,8 @@ endif
 
 ADDLIBS += @ADDLIBS@
 
-LIBS += -lOsi -lCoinUtils `cat @OSIOBJDIR@/osi_addlibs.txt` \
-	`cat @COINUTILSOBJDIR@/coinutils_addlibs.txt` $(ADDLIBS)
+LIBS += -lOsi -lCoinUtils `cat @OSIDOCDIR@/osi_addlibs.txt` \
+	`cat @COINUTILSDOCDIR@/coinutils_addlibs.txt` $(ADDLIBS)
 
 # The following is necessary under cygwin, if native compilers are used
 CYGPATH_W = @CYGPATH_W@
