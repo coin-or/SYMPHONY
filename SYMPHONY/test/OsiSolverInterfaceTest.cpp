@@ -34,7 +34,7 @@ If you work on this code, please keep these conventions in mind:
 #  pragma warning(disable:4786)
 #endif
 
-#include "OsiConfig.h"
+//#include "OsiConfig.h"
 
 #ifdef NDEBUG
 #undef NDEBUG
