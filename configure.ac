@@ -65,6 +65,8 @@ AC_COIN_CREATE_LIBTOOL
 #############################################################################
 
 AC_COIN_THIRDPARTY_SUBDIRS([Glpk],[ThirdParty/Glpk],[glpk/src/glplpx01.c])
+AC_COIN_THIRDPARTY_SUBDIRS([Blas],[ThirdParty/Blas],[daxpy.f])
+AC_COIN_THIRDPARTY_SUBDIRS([Lapack],[ThirdParty/Lapack],[LAPACK/SRC/dlarf.f])
 
 #############################################################################
 #                  Check which subprojects are there                        #
