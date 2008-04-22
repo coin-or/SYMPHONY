@@ -155,6 +155,7 @@ typedef struct LP_PARAMS{
    int               strong_branching_cand_num_min;
    int               strong_branching_cand_num_max;
    double            strong_branching_red_ratio;
+   int               use_hot_starts;
    int               compare_candidates_default;
    int               select_child_default;
    int               pack_lp_solution_default;

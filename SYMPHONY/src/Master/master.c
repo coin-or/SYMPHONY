@@ -336,6 +336,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->strong_branching_cand_num_max = 10;
    lp_par->strong_branching_cand_num_min = 5;
    lp_par->strong_branching_red_ratio = 1;
+   lp_par->use_hot_starts = TRUE;
    lp_par->compare_candidates_default = HIGHEST_LOW_OBJ;
    lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
@@ -5229,6 +5230,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    else if (strcmp(key, "strong_branching_cand_num_min") == 0 ||
 	    strcmp(key, "LP_strong_branching_cand_num_min") == 0){
       *value = lp_par->strong_branching_cand_num_min;
+      return(0);
+   }
+   else if (strcmp(key,"use_hot_starts") == 0) {
+      *value = lp_par->use_hot_starts;
       return(0);
    }
    else if (strcmp(key, "compare_candidates_default") == 0 ||

@@ -884,6 +884,25 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 }
 
 /*===========================================================================*/
+int solve_hotstart(LPdata *lp_data, int *iterd)
+{
+   return(dual_simplex(lp_data,iterd));
+}
+/*===========================================================================*/
+int unmark_hotstart(LPdata *lp_data)
+{
+   /* only when using osi */
+   return (0);
+}
+
+/*===========================================================================*/
+int mark_hotstart(LPdata *lp_data)
+{
+   /* only when using osi */
+   return (0);
+}
+
+/*===========================================================================*/
 
 void btran(LPdata *lp_data, double *col)
 {
@@ -983,6 +1002,12 @@ void set_itlim(LPdata *lp_data, int itlim)
    if (itlim < 0) itlim = LP_MAX_ITER;
    osllib_status = ekk_setImaxiter(lp_data->lp, itlim);
    OSL_check_error("set_itlim - ekk_setImaxiter");
+}
+
+/*===========================================================================*/
+void set_itlim_hotstart(LPdata *lp_data, int itlim)
+{
+   /* read being and nothingness -- Jean Paul Sartre */
 }
 
 /*===========================================================================*/
@@ -1678,6 +1703,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    term = CPXgetstat(lp_data->cpxenv,lp_data->lp);
 #if CPX_VERSION >= 800
    if (term == CPX_STAT_UNBOUNDED){
+      /* } to unconfuse vi */
 #else
    if (term == CPX_INFEASIBLE){
 #endif
@@ -1747,6 +1773,27 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 }
 
 /*===========================================================================*/
+int solve_hotstart(LPdata *lp_data, int *iterd)
+{
+   return(dual_simplex(lp_data,iterd));
+}
+/*===========================================================================*/
+int unmark_hotstart(LPdata *lp_data)
+{
+   /* only when using osi */
+   return (0);
+}
+
+/*===========================================================================*/
+int mark_hotstart(LPdata *lp_data)
+{
+   /* only when using osi */
+   return (0);
+}
+
+
+
+/*===========================================================================*/
 
 void btran(LPdata *lp_data, double *col)
 {
@@ -1807,6 +1854,12 @@ void set_itlim(LPdata *lp_data, int itlim)
    cpx_status = CPXsetintparam(lp_data->cpxenv, CPX_PARAM_ITLIM, itlim);
    CPX_check_error("set_itlim - CPXsetintparam");
 }
+/*===========================================================================*/
+void set_itlim_hotstart(LPdata *lp_data, int itlim)
+{
+   /* read being and nothingness -- Jean Paul Sartre */
+}
+
 
 /*===========================================================================*/
 
@@ -2447,7 +2500,70 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 
 
 /*===========================================================================*/
+/* 
+ * Following hot-start functions make it faster for the lp solver to do strong
+ * branching
+ */
+/*===========================================================================*/
+int solve_hotstart(LPdata *lp_data, int *iterd)
+{
+   
+   //int term = LP_ABANDONED;
+   int term = 0;
+    
+   lp_data->si->solveFromHotStart();
+   
+   if (lp_data->si->isProvenDualInfeasible())
+      term = LP_D_INFEASIBLE;
+   else if (lp_data->si->isDualObjectiveLimitReached())
+      term = LP_D_OBJLIM;
+   else if (lp_data->si->isProvenPrimalInfeasible())
+      term = LP_D_UNBOUNDED;
+   else if (lp_data->si->isProvenOptimal())
+      term = LP_OPTIMAL;
+   else if (lp_data->si->isIterationLimitReached())
+      term = LP_D_ITLIM;
+   else if (lp_data->si->isAbandoned())
+      term = LP_ABANDONED;
+   
+   /* if(term == D_UNBOUNDED){
+      retval=lp_data->si->getIntParam(OsiMaxNumIteration, itlim); 
+      CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() */
+   /* } to unconfuse vi */
+   
+   lp_data->termcode = term;
+   
+   if (term != LP_ABANDONED){
+      
+      *iterd = lp_data->si->getIterationCount();
+      
+      lp_data->objval = lp_data->si->getObjValue();
+      
+      lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
+   }   
+   else{
+      lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
+      printf("OSI Abandoned calculation: Code %i \n\n", term);
+   }
+   
+   return(term);
+}
 
+/*===========================================================================*/
+int mark_hotstart(LPdata *lp_data)
+{
+   lp_data->si->markHotStart();
+   return (0);
+}
+
+/*===========================================================================*/
+int unmark_hotstart(LPdata *lp_data)
+{
+   lp_data->si->unmarkHotStart();
+   return (0);
+}
+
+/*===========================================================================*/
 /*===========================================================================*/
 /* This function is used only together with get_proof_of_infeasibility...    */
 
@@ -2540,6 +2656,17 @@ void set_itlim(LPdata *lp_data, int itlim)
    if (itlim < 0) itlim = LP_MAX_ITER;
 
    OsiIntParam key = OsiMaxNumIteration;
+   
+   retval = lp_data->si->setIntParam(key, itlim);
+}
+
+/*===========================================================================*/
+
+void set_itlim_hotstart(LPdata *lp_data, int itlim)
+{
+   if (itlim < 0) itlim = LP_MAX_ITER;
+
+   OsiIntParam key = OsiMaxNumIterationHotStart;
    
    retval = lp_data->si->setIntParam(key, itlim);
 }

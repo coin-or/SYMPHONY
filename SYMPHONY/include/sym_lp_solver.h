@@ -234,12 +234,16 @@ void change_row PROTO((LPdata *lp_data, int row_ind,
 void change_col PROTO((LPdata *lp_data, int col_ind,
 		       char sense, double lb, double ub));
 int dual_simplex PROTO((LPdata *lp_data, int *iterd));
+int solve_hotstart(LPdata *lp_data, int *iterd);
+int mark_hotstart(LPdata *lp_data);
+int unmark_hotstart(LPdata *lp_data);
 void btran PROTO((LPdata *lp_data, double *col));
 void get_binvcol PROTO((LPdata *lp_data, int j, double *col));
 void get_binvrow PROTO((LPdata *lp_data, int i, double *row));
 void get_basis PROTO((LPdata *lp_data, int *cstat, int *rstat));
 void set_obj_upper_lim PROTO((LPdata *lp_data, double lim));
 void set_itlim PROTO((LPdata *lp_data, int itlim));
+void set_itlim_hotstart PROTO((LPdata *lp_data, int itlim));
 void get_column PROTO((LPdata *lp_data, int j,
 		       double *colval, int *colind, int *collen, double *cj));
 void get_row PROTO((LPdata *lp_data, int i,
