@@ -224,6 +224,14 @@ void free_node_dependent(lp_prob *p)
       free_cuts(p->slack_cuts, p->slack_cut_num);
       p->slack_cut_num = 0;
    }
+   // necessary to purge waiting rows, otherwise these may get added to the
+   // node that is solved next time.
+   if (p->waiting_row_num>0) {
+      free_waiting_rows(p->waiting_rows, p->waiting_row_num);
+      p->waiting_row_num = 0;
+      p->waiting_rows=NULL;
+   }
+
    unload_lp_prob(lp_data);
 }
 
