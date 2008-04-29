@@ -248,8 +248,12 @@ int sym_set_defaults(sym_environment *env)
    lp_par->max_not_fixable_to_add_max = 500;
    lp_par->mat_col_compress_num = 50;
    lp_par->mat_col_compress_ratio = .05;
-   lp_par->mat_row_compress_num = 20;
-   lp_par->mat_row_compress_ratio = .05;
+   /*
+    * changed row compression so that poor cuts are fully purged and are not
+    * merely lying around with very high rhs values -- asm4
+    */
+   lp_par->mat_row_compress_num = 0;
+   lp_par->mat_row_compress_ratio = .00001;
    lp_par->tailoff_gap_backsteps = 2;
    lp_par->tailoff_gap_frac = .99;
    lp_par->tailoff_obj_backsteps = 4;
