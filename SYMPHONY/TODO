@@ -1,4 +1,6 @@
  1 dynamic cut generation (M)
+   1.1 add parameters for different cuts
+   1.2 add mir, twomir
  2 cut selection (A)
  3 preprocessing (M)
  4 primal heuristics (A)
@@ -12,7 +14,7 @@
    7.1 carry rc fixing to child nodes (A)
    7.2 make loops for calculating tm->lb more efficient (A)
    7.3 print correct lb in print_tm_status (A)
- 8 conflict graphs + implications (A,M)
+ 8 conflict graphs + implications + probing(A,M)
  9 sos branching (A)
 10 scripts (A)
 11 collect mip info (M)
@@ -24,4 +26,8 @@
 17 tail off (A)
 18 priority lists (M)
 19 memory overflow (A)
-20 why are 15x slower than cplex (A)
+20 why are we 15x slower than cplex in branch and bound (A)
+21 use column cuts from cgl. tie it up with (7.1).
+22 check_row_effectiveness() sometimes does not delete constraints. it just
+   makes rhs very big. causes problems with flowcover cuts.
+23 replace array as data-structure for heap with linked lists.
