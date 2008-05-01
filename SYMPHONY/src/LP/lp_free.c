@@ -70,6 +70,7 @@ void free_col_set(our_col_set **colset)
 
 void free_candidate(branch_obj **cand)
 {
+
    if (*cand){
       branch_obj *can = *cand;
 #ifdef COMPILE_FRAC_BRANCHING
@@ -224,6 +225,14 @@ void free_node_dependent(lp_prob *p)
       free_cuts(p->slack_cuts, p->slack_cut_num);
       p->slack_cut_num = 0;
    }
+   // necessary to purge waiting rows, otherwise these may get added to the
+   // node that is solved next time.
+   if (p->waiting_row_num>0) {
+      free_waiting_rows(p->waiting_rows, p->waiting_row_num);
+      p->waiting_row_num = 0;
+      p->waiting_rows=NULL;
+   }
+
    unload_lp_prob(lp_data);
 }
 

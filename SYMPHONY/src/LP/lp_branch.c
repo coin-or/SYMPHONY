@@ -143,6 +143,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #ifdef STATISTICS
    int itlim = 0, cnum = 0;
 #endif
+   int should_use_hot_starts;
 
    /*------------------------------------------------------------------------*\
     * First we call select_candidates_u() to select candidates. It can
@@ -230,10 +231,24 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    piter = (int *) malloc(maxnum * ISIZE);
 #endif
 
+   /* 
+    * see if hot-starts should be used. in theory if strong branching is used
+    * and only variable bounds are changed then, hot-starts should be faster
+    */
+   if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
+      should_use_hot_starts = TRUE;
+   } else {
+      should_use_hot_starts = FALSE;
+   }
+
    /* Set the iteration limit */
    if (p->par.max_presolve_iter > 0)
       set_itlim(lp_data, p->par.max_presolve_iter);
 
+   if (should_use_hot_starts) {
+      mark_hotstart(lp_data);
+      set_itlim_hotstart(lp_data, p->par.max_presolve_iter);
+   }
    vars = lp_data->vars;
 
    /* Look at the candidates one-by-one and presolve them. */
@@ -300,6 +315,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    printf("SYMPHONY has encountered numerical difficulties \n");
 	    printf("With the LP solver. Exiting...\n\n");
 	 }
+         /* } to unconfuse vi*/
 #endif
 	 lb = vars[branch_var]->lb;
 	 ub = vars[branch_var]->ub;
@@ -321,7 +337,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    }
 	    check_ub(p);
 	    /* The original basis is in lp_data->lpbas */
-	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+            if (should_use_hot_starts) {
+               can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
+            } else {
+               can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+            }
 	    can->objval[j] = lp_data->objval;
 	    get_x(lp_data);
 
@@ -595,6 +615,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       if ((j & BRANCH_ON_IT)){
 	 break;
       }
+   }
+
+   if (should_use_hot_starts) {
+      unmark_hotstart(lp_data);
    }
 
 #if 0

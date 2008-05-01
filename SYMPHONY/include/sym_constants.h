@@ -220,7 +220,7 @@
 
 /*----------------------- col_gen -------------------------------------------*
  * last 2 digits refer to what to do when we would fathom:
- *     DO_NOT_GENERATE_COLS_DISCARD
+ *     DO_NOT_GENERATE__COLS_DISCARD
  *     DO_NOT_GENERATE_COLS_SEND (for next phase)
  *     GENERATE_COLS__RESOLVE
  * next 2 digits refer to what to do right before branching
@@ -429,6 +429,14 @@
 /*-------------------- generate_cuts_in_lp defaults -------------------------*/
 #define GENERATE_CGL_CUTS                  20
 #define DO_NOT_GENERATE_CGL_CUTS           21
+
+/*-------------------- xxx_cuts_generation_levels ---------------------------*/
+#define DO_NOT_GENERATE        -1
+#define GENERATE_DEFAULT        0
+#define GENERATE_ONLY_IN_ROOT   1
+#define GENERATE_IF_IN_ROOT     2    /*default*/
+#define GENERATE_ALWAYS         3 
+#define GENERATE_PERIODICALLY   4
 
 /*****************************************************************************
  *****************************************************************************

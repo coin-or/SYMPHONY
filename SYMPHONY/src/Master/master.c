@@ -248,8 +248,12 @@ int sym_set_defaults(sym_environment *env)
    lp_par->max_not_fixable_to_add_max = 500;
    lp_par->mat_col_compress_num = 50;
    lp_par->mat_col_compress_ratio = .05;
-   lp_par->mat_row_compress_num = 20;
-   lp_par->mat_row_compress_ratio = .05;
+   /*
+    * changed row compression so that poor cuts are fully purged and are not
+    * merely lying around with very high rhs values -- asm4
+    */
+   lp_par->mat_row_compress_num = 0;
+   lp_par->mat_row_compress_ratio = .00001;
    lp_par->tailoff_gap_backsteps = 2;
    lp_par->tailoff_gap_frac = .99;
    lp_par->tailoff_obj_backsteps = 4;
@@ -276,26 +280,44 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fixed_to_ub_frac_before_logical_fixing = .01;
 
    lp_par->cgl.generate_cgl_cuts = TRUE;
-   lp_par->cgl.generate_cgl_gomory_cuts = TRUE;
-   lp_par->cgl.generate_cgl_knapsack_cuts = TRUE;
-   lp_par->cgl.generate_cgl_oddhole_cuts = TRUE;
-   lp_par->cgl.generate_cgl_clique_cuts = FALSE;
-   lp_par->cgl.generate_cgl_probing_cuts = TRUE;
-   lp_par->cgl.generate_cgl_mir_cuts = FALSE;
-   lp_par->cgl.generate_cgl_flow_and_cover_cuts = FALSE;
-   lp_par->cgl.generate_cgl_rounding_cuts = FALSE;
-   lp_par->cgl.generate_cgl_lift_and_project_cuts = FALSE;
+   lp_par->cgl.generate_cgl_gomory_cuts = GENERATE_DEFAULT;
+   lp_par->cgl.generate_cgl_redsplit_cuts = DO_NOT_GENERATE;
+   lp_par->cgl.generate_cgl_knapsack_cuts = GENERATE_DEFAULT;
+   lp_par->cgl.generate_cgl_oddhole_cuts = GENERATE_DEFAULT;
+   lp_par->cgl.generate_cgl_clique_cuts = GENERATE_DEFAULT;
+   lp_par->cgl.generate_cgl_probing_cuts = GENERATE_DEFAULT;
+   lp_par->cgl.generate_cgl_mir_cuts = DO_NOT_GENERATE;
+   lp_par->cgl.generate_cgl_twomir_cuts = DO_NOT_GENERATE;
+   lp_par->cgl.generate_cgl_flow_and_cover_cuts = GENERATE_DEFAULT;
+   lp_par->cgl.generate_cgl_rounding_cuts = DO_NOT_GENERATE;
+   lp_par->cgl.generate_cgl_lift_and_project_cuts = DO_NOT_GENERATE;
+   lp_par->cgl.generate_cgl_landp_cuts = DO_NOT_GENERATE;
 
-
+   lp_par->cgl.generate_cgl_gomory_cuts_freq = 
+      lp_par->cgl.generate_cgl_redsplit_cuts_freq = 
+      lp_par->cgl.generate_cgl_knapsack_cuts_freq = 
+      lp_par->cgl.generate_cgl_oddhole_cuts_freq = 
+      lp_par->cgl.generate_cgl_clique_cuts_freq = 
+      lp_par->cgl.generate_cgl_probing_cuts_freq = 
+      lp_par->cgl.generate_cgl_mir_cuts_freq = 
+      lp_par->cgl.generate_cgl_twomir_cuts_freq = 
+      lp_par->cgl.generate_cgl_flow_and_cover_cuts_freq = 
+      lp_par->cgl.generate_cgl_rounding_cuts_freq = 
+      lp_par->cgl.generate_cgl_lift_and_project_cuts_freq = 
+      lp_par->cgl.generate_cgl_landp_cuts_freq = 10;
+   
    lp_par->cgl.gomory_generated_in_root = FALSE;
+   lp_par->cgl.redsplit_generated_in_root = FALSE;
    lp_par->cgl.knapsack_generated_in_root = FALSE;
    lp_par->cgl.oddhole_generated_in_root = FALSE;
    lp_par->cgl.probing_generated_in_root = FALSE;
    lp_par->cgl.mir_generated_in_root = FALSE;
+   lp_par->cgl.twomir_generated_in_root = FALSE;
    lp_par->cgl.clique_generated_in_root = FALSE;
    lp_par->cgl.flow_and_cover_generated_in_root = FALSE;
    lp_par->cgl.rounding_generated_in_root = FALSE;
    lp_par->cgl.lift_and_project_generated_in_root = FALSE;
+   lp_par->cgl.landp_generated_in_root = FALSE;
 
    lp_par->multi_criteria = FALSE;
    lp_par->mc_find_supported_solutions = FALSE;
@@ -318,6 +340,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->strong_branching_cand_num_max = 10;
    lp_par->strong_branching_cand_num_min = 5;
    lp_par->strong_branching_red_ratio = 1;
+   lp_par->use_hot_starts = TRUE;
    lp_par->compare_candidates_default = HIGHEST_LOW_OBJ;
    lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
@@ -811,7 +834,7 @@ int sym_solve(sym_environment *env)
        case FEASIBLE_SOLUTION_NONZEROS:
        case FEASIBLE_SOLUTION_USER:
 	 CALL_WRAPPER_FUNCTION( receive_feasible_solution_u(env, msgtag) );
-	 if (env->par.verbosity > 0){
+	 if (env->par.verbosity >= -1){
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
 	    CALL_WRAPPER_FUNCTION( display_solution_u(env,
 						env->tm->opt_thread_num) );
@@ -3444,7 +3467,6 @@ int sym_set_continuous(sym_environment *env, int index)
 
 int sym_set_integer(sym_environment *env, int index)
 {
-   int i;
 
    if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
        !env->mip->is_int){
@@ -4911,12 +4933,17 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
       return(0);
    }
    else if (strcmp(key, "generate_cgl_cuts") == 0 ||
-	    strcmp(key, "generate_cgl_cuts") == 0){
+	    strcmp(key, "LP_generate_cgl_cuts") == 0){
       *value = cg_par->do_findcuts;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_gomory_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_gomory_cuts") == 0){
+      *value = lp_par->cgl.generate_cgl_gomory_cuts;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_redsplit_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_redsplit_cuts") == 0){
       *value = lp_par->cgl.generate_cgl_gomory_cuts;
       return(0);
    }
@@ -4945,6 +4972,11 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
      *value = lp_par->cgl.generate_cgl_mir_cuts;
      return(0);
    }
+   else if (strcmp(key, "generate_cgl_twomir_cuts") == 0 ||
+            strcmp(key, "LP_generate_cgl_twomir_cuts") == 0){
+     *value = lp_par->cgl.generate_cgl_mir_cuts;
+     return(0);
+   }
    else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts") == 0){
       *value = lp_par->cgl.generate_cgl_flow_and_cover_cuts;
@@ -4957,8 +4989,73 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    }
    else if (strcmp(key, "generate_cgl_lift_and_project_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts") == 0){
-      *value = lp_par->cgl.generate_cgl_lift_and_project_cuts;
+      *value = lp_par->cgl.generate_cgl_lift_and_project_cuts; 
+     return(0);
+   }
+   else if (strcmp(key, "generate_cgl_landp_cuts") == 0 ||
+            strcmp(key, "LP_generate_cgl_landp_cuts") == 0){
+     *value = lp_par->cgl.generate_cgl_mir_cuts;
+     return(0);
+   }
+   else if (strcmp(key, "generate_cgl_gomory_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_gomory_cuts_freq") == 0){
+      *value = lp_par->cgl.generate_cgl_gomory_cuts_freq;
       return(0);
+   }
+   else if (strcmp(key, "generate_cgl_redsplit_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_redsplit_cuts_freq") == 0){
+      *value = lp_par->cgl.generate_cgl_gomory_cuts_freq;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_knapsack_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_knapsack_cuts_freq") == 0){
+      *value = lp_par->cgl.generate_cgl_knapsack_cuts_freq;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_oddhole_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_oddhole_cuts_freq") == 0){
+      *value = lp_par->cgl.generate_cgl_oddhole_cuts_freq;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_probing_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_probing_cuts_freq") == 0){
+      *value = lp_par->cgl.generate_cgl_probing_cuts_freq;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_clique_cuts_freq") == 0 ||
+            strcmp(key, "LP_generate_cgl_clique_cuts_freq") == 0){
+     *value = lp_par->cgl.generate_cgl_clique_cuts_freq;
+     return(0);
+   }
+   else if (strcmp(key, "generate_cgl_mir_cuts_freq") == 0 ||
+            strcmp(key, "LP_generate_cgl_mir_cuts_freq") == 0){
+     *value = lp_par->cgl.generate_cgl_mir_cuts_freq;
+     return(0);
+   }
+   else if (strcmp(key, "generate_cgl_twomir_cuts_freq") == 0 ||
+            strcmp(key, "LP_generate_cgl_twomir_cuts_freq") == 0){
+     *value = lp_par->cgl.generate_cgl_twomir_cuts_freq;
+     return(0);
+   }
+   else if (strcmp(key, "generate_cgl_flow_and_cover_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts_freq") == 0){
+      *value = lp_par->cgl.generate_cgl_flow_and_cover_cuts_freq;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_rounding_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_rounding_cuts_freq") == 0){
+      *value = lp_par->cgl.generate_cgl_rounding_cuts_freq;
+      return(0);
+   }
+   else if (strcmp(key, "generate_cgl_lift_and_project_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts_freq") == 0){
+      *value = lp_par->cgl.generate_cgl_lift_and_project_cuts_freq; 
+     return(0);
+   }
+   else if (strcmp(key, "generate_cgl_landp_cuts_freq") == 0 ||
+            strcmp(key, "LP_generate_cgl_landp_cuts_freq") == 0){
+     *value = lp_par->cgl.generate_cgl_landp_cuts_freq;
+     return(0);
    }
    else if (strcmp(key, "max_presolve_iter") == 0 ||
 	    strcmp(key, "LP_max_presolve_iter") == 0){
@@ -5004,6 +5101,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    else if (strcmp(key, "strong_branching_cand_num_min") == 0 ||
 	    strcmp(key, "LP_strong_branching_cand_num_min") == 0){
       *value = lp_par->strong_branching_cand_num_min;
+      return(0);
+   }
+   else if (strcmp(key,"use_hot_starts") == 0) {
+      *value = lp_par->use_hot_starts;
       return(0);
    }
    else if (strcmp(key, "compare_candidates_default") == 0 ||
@@ -5119,7 +5220,7 @@ int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
 
    tm_params *tm_par = &env->par.tm_par;
    lp_params *lp_par = &env->par.lp_par;
-   cg_params *cg_par = &env->par.cg_par;
+   //cg_params *cg_par = &env->par.cg_par;
    //cp_params *cp_par = &env->par.cp_par;
    
    dg_params *dg_par = &env->par.dg_par;

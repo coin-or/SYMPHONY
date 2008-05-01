@@ -67,9 +67,10 @@ void OSL_check_error PROTO((const char *erring_func));
 #include "CglKnapsackCover.hpp"
 #include "CglProbing.hpp"
 #include "CglFlowCover.hpp"
+#include "CglTwomir.hpp"
+#include "CglLandP.hpp"
+#include "CglRedSplit.hpp"
 #endif
-
-
 
 #ifdef __OSI_CPLEX__
 #include "OsiCpxSolverInterface.hpp"
@@ -203,7 +204,7 @@ typedef struct LPDATA{
    double     *pseudo_costs_one;
    double     *pseudo_costs_zero;
 #endif
-
+   int         lp_count;
    cgl_params  cgl;
 
 }LPdata;
@@ -233,12 +234,16 @@ void change_row PROTO((LPdata *lp_data, int row_ind,
 void change_col PROTO((LPdata *lp_data, int col_ind,
 		       char sense, double lb, double ub));
 int dual_simplex PROTO((LPdata *lp_data, int *iterd));
+int solve_hotstart PROTO((LPdata *lp_data, int *iterd));
+int mark_hotstart PROTO((LPdata *lp_data));
+int unmark_hotstart PROTO((LPdata *lp_data));
 void btran PROTO((LPdata *lp_data, double *col));
 void get_binvcol PROTO((LPdata *lp_data, int j, double *col));
 void get_binvrow PROTO((LPdata *lp_data, int i, double *row));
 void get_basis PROTO((LPdata *lp_data, int *cstat, int *rstat));
 void set_obj_upper_lim PROTO((LPdata *lp_data, double lim));
 void set_itlim PROTO((LPdata *lp_data, int itlim));
+void set_itlim_hotstart PROTO((LPdata *lp_data, int itlim));
 void get_column PROTO((LPdata *lp_data, int j,
 		       double *colval, int *colind, int *collen, double *cj));
 void get_row PROTO((LPdata *lp_data, int i,
@@ -273,8 +278,9 @@ void write_mip_desc_mps PROTO((MIPdesc *mip, char *fname));
 void write_mip_desc_lp PROTO((MIPdesc *mip, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
 #ifdef USE_CGL_CUTS
-void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts, cut_data ***cuts,
-			      char send_to_pool, int is_rootnode));
+void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts,
+			      cut_data ***cuts, char send_to_pool,
+			      int is_rootnode, int verbosity));
 #endif
 #ifdef USE_GLPMPL
 int read_gmpl PROTO((MIPdesc *mip, char *modelfile, char *datafile,

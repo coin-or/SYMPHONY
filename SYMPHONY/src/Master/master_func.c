@@ -2365,7 +2365,7 @@ int set_param(sym_environment *env, char *line)
    }
    
    else if (strcmp(key, "generate_cgl_cuts") == 0 ||
-	    strcmp(key, "CG_generate_cgl_cuts") == 0){
+	    strcmp(key, "LP_generate_cgl_cuts") == 0){
       READ_INT_PAR(lp_par->cgl.generate_cgl_cuts);
       return(0);
    }
@@ -2406,6 +2406,12 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
 
+   else if (strcmp(key, "generate_cgl_twomir_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_twomir_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts);
+      return(0);
+   }
+
    else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_flow_and_cover_cuts") == 0){
       READ_INT_PAR(lp_par->cgl.generate_cgl_flow_and_cover_cuts);
@@ -2421,6 +2427,78 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "generate_cgl_lift_and_project_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts") == 0){
       READ_INT_PAR(lp_par->cgl.generate_cgl_lift_and_project_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_landp_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_landp_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_gomory_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_gomory_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_gomory_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_knapsack_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_knapsack_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_knapsack_cuts_freq);
+      return(0);
+   }
+   
+   else if (strcmp(key, "generate_cgl_oddhole_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_oddhole_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_oddhole_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_probing_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_probing_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_probing_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_clique_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_clique_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_clique_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_mir_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_mir_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_mir_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_twomir_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_twomir_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_twomir_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_flow_and_cover_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_flow_and_cover_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_rounding_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_rounding_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_rounding_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_lift_and_project_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_lift_and_project_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_lift_and_project_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_landp_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_landp_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts_freq);
       return(0);
    }
 
@@ -2476,6 +2554,10 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key,"strong_branching_red_ratio") == 0 ||
 	    strcmp(key,"LP_strong_branching_red_ratio") == 0){
       READ_DBL_PAR(lp_par->strong_branching_red_ratio);
+      return(0);
+   }
+   else if (strcmp(key,"use_hot_starts") == 0) {
+      READ_INT_PAR(lp_par->use_hot_starts);
       return(0);
    }
    else if (strcmp(key, "compare_candidates_default") == 0 ||

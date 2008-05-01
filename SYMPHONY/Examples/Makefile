@@ -1,152 +1,160 @@
-##############################################################################
-##############################################################################
-#                                                                            #
-# This file is part of the SYMPHONY MILP Solver Framework.                   #
-#                                                                            #
-# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and     #
-# Laci Ladanyi (ladanyi@us.ibm.com).                                         #
-#                                                                            #
-# (c) Copyright 2005-2007 Lehigh University. All Rights Reserved.            #
-#                                                                            #
-# This software is licensed under the Common Public License. Please see      #
-# accompanying file for terms.                                               #
-#                                                                            #
-# The author of this file is Menal Guzelsoy (megb@lehigh.edu)                #
-#                                                                            #
-##############################################################################
-##############################################################################
+#===========================================================================#
+#                                                                           #
+# This file is part of the SYMPHONY MILP Solver Framework.                  #
+#                                                                           #
+# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
+# Laci Ladanyi (ladanyi@us.ibm.com).                                        #
+#                                                                           #
+# The author of this file is Menal Guzelsoy                                 #
+#                                                                           #
+# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+#                                                                           #
+# This software is licensed under the Common Public License. Please see     #
+# accompanying file for terms.                                              #
+#                                                                           #
+#===========================================================================#
 
-CC = g++
-OPT = -g #-fPIC
-SHLINKPREFIX = -Wl,-rpath,
+# $Id$
 
-SYMPHONYROOT = ..
-COINROOT = ../../build/coin
-
-
-LP_SOLVER = OSI
-OSI_INTERFACE = CLP
+EXAMPLES = milp milp2 bicriteria sensitivity \
+	warm_start1 warm_start2 warm_start3
 
 ##############################################################################
 # If you wish to use SYMPHONY through the SYMPHONY OSI interface, 
 # set USE_OSI_INTERFACE to TRUE below. This will have the examples 
 # to call the OSI SYMPHONY interface routines. 
 ##############################################################################
+
 USE_OSI_INTERFACE = FALSE
 
-LPINCDIR = 
-LPLIBPATHS = 
-LPLIB = 
-SYMDEFS =
-
-ifeq ($(LP_SOLVER),OSI)
 ifeq ($(USE_OSI_INTERFACE),TRUE)
-       LPLIB += -lOsiSym
-       SYMDEFS += -DUSE_OSI_INTERFACE    
+EXAMPLES += milpOsi milpOsi2
+endif
+
+# Directory with COIN header files
+COININCDIR = /home/asm4/src/sym-stable/build-debug/include/coin
+
+# Directory with COIN libraries
+COINLIBDIR = /home/asm4/src/sym-stable/build-debug/lib
+
+# Directoy with SYMPHONY header files 
+#SYMINCDIR = /home/asm4/src/sym-stable/SYMPHONY/include
+
+# Directoy with SYMPHONY library
+#SYMLIBDIR = /home/asm4/src/sym-stable/SYMPHONY/src
+
+# Directory with Application files
+SYMEXDIR = /home/asm4/src/sym-stable/SYMPHONY/src/../Examples
+
+#Directory for LP solver
+GLPKINCDIR = 
+CPXINCDIR = 
+OSLINCDIR = 
+SPXINCDIR = 
+XPRINCDIR = 
+
+##########################################################################
+#  Usually, you don't have to change anything below.  Note that if you   #
+#  change certain compiler options, you might have to recompile the      #
+#  COIN package.                                                         #
+##########################################################################
+USE_CGL_CUTS = TRUE
+CLP_LP_SOLVER = TRUE
+GLPK_LP_SOLVER = #TRUE
+CPLEX_LP_SOLVER = #TRUE
+OSL_LP_SOLVER = #TRUE
+SOPLEX_LP_SOLVER = #TRUE
+XPRESS_LP_SOLVER = #TRUE
+
+VPATH = \
+	$(SYMEXDIR)
+
+WHATTOMAKE = $(addsuffix , $(EXAMPLES))
+
+# C++ Compiler command
+CXX = g++
+
+# C++ Compiler options
+CXXFLAGS = -g -pipe -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion   -Wno-unknown-pragmas -Wno-write-strings -Wno-sign-compare -Wno-cast-qual
+
+# additional C++ Compiler options for linking
+CXXLINKFLAGS = 
+
+#Include files
+INCL =  -I`$(CYGPATH_W) $(COININCDIR)`
+
+# Libraries necessary to link
+LIBS = 
+
+# Additional flags
+ADDINCFLAGS =
+
+ifeq ($(USE_CGL_CUTS),TRUE)
+LIBS += -lCgl `cat /home/asm4/src/sym-stable/build-debug/lib/../share/doc/coin/Cgl/cgl_addlibs.txt`
+#ADDINCFLAGS += -DUSE_CGL_CUTS
+endif
+
+ifeq ($(CLP_LP_SOLVER),TRUE)
+LIBS += -lOsiClp -lClp `cat /home/asm4/src/sym-stable/build-debug/lib/../share/doc/coin/Clp/clp_addlibs.txt`
+#ADDINCFLAGS += -D__OSI_CLP__
+endif
+
+ifeq ($(GLPK_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+LIBS += -lOsiGlpk #-lglpk
+#ADDINCFLAGS += -D__OSI_GLPK__
+else
+ifeq ($(USE_GMPL), TRUE)
+INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+#ADDINCFLAGS += -DUSE_GLPMPL
 endif
 endif
 
-LPLIB += -lSym #-L$(HOME)/src/glpk-4.9/src/ -lglpk
-
-ifeq ($(LP_SOLVER),CPLEX)
-       LPINCDIR += /usr/local/include/
-       LPLIBPATHS += /usr/local/lib/ 
-       LPLIB += -lcplex -lpthread
+ifeq ($(CPLEX_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
+LIBS += -lOsiCpx #-lcplex
+#ADDINCFLAGS += -D__OSI_CPLEX__
 endif
 
-ifeq ($(LP_SOLVER),OSL)
-       LPINCDIR +=  $(HOME)/OSL/osllib/include/
-       LPLIBPATHS += $(HOME)/OSL/osllib/lib
-       LPLIB += -losl
+ifeq ($(OSL_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(OSLINCDIR)`
+LIBS += -lOsiOsl #-losl
+#ADDINCFLAGS += -D__OSI_OSL__
 endif
 
-ifeq ($(LP_SOLVER),OSI)
-       LPINCDIR += $(COINROOT)/include/coin
-       LPLIBPATHS += $(COINROOT)/lib
-       LPLIB += -lCgl
-ifeq ($(OSI_INTERFACE),CPLEX)
-       LPINCDIR += /usr/local/include/
-       LPLIBPATHS += /usr/local/lib/
-       LPLIB += -lOsiCpx -lcplex -lpthread
-endif
-ifeq ($(OSI_INTERFACE),OSL)
-       LPINCDIR += $(HOME)/OSL/osllib/include
-       LPLIBPATHS += $(HOME)/OSL/osllib/lib
-       LPLIB += -lOsiOsl -losl
-endif
-ifeq ($(OSI_INTERFACE),CLP)
-       LPINCDIR += 
-       LPLIBPATHS +=
-       LPLIB += -lOsiClp -lClp
-endif
-ifeq ($(OSI_INTERFACE),GLPK)
-       LPINCDIR += ${HOME}/GLPK/glpk-4.3/include
-       LPLIBPATHS += ${HOME}/GLPK/glpk-4.3/src
-       LPLIB += -lOsiGlpk -lglpk
-endif
-       LPLIB += -lOsi -lCoinUtils 
+ifeq ($(SOPLEX_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(SPXINCDIR)`
+LIBS += -lOsiSpx #-l
+#ADDINCFLAGS += -D__OSI_SOPLEX__
 endif
 
-LPOSILIB =
-
-ifneq ($(USE_OSI_INTERFACE),TRUE)
-       LPOSILIB += -lOsiSym $(LPLIB)
-else 
-       LPOSILIB += $(LPLIB)
+ifeq ($(XPRESS_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(XPRINCDIR)`
+LIBS += -lOsiXpr #-l
+#ADDINCFLAGS += -D__OSI_XPRESS__
 endif
 
+ADDLIBS += -lm 
 
-INCDIR        = $(addprefix -I,${LPINCDIR})
-LDFLAGS       = $(addprefix -L,${LPLIBPATHS})
-LDFLAGS      += $(SYMDEFS)
+LIBS += -lOsi -lCoinUtils `cat /home/asm4/src/sym-stable/build-debug/lib/../share/doc/coin/Osi/osi_addlibs.txt` \
+	`cat /home/asm4/src/sym-stable/build-debug/lib/../share/doc/coin/CoinUtils/coinutils_addlibs.txt` $(ADDLIBS)
 
-LINKFLAGS += $(addprefix ${SHLINKPREFIX},${LPLIBPATHS})
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = echo
 
-EXAMPLES = milp milp2 milpOsi milpOsi2 bicriteria sensitivity \
-	warm_start1 warm_start2 warm_start3
+SYMLIBS = -L$(COINLIBDIR) #-L$(SYMLIBDIR)
 
-examples: $(EXAMPLES)
-	true
+ifeq ($(USE_OSI_INTERFACE),TRUE)
+SYMLIBS += -lOsiSym
+ADDINCFLAGS += -DUSE_OSI_INTERFACE
+endif
 
-milp : milp.c
+SYMLIBS += -lSym $(LIBS) 
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPLIB)
+all: $(WHATTOMAKE)
 
-milp2 : milp2.c
+%: %.c
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) $(INCL) $(ADDINCFLAGS) $< -o $@ $(SYMLIBS)
 
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPLIB)
-
-milpOsi : milpOsi.c
-
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPOSILIB)
-
-milpOsi2 : milpOsi2.c
-
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPOSILIB)
-
-bicriteria : bicriteria.c
-
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
-
-sensitivity : sensitivity.c
-
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR) $(LINKFLAGS) $< -o $@ $(LPLIB)
-
-warm_start1 : warm_start1.c
-
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
-
-warm_start2 : warm_start2.c
-
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
-
-warm_start3 : warm_start3.c
-
-	$(CC) $(OPT) $(LDFLAGS) $(INCDIR)  $(LINKFLAGS) $< -o $@ $(LPLIB)
-
-
-clean : 
-
-	rm -rf $(EXAMPLES)
-
-#.SILENT:
+clean:
+	rm -rf $(WHATTOMAKE)

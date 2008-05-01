@@ -327,6 +327,7 @@ AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLandP` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
