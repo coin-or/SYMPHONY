@@ -488,10 +488,7 @@ int solve(tm_prob *tm)
 	 struct timeval timeout = {5, 0};
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
 	 if (r_bufid && !process_messages(tm, r_bufid)){
-	    for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-	       if (tm->samephase_cand[i]->lower_bound < tm->lb)
-		  tm->lb = tm->samephase_cand[i]->lower_bound;
-	    }
+            find_tree_lb(tm);
 	    termcode = SOMETHING_DIED;
 	    break;
 	 }
@@ -499,11 +496,8 @@ int solve(tm_prob *tm)
 	 now = wall_clock(NULL);
 	 if (now - then > timeout4){
 	    if (!processes_alive(tm)){
-	       for (i=tm->samephase_candnum, tm->lb=MAXDOUBLE; i >= 1; i--){
-		  if (tm->samephase_cand[i]->lower_bound < tm->lb)
-		     tm->lb = tm->samephase_cand[i]->lower_bound;
-	       }
-	       termcode = SOMETHING_DIED;
+               find_tree_lb(tm);
+               termcode = SOMETHING_DIED;
 	       break;
 	    }
 	    then = now;
@@ -531,13 +525,7 @@ int solve(tm_prob *tm)
       if (termcode != TM_UNFINISHED)
 	 break;
    }
-   for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-      if (tm->samephase_cand[i]->lower_bound < tm->lb)
-	 tm->lb = tm->samephase_cand[i]->lower_bound;
-   }
-   if (tm->lb >= MAXDOUBLE / 2){
-      tm->lb = tm->ub;
-   }
+   find_tree_lb(tm);
    tm->comp_times.ramp_up_tm = ramp_up_tm;
    tm->comp_times.ramp_down_time = ramp_down_time;
    write_log_files(tm);
@@ -659,18 +647,7 @@ void print_tree_status(tm_prob *tm)
 	 printf("ub: ?? ");
       }
    }
-   if (tm->samephase_candnum == 0){
-      tm->lb = tm->ub;
-   }else{
-      for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-	 if (tm->samephase_cand[i]->parent->lower_bound < tm->lb){
-	    tm->lb = tm->samephase_cand[i]->parent->lower_bound;
-	 }
-      }
-   }
-   if (tm->lb >= MAXDOUBLE / 2 || (tm->has_ub && tm->lb > tm->ub)){
-      tm->lb = tm->ub;
-   }
+   find_tree_lb(tm);
    if (tm->obj_sense == SYM_MAXIMIZE){
       printf("ub: %.2f ", -tm->lb);
    }else{
@@ -1428,13 +1405,7 @@ char shall_we_dive(tm_prob *tm, double objval)
    double rand_num, average_lb;
    double cutoff = 0;
 
-   for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-      if (tm->samephase_cand[i]->lower_bound < tm->lb)
-	 tm->lb = tm->samephase_cand[i]->lower_bound;
-   }
-   if (tm->lb >= MAXDOUBLE / 2){
-      tm->lb = tm->ub;
-   }
+   find_tree_lb(tm);
    
    if (tm->par.time_limit >= 0.0 &&
 	wall_clock(NULL) - tm->start_time >= tm->par.time_limit){
@@ -3427,14 +3398,7 @@ int tm_close(tm_prob *tm, int termcode)
 #endif
    
    tm->stat.root_lb = tm->rootnode->lower_bound;
-   for (i = tm->samephase_candnum, tm->lb = MAXDOUBLE; i >= 1; i--){
-      if (tm->samephase_cand[i]->lower_bound < tm->lb)
-	 tm->lb = tm->samephase_cand[i]->lower_bound;
-   }
-   if (tm->lb >= MAXDOUBLE / 2){
-      tm->lb = tm->ub;
-   }
-
+   find_tree_lb(tm);
    return(termcode);
 
 #ifndef COMPILE_IN_TM
@@ -3492,4 +3456,31 @@ void sym_catch_c(int num)
 }
 #endif
 /*===========================================================================*/
+/*
+ * Find the lowerbound of the current branch-and-cut tree and save it in
+ * tm->lb
+ */
+int find_tree_lb(tm_prob *tm)
+{
+   double lb = MAXDOUBLE;
+   bc_node **samephase_cand;
+
+   if (tm->par.node_selection_rule == LOWEST_LP_FIRST) {
+      if (tm->samephase_candnum > 0) {
+         lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
+      } /* else its same as MAXDOUBLE */
+   } else {
+      samephase_cand = tm->samephase_cand;
+      for (int i = tm->samephase_candnum; i >= 1; i--){
+         if (samephase_cand[i]->lower_bound < lb) {
+            lb = samephase_cand[i]->lower_bound;
+         }
+      }
+   }
+   if (lb >= MAXDOUBLE / 2){ 
+      lb = tm->ub;
+   }
+   tm->lb = lb;
+   return 0;
+}
 /*===========================================================================*/

@@ -152,6 +152,7 @@ void mark_lp_process_free PROTO((tm_prob *tm, int lp, int cp));
 int add_cut_to_list PROTO((tm_prob *tm, cut_data *cut));
 void install_new_ub PROTO((tm_prob *tm, double new_ub, int opt_thread_num,
 			   int bc_index, char branching, int feasible));
+int find_tree_lb PROTO((tm_prob *tm));
 
 /*--------------- Function related to merging descriptions ------------------*/
 
@@ -220,5 +221,4 @@ void unpack_cut_set PROTO((tm_prob *tm, int sender, int cutnum,
 int receive_lp_timing PROTO((tm_prob *tm));
 
 void sym_catch_c PROTO((int num));
-
 #endif

@@ -3360,34 +3360,37 @@ void write_sav(LPdata *lp_data, char *fname)
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 		       char send_to_pool, int is_rootnode, int verbosity)
 {
-   OsiCuts cutlist;
-   OsiRowCut cut;
-   int i = 0, j = 0, k = 0; 
-   int *matind;
-   double *matval;
-   cgl_params *par = &(lp_data->cgl);
-   int termcode, iterd, cut_num = 0;
-   int new_cut_num = 0;
-   int is_top_iter = lp_data->lp_count == 1 ? TRUE: FALSE; 
+   OsiCuts              cutlist;
+   OsiRowCut            cut;
+   int                  i = 0, j = 0, k = 0; 
+   int                  *matind;
+   double               *matval;
+   cgl_params           *par = &(lp_data->cgl);
+   int                  termcode, iterd, cut_num = 0;
+   int                  new_cut_num = 0;
+   int                  is_top_iter = (lp_data->lp_count == 1) ? TRUE : FALSE; 
+   OsiXSolverInterface  *si = lp_data->si;
+   var_desc             **vars = lp_data->vars;
+
    
 #ifndef COMPILE_IN_LP
-   par->probing_generated_in_root = TRUE;
-   par->gomory_generated_in_root = TRUE;
-   par->redsplit_generated_in_root = FALSE;
-   par->oddhole_generated_in_root = TRUE;
-   par->mir_generated_in_root = TRUE;
-   par->twomir_generated_in_root = FALSE;
-   par->clique_generated_in_root = FALSE;
-   par->flow_and_cover_generated_in_root = TRUE;
-   par->rounding_generated_in_root = FALSE;
-   par->lift_and_project_generated_in_root = FALSE;
-   par->landp_generated_in_root = FALSE;
+   par->probing_generated_in_root               = TRUE;
+   par->gomory_generated_in_root                = TRUE;
+   par->redsplit_generated_in_root              = FALSE;
+   par->oddhole_generated_in_root               = TRUE;
+   par->mir_generated_in_root                   = TRUE;
+   par->twomir_generated_in_root                = FALSE;
+   par->clique_generated_in_root                = FALSE;
+   par->flow_and_cover_generated_in_root        = TRUE;
+   par->rounding_generated_in_root              = FALSE;
+   par->lift_and_project_generated_in_root      = FALSE;
+   par->landp_generated_in_root                 = FALSE;
 #endif
       
    /* Set proper variables to be integer */
    for (i = 0; i < lp_data->n; i++) {
-      if (lp_data->vars[i]->is_int) { // integer or binary
-	 lp_data->si->setInteger(i);
+      if (vars[i]->is_int) { // integer or binary
+	 si->setInteger(i);
       }
    }  
    
@@ -3410,7 +3413,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	probe->setMaxLook(50);
 	probe->setRowCuts(3);
 	//#endif
-	probe->generateCuts(*(lp_data->si), cutlist);
+	probe->generateCuts(*(si), cutlist);
 	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	   if (is_top_iter){
 	      par->probing_generated_in_root = TRUE;
@@ -3436,7 +3439,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 (lp_data->lp_count % par->generate_cgl_gomory_cuts_freq == 0)) ||
 	is_top_iter){				     
 	CglGomory *gomory = new CglGomory;
-	gomory->generateCuts(*(lp_data->si), cutlist);
+	gomory->generateCuts(*si, cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	  if (is_top_iter){
 	     par->gomory_generated_in_root = TRUE;
@@ -3465,7 +3468,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	/* make basis ready first */
 	termcode = dual_simplex(lp_data, &iterd);	
 	CglRedSplit *redsplit = new CglRedSplit;
-	redsplit->generateCuts(*(lp_data->si), cutlist);
+	redsplit->generateCuts(*si, cutlist);
 	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	   if (is_top_iter){
 	      par->redsplit_generated_in_root = TRUE;
@@ -3491,7 +3494,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 (lp_data->lp_count % par->generate_cgl_knapsack_cuts_freq == 0)) ||
 	 is_top_iter){	
 	CglKnapsackCover *knapsack = new CglKnapsackCover;
-	knapsack->generateCuts(*(lp_data->si), cutlist);
+	knapsack->generateCuts(*si, cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	  if (is_top_iter){
 	     par->knapsack_generated_in_root = TRUE;
@@ -3523,7 +3526,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
        oddhole->setMinimumViolationPer(0.00002);
        oddhole->setMaximumEntries(200);
        //#endif
-       oddhole->generateCuts(*(lp_data->si), cutlist);
+       oddhole->generateCuts(*si, cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	  if (is_top_iter){ 
 	     par->oddhole_generated_in_root = TRUE;
@@ -3550,7 +3553,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 is_top_iter){
 				     
 	 CglMixedIntegerRounding *mir = new CglMixedIntegerRounding;
-	 mir->generateCuts(*(lp_data->si), cutlist);
+	 mir->generateCuts(*si, cutlist);
 	 if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	    if (is_top_iter){
 	       par->mir_generated_in_root = TRUE;
@@ -3577,7 +3580,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 is_top_iter){
 				     
        CglTwomir *twomir = new CglTwomir;
-       twomir->generateCuts(*(lp_data->si), cutlist);
+       twomir->generateCuts(*si, cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	  if (is_top_iter){
 	     par->twomir_generated_in_root = TRUE;
@@ -3606,7 +3609,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
        CglClique *clique = new CglClique;
        clique->setStarCliqueReport(FALSE);
        clique->setRowCliqueReport(FALSE);
-       clique->generateCuts(*(lp_data->si), cutlist);
+       clique->generateCuts(*si, cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	  if (is_top_iter){
 	     par->clique_generated_in_root = TRUE;
@@ -3633,7 +3636,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 is_top_iter){
 				     
        CglFlowCover *flow = new CglFlowCover;
-       flow->generateCuts(*(lp_data->si), cutlist);
+       flow->generateCuts(*si, cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	  if (is_top_iter){
 	     par->flow_and_cover_generated_in_root = TRUE;
@@ -3661,7 +3664,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 is_top_iter){
 				     
        CglSimpleRounding * rounding = new CglSimpleRounding;
-       rounding->generateCuts(*(lp_data->si), cutlist);
+       rounding->generateCuts(*si, cutlist);
        if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	  if (is_top_iter){
 	     par->rounding_generated_in_root = TRUE;
@@ -3689,7 +3692,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 is_top_iter){
 				     
 	CglLiftAndProject *liftandproject = new CglLiftAndProject;
-	liftandproject->generateCuts(*(lp_data->si), cutlist);
+	liftandproject->generateCuts(*si, cutlist);
 	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	   if (is_top_iter){
 	      par->lift_and_project_generated_in_root = TRUE;
@@ -3727,14 +3730,14 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	termcode = dual_simplex(lp_data, &iterd); 
 	/* 	if(termcode != 0){ 
 	   write_mps(lp_data, "lanp.mps"); 
- 	   lp_data->si->initialSolve(); 
- 	   lp_data->objval = lp_data->si->getObjValue(); 
+ 	   si->initialSolve(); 
+ 	   lp_data->objval = si->getObjValue(); 
  	   dual_simplex(lp_data, &iterd); 
  	} */
 	CglLandP *landp = new CglLandP;
 	//landp->parameter().pivotLimit = 10;
 	landp->parameter().maxCutPerRound = 30;
-	landp->generateCuts(*(lp_data->si), cutlist);
+	landp->generateCuts(*si, cutlist);
 	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	   if (is_top_iter){
 	      par->landp_generated_in_root = TRUE;
@@ -3784,7 +3787,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 matind = (int *) ((*cuts)[j]->coef + ISIZE);
 	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
 	 for (k = 0; k < num_elements; k++){
-	    matind[k] = lp_data->vars[indices[k]]->userind;
+	    matind[k] = vars[indices[k]]->userind;
 	 }
 	 memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
 	 qsort_id(matind, matval, num_elements);
