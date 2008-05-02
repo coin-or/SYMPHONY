@@ -1615,6 +1615,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
    LPdata       *lp_data = p->lp_data;
    int           user_res;
    int           i, j, k, l = 0, nzcnt, real_nzcnt, explicit_row_num = 0;
+   const int     n = lp_data->n;
    int          *matind, *row_matind;
    double       *matval, *row_matval;
    waiting_row **row_list = NULL;
@@ -1644,14 +1645,35 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
             (int *) malloc(nzcnt * ISIZE);
 	 row_matval = row_list[explicit_row_num]->matval = 
             (double *) malloc(nzcnt * DSIZE);
-	 for (j = 0; j < lp_data->n; j++){
-	    for (k = 0; k < nzcnt; k++){
-	       if (matind[k] == vars[j]->userind){
-		  row_matind[real_nzcnt]   = j;
-		  row_matval[real_nzcnt++] = matval[k];
-	       }
-	    }
+#if 0
+         for (k = 0; k < nzcnt; k++){
+            /* 
+             * desparate to avoid the following nested for loop here, 
+             * we try this first
+             */
+            if (matind[k] == vars[matind[k]]->userind) {
+               row_matind[real_nzcnt]   = matind[k];
+               row_matval[real_nzcnt++] = matval[k];
+               //printf("success\n");
+            } else {
+               for (j = 0; j < n; j++){
+                  if (matind[k] == vars[j]->userind){
+                     row_matind[real_nzcnt]   = j;
+                     row_matval[real_nzcnt++] = matval[k];
+                     break;
+                  }
+               }
+            }
 	 }
+#endif
+         for (j = 0; j < n; j++){
+            for (k = 0; k < nzcnt; k++){
+               if (matind[k] == vars[j]->userind){
+                  row_matind[real_nzcnt]   = j;
+                  row_matval[real_nzcnt++] = matval[k];
+               }
+            }
+         }
 	 row_list[explicit_row_num++]->nzcnt = real_nzcnt;
 	 cuts[i] = NULL;
 	 break;
