@@ -287,7 +287,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.generate_cgl_clique_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_probing_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_mir_cuts = DO_NOT_GENERATE;
-   lp_par->cgl.generate_cgl_twomir_cuts = DO_NOT_GENERATE;
+   lp_par->cgl.generate_cgl_twomir_cuts = GENERATE_ONLY_IN_ROOT;
    lp_par->cgl.generate_cgl_flow_and_cover_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_rounding_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_lift_and_project_cuts = DO_NOT_GENERATE;
