@@ -5077,7 +5077,7 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    }
    else if (strcmp(key, "generate_cgl_redsplit_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_redsplit_cuts") == 0){
-      *value = lp_par->cgl.generate_cgl_gomory_cuts;
+      *value = lp_par->cgl.generate_cgl_redsplit_cuts;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_knapsack_cuts") == 0 ||
@@ -5935,9 +5935,9 @@ int sym_test(sym_environment *env, int *test_status)
       free_master_u(env);
       strcpy(env->par.infile, "");
       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
-      sym_set_defaults (env);
-      sym_set_int_param(env, "verbosity", -10);
     }
+    sym_set_defaults (env);
+    sym_set_int_param(env, "verbosity", -10);
 
     strcpy(infile, "");
     if (dirsep == '/')
