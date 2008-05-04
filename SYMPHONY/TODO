@@ -2,6 +2,8 @@
    1.1 add parameters for different cuts
    1.2 add mir, twomir
  2 cut selection (A)
+   2.1 use tightLower, tightUpper to get tighter bounds on variables from
+       cglprobing
  3 preprocessing (M)
  4 primal heuristics (A)
    4.1 octane (M)
