@@ -287,7 +287,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.generate_cgl_clique_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_probing_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_mir_cuts = DO_NOT_GENERATE;
-   lp_par->cgl.generate_cgl_twomir_cuts = DO_NOT_GENERATE;
+   lp_par->cgl.generate_cgl_twomir_cuts = GENERATE_ONLY_IN_ROOT;
    lp_par->cgl.generate_cgl_flow_and_cover_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_rounding_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_lift_and_project_cuts = DO_NOT_GENERATE;
@@ -4944,7 +4944,7 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    }
    else if (strcmp(key, "generate_cgl_redsplit_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_redsplit_cuts") == 0){
-      *value = lp_par->cgl.generate_cgl_gomory_cuts;
+      *value = lp_par->cgl.generate_cgl_redsplit_cuts;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_knapsack_cuts") == 0 ||
@@ -5802,9 +5802,9 @@ int sym_test(sym_environment *env, int *test_status)
       free_master_u(env);
       strcpy(env->par.infile, "");
       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
-      sym_set_defaults (env);
-      sym_set_int_param(env, "verbosity", -10);
     }
+    sym_set_defaults (env);
+    sym_set_int_param(env, "verbosity", -10);
 
     strcpy(infile, "");
     if (dirsep == '/')

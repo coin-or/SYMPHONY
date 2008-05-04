@@ -193,6 +193,19 @@ int create_subproblem_u(lp_prob *p)
 
    double *lb, *ub;
    char *is_int;
+   MIPdesc *lp_data_mip, *p_mip;
+   char *lp_data_mip_is_int, *p_mip_is_int;
+   double *lp_data_mip_ub, *p_mip_ub;
+   double *lp_data_mip_lb, *p_mip_lb;
+   double *lp_data_mip_obj, *p_mip_obj;
+   int *lp_data_mip_matbeg, *p_mip_matbeg;
+   int *lp_data_mip_matind, *p_mip_matind;
+   double *lp_data_mip_matval, *p_mip_matval;
+   char *lp_data_mip_sense, *p_mip_sense;
+   double *lp_data_mip_rhs, *p_mip_rhs;
+   double *lp_data_mip_rngval, *p_mip_rngval;
+
+   p_mip = p->mip;
 
    lp_data->n = bvarnum + desc->uind.size;
    lp_data->m = bcutnum + desc->cutind.size;
@@ -225,14 +238,15 @@ int create_subproblem_u(lp_prob *p)
       }
 
       if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
-	 vars[lp_data->n - 1]->userind = p->mip->n;
+	 vars[lp_data->n - 1]->userind = p_mip->n;
 	 vars[lp_data->n - 1]->colind  = lp_data->n - 1;
       }
    }
    lp_data->ordering = COLIND_AND_USERIND_ORDERED;
 
-   lp_data->mip->n = lp_data->n;
-   lp_data->mip->m = lp_data->m;
+   lp_data_mip     = lp_data->mip;
+   lp_data_mip->n = lp_data->n;
+   lp_data_mip->m = lp_data->m;
 
    /* Create the list of indices to pass to the user */
    userind = (int *) malloc(lp_data->n * ISIZE);
@@ -246,7 +260,7 @@ int create_subproblem_u(lp_prob *p)
        /* list of base and extra variables */
        userind,
        /* description of the LP relaxation to be filled out by the user */
-       lp_data->mip, 
+       lp_data_mip, 
        /* max sizes (estimated by the user) */
        &maxn, &maxm, &maxnz);
 #else
@@ -257,86 +271,107 @@ int create_subproblem_u(lp_prob *p)
       
     case USER_DEFAULT:
        
-      if (!p->mip->matbeg){
+      if (!p_mip->matbeg){
 	 printf("Illegal return code.\n");
 	 printf("Trying to use default user_create_subproblem without");
 	 printf("reading an MPS or AMPL file. Exiting...\n\n");
 	 return(ERROR__ILLEGAL_RETURN_CODE);
       }
 
-      lp_data->mip->nz = p->mip->nz;
+      lp_data_mip->nz = p_mip->nz;
       if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
-	 lp_data->mip->nz += 2 * lp_data->n;
+	 lp_data_mip->nz += 2 * lp_data->n;
       }
       
       /* Allocate the arrays.*/
-      lp_data->mip->matbeg  = (int *) malloc((lp_data->mip->n + 1) * ISIZE);
-      lp_data->mip->matind  = (int *) malloc((lp_data->mip->nz) * ISIZE);
-      lp_data->mip->matval  = (double *) malloc((lp_data->mip->nz) * DSIZE);
-      lp_data->mip->obj     = (double *) malloc(lp_data->mip->n * DSIZE);
-      lp_data->mip->ub      = (double *) malloc(lp_data->mip->n * DSIZE);
-      lp_data->mip->lb      = (double *) calloc(lp_data->mip->n, DSIZE); 
-      lp_data->mip->rhs     = (double *) malloc(lp_data->mip->m * DSIZE);
-      lp_data->mip->sense   = (char *)   malloc(lp_data->mip->m * CSIZE);
-      lp_data->mip->rngval  = (double *) calloc(lp_data->mip->m, DSIZE);
-      lp_data->mip->is_int  = (char *)   calloc(lp_data->mip->n, CSIZE);
+      lp_data_mip->matbeg  = (int *) malloc((lp_data_mip->n + 1) * ISIZE);
+      lp_data_mip->matind  = (int *) malloc((lp_data_mip->nz) * ISIZE);
+      lp_data_mip->matval  = (double *) malloc((lp_data_mip->nz) * DSIZE);
+      lp_data_mip->obj     = (double *) malloc(lp_data_mip->n * DSIZE);
+      lp_data_mip->ub      = (double *) malloc(lp_data_mip->n * DSIZE);
+      lp_data_mip->lb      = (double *) calloc(lp_data_mip->n, DSIZE); 
+      lp_data_mip->rhs     = (double *) malloc(lp_data_mip->m * DSIZE);
+      lp_data_mip->sense   = (char *)   malloc(lp_data_mip->m * CSIZE);
+      lp_data_mip->rngval  = (double *) calloc(lp_data_mip->m, DSIZE);
+      lp_data_mip->is_int  = (char *)   calloc(lp_data_mip->n, CSIZE);
 
+      lp_data_mip_is_int        = lp_data_mip->is_int;
+      lp_data_mip_ub            = lp_data_mip->ub;
+      lp_data_mip_lb            = lp_data_mip->lb;
+      lp_data_mip_obj           = lp_data_mip->obj;
+      lp_data_mip_matbeg        = lp_data_mip->matbeg;
+      lp_data_mip_matind        = lp_data_mip->matind;
+      lp_data_mip_matval        = lp_data_mip->matval;
+      lp_data_mip_sense         = lp_data_mip->sense;
+      lp_data_mip_rhs           = lp_data_mip->rhs;
+      lp_data_mip_rngval        = lp_data_mip->rngval;
+
+      p_mip_is_int              = p_mip->is_int;
+      p_mip_ub                  = p_mip->ub;
+      p_mip_lb                  = p_mip->lb;
+      p_mip_obj                 = p_mip->obj;
+      p_mip_matbeg              = p_mip->matbeg;
+      p_mip_matind              = p_mip->matind;
+      p_mip_matval              = p_mip->matval;
+      p_mip_sense               = p_mip->sense;
+      p_mip_rhs                 = p_mip->rhs;
+      p_mip_rngval              = p_mip->rngval;
       /* Fill out the appropriate data structures*/
-      lp_data->mip->matbeg[0] = 0;
-      for (j = 0, i = 0; i < lp_data->mip->n; i++){
-	 if (userind[i] == p->mip->n){
+      lp_data_mip_matbeg[0]    = 0;
+      for (j = 0, i = 0; i < lp_data_mip->n; i++){
+	 if (userind[i] == p_mip->n){
 	    /* We should only be here with multi-criteria problems. */
 	    /* This is the artifical variable added for finding nondominated */
 	    /* solutions. */
-	    lp_data->mip->is_int[i]    = FALSE;
-	    lp_data->mip->ub[i]        = MAXINT;
-	    lp_data->mip->lb[i]         = -MAXINT;
-	    lp_data->mip->obj[i]       = 1.0;
-	    lp_data->mip->matval[j]    = -1.0;
-	    lp_data->mip->matind[j++]  = bcutnum - 2;
-	    lp_data->mip->matval[j]    = -1.0;
-	    lp_data->mip->matind[j++]  = bcutnum - 1;
-	    lp_data->mip->matbeg[i+1]  = j;
+	    lp_data_mip_is_int[i]    = FALSE;
+	    lp_data_mip_ub[i]        = MAXINT;
+	    lp_data_mip_lb[i]        = -MAXINT;
+	    lp_data_mip_obj[i]       = 1.0;
+	    lp_data_mip_matval[j]    = -1.0;
+	    lp_data_mip_matind[j++]  = bcutnum - 2;
+	    lp_data_mip_matval[j]    = -1.0;
+	    lp_data_mip_matind[j++]  = bcutnum - 1;
+	    lp_data_mip_matbeg[i+1]  = j;
 	    continue;
 	 }
-	 lp_data->mip->ub[i] = p->mip->ub[userind[i]];
-	 lp_data->mip->lb[i] = p->mip->lb[userind[i]];
-	 lp_data->mip->is_int[i] = p->mip->is_int[userind[i]];
-	 for (k = p->mip->matbeg[userind[i]]; k < p->mip->matbeg[userind[i]+1];
+	 lp_data_mip_ub[i] = p_mip_ub[userind[i]];
+	 lp_data_mip_lb[i] = p_mip_lb[userind[i]];
+	 lp_data_mip_is_int[i] = p_mip_is_int[userind[i]];
+	 for (k = p_mip_matbeg[userind[i]]; k < p_mip_matbeg[userind[i]+1];
 	      k++){
-	    lp_data->mip->matind[j]   = p->mip->matind[k];
-	    lp_data->mip->matval[j++] = p->mip->matval[k];
+	    lp_data_mip_matind[j]   = p_mip_matind[k];
+	    lp_data_mip_matval[j++] = p_mip_matval[k];
 	 }
 	 if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
-	    lp_data->mip->obj[i] = p->par.mc_rho*(p->mip->obj1[userind[i]] +
-						  p->mip->obj2[userind[i]]);
-	    lp_data->mip->matval[j] = p->par.mc_gamma*p->mip->obj1[userind[i]];
-	    lp_data->mip->matind[j++] = bcutnum - 2;
-	    lp_data->mip->matval[j] = p->par.mc_tau*p->mip->obj2[userind[i]];
-	    lp_data->mip->matind[j++] = bcutnum - 1;
+	    lp_data_mip_obj[i] = p->par.mc_rho*(p_mip->obj1[userind[i]] +
+						  p_mip->obj2[userind[i]]);
+	    lp_data_mip_matval[j] = p->par.mc_gamma*p_mip->obj1[userind[i]];
+	    lp_data_mip_matind[j++] = bcutnum - 2;
+	    lp_data_mip_matval[j] = p->par.mc_tau*p_mip->obj2[userind[i]];
+	    lp_data_mip_matind[j++] = bcutnum - 1;
 	 }else{
-	    lp_data->mip->obj[i] = p->mip->obj[userind[i]];
+	    lp_data_mip_obj[i] = p_mip_obj[userind[i]];
 	 }
-	 lp_data->mip->matbeg[i+1] = j;
+	 lp_data_mip_matbeg[i+1] = j;
       }
-      lp_data->mip->nz = j;
-      for (i = 0; i < p->mip->m; i++){
-	 lp_data->mip->rhs[i] = p->mip->rhs[i];
-	 lp_data->mip->sense[i] = p->mip->sense[i];
-	 lp_data->mip->rngval[i] = p->mip->rngval[i];
+      lp_data_mip->nz = j;
+      for (i = 0; i < p_mip->m; i++){
+	 lp_data_mip_rhs[i] = p_mip_rhs[i];
+	 lp_data_mip_sense[i] = p_mip_sense[i];
+	 lp_data_mip_rngval[i] = p_mip_rngval[i];
       }
       if (p->par.multi_criteria && !p->par.mc_find_supported_solutions){
-	 lp_data->mip->rhs[bcutnum - 2] = p->par.mc_gamma * p->utopia[0]; 
-	 lp_data->mip->sense[bcutnum - 2] = 'L';
-	 lp_data->mip->rhs[bcutnum - 1] = p->par.mc_tau * p->utopia[1]; 
-	 lp_data->mip->sense[bcutnum - 1] = 'L';
+	 lp_data_mip_rhs[bcutnum - 2] = p->par.mc_gamma * p->utopia[0]; 
+	 lp_data_mip_sense[bcutnum - 2] = 'L';
+	 lp_data_mip_rhs[bcutnum - 1] = p->par.mc_tau * p->utopia[1]; 
+	 lp_data_mip_sense[bcutnum - 1] = 'L';
       }
       maxm = lp_data->m;
       maxn = lp_data->n;
       maxnz = lp_data->nz;
 
       lp_data->m = bcutnum;
-      lp_data->nz = lp_data->mip->nz;
+      lp_data->nz = lp_data_mip->nz;
       break;
     case USER_SUCCESS:
        /* Fall through to next case */
@@ -352,14 +387,15 @@ int create_subproblem_u(lp_prob *p)
        /* change obj coeff only if the obj funct. was created through 
 	  user_create_subproblem() */
 
-      if (p->mip->obj_sense == SYM_MAXIMIZE){
-         for (i = 0; i < lp_data->mip->n; i++){
-	    lp_data->mip->obj[i] *= -1.0;
+      if (p_mip->obj_sense == SYM_MAXIMIZE){
+         lp_data_mip_obj = lp_data_mip->obj;
+         for (i = 0; i < lp_data_mip->n; i++){
+	    lp_data_mip_obj[i] *= -1.0;
 	 }
       }
 
       lp_data->m = bcutnum;
-      lp_data->nz = lp_data->mip->nz;
+      lp_data->nz = lp_data_mip->nz;
       break;
 
     case USER_ERROR:
@@ -406,9 +442,9 @@ int create_subproblem_u(lp_prob *p)
    \*----------------------------------------------------------------------- */
 
    rows = lp_data->rows;
-   rhs = lp_data->mip->rhs;
-   rngval = lp_data->mip->rngval;
-   sense = lp_data->mip->sense;
+   rhs = lp_data_mip->rhs;
+   rngval = lp_data_mip->rngval;
+   sense = lp_data_mip->sense;
    for (i = bcutnum - 1; i >= 0; i--){
       row = rows + i;
       cut = row->cut;
@@ -427,9 +463,9 @@ int create_subproblem_u(lp_prob *p)
     * Set the upper and lower bounds and integer status
    \*----------------------------------------------------------------------- */
 
-   lb = lp_data->mip->lb;
-   ub = lp_data->mip->ub;
-   is_int = lp_data->mip->is_int;
+   lb = lp_data_mip->lb;
+   ub = lp_data_mip->ub;
+   is_int = lp_data_mip->is_int;
 
    vars = lp_data->vars;
    for (i = lp_data->n - 1; i >= 0; i--){
@@ -445,7 +481,7 @@ int create_subproblem_u(lp_prob *p)
    load_lp_prob(lp_data, p->par.scaling, p->par.fastmip);
 
    /* Free the user's description */
-   free_mip_desc(lp_data->mip);
+   free_mip_desc(lp_data_mip);
 
    if (desc->cutind.size > 0){
       unpack_cuts_u(p, CUT_FROM_TM, UNPACK_CUTS_SINGLE,
@@ -1582,12 +1618,16 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 		   int cut_num, cut_data **cuts,
 		   int *new_row_num, waiting_row ***new_rows)
 {
-   LPdata *lp_data = p->lp_data;
-   int user_res;
-   int i, j, k, l = 0, nzcnt, real_nzcnt, explicit_row_num = 0;
-   int *matind;
-   double *matval;
+   LPdata       *lp_data = p->lp_data;
+   int           user_res;
+   int           i, j, k, l = 0, nzcnt, real_nzcnt, explicit_row_num = 0;
+   const int     n = lp_data->n;
+   int          *matind, *row_matind;
+   double       *matval, *row_matval;
    waiting_row **row_list = NULL;
+   double       *obj1 = p->mip->obj1;
+   double       *obj2 = p->mip->obj2;
+   var_desc    **vars = lp_data->vars;
    
    colind_sort_extra(p);
 
@@ -1607,16 +1647,39 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	 nzcnt = ((int *) (cuts[i]->coef))[0];
 	 matind = (int *) (cuts[i]->coef + ISIZE);
 	 matval = (double *) (cuts[i]->coef + (1 + nzcnt) * ISIZE);
-	 row_list[explicit_row_num]->matind = (int *) malloc(nzcnt * ISIZE);
-	 row_list[explicit_row_num]->matval = (double *) malloc(nzcnt * DSIZE);
-	 for (j = 0; j < lp_data->n; j++){
-	    for (k = 0; k < nzcnt; k++){
-	       if (matind[k] == lp_data->vars[j]->userind){
-		  row_list[explicit_row_num]->matind[real_nzcnt] = j;
-		  row_list[explicit_row_num]->matval[real_nzcnt++] = matval[k];
-	       }
-	    }
+	 row_matind = row_list[explicit_row_num]->matind = 
+            (int *) malloc(nzcnt * ISIZE);
+	 row_matval = row_list[explicit_row_num]->matval = 
+            (double *) malloc(nzcnt * DSIZE);
+#if 0
+         for (k = 0; k < nzcnt; k++){
+            /* 
+             * desparate to avoid the following nested for loop here, 
+             * we try this first
+             */
+            if (matind[k] == vars[matind[k]]->userind) {
+               row_matind[real_nzcnt]   = matind[k];
+               row_matval[real_nzcnt++] = matval[k];
+               //printf("success\n");
+            } else {
+               for (j = 0; j < n; j++){
+                  if (matind[k] == vars[j]->userind){
+                     row_matind[real_nzcnt]   = j;
+                     row_matval[real_nzcnt++] = matval[k];
+                     break;
+                  }
+               }
+            }
 	 }
+#endif
+         for (j = 0; j < n; j++){
+            for (k = 0; k < nzcnt; k++){
+               if (matind[k] == vars[j]->userind){
+                  row_matind[real_nzcnt]   = j;
+                  row_matval[real_nzcnt++] = matval[k];
+               }
+            }
+         }
 	 row_list[explicit_row_num++]->nzcnt = real_nzcnt;
 	 cuts[i] = NULL;
 	 break;
@@ -1624,17 +1687,16 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
       case OPTIMALITY_CUT_FIRST:
 	 row_list[explicit_row_num] =
 	    (waiting_row *) malloc(sizeof(waiting_row));
-	 row_list[explicit_row_num]->matind =
-	    (int *) malloc (lp_data->n * ISIZE);
-	 row_list[explicit_row_num]->matval =
+	 row_matind = row_list[explicit_row_num]->matind =
+            (int *) malloc (lp_data->n * ISIZE);
+	 row_matval = row_list[explicit_row_num]->matval =
 	    (double *) malloc (lp_data->n * DSIZE);
 	 row_list[explicit_row_num]->cut = cuts[i];
 	 for (nzcnt = 0, j = 0; j < lp_data->n; j++){
-	    if (lp_data->vars[j]->userind == p->mip->n)
+	    if (vars[j]->userind == p->mip->n)
 	       continue;
-	    row_list[explicit_row_num]->matind[nzcnt] = j;
-	    row_list[explicit_row_num]->matval[nzcnt++] =
-	       p->mip->obj1[lp_data->vars[j]->userind];
+	    row_matind[nzcnt] = j;
+	    row_matval[nzcnt++] = obj1[vars[j]->userind];
 	 }
 	 cuts[i]->sense = 'L';
 	 cuts[i]->deletable = FALSE;
@@ -1652,11 +1714,11 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	    (double *) malloc (lp_data->n * DSIZE);
 	 row_list[explicit_row_num]->cut = cuts[i];
 	 for (nzcnt = 0, j = 0; j < lp_data->n; j++){
-	    if (lp_data->vars[j]->userind == p->mip->n)
+	    if (vars[j]->userind == p->mip->n)
 	       continue;
 	    row_list[explicit_row_num]->matind[nzcnt] = j;
 	    row_list[explicit_row_num]->matval[nzcnt++] =
-	       p->mip->obj2[lp_data->vars[j]->userind];
+	       obj2[vars[j]->userind];
 	 }
 	 cuts[i]->sense = 'L';
 	 cuts[i]->deletable = FALSE;

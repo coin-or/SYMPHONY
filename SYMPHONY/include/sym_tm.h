@@ -150,6 +150,7 @@ int purge_pruned_nodes PROTO((tm_prob *tm, bc_node *node, int category));
 int find_process_index PROTO((process_set *pset, int tid));
 void mark_lp_process_free PROTO((tm_prob *tm, int lp, int cp));
 int add_cut_to_list PROTO((tm_prob *tm, cut_data *cut));
+int find_tree_lb PROTO((tm_prob *tm));
 
 /*--------------- Function related to merging descriptions ------------------*/
 
@@ -218,5 +219,4 @@ void unpack_cut_set PROTO((tm_prob *tm, int sender, int cutnum,
 int receive_lp_timing PROTO((tm_prob *tm));
 
 void sym_catch_c PROTO((int num));
-
 #endif
