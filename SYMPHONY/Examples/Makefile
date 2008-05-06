@@ -32,22 +32,22 @@ EXAMPLES += milpOsi milpOsi2
 endif
 
 # Directory with COIN header files
-COININCDIR = /home/asm4/src/sym-stable/build-debug/include/coin
+COININCDIR = /home/ted/SYMPHONY/stable/5.1/tmp_checkout/build/include/coin
 
 # Directory with COIN libraries
-COINLIBDIR = /home/asm4/src/sym-stable/build-debug/lib
+COINLIBDIR = /home/ted/SYMPHONY/stable/5.1/tmp_checkout/build/lib
 
 # Directoy with SYMPHONY header files 
-#SYMINCDIR = /home/asm4/src/sym-stable/SYMPHONY/include
+#SYMINCDIR = /home/ted/SYMPHONY/stable/5.1/tmp_checkout/SYMPHONY/include
 
 # Directoy with SYMPHONY library
-#SYMLIBDIR = /home/asm4/src/sym-stable/SYMPHONY/src
+#SYMLIBDIR = /home/ted/SYMPHONY/stable/5.1/tmp_checkout/SYMPHONY/src
 
 # Directory with Application files
-SYMEXDIR = /home/asm4/src/sym-stable/SYMPHONY/src/../Examples
+SYMEXDIR = /home/ted/SYMPHONY/stable/5.1/tmp_checkout/SYMPHONY/src/../Examples
 
 #Directory for LP solver
-GLPKINCDIR = 
+GLPKINCDIR = /home/ted/SYMPHONY/stable/5.1/tmp_checkout/SYMPHONY/../ThirdParty/Glpk/glpk/include
 CPXINCDIR = 
 OSLINCDIR = 
 SPXINCDIR = 
@@ -75,10 +75,10 @@ WHATTOMAKE = $(addsuffix , $(EXAMPLES))
 CXX = g++
 
 # C++ Compiler options
-CXXFLAGS = -g -pipe -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion   -Wno-unknown-pragmas -Wno-write-strings -Wno-sign-compare -Wno-cast-qual
+CXXFLAGS = -O3 -fomit-frame-pointer -pipe -DNDEBUG -pedantic-errors -Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion   -Wno-unknown-pragmas -Wno-write-strings -Wno-sign-compare -Wno-cast-qual
 
 # additional C++ Compiler options for linking
-CXXLINKFLAGS = 
+CXXLINKFLAGS =  -Wl,--rpath -Wl,/home/ted/SYMPHONY/stable/5.1/tmp_checkout/build/lib
 
 #Include files
 INCL =  -I`$(CYGPATH_W) $(COININCDIR)`
@@ -90,12 +90,12 @@ LIBS =
 ADDINCFLAGS =
 
 ifeq ($(USE_CGL_CUTS),TRUE)
-LIBS += -lCgl `cat /home/asm4/src/sym-stable/build-debug/lib/../share/doc/coin/Cgl/cgl_addlibs.txt`
+LIBS += -lCgl `cat /home/ted/SYMPHONY/stable/5.1/tmp_checkout/build/lib/../share/doc/coin/Cgl/cgl_addlibs.txt`
 #ADDINCFLAGS += -DUSE_CGL_CUTS
 endif
 
 ifeq ($(CLP_LP_SOLVER),TRUE)
-LIBS += -lOsiClp -lClp `cat /home/asm4/src/sym-stable/build-debug/lib/../share/doc/coin/Clp/clp_addlibs.txt`
+LIBS += -lOsiClp -lClp `cat /home/ted/SYMPHONY/stable/5.1/tmp_checkout/build/lib/../share/doc/coin/Clp/clp_addlibs.txt`
 #ADDINCFLAGS += -D__OSI_CLP__
 endif
 
@@ -136,8 +136,8 @@ endif
 
 ADDLIBS += -lm 
 
-LIBS += -lOsi -lCoinUtils `cat /home/asm4/src/sym-stable/build-debug/lib/../share/doc/coin/Osi/osi_addlibs.txt` \
-	`cat /home/asm4/src/sym-stable/build-debug/lib/../share/doc/coin/CoinUtils/coinutils_addlibs.txt` $(ADDLIBS)
+LIBS += -lOsi -lCoinUtils `cat /home/ted/SYMPHONY/stable/5.1/tmp_checkout/build/lib/../share/doc/coin/Osi/osi_addlibs.txt` \
+	`cat /home/ted/SYMPHONY/stable/5.1/tmp_checkout/build/lib/../share/doc/coin/CoinUtils/coinutils_addlibs.txt` $(ADDLIBS)
 
 # The following is necessary under cygwin, if native compilers are used
 CYGPATH_W = echo
