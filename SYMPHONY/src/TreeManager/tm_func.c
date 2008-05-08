@@ -3296,6 +3296,12 @@ void free_tree_node(bc_node *n)
    FREE(n->desc.not_fixed.list);
    FREE(n->desc.cutind.list);
    FREE(n->desc.desc);
+   if (n->desc.bnd_change) {
+      FREE(n->desc.bnd_change->index);
+      FREE(n->desc.bnd_change->lbub);
+      FREE(n->desc.bnd_change->value);
+      FREE(n->desc.bnd_change);
+   }
    FREE(n);
 }
 

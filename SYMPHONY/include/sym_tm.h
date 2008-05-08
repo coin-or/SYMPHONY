@@ -221,4 +221,6 @@ void unpack_cut_set PROTO((tm_prob *tm, int sender, int cutnum,
 int receive_lp_timing PROTO((tm_prob *tm));
 
 void sym_catch_c PROTO((int num));
+int copy_bound_changes_from_node PROTO((bounds_change_desc **bnd_change_ptr, 
+                             bounds_change_desc  *p_bnd_change));
 #endif

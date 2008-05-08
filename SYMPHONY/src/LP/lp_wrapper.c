@@ -469,8 +469,8 @@ int create_subproblem_u(lp_prob *p)
 
    vars = lp_data->vars;
    for (i = lp_data->n - 1; i >= 0; i--){
-      vars[i]->lb = lb[i];
-      vars[i]->ub = ub[i];
+      vars[i]->lb = vars[i]->new_lb = lb[i];
+      vars[i]->ub = vars[i]->new_ub = ub[i];
       vars[i]->is_int = is_int[i];
    }
    
@@ -511,6 +511,7 @@ int create_subproblem_u(lp_prob *p)
       status = lp_data->status;
       for (i = 0; i < p->bc_level; i++){
 	 bobj = p->bdesc + i;
+         //bd_change = p->bnd_change + i;
 	 if (bobj->type == BRANCHING_VARIABLE){
 	    j = bobj->name < 0 ? /* base variable : extra variable */
 	       -bobj->name-1 :
@@ -519,19 +520,24 @@ int create_subproblem_u(lp_prob *p)
 	     case 'E':
 	       change_lbub(lp_data, j, bobj->rhs, bobj->rhs);
 	       vars[j]->lb = vars[j]->ub = bobj->rhs;
+	       vars[j]->new_lb = vars[j]->new_ub = bobj->rhs;
 	       break;
 	     case 'L':
 	       change_ub(lp_data, j, bobj->rhs);
 	       vars[j]->ub = bobj->rhs;
+	       vars[j]->new_ub = bobj->rhs;
 	       break;
 	     case 'G':
 	       change_lb(lp_data, j, bobj->rhs);
 	       vars[j]->lb = bobj->rhs;
+	       vars[j]->new_lb = bobj->rhs;
 	       break;
 	     case 'R':
 	       change_lbub(lp_data, j, bobj->rhs, bobj->rhs + bobj->range);
 	       vars[j]->lb = bobj->rhs;
+	       vars[j]->new_lb = bobj->rhs;
 	       vars[j]->ub = bobj->rhs + bobj->range;
+	       vars[j]->new_ub = bobj->rhs + bobj->range;
 	       break;
 	    }
 	    status[j] |= VARIABLE_BRANCHED_ON;
@@ -560,6 +566,67 @@ int create_subproblem_u(lp_prob *p)
 	    cut->branch |= CUT_BRANCHED_ON;
 	 }
       }
+   }
+
+   /*------------------------------------------------------------------------*\
+    * Change bounds of variables that got changed in previous nodes
+   \*----------------------------------------------------------------------- */
+   /*
+   for (i=0; i<lp_data->n; i++) {
+      if (vars[i]->lb != vars[i]->new_lb) {
+         printf("new lb of %d = %f, old = %f\n", i, vars[i]->new_lb, 
+         vars[i]->lb);
+      }
+      if (vars[i]->ub != vars[i]->new_ub) {
+         printf("new ub of %d = %f, old = %f\n", i, vars[i]->new_ub, 
+         vars[i]->ub);
+      }
+   }
+   */
+   if (p->desc->bnd_change) {
+      bounds_change_desc *bnd_change = p->desc->bnd_change;
+      int *index = bnd_change->index;
+      char *lbub = bnd_change->lbub;
+      double *value = bnd_change->value;
+      int tmp_index = -1;
+      for (i=0; i<bnd_change->num_changes; i++) {
+         tmp_index = -1;
+         if (vars[index[i]]->userind == index[i]) {
+            tmp_index = index[i];
+         } else {
+            for (j=0; j<lp_data->n; j++) {
+               if (vars[j]->userind==index[i]) {
+                  tmp_index = j;
+               }
+            }
+         }
+         if (tmp_index<0) {
+            /*
+             * the variable with userind index[i] does not exist in this
+             * formulation
+             */
+            continue;
+         }
+         if (lbub[i] == 'L') {
+            if (vars[tmp_index]->lb<value[i]) {
+               vars[tmp_index]->lb = value[i];
+               vars[tmp_index]->new_lb = value[i];
+               change_lb(lp_data, tmp_index, value[i]);
+            }
+         }
+         if (lbub[i] == 'U') {
+            if (vars[tmp_index]->ub>value[i]) {
+               vars[tmp_index]->ub = value[i];
+               vars[tmp_index]->new_ub = value[i];
+               change_ub(lp_data, tmp_index, value[i]);
+            }
+         }
+      }
+      /* p->desc->bnd_change_desc no longer needed. free it */
+      FREE(bnd_change->index);
+      FREE(bnd_change->lbub);
+      FREE(bnd_change->value);
+      FREE(p->desc->bnd_change);
    }
 
    /*------------------------------------------------------------------------*\
@@ -1047,6 +1114,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
       action = USER__DO_BRANCH;
 
    if ((action == USER__DO_NOT_BRANCH) ||
+       (p->bound_changes_in_iter>0) ||
        (action == USER__BRANCH_IF_TAILOFF && *cuts > 0 && !check_tailoff(p)) ||
        (action == USER__BRANCH_IF_MUST && *cuts > 0))
       return(DO_NOT_BRANCH);
@@ -2086,9 +2154,13 @@ int generate_cuts_in_lp_u(lp_prob *p)
       /* Add to the user's list of cuts */
 #ifdef USE_CGL_CUTS
       if (p->par.cgl.generate_cgl_cuts){
+         int bound_changes = 0;
 	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
-			   (p->bc_index < 1)? TRUE: FALSE, 
+			   p->bc_index, p->bc_level, &bound_changes,
 			   p->par.verbosity);
+         if (bound_changes>0) {
+            p->bound_changes_in_iter += bound_changes;
+         }
 	 if(p->bc_index < 1 && p->iter_num == 1 ){
 	    p->par.cgl = 
 	       lp_data->cgl;

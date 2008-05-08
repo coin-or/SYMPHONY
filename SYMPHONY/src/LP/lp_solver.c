@@ -3358,10 +3358,12 @@ void write_sav(LPdata *lp_data, char *fname)
 #include "sym_qsort.h"
 
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
-		       char send_to_pool, int is_rootnode, int verbosity)
+		       char send_to_pool, int bc_index, int bc_level, 
+                       int *bnd_changes, int verbosity)
 {
    OsiCuts              cutlist;
    OsiRowCut            cut;
+   int                  n = lp_data->n;
    int                  i = 0, j = 0;
    int                  *matind;
    double               *matval;
@@ -3371,7 +3373,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    int                  is_top_iter = (lp_data->lp_count == 1) ? TRUE : FALSE; 
    OsiXSolverInterface  *si = lp_data->si;
    var_desc             **vars = lp_data->vars;
-
+   int                  is_rootnode = (bc_index>0) ? FALSE : TRUE;
+   //double               *newLower = lp_data->tmp.d;
+   //double               *newUpper = lp_data->tmp.d+n;
+   int                  sizeColCuts;
    
 #ifndef COMPILE_IN_LP
    par->probing_generated_in_root               = TRUE;
@@ -3392,11 +3397,16 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
     * TODO: take this loop outside, should not be called in every call of
     * generate_cgl_cuts
     */
-   for (i = 0; i < lp_data->n; i++) {
+   for (i = 0; i < n; i++) {
       if (vars[i]->is_int) { // integer or binary
 	 si->setInteger(i);
       }
    }  
+   /* TODO: move these to vars[i]->... */
+   //get_bounds(lp_data);
+   //memcpy(newLower,lp_data->lb,DSIZE*n);
+   //memcpy(newUpper,lp_data->ub,DSIZE*n);
+
    
    /* create CGL probing cuts */
    if(par->generate_cgl_probing_cuts > -1 && 
@@ -3424,6 +3434,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
            probe->setMaxElements(200+(int)0.2*lp_data->n);
         }
 #endif
+        //CglTreeProbingInfo * info2 = new CglTreeProbingInfo();
+	//probe->generateCutsAndModify(*(si), cutlist,info2);
 	probe->generateCuts(*(si), cutlist);
 	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
 	   if (is_top_iter){
@@ -3433,6 +3445,19 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 		 ("%i probing cuts added\n", new_cut_num));
 	}
 	cut_num = cutlist.sizeRowCuts();
+        //memcpy(newLower, probe->tightLower(),DSIZE*n);
+        //memcpy(newUpper, probe->tightUpper(),DSIZE*n);
+        /*
+        printf("printing new bounds\n");
+        for (i=0;i<n;i++) {
+           if (lp_data->lb[i]<newLower[i]) {
+              printf("lower %d changed from %f to %f\n",i,lp_data->lb[i],newLower[i]);
+           }
+           if (lp_data->ub[i]>newUpper[i]) {
+              printf("upper %d changed from %f to %f\n",i,lp_data->ub[i],newUpper[i]);
+           }
+        }
+        */
 	delete probe;
      }
    }
@@ -3778,7 +3803,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
    if (cutlist.sizeRowCuts() > 0){
       int num_discarded_cuts = 0;
-      int *tmp_matind = (int*)malloc(ISIZE*lp_data->n);
+      int *tmp_matind = lp_data->tmp.i1;
       if (*cuts){
 	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+cutlist.sizeRowCuts())
 				      * sizeof(cut_data *));
@@ -3880,7 +3905,41 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       if (num_discarded_cuts>0) {
 	 PRINT(verbosity,3,("generate_cgl_cuts: Number of discarded cuts = %d\n",num_discarded_cuts));
       }
-      FREE(tmp_matind);
+   }
+
+   sizeColCuts = cutlist.sizeColCuts();
+   if (sizeColCuts > 0){
+      PRINT(verbosity,3,("cgl_generate_cuts: %d colCuts found\n",sizeColCuts));
+      OsiColCut colCut;
+      const int *indices;
+      const double *elements;
+      for (i=0;i<sizeColCuts;i++) {
+         colCut = cutlist.colCut(i);
+         if (verbosity>10) {
+            colCut.print();
+         }
+         indices  = colCut.lbs().getIndices();
+         elements = colCut.lbs().getElements();
+         for (j=0;j<colCut.lbs().getNumElements();j++) {
+            if (vars[indices[j]]->new_lb < elements[j]) {
+               vars[indices[j]]->new_lb = elements[j];
+               change_lbub(lp_data, indices[j], elements[j], 
+                     vars[indices[j]]->new_ub);
+               (*bnd_changes)++;
+            }
+         }
+         indices  = colCut.ubs().getIndices();
+         elements = colCut.ubs().getElements();
+         for (j=0;j<colCut.ubs().getNumElements();j++) {
+            if (vars[indices[j]]->new_ub > elements[j]) {
+               vars[indices[j]]->new_ub = elements[j];
+               change_lbub(lp_data, indices[j], vars[indices[j]]->new_lb,
+                     elements[j]);
+               (*bnd_changes)++;
+            }
+         }
+      }
+      //exit(0);
    }
    return;
 }

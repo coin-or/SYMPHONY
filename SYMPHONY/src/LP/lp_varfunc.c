@@ -216,6 +216,8 @@ void tighten_bounds(lp_prob *p)
 	       lu[cnt] = 'U';
 	       bd[cnt++] = vars[i]->is_int ? floor(lb[i] + max_change) :
 		  lb[i] + max_change;
+               vars[i]->new_ub = bd[cnt-1];
+               p->bound_changes_in_iter++;
 	       if (! (status[i] & NOT_REMOVABLE) && lb[i] == 0 &&
 		   lb[i] == ub[i]){
 		  p->vars_deletable++;
@@ -233,6 +235,8 @@ void tighten_bounds(lp_prob *p)
 	       lu[cnt] = 'L';
 	       bd[cnt++] = vars[i]->is_int ? ceil(ub[i] + max_change) :
 		  ub[i] + max_change;
+               vars[i]->new_lb = bd[cnt-1];
+               p->bound_changes_in_iter++;
 	       if (! (status[i] & NOT_REMOVABLE) && lb[i] == 0 &&
 		   lb[i] == ub[i]){
 		  p->vars_deletable++;

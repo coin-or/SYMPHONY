@@ -629,7 +629,7 @@ void send_node_desc(lp_prob *p, char node_type)
 	              TRUE : FALSE;
       
       new_tm_desc = (node_desc *) calloc(1, sizeof(node_desc)); 
-      
+
       if (p->bc_level == 0){
 	 COPY_ARRAY_DESC(new_tm_desc->uind, new_lp_desc->uind);
 	 COPY_ARRAY_DESC(new_tm_desc->cutind, new_lp_desc->cutind);
@@ -687,6 +687,12 @@ void send_node_desc(lp_prob *p, char node_type)
 		new_lp_desc->desc_size);
       
       merge_descriptions(tm_desc, new_tm_desc);
+      /* 
+       * new_lp_desc used by "lp_prob p" does not need bnd_change. it is meant
+       * only for bc_node->node_desc. hence we insert bnd_change in tm_desc
+       * only
+       */
+      add_bound_changes_to_desc(tm_desc,p);
       free_node_desc(&new_tm_desc);
       
       if (p->par.verbosity > 10){
@@ -984,6 +990,8 @@ void send_node_desc(lp_prob *p, char node_type)
    }
 
    new_lp_desc = create_explicit_node_desc(p);
+
+   new_lp_desc->bnd_change = NULL; /* TODO: implement this */
 
    /* Now start the real message */
    s_bufid = init_send(DataInPlace);
@@ -1654,6 +1662,4 @@ void send_cuts_to_pool(lp_prob *p, int eff_cnt_limit)
 
 #endif
 }
-
-
 

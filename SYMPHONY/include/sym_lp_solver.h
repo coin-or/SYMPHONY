@@ -280,7 +280,8 @@ void write_sav PROTO((LPdata *lp_data, char *fname));
 #ifdef USE_CGL_CUTS
 void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts,
 			      cut_data ***cuts, char send_to_pool,
-			      int is_rootnode, int verbosity));
+			      int bc_index, int bc_level, int *bnd_changes, 
+                              int verbosity));
 #endif
 #ifdef USE_GLPMPL
 int read_gmpl PROTO((MIPdesc *mip, char *modelfile, char *datafile,

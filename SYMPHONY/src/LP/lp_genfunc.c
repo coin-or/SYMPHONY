@@ -244,6 +244,7 @@ int fathom_branch(lp_prob *p)
       PRINT(p->par.verbosity, 2,
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
+      p->bound_changes_in_iter = 0;
       termcode = dual_simplex(lp_data, &iterd);
 
 #ifdef DO_TESTS
@@ -421,8 +422,12 @@ int fathom_branch(lp_prob *p)
 	 if (p->par.verbosity > 2){
 	    printf("Continue with this node.");
 	    if (cuts > 0)
-	       printf(" %i cuts added alltogether in iteration %i",
+	       printf(" %i cuts added altogether in iteration %i\n",
 		      cuts, p->iter_num);
+            if (p->bound_changes_in_iter > 0) {
+               printf(" %i bounds added altogether in iteration %i\n",
+                     p->bound_changes_in_iter, p->iter_num);
+            }
 	    printf("\n\n");
 	 }
 	 break;
@@ -1918,4 +1923,66 @@ void lp_close(lp_prob *p)
    free_lp(p);
 #endif
 }
+
+/*===========================================================================*/
+/*===========================================================================*/
+/*
+ * save the changes in bounds that occurred while processing the current node
+ * into current-node's node_desc. These changes are available by comparing
+ * vars[i]->lb and vars[i]->new_lb etc. After saving the changes, vars[i]->lb,
+ * vars[i]->ub are changed to new_lb and new_ub so that the same changes are
+ * not saved in the child-node's desc.
+ */
+int add_bound_changes_to_desc(node_desc *desc, lp_prob *p)
+{
+#ifdef COMPILE_IN_LP
+   LPdata                *lp_data = p->lp_data; 
+   var_desc             **vars = lp_data->vars;
+   int                    i, num_bnd_changes, cnt;
+   bounds_change_desc    *bnd_change;
+   int                   *index;
+   char                  *lbub;
+   double                *value;
+
+   num_bnd_changes = 0;
+   for (i=0;i<lp_data->n;i++) {
+      if (vars[i]->new_lb>vars[i]->lb) {
+         num_bnd_changes++;
+      }
+      if (vars[i]->new_ub<vars[i]->ub) {
+         num_bnd_changes++;
+      }
+   }
+   if (num_bnd_changes>0) {
+      bnd_change = desc->bnd_change = (bounds_change_desc *) 
+         calloc (1, sizeof(bounds_change_desc));
+      bnd_change->num_changes = num_bnd_changes;
+      index = bnd_change->index = (int *)malloc(num_bnd_changes*ISIZE);
+      lbub  = bnd_change->lbub = (char *)malloc(num_bnd_changes*CSIZE);
+      value = bnd_change->value = (double *)malloc(num_bnd_changes*DSIZE);
+      cnt = 0;
+      for (i=0;i<lp_data->n;i++) {
+         if (vars[i]->new_lb>vars[i]->lb) {
+            index[cnt] = vars[i]->userind;
+            lbub[cnt] = 'L';
+            value[cnt] = vars[i]->new_lb;
+            cnt++;
+            vars[i]->lb = vars[i]->new_lb;
+         }
+         if (vars[i]->new_ub<vars[i]->ub) {
+            index[cnt] = vars[i]->userind;
+            lbub[cnt] = 'U';
+            value[cnt] = vars[i]->new_ub;
+            cnt++;
+            vars[i]->ub = vars[i]->new_ub;
+         }
+      }
+   } else {
+      desc->bnd_change = NULL;
+   }
+#endif
+
+   return 0;
+}
+
 

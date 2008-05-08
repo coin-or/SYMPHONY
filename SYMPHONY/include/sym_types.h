@@ -109,10 +109,26 @@ typedef struct WAITING_ROW{
 typedef struct VAR_DESC{
    int            userind;
    int            colind;
-   double         lb;
-   double         ub;
+   double         lb;     /* lb on var before we start processing lp_prob */
+   double         ub;     /* ub on var before we start processing lp_prob */
+   double         new_lb; /* lb may change due to rc fixing or cuts */
+   double         new_ub; /* ub may change due to rc fixing or cuts */
    char           is_int; /* whether or not the variable is integer */
 }var_desc;
+
+/*========================================================================*\ 
+ * changes in bounds of variables at a node are stored here. 
+ * Only the changes pertaining to this node are stored here. changes in 
+ * parents are not stored with children. Variable bounds can changed due to
+ * reduced cost fixing, cuts etc.
+ \*========================================================================*/ 
+typedef struct BOUNDS_CHANGE_DESC{ 
+   int                 num_changes; /* how many bounds changed */
+   int                *index;       /* max size 2*n */
+   char               *lbub;       /* ub or lb? */ 
+   double             *value;       /* new bound value */
+}bounds_change_desc; 
+
 
 typedef struct BRANCH_DESC{
    int            name;        /* the userind/cut name depending on the type */
@@ -176,6 +192,9 @@ typedef struct NODE_DESC{
 #if defined(COMPILING_FOR_LP) || defined(COMPILING_FOR_MASTER) || defined(COMPILE_IN_LP)
    cut_data     **cuts;        /* this is not used in TM anyway. */
 #endif
+
+   bounds_change_desc *bnd_change; /* changes in variable bounds that happen 
+                                     during the processing of the node */
 
    /* Any additional info the user might want to pass */
    int           desc_size;

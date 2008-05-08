@@ -391,6 +391,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
 	 modify_list(&not_fixed, &path[i]->desc.not_fixed);
    }
 
+   bounds_change_desc *bnd_change = NULL;
    for (bpath = branch_path, i = 0; i < level; i++, bpath++){
       for (j = path[i]->bobj.child_num - 1; j >= 0; j--)
 	 if (path[i]->children[j] == path[i+1])
@@ -402,7 +403,31 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
       bpath->rhs = bobj->rhs[j];
       bpath->range = bobj->range[j];
       bpath->branch = bobj->branch[j];
+
+      /* copy changes in variable bounds from each node above this node */
+      copy_bound_changes_from_node(&bnd_change, path[i]->desc.bnd_change);
+      /*
+      if (path[i]->desc.bnd_change) {
+         printf("size = %d\n",path[i]->desc.bnd_change->num_changes);
+      } else {
+         printf("parent %d is null\n",path[i]->bc_index);
+      }
+      */
    }
+   /*
+   if (bnd_change->num_changes==0) {
+      FREE(bnd_change);
+      bnd_change = NULL;
+   }
+
+   if (bnd_change) {
+      for (i=0; i<bnd_change->num_changes; i++) {
+         printf("change bound %c of var %d to %f\n",bnd_change->lbub[i], bnd_change->index[i], bnd_change->value[i]);
+      }
+   } else {
+      printf("NULL\n");
+   }
+   */
    
 #ifdef COMPILE_IN_LP
 
@@ -450,6 +475,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
    lp[thread_num]->bc_level = node->bc_level;
    lp[thread_num]->lp_data->objval = node->lower_bound;
    lp[thread_num]->colgen_strategy = colgen_strat;
+   lp[thread_num]->desc->bnd_change = bnd_change;
    
    new_desc->nf_status = desc->nf_status;
    new_desc->basis = basis;
@@ -477,7 +503,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
    new_desc->desc_size = desc->desc_size;
    if (new_desc->desc_size > 0)
       memcpy((char *)new_desc->desc, (char *)desc->desc, new_desc->desc_size);
-   
+
 #else
    
    /*------------------------------------------------------------------------*\
@@ -1207,4 +1233,82 @@ int receive_lp_timing(tm_prob *tm)
 	  FUNCTION_TERMINATED_NORMALLY);
 }
 
+/*===========================================================================*/
+/*===========================================================================*/
+/* 
+ * merge p_bnd_change into bnd_change
+ */
+int copy_bound_changes_from_node(bounds_change_desc **bnd_change_ptr, 
+                                 bounds_change_desc  *p_bnd_change)
+{
+
+   //return 0;
+
+   if (!p_bnd_change) {
+      return 0;
+   } else {
+      int p_num_changes = p_bnd_change->num_changes;
+      int memory_size = 0;
+      int num_changes = 0;
+      int *index, *p_index = p_bnd_change->index;
+      char *lbub, *p_lbub = p_bnd_change->lbub;
+      double *value, *p_value = p_bnd_change->value;
+      bounds_change_desc *bnd_change = *bnd_change_ptr;
+      int m_stepsize = 200;
+      
+      if (p_bnd_change->num_changes>0) {
+         if (bnd_change == NULL) {
+             bnd_change = (bounds_change_desc *)calloc(1,
+                  sizeof(bounds_change_desc));
+            *bnd_change_ptr = bnd_change;
+
+            /* round up to nearest m_stepsize */
+            memory_size = ((int)(p_num_changes/m_stepsize)+1)*m_stepsize;
+            bnd_change->index = (int *)malloc(memory_size*ISIZE);
+            bnd_change->lbub = (char *)malloc(memory_size*CSIZE);
+            bnd_change->value = (double *)malloc(memory_size*DSIZE);
+
+            memcpy(bnd_change->index, p_index, ISIZE*p_num_changes);
+            memcpy(bnd_change->lbub,  p_lbub,  CSIZE*p_num_changes);
+            memcpy(bnd_change->value, p_value, DSIZE*p_num_changes);
+            num_changes = p_num_changes;
+            bnd_change->num_changes = num_changes;
+         } else {
+            index = bnd_change->index;
+            lbub  = bnd_change->lbub;
+            value = bnd_change->value;
+            num_changes = bnd_change->num_changes;
+            memory_size = ((int)(num_changes/m_stepsize)+1)*m_stepsize;
+            for (int k=0; k<p_num_changes; k++) {
+               /* see if it already exists */
+               int l=0;
+               for (l=0; l<bnd_change->num_changes; l++) {
+                  if (index[l]==p_index[k] && lbub[l]==p_lbub[k]) {
+                     value[l] = p_value[k];
+                     break;
+                  }
+               }
+               if (l>=bnd_change->num_changes) {
+                  if (memory_size<=num_changes+1) {
+                     memory_size+=m_stepsize;
+                     index = (int *)realloc(index, memory_size*ISIZE);
+                     lbub = (char *)realloc(lbub, memory_size*CSIZE);
+                     value = (double *)realloc(value, memory_size*DSIZE);
+                  }
+                  index[num_changes] = p_index[k];
+                  lbub[num_changes] = p_lbub[k];
+                  value[num_changes] = p_value[k];
+                  num_changes++;
+               }
+            }
+            bnd_change->index = index;
+            bnd_change->lbub  = lbub;
+            bnd_change->value = value;
+            bnd_change->num_changes = num_changes;
+         }
+      }
+      *bnd_change_ptr = bnd_change;
+   }
+   return 0;
+}
 

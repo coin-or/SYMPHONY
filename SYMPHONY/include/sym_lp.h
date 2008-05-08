@@ -83,6 +83,7 @@ typedef struct LP_PROB{
    base_desc     base;
 
    branch_desc  *bdesc;        /* there are p->bc_level branch_desc's */
+   bounds_change_desc *bnd_changes; /* there are p->bc_level bnd_change's */
    int           bdesc_size;
 
    int           master;
@@ -120,12 +121,14 @@ typedef struct LP_PROB{
 
    int           iter_num;
    int           node_iter_num;
+   int           bound_changes_in_iter;
    int           vars_recently_fixed_to_ub;
    LPdata       *lp_data;
    MIPdesc      *mip; /* Holds the MIP description when read in from MPS */
    
    double        last_gap;
    double       *obj_history;
+
 
    /*========================================================================*\
     * The following fields refer to the cuts/rows arrived to the LP,
@@ -247,6 +250,7 @@ void send_branching_info PROTO((lp_prob *p, branch_obj *can, char *action,
 				int *keep)); 
 void send_lp_is_free PROTO((lp_prob *p));
 void send_cuts_to_pool PROTO((lp_prob *p, int eff_cnt_limit));
+int add_bound_changes_to_desc PROTO((node_desc *new_tm_desc, lp_prob *p));
 
 /*===========================================================================*/
 /*======================= Freeing things (lp_free.c) ========================*/

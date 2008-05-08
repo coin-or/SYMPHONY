@@ -197,6 +197,12 @@ void free_node_desc(node_desc **desc)
       }
       if (n->desc_size > 0)
 	 FREE(n->desc);
+      if (n->bnd_change) {
+         FREE(n->bnd_change->index);
+         FREE(n->bnd_change->lbub);
+         FREE(n->bnd_change->value);
+         FREE(n->bnd_change);
+      }
       FREE(*desc);
    }
 }
