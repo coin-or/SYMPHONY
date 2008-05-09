@@ -740,12 +740,17 @@ int branch(lp_prob *p, int cuts)
       var = lp_data->vars[branch_var = can->position];
       switch (can->sense[keep]){
        case 'E':
+	 var->new_lb = var->new_ub = can->rhs[keep];
 	 var->lb = var->ub = can->rhs[keep];                             break;
        case 'R':
+	 var->new_lb = can->rhs[keep]; 
+         var->new_ub = var->lb + can->range[keep];
 	 var->lb = can->rhs[keep]; var->ub = var->lb + can->range[keep]; break;
        case 'L':
+	 var->new_ub = can->rhs[keep];
 	 var->ub = can->rhs[keep];                                       break;
        case 'G':
+	 var->new_lb = can->rhs[keep];
 	 var->lb = can->rhs[keep];                                       break;
       }
       change_col(lp_data, branch_var, can->sense[keep], var->lb, var->ub);
