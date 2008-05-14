@@ -1,4 +1,4 @@
-SYMPHONY Version 5.1.4 README
+SYMPHONY Version 5.1.8 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Common Public License
@@ -24,6 +24,41 @@ http://projects.coin-or.org/SYMPHONY/
 WHAT'S NEW
 ==========
 
+Release 5.1.8:
+
+1. Introduced use of LP hot starting.
+
+2. Improved management of cut generation.
+
+3. Updated externals
+
+4. Minor bug fixes
+
+Release 5.1.7:
+
+1. Minor bug fixes
+
+Release 5.1.6:
+
+1. Only a single header file (symphony.h) needs to be installed and user 
+applications only need to be able to find this one header file.
+
+2. Fixes to MSVC++ project files.
+
+3. Removed dependence on qsortucb routines.
+
+Release 5.1.5:
+
+1. Added support for automatic download and build of Glpk (for reading of GMPL
+files).
+
+2. Minor bugs fixed and compiler warnings eliminated.
+
+3. Updates to MS Visual Studio files.
+
+4. Added short installation verification test.
+
+>>>>>>> .merge-right.r1327
 Release 5.1.4:
 
 1. Added ability to read files in LP format.
