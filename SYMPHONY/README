@@ -1,4 +1,4 @@
-SYMPHONY Version 5.1.7 README
+SYMPHONY Version 5.1.8 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Common Public License
@@ -23,6 +23,16 @@ http://projects.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
+
+Release 5.1.8:
+
+1. Introduced use of LP hot starting.
+
+2. Improved management of cut generation.
+
+3. Updated externals
+
+4. Minor bug fixes
 
 Release 5.1.7:
 

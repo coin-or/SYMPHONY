@@ -4,7 +4,7 @@
 /* SYMPHONY Branch, Cut, and Price Library. This application is a solver for */
 /* the Mixed Postman Problem.                                                */
 /*                                                                           */
-/* (c) Copyright 2005-2007 Lehigh University. All Rights Reserved.           */
+/* (c) Copyright 2005-2008 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* This application was originally developed by Andrew Hofmann and was       */
 /* modified by  Ted Ralphs (tkralphs@lehigh.edu)                             */
