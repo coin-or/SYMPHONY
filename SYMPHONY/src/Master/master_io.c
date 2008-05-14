@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2008 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -83,8 +83,8 @@ void version(void)
 {
    printf("\n");
    printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 5.1.7                    *\n");
-   printf("*   Copyright 2000-2007 Ted Ralphs and others         *\n");
+   printf("*   This is SYMPHONY Version 5.1.8                    *\n");
+   printf("*   Copyright 2000-2008 Ted Ralphs and others         *\n");
    printf("*   All Rights Reserved.                              *\n");
    printf("*   Distributed under the Common Public License 1.0   *\n");
    printf("*******************************************************\n");
