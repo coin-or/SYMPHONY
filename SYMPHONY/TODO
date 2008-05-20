@@ -1,6 +1,7 @@
  1 dynamic cut generation (M)
    1.1 add parameters for different cuts
    1.2 add mir, twomir
+   1.3 try cuts when global lb keeps steady etc. 
  2 cut selection (A)
    2.1 use tightLower, tightUpper to get tighter bounds on variables from
        cglprobing
