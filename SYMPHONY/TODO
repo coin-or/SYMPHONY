@@ -22,6 +22,7 @@
  9 sos branching (A)
 10 scripts (A)
 11 collect mip info (M)
+   11.1 check integrality of obj-coeffs and if ub - lb < 1 etc. 
 12 gams read (A)
 13 sym infinity (A)
 14 clp settings (A)
