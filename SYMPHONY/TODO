@@ -6,6 +6,7 @@
    2.1 use tightLower, tightUpper to get tighter bounds on variables from
        cglprobing
  3 preprocessing (M)
+   3.1 get cliques and store them in the beginning
  4 primal heuristics (A)
    4.1 octane (M)
    4.2 everything else (A)
