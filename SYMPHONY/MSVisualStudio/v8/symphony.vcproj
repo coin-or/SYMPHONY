@@ -15,8 +15,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -49,10 +49,6 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				RuntimeTypeInfo="true"
-				PrecompiledHeaderFile=".\Debug/symphony.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="2"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
@@ -70,12 +66,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\Debug/symphony.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				IgnoreDefaultLibraryNames="odbc32.lib;odbccp32.lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/symphony.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -108,8 +102,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -145,10 +139,6 @@
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
-				PrecompiledHeaderFile=".\Release/symphony.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="2"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="0"
@@ -166,10 +156,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\Release/symphony.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release/symphony.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
