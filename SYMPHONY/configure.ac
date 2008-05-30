@@ -81,22 +81,15 @@ AC_COIN_CHECK_GNU_READLINE
 AM_CONDITIONAL(COIN_HAS_READLINE,
                [test $coin_has_readline = yes])
 
-# Check whether windows.h is present (for supressing unit test pop-ups in 
-# Windows)
-
-AC_CHECK_HEADERS([windows.h])
-
 #############################################################################
 #                              COIN components                              #
 #############################################################################
-
 AC_COIN_HAS_PROJECT(SYMPHONY)
 AC_COIN_HAS_PROJECT(CoinUtils)
 AC_COIN_HAS_PROJECT(Data)
 AC_COIN_HAS_PROJECT(Clp)
 AC_COIN_HAS_PROJECT(Osi)
 AC_COIN_HAS_PROJECT(Cgl)
-
 #############################################################################
 #                            Third party solvers                            #
 #############################################################################

@@ -12,10 +12,6 @@
 /*                                                                           */
 /*===========================================================================*/
 
-#ifdef HAVE_WINDOWS_H
-#include <windows.h>
-#endif
-
 #include <cassert>
 #include <iostream>
 #include <cstdio>
@@ -38,10 +34,6 @@ int main (int argc, const char *argv[])
    const char dirsep =  CoinFindDirSeparator();
    int test_status = 0;
    
-#ifdef HAVE_WINDOWS_H
-   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
-#endif
-
    // define valid parameter keywords
    std::set<std::string> definedKeyWords;
    definedKeyWords.insert("-mpsDir");
