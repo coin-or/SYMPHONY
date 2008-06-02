@@ -19,6 +19,7 @@
 #include "OsiRowCut.hpp"
 #include "OsiColCut.hpp"
 #include "OsiCuts.hpp"
+#include "CoinError.hpp"
 #include "CoinHelperFunctions.hpp"
 #include "CoinSort.hpp"
 #include "OsiSolverInterface.hpp"
@@ -39,6 +40,8 @@ int main (int argc, const char *argv[])
    definedKeyWords.insert("-mpsDir");
    definedKeyWords.insert("-netlibDir");
    definedKeyWords.insert("-testOsiSolverInterface");
+
+   WindowsErrorPopupBlocker();
 
    std::map<std::string,std::string> parms;
    for ( i=1; i<argc; i++ ) {
