@@ -513,4 +513,11 @@
 #define TRIM_LEVEL           1
 #define TRIM_INDEX           2
 #define ON_CRU_VARS          3
+
+/*--------------- parameter values for primal heuristics --------------------*/
+#define SYM_FEAS_PUMP_DEFAULT    1       /* use fp using the default rules   */
+#define SYM_FEAS_PUMP_REPEATED   2       /* use fp till the end of solve     */
+#define SYM_FEAS_PUMP_TILL_SOL   3       /* use fp till a solution is found  */
+#define SYM_FEAS_PUMP_DISABLE   -1       /* dont use fp */
+
 #endif

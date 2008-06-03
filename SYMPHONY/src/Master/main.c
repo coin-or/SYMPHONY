@@ -424,6 +424,7 @@ int main(int argc, char **argv)
 	       
 	       print_statistics(&(env->warm_start->comp_times), 
 				&(env->warm_start->stat),
+                                NULL,
 				env->warm_start->ub, env->warm_start->lb, 
 				initial_time, start_time, finish_time,
 				env->mip->obj_offset, env->mip->obj_sense,

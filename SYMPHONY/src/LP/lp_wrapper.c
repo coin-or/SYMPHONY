@@ -27,6 +27,7 @@
 #include "sym_macros.h"
 #include "sym_types.h"
 #include "sym_lp_solver.h"
+#include "sym_primal_heuristics.h"
 #ifdef USE_CGL_CUTS
 #include "sym_cg.h"
 #endif
@@ -678,9 +679,12 @@ int is_feasible_u(lp_prob *p, char branching)
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
    int *indices;
-   double *values, valuesi, *heur_solution = NULL, *col_sol = NULL;
-   int cnt, i;
+   double *values, valuesi, *heur_solution = NULL, *col_sol = NULL, 
+          new_obj_val;
+   int cnt, i, termcode;
    var_desc **vars = lp_data->vars;
+   char found_better_solution;
+   int should_call_fp = FALSE;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
@@ -742,6 +746,21 @@ int is_feasible_u(lp_prob *p, char branching)
       break;
     default:
       break;
+   }
+
+   if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
+      fp_should_call_fp(p,branching,&should_call_fp); 
+      if (should_call_fp==TRUE) {
+         termcode    = feasibility_pump (p, &found_better_solution, new_obj_val, 
+               heur_solution);
+         if (termcode!=FUNCTION_TERMINATED_NORMALLY) {
+            PRINT(p->par.verbosity,0,("warning: feasibility pump faced some "
+                     "difficulties.\n"));
+         } else if (found_better_solution) {
+            feasible    = IP_HEUR_FEASIBLE;
+            true_objval = new_obj_val;
+         }
+      }
    }
 
    /* try rounding */
@@ -2156,8 +2175,8 @@ int generate_cuts_in_lp_u(lp_prob *p)
       if (p->par.cgl.generate_cgl_cuts){
          int bound_changes = 0;
 	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
-			   p->bc_index, p->bc_level, &bound_changes,
-			   p->par.verbosity);
+			   p->bc_index, p->bc_level, &bound_changes, 
+                           &(p->lp_stat), &(p->comp_times), p->par.verbosity);
          if (bound_changes>0) {
             p->bound_changes_in_iter += bound_changes;
          }

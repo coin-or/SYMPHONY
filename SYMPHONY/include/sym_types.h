@@ -301,6 +301,24 @@ typedef struct NODE_TIMES{
    double        idle_cuts;
    double        start_node;
    double        cut_pool;
+
+   /* cuts */
+   double        cuts;
+   double        gomory_cuts;
+   double        knapsack_cuts;
+   double        oddhole_cuts;
+   double        clique_cuts;
+   double        probing_cuts;
+   double        mir_cuts;
+   double        twomir_cuts;
+   double        flow_and_cover_cuts;
+   double        rounding_cuts;
+   double        lift_and_project_cuts;
+   double        landp_cuts;
+   double        redsplit_cuts;
+
+   double        fp;                            /* feasibility pump */
+   double        primal_heur;                   /* all primal heuristics */
 }node_times;
 
 /*===========================================================================*\
@@ -384,6 +402,59 @@ typedef struct PROBLEM_STAT{
 				      repricing */
 }problem_stat;
 
+typedef struct LP_STAT{
+   /* cuts */
+   int         cuts_generated;
+   int         gomory_cuts_generated;
+   int         knapsack_cuts_generated;
+   int         oddhole_cuts_generated;
+   int         clique_cuts_generated;
+   int         probing_cuts_generated;
+   int         mir_cuts_generated;
+   int         twomir_cuts_generated;
+   int         flow_and_cover_cuts_generated;
+   int         rounding_cuts_generated;
+   int         lift_and_project_cuts_generated;
+   int         landp_cuts_generated;
+   int         redsplit_cuts_generated;
+   
+   int         cuts_root;
+   int         gomory_cuts_root;
+   int         knapsack_cuts_root;
+   int         oddhole_cuts_root;
+   int         clique_cuts_root;
+   int         probing_cuts_root;
+   int         mir_cuts_root;
+   int         twomir_cuts_root;
+   int         flow_and_cover_cuts_root;
+   int         rounding_cuts_root;
+   int         lift_and_project_cuts_root;
+   int         landp_cuts_root;
+   int         redsplit_cuts_root;
+   
+   int         cuts_discarded;
+
+   /* feasibility pump */
+   int         fp_calls;
+   int         fp_num_sols;
+}lp_stat_desc;
+
+
+typedef struct MIPINFO{ 
+   int prob_type; /* mixed, pure(not binary), binary... */
+   int *row_int_type; /* same above -considering the type of variables*/
+   int *row_bound_type; /* all_bounded, mixed 
+			   - considering the bounds of variables */
+   int *row_coef_type; /* all integer, all binary, fractional
+			  - considering the type of coefficients*/
+   int *col_coef_type; /* all integer, all binary, fractional
+			  - considering the type of coefficients*/
+   int *row_entries_type; /* all_pos, all_neg, mixed */ 
+   int *col_entries_type; /* same above */
+   /* will be evaluated only if preprocessor is used */
+   int *row_ub; /* calculated using variable bounds */
+   int *row_lb; /* same above */
+}MIPinfo;
 
 /* This structure stores the user's description of the model */
 
@@ -443,4 +514,28 @@ typedef struct WARM_START_DESC{
    int            trim_tree_level;
    int            trim_tree_index;
 }warm_start_desc;
+
+/* solution pool */
+typedef struct SP_SOLUTION_DESC{
+   double         objval;
+   int            xlength;
+   int           *xind;
+   double        *xval;
+  
+   /* The bnb node where this solution was discoverd*/
+   int            node_index;
+  
+   /* The level of the node in bnb tree where this solution was discovered */
+    int            node_level;  
+}sp_solution;
+
+typedef struct SP_DESC{
+   /* max. no. of solutions in the pool */
+   int            max_solutions; 
+   /* no. of solutions in the pool */
+   int            num_solutions;
+   int            total_num_sols_found;
+   /* array of those solutions */
+   sp_solution    **solutions;
+}sp_desc;
 #endif

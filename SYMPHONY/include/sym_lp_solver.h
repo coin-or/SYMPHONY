@@ -266,6 +266,11 @@ void get_ub PROTO((LPdata *lp_data, int j, double *ub));
 void get_lb PROTO((LPdata *lp_data, int j, double *lb));
 void get_bounds PROTO((LPdata *lp_data));
 void get_objcoef PROTO((LPdata *lp_data, int j, double *objcoef));
+void get_objcoeffs(LPdata *lp_data);
+void change_objcoeff(LPdata *lp_data, const int* indexFirst, 
+      const int* indexLast, double *coeffs);
+void get_rhs_rng_sense(LPdata *lp_data);
+int copy_lp_data(LPdata *lp_data, LPdata *new_data);
 void delete_rows PROTO((LPdata *lp_data, int deletable, int *free_rows));
 int delete_cols PROTO((LPdata *lp_data, int delnum, int *delstat));
 void release_var PROTO((LPdata *lp_data, int j, int where_to_move));
@@ -278,10 +283,17 @@ void write_mip_desc_mps PROTO((MIPdesc *mip, char *fname));
 void write_mip_desc_lp PROTO((MIPdesc *mip, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
 #ifdef USE_CGL_CUTS
+void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
+		       char send_to_pool, int bc_index, int bc_level,
+                       int *bnd_changes,
+                       lp_stat_desc *lp_stat, node_times *comp_times,
+                       int verbosity);
+/*
 void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts,
 			      cut_data ***cuts, char send_to_pool,
-			      int bc_index, int bc_level, int *bnd_changes, 
-                              int verbosity));
+			      int is_rootnode, lp_stat_desc *lp_stat, 
+                              node_times *comp_times, int verbosity));
+*/
 #endif
 #ifdef USE_GLPMPL
 int read_gmpl PROTO((MIPdesc *mip, char *modelfile, char *datafile,

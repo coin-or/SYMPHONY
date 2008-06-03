@@ -66,11 +66,14 @@ SYMPHONY/configure -text
 SYMPHONY/configure.ac -text
 SYMPHONY/include/SymConfig.h -text
 SYMPHONY/include/config_sym.h.in -text
+SYMPHONY/include/sym_primal_heuristics.h -text
 SYMPHONY/include/sym_qsort.h -text
 SYMPHONY/scripts/publish2 -text
 SYMPHONY/src/Common/sym_qsort.c -text
 SYMPHONY/src/Makefile.am -text
 SYMPHONY/src/Makefile.in -text
+SYMPHONY/src/PrimalHeuristics/feasibility_pump.c -text
+SYMPHONY/src/PrimalHeuristics/sp.c -text
 SYMPHONY/sym_addlibs.txt.in -text
 SYMPHONY/test/Makefile.am -text
 SYMPHONY/test/Makefile.in -text

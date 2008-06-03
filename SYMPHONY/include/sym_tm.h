@@ -112,6 +112,7 @@ typedef struct TM_PROB{
 
    node_times      comp_times;         /* keeps track of the computation times
 			                  for the problem */
+   lp_stat_desc    lp_stat;         
 
    /* some temporary stuff */
    bc_node      ***rpath;
@@ -125,6 +126,8 @@ typedef struct TM_PROB{
 #endif
 
    tm_temp         tmp;
+   /* solution pool */
+   sp_desc  *sp;
 }tm_prob;
 
 /*===========================================================================*/

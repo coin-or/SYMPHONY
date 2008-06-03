@@ -2524,7 +2524,8 @@ int tasks_before_phase_two(tm_prob *tm)
       printf( "* Now displaying stats and best solution...  *\n");
       printf( "**********************************************\n\n");
       
-      print_statistics(&(tm->comp_times), &(tm->stat), tm->ub, tm->lb, 0,
+      print_statistics(&(tm->comp_times), &(tm->stat), &(tm->lp_stat), 
+                       tm->ub, tm->lb, 0,
 		       tm->start_time, wall_clock(NULL),
 		       tm->obj_offset,
 		       tm->obj_sense, tm->has_ub);

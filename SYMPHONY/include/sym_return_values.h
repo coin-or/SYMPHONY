@@ -26,6 +26,7 @@
 /*----------------------- Global return codes -------------------------------*/
 #define FUNCTION_TERMINATED_NORMALLY      0
 #define FUNCTION_TERMINATED_ABNORMALLY   -1
+#define FUNCTION_OUT_OF_MEMORY           -2
 #define ERROR__USER                      -100
 
 /*-------------- Return codes for sym_parse_comand_line() -------------------*/
