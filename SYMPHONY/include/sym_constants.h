@@ -279,10 +279,12 @@
 #define DO_BRANCH                   0
 #define DO_NOT_BRANCH               1
 #define DO_NOT_BRANCH__FATHOMED     2
+#define DO_NOT_BRANCH__FEAS_SOL     3
 
 /*---------------- possible return values of branch() -----------------------*/
 #define NEW_NODE                     -1
 #define FATHOMED_NODE                -2
+#define FEAS_SOL_FOUND               -3
 
 /*------------- normal return value of various functions --------------------*/
 

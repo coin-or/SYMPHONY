@@ -51,7 +51,7 @@ int sp_add_solution (lp_prob *p, int cnt, int *indices, double *values,
    sol->node_index = bc_index;
    sp->num_solutions++;
    sp->total_num_sols_found++;
-   PRINT(p->par.verbosity,-1,("sp: solution pool size = %d \n", 
+   PRINT(p->par.verbosity,5,("sp: solution pool size = %d \n", 
             sp->num_solutions));
    return 0;
 }

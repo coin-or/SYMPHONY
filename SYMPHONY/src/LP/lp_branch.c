@@ -188,6 +188,17 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       return(ERROR__NO_BRANCHING_CANDIDATE);
    }
 
+   {
+      /* we are going to branch. Before doing that, we should invoke
+       * heuristics. */
+      int feas_status = is_feasible_u(p, FALSE, TRUE);
+      if (feas_status == IP_FEASIBLE||feas_status==IP_HEUR_FEASIBLE) {
+         *candidate = NULL;
+         return(DO_NOT_BRANCH__FEAS_SOL);
+      }
+   }
+
+
    /* OK, now we have to branch. */
 
    /* First of all, send everything to the cutpool that hasn't been sent
@@ -355,7 +366,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
-	       switch (is_feasible_u(p, TRUE)){
+	       switch (is_feasible_u(p, TRUE, FALSE)){
 
 		  /*NOTE: This is confusing but not all that citical...*/
 		  /*The "feasible" field is only filled out for the
@@ -439,7 +450,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
 	    if (can->termcode[j] == LP_OPTIMAL){
 	       /* is_feasible_u() fills up lp_data->x, too!! */
-	       switch (is_feasible_u(p, TRUE)){
+	       switch (is_feasible_u(p, TRUE, FALSE)){
 
 		  /*NOTE: This is confusing but not all that citical...*/
 		  /*The "feasible" field is only filled out for the
@@ -701,6 +712,12 @@ int branch(lp_prob *p, int cuts)
    }
    
    if (can == NULL){
+      if (termcode == DO_NOT_BRANCH__FEAS_SOL) {
+         /* a better feasible solution was found. return to do reduced cost
+          * fixing etc.
+          */
+         return(FEAS_SOL_FOUND);
+      }
       /* We were either able to fathom the node or found violated cuts
        * In any case, send the qualifying cuts to the cutpool */
       p->comp_times.strong_branching += used_time(&p->tt);

@@ -50,10 +50,9 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    const CoinPackedMatrix  *matrix      = model->getMatrixByRow();
    const double            *lp_r_low    = model->getRowLower();
    const double            *lp_r_up     = model->getRowUpper();
-   int                      count, i, r, iter, cnt, verbosity;
+   int                      i, r, iter, cnt, verbosity;
    int                     *indices;
    double                  *values;
-   int                      flip_rand = FALSE;
    double                   fp_time, real_obj_value, target_ub;
    FPvars                 **vars;
    double                   gap           = model->getInfinity();
@@ -71,6 +70,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
 
    *found_better_solution = FALSE;
    verbosity = fp_data->verbosity     = p->par.verbosity;
+   //verbosity = 10;
    fp_data->mip_obj       = (double *)malloc(n*DSIZE);
    fp_data->flip_fraction = p->par.fp_flip_fraction;
    memcpy(fp_data->mip_obj,mip_obj,n*DSIZE);
@@ -79,6 +79,9 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    fp_initialize_lp_solver(p, new_lp_data, fp_data);
    x_ip = fp_data->x_ip;
    x_lp = fp_data->x_lp;
+   if (p->has_ub) {
+      fp_add_obj_row(new_lp_data, n, mip_obj, p->ub-p->par.granularity);
+   }
 
    /* round the x_lp and store as x_ip, it will usually become infeasible */
    vars = fp_data->fp_vars;
@@ -90,6 +93,14 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
       is_feasible = FALSE;
       /* solve an lp */
       fp_round(fp_data, new_lp_data);
+      if (fp_data->x_bar_len[fp_data->iter] == -1) {
+         /*
+          * the cost and reference point are same as some other iteration. we
+          * should stop here because we are cycling
+          */
+         PRINT(verbosity,5,("fp: leaving because of cycling\n"));
+         break;
+      }
       fp_is_feasible (lp_data,matrix,lp_r_low,lp_r_up,fp_data,&is_feasible);
 
       if (is_feasible == TRUE) {
@@ -114,17 +125,18 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
             break;
          }
          target_ub = (obj_lb + solution_value)/2;
-         if (*found_better_solution != TRUE) {
+         if (*found_better_solution != TRUE && p->has_ub==FALSE) {
             // add another objective function constraint to lower the
             // objective value.
             fp_add_obj_row(new_lp_data, n, mip_obj, target_ub);
-            *found_better_solution = TRUE;
          } else {
             r = new_lp_data->m-1;
             change_rhs(new_lp_data, 1, &r, &target_ub);
          }
+         *found_better_solution = TRUE;
       } 
 
+      PRINT(verbosity,10,("fp: solve lp %d\n",iter));
       if (fp_solve_lp(new_lp_data, fp_data, &is_feasible) != 
             FUNCTION_TERMINATED_NORMALLY) {
          break;
@@ -181,7 +193,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
       } else {
          real_obj_value=solution_value+p->mip->obj_offset;
       }
-      PRINT(verbosity,-1,("fp: found solution = %10.2f time = %10.2f\n",
+      PRINT(verbosity,5,("fp: found solution = %10.2f time = %10.2f\n",
                real_obj_value,total_time));
    }
 
@@ -255,7 +267,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    new_lp_data->lpetol = lp_data->lpetol;
    int n = lp_data->n;
    int m = lp_data->m;
-   int i,newn, newm;
+   int i;
    int *rstat,*cstat;
 
    double one=1.0;
@@ -271,7 +283,6 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    double rhs;
    double lb, ub;
    double lpetol = lp_data->lpetol;
-   double *x = lp_data->x;
    double *lp_lb, *lp_ub, *fp_obj;
    double norm_c = 0;
    double *mip_obj = fp_data->mip_obj;
@@ -421,7 +432,6 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
    FPvars **fp_vars = fp_data->fp_vars;
    double *mip_obj  = fp_data->mip_obj;
    int verbosity = fp_data->verbosity;
-   double flip_fraction = fp_data->flip_fraction;
    int  *index_list = fp_data->index_list;
    double *x_ip = fp_data->x_ip;
    double *x_lp = fp_data->x_lp;
@@ -463,6 +473,7 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
 
    change_objcoeff(lp_data, index_list, &index_list[n-1], objcoeff);
    termstatus = dual_simplex(lp_data, &iterd);
+
    if (termstatus != LP_OPTIMAL) {
       PRINT(verbosity,0,("Feasibility Pump: Unable to solve LP. Pump malfunction.\n"));
       return FUNCTION_TERMINATED_ABNORMALLY;
@@ -564,8 +575,9 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
       qsort_id(tind, tx, cnt);
 
       /* go through all 'iter' points and check if x_ip already exists */
+      has_changed = TRUE;
       for (i=0; i<fp_data->iter; i++) {
-         if (fp_data->x_bar_len[i] == cnt && fp_data->alpha_p[i] < 0.08) {
+         if (x_bar_len[i] == cnt && fp_data->alpha_p[i] < 0.08) {
             for (j=0; j<cnt; j++) {
                if (tind[j]!=x_bar_ind[i][j] || 
                      fabs(tx[j]-x_bar_val[i][j])>lpetol) {
@@ -573,7 +585,7 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
                }
             }
             if (j==cnt) {
-               PRINT(fp_data->verbosity,15,("fp: same as %d\n",i));
+               PRINT(fp_data->verbosity,5,("fp: same as %d\n",i));
                break; //its same
             }
          }
@@ -582,7 +594,7 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
          /* flip some vars in x_ip */
          int num_flipped = 0;
          has_changed = FALSE;
-         PRINT(fp_data->verbosity,15,("fp: flipping\n"));
+         PRINT(fp_data->verbosity,5,("fp: flipping\n"));
          for (j=0; j<n; j++) {
             if (CoinDrand48()<flip_fraction) {
                if (vars[j]->is_bin) {
@@ -594,46 +606,56 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
                }
             }
          }
-         PRINT(fp_data->verbosity,15,("fp: flipping %d\n", num_flipped));
+         PRINT(fp_data->verbosity,5,("fp: flipping %d\n", num_flipped));
+         if (num_flipped==0) {
+            // TODO: dont know what to do
+            break;
+         }
       } else {
          break;
       }
    }
 
-   fp_data->x_bar_ind[fp_data->iter] = (int *)malloc(ISIZE*cnt);
-   fp_data->x_bar_val[fp_data->iter] = (double *)malloc(DSIZE*cnt);
-   fp_data->x_bar_len[fp_data->iter] = cnt;
-   memcpy(fp_data->x_bar_ind[fp_data->iter],tind,ISIZE*cnt);
-   memcpy(fp_data->x_bar_val[fp_data->iter],tx,DSIZE*cnt);
-   fp_data->alpha = fp_data->alpha*fp_data->alpha_decr;
-   if (fp_data->alpha<0.08) {
-      fp_data->alpha = 0;
+   if (has_changed==TRUE || fp_data->alpha>0) {
+      fp_data->x_bar_ind[fp_data->iter] = (int *)malloc(ISIZE*cnt);
+      fp_data->x_bar_val[fp_data->iter] = (double *)malloc(DSIZE*cnt);
+      x_bar_len[fp_data->iter] = cnt;
+      memcpy(fp_data->x_bar_ind[fp_data->iter],tind,ISIZE*cnt);
+      memcpy(fp_data->x_bar_val[fp_data->iter],tx,DSIZE*cnt);
+      fp_data->alpha = fp_data->alpha*fp_data->alpha_decr;
+      if (fp_data->alpha<0.08) {
+         fp_data->alpha = 0;
+      }
+      fp_data->alpha_p[fp_data->iter] = fp_data->alpha;
+   } else {
+      x_bar_len[fp_data->iter] = -1;
    }
-   fp_data->alpha_p[fp_data->iter] = fp_data->alpha;
    return termcode;
 }
 
 /*===========================================================================*/
-int fp_should_call_fp(lp_prob *p, int branching, int *should_call)
+int fp_should_call_fp(lp_prob *p, int branching, int *should_call, 
+      char is_last_iter)
 {
    int        termcode = FUNCTION_TERMINATED_NORMALLY;
 
    *should_call = FALSE;
+   if (is_last_iter==FALSE) {
+      return termcode;
+   }
    if (p->par.fp_enabled>0 && !branching) {
       if (p->par.fp_enabled == SYM_FEAS_PUMP_REPEATED && 
-            p->bc_index%p->par.fp_frequency==0 && 
-            p->node_iter_num == 0) {
+            p->bc_index%p->par.fp_frequency==0) {
          *should_call = TRUE;
       } else if (p->has_ub==FALSE && p->par.fp_enabled==SYM_FEAS_PUMP_TILL_SOL
-            && p->bc_index%p->par.fp_frequency==0 && p->node_iter_num==0) {
+            && p->bc_index%p->par.fp_frequency==0) {
          *should_call = TRUE;
-      } else if (p->has_ub==FALSE  &&
+      } else if ( (p->has_ub==FALSE||
+                   (p->ub-p->lp_data->objval)/fabs(p->ub)*100>
+                   p->par.fp_min_gap) &&
                  p->comp_times.fp < p->par.fp_max_total_time &&
-                 ((p->bc_index%p->par.fp_frequency == 0 &&
-                   p->node_iter_num == 0) ||
-                  (p->bc_index==0 && p->node_iter_num%(2*p->par.fp_frequency))
-                 )) {
-       *should_call = TRUE;
+                 p->bc_index%p->par.fp_frequency == 0) {
+         *should_call = TRUE;
       }
    }
    return termcode;

@@ -324,7 +324,7 @@ int fathom_branch(lp_prob *p)
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
-      if (is_feasible_u(p, FALSE) == IP_FEASIBLE){
+      if (is_feasible_u(p, FALSE, FALSE) == IP_FEASIBLE){
 	 cuts = -1;
       }else{
 	 /*------------------------------------------------------------------*\
@@ -417,7 +417,9 @@ int fathom_branch(lp_prob *p)
 
        case ERROR__NO_BRANCHING_CANDIDATE: /* Something went wrong */
 	 return(ERROR__NO_BRANCHING_CANDIDATE);
-	 
+
+       case FEAS_SOL_FOUND:
+         PRINT(p->par.verbosity,2,("solution found before branching\n"));
        default: /* the return value is the number of cuts added */
 	 if (p->par.verbosity > 2){
 	    printf("Continue with this node.");
@@ -684,7 +686,7 @@ int repricing(lp_prob *p)
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
-      if (is_feasible_u(p, FALSE) == IP_FEASIBLE){
+      if (is_feasible_u(p, FALSE, FALSE) == IP_FEASIBLE){
 	 if (p->par.verbosity > 2){
 	    printf ("Now displaying the feasible solution ...\n");
 	    display_lp_solution_u(p, DISP_FEAS_SOLUTION);

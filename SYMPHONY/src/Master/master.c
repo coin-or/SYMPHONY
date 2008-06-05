@@ -348,7 +348,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->sensitivity_analysis = FALSE;
 
    /* feasibility pump */
-   lp_par->fp_enabled        = SYM_FEAS_PUMP_DISABLE;
+   lp_par->fp_enabled        = SYM_FEAS_PUMP_DEFAULT;
    lp_par->fp_max_cycles     = 50;
    lp_par->fp_time_limit     = 100;
    lp_par->fp_flip_fraction  = 0.2;

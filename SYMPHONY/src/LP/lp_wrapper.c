@@ -667,8 +667,10 @@ int create_subproblem_u(lp_prob *p)
 }
 
 /*===========================================================================*/
-
-int is_feasible_u(lp_prob *p, char branching)
+/* is_last_iter == TRUE ==> it is the last iteration before branching. However
+ * if a solutiion is found by the following heuristics, then this may no
+ * longer be a last call. */
+int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 {
 #ifndef COMPILE_IN_LP
    int s_bufid;
@@ -749,7 +751,7 @@ int is_feasible_u(lp_prob *p, char branching)
    }
 
    if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
-      fp_should_call_fp(p,branching,&should_call_fp); 
+      fp_should_call_fp(p,branching,&should_call_fp,is_last_iter); 
       if (should_call_fp==TRUE) {
          termcode    = feasibility_pump (p, &found_better_solution, new_obj_val, 
                heur_solution);
