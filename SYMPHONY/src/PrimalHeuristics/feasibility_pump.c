@@ -60,7 +60,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    double                   total_time    = 0;
    const double            *mip_obj       = model->getObjCoefficients();
    char                     is_feasible   = FALSE;
-   double                  *x_ip,*x_lp;
+   double                  *x_ip, *x_lp, new_solution_value;
 
    fp_time                                = used_time(&total_time);
    /* total_time and fp_time both now have total time used by symphony's lp
@@ -80,7 +80,10 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    x_ip = fp_data->x_ip;
    x_lp = fp_data->x_lp;
    if (p->has_ub) {
+      solution_value = p->ub-p->mip->obj_offset;
       fp_add_obj_row(new_lp_data, n, mip_obj, p->ub-p->par.granularity);
+   } else {
+      solution_value = model->getInfinity();
    }
 
    /* round the x_lp and store as x_ip, it will usually become infeasible */
@@ -107,33 +110,37 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
          /* we found what we wanted */
          memcpy(betterSolution, x_ip, n*DSIZE);
 
-         solution_value = 0;
+         new_solution_value = 0;
          for (i=0;i<n;i++) {
-            solution_value = solution_value + betterSolution[i]*mip_obj[i];
+            new_solution_value += betterSolution[i]*mip_obj[i];
          }
-         indices = p->lp_data->tmp.i1;          /* n */
-         values  = p->lp_data->tmp.d;           /* n */
-         cnt     = collect_nonzeros(p, betterSolution, indices, values);
-         gap     = (solution_value - obj_lb)/(fabs(solution_value)+0.001)*100;
-         p->lp_stat.fp_num_sols++;
-         PRINT(verbosity,5,("fp: found solution with value = %f\n",
-                  solution_value));
-         PRINT(verbosity,5,("fp: gap = %f\n", gap));
-         sp_add_solution(p,cnt,indices,values,solution_value,p->bc_index);
-         if (gap <= p->par.fp_min_gap) {
+         if (new_solution_value<solution_value) {
+            solution_value = new_solution_value;
+            indices = p->lp_data->tmp.i1;          /* n */
+            values  = p->lp_data->tmp.d;           /* n */
+            cnt     = collect_nonzeros(p, betterSolution, indices, values);
+            gap     = (solution_value -
+                      obj_lb)/(fabs(solution_value)+0.001)*100;
+            p->lp_stat.fp_num_sols++;
+            PRINT(verbosity,5,("fp: found solution with value = %f\n",
+                     solution_value));
+            PRINT(verbosity,5,("fp: gap = %f\n", gap));
+            sp_add_solution(p,cnt,indices,values,solution_value,p->bc_index);
+            if (gap <= p->par.fp_min_gap) {
+               *found_better_solution = TRUE;
+               break;
+            }
+            target_ub = (obj_lb + solution_value)/2;
+            if (*found_better_solution != TRUE && p->has_ub==FALSE) {
+               // add another objective function constraint to lower the
+               // objective value.
+               fp_add_obj_row(new_lp_data, n, mip_obj, target_ub);
+            } else {
+               r = new_lp_data->m-1;
+               change_rhs(new_lp_data, 1, &r, &target_ub);
+            }
             *found_better_solution = TRUE;
-            break;
          }
-         target_ub = (obj_lb + solution_value)/2;
-         if (*found_better_solution != TRUE && p->has_ub==FALSE) {
-            // add another objective function constraint to lower the
-            // objective value.
-            fp_add_obj_row(new_lp_data, n, mip_obj, target_ub);
-         } else {
-            r = new_lp_data->m-1;
-            change_rhs(new_lp_data, 1, &r, &target_ub);
-         }
-         *found_better_solution = TRUE;
       } 
 
       PRINT(verbosity,10,("fp: solve lp %d\n",iter));
