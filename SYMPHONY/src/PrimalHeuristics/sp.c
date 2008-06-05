@@ -31,8 +31,11 @@ int sp_add_solution (lp_prob *p, int cnt, int *indices, double *values,
    sp_desc *sp = p->tm->sp;
    int i;
    sp_solution *sol;
+
+   //TODO: check duplicates
    
-   if (sp->num_solutions == sp->max_solutions) {
+   if (sp->num_solutions == sp->max_solutions && 
+         sp->solutions[0]->objval>=obj_value) {
       /* delete first solution and move everything up by 1 */
       sp_delete_solution(sp,0);
       /*

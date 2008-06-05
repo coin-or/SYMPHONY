@@ -816,6 +816,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE ||
        feasible == IP_HEUR_FEASIBLE){
+      sp_add_solution(p,cnt,indices,values,true_objval+p->mip->obj_offset,
+            p->bc_index);
       /* Send the solution value to the treemanager */
       if (p->has_ub && true_objval >= p->ub - p->par.granularity){
 	 FREE(heur_solution);

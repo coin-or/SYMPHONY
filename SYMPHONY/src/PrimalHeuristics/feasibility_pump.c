@@ -125,7 +125,8 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
             PRINT(verbosity,5,("fp: found solution with value = %f\n",
                      solution_value));
             PRINT(verbosity,5,("fp: gap = %f\n", gap));
-            sp_add_solution(p,cnt,indices,values,solution_value,p->bc_index);
+            sp_add_solution(p,cnt,indices,values,
+                  solution_value+p->mip->obj_offset,p->bc_index);
             if (gap <= p->par.fp_min_gap) {
                *found_better_solution = TRUE;
                break;
