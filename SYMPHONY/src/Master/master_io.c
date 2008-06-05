@@ -755,7 +755,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
                       lp_stat_desc *lp_stat, double ub,
 		      double lb, double initial_time, double start_time,
 		      double finish_time, double obj_offset, char obj_sense, 
-		      char has_ub)
+		      char has_ub, sp_desc *solpool)
 {
    double gap = 0.0;
 
@@ -807,6 +807,8 @@ void print_statistics(node_times *tim, problem_stat *stat,
    printf("Number of analyzed nodes:       %i\n", stat->analyzed);
    printf("Depth of tree:                  %i\n", stat->max_depth);
    printf("Size of the tree:               %i\n", stat->tree_size);
+   printf("Number of solutions found:      %i\n", solpool->total_num_sols_found);
+   printf("Number of solutions in pool:    %i\n", solpool->num_solutions);
 
 #if 0
    printf("Leaves before trimming:         %i\n",

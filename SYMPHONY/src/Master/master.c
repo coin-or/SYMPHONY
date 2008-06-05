@@ -903,7 +903,7 @@ int sym_solve(sym_environment *env)
                           NULL,
 			  env->ub, env->lb, 0, start_time, wall_clock(NULL),
 			  env->mip->obj_offset, env->mip->obj_sense,
-			  env->has_ub);
+			  env->has_ub, NULL);
 #if defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP)
 	 CALL_WRAPPER_FUNCTION( display_solution_u(env,
 						   env->tm->opt_thread_num) );
@@ -963,9 +963,6 @@ int sym_solve(sym_environment *env)
    tm->start_time += start_time;
 
    termcode = solve(tm);
-   sp_free_sp(tm->sp);
-   FREE(tm->sp);
-
    tm_close(tm, termcode);
 
    /* Save the warm start info */
@@ -1133,9 +1130,12 @@ int sym_solve(sym_environment *env)
                           tm->ub, env->lb,
 			  total_time, start_time, wall_clock(NULL),
 			  env->mip->obj_offset, env->mip->obj_sense,
-			  tm->has_ub);
+			  tm->has_ub, tm->sp);
       }
       temp = termcode;
+      sp_free_sp(tm->sp);
+      FREE(tm->sp);
+
       if(env->par.verbosity >=-1 ) {
 #ifdef COMPILE_IN_LP
 	 CALL_WRAPPER_FUNCTION( display_solution_u(env, env->tm->opt_thread_num) );
@@ -1148,7 +1148,8 @@ int sym_solve(sym_environment *env)
 	 print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 
                           NULL,
 			  env->ub, env->lb, 0, start_time, wall_clock(NULL), 
-			  env->mip->obj_offset, env->mip->obj_sense, env->has_ub);
+			  env->mip->obj_offset, env->mip->obj_sense, 
+                          env->has_ub, NULL);
 	 CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
       }
 #endif
@@ -2029,7 +2030,8 @@ int sym_mc_solve(sym_environment *env)
    if (!env->par.multi_criteria){
       print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 
                        NULL, 0.0, 0.0, 0, start_time, wall_clock(NULL), 
-                       env->mip->obj_offset, env->mip->obj_sense, env->has_ub);
+                       env->mip->obj_offset, env->mip->obj_sense, env->has_ub,
+                       NULL);
    } else{ 
       printf("Total WallClock Time         %.3f\n", wall_clock(NULL) -
 	     start_time);

@@ -428,7 +428,7 @@ int main(int argc, char **argv)
 				env->warm_start->ub, env->warm_start->lb, 
 				initial_time, start_time, finish_time,
 				env->mip->obj_offset, env->mip->obj_sense,
-				env->warm_start->has_ub);
+				env->warm_start->has_ub,NULL);
 	       printf("\n");	       
 	     }
 	     strcpy(args[1], "");	       

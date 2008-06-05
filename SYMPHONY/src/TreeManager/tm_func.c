@@ -2528,7 +2528,7 @@ int tasks_before_phase_two(tm_prob *tm)
                        tm->ub, tm->lb, 0,
 		       tm->start_time, wall_clock(NULL),
 		       tm->obj_offset,
-		       tm->obj_sense, tm->has_ub);
+		       tm->obj_sense, tm->has_ub,NULL);
    }
 #else
    /* Report to the master all kind of statistics */
