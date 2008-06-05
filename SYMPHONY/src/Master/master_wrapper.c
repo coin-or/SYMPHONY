@@ -363,11 +363,13 @@ int initialize_root_node_u(sym_environment *env)
 	 return(FUNCTION_TERMINATED_ABNORMALLY);
       }
 #endif
-      root->uind.list = (int *) malloc(root->uind.size * ISIZE);
-      for (i = 0; i < root->uind.size; i++){
-	 root->uind.list[i] = i;
+      if(root->uind.size){
+	 root->uind.list = (int *) malloc(root->uind.size * ISIZE);
+	 for (i = 0; i < root->uind.size; i++){
+	    root->uind.list[i] = i;
+	 }
       }
-      
+
       base->varnum = 0;
       base->userind = NULL;
 

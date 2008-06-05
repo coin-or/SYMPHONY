@@ -2207,57 +2207,64 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
    env->mip->m  = numrows;
    env->mip->n  = numcols;
 
-   if (make_copy){
-      env->mip->obj    = (double *) calloc(numcols, DSIZE);
-      env->mip->obj1   = (double *) calloc(numcols, DSIZE);
-      env->mip->obj2   = (double *) calloc(numcols, DSIZE);
-      env->mip->rhs    = (double *) calloc(numrows, DSIZE);
-      env->mip->sense  = (char *)   malloc(CSIZE * numrows);
-      env->mip->rngval = (double *) calloc(numrows, DSIZE);
-      env->mip->ub     = (double *) calloc(numcols, DSIZE);
-      env->mip->lb     = (double *) calloc(numcols, DSIZE);
-      env->mip->is_int = (char *)   calloc(CSIZE, numcols);
+   if (make_copy){      
       
-      if (obj){
-	 memcpy(env->mip->obj,  obj,  DSIZE * numcols);
-      }
+      if(numcols){
+	 env->mip->obj    = (double *) calloc(numcols, DSIZE);
+	 env->mip->obj1   = (double *) calloc(numcols, DSIZE);
+	 env->mip->obj2   = (double *) calloc(numcols, DSIZE);
+	 env->mip->ub     = (double *) calloc(numcols, DSIZE);
+	 env->mip->lb     = (double *) calloc(numcols, DSIZE);
+	 env->mip->is_int = (char *)   calloc(CSIZE, numcols);
 
-      if (obj2){
-	 memcpy(env->mip->obj2, obj2, DSIZE * numcols);
-      }
+	 if (obj){
+	    memcpy(env->mip->obj,  obj,  DSIZE * numcols);
+	 }
+	 
+	 if (obj2){
+	    memcpy(env->mip->obj2, obj2, DSIZE * numcols);
+	 }
 
-      if (rowsen){
-	 memcpy(env->mip->sense, rowsen, CSIZE * numrows); 
-      }else{
-	 memset(env->mip->sense, 'N', CSIZE *numrows);
-      }
-
-      if(rowrhs){
-	 memcpy(env->mip->rhs, rowrhs, DSIZE * numrows);
-      }
-
-      if (rowrng){
-	 memcpy(env->mip->rngval, rowrng, DSIZE * numrows);
-      }
-
-      if (colub){
-	 memcpy(env->mip->ub, colub, DSIZE * numcols); 
-      }else{
-	 for(i = 0; i<env->mip->n; i++){
-	    env->mip->ub[i] = inf;
+	 if (colub){
+	    memcpy(env->mip->ub, colub, DSIZE * numcols); 
+	 }else{
+	    for(i = 0; i<env->mip->n; i++){
+	       env->mip->ub[i] = inf;
+	    }
+	 }
+	 
+	 if(collb){
+	    memcpy(env->mip->lb, collb, DSIZE * numcols);
+	 }
+	 
+	 if (is_int){
+	    memcpy(env->mip->is_int, is_int, CSIZE * numcols);
 	 }
       }
 
-      if(collb){
-	 memcpy(env->mip->lb, collb, DSIZE * numcols);
-      }
+      if(numrows){
 
-      if (is_int){
-	 memcpy(env->mip->is_int, is_int, CSIZE * numcols);
+	 env->mip->rhs    = (double *) calloc(numrows, DSIZE);
+	 env->mip->sense  = (char *)   malloc(CSIZE * numrows);
+	 env->mip->rngval = (double *) calloc(numrows, DSIZE);
+
+	 if (rowsen){
+	    memcpy(env->mip->sense, rowsen, CSIZE * numrows); 
+	 }else{
+	    memset(env->mip->sense, 'N', CSIZE *numrows);
+	 }
+	 
+	 if(rowrhs){
+	    memcpy(env->mip->rhs, rowrhs, DSIZE * numrows);
+	 }
+	 
+	 if (rowrng){
+	    memcpy(env->mip->rngval, rowrng, DSIZE * numrows);
+	 }
       }
       
       //user defined matind, matval, matbeg--fill as column ordered
-
+      
       if(start){      
 
 	 env->mip->nz = start[numcols];
@@ -3427,6 +3434,7 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    char feasible;
    double lpetol =  9.9999999999999995e-07;
    lp_sol * sol;
+   int * tmp_ind;
 
    if (!env->mip || !env->mip->n){
       if(env->par.verbosity >= 1){
@@ -3498,32 +3506,35 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       }
    }
 
+
+   tmp_ind = (int*)malloc(ISIZE*env->mip->n);
+
    for (i = 0; i < env->mip->n; i++){
       if (colsol[i] > lpetol || colsol[i] < - lpetol){
+	 tmp_ind[nz] = i;
 	 nz++;
       }
    }
 
    sol = &(env->best_sol);
-   if (sol->xval) {
-      FREE(sol->xval);
+   if(sol->xlength){
       FREE(sol->xind);
+      FREE(sol->xval);
    }
-   sol->xind = (int*)malloc(ISIZE*nz);
-   sol->xval = (double*)calloc(nz,DSIZE);
+   
    sol->xlength = nz;
-   
-   for(i = 0, j =0 ; i<env->mip->n; i++){
-      if (colsol[i] != 0.0){
-	 sol->xind[j] = i;
-	 sol->xval[j] = colsol[i];
-	 sol->objval += colsol[i] * env->mip->obj[i];	   
-	 j++;
-      }      
-   }  
-   
-   //env->best_sol = *sol;           
+   sol->objval = 0.0;
 
+   if(nz){
+      sol->xval = (double*)calloc(nz,DSIZE);
+      sol->xind = (int*)malloc(ISIZE*nz);
+      memcpy(sol->xind, tmp_ind, ISIZE*nz);
+      for (i = 0; i < nz; i++){
+	 sol->xval[i] = colsol[tmp_ind[i]];
+	 sol->objval += sol->xval[i] * env->mip->obj[tmp_ind[i]]; 
+      }
+   }
+   
    if (feasible){
       /* now, it is feasible, set the best_sol to colsol */
       //FIXME
@@ -3554,6 +3565,8 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    if (rowAct){
       FREE(rowAct);
    }
+
+   FREE(tmp_ind);
    
    return(FUNCTION_TERMINATED_NORMALLY);      
 }
