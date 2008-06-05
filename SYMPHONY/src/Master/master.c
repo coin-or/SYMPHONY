@@ -3504,7 +3504,11 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       }
    }
 
-   sol = (lp_sol*) calloc(1,sizeof(lp_sol));      
+   sol = &(env->best_sol);
+   if (sol->xval) {
+      FREE(sol->xval);
+      FREE(sol->xind);
+   }
    sol->xind = (int*)malloc(ISIZE*nz);
    sol->xval = (double*)calloc(nz,DSIZE);
    sol->xlength = nz;
@@ -3518,7 +3522,7 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       }      
    }  
    
-   env->best_sol = *sol;           
+   //env->best_sol = *sol;           
 
    if (feasible){
       /* now, it is feasible, set the best_sol to colsol */
