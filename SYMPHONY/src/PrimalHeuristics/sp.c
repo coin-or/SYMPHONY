@@ -35,7 +35,7 @@ int sp_add_solution (lp_prob *p, int cnt, int *indices, double *values,
    //TODO: check duplicates
    
    if (sp->num_solutions == sp->max_solutions && 
-         sp->solutions[0]->objval>=obj_value) {
+         sp->solutions[0]->objval>=obj_value+p->lp_data->lpetol) {
       /* delete first solution and move everything up by 1 */
       sp_delete_solution(sp,0);
       /*
@@ -43,6 +43,10 @@ int sp_add_solution (lp_prob *p, int cnt, int *indices, double *values,
          sp->solutions[i] = sp->solutions[i+1];
       }
       */
+   } else if (sp->num_solutions == sp->max_solutions) {
+      /* pool is full and the new solution is worse than any stored solution
+       */
+      return 0;
    }
    sol = sp->solutions[sp->num_solutions];
    sol->objval = obj_value;

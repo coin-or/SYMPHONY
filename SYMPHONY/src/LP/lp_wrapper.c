@@ -1142,6 +1142,16 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
        (action == USER__BRANCH_IF_MUST && *cuts > 0))
       return(DO_NOT_BRANCH);
 
+   {
+      /* it seems we are going to branch. Before doing that, we should invoke
+       * heuristics. */
+      int feas_status = is_feasible_u(p, FALSE, TRUE);
+      if (feas_status == IP_FEASIBLE||feas_status==IP_HEUR_FEASIBLE) {
+         return(DO_NOT_BRANCH__FEAS_SOL);
+      }
+   }
+
+
    action = col_gen_before_branch(p, new_vars);
    /* vars might have been added, so tmp arrays might be freed/malloc'd,
       but only those where maxn plays any role in the size. Therefore tmp.i2

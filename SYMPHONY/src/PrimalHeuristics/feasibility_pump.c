@@ -114,7 +114,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
          for (i=0;i<n;i++) {
             new_solution_value += betterSolution[i]*mip_obj[i];
          }
-         if (new_solution_value<solution_value) {
+         if (new_solution_value<solution_value-p->par.granularity) {
             solution_value = new_solution_value;
             indices = p->lp_data->tmp.i1;          /* n */
             values  = p->lp_data->tmp.d;           /* n */
@@ -480,6 +480,7 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
    alpha = alpha*fp_data->alpha_decr;
 
    change_objcoeff(lp_data, index_list, &index_list[n-1], objcoeff);
+   //lp_data->si->writeLp("fp.lp");
    termstatus = dual_simplex(lp_data, &iterd);
 
    if (termstatus != LP_OPTIMAL) {

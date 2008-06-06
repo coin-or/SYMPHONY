@@ -158,7 +158,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
     case DO_NOT_BRANCH__FATHOMED:
       *candidate = NULL;
       return(DO_NOT_BRANCH__FATHOMED);
-
+    case DO_NOT_BRANCH__FEAS_SOL:
+      *candidate = NULL;
+      return(DO_NOT_BRANCH__FEAS_SOL);
     case DO_NOT_BRANCH:
       if (cand_num)
 	 *cuts += add_violated_slacks(p, cand_num, candidates);
@@ -187,17 +189,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       *candidate = NULL;
       return(ERROR__NO_BRANCHING_CANDIDATE);
    }
-
-   {
-      /* we are going to branch. Before doing that, we should invoke
-       * heuristics. */
-      int feas_status = is_feasible_u(p, FALSE, TRUE);
-      if (feas_status == IP_FEASIBLE||feas_status==IP_HEUR_FEASIBLE) {
-         *candidate = NULL;
-         return(DO_NOT_BRANCH__FEAS_SOL);
-      }
-   }
-
 
    /* OK, now we have to branch. */
 
