@@ -587,6 +587,8 @@ int sym_solve(sym_environment *env)
    double start_time, lb;
    struct timeval timeout = {10, 0};
    double total_time = 0;
+
+   int granularity = 0;
    
    node_desc *rootdesc = env->rootdesc;
    base_desc *base = env->base;
@@ -682,6 +684,32 @@ int sym_solve(sym_environment *env)
    /*------------------------------------------------------------------------*\
     * Create the treemanager and copy the problem data
    \*------------------------------------------------------------------------*/
+
+   /* 
+    * set granularity. TODO: move this to preprocessor when it becomes
+    * available
+    */
+   if (env->mip && env->mip->obj) {
+      for (int i=0;i<env->mip->n;i++) {
+         double coeff = env->mip->obj[i];
+         if (env->mip->is_int[i] && fabs(floor(coeff+0.5)-coeff)<0.000001) {
+            granularity = gcd(granularity,(int)floor(coeff+0.5));
+         } else {
+            granularity=0;
+            break;
+         }
+      }
+      /*
+       * if granularity >= 1, set it at granularity - epsilon, otherwise set at
+       * epsilon
+       */
+      env->par.tm_par.granularity = env->par.lp_par.granularity = 
+         fabs((double)granularity-0.000001);
+      PRINT(env->par.verbosity, 1, ("granularity set at %f\n",
+               env->par.tm_par.granularity));
+   }
+
+
 
    if (env->par.tm_par.node_selection_rule == BEST_FIRST_SEARCH){
       env->par.tm_par.node_selection_rule = LOWEST_LP_FIRST;
