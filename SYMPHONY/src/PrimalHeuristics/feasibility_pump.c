@@ -193,7 +193,6 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    /* update stats */
    fp_time                        += used_time(&total_time);
    p->comp_times.fp               += fp_time;
-   p->comp_times.primal_heur      += fp_time;
    p->lp_stat.fp_calls++;
    if (*found_better_solution==TRUE) {
       if (p->mip->obj_sense == SYM_MAXIMIZE){

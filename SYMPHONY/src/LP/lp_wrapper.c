@@ -1142,10 +1142,12 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
        (action == USER__BRANCH_IF_MUST && *cuts > 0))
       return(DO_NOT_BRANCH);
 
+   p->comp_times.strong_branching += used_time(&p->tt);
    {
       /* it seems we are going to branch. Before doing that, we should invoke
        * heuristics. */
       int feas_status = is_feasible_u(p, FALSE, TRUE);
+      p->comp_times.primal_heur += used_time(&p->tt);
       if (feas_status == IP_FEASIBLE||feas_status==IP_HEUR_FEASIBLE) {
          return(DO_NOT_BRANCH__FEAS_SOL);
       }

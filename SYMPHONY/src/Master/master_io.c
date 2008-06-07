@@ -775,6 +775,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
    initial_time += tim->pricing;
    initial_time += tim->strong_branching;
    initial_time += tim->cut_pool;
+   initial_time += tim->primal_heur;
 #if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
    printf("======================= CP Timing ===========================\n");
    printf("  Cut Pool                  %.3f\n", tim->cut_pool);
@@ -786,6 +787,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
    printf("  Pricing                   %.3f\n", tim->pricing);
    printf("  Strong Branching          %.3f\n", tim->strong_branching);
    printf("  Separation                %.3f\n", tim->separation); 
+   printf("  Primal Heuristics         %.3f\n", tim->primal_heur); 
 #ifndef COMPILE_IN_LP
    printf("=================== Parallel Overhead ======================\n");
    printf("  Communication         %.3f\n", tim->communication);
