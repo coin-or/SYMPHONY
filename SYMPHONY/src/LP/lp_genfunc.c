@@ -246,6 +246,7 @@ int fathom_branch(lp_prob *p)
 
       p->bound_changes_in_iter = 0;
       termcode = dual_simplex(lp_data, &iterd);
+      p->lp_stat.lp_calls++;
 
 #ifdef DO_TESTS
       if (lp_data->objval < oldobjval - .01){
@@ -624,6 +625,7 @@ int repricing(lp_prob *p)
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
       termcode = dual_simplex(lp_data, &iterd);
+      p->lp_stat.lp_calls++;
 
       /* Get relevant data */
       get_dj_pi(lp_data);
@@ -1934,6 +1936,9 @@ void lp_close(lp_prob *p)
       p->comp_times.lift_and_project_cuts;
    p->tm->comp_times.redsplit_cuts += 
       p->comp_times.redsplit_cuts;
+
+   p->tm->lp_stat.lp_calls                += p->lp_stat.lp_calls;
+   p->tm->lp_stat.lp_sols                 += p->lp_stat.lp_sols;
 
    p->tm->lp_stat.cuts_generated          += p->lp_stat.cuts_generated;
    p->tm->lp_stat.gomory_cuts_generated   += p->lp_stat.gomory_cuts_generated;

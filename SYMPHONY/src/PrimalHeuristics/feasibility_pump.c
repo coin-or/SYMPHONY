@@ -145,6 +145,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
       } 
 
       PRINT(verbosity,10,("fp: solve lp %d\n",iter));
+      p->lp_stat.lp_calls++;
       if (fp_solve_lp(new_lp_data, fp_data, &is_feasible) != 
             FUNCTION_TERMINATED_NORMALLY) {
          break;

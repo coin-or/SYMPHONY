@@ -344,6 +344,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             } else {
                can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
             }
+            p->lp_stat.lp_calls++;
 	    can->objval[j] = lp_data->objval;
 	    get_x(lp_data);
 
@@ -426,6 +427,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    check_ub(p);
 	    /* The original basis is in lp_data->lpbas */
 	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+            p->lp_stat.lp_calls++;
 	    can->objval[j] = lp_data->objval;
 
 

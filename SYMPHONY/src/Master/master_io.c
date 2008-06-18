@@ -834,6 +834,12 @@ void print_statistics(node_times *tim, problem_stat *stat,
    }
 
    if (lp_stat) {
+      printf ("\n======================= LP Solver =========================");
+      printf ("\n");
+      printf ("Number of times LP solver called:               "
+              "%i\n",lp_stat->lp_calls);
+      printf ("Number of solutions found by LP solve:          "
+              "%i\n",lp_stat->lp_sols);
       printf ("\n==================== Feasibility Pump =====================");
       printf ("\n");
       printf ("Number of times feasibility pump called:        ");

@@ -403,6 +403,10 @@ typedef struct PROBLEM_STAT{
 }problem_stat;
 
 typedef struct LP_STAT{
+   /* LP solver */
+   int         lp_calls;
+   int         lp_sols;
+
    /* cuts */
    int         cuts_generated;
    int         gomory_cuts_generated;

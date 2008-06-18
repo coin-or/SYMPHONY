@@ -28,7 +28,6 @@ int sp_add_solution (lp_prob *p, int cnt, int *indices, double *values,
       double obj_value, int bc_index)
 {
    sp_desc *sp = p->tm->sp;
-   int i;
    sp_solution *sol;
 
    //TODO: check duplicates
