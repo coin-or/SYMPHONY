@@ -872,6 +872,11 @@ void print_statistics(node_times *tim, problem_stat *stat,
      
       printf ("\n");
 
+      printf ("cuts removed because of bad coeffs:    %d\n",
+            lp_stat->cuts_discarded);
+      
+      printf ("\n");
+
       printf ("cuts in root:                          %d\n",
             lp_stat->cuts_root);
       printf ("gomory cuts in root:                   %d\n",
@@ -897,9 +902,6 @@ void print_statistics(node_times *tim, problem_stat *stat,
       printf ("landp cuts in root:                    %d\n",
             lp_stat->landp_cuts_root);
      
-      printf ("total cuts discarded:                  %d\n",
-            lp_stat->cuts_discarded);
-      
       printf ("\n");
       
       printf ("time in cut generation:                %.2f\n", tim->cuts);

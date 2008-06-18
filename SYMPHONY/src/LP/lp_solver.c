@@ -4040,7 +4040,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 if (num_elements>0) {
 	    if ( (max_coeff > 0 && min_coeff/max_coeff < 100*lp_data->lpetol)||
 	         (min_coeff > 0 && min_coeff<1000*lp_data->lpetol) ) {
-	       num_discarded_cuts++;
 	       discard_cut = TRUE;
                num_discarded_cuts++;
 	    }
