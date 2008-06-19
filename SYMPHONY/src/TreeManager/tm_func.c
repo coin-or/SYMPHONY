@@ -1405,8 +1405,6 @@ char shall_we_dive(tm_prob *tm, double objval)
    double rand_num, average_lb;
    double cutoff = 0;
 
-   find_tree_lb(tm);
-   
    if (tm->par.time_limit >= 0.0 &&
 	wall_clock(NULL) - tm->start_time >= tm->par.time_limit){
       return(FALSE);
@@ -1417,6 +1415,7 @@ char shall_we_dive(tm_prob *tm, double objval)
    }
    
    if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
+      find_tree_lb(tm);
       if (100*(tm->ub-tm->lb)/tm->ub <= tm->par.gap_limit){
 	 return(FALSE);
       }
@@ -3472,21 +3471,26 @@ int find_tree_lb(tm_prob *tm)
    double lb = MAXDOUBLE;
    bc_node **samephase_cand;
 
-   if (tm->par.node_selection_rule == LOWEST_LP_FIRST) {
-      if (tm->samephase_candnum > 0) {
+   if (tm->samephase_candnum > 0) {
+      if (tm->par.node_selection_rule == LOWEST_LP_FIRST) {
          lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
-      } /* else its same as MAXDOUBLE */
-   } else {
-      samephase_cand = tm->samephase_cand;
-      for (int i = tm->samephase_candnum; i >= 1; i--){
-         if (samephase_cand[i]->lower_bound < lb) {
-            lb = samephase_cand[i]->lower_bound;
+      } else {
+         samephase_cand = tm->samephase_cand;
+         for (int i = tm->samephase_candnum; i >= 1; i--){
+            if (samephase_cand[i]->lower_bound < lb) {
+               lb = samephase_cand[i]->lower_bound;
+            }
          }
       }
+   } else {
+      /* there are no more nodes left. */
+      lb = tm->ub;
    }
+   /*
    if (lb >= MAXDOUBLE / 2){ 
       lb = tm->ub;
    }
+   */
    tm->lb = lb;
    return 0;
 }
