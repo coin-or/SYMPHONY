@@ -914,7 +914,7 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
    int i, j, cnt = 0;
    double lim[7] = {.1, .15, .20, .233333, .266667, .3, 1};
    var_desc **vars = lp_data->vars;
-   
+
    /* first get the fractional values */
    for (i = lp_data->n-1; i >= 0; i--){
       /*FIXME: This is a quick-fix to allow variables without upper bounds*/
@@ -933,20 +933,23 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
    }
    qsort_di(xval, xind, cnt);
 
-   for (j = 0, i = 0; i < cnt;){
-      if (xval[i] > lim[j]){
-	 if (i == 0){
-	    j++; continue;
-	 }else{
-	    break;
-	 }
-      }else{
-	 i++;
+   if (p->bc_level>p->par.strong_br_all_candidates_level) {
+      for (j = 0, i = 0; i < cnt;){
+         if (xval[i] > lim[j]){
+            if (i == 0){
+               j++; continue;
+            }else{
+               break;
+            }
+         }else{
+            i++;
+         }
       }
+      cnt = i;
+      *cand_num = MIN(max_cand_num, cnt);
+   } else {
+      *cand_num = cnt;
    }
-   cnt = i;
-
-   *cand_num = MIN(max_cand_num, cnt);
 
    if (!*candidates)
       *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
