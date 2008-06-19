@@ -436,7 +436,8 @@ typedef struct LP_STAT{
    int         landp_cuts_root;
    int         redsplit_cuts_root;
    
-   int         cuts_discarded;
+   int         num_discarded_cuts;
+   int         num_duplicate_cuts;
 
    /* feasibility pump */
    int         fp_calls;

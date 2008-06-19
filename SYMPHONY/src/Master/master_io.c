@@ -879,7 +879,9 @@ void print_statistics(node_times *tim, problem_stat *stat,
       printf ("\n");
 
       printf ("cuts removed because of bad coeffs:    %d\n",
-            lp_stat->cuts_discarded);
+            lp_stat->num_discarded_cuts);
+      printf ("cuts removed because of duplicacy:     %d\n",
+            lp_stat->num_duplicate_cuts);
       
       printf ("\n");
 

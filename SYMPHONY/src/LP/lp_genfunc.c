@@ -1974,7 +1974,8 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.redsplit_cuts_root += 
       p->lp_stat.redsplit_cuts_root;
 
-   p->tm->lp_stat.cuts_discarded          += p->lp_stat.cuts_discarded;
+   p->tm->lp_stat.num_discarded_cuts      += p->lp_stat.num_discarded_cuts;
+   p->tm->lp_stat.num_duplicate_cuts      += p->lp_stat.num_duplicate_cuts;
 
    p->tm->lp_stat.fp_calls                += p->lp_stat.fp_calls;
    p->tm->lp_stat.fp_num_sols             += p->lp_stat.fp_num_sols;

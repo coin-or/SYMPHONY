@@ -3449,9 +3449,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
                        int verbosity)
 {
    OsiCuts              cutlist;
-   OsiRowCut            cut;
+   OsiRowCut            cut, cut2;
    int                  n = lp_data->n;
-   int                  i = 0, j = 0;
+   int                  i = 0, j = 0, k = 0, l = 0;
    int                  *matind;
    double               *matval, total_time=0, cut_time=0;
    cgl_params           *par = &(lp_data->cgl);
@@ -3464,6 +3464,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    //double               *newLower = lp_data->tmp.d;
    //double               *newUpper = lp_data->tmp.d+n;
    int                  sizeColCuts;
+   int                  num_duplicate_cuts = 0;
    
 #ifndef COMPILE_IN_LP
    par->probing_generated_in_root               = TRUE;
@@ -3992,6 +3993,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    if (cutlist.sizeRowCuts() > 0){
       int num_discarded_cuts = 0;
       int *tmp_matind = lp_data->tmp.i1;
+      int *is_deleted = (int *) calloc(cutlist.sizeRowCuts(), ISIZE);
       if (*cuts){
 	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+cutlist.sizeRowCuts())
 				      * sizeof(cut_data *));
@@ -4000,13 +4002,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       }
              
       for (i = 0, j = *num_cuts; i < cutlist.sizeRowCuts(); i++){
-	 int num_elements;
-	 int *indices;
-	 double *elements;
+	 int num_elements, num_elements2;
+	 int *indices, *indices2;
+	 double *elements, *elements2;
 	 double min_coeff = DBL_MAX;
 	 double max_coeff = 0;
-	 int discard_cut = FALSE;
-	 double rhs;
+	 int discard_cut = FALSE, is_duplicate;
+	 double rhs, rhs2;
          
          cut = cutlist.rowCut(i);
          num_elements = cut.row().getNumElements();
@@ -4059,15 +4061,53 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
                   min_coeff));
    
 	 if (discard_cut==TRUE) {
+            is_deleted[k] = TRUE;
             PRINT(verbosity,5,("Threw out cut.\n\n\n"));
             continue;
          }
+
+         /* check for duplicates */
+         if (num_elements>0) {
+            is_duplicate = FALSE;
+            for (k=0;k<i;k++) {
+               if (is_deleted[k]==TRUE) {
+                  continue;
+               }
+               cut2 = cutlist.rowCut(k);
+               num_elements2 = cut2.row().getNumElements();
+               indices2 = const_cast<int *> (cut2.row().getIndices());
+               elements2 = const_cast<double *> (cut2.row().getElements());
+               rhs2 = cut2.rhs();
+               if (num_elements2 != num_elements || 
+                   fabs(rhs2 - rhs)>lp_data->lpetol) {
+                  continue;
+               } else {
+                  for (l=0;l<num_elements;l++) {
+                     if (indices2[l] != indices[l] || 
+                         fabs(elements2[l]-elements[l]) > lp_data->lpetol) {
+                        break;
+                     }
+                  }
+                  if (l>=num_elements) {
+                     break;
+                  } 
+               }
+            }
+            if (k<i) {
+               is_deleted[k] = TRUE;
+               PRINT(verbosity,5,("cut #%d is same as cut #%d\n",i,k));
+               num_duplicate_cuts++;
+               continue;
+            }
+         }
+
 	 (*cuts)[j] =  (cut_data *) calloc(1, sizeof(cut_data));
 	 (*cuts)[j]->type = EXPLICIT_ROW;
 	 if (((*cuts)[j]->sense = cut.sense()) == 'R'){
 	    FREE((*cuts)[j]);
 	    continue; /* This must be a bug. */
 	 }
+
 	 (*cuts)[j]->rhs = rhs;
 	 (*cuts)[j]->range = cut.range();
 	 (*cuts)[j]->size = ISIZE + num_elements * (ISIZE + DSIZE);
@@ -4092,7 +4132,12 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       if (num_discarded_cuts>0) {
 	 PRINT(verbosity,3,("generate_cgl_cuts: Number of discarded cuts = %d\n",num_discarded_cuts));
       }
-      lp_stat->cuts_discarded += num_discarded_cuts;
+      lp_stat->num_discarded_cuts += num_discarded_cuts;
+      if (num_duplicate_cuts>0) {
+	 PRINT(verbosity,3,("generate_cgl_cuts: Number of duplicate cuts = %d\n",num_duplicate_cuts));
+      }
+      lp_stat->num_duplicate_cuts += num_duplicate_cuts;
+      FREE(is_deleted);
    }
 
    sizeColCuts = cutlist.sizeColCuts();
