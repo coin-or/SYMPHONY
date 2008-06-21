@@ -228,6 +228,7 @@ void branch_close_to_half_and_expensive PROTO((lp_prob *p, int max_cand_num,
 void branch_close_to_one_and_cheap PROTO((lp_prob *p, int max_cand_num,
 					  int *cand_num,
 					  branch_obj ***candidates));
+int auto_change_strong_br_params(lp_prob *p);
 
 /*===========================================================================*/
 /*================ LP communication functions (lp_proccomm.c) ===============*/
