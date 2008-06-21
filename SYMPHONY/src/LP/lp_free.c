@@ -235,7 +235,7 @@ void free_node_dependent(lp_prob *p)
    if (p->waiting_row_num>0) {
       free_waiting_rows(p->waiting_rows, p->waiting_row_num);
       p->waiting_row_num = 0;
-      p->waiting_rows=NULL;
+      FREE(p->waiting_rows);
    }
 
    unload_lp_prob(lp_data);
