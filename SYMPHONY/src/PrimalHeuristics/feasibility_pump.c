@@ -102,6 +102,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
           * should stop here because we are cycling
           */
          PRINT(verbosity,5,("fp: leaving because of cycling\n"));
+         fp_data->iter++;
          break;
       }
       fp_is_feasible (lp_data,matrix,lp_r_low,lp_r_up,fp_data,&is_feasible);
@@ -129,6 +130,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
                   solution_value+p->mip->obj_offset,p->bc_index);
             if (gap <= p->par.fp_min_gap) {
                *found_better_solution = TRUE;
+               fp_data->iter++;
                break;
             }
             target_ub = (obj_lb + solution_value)/2;
