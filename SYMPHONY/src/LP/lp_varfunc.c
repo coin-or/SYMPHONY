@@ -248,9 +248,7 @@ void tighten_bounds(lp_prob *p)
 	 p->vars_recently_fixed_to_ub += vars_recently_fixed_to_ub;
       }
    }
-   if (cnt > 0){
-      change_bounds(lp_data, cnt, ind, lu, bd);
-   }
+
 #ifdef COMPILE_IN_LP
    if (p->bc_level==0 && p->par.do_reduced_cost_fixing) {
       /* we are root node. we will save the reduced costs after each round of
@@ -261,6 +259,9 @@ void tighten_bounds(lp_prob *p)
    }
 #endif
 
+   if (cnt > 0){
+      change_bounds(lp_data, cnt, ind, lu, bd);
+   }
 
    /*========================================================================*\
     * Logical fixing is done only if the number of variables recently fixed
@@ -1143,7 +1144,6 @@ int tighten_root_bounds(lp_prob *p)
    double              *bd = p->lp_data->tmp.d;
    char                *lu = p->lp_data->tmp.c;
    int                  cnt, total_changes = 0;
-   var_desc           **vars = p->lp_data->vars;
    double               lpetol = p->lp_data->lpetol;
    bounds_change_desc  *bnd_change;
    int                 *new_ind;
@@ -1181,7 +1181,7 @@ int tighten_root_bounds(lp_prob *p)
             lu[cnt] = 'U';
             bd[cnt++] = floor(lb[j] + max_change);
          }else if (max_change < 0 && max_change > lb[j] - ub[j]){
-            ind[cnt] = vars[j]->userind;
+            ind[cnt] = saved_ind[j];
             lu[cnt] = 'L';
             bd[cnt++] = ceil(ub[j] + max_change);
          }
