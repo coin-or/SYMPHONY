@@ -125,7 +125,7 @@ typedef struct VAR_DESC{
 typedef struct BOUNDS_CHANGE_DESC{ 
    int                 num_changes; /* how many bounds changed */
    int                *index;       /* max size 2*n */
-   char               *lbub;       /* ub or lb? */ 
+   char               *lbub;        /* ub or lb? */ 
    double             *value;       /* new bound value */
 }bounds_change_desc; 
 
@@ -444,6 +444,17 @@ typedef struct LP_STAT{
    int         fp_num_sols;
 }lp_stat_desc;
 
+
+typedef struct RC_DESC{
+   int         size;
+   int         num_rcs;
+   int       **indices;
+   double    **values;
+   double    **ub;
+   double    **lb;
+   double     *obj;
+   int        *cnt;
+}rc_desc;
 
 typedef struct MIPINFO{ 
    int prob_type; /* mixed, pure(not binary), binary... */

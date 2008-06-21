@@ -113,6 +113,7 @@ typedef struct TM_PROB{
    node_times      comp_times;         /* keeps track of the computation times
 			                  for the problem */
    lp_stat_desc    lp_stat;         
+   rc_desc        *reduced_costs;
 
    /* some temporary stuff */
    bc_node      ***rpath;
@@ -224,6 +225,6 @@ void unpack_cut_set PROTO((tm_prob *tm, int sender, int cutnum,
 int receive_lp_timing PROTO((tm_prob *tm));
 
 void sym_catch_c PROTO((int num));
-int copy_bound_changes_from_node PROTO((bounds_change_desc **bnd_change_ptr, 
-                             bounds_change_desc  *p_bnd_change));
+int merge_bound_changes PROTO((bounds_change_desc **bnd_change_ptr, 
+                               bounds_change_desc  *p_bnd_change));
 #endif

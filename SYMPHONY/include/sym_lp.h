@@ -180,6 +180,8 @@ void add_col_set PROTO((lp_prob *p, our_col_set *new_cols));
 void colind_sort_extra PROTO((lp_prob *p));
 void userind_sort_extra PROTO((lp_prob *p));
 void tighten_bounds PROTO((lp_prob *p));
+int save_root_reduced_costs(lp_prob *p);
+int tighten_root_bounds(lp_prob *p);
 our_col_set *price_all_vars PROTO((lp_prob *p));
 int restore_lp_feasibility PROTO((lp_prob *p, our_col_set *new_cols));
 void userind_sort_extra PROTO((lp_prob *p));

@@ -417,6 +417,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #endif
 	 }
 	 change_lbub(lp_data, branch_var, lb, ub);
+         auto_change_strong_br_params(p);
 	 break;
 
        case CANDIDATE_CUT_IN_MATRIX:
@@ -1094,3 +1095,10 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
    }
 }
 
+/*===========================================================================*/
+int auto_change_strong_br_params(lp_prob *p)
+{
+   return 0;
+}
+/*===========================================================================*/
+/*===========================================================================*/

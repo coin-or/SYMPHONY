@@ -405,7 +405,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
       bpath->branch = bobj->branch[j];
 
       /* copy changes in variable bounds from each node above this node */
-      copy_bound_changes_from_node(&bnd_change, path[i]->desc.bnd_change);
+      merge_bound_changes(&bnd_change, path[i]->desc.bnd_change);
       /*
       if (path[i]->desc.bnd_change) {
          printf("size = %d\n",path[i]->desc.bnd_change->num_changes);
@@ -1240,8 +1240,8 @@ int receive_lp_timing(tm_prob *tm)
 /* 
  * merge p_bnd_change into bnd_change
  */
-int copy_bound_changes_from_node(bounds_change_desc **bnd_change_ptr, 
-                                 bounds_change_desc  *p_bnd_change)
+int merge_bound_changes(bounds_change_desc **bnd_change_ptr, 
+                        bounds_change_desc  *p_bnd_change)
 {
 
    //return 0;

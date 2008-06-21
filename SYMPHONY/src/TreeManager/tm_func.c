@@ -3256,6 +3256,22 @@ void free_tm(tm_prob *tm)
    FREE(tm->rpath_size);
    FREE(tm->bpath);
    FREE(tm->bpath_size);
+
+   if (tm->reduced_costs) {
+      for (i=0; i<tm->reduced_costs->num_rcs; i++) {
+         FREE(tm->reduced_costs->indices[i]);
+         FREE(tm->reduced_costs->values[i]);
+         FREE(tm->reduced_costs->lb[i]);
+         FREE(tm->reduced_costs->ub[i]);
+      }
+      FREE(tm->reduced_costs->indices);
+      FREE(tm->reduced_costs->values);
+      FREE(tm->reduced_costs->lb);
+      FREE(tm->reduced_costs->ub);
+      FREE(tm->reduced_costs->cnt);
+      FREE(tm->reduced_costs->obj);
+      FREE(tm->reduced_costs);
+   }
    
    FREE(tm);
 }
