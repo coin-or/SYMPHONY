@@ -366,7 +366,9 @@ sym_lib : \
 	$(SYMPHONYROOT)\src\Master\master_wrapper.obj \
 	$(SYMPHONYROOT)\src\TreeManager\tm_func.obj \
 	$(SYMPHONYROOT)\src\TreeManager\tm_proccomm.obj \
-	$(SYMPHONYROOT)\src\TreeManager\treemanager.obj
+	$(SYMPHONYROOT)\src\TreeManager\treemanager.obj \
+	$(SYMPHONYROOT)\src\PrimalHeuristics\feasibility_pump.obj \
+	$(SYMPHONYROOT)\src\PrimalHeuristics\sp.obj
 	lib.exe /nologo /out:$(OUTDIR)\libSymphony.lib $(OUTDIR)\*.obj
 	echo "libSymphony.lib" created successfully...
 	echo ...
