@@ -437,7 +437,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #endif
 	 }
 	 change_lbub(lp_data, branch_var, lb, ub);
-         auto_change_strong_br_params(p);
 	 break;
 
        case CANDIDATE_CUT_IN_MATRIX:
@@ -954,7 +953,8 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
    }
    qsort_di(xval, xind, cnt);
 
-   if (p->bc_level>p->par.strong_br_all_candidates_level) {
+   if (p->bc_level>p->par.strong_br_all_candidates_level || 
+         p->par.user_set_strong_branching_cand_num) {
       for (j = 0, i = 0; i < cnt;){
          if (xval[i] > lim[j]){
             if (i == 0){
@@ -1116,12 +1116,6 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
 }
 
 /*===========================================================================*/
-int auto_change_strong_br_params(lp_prob *p)
-{
-   return 0;
-}
-
-/*===========================================================================*/
 int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
                                      double st_time, int total_iters, 
                                      int *should_continue)
@@ -1132,7 +1126,7 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
    int verbosity = p->par.verbosity;
    //verbosity = -2;
 
-   if (p->bc_level<6) {
+   if (p->bc_level<p->par.strong_br_all_candidates_level) {
       allowed_time = p->comp_times.lp/pow(2.0,p->bc_level)/10;
       min_cands = MIN(cand_num,p->par.strong_branching_cand_num_max);
    } else {
@@ -1152,6 +1146,9 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
       /* time is up and min required candidates have been evaluated */
       *should_continue = FALSE;
       return 0;
+   } else if (p->par.user_set_max_presolve_iter == TRUE) {
+      /* user specified a limit and we wont change it */
+      *should_continue = TRUE;
    } else {
       /* we will not be able to evaluate all candidates in given time. we
        * reduce the number of iterations */

@@ -2686,6 +2686,7 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "max_presolve_iter") == 0 ||
 	    strcmp(key, "LP_max_presolve_iter") == 0){
       READ_INT_PAR(lp_par->max_presolve_iter);
+      lp_par->user_set_max_presolve_iter = TRUE;
       return(0);
    }
    
@@ -2719,6 +2720,7 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->strong_branching_cand_num_max);
       lp_par->strong_branching_cand_num_min =
 	 lp_par->strong_branching_cand_num_max;
+      lp_par->user_set_strong_branching_cand_num = TRUE;
       lp_par->strong_branching_red_ratio = 0;
       return(0);
    }
