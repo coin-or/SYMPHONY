@@ -144,6 +144,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    int itlim = 0, cnum = 0;
 #endif
    int should_use_hot_starts;
+   double total_time = 0;
+   double st_time = 0;
+   int total_iters, should_continue;
 
    /*------------------------------------------------------------------------*\
     * First we call select_candidates_u() to select candidates. It can
@@ -254,9 +257,24 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    vars = lp_data->vars;
 
    /* Look at the candidates one-by-one and presolve them. */
-   oldobjval = lp_data->objval;
+   oldobjval   = lp_data->objval;
 
+   st_time     = used_time(&total_time);
+   st_time     = used_time(&total_time);
+   total_iters = 0;
+   //printf("number of candidates = %d\n",cand_num);
+   //printf("lp time = %f\n",p->comp_times.lp);
+   //printf ("used time = %f\n",p->tt);
+   //printf ("str time = %f\n",p->comp_times.strong_branching);
    for (i=0; i<cand_num; i++){
+      st_time += used_time(&total_time);
+      should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
+            &should_continue);
+      if (should_continue==FALSE) {
+         PRINT(p->par.verbosity, 0, 
+               ("too much time in strong branching, breaking\n"));
+         break;
+      }
 
       can = candidates[i];
 
@@ -341,8 +359,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    /* The original basis is in lp_data->lpbas */
             if (should_use_hot_starts) {
                can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
+               total_iters+=*(can->iterd+j);
             } else {
                can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+               total_iters+=*(can->iterd+j);
             }
             p->lp_stat.lp_calls++;
 	    can->objval[j] = lp_data->objval;
@@ -1098,6 +1118,59 @@ void branch_close_to_one_and_cheap(lp_prob *p, int max_cand_num, int *cand_num,
 /*===========================================================================*/
 int auto_change_strong_br_params(lp_prob *p)
 {
+   return 0;
+}
+
+/*===========================================================================*/
+int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
+                                     double st_time, int total_iters, 
+                                     int *should_continue)
+{
+   double allowed_time = 0;
+   *should_continue = TRUE;
+   int min_cands;
+   int verbosity = p->par.verbosity;
+   //verbosity = -2;
+
+   if (p->bc_level<6) {
+      allowed_time = p->comp_times.lp/pow(2.0,p->bc_level)/10;
+      min_cands = MIN(cand_num,p->par.strong_branching_cand_num_max);
+   } else {
+      allowed_time = p->comp_times.lp/2 - p->comp_times.strong_branching;
+      min_cands = MIN(cand_num,p->par.strong_branching_cand_num_min);
+   }
+   if (allowed_time < 0.01) {
+      allowed_time = 0.01;
+   }
+   PRINT(verbosity,10,("allowed_time = %f\n",allowed_time));
+
+   if (st_time/(i+1)*cand_num < allowed_time) {
+      /* all cands can be evaluated in given time */
+      *should_continue = TRUE;
+      return 0;
+   } else if (i >= min_cands && st_time>allowed_time) {
+      /* time is up and min required candidates have been evaluated */
+      *should_continue = FALSE;
+      return 0;
+   } else {
+      /* we will not be able to evaluate all candidates in given time. we
+       * reduce the number of iterations */
+      double min_iters = 
+         (allowed_time-st_time)*total_iters/st_time/(cand_num-i);
+      if (min_iters<10) {
+         /*
+          * cant evaluate all candidates in given time with just 10 iters
+          * as well. we have a choice: increase iters and do min_cands
+          * or do ten iters and try to evaluate max possible num of cands.
+          * we like the second option more.
+          */
+         min_iters = 10;
+      }
+      set_itlim_hotstart(p->lp_data, (int )min_iters);
+      PRINT(verbosity,6, ("iteration limit set to %d\n", (int )min_iters));
+      *should_continue = TRUE;
+      return 0;
+   }
    return 0;
 }
 /*===========================================================================*/

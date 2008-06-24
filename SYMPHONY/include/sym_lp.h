@@ -215,6 +215,9 @@ int add_violated_slacks PROTO((lp_prob *p, int cand_num,
 			       branch_obj **candidates));
 int select_branching_object PROTO((lp_prob *p, int *cuts,
 				   branch_obj **can));
+int should_continue_strong_branching PROTO((lp_prob *p, int i, int cand_num,
+                                     double st_time, int total_iters, 
+                                     int *should_continue));
 int branch PROTO((lp_prob *p, int cuts));
 int col_gen_before_branch PROTO((lp_prob *p, int *new_vars));
 
