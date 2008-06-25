@@ -2819,8 +2819,8 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(lp_par->fp_flip_fraction);
       return(0);
    }
-   else if (strcmp(key, "fp_max_total_time") == 0) {
-      READ_DBL_PAR(lp_par->fp_max_total_time);
+   else if (strcmp(key, "fp_max_initial_time") == 0) {
+      READ_DBL_PAR(lp_par->fp_max_initial_time);
       return(0);
    }
    else if (strcmp(key, "fp_min_gap") == 0) {

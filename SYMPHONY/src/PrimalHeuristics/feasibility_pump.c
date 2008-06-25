@@ -664,7 +664,8 @@ int fp_should_call_fp(lp_prob *p, int branching, int *should_call,
       } else if ( (p->has_ub==FALSE||
                    (p->ub-p->lp_data->objval)/(fabs(p->ub)+0.0001)*100>
                    p->par.fp_min_gap) &&
-                 p->comp_times.fp < p->par.fp_max_total_time &&
+                 (p->comp_times.fp < p->par.fp_max_initial_time ||
+                  p->comp_times.fp < 0.05*p->tt) &&
                  p->comp_times.fp < 0.5*p->tt &&
                  p->bc_index%p->par.fp_frequency == 0) {
          *should_call = TRUE;
