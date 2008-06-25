@@ -4174,6 +4174,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       }
       //exit(0);
    }
+   cut_time = used_time(&total_time);
+   comp_times->dupes_and_bad_coeffs_in_cuts += cut_time;
    return;
 }
 #endif

@@ -316,6 +316,7 @@ typedef struct NODE_TIMES{
    double        lift_and_project_cuts;
    double        landp_cuts;
    double        redsplit_cuts;
+   double        dupes_and_bad_coeffs_in_cuts;
 
    double        fp;                            /* feasibility pump */
    double        primal_heur;                   /* all primal heuristics */

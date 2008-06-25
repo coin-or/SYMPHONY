@@ -1934,8 +1934,9 @@ void lp_close(lp_prob *p)
    p->tm->comp_times.flow_and_cover_cuts += p->comp_times.flow_and_cover_cuts;
    p->tm->comp_times.lift_and_project_cuts += 
       p->comp_times.lift_and_project_cuts;
-   p->tm->comp_times.redsplit_cuts += 
-      p->comp_times.redsplit_cuts;
+   p->tm->comp_times.redsplit_cuts += p->comp_times.redsplit_cuts;
+   p->tm->comp_times.dupes_and_bad_coeffs_in_cuts += 
+      p->comp_times.dupes_and_bad_coeffs_in_cuts;
 
    p->tm->lp_stat.lp_calls                += p->lp_stat.lp_calls;
    p->tm->lp_stat.lp_sols                 += p->lp_stat.lp_sols;

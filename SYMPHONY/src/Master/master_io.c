@@ -936,6 +936,8 @@ void print_statistics(node_times *tim, problem_stat *stat,
             tim->landp_cuts);
       printf ("time in redsplit cuts:                 %.2f\n", 
             tim->redsplit_cuts);
+      printf ("time in checking quality and adding:   %.2f\n", 
+            tim->dupes_and_bad_coeffs_in_cuts);
      
    }
    if (has_ub){
