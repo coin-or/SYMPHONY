@@ -338,7 +338,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->display_solution_default = DISP_NOTHING;
    lp_par->shall_we_branch_default = USER__BRANCH_IF_TAILOFF;
    lp_par->select_candidates_default = USER__CLOSE_TO_HALF;
-   lp_par->strong_branching_cand_num_max = 10;
+   lp_par->strong_branching_cand_num_max = 20;
    lp_par->strong_branching_cand_num_min = 5;
    lp_par->strong_branching_red_ratio = 1;
    lp_par->user_set_strong_branching_cand_num = FALSE;

@@ -267,15 +267,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    //printf ("used time = %f\n",p->tt);
    //printf ("str time = %f\n",p->comp_times.strong_branching);
    for (i=0; i<cand_num; i++){
-      st_time += used_time(&total_time);
-      should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
-            &should_continue);
-      if (should_continue==FALSE) {
-         PRINT(p->par.verbosity, 0, 
-               ("too much time in strong branching, breaking\n"));
-         break;
-      }
-
       can = candidates[i];
 
 #ifndef MAX_CHILDREN_NUM
@@ -635,7 +626,17 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       if ((j & BRANCH_ON_IT)){
 	 break;
       }
+      st_time += used_time(&total_time);
+      should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
+            &should_continue);
+      if (should_continue==FALSE) {
+         PRINT(p->par.verbosity, 0, 
+               ("too much time in strong branching, breaking\n"));
+         break;
+      }
    }
+   //printf ("total_iters = %d \n",total_iters);
+   //printf ("candidates evaluated = %d \n",i);
 
    if (should_use_hot_starts) {
       unmark_hotstart(lp_data);
@@ -1124,17 +1125,20 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
    *should_continue = TRUE;
    int min_cands;
    int verbosity = p->par.verbosity;
-   //verbosity = -2;
+   //verbosity = 20;
 
    if (p->bc_level<p->par.strong_br_all_candidates_level) {
       allowed_time = p->comp_times.lp/pow(2.0,p->bc_level)/10;
       min_cands = MIN(cand_num,p->par.strong_branching_cand_num_max);
+      if (allowed_time < 5) {
+         allowed_time = 5;
+      }
    } else {
       allowed_time = p->comp_times.lp/2 - p->comp_times.strong_branching;
       min_cands = MIN(cand_num,p->par.strong_branching_cand_num_min);
-   }
-   if (allowed_time < 0.01) {
-      allowed_time = 0.01;
+      if (allowed_time < 0.5) {
+         allowed_time = 0.5;
+      }
    }
    PRINT(verbosity,10,("allowed_time = %f\n",allowed_time));
 
@@ -1142,7 +1146,7 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
       /* all cands can be evaluated in given time */
       *should_continue = TRUE;
       return 0;
-   } else if (i >= min_cands && st_time>allowed_time) {
+   } else if (i >= min_cands-1 && st_time>allowed_time) {
       /* time is up and min required candidates have been evaluated */
       *should_continue = FALSE;
       return 0;
@@ -1153,7 +1157,7 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
       /* we will not be able to evaluate all candidates in given time. we
        * reduce the number of iterations */
       double min_iters = 
-         (allowed_time-st_time)*total_iters/st_time/(cand_num-i);
+         (allowed_time-st_time)*total_iters/st_time/(cand_num-i+1);
       if (min_iters<10) {
          /*
           * cant evaluate all candidates in given time with just 10 iters
@@ -1163,7 +1167,11 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
           */
          min_iters = 10;
       }
-      set_itlim_hotstart(p->lp_data, (int )min_iters);
+      if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
+         set_itlim_hotstart(p->lp_data, (int) min_iters);
+      } else {
+         set_itlim(p->lp_data, (int) min_iters);
+      }
       PRINT(verbosity,6, ("iteration limit set to %d\n", (int )min_iters));
       *should_continue = TRUE;
       return 0;
