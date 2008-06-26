@@ -401,6 +401,7 @@ typedef struct PROBLEM_STAT{
 				      after the first phase */
    char        nf_status;          /* nf_status of the root node after
 				      repricing */
+   double      max_vsize;
 }problem_stat;
 
 typedef struct LP_STAT{

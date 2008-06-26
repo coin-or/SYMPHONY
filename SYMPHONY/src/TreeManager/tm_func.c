@@ -52,6 +52,12 @@ extern long random PROTO((void));
 #include "sym_cp.h"
 #endif
 
+/* experiments with memory usage --asm4 */
+#define SHOULD_SHOW_MEMORY_USAGE
+#ifdef SHOULD_SHOW_MEMORY_USAGE
+#include <unistd.h>            /* to get pid */
+#endif
+
 
 int c_count = 0;
 
@@ -575,6 +581,15 @@ void print_tree_status(tm_prob *tm)
    int i;
    double elapsed_time;
 
+#ifdef SHOULD_SHOW_MEMORY_USAGE
+   int pid;
+   int tmp_int;
+   long unsigned vsize;
+   char tmp_str[100], proc_filename[100];
+   FILE *proc_file;
+   double vsize_in_mb;
+#endif
+
 #if 0
    int *widths;
    double *gamma;
@@ -632,6 +647,25 @@ void print_tree_status(tm_prob *tm)
 
 #endif
    
+#ifdef SHOULD_SHOW_MEMORY_USAGE
+   pid = getpid();
+   //printf("process id = %d\n",pid);
+   sprintf(proc_filename,"/proc/%d/stat",pid);
+   proc_file = fopen (proc_filename, "r");
+   fscanf (proc_file, "%d %s %s", &tmp_int, tmp_str, tmp_str); 
+   for (i=0; i<19;i++) {
+      fscanf (proc_file, "%d", &tmp_int);
+   }
+   fscanf (proc_file, "%lu", &vsize);
+   fclose(proc_file);
+   //printf("vsize = %lu\n",vsize);
+   vsize_in_mb = vsize/1024.0/1024.0;
+   if (tm->stat.max_vsize<vsize_in_mb) {
+      tm->stat.max_vsize = vsize_in_mb;
+   }
+   printf("memory: %.2f MB ", vsize_in_mb);
+#endif
+
    printf("done: %i ", tm->stat.analyzed);
    printf("left: %i ", tm->samephase_candnum);
    if (tm->has_ub){
