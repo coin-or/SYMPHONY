@@ -288,6 +288,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
                        int *bnd_changes,
                        lp_stat_desc *lp_stat, node_times *comp_times,
                        int verbosity);
+int should_generate_this_cgl_cut(int generation_flag, int freq, int bc_level, 
+      int bc_index, int cuts_in_root, int *should_generate);
 /*
 void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts,
 			      cut_data ***cuts, char send_to_pool,

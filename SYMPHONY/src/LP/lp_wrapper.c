@@ -1203,6 +1203,13 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 
    action = USER__DO_BRANCH;
 
+   /* before branching, update the control parameters for cut generation
+    * --asm4
+    */
+   if (p->bc_level==0) {
+      update_cut_parameters(p);
+   }
+
    /* OK, so we got to branch */
 #ifdef USE_SYM_APPLICATION
    user_res = user_select_candidates(p->user, lp_data->lpetol, *cuts, j,

@@ -3463,7 +3463,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    int                  is_rootnode = (bc_index>0) ? FALSE : TRUE;
    //double               *newLower = lp_data->tmp.d;
    //double               *newUpper = lp_data->tmp.d+n;
-   int                  sizeColCuts;
+   int                  sizeColCuts, should_generate;
    int                  num_duplicate_cuts = 0;
    
 #ifndef COMPILE_IN_LP
@@ -3501,66 +3501,60 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    cut_time = used_time(&total_time);
 
    /* create CGL probing cuts */
-   if(par->generate_cgl_probing_cuts > -1 && 
-      par->generate_cgl_probing_cuts_freq > 0){
-      if(par->generate_cgl_probing_cuts == GENERATE_ALWAYS || 
-	 (par->generate_cgl_probing_cuts == GENERATE_ONLY_IN_ROOT &&
-	  is_rootnode && par->probing_generated_in_root) || 
-	 ((par->generate_cgl_probing_cuts == GENERATE_DEFAULT ||
-	   par->generate_cgl_probing_cuts == GENERATE_IF_IN_ROOT) &&
-	  par->probing_generated_in_root) ||
-	 (par->generate_cgl_probing_cuts == GENERATE_PERIODICALLY &&
-	  (lp_data->lp_count % par->generate_cgl_probing_cuts_freq == 0)) ||
-	 is_top_iter){	 
-	CglProbing *probe = new CglProbing;
+   should_generate_this_cgl_cut(par->generate_cgl_probing_cuts, 
+         par->generate_cgl_probing_cuts_freq, bc_level, bc_index, 
+         lp_stat->probing_cuts_root, &should_generate);
+   if (should_generate==TRUE) {
+      CglProbing *probe = new CglProbing;
 #if 0
-	probe->setUsingObjective(true);
-	probe->setMaxPass(3);
-        probe->setMaxElements(100+(int)0.05*lp_data->n);
-        probe->setMaxElements(200);
-	probe->setRowCuts(3);
-        probe->setMaxLook(2);
-        probe->setMaxProbe(2);
-        if (is_rootnode) {
-           probe->setMaxPass(2);
-           probe->setMaxElements(200+(int)0.2*lp_data->n);
-        }
+      probe->setLogLevel(2); /* default is 0 */
+      probe->setMode(1); /* default is 1 */
+      probe->setUsingObjective(true); /* default is 0 */
+      probe->setMaxPass(3); /* default is 3 */
+      probe->setMaxElements(100+(int)0.05*lp_data->n);
+      probe->setMaxElements(200);  /* default is 1000, 10000 for root */
+      probe->setRowCuts(3);
+      probe->setMaxLook(2);    /* default is 50 */
+      probe->setMaxProbe(2);   /* default is 100 */
+      if (is_rootnode) {
+         probe->setMaxPass(2);
+         probe->setMaxElements(200+(int)0.2*lp_data->n);
+      }
+      //CglTreeProbingInfo * info2 = new CglTreeProbingInfo();
+      //probe->generateCutsAndModify(*(si), cutlist,info2);
 #endif
-        //CglTreeProbingInfo * info2 = new CglTreeProbingInfo();
-	//probe->generateCutsAndModify(*(si), cutlist,info2);
-	probe->generateCuts(*(si), cutlist);
-	if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-	   if (is_top_iter){
-	      par->probing_generated_in_root = TRUE;
-	   }
-	   PRINT(verbosity, 5,
-		 ("%i probing cuts added\n", new_cut_num));
-           lp_stat->cuts_generated += new_cut_num;
-           lp_stat->probing_cuts_generated += new_cut_num;
-           if (is_rootnode) {
-              lp_stat->cuts_root   += new_cut_num;
-              lp_stat->probing_cuts_root   += new_cut_num;
-           }
-	}
-	cut_num = cutlist.sizeRowCuts();
-        //memcpy(newLower, probe->tightLower(),DSIZE*n);
-        //memcpy(newUpper, probe->tightUpper(),DSIZE*n);
-        /*
-        printf("printing new bounds\n");
-        for (i=0;i<n;i++) {
-           if (lp_data->lb[i]<newLower[i]) {
-              printf("lower %d changed from %f to %f\n",i,lp_data->lb[i],newLower[i]);
-           }
-           if (lp_data->ub[i]>newUpper[i]) {
-              printf("upper %d changed from %f to %f\n",i,lp_data->ub[i],newUpper[i]);
-           }
-        }
-        */
-	delete probe;
-        cut_time = used_time(&total_time);
-        comp_times->cuts += cut_time;
-        comp_times->probing_cuts += cut_time;
-     }
+      probe->generateCuts(*(si), cutlist);
+      if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+         if (is_top_iter){
+            par->probing_generated_in_root = TRUE;
+         }
+         PRINT(verbosity, 5,
+               ("%i probing cuts added\n", new_cut_num));
+         lp_stat->cuts_generated += new_cut_num;
+         lp_stat->probing_cuts_generated += new_cut_num;
+         if (is_rootnode) {
+            lp_stat->cuts_root   += new_cut_num;
+            lp_stat->probing_cuts_root   += new_cut_num;
+         }
+      }
+      cut_num = cutlist.sizeRowCuts();
+      //memcpy(newLower, probe->tightLower(),DSIZE*n);
+      //memcpy(newUpper, probe->tightUpper(),DSIZE*n);
+      /*
+         printf("printing new bounds\n");
+         for (i=0;i<n;i++) {
+         if (lp_data->lb[i]<newLower[i]) {
+         printf("lower %d changed from %f to %f\n",i,lp_data->lb[i],newLower[i]);
+         }
+         if (lp_data->ub[i]>newUpper[i]) {
+         printf("upper %d changed from %f to %f\n",i,lp_data->ub[i],newUpper[i]);
+         }
+         }
+         */
+      delete probe;
+      cut_time = used_time(&total_time);
+      comp_times->cuts += cut_time;
+      comp_times->probing_cuts += cut_time;
    }
 
    /* create CGL gomory cuts */
@@ -4178,6 +4172,50 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    comp_times->dupes_and_bad_coeffs_in_cuts += cut_time;
    return;
 }
-#endif
 
+
+/*===========================================================================*/
+int should_generate_this_cgl_cut(int generation_flag, int freq, int bc_level, 
+      int bc_index, int cuts_in_root, int *should_generate) 
+{
+   switch (generation_flag) {
+    case (GENERATE_DEFAULT):
+      if (bc_level<6 || (freq>0 && bc_index % freq == 0)) {
+         *should_generate = TRUE;
+      } else {
+         *should_generate = FALSE;
+      }
+      break;
+    case (GENERATE_ALWAYS):
+      *should_generate = TRUE;
+      break;
+    case (GENERATE_ONLY_IN_ROOT):
+      if (bc_level<1) {
+         *should_generate = TRUE;
+      } else {
+         *should_generate = FALSE;
+      }
+      break;
+    case (GENERATE_IF_IN_ROOT):
+      if (bc_level<1) {
+         *should_generate = TRUE;
+      } else if (cuts_in_root>0 && bc_index % freq == 0) {
+         *should_generate = TRUE;
+      } else {
+         *should_generate = FALSE;
+      }
+      break;
+    case (GENERATE_PERIODICALLY):
+      if (bc_index % freq == 0) {
+         *should_generate = TRUE;
+      } else {
+         *should_generate = FALSE;
+      }
+      break;
+    default:
+      *should_generate = FALSE;
+   }
+   return 0;
+}
+#endif
 #endif /* __OSI_xxx__ */

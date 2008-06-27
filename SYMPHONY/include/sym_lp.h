@@ -256,6 +256,7 @@ void send_branching_info PROTO((lp_prob *p, branch_obj *can, char *action,
 void send_lp_is_free PROTO((lp_prob *p));
 void send_cuts_to_pool PROTO((lp_prob *p, int eff_cnt_limit));
 int add_bound_changes_to_desc PROTO((node_desc *new_tm_desc, lp_prob *p));
+int update_cut_parameters(lp_prob *p);
 
 /*===========================================================================*/
 /*======================= Freeing things (lp_free.c) ========================*/

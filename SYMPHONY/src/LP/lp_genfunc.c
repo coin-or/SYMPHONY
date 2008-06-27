@@ -446,6 +446,10 @@ int fathom_branch(lp_prob *p)
 #else
       if (p->par.time_limit >= 0.0 &&
 	  wall_clock(NULL) - p->start_time >= p->par.time_limit){
+#if 0
+      to unconfuse vi
+      }
+#endif
 #endif
 	 if (fathom(p, TRUE)){
 	    return(FUNCTION_TERMINATED_NORMALLY);
@@ -1991,7 +1995,6 @@ void lp_close(lp_prob *p)
 }
 
 /*===========================================================================*/
-/*===========================================================================*/
 /*
  * save the changes in bounds that occurred while processing the current node
  * into current-node's node_desc. These changes are available by comparing
@@ -2052,3 +2055,34 @@ int add_bound_changes_to_desc(node_desc *desc, lp_prob *p)
 }
 
 
+/*===========================================================================*/
+/* this function is called after root node has been processed. we update
+ * frequency of cut generation for different cuts depending upon how many cuts
+ * were generated and how much time was used
+ */
+int update_cut_parameters(lp_prob *p)
+{
+#ifdef USE_CGL_CUTS
+   /* TODO: check (a) time (b) if any cuts are in the LP */
+   lp_stat_desc  lp_stat = p->lp_stat;
+   cgl_params    par     = p->par.cgl;
+   /* probing cuts */
+   if (par.generate_cgl_probing_cuts == GENERATE_IF_IN_ROOT && 
+       lp_stat.probing_cuts_root<1) {
+      par.generate_cgl_probing_cuts_freq = -1;
+   }
+   if (par.generate_cgl_probing_cuts == GENERATE_DEFAULT) {
+      if (lp_stat.probing_cuts_root<1) {
+         par.generate_cgl_probing_cuts_freq = -1;
+      } else {
+         par.generate_cgl_probing_cuts_freq = 100;
+      }
+      printf("probing cut frequency changed to %d\n",
+            par.generate_cgl_probing_cuts_freq);
+   }
+
+#endif
+   return 0;
+}
+/*===========================================================================*/
+/*===========================================================================*/
