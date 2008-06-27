@@ -4145,7 +4145,7 @@ int should_generate_this_cgl_cut(int generation_flag, int freq, int bc_level,
 {
    switch (generation_flag) {
     case (GENERATE_DEFAULT):
-      if (bc_level<6 || (freq>0 && bc_index % freq == 0)) {
+      if (freq>0 && (bc_level<6 || bc_index % freq == 0)) {
          *should_generate = TRUE;
       } else {
          *should_generate = FALSE;
