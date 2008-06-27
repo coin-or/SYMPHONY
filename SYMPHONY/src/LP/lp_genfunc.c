@@ -2077,8 +2077,10 @@ int update_cut_parameters(lp_prob *p)
       } else {
          par.generate_cgl_probing_cuts_freq = 100;
       }
+      /*
       printf("probing cut frequency changed to %d\n",
             par.generate_cgl_probing_cuts_freq);
+      */
    }
 
 #endif
