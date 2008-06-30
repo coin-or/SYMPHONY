@@ -4026,7 +4026,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
                   min_coeff));
    
 	 if (discard_cut==TRUE) {
-            is_deleted[k] = TRUE;
+            is_deleted[i] = TRUE;
             PRINT(verbosity,5,("Threw out cut.\n\n\n"));
             continue;
          }
@@ -4059,7 +4059,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
                }
             }
             if (k<i) {
-               is_deleted[k] = TRUE;
+               is_deleted[i] = TRUE;
                PRINT(verbosity,5,("cut #%d is same as cut #%d\n",i,k));
                num_duplicate_cuts++;
                continue;
