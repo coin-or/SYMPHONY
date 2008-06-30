@@ -1258,8 +1258,10 @@ int tighten_root_bounds(lp_prob *p)
          bnd_change->num_changes = cnt;
       }
    }
-   PRINT(verbosity, 5, ("tighten_root_bounds: root now has %d changes\n",
-            p->tm->rootnode->desc.bnd_change->num_changes));
+   if (verbosity>5 && p->tm->rootnode->desc.bnd_change!=NULL) {
+      printf("tighten_root_bounds: root now has %d changes\n",
+            p->tm->rootnode->desc.bnd_change->num_changes);
+   }
    FREE(new_ind);
    return 0;
 }
