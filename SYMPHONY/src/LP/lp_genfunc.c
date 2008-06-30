@@ -2065,24 +2065,24 @@ int update_cut_parameters(lp_prob *p)
 #ifdef USE_CGL_CUTS
    /* TODO: check (a) time (b) if any cuts are in the LP */
    lp_stat_desc  lp_stat  = p->lp_stat;
-   cgl_params    par      = p->par.cgl;
-   cgl_params    data_par = p->lp_data->cgl;
+   cgl_params   *par      = &(p->par.cgl);
+   cgl_params   *data_par = &(p->lp_data->cgl);
    /* probing cuts */
-   if (par.generate_cgl_probing_cuts == GENERATE_IF_IN_ROOT && 
+   if (par->generate_cgl_probing_cuts == GENERATE_IF_IN_ROOT && 
        lp_stat.probing_cuts_root<1) {
-      par.generate_cgl_probing_cuts_freq = -1;
+      par->generate_cgl_probing_cuts_freq = -1;
    }
-   if (par.generate_cgl_probing_cuts == GENERATE_DEFAULT) {
+   if (par->generate_cgl_probing_cuts == GENERATE_DEFAULT) {
       if (lp_stat.probing_cuts_root<1) {
-         data_par.generate_cgl_probing_cuts_freq = 
-              par.generate_cgl_probing_cuts_freq = -1;
+         data_par->generate_cgl_probing_cuts_freq = 
+              par->generate_cgl_probing_cuts_freq = -1;
       } else {
-         data_par.generate_cgl_probing_cuts_freq = 
-              par.generate_cgl_probing_cuts_freq = 100;
+         data_par->generate_cgl_probing_cuts_freq = 
+              par->generate_cgl_probing_cuts_freq = 100;
       }
       /*
       printf("probing cut frequency changed to %d\n",
-            par.generate_cgl_probing_cuts_freq);
+            par->generate_cgl_probing_cuts_freq);
       */
    }
 
