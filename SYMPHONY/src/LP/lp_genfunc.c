@@ -2080,12 +2080,52 @@ int update_cut_parameters(lp_prob *p)
          data_par->generate_cgl_probing_cuts_freq = 
               par->generate_cgl_probing_cuts_freq = 100;
       }
-      /*
-      printf("probing cut frequency changed to %d\n",
-            par->generate_cgl_probing_cuts_freq);
-      */
    }
 
+   /* flow and cover cuts */
+   if (par->generate_cgl_flow_and_cover_cuts == GENERATE_IF_IN_ROOT && 
+       lp_stat.flow_and_cover_cuts_root<1) {
+      par->generate_cgl_flow_and_cover_cuts_freq = -1;
+   }
+   if (par->generate_cgl_flow_and_cover_cuts == GENERATE_DEFAULT) {
+      if (lp_stat.flow_and_cover_cuts_root<1) {
+         data_par->generate_cgl_flow_and_cover_cuts_freq = 
+              par->generate_cgl_flow_and_cover_cuts_freq = -1;
+      } else {
+         data_par->generate_cgl_flow_and_cover_cuts_freq = 
+              par->generate_cgl_flow_and_cover_cuts_freq = 100;
+      }
+   }
+
+   /* knapsack cuts */
+   if (par->generate_cgl_knapsack_cuts == GENERATE_IF_IN_ROOT && 
+       lp_stat.knapsack_cuts_root<1) {
+      par->generate_cgl_knapsack_cuts_freq = -1;
+   }
+   if (par->generate_cgl_knapsack_cuts == GENERATE_DEFAULT) {
+      if (lp_stat.knapsack_cuts_root<1) {
+         data_par->generate_cgl_knapsack_cuts_freq = 
+              par->generate_cgl_knapsack_cuts_freq = 200;
+      } else {
+         data_par->generate_cgl_knapsack_cuts_freq = 
+              par->generate_cgl_knapsack_cuts_freq = 20;
+      }
+   }
+
+   /* gomory cuts */
+   if (par->generate_cgl_gomory_cuts == GENERATE_IF_IN_ROOT && 
+       lp_stat.gomory_cuts_root<1) {
+      par->generate_cgl_gomory_cuts_freq = -1;
+   }
+   if (par->generate_cgl_gomory_cuts == GENERATE_DEFAULT) {
+      if (lp_stat.gomory_cuts_root<1) {
+         data_par->generate_cgl_gomory_cuts_freq = 
+              par->generate_cgl_gomory_cuts_freq = 100;
+      } else {
+         data_par->generate_cgl_gomory_cuts_freq = 
+              par->generate_cgl_gomory_cuts_freq = 10;
+      }
+   }
 #endif
    return 0;
 }
