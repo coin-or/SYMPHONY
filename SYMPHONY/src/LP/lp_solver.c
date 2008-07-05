@@ -3507,13 +3507,14 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          lp_stat->probing_cuts_root, &should_generate);
    if (should_generate==TRUE) {
       CglProbing *probe = new CglProbing;
-#if 0
-      if (bc_index!=0 || !is_top_iter) {
+      if ((bc_level<6 && comp_times->probing_cuts>comp_times->lp) || 
+          (bc_level>6 && comp_times->probing_cuts>comp_times->lp/10)) {
          /* since we are not using cgltreeinfo, 
           * all nodes are like root nodes 
           */
          probe->setMaxLookRoot(5); 
       }
+#if 0
       probe->setLogLevel(2); /* default is 0 */
       probe->setMode(1); /* default is 1 */
       probe->setUsingObjective(true); /* default is 0 */
