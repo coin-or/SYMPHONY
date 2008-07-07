@@ -309,7 +309,8 @@ int fathom_branch(lp_prob *p)
 		   || termcode == LP_D_OBJLIM){
 	    PRINT(p->par.verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
-	    break;
+            comp_times->lp += used_time(&p->tt);
+            break;
 	 }
 	 comp_times->lp += used_time(&p->tt);
 	 if (fathom(p, (termcode != LP_D_UNBOUNDED))){
