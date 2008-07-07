@@ -4035,10 +4035,19 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
          /* check for duplicates */
          if (num_elements>0) {
+            int cuts_compared = 0;
             is_duplicate = FALSE;
-            for (k=0;k<i;k++) {
+            /* check against last 40 cuts only. otherwise, takes a lot of time
+             */
+            for (k=i-1;k>-1;k--) {
                if (is_deleted[k]==TRUE) {
                   continue;
+               }
+               cuts_compared++;
+               /* TODO: parameterize this */
+               if (cuts_compared>50) {
+                  k = -1;
+                  break;
                }
                cut2 = cutlist.rowCut(k);
                num_elements2 = cut2.row().getNumElements();
@@ -4060,7 +4069,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
                   } 
                }
             }
-            if (k<i) {
+            if (k>-1) {
                is_deleted[i] = TRUE;
                PRINT(verbosity,5,("cut #%d is same as cut #%d\n",i,k));
                num_duplicate_cuts++;
