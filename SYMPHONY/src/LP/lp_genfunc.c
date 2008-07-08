@@ -2064,7 +2064,7 @@ int add_bound_changes_to_desc(node_desc *desc, lp_prob *p)
 int update_cut_parameters(lp_prob *p)
 {
 #ifdef USE_CGL_CUTS
-   /* TODO: check (a) time (b) if any cuts are in the LP */
+   /* TODO: check (a) time (b) if any cuts are actually in the LP */
    lp_stat_desc  lp_stat  = p->lp_stat;
    cgl_params   *par      = &(p->par.cgl);
    cgl_params   *data_par = &(p->lp_data->cgl);

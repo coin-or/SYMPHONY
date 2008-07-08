@@ -3570,27 +3570,31 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          par->generate_cgl_gomory_cuts_freq, bc_level, bc_index, 
          lp_stat->gomory_cuts_root, &should_generate);
    if (should_generate==TRUE) {
-      CglGomory *gomory = new CglGomory;
-      gomory->generateCuts(*(lp_data->si), cutlist);
-      if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
-         if (is_top_iter){
-            par->gomory_generated_in_root = TRUE;
+      if ((bc_level<6 && comp_times->gomory_cuts<comp_times->lp) || 
+          (bc_level>6 && comp_times->gomory_cuts<comp_times->lp/10)) {
+         CglGomory *gomory = new CglGomory;
+         gomory->generateCuts(*(lp_data->si), cutlist);
+         if ((new_cut_num = cutlist.sizeRowCuts() - cut_num) > 0) {
+            if (is_top_iter){
+               par->gomory_generated_in_root = TRUE;
+            }
+            PRINT(verbosity, 5,
+                  ("%i Gomory cuts added\n", new_cut_num));
+            lp_stat->cuts_generated += new_cut_num;
+            lp_stat->gomory_cuts_generated += new_cut_num;
+            if (is_rootnode) {
+               lp_stat->cuts_root   += new_cut_num;
+               lp_stat->gomory_cuts_root += new_cut_num;
+            }
          }
-         PRINT(verbosity, 5,
-               ("%i Gomory cuts added\n", new_cut_num));
-         lp_stat->cuts_generated += new_cut_num;
-         lp_stat->gomory_cuts_generated += new_cut_num;
-         if (is_rootnode) {
-            lp_stat->cuts_root   += new_cut_num;
-            lp_stat->gomory_cuts_root += new_cut_num;
-         }
+         cut_num = cutlist.sizeRowCuts();       
+         delete gomory;
+         cut_time = used_time(&total_time);
+         comp_times->cuts += cut_time;
+         comp_times->gomory_cuts += cut_time;
       }
-      cut_num = cutlist.sizeRowCuts();       
-      delete gomory;
-      cut_time = used_time(&total_time);
-      comp_times->cuts += cut_time;
-      comp_times->gomory_cuts += cut_time;
    }
+   //printf("gomory time = %f, lp time = %f\n",comp_times->gomory_cuts, comp_times->lp); 
 
    /* create CGL redsplit cuts */
    if(par->generate_cgl_redsplit_cuts > -1 && 
