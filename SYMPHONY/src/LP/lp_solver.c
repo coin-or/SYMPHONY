@@ -4037,27 +4037,18 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          if (num_elements>0) {
             int cuts_compared = 0;
             is_duplicate = FALSE;
-            /* check against last 40 cuts only. otherwise, takes a lot of time
+            /* check against last 50 cuts only. otherwise, takes a lot of time
              */
-            for (k=i-1;k>-1;k--) {
-               if (is_deleted[k]==TRUE) {
-                  continue;
-               }
-               cuts_compared++;
-               /* TODO: parameterize this */
-               if (cuts_compared>50) {
-                  k = -1;
-                  break;
-               }
-               cut2 = cutlist.rowCut(k);
-               num_elements2 = cut2.row().getNumElements();
-               indices2 = const_cast<int *> (cut2.row().getIndices());
-               elements2 = const_cast<double *> (cut2.row().getElements());
-               rhs2 = cut2.rhs();
+            for (k=j-1;k>MAX(-1,j-51);k--) {
+               num_elements2 = ((*cuts)[k]->coef)[0];
+               rhs2 = (*cuts)[k]->rhs;
                if (num_elements2 != num_elements || 
                    fabs(rhs2 - rhs)>lp_data->lpetol) {
                   continue;
                } else {
+                  indices2 = (int *) ((*cuts)[k]->coef + ISIZE);
+                  elements2 = (double *) ((*cuts)[k]->coef +
+                                          (num_elements2+1)*ISIZE);
                   for (l=0;l<num_elements;l++) {
                      if (indices2[l] != indices[l] || 
                          fabs(elements2[l]-elements[l]) > lp_data->lpetol) {
@@ -4069,9 +4060,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
                   } 
                }
             }
-            if (k>-1) {
+            if (k>MAX(-1,i-51)) {
                is_deleted[i] = TRUE;
-               PRINT(verbosity,5,("cut #%d is same as cut #%d\n",i,k));
+               PRINT(verbosity,5,("cut #%d is same as accepted cut #%d\n",i,k));
                num_duplicate_cuts++;
                continue;
             }

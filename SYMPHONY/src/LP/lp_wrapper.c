@@ -252,8 +252,12 @@ int create_subproblem_u(lp_prob *p)
    /* Create the list of indices to pass to the user */
    userind = (int *) malloc(lp_data->n * ISIZE);
    vars = lp_data->vars;
+   p->par.is_userind_in_order = TRUE;
    for (i = lp_data->n - 1; i >= 0; --i){
       userind[i] = vars[i]->userind;
+      if (userind[i]!=i) {
+         p->par.is_userind_in_order = FALSE;
+      }
    }
    
 #ifdef USE_SYM_APPLICATION
@@ -1736,6 +1740,7 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
    double       *obj1 = p->mip->obj1;
    double       *obj2 = p->mip->obj2;
    var_desc    **vars = lp_data->vars;
+   const int     is_userind_in_order = p->par.is_userind_in_order;     
    
    colind_sort_extra(p);
 
@@ -1759,32 +1764,17 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
             (int *) malloc(nzcnt * ISIZE);
 	 row_matval = row_list[explicit_row_num]->matval = 
             (double *) malloc(nzcnt * DSIZE);
-#if 0
-         for (k = 0; k < nzcnt; k++){
-            /* 
-             * desparate to avoid the following nested for loop here, 
-             * we try this first
-             */
-            if (matind[k] == vars[matind[k]]->userind) {
-               row_matind[real_nzcnt]   = matind[k];
-               row_matval[real_nzcnt++] = matval[k];
-               //printf("success\n");
-            } else {
-               for (j = 0; j < n; j++){
+         if (is_userind_in_order) {
+            memcpy(row_matind, matind, nzcnt*ISIZE);
+            memcpy(row_matval, matval, nzcnt*DSIZE);
+            real_nzcnt = nzcnt;
+         } else {
+            for (j = 0; j < n; j++){
+               for (k = 0; k < nzcnt; k++){
                   if (matind[k] == vars[j]->userind){
                      row_matind[real_nzcnt]   = j;
                      row_matval[real_nzcnt++] = matval[k];
-                     break;
                   }
-               }
-            }
-	 }
-#endif
-         for (j = 0; j < n; j++){
-            for (k = 0; k < nzcnt; k++){
-               if (matind[k] == vars[j]->userind){
-                  row_matind[real_nzcnt]   = j;
-                  row_matval[real_nzcnt++] = matval[k];
                }
             }
          }

@@ -181,6 +181,9 @@ typedef struct LP_PARAMS{
    double            fp_flip_fraction;
    double            fp_max_initial_time;
    double            fp_min_gap;
+
+   /* to avoid nested for loops, check if userind's are in order */
+   int               is_userind_in_order;
 }lp_params;
 
 #endif
