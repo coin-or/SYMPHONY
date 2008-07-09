@@ -131,6 +131,7 @@ typedef struct LP_PARAMS{
    cut_time_out      later_lp;
 
    int               max_cut_num_per_iter;
+   int               max_cut_num_per_iter_root;
 
    /* Reduced cost and logical fixing parameters */
    int               do_reduced_cost_fixing;

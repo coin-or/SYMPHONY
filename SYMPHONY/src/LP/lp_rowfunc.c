@@ -339,8 +339,10 @@ int add_best_waiting_rows(lp_prob *p)
 {
    int i, added_rows;
    row_data *rows;
+   int max_cut_num_per_iter = (p->bc_level<1)?p->par.max_cut_num_per_iter_root:
+                                            p->par.max_cut_num_per_iter;
 
-   added_rows = MIN(p->par.max_cut_num_per_iter, p->waiting_row_num);
+   added_rows = MIN(max_cut_num_per_iter, p->waiting_row_num);
    if (added_rows < p->waiting_row_num)
       qsort((char *)p->waiting_rows, p->waiting_row_num,
 	    sizeof(waiting_row *), waiting_row_comp);

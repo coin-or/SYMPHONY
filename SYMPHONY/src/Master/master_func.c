@@ -2513,6 +2513,12 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
    
+   else if (strcmp(key, "max_cut_num_per_iter_root") == 0 ||
+	    strcmp(key, "LP_max_cut_num_per_iter_root") == 0){
+      READ_INT_PAR(lp_par->max_cut_num_per_iter_root);
+      return(0);
+   }
+   
    /* variable fixing parameters */
    else if (strcmp(key, "do_reduced_cost_fixing") == 0 ||
 	    strcmp(key, "LP_do_reduced_cost_fixing") == 0){

@@ -2287,6 +2287,7 @@ void purge_waiting_rows_u(lp_prob *p)
    waiting_row **wrows = p->waiting_rows;
    int wrow_num = p->waiting_row_num;
    char *delete_rows;
+   int   max_cut_num_per_iter;
 
    REMALLOC(p->lp_data->tmp.cv, char, p->lp_data->tmp.cv_size, wrow_num,
 	    BB_BUNCH);
@@ -2307,10 +2308,12 @@ void purge_waiting_rows_u(lp_prob *p)
       break;
     case USER_DEFAULT: /* the only default is to keep enough for one
 			  iteration */
-      if (wrow_num - p->par.max_cut_num_per_iter > 0){
-	 free_waiting_rows(wrows + p->par.max_cut_num_per_iter,
-			   wrow_num-p->par.max_cut_num_per_iter);
-	 p->waiting_row_num = p->par.max_cut_num_per_iter;
+      max_cut_num_per_iter = (p->bc_level<1) ? p->par.max_cut_num_per_iter_root
+                                             : p->par.max_cut_num_per_iter;
+      if (wrow_num - max_cut_num_per_iter > 0){
+	 free_waiting_rows(wrows + max_cut_num_per_iter,
+			   wrow_num-max_cut_num_per_iter);
+	 p->waiting_row_num = max_cut_num_per_iter;
       }
       break;
     case USER_SUCCESS:
