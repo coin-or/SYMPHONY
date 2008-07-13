@@ -231,16 +231,18 @@ int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const doubl
    double *x = fp_data->x_ip;
 
    *is_feasible = TRUE;
+   /* some int variable is non-integral */
+   /* is not possible, since this function is called after rounding */
+   /*
    for (i=0;i<n;i++) {
       if (vars[i]->is_int) {
          if (x[i]-floor(x[i])>lpetol && ceil(x[i])-x[i]>lpetol) {
-            /* some int variable is non-integral */
-            /* is not possible, since this function is called after rounding */
             printf("Bok!\n");
             return FUNCTION_TERMINATED_ABNORMALLY;
          }
       }
    }
+   */
 
    /* check feasibility of constraints */
    for (i=0;i<m;i++) {
@@ -248,7 +250,7 @@ int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const doubl
       c=0;			/* column */
       for (j=r_matbeg[i];j<r_matbeg[i]+r_matlen[i];j++) {
          c=r_matind[j];
-         Ractivity = Ractivity+x[c]*r_matval[j];
+         Ractivity += x[c]*r_matval[j];
       }
       //      printf("Ractivity[%d] = \t%f\n",i,Ractivity);
       if (Ractivity>r_up[i]+lpetol || Ractivity<r_low[i]-lpetol) {
@@ -301,6 +303,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
 
    /* used because we can not call si directly */
    copy_lp_data(lp_data,new_lp_data);
+   new_lp_data->si->setupForRepeatedUse(3,0);
    lp_lb = new_lp_data->lb;
    lp_ub = new_lp_data->ub;
 
@@ -446,10 +449,13 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
    double *x_ip = fp_data->x_ip;
    double *x_lp = fp_data->x_lp;
    double alpha = fp_data->alpha;
+   double one_minus_alpha = 1-fp_data->alpha;
+   int n0 = fp_data->n0;
+   double *lp_data_x = lp_data->x;
 
    is_feasible = FALSE;
    memset ((char *)(objcoeff),0,DSIZE*n);
-   for (i=0;i<fp_data->n0;i++) {
+   for (i=0;i<n0;i++) {
       if (fp_vars[i]->is_int) {
          if (fp_vars[i]->is_bin) {
             if (x_ip[i]==0) {
@@ -473,13 +479,15 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
    norm = sqrt(norm);
    //norm = 0;
    PRINT(verbosity, 15, ("fp: norm = %f\n",norm));
-   for (i=0;i<fp_data->n0;i++) {
-      objcoeff[i] = (1-alpha)*objcoeff[i]+alpha*mip_obj[i]*norm;
+   for (i=0;i<n0;i++) {
+      objcoeff[i] = one_minus_alpha*objcoeff[i]+alpha*mip_obj[i]*norm;
    }
+   /*
    for (i=fp_data->n0;i<fp_data->n;i++) {
       objcoeff[i] = (1-alpha)*objcoeff[i];
    }
    alpha = alpha*fp_data->alpha_decr;
+   */
 
    change_objcoeff(lp_data, index_list, &index_list[n-1], objcoeff);
    //lp_data->si->writeLp("fp.lp");
@@ -493,10 +501,10 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
    get_x(lp_data);
 
    delta_x = 0;
-   for (i=0;i<fp_data->n0;i++) {
-      x_lp[i]=lp_data->x[i];
-      if (fp_data->fp_vars[i]->is_int) {
-         delta_x = delta_x+fabs(x_lp[i]-x_ip[i]);
+   memcpy(x_lp,lp_data_x,DSIZE*n0);
+   for (i=0;i<n0;i++) {
+      if (fp_vars[i]->is_int) {
+         delta_x += fabs(x_lp[i]-x_ip[i]);
       }
    }
    PRINT(verbosity, 15, ("fp: delta_x = %f\n",delta_x));
@@ -556,11 +564,14 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
    double *tx = lp_data->tmp.d; /* n */
    int cnt = 0;
    int *index = fp_data->index_list;
-   double **x_bar_val = fp_data->x_bar_val;
-   int **x_bar_ind = fp_data->x_bar_ind;
+   double **x_bar_val_p = fp_data->x_bar_val;
+   double *x_bar_val;
+   int **x_bar_ind_p = fp_data->x_bar_ind;
+   int *x_bar_ind;
    int *x_bar_len = fp_data->x_bar_len;
    double flip_fraction = fp_data->flip_fraction;
    FPvars **vars = fp_data->fp_vars;
+   int fp_iter = fp_data->iter;
 
    for (i=0;i<n;i++) {
       if (vars[i]->is_int) {
@@ -587,11 +598,13 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
 
       /* go through all 'iter' points and check if x_ip already exists */
       has_changed = TRUE;
-      for (i=0; i<fp_data->iter; i++) {
+      for (i=0; i<fp_iter; i++) {
          if (x_bar_len[i] == cnt && fp_data->alpha_p[i] < 0.08) {
+            x_bar_val = x_bar_val_p[i];
+            x_bar_ind = x_bar_ind_p[i];
             for (j=0; j<cnt; j++) {
-               if (tind[j]!=x_bar_ind[i][j] || 
-                     fabs(tx[j]-x_bar_val[i][j])>lpetol) {
+               if (tind[j]!=x_bar_ind[j] || 
+                     fabs(tx[j]-x_bar_val[j])>lpetol) {
                   break;
                }
             }
@@ -601,7 +614,7 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
             }
          }
       }
-      if (i<fp_data->iter) {
+      if (i<fp_iter) {
          /* flip some vars in x_ip */
          int num_flipped = 0;
          has_changed = FALSE;
@@ -628,18 +641,18 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
    }
 
    if (has_changed==TRUE || fp_data->alpha>0) {
-      fp_data->x_bar_ind[fp_data->iter] = (int *)malloc(ISIZE*cnt);
-      fp_data->x_bar_val[fp_data->iter] = (double *)malloc(DSIZE*cnt);
-      x_bar_len[fp_data->iter] = cnt;
-      memcpy(fp_data->x_bar_ind[fp_data->iter],tind,ISIZE*cnt);
-      memcpy(fp_data->x_bar_val[fp_data->iter],tx,DSIZE*cnt);
+      fp_data->x_bar_ind[fp_iter] = (int *)malloc(ISIZE*cnt);
+      fp_data->x_bar_val[fp_iter] = (double *)malloc(DSIZE*cnt);
+      x_bar_len[fp_iter] = cnt;
+      memcpy(fp_data->x_bar_ind[fp_iter],tind,ISIZE*cnt);
+      memcpy(fp_data->x_bar_val[fp_iter],tx,DSIZE*cnt);
       fp_data->alpha = fp_data->alpha*fp_data->alpha_decr;
       if (fp_data->alpha<0.08) {
          fp_data->alpha = 0;
       }
-      fp_data->alpha_p[fp_data->iter] = fp_data->alpha;
+      fp_data->alpha_p[fp_iter] = fp_data->alpha;
    } else {
-      x_bar_len[fp_data->iter] = -1;
+      x_bar_len[fp_iter] = -1;
    }
    return termcode;
 }
