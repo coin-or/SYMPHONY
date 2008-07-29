@@ -3858,11 +3858,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 }
 	 (*cuts)[j]->rhs = rhs;
 	 (*cuts)[j]->range = cut.range();
-	 (*cuts)[j]->size = ISIZE + num_elements * (ISIZE + DSIZE);
+	 (*cuts)[j]->size = (num_elements + 1) * (ISIZE + DSIZE);
 	 (*cuts)[j]->coef = (char *) malloc ((*cuts)[j]->size);
 	 ((int *) ((*cuts)[j]->coef))[0] = num_elements;
-	 matind = (int *) ((*cuts)[j]->coef + ISIZE);
-	 matval = (double *) ((*cuts)[j]->coef + (num_elements + 1) * ISIZE);
+	 //Here, we have to pad the initial int to avoid misalignment, so we
+	 //add DSIZE bytes to get to a double boundary
+	 matval = (double *) ((*cuts)[j]->coef + DSIZE);
+	 matind = (int *) ((*cuts)[j]->coef + (num_elements + 1)*DSIZE);
 	 memcpy((char *)matval, (char *)elements, num_elements * DSIZE);
 	 memcpy((char*)matind, (char *)tmp_matind, num_elements * ISIZE);
 	 qsort_id(matind, matval, num_elements);
