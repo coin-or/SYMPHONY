@@ -3240,7 +3240,7 @@ int read_lp(MIPdesc *mip, char *infile, char *probname)
 
 void write_mps(LPdata *lp_data, char *fname)
 {
-   char * extension = "MPS";
+   const char * extension = "MPS";
    double ObjSense = lp_data->si->getObjSense();
    int i;
    

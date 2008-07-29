@@ -134,8 +134,8 @@ int main_level = 0; /* 0 - SYMPHONY:
 		       3 - SYMPHONY\Display\Parameter:
 		    */
 
-int sym_help(char *line);
-int sym_read_line(char *prompt, char **input);
+int sym_help(const char *line);
+int sym_read_line(const char *prompt, char **input);
 int sym_free_env(sym_environment *env);
 
 int main(int argc, char **argv)
@@ -588,7 +588,7 @@ int main(int argc, char **argv)
 /*===========================================================================*\
 \*===========================================================================*/
 
-int sym_help(char *line)
+int sym_help(const char *line)
 {    
   if(strcmp(line, "main_help") == 0){
 
@@ -658,7 +658,7 @@ int sym_help(char *line)
 /*===========================================================================*\
 \*===========================================================================*/
 
-int sym_read_line(char *prompt, char **input)
+int sym_read_line(const char *prompt, char **input)
 {
 
 #ifndef HAS_READLINE
