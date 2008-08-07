@@ -1314,6 +1314,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
    int user_res;
    int i;
    double low0, low1, high0, high1;
+   double lpetol = p->lp_data->lpetol;
 #ifdef COMPILE_FRAC_BRANCHING
    int frl0, frl1, frh0, frh1;
 #endif
@@ -1430,16 +1431,16 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
       i = (high0 - low0 >= high1 - low1) ? 0 : 1;
       break;
     case LOWEST_LOW_OBJ:
-      i = (low0 == low1) ? (high0 <= high1 ? 0 : 1) : (low0 < low1 ? 0 : 1);
+      i = (fabs(low0-low1)<lpetol) ? (high0 <= high1 ? 0 : 1) : (low0 < low1 ? 0 : 1);
       break;
     case HIGHEST_LOW_OBJ:
-      i = (low0 == low1) ? (high0 >= high1 ? 0 : 1) : (low0 > low1 ? 0 : 1);
+      i = (fabs(low0-low1)<lpetol) ? (high0 >= high1 ? 0 : 1) : (low0 > low1 ? 0 : 1);
       break;
     case LOWEST_HIGH_OBJ:
-      i = (high0 == high1) ? (low0 <= low1 ? 0 : 1) : (high0 < high1 ? 0 : 1);
+      i = (fabs(high0-high1)<lpetol) ? (low0 <= low1 ? 0 : 1) : (high0 < high1 ? 0 : 1);
       break;
     case HIGHEST_HIGH_OBJ:
-      i = (high0 == high1) ? (low0 >= low1 ? 0 : 1) : (high0 > high1 ? 0 : 1);
+      i = (fabs(high0-high1)<lpetol) ? (low0 >= low1 ? 0 : 1) : (high0 > high1 ? 0 : 1);
       break;
 #ifdef COMPILE_FRAC_BRANCHING
     case HIGHEST_LOW_FRAC:
