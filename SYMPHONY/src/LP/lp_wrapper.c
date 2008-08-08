@@ -1146,7 +1146,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 
    if ((action == USER__DO_NOT_BRANCH) ||
        (p->bound_changes_in_iter>0) ||
-       (action == USER__BRANCH_IF_TAILOFF && *cuts > 0 && !check_tailoff(p)) ||
+       (action == USER__BRANCH_IF_TAILOFF && *cuts > 0 && p->has_tailoff==FALSE) ||
        (action == USER__BRANCH_IF_MUST && *cuts > 0))
       return(DO_NOT_BRANCH);
 

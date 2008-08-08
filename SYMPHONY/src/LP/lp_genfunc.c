@@ -366,12 +366,14 @@ int fathom_branch(lp_prob *p)
 	  * receive the cuts from the cut generator and the cut pool
 	 \*------------------------------------------------------------------*/
 
-	 if ((cut_term = receive_cuts(p, first_in_loop,
-				      no_more_cuts_count)) >=0 ){
-	    cuts += cut_term;
-	 }else{
-	    return(ERROR__USER);
-	 }
+         if (!check_tailoff(p)) {
+            if ((cut_term = receive_cuts(p, first_in_loop,
+                        no_more_cuts_count)) >=0 ){
+               cuts += cut_term;
+            }else{
+               return(ERROR__USER);
+            }
+         }
       }
 
       comp_times->lp += used_time(&p->tt);
@@ -734,12 +736,11 @@ int repricing(lp_prob *p)
 	 /*------------------------------------------------------------------*\
 	  * receive the cuts from the cut generator and the cut pool
 	 \*------------------------------------------------------------------*/
-
-	 if ((cut_term = receive_cuts(p, TRUE, no_more_cuts_count)) >= 0){
-	    cuts += cut_term;
-	 }else{
-	    return(ERROR__USER);
-	 }
+         if ((cut_term = receive_cuts(p, TRUE, no_more_cuts_count)) >= 0){
+            cuts += cut_term;
+         }else{
+            return(ERROR__USER);
+         }
       }
 
       comp_times->lp += used_time(&p->tt);
@@ -1041,6 +1042,7 @@ int check_tailoff(lp_prob *p)
    double sum, ub;
    int maxsteps = MAX(gap_backsteps, obj_backsteps);
 
+   p->has_tailoff = TRUE;
    if (gap_backsteps >= 1 || obj_backsteps >= 2) {
 
       /* shift the data in obj_hist by one to the right and insert the
@@ -1096,9 +1098,11 @@ int check_tailoff(lp_prob *p)
          check_tailoff. The user asks for tailoff (since we came to this
 	 function) yet doesn't want to check any kind of tailoff (since this
 	 condition is true). Report no tailoff. */
+      p->has_tailoff=FALSE;
       return(FALSE); /* no tailoff */
    }
 
+   p->has_tailoff=FALSE;
    return(FALSE); /* gone thru everything ==> no tailoff */
 }
 
