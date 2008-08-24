@@ -4044,17 +4044,17 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
             is_duplicate = FALSE;
             /* check against last 50 cuts only. otherwise, takes a lot of time
              */
-            for (k=j-1;k>MAX(-1,j-51);k--) {
-               num_elements2 = ((*cuts)[k]->coef)[0];
+            for (k = j-1; k > MAX(-1,j-51); k--) {
+               num_elements2 = ((int *) ((*cuts)[k]->coef))[0];
                rhs2 = (*cuts)[k]->rhs;
                if (num_elements2 != num_elements || 
                    fabs(rhs2 - rhs)>lp_data->lpetol) {
                   continue;
                } else {
-                  indices2 = (int *) ((*cuts)[k]->coef + ISIZE);
-                  elements2 = (double *) ((*cuts)[k]->coef +
-                                          (num_elements2+1)*ISIZE);
-                  for (l=0;l<num_elements;l++) {
+                  elements2 = (double *) ((*cuts)[k]->coef + DSIZE);
+                  indices2 = (int *) ((*cuts)[k]->coef +
+				      (num_elements + 1) * DSIZE);
+                  for (l = 0; l < num_elements; l++) {
                      if (indices2[l] != indices[l] || 
                          fabs(elements2[l]-elements[l]) > lp_data->lpetol) {
                         break;
