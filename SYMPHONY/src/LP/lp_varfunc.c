@@ -787,7 +787,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
    int infind, violation;
 
    int collen, *colind;
-   double obj, lb, ub, *colval, *binvrow;
+   double obj, lb = 0, ub = 0, *colval, *binvrow;
 
    double gap, red_cost, prod;
 

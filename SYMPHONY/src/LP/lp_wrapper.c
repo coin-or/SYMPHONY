@@ -1759,12 +1759,12 @@ void unpack_cuts_u(lp_prob *p, int from, int type,
 	    (waiting_row *) malloc(sizeof(waiting_row));
 	 row_list[explicit_row_num]->cut = cuts[i];
 	 nzcnt = ((int *) (cuts[i]->coef))[0];
-	 matind = (int *) (cuts[i]->coef + ISIZE);
-	 matval = (double *) (cuts[i]->coef + (1 + nzcnt) * ISIZE);
-	 row_matind = row_list[explicit_row_num]->matind = 
-            (int *) malloc(nzcnt * ISIZE);
+	 matval = (double *) (cuts[i]->coef + DSIZE);
+	 matind = (int *) (cuts[i]->coef + (nzcnt + 1)*DSIZE);
 	 row_matval = row_list[explicit_row_num]->matval = 
             (double *) malloc(nzcnt * DSIZE);
+	 row_matind = row_list[explicit_row_num]->matind = 
+            (int *) malloc(nzcnt * ISIZE);
          if (is_userind_in_order) {
             memcpy(row_matind, matind, nzcnt*ISIZE);
             memcpy(row_matval, matval, nzcnt*DSIZE);
