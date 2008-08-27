@@ -82,13 +82,14 @@ def find_int(arr0,st0,in0):
 
 def print_usage():
 	print "usage: python report_tsp.py -d <path to dir> [-c] [-h] [-n] [-g]",
-	print "[-b] [-p]"
+	print "[-b] [-p] [-m]"
 	print "   -c: information about cuts"
 	print "   -h: information about heuristics"
 	print "   -b: information about branching"
 	print "   -n: information about nodes and tree sizes"
 	print "   -g: general info about total time, lb, ub, number of solutions"
 	print "   -p: general info about presolve (not implemented)"
+	print "   -m: memory usage"
 	print "opt status and total time taken is always displayed"
 
 # ---------------------------------------------------------------------------
@@ -101,6 +102,7 @@ has_user_cuts     = 0
 has_user_gen      = 0
 has_user_branch   = 0
 has_user_presolve = 0
+has_user_memory   = 0
 
 if (len(sys.argv)<2):
 	print_usage()
@@ -135,6 +137,8 @@ while(i<len(sys.argv)):
 		has_user_branch = 1
 	elif (sys.argv[i]=='-p'):
 		has_user_presolve = 1
+	elif (sys.argv[i]=='-m'):
+		has_user_memory = 1
 	else:
 		print "invalid option: %s"%sys.argv[i]
 		print_usage()
@@ -161,13 +165,17 @@ if (has_user_nodes>0):
 if (has_user_heurs>0):
 	print "%8s"%"fp-time", "%8s"%"fp-sols",
 if (has_user_cuts>0):
-	print "%8s"%"cuts", "%8s"%"rt-cuts", "%8s"%"bad-coef", "%8s"%"duplicat","%8s"%"time-gom","%8s"%"time-kna","%8s"%"time-odd","%8s"%"time-cli","%8s"%"time-pro","%8s"%"time-flo",
+	print "%8s"%"cuts", "%8s"%"rt-cuts", "%8s"%"bad-coef", "%8s"%"duplicat","%8s"%"time-gom","%8s"%"time-kna","%8s"%"time-odd","%8s"%"time-cli","%8s"%"time-pro","%8s"%"time-flo", "%8s"%"time-che",
+	if (has_user_gen<1):
+		print "%8s"%"time-cut",
 if (has_user_gen>0):
 	print "%16s"%"best-ub","%16s"%"ub","%16s"%"lb","%6s"%"gap","%8s"%"lp-time","%8s"%"pre-time","%8s"%"heu-time","%8s"%"cut-time","%8s"%"bra-time","%8s"%"unaccntd",
 if (has_user_branch>0):
 	print "%8s"%"str-time",
 if (has_user_presolve>0):
 	print "%8s"%"pre-time",
+if (has_user_memory>0):
+	print "%8s"%"max-MB",
 print ''
 for instance in a:
 	print "%18s"%instance,
@@ -397,6 +405,21 @@ for instance in a:
 		else:
 			print  "%8.2f"%ctime,
 			
+		ctime = INFTY
+		find,ctime=find_float(whole_file,'time in checking quality',ctime)
+		if (find<0 or ctime >= INFTY):
+			print  "%8s"%"NF",
+		else:
+			print  "%8.2f"%ctime,
+			
+		if (has_user_gen<1):
+			#=======================================================================
+			sep_time = INFTY
+			find,sep_time=find_float(whole_file,'Separation',sep_time)
+			if (find<0 or sep_time >= INFTY):
+				print  "%8s"%"NF",
+			else:
+				print  "%8.2f"%sep_time,
    #==========================================================================
 	if (has_user_heurs>0):
 		fp_time = INFTY
@@ -460,6 +483,14 @@ for instance in a:
 			print  "%8d"%d_halts,
 		
    #==========================================================================
+	if (has_user_memory>0):
+		max_mb = INFTY
+		find,max_mb=find_float(whole_file,'Virtual memory used',max_mb)
+		if (find<0 or max_mb >= INFTY):
+			print  "%8s"%"NF",
+		else:
+			print  "%8.2f"%max_mb,
+		
 	print ''
 
 print "## errors:",error
