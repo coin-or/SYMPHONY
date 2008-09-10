@@ -167,6 +167,12 @@ if ((termcode = f) < 0)                                                    \
 
 /*---------------------- Standard macros ------------------------------------*/
 
+#ifdef PRINT
+#undef PRINT
+#endif
+#define PRINT(a, b, c) \
+   if ((a) > (b)) printf c
+
 #ifdef FREE
 #undef FREE
 #endif

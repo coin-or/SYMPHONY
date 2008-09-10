@@ -458,21 +458,106 @@ typedef struct RC_DESC{
    int        *cnt;
 }rc_desc;
 
+typedef struct COLINFO{
+   int coef_type; /* all integer, all binary, fractional
+			 - considering the type of coefficients*/
+   int sign_type; /* same below */
+   char var_type; /* '*C'ontinuous, 
+		     *'B'inary, 
+                     *negative bina'R'y, 
+		     *'general 'I'nteger, 
+                     *'F'ixed, 
+		     *'Z'-continous but can be integerized 
+
+		     -those should only appear during preprocessor stage-
+		     *fixable to its 'U'pper bound, 
+		     *fixable to its 'L'ower bound,
+		     -for the last two, need to use is_int to see if 
+		     they are integer or not-
+		     *'T'emporarily fixed, 
+		     */
+
+   int col_size;     /* col size */
+   int fix_row_ind; /* state which row caused to fix this variable during
+		       basic preprocessor */
+		    
+}COLinfo;
+
+typedef struct ROWINFO{
+   int type; /* all mixed, binary, pure(not binary), cont_binary... */
+   int bound_type;  /* all_bounded, mixed 
+			   - considering the bounds of variables */
+   int coef_type; /* all integer, all binary, fractional
+			 - considering the type of coefficients*/
+   int sign_type; /* all_pos, all_neg, mixed */ 
+
+   /* for preprocessor */
+
+
+   double fixed_obj_offset; /* obtained from fixed vars */
+   double fixed_lhs_offset; /* obtained from fixed vars */
+
+   double ub; /* calculated using variable bounds */
+   double lb; /* same above */
+
+   double sr_ub; /* calculated using sr relaxations + bounds*/
+   double sr_lb; /* same above */
+
+   double orig_ub; /* for debugging purposes */
+   double orig_lb;
+ 
+   int free_var_num; 
+   
+   int ub_inf_var_num; /* number of variables in this row with 
+			   upper side unbounded */
+   int lb_inf_var_num; /* number of variables in this row with 
+				lower side unbounded */
+   int size; 
+   char is_redundant; 
+   int fixed_var_num; /* number of fixed variables on this row*/
+   int fixable_var_num; /* number of fixed variables on this row*/
+   int bin_var_num;
+   int cont_var_num;
+
+}ROWinfo;
+
 typedef struct MIPINFO{ 
    int prob_type; /* mixed, pure(not binary), binary... */
-   int *row_int_type; /* same above -considering the type of variables*/
-   int *row_bound_type; /* all_bounded, mixed 
-			   - considering the bounds of variables */
-   int *row_coef_type; /* all integer, all binary, fractional
-			  - considering the type of coefficients*/
-   int *col_coef_type; /* all integer, all binary, fractional
-			  - considering the type of coefficients*/
-   int *row_entries_type; /* all_pos, all_neg, mixed */ 
-   int *col_entries_type; /* same above */
-   /* will be evaluated only if preprocessor is used */
-   int *row_ub; /* calculated using variable bounds */
-   int *row_lb; /* same above */
-}MIPinfo;
+   int cont_var_num;
+   int binary_var_num;
+   int fixed_var_num; 
+   int integerizable_var_num;
+   int max_row_size; 
+   int max_col_size; 
+   double mat_density;
+   char is_opt_val_integral; /*is the optimal 
+			   solution value required to be integral, if one 
+			   exists*/
+
+   double sum_obj_offset; /* from fixed variables*/
+
+   ROWinfo *rows;
+   COLinfo *cols;
+}MIPinfo; 
+
+#if 0
+/* not implemented yet */
+typedef struct MIPDIFF
+{
+   int rows_del_num;
+   int vars_fixed_num;
+   int coef_changed_num;
+   int bounds_tightened_num;
+   int bounds_integerized_num;
+   int *rows_deleted_ind;
+   int *vars_fixed_ind;
+   int *bounds_tightened_ind;
+   int *bounds_integerized_ind;
+   int *coef_changed_col_ind; 
+   int *coef_changed_row_ind; 
+}MIPdiff;
+
+#endif 
 
 /* This structure stores the user's description of the model */
 
@@ -509,6 +594,14 @@ typedef struct MIPDESC{
    int        new_col_num; /* used only when new cols added */
    int        cru_vars_num;
    int       *cru_vars; 
+
+   /* will be evaluated only if preprocessor is used */
+   /* it is here to be carried later for further use */
+   /* mip info */
+   MIPinfo   *mip_inf; 
+   
+   //  MIPdiff *mip_diff;
+
 }MIPdesc;
 
 /*===========================================================================*\

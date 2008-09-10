@@ -522,4 +522,43 @@
 #define SYM_FEAS_PUMP_TILL_SOL   3       /* use fp till a solution is found  */
 #define SYM_FEAS_PUMP_DISABLE   -1       /* dont use fp */
 
+/*--------------- parameter values for collecting info about the problem ----*/
+
+/* used to define prob type and/or row type */
+#define CONTINUOUS_TYPE       0
+#define BINARY_TYPE           1
+#define INTEGER_TYPE          2
+//#define INTEGER_PROBLEM          1
+//#define MIXED_INTEGER_PROBLEM    2
+#define BIN_CONT_TYPE         3
+#define BIN_INT_TYPE          4
+#define INT_CONT_TYPE         5
+#define ALL_MIXED_TYPE        6
+
+#if 0
+/* row type */
+#define CONTINUOUS_ROW           0
+#define BINARY_ROW               1
+#define INTEGER_ROW              2
+#define BIN_CONT_ROW             3
+#define BIN_INT_ROW              4
+#define INT_CONT_ROW             5
+#define ALL_MIXED_ROW            6
+#endif 
+
+/* row bound type*/
+#define OPEN_ROW                 0
+#define ALL_BOUNDED_ROW          1
+#define MIXED_BOUNDED_ROW        2
+
+/* vec coefs type*/
+#define ALL_INTEGER_VEC          0
+#define ALL_BINARY_VEC           1
+#define FRACTIONAL_VEC           2
+
+/* vec sign type */
+#define MIXED_TYPE_VEC           0
+#define ALL_POS_VEC              1
+#define ALL_NEG_VEC              2
+
 #endif

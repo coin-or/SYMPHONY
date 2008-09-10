@@ -155,5 +155,4 @@ double get_ub_for_new_obj PROTO((bc_node *root, MIPdesc *mip, int cnt,
 int check_feasibility_new_rhs PROTO((bc_node * node, MIPdesc * mip, 
 					int cnt, int *ind, double *val));
 int trim_warm_tree PROTO((sym_environment *env, bc_node *n));
-
 #endif

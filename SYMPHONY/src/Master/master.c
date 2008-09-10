@@ -34,6 +34,9 @@
 #include "sym_master_u.h"
 #include "sym_lp_solver.h"
 #include "sym_primal_heuristics.h"
+#ifdef USE_PREPROCESSOR
+#include "sym_preprocessor.h"
+#endif
 #ifdef COMPILE_IN_TM
 #include "sym_tm.h"
 #ifdef COMPILE_IN_LP
@@ -135,6 +138,10 @@ int sym_set_defaults(sym_environment *env)
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
    dg_params *dg_par = &env->par.dg_par;
+
+#ifdef USE_PREPROCESSOR
+   prep_params *prep_par = &env->par.prep_par;
+#endif
 
    /************************* Global defaults ********************************/
    env->ub = 0;
@@ -400,6 +407,25 @@ int sym_set_defaults(sym_environment *env)
    strcpy(dg_par->edgeweight_font,
 	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
 
+#ifdef USE_PREPROCESSOR
+   /********************* preprocessor defaults ******************************/
+   prep_par->do_prep = 1;
+   prep_par->prep_level = 0;
+   prep_par->do_probe = 1;
+   prep_par->prep_verbosity = 2;
+   prep_par->probe_verbosity = 0;
+   prep_par->probe_level = 1;
+   prep_par->display_stats = 0;
+   prep_par->iteration_limit = 5;
+   prep_par->etol = tm_par->granularity;
+   prep_par->do_single_row_rlx = 1;
+   prep_par->single_row_rlx_ratio = 0.1;
+   prep_par->max_sr_cnt = 5;
+   prep_par->do_aggregate_row_rlx = 0;
+   prep_par->max_aggr_row_cnt = 0;
+   prep_par->max_aggr_row_ratio = 0.1;
+#endif
+
    return(termcode);
 }
 
@@ -593,12 +619,16 @@ int sym_solve(sym_environment *env)
    double total_time = 0;
 
    int granularity = 0;
-   
+
    node_desc *rootdesc = env->rootdesc;
    base_desc *base = env->base;
 
    start_time = wall_clock(NULL);
-
+#ifdef USE_PREPROCESSOR_NOT_READY
+   if(env->par.prep_par.prep_level > 0){
+      preprocess_mip(env->mip, env->par.prep_par, 0, 0);   
+   }
+#endif
    if (env->par.verbosity >= 0){
       printf("Solving...\n\n");
    }
@@ -715,8 +745,6 @@ int sym_solve(sym_environment *env)
    }
    PRINT(env->par.verbosity, 1, ("granularity set at %f\n",
             env->par.tm_par.granularity));
-
-
 
    if (env->par.tm_par.node_selection_rule == BEST_FIRST_SEARCH){
       env->par.tm_par.node_selection_rule = LOWEST_LP_FIRST;
