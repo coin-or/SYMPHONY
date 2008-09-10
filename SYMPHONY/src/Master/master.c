@@ -624,7 +624,7 @@ int sym_solve(sym_environment *env)
    base_desc *base = env->base;
 
    start_time = wall_clock(NULL);
-#ifdef USE_PREPROCESSOR_NOT_READY
+#ifdef USE_PREPROCESSOR
    if(env->par.prep_par.prep_level > 0){
       preprocess_mip(env->mip, env->par.prep_par, 0, 0);   
    }

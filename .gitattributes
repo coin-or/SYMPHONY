@@ -75,6 +75,9 @@ SYMPHONY/scripts/report.py -text
 SYMPHONY/src/Common/sym_qsort.c -text
 SYMPHONY/src/Makefile.am -text
 SYMPHONY/src/Makefile.in -text
+SYMPHONY/src/Preprocessor/preprocessor.c -text
+SYMPHONY/src/Preprocessor/preprocessor_basic.c -text
+SYMPHONY/src/Preprocessor/preprocessor_func.c -text
 SYMPHONY/src/PrimalHeuristics/feasibility_pump.c -text
 SYMPHONY/src/PrimalHeuristics/sp.c -text
 SYMPHONY/sym_addlibs.txt.in -text
