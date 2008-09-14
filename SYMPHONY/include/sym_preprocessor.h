@@ -226,10 +226,10 @@ class implication
     fixed_col(col_num),
     fixed_val(value)
     {
-    };
+    }
   ~implication()
     {
-    };
+    }
   /* stores one implication of fixing certain var to a certain value */
 };
 
