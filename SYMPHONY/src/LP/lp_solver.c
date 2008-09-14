@@ -2281,6 +2281,7 @@ void open_lp_solver(LPdata *lp_data)
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
    lp_data->si->setupForRepeatedUse();
+   //lp_data->si->getModelPtr()->setFactorizationFrequency(200);
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
 #else   
@@ -2463,6 +2464,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    int term = 0;
     
    lp_data->si->resolve();
+   //lp_data->si->initialSolve();
    
    if (lp_data->si->isProvenDualInfeasible())
       term = LP_D_INFEASIBLE;
@@ -2479,7 +2481,9 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    
    /* if(term == D_UNBOUNDED){
       retval=lp_data->si->getIntParam(OsiMaxNumIteration, itlim); 
-      CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() */
+      CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() 
+      }
+   */
    
    lp_data->termcode = term;
    
@@ -2496,6 +2500,9 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       printf("OSI Abandoned calculation: Code %i \n\n", term);
    }
    
+   /*
+   lp_data->si->getModelPtr()->tightenPrimalBounds(0.0,0,true);
+   */
    return(term);
 }
 
@@ -3466,7 +3473,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    //double               *newUpper = lp_data->tmp.d+n;
    int                  sizeColCuts, should_generate;
    int                  num_duplicate_cuts = 0;
-   
+
 #ifndef COMPILE_IN_LP
    par->probing_generated_in_root               = TRUE;
    par->gomory_generated_in_root                = TRUE;
@@ -3574,6 +3581,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       if ((bc_level<6 && comp_times->gomory_cuts<comp_times->lp) || 
           (bc_level>6 && comp_times->gomory_cuts<comp_times->lp/10)) {
          CglGomory *gomory = new CglGomory;
+         // TODO: change this to something based on number of cols, sparsity
+         // etc.
+         if (bc_level<6) {
+            gomory->setLimitAtRoot(1000);
+         } else {
+            gomory->setLimitAtRoot(100);
+         }
          gomory->generateCuts(*(lp_data->si), cutlist);
          if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {
             if (is_top_iter){
@@ -3641,6 +3655,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          lp_stat->knapsack_cuts_root, &should_generate);
    if (should_generate==TRUE) {
       CglKnapsackCover *knapsack = new CglKnapsackCover;
+      if (bc_level<6) {
+         knapsack->setMaxInKnapsack(1000); // default is 50
+      } 
       knapsack->generateCuts(*si, cutlist);
       if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {
          if (is_top_iter){
@@ -3717,6 +3734,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 is_top_iter){
 				     
 	 CglMixedIntegerRounding *mir = new CglMixedIntegerRounding;
+         if (bc_level<6) {
+            mir->setMAXAGGR_(5); // default __seems__ 1
+         } 
 	 mir->generateCuts(*si, cutlist);
 	 if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {
 	    if (is_top_iter){
@@ -3783,6 +3803,11 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          lp_stat->clique_cuts_root, &should_generate);
    if (should_generate==TRUE) {
       CglClique *clique = new CglClique;
+      if (bc_level<6) {
+         clique->setStarCliqueCandidateLengthThreshold(100); // default 12
+         clique->setRowCliqueCandidateLengthThreshold(100); // default 12
+      } 
+
       clique->setStarCliqueReport(FALSE);
       clique->setRowCliqueReport(FALSE);
       clique->generateCuts(*(lp_data->si), cutlist);
@@ -3812,6 +3837,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          lp_stat->flow_and_cover_cuts_root, &should_generate);
    if (should_generate==TRUE) {
       CglFlowCover *flow = new CglFlowCover;
+      /* numFlowCuts_ is a static variable! needs to be reset */
+      flow->setNumFlowCuts(0);
       flow->generateCuts(*(lp_data->si), cutlist);
       if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {
          if (is_top_iter){
@@ -4040,7 +4067,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
          /* check for duplicates */
          if (num_elements>0) {
-            int cuts_compared = 0;
             is_duplicate = FALSE;
             /* check against last 50 cuts only. otherwise, takes a lot of time
              */
