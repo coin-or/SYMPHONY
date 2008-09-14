@@ -1042,6 +1042,11 @@ int check_tailoff(lp_prob *p)
    double sum, ub;
    int maxsteps = MAX(gap_backsteps, obj_backsteps);
 
+   /*
+   p->has_tailoff = FALSE;
+   return (FALSE);
+   */
+
    p->has_tailoff = TRUE;
    if (gap_backsteps >= 1 || obj_backsteps >= 2) {
 
@@ -1051,6 +1056,11 @@ int check_tailoff(lp_prob *p)
 	 obj_hist[i+1] = obj_hist[i];
       }
       obj_hist[0] = p->lp_data->objval;
+
+      if (p->bc_index == 0 && p->node_iter_num < p->par.min_root_cut_rounds) {
+         p->has_tailoff = FALSE;
+         return (FALSE);
+      }
 
       /* if there is an upper bound and we want gap based tailoff:
 	 tailoff_gap is false if the average of the consecutive gap ratios is
@@ -1074,7 +1084,7 @@ int check_tailoff(lp_prob *p)
 	    if (obj_hist[i-1] - obj_hist[i] > p->lp_data->lpetol){
 	       sum += (obj_hist[i-2]-obj_hist[i-1]) / (obj_hist[i-1]-obj_hist[i]);
 	    }else if (obj_hist[i-2] - obj_hist[i-1] > p->lp_data->lpetol){
-	       sum += 1;
+	       sum += obj_backsteps;
 	    }
 	 }
 	 if (sum / (obj_backsteps - 1) < p->par.tailoff_obj_frac){

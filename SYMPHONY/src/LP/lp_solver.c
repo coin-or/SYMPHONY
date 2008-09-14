@@ -3520,6 +3520,15 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
           * all nodes are like root nodes 
           */
          probe->setMaxLookRoot(5); 
+      } else if (bc_level < 1) {
+         probe->setMaxPass(10); /* default is 3 */
+         probe->setMaxPassRoot(10); /* default is 3 */
+         probe->setMaxElements(20000);  /* default is 1000, 10000 for root */
+         probe->setMaxElementsRoot(20000); /* default is 1000, 10000 for root */
+         probe->setMaxLook(200);    /* default is 50 */
+         probe->setMaxLookRoot(200);    /* default is 50 */
+         probe->setMaxProbe(2000);   /* default is 100 */
+         probe->setMaxProbeRoot(2000);   /* default is 100 */
       }
 #if 0
       probe->setLogLevel(2); /* default is 0 */

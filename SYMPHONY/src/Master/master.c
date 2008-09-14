@@ -280,7 +280,8 @@ int sym_set_defaults(sym_environment *env)
    lp_par->later_lp.all_cuts_time_out = 1;
    lp_par->later_lp.all_cuts_time_out = 0;
    lp_par->max_cut_num_per_iter = 20;
-   lp_par->max_cut_num_per_iter_root = 200;
+   lp_par->max_cut_num_per_iter_root = 500;
+   lp_par->min_root_cut_rounds = 5;
    lp_par->do_reduced_cost_fixing = TRUE;
    lp_par->gap_as_ub_frac = .1;
    lp_par->gap_as_last_gap_frac = .7;
@@ -5164,6 +5165,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    else if (strcmp(key, "max_cut_num_per_iter_root") == 0 ||
 	    strcmp(key, "LP_max_cut_num_per_iter_root") == 0){
       *value = lp_par->max_cut_num_per_iter_root;
+      return(0);
+   }
+   else if (strcmp(key, "min_root_cut_rounds") == 0) {
+      *value = lp_par->min_root_cut_rounds;
       return(0);
    }
    
