@@ -1315,6 +1315,9 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
    int i;
    double low0, low1, high0, high1;
    double lpetol = p->lp_data->lpetol;
+   const double ub_minus_gran = p->ub - p->par.granularity;
+   const double alpha = p->par.strong_branching_high_low_weight;
+   const double infinity = 1e12;
 #ifdef COMPILE_FRAC_BRANCHING
    int frl0, frl1, frh0, frh1;
 #endif
@@ -1358,7 +1361,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
 	     can->termcode[i] == LP_OPT_FEASIBLE ||
 	     can->termcode[i] == LP_OPT_FEASIBLE_BUT_CONTINUE ||
 	     (can->termcode[i] == LP_OPTIMAL && p->has_ub &&
-	      can->objval[i] > p->ub - p->par.granularity))){
+	      can->objval[i] > ub_minus_gran))){
 	 break;
       }
    }
@@ -1427,6 +1430,22 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
    }
 
    switch(user_res){
+    case HIGH_LOW_COMBINATION:
+      if (high0 > ub_minus_gran) {
+         high0 = infinity;
+      }
+      if (low0 > ub_minus_gran) {
+         low0 = infinity;
+      }
+      if (high1 > ub_minus_gran) {
+         high1 = infinity;
+      }
+      if (low1 > ub_minus_gran) {
+         low1 = infinity;
+      }
+      i = (alpha*low0 + (1 - alpha)*high0 > alpha*low1 + (1 - alpha)*high1) ?
+         0 : 1;
+      break;
     case BIGGEST_DIFFERENCE_OBJ:
       i = (high0 - low0 >= high1 - low1) ? 0 : 1;
       break;

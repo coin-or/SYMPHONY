@@ -399,6 +399,7 @@
 #define HIGHEST_HIGH_FRAC        7
 #define LOWEST_HIGH_FRAC         8
 #endif
+#define HIGH_LOW_COMBINATION     9
 
 #define FIRST_CANDIDATE_BETTER                    0
 #define FIRST_CANDIDATE_BETTER_AND_BRANCH_ON_IT   1

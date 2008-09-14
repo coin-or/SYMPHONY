@@ -2753,6 +2753,11 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(lp_par->strong_branching_red_ratio);
       return(0);
    }
+   else if (strcmp(key,"strong_branching_high_low_weight") == 0 ||
+	    strcmp(key,"LP_strong_branching_high_low_weight") == 0){
+      READ_DBL_PAR(lp_par->strong_branching_high_low_weight);
+      return(0);
+   }
    else if (strcmp(key,"use_hot_starts") == 0) {
       READ_INT_PAR(lp_par->use_hot_starts);
       return(0);

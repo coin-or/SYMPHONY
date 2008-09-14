@@ -350,6 +350,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->strong_branching_cand_num_max = 20;
    lp_par->strong_branching_cand_num_min = 5;
    lp_par->strong_branching_red_ratio = 1;
+   lp_par->strong_branching_high_low_weight = 0.8; // alpha*min + (1-alpha)*max
    lp_par->user_set_strong_branching_cand_num = FALSE;
    lp_par->user_set_max_presolve_iter = FALSE;
    lp_par->strong_br_all_candidates_level = 6;
@@ -5661,6 +5662,11 @@ int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
    else if (strcmp(key,"strong_branching_red_ratio") == 0 ||
 	    strcmp(key,"LP_strong_branching_red_ratio") == 0){
       *value = lp_par->strong_branching_red_ratio;
+      return(0);
+   }
+   else if (strcmp(key,"strong_branching_high_low_weight") == 0 ||
+	    strcmp(key,"LP_strong_branching_high_low_weight") == 0){
+      *value = lp_par->strong_branching_high_low_weight;
       return(0);
    }
   else if (strcmp(key, "mc_gamma") == 0 ||
