@@ -410,9 +410,10 @@ int sym_set_defaults(sym_environment *env)
 #ifdef USE_PREPROCESSOR
    /********************* preprocessor defaults ******************************/
    prep_par->do_prep = 1;
-   prep_par->prep_level = 0;
+   prep_par->level = 0;
    prep_par->do_probe = 1;
-   prep_par->prep_verbosity = 2;
+   prep_par->verbosity = 1;
+   prep_par->reduce_mip = 1;
    prep_par->probe_verbosity = 0;
    prep_par->probe_level = 1;
    prep_par->display_stats = 0;
@@ -424,6 +425,8 @@ int sym_set_defaults(sym_environment *env)
    prep_par->do_aggregate_row_rlx = 0;
    prep_par->max_aggr_row_cnt = 0;
    prep_par->max_aggr_row_ratio = 0.1;
+   prep_par->keep_row_ordered = 1;
+   prep_par->keep_track = 0;
 #endif
 
    return(termcode);
@@ -625,8 +628,19 @@ int sym_solve(sym_environment *env)
 
    start_time = wall_clock(NULL);
 #ifdef USE_PREPROCESSOR
-   if(env->par.prep_par.prep_level > 0){
-      preprocess_mip(env->mip, env->par.prep_par, 0, 0);   
+   /* we send environment in just because we may need to 
+      update rootdesc and so...*/
+   if(env->par.prep_par.level > 0){
+      termcode = preprocess_mip(env);   
+      
+      if(termcode != PREP_MODIFIED ||
+	 termcode != PREP_UNMODIFIED){
+	 /* no need to go on if the problem is solved/infeasible/ 
+	    unbounded 
+
+	    we may continue if we had other problems*/
+	 /* fix me */
+      }
    }
 #endif
    if (env->par.verbosity >= 0){

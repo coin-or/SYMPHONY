@@ -2919,7 +2919,7 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
    else if (strcmp(key, "prep_level") == 0){
-      READ_INT_PAR(prep_par->prep_level);
+      READ_INT_PAR(prep_par->level);
       return(0);
    }
    else if (strcmp(key, "prep_iter_limit") == 0){
@@ -2931,7 +2931,11 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
    else if (strcmp(key, "prep_verbosity") == 0){
-      READ_INT_PAR(prep_par->prep_verbosity);
+      READ_INT_PAR(prep_par->verbosity);
+      return(0);
+   }
+   else if (strcmp(key, "prep_reduce_mip") == 0){
+      READ_INT_PAR(prep_par->reduce_mip);
       return(0);
    }
    else if (strcmp(key, "prep_probing_verbosity") == 0){
@@ -2954,7 +2958,11 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(prep_par->max_aggr_row_cnt);
       return(0);
    }
-
+   else if (strcmp(key, "keep_row_ordered") == 0){
+      READ_INT_PAR(prep_par->keep_row_ordered);
+      return(0);
+   }
+   
 #endif
 
    return(FUNCTION_TERMINATED_ABNORMALLY);

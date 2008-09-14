@@ -20,10 +20,11 @@
 |                                                                             |
 \*---------------------------------------------------------------------------*/
 typedef struct PREP_PARAMS{
-   int               prep_level;
+   int               level;
    int               do_prep;
    int               do_probe;
-   int               prep_verbosity;
+   int               verbosity;
+   int               reduce_mip;
    int               probe_verbosity;
    int               probe_level;
    int               display_stats;
@@ -36,6 +37,7 @@ typedef struct PREP_PARAMS{
    double            max_aggr_row_ratio;   
    int               max_aggr_row_cnt;
    int               iteration_limit; 
+   int               keep_track; 
 }prep_params;
 
 #endif

@@ -151,7 +151,7 @@ LP_SRC         += CutGen/cg_func.c CutGen/cg_wrapper.c
 endif
 
 if SYM_COMPILE_IN_PREPROCESSOR
-SYM_MASTER_SRC     += Preprocessor/preprocessor.c Preprocessor/preprocessor_basic.c Preprocessor/preprocessor_func.c 
+SYM_MASTER_SRC     += Preprocessor/preprocessor.c Preprocessor/preprocessor_basic.c #Preprocessor/preprocessor_func.c 
 endif
 
 CP_SRC		= CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \

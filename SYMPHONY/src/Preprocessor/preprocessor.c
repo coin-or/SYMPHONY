@@ -31,8 +31,7 @@
 
 /* this will take control of the mip desc, it has to be copied before 
    not to lose the original mip*/
-int preprocess_mip (MIPdesc *mip, prep_params prep_par, char imply_changes, 
-		    char keep_track)
+int preprocess_mip (sym_environment *env)
 {
 /*
    This function is the master of the preprocessing part. It calls and 
@@ -41,8 +40,17 @@ int preprocess_mip (MIPdesc *mip, prep_params prep_par, char imply_changes,
    int termcode;		/* return status of this function, 0 normal, 1
 				   error */
    int termstatus;		/* return status of functions called herein */
-   int verbosity = prep_par.prep_verbosity;
-   int p_level = prep_par.prep_level;
+
+
+
+   /* FIXME get a copy of mip, 
+      in case of an error, ignore presolve and continue with that...*/
+
+   MIPdesc *mip = env->mip;
+   prep_params params = env->par.prep_par; 
+   
+   int verbosity = params.verbosity;
+   int p_level = params.level;
 
    if (p_level <= 0) {
       if(verbosity >= 0){
@@ -55,44 +63,49 @@ int preprocess_mip (MIPdesc *mip, prep_params prep_par, char imply_changes,
    /* need to fill in the row ordered vars of mip */
 
    double start_time = wall_clock(NULL);
-   double mark_time; 
-
-   PRINT(verbosity, 1, ("Collecting data...\n"));
-   prep_initialize_mipinfo(mip, prep_par);
-
-   PRINT(verbosity, 1, ("Collecting data time: %f...\n\n",wall_clock(NULL) - start_time));
-
-   mark_time = wall_clock(NULL);
-   prep_fill_row_ordered(mip);
-   PRINT(verbosity, 1, ("Row packing time: %f...\n\n",wall_clock(NULL) - mark_time));
-
-   mark_time = wall_clock(NULL);
+   //double mark_time; 
 
    /* Start with Basic Preprocessing */
-   PRINT(verbosity, 1, ("Starting Basic Preprocessing.\n")); 
+   PRINT(verbosity, 0, ("Starting Preprocessing...\n")); 
+   
+   //mark_time = wall_clock(NULL);
 
+
+   /* initialize prep desc */
    PREPdesc * P = (PREPdesc *)calloc(1, sizeof(PREPdesc)); 
    P->mip = mip;
-   P->params = prep_par;
-
-   /* first integerize the bounds */
-   /* can be embedded somewhere in basic prep down*/
-   /* for now let it be */
-   prep_integerize_bounds(P, keep_track);
+   P->params = params;
    
-   termstatus = prep_basic(P, keep_track);
-
-   PRINT(verbosity, 1, ("Basic Prep time: %f...\n", wall_clock(NULL) - mark_time));
-   PRINT(verbosity, 1, ("Total Prep time: %f...\n\n", wall_clock(NULL) - start_time));
+   P->stats.nz_coeff_changed = (char *)calloc(CSIZE ,mip->nz);
    
-   if (termstatus == PREP_SOLVED) {
-      /* free stuff */
-      if (verbosity>=1) {
-	 printf("Basic Preprocessing solved the problem.\n");
-      }
-      return PREP_SOLVED;
+   /* these will be needed for both bassic and advanced prep functions
+      so we call them here */
+   termcode = prep_fill_row_ordered(mip);
+   
+   termcode = prep_initialize_mipinfo(mip, params, &(P->stats));   
+   
+   /* no changes so far */
+
+   if(!prep_quit(termcode)){
+      termcode = prep_basic(P);
    }
+   //PRINT(verbosity, 1, ("Basic Prep time: %f...\n", 
+   //		wall_clock(NULL) - mark_time));
 
+   prep_report(P, termcode);
+   
+   if(params.reduce_mip){
+      prep_restore_rootdesc(env);
+   }
+   
+
+   /* since we use the original mip desc */
+   P->mip = 0;
+
+   prep_close_desc(P);   
+
+   PRINT(verbosity, 0, ("Total Presolve Time: %f...\n\n", 
+			wall_clock(NULL) - start_time));   
 
   /* Do advanced Preprocessing */
 
@@ -174,7 +187,8 @@ int preprocess_mip (MIPdesc *mip, prep_params prep_par, char imply_changes,
       printf("Leaving Preprocessor\n");
    }
 #endif 
-   return 0; 
+
+   return termcode; 
 }
 
 

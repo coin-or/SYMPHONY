@@ -464,12 +464,12 @@ typedef struct COLINFO{
    int sign_type; /* same below */
    char var_type; /* '*C'ontinuous, 
 		     *'B'inary, 
-                     *negative bina'R'y, 
 		     *'general 'I'nteger, 
                      *'F'ixed, 
 		     *'Z'-continous but can be integerized 
 
 		     -those should only appear during preprocessor stage-
+                     *negative bina'R'y, 
 		     *fixable to its 'U'pper bound, 
 		     *fixable to its 'L'ower bound,
 		     -for the last two, need to use is_int to see if 
@@ -508,16 +508,17 @@ typedef struct ROWINFO{
  
    int free_var_num; 
    
-   int ub_inf_var_num; /* number of variables in this row with 
-			   upper side unbounded */
-   int lb_inf_var_num; /* number of variables in this row with 
-				lower side unbounded */
+   int ub_inf_var_num; /* number of variables in this row those causes 
+			  ub to be infinite */
+   int lb_inf_var_num; /* number of variables in this row those causes
+			  lb to be infinite */
    int size; 
    char is_redundant; 
    int fixed_var_num; /* number of fixed variables on this row*/
-   int fixable_var_num; /* number of fixed variables on this row*/
-   int bin_var_num;
-   int cont_var_num;
+   int fixable_var_num; /* number of fixable variables on this row*/
+   int bin_var_num; /*not fixed binary variables */
+   int cont_var_num; /*not fixed continuous variables */
+   int frac_coef_num; /* not fixed, frac coeffs on this row */   
 
 }ROWinfo;
 
@@ -581,6 +582,10 @@ typedef struct MIPDESC{
    double     obj_offset;  /* constant to be added to the objective function.*/
    char       obj_sense;   /* objective sense. */
 
+   int        alloc_n;     /* allocated dims */ 
+   int        alloc_m;
+   int        alloc_nz;
+
 /* Only to be allocated and used by SYMPHONY */
 
    int       *col_lengths;   
@@ -588,6 +593,8 @@ typedef struct MIPDESC{
    int       *row_matind;      /* nz */
    double    *row_matval;      /* nz */
    int       *row_lengths;  
+   char      *orig_sense; /* will keep the orig row senses*/
+
    int        var_type_modified;  /* number of updates on the mip desc */
    int        change_num;  /* number of updates on the mip desc */
    int        change_type[MAX_CHANGE_NUM];  /* type of the mip desc. changes */

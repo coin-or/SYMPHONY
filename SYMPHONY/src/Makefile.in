@@ -73,7 +73,7 @@ host_triplet = @host@
 @PSEUDO_COSTS_TRUE@am__append_12 = LP/lp_pseudo_branch.c
 @PSEUDO_COSTS_FALSE@am__append_13 = LP/lp_branch.c
 @SYM_COMPILE_IN_CG_TRUE@am__append_14 = CutGen/cg_func.c CutGen/cg_wrapper.c
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__append_15 = Preprocessor/preprocessor.c Preprocessor/preprocessor_basic.c Preprocessor/preprocessor_func.c 
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__append_15 = Preprocessor/preprocessor.c Preprocessor/preprocessor_basic.c #Preprocessor/preprocessor_func.c 
 @SYM_COMPILE_IN_LP_TRUE@am__append_16 = $(QSORT_SRC)
 @USE_CGL_CUTS_TRUE@am__append_17 = $(CGLOBJDIR)/src/libCgl.la
 @USE_CGL_CUTS_TRUE@am__append_18 = \
@@ -196,8 +196,7 @@ am__libSym_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c TreeManager/tm_func.c \
+	Preprocessor/preprocessor_basic.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
 	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
@@ -211,8 +210,7 @@ am__objects_2 = $(am__objects_1) $(am__objects_1)
 am__objects_3 = $(am__objects_2)
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_4 =  \
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_la-preprocessor_basic.lo
 am__objects_5 = libSym_la-master.lo libSym_la-master_wrapper.lo \
 	libSym_la-master_io.lo libSym_la-master_func.lo \
 	$(am__objects_4)
@@ -260,8 +258,7 @@ am__libSymAppl_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c TreeManager/tm_func.c \
+	Preprocessor/preprocessor_basic.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_solver.c LP/lp_varfunc.c \
 	LP/lp_rowfunc.c LP/lp_genfunc.c LP/lp_proccomm.c \
 	LP/lp_wrapper.c LP/lp_free.c LP/lp_pseudo_branch.c \
@@ -271,8 +268,7 @@ am__libSymAppl_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_19 = libSymAppl_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_la-preprocessor_basic.lo
 am__objects_20 = libSymAppl_la-master.lo \
 	libSymAppl_la-master_wrapper.lo libSymAppl_la-master_io.lo \
 	libSymAppl_la-master_func.lo $(am__objects_19)
@@ -482,8 +478,7 @@ am__libSymAppl_m_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -493,8 +488,7 @@ am__libSymAppl_m_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_66 = libSymAppl_m_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_la-preprocessor_basic.lo
 am__objects_67 = libSymAppl_m_la-master.lo \
 	libSymAppl_m_la-master_wrapper.lo libSymAppl_m_la-master_io.lo \
 	libSymAppl_m_la-master_func.lo $(am__objects_66)
@@ -563,8 +557,7 @@ am__libSymAppl_m_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -574,8 +567,7 @@ am__libSymAppl_m_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_84 = libSymAppl_m_tm_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_la-preprocessor_basic.lo
 am__objects_85 = libSymAppl_m_tm_la-master.lo \
 	libSymAppl_m_tm_la-master_wrapper.lo \
 	libSymAppl_m_tm_la-master_io.lo \
@@ -647,8 +639,7 @@ am__libSymAppl_m_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -658,8 +649,7 @@ am__libSymAppl_m_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_102 = libSymAppl_m_tm_cp_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_cp_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_cp_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_cp_la-preprocessor_basic.lo
 am__objects_103 = libSymAppl_m_tm_cp_la-master.lo \
 	libSymAppl_m_tm_cp_la-master_wrapper.lo \
 	libSymAppl_m_tm_cp_la-master_io.lo \
@@ -732,8 +722,7 @@ am__libSymAppl_m_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -743,8 +732,7 @@ am__libSymAppl_m_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_120 = libSymAppl_m_tm_lp_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_lp_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_lp_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_lp_la-preprocessor_basic.lo
 am__objects_121 = libSymAppl_m_tm_lp_la-master.lo \
 	libSymAppl_m_tm_lp_la-master_wrapper.lo \
 	libSymAppl_m_tm_lp_la-master_io.lo \
@@ -817,8 +805,7 @@ am__libSymAppl_m_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -828,8 +815,7 @@ am__libSymAppl_m_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_138 = libSymAppl_m_tm_lp_cg_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_lp_cg_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_lp_cg_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_lp_cg_la-preprocessor_basic.lo
 am__objects_139 = libSymAppl_m_tm_lp_cg_la-master.lo \
 	libSymAppl_m_tm_lp_cg_la-master_wrapper.lo \
 	libSymAppl_m_tm_lp_cg_la-master_io.lo \
@@ -901,8 +887,7 @@ am__libSymAppl_m_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -912,8 +897,7 @@ am__libSymAppl_m_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_156 = libSymAppl_m_tm_lp_cg_cp_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_lp_cg_cp_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSymAppl_m_tm_lp_cg_cp_la-preprocessor_basic.lo
 am__objects_157 = libSymAppl_m_tm_lp_cg_cp_la-master.lo \
 	libSymAppl_m_tm_lp_cg_cp_la-master_wrapper.lo \
 	libSymAppl_m_tm_lp_cg_cp_la-master_io.lo \
@@ -1472,8 +1456,7 @@ am__libSym_m_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -1484,8 +1467,7 @@ am__libSym_m_la_SOURCES_DIST = ../include/SymConfig.h \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_271 =  \
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_la-preprocessor_basic.lo
 am__objects_272 = libSym_m_la-master.lo libSym_m_la-master_wrapper.lo \
 	libSym_m_la-master_io.lo libSym_m_la-master_func.lo \
 	$(am__objects_271)
@@ -1551,8 +1533,7 @@ am__libSym_m_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -1562,8 +1543,7 @@ am__libSym_m_tm_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_289 = libSym_m_tm_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_la-preprocessor_basic.lo
 am__objects_290 = libSym_m_tm_la-master.lo \
 	libSym_m_tm_la-master_wrapper.lo libSym_m_tm_la-master_io.lo \
 	libSym_m_tm_la-master_func.lo $(am__objects_289)
@@ -1633,8 +1613,7 @@ am__libSym_m_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -1644,8 +1623,7 @@ am__libSym_m_tm_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_307 = libSym_m_tm_cp_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_cp_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_cp_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_cp_la-preprocessor_basic.lo
 am__objects_308 = libSym_m_tm_cp_la-master.lo \
 	libSym_m_tm_cp_la-master_wrapper.lo \
 	libSym_m_tm_cp_la-master_io.lo \
@@ -1718,8 +1696,7 @@ am__libSym_m_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -1729,8 +1706,7 @@ am__libSym_m_tm_lp_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_325 = libSym_m_tm_lp_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_lp_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_lp_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_lp_la-preprocessor_basic.lo
 am__objects_326 = libSym_m_tm_lp_la-master.lo \
 	libSym_m_tm_lp_la-master_wrapper.lo \
 	libSym_m_tm_lp_la-master_io.lo \
@@ -1803,8 +1779,7 @@ am__libSym_m_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -1814,8 +1789,7 @@ am__libSym_m_tm_lp_cg_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_343 = libSym_m_tm_lp_cg_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_lp_cg_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_lp_cg_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_lp_cg_la-preprocessor_basic.lo
 am__objects_344 = libSym_m_tm_lp_cg_la-master.lo \
 	libSym_m_tm_lp_cg_la-master_wrapper.lo \
 	libSym_m_tm_lp_cg_la-master_io.lo \
@@ -1888,8 +1862,7 @@ am__libSym_m_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_win32_time.h Master/master.c \
 	Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c \
-	Preprocessor/preprocessor_func.c LP/lp_solver.c \
+	Preprocessor/preprocessor_basic.c LP/lp_solver.c \
 	TreeManager/treemanager.c TreeManager/tm_func.c \
 	TreeManager/tm_proccomm.c LP/lp_varfunc.c LP/lp_rowfunc.c \
 	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c \
@@ -1899,8 +1872,7 @@ am__libSym_m_tm_lp_cg_cp_la_SOURCES_DIST = ../include/SymConfig.h \
 	Common/proccomm.c Common/pack_cut.c Common/pack_array.c \
 	PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 @SYM_COMPILE_IN_PREPROCESSOR_TRUE@am__objects_361 = libSym_m_tm_lp_cg_cp_la-preprocessor.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_lp_cg_cp_la-preprocessor_basic.lo \
-@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_lp_cg_cp_la-preprocessor_func.lo
+@SYM_COMPILE_IN_PREPROCESSOR_TRUE@	libSym_m_tm_lp_cg_cp_la-preprocessor_basic.lo
 am__objects_362 = libSym_m_tm_lp_cg_cp_la-master.lo \
 	libSym_m_tm_lp_cg_cp_la-master_wrapper.lo \
 	libSym_m_tm_lp_cg_cp_la-master_io.lo \
@@ -3401,7 +3373,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_la-sym_qsort.Plo@am__quote@
@@ -3465,7 +3436,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_la-sym_qsort.Plo@am__quote@
@@ -3496,7 +3466,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_cp_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_cp_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_cp_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_cp_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_cp_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_cp_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_cp_la-sym_qsort.Plo@am__quote@
@@ -3527,7 +3496,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_la-sym_qsort.Plo@am__quote@
@@ -3558,7 +3526,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-sym_qsort.Plo@am__quote@
@@ -3589,7 +3556,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-sym_qsort.Plo@am__quote@
@@ -3620,7 +3586,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSymAppl_m_tm_lp_la-sym_qsort.Plo@am__quote@
@@ -3777,7 +3742,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_la-sym_qsort.Plo@am__quote@
@@ -3841,7 +3805,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_la-sym_qsort.Plo@am__quote@
@@ -3872,7 +3835,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_cp_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_cp_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_cp_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_cp_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_cp_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_cp_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_cp_la-sym_qsort.Plo@am__quote@
@@ -3903,7 +3865,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_la-sym_qsort.Plo@am__quote@
@@ -3934,7 +3895,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-sym_qsort.Plo@am__quote@
@@ -3965,7 +3925,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_cg_la-sym_qsort.Plo@am__quote@
@@ -3996,7 +3955,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_la-pack_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_la-preprocessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_la-preprocessor_basic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_la-preprocessor_func.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_la-proccomm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_la-sp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSym_m_tm_lp_la-sym_qsort.Plo@am__quote@
@@ -4184,13 +4142,6 @@ libSym_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_basic.c' object='libSym_la-preprocessor_basic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
-
-libSym_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSym_la-preprocessor_func.Tpo" -c -o libSym_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_la-preprocessor_func.Tpo" "$(DEPDIR)/libSym_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSym_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSym_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
 
 libSym_la-tm_func.lo: TreeManager/tm_func.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_la-tm_func.lo -MD -MP -MF "$(DEPDIR)/libSym_la-tm_func.Tpo" -c -o libSym_la-tm_func.lo `test -f 'TreeManager/tm_func.c' || echo '$(srcdir)/'`TreeManager/tm_func.c; \
@@ -4394,13 +4345,6 @@ libSymAppl_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_basic.c' object='libSymAppl_la-preprocessor_basic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
-
-libSymAppl_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-preprocessor_func.Tpo" -c -o libSymAppl_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_la-preprocessor_func.Tpo" "$(DEPDIR)/libSymAppl_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSymAppl_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
 
 libSymAppl_la-tm_func.lo: TreeManager/tm_func.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_la-tm_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_la-tm_func.Tpo" -c -o libSymAppl_la-tm_func.lo `test -f 'TreeManager/tm_func.c' || echo '$(srcdir)/'`TreeManager/tm_func.c; \
@@ -4955,13 +4899,6 @@ libSymAppl_m_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
 
-libSymAppl_m_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_la-preprocessor_func.Tpo" -c -o libSymAppl_m_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_m_la-preprocessor_func.Tpo" "$(DEPDIR)/libSymAppl_m_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_m_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSymAppl_m_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
-
 libSymAppl_m_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_la-lp_solver.Tpo" -c -o libSymAppl_m_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_m_la-lp_solver.Tpo" "$(DEPDIR)/libSymAppl_m_la-lp_solver.Plo"; else rm -f "$(DEPDIR)/libSymAppl_m_la-lp_solver.Tpo"; exit 1; fi
@@ -5171,13 +5108,6 @@ libSymAppl_m_tm_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_basic.c' object='libSymAppl_m_tm_la-preprocessor_basic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_tm_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
-
-libSymAppl_m_tm_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_tm_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_tm_la-preprocessor_func.Tpo" -c -o libSymAppl_m_tm_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_m_tm_la-preprocessor_func.Tpo" "$(DEPDIR)/libSymAppl_m_tm_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_m_tm_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSymAppl_m_tm_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_tm_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
 
 libSymAppl_m_tm_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_tm_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_tm_la-lp_solver.Tpo" -c -o libSymAppl_m_tm_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
@@ -5389,13 +5319,6 @@ libSymAppl_m_tm_cp_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_tm_cp_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
 
-libSymAppl_m_tm_cp_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_tm_cp_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_tm_cp_la-preprocessor_func.Tpo" -c -o libSymAppl_m_tm_cp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_m_tm_cp_la-preprocessor_func.Tpo" "$(DEPDIR)/libSymAppl_m_tm_cp_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_m_tm_cp_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSymAppl_m_tm_cp_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_tm_cp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
-
 libSymAppl_m_tm_cp_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_tm_cp_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_tm_cp_la-lp_solver.Tpo" -c -o libSymAppl_m_tm_cp_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_m_tm_cp_la-lp_solver.Tpo" "$(DEPDIR)/libSymAppl_m_tm_cp_la-lp_solver.Plo"; else rm -f "$(DEPDIR)/libSymAppl_m_tm_cp_la-lp_solver.Tpo"; exit 1; fi
@@ -5605,13 +5528,6 @@ libSymAppl_m_tm_lp_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_basic.c' object='libSymAppl_m_tm_lp_la-preprocessor_basic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_tm_lp_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
-
-libSymAppl_m_tm_lp_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_tm_lp_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_tm_lp_la-preprocessor_func.Tpo" -c -o libSymAppl_m_tm_lp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_m_tm_lp_la-preprocessor_func.Tpo" "$(DEPDIR)/libSymAppl_m_tm_lp_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_m_tm_lp_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSymAppl_m_tm_lp_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_tm_lp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
 
 libSymAppl_m_tm_lp_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_tm_lp_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_tm_lp_la-lp_solver.Tpo" -c -o libSymAppl_m_tm_lp_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
@@ -5823,13 +5739,6 @@ libSymAppl_m_tm_lp_cg_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_tm_lp_cg_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
 
-libSymAppl_m_tm_lp_cg_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_tm_lp_cg_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-preprocessor_func.Tpo" -c -o libSymAppl_m_tm_lp_cg_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-preprocessor_func.Tpo" "$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSymAppl_m_tm_lp_cg_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_tm_lp_cg_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
-
 libSymAppl_m_tm_lp_cg_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_tm_lp_cg_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-lp_solver.Tpo" -c -o libSymAppl_m_tm_lp_cg_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-lp_solver.Tpo" "$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-lp_solver.Plo"; else rm -f "$(DEPDIR)/libSymAppl_m_tm_lp_cg_la-lp_solver.Tpo"; exit 1; fi
@@ -6039,13 +5948,6 @@ libSymAppl_m_tm_lp_cg_cp_la-preprocessor_basic.lo: Preprocessor/preprocessor_bas
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_basic.c' object='libSymAppl_m_tm_lp_cg_cp_la-preprocessor_basic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_tm_lp_cg_cp_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
-
-libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.Tpo" -c -o libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.Tpo" "$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSymAppl_m_tm_lp_cg_cp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
 
 libSymAppl_m_tm_lp_cg_cp_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSymAppl_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSymAppl_m_tm_lp_cg_cp_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSymAppl_m_tm_lp_cg_cp_la-lp_solver.Tpo" -c -o libSymAppl_m_tm_lp_cg_cp_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
@@ -7377,13 +7279,6 @@ libSym_m_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
 
-libSym_m_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSym_m_la-preprocessor_func.Tpo" -c -o libSym_m_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_m_la-preprocessor_func.Tpo" "$(DEPDIR)/libSym_m_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSym_m_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSym_m_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
-
 libSym_m_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSym_m_la-lp_solver.Tpo" -c -o libSym_m_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_m_la-lp_solver.Tpo" "$(DEPDIR)/libSym_m_la-lp_solver.Plo"; else rm -f "$(DEPDIR)/libSym_m_la-lp_solver.Tpo"; exit 1; fi
@@ -7593,13 +7488,6 @@ libSym_m_tm_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_basic.c' object='libSym_m_tm_la-preprocessor_basic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_tm_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
-
-libSym_m_tm_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_tm_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSym_m_tm_la-preprocessor_func.Tpo" -c -o libSym_m_tm_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_m_tm_la-preprocessor_func.Tpo" "$(DEPDIR)/libSym_m_tm_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSym_m_tm_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSym_m_tm_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_tm_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
 
 libSym_m_tm_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_tm_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSym_m_tm_la-lp_solver.Tpo" -c -o libSym_m_tm_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
@@ -7811,13 +7699,6 @@ libSym_m_tm_cp_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_tm_cp_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
 
-libSym_m_tm_cp_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_tm_cp_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSym_m_tm_cp_la-preprocessor_func.Tpo" -c -o libSym_m_tm_cp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_m_tm_cp_la-preprocessor_func.Tpo" "$(DEPDIR)/libSym_m_tm_cp_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSym_m_tm_cp_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSym_m_tm_cp_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_tm_cp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
-
 libSym_m_tm_cp_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_tm_cp_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSym_m_tm_cp_la-lp_solver.Tpo" -c -o libSym_m_tm_cp_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_m_tm_cp_la-lp_solver.Tpo" "$(DEPDIR)/libSym_m_tm_cp_la-lp_solver.Plo"; else rm -f "$(DEPDIR)/libSym_m_tm_cp_la-lp_solver.Tpo"; exit 1; fi
@@ -8027,13 +7908,6 @@ libSym_m_tm_lp_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_basic.c' object='libSym_m_tm_lp_la-preprocessor_basic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_tm_lp_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
-
-libSym_m_tm_lp_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_tm_lp_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSym_m_tm_lp_la-preprocessor_func.Tpo" -c -o libSym_m_tm_lp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_m_tm_lp_la-preprocessor_func.Tpo" "$(DEPDIR)/libSym_m_tm_lp_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSym_m_tm_lp_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSym_m_tm_lp_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_tm_lp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
 
 libSym_m_tm_lp_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_tm_lp_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSym_m_tm_lp_la-lp_solver.Tpo" -c -o libSym_m_tm_lp_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
@@ -8245,13 +8119,6 @@ libSym_m_tm_lp_cg_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_tm_lp_cg_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
 
-libSym_m_tm_lp_cg_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_tm_lp_cg_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSym_m_tm_lp_cg_la-preprocessor_func.Tpo" -c -o libSym_m_tm_lp_cg_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_m_tm_lp_cg_la-preprocessor_func.Tpo" "$(DEPDIR)/libSym_m_tm_lp_cg_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSym_m_tm_lp_cg_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSym_m_tm_lp_cg_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_tm_lp_cg_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
-
 libSym_m_tm_lp_cg_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_tm_lp_cg_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSym_m_tm_lp_cg_la-lp_solver.Tpo" -c -o libSym_m_tm_lp_cg_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_m_tm_lp_cg_la-lp_solver.Tpo" "$(DEPDIR)/libSym_m_tm_lp_cg_la-lp_solver.Plo"; else rm -f "$(DEPDIR)/libSym_m_tm_lp_cg_la-lp_solver.Tpo"; exit 1; fi
@@ -8461,13 +8328,6 @@ libSym_m_tm_lp_cg_cp_la-preprocessor_basic.lo: Preprocessor/preprocessor_basic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_basic.c' object='libSym_m_tm_lp_cg_cp_la-preprocessor_basic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_tm_lp_cg_cp_la-preprocessor_basic.lo `test -f 'Preprocessor/preprocessor_basic.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_basic.c
-
-libSym_m_tm_lp_cg_cp_la-preprocessor_func.lo: Preprocessor/preprocessor_func.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_tm_lp_cg_cp_la-preprocessor_func.lo -MD -MP -MF "$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-preprocessor_func.Tpo" -c -o libSym_m_tm_lp_cg_cp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-preprocessor_func.Tpo" "$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-preprocessor_func.Plo"; else rm -f "$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-preprocessor_func.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Preprocessor/preprocessor_func.c' object='libSym_m_tm_lp_cg_cp_la-preprocessor_func.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libSym_m_tm_lp_cg_cp_la-preprocessor_func.lo `test -f 'Preprocessor/preprocessor_func.c' || echo '$(srcdir)/'`Preprocessor/preprocessor_func.c
 
 libSym_m_tm_lp_cg_cp_la-lp_solver.lo: LP/lp_solver.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSym_m_tm_lp_cg_cp_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libSym_m_tm_lp_cg_cp_la-lp_solver.lo -MD -MP -MF "$(DEPDIR)/libSym_m_tm_lp_cg_cp_la-lp_solver.Tpo" -c -o libSym_m_tm_lp_cg_cp_la-lp_solver.lo `test -f 'LP/lp_solver.c' || echo '$(srcdir)/'`LP/lp_solver.c; \

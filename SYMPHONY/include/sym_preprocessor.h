@@ -31,6 +31,7 @@
 #define PREP_SOLVED 3		/* preprocessor found the MIP unbounded */
 #define PREP_UNBOUNDED 4	/* preprocessor found the MIP unbounded */
 #define PREP_NUMERIC_ERROR 5
+#define PREP_OTHER_ERROR 6
 
 #define SR_NO_UPDATES 0
 #define SR_BOUNDS_UPDATED 1
@@ -46,12 +47,29 @@
 #define RND_FLOOR 0
 #define RND_CEIL 1
 
+#define VAR_NEW 0 
+#define VAR_IN_BOUND 1
+
+#define UB_SIDE 0
+#define LB_SIDE 1
+#define BOTH_SIDE 2
+/* modification types on a variable */
+
 #define FIX_NO_BOUND 0
 #define FIX_BINARY 1
 #define FIX_OTHER  2
 #define FIX_FIXABLE 3
-#define FIX_UB 4
-#define FIX_LB 5
+#define IMPROVE_UB 4
+#define IMPROVE_LB 5
+#define IMPROVE_COEF 6
+
+#ifdef INF
+#undef INF
+#endif
+
+#define INF DBL_MAX
+
+#if 0
 
 typedef struct ROWPACKEDARRAY
 {
@@ -84,14 +102,27 @@ typedef struct LHSPARAMS
    double *lbound;              /*  contains lower bounds of the value of a
 				    constraint.*/
 }lhsparams;
+#endif
 
 typedef struct PREP_STATS
 {
    int rows_deleted;
    int vars_fixed;
-   int coeffs_changed;
-   int bounds_tightened;
+   int coeffs_nulled;
    int bounds_integerized;
+
+   /* regarding coeffs changes and bounds tightening */
+
+   int coeffs_changed;
+   char *nz_coeff_changed; 
+
+   int bounds_tightened;
+
+   /* regarding uboundedness and infeasiblity */
+   int col_infeas_ind;
+   int row_infeas_ind;
+   int col_unbound_ind;
+   int col_numeric_ind;
 }prep_stats;
 
 
@@ -142,63 +173,6 @@ typedef struct SRDESC{
 			variable is fixed for this case */   
 }SRdesc;
 
-
-
-#if 0
-typedef struct SRDESC{
-    
-   int n;
-   int rhs;
-   int sense;
-   
-   double *obj;
-   double *matval;
-   double *ratios;
-   int *matind;
-
-   char no_upper; 
-   char no_lower;
-
-   double ub_offset;
-   double lb_offset;
-   
-   double rhs_lb_offset;
-   double rhs_ub_offset;  
-
-   double ub;
-   double lb;
-
-}SRdesc;
-#endif
-
-#if 0
-typedef struct SRRELAX
-{
-   char exists;
-   int row_ind; 
-   int constr_row_ind; /* -1 for aggregated rows*/
-
-   int sub_n;
-   double *obj;
-   double *matval;
-   int *matind; /* indices of colums appear in this problem */
-   double *ratios;  
-
-   /* filled if it is an aggregated row */
-   double rhs;
-   char sense;
-     
-   double lb;
-   double ub;
-   
-   int lb_sol_size;
-   int *lb_sol; 
-
-   int ub_sol_size;
-   int *ub_sol; 
-}SRrlx;
-#endif 
-
 typedef struct PREPDesc
 {
    MIPdesc * mip; 
@@ -235,29 +209,61 @@ class implication
 
 typedef std::list<implication> impList;
 
-int preprocess_mip(MIPdesc *mip, prep_params prep_par, char imply_changes, 
-		   char keeptrack);
+int preprocess_mip(sym_environment *env);
 
-int prep_initialize_mipinfo(MIPdesc *mip,  prep_params prep_par);
+int prep_initialize_mipinfo(MIPdesc *mip,  prep_params params, 
+			    prep_stats *stats);
 
 int prep_fill_row_ordered(MIPdesc *mip);
+int prep_update_mip(MIPdesc *mip, prep_stats stats, prep_params params, 
+		    double etol);
 
-int prep_integerize_bounds(PREPdesc *P, char keeptrack);
-
-int prep_basic(PREPdesc *P, char keeptrack);
+int prep_integerize_bounds(PREPdesc *P);
+int prep_basic(PREPdesc *P);
 
 double prep_rnd_integral(double val, double etol, char rnd_type);
 
-int prep_fix_variable(MIPdesc *mip, int col_ind, int row_ind, int a_loc, 
-		      double etol);
+//int prep_fix_variable(MIPdesc *mip, int col_ind, int row_ind, int a_loc, 
+//		      double etol);
 
-int prep_check_redundancy(MIPdesc *mip, int row_ind,  double etol, 
-			  char use_sr_bounds);
+int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc);
+//int prep_improve_variable(MIPdesc *mip, int col_ind, int row_ind, int a_loc, 
+//		      double etol);
+int  prep_get_row_bounds(MIPdesc *mip, int r_ind);
 
-void prep_fixed_col_update_info(MIPdesc *mip, int col_ind, double fixed_bound,  
-				      int fix_type);
-void prep_deleted_row_update_info(MIPdesc *mip, int row_ind);
+int prep_check_redundancy(PREPdesc *P, int row_ind, char use_sr_bounds);
+int prep_modified_col_update_info(PREPdesc *P, int col_ind,  
+				  double fixed_bound,  int fix_type);
+int prep_force_row_bounds(PREPdesc *P, int row_ind, int col_ind, int a_loc);
 
+//int prep_check_redundancy(MIPdesc *mip, int row_ind,  double etol, 
+//			  prep_stats *stats, char use_sr_bounds);
+
+//int prep_modified_col_update_info(MIPdesc *mip, int col_ind, 
+//				   double fixed_bound, int mod_type, 
+//				  prep_stats *stats, double etol);  
+				   
+int prep_deleted_row_update_info(MIPdesc *mip, int row_ind);
+
+//int prep_force_row_bounds(MIPdesc *mip, int row_ind, int col_ind, int a_loc, 
+//			  prep_stats *stats, double etol);
+char prep_is_equal(double lval, double rval, double etol);
+char prep_is_integral(double val, double etol);
+
+
+int prep_declare_fixed_var(int col_ind, char *name, double fixed_bound);
+int prep_declare_redundant_row(ROWinfo row, int row_ind, char sense, 
+			       double rhs);
+int prep_declare_coef_change(int row_ind, int col_ind, 
+			     char *name, double a_val, 
+			     double rhs);
+int prep_report(PREPdesc *P, int termcode);
+char prep_quit(int termcode);
+
+/* note that for now we dont keep track of changes and 
+   we assume that the rootdesc was built by default by symphony
+*/ 
+int prep_restore_rootdesc(sym_environment *env);
 
 int prep_solve_sr_rlx(PREPdesc *P, int row_cnt, int *row_indices); 
 void sr_initialize(SRdesc **sr, int n);
@@ -281,9 +287,10 @@ int sr_find_opt_bounded(SRdesc *sr, double *ub, double *lb);
 int sr_solve_open_prob(SRdesc *sr, int obj_ind, int row_ind, int *r_matbeg, 
 		       int *r_matind, double *r_matval, COLinfo *cols, 
 		       double *ub, double *lb, double etol);
+int prep_close_desc(PREPdesc *P);   
+int prep_free_sr_desc(SRdesc *sr);
 
-
-
+#if 0
 int prep_light(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 	       prep_stats *stats, prep_params *prep_par);
 int prep_advanced(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
@@ -341,4 +348,5 @@ int prep_apply_imp(MIPdesc *P, rowpackedarray *row_P, lhsparams *lhs,
 		   prep_stats *stats);
 bool prep_isImplied(const int col_num, const int imp_col, impList *il,
 		    double &imp_val);
+#endif
 #endif
