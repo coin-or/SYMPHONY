@@ -215,8 +215,7 @@ int prep_initialize_mipinfo(MIPdesc *mip,  prep_params params,
 			    prep_stats *stats);
 
 int prep_fill_row_ordered(MIPdesc *mip);
-int prep_update_mip(MIPdesc *mip, prep_stats stats, prep_params params, 
-		    double etol);
+int prep_cleanup_desc(PREPdesc *P);
 
 int prep_integerize_bounds(PREPdesc *P);
 int prep_basic(PREPdesc *P);
@@ -229,7 +228,7 @@ double prep_rnd_integral(double val, double etol, char rnd_type);
 int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc);
 //int prep_improve_variable(MIPdesc *mip, int col_ind, int row_ind, int a_loc, 
 //		      double etol);
-int  prep_get_row_bounds(MIPdesc *mip, int r_ind);
+int  prep_get_row_bounds(MIPdesc *mip, int r_ind, double etol);
 
 int prep_check_redundancy(PREPdesc *P, int row_ind, char use_sr_bounds);
 int prep_modified_col_update_info(PREPdesc *P, int col_ind,  

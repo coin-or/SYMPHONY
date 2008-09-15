@@ -505,12 +505,12 @@ typedef struct ROWINFO{
 
    double orig_ub; /* for debugging purposes */
    double orig_lb;
- 
+   
    int free_var_num; 
    
-   int ub_inf_var_num; /* number of variables in this row those causes 
+   int ub_inf_var_num; /* number of variables in this row those cause 
 			  ub to be infinite */
-   int lb_inf_var_num; /* number of variables in this row those causes
+   int lb_inf_var_num; /* number of variables in this row those cause
 			  lb to be infinite */
    int size; 
    char is_redundant; 
@@ -585,6 +585,10 @@ typedef struct MIPDESC{
    int        alloc_n;     /* allocated dims */ 
    int        alloc_m;
    int        alloc_nz;
+
+   int        fixed_n;      /* only used if preprocessor is used */
+   char     **fixed_name;
+   double   **fixed_val; 
 
 /* Only to be allocated and used by SYMPHONY */
 
