@@ -99,6 +99,22 @@ int preprocess_mip (sym_environment *env)
    }
    
 
+   /* debug */
+   /*----------*/
+   char file_name[80] = "";
+   sprintf(file_name, "%s_prep", env->probname);
+   
+   if(params.write_mps){
+      sym_write_mps(env, file_name);
+   }
+   if(params.write_lp){
+      sym_write_lp(env, file_name);
+   }
+   
+   /*----------*/
+
+
+
    /* since we use the original mip desc */
    P->mip = 0;
 
@@ -106,6 +122,7 @@ int preprocess_mip (sym_environment *env)
 
    PRINT(verbosity, 0, ("Total Presolve Time: %f...\n\n", 
 			wall_clock(NULL) - start_time));   
+
 
   /* Do advanced Preprocessing */
 

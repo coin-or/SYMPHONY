@@ -30,7 +30,7 @@ typedef struct PREP_PARAMS{
    int               display_stats;
    double            etol; 
    int               keep_row_ordered; 
-   char              do_single_row_rlx; 
+   int               do_single_row_rlx; 
    double            single_row_rlx_ratio;
    int               max_sr_cnt;
    char              do_aggregate_row_rlx; 
@@ -38,6 +38,8 @@ typedef struct PREP_PARAMS{
    int               max_aggr_row_cnt;
    int               iteration_limit; 
    int               keep_track; 
+   int               write_mps;
+   int               write_lp; 
 }prep_params;
 
 #endif

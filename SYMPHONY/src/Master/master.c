@@ -412,16 +412,16 @@ int sym_set_defaults(sym_environment *env)
 #ifdef USE_PREPROCESSOR
    /********************* preprocessor defaults ******************************/
    prep_par->do_prep = 1;
-   prep_par->level = 0;
+   prep_par->level = 3;
    prep_par->do_probe = 1;
    prep_par->verbosity = 1;
    prep_par->reduce_mip = 1;
    prep_par->probe_verbosity = 0;
    prep_par->probe_level = 1;
    prep_par->display_stats = 0;
-   prep_par->iteration_limit = 5;
+   prep_par->iteration_limit = 7;
    prep_par->etol = tm_par->granularity;
-   prep_par->do_single_row_rlx = 1;
+   prep_par->do_single_row_rlx = 0;
    prep_par->single_row_rlx_ratio = 0.1;
    prep_par->max_sr_cnt = 5;
    prep_par->do_aggregate_row_rlx = 0;

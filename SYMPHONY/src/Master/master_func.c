@@ -2935,6 +2935,10 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(prep_par->do_probe);
       return(0);
    }
+   else if (strcmp(key, "prep_do_sr") == 0){
+      READ_INT_PAR(prep_par->do_single_row_rlx);
+      return(0);
+   }
    else if (strcmp(key, "prep_verbosity") == 0){
       READ_INT_PAR(prep_par->verbosity);
       return(0);
@@ -2965,6 +2969,14 @@ int set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "keep_row_ordered") == 0){
       READ_INT_PAR(prep_par->keep_row_ordered);
+      return(0);
+   }
+   else if (strcmp(key, "write_mps") == 0){
+      READ_INT_PAR(prep_par->write_mps);
+      return(0);
+   }
+   else if (strcmp(key, "write_lp") == 0){
+      READ_INT_PAR(prep_par->write_lp);
       return(0);
    }
    

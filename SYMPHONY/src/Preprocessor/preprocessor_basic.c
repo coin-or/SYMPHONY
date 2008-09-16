@@ -44,7 +44,8 @@ int prep_basic(PREPdesc *P)
    
    int verbosity;
    double a_val, etol;// min_ub, max_lb; 
-   char do_sr_rlx, do_aggr_row_rlx;// fix_var; 
+   int do_sr_rlx;
+   char do_aggr_row_rlx;// fix_var; 
    int j, m, n, nz, *r_matbeg, *r_matind; 
    //int i, max_size, min_size, *max_ind, *min_ind; 
    double *obj, *rhs, *r_matval, *ub, *lb;// old_val, old_lb, old_ub;  
@@ -229,13 +230,6 @@ int prep_basic(PREPdesc *P)
 	       }
 	    }
 	    
-#if 0	 
-	    if(do_sr_rlx){
-	       if(iter_cnt <= 2){
-		  sr_termcode = prep_solve_sr_rlx(P, 1, &row_ind);
-	       }
-	    }
-#endif
 	    //if(iter_cnt == iter_cnt_limit - 1){
 	    /* do gcd thing and see for infeasiblity and further bound 
 	       tightening:  ax <= b
@@ -244,37 +238,18 @@ int prep_basic(PREPdesc *P)
 	    //}
 	 }
       
-
 	 /* one last time to detect more redundancy */
-#if 0
-	 if(do_sr_rlx){
-	    for(row_ind = 0; row_ind < m; row_ind++){
+	 if(do_sr_rlx && !rows[row_ind].is_redundant){
+	    termcode = prep_solve_sr_rlx(P, 1, &row_ind);	    
+	    if(termcode == SR_BOUNDS_UPDATED){
 	       
-	       if(row.is_redundant){
-		  continue;
-	       }
-	       sr_termcode = prep_solve_sr_rlx(P, 1, &row_ind);
-	       if(sr_termcode == SR_BOUNDS_UPDATED){
-		  prep_check_redundancy(rows, row_ind, sense[row_ind], 
-					rhs[row_ind], 
-					cols, r_matind, r_matbeg, r_matval, 
-					ub, lb, 
-					etol, TRUE);
-		  if(row.is_redundant){
-		     redundant_row_cnt++;
-		     if(verbosity >= 1){
-			printf("row %i is redundant: ub: %f \t lb: %f \t" 
-			       "sense: %c \t rhs: %f \n", 
-			       row_ind, row.ub >= INF ? -1 : row.ub, 
-			       row.lb <= -INF ? 1 : row.lb, sense[row_ind], 
-			       rhs[row_ind]);
-		     }
-		  }
+	       termcode = prep_check_redundancy(P, row_ind, TRUE);
+	       
+	       if(prep_quit(termcode)){
+		  return termcode;
 	       }
 	    }
-	 }
-#endif 
-	 
+	 }	 
       }
 
       /* now check if we have any col with col.size = 0 
@@ -533,6 +508,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc)
    double etol = P->params.etol;
    prep_stats *stats = &(P->stats);
    
+
    if(cols[col_ind].var_type != 'U' &&
       cols[col_ind].var_type != 'L'){
       if(cols[col_ind].col_size <= 1){
@@ -622,6 +598,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc)
 			 
 			 if(prep_is_equal(r_matval[a_loc], 0.0, etol)){
 			    r_matval[a_loc] = 0.0;
+			    // printf("assigned to 0\n");
 			 }
 			 
 			 /* update bounds */
@@ -688,7 +665,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc)
 		if(!fix_to_ub){
 		   if(rows[row_ind].ub < INF){
 		      new_ub = rows[row_ind].ub + a_val;
-		      if(new_ub < rhs){
+		      if(new_ub < rhs - etol){
 			 //improve_offset = rhs - new_ub; 
 
 			 /* update coef*/			 
@@ -702,6 +679,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc)
 			 
 			 if(prep_is_equal(r_matval[a_loc], 0.0, etol)){
 			    r_matval[a_loc] = 0.0;
+			    //	    printf("assigned to 0\n");
 			 }
 
 			 /* update bounds */
@@ -1229,7 +1207,7 @@ int prep_modified_col_update_info(PREPdesc *P, int col_ind,
    
    if(verbosity >= 3){
       printf("var %s [%i] bounds are improved: ",
-	     col_ind, mip->colname[col_ind]); 
+	     mip->colname[col_ind], col_ind); 
       if(lb[col_ind] > -INF){
 	 printf("\t lb:%f", lb[col_ind]);
       }
@@ -2767,7 +2745,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind, char use_sr_bounds)
       3 c_val < 0, a_val < 0
    */
    //   if(row.fixed_var_num + row.fixable_var_num >= row.size){
-   if(rows[row_ind].fixed_var_num  >= rows[row_ind].size){
+   if(!use_sr_bounds && rows[row_ind].fixed_var_num  >= rows[row_ind].size){
       if((sense == 'L' && rows[row_ind].fixed_lhs_offset > rhs + etol) ||
 	 (sense == 'E' && 
 	  !prep_is_equal(rows[row_ind].fixed_lhs_offset, rhs, etol))){
@@ -2776,7 +2754,8 @@ int prep_check_redundancy(PREPdesc *P, int row_ind, char use_sr_bounds)
       }									       
       //rows[row_ind].is_redundant = TRUE;
       termcode = PREP_MODIFIED;
-   }else if(rows[row_ind].fixed_var_num >= rows[row_ind].size - 1){
+   }else if(!use_sr_bounds && 
+	    rows[row_ind].fixed_var_num >= rows[row_ind].size - 1){
       for(i = r_matbeg[row_ind]; i < r_matbeg[row_ind + 1]; i++){
 	 col_ind = r_matind[i];
 	 a_val = r_matval[i];
@@ -2885,7 +2864,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind, char use_sr_bounds)
 		  }
 	       }
 	    }else{
-	       /* so a_val has been fixed to 0 */
+	       /* so a_val has been fixed to 0.0 */
 	       /* this row is redundant */
 	       /* check if we can fix this column*/
 	       if(cols[col_ind].col_size == 1){
@@ -2911,9 +2890,9 @@ int prep_check_redundancy(PREPdesc *P, int row_ind, char use_sr_bounds)
 		  }
 		  fix_type = FIX_OTHER;
 	       }else{
-		  /* just modify col size and declare this row redundant 
+		  /* just declare this row to be redundant 
 		     here*/
-		  cols[col_ind].col_size--;
+		  //cols[col_ind].col_size--;
 		  termcode = PREP_MODIFIED;
 	       }
 	    }
@@ -2939,14 +2918,9 @@ int prep_check_redundancy(PREPdesc *P, int row_ind, char use_sr_bounds)
 	       }else if(rows[row_ind].is_redundant){
 		     return PREP_MODIFIED;
 	       }
-	       if(fix_type == FIX_BINARY ||
-		  fix_type == FIX_OTHER){
-		  termcode =  PREP_MODIFIED;
-	       } 
-	       /* else we just modified bounds, no proof to show that 
-		    this row is redundant */
 	    }
-	    /* debug - need to break here 
+	    termcode = PREP_MODIFIED;
+       	    /* debug - need to break here 
 	       break; */
 	 }
       }
@@ -2993,8 +2967,32 @@ int prep_check_redundancy(PREPdesc *P, int row_ind, char use_sr_bounds)
 	     /* prob infeasible */
 	     return PREP_INFEAS;
 	  }
-	  if(ub < rhs - etol || fixed_row){
+	  if(ub < rhs - etol || fixed_row){ 
 	     //rows[row_ind].is_redundant = TRUE;
+	     termcode = PREP_MODIFIED;
+	  }
+	  if(lb > rhs - etol){
+	     /* fix all colums*/
+	     /* becaue of recursive call, we dont want 
+		to deal with this row in prep_modified_col func */
+	     rows[row_ind].is_redundant = TRUE;
+	     fix_type = FIX_OTHER;
+	     
+	     for(i = r_matbeg[row_ind]; i < r_matbeg[row_ind +1]; i++){
+		col_ind = r_matind[i];
+		a_val = r_matval[i];
+		if(cols[col_ind].var_type != 'F' && 
+		   (a_val > etol || a_val <-etol)){
+		   if(a_val > etol){
+		      new_bound = c_lb[col_ind];
+		   }else{ 
+		      new_bound = c_ub[col_ind];
+		   }
+		   termcode = prep_modified_col_update_info(P, col_ind, 
+							    new_bound, 
+							    fix_type);
+		}
+	     }
 	     termcode = PREP_MODIFIED;
 	  }
 	  break;
@@ -3072,7 +3070,7 @@ int prep_declare_redundant_row(ROWinfo row, int row_ind, char sense,
 /*===========================================================================*/
 int prep_declare_fixed_var(int col_ind, char *name, double fixed_bound){
 
-   printf("col %s [%i] is fixed to %f\n",
+   printf("var %s [%i] is fixed to %f\n",
 	  name, col_ind, fixed_bound);
    return 0;
 
@@ -3916,7 +3914,7 @@ int prep_cleanup_desc(PREPdesc *P)
       
    /* debug */
    /* -------------- */
-   if(col_num != n - (vars_fixed + mip->mip_inf->fixed_var_num)){
+   if(col_num != n - (stats->vars_fixed + mip->mip_inf->fixed_var_num)){
       printf("error: missing cols \n");
       return PREP_OTHER_ERROR;
    }
@@ -3963,7 +3961,7 @@ int prep_cleanup_desc(PREPdesc *P)
    }
    
    /* */
-   
+
    for(i = 0; i < col_num; i++){
       for(j = matbeg[i]; j < matbeg[i+1]; j++){
 	 matind[j] = row_new_inds[matind[j]];
@@ -3974,7 +3972,7 @@ int prep_cleanup_desc(PREPdesc *P)
 	 r_matbeg[row_ind] = elem_ind + 1;
       }
    }
-   
+
    for(i = 0; i < row_num; i++){
       r_matbeg[i] -= r_lengths[i];
    }
