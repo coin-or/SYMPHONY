@@ -2280,7 +2280,7 @@ void open_lp_solver(LPdata *lp_data)
    /* Turn off the OSL messages (There are LOTS of them) */
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
-   //lp_data->si->setupForRepeatedUse();
+   lp_data->si->setupForRepeatedUse();
    //lp_data->si->getModelPtr()->setFactorizationFrequency(200);
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
@@ -2309,13 +2309,14 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 
    /* Turn off scaling for CLP */
    //lp_data->si->setHintParam(OsiDoScale,false,OsiHintDo);
+   MIPdesc *mip = lp_data->mip;
 
    lp_data->si->loadProblem(lp_data->n, lp_data->m,
-			    lp_data->mip->matbeg, lp_data->mip->matind,
-			    lp_data->mip->matval, lp_data->mip->lb,
-			    lp_data->mip->ub, lp_data->mip->obj,
-			    lp_data->mip->sense, lp_data->mip->rhs,
-			    lp_data->mip->rngval);
+			    mip->matbeg, mip->matind,
+			    mip->matval, mip->lb,
+			    mip->ub, mip->obj,
+			    mip->sense, mip->rhs,
+			    mip->rngval);
 }
 
 /*===========================================================================*/
@@ -2393,17 +2394,25 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
 {
-   int i, j;
+   int i, start, size;
+   OsiXSolverInterface  *si = lp_data->si;
    
+   /*
    for (i = 0; i < rcnt; i++){
       CoinPackedVector new_row;
       for (j = rmatbeg[i]; j < rmatbeg[i+1]; j++){
 	 new_row.insert(rmatind[j], rmatval[j]);
       }
-      lp_data->si->addRow(new_row, sense[i], rhs[i], 0);
+      si->addRow(new_row, sense[i], rhs[i], 0);
    }
+   */
 
-   //  lp_data->si->addRows(rcnt,rows,sense,rhs,rowrng);
+   for (i = 0; i < rcnt; i++){
+      start = rmatbeg[i];
+      size = rmatbeg[i+1] - start;
+      CoinPackedVector new_row(size, &rmatind[start], &rmatval[start], FALSE);
+      si->addRow(new_row, sense[i], rhs[i], 0);
+   }
 
    lp_data->m += rcnt;
    lp_data->nz += nzcnt;
@@ -2416,12 +2425,14 @@ void add_cols(LPdata *lp_data, int ccnt, int nzcnt, double *obj,
 	      int *cmatbeg, int *cmatind, double *cmatval,
 	      double *lb, double *ub, char *where_to_move)
 {
+   // TODO: eliminate the inner loop. its inefficient.
    int i, j;
+   OsiXSolverInterface  *si = lp_data->si;
    for (i = 0; i < ccnt; i++){
       CoinPackedVector col;
       for (j = cmatbeg[i]; j < cmatbeg[i+1]; j++)
 	 col.insert(cmatind[j], cmatval[j]);
-      lp_data->si->addCol(col, lb[i], ub[i], obj[i]);
+      si->addCol(col, lb[i], ub[i], obj[i]);
    }
    
    lp_data->n += ccnt;
@@ -2462,25 +2473,29 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    
    //int term = LP_ABANDONED;
    int term = 0;
+   OsiXSolverInterface  *si = lp_data->si;
+
     
-   lp_data->si->resolve();
-   //lp_data->si->initialSolve();
+   printf("solving\n");
+   si->resolve();
+   printf("solved\n");
+   //si->initialSolve();
    
-   if (lp_data->si->isProvenDualInfeasible())
+   if (si->isProvenDualInfeasible())
       term = LP_D_INFEASIBLE;
-   else if (lp_data->si->isDualObjectiveLimitReached())
+   else if (si->isDualObjectiveLimitReached())
       term = LP_D_OBJLIM;
-   else if (lp_data->si->isProvenPrimalInfeasible())
+   else if (si->isProvenPrimalInfeasible())
       term = LP_D_UNBOUNDED;
-   else if (lp_data->si->isProvenOptimal())
+   else if (si->isProvenOptimal())
       term = LP_OPTIMAL;
-   else if (lp_data->si->isIterationLimitReached())
+   else if (si->isIterationLimitReached())
       term = LP_D_ITLIM;
-   else if (lp_data->si->isAbandoned())
+   else if (si->isAbandoned())
       term = LP_ABANDONED;
    
    /* if(term == D_UNBOUNDED){
-      retval=lp_data->si->getIntParam(OsiMaxNumIteration, itlim); 
+      retval=si->getIntParam(OsiMaxNumIteration, itlim); 
       CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() 
       }
    */
@@ -2489,9 +2504,9 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    
    if (term != LP_ABANDONED){
       
-      *iterd = lp_data->si->getIterationCount();
+      *iterd = si->getIterationCount();
       
-      lp_data->objval = lp_data->si->getObjValue();
+      lp_data->objval = si->getObjValue();
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
@@ -2501,7 +2516,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }
    
    /*
-   lp_data->si->getModelPtr()->tightenPrimalBounds(0.0,0,true);
+   si->getModelPtr()->tightenPrimalBounds(0.0,0,true);
    */
    return(term);
 }
@@ -2518,24 +2533,25 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
    
    //int term = LP_ABANDONED;
    int term = 0;
+   OsiXSolverInterface  *si = lp_data->si;
     
-   lp_data->si->solveFromHotStart();
+   si->solveFromHotStart();
    
-   if (lp_data->si->isProvenDualInfeasible())
+   if (si->isProvenDualInfeasible())
       term = LP_D_INFEASIBLE;
-   else if (lp_data->si->isDualObjectiveLimitReached())
+   else if (si->isDualObjectiveLimitReached())
       term = LP_D_OBJLIM;
-   else if (lp_data->si->isProvenPrimalInfeasible())
+   else if (si->isProvenPrimalInfeasible())
       term = LP_D_UNBOUNDED;
-   else if (lp_data->si->isProvenOptimal())
+   else if (si->isProvenOptimal())
       term = LP_OPTIMAL;
-   else if (lp_data->si->isIterationLimitReached())
+   else if (si->isIterationLimitReached())
       term = LP_D_ITLIM;
-   else if (lp_data->si->isAbandoned())
+   else if (si->isAbandoned())
       term = LP_ABANDONED;
    
    /* if(term == D_UNBOUNDED){
-      retval=lp_data->si->getIntParam(OsiMaxNumIteration, itlim); 
+      retval=si->getIntParam(OsiMaxNumIteration, itlim); 
       CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() */
    /* } to unconfuse vi */
    
@@ -2543,9 +2559,9 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
    
    if (term != LP_ABANDONED){
       
-      *iterd = lp_data->si->getIterationCount();
+      *iterd = si->getIterationCount();
       
-      lp_data->objval = lp_data->si->getObjValue();
+      lp_data->objval = si->getObjValue();
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
@@ -2691,12 +2707,13 @@ void get_column(LPdata *lp_data, int j,
    const double *matval = matrixByCol->getElements();
    const int *matind = matrixByCol->getIndices(); 
    const int *matbeg = matrixByCol->getVectorStarts();
+   const int matbeg_j = matbeg[j];
 
    *collen = matrixByCol->getVectorSize(j);
    
    for (i = 0; i < (*collen); i++){
-      colval[i] = matval[matbeg[j] + i];
-      colind[i] = matind[matbeg[j] + i];
+      colval[i] = matval[matbeg_j + i];
+      colind[i] = matind[matbeg_j + i];
    }
    
    const double * objval = lp_data->si->getObjCoefficients();
@@ -2717,14 +2734,15 @@ void get_row(LPdata *lp_data, int i,
    const double *matval = matrixByRow->getElements();  
    const int *matind = matrixByRow->getIndices(); 
    const int *matbeg = matrixByRow->getVectorStarts();
+   const int matbeg_i = matbeg[i];
 
    *rowlen = matrixByRow->getVectorSize(i);
    *rowub = lp_data->si->getRowUpper()[i];
    *rowlb = lp_data->si->getRowLower()[i];      
 
    for (j = 0; j < (*rowlen); j++){
-      rowval[j] = matval[matbeg[i] + j];
-      rowind[j] = matind[matbeg[i] + j];
+      rowval[j] = matval[matbeg_i + j];
+      rowind[j] = matind[matbeg_i + j];
    }
 }
 
@@ -2770,16 +2788,18 @@ void get_slacks(LPdata *lp_data)
    int m = lp_data->m, i = 0;
    double * slacks = lp_data->slacks;
    row_data *rows = lp_data->rows;
+   cut_data *cut;
    
 #ifndef __OSI_CPLEX__
    
    const double * rowActivity = lp_data->si->getRowActivity();
    
    for (i = m - 1; i >= 0; i--) {
-      if ((rows[i].cut->sense == 'R') && (rows[i].cut->range < 0) ) {
-	 slacks[i] = - rows[i].cut->rhs + rowActivity[i];
+      cut = rows[i].cut;
+      if ((cut->sense == 'R') && (cut->range < 0) ) {
+	 slacks[i] = - cut->rhs + rowActivity[i];
       } else {
-	 slacks[i] = rows[i].cut->rhs - rowActivity[i];
+	 slacks[i] = cut->rhs - rowActivity[i];
       }
    }
 
@@ -2788,7 +2808,7 @@ void get_slacks(LPdata *lp_data)
    CPXgetslack(lp_data->si->getEnvironmentPtr(), lp_data->si->getLpPtr(),
 	       lp_data->slacks, 0, lp_data->m-1);
    /* Compute the real slacks for the free rows */
-   for (i =m - 1; i >= 0; i--){
+   for (i = m - 1; i >= 0; i--){
       if (rows[i].free){
 	 switch (rows[i].cut->sense){
 	  case 'E': slacks[i] +=  rows[i].cut->rhs - SYM_INFINITY; break;
@@ -2818,16 +2838,19 @@ void change_rhs(LPdata *lp_data, int rownum, int *rhsind, double *rhsval)
 {
    char *sense = lp_data->tmp.c; 
    double *range = lp_data->tmp.d; 
+   OsiXSolverInterface  *si = lp_data->si;
    int i;
+   const char *si_sense = si->getRowSense();
+   const double *si_range = si->getRowRange();
 
    for (i = 0; i < rownum; i++){
-      sense[i] = lp_data->si->getRowSense()[rhsind[i]];
+      sense[i] = si_sense[rhsind[i]];
       if (sense[i] == 'R'){
-	 range[i] = lp_data->si->getRowRange()[rhsind[i]];
+	 range[i] = si_range[rhsind[i]];
       }
    }
    
-   lp_data->si->setRowSetTypes(rhsind, rhsind + rownum, sense, rhsval, range);
+   si->setRowSetTypes(rhsind, rhsind + rownum, sense, rhsval, range);
 }
 
 /*===========================================================================*/
@@ -2836,15 +2859,18 @@ void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 {
   double *rhs = lp_data->tmp.d; 
   double *range = (double *) calloc(cnt, DSIZE);
+  OsiXSolverInterface  *si = lp_data->si;
+  const double *si_rhs = si->getRightHandSide();
+  const double *si_range = si->getRowRange();
   int i; 
 
   for (i = 0; i < cnt; i++){
-     rhs[i] = lp_data->si->getRightHandSide()[index[i]];
+     rhs[i] = si_rhs[index[i]];
      if (sense[i] == 'R')
-	range[i] = lp_data->si->getRowRange()[index[i]];
+        range[i] = si_range[index[i]];
   }
 
-  lp_data->si->setRowSetTypes(index, index + cnt, sense, rhs, range);
+  si->setRowSetTypes(index, index + cnt, sense, rhs, range);
 
   FREE(range);
 }
@@ -2854,14 +2880,15 @@ void change_sense(LPdata *lp_data, int cnt, int *index, char *sense)
 void change_bounds(LPdata *lp_data, int cnt, int *index, char *lu, double *bd)
 {
    int i;
+   OsiXSolverInterface  *si = lp_data->si;
  
    for (i = 0; i < cnt; i++){
       switch (lu[i]){
        case 'L':
-	 lp_data->si->setColLower(index[i], bd[i]); 
+	 si->setColLower(index[i], bd[i]); 
 	 break;
        case 'U':
-	 lp_data->si->setColUpper(index[i], bd[i]); 
+	 si->setColUpper(index[i], bd[i]); 
 	 break;
        default:
 	 /* default: can't happen */
@@ -2944,20 +2971,23 @@ void get_rhs_rng_sense(LPdata *lp_data)
 {
    const double *rowub = lp_data->si->getRowUpper();
    const double *rowlb = lp_data->si->getRowLower();
+   double *mip_rhs = lp_data->mip->rhs;
+   double *mip_rngval = lp_data->mip->rngval;
+   char *mip_sense = lp_data->mip->sense;
 
    for (int i=0;i<lp_data->m;i++) {
       if (rowub[i]>=SYM_INFINITY) {
-         lp_data->mip->sense[i] = 'G';
-         lp_data->mip->rhs[i] = rowlb[i];
+         mip_sense[i] = 'G';
+         mip_rhs[i] = rowlb[i];
       }
       else if (rowlb[i]<=-SYM_INFINITY) {
-         lp_data->mip->sense[i] = 'L';
-         lp_data->mip->rhs[i] = rowub[i];
+         mip_sense[i] = 'L';
+         mip_rhs[i] = rowub[i];
       }
       else {
-         lp_data->mip->sense[i] = 'R';
-         lp_data->mip->rhs[i] = rowub[i];
-         lp_data->mip->rngval[i] = rowub[i]-rowlb[i];
+         mip_sense[i] = 'R';
+         mip_rhs[i] = rowub[i];
+         mip_rngval[i] = rowub[i]-rowlb[i];
       }
    }
 }
@@ -2973,6 +3003,7 @@ int copy_lp_data(LPdata *lp_data, LPdata *new_data)
    int n = lp_data->n;
    int m = lp_data->m;
    double *lb, *ub;
+   OsiXSolverInterface  *si = lp_data->si;
 
    if (!new_data) {
       return FUNCTION_TERMINATED_ABNORMALLY;
@@ -2990,12 +3021,12 @@ int copy_lp_data(LPdata *lp_data, LPdata *new_data)
    ub = (double *)malloc(n*DSIZE);
 
    open_lp_solver(new_data);
-   new_data->si->loadProblem(*(lp_data->si->getMatrixByRow()),
-                             lp_data->si->getColLower(),
-                             lp_data->si->getColUpper(),
-                             lp_data->si->getObjCoefficients(),
-                             lp_data->si->getRowLower(),
-                             lp_data->si->getRowUpper()
+   new_data->si->loadProblem(*(si->getMatrixByRow()),
+                             si->getColLower(),
+                             si->getColUpper(),
+                             si->getObjCoefficients(),
+                             si->getRowLower(),
+                             si->getRowUpper()
                              );
    /* get_bounds just returns a const pointer to si->ub, si->lb. we need to
     * memcpy because these pointers get changed when addCols is used */
@@ -3086,12 +3117,17 @@ void free_row_set(LPdata *lp_data, int length, int *index)
    double *rhs = lp_data->tmp.d; /* m */
    double *range = (double *) calloc(length, DSIZE);
    int i; 
+   OsiXSolverInterface  *si = lp_data->si;
+   const double infinity = si->getInfinity();
+   const double *si_rhs = si->getRightHandSide();
+   const double *si_rowrange = si->getRowRange();
+   const char *si_rowsense = si->getRowSense();
    
    for (i = 0; i < length; i++){
-      rhs[i] = lp_data->si->getRightHandSide()[index[i]];
-      sense[i] = lp_data->si->getRowSense()[index[i]];
+      rhs[i] = si_rhs[index[i]];
+      sense[i] = si_rowsense[index[i]];
       if (sense[i] =='R'){
-	 range[i] = lp_data->si->getRowRange()[index[i]];
+	 range[i] = si_rowrange[index[i]];
       }
    }
    
@@ -3099,21 +3135,21 @@ void free_row_set(LPdata *lp_data, int length, int *index)
      //     range[i]=0;
      switch (sense[i]){
      case 'E':
-       rhs[i] = lp_data->si->getInfinity();
+       rhs[i] = infinity;
        sense[i] = 'L';
        break;
      case 'L':
-       rhs[i] = lp_data->si->getInfinity(); 
+       rhs[i] = infinity; 
        break;
      case 'R':
-       range[i] = 2*lp_data->si->getInfinity();
+       range[i] = 2*infinity;
        break;
      case 'G':
-       rhs[i] = -lp_data->si->getInfinity();
+       rhs[i] = -infinity;
       }
    }
 
-   lp_data->si->setRowSetTypes(index, index + length, sense, rhs, range);
+   si->setRowSetTypes(index, index + length, sense, rhs, range);
    
    FREE(range);
 }
@@ -3336,14 +3372,15 @@ int read_lp(MIPdesc *mip, char *infile, char *probname)
 void write_mps(LPdata *lp_data, char *fname)
 {
    const char * extension = "MPS";
-   double ObjSense = lp_data->si->getObjSense();
+   OsiXSolverInterface  *si = lp_data->si;
+   double ObjSense = si->getObjSense();
    int i;
    
    for (i = 0; i < lp_data->n; i++) {
-      lp_data->si->setContinuous(i);
+      si->setContinuous(i);
    }
 
-   lp_data->si->writeMps(fname, extension, ObjSense);
+   si->writeMps(fname, extension, ObjSense);
 }
 
 /*===========================================================================*/
@@ -3552,7 +3589,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          if (is_top_iter){
             par->probing_generated_in_root = TRUE;
          }
-         PRINT(verbosity, 5,
+         PRINT(verbosity, 4,
                ("%i probing cuts added\n", new_cut_num));
          lp_stat->cuts_generated += new_cut_num;
          lp_stat->probing_cuts_generated += new_cut_num;
@@ -3580,7 +3617,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       comp_times->cuts += cut_time;
       comp_times->probing_cuts += cut_time;
       //cutlist.printCuts();
-   }
+   } 
 
    /* create CGL gomory cuts */
    should_generate_this_cgl_cut(par->generate_cgl_gomory_cuts, 
@@ -3602,7 +3639,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
             if (is_top_iter){
                par->gomory_generated_in_root = TRUE;
             }
-            PRINT(verbosity, 5,
+            PRINT(verbosity, 4,
                   ("%i Gomory cuts added\n", new_cut_num));
             lp_stat->cuts_generated += new_cut_num;
             lp_stat->gomory_cuts_generated += new_cut_num;
@@ -3641,7 +3678,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	   if (is_top_iter){
 	      par->redsplit_generated_in_root = TRUE;
 	   }
-	   PRINT(verbosity, 5,
+	   PRINT(verbosity, 4,
 		 ("%i reduce and split cuts added\n", new_cut_num));
            lp_stat->cuts_generated += new_cut_num;
            lp_stat->redsplit_cuts_generated += new_cut_num;
@@ -3672,7 +3709,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          if (is_top_iter){
             par->knapsack_generated_in_root = TRUE;
          }
-         PRINT(verbosity, 5,
+         PRINT(verbosity, 4,
                ("%i knapsack cuts added\n", new_cut_num));
          lp_stat->cuts_generated += new_cut_num;
          lp_stat->knapsack_cuts_generated += new_cut_num;
@@ -3712,7 +3749,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	  if (is_top_iter){ 
 	     par->oddhole_generated_in_root = TRUE;
 	  }
-	  PRINT(verbosity, 5,
+	  PRINT(verbosity, 4,
 		("%i odd hole cuts added\n", new_cut_num));
            lp_stat->cuts_generated += new_cut_num;
            lp_stat->oddhole_cuts_generated += new_cut_num;
@@ -3751,7 +3788,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	    if (is_top_iter){
 	       par->mir_generated_in_root = TRUE;
 	    }
-	    PRINT(verbosity, 5,
+	    PRINT(verbosity, 4,
 		  ("%i MIR cuts added\n", new_cut_num));
            lp_stat->cuts_generated += new_cut_num;
            lp_stat->mir_cuts_generated += new_cut_num;
@@ -3789,7 +3826,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	  if (is_top_iter){
 	     par->twomir_generated_in_root = TRUE;
 	  }
-	  PRINT(verbosity, 5,
+	  PRINT(verbosity, 4,
 		("%i 2-MIR cuts added\n", new_cut_num));
            lp_stat->cuts_generated += new_cut_num;
            lp_stat->twomir_cuts_generated += new_cut_num;
@@ -3824,7 +3861,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          if (is_top_iter){
             par->clique_generated_in_root = TRUE;
          }
-         PRINT(verbosity, 5,
+         PRINT(verbosity, 4,
                ("%i clique cuts added\n", new_cut_num));
          lp_stat->cuts_generated += new_cut_num;
          lp_stat->clique_cuts_generated += new_cut_num;
@@ -3853,7 +3890,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          if (is_top_iter){
             par->flow_and_cover_generated_in_root = TRUE;
          }
-         PRINT(verbosity, 5,
+         PRINT(verbosity, 4,
                ("%i flow cover cuts added\n", new_cut_num));
          lp_stat->cuts_generated += new_cut_num;
          lp_stat->flow_and_cover_cuts_generated += new_cut_num;
@@ -3888,7 +3925,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	  if (is_top_iter){
 	     par->rounding_generated_in_root = TRUE;
 	  }
-	  PRINT(verbosity, 5,
+	  PRINT(verbosity, 4,
 		("%i rounding cuts added\n", new_cut_num));
            lp_stat->cuts_generated += new_cut_num;
            lp_stat->rounding_cuts_generated += new_cut_num;
@@ -3925,7 +3962,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	   if (is_top_iter){
 	      par->lift_and_project_generated_in_root = TRUE;
 	   }
-	   PRINT(verbosity, 5,
+	   PRINT(verbosity, 4,
 		 ("%i lift and project cuts added\n", new_cut_num));
            lp_stat->cuts_generated += new_cut_num;
            lp_stat->lift_and_project_cuts_generated += new_cut_num;
@@ -3980,7 +4017,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	   if (is_top_iter){
 	      par->landp_generated_in_root = TRUE;
 	   }
-	   PRINT(verbosity, 5,
+	   PRINT(verbosity, 4,
 		 ("%i landp cuts added\n", new_cut_num));
            lp_stat->cuts_generated += new_cut_num;
            lp_stat->landp_cuts_generated += new_cut_num;
