@@ -4101,22 +4101,22 @@ int prep_report(PREPdesc *P, int termcode)
 	     stats.rows_deleted + 
 	     stats.vars_fixed > 0){
 	     if(stats.coeffs_changed > 0){
-		printf("\t modified %i coefficients \n",
+		printf("\t coefficients modified: %i\n",
 		       stats.coeffs_changed);		       
 	     }
 	     if(stats.bounds_tightened > 0){
-		printf("\t improved %i bounds \n", 
+		printf("\t bounds improved: %i\n", 
 		       stats.bounds_tightened);
 	     }	     
 	     if(stats.rows_deleted + 
 		stats.vars_fixed > 0){
 		if(stats.rows_deleted > 0){
-		   printf("\t removed %i constraints\n", 
+		   printf("\t constraints removed: %i\n", 
 			  stats.rows_deleted);
 		   //printf("\t %i remained\n", mip->m);
 		}
 		if(stats.vars_fixed > 0){
-		   printf("\t fixed %i variables\n", stats.vars_fixed);
+		   printf("\t variables fixed: %i\n", stats.vars_fixed);
 		   //printf("\t %i remained\n", mip->n);
 		}	     
 	     }
