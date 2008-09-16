@@ -80,6 +80,15 @@ def find_int(arr0,st0,in0):
 			return 1,in0
 	return -1,in0
 
+def find_int_mid(arr0,st0,in0):
+	in0=0
+	for line in arr0:
+		find = re.search(st0,line)
+		if (find >= 0):
+			in0 = int(re.search('-*[0-9]+',line).group())
+			return 1,in0
+	return -1,in0
+
 def print_usage():
 	print "usage: python report_tsp.py -d <path to dir> [-c] [-h] [-n] [-g]",
 	print "[-b] [-p] [-m]"
@@ -173,7 +182,7 @@ if (has_user_gen>0):
 if (has_user_branch>0):
 	print "%8s"%"str-time",
 if (has_user_presolve>0):
-	print "%8s"%"pre-time",
+	print "%8s"%"pre-time","%8s"%"vars-fix","%8s"%"cons-rem","%8s"%"bnd-chan",
 if (has_user_memory>0):
 	print "%8s"%"max-MB",
 print ''
@@ -291,7 +300,7 @@ for instance in a:
 
 		#=======================================================================
 		pre_time = INFTY
-		find,pre_time=find_float(whole_file,'Presolve Time',pre_time)
+		find,pre_time=find_float(whole_file,'Total Presolve Time',pre_time)
 		if (find<0 or pre_time >= INFTY):
 			print  "%8s"%"NF",
 			pre_time = 0
@@ -491,6 +500,32 @@ for instance in a:
 		else:
 			print  "%8.2f"%max_mb,
 		
+   #==========================================================================
+	if (has_user_presolve>0):
+		pre_time = INFTY
+		find,pre_time=find_float(whole_file,'Total Presolve Time',pre_time)
+		if (find<0 or pre_time >= INFTY):
+			print  "%8s"%"NF",
+			pre_time = 0
+		else:
+			print  "%8.2f"%pre_time,
+
+		vars_fixed = INFTY
+		find,vars_fixed=find_int_mid(whole_file,'fixed',vars_fixed)
+		if (find<0 or vars_fixed >= INFTY):
+			print  "%8s"%"NF",
+			vars_fixed = 0
+		else:
+			print  "%8d"%vars_fixed,
+
+		cons_del = INFTY
+		find,cons_del=find_int_mid(whole_file,'removed',cons_del)
+		if (find<0 or cons_del >= INFTY):
+			print  "%8s"%"NF",
+			cons_del = 0
+		else:
+			print  "%8d"%cons_del,
 	print ''
 
 print "## errors:",error
+
