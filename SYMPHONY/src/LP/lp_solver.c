@@ -2476,9 +2476,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    OsiXSolverInterface  *si = lp_data->si;
 
     
-   printf("solving\n");
    si->resolve();
-   printf("solved\n");
    //si->initialSolve();
    
    if (si->isProvenDualInfeasible())
