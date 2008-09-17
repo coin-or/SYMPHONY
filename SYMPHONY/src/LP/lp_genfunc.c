@@ -245,7 +245,11 @@ int fathom_branch(lp_prob *p)
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
       p->bound_changes_in_iter = 0;
-      termcode = dual_simplex(lp_data, &iterd);
+      if (p->iter_num < 2) {
+         termcode = initial_lp_solve(lp_data, &iterd);
+      } else {
+         termcode = dual_simplex(lp_data, &iterd);
+      }
       p->lp_stat.lp_calls++;
 
 #ifdef DO_TESTS

@@ -219,9 +219,9 @@ int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const doubl
    /* check if x is a integer feasible solution to problem in p */
    int termcode = FUNCTION_TERMINATED_NORMALLY;
    double lpetol = lp_data->lpetol;
-   int n = fp_data->n0;
+   //int n = fp_data->n0;
    int m = fp_data->m0;
-   FPvars **vars = fp_data->fp_vars;
+   //FPvars **vars = fp_data->fp_vars;
    int i,c,j;
    double Ractivity;
    const int *r_matbeg = matrix->getVectorStarts();
@@ -491,7 +491,11 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
 
    change_objcoeff(lp_data, index_list, &index_list[n-1], objcoeff);
    //lp_data->si->writeLp("fp.lp");
-   termstatus = dual_simplex(lp_data, &iterd);
+   if (fp_data->iter > 0) { 
+      termstatus = dual_simplex(lp_data, &iterd);
+   } else {
+      termstatus = initial_lp_solve(lp_data, &iterd);
+   }
 
    if (termstatus != LP_OPTIMAL) {
       PRINT(verbosity,0,("Feasibility Pump: Unable to solve LP. Pump malfunction.\n"));

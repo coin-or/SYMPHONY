@@ -2468,6 +2468,65 @@ void change_col(LPdata *lp_data, int col_ind,
  * the termination code of the dual simplex method.
 \*===========================================================================*/
 
+int initial_lp_solve (LPdata *lp_data, int *iterd)
+{
+   
+   //int term = LP_ABANDONED;
+   int term = 0;
+   OsiXSolverInterface  *si = lp_data->si;
+
+    
+   si->initialSolve();
+   
+   if (si->isProvenDualInfeasible())
+      term = LP_D_INFEASIBLE;
+   else if (si->isDualObjectiveLimitReached())
+      term = LP_D_OBJLIM;
+   else if (si->isProvenPrimalInfeasible())
+      term = LP_D_UNBOUNDED;
+   else if (si->isProvenOptimal())
+      term = LP_OPTIMAL;
+   else if (si->isIterationLimitReached())
+      term = LP_D_ITLIM;
+   else if (si->isAbandoned())
+      term = LP_ABANDONED;
+   
+   /* if(term == D_UNBOUNDED){
+      retval=si->getIntParam(OsiMaxNumIteration, itlim); 
+      CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() 
+      }
+   */
+   
+   lp_data->termcode = term;
+   
+   if (term != LP_ABANDONED){
+      
+      *iterd = si->getIterationCount();
+      
+      lp_data->objval = si->getObjValue();
+      
+      lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
+   }   
+   else{
+      lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
+      printf("OSI Abandoned calculation: Code %i \n\n", term);
+   }
+   
+   /*
+   si->getModelPtr()->tightenPrimalBounds(0.0,0,true);
+   */
+   return(term);
+}
+
+/*===========================================================================*/
+
+/*===========================================================================*\
+ * Solve the lp specified in lp_data->lp with dual simplex. The number of
+ * iterations is returned in 'iterd'. The return value of the function is
+ * the termination code of the dual simplex method.
+\*===========================================================================*/
+
+
 int dual_simplex(LPdata *lp_data, int *iterd)
 {
    
@@ -3558,12 +3617,12 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       } else if (bc_level < 1) {
          probe->setMaxPass(10); /* default is 3 */
          probe->setMaxPassRoot(10); /* default is 3 */
-         probe->setMaxElements(20000);  /* default is 1000, 10000 for root */
-         probe->setMaxElementsRoot(20000); /* default is 1000, 10000 for root */
-         probe->setMaxLook(200);    /* default is 50 */
-         probe->setMaxLookRoot(200);    /* default is 50 */
-         probe->setMaxProbe(2000);   /* default is 100 */
-         probe->setMaxProbeRoot(2000);   /* default is 100 */
+         probe->setMaxElements(10000);  /* default is 1000, 10000 for root */
+         probe->setMaxElementsRoot(10000); /* default is 1000, 10000 for root */
+         probe->setMaxLook(100);    /* default is 50 */
+         probe->setMaxLookRoot(100);    /* default is 50 */
+         probe->setMaxProbe(200);   /* default is 100 */
+         probe->setMaxProbeRoot(200);   /* default is 100 */
       }
 #if 0
       probe->setLogLevel(2); /* default is 0 */
@@ -3628,7 +3687,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          // TODO: change this to something based on number of cols, sparsity
          // etc.
          if (bc_level<6) {
-            gomory->setLimitAtRoot(1000);
+            gomory->setLimitAtRoot(500);
          } else {
             gomory->setLimitAtRoot(100);
          }

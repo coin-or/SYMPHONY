@@ -233,6 +233,7 @@ void change_row PROTO((LPdata *lp_data, int row_ind,
 		       char sense, double rhs, double range));
 void change_col PROTO((LPdata *lp_data, int col_ind,
 		       char sense, double lb, double ub));
+int initial_lp_solve PROTO((LPdata *lp_data, int *iterd));
 int dual_simplex PROTO((LPdata *lp_data, int *iterd));
 int solve_hotstart PROTO((LPdata *lp_data, int *iterd));
 int mark_hotstart PROTO((LPdata *lp_data));
