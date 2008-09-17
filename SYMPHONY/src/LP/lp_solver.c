@@ -3567,6 +3567,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    //double               *newUpper = lp_data->tmp.d+n;
    int                  sizeColCuts, should_generate;
    int                  num_duplicate_cuts = 0;
+   const double         lpetol = lp_data->lpetol;
 
 #ifndef COMPILE_IN_LP
    par->probing_generated_in_root               = TRUE;
@@ -3686,8 +3687,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          CglGomory *gomory = new CglGomory;
          // TODO: change this to something based on number of cols, sparsity
          // etc.
-         if (bc_level<6) {
-            gomory->setLimitAtRoot(500);
+         if (bc_level<1) {
+            gomory->setLimitAtRoot(1000);
          } else {
             gomory->setLimitAtRoot(100);
          }
@@ -4130,10 +4131,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	    if (fabs(elements[el_num]) < min_coeff) {
 	       min_coeff = fabs(elements[el_num]);
 	    }
-	    tmp_matind[el_num] = lp_data->vars[indices[el_num]]->userind;
+	    tmp_matind[el_num] = vars[indices[el_num]]->userind;
 	 }
          /* see rhs as well */
-         if (fabs(rhs) > lp_data->lpetol) {
+         if (fabs(rhs) > lpetol) {
             if (fabs(rhs) < min_coeff) { 
                min_coeff = fabs(rhs);
             }
@@ -4142,8 +4143,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
             }
          }
 	 if (num_elements>0) {
-	    if ( (max_coeff > 0 && min_coeff/max_coeff < 100*lp_data->lpetol)||
-	         (min_coeff > 0 && min_coeff<1000*lp_data->lpetol) ) {
+	    if ( (max_coeff > 0 && min_coeff/max_coeff < 100*lpetol)||
+	         (min_coeff > 0 && min_coeff<1000*lpetol) ) {
 	       discard_cut = TRUE;
                num_discarded_cuts++;
 	    }
@@ -4177,7 +4178,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
                num_elements2 = ((int *) ((*cuts)[k]->coef))[0];
                rhs2 = (*cuts)[k]->rhs;
                if (num_elements2 != num_elements || 
-                   fabs(rhs2 - rhs)>lp_data->lpetol) {
+                   fabs(rhs2 - rhs) > lpetol) {
                   continue;
                } else {
                   elements2 = (double *) ((*cuts)[k]->coef + DSIZE);
@@ -4185,7 +4186,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 				      (num_elements + 1) * DSIZE);
                   for (l = 0; l < num_elements; l++) {
                      if (indices2[l] != indices[l] || 
-                         fabs(elements2[l]-elements[l]) > lp_data->lpetol) {
+                         fabs(elements2[l]-elements[l]) > lpetol) {
                         break;
                      }
                   }
