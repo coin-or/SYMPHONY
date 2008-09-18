@@ -443,6 +443,7 @@ typedef struct LP_STAT{
 
    /* feasibility pump */
    int         fp_calls;
+   int         fp_lp_calls;
    int         fp_num_sols;
 }lp_stat_desc;
 

@@ -2002,6 +2002,7 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.num_duplicate_cuts      += p->lp_stat.num_duplicate_cuts;
 
    p->tm->lp_stat.fp_calls                += p->lp_stat.fp_calls;
+   p->tm->lp_stat.fp_lp_calls             += p->lp_stat.fp_lp_calls;
    p->tm->lp_stat.fp_num_sols             += p->lp_stat.fp_num_sols;
 }
 #endif

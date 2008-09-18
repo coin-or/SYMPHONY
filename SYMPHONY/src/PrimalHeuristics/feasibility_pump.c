@@ -148,6 +148,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
 
       PRINT(verbosity,10,("fp: solve lp %d\n",iter));
       p->lp_stat.lp_calls++;
+      p->lp_stat.fp_lp_calls++;
       if (fp_solve_lp(new_lp_data, fp_data, &is_feasible) != 
             FUNCTION_TERMINATED_NORMALLY) {
          break;
@@ -280,7 +281,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    int n = lp_data->n;
    int m = lp_data->m;
    int i;
-   int *rstat,*cstat;
+   //int *rstat,*cstat;
 
    double one=1.0;
    char sense='G';
@@ -367,14 +368,14 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    }
    
    /* load basis */
-   rstat = (int *) malloc(m * ISIZE);
-   cstat = (int *) malloc(n * ISIZE);
+   //rstat = (int *) malloc(m * ISIZE);
+   //cstat = (int *) malloc(n * ISIZE);
 
-   get_basis(lp_data,cstat,rstat);
-   load_basis (new_lp_data,cstat,rstat);
+   //get_basis(lp_data,cstat,rstat);
+   //load_basis (new_lp_data,cstat,rstat);
 
-   FREE(rstat);
-   FREE(cstat);
+   //FREE(rstat);
+   //FREE(cstat);
 
    /* add 1 columns and 2 rows for each nonBinary Integer */
    /* 
@@ -466,17 +467,25 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
          } else {
             objcoeff[i] = 0;
             objcoeff[fp_vars[i]->xplus] = 1;
-            norm += 1.0; /* stays the same every iteration */
          }
       } else {
          objcoeff[i] = 0;
       }
       /* calculate ||coeff||, norm is not zero because otherwise x_ip is
        * feasible */
-      norm += objcoeff[i]*objcoeff[i]; /* stays the same every iteration */
    }
 
-   norm = sqrt(norm);
+   if (fp_data->iter < 1) {
+      norm = 0;
+      for (i=0; i < n0; i++) {
+         norm += objcoeff[i]*objcoeff[i]; /* stays the same every iteration */
+      }
+      norm = sqrt(norm);
+      fp_data->norm = norm;
+   } else {
+      norm = fp_data->norm;
+   }
+
    //norm = 0;
    PRINT(verbosity, 15, ("fp: norm = %f\n",norm));
    for (i=0;i<n0;i++) {
@@ -487,10 +496,14 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
       objcoeff[i] = (1-alpha)*objcoeff[i];
    }
    alpha = alpha*fp_data->alpha_decr;
+   for (i=0;i<n0;i++) {
+      if (fp_vars[i]->is_int) {
+         lp_data->si->setInteger(i);
+      }
+   }
    */
 
    change_objcoeff(lp_data, index_list, &index_list[n-1], objcoeff);
-   //lp_data->si->writeLp("fp.lp");
    if (fp_data->iter > 0) { 
       termstatus = dual_simplex(lp_data, &iterd);
    } else {
@@ -506,12 +519,14 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
 
    delta_x = 0;
    memcpy(x_lp,lp_data_x,DSIZE*n0);
+   /*
    for (i=0;i<n0;i++) {
       if (fp_vars[i]->is_int) {
          delta_x += fabs(x_lp[i]-x_ip[i]);
       }
    }
    PRINT(verbosity, 15, ("fp: delta_x = %f\n",delta_x));
+   */
 
    return termcode;
 }
