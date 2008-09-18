@@ -1317,7 +1317,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
    double lpetol = p->lp_data->lpetol;
    const double ub_minus_gran = p->ub - p->par.granularity;
    const double alpha = p->par.strong_branching_high_low_weight;
-   const double infinity = 1e12;
+   const double infinity = SYM_INFINITY;
 #ifdef COMPILE_FRAC_BRANCHING
    int frl0, frl1, frh0, frh1;
 #endif

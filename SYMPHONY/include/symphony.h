@@ -109,7 +109,7 @@
 #endif
 #define	MAXDOUBLE 1.79769313486231570e+308
 
-#define SYM_INFINITY                 100000000
+#define SYM_INFINITY                 1e20
 
 #define BIG_DBL                      1e40
 
