@@ -3689,8 +3689,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          // etc.
          if (bc_level<1) {
             gomory->setLimitAtRoot(1000);
+            gomory->setLimit(1000);
          } else {
             gomory->setLimitAtRoot(100);
+            gomory->setLimit(100);
          }
          gomory->generateCuts(*(lp_data->si), cutlist);
          if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {
@@ -4097,6 +4099,14 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       int num_discarded_cuts = 0;
       int *tmp_matind = lp_data->tmp.i1;
       int *is_deleted = (int *) calloc(cutlist.sizeRowCuts(), ISIZE);
+      int num_elements, num_elements2;
+      int *indices, *indices2;
+      double *elements, *elements2;
+      double min_coeff, max_coeff;
+      int discard_cut, is_duplicate;
+      double rhs, rhs2;
+      const double max_elements = (bc_level < 1) ? 1000 : 100;
+         
       if (*cuts){
 	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+cutlist.sizeRowCuts())
 				      * sizeof(cut_data *));
@@ -4105,19 +4115,22 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       }
              
       for (i = 0, j = *num_cuts; i < cutlist.sizeRowCuts(); i++){
-	 int num_elements, num_elements2;
-	 int *indices, *indices2;
-	 double *elements, *elements2;
-	 double min_coeff = DBL_MAX;
-	 double max_coeff = 0;
-	 int discard_cut = FALSE, is_duplicate;
-	 double rhs, rhs2;
-         
          cut = cutlist.rowCut(i);
          num_elements = cut.row().getNumElements();
          indices = const_cast<int *> (cut.row().getIndices());
          elements = const_cast<double *> (cut.row().getElements());
          rhs = cut.rhs();
+         discard_cut = FALSE;
+         max_coeff = 0;
+         min_coeff = DBL_MAX;
+
+         if (num_elements > max_elements) {
+            is_deleted[i] = TRUE;
+            PRINT(verbosity,5,("Threw out cut because its length %d is too "
+                     "high.\n\n\n", num_elements));
+            num_discarded_cuts++;
+            continue;
+         }
 
 	 /* 
 	  * Find the largest and the smallest non-zero coeffs to test the
