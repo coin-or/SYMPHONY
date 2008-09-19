@@ -1,4 +1,4 @@
-BUILDING AND INSTALLING SYMPHONY Version 5.1.7
+BUILDING AND INSTALLING SYMPHONY Version 5.1.9
 ==============================================
 
 The following are brief instructions that should be sufficient to install
@@ -159,10 +159,10 @@ SHARED MEMORY BUILD
 ===================
 
 1. To compile a shared memory version of SYMPHONY, simply use an OpenMP
-compliant compiler. Version 5.1.7 has been tested with gcc 4.2, and should work
+compliant compiler. Version 5.1.8 has been tested with gcc 4.2, and should work
 by configuring with
 
-  ./configure --with-openmp
+  ./configure --enable-openmp
 
 2. Follow the instructions above for building and testing.
 

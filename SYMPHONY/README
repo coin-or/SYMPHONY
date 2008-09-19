@@ -311,15 +311,20 @@ SEQUENTIAL
 
 Known configurations that build and pass unit test
 
-- gcc 4.1 on LINUX
-- gcc 3.4 on LINUX
-- gcc 3.4.4 on CYGWIN in Windows XP
-- gcc 3.4.4 on CYGWIN in Windows XP (-mno-cygwin)
+- gcc 3 on LINUX
+- gcc 4 on LINUX (32-bit and 64-bit)
+- gcc 3 in CYGWIN under Windows XP
+- gcc 3 in CYGWIN under Windows XP (-mno-cygwin)
+- gcc 3 in Mys under Windows 
+- gcc 4 in Mys under Windows 
 - MSVC++ Version 8 compiler in CYGWIN using the autotools 
 - MSVC++ Version 8 IDE
 - MSVC++ nmake Utility with Version 8 compiler
-- gcc 4.0 on Mac OSX 10.4.8
-- gcc 4.1 on Solaris x86
+- gcc 4 on Mac OSX 10.4.8
+- gcc 4 on Solaris x86
+- Sun Studio on Solaris
+- gcc 4 on Solaris
+- xlc on AIX
 
 SHARED MEMORY PARLLEL (OpenMP)
 
@@ -331,8 +336,8 @@ DISTRIBUTED MEMORY PARALLEL (PVM)
 
 Known configurations that build and pass unit test
 
-- gcc 4.1 on LINUX with PVM
-- gcc 3.4 on LINUX with PVM
+- gcc 4 on LINUX with PVM
+- gcc 3 on LINUX with PVM
 
 APPLICATIONS
 ============
@@ -366,19 +371,6 @@ few cases where the optimal solution was not found when using the Gomory cut
 generator, especially in combination with CPLEX. If the solver is not
 performing as it should, try turning off some of the cut generators to see if
 that fixes the problem. 
-
-EXTERNAL COIN-OR LIBRARIES
-==========================
-
-SYMPHONY 5.1 works with the following stable versions of other COIN-OR 
-libraries 
-
-BuildTools     0.5
-CoinUtils      1.0
-Cgl            0.5
-Clp            1.3
-Osi            0.95
-MsVisualStudio 1.0
 
 *******************************************************************************
 *                                 SUPPORT                                     *
