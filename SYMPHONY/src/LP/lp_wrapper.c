@@ -640,7 +640,8 @@ int create_subproblem_u(lp_prob *p)
     * might be ok if {VAR,SLACK}_{B,LB,UB} are properly defined
    \*----------------------------------------------------------------------- */
 
-   if (desc->basis.basis_exists == TRUE){
+   if (p->par.should_warmstart_chain == TRUE && 
+         desc->basis.basis_exists == TRUE){
       int *rstat, *cstat;
       if (desc->basis.extravars.size == 0){
 	 cstat = desc->basis.basevars.stat;

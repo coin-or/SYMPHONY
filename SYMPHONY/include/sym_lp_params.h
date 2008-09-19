@@ -83,6 +83,13 @@ typedef struct LP_PARAMS{
    int               scaling;
    int               fastmip;
 
+   /* 
+    * should we do initial_solve() or dual_simplex() when we start a new
+    * chain. both have pros and cons and asm4 is not sure what to do.
+    */
+   int               should_warmstart_chain;
+
+
    int               try_to_recover_from_error;
    /* ZERO_ONE_PROBLEM / INTEGER_PROBLEM / MIXED_INTEGER_PROBLEM */
    int               problem_type;
