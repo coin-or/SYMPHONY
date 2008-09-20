@@ -2802,8 +2802,8 @@ int prep_check_redundancy(PREPdesc *P, int row_ind, char use_sr_bounds)
 			   if(cols[col_ind].var_type != 'C'){
 			      new_bound = prep_rnd_integral(new_bound, etol, 
 							    RND_CEIL);
-			      fix_type = IMPROVE_LB;
 			   }
+			   fix_type = IMPROVE_LB;
 			}
 		     }else{
 			if(new_bound < c_lb[col_ind] - etol){
@@ -2815,8 +2815,8 @@ int prep_check_redundancy(PREPdesc *P, int row_ind, char use_sr_bounds)
 			   if(cols[col_ind].var_type != 'C'){
 			      new_bound= prep_rnd_integral(new_bound, etol, 
 							   RND_FLOOR);
-			      fix_type = IMPROVE_UB;
 			   }
+			   fix_type = IMPROVE_UB;
 			}
 		     }
 		  }else{
