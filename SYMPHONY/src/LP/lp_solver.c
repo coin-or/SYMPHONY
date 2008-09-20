@@ -3568,6 +3568,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    int                  sizeColCuts, should_generate;
    int                  num_duplicate_cuts = 0;
    const double         lpetol = lp_data->lpetol;
+   const double         etol1000 = lpetol*1000;
 
 #ifndef COMPILE_IN_LP
    par->probing_generated_in_root               = TRUE;
@@ -4156,8 +4157,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
             }
          }
 	 if (num_elements>0) {
-	    if ( (max_coeff > 0 && min_coeff/max_coeff < 100*lpetol)||
-	         (min_coeff > 0 && min_coeff<1000*lpetol) ) {
+	    if ( (max_coeff > 0 && min_coeff/max_coeff < etol1000)||
+	         (min_coeff > 0 && min_coeff < etol1000) ) {
 	       discard_cut = TRUE;
                num_discarded_cuts++;
 	    }

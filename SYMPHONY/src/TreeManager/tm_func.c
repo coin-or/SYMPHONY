@@ -1438,6 +1438,7 @@ char shall_we_dive(tm_prob *tm, double objval)
    int i, k;
    double rand_num, average_lb;
    double cutoff = 0;
+   double etol = 1e-3;
 
    if (tm->par.time_limit >= 0.0 &&
 	wall_clock(NULL) - tm->start_time >= tm->par.time_limit){
@@ -1484,7 +1485,10 @@ char shall_we_dive(tm_prob *tm, double objval)
 	    dive = CHECK_BEFORE_DIVE;
 	    break;
 	 }
-	 if ((objval/average_lb)-1 > tm->par.diving_threshold){
+         if (fabs(average_lb) < etol) {
+            average_lb = (average_lb > 0) ? etol : -etol;
+         }
+	 if (fabs((objval/average_lb)-1) > tm->par.diving_threshold){
 	    dive = DO_NOT_DIVE;
 	    tm->stat.diving_halts++;
 	 }else{
