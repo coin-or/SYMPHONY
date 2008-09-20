@@ -1128,11 +1128,11 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
    //verbosity = 20;
 
    if (p->bc_level<p->par.strong_br_all_candidates_level) {
-      allowed_time = p->comp_times.lp/pow(2.0,p->bc_level+1)/10;
-      min_cands = MIN(cand_num,p->par.strong_branching_cand_num_max);
+      allowed_time = 2*p->comp_times.lp - p->comp_times.strong_branching;
       if (allowed_time < 2) {
          allowed_time = 2;
       }
+      min_cands = MIN(cand_num,p->par.strong_branching_cand_num_max);
    } else {
       allowed_time = p->comp_times.lp/2 - p->comp_times.strong_branching;
       min_cands = MIN(cand_num,p->par.strong_branching_cand_num_min);

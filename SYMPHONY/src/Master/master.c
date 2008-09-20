@@ -746,12 +746,19 @@ int sym_solve(sym_environment *env)
    if (env->mip && env->mip->obj && env->par.tm_par.granularity<=0.000001) {
       for (int i=0;i<env->mip->n;i++) {
          double coeff = env->mip->obj[i];
-         if (env->mip->is_int[i] && fabs(floor(coeff+0.5)-coeff)<0.000001) {
-            granularity = gcd(granularity,(int)floor(coeff+0.5));
-         } else if (env->mip->ub[i]-env->mip->lb[i]>0.000001){
-            granularity=0;
-            break;
-         } 
+         if (fabs(coeff)>0.000001) {
+            if (env->mip->is_int[i]) {
+               if (fabs(floor(coeff+0.5)-coeff)<0.000001) {
+                  granularity = gcd(granularity,(int)floor(coeff+0.5));
+               } else {
+                  granularity = 0;
+                  break;
+               }
+            } else if (env->mip->ub[i]-env->mip->lb[i]>0.000001) {
+               granularity=0;
+               break;
+            } 
+         } // else do nothing 
       }
       /*
        * if granularity >= 1, set it at granularity - epsilon, otherwise set at
@@ -760,7 +767,7 @@ int sym_solve(sym_environment *env)
       env->par.tm_par.granularity = env->par.lp_par.granularity = 
          fabs((double)granularity-0.000001);
    }
-   PRINT(env->par.verbosity, 1, ("granularity set at %f\n",
+   PRINT(env->par.verbosity, 0, ("granularity set at %f\n",
             env->par.tm_par.granularity));
 
    if (env->par.tm_par.node_selection_rule == BEST_FIRST_SEARCH){
