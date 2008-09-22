@@ -459,6 +459,32 @@ typedef struct RC_DESC{
    int        *cnt;
 }rc_desc;
 
+#define IMP_ROW 0
+#define IMP_COL 1
+
+
+typedef struct IMPVAR{   
+   
+   int  type; /* ROW, COL */
+   int  ind; 
+   int  fix_type; /*'U', 'L, 'F'
+		    for column: improve upper bound, lower bound or fix it
+		    for row: all other variables need to be fixed to their 
+		    'U or 'L' or the row is infea'S'ible
+		    however, right now it is same with fix_bounds */  
+   double val; /* if it is a column impl*/
+   struct IMPVAR *right;
+   struct IMPVAR *left;   
+
+}IMPvar;
+
+typedef struct IMPLIST{
+
+   int size;
+   IMPvar * head;
+   IMPvar * tail;   
+}IMPlist;
+
 typedef struct COLINFO{
    int coef_type; /* all integer, all binary, fractional
 			 - considering the type of coefficients*/
@@ -469,19 +495,27 @@ typedef struct COLINFO{
                      *'F'ixed, 
 		     *'Z'-continous but can be integerized 
 
-		     -those should only appear during preprocessor stage-
+		        -those should only appear during preprocessor stage-
                      *negative bina'R'y, 
 		     *fixable to its 'U'pper bound, 
 		     *fixable to its 'L'ower bound,
-		     -for the last two, need to use is_int to see if 
-		     they are integer or not-
+		        -for the last two, need to use is_int to see if 
+		         they are integer or not-
 		     *'T'emporarily fixed, 
+		     * binary variable and temprarily fixed to 
+ 		       its 'l'ower bound, simiarly, 
+		       temporarily fixed to its 'u'pper bound		     
 		     */
 
    int col_size;     /* col size */
    int fix_row_ind; /* state which row caused to fix this variable during
 		       basic preprocessor */
 		    
+   IMPlist *ulist;  /* for binary variables: keeps the list of variables 
+		       fixed or bounds improved if this variable is fixed to 
+		       its upper bound */
+   IMPlist *llist;  /* same here - lower side */
+   
 }COLinfo;
 
 typedef struct ROWINFO{
@@ -493,7 +527,6 @@ typedef struct ROWINFO{
    int sign_type; /* all_pos, all_neg, mixed */ 
 
    /* for preprocessor */
-
 
    double fixed_obj_offset; /* obtained from fixed vars */
    double fixed_lhs_offset; /* obtained from fixed vars */
@@ -514,12 +547,15 @@ typedef struct ROWINFO{
    int lb_inf_var_num; /* number of variables in this row those cause
 			  lb to be infinite */
    int size; 
-   char is_redundant; 
    int fixed_var_num; /* number of fixed variables on this row*/
    int fixable_var_num; /* number of fixable variables on this row*/
    int bin_var_num; /*not fixed binary variables */
    int cont_var_num; /*not fixed continuous variables */
    int frac_coef_num; /* not fixed, frac coeffs on this row */   
+
+   char is_redundant; 
+   char is_updated;
+   char vars_checked;
 
 }ROWinfo;
 

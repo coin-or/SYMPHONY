@@ -21,6 +21,9 @@
 \*---------------------------------------------------------------------------*/
 typedef struct PREP_PARAMS{
    int               level;
+   int               dive_level; 
+   int               impl_dive_level; 
+   int               impl_limit;
    int               do_prep;
    int               do_probe;
    int               verbosity;

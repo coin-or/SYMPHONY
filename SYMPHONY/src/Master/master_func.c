@@ -2927,6 +2927,18 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(prep_par->level);
       return(0);
    }
+   else if (strcmp(key, "prep_dive_level") == 0){
+      READ_INT_PAR(prep_par->dive_level);
+      return(0);
+   }
+   else if (strcmp(key, "prep_impl_dive_level") == 0){
+      READ_INT_PAR(prep_par->impl_dive_level);
+      return(0);
+   }
+   else if (strcmp(key, "prep_impl_limit") == 0){
+      READ_INT_PAR(prep_par->impl_limit);
+      return(0);
+   }
    else if (strcmp(key, "prep_iter_limit") == 0){
       READ_INT_PAR(prep_par->iteration_limit);
       return(0);

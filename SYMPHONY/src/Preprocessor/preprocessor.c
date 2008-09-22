@@ -72,6 +72,7 @@ int preprocess_mip (sym_environment *env)
 
 
    /* initialize prep desc */
+   /* have a func for these */
    PREPdesc * P = (PREPdesc *)calloc(1, sizeof(PREPdesc)); 
    P->mip = mip;
    P->params = params;
@@ -83,7 +84,7 @@ int preprocess_mip (sym_environment *env)
    termcode = prep_fill_row_ordered(mip);
    
    termcode = prep_initialize_mipinfo(mip, params, &(P->stats));   
-   
+ 
    /* no changes so far */
 
    if(!prep_quit(termcode)){
@@ -123,7 +124,7 @@ int preprocess_mip (sym_environment *env)
    PRINT(verbosity, 0, ("Total Presolve Time: %f...\n\n", 
 			wall_clock(NULL) - start_time));   
 
-
+   //exit(0);
   /* Do advanced Preprocessing */
 
 #if 0
