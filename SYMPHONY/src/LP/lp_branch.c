@@ -328,8 +328,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 }
          /* } to unconfuse vi*/
 #endif
-	 lb = vars[branch_var]->lb;
-	 ub = vars[branch_var]->ub;
+	 lb = vars[branch_var]->new_lb;
+	 ub = vars[branch_var]->new_ub;
 	 for (j = 0; j < can->child_num; j++){
 	    switch (can->sense[j]){
 	     case 'E':
@@ -401,7 +401,26 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		default:
 		  break;
 	       }
-	    }
+	    } else if (can->termcode[j] == LP_D_OBJLIM || 
+                  can->termcode[j] == LP_D_UNBOUNDED ||
+                  can->termcode[j] == LP_D_INFEASIBLE){
+               p->bound_changes_in_iter++;
+               switch (can->sense[j]){
+                case 'L':
+                  /* decreasing the ub made the problem inf, so change lb */
+                  lb = can->rhs[j] + 1;
+                  vars[can->position]->new_lb = lb;
+                  break;
+                case 'G':
+                  ub = can->rhs[j] - 1;
+                  vars[can->position]->new_ub = ub;
+                  break;
+                case 'E':
+                  /* problem becomes infeasible */
+                  /* dont know what to do */
+                  break;
+               }
+            }
 #ifdef COMPILE_FRAC_BRANCHING
 	    else{
 	       if (can->termcode[j] != LP_ABANDONED){
@@ -942,7 +961,7 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
       /* Not sure what I meant with this */
       /* if (lp_data->vars[i]->ub < 2.0){ */
       if (vars[i]->is_int){
-	 if (x[i] > vars[i]->lb && x[i] < vars[i]->ub){
+	 if (x[i] > vars[i]->new_lb && x[i] < vars[i]->new_ub){
 	    fracx = x[i] - floor(x[i]);
 	    if (fracx > lpetol && fracx < lpetol1){
 	       xind[cnt] = i;
