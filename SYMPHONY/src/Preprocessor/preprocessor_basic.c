@@ -189,10 +189,15 @@ int prep_basic(PREPdesc *P)
 
 
 	 /* get the list of columns to apply impl on */
+
+	 
+	 /* not effective */
 	 impl_vars = (char *) calloc(CSIZE,n);
-	 impl_vars_checked = (char *) malloc(CSIZE*n);
+#if 0
 	 impl_vars_weight = (int *) calloc(ISIZE,n);
+	 impl_vars_checked = (char *) malloc(CSIZE*n);
 	 ind_list = (int *) malloc(ISIZE*n);
+
 	 for(col_ind = 0; col_ind < n; col_ind++){
 	    ind_list[col_ind] = col_ind;
 	    if(cols[col_ind].var_type != 'B'){
@@ -215,7 +220,6 @@ int prep_basic(PREPdesc *P)
 	 }
 	  
 	 qsort_ii(impl_vars_weight, ind_list, n);
-#if 0
 	 /* fixme this ugly thing here -very important, choose the 
 	    vars varefully */
 	 if(p_level >= 6 || mip_inf->binary_var_num < 2000){
@@ -226,7 +230,6 @@ int prep_basic(PREPdesc *P)
 	       impl_cnt_limit = n;
 	    }
 	 }
-#endif
 	 impl_cnt_limit = n;
 	 impl_cnt = 0;
 	 //for(i = n - 1; i >= 0 && impl_cnt < impl_cnt_limit; i--){
@@ -247,10 +250,17 @@ int prep_basic(PREPdesc *P)
 	    impl_vars[ind_list[i]] = TRUE;
 	    impl_cnt++;
 	 }
+#endif
 
+	 for(i = n - 1; i >= 0; i--){
+	    impl_vars[i] = TRUE;
+
+	 }
+#if 0
 	 FREE(impl_vars_weight);
 	 FREE(ind_list);
 	 FREE(impl_vars_checked);
+#endif
       }
    }
    
