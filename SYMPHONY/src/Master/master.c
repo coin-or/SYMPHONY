@@ -415,9 +415,9 @@ int sym_set_defaults(sym_environment *env)
    /********************* preprocessor defaults ******************************/
    prep_par->do_prep = 1;
    prep_par->level = 3;
-   prep_par->dive_level = 5;
-   prep_par->impl_dive_level = 3;
-   prep_par->impl_limit = 20;
+   prep_par->dive_level = 3;
+   prep_par->impl_dive_level = 0;
+   prep_par->impl_limit = 50;
    prep_par->do_probe = 1;
    prep_par->verbosity = 1;
    prep_par->reduce_mip = 1;
@@ -434,6 +434,7 @@ int sym_set_defaults(sym_environment *env)
    prep_par->max_aggr_row_ratio = 0.1;
    prep_par->keep_row_ordered = 1;
    prep_par->keep_track = 0;
+   prep_par->time_limit = 10;
 #endif
 
    return(termcode);

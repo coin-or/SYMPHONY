@@ -2995,7 +2995,10 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(prep_par->write_lp);
       return(0);
    }
-   
+   else if (strcmp(key, "prep_time_limit") == 0){
+      READ_INT_PAR(prep_par->time_limit);
+      return(0);
+   }
 #endif
 
    return(FUNCTION_TERMINATED_ABNORMALLY);

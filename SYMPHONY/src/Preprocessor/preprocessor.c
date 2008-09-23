@@ -81,9 +81,9 @@ int preprocess_mip (sym_environment *env)
    
    /* these will be needed for both bassic and advanced prep functions
       so we call them here */
-   termcode = prep_fill_row_ordered(mip);
+   termcode = prep_fill_row_ordered(P);
    
-   termcode = prep_initialize_mipinfo(mip, params, &(P->stats));   
+   termcode = prep_initialize_mipinfo(P);//mip, params, &(P->stats));   
  
    /* no changes so far */
 

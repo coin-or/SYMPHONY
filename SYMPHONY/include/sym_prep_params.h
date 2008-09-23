@@ -43,6 +43,7 @@ typedef struct PREP_PARAMS{
    int               keep_track; 
    int               write_mps;
    int               write_lp; 
+   int               time_limit;
 }prep_params;
 
 #endif

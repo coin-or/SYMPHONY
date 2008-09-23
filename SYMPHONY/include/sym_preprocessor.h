@@ -81,6 +81,9 @@
 
 #define INF DBL_MAX
 
+#define ROW_ORDERED 0
+#define COL_ORDERED 1
+
 #if 0
 
 typedef struct ROWPACKEDARRAY
@@ -232,8 +235,6 @@ typedef struct PREPDesc
    char *ulist_checked;
    char *llist_checked;
 
-   /* for recursive check for variables' fixed values */
-
    /* trying single/aggr row relaxations to improve bounds*/
    int max_sr_cnt; 
    int max_aggr_cnt; 
@@ -241,6 +242,11 @@ typedef struct PREPDesc
    SRdesc *d_sr; /* additionally, for 'E' constraints */    
    /* for subproblems checking purposes */
    char *rows_checked;    
+   double alloc_time; 
+
+   /* will need for sorting etc */
+   int * user_col_ind;
+   int * user_row_ind;
 
 }PREPdesc;
 
@@ -266,10 +272,9 @@ typedef std::list<implication> impList;
 
 int preprocess_mip(sym_environment *env);
 
-int prep_initialize_mipinfo(MIPdesc *mip,  prep_params params, 
-			    prep_stats *stats);
+int prep_initialize_mipinfo(PREPdesc *P);
 
-int prep_fill_row_ordered(MIPdesc *mip);
+int prep_fill_row_ordered(PREPdesc *P);
 int prep_cleanup_desc(PREPdesc *P);
 
 int prep_integerize_bounds(PREPdesc *P);
@@ -284,7 +289,7 @@ int prep_initialize_impl_lists(PREPdesc *P);
 int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc, 
 			  int dive_level, char check_improve, char impl_mode,  
 			  char use_sr_bounds, 
-			  double sr_ub, double sr_lb);
+			  double sr_ub, double sr_lb, int use_mip);
 //int prep_improve_variable(MIPdesc *mip, int col_ind, int row_ind, int a_loc, 
 //		      double etol);
 int  prep_get_row_bounds(MIPdesc *mip, int r_ind, double etol);
@@ -307,6 +312,9 @@ int prep_force_row_bounds(PREPdesc *P, int row_ind, int col_ind, int a_loc);
 //				  prep_stats *stats, double etol);  
 				   
 int prep_deleted_row_update_info(MIPdesc *mip, int row_ind);
+
+int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows, 
+				    char check_cols);
 
 //int prep_force_row_bounds(MIPdesc *mip, int row_ind, int col_ind, int a_loc, 
 //			  prep_stats *stats, double etol);
