@@ -1487,6 +1487,9 @@ char shall_we_dive(tm_prob *tm, double objval)
 	 }
          if (fabs(average_lb) < etol) {
             average_lb = (average_lb > 0) ? etol : -etol;
+            if (fabs(objval) < etol) {
+               objval = (objval > 0) ? etol : -etol;
+            }
          }
 	 if (fabs((objval/average_lb)-1) > tm->par.diving_threshold){
 	    dive = DO_NOT_DIVE;

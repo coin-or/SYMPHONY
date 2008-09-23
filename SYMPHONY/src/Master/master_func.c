@@ -2830,6 +2830,10 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(lp_par->fp_time_limit);
       return(0);
    }
+   else if (strcmp(key, "fp_display_interval") == 0) {
+      READ_DBL_PAR(lp_par->fp_display_interval);
+      return(0);
+   }
    else if (strcmp(key, "fp_flip_fraction") == 0) {
       READ_DBL_PAR(lp_par->fp_flip_fraction);
       return(0);

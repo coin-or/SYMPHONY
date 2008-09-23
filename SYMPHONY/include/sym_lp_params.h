@@ -188,6 +188,7 @@ typedef struct LP_PARAMS{
    int               fp_frequency;
    int               fp_max_cycles;
    double            fp_time_limit;
+   double            fp_display_interval;
    double            fp_flip_fraction;
    double            fp_max_initial_time;
    double            fp_min_gap;

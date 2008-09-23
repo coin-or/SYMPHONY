@@ -362,13 +362,14 @@ int sym_set_defaults(sym_environment *env)
    lp_par->sensitivity_analysis = FALSE;
 
    /* feasibility pump */
-   lp_par->fp_enabled        = SYM_FEAS_PUMP_DEFAULT;
-   lp_par->fp_max_cycles     = 50;
-   lp_par->fp_time_limit     = 100;
-   lp_par->fp_flip_fraction  = 0.2;
-   lp_par->fp_frequency      = 10;
+   lp_par->fp_enabled          = SYM_FEAS_PUMP_DEFAULT;
+   lp_par->fp_max_cycles       = 50;
+   lp_par->fp_time_limit       = 100;
+   lp_par->fp_display_interval = 10;
+   lp_par->fp_flip_fraction    = 0.2;
+   lp_par->fp_frequency        = 10;
    lp_par->fp_max_initial_time = 200;
-   lp_par->fp_min_gap        = 1;                   /* 1% gap */
+   lp_par->fp_min_gap          = 1;                   /* 1% gap */
 
    /************************** cut_gen defaults *****************************/
    cg_par->verbosity = 0;
@@ -5708,8 +5709,12 @@ int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
       *value = lp_par->fp_flip_fraction;
       return(0);
    }
-   else if (strcmp(key, "fp_max_total_time") == 0) {
+   else if (strcmp(key, "fp_max_initial_time") == 0) {
       *value = lp_par->fp_max_initial_time;
+      return(0);
+   }
+   else if (strcmp(key, "fp_display_time") == 0) {
+      *value = lp_par->fp_display_interval;
       return(0);
    }
    else if (strcmp(key, "fp_min_gap") == 0) {

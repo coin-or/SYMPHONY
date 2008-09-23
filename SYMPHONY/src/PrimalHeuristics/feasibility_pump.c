@@ -53,7 +53,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    int                      i, r, iter, cnt, verbosity;
    int                     *indices;
    double                  *values;
-   double                   fp_time, real_obj_value, target_ub;
+   double                   fp_time, last_fp_time, real_obj_value, target_ub;
    FPvars                 **vars;
    double                   gap           = model->getInfinity();
    double                   obj_lb        = lp_data->objval;
@@ -61,16 +61,21 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    const double            *mip_obj       = model->getObjCoefficients();
    char                     is_feasible   = FALSE;
    double                  *x_ip, *x_lp, new_solution_value;
+   const double             fp_display_interval = p->par.fp_display_interval;
 
    fp_time                                = used_time(&total_time);
    /* total_time and fp_time both now have total time used by symphony's lp
     * process */
    fp_time                                = used_time(&total_time);
+   last_fp_time                           = fp_time;
    /* fp_time should now be zero and total_time be still the same */
 
-   *found_better_solution = FALSE;
    verbosity = fp_data->verbosity     = p->par.verbosity;
-   //verbosity = 10;
+   if (p->bc_index<1) {
+      PRINT(verbosity, -1, ("starting feasibility pump\n"));
+   }
+
+   *found_better_solution = FALSE;
    fp_data->mip_obj       = (double *)malloc(n*DSIZE);
    fp_data->flip_fraction = p->par.fp_flip_fraction;
    memcpy(fp_data->mip_obj,mip_obj,n*DSIZE);
@@ -92,7 +97,12 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    /* do the following max_iter times */
    fp_time += used_time(&total_time);
    for (iter=0; iter<max_iter && fp_time<p->par.fp_time_limit; iter++) {
-      PRINT(verbosity,5,("fp: iteration %d\n",iter));
+      if (fp_time - last_fp_time > fp_display_interval || verbosity > 5) {
+         PRINT(verbosity, -1, 
+               ("feasibility pump: starting iteration %d, time used = %.2f\n",
+                iter, fp_time));
+         last_fp_time = fp_time;
+      }
       is_feasible = FALSE;
       /* solve an lp */
       fp_round(fp_data, new_lp_data);
@@ -208,7 +218,9 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
                real_obj_value,total_time));
    }
 
-   PRINT(verbosity,5,("Leaving Feasibility Pump.\n"));
+   if (p->bc_index<1 || verbosity > 5) {
+      PRINT(verbosity, -1, ("leaving feasibility pump.\n"));
+   }
     //exit(0);
    return termcode;
 }
@@ -258,6 +270,7 @@ int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const doubl
          /* constraint infeasibility is possible since we call this func. after
             rounding */
          *is_feasible = FALSE;
+         //printf("constraint %d activity = %f, down = %g, up = %g\n", i, Ractivity, r_low[i], r_up[i]);
          break;
       }
    }
@@ -591,6 +604,7 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
    double flip_fraction = fp_data->flip_fraction;
    FPvars **vars = fp_data->fp_vars;
    int fp_iter = fp_data->iter;
+   double *alpha_p = fp_data->alpha_p;
 
    for (i=0;i<n;i++) {
       if (vars[i]->is_int) {
@@ -607,7 +621,7 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
    while (1) {
       cnt = 0;
       for (i = 0; i < n; i++){
-         if (x_ip[i] > lpetol || x_ip[i] < -lpetol){
+         if (vars[i]->is_int && (x_ip[i] > lpetol || x_ip[i] < -lpetol)){
             tind[cnt] = index[i];
             tx[cnt++] = x_ip[i];
          }
@@ -618,12 +632,12 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
       /* go through all 'iter' points and check if x_ip already exists */
       has_changed = TRUE;
       for (i=0; i<fp_iter; i++) {
-         if (x_bar_len[i] == cnt && fp_data->alpha_p[i] < 0.08) {
+         //printf("alpha = %f, len = %d\n", alpha_p[i], x_bar_len[i]);
+         if (x_bar_len[i] == cnt && alpha_p[i] < 0.08) {
             x_bar_val = x_bar_val_p[i];
             x_bar_ind = x_bar_ind_p[i];
             for (j=0; j<cnt; j++) {
-               if (tind[j]!=x_bar_ind[j] || 
-                     fabs(tx[j]-x_bar_val[j])>lpetol) {
+               if (tind[j]!=x_bar_ind[j] || fabs(tx[j]-x_bar_val[j])>lpetol) {
                   break;
                }
             }
@@ -639,11 +653,13 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
          has_changed = FALSE;
          PRINT(fp_data->verbosity,5,("fp: flipping\n"));
          for (j=0; j<n; j++) {
-            if (CoinDrand48()<flip_fraction) {
-               if (vars[j]->is_bin) {
+            if (vars[j]->is_bin) {
+               if (CoinDrand48()<flip_fraction) {
                   x_ip[j] = 1-x_ip[j];
                   num_flipped++;
-               } else if (vars[j]->is_int) {
+               }
+            } else if (vars[j]->is_int) {
+               if (CoinDrand48()<flip_fraction) {
                   x_ip[j] = floor(x_lp[j]) + 
                      floor(ceil(x_lp[j]) - x_lp[j] + 0.5); /*round and flip*/
                }
