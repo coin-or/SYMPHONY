@@ -356,7 +356,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->user_set_max_presolve_iter = FALSE;
    lp_par->strong_br_all_candidates_level = 6;
    lp_par->use_hot_starts = TRUE;
-   lp_par->compare_candidates_default = HIGHEST_LOW_OBJ;
+   lp_par->compare_candidates_default = HIGH_LOW_COMBINATION;
    lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
    lp_par->sensitivity_analysis = FALSE;

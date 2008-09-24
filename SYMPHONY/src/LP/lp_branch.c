@@ -404,16 +404,16 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    } else if (can->termcode[j] == LP_D_OBJLIM || 
                   can->termcode[j] == LP_D_UNBOUNDED ||
                   can->termcode[j] == LP_D_INFEASIBLE){
-               p->bound_changes_in_iter++;
+               //p->bound_changes_in_iter++;
                switch (can->sense[j]){
                 case 'L':
                   /* decreasing the ub made the problem inf, so change lb */
-                  lb = can->rhs[j] + 1;
-                  vars[can->position]->new_lb = lb;
+                  //lb = can->rhs[j] + 1;
+                  //vars[can->position]->new_lb = lb;
                   break;
                 case 'G':
-                  ub = can->rhs[j] - 1;
-                  vars[can->position]->new_ub = ub;
+                  //ub = can->rhs[j] - 1;
+                  //vars[can->position]->new_ub = ub;
                   break;
                 case 'E':
                   /* problem becomes infeasible */
