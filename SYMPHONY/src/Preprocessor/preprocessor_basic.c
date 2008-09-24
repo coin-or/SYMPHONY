@@ -62,7 +62,7 @@ int prep_basic(PREPdesc *P)
    int old_others_cnt, new_others_cnt, mark_others_cnt = 0;
    double start_time = wall_clock(NULL);
    double mark_time, impl_time = 0.0;
-   
+   double alloc_time = 0.0; 
    prep_stats *stats = &(P->stats);
    prep_params params = P->params;
    
@@ -291,7 +291,6 @@ int prep_basic(PREPdesc *P)
 	 if(cols[col_ind].var_type == 'F'){
 	    continue;
 	 }
-
 	 /* can we fix it? first check implications */	 
 	 if(can_impl && iter_cnt < 2 && impl_time < params.time_limit){
 	    if(cols[col_ind].var_type == 'B' && 
@@ -306,8 +305,10 @@ int prep_basic(PREPdesc *P)
 	       fix_type = FIX_NO_BOUND;
 	       
 	       if(cols[col_ind].sign_type != ALL_NEG_VEC){
+		  mark_time = wall_clock(NULL);
 		  memcpy(P->impl_rows, rows, sizeof(ROWinfo)*m); 
 		  memcpy(P->impl_cols, cols, sizeof(COLinfo)*n); 
+		  alloc_time += wall_clock(NULL) - mark_time;
 		  memcpy(P->impl_ub, ub, DSIZE*n);
 		  memcpy(P->impl_lb, lb, DSIZE*n);
 		  P->impl_stats = P->stats;
@@ -338,7 +339,7 @@ int prep_basic(PREPdesc *P)
 		  impl_time += wall_clock(NULL) - mark_time;
 		  //prep_delete_imp_list(&(cols[col_ind].ulist));
 		  if(termcode == PREP_INFEAS){
-		     //printf("infeasibility detected!\n");
+		     printf("infeasibility detected!\n");
 		     prep_delete_imp_list(&(cols[col_ind].ulist));
 		     /*then this column is fixable to its lower bound! */
 		     new_bound = 0.0;
@@ -368,14 +369,14 @@ int prep_basic(PREPdesc *P)
 	       
 	       if(fix_type != FIX_BINARY && 
 		  cols[col_ind].sign_type != ALL_POS_VEC){
-
+		  mark_time = wall_clock(NULL);
 		  /* reset what we had */
 		  memcpy(rows, P->impl_rows,sizeof(ROWinfo)*mip->m); 
 		  memcpy(cols, P->impl_cols, sizeof(COLinfo)*mip->n); 
+		  alloc_time += wall_clock(NULL) - mark_time;		  
 		  memcpy(ub, P->impl_ub, DSIZE*mip->n);
 		  memcpy(lb, P->impl_lb, DSIZE*mip->n);
 		  P->stats = P->impl_stats;
-		  
 		  if(!cols[col_ind].llist){
 		     cols[col_ind].llist = 
 			(IMPlist *)calloc(sizeof(IMPlist),1);
@@ -391,7 +392,7 @@ int prep_basic(PREPdesc *P)
 							    TRUE, TRUE);
 		  impl_time += wall_clock(NULL) - mark_time;
 		  if(termcode == PREP_INFEAS){
-		     //printf("infeasibility detected!\n");
+		     printf("infeasibility detected!\n");
 		     /*then this column is fixable to its lower bound! */
 		     prep_delete_imp_list(&(cols[col_ind].llist));
 		     new_bound = 1.0;
@@ -400,8 +401,10 @@ int prep_basic(PREPdesc *P)
 	       }
 	       
 	       /* now get back */
+	       mark_time = wall_clock(NULL);
 	       memcpy(rows, P->impl_rows,sizeof(ROWinfo)*mip->m); 
 	       memcpy(cols, P->impl_cols, sizeof(COLinfo)*mip->n); 
+	       alloc_time += wall_clock(NULL) - mark_time;		  	       
 	       memcpy(ub, P->impl_ub, DSIZE*mip->n);
 	       memcpy(lb, P->impl_lb, DSIZE*mip->n);
 	       P->stats = P->impl_stats;
@@ -498,7 +501,7 @@ int prep_basic(PREPdesc *P)
 	    old_others_cnt = new_others_cnt;
 	    mark_others_cnt++;
 	 }
-	 if(mark_others_cnt > 1){
+	 if(mark_others_cnt > 10){
 	    break;
 	 }
       }
@@ -556,8 +559,10 @@ int prep_basic(PREPdesc *P)
    }
    
    if(new_changes_cnt > init_changes_cnt){
-      termcode = prep_delete_duplicate_rows_cols(P, TRUE, bin_type);
+      termcode = prep_delete_duplicate_rows_cols(P, TRUE, TRUE);
    }
+
+   // printf("total alloc time: %f\n", alloc_time);
 	 
    FREE(impl_vars);
 
@@ -602,6 +607,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
    char can_iterate, in_conflict, delete_row; 
    int fix_type, diff_cnt, diff_ind;
    double new_bound, diff_val, diff_obj_val, diff_row_val, rhs_obj, rhs_row;
+   double delete_val;
    //double mark_time, start_time = wall_clock(NULL); 
 
    MIPdesc *mip = P->mip;
@@ -633,9 +639,13 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 
    double *col_sum, *row_sum, *row_factor, *col_factor; 
    int last_lloc, last_rloc, *r_loc, *c_loc;
-   /* fixme - For now, just do this on the binary cols which are in 
-      conflict and straightforward row comparisons */
-   
+ 
+   int * col_del_ind, col_del_cnt = 0;
+   int * col_fix_type, dup_type;   
+   double *col_fix_val;
+   char *col_orig_type, type_l, type_r, bin_type; 
+   double obj_l, obj_r, obj_diff; 
+
    if(check_rows){
       col_factor = (double *)malloc(n*DSIZE);
       row_sum = (double *)calloc(m,DSIZE);
@@ -651,6 +661,10 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
   }
 
    if(check_cols){   
+      col_del_ind = (int *)malloc(n*ISIZE);
+      col_fix_type = (int *)malloc(n*ISIZE);
+      col_fix_val = (double *)malloc(n*DSIZE);
+      col_orig_type = (char *)malloc(n*CSIZE);
       row_factor = (double *)malloc(m*DSIZE);
       col_sum = (double *)calloc(n,DSIZE);
 
@@ -693,6 +707,15 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
    }
 
    /* first columns */
+   /* for same cols, 
+      -if objs are same, then aggregate them (though for binary, 
+            check if they conflict first)
+      -otherwise, 			 
+      -for binary cols, check if they conflict
+      -for others, we can delete the duplicate col only under some 
+      specific requirements 
+    */
+
    if(check_cols){
       qsort_di(col_sum, c_loc, n);      
       last_lloc = last_rloc = 0;
@@ -700,8 +723,13 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 	 if(last_lloc == n - 1){
 	    break;
 	 }
-	 
+	 /* search for same cols */
 	 for(i = last_lloc; i < n - 1; i++){
+	    if(cols[c_loc[i]].var_type == 'F' ||
+	       cols[c_loc[i]].var_type == 'U' ||
+	       cols[c_loc[i]].var_type == 'L'){
+	       continue;
+	    }
 	    if(prep_is_equal(col_sum[i], col_sum[i+1], etol)){
 	       last_rloc = i+1;
 	       if( i < n - 2 ){
@@ -719,7 +747,8 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 	 if(i == n - 1){
 	    break;
 	 }
-	 
+
+	 /* now we got 2 candidate cols*/
 	 l_ind = i;
 	 r_ind = l_ind + 1;
 	 last_lloc = last_rloc;
@@ -732,34 +761,176 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 
 	    //printf("processing cl_ind, %i cr_ind %i\n", cl_ind, cr_ind);
 	    
-	    if(r_ind == last_rloc || 
-	       cols[cl_ind].var_type != 'B'){
+	    if(r_ind == last_rloc || cols[cl_ind].var_type == 'F' ||
+	       cols[cl_ind].var_type == 'U' ||
+	       cols[cl_ind].var_type == 'L'){
+	       //cols[cl_ind].var_type != 'B'){
 	       l_ind++;
 	       r_ind = l_ind + 1;
 	       continue;
 	    }
 	    
-	    if(cols[cr_ind].var_type != 'B'){
+	    //if(cols[cr_ind].var_type != 'B'){
+	    if(cols[cr_ind].var_type == 'F' ||
+	       cols[cl_ind].var_type == 'U' ||
+	       cols[cl_ind].var_type == 'L'){
 	       r_ind++;
 	       continue;
 	    }
-	    
+
 	    if(cols[cl_ind].col_size == 0){
+	       /* fix this here */
+	       col_orig_type[col_del_cnt] = cols[cl_ind].var_type;
+	       cols[cl_ind].var_type = 'F';
+	       col_del_ind[col_del_cnt] = cl_ind;	       
+	       col_fix_type[col_del_cnt] = FIX_OTHER;
+	       if(obj[cl_ind] >= 0){
+		  col_fix_val[col_del_cnt] = lb[cl_ind];
+	       }else{
+		  col_fix_val[col_del_cnt] = ub[cl_ind];
+	       }
+	       col_del_cnt++;
 	       l_ind++;
 	       r_ind = l_ind + 1;
 	       continue;
 	    }
 	    
-	    if(cols[cl_ind].col_size != cols[cr_ind].col_size){
+	    if(cols[cr_ind].col_size == 0){
+	       /* fix this here */
+	       col_orig_type[col_del_cnt] = cols[cr_ind].var_type;
+	       cols[cr_ind].var_type = 'F';
+	       col_del_ind[col_del_cnt] = cr_ind;	       
+	       col_fix_type[col_del_cnt] = FIX_OTHER;
+	       if(obj[cr_ind] >= 0){
+		  col_fix_val[col_del_cnt] = lb[cr_ind];
+	       }else{
+		  col_fix_val[col_del_cnt] = ub[cr_ind];
+	       }
+	       col_del_cnt++;
 	       r_ind++;
 	       continue;
 	    }
+
+	    /* if sizes are different, then they are definitely not 
+	       same cols 
+	       -remember, col_size = real_size - redundant_rows	       
+	    */
+	    /* also I dont want to mess with diff type of columns now, 
+	       so skip if one is int and the other is cont column */
+
+	    type_l = cols[cl_ind].var_type;
+	    type_r = cols[cr_ind].var_type;
+
+	    if((cols[cl_ind].col_size != cols[cr_ind].col_size) || 
+	       (type_l == 'C' && type_r != 'C') ||
+	       (type_l != 'C' && type_r == 'C')){
+	       r_ind++;
+	       continue;
+	    }
+
+	    /* now we have two cols with same size, but this is not enough, 
+	       we can iterate only if we have two binary cols or one of 
+	       the following conditions are satisfied */
+
+	    obj_l = obj[cl_ind];
+	    obj_r = obj[cr_ind];
+	    obj_diff = obj_l - obj_r;
 	    
-	    /* check conflict */
+	    if(type_l == type_r == 'B'){
+	       bin_type = TRUE;
+	    }else{
+	       bin_type = FALSE;
+	    }
+
+	    dup_type = -1;
 	    
+	
+    /* 
+	       dup_type: -1 -> others, 
+	                  0 -> obj_l = obj_r, obj_diff = 0,
+
+	                  1 -> obj_l, obj_r >= 0, obj_diff > 0, l->lb
+                               lb[cl_ind] > -INF, ub[cr_ind] = INF
+                           
+	                  2 -> obj_l, obj_r <= 0, obj_diff > 0, r->lb
+                               lb[cl_ind] = -INF, ub[cr_ind] < INF
+
+	                  3 -> obj_1, obj_r >= 0, obj_diff < 0, r->ub
+                               ub[cl_ind] = INF, lb[cr_ind] > -INF
+
+	                  4 -> obj_l, obj_r <= 0, obj_diff < 0, l->ub
+                               ub[cl_ind] < INF, lb[cr_ind] = -INF
+
+			      --- unbounded cases -- 
+
+			  5 -> ub[cl_ind] = INF, lb[cr_ind] = -INF    
+                               obj_l <= 0, obj_r >= 0
+
+		          6 -> ub[cl_ind] = INF, lb[cr_ind] = -INF
+			       obj_l >= 0, obj_r >= 0, obj_diff < 0
+
+		          7 -> ub[cl_ind] = INF, lb[cr_ind] = -INF
+			       obj_l <= 0, obj_r <= 0, obj_diff < 0
+
+                         
+		          8 -> lb[cl_ind] = -INF, ub[cr_ind] = INF
+                               obj_l >= 0, obj_r <= 0 
+
+		          9 -> lb[cl_ind] = -INF, ub[cr_ind] = INF
+                               obj_l >= 0, obj_r >= 0, obj_diff > 0 
+
+		         10 -> lb[cl_ind] = -INF, ub[cr_ind] = INF
+                               obj_l <= 0, obj_r <= 0, obj_diff > 0 
+
+	    */
+	    /* get dup type */
+
+	    if(obj_l == obj_r){ //fixme ??
+	       /* fixme, make this more efficient */
+	       //if(prep_is_equal(obj_r, obj_l, etol)){
+	       dup_type = 0;
+	    }else if(!bin_type){
+	       /* at least one inf */
+	       /* fix this ugly thing here */
+	       if(ub[cl_ind] >= INF || lb[cl_ind] <= -INF || 
+		  ub[cr_ind] >= INF || lb[cl_ind] <= -INF){
+		  if(obj_diff > 0.0){
+		     if(lb[cl_ind] > -INF && ub[cr_ind] >= INF){
+			if(obj_l >= 0 && obj_r >= 0) dup_type = 1;
+		     }else if(lb[cl_ind] <= -INF && ub[cr_ind] < INF){
+			if(obj_l <= 0.0 && obj_r <= 0.0) dup_type = 2;
+		     }else if(lb[cl_ind] <= -INF && ub[cr_ind] >= INF){
+			if(obj_l >= 0.0 && obj_r <= 0.0) dup_type = 8;
+			else if(obj_l >= 0.0 && obj_r >= 0.0) dup_type = 9;
+			else if(obj_l <= 0.0 && obj_r <= 0.0) dup_type = 10;
+		     }
+		  }else{
+		     if(ub[cl_ind] >= INF && lb[cr_ind] > -INF){
+			if(obj_l >= 0 && obj_r >= 0) dup_type = 3;
+		     }else if(ub[cl_ind] < INF && lb[cr_ind] <= -INF){
+			if(obj_l <= 0.0 && obj_r <= 0.0) dup_type = 4;
+		     }else if(ub[cl_ind] >= INF && lb[cr_ind] <= -INF){
+			if(obj_l <= 0.0 && obj_r >= 0.0) dup_type = 5;
+			else if(obj_l >= 0.0 && obj_r >= 0.0) dup_type = 6;
+			else if(obj_l <= 0.0 && obj_r <= 0.0) dup_type = 7;
+		     }
+		  }
+	       }
+	    }
+	    
+	    /* fixme - check other cases! 
+	       cant iterate in this case for now */
+	    if(dup_type < 0 && !bin_type){
+	       r_ind++;
+	       continue;
+	    }
+
+	    /* so now, we have a case*/
+	    /* first check if we have same cols here */
+	    /* also check conflict if it is binary */
+
 	    in_conflict = FALSE;
 	    can_iterate = TRUE;
-	    
 	    
 	    for( k = matbeg[cl_ind], l = matbeg[cr_ind];;){
 	       if(k < matbeg[cl_ind + 1] && 
@@ -784,35 +955,36 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 			can_iterate = FALSE;
 			break;
 		     }	       
-		     if(!in_conflict){
-			new_row_lb = rows[matind[l]].lb;
-			new_row_ub = rows[matind[l]].ub;
-			if(matval[l] > 0.0){
-			   new_row_lb += matval[l];
-			}else{
-			   new_row_ub += matval[l];
+		     if(bin_type){
+			if(!in_conflict){
+			   new_row_lb = rows[matind[l]].lb;
+			   new_row_ub = rows[matind[l]].ub;
+			   if(matval[l] > 0.0){
+			      new_row_lb += matval[l];
+			   }else{
+			      new_row_ub += matval[l];
+			   }
+			   if(matval[k] > 0.0){
+			      new_row_lb += matval[k];
+			   }else{
+			      new_row_ub += matval[k];
+			   }
+			   
+			   switch(sense[matind[l]]){
+			    case 'E':
+			       if(new_row_lb > rhs[matind[l]] + etol ||
+				  new_row_ub < rhs[matind[l]] - etol){
+				  in_conflict = TRUE;
+			       }
+			       break;
+			    case 'L':
+			       if(new_row_lb > rhs[matind[l]] + etol){
+				  in_conflict = TRUE;
+			       }
+			       break;
+			   }
 			}
-			if(matval[k] > 0.0){
-			   new_row_lb += matval[k];
-			}else{
-			   new_row_ub += matval[k];
-			}
-			
-			switch(sense[matind[l]]){
-			 case 'E':
-			    if(new_row_lb > rhs[matind[l]] + etol ||
-			       new_row_ub < rhs[matind[l]] - etol){
-			       in_conflict = TRUE;
-			    }
-			    break;
-			 case 'L':
-			    if(new_row_lb > rhs[matind[l]] + etol){
-			       in_conflict = TRUE;
-			    }
-			    break;
-			}
-		     }
-		     
+		     }		     
 		  } 
 		  k++;
 		  l++;
@@ -822,32 +994,138 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 	       }
 	    }
 	    
-	    
-	    if(!can_iterate || !in_conflict){
+	    if(!can_iterate){
+	       /* so columns are not same, go back */
 	       r_ind++;
 	       continue;
+	    }
+	    
+	    /* so we have same columns, check if we can aggregate/ 
+	       delete one of them */
+
+	    /* first check if we have conflict in binary case */
+	    delete_ind = -1;
+	    if(bin_type && in_conflict){
+	       if(obj_diff > 0.0){
+		  delete_ind = cl_ind; 
+		  delete_val = 0.0;
+	       }else{
+		  delete_ind = cr_ind;
+		  delete_val = 0.0;
+	       }
+	       fix_type = FIX_BINARY;
 	    }else{
-	       if(obj[cl_ind] > obj[cr_ind]){
-		  delete_ind = cl_ind;
+	       /* so not binary or are not in conflict */
+	       /*check if we can aggregate first*/
+	       if(dup_type == 0){
+		  /* same obj, same col */
+		  /* just merge it to the one on the left and 
+		     make the one on the right invisible
+		     row bounds wont change in this case */
+		  
+		  /* first merge */
+		  /* just the bounds */
+		  if(lb[cl_ind] > -INF){
+		     if(lb[cr_ind] <= -INF){
+			lb[cl_ind] = -INF;
+		     }else{
+			lb[cl_ind] += lb[cr_ind];
+		     }
+		  }
+		  if(ub[cl_ind] < INF){
+		     if(ub[cr_ind] >= INF){
+			ub[cl_ind] = INF;
+		     }else{
+			ub[cl_ind] += ub[cr_ind];
+		     }
+		  }
+
+		  if(type_l == 'B'){
+		     cols[cl_ind].var_type = 'I';
+		  }
+
+		  stats->vars_aggregated++;
+		  /* now cleanup*/
+		  /* well just fix it to 0.0 so that we 
+		     will take care of other attr with this row*/
+		  
+		  delete_ind = cr_ind;
+		  delete_val = 0.0;
+		  fix_type = FIX_AGGREGATE;
+	       }else{
+		  if(bin_type){
+		     /* cant do anything with this pair*/
+		     r_ind++;
+		     continue;
+		  }
+		  
+		  /* now check dup_type and see what we can do */
+		  fix_type = FIX_OTHER;
+		  switch(dup_type){
+		   case 1:
+		      delete_ind = cl_ind;
+		      delete_val = lb[cl_ind];
+		      break;
+		   case 2:
+		      delete_ind = cr_ind;
+		      delete_val = ub[cr_ind];
+		      break;
+		   case 3:
+		      delete_ind = cr_ind;
+		      delete_val = lb[cr_ind];
+		      break;
+		   case 4:
+		      delete_ind = cl_ind;
+		      delete_val = ub[cl_ind];
+		      break;
+		   case 5:
+		   case 6:
+		   case 10:
+		      stats->col_unbound_ind = cr_ind;
+		      return PREP_UNBOUNDED;
+		   case 7:
+		   case 8:
+		   case 9:
+		      stats->col_unbound_ind = cl_ind;
+		      return PREP_UNBOUNDED;
+		   default:
+		      printf("error in prep_delete_duplicate_row_cols()\n");
+		      return PREP_OTHER_ERROR;
+		  }
+	       }
+	    }
+		  
+	    if(delete_ind >= 0){
+	       if(delete_ind == cl_ind){
 		  l_ind++;
 		  r_ind = l_ind + 1;
 	       }else{
-		  delete_ind = cr_ind;
 		  r_ind++;
 	       }
-	       
-	       termcode = prep_modified_cols_update_info(P, 1, &delete_ind, 
-							 -1, dive_level, 
-							 0.0, 
-							 FIX_BINARY, 
-							 TRUE, FALSE);
-	       if(prep_quit(termcode)){
-		  return termcode;
-	       }
+	       col_orig_type[col_del_cnt] = cols[delete_ind].var_type;
+	       cols[delete_ind].var_type = 'F';
+	       col_del_ind[col_del_cnt] = delete_ind;
+	       col_fix_val[col_del_cnt] = delete_val;
+	       col_fix_type[col_del_cnt++] = fix_type;	       
 	    }
 	 }
       }
+
+      /* ok, now fix each of these duplicate cols */
+      for(i = 0; i < col_del_cnt; i++){
+	 cols[col_del_ind[i]].var_type = col_orig_type[i];
+	 termcode = prep_modified_cols_update_info(P, 1, &col_del_ind[i], 
+						   -1, dive_level, 
+						   col_fix_val[i], 
+						   col_fix_type[i], 
+						   TRUE, FALSE);
+	 if(prep_quit(termcode)){
+	    return termcode;
+	 }
+      }
    }
+   
+   //  printf("Aggre cnt: %i\n", stats->vars_aggregated);
 
 #if 0
    mark_time = wall_clock(NULL);
@@ -1168,6 +1446,11 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 #endif
  
    if(check_cols){
+      FREE(col_orig_type);
+      FREE(col_del_ind);
+      FREE(col_fix_type);
+      FREE(col_fix_val);
+
       FREE(col_sum);
       FREE(col_factor);
       FREE(c_loc);
@@ -1562,7 +1845,8 @@ int prep_force_row_bounds(PREPdesc *P, int row_ind, int col_ind, int a_loc)
 	    // printf("error -2 in prep_force_row_bounds()\n");
 	    //  return PREP_OTHER_ERROR;
 	    //}	 
-	    new_bound = (double)((rhs[row_ind] - rows[row_ind].lb)/a_val);
+	    new_bound = (double)((rhs[row_ind] - rows[row_ind].lb + 
+				  lb[col_ind]*a_val)/a_val);
 	    
 	    fix_type = IMPROVE_UB;
 	    row_ub_improved = TRUE;
@@ -1578,7 +1862,8 @@ int prep_force_row_bounds(PREPdesc *P, int row_ind, int col_ind, int a_loc)
 	    //  return PREP_OTHER_ERROR;
 	    //}
 	    
-	    new_bound = (double)((rhs[row_ind] - rows[row_ind].lb)/a_val);
+	    new_bound = (double)((rhs[row_ind] - rows[row_ind].lb + 
+				  ub[col_ind]*a_val)/a_val);
 	    
 	    fix_type = IMPROVE_LB;
 	    row_ub_improved = TRUE;
@@ -1597,7 +1882,8 @@ int prep_force_row_bounds(PREPdesc *P, int row_ind, int col_ind, int a_loc)
 	    //   return PREP_OTHER_ERROR;
 	    // }
 	    
-	    new_bound = (double)((rhs[row_ind] - rows[row_ind].ub)/a_val);
+	    new_bound = (double)((rhs[row_ind] - rows[row_ind].ub + 
+				  ub[col_ind]*a_val)/a_val);
 	    
 	    fix_type = IMPROVE_LB;
 	    row_lb_improved = TRUE;	    
@@ -1613,7 +1899,8 @@ int prep_force_row_bounds(PREPdesc *P, int row_ind, int col_ind, int a_loc)
 	    //  return PREP_OTHER_ERROR;
 	    //}
 	    
-	    new_bound = (double)((rhs[row_ind] - rows[row_ind].ub)/a_val);
+	    new_bound = (double)((rhs[row_ind] - rows[row_ind].ub + 
+				  lb[col_ind]*a_val)/a_val);
 
 	    fix_type = IMPROVE_UB;
 	    row_lb_improved = TRUE;
@@ -2498,10 +2785,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
    IMPlist *imp_list;
    IMPvar *imp_var;
 
-   is_row_updated = (char *)calloc(CSIZE,mip->m);
-   row_updated_ind = (int *)malloc(ISIZE*mip->m);
-
-   /*first, if in impl mode, add these variables to current impl_list */
+    /*first, if in impl mode, add these variables to current impl_list */
    /* do this above */
    int can_iterate = FALSE;
 
@@ -2543,7 +2827,10 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
       memset(is_row_updated, FALSE, CSIZE*mip->m);
    }
 #endif 
-   
+ 
+   is_row_updated = (char *)calloc(CSIZE,mip->m);
+   row_updated_ind = (int *)malloc(ISIZE*mip->m);
+     
   
    if(intl_fix_type == FIX_ROW_LB ||
       intl_fix_type == FIX_ROW_UB){
@@ -2576,40 +2863,44 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
       old_lb = lb[col_ind];
 
       /* debug */
+#if 0      
       if(a_loc_ref > r_matbeg[row_ind + 1]){
 	 printf("error in prep_modified_cols_update_info()\n");
 	 exit(0);
       }
+#endif
 
-      a_val = r_matval[a_loc_ref + j];	 
-      if(fix_type == FIX_ROW_LB){
-	 if(a_val > etol){
-	    fixed_bound = ub[col_ind] = lb[col_ind];
-	 }else if (a_val < -etol){
-	    fixed_bound = lb[col_ind] = ub[col_ind];
+      if(fix_type == FIX_ROW_LB || fix_type == FIX_ROW_UB){
+	 a_val = r_matval[a_loc_ref + j];	 
+	 if(fix_type == FIX_ROW_LB){
+	    if(a_val > etol){
+	       fixed_bound = ub[col_ind] = lb[col_ind];
+	    }else if (a_val < -etol){
+	       fixed_bound = lb[col_ind] = ub[col_ind];
+	    }else{
+	       continue;
+	    }
+	    if(cols[col_ind].var_type == 'B'){
+	       fix_type = FIX_BINARY;
+	    }else{
+	       fix_type = FIX_OTHER;
+	    }
 	 }else{
-	    continue;
-	 }
-	 if(cols[col_ind].var_type == 'B'){
-	    fix_type = FIX_BINARY;
-	 }else{
-	    fix_type = FIX_OTHER;
-	 }
-      }else if(fix_type == FIX_ROW_UB){
-	 if(a_val > etol){
-	    fixed_bound = lb[col_ind] = ub[col_ind];
-	 }else if (a_val < -etol){
-	    fixed_bound = ub[col_ind] = lb[col_ind];
-	 }else{
-	    continue;
-	 }
-	 if(cols[col_ind].var_type == 'B'){
-	    fix_type = FIX_BINARY;
-	 }else{
-	    fix_type = FIX_OTHER;
+	    if(a_val > etol){
+	       fixed_bound = lb[col_ind] = ub[col_ind];
+	    }else if (a_val < -etol){
+	       fixed_bound = ub[col_ind] = lb[col_ind];
+	    }else{
+	       continue;
+	    }
+	    if(cols[col_ind].var_type == 'B'){
+	       fix_type = FIX_BINARY;
+	    }else{
+	       fix_type = FIX_OTHER;
+	    }
 	 }
       }else{
-	 if(fix_type != IMPROVE_LB){
+	 if(fix_type != IMPROVE_LB && fix_type != FIX_AGGREGATE){
 	    if(ub[col_ind] < fixed_bound - etol){
 	       if(!impl_mode){
 		  stats->col_infeas_ind = col_ind;
@@ -2622,7 +2913,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	    ub[col_ind] = fixed_bound;     
 	    //(stats->bounds_tightened)++;
 	 }
-	 if(fix_type != IMPROVE_UB){
+	 if(fix_type != IMPROVE_UB && fix_type != FIX_AGGREGATE){
 	    
 	    if(lb[col_ind] > fixed_bound + etol){
 	       if(!impl_mode){
@@ -2641,19 +2932,24 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
       }
       
       if(verbosity >= 3){
-	 printf("var %s [%i] bounds are improved: ",
-		mip->colname[col_ind], col_ind); 
-	 if(lb[col_ind] > -INF){
-	    printf("\t lb:%f", lb[col_ind]);
+	 if(fix_type == FIX_AGGREGATE){
+	    printf("var %s [%i] is aggregated: \n", mip->colname[col_ind],
+		   col_ind);
+	 }else{
+
+	    printf("var %s [%i] bounds are improved: ",
+		   mip->colname[col_ind], col_ind); 
+	    if(lb[col_ind] > -INF){
+	       printf("\t lb:%f", lb[col_ind]);
+	    }
+	    if(ub[col_ind] < INF){
+	       printf("\t ub:%f ", ub[col_ind]);
+	    }
+	    printf("\n");
 	 }
-	 if(ub[col_ind] < INF){
-	    printf("\t ub:%f ", ub[col_ind]);
-	 }
-	 printf("\n");
-      }
+      }      
       
-      
-      if(fix_type != FIX_BINARY){
+      if(fix_type != FIX_BINARY){	 
 	 if(prep_is_equal(ub[col_ind], lb[col_ind], etol)){
 	    if(cols[col_ind].var_type == 'B'){
 	       fix_type = FIX_BINARY;	      	    
@@ -2664,22 +2960,24 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	 } 
       }else{
 	 cols[col_ind].var_type = 'F';      
-      }
+      }      
       
       /* now add to impl list if in impl_mode */
 
-      if(impl_mode && P->impl_col_ind != col_ind){
-	 if(P->list->size < P->impl_limit){
-	    prep_add_to_impl_list(P->list, col_ind, fix_type, 
-				  fixed_bound);
-	 }	 
+      if(fix_type != FIX_AGGREGATE){
+	 if(impl_mode && P->impl_col_ind != col_ind){
+	    if(P->list->size < P->impl_limit){
+	       prep_add_to_impl_list(P->list, col_ind, fix_type, 
+				     fixed_bound);
+	    }	 
+	 }
       }
-      
-      if(cols[col_ind].var_type == 'F'){
+
+      if(cols[col_ind].var_type == 'F' && fix_type != FIX_AGGREGATE){
 	 
 	 /* first see if you can fix any other variables from the 
 	    impl list of this variable */
-
+	 
 	 if(fix_type == FIX_BINARY){
 	    if(lb[col_ind] >= 1.0 - etol){
 	       imp_list = cols[col_ind].ulist;
@@ -2714,10 +3012,12 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	    mip->mip_inf->sum_obj_offset += mip->obj[col_ind]*ub[col_ind];
 	 }
       }else{
-	 (stats->bounds_tightened)++;
+	 if(fix_type != FIX_AGGREGATE){
+	    (stats->bounds_tightened)++;
+	 }
       }
       
-      if(cols[col_ind].col_size ==0 ){
+      if(cols[col_ind].col_size == 0 ){
 	 continue;
       }else if(cols[col_ind].col_size < 0){
 	 printf("error -00 in prep_fixed_col_update_info()\n");
@@ -2727,7 +3027,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
       }
       
       end = matbeg[col_ind + 1];
-
+      
       for(i = matbeg[col_ind]; i < end; i++){
 	 if(!(rows[matind[i]].is_redundant)){	 
 	    get_row_ubounds = FALSE;
@@ -2735,7 +3035,8 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	    r_ind = matind[i];
 	    a_val = matval[i];
 	    row_updated = FALSE;
-	    if(fix_type != IMPROVE_UB && fix_type != IMPROVE_LB){
+	    if(fix_type != IMPROVE_UB && fix_type != IMPROVE_LB && 
+	       fix_type != FIX_AGGREGATE){
 	       rows[r_ind].fixed_var_num++; 
 	       if(!is_int[col_ind]){
 		  rows[r_ind].cont_var_num--;
@@ -2789,65 +3090,68 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	       }
 	    }
 	    
-	    if(a_val > etol){
-	       if(fix_type != IMPROVE_LB){
-		  if(rows[r_ind].ub < INF){
-		     /* debug */
-		     if(old_ub >= INF){
-			printf("error -1 in prep_fixed_col_update_info()\n");
-			termcode = PREP_OTHER_ERROR;
-			break;
-		     }
-		     if(fixed_bound != old_ub){
-			rows[r_ind].ub += a_val*(fixed_bound - old_ub);
-			rows[r_ind].is_updated = TRUE;
-			row_updated = TRUE;
-		     }
-		  }
-	       }
-	       if(fix_type != IMPROVE_UB){
-		  if(rows[r_ind].lb > -INF){
-		     /* debug */
-		     if(old_lb <= -INF){
-			printf("error -2 in prep_fixed_col_update_info()\n");
-			termcode = PREP_OTHER_ERROR;
-			break;
-		     }
-		     if(fixed_bound != old_lb){
-			rows[r_ind].lb += a_val*(fixed_bound - old_lb);
-			rows[r_ind].is_updated = TRUE;
-			row_updated = TRUE;
+	    if(fix_type != FIX_AGGREGATE){
+	       if(a_val > etol){
+		  if(fix_type != IMPROVE_LB){
+		     if(rows[r_ind].ub < INF){
+			/* debug */
+			if(old_ub >= INF){
+			   printf("error -1 in prep_fixed_col_update_info()\n");
+			   termcode = PREP_OTHER_ERROR;
+			   break;
+			}
+			if(fixed_bound != old_ub){
+			   rows[r_ind].ub += a_val*(fixed_bound - old_ub);
+			   rows[r_ind].is_updated = TRUE;
+			   row_updated = TRUE;
+			}
 		     }
 		  }
-	       }
-	    }else if(a_val < -etol){
-	       if(fix_type != IMPROVE_UB){	    
-		  if(rows[r_ind].ub < INF){
-		     /* debug */
-		     if(old_lb <= -INF){
-			printf("error -3 in prep_fixed_col_update_info()\n");
-			termcode = PREP_OTHER_ERROR;
-			break;
-		     }
-		     if(fixed_bound != old_lb){
-			rows[r_ind].ub += a_val*(fixed_bound - old_lb);
-			rows[r_ind].is_updated = TRUE;
-			row_updated = TRUE;
+		  if(fix_type != IMPROVE_UB && fix_type != FIX_AGGREGATE){
+		     if(rows[r_ind].lb > -INF){
+			/* debug */
+			if(old_lb <= -INF){
+			   printf("error -2 in prep_fixed_col_update_info()\n");
+			   termcode = PREP_OTHER_ERROR;
+			   break;
+			}
+			if(fixed_bound != old_lb){
+			   rows[r_ind].lb += a_val*(fixed_bound - old_lb);
+			   rows[r_ind].is_updated = TRUE;
+			   row_updated = TRUE;
+			}
 		     }
 		  }
-	       }
-	       if(fix_type != IMPROVE_LB){
-		  if(rows[r_ind].lb > -INF){
-		     /* debug */
-		     if(old_ub >= INF){
-			printf("error -4 in prep_fixed_col_update_info()\n");
-			termcode = PREP_OTHER_ERROR;
-			break;
+	       }else if(a_val < -etol){
+		  if(fix_type != IMPROVE_UB){	    
+		     if(rows[r_ind].ub < INF){
+			/* debug */
+			if(old_lb <= -INF){
+			   printf("error -3 in prep_fixed_col_update_info()\n");
+			   termcode = PREP_OTHER_ERROR;
+			   break;
+			}
+			if(fixed_bound != old_lb){
+			   rows[r_ind].ub += a_val*(fixed_bound - old_lb);
+			   rows[r_ind].is_updated = TRUE;
+			   row_updated = TRUE;
+			}
 		     }
-		     if(fixed_bound != old_ub){
-			rows[r_ind].lb += a_val*(fixed_bound - old_ub);
-			rows[r_ind].is_updated = TRUE;
-			row_updated = TRUE;
+		  }
+
+		  if(fix_type != IMPROVE_LB){
+		     if(rows[r_ind].lb > -INF){
+			/* debug */
+			if(old_ub >= INF){
+			   printf("error -4 in prep_fixed_col_update_info()\n");
+			   termcode = PREP_OTHER_ERROR;
+			   break;
+			}
+			if(fixed_bound != old_ub){
+			   rows[r_ind].lb += a_val*(fixed_bound - old_ub);
+			   rows[r_ind].is_updated = TRUE;
+			   row_updated = TRUE;
+			}
 		     }
 		  }
 	       }
@@ -2924,9 +3228,6 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	 }
       }
    }
-
-
-
 
    FREE(row_updated_ind);
    FREE(is_row_updated);

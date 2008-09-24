@@ -62,6 +62,7 @@
 #define IMPROVE_UB 4
 #define IMPROVE_LB 5
 #define IMPROVE_COEF 6
+#define FIX_AGGREGATE 7
 
 /* for a range of variables */
 #define FIX_ROW_LB 7
@@ -125,6 +126,7 @@ typedef struct PREP_STATS
    int vars_fixed;
    int coeffs_nulled;
    int bounds_integerized;
+   int vars_aggregated;
 
    /* regarding coeffs changes and bounds tightening */
 
@@ -217,14 +219,16 @@ typedef struct PREPDesc
 
    /* for logical fixing */
    int impl_limit; 
-   int impl_var_cnt; /* fixed ones */
-   int     *impl_var_ind; /* */
+   //int impl_var_cnt; /* fixed ones */
+   //int     *impl_var_ind; /* */
    char    *impl_var_stat; /* to lower or upper */
    IMPlist *list; /* the list under inspection */
    int      impl_col_ind;
    prep_stats impl_stats;
-   int      impl_del_row_cnt; 
-   int     *impl_del_row_ind; /* */
+   int      impl_row_cnt; 
+   int     *impl_row_ind; /* */
+   int      impl_var_cnt; 
+   int     *impl_var_ind; /* */
 
    ROWinfo *impl_rows; 
    COLinfo *impl_cols;
