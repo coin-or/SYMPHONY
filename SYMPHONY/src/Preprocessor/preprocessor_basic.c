@@ -834,7 +834,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 	    obj_r = obj[cr_ind];
 	    obj_diff = obj_l - obj_r;
 	    
-	    if(type_l == type_r == 'B'){
+	    if(type_l == 'B' && type_r == 'B'){
 	       bin_type = TRUE;
 	    }else{
 	       bin_type = FALSE;
