@@ -434,7 +434,7 @@ int sym_set_defaults(sym_environment *env)
    prep_par->max_aggr_row_ratio = 0.1;
    prep_par->keep_row_ordered = 1;
    prep_par->keep_track = 0;
-   prep_par->time_limit = 10;
+   prep_par->time_limit = 100;
 #endif
 
    return(termcode);

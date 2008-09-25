@@ -115,7 +115,7 @@ int prep_basic(PREPdesc *P)
    rhs = mip->rhs;
 
 
-   char *impl_vars = NULL, *impl_vars_checked = NULL;
+   char need_reset, *impl_vars = NULL, *impl_vars_checked = NULL;
    int var_ind, impl_cnt, impl_cnt_limit;
    int *ind_list = NULL, *impl_vars_weight = NULL;
    
@@ -302,17 +302,17 @@ int prep_basic(PREPdesc *P)
 	       */
 	       
 	       /* do once for each variable */
+	       mark_time = wall_clock(NULL);
 	       fix_type = FIX_NO_BOUND;
+	       need_reset = FALSE;
+	       memcpy(P->impl_rows, rows, sizeof(ROWinfo)*m); 
+	       memcpy(P->impl_cols, cols, sizeof(COLinfo)*n); 
+	       memcpy(P->impl_ub, ub, DSIZE*n);
+	       memcpy(P->impl_lb, lb, DSIZE*n);
+	       P->impl_stats = P->stats;
 	       
 	       if(cols[col_ind].sign_type != ALL_NEG_VEC){
-		  mark_time = wall_clock(NULL);
-		  memcpy(P->impl_rows, rows, sizeof(ROWinfo)*m); 
-		  memcpy(P->impl_cols, cols, sizeof(COLinfo)*n); 
-		  alloc_time += wall_clock(NULL) - mark_time;
-		  memcpy(P->impl_ub, ub, DSIZE*n);
-		  memcpy(P->impl_lb, lb, DSIZE*n);
-		  P->impl_stats = P->stats;
-		  
+		  need_reset = TRUE;
 		  if(!cols[col_ind].ulist){
 		     cols[col_ind].ulist = (IMPlist *)calloc(sizeof(IMPlist),1);
 		  }	       
@@ -330,13 +330,11 @@ int prep_basic(PREPdesc *P)
 		  //  P->params.verbosity = 3;
 		  //  impl_dive_level = 100;
 		  //}
-		  mark_time = wall_clock(NULL);
 		  termcode = prep_modified_cols_update_info(P, 1, &col_ind, -1,
 							    impl_dive_level,
 							    1.0,
 							    FIX_BINARY, TRUE, 
 							    TRUE);
-		  impl_time += wall_clock(NULL) - mark_time;
 		  //prep_delete_imp_list(&(cols[col_ind].ulist));
 		  if(termcode == PREP_INFEAS){
 		     printf("infeasibility detected!\n");
@@ -369,14 +367,14 @@ int prep_basic(PREPdesc *P)
 	       
 	       if(fix_type != FIX_BINARY && 
 		  cols[col_ind].sign_type != ALL_POS_VEC){
-		  mark_time = wall_clock(NULL);
-		  /* reset what we had */
-		  memcpy(rows, P->impl_rows,sizeof(ROWinfo)*mip->m); 
-		  memcpy(cols, P->impl_cols, sizeof(COLinfo)*mip->n); 
-		  alloc_time += wall_clock(NULL) - mark_time;		  
-		  memcpy(ub, P->impl_ub, DSIZE*mip->n);
-		  memcpy(lb, P->impl_lb, DSIZE*mip->n);
-		  P->stats = P->impl_stats;
+		  if(need_reset){
+		     /* reset what we had */
+		     memcpy(rows, P->impl_rows,sizeof(ROWinfo)*mip->m); 
+		     memcpy(cols, P->impl_cols, sizeof(COLinfo)*mip->n); 
+		     memcpy(ub, P->impl_ub, DSIZE*mip->n);
+		     memcpy(lb, P->impl_lb, DSIZE*mip->n);
+		     P->stats = P->impl_stats;
+		  }
 		  if(!cols[col_ind].llist){
 		     cols[col_ind].llist = 
 			(IMPlist *)calloc(sizeof(IMPlist),1);
@@ -385,12 +383,10 @@ int prep_basic(PREPdesc *P)
 		  P->list = cols[col_ind].llist;	      
 		  P->impl_col_ind = col_ind;
 
-		  mark_time = wall_clock(NULL);
 		  termcode = prep_modified_cols_update_info(P, 1, &col_ind, -1,
 							    impl_dive_level,
 							    0.0, FIX_BINARY, 
 							    TRUE, TRUE);
-		  impl_time += wall_clock(NULL) - mark_time;
 		  if(termcode == PREP_INFEAS){
 		     printf("infeasibility detected!\n");
 		     /*then this column is fixable to its lower bound! */
@@ -411,6 +407,8 @@ int prep_basic(PREPdesc *P)
 	       
 	       /* and now check if we can fix anything */
 	       //prep_delete_imp_list(&(cols[col_ind].llist));	       
+	       
+	       impl_time += wall_clock(NULL) - mark_time;
 	       if(fix_type == FIX_BINARY){
 		  termcode = prep_modified_cols_update_info(P, 1, 
 							    &col_ind, -1, 

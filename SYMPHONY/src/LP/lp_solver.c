@@ -4059,9 +4059,6 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	(par->generate_cgl_landp_cuts == GENERATE_PERIODICALLY &&
 	 (lp_data->lp_count % par->generate_cgl_landp_cuts_freq == 0)) ||
 	 is_top_iter){
-
-
-
 	/* make basis ready first */
 	termcode = dual_simplex(lp_data, &iterd); 
 	/* 	if(termcode != 0){ 
