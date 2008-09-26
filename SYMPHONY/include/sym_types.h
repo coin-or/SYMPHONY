@@ -408,6 +408,7 @@ typedef struct LP_STAT{
    /* LP solver */
    int         lp_calls;
    int         lp_sols;
+   int         str_br_lp_calls; /* no of calls from strong branching */
 
    /* cuts */
    int         cuts_generated;

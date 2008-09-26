@@ -846,6 +846,8 @@ void print_statistics(node_times *tim, problem_stat *stat,
               "%i\n",lp_stat->lp_calls);
       printf ("Number of calls from feasibility pump:          "
               "%i\n",lp_stat->fp_lp_calls);
+      printf ("Number of calls from strong branching:          "
+              "%i\n",lp_stat->str_br_lp_calls);
       printf ("Number of solutions found by LP solve:          "
               "%i\n",lp_stat->lp_sols);
       printf ("\n==================== Feasibility Pump =====================");

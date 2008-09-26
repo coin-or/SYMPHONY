@@ -1969,6 +1969,7 @@ void lp_close(lp_prob *p)
       p->comp_times.dupes_and_bad_coeffs_in_cuts;
 
    p->tm->lp_stat.lp_calls                += p->lp_stat.lp_calls;
+   p->tm->lp_stat.str_br_lp_calls         += p->lp_stat.str_br_lp_calls;
    p->tm->lp_stat.lp_sols                 += p->lp_stat.lp_sols;
 
    p->tm->lp_stat.cuts_generated          += p->lp_stat.cuts_generated;
