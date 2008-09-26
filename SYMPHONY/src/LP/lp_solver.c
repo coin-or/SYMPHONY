@@ -3545,7 +3545,7 @@ void write_sav(LPdata *lp_data, char *fname)
 #include "sym_qsort.h"
 
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
-		       char send_to_pool, int bc_index, int bc_level,
+		       char send_to_pool, int bc_index, int bc_level, 
                        int *bnd_changes,
                        lp_stat_desc *lp_stat, node_times *comp_times,
                        int verbosity)
@@ -3610,6 +3610,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
          lp_stat->probing_cuts_root, &should_generate);
    if (should_generate==TRUE) {
       CglProbing *probe = new CglProbing;
+      probe->setRowCuts(3); 
+      //TODO: probe->setUsingObjective()
       if ((bc_level<6 && comp_times->probing_cuts>comp_times->lp) || 
           (bc_level>6 && comp_times->probing_cuts>comp_times->lp/10)) {
          /* since we are not using cgltreeinfo, 
@@ -3764,6 +3766,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       CglKnapsackCover *knapsack = new CglKnapsackCover;
       if (bc_level<6) {
          knapsack->setMaxInKnapsack(1000); // default is 50
+         knapsack->switchOnExpensive(); // default is 50
       } 
       knapsack->generateCuts(*si, cutlist);
       if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {
