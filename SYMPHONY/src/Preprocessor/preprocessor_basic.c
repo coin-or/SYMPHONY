@@ -6323,9 +6323,11 @@ int prep_cleanup_desc(PREPdesc *P)
 	    rows[i].is_redundant = TRUE;
 	    new_del_cnt++;
 	 }else{      
-	    rows[row_num] = rows[i];
+	    if(i != row_num){
+	       rows[row_num] = rows[i];
+	       sense[row_num] = sense[i];
+	    }
 	    rhs[row_num] = rhs[i] - rows[i].fixed_lhs_offset;
-	    sense[row_num] = sense[i];
 	    row_num++;
 	 }
       }
