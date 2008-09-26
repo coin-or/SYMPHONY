@@ -6276,9 +6276,11 @@ int prep_cleanup_desc(PREPdesc *P)
 	    ub[col_num] = ub[i];
 	    lb[col_num] = lb[i];
 	    is_int[col_num] = is_int[i];
-	    cols[col_num] = cols[i];
+	    if(col_num != i){
+	       cols[col_num] = cols[i];
+	       strcpy(colnames[col_num], colnames[i]);
+	    }
 	    cols[col_num].col_size = col_nz - matbeg[col_num];
-	    strcpy(colnames[col_num], colnames[i]);
 	    old_start = matbeg[i+1];
 	    matbeg[(++col_num)] = col_nz;
 	    /* debug */
