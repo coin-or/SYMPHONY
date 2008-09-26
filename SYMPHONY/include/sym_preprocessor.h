@@ -65,8 +65,8 @@
 #define FIX_AGGREGATE 7
 
 /* for a range of variables */
-#define FIX_ROW_LB 7
-#define FIX_ROW_UB 8
+#define FIX_ROW_LB 8
+#define FIX_ROW_UB 9
 
 /* status of a variable in sr problem */
 #define SR_VAR_IN 0
@@ -251,7 +251,10 @@ typedef struct PREPDesc
    /* will need for sorting etc */
    int * user_col_ind;
    int * user_row_ind;
-
+   double alloc2_time;
+   double impl_array_time;
+   double impl_cols_time;
+   double impl_rows_time;
 }PREPdesc;
 
 
