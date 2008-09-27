@@ -3078,6 +3078,10 @@ int copy_lp_data(LPdata *lp_data, LPdata *new_data)
    ub = (double *)malloc(n*DSIZE);
 
    open_lp_solver(new_data);
+   /* Turn off the OSI messages (There are LOTS of them) */
+   new_data->si->setHintParam(OsiDoReducePrint);
+   new_data->si->messageHandler()->setLogLevel(0);
+
    new_data->si->loadProblem(*(si->getMatrixByRow()),
                              si->getColLower(),
                              si->getColUpper(),
@@ -3118,6 +3122,16 @@ void delete_rows(LPdata *lp_data, int deletable, int *free_rows)
    lp_data->si->deleteRows(delnum, which);
    lp_data->nz = lp_data->si->getNumElements();
    lp_data->m -= delnum;
+}
+
+/*===========================================================================*/
+
+void delete_rows_with_ind(LPdata *lp_data, int deletable, int *rowind)
+{
+   
+   lp_data->si->deleteRows(deletable, rowind);
+   lp_data->nz = lp_data->si->getNumElements();
+   lp_data->m -= deletable;
 }
 
 /*===========================================================================*/
@@ -3546,7 +3560,7 @@ void write_sav(LPdata *lp_data, char *fname)
 
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 		       char send_to_pool, int bc_index, int bc_level, 
-                       int *bnd_changes,
+                       int node_iter_num, double ub, int *bnd_changes,
                        lp_stat_desc *lp_stat, node_times *comp_times,
                        int verbosity)
 {
@@ -3589,11 +3603,13 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
     * TODO: take this loop outside, should not be called in every call of
     * generate_cgl_cuts
     */
-   for (i = 0; i < n; i++) {
-      if (vars[i]->is_int) { // integer or binary
-	 si->setInteger(i);
-      }
-   }  
+   if (node_iter_num < 2) {
+      for (i = 0; i < n; i++) {
+         if (vars[i]->is_int) { // integer or binary
+            si->setInteger(i);
+         }
+      }  
+   }
    /* TODO: move these to vars[i]->... */
    //get_bounds(lp_data);
    //memcpy(newLower,lp_data->lb,DSIZE*n);
@@ -3611,7 +3627,11 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    if (should_generate==TRUE) {
       CglProbing *probe = new CglProbing;
       probe->setRowCuts(3); 
-      //TODO: probe->setUsingObjective()
+      if (ub < SYM_INFINITY/10) {
+         probe->setUsingObjective(1);
+      } else {
+         probe->setUsingObjective(0);
+      }
       if ((bc_level<6 && comp_times->probing_cuts>comp_times->lp) || 
           (bc_level>6 && comp_times->probing_cuts>comp_times->lp/10)) {
          /* since we are not using cgltreeinfo, 
@@ -3766,7 +3786,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       CglKnapsackCover *knapsack = new CglKnapsackCover;
       if (bc_level<6) {
          knapsack->setMaxInKnapsack(1000); // default is 50
-         knapsack->switchOnExpensive(); // default is 50
+         knapsack->switchOffExpensive(); // seems to get into infinite loop if 
+                                         // turned on
       } 
       knapsack->generateCuts(*si, cutlist);
       if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {

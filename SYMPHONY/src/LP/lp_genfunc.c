@@ -1068,9 +1068,11 @@ int check_tailoff(lp_prob *p)
       }
       obj_hist[0] = p->lp_data->objval;
 
-      if (p->bc_index == 0 && p->node_iter_num < p->par.min_root_cut_rounds) {
-         p->has_tailoff = FALSE;
-         return (FALSE);
+      if (p->bc_index == 0) {
+         if (p->node_iter_num < p->par.min_root_cut_rounds) {
+            p->has_tailoff = FALSE;
+            return (FALSE);
+         }
       }
 
       /* if there is an upper bound and we want gap based tailoff:

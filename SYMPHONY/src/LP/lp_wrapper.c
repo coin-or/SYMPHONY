@@ -2212,9 +2212,11 @@ int generate_cuts_in_lp_u(lp_prob *p)
 #ifdef USE_CGL_CUTS
       if (p->par.cgl.generate_cgl_cuts){
          int bound_changes = 0;
+         double ub = p->has_ub ? p->ub : SYM_INFINITY;
 	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
-			   p->bc_index, p->bc_level, &bound_changes, 
-                           &(p->lp_stat), &(p->comp_times), p->par.verbosity);
+			   p->bc_index, p->bc_level, p->node_iter_num,
+                           ub, &bound_changes, &(p->lp_stat), &(p->comp_times),
+                           p->par.verbosity);
          if (bound_changes>0) {
             p->bound_changes_in_iter += bound_changes;
          }

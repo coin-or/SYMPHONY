@@ -2523,6 +2523,12 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
    
+   else if (strcmp(key, "min_root_cut_rounds") == 0 ||
+	    strcmp(key, "LP_min_root_cut_rounds") == 0){
+      READ_INT_PAR(lp_par->min_root_cut_rounds);
+      return(0);
+   }
+   
    /* variable fixing parameters */
    else if (strcmp(key, "do_reduced_cost_fixing") == 0 ||
 	    strcmp(key, "LP_do_reduced_cost_fixing") == 0){

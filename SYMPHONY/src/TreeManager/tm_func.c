@@ -580,6 +580,7 @@ void print_tree_status(tm_prob *tm)
 {
    int i;
    double elapsed_time;
+   double obj_ub = SYM_INFINITY, obj_lb = -SYM_INFINITY;
 
 #ifdef SHOULD_SHOW_MEMORY_USAGE
    int pid;
@@ -668,13 +669,15 @@ void print_tree_status(tm_prob *tm)
 
    printf("done: %i ", tm->stat.analyzed);
    printf("left: %i ", tm->samephase_candnum);
-   if (tm->has_ub){
+   if (tm->has_ub) {
       if (tm->obj_sense == SYM_MAXIMIZE){
-	 printf("lb: %.2f ", -tm->ub);
+         obj_lb = -tm->ub + tm->obj_offset;
+	 printf("lb: %.2f ", obj_lb);
       }else{
-	 printf("ub: %.2f ", tm->ub);
+         obj_ub = tm->ub + tm->obj_offset;
+	 printf("ub: %.2f ", obj_ub);
       }
-   }else{
+   } else {
       if (tm->obj_sense == SYM_MAXIMIZE){
 	 printf("lb: ?? ");
       }else{
@@ -683,14 +686,15 @@ void print_tree_status(tm_prob *tm)
    }
    find_tree_lb(tm);
    if (tm->obj_sense == SYM_MAXIMIZE){
-      printf("ub: %.2f ", -tm->lb);
+      obj_ub = -tm->lb + tm->obj_offset;
+      printf("ub: %.2f ", obj_ub);
    }else{
-      printf("lb: %.2f ", tm->lb);
+      obj_lb = tm->lb + tm->obj_offset;
+      printf("lb: %.2f ", obj_lb);
    }
       
    if (tm->has_ub && tm->ub){
-      printf("gap: %.2f ",
-	     fabs(100*(tm->ub-tm->lb)/tm->ub));
+      printf("gap: %.2f ", fabs(100*(obj_ub-obj_lb)/obj_ub));
    }
    printf("time: %i\n", (int)(elapsed_time));
 #if 0

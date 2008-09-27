@@ -273,6 +273,7 @@ void change_objcoeff(LPdata *lp_data, const int* indexFirst,
 void get_rhs_rng_sense(LPdata *lp_data);
 int copy_lp_data(LPdata *lp_data, LPdata *new_data);
 void delete_rows PROTO((LPdata *lp_data, int deletable, int *free_rows));
+void delete_rows_with_ind PROTO((LPdata *lp_data, int deletable, int *rowind));
 int delete_cols PROTO((LPdata *lp_data, int delnum, int *delstat));
 void release_var PROTO((LPdata *lp_data, int j, int where_to_move));
 void free_row_set PROTO((LPdata *lp_data, int length, int *index));
@@ -285,7 +286,8 @@ void write_mip_desc_lp PROTO((MIPdesc *mip, char *fname));
 void write_sav PROTO((LPdata *lp_data, char *fname));
 #ifdef USE_CGL_CUTS
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
-		       char send_to_pool, int bc_index, int bc_level,
+		       char send_to_pool, int bc_index, int bc_level, 
+                       int node_iter_limit, double ub,
                        int *bnd_changes,
                        lp_stat_desc *lp_stat, node_times *comp_times,
                        int verbosity);

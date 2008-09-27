@@ -293,7 +293,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    new_lp_data->lpetol = lp_data->lpetol;
    int n = lp_data->n;
    int m = lp_data->m;
-   int i;
+   int i, k, *outrhsind;
    //int *rstat,*cstat;
 
    double one=1.0;
@@ -314,12 +314,27 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    double *mip_obj = fp_data->mip_obj;
    int verbosity = fp_data->verbosity;
    int *index_list;
+   int fp_max_length_cuts = 200;
+   row_data *rows = lp_data->rows;
 
    /* used because we can not call si directly */
    copy_lp_data(lp_data,new_lp_data);
    new_lp_data->si->setupForRepeatedUse(3,0);
    lp_lb = new_lp_data->lb;
    lp_ub = new_lp_data->ub;
+
+   /* delete cuts that are long as they slow down the lp */
+   outrhsind = (int *)calloc(m, ISIZE);
+   k = 0;
+   for (i = p->base.cutnum; i < m; i++){
+      if (((int *)rows[i].cut->coef)[0] > fp_max_length_cuts) {
+         outrhsind[k] = i;
+         k++;
+      }
+   }
+   PRINT(verbosity, 5, ("feasibility pump: cuts discarded = %d\n", k));
+   delete_rows_with_ind(new_lp_data, k, outrhsind);
+   m -= k;
 
    /* set up fp_data */
    fp_data->alpha           = 0.8;
@@ -440,6 +455,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    FREE(rmatind);
    FREE(cmatbeg);
    FREE(rmatbeg);
+   FREE(outrhsind);
 
    return termcode;
 }
