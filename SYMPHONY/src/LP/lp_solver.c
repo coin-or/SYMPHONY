@@ -4126,6 +4126,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       int num_discarded_cuts = 0;
       int *tmp_matind = lp_data->tmp.i1;
       int *is_deleted = (int *) calloc(cutlist.sizeRowCuts(), ISIZE);
+      double *hashes  = (double *) malloc(cutlist.sizeRowCuts()* DSIZE);
       int num_elements, num_elements2;
       int *indices, *indices2;
       double *elements, *elements2;
@@ -4133,6 +4134,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       int discard_cut, is_duplicate;
       double rhs, rhs2;
       const double max_elements = (bc_level < 1) ? 1000 : 100;
+      double hash_value;
+      double *random_hash = lp_data->random_hash;
          
       if (*cuts){
 	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+cutlist.sizeRowCuts())
@@ -4162,8 +4165,10 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	 /* 
 	  * Find the largest and the smallest non-zero coeffs to test the
 	  * numerical stability of the cut
+          * also calculate the hash value
 	  */
 
+         hash_value = 0;
 	 for (int el_num=0; el_num<num_elements; el_num++) {
 	    if (fabs(elements[el_num])>max_coeff) {
 	       max_coeff = fabs(elements[el_num]);
@@ -4172,6 +4177,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	       min_coeff = fabs(elements[el_num]);
 	    }
 	    tmp_matind[el_num] = vars[indices[el_num]]->userind;
+            hash_value += elements[el_num]*random_hash[tmp_matind[el_num]];
 	 }
          /* see rhs as well */
          if (fabs(rhs) > lpetol) {
@@ -4209,35 +4215,25 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
             continue;
          }
 
-
-
          /* check for duplicates */
          if (num_elements>0) {
             is_duplicate = FALSE;
             /* check against last 50 cuts only. otherwise, takes a lot of time
              */
-            for (k = j-1; k > MAX(-1,j-51); k--) {
+            /* for (k = j-1; k > MAX(-1,j-51); k--) */
+            for (k=j-1; k>-1; k--) {
                num_elements2 = ((int *) ((*cuts)[k]->coef))[0];
                rhs2 = (*cuts)[k]->rhs;
                if (num_elements2 != num_elements || 
-                   fabs(rhs2 - rhs) > lpetol) {
+                   fabs(rhs2 - rhs) > lpetol || 
+                   fabs(hashes[k]-hash_value) > lpetol) {
                   continue;
                } else {
-                  elements2 = (double *) ((*cuts)[k]->coef + DSIZE);
-                  indices2 = (int *) ((*cuts)[k]->coef +
-				      (num_elements + 1) * DSIZE);
-                  for (l = 0; l < num_elements; l++) {
-                     if (indices2[l] != indices[l] || 
-                         fabs(elements2[l]-elements[l]) > lpetol) {
-                        break;
-                     }
-                  }
-                  if (l>=num_elements) {
-                     break;
-                  } 
+                  break;
                }
             }
-            if (k>MAX(-1,i-51)) {
+            /* if (k>MAX(-1,i-51)) */
+            if (k>-1) {
                is_deleted[i] = TRUE;
                PRINT(verbosity,5,("cut #%d is same as accepted cut #%d\n",i,k));
                num_duplicate_cuts++;
@@ -4251,6 +4247,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 	    FREE((*cuts)[j]);
 	    continue; /* This must be a bug. */
 	 }
+         hashes[j] = hash_value;
+         PRINT(verbosity, 12, ("Cut #%i: accepted as cut number %i\n", i, j));
 
 	 (*cuts)[j]->rhs = rhs;
 	 (*cuts)[j]->range = cut.range();
@@ -4284,6 +4282,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       }
       lp_stat->num_duplicate_cuts += num_duplicate_cuts;
       FREE(is_deleted);
+      FREE(hashes);
    }
 
    sizeColCuts = cutlist.sizeColCuts();
