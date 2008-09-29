@@ -377,6 +377,14 @@ int fathom_branch(lp_prob *p)
 	  * receive the cuts from the cut generator and the cut pool
 	 \*------------------------------------------------------------------*/
 
+#ifdef USE_SYM_APPLICATION
+            if ((cut_term = receive_cuts(p, first_in_loop,
+                        no_more_cuts_count)) >=0 ){
+               cuts += cut_term;
+            }else{
+               return(ERROR__USER);
+            }
+#else
          if (!check_tailoff(p)) {
             if ((cut_term = receive_cuts(p, first_in_loop,
                         no_more_cuts_count)) >=0 ){
@@ -385,6 +393,7 @@ int fathom_branch(lp_prob *p)
                return(ERROR__USER);
             }
          }
+#endif
       }
 
       comp_times->lp += used_time(&p->tt);

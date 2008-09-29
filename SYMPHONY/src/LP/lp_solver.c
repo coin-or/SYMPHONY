@@ -155,6 +155,8 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
          lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->status);
          lp_data->status = (char *) malloc(lp_data->maxn * CSIZE);
+         FREE(lp_data->random_hash);
+         lp_data->random_hash = (double *) malloc(lp_data->maxn * DSIZE);
 #ifdef __CPLEX__
 	 FREE(lp_data->lb);
 	 lp_data->lb = (double *) malloc(lp_data->maxn * DSIZE);
@@ -168,6 +170,8 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
                                           lp_data->maxn * DSIZE);
          lp_data->status = (char *) realloc((char *)lp_data->status,
                                             lp_data->maxn * CSIZE);
+         lp_data->random_hash = (double *) realloc((char *)lp_data->random_hash,
+                                         lp_data->maxn * DSIZE);
 #ifdef __CPLEX__
 	 lp_data->lb = (double *) realloc((char *)lp_data->lb,
 					  lp_data->maxn * DSIZE);
@@ -4203,6 +4207,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
             PRINT(verbosity,5,("Threw out cut.\n\n\n"));
             continue;
          }
+
+
 
          /* check for duplicates */
          if (num_elements>0) {

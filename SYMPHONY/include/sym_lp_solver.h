@@ -180,6 +180,7 @@ typedef struct LPDATA{
    int        maxm;
    int        nz;          /* number of nonzeros */
    int        maxnz;       /* space is allocated for this many nonzeros */
+   double    *random_hash;
 
    char       ordering;    /* COLIND_AND_USERIND_ORDERED, COLIND_ORDERED or
 			      USERIND_ORDERED */

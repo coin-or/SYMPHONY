@@ -181,7 +181,7 @@ int create_subproblem_u(lp_prob *p)
 
    int *d_uind = NULL, *d_cind = NULL; /* just to keep gcc quiet */
 
-   double *rhs, *rngval;
+   double *rhs, *rngval, *darray;
    char *sense, *status;
    cut_data *cut;
    branch_desc *bobj;
@@ -427,6 +427,14 @@ int create_subproblem_u(lp_prob *p)
    if (maxnz < lp_data->nz) maxnz = lp_data->nz;
 
    size_lp_arrays(lp_data, FALSE, TRUE, maxm, maxn, maxnz);
+   
+   /* generate the random hash. useful for checking duplicacy of cuts and 
+    * solutions from feasibility pump
+    */
+   darray = lp_data->random_hash;
+   for (i=0; i<lp_data->n; i++) {
+      darray[i] = CoinDrand48();
+   }
 
    if (lp_data->maxn > lp_data->n){
       vars = lp_data->vars = (var_desc **)
@@ -1126,6 +1134,7 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
 				   p->slack_cuts, lp_data->n, lp_data->vars, 
 				   lp_data->x, lp_data->status, cand_num, 
 				   candidates, &action);
+   check_tailoff(p);
 #else
    user_res = USER_DEFAULT;
 #endif
