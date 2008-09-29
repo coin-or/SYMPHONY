@@ -55,6 +55,7 @@ void free_lp_arrays(LPdata *lp_data)
    FREE(lp_data->dj);
    FREE(lp_data->dualsol);
    FREE(lp_data->slacks);
+   FREE(lp_data->random_hash);
 #ifdef __CPLEX__
    FREE(lp_data->lb);
    FREE(lp_data->ub);
