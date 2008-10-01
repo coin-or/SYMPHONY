@@ -864,34 +864,36 @@ void print_statistics(node_times *tim, problem_stat *stat,
       printf ("total cuts generated:                  %d\n",
             lp_stat->cuts_generated);
       printf ("total gomory cuts generated:           %d\n",
-            lp_stat->gomory_cuts_generated);
+            lp_stat->gomory_cuts);
       printf ("total knapsack cuts generated:         %d\n",
-            lp_stat->knapsack_cuts_generated);
+            lp_stat->knapsack_cuts);
       printf ("total oddhole cuts generated:          %d\n",
-            lp_stat->oddhole_cuts_generated);
+            lp_stat->oddhole_cuts);
       printf ("total clique cuts generated:           %d\n",
-            lp_stat->clique_cuts_generated);
+            lp_stat->clique_cuts);
       printf ("total probing cuts generated:          %d\n",
-            lp_stat->probing_cuts_generated);
+            lp_stat->probing_cuts);
       printf ("total mir cuts generated:              %d\n",
-            lp_stat->mir_cuts_generated);
+            lp_stat->mir_cuts);
       printf ("total twomir cuts generated:           %d\n",
-            lp_stat->twomir_cuts_generated);
+            lp_stat->twomir_cuts);
       printf ("total flow and cover cuts generated:   %d\n",
-            lp_stat->flow_and_cover_cuts_generated);
+            lp_stat->flow_and_cover_cuts);
       printf ("total rounding cuts generated:         %d\n",
-            lp_stat->rounding_cuts_generated);
+            lp_stat->rounding_cuts);
       printf ("total lift and project cuts generated: %d\n",
-            lp_stat->lift_and_project_cuts_generated);
+            lp_stat->lift_and_project_cuts);
       printf ("total landp cuts generated:            %d\n",
-            lp_stat->landp_cuts_generated);
+            lp_stat->landp_cuts);
      
       printf ("\n");
 
       printf ("cuts removed because of bad coeffs:    %d\n",
-            lp_stat->num_discarded_cuts);
+            lp_stat->num_poor_cuts);
       printf ("cuts removed because of duplicacy:     %d\n",
             lp_stat->num_duplicate_cuts);
+      printf ("insufficiently violated cuts:          %d\n",
+            lp_stat->num_unviolated_cuts);
       
       printf ("\n");
 

@@ -2222,16 +2222,19 @@ int generate_cuts_in_lp_u(lp_prob *p)
       if (p->par.cgl.generate_cgl_cuts){
          int bound_changes = 0;
          double ub = p->has_ub ? p->ub : SYM_INFINITY;
+         /*
 	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
-			   p->bc_index, p->bc_level, p->node_iter_num,
+			   p->bc_index, p->bc_level, p->node_iter_num, 
+                            p->par.max_cut_num_per_iter_root,
                            ub, &bound_changes, &(p->lp_stat), &(p->comp_times),
                            p->par.verbosity);
+                           */
+         generate_cgl_cuts_new(p, &new_row_num, &cuts, FALSE, &bound_changes);
          if (bound_changes>0) {
             p->bound_changes_in_iter += bound_changes;
          }
 	 if(p->bc_index < 1 && p->iter_num == 1 ){
-	    p->par.cgl = 
-	       lp_data->cgl;
+	    p->par.cgl = lp_data->cgl;
 	 }
       }
 #endif

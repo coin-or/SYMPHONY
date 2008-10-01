@@ -196,6 +196,16 @@
 #define INTERNAL_CUT_GEN           -3
 #define EXTERNAL_CUT_GEN           -4
 
+
+/* --------------- type of cgl cut generator --------------------------------*/
+#define CGL_PROBING_GENERATOR       0
+#define CGL_KNAPSACK_GENERATOR      1
+#define CGL_CLIQUE_GENERATOR        2
+#define CGL_GOMORY_GENERATOR        3
+#define CGL_TWOMIR_GENERATOR        4
+#define CGL_FLOWCOVER_GENERATOR     5
+#define CGL_NUM_GENERATORS          6
+
 /*---------------- what is the status of a particular constraint ------------*/
 #define VIOLATED_ROW                0
 #define TIGHT_ROW                   1

@@ -288,12 +288,16 @@ void write_sav PROTO((LPdata *lp_data, char *fname));
 #ifdef USE_CGL_CUTS
 void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 		       char send_to_pool, int bc_index, int bc_level, 
-                       int node_iter_limit, double ub,
-                       int *bnd_changes,
+                       int node_iter_limit, int max_cuts_before_resolve,
+                       double ub, int *bnd_changes,
                        lp_stat_desc *lp_stat, node_times *comp_times,
                        int verbosity);
-int should_generate_this_cgl_cut(int generation_flag, int freq, int bc_level, 
-      int bc_index, int cuts_in_root, int *should_generate);
+int check_cuts(OsiCuts &cutlist, LPdata *lp_data, int bc_level, int
+      *num_cuts, cut_data ***cuts, char send_to_pool, int *bnd_changes, 
+      lp_stat_desc *lp_stat, node_times *compe_times, int verbosity);
+int should_generate_this_cgl_cut(int cut_num, int max_cuts_before_resolve, 
+      int generation_flag, int freq, int bc_level, int bc_index, 
+      int cuts_in_root, int *should_generate);
 /*
 void generate_cgl_cuts PROTO((LPdata * lp_data, int *num_cuts,
 			      cut_data ***cuts, char send_to_pool,

@@ -412,18 +412,18 @@ typedef struct LP_STAT{
 
    /* cuts */
    int         cuts_generated;
-   int         gomory_cuts_generated;
-   int         knapsack_cuts_generated;
-   int         oddhole_cuts_generated;
-   int         clique_cuts_generated;
-   int         probing_cuts_generated;
-   int         mir_cuts_generated;
-   int         twomir_cuts_generated;
-   int         flow_and_cover_cuts_generated;
-   int         rounding_cuts_generated;
-   int         lift_and_project_cuts_generated;
-   int         landp_cuts_generated;
-   int         redsplit_cuts_generated;
+   int         gomory_cuts;
+   int         knapsack_cuts;
+   int         oddhole_cuts;
+   int         clique_cuts;
+   int         probing_cuts;
+   int         mir_cuts;
+   int         twomir_cuts;
+   int         flow_and_cover_cuts;
+   int         rounding_cuts;
+   int         lift_and_project_cuts;
+   int         landp_cuts;
+   int         redsplit_cuts;
    
    int         cuts_root;
    int         gomory_cuts_root;
@@ -439,8 +439,9 @@ typedef struct LP_STAT{
    int         landp_cuts_root;
    int         redsplit_cuts_root;
    
-   int         num_discarded_cuts;
+   int         num_poor_cuts;
    int         num_duplicate_cuts;
+   int         num_unviolated_cuts;
 
    /* feasibility pump */
    int         fp_calls;

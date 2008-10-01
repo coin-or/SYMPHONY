@@ -282,7 +282,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->later_lp.all_cuts_time_out = 0;
    lp_par->max_cut_num_per_iter = 20;
    lp_par->max_cut_num_per_iter_root = 500;
-   lp_par->min_root_cut_rounds = 5;
+   lp_par->min_root_cut_rounds = 100;
    lp_par->do_reduced_cost_fixing = TRUE;
    lp_par->gap_as_ub_frac = .1;
    lp_par->gap_as_last_gap_frac = .7;
