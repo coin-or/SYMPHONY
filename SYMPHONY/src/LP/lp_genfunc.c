@@ -270,7 +270,6 @@ int fathom_branch(lp_prob *p)
       get_dj_pi(lp_data);
       get_slacks(lp_data);
       get_x(lp_data);
-      lp_data->si->writeLp("lp.lp");
       
       /* display the current solution */
       if (p->mip->obj_sense == SYM_MAXIMIZE){
