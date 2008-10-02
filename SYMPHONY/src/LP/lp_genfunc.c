@@ -1976,7 +1976,7 @@ void lp_close(lp_prob *p)
    p->tm->comp_times.twomir_cuts      += p->comp_times.twomir_cuts;
    p->tm->comp_times.rounding_cuts    += p->comp_times.rounding_cuts;
    p->tm->comp_times.landp_cuts       += p->comp_times.landp_cuts;
-   p->tm->comp_times.flow_and_cover_cuts += p->comp_times.flow_and_cover_cuts;
+   p->tm->comp_times.flowcover_cuts   += p->comp_times.flowcover_cuts;
    p->tm->comp_times.lift_and_project_cuts += 
       p->comp_times.lift_and_project_cuts;
    p->tm->comp_times.redsplit_cuts += p->comp_times.redsplit_cuts;
@@ -1997,7 +1997,7 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.twomir_cuts             += p->lp_stat.twomir_cuts;
    p->tm->lp_stat.rounding_cuts           += p->lp_stat.rounding_cuts;
    p->tm->lp_stat.landp_cuts              += p->lp_stat.landp_cuts;
-   p->tm->lp_stat.flow_and_cover_cuts     += p->lp_stat.flow_and_cover_cuts;
+   p->tm->lp_stat.flowcover_cuts          += p->lp_stat.flowcover_cuts;
    p->tm->lp_stat.lift_and_project_cuts   += p->lp_stat.lift_and_project_cuts;
    p->tm->lp_stat.redsplit_cuts           += p->lp_stat.redsplit_cuts;
 
@@ -2011,8 +2011,7 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.twomir_cuts_root        += p->lp_stat.twomir_cuts_root;
    p->tm->lp_stat.rounding_cuts_root      += p->lp_stat.rounding_cuts_root;
    p->tm->lp_stat.landp_cuts_root         += p->lp_stat.landp_cuts_root;
-   p->tm->lp_stat.flow_and_cover_cuts_root += 
-      p->lp_stat.flow_and_cover_cuts_root;
+   p->tm->lp_stat.flowcover_cuts_root     += p->lp_stat.flowcover_cuts_root;
    p->tm->lp_stat.lift_and_project_cuts_root += 
       p->lp_stat.lift_and_project_cuts_root;
    p->tm->lp_stat.redsplit_cuts_root += 
@@ -2021,6 +2020,19 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.num_poor_cuts           += p->lp_stat.num_poor_cuts;
    p->tm->lp_stat.num_duplicate_cuts      += p->lp_stat.num_duplicate_cuts;
    p->tm->lp_stat.num_unviolated_cuts     += p->lp_stat.num_unviolated_cuts;
+
+   p->tm->lp_stat.gomory_calls            += p->lp_stat.gomory_calls;
+   p->tm->lp_stat.knapsack_calls          += p->lp_stat.knapsack_calls;
+   p->tm->lp_stat.oddhole_calls           += p->lp_stat.oddhole_calls;
+   p->tm->lp_stat.clique_calls            += p->lp_stat.clique_calls;
+   p->tm->lp_stat.probing_calls           += p->lp_stat.probing_calls;
+   p->tm->lp_stat.mir_calls               += p->lp_stat.mir_calls;
+   p->tm->lp_stat.twomir_calls            += p->lp_stat.twomir_calls;
+   p->tm->lp_stat.rounding_calls          += p->lp_stat.rounding_calls;
+   p->tm->lp_stat.landp_calls             += p->lp_stat.landp_calls;
+   p->tm->lp_stat.flowcover_calls         += p->lp_stat.flowcover_calls;
+   p->tm->lp_stat.lift_and_project_calls  += p->lp_stat.lift_and_project_calls;
+   p->tm->lp_stat.redsplit_calls          += p->lp_stat.redsplit_calls;
 
    p->tm->lp_stat.fp_calls                += p->lp_stat.fp_calls;
    p->tm->lp_stat.fp_lp_calls             += p->lp_stat.fp_lp_calls;
@@ -2123,18 +2135,33 @@ int update_cut_parameters(lp_prob *p)
       }
    }
 
-   /* flow and cover cuts */
-   if (par->generate_cgl_flow_and_cover_cuts == GENERATE_IF_IN_ROOT && 
-       lp_stat.flow_and_cover_cuts_root<1) {
-      par->generate_cgl_flow_and_cover_cuts_freq = -1;
+   /* cliques cuts */
+   if (par->generate_cgl_clique_cuts == GENERATE_IF_IN_ROOT && 
+       lp_stat.clique_cuts_root<1) {
+      par->generate_cgl_clique_cuts_freq = -1;
    }
-   if (par->generate_cgl_flow_and_cover_cuts == GENERATE_DEFAULT) {
-      if (lp_stat.flow_and_cover_cuts_root<1) {
-         data_par->generate_cgl_flow_and_cover_cuts_freq = 
-              par->generate_cgl_flow_and_cover_cuts_freq = -1;
+   if (par->generate_cgl_probing_cuts == GENERATE_DEFAULT) {
+      if (lp_stat.probing_cuts_root<1) {
+         data_par->generate_cgl_clique_cuts_freq = 
+              par->generate_cgl_clique_cuts_freq = 200;
       } else {
-         data_par->generate_cgl_flow_and_cover_cuts_freq = 
-              par->generate_cgl_flow_and_cover_cuts_freq = 100;
+         data_par->generate_cgl_clique_cuts_freq = 
+              par->generate_cgl_clique_cuts_freq = 10;
+      }
+   }
+
+   /* flow and cover cuts */
+   if (par->generate_cgl_flowcover_cuts == GENERATE_IF_IN_ROOT && 
+       lp_stat.flowcover_cuts_root<1) {
+      par->generate_cgl_flowcover_cuts_freq = -1;
+   }
+   if (par->generate_cgl_flowcover_cuts == GENERATE_DEFAULT) {
+      if (lp_stat.flowcover_cuts_root<1) {
+         data_par->generate_cgl_flowcover_cuts_freq = 
+              par->generate_cgl_flowcover_cuts_freq = -1;
+      } else {
+         data_par->generate_cgl_flowcover_cuts_freq = 
+              par->generate_cgl_flowcover_cuts_freq = 100;
       }
    }
 
@@ -2177,7 +2204,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 {
 #ifdef USE_CGL_CUTS
    int *should_generate = (int *) malloc(CGL_NUM_GENERATORS*ISIZE);
-   int i, should_stop = FALSE;
+   int i, should_stop = FALSE, repeat_with_long = TRUE, max_cut_length;
    double **hash_values;
    OsiCuts cutlist;
    const int n                 = p->lp_data->n;
@@ -2192,6 +2219,10 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
       }  
    }
 
+   max_cut_length = p->par.max_cut_length;
+   if (p->par.tried_long_cuts == TRUE) {
+      repeat_with_long = FALSE;
+   }
    for (i=0; i<CGL_NUM_GENERATORS; i++) {
       generate_cgl_cut_of_type(p, i, &cutlist);
       check_and_add_cgl_cuts(p, i, cuts, num_cuts, bound_changes, &cutlist, 
@@ -2200,7 +2231,15 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
       if (should_stop == TRUE) {
          break;
       }
+      if (i==CGL_NUM_GENERATORS-1 && p->bc_index < 1 && *num_cuts < 1 && 
+            repeat_with_long == TRUE) {
+         p->par.max_cut_length = 1000;
+         i = 0;
+         repeat_with_long = FALSE;
+         p->par.tried_long_cuts = TRUE;
+      }
    }
+   p->par.max_cut_length = max_cut_length;
 
    FREE(should_generate);
 #endif
@@ -2237,13 +2276,34 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          } else if (param == GENERATE_PERIODICALLY && bc_index % freq != 0) {
             *should_generate = FALSE;
             break;
-         } 
+         } else if (param == GENERATE_DEFAULT) {
+            if (p->bc_index > 0) {
+               if (p->comp_times.probing_cuts > p->comp_times.lp/5) {
+                  *should_generate = FALSE;
+                  break;
+               }
+            } else {
+               if (p->lp_stat.probing_cuts > p->lp_stat.cuts_generated/2
+                   && p->comp_times.probing_cuts > p->comp_times.lp) {
+                  p->par.cgl.probing_is_expensive = TRUE;
+                  *should_generate = FALSE;
+                  break;
+               } else if (p->lp_stat.probing_cuts <= 
+                     p->lp_stat.cuts_generated/2 && 
+                     p->comp_times.probing_cuts > p->comp_times.lp/4) {
+                  p->par.cgl.probing_is_expensive = TRUE;
+                  *should_generate = FALSE;
+                  break;
+               }
+            }
+         }
+
          probing->setRowCuts(3); 
          probing->setMode(2);
          if (p->has_ub) {
             probing->setUsingObjective(1);
          }
-         if (is_root_node == TRUE) {
+         if (is_root_node == TRUE && !p->par.cgl.probing_is_expensive) {
             probing->setMaxPass(10); /* default is 3 */
             probing->setMaxPassRoot(10); /* default is 3 */
             probing->setMaxElements(10000);  /* default is 1000 */
@@ -2254,6 +2314,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             probing->setMaxProbeRoot(200);   /* default is 100 */
          }
          *should_generate = TRUE;
+         p->lp_stat.probing_calls++;
          break;
       }
     case CGL_CLIQUE_GENERATOR:
@@ -2280,6 +2341,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          *should_generate = TRUE;
          clique->setStarCliqueReport(FALSE);
          clique->setRowCliqueReport(FALSE);
+         p->lp_stat.clique_calls++;
          break;
       }
     case CGL_KNAPSACK_GENERATOR:
@@ -2304,8 +2366,9 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             break;
          } 
          *should_generate = TRUE;
-         knapsack->setMaxInKnapsack(1000); // default is 50
+         knapsack->setMaxInKnapsack(p->par.max_cut_length); // default is 50
          knapsack->switchOffExpensive(); // gets into infinite loop if on 
+         p->lp_stat.knapsack_calls++;
          break;
       }
     case CGL_GOMORY_GENERATOR:
@@ -2329,7 +2392,9 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             *should_generate = FALSE;
             break;
          } 
+         gomory->setLimit(p->par.max_cut_length);
          *should_generate = TRUE;
+         p->lp_stat.gomory_calls++;
          break;
       }
     case CGL_TWOMIR_GENERATOR:
@@ -2354,15 +2419,16 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             break;
          } 
          *should_generate = TRUE;
-         twomir->setMaxElements(100);
+         twomir->setMaxElements(p->par.max_cut_length);
          twomir->setCutTypes (TRUE, TRUE, TRUE, TRUE);
+         p->lp_stat.twomir_calls++;
          break;
       }
     case CGL_FLOWCOVER_GENERATOR:
       {
          CglFlowCover *flowcover = (CglFlowCover *)generator;
-         int param = p->par.cgl.generate_cgl_flow_and_cover_cuts;
-         int freq  = p->par.cgl.generate_cgl_flow_and_cover_cuts_freq;
+         int param = p->par.cgl.generate_cgl_flowcover_cuts;
+         int freq  = p->par.cgl.generate_cgl_flowcover_cuts_freq;
          if (param < 0) {
             *should_generate = FALSE;
             break;
@@ -2381,6 +2447,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          } 
          *should_generate = TRUE;
          flowcover->setNumFlowCuts(0); //needs to be called because static
+         p->lp_stat.flowcover_calls++;
          break;
       }
    }
@@ -2470,7 +2537,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p)
          }
          delete flowcover;
          cut_time     = used_time(&total_time);
-         p->comp_times.flow_and_cover_cuts += cut_time;
+         p->comp_times.flowcover_cuts += cut_time;
          break;
       }
    }
@@ -2486,7 +2553,8 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    int          i, j, k, num_row_cuts, num_col_cuts, *is_deleted, num_elements,
                 *indices, discard_cut, num_poor_quality = 0, num_unviolated = 0,
                 num_duplicate = 0, *cut_size, *matind; 
-   const int    max_elements = 100, verbosity = p->par.verbosity;
+   const int    max_elements = p->par.max_cut_length, 
+                verbosity = p->par.verbosity;
    LPdata       *lp_data = p->lp_data;
    int          *tmp_matind = lp_data->tmp.i1;
    double       *hashes, *elements, rhs, max_coeff, min_coeff, hash_value, 
@@ -2722,6 +2790,10 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    p->lp_stat.num_poor_cuts += num_poor_quality;
    p->lp_stat.num_unviolated_cuts += num_unviolated;
    p->lp_stat.cuts_generated += num_row_cuts;
+   if (p->bc_level<1) {
+      p->lp_stat.cuts_root   += num_row_cuts;
+   }
+
    switch (generator) {
     case (CGL_PROBING_GENERATOR):
       p->lp_stat.probing_cuts += num_row_cuts;
@@ -2754,9 +2826,9 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       }
       break;
     case (CGL_FLOWCOVER_GENERATOR):
-      p->lp_stat.flow_and_cover_cuts += num_row_cuts;
+      p->lp_stat.flowcover_cuts += num_row_cuts;
       if (p->bc_level<1) {
-         p->lp_stat.flow_and_cover_cuts_root += num_row_cuts;
+         p->lp_stat.flowcover_cuts_root += num_row_cuts;
       }
       break;
    }

@@ -1148,8 +1148,8 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
    int verbosity = p->par.verbosity;
    //verbosity = 20;
 
-   if (p->bc_level<p->par.strong_br_all_candidates_level) {
-      allowed_time = 2*p->comp_times.lp - p->comp_times.strong_branching;
+   if (p->bc_level<1) {
+      allowed_time = 20*p->comp_times.lp/p->iter_num;
       if (allowed_time < 2) {
          allowed_time = 2;
       }

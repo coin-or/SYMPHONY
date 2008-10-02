@@ -283,6 +283,8 @@ int sym_set_defaults(sym_environment *env)
    lp_par->max_cut_num_per_iter = 20;
    lp_par->max_cut_num_per_iter_root = 500;
    lp_par->min_root_cut_rounds = 100;
+   lp_par->tried_long_cuts = FALSE;
+   lp_par->max_cut_length = 100;
    lp_par->do_reduced_cost_fixing = TRUE;
    lp_par->gap_as_ub_frac = .1;
    lp_par->gap_as_last_gap_frac = .7;
@@ -299,10 +301,12 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.generate_cgl_probing_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_mir_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_twomir_cuts = GENERATE_ONLY_IN_ROOT;
-   lp_par->cgl.generate_cgl_flow_and_cover_cuts = GENERATE_DEFAULT;
+   lp_par->cgl.generate_cgl_flowcover_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_rounding_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_lift_and_project_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_landp_cuts = DO_NOT_GENERATE;
+
+   lp_par->cgl.probing_is_expensive = FALSE;
 
    lp_par->cgl.generate_cgl_gomory_cuts_freq = 
       lp_par->cgl.generate_cgl_redsplit_cuts_freq = 
@@ -312,7 +316,7 @@ int sym_set_defaults(sym_environment *env)
       lp_par->cgl.generate_cgl_probing_cuts_freq = 
       lp_par->cgl.generate_cgl_mir_cuts_freq = 
       lp_par->cgl.generate_cgl_twomir_cuts_freq = 
-      lp_par->cgl.generate_cgl_flow_and_cover_cuts_freq = 
+      lp_par->cgl.generate_cgl_flowcover_cuts_freq = 
       lp_par->cgl.generate_cgl_rounding_cuts_freq = 
       lp_par->cgl.generate_cgl_lift_and_project_cuts_freq = 
       lp_par->cgl.generate_cgl_landp_cuts_freq = 5;
@@ -325,7 +329,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.mir_generated_in_root = FALSE;
    lp_par->cgl.twomir_generated_in_root = FALSE;
    lp_par->cgl.clique_generated_in_root = FALSE;
-   lp_par->cgl.flow_and_cover_generated_in_root = FALSE;
+   lp_par->cgl.flowcover_generated_in_root = FALSE;
    lp_par->cgl.rounding_generated_in_root = FALSE;
    lp_par->cgl.lift_and_project_generated_in_root = FALSE;
    lp_par->cgl.landp_generated_in_root = FALSE;
@@ -5190,6 +5194,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
       *value = lp_par->min_root_cut_rounds;
       return(0);
    }
+   else if (strcmp(key, "max_cut_length") == 0) {
+      *value = lp_par->max_cut_length;
+      return(0);
+   }
    
    /* variable fixing params */
    else if (strcmp(key, "do_reduced_cost_fixing") == 0 ||
@@ -5252,9 +5260,9 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
      *value = lp_par->cgl.generate_cgl_twomir_cuts;
      return(0);
    }
-   else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
-	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts") == 0){
-      *value = lp_par->cgl.generate_cgl_flow_and_cover_cuts;
+   else if (strcmp(key, "generate_cgl_flowcover_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flowcvber_cuts") == 0){
+      *value = lp_par->cgl.generate_cgl_flowcover_cuts;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_rounding_cuts") == 0 ||
@@ -5312,9 +5320,9 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
      *value = lp_par->cgl.generate_cgl_twomir_cuts_freq;
      return(0);
    }
-   else if (strcmp(key, "generate_cgl_flow_and_cover_cuts_freq") == 0 ||
-	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts_freq") == 0){
-      *value = lp_par->cgl.generate_cgl_flow_and_cover_cuts_freq;
+   else if (strcmp(key, "generate_cgl_flowcover_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flowcvber_cuts_freq") == 0){
+      *value = lp_par->cgl.generate_cgl_flowcover_cuts_freq;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_rounding_cuts_freq") == 0 ||

@@ -878,7 +878,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
       printf ("total twomir cuts generated:           %d\n",
             lp_stat->twomir_cuts);
       printf ("total flow and cover cuts generated:   %d\n",
-            lp_stat->flow_and_cover_cuts);
+            lp_stat->flowcover_cuts);
       printf ("total rounding cuts generated:         %d\n",
             lp_stat->rounding_cuts);
       printf ("total lift and project cuts generated: %d\n",
@@ -914,7 +914,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
       printf ("twomir cuts in root:                   %d\n",
             lp_stat->twomir_cuts_root);
       printf ("flow and cover cuts in root:           %d\n",
-            lp_stat->flow_and_cover_cuts_root);
+            lp_stat->flowcover_cuts_root);
       printf ("rounding cuts in root:                 %d\n",
             lp_stat->rounding_cuts_root);
       printf ("lift and project cuts in root:         %d\n",
@@ -924,31 +924,32 @@ void print_statistics(node_times *tim, problem_stat *stat,
      
       printf ("\n");
       
-      printf ("time in cut generation:                %.2f\n", tim->cuts);
-      printf ("time in gomory cuts:                   %.2f\n", 
-            tim->gomory_cuts);
-      printf ("time in knapsack cuts:                 %.2f\n",
-            tim->knapsack_cuts);
-      printf ("time in oddhole cuts:                  %.2f\n", 
-            tim->oddhole_cuts);
-      printf ("time in clique cuts:                   %.2f\n", 
-            tim->clique_cuts);
-      printf ("time in probing cuts:                  %.2f\n", 
-            tim->probing_cuts);
-      printf ("time in mir cuts:                      %.2f\n", tim->mir_cuts);
-      printf ("time in twomir cuts:                   %.2f\n", 
-            tim->twomir_cuts);
-      printf ("time in flow and cover cuts:           %.2f\n",
-            tim->flow_and_cover_cuts);
-      printf ("time in rounding cuts:                 %.2f\n",
-            tim->rounding_cuts);
-      printf ("time in lift and project cuts:         %.2f\n",
-            tim->lift_and_project_cuts);
-      printf ("time in landp cuts:                    %.2f\n", 
-            tim->landp_cuts);
-      printf ("time in redsplit cuts:                 %.2f\n", 
-            tim->redsplit_cuts);
-      printf ("time in checking quality and adding:   %.2f\n", 
+      printf ("time in cut generation: %.2f\n", tim->cuts);
+      printf ("time in gomory cuts in %d calls: %.2f\n", 
+            lp_stat->gomory_calls, tim->gomory_cuts);
+      printf ("time in knapsack cuts in %d calls: %.2f\n",
+            lp_stat->knapsack_calls, tim->knapsack_cuts);
+      printf ("time in oddhole cuts in %d calls: %.2f\n", 
+            lp_stat->oddhole_calls, tim->oddhole_cuts);
+      printf ("time in clique cuts in %d calls: %.2f\n", 
+            lp_stat->clique_calls, tim->clique_cuts);
+      printf ("time in probing cuts in %d calls: %.2f\n", 
+            lp_stat->probing_calls, tim->probing_cuts);
+      printf ("time in mir cuts in %d calls: %.2f\n", 
+            lp_stat->mir_calls, tim->mir_cuts);
+      printf ("time in twomir cuts in %d calls: %.2f\n", 
+            lp_stat->twomir_calls, tim->twomir_cuts);
+      printf ("time in flow and cover cuts in %d calls: %.2f\n",
+            lp_stat->flowcover_calls, tim->flowcover_cuts);
+      printf ("time in rounding cuts in %d calls: %.2f\n",
+            lp_stat->rounding_calls, tim->rounding_cuts);
+      printf ("time in lift and project cuts in %d calls: %.2f\n",
+            lp_stat->lift_and_project_calls, tim->lift_and_project_cuts);
+      printf ("time in landp cuts in %d calls: %.2f\n", 
+            lp_stat->landp_calls, tim->landp_cuts);
+      printf ("time in redsplit cuts in %d calls: %.2f\n", 
+            lp_stat->redsplit_calls, tim->redsplit_cuts);
+      printf ("time in checking quality and adding: %.2f\n", 
             tim->dupes_and_bad_coeffs_in_cuts);
      
    }

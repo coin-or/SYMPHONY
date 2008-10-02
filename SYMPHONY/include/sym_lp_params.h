@@ -39,7 +39,7 @@ typedef struct CGL_PARAMS{
    int               generate_cgl_mir_cuts;
    int               generate_cgl_twomir_cuts;
    int               generate_cgl_clique_cuts;
-   int               generate_cgl_flow_and_cover_cuts;
+   int               generate_cgl_flowcover_cuts;
    int               generate_cgl_rounding_cuts;
    int               generate_cgl_lift_and_project_cuts;
    int               generate_cgl_landp_cuts;
@@ -52,7 +52,7 @@ typedef struct CGL_PARAMS{
    int               generate_cgl_mir_cuts_freq;
    int               generate_cgl_twomir_cuts_freq;
    int               generate_cgl_clique_cuts_freq;
-   int               generate_cgl_flow_and_cover_cuts_freq;
+   int               generate_cgl_flowcover_cuts_freq;
    int               generate_cgl_rounding_cuts_freq;
    int               generate_cgl_lift_and_project_cuts_freq;
    int               generate_cgl_landp_cuts_freq;
@@ -65,10 +65,12 @@ typedef struct CGL_PARAMS{
    int               mir_generated_in_root;
    int               twomir_generated_in_root;
    int               clique_generated_in_root;
-   int               flow_and_cover_generated_in_root;
+   int               flowcover_generated_in_root;
    int               rounding_generated_in_root;
    int               lift_and_project_generated_in_root;
    int               landp_generated_in_root;
+
+   int               probing_is_expensive;
 }cgl_params;
 
 typedef struct LP_PARAMS{
@@ -140,6 +142,8 @@ typedef struct LP_PARAMS{
    int               max_cut_num_per_iter;
    int               max_cut_num_per_iter_root;
    int               min_root_cut_rounds;
+   int               max_cut_length;
+   int               tried_long_cuts;
 
    /* Reduced cost and logical fixing parameters */
    int               do_reduced_cost_fixing;

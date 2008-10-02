@@ -2529,6 +2529,12 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
    
+   else if (strcmp(key, "max_cut_length") == 0 ||
+	    strcmp(key, "LP_max_cut_length") == 0){
+      READ_INT_PAR(lp_par->max_cut_length);
+      return(0);
+   }
+
    /* variable fixing parameters */
    else if (strcmp(key, "do_reduced_cost_fixing") == 0 ||
 	    strcmp(key, "LP_do_reduced_cost_fixing") == 0){
@@ -2611,7 +2617,13 @@ int set_param(sym_environment *env, char *line)
 
    else if (strcmp(key, "generate_cgl_flow_and_cover_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_flow_and_cover_cuts") == 0){
-      READ_INT_PAR(lp_par->cgl.generate_cgl_flow_and_cover_cuts);
+      READ_INT_PAR(lp_par->cgl.generate_cgl_flowcover_cuts);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_flowcover_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flowcover_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_flowcover_cuts);
       return(0);
    }
 
@@ -2676,8 +2688,14 @@ int set_param(sym_environment *env, char *line)
    }
 
    else if (strcmp(key, "generate_cgl_flow_and_cover_cuts_freq") == 0 ||
-	    strcmp(key, "LP_generate_cgl_flow_and_cvber_cuts_freq") == 0){
-      READ_INT_PAR(lp_par->cgl.generate_cgl_flow_and_cover_cuts_freq);
+	    strcmp(key, "LP_generate_cgl_flow_and_cover_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_flowcover_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_flowcover_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_flowcover_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_flowcover_cuts_freq);
       return(0);
    }
 

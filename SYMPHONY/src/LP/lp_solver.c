@@ -3598,7 +3598,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    par->mir_generated_in_root                   = TRUE;
    par->twomir_generated_in_root                = FALSE;
    par->clique_generated_in_root                = FALSE;
-   par->flow_and_cover_generated_in_root        = TRUE;
+   par->flowcover_generated_in_root             = TRUE;
    par->rounding_generated_in_root              = FALSE;
    par->lift_and_project_generated_in_root      = FALSE;
    par->landp_generated_in_root                 = FALSE;
@@ -3790,9 +3790,9 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
 
    /* create CGL flow cover cuts */
    should_generate_this_cgl_cut(cut_num, max_cuts_before_resolve, 
-         par->generate_cgl_flow_and_cover_cuts, 
-         par->generate_cgl_flow_and_cover_cuts_freq, bc_level, bc_index, 
-         lp_stat->flow_and_cover_cuts_root, &should_generate);
+         par->generate_cgl_flowcover_cuts, 
+         par->generate_cgl_flowcover_cuts_freq, bc_level, bc_index, 
+         lp_stat->flowcover_cuts_root, &should_generate);
    if (should_generate==TRUE) {
       CglFlowCover *flow = new CglFlowCover;
       /* numFlowCuts_ is a static variable! needs to be reset */
@@ -3800,22 +3800,22 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
       flow->generateCuts(*(lp_data->si), cutlist);
       if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {
          if (is_top_iter){
-            par->flow_and_cover_generated_in_root = TRUE;
+            par->flowcover_generated_in_root = TRUE;
          }
          PRINT(verbosity, 4,
                ("%i flow cover cuts added\n", new_cut_num));
          lp_stat->cuts_generated += new_cut_num;
-         lp_stat->flow_and_cover_cuts += new_cut_num;
+         lp_stat->flowcover_cuts += new_cut_num;
          if (is_rootnode) {
             lp_stat->cuts_root   += new_cut_num;
-            lp_stat->flow_and_cover_cuts_root += new_cut_num;
+            lp_stat->flowcover_cuts_root += new_cut_num;
          }
       }
       cut_num = cutlist.sizeCuts();       
       delete flow;
       cut_time = used_time(&total_time);
       comp_times->cuts += cut_time;
-      comp_times->flow_and_cover_cuts += cut_time;
+      comp_times->flowcover_cuts += cut_time;
    }
 
    /* create CGL twomir cuts */

@@ -311,7 +311,7 @@ typedef struct NODE_TIMES{
    double        probing_cuts;
    double        mir_cuts;
    double        twomir_cuts;
-   double        flow_and_cover_cuts;
+   double        flowcover_cuts;
    double        rounding_cuts;
    double        lift_and_project_cuts;
    double        landp_cuts;
@@ -419,7 +419,7 @@ typedef struct LP_STAT{
    int         probing_cuts;
    int         mir_cuts;
    int         twomir_cuts;
-   int         flow_and_cover_cuts;
+   int         flowcover_cuts;
    int         rounding_cuts;
    int         lift_and_project_cuts;
    int         landp_cuts;
@@ -433,7 +433,7 @@ typedef struct LP_STAT{
    int         probing_cuts_root;
    int         mir_cuts_root;
    int         twomir_cuts_root;
-   int         flow_and_cover_cuts_root;
+   int         flowcover_cuts_root;
    int         rounding_cuts_root;
    int         lift_and_project_cuts_root;
    int         landp_cuts_root;
@@ -442,6 +442,19 @@ typedef struct LP_STAT{
    int         num_poor_cuts;
    int         num_duplicate_cuts;
    int         num_unviolated_cuts;
+
+   int         gomory_calls;
+   int         knapsack_calls;
+   int         oddhole_calls;
+   int         clique_calls;
+   int         probing_calls;
+   int         mir_calls;
+   int         twomir_calls;
+   int         flowcover_calls;
+   int         rounding_calls;
+   int         lift_and_project_calls;
+   int         landp_calls;
+   int         redsplit_calls;
 
    /* feasibility pump */
    int         fp_calls;

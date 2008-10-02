@@ -1093,7 +1093,7 @@ int save_root_reduced_costs(lp_prob *p)
    if (!tm->reduced_costs) {
       tm->reduced_costs = (rc_desc *) malloc(sizeof(rc_desc));
       rc = tm->reduced_costs;
-      rc->size    = 50;
+      rc->size    = 10;
       rc->num_rcs = 0;
       rc->indices = (int **)calloc(rc->size,sizeof(int *));
       rc->values  = (double **)calloc(rc->size,sizeof(double *));
@@ -1105,23 +1105,23 @@ int save_root_reduced_costs(lp_prob *p)
       rc = tm->reduced_costs;
    }
 
+   pos = rc->num_rcs%rc->size;
    if (rc->size==rc->num_rcs) {
-      rc->size   += 50;
-      rc->indices = (int **)realloc(rc->indices,rc->size*sizeof(int *));
-      rc->values  = (double **)realloc(rc->values,rc->size*sizeof(double *));
-      rc->lb      = (double **)realloc(rc->lb,rc->size*sizeof(double *));
-      rc->ub      = (double **)realloc(rc->ub,rc->size*sizeof(double *));
-      rc->obj     = (double *)realloc(rc->obj,rc->size*DSIZE);
-      rc->cnt     = (int *)realloc(rc->cnt,rc->size*ISIZE);
+      /* replace the oldest one with the new one */
+      FREE(rc->indices[pos]);
+      FREE(rc->values[pos]);
+      FREE(rc->lb[pos]);
+      FREE(rc->ub[pos]);
    }
-   pos = rc->num_rcs;
    rc->indices[pos] = indices;
    rc->values[pos] = values;
    rc->lb[pos] = lb;
    rc->ub[pos] = ub;
    rc->cnt[pos] = cnt;
    rc->obj[pos] = p->lp_data->objval;
-   rc->num_rcs++;
+   if (rc->num_rcs < rc->size) {
+      rc->num_rcs++;
+   }
    return 0;
 }
 
