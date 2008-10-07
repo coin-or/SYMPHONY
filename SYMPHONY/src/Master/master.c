@@ -360,6 +360,10 @@ int sym_set_defaults(sym_environment *env)
    lp_par->user_set_max_presolve_iter = FALSE;
    lp_par->strong_br_all_candidates_level = 6;
    lp_par->use_hot_starts = TRUE;
+   lp_par->should_use_rel_br = TRUE;
+   lp_par->rel_br_threshold = 8;
+   lp_par->rel_br_cand_threshold = 10; // stop doing strong branching if last 
+                                       // 10 strong branchings didnt help.
    lp_par->compare_candidates_default = HIGH_LOW_COMBINATION;
    lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
@@ -5400,6 +5404,18 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    }
    else if (strcmp(key,"use_hot_starts") == 0) {
       *value = lp_par->use_hot_starts;
+      return(0);
+   }
+   else if (strcmp(key,"rel_br_threshold") == 0) {
+      *value = lp_par->rel_br_threshold;
+      return(0);
+   }
+   else if (strcmp(key,"rel_br_cand_threshold") == 0) {
+      *value = lp_par->rel_br_cand_threshold;
+      return(0);
+   }
+   else if (strcmp(key,"should_use_rel_br") == 0) {
+      *value = lp_par->should_use_rel_br;
       return(0);
    }
    else if (strcmp(key, "compare_candidates_default") == 0 ||

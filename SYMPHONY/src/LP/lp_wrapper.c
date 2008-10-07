@@ -513,6 +513,26 @@ int create_subproblem_u(lp_prob *p)
       desc->cuts = NULL;
    }
 
+   /* reliability branching */
+   /* pseudo costs and reliability measures */
+   if (p->tm->pcost_down==NULL) {
+      p->pcost_down = (double *)calloc(p->mip->n, DSIZE);
+      p->pcost_up = (double *)calloc(p->mip->n, DSIZE);
+      p->br_rel_down = (int *)calloc(p->mip->n, ISIZE);
+      p->br_rel_up = (int *)calloc(p->mip->n, ISIZE);
+      p->br_rel_cand_list = (int *)calloc(p->mip->n, ISIZE);
+      p->tm->pcost_down = p->pcost_down;
+      p->tm->pcost_up = p->pcost_up;
+      p->tm->br_rel_down = p->br_rel_down;
+      p->tm->br_rel_up = p->br_rel_up;
+      p->tm->br_rel_cand_list = p->br_rel_cand_list;
+   } else {
+      p->pcost_down = p->tm->pcost_down;
+      p->pcost_up = p->tm->pcost_up;
+      p->br_rel_down = p->tm->br_rel_down;
+      p->br_rel_up = p->tm->br_rel_up;
+   }
+
    /*------------------------------------------------------------------------*\
     * Now go through the branching stuff
    \*----------------------------------------------------------------------- */

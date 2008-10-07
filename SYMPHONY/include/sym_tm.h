@@ -115,6 +115,13 @@ typedef struct TM_PROB{
    lp_stat_desc    lp_stat;         
    rc_desc        *reduced_costs;
 
+   /* pseudo costs and reliability measures */
+   double         *pcost_down;
+   double         *pcost_up;
+   int            *br_rel_down;
+   int            *br_rel_up;
+   int            *br_rel_cand_list;
+
    /* some temporary stuff */
    bc_node      ***rpath;
    int            *rpath_size;

@@ -147,6 +147,14 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    double total_time = 0;
    double st_time = 0;
    int total_iters, should_continue;
+   int should_use_rel_br = p->par.should_use_rel_br;
+   double high, low, down_obj, up_obj, best_var_score;
+   int *br_rel_down = p->br_rel_down;
+   int *br_rel_up = p->br_rel_up;
+   double *pcost_down = p->pcost_down;
+   double *pcost_up = p->pcost_up;
+   int rel_threshold = 8;
+   int best_var;
 
    /*------------------------------------------------------------------------*\
     * First we call select_candidates_u() to select candidates. It can
@@ -266,394 +274,492 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    //printf("lp time = %f\n",p->comp_times.lp);
    //printf ("used time = %f\n",p->tt);
    //printf ("str time = %f\n",p->comp_times.strong_branching);
-   for (i=0; i<cand_num; i++){
-      can = candidates[i];
+
+   if (should_use_rel_br==TRUE) {
+      double *x = lp_data->x;
+      double var_score, best_up_obj, best_down_obj;
+      int full_solves = 0, best_up_is_est, best_down_is_est, down_is_est, 
+          up_is_est, max_solves_before_break = p->par.rel_br_cand_threshold, 
+          stop_solving = FALSE;
+      best_var = -1;
+      best_var_score = -SYM_INFINITY;
+      for (i=0; i<cand_num; i++) {
+         branch_var = p->br_rel_cand_list[i];
+         lb = vars[branch_var]->new_lb;
+         ub = vars[branch_var]->new_ub;
+
+         //calculate the score for each candidate variable.
+         if (br_rel_down[branch_var] > rel_threshold) {
+            down_obj = oldobjval + pcost_down[branch_var] * (x[branch_var] -
+                  floor(x[branch_var]));
+            down_is_est = TRUE;
+         } else {
+            if (stop_solving == TRUE) {
+               continue;
+            }
+            strong_branch(lp_data, branch_var, lb, ub, lb, 
+                  floor(x[branch_var]), &down_obj);
+            down_is_est = FALSE;
+            // update pcost
+            if (down_obj < SYM_INFINITY/10) {
+               pcost_down[branch_var] = (pcost_down[branch_var]*
+                  br_rel_down[branch_var] + (down_obj - oldobjval)/
+                  (x[branch_var]-floor(x[branch_var])))/
+                  (br_rel_down[branch_var] + 1);
+               br_rel_down[branch_var]++;
+            }
+            p->lp_stat.lp_calls++;
+            p->lp_stat.str_br_lp_calls++;
+            full_solves++;
+         }
+         if (br_rel_up[branch_var] > rel_threshold) {
+            up_obj   = oldobjval + pcost_up[branch_var] * (ceil(x[branch_var])
+                  - x[branch_var]);
+            up_is_est = TRUE;
+         } else {
+            if (stop_solving == TRUE) {
+               continue;
+            }
+            strong_branch(lp_data, branch_var, lb, ub, ceil(x[branch_var]), 
+                  ub, &up_obj);
+            up_is_est = FALSE;
+            // update pcost
+            if (up_obj < SYM_INFINITY/10) {
+               pcost_up[branch_var] = (pcost_up[branch_var]*
+                  br_rel_up[branch_var] + (up_obj - oldobjval)/
+                  (ceil(x[branch_var])-x[branch_var]))/
+                  (br_rel_up[branch_var] + 1);
+               br_rel_up[branch_var]++;
+            }
+            p->lp_stat.lp_calls++;
+            p->lp_stat.str_br_lp_calls++;
+            full_solves++;
+         }
+
+         if (down_obj < up_obj) {
+            low = down_obj;
+            high = up_obj;
+         } else {
+            low = up_obj;
+            high = down_obj;
+         }
+         var_score = 0.8 * low + 0.2 * high;
+         if (var_score > best_var_score) {
+            best_var_score = var_score;
+            best_var = branch_var;
+            best_can = candidates[0];
+            best_can->position = branch_var;
+            best_can->solutions = NULL;
+            best_can->sol_inds = NULL;
+            best_can->sol_sizes = NULL;
+            best_can->sense[0] = 'L';
+            best_can->sense[1] = 'G';
+            best_can->objval[0] = (down_is_est == TRUE) ? oldobjval : down_obj;
+            best_can->objval[1] = (up_is_est == TRUE) ? oldobjval : up_obj;
+            best_can->rhs[0] = floor(x[best_var]);
+            best_can->rhs[1] = ceil(x[best_var]);
+            if (down_is_est != TRUE || up_is_est != TRUE) {
+               full_solves = 0;
+            }
+         }
+         if (full_solves > max_solves_before_break) {
+            printf("breaking because of no gain at iter %d\n", i);
+            stop_solving = TRUE;
+         }
+      }
+      //printf("reliability branching: selected var %d with score %f\n", best_var, best_var_score);
+      cand_num = 1;
+   } else {
+      /* do the default symphony branching */
+      for (i=0; i<cand_num; i++){
+         can = candidates[i];
 
 #ifndef MAX_CHILDREN_NUM
-      can->objval = pobj;
-      can->termcode = pterm;
-      can->feasible = pfeas;
-      can->iterd = piter;
-      if (p->tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	 can->solutions = (double **) calloc(maxnum, sizeof(double *));	
-	 can->sol_inds = (int **) calloc(maxnum, sizeof(int *));	
-	 can->sol_size = (int *) calloc(maxnum, ISIZE);	
-      }
+         can->objval = pobj;
+         can->termcode = pterm;
+         can->feasible = pfeas;
+         can->iterd = piter;
+         if (p->tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+            can->solutions = (double **) calloc(maxnum, sizeof(double *));	
+            can->sol_inds = (int **) calloc(maxnum, sizeof(int *));	
+            can->sol_size = (int *) calloc(maxnum, ISIZE);	
+         }
 
 #ifdef SENSITIVITY_ANALYSIS
-      if (p->tm->par.sensitivity_analysis){      
-	 can->duals = (double **) calloc(maxnum, sizeof(double *));
-      }else{
-	 can->duals = NULL;	 
-      }
+         if (p->tm->par.sensitivity_analysis){      
+            can->duals = (double **) calloc(maxnum, sizeof(double *));
+         }else{
+            can->duals = NULL;	 
+         }
 #endif
 #ifdef COMPILE_FRAC_BRANCHING
-      can->frac_num = pfrnum;
-      can->frac_ind = pfrind;
-      can->frac_val = pfrval;
+         can->frac_num = pfrnum;
+         can->frac_ind = pfrind;
+         can->frac_val = pfrval;
 #endif
 
 #else
-      if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){	 	 
-	 can->solutions = (double **) calloc (MAX_CHILDREN_NUM, 
-					      sizeof(double *));
-	 can->sol_inds = (int **) calloc(MAX_CHILDREN_NUM, 
-					 sizeof(int *));	
-	 can->sol_sizes = (int *) calloc(MAX_CHILDREN_NUM, ISIZE);	
-      }
+         if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){	 	 
+            can->solutions = (double **) calloc (MAX_CHILDREN_NUM, 
+                  sizeof(double *));
+            can->sol_inds = (int **) calloc(MAX_CHILDREN_NUM, 
+                  sizeof(int *));	
+            can->sol_sizes = (int *) calloc(MAX_CHILDREN_NUM, ISIZE);	
+         }
 #ifdef SENSITIVITY_ANALYSIS
-      if (p->par.sensitivity_analysis){      
-	 can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
-      }else{
-	 can->duals = NULL;	 
-      }
+         if (p->par.sensitivity_analysis){      
+            can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
+         }else{
+            can->duals = NULL;	 
+         }
 #endif
 #endif
 
 #ifdef STATISTICS
-      cnum += can->child_num;
+         cnum += can->child_num;
 #endif
 
-      /* Now depending on the type, adjust ub/lb or rhs/range/sense */
-      switch (can->type){
-       case CANDIDATE_VARIABLE:
-	 branch_var = can->position;
+         /* Now depending on the type, adjust ub/lb or rhs/range/sense */
+         switch (can->type){
+          case CANDIDATE_VARIABLE:
+            branch_var = can->position;
 #if 0
-	 if (lp_data->status[branch_var] & PERM_FIXED_TO_LB ||
-	     lp_data->status[branch_var] & PERM_FIXED_TO_UB){
-	 if (vars[branch_var]->lb == vars[branch_var]->ub){
-	    printf("Warning -- branching candidate is already fixed. \n");
-	    printf("SYMPHONY has encountered numerical difficulties \n");
-	    printf("With the LP solver. Exiting...\n\n");
-	 }
-         /* } to unconfuse vi*/
+            if (lp_data->status[branch_var] & PERM_FIXED_TO_LB ||
+                  lp_data->status[branch_var] & PERM_FIXED_TO_UB){
+               if (vars[branch_var]->lb == vars[branch_var]->ub){
+                  printf("Warning -- branching candidate is already fixed. \n");
+                  printf("SYMPHONY has encountered numerical difficulties \n");
+                  printf("With the LP solver. Exiting...\n\n");
+               }
+               /* } to unconfuse vi*/
 #endif
-	 lb = vars[branch_var]->new_lb;
-	 ub = vars[branch_var]->new_ub;
-	 for (j = 0; j < can->child_num; j++){
-	    switch (can->sense[j]){
-	     case 'E':
-	       change_lbub(lp_data, branch_var, can->rhs[j], can->rhs[j]);
-	       break;
-	     case 'R':
-	       change_lbub(lp_data, branch_var, can->rhs[j],
-			   can->rhs[j] + can->range[j]);
-	       break;
-	     case 'L':
-	       change_lbub(lp_data, branch_var, lb, can->rhs[j]);
-	       break;
-	     case 'G':
-	       change_lbub(lp_data, branch_var, can->rhs[j], ub);
-	       break;
-	    }
-	    check_ub(p);
-	    /* The original basis is in lp_data->lpbas */
-            if (should_use_hot_starts) {
-               can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
-               total_iters+=*(can->iterd+j);
-            } else {
-               can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
-               total_iters+=*(can->iterd+j);
-            }
-            p->lp_stat.lp_calls++;
-            p->lp_stat.str_br_lp_calls++;
-	    can->objval[j] = lp_data->objval;
-	    get_x(lp_data);
-
-#ifdef SENSITIVITY_ANALYSIS
-	    if (p->par.sensitivity_analysis){      
-	       get_dj_pi(lp_data);
-	       can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
-	       memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
-	    }
-#endif
-
-	    if (can->termcode[j] == LP_OPTIMAL){
-	       /* is_feasible_u() fills up lp_data->x, too!! */
-	       switch (is_feasible_u(p, TRUE, FALSE)){
-
-		  /*NOTE: This is confusing but not all that citical...*/
-		  /*The "feasible" field is only filled out for the
-		    purposes of display (in vbctool) to keep track of
-		    where in the tree the feasible solutions were
-		    found. Since this may not be the actual candidate
-		    branched on, we need to pass this info on to whatever
-		    candidate does get branched on so the that the fact that
-		    a feasible solution was found in presolve can be recorded*/
-
-		case IP_FEASIBLE:
-		  can->termcode[j] = LP_OPT_FEASIBLE;
-		  can->feasible[j] = TRUE;
-		  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		     can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
-		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-		  }
-		  break;
-		  
-		case IP_FEASIBLE_BUT_CONTINUE:
-		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
-		  can->feasible[j] = TRUE;
-		  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		     can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
-		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-		  }
-		  break;
-
-		default:
-		  break;
-	       }
-	    } else if (can->termcode[j] == LP_D_OBJLIM || 
-                  can->termcode[j] == LP_D_UNBOUNDED ||
-                  can->termcode[j] == LP_D_INFEASIBLE){
-               //p->bound_changes_in_iter++;
+            lb = vars[branch_var]->new_lb;
+            ub = vars[branch_var]->new_ub;
+            for (j = 0; j < can->child_num; j++){
                switch (can->sense[j]){
+                case 'E':
+                  change_lbub(lp_data, branch_var, can->rhs[j], can->rhs[j]);
+                  break;
+                case 'R':
+                  change_lbub(lp_data, branch_var, can->rhs[j],
+                        can->rhs[j] + can->range[j]);
+                  break;
                 case 'L':
-                  /* decreasing the ub made the problem inf, so change lb */
-                  //lb = can->rhs[j] + 1;
-                  //vars[can->position]->new_lb = lb;
+                  change_lbub(lp_data, branch_var, lb, can->rhs[j]);
                   break;
                 case 'G':
-                  //ub = can->rhs[j] - 1;
-                  //vars[can->position]->new_ub = ub;
-                  break;
-                case 'E':
-                  /* problem becomes infeasible */
-                  /* dont know what to do */
+                  change_lbub(lp_data, branch_var, can->rhs[j], ub);
                   break;
                }
-            }
-#ifdef COMPILE_FRAC_BRANCHING
-	    else{
-	       if (can->termcode[j] != LP_ABANDONED){
-		  get_x(lp_data);
-	       }
-	    }
-	    if (can->termcode[j] != LP_ABANDONED){
-	       xind = lp_data->tmp.i1; /* n */
-	       xval = lp_data->tmp.d; /* n */
-	       can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
-	       if (can->frac_num[j] > 0){
-		  can->frac_ind[j] = (int *) malloc(can->frac_num[j] * ISIZE);
-		  can->frac_val[j] = (double *) malloc(can->frac_num[j]*DSIZE);
-		  memcpy(can->frac_ind[j], xind, can->frac_num[j] * ISIZE);
-		  memcpy(can->frac_val[j], xval, can->frac_num[j] * DSIZE);
-	       }
-	    }else{
-	       can->frac_num[j] = 0;
-	    }
-#endif
-#ifdef STATISTICS
-	    if (can->termcode[j] == LP_D_ITLIM)
-	       itlim++;
-#endif
-	 }
-	 change_lbub(lp_data, branch_var, lb, ub);
-	 break;
-
-       case CANDIDATE_CUT_IN_MATRIX:
-	 branch_row = can->position;
-	 for (j = 0; j < can->child_num; j++){
-	    change_row(lp_data, branch_row,
-		       can->sense[j], can->rhs[j], can->range[j]);
-	    check_ub(p);
-	    /* The original basis is in lp_data->lpbas */
-	    can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
-            p->lp_stat.lp_calls++;
-            p->lp_stat.str_br_lp_calls++;
-	    can->objval[j] = lp_data->objval;
-
-
-	    get_x(lp_data);
+               check_ub(p);
+               /* The original basis is in lp_data->lpbas */
+               if (should_use_hot_starts) {
+                  can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
+                  total_iters+=*(can->iterd+j);
+               } else {
+                  can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+                  total_iters+=*(can->iterd+j);
+               }
+               p->lp_stat.lp_calls++;
+               p->lp_stat.str_br_lp_calls++;
+               can->objval[j] = lp_data->objval;
+               get_x(lp_data);
 
 #ifdef SENSITIVITY_ANALYSIS
-	    if (p->par.sensitivity_analysis){      
-	       get_dj_pi(lp_data);
-	       can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
-	       memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
-	    }
+               if (p->par.sensitivity_analysis){      
+                  get_dj_pi(lp_data);
+                  can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
+                  memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
+               }
 #endif
 
-	    if (can->termcode[j] == LP_OPTIMAL){
-	       /* is_feasible_u() fills up lp_data->x, too!! */
-	       switch (is_feasible_u(p, TRUE, FALSE)){
+               if (can->termcode[j] == LP_OPTIMAL){
+                  /* is_feasible_u() fills up lp_data->x, too!! */
+                  switch (is_feasible_u(p, TRUE, FALSE)){
 
-		  /*NOTE: This is confusing but not all that citical...*/
-		  /*The "feasible" field is only filled out for the
-		    purposes of display (in vbctool) to keep track of
-		    where in the tree the feasible solutions were
-		    found. Since this may not be the actual candidate
-		    branched on, we need to pass this info on to whatever
-		    candidate does get branched on so the that the fact that
-		    a feasible solution was found in presolve can be recorded*/
+                     /*NOTE: This is confusing but not all that citical...*/
+                     /*The "feasible" field is only filled out for the
+                       purposes of display (in vbctool) to keep track of
+                       where in the tree the feasible solutions were
+                       found. Since this may not be the actual candidate
+                       branched on, we need to pass this info on to whatever
+                       candidate does get branched on so the that the fact that
+                       a feasible solution was found in presolve can be recorded*/
 
-		case IP_FEASIBLE:
-		  can->termcode[j] = LP_OPT_FEASIBLE;
-		  can->feasible[j] = TRUE;
-		  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		     can->solutions[j] = (double *) malloc (DSIZE*
-							    lp_data->n);
-		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-		  }
-		  break;
-		  
-		case IP_FEASIBLE_BUT_CONTINUE:
-		  can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
-		  can->feasible[j] = TRUE;
-		  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-		     can->solutions[j] = (double *) malloc (DSIZE*
-							    lp_data->n);
-		     memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
-		  }
-		  break;
-		  
-		default:
-		  break;
-	       }
-	    }
+                   case IP_FEASIBLE:
+                     can->termcode[j] = LP_OPT_FEASIBLE;
+                     can->feasible[j] = TRUE;
+                     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+                        can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+                        memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                     }
+                     break;
+
+                   case IP_FEASIBLE_BUT_CONTINUE:
+                     can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
+                     can->feasible[j] = TRUE;
+                     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+                        can->solutions[j] = (double *) malloc (DSIZE*lp_data->n);
+                        memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                     }
+                     break;
+
+                   default:
+                     break;
+                  }
+               } else if (can->termcode[j] == LP_D_OBJLIM || 
+                     can->termcode[j] == LP_D_UNBOUNDED ||
+                     can->termcode[j] == LP_D_INFEASIBLE){
+                  //p->bound_changes_in_iter++;
+                  switch (can->sense[j]){
+                   case 'L':
+                     /* decreasing the ub made the problem inf, so change lb */
+                     //lb = can->rhs[j] + 1;
+                     //vars[can->position]->new_lb = lb;
+                     break;
+                   case 'G':
+                     //ub = can->rhs[j] - 1;
+                     //vars[can->position]->new_ub = ub;
+                     break;
+                   case 'E':
+                     /* problem becomes infeasible */
+                     /* dont know what to do */
+                     break;
+                  }
+               }
 #ifdef COMPILE_FRAC_BRANCHING
-	    else{
-	       if (can->termcode[j] != LP_ABANDONED)
-		  get_x(lp_data);
-	    }
-	    if (can->termcode[j] != LP_ABANDONED){
-	       xind = lp_data->tmp.i1; /* n */
-	       xval = lp_data->tmp.d; /* n */
-	       can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
-	       if (can->frac_num[j] > 0){
-		  can->frac_ind[j] = (int *) malloc(can->frac_num[j] * ISIZE);
-		  can->frac_val[j] = (double *) malloc(can->frac_num[j]*DSIZE);
-		  memcpy(can->frac_ind[j], xind, can->frac_num[j] * ISIZE);
-		  memcpy(can->frac_val[j], xval, can->frac_num[j] * DSIZE);
-	       }
-	    }else{
-	       can->frac_num[j] = 0;
-	    }
+               else{
+                  if (can->termcode[j] != LP_ABANDONED){
+                     get_x(lp_data);
+                  }
+               }
+               if (can->termcode[j] != LP_ABANDONED){
+                  xind = lp_data->tmp.i1; /* n */
+                  xval = lp_data->tmp.d; /* n */
+                  can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
+                  if (can->frac_num[j] > 0){
+                     can->frac_ind[j] = (int *) malloc(can->frac_num[j] * ISIZE);
+                     can->frac_val[j] = (double *) malloc(can->frac_num[j]*DSIZE);
+                     memcpy(can->frac_ind[j], xind, can->frac_num[j] * ISIZE);
+                     memcpy(can->frac_val[j], xval, can->frac_num[j] * DSIZE);
+                  }
+               }else{
+                  can->frac_num[j] = 0;
+               }
 #endif
 #ifdef STATISTICS
-	    if (can->termcode[j] == LP_D_ITLIM)
-	       itlim++;
+               if (can->termcode[j] == LP_D_ITLIM)
+                  itlim++;
 #endif
-	 }
-	 cut = rows[branch_row].cut;
-	 change_row(lp_data, branch_row, cut->sense, cut->rhs, cut->range);
-	 free_row_set(lp_data, 1, &branch_row);
-	 break;
-      }
+            }
+            change_lbub(lp_data, branch_var, lb, ub);
+            break;
 
-      switch ((j = compare_candidates_u(p, oldobjval, best_can, can))){
-       case FIRST_CANDIDATE_BETTER:
-       case FIRST_CANDIDATE_BETTER_AND_BRANCH_ON_IT:
-	  if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	     min_ind = -1;
-	     for (k = can->child_num - 1; k >= 0; k--){
-		if (can->feasible[k]){
-		   if (min_ind < 0){
-		      min_obj = SYM_INFINITY;
-		      for (l = best_can->child_num - 1; l >= 0; l--){
-			 if (best_can->feasible[l] && best_can->objval[k] < 
-			     min_obj){
-			    min_obj = best_can->objval[l]; 
-			    min_ind = l;		      
-			 }
-		      }
-		   }		   
-		   if (min_ind > -1){
-		      if(can->objval[k] > best_can->objval[min_ind]){
-			 best_can->feasible[k] = TRUE;
-			 best_can->solutions[k] = can->solutions[k];
-			 can->solutions[k] = 0;
-			 min_ind = -1;
-		      }
-		   }
-		}
-	     }
-	  } else{
-	     for (k = best_can->child_num - 1; k >= 0; k--){
-		/* Again, this is only for tracking that there was a feasible
-		   solution discovered in presolve for display purposes */
-		if (can->feasible[k]){
-		   best_can->feasible[k] = TRUE;
-		}
-	     }
-	  }
-	  free_candidate(candidates + i);
-	  break;
-       case SECOND_CANDIDATE_BETTER:
-       case SECOND_CANDIDATE_BETTER_AND_BRANCH_ON_IT:
+          case CANDIDATE_CUT_IN_MATRIX:
+            branch_row = can->position;
+            for (j = 0; j < can->child_num; j++){
+               change_row(lp_data, branch_row,
+                     can->sense[j], can->rhs[j], can->range[j]);
+               check_ub(p);
+               /* The original basis is in lp_data->lpbas */
+               can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+               p->lp_stat.lp_calls++;
+               p->lp_stat.str_br_lp_calls++;
+               can->objval[j] = lp_data->objval;
+
+
+               get_x(lp_data);
+
+#ifdef SENSITIVITY_ANALYSIS
+               if (p->par.sensitivity_analysis){      
+                  get_dj_pi(lp_data);
+                  can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
+                  memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
+               }
+#endif
+
+               if (can->termcode[j] == LP_OPTIMAL){
+                  /* is_feasible_u() fills up lp_data->x, too!! */
+                  switch (is_feasible_u(p, TRUE, FALSE)){
+
+                     /*NOTE: This is confusing but not all that citical...*/
+                     /*The "feasible" field is only filled out for the
+                       purposes of display (in vbctool) to keep track of
+                       where in the tree the feasible solutions were
+                       found. Since this may not be the actual candidate
+                       branched on, we need to pass this info on to whatever
+                       candidate does get branched on so the that the fact that
+                       a feasible solution was found in presolve can be recorded*/
+
+                   case IP_FEASIBLE:
+                     can->termcode[j] = LP_OPT_FEASIBLE;
+                     can->feasible[j] = TRUE;
+                     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+                        can->solutions[j] = (double *) malloc (DSIZE*
+                              lp_data->n);
+                        memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                     }
+                     break;
+
+                   case IP_FEASIBLE_BUT_CONTINUE:
+                     can->termcode[j] = LP_OPT_FEASIBLE_BUT_CONTINUE;
+                     can->feasible[j] = TRUE;
+                     if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+                        can->solutions[j] = (double *) malloc (DSIZE*
+                              lp_data->n);
+                        memcpy(can->solutions[j], lp_data->x, DSIZE*lp_data->n);
+                     }
+                     break;
+
+                   default:
+                     break;
+                  }
+               }
+#ifdef COMPILE_FRAC_BRANCHING
+               else{
+                  if (can->termcode[j] != LP_ABANDONED)
+                     get_x(lp_data);
+               }
+               if (can->termcode[j] != LP_ABANDONED){
+                  xind = lp_data->tmp.i1; /* n */
+                  xval = lp_data->tmp.d; /* n */
+                  can->frac_num[j] = collect_fractions(p, lp_data->x, xind, xval);
+                  if (can->frac_num[j] > 0){
+                     can->frac_ind[j] = (int *) malloc(can->frac_num[j] * ISIZE);
+                     can->frac_val[j] = (double *) malloc(can->frac_num[j]*DSIZE);
+                     memcpy(can->frac_ind[j], xind, can->frac_num[j] * ISIZE);
+                     memcpy(can->frac_val[j], xval, can->frac_num[j] * DSIZE);
+                  }
+               }else{
+                  can->frac_num[j] = 0;
+               }
+#endif
+#ifdef STATISTICS
+               if (can->termcode[j] == LP_D_ITLIM)
+                  itlim++;
+#endif
+            }
+            cut = rows[branch_row].cut;
+            change_row(lp_data, branch_row, cut->sense, cut->rhs, cut->range);
+            free_row_set(lp_data, 1, &branch_row);
+            break;
+         }
+
+         switch ((j = compare_candidates_u(p, oldobjval, best_can, can))){
+          case FIRST_CANDIDATE_BETTER:
+          case FIRST_CANDIDATE_BETTER_AND_BRANCH_ON_IT:
+            if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+               min_ind = -1;
+               for (k = can->child_num - 1; k >= 0; k--){
+                  if (can->feasible[k]){
+                     if (min_ind < 0){
+                        min_obj = SYM_INFINITY;
+                        for (l = best_can->child_num - 1; l >= 0; l--){
+                           if (best_can->feasible[l] && best_can->objval[k] < 
+                                 min_obj){
+                              min_obj = best_can->objval[l]; 
+                              min_ind = l;		      
+                           }
+                        }
+                     }		   
+                     if (min_ind > -1){
+                        if(can->objval[k] > best_can->objval[min_ind]){
+                           best_can->feasible[k] = TRUE;
+                           best_can->solutions[k] = can->solutions[k];
+                           can->solutions[k] = 0;
+                           min_ind = -1;
+                        }
+                     }
+                  }
+               }
+            } else{
+               for (k = best_can->child_num - 1; k >= 0; k--){
+                  /* Again, this is only for tracking that there was a feasible
+                     solution discovered in presolve for display purposes */
+                  if (can->feasible[k]){
+                     best_can->feasible[k] = TRUE;
+                  }
+               }
+            }
+            free_candidate(candidates + i);
+            break;
+          case SECOND_CANDIDATE_BETTER:
+          case SECOND_CANDIDATE_BETTER_AND_BRANCH_ON_IT:
 #ifndef MAX_CHILDREN_NUM
-	 if (best_can == NULL){
-	    pobj  = objval;
-	    pterm = termcode;
-	    pfeas = feasible;
-	    piter = iterd;
+            if (best_can == NULL){
+               pobj  = objval;
+               pterm = termcode;
+               pfeas = feasible;
+               piter = iterd;
 #ifdef COMPILE_FRAC_BRANCHING
-	    pfrnum = frnum;
-	    pfrind = frind;
-	    pfrval = frval;
+               pfrnum = frnum;
+               pfrind = frind;
+               pfrval = frval;
 #endif
-	 }else{
-	    pobj  = best_can->objval;
-	    pterm = best_can->termcode;
-	    pfeas = best_can->feasible;
-	    piter = best_can->iterd;
+            }else{
+               pobj  = best_can->objval;
+               pterm = best_can->termcode;
+               pfeas = best_can->feasible;
+               piter = best_can->iterd;
 #ifdef COMPILE_FRAC_BRANCHING
-	    pfrnum = best_can->frac_num;
-	    pfrind = best_can->frac_ind;
-	    pfrval = best_can->frac_val;
+               pfrnum = best_can->frac_num;
+               pfrind = best_can->frac_ind;
+               pfrval = best_can->frac_val;
 #endif
-	 }
+            }
 #endif
-	 if (best_can){
-	    if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
-	       min_ind = -1;
-	       for (k = best_can->child_num - 1; k >= 0; k--){
-		  if (best_can->feasible[k]){
-		     if (min_ind < 0){
-			min_obj = SYM_INFINITY;
-			for (l = can->child_num - 1; l >= 0; l--){
-			   if (can->feasible[l] && can->objval[k] < 
-			       min_obj){
-			      min_obj = can->objval[l]; 
-			      min_ind = l;		      
-			   }
-			}
-		     }		   
-		     if (min_ind > -1){
-			if(best_can->objval[k] > can->objval[min_ind]){
-			   can->feasible[k] = TRUE;
-			   can->solutions[k] = best_can->solutions[k];
-			   best_can->solutions[k] = 0;
-			   min_ind = -1;
-			}
-		     }
-		  }
-	       }
-	    }	
-	    else{
-	       for (k = can->child_num - 1; k >= 0; k--){
-		  /* Again, this is only for tracking that there was a feasible
-		     solution discovered in presolve for display purposes */
-		  if (best_can->feasible[k]){
-		     can->feasible[k] = TRUE;
-		  }
-	       }
-	    }
-	    free_candidate(&best_can);
-	 }
-	 best_can = can;
-	 candidates[i] = NULL;
-	 break;
-      }
-      if ((j & BRANCH_ON_IT)){
-	 break;
-      }
-      st_time += used_time(&total_time);
-      should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
-            &should_continue);
-      if (should_continue==FALSE) {
-         PRINT(p->par.verbosity, 0, 
-               ("too much time in strong branching, breaking\n"));
-         break;
+            if (best_can){
+               if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
+                  min_ind = -1;
+                  for (k = best_can->child_num - 1; k >= 0; k--){
+                     if (best_can->feasible[k]){
+                        if (min_ind < 0){
+                           min_obj = SYM_INFINITY;
+                           for (l = can->child_num - 1; l >= 0; l--){
+                              if (can->feasible[l] && can->objval[k] < 
+                                    min_obj){
+                                 min_obj = can->objval[l]; 
+                                 min_ind = l;		      
+                              }
+                           }
+                        }		   
+                        if (min_ind > -1){
+                           if(best_can->objval[k] > can->objval[min_ind]){
+                              can->feasible[k] = TRUE;
+                              can->solutions[k] = best_can->solutions[k];
+                              best_can->solutions[k] = 0;
+                              min_ind = -1;
+                           }
+                        }
+                     }
+                  }
+               }	
+               else{
+                  for (k = can->child_num - 1; k >= 0; k--){
+                     /* Again, this is only for tracking that there was a feasible
+                        solution discovered in presolve for display purposes */
+                     if (best_can->feasible[k]){
+                        can->feasible[k] = TRUE;
+                     }
+                  }
+               }
+               free_candidate(&best_can);
+            }
+            best_can = can;
+            candidates[i] = NULL;
+            break;
+         }
+         if ((j & BRANCH_ON_IT)){
+            break;
+         }
+         st_time += used_time(&total_time);
+         should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
+               &should_continue);
+         if (should_continue==FALSE) {
+            PRINT(p->par.verbosity, 0, 
+                  ("too much time in strong branching, breaking\n"));
+            break;
+         }
       }
    }
    //printf ("total_iters = %d \n",total_iters);
@@ -695,9 +801,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 ("Itlim reached %i times out of %i .\n\n", itlim, cnum));
 #endif
 
-   for (i++; i<cand_num; i++){
-      /* Free the remaining candidates */
-      free_candidate(candidates + i);
+   if (should_use_rel_br != TRUE) {
+      for (i++; i<cand_num; i++){
+         /* Free the remaining candidates */
+         free_candidate(candidates + i);
+      }
    }
    FREE(candidates);
    if (p->par.keep_description_of_pruned == KEEP_IN_MEMORY){
@@ -956,12 +1064,13 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
    int i, j, cnt = 0;
    double lim[7] = {.1, .15, .20, .233333, .266667, .3, 1};
    var_desc **vars = lp_data->vars;
+   int should_use_rel_br = p->par.should_use_rel_br;
 
    /* first get the fractional values */
+   if (should_use_rel_br == TRUE) {
+      xind = p->br_rel_cand_list;
+   }
    for (i = lp_data->n-1; i >= 0; i--){
-      /*FIXME: This is a quick-fix to allow variables without upper bounds*/
-      /* Not sure what I meant with this */
-      /* if (lp_data->vars[i]->ub < 2.0){ */
       if (vars[i]->is_int){
 	 if (x[i] > vars[i]->new_lb && x[i] < vars[i]->new_ub){
 	    fracx = x[i] - floor(x[i]);
@@ -971,41 +1080,51 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
 	    }
 	 }
       }
-      /*}*/
-   }
-   qsort_di(xval, xind, cnt);
-
-   if (p->bc_level>p->par.strong_br_all_candidates_level || 
-         p->par.user_set_strong_branching_cand_num) {
-      for (j = 0, i = 0; i < cnt;){
-         if (xval[i] > lim[j]){
-            if (i == 0){
-               j++; continue;
-            }else{
-               break;
-            }
-         }else{
-            i++;
-         }
-      }
-      cnt = i;
-      *cand_num = MIN(max_cand_num, cnt);
-   } else {
       *cand_num = cnt;
    }
 
-   if (!*candidates)
-      *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
-   for (i=*cand_num-1; i>=0; i--){
-      cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj) );
+   if (should_use_rel_br == TRUE) {
+      *candidates = (branch_obj **) malloc(1 * sizeof(branch_obj *));
+      cand = (*candidates)[0] = (branch_obj *) calloc(1, sizeof(branch_obj) );
       cand->type = CANDIDATE_VARIABLE;
       cand->child_num = 2;
-      cand->position = xind[i];
       cand->sense[0] = 'L';
       cand->sense[1] = 'G';
-      cand->rhs[0] = floor(x[xind[i]]);
-      cand->rhs[1] = cand->rhs[0] + 1;
       cand->range[0] = cand->range[1] = 0;
+   } else {
+      qsort_di(xval, xind, cnt);
+      if (p->bc_level>p->par.strong_br_all_candidates_level || 
+            p->par.user_set_strong_branching_cand_num) {
+         for (j = 0, i = 0; i < cnt;){
+            if (xval[i] > lim[j]){
+               if (i == 0){
+                  j++; continue;
+               }else{
+                  break;
+               }
+            }else{
+               i++;
+            }
+         }
+         cnt = i;
+         *cand_num = MIN(max_cand_num, cnt);
+      } else {
+         *cand_num = cnt;
+      }
+
+      if (!*candidates)
+         *candidates = (branch_obj **) malloc(*cand_num * sizeof(branch_obj *));
+      for (i=*cand_num-1; i>=0; i--){
+         cand = (*candidates)[i] = (branch_obj *) calloc(1, sizeof(branch_obj) );
+         cand->type = CANDIDATE_VARIABLE;
+         cand->child_num = 2;
+         cand->position = xind[i];
+         cand->sense[0] = 'L';
+         cand->sense[1] = 'G';
+         cand->rhs[0] = floor(x[xind[i]]);
+         cand->rhs[1] = cand->rhs[0] + 1;
+         cand->range[0] = cand->range[1] = 0;
+      }
    }
 }
 
@@ -1192,6 +1311,27 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
       *should_continue = TRUE;
    }
    PRINT(verbosity,29, ("strong branching i = %d\n",i));
+   return 0;
+}
+
+/*===========================================================================*/
+int strong_branch(LPdata *lp_data, int branch_var, double lb, double ub, 
+      double new_lb, double new_ub, double *obj)
+{
+   int termstatus;
+   int iterd;
+   // TODO: LP_ABANDONED
+   /* change the lb and ub */
+   change_lbub(lp_data, branch_var, new_lb, new_ub);
+   termstatus = solve_hotstart(lp_data, &iterd);
+
+   if (termstatus == LP_D_INFEASIBLE || termstatus == LP_D_OBJLIM || 
+         termstatus == LP_D_UNBOUNDED) {
+      *obj = SYM_INFINITY;
+   }
+   *obj = lp_data->objval;
+
+   change_lbub(lp_data, branch_var, lb, ub);
    return 0;
 }
 /*===========================================================================*/

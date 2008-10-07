@@ -3317,6 +3317,14 @@ void free_tm(tm_prob *tm)
       FREE(tm->reduced_costs->obj);
       FREE(tm->reduced_costs);
    }
+
+   if (tm->pcost_down) {
+      FREE(tm->pcost_down);
+      FREE(tm->pcost_up);
+      FREE(tm->br_rel_down);
+      FREE(tm->br_rel_up);
+      FREE(tm->br_rel_cand_list);
+   }
    
    FREE(tm);
 }

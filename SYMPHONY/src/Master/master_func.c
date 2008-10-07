@@ -2786,6 +2786,18 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->use_hot_starts);
       return(0);
    }
+   else if (strcmp(key,"should_use_rel_br") == 0) {
+      READ_INT_PAR(lp_par->should_use_rel_br);
+      return(0);
+   }
+   else if (strcmp(key,"rel_br_threshold") == 0) {
+      READ_INT_PAR(lp_par->rel_br_threshold);
+      return(0);
+   }
+   else if (strcmp(key,"rel_br_cand_threshold") == 0) {
+      READ_INT_PAR(lp_par->rel_br_cand_threshold);
+      return(0);
+   }
    else if (strcmp(key, "compare_candidates_default") == 0 ||
 	    strcmp(key, "LP_compare_candidates_default") == 0){
       READ_INT_PAR(lp_par->compare_candidates_default);

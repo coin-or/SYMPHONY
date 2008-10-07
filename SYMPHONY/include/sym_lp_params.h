@@ -173,6 +173,14 @@ typedef struct LP_PARAMS{
    int               strong_br_all_candidates_level;
    int               user_set_strong_branching_cand_num;
    int               user_set_max_presolve_iter;
+   int               should_use_rel_br;
+   int               rel_br_threshold; /* how many times to do strong branching
+                                          on each variable before using pseudo 
+                                          cost estimates */
+   int               rel_br_cand_threshold; /* how many candidates to solve 
+                                               using strong branching without 
+                                               any improvement in score before 
+                                               stopping */
    int               compare_candidates_default;
    int               select_child_default;
    int               pack_lp_solution_default;

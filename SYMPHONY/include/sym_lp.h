@@ -142,6 +142,13 @@ typedef struct LP_PROB{
    int         slack_cut_num;
    cut_data  **slack_cuts;
    int         slack_cuts_size;
+
+   /* pseudo costs and reliability measures */
+   double         *pcost_down;
+   double         *pcost_up;
+   int            *br_rel_down;
+   int            *br_rel_up;
+   int            *br_rel_cand_list;
 }lp_prob;
 
 /*===========================================================================*/
@@ -219,6 +226,8 @@ int select_branching_object PROTO((lp_prob *p, int *cuts,
 int should_continue_strong_branching PROTO((lp_prob *p, int i, int cand_num,
                                      double st_time, int total_iters, 
                                      int *should_continue));
+int strong_branch(LPdata *lp_data, int branch_var, double lb, double ub, 
+      double new_lb, double new_ub, double *obj);
 int branch PROTO((lp_prob *p, int cuts));
 int col_gen_before_branch PROTO((lp_prob *p, int *new_vars));
 
