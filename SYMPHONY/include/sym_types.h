@@ -212,6 +212,7 @@ typedef struct BRANCH_OBJ{
 #if defined(COMPILING_FOR_TM) || defined(COMPILING_FOR_MASTER) || defined(COMPILE_IN_LP) 
    int           name;         /* userind for VAR, the index for CUT */
 #endif
+   double        value;        /* for evaluating pcost */
 
    /*========================================================================*\
     * Description of the children.
@@ -250,6 +251,7 @@ typedef struct BRANCH_OBJ{
    int           termcode[MAX_CHILDREN_NUM];
    int           iterd[MAX_CHILDREN_NUM];
    int           feasible[MAX_CHILDREN_NUM];
+   int           is_est[MAX_CHILDREN_NUM];
 
 #else
    double       *objval;   /* arrays of size 'number' */
@@ -350,6 +352,8 @@ typedef struct BC_NODE{
    int        cp;           /* the tid of the cut pool assigned to the node */
    double     lower_bound;  /* the current best objective function value
 			       obtained in the subproblem */
+   int        update_pc;    /* whether the pseudo cost should be updated after
+                               solving the LP */
    double     opt_estimate; /* an estimate of the value of the best feasible
 			       solution that could be obtained in this node */
    struct BC_NODE  *parent;
@@ -409,6 +413,8 @@ typedef struct LP_STAT{
    int         lp_calls;
    int         lp_sols;
    int         str_br_lp_calls; /* no of calls from strong branching */
+   int         str_br_bnd_changes; /* no of bounds changed due to strong br */
+   int         str_br_nodes_fathomed; /* no of nodes fathomed by strong br */
 
    /* cuts */
    int         cuts_generated;

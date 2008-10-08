@@ -1087,6 +1087,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       child->bc_index = tm->stat.tree_size++;
       child->bc_level = node->bc_level + 1;
       child->lower_bound = objval[i];
+      child->update_pc = bobj->is_est[i] ? TRUE : FALSE;
       child->parent = node;
       if (tm->par.verbosity > 10){
 	 printf("Generating node %i from %i...\n", child->bc_index,

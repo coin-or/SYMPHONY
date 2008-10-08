@@ -720,17 +720,18 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    var_desc **vars = lp_data->vars;
    char found_better_solution;
    int should_call_fp = FALSE;
+   double *x;
+   int n = lp_data->n;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
    indices = lp_data->tmp.i1; /* n */
    values = lp_data->tmp.d; /* n */
 
-   cnt = collect_nonzeros(p, lp_data->x, indices, values);
-
-   heur_solution = (double *) malloc(lp_data->n*DSIZE);
+   heur_solution = p->lp_data->heur_solution;
    
 #ifdef USE_SYM_APPLICATION
+   cnt = collect_nonzeros(p, lp_data->x, indices, values);
    user_res = user_is_feasible(p->user, lpetol, cnt, indices, values,
 			       &feasible, &true_objval, branching,
 			       heur_solution);
@@ -759,18 +760,20 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 
    switch (user_res){
     case TEST_ZERO_ONE: /* User wants us to test 0/1 -ness. */
+      cnt = collect_nonzeros(p, lp_data->x, indices, values);
        for (i=cnt-1; i>=0; i--){
-	 if (!vars[i]->is_int)
+	 if (!vars[indices[i]]->is_int)
 	    continue; /* Not an integer variable */
 	 if (values[i] < lpetol1) break;
        }
       feasible = i < 0 ? IP_FEASIBLE : IP_INFEASIBLE;
       break;
     case TEST_INTEGRALITY:
-      for (i = lp_data->n - 1; i >= 0; i--){
+      x = lp_data->x;
+      for (i = n - 1; i >= 0; i--){
 	 if (!vars[i]->is_int)
 	    continue; /* Not an integer variable */
-	 valuesi = lp_data->x[i];
+	 valuesi = x[i];
 	 if (valuesi-floor(valuesi) > lpetol &&
 	     ceil(valuesi)-valuesi > lpetol &&
              valuesi>vars[i]->lb-lpetol && valuesi<vars[i]->ub+lpetol){
@@ -786,8 +789,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
       fp_should_call_fp(p,branching,&should_call_fp,is_last_iter); 
       if (should_call_fp==TRUE) {
-         termcode    = feasibility_pump (p, &found_better_solution, new_obj_val, 
-               heur_solution);
+         termcode    = feasibility_pump (p, &found_better_solution, 
+               new_obj_val, heur_solution);
          if (termcode!=FUNCTION_TERMINATED_NORMALLY) {
             PRINT(p->par.verbosity,0,("warning: feasibility pump faced some "
                      "difficulties.\n"));
@@ -829,6 +832,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    }     
    
    if (feasible == IP_FEASIBLE && p->par.multi_criteria){
+      cnt = collect_nonzeros(p, lp_data->x, indices, values);
       if (analyze_multicriteria_solution(p, indices, values, cnt,
 					 &true_objval, lpetol, branching) > 0){
 	 if(feasible == IP_FEASIBLE){
@@ -843,12 +847,13 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       }
    }
    
-   if (feasible == IP_HEUR_FEASIBLE){
-      cnt = collect_nonzeros(p, heur_solution, indices, values);        
-   }
-   
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE ||
        feasible == IP_HEUR_FEASIBLE){
+      if (feasible == IP_HEUR_FEASIBLE) {
+         cnt = collect_nonzeros(p, heur_solution, indices, values);        
+      } else {
+         cnt = collect_nonzeros(p, lp_data->x, indices, values);        
+      }
       /* Send the solution value to the treemanager */
       if (p->has_ub && true_objval >= p->ub - p->par.granularity){
 	 FREE(heur_solution);
@@ -932,7 +937,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
             p->bc_index);
    }
 
-   FREE(heur_solution);
    FREE(col_sol);
    return(feasible);
 }
@@ -2241,8 +2245,8 @@ int generate_cuts_in_lp_u(lp_prob *p)
 #ifdef USE_CGL_CUTS
       if (p->par.cgl.generate_cgl_cuts){
          int bound_changes = 0;
-         double ub = p->has_ub ? p->ub : SYM_INFINITY;
          /*
+         double ub = p->has_ub ? p->ub : SYM_INFINITY;
 	 generate_cgl_cuts(lp_data, &new_row_num, &cuts, FALSE,
 			   p->bc_index, p->bc_level, p->node_iter_num, 
                             p->par.max_cut_num_per_iter_root,

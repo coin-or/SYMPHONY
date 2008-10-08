@@ -56,6 +56,7 @@ void free_lp_arrays(LPdata *lp_data)
    FREE(lp_data->dualsol);
    FREE(lp_data->slacks);
    FREE(lp_data->random_hash);
+   FREE(lp_data->heur_solution);
 #ifdef __CPLEX__
    FREE(lp_data->lb);
    FREE(lp_data->ub);
@@ -158,6 +159,8 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
          lp_data->status = (char *) malloc(lp_data->maxn * CSIZE);
          FREE(lp_data->random_hash);
          lp_data->random_hash = (double *) malloc(lp_data->maxn * DSIZE);
+         FREE(lp_data->heur_solution);
+         lp_data->heur_solution = (double *) malloc(lp_data->maxn * DSIZE);
 #ifdef __CPLEX__
 	 FREE(lp_data->lb);
 	 lp_data->lb = (double *) malloc(lp_data->maxn * DSIZE);
@@ -173,6 +176,8 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
                                             lp_data->maxn * CSIZE);
          lp_data->random_hash = (double *) realloc((char *)lp_data->random_hash,
                                          lp_data->maxn * DSIZE);
+         lp_data->heur_solution = (double *) realloc((char *)
+               lp_data->heur_solution, lp_data->maxn * DSIZE);
 #ifdef __CPLEX__
 	 lp_data->lb = (double *) realloc((char *)lp_data->lb,
 					  lp_data->maxn * DSIZE);
@@ -2286,7 +2291,7 @@ void open_lp_solver(LPdata *lp_data)
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
    //lp_data->si->setupForRepeatedUse();
-   //lp_data->si->getModelPtr()->setFactorizationFrequency(200);
+   lp_data->si->getModelPtr()->setFactorizationFrequency(200);
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
 #else   

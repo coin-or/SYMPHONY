@@ -320,7 +320,13 @@ int fathom_branch(lp_prob *p)
 		   || termcode == LP_D_OBJLIM){
 	    PRINT(p->par.verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
+#ifdef COMPILE_IN_LP
+            if (p->node_iter_num < 2 && p->bc_index > 0 && 
+                  p->par.should_use_rel_br) {
+               update_pcost(p);
+            }
             comp_times->lp += used_time(&p->tt);
+#endif
             break;
 	 }
 	 comp_times->lp += used_time(&p->tt);
@@ -839,15 +845,24 @@ int collect_nonzeros(lp_prob *p, double *x, int *tind, double *tx)
    int i, cnt = 0;
    double lpetol = p->lp_data->lpetol;
 
-   colind_sort_extra(p);
-   for (i = 0; i < n; i++){
-      if (x[i] > lpetol || x[i] < -lpetol){
-	 tind[cnt] = vars[i]->userind;
-	 tx[cnt++] = x[i];
+   if (p->par.is_userind_in_order != TRUE) {
+      colind_sort_extra(p);
+      for (i = 0; i < n; i++){
+         if (x[i] > lpetol || x[i] < -lpetol){
+            tind[cnt] = vars[i]->userind;
+            tx[cnt++] = x[i];
+         }
+      }
+      /* order indices and values according to indices */
+      qsort_id(tind, tx, cnt);
+   } else {
+      for (i = 0; i < n; i++){
+         if (x[i] > lpetol || x[i] < -lpetol){
+            tind[cnt] = i;
+            tx[cnt++] = x[i];
+         }
       }
    }
-   /* order indices and values according to indices */
-   qsort_id(tind, tx, cnt);
    return(cnt);
 }
 
@@ -1985,6 +2000,8 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.lp_calls                += p->lp_stat.lp_calls;
    p->tm->lp_stat.str_br_lp_calls         += p->lp_stat.str_br_lp_calls;
    p->tm->lp_stat.lp_sols                 += p->lp_stat.lp_sols;
+   p->tm->lp_stat.str_br_bnd_changes      += p->lp_stat.str_br_bnd_changes;
+   p->tm->lp_stat.str_br_nodes_fathomed   += p->lp_stat.str_br_nodes_fathomed;
 
    p->tm->lp_stat.cuts_generated          += p->lp_stat.cuts_generated;
    p->tm->lp_stat.gomory_cuts             += p->lp_stat.gomory_cuts;
@@ -2106,6 +2123,50 @@ int add_bound_changes_to_desc(node_desc *desc, lp_prob *p)
    return 0;
 }
 
+/*===========================================================================*/
+int str_br_bound_changes(lp_prob *p, int num_bnd_changes, double *bnd_val, 
+      int *bnd_ind, char *bnd_sense)
+{
+#ifdef COMPILE_IN_LP
+   bounds_change_desc    *bnd_change;
+   node_desc             *desc;
+   int                   i, j;
+   var_desc              **vars = p->lp_data->vars;
+   int                   *index;
+   double                *value;
+   char                  *lbub;
+
+   if (num_bnd_changes<1) {
+      return 0;
+   }
+   if (p->tm->active_nodes[p->proc_index]->desc.bnd_change == NULL) {
+      bnd_change = (bounds_change_desc *)calloc(1, sizeof(bounds_change_desc));
+      index = bnd_change->index = (int *)malloc(num_bnd_changes*ISIZE);
+      lbub = bnd_change->lbub = (char *)malloc(num_bnd_changes*CSIZE);
+      value = bnd_change->value = (double *)malloc(num_bnd_changes*DSIZE);
+      bnd_change->num_changes = num_bnd_changes;
+      j = 0;
+   } else {
+      bnd_change = p->tm->active_nodes[p->proc_index]->desc.bnd_change;
+      j = bnd_change->num_changes;
+      bnd_change->num_changes += num_bnd_changes;
+      index = bnd_change->index = (int *)realloc(bnd_change->index, 
+            bnd_change->num_changes*ISIZE);
+      lbub = bnd_change->lbub = (char *)realloc(bnd_change->lbub,
+            bnd_change->num_changes*CSIZE);
+      value = bnd_change->value = (double *)realloc(bnd_change->value,
+            bnd_change->num_changes*DSIZE);
+   }
+   for (i = 0; i<num_bnd_changes; i++) {
+      index[i+j] = vars[bnd_ind[i]]->userind;
+      lbub[i+j] = (bnd_sense[i] == 'L') ? 'U' : 'L';
+      value[i+j] = bnd_val[i];
+   }
+   p->tm->active_nodes[p->proc_index]->desc.bnd_change = bnd_change;
+
+#endif
+   return 0;
+}
 
 /*===========================================================================*/
 /* this function is called after root node has been processed. we update
@@ -2702,6 +2763,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       row_cut = cutlist->rowCut(i);
       rhs = row_cut.rhs();
       num_elements = row_cut.row().getNumElements();
+      //PRINT(verbosity, -1,("length = %d \n", num_elements));
       indices = const_cast<int *> (row_cut.row().getIndices());
       elements = const_cast<double *> (row_cut.row().getElements());
       (*cuts)[k] =  (cut_data *) calloc(1, sizeof(cut_data));
@@ -2844,4 +2906,43 @@ int should_stop_adding_cgl_cuts(lp_prob *p, int i, int *should_stop)
    *should_stop = 0;
    return 0;
 }
+
+/*===========================================================================*/
+int update_pcost(lp_prob *p)
+{
+#ifdef COMPILE_IN_LP
+   bc_node *parent = p->tm->active_nodes[p->proc_index]->parent;
+   char sense = parent->bobj.sense[0];
+   int branch_var = parent->bobj.position;
+   double *pcost_down = p->pcost_down;
+   double *pcost_up = p->pcost_up;
+   int *br_rel_down = p->br_rel_down;
+   int *br_rel_up = p->br_rel_up;
+   double objval = p->lp_data->objval;
+   double oldobjval = p->tm->active_nodes[p->proc_index]->lower_bound;
+   double oldx =  parent->bobj.value;
+   double *x;
+   get_x(p->lp_data);
+   x = p->lp_data->x;
+   if (parent->children[0]->bc_index != p->bc_index) {
+      sense = (sense == 'L') ? 'G' : 'L';
+   }
+   if (sense == 'L') {
+      pcost_down[branch_var] = (pcost_down[branch_var]*
+            br_rel_down[branch_var] + (objval - oldobjval)/
+            (oldx-x[branch_var]))/(br_rel_down[branch_var] + 1);
+      //printf("new pcost_down[%d] = %f\n", branch_var, pcost_down[branch_var]);
+      //printf("old objval = %f, new = %f\n", oldobjval, objval);
+      br_rel_down[branch_var]++;
+   } else {
+      pcost_up[branch_var] = (pcost_up[branch_var]*
+            br_rel_up[branch_var] + (objval - oldobjval)/
+            (x[branch_var]-oldx))/(br_rel_up[branch_var] + 1);
+      //printf("new pcost_up[%d] = %f\n", branch_var, pcost_up[branch_var]);
+      br_rel_up[branch_var]++;
+   }
+#endif
+   return 0;
+}
+/*===========================================================================*/
 /*===========================================================================*/

@@ -179,6 +179,9 @@ int should_use_cgl_generator PROTO ((lp_prob *p, int *should_generate,
 int generate_cgl_cut_of_type PROTO((lp_prob *p, int i, OsiCuts *cutlist_p));
 int check_and_add_cgl_cuts PROTO((lp_prob *p, int i, cut_data ***cuts, int *num_cuts, int *bound_changes, OsiCuts *cutlist, int send_to_pool));
 int should_stop_adding_cgl_cuts PROTO((lp_prob *p, int i, int *should_stop));
+int update_pcost PROTO ((lp_prob *p));
+int str_br_bound_changes PROTO((lp_prob *p, int num_bnd_changes, 
+         double *bnd_val, int *bnd_ind, char *bnd_sense));
 
 /*===========================================================================*/
 /*======== LP functions related to variable management (lp_varfunc.c) =======*/
@@ -226,7 +229,7 @@ int select_branching_object PROTO((lp_prob *p, int *cuts,
 int should_continue_strong_branching PROTO((lp_prob *p, int i, int cand_num,
                                      double st_time, int total_iters, 
                                      int *should_continue));
-int strong_branch(LPdata *lp_data, int branch_var, double lb, double ub, 
+int strong_branch(lp_prob *p, int branch_var, double lb, double ub, 
       double new_lb, double new_ub, double *obj);
 int branch PROTO((lp_prob *p, int cuts));
 int col_gen_before_branch PROTO((lp_prob *p, int *new_vars));

@@ -276,64 +276,93 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    //printf ("str time = %f\n",p->comp_times.strong_branching);
 
    if (should_use_rel_br==TRUE) {
-      double *x = lp_data->x;
-      double var_score, best_up_obj, best_down_obj;
+      double *x = (double *)malloc (lp_data->n*DSIZE);
+      double *bnd_val = (double *)malloc (2*lp_data->n*DSIZE);
+      int *bnd_ind = (int *)malloc (2*lp_data->n*ISIZE);
+      char *bnd_sense = (char *)malloc (2*lp_data->n*CSIZE);
+      int num_bnd_changes = 0;
+      double xval, floorx, ceilx, var_score, best_up_obj, best_down_obj;
       int full_solves = 0, best_up_is_est, best_down_is_est, down_is_est, 
           up_is_est, max_solves_before_break = p->par.rel_br_cand_threshold, 
-          stop_solving = FALSE;
+          stop_solving = FALSE, both_children_inf = FALSE, rel_up, rel_down;
+      double alpha = p->par.strong_branching_high_low_weight;
+      double one_m_alpha = 1-alpha;
       best_var = -1;
       best_var_score = -SYM_INFINITY;
+      memcpy(x, lp_data->x, lp_data->n*DSIZE);
       for (i=0; i<cand_num; i++) {
          branch_var = p->br_rel_cand_list[i];
          lb = vars[branch_var]->new_lb;
          ub = vars[branch_var]->new_ub;
+         xval = x[branch_var];
+         floorx = floor(xval);
+         ceilx = ceil(xval);
+         rel_down = br_rel_down[branch_var];
+         rel_up = br_rel_up[branch_var];
 
          //calculate the score for each candidate variable.
-         if (br_rel_down[branch_var] > rel_threshold) {
-            down_obj = oldobjval + pcost_down[branch_var] * (x[branch_var] -
-                  floor(x[branch_var]));
+         if (rel_down > rel_threshold) {
+            down_obj = oldobjval + pcost_down[branch_var] * (xval - floorx);
             down_is_est = TRUE;
          } else {
             if (stop_solving == TRUE) {
                continue;
             }
-            strong_branch(lp_data, branch_var, lb, ub, lb, 
-                  floor(x[branch_var]), &down_obj);
+            if (strong_branch(p, branch_var, lb, ub, lb, floorx, &down_obj)) {
+               // lp was abandoned
+               continue;
+            }
             down_is_est = FALSE;
             // update pcost
             if (down_obj < SYM_INFINITY/10) {
                pcost_down[branch_var] = (pcost_down[branch_var]*
-                  br_rel_down[branch_var] + (down_obj - oldobjval)/
-                  (x[branch_var]-floor(x[branch_var])))/
-                  (br_rel_down[branch_var] + 1);
+                  rel_down + (down_obj - oldobjval)/(xval-floorx))/
+                  (rel_down + 1);
                br_rel_down[branch_var]++;
+            } else {
+               bnd_val[num_bnd_changes] = ceilx;
+               bnd_sense[num_bnd_changes] = 'G';
+               bnd_ind[num_bnd_changes] = branch_var;
+               num_bnd_changes++;
+               change_lbub(lp_data, branch_var, ceilx, ub);
+               vars[branch_var]->new_lb = ceilx;
+               vars[branch_var]->lb = ceilx;
             }
-            p->lp_stat.lp_calls++;
-            p->lp_stat.str_br_lp_calls++;
             full_solves++;
          }
          if (br_rel_up[branch_var] > rel_threshold) {
-            up_obj   = oldobjval + pcost_up[branch_var] * (ceil(x[branch_var])
-                  - x[branch_var]);
+            up_obj   = oldobjval + pcost_up[branch_var] * (ceilx - xval);
             up_is_est = TRUE;
          } else {
             if (stop_solving == TRUE) {
                continue;
             }
-            strong_branch(lp_data, branch_var, lb, ub, ceil(x[branch_var]), 
-                  ub, &up_obj);
+            if (strong_branch(p, branch_var, lb, ub, ceilx, ub, &up_obj)) {
+               // lp was abandoned
+               continue;
+            }
             up_is_est = FALSE;
             // update pcost
             if (up_obj < SYM_INFINITY/10) {
                pcost_up[branch_var] = (pcost_up[branch_var]*
-                  br_rel_up[branch_var] + (up_obj - oldobjval)/
-                  (ceil(x[branch_var])-x[branch_var]))/
-                  (br_rel_up[branch_var] + 1);
+                  rel_up + (up_obj - oldobjval)/(ceilx-xval))/ 
+                  (rel_up + 1);
                br_rel_up[branch_var]++;
+            } else {
+               bnd_val[num_bnd_changes] = floorx;
+               bnd_sense[num_bnd_changes] = 'L';
+               bnd_ind[num_bnd_changes] = branch_var;
+               num_bnd_changes++;
+               change_lbub(lp_data, branch_var, lb, floorx);
+               vars[branch_var]->new_ub = floorx;
+               vars[branch_var]->ub = floorx;
             }
-            p->lp_stat.lp_calls++;
-            p->lp_stat.str_br_lp_calls++;
             full_solves++;
+         }
+
+         if (down_obj > SYM_INFINITY/10 && up_obj > SYM_INFINITY/10) {
+            both_children_inf = TRUE;
+            break;
          }
 
          if (down_obj < up_obj) {
@@ -343,7 +372,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             low = up_obj;
             high = down_obj;
          }
-         var_score = 0.8 * low + 0.2 * high;
+         var_score = alpha * low + one_m_alpha * high;
          if (var_score > best_var_score) {
             best_var_score = var_score;
             best_var = branch_var;
@@ -356,19 +385,38 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             best_can->sense[1] = 'G';
             best_can->objval[0] = (down_is_est == TRUE) ? oldobjval : down_obj;
             best_can->objval[1] = (up_is_est == TRUE) ? oldobjval : up_obj;
-            best_can->rhs[0] = floor(x[best_var]);
-            best_can->rhs[1] = ceil(x[best_var]);
+            best_can->is_est[0] = down_is_est;
+            best_can->is_est[1] = up_is_est;
+            best_can->rhs[0] = floorx;
+            best_can->rhs[1] = ceilx;
+            best_can->value = xval;
             if (down_is_est != TRUE || up_is_est != TRUE) {
                full_solves = 0;
             }
          }
          if (full_solves > max_solves_before_break) {
-            printf("breaking because of no gain at iter %d\n", i);
+            //printf("breaking because of no gain at iter %d\n", i);
             stop_solving = TRUE;
          }
       }
-      //printf("reliability branching: selected var %d with score %f\n", best_var, best_var_score);
+         //printf("reliability branching: selected var %d with score %f\n", best_var, best_var_score);
+#ifdef COMPILE_IN_LP
+      if (num_bnd_changes > 0) {
+         str_br_bound_changes(p, num_bnd_changes, bnd_val, bnd_ind, bnd_sense);
+      }
+#endif
       cand_num = 1;
+      FREE(x);
+      FREE(bnd_val);
+      FREE(bnd_ind);
+      FREE(bnd_sense);
+      if (both_children_inf == TRUE) {
+         FREE(best_can);
+         FREE(candidates);
+         *candidate = NULL;
+         p->lp_stat.str_br_nodes_fathomed++;
+         return (DO_NOT_BRANCH__FATHOMED);
+      }
    } else {
       /* do the default symphony branching */
       for (i=0; i<cand_num; i++){
@@ -1315,11 +1363,13 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
 }
 
 /*===========================================================================*/
-int strong_branch(LPdata *lp_data, int branch_var, double lb, double ub, 
+int strong_branch(lp_prob *p, int branch_var, double lb, double ub, 
       double new_lb, double new_ub, double *obj)
 {
-   int termstatus;
+   int termstatus, status = 0;
    int iterd;
+   LPdata *lp_data = p->lp_data;
+   
    // TODO: LP_ABANDONED
    /* change the lb and ub */
    change_lbub(lp_data, branch_var, new_lb, new_ub);
@@ -1328,11 +1378,25 @@ int strong_branch(LPdata *lp_data, int branch_var, double lb, double ub,
    if (termstatus == LP_D_INFEASIBLE || termstatus == LP_D_OBJLIM || 
          termstatus == LP_D_UNBOUNDED) {
       *obj = SYM_INFINITY;
+      p->lp_stat.str_br_bnd_changes++;
+   } else {
+      *obj = lp_data->objval;
+      if (termstatus == LP_OPTIMAL) {
+         if (!p->has_ub || *obj < p->ub - lp_data->lpetol) {
+            is_feasible_u(p, TRUE, FALSE);
+         } else {
+            *obj = SYM_INFINITY;
+            p->lp_stat.str_br_bnd_changes++;
+         }
+      } else if (termstatus == LP_ABANDONED) {
+         status = LP_ABANDONED;
+      }
    }
-   *obj = lp_data->objval;
+   p->lp_stat.lp_calls++;
+   p->lp_stat.str_br_lp_calls++;
 
    change_lbub(lp_data, branch_var, lb, ub);
-   return 0;
+   return status;
 }
 /*===========================================================================*/
 /*===========================================================================*/
