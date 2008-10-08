@@ -327,6 +327,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                change_lbub(lp_data, branch_var, ceilx, ub);
                vars[branch_var]->new_lb = ceilx;
                vars[branch_var]->lb = ceilx;
+               lb = ceilx;
             }
             full_solves++;
          }
@@ -356,6 +357,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                change_lbub(lp_data, branch_var, lb, floorx);
                vars[branch_var]->new_ub = floorx;
                vars[branch_var]->ub = floorx;
+               ub = floorx;
             }
             full_solves++;
          }
