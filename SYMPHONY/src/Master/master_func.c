@@ -2294,6 +2294,11 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->fastmip);
       return(0);
    }
+   else if (strcmp(key, "should_warmstart_chain") == 0 ||
+	    strcmp(key, "LP_should_warmstart_chain") == 0){
+      READ_INT_PAR(lp_par->should_warmstart_chain);
+      return(0);
+   }
    else if (strcmp(key, "try_to_recover_from_error") == 0 ||
 	    strcmp(key, "LP_try_to_recover_from_error") == 0){
       READ_INT_PAR(lp_par->try_to_recover_from_error);

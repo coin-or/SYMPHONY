@@ -238,7 +238,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->do_primal_heuristic = FALSE;
    lp_par->scaling = -1; /* CPLEX'ism ... don't scale */
    lp_par->fastmip = 1; /* CPLEX'ism ... set it to 1 */
-   lp_par->should_warmstart_chain = FALSE; /* see header file for description */
+   lp_par->should_warmstart_chain = TRUE; /* see header file for description */
    lp_par->try_to_recover_from_error = TRUE;
    lp_par->problem_type = ZERO_ONE_PROBLEM;
    lp_par->keep_description_of_pruned = tm_par->keep_description_of_pruned;
