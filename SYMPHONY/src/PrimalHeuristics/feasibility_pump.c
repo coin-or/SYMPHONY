@@ -64,6 +64,10 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    const double             fp_display_interval = p->par.fp_display_interval;
 
    fp_time                                = used_time(&total_time);
+   if (p->lp_stat.fp_calls < 1) {
+      CoinSeedRandom(17000);
+   }
+
    /* total_time and fp_time both now have total time used by symphony's lp
     * process */
    fp_time                                = used_time(&total_time);
