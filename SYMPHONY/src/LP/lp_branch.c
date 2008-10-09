@@ -1107,7 +1107,7 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
 {
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;
-   double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
+   double lpetol100 = lp_data->lpetol*100, lpetol1 = 1 - lpetol100;
    int *xind = lp_data->tmp.i1; /* n */
    double fracx, *xval = lp_data->tmp.d; /* n */
    branch_obj *cand;
@@ -1124,7 +1124,7 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
       if (vars[i]->is_int){
 	 if (x[i] > vars[i]->new_lb && x[i] < vars[i]->new_ub){
 	    fracx = x[i] - floor(x[i]);
-	    if (fracx > lpetol && fracx < lpetol1){
+	    if (fracx > lpetol100 && fracx < lpetol1){
 	       xind[cnt] = i;
 	       xval[cnt++] = fabs(fracx - .5);
 	    }

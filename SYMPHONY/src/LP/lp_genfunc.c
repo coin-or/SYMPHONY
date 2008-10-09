@@ -2928,18 +2928,25 @@ int update_pcost(lp_prob *p)
       sense = (sense == 'L') ? 'G' : 'L';
    }
    if (sense == 'L') {
-      pcost_down[branch_var] = (pcost_down[branch_var]*
-            br_rel_down[branch_var] + (objval - oldobjval)/
-            (oldx-x[branch_var]))/(br_rel_down[branch_var] + 1);
-      //printf("new pcost_down[%d] = %f\n", branch_var, pcost_down[branch_var]);
-      //printf("old objval = %f, new = %f\n", oldobjval, objval);
-      br_rel_down[branch_var]++;
+      if (oldx - x[branch_var] > 1e-5) {
+         pcost_down[branch_var] = (pcost_down[branch_var]*
+               br_rel_down[branch_var] + (objval - oldobjval)/
+               (oldx-x[branch_var]))/(br_rel_down[branch_var] + 1);
+         //printf("new pcost_down[%d] = %f\n", branch_var, pcost_down[branch_var]);
+         br_rel_down[branch_var]++;
+      } else {
+         PRINT(p->par.verbosity, -1, ("warning: poor lpetol used while branching\n"));
+      }
    } else {
-      pcost_up[branch_var] = (pcost_up[branch_var]*
-            br_rel_up[branch_var] + (objval - oldobjval)/
-            (x[branch_var]-oldx))/(br_rel_up[branch_var] + 1);
-      //printf("new pcost_up[%d] = %f\n", branch_var, pcost_up[branch_var]);
-      br_rel_up[branch_var]++;
+      if (x[branch_var] - oldx > 1e-5) {
+         pcost_up[branch_var] = (pcost_up[branch_var]*
+               br_rel_up[branch_var] + (objval - oldobjval)/
+               (x[branch_var]-oldx))/(br_rel_up[branch_var] + 1);
+         //printf("new pcost_up[%d] = %f\n", branch_var, pcost_up[branch_var]);
+         br_rel_up[branch_var]++;
+      } else {
+         PRINT(p->par.verbosity, -1, ("warning: poor lpetol used while branching\n"));
+      }
    }
 #endif
    return 0;

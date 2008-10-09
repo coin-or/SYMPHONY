@@ -712,7 +712,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    int feasible = IP_INFEASIBLE;
    double true_objval = p->lp_data->objval;
    LPdata *lp_data = p->lp_data;
-   double lpetol = lp_data->lpetol, lpetol1 = 1 - lpetol;
+   double lpetol = lp_data->lpetol;
+   double lpetol100 = lpetol*100, lpetol1 = 1 - lpetol100;
    int *indices;
    double *values, valuesi, *heur_solution = NULL, *col_sol = NULL, 
           new_obj_val;
@@ -774,8 +775,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	 if (!vars[i]->is_int)
 	    continue; /* Not an integer variable */
 	 valuesi = x[i];
-	 if (valuesi-floor(valuesi) > lpetol &&
-	     ceil(valuesi)-valuesi > lpetol &&
+	 if (valuesi-floor(valuesi) > lpetol100 &&
+	     ceil(valuesi)-valuesi > lpetol100 &&
              valuesi>vars[i]->lb-lpetol && valuesi<vars[i]->ub+lpetol){
 	    break;
 	 }
