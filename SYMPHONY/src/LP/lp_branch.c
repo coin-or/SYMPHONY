@@ -389,6 +389,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             best_can->objval[1] = (up_is_est == TRUE) ? oldobjval : up_obj;
             best_can->is_est[0] = down_is_est;
             best_can->is_est[1] = up_is_est;
+            best_can->termcode[0] = LP_D_ITLIM;
+            best_can->termcode[1] = LP_D_ITLIM;
             best_can->rhs[0] = floorx;
             best_can->rhs[1] = ceilx;
             best_can->value = xval;
