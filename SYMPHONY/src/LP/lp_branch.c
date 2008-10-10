@@ -375,7 +375,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             high = down_obj;
          }
          var_score = alpha * low + one_m_alpha * high;
-         if (var_score > best_var_score) {
+         if (var_score > best_var_score || best_can == NULL) {
             best_var_score = var_score;
             best_var = branch_var;
             best_can = candidates[0];
