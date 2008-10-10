@@ -4905,4 +4905,7 @@ OsiSolverInterfaceCommonUnitTest(const OsiSolverInterface* emptySi,
           0  0  5  0 -6  >= -4
           2 -4  0  6  0  >=  5
   */
+
+  return errCnt;
+
 }
