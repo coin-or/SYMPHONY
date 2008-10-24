@@ -1169,7 +1169,7 @@ Optional Packages:
   --without-cp            compile without cut pool module(defualt=yes)
   --without-lp            compile without LP solver module(default=yes)
   --without-tm            compile without tree manager module (default=yes)
-  --with-preprocessor     compile with preprocessor (default=no)
+  --without-preprocessor  compile without preprocessor (default=yes)
 
 Some influential environment variables:
   CDEFS       Additional -D flags to be used when compiling C code.
@@ -23089,7 +23089,7 @@ if test "${with_preprocessor+set}" = set; then
   withval="$with_preprocessor"
   in_preprocessor=$withval
 else
-  in_preprocessor=no
+  in_preprocessor=yes
 fi;
 
 

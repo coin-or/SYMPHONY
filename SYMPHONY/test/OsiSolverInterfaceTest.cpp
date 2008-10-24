@@ -1224,7 +1224,7 @@ void testNames (const OsiSolverInterface *emptySi, std::string fn)
   bool ok ;
   bool allOK = true ;
 
-  OsiSolverInterface *si = emptySi->clone() ;
+  OsiSolverInterface *si = new OsiSymSolverInterface();//emptySi->clone() ;
 
   std::string exmip1ObjName = "OBJ" ;
   OsiSolverInterface::OsiNameVec exmip1RowNames(0) ;
@@ -1836,8 +1836,7 @@ void testNames (const OsiSolverInterface *emptySi, std::string fn)
     msg << "." ;
     failureMessage(solverName,msg.str()) ; }
 
-    delete si;
-
+  delete si;
   return ;
 }
 
