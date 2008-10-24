@@ -976,6 +976,12 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
    double *rowact = NULL, *matval, *colsol = NULL; 
    char feasible = TRUE;
 
+
+#ifdef USE_SYM_APPLICATION
+   /* for now, just assume it is infeasible */
+
+#else
+   
    MIPdesc *mip = env->mip;
    lp_sol *best_sol = &(env->warm_start->best_sol);
 
@@ -1149,7 +1155,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
       
       FREE(best_sol->xind);
       FREE(best_sol->xval);
-
+      
       //      if(delete_node){
       best_sol->xind = root->sol_ind;
       best_sol->xval = root->sol;
@@ -1166,7 +1172,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
    FREE(colsol);
    FREE(root->sol);
    FREE(root->sol_ind);
-   
+#endif
 }
 
 /*===========================================================================*/
@@ -2141,7 +2147,7 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
    else if(strcmp(key, "keep_warm_start") == 0){
-      if (value){
+      if (value[0]){
 	 tm_par->keep_description_of_pruned = 
 	   lp_par->keep_description_of_pruned = KEEP_IN_MEMORY;
          return(0);

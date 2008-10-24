@@ -374,7 +374,7 @@ int create_subproblem_u(lp_prob *p)
       maxm = lp_data->m;
       maxn = lp_data->n;
       maxnz = lp_data->nz;
-
+    
       lp_data->m = bcutnum;
       lp_data->nz = lp_data_mip->nz;
       break;

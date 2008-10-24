@@ -164,8 +164,8 @@ int user_free_cg(void **user)
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
 #pragma omp master
-   FREE(vrp->demand);
-   FREE(vrp->edges);
+   //FREE(vrp->demand);
+   //  FREE(vrp->edges);
    FREE(vrp->in_set);
    FREE(vrp->ref);
    FREE(vrp->new_demand);

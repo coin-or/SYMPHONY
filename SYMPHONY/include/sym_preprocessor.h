@@ -79,8 +79,11 @@
 #ifdef INF
 #undef INF
 #endif
-
-#define INF DBL_MAX
+#ifdef SYM_INFINITY 
+#define INF SYM_INFINITY
+#else
+#define INF 1e20
+#endif
 
 #define ROW_ORDERED 0
 #define COL_ORDERED 1
@@ -213,7 +216,8 @@ typedef struct COL_IMP{
 
 typedef struct PREPDesc
 {
-   MIPdesc * mip; 
+   MIPdesc * mip;
+   MIPdesc * orig_mip;
    prep_stats stats; 
    prep_params params;
 

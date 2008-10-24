@@ -209,9 +209,9 @@ int sym_set_defaults(sym_environment *env)
 
    tm_par->warm_start = FALSE;
    tm_par->warm_start_node_ratio = 0.0;
-   tm_par->warm_start_node_limit = SYM_INFINITY;      
+   tm_par->warm_start_node_limit = (int)SYM_INFINITY;      
    tm_par->warm_start_node_level_ratio = 0.0; 
-   tm_par->warm_start_node_level = SYM_INFINITY;
+   tm_par->warm_start_node_level = (int)SYM_INFINITY;
 
    tm_par->logging = NO_LOGGING;
    tm_par->logging_interval = 1800;
@@ -423,7 +423,7 @@ int sym_set_defaults(sym_environment *env)
    /********************* preprocessor defaults ******************************/
    prep_par->do_prep = 1;
    prep_par->level = 3;
-   prep_par->dive_level = 3;
+   prep_par->dive_level = 5;
    prep_par->impl_dive_level = 0;
    prep_par->impl_limit = 50;
    prep_par->do_probe = 1;
@@ -432,7 +432,7 @@ int sym_set_defaults(sym_environment *env)
    prep_par->probe_verbosity = 0;
    prep_par->probe_level = 1;
    prep_par->display_stats = 0;
-   prep_par->iteration_limit = 5;
+   prep_par->iteration_limit = 10;
    prep_par->etol = tm_par->granularity;
    prep_par->do_single_row_rlx = 0;
    prep_par->single_row_rlx_ratio = 0.1;
@@ -643,22 +643,52 @@ int sym_solve(sym_environment *env)
    base_desc *base = env->base;
 
    start_time = wall_clock(NULL);
+
 #ifdef USE_PREPROCESSOR
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
    if(env->par.prep_par.level > 0){
       termcode = preprocess_mip(env);   
-      
-      if(termcode != PREP_MODIFIED ||
-	 termcode != PREP_UNMODIFIED){
-	 /* no need to go on if the problem is solved/infeasible/ 
-	    unbounded 
 
-	    we may continue if we had other problems*/
-	 /* fix me */
+      if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED ||
+	 termcode == PREP_SOLVED || termcode == PREP_NUMERIC_ERROR ||
+	 termcode == PREP_OTHER_ERROR){
+
+	 env->mip = env->orig_mip;
+	 env->orig_mip = 0;
+	 
+	 if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED){
+	    return(env->termcode = PREP_NO_SOLUTION);
+	 }	 
+	 else if(termcode == PREP_SOLVED){
+	    env->best_sol.has_sol = TRUE;
+	    env->best_sol.xind = (int *) malloc(ISIZE *
+						env->prep_mip->fixed_n);
+	    env->best_sol.xval = (double *) malloc(DSIZE *
+						   env->prep_mip->fixed_n); 
+	    
+	    env->best_sol.xlength = env->prep_mip->fixed_n;
+	    memcpy(env->best_sol.xind, env->prep_mip->fixed_ind, ISIZE *
+		   env->prep_mip->fixed_n);
+	    memcpy(env->best_sol.xval, env->prep_mip->fixed_val, ISIZE *
+		   env->prep_mip->fixed_n);
+
+	    return(env->termcode = PREP_OPTIMAL_SOLUTION_FOUND);
+	 }else if(termcode == PREP_NUMERIC_ERROR){
+	    return(env->termcode = PREP_ERROR);
+	 }
+      }
+   }
+
+   if(termcode == PREP_OTHER_ERROR || env->par.prep_par.level <= 0){
+      if(env->prep_mip){
+	 free_mip_desc(env->prep_mip);
+	 FREE(env->prep_mip);
+	 env->prep_mip = 0;
       }
    }
 #endif
+
    if (env->par.verbosity >= 0){
       printf("Solving...\n\n");
    }
@@ -798,7 +828,7 @@ int sym_solve(sym_environment *env)
    tm->lb = env->lb;
 
    if(env->obj_offset){
-      env->mip->obj_offset = env->obj_offset;
+      env->mip->obj_offset += env->obj_offset;
    }
    
    tm->obj_offset = env->mip->obj_offset;
@@ -1262,6 +1292,15 @@ int sym_solve(sym_environment *env)
    }
 #endif
 
+#ifdef USE_PREPROCESSOR
+   if(env->par.prep_par.level > 0){
+      if(env->orig_mip){
+	 env->mip = env->orig_mip;
+	 env->orig_mip = 0;
+      }
+   }
+#endif
+
    env->has_ub = FALSE;
    env->ub = 0.0;
    env->lb = -MAXDOUBLE;
@@ -1443,7 +1482,7 @@ int sym_warm_solve(sym_environment *env)
 
 #ifdef USE_SYM_APPLICATION 
 	    cut_data * cut;
-	    if(change_type == COLS_ADDED){
+	    if(change_type == COLS_ADDED || change_type == RHS_CHANGED){
 	       for(i = 0; i < env->warm_start->cut_num; i++){
 		  cut = env->warm_start->cuts[i];
 		  user_ws_update_cuts(env->user, &(cut->size), &(cut->coef), 
@@ -2445,6 +2484,13 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
 #if !defined(_MSC_VER) && !defined (__MNO_CYGWIN)
    CALL_WRAPPER_FUNCTION( init_draw_graph_u(env) );   
 #endif
+
+   if(env->mip->obj_sense == SYM_MAXIMIZE){
+      for (i = 0; i < numcols; i++){
+	 env->mip->obj[i] *= -1.0;
+	 env->mip->obj2[i] *= -1.0;
+      }
+   }
    
    /*------------------------------------------------------------------------*\
     * Have the user generate the base and root description
@@ -2466,6 +2512,7 @@ int sym_is_abandoned(sym_environment *env)
 {
 
    switch(env->termcode){
+    case PREP_ERROR:
     case SOMETHING_DIED:
     case TM_ERROR__NUMERICAL_INSTABILITY:    
        return(TRUE);
@@ -2484,7 +2531,8 @@ int sym_is_proven_optimal(sym_environment *env)
 
    switch(env->termcode){
     case TM_OPTIMAL_SOLUTION_FOUND:
-       return(TRUE);
+    case PREP_OPTIMAL_SOLUTION_FOUND:
+      return(TRUE);
     default:
        break;
    }
@@ -2500,7 +2548,8 @@ int sym_is_proven_primal_infeasible(sym_environment *env)
 
    switch(env->termcode){
     case TM_NO_SOLUTION:
-       return(TRUE);
+    case PREP_NO_SOLUTION:
+      return(TRUE);
     default:
        break;
    }
@@ -2996,8 +3045,18 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
    else{
       memset(colsol, 0, DSIZE*env->mip->n);
       if(sol.xlength){
-	 for( i = 0; i<sol.xlength; i++){
-	    colsol[sol.xind[i]] = sol.xval[i];
+	 if(!env->prep_mip){
+	    for( i = 0; i<sol.xlength; i++){
+	       colsol[sol.xind[i]] = sol.xval[i];
+	    }
+	 }else{
+	    for( i = 0; i<sol.xlength; i++){
+	       colsol[env->prep_mip->orig_ind[sol.xind[i]]] = sol.xval[i];
+	    }	    
+	    for(i = 0; i < env->prep_mip->fixed_n; i++){
+	       colsol[env->prep_mip->fixed_ind[i]] =
+		  env->prep_mip->fixed_val[i];
+	    }
 	 }
       }
    }
@@ -3055,7 +3114,8 @@ int sym_get_obj_val(sym_environment *env, double *objval)
 
    if (env->best_sol.has_sol){
       *objval = (env->mip->obj_sense == SYM_MINIMIZE ? env->best_sol.objval :
-		 -env->best_sol.objval) + env->mip->obj_offset;
+		 -env->best_sol.objval) + env->mip->obj_offset + 
+	         (env->prep_mip ? env->prep_mip->obj_offset : 0.0);
    }else{ 
       if(env->par.verbosity >= 1){
 	 printf("sym_get_obj_val(): There is no solution!\n");
@@ -3130,13 +3190,12 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
-
    if (env->mip->obj_sense == SYM_MAXIMIZE){
       env->mip->obj[index] = -value;
    }else{
       env->mip->obj[index] = value;
    }
-
+   
    if (env->mip->change_num){
       for(i = env->mip->change_num - 1 ; i >=0 ; i--){
 	 if (env->mip->change_type[i] == OBJ_COEFF_CHANGED){
@@ -3174,8 +3233,6 @@ int sym_set_obj2_coeff(sym_environment *env, int index, double value)
    }else{
       env->mip->obj2[index] = value;
    }
-
-   env->mip->obj2[index] = value;
 
    return(FUNCTION_TERMINATED_NORMALLY);
 }
@@ -5878,6 +5935,14 @@ warm_start_desc *sym_create_copy_warm_start(warm_start_desc *ws)
 MIPdesc *sym_create_copy_mip_desc(sym_environment *env)
 {
    return(create_copy_mip_desc(env->mip));
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+MIPdesc *sym_get_presolved_mip_desc(sym_environment *env)
+{
+   return(env->prep_mip);
 }
 
 /*===========================================================================*/

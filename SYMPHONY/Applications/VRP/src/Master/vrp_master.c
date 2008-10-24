@@ -986,7 +986,43 @@ int user_ws_update_cuts (void *user, int *size, char **coef, double * rhs,
 			 char *sense, char type, int new_col_num, 
 			 int change_type)
 {
-   return(USER_DEFAULT);
+   
+   /* customer demands, new number of routes, and problem data
+      (demand of not showed up customers) should have been taken
+      care of before,
+      here we just update the rhs of the given cut*/
+   vrp_problem * vrp = (vrp_problem *)user;
+   int * demand = vrp->demand;
+   int total_demand = demand[0];
+   int num_routes = vrp->numroutes;
+   //   int v0, v1, *edges = vrp->edges;
+   int vertnum = vrp->vertnum;
+   int comp_demand = 0;
+   int comp_nodes = 0;
+   int capacity = vrp->capacity;
+   int i; 
+   for (i = 0; i < vertnum; i++){  
+      if (((*coef)[i >> DELETE_POWER] >>
+	   (i & DELETE_AND) & 1)){
+	 if(i == 0) printf("depo node in cut!\n");
+	 comp_demand += vrp->demand[i];
+	 comp_nodes++;	 
+      }
+   }
+   
+   switch (type){
+    case SUBTOUR_ELIM_SIDE:
+      *rhs = RHS(comp_nodes, comp_demand, capacity);
+      break;
+    case SUBTOUR_ELIM_ACROSS:
+      *rhs = 2*BINS(comp_demand, capacity);
+      break;   
+    default:
+      printf("error in user_ws_update_cuts(): unknown cut type:\n");
+      exit(0);
+   }
+
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/

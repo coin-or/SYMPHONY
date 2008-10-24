@@ -82,13 +82,14 @@ void free_mip_desc(MIPdesc *mip)
    FREE(mip->matbeg);
    FREE(mip->matind);
    FREE(mip->matval);
-#if 0
    FREE(mip->col_lengths);
    FREE(mip->row_matbeg);
    FREE(mip->row_matind);
    FREE(mip->row_matval);
    FREE(mip->row_lengths);
-#endif
+   FREE(mip->orig_sense);
+   FREE(mip->orig_ind);
+   
    FREE(mip->obj);
    FREE(mip->obj1);
    FREE(mip->obj2);
@@ -104,9 +105,27 @@ void free_mip_desc(MIPdesc *mip)
       }
       FREE(mip->colname);
    }
+#if 0
+   if(mip->fixed_name){
+      for(j = 0; j < mip->fixed_n; j++){
+	 FREE(mip->fixed_name[j]);
+      }
+      FREE(mip->fixed_name);
+   }
+#endif
+   
+   FREE(mip->fixed_val);
+   FREE(mip->fixed_ind);
+   
    if(mip->cru_vars_num){
       FREE(mip->cru_vars);
    }
+
+   if(mip->mip_inf){
+      FREE(mip->mip_inf->rows);
+      FREE(mip->mip_inf->cols);
+      FREE(mip->mip_inf);
+   }   
 }
 
 /*===========================================================================*/
@@ -3358,21 +3377,24 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
 	  DSIZE * mip->matbeg[mip->n]);  
    memcpy(mip->matind, const_cast<int *> (matrixByCol->getIndices()), 
 	  ISIZE * mip->matbeg[mip->n]);  
-   
+
+   mip->colname = (char **) malloc(sizeof(char *) * mip->n);  
+
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
-   }
-
-   mip->obj_offset = -mps.objectiveOffset();
-
-   mip->colname = (char **) malloc(sizeof(char *) * mip->n);   
-   
-   for (j = 0; j < mip->n; j++){
       mip->colname[j] = (char *) malloc(CSIZE * 9);
       strncpy(mip->colname[j], const_cast<char*>(mps.columnName(j)), 9);
       mip->colname[j][8] = 0;
    }
-   
+
+   if (mip->obj_sense == SYM_MAXIMIZE){
+      for (j = 0; j < mip->n; j++){
+	 mip->obj[j] *= -1.0;
+      }
+   }
+    
+   mip->obj_offset = -mps.objectiveOffset();
+
    return(errors);
 }
 
@@ -3430,21 +3452,24 @@ int read_lp(MIPdesc *mip, char *infile, char *probname)
 	  DSIZE * mip->matbeg[mip->n]);  
    memcpy(mip->matind, const_cast<int *> (matrixByCol->getIndices()), 
 	  ISIZE * mip->matbeg[mip->n]);  
-   
+
+   mip->colname = (char **) malloc(sizeof(char *) * mip->n); 
+
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = lp.isInteger(j);
-   }
-
-   mip->obj_offset = -lp.objectiveOffset();
-
-   mip->colname = (char **) malloc(sizeof(char *) * mip->n);   
-   
-   for (j = 0; j < mip->n; j++){
       mip->colname[j] = (char *) malloc(CSIZE * 9);
       strncpy(mip->colname[j], const_cast<char*>(lp.columnName(j)), 9);
       mip->colname[j][8] = 0;
    }
-   
+
+   if (mip->obj_sense == SYM_MAXIMIZE){
+      for (j = 0; j < mip->n; j++){
+	 mip->obj[j] *= -1.0;
+      }
+   }
+
+   mip->obj_offset = -lp.objectiveOffset();
+
    return 0;
 }
 

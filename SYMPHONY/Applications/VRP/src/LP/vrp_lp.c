@@ -116,6 +116,7 @@ int user_receive_lp_data(void **user)
 int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
 			   int *maxn, int *maxm, int *maxnz)
 {
+
    vrp_lp_problem *vrp = (vrp_lp_problem *)user;
    int *costs = vrp->costs;
    int *edges = vrp->edges;
@@ -364,7 +365,8 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
   char *cpt;
   int *arcs;
   char *indicators;
-	
+  //  vrp_lp_problem *vrp = (vrp_lp_problem *)user;
+  //  int node_cnt, demand = 0;
   double bigM, *weights;
 
   /*___END_EXPERIMENTAL_SECTION___*/
@@ -377,6 +379,11 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
      coef = (cut = cuts[j])->coef;
      cuts[j] = NULL;
      (row_list[j] = (waiting_row *) malloc(sizeof(waiting_row)))->cut = cut;
+#if 0
+     memset(node_used, FALSE, CSIZE*vertnum);
+     node_cnt = 0;
+     demand = 0;
+#endif
      switch (cut->type){
 	/*-------------------------------------------------------------------*\
 	 * The subtour elimination constraints are stored as a vector of
@@ -453,6 +460,14 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
 	      matind[nzcnt++] = i;
 	   }
 	}
+#if 0
+	for (i = 0; i < vrp->vertnum; i++){
+	   if ((coef[i >> DELETE_POWER] >>
+		(i & DELETE_AND) & 1)){
+	      demand += vrp->demand[i];
+	   }
+	}
+#endif	
 	cut->deletable = TRUE;
 	cut->sense = 'G';
 	break;
@@ -976,8 +991,8 @@ int user_free_lp(void **user)
 #ifndef COMPILE_IN_CG
    FREE(vrp->demand);
 #endif
-   FREE(vrp->costs);
-   FREE(vrp->edges);
+   // FREE(vrp->costs);
+   //  FREE(vrp->edges);
    FREE(vrp->cur_sol);
    FREE(vrp);
    return(USER_SUCCESS);

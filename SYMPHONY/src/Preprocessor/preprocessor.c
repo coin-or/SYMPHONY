@@ -40,9 +40,7 @@ int preprocess_mip (sym_environment *env)
    int termcode;		/* return status of this function, 0 normal, 1
 				   error */
    int termstatus;		/* return status of functions called herein */
-
-
-
+   
    /* FIXME get a copy of mip, 
       in case of an error, ignore presolve and continue with that...*/
 
@@ -51,7 +49,11 @@ int preprocess_mip (sym_environment *env)
    
    int verbosity = params.verbosity;
    int p_level = params.level;
-
+   
+   if(env->par.verbosity < 0){
+      verbosity = -1;
+   }
+   
    if (p_level <= 0) {
       if(verbosity >= 0){
 	 printf ("Skipping Preprocessor\n");
@@ -66,7 +68,9 @@ int preprocess_mip (sym_environment *env)
    //double mark_time; 
 
    /* Start with Basic Preprocessing */
+
    PRINT(verbosity, 0, ("Starting Preprocessing...\n")); 
+
    
    //mark_time = wall_clock(NULL);
 
@@ -74,7 +78,16 @@ int preprocess_mip (sym_environment *env)
    /* initialize prep desc */
    /* have a func for these */
    PREPdesc * P = (PREPdesc *)calloc(1, sizeof(PREPdesc)); 
-   P->mip = mip;
+
+   /* get a copy of orig mip */
+
+   if(env->prep_mip){
+      free_mip_desc(env->prep_mip);
+      FREE(env->prep_mip);
+   }
+   
+   P->orig_mip = env->orig_mip = create_copy_mip_desc(mip);
+   P->mip = env->prep_mip = mip;
    P->params = params;
    
    P->stats.nz_coeff_changed = (char *)calloc(CSIZE ,mip->nz);
@@ -84,8 +97,8 @@ int preprocess_mip (sym_environment *env)
    termcode = prep_fill_row_ordered(P);
    
    termcode = prep_initialize_mipinfo(P);//mip, params, &(P->stats));   
- 
-   /* no changes so far */
+
+   /* no changes so far on column based mip*/
 
    if(!prep_quit(termcode)){
       termcode = prep_basic(P);
@@ -93,7 +106,9 @@ int preprocess_mip (sym_environment *env)
    //PRINT(verbosity, 1, ("Basic Prep time: %f...\n", 
    //		wall_clock(NULL) - mark_time));
 
-   prep_report(P, termcode);
+   if(env->par.verbosity >= 0){
+      prep_report(P, termcode);
+   }
    
    if(params.reduce_mip){
       prep_restore_rootdesc(env);
@@ -102,23 +117,24 @@ int preprocess_mip (sym_environment *env)
 
    /* debug */
    /*----------*/
-   char file_name[80] = "";
-   sprintf(file_name, "%s_prep", env->probname);
-   
-   if(params.write_mps){
-      sym_write_mps(env, file_name);
-   }
-   if(params.write_lp){
-      sym_write_lp(env, file_name);
+   if(params.write_mps || params.write_lp){
+      char file_name[80] = "";
+      sprintf(file_name, "%s_prep", env->probname);
+      
+      if(params.write_mps){
+	 sym_write_mps(env, file_name);
+      }
+      if(params.write_lp){
+	 sym_write_lp(env, file_name);
+      }
    }
    
    /*----------*/
 
-
-
    /* since we use the original mip desc */
    P->mip = 0;
-
+   P->orig_mip = 0;
+   
    prep_close_desc(P);   
 
    PRINT(verbosity, 0, ("Total Presolve Time: %f...\n\n", 

@@ -67,7 +67,9 @@ void delete_dup_edges(small_graph *g)
    for (pos=0, ed0=ed1=g->edges ; pos < g->edgenum; pos++, ed1++){
       if ( memcmp((char *)ed0, (char *)ed1, 2*sizeof(int)) ){
 	 ed0++;
-	 (void)memcpy((char *)ed0, (char *)ed1, sizeof(edge_data));
+	 if(ed0 != ed1){
+	    (void)memcpy((char *)ed0, (char *)ed1, sizeof(edge_data));
+	 }
       }
    }
    pos = ((int)ed0 - (int)g->edges)/sizeof(edge_data) + 1;

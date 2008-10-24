@@ -645,8 +645,8 @@ typedef struct MIPDESC{
    int        alloc_nz;
 
    int        fixed_n;      /* only used if preprocessor is used */
-   char     **fixed_name;
-   double   **fixed_val; 
+   int       *fixed_ind;    /* fixed vars to nonzero vals */
+   double    *fixed_val; 
 
 /* Only to be allocated and used by SYMPHONY */
 
@@ -654,9 +654,12 @@ typedef struct MIPDESC{
    int       *row_matbeg;      /* m */  /* a row ordered desc for heuristics */
    int       *row_matind;      /* nz */
    double    *row_matval;      /* nz */
-   int       *row_lengths;  
-   char      *orig_sense; /* will keep the orig row senses*/
-
+   int       *row_lengths;
+   /* will keep the orig sense - if prep is used */
+   char      *orig_sense;
+   int       *orig_ind; /*mapping of indices of presolved model into orig one
+			 */
+   
    int        var_type_modified;  /* number of updates on the mip desc */
    int        change_num;  /* number of updates on the mip desc */
    int        change_type[MAX_CHANGE_NUM];  /* type of the mip desc. changes */
