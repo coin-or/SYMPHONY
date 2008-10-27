@@ -90,6 +90,7 @@ int prep_basic(PREPdesc *P)
    /* first integerize the bounds */
    /* can be embedded somewhere in basic prep down*/
    /* for now let it be */
+   /* also we integerize the integerizable vars if p_level > 2 */
    termcode = prep_integerize_bounds(P);
    
    if(prep_quit(termcode)){
@@ -5564,7 +5565,8 @@ int prep_initialize_mipinfo(PREPdesc *P)
    prep_stats *stats = &(P->stats);
    prep_params params = P->params;
 
-   double etol = params.etol; 
+   double etol = params.etol;
+   double coeff_etol = 1e-15;
    int verbosity = params.verbosity;
    //   int p_level = prep_par.prep_level;
    //   int termcode; 
@@ -5713,10 +5715,11 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	 }
 
 	 /* for coef types */
-	 if (!(coef_val-floor(coef_val) > etol &&
-	     ceil(coef_val)-coef_val > etol)){
-	    if((coef_val > 1.0 - etol && coef_val < 1.0 + etol) ||
-	       (coef_val > -1.0 - etol && coef_val < -1.0 + etol)) {	       
+	 if (!(coef_val-floor(coef_val) > coeff_etol &&
+	     ceil(coef_val)-coef_val > coeff_etol)){
+	    if((coef_val > 1.0 - coeff_etol && coef_val < 1.0 + coeff_etol) ||
+	       (coef_val > -1.0 - coeff_etol &&
+		coef_val < -1.0 + coeff_etol)) {	       
 	       row_coef_bin_cnt[row_ind]++;
 	       col_coef_bin_cnt++;
 	    }
@@ -5962,8 +5965,8 @@ int prep_initialize_mipinfo(PREPdesc *P)
   
       if(sense[j] == 'E' && rows[j].cont_var_num == 1 && 
 	 rows[j].coef_type != FRACTIONAL_VEC && 
-	 prep_is_integral(rhs[j], etol) && 
-	 prep_is_integral(rows[j].fixed_lhs_offset, etol)){
+	 prep_is_integral(rhs[j], coeff_etol) && 
+	 prep_is_integral(rows[j].fixed_lhs_offset, coeff_etol)){
 	 if(cols[rows_integerized_var_ind[j]].var_type != 'Z'){
 	    cols[rows_integerized_var_ind[j]].var_type = 'Z';
 	    integerizable_var_num++;
@@ -5979,7 +5982,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
    if(!(cont_var_cnt - integerizable_var_num)){
       for(i = 0; i < n; i++){
 	 coef_val = obj[i];
-	 if (!prep_is_integral(coef_val, etol)){
+	 if (!prep_is_integral(coef_val, coeff_etol)){
 	    if(cols[i].var_type == 'F'){
 	       if(ub[i] < etol && ub[i] > -etol){
 		  continue;
@@ -6057,7 +6060,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
 int prep_integerize_bounds(PREPdesc *P)
 {
    /* Change the bounds of integer variables to floor/ceiling appropriately */
-
+   int termcode = 0;
    MIPdesc *mip = P->mip;
    MIPinfo *mip_inf = mip->mip_inf;
    COLinfo *cols = mip_inf->cols;
@@ -6070,6 +6073,17 @@ int prep_integerize_bounds(PREPdesc *P)
    int verbosity = P->params.verbosity;
 
    //   int * bounds_updated = (int *)calloc(ISIZE,n);
+
+   if(P->params.level > 2 && mip_inf->integerizable_var_num){
+      for (i = 0; i < n; i++) {
+	 if (cols[i].var_type == 'Z'){
+	    termcode = prep_integerize_var(P, i);
+	    if(prep_quit(termcode)){
+	       return termcode;
+	    }
+	 }
+      }
+   }
 
    for (i = 0; i < n; i++) {
       if (cols[i].var_type != 'F' && 
@@ -6118,6 +6132,7 @@ int prep_integerize_bounds(PREPdesc *P)
 	 }
       }
    }
+
 #if 0   
    if(keeptrack){
       P->mip_diff->bounds_integerized_num = b_cnt;
@@ -6127,9 +6142,74 @@ int prep_integerize_bounds(PREPdesc *P)
    }
 #endif
    P->stats.bounds_integerized = b_cnt;
-   return 0;
+   return termcode;
 }
 
+/*===========================================================================*/
+/*===========================================================================*/
+
+int prep_integerize_var(PREPdesc *P, int col_ind) {
+   
+   int j, k, row_ind, termcode = PREP_MODIFIED;
+   MIPdesc *mip = P->mip;
+   ROWinfo *rows = mip->mip_inf->rows;
+   COLinfo *cols = mip->mip_inf->cols;
+   double etol = P->params.etol;
+   double coeff_etol = 1e-15;
+
+   if(P->params.verbosity >= 2 ){
+      printf("col %i is integerized\n", col_ind);
+   }
+
+   (P->stats.vars_integerized)++;
+   mip->is_int[col_ind] = TRUE;
+   cols[col_ind].var_type = 'I';
+   if(mip->lb[col_ind] > (-1.0 + etol) && 
+      mip->ub[col_ind] < (2.0 - etol)){
+      cols[col_ind].var_type = 'B';
+   }
+   for(j = mip->matbeg[col_ind];
+       j < mip->matbeg[col_ind+1]; j++){
+      row_ind = mip->matind[j];
+      if(cols[col_ind].var_type == 'B'){
+	 rows[row_ind].bin_var_num++;
+      }
+      rows[row_ind].cont_var_num--;
+      if(rows[row_ind].cont_var_num < 0){
+	 printf("error: prep_integerize_var()\n");
+	 return PREP_OTHER_ERROR;
+      }else if(rows[row_ind].cont_var_num < 1){
+	 if(rows[row_ind].bin_var_num){
+	    if(rows[row_ind].bin_var_num + 
+	       rows[row_ind].fixed_var_num 
+	       >= rows[row_ind].size){
+	       rows[row_ind].type = BINARY_TYPE;
+	    }else{
+	       rows[row_ind].type = BIN_INT_TYPE;
+	    }
+	 }else{
+	    rows[row_ind].type = INTEGER_TYPE;
+	 }
+      }else if(rows[row_ind].cont_var_num == 1){
+	 if(mip->sense[row_ind] == 'E' && 
+	    rows[row_ind].coef_type != FRACTIONAL_VEC && 
+	    prep_is_integral(mip->rhs[row_ind], coeff_etol) && 
+	    prep_is_integral(rows[row_ind].fixed_lhs_offset, coeff_etol)){
+	    for(k = mip->row_matbeg[row_ind];
+		k < mip->row_matbeg[row_ind + 1]; k++){
+	       if(cols[mip->row_matind[k]].var_type == 'C'){
+		  termcode = prep_integerize_var(P, mip->row_matind[k]);
+		  break;
+	       }
+	    }
+	 }
+      }
+      if(prep_quit(termcode)){
+	 break;
+      }
+   }
+   return termcode;
+}
 /*===========================================================================*/
 /*===========================================================================*/
 int prep_fill_row_ordered(PREPdesc *P)
@@ -6654,7 +6734,8 @@ int prep_report(PREPdesc *P, int termcode)
 	 stats.bounds_tightened + 
 	 stats.rows_deleted + 
 	 stats.vars_fixed + 
-	 stats.vars_aggregated> 0){
+	 stats.vars_aggregated +
+	 stats.vars_integerized > 0){
 	 if(stats.coeffs_changed > 0){
 	    printf("\t coefficients modified: %i\n",
 		   stats.coeffs_changed);		       
@@ -6677,6 +6758,9 @@ int prep_report(PREPdesc *P, int termcode)
 	 }
 	 if(stats.vars_aggregated > 0){
 	    printf("\t variables aggregated: %i\n", stats.vars_aggregated);
+	 }
+	 if(stats.vars_integerized > 0){
+	    printf("\t variables integerized: %i\n", stats.vars_integerized);
 	 }
 	 
       }else{
