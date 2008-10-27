@@ -2344,13 +2344,13 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
                }
             } else {
                if (p->lp_stat.probing_cuts > p->lp_stat.cuts_generated/2
-                   && p->comp_times.probing_cuts > p->comp_times.lp) {
+                   && p->comp_times.probing_cuts > 5*p->comp_times.lp) {
                   p->par.cgl.probing_is_expensive = TRUE;
                   *should_generate = FALSE;
                   break;
                } else if (p->lp_stat.probing_cuts <= 
                      p->lp_stat.cuts_generated/2 && 
-                     p->comp_times.probing_cuts > p->comp_times.lp/4) {
+                     p->comp_times.probing_cuts > 5*p->comp_times.lp) {
                   p->par.cgl.probing_is_expensive = TRUE;
                   *should_generate = FALSE;
                   break;
@@ -2368,8 +2368,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             probing->setMaxPassRoot(10); /* default is 3 */
             probing->setMaxElements(10000);  /* default is 1000 */
             probing->setMaxElementsRoot(10000); /* default is 10000 */
-            probing->setMaxLook(100);    /* default is 50 */
-            probing->setMaxLookRoot(100);    /* default is 50 */
+            probing->setMaxLook(1000);    /* default is 50 */
+            probing->setMaxLookRoot(1000);    /* default is 50 */
             probing->setMaxProbe(200);   /* default is 100 */
             probing->setMaxProbeRoot(200);   /* default is 100 */
          }
