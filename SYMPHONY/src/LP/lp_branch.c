@@ -281,10 +281,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       int *bnd_ind = (int *)malloc (2*lp_data->n*ISIZE);
       char *bnd_sense = (char *)malloc (2*lp_data->n*CSIZE);
       int num_bnd_changes = 0;
-      double xval, floorx, ceilx, var_score, best_up_obj, best_down_obj;
-      int full_solves = 0, best_up_is_est, best_down_is_est, down_is_est, 
-          up_is_est, max_solves_before_break = p->par.rel_br_cand_threshold, 
-          stop_solving = FALSE, both_children_inf = FALSE, rel_up, rel_down;
+      double xval, floorx, ceilx, var_score;
+      int full_solves = 0, down_is_est, up_is_est, 
+          max_solves_before_break = p->par.rel_br_cand_threshold, 
+          stop_solving = FALSE, both_children_inf = FALSE, rel_up, 
+          rel_down;
       double alpha = p->par.strong_branching_high_low_weight;
       double one_m_alpha = 1-alpha;
       best_var = -1;

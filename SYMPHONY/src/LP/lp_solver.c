@@ -3600,6 +3600,7 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
                        lp_stat_desc *lp_stat, node_times *comp_times,
                        int verbosity)
 {
+#if 0
    OsiCuts              cutlist;
    OsiRowCut            cut, cut2;
    int                  n = lp_data->n;
@@ -4132,6 +4133,8 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
 #endif
 
+#endif
+
    return;
 }
 
@@ -4191,6 +4194,7 @@ int check_cuts(OsiCuts &cutlist, LPdata *lp_data, int bc_level, int
       *num_cuts, cut_data ***cuts, char send_to_pool, int *bnd_changes, 
       lp_stat_desc *lp_stat, node_times *comp_times, int verbosity)
 {
+#if 0
    //OsiCuts cutlist = *cutlist_p;
    OsiRowCut cut;
    int i, j, k, sizeColCuts;
@@ -4427,6 +4431,7 @@ int check_cuts(OsiCuts &cutlist, LPdata *lp_data, int bc_level, int
    }
    cut_time = used_time(&total_time);
    comp_times->dupes_and_bad_coeffs_in_cuts += cut_time;
+#endif
    return 0;
 }
 #endif
