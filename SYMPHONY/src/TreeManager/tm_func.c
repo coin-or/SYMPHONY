@@ -348,9 +348,9 @@ int solve(tm_prob *tm)
 #pragma omp parallel default(shared)
 {
 #ifdef _OPENMP
-      int i, thread_num = omp_get_thread_num();
+      int thread_num = omp_get_thread_num();
 #else
-      int i, thread_num = 0;
+      int thread_num = 0;
 #endif
       while (tm->active_node_num > 0 || tm->samephase_candnum > 0){
 	 /*------------------------------------------------------------------*\
@@ -578,11 +578,11 @@ void write_log_files(tm_prob *tm)
 
 void print_tree_status(tm_prob *tm)
 {
-   int i;
    double elapsed_time;
    double obj_ub = SYM_INFINITY, obj_lb = -SYM_INFINITY;
 
 #ifdef SHOULD_SHOW_MEMORY_USAGE
+   int i;
    int pid;
    int tmp_int;
    long unsigned vsize;

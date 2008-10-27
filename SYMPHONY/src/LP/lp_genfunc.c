@@ -218,6 +218,17 @@ int fathom_branch(lp_prob *p)
    
    check_ub(p);
    p->iter_num = p->node_iter_num = 0;
+
+   // TODO: replace check_bounds with a better preprocessor
+   termcode = LP_OPTIMAL; // just to initialize
+   check_bounds(p, &termcode);
+   if (termcode == LP_D_UNBOUNDED) {
+      if (fathom(p, FALSE)) {
+         comp_times->communication += used_time(&p->tt);
+         return(FUNCTION_TERMINATED_NORMALLY);
+      }
+   }
+
   
    /*------------------------------------------------------------------------*\
     * The main loop -- continue solving relaxations until no new cuts
@@ -2129,7 +2140,6 @@ int str_br_bound_changes(lp_prob *p, int num_bnd_changes, double *bnd_val,
 {
 #ifdef COMPILE_IN_LP
    bounds_change_desc    *bnd_change;
-   node_desc             *desc;
    int                   i, j;
    var_desc              **vars = p->lp_data->vars;
    int                   *index;
@@ -2265,7 +2275,6 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 #ifdef USE_CGL_CUTS
    int *should_generate = (int *) malloc(CGL_NUM_GENERATORS*ISIZE);
    int i, should_stop = FALSE, repeat_with_long = TRUE, max_cut_length;
-   double **hash_values;
    OsiCuts cutlist;
    const int n                 = p->lp_data->n;
    OsiXSolverInterface  *si    = p->lp_data->si;
@@ -2344,13 +2353,13 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
                }
             } else {
                if (p->lp_stat.probing_cuts > p->lp_stat.cuts_generated/2
-                   && p->comp_times.probing_cuts > 5*p->comp_times.lp) {
+                   && p->comp_times.probing_cuts > 3*p->comp_times.lp) {
                   p->par.cgl.probing_is_expensive = TRUE;
                   *should_generate = FALSE;
                   break;
                } else if (p->lp_stat.probing_cuts <= 
                      p->lp_stat.cuts_generated/2 && 
-                     p->comp_times.probing_cuts > 5*p->comp_times.lp) {
+                     p->comp_times.probing_cuts > 3*p->comp_times.lp) {
                   p->par.cgl.probing_is_expensive = TRUE;
                   *should_generate = FALSE;
                   break;
@@ -2368,8 +2377,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             probing->setMaxPassRoot(10); /* default is 3 */
             probing->setMaxElements(10000);  /* default is 1000 */
             probing->setMaxElementsRoot(10000); /* default is 10000 */
-            probing->setMaxLook(1000);    /* default is 50 */
-            probing->setMaxLookRoot(1000);    /* default is 50 */
+            probing->setMaxLook(500);    /* default is 50 */
+            probing->setMaxLookRoot(500);    /* default is 50 */
             probing->setMaxProbe(200);   /* default is 100 */
             probing->setMaxProbeRoot(200);   /* default is 100 */
          }
@@ -2935,7 +2944,7 @@ int update_pcost(lp_prob *p)
          //printf("new pcost_down[%d] = %f\n", branch_var, pcost_down[branch_var]);
          br_rel_down[branch_var]++;
       } else {
-         PRINT(p->par.verbosity, -1, ("warning: poor lpetol used while branching\n"));
+         PRINT(p->par.verbosity, 0, ("warning: poor lpetol used while branching\n"));
       }
    } else {
       if (x[branch_var] - oldx > 1e-5) {
@@ -2945,10 +2954,35 @@ int update_pcost(lp_prob *p)
          //printf("new pcost_up[%d] = %f\n", branch_var, pcost_up[branch_var]);
          br_rel_up[branch_var]++;
       } else {
-         PRINT(p->par.verbosity, -1, ("warning: poor lpetol used while branching\n"));
+         PRINT(p->par.verbosity, 0, ("warning: poor lpetol used while branching\n"));
       }
    }
 #endif
+   return 0;
+}
+/*===========================================================================*/
+
+/* check if lb <= ub for each variable. otherwise fathom this branch. */
+int check_bounds(lp_prob *p, int *termcode)
+{
+   int i;
+   double *lb, *ub;
+   const double lpetol = p->lp_data->lpetol;
+   const int n = p->lp_data->n;
+   LPdata *lp_data = p->lp_data;
+   
+   get_bounds(lp_data);
+   lb = lp_data->lb;
+   ub = lp_data->ub;
+
+   for (i=0; i<n; i++) {
+      if (lb[i] > ub[i]+lpetol) {
+         break;
+      }
+   }
+   if (i<n) {
+      *termcode = LP_D_UNBOUNDED;
+   }
    return 0;
 }
 /*===========================================================================*/
