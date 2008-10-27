@@ -689,7 +689,7 @@ int sym_solve(sym_environment *env)
    }
 #endif
 
-   if (env->par.verbosity >= 0){
+   if (env->par.verbosity >= -1){
       printf("Solving...\n\n");
    }
    

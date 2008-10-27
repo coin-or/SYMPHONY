@@ -431,7 +431,7 @@ int solve(tm_prob *tm)
 {	    
             now = wall_clock(NULL);
 	    if (now - then2 > timeout2){
-	       if(tm->par.verbosity >=0 ){
+	       if(tm->par.verbosity >= -1 ){
 		  print_tree_status(tm);
 	       }
 	       then2 = now;

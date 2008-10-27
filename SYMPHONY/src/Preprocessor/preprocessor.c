@@ -39,7 +39,7 @@ int preprocess_mip (sym_environment *env)
 */
    int termcode;		/* return status of this function, 0 normal, 1
 				   error */
-   int termstatus;		/* return status of functions called herein */
+   //int termstatus;		/* return status of functions called herein */
    
    /* FIXME get a copy of mip, 
       in case of an error, ignore presolve and continue with that...*/
@@ -49,11 +49,7 @@ int preprocess_mip (sym_environment *env)
    
    int verbosity = params.verbosity;
    int p_level = params.level;
-   
-   if(env->par.verbosity < 0){
-      verbosity = -1;
-   }
-   
+
    if (p_level <= 0) {
       if(verbosity >= 0){
 	 printf ("Skipping Preprocessor\n");
@@ -69,7 +65,7 @@ int preprocess_mip (sym_environment *env)
 
    /* Start with Basic Preprocessing */
 
-   PRINT(verbosity, 0, ("Starting Preprocessing...\n")); 
+   PRINT(verbosity, -2, ("Starting Preprocessing...\n")); 
 
    
    //mark_time = wall_clock(NULL);
@@ -106,7 +102,7 @@ int preprocess_mip (sym_environment *env)
    //PRINT(verbosity, 1, ("Basic Prep time: %f...\n", 
    //		wall_clock(NULL) - mark_time));
 
-   if(env->par.verbosity >= 0){
+   if(verbosity >= -1){
       prep_report(P, termcode);
    }
    
