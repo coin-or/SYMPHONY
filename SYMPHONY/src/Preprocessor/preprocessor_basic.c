@@ -2155,9 +2155,9 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 
 			    if(prep_is_equal(maj_matval[a_loc], 0.0, etol)){
 			       maj_matval[a_loc] = 0.0;
+#if 0
 			       (rows[row_ind].fixed_var_num)++;
 			       (cols[col_ind].col_size)--;
-#if 0
 			       if(rows[row_ind].fixed_var_num >=
 				  rows[row_ind].size -1){
 				  printf("assigned to 0\n");
@@ -2189,9 +2189,9 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 			    
 			    if(prep_is_equal(maj_matval[a_loc], 0.0, etol)){
 			       maj_matval[a_loc] = 0.0;
+#if 0
 			       (rows[row_ind].fixed_var_num)++;
 			       (cols[col_ind].col_size)--;
-#if 0
 			       if(rows[row_ind].fixed_var_num >=
 				  rows[row_ind].size -1){
 				  printf("assigned to 0\n");
