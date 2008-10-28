@@ -2155,9 +2155,15 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 
 			    if(prep_is_equal(maj_matval[a_loc], 0.0, etol)){
 			       maj_matval[a_loc] = 0.0;
-			       (rows[row_ind].fixed_var_num)++;
-			       (cols[col_ind].col_size)--;
 #if 0
+			       /*fixme! */
+			       (rows[row_ind].fixed_var_num)++;
+			       (rows[row_ind].bin_var_num)--;
+			       if(!prep_is_integral(a_val, etol)){
+				  (rows[row_ind].frac_coef_num)--;
+			       }
+			       (cols[col_ind].col_size)--;
+
 			       if(rows[row_ind].fixed_var_num >=
 				  rows[row_ind].size -1){
 				  printf("assigned to 0\n");
@@ -2189,9 +2195,14 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 			    
 			    if(prep_is_equal(maj_matval[a_loc], 0.0, etol)){
 			       maj_matval[a_loc] = 0.0;
-			       (rows[row_ind].fixed_var_num)++;
-			       (cols[col_ind].col_size)--;
 #if 0
+			       (rows[row_ind].fixed_var_num)++;
+			       (rows[row_ind].bin_var_num)--;
+			       if(!prep_is_integral(a_val, etol)){
+				  (rows[row_ind].frac_coef_num)--;
+			       }
+			       (cols[col_ind].col_size)--;
+
 			       if(rows[row_ind].fixed_var_num >=
 				  rows[row_ind].size -1){
 				  printf("assigned to 0\n");
@@ -3086,10 +3097,13 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
       
       for(i = matbeg[col_ind]; i < end; i++){
 	 if(!(rows[matind[i]].is_redundant)){	 
+	    a_val = matval[i];
+	    if(a_val ==  0.0){ /* we have set it to 0.0 */
+	       continue;
+	    }
 	    get_row_ubounds = FALSE;
 	    get_row_lbounds = FALSE;
 	    r_ind = matind[i];
-	    a_val = matval[i];
 	    row_updated = FALSE;
 	    if(fix_type != IMPROVE_UB && fix_type != IMPROVE_LB){	       
 	       rows[r_ind].fixed_var_num++; 
