@@ -127,7 +127,7 @@ typedef struct PREP_STATS
    int coeffs_nulled;
    int bounds_integerized;
    int vars_aggregated;
-
+   int vars_integerized;
    /* regarding coeffs changes and bounds tightening */
 
    int coeffs_changed;
@@ -285,6 +285,7 @@ int prep_fill_row_ordered(PREPdesc *P);
 int prep_cleanup_desc(PREPdesc *P);
 
 int prep_integerize_bounds(PREPdesc *P);
+int prep_integerize_var(PREPdesc *P, int col_ind);
 int prep_basic(PREPdesc *P);
 
 double prep_rnd_integral(double val, double etol, char rnd_type);

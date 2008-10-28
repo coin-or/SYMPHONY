@@ -1777,6 +1777,9 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(env->par.verbosity);
       tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
 	 cp_par->verbosity = env->par.verbosity;
+#ifdef USE_PREPROCESSOR
+      prep_par->verbosity = env->par.verbosity;
+#endif
       return(0);
    }
    else if (strcmp(key, "test") == 0){

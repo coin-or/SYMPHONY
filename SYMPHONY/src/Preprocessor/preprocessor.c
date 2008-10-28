@@ -39,7 +39,7 @@ int preprocess_mip (sym_environment *env)
 */
    int termcode;		/* return status of this function, 0 normal, 1
 				   error */
-   int termstatus;		/* return status of functions called herein */
+   //int termstatus;		/* return status of functions called herein */
 
 
 
@@ -66,7 +66,7 @@ int preprocess_mip (sym_environment *env)
    //double mark_time; 
 
    /* Start with Basic Preprocessing */
-   PRINT(verbosity, 0, ("Starting Preprocessing...\n")); 
+   PRINT(verbosity, -2, ("Starting Preprocessing...\n")); 
    
    //mark_time = wall_clock(NULL);
 
@@ -93,7 +93,9 @@ int preprocess_mip (sym_environment *env)
    //PRINT(verbosity, 1, ("Basic Prep time: %f...\n", 
    //		wall_clock(NULL) - mark_time));
 
-   prep_report(P, termcode);
+   if(verbosity >= -1){
+      prep_report(P, termcode);
+   }
    
    if(params.reduce_mip){
       prep_restore_rootdesc(env);

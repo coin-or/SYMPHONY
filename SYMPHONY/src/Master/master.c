@@ -422,7 +422,7 @@ int sym_set_defaults(sym_environment *env)
 #ifdef USE_PREPROCESSOR
    /********************* preprocessor defaults ******************************/
    prep_par->do_prep = 1;
-   prep_par->level = 3;
+   prep_par->level = 2;
    prep_par->dive_level = 3;
    prep_par->impl_dive_level = 0;
    prep_par->impl_limit = 50;
@@ -659,7 +659,7 @@ int sym_solve(sym_environment *env)
       }
    }
 #endif
-   if (env->par.verbosity >= 0){
+   if (env->par.verbosity >= -1){
       printf("Solving...\n\n");
    }
    
