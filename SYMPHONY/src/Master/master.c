@@ -34,9 +34,7 @@
 #include "sym_master_u.h"
 #include "sym_lp_solver.h"
 #include "sym_primal_heuristics.h"
-#ifdef USE_PREPROCESSOR
 #include "sym_preprocessor.h"
-#endif
 #ifdef COMPILE_IN_TM
 #include "sym_tm.h"
 #ifdef COMPILE_IN_LP
@@ -138,10 +136,8 @@ int sym_set_defaults(sym_environment *env)
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
    dg_params *dg_par = &env->par.dg_par;
-
-#ifdef USE_PREPROCESSOR
    prep_params *prep_par = &env->par.prep_par;
-#endif
+
 
    /************************* Global defaults ********************************/
    env->ub = 0;
@@ -419,7 +415,6 @@ int sym_set_defaults(sym_environment *env)
    strcpy(dg_par->edgeweight_font,
 	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
 
-#ifdef USE_PREPROCESSOR
    /********************* preprocessor defaults ******************************/
    prep_par->do_prep = 1;
    prep_par->level = 2;
@@ -443,7 +438,6 @@ int sym_set_defaults(sym_environment *env)
    prep_par->keep_row_ordered = 1;
    prep_par->keep_track = 0;
    prep_par->time_limit = 100;
-#endif
 
    return(termcode);
 }
@@ -644,7 +638,6 @@ int sym_solve(sym_environment *env)
 
    start_time = wall_clock(NULL);
 
-#ifdef USE_PREPROCESSOR
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
    if(env->par.prep_par.level > 0){
@@ -687,7 +680,6 @@ int sym_solve(sym_environment *env)
 	 env->prep_mip = 0;
       }
    }
-#endif
 
    if (env->par.verbosity >= -1){
       printf("Solving...\n\n");
@@ -1292,14 +1284,12 @@ int sym_solve(sym_environment *env)
    }
 #endif
 
-#ifdef USE_PREPROCESSOR
    if(env->par.prep_par.level > 0){
       if(env->orig_mip){
 	 env->mip = env->orig_mip;
 	 env->orig_mip = 0;
       }
    }
-#endif
 
    env->has_ub = FALSE;
    env->ub = 0.0;

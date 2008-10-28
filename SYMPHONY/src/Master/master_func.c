@@ -1768,10 +1768,7 @@ int set_param(sym_environment *env, char *line)
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
    dg_params *dg_par = &env->par.dg_par;
-
-#ifdef USE_PREPROCESSOR
    prep_params *prep_par = &env->par.prep_par;
-#endif
 
    strcpy(key,"");
    sscanf(line,"%s%s", key, value);
@@ -2968,7 +2965,6 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
 
-#ifdef USE_PREPROCESSOR
    /*************************************************************************
     ***                     preprocessing - parameters                    ***
     *************************************************************************/ 
@@ -3049,7 +3045,6 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(prep_par->time_limit);
       return(0);
    }
-#endif
 
    return(FUNCTION_TERMINATED_ABNORMALLY);
 }
