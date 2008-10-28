@@ -685,15 +685,16 @@ void print_tree_status(tm_prob *tm)
       }
    }
    find_tree_lb(tm);
-   if (tm->obj_sense == SYM_MAXIMIZE){
-      obj_ub = -tm->lb + tm->obj_offset;
-      printf("ub: %.2f ", obj_ub);
-   }else{
-      obj_lb = tm->lb + tm->obj_offset;
-      printf("lb: %.2f ", obj_lb);
+   if(tm->lb > -DBL_MAX){
+      if (tm->obj_sense == SYM_MAXIMIZE){
+	 obj_ub = -tm->lb + tm->obj_offset;
+	 printf("ub: %.2f ", obj_ub);
+      }else{
+	 obj_lb = tm->lb + tm->obj_offset;
+	 printf("lb: %.2f ", obj_lb);
+      }
    }
-      
-   if (tm->has_ub && tm->ub){
+   if (tm->has_ub && tm->ub && tm->lb > -DBL_MAX){
       printf("gap: %.2f ", fabs(100*(obj_ub-obj_lb)/obj_ub));
    }
    printf("time: %i\n", (int)(elapsed_time));

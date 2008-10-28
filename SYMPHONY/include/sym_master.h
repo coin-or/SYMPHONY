@@ -52,8 +52,14 @@ typedef struct SYM_ENVIRONMENT{
    double           lb;   
    double           obj_offset;
 
-   MIPdesc         *mip; /*For holding the description when read in from MPS */
-
+   MIPdesc         *mip; /*For holding the description when read in from MPS
+			   - also the working copy */
+   
+   MIPdesc         *orig_mip; /*For holding the original description if
+				presolve is used*/
+   MIPdesc         *prep_mip; /* For holding the presolved description if
+				 presolve is used*/
+   
    char             probname[81];
 
    base_desc       *base;

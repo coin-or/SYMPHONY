@@ -712,6 +712,12 @@ int display_solution_u(sym_environment *env, int thread_num)
 		   printf("%8s %10.3f\n", env->mip->colname[sol.xind[i]],
 			  sol.xval[i]);
 		}
+		for (i = 0; i < env->mip->fixed_n; i++){
+		   printf("%8s %10.3f\n",
+			  env->orig_mip->colname[env->mip->fixed_ind[i]],
+			  env->mip->fixed_val[i]);
+		}
+		
 		printf("\n");
 	     }else{
 		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
@@ -721,7 +727,17 @@ int display_solution_u(sym_environment *env, int thread_num)
 		   if (sol.xind[i] == env->mip->n){
 		      continue;
 		   }
-		   printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+		   if(!env->prep_mip){
+		      printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+		   }else{
+		      printf("%7d %10.3f\n",
+			     env->prep_mip->orig_ind[sol.xind[i]],
+			     sol.xval[i]);
+		   }
+		}
+		for (i = 0; i < env->mip->fixed_n; i++){
+		   printf("%7d %10.3f\n", env->mip->fixed_ind[i],
+			  env->mip->fixed_val[i]);
 		}
 		printf("\n");
 	     }
@@ -769,6 +785,11 @@ int free_master_u(sym_environment *env)
    if (env->mip){
       free_mip_desc(env->mip);
       FREE(env->mip);
+   }
+
+   if(env->prep_mip){
+      free_mip_desc(env->prep_mip);
+      FREE(env->prep_mip);
    }
    
    if (env->rootdesc){

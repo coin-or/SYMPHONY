@@ -79,7 +79,10 @@ void OsiSymSolverInterface::printBounds()
 
 //--------------------------------------------------------------------------
 int OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string & netlibDir )
-{
+{  
+
+   int errCnt = 0;
+
   // Test default constructor
   {
     OsiSymSolverInterface m;
@@ -753,9 +756,10 @@ int OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string
     
   // Do common solverInterface testing by calling the
   // base class testing method.
-
   {
      OsiSymSolverInterface m;
-     return(OsiSolverInterfaceCommonUnitTest(&m, mpsDir,netlibDir));
+     errCnt += OsiSolverInterfaceCommonUnitTest(&m, mpsDir,netlibDir);
   }
+
+  return errCnt;
 }
