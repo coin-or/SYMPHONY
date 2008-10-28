@@ -3098,9 +3098,11 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
       for(i = matbeg[col_ind]; i < end; i++){
 	 if(!(rows[matind[i]].is_redundant)){	 
 	    a_val = matval[i];
+#if 0
 	    if(a_val ==  0.0){ /* we have set it to 0.0 */
 	       continue;
 	    }
+#endif
 	    get_row_ubounds = FALSE;
 	    get_row_lbounds = FALSE;
 	    r_ind = matind[i];
