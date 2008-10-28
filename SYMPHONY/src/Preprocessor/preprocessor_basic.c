@@ -635,13 +635,14 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
    double *rhs = mip->rhs;
    double *obj = mip->obj;
 
-   double *col_sum, *row_sum, *row_factor, *col_factor; 
-   int last_lloc, last_rloc, *r_loc, *c_loc;
+   double *col_sum = NULL, *col_factor = NULL;
+   double *row_sum = NULL, *row_factor = NULL;
+   int last_lloc, last_rloc, *r_loc = NULL, *c_loc = NULL;
  
-   int * col_del_ind, col_del_cnt = 0;
-   int * col_fix_type, dup_type;   
-   double *col_fix_val;
-   char *col_orig_type, type_l, type_r, bin_type; 
+   int * col_del_ind = NULL, col_del_cnt = 0;
+   int * col_fix_type = NULL, dup_type;   
+   double *col_fix_val = NULL;
+   char *col_orig_type = NULL, type_l, type_r, bin_type; 
    double obj_l, obj_r, obj_diff; 
 
    if(check_rows){
@@ -2808,7 +2809,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
    prep_stats *stats = &(P->stats);
 
    //char *is_row_updated;
-   int fix_type, row_cnt = 0;
+   int fix_type = 0, row_cnt = 0;
    //int * row_updated_ind;
    char row_updated;
    char *is_row_updated = NULL;
@@ -3390,7 +3391,7 @@ int prep_get_row_bounds(MIPdesc *mip, int r_ind, double etol)
 double prep_rnd_integral(double val, double etol, char rnd_type)
 {
 
-   double new_bound;
+   double new_bound = 0.0;
    
    if(rnd_type == RND_FLOOR){
       new_bound = ceil(val);
@@ -3989,7 +3990,7 @@ int sr_solve_bounded_prob(PREPdesc *P, SRdesc *sr, SRdesc *d_sr,
    }
    
 
-   int termcode; 
+   int termcode = 0; 
    ROWinfo *rows = P->mip->mip_inf->rows;
    double min_ub = sr->ub;
    double max_lb = sr->lb;
@@ -5017,7 +5018,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
    int i, termcode = PREP_UNMODIFIED, fix_type = FIX_NO_BOUND;
    int fixed_row = FALSE, fix_all_lb = FALSE, fix_all_ub = FALSE, col_ind;
    int debug_cnt = 0; 
-   double a_val, ub, lb, new_bound, rnd_floor, rnd_ceil;
+   double a_val, ub, lb, new_bound = 0.0, rnd_floor, rnd_ceil;
 
    MIPdesc *mip = P->mip;
    ROWinfo *rows = mip->mip_inf->rows;
@@ -5552,11 +5553,11 @@ int prep_initialize_mipinfo(PREPdesc *P)
    double coef_val, fixed_obj_offset;  
    int row_ind, cont_var_cnt = 0, bin_var_cnt = 0, fixed_var_cnt = 0;   
    int  row_unbounded_cnt, max_row_size, max_col_size;
-   int * row_coef_bin_cnt, *row_sign_pos_cnt;   
+   int * row_coef_bin_cnt = NULL, *row_sign_pos_cnt = NULL;   
    char is_binary, is_bounded, unbounded_below, unbounded_above;
    int gen_type; /* 0 fractional, 1 integer, 2 binary */
    int col_size, col_coef_bin_cnt, col_coef_frac_cnt, col_sign_pos_cnt; 
-   int *rows_integerized_var_ind, integerizable_var_num;
+   int *rows_integerized_var_ind = NULL, integerizable_var_num;
    char is_opt_val_integral = TRUE;
    int is_col_all_neg; /* if we convert all constraints to 'L' */
    int is_col_all_pos; /* if we convert all constraints to 'L' */
@@ -5596,8 +5597,8 @@ int prep_initialize_mipinfo(PREPdesc *P)
    //   char obj_sense = env->mip->obj_sense;
 
    MIPinfo *mip_inf = (MIPinfo *)calloc (1, sizeof(MIPinfo));
-   COLinfo *cols;
-   ROWinfo *rows;
+   COLinfo *cols = NULL;
+   ROWinfo *rows = NULL;
 
    if(m > 0){
       rows = (ROWinfo *)calloc(m, sizeof(ROWinfo));   
@@ -6343,7 +6344,11 @@ int prep_cleanup_desc(PREPdesc *P)
    rngval = mip->rngval;
    o_sense = mip->orig_sense;
    rhs = mip->rhs;
-
+   obj = mip->obj;
+   ub = mip->ub;
+   lb = mip->lb;
+   is_int = mip->is_int;
+   
    fixed_nz = 0;
    fixed_ind = mip->fixed_ind = (int *)malloc(n*ISIZE);
    fixed_val = mip->fixed_val = (double *)malloc(n*DSIZE);
@@ -6404,10 +6409,6 @@ int prep_cleanup_desc(PREPdesc *P)
    matbeg = mip->matbeg;
 
    colnames = mip->colname;
-   obj = mip->obj;
-   ub = mip->ub;
-   lb = mip->lb;
-   is_int = mip->is_int;
    
    /* first get new row indices */
    
