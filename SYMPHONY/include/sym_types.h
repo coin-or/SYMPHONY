@@ -588,6 +588,7 @@ typedef struct MIPINFO{
    int integerizable_var_num;
    int max_row_size; 
    int max_col_size; 
+   int obj_size;  /* number of nonzeros in objective function */
    double mat_density;
    char is_opt_val_integral; /*is the optimal 
 			   solution value required to be integral, if one 

@@ -88,7 +88,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    fp_initialize_lp_solver(p, new_lp_data, fp_data);
    x_ip = fp_data->x_ip;
    x_lp = fp_data->x_lp;
-   if (p->has_ub) {
+   if (p->has_ub && (p->mip->mip_inf->obj_size <= p->mip->mip_inf->max_row_size || p->mip->mip_inf->obj_size < n/10)) {
       solution_value = p->ub-p->mip->obj_offset;
       fp_add_obj_row(new_lp_data, n, mip_obj, p->ub-p->par.granularity);
    } else {
@@ -148,13 +148,16 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
                break;
             }
             target_ub = (obj_lb + solution_value)/2;
-            if (*found_better_solution != TRUE && p->has_ub==FALSE) {
-               // add another objective function constraint to lower the
-               // objective value.
-               fp_add_obj_row(new_lp_data, n, mip_obj, target_ub);
-            } else {
-               r = new_lp_data->m-1;
-               change_rhs(new_lp_data, 1, &r, &target_ub);
+            if (p->mip->mip_inf->obj_size <= p->mip->mip_inf->max_row_size
+                  || p->mip->mip_inf->obj_size < n/10) {
+               if (*found_better_solution != TRUE && p->has_ub==FALSE) {
+                  // add another objective function constraint to lower the
+                  // objective value.
+                  fp_add_obj_row(new_lp_data, n, mip_obj, target_ub);
+               } else {
+                  r = new_lp_data->m-1;
+                  change_rhs(new_lp_data, 1, &r, &target_ub);
+               }
             }
             *found_better_solution = TRUE;
          }
@@ -575,6 +578,8 @@ int fp_add_obj_row(LPdata *new_lp_data, int n, const double *obj, double rhs)
    double lpetol = new_lp_data->lpetol;
 
    // count non zeros
+   // we dont trust p->mip->mip_inf->obj_size because it is the size before
+   // preprocessing.
    nz = 0;
    for (i=0;i<n;i++) {
       if (fabs(obj[i])>lpetol) {

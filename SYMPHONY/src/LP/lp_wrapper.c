@@ -857,8 +857,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       }
       /* Send the solution value to the treemanager */
       if (p->has_ub && true_objval >= p->ub - p->par.granularity){
-	 FREE(heur_solution);
-	 FREE(col_sol);
+	 //FREE(heur_solution);
+	 //FREE(col_sol);
 	 if (!p->par.multi_criteria){
 	    PRINT(p->par.verbosity, 0,
 		  ("\n* Found Another Feasible Solution.\n"));
@@ -1189,9 +1189,11 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    {
       /* it seems we are going to branch. Before doing that, we should invoke
        * heuristics. */
+      double oldobj = (p->has_ub ? p->ub : SYM_INFINITY);
       int feas_status = is_feasible_u(p, FALSE, TRUE);
       p->comp_times.primal_heur += used_time(&p->tt);
-      if (feas_status == IP_FEASIBLE||feas_status==IP_HEUR_FEASIBLE) {
+      if (feas_status == IP_FEASIBLE || (feas_status==IP_HEUR_FEASIBLE &&
+               p->ub < oldobj - lp_data->lpetol)) {
          return(DO_NOT_BRANCH__FEAS_SOL);
       }
    }
