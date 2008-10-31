@@ -2429,6 +2429,11 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(lp_par->tailoff_absolute);
       return(0);
    }
+   else if (strcmp(key, "tailoff_max_no_impr_iters_root") == 0 ||
+	    strcmp(key, "LP_tailoff_max_no_impr_iters_root") == 0){
+      READ_INT_PAR(lp_par->tailoff_max_no_impr_iters_root);
+      return(0);
+   }
    
    else if (strcmp(key, "ineff_cnt_to_delete") == 0 ||
 	    strcmp(key, "LP_ineff_cnt_to_delete") == 0){

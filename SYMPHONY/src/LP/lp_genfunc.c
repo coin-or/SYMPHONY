@@ -1104,6 +1104,21 @@ int check_tailoff(lp_prob *p)
       obj_hist[0] = p->lp_data->objval;
 
       if (p->bc_index == 0) {
+         /*
+          * root policy: generate cuts for min_root_cut_rounds and then stop.
+          * if obj value doesnt improve in last
+          * tailoff_max_no_impr_iters_root, then stop.
+          */
+         if (obj_hist[0] <= obj_hist[1] + p->lp_data->lpetol) {
+            p->obj_no_impr_iters++;
+         } else {
+            p->obj_no_impr_iters = 0;
+         }
+         if (p->obj_no_impr_iters >=
+               p->par.tailoff_max_no_impr_iters_root) {
+            p->has_tailoff = TRUE;
+            return (TRUE);
+         }
          if (p->node_iter_num < p->par.min_root_cut_rounds) {
             p->has_tailoff = FALSE;
             return (FALSE);

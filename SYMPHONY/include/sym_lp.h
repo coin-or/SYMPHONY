@@ -123,6 +123,7 @@ typedef struct LP_PROB{
    double        last_gap;
    double       *obj_history;
    int           has_tailoff;
+   int           obj_no_impr_iters;
 
 
    /*========================================================================*\

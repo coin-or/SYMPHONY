@@ -127,6 +127,7 @@ typedef struct LP_PARAMS{
    int               tailoff_obj_backsteps;
    double            tailoff_obj_frac;
    double            tailoff_absolute;
+   int               tailoff_max_no_impr_iters_root;
 
    int               ineff_cnt_to_delete;
    int               eff_cnt_before_cutpool;
