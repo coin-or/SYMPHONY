@@ -264,6 +264,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->tailoff_obj_backsteps = 4;
    lp_par->tailoff_obj_frac = .75;
    lp_par->tailoff_absolute = 0.0001;
+   lp_par->tailoff_max_no_impr_iters_root = 15;
    lp_par->ineff_cnt_to_delete = 0;
    lp_par->eff_cnt_before_cutpool = 3;
    lp_par->ineffective_constraints = BASIC_SLACKS_ARE_INEFFECTIVE;
@@ -5708,6 +5709,11 @@ int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
    else if (strcmp(key, "tailoff_absolute") == 0 ||
 	    strcmp(key, "LP_tailoff_absolute") == 0){
       *value = lp_par->tailoff_absolute;
+      return(0);
+   }
+   else if (strcmp(key, "tailoff_max_no_impr_iters_root") == 0 ||
+	    strcmp(key, "LP_tailoff_max_no_impr_iters_root") == 0){
+      *value = lp_par->tailoff_max_no_impr_iters_root;
       return(0);
    }
 
