@@ -857,8 +857,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       }
       /* Send the solution value to the treemanager */
       if (p->has_ub && true_objval >= p->ub - p->par.granularity){
-	 FREE(heur_solution);
-	 FREE(col_sol);
+	 //FREE(heur_solution);
+	 //FREE(col_sol);
 	 if (!p->par.multi_criteria){
 	    PRINT(p->par.verbosity, 0,
 		  ("\n* Found Another Feasible Solution.\n"));
