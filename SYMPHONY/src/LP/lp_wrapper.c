@@ -1189,9 +1189,11 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    {
       /* it seems we are going to branch. Before doing that, we should invoke
        * heuristics. */
+      double oldobj = (p->has_ub ? p->ub : SYM_INFINITY);
       int feas_status = is_feasible_u(p, FALSE, TRUE);
       p->comp_times.primal_heur += used_time(&p->tt);
-      if (feas_status == IP_FEASIBLE||feas_status==IP_HEUR_FEASIBLE) {
+      if (feas_status == IP_FEASIBLE || (feas_status==IP_HEUR_FEASIBLE &&
+               p->ub < oldobj - lp_data->lpetol)) {
          return(DO_NOT_BRANCH__FEAS_SOL);
       }
    }
