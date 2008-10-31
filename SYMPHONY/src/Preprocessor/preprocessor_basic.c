@@ -5577,6 +5577,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
    char is_opt_val_integral = TRUE;
    int is_col_all_neg; /* if we convert all constraints to 'L' */
    int is_col_all_pos; /* if we convert all constraints to 'L' */
+   int obj_size; /* number of nonzeros in objective function */
 
    MIPdesc *mip = P->mip;
    prep_stats *stats = &(P->stats);
@@ -5632,12 +5633,17 @@ int prep_initialize_mipinfo(PREPdesc *P)
 
    max_col_size = 0;
    fixed_obj_offset = 0;
+   obj_size = 0;
    
    for(i = 0; i < n; i++){
       is_binary = FALSE;
       is_bounded = FALSE;
       unbounded_below = FALSE;
       unbounded_above = FALSE;
+
+      if (fabs(obj[i]) > etol) {
+         obj_size++;
+      }
       
       cols[i].var_type = 'I';
       if(lb[i] >= ub[i] + etol){
@@ -6050,6 +6056,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
    mip_inf->fixed_var_num = fixed_var_cnt;
    mip_inf->max_row_size = max_row_size;
    mip_inf->max_col_size = max_col_size;   
+   mip_inf->obj_size = obj_size;
    mip_inf->mat_density = mip->nz/(n*m);
    mip_inf->integerizable_var_num = integerizable_var_num;
    mip_inf->is_opt_val_integral = is_opt_val_integral;
