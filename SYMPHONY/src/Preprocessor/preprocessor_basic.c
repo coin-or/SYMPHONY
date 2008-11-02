@@ -2949,30 +2949,33 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	    }
 	 }
       }else{
-	 if(fix_type != IMPROVE_LB && fix_type != FIX_AGGREGATE){
-	    if(ub[col_ind] < fixed_bound - etol){
-	       if(!impl_mode){
+	 if(fix_type != IMPROVE_LB){
+	    if(fix_type != FIX_AGGREGATE){
+	      if(ub[col_ind] < fixed_bound - etol){
+		if(!impl_mode){
 		  stats->col_infeas_ind = col_ind;
 		  stats->row_infeas_ind = row_ind;
-	       }
-	       termcode = PREP_INFEAS;
-	       can_iterate = FALSE;
-	       break;
+		}
+		termcode = PREP_INFEAS;
+		can_iterate = FALSE;
+		break;
+	      }
 	    }  
 	    ub[col_ind] = fixed_bound;     
 	    //(stats->bounds_tightened)++;
 	 }
-	 if(fix_type != IMPROVE_UB && fix_type != FIX_AGGREGATE){
-	    
-	    if(lb[col_ind] > fixed_bound + etol){
-	       if(!impl_mode){
+	 if(fix_type != IMPROVE_UB){
+	    if(fix_type != FIX_AGGREGATE){
+	      if(lb[col_ind] > fixed_bound + etol){
+		if(!impl_mode){
 		  stats->col_infeas_ind = col_ind;
 		  stats->row_infeas_ind = row_ind;
-	       }
-	       termcode = PREP_INFEAS;
-	       can_iterate = FALSE;
-	       break;
-	    }      
+		}
+		termcode = PREP_INFEAS;
+		can_iterate = FALSE;
+		break;
+	      }      
+	    }
 	    lb[col_ind] = fixed_bound;
 	    // if(fix_type == IMPROVE_LB){
 	    //	 (stats->bounds_tightened)++;
