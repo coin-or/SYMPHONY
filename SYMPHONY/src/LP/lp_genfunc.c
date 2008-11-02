@@ -2348,20 +2348,23 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && bc_index % freq != 0) {
+         } else if (param == GENERATE_DEFAULT && (freq < 1 || 
+                  bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_IF_IN_ROOT && bc_index % freq != 0) {
+         } else if (param == GENERATE_IF_IN_ROOT && (freq < 1 || 
+               bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_PERIODICALLY && bc_index % freq != 0) {
+         } else if (param == GENERATE_PERIODICALLY && (freq < 1 || 
+               bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_DEFAULT) {
-            if (p->bc_index > 0) {
+            if (bc_index > 0) {
                if (p->comp_times.probing_cuts > p->comp_times.lp/5) {
                   *should_generate = FALSE;
                   break;
@@ -2409,16 +2412,19 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && bc_index % freq != 0) {
+         } else if (param == GENERATE_DEFAULT && (freq < 0 ||
+                  bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_IF_IN_ROOT && bc_index % freq != 0) {
+         } else if (param == GENERATE_IF_IN_ROOT && (freq < 0 ||
+               bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_PERIODICALLY && bc_index % freq != 0) {
+         } else if (param == GENERATE_PERIODICALLY && (freq < 0 ||
+               bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } 
@@ -2436,16 +2442,19 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && bc_index % freq != 0) {
+         } else if (param == GENERATE_DEFAULT && (freq < 1 ||
+                  bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_IF_IN_ROOT && bc_index % freq != 0) {
+         } else if (param == GENERATE_IF_IN_ROOT && (freq < 1 ||
+               bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_PERIODICALLY && bc_index % freq != 0) {
+         } else if (param == GENERATE_PERIODICALLY && (freq < 1 ||
+               bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } 
@@ -2463,16 +2472,19 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && bc_index % freq != 0) {
+         } else if (param == GENERATE_DEFAULT && (freq < 1 || 
+                  bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_IF_IN_ROOT && bc_index % freq != 0) {
+         } else if (param == GENERATE_IF_IN_ROOT && (freq < 1 || 
+               bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_PERIODICALLY && bc_index % freq != 0) {
+         } else if (param == GENERATE_PERIODICALLY && (freq < 1 || 
+               bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } 
@@ -2489,16 +2501,19 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && bc_index % freq != 0) {
+         } else if (param == GENERATE_DEFAULT && (freq < 1 ||
+                  bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_IF_IN_ROOT && bc_index % freq != 0) {
+         } else if (param == GENERATE_IF_IN_ROOT && (freq < 1 ||
+                  bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_PERIODICALLY && bc_index % freq != 0) {
+         } else if (param == GENERATE_PERIODICALLY && (freq < 1 ||
+                  bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } 
@@ -2516,16 +2531,19 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && bc_index % freq != 0) {
+         } else if (param == GENERATE_DEFAULT && (freq < 1 ||
+                  bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_IF_IN_ROOT && bc_index % freq != 0) {
+         } else if (param == GENERATE_IF_IN_ROOT && (freq < 1 ||
+               bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_PERIODICALLY && bc_index % freq != 0) {
+         } else if (param == GENERATE_PERIODICALLY && (freq < 1 ||
+               bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } 
