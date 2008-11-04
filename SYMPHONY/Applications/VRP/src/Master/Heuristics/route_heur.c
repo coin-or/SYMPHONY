@@ -15,7 +15,7 @@
 /*===========================================================================*/
 
 #include <math.h>
-#include <malloc.h>
+#include <memory.h>
 #include <string.h>
 #include "BB_constants.h"
 #include "BB_macros.h"

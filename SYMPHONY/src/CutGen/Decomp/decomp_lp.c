@@ -1,4 +1,4 @@
-#include <malloc.h>
+#include <memory.h>
 #include <stdlib.h>
 
 #include "sym_lp_solver.h"

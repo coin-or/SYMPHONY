@@ -17,7 +17,7 @@
 #ifndef _BINOMIAL_H
 #define _BINOMIAL_H
 
-#include <malloc.h>
+#include <memory.h>
 
 #include "sym_proto.h"
 

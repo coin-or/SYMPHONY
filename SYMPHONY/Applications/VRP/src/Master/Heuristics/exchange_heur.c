@@ -15,7 +15,7 @@
 /*===========================================================================*/
 
 #include <stdio.h>
-#include <malloc.h>
+#include <memory.h>
 #include <stdlib.h>
 
 #include "exchange_heur.h"

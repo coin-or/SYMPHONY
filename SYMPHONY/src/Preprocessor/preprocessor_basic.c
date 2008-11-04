@@ -16,7 +16,7 @@
 /* This file is a part of the symphony-processor                             */
 /*===========================================================================*/
 
-#include <malloc.h>
+#include <memory.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
