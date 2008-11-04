@@ -448,6 +448,8 @@ typedef struct LP_STAT{
    int         num_poor_cuts;
    int         num_duplicate_cuts;
    int         num_unviolated_cuts;
+   int         cuts_added_to_lps;
+   int         cuts_deleted_from_lps;
 
    int         gomory_calls;
    int         knapsack_calls;

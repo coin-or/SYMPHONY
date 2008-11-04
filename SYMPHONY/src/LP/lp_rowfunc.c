@@ -249,6 +249,7 @@ int check_row_effectiveness(lp_prob *p)
 	 }
       }
       delete_rows(lp_data, deletable, free_rows);
+      p->lp_stat.cuts_deleted_from_lps += deletable;
    }
    PRINT(p->par.verbosity, 3, ("\n"));
 

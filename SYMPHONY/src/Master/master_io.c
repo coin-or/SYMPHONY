@@ -789,6 +789,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
    printf("  Strong Branching          %.3f\n", tim->strong_branching);
    printf("  Separation                %.3f\n", tim->separation); 
    printf("  Primal Heuristics         %.3f\n", tim->primal_heur); 
+   printf("  Communication             %.3f\n", tim->communication);
 #ifndef COMPILE_IN_LP
    printf("=================== Parallel Overhead ======================\n");
    printf("  Communication         %.3f\n", tim->communication);
@@ -866,8 +867,12 @@ void print_statistics(node_times *tim, problem_stat *stat,
 
       printf ("\n=========================== Cuts ==========================");
       printf ("\n");
-      printf ("total cuts generated:                  %d\n",
+      printf ("total cuts accepted:                   %d\n",
             lp_stat->cuts_generated);
+      printf ("total cuts added to LPs:               %d\n",
+            lp_stat->cuts_added_to_lps);
+      printf ("total cuts deleted from LPs:           %d\n",
+            lp_stat->cuts_deleted_from_lps);
       printf ("total gomory cuts generated:           %d\n",
             lp_stat->gomory_cuts);
       printf ("total knapsack cuts generated:         %d\n",
