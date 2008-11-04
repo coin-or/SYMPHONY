@@ -436,6 +436,7 @@ int fathom_branch(lp_prob *p)
 	 PRINT(p->par.verbosity, 2,
 	       ("... %i violated cuts were added\n", cuts));
       }
+      p->lp_stat.cuts_added_to_lps += cuts;
       
       comp_times->lp += used_time(&p->tt);
 
@@ -2062,6 +2063,8 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.num_poor_cuts           += p->lp_stat.num_poor_cuts;
    p->tm->lp_stat.num_duplicate_cuts      += p->lp_stat.num_duplicate_cuts;
    p->tm->lp_stat.num_unviolated_cuts     += p->lp_stat.num_unviolated_cuts;
+   p->tm->lp_stat.cuts_deleted_from_lps   += p->lp_stat.cuts_deleted_from_lps;
+   p->tm->lp_stat.cuts_added_to_lps       += p->lp_stat.cuts_added_to_lps;
 
    p->tm->lp_stat.gomory_calls            += p->lp_stat.gomory_calls;
    p->tm->lp_stat.knapsack_calls          += p->lp_stat.knapsack_calls;

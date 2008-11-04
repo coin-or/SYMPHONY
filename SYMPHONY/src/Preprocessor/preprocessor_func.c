@@ -12,17 +12,12 @@
 /*                                                                           */
 /*===========================================================================*/
 
-/*===========================================================================*/
-/* This file is a part of the symphony-processor                             */
-/* This file was written by Ashutosh (asm4@lehigh.edu)                       */
-/*===========================================================================*/
-
 #define ERR_TOL 1e-6		/* error tolerance, should really be a
 				   parameter set based on the processor and
 				   input method; unused so far */
 /*===========================================================================*/
 /*===========================================================================*/
-#include <malloc.h>
+#include <memory.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
