@@ -2487,7 +2487,25 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
                bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
-         } 
+         } else if (param == GENERATE_DEFAULT) {
+            if (bc_index > 0) {
+               if (p->comp_times.gomory_cuts > p->comp_times.lp/5) {
+                  *should_generate = FALSE;
+                  break;
+               }
+            } else {
+               if (p->lp_stat.gomory_cuts > p->lp_stat.cuts_generated/2
+                   && p->comp_times.gomory_cuts > 3*p->comp_times.lp) {
+                  *should_generate = FALSE;
+                  break;
+               } else if (p->lp_stat.gomory_cuts <= 
+                     p->lp_stat.cuts_generated/2 && 
+                     p->comp_times.gomory_cuts > 3*p->comp_times.lp) {
+                  *should_generate = FALSE;
+                  break;
+               }
+            }
+         }
          gomory->setLimit(p->par.max_cut_length);
          *should_generate = TRUE;
          p->lp_stat.gomory_calls++;
@@ -2644,6 +2662,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p)
       }
    }
    *cutlist_p = cutlist;
+   p->comp_times.cuts += cut_time;
    return 0;
 }
 #endif

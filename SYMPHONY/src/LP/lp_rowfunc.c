@@ -34,6 +34,7 @@ int check_row_effectiveness(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    //double *dualsol = lp_data->dualsol;
    double lpetol = lp_data->lpetol;
+   double lpetol10 = 10*lpetol;
    row_data *row, *rows = lp_data->rows;
    int m = lp_data->m;
 
@@ -57,31 +58,31 @@ int check_row_effectiveness(lp_prob *p)
       slack = slacks[i];
       switch (rows[i].cut->sense){
        case 'E':
-	 if (slack < -lpetol || slack > lpetol) stat[i] = VIOLATED_ROW;
+	 if (slack < -lpetol10 || slack > lpetol10) stat[i] = VIOLATED_ROW;
 	 else                                   stat[i] = TIGHT_ROW;
 	 break;
        case 'L':
-	 if (slack > lpetol)       stat[i] = SLACK_ROW;
-	 else if (slack > -lpetol) stat[i] = TIGHT_ROW;
-	 else                      stat[i] = VIOLATED_ROW;
+	 if (slack > lpetol10)       stat[i] = SLACK_ROW;
+	 else if (slack > -lpetol10) stat[i] = TIGHT_ROW;
+	 else                        stat[i] = VIOLATED_ROW;
 	 break;
        case 'G':
-	 if (slack < -lpetol)     stat[i] = SLACK_ROW;
-	 else if (slack < lpetol) stat[i] = TIGHT_ROW;
-	 else                     stat[i] = VIOLATED_ROW;
+	 if (slack < -lpetol10)     stat[i] = SLACK_ROW;
+	 else if (slack < lpetol10) stat[i] = TIGHT_ROW;
+	 else                       stat[i] = VIOLATED_ROW;
 	 break;
        case 'R':
 	 if (rows[i].cut->range < 0){
-	    if (slack > rows[i].cut->range + lpetol || slack < -lpetol)
+	    if (slack > rows[i].cut->range + lpetol10 || slack < -lpetol10)
 	       stat[i] = SLACK_ROW;
-	    else if (slack > rows[i].cut->range - lpetol || slack < lpetol)
+	    else if (slack > rows[i].cut->range - lpetol10 || slack < lpetol10)
 	       stat[i] = TIGHT_ROW;
 	    else
 	       stat[i] = VIOLATED_ROW;
 	 }else{
-	    if (slack < rows[i].cut->range - lpetol || slack > lpetol)
+	    if (slack < rows[i].cut->range - lpetol10 || slack > lpetol10)
 	       stat[i] = SLACK_ROW;
-	    else if (slack < rows[i].cut->range + lpetol || slack > - lpetol)
+	    else if (slack < rows[i].cut->range + lpetol10 || slack > - lpetol10)
 	       stat[i] = TIGHT_ROW;
 	    else
 	       stat[i] = VIOLATED_ROW;
