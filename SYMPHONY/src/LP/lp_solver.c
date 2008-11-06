@@ -77,7 +77,7 @@ void free_lp_arrays(LPdata *lp_data)
 
 void free_mip_desc(MIPdesc *mip)
 {
-   int j;
+   int j, n = 0;
    
    FREE(mip->matbeg);
    FREE(mip->matind);
@@ -100,7 +100,11 @@ void free_mip_desc(MIPdesc *mip)
    FREE(mip->ub);
    FREE(mip->is_int);
    if (mip->colname){
-      for (j = 0; j < mip->n; j++){
+      n = mip->n;
+      if(mip->alloc_n > n){
+	 n = mip->alloc_n;
+      }
+      for (j = 0; j < n; j++){
 	 FREE(mip->colname[j]);
       }
       FREE(mip->colname);
