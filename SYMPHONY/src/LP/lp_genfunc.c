@@ -209,13 +209,14 @@ int fathom_branch(lp_prob *p)
    node_times *comp_times = &p->comp_times;
    char first_in_loop = TRUE;
    int iterd, termcode;
-   int cuts, no_more_cuts_count;
+   int cuts = 0, no_more_cuts_count;
    int num_errors = 0;
    int cut_term = 0;
+   double obj_before_cuts = 0;
 #ifdef DO_TESTS
    double oldobjval = lp_data->objval;
 #endif
-   
+
    check_ub(p);
    p->iter_num = p->node_iter_num = 0;
 
@@ -336,6 +337,21 @@ int fathom_branch(lp_prob *p)
                   p->par.should_use_rel_br) {
                update_pcost(p);
             }
+            if (cuts > 0) {
+               p->lp_stat.cuts_added_to_lps += cuts;
+            }
+            if (p->node_iter_num > 0 && p->bc_level > 0) {
+               if (cuts > 0) {
+                  p->lp_stat.num_cuts_added_in_path += cuts;
+               }
+               if (p->lp_stat.avg_cuts_obj_impr_in_path > 0) {
+                  p->lp_stat.avg_cuts_obj_impr_in_path = 
+                     (p->lp_stat.avg_cuts_obj_impr_in_path *
+                      (p->lp_stat.num_cut_iters_in_path-1) + p->lp_data->objval - 
+                      obj_before_cuts)/p->lp_stat.num_cut_iters_in_path;
+               }
+            } 
+            obj_before_cuts = lp_data->objval;
             comp_times->lp += used_time(&p->tt);
 #endif
             break;
@@ -436,7 +452,6 @@ int fathom_branch(lp_prob *p)
 	 PRINT(p->par.verbosity, 2,
 	       ("... %i violated cuts were added\n", cuts));
       }
-      p->lp_stat.cuts_added_to_lps += cuts;
       
       comp_times->lp += used_time(&p->tt);
 
@@ -451,6 +466,18 @@ int fathom_branch(lp_prob *p)
 	    printf("*************************************************\n\n");
 	 }
 	 p->node_iter_num = 0;
+         /*
+         printf("node = %d\n", p->bc_index);
+         printf("cut iters = %d\n", p->lp_stat.num_cut_iters_in_path);
+         printf("cuts added = %d\n", p->lp_stat.num_cuts_added_in_path);
+         printf("cut removed = %d\n", p->lp_stat.num_cuts_slacked_out_in_path);
+         printf("cut obj impr = %f\n", p->lp_stat.avg_cuts_obj_impr_in_path);
+
+         printf("strong br cands = %d\n", p->lp_stat.num_str_br_cands_in_path);
+         printf("str br impr = %f\n", p->lp_stat.avg_br_obj_impr_in_path);
+
+         printf("fp calls = %d\n", p->lp_stat.num_fp_calls_in_path);
+         */
 	 break;
 #endif
        case FATHOMED_NODE:
@@ -2297,6 +2324,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
    const int n                 = p->lp_data->n;
    OsiXSolverInterface  *si    = p->lp_data->si;
    var_desc             **vars = p->lp_data->vars;
+   int                  was_tried = FALSE;
    
    if (p->iter_num < 2) {
       for (i = 0; i < n; i++) {
@@ -2311,7 +2339,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
       repeat_with_long = FALSE;
    }
    for (i=0; i<CGL_NUM_GENERATORS; i++) {
-      generate_cgl_cut_of_type(p, i, &cutlist);
+      generate_cgl_cut_of_type(p, i, &cutlist, &was_tried);
       check_and_add_cgl_cuts(p, i, cuts, num_cuts, bound_changes, &cutlist, 
             send_to_pool);
       should_stop_adding_cgl_cuts(p, i, &should_stop);
@@ -2327,6 +2355,10 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
       }
    }
    p->par.max_cut_length = max_cut_length;
+
+   if (was_tried == TRUE && p->bc_index > 0) {
+      p->lp_stat.num_cut_iters_in_path++;
+   }
 
    FREE(should_generate);
 #endif
@@ -2580,7 +2612,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 
 /*===========================================================================*/
 #ifdef USE_CGL_CUTS
-int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p)
+int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p, 
+      int *was_tried)
 {
    OsiCuts cutlist = *cutlist_p;
    int should_generate = FALSE;
@@ -2597,6 +2630,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p)
          should_use_cgl_generator(p, &should_generate, i, (void *)probing);
          if (should_generate == TRUE) {
             probing->generateCuts(*(p->lp_data->si), cutlist);
+            *was_tried = TRUE;
          }
          delete probing;
          cut_time     = used_time(&total_time);
@@ -2609,6 +2643,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p)
          should_use_cgl_generator(p, &should_generate, i, (void *)clique);
          if (should_generate == TRUE) {
             clique->generateCuts(*(p->lp_data->si), cutlist);
+            *was_tried = TRUE;
          }
          delete clique;
          cut_time     = used_time(&total_time);
@@ -2621,6 +2656,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p)
          should_use_cgl_generator(p, &should_generate, i, (void *)knapsack);
          if (should_generate == TRUE) {
             knapsack->generateCuts(*(p->lp_data->si), cutlist);
+            *was_tried = TRUE;
          }
          delete knapsack;
          cut_time     = used_time(&total_time);
@@ -2633,6 +2669,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p)
          should_use_cgl_generator(p, &should_generate, i, (void *)gomory);
          if (should_generate == TRUE) {
             gomory->generateCuts(*(p->lp_data->si), cutlist);
+            *was_tried = TRUE;
          }
          delete gomory;
          cut_time     = used_time(&total_time);
@@ -2645,6 +2682,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p)
          should_use_cgl_generator(p, &should_generate, i, (void *)twomir);
          if (should_generate == TRUE) {
             twomir->generateCuts(*(p->lp_data->si), cutlist);
+            *was_tried = TRUE;
          }
          delete twomir;
          cut_time     = used_time(&total_time);
@@ -2657,6 +2695,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p)
          should_use_cgl_generator(p, &should_generate, i, (void *)flowcover);
          if (should_generate == TRUE) {
             flowcover->generateCuts(*(p->lp_data->si), cutlist);
+            *was_tried = TRUE;
          }
          delete flowcover;
          cut_time     = used_time(&total_time);
@@ -3012,6 +3051,9 @@ int update_pcost(lp_prob *p)
          PRINT(p->par.verbosity, 0, ("warning: poor lpetol used while branching\n"));
       }
    }
+
+   p->lp_stat.avg_br_obj_impr_in_path = ((p->bc_level-1)*
+         p->lp_stat.avg_br_obj_impr_in_path + objval - oldobjval)/p->bc_level;
 #endif
    return 0;
 }

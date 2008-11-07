@@ -476,7 +476,45 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
    lp[thread_num]->lp_data->objval = node->lower_bound;
    lp[thread_num]->colgen_strategy = colgen_strat;
    lp[thread_num]->desc->bnd_change = bnd_change;
-   
+
+   if (level > 1) {
+      lp[thread_num]->lp_stat.num_cut_iters_in_path =
+         node->parent->num_cut_iters_in_path;
+      lp[thread_num]->lp_stat.num_cuts_added_in_path =
+         node->parent->num_cuts_added_in_path;
+      lp[thread_num]->lp_stat.num_cuts_slacked_out_in_path =
+         node->parent->num_cuts_slacked_out_in_path;
+      lp[thread_num]->lp_stat.avg_cuts_obj_impr_in_path =
+         node->parent->avg_cuts_obj_impr_in_path;
+   } else {
+      lp[thread_num]->lp_stat.num_cut_iters_in_path =
+         node->num_cut_iters_in_path = 0;
+      lp[thread_num]->lp_stat.num_cuts_added_in_path =
+         node->num_cuts_added_in_path = 0;
+      lp[thread_num]->lp_stat.num_cuts_slacked_out_in_path =
+         node->num_cuts_slacked_out_in_path = 0;
+      lp[thread_num]->lp_stat.avg_cuts_obj_impr_in_path =
+         node->avg_cuts_obj_impr_in_path = 0;
+   }
+
+   if (level > 0) {
+      lp[thread_num]->lp_stat.num_str_br_cands_in_path =
+         node->parent->num_str_br_cands_in_path;
+      lp[thread_num]->lp_stat.avg_br_obj_impr_in_path =
+         node->parent->avg_br_obj_impr_in_path;
+
+      lp[thread_num]->lp_stat.num_fp_calls_in_path =
+         node->parent->num_fp_calls_in_path;
+   } else {
+      lp[thread_num]->lp_stat.num_str_br_cands_in_path =
+         node->num_str_br_cands_in_path = 0;
+      lp[thread_num]->lp_stat.avg_br_obj_impr_in_path =
+         node->avg_br_obj_impr_in_path = 0;
+
+      lp[thread_num]->lp_stat.num_fp_calls_in_path =
+         node->num_fp_calls_in_path = 0;
+   }
+
    new_desc->nf_status = desc->nf_status;
    new_desc->basis = basis;
    if (deal_with_nf)

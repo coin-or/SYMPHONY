@@ -250,6 +250,9 @@ int check_row_effectiveness(lp_prob *p)
       }
       delete_rows(lp_data, deletable, free_rows);
       p->lp_stat.cuts_deleted_from_lps += deletable;
+      if (p->bc_level > 0) {
+         p->lp_stat.num_cuts_slacked_out_in_path += deletable;
+      }
    }
    PRINT(p->par.verbosity, 3, ("\n"));
 

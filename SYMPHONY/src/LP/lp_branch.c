@@ -1399,6 +1399,7 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
    }
    p->lp_stat.lp_calls++;
    p->lp_stat.str_br_lp_calls++;
+   p->lp_stat.num_str_br_cands_in_path++;
 
    change_lbub(lp_data, branch_var, lb, ub);
    return status;
