@@ -2741,7 +2741,7 @@ int set_param(sym_environment *env, char *line)
    }
    
    /* user-defined function defaults */
-   else if (strcmp(key, "is_feasible_default") == 0 ||
+   if (strcmp(key, "is_feasible_default") == 0 ||
 	    strcmp(key, "LP_is_feasible_default") == 0){
       READ_INT_PAR(lp_par->is_feasible_default);
       return(0);
@@ -2915,7 +2915,7 @@ int set_param(sym_environment *env, char *line)
    /***********************************************************************
     ***                      cutpool parameters                         ***
     ***********************************************************************/
-   else if (strcmp(key, "CP_verbosity") == 0){
+   if (strcmp(key, "CP_verbosity") == 0){
       READ_INT_PAR(cp_par->verbosity);
       return(0);
    }
