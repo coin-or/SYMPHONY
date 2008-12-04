@@ -293,8 +293,6 @@
 
 /*---------------- possible return values of branch() -----------------------*/
 #define NEW_NODE                     -1
-/* this is confusing. if symphony decides not to dive, then the return value
- * is FATHOMED_NODE even though the node is not fathomed */
 #define FATHOMED_NODE                -2 
 #define FEAS_SOL_FOUND               -3
 /* asm4: added this return code for the case when the node can be pruned by
