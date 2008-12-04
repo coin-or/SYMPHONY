@@ -484,7 +484,7 @@ int fathom_branch(lp_prob *p)
 	 comp_times->strong_branching += used_time(&p->tt);
 	 return(FUNCTION_TERMINATED_NORMALLY);
 
-       case FATHOMED_NODE_REAL:
+       case BRANCHING_INF_NODE:
 	 comp_times->strong_branching += used_time(&p->tt);
 	 if (fathom(p, FALSE)){
 	    return(FUNCTION_TERMINATED_NORMALLY);

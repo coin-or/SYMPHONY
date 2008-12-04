@@ -297,9 +297,9 @@
  * is FATHOMED_NODE even though the node is not fathomed */
 #define FATHOMED_NODE                -2 
 #define FEAS_SOL_FOUND               -3
-/* asm4: added this return code for the case when the node is really fathomed
- * ie can be deleted safely */
-#define FATHOMED_NODE_REAL           -4 
+/* asm4: added this return code for the case when the node can be pruned by
+ * branching */
+#define BRANCHING_INF_NODE           -4 
 
 /*------------- normal return value of various functions --------------------*/
 

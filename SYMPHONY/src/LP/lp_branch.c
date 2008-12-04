@@ -920,7 +920,7 @@ int branch(lp_prob *p, int cuts)
 #pragma omp critical(cut_pool)
       send_cuts_to_pool(p, p->par.eff_cnt_before_cutpool);
       p->comp_times.communication += used_time(&p->tt);
-      return (termcode == DO_NOT_BRANCH__FATHOMED ? FATHOMED_NODE_REAL : cuts);
+      return (termcode == DO_NOT_BRANCH__FATHOMED ? BRANCHING_INF_NODE : cuts);
    }
 
    /*------------------------------------------------------------------------*\
