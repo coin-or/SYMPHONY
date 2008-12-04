@@ -293,8 +293,11 @@
 
 /*---------------- possible return values of branch() -----------------------*/
 #define NEW_NODE                     -1
-#define FATHOMED_NODE                -2
+#define FATHOMED_NODE                -2 
 #define FEAS_SOL_FOUND               -3
+/* asm4: added this return code for the case when the node can be pruned by
+ * branching */
+#define BRANCHING_INF_NODE           -4 
 
 /*------------- normal return value of various functions --------------------*/
 

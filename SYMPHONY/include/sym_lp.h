@@ -178,7 +178,8 @@ int generate_cgl_cuts_new PROTO((lp_prob *p, int *num_cuts, cut_data ***cuts,
       int send_to_pool, int *bound_changes));
 int should_use_cgl_generator PROTO ((lp_prob *p, int *should_generate, 
       int which_generator, void *generator));
-int generate_cgl_cut_of_type PROTO((lp_prob *p, int i, OsiCuts *cutlist_p));
+int generate_cgl_cut_of_type PROTO((lp_prob *p, int i, OsiCuts *cutlist_p, 
+         int *was_tried));
 int check_and_add_cgl_cuts PROTO((lp_prob *p, int i, cut_data ***cuts, int *num_cuts, int *bound_changes, OsiCuts *cutlist, int send_to_pool));
 int should_stop_adding_cgl_cuts PROTO((lp_prob *p, int i, int *should_stop));
 int update_pcost PROTO ((lp_prob *p));

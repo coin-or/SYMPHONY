@@ -920,7 +920,7 @@ int branch(lp_prob *p, int cuts)
 #pragma omp critical(cut_pool)
       send_cuts_to_pool(p, p->par.eff_cnt_before_cutpool);
       p->comp_times.communication += used_time(&p->tt);
-      return( termcode == DO_NOT_BRANCH__FATHOMED ? FATHOMED_NODE : cuts );
+      return (termcode == DO_NOT_BRANCH__FATHOMED ? BRANCHING_INF_NODE : cuts);
    }
 
    /*------------------------------------------------------------------------*\
@@ -1399,6 +1399,7 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
    }
    p->lp_stat.lp_calls++;
    p->lp_stat.str_br_lp_calls++;
+   p->lp_stat.num_str_br_cands_in_path++;
 
    change_lbub(lp_data, branch_var, lb, ub);
    return status;

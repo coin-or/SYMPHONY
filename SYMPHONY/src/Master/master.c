@@ -960,6 +960,7 @@ int sym_solve(sym_environment *env)
 	  !(cp_data_sent == env->par.tm_par.max_cp_num)){
 #else
    do{
+            /* } unconfuse vi */
 #endif
       r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
       if (r_bufid == 0){
@@ -968,6 +969,7 @@ int sym_solve(sym_environment *env)
 	    printf("\nThe treemanager has died :-(\n\n");
 #else
 	 if (!processes_alive(env->tm)){
+            /* } unconfuse vi */
 #endif
 	    termcode = msgtag = SOMETHING_DIED;
 	    break;
@@ -1076,6 +1078,7 @@ int sym_solve(sym_environment *env)
 
    termcode = msgtag;
 #else
+      /* unconfuse vi { */
    }
    
    /*------------------------------------------------------------------------*\

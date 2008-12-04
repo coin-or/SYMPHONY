@@ -518,6 +518,36 @@ void send_node_desc(lp_prob *p, char node_type)
 #else
    int s_bufid;
 #endif
+
+   if (p->bc_level > 0) {
+      n->num_cut_iters_in_path =
+         p->lp_stat.num_cut_iters_in_path;
+      n->num_cuts_added_in_path =
+         p->lp_stat.num_cuts_added_in_path;
+      n->num_cuts_slacked_out_in_path =
+         p->lp_stat.num_cuts_slacked_out_in_path;
+      n->avg_cuts_obj_impr_in_path =
+         p->lp_stat.avg_cuts_obj_impr_in_path;
+
+      n->avg_br_obj_impr_in_path =
+         p->lp_stat.avg_br_obj_impr_in_path;
+
+   } else {
+      n->num_cut_iters_in_path = 0;
+      n->num_cuts_added_in_path = 0;
+      n->num_cuts_slacked_out_in_path = 0;
+      n->avg_cuts_obj_impr_in_path = 0;
+
+      n->num_str_br_cands_in_path = 0;
+      n->avg_br_obj_impr_in_path = 0;
+
+      n->num_fp_calls_in_path = 0;
+   }
+   n->num_str_br_cands_in_path =
+      p->lp_stat.num_str_br_cands_in_path;
+   n->num_fp_calls_in_path =
+      p->lp_stat.num_fp_calls_in_path;
+
    
 
 #ifdef SENSITIVITY_ANALYSIS

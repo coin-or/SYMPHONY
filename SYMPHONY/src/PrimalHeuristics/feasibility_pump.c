@@ -744,6 +744,9 @@ int fp_should_call_fp(lp_prob *p, int branching, int *should_call,
          *should_call = TRUE;
       }
    }
+   if (*should_call == TRUE) {
+      p->lp_stat.num_fp_calls_in_path++;
+   }
    return termcode;
 }
 

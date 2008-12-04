@@ -377,6 +377,17 @@ typedef struct BC_NODE{
 #ifdef TRACE_PATH
    char       optimal_path;
 #endif 
+
+   /* usage of different tools in process chain: fp, cuts, strong branching */
+   int         num_cut_iters_in_path;
+   int         num_cuts_added_in_path;
+   int         num_cuts_slacked_out_in_path;
+   double      avg_cuts_obj_impr_in_path;
+
+   int         num_str_br_cands_in_path;
+   double      avg_br_obj_impr_in_path;
+
+   int         num_fp_calls_in_path;
 }bc_node;
 
 /*===========================================================================*\
@@ -468,6 +479,17 @@ typedef struct LP_STAT{
    int         fp_calls;
    int         fp_lp_calls;
    int         fp_num_sols;
+
+   /* usage of different tools in process chain: fp, cuts, strong branching */
+   int         num_cut_iters_in_path;
+   int         num_cuts_added_in_path;
+   int         num_cuts_slacked_out_in_path;
+   double      avg_cuts_obj_impr_in_path;
+
+   int         num_str_br_cands_in_path;
+   double      avg_br_obj_impr_in_path;
+
+   int         num_fp_calls_in_path;
 }lp_stat_desc;
 
 
