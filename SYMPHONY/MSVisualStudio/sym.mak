@@ -336,22 +336,13 @@ sym_lib : \
 	$(SYMPHONYROOT)\src\Common\pack_array.obj \
 	$(SYMPHONYROOT)\src\Common\pack_cut.obj \
 	$(SYMPHONYROOT)\src\Common\proccomm.obj \
-	$(SYMPHONYROOT)\src\Common\qsortucb.obj \
-	$(SYMPHONYROOT)\src\Common\qsortucb_di.obj \
-	$(SYMPHONYROOT)\src\Common\qsortucb_i.obj \
-	$(SYMPHONYROOT)\src\Common\qsortucb_ic.obj \
-	$(SYMPHONYROOT)\src\Common\qsortucb_id.obj \
-	$(SYMPHONYROOT)\src\Common\qsortucb_ii.obj \
+	$(SYMPHONYROOT)\src\Common\sym_qsort.obj \
 	$(SYMPHONYROOT)\src\Common\timemeas.obj \
 	$(SYMPHONYROOT)\src\CutGen\cg_func.obj \
-	$(SYMPHONYROOT)\src\CutGen\cg_proccomm.obj \
 	$(SYMPHONYROOT)\src\CutGen\cg_wrapper.obj \
-	$(SYMPHONYROOT)\src\CutGen\cut_gen.obj \
 	$(SYMPHONYROOT)\src\CutPool\cp_func.obj \
 	$(SYMPHONYROOT)\src\CutPool\cp_proccomm.obj \
 	$(SYMPHONYROOT)\src\CutPool\cp_wrapper.obj \
-	$(SYMPHONYROOT)\src\CutPool\cut_pool.obj \
-	$(SYMPHONYROOT)\src\LP\lp.obj \
 	$(SYMPHONYROOT)\src\LP\lp_branch.obj \
 	$(SYMPHONYROOT)\src\LP\lp_free.obj \
 	$(SYMPHONYROOT)\src\LP\lp_genfunc.obj \
@@ -366,9 +357,10 @@ sym_lib : \
 	$(SYMPHONYROOT)\src\Master\master_wrapper.obj \
 	$(SYMPHONYROOT)\src\TreeManager\tm_func.obj \
 	$(SYMPHONYROOT)\src\TreeManager\tm_proccomm.obj \
-	$(SYMPHONYROOT)\src\TreeManager\treemanager.obj \
 	$(SYMPHONYROOT)\src\PrimalHeuristics\feasibility_pump.obj \
-	$(SYMPHONYROOT)\src\PrimalHeuristics\sp.obj
+	$(SYMPHONYROOT)\src\PrimalHeuristics\sp.obj \
+	$(SYMPHONYROOT)\src\Preprocessor\preprocessor_basic.obj \
+	$(SYMPHONYROOT)\src\Preprocessor\preprocessor.obj
 	lib.exe /nologo /out:$(OUTDIR)\libSymphony.lib $(OUTDIR)\*.obj
 	echo "libSymphony.lib" created successfully...
 	echo ...
