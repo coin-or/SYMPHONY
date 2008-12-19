@@ -59,14 +59,14 @@ int receive_lp_data_u(lp_prob *p)
 
    r_bufid = receive_msg(p->master, LP_DATA);
    receive_char_array((char *)(&p->par), sizeof(lp_params));
-   receive_char_array(&p->has_ub, 1);
+   receive_int_array(&p->has_ub, 1);
    if (p->has_ub){
       receive_dbl_array(&p->ub, 1);
    }else{
       p->ub = - (MAXDOUBLE / 2);
    }
    if(p->par.multi_criteria){
-      receive_char_array(&p->has_mc_ub, 1);
+      receive_int_array(&p->has_mc_ub, 1);
       if (p->has_mc_ub){
 	 receive_dbl_array(&p->mc_ub, 1);
 	 receive_dbl_array(p->obj, 2);
@@ -182,7 +182,8 @@ int create_subproblem_u(lp_prob *p)
    int *d_uind = NULL, *d_cind = NULL; /* just to keep gcc quiet */
 
    double *rhs, *rngval, *darray;
-   char *sense, *status;
+   char *sense;
+   int *status;
    cut_data *cut;
    branch_desc *bobj;
 
@@ -1983,7 +1984,7 @@ int send_lp_solution_u(lp_prob *p, int tid)
    send_dbl_array(&lp_data->lpetol, 1);
    if (tid == p->cut_gen){
       send_dbl_array(&lp_data->objval, 1);
-      send_char_array(&p->has_ub, 1);
+      send_int_array(&p->has_ub, 1);
       if (p->has_ub)
 	 send_dbl_array(&p->ub, 1);
    }
@@ -2042,7 +2043,7 @@ int send_lp_solution_u(lp_prob *p, int tid)
 void logical_fixing_u(lp_prob *p)
 {
    char *status = p->lp_data->tmp.c; /* n */
-   char *lpstatus = p->lp_data->status;
+   int  *lpstatus = p->lp_data->status;
    char *laststat = status + p->lp_data->n;
    int fixed_num = 0, user_res;
 
@@ -2425,14 +2426,14 @@ void free_prob_dependent_u(lp_prob *p)
 /*===========================================================================*/
 /*===========================================================================*/
 
-char analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
+int analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 				    int length, double *true_objval,
 				    double etol, char branching)
 {
   double obj[2] = {0.0, 0.0};
   int i;
   char new_solution = FALSE;
-  char continue_with_node = FALSE;
+  int continue_with_node = FALSE;
   
   for (i = 0; i < length; i++){
      if (indices[i] == p->mip->n){

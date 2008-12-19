@@ -3458,7 +3458,7 @@ int prep_solve_sr_rlx(PREPdesc *P, int row_cnt, int *row_indices)
    //  SRrlx ** srows = (P->srows = (SRrlx **)malloc(m* sizeof(SRrlx*)));
    
    int max_sr_cnt, max_aggr_cnt, verbosity; //max_aggr_row_num, verbosity;
-   char p_level, do_sr_rlx, do_aggr_row_rlx;  
+   int p_level, do_sr_rlx, do_aggr_row_rlx;  
    int obj_ind, tot_sub_pr;
    char can_iterate = TRUE;
    double etol;
@@ -4427,7 +4427,7 @@ int sr_add_new_col(SRdesc *sr, SRdesc *d_sr, double c_val, double a_val,
 				    -rhs_ub_offset, -rhs_lb_offset,
 				    obj_ub_offset, obj_lb_offset,
 				    col_ub, col_lb, 
-				    SR_MAX, col_type);
+				    SR_MAX, var_type);
 		add_new_bounded_col(sr, c_val, a_val, col_ind,
 				    rhs_ub_offset, rhs_lb_offset,
 				    obj_ub_offset, obj_lb_offset,

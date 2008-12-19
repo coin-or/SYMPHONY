@@ -34,7 +34,7 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
    LPdata *lp_data = p->lp_data;
    var_desc *evar, **extra, **vars = lp_data->vars;
 
-   char *status = lp_data->status;
+   int *status = lp_data->status;
 
    int new_vars = new_cols->num_vars;
    int i, j, oldn;
@@ -145,7 +145,7 @@ void tighten_bounds(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    double *dj = lp_data->dj;
    //double *x = lp_data->x;
-   char *status = lp_data->status;
+   int *status = lp_data->status;
    var_desc **vars = lp_data->vars;
    int n = lp_data->n;
    double lpetol = lp_data->lpetol;
@@ -367,7 +367,7 @@ our_col_set *price_all_vars(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol;
    int m = lp_data->m, n = lp_data->n;
-   char *status = lp_data->status;
+   int *status = lp_data->status;
    double *dj = lp_data->dj;
    double *dual = lp_data->dualsol;
 
@@ -379,7 +379,7 @@ our_col_set *price_all_vars(lp_prob *p)
    int next_not_fixed, not_fixed_num = lp_data->not_fixed_num;
    int *not_fixed = lp_data->not_fixed;
    char new_nf_status = NF_CHECK_UNTIL_LAST;
-   char nf_status = lp_data->nf_status;
+   int  nf_status = lp_data->nf_status;
    int tmp_not_fixed_num = 0, *tmp_not_fixed, *itmp;
 
    int cutnum;
@@ -769,7 +769,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
 {
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol;
-   char *status = lp_data->status;
+   int *status = lp_data->status;
    double *dual = lp_data->dualsol;
 
    int bvarnum = p->base.varnum;
@@ -778,7 +778,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
    var_desc **extra = vars + bvarnum;
 
    int next_not_fixed, *not_fixed = lp_data->not_fixed;
-   char nf_status = lp_data->nf_status;
+   int  nf_status = lp_data->nf_status;
    int not_fixed_num = lp_data->not_fixed_num;
 
    int cutnum;

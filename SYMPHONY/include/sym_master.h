@@ -40,10 +40,10 @@ typedef struct SYM_ENVIRONMENT{
    params           par;         /* problem parameters */
    prob_times       comp_times;  /* keeps track of the computation times for
 				    the problem */
-   char             has_ub;
+   int              has_ub;
    double           ub;
    lp_sol           best_sol;
-   char             has_mc_ub;
+   int              has_mc_ub;
    double           mc_ub;
    double           obj[2];
    double           utopia[2];
@@ -91,7 +91,7 @@ void print_statistics PROTO((node_times *tim, problem_stat *stat,
                             lp_stat_desc *lp_stat, double ub,
 			     double lb, double initial_time,
 			     double start_time, double finish_time,
-			     double obj_offset, char obj_sense, char has_ub,
+			     double obj_offset, char obj_sense, int has_ub,
                              sp_desc *solpool));
 
 /*===========================================================================*/

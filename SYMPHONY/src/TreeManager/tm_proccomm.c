@@ -138,7 +138,7 @@ char processes_alive(tm_prob *tm)
  * Send the active node to the LP
 \*===========================================================================*/
 
-void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
+void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
 		      int thread_num)
 {
 #ifdef COMPILE_IN_LP
@@ -553,7 +553,7 @@ void send_active_node(tm_prob *tm, bc_node *node, char colgen_strat,
    send_int_array(&node->bc_index, 1);
    send_int_array(&node->bc_level, 1);
    send_dbl_array(&node->lower_bound, 1);
-   send_char_array(&colgen_strat, 1);
+   send_int_array(&colgen_strat, 1);
    send_int_array(&desc->nf_status, 1);
 
    pack_basis(&basis, TRUE);
@@ -884,7 +884,7 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    int *feasible;
    double *objval;
    int oldkeep, keep;
-   char olddive, dive;
+   int olddive, dive;
    int new_branching_cut = FALSE, lp, i;
 
    receive_char_array(&bobj->type, 1);
@@ -928,7 +928,7 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    }
    receive_char_array(action, bobj->child_num);
 
-   receive_char_array(&olddive, 1);
+   receive_int_array(&olddive, 1);
    receive_int_array(&keep, 1);
    oldkeep = keep;
    lp = node->lp;
@@ -939,7 +939,7 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    if (oldkeep >= 0 && (olddive == CHECK_BEFORE_DIVE || olddive == DO_DIVE)){
       /* We have to reply */
       s_bufid = init_send(DataInPlace);
-      send_char_array(&dive, 1);
+      send_int_array(&dive, 1);
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE){
 	 /* Give the index of the node kept and also the index of the
 	  * branching cut if necessary */

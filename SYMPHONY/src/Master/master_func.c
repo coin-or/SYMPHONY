@@ -974,7 +974,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
    double obj[2] = {0.0, 0.0}, gamma, tau, objval;
    int *matbeg, *matind;
    double *rowact = NULL, *matval, *colsol = NULL; 
-   char feasible = TRUE;
+   int feasible = TRUE;
 
 
 #ifdef USE_SYM_APPLICATION

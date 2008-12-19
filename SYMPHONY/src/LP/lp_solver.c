@@ -179,7 +179,7 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
          FREE(lp_data->dj);
          lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->status);
-         lp_data->status = (char *) malloc(lp_data->maxn * CSIZE);
+         lp_data->status = (int *) malloc(lp_data->maxn * CSIZE);
          FREE(lp_data->random_hash);
          lp_data->random_hash = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->heur_solution);
@@ -195,7 +195,7 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
                                          lp_data->maxn * DSIZE);
          lp_data->dj = (double *) realloc((char *)lp_data->dj,
                                           lp_data->maxn * DSIZE);
-         lp_data->status = (char *) realloc((char *)lp_data->status,
+         lp_data->status = (int *) realloc((char *)lp_data->status,
                                             lp_data->maxn * CSIZE);
          lp_data->random_hash = (double *) realloc((char *)lp_data->random_hash,
                                          lp_data->maxn * DSIZE);
@@ -1304,7 +1304,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    int num_to_delete = 0, num_to_keep = 0;
    double *dj = lp_data->dj;
    double *x = lp_data->x;
-   char *status = lp_data->status;
+   int *status = lp_data->status;
 
    for (i = n - 1, num_to_delete = 0; i >= 0; i--) {
       if (delstat[i]) {
@@ -2135,7 +2135,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 {
    double *dj = lp_data->dj;
    double *x = lp_data->x;
-   char *status = lp_data->status;
+   int *status = lp_data->status;
    int i, num_to_keep;
 
    cpx_status = CPXdelsetcols(lp_data->cpxenv, lp_data->lp, delstat);
@@ -3176,7 +3176,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    int num_to_delete = 0, num_to_keep = 0;
    double *dj = lp_data->dj;
    double *x = lp_data->x;
-   char *status = lp_data->status;
+   int *status = lp_data->status;
 
    for (i = n - 1; i >= 0; i--){
       if (delstat[i]){

@@ -952,7 +952,7 @@ void insert_new_node(tm_prob *tm, bc_node *node)
  * Nodes are ordered differently depending on what the comparison rule is
 \*===========================================================================*/
 
-char node_compar(int rule, bc_node *node0, bc_node *node1)
+int node_compar(int rule, bc_node *node0, bc_node *node1)
 {
    switch(rule){
     case LOWEST_LP_FIRST:
@@ -1050,7 +1050,7 @@ int assign_pool(tm_prob *tm, int oldpool, process_set *pools,
 
 int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		      double *objval, int *feasible, char *action,
-		      char olddive, int *keep, int new_branching_cut)
+		      int olddive, int *keep, int new_branching_cut)
 {
    node_desc *desc;
    int np_cp = 0, np_sp = 0;
