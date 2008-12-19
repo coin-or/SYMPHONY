@@ -2489,7 +2489,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 	    termcode = PREP_MODIFIED;
 	 }else if(FALSE && !impl_mode &&
 		  ((a_val > etol && !P->ulist_checked[col_ind]) ||
-		   a_val < -etol && !P->llist_checked[col_ind])){
+		   (a_val < -etol && !P->llist_checked[col_ind]))){
 	    //printf("implication of col: %i\n", col_ind);
 	    /* for now - just among the binary variables*/
 	    /* so cant fix it, cant improve it and binary 
