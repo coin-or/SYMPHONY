@@ -66,7 +66,7 @@ typedef struct LP_PROB{
 
    lp_params     par;
 
-   char          has_ub;
+   int           has_ub;
    double        ub;
 
    int           phase;
@@ -94,7 +94,7 @@ typedef struct LP_PROB{
    lp_sol        best_sol;
    double        obj[2];
    double        utopia[2];
-   char          has_mc_ub;
+   int           has_mc_ub;
    double        mc_ub;
    
    double        tt;
@@ -108,8 +108,8 @@ typedef struct LP_PROB{
    int           vars_at_lb;
    int           vars_deletable; /* a subset of vars at LB */
 
-   char          dive;
-   char          colgen_strategy;
+   int           dive;
+   int           colgen_strategy;
    char          colgen_happened;
    char          colset_changed;
 
@@ -256,7 +256,7 @@ int process_message PROTO((lp_prob *p, int r_bufid, int *pindex, int *pitnum));
 void lp_process_ub_message PROTO((lp_prob *p));
 int receive_active_node PROTO((lp_prob *p));
 int receive_cuts PROTO((lp_prob *p, int first_lp, int no_more_cuts_count));
-void send_node_desc PROTO((lp_prob *p, char node_type));
+void send_node_desc PROTO((lp_prob *p, int node_type));
 array_desc pack_array_desc_diff PROTO((array_desc *ad, array_desc *new_ad,
 				       int *itmp));
 basis_desc pack_basis_diff PROTO((node_desc *oldnode, node_desc *newnode,
@@ -324,7 +324,7 @@ int generate_column_u PROTO((lp_prob *p, int lpcutnum, cut_data **cuts,
 void print_stat_on_cuts_added_u PROTO((lp_prob *p, int added_rows));
 void purge_waiting_rows_u PROTO((lp_prob *p));
 int generate_cuts_in_lp_u PROTO((lp_prob *p));
-char analyze_multicriteria_solution PROTO((lp_prob *p, int *indices,
+int analyze_multicriteria_solution PROTO((lp_prob *p, int *indices,
 					   double *values, int length,
 					   double *true_objval, double etol,
 					   char branching));

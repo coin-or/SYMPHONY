@@ -212,7 +212,7 @@ int receive_active_node(lp_prob *p)
    receive_int_array(&p->bc_index, 1);
    receive_int_array(&p->bc_level, 1);
    receive_dbl_array(&p->lp_data->objval, 1);
-   receive_char_array(&p->colgen_strategy, 1);
+   receive_int_array(&p->colgen_strategy, 1);
    receive_int_array(&desc->nf_status, 1);
 
    if (! (p->colgen_strategy & COLGEN_REPRICING) &&
@@ -284,7 +284,7 @@ int receive_active_node(lp_prob *p)
 				 p->bc_level * sizeof(branch_desc));
    }
 
-   receive_char_array(&p->dive, 1);
+   receive_int_array(&p->dive, 1);
 
    /*------------------------------------------------------------------------*\
     * Unpack the user defined description
@@ -501,12 +501,12 @@ if (newad.size > 0){                                                        \
       
 /*===========================================================================*/
 
-void send_node_desc(lp_prob *p, char node_type)
+void send_node_desc(lp_prob *p, int node_type)
 {
    node_desc *new_lp_desc = NULL, *new_tm_desc = NULL;
    node_desc *lp_desc = p->desc;
-   char repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
-   char deal_with_nf;
+   int repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
+   int deal_with_nf;
    
    LPdata *lp_data = p->lp_data;
 
@@ -1416,7 +1416,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 #endif
    int i = 0, pos = can->position;
    cut_data *brcut;
-   char dive = p->dive, olddive = p->dive;
+   int dive = p->dive, olddive = p->dive;
    char fractional_dive = FALSE;
 
 #ifdef COMPILE_IN_LP
@@ -1545,7 +1545,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
    send_char_array(action, can->child_num);
 
    /* Our diving status and what we would keep */
-   send_char_array(&dive, 1);
+   send_int_array(&dive, 1);
    send_int_array(keep, 1);
    
    send_msg(p->tree_manager, LP__BRANCHING_INFO);

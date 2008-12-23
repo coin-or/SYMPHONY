@@ -756,7 +756,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
                       lp_stat_desc *lp_stat, double ub,
 		      double lb, double initial_time, double start_time,
 		      double finish_time, double obj_offset, char obj_sense, 
-		      char has_ub, sp_desc *solpool)
+		      int has_ub, sp_desc *solpool)
 {
    double gap = 0.0;
 

@@ -76,7 +76,7 @@ typedef struct CUT_DATA{
    char           sense;       /* sense of the cut constraint */
    char           deletable;   /* whether or not this cut should be removed
 				  from the LP after being added */
-   char           branch;      /* shows whether we can branch on its cut if
+   int            branch;      /* shows whether we can branch on its cut if
 				  this row becomes slack */
    int            name;        /* internal to the BB. The identifier of the
 				  cut. >=0 if exists, -1 if does not exist yet,
@@ -414,7 +414,7 @@ typedef struct PROBLEM_STAT{
    int         leaves_after_trimming;
    int         vars_not_priced;    /* How many variables did not price out
 				      after the first phase */
-   char        nf_status;          /* nf_status of the root node after
+   int         nf_status;          /* nf_status of the root node after
 				      repricing */
    double      max_vsize;
 }problem_stat;
@@ -715,7 +715,7 @@ typedef struct WARM_START_DESC{
    node_times     comp_times;
    int            phase;
    double         lb;
-   char           has_ub;
+   int            has_ub;
    double         ub;
    lp_sol         best_sol;
    char           trim_tree;

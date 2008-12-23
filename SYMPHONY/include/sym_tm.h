@@ -56,7 +56,7 @@ struct LP_PROB;
 typedef struct TM_PROB{
    tm_params       par;
    int             master;
-   char            has_ub;
+   int             has_ub;
    char            has_ub_estimate;
    double          start_time;
    double          ub;       /* the best global upper bound found */
@@ -150,12 +150,12 @@ void calculate_widths PROTO((bc_node *node, int *widths));
 int start_node PROTO((tm_prob *tm, int thread_num));
 bc_node *del_best_node PROTO((tm_prob *tm));
 void insert_new_node PROTO((tm_prob *tm, bc_node *new_node));
-char node_compar PROTO((int rule, bc_node *node0, bc_node *node1));
+int node_compar PROTO((int rule, bc_node *node0, bc_node *node1));
 int assign_pool PROTO((tm_prob *tm, int oldpool, process_set *pools,
 		       int *active_nodes_per_pool, int *nodes_per_pool));
 int generate_children PROTO((tm_prob *tm, bc_node *node, branch_obj *bobj,
 			     double *objval, int *feasible, char *action,
-			     char olddive, int *keep, int new_branching_cut));
+			     int olddive, int *keep, int new_branching_cut));
 char shall_we_dive PROTO((tm_prob *tm, double objval));
 int purge_pruned_nodes PROTO((tm_prob *tm, bc_node *node, int category));
 int find_process_index PROTO((process_set *pset, int tid));
@@ -221,7 +221,7 @@ process_set start_processes PROTO((tm_prob *tm,
 				   int machnum, char **mach));
 void stop_processes PROTO((process_set *pset));
 char processes_alive PROTO((tm_prob *tm));
-void send_active_node PROTO((tm_prob *tm, bc_node *node, char colgen_strat,
+void send_active_node PROTO((tm_prob *tm, bc_node *node, int colgen_strat,
 			     int thread_num));
 void receive_node_desc PROTO((tm_prob *tm, bc_node *n));
 void process_branching_info PROTO((tm_prob *tm, bc_node *node));

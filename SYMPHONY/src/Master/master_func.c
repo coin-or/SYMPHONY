@@ -974,7 +974,7 @@ void check_better_solution(sym_environment * env, bc_node *root, int delete_node
    double obj[2] = {0.0, 0.0}, gamma, tau, objval;
    int *matbeg, *matind;
    double *rowact = NULL, *matval, *colsol = NULL; 
-   char feasible = TRUE;
+   int feasible = TRUE;
 
 
 #ifdef USE_SYM_APPLICATION
@@ -1780,9 +1780,7 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(env->par.verbosity);
       tm_par->verbosity = lp_par->verbosity = cg_par->verbosity =
 	 cp_par->verbosity = env->par.verbosity;
-#ifdef USE_PREPROCESSOR
       prep_par->verbosity = env->par.verbosity;
-#endif
       return(0);
    }
    else if (strcmp(key, "test") == 0){

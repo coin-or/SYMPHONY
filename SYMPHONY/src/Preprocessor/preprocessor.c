@@ -102,7 +102,7 @@ int preprocess_mip (sym_environment *env)
    //PRINT(verbosity, 1, ("Basic Prep time: %f...\n", 
    //		wall_clock(NULL) - mark_time));
 
-   if(verbosity >= -1){
+   if(verbosity > -1){
       prep_report(P, termcode);
    }
    

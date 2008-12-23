@@ -1656,7 +1656,7 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
   memcpy(newSolution,solution,numberColumns*sizeof(double));
 
   // way is 1 if down possible, 2 if up possible, 3 if both possible
-  char * way = new char[numberIntegers];
+  int * way = new int[numberIntegers];
   // corrected costs
   double * cost = new double[numberIntegers];
   // for array to mark infeasible rows after iColumn branch
