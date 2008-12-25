@@ -2063,7 +2063,7 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.str_br_lp_calls         += p->lp_stat.str_br_lp_calls;
    p->tm->lp_stat.lp_sols                 += p->lp_stat.lp_sols;
    p->tm->lp_stat.str_br_bnd_changes      += p->lp_stat.str_br_bnd_changes;
-   p->tm->lp_stat.str_br_nodes_fathomed   += p->lp_stat.str_br_nodes_fathomed;
+   p->tm->lp_stat.str_br_nodes_pruned   += p->lp_stat.str_br_nodes_pruned;
 
    p->tm->lp_stat.cuts_generated          += p->lp_stat.cuts_generated;
    p->tm->lp_stat.gomory_cuts             += p->lp_stat.gomory_cuts;

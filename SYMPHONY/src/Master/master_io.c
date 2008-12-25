@@ -853,8 +853,8 @@ void print_statistics(node_times *tim, problem_stat *stat,
               "%i\n",lp_stat->lp_sols);
       printf ("Number of bounds changed by strong branching:   "
               "%i\n",lp_stat->str_br_bnd_changes);
-      printf ("Number of nodes fathomed by strong branching:   "
-              "%i\n",lp_stat->str_br_nodes_fathomed);
+      printf ("Number of nodes pruned by strong branching:     "
+              "%i\n",lp_stat->str_br_nodes_pruned);
 
       printf ("\n==================== Feasibility Pump =====================");
       printf ("\n");
