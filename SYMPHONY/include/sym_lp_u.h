@@ -48,7 +48,7 @@ int user_shall_we_branch PROTO((void *user, double lpetol, int cutnum,
 				int slacks_in_matrix_num,
 				cut_data **slacks_im_matrix, int slack_cut_num,
 				cut_data **slack_cuts, int varnum,
-				var_desc **vars, double *x, char *status,
+				var_desc **vars, double *x, int *status,
 				int *cand_num, branch_obj ***candidates,
 				int *action));
 int user_select_candidates PROTO((void *user, double lpetol, int cutnum,
@@ -56,7 +56,7 @@ int user_select_candidates PROTO((void *user, double lpetol, int cutnum,
 				  cut_data **slacks_im_matrix,
 				  int slack_cut_num, cut_data **slack_cuts,
 				  int varnum, var_desc **vars, double *x,
-				  char *status, int *cand_num,
+				  int *status, int *cand_num,
 				  branch_obj ***candidates, int *action,
 				  int bc_level));
 int user_compare_candidates PROTO((void *user, branch_obj *can1,
@@ -75,7 +75,7 @@ int user_unpack_cuts PROTO((void *user, int from, int type, int varnum,
 int user_send_lp_solution PROTO((void *user, int varnum, var_desc **vars,
 				 double *x, int where));
 int user_logical_fixing PROTO((void *user, int varnum, var_desc **vars,
-			       double *x, char *status, int *fixed_num));
+			       double *x, int *status, int *fixed_num));
 int user_generate_column PROTO((void *user, int generate_what, int cutnum,
 				cut_data **cuts, int prevind, int nextind,
 				int *real_nextind, double *colval, int *colind,

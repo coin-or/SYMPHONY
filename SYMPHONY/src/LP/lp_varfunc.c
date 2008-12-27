@@ -131,7 +131,10 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
    /* zero out x, i.e., set it to the LB */
    memset(lp_data->x + oldn, 0, new_vars * DSIZE);
    /* set status of the new vars to NOT_FIXED */
-   memset(lp_data->status + oldn, NOT_FIXED, new_vars);
+   //memset(lp_data->status + oldn, NOT_FIXED, new_vars);
+   for (i = oldn; i<oldn+new_vars; i++) {
+      lp_data->status[i] = NOT_FIXED;
+   }
 }
 
 /*===========================================================================*/
