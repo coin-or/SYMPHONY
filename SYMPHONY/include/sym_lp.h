@@ -182,6 +182,7 @@ int generate_cgl_cut_of_type PROTO((lp_prob *p, int i, OsiCuts *cutlist_p,
          int *was_tried));
 int check_and_add_cgl_cuts PROTO((lp_prob *p, int i, cut_data ***cuts, int *num_cuts, int *bound_changes, OsiCuts *cutlist, int send_to_pool));
 int should_stop_adding_cgl_cuts PROTO((lp_prob *p, int i, int *should_stop));
+int add_col_cuts PROTO((lp_prob *p, OsiCuts *cutlist, int *bound_changes));
 int update_pcost PROTO ((lp_prob *p));
 int str_br_bound_changes PROTO((lp_prob *p, int num_bnd_changes, 
          double *bnd_val, int *bnd_ind, char *bnd_sense));
