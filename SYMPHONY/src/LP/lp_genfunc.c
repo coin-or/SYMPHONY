@@ -2063,7 +2063,7 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.str_br_lp_calls         += p->lp_stat.str_br_lp_calls;
    p->tm->lp_stat.lp_sols                 += p->lp_stat.lp_sols;
    p->tm->lp_stat.str_br_bnd_changes      += p->lp_stat.str_br_bnd_changes;
-   p->tm->lp_stat.str_br_nodes_fathomed   += p->lp_stat.str_br_nodes_fathomed;
+   p->tm->lp_stat.str_br_nodes_pruned   += p->lp_stat.str_br_nodes_pruned;
 
    p->tm->lp_stat.cuts_generated          += p->lp_stat.cuts_generated;
    p->tm->lp_stat.gomory_cuts             += p->lp_stat.gomory_cuts;
@@ -2326,7 +2326,6 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
       int send_to_pool, int *bound_changes)
 {
 #ifdef USE_CGL_CUTS
-   int *should_generate = (int *) malloc(CGL_NUM_GENERATORS*ISIZE);
    int i, should_stop = FALSE, repeat_with_long = TRUE, max_cut_length;
    OsiCuts cutlist;
    const int n                 = p->lp_data->n;
@@ -2364,11 +2363,11 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
    }
    p->par.max_cut_length = max_cut_length;
 
+   add_col_cuts(p, &cutlist, bound_changes);
    if (was_tried == TRUE && p->bc_index > 0) {
       p->lp_stat.num_cut_iters_in_path++;
    }
 
-   FREE(should_generate);
 #endif
    return 0;
 }
@@ -2721,7 +2720,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
 int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts, 
       int *num_cuts, int *bound_changes, OsiCuts *cutlist, int send_to_pool) 
 {
-   int          i, j, k, num_row_cuts, num_col_cuts, *is_deleted, num_elements,
+   int          i, j, k, num_row_cuts, *is_deleted, num_elements,
                 *indices, discard_cut, num_poor_quality = 0, num_unviolated = 0,
                 num_duplicate = 0, *cut_size, *matind; 
    const int    max_elements = p->par.max_cut_length, 
@@ -2735,7 +2734,6 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    const double etol1000 = lpetol * 1000;
    const double *x     = lp_data->x;
    OsiRowCut    row_cut;
-   OsiColCut    col_cut;
    var_desc     **vars = lp_data->vars;
    const int    is_userind_in_order = p->par.is_userind_in_order;
    cut_data     *sym_cut;
@@ -2745,7 +2743,6 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    cut_time     = used_time(&total_time);
 
    num_row_cuts = cutlist->sizeRowCuts();
-   num_col_cuts = cutlist->sizeColCuts();
    hashes       = (double *) malloc(num_row_cuts*DSIZE);
    is_deleted   = (int *) calloc(num_row_cuts, ISIZE);
    cut_size     = (int *) calloc(num_row_cuts, ISIZE);
@@ -2763,6 +2760,9 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       max_coeff = 0;
       min_coeff = DBL_MAX;
 
+      if (verbosity>10) {
+         row_cut.print();
+      }
       /* length */
       if (num_elements > max_elements) {
          PRINT(verbosity,5,("Threw out cut because its length %d is too "
@@ -2920,39 +2920,6 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       cutlist->eraseRowCut(0);
    }
 
-   for (i=0; i<num_col_cuts; i++) {
-      col_cut = cutlist->colCut(i);
-      if (verbosity>10) {
-         col_cut.print();
-      }
-      indices  = const_cast<int *>(col_cut.lbs().getIndices());
-      elements = const_cast<double *>(col_cut.lbs().getElements());
-      for (j=0;j<col_cut.lbs().getNumElements();j++) {
-         if (vars[indices[j]]->new_lb < elements[j]) {
-            vars[indices[j]]->new_lb = elements[j];
-            change_lbub(lp_data, indices[j], elements[j], 
-                  vars[indices[j]]->new_ub);
-            (*bound_changes)++;
-         }
-      }
-      indices  = const_cast<int *>(col_cut.ubs().getIndices());
-      elements = const_cast<double *>(col_cut.ubs().getElements());
-      for (j=0;j<col_cut.ubs().getNumElements();j++) {
-         if (vars[indices[j]]->new_ub > elements[j]) {
-            vars[indices[j]]->new_ub = elements[j];
-            change_lbub(lp_data, indices[j], vars[indices[j]]->new_lb,
-                  elements[j]);
-            (*bound_changes)++;
-         }
-      }
-   }
-
-
-   
-   for (i=0; i<num_col_cuts; i++) {
-      cutlist->eraseColCut(0);
-   }
-
    FREE(hashes);
    FREE(is_deleted);
    FREE(cut_size);
@@ -3012,9 +2979,58 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 }
 
 /*===========================================================================*/
+int add_col_cuts(lp_prob *p, OsiCuts *cutlist, int *bound_changes)
+{
+   int i, j;
+   OsiColCut    col_cut;
+   const int verbosity = p->par.verbosity;
+   int *indices;
+   double *elements;
+   int num_col_cuts;
+   LPdata       *lp_data = p->lp_data;
+   var_desc **vars = lp_data->vars;
+
+   num_col_cuts = cutlist->sizeColCuts();
+   for (i=0; i<num_col_cuts; i++) {
+      col_cut = cutlist->colCut(i);
+      if (verbosity>10) {
+         col_cut.print();
+      }
+      indices  = const_cast<int *>(col_cut.lbs().getIndices());
+      elements = const_cast<double *>(col_cut.lbs().getElements());
+      for (j=0;j<col_cut.lbs().getNumElements();j++) {
+         if (vars[indices[j]]->new_lb < elements[j]) {
+            vars[indices[j]]->new_lb = elements[j];
+            change_lbub(lp_data, indices[j], elements[j], 
+                  vars[indices[j]]->new_ub);
+            (*bound_changes)++;
+         }
+      }
+      indices  = const_cast<int *>(col_cut.ubs().getIndices());
+      elements = const_cast<double *>(col_cut.ubs().getElements());
+      for (j=0;j<col_cut.ubs().getNumElements();j++) {
+         if (vars[indices[j]]->new_ub > elements[j]) {
+            vars[indices[j]]->new_ub = elements[j];
+            change_lbub(lp_data, indices[j], vars[indices[j]]->new_lb,
+                  elements[j]);
+            (*bound_changes)++;
+         }
+      }
+   }
+
+
+   
+   for (i=0; i<num_col_cuts; i++) {
+      cutlist->eraseColCut(0);
+   }
+
+   return 0;
+}
+
+/*===========================================================================*/
 int should_stop_adding_cgl_cuts(lp_prob *p, int i, int *should_stop)
 {
-   *should_stop = 0;
+   *should_stop = FALSE;
    return 0;
 }
 

@@ -1301,7 +1301,7 @@ int user_send_lp_solution(void *user, int varnum, var_desc **vars, double *x,
 \*===========================================================================*/
 
 int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
-			char *status, int *num_fixed)
+			int *status, int *num_fixed)
 {
    cnrp_spec *cnrp = (cnrp_spec *)user;
    lp_net *lp_net;
@@ -1531,7 +1531,7 @@ int user_generate_cuts_in_lp(void *user, LPdata *lp_data, int varnum,
  * logical fixing routine 
 \*===========================================================================*/
 
-lp_net *create_lp_net(cnrp_spec *cnrp, char *status, int edgenum,
+lp_net *create_lp_net(cnrp_spec *cnrp, int *status, int edgenum,
 		      var_desc **vars)
 {
    lp_net *n;

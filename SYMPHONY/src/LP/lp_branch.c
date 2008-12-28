@@ -419,7 +419,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          FREE(best_can);
          FREE(candidates);
          *candidate = NULL;
-         p->lp_stat.str_br_nodes_fathomed++;
+         p->lp_stat.str_br_nodes_pruned++;
          return (DO_NOT_BRANCH__FATHOMED);
       }
    } else {

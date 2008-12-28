@@ -48,7 +48,7 @@
 int user_shall_we_branch(void *user, double lpetol, int cutnum,
 			 int slacks_in_matrix_num, cut_data **slacks_im_matrix,
 			 int slack_cut_num, cut_data **slack_cuts, int varnum,
-			 var_desc **vars, double *x, char *status,
+			 var_desc **vars, double *x, int *status,
 			 int *cand_num, branch_obj ***candidates,
 			 int *action)
 {
@@ -97,7 +97,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 			   int slacks_in_matrix_num,
 			   cut_data **slacks_in_matrix, int slack_cut_num,
 			   cut_data **slack_cuts, int varnum, var_desc **vars,
-			   double *x, char *status, int *cand_num,
+			   double *x, int *status, int *cand_num,
 			   branch_obj ***candidates, int *action,
 			   int bc_level)
 

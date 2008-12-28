@@ -446,10 +446,19 @@ int create_subproblem_u(lp_prob *p)
    }
    
    /* Default status of every variable is NOT_FIXED */
-   if (bvarnum > 0)
-      memset(lp_data->status, NOT_FIXED | BASE_VARIABLE, bvarnum);
-   if (bvarnum < lp_data->n)
-      memset(lp_data->status + bvarnum, NOT_FIXED, lp_data->n - bvarnum);
+   status = lp_data->status;
+   if (bvarnum > 0) {
+      //memset(lp_data->status, NOT_FIXED | BASE_VARIABLE, bvarnum);
+      for (i=0; i<bvarnum; i++) {
+         status[i] = NOT_FIXED | BASE_VARIABLE;
+      }
+   }
+   if (bvarnum < lp_data->n) {
+      //memset(lp_data->status + bvarnum, NOT_FIXED, lp_data->n - bvarnum);
+      for (i=bvarnum; i<lp_data->n; i++) {
+         status[i] = NOT_FIXED;
+      }
+   }
 
    /*------------------------------------------------------------------------*\
     * Set the necessary fields in rows
@@ -2042,13 +2051,14 @@ int send_lp_solution_u(lp_prob *p, int tid)
 
 void logical_fixing_u(lp_prob *p)
 {
-   char *status = p->lp_data->tmp.c; /* n */
-   int  *lpstatus = p->lp_data->status;
-   char *laststat = status + p->lp_data->n;
+   int *status = p->lp_data->tmp.i1; /* n */
+   int *lpstatus = p->lp_data->status;
+   int *laststat = status + p->lp_data->n;
    int fixed_num = 0, user_res;
 
    colind_sort_extra(p);
-   memcpy(status, lpstatus, p->lp_data->n);
+   //memcpy(status, lpstatus, p->lp_data->n);
+   memcpy(status, lpstatus, ISIZE*p->lp_data->n);
 
 #ifdef USE_SYM_APPLICATION
    user_res = user_logical_fixing(p->user, p->lp_data->n, p->lp_data->vars,

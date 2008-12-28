@@ -425,7 +425,7 @@ typedef struct LP_STAT{
    int         lp_sols;
    int         str_br_lp_calls; /* no of calls from strong branching */
    int         str_br_bnd_changes; /* no of bounds changed due to strong br */
-   int         str_br_nodes_fathomed; /* no of nodes fathomed by strong br */
+   int         str_br_nodes_pruned; /* no of nodes pruned by strong br */
 
    /* cuts */
    int         cuts_generated;
