@@ -2251,7 +2251,7 @@ int update_cut_parameters(lp_prob *p)
    if (par->generate_cgl_probing_cuts == GENERATE_DEFAULT) {
       if (lp_stat.probing_cuts_root<1) {
          data_par->generate_cgl_probing_cuts_freq = 
-              par->generate_cgl_probing_cuts_freq = -1;
+              par->generate_cgl_probing_cuts_freq = 1000;
       } else {
          data_par->generate_cgl_probing_cuts_freq = 
               par->generate_cgl_probing_cuts_freq = 100;
@@ -2377,9 +2377,11 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
       int which_generator, void *generator)
 {
 
+#ifdef USE_CGL_CUTS
    int bc_index = p->bc_index;
    int is_root_node = (bc_index < 1) ? TRUE : FALSE;
-#ifdef USE_CGL_CUTS
+   const int bc_level = p->bc_level;
+   const int max_bc_level = p->par.cgl.max_depth_for_cgl_cuts;
    *should_generate = FALSE;
    switch (which_generator) {
     case CGL_PROBING_GENERATOR:
@@ -2390,8 +2392,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 1 || 
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level || 
+                  freq < 1 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
@@ -2454,8 +2456,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 0 ||
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level ||
+                  freq < 0 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
@@ -2484,8 +2486,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 1 ||
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level ||
+                  freq < 1 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
@@ -2514,8 +2516,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 1 || 
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level ||
+                  freq < 1 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
@@ -2561,8 +2563,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 1 ||
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level ||
+                  freq < 1 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
@@ -2591,8 +2593,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 1 ||
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level ||
+                  freq < 1 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
