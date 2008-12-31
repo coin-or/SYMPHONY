@@ -213,6 +213,7 @@ int fathom_branch(lp_prob *p)
    int num_errors = 0;
    int cut_term = 0;
    double obj_before_cuts = 0;
+   const int verbosity = p->par.verbosity;
 #ifdef DO_TESTS
    double oldobjval = lp_data->objval;
 #endif
@@ -253,19 +254,16 @@ int fathom_branch(lp_prob *p)
       p->node_iter_num++;
       lp_data->lp_count++;
 
-      PRINT(p->par.verbosity, 2,
+      PRINT(verbosity, 2,
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
       p->bound_changes_in_iter = 0;
       if (p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
                p->bc_level < 1)) {
          if (p->bc_level < 1) {
-            PRINT(p->par.verbosity, -1, ("solving root lp relaxation\n"));
+            PRINT(verbosity, -1, ("solving root lp relaxation\n"));
          }
          termcode = initial_lp_solve(lp_data, &iterd);
-         if (p->bc_level < 1) {
-            PRINT(p->par.verbosity, -1, ("finished solving lp relaxation.\n"));
-         }
       } else {
          termcode = dual_simplex(lp_data, &iterd);
       }
@@ -285,14 +283,18 @@ int fathom_branch(lp_prob *p)
       
       /* display the current solution */
       if (p->mip->obj_sense == SYM_MAXIMIZE){
-	 PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
-				     -lp_data->objval + p->mip->obj_offset,
-				     termcode, iterd));
+         if ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2) {
+            PRINT(verbosity, -1, ("The LP value is: %.3f [%i,%i]\n\n",
+                                   -lp_data->objval + p->mip->obj_offset,
+                                   termcode, iterd));
+         }
 
       }else{
-	 PRINT(p->par.verbosity, 2, ("The LP value is: %.3f [%i,%i]\n\n",
-				     lp_data->objval+ p->mip->obj_offset,
-				     termcode, iterd));
+         if ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2) {
+            PRINT(verbosity, -1, ("The LP value is: %.3f [%i,%i]\n\n",
+                                   lp_data->objval+ p->mip->obj_offset,
+                                   termcode, iterd));
+         }
       }
       switch (termcode){
        case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
@@ -322,7 +324,7 @@ int fathom_branch(lp_prob *p)
 	    num_errors = 0;
 	 }
 	 if (termcode == LP_D_UNBOUNDED){
-	    PRINT(p->par.verbosity, 1, ("Feasibility lost -- "));
+	    PRINT(verbosity, 1, ("Feasibility lost -- "));
 #if 0
 	    char name[50] = "";
 	    sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
@@ -330,7 +332,7 @@ int fathom_branch(lp_prob *p)
 #endif
 	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity)
 		   || termcode == LP_D_OBJLIM){
-	    PRINT(p->par.verbosity, 1, ("Terminating due to high cost -- "));
+	    PRINT(verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
 #ifdef COMPILE_IN_LP
             if (p->node_iter_num < 2 && p->bc_index > 0 && 
@@ -391,7 +393,7 @@ int fathom_branch(lp_prob *p)
 	    no_more_cuts_count += send_lp_solution_u(p, p->cut_gen);
 	 }
 
-	 if (p->par.verbosity > 4){
+	 if (verbosity > 4){
 	    printf ("Now displaying the relaxed solution ...\n");
 	    display_lp_solution_u(p, DISP_RELAXED_SOLUTION);
 	 }
@@ -440,17 +442,16 @@ int fathom_branch(lp_prob *p)
 	 }
       }
 
-      PRINT(p->par.verbosity, 2,
+      PRINT(verbosity, 2,
 	    ("\nIn iteration %i, before calling branch()\n", p->iter_num));
       if (cuts == 0){
-	 PRINT(p->par.verbosity, 2, ("... no cuts were added.\n"));
-	 if (p->par.verbosity > 4){
+	 PRINT(verbosity, 2, ("... no cuts were added.\n"));
+	 if (verbosity > 4){
 	    printf("Now displaying final relaxed solution...\n\n");
 	    display_lp_solution_u(p, DISP_FINAL_RELAXED_SOLUTION);
 	 }
       }else{
-	 PRINT(p->par.verbosity, 2,
-	       ("... %i violated cuts were added\n", cuts));
+	 PRINT(verbosity, 2, ("... %i violated cuts were added\n", cuts));
       }
       
       comp_times->lp += used_time(&p->tt);
@@ -459,7 +460,7 @@ int fathom_branch(lp_prob *p)
 
        case NEW_NODE:
 #ifndef ROOT_NODE_ONLY
-	 if (p->par.verbosity > 0){
+	 if (verbosity > 0){
 	    printf("*************************************************\n");
 	    printf("* Now processing NODE %i LEVEL %i\n",
 		   p->bc_index, p->bc_level);
@@ -496,9 +497,9 @@ int fathom_branch(lp_prob *p)
 	 return(ERROR__NO_BRANCHING_CANDIDATE);
 
        case FEAS_SOL_FOUND:
-         PRINT(p->par.verbosity,2,("solution found before branching\n"));
+         PRINT(verbosity,2,("solution found before branching\n"));
        default: /* the return value is the number of cuts added */
-	 if (p->par.verbosity > 2){
+	 if (verbosity > 2){
 	    printf("Continue with this node.");
 	    if (cuts > 0)
 	       printf(" %i cuts added altogether in iteration %i\n",
@@ -2251,7 +2252,7 @@ int update_cut_parameters(lp_prob *p)
    if (par->generate_cgl_probing_cuts == GENERATE_DEFAULT) {
       if (lp_stat.probing_cuts_root<1) {
          data_par->generate_cgl_probing_cuts_freq = 
-              par->generate_cgl_probing_cuts_freq = -1;
+              par->generate_cgl_probing_cuts_freq = 1000;
       } else {
          data_par->generate_cgl_probing_cuts_freq = 
               par->generate_cgl_probing_cuts_freq = 100;
@@ -2377,9 +2378,11 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
       int which_generator, void *generator)
 {
 
+#ifdef USE_CGL_CUTS
    int bc_index = p->bc_index;
    int is_root_node = (bc_index < 1) ? TRUE : FALSE;
-#ifdef USE_CGL_CUTS
+   const int bc_level = p->bc_level;
+   const int max_bc_level = p->par.cgl.max_depth_for_cgl_cuts;
    *should_generate = FALSE;
    switch (which_generator) {
     case CGL_PROBING_GENERATOR:
@@ -2390,8 +2393,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 1 || 
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level || 
+                  freq < 1 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
@@ -2454,8 +2457,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 0 ||
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level ||
+                  freq < 0 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
@@ -2484,8 +2487,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 1 ||
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level ||
+                  freq < 1 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
@@ -2514,8 +2517,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 1 || 
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level ||
+                  freq < 1 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
@@ -2561,8 +2564,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 1 ||
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level ||
+                  freq < 1 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
@@ -2591,8 +2594,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          if (param < 0) {
             *should_generate = FALSE;
             break;
-         } else if (param == GENERATE_DEFAULT && (freq < 1 ||
-                  bc_index % freq != 0)) {
+         } else if (param == GENERATE_DEFAULT && (bc_level > max_bc_level ||
+                  freq < 1 || bc_index % freq != 0)) {
             *should_generate = FALSE;
             break;
          } else if (param == GENERATE_ONLY_IN_ROOT && bc_index > 0) {
