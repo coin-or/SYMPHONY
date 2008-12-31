@@ -76,7 +76,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
 
    verbosity = fp_data->verbosity     = p->par.verbosity;
    if (p->bc_index<1) {
-      PRINT(verbosity, -1, ("starting feasibility pump\n"));
+      PRINT(verbosity, 0, ("starting feasibility pump\n"));
    }
 
    *found_better_solution = FALSE;
@@ -104,7 +104,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    fp_time += used_time(&total_time);
    for (iter=0; iter<max_iter && fp_time<p->par.fp_time_limit; iter++) {
       if (fp_time - last_fp_time > fp_display_interval || verbosity > 5) {
-         PRINT(verbosity, -1, 
+         PRINT(verbosity, 0, 
                ("feasibility pump: starting iteration %d, time used = %.2f\n",
                 iter, fp_time));
          last_fp_time = fp_time;
@@ -229,7 +229,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    }
 
    if (p->bc_index<1 || verbosity > 5) {
-      PRINT(verbosity, -1, ("leaving feasibility pump.\n"));
+      PRINT(verbosity, 0, ("leaving feasibility pump.\n"));
    }
     //exit(0);
    return termcode;
