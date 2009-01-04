@@ -1378,7 +1378,11 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
    // TODO: LP_ABANDONED
    /* change the lb and ub */
    change_lbub(lp_data, branch_var, new_lb, new_ub);
-   termstatus = solve_hotstart(lp_data, &iterd);
+   if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
+      termstatus = solve_hotstart(lp_data, &iterd);
+   } else {
+      termstatus = dual_simplex(lp_data, &iterd);
+   }
 
    if (termstatus == LP_D_INFEASIBLE || termstatus == LP_D_OBJLIM || 
          termstatus == LP_D_UNBOUNDED) {

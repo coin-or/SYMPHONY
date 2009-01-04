@@ -289,6 +289,7 @@ typedef struct STR_INT{
 typedef struct NODE_TIMES{
    double        communication;
    double        lp;
+   double        lp_setup;
    double        separation;
    double        fixing;
    double        pricing;

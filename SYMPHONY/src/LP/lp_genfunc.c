@@ -148,11 +148,14 @@ int process_chain(lp_prob *p)
 {
    int termcode;
    
+   p->comp_times.lp += used_time(&p->tt);
    /* Create the LP */
    if ((termcode = create_subproblem_u(p)) < 0){
       /* User had problems creating initial LP. Abandon node. */
+      p->comp_times.lp_setup+= used_time(&p->tt);
       return(termcode);
    }
+   p->comp_times.lp_setup += used_time(&p->tt);
 
    p->last_gap = 0.0;
    p->dive = CHECK_BEFORE_DIVE;
@@ -2036,6 +2039,7 @@ void lp_close(lp_prob *p)
 {
    p->tm->comp_times.communication    += p->comp_times.communication;
    p->tm->comp_times.lp               += p->comp_times.lp;
+   p->tm->comp_times.lp_setup         += p->comp_times.lp_setup;
    p->tm->comp_times.separation       += p->comp_times.separation;
    p->tm->comp_times.fixing           += p->comp_times.fixing;
    p->tm->comp_times.pricing          += p->comp_times.pricing;

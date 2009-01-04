@@ -784,6 +784,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
    printf("====================== LP/CG Timing =========================\n");
 #if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
    printf("  LP Solution Time          %.3f\n", tim->lp);
+   printf("  LP Setup Time             %.3f\n", tim->lp_setup);
    printf("  Variable Fixing           %.3f\n", tim->fixing);
    printf("  Pricing                   %.3f\n", tim->pricing);
    printf("  Strong Branching          %.3f\n", tim->strong_branching);
