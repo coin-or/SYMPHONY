@@ -420,6 +420,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          FREE(candidates);
          *candidate = NULL;
          p->lp_stat.str_br_nodes_pruned++;
+         if (should_use_hot_starts) {
+            unmark_hotstart(lp_data);
+         }
          return (DO_NOT_BRANCH__FATHOMED);
       }
    } else {
