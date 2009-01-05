@@ -733,6 +733,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    int should_call_fp = FALSE;
    double *x;
    int n = lp_data->n;
+   double gran_round;
 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
@@ -865,6 +866,17 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       } else {
          cnt = collect_nonzeros(p, lp_data->x, indices, values);        
       }
+      gran_round = p->par.granularity;
+      gran_round = floor(gran_round + 0.5);
+      if (p->par.granularity > lpetol100 &&
+            fabs(gran_round-p->par.granularity) < lpetol100) {
+         /* we have granularity. symphony now uses granularity to set ub on
+          * lp-solver using granularity. so we round the solution to the
+          * nearest integer so that this tighter ub does not cut off other
+          * good solutions.
+          */
+         true_objval = floor(true_objval+0.5);
+      }
       /* Send the solution value to the treemanager */
       if (p->has_ub && true_objval >= p->ub - p->par.granularity){
 	 //FREE(heur_solution);
@@ -884,8 +896,9 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       }
       p->has_ub = TRUE;
       p->ub = true_objval;
-      if (p->par.set_obj_upper_lim)
-	 set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
+      if (p->par.set_obj_upper_lim) {
+	 set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity + lpetol);
+      }
       if (!p->par.multi_criteria){
 	 p->best_sol.xlevel = p->bc_level;
 	 p->best_sol.xindex = p->bc_index;

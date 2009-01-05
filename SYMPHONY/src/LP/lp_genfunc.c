@@ -159,8 +159,10 @@ int process_chain(lp_prob *p)
 
    p->last_gap = 0.0;
    p->dive = CHECK_BEFORE_DIVE;
-   if (p->has_ub && p->par.set_obj_upper_lim)
-      set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
+   if (p->has_ub && p->par.set_obj_upper_lim) {
+      set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity + 
+            p->lp_data->lpetol);
+   }
    
    if (p->colgen_strategy & COLGEN_REPRICING){
       if (p->par.verbosity > 0){
