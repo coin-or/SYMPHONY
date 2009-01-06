@@ -771,6 +771,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
 
    initial_time += tim->communication;
    initial_time += tim->lp;
+   initial_time += tim->lp_setup;
    initial_time += tim->separation;
    initial_time += tim->fixing;
    initial_time += tim->pricing;

@@ -255,12 +255,15 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    }
 
    /* Set the iteration limit */
-   if (p->par.max_presolve_iter > 0)
+   if (p->par.max_presolve_iter > 0) {
       set_itlim(lp_data, p->par.max_presolve_iter);
+   }
 
    if (should_use_hot_starts) {
       mark_hotstart(lp_data);
-      set_itlim_hotstart(lp_data, p->par.max_presolve_iter);
+      if (p->par.max_presolve_iter > 0) {
+         set_itlim_hotstart(lp_data, p->par.max_presolve_iter);
+      }
    }
    vars = lp_data->vars;
 
@@ -365,6 +368,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
          if (down_obj > SYM_INFINITY/10 && up_obj > SYM_INFINITY/10) {
             both_children_inf = TRUE;
+            best_can = candidates[0];
             break;
          }
 
@@ -422,7 +426,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          p->lp_stat.str_br_nodes_pruned++;
          if (should_use_hot_starts) {
             unmark_hotstart(lp_data);
-         }
+            set_itlim_hotstart(lp_data, -1);
+         } 
+         set_itlim(lp_data, -1); //both limits should be set for hotstarts
          return (DO_NOT_BRANCH__FATHOMED);
       }
    } else {
@@ -849,8 +855,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #  endif
 #endif
 
-   if (p->par.max_presolve_iter > 0)
-      set_itlim(lp_data, -1);
+   if (p->par.max_presolve_iter > 0) {
+      if (should_use_hot_starts == TRUE) {
+         set_itlim_hotstart(lp_data, -1);
+      } 
+      set_itlim(lp_data, -1); // both limits should be set if using hotstarts
+   }
 
 #ifdef STATISTICS
    PRINT(p->par.verbosity, 5,
@@ -1360,6 +1370,7 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
       }
       if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
          set_itlim_hotstart(p->lp_data, (int) min_iters);
+         set_itlim(p->lp_data, (int) min_iters);
       } else {
          set_itlim(p->lp_data, (int) min_iters);
       }

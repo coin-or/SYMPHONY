@@ -272,6 +272,9 @@ int fathom_branch(lp_prob *p)
       } else {
          termcode = dual_simplex(lp_data, &iterd);
       }
+      if (p->bc_index < 1 && p->iter_num < 2) {
+         save_lp(lp_data);
+      }
       p->lp_stat.lp_calls++;
 
 #ifdef DO_TESTS
@@ -309,7 +312,6 @@ int fathom_branch(lp_prob *p)
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
 	    printf("####### Trying to recover by resolving from scratch...\n");
-	    
 	    continue;
 	 }else{
 	    char name[50] = "";

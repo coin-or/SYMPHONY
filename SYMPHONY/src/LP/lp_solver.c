@@ -2353,11 +2353,24 @@ void load_lp_prob(LPdata *lp_data, int scaling, int fastmip)
 }
 
 /*===========================================================================*/
+int reset_lp_prob(LPdata *lp_data, int scaling, int fastmip)
+{
+   lp_data->si->restoreBaseModel(lp_data->m);
+   return 0;
+}
+
+/*===========================================================================*/
+int save_lp(LPdata *lp_data)
+{
+   lp_data->si->saveBaseModel();
+   return 0;
+}
+/*===========================================================================*/
 
 void unload_lp_prob(LPdata *lp_data)
 {
 
-   lp_data->si->reset();
+   //lp_data->si->reset();
   
    /* Set parameters as in open_lp_solver() (do these persist?) */
    lp_data->si->setHintParam(OsiDoReducePrint);

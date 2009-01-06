@@ -82,6 +82,8 @@ typedef struct LP_PARAMS{
    int               do_primal_heuristic;
    double            time_limit;
 
+   int               lp_data_mip_is_copied;
+
    /* these two are passed directly to the lp solver */
    int               scaling;
    int               fastmip;

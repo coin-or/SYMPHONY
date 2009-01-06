@@ -264,7 +264,9 @@ void free_lp(lp_prob *p)
    FREE(p->lp_data->rows);
    close_lp_solver(p->lp_data);
    free_lp_arrays(p->lp_data);
-   free_mip_desc(p->lp_data->mip);
+   if (p->par.lp_data_mip_is_copied == TRUE) {
+      free_mip_desc(p->lp_data->mip);
+   }
    FREE(p->lp_data->mip);
    FREE(p->lp_data);
 #if !(defined(COMPILE_IN_TM) && defined(COMPILE_IN_LP))
