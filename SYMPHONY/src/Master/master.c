@@ -290,7 +290,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fixed_to_ub_frac_before_logical_fixing = .01;
 
    lp_par->cgl.generate_cgl_cuts = TRUE;
-   lp_par->cgl.max_depth_for_cgl_cuts = 15;
+   lp_par->cgl.max_depth_for_cgl_cuts = 50;
    lp_par->cgl.generate_cgl_gomory_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_redsplit_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_knapsack_cuts = GENERATE_DEFAULT;
