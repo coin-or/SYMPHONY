@@ -223,6 +223,8 @@ void size_lp_arrays PROTO((LPdata *lp_data, char do_realloc, char set_max,
 void open_lp_solver PROTO((LPdata *lp_data));
 void close_lp_solver PROTO((LPdata *lp_data));
 void load_lp_prob PROTO((LPdata *lp_data, int scaling, int fastmip));
+int reset_lp_prob PROTO ((LPdata *lp_data, int scaling, int fastmip));
+int save_lp PROTO((LPdata *lp_data));
 void unload_lp_prob PROTO((LPdata *lp_data));
 void load_basis PROTO((LPdata *lp_data, int *cstat, int *rstat));
 void refactorize PROTO((LPdata *lp_data));

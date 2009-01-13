@@ -148,16 +148,21 @@ int process_chain(lp_prob *p)
 {
    int termcode;
    
+   p->comp_times.lp += used_time(&p->tt);
    /* Create the LP */
    if ((termcode = create_subproblem_u(p)) < 0){
       /* User had problems creating initial LP. Abandon node. */
+      p->comp_times.lp_setup+= used_time(&p->tt);
       return(termcode);
    }
+   p->comp_times.lp_setup += used_time(&p->tt);
 
    p->last_gap = 0.0;
    p->dive = CHECK_BEFORE_DIVE;
-   if (p->has_ub && p->par.set_obj_upper_lim)
-      set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity);
+   if (p->has_ub && p->par.set_obj_upper_lim) {
+      set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity + 
+            p->lp_data->lpetol);
+   }
    
    if (p->colgen_strategy & COLGEN_REPRICING){
       if (p->par.verbosity > 0){
@@ -267,6 +272,9 @@ int fathom_branch(lp_prob *p)
       } else {
          termcode = dual_simplex(lp_data, &iterd);
       }
+      if (p->bc_index < 1 && p->iter_num < 2) {
+         save_lp(lp_data);
+      }
       p->lp_stat.lp_calls++;
 
 #ifdef DO_TESTS
@@ -304,7 +312,6 @@ int fathom_branch(lp_prob *p)
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
 	    printf("####### Trying to recover by resolving from scratch...\n");
-	    
 	    continue;
 	 }else{
 	    char name[50] = "";
@@ -2036,6 +2043,7 @@ void lp_close(lp_prob *p)
 {
    p->tm->comp_times.communication    += p->comp_times.communication;
    p->tm->comp_times.lp               += p->comp_times.lp;
+   p->tm->comp_times.lp_setup         += p->comp_times.lp_setup;
    p->tm->comp_times.separation       += p->comp_times.separation;
    p->tm->comp_times.fixing           += p->comp_times.fixing;
    p->tm->comp_times.pricing          += p->comp_times.pricing;
