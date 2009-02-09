@@ -640,8 +640,11 @@ int sym_solve(sym_environment *env)
 
    start_time = wall_clock(NULL);
 
+#ifndef USE_SYM_APPLICATION   
+
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
+
    if(env->par.prep_par.level > 0){
       termcode = preprocess_mip(env);   
 
@@ -683,6 +686,8 @@ int sym_solve(sym_environment *env)
       }
    }
 
+#endif
+   
    if (env->par.verbosity >= -1){
       printf("Solving...\n\n");
    }
@@ -1289,6 +1294,9 @@ int sym_solve(sym_environment *env)
    }
 #endif
 
+      
+#ifndef USE_SYM_APPLICATION
+   
    if(env->par.prep_par.level > 0){
       if(env->orig_mip){
 	 env->mip = env->orig_mip;
@@ -1296,6 +1304,8 @@ int sym_solve(sym_environment *env)
       }
    }
 
+#endif
+   
    env->has_ub = FALSE;
    env->ub = 0.0;
    env->lb = -MAXDOUBLE;
