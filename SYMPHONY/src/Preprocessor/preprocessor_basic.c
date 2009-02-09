@@ -479,7 +479,7 @@ int prep_basic(PREPdesc *P)
       }	       
      
       new_changes_cnt = stats->rows_deleted + 
-	 stats->vars_fixed - stats->vars_aggregated; 
+	 stats->vars_fixed;// - stats->vars_aggregated; 
       new_others_cnt = stats->coeffs_changed + 
 	 stats->bounds_tightened;
       /* and check duplicacy */
@@ -816,7 +816,6 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 	    */
 	    /* also I dont want to mess with diff type of columns now, 
 	       so skip if one is int and the other is cont column */
-
 	    type_l = cols[cl_ind].var_type;
 	    type_r = cols[cr_ind].var_type;
 
@@ -6282,7 +6281,7 @@ int prep_fill_row_ordered(PREPdesc *P)
    u_row_ind = (P->user_row_ind) = (int *)malloc(m*ISIZE);
    /* these are initialized here, we have to visit this function anyway */
    
-   srand ( time(NULL) ); 
+   //   srand ( time(NULL) ); 
 
    /* first get row legths */   
    for(i = 0; i < n; i++){
@@ -6566,7 +6565,8 @@ int prep_cleanup_desc(PREPdesc *P)
    }
    
    stats->rows_deleted += new_del_cnt;
-
+   stats->vars_fixed += mip->mip_inf->fixed_var_num;
+   
    /* now convert it row ordered if asked*/
    /* get row_lengths and fill in r_matbeg, sense, rhs etc */
    
