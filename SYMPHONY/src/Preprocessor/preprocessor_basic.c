@@ -6414,6 +6414,7 @@ int prep_cleanup_desc(PREPdesc *P)
 	    fixed_nz++;
 	 }
 	 mip->fixed_n = fixed_nz;
+	 mip->obj_offset = mip->mip_inf->sum_obj_offset + obj_offset;     
 	 return PREP_SOLVED;
       }
       return PREP_UNMODIFIED;
