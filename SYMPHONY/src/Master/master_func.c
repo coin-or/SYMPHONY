@@ -1368,6 +1368,31 @@ int copy_node(bc_node * n_to, bc_node *n_from)
 	     n_to->desc.desc_size*CSIZE);   
    }
 
+   if(n_to->desc.bnd_change){
+      n_to->desc.bnd_change = (bounds_change_desc *)
+	 calloc(sizeof(bounds_change_desc),1);
+      if(n_from->desc.bnd_change->num_changes){
+	 n_to->desc.bnd_change->index =(int *)malloc
+	    (ISIZE *n_from->desc.bnd_change->num_changes);
+	 n_to->desc.bnd_change->lbub =(char *)malloc
+	    (CSIZE *n_from->desc.bnd_change->num_changes);
+	 n_to->desc.bnd_change->value =(double *)malloc
+	    (DSIZE *n_from->desc.bnd_change->num_changes);
+	 memcpy( n_to->desc.bnd_change->index,
+		 n_from->desc.bnd_change->index,
+		 ISIZE *n_from->desc.bnd_change->num_changes);
+	 memcpy( n_to->desc.bnd_change->lbub,
+		 n_from->desc.bnd_change->lbub,
+		 CSIZE *n_from->desc.bnd_change->num_changes);
+	 memcpy( n_to->desc.bnd_change->value,
+		 n_from->desc.bnd_change->value,
+		 DSIZE *n_from->desc.bnd_change->num_changes);
+      }
+      n_to->desc.bnd_change->num_changes =
+	 n_from->desc.bnd_change->num_changes;
+   }
+   
+
    return(FUNCTION_TERMINATED_NORMALLY);      
 }
 
@@ -3108,7 +3133,7 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
    if (mip){
       mip_copy = (MIPdesc*) calloc(1, sizeof(MIPdesc));
       memcpy(mip_copy, mip, sizeof(MIPdesc));
-      
+
       if (mip->n){
 	 mip_copy->obj       = (double *) malloc(DSIZE * mip_copy->n);
 
@@ -3150,6 +3175,12 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	 memcpy(mip_copy->matind, mip->matind, ISIZE * mip_copy->nz);  
       }
 
+      /* will not be used anywhere other than presolve where they are
+	 always initialized */
+      mip_copy->mip_inf = 0;
+      mip->cru_vars = 0;
+      mip->orig_sense = 0;
+      mip->orig_ind = 0;
 #if 0
       if (mip->row_matbeg){
 	 mip_copy->row_matbeg  = (int *) malloc(ISIZE * (mip_copy->m + 1));
@@ -3178,7 +3209,12 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	       mip_copy->colname[i][19] = 0;
 	    }
 	 }
-      }      
+      }
+
+      if(mip->fixed_n){
+	 memcpy(mip_copy->fixed_ind, mip->fixed_ind, ISIZE*mip->fixed_n);
+	 memcpy(mip_copy->fixed_val, mip->fixed_val, DSIZE*mip->fixed_n);
+      }
    }
    else{
       printf("create_copy_mip_desc():");
@@ -3276,7 +3312,14 @@ sym_environment *create_copy_environment (sym_environment *env)
    /* copy mip */
    if (env->mip){
       //free_mip_desc(env_copy->mip);
-      env_copy->mip = create_copy_mip_desc(env->mip);
+      if(env->prep_mip){
+	 env_copy->prep_mip = create_copy_mip_desc(env->prep_mip);
+	 env_copy->orig_mip = create_copy_mip_desc(env->orig_mip);
+	 env_copy->mip = env_copy->orig_mip;
+      }else{
+	 env_copy->mip = create_copy_mip_desc(env->mip);
+	 env_copy->prep_mip = env_copy->orig_mip = 0;
+      }
    }
 
    /*========================================================================*/
@@ -3326,6 +3369,30 @@ sym_environment *create_copy_environment (sym_environment *env)
 	 desc->desc = (char*) malloc(desc->desc_size*CSIZE);
 	 memcpy(desc->desc, env->rootdesc->desc, 
 		desc->desc_size*CSIZE);   
+      }
+
+      if(desc->bnd_change){
+	 desc->bnd_change = (bounds_change_desc *)
+	    calloc(sizeof(bounds_change_desc),1);
+	 if(env->rootdesc->bnd_change->num_changes){
+	    desc->bnd_change->index =(int *)malloc
+	       (ISIZE *env->rootdesc->bnd_change->num_changes);
+	    desc->bnd_change->lbub =(char *)malloc
+	       (CSIZE *env->rootdesc->bnd_change->num_changes);
+	    desc->bnd_change->value =(double *)malloc
+	       (DSIZE *env->rootdesc->bnd_change->num_changes);
+	    memcpy(desc->bnd_change->index,
+		   env->rootdesc->bnd_change->index,
+		   ISIZE *env->rootdesc->bnd_change->num_changes);
+	    memcpy(desc->bnd_change->lbub,
+		   env->rootdesc->bnd_change->lbub,
+		   CSIZE *env->rootdesc->bnd_change->num_changes);
+	    memcpy(desc->bnd_change->value,
+		   env->rootdesc->bnd_change->value,
+		   DSIZE *env->rootdesc->bnd_change->num_changes);
+	 }
+	 desc->bnd_change->num_changes =
+	    env->rootdesc->bnd_change->num_changes;
       }
    }
 
