@@ -640,8 +640,11 @@ int sym_solve(sym_environment *env)
 
    start_time = wall_clock(NULL);
 
+#ifndef USE_SYM_APPLICATION   
+
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
+
    if(env->par.prep_par.level > 0){
       termcode = preprocess_mip(env);   
 
@@ -683,6 +686,8 @@ int sym_solve(sym_environment *env)
       }
    }
 
+#endif
+   
    if (env->par.verbosity >= -1){
       printf("Solving...\n\n");
    }
@@ -1289,6 +1294,9 @@ int sym_solve(sym_environment *env)
    }
 #endif
 
+      
+#ifndef USE_SYM_APPLICATION
+   
    if(env->par.prep_par.level > 0){
       if(env->orig_mip){
 	 env->mip = env->orig_mip;
@@ -1296,6 +1304,8 @@ int sym_solve(sym_environment *env)
       }
    }
 
+#endif
+   
    env->has_ub = FALSE;
    env->ub = 0.0;
    env->lb = -MAXDOUBLE;
@@ -4291,10 +4301,6 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
    }
 
    for(; i < n; i++, k++){
-      if (indices[j] == i){
-	 j++;
-	 continue;
-      }
       matBeg[k+1] = matBeg[k] + lengths[i];
       memmove(matInd + matBeg[k], matInd + matBeg[i], ISIZE * lengths[i]); 
       memmove(matVal + matBeg[k], matVal + matBeg[i], DSIZE * lengths[i]); 
@@ -4316,10 +4322,6 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
       }
       
       for(; i < n; i++, k++){
-	 if (indices[j] == i){
-	    j++;
-	    continue;
-	 }
 	 obj1N[k] = obj1N[i];
       }
    }
@@ -4335,17 +4337,13 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
       }
       
       for(; i < n; i++, k++){
-	 if (indices[j] == i){
-	    j++;
-	    continue;
-	 }
 	 obj2N[k] = obj2N[i];
       }
    }
    
    n = env->mip->n = n - num;
    nz = env->mip->nz = nz - num_to_delete;
-   env->mip->matbeg = (int *) realloc(matBeg, n*ISIZE);
+   env->mip->matbeg = (int *) realloc(matBeg, (n+1)*ISIZE);
    env->mip->matind = (int *) realloc(matInd, nz*ISIZE);
    env->mip->matval = (double *) realloc(matVal, nz*DSIZE);
    env->mip->lb = (double *) realloc(colLb, n*DSIZE);
@@ -4353,6 +4351,8 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
    env->mip->obj = (double *) realloc(objN, n*DSIZE);
    env->mip->is_int = (char *) realloc(isInt, n*CSIZE);
    env->mip->colname = (char **) realloc(colName, n*sizeof(char *));
+
+   free(lengths);
    
    return(FUNCTION_TERMINATED_NORMALLY);      
 
