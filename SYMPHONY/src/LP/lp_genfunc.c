@@ -1587,6 +1587,7 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
 /*===========================================================================*/
 
 /*
+  from cbc-disabled
   First tries setting a variable to better value.  If feasible then
   tries setting others.  If not feasible then tries swaps
   Returns 1 if solution, 0 if not */
@@ -1687,7 +1688,7 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
   memcpy(newSolution,solution,numberColumns*sizeof(double));
 
   // way is 1 if down possible, 2 if up possible, 3 if both possible
-  int * way = new int[numberIntegers];
+  char * way = new char[numberIntegers];
   // corrected costs
   double * cost = new double[numberIntegers];
   // for array to mark infeasible rows after iColumn branch
@@ -1701,16 +1702,22 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
     int iColumn = integerVariable[i];
     
     // get original bounds
-    double originalLower = lp_data->vars[iColumn]->lb; //p->mip->lb[iColumn];
-    double originalUpper = lp_data->vars[iColumn]->ub; //p->mip->ub[iColumn];
+    //    double originalLower = lp_data->vars[iColumn]->lb; //p->mip->lb[iColumn];
+    // double originalUpper = lp_data->vars[iColumn]->ub; //p->mip->ub[iColumn];
 
-    //  double originalLower = lp_data->lb[iColumn];
-    //double originalUpper = lp_data->ub[iColumn];
-
-    //   double originalLower = p->mip->lb[iColumn];
-    //  double originalUpper = p->mip->ub[iColumn];
+    double originalLower = p->mip->lb[iColumn];
+    double originalUpper = p->mip->ub[iColumn];
 
     double value=newSolution[iColumn];
+
+    if (value<originalLower) {
+       value=originalLower;
+       newSolution[iColumn]=value;
+    } else if (value>originalUpper) {
+       value=originalUpper;
+       newSolution[iColumn]=value;
+    }
+
     double nearest=floor(value+0.5);
     //assert(fabs(value-nearest)<10.0*primalTolerance);
     value=nearest;
@@ -1724,8 +1731,8 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
     
     if (value>originalLower+0.5) 
       iway = 1;
-    if (value<originalUpper-0.5) 
-      iway |= 2;
+    if (value<originalUpper-0.5)
+       iway |= 2;
     way[i]=iway;
   }
   // get row activities
@@ -1968,14 +1975,7 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
       }
     }
     if (bestChange+newSolutionValue<*solutionValue) {
-      // new solution
-      memcpy(betterSolution, newSolution, numberColumns*DSIZE);
-      returnCode=1;
-      *solutionValue = newSolutionValue + bestChange;
-      if (bestChange>1.0e-12)
-	printf("Local search heuristic improved solution by %g\n",
-	     -bestChange);
-      // paranoid check
+       // paranoid check
       memset(rowActivity,0,numberRows*sizeof(double));
       
       for (i=0;i<numberColumns;i++) {
@@ -1989,29 +1989,47 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
 	  }
 	}
       }
+      int numberBad=0;
+      double sumBad=0.0;
+      
       // check was approximately feasible
       for (i=0;i<numberRows;i++) {
-	if(rowActivity[i]<rowLower[i]) {
-	   //assert (rowActivity[i]>rowLower[i]-10.0*primalTolerance);
-	} else if(rowActivity[i]>rowUpper[i]) {
-	   //assert (rowActivity[i]<rowUpper[i]+10.0*primalTolerance);
-	}
+	 if(rowActivity[i]<rowLower[i]) {
+	    sumBad += rowLower[i]-rowActivity[i];
+	    if (rowActivity[i]<rowLower[i]-10.0*primalTolerance)
+	       numberBad++;
+	 } else if(rowActivity[i]>rowUpper[i]) {
+	    sumBad += rowUpper[i]-rowActivity[i];
+	    if (rowActivity[i]>rowUpper[i]+10.0*primalTolerance)
+	       numberBad++;
+	 }
       }
-      for (i=0;i<numberIntegers;i++) {
-	int iColumn = integerVariable[i];
-	double originalLower = p->mip->lb[iColumn];
-	//double originalUpper = integerObject->originalUpperBound();
-
-	double value=newSolution[iColumn];
-	// if away from lower bound mark that fact
-	if (value>originalLower) {
-	  //	  used_[iColumn]=1;
-	}
+      if (!numberBad) {
+	 for (i=0;i<numberIntegers;i++) {
+	    int iColumn = integerVariable[i];
+	    // get original bounds
+	    double originalLower = p->mip->lb[iColumn];
+	    //double originalUpper = p->mip->ub[iColumn];
+	    
+	    double value=newSolution[iColumn];
+	    // if away from lower bound mark that fact
+	    if (value>originalLower) {
+	       //used_[iColumn]=1;
+	    }
+	 }
+	 // new solution
+	 memcpy(betterSolution,newSolution,numberColumns*sizeof(double));
+	 returnCode=1;
+	 *solutionValue = newSolutionValue + bestChange;
+      } else {
+	 // bad solution - should not happen so debug if see message
+	 printf("Local search got bad solution with %d infeasibilities"
+		"summing to %g\n",
+		numberBad,sumBad);
       }
     }
   }
-
-
+  
   delete [] integerVariable;
 
   delete [] newSolution;

@@ -836,7 +836,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	 true_objval = SYM_INFINITY;
       }
       
-      if (p->has_ub && p->bc_level < 50){
+      if (p->has_ub){
 	 d_gap = (p->ub-p->lp_data->objval)/(fabs(p->ub)+0.0001)*100;
 	 if(d_gap > p->par.fp_min_gap/10){	 
 	    true_objval = p->ub;
@@ -844,29 +844,30 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	       feasible = IP_HEUR_FEASIBLE;
 	    }
 	 }
-	 do_local_search = FALSE;
-	 if(feasible == IP_HEUR_FEASIBLE){ 
-	    if((true_objval - p->lp_data->objval)/
-	       (fabs(true_objval)+0.0001)*100 - d_gap < 0.1998){
+	 do_local_search = FALSE; 
+	 if(do_local_search){ //disable local search for now
+	    if(feasible == IP_HEUR_FEASIBLE){ 
+	       if((true_objval - p->lp_data->objval)/
+		  (fabs(true_objval)+0.0001)*100 - d_gap < 0.1998){
+		  col_sol = (double *)calloc(DSIZE, lp_data->n);
+		  memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+		  do_local_search = TRUE;
+	       }
+	    }else if(d_gap > p->par.fp_min_gap){
 	       col_sol = (double *)calloc(DSIZE, lp_data->n);
-	       memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+	       for(i = 0; i< p->best_sol.xlength; i++) {
+		  col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
+	       }
 	       do_local_search = TRUE;
 	    }
-	 }else if(d_gap > p->par.fp_min_gap){
-	    col_sol = (double *)calloc(DSIZE, lp_data->n);
-	    for(i = 0; i< p->best_sol.xlength; i++) {
-	       col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
-	    }
-	    do_local_search = TRUE;
 	 }
-
 	 if(do_local_search){
 	    if (local_search(p, &true_objval, col_sol, heur_solution)){
 	       feasible = IP_HEUR_FEASIBLE;
 	    }
 	 }
       }else{
-	 if(p->bc_level < 100){
+	 if(p->bc_level < 300){
 	    if (round_solution(p, &true_objval, heur_solution)){
 	       feasible = IP_HEUR_FEASIBLE;
 	    }
