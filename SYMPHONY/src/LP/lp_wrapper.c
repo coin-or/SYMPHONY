@@ -767,6 +767,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    indices = lp_data->tmp.i1; /* n */
    values = lp_data->tmp.d; /* n */
 
+   char do_local_search;
+   double d_gap; 
    heur_solution = p->lp_data->heur_solution;
    
 #ifdef USE_SYM_APPLICATION
@@ -824,6 +826,53 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
     default:
       break;
    }
+   
+   /* try rounding first */
+   if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE && 
+       p->par.do_primal_heuristic &&
+       !p->par.multi_criteria){
+      
+      if (feasible == IP_INFEASIBLE){ 
+	 true_objval = SYM_INFINITY;
+      }
+      
+      if (p->has_ub && p->bc_level < 50){
+	 d_gap = (p->ub-p->lp_data->objval)/(fabs(p->ub)+0.0001)*100;
+	 if(d_gap > p->par.fp_min_gap/10){	 
+	    true_objval = p->ub;
+	    if (round_solution(p, &true_objval, heur_solution)){
+	       feasible = IP_HEUR_FEASIBLE;
+	    }
+	 }
+	 do_local_search = FALSE;
+	 if(feasible == IP_HEUR_FEASIBLE){ 
+	    if((true_objval - p->lp_data->objval)/
+	       (fabs(true_objval)+0.0001)*100 - d_gap < 0.1998){
+	       col_sol = (double *)calloc(DSIZE, lp_data->n);
+	       memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+	       do_local_search = TRUE;
+	    }
+	 }else if(d_gap > p->par.fp_min_gap){
+	    col_sol = (double *)calloc(DSIZE, lp_data->n);
+	    for(i = 0; i< p->best_sol.xlength; i++) {
+	       col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
+	    }
+	    do_local_search = TRUE;
+	 }
+
+	 if(do_local_search){
+	    if (local_search(p, &true_objval, col_sol, heur_solution)){
+	       feasible = IP_HEUR_FEASIBLE;
+	    }
+	 }
+      }else{
+	 if(p->bc_level < 100){
+	    if (round_solution(p, &true_objval, heur_solution)){
+	       feasible = IP_HEUR_FEASIBLE;
+	    }
+	 }
+      }
+   }
 
    if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
       fp_should_call_fp(p,branching,&should_call_fp,is_last_iter); 
@@ -839,36 +888,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
          }
       }
    }
-
-   /* try rounding */
-   if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE && 
-       p->par.do_primal_heuristic &&
-       !p->par.multi_criteria){
-      if (feasible == IP_INFEASIBLE){ 
-	 true_objval = SYM_INFINITY;
-      }
-      if (p->has_ub){
-	 true_objval = p->ub;      
-	 if (round_solution(p, &true_objval, heur_solution)){
-	    feasible = IP_HEUR_FEASIBLE;
-	 }
-	 col_sol = (double *)calloc(DSIZE, lp_data->n);
-	 if (feasible == IP_HEUR_FEASIBLE){
-	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	 }else{
-	    for(i = 0; i< p->best_sol.xlength; i++) {
-	       col_sol[p->best_sol.xind[i]] = p->best_sol.xval[i];
-	    }
-	 }
-	 if (local_search(p, &true_objval, col_sol, heur_solution)){
-	    feasible = IP_HEUR_FEASIBLE;
-	 }
-      }else{
-	 if (round_solution(p, &true_objval, heur_solution)){
-	    feasible = IP_HEUR_FEASIBLE;
-	 }
-      }
-   }     
    
    if (feasible == IP_FEASIBLE && p->par.multi_criteria){
       cnt = collect_nonzeros(p, lp_data->x, indices, values);

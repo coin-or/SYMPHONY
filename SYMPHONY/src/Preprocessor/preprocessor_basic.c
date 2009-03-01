@@ -6242,7 +6242,7 @@ int prep_fill_row_ordered(PREPdesc *P)
      column
    */ 
 
-   int i, j, *o_ind;
+   int i, j, *o_ind, *c_lengths;
    int row_ind, elem_ind, *matind, *matbeg, *r_matind, *r_matbeg, *r_lengths; 
    double * matval, *r_matval, *rhs;
    MIPdesc *mip = P->mip;
@@ -6275,6 +6275,7 @@ int prep_fill_row_ordered(PREPdesc *P)
    o_ind = (mip->orig_ind = (int *)malloc(n*ISIZE));
    u_col_ind = (P->user_col_ind) = (int *)malloc(n*ISIZE);
    u_row_ind = (P->user_row_ind) = (int *)malloc(m*ISIZE);
+   c_lengths = (mip->col_lengths = (int *)calloc(n,ISIZE));
    /* these are initialized here, we have to visit this function anyway */
    
    //   srand ( time(NULL) ); 
@@ -6286,6 +6287,7 @@ int prep_fill_row_ordered(PREPdesc *P)
       for(j = matbeg[i]; j < matbeg[i+1]; j++){
 	 r_lengths[matind[j]]++;
       }
+      c_lengths[i] = matbeg[i+1] - matbeg[i];
    }
 
    r_matbeg[0] = 0;
@@ -6331,7 +6333,7 @@ int prep_cleanup_desc(PREPdesc *P)
    int row_ind, elem_ind, *matind, *matbeg, *r_matind, *r_matbeg, *r_lengths; 
    double *ub, *lb, *matval, *r_matval, *obj, *rhs, *rngval, *fixed_val;
    double obj_offset, debug_offset;
-   int new_del_cnt;
+   int new_del_cnt, *c_lengths;
 
    MIPdesc *mip = P->mip;
    int n = mip->n;
@@ -6571,6 +6573,7 @@ int prep_cleanup_desc(PREPdesc *P)
    r_matind = mip->row_matind;
    r_matval = mip->row_matval;
    r_lengths = mip->row_lengths;      
+   c_lengths = mip->col_lengths;
    
    for(i = 0; i < row_num; i++){
       r_lengths[i] = rows[i].size;
@@ -6595,6 +6598,7 @@ int prep_cleanup_desc(PREPdesc *P)
 	 r_matval[elem_ind] = matval[j];
 	 r_matbeg[row_ind] = elem_ind + 1;
       }
+      c_lengths[i] = matbeg[i+1] - matbeg[i];
    }
 
    for(i = 0; i < row_num; i++){

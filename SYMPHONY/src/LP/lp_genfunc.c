@@ -1228,8 +1228,6 @@ int check_tailoff(lp_prob *p)
 
 /*===========================================================================*/
 
-// Adapted from COIN's BRANCH AND CUT (CBC) solver! 
-
 // See if rounding will give solution
 // Sets value of solution
 // Assumes rhs for original matrix still okay
@@ -1240,350 +1238,353 @@ int check_tailoff(lp_prob *p)
 int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
 {
 
-  LPdata *lp_data = p->lp_data;
-  int numberColumns = lp_data->n;
-  //  int numberRows = lp_data->m; 
-  int numberRows = p->base.cutnum + p->desc->cutind.size, nz = lp_data->nz;
-  int returnCode = 0, numberIntegers = 0;
-  double primalTolerance = lp_data->lpetol, integerTolerance = primalTolerance;
-  double *lower, *upper, *rowLower, *rowUpper, *solution, *objective;
-  double direction = p->mip->obj_sense == SYM_MINIMIZE ? 1: -1 ;
-  double newSolutionValue = direction*lp_data->objval;
-  double *element, *elementByRow;
-  int * integerVariable, *isInteger;
-  int *row, *column, *columnStart, *rowStart, *columnLength, *rowLength;
-  int i, j;
+   int numberColumns = p->mip->n;
+   int numberRows = p->mip->m; 
+   int nz = p->mip->nz;
+   int returnCode = 0, numberIntegers = 0;
+   double primalTolerance = p->lp_data->lpetol,
+      integerTolerance = primalTolerance;
+   double *lower, *upper, *solution, *objective;
+   double direction = p->mip->obj_sense == SYM_MINIMIZE ? 1: -1 ;
+   double newSolutionValue = direction*p->lp_data->objval;
+   double *element, *elementByRow;
+   int * integerVariable, row_ind, elem_ind;
+   int *row, *column, *columnStart, *rowStart, *columnLength, *rowLength;
+   int i, j;
+   
+   get_bounds(p->lp_data);
+   get_x(p->lp_data);
+   
+   lower = p->lp_data->lb;
+   upper = p->lp_data->ub;
+   solution = p->lp_data->x;
 
-  get_bounds(lp_data);
-  get_x(lp_data);
+   element = p->mip->matval;
+   row = p->mip->matind;
+   columnStart = p->mip->matbeg;
+   objective = p->mip->obj;
 
-  lower = lp_data->lb;
-  upper = lp_data->ub;
-  solution = lp_data->x;
+   columnLength = p->mip->col_lengths;
 
-  element = new double[nz];
-  row = new int[nz];
-  columnStart = new int[numberColumns+1];
-  columnLength = new int[numberColumns];
-  objective = new double[numberColumns];     
+   if(!columnLength){
+      columnLength=(p->mip->col_lengths = (int *)calloc(numberColumns,ISIZE));
+      elementByRow = (p->mip->row_matval = (double *)malloc(nz*DSIZE)); 
+      column = (p->mip->row_matind = (int *)malloc(nz*ISIZE)); 
+      rowStart = (p->mip->row_matbeg = (int *)malloc((numberRows+1)*ISIZE));
+      rowLength = (p->mip->row_lengths = (int *)calloc(numberRows,ISIZE));
 
-  elementByRow = new double[nz];
-  column = new int[nz];
-  rowStart = new int[numberRows+1];
-  rowLength = new int[numberRows];
-  rowUpper = new double[numberRows];
-  rowLower = new double[numberRows];
-
-  columnStart[0] = 0;
-  rowStart[0] = 0;
-
-  for (i = 0; i < numberColumns; i++){
-     get_column(lp_data, i, &element[columnStart[i]], &row[columnStart[i]], 
-		&columnLength[i], &objective[i]);     
-     columnStart[i+1] = columnStart[i] + columnLength[i];
-
-     for(j = 0; j < columnLength[i]; j++){
-	if(row[columnStart[i] + j] >= numberRows){
-	   columnLength[i] = j;
-	   break;
-	}
-     }     
-  }
-
-  for (i = 0; i < numberRows; i++){
-     get_row(lp_data, i, &elementByRow[rowStart[i]], &column[rowStart[i]],
-	     &rowLength[i], &rowUpper[i], &rowLower[i]);
-     rowStart[i+1] = rowStart[i] + rowLength[i];
-  }	     
-
-  isInteger = new int[numberColumns];
-  integerVariable = new int[numberColumns];
-
-  for (i = 0; i<numberColumns; i++){
-     isInteger[i] = 0;
-     if (lp_data->vars[i]->is_int){
-	isInteger[i] = 1;
-	integerVariable[numberIntegers++] = i;
-     }
-  }
- 
-  // Get solution array for heuristic solution
-
-  double * newSolution = new double [numberColumns];
-  memcpy(newSolution,solution,numberColumns*sizeof(double));
-
-  double * rowActivity = new double[numberRows];
-  memset(rowActivity,0,numberRows*sizeof(double));
-  for (i=0;i<numberColumns;i++) {
-    int j;
-    double value = newSolution[i];
-    if (value) {
-      for (j=columnStart[i];
-	   j<columnStart[i]+columnLength[i];j++) {
-	int iRow=row[j];
-	//	printf("rowind %i: %i \n", j, iRow);
-	//	if(j < 5){
-	//	printf("element %i: %f \n", j, element[j]);
-	//	}
-	rowActivity[iRow] += value*element[j];
+      /* first get row legths */   
+      for(i = 0; i < numberColumns; i++){
+	 /* get orig indices here */
+	 for(j = columnStart[i]; j < columnStart[i+1]; j++){
+	    rowLength[row[j]]++;
+	 }
+	 columnLength[i] = columnStart[i+1] - columnStart[i];
       }
-    }
-  }
-  // check was feasible - if not adjust (cleaning may move)
-  for (i=0;i<numberRows;i++) {
-    if(rowActivity[i]<rowLower[i]) {
-      //assert (rowActivity[i]>rowLower[i]-1000.0*primalTolerance);
-      rowActivity[i]=rowLower[i];
-    } else if(rowActivity[i]>rowUpper[i]) {
-      //assert (rowActivity[i]<rowUpper[i]+1000.0*primalTolerance);
-      rowActivity[i]=rowUpper[i];
-    }
-  }
-  for (i=0;i<numberIntegers;i++) {
-    int iColumn = integerVariable[i];
-    double value=newSolution[iColumn];
-    if (fabs(floor(value+0.5)-value)>integerTolerance) {
-      double below = floor(value);
-      double newValue=newSolution[iColumn];
-      double cost = direction * objective[iColumn];
-      double move;
-      if (cost>0.0) {
-	// try up
-	move = 1.0 -(value-below);
-      } else if (cost<0.0) {
-	// try down
-	move = below-value;
-      } else {
-	// won't be able to move unless we can grab another variable
-	// just for now go down
-	move = below-value;
+      
+      rowStart[0] = 0;
+      
+      /* fill in matbegs */
+      for(i = 0; i < numberRows; i++){
+	 rowStart[i + 1] = rowStart[i] + rowLength[i];
       }
-      newValue += move;
-      newSolution[iColumn] = newValue;
-      newSolutionValue += move*cost;
+
+      /* get matrix, change 'G' rows to 'L'*/
+      for(i = 0; i < numberColumns; i++){
+	 for(j = columnStart[i]; j < columnStart[i+1]; j++){
+	    row_ind = row[j];
+	    elem_ind = rowStart[row_ind];
+	    column[elem_ind] = i;
+
+	    elementByRow[elem_ind] = element[j];
+	    rowStart[row_ind] = elem_ind + 1;
+	 }
+      }
+
+      for(i = 0; i < numberRows; i++){
+	 rowStart[i] -= rowLength[i];
+      }      
+   }else{   
+   
+      elementByRow = p->mip->row_matval;
+      column = p->mip->row_matind;
+      rowStart = p->mip->row_matbeg;
+      rowLength = p->mip->row_lengths;
+   }
+
+
+   const double * rowUpper = p->lp_data->si->getRowUpper();
+   const double * rowLower = p->lp_data->si->getRowLower();
+
+   integerVariable = new int[numberColumns];
+   
+   for (i = 0; i<numberColumns; i++){
+      if (p->mip->is_int[i]){
+	 integerVariable[numberIntegers++] = i;
+      }
+   }
+   
+   // Get solution array for heuristic solution
+   
+   double * newSolution = new double [numberColumns];
+   memcpy(newSolution,solution,numberColumns*sizeof(double));
+   
+   double * rowActivity = new double[numberRows];
+   memset(rowActivity,0,numberRows*sizeof(double));
+   for (i=0;i<numberColumns;i++) {
       int j;
-      for (j=columnStart[iColumn];
-	   j<columnStart[iColumn]+columnLength[iColumn];j++) {
-	int iRow = row[j];
-	rowActivity[iRow] += move*element[j];
-      }
-    }
-  }
-
-  double penalty=0.0;
-  
-  // see if feasible
-  for (i=0;i<numberRows;i++) {
-    double value = rowActivity[i];
-    double thisInfeasibility=0.0;
-    if (value<rowLower[i]-primalTolerance)
-      thisInfeasibility = value-rowLower[i];
-    else if (value>rowUpper[i]+primalTolerance)
-      thisInfeasibility = value-rowUpper[i];
-    if (thisInfeasibility) {
-      // See if there are any slacks I can use to fix up
-      // maybe put in coding for multiple slacks?
-      double bestCost = 1.0e50;
-      int k;
-      int iBest=-1;
-      double addCost=0.0;
-      double newValue=0.0;
-      double changeRowActivity=0.0;
-      double absInfeasibility = fabs(thisInfeasibility);
-      for (k=rowStart[i];k<rowStart[i]+rowLength[i];k++) {
-	int iColumn = column[k];
-	if (columnLength[iColumn]==1) {
-	  double currentValue = newSolution[iColumn];
-	  double elementValue = elementByRow[k];
-	  double lowerValue = lower[iColumn];
-	  double upperValue = upper[iColumn];
-	  double gap = rowUpper[i]-rowLower[i];
-	  double absElement=fabs(elementValue);
-	  if (thisInfeasibility*elementValue>0.0) {
-	    // we want to reduce
-	    if ((currentValue-lowerValue)*absElement>=absInfeasibility) {
-	      // possible - check if integer
-	      double distance = absInfeasibility/absElement;
-	      double thisCost = -direction*objective[iColumn]*distance;
-	      if (isInteger[iColumn]) {
-		distance = ceil(distance-primalTolerance);
-		if (currentValue-distance>=lowerValue-primalTolerance) {
-		  if (absInfeasibility-distance*absElement< -gap-primalTolerance)
-		    thisCost=1.0e100; // no good
-		  else
-		    thisCost = -direction*objective[iColumn]*distance;
-		} else {
-		  thisCost=1.0e100; // no good
-		}
-	      }
-	      if (thisCost<bestCost) {
-		bestCost=thisCost;
-		iBest=iColumn;
-		addCost = thisCost;
-		newValue = currentValue-distance;
-		changeRowActivity = -distance*elementValue;
-	      }
-	    }
-	  } else {
-	    // we want to increase
-	    if ((upperValue-currentValue)*absElement>=absInfeasibility) {
-	      // possible - check if integer
-	      double distance = absInfeasibility/absElement;
-	      double thisCost = direction*objective[iColumn]*distance;
-	      if (isInteger[iColumn]) {
-		distance = ceil(distance-primalTolerance);
-		//assert (currentValue-distance<=upperValue+primalTolerance);
-		if (absInfeasibility-distance*absElement< -gap-primalTolerance)
-		  thisCost=1.0e100; // no good
-		else
-		  thisCost = direction*objective[iColumn]*distance;
-	      }
-	      if (thisCost<bestCost) {
-		bestCost=thisCost;
-		iBest=iColumn;
-		addCost = thisCost;
-		newValue = currentValue+distance;
-		changeRowActivity = distance*elementValue;
-	      }
-	    }
-	  }
-	}
-      }
-      if (iBest>=0) {
-	/*printf("Infeasibility of %g on row %d cost %g\n",
-	  thisInfeasibility,i,addCost);*/
-	newSolution[iBest]=newValue;
-	thisInfeasibility=0.0;
-	newSolutionValue += addCost;
-	rowActivity[i] += changeRowActivity;
-      }
-      penalty += fabs(thisInfeasibility);
-    }
-  }
-
-  // Could also set SOS (using random) and repeat
-  if (!penalty) {
-    // See if we can do better
-    //seed_++;
-    //CoinSeedRandom(seed_);
-    // Random number between 0 and 1.
-    double randomNumber = CoinDrand48();
-    int iPass;
-    int start[2];
-    int end[2];
-    int iRandom = (int) (randomNumber*((double) numberIntegers));
-    start[0]=iRandom;
-    end[0]=numberIntegers;
-    start[1]=0;
-    end[1]=iRandom;
-    for (iPass=0;iPass<2;iPass++) {
-      int i;
-      for (i=start[iPass];i<end[iPass];i++) {
-	int iColumn = integerVariable[i];
-	//double value=newSolution[iColumn];
-	//assert (fabs(floor(value+0.5)-value)<integerTolerance);
-	double cost = direction * objective[iColumn];
-	double move=0.0;
-	if (cost>0.0)
-	  move = -1.0;
-	else if (cost<0.0)
-	  move=1.0;
-	while (move) {
-	  bool good=true;
-	  double newValue=newSolution[iColumn]+move;
-	  if (newValue<lower[iColumn]-primalTolerance||
-	      newValue>upper[iColumn]+primalTolerance) {
-	    move=0.0;
-	  } else {
-	    // see if we can move
-	    int j;
-	    for (j=columnStart[iColumn];
-		 j<columnStart[iColumn]+columnLength[iColumn];j++) {
-	      int iRow = row[j];
-	      double newActivity = rowActivity[iRow] + move*element[j];
-	      if (newActivity<rowLower[iRow]-primalTolerance||
-		  newActivity>rowUpper[iRow]+primalTolerance) {
-		good=false;
-		break;
-	      }
-	    }
-	    if (good) {
-	      newSolution[iColumn] = newValue;
-	      newSolutionValue += move*cost;
-	      int j;
-	      for (j=columnStart[iColumn];
-		   j<columnStart[iColumn]+columnLength[iColumn];j++) {
-		int iRow = row[j];
-		rowActivity[iRow] += move*element[j];
-	      }
-	    } else {
-	      move=0.0;
-	    }
-	  }
-	}
-      }
-    }
-    if (newSolutionValue < *solutionValue) {
-      // paranoid check
-      memset(rowActivity,0,numberRows*sizeof(double));
-      for (i=0;i<numberColumns;i++) {
-	int j;
-	double value = newSolution[i];
-	if (value) {
-	  for (j=columnStart[i];
-	       j<columnStart[i]+columnLength[i];j++) {
+      double value = newSolution[i];
+      if (value) {
+	 for (j=columnStart[i];
+	      j<columnStart[i]+columnLength[i];j++) {
 	    int iRow=row[j];
+	    //	printf("rowind %i: %i \n", j, iRow);
+	    //	if(j < 5){
+	    //	printf("element %i: %f \n", j, element[j]);
+	    //	}
 	    rowActivity[iRow] += value*element[j];
-	  }
-	}
+	 }
       }
-      // check was approximately feasible
-      bool feasible=true;
-      for (i=0;i<numberRows;i++) {
-	if(rowActivity[i]<rowLower[i]) {
-	  if (rowActivity[i]<rowLower[i]-10.0*primalTolerance)
-	    feasible = false;
-	} else if(rowActivity[i]>rowUpper[i]) {
-	  if (rowActivity[i]>rowUpper[i]+10.0*primalTolerance)
-	    feasible = false;
-	}
+   }
+   // check was feasible - if not adjust (cleaning may move)
+   for (i=0;i<numberRows;i++) {
+      if(rowActivity[i]<rowLower[i]) {
+	 //assert (rowActivity[i]>rowLower[i]-1000.0*primalTolerance);
+	 rowActivity[i]=rowLower[i];
+      } else if(rowActivity[i]>rowUpper[i]) {
+	 //assert (rowActivity[i]<rowUpper[i]+1000.0*primalTolerance);
+	 rowActivity[i]=rowUpper[i];
       }
-      if (feasible) {
-	// new solution
-	memcpy(betterSolution, newSolution, numberColumns*DSIZE);
-	*solutionValue = newSolutionValue;
-	//printf("** Solution of %g found by rounding\n",newSolutionValue);
-	returnCode=1;
-      } else {
-	// Can easily happen
-	//printf("Debug CbcRounding giving bad solution\n");
+   }
+   for (i=0;i<numberIntegers;i++) {
+      int iColumn = integerVariable[i];
+      double value=newSolution[iColumn];
+      if (fabs(floor(value+0.5)-value)>integerTolerance) {
+	 double below = floor(value);
+	 double newValue=newSolution[iColumn];
+	 double cost = direction * objective[iColumn];
+	 double move;
+	 if (cost>0.0) {
+	    // try up
+	    move = 1.0 -(value-below);
+	 } else if (cost<0.0) {
+	    // try down
+	    move = below-value;
+	 } else {
+	    // won't be able to move unless we can grab another variable
+	    // just for now go down
+	    move = below-value;
+	 }
+	 newValue += move;
+	 newSolution[iColumn] = newValue;
+	 newSolutionValue += move*cost;
+	 int j;
+	 for (j=columnStart[iColumn];
+	      j<columnStart[iColumn]+columnLength[iColumn];j++) {
+	    int iRow = row[j];
+	    rowActivity[iRow] += move*element[j];
+	 }
       }
-    }
-  }
+   }
+   
+   double penalty=0.0;
+   
+   // see if feasible
+   for (i=0;i<numberRows;i++) {
+      double value = rowActivity[i];
+      double thisInfeasibility=0.0;
+      if (value<rowLower[i]-primalTolerance)
+	 thisInfeasibility = value-rowLower[i];
+      else if (value>rowUpper[i]+primalTolerance)
+	 thisInfeasibility = value-rowUpper[i];
+      if (thisInfeasibility) {
+	 // See if there are any slacks I can use to fix up
+	 // maybe put in coding for multiple slacks?
+	 double bestCost = 1.0e50;
+	 int k;
+	 int iBest=-1;
+	 double addCost=0.0;
+	 double newValue=0.0;
+	 double changeRowActivity=0.0;
+	 double absInfeasibility = fabs(thisInfeasibility);
+	 for (k=rowStart[i];k<rowStart[i]+rowLength[i];k++) {
+	    int iColumn = column[k];
+	    if (columnLength[iColumn]==1) {
+	       double currentValue = newSolution[iColumn];
+	       double elementValue = elementByRow[k];
+	       double lowerValue = lower[iColumn];
+	       double upperValue = upper[iColumn];
+	       double gap = rowUpper[i]-rowLower[i];
+	       double absElement=fabs(elementValue);
+	       if (thisInfeasibility*elementValue>0.0) {
+		  // we want to reduce
+		  if ((currentValue-lowerValue)*absElement>=absInfeasibility) {
+		     // possible - check if integer
+		     double distance = absInfeasibility/absElement;
+		     double thisCost = -direction*objective[iColumn]*distance;
+		     if (p->mip->is_int[iColumn]) {
+			distance = ceil(distance-primalTolerance);
+			if (currentValue-distance>=lowerValue-primalTolerance) {
+			   if (absInfeasibility-distance*absElement< -gap-primalTolerance)
+			      thisCost=1.0e100; // no good
+			   else
+			      thisCost = -direction*objective[iColumn]*distance;
+			} else {
+			   thisCost=1.0e100; // no good
+			}
+		     }
+		     if (thisCost<bestCost) {
+			bestCost=thisCost;
+			iBest=iColumn;
+			addCost = thisCost;
+			newValue = currentValue-distance;
+			changeRowActivity = -distance*elementValue;
+		     }
+		  }
+	       } else {
+		  // we want to increase
+		  if ((upperValue-currentValue)*absElement>=absInfeasibility) {
+		     // possible - check if integer
+		     double distance = absInfeasibility/absElement;
+		     double thisCost = direction*objective[iColumn]*distance;
+		     if (p->mip->is_int[iColumn]) {
+			distance = ceil(distance-primalTolerance);
+		//assert (currentValue-distance<=upperValue+primalTolerance);
+			if (absInfeasibility-distance*absElement< -gap-primalTolerance)
+			   thisCost=1.0e100; // no good
+			else
+			   thisCost = direction*objective[iColumn]*distance;
+		     }
+		     if (thisCost<bestCost) {
+			bestCost=thisCost;
+			iBest=iColumn;
+			addCost = thisCost;
+			newValue = currentValue+distance;
+			changeRowActivity = distance*elementValue;
+		     }
+		  }
+	       }
+	    }
+	 }
+	 if (iBest>=0) {
+	    /*printf("Infeasibility of %g on row %d cost %g\n",
+	      thisInfeasibility,i,addCost);*/
+	    newSolution[iBest]=newValue;
+	    thisInfeasibility=0.0;
+	    newSolutionValue += addCost;
+	    rowActivity[i] += changeRowActivity;
+	 }
+	 penalty += fabs(thisInfeasibility);
+      }
+   }
+   
+   // Could also set SOS (using random) and repeat
+   if (!penalty) {
+      // See if we can do better
+      //seed_++;
+      //CoinSeedRandom(seed_);
+      // Random number between 0 and 1.
+      double randomNumber = CoinDrand48();
+      int iPass;
+      int start[2];
+      int end[2];
+      int iRandom = (int) (randomNumber*((double) numberIntegers));
+      start[0]=iRandom;
+      end[0]=numberIntegers;
+      start[1]=0;
+      end[1]=iRandom;
+      for (iPass=0;iPass<2;iPass++) {
+	 int i;
+	 for (i=start[iPass];i<end[iPass];i++) {
+	    int iColumn = integerVariable[i];
+	    //double value=newSolution[iColumn];
+	    //assert (fabs(floor(value+0.5)-value)<integerTolerance);
+	    double cost = direction * objective[iColumn];
+	    double move=0.0;
+	    if (cost>0.0)
+	       move = -1.0;
+	    else if (cost<0.0)
+	       move=1.0;
+	    while (move) {
+	       bool good=true;
+	       double newValue=newSolution[iColumn]+move;
+	       if (newValue<lower[iColumn]-primalTolerance||
+		   newValue>upper[iColumn]+primalTolerance) {
+		  move=0.0;
+	       } else {
+		  // see if we can move
+		  int j;
+		  for (j=columnStart[iColumn];
+		       j<columnStart[iColumn]+columnLength[iColumn];j++) {
+		     int iRow = row[j];
+		     double newActivity = rowActivity[iRow] + move*element[j];
+		     if (newActivity<rowLower[iRow]-primalTolerance||
+			 newActivity>rowUpper[iRow]+primalTolerance) {
+			good=false;
+			break;
+		     }
+		  }
+		  if (good) {
+		     newSolution[iColumn] = newValue;
+		     newSolutionValue += move*cost;
+		     int j;
+		     for (j=columnStart[iColumn];
+			  j<columnStart[iColumn]+columnLength[iColumn];j++) {
+			int iRow = row[j];
+			rowActivity[iRow] += move*element[j];
+		     }
+		  } else {
+		     move=0.0;
+		  }
+	       }
+	    }
+	 }
+      }
+      if (newSolutionValue < *solutionValue) {
+	 // paranoid check
+	 memset(rowActivity,0,numberRows*sizeof(double));
+	 for (i=0;i<numberColumns;i++) {
+	    int j;
+	    double value = newSolution[i];
+	    if (value) {
+	       for (j=columnStart[i];
+		    j<columnStart[i]+columnLength[i];j++) {
+		  int iRow=row[j];
+		  rowActivity[iRow] += value*element[j];
+	       }
+	    }
+	 }
+	 // check was approximately feasible
+	 bool feasible=true;
+	 for (i=0;i<numberRows;i++) {
+	    if(rowActivity[i]<rowLower[i]) {
+	       if (rowActivity[i]<rowLower[i]-10.0*primalTolerance)
+		  feasible = false;
+	    } else if(rowActivity[i]>rowUpper[i]) {
+	       if (rowActivity[i]>rowUpper[i]+10.0*primalTolerance)
+		  feasible = false;
+	    }
+	 }
+	 if (feasible) {
+	    // new solution
+	    memcpy(betterSolution, newSolution, numberColumns*DSIZE);
+	    *solutionValue = newSolutionValue;
+	    //printf("** Solution of %g found by rounding\n",newSolutionValue);
+	    returnCode=1;
+	 } else {
+	    // Can easily happen
+	    //printf("Debug CbcRounding giving bad solution\n");
+	 }
+      }
+   }
   delete [] integerVariable;
-  delete [] isInteger;
-
-  delete [] element;
-  delete [] row;
-  delete [] columnStart;
-  delete [] columnLength;
-  delete [] objective;
-
-  delete [] elementByRow;
-  delete [] column;
-  delete [] rowStart;
-  delete [] rowLength;
-  delete [] rowUpper;
-  delete [] rowLower;
-
+ 
   delete [] newSolution;
   delete [] rowActivity;
   return returnCode;
 }
 
 /*===========================================================================*/
-
-// Adapted from COIN's BRANCH AND CUT (CBC) solver! 
 
 /*
   First tries setting a variable to better value.  If feasible then
@@ -1594,63 +1595,85 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
 		 double *betterSolution)
 {
  
-  LPdata *lp_data = p->lp_data;
-  int numberColumns = lp_data->n;
-  int numberRows = p->base.cutnum + p->desc->cutind.size, nz = lp_data->nz;
-  int returnCode = 0, numberIntegers = 0;
-  double primalTolerance = lp_data->lpetol;
-  double *rowLower, *rowUpper, *solution = colSolution, *objective;
-  double direction = p->mip->obj_sense == SYM_MINIMIZE ? 1: -1 ;
-  double newSolutionValue = direction*p->ub;
-  double *element, *elementByRow;
-  int * integerVariable, *isInteger;
-  int *row, *columnStart, *columnLength, *column, rowLength;
-  int i, j;
+   LPdata *lp_data = p->lp_data;
+   int numberColumns = p->mip->n;
+   int numberRows = p->mip->m, nz = p->mip->nz;
+   int returnCode = 0, numberIntegers = 0;
+   double primalTolerance = lp_data->lpetol;
+   double *solution = colSolution, *objective;
+   double direction = p->mip->obj_sense == SYM_MINIMIZE ? 1: -1 ;
+   double newSolutionValue = direction*(*solutionValue);
+   double *element, *elementByRow;
+   int * integerVariable, *rowStart;
+   int *row, *columnStart, *columnLength, *column, *rowLength;
+   int i, j, row_ind, elem_ind;
+
+
+  element = p->mip->matval;
+  row = p->mip->matind;
+  columnStart = p->mip->matbeg;
+  objective = p->mip->obj;
+
+  columnLength = p->mip->col_lengths;
   
-  element = new double[nz];
-  row = new int[nz];
-  columnStart = new int[numberColumns+1];
-  columnLength = new int[numberColumns];
-  objective = new double[numberColumns];     
-
-  rowUpper = new double[numberRows];
-  rowLower = new double[numberRows];
-
-
-  elementByRow = new double[numberColumns];
-  column = new int[numberColumns];
-  
-  columnStart[0] = 0;
-
-  for (i = 0; i < numberColumns; i++){
-     get_column(lp_data, i, &element[columnStart[i]], &row[columnStart[i]], 
-		&columnLength[i], &objective[i]);     
-     columnStart[i+1] = columnStart[i] + columnLength[i];
-
-     for(j = 0; j < columnLength[i]; j++){
-	if(row[columnStart[i] + j] >= numberRows){
-	   columnLength[i] = j;
-	   break;
+  if(!columnLength){
+     columnLength=(p->mip->col_lengths = (int *)calloc(numberColumns,ISIZE));
+     elementByRow = (p->mip->row_matval = (double *)malloc(nz*DSIZE)); 
+     column = (p->mip->row_matind = (int *)malloc(nz*ISIZE)); 
+     rowStart = (p->mip->row_matbeg = (int *)malloc((numberRows+1)*ISIZE));
+     rowLength = (p->mip->row_lengths = (int *)calloc(numberRows,ISIZE));
+     
+     /* first get row legths */   
+     for(i = 0; i < numberColumns; i++){
+	/* get orig indices here */
+	for(j = columnStart[i]; j < columnStart[i+1]; j++){
+	   rowLength[row[j]]++;
 	}
-     }     
-  }
-
-  for (i = 0; i < numberRows; i++){
-     get_row(lp_data, i, elementByRow, column, &rowLength, &rowUpper[i], 
-	     &rowLower[i]);
-  }
-
-  isInteger = new int[numberColumns];
-  integerVariable = new int[numberColumns];
-
-  for (i = 0; i<numberColumns; i++){
-     isInteger[i] = 0;
-     if (lp_data->vars[i]->is_int){
-	isInteger[i] = 1;
-	integerVariable[numberIntegers++] = i;
+	columnLength[i] = columnStart[i+1] - columnStart[i];
      }
+     
+     rowStart[0] = 0;
+     
+     /* fill in matbegs */
+     for(i = 0; i < numberRows; i++){
+	rowStart[i + 1] = rowStart[i] + rowLength[i];
+     }
+     
+     /* get matrix, change 'G' rows to 'L'*/
+     for(i = 0; i < numberColumns; i++){
+	for(j = columnStart[i]; j < columnStart[i+1]; j++){
+	   row_ind = row[j];
+	   elem_ind = rowStart[row_ind];
+	   column[elem_ind] = i;
+	   
+	   elementByRow[elem_ind] = element[j];
+	   rowStart[row_ind] = elem_ind + 1;
+	}
+     }
+     
+     for(i = 0; i < numberRows; i++){
+	rowStart[i] -= rowLength[i];
+     }      
+  }else{   
+     
+     elementByRow = p->mip->row_matval;
+     column = p->mip->row_matind;
+     rowStart = p->mip->row_matbeg;
+     rowLength = p->mip->row_lengths;
   }
+  
 
+  const double * rowUpper = p->lp_data->si->getRowUpper();
+  const double * rowLower = p->lp_data->si->getRowLower();
+
+   integerVariable = new int[numberColumns];
+   
+   for (i = 0; i<numberColumns; i++){
+      if (p->mip->is_int[i]){
+	 integerVariable[numberIntegers++] = i;
+      }
+   }
+   
   // Column copy
   /* 
   const double * element = matrix.getElements();
@@ -1724,7 +1747,7 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
   // if very infeasible then give up
   bool tryHeuristic=true;
   for (i=0;i<numberRows;i++) {
-    if(rowActivity[i]<rowLower[i]) {
+     if(rowActivity[i]<rowLower[i]) {
       if (rowActivity[i]<rowLower[i]-10.0*primalTolerance)
 	tryHeuristic=false;
       rowActivity[i]=rowLower[i];
@@ -1990,18 +2013,6 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
 
 
   delete [] integerVariable;
-  delete [] isInteger;
-
-  delete [] element;
-  delete [] row;
-  delete [] columnStart;
-  delete [] columnLength;
-  delete [] objective;
-
-  delete [] elementByRow;
-  delete [] column;
-  delete [] rowUpper;
-  delete [] rowLower;
 
   delete [] newSolution;
   delete [] rowActivity;
