@@ -791,7 +791,7 @@ int sym_solve(sym_environment *env)
          if (fabs(coeff)>0.000001) {
             if (env->mip->is_int[i]) {
                if (fabs(floor(coeff+0.5)-coeff)<0.000001) {
-                  granularity = gcd(granularity,(int)floor(coeff+0.5));
+                  granularity = sym_gcd(granularity,(int)floor(coeff+0.5));
                } else {
                   granularity = 0;
                   break;

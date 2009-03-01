@@ -649,10 +649,8 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
       col_factor = (double *)malloc(n*DSIZE);
       row_sum = (double *)calloc(m,DSIZE);
       for(i = 0; i < n; i++){
-	 col_factor[i] = 1 + (double(rand()) / 
-			      RAND_MAX * (10 - 1));;
-	 if((double(rand()) / RAND_MAX) < 0.5) col_factor[i] 
-						  = -col_factor[i];
+	 col_factor[i] = 1 + CoinDrand48();
+	 if(CoinDrand48() < 0.5) col_factor[i] *= -1.0;
       }
       
       r_loc = (int *)malloc(m*ISIZE);
@@ -668,10 +666,8 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
       col_sum = (double *)calloc(n,DSIZE);
 
       for(i = 0; i < m; i++){
-	 row_factor[i] = 1 + (double(rand()) / 
-			      RAND_MAX * (10 - 1));;
-	 if((double(rand()) / RAND_MAX) < 0.5) row_factor[i] = 
-						  -row_factor[i];
+	 row_factor[i] = 1 + CoinDrand48();
+	 if(CoinDrand48() < 0.5) row_factor[i] *= -1.0; 
       }
 
       c_loc = (int *)malloc(n*ISIZE);
