@@ -185,6 +185,9 @@ typedef struct LP_PARAMS{
                                                using strong branching without 
                                                any improvement in score before 
                                                stopping */
+   int               rel_br_max_solves; /* stop after these many LP-solve calls
+                                           regardless of improvement */
+
    int               compare_candidates_default;
    int               select_child_default;
    int               pack_lp_solution_default;

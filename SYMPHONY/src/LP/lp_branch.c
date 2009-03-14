@@ -279,6 +279,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    //printf ("str time = %f\n",p->comp_times.strong_branching);
 
    if (should_use_rel_br==TRUE) {
+      const double lpetol100 = lp_data->lpetol*100;
       double *x = (double *)malloc (lp_data->n*DSIZE);
       double *bnd_val = (double *)malloc (2*lp_data->n*DSIZE);
       int *bnd_ind = (int *)malloc (2*lp_data->n*ISIZE);
@@ -286,9 +287,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       int num_bnd_changes = 0;
       double xval, floorx, ceilx, var_score;
       int full_solves = 0, down_is_est, up_is_est, 
-          max_solves_before_break = p->par.rel_br_cand_threshold, 
+          max_solves_since_impr = p->par.rel_br_cand_threshold, 
           stop_solving = FALSE, both_children_inf = FALSE, rel_up, 
-          rel_down;
+          rel_down, solves_since_impr = 0;
+      int max_solves = p->par.rel_br_max_solves;
       double alpha = p->par.strong_branching_high_low_weight;
       double one_m_alpha = 1-alpha;
       best_var = -1;
@@ -334,6 +336,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                lb = ceilx;
             }
             full_solves++;
+            solves_since_impr++;
          }
          if (br_rel_up[branch_var] > rel_threshold) {
             up_obj   = oldobjval + pcost_up[branch_var] * (ceilx - xval);
@@ -364,6 +367,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                ub = floorx;
             }
             full_solves++;
+            solves_since_impr++;
          }
 
          if (down_obj > SYM_INFINITY/10 && up_obj > SYM_INFINITY/10) {
@@ -380,7 +384,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             high = down_obj;
          }
          var_score = alpha * low + one_m_alpha * high;
-         if (var_score > best_var_score || best_can == NULL) {
+         if (var_score > best_var_score + lpetol100 || best_can == NULL) {
             best_var_score = var_score;
             best_var = branch_var;
             best_can = candidates[0];
@@ -400,10 +404,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             best_can->rhs[1] = ceilx;
             best_can->value = xval;
             if (down_is_est != TRUE || up_is_est != TRUE) {
-               full_solves = 0;
+               solves_since_impr = 0;
             }
          }
-         if (full_solves > max_solves_before_break) {
+         if (solves_since_impr > max_solves_since_impr || 
+               full_solves >= max_solves) {
             //printf("breaking because of no gain at iter %d\n", i);
             stop_solving = TRUE;
          }

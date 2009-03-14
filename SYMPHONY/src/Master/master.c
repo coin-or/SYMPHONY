@@ -360,8 +360,10 @@ int sym_set_defaults(sym_environment *env)
    lp_par->use_hot_starts = TRUE;
    lp_par->should_use_rel_br = TRUE;
    lp_par->rel_br_threshold = 8;
-   lp_par->rel_br_cand_threshold = 10; // stop doing strong branching if last 
-                                       // 10 strong branchings didnt help.
+   lp_par->rel_br_max_solves = 20;      /* stop after these many LP-solve calls
+                                           regardless of improvement */
+   lp_par->rel_br_cand_threshold = 10;  /* stop doing LP-solve if last
+                                           10 LP-solves didnt help. */
    lp_par->compare_candidates_default = HIGH_LOW_COMBINATION;
    lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
