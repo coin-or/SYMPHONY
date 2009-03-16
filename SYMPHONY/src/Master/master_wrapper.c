@@ -646,6 +646,8 @@ int display_solution_u(sym_environment *env, int thread_num)
    int user_res, i;
    lp_sol sol;
 
+   memset(&sol, 0, sizeof(lp_sol));
+   
    sol.xlength = 0;
 
    if (env->par.verbosity < -1){

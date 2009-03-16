@@ -72,7 +72,7 @@ SYMHEADERS = \
 	../include/sym_tm.h \
 	../include/sym_tm_params.h \
 	../include/sym_primal_heuristics.h \
-	../include/sym_preprocessor.h  \
+	../include/sym_prep.h  \
 	../include/sym_prep_params.h
 
 if USE_CL
@@ -147,8 +147,8 @@ if SYM_COMPILE_IN_CG
 LP_SRC         += CutGen/cg_func.c CutGen/cg_wrapper.c
 endif
 
-SYM_MASTER_SRC     += Preprocessor/preprocessor.c \
-	Preprocessor/preprocessor_basic.c #Preprocessor/preprocessor_func.c 
+SYM_MASTER_SRC     += Preprocessor/prep.c \
+	Preprocessor/prep_base.c Preprocessor/prep_sr.c 
 
 CP_SRC		= CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c

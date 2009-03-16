@@ -99,22 +99,6 @@
 #define FULL_LOGGING             1
 #define VBC_TOOL                 2
 
-/*-------------------- emulation options for vbctool ------------------------*/
-#define NO_VBC_EMULATION         0
-#define VBC_EMULATION_FILE       1
-#define VBC_EMULATION_LIVE       2
-#define VBC_EMULATION_FILE_NEW   3
-
-/*------------ search order options for multi-criteria problems -------------*/
-#define MC_FIFO                  0
-#define MC_LIFO                  1
-
-/*------------  warm_starting options for multi-criteria problems -------------*/
-#define MC_WS_UTOPIA_FIRST               0
-#define MC_WS_UTOPIA_BOTH_FIXED          1
-#define MC_WS_UTOPIA_BOTH                2
-#define MC_WS_BEST_CLOSE                 3
-
 /*****************************************************************************
  *****************************************************************************
  *************                                                      **********
@@ -400,19 +384,19 @@
 #define LP_SOL_WITHIN_LP         2
 /* no result */
 
+/*-------------------- emulation options for vbctool ------------------------*/
+#define NO_VBC_EMULATION         0
+#define VBC_EMULATION_FILE       1
+#define VBC_EMULATION_LIVE       2
+#define VBC_EMULATION_FILE_NEW   3
+
 /*------------------------ compare_candidates -------------------------------*/
-#define BIGGEST_DIFFERENCE_OBJ   0
-#define LOWEST_LOW_OBJ           1
-#define HIGHEST_LOW_OBJ          2
-#define LOWEST_HIGH_OBJ          3
-#define HIGHEST_HIGH_OBJ         4
 #ifdef COMPILE_FRAC_BRANCHING
 #define HIGHEST_LOW_FRAC         5
 #define LOWEST_LOW_FRAC          6
 #define HIGHEST_HIGH_FRAC        7
 #define LOWEST_HIGH_FRAC         8
 #endif
-#define HIGH_LOW_COMBINATION     9
 
 #define FIRST_CANDIDATE_BETTER                    0
 #define FIRST_CANDIDATE_BETTER_AND_BRANCH_ON_IT   1
@@ -421,8 +405,6 @@
 #define BRANCH_ON_IT                              1
 
 /*--------------------------- select_child ----------------------------------*/
-#define PREFER_LOWER_OBJ_VALUE   0
-#define PREFER_HIGHER_OBJ_VALUE  1
 #ifdef COMPILE_FRAC_BRANCHING
 #define PREFER_MORE_FRACTIONAL   2
 #define PREFER_LESS_FRACTIONAL   3
@@ -447,18 +429,6 @@
 #define USER__CLOSE_TO_HALF_AND_EXPENSIVE  11
 #define USER__CLOSE_TO_ONE_AND_CHEAP       12
 
-/*-------------------- generate_cuts_in_lp defaults -------------------------*/
-#define GENERATE_CGL_CUTS                  20
-#define DO_NOT_GENERATE_CGL_CUTS           21
-
-/*-------------------- xxx_cuts_generation_levels ---------------------------*/
-#define DO_NOT_GENERATE        -1
-#define GENERATE_DEFAULT        0
-#define GENERATE_IF_IN_ROOT     1    /*default*/
-#define GENERATE_ONLY_IN_ROOT   2
-#define GENERATE_ALWAYS         3 
-#define GENERATE_PERIODICALLY   4
-
 /*****************************************************************************
  *****************************************************************************
  *************                                                      **********
@@ -471,19 +441,6 @@
 #define NEW_NODE__NONE          -1
 #define NEW_NODE__STARTED       -2
 #define NEW_NODE__ERROR         -3
-
-/*------------------------- node selection rules ----------------------------*/
-#define LOWEST_LP_FIRST       0
-#define HIGHEST_LP_FIRST      1
-#define BREADTH_FIRST_SEARCH  2
-#define DEPTH_FIRST_SEARCH    3
-#define BEST_FIRST_SEARCH     4
-#define DEPTH_FIRST_THEN_BEST_FIRST 5
-
-/*-------------------------- diving_strategy --------------------------------*/
-#define BEST_ESTIMATE         0
-#define COMP_BEST_K           1
-#define COMP_BEST_K_GAP       2
 
 /*****************************************************************************
  *****************************************************************************
@@ -511,8 +468,6 @@
 #define DELETE_DUPLICATES                 2
 #define DELETE_DUPLICATE_AND_INEFFECTIVE  2
 
-
-
 /*--------------- parameter values for restart/sens analysis ----------------*/
 
 #define NOTHING_CHANGED                   0
@@ -530,13 +485,27 @@
 #define TRIM_INDEX           2
 #define ON_CRU_VARS          3
 
-/*--------------- parameter values for primal heuristics --------------------*/
-#define SYM_FEAS_PUMP_DEFAULT    1       /* use fp using the default rules   */
-#define SYM_FEAS_PUMP_REPEATED   2       /* use fp till the end of solve     */
-#define SYM_FEAS_PUMP_TILL_SOL   3       /* use fp till a solution is found  */
-#define SYM_FEAS_PUMP_DISABLE   -1       /* dont use fp */
 
-/*--------------- parameter values for collecting info about the problem ----*/
+/*--------------------- order type of a  matrix -----------------------------*/
+#define ROW_ORDERED         0
+#define COL_ORDERED         1
+
+/*---------------------- type of an implication -----------------------------*/
+#define IMP_ROW             0
+#define IMP_COL             1
+
+/*-----------------  return codes for presolve functions --------------------*/
+
+#define PREP_UNMODIFIED     0	/* preprocessor exited without modifying the
+				   MIP in any way*/
+#define PREP_MODIFIED       1	/* preprocessor modified the MIP in some way */
+#define PREP_INFEAS         2	/* preprocessor found the MIP infeasible */
+#define PREP_SOLVED         3	/* preprocessor found the MIP unbounded */
+#define PREP_UNBOUNDED      4	/* preprocessor found the MIP unbounded */
+#define PREP_NUMERIC_ERROR -1
+#define PREP_OTHER_ERROR   -2
+
+/*--------------- types used for collecting info about the problem ----*/
 
 /* used to define prob type and/or row type */
 #define CONTINUOUS_TYPE       0

@@ -2048,7 +2048,7 @@ int set_param(sym_environment *env, char *line)
    /***********************************************************************
     ***                  Treemanager parameters                         ***
     ***********************************************************************/
-   else if (strcmp(key, "TM_verbosity") == 0){
+   if (strcmp(key, "TM_verbosity") == 0){
       READ_INT_PAR(tm_par->verbosity);
       return(0);
    }
@@ -2997,11 +2997,7 @@ int set_param(sym_environment *env, char *line)
     ***                     preprocessing - parameters                    ***
     *************************************************************************/ 
 
-   if (strcmp(key, "prep_do_preprocessing") == 0){
-      READ_INT_PAR(prep_par->do_prep);
-      return(0);
-   }
-   else if (strcmp(key, "prep_level") == 0){
+   if (strcmp(key, "prep_level") == 0){
       READ_INT_PAR(prep_par->level);
       return(0);
    }

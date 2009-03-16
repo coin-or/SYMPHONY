@@ -5,15 +5,15 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2005 Ted Ralphs. All Rights Reserved.                       */
+/* (c) Copyright 2005-2009 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
 
-#ifndef _API_H
-#define _API_H
+#ifndef _SYM_API_H
+#define _SYM_API_H
 
 #define COMPILING_FOR_MASTER
 
@@ -125,6 +125,59 @@
 #define USER_NO_PP              -3
 #define USER_AND_PP             -2
 #define USER_DEFAULT            -1
+
+/*------------ search order options for multi-criteria problems -------------*/
+#define MC_FIFO                  0
+#define MC_LIFO                  1
+
+/*------------  warm_starting options for multi-criteria problems -------------*/
+#define MC_WS_UTOPIA_FIRST               0
+#define MC_WS_UTOPIA_BOTH_FIXED          1
+#define MC_WS_UTOPIA_BOTH                2
+#define MC_WS_BEST_CLOSE                 3
+
+/*------------------------ compare_candidates -------------------------------*/
+#define BIGGEST_DIFFERENCE_OBJ   0
+#define LOWEST_LOW_OBJ           1
+#define HIGHEST_LOW_OBJ          2
+#define LOWEST_HIGH_OBJ          3
+#define HIGHEST_HIGH_OBJ         4
+#define HIGH_LOW_COMBINATION     9
+
+/*--------------------------- select_child ----------------------------------*/
+#define PREFER_LOWER_OBJ_VALUE   0
+#define PREFER_HIGHER_OBJ_VALUE  1
+
+/*-------------------- generate_cuts_in_lp defaults -------------------------*/
+#define GENERATE_CGL_CUTS                  20
+#define DO_NOT_GENERATE_CGL_CUTS           21
+
+/*-------------------- xxx_cuts_generation_levels ---------------------------*/
+#define DO_NOT_GENERATE        -1
+#define GENERATE_DEFAULT        0
+#define GENERATE_IF_IN_ROOT     1    
+#define GENERATE_ONLY_IN_ROOT   2
+#define GENERATE_ALWAYS         3 
+#define GENERATE_PERIODICALLY   4
+
+/*------------------------- node selection rules ----------------------------*/
+#define LOWEST_LP_FIRST       0
+#define HIGHEST_LP_FIRST      1
+#define BREADTH_FIRST_SEARCH  2
+#define DEPTH_FIRST_SEARCH    3
+#define BEST_FIRST_SEARCH     4
+#define DEPTH_FIRST_THEN_BEST_FIRST 5
+
+/*-------------------------- diving_strategy --------------------------------*/
+#define BEST_ESTIMATE         0
+#define COMP_BEST_K           1
+#define COMP_BEST_K_GAP       2
+
+/*--------------- parameter values for feasibility pump heuristic -----------*/
+#define SYM_FEAS_PUMP_DEFAULT    1       /* use fp using the default rules   */
+#define SYM_FEAS_PUMP_REPEATED   2       /* use fp till the end of solve     */
+#define SYM_FEAS_PUMP_TILL_SOL   3       /* use fp till a solution is found  */
+#define SYM_FEAS_PUMP_DISABLE   -1       /* dont use fp */
 
 typedef struct MIPDESC MIPdesc;
 typedef struct WARM_START_DESC warm_start_desc;

@@ -420,6 +420,8 @@ typedef struct PROBLEM_STAT{
    double      max_vsize;
 }problem_stat;
 
+/*===========================================================================*/
+
 typedef struct LP_STAT{
    /* LP solver */
    int         lp_calls;
@@ -505,9 +507,16 @@ typedef struct RC_DESC{
    int        *cnt;
 }rc_desc;
 
-#define IMP_ROW 0
-#define IMP_COL 1
+/*===========================================================================*/
+/* Implications */
+/*===========================================================================*/
+/*===========================================================================*/
+typedef struct COL_IMP{
 
+   int col_ind;
+  struct COL_IMP *c_next;
+
+}col_imp;
 
 typedef struct IMPVAR{   
    
@@ -531,6 +540,9 @@ typedef struct IMPLIST{
    IMPvar * tail;   
 }IMPlist;
 
+/*===========================================================================*/
+/* Data structure to keep relevant info of a column */
+/*===========================================================================*/
 typedef struct COLINFO{
    int coef_type; /* all integer, all binary, fractional
 			 - considering the type of coefficients*/
@@ -564,6 +576,9 @@ typedef struct COLINFO{
    
 }COLinfo;
 
+/*===========================================================================*/
+/* Data structure to keep relevant info of a row */
+/*===========================================================================*/
 typedef struct ROWINFO{
    int type; /* all mixed, binary, pure(not binary), cont_binary... */
    int bound_type;  /* all_bounded, mixed 
@@ -572,6 +587,8 @@ typedef struct ROWINFO{
 			 - considering the type of coefficients*/
    int sign_type; /* all_pos, all_neg, mixed */ 
 
+   char is_sos_row; 
+   
    /* for preprocessor */
 
    double fixed_obj_offset; /* obtained from fixed vars */
@@ -605,10 +622,15 @@ typedef struct ROWINFO{
 
 }ROWinfo;
 
+/*===========================================================================*/
+/* Data structure to collect information about the model   */
+/*===========================================================================*/
+
 typedef struct MIPINFO{ 
    int prob_type; /* mixed, pure(not binary), binary... */
    int cont_var_num;
    int binary_var_num;
+   int binary_var_nz;
    int fixed_var_num; 
    int integerizable_var_num;
    int max_row_size; 
@@ -621,12 +643,23 @@ typedef struct MIPINFO{
 
    double sum_obj_offset; /* from fixed variables*/
 
+   int binary_sos_row_num; /* sos rows with binary vars count*/
+   int binary_row_num; /* rows with binary vars*/
+   int row_bin_den; /* binary nz / number of rows */
+   int col_bin_den; /* binary nz / number of binary columns */
+   int row_bin_den_mean; /* 2*row_bin_den*max_row_size/
+			    row_bin_den+max_row_size */
+   int col_bin_den_mean; /* same here for cols */
+
    ROWinfo *rows;
    COLinfo *cols;
 }MIPinfo; 
 
+/*===========================================================================*/
+
 #if 0
 /* not implemented yet */
+/* to keep the differences with the original model */
 typedef struct MIPDIFF
 {
    int rows_del_num;
@@ -644,8 +677,9 @@ typedef struct MIPDIFF
 
 #endif 
 
+/*===========================================================================*/
 /* This structure stores the user's description of the model */
-
+/*===========================================================================*/
 typedef struct MIPDESC{
    int        n;           /* number of columns */
    int        m;           /* number of rows */
@@ -724,7 +758,9 @@ typedef struct WARM_START_DESC{
    int            trim_tree_index;
 }warm_start_desc;
 
+/*===========================================================================*/
 /* solution pool */
+
 typedef struct SP_SOLUTION_DESC{
    double         objval;
    int            xlength;
@@ -737,6 +773,8 @@ typedef struct SP_SOLUTION_DESC{
    /* The level of the node in bnb tree where this solution was discovered */
     int            node_level;  
 }sp_solution;
+
+/*===========================================================================*/
 
 typedef struct SP_DESC{
    /* max. no. of solutions in the pool */

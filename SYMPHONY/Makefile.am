@@ -78,10 +78,10 @@ addlibsfile = sym_addlibs.txt
 addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
 
 install-exec-local: install-doc
-	$(install_sh_DATA) $(addlibsfile) $(addlibsdir)/$(addlibsfile)
+	$(install_sh_DATA) $(addlibsfile) $(DESTDIR)$(addlibsdir)/$(addlibsfile)
 
 uninstall-local: uninstall-doc
-	rm -f $(addlibsdir)/$(addlibsfile)
+	rm -f $(DESTDIR)$(addlibsdir)/$(addlibsfile)
 
 ########################################################################
 #                         Maintainer Stuff                             #

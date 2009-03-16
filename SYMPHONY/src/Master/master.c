@@ -34,7 +34,7 @@
 #include "sym_master_u.h"
 #include "sym_lp_solver.h"
 #include "sym_primal_heuristics.h"
-#include "sym_preprocessor.h"
+#include "sym_prep.h"
 #ifdef COMPILE_IN_TM
 #include "sym_tm.h"
 #ifdef COMPILE_IN_LP
@@ -420,7 +420,6 @@ int sym_set_defaults(sym_environment *env)
 	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
 
    /********************* preprocessor defaults ******************************/
-   prep_par->do_prep = 1;
    prep_par->level = 2;
    prep_par->dive_level = 5;
    prep_par->impl_dive_level = 0;
@@ -648,7 +647,7 @@ int sym_solve(sym_environment *env)
       update rootdesc and so...*/
 
    if(env->par.prep_par.level > 0){
-      termcode = preprocess_mip(env);   
+      termcode = sym_presolve(env);   
 
       if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED ||
 	 termcode == PREP_SOLVED || termcode == PREP_NUMERIC_ERROR ||
@@ -4954,7 +4953,7 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
     ***                  Treemanager params                         ***
     ***********************************************************************/
 
-   else if (strcmp(key, "TM_verbosity") == 0){
+   if (strcmp(key, "TM_verbosity") == 0){
       *value = tm_par->verbosity;
       return(0);
    }
@@ -5519,7 +5518,7 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    /***********************************************************************
     ***                     cut_gen params                          ***
     ***********************************************************************/
-   else if (strcmp(key, "CG_verbosity") == 0){
+   if (strcmp(key, "CG_verbosity") == 0){
       *value = cg_par->verbosity;
       return(0);
    }

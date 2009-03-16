@@ -1733,7 +1733,7 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
       iway = 1;
     if (value<originalUpper-0.5)
        iway |= 2;
-    way[i]=iway;
+    way[i]=(char)iway;
   }
   // get row activities
   double * rowActivity = new double[numberRows];
@@ -1971,7 +1971,7 @@ int local_search(lp_prob *p, double *solutionValue, double *colSolution,
 	  iway = 1;
 	if (value<originalUpper-0.5) 
 	  iway |= 2;
-	way[goodK]=iway;
+	way[goodK]=(char)iway;
       }
     }
     if (bestChange+newSolutionValue<*solutionValue) {
@@ -2301,8 +2301,8 @@ int update_cut_parameters(lp_prob *p)
        lp_stat.clique_cuts_root<1) {
       par->generate_cgl_clique_cuts_freq = -1;
    }
-   if (par->generate_cgl_probing_cuts == GENERATE_DEFAULT) {
-      if (lp_stat.probing_cuts_root<1) {
+   if (par->generate_cgl_clique_cuts == GENERATE_DEFAULT) {
+      if (lp_stat.clique_cuts_root<1) {
          data_par->generate_cgl_clique_cuts_freq = 
               par->generate_cgl_clique_cuts_freq = 200;
       } else {

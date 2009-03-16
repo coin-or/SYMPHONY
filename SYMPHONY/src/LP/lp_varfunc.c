@@ -160,9 +160,9 @@ void tighten_bounds(lp_prob *p)
    int del_vars = 0, *delstat = NULL;
 
    //char not_fixed__lb__switch, not_fixed__ub__switch;
-   int *ind;
-   char *lu;
-   double *bd, *ub, *lb;
+   int *ind = 0;
+   char *lu = 0;
+   double *bd = 0, *ub = 0, *lb = 0;
    int cnt = 0;
 
    colind_sort_extra(p);
