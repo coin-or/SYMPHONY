@@ -1162,6 +1162,7 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
       cand->sense[0] = 'L';
       cand->sense[1] = 'G';
       cand->range[0] = cand->range[1] = 0;
+      qsort_di(xval, xind, cnt);
    } else {
       qsort_di(xval, xind, cnt);
       if (p->bc_level>p->par.strong_br_all_candidates_level || 
