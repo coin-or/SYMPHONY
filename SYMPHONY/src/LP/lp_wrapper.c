@@ -183,7 +183,7 @@ int create_subproblem_u(lp_prob *p)
 
    double *rhs, *rngval, *darray;
    char *sense;
-   int *status;
+   char *status;
    cut_data *cut;
    branch_desc *bobj;
 
@@ -457,6 +457,7 @@ int create_subproblem_u(lp_prob *p)
       }
    }
    
+   // TODO: fix char vs int
    /* Default status of every variable is NOT_FIXED */
    status = lp_data->status;
    if (bvarnum > 0) {
@@ -2111,14 +2112,14 @@ int send_lp_solution_u(lp_prob *p, int tid)
 
 void logical_fixing_u(lp_prob *p)
 {
-   int *status = p->lp_data->tmp.i1; /* n */
-   int *lpstatus = p->lp_data->status;
-   int *laststat = status + p->lp_data->n;
-   int fixed_num = 0, user_res;
+   char *status = p->lp_data->tmp.c; /* n */
+   char *lpstatus = p->lp_data->status;
+   char *laststat = status + p->lp_data->n;
+   int  fixed_num = 0, user_res;
 
    colind_sort_extra(p);
    //memcpy(status, lpstatus, p->lp_data->n);
-   memcpy(status, lpstatus, ISIZE*p->lp_data->n);
+   memcpy(status, lpstatus, CSIZE*p->lp_data->n);
 
 #ifdef USE_SYM_APPLICATION
    user_res = user_logical_fixing(p->user, p->lp_data->n, p->lp_data->vars,

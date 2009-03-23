@@ -34,7 +34,7 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
    LPdata *lp_data = p->lp_data;
    var_desc *evar, **extra, **vars = lp_data->vars;
 
-   int *status = lp_data->status;
+   char *status = lp_data->status;
 
    int new_vars = new_cols->num_vars;
    int i, j, oldn;
@@ -132,6 +132,7 @@ void add_col_set(lp_prob *p, our_col_set *new_cols)
    memset(lp_data->x + oldn, 0, new_vars * DSIZE);
    /* set status of the new vars to NOT_FIXED */
    //memset(lp_data->status + oldn, NOT_FIXED, new_vars);
+   //TODO: char vs int
    for (i = oldn; i<oldn+new_vars; i++) {
       lp_data->status[i] = NOT_FIXED;
    }
@@ -148,7 +149,7 @@ void tighten_bounds(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    double *dj = lp_data->dj;
    //double *x = lp_data->x;
-   int *status = lp_data->status;
+   char *status = lp_data->status;
    var_desc **vars = lp_data->vars;
    int n = lp_data->n;
    double lpetol = lp_data->lpetol;
@@ -370,7 +371,7 @@ our_col_set *price_all_vars(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol;
    int m = lp_data->m, n = lp_data->n;
-   int *status = lp_data->status;
+   char *status = lp_data->status;
    double *dj = lp_data->dj;
    double *dual = lp_data->dualsol;
 
@@ -772,7 +773,7 @@ int restore_lp_feasibility(lp_prob *p, our_col_set *new_cols)
 {
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol;
-   int *status = lp_data->status;
+   char *status = lp_data->status;
    double *dual = lp_data->dualsol;
 
    int bvarnum = p->base.varnum;

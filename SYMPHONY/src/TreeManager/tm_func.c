@@ -1406,7 +1406,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 if (*keep == i)
 	    dive = DO_NOT_DIVE;
 	 REALLOC(tm->nextphase_cand, bc_node *,
-		 tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
+                 tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
 	 tm->nextphase_cand[tm->nextphase_candnum++] = child;
 	 np_cp++;
 	 np_sp++;

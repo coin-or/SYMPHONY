@@ -261,7 +261,7 @@ int user_send_lp_solution(void *user, int varnum, var_desc **vars, double *x,
 \*===========================================================================*/
 
 int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
-			int *status, int *num_fixed)
+			char *status, int *num_fixed)
 {
    *num_fixed = 0;
 

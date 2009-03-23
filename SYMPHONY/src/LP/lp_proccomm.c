@@ -281,7 +281,7 @@ int receive_active_node(lp_prob *p)
    if (p->bc_level > 0){
       REMALLOC(p->bdesc, branch_desc, p->bdesc_size, p->bc_level, BB_BUNCH);
       receive_char_array((char *)p->bdesc,
-				 p->bc_level * sizeof(branch_desc));
+				 p->bc_level * (int)sizeof(branch_desc));
    }
 
    receive_int_array(&p->dive, 1);

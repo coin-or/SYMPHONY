@@ -191,7 +191,7 @@ typedef struct LPDATA{
    int       *not_fixed;
    int        nf_status;
 
-   int       *status;      /* maxn */ /* BB */
+   char      *status;      /* maxn */ /* BB */
    double    *x;           /* maxn */ /* BB */
    double    *dj;          /* maxn */ /* BB */
    double    *dualsol;     /* maxm */ /* BB */

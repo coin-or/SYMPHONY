@@ -2922,7 +2922,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       sym_cut->type = EXPLICIT_ROW;
       sym_cut->rhs = rhs;
       sym_cut->range = row_cut.range();
-      sym_cut->size = (num_elements * (ISIZE + DSIZE) + DSIZE);
+      sym_cut->size = (num_elements * (int)((ISIZE + DSIZE) + DSIZE));
       sym_cut->coef = (char *) malloc (sym_cut->size);
       sym_cut->sense = row_cut.sense();
       ((double *) (sym_cut->coef))[0] = 0; // otherwise valgrind complains.

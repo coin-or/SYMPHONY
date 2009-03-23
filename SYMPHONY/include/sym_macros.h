@@ -31,13 +31,13 @@
 #ifdef REMALLOC
 #undef REMALLOC
 #endif
-#define REMALLOC(ptr, ptrtype, oldsize, newsize, block_size)	\
-{								\
-   if (!ptr || (oldsize < newsize)){				\
-      FREE(ptr);						\
-      oldsize = (newsize) + (block_size);			\
-      ptr = (ptrtype *) malloc((oldsize) * sizeof(ptrtype));	\
-   }								\
+#define REMALLOC(ptr, ptrtype, oldsize, newsize, block_size)	             \
+{								             \
+   if (!ptr || (oldsize < newsize)){				             \
+      FREE(ptr);						             \
+      oldsize = newsize + (int)block_size;                                   \
+      ptr = (ptrtype *) malloc((size_t)(oldsize * sizeof(ptrtype)));	     \
+   }								             \
 }
 
 #ifdef REALLOC
@@ -46,8 +46,9 @@
 #define REALLOC(ptr, ptrtype, oldsize, newsize, block_size)		     \
 {									     \
    if (!ptr || (oldsize < newsize)){					     \
-      oldsize = (newsize) + (block_size);				     \
-      ptr = (ptrtype *) realloc((char *)ptr, ((oldsize) * sizeof(ptrtype))); \
+      oldsize = newsize + (int)(block_size);				     \
+      ptr = (ptrtype *) realloc((char *)ptr, (size_t)                        \
+                                (oldsize * sizeof(ptrtype)));                \
    }									     \
 }
 

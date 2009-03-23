@@ -153,7 +153,7 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
 
    if (maxm > lp_data->maxm){
       resize_m = TRUE;
-      lp_data->maxm = maxm + (set_max ? 0 : BB_BUNCH);
+      lp_data->maxm = maxm + (set_max ? 0 : (int)BB_BUNCH);
       if (! do_realloc){
          FREE(lp_data->dualsol);
          lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
@@ -172,14 +172,14 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
    if (maxn > lp_data->maxn){
       // int oldmaxn = MAX(lp_data->maxn, lp_data->n);
       resize_n = TRUE;
-      lp_data->maxn = maxn + (set_max ? 0 : 5 * BB_BUNCH);
+      lp_data->maxn = maxn + (set_max ? 0 : 5 * (int)BB_BUNCH);
       if (! do_realloc){
          FREE(lp_data->x);
          lp_data->x = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->dj);
          lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->status);
-         lp_data->status = (int *) malloc(lp_data->maxn * ISIZE);
+         lp_data->status = (char *) malloc(lp_data->maxn * CSIZE);
          FREE(lp_data->random_hash);
          lp_data->random_hash = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->heur_solution);
@@ -195,8 +195,8 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
                                          lp_data->maxn * DSIZE);
          lp_data->dj = (double *) realloc((char *)lp_data->dj,
                                           lp_data->maxn * DSIZE);
-         lp_data->status = (int *) realloc((char *)lp_data->status,
-                                            lp_data->maxn * ISIZE);
+         lp_data->status = (char *) realloc((char *)lp_data->status,
+                                            lp_data->maxn * CSIZE);
          lp_data->random_hash = (double *) realloc((char *)lp_data->random_hash,
                                          lp_data->maxn * DSIZE);
          lp_data->heur_solution = (double *) realloc((char *)
@@ -210,7 +210,7 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
       }
    }
    if (maxnz > lp_data->maxnz){
-      lp_data->maxnz = maxnz + (set_max ? 0 : 20 * BB_BUNCH);
+      lp_data->maxnz = maxnz + (set_max ? 0 : 20 * (int)BB_BUNCH);
    }
 
    /* re(m)alloc the tmp arrays */
@@ -1304,7 +1304,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    int num_to_delete = 0, num_to_keep = 0;
    double *dj = lp_data->dj;
    double *x = lp_data->x;
-   int *status = lp_data->status;
+   char *status = lp_data->status;
 
    for (i = n - 1, num_to_delete = 0; i >= 0; i--) {
       if (delstat[i]) {
@@ -2135,7 +2135,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
 {
    double *dj = lp_data->dj;
    double *x = lp_data->x;
-   int *status = lp_data->status;
+   char *status = lp_data->status;
    int i, num_to_keep;
 
    cpx_status = CPXdelsetcols(lp_data->cpxenv, lp_data->lp, delstat);
@@ -2313,8 +2313,8 @@ void open_lp_solver(LPdata *lp_data)
    /* Turn off the OSL messages (There are LOTS of them) */
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
-   //lp_data->si->setupForRepeatedUse();
-   lp_data->si->getModelPtr()->setFactorizationFrequency(200);
+   lp_data->si->setupForRepeatedUse();
+   //lp_data->si->getModelPtr()->setFactorizationFrequency(200);
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
 #else   
@@ -3189,7 +3189,7 @@ int delete_cols(LPdata *lp_data, int delnum, int *delstat)
    int num_to_delete = 0, num_to_keep = 0;
    double *dj = lp_data->dj;
    double *x = lp_data->x;
-   int *status = lp_data->status;
+   char *status = lp_data->status;
 
    for (i = n - 1; i >= 0; i--){
       if (delstat[i]){
