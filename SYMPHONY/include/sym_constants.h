@@ -487,8 +487,8 @@
 
 
 /*--------------------- order type of a  matrix -----------------------------*/
-#define ROW_ORDERED         0
-#define COL_ORDERED         1
+#define MAT_ROW_ORDERED         0
+#define MAT_COL_ORDERED         1
 
 /*---------------------- type of an implication -----------------------------*/
 #define IMP_ROW             0

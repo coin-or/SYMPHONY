@@ -348,7 +348,7 @@ int prep_basic(PREPdesc *P)
 						row_ind, j, 
 						dive_level, TRUE, 
 						FALSE, FALSE, 0.0, 
-						0.0, COL_ORDERED);
+						0.0, MAT_COL_ORDERED);
 	       if(PREP_QUIT(termcode)){
 		  return termcode;
 	       }
@@ -401,7 +401,7 @@ int prep_basic(PREPdesc *P)
 	    termcode = prep_improve_variable(P, col_ind, -1, 0, 
 					     dive_level, TRUE, FALSE, 
 					     FALSE,
-					     0.0,0.0, COL_ORDERED);
+					     0.0,0.0, MAT_COL_ORDERED);
 	    if(PREP_QUIT(termcode)){
 	       return termcode;
 	    }
@@ -1481,7 +1481,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
    ROWinfo *rows = mip->mip_inf->rows;
    double *maj_matval;
 
-   if(use_mip == COL_ORDERED){
+   if(use_mip == MAT_COL_ORDERED){
       maj_matval = mip->matval; 
    }else{
       maj_matval = mip->row_matval;
@@ -1767,7 +1767,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 	    /* debug -fixme */
 	    /* i really dont like this brute forcing here, try to fix it*/
 
-	    if(use_mip == COL_ORDERED){	    
+	    if(use_mip == MAT_COL_ORDERED){	    
 	       for(i = mip->row_matbeg[row_ind]; i < 
 		      mip->row_matbeg[row_ind + 1]; i++){
 		  if(mip->row_matind[i] == col_ind){
@@ -2565,9 +2565,9 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 		  if(cols[col_ind].var_type != 'F'){
 		     termcode = prep_improve_variable(P, col_ind, 
 						      r_ind, k, 
-						      (dive_level - 1), 
-						      TRUE, impl_mode, FALSE,
-						      0.0,0.0, ROW_ORDERED); 
+						      (dive_level - 1), TRUE, 
+                                                      impl_mode, FALSE, 0.0,
+                                                      0.0, MAT_ROW_ORDERED); 
 		     if(PREP_QUIT(termcode)){
 			break;
 		     }
