@@ -124,14 +124,13 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
       fp_is_feasible (lp_data,matrix,lp_r_low,lp_r_up,fp_data,&is_feasible);
 
       if (is_feasible == TRUE) {
-         /* we found what we wanted */
-         memcpy(betterSolution, x_ip, n*DSIZE);
-
          new_solution_value = 0;
          for (i=0;i<n;i++) {
-            new_solution_value += betterSolution[i]*mip_obj[i];
+            new_solution_value += x_ip[i]*mip_obj[i];
          }
          if (new_solution_value<solution_value-p->par.granularity) {
+	    /* we found what we wanted */
+	    memcpy(betterSolution, x_ip, n*DSIZE);
             solution_value = new_solution_value;
             indices = p->lp_data->tmp.i1;          /* n */
             values  = p->lp_data->tmp.d;           /* n */
