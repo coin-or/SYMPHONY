@@ -482,6 +482,7 @@ typedef struct LP_STAT{
    int         fp_calls;
    int         fp_lp_calls;
    int         fp_num_sols;
+   int         fp_poor_sols;
 
    /* usage of different tools in process chain: fp, cuts, strong branching */
    int         num_cut_iters_in_path;

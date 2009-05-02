@@ -374,6 +374,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fp_max_cycles       = 100;
    lp_par->fp_time_limit       = 50;
    lp_par->fp_display_interval = 10;
+   lp_par->fp_poor_sol_lim_fac = 20;
    lp_par->fp_flip_fraction    = 0.1;
    lp_par->fp_frequency        = 10;
    lp_par->fp_max_initial_time = 100;

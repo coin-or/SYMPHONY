@@ -62,6 +62,11 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    char                     is_feasible   = FALSE;
    double                  *x_ip, *x_lp, new_solution_value;
    const double             fp_display_interval = p->par.fp_display_interval;
+   /* number of solutions with obj value more than the best */
+   int                      num_poor_sols = 0;
+   int                      num_better_sols = 0;
+   const double             lpetol = p->lp_data->lpetol;
+   int                      fp_poor_sol_lim = p->par.fp_poor_sol_lim_fac;
 
    fp_time                                = used_time(&total_time);
    if (p->lp_stat.fp_calls < 1) {
@@ -74,7 +79,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    last_fp_time                           = fp_time;
    /* fp_time should now be zero and total_time be still the same */
 
-   verbosity = fp_data->verbosity     = p->par.verbosity;
+   verbosity = fp_data->verbosity         = p->par.verbosity;
    if (p->bc_index<1) {
       PRINT(verbosity, 0, ("starting feasibility pump\n"));
    }
@@ -88,15 +93,19 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    fp_initialize_lp_solver(p, new_lp_data, fp_data);
    x_ip = fp_data->x_ip;
    x_lp = fp_data->x_lp;
-   if (p->has_ub && p->mip->mip_inf && 
-         (p->mip->mip_inf->obj_size <= p->mip->mip_inf->max_row_size || 
-          p->mip->mip_inf->obj_size < n/10)) {
-      solution_value = p->ub-p->mip->obj_offset;
-      fp_add_obj_row(new_lp_data, n, mip_obj, p->ub-p->par.granularity);
-   } else {
+
+   if (p->has_ub) {
+      solution_value = p->ub-p->par.granularity;
+   }
+   else {
       solution_value = model->getInfinity();
    }
 
+   if (p->has_ub && p->mip->mip_inf && 
+         (p->mip->mip_inf->obj_size <= p->mip->mip_inf->max_row_size || 
+          p->mip->mip_inf->obj_size < n/10)) {
+      fp_add_obj_row(new_lp_data, n, mip_obj, p->ub-p->par.granularity);
+   } 
    /* round the x_lp and store as x_ip, it will usually become infeasible */
    vars = fp_data->fp_vars;
 
@@ -128,7 +137,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
          for (i=0;i<n;i++) {
             new_solution_value += x_ip[i]*mip_obj[i];
          }
-         if (new_solution_value<solution_value-p->par.granularity) {
+         if (new_solution_value<solution_value-p->par.granularity-lpetol) {
 	    /* we found what we wanted */
 	    memcpy(betterSolution, x_ip, n*DSIZE);
             solution_value = new_solution_value;
@@ -138,6 +147,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
             gap     = (solution_value -
                       obj_lb)/(fabs(solution_value)+0.001)*100;
             p->lp_stat.fp_num_sols++;
+            num_better_sols++;
             PRINT(verbosity,5,("fp: found solution with value = %f\n",
                      solution_value));
             PRINT(verbosity,5,("fp: gap = %f\n", gap));
@@ -162,6 +172,24 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
                }
             }
             *found_better_solution = TRUE;
+            fp_poor_sol_lim = p->par.fp_poor_sol_lim_fac *
+                              num_better_sols;
+         } else {
+            num_poor_sols++;
+            /*
+            PRINT(verbosity,5,("fp: rejecting poor solution with value = %f\n",
+                     solution_value));
+            PRINT(verbosity,5,("fp: number of poor sols = %d, better sols = %d, limit=%d\n",
+                     num_poor_sols, num_better_sols, fp_poor_sol_lim));
+            */
+            if (num_poor_sols > fp_poor_sol_lim) {
+            /*
+               PRINT(verbosity,5,("fp: breaking because of too many (%d) poor"
+                       " solutions\n", num_poor_sols));
+            */
+               fp_data->iter++;
+               break;
+            }
          }
       } 
 
@@ -176,6 +204,8 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
       fp_data->iter++;
       fp_time += used_time(&total_time);
    }
+
+   p->lp_stat.fp_poor_sols = num_poor_sols;
    close_lp_solver(new_lp_data);
    /* free all the allocated memory */
    FREE(new_lp_data->x);
@@ -736,13 +766,13 @@ int fp_should_call_fp(lp_prob *p, int branching, int *should_call,
       } else if (p->has_ub==FALSE && p->par.fp_enabled==SYM_FEAS_PUMP_TILL_SOL
             && p->bc_index%p->par.fp_frequency==0) {
          *should_call = TRUE;
-      } else if ( (p->has_ub==FALSE||
+      } else if (  (p->has_ub==FALSE||
                    (p->ub-p->lp_data->objval)/(fabs(p->ub)+0.0001)*100>
                    p->par.fp_min_gap) &&
                  (p->comp_times.fp < p->par.fp_max_initial_time ||
                   p->comp_times.fp < 0.025*p->tt) &&
                  p->comp_times.fp < 0.5*p->tt &&
-                 p->bc_index%p->par.fp_frequency == 0) {
+                 p->bc_index%p->par.fp_frequency == 0 ) {
          *should_call = TRUE;
       }
    }
