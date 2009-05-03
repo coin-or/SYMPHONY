@@ -388,6 +388,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          }
          var_score = alpha * low + one_m_alpha * high;
          if (var_score > best_var_score + lpetol100 || best_can == NULL) {
+            if ( var_score > best_var_score + 0.1 &&(down_is_est != TRUE || up_is_est != TRUE)) {
+               solves_since_impr = 0;
+            }
             best_var_score = var_score;
             best_var = branch_var;
             best_can = candidates[0];
@@ -406,10 +409,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             best_can->rhs[0] = floorx;
             best_can->rhs[1] = ceilx;
             best_can->value = xval;
-            if ( var_score > best_var_score + 0.1 &&(down_is_est != TRUE || up_is_est != TRUE)) {
-               printf("best_var_score = %f\n", best_var_score);
-               solves_since_impr = 0;
-            }
          }
          if (solves_since_impr > max_solves_since_impr || 
                full_solves >= max_solves) {
