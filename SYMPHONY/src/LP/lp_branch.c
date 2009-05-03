@@ -155,6 +155,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    double *pcost_up = p->pcost_up;
    int rel_threshold = 8;
    int best_var;
+   int max_presolve_iter;
 
    /*------------------------------------------------------------------------*\
     * First we call select_candidates_u() to select candidates. It can
@@ -254,17 +255,19 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       should_use_hot_starts = FALSE;
    }
 
-   /* Set the iteration limit */
-   if (p->par.max_presolve_iter > 0) {
-      set_itlim(lp_data, p->par.max_presolve_iter);
-   }
-
    if (should_use_hot_starts) {
       mark_hotstart(lp_data);
-      if (p->par.max_presolve_iter > 0) {
-         set_itlim_hotstart(lp_data, p->par.max_presolve_iter);
-      }
    }
+
+   if (p->par.max_presolve_iter > 0) {
+      max_presolve_iter = p->par.max_presolve_iter - p->bc_level;
+      if (max_presolve_iter < 5) {
+         max_presolve_iter = 5;
+      }
+      set_itlim_hotstart(lp_data, max_presolve_iter);
+      set_itlim(lp_data, max_presolve_iter);
+   }
+
    vars = lp_data->vars;
 
    /* Look at the candidates one-by-one and presolve them. */
@@ -403,7 +406,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             best_can->rhs[0] = floorx;
             best_can->rhs[1] = ceilx;
             best_can->value = xval;
-            if (down_is_est != TRUE || up_is_est != TRUE) {
+            if ( var_score > best_var_score + 0.1 &&(down_is_est != TRUE || up_is_est != TRUE)) {
+               printf("best_var_score = %f\n", best_var_score);
                solves_since_impr = 0;
             }
          }
