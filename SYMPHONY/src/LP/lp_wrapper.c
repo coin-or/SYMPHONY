@@ -514,10 +514,10 @@ int create_subproblem_u(lp_prob *p)
     * Load the lp problem (load_lp is an lp solver dependent routine).
    \*----------------------------------------------------------------------- */
 
-   if (p->bc_index == 0) {
-      load_lp_prob(lp_data, p->par.scaling, p->par.fastmip);
+   if (p->bc_index == 0 || p->par.should_reuse_lp == FALSE) {
+      load_lp_prob(lp_data, p->par.scaling, p->par.fastmip); //load new
    } else {
-      reset_lp_prob(lp_data, p->par.scaling, p->par.fastmip);
+      reset_lp_prob(lp_data, p->par.scaling, p->par.fastmip); //use old
    }
 
 

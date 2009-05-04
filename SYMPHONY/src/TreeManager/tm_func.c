@@ -1457,7 +1457,7 @@ char shall_we_dive(tm_prob *tm, double objval)
    
    if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
       find_tree_lb(tm);
-      if (100*(tm->ub-tm->lb)/tm->ub <= tm->par.gap_limit){
+      if (100*(tm->ub-tm->lb)/(fabs(tm->ub)+etol) <= tm->par.gap_limit){
 	 return(FALSE);
       }
    }

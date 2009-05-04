@@ -2173,6 +2173,7 @@ int set_param(sym_environment *env, char *line)
       if (value[0]){
 	 tm_par->keep_description_of_pruned = 
 	   lp_par->keep_description_of_pruned = KEEP_IN_MEMORY;
+         lp_par->should_reuse_lp = FALSE; //by asm4
          return(0);
    } else
 	 tm_par->keep_description_of_pruned = 
