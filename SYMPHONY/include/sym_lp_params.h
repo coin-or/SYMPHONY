@@ -83,6 +83,12 @@ typedef struct LP_PARAMS{
    double            time_limit;
 
    int               lp_data_mip_is_copied;
+   /* TRUE: save the base model after root solve and then load it each time we
+    * start a new chain (dive). FALSE: load the model from scratch. Basis
+    * information is loaded separately in both cases for a warm start. Cant be
+    * set by user.
+    */
+   int               should_reuse_lp; 
 
    /* these two are passed directly to the lp solver */
    int               scaling;
