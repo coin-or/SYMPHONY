@@ -2808,6 +2808,10 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->strong_branching_cand_num_min);
       return(0);
    }
+   else if (strcmp(key, "strong_br_min_level") == 0) {
+      READ_INT_PAR(lp_par->strong_br_min_level);
+      return(0);
+   }
    else if (strcmp(key, "strong_br_all_candidates_level") == 0) {
       READ_INT_PAR(lp_par->strong_br_all_candidates_level);
       return(0);

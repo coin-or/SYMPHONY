@@ -239,6 +239,9 @@ int sym_set_defaults(sym_environment *env)
 #ifdef COMPILE_IN_LP
    lp_par->should_reuse_lp = TRUE; /* see header file for description */
 #endif
+#ifdef _OPENMP
+   lp_par->should_reuse_lp = FALSE; /* see header file for description */
+#endif
    lp_par->try_to_recover_from_error = TRUE;
    lp_par->problem_type = ZERO_ONE_PROBLEM;
    lp_par->keep_description_of_pruned = tm_par->keep_description_of_pruned;
@@ -360,6 +363,11 @@ int sym_set_defaults(sym_environment *env)
    lp_par->strong_branching_high_low_weight = 0.8; // alpha*min + (1-alpha)*max
    lp_par->user_set_strong_branching_cand_num = FALSE;
    lp_par->user_set_max_presolve_iter = FALSE;
+   /* 
+    * strong branching is carried out for candidate variables even when pseudo
+    * costs are reliably known when the depth is less than this number 
+   */
+   lp_par->strong_br_min_level = 10; 
    lp_par->strong_br_all_candidates_level = 6;
    lp_par->use_hot_starts = TRUE;
    lp_par->should_use_rel_br = TRUE;
@@ -5459,6 +5467,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    }
    else if (strcmp(key, "user_set_max_presolve_iter") == 0) {
       *value = lp_par->user_set_max_presolve_iter;
+      return(0);
+   }
+   else if (strcmp(key, "strong_br_min_level") == 0) {
+      *value = lp_par->strong_br_min_level;
       return(0);
    }
    else if (strcmp(key, "strong_br_all_candidates_level") == 0) {

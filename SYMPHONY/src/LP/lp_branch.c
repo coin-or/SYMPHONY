@@ -156,6 +156,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    int rel_threshold = 8;
    int best_var;
    int max_presolve_iter;
+   const int bc_level = p->bc_level;
+   const int strong_br_min_level = p->par.strong_br_min_level;
 
    /*------------------------------------------------------------------------*\
     * First we call select_candidates_u() to select candidates. It can
@@ -260,7 +262,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    }
 
    if (p->par.max_presolve_iter > 0) {
-      max_presolve_iter = p->par.max_presolve_iter - p->bc_level;
+      max_presolve_iter = p->par.max_presolve_iter - bc_level;
       if (max_presolve_iter < 5) {
          max_presolve_iter = 5;
       }
@@ -310,7 +312,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          rel_up = br_rel_up[branch_var];
 
          //calculate the score for each candidate variable.
-         if (rel_down > rel_threshold) {
+         if (rel_down > rel_threshold && bc_level > strong_br_min_level) {
             down_obj = oldobjval + pcost_down[branch_var] * (xval - floorx);
             down_is_est = TRUE;
          } else {
@@ -341,7 +343,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             full_solves++;
             solves_since_impr++;
          }
-         if (br_rel_up[branch_var] > rel_threshold) {
+         if (br_rel_up[branch_var] > rel_threshold && bc_level > strong_br_min_level) {
             up_obj   = oldobjval + pcost_up[branch_var] * (ceilx - xval);
             up_is_est = TRUE;
          } else {
