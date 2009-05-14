@@ -322,7 +322,7 @@ int solve(tm_prob *tm)
 #ifndef COMPILE_IN_LP
    int r_bufid;
 #endif
-   int termcode = 0, i;
+   int termcode = 0;
    double start_time = tm->start_time;
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char ramp_down = FALSE, ramp_up = TRUE;
@@ -349,9 +349,9 @@ int solve(tm_prob *tm)
 #pragma omp parallel default(shared)
 {
 #ifdef _OPENMP
-      int thread_num = omp_get_thread_num();
+      int i, thread_num = omp_get_thread_num();
 #else
-      int thread_num = 0;
+      int i, thread_num = 0;
 #endif
       while (tm->active_node_num > 0 || tm->samephase_candnum > 0){
 	 /*------------------------------------------------------------------*\

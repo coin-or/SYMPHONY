@@ -370,7 +370,13 @@ int sym_set_defaults(sym_environment *env)
    lp_par->strong_br_min_level = 10; 
    lp_par->strong_br_all_candidates_level = 6;
    lp_par->use_hot_starts = TRUE;
-   lp_par->should_use_rel_br = TRUE;
+   lp_par->should_use_rel_br = FALSE;
+#ifdef COMPILE_IN_LP
+   lp_par->should_use_rel_br = TRUE; 
+#endif
+#ifdef _OPENMP
+   lp_par->should_use_rel_br = FALSE; 
+#endif
    lp_par->rel_br_threshold = 8;
    lp_par->rel_br_max_solves = 20;      /* stop after these many LP-solve calls
                                            regardless of improvement */
