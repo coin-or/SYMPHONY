@@ -52,14 +52,6 @@ extern long random PROTO((void));
 #include "sym_cp.h"
 #endif
 
-/* experiments with memory usage --asm4 */
-#undef SHOULD_SHOW_MEMORY_USAGE
-#define SHOULD_SHOW_MEMORY_USAGE
-#ifdef SHOULD_SHOW_MEMORY_USAGE
-#include <unistd.h>            /* to get pid */
-#endif
-
-
 int c_count = 0;
 
 /*===========================================================================*/
