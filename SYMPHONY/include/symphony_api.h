@@ -2,7 +2,7 @@
 /*                                                                           */
 /* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
-/* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
+/* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
 /* (c) Copyright 2005 Ted Ralphs. All Rights Reserved.                       */

@@ -3,7 +3,7 @@
 #                                                                            #
 # This file is part of the SYMPHONY Branch, Cut, and Price Library.          #
 #                                                                            #
-# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and     #
+# SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and          #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                         #
 #                                                                            #
 # (c) Copyright 2005-2006 Ted Ralphs. All Rights Reserved.                   #

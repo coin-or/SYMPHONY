@@ -2,12 +2,12 @@
 #                                                                           #
 # This file is part of the SYMPHONY MILP Solver Framework.                  #
 #                                                                           #
-# SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    #
+# SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         #
 # Laci Ladanyi (ladanyi@us.ibm.com).                                        #
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2008 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2009 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Common Public License. Please see     #
 # accompanying file for terms.                                              #
@@ -29,10 +29,10 @@ AC_COPYRIGHT([
 /*                                                                           */
 /* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
-/* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
+/* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2009 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
