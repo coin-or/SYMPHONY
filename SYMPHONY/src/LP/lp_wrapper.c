@@ -2,10 +2,10 @@
 /*                                                                           */
 /* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
-/* SYMPHONY was jointly developed by Ted Ralphs (tkralphs@lehigh.edu) and    */
+/* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2008 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2009 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* The OSI interface in this file was written by Menal Guzelsoy.             */
 /* The OSL interface was written by Ondrej Medek.                            */
