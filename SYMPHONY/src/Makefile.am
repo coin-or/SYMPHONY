@@ -84,7 +84,7 @@ endif
 SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 
 SYM_MASTER_SRC	= Master/master.c Master/master_wrapper.c Master/master_io.c \
-	Master/master_func.c
+	Master/master_func.c Master/prep.c Master/prep_base.c Master/prep_sr.c 
 
 MASTER_SRC =$(SYM_MASTER_SRC)
 
@@ -102,7 +102,7 @@ TM_SRC          = TreeManager/treemanager.c TreeManager/tm_func.c \
 endif
 
 SYM_LP_SRC = LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c LP/feasibility_pump.c LP/sp.c
 if PSEUDO_COSTS
 SYM_LP_SRC += LP/lp_pseudo_branch.c
 else
@@ -136,7 +136,7 @@ MASTER_SRC     += $(TM_SRC)
 endif
 
 LP_SRC		= LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/feasibility_pump.c LP/sp.c
 if PSEUDO_COSTS
 LP_SRC         += LP/lp_pseudo_branch.c
 else
@@ -146,9 +146,6 @@ endif
 if SYM_COMPILE_IN_CG
 LP_SRC         += CutGen/cg_func.c CutGen/cg_wrapper.c
 endif
-
-SYM_MASTER_SRC     += Preprocessor/prep.c \
-	Preprocessor/prep_base.c Preprocessor/prep_sr.c 
 
 CP_SRC		= CutPool/cut_pool.c CutPool/cp_proccomm.c CutPool/cp_func.c \
 	CutPool/cp_wrapper.c
@@ -161,17 +158,16 @@ TIME_SRC	= Common/timemeas.c
 PROCCOMM_SRC	= Common/proccomm.c
 PACKCUT_SRC	= Common/pack_cut.c
 PACKARRAY_SRC	= Common/pack_array.c
-PRIMALHEUR_SRC  = PrimalHeuristics/feasibility_pump.c PrimalHeuristics/sp.c
 
 BB_SRC = $(MASTER_SRC) $(DG_SRC) $(TM_SRC) $(LP_SRC) $(CP_SRC) $(CG_SRC) \
 	 $(QSORT_SRC) $(TIME_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
-	 $(PACKARRAY_SRC) $(PRIMALHEUR_SRC)
+	 $(PACKARRAY_SRC) 
 
 ALL_SRC = $(BB_SRC)
 
 ALL_SYM_MASTER = $(SYM_MASTER_SRC) $(SYM_TM_SRC) $(SYM_LP_SRC) $(SYM_CG_SRC) \
 	$(SYM_CP_SRC) $(TIME_SRC) $(QSORT_SRC) $(PROCCOMM_SRC) $(PACKCUT_SRC) \
-	$(PACKARRAY_SRC) $(PRIMALHEUR_SRC)
+	$(PACKARRAY_SRC) 
 
 ALL_MASTER	 = $(MASTER_SRC)
 ALL_MASTER 	+= $(TIME_SRC)
@@ -179,7 +175,6 @@ ALL_MASTER 	+= $(QSORT_SRC)
 ALL_MASTER 	+= $(PROCCOMM_SRC)
 ALL_MASTER 	+= $(PACKCUT_SRC)
 ALL_MASTER 	+= $(PACKARRAY_SRC)
-ALL_MASTER 	+= $(PRIMALHEUR_SRC)
 
 ALL_LP	 = $(LP_SRC)
 ALL_LP 	+= $(TIME_SRC)
