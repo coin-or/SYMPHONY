@@ -505,7 +505,7 @@ void send_node_desc(lp_prob *p, int node_type)
 {
    node_desc *new_lp_desc = NULL, *new_tm_desc = NULL;
    node_desc *lp_desc = p->desc;
-   int repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
+   char repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
    int deal_with_nf;
    
    LPdata *lp_data = p->lp_data;
@@ -515,9 +515,6 @@ void send_node_desc(lp_prob *p, int node_type)
    bc_node *n = repricing ? (bc_node *) calloc(1, sizeof(bc_node)) :
       tm->active_nodes[p->proc_index];
    node_desc *tm_desc = &n->desc;   
-#else
-   int s_bufid;
-#endif
 
    if (p->bc_level > 0) {
       n->num_cut_iters_in_path =
@@ -547,6 +544,10 @@ void send_node_desc(lp_prob *p, int node_type)
       p->lp_stat.num_str_br_cands_in_path;
    n->num_fp_calls_in_path =
       p->lp_stat.num_fp_calls_in_path;
+
+#else
+   int s_bufid;
+#endif
 
    
 
@@ -1007,7 +1008,7 @@ void send_node_desc(lp_prob *p, int node_type)
        !p->par.keep_description_of_pruned){
       s_bufid = init_send(DataInPlace);
       send_char_array(&repricing, 1);
-      send_char_array(&node_type, 1);
+      send_int_array(&node_type, 1);
       if (node_type == FEASIBLE_PRUNED) {
 	 if (!p->par.sensitivity_analysis){ 
 	    send_int_array(&p->desc->uind.size, 1);
@@ -1026,7 +1027,7 @@ void send_node_desc(lp_prob *p, int node_type)
    /* Now start the real message */
    s_bufid = init_send(DataInPlace);
    send_char_array(&repricing, 1);
-   send_char_array(&node_type, 1);
+   send_int_array(&node_type, 1);
    send_dbl_array(&lp_data->objval, 1);
    if (node_type == INTERRUPTED_NODE){
       send_msg(p->tree_manager, LP__NODE_DESCRIPTION);
@@ -1416,7 +1417,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 #endif
    int i = 0, pos = can->position;
    cut_data *brcut;
-   int dive = p->dive, olddive = p->dive;
+   char dive = p->dive, olddive = p->dive;
    char fractional_dive = FALSE;
 
 #ifdef COMPILE_IN_LP
@@ -1545,7 +1546,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
    send_char_array(action, can->child_num);
 
    /* Our diving status and what we would keep */
-   send_int_array(&dive, 1);
+   send_char_array(&dive, 1);
    send_int_array(keep, 1);
    
    send_msg(p->tree_manager, LP__BRANCHING_INFO);

@@ -544,6 +544,7 @@ int create_subproblem_u(lp_prob *p)
       desc->cuts = NULL;
    }
 
+#ifdef COMPILE_IN_LP 
    /* reliability branching */
    /* pseudo costs and reliability measures */
    if (p->tm->pcost_down==NULL) {
@@ -563,6 +564,7 @@ int create_subproblem_u(lp_prob *p)
       p->br_rel_down = p->tm->br_rel_down;
       p->br_rel_up = p->tm->br_rel_up;
    }
+#endif 
 
    /*------------------------------------------------------------------------*\
     * Now go through the branching stuff
@@ -876,6 +878,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       }
    }
 
+#ifdef COMPILE_IN_LP
    if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
       fp_should_call_fp(p,branching,&should_call_fp,is_last_iter); 
       if (should_call_fp==TRUE) {
@@ -890,6 +893,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
          }
       }
    }
+#endif
    
    if (feasible == IP_FEASIBLE && p->par.multi_criteria){
       cnt = collect_nonzeros(p, lp_data->x, indices, values);
@@ -1005,8 +1009,11 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    if (feasible == IP_FEASIBLE){
       lp_data->termcode = LP_OPT_FEASIBLE;
       p->lp_stat.lp_sols++;
+
+#ifdef COMPILE_IN_LP
       sp_add_solution(p,cnt,indices,values,true_objval+p->mip->obj_offset,
             p->bc_index);
+#endif
    }
 
    FREE(col_sol);

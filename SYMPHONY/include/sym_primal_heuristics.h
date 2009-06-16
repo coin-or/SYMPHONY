@@ -61,7 +61,9 @@ typedef struct FP_DATA {
 int sp_add_solution PROTO((lp_prob *p, int cnt, int *indices, double *values, double obj_value, int bc_index));
 int sp_delete_solution PROTO((sp_desc *sp, int position));
 int sp_is_solution_in_sp PROTO((lp_prob *p, int cnt, int *indices, double *values, double obj_value));
+#ifdef COMPILE_IN_LP
 int sp_initialize(tm_prob *tm);
+#endif
 int sp_free_sp(sp_desc *sp);
 
 /* feasibility pump */

@@ -1110,7 +1110,9 @@ int sym_solve(sym_environment *env)
    /*------------------------------------------------------------------------*\
     * Solve the problem and receive solutions                         
    \*------------------------------------------------------------------------*/
+#ifdef COMPILE_IN_LP
    sp_initialize(tm);
+#endif
 
    tm->start_time += start_time;
 
@@ -1285,8 +1287,10 @@ int sym_solve(sym_environment *env)
 			  tm->has_ub, tm->sp);
       }
       temp = termcode;
+#ifdef COMPILE_IN_LP
       sp_free_sp(tm->sp);
       FREE(tm->sp);
+#endif
 
       if(env->par.verbosity >=-1 ) {
 #ifdef COMPILE_IN_LP
