@@ -509,6 +509,7 @@ void send_node_desc(lp_prob *p, int node_type)
    node_desc *lp_desc = p->desc;
    char repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
    int deal_with_nf;
+   char ch;
    
    LPdata *lp_data = p->lp_data;
 
@@ -1029,7 +1030,8 @@ void send_node_desc(lp_prob *p, int node_type)
    /* Now start the real message */
    s_bufid = init_send(DataInPlace);
    send_char_array(&repricing, 1);
-   send_int_array(&node_type, 1);
+   ch = (char) node_type;
+   send_char_array(&ch, 1);
    send_dbl_array(&lp_data->objval, 1);
    if (node_type == INTERRUPTED_NODE){
       send_msg(p->tree_manager, LP__NODE_DESCRIPTION);

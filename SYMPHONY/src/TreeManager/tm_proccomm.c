@@ -880,7 +880,7 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    int s_bufid;
    int old_cut_name = 0;
    branch_obj *bobj = &node->bobj;
-   char *action;
+   char *action, ch;
    int *feasible;
    double *objval;
    int oldkeep, keep;
@@ -928,7 +928,8 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    }
    receive_char_array(action, bobj->child_num);
 
-   receive_int_array(&olddive, 1);
+   receive_char_array(&ch, 1);
+   olddive = (int) ch;
    receive_int_array(&keep, 1);
    oldkeep = keep;
    lp = node->lp;
@@ -939,7 +940,8 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    if (oldkeep >= 0 && (olddive == CHECK_BEFORE_DIVE || olddive == DO_DIVE)){
       /* We have to reply */
       s_bufid = init_send(DataInPlace);
-      send_int_array(&dive, 1);
+      ch = (char) dive;
+      send_char_array(&ch, 1);
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE){
 	 /* Give the index of the node kept and also the index of the
 	  * branching cut if necessary */
