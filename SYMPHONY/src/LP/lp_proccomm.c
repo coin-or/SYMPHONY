@@ -205,6 +205,7 @@ int receive_active_node(lp_prob *p)
 {
    int i, s_bufid;
    node_desc *desc;
+   char ch;
 
    desc = p->desc = (node_desc *) malloc( sizeof(node_desc) );
 
@@ -284,7 +285,8 @@ int receive_active_node(lp_prob *p)
 				 p->bc_level * (int)sizeof(branch_desc));
    }
 
-   receive_int_array(&p->dive, 1);
+   receive_char_array(&ch, 1);
+   p->dive = (int) ch;
 
    /*------------------------------------------------------------------------*\
     * Unpack the user defined description
