@@ -656,6 +656,7 @@ int create_subproblem_u(lp_prob *p)
       }
    }
    */
+#ifdef COMPILE_IN_LP
    if (p->desc->bnd_change) {
       bounds_change_desc *bnd_change = p->desc->bnd_change;
       int *index = bnd_change->index;
@@ -701,6 +702,7 @@ int create_subproblem_u(lp_prob *p)
       FREE(bnd_change->value);
       FREE(p->desc->bnd_change);
    }
+#endif
 
    /*------------------------------------------------------------------------*\
     * The final step: load in the basis.
@@ -745,6 +747,7 @@ int create_subproblem_u(lp_prob *p)
  * longer be a last call. */
 int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 {
+  p->par.verbosity = 100;
 #ifndef COMPILE_IN_LP
    int s_bufid;
 #endif
