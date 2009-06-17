@@ -747,7 +747,6 @@ int create_subproblem_u(lp_prob *p)
  * longer be a last call. */
 int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 {
-  p->par.verbosity = 100;
 #ifndef COMPILE_IN_LP
    int s_bufid;
 #endif
