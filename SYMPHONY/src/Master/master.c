@@ -1146,7 +1146,16 @@ int sym_solve(sym_environment *env)
       }else {
 	 env->tm->lpp[thread_num]->best_sol = env->best_sol;	    
       }
+   }
+#else
+   if (env->tm->best_sol.has_sol){
+     FREE(env->best_sol.xind);
+     FREE(env->best_sol.xval);
+     env->best_sol = env->tm->best_sol;
+   }
+#endif
       
+   if (env->best_sol.has_sol) {
       memcpy(&env->warm_start->best_sol, &env->best_sol, sizeof(lp_sol) *1);
       env->warm_start->best_sol.xind = 0;
       env->warm_start->best_sol.xval = 0;
@@ -1160,14 +1169,6 @@ int sym_solve(sym_environment *env)
 		env->best_sol.xval, DSIZE * env->best_sol.xlength);	
       }
    }
-#else
-   if (env->tm->best_sol.has_sol){
-      FREE(env->best_sol.xind);
-      FREE(env->best_sol.xval);
-      env->best_sol = env->warm_start->best_sol = 
-	 env->tm->best_sol;
-   }
-#endif
 
    tm->rootnode = NULL;
    tm->cuts = NULL;
