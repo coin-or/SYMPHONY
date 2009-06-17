@@ -702,6 +702,8 @@ int create_subproblem_u(lp_prob *p)
       FREE(bnd_change->value);
       FREE(p->desc->bnd_change);
    }
+#else
+   p->desc->bnd_change = NULL;
 #endif
 
    /*------------------------------------------------------------------------*\
