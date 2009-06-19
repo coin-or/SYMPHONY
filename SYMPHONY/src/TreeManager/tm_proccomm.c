@@ -608,7 +608,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       }
       receive_int_array(&n->sol_size, 1);
       n->sol = (double *) malloc (DSIZE * n->sol_size);
-      receive_dbl_array(n->sol, tm->rootnode->desc.uind.size);
+      receive_dbl_array(n->sol, n->sol.size);
       n->duals = (double *) malloc (DSIZE * tm->bcutnum);
       send_dbl_array(n->duals, tm->bcutnum);
    }
@@ -620,7 +620,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       n->node_status = NODE_STATUS__PRUNED;
       if (node_type == FEASIBLE_PRUNED) {
 	 if (!tm->par.sensitivity_analysis){ 
-	    receive_int_array(&n->sol_size, 1);
+	    receive_int_array(&(n->sol_size), 1);
 	    n->sol = (double *) malloc (DSIZE * n->sol_size);
 	    receive_dbl_array(n->sol, n->sol_size);
 	 }

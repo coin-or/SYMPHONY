@@ -1011,10 +1011,11 @@ void send_node_desc(lp_prob *p, int node_type)
        !p->par.keep_description_of_pruned){
       s_bufid = init_send(DataInPlace);
       send_char_array(&repricing, 1);
-      send_int_array(&node_type, 1);
+      ch = (char) node_type;
+      send_char_array(&ch, 1);
       if (node_type == FEASIBLE_PRUNED) {
-	 if (!p->par.sensitivity_analysis){ 
-	    send_int_array(&p->desc->uind.size, 1);
+	 if (!p->par.sensitivity_analysis){
+	    send_int_array(&(p->desc->uind.size), 1);
 	    send_dbl_array(lp_data->x, p->desc->uind.size);
 	 }
       }

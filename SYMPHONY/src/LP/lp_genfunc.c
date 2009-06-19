@@ -55,7 +55,7 @@ int lp_initialize(lp_prob *p, int master_tid)
    p->master = master_tid;
 
 #else
-   
+
    /* set stdout to be line buffered */
    setvbuf(stdout, (char *)NULL, _IOLBF, 0);
 
