@@ -88,7 +88,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    signal(SIGINT, sym_catch_c);    
 #endif   
    par = &tm->par;
-
+   
 #ifdef _OPENMP
    tm->rpath =
       (bc_node ***) calloc(par->max_active_nodes, sizeof(bc_node **));
@@ -319,7 +319,7 @@ int solve(tm_prob *tm)
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
-   double timeout2 = 5, timeout3 = tm->par.logging_interval, timeout4 = 10;
+   double timeout2 = 30, timeout3 = tm->par.logging_interval, timeout4 = 10;
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
@@ -660,8 +660,8 @@ void print_tree_status(tm_prob *tm)
    printf("memory: %.2f MB ", vsize_in_mb);
 #endif
 
-   printf("done: %i ", tm->stat.analyzed);
-   printf("left: %i ", tm->samephase_candnum);
+   printf("done: %i ", tm->stat.analyzed-tm->active_node_num);
+   printf("left: %i ", tm->samephase_candnum+tm->active_node_num);
    if (tm->has_ub) {
       if (tm->obj_sense == SYM_MAXIMIZE){
          obj_lb = -tm->ub + tm->obj_offset;
@@ -678,7 +678,7 @@ void print_tree_status(tm_prob *tm)
       }
    }
    find_tree_lb(tm);
-   if(tm->lb > -DBL_MAX){
+   if(tm->lb > -SYM_INFINITY){
       if (tm->obj_sense == SYM_MAXIMIZE){
 	 obj_ub = -tm->lb + tm->obj_offset;
 	 printf("ub: %.2f ", obj_ub);
@@ -686,8 +686,14 @@ void print_tree_status(tm_prob *tm)
 	 obj_lb = tm->lb + tm->obj_offset;
 	 printf("lb: %.2f ", obj_lb);
       }
+   }else{
+      if (tm->obj_sense == SYM_MAXIMIZE){
+	 printf("ub: ?? ");
+      }else{
+	 printf("lb: ?? ");
+      }
    }
-   if (tm->has_ub && tm->ub && tm->lb > -DBL_MAX){
+   if (tm->has_ub && tm->ub && tm->lb > -SYM_INFINITY){
       printf("gap: %.2f ", fabs(100*(obj_ub-obj_lb)/obj_ub));
    }
    printf("time: %i\n", (int)(elapsed_time));
@@ -3537,7 +3543,7 @@ int find_tree_lb(tm_prob *tm)
    double lb = MAXDOUBLE;
    bc_node **samephase_cand;
 
-   if (tm->samephase_candnum > 0) {
+   if (tm->samephase_candnum > 0 || tm->active_node_num > 0) {
       if (tm->par.node_selection_rule == LOWEST_LP_FIRST) {
          lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
       } else {
