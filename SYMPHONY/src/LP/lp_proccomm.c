@@ -150,6 +150,7 @@ int process_message(lp_prob *p, int r_bufid, int *pindex, int *pitnum)
       /* Send back the timing data for the first phase */
       s_bufid = init_send(DataInPlace);
       send_char_array((char *)&p->comp_times, sizeof(node_times));
+      send_char_array((char *)&p->lp_stat, sizeof(lp_stat_desc));
       send_msg(p->tree_manager, LP__TIMING);
 #ifdef DO_TESTS
       if (pindex){

@@ -2581,6 +2581,7 @@ int tasks_before_phase_two(tm_prob *tm)
    /* Report to the master all kind of statistics */
    s_bufid = init_send(DataInPlace);
    send_char_array((char *)&tm->comp_times, sizeof(node_times));
+   send_char_array((char *)&tm->lp_stat, sizeof(lp_stat_desc));
    send_dbl_array(&tm->lb, 1);
    send_char_array((char *)&tm->stat, sizeof(tm_stat));
    send_msg(tm->master, TM_FIRST_PHASE_FINISHED);
@@ -3488,6 +3489,7 @@ int tm_close(tm_prob *tm, int termcode)
 
    s_bufid = init_send(DataInPlace);
    send_char_array((char *)&tm->comp_times, sizeof(node_times));
+   send_char_array((char *)&tm->lp_stat, sizeof(lp_stat_desc));
    send_dbl_array(&tm->lb, 1);
    send_char_array((char *)&tm->stat, sizeof(tm_stat));
    send_msg(tm->master, termcode);
