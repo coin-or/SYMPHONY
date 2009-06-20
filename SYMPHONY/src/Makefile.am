@@ -84,7 +84,7 @@ endif
 SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 
 SYM_MASTER_SRC	= Master/master.c Master/master_wrapper.c Master/master_io.c \
-	Master/master_func.c Master/prep.c Master/prep_base.c Master/prep_sr.c 
+	Master/master_func.c Master/master_prep.c Master/master_prep_base.c Master/master_prep_sr.c 
 
 MASTER_SRC =$(SYM_MASTER_SRC)
 
@@ -102,7 +102,7 @@ TM_SRC          = TreeManager/treemanager.c TreeManager/tm_func.c \
 endif
 
 SYM_LP_SRC = LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c LP/feasibility_pump.c LP/sp.c
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c LP/lp_heuristics.c LP/lp_sp.c
 if PSEUDO_COSTS
 SYM_LP_SRC += LP/lp_pseudo_branch.c
 else
@@ -136,7 +136,7 @@ MASTER_SRC     += $(TM_SRC)
 endif
 
 LP_SRC		= LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/feasibility_pump.c LP/sp.c
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_heuristics.c LP/lp_sp.c
 if PSEUDO_COSTS
 LP_SRC         += LP/lp_pseudo_branch.c
 else
