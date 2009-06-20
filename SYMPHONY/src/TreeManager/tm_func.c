@@ -2657,6 +2657,7 @@ int trim_subtree(tm_prob *tm, bc_node *n)
       FREE(n->bobj.range);
       FREE(n->bobj.branch);
 #endif
+      FREE(n->bobj.solutions); //added by asm4
    }else{
       /* try to trim every child */
       for (i = n->bobj.child_num - 1; i >= 0; i--)
@@ -3362,6 +3363,7 @@ void free_tree_node(bc_node *n)
    FREE(n->bobj.range);
    FREE(n->bobj.branch);
 #endif
+   FREE(n->bobj.solutions); //added by asm4
 
    FREE(n->desc.uind.list);
    free_basis(&n->desc.basis);
