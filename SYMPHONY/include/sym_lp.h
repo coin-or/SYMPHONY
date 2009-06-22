@@ -153,7 +153,6 @@ typedef struct LP_PROB{
    /* pseudo costs and reliability measures */
    double         *pcost_down;
    double         *pcost_up;
-   double         *pcost_avg;
    int            *br_rel_down;
    int            *br_rel_up;
    int            *br_rel_cand_list;

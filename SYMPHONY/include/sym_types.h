@@ -437,8 +437,6 @@ typedef struct LP_STAT{
    int         str_br_nodes_pruned; /* no of nodes pruned by strong br */
    int         str_br_total_iter_num; /* number of total simplex iterations by
 					 strong br*/
-   int         str_presolve_iter_num;
-   
    int         rel_br_full_solve_num;
    int         rel_br_pc_up_num;
    int         rel_br_up_update;

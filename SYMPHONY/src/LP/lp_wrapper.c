@@ -552,7 +552,6 @@ int create_subproblem_u(lp_prob *p)
    if (p->tm->pcost_down==NULL) {
       p->pcost_down = (double *)calloc(p->mip->n, DSIZE);
       p->pcost_up = (double *)calloc(p->mip->n, DSIZE);
-      p->pcost_avg = (double *)calloc(p->mip->n, DSIZE);
       p->br_rel_down = (int *)calloc(p->mip->n, ISIZE);
       p->br_rel_up = (int *)calloc(p->mip->n, ISIZE);
       p->br_rel_cand_list = (int *)calloc(p->mip->n, ISIZE);
@@ -564,7 +563,6 @@ int create_subproblem_u(lp_prob *p)
       }
       p->tm->pcost_down = p->pcost_down;
       p->tm->pcost_up = p->pcost_up;
-      p->tm->pcost_avg = p->pcost_avg;
       p->tm->br_rel_down = p->br_rel_down;
       p->tm->br_rel_up = p->br_rel_up;
       p->tm->br_rel_cand_list = p->br_rel_cand_list;
@@ -573,7 +571,6 @@ int create_subproblem_u(lp_prob *p)
    } else {
       p->pcost_down = p->tm->pcost_down;
       p->pcost_up = p->tm->pcost_up;
-      p->pcost_avg = p->tm->pcost_avg;
       p->br_rel_down = p->tm->br_rel_down;
       p->br_rel_up = p->tm->br_rel_up;
       p->br_rel_down_min_level = p->tm->br_rel_down_min_level;
@@ -1421,76 +1418,6 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
     default:
       break;
    }
-   
-#if 0
-   int cand_num_max = p->par.strong_branching_cand_num_max;
-   int cand_num_min = p->par.strong_branching_cand_num_min;
-   int max_num = p->par.max_presolve_iter;
-   int max_backtrack = 5;
-   int scale_by = 1;
-   double avg_gap = 0;
-   if(!p->par.user_set_strong_branching_cand_num && p->str_br_check){
-      cand_num_max = MAX(20, (int)(50000/p->lp_stat.lp_max_iter_num));
-      cand_num_min = MAX(5, (int)(20000/p->lp_stat.lp_max_iter_num));
-      max_num = MIN(500, p->lp_stat.lp_max_iter_num);
-#ifdef COMPILE_IN_LP     
-      if(p->bc_level > 0){
-	 if(p->str_br_check){
-	    bc_node * node = p->tm->active_nodes[p->proc_index];
-	    for(i = 0; i < max_backtrack && node->parent; i++){
-	       avg_gap += fabs(node->start_objval/node->parent->end_objval - 1.0);
-	       node = node->parent;
-	    }
-	    if(avg_gap/i < 0.00333){
-	       if(i >= max_backtrack){
-		  p->str_br_check = FALSE;
-	       }else{
-		  scale_by = 10;
-	       }
-	    }else{
-	       if(p->comp_times.strong_branching > 7*p->tt/10){
-		  if(avg_gap/i <0.05){
-		     scale_by = 10;
-		  }else{
-		     scale_by = 2;
-		  }
-	       }else if(p->comp_times.strong_branching > p->tt/2){
-		  if(avg_gap/i <0.05){
-		     scale_by = 6;
-		  }else{
-		     scale_by = 2;
-		  }
-	       }else if (p->comp_times.strong_branching > 3*p->tt/10){
-		  if(avg_gap/i < 0.05){
-		     scale_by = 4;
-		  }else{
-		     scale_by = 2;
-		  }
-	       }else{
-		  if(avg_gap/i < 0.1){
-		     scale_by = 2;
-		  }
-	       }
-	    }
-	 }
-	 if(p->str_br_check){
-	    cand_num_max = MAX(20, (int)(cand_num_max/scale_by));
-	    cand_num_min = MAX(5, (int)(cand_num_max/scale_by));
-	    max_num = MIN(100, (int)(max_num/scale_by));	    
-	 }
-      }
-   }
-   //   cand_num_max =500;
-   // cand_num_min = 500;
-   //p->par.rel_br_cand_threshold = 500; 
-   p->lp_stat.str_presolve_iter_num = max_num = 500;
-   //   p->par.strong_branching_cand_num_min = 200;
-   i = (int) (cand_num_max -
-	      p->par.strong_branching_red_ratio * p->bc_level);
-   i = MAX(i, cand_num_min);
-#endif
-#endif
-   p->lp_stat.str_presolve_iter_num = p->par.max_presolve_iter;
    
    i = (int) (p->par.strong_branching_cand_num_max -
 	      p->par.strong_branching_red_ratio * p->bc_level);
