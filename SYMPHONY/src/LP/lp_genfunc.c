@@ -1973,13 +1973,13 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 	    p->par.max_cut_length = p->par.max_cut_length/2;
 	
 	 if(p->mip->mip_inf->max_row_size <= 500){
-	    p->par.max_cut_length = 4 + MIN(MAX(p->mip->mip_inf->max_row_size,
-						MIN(((int)(1.0133 *
+	    p->par.max_cut_length = MIN(MAX(p->mip->mip_inf->max_row_size,
+					    MIN(((int)(1.0133 *
 						       p->mip->mip_inf->mat_density *
 						       (p->mip->m + 1)* p->mip->n) -
 						 p->mip->nz + row_den) + 1,
 						(int)3.0*p->mip->mip_inf->max_row_size +
-						5)),
+						5)) + 4,
 					p->par.max_cut_length);
 	 }else{
 	    if(1.0*p->mip->mip_inf->max_row_size/p->mip->n > 0.5){
@@ -2002,7 +2002,6 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
       }
    }
 #endif
-
    max_cut_length = p->par.max_cut_length;
    if (p->par.tried_long_cuts == TRUE) {
       repeat_with_long = FALSE;
