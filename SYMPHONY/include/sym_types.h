@@ -384,10 +384,14 @@ typedef struct BC_NODE{
    int         num_cuts_added_in_path;
    int         num_cuts_slacked_out_in_path;
    double      avg_cuts_obj_impr_in_path;
-
+   double      start_objval;
+   double      end_objval;
+   char        cuts_tried;
    int         num_str_br_cands_in_path;
    double      avg_br_obj_impr_in_path;
-
+   char        used_str;
+   int         t_cnt;
+   
    int         num_fp_calls_in_path;
 }bc_node;
 
@@ -426,10 +430,21 @@ typedef struct LP_STAT{
    /* LP solver */
    int         lp_calls;
    int         lp_sols;
+   int         lp_total_iter_num; /* number of total simplex iterations */
+   int         lp_max_iter_num; /* max of lps' simplex iterations */
    int         str_br_lp_calls; /* no of calls from strong branching */
    int         str_br_bnd_changes; /* no of bounds changed due to strong br */
    int         str_br_nodes_pruned; /* no of nodes pruned by strong br */
-
+   int         str_br_total_iter_num; /* number of total simplex iterations by
+					 strong br*/
+   int         str_presolve_iter_num;
+   
+   int         rel_br_full_solve_num;
+   int         rel_br_pc_up_num;
+   int         rel_br_up_update;
+   int         rel_br_pc_down_num; 
+   int         rel_br_down_update;
+   int         rel_br_impr_num;
    /* cuts */
    int         cuts_generated;
    int         gomory_cuts;
@@ -483,13 +498,15 @@ typedef struct LP_STAT{
    int         fp_lp_calls;
    int         fp_num_sols;
    int         fp_poor_sols;
+   int         fp_lp_total_iter_num;
 
    /* usage of different tools in process chain: fp, cuts, strong branching */
    int         num_cut_iters_in_path;
    int         num_cuts_added_in_path;
    int         num_cuts_slacked_out_in_path;
    double      avg_cuts_obj_impr_in_path;
-
+   double      start_objval;
+   double      end_objval;
    int         num_str_br_cands_in_path;
    double      avg_br_obj_impr_in_path;
 
@@ -565,7 +582,7 @@ typedef struct COLINFO{
  		       its 'l'ower bound, simiarly, 
 		       temporarily fixed to its 'u'pper bound		     
 		     */
-
+   int sos_num;      /* #of sos rows that this var appears in */
    int col_size;     /* col size */
    int fix_row_ind; /* state which row caused to fix this variable during
 		       basic preprocessor */
@@ -588,7 +605,9 @@ typedef struct ROWINFO{
 			 - considering the type of coefficients*/
    int sign_type; /* all_pos, all_neg, mixed */ 
 
-   char is_sos_row; 
+   char is_sos_row;
+   char * sos_rep;  /* compact representation of the sos row for bitwise
+		       operations */
    
    /* for preprocessor */
 
@@ -637,7 +656,7 @@ typedef struct MIPINFO{
    int max_row_size; 
    int max_col_size; 
    int obj_size;  /* number of nonzeros in objective function */
-   double mat_density;
+
    char is_opt_val_integral; /*is the optimal 
 			   solution value required to be integral, if one 
 			   exists*/
@@ -646,12 +665,25 @@ typedef struct MIPINFO{
 
    int binary_sos_row_num; /* sos rows with binary vars count*/
    int binary_row_num; /* rows with binary vars*/
+   int cont_row_num; /* rows with cont vars */
+   int bin_cont_row_num; /* rows with both cont and bin vars */
    int row_bin_den; /* binary nz / number of rows */
    int col_bin_den; /* binary nz / number of binary columns */
    int row_bin_den_mean; /* 2*row_bin_den*max_row_size/
 			    row_bin_den+max_row_size */
    int col_bin_den_mean; /* same here for cols */
 
+   double bin_var_ratio;
+   double cont_var_ratio;
+   double int_var_ratio;
+   double max_row_ratio;
+   double max_col_ratio;
+   double mat_density;
+   double row_density;
+   double col_density;
+   double sos_bin_row_ratio;
+   double bin_row_ratio;
+   
    ROWinfo *rows;
    COLinfo *cols;
 }MIPinfo; 

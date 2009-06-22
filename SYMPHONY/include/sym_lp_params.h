@@ -72,6 +72,23 @@ typedef struct CGL_PARAMS{
    int               landp_generated_in_root;
 
    int               probing_is_expensive;
+   int               probing_root_max_look;
+
+   int               gomory_max_depth;
+   int               probing_max_depth;
+   int               flowcover_max_depth;
+   int               twomir_max_depth;
+   int               clique_max_depth;
+   int               oddhole_max_depth;
+   int               knapsack_max_depth;
+   
+   int               use_chain_strategy;
+   int               chain_status;
+   int               max_chain_backtrack;
+   int               max_chain_trial_num;
+   int               chain_trial_freq;
+   int               chain_check_index;
+   double            chain_weighted_gap;
 }cgl_params;
 
 typedef struct LP_PARAMS{
@@ -136,7 +153,7 @@ typedef struct LP_PARAMS{
    int               tailoff_obj_backsteps;
    double            tailoff_obj_frac;
    double            tailoff_absolute;
-   int               tailoff_max_no_impr_iters_root;
+   int               tailoff_max_no_iterative_impr_iters_root;
 
    int               ineff_cnt_to_delete;
    int               eff_cnt_before_cutpool;
@@ -185,6 +202,12 @@ typedef struct LP_PARAMS{
    int               user_set_strong_branching_cand_num;
    int               user_set_max_presolve_iter;
    int               should_use_rel_br;
+   int               rel_br_override_default;
+   int               rel_br_override_max_solves;
+   int               rel_br_chain_backtrack;
+   double            rel_br_min_imp;
+   double            rel_br_max_imp;
+
    int               rel_br_threshold; /* how many times to do strong branching
                                           on each variable before using pseudo 
                                           cost estimates */

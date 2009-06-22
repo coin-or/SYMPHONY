@@ -69,7 +69,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    int                      num_better_sols = 0;
    const double             lpetol = p->lp_data->lpetol;
    int                      fp_poor_sol_lim = p->par.fp_poor_sol_lim_fac;
-
+   int                      total_iter_cnt = 0;
    fp_time                                = used_time(&total_time);
    if (p->lp_stat.fp_calls < 1) {
       CoinSeedRandom(17000);
@@ -113,14 +113,29 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
 
    /* do the following max_iter times */
    fp_time += used_time(&total_time);
-   for (iter=0; iter<max_iter && fp_time<p->par.fp_time_limit; iter++) {
+   int fp_override_cnt = 0;
+
+   if(p->lp_stat.fp_calls < 1){
+      p->par.fp_time_limit += 20;
+      //      p->par.fp_max_initial_time += 10;
+   }else if(p->lp_stat.fp_calls < 2){
+      // p->par.fp_time_limit -= 20;
+      p->par.fp_max_initial_time += 20;
+   }else if(p->lp_stat.fp_calls < 3){
+      p->par.fp_max_initial_time -= 20;
+   }
+      
+   for (iter=0; (iter<max_iter && fp_time<p->par.fp_time_limit &&
+		 fp_time + p->comp_times.fp < p->par.fp_max_initial_time) ||
+	   fp_override_cnt > 0; iter++) {
       if (fp_time - last_fp_time > fp_display_interval || verbosity > 5) {
          PRINT(verbosity, 0, 
                ("feasibility pump: starting iteration %d, time used = %.2f\n",
                 iter, fp_time));
          last_fp_time = fp_time;
       }
-      is_feasible = FALSE;
+
+       is_feasible = FALSE;
       /* solve an lp */
       fp_round(fp_data, new_lp_data);
       if (fp_data->x_bar_len[fp_data->iter] == -1) {
@@ -142,7 +157,11 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
          if (new_solution_value<solution_value-p->par.granularity-lpetol) {
 	    /* we found what we wanted */
 	    memcpy(betterSolution, x_ip, n*DSIZE);
-            solution_value = new_solution_value;
+
+	    /* we found what we wanted */
+	    memcpy(betterSolution, x_ip, n*DSIZE);
+
+	    solution_value = new_solution_value;
             indices = p->lp_data->tmp.i1;          /* n */
             values  = p->lp_data->tmp.d;           /* n */
             cnt     = collect_nonzeros(p, betterSolution, indices, values);
@@ -176,6 +195,9 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
             *found_better_solution = TRUE;
             fp_poor_sol_lim = p->par.fp_poor_sol_lim_fac *
                               num_better_sols;
+	    /* menal ---*/ 
+	    if(p->bc_level > 0) break;	    
+	    /* --- */
          } else {
             num_poor_sols++;
             /*
@@ -195,9 +217,10 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
          }
       } 
 
-      PRINT(verbosity,10,("fp: solve lp %d\n",iter));
+      PRINT(verbosity,5,("fp: solve lp %d\n",iter));
       p->lp_stat.lp_calls++;
       p->lp_stat.fp_lp_calls++;
+
       if (fp_solve_lp(new_lp_data, fp_data, &is_feasible) != 
             FUNCTION_TERMINATED_NORMALLY) {
          break;
@@ -205,9 +228,12 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
 
       fp_data->iter++;
       fp_time += used_time(&total_time);
+      total_iter_cnt += fp_data->iterd;
+
    }
 
    p->lp_stat.fp_poor_sols = num_poor_sols;
+   p->lp_stat.fp_lp_total_iter_num += total_iter_cnt;
    close_lp_solver(new_lp_data);
    /* free all the allocated memory */
    FREE(new_lp_data->x);
@@ -216,7 +242,6 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    FREE(new_lp_data->slacks);
    FREE(new_lp_data->dualsol);
    FREE(new_lp_data->dj);
-   FREE(new_lp_data->slacks);
    FREE(new_lp_data->tmp.c);
    FREE(new_lp_data->tmp.d);
    FREE(new_lp_data->tmp.i1);
@@ -262,13 +287,15 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    if (p->bc_index<1 || verbosity > 5) {
       PRINT(verbosity, 0, ("leaving feasibility pump.\n"));
    }
-    //exit(0);
+ 
    return termcode;
 }
 
 
 /*===========================================================================*/
-int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const double *r_low, const double *r_up, FPdata *fp_data, char *is_feasible )
+int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix,
+		    const double *r_low, const double *r_up, FPdata *fp_data,
+		    char *is_feasible )		    
 {
    /* check if x is a integer feasible solution to problem in p */
    int termcode = FUNCTION_TERMINATED_NORMALLY;
@@ -287,16 +314,6 @@ int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const doubl
    *is_feasible = TRUE;
    /* some int variable is non-integral */
    /* is not possible, since this function is called after rounding */
-   /*
-   for (i=0;i<n;i++) {
-      if (vars[i]->is_int) {
-         if (x[i]-floor(x[i])>lpetol && ceil(x[i])-x[i]>lpetol) {
-            printf("Bok!\n");
-            return FUNCTION_TERMINATED_ABNORMALLY;
-         }
-      }
-   }
-   */
 
    /* check feasibility of constraints */
    for (i=0;i<m;i++) {
@@ -311,7 +328,8 @@ int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const doubl
          /* constraint infeasibility is possible since we call this func. after
             rounding */
          *is_feasible = FALSE;
-         //printf("constraint %d activity = %f, down = %g, up = %g\n", i, Ractivity, r_low[i], r_up[i]);
+         //printf("constraint %d activity = %f, down = %g, up = %g\n",
+	 //i, Ractivity, r_low[i], r_up[i]);
          break;
       }
    }
@@ -355,18 +373,33 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    double *mip_obj = fp_data->mip_obj;
    int verbosity = fp_data->verbosity;
    int *index_list;
-   int fp_max_length_cuts = 200;
+   int fp_max_length_cuts = 1; 
    row_data *rows = lp_data->rows;
 
    /* used because we can not call si directly */
    copy_lp_data(lp_data,new_lp_data);
-   new_lp_data->si->setupForRepeatedUse(3,0);
+   new_lp_data->si->setupForRepeatedUse(3,0); 
+
+#ifdef COMPILE_IN_LP
+   double mat_den = (1.0)*p->mip->nz/(p->mip->m * p->mip->n + 1);
+   if(p->mip->nz > 1e5 && mat_den > 0.01){
+      new_lp_data->si->setupForRepeatedUse(0,0); 
+   }
+#endif
+   
    lp_lb = new_lp_data->lb;
    lp_ub = new_lp_data->ub;
 
    /* delete cuts that are long as they slow down the lp */
    outrhsind = (int *)calloc(m, ISIZE);
    k = 0;
+
+#ifdef COMPILE_IN_LP   
+   if(p->bc_level < 1 && p->mip->mip_inf->cont_var_num <= 0){
+      fp_max_length_cuts = 100;   
+   }
+#endif
+   
    for (i = p->base.cutnum; i < m; i++){
       if (((int *)rows[i].cut->coef)[0] > fp_max_length_cuts) {
          outrhsind[k] = i;
@@ -376,7 +409,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    PRINT(verbosity, 5, ("feasibility pump: cuts discarded = %d\n", k));
    delete_rows_with_ind(new_lp_data, k, outrhsind);
    m -= k;
-
+   //   printf("m: %i \n",m);
    /* set up fp_data */
    fp_data->alpha           = 0.8;
    fp_data->alpha_decr      = 0.7;
@@ -508,7 +541,7 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
    int termcode = FUNCTION_TERMINATED_NORMALLY;
    double *objcoeff= fp_data->obj;
    int n = fp_data->n;
-   int iterd;
+   //int iterd;
    int termstatus;
    int i;
    double delta_x;
@@ -523,23 +556,24 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
    double one_minus_alpha = 1-fp_data->alpha;
    int n0 = fp_data->n0;
    double *lp_data_x = lp_data->x;
-
+   double etol = lp_data->lpetol;
+   
    is_feasible = FALSE;
    memset ((char *)(objcoeff),0,DSIZE*n);
    for (i=0;i<n0;i++) {
       if (fp_vars[i]->is_int) {
          if (fp_vars[i]->is_bin) {
-            if (x_ip[i]==0) {
-               objcoeff[i] = 1.0;
-            } else if (x_ip[i]==1) {
-               objcoeff[i] = -1.0;
+            if (x_ip[i] <= 0.0 + etol && x_ip[i] >= 0.0 - etol) {
+               objcoeff[i] = 10.0;
+	    } else if (x_ip[i] >= 1.0 - etol && x_ip[i] <= 1.0 + etol ) {
+	       objcoeff[i] = -10.0;
             }
          } else {
-            objcoeff[i] = 0;
-            objcoeff[fp_vars[i]->xplus] = 1;
+            objcoeff[i] = 0.0;
+            objcoeff[fp_vars[i]->xplus] = 1.0;
          }
       } else {
-         objcoeff[i] = 0;
+         objcoeff[i] = 0.0;
       }
       /* calculate ||coeff||, norm is not zero because otherwise x_ip is
        * feasible */
@@ -559,9 +593,10 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
    //norm = 0;
    PRINT(verbosity, 15, ("fp: norm = %f\n",norm));
    for (i=0;i<n0;i++) {
-      objcoeff[i] = one_minus_alpha*objcoeff[i]+alpha*mip_obj[i]*norm;
+      objcoeff[i] = 
+      one_minus_alpha*objcoeff[i]+alpha*mip_obj[i]*norm;
    }
-   /*
+  /*
    for (i=fp_data->n0;i<fp_data->n;i++) {
       objcoeff[i] = (1-alpha)*objcoeff[i];
    }
@@ -572,12 +607,12 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
       }
    }
    */
-
+   
    change_objcoeff(lp_data, index_list, &index_list[n-1], objcoeff);
    if (fp_data->iter > 0) { 
-      termstatus = dual_simplex(lp_data, &iterd);
+      termstatus = dual_simplex(lp_data, &fp_data->iterd);
    } else {
-      termstatus = initial_lp_solve(lp_data, &iterd);
+      termstatus = initial_lp_solve(lp_data, &fp_data->iterd);
    }
 
    if (termstatus != LP_OPTIMAL) {
@@ -756,28 +791,59 @@ int fp_should_call_fp(lp_prob *p, int branching, int *should_call,
       char is_last_iter)
 {
    int        termcode = FUNCTION_TERMINATED_NORMALLY;
-
+   
    *should_call = FALSE;
-   if (is_last_iter==FALSE) {
+   if (is_last_iter==FALSE || (p->has_ub && p->lp_stat.fp_calls > 100)){
+			       //(p->ub-p->lp_data->objval)/(fabs(p->ub)+0.0001)*100 >
+			       //2*p->par.fp_min_gap)){
       return termcode;
    }
+
+   int fp_freq_base = p->bc_level;
+#ifdef COMPILE_IN_LP
+   //   fp_freq_base = p->tm->stat.analyzed - 1;
+#endif
+
+   int orig_fp_freq = p->par.fp_frequency;
+   if(!p->has_ub && p->lp_stat.fp_calls < 3 &&
+      p->lp_stat.lp_total_iter_num/(p->lp_stat.lp_calls -
+				    p->lp_stat.str_br_lp_calls -
+				    p->lp_stat.fp_lp_calls + 1) > 1000){
+      p->par.fp_frequency = 5;
+   }
+
    if (p->par.fp_enabled>0 && !branching) {
       if (p->par.fp_enabled == SYM_FEAS_PUMP_REPEATED && 
-            p->bc_index%p->par.fp_frequency==0) {
+	  (fp_freq_base)%p->par.fp_frequency==0) {
          *should_call = TRUE;
       } else if (p->has_ub==FALSE && p->par.fp_enabled==SYM_FEAS_PUMP_TILL_SOL
-            && p->bc_index%p->par.fp_frequency==0) {
+            && p->bc_level%p->par.fp_frequency==0) {
          *should_call = TRUE;
-      } else if (  (p->has_ub==FALSE||
-                   (p->ub-p->lp_data->objval)/(fabs(p->ub)+0.0001)*100>
-                   p->par.fp_min_gap) &&
-                 (p->comp_times.fp < p->par.fp_max_initial_time ||
-                  p->comp_times.fp < 0.025*p->tt) &&
-                 p->comp_times.fp < 0.5*p->tt &&
-                 p->bc_index%p->par.fp_frequency == 0 ) {
+      } else if (  (p->has_ub==FALSE|| 
+		    (p->ub-p->lp_data->objval)/(fabs(p->ub)+0.0001)*100>
+		    p->par.fp_min_gap) &&
+		   (p->comp_times.fp < p->par.fp_max_initial_time) &&// ||
+		   //p->lp_stat.fp_lp_total_iter_num <
+		   //0.025*(p->lp_stat.lp_total_iter_num +
+		   //   p->lp_stat.fp_lp_total_iter_num)) &&
+		   //p->comp_times.fp < 0.025*p->tt) &&
+		   //p->comp_times.fp < 0.5*p->tt && //menal, also index->level
+		   fp_freq_base%p->par.fp_frequency == 0 ) {
          *should_call = TRUE;
       }
    }
+   
+   if(p->bc_level < 1 && p->lp_stat.fp_calls > 0 &&
+      p->comp_times.fp >= 0.5*p->par.fp_time_limit){
+      *should_call = FALSE;
+   }else if (!should_call){
+      if(p->bc_level > 0 && !p->has_ub && p->lp_stat.fp_calls <= 3){
+	 *should_call = TRUE;
+      }
+   }
+      
+   p->par.fp_frequency = orig_fp_freq;
+   
    if (*should_call == TRUE) {
       p->lp_stat.num_fp_calls_in_path++;
    }
@@ -785,5 +851,824 @@ int fp_should_call_fp(lp_prob *p, int branching, int *should_call,
 }
 
 /*===========================================================================*/
+// menal - adapted from cbc
+// See if rounding will give solution
+
+int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
+{
+
+   int numberColumns = p->mip->n;
+   int numberRows = p->mip->m; 
+   int nz = p->mip->nz;
+   int returnCode = 0, numberIntegers = 0;
+   double primalTolerance = p->lp_data->lpetol,
+      integerTolerance = primalTolerance;
+   double *lower, *upper, *solution, *objective;
+   double direction = p->mip->obj_sense == SYM_MINIMIZE ? 1: -1 ;
+   double newSolutionValue = direction*p->lp_data->objval;
+   double *element, *elementByRow;
+   int * integerVariable, row_ind, elem_ind;
+   int *row, *column, *columnStart, *rowStart, *columnLength, *rowLength;
+   int i, j;
+   
+   get_bounds(p->lp_data);
+   get_x(p->lp_data);
+   
+   lower = p->lp_data->lb;
+   upper = p->lp_data->ub;
+   solution = p->lp_data->x;
+
+   element = p->mip->matval;
+   row = p->mip->matind;
+   columnStart = p->mip->matbeg;
+   objective = p->mip->obj;
+
+   columnLength = p->mip->col_lengths;
+
+   if(!columnLength){
+      columnLength=(p->mip->col_lengths = (int *)calloc(numberColumns,ISIZE));
+      elementByRow = (p->mip->row_matval = (double *)malloc(nz*DSIZE)); 
+      column = (p->mip->row_matind = (int *)malloc(nz*ISIZE)); 
+      rowStart = (p->mip->row_matbeg = (int *)malloc((numberRows+1)*ISIZE));
+      rowLength = (p->mip->row_lengths = (int *)calloc(numberRows,ISIZE));
+
+      /* first get row legths */   
+      for(i = 0; i < numberColumns; i++){
+	 /* get orig indices here */
+	 for(j = columnStart[i]; j < columnStart[i+1]; j++){
+	    rowLength[row[j]]++;
+	 }
+	 columnLength[i] = columnStart[i+1] - columnStart[i];
+      }
+      
+      rowStart[0] = 0;
+      
+      /* fill in matbegs */
+      for(i = 0; i < numberRows; i++){
+	 rowStart[i + 1] = rowStart[i] + rowLength[i];
+      }
+
+      /* get matrix, change 'G' rows to 'L'*/
+      for(i = 0; i < numberColumns; i++){
+	 for(j = columnStart[i]; j < columnStart[i+1]; j++){
+	    row_ind = row[j];
+	    elem_ind = rowStart[row_ind];
+	    column[elem_ind] = i;
+
+	    elementByRow[elem_ind] = element[j];
+	    rowStart[row_ind] = elem_ind + 1;
+	 }
+      }
+
+      for(i = 0; i < numberRows; i++){
+	 rowStart[i] -= rowLength[i];
+      }      
+   }else{   
+   
+      elementByRow = p->mip->row_matval;
+      column = p->mip->row_matind;
+      rowStart = p->mip->row_matbeg;
+      rowLength = p->mip->row_lengths;
+   }
+
+
+   const double * rowUpper = p->lp_data->si->getRowUpper();
+   const double * rowLower = p->lp_data->si->getRowLower();
+
+   integerVariable = new int[numberColumns];
+   
+   for (i = 0; i<numberColumns; i++){
+      if (p->mip->is_int[i]){
+	 integerVariable[numberIntegers++] = i;
+      }
+   }
+   
+   // Get solution array for heuristic solution
+   
+   double * newSolution = new double [numberColumns];
+   memcpy(newSolution,solution,numberColumns*sizeof(double));
+   
+   double * rowActivity = new double[numberRows];
+   memset(rowActivity,0,numberRows*sizeof(double));
+   for (i=0;i<numberColumns;i++) {
+      int j;
+      double value = newSolution[i];
+      if (value) {
+	 for (j=columnStart[i];
+	      j<columnStart[i]+columnLength[i];j++) {
+	    int iRow=row[j];
+	    //	printf("rowind %i: %i \n", j, iRow);
+	    //	if(j < 5){
+	    //	printf("element %i: %f \n", j, element[j]);
+	    //	}
+	    rowActivity[iRow] += value*element[j];
+	 }
+      }
+   }
+   // check was feasible - if not adjust (cleaning may move)
+   for (i=0;i<numberRows;i++) {
+      if(rowActivity[i]<rowLower[i]) {
+	 //assert (rowActivity[i]>rowLower[i]-1000.0*primalTolerance);
+	 rowActivity[i]=rowLower[i];
+      } else if(rowActivity[i]>rowUpper[i]) {
+	 //assert (rowActivity[i]<rowUpper[i]+1000.0*primalTolerance);
+	 rowActivity[i]=rowUpper[i];
+      }
+   }
+   for (i=0;i<numberIntegers;i++) {
+      int iColumn = integerVariable[i];
+      double value=newSolution[iColumn];
+      if (fabs(floor(value+0.5)-value)>integerTolerance) {
+	 double below = floor(value);
+	 double newValue=newSolution[iColumn];
+	 double cost = direction * objective[iColumn];
+	 double move;
+	 if (cost>0.0) {
+	    // try up
+	    move = 1.0 -(value-below);
+	 } else if (cost<0.0) {
+	    // try down
+	    move = below-value;
+	 } else {
+	    // won't be able to move unless we can grab another variable
+	    // just for now go down
+	    move = below-value;
+	 }
+	 newValue += move;
+	 newSolution[iColumn] = newValue;
+	 newSolutionValue += move*cost;
+	 int j;
+	 for (j=columnStart[iColumn];
+	      j<columnStart[iColumn]+columnLength[iColumn];j++) {
+	    int iRow = row[j];
+	    rowActivity[iRow] += move*element[j];
+	 }
+      }
+   }
+   
+   double penalty=0.0;
+   
+   // see if feasible
+   for (i=0;i<numberRows;i++) {
+      double value = rowActivity[i];
+      double thisInfeasibility=0.0;
+      if (value<rowLower[i]-primalTolerance)
+	 thisInfeasibility = value-rowLower[i];
+      else if (value>rowUpper[i]+primalTolerance)
+	 thisInfeasibility = value-rowUpper[i];
+      if (thisInfeasibility) {
+	 // See if there are any slacks I can use to fix up
+	 // maybe put in coding for multiple slacks?
+	 double bestCost = 1.0e50;
+	 int k;
+	 int iBest=-1;
+	 double addCost=0.0;
+	 double newValue=0.0;
+	 double changeRowActivity=0.0;
+	 double absInfeasibility = fabs(thisInfeasibility);
+	 for (k=rowStart[i];k<rowStart[i]+rowLength[i];k++) {
+	    int iColumn = column[k];
+	    if (columnLength[iColumn]==1) {
+	       double currentValue = newSolution[iColumn];
+	       double elementValue = elementByRow[k];
+	       double lowerValue = lower[iColumn];
+	       double upperValue = upper[iColumn];
+	       double gap = rowUpper[i]-rowLower[i];
+	       double absElement=fabs(elementValue);
+	       if (thisInfeasibility*elementValue>0.0) {
+		  // we want to reduce
+		  if ((currentValue-lowerValue)*absElement>=absInfeasibility) {
+		     // possible - check if integer
+		     double distance = absInfeasibility/absElement;
+		     double thisCost = -direction*objective[iColumn]*distance;
+		     if (p->mip->is_int[iColumn]) {
+			distance = ceil(distance-primalTolerance);
+			if (currentValue-distance>=lowerValue-primalTolerance) {
+			   if (absInfeasibility-distance*absElement< -gap-primalTolerance)
+			      thisCost=1.0e100; // no good
+			   else
+			      thisCost = -direction*objective[iColumn]*distance;
+			} else {
+			   thisCost=1.0e100; // no good
+			}
+		     }
+		     if (thisCost<bestCost) {
+			bestCost=thisCost;
+			iBest=iColumn;
+			addCost = thisCost;
+			newValue = currentValue-distance;
+			changeRowActivity = -distance*elementValue;
+		     }
+		  }
+	       } else {
+		  // we want to increase
+		  if ((upperValue-currentValue)*absElement>=absInfeasibility) {
+		     // possible - check if integer
+		     double distance = absInfeasibility/absElement;
+		     double thisCost = direction*objective[iColumn]*distance;
+		     if (p->mip->is_int[iColumn]) {
+			distance = ceil(distance-primalTolerance);
+		//assert (currentValue-distance<=upperValue+primalTolerance);
+			if (absInfeasibility-distance*absElement< -gap-primalTolerance)
+			   thisCost=1.0e100; // no good
+			else
+			   thisCost = direction*objective[iColumn]*distance;
+		     }
+		     if (thisCost<bestCost) {
+			bestCost=thisCost;
+			iBest=iColumn;
+			addCost = thisCost;
+			newValue = currentValue+distance;
+			changeRowActivity = distance*elementValue;
+		     }
+		  }
+	       }
+	    }
+	 }
+	 if (iBest>=0) {
+	    /*printf("Infeasibility of %g on row %d cost %g\n",
+	      thisInfeasibility,i,addCost);*/
+	    newSolution[iBest]=newValue;
+	    thisInfeasibility=0.0;
+	    newSolutionValue += addCost;
+	    rowActivity[i] += changeRowActivity;
+	 }
+	 penalty += fabs(thisInfeasibility);
+      }
+   }
+   
+   // Could also set SOS (using random) and repeat
+   if (!penalty) {
+      // See if we can do better
+      //seed_++;
+      //CoinSeedRandom(seed_);
+      // Random number between 0 and 1.
+      double randomNumber = CoinDrand48();
+      int iPass;
+      int start[2];
+      int end[2];
+      int iRandom = (int) (randomNumber*((double) numberIntegers));
+      start[0]=iRandom;
+      end[0]=numberIntegers;
+      start[1]=0;
+      end[1]=iRandom;
+      for (iPass=0;iPass<2;iPass++) {
+	 int i;
+	 for (i=start[iPass];i<end[iPass];i++) {
+	    int iColumn = integerVariable[i];
+	    //double value=newSolution[iColumn];
+	    //assert (fabs(floor(value+0.5)-value)<integerTolerance);
+	    double cost = direction * objective[iColumn];
+	    double move=0.0;
+	    if (cost>0.0)
+	       move = -1.0;
+	    else if (cost<0.0)
+	       move=1.0;
+	    while (move) {
+	       bool good=true;
+	       double newValue=newSolution[iColumn]+move;
+	       if (newValue<lower[iColumn]-primalTolerance||
+		   newValue>upper[iColumn]+primalTolerance) {
+		  move=0.0;
+	       } else {
+		  // see if we can move
+		  int j;
+		  for (j=columnStart[iColumn];
+		       j<columnStart[iColumn]+columnLength[iColumn];j++) {
+		     int iRow = row[j];
+		     double newActivity = rowActivity[iRow] + move*element[j];
+		     if (newActivity<rowLower[iRow]-primalTolerance||
+			 newActivity>rowUpper[iRow]+primalTolerance) {
+			good=false;
+			break;
+		     }
+		  }
+		  if (good) {
+		     newSolution[iColumn] = newValue;
+		     newSolutionValue += move*cost;
+		     int j;
+		     for (j=columnStart[iColumn];
+			  j<columnStart[iColumn]+columnLength[iColumn];j++) {
+			int iRow = row[j];
+			rowActivity[iRow] += move*element[j];
+		     }
+		  } else {
+		     move=0.0;
+		  }
+	       }
+	    }
+	 }
+      }
+      if (newSolutionValue < *solutionValue) {
+	 // paranoid check
+	 memset(rowActivity,0,numberRows*sizeof(double));
+	 for (i=0;i<numberColumns;i++) {
+	    int j;
+	    double value = newSolution[i];
+	    if (value) {
+	       for (j=columnStart[i];
+		    j<columnStart[i]+columnLength[i];j++) {
+		  int iRow=row[j];
+		  rowActivity[iRow] += value*element[j];
+	       }
+	    }
+	 }
+	 // check was approximately feasible
+	 bool feasible=true;
+	 for (i=0;i<numberRows;i++) {
+	    if(rowActivity[i]<rowLower[i]) {
+	       if (rowActivity[i]<rowLower[i]-10.0*primalTolerance)
+		  feasible = false;
+	    } else if(rowActivity[i]>rowUpper[i]) {
+	       if (rowActivity[i]>rowUpper[i]+10.0*primalTolerance)
+		  feasible = false;
+	    }
+	 }
+	 if (feasible) {
+	    // new solution
+	    memcpy(betterSolution, newSolution, numberColumns*DSIZE);
+	    *solutionValue = newSolutionValue;
+	    //printf("** Solution of %g found by rounding\n",newSolutionValue);
+	    returnCode=1;
+	 } else {
+	    // Can easily happen
+	    //printf("Debug CbcRounding giving bad solution\n");
+	 }
+      }
+   }
+  delete [] integerVariable;
+ 
+  delete [] newSolution;
+  delete [] rowActivity;
+  return returnCode;
+}
+
 /*===========================================================================*/
+/* --menal
+  adapted from cbc-disabled
+*/
+/*===========================================================================*/
+int local_search(lp_prob *p, double *solutionValue, double *colSolution,
+		 double *betterSolution)
+{
+ 
+   LPdata *lp_data = p->lp_data;
+   int numberColumns = p->mip->n;
+   int numberRows = p->mip->m, nz = p->mip->nz;
+   int returnCode = 0, numberIntegers = 0;
+   double primalTolerance = lp_data->lpetol;
+   double *solution = colSolution, *objective;
+   double direction = p->mip->obj_sense == SYM_MINIMIZE ? 1: -1 ;
+   double newSolutionValue = direction*(*solutionValue);
+   double *element, *elementByRow;
+   int * integerVariable, *rowStart;
+   int *row, *columnStart, *columnLength, *column, *rowLength;
+   int i, j, row_ind, elem_ind;
+
+
+  element = p->mip->matval;
+  row = p->mip->matind;
+  columnStart = p->mip->matbeg;
+  objective = p->mip->obj;
+
+  columnLength = p->mip->col_lengths;
+  
+  if(!columnLength){
+     columnLength=(p->mip->col_lengths = (int *)calloc(numberColumns,ISIZE));
+     elementByRow = (p->mip->row_matval = (double *)malloc(nz*DSIZE)); 
+     column = (p->mip->row_matind = (int *)malloc(nz*ISIZE)); 
+     rowStart = (p->mip->row_matbeg = (int *)malloc((numberRows+1)*ISIZE));
+     rowLength = (p->mip->row_lengths = (int *)calloc(numberRows,ISIZE));
+     
+     /* first get row legths */   
+     for(i = 0; i < numberColumns; i++){
+	/* get orig indices here */
+	for(j = columnStart[i]; j < columnStart[i+1]; j++){
+	   rowLength[row[j]]++;
+	}
+	columnLength[i] = columnStart[i+1] - columnStart[i];
+     }
+     
+     rowStart[0] = 0;
+     
+     /* fill in matbegs */
+     for(i = 0; i < numberRows; i++){
+	rowStart[i + 1] = rowStart[i] + rowLength[i];
+     }
+     
+     /* get matrix, change 'G' rows to 'L'*/
+     for(i = 0; i < numberColumns; i++){
+	for(j = columnStart[i]; j < columnStart[i+1]; j++){
+	   row_ind = row[j];
+	   elem_ind = rowStart[row_ind];
+	   column[elem_ind] = i;
+	   
+	   elementByRow[elem_ind] = element[j];
+	   rowStart[row_ind] = elem_ind + 1;
+	}
+     }
+     
+     for(i = 0; i < numberRows; i++){
+	rowStart[i] -= rowLength[i];
+     }      
+  }else{   
+     
+     elementByRow = p->mip->row_matval;
+     column = p->mip->row_matind;
+     rowStart = p->mip->row_matbeg;
+     rowLength = p->mip->row_lengths;
+  }
+  
+
+  const double * rowUpper = p->lp_data->si->getRowUpper();
+  const double * rowLower = p->lp_data->si->getRowLower();
+
+   integerVariable = new int[numberColumns];
+   
+   for (i = 0; i<numberColumns; i++){
+      if (p->mip->is_int[i]){
+	 integerVariable[numberIntegers++] = i;
+      }
+   }
+   
+  // Column copy
+  /* 
+  const double * element = matrix.getElements();
+  const int * row = matrix.getIndices();
+  const CoinBigIndex * columnStart = matrix.getVectorStarts();
+  const int * columnLength = matrix.getVectorLengths();
+  */
+
+  // Get solution array for heuristic solution
+  double * newSolution = new double [numberColumns];
+  memcpy(newSolution,solution,numberColumns*sizeof(double));
+
+  // way is 1 if down possible, 2 if up possible, 3 if both possible
+  char * way = new char[numberIntegers];
+  // corrected costs
+  double * cost = new double[numberIntegers];
+  // for array to mark infeasible rows after iColumn branch
+  char * mark = new char[numberRows];
+  memset(mark,0,numberRows);
+  // space to save values so we don't introduce rounding errors
+  double * save = new double[numberRows];
+
+  // clean solution
+  for (i=0;i<numberIntegers;i++) {
+    int iColumn = integerVariable[i];
+    
+    // get original bounds
+    //    double originalLower = lp_data->vars[iColumn]->lb; //p->mip->lb[iColumn];
+    // double originalUpper = lp_data->vars[iColumn]->ub; //p->mip->ub[iColumn];
+
+    double originalLower = p->mip->lb[iColumn];
+    double originalUpper = p->mip->ub[iColumn];
+
+    double value=newSolution[iColumn];
+
+    if (value<originalLower) {
+       value=originalLower;
+       newSolution[iColumn]=value;
+    } else if (value>originalUpper) {
+       value=originalUpper;
+       newSolution[iColumn]=value;
+    }
+
+    double nearest=floor(value+0.5);
+    //assert(fabs(value-nearest)<10.0*primalTolerance);
+    value=nearest;
+    newSolution[iColumn]=nearest;
+    // if away from lower bound mark that fact
+    if (nearest>originalLower) {
+      //      used_[iColumn]=1;
+    }
+    cost[i] = direction*objective[iColumn];
+    int iway=0;
+    
+    if (value>originalLower+0.5) 
+      iway = 1;
+    if (value<originalUpper-0.5)
+       iway |= 2;
+    way[i]=(char)iway;
+  }
+  // get row activities
+  double * rowActivity = new double[numberRows];
+  memset(rowActivity,0,numberRows*sizeof(double));
+
+  for (i=0;i<numberColumns;i++) {
+    int j;
+    double value = newSolution[i];
+    if (value) {
+      for (j=columnStart[i];
+	   j<columnStart[i]+columnLength[i];j++) {
+	int iRow=row[j];
+	rowActivity[iRow] += value*element[j];
+      }
+    }
+  }
+  // check was feasible - if not adjust (cleaning may move)
+  // if very infeasible then give up
+  bool tryHeuristic=true;
+  for (i=0;i<numberRows;i++) {
+     if(rowActivity[i]<rowLower[i]) {
+      if (rowActivity[i]<rowLower[i]-10.0*primalTolerance)
+	tryHeuristic=false;
+      rowActivity[i]=rowLower[i];
+    } else if(rowActivity[i]>rowUpper[i]) {
+      if (rowActivity[i]<rowUpper[i]+10.0*primalTolerance)
+	tryHeuristic=false;
+      rowActivity[i]=rowUpper[i];
+    }
+  }
+  if (tryHeuristic) {
+    
+    // best change in objective
+    double bestChange=0.0;
+    
+    for (i=0;i<numberIntegers;i++) {
+      int iColumn = integerVariable[i];
+      
+      double objectiveCoefficient = cost[i];
+      int k;
+      int j;
+      int goodK=-1;
+      int wayK=-1,wayI=-1;
+      if ((way[i]&1)!=0) {
+	int numberInfeasible=0;
+	// save row activities and adjust
+	for (j=columnStart[iColumn];
+	     j<columnStart[iColumn]+columnLength[iColumn];j++) {
+	  int iRow = row[j];
+	  save[iRow]=rowActivity[iRow];
+	  rowActivity[iRow] -= element[j];
+	  if(rowActivity[iRow]<rowLower[iRow]-primalTolerance||
+	     rowActivity[iRow]>rowUpper[iRow]+primalTolerance) {
+	    // mark row
+	    mark[iRow]=1;
+	    numberInfeasible++;
+	  }
+	}
+	// try down
+	for (k=i+1;k<numberIntegers;k++) {
+	  if ((way[k]&1)!=0) {
+	    // try down
+	    if (-objectiveCoefficient-cost[k]<bestChange) {
+	      // see if feasible down
+	      bool good=true;
+	      int numberMarked=0;
+	      int kColumn = integerVariable[k];
+	      for (j=columnStart[kColumn];
+		   j<columnStart[kColumn]+columnLength[kColumn];j++) {
+		int iRow = row[j];
+		double newValue = rowActivity[iRow] - element[j];
+		if(newValue<rowLower[iRow]-primalTolerance||
+		   newValue>rowUpper[iRow]+primalTolerance) {
+		  good=false;
+		  break;
+		} else if (mark[iRow]) {
+		  // made feasible
+		  numberMarked++;
+		}
+	      }
+	      if (good&&numberMarked==numberInfeasible) {
+		// better solution
+		goodK=k;
+		wayK=-1;
+		wayI=-1;
+		bestChange = -objectiveCoefficient-cost[k];
+	      }
+	    }
+	  }
+	  if ((way[k]&2)!=0) {
+	    // try up
+	    if (-objectiveCoefficient+cost[k]<bestChange) {
+	      // see if feasible up
+	      bool good=true;
+	      int numberMarked=0;
+	      int kColumn = integerVariable[k];
+	      for (j=columnStart[kColumn];
+		   j<columnStart[kColumn]+columnLength[kColumn];j++) {
+		int iRow = row[j];
+		double newValue = rowActivity[iRow] + element[j];
+		if(newValue<rowLower[iRow]-primalTolerance||
+		   newValue>rowUpper[iRow]+primalTolerance) {
+		  good=false;
+		  break;
+		} else if (mark[iRow]) {
+		  // made feasible
+		  numberMarked++;
+		}
+	      }
+	      if (good&&numberMarked==numberInfeasible) {
+		// better solution
+		goodK=k;
+		wayK=1;
+		wayI=-1;
+		bestChange = -objectiveCoefficient+cost[k];
+	      }
+	    }
+	  }
+	}
+	// restore row activities
+	for (j=columnStart[iColumn];
+	     j<columnStart[iColumn]+columnLength[iColumn];j++) {
+	  int iRow = row[j];
+	  rowActivity[iRow] = save[iRow];
+	  mark[iRow]=0;
+	}
+      }
+      if ((way[i]&2)!=0) {
+	int numberInfeasible=0;
+	// save row activities and adjust
+	for (j=columnStart[iColumn];
+	     j<columnStart[iColumn]+columnLength[iColumn];j++) {
+	  int iRow = row[j];
+	  save[iRow]=rowActivity[iRow];
+	  rowActivity[iRow] += element[j];
+	  if(rowActivity[iRow]<rowLower[iRow]-primalTolerance||
+	     rowActivity[iRow]>rowUpper[iRow]+primalTolerance) {
+	    // mark row
+	    mark[iRow]=1;
+	    numberInfeasible++;
+	  }
+	}
+	// try up
+	for (k=i+1;k<numberIntegers;k++) {
+	  if ((way[k]&1)!=0) {
+	    // try down
+	    if (objectiveCoefficient-cost[k]<bestChange) {
+	      // see if feasible down
+	      bool good=true;
+	      int numberMarked=0;
+	      int kColumn = integerVariable[k];
+	      for (j=columnStart[kColumn];
+		   j<columnStart[kColumn]+columnLength[kColumn];j++) {
+		int iRow = row[j];
+		double newValue = rowActivity[iRow] - element[j];
+		if(newValue<rowLower[iRow]-primalTolerance||
+		   newValue>rowUpper[iRow]+primalTolerance) {
+		  good=false;
+		  break;
+		} else if (mark[iRow]) {
+		  // made feasible
+		  numberMarked++;
+		}
+	      }
+	      if (good&&numberMarked==numberInfeasible) {
+		// better solution
+		goodK=k;
+		wayK=-1;
+		wayI=1;
+		bestChange = objectiveCoefficient-cost[k];
+	      }
+	    }
+	  }
+	  if ((way[k]&2)!=0) {
+	    // try up
+	    if (objectiveCoefficient+cost[k]<bestChange) {
+	      // see if feasible up
+	      bool good=true;
+	      int numberMarked=0;
+	      int kColumn = integerVariable[k];
+	      for (j=columnStart[kColumn];
+		   j<columnStart[kColumn]+columnLength[kColumn];j++) {
+		int iRow = row[j];
+		double newValue = rowActivity[iRow] + element[j];
+		if(newValue<rowLower[iRow]-primalTolerance||
+		   newValue>rowUpper[iRow]+primalTolerance) {
+		  good=false;
+		  break;
+		} else if (mark[iRow]) {
+		  // made feasible
+		  numberMarked++;
+		}
+	      }
+	      if (good&&numberMarked==numberInfeasible) {
+		// better solution
+		goodK=k;
+		wayK=1;
+		wayI=1;
+		bestChange = objectiveCoefficient+cost[k];
+	      }
+	    }
+	  }
+	}
+	// restore row activities
+	for (j=columnStart[iColumn];
+	     j<columnStart[iColumn]+columnLength[iColumn];j++) {
+	  int iRow = row[j];
+	  rowActivity[iRow] = save[iRow];
+	  mark[iRow]=0;
+	}
+      }
+      if (goodK>=0) {
+	// we found something - update solution
+	for (j=columnStart[iColumn];
+	     j<columnStart[iColumn]+columnLength[iColumn];j++) {
+	  int iRow = row[j];
+	  rowActivity[iRow]  += wayI * element[j];
+	}
+	newSolution[iColumn] += wayI;
+	int kColumn = integerVariable[goodK];
+	for (j=columnStart[kColumn];
+	     j<columnStart[kColumn]+columnLength[kColumn];j++) {
+	  int iRow = row[j];
+	  rowActivity[iRow]  += wayK * element[j];
+	}
+	newSolution[kColumn] += wayK;
+	// See if k can go further ?
+	// get original bounds
+	double originalLower = p->mip->lb[kColumn];
+	double originalUpper = p->mip->ub[kColumn];
+	
+	double value=newSolution[kColumn];
+	int iway=0;
+	if (value>originalLower+0.5) 
+	  iway = 1;
+	if (value<originalUpper-0.5) 
+	  iway |= 2;
+	way[goodK]=(char)iway;
+      }
+    }
+    if (bestChange+newSolutionValue<*solutionValue) {
+       // paranoid check
+      memset(rowActivity,0,numberRows*sizeof(double));
+      
+      for (i=0;i<numberColumns;i++) {
+	int j;
+	double value = newSolution[i];
+	if (value) {
+	  for (j=columnStart[i];
+	       j<columnStart[i]+columnLength[i];j++) {
+	    int iRow=row[j];
+	    rowActivity[iRow] += value*element[j];
+	  }
+	}
+      }
+      int numberBad=0;
+      double sumBad=0.0;
+      
+      // check was approximately feasible
+      for (i=0;i<numberRows;i++) {
+	 if(rowActivity[i]<rowLower[i]) {
+	    sumBad += rowLower[i]-rowActivity[i];
+	    if (rowActivity[i]<rowLower[i]-10.0*primalTolerance)
+	       numberBad++;
+	 } else if(rowActivity[i]>rowUpper[i]) {
+	    sumBad += rowUpper[i]-rowActivity[i];
+	    if (rowActivity[i]>rowUpper[i]+10.0*primalTolerance)
+	       numberBad++;
+	 }
+      }
+      if (!numberBad) {
+	 for (i=0;i<numberIntegers;i++) {
+	    int iColumn = integerVariable[i];
+	    // get original bounds
+	    double originalLower = p->mip->lb[iColumn];
+	    //double originalUpper = p->mip->ub[iColumn];
+	    
+	    double value=newSolution[iColumn];
+	    // if away from lower bound mark that fact
+	    if (value>originalLower) {
+	       //used_[iColumn]=1;
+	    }
+	 }
+	 // new solution
+	 memcpy(betterSolution,newSolution,numberColumns*sizeof(double));
+	 returnCode=1;
+	 *solutionValue = newSolutionValue + bestChange;
+      } else {
+	 // bad solution - should not happen so debug if see message
+	 printf("Local search got bad solution with %d infeasibilities"
+		"summing to %g\n",
+		numberBad,sumBad);
+      }
+    }
+  }
+  
+  delete [] integerVariable;
+
+  delete [] newSolution;
+  delete [] rowActivity;
+  delete [] way;
+  delete [] cost;
+  delete [] save;
+  delete [] mark;
+
+  return returnCode;
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+
+
+
+
+
+
+
+
+
+
 

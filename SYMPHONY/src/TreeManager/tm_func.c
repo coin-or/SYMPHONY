@@ -3329,6 +3329,8 @@ void free_tm(tm_prob *tm)
       FREE(tm->br_rel_down);
       FREE(tm->br_rel_up);
       FREE(tm->br_rel_cand_list);
+      FREE(tm->br_rel_down_min_level);
+      FREE(tm->br_rel_up_min_level);
    }
    
    FREE(tm);

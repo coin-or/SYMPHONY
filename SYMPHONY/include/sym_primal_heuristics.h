@@ -57,6 +57,7 @@ typedef struct FP_DATA {
    int           verbosity;
    double        flip_fraction;
    double        norm;
+   int           iterd;
 }FPdata;
 
 /*  solution pool */

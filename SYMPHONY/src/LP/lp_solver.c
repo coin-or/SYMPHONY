@@ -126,6 +126,7 @@ void free_mip_desc(MIPdesc *mip)
    }
 
    if(mip->mip_inf){
+      
       FREE(mip->mip_inf->rows);
       FREE(mip->mip_inf->cols);
       FREE(mip->mip_inf);
@@ -2314,6 +2315,7 @@ void open_lp_solver(LPdata *lp_data)
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
    lp_data->si->setupForRepeatedUse();
+   //lp_data->si->setupForRepeatedUse(2,0);
    //lp_data->si->getModelPtr()->setFactorizationFrequency(200);
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
@@ -2375,7 +2377,6 @@ void unload_lp_prob(LPdata *lp_data)
    /* Set parameters as in open_lp_solver() (do these persist?) */
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
-
    lp_data->m = lp_data->n = lp_data->nz = 0;
 }
 
@@ -3867,22 +3868,15 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
 
    /* create CGL twomir cuts */
-   if(cut_num < max_cuts_before_resolve &&
-         par->generate_cgl_twomir_cuts > -1 && 
-      par->generate_cgl_twomir_cuts_freq > 0){
-     if(par->generate_cgl_twomir_cuts == GENERATE_ALWAYS || 
-	 (par->generate_cgl_twomir_cuts == GENERATE_ONLY_IN_ROOT &&
-	  is_rootnode && par->twomir_generated_in_root) || 
-	((par->generate_cgl_twomir_cuts == GENERATE_DEFAULT ||
-	  par->generate_cgl_twomir_cuts == GENERATE_IF_IN_ROOT) &&
-	 par->twomir_generated_in_root) ||
-	(par->generate_cgl_twomir_cuts == GENERATE_PERIODICALLY &&
-	 (lp_data->lp_count % par->generate_cgl_twomir_cuts_freq == 0)) ||
-	 is_top_iter){
-				     
-       CglTwomir *twomir = new CglTwomir;
-       twomir->setMaxElements (100);
-       twomir->setCutTypes (TRUE, TRUE, TRUE, TRUE);
+   should_generate_this_cgl_cut(cut_num, max_cuts_before_resolve, 
+				par->generate_cgl_twomir_cuts, 
+				par->generate_cgl_twomir_cuts_freq, 
+				bc_level, bc_index, 
+				lp_stat->twomir_cuts_root, &should_generate);
+   if (should_generate==TRUE) {				     
+      CglTwomir *twomir = new CglTwomir;
+      twomir->setMaxElements (100);
+      twomir->setCutTypes (TRUE, TRUE, TRUE, TRUE);
        twomir->generateCuts(*(lp_data->si), cutlist);
        if ((new_cut_num = cutlist.sizeCuts() - cut_num) > 0) {
 	  if (is_top_iter){
@@ -3944,20 +3938,15 @@ void generate_cgl_cuts(LPdata *lp_data, int *num_cuts, cut_data ***cuts,
    }
 
    /* create CGL odd hole cuts */
-   if(par->generate_cgl_oddhole_cuts > -1 && 
-      par->generate_cgl_oddhole_cuts_freq > 0){
-     if(par->generate_cgl_oddhole_cuts == GENERATE_ALWAYS || 
-	 (par->generate_cgl_oddhole_cuts == GENERATE_ONLY_IN_ROOT &&
-	  is_rootnode && par->oddhole_generated_in_root) || 
-	((par->generate_cgl_oddhole_cuts == GENERATE_DEFAULT ||
-	  par->generate_cgl_oddhole_cuts == GENERATE_IF_IN_ROOT) &&
-	 par->oddhole_generated_in_root) ||
-	(par->generate_cgl_oddhole_cuts == GENERATE_PERIODICALLY &&
-	 (lp_data->lp_count % par->generate_cgl_oddhole_cuts_freq == 0)) ||
-	 is_top_iter){
-				     
-       CglOddHole *oddhole = new CglOddHole;
-       //#if 0
+   should_generate_this_cgl_cut(cut_num, max_cuts_before_resolve, 
+				par->generate_cgl_oddhole_cuts, 
+				par->generate_cgl_oddhole_cuts_freq, 
+				bc_level, bc_index, 
+				lp_stat->oddhole_cuts_root, 
+				&should_generate);
+   if (should_generate==TRUE) {		     
+      CglOddHole *oddhole = new CglOddHole;
+      //#if 0
        oddhole->setMinimumViolation(0.005);
        oddhole->setMinimumViolationPer(0.00002);
        oddhole->setMaximumEntries(200);

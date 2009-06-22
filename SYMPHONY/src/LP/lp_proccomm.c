@@ -532,7 +532,7 @@ void send_node_desc(lp_prob *p, int node_type)
 
       n->avg_br_obj_impr_in_path =
          p->lp_stat.avg_br_obj_impr_in_path;
-
+      
    } else {
       n->num_cut_iters_in_path = 0;
       n->num_cuts_added_in_path = 0;
@@ -544,16 +544,17 @@ void send_node_desc(lp_prob *p, int node_type)
 
       n->num_fp_calls_in_path = 0;
    }
+
+   n->start_objval = p->lp_stat.start_objval;
+   n->end_objval = p->lp_stat.end_objval;
    n->num_str_br_cands_in_path =
       p->lp_stat.num_str_br_cands_in_path;
    n->num_fp_calls_in_path =
-      p->lp_stat.num_fp_calls_in_path;
+      p->lp_stat.num_fp_calls_in_path;   
 
 #else
    int s_bufid;
 #endif
-
-   
 
 #ifdef SENSITIVITY_ANALYSIS
       if (tm->par.sensitivity_analysis && 

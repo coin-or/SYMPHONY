@@ -442,6 +442,7 @@ int create_subproblem_u(lp_prob *p)
    /* generate the random hash. useful for checking duplicacy of cuts and 
     * solutions from feasibility pump
     */
+
    if (p->par.is_userind_in_order == FALSE || p->bc_index == 0) {
       darray = lp_data->random_hash;
       for (i=0; i<lp_data->n; i++) {
@@ -543,28 +544,44 @@ int create_subproblem_u(lp_prob *p)
    }else{
       desc->cuts = NULL;
    }
-
+   lp_data->cgl = p->par.cgl;
+   
 #ifdef COMPILE_IN_LP 
    /* reliability branching */
    /* pseudo costs and reliability measures */
    if (p->tm->pcost_down==NULL) {
       p->pcost_down = (double *)calloc(p->mip->n, DSIZE);
       p->pcost_up = (double *)calloc(p->mip->n, DSIZE);
+      p->pcost_avg = (double *)calloc(p->mip->n, DSIZE);
       p->br_rel_down = (int *)calloc(p->mip->n, ISIZE);
       p->br_rel_up = (int *)calloc(p->mip->n, ISIZE);
       p->br_rel_cand_list = (int *)calloc(p->mip->n, ISIZE);
+      p->br_rel_down_min_level = (int *)malloc(p->mip->n* ISIZE);
+      p->br_rel_up_min_level = (int *)malloc(p->mip->n* ISIZE);
+      for(i = 0; i <p->mip->n; i++){
+	 p->br_rel_down_min_level[i] =
+	    p->br_rel_up_min_level[i] = (int)1e7;
+      }
       p->tm->pcost_down = p->pcost_down;
       p->tm->pcost_up = p->pcost_up;
+      p->tm->pcost_avg = p->pcost_avg;
       p->tm->br_rel_down = p->br_rel_down;
       p->tm->br_rel_up = p->br_rel_up;
       p->tm->br_rel_cand_list = p->br_rel_cand_list;
+      p->tm->br_rel_down_min_level = p->br_rel_down_min_level;
+      p->tm->br_rel_up_min_level = p->br_rel_up_min_level;      
    } else {
       p->pcost_down = p->tm->pcost_down;
       p->pcost_up = p->tm->pcost_up;
+      p->pcost_avg = p->tm->pcost_avg;
       p->br_rel_down = p->tm->br_rel_down;
       p->br_rel_up = p->tm->br_rel_up;
+      p->br_rel_down_min_level = p->tm->br_rel_down_min_level;
+      p->br_rel_up_min_level = p->tm->br_rel_up_min_level;      
    }
 #endif 
+
+   p->str_br_check = TRUE;
 
    /*------------------------------------------------------------------------*\
     * Now go through the branching stuff
@@ -774,7 +791,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    indices = lp_data->tmp.i1; /* n */
    values = lp_data->tmp.d; /* n */
 
-   char do_local_search;
+   char do_local_search = TRUE;
    double d_gap; 
    heur_solution = p->lp_data->heur_solution;
    
@@ -834,6 +851,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       break;
    }
    
+#ifdef COMPILE_IN_LP
    /* try rounding first */
    if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE && 
        p->par.do_primal_heuristic &&
@@ -845,17 +863,18 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       
       if (p->has_ub){
 	 d_gap = (p->ub-p->lp_data->objval)/(fabs(p->ub)+0.0001)*100;
-	 if(d_gap > p->par.fp_min_gap/10){	 
+	 if(d_gap > 0.0001){
 	    true_objval = p->ub;
 	    if (round_solution(p, &true_objval, heur_solution)){
 	       feasible = IP_HEUR_FEASIBLE;
 	    }
 	 }
 	 do_local_search = FALSE; 
-	 if(do_local_search){ //disable local search for now
+	 if(do_local_search && p->mip->n - p->mip->mip_inf->cont_var_num < 12500){// &&
+	    //	    p->bc_level <=10){ 
 	    if(feasible == IP_HEUR_FEASIBLE){ 
 	       if((true_objval - p->lp_data->objval)/
-		  (fabs(true_objval)+0.0001)*100 - d_gap < 0.1998){
+		  (fabs(true_objval)+0.0001)*100 - d_gap < 0.0133){
 		  col_sol = (double *)calloc(DSIZE, lp_data->n);
 		  memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
 		  do_local_search = TRUE;
@@ -869,26 +888,26 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	    }
 	 }
 	 if(do_local_search){
+	    printf("callin ls-1\n");
 	    if (local_search(p, &true_objval, col_sol, heur_solution)){
 	       feasible = IP_HEUR_FEASIBLE;
+	       printf("found ls -1\n");
 	    }
 	 }
       }else{
-	 if(p->bc_level < 300){
-	    if (round_solution(p, &true_objval, heur_solution)){
-	       feasible = IP_HEUR_FEASIBLE;
-	    }
+	 if (round_solution(p, &true_objval, heur_solution)){
+	    feasible = IP_HEUR_FEASIBLE;
 	 }
       }
    }
 
-#ifdef COMPILE_IN_LP
    if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
       fp_should_call_fp(p,branching,&should_call_fp,is_last_iter); 
       if (should_call_fp==TRUE) {
          termcode    = feasibility_pump (p, &found_better_solution, 
-               new_obj_val, heur_solution);
-         if (termcode!=FUNCTION_TERMINATED_NORMALLY) {
+					 new_obj_val, heur_solution);
+
+	 if (termcode!=FUNCTION_TERMINATED_NORMALLY) {
             PRINT(p->par.verbosity,0,("warning: feasibility pump faced some "
                      "difficulties.\n"));
          } else if (found_better_solution) {
@@ -1020,6 +1039,16 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 #endif
    }
 
+#if 0
+   if(is_last_iter){
+      for (i=p->lp_data->mip->n-1; i>=0; i--){
+	 if (vars[i]->is_int)
+	    p->lp_data->si->setInteger(i);
+      }
+      write_mps(p->lp_data, "test");
+   }
+#endif   
+   //printf("feasible: solution = %f\n", lp_data->objval);
    FREE(col_sol);
    return(feasible);
 }
@@ -1275,7 +1304,8 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
       int feas_status = is_feasible_u(p, FALSE, TRUE);
       p->comp_times.primal_heur += used_time(&p->tt);
       if (feas_status == IP_FEASIBLE || (feas_status==IP_HEUR_FEASIBLE &&
-               p->ub < oldobj - lp_data->lpetol)) {
+					 p->ub < oldobj - lp_data->lpetol)){// && //){
+	  //					 *cuts > 0)){
          return(DO_NOT_BRANCH__FEAS_SOL);
       }
    }
@@ -1329,9 +1359,9 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
    /* before branching, update the control parameters for cut generation
     * --asm4
     */
-   if (p->bc_level==0) {
-      update_cut_parameters(p);
-   }
+   //   if (p->bc_level==0) {
+   //update_cut_parameters(p);
+   // }
 
    /* OK, so we got to branch */
 #ifdef USE_SYM_APPLICATION
@@ -1391,11 +1421,81 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
     default:
       break;
    }
-
+   
+#if 0
+   int cand_num_max = p->par.strong_branching_cand_num_max;
+   int cand_num_min = p->par.strong_branching_cand_num_min;
+   int max_num = p->par.max_presolve_iter;
+   int max_backtrack = 5;
+   int scale_by = 1;
+   double avg_gap = 0;
+   if(!p->par.user_set_strong_branching_cand_num && p->str_br_check){
+      cand_num_max = MAX(20, (int)(50000/p->lp_stat.lp_max_iter_num));
+      cand_num_min = MAX(5, (int)(20000/p->lp_stat.lp_max_iter_num));
+      max_num = MIN(500, p->lp_stat.lp_max_iter_num);
+#ifdef COMPILE_IN_LP     
+      if(p->bc_level > 0){
+	 if(p->str_br_check){
+	    bc_node * node = p->tm->active_nodes[p->proc_index];
+	    for(i = 0; i < max_backtrack && node->parent; i++){
+	       avg_gap += fabs(node->start_objval/node->parent->end_objval - 1.0);
+	       node = node->parent;
+	    }
+	    if(avg_gap/i < 0.00333){
+	       if(i >= max_backtrack){
+		  p->str_br_check = FALSE;
+	       }else{
+		  scale_by = 10;
+	       }
+	    }else{
+	       if(p->comp_times.strong_branching > 7*p->tt/10){
+		  if(avg_gap/i <0.05){
+		     scale_by = 10;
+		  }else{
+		     scale_by = 2;
+		  }
+	       }else if(p->comp_times.strong_branching > p->tt/2){
+		  if(avg_gap/i <0.05){
+		     scale_by = 6;
+		  }else{
+		     scale_by = 2;
+		  }
+	       }else if (p->comp_times.strong_branching > 3*p->tt/10){
+		  if(avg_gap/i < 0.05){
+		     scale_by = 4;
+		  }else{
+		     scale_by = 2;
+		  }
+	       }else{
+		  if(avg_gap/i < 0.1){
+		     scale_by = 2;
+		  }
+	       }
+	    }
+	 }
+	 if(p->str_br_check){
+	    cand_num_max = MAX(20, (int)(cand_num_max/scale_by));
+	    cand_num_min = MAX(5, (int)(cand_num_max/scale_by));
+	    max_num = MIN(100, (int)(max_num/scale_by));	    
+	 }
+      }
+   }
+   //   cand_num_max =500;
+   // cand_num_min = 500;
+   //p->par.rel_br_cand_threshold = 500; 
+   p->lp_stat.str_presolve_iter_num = max_num = 500;
+   //   p->par.strong_branching_cand_num_min = 200;
+   i = (int) (cand_num_max -
+	      p->par.strong_branching_red_ratio * p->bc_level);
+   i = MAX(i, cand_num_min);
+#endif
+#endif
+   p->lp_stat.str_presolve_iter_num = p->par.max_presolve_iter;
+   
    i = (int) (p->par.strong_branching_cand_num_max -
-      p->par.strong_branching_red_ratio * p->bc_level);
+	      p->par.strong_branching_red_ratio * p->bc_level);
    i = MAX(i, p->par.strong_branching_cand_num_min);
-
+   
    switch(user_res){
     case USER__CLOSE_TO_HALF:
       branch_close_to_half(p, i, cand_num, candidates);
@@ -2339,13 +2439,14 @@ int generate_cuts_in_lp_u(lp_prob *p)
                            ub, &bound_changes, &(p->lp_stat), &(p->comp_times),
                            p->par.verbosity);
                            */
-         generate_cgl_cuts_new(p, &new_row_num, &cuts, FALSE, &bound_changes);
-         if (bound_changes>0) {
-            p->bound_changes_in_iter += bound_changes;
-         }
-	 if(p->bc_index < 1 && p->iter_num == 1 ){
-	    p->par.cgl = lp_data->cgl;
+	 generate_cgl_cuts_new(p, &new_row_num, &cuts, FALSE,
+			       &bound_changes);
+	 if (bound_changes>0) {
+	    p->bound_changes_in_iter += bound_changes;
 	 }
+	 // if(p->bc_index < 1 && p->iter_num == 1 ){
+	 //  p->par.cgl = lp_data->cgl;
+	 // }
       }
 #endif
       /* Fall through to next case */

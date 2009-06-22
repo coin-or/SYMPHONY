@@ -188,7 +188,17 @@
 #define CGL_GOMORY_GENERATOR        3
 #define CGL_TWOMIR_GENERATOR        4
 #define CGL_FLOWCOVER_GENERATOR     5
-#define CGL_NUM_GENERATORS          6
+#define CGL_ODDHOLE_GENERATOR       6
+#define CGL_MIR_GENERATOR           7
+#define CGL_NUM_GENERATORS          7
+
+
+/* --------------- the status of cut generation on the chain ----------------*/
+#define CGL_CHAIN_START             0
+#define CGL_CHAIN_CONTINUE          1
+#define CGL_CHAIN_CHECK             2
+#define CGL_CHAIN_PAUSE             3  
+#define CGL_CHAIN_STOP              4
 
 /*---------------- what is the status of a particular constraint ------------*/
 #define VIOLATED_ROW                0

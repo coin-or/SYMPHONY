@@ -13,7 +13,7 @@
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
-/* last modified: January 09, menal*/
+/* last modified: June 09, menal*/
 
 #include <memory.h>
 #include <string.h>
@@ -223,7 +223,7 @@ int prep_basic(PREPdesc *P)
 							    FIX_BINARY, TRUE, 
 							    TRUE);
 		  if(termcode == PREP_INFEAS){
-		     free_imp_list(&(cols[col_ind].ulist));
+		     free_imp_list(&(cols[col_ind].ulist));		     
 		     /*then this column is fixable to its lower bound! */
 		     new_bound = 0.0;
 		     fix_type = FIX_BINARY;
@@ -444,6 +444,14 @@ int prep_basic(PREPdesc *P)
    
    FREE(impl_vars);
 
+   /* we dont use impl_lists now, so delete them */
+   if(can_impl){ 
+      for(j = 0; j < n; j++){
+	 free_imp_list(&cols[j].ulist);
+	 free_imp_list(&cols[j].llist);      
+      }
+   }   
+   
    if(new_changes_cnt + stats->coeffs_changed + mip_inf->fixed_var_num > 0){
       termcode = prep_cleanup_desc(P);
    }
@@ -451,6 +459,10 @@ int prep_basic(PREPdesc *P)
    if(PREP_QUIT(termcode)){
       return termcode;
    }   
+
+   if(P->mip->mip_inf->binary_sos_row_num){
+      prep_sos_fill_var_cnt(P);
+   }
    
    if(stats->rows_deleted + 
       stats->vars_fixed + 
@@ -1797,7 +1809,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 	       }
 	    }
 
-	    if(verbosity >=3){
+	    if(verbosity >=10){
 	       if(mip->colname){
 		  prep_declare_coef_change(row_ind, col_ind, 
 					   mip->colname[col_ind], 
@@ -3128,7 +3140,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
    double coef_val, fixed_obj_offset;  
    int row_ind, cont_var_cnt = 0, bin_var_cnt = 0, fixed_var_cnt = 0;   
    int  row_unbounded_cnt, max_row_size, max_col_size, bin_var_nz_cnt = 0;
-   int * row_coef_bin_cnt = NULL, *row_sign_pos_cnt = NULL, bin_row_cnt; 
+   int * row_coef_bin_cnt = NULL, *row_sign_pos_cnt = NULL, bin_row_cnt;
    char is_binary, is_bounded, unbounded_below, unbounded_above;
    int gen_type; /* 0 fractional, 1 integer, 2 binary */
    int col_size, col_coef_bin_cnt, col_coef_frac_cnt, col_sign_pos_cnt; 
@@ -3137,7 +3149,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
    int is_col_all_neg; /* if we convert all constraints to 'L' */
    int is_col_all_pos; /* if we convert all constraints to 'L' */
    int obj_size; /* number of nonzeros in objective function */
-   int bin_sos_row_cnt = 0;
+   int bin_sos_row_cnt = 0, bin_cont_row_cnt, cont_row_cnt = 0;
    
    MIPdesc *mip = P->mip;
    prep_stats *stats = &(P->stats);
@@ -3400,7 +3412,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
 		  later(if prep.is used) will include 'U' and 'L' 
 		  variables */
 	       //total_obj_offset += obj[i] * ub[i];
-	       if(verbosity >= 2){
+	       if(verbosity >= 20){
 		  if(mip->colname){
 		     printf("var %s [%i] is fixable to its upper bound: %f\n", 
 			    mip->colname[i], i, ub[i]);
@@ -3420,7 +3432,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	       return(PREP_UNBOUNDED);
 	    }else{
 	       //total_obj_offset += obj[i] * lb[i];
-	       if(verbosity >= 2){
+	       if(verbosity >= 20){
 		  if(mip->colname){
 		     printf("var %s [%i] is fixable to its lower bound: %f\n", 
 			    mip->colname[i], i, lb[i]);
@@ -3471,7 +3483,9 @@ int prep_initialize_mipinfo(PREPdesc *P)
 
    max_row_size = 0;
    bin_row_cnt = 0;
-
+   cont_row_cnt = 0;
+   bin_cont_row_cnt = 0;
+   
    for(j = 0; j < m; j++){
       
       if(rows[j].size > max_row_size){
@@ -3489,6 +3503,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	       gen_type = ALL_MIXED_TYPE;
 	    }
 	    bin_row_cnt++;
+	    bin_cont_row_cnt++;
 	 } else {
 	    if (rows[j].cont_var_num + rows[j].fixed_var_num < rows[j].size){
 	       gen_type = INT_CONT_TYPE;
@@ -3496,6 +3511,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	       gen_type = CONTINUOUS_TYPE;
 	    }
 	 }
+	 cont_row_cnt++;
       }else{
 	 if(rows[j].bin_var_num > 0){
 	    if(rows[j].bin_var_num + rows[j].fixed_var_num < rows[j].size){
@@ -3579,8 +3595,19 @@ int prep_initialize_mipinfo(PREPdesc *P)
       rows[j].sr_lb = rows[j].lb;
    }
 
+   /*   
+   if(bin_sos_row_cnt > 0){
+      for(i = 0; i < n; i++){	 
+	 for(j = matbeg[i]; j < matbeg[i+1]; j++){
+	    if(rows[matind[j]].is_sos_row)
+	       cols[i].sos_num += (rows[matind[j]].size - 1);
+	 }
+      }
+   }
+   */
+   
   /* work on obj */
-
+   
    if(!(cont_var_cnt - integerizable_var_num)){
       for(i = 0; i < n; i++){
 	 coef_val = obj[i];
@@ -3630,17 +3657,30 @@ int prep_initialize_mipinfo(PREPdesc *P)
    mip_inf->cont_var_num = cont_var_cnt;
    mip_inf->binary_var_num = bin_var_cnt;
    mip_inf->binary_var_nz = bin_var_nz_cnt;
+   mip_inf->int_var_ratio = (1.0*(n - cont_var_cnt))/(n + 1); 
+   mip_inf->cont_var_ratio = 1.0*cont_var_cnt/(n + 1);
+   mip_inf->bin_var_ratio = 1.0*bin_var_cnt/(n +1);
    mip_inf->fixed_var_num = fixed_var_cnt;
    mip_inf->max_row_size = max_row_size;
-   mip_inf->max_col_size = max_col_size;   
+   mip_inf->max_col_size = max_col_size;
+   mip_inf->max_row_ratio = 1.0*max_row_size/(n+1);
+   mip_inf->max_col_ratio = 1.0*max_col_size/(m+1);
    mip_inf->obj_size = obj_size;
-   mip_inf->mat_density = mip->nz/(n*m);
+   mip_inf->mat_density = 1.0*mip->nz/(n*m + 1);
+   mip_inf->row_density = 1.0*mip->nz/(n+1);
+   mip_inf->col_density = 1.0*mip->nz/(m+1);
    mip_inf->integerizable_var_num = integerizable_var_num;
    mip_inf->is_opt_val_integral = is_opt_val_integral;
    mip_inf->sum_obj_offset = fixed_obj_offset;
    mip_inf->binary_row_num = bin_row_cnt;
    mip_inf->binary_sos_row_num = bin_sos_row_cnt;
-   
+   mip_inf->cont_row_num = cont_row_cnt;
+   mip_inf->bin_cont_row_num = bin_cont_row_cnt;
+
+   mip_inf->sos_bin_row_ratio = 1.0*bin_sos_row_cnt/(bin_row_cnt +1);
+   mip_inf->bin_row_ratio = 1.0*bin_row_cnt/(m +1);
+
+   //   printf("m, cont_row_num: %i\t%i\n", m, cont_row_cnt);
    if(bin_var_cnt){
       mip_inf->row_bin_den = (int)
 	 (bin_var_nz_cnt/bin_row_cnt) + 1;
@@ -3666,8 +3706,32 @@ int prep_initialize_mipinfo(PREPdesc *P)
 
    mip_inf->rows = rows;
    mip_inf->cols = cols;
-   mip->mip_inf = mip_inf;  
 
+   if(mip->mip_inf){
+      FREE(mip->mip_inf->rows);
+      FREE(mip->mip_inf->cols);
+      FREE(mip->mip_inf);
+   }
+
+   mip->mip_inf = mip_inf;  
+   /*
+   double mat_den = (1.0)* mip->nz/(mip->m * mip->n + 1);
+   double int_den = (1.0*(mip->n-mip->mip_inf->cont_var_num))/(mip->n + 1);
+   double max_row_col_den = (1.0*mip->mip_inf->max_col_size *
+			     mip->mip_inf->max_row_size)/(mip->n * mip->m);
+   double max_col_den = 1.0*mip->mip_inf->max_col_size/(mip->m + 1);
+   double max_row_den = 1.0*mip->mip_inf->max_row_size/(mip->n + 1);
+   printf("mat_den - int_den  - row_col_den: %f %f %f \n",
+	  mat_den, int_den, max_row_col_den);
+   printf("col_den - row_den %f %f \n", max_col_den, max_row_den);
+   
+   if((mat_den < 0.05 && int_den > 0.05 && (max_col_den > 0.05 ||
+					    max_row_den > 0.05)) 
+      || mip->nz > 1e5){ 
+      printf("TRUE");
+   }
+   */
+   
    FREE(row_coef_bin_cnt);
    FREE(row_sign_pos_cnt);
    FREE(rows_integerized_var_ind);
@@ -3741,7 +3805,7 @@ int prep_integerize_bounds(PREPdesc *P)
 	       cols[i].var_type = 'F';
 	    }
 	    b_cnt++;
-	    if (verbosity>=3) {
+	    if (verbosity>=20) {
 	       if(mip->colname){
 		  printf("integerized bounds [lb-ub] of variable %s:"
 			 "%f - %f\n",
@@ -3925,7 +3989,8 @@ int prep_cleanup_desc(PREPdesc *P)
    int row_ind, elem_ind, *matind, *matbeg, *r_matind, *r_matbeg, *r_lengths; 
    double *ub, *lb, *matval, *r_matval, *obj, *rhs, *rngval, *fixed_val;
    double obj_offset, debug_offset;
-   int new_del_cnt, *c_lengths, binary_var_nz, binary_var_num, bin_row_cnt;
+   int new_del_cnt, *c_lengths, binary_var_nz, binary_var_num, bin_row_cnt,
+      cont_row_cnt, bin_cont_row_cnt;
    int sos_row_cnt;
    
    MIPdesc *mip = P->mip;
@@ -4056,7 +4121,7 @@ int prep_cleanup_desc(PREPdesc *P)
    col_nz = col_num = 0;
    old_start = 0;
    for(i = 0; i < n; i++){
-      if(cols[i].var_type != 'F'){
+       if(cols[i].var_type != 'F'){
 	 for(j = old_start; j < matbeg[i+1]; j++){
 	    r_ind = matind[j];
 	    if(!(rows[r_ind].is_redundant)){
@@ -4212,6 +4277,8 @@ int prep_cleanup_desc(PREPdesc *P)
    }
 
    bin_row_cnt = 0;
+   cont_row_cnt = 0;
+   bin_cont_row_cnt = 0;
    sos_row_cnt = 0;
    for(i = 0; i < row_num; i++){
       r_matbeg[i] -= r_lengths[i];
@@ -4220,46 +4287,94 @@ int prep_cleanup_desc(PREPdesc *P)
       }
       if(rows[i].bin_var_num){
 	 bin_row_cnt++;
+	 if(rows[i].cont_var_num){
+	    bin_cont_row_cnt++;
+	 }
       }
+      
+      if(rows[i].cont_var_num){
+	 cont_row_cnt++;
+      }
+	 
       if(rows[i].is_sos_row){
 	 sos_row_cnt++;
       }
    }
+
+   MIPinfo * mip_inf = mip->mip_inf;
    
    mip->n = col_num;
    mip->m = row_num;
    mip->nz = col_nz;
-   mip->obj_offset = mip->mip_inf->sum_obj_offset + obj_offset;     
+   mip->obj_offset = mip_inf->sum_obj_offset + obj_offset;     
    mip->fixed_n = fixed_nz;
-   mip->mip_inf->binary_var_num = binary_var_num;
-   mip->mip_inf->binary_var_nz = binary_var_nz;
-   mip->mip_inf->max_row_size = max_row_size;
-   mip->mip_inf->max_col_size = max_col_size;
-   mip->mip_inf->binary_row_num = bin_row_cnt;
-   mip->mip_inf->binary_sos_row_num = sos_row_cnt;
+   mip_inf->binary_var_num = binary_var_num;
+   mip_inf->binary_var_nz = binary_var_nz;
+   mip_inf->max_row_size = max_row_size;
+   mip_inf->max_col_size = max_col_size;
+   mip_inf->binary_row_num = bin_row_cnt;
+   mip_inf->cont_row_num = cont_row_cnt;
+   mip_inf->bin_cont_row_num = bin_cont_row_cnt;
+   mip_inf->binary_sos_row_num = sos_row_cnt;
+   mip_inf->int_var_ratio = (1.0*(col_num - mip_inf->cont_var_num))/(col_num + 1); 
+   mip_inf->cont_var_ratio = 1.0*mip_inf->cont_var_num/(col_num + 1);
+   mip_inf->bin_var_ratio = 1.0*binary_var_num/(col_num +1);
+   mip_inf->max_row_ratio = 1.0*max_row_size/(col_num+1);
+   mip_inf->max_col_ratio = 1.0*max_col_size/(row_num+1);   
+   mip_inf->mat_density = 1.0*col_nz/(col_num*row_num + 1);
+   mip_inf->row_density = 1.0*col_nz/(col_num+1);
+   mip_inf->col_density = 1.0*col_nz/(row_num+1);
+   mip_inf->sos_bin_row_ratio = 1.0*sos_row_cnt/(bin_row_cnt +1);
+   mip_inf->bin_row_ratio = 1.0*bin_row_cnt/(row_num +1);
+
+   /*
+   if(sos_row_cnt > 0){
+      for(i = 0; i < col_num; i++){	 
+	 for(j = matbeg[i]; j < matbeg[i+1]; j++){
+	    if(rows[matind[j]].is_sos_row)
+	       cols[i].sos_num += (rows[matind[j]].size - 1);
+	 }
+      }
+   }
+   */
+
+   /*
+   
+   if(sos_row_cnt > 0){
+      for(i = 0; i < row_num; i++){
+	 if(rows[i].is_sos_row){
+	    for(j = r_matbeg[i]; j < r_matbeg[i+1]; j++){
+	       cols[r_matind[j]].sos_num++;
+	    }
+	 }
+      }
+   }
+   */
+   
+   //   printf("bin_row_cnt - bin_cont_row_num %i %i\n", bin_row_cnt, bin_cont_row_cnt);
    
    if(binary_var_num){
-      mip->mip_inf->row_bin_den = (int)
+      mip_inf->row_bin_den = (int)
 	 (binary_var_nz/bin_row_cnt) + 1;
 
-      mip->mip_inf->col_bin_den = (int)
+      mip_inf->col_bin_den = (int)
 	 (binary_var_nz/binary_var_num) + 1;
       
       if(binary_var_num < col_num){
-      	 mip->mip_inf->row_bin_den = (int)(mip->mip_inf->row_bin_den*
+      	 mip_inf->row_bin_den = (int)(mip_inf->row_bin_den*
 					   col_num/
 					   binary_var_num) + 1;
       }
 
-      mip->mip_inf->row_bin_den_mean =
-	 (int)2*mip->mip_inf->row_bin_den * max_row_size/
-	 (mip->mip_inf->row_bin_den + max_row_size) + 1;
+      mip_inf->row_bin_den_mean =
+	 (int)2*mip_inf->row_bin_den * max_row_size/
+	 (mip_inf->row_bin_den + max_row_size) + 1;
       
-      mip->mip_inf->col_bin_den_mean =
-	 (int)2*mip->mip_inf->col_bin_den * max_row_size/
-	 (mip->mip_inf->col_bin_den + max_col_size) + 1;
+      mip_inf->col_bin_den_mean =
+	 (int)2*mip_inf->col_bin_den * max_row_size/
+	 (mip_inf->col_bin_den + max_col_size) + 1;
    }
-       
+
    FREE(row_new_inds);
 
    if(mip->n <= 0 || mip->m <= 0){
@@ -4307,6 +4422,7 @@ int prep_report(PREPdesc *P, int termcode)
    MIPdesc *mip = P->mip;
    int i;
    prep_stats stats = P->stats;
+   int p_level = P->params.level;
    
    switch(termcode){
     case PREP_INFEAS:
@@ -4384,43 +4500,45 @@ int prep_report(PREPdesc *P, int termcode)
       }
       break;	  
     default:
-      printf("Preprocessing finished...\n ");	  
+      if(p_level > 2){
+	 printf("Preprocessing finished...\n ");	  
       
-      if(stats.coeffs_changed + 
-	 stats.bounds_tightened + 
-	 stats.rows_deleted + 
-	 stats.vars_fixed + 
-	 stats.vars_aggregated +
-	 stats.vars_integerized > 0){
-	 if(stats.coeffs_changed > 0){
-	    printf("\t coefficients modified: %i\n",
-		   stats.coeffs_changed);		       
-	 }
-	 if(stats.bounds_tightened > 0){
-	    printf("\t bounds improved: %i\n", 
-		   stats.bounds_tightened);
-	 }	     
-	 if(stats.rows_deleted + 
-	    stats.vars_fixed > 0){
-	    if(stats.rows_deleted > 0){
-	       printf("\t constraints removed: %i\n", 
-		      stats.rows_deleted);
-	       //printf("\t %i remained\n", mip->m);
+	 if(stats.coeffs_changed + 
+	    stats.bounds_tightened + 
+	    stats.rows_deleted + 
+	    stats.vars_fixed + 
+	    stats.vars_aggregated +
+	    stats.vars_integerized > 0){
+	    if(stats.coeffs_changed > 0){
+	       printf("\t coefficients modified: %i\n",
+		      stats.coeffs_changed);		       
 	    }
-	    if(stats.vars_fixed > 0){
-	       printf("\t variables fixed: %i\n", stats.vars_fixed);
-	       //printf("\t %i remained\n", mip->n);
+	    if(stats.bounds_tightened > 0){
+	       printf("\t bounds improved: %i\n", 
+		      stats.bounds_tightened);
 	    }	     
+	    if(stats.rows_deleted + 
+	       stats.vars_fixed > 0){
+	       if(stats.rows_deleted > 0){
+		  printf("\t constraints removed: %i\n", 
+			 stats.rows_deleted);
+		  //printf("\t %i remained\n", mip->m);
+	       }
+	       if(stats.vars_fixed > 0){
+		  printf("\t variables fixed: %i\n", stats.vars_fixed);
+		  //printf("\t %i remained\n", mip->n);
+	       }	     
+	    }
+	    if(stats.vars_aggregated > 0){
+	       printf("\t variables aggregated: %i\n", stats.vars_aggregated);
+	    }
+	    if(stats.vars_integerized > 0){
+	       printf("\t variables integerized: %i\n", stats.vars_integerized);
+	    }
+	    
+	 }else{
+	    printf("\t with no modifications...\n");
 	 }
-	 if(stats.vars_aggregated > 0){
-	    printf("\t variables aggregated: %i\n", stats.vars_aggregated);
-	 }
-	 if(stats.vars_integerized > 0){
-	    printf("\t variables integerized: %i\n", stats.vars_integerized);
-	 }
-	 
-      }else{
-	 printf("\t with no modifications...\n");
       }
       printf("Problem has \n"
 	     "\t %i constraints \n"
@@ -4433,6 +4551,87 @@ int prep_report(PREPdesc *P, int termcode)
    return 0;
 }
 
+/*===========================================================================*/
+/*===========================================================================*/
+void prep_sos_fill_row(ROWinfo *row, int alloc_size, int size,
+			   int *ind)
+{
+   /* check CHAR_BIT? */
+   
+   int i, sos_size = (alloc_size >> 3) + 1;
+   if(row->sos_rep){
+      memset(row->sos_rep, 0, CSIZE*sos_size); 
+   }else{
+      row->sos_rep = (char *)malloc(CSIZE*sos_size);
+   }
+   
+   for(i = 0; i < size; i++){
+      row->sos_rep[ind[i] >> 3] |= 1 << (ind[i] & 7);
+   }
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+void prep_sos_fill_var_cnt(PREPdesc *P) 
+{
+   /* for now, just count the obvious variables those to be fixed
+      if col_ind is fixed */
+   
+   ROWinfo * rows = P->mip->mip_inf->rows;
+   COLinfo *cols = P->mip->mip_inf->cols;
+   int n = P->mip->n;
+   int m = P->mip->m;
+   int sos_row_size = (n >> 3) + 1;
+   
+   int i, j, k;
+   char * sos_final = (char *)malloc(CSIZE*sos_row_size);
+   int sos_cnt = 0;
+   
+   int *matbeg = P->mip->matbeg;
+   int *matind = P->mip->matind;
+   int *r_matbeg = P->mip->row_matbeg;
+   int *r_matind = P->mip->row_matind;
+   int row_ind;
+
+   for(i = 0; i < m; i++){
+      if(rows[i].is_sos_row){
+	 prep_sos_fill_row(&rows[i], n, r_matbeg[i+1] - r_matbeg[i],
+			   &r_matind[i]);
+      }
+   }
+	    
+   for(i = 0; i < n; i++){
+      memset(sos_final, 0, CSIZE*sos_row_size);
+      sos_cnt = 0;
+      for(j = matbeg[i]; j < matbeg[i + 1]; j++){
+	 row_ind = matind[j];
+	 if(rows[row_ind].is_sos_row){
+	    for(k = 0; k < sos_row_size; k++){
+	       sos_final[k] |= rows[row_ind].sos_rep[k];
+	    }
+	 }
+      }
+      
+      for(j = 0; j < sos_row_size; j++){
+	 for(k = 7; k >= 0; k--){
+	    sos_cnt += (sos_final[j] & (1 << k)) ? 1 : 0;
+	 }
+      }
+
+      cols[i].sos_num = sos_cnt;
+      //printf("col %i - sos_vars: %i\n", i, sos_cnt); 
+   }
+
+   /* since we wont use these for now, delete sos row representations */
+   for(i = 0; i < m; i++){
+      if(rows[i].is_sos_row){
+	 FREE(rows[i].sos_rep);
+      }
+   }
+   
+   FREE(sos_final);   
+   
+}
 /*===========================================================================*/
 /*===========================================================================*/
 void free_prep_desc(PREPdesc *P)
@@ -4449,6 +4648,14 @@ void free_prep_desc(PREPdesc *P)
 	 free_mip_desc(P->mip);
       }
       /* fixme - add impl stuff here - disabled now*/
+      FREE(P->impl_var_stat);
+      FREE(P->impl_row_ind);
+      FREE(P->impl_var_ind);
+      FREE(P->impl_ub);
+      FREE(P->impl_lb);
+      FREE(P->ulist_checked);
+      FREE(P->llist_checked);
+      FREE(P->rows_checked);
       
       FREE(P->user_col_ind);
       FREE(P->user_row_ind);

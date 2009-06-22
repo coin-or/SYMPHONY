@@ -54,6 +54,8 @@ int check_row_effectiveness(lp_prob *p)
     * Now based on their slack values, mark each row whether it's
     * violated, loose or tight */
 
+   //int base_m = orig_eff ? bcutnum : 0;
+   
    for (i = m - 1; i >= 0; i--){
       slack = slacks[i];
       switch (rows[i].cut->sense){
@@ -173,7 +175,11 @@ int check_row_effectiveness(lp_prob *p)
 
    deletable = k = 0;
    for (j = ineffective - 1; j >= 0; j--){
+      
       row = rows + (i = now_ineff[j]);
+
+      if(p->bc_level > 100 && !(row->deletable))row->deletable = TRUE;
+
       if (!row->free && row->deletable){
 	 row->free = TRUE;
 	 row->ineff_cnt = stat[i] == TIGHT_ROW ? 0 : ((MAXINT) >> 1);

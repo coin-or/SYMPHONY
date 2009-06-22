@@ -337,6 +337,10 @@ int prep_deleted_row_update_info(MIPdesc *mip, int row_ind);
 int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows, 
 				    char check_cols);
 /* utility functions */
+void prep_sos_fill_var_cnt(PREPdesc *P);
+void prep_sos_fill_row(ROWinfo *row, int alloc_size, int size,
+		       int *ind);
+
 double prep_rnd_integral(double val, double etol, char rnd_type);
 int  prep_get_row_bounds(MIPdesc *mip, int r_ind, double etol);
 char prep_is_equal(double lval, double rval, double etol);

@@ -2453,9 +2453,9 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(lp_par->tailoff_absolute);
       return(0);
    }
-   else if (strcmp(key, "tailoff_max_no_impr_iters_root") == 0 ||
-	    strcmp(key, "LP_tailoff_max_no_impr_iters_root") == 0){
-      READ_INT_PAR(lp_par->tailoff_max_no_impr_iters_root);
+   else if (strcmp(key, "tailoff_max_no_iterative_impr_iters_root") == 0 ||
+	    strcmp(key, "LP_tailoff_max_no_iterative_impr_iters_root") == 0){
+      READ_INT_PAR(lp_par->tailoff_max_no_iterative_impr_iters_root);
       return(0);
    }
    
@@ -2727,12 +2727,6 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
 
-   else if (strcmp(key, "generate_cgl_flow_and_cover_cuts_freq") == 0 ||
-	    strcmp(key, "LP_generate_cgl_flow_and_cover_cuts_freq") == 0){
-      READ_INT_PAR(lp_par->cgl.generate_cgl_flowcover_cuts_freq);
-      return(0);
-   }
-
    else if (strcmp(key, "generate_cgl_flowcover_cuts_freq") == 0 ||
 	    strcmp(key, "LP_generate_cgl_flowcover_cuts_freq") == 0){
       READ_INT_PAR(lp_par->cgl.generate_cgl_flowcover_cuts_freq);
@@ -2754,6 +2748,72 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "generate_cgl_landp_cuts_freq") == 0 ||
 	    strcmp(key, "LP_generate_cgl_landp_cuts_freq") == 0){
       READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts_freq);
+      return(0);
+   }
+
+    else if (strcmp(key, "gomory_max_depth") == 0 ||
+	    strcmp(key, "LP_gomory_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.gomory_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "knapsack_max_depth") == 0 ||
+	    strcmp(key, "LP_knapsack_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.knapsack_max_depth);
+      return(0);
+   }
+   
+   else if (strcmp(key, "oddhole_max_depth") == 0 ||
+	    strcmp(key, "LP_oddhole_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.oddhole_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "probing_max_depth") == 0 ||
+	    strcmp(key, "LP_probing_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.probing_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "clique_max_depth") == 0 ||
+	    strcmp(key, "LP_clique_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.clique_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "twomir_max_depth") == 0 ||
+	    strcmp(key, "LP_twomir_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.twomir_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "flowcover_max_depth") == 0 ||
+	    strcmp(key, "LP_flowcover_max_depth") == 0){
+      READ_INT_PAR(lp_par->cgl.flowcover_max_depth);
+      return(0);
+   }
+
+   else if (strcmp(key, "max_chain_backtrack") == 0 ||
+	    strcmp(key, "LP_max_chain_backtrack") == 0){
+      READ_INT_PAR(lp_par->cgl.max_chain_backtrack);
+      return(0);
+   }
+
+   else if (strcmp(key, "max_chain_trial_num") == 0 ||
+	    strcmp(key, "LP_max_chain_trial_num") == 0){
+      READ_INT_PAR(lp_par->cgl.max_chain_trial_num);
+      return(0);
+   }
+   
+   else if (strcmp(key, "chain_trial_freq") == 0 ||
+	    strcmp(key, "chain_trial_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.chain_trial_freq);
+      return(0);
+   }
+   
+   else if (strcmp(key, "chain_weighted_gap") == 0 ||
+	    strcmp(key, "LP_chain_weighted_gap") == 0){
+      READ_DBL_PAR(lp_par->cgl.chain_weighted_gap);
       return(0);
    }
 

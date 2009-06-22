@@ -61,6 +61,8 @@ typedef struct OUR_COL_SET{
 
 /*===========================================================================*/
 typedef struct LP_PROB{
+   double       str_time;
+
    int           proc_index;
    void         *user;
 
@@ -69,6 +71,8 @@ typedef struct LP_PROB{
    int           has_ub;
    double        ub;
 
+   double        root_objval;
+   
    int           phase;
 
    double        start_time;
@@ -125,6 +129,8 @@ typedef struct LP_PROB{
    int           has_tailoff;
    int           obj_no_impr_iters;
 
+   //double        str_br_impr_count; /* if we dont have 3 consequent
+   //				       improvements, return to initials */
 
    /*========================================================================*\
     * The following fields refer to the cuts/rows arrived to the LP,
@@ -147,9 +153,17 @@ typedef struct LP_PROB{
    /* pseudo costs and reliability measures */
    double         *pcost_down;
    double         *pcost_up;
+   double         *pcost_avg;
    int            *br_rel_down;
    int            *br_rel_up;
    int            *br_rel_cand_list;
+   char            str_br_check;
+   int            *br_rel_down_min_level;
+   int            *br_rel_up_min_level;   
+   double          str_check_obj;
+   int             str_check_trial;
+   int             str_check_freq;
+   int             str_check_cnt;
 }lp_prob;
 
 /*===========================================================================*/
@@ -234,7 +248,7 @@ int should_continue_strong_branching PROTO((lp_prob *p, int i, int cand_num,
                                      double st_time, int total_iters, 
                                      int *should_continue));
 int strong_branch(lp_prob *p, int branch_var, double lb, double ub, 
-      double new_lb, double new_ub, double *obj);
+		  double new_lb, double new_ub, double *obj, int should_use_hot_starts);
 int branch PROTO((lp_prob *p, int cuts));
 int col_gen_before_branch PROTO((lp_prob *p, int *new_vars));
 

@@ -13,7 +13,7 @@
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
-/* last modified: Feb 09, menal*/
+/* last modified: June 09, menal*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,14 +31,20 @@ int sym_presolve(sym_environment *env)
    int termcode = 0;
 
    PREPdesc * P = (PREPdesc *)calloc(1, sizeof(PREPdesc));
-   
+   int p_level = env->par.prep_par.level;
+
    if(env->prep_mip){
       free_mip_desc(env->prep_mip);
       FREE(env->prep_mip);
    }
 
-   P->orig_mip = env->orig_mip = create_copy_mip_desc(env->mip);
-   P->mip = env->prep_mip = env->mip;
+   if(p_level > 2){
+      P->orig_mip = env->orig_mip = create_copy_mip_desc(env->mip);
+      P->mip = env->prep_mip = env->mip;
+   }else{
+      P->mip = env->mip;
+   }
+
    P->params = env->par.prep_par;
    
    if(P->mip){
@@ -68,7 +74,7 @@ int sym_presolve(sym_environment *env)
    P->orig_mip = 0;
    
    free_prep_desc(P);
-
+	    
    return termcode;
 }
 /*===========================================================================*/
@@ -175,16 +181,16 @@ int prep_solve_desc (PREPdesc * P)
       if(verbosity >= 0){
 	 printf ("Skipping Preprocessor\n");
       }
-      return(termcode);
+      //  return(termcode);
    }
 
    double start_time = wall_clock(NULL);
 
    /* Start with Basic Preprocessing */
-
-   PRINT(verbosity, -2, ("Starting Preprocessing...\n"));
-   
-   P->stats.nz_coeff_changed = (char *)calloc(CSIZE ,mip->nz);
+   if(p_level > 2){
+      PRINT(verbosity, -2, ("Starting Preprocessing...\n"));
+      P->stats.nz_coeff_changed = (char *)calloc(CSIZE ,mip->nz);
+   }
 
    /* need to fill in the row ordered vars of mip */
 
@@ -195,7 +201,7 @@ int prep_solve_desc (PREPdesc * P)
 
    /* no changes so far on column based mip*/
    /* call the main sub function of presolver */
-   if(!PREP_QUIT(termcode)){
+   if(!PREP_QUIT(termcode) && p_level > 2){
       termcode = prep_basic(P);
    }
 
@@ -203,10 +209,10 @@ int prep_solve_desc (PREPdesc * P)
    if(verbosity > -2){
       prep_report(P, termcode);
    }
-
-   PRINT(verbosity, 0, ("Total Presolve Time: %f...\n\n", 
-			wall_clock(NULL) - start_time));   
-
+   if(p_level > 2){
+      PRINT(verbosity, 0, ("Total Presolve Time: %f...\n\n", 
+			   wall_clock(NULL) - start_time));   
+   }
    return termcode; 
 }
  
