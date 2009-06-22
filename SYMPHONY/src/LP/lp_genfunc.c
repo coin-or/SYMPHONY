@@ -1963,20 +1963,19 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 	 if(p->mip->mip_inf->sos_bin_row_ratio > 0.6){
 	    p->par.max_cut_length *= 2;
 	 }
-
+	
 	 if(p->mip->mip_inf->max_row_ratio < 0.01 &&
 	    p->mip->mip_inf->prob_type != BIN_CONT_TYPE){
 	    p->par.cgl.chain_trial_freq = (int)1.5*p->par.cgl.chain_trial_freq;
 	 }
-	 
-
 	 if(p->mip->mip_inf->cont_var_ratio > 0.1 &&
 	    1.0*p->mip->mip_inf->max_row_size/(p->mip->n +1) > 0.1)
 	    p->par.max_cut_length = p->par.max_cut_length/2;
-	 
+	
 	 if(p->mip->mip_inf->max_row_size <= 500){
-	    p->par.max_cut_length = MIN(MAX(p->mip->mip_inf->max_row_size,
-					    MIN(((int)(1.0133 * p->mip->mip_inf->mat_density *
+	    p->par.max_cut_length = 4 + MIN(MAX(p->mip->mip_inf->max_row_size,
+						MIN(((int)(1.0133 *
+						       p->mip->mip_inf->mat_density *
 						       (p->mip->m + 1)* p->mip->n) -
 						 p->mip->nz + row_den) + 1,
 						(int)3.0*p->mip->mip_inf->max_row_size +
@@ -2003,7 +2002,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
       }
    }
 #endif
-   
+
    max_cut_length = p->par.max_cut_length;
    if (p->par.tried_long_cuts == TRUE) {
       repeat_with_long = FALSE;
@@ -2133,7 +2132,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 		  }
 	       }
 	       probing->setMaxLookRoot(p->par.cgl.probing_root_max_look);
-	       // printf("max_look: %i\n", p->par.cgl.probing_root_max_look);
+	       //printf("max_look: %i\n", p->par.cgl.probing_root_max_look);
 	       // printf("bin_row_num %i\n", p->mip->mip_inf->binary_row_num);
 	    }else{
 	       if(p->mip->nz > 1e5){
