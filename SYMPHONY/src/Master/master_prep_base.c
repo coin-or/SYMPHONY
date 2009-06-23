@@ -3226,7 +3226,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	 cols[i].var_type = 'F';
 	 fixed_obj_offset += obj[i]*ub[i];
 	 fixed_var_cnt++;	 
-	 if(ub[i] >= INF || ub[i] <= -INF && p_level > 2){
+	 if((ub[i] >= INF || ub[i] <= -INF) && p_level > 2){
 	    stats->col_numeric_ind = i;
 	    return(PREP_NUMERIC_ERROR);
 	 }else{
