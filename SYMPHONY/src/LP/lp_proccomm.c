@@ -150,6 +150,7 @@ int process_message(lp_prob *p, int r_bufid, int *pindex, int *pitnum)
       /* Send back the timing data for the first phase */
       s_bufid = init_send(DataInPlace);
       send_char_array((char *)&p->comp_times, sizeof(node_times));
+      send_char_array((char *)&p->lp_stat, sizeof(lp_stat_desc));
       send_msg(p->tree_manager, LP__TIMING);
 #ifdef DO_TESTS
       if (pindex){
@@ -205,6 +206,7 @@ int receive_active_node(lp_prob *p)
 {
    int i, s_bufid;
    node_desc *desc;
+   char ch;
 
    desc = p->desc = (node_desc *) malloc( sizeof(node_desc) );
 
@@ -281,10 +283,11 @@ int receive_active_node(lp_prob *p)
    if (p->bc_level > 0){
       REMALLOC(p->bdesc, branch_desc, p->bdesc_size, p->bc_level, BB_BUNCH);
       receive_char_array((char *)p->bdesc,
-				 p->bc_level * sizeof(branch_desc));
+				 p->bc_level * (int)sizeof(branch_desc));
    }
 
-   receive_int_array(&p->dive, 1);
+   receive_char_array(&ch, 1);
+   p->dive = (int) ch;
 
    /*------------------------------------------------------------------------*\
     * Unpack the user defined description
@@ -505,8 +508,9 @@ void send_node_desc(lp_prob *p, int node_type)
 {
    node_desc *new_lp_desc = NULL, *new_tm_desc = NULL;
    node_desc *lp_desc = p->desc;
-   int repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
+   char repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
    int deal_with_nf;
+   char ch;
    
    LPdata *lp_data = p->lp_data;
 
@@ -515,9 +519,6 @@ void send_node_desc(lp_prob *p, int node_type)
    bc_node *n = repricing ? (bc_node *) calloc(1, sizeof(bc_node)) :
       tm->active_nodes[p->proc_index];
    node_desc *tm_desc = &n->desc;   
-#else
-   int s_bufid;
-#endif
 
    if (p->bc_level > 0) {
       n->num_cut_iters_in_path =
@@ -531,7 +532,7 @@ void send_node_desc(lp_prob *p, int node_type)
 
       n->avg_br_obj_impr_in_path =
          p->lp_stat.avg_br_obj_impr_in_path;
-
+      
    } else {
       n->num_cut_iters_in_path = 0;
       n->num_cuts_added_in_path = 0;
@@ -543,12 +544,17 @@ void send_node_desc(lp_prob *p, int node_type)
 
       n->num_fp_calls_in_path = 0;
    }
+
+   n->start_objval = p->lp_stat.start_objval;
+   n->end_objval = p->lp_stat.end_objval;
    n->num_str_br_cands_in_path =
       p->lp_stat.num_str_br_cands_in_path;
    n->num_fp_calls_in_path =
-      p->lp_stat.num_fp_calls_in_path;
+      p->lp_stat.num_fp_calls_in_path;   
 
-   
+#else
+   int s_bufid;
+#endif
 
 #ifdef SENSITIVITY_ANALYSIS
       if (tm->par.sensitivity_analysis && 
@@ -1007,10 +1013,11 @@ void send_node_desc(lp_prob *p, int node_type)
        !p->par.keep_description_of_pruned){
       s_bufid = init_send(DataInPlace);
       send_char_array(&repricing, 1);
-      send_char_array(&node_type, 1);
+      ch = (char) node_type;
+      send_char_array(&ch, 1);
       if (node_type == FEASIBLE_PRUNED) {
-	 if (!p->par.sensitivity_analysis){ 
-	    send_int_array(&p->desc->uind.size, 1);
+	 if (!p->par.sensitivity_analysis){
+	    send_int_array(&(p->desc->uind.size), 1);
 	    send_dbl_array(lp_data->x, p->desc->uind.size);
 	 }
       }
@@ -1026,7 +1033,8 @@ void send_node_desc(lp_prob *p, int node_type)
    /* Now start the real message */
    s_bufid = init_send(DataInPlace);
    send_char_array(&repricing, 1);
-   send_char_array(&node_type, 1);
+   ch = (char) node_type;
+   send_char_array(&ch, 1);
    send_dbl_array(&lp_data->objval, 1);
    if (node_type == INTERRUPTED_NODE){
       send_msg(p->tree_manager, LP__NODE_DESCRIPTION);
@@ -1416,7 +1424,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 #endif
    int i = 0, pos = can->position;
    cut_data *brcut;
-   int dive = p->dive, olddive = p->dive;
+   char dive = p->dive, olddive = p->dive;
    char fractional_dive = FALSE;
 
 #ifdef COMPILE_IN_LP
@@ -1545,7 +1553,7 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
    send_char_array(action, can->child_num);
 
    /* Our diving status and what we would keep */
-   send_int_array(&dive, 1);
+   send_char_array(&dive, 1);
    send_int_array(keep, 1);
    
    send_msg(p->tree_manager, LP__BRANCHING_INFO);

@@ -163,7 +163,7 @@ cut_data *create_explicit_cut(int nzcnt, int *indices, double *values,
    cut->sense = sense;
    cut->rhs = rhs;
    cut->range = range;
-   cut->size = ISIZE + nzcnt * (ISIZE + DSIZE);
+   cut->size = (int)(ISIZE + nzcnt * (ISIZE + DSIZE));
    cut->coef = (char *) malloc (cut->size);
    ((int *) cut->coef)[0] = nzcnt;
    memcpy(cut->coef + ISIZE, (char *)indices, nzcnt*ISIZE);
@@ -188,7 +188,7 @@ int cg_add_explicit_cut(int nzcnt, int *indices, double *values,
    cut->sense = sense;
    cut->rhs = rhs;
    cut->range = range;
-   cut->size = ISIZE + nzcnt * (ISIZE + DSIZE);
+   cut->size = (int)(ISIZE + nzcnt * (ISIZE + DSIZE));
    cut->coef = (char *) malloc (cut->size);
    ((int *) cut->coef)[0] = nzcnt;
    memcpy(cut->coef + ISIZE, (char *)indices, nzcnt*ISIZE);

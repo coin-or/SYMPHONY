@@ -6,7 +6,7 @@
 /*                                                                           */
 /* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
-/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This application was developed by Ted Ralphs (ted@lehigh.edu)             */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -48,7 +48,7 @@
 int user_shall_we_branch(void *user, double lpetol, int cutnum,
 			 int slacks_in_matrix_num, cut_data **slacks_im_matrix,
 			 int slack_cut_num, cut_data **slack_cuts, int varnum,
-			 var_desc **vars, double *x, int *status,
+			 var_desc **vars, double *x, char *status,
 			 int *cand_num, branch_obj ***candidates,
 			 int *action)
 {
@@ -97,7 +97,7 @@ int user_select_candidates(void *user, double lpetol, int cutnum,
 			   int slacks_in_matrix_num,
 			   cut_data **slacks_in_matrix, int slack_cut_num,
 			   cut_data **slack_cuts, int varnum, var_desc **vars,
-			   double *x, int *status, int *cand_num,
+			   double *x, char *status, int *cand_num,
 			   branch_obj ***candidates, int *action,
 			   int bc_level)
 

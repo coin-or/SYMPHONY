@@ -810,7 +810,7 @@
 				Name="Preprocessor"
 				>
 				<File
-					RelativePath="..\..\src\Preprocessor\preprocessor.c"
+					RelativePath="..\..\src\Preprocessor\prep.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -834,7 +834,31 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\src\Preprocessor\preprocessor_basic.c"
+					RelativePath="..\..\src\Preprocessor\prep_base.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AdditionalIncludeDirectories=""
+							PreprocessorDefinitions=""
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\src\Preprocessor\prep_sr.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"

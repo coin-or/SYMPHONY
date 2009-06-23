@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+# (c) Copyright 2006-2009 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Common Public License. Please see     #
 # accompanying file for terms.                                              #

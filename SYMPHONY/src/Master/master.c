@@ -34,7 +34,7 @@
 #include "sym_master_u.h"
 #include "sym_lp_solver.h"
 #include "sym_primal_heuristics.h"
-#include "sym_preprocessor.h"
+#include "sym_prep.h"
 #ifdef COMPILE_IN_TM
 #include "sym_tm.h"
 #ifdef COMPILE_IN_LP
@@ -231,10 +231,17 @@ int sym_set_defaults(sym_environment *env)
    lp_par->granularity = tm_par->granularity;
    lp_par->use_cg = tm_par->use_cg;
    lp_par->set_obj_upper_lim = TRUE;
-   lp_par->do_primal_heuristic = FALSE;
+   lp_par->do_primal_heuristic = TRUE;
    lp_par->scaling = -1; /* CPLEX'ism ... don't scale */
    lp_par->fastmip = 1; /* CPLEX'ism ... set it to 1 */
    lp_par->should_warmstart_chain = TRUE; /* see header file for description */
+   lp_par->should_reuse_lp = FALSE; /* see header file for description */
+#ifdef COMPILE_IN_LP
+   lp_par->should_reuse_lp = TRUE; /* see header file for description */
+#endif
+#ifdef _OPENMP
+   lp_par->should_reuse_lp = FALSE; /* see header file for description */
+#endif
    lp_par->try_to_recover_from_error = TRUE;
    lp_par->problem_type = ZERO_ONE_PROBLEM;
    lp_par->keep_description_of_pruned = tm_par->keep_description_of_pruned;
@@ -261,10 +268,10 @@ int sym_set_defaults(sym_environment *env)
    lp_par->mat_row_compress_ratio = .00001;
    lp_par->tailoff_gap_backsteps = 2;
    lp_par->tailoff_gap_frac = .99;
-   lp_par->tailoff_obj_backsteps = 4;
+   lp_par->tailoff_obj_backsteps = 3;
    lp_par->tailoff_obj_frac = .75;
    lp_par->tailoff_absolute = 0.0001;
-   lp_par->tailoff_max_no_impr_iters_root = 15;
+   lp_par->tailoff_max_no_iterative_impr_iters_root = 3;
    lp_par->ineff_cnt_to_delete = 0;
    lp_par->eff_cnt_before_cutpool = 3;
    lp_par->ineffective_constraints = BASIC_SLACKS_ARE_INEFFECTIVE;
@@ -277,7 +284,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->later_lp.first_cut_time_out = 0;
    lp_par->later_lp.all_cuts_time_out = 1;
    lp_par->later_lp.all_cuts_time_out = 0;
-   lp_par->max_cut_num_per_iter = 20;
+   lp_par->max_cut_num_per_iter = 50;
    lp_par->max_cut_num_per_iter_root = 500;
    lp_par->min_root_cut_rounds = 100;
    lp_par->tried_long_cuts = FALSE;
@@ -290,7 +297,6 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fixed_to_ub_frac_before_logical_fixing = .01;
 
    lp_par->cgl.generate_cgl_cuts = TRUE;
-   lp_par->cgl.max_depth_for_cgl_cuts = 50;
    lp_par->cgl.generate_cgl_gomory_cuts = GENERATE_DEFAULT;
    lp_par->cgl.generate_cgl_redsplit_cuts = DO_NOT_GENERATE;
    lp_par->cgl.generate_cgl_knapsack_cuts = GENERATE_DEFAULT;
@@ -305,7 +311,16 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.generate_cgl_landp_cuts = DO_NOT_GENERATE;
 
    lp_par->cgl.probing_is_expensive = FALSE;
+   lp_par->cgl.probing_root_max_look = 100;
 
+   lp_par->cgl.gomory_max_depth = 500;
+   lp_par->cgl.probing_max_depth = 100;
+   lp_par->cgl.flowcover_max_depth = 50;
+   lp_par->cgl.twomir_max_depth = 50;
+   lp_par->cgl.clique_max_depth = 50;
+   lp_par->cgl.oddhole_max_depth = 50;
+   lp_par->cgl.knapsack_max_depth = 50;
+   
    lp_par->cgl.generate_cgl_gomory_cuts_freq = 
       lp_par->cgl.generate_cgl_redsplit_cuts_freq = 
       lp_par->cgl.generate_cgl_knapsack_cuts_freq = 
@@ -331,7 +346,14 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.rounding_generated_in_root = FALSE;
    lp_par->cgl.lift_and_project_generated_in_root = FALSE;
    lp_par->cgl.landp_generated_in_root = FALSE;
-
+ 
+   lp_par->cgl.use_chain_strategy = TRUE;
+   lp_par->cgl.chain_status = CGL_CHAIN_START;
+   lp_par->cgl.max_chain_backtrack = 1;
+   lp_par->cgl.max_chain_trial_num = 10;
+   lp_par->cgl.chain_trial_freq = 10;
+   lp_par->cgl.chain_weighted_gap = 9.333e-6;
+   
    lp_par->multi_criteria = FALSE;
    lp_par->mc_find_supported_solutions = FALSE;
    lp_par->mc_add_optimality_cuts = TRUE;
@@ -356,12 +378,32 @@ int sym_set_defaults(sym_environment *env)
    lp_par->strong_branching_high_low_weight = 0.8; // alpha*min + (1-alpha)*max
    lp_par->user_set_strong_branching_cand_num = FALSE;
    lp_par->user_set_max_presolve_iter = FALSE;
+   /* 
+    * strong branching is carried out for candidate variables even when pseudo
+    * costs are reliably known when the depth is less than this number 
+   */
+
+   lp_par->strong_br_min_level = 4; 
    lp_par->strong_br_all_candidates_level = 6;
    lp_par->use_hot_starts = TRUE;
-   lp_par->should_use_rel_br = TRUE;
+   lp_par->should_use_rel_br = FALSE;
+#ifdef COMPILE_IN_LP
+   lp_par->should_use_rel_br = TRUE; 
+#endif
+#ifdef _OPENMP
+   lp_par->should_use_rel_br = FALSE; 
+#endif
+   lp_par->rel_br_override_default = TRUE;
+   lp_par->rel_br_override_max_solves = 200;
+   lp_par->rel_br_chain_backtrack = 5;
+   lp_par->rel_br_min_imp = 0.0133;
+   lp_par->rel_br_max_imp = 0.30;
+   
    lp_par->rel_br_threshold = 8;
-   lp_par->rel_br_cand_threshold = 10; // stop doing strong branching if last 
-                                       // 10 strong branchings didnt help.
+   lp_par->rel_br_max_solves = 20;      /* stop after these many LP-solve calls
+                                           regardless of improvement */
+   lp_par->rel_br_cand_threshold = 10;  /* stop doing LP-solve if last
+                                           10 LP-solves didnt help. */
    lp_par->compare_candidates_default = HIGH_LOW_COMBINATION;
    lp_par->select_child_default = PREFER_LOWER_OBJ_VALUE;
    lp_par->pack_lp_solution_default = SEND_NONZEROS;
@@ -372,10 +414,11 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fp_max_cycles       = 100;
    lp_par->fp_time_limit       = 50;
    lp_par->fp_display_interval = 10;
+   lp_par->fp_poor_sol_lim_fac = 10;
    lp_par->fp_flip_fraction    = 0.1;
    lp_par->fp_frequency        = 10;
    lp_par->fp_max_initial_time = 100;
-   lp_par->fp_min_gap          = 1;                   /* 1% gap */
+   lp_par->fp_min_gap          = 0.5;                   /* 1% gap */
 
    /************************** cut_gen defaults *****************************/
    cg_par->verbosity = 0;
@@ -418,8 +461,7 @@ int sym_set_defaults(sym_environment *env)
 	  "-adobe-helvetica-bold-r-normal--11-80-*-*-*-*-*-*");
 
    /********************* preprocessor defaults ******************************/
-   prep_par->do_prep = 1;
-   prep_par->level = 2;
+   prep_par->level = 5;
    prep_par->dive_level = 5;
    prep_par->impl_dive_level = 0;
    prep_par->impl_limit = 50;
@@ -439,7 +481,7 @@ int sym_set_defaults(sym_environment *env)
    prep_par->max_aggr_row_ratio = 0.1;
    prep_par->keep_row_ordered = 1;
    prep_par->keep_track = 0;
-   prep_par->time_limit = 100;
+   prep_par->time_limit = 50;
 
    return(termcode);
 }
@@ -645,38 +687,38 @@ int sym_solve(sym_environment *env)
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
 
-   if(env->par.prep_par.level > 0){
-      termcode = preprocess_mip(env);   
+   //   if(env->par.prep_par.level > 0){
+   termcode = sym_presolve(env);   
 
-      if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED ||
-	 termcode == PREP_SOLVED || termcode == PREP_NUMERIC_ERROR ||
-	 termcode == PREP_OTHER_ERROR){
-
-	 env->mip = env->orig_mip;
-	 env->orig_mip = 0;
+   if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED ||
+      termcode == PREP_SOLVED || termcode == PREP_NUMERIC_ERROR ||
+      termcode == PREP_OTHER_ERROR){
+      
+      env->mip = env->orig_mip;
+      env->orig_mip = 0;
+      
+      if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED){
+	 return(env->termcode = PREP_NO_SOLUTION);
+      }	 
+      else if(termcode == PREP_SOLVED){
+	 env->best_sol.has_sol = TRUE;
+	 env->best_sol.xind = (int *) malloc(ISIZE *
+					     env->prep_mip->fixed_n);
+	 env->best_sol.xval = (double *) malloc(DSIZE *
+						env->prep_mip->fixed_n); 
 	 
-	 if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED){
-	    return(env->termcode = PREP_NO_SOLUTION);
-	 }	 
-	 else if(termcode == PREP_SOLVED){
-	    env->best_sol.has_sol = TRUE;
-	    env->best_sol.xind = (int *) malloc(ISIZE *
-						env->prep_mip->fixed_n);
-	    env->best_sol.xval = (double *) malloc(DSIZE *
-						   env->prep_mip->fixed_n); 
-	    
-	    env->best_sol.xlength = env->prep_mip->fixed_n;
-	    memcpy(env->best_sol.xind, env->prep_mip->fixed_ind, ISIZE *
-		   env->prep_mip->fixed_n);
-	    memcpy(env->best_sol.xval, env->prep_mip->fixed_val, ISIZE *
-		   env->prep_mip->fixed_n);
-
-	    return(env->termcode = PREP_OPTIMAL_SOLUTION_FOUND);
-	 }else if(termcode == PREP_NUMERIC_ERROR){
-	    return(env->termcode = PREP_ERROR);
-	 }
+	 env->best_sol.xlength = env->prep_mip->fixed_n;
+	 memcpy(env->best_sol.xind, env->prep_mip->fixed_ind, ISIZE *
+		env->prep_mip->fixed_n);
+	 memcpy(env->best_sol.xval, env->prep_mip->fixed_val, ISIZE *
+		env->prep_mip->fixed_n);
+	 
+	 return(env->termcode = PREP_OPTIMAL_SOLUTION_FOUND);
+      }else if(termcode == PREP_NUMERIC_ERROR){
+	 return(env->termcode = PREP_ERROR);
       }
    }
+   //   }
 
    if(termcode == PREP_OTHER_ERROR || env->par.prep_par.level <= 0){
       if(env->prep_mip){
@@ -791,7 +833,7 @@ int sym_solve(sym_environment *env)
          if (fabs(coeff)>0.000001) {
             if (env->mip->is_int[i]) {
                if (fabs(floor(coeff+0.5)-coeff)<0.000001) {
-                  granularity = gcd(granularity,(int)floor(coeff+0.5));
+                  granularity = sym_gcd(granularity,(int)floor(coeff+0.5));
                } else {
                   granularity = 0;
                   break;
@@ -1090,7 +1132,9 @@ int sym_solve(sym_environment *env)
    /*------------------------------------------------------------------------*\
     * Solve the problem and receive solutions                         
    \*------------------------------------------------------------------------*/
+#ifdef COMPILE_IN_LP
    sp_initialize(tm);
+#endif
 
    tm->start_time += start_time;
 
@@ -1124,7 +1168,16 @@ int sym_solve(sym_environment *env)
       }else {
 	 env->tm->lpp[thread_num]->best_sol = env->best_sol;	    
       }
+   }
+#else
+   if (env->tm->best_sol.has_sol){
+     FREE(env->best_sol.xind);
+     FREE(env->best_sol.xval);
+     env->best_sol = env->tm->best_sol;
+   }
+#endif
       
+   if (env->best_sol.has_sol) {
       memcpy(&env->warm_start->best_sol, &env->best_sol, sizeof(lp_sol) *1);
       env->warm_start->best_sol.xind = 0;
       env->warm_start->best_sol.xval = 0;
@@ -1138,14 +1191,6 @@ int sym_solve(sym_environment *env)
 		env->best_sol.xval, DSIZE * env->best_sol.xlength);	
       }
    }
-#else
-   if (env->tm->best_sol.has_sol){
-      FREE(env->best_sol.xind);
-      FREE(env->best_sol.xval);
-      env->best_sol = env->warm_start->best_sol = 
-	 env->tm->best_sol;
-   }
-#endif
 
    tm->rootnode = NULL;
    tm->cuts = NULL;
@@ -1265,8 +1310,10 @@ int sym_solve(sym_environment *env)
 			  tm->has_ub, tm->sp);
       }
       temp = termcode;
+#ifdef COMPILE_IN_LP
       sp_free_sp(tm->sp);
       FREE(tm->sp);
+#endif
 
       if(env->par.verbosity >=-1 ) {
 #ifdef COMPILE_IN_LP
@@ -4952,7 +4999,7 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
     ***                  Treemanager params                         ***
     ***********************************************************************/
 
-   else if (strcmp(key, "TM_verbosity") == 0){
+   if (strcmp(key, "TM_verbosity") == 0){
       *value = tm_par->verbosity;
       return(0);
    }
@@ -5122,6 +5169,11 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    else if (strcmp(key, "should_warmstart_chain") == 0 ||
 	    strcmp(key, "LP_should_warmstart_chain") == 0){
       *value = lp_par->should_warmstart_chain;
+      return(0);
+   }
+   else if (strcmp(key, "should_reuse_lp") == 0 ||
+	    strcmp(key, "LP_should_reuse_lp") == 0){
+      *value = lp_par->should_reuse_lp;
       return(0);
    }
    else if (strcmp(key, "try_to_recover_from_error") == 0 ||
@@ -5450,6 +5502,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
       *value = lp_par->user_set_max_presolve_iter;
       return(0);
    }
+   else if (strcmp(key, "strong_br_min_level") == 0) {
+      *value = lp_par->strong_br_min_level;
+      return(0);
+   }
    else if (strcmp(key, "strong_br_all_candidates_level") == 0) {
       *value = lp_par->strong_br_all_candidates_level;
       return(0);
@@ -5517,7 +5573,7 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    /***********************************************************************
     ***                     cut_gen params                          ***
     ***********************************************************************/
-   else if (strcmp(key, "CG_verbosity") == 0){
+   if (strcmp(key, "CG_verbosity") == 0){
       *value = cg_par->verbosity;
       return(0);
    }
@@ -5715,9 +5771,9 @@ int sym_get_dbl_param(sym_environment *env, const char *key, double *value)
       *value = lp_par->tailoff_absolute;
       return(0);
    }
-   else if (strcmp(key, "tailoff_max_no_impr_iters_root") == 0 ||
-	    strcmp(key, "LP_tailoff_max_no_impr_iters_root") == 0){
-      *value = lp_par->tailoff_max_no_impr_iters_root;
+   else if (strcmp(key, "tailoff_max_no_iterative_impr_iters_root") == 0 ||
+	    strcmp(key, "LP_tailoff_max_no_iterative_impr_iters_root") == 0){
+      *value = lp_par->tailoff_max_no_iterative_impr_iters_root;
       return(0);
    }
 

@@ -66,7 +66,7 @@ void qsort_di(double *botd, int *boti, int nmemb)
 /* calculate gcd of two integers i1, i2. */
 /* TODO: replace with some function from CoinUtils */
 
-int gcd(int i1, int i2)
+int sym_gcd(int i1, int i2)
 {
    int i;
    if (i1==0 && i2==0) {

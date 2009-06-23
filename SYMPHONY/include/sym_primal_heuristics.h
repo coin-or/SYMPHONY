@@ -5,7 +5,9 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2007 Ted Ralphs. All Rights Reserved.                  */
+/* The author of this file is Ashutosh Mahajan                               */
+/*                                                                           */
+/* (c) Copyright 2006-2009 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -55,13 +57,16 @@ typedef struct FP_DATA {
    int           verbosity;
    double        flip_fraction;
    double        norm;
+   int           iterd;
 }FPdata;
 
 /*  solution pool */
 int sp_add_solution PROTO((lp_prob *p, int cnt, int *indices, double *values, double obj_value, int bc_index));
 int sp_delete_solution PROTO((sp_desc *sp, int position));
 int sp_is_solution_in_sp PROTO((lp_prob *p, int cnt, int *indices, double *values, double obj_value));
+#ifdef COMPILE_IN_LP
 int sp_initialize(tm_prob *tm);
+#endif
 int sp_free_sp(sp_desc *sp);
 
 /* feasibility pump */

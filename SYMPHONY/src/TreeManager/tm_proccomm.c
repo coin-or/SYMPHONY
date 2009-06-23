@@ -608,7 +608,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       }
       receive_int_array(&n->sol_size, 1);
       n->sol = (double *) malloc (DSIZE * n->sol_size);
-      receive_dbl_array(n->sol, tm->rootnode->desc.uind.size);
+      receive_dbl_array(n->sol, n->sol.size);
       n->duals = (double *) malloc (DSIZE * tm->bcutnum);
       send_dbl_array(n->duals, tm->bcutnum);
    }
@@ -620,7 +620,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       n->node_status = NODE_STATUS__PRUNED;
       if (node_type == FEASIBLE_PRUNED) {
 	 if (!tm->par.sensitivity_analysis){ 
-	    receive_int_array(&n->sol_size, 1);
+	    receive_int_array(&(n->sol_size), 1);
 	    n->sol = (double *) malloc (DSIZE * n->sol_size);
 	    receive_dbl_array(n->sol, n->sol_size);
 	 }
@@ -880,7 +880,7 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    int s_bufid;
    int old_cut_name = 0;
    branch_obj *bobj = &node->bobj;
-   char *action;
+   char *action, ch;
    int *feasible;
    double *objval;
    int oldkeep, keep;
@@ -928,7 +928,8 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    }
    receive_char_array(action, bobj->child_num);
 
-   receive_int_array(&olddive, 1);
+   receive_char_array(&ch, 1);
+   olddive = (int) ch;
    receive_int_array(&keep, 1);
    oldkeep = keep;
    lp = node->lp;
@@ -939,7 +940,8 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    if (oldkeep >= 0 && (olddive == CHECK_BEFORE_DIVE || olddive == DO_DIVE)){
       /* We have to reply */
       s_bufid = init_send(DataInPlace);
-      send_int_array(&dive, 1);
+      ch = (char) dive;
+      send_char_array(&ch, 1);
       if (dive == DO_DIVE || dive == CHECK_BEFORE_DIVE){
 	 /* Give the index of the node kept and also the index of the
 	  * branching cut if necessary */
@@ -1132,6 +1134,7 @@ int receive_lp_timing(tm_prob *tm)
 #ifndef COMPILE_IN_LP
    int i, r_bufid = 0, msgtag, bytes, sender;
    node_times tim;
+   lp_stat_desc lp_stat;
    struct timeval timeout = {5, 0};
    double ramp_up_tm = tm->comp_times.ramp_up_tm;
    double ramp_down_time = tm->comp_times.ramp_down_time;
@@ -1140,6 +1143,7 @@ int receive_lp_timing(tm_prob *tm)
    bc_node *node;
    
    memset(&tm->comp_times, 0, sizeof(node_times));
+   memset(&tm->lp_stat, 0, sizeof(lp_stat_desc));
    tm->comp_times.ramp_up_tm = ramp_up_tm;
    tm->comp_times.ramp_down_time = ramp_down_time;
    tm->comp_times.start_node = start_node;
@@ -1233,10 +1237,14 @@ int receive_lp_timing(tm_prob *tm)
 	       receive_char_array((char *)&tim, sizeof(node_times));
 	       tm->comp_times.communication    += tim.communication;
 	       tm->comp_times.lp               += tim.lp;
+	       tm->comp_times.lp_setup         += tim.lp_setup;
 	       tm->comp_times.separation       += tim.separation;
 	       tm->comp_times.fixing           += tim.fixing;
 	       tm->comp_times.pricing          += tim.pricing;
 	       tm->comp_times.strong_branching += tim.strong_branching;
+	       tm->comp_times.fp               += tim.fp;
+	       tm->comp_times.primal_heur      += tim.primal_heur;
+
 	       tm->comp_times.wall_clock_lp    += tim.wall_clock_lp;
 	       tm->comp_times.ramp_up_lp       += tim.ramp_up_lp;
 	       tm->comp_times.idle_diving      += tim.idle_diving;
@@ -1244,8 +1252,87 @@ int receive_lp_timing(tm_prob *tm)
 	       tm->comp_times.idle_names       += tim.idle_names;
 	       tm->comp_times.idle_cuts        += tim.idle_cuts;
 	       tm->comp_times.cut_pool         += tim.cut_pool;
-	       tm->comp_times.fp               += tim.fp;
-	       tm->comp_times.primal_heur      += tim.primal_heur;
+
+               tm->comp_times.cuts             += tim.cuts;
+               tm->comp_times.gomory_cuts      += tim.gomory_cuts;
+               tm->comp_times.knapsack_cuts    += tim.knapsack_cuts;
+               tm->comp_times.oddhole_cuts     += tim.oddhole_cuts;
+               tm->comp_times.clique_cuts      += tim.clique_cuts;
+               tm->comp_times.probing_cuts     += tim.probing_cuts;
+               tm->comp_times.mir_cuts         += tim.mir_cuts;
+               tm->comp_times.twomir_cuts      += tim.twomir_cuts;
+               tm->comp_times.rounding_cuts    += tim.rounding_cuts;
+               tm->comp_times.landp_cuts       += tim.landp_cuts;
+               tm->comp_times.flowcover_cuts   += tim.flowcover_cuts;
+               tm->comp_times.lift_and_project_cuts += 
+                 tim.lift_and_project_cuts;
+               tm->comp_times.redsplit_cuts    += tim.redsplit_cuts;
+               tm->comp_times.dupes_and_bad_coeffs_in_cuts += 
+                 tim.dupes_and_bad_coeffs_in_cuts;
+
+	       receive_char_array((char *)&lp_stat, sizeof(lp_stat_desc));
+               tm->lp_stat.lp_calls             += lp_stat.lp_calls;
+               tm->lp_stat.str_br_lp_calls      += lp_stat.str_br_lp_calls;
+               tm->lp_stat.lp_sols              += lp_stat.lp_sols;
+               tm->lp_stat.str_br_bnd_changes   += lp_stat.str_br_bnd_changes;
+               tm->lp_stat.str_br_nodes_pruned  += lp_stat.str_br_nodes_pruned;
+
+               tm->lp_stat.cuts_generated        += lp_stat.cuts_generated;
+               tm->lp_stat.gomory_cuts           += lp_stat.gomory_cuts;
+               tm->lp_stat.knapsack_cuts         += lp_stat.knapsack_cuts;
+               tm->lp_stat.oddhole_cuts          += lp_stat.oddhole_cuts;
+               tm->lp_stat.clique_cuts           += lp_stat.clique_cuts;
+               tm->lp_stat.probing_cuts          += lp_stat.probing_cuts;
+               tm->lp_stat.mir_cuts              += lp_stat.mir_cuts;
+               tm->lp_stat.twomir_cuts           += lp_stat.twomir_cuts;
+               tm->lp_stat.rounding_cuts         += lp_stat.rounding_cuts;
+               tm->lp_stat.landp_cuts            += lp_stat.landp_cuts;
+               tm->lp_stat.flowcover_cuts        += lp_stat.flowcover_cuts;
+               tm->lp_stat.lift_and_project_cuts += 
+                 lp_stat.lift_and_project_cuts;
+               tm->lp_stat.redsplit_cuts         += lp_stat.redsplit_cuts;
+
+               tm->lp_stat.cuts_root             += lp_stat.cuts_root;
+               tm->lp_stat.gomory_cuts_root      += lp_stat.gomory_cuts_root;
+               tm->lp_stat.knapsack_cuts_root    += lp_stat.knapsack_cuts_root;
+               tm->lp_stat.oddhole_cuts_root     += lp_stat.oddhole_cuts_root;
+               tm->lp_stat.clique_cuts_root      += lp_stat.clique_cuts_root;
+               tm->lp_stat.probing_cuts_root     += lp_stat.probing_cuts_root;
+               tm->lp_stat.mir_cuts_root         += lp_stat.mir_cuts_root;
+               tm->lp_stat.twomir_cuts_root      += lp_stat.twomir_cuts_root;
+               tm->lp_stat.rounding_cuts_root    += lp_stat.rounding_cuts_root;
+               tm->lp_stat.landp_cuts_root       += lp_stat.landp_cuts_root;
+               tm->lp_stat.flowcover_cuts_root   += lp_stat.flowcover_cuts_root;
+               tm->lp_stat.lift_and_project_cuts_root +=
+                 lp_stat.lift_and_project_cuts_root;
+               tm->lp_stat.redsplit_cuts_root += 
+                 lp_stat.redsplit_cuts_root;
+
+               tm->lp_stat.num_poor_cuts         += lp_stat.num_poor_cuts;
+               tm->lp_stat.num_duplicate_cuts    += lp_stat.num_duplicate_cuts;
+               tm->lp_stat.num_unviolated_cuts   += lp_stat.num_unviolated_cuts;
+               tm->lp_stat.cuts_deleted_from_lps += 
+                 lp_stat.cuts_deleted_from_lps;
+               tm->lp_stat.cuts_added_to_lps     += lp_stat.cuts_added_to_lps;
+
+               tm->lp_stat.gomory_calls           += lp_stat.gomory_calls;
+               tm->lp_stat.knapsack_calls         += lp_stat.knapsack_calls;
+               tm->lp_stat.oddhole_calls          += lp_stat.oddhole_calls;
+               tm->lp_stat.clique_calls           += lp_stat.clique_calls;
+               tm->lp_stat.probing_calls          += lp_stat.probing_calls;
+               tm->lp_stat.mir_calls              += lp_stat.mir_calls;
+               tm->lp_stat.twomir_calls           += lp_stat.twomir_calls;
+               tm->lp_stat.rounding_calls         += lp_stat.rounding_calls;
+               tm->lp_stat.landp_calls            += lp_stat.landp_calls;
+               tm->lp_stat.flowcover_calls        += lp_stat.flowcover_calls;
+               tm->lp_stat.lift_and_project_calls += 
+                 lp_stat.lift_and_project_calls;
+               tm->lp_stat.redsplit_calls         += lp_stat.redsplit_calls;
+
+               tm->lp_stat.fp_calls              += lp_stat.fp_calls;
+               tm->lp_stat.fp_lp_calls           += lp_stat.fp_lp_calls;
+               tm->lp_stat.fp_num_sols           += lp_stat.fp_num_sols;
+
 	       break;
 
 	     default:

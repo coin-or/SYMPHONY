@@ -7,7 +7,7 @@
 /* (c) Copyright 2005-2007 Michael Trick and Ted Ralphs. All Rights Reserved.*/
 /*                                                                           */
 /* This application was originally written by Michael Trick and was modified */
-/* by Ted Ralphs (tkralphs@lehigh.edu).                                      */
+/* by Ted Ralphs (ted@lehigh.edu)     .                                      */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -261,7 +261,7 @@ int user_send_lp_solution(void *user, int varnum, var_desc **vars, double *x,
 \*===========================================================================*/
 
 int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
-			int *status, int *num_fixed)
+			char *status, int *num_fixed)
 {
    *num_fixed = 0;
 

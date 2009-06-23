@@ -505,11 +505,11 @@ int send_lp_data_u(sym_environment *env, int sender)
 
    s_bufid = init_send(DataInPlace);
    send_char_array((char *)(&env->par.lp_par), sizeof(lp_params));
-   send_char_array(&env->has_ub, 1);
+   send_int_array(&env->has_ub, 1);
    if (env->has_ub)
       send_dbl_array(&env->ub, 1);
    if (env->par.multi_criteria){
-      send_char_array(&env->has_mc_ub, 1);
+      send_int_array(&env->has_mc_ub, 1);
       if (env->has_mc_ub){
 	 send_dbl_array(&env->mc_ub, 1);
 	 send_dbl_array(env->obj, 2);
@@ -646,6 +646,8 @@ int display_solution_u(sym_environment *env, int thread_num)
    int user_res, i;
    lp_sol sol;
 
+   memset(&sol, 0, sizeof(lp_sol));
+   
    sol.xlength = 0;
 
    if (env->par.verbosity < -1){

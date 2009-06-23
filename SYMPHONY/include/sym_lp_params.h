@@ -72,6 +72,23 @@ typedef struct CGL_PARAMS{
    int               landp_generated_in_root;
 
    int               probing_is_expensive;
+   int               probing_root_max_look;
+
+   int               gomory_max_depth;
+   int               probing_max_depth;
+   int               flowcover_max_depth;
+   int               twomir_max_depth;
+   int               clique_max_depth;
+   int               oddhole_max_depth;
+   int               knapsack_max_depth;
+   
+   int               use_chain_strategy;
+   int               chain_status;
+   int               max_chain_backtrack;
+   int               max_chain_trial_num;
+   int               chain_trial_freq;
+   int               chain_check_index;
+   double            chain_weighted_gap;
 }cgl_params;
 
 typedef struct LP_PARAMS{
@@ -83,6 +100,12 @@ typedef struct LP_PARAMS{
    double            time_limit;
 
    int               lp_data_mip_is_copied;
+   /* TRUE: save the base model after root solve and then load it each time we
+    * start a new chain (dive). FALSE: load the model from scratch. Basis
+    * information is loaded separately in both cases for a warm start. Cant be
+    * set by user.
+    */
+   int               should_reuse_lp; 
 
    /* these two are passed directly to the lp solver */
    int               scaling;
@@ -130,7 +153,7 @@ typedef struct LP_PARAMS{
    int               tailoff_obj_backsteps;
    double            tailoff_obj_frac;
    double            tailoff_absolute;
-   int               tailoff_max_no_impr_iters_root;
+   int               tailoff_max_no_iterative_impr_iters_root;
 
    int               ineff_cnt_to_delete;
    int               eff_cnt_before_cutpool;
@@ -175,9 +198,16 @@ typedef struct LP_PARAMS{
    double            strong_branching_high_low_weight;
    int               use_hot_starts;
    int               strong_br_all_candidates_level;
+   int               strong_br_min_level;
    int               user_set_strong_branching_cand_num;
    int               user_set_max_presolve_iter;
    int               should_use_rel_br;
+   int               rel_br_override_default;
+   int               rel_br_override_max_solves;
+   int               rel_br_chain_backtrack;
+   double            rel_br_min_imp;
+   double            rel_br_max_imp;
+
    int               rel_br_threshold; /* how many times to do strong branching
                                           on each variable before using pseudo 
                                           cost estimates */
@@ -185,6 +215,9 @@ typedef struct LP_PARAMS{
                                                using strong branching without 
                                                any improvement in score before 
                                                stopping */
+   int               rel_br_max_solves; /* stop after these many LP-solve calls
+                                           regardless of improvement */
+
    int               compare_candidates_default;
    int               select_child_default;
    int               pack_lp_solution_default;
@@ -203,6 +236,7 @@ typedef struct LP_PARAMS{
    int               fp_enabled;
    int               fp_frequency;
    int               fp_max_cycles;
+   int               fp_poor_sol_lim_fac;
    double            fp_time_limit;
    double            fp_display_interval;
    double            fp_flip_fraction;

@@ -54,6 +54,8 @@ int check_row_effectiveness(lp_prob *p)
     * Now based on their slack values, mark each row whether it's
     * violated, loose or tight */
 
+   //int base_m = orig_eff ? bcutnum : 0;
+   
    for (i = m - 1; i >= 0; i--){
       slack = slacks[i];
       switch (rows[i].cut->sense){
@@ -173,7 +175,11 @@ int check_row_effectiveness(lp_prob *p)
 
    deletable = k = 0;
    for (j = ineffective - 1; j >= 0; j--){
+      
       row = rows + (i = now_ineff[j]);
+
+      if(p->bc_level > 100 && !(row->deletable))row->deletable = TRUE;
+
       if (!row->free && row->deletable){
 	 row->free = TRUE;
 	 row->ineff_cnt = stat[i] == TIGHT_ROW ? 0 : ((MAXINT) >> 1);
@@ -384,10 +390,11 @@ void add_waiting_rows(lp_prob *p, waiting_row **wrows, int add_row_num)
 
    sense = lp_data->tmp.c; /* m */
    rhs = lp_data->tmp.d; /* m */
-   REMALLOC(lp_data->tmp.dv, double, lp_data->tmp.dv_size, nzcnt, 5*BB_BUNCH);
+   REMALLOC(lp_data->tmp.dv, double, lp_data->tmp.dv_size, nzcnt, 
+         5*(int)BB_BUNCH);
    rmatval = lp_data->tmp.dv; /* nzcnt */
    rmatbeg = lp_data->tmp.i1;
-   REMALLOC(lp_data->tmp.iv, int, lp_data->tmp.iv_size, nzcnt, 5*BB_BUNCH);
+   REMALLOC(lp_data->tmp.iv, int, lp_data->tmp.iv_size, nzcnt, 5*(int)BB_BUNCH);
    rmatind = lp_data->tmp.iv;
 
    *rmatbeg = 0;

@@ -121,7 +121,9 @@ typedef struct TM_PROB{
    int            *br_rel_down;
    int            *br_rel_up;
    int            *br_rel_cand_list;
-
+   int            *br_rel_down_min_level;
+   int            *br_rel_up_min_level;
+   
    /* some temporary stuff */
    bc_node      ***rpath;
    int            *rpath_size;

@@ -6,7 +6,7 @@
 /*                                                                           */
 /* (c) Copyright 2000-2009 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
-/* This application was developed by Ted Ralphs (tkralphs@lehigh.edu)        */
+/* This application was developed by Ted Ralphs (ted@lehigh.edu)             */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -105,7 +105,7 @@ typedef struct CNRP_SPEC{
 | Routines entirely specific to main_lp                                       |
 \*---------------------------------------------------------------------------*/
 
-lp_net *create_lp_net PROTO((cnrp_spec *cnrp, int *status, int edgenum,
+lp_net *create_lp_net PROTO((cnrp_spec *cnrp, char *status, int edgenum,
 			     var_desc **vars));
 int cnrp_lp_connected PROTO((lp_net *n, double *compdemands));
 void free_lp_net  PROTO((lp_net *n));

@@ -730,14 +730,14 @@ void read_string(char *target, char *line, int maxlen)
 
    if (value[0] != '"'){ /* the string is not quoted */
       quote1 = value;
-      len = strlen(quote1);
+      len = (int)strlen(quote1);
    }else{ /* the string is quoted */
       quote1 = strchr(line, '"');
       quote2 = strrchr(line,'"');
       if (quote1 == quote2)
 	 READPAR_ERROR(key);
       quote1++;
-      len = quote2 - quote1;
+      len = (int)(quote2 - quote1);
    }
    
    if (len > maxlen)

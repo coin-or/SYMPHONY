@@ -384,10 +384,14 @@ typedef struct BC_NODE{
    int         num_cuts_added_in_path;
    int         num_cuts_slacked_out_in_path;
    double      avg_cuts_obj_impr_in_path;
-
+   double      start_objval;
+   double      end_objval;
+   char        cuts_tried;
    int         num_str_br_cands_in_path;
    double      avg_br_obj_impr_in_path;
-
+   char        used_str;
+   int         t_cnt;
+   
    int         num_fp_calls_in_path;
 }bc_node;
 
@@ -420,14 +424,25 @@ typedef struct PROBLEM_STAT{
    double      max_vsize;
 }problem_stat;
 
+/*===========================================================================*/
+
 typedef struct LP_STAT{
    /* LP solver */
    int         lp_calls;
    int         lp_sols;
+   int         lp_total_iter_num; /* number of total simplex iterations */
+   int         lp_max_iter_num; /* max of lps' simplex iterations */
    int         str_br_lp_calls; /* no of calls from strong branching */
    int         str_br_bnd_changes; /* no of bounds changed due to strong br */
    int         str_br_nodes_pruned; /* no of nodes pruned by strong br */
-
+   int         str_br_total_iter_num; /* number of total simplex iterations by
+					 strong br*/
+   int         rel_br_full_solve_num;
+   int         rel_br_pc_up_num;
+   int         rel_br_up_update;
+   int         rel_br_pc_down_num; 
+   int         rel_br_down_update;
+   int         rel_br_impr_num;
    /* cuts */
    int         cuts_generated;
    int         gomory_cuts;
@@ -480,13 +495,16 @@ typedef struct LP_STAT{
    int         fp_calls;
    int         fp_lp_calls;
    int         fp_num_sols;
+   int         fp_poor_sols;
+   int         fp_lp_total_iter_num;
 
    /* usage of different tools in process chain: fp, cuts, strong branching */
    int         num_cut_iters_in_path;
    int         num_cuts_added_in_path;
    int         num_cuts_slacked_out_in_path;
    double      avg_cuts_obj_impr_in_path;
-
+   double      start_objval;
+   double      end_objval;
    int         num_str_br_cands_in_path;
    double      avg_br_obj_impr_in_path;
 
@@ -505,9 +523,16 @@ typedef struct RC_DESC{
    int        *cnt;
 }rc_desc;
 
-#define IMP_ROW 0
-#define IMP_COL 1
+/*===========================================================================*/
+/* Implications */
+/*===========================================================================*/
+/*===========================================================================*/
+typedef struct COL_IMP{
 
+   int col_ind;
+  struct COL_IMP *c_next;
+
+}col_imp;
 
 typedef struct IMPVAR{   
    
@@ -531,6 +556,9 @@ typedef struct IMPLIST{
    IMPvar * tail;   
 }IMPlist;
 
+/*===========================================================================*/
+/* Data structure to keep relevant info of a column */
+/*===========================================================================*/
 typedef struct COLINFO{
    int coef_type; /* all integer, all binary, fractional
 			 - considering the type of coefficients*/
@@ -552,7 +580,7 @@ typedef struct COLINFO{
  		       its 'l'ower bound, simiarly, 
 		       temporarily fixed to its 'u'pper bound		     
 		     */
-
+   int sos_num;      /* #of sos rows that this var appears in */
    int col_size;     /* col size */
    int fix_row_ind; /* state which row caused to fix this variable during
 		       basic preprocessor */
@@ -564,6 +592,9 @@ typedef struct COLINFO{
    
 }COLinfo;
 
+/*===========================================================================*/
+/* Data structure to keep relevant info of a row */
+/*===========================================================================*/
 typedef struct ROWINFO{
    int type; /* all mixed, binary, pure(not binary), cont_binary... */
    int bound_type;  /* all_bounded, mixed 
@@ -572,6 +603,10 @@ typedef struct ROWINFO{
 			 - considering the type of coefficients*/
    int sign_type; /* all_pos, all_neg, mixed */ 
 
+   char is_sos_row;
+   char * sos_rep;  /* compact representation of the sos row for bitwise
+		       operations */
+   
    /* for preprocessor */
 
    double fixed_obj_offset; /* obtained from fixed vars */
@@ -605,28 +640,57 @@ typedef struct ROWINFO{
 
 }ROWinfo;
 
+/*===========================================================================*/
+/* Data structure to collect information about the model   */
+/*===========================================================================*/
+
 typedef struct MIPINFO{ 
    int prob_type; /* mixed, pure(not binary), binary... */
    int cont_var_num;
    int binary_var_num;
+   int binary_var_nz;
    int fixed_var_num; 
    int integerizable_var_num;
    int max_row_size; 
    int max_col_size; 
    int obj_size;  /* number of nonzeros in objective function */
-   double mat_density;
+
    char is_opt_val_integral; /*is the optimal 
 			   solution value required to be integral, if one 
 			   exists*/
 
    double sum_obj_offset; /* from fixed variables*/
 
+   int binary_sos_row_num; /* sos rows with binary vars count*/
+   int binary_row_num; /* rows with binary vars*/
+   int cont_row_num; /* rows with cont vars */
+   int bin_cont_row_num; /* rows with both cont and bin vars */
+   int row_bin_den; /* binary nz / number of rows */
+   int col_bin_den; /* binary nz / number of binary columns */
+   int row_bin_den_mean; /* 2*row_bin_den*max_row_size/
+			    row_bin_den+max_row_size */
+   int col_bin_den_mean; /* same here for cols */
+
+   double bin_var_ratio;
+   double cont_var_ratio;
+   double int_var_ratio;
+   double max_row_ratio;
+   double max_col_ratio;
+   double mat_density;
+   double row_density;
+   double col_density;
+   double sos_bin_row_ratio;
+   double bin_row_ratio;
+   
    ROWinfo *rows;
    COLinfo *cols;
 }MIPinfo; 
 
+/*===========================================================================*/
+
 #if 0
 /* not implemented yet */
+/* to keep the differences with the original model */
 typedef struct MIPDIFF
 {
    int rows_del_num;
@@ -644,8 +708,9 @@ typedef struct MIPDIFF
 
 #endif 
 
+/*===========================================================================*/
 /* This structure stores the user's description of the model */
-
+/*===========================================================================*/
 typedef struct MIPDESC{
    int        n;           /* number of columns */
    int        m;           /* number of rows */
@@ -724,7 +789,9 @@ typedef struct WARM_START_DESC{
    int            trim_tree_index;
 }warm_start_desc;
 
+/*===========================================================================*/
 /* solution pool */
+
 typedef struct SP_SOLUTION_DESC{
    double         objval;
    int            xlength;
@@ -737,6 +804,8 @@ typedef struct SP_SOLUTION_DESC{
    /* The level of the node in bnb tree where this solution was discovered */
     int            node_level;  
 }sp_solution;
+
+/*===========================================================================*/
 
 typedef struct SP_DESC{
    /* max. no. of solutions in the pool */

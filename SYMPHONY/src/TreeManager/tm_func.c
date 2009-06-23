@@ -52,13 +52,6 @@ extern long random PROTO((void));
 #include "sym_cp.h"
 #endif
 
-/* experiments with memory usage --asm4 */
-#undef SHOULD_SHOW_MEMORY_USAGE
-#ifdef SHOULD_SHOW_MEMORY_USAGE
-#include <unistd.h>            /* to get pid */
-#endif
-
-
 int c_count = 0;
 
 /*===========================================================================*/
@@ -95,7 +88,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    signal(SIGINT, sym_catch_c);    
 #endif   
    par = &tm->par;
-
+   
 #ifdef _OPENMP
    tm->rpath =
       (bc_node ***) calloc(par->max_active_nodes, sizeof(bc_node **));
@@ -321,12 +314,12 @@ int solve(tm_prob *tm)
 #ifndef COMPILE_IN_LP
    int r_bufid;
 #endif
-   int termcode = 0, i;
+   int termcode = 0;
    double start_time = tm->start_time;
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
-   double timeout2 = 5, timeout3 = tm->par.logging_interval, timeout4 = 10;
+   double timeout2 = 30, timeout3 = tm->par.logging_interval, timeout4 = 10;
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
@@ -348,9 +341,9 @@ int solve(tm_prob *tm)
 #pragma omp parallel default(shared)
 {
 #ifdef _OPENMP
-      int thread_num = omp_get_thread_num();
+      int i, thread_num = omp_get_thread_num();
 #else
-      int thread_num = 0;
+      int i, thread_num = 0;
 #endif
       while (tm->active_node_num > 0 || tm->samephase_candnum > 0){
 	 /*------------------------------------------------------------------*\
@@ -667,8 +660,8 @@ void print_tree_status(tm_prob *tm)
    printf("memory: %.2f MB ", vsize_in_mb);
 #endif
 
-   printf("done: %i ", tm->stat.analyzed);
-   printf("left: %i ", tm->samephase_candnum);
+   printf("done: %i ", tm->stat.analyzed-tm->active_node_num);
+   printf("left: %i ", tm->samephase_candnum+tm->active_node_num);
    if (tm->has_ub) {
       if (tm->obj_sense == SYM_MAXIMIZE){
          obj_lb = -tm->ub + tm->obj_offset;
@@ -685,7 +678,7 @@ void print_tree_status(tm_prob *tm)
       }
    }
    find_tree_lb(tm);
-   if(tm->lb > -DBL_MAX){
+   if(tm->lb > -SYM_INFINITY){
       if (tm->obj_sense == SYM_MAXIMIZE){
 	 obj_ub = -tm->lb + tm->obj_offset;
 	 printf("ub: %.2f ", obj_ub);
@@ -693,8 +686,14 @@ void print_tree_status(tm_prob *tm)
 	 obj_lb = tm->lb + tm->obj_offset;
 	 printf("lb: %.2f ", obj_lb);
       }
+   }else{
+      if (tm->obj_sense == SYM_MAXIMIZE){
+	 printf("ub: ?? ");
+      }else{
+	 printf("lb: ?? ");
+      }
    }
-   if (tm->has_ub && tm->ub && tm->lb > -DBL_MAX){
+   if (tm->has_ub && tm->ub && tm->lb > -SYM_INFINITY){
       printf("gap: %.2f ", fabs(100*(obj_ub-obj_lb)/obj_ub));
    }
    printf("time: %i\n", (int)(elapsed_time));
@@ -1088,7 +1087,9 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       child->bc_index = tm->stat.tree_size++;
       child->bc_level = node->bc_level + 1;
       child->lower_bound = objval[i];
+#ifdef COMPILE_IN_LP
       child->update_pc = bobj->is_est[i] ? TRUE : FALSE;
+#endif
       child->parent = node;
       if (tm->par.verbosity > 10){
 	 printf("Generating node %i from %i...\n", child->bc_index,
@@ -1406,7 +1407,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 if (*keep == i)
 	    dive = DO_NOT_DIVE;
 	 REALLOC(tm->nextphase_cand, bc_node *,
-		 tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
+                 tm->nextphase_cand_size, tm->nextphase_candnum+1, BB_BUNCH);
 	 tm->nextphase_cand[tm->nextphase_candnum++] = child;
 	 np_cp++;
 	 np_sp++;
@@ -1457,7 +1458,7 @@ char shall_we_dive(tm_prob *tm, double objval)
    
    if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
       find_tree_lb(tm);
-      if (100*(tm->ub-tm->lb)/tm->ub <= tm->par.gap_limit){
+      if (100*(tm->ub-tm->lb)/(fabs(tm->ub)+etol) <= tm->par.gap_limit){
 	 return(FALSE);
       }
    }
@@ -2580,6 +2581,7 @@ int tasks_before_phase_two(tm_prob *tm)
    /* Report to the master all kind of statistics */
    s_bufid = init_send(DataInPlace);
    send_char_array((char *)&tm->comp_times, sizeof(node_times));
+   send_char_array((char *)&tm->lp_stat, sizeof(lp_stat_desc));
    send_dbl_array(&tm->lb, 1);
    send_char_array((char *)&tm->stat, sizeof(tm_stat));
    send_msg(tm->master, TM_FIRST_PHASE_FINISHED);
@@ -2656,6 +2658,7 @@ int trim_subtree(tm_prob *tm, bc_node *n)
       FREE(n->bobj.range);
       FREE(n->bobj.branch);
 #endif
+      FREE(n->bobj.solutions); //added by asm4
    }else{
       /* try to trim every child */
       for (i = n->bobj.child_num - 1; i >= 0; i--)
@@ -3326,6 +3329,8 @@ void free_tm(tm_prob *tm)
       FREE(tm->br_rel_down);
       FREE(tm->br_rel_up);
       FREE(tm->br_rel_cand_list);
+      FREE(tm->br_rel_down_min_level);
+      FREE(tm->br_rel_up_min_level);
    }
    
    FREE(tm);
@@ -3361,6 +3366,7 @@ void free_tree_node(bc_node *n)
    FREE(n->bobj.range);
    FREE(n->bobj.branch);
 #endif
+   FREE(n->bobj.solutions); //added by asm4
 
    FREE(n->desc.uind.list);
    free_basis(&n->desc.basis);
@@ -3485,6 +3491,7 @@ int tm_close(tm_prob *tm, int termcode)
 
    s_bufid = init_send(DataInPlace);
    send_char_array((char *)&tm->comp_times, sizeof(node_times));
+   send_char_array((char *)&tm->lp_stat, sizeof(lp_stat_desc));
    send_dbl_array(&tm->lb, 1);
    send_char_array((char *)&tm->stat, sizeof(tm_stat));
    send_msg(tm->master, termcode);
@@ -3542,7 +3549,7 @@ int find_tree_lb(tm_prob *tm)
    double lb = MAXDOUBLE;
    bc_node **samephase_cand;
 
-   if (tm->samephase_candnum > 0) {
+   if (tm->samephase_candnum > 0 || tm->active_node_num > 0) {
       if (tm->par.node_selection_rule == LOWEST_LP_FIRST) {
          lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
       } else {

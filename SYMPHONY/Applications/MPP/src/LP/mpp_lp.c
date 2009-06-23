@@ -7,7 +7,7 @@
 /* (c) Copyright 2005-2007 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* This application was originally developed by Andrew Hofmann and was       */
-/* modified by  Ted Ralphs (tkralphs@lehigh.edu)                             */
+/* modified by  Ted Ralphs (ted@lehigh.edu)                                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -310,7 +310,7 @@ int user_send_lp_solution(void *user, int varnum, var_desc **vars, double *x,
 \*===========================================================================*/
 
 int user_logical_fixing(void *user, int varnum, var_desc **vars, double *x,
-			int *status, int *num_fixed)
+			char *status, int *num_fixed)
 {
    return(USER_DEFAULT);
 }

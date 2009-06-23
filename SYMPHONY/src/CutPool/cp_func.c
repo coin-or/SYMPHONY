@@ -187,7 +187,7 @@ int delete_ineffective_cuts(cut_pool *cp)
 	 FREE(*cp_cut1);
       }
       cp->cut_num -= del_cuts;
-      cp->size -= del_cuts * sizeof(cp_cut_data);
+      cp->size -= del_cuts * (int) sizeof(cp_cut_data);
       break;
 
     case DELETE_BY_TOUCHES:
@@ -207,7 +207,7 @@ int delete_ineffective_cuts(cut_pool *cp)
 	    }
 	 }
 	 cp->cut_num -= tmp_del_cuts;
-	 cp->size -= tmp_del_cuts * sizeof(cp_cut_data);
+	 cp->size -= tmp_del_cuts * (int)sizeof(cp_cut_data);
 	 del_cuts += tmp_del_cuts;
 	 touches_until_deletion--;
       }
@@ -267,7 +267,7 @@ int delete_duplicate_cuts(cut_pool *cp)
    }
 
    cp->cut_num -= del_cuts;
-   cp->size -= del_cuts * sizeof(cp_cut_data);
+   cp->size -= del_cuts * (int)sizeof(cp_cut_data);
 
    if (cp->par.verbosity > 5)
       printf("******* CUT_POOL : Deleted %i duplicate cuts leaving %i\n",
@@ -384,7 +384,7 @@ int cp_read_tm_cut_list(cut_pool *cp, char *file)
       cp->cuts[i]->cut.branch = (char)tmp2;
       cp->cuts[i]->cut.coef = 
 	(char *) malloc(cp->cuts[i]->cut.size*sizeof(char));
-      cp->size += cp->cuts[i]->cut.size + sizeof(cp_cut_data);
+      cp->size += cp->cuts[i]->cut.size + (int) sizeof(cp_cut_data);
       for (j = 0; j < cp->cuts[i]->cut.size; j++){
 	 fscanf(f, "%i ", &tmp1);
 	 cp->cuts[i]->cut.coef[j] = (char)tmp1;

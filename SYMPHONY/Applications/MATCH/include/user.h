@@ -7,7 +7,7 @@
 /* (c) Copyright 2005-2008 Michael Trick and Ted Ralphs. All Rights Reserved.*/
 /*                                                                           */
 /* This application was originally written by Michael Trick and was modified */
-/* by Ted Ralphs (tkralphs@lehigh.edu).                                      */
+/* by Ted Ralphs (ted@lehigh.edu)     .                                      */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
