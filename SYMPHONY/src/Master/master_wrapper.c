@@ -195,6 +195,7 @@ int io_u(sym_environment *env)
 	 printf("ERROR: SYMPHONY can only read GMPL/AMPL files if GLPK is \n");
 	 printf("installed and the USE_GLPMPL compiler define is set. \n");
 	 printf("Exiting.\n\n");
+	 return (ERROR__READING_GMPL_FILE);
 #endif
       }
       
@@ -668,6 +669,9 @@ int display_solution_u(sym_environment *env, int thread_num)
 
    if (!sol.has_sol){
       switch(env->termcode){
+       case TM_UNBOUNDED:
+	 printf("\nThe problem is unbounded!\n\n");
+	 return(FUNCTION_TERMINATED_NORMALLY);
        case TM_NO_SOLUTION:
 	  printf("\nThe problem is infeasible!");
 	  break;

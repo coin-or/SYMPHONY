@@ -417,7 +417,14 @@ int solve(tm_prob *tm)
 	     case ERROR__USER:
 	       termcode = TM_ERROR__USER;
 	       break;
-	       
+
+	     case ERROR__DUAL_INFEASIBLE:
+	       if(tm->lpp[thread_num]->bc_index < 1 ) {		  
+		  termcode = TM_UNBOUNDED;
+	       }else{
+		  termcode = TM_ERROR__NUMERICAL_INSTABILITY;
+	       }
+	       break;	       
 	    }
 #endif
 #pragma omp master
@@ -516,6 +523,9 @@ int solve(tm_prob *tm)
 }
       }
 }
+
+      if(termcode == TM_UNBOUNDED) break;
+
       if (tm->samephase_candnum + tm->active_node_num == 0){
 	 termcode = TM_FINISHED;
       }

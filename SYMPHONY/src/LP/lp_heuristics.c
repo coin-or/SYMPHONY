@@ -24,7 +24,6 @@
 #include "sym_lp_solver.h"
 #include "sym_primal_heuristics.h"
 #include "sym_macros.h"
-#include "sym_return_values.h"
 
 /*===========================================================================*/
 /*===========================================================================*\

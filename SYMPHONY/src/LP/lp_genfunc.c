@@ -299,22 +299,25 @@ int fathom_branch(lp_prob *p)
 
       /* display the current solution */
       if (p->mip->obj_sense == SYM_MAXIMIZE){
-         if ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2) {
+         if (termcode == LP_OPTIMAL &&
+	     ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2)) {
             PRINT(verbosity, -1, ("The LP value is: %.3f [%i,%i]\n\n",
                                    -lp_data->objval + p->mip->obj_offset,
                                    termcode, iterd));
          }
 
       }else{
-         if ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2) {
+         if (termcode == LP_OPTIMAL &&
+	     ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2)) {
             PRINT(verbosity, -1, ("The LP value is: %.3f [%i,%i]\n\n",
                                    lp_data->objval+ p->mip->obj_offset,
                                    termcode, iterd));
          }
       }
       switch (termcode){
-       case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
+	 return(ERROR__DUAL_INFEASIBLE);
+       case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
        case LP_ABANDONED:
 	 printf("####### Unexpected termcode: %i \n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){

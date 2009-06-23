@@ -25,7 +25,7 @@
 #define ERROR__NUMERICAL_INSTABILITY   -103
 #define ERROR__ILLEGAL_BRANCHING       -104
 #define ERROR__COMM_ERROR              -105
-
+#define ERROR__DUAL_INFEASIBLE         -106  
 /*---------------------------- type of the problem --------------------------*/
 #define ZERO_ONE_PROBLEM         0
 #define INTEGER_PROBLEM          1

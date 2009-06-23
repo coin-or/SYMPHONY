@@ -57,8 +57,9 @@
 #define TM_UNFINISHED                     233
 #define TM_FEASIBLE_SOLUTION_FOUND        234
 #define TM_SIGNAL_CAUGHT                  235
-#define PREP_OPTIMAL_SOLUTION_FOUND       236
-#define PREP_NO_SOLUTION                  237
+#define TM_UNBOUNDED                      236
+#define PREP_OPTIMAL_SOLUTION_FOUND       237
+#define PREP_NO_SOLUTION                  238
 #define TM_ERROR__NO_BRANCHING_CANDIDATE -250
 #define TM_ERROR__ILLEGAL_RETURN_CODE    -251
 #define TM_ERROR__NUMERICAL_INSTABILITY  -252

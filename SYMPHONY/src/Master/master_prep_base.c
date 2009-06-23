@@ -3158,7 +3158,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
    double etol = params.etol;
    double coeff_etol = 1e-15;
    int verbosity = params.verbosity;
-   //   int p_level = prep_par.prep_level;
+   int p_level = params.level;
    //   int termcode; 
 
    /* fixme! objsense min max issue!!! will always assume that it is a 
@@ -3219,14 +3219,14 @@ int prep_initialize_mipinfo(PREPdesc *P)
       }
       
       cols[i].var_type = 'I';
-      if(lb[i] >= ub[i] + etol){
+      if(lb[i] >= ub[i] + etol && p_level > 2){
 	 stats->col_infeas_ind = i;
 	 return(PREP_INFEAS);
       }else if(lb[i] > (ub[i] - etol)){	 
 	 cols[i].var_type = 'F';
 	 fixed_obj_offset += obj[i]*ub[i];
 	 fixed_var_cnt++;	 
-	 if(ub[i] >= INF || ub[i] <= -INF){
+	 if(ub[i] >= INF || ub[i] <= -INF && p_level > 2){
 	    stats->col_numeric_ind = i;
 	    return(PREP_NUMERIC_ERROR);
 	 }else{
@@ -3404,7 +3404,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	 //if((obj[i] > 0.0 && obj_sense == SYM_MAXIMIZE) ||
 	 //(obj[i] < 0.0 && obj_sense == SYM_MINIMIZE)){
 	 if(obj[i] < 0.0){
-	    if(ub[i] >= INF){
+	    if(ub[i] >= INF && p_level > 2){
 	       stats->col_unbound_ind = i;
 	       return(PREP_UNBOUNDED); /* fixme: unbounded return code */
 	    }else{
@@ -3427,7 +3427,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
       }
       if(is_col_all_pos || col_size <= 0){
 	 if(obj[i] > 0.0){
-	    if(lb[i] <= -INF){
+	    if(lb[i] <= -INF && p_level > 2){
 	       stats->col_unbound_ind = i;
 	       return(PREP_UNBOUNDED);
 	    }else{
@@ -4423,86 +4423,86 @@ int prep_report(PREPdesc *P, int termcode)
    int i;
    prep_stats stats = P->stats;
    int p_level = P->params.level;
-   
-   switch(termcode){
-    case PREP_INFEAS:
-      printf("Preprocessing detected infeasibility...");
-      if(stats.col_infeas_ind >= 0 ||
-	 stats.row_infeas_ind >= 0){
-	 printf("while improving bounds of \n\t");	  
-	 if(stats.col_infeas_ind >= 0){
-	    printf("variable ");
-	    if(mip->colname){
-	       printf("%s ", mip->colname[stats.col_infeas_ind]); 
+
+   if(p_level > 2){
+      switch(termcode){
+       case PREP_INFEAS:
+	 printf("Preprocessing detected infeasibility...");
+	 if(stats.col_infeas_ind >= 0 ||
+	    stats.row_infeas_ind >= 0){
+	    printf("while improving bounds of \n\t");	  
+	    if(stats.col_infeas_ind >= 0){
+	       printf("variable ");
+	       if(mip->colname){
+		  printf("%s ", mip->colname[stats.col_infeas_ind]); 
+	       }
+	       printf("[%i]", stats.col_infeas_ind);
+	       if(stats.row_infeas_ind >= 0){
+		  printf(" on the ");
+	       }
 	    }
-	    printf("[%i]", stats.col_infeas_ind);
 	    if(stats.row_infeas_ind >= 0){
-	       printf(" on the ");
+	       printf("row [%i]", stats.row_infeas_ind);
+	    }
+	    printf("\n");	     
+	 }
+	 break;
+       case PREP_UNBOUNDED:
+	 printf("Preprocessing detected unbounded problem...");	  
+	 if(stats.col_unbound_ind >= 0){
+	    printf("while improving bounds on \n");	  
+	    if(mip->colname){
+	       printf("variable %s [%i]\n", 
+		      mip->colname[stats.col_unbound_ind], 
+		      stats.col_unbound_ind);
+	    }else{
+	       printf("variable [%i]\n", 
+		      stats.col_unbound_ind);		
 	    }
 	 }
-	 if(stats.row_infeas_ind >= 0){
-	    printf("row [%i]", stats.row_infeas_ind);
+	 break;
+       case PREP_NUMERIC_ERROR:
+	 printf("Preprocessing detected numerical problems ");	  
+	 if(stats.col_numeric_ind >= 0){
+	    printf("while improving bounds on \n");	  
+	    if(mip->colname){
+	       printf("variable %s [%i]\n", 
+		      mip->colname[stats.col_numeric_ind], 
+		      stats.col_numeric_ind);
+	    }else{
+	       printf("variable [%i]\n", 
+		      stats.col_numeric_ind);		
+	    }
 	 }
-	 printf("\n");	     
-      }
-      break;
-    case PREP_UNBOUNDED:
-      printf("Preprocessing detected unbounded problem...");	  
-      if(stats.col_unbound_ind >= 0){
-	 printf("while improving bounds on \n");	  
-	 if(mip->colname){
-	    printf("variable %s [%i]\n", 
-		   mip->colname[stats.col_unbound_ind], 
-		   stats.col_unbound_ind);
+	 break;
+       case PREP_OTHER_ERROR:
+	 printf("Preprocessing - unknown error.. ignoring presolve...\n");
+	 break;
+       case PREP_SOLVED:
+	 printf("Preprocessing found the optimum:\n");	  	  
+	 printf("Solution Cost: %f\n:", mip->obj_offset);
+	 if (mip->colname){ 
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf("Column names and values of nonzeros in the solution\n");
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    for (i = 0; i < mip->fixed_n; i++){
+	       printf("%8s %10.3f\n", P->orig_mip->colname[mip->fixed_ind[i]],
+		      mip->fixed_val[i]);
+	    }
+	    printf("\n");
 	 }else{
-	    printf("variable [%i]\n", 
-		   stats.col_unbound_ind);		
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf("User indices and values of nonzeros in the solution\n");
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    for (i = 0; i < mip->fixed_n; i++){
+	       printf("%7d %10.3f\n", mip->fixed_ind[i], mip->fixed_val[i]);
+	    }
+	    printf("\n");
 	 }
-      }
-      break;
-    case PREP_NUMERIC_ERROR:
-      printf("Preprocessing detected numerical problems ");	  
-      if(stats.col_numeric_ind >= 0){
-	 printf("while improving bounds on \n");	  
-	 if(mip->colname){
-	    printf("variable %s [%i]\n", 
-		   mip->colname[stats.col_numeric_ind], 
-		   stats.col_numeric_ind);
-	 }else{
-	    printf("variable [%i]\n", 
-		   stats.col_numeric_ind);		
-	 }
-      }
-      break;
-    case PREP_OTHER_ERROR:
-      printf("Preprocessing - unknown error.. ignoring presolve...\n");
-      break;
-    case PREP_SOLVED:
-      printf("Preprocessing found the optimum:\n");	  	  
-      printf("Solution Cost: %f\n:", mip->obj_offset);
-      if (mip->colname){ 
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf("Column names and values of nonzeros in the solution\n");
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < mip->fixed_n; i++){
-	    printf("%8s %10.3f\n", P->orig_mip->colname[mip->fixed_ind[i]],
-		   mip->fixed_val[i]);
-	 }
-	 printf("\n");
-      }else{
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf("User indices and values of nonzeros in the solution\n");
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < mip->fixed_n; i++){
-	    printf("%7d %10.3f\n", mip->fixed_ind[i], mip->fixed_val[i]);
-	 }
-	 printf("\n");
-      }
-      break;	  
-    default:
-      if(p_level > 2){
+	 break;	  
+       default:
 	 printf("Preprocessing finished...\n ");	  
-      
+	 
 	 if(stats.coeffs_changed + 
 	    stats.bounds_tightened + 
 	    stats.rows_deleted + 
@@ -4530,23 +4530,26 @@ int prep_report(PREPdesc *P, int termcode)
 	       }	     
 	    }
 	    if(stats.vars_aggregated > 0){
-	       printf("\t variables aggregated: %i\n", stats.vars_aggregated);
+	       printf("\t variables aggregated: %i\n",
+		      stats.vars_aggregated);
 	    }
 	    if(stats.vars_integerized > 0){
-	       printf("\t variables integerized: %i\n", stats.vars_integerized);
+	       printf("\t variables integerized: %i\n",
+		      stats.vars_integerized);
 	    }
 	    
 	 }else{
 	    printf("\t with no modifications...\n");
 	 }
       }
-      printf("Problem has \n"
-	     "\t %i constraints \n"
-	     "\t %i variables \n"
-	     "\t %i nonzero coefficients\n", 
-	     mip->m, mip->n, mip->nz);	     	  
-      break;
    }
+
+   printf("Problem has \n"
+	  "\t %i constraints \n"
+	  "\t %i variables \n"
+	  "\t %i nonzero coefficients\n", 
+	  mip->m, mip->n, mip->nz);	     	  
+   
    printf("\n");
    return 0;
 }
