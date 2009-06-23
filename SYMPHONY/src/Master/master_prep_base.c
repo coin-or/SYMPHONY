@@ -108,7 +108,7 @@ int prep_basic(PREPdesc *P)
    sense = mip->sense;
    rhs = mip->rhs;
 
-   char need_reset, *impl_vars = NULL;
+   char need_reset;
    
    /* check if we have binary columns */
    if(mip_inf->prob_type == BINARY_TYPE ||
@@ -140,8 +140,6 @@ int prep_basic(PREPdesc *P)
 	    P->impl_cols = (COLinfo *)malloc(sizeof(COLinfo)*n); 
 	    P->impl_ub = (double *) malloc(DSIZE*n);
 	    P->impl_lb = (double *) malloc(DSIZE*n);
-	    P->impl_var_ind = (int *)malloc(ISIZE * n);
-	    P->impl_var_stat = (char *)malloc(CSIZE * n);
 	    
 	    P->ulist_checked = (char *)malloc(CSIZE * n);
 	    P->llist_checked = (char *)malloc(CSIZE * n);
@@ -151,10 +149,10 @@ int prep_basic(PREPdesc *P)
 	    
 	    /* get the list of columns to apply impl on */
 	    /* not effective */
-	    impl_vars = (char *) calloc(CSIZE,n);
+	    P->impl_vars = (char *) calloc(CSIZE,n);
 	    
 	    for(i = n - 1; i >= 0; i--){
-	       impl_vars[i] = TRUE;
+	       P->impl_vars[i] = TRUE;
 	       
 	    }
 	 }
@@ -186,7 +184,7 @@ int prep_basic(PREPdesc *P)
 	 /* disabled now */
 	 if(can_impl && impl_time < params.time_limit){
 	    if(cols[col_ind].var_type == 'B' && 
-	       impl_vars[col_ind]){
+	       P->impl_vars[col_ind]){
 	       
 	       /* fist copy initial info */
 	       /* do once for each variable */
@@ -224,6 +222,7 @@ int prep_basic(PREPdesc *P)
 							    TRUE);
 		  if(termcode == PREP_INFEAS){
 		     free_imp_list(&(cols[col_ind].ulist));		     
+		     P->list = 0;
 		     /*then this column is fixable to its lower bound! */
 		     new_bound = 0.0;
 		     fix_type = FIX_BINARY;
@@ -257,6 +256,7 @@ int prep_basic(PREPdesc *P)
 							    TRUE, TRUE);
 		  if(termcode == PREP_INFEAS){
 		     free_imp_list(&(cols[col_ind].llist));
+		     P->list = 0;
 		     new_bound = 1.0;
 		     fix_type = FIX_BINARY;
 		  }
@@ -441,16 +441,6 @@ int prep_basic(PREPdesc *P)
       printf("total impl_rows_time: %f\n", P->impl_rows_time);
    }
 #endif
-   
-   FREE(impl_vars);
-
-   /* we dont use impl_lists now, so delete them */
-   if(can_impl){ 
-      for(j = 0; j < n; j++){
-	 free_imp_list(&cols[j].ulist);
-	 free_imp_list(&cols[j].llist);      
-      }
-   }   
    
    if(new_changes_cnt + stats->coeffs_changed + mip_inf->fixed_var_num > 0){
       termcode = prep_cleanup_desc(P);
@@ -1842,7 +1832,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 
 	    fix_type = IMPROVE_COEF; 
 	    termcode = PREP_MODIFIED;
-	 }else if(FALSE && !impl_mode &&
+	 }else if(FALSE && !impl_mode && //disabled --
 		  ((a_val > etol && !P->ulist_checked[col_ind]) ||
 		   (a_val < -etol && !P->llist_checked[col_ind]))){
 
@@ -4629,6 +4619,7 @@ void prep_sos_fill_var_cnt(PREPdesc *P)
    for(i = 0; i < m; i++){
       if(rows[i].is_sos_row){
 	 FREE(rows[i].sos_rep);
+	 rows[i].sos_rep = 0;
       }
    }
    
@@ -4651,14 +4642,17 @@ void free_prep_desc(PREPdesc *P)
 	 free_mip_desc(P->mip);
       }
       /* fixme - add impl stuff here - disabled now*/
-      FREE(P->impl_var_stat);
-      FREE(P->impl_row_ind);
-      FREE(P->impl_var_ind);
+      FREE(P->impl_vars);
       FREE(P->impl_ub);
       FREE(P->impl_lb);
       FREE(P->ulist_checked);
       FREE(P->llist_checked);
       FREE(P->rows_checked);
+
+      /* since used to keep only static row and col info,
+      */
+      FREE(P->impl_cols);
+      FREE(P->impl_rows);
       
       FREE(P->user_col_ind);
       FREE(P->user_row_ind);
