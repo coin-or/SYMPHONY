@@ -49,7 +49,7 @@ int prep_basic(PREPdesc *P)
 
    char can_impl = FALSE, bin_type = FALSE;
    int dive_level, impl_dive_level, impl_limit;
-   int old_changes_cnt, new_changes_cnt, init_changes_cnt = 0;
+   int old_changes_cnt, changes_diff = 0, new_changes_cnt, init_changes_cnt = 0;
    int old_others_cnt, new_others_cnt, mark_others_cnt = 0;
    double start_impl_time, mark_time, impl_time = 0.0;
 
@@ -150,10 +150,9 @@ int prep_basic(PREPdesc *P)
 	    /* get the list of columns to apply impl on */
 	    /* not effective */
 	    P->impl_vars = (char *) calloc(CSIZE,n);
-	    
+	    	    
 	    for(i = n - 1; i >= 0; i--){
 	       P->impl_vars[i] = TRUE;
-	       
 	    }
 	 }
       }
@@ -166,7 +165,7 @@ int prep_basic(PREPdesc *P)
    while(iter_cnt < iter_cnt_limit){
       
       iter_cnt++;
-
+      
       PRINT(verbosity, 1, ("Basic iteration number: %d\n", iter_cnt));
 
       /* check the updated bounds and cols to iterate on*/
@@ -184,8 +183,9 @@ int prep_basic(PREPdesc *P)
 	 /* disabled now */
 	 if(can_impl && impl_time < params.time_limit){
 	    if(cols[col_ind].var_type == 'B' && 
-	       P->impl_vars[col_ind]){
-	       
+	       P->impl_vars[col_ind] && (iter_cnt < 2 ||
+					 (iter_cnt > 1 &&
+					  changes_diff > 0))){
 	       /* fist copy initial info */
 	       /* do once for each variable */
 	       start_impl_time = wall_clock(NULL);
@@ -202,10 +202,10 @@ int prep_basic(PREPdesc *P)
 
 	       if(cols[col_ind].sign_type != ALL_NEG_VEC){
 		  need_reset = TRUE;
-		  if(!cols[col_ind].ulist){
-		     cols[col_ind].ulist = 
-			(IMPlist *)calloc(sizeof(IMPlist),1);
-		  }	       
+		  //if(!cols[col_ind].ulist){
+		     // P->impl_cols[col_ind].ulist = (cols[col_ind].ulist = 
+		     //	(IMPlist *)calloc(sizeof(IMPlist),1));
+		  //}	       
 		  
 		  P->list = cols[col_ind].ulist;	      
 		  /* fix it to 1.0 and see if that causes any infeasibility 
@@ -220,9 +220,10 @@ int prep_basic(PREPdesc *P)
 							    1.0,
 							    FIX_BINARY, TRUE, 
 							    TRUE);
-		  if(termcode == PREP_INFEAS){
-		     free_imp_list(&(cols[col_ind].ulist));		     
-		     P->list = 0;
+		  free_imp_list(&(cols[col_ind].ulist));
+		  P->impl_cols[col_ind].ulist = 0;
+		  P->list = 0;
+		  if(termcode == PREP_INFEAS){		  
 		     /*then this column is fixable to its lower bound! */
 		     new_bound = 0.0;
 		     fix_type = FIX_BINARY;
@@ -242,10 +243,10 @@ int prep_basic(PREPdesc *P)
 		     P->stats = P->impl_stats;
 		     P->alloc_time += wall_clock(NULL) - mark_time;
 		  }
-		  if(!cols[col_ind].llist){
-		     cols[col_ind].llist = 
-			(IMPlist *)calloc(sizeof(IMPlist),1);
-		  }
+		  //if(!cols[col_ind].llist){
+		     //P->impl_cols[col_ind].llist = (cols[col_ind].llist = 
+		     //	(IMPlist *)calloc(sizeof(IMPlist),1));
+		  //}
 		  
 		  P->list = cols[col_ind].llist;	      
 		  P->impl_col_ind = col_ind;
@@ -254,9 +255,10 @@ int prep_basic(PREPdesc *P)
 							    impl_dive_level,
 							    0.0, FIX_BINARY, 
 							    TRUE, TRUE);
+		  free_imp_list(&(cols[col_ind].llist));
+		  P->impl_cols[col_ind].llist = 0;
+		  P->list = 0;		  
 		  if(termcode == PREP_INFEAS){
-		     free_imp_list(&(cols[col_ind].llist));
-		     P->list = 0;
 		     new_bound = 1.0;
 		     fix_type = FIX_BINARY;
 		  }
@@ -365,7 +367,9 @@ int prep_basic(PREPdesc *P)
       new_others_cnt = stats->coeffs_changed + 
 	 stats->bounds_tightened;
 
-      if(new_changes_cnt > old_changes_cnt){
+      changes_diff = new_changes_cnt - old_changes_cnt;
+      
+      if(changes_diff > 0){
 	 old_changes_cnt = new_changes_cnt;
 	 old_others_cnt = new_others_cnt;
       }else{
@@ -434,7 +438,7 @@ int prep_basic(PREPdesc *P)
    
 #if 0
    if(verbosity >= 2){
-      printf("total alloc time: %f\n", P->alloc_time);
+      printf("total alloc time: %f\n", P->alloc_time);  
       printf("total alloc time2: %f\n", P->alloc2_time);
       printf("total impl time2: %f\n", impl_time);
       printf("total impl_cols_time: %f\n", P->impl_cols_time);
@@ -1853,9 +1857,9 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 	    P->impl_stats = P->stats;
 	    if(a_val > etol){
 
-	       if(!cols[col_ind].ulist){
-		  cols[col_ind].ulist = (IMPlist *)calloc(sizeof(IMPlist),1);
-	       }	       
+	       //if(!cols[col_ind].ulist){
+		  // cols[col_ind].ulist = (IMPlist *)calloc(sizeof(IMPlist),1);
+	       //}	       
 
 	       P->list = cols[col_ind].ulist;	      
 	       P->ulist_checked[col_ind] = TRUE;
@@ -1884,9 +1888,9 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 	       }
 	    }else if (a_val < etol){
 
-	       if(!cols[col_ind].llist){
-		  cols[col_ind].llist = (IMPlist *)calloc(sizeof(IMPlist),1);
-	       }
+	       //if(!cols[col_ind].llist){
+		  //  cols[col_ind].llist = (IMPlist *)calloc(sizeof(IMPlist),1);
+	       //}
 
 	       P->list = cols[col_ind].llist;	      
 	       P->llist_checked[col_ind] = TRUE;
@@ -2157,7 +2161,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 
     /*first, if in impl mode, add these variables to current impl_list */
    /* do this above */
-   int can_iterate = FALSE;
+   int can_iterate = TRUE;
 
    double mark_time = wall_clock(NULL);
    //if(intl_fix_type != FIX_AGGREGATE){
@@ -2303,7 +2307,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
       
       /* now add to impl list if in impl_mode */
 
-      if(fix_type != FIX_AGGREGATE){
+      if(fix_type != FIX_AGGREGATE && FALSE){ //disabled now
 	 if(impl_mode && P->impl_col_ind != col_ind){
 	    if(P->list->size < P->impl_limit){
 	       prep_add_to_impl_list(P->list, col_ind, fix_type, 
@@ -2317,7 +2321,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	 
 	 /* first see if you can fix any other variables from the 
 	    impl list of this variable */
-	    if(fix_type == FIX_BINARY){
+	    if(fix_type == FIX_BINARY && FALSE){ //disabled now
 	       if(lb[col_ind] >= 1.0 - etol){
 		  imp_list = cols[col_ind].ulist;
 	       }else{
@@ -2331,13 +2335,15 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 								  &imp_var->ind,
 								  -1, 0, 
 								  imp_var->val,
-								  FIX_BINARY, 
+								  imp_var->fix_type,//FIX_BINARY, 
 								  FALSE, FALSE);
 			if(PREP_QUIT(termcode)){
 			   can_iterate = FALSE;
 			   break;
 			}
 		     }
+
+		     if(!can_iterate) break;
 		  }
 	       }
 	    }
@@ -2371,7 +2377,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	 can_iterate = FALSE;
 	 break;
       }
-      
+
       end = matbeg[col_ind + 1];
       
       for(i = matbeg[col_ind]; i < end; i++){
@@ -4148,6 +4154,7 @@ int prep_cleanup_desc(PREPdesc *P)
 	    is_int[col_num] = is_int[i];
 	    if(col_num != i){
 	       cols[col_num] = cols[i];
+	       cols[i].ulist = cols[i].llist = 0;
 	       if(colnames){
 		  strcpy(colnames[col_num], colnames[i]);
 	       }
@@ -4555,14 +4562,13 @@ void prep_sos_fill_row(ROWinfo *row, int alloc_size, int size,
    if(row->sos_rep){
       memset(row->sos_rep, 0, CSIZE*sos_size); 
    }else{
-      row->sos_rep = (char *)malloc(CSIZE*sos_size);
+      row->sos_rep = (char *)calloc(CSIZE,sos_size);
    }
-   
+
    for(i = 0; i < size; i++){
-      row->sos_rep[ind[i] >> 3] |= 1 << (ind[i] & 7);
+      (row->sos_rep[ind[i] >> 3]) |= (1 << (ind[i] & 7));
    }
 }
-
 /*===========================================================================*/
 /*===========================================================================*/
 void prep_sos_fill_var_cnt(PREPdesc *P) 
@@ -4651,9 +4657,9 @@ void free_prep_desc(PREPdesc *P)
 
       /* since used to keep only static row and col info,
       */
+
       FREE(P->impl_cols);
       FREE(P->impl_rows);
-      
       FREE(P->user_col_ind);
       FREE(P->user_row_ind);
       FREE(P->stats.nz_coeff_changed);

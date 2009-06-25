@@ -134,7 +134,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
          last_fp_time = fp_time;
       }
 
-       is_feasible = FALSE;
+      is_feasible = FALSE;
       /* solve an lp */
       fp_round(fp_data, new_lp_data);
       if (fp_data->x_bar_len[fp_data->iter] == -1) {
@@ -263,9 +263,6 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    FREE(fp_data->x_lp);
    FREE(fp_data->x_ip);
    FREE(fp_data->index_list);
-   FREE(fp_data->x_bar_len);
-   FREE(fp_data->x_bar_val);
-   FREE(fp_data->x_bar_ind);
    FREE(fp_data->alpha_p);
    FREE(fp_data);
 
