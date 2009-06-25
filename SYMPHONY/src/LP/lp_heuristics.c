@@ -210,7 +210,10 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
             fp_poor_sol_lim = p->par.fp_poor_sol_lim_fac *
                               num_better_sols;
 	    /* menal ---*/ 
-	    if(p->bc_level > 0) break;	    
+	    if(p->bc_level > 0) {
+              fp_data->iter++;
+              break;	    
+            }
 	    /* --- */
          } else {
             num_poor_sols++;
