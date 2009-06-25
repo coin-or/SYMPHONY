@@ -1,10 +1,11 @@
-BuildTools         https://projects.coin-or.org/svn/BuildTools/trunk
-ThirdParty/Blas https://projects.coin-or.org/svn/BuildTools/ThirdParty/Blas/trunk
-ThirdParty/Lapack https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/trunk
-ThirdParty/Glpk    https://projects.coin-or.org/svn/BuildTools/ThirdParty/Glpk/trunk
-Data/Sample        https://projects.coin-or.org/svn/Data/trunk/Sample
-CoinUtils          https://projects.coin-or.org/svn/CoinUtils/trunk/CoinUtils
-Cgl                https://projects.coin-or.org/svn/Cgl/trunk/Cgl
-Clp                https://projects.coin-or.org/svn/Clp/trunk/Clp
-Osi                https://projects.coin-or.org/svn/Osi/trunk/Osi
-FlopC++            https://projects.coin-or.org/svn/FlopC++/trunk/FlopCpp
+BuildTools https://projects.coin-or.org/svn/BuildTools/releases/0.5.28
+ThirdParty/Glpk https://projects.coin-or.org/svn/BuildTools/ThirdParty/Glpk/releases/1.5.0
+ThirdParty/Blas https://projects.coin-or.org/svn/BuildTools/ThirdParty/Blas/releases/1.0.13
+ThirdParty/Lapack https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/releases/1.0.18
+Data/Sample https://projects.coin-or.org/svn/Data/releases/1.0.7/Sample
+CoinUtils https://projects.coin-or.org/svn/CoinUtils/releases/2.5.0/CoinUtils
+Cgl https://projects.coin-or.org/svn/Cgl/releases/0.54.0/Cgl
+Clp https://projects.coin-or.org/svn/Clp/releases/1.10.0/Clp
+Osi https://projects.coin-or.org/svn/Osi/releases/0.100.0/Osi
+FlopC++ https://projects.coin-or.org/svn/FlopC++/releases/1.0.5/FlopCpp
+
