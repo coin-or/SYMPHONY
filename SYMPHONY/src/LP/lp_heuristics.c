@@ -24,7 +24,6 @@
 #include "sym_lp_solver.h"
 #include "sym_primal_heuristics.h"
 #include "sym_macros.h"
-#include "sym_return_values.h"
 
 /*===========================================================================*/
 /*===========================================================================*\
@@ -71,10 +70,11 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    int                      fp_poor_sol_lim = p->par.fp_poor_sol_lim_fac;
    int                      total_iter_cnt = 0;
    fp_time                                = used_time(&total_time);
+
    if (p->lp_stat.fp_calls < 1) {
       CoinSeedRandom(17000);
    }
-
+   
    /* total_time and fp_time both now have total time used by symphony's lp
     * process */
    fp_time                                = used_time(&total_time);
@@ -89,6 +89,13 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    *found_better_solution = FALSE;
    fp_data->mip_obj       = (double *)malloc(n*DSIZE);
    fp_data->flip_fraction = p->par.fp_flip_fraction;
+
+   if(p->mip->mip_inf->binary_sos_row_num > 0){
+      fp_data->sos_row_filled = (char *)malloc(p->mip->m*CSIZE);      
+   }else{
+      fp_data->sos_row_filled = 0;
+   }
+
    memcpy(fp_data->mip_obj,mip_obj,n*DSIZE);
 
    /* initialize the lp solver. load the current basis */
@@ -114,12 +121,19 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    /* do the following max_iter times */
    fp_time += used_time(&total_time);
    int fp_override_cnt = 0;
-
+   /*
+   if(p->lp_stat.fp_calls == 1){
+      p->par.fp_time_limit += 10;
+      p->par.fp_max_initial_time += 10;
+   }else if (p->lp_stat.fp_calls == 2){
+      p->par.fp_time_limit -= 10;    
+      p->par.fp_max_initial_time -= 10;
+   }
+   */   
    if(p->lp_stat.fp_calls < 1){
       p->par.fp_time_limit += 20;
-      //      p->par.fp_max_initial_time += 10;
    }else if(p->lp_stat.fp_calls < 2){
-      // p->par.fp_time_limit -= 20;
+      p->par.fp_time_limit -= 20;
       p->par.fp_max_initial_time += 20;
    }else if(p->lp_stat.fp_calls < 3){
       p->par.fp_max_initial_time -= 20;
@@ -135,9 +149,9 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
          last_fp_time = fp_time;
       }
 
-       is_feasible = FALSE;
+      is_feasible = FALSE;
       /* solve an lp */
-      fp_round(fp_data, new_lp_data);
+       fp_round(p, fp_data, new_lp_data);
       if (fp_data->x_bar_len[fp_data->iter] == -1) {
          /*
           * the cost and reference point are same as some other iteration. we
@@ -259,14 +273,12 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    FREE(fp_data->x_bar_ind);
    FREE(fp_data->x_bar_len);
    FREE(fp_data->fp_vars);
+   FREE(fp_data->sos_row_filled);
    FREE(fp_data->obj);
    FREE(fp_data->mip_obj);
    FREE(fp_data->x_lp);
    FREE(fp_data->x_ip);
    FREE(fp_data->index_list);
-   FREE(fp_data->x_bar_len);
-   FREE(fp_data->x_bar_val);
-   FREE(fp_data->x_bar_ind);
    FREE(fp_data->alpha_p);
    FREE(fp_data);
 
@@ -678,12 +690,12 @@ int fp_add_obj_row(LPdata *new_lp_data, int n, const double *obj, double rhs)
 }
 
 /*===========================================================================*/
-int fp_round(FPdata *fp_data, LPdata *lp_data)
+int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
 {
    int termcode = FUNCTION_TERMINATED_NORMALLY;
    double *x_ip = fp_data->x_ip;
    double *x_lp = fp_data->x_lp;
-   int i,j, has_changed;
+   int i,j, k, has_changed;
    int n = fp_data->n0;
    double lpetol = lp_data->lpetol;
    int *tind = lp_data->tmp.i1; /* n */
@@ -741,25 +753,83 @@ int fp_round(FPdata *fp_data, LPdata *lp_data)
             }
          }
       }
+
       if (i<fp_iter) {
-         /* flip some vars in x_ip */
+         /* flip some vars in x_ip */	 
+	 if(p->mip->mip_inf->binary_sos_row_num > 0){
+	    memset(fp_data->sos_row_filled, 0, CSIZE*p->mip->m); 
+	 }
+	 
          int num_flipped = 0;
+	 int filled_cnt = 0;
+	 int row_ind = 0;
+	 
          has_changed = FALSE;
          PRINT(fp_data->verbosity,5,("fp: flipping\n"));
-         for (j=0; j<n; j++) {
-            if (vars[j]->is_bin) {
-               if (CoinDrand48()<flip_fraction) {
-                  x_ip[j] = 1-x_ip[j];
-                  num_flipped++;
-               }
-            } else if (vars[j]->is_int) {
-               if (CoinDrand48()<flip_fraction) {
-                  x_ip[j] = floor(x_lp[j]) + 
-                     floor(ceil(x_lp[j]) - x_lp[j] + 0.5); /*round and flip*/
-               }
-            }
-         }
-         PRINT(fp_data->verbosity,5,("fp: flipping %d\n", num_flipped));
+
+	 for (j=0; j<n; j++) {
+	    if (vars[j]->is_bin) {
+	       
+	       if (CoinDrand48()<flip_fraction) {
+		  x_ip[j] = 1-x_ip[j];
+		  num_flipped++;
+	       }
+	       
+	       if(x_ip[j] == 1.0 && p->mip->mip_inf->cols[j].sos_num){
+		  char rows_filled = FALSE;
+		  for(k = p->mip->matbeg[j]; k < p->mip->matbeg[j+1]; k++){
+		     row_ind = p->mip->matind[k];
+		     if(p->mip->mip_inf->rows[row_ind].is_sos_row){
+			if(fp_data->sos_row_filled[row_ind]){
+			   rows_filled = TRUE;
+			   break;
+			}			   
+		     }
+		  }
+		  if(rows_filled) x_ip[j] = 0.0;
+		  else{
+		     for(k = p->mip->matbeg[j]; k < p->mip->matbeg[j+1]; k++){
+			row_ind = p->mip->matind[k];
+			if(p->mip->mip_inf->rows[row_ind].is_sos_row){
+			   fp_data->sos_row_filled[row_ind] = TRUE; 
+			   filled_cnt++;
+			}
+		     }
+		  }
+	       }
+	       
+	    } else if (vars[j]->is_int) {
+	       if (CoinDrand48()<flip_fraction) {
+		  x_ip[j] = floor(x_lp[j]) + 
+		     floor(ceil(x_lp[j]) - x_lp[j] + 0.5); /*round and flip*/
+	       }
+	    }	    
+	 }
+
+	 if(p->mip->mip_inf->binary_sos_row_num > filled_cnt){
+	    int fix_col = 0;
+	    for(k = 0; k < p->mip->m; k++){
+	       if(p->mip->mip_inf->rows[k].is_sos_row &&
+		  !(fp_data->sos_row_filled[k])){
+		  fix_col = p->mip->row_matind[p->mip->row_matbeg[k]];
+		  for(j = p->mip->matbeg[fix_col]; j < p->mip->matbeg[fix_col + 1];
+		      j++){
+		     row_ind = p->mip->matind[j];
+		     if(p->mip->mip_inf->rows[row_ind].is_sos_row){		     
+			fp_data->sos_row_filled[row_ind] = TRUE;
+			filled_cnt++;
+		     }
+		  }
+		  x_ip[fix_col] = 1.0;
+		  if(filled_cnt >= p->mip->mip_inf->binary_sos_row_num){
+		     break;
+		  }
+	       }
+	    }
+	 }
+
+ 
+	 PRINT(fp_data->verbosity,5,("fp: flipping %d\n", num_flipped));
          if (num_flipped==0) {
             // TODO: dont know what to do
             break;

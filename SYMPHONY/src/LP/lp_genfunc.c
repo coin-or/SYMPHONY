@@ -299,22 +299,25 @@ int fathom_branch(lp_prob *p)
 
       /* display the current solution */
       if (p->mip->obj_sense == SYM_MAXIMIZE){
-         if ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2) {
+         if (termcode == LP_OPTIMAL &&
+	     ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2)) {
             PRINT(verbosity, -1, ("The LP value is: %.3f [%i,%i]\n\n",
                                    -lp_data->objval + p->mip->obj_offset,
                                    termcode, iterd));
          }
 
       }else{
-         if ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2) {
+         if (termcode == LP_OPTIMAL &&
+	     ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2)) {
             PRINT(verbosity, -1, ("The LP value is: %.3f [%i,%i]\n\n",
                                    lp_data->objval+ p->mip->obj_offset,
                                    termcode, iterd));
          }
       }
       switch (termcode){
-       case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
+	 return(ERROR__DUAL_INFEASIBLE);
+       case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
        case LP_ABANDONED:
 	 printf("####### Unexpected termcode: %i \n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
@@ -2696,7 +2699,8 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       sym_cut->type = EXPLICIT_ROW;
       sym_cut->rhs = rhs;
       sym_cut->range = row_cut.range();
-      sym_cut->size = (num_elements * (int)((ISIZE + DSIZE) + DSIZE));
+      //sym_cut->size = (num_elements * (int)((ISIZE + DSIZE) + DSIZE));
+      sym_cut->size = (DSIZE + num_elements * (int)((ISIZE + DSIZE)));
       sym_cut->coef = (char *) malloc (sym_cut->size);
       sym_cut->sense = row_cut.sense();
       ((double *) (sym_cut->coef))[0] = 0; // otherwise valgrind complains.

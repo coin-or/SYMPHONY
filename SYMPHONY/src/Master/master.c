@@ -695,12 +695,13 @@ int sym_solve(sym_environment *env)
       termcode == PREP_OTHER_ERROR){
       
       env->mip = env->orig_mip;
-      env->orig_mip = 0;
+      env->orig_mip = 0;      
       
-      if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED){
+      if(termcode == PREP_INFEAS){
 	 return(env->termcode = PREP_NO_SOLUTION);
-      }	 
-      else if(termcode == PREP_SOLVED){
+      }else if(termcode == PREP_UNBOUNDED){
+	 return(env->termcode = PREP_UNBOUNDED);
+      }else if(termcode == PREP_SOLVED){
 	 env->best_sol.has_sol = TRUE;
 	 env->best_sol.xind = (int *) malloc(ISIZE *
 					     env->prep_mip->fixed_n);
@@ -1253,7 +1254,7 @@ int sym_solve(sym_environment *env)
       printf("\n****************************************************\n");
       if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
 	 printf(  "* Optimal Solution Found                           *\n");
-      }else if (termcode == TM_NO_SOLUTION){
+      }else if (termcode == TM_NO_SOLUTION || termcode == TM_UNBOUNDED){
 	 printf(  "* Branch and Cut Finished                          *\n");
       }else if (termcode == TM_TIME_LIMIT_EXCEEDED){
 	 printf(  "* Time Limit Reached                               *\n");

@@ -380,8 +380,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		  check_off = FALSE;
 	       }
 	       
-	       if(p->mip->mip_inf && p->mip->mip_inf->prob_type == BIN_CONT_TYPE ||
-		  p->mip->mip_inf->prob_type == BINARY_TYPE){
+	       if(p->mip->mip_inf && (p->mip->mip_inf->prob_type == BIN_CONT_TYPE ||
+				      p->mip->mip_inf->prob_type == BINARY_TYPE)){
 		  if(!check_off) check_first = TRUE;
 	       }
 	    }
@@ -488,13 +488,13 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
 	 double rel_limit = 0.05;
 	 
-	 if((p->mip->mip_inf && (p->mip->mip_inf->mat_density < rel_limit &&
+	 if((p->mip->mip_inf && ((p->mip->mip_inf->mat_density < rel_limit &&
 				 p->mip->mip_inf->int_var_ratio > rel_limit &&
 				 (p->mip->mip_inf->max_col_ratio > rel_limit ||
 				  p->mip->mip_inf->max_row_ratio > rel_limit))||
 	     (p->mip->nz > 1e5 && p->mip->mip_inf->mat_density > rel_limit/50) ||
 	     (p->mip->mip_inf->max_row_ratio < rel_limit/5 &&
-	      p->mip->mip_inf->prob_type != BIN_CONT_TYPE))){ 
+	      p->mip->mip_inf->prob_type != BIN_CONT_TYPE)))){ 
 	    lp_data->si->setupForRepeatedUse(2,0);
 	 }
       }

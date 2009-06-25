@@ -69,6 +69,16 @@ int sym_presolve(sym_environment *env)
       }
    }
 
+   /* we don't use the impl lists now, so get rid of them */
+   if(P->mip->mip_inf && P->params.level >= 5 &&
+      P->mip->mip_inf->binary_var_num > 0){
+      int j;
+      for(j = 0; j < P->mip->n; j++){
+	 free_imp_list(&(P->mip->mip_inf->cols[j].ulist));
+	 free_imp_list(&(P->mip->mip_inf->cols[j].llist));
+      }      
+   }
+   
    /* since we use the original mip desc */
    P->mip = 0;
    P->orig_mip = 0;

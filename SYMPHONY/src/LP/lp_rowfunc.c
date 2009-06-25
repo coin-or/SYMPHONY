@@ -135,7 +135,7 @@ int check_row_effectiveness(lp_prob *p)
 	    rows[i].eff_cnt = 0;
 	    rows[i].ineff_cnt = 0;
 	    inrhsind[violated++] = i;
-	 }
+	 } 
       }
       /* Collect the rows that are deemed ineffective now */
       switch (p->par.ineffective_constraints){
@@ -184,11 +184,11 @@ int check_row_effectiveness(lp_prob *p)
 	 row->free = TRUE;
 	 row->ineff_cnt = stat[i] == TIGHT_ROW ? 0 : ((MAXINT) >> 1);
 	 outrhsind[k++] = i;
-      }
+      } 
       row->ineff_cnt++;
       if (i >= bcutnum && ! (row->cut->branch & CUT_BRANCHED_ON) &&
-	  row->ineff_cnt >= ineff_cnt_to_delete && row->deletable)
-	 deletable++;
+	  row->deletable && row->ineff_cnt >= ineff_cnt_to_delete )
+        deletable++;
    }
 
    /* stat is not used any more so its location can be used in

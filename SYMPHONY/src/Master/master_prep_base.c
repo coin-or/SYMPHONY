@@ -49,7 +49,7 @@ int prep_basic(PREPdesc *P)
 
    char can_impl = FALSE, bin_type = FALSE;
    int dive_level, impl_dive_level, impl_limit;
-   int old_changes_cnt, new_changes_cnt, init_changes_cnt = 0;
+   int old_changes_cnt, changes_diff = 0, new_changes_cnt, init_changes_cnt = 0;
    int old_others_cnt, new_others_cnt, mark_others_cnt = 0;
    double start_impl_time, mark_time, impl_time = 0.0;
 
@@ -108,7 +108,7 @@ int prep_basic(PREPdesc *P)
    sense = mip->sense;
    rhs = mip->rhs;
 
-   char need_reset, *impl_vars = NULL;
+   char need_reset;
    
    /* check if we have binary columns */
    if(mip_inf->prob_type == BINARY_TYPE ||
@@ -140,8 +140,6 @@ int prep_basic(PREPdesc *P)
 	    P->impl_cols = (COLinfo *)malloc(sizeof(COLinfo)*n); 
 	    P->impl_ub = (double *) malloc(DSIZE*n);
 	    P->impl_lb = (double *) malloc(DSIZE*n);
-	    P->impl_var_ind = (int *)malloc(ISIZE * n);
-	    P->impl_var_stat = (char *)malloc(CSIZE * n);
 	    
 	    P->ulist_checked = (char *)malloc(CSIZE * n);
 	    P->llist_checked = (char *)malloc(CSIZE * n);
@@ -151,11 +149,10 @@ int prep_basic(PREPdesc *P)
 	    
 	    /* get the list of columns to apply impl on */
 	    /* not effective */
-	    impl_vars = (char *) calloc(CSIZE,n);
-	    
+	    P->impl_vars = (char *) calloc(CSIZE,n);
+	    	    
 	    for(i = n - 1; i >= 0; i--){
-	       impl_vars[i] = TRUE;
-	       
+	       P->impl_vars[i] = TRUE;
 	    }
 	 }
       }
@@ -168,7 +165,7 @@ int prep_basic(PREPdesc *P)
    while(iter_cnt < iter_cnt_limit){
       
       iter_cnt++;
-
+      
       PRINT(verbosity, 1, ("Basic iteration number: %d\n", iter_cnt));
 
       /* check the updated bounds and cols to iterate on*/
@@ -186,8 +183,9 @@ int prep_basic(PREPdesc *P)
 	 /* disabled now */
 	 if(can_impl && impl_time < params.time_limit){
 	    if(cols[col_ind].var_type == 'B' && 
-	       impl_vars[col_ind]){
-	       
+	       P->impl_vars[col_ind] && (iter_cnt < 2 ||
+					 (iter_cnt > 1 &&
+					  changes_diff > 0))){
 	       /* fist copy initial info */
 	       /* do once for each variable */
 	       start_impl_time = wall_clock(NULL);
@@ -204,10 +202,10 @@ int prep_basic(PREPdesc *P)
 
 	       if(cols[col_ind].sign_type != ALL_NEG_VEC){
 		  need_reset = TRUE;
-		  if(!cols[col_ind].ulist){
-		     cols[col_ind].ulist = 
-			(IMPlist *)calloc(sizeof(IMPlist),1);
-		  }	       
+		  //if(!cols[col_ind].ulist){
+		     // P->impl_cols[col_ind].ulist = (cols[col_ind].ulist = 
+		     //	(IMPlist *)calloc(sizeof(IMPlist),1));
+		  //}	       
 		  
 		  P->list = cols[col_ind].ulist;	      
 		  /* fix it to 1.0 and see if that causes any infeasibility 
@@ -222,8 +220,10 @@ int prep_basic(PREPdesc *P)
 							    1.0,
 							    FIX_BINARY, TRUE, 
 							    TRUE);
-		  if(termcode == PREP_INFEAS){
-		     free_imp_list(&(cols[col_ind].ulist));		     
+		  free_imp_list(&(cols[col_ind].ulist));
+		  P->impl_cols[col_ind].ulist = 0;
+		  P->list = 0;
+		  if(termcode == PREP_INFEAS){		  
 		     /*then this column is fixable to its lower bound! */
 		     new_bound = 0.0;
 		     fix_type = FIX_BINARY;
@@ -243,10 +243,10 @@ int prep_basic(PREPdesc *P)
 		     P->stats = P->impl_stats;
 		     P->alloc_time += wall_clock(NULL) - mark_time;
 		  }
-		  if(!cols[col_ind].llist){
-		     cols[col_ind].llist = 
-			(IMPlist *)calloc(sizeof(IMPlist),1);
-		  }
+		  //if(!cols[col_ind].llist){
+		     //P->impl_cols[col_ind].llist = (cols[col_ind].llist = 
+		     //	(IMPlist *)calloc(sizeof(IMPlist),1));
+		  //}
 		  
 		  P->list = cols[col_ind].llist;	      
 		  P->impl_col_ind = col_ind;
@@ -255,8 +255,10 @@ int prep_basic(PREPdesc *P)
 							    impl_dive_level,
 							    0.0, FIX_BINARY, 
 							    TRUE, TRUE);
+		  free_imp_list(&(cols[col_ind].llist));
+		  P->impl_cols[col_ind].llist = 0;
+		  P->list = 0;		  
 		  if(termcode == PREP_INFEAS){
-		     free_imp_list(&(cols[col_ind].llist));
 		     new_bound = 1.0;
 		     fix_type = FIX_BINARY;
 		  }
@@ -365,7 +367,9 @@ int prep_basic(PREPdesc *P)
       new_others_cnt = stats->coeffs_changed + 
 	 stats->bounds_tightened;
 
-      if(new_changes_cnt > old_changes_cnt){
+      changes_diff = new_changes_cnt - old_changes_cnt;
+      
+      if(changes_diff > 0){
 	 old_changes_cnt = new_changes_cnt;
 	 old_others_cnt = new_others_cnt;
       }else{
@@ -434,23 +438,13 @@ int prep_basic(PREPdesc *P)
    
 #if 0
    if(verbosity >= 2){
-      printf("total alloc time: %f\n", P->alloc_time);
+      printf("total alloc time: %f\n", P->alloc_time);  
       printf("total alloc time2: %f\n", P->alloc2_time);
       printf("total impl time2: %f\n", impl_time);
       printf("total impl_cols_time: %f\n", P->impl_cols_time);
       printf("total impl_rows_time: %f\n", P->impl_rows_time);
    }
 #endif
-   
-   FREE(impl_vars);
-
-   /* we dont use impl_lists now, so delete them */
-   if(can_impl){ 
-      for(j = 0; j < n; j++){
-	 free_imp_list(&cols[j].ulist);
-	 free_imp_list(&cols[j].llist);      
-      }
-   }   
    
    if(new_changes_cnt + stats->coeffs_changed + mip_inf->fixed_var_num > 0){
       termcode = prep_cleanup_desc(P);
@@ -1842,7 +1836,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 
 	    fix_type = IMPROVE_COEF; 
 	    termcode = PREP_MODIFIED;
-	 }else if(FALSE && !impl_mode &&
+	 }else if(FALSE && !impl_mode && //disabled --
 		  ((a_val > etol && !P->ulist_checked[col_ind]) ||
 		   (a_val < -etol && !P->llist_checked[col_ind]))){
 
@@ -1863,9 +1857,9 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 	    P->impl_stats = P->stats;
 	    if(a_val > etol){
 
-	       if(!cols[col_ind].ulist){
-		  cols[col_ind].ulist = (IMPlist *)calloc(sizeof(IMPlist),1);
-	       }	       
+	       //if(!cols[col_ind].ulist){
+		  // cols[col_ind].ulist = (IMPlist *)calloc(sizeof(IMPlist),1);
+	       //}	       
 
 	       P->list = cols[col_ind].ulist;	      
 	       P->ulist_checked[col_ind] = TRUE;
@@ -1894,9 +1888,9 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 	       }
 	    }else if (a_val < etol){
 
-	       if(!cols[col_ind].llist){
-		  cols[col_ind].llist = (IMPlist *)calloc(sizeof(IMPlist),1);
-	       }
+	       //if(!cols[col_ind].llist){
+		  //  cols[col_ind].llist = (IMPlist *)calloc(sizeof(IMPlist),1);
+	       //}
 
 	       P->list = cols[col_ind].llist;	      
 	       P->llist_checked[col_ind] = TRUE;
@@ -2167,7 +2161,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 
     /*first, if in impl mode, add these variables to current impl_list */
    /* do this above */
-   int can_iterate = FALSE;
+   int can_iterate = TRUE;
 
    double mark_time = wall_clock(NULL);
    //if(intl_fix_type != FIX_AGGREGATE){
@@ -2313,7 +2307,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
       
       /* now add to impl list if in impl_mode */
 
-      if(fix_type != FIX_AGGREGATE){
+      if(fix_type != FIX_AGGREGATE && FALSE){ //disabled now
 	 if(impl_mode && P->impl_col_ind != col_ind){
 	    if(P->list->size < P->impl_limit){
 	       prep_add_to_impl_list(P->list, col_ind, fix_type, 
@@ -2327,7 +2321,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	 
 	 /* first see if you can fix any other variables from the 
 	    impl list of this variable */
-	    if(fix_type == FIX_BINARY){
+	    if(fix_type == FIX_BINARY && FALSE){ //disabled now
 	       if(lb[col_ind] >= 1.0 - etol){
 		  imp_list = cols[col_ind].ulist;
 	       }else{
@@ -2341,13 +2335,15 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 								  &imp_var->ind,
 								  -1, 0, 
 								  imp_var->val,
-								  FIX_BINARY, 
+								  imp_var->fix_type,//FIX_BINARY, 
 								  FALSE, FALSE);
 			if(PREP_QUIT(termcode)){
 			   can_iterate = FALSE;
 			   break;
 			}
 		     }
+
+		     if(!can_iterate) break;
 		  }
 	       }
 	    }
@@ -2381,7 +2377,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	 can_iterate = FALSE;
 	 break;
       }
-      
+
       end = matbeg[col_ind + 1];
       
       for(i = matbeg[col_ind]; i < end; i++){
@@ -3158,7 +3154,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
    double etol = params.etol;
    double coeff_etol = 1e-15;
    int verbosity = params.verbosity;
-   //   int p_level = prep_par.prep_level;
+   int p_level = params.level;
    //   int termcode; 
 
    /* fixme! objsense min max issue!!! will always assume that it is a 
@@ -3219,14 +3215,14 @@ int prep_initialize_mipinfo(PREPdesc *P)
       }
       
       cols[i].var_type = 'I';
-      if(lb[i] >= ub[i] + etol){
+      if(lb[i] >= ub[i] + etol && p_level > 2){
 	 stats->col_infeas_ind = i;
 	 return(PREP_INFEAS);
       }else if(lb[i] > (ub[i] - etol)){	 
 	 cols[i].var_type = 'F';
 	 fixed_obj_offset += obj[i]*ub[i];
 	 fixed_var_cnt++;	 
-	 if(ub[i] >= INF || ub[i] <= -INF){
+	 if((ub[i] >= INF || ub[i] <= -INF) && p_level > 2){
 	    stats->col_numeric_ind = i;
 	    return(PREP_NUMERIC_ERROR);
 	 }else{
@@ -3404,7 +3400,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	 //if((obj[i] > 0.0 && obj_sense == SYM_MAXIMIZE) ||
 	 //(obj[i] < 0.0 && obj_sense == SYM_MINIMIZE)){
 	 if(obj[i] < 0.0){
-	    if(ub[i] >= INF){
+	    if(ub[i] >= INF && p_level > 2){
 	       stats->col_unbound_ind = i;
 	       return(PREP_UNBOUNDED); /* fixme: unbounded return code */
 	    }else{
@@ -3427,7 +3423,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
       }
       if(is_col_all_pos || col_size <= 0){
 	 if(obj[i] > 0.0){
-	    if(lb[i] <= -INF){
+	    if(lb[i] <= -INF && p_level > 2){
 	       stats->col_unbound_ind = i;
 	       return(PREP_UNBOUNDED);
 	    }else{
@@ -4158,6 +4154,7 @@ int prep_cleanup_desc(PREPdesc *P)
 	    is_int[col_num] = is_int[i];
 	    if(col_num != i){
 	       cols[col_num] = cols[i];
+	       cols[i].ulist = cols[i].llist = 0;
 	       if(colnames){
 		  strcpy(colnames[col_num], colnames[i]);
 	       }
@@ -4423,86 +4420,86 @@ int prep_report(PREPdesc *P, int termcode)
    int i;
    prep_stats stats = P->stats;
    int p_level = P->params.level;
-   
-   switch(termcode){
-    case PREP_INFEAS:
-      printf("Preprocessing detected infeasibility...");
-      if(stats.col_infeas_ind >= 0 ||
-	 stats.row_infeas_ind >= 0){
-	 printf("while improving bounds of \n\t");	  
-	 if(stats.col_infeas_ind >= 0){
-	    printf("variable ");
-	    if(mip->colname){
-	       printf("%s ", mip->colname[stats.col_infeas_ind]); 
+
+   if(p_level > 2){
+      switch(termcode){
+       case PREP_INFEAS:
+	 printf("Preprocessing detected infeasibility...");
+	 if(stats.col_infeas_ind >= 0 ||
+	    stats.row_infeas_ind >= 0){
+	    printf("while improving bounds of \n\t");	  
+	    if(stats.col_infeas_ind >= 0){
+	       printf("variable ");
+	       if(mip->colname){
+		  printf("%s ", mip->colname[stats.col_infeas_ind]); 
+	       }
+	       printf("[%i]", stats.col_infeas_ind);
+	       if(stats.row_infeas_ind >= 0){
+		  printf(" on the ");
+	       }
 	    }
-	    printf("[%i]", stats.col_infeas_ind);
 	    if(stats.row_infeas_ind >= 0){
-	       printf(" on the ");
+	       printf("row [%i]", stats.row_infeas_ind);
+	    }
+	    printf("\n");	     
+	 }
+	 break;
+       case PREP_UNBOUNDED:
+	 printf("Preprocessing detected unbounded problem...");	  
+	 if(stats.col_unbound_ind >= 0){
+	    printf("while improving bounds on \n");	  
+	    if(mip->colname){
+	       printf("variable %s [%i]\n", 
+		      mip->colname[stats.col_unbound_ind], 
+		      stats.col_unbound_ind);
+	    }else{
+	       printf("variable [%i]\n", 
+		      stats.col_unbound_ind);		
 	    }
 	 }
-	 if(stats.row_infeas_ind >= 0){
-	    printf("row [%i]", stats.row_infeas_ind);
+	 break;
+       case PREP_NUMERIC_ERROR:
+	 printf("Preprocessing detected numerical problems ");	  
+	 if(stats.col_numeric_ind >= 0){
+	    printf("while improving bounds on \n");	  
+	    if(mip->colname){
+	       printf("variable %s [%i]\n", 
+		      mip->colname[stats.col_numeric_ind], 
+		      stats.col_numeric_ind);
+	    }else{
+	       printf("variable [%i]\n", 
+		      stats.col_numeric_ind);		
+	    }
 	 }
-	 printf("\n");	     
-      }
-      break;
-    case PREP_UNBOUNDED:
-      printf("Preprocessing detected unbounded problem...");	  
-      if(stats.col_unbound_ind >= 0){
-	 printf("while improving bounds on \n");	  
-	 if(mip->colname){
-	    printf("variable %s [%i]\n", 
-		   mip->colname[stats.col_unbound_ind], 
-		   stats.col_unbound_ind);
+	 break;
+       case PREP_OTHER_ERROR:
+	 printf("Preprocessing - unknown error.. ignoring presolve...\n");
+	 break;
+       case PREP_SOLVED:
+	 printf("Preprocessing found the optimum:\n");	  	  
+	 printf("Solution Cost: %f\n:", mip->obj_offset);
+	 if (mip->colname){ 
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf("Column names and values of nonzeros in the solution\n");
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    for (i = 0; i < mip->fixed_n; i++){
+	       printf("%8s %10.3f\n", P->orig_mip->colname[mip->fixed_ind[i]],
+		      mip->fixed_val[i]);
+	    }
+	    printf("\n");
 	 }else{
-	    printf("variable [%i]\n", 
-		   stats.col_unbound_ind);		
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    printf("User indices and values of nonzeros in the solution\n");
+	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    for (i = 0; i < mip->fixed_n; i++){
+	       printf("%7d %10.3f\n", mip->fixed_ind[i], mip->fixed_val[i]);
+	    }
+	    printf("\n");
 	 }
-      }
-      break;
-    case PREP_NUMERIC_ERROR:
-      printf("Preprocessing detected numerical problems ");	  
-      if(stats.col_numeric_ind >= 0){
-	 printf("while improving bounds on \n");	  
-	 if(mip->colname){
-	    printf("variable %s [%i]\n", 
-		   mip->colname[stats.col_numeric_ind], 
-		   stats.col_numeric_ind);
-	 }else{
-	    printf("variable [%i]\n", 
-		   stats.col_numeric_ind);		
-	 }
-      }
-      break;
-    case PREP_OTHER_ERROR:
-      printf("Preprocessing - unknown error.. ignoring presolve...\n");
-      break;
-    case PREP_SOLVED:
-      printf("Preprocessing found the optimum:\n");	  	  
-      printf("Solution Cost: %f\n:", mip->obj_offset);
-      if (mip->colname){ 
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf("Column names and values of nonzeros in the solution\n");
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < mip->fixed_n; i++){
-	    printf("%8s %10.3f\n", P->orig_mip->colname[mip->fixed_ind[i]],
-		   mip->fixed_val[i]);
-	 }
-	 printf("\n");
-      }else{
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 printf("User indices and values of nonzeros in the solution\n");
-	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 for (i = 0; i < mip->fixed_n; i++){
-	    printf("%7d %10.3f\n", mip->fixed_ind[i], mip->fixed_val[i]);
-	 }
-	 printf("\n");
-      }
-      break;	  
-    default:
-      if(p_level > 2){
+	 break;	  
+       default:
 	 printf("Preprocessing finished...\n ");	  
-      
+	 
 	 if(stats.coeffs_changed + 
 	    stats.bounds_tightened + 
 	    stats.rows_deleted + 
@@ -4530,23 +4527,26 @@ int prep_report(PREPdesc *P, int termcode)
 	       }	     
 	    }
 	    if(stats.vars_aggregated > 0){
-	       printf("\t variables aggregated: %i\n", stats.vars_aggregated);
+	       printf("\t variables aggregated: %i\n",
+		      stats.vars_aggregated);
 	    }
 	    if(stats.vars_integerized > 0){
-	       printf("\t variables integerized: %i\n", stats.vars_integerized);
+	       printf("\t variables integerized: %i\n",
+		      stats.vars_integerized);
 	    }
 	    
 	 }else{
 	    printf("\t with no modifications...\n");
 	 }
       }
-      printf("Problem has \n"
-	     "\t %i constraints \n"
-	     "\t %i variables \n"
-	     "\t %i nonzero coefficients\n", 
-	     mip->m, mip->n, mip->nz);	     	  
-      break;
    }
+
+   printf("Problem has \n"
+	  "\t %i constraints \n"
+	  "\t %i variables \n"
+	  "\t %i nonzero coefficients\n", 
+	  mip->m, mip->n, mip->nz);	     	  
+   
    printf("\n");
    return 0;
 }
@@ -4562,14 +4562,13 @@ void prep_sos_fill_row(ROWinfo *row, int alloc_size, int size,
    if(row->sos_rep){
       memset(row->sos_rep, 0, CSIZE*sos_size); 
    }else{
-      row->sos_rep = (char *)malloc(CSIZE*sos_size);
+      row->sos_rep = (char *)calloc(CSIZE,sos_size);
    }
-   
+
    for(i = 0; i < size; i++){
-      row->sos_rep[ind[i] >> 3] |= 1 << (ind[i] & 7);
+      (row->sos_rep[ind[i] >> 3]) |= (1 << (ind[i] & 7));
    }
 }
-
 /*===========================================================================*/
 /*===========================================================================*/
 void prep_sos_fill_var_cnt(PREPdesc *P) 
@@ -4626,6 +4625,7 @@ void prep_sos_fill_var_cnt(PREPdesc *P)
    for(i = 0; i < m; i++){
       if(rows[i].is_sos_row){
 	 FREE(rows[i].sos_rep);
+	 rows[i].sos_rep = 0;
       }
    }
    
@@ -4648,15 +4648,18 @@ void free_prep_desc(PREPdesc *P)
 	 free_mip_desc(P->mip);
       }
       /* fixme - add impl stuff here - disabled now*/
-      FREE(P->impl_var_stat);
-      FREE(P->impl_row_ind);
-      FREE(P->impl_var_ind);
+      FREE(P->impl_vars);
       FREE(P->impl_ub);
       FREE(P->impl_lb);
       FREE(P->ulist_checked);
       FREE(P->llist_checked);
       FREE(P->rows_checked);
-      
+
+      /* since used to keep only static row and col info,
+      */
+
+      FREE(P->impl_cols);
+      FREE(P->impl_rows);
       FREE(P->user_col_ind);
       FREE(P->user_row_ind);
       FREE(P->stats.nz_coeff_changed);

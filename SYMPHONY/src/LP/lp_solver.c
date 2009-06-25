@@ -258,7 +258,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 
    int *indices;
    double *values;   
-   double inf = SYM_INFINITY;
+   double inf = MAXDOUBLE;//SYM_INFINITY;
 
    mpl = mpl_initialize();  /* initialize the translator */
     
@@ -2546,14 +2546,14 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    
    lp_data->termcode = term;
    
-   if (term != LP_ABANDONED){
+   if (term != LP_ABANDONED && term != LP_D_INFEASIBLE){
       
       *iterd = si->getIterationCount();
       
       lp_data->objval = si->getObjValue();
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
-   }   
+   }
    else{
       lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
       printf("OSI Abandoned calculation: Code %i \n\n", term);
