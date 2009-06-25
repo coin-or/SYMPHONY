@@ -51,6 +51,7 @@ typedef struct FP_DATA {
    double       *x_ip;          /* rounded x_lp */
    double       *mip_obj;       /* normalized original obj */
    double       *obj;           /* obj function for pumping lp */
+   char         *sos_row_filled; /*to keep track of the sos variables while flipping */
    double        norm_c;        /* norm of mip_obj */
    double        alpha;
    double        alpha_decr;
@@ -71,7 +72,7 @@ int sp_free_sp(sp_desc *sp);
 
 /* feasibility pump */
 int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_value, double *betterSolution);
-int fp_round (FPdata *fp_data, LPdata *lp_data);
+int fp_round (lp_prob *p, FPdata *fp_data, LPdata *lp_data);
 int fp_is_feasible (LPdata *lp_data, const CoinPackedMatrix *matrix, const double *r_low, const double *r_up, FPdata *fp_data, char *is_feasible );
 int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data);
 int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char *is_feasible) ;
