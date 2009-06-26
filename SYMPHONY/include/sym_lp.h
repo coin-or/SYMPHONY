@@ -247,7 +247,8 @@ int should_continue_strong_branching PROTO((lp_prob *p, int i, int cand_num,
                                      double st_time, int total_iters, 
                                      int *should_continue));
 int strong_branch(lp_prob *p, int branch_var, double lb, double ub, 
-		  double new_lb, double new_ub, double *obj, int should_use_hot_starts);
+		  double new_lb, double new_ub, double *obj, int should_use_hot_starts, 
+                  int *termstatus, int *iterd);
 int branch PROTO((lp_prob *p, int cuts));
 int col_gen_before_branch PROTO((lp_prob *p, int *new_vars));
 

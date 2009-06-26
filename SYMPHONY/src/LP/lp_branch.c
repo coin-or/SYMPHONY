@@ -274,6 +274,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       double one_m_alpha = 1.0 - alpha;
       int check_first = FALSE;
       int check_level = 0;
+      int num_up_iters = 0, num_down_iters = 0;
+      int up_status = -1, down_status = -1;
       
       best_var = -1;
       best_var_score = -SYM_INFINITY;
@@ -634,7 +636,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                continue;
             }
             if (strong_branch(p, branch_var, lb, ub, lb, floorx, &down_obj,
-			      should_use_hot_starts)) {
+			      should_use_hot_starts, &down_status, &num_down_iters)) {
                // lp was abandoned
                continue;
             }	    
@@ -675,7 +677,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             }
 
             if (strong_branch(p, branch_var, lb, ub, ceilx, ub, &up_obj,
-			      should_use_hot_starts)) {
+			      should_use_hot_starts, &up_status, &num_up_iters)) {
                // lp was abandoned
                continue;
             }
@@ -738,12 +740,26 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             best_can->sol_sizes = NULL;
             best_can->sense[0] = 'L';
             best_can->sense[1] = 'G';
-            best_can->objval[0] = (down_is_est == TRUE) ? oldobjval : down_obj;
-            best_can->objval[1] = (up_is_est == TRUE) ? oldobjval : up_obj;
+            if (down_is_est==TRUE) {
+              best_can->objval[0] = oldobjval;
+              best_can->iterd[0] = 0;
+              best_can->termcode[0] = LP_D_ITLIM;
+            } else {
+              best_can->objval[0] = down_obj;
+              best_can->iterd[0] = num_down_iters;
+              best_can->termcode[0] = down_status;
+            }
+            if (up_is_est==TRUE) {
+              best_can->objval[1] = oldobjval;
+              best_can->iterd[1] = 0;
+              best_can->termcode[1] = LP_D_ITLIM;
+            } else {
+              best_can->objval[1] = up_obj;
+              best_can->iterd[1] = num_up_iters;
+              best_can->termcode[1] = up_status;
+            }
             best_can->is_est[0] = down_is_est;
             best_can->is_est[1] = up_is_est;
-            best_can->termcode[0] = LP_D_ITLIM;
-            best_can->termcode[1] = LP_D_ITLIM;
             best_can->rhs[0] = floorx;
             best_can->rhs[1] = ceilx;
             best_can->value = xval;
@@ -1765,10 +1781,10 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
 
 /*===========================================================================*/
 int strong_branch(lp_prob *p, int branch_var, double lb, double ub, 
-		  double new_lb, double new_ub, double *obj, int should_use_hot_starts)
+		  double new_lb, double new_ub, double *obj, int should_use_hot_starts, 
+                  int *termstatus, int *iterd)
 {
-   int termstatus, status = 0;
-   int iterd;
+   int status = 0;
    LPdata *lp_data = p->lp_data;
    
    // TODO: LP_ABANDONED
@@ -1778,31 +1794,31 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
 
    //   if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
    if (should_use_hot_starts) {
-      termstatus = solve_hotstart(lp_data, &iterd);
+      *termstatus = solve_hotstart(lp_data, iterd);
    } else {
-      termstatus = dual_simplex(lp_data, &iterd);
+      *termstatus = dual_simplex(lp_data, iterd);
    }
    
-   if (termstatus == LP_D_INFEASIBLE || termstatus == LP_D_OBJLIM || 
-         termstatus == LP_D_UNBOUNDED) {
+   if (*termstatus == LP_D_INFEASIBLE || *termstatus == LP_D_OBJLIM || 
+         *termstatus == LP_D_UNBOUNDED) {
       *obj = SYM_INFINITY;
       p->lp_stat.str_br_bnd_changes++;
    } else {
       *obj = lp_data->objval;
-      if (termstatus == LP_OPTIMAL) {
+      if (*termstatus == LP_OPTIMAL) {
          if (!p->has_ub || *obj < p->ub - lp_data->lpetol) {
             is_feasible_u(p, TRUE, FALSE);
          } else {
             *obj = SYM_INFINITY;
             p->lp_stat.str_br_bnd_changes++;
          }
-      } else if (termstatus == LP_ABANDONED) {
+      } else if (*termstatus == LP_ABANDONED) {
          status = LP_ABANDONED;
       }
    }
    p->lp_stat.lp_calls++;
    p->lp_stat.str_br_lp_calls++;
-   p->lp_stat.str_br_total_iter_num += iterd;
+   p->lp_stat.str_br_total_iter_num += *iterd;
    p->lp_stat.num_str_br_cands_in_path++;
 
    change_lbub(lp_data, branch_var, lb, ub);
