@@ -248,13 +248,26 @@ LDADD =
 ALLLDADD =
 PALLLDADD =
 LIBS =
-ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
-	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 
 if USE_CGL_CUTS
-LDADD += $(CGLOBJDIR)/src/libCgl.la
-ADDLIBS += \
+if COIN_HAS_CGL_PREINSTALLED
+  ADDLIBS += -L`$(CYGPATH_W) $(CGLINSTDIR)/lib` -lCgl \
 	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+else
+  LDADD += $(CGLOBJDIR)/src/libCgl.la
+  ADDLIBS += `cat $(CGLOBJDIR)/cgl_addlibs.txt`
+endif
+endif
+
+if COIN_HAS_CLP_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(CLPINSTDIR)/lib` -lClp \
+	`cat $(CLPDOCDIR)/clp_addlibs.txt`
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
+  LDADD += $(CLPOBJDIR)/src/libClp.la
+  ADDLIBS += `cat $(CLPOBJDIR)/clp_addlibs.txt`
 endif
 
 # Add include files
@@ -262,28 +275,30 @@ AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)`
 
 # List all additionally required solver and Osi libraries
 
-#if CLP_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
-  LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(CLPOBJDIR)/src/libClp.la
-  ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
 if CLP_LP_SOLVER
   AM_CPPFLAGS += -D__OSI_CLP__
 endif
 
 if CPLEX_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  LIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiCpx
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
   LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+endif
   AM_CPPFLAGS += -D__OSI_CPLEX__
 endif
 
 if GLPK_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
-  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  LIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiGlpk
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
+  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la
+endif
   AM_CPPFLAGS += -D__OSI_GLPK__
 else 
 if USE_GMPL
@@ -292,28 +307,60 @@ endif
 endif
 
 if OSL_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSLINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl`
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSLINCDIR)`
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  LIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiOsl
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl`
   LDADD += $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
+endif
   AM_CPPFLAGS += -D__OSI_OSL__
 endif
 
 if SOPLEX_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)`
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  LIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiSpx
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
   LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
-AM_CPPFLAGS += -D__OSI_SOPLEX__
+endif
+  AM_CPPFLAGS += -D__OSI_SOPLEX__
 endif
 
 if XPRESS_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)`
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  LIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiXpr
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
   LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
+endif
   AM_CPPFLAGS += -D__OSI_XPRESS__
 endif
 
-LDADD += $(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiClp -lOsi \
+	`cat $(OSIDOCDIR)/osi_addlibs.txt`
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp`
+  LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+	$(OSIOBJDIR)/src/libOsi.la
+  ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt`
+endif
+
+if COIN_HAS_COINUTILS_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(COINUTILSINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(COINUTILSINSTDIR)/lib` -lCoinUtils \
+	`cat $(COINUTILSDOCDIR)/coinutils_addlibs.txt`
+else
+  LDADD += $(COINUTILSOBJDIR)/src/libCoinUtils.la
+  ADDLIBS += `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
+endif
 
 ########################################################################
 #                            Additional flags                          #
