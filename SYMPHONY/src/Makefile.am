@@ -259,17 +259,6 @@ else
 endif
 endif
 
-if COIN_HAS_CLP_PREINSTALLED
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPINSTDIR)/include/coin`
-  ADDLIBS += -L`$(CYGPATH_W) $(CLPINSTDIR)/lib` -lClp \
-	`cat $(CLPDOCDIR)/clp_addlibs.txt`
-else
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
-  LDADD += $(CLPOBJDIR)/src/libClp.la
-  ADDLIBS += `cat $(CLPOBJDIR)/clp_addlibs.txt`
-endif
-
 # Add include files
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)`
 
@@ -353,11 +342,25 @@ else
   ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt`
 endif
 
+if COIN_HAS_CLP_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(CLPINSTDIR)/lib` -lClp \
+	`cat $(CLPDOCDIR)/clp_addlibs.txt`
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
+  LDADD += $(CLPOBJDIR)/src/libClp.la
+  ADDLIBS += `cat $(CLPOBJDIR)/clp_addlibs.txt`
+endif
+
 if COIN_HAS_COINUTILS_PREINSTALLED
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(COINUTILSINSTDIR)/include/coin`
   ADDLIBS += -L`$(CYGPATH_W) $(COINUTILSINSTDIR)/lib` -lCoinUtils \
 	`cat $(COINUTILSDOCDIR)/coinutils_addlibs.txt`
 else
+  AM_CPPFLAGS += \
+	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc`
   LDADD += $(COINUTILSOBJDIR)/src/libCoinUtils.la
   ADDLIBS += `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 endif
