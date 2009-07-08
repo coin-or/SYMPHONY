@@ -40,88 +40,20 @@ ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
 	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 
 if USE_CGL_CUTS
-LDADD += $(CGLOBJDIR)/src/libCgl.la
-ADDLIBS += \
-	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
-endif
-
-# Add include files
-AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSym`
-
-AM_CPPFLAGS += -DCOIN_HAS_SYMPHONY
-
-# List all additionally required solver and Osi libraries
-
-if CLP_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
-  LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(CLPOBJDIR)/src/libClp.la
-  ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
-  AM_CPPFLAGS += -D__OSI_CLP__
-endif
-
-if CPLEX_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-  AM_CPPFLAGS += -D__OSI_CPLEX__
-endif
-
-if GLPK_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
-  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
-  AM_CPPFLAGS += -D__OSI_GLPK__
-else 
-if USE_GMPL
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
-endif
-endif
-
-if OSL_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSLINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl`
-  LDADD += $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
-  AM_CPPFLAGS += -D__OSI_OSL__
-endif
-
-if SOPLEX_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
-  LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
-AM_CPPFLAGS += -D__OSI_SPX__
-endif
-
-if XPRESS_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
-  LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
-  AM_CPPFLAGS += -D__OSI_XPRESS__
-endif
-
-LDADD += $(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la
-
-LDADD += $(OSIOBJDIR)/src/OsiSym/libOsiSym.la
-
-########################################################################
-#                            Additional flags                          #
-########################################################################
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows.
-# "top_srcdir" refers to the basic directory for the main package that is
-# being compiled.
-AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
+if COIN_HAS_CGL_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(CGLINSTDIR)/lib` -lCgl \
+	`cat $(CGLDOCDIR)/cgl_addlibs.txt`
+else
+  AM_CPPFLAGS += \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLandP` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
@@ -130,11 +62,129 @@ AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglSimpleRounding` \
 	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
-	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc`
+  LDADD += $(CGLOBJDIR)/src/libCgl.la
+  ADDLIBS += `cat $(CGLOBJDIR)/cgl_addlibs.txt`
+endif
+endif
+
+# Add include files
+AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)`
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSym`
+
+AM_CPPFLAGS += -DCOIN_HAS_SYMPHONY
+
+# List all additionally required solver and Osi libraries
+
+if CLP_LP_SOLVER
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiClp
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp`
+  LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la
+endif
+if COIN_HAS_CLP_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(CLPINSTDIR)/lib` -lClp \
+	`cat $(CLPDOCDIR)/clp_addlibs.txt`
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
+  LDADD += $(CLPOBJDIR)/src/libClp.la
+  ADDLIBS += `cat $(CLPOBJDIR)/clp_addlibs.txt`
+endif
+  AM_CPPFLAGS += -D__OSI_CLP__
+endif
+
+if CPLEX_LP_SOLVER
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiCpx
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
+  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+endif
+  AM_CPPFLAGS += -D__OSI_CPLEX__
+endif
+
+if GLPK_LP_SOLVER
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiGlpk
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
+  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la
+endif
+  AM_CPPFLAGS += -D__OSI_GLPK__
+else 
+if USE_GMPL
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+endif
+endif
+
+if OSL_LP_SOLVER
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSLINCDIR)`
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiOsl
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl`
+  LDADD += $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
+endif
+  AM_CPPFLAGS += -D__OSI_OSL__
+endif
+
+if SOPLEX_LP_SOLVER
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)`
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiSpx
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
+  LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
+endif
+  AM_CPPFLAGS += -D__OSI_SOPLEX__
+endif
+
+if XPRESS_LP_SOLVER
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)`
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiXpr
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
+  LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
+endif
+  AM_CPPFLAGS += -D__OSI_XPRESS__
+endif
+
+if COIN_HAS_OSI_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiSym -lOsi \
+	`cat $(OSIDOCDIR)/osi_addlibs.txt`
+else
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSym` \
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc`
+  LDADD += $(OSIOBJDIR)/src/OsiSym/libOsiSym.la \
+	$(OSIOBJDIR)/src/libOsi.la
+  ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt`
+endif
+
+if COIN_HAS_COINUTILS_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(COINUTILSINSTDIR)/include/coin`
+  ADDLIBS += -L`$(CYGPATH_W) $(COINUTILSINSTDIR)/lib` -lCoinUtils \
+	`cat $(COINUTILSDOCDIR)/coinutils_addlibs.txt`
+else
+  AM_CPPFLAGS += \
+	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc`
+  LDADD += $(COINUTILSOBJDIR)/src/libCoinUtils.la
+  ADDLIBS += `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
+endif
+
 
 ########################################################################
 #                            Additional Definitions                    #
@@ -216,6 +266,10 @@ punitTest_LDFLAGS = -rpath $(libdir)
 testFILES = air03 dcmulti egout flugpl khb05250 l152lav \
 	lseu mod010 p0033 p0201 stein27 vpm1
 
+if COIN_HAS_OSI_PREINSTALLED
+test:
+	echo "SYMPHONY has been compiled without Osi sources - no test possible"
+else
 test: unitTest$(EXEEXT)
 	if test x"$(DIRNETLIB)" != x; then \
 		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
@@ -224,6 +278,7 @@ test: unitTest$(EXEEXT)
 #-T $(DATAOBJDIR)/miplib3 \
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
+endif
 
 fulltest: check_files unitTest$(EXEEXT)
 	if test x"$(DIRNETLIB)" != x; then \

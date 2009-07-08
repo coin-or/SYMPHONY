@@ -251,9 +251,28 @@ LIBS =
 
 if USE_CGL_CUTS
 if COIN_HAS_CGL_PREINSTALLED
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLINSTDIR)/include/coin`
   ADDLIBS += -L`$(CYGPATH_W) $(CGLINSTDIR)/lib` -lCgl \
-	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+	`cat $(CGLDOCDIR)/cgl_addlibs.txt`
 else
+  AM_CPPFLAGS += \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLandP` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglSimpleRounding` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
+	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc`
   LDADD += $(CGLOBJDIR)/src/libCgl.la
   ADDLIBS += `cat $(CGLOBJDIR)/cgl_addlibs.txt`
 endif
@@ -271,7 +290,7 @@ endif
 if CPLEX_LP_SOLVER
 if COIN_HAS_OSI_PREINSTALLED
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
-  LIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiCpx
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiCpx
 else
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
   LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
@@ -283,7 +302,7 @@ if GLPK_LP_SOLVER
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
 if COIN_HAS_OSI_PREINSTALLED
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
-  LIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiGlpk
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiGlpk
 else
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
   LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la
@@ -299,7 +318,7 @@ if OSL_LP_SOLVER
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSLINCDIR)`
 if COIN_HAS_OSI_PREINSTALLED
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
-  LIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiOsl
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiOsl
 else
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl`
   LDADD += $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
@@ -311,7 +330,7 @@ if SOPLEX_LP_SOLVER
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)`
 if COIN_HAS_OSI_PREINSTALLED
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
-  LIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiSpx
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiSpx
 else
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
   LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
@@ -323,7 +342,7 @@ if XPRESS_LP_SOLVER
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)`
 if COIN_HAS_OSI_PREINSTALLED
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
-  LIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiXpr
+  ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiXpr
 else
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
   LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
@@ -336,7 +355,9 @@ if COIN_HAS_OSI_PREINSTALLED
   ADDLIBS += -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiClp -lOsi \
 	`cat $(OSIDOCDIR)/osi_addlibs.txt`
 else
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp`
+  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc`
   LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
 	$(OSIOBJDIR)/src/libOsi.la
   ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt`
@@ -364,37 +385,6 @@ else
   LDADD += $(COINUTILSOBJDIR)/src/libCoinUtils.la
   ADDLIBS += `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 endif
-
-########################################################################
-#                            Additional flags                          #
-########################################################################
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows.
-# "top_srcdir" refers to the basic directory for the main package that is
-# being compiled.
-AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLandP` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglSimpleRounding` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
-	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc`
-#	-I`$(CYGPATH_W) $(srcdir)/GMPL`
 
 ########################################################################
 #                            Additional Definitions                    #

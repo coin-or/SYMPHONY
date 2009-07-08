@@ -52,49 +52,106 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@USE_CGL_CUTS_TRUE@am__append_1 = $(CGLOBJDIR)/src/libCgl.la
-@USE_CGL_CUTS_TRUE@am__append_2 = \
-@USE_CGL_CUTS_TRUE@	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+@COIN_HAS_CGL_PREINSTALLED_TRUE@@USE_CGL_CUTS_TRUE@am__append_1 = -I`$(CYGPATH_W) $(CGLINSTDIR)/include/coin`
+@COIN_HAS_CGL_PREINSTALLED_TRUE@@USE_CGL_CUTS_TRUE@am__append_2 = -L`$(CYGPATH_W) $(CGLINSTDIR)/lib` -lCgl \
+@COIN_HAS_CGL_PREINSTALLED_TRUE@@USE_CGL_CUTS_TRUE@	`cat $(CGLDOCDIR)/cgl_addlibs.txt`
 
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@am__append_3 = \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLandP` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglSimpleRounding` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc`
+
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@am__append_4 = $(CGLOBJDIR)/src/libCgl.la
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@am__append_5 = `cat $(CGLOBJDIR)/cgl_addlibs.txt`
 
 # List all additionally required solver and Osi libraries
-@CLP_LP_SOLVER_TRUE@am__append_3 = -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-@CLP_LP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-@CLP_LP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-@CLP_LP_SOLVER_TRUE@	-D__OSI_CLP__
-@CLP_LP_SOLVER_TRUE@am__append_4 = $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-@CLP_LP_SOLVER_TRUE@	$(CLPOBJDIR)/src/libClp.la
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_OSI_PREINSTALLED_TRUE@am__append_6 = -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_OSI_PREINSTALLED_TRUE@am__append_7 = -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiClp
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_OSI_PREINSTALLED_FALSE@am__append_8 = -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp`
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_OSI_PREINSTALLED_FALSE@am__append_9 = $(OSIOBJDIR)/src/OsiClp/libOsiClp.la
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_TRUE@am__append_10 = -I`$(CYGPATH_W) $(CLPINSTDIR)/include/coin`
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_TRUE@am__append_11 = -L`$(CYGPATH_W) $(CLPINSTDIR)/lib` -lClp \
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_TRUE@	`cat $(CLPDOCDIR)/clp_addlibs.txt`
 
-@CLP_LP_SOLVER_TRUE@am__append_5 = `cat $(CLPOBJDIR)/clp_addlibs.txt`
-@CPLEX_LP_SOLVER_TRUE@am__append_6 = -I`$(CYGPATH_W) $(CPXINCDIR)` \
-@CPLEX_LP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
-@CPLEX_LP_SOLVER_TRUE@	-D__OSI_CPLEX__
-@CPLEX_LP_SOLVER_TRUE@am__append_7 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-@GLPK_LP_SOLVER_TRUE@am__append_8 = -I`$(CYGPATH_W) $(GLPKINCDIR)` \
-@GLPK_LP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk` \
-@GLPK_LP_SOLVER_TRUE@	-D__OSI_GLPK__
-@GLPK_LP_SOLVER_TRUE@am__append_9 = $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
-@GLPK_LP_SOLVER_FALSE@@USE_GMPL_TRUE@am__append_10 = -I`$(CYGPATH_W) $(GLPKINCDIR)`
-@OSL_LP_SOLVER_TRUE@am__append_11 = -I`$(CYGPATH_W) $(OSLINCDIR)` \
-@OSL_LP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl` \
-@OSL_LP_SOLVER_TRUE@	-D__OSI_OSL__
-@OSL_LP_SOLVER_TRUE@am__append_12 = $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
-@SOPLEX_LP_SOLVER_TRUE@am__append_13 = -I`$(CYGPATH_W) $(SPXINCDIR)` \
-@SOPLEX_LP_SOLVER_TRUE@	-I`$(CYGPATH_W) \
-@SOPLEX_LP_SOLVER_TRUE@	$(OSISRCDIR)/src/OsiSpx` -D__OSI_SPX__
-@SOPLEX_LP_SOLVER_TRUE@am__append_14 = $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
-@XPRESS_LP_SOLVER_TRUE@am__append_15 = -I`$(CYGPATH_W) $(XPRINCDIR)` \
-@XPRESS_LP_SOLVER_TRUE@	-I`$(CYGPATH_W) \
-@XPRESS_LP_SOLVER_TRUE@	$(OSISRCDIR)/src/OsiXpr` \
-@XPRESS_LP_SOLVER_TRUE@	-D__OSI_XPRESS__
-@XPRESS_LP_SOLVER_TRUE@am__append_16 = $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
-@SYM_PARALLEL_TRUE@am__append_17 = -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-@SYM_PARALLEL_TRUE@am__append_18 = -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_FALSE@am__append_12 = -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_FALSE@	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
+
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_FALSE@am__append_13 = $(CLPOBJDIR)/src/libClp.la
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_FALSE@am__append_14 = `cat $(CLPOBJDIR)/clp_addlibs.txt`
+@CLP_LP_SOLVER_TRUE@am__append_15 = -D__OSI_CLP__
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@CPLEX_LP_SOLVER_TRUE@am__append_16 = -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@CPLEX_LP_SOLVER_TRUE@am__append_17 = -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiCpx
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@CPLEX_LP_SOLVER_TRUE@am__append_18 = -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@CPLEX_LP_SOLVER_TRUE@am__append_19 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+@CPLEX_LP_SOLVER_TRUE@am__append_20 = -D__OSI_CPLEX__
+@GLPK_LP_SOLVER_TRUE@am__append_21 = -I`$(CYGPATH_W) $(GLPKINCDIR)`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@GLPK_LP_SOLVER_TRUE@am__append_22 = -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@GLPK_LP_SOLVER_TRUE@am__append_23 = -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiGlpk
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@GLPK_LP_SOLVER_TRUE@am__append_24 = -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@GLPK_LP_SOLVER_TRUE@am__append_25 = $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la
+@GLPK_LP_SOLVER_TRUE@am__append_26 = -D__OSI_GLPK__
+@GLPK_LP_SOLVER_FALSE@@USE_GMPL_TRUE@am__append_27 = -I`$(CYGPATH_W) $(GLPKINCDIR)`
+@OSL_LP_SOLVER_TRUE@am__append_28 = -I`$(CYGPATH_W) $(OSLINCDIR)`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@OSL_LP_SOLVER_TRUE@am__append_29 = -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@OSL_LP_SOLVER_TRUE@am__append_30 = -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiOsl
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@OSL_LP_SOLVER_TRUE@am__append_31 = -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl`
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@OSL_LP_SOLVER_TRUE@am__append_32 = $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
+@OSL_LP_SOLVER_TRUE@am__append_33 = -D__OSI_OSL__
+@SOPLEX_LP_SOLVER_TRUE@am__append_34 = -I`$(CYGPATH_W) $(SPXINCDIR)`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@SOPLEX_LP_SOLVER_TRUE@am__append_35 = -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@SOPLEX_LP_SOLVER_TRUE@am__append_36 = -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiSpx
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@SOPLEX_LP_SOLVER_TRUE@am__append_37 = -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@SOPLEX_LP_SOLVER_TRUE@am__append_38 = $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
+@SOPLEX_LP_SOLVER_TRUE@am__append_39 = -D__OSI_SOPLEX__
+@XPRESS_LP_SOLVER_TRUE@am__append_40 = -I`$(CYGPATH_W) $(XPRINCDIR)`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@XPRESS_LP_SOLVER_TRUE@am__append_41 = -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@XPRESS_LP_SOLVER_TRUE@am__append_42 = -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiXpr
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@XPRESS_LP_SOLVER_TRUE@am__append_43 = -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@XPRESS_LP_SOLVER_TRUE@am__append_44 = $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
+@XPRESS_LP_SOLVER_TRUE@am__append_45 = -D__OSI_XPRESS__
+@COIN_HAS_OSI_PREINSTALLED_TRUE@am__append_46 = -I`$(CYGPATH_W) $(OSIINSTDIR)/include/coin`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@am__append_47 = -L`$(CYGPATH_W) $(OSIINSTDIR)/lib` -lOsiSym -lOsi \
+@COIN_HAS_OSI_PREINSTALLED_TRUE@	`cat $(OSIDOCDIR)/osi_addlibs.txt`
+
+@COIN_HAS_OSI_PREINSTALLED_FALSE@am__append_48 = -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSym` \
+@COIN_HAS_OSI_PREINSTALLED_FALSE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+@COIN_HAS_OSI_PREINSTALLED_FALSE@	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc`
+
+@COIN_HAS_OSI_PREINSTALLED_FALSE@am__append_49 = $(OSIOBJDIR)/src/OsiSym/libOsiSym.la \
+@COIN_HAS_OSI_PREINSTALLED_FALSE@	$(OSIOBJDIR)/src/libOsi.la
+
+@COIN_HAS_OSI_PREINSTALLED_FALSE@am__append_50 = `cat $(OSIOBJDIR)/osi_addlibs.txt`
+@COIN_HAS_COINUTILS_PREINSTALLED_TRUE@am__append_51 = -I`$(CYGPATH_W) $(COINUTILSINSTDIR)/include/coin`
+@COIN_HAS_COINUTILS_PREINSTALLED_TRUE@am__append_52 = -L`$(CYGPATH_W) $(COINUTILSINSTDIR)/lib` -lCoinUtils \
+@COIN_HAS_COINUTILS_PREINSTALLED_TRUE@	`cat $(COINUTILSDOCDIR)/coinutils_addlibs.txt`
+
+@COIN_HAS_COINUTILS_PREINSTALLED_FALSE@am__append_53 = \
+@COIN_HAS_COINUTILS_PREINSTALLED_FALSE@	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
+@COIN_HAS_COINUTILS_PREINSTALLED_FALSE@	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc`
+
+@COIN_HAS_COINUTILS_PREINSTALLED_FALSE@am__append_54 = $(COINUTILSOBJDIR)/src/libCoinUtils.la
+@COIN_HAS_COINUTILS_PREINSTALLED_FALSE@am__append_55 = `cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
+@SYM_PARALLEL_TRUE@am__append_56 = -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+@SYM_PARALLEL_TRUE@am__append_57 = -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
 @SYM_PARALLEL_TRUE@	-lgpvm3 -lpvm3
 
-@SYM_PARALLEL_TRUE@am__append_19 = $(SYMPHONYOBJDIR)/src/libSym$(MASTEREXT).la
-@SYM_PARALLEL_FALSE@am__append_20 = $(SYMLIB)
-@USE_CL_TRUE@am__append_21 = cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
+@SYM_PARALLEL_TRUE@am__append_58 = $(SYMPHONYOBJDIR)/src/libSym$(MASTEREXT).la
+@SYM_PARALLEL_FALSE@am__append_59 = $(SYMLIB)
+@USE_CL_TRUE@am__append_60 = cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
 @USE_CL_TRUE@	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
 @USE_CL_TRUE@	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
 @USE_CL_TRUE@	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
@@ -105,12 +162,12 @@ host_triplet = @host@
 @USE_CL_TRUE@	--tag=CXX --mode=link $(CXX) $(AM_CFLAGS) $(CCLCFLAGS) \
 @USE_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-@USE_CL_TRUE@am__append_22 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
+@USE_CL_TRUE@am__append_61 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
 @USE_CL_TRUE@	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
 @USE_CL_TRUE@	OsiSolverInterfaceTest.$(OBJEXT) OsiSymSolverInterfaceTest.$(OBJEXT) \
 @USE_CL_TRUE@	 unitTestSym.$(OBJEXT)
 
-@USE_CL_FALSE@am__append_23 = $(CXXLINK)
+@USE_CL_FALSE@am__append_62 = $(CXXLINK)
 noinst_PROGRAMS = unitTest$(EXEEXT) punitTest$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -131,40 +188,66 @@ am_punitTest_OBJECTS = punitTest-OsiColCutTest.$(OBJEXT) \
 	punitTest-OsiSymSolverInterfaceTest.$(OBJEXT) \
 	punitTest-unitTestSym.$(OBJEXT)
 punitTest_OBJECTS = $(am_punitTest_OBJECTS)
-@SYM_PARALLEL_TRUE@am__DEPENDENCIES_8 = $(SYMPHONYOBJDIR)/src/libSym$(MASTEREXT).la
-am__DEPENDENCIES_9 = $(SYMPHONYOBJDIR)/src/libSym.la
-@SYM_PARALLEL_FALSE@am__DEPENDENCIES_10 = $(am__DEPENDENCIES_9)
-am__DEPENDENCIES_11 = $(am__DEPENDENCIES_8) $(am__DEPENDENCIES_10)
-@USE_CGL_CUTS_TRUE@am__DEPENDENCIES_1 = $(CGLOBJDIR)/src/libCgl.la
-@CLP_LP_SOLVER_TRUE@am__DEPENDENCIES_2 =  \
-@CLP_LP_SOLVER_TRUE@	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-@CLP_LP_SOLVER_TRUE@	$(CLPOBJDIR)/src/libClp.la
-@CPLEX_LP_SOLVER_TRUE@am__DEPENDENCIES_3 =  \
-@CPLEX_LP_SOLVER_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-@GLPK_LP_SOLVER_TRUE@am__DEPENDENCIES_4 =  \
-@GLPK_LP_SOLVER_TRUE@	$(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la
-@OSL_LP_SOLVER_TRUE@am__DEPENDENCIES_5 =  \
-@OSL_LP_SOLVER_TRUE@	$(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
-@SOPLEX_LP_SOLVER_TRUE@am__DEPENDENCIES_6 =  \
-@SOPLEX_LP_SOLVER_TRUE@	$(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
-@XPRESS_LP_SOLVER_TRUE@am__DEPENDENCIES_7 =  \
-@XPRESS_LP_SOLVER_TRUE@	$(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
-am__DEPENDENCIES_12 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
+@SYM_PARALLEL_TRUE@am__DEPENDENCIES_11 = $(SYMPHONYOBJDIR)/src/libSym$(MASTEREXT).la
+am__DEPENDENCIES_12 = $(SYMPHONYOBJDIR)/src/libSym.la
+@SYM_PARALLEL_FALSE@am__DEPENDENCIES_13 = $(am__DEPENDENCIES_12)
+am__DEPENDENCIES_14 = $(am__DEPENDENCIES_11) $(am__DEPENDENCIES_13)
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@am__DEPENDENCIES_1 = $(CGLOBJDIR)/src/libCgl.la
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_OSI_PREINSTALLED_FALSE@am__DEPENDENCIES_2 = $(OSIOBJDIR)/src/OsiClp/libOsiClp.la
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_FALSE@am__DEPENDENCIES_3 = $(CLPOBJDIR)/src/libClp.la
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@CPLEX_LP_SOLVER_TRUE@am__DEPENDENCIES_4 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@GLPK_LP_SOLVER_TRUE@am__DEPENDENCIES_5 = $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@OSL_LP_SOLVER_TRUE@am__DEPENDENCIES_6 = $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@SOPLEX_LP_SOLVER_TRUE@am__DEPENDENCIES_7 = $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
+@COIN_HAS_OSI_PREINSTALLED_FALSE@@XPRESS_LP_SOLVER_TRUE@am__DEPENDENCIES_8 = $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
+@COIN_HAS_OSI_PREINSTALLED_FALSE@am__DEPENDENCIES_9 = $(OSIOBJDIR)/src/OsiSym/libOsiSym.la \
+@COIN_HAS_OSI_PREINSTALLED_FALSE@	$(OSIOBJDIR)/src/libOsi.la
+@COIN_HAS_COINUTILS_PREINSTALLED_FALSE@am__DEPENDENCIES_10 = $(COINUTILSOBJDIR)/src/libCoinUtils.la
+am__DEPENDENCIES_15 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
 	$(am__DEPENDENCIES_3) $(am__DEPENDENCIES_4) \
 	$(am__DEPENDENCIES_5) $(am__DEPENDENCIES_6) \
-	$(am__DEPENDENCIES_7) $(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(OSIOBJDIR)/src/OsiSym/libOsiSym.la
-@USE_CGL_CUTS_TRUE@am__DEPENDENCIES_13 = `cat \
-@USE_CGL_CUTS_TRUE@	$(CGLOBJDIR)/cgl_addlibs.txt`
-@CLP_LP_SOLVER_TRUE@am__DEPENDENCIES_14 = `cat \
-@CLP_LP_SOLVER_TRUE@	$(CLPOBJDIR)/clp_addlibs.txt`
-am__DEPENDENCIES_15 = `cat $(OSIOBJDIR)/osi_addlibs.txt` `cat \
+	$(am__DEPENDENCIES_7) $(am__DEPENDENCIES_8) \
+	$(am__DEPENDENCIES_9) $(am__DEPENDENCIES_10)
+@COIN_HAS_CGL_PREINSTALLED_TRUE@@USE_CGL_CUTS_TRUE@am__DEPENDENCIES_16 = $(CGLINSTDIR)/lib` \
+@COIN_HAS_CGL_PREINSTALLED_TRUE@@USE_CGL_CUTS_TRUE@	`cat \
+@COIN_HAS_CGL_PREINSTALLED_TRUE@@USE_CGL_CUTS_TRUE@	$(CGLDOCDIR)/cgl_addlibs.txt`
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@am__DEPENDENCIES_17 =  \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	`cat \
+@COIN_HAS_CGL_PREINSTALLED_FALSE@@USE_CGL_CUTS_TRUE@	$(CGLOBJDIR)/cgl_addlibs.txt`
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_OSI_PREINSTALLED_TRUE@am__DEPENDENCIES_18 = $(OSIINSTDIR)/lib`
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_TRUE@am__DEPENDENCIES_19 = $(CLPINSTDIR)/lib` \
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_TRUE@	`cat \
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_TRUE@	$(CLPDOCDIR)/clp_addlibs.txt`
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_FALSE@am__DEPENDENCIES_20 =  \
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_FALSE@	`cat \
+@CLP_LP_SOLVER_TRUE@@COIN_HAS_CLP_PREINSTALLED_FALSE@	$(CLPOBJDIR)/clp_addlibs.txt`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@CPLEX_LP_SOLVER_TRUE@am__DEPENDENCIES_21 = $(OSIINSTDIR)/lib`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@GLPK_LP_SOLVER_TRUE@am__DEPENDENCIES_22 = $(OSIINSTDIR)/lib`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@OSL_LP_SOLVER_TRUE@am__DEPENDENCIES_23 = $(OSIINSTDIR)/lib`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@SOPLEX_LP_SOLVER_TRUE@am__DEPENDENCIES_24 = $(OSIINSTDIR)/lib`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@@XPRESS_LP_SOLVER_TRUE@am__DEPENDENCIES_25 = $(OSIINSTDIR)/lib`
+@COIN_HAS_OSI_PREINSTALLED_TRUE@am__DEPENDENCIES_26 =  \
+@COIN_HAS_OSI_PREINSTALLED_TRUE@	$(OSIINSTDIR)/lib` `cat \
+@COIN_HAS_OSI_PREINSTALLED_TRUE@	$(OSIDOCDIR)/osi_addlibs.txt`
+@COIN_HAS_OSI_PREINSTALLED_FALSE@am__DEPENDENCIES_27 = `cat \
+@COIN_HAS_OSI_PREINSTALLED_FALSE@	$(OSIOBJDIR)/osi_addlibs.txt`
+@COIN_HAS_COINUTILS_PREINSTALLED_TRUE@am__DEPENDENCIES_28 = $(COINUTILSINSTDIR)/lib` \
+@COIN_HAS_COINUTILS_PREINSTALLED_TRUE@	`cat \
+@COIN_HAS_COINUTILS_PREINSTALLED_TRUE@	$(COINUTILSDOCDIR)/coinutils_addlibs.txt`
+@COIN_HAS_COINUTILS_PREINSTALLED_FALSE@am__DEPENDENCIES_29 = `cat \
+@COIN_HAS_COINUTILS_PREINSTALLED_FALSE@	$(COINUTILSOBJDIR)/coinutils_addlibs.txt`
+am__DEPENDENCIES_30 = `cat $(OSIOBJDIR)/osi_addlibs.txt` `cat \
 	$(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
-	$(am__DEPENDENCIES_13) $(am__DEPENDENCIES_14)
-am__DEPENDENCIES_16 = $(am__DEPENDENCIES_12) $(am__DEPENDENCIES_15)
-@SYM_PARALLEL_TRUE@am__DEPENDENCIES_17 = $(PVM_ROOT)/lib/$(ARCH)`
-am__DEPENDENCIES_18 = $(am__DEPENDENCIES_16) $(am__DEPENDENCIES_17)
+	$(am__DEPENDENCIES_16) $(am__DEPENDENCIES_17) \
+	$(am__DEPENDENCIES_18) $(am__DEPENDENCIES_19) \
+	$(am__DEPENDENCIES_20) $(am__DEPENDENCIES_21) \
+	$(am__DEPENDENCIES_22) $(am__DEPENDENCIES_23) \
+	$(am__DEPENDENCIES_24) $(am__DEPENDENCIES_25) \
+	$(am__DEPENDENCIES_26) $(am__DEPENDENCIES_27) \
+	$(am__DEPENDENCIES_28) $(am__DEPENDENCIES_29)
+am__DEPENDENCIES_31 = $(am__DEPENDENCIES_15) $(am__DEPENDENCIES_30)
+@SYM_PARALLEL_TRUE@am__DEPENDENCIES_32 = $(PVM_ROOT)/lib/$(ARCH)`
+am__DEPENDENCIES_33 = $(am__DEPENDENCIES_31) $(am__DEPENDENCIES_32)
 am_unitTest_OBJECTS = unitTest-OsiColCutTest.$(OBJEXT) \
 	unitTest-OsiCutsTest.$(OBJEXT) \
 	unitTest-OsiRowCutDebuggerTest.$(OBJEXT) \
@@ -191,7 +274,11 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ADDLIBS = @ADDLIBS@ `cat $(OSIOBJDIR)/osi_addlibs.txt` `cat \
 	$(COINUTILSOBJDIR)/coinutils_addlibs.txt` $(am__append_2) \
-	$(am__append_5)
+	$(am__append_5) $(am__append_7) $(am__append_11) \
+	$(am__append_14) $(am__append_17) $(am__append_23) \
+	$(am__append_30) $(am__append_36) $(am__append_42) \
+	$(am__append_47) $(am__append_50) $(am__append_52) \
+	$(am__append_55)
 ADD_CFLAGS = @ADD_CFLAGS@
 ADD_CXXFLAGS = @ADD_CXXFLAGS@
 ALWAYS_FALSE_FALSE = @ALWAYS_FALSE_FALSE@
@@ -472,57 +559,36 @@ AUTOMAKE_OPTIONS = foreign
 test_srcdir = $(OSISRCDIR)/test
 
 # Add include files
-
-########################################################################
-#                            Additional flags                          #
-########################################################################
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows.
-# "top_srcdir" refers to the basic directory for the main package that is
-# being compiled.
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(SYMINCDIR)` -I`$(CYGPATH_W) \
-	$(OSISRCDIR)/src/OsiSym` -DCOIN_HAS_SYMPHONY $(am__append_3) \
-	$(am__append_6) $(am__append_8) $(am__append_10) \
-	$(am__append_11) $(am__append_13) $(am__append_15) \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglClique` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglDuplicateRow` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglFlowCover` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglGomory` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglKnapsackCover` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglLiftAndProject` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglMixedIntegerRounding` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglMixedIntegerRounding2` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglOddHole` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglPreProcess` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglProbing` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglRedSplit` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglSimpleRounding` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglTwomir` -I`$(CYGPATH_W) \
-	$(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` -I`$(CYGPATH_W) \
-	$(CGLOBJDIR)/inc`
+AM_CPPFLAGS = $(am__append_1) $(am__append_3) -I`$(CYGPATH_W) \
+	$(SYMINCDIR)` -DCOIN_HAS_SYMPHONY $(am__append_6) \
+	$(am__append_8) $(am__append_10) $(am__append_12) \
+	$(am__append_15) $(am__append_16) $(am__append_18) \
+	$(am__append_20) $(am__append_21) $(am__append_22) \
+	$(am__append_24) $(am__append_26) $(am__append_27) \
+	$(am__append_28) $(am__append_29) $(am__append_31) \
+	$(am__append_33) $(am__append_34) $(am__append_35) \
+	$(am__append_37) $(am__append_39) $(am__append_40) \
+	$(am__append_41) $(am__append_43) $(am__append_45) \
+	$(am__append_46) $(am__append_48) $(am__append_51) \
+	$(am__append_53)
 SYMCPPFLAGS = $(AM_CPPFLAGS) $(SYMDEFS)
-SYMPCPPFLAGS = $(AM_CPPFLAGS) $(SYMPDEFS) $(am__append_17)
+SYMPCPPFLAGS = $(AM_CPPFLAGS) $(SYMPDEFS) $(am__append_56)
 APPLCPPFLAGS = 
-SYMPALLLDADD = $(ALLLDADD) $(am__append_18)
-LDADD = $(am__append_1) $(am__append_4) $(am__append_7) \
-	$(am__append_9) $(am__append_12) $(am__append_14) \
-	$(am__append_16) $(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
-	$(OSIOBJDIR)/src/OsiSym/libOsiSym.la
+SYMPALLLDADD = $(ALLLDADD) $(am__append_57)
+LDADD = $(am__append_4) $(am__append_9) $(am__append_13) \
+	$(am__append_19) $(am__append_25) $(am__append_32) \
+	$(am__append_38) $(am__append_44) $(am__append_49) \
+	$(am__append_54)
 
 ########################################################################
 #                            Additional Definitions                    #
 ########################################################################
 ALLLDADD = $(LDADD) $(ADDLIBS)
 SYMLIB = $(SYMPHONYOBJDIR)/src/libSym.la
-SYMPLIB = $(am__append_19) $(am__append_20)
+SYMPLIB = $(am__append_58) $(am__append_59)
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
-TestLDADD = $(LDADD) $(am__append_22)
-TestLINK = $(am__append_21) $(am__append_23)
+TestLDADD = $(LDADD) $(am__append_61)
+TestLINK = $(am__append_60) $(am__append_62)
 unitTest_SOURCES = \
 	$(test_srcdir)/OsiColCutTest.cpp \
 	$(test_srcdir)/OsiCutsTest.cpp \
@@ -1025,12 +1091,15 @@ uninstall-am: uninstall-info-am
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-info-am
 
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSym`
 
-test: unitTest$(EXEEXT)
-	if test x"$(DIRNETLIB)" != x; then \
-		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
-	fi;
-	./unitTest$(EXEEXT) $$NETLIBARG
+@COIN_HAS_OSI_PREINSTALLED_TRUE@test:
+@COIN_HAS_OSI_PREINSTALLED_TRUE@	echo "SYMPHONY has been compiled without Osi sources - no test possible"
+@COIN_HAS_OSI_PREINSTALLED_FALSE@test: unitTest$(EXEEXT)
+@COIN_HAS_OSI_PREINSTALLED_FALSE@	if test x"$(DIRNETLIB)" != x; then \
+@COIN_HAS_OSI_PREINSTALLED_FALSE@		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+@COIN_HAS_OSI_PREINSTALLED_FALSE@	fi;
+@COIN_HAS_OSI_PREINSTALLED_FALSE@	./unitTest$(EXEEXT) $$NETLIBARG
 #-T $(DATAOBJDIR)/miplib3 \
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
