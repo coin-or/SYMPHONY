@@ -223,7 +223,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    rows = lp_data->rows;   
 
 
-#ifndef MAX_CHILDREN_NUM
+#ifndef MAX_CHILDREN_NUM   
    /* The part below is not needed when we have MAX_CHILDREN_NUM specified */
    /* Count how many objval/termcode/feasible entry we might need
       and allocate space for it */
@@ -287,7 +287,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       int hotstart_ch_cand = 0;
       int check_off = TRUE;      
       
-      if(p->par.rel_br_override_default){
+      if(p->par.rel_br_override_default && p->mip->mip_inf){
 
 
 	 int weighted_iter =
@@ -302,8 +302,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 if(p->mip->nz > 5e4){
 	    rel_threshold = MAX(2, (int)(1.0 * rel_threshold * 5e4/p->mip->nz));
 	 }
-
-	 // if(p->bc_level < 1){
+	 
+	 if(p->bc_level < 1){
 	    if(p->iter_num > 2 && weighted_iter <= 1000){
 	       if(p->mip->mip_inf){
 		  if(p->mip->mip_inf->prob_type == BINARY_TYPE){
@@ -324,7 +324,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		  }
 	       }
 	    }
-	    //}
+	 }
+	 
+	 if(weighted_iter * p->bc_index < 5e7){
+	    check_off = FALSE;
+	 }
+	 
 	 
 	 if(p->mip->mip_inf && p->mip->mip_inf->bin_cont_row_num > 0 && 
 	    (p->mip->mip_inf->bin_cont_row_num >= p->mip->m ||
@@ -343,7 +348,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    
 	    if(p->mip->mip_inf->bin_cont_row_num >= p->mip->m){ 
 	       max_solves = MIN(max_solves, 2*cand_num);
-
+	       
 	    }else if(p->mip->mip_inf->bin_var_ratio < 0.2){
 	       max_solves = MIN(max_solves, 2*cand_num);
 	       if(p->mip->mip_inf->bin_var_ratio > 0.05){
@@ -360,13 +365,13 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       // }
 	    }///else{
 	     //  max_solves = MIN(2*max_solves, 2*cand_num);
-	       //if(p->mip->n - p->mip->mip_inf->cont_var_num <= 100 &&
-	       //  p->mip->nz < 1e4){
-	       //printf("here");
-	       //max_solves = 2*cand_num;
-	       //rel_threshold = MAX(2, rel_threshold/2);
-	       //printf("rel_the %i\n",rel_threshold);	       
-	       // }
+	    //if(p->mip->n - p->mip->mip_inf->cont_var_num <= 100 &&
+	    //  p->mip->nz < 1e4){
+	    //printf("here");
+	    //max_solves = 2*cand_num;
+	    //rel_threshold = MAX(2, rel_threshold/2);
+	    //printf("rel_the %i\n",rel_threshold);	       
+	    // }
 	    // }
 	 }else{	 
 	    double imp_avg = 0.0;
@@ -374,10 +379,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
 	    bc_node *node = p->tm->active_nodes[p->proc_index];	    
 	    node = p->tm->active_nodes[p->proc_index];      
-	    
+	    /*	    
 	    if(p->bc_level > 0){
 		  
 		  //if(node->start_objval > node->parent->end_objval + lp_data->lpetol){
+
 	       if(weighted_iter * p->bc_index < 5e7){
 		  check_off = FALSE;
 	       }
@@ -387,7 +393,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		  if(!check_off) check_first = TRUE;
 	       }
 	    }
-
+	    */
 	    if(p->bc_level >= 1){   
 	       while(node->parent){
 		  if(node->start_objval > node->parent->end_objval){
@@ -396,7 +402,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		  }
 		  node = node->parent;
 		  if(backtrack++ > p->par.rel_br_chain_backtrack) break;
-	       }
+	       }	       
 	    }
 
 	    if(backtrack > 0){
@@ -452,18 +458,17 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		  max_solves = MAX(c_cnt/4, (int)(0.15 * cand_num) + 1);
 	       }
 	    }
+
+	    max_solves_since_impr  = 5;
 	    
 	    //printf("level - set to : %i %i\n", p->bc_level, max_solves);	    
 	    //printf("c_cnt - cand num - max_solves : %i %i %i\n\n",
 	    //c_cnt,cand_num, max_solves);
-	    
-	    max_solves_since_impr  = 5;
-	    
 	    //if(check_off){
 	    int int_num = p->mip->n - p->mip->mip_inf->cont_var_num;
 	    int max_level = (p->mip->mip_inf == 0) ? 500 : 
 	       (int_num)/2;
-	    max_level = MIN(500, MAX(50, max_level));
+	    max_level = MIN(500, MAX(100, max_level));
 	    // if(cand_num > 0.25*(p->mip->n -
 	    //		   p->mip->mip_inf->cont_var_num))  
 	    //  max_level = MIN(50, max_level);
@@ -473,7 +478,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       max_level = MIN(100, max_level);
 	       if((p->mip->mip_inf->prob_type == BINARY_TYPE ||
 		   p->mip->mip_inf->prob_type == BIN_CONT_TYPE) &&
-		  cand_num > 0.1*int_num){
+		  cand_num > 0.05*int_num){
 		  max_level /= 2;
 	       }
 	    }
@@ -485,11 +490,16 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    }
 	 }
 	 //}
+	 /*
+	 for (i=0; i<cand_num; i++) {
+	    branch_var = p->br_rel_cand_list[i];
+	    printf("x - xval %s %f\n", p->mip->colname[branch_var], lp_data->x[branch_var]);
+	 }
+	 */	 
 
 	 max_solves = MIN(p->par.rel_br_override_max_solves, max_solves);
-
-	 double rel_limit = 0.05;
 	 
+	 double rel_limit = 0.05;
 	 if((p->mip->mip_inf && ((p->mip->mip_inf->mat_density < rel_limit &&
 				 p->mip->mip_inf->int_var_ratio > rel_limit &&
 				 (p->mip->mip_inf->max_col_ratio > rel_limit ||
@@ -499,65 +509,74 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	      p->mip->mip_inf->prob_type != BIN_CONT_TYPE)))){ 
 	    lp_data->si->setupForRepeatedUse(2,0);
 	 }
-      }
-   
-      //  printf("c_cnt - cand num - max_solves : %i %i %i\n\n",
-      //c_cnt,cand_num, max_solves);
-      //printf("cand num - max_solves : %i %i \n\n", cand_num, max_solves);
-      // printf("str_level - thresh: %i %i \n",strong_br_min_level, rel_threshold);
-      
-      if(p->mip->mip_inf->binary_sos_row_num > 0){
 
-	 double bin_den = (1.0*p->mip->mip_inf->binary_sos_row_num)/
-	    (p->mip->m + 1);
-	 //printf("bin-density %f\n",
-	 //1.0*p->mip->mip_inf->binary_sos_row_num/(p->mip->m+1));
-	 if( bin_den > 0.05 && ((bin_den < 0.5 && 
-				 p->mip->mip_inf->prob_type != BINARY_TYPE &&
-				 p->mip->mip_inf->bin_var_ratio > 0.5) ||
-				(bin_den < 0.1 &&
-				 p->mip->mip_inf->prob_type == BINARY_TYPE))){
-	    /* give priority to vars appear in sos rows */
-	    int *sos_ind = (int *)(malloc)(ISIZE*cand_num);
-	    int *sos_tot_var = (int *)(malloc)(ISIZE*cand_num);
-	    int sos_cnt = 0;
-	    for (i=0; i<cand_num; i++) {
-	       branch_var = p->br_rel_cand_list[i];
-	       
-	       if(p->mip->mip_inf->cols[branch_var].sos_num > 0.1*p->mip->n){
-		  sos_tot_var[sos_cnt] = p->mip->n -
-		     p->mip->mip_inf->cols[branch_var].sos_num;
-		  sos_ind[sos_cnt] = i;
-		  sos_cnt++;
+	 if(p->mip->mip_inf && !check_off &&
+	    (p->mip->mip_inf->prob_type == BINARY_TYPE ||
+	     p->mip->mip_inf->prob_type == BIN_CONT_TYPE) && 
+	    (p->mip->n - p->mip->mip_inf->cont_var_num < 100 ||
+	     (p->mip->mip_inf->int_var_ratio > rel_limit &&
+	      p->mip->mip_inf->row_density/(p->mip->n + 1) > rel_limit/5))){//
+	    //	      && p->mip->mip_inf->int_var_ratio < 1-rel_limit))){
+	    check_first = TRUE;
+	 }
+      
+	 //  printf("c_cnt - cand num - max_solves : %i %i %i\n\n",
+	 //c_cnt,cand_num, max_solves);
+	 //printf("cand num - max_solves : %i %i \n\n", cand_num, max_solves);
+	 //    printf("str_level - thresh: %i %i \n",strong_br_min_level, rel_threshold);
+         
+	 if(p->mip->mip_inf->binary_sos_row_num > 0){
+	    double bin_den = (1.0*p->mip->mip_inf->binary_sos_row_num)/
+	       (p->mip->m + 1);
+	    //1.0*p->mip->mip_inf->binary_sos_row_num/(p->mip->m+1));
+	    if( bin_den > rel_limit && ((bin_den < 10*rel_limit && 
+					 p->mip->mip_inf->prob_type != BINARY_TYPE &&
+					 p->mip->mip_inf->bin_var_ratio > 10*rel_limit) ||
+					(bin_den < 2*rel_limit &&
+					 p->mip->mip_inf->prob_type == BINARY_TYPE))){
+	       /* give priority to vars appear in sos rows */
+	       int *sos_ind = (int *)(malloc)(ISIZE*cand_num);
+	       int *sos_tot_var = (int *)(malloc)(ISIZE*cand_num);
+	       int sos_cnt = 0;
+	       for (i=0; i<cand_num; i++) {
+		  branch_var = p->br_rel_cand_list[i];
+		  //printf("%i %i\n", branch_var, p->mip->mip_inf->cols[branch_var].sos_num);
+		  // if(p->mip->mip_inf->cols[branch_var].sos_num > 0.1*p->mip->n){
+		  if(p->mip->mip_inf->cols[branch_var].sos_num >= (1.0*p->mip->nz)/(p->mip->m + 1)){
+		     sos_tot_var[sos_cnt] = p->mip->n -
+			p->mip->mip_inf->cols[branch_var].sos_num;
+		     sos_ind[sos_cnt] = i;
+		     sos_cnt++;
+		  }
 	       }
-	    }
-	    
-	    if(sos_cnt > 0){
-	       qsort_ii(sos_tot_var, sos_ind, sos_cnt);
-	       int *sos_chosen = (int *)(calloc)(ISIZE,cand_num);
-	       int *new_ord = (int *)(malloc)(ISIZE*cand_num);
-	       
-	       for (i=0; i<MIN(max_solves/2 + 1, sos_cnt); i++) {	       
-		  new_ord[i] = p->br_rel_cand_list[sos_ind[i]];
-		  sos_chosen[sos_ind[i]] = TRUE;
-	       }
-	       
-	       if(i < cand_num){
-		  int rest_cnt = 0;
+	       //printf("sos_cnt %i\n", sos_cnt);
+	       if(sos_cnt > 0){
+		  qsort_ii(sos_tot_var, sos_ind, sos_cnt);
+		  int *sos_chosen = (int *)(calloc)(ISIZE,cand_num);
+		  int *new_ord = (int *)(malloc)(ISIZE*cand_num);
+		  
+		  for (i=0; i<MIN(max_solves/2 + 1, sos_cnt); i++) {	       
+		     new_ord[i] = p->br_rel_cand_list[sos_ind[i]];
+		     sos_chosen[sos_ind[i]] = TRUE;
+		  }
+		  
+		  if(i < cand_num){
+		     int rest_cnt = 0;
 		  for(j = 0; j < cand_num; j++){
 		     if(sos_chosen[j]) continue;
 		     else new_ord[i+rest_cnt++] = p->br_rel_cand_list[j];
 		  }
-	       }	       
+		  }	       
+		  
+		  memcpy(p->br_rel_cand_list, new_ord, ISIZE*cand_num);
+		  
+		  FREE(sos_chosen);
+		  FREE(new_ord);
+	       }
 	       
-	       memcpy(p->br_rel_cand_list, new_ord, ISIZE*cand_num);
-	       
-	       FREE(sos_chosen);
-	       FREE(new_ord);
+	       FREE(sos_ind);
+	       FREE(sos_tot_var);	 
 	    }
-	    
-	    FREE(sos_ind);
-	    FREE(sos_tot_var);	 
 	 }
       }
       
@@ -611,6 +630,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 if (max_presolve_iter < 5) {
 	    max_presolve_iter = 5;
 	 }
+	 
 	 set_itlim_hotstart(lp_data, max_presolve_iter);
 	 set_itlim(lp_data, max_presolve_iter);
       }
@@ -721,9 +741,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             high = down_obj;
          }
 	  var_score = alpha * low + one_m_alpha * high;
-	  //printf("var_score :%f\n", var_score);
          if (var_score > best_var_score + lpetol100 || best_can == NULL) {
-            if ( var_score > best_var_score + 0.1 &&(down_is_est != TRUE ||
+	    if ( var_score > best_var_score + 0.1 &&(down_is_est != TRUE ||
 							   up_is_est != TRUE)) {
                solves_since_impr = 0;
 	       if(best_can!= NULL){
