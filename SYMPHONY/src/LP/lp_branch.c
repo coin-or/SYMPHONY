@@ -664,14 +664,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    if(p->bc_level < p->br_rel_down_min_level[branch_var]){ 
 	       p->br_rel_down_min_level[branch_var] =  p->bc_level;
 	    }
-            // update pcost
-            if (down_obj < SYM_INFINITY/10) {
-	       pcost_down[branch_var] = (pcost_down[branch_var]*
-		  rel_down + (down_obj - oldobjval)/(xval-floorx))/
-		  (rel_down + 1);
-               br_rel_down[branch_var]++;
-	       p->lp_stat.rel_br_down_update++;
-            } else {
+            if (down_status == LP_D_INFEASIBLE || down_status == LP_D_OBJLIM || 
+                down_status == LP_D_UNBOUNDED) {
+               // update bounds
                bnd_val[num_bnd_changes] = ceilx;
                bnd_sense[num_bnd_changes] = 'G';
                bnd_ind[num_bnd_changes] = branch_var;
@@ -680,6 +675,13 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                vars[branch_var]->new_lb = ceilx;
                vars[branch_var]->lb = ceilx;
                lb = ceilx;
+            } else {
+              // update pcost
+	       pcost_down[branch_var] = (pcost_down[branch_var]*
+		  rel_down + (down_obj - oldobjval)/(xval-floorx))/
+		  (rel_down + 1);
+               br_rel_down[branch_var]++;
+	       p->lp_stat.rel_br_down_update++;
             }
             full_solves++;
             solves_since_impr++;
@@ -705,14 +707,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       p->br_rel_up_min_level[branch_var] =  p->bc_level;
 	    }
             up_is_est = FALSE;
-            // update pcost
-            if (up_obj < SYM_INFINITY/10) {
-               pcost_up[branch_var] = (pcost_up[branch_var]*
-	         rel_up + (up_obj - oldobjval)/(ceilx-xval))/ 
-	         (rel_up + 1);
-               br_rel_up[branch_var]++;
-	       p->lp_stat.rel_br_up_update++;
-            } else {
+            if (up_status == LP_D_INFEASIBLE || up_status == LP_D_OBJLIM || 
+                up_status == LP_D_UNBOUNDED) {
+               // update bounds
                bnd_val[num_bnd_changes] = floorx;
                bnd_sense[num_bnd_changes] = 'L';
                bnd_ind[num_bnd_changes] = branch_var;
@@ -721,6 +718,13 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                vars[branch_var]->new_ub = floorx;
                vars[branch_var]->ub = floorx;
                ub = floorx;
+            } else {
+              // update pcost
+               pcost_up[branch_var] = (pcost_up[branch_var]*
+	         rel_up + (up_obj - oldobjval)/(ceilx-xval))/ 
+	         (rel_up + 1);
+               br_rel_up[branch_var]++;
+	       p->lp_stat.rel_br_up_update++;
             }
             full_solves++;
             solves_since_impr++;
@@ -767,6 +771,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
               best_can->objval[0] = down_obj;
               best_can->iterd[0] = num_down_iters;
               best_can->termcode[0] = down_status;
+              // added by asm4 because  hot starts dont generate a reliable 
+              // bound.
+              if (should_use_hot_starts && down_status==LP_D_ITLIM) { 
+                down_is_est = TRUE;
+                best_can->objval[0] = oldobjval;
+              }
             }
             if (up_is_est==TRUE) {
               best_can->objval[1] = oldobjval;
@@ -776,6 +786,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
               best_can->objval[1] = up_obj;
               best_can->iterd[1] = num_up_iters;
               best_can->termcode[1] = up_status;
+              // added by asm4 because  hot starts dont generate a reliable 
+              // bound.
+              if (should_use_hot_starts && up_status==LP_D_ITLIM) { 
+                up_is_est = TRUE;
+                best_can->objval[1] = oldobjval;
+              }
             }
             best_can->is_est[0] = down_is_est;
             best_can->is_est[1] = up_is_est;
