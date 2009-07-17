@@ -21193,6 +21193,10 @@ echo "${ECHO_T}no" >&6
 ADDLIBS="-lm $LIBS"
 
 
+# As backup, we make sure we don't loose an FLIBS if it has been set
+# by the user
+save_FLIBS="$FLIBS"
+
 # Initialize the FADDLIBS variable (which is to be used with a fortran
 # compiler and will not include FLIBS)
 FADDLIBS="$LIBS"
