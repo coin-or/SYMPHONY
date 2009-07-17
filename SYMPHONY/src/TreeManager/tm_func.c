@@ -319,7 +319,7 @@ int solve(tm_prob *tm)
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
-   double timeout2 = 30, timeout3 = tm->par.logging_interval, timeout4 = 10;
+   double timeout2 = 2, timeout3 = tm->par.logging_interval, timeout4 = 10;
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
