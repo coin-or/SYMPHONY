@@ -773,10 +773,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
               best_can->termcode[0] = down_status;
               // added by asm4 because  hot starts dont generate a reliable 
               // bound.
-              if (should_use_hot_starts && down_status==LP_D_ITLIM) { 
-                down_is_est = TRUE;
-                best_can->objval[0] = oldobjval;
-              }
+              //if (should_use_hot_starts && down_status==LP_D_ITLIM) { 
+              //  down_is_est = TRUE;
+              //  best_can->objval[0] = oldobjval;
+              //}
             }
             if (up_is_est==TRUE) {
               best_can->objval[1] = oldobjval;
@@ -788,10 +788,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
               best_can->termcode[1] = up_status;
               // added by asm4 because  hot starts dont generate a reliable 
               // bound.
-              if (should_use_hot_starts && up_status==LP_D_ITLIM) { 
-                up_is_est = TRUE;
-                best_can->objval[1] = oldobjval;
-              }
+              //if (should_use_hot_starts && up_status==LP_D_ITLIM) { 
+              //  up_is_est = TRUE;
+              //  best_can->objval[1] = oldobjval;
+              //}
             }
             best_can->is_est[0] = down_is_est;
             best_can->is_est[1] = up_is_est;
