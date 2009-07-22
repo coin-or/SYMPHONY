@@ -6,7 +6,6 @@
 /Makefile.in -text
 /README -text
 SYMPHONY/AUTHORS -text
-SYMPHONY/Applications/CNRP/MSVisualStudio/v8/cnrp.ncb -text svneol=unset#unset
 SYMPHONY/Applications/CNRP/MSVisualStudio/v8/cnrp.sln -text
 SYMPHONY/Applications/CNRP/MSVisualStudio/v8/cnrp.suo -text
 SYMPHONY/Applications/CNRP/MSVisualStudio/v8/cnrp.vcproj -text
