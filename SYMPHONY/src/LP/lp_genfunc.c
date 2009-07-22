@@ -1954,7 +1954,6 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 #ifdef COMPILE_IN_LP
    if(p->bc_level < 1 && p->iter_num < 2){
       int row_den = (int)(1.0*p->mip->nz/p->mip->m) + 1;
-
       /* all previous */
       if(p->mip->mip_inf){
 	 //printf("max_col_size: %i\t", p->mip->mip_inf->max_col_size);
@@ -1972,24 +1971,48 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 	    p->par.cgl.chain_trial_freq = (int)1.5*p->par.cgl.chain_trial_freq;
 	 }
 	 if(p->mip->mip_inf->cont_var_ratio > 0.1 &&
-	    1.0*p->mip->mip_inf->max_row_size/(p->mip->n +1) > 0.1)
-	    p->par.max_cut_length = p->par.max_cut_length/2;
+	    p->mip->mip_inf->max_row_ratio > 0.1)
+	    p->par.max_cut_length = p->par.max_cut_length/3 + 1;
 	
 	 if(p->mip->mip_inf->max_row_size <= 500){
-	    p->par.max_cut_length = MIN(MAX(p->mip->mip_inf->max_row_size,
-					    MIN(((int)(1.0133 *
-						       p->mip->mip_inf->mat_density *
-						       (p->mip->m + 1)* p->mip->n) -
-						 p->mip->nz + row_den) + 1,
-						(int)3.0*p->mip->mip_inf->max_row_size +
-						5)) + 4,
-					p->par.max_cut_length);
+	    int max_const_size = p->mip->mip_inf->max_row_size;
+	    if(p->mip->mip_inf->prob_type == BINARY_TYPE ||
+	       p->mip->mip_inf->prob_type == BIN_CONT_TYPE){
+	       if(p->mip->mip_inf->max_row_ratio < 0.05){
+		  max_const_size = 2*max_const_size;
+	       }else {
+		  max_const_size = 3*max_const_size;
+	       }
+	    }else{
+	       if(p->mip->mip_inf->max_row_ratio < 0.01){
+		  max_const_size += row_den;
+	       }else {
+		  max_const_size = (int)(max_const_size * 3.5);
+	       }
+	    }
+
+	    p->par.max_cut_length =
+	       MIN(MAX(p->mip->mip_inf->max_row_size,
+		       MIN(((int)(1.0133 * p->mip->mip_inf->mat_density *
+				  (p->mip->m + 1)* p->mip->n) -
+			    p->mip->nz + row_den) + 5,
+			   max_const_size)),
+		   p->par.max_cut_length);
+
+/* 	    p->par.max_cut_length = */
+/* 	       MIN(MAX(p->mip->mip_inf->max_row_size, */
+/* 		       MIN(((int)(1.0133 * p->mip->mip_inf->mat_density * */
+/* 				  (p->mip->m + 1)* p->mip->n) - p->mip->nz + row_den) + 1, */
+/* 			   (int)3.0*p->mip->mip_inf->max_row_size + 5)) + 4,//4, //-rl5  */
+/* 		   p->par.max_cut_length); */
+
 	 }else{
 	    if(1.0*p->mip->mip_inf->max_row_size/p->mip->n > 0.5){
-	       p->par.max_cut_length = MIN(p->mip->mip_inf->max_row_size,
-					   (int)(1.0*p->par.max_cut_length *
-						 p->mip->mip_inf->max_row_size/
-						 500.0) + row_den);
+	       p->par.max_cut_length =
+		  MIN(p->mip->mip_inf->max_row_size,
+		      (int)(1.0*p->par.max_cut_length *
+			    p->mip->mip_inf->max_row_size/500.0) + row_den);
+			    
 	    }else{
 	       p->par.max_cut_length = MAX(2*p->mip->mip_inf->max_row_size,
 					   (int)(1.0*p->par.max_cut_length *
@@ -2000,11 +2023,14 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
       }else{
 	 p->par.max_cut_length =
 	    MIN(p->par.max_cut_length,
-		(int)(10.0*row_den*p->mip->mip_inf->max_row_size/
-		      row_den + p->mip->mip_inf->max_row_size) + 5);
+		(int)(5.0*row_den*p->mip->n/(row_den + p->mip->n)) + 5);
+		      
       }
+      //     printf("sos/m %f\n", (1.0*p->mip->mip_inf->binary_sos_row_num)/p->mip->m);
+      //  printf("max_cut_length %i\n", p->par.max_cut_length);
    }
 #endif
+   
    max_cut_length = p->par.max_cut_length;
    if (p->par.tried_long_cuts == TRUE) {
       repeat_with_long = FALSE;
@@ -2044,6 +2070,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 #ifdef USE_CGL_CUTS
    int bc_index = p->bc_index;
    int bc_level = p->bc_level;
+   int max_cut_length = p->par.max_cut_length;
    cgl_params   *data_par = &(p->lp_data->cgl);   
 
    *should_generate = FALSE;
@@ -2115,12 +2142,6 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 		     p->par.cgl.probing_root_max_look =
 			MIN(200,MAX(p->par.cgl.probing_root_max_look, 20));
 
-		     /* last check to see how bin rows are oriented*/
-		     //  if(p->mip->mip_inf->max_row_ratio < 0.01 ||
-		     //		p->mip->mip_inf->max_row_size < 10 ||
-		     //	p->mip->mip_inf->bin_row_ratio > 0.8){
-		     //		p->par.cgl.probing_root_max_look /= 10;
-		     // }
 		  }else{
 		     p->par.cgl.probing_root_max_look =
 			MIN(200,MAX((int)(1e5/p->mip->nz * 5e4/p->mip->n) + 1,
@@ -2147,18 +2168,8 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
 	       
 	       probing->setMaxElementsRoot(1000);
 	       probing->setMaxLookRoot 
-		  (MAX(10, (int)(p->par.cgl.probing_root_max_look)/2 + 10));
+		  (MAX(11, (int)(p->par.cgl.probing_root_max_look)/2 + 10));
 
-	       // if(p->mip->mip_inf->max_row_ratio < 0.01 ||
-	       //  p->mip->mip_inf->max_row_size < 10 ||
-	       //  p->mip->mip_inf->bin_row_ratio > 0.8){
-	       //  probing->setMaxLookRoot
-	       //     (MAX(5, (int)(p->par.cgl.probing_root_max_look)/2 + 1));
-	       // }else{
-	       //  probing->setMaxLookRoot
-	       //     (MAX(10, (int)(p->par.cgl.probing_root_max_look)/2 + 10));
-		  // }
-	       
 	       if(p->par.cgl.probing_is_expensive){
 		  probing->setMaxLookRoot
 		     (MAX(5,(int)(p->par.cgl.probing_root_max_look)/5 + 1));
@@ -2273,7 +2284,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             break;
          } 
          *should_generate = TRUE;
-         knapsack->setMaxInKnapsack(p->par.max_cut_length); // default is 50
+         knapsack->setMaxInKnapsack(max_cut_length); // default is 50
          knapsack->switchOffExpensive(); // gets into infinite loop if on 
          p->lp_stat.knapsack_calls++;
          break;
@@ -2305,7 +2316,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             *should_generate = FALSE;
             break;
          }
-	 gomory->setLimit(p->par.max_cut_length);
+	 gomory->setLimit(max_cut_length);
 	 *should_generate = TRUE;
          p->lp_stat.gomory_calls++;
          break;
@@ -2338,7 +2349,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             break;
          } 
          *should_generate = TRUE;
-         twomir->setMaxElements(p->par.max_cut_length);
+         twomir->setMaxElements(max_cut_length);
          twomir->setCutTypes (TRUE, TRUE, TRUE, TRUE);
          p->lp_stat.twomir_calls++;
          break;
@@ -2405,7 +2416,7 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
          *should_generate = TRUE;
 	 oddhole->setMinimumViolation(0.005);
 	 oddhole->setMinimumViolationPer(0.00002);
-	 oddhole->setMaximumEntries(p->par.max_cut_length);
+	 oddhole->setMaximumEntries(max_cut_length);
          p->lp_stat.oddhole_calls++;
          break;
       }
@@ -2534,7 +2545,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    int          i, j, k, num_row_cuts, *is_deleted, num_elements,
       *indices, discard_cut, num_poor_quality = 0, num_unviolated = 0,
       num_duplicate = 0, *cut_size, *matind; 
-   const int    max_elements = p->par.max_cut_length, 
+   int    max_elements = p->par.max_cut_length, 
       verbosity = p->par.verbosity;
    LPdata       *lp_data = p->lp_data;
    int          *tmp_matind = lp_data->tmp.i1;
@@ -2548,7 +2559,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    var_desc     **vars = lp_data->vars;
    const int    is_userind_in_order = p->par.is_userind_in_order;
    cut_data     *sym_cut;
-
+   
    /* two times is necessary */
    cut_time     = used_time(&total_time);
    cut_time     = used_time(&total_time);
@@ -2558,7 +2569,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    hashes       = (double *) malloc(num_row_cuts*DSIZE);
    is_deleted   = (int *) calloc(num_row_cuts, ISIZE);
    cut_size     = (int *) calloc(num_row_cuts, ISIZE);
-   
+
    j = 0;
 
    for (i=0; i<num_row_cuts; i++) {
@@ -2727,14 +2738,15 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       sym_cut->deletable = TRUE;
 
 #ifdef COMPILE_IN_LP      
-      if(p->bc_level < 1 && (generator == CGL_PROBING_GENERATOR ||
-			     //generator == CGL_KNAPSACK_GENERATOR) &&
-			     generator == CGL_CLIQUE_GENERATOR) &&
-	 1.0*p->mip->mip_inf->binary_sos_row_num/
-	 (p->mip->mip_inf->binary_row_num + 1) > 0.5){
+      if(p->bc_level < 1 && p->mip->mip_inf && (generator == CGL_PROBING_GENERATOR ||
+						generator == CGL_CLIQUE_GENERATOR)){
+
+	 double sos_ratio = 1.0*p->mip->mip_inf->binary_sos_row_num/(p->mip->m + 1);
 	 
-	 if(p->lp_data->objval <= p->lp_stat.start_objval + lp_data->lpetol &&
-	    p->node_iter_num < 5 && p_cnt < 50 && cut_size[i] > 2){
+	 if( ((sos_ratio >= 0.9 && p->iter_num < 2) ||
+	      (sos_ratio > 0.1 && sos_ratio < 0.9 && p->mip->mip_inf->prob_type == BINARY_TYPE) ||
+	      (sos_ratio > 0.5 && sos_ratio < 0.9 && p->mip->mip_inf->prob_type == BIN_CONT_TYPE)) && 
+	     p->node_iter_num < 5 && p_cnt < 50 && cut_size[i] > 2){
 	    sym_cut->deletable = FALSE;
 	    p_cnt++;
 	 }

@@ -89,11 +89,14 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    *found_better_solution = FALSE;
    fp_data->mip_obj       = (double *)malloc(n*DSIZE);
    fp_data->flip_fraction = p->par.fp_flip_fraction;
-
-   if(p->mip->mip_inf->binary_sos_row_num > 0){
-      fp_data->sos_row_filled = (char *)malloc(p->mip->m*CSIZE);      
-   }else{
-      fp_data->sos_row_filled = 0;
+   fp_data->sos_row_filled = 0;
+   fp_data->sos_var_fixed_zero = 0;
+   fp_data->can_check_sos = FALSE;
+      
+   if(p->mip->mip_inf && p->mip->mip_inf->binary_sos_row_num > 0){
+      fp_data->can_check_sos = TRUE;
+      fp_data->sos_row_filled = (char *)malloc(p->mip->m*CSIZE);
+      //fp_data->sos_var_fixed_zero = (char *)malloc(p->mip->n*CSIZE);      
    }
 
    memcpy(fp_data->mip_obj,mip_obj,n*DSIZE);
@@ -277,6 +280,7 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    FREE(fp_data->x_bar_len);
    FREE(fp_data->fp_vars);
    FREE(fp_data->sos_row_filled);
+   FREE(fp_data->sos_var_fixed_zero);
    FREE(fp_data->obj);
    FREE(fp_data->mip_obj);
    FREE(fp_data->x_lp);
@@ -410,7 +414,7 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    k = 0;
 
 #ifdef COMPILE_IN_LP   
-   if(p->bc_level < 1 && p->mip->mip_inf->cont_var_num <= 0){
+   if(p->bc_level < 1 && p->mip->mip_inf && p->mip->mip_inf->cont_var_num <= 0){
       fp_max_length_cuts = 100;   
    }
 #endif
@@ -572,7 +576,7 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
    int n0 = fp_data->n0;
    double *lp_data_x = lp_data->x;
    double etol = lp_data->lpetol;
-   
+      
    is_feasible = FALSE;
    memset ((char *)(objcoeff),0,DSIZE*n);
    for (i=0;i<n0;i++) {
@@ -639,6 +643,7 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
 
    delta_x = 0;
    memcpy(x_lp,lp_data_x,DSIZE*n0);
+
    /*
    for (i=0;i<n0;i++) {
       if (fp_vars[i]->is_int) {
@@ -698,7 +703,7 @@ int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
    int termcode = FUNCTION_TERMINATED_NORMALLY;
    double *x_ip = fp_data->x_ip;
    double *x_lp = fp_data->x_lp;
-   int i,j, k, has_changed;
+   int i,j, has_changed;
    int n = fp_data->n0;
    double lpetol = lp_data->lpetol;
    int *tind = lp_data->tmp.i1; /* n */
@@ -714,11 +719,30 @@ int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
    FPvars **vars = fp_data->fp_vars;
    int fp_iter = fp_data->iter;
    double *alpha_p = fp_data->alpha_p;
-
+   int sos_row_filled_cnt = 0;
+ 
+   if(fp_data->can_check_sos){
+      memset(fp_data->sos_row_filled, 0, CSIZE*p->mip->m);
+      //memset(fp_data->sos_var_fixed_zero, 0, CSIZE*p->mip->n); 
+   }
+   
    for (i=0;i<n;i++) {
       if (vars[i]->is_int) {
          /* round x_lp[i] and put into x_ip[i] */
          x_ip[i]=floor(x_lp[i]+0.5);
+	 /*
+	 if(vars[i]->is_bin && fp_data->can_check_sos && x_ip[i] == 1.0 && 
+	    p->mip->mip_inf->cols[i].sos_num){
+	    if(fp_data->sos_var_fixed_zero[i]) x_ip[i] = 0;
+	    else fp_fix_sos_var(p, fp_data, i);
+	 }
+	 */
+	 if(vars[i]->is_bin && fp_data->can_check_sos && x_ip[i] == 1.0 && 
+	    p->mip->mip_inf->cols[i].sos_num){
+	    if(!(fp_can_sos_var_fix(p, fp_data, i, &sos_row_filled_cnt))){
+	       x_ip[i] = 0.0;
+	    }
+	 }	 
       }
       else {
          x_ip[i]=x_lp[i];
@@ -759,13 +783,12 @@ int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
 
       if (i<fp_iter) {
          /* flip some vars in x_ip */	 
-	 if(p->mip->mip_inf->binary_sos_row_num > 0){
-	    memset(fp_data->sos_row_filled, 0, CSIZE*p->mip->m); 
-	 }
+	 //if(fp_data->can_check_sos){
+	 //  memset(fp_data->sos_row_filled, 0, CSIZE*p->mip->m); 
+	 //  sos_row_filled_cnt = 0;	 
+	 //}
 	 
          int num_flipped = 0;
-	 int filled_cnt = 0;
-	 int row_ind = 0;
 	 
          has_changed = FALSE;
          PRINT(fp_data->verbosity,5,("fp: flipping\n"));
@@ -777,30 +800,12 @@ int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
 		  x_ip[j] = 1-x_ip[j];
 		  num_flipped++;
 	       }
-	       
-	       if(x_ip[j] == 1.0 && p->mip->mip_inf->cols[j].sos_num){
-		  char rows_filled = FALSE;
-		  for(k = p->mip->matbeg[j]; k < p->mip->matbeg[j+1]; k++){
-		     row_ind = p->mip->matind[k];
-		     if(p->mip->mip_inf->rows[row_ind].is_sos_row){
-			if(fp_data->sos_row_filled[row_ind]){
-			   rows_filled = TRUE;
-			   break;
-			}			   
-		     }
-		  }
-		  if(rows_filled) x_ip[j] = 0.0;
-		  else{
-		     for(k = p->mip->matbeg[j]; k < p->mip->matbeg[j+1]; k++){
-			row_ind = p->mip->matind[k];
-			if(p->mip->mip_inf->rows[row_ind].is_sos_row){
-			   fp_data->sos_row_filled[row_ind] = TRUE; 
-			   filled_cnt++;
-			}
-		     }
-		  }
-	       }
-	       
+	       // if(fp_data->can_check_sos && x_ip[j] == 1.0 && 
+	       //  p->mip->mip_inf->cols[j].sos_num){
+		  //if(!(fp_can_sos_var_fix(p, fp_data, j, &sos_row_filled_cnt))){
+		  //   x_ip[j] = 0.0;
+		  // }
+	       // }	       
 	    } else if (vars[j]->is_int) {
 	       if (CoinDrand48()<flip_fraction) {
 		  x_ip[j] = floor(x_lp[j]) + 
@@ -809,29 +814,6 @@ int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
 	    }	    
 	 }
 
-	 if(p->mip->mip_inf->binary_sos_row_num > filled_cnt){
-	    int fix_col = 0;
-	    for(k = 0; k < p->mip->m; k++){
-	       if(p->mip->mip_inf->rows[k].is_sos_row &&
-		  !(fp_data->sos_row_filled[k])){
-		  fix_col = p->mip->row_matind[p->mip->row_matbeg[k]];
-		  for(j = p->mip->matbeg[fix_col]; j < p->mip->matbeg[fix_col + 1];
-		      j++){
-		     row_ind = p->mip->matind[j];
-		     if(p->mip->mip_inf->rows[row_ind].is_sos_row){		     
-			fp_data->sos_row_filled[row_ind] = TRUE;
-			filled_cnt++;
-		     }
-		  }
-		  x_ip[fix_col] = 1.0;
-		  if(filled_cnt >= p->mip->mip_inf->binary_sos_row_num){
-		     break;
-		  }
-	       }
-	    }
-	 }
-
- 
 	 PRINT(fp_data->verbosity,5,("fp: flipping %d\n", num_flipped));
          if (num_flipped==0) {
             // TODO: dont know what to do
@@ -841,6 +823,32 @@ int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
          break;
       }
    }
+
+   /*
+   int k;
+   if(fp_data->can_check_sos && p->mip->mip_inf->binary_sos_row_num > sos_row_filled_cnt){
+      int fix_col = 0;
+      int row_ind = 0;
+      for(k = 0; k < p->mip->m; k++){
+	 if(p->mip->mip_inf->rows[k].is_sos_row &&
+	    !(fp_data->sos_row_filled[k])){
+	    fix_col = p->mip->row_matind[p->mip->row_matbeg[k]];
+	    for(j = p->mip->matbeg[fix_col]; j < p->mip->matbeg[fix_col + 1];
+		j++){
+	       row_ind = p->mip->matind[j];
+	       if(p->mip->mip_inf->rows[row_ind].is_sos_row){		     
+		  fp_data->sos_row_filled[row_ind] = TRUE;
+		  sos_row_filled_cnt++;
+	       }
+	    }
+	    x_ip[fix_col] = 1.0;
+	    if(sos_row_filled_cnt >= p->mip->mip_inf->binary_sos_row_num){
+	       break;
+	    }
+	 }
+      }
+   }
+   */
 
    if (has_changed==TRUE || fp_data->alpha>0) {
       fp_data->x_bar_ind[fp_iter] = (int *)malloc(ISIZE*cnt);
@@ -858,7 +866,48 @@ int fp_round(lp_prob *p, FPdata *fp_data, LPdata *lp_data)
    }
    return termcode;
 }
+/*===========================================================================*/
 
+int fp_fix_sos_var(lp_prob *p, FPdata *fp_data, int ind)
+{
+
+   int k, j, row_ind, col_ind;
+   for(k = p->mip->matbeg[ind]; k < p->mip->matbeg[ind+1]; k++){
+      row_ind = p->mip->matind[k];
+      for(j = p->mip->row_matbeg[row_ind + 1] - 1; j >= p->mip->row_matbeg[row_ind] ; j--){
+	 col_ind = p->mip->row_matind[j];
+	 if(col_ind <= ind) break;
+	 else fp_data->sos_var_fixed_zero[col_ind] = TRUE;
+      }
+   }
+
+   return 0;
+}
+
+/*===========================================================================*/
+
+int fp_can_sos_var_fix(lp_prob *p, FPdata *fp_data, int ind, int *filled_row_cnt)
+{
+   int k, row_ind;
+   
+   for(k = p->mip->matbeg[ind]; k < p->mip->matbeg[ind+1]; k++){
+      row_ind = p->mip->matind[k];
+      if(p->mip->mip_inf->rows[row_ind].is_sos_row){
+	 if(fp_data->sos_row_filled[row_ind]){
+	    return FALSE;
+	 }			   
+      }
+   }
+   for(k = p->mip->matbeg[ind]; k < p->mip->matbeg[ind+1]; k++){
+      row_ind = p->mip->matind[k];
+      if(p->mip->mip_inf->rows[row_ind].is_sos_row){
+	 fp_data->sos_row_filled[row_ind] = TRUE; 
+	 (*filled_row_cnt)++;
+      }
+   }
+
+   return TRUE; 
+}
 /*===========================================================================*/
 int fp_should_call_fp(lp_prob *p, int branching, int *should_call, 
       char is_last_iter)

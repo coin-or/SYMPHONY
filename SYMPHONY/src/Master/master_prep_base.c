@@ -3663,8 +3663,8 @@ int prep_initialize_mipinfo(PREPdesc *P)
    mip_inf->max_col_ratio = 1.0*max_col_size/(m+1);
    mip_inf->obj_size = obj_size;
    mip_inf->mat_density = 1.0*mip->nz/(n*m + 1);
-   mip_inf->row_density = 1.0*mip->nz/(n+1);
-   mip_inf->col_density = 1.0*mip->nz/(m+1);
+   mip_inf->row_density = 1.0*mip->nz/(m+1);
+   mip_inf->col_density = 1.0*mip->nz/(n+1);
    mip_inf->integerizable_var_num = integerizable_var_num;
    mip_inf->is_opt_val_integral = is_opt_val_integral;
    mip_inf->sum_obj_offset = fixed_obj_offset;
@@ -4319,8 +4319,8 @@ int prep_cleanup_desc(PREPdesc *P)
    mip_inf->max_row_ratio = 1.0*max_row_size/(col_num+1);
    mip_inf->max_col_ratio = 1.0*max_col_size/(row_num+1);   
    mip_inf->mat_density = 1.0*col_nz/(col_num*row_num + 1);
-   mip_inf->row_density = 1.0*col_nz/(col_num+1);
-   mip_inf->col_density = 1.0*col_nz/(row_num+1);
+   mip_inf->row_density = 1.0*col_nz/(row_num+1);
+   mip_inf->col_density = 1.0*col_nz/(col_num+1);
    mip_inf->sos_bin_row_ratio = 1.0*sos_row_cnt/(bin_row_cnt +1);
    mip_inf->bin_row_ratio = 1.0*bin_row_cnt/(row_num +1);
 
