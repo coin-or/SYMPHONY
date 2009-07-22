@@ -1,6 +1,7 @@
 * text=auto !eol
 /AUTHORS -text
 /Dependencies -text
+/Externals -text
 /LICENSE -text
 /Makefile.am -text
 /Makefile.in -text
