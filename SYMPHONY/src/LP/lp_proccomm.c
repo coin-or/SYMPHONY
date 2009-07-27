@@ -510,7 +510,6 @@ void send_node_desc(lp_prob *p, int node_type)
    node_desc *lp_desc = p->desc;
    char repricing = (p->colgen_strategy & COLGEN_REPRICING) ? 1 : 0;
    int deal_with_nf;
-   char ch;
    
    LPdata *lp_data = p->lp_data;
 
@@ -554,6 +553,7 @@ void send_node_desc(lp_prob *p, int node_type)
 
 #else
    int s_bufid;
+   char ch;
 #endif
 
 #ifdef SENSITIVITY_ANALYSIS
