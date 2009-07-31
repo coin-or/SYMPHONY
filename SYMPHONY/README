@@ -2,14 +2,9 @@ SYMPHONY Version 5.2.0 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Common Public License
-Version 1.0 and is freely redistributable. However, it is vital to the
-survival of projects such as this one that we be able to justify our existence
-through usage statistics. Therefore, we ask that you become a registered user
-of this software if you have not already done so. Registration is free, but
-helps us maintain our funding. Please visit SYMPHONY's registration page at
-http://branchandcut.org/SYMPHONY/license.htm to receive an official copy of
-the distribution. All source code and documentation is Copyright 2000-2009 by
-Ted Ralphs and others. This README may be redistributed freely.
+Version 1.0 and is freely redistributable. All source code and documentation
+is Copyright 2000-2009 by Ted Ralphs and others. This README may be
+redistributed freely.
 
 DOCUMENTATION
 =============
@@ -19,7 +14,7 @@ in the SYMPHONY/Doc/ subdirectory. If you have downloaded a binary
 distribution, the manual should be located in the man/ subdirectory. HTML
 or PDF versions of the manual can also be viewed at:
 
-http://projects.coin-or.org/SYMPHONY/
+http://www.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
