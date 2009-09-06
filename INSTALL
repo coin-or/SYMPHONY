@@ -162,7 +162,7 @@ SHARED MEMORY BUILD
 compliant compiler. Version 5.1 has been tested with gcc 4.2, and should work
 by configuring with
 
-  ./configure --with-openmp
+  ./configure --enable-openmp
 
 2. Follow the instructions above for building and testing.
 
