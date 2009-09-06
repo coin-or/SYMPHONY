@@ -1,19 +1,20 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY Branch, Cut, and Price Library.         */
+/* This file is part of the SYMPHONY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* The author of this file is Menal Guzelsoy                                 */
-/*                                                                           */
 /* (c) Copyright 2006-2009 Lehigh University. All Rights Reserved.           */
+/*                                                                           */
+/* The author of this file is Menal Guzelsoy                                 */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
 /* last modified: June 09, menal*/
+/* needs a LOT of cleaning */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,10 +22,6 @@
 #include "sym_master.h"
 #include "sym_macros.h"
 #include "sym_prep.h"
-
-/*===========================================================================*/
-/* Accessing preprocessor through sym_environment */
-/*===========================================================================*/
 
 int sym_presolve(sym_environment *env)
 {
@@ -38,6 +35,10 @@ int sym_presolve(sym_environment *env)
       FREE(env->prep_mip);
    }
 
+   /* 
+    * if preprocessing level > 2, then create a copy. otherwise change the
+    * existing data.
+    */
    if(p_level > 2){
       P->orig_mip = env->orig_mip = create_copy_mip_desc(env->mip);
       P->mip = env->prep_mip = env->mip;
@@ -52,7 +53,7 @@ int sym_presolve(sym_environment *env)
    }
    
    if(termcode > -1 && P->params.reduce_mip){
-      sym_restore_rootdesc(env);
+      prep_update_rootdesc(env);
    }
 
    /* debug */
@@ -89,12 +90,10 @@ int sym_presolve(sym_environment *env)
 }
 /*===========================================================================*/
 /*===========================================================================*/
-int sym_restore_rootdesc(sym_environment *env)
+int prep_update_rootdesc(sym_environment *env)
 
 {
-      //int bvarnum = env->base->varnum, bind = 0;
    int i, user_size = env->rootdesc->uind.size;// uind = 0;
-   //int *bvar_ind = env->base->userind; 
    int *user_ind = env->rootdesc->uind.list;
    
    env->base->cutnum = env->mip->m;
@@ -110,63 +109,6 @@ int sym_restore_rootdesc(sym_environment *env)
    env->rootdesc->uind.size = env->mip->n;
    
    return PREP_MODIFIED;
-}
-/*===========================================================================*/
-/* open and initialize an environment */
-/*===========================================================================*/
-
-prep_environment * prep_open_environment()
-{
-
-   prep_environment *prep =
-      (prep_environment *)calloc(1, sizeof(prep_environment));   
-   prep->P = (PREPdesc *) calloc(1, sizeof(PREPdesc));
-   prep->P->mip = (MIPdesc *)calloc(1, sizeof(MIPdesc));   
-
-   /*set defaults here */
-
-   prep_params *prep_par = &prep->params;
-   prep_par->level = 5;
-   prep_par->dive_level = 5;
-   prep_par->impl_dive_level = 0;
-   prep_par->impl_limit = 50;
-   prep_par->do_probe = 1;
-   prep_par->verbosity = 1;
-   prep_par->reduce_mip = 1;
-   prep_par->probe_verbosity = 0;
-   prep_par->probe_level = 1;
-   prep_par->display_stats = 0;
-   prep_par->iteration_limit = 10;
-   prep_par->etol = 1e-07;
-   prep_par->do_single_row_rlx = 0;
-   prep_par->single_row_rlx_ratio = 0.1;
-   prep_par->max_sr_cnt = 5;
-   prep_par->do_aggregate_row_rlx = 0;
-   prep_par->max_aggr_row_cnt = 0;
-   prep_par->max_aggr_row_ratio = 0.1;
-   prep_par->keep_row_ordered = 1;
-   prep_par->keep_track = 0;
-   prep_par->time_limit = 100;
-   prep_par->write_mps = 0;
-   prep_par->write_lp = 0;
-   
-   return prep;
-}
-
-/*===========================================================================*/
-
-int prep_solve(prep_environment *prep){
-
-   int termcode = 0;
-   PREPdesc * P = prep->P;
-   
-   if(P->mip){
-      P->orig_mip = create_copy_mip_desc(P->mip);
-      P->params = prep->params;
-      termcode = prep_solve_desc(P);
-   }
-   
-   return termcode;
 }
 
 /*===========================================================================*/
@@ -188,10 +130,9 @@ int prep_solve_desc (PREPdesc * P)
    int p_level = params.level;
 
    if (p_level <= 0) {
-      if(verbosity >= 0){
-	 printf ("Skipping Preprocessor\n");
-      }
-      //  return(termcode);
+     /* preprocessing is not carried out. mipinfo data structures are still
+      * filled up */
+     PRINT(verbosity, -1, ("Skipping Preprocessor\n"));
    }
 
    double start_time = wall_clock(NULL);
@@ -203,15 +144,22 @@ int prep_solve_desc (PREPdesc * P)
    }
 
    /* need to fill in the row ordered vars of mip */
-
    /* these will be needed for both basic and advanced prep functions
       so we call them here */
    termcode = prep_fill_row_ordered(P);
-   termcode = prep_initialize_mipinfo(P);//mip, params, &(P->stats));   
+   if (PREP_QUIT(termcode)) {
+     return termcode;
+   }
 
-   /* no changes so far on column based mip*/
+   /* find some information about the mip: type of rows, cols, variables etc. */
+   termcode = prep_initialize_mipinfo(P);//mip, params, &(P->stats));   
+   if (PREP_QUIT(termcode)) {
+     return termcode;
+   }
+
+   /* no changes so far on column based mip */
    /* call the main sub function of presolver */
-   if(!PREP_QUIT(termcode) && p_level > 2){
+   if(p_level > 2){
       termcode = prep_basic(P);
    }
 
@@ -374,95 +322,6 @@ int prep_load_problem(prep_environment *prep, int numcols, int numrows,
    mip->obj_offset = -obj_offset;
 
    return termcode;
-}
-
-/*************************************************************************
- ***                     preprocessing - parameters                    ***
- *************************************************************************/ 
-
-int prep_set_param(prep_environment *prep, char *key, int value)
-{
-
-   prep_params *prep_par = &prep->params;
-   
-   //if (strcmp(key, "prep_do_preprocessing") == 0){
-   //  prep_par->do_prep = value;
-   //  return(0);
-   //}
-   if (strcmp(key, "prep_level") == 0){
-      prep_par->level = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_dive_level") == 0){
-      prep_par->dive_level = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_impl_dive_level") == 0){
-      prep_par->impl_dive_level = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_impl_limit") == 0){
-      prep_par->impl_limit = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_iter_limit") == 0){
-      prep_par->iteration_limit = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_do_probing") == 0){
-      prep_par->do_probe = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_do_sr") == 0){
-      prep_par->do_single_row_rlx = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_verbosity") == 0){
-      prep_par->verbosity = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_reduce_mip") == 0){
-      prep_par->reduce_mip = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_probing_verbosity") == 0){
-      prep_par->probe_verbosity = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_probing_level") == 0){
-      prep_par->probe_level = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_display_stats") == 0){
-      prep_par->display_stats = value;
-      return(0);
-   }
-   else if (strcmp(key, "max_sr_cnt") == 0){
-      prep_par->max_sr_cnt = value;
-      return(0);
-   }
-   else if (strcmp(key, "max_aggr_row_cnt") == 0){
-      prep_par->max_aggr_row_cnt = value;
-      return(0);
-   }
-   else if (strcmp(key, "keep_row_ordered") == 0){
-      prep_par->keep_row_ordered = value;
-      return(0);
-   }
-   else if (strcmp(key, "write_mps") == 0){
-      prep_par->write_mps = value;
-      return(0);
-   }
-   else if (strcmp(key, "write_lp") == 0){
-      prep_par->write_lp = value;
-      return(0);
-   }
-   else if (strcmp(key, "prep_time_limit") == 0){
-      prep_par->time_limit = value;
-      return(0);
-   }
-
-   return(PREP_FUNC_ERROR);
 }
 
 /*===========================================================================*/
@@ -743,12 +602,5 @@ void prep_write_lp(prep_environment *prep, char *outfile)
    FREE(rub);
 }
 #endif
-/*===========================================================================*/
-/*===========================================================================*/
-void prep_close_environment(prep_environment *prep)
-{
-   free_prep_desc(prep->P);
-   FREE(prep);
-}
 
 /*===========================================================================*/

@@ -35,56 +35,50 @@
 int prep_basic(PREPdesc *P)
 {
 
-   int termcode;     /* return status of each function called
-		       herein */
-   int iter_cnt = 0, iter_cnt_limit, p_level;    
-   int verbosity;
-   double a_val, etol, new_bound = 0.0;// min_ub, max_lb; 
-   int do_sr_rlx;
-   char do_aggr_row_rlx;// fix_var; 
+   /* initialization */
+   prep_stats *stats = &(P->stats);
+   prep_params params = P->params;
+   
+   const int p_level = params.level;    
+   const int iter_cnt_limit = params.iteration_limit;
+   const int verbosity = params.verbosity;
+   const int do_sr_rlx = params.do_single_row_rlx;      
+   const int dive_level = params.dive_level;
+   const int impl_dive_level = params.impl_dive_level;
+   const double etol = params.etol;
+   const double time_limit = params.time_limit;
+
+   int termcode;     /* return status of functions called herein */
+   int iter_cnt = 0;
+   double a_val, new_bound = 0.0;// min_ub, max_lb; 
    int i, j, m, n, nz, *r_matbeg, *r_matind, *matbeg, *matind; 
    double *obj, *rhs, *r_matval, *matval, *ub, *lb;
    char *sense; 
    int col_ind, row_ind, fix_type;
 
    char can_impl = FALSE, bin_type = FALSE;
-   int dive_level, impl_dive_level, impl_limit;
    int old_changes_cnt, changes_diff = 0, new_changes_cnt, init_changes_cnt = 0;
    int old_others_cnt, new_others_cnt, mark_others_cnt = 0;
    double start_impl_time, mark_time, impl_time = 0.0;
-
-   /* initialization */
-   prep_stats *stats = &(P->stats);
-   prep_params params = P->params;
-   
-   stats->row_infeas_ind = stats->col_infeas_ind = -1;
-   
-   verbosity = params.verbosity; 
-   p_level = params.level;
-   etol = params.etol;
-   iter_cnt_limit = params.iteration_limit;
-   do_sr_rlx = params.do_single_row_rlx;      
-   do_aggr_row_rlx = params.do_aggregate_row_rlx;
-   dive_level = params.dive_level;
-   impl_dive_level = params.impl_dive_level;
-   impl_limit = params.impl_limit;
 
    MIPdesc *mip = P->mip;
    MIPinfo *mip_inf = mip->mip_inf;
    COLinfo * cols = mip_inf->cols;
    ROWinfo *rows = mip_inf->rows;
 
+   stats->row_infeas_ind = stats->col_infeas_ind = -1;
+
    if(mip_inf->prob_type == CONTINUOUS_TYPE){
       /* no need for prep, just quit */
       return PREP_UNMODIFIED;
    }
    
-   /* first integerize the bounds */
-   /* can be embedded somewhere in basic prep down*/
-   /* for now let it be */
-   /* also we integerize the integerizable vars if p_level > 2 */
+   /* 
+    * round up/down the bounds on integer variables.
+    * if p_level>2, also round up/down the bounds on vars that are implied to
+    * be integers.
+    */
    termcode = prep_integerize_bounds(P);
-   
    if(PREP_QUIT(termcode)){
       return termcode;
    }
@@ -120,9 +114,7 @@ int prep_basic(PREPdesc *P)
    } 
    
    /* first check duplicate rows, cols */
-   
    termcode = prep_delete_duplicate_rows_cols(P, TRUE, TRUE);
-      
    if(PREP_QUIT(termcode)){
       return termcode;
    } 
@@ -131,8 +123,7 @@ int prep_basic(PREPdesc *P)
 
    /*initialize implications data structure */
    if(p_level >= 5){ /* disabled now */ 
-      /* probably doesnt worth it for this version
-	 if n or nz is too large */
+      /* probably doesnt worth it for this version if n or nz is too large */
       if(p_level >= 10 || (n < 1e4 && nz < 1e5)){
 	 if(bin_type){	 
 	    /* for now, just between binary variables */
@@ -144,7 +135,7 @@ int prep_basic(PREPdesc *P)
 	    P->ulist_checked = (char *)malloc(CSIZE * n);
 	    P->llist_checked = (char *)malloc(CSIZE * n);
 	    
-	    P->impl_limit = impl_limit;
+	    P->impl_limit = params.impl_limit;
 	    can_impl = TRUE;
 	    
 	    /* get the list of columns to apply impl on */
@@ -159,7 +150,6 @@ int prep_basic(PREPdesc *P)
    }
    
    /* main preprocessing loop */
-
    old_changes_cnt = new_changes_cnt = 0;
    old_others_cnt = new_others_cnt = 0;
    while(iter_cnt < iter_cnt_limit){
@@ -181,7 +171,7 @@ int prep_basic(PREPdesc *P)
 	 }
 	 /* can we fix it? first check implications */	 
 	 /* disabled now */
-	 if(can_impl && impl_time < params.time_limit){
+	 if(can_impl && impl_time < time_limit){
 	    if(cols[col_ind].var_type == 'B' && 
 	       P->impl_vars[col_ind] && (iter_cnt < 2 ||
 					 (iter_cnt > 1 &&
@@ -484,6 +474,9 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
    if(!check_cols && !check_rows){
       return termcode;
    }
+
+   const double etol = P->params.etol;
+   const int verbosity = P->params.verbosity;
  
    int i, j, k, l, delete_ind, l_ind, r_ind, cr_ind, cl_ind;
    int obj_ind, col_ind, row_ind, end, obj_size, row_size, delete_row_ind;
@@ -495,9 +488,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
    MIPdesc *mip = P->mip;
    COLinfo *cols = mip->mip_inf->cols;
    ROWinfo *rows = mip->mip_inf->rows;
-   double etol = P->params.etol;
    int dive_level = 0; 
-   int verbosity = P->params.verbosity;
    prep_stats *stats = &(P->stats);
    
    int m = mip->m;
@@ -1353,7 +1344,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 
 /*===========================================================================*/
 /*===========================================================================*/
-/* check if we can boundarize an unbounded variable 
+/* check if we can bound an unbounded variable 
    only used when this row has only 1 lb_inf_var_num or 1 ub_inf_var_num */
 
 int prep_force_row_bounds(PREPdesc *P, int row_ind, int col_ind, int a_loc) 
@@ -3900,7 +3891,9 @@ int prep_fill_row_ordered(PREPdesc *P)
    /*
      recreates 'A' matrix using three matrices just like the standard
      notation. However, matrices contain row representations rather than
-     column
+     column representation.
+
+     Also replace any >= constraints by <=.
    */ 
 
    int i, j, *o_ind, *c_lengths;
@@ -3974,7 +3967,7 @@ int prep_fill_row_ordered(PREPdesc *P)
       }
    }   
 
-   return 0;
+   return PREP_UNMODIFIED;
 }
 /*===========================================================================*/
 /*===========================================================================*/

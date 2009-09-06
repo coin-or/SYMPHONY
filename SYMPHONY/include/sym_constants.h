@@ -505,13 +505,16 @@
 #define IMP_COL             1
 
 /*-----------------  return codes for presolve functions --------------------*/
-
-#define PREP_UNMODIFIED     0	/* preprocessor exited without modifying the
-				   MIP in any way*/
-#define PREP_MODIFIED       1	/* preprocessor modified the MIP in some way */
-#define PREP_INFEAS         2	/* preprocessor found the MIP infeasible */
-#define PREP_SOLVED         3	/* preprocessor found the MIP unbounded */
-#define PREP_UNBOUNDED      4	/* preprocessor found the MIP unbounded */
+/* preprocessor exited without modifying the MIP in any way */
+#define PREP_UNMODIFIED     0
+/* preprocessor modified the MIP in some way */  
+#define PREP_MODIFIED       1
+/* preprocessor found the MIP infeasible */
+#define PREP_INFEAS         2
+/* preprocessor found the MIP unbounded */
+#define PREP_SOLVED         3
+/* preprocessor solved the MIP */
+#define PREP_UNBOUNDED      4
 #define PREP_NUMERIC_ERROR -1
 #define PREP_OTHER_ERROR   -2
 
