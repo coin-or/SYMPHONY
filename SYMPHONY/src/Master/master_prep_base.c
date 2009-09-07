@@ -465,8 +465,8 @@ int prep_basic(PREPdesc *P)
 /* We check duplicacy here. */
 /*===========================================================================*/
 
-int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows, 
-				    char check_cols){
+int prep_delete_duplicate_rows_cols(PREPdesc *P, const char check_rows, 
+    const char check_cols){
 
    /* start - initialization */
    int termcode = PREP_UNMODIFIED;
@@ -608,6 +608,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 	 }
 	 /* search for same cols */
 	 for(i = last_lloc; i < n - 1; i++){
+            /* if fixed or fixable to a bound, continue */
 	    if(cols[c_loc[i]].var_type == 'F' ||
 	       cols[c_loc[i]].var_type == 'U' ||
 	       cols[c_loc[i]].var_type == 'L'){
@@ -647,13 +648,13 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 	    if(r_ind == last_rloc || cols[cl_ind].var_type == 'F' ||
 	       cols[cl_ind].var_type == 'U' ||
 	       cols[cl_ind].var_type == 'L'){
-	       //cols[cl_ind].var_type != 'B'){
+	       //cols[cl_ind].var_type != 'B')
 	       l_ind++;
 	       r_ind = l_ind + 1;
 	       continue;
 	    }
 	    
-	    //if(cols[cr_ind].var_type != 'B'){
+	    //if(cols[cr_ind].var_type != 'B'){ }
 	    if(cols[cr_ind].var_type == 'F' ||
 	       cols[cl_ind].var_type == 'U' ||
 	       cols[cl_ind].var_type == 'L'){
@@ -767,7 +768,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 
 	    if(obj_l == obj_r){ 
 	       /* fixme, make this more efficient */
-	       //if(prep_is_equal(obj_r, obj_l, etol)){
+	       //if(prep_is_equal(obj_r, obj_l, etol)){ }
 	       dup_type = 0;
 	    }else if(!bin_type){
 	       /* at least one inf */

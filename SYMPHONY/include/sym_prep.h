@@ -309,8 +309,8 @@ int prep_force_row_bounds(PREPdesc *P, int row_ind, int col_ind, int a_loc);
 int prep_deleted_row_update_info(MIPdesc *mip, int row_ind);
 
 /* try to find duplicate rows and columns */
-int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows, 
-				    char check_cols);
+int prep_delete_duplicate_rows_cols(PREPdesc *P, const char check_rows, 
+				    const char check_cols);
 /* utility functions */
 void prep_sos_fill_var_cnt(PREPdesc *P);
 void prep_sos_fill_row(ROWinfo *row, int alloc_size, int size,
