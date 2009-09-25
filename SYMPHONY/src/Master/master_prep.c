@@ -34,7 +34,7 @@ int sym_presolve(sym_environment *env)
     * free any existing preprocessed mip in the environment.
     * fixme: an environment should have any number of mips and prep_mips.
     */
-   if(env->prep_mip){
+   if (env->prep_mip){
       free_mip_desc(env->prep_mip);
       FREE(env->prep_mip);
    }
@@ -43,41 +43,41 @@ int sym_presolve(sym_environment *env)
     * if preprocessing level > 2, then create a copy. otherwise change the
     * existing data.
     */
-   if(p_level > 2){
+   if (p_level > 2){
       P->orig_mip = env->orig_mip = create_copy_mip_desc(env->mip);
       P->mip = env->prep_mip = env->mip;
-   }else{
+   } else {
       P->mip = env->mip;
    }
 
    P->params = env->par.prep_par;
    
-   if(P->mip){
+   if (P->mip){
       termcode = prep_solve_desc(P);
    }
    
-   if(termcode > -1 && P->params.reduce_mip){
+   if (termcode > -1 && P->params.reduce_mip){
       prep_update_rootdesc(env);
    }
 
    /* debug */
-   if(P->params.write_mps || P->params.write_lp){
+   if (P->params.write_mps || P->params.write_lp){
       char file_name[80] = "";
       sprintf(file_name, "%s_prep", env->probname);
       
-      if(P->params.write_mps){
+      if (P->params.write_mps){
 	 sym_write_mps(env, file_name);
       }
-      if(P->params.write_lp){
+      if (P->params.write_lp){
 	 sym_write_lp(env, file_name);
       }
    }
 
    /* fixme: we don't use the impl lists now, so get rid of them */
-   if(P->mip->mip_inf && P->params.level >= 5 &&
+   if (P->mip->mip_inf && P->params.level >= 5 &&
       P->mip->mip_inf->binary_var_num > 0){
       int j;
-      for(j = 0; j < P->mip->n; j++){
+      for (j = 0; j < P->mip->n; j++){
 	 free_imp_list(&(P->mip->mip_inf->cols[j].ulist));
 	 free_imp_list(&(P->mip->mip_inf->cols[j].llist));
       }      
@@ -108,10 +108,10 @@ int prep_update_rootdesc(sym_environment *env)
    
    env->base->cutnum = env->mip->m;
 
-   if(user_size == env->mip->n){
+   if (user_size == env->mip->n){
       return PREP_UNMODIFIED;
-   }else{
-      for(i = 0; i < env->mip->n; i++){
+   } else {
+      for (i = 0; i < env->mip->n; i++){
 	 user_ind[i] = i;
       }
    }
@@ -148,7 +148,7 @@ int prep_solve_desc (PREPdesc * P)
    double start_time = wall_clock(NULL);
 
    /* Start with Basic Preprocessing */
-   if(p_level > 2){
+   if (p_level > 2){
       PRINT(verbosity, -2, ("Starting Preprocessing...\n"));
       P->stats.nz_coeff_changed = (char *)calloc(CSIZE ,mip->nz);
    }
@@ -169,15 +169,15 @@ int prep_solve_desc (PREPdesc * P)
 
    /* no changes so far on column based mip */
    /* call the main sub function of presolver */
-   if(p_level > 2){
+   if (p_level > 2){
       termcode = prep_basic(P);
    }
 
    /* report what we have done */
-   if(verbosity > -2){
+   if (verbosity > -2){
       prep_report(P, termcode);
    }
-   if(p_level > 2){
+   if (p_level > 2){
       PRINT(verbosity, 0, ("Total Presolve Time: %f...\n\n", 
 			   wall_clock(NULL) - start_time));   
    }
@@ -211,7 +211,7 @@ int prep_load_problem(prep_environment *prep, int numcols, int numrows,
 
    if (make_copy){      
       
-      if(numcols){
+      if (numcols){
 	 mip->obj    = (double *) calloc(numcols, DSIZE);
 	 mip->ub     = (double *) calloc(numcols, DSIZE);
 	 mip->lb     = (double *) calloc(numcols, DSIZE);
@@ -223,13 +223,13 @@ int prep_load_problem(prep_environment *prep, int numcols, int numrows,
 
 	 if (colub){
 	    memcpy(mip->ub, colub, DSIZE * numcols); 
-	 }else{
-	    for(i = 0; i<mip->n; i++){
+	 } else {
+	    for (i = 0; i<mip->n; i++){
 	       mip->ub[i] = inf;
 	    }
 	 }
 	 
-	 if(collb){
+	 if (collb){
 	    memcpy(mip->lb, collb, DSIZE * numcols);
 	 }
 	 
@@ -238,7 +238,7 @@ int prep_load_problem(prep_environment *prep, int numcols, int numrows,
 	 }
       }
 
-      if(numrows){
+      if (numrows){
 
 	 mip->rhs    = (double *) calloc(numrows, DSIZE);
 	 mip->sense  = (char *)   malloc(CSIZE * numrows);
@@ -246,11 +246,11 @@ int prep_load_problem(prep_environment *prep, int numcols, int numrows,
 
 	 if (rowsen){
 	    memcpy(mip->sense, rowsen, CSIZE * numrows); 
-	 }else{
+	 } else {
 	    memset(mip->sense, 'N', CSIZE *numrows);
 	 }
 	 
-	 if(rowrhs){
+	 if (rowrhs){
 	    memcpy(mip->rhs, rowrhs, DSIZE * numrows);
 	 }
 	 
@@ -261,7 +261,7 @@ int prep_load_problem(prep_environment *prep, int numcols, int numrows,
       
       //user defined matind, matval, matbeg--fill as column ordered
       
-      if(start){      
+      if (start){      
 
 	 mip->nz = start[numcols];
 	 mip->matbeg = (int *) calloc(ISIZE, (numcols + 1));
@@ -273,55 +273,55 @@ int prep_load_problem(prep_environment *prep, int numcols, int numrows,
 	 memcpy(mip->matind, index, ISIZE *start[numcols]);  
       }
       
-   }else{
+   } else {
       
       if (obj){
 	 mip->obj = obj;
-      }else{
+      } else {
 	 mip->obj    = (double *) calloc(numcols, DSIZE);	 
       }
 
       if (rowsen){
 	 mip->sense = rowsen;
-      }else{
+      } else {
 	 mip->sense  = (char *) malloc(CSIZE * numrows);
 	 memset(mip->sense, 'N', CSIZE *numrows);
       }
 
-      if(rowrhs){
+      if (rowrhs){
 	 mip->rhs = rowrhs;
-      }else{
+      } else {
 	 mip->rhs = (double *) calloc(numrows, DSIZE);	 
       }
 
       if (rowrng){
 	 mip->rngval = rowrng;
-      }else{
+      } else {
 	 mip->rngval = (double *) calloc(numrows, DSIZE);
       }
 
       if (colub){
 	 mip->ub = colub;
-      }else{
+      } else {
 	 mip->ub = (double *) calloc(numcols, DSIZE);
-	 for(i = 0; i<mip->n; i++){
+	 for (i = 0; i<mip->n; i++){
 	    mip->ub[i] = inf;
 	 }
       }
 
       if (collb){
 	 mip->lb = collb;
-      }else{
+      } else {
 	 mip->lb = (double *) calloc(numcols, DSIZE);	 
       }
 
       if (is_int){
 	 mip->is_int = is_int;
-      }else{
+      } else {
 	 mip->is_int = (char *)   calloc(CSIZE, numcols);
       }
 
-      if(start){
+      if (start){
 	 mip->nz = start[numcols];
 	 mip->matbeg = start;
 	 mip->matval = value;
@@ -371,16 +371,15 @@ int prep_read_mps(prep_environment *prep, char *infile)
       if (infile[j] == '.') {
 	    last_dot = j;
 	  }
-	  if(infile[j] == slash){
+	  if (infile[j] == slash){
 		last_dir = j;
 	  }
    }
    
-   if(last_dir < last_dot){
+   if (last_dir < last_dot){
 	   memcpy(fname, infile, CSIZE*last_dot);
 	   memcpy(ext, infile + last_dot + 1, CSIZE*(j - last_dot - 1)); 
-   }
-   else{
+   } else {
 	   memcpy(fname, infile, CSIZE*j);
    }
 #endif
@@ -577,7 +576,7 @@ void prep_write_lp(prep_environment *prep, char *outfile)
    infinity = lp.getInfinity();
 
    /* convert sense to bound */
-   for(i = 0; i < mip->m; i++){
+   for (i = 0; i < mip->m; i++){
       switch (mip->sense[i]){
        case 'E':
 	  rlb[i] = rub[i] = mip->rhs[i];
