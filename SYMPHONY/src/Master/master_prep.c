@@ -30,6 +30,10 @@ int sym_presolve(sym_environment *env)
    PREPdesc * P = (PREPdesc *)calloc(1, sizeof(PREPdesc));
    int p_level = env->par.prep_par.level;
 
+   /*
+    * free any existing preprocessed mip in the environment.
+    * fixme: an environment should have any number of mips and prep_mips.
+    */
    if(env->prep_mip){
       free_mip_desc(env->prep_mip);
       FREE(env->prep_mip);
@@ -57,7 +61,6 @@ int sym_presolve(sym_environment *env)
    }
 
    /* debug */
-   /*----------*/
    if(P->params.write_mps || P->params.write_lp){
       char file_name[80] = "";
       sprintf(file_name, "%s_prep", env->probname);
@@ -70,7 +73,7 @@ int sym_presolve(sym_environment *env)
       }
    }
 
-   /* we don't use the impl lists now, so get rid of them */
+   /* fixme: we don't use the impl lists now, so get rid of them */
    if(P->mip->mip_inf && P->params.level >= 5 &&
       P->mip->mip_inf->binary_var_num > 0){
       int j;
@@ -80,10 +83,17 @@ int sym_presolve(sym_environment *env)
       }      
    }
    
-   /* since we use the original mip desc */
+   /* 
+    * zero out the mip descriptions in P. since they point to the MIPs in
+    * environment, we dont need to free these.
+    */
    P->mip = 0;
    P->orig_mip = 0;
    
+   /*
+    * free other data structures of P. if mip and orig_mip are not zeroed out,
+    * they will also get freed.
+    */
    free_prep_desc(P);
 	    
    return termcode;

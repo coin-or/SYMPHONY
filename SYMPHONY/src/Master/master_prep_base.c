@@ -3182,15 +3182,18 @@ int prep_initialize_mipinfo(PREPdesc *P)
       rows = (ROWinfo *)calloc(m, sizeof(ROWinfo));   
       row_coef_bin_cnt = (int *)calloc(ISIZE,m);
       row_sign_pos_cnt = (int *)calloc(ISIZE,m);
-      /* will be done for rows with only one cont var */
-      /* this might be further improved in advanced option of 
-	 preprocessor */
-      integerizable_var_num = 0;
       rows_integerized_var_ind = (int *)malloc(ISIZE*m);
    }
    if(n > 0){
       cols = (COLinfo *)calloc(n, sizeof(COLinfo));           
    }
+
+   /* 
+      Number of continuous variables that will always have an integer value in
+      a solution. For now, we check rows with only one cont var 
+      this might be further improved in advanced option of preprocessor 
+   */
+   integerizable_var_num = 0;
 
    max_col_size = 0;
    fixed_obj_offset = 0;
@@ -3207,46 +3210,53 @@ int prep_initialize_mipinfo(PREPdesc *P)
       }
       
       cols[i].var_type = 'I';
-      if(lb[i] >= ub[i] + etol && p_level > 2){
+      /* check if a variable has bad bounds */
+      if (lb[i] >= ub[i] + etol && p_level > 2) {
 	 stats->col_infeas_ind = i;
+         /* fixme: who will free the above allocs? */
 	 return(PREP_INFEAS);
-      }else if(lb[i] > (ub[i] - etol)){	 
+      }
+      
+      /* check for unboundedness */
+      if ((lb[i] >= INF || ub[i] <= -INF) && p_level > 2) {
+        stats->col_numeric_ind = i;
+        /* fixme: who will free the above allocs? */
+        return(PREP_NUMERIC_ERROR);
+      } 
+      
+      /* check if a variable can be fixed because of its bounds */
+      if (lb[i] > (ub[i] - etol)) {	 
 	 cols[i].var_type = 'F';
 	 fixed_obj_offset += obj[i]*ub[i];
 	 fixed_var_cnt++;	 
-	 if((ub[i] >= INF || ub[i] <= -INF) && p_level > 2){
-	    stats->col_numeric_ind = i;
-	    return(PREP_NUMERIC_ERROR);
-	 }else{
-	    is_bounded = TRUE;
-	 }
-      } else if (is_int[i]){
-	 if(lb[i] > (-1.0 + etol) && 
+      } else if (is_int[i]) {
+	 if (lb[i] > (-1.0 + etol) && 
 	    ub[i] < (2.0 - etol)){
 	    is_binary = is_bounded = TRUE; //is_lb_zero = TRUE;	    
 	    cols[i].var_type = 'B';
 	    bin_var_cnt++;
 	    bin_var_nz_cnt += matbeg[i+1] - matbeg[i];
-	 }else if(lb[i] > (-2.0 + etol) && 
-		  ub[i] < (1.0 - etol)){
+	 } else if (lb[i] > (-2.0 + etol) && ub[i] < (1.0 - etol)) {
+           /* fixme: move this to later. there may be other variables as well
+            * that can be reduced to binary variables. */
 	    is_binary = is_bounded = TRUE; //is_lb_zero = TRUE;	    
 	    cols[i].var_type = 'R';
 	    bin_var_cnt++;
 	    bin_var_nz_cnt += matbeg[i+1] - matbeg[i];
 	 }
-      }else {
+      } else {
 	 cols[i].var_type = 'C';
 	 cont_var_cnt++;
       }
 
-      if(!is_bounded){
-	 if(lb[i] <= -INF){
+      if(!is_bounded) {
+	 if(lb[i] <= -INF) {
 	    unbounded_below = TRUE;
 	 }
-	 if(ub[i] >= INF){
+	 if(ub[i] >= INF) {
 	    unbounded_above = TRUE;
 	 }
-	 if(!unbounded_below && !unbounded_above){
+	 if(!unbounded_below && !unbounded_above) {
 	    is_bounded = TRUE;
 	 }
       }
@@ -3257,99 +3267,90 @@ int prep_initialize_mipinfo(PREPdesc *P)
       is_col_all_neg = TRUE;
       is_col_all_pos = TRUE;
 
-      for(j = matbeg[i]; j < matbeg[i+1]; j++){
+      for(j = matbeg[i]; j < matbeg[i+1]; j++) {
 	 row_ind = matind[j];
 	 coef_val = matval[j];
 	 rows[row_ind].size++;
-	 /* for row types */	 
-	 if(cols[i].var_type != 'F'){
-	    if(is_int[i]){
-	       if(is_binary){
-		  rows[row_ind].bin_var_num++;
-	       }
-	    }else{
-	       rows[row_ind].cont_var_num++;
-	       if(rows[row_ind].cont_var_num < 2){
-		  rows_integerized_var_ind[row_ind] = i;
-	       }
-	    }
 
-	    //if(cols[i].var_type == 'U' ||
-	    //  cols[i].var_type == 'L'){
-	    //   rows[row_ind].fixable_var_num++;
-	    // }
-	 }else{
+	 /* for types of variables in a row */	 
+	 if(cols[i].var_type == 'F'){
 	    rows[row_ind].fixed_var_num++;
-	 }
-	 
-	 /* for bound types */
-	 if(!is_bounded){
-	    if(unbounded_above){
-	       if(coef_val > 0.0){
+         } else if(is_int[i]) {
+            if(is_binary){
+              rows[row_ind].bin_var_num++;
+            }
+         } else {
+           rows[row_ind].cont_var_num++;
+           if(rows[row_ind].cont_var_num < 2){
+             rows_integerized_var_ind[row_ind] = i;
+           }
+         }
+
+	 /* for bounds on the activity of a row */
+	 if(!is_bounded) {
+	    if(unbounded_above) {
+	       if(coef_val > 0.0) {
 		  rows[row_ind].ub_inf_var_num++;
-	       }else{
+	       } else {
 		  rows[row_ind].lb_inf_var_num++;
 	       }
 	    }
-	    if(unbounded_below){
-	       if(coef_val > 0.0){
+	    if(unbounded_below) {
+	       if(coef_val > 0.0) {
 		  rows[row_ind].lb_inf_var_num++;
-	       }else{
+	       } else {
 		  rows[row_ind].ub_inf_var_num++;
 	       }
 	    }
 	 }
 
 	 /* for coef types */
-	 if (!(coef_val-floor(coef_val) > coeff_etol &&
-	     ceil(coef_val)-coef_val > coeff_etol)){
-	    if((coef_val > 1.0 - coeff_etol && coef_val < 1.0 + coeff_etol) ||
-	       (coef_val > -1.0 - coeff_etol &&
-		coef_val < -1.0 + coeff_etol)) {	       
-	       row_coef_bin_cnt[row_ind]++;
-	       col_coef_bin_cnt++;
-	    }
-	 }else{
+	 if (fabs(coef_val-floor(coef_val+0.5)) > coeff_etol) {
 	    rows[row_ind].frac_coef_num++;
 	    col_coef_frac_cnt++;
-	 }
+	 } else if (fabs(coef_val - 1.0) < coeff_etol ||
+	            fabs(coef_val + 1.0) < coeff_etol) {	       
+            row_coef_bin_cnt[row_ind]++;
+            col_coef_bin_cnt++;
+         }
 
-	 /* for sign types  and update bounds */
-	 
-	 if(coef_val > 0.0){
+	 /* for sign types and update bounds */
+	 if (coef_val > 0.0) {
 	    row_sign_pos_cnt[row_ind]++;
 	    col_sign_pos_cnt++;
-	    if(rows[row_ind].ub < INF){
-	       if(ub[i] >= INF){
+	    if (rows[row_ind].ub < INF) {
+	       if (ub[i] >= INF) {
 		  rows[row_ind].ub = INF;
-	       }else{
+	       } else {
 		  rows[row_ind].ub += coef_val * ub[i];
 	       }
 	    }
-	    if(rows[row_ind].lb > -INF){
-	       if(lb[i] <= -INF){
+	    if (rows[row_ind].lb > -INF) {
+	       if (lb[i] <= -INF) {
 		  rows[row_ind].lb = -INF;
-	       }else{
+	       } else {
 		  rows[row_ind].lb += coef_val * lb[i];
 	       }
 	    }
 
-	    if(is_col_all_neg){
-	       if(sense[row_ind] != 'G'){
+	    if (is_col_all_neg) {
+               /* fixme: this is never going to be the case, since we
+                * eliminated >= constraints? */
+	       if (sense[row_ind] != 'G') {
 		  is_col_all_neg = FALSE;
 	       }
 	    }
-	    if(is_col_all_pos){
-	       if(sense[row_ind] != 'L'){
+	    if (is_col_all_pos) {
+	       if (sense[row_ind] != 'L') {
 		  is_col_all_pos = FALSE;
 	       }
 	    }
 
-	 }else if(coef_val < 0.0){
-	    if(rows[row_ind].ub < INF){
-	       if(lb[i] <= -INF){
+	 } else if(coef_val < 0.0) {
+	    if(rows[row_ind].ub < INF) {
+	       if(lb[i] <= -INF) {
 		  rows[row_ind].ub = INF;
-	       }else{
+	       } else {
 		  rows[row_ind].ub += coef_val * lb[i];
 	       }
 	    }
@@ -3361,15 +3362,16 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	       }
 	    }
 
-	    if(is_col_all_neg){
-	       if(sense[row_ind] != 'L'){ 
+	    if(is_col_all_neg) {
+	       if(sense[row_ind] != 'L') {  
 		  is_col_all_neg = FALSE;
-	       }else{
-		  
-
+	       } else {
+                 /* do nothing */
 	       }
 	    }
 	    if(is_col_all_pos){
+              /* fixme: this is never going to be the case, since we
+               * eliminated >= constraints? */
 	       if(sense[row_ind] != 'G'){
 		  is_col_all_pos = FALSE;
 	       }
@@ -3928,7 +3930,7 @@ int prep_fill_row_ordered(PREPdesc *P)
    
    /* first get row legths */   
    for(i = 0; i < n; i++){
-      /* get orig indices here */
+      /* set orig indices here */
       o_ind[i] = u_col_ind[i] = i;
       for(j = matbeg[i]; j < matbeg[i+1]; j++){
 	 r_lengths[matind[j]]++;
