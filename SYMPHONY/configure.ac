@@ -99,7 +99,7 @@ AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
 AC_COIN_HAS_GLPK(Glpk)
 AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
 AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
-AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
+AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSinit])
 
 #############################################################################
 #                      Check for the LP solver                              #
