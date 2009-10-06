@@ -1129,7 +1129,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    char branch_dir = 'M';
 	    sprintf (reason, "%s %i %i", "candidate", child->bc_index+1,
 		     node->bc_index+1);
-	    if (node->bc_index>0){
+	    if (child->bc_index>0){
 	       if (node->children[0]==child) {
 		  branch_dir = node->bobj.sense[0];
 		  /*branch_dir = 'L';*/
