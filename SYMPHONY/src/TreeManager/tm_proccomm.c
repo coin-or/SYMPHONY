@@ -608,9 +608,9 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       }
       receive_int_array(&n->sol_size, 1);
       n->sol = (double *) malloc (DSIZE * n->sol_size);
-      receive_dbl_array(n->sol, n->sol.size);
+      receive_dbl_array(n->sol, n->sol_size);
       n->duals = (double *) malloc (DSIZE * tm->bcutnum);
-      send_dbl_array(n->duals, tm->bcutnum);
+      receive_dbl_array(n->duals, tm->bcutnum);
    }
 #endif
    receive_char_array(&repricing, 1);

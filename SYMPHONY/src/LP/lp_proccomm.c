@@ -1004,7 +1004,7 @@ void send_node_desc(lp_prob *p, int node_type)
    if (p->par.sensitivity_analysis){
       send_int_array(&p->desc->uind.size, 1);
       send_dbl_array(lp_data->x, p->desc->uind.size);
-      send_int_array(&p->base.cutnum, 1);
+      //send_int_array(&p->base.cutnum, 1);
       send_dbl_array(lp_data->dualsol, p->base.cutnum);
    }
 #endif

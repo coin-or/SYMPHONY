@@ -92,8 +92,9 @@ int feasibility_pump (lp_prob *p, char *found_better_solution,
    fp_data->sos_row_filled = 0;
    fp_data->sos_var_fixed_zero = 0;
    fp_data->can_check_sos = FALSE;
-      
-   if(p->mip->mip_inf && p->mip->mip_inf->binary_sos_row_num > 0){
+   
+   if(p->mip->matbeg && p->mip->mip_inf && 
+      p->mip->mip_inf->binary_sos_row_num > 0){
       fp_data->can_check_sos = TRUE;
       fp_data->sos_row_filled = (char *)malloc(p->mip->m*CSIZE);
       //fp_data->sos_var_fixed_zero = (char *)malloc(p->mip->n*CSIZE);      
@@ -400,9 +401,11 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data)
    new_lp_data->si->setupForRepeatedUse(3,0); 
 
 #ifdef COMPILE_IN_LP
-   double mat_den = (1.0)*p->mip->nz/(p->mip->m * p->mip->n + 1);
-   if(p->mip->nz > 1e5 && mat_den > 0.01){
-      new_lp_data->si->setupForRepeatedUse(0,0); 
+   if(p->mip->matbeg){
+     double mat_den = (1.0)*p->mip->nz/(p->mip->m * p->mip->n + 1);
+     if(p->mip->nz > 1e5 && mat_den > 0.01){
+       new_lp_data->si->setupForRepeatedUse(0,0); 
+     }
    }
 #endif
    
@@ -992,6 +995,10 @@ int round_solution(lp_prob *p, double *solutionValue, double *betterSolution)
    int * integerVariable, row_ind, elem_ind;
    int *row, *column, *columnStart, *rowStart, *columnLength, *rowLength;
    int i, j;
+
+   if(!(p->mip->matbeg)){
+     return returnCode;
+   }
    
    get_bounds(p->lp_data);
    get_x(p->lp_data);
