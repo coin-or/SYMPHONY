@@ -1047,41 +1047,9 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 }else{
 	    PRINT_TIME(tm, f);
 	    fprintf(f, "N %i %i %i\n", node->bc_index+1, child->bc_index+1,
-		  feasible[i] ? VBC_FEAS_SOL_FOUND :
-		  ((dive != DO_NOT_DIVE && *keep == i) ?
-		   VBC_ACTIVE_NODE : VBC_CAND_NODE));
-	 }
-      } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
-	 FILE *f;
-#pragma omp critical(write_vbc_emulation_file)
-	 if (!(f = fopen(tm->par.vbc_emulation_file_name, "a"))){
-	    printf("\nError opening vbc emulation file\n\n");
-	 }else{
-	    PRINT_TIME2(tm, f);
-	    char reason[50];
-	    char branch_dir = 'M';
-	    sprintf (reason, "%s %i %i", "candidate", child->bc_index+1,
-		     node->bc_index+1);
-	    if (child->bc_index>0){
-	       if (node->children[0]==child) {
-		  branch_dir = node->bobj.sense[0];
-		  /*branch_dir = 'L';*/
-	       } else {
-		  branch_dir = node->bobj.sense[1];
-		  /*branch_dir = 'R';*/
-	       }
-	       if (branch_dir == 'G') {
-		  branch_dir = 'R';
-	       }
-	    }
-	    if (action[i] == PRUNE_THIS_CHILD_FATHOMABLE ||
-		action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
-	       sprintf(reason,"%s %c", reason, branch_dir);
-	    }else{
-	       sprintf(reason,"%s %c %f", reason, branch_dir,
-		       child->lower_bound);
-	    }
-	    fprintf(f,"%s\n",reason);
+		    feasible[i] ? VBC_FEAS_SOL_FOUND :
+		    ((dive != DO_NOT_DIVE && *keep == i) ?
+		     VBC_ACTIVE_NODE : VBC_CAND_NODE));
 	    fclose(f);
 	 }
       }else if (tm->par.vbc_emulation == VBC_EMULATION_LIVE){
