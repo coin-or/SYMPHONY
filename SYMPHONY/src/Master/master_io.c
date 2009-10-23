@@ -83,8 +83,8 @@ void version(void)
 {
    printf("\n");
    printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 5.1.10                   *\n");
-   printf("*   Copyright 2000-2008 Ted Ralphs and others         *\n");
+   printf("*   This is SYMPHONY Version 5.1.11                   *\n");
+   printf("*   Copyright 2000-2009 Ted Ralphs and others         *\n");
    printf("*   All Rights Reserved.                              *\n");
    printf("*   Distributed under the Common Public License 1.0   *\n");
    printf("*******************************************************\n");
