@@ -115,7 +115,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\..\Osi\src;..\..\..\..\Osi\src\OsiClp;..\..\..\..\Clp\src;..\..\..\..\CoinUtils\src;..\..\..\..\Cgl\src;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglFlowCover;..\..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\..\Cgl\src\CglClique;..\..\..\..\Cgl\src\CglOddHole;..\..\..\..\Cgl\src\CglKnapsackCover;..\..\..\..\Cgl\src\CglGomory;..\..\..\..\Cgl\src\CglSimpleRounding;..\..\..\..\Cgl\src\CglProbing;..\..\..\..\BuildTools\headers;..\..\..\include;..\..\..\..\Cgl\src\CglRedSplit;..\..\..\..\Cgl\src\CglTwomir"
+				AdditionalIncludeDirectories="..\..\..\..\Osi\src;..\..\..\..\Osi\src\OsiClp;..\..\..\..\Clp\src;..\..\..\..\CoinUtils\src;..\..\..\..\Cgl\src;..\..\..\..\Cgl\src\CglLiftAndProject;..\..\..\..\Cgl\src\CglLandP;..\..\..\..\Cgl\src\CglFlowCover;..\..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\..\Cgl\src\CglClique;..\..\..\..\Cgl\src\CglOddHole;..\..\..\..\Cgl\src\CglKnapsackCover;..\..\..\..\Cgl\src\CglGomory;..\..\..\..\Cgl\src\CglSimpleRounding;..\..\..\..\Cgl\src\CglProbing;..\..\..\..\BuildTools\headers;..\..\..\include;..\..\..\..\Cgl\src\CglRedSplit;..\..\..\..\Cgl\src\CglTwomir"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;INTEL;USE_SYM_APPLICATION;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -588,6 +588,26 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\..\..\src\LP\lp_heuristics.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="..\..\..\src\LP\lp_proccomm.c"
 					>
 					<FileConfiguration
@@ -655,6 +675,26 @@
 							Name="VCCLCompilerTool"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\src\LP\lp_sp.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
 							CompileAs="2"
 						/>
 					</FileConfiguration>
@@ -784,135 +824,67 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\..\..\src\Master\master_prep.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\src\Master\master_prep_base.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\src\Master\master_prep_sr.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="2"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="..\..\..\src\Master\master_wrapper.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-				</File>
-			</Filter>
-			<Filter
-				Name="Preprocessor"
-				>
-				<File
-					RelativePath="..\..\..\src\Preprocessor\prep.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\..\src\Preprocessor\prep_base.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\..\src\Preprocessor\prep_sr.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-				</File>
-			</Filter>
-			<Filter
-				Name="PrimalHeuristics"
-				>
-				<File
-					RelativePath="..\..\..\src\PrimalHeuristics\feasibility_pump.c"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							AdditionalIncludeDirectories=""
-							PreprocessorDefinitions=""
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath="..\..\..\src\PrimalHeuristics\sp.c"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
