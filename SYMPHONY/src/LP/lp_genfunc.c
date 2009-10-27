@@ -1166,6 +1166,7 @@ int check_tailoff(lp_prob *p)
       obj_hist[0] = p->lp_data->objval;
       
       if (p->bc_index == 0) {
+
 	 /*
           * root policy: generate cuts for min_root_cut_rounds and then stop.
 	  * if obj value doesnt improve in last
@@ -2539,6 +2540,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
 #endif
 
 /*===========================================================================*/
+#ifdef USE_CGL_CUTS
 int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts, 
       int *num_cuts, int *bound_changes, OsiCuts *cutlist, int send_to_pool) 
 {
@@ -2828,8 +2830,9 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
         
    return 0;
 }
-
+#endif
 /*===========================================================================*/
+#ifdef USE_CGL_CUTS
 int add_col_cuts(lp_prob *p, OsiCuts *cutlist, int *bound_changes)
 {
    int i, j;
@@ -2877,7 +2880,7 @@ int add_col_cuts(lp_prob *p, OsiCuts *cutlist, int *bound_changes)
 
    return 0;
 }
-
+#endif
 /*===========================================================================*/
 int should_stop_adding_cgl_cuts(lp_prob *p, int i, int *should_stop)
 {

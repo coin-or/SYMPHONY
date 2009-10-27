@@ -477,6 +477,7 @@ int solve(tm_prob *tm)
 	 }
 
 	 if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
+            find_tree_lb(tm);
 	    if (fabs(100*(tm->ub-tm->lb)/tm->ub) <= tm->par.gap_limit){
 	       if (tm->lb < tm->ub){
 		  termcode = TM_TARGET_GAP_ACHIEVED;

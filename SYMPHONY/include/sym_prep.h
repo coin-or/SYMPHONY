@@ -43,6 +43,7 @@
 /*===========================================================================*/
 
 /* for sr internal use */
+/* Menal's single-row (sr) stuff */
 
 #define SR_NO_UPDATES       0
 #define SR_BOUNDS_UPDATED   1
@@ -241,22 +242,13 @@ typedef struct PREP_ENVIRONMENT{
 
 /*===========================================================================*/
 
+/* presolve the MIP formulation stored in the current environment */
 int sym_presolve(sym_environment *env);
-int sym_restore_rootdesc(sym_environment *env);
 
-/* open and initialize prep environment */
-prep_environment * prep_open_environment(void);
-
-/*presolve the model */
-int prep_solve(prep_environment *prep);
-
-#if 0
-/* read an MPS format file in to the environment */
-int prep_read_mps(prep_environment * prep, char *infile);
-
-/* read an LP format file in to the environment */
-int prep_read_lp(prep_environment *prep, char *infile);
-#endif
+/* some data structures in root description are initialized before calling
+ * preprocessor. update these after the preprocessor has changed the problem 
+ * size. */
+int prep_update_rootdesc(sym_environment *env);
 
 /*load a problem through MIP model description arrays*/
 int prep_load_problem(prep_environment *prep, int numcols, int numrows,
@@ -264,20 +256,6 @@ int prep_load_problem(prep_environment *prep, int numcols, int numrows,
 		      double *collb, double *colub, char *is_int,    
 		      double *obj, double obj_offset, char *rowsen,       
 		      double *rowrhs, double *rowrng, char make_copy);
-
-/*set an environment parameter */
-int prep_set_param(prep_environment *prep, char *key, int value);
-
-#if 0
-/*write the presolved model in MPS format*/
-void prep_write_mps(prep_environment *prep, char *outfile);
-
-/*write the presolved model in LP format*/
-void prep_write_lp(prep_environment *prep, char *outfile);
-#endif
-
-/*free the used memory */
-void prep_close_environment(prep_environment *prep);
 
 /*==========================================================================*/
 /*==========================================================================*/
@@ -331,8 +309,8 @@ int prep_force_row_bounds(PREPdesc *P, int row_ind, int col_ind, int a_loc);
 int prep_deleted_row_update_info(MIPdesc *mip, int row_ind);
 
 /* try to find duplicate rows and columns */
-int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows, 
-				    char check_cols);
+int prep_delete_duplicate_rows_cols(PREPdesc *P, const char check_rows, 
+				    const char check_cols);
 /* utility functions */
 void prep_sos_fill_var_cnt(PREPdesc *P);
 void prep_sos_fill_row(ROWinfo *row, int alloc_size, int size,

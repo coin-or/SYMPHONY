@@ -850,9 +850,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    
 #ifdef COMPILE_IN_LP
    /* try rounding first */
-   if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE && 
-       p->par.do_primal_heuristic &&
-       !p->par.multi_criteria){
+   if (user_res == TEST_INTEGRALITY && feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE && 
+       p->par.do_primal_heuristic && !p->par.multi_criteria){
       
       if (feasible == IP_INFEASIBLE){ 
 	 true_objval = SYM_INFINITY;
@@ -898,7 +897,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       }
    }
 
-   if (feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
+   if (user_res == TEST_INTEGRALITY && feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
       fp_should_call_fp(p,branching,&should_call_fp,is_last_iter); 
       if (should_call_fp==TRUE) {
          termcode    = feasibility_pump (p, &found_better_solution, 
