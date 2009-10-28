@@ -242,6 +242,9 @@ int sym_set_defaults(sym_environment *env)
 #ifdef _OPENMP
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
 #endif
+#ifdef USE_SYM_APPLICATION
+   lp_par->should_reuse_lp = FALSE; /* see header file for description */
+#endif
    lp_par->try_to_recover_from_error = TRUE;
    lp_par->problem_type = ZERO_ONE_PROBLEM;
    lp_par->keep_description_of_pruned = tm_par->keep_description_of_pruned;
