@@ -278,7 +278,9 @@ int fathom_branch(lp_prob *p)
       }
       if (p->bc_index < 1 && p->iter_num < 2) {
 	 p->root_objval = lp_data->objval;
-         save_lp(lp_data);
+         if (p->par.should_reuse_lp == TRUE) {
+           save_lp(lp_data);
+         }
       }
       p->lp_stat.lp_calls++;
       p->lp_stat.lp_total_iter_num += iterd;
