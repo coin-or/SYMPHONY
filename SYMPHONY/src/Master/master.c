@@ -690,7 +690,6 @@ int sym_solve(sym_environment *env)
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
 
-   //   if(env->par.prep_par.level > 0){
    termcode = sym_presolve(env);   
 
    if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED ||
@@ -722,7 +721,6 @@ int sym_solve(sym_environment *env)
 	 return(env->termcode = PREP_ERROR);
       }
    }
-   //   }
 
    if(termcode == PREP_OTHER_ERROR || env->par.prep_par.level <= 0){
       if(env->prep_mip){

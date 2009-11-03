@@ -2731,11 +2731,16 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
    //      row_ind = row_start[i];
 
       if (!use_sr_bounds && rows[row_ind].fixed_var_num  >= rows[row_ind].size){
-	 if ((sense == 'L' && rows[row_ind].fixed_lhs_offset > rhs + etol) ||
-	    (sense == 'E' && 
-	     !prep_is_equal(rows[row_ind].fixed_lhs_offset, rhs, etol))){
-	    stats->row_infeas_ind = row_ind;
-	    return PREP_INFEAS;
+	 if ((sense == 'L' && 
+	      rows[row_ind].fixed_lhs_offset > rhs + etol) ||
+	     (sense == 'E' && 
+	      !prep_is_equal(rows[row_ind].fixed_lhs_offset, rhs, etol)) ||
+	     (sense == 'R' && 
+	      (rows[row_ind].fixed_lhs_offset > rhs + etol || 
+	       rows[row_ind].fixed_lhs_offset < 
+	       rhs - mip->rngval[row_ind] - etol))){
+	   stats->row_infeas_ind = row_ind;
+	   return PREP_INFEAS;
 	 }
 	 termcode = PREP_MODIFIED;
       } else if (sense != 'R' && !use_sr_bounds && 
