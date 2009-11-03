@@ -631,7 +631,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    max_presolve_iter = 5;
 	 }
 	 
-	 set_itlim_hotstart(lp_data, max_presolve_iter);
+	 if(should_use_hot_starts){
+	   set_itlim_hotstart(lp_data, max_presolve_iter);
+	 }
 	 set_itlim(lp_data, max_presolve_iter);
       }
        
@@ -854,8 +856,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 if (max_presolve_iter < 5) {
 	    max_presolve_iter = 5;
 	 }
-
-	 set_itlim_hotstart(lp_data, max_presolve_iter);
+	 if(should_use_hot_starts){
+	   set_itlim_hotstart(lp_data, max_presolve_iter);
+	 }
 	 set_itlim(lp_data, max_presolve_iter);
       }
       
