@@ -4465,8 +4465,10 @@ int prep_report(PREPdesc *P, int termcode)
 	 printf("Preprocessing - unknown error.. ignoring presolve...\n");
 	 break;
        case PREP_SOLVED:
-	 printf("Preprocessing found the optimum:\n");	  	  
-	 printf("Solution Cost: %f\n:", mip->obj_offset);
+	 printf("Preprocessing found the optimum:\n");	  	  	 
+	 printf("Solution Cost: %f\n:", 
+		mip->obj_sense == SYM_MAXIMIZE ? -(mip->obj_offset) : 
+		mip->obj_offset);
 	 if (mip->colname){ 
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    printf("Column names and values of nonzeros in the solution\n");
