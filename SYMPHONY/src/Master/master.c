@@ -3169,7 +3169,9 @@ int sym_get_obj_val(sym_environment *env, double *objval)
    if (env->best_sol.has_sol){
       *objval = (env->mip->obj_sense == SYM_MINIMIZE ? env->best_sol.objval :
 		 -env->best_sol.objval) + env->mip->obj_offset + 
-	         (env->prep_mip ? env->prep_mip->obj_offset : 0.0);
+	(env->prep_mip ? (env->mip->obj_sense == SYM_MINIMIZE ? 
+			  env->prep_mip->obj_offset : 
+			  -env->prep_mip->obj_offset) : 0.0);
    }else{ 
       if(env->par.verbosity >= 1){
 	 printf("sym_get_obj_val(): There is no solution!\n");
