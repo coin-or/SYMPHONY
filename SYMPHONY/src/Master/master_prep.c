@@ -163,14 +163,14 @@ int prep_solve_desc (PREPdesc * P)
 
    /* find some information about the mip: type of rows, cols, variables etc. */
    termcode = prep_initialize_mipinfo(P);//mip, params, &(P->stats));   
-   if (PREP_QUIT(termcode)) {
-     return termcode;
-   }
+   //   if (PREP_QUIT(termcode)) {
+   //     return termcode;
+   //   }
 
    /* no changes so far on column based mip */
    /* call the main sub function of presolver */
-   if (p_level > 2){
-      termcode = prep_basic(P);
+   if (p_level > 2 && !PREP_QUIT(termcode)){
+     termcode = prep_basic(P);
    }
 
    /* report what we have done */
