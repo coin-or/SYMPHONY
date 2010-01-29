@@ -465,14 +465,18 @@ int prep_basic(PREPdesc *P)
 /* We check duplicacy here. */
 /*===========================================================================*/
 
-int prep_delete_duplicate_rows_cols(PREPdesc *P, const char check_rows, 
-    const char check_cols){
-
+int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows, 
+				    char check_cols)
+{
+  
    /* start - initialization */
    int termcode = PREP_UNMODIFIED;
 
-   if (!check_cols && !check_rows){
-      return termcode;
+   if ((!check_cols && !check_rows) || P->mip->n < 1){
+     return termcode;
+   } else{
+     if(P->mip->m < 2) check_rows = FALSE;
+     if(P->mip->n < 2) check_cols = FALSE;
    }
 
    const double etol = P->params.etol;
@@ -3175,6 +3179,13 @@ int prep_initialize_mipinfo(PREPdesc *P)
 		"Empty mip description...\n");
       }
       return(PREP_OTHER_ERROR);
+   } else{
+     if (mip->n < 1 && p_level > 2 ){
+       if (verbosity >= 1){
+	 printf("Empty problem...\n");		
+       }      
+       return PREP_SOLVED;
+     }
    }
    
    int n = mip->n;
