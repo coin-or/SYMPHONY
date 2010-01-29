@@ -156,7 +156,9 @@ int prep_solve_desc (PREPdesc * P)
    /* need to fill in the row ordered vars of mip */
    /* these will be needed for both basic and advanced prep functions
       so we call them here */
+
    termcode = prep_fill_row_ordered(P);
+
    if (PREP_QUIT(termcode)) {
      return termcode;
    }
