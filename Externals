@@ -1,10 +1,10 @@
 BuildTools  https://projects.coin-or.org/svn/BuildTools/releases/0.5.29
-ThirdParty/Glpk  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Glpk/releases/1.5.0
+ThirdParty/Glpk  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Glpk/releases/1.5.1
 ThirdParty/Blas  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Blas/releases/1.0.14
-ThirdParty/Lapack  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/releases/1.0.19
+ThirdParty/Lapack  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/releases/1.0.20
 Data/Sample  https://projects.coin-or.org/svn/Data/releases/1.0.7/Sample
-CoinUtils  https://projects.coin-or.org/svn/CoinUtils/releases/2.5.0/CoinUtils
-Cgl  https://projects.coin-or.org/svn/Cgl/releases/0.54.0/Cgl
-Clp  https://projects.coin-or.org/svn/Clp/releases/1.10.1/Clp
-Osi  https://projects.coin-or.org/svn/Osi/releases/0.100.0/Osi
+CoinUtils  https://projects.coin-or.org/svn/CoinUtils/releases/2.6.0/CoinUtils
+Cgl  https://projects.coin-or.org/svn/Cgl/releases/0.55.0/Cgl
+Clp  https://projects.coin-or.org/svn/Clp/releases/1.11.0/Clp
+Osi  https://projects.coin-or.org/svn/Osi/releases/0.102.1/Osi
 FlopC++  https://projects.coin-or.org/svn/FlopC++/releases/1.0.6/FlopCpp
