@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2009 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2010 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* The OSI interface in this file was written by Menal Guzelsoy.             */
 /* The OSL interface was written by Ondrej Medek.                            */
