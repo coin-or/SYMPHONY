@@ -46,42 +46,43 @@ endif
 #                           Extra Targets                              #
 ########################################################################
 
- test: all
+test: all
 	cd test; $(MAKE) test
 
- unitTest: test
+unitTest: test
 
- fulltest: all
+fulltest: all
 	cd test; $(MAKE) fulltest
 
- ptest: all
+ptest: all
 	cd test; $(MAKE) ptest
 
- punitTest: ptest
+punitTest: ptest
 
- pfulltest: all
+pfulltest: all
 	cd test; $(MAKE) pfulltest
 
- clean-local:
+clean-local:
 	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
 
- distclean-local:
+distclean-local:
 	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
 
- .PHONY: test unitTest ptest punitTest
+install-exec-local: install-doc
+
+uninstall-local: uninstall-doc
+
+.PHONY: test unitTest ptest punitTest
 
 ########################################################################
 #                  Installation of the addlibs file                    #
 ########################################################################
 
-addlibsfile = sym_addlibs.txt
-addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
+addlibsdir = $(datadir)/coin/doc/SYMPHONY
+addlibs_DATA = sym_addlibs.txt
 
-install-exec-local: install-doc
-	$(install_sh_DATA) $(addlibsfile) $(DESTDIR)$(addlibsdir)/$(addlibsfile)
-
-uninstall-local: uninstall-doc
-	rm -f $(DESTDIR)$(addlibsdir)/$(addlibsfile)
+pkgconfiglibdir = $(libdir)/pkgconfig
+pkgconfiglib_DATA = symphony.pc 
 
 ########################################################################
 #                         Maintainer Stuff                             #

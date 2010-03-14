@@ -39,6 +39,7 @@
 ########################################################################
 #                    Documentation installation                        #
 ########################################################################
+
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -72,6 +73,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/../ltmain.sh $(srcdir)/../missing \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/sym_addlibs.txt.in \
+	$(srcdir)/symphony-uninstalled.pc.in $(srcdir)/symphony.pc.in \
 	$(top_srcdir)/Applications/CNRP/Makefile.in \
 	$(top_srcdir)/Applications/MATCH/Makefile.in \
 	$(top_srcdir)/Applications/MCKP/Makefile.in \
@@ -98,8 +100,8 @@ CONFIG_CLEAN_FILES = Examples/Makefile Applications/CNRP/Makefile \
 	Applications/MATCH/Makefile Applications/MCKP/Makefile \
 	Applications/MPP/Makefile Applications/SPP/Makefile \
 	Applications/SPP+CUTS/Makefile Applications/USER/Makefile \
-	Applications/VRP/Makefile sym_addlibs.txt \
-	$srcdir/Applications/CNRP/Makefile \
+	Applications/VRP/Makefile symphony.pc symphony-uninstalled.pc \
+	sym_addlibs.txt $srcdir/Applications/CNRP/Makefile \
 	$srcdir/Applications/MATCH/Makefile \
 	$srcdir/Applications/MCKP/Makefile \
 	$srcdir/Applications/MPP/Makefile \
@@ -115,6 +117,17 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	install-recursive installcheck-recursive installdirs-recursive \
 	pdf-recursive ps-recursive uninstall-info-recursive \
 	uninstall-recursive
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(addlibsdir)" \
+	"$(DESTDIR)$(pkgconfiglibdir)"
+addlibsDATA_INSTALL = $(INSTALL_DATA)
+pkgconfiglibDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(addlibs_DATA) $(pkgconfiglib_DATA)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = src test
@@ -129,6 +142,7 @@ DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
+ABSBUILDDIR = @ABSBUILDDIR@
 ACLOCAL = @ACLOCAL@
 ADDLIBS = @ADDLIBS@
 ADD_CFLAGS = @ADD_CFLAGS@
@@ -150,45 +164,47 @@ CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CDEFS = @CDEFS@
 CFLAGS = @CFLAGS@
-CGLDOCDIR = @CGLDOCDIR@
-CGLOBJDIR = @CGLOBJDIR@
-CGLSRCDIR = @CGLSRCDIR@
+CGL_CFLAGS = @CGL_CFLAGS@
+CGL_DATA = @CGL_DATA@
+CGL_LIBS = @CGL_LIBS@
 CHECK_CUT_VALIDITY_FALSE = @CHECK_CUT_VALIDITY_FALSE@
 CHECK_CUT_VALIDITY_TRUE = @CHECK_CUT_VALIDITY_TRUE@
 CLLCFLAGS = @CLLCFLAGS@
-CLPDOCDIR = @CLPDOCDIR@
-CLPOBJDIR = @CLPOBJDIR@
-CLPSRCDIR = @CLPSRCDIR@
+CLP_CFLAGS = @CLP_CFLAGS@
+CLP_DATA = @CLP_DATA@
+CLP_LIBS = @CLP_LIBS@
 CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
 CLP_LP_SOLVER_TRUE = @CLP_LP_SOLVER_TRUE@
-COINUTILSDOCDIR = @COINUTILSDOCDIR@
-COINUTILSOBJDIR = @COINUTILSOBJDIR@
-COINUTILSSRCDIR = @COINUTILSSRCDIR@
-COIN_BUILD_GLPK_FALSE = @COIN_BUILD_GLPK_FALSE@
-COIN_BUILD_GLPK_TRUE = @COIN_BUILD_GLPK_TRUE@
+COINDEPEND_CFLAGS = @COINDEPEND_CFLAGS@
+COINDEPEND_DATA = @COINDEPEND_DATA@
+COINDEPEND_LIBS = @COINDEPEND_LIBS@
 COIN_HAS_CGL_FALSE = @COIN_HAS_CGL_FALSE@
 COIN_HAS_CGL_TRUE = @COIN_HAS_CGL_TRUE@
 COIN_HAS_CLP = @COIN_HAS_CLP@
 COIN_HAS_CLP_FALSE = @COIN_HAS_CLP_FALSE@
 COIN_HAS_CLP_TRUE = @COIN_HAS_CLP_TRUE@
-COIN_HAS_COINUTILS_FALSE = @COIN_HAS_COINUTILS_FALSE@
-COIN_HAS_COINUTILS_TRUE = @COIN_HAS_COINUTILS_TRUE@
+COIN_HAS_COINDEPEND_FALSE = @COIN_HAS_COINDEPEND_FALSE@
+COIN_HAS_COINDEPEND_TRUE = @COIN_HAS_COINDEPEND_TRUE@
 COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
 COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@
-COIN_HAS_DATA_FALSE = @COIN_HAS_DATA_FALSE@
-COIN_HAS_DATA_TRUE = @COIN_HAS_DATA_TRUE@
+COIN_HAS_DYLP_FALSE = @COIN_HAS_DYLP_FALSE@
+COIN_HAS_DYLP_TRUE = @COIN_HAS_DYLP_TRUE@
 COIN_HAS_GLPK_FALSE = @COIN_HAS_GLPK_FALSE@
 COIN_HAS_GLPK_TRUE = @COIN_HAS_GLPK_TRUE@
-COIN_HAS_OSI_FALSE = @COIN_HAS_OSI_FALSE@
-COIN_HAS_OSI_TRUE = @COIN_HAS_OSI_TRUE@
-COIN_HAS_OSL_FALSE = @COIN_HAS_OSL_FALSE@
-COIN_HAS_OSL_TRUE = @COIN_HAS_OSL_TRUE@
+COIN_HAS_MIPLIB3_FALSE = @COIN_HAS_MIPLIB3_FALSE@
+COIN_HAS_MIPLIB3_TRUE = @COIN_HAS_MIPLIB3_TRUE@
+COIN_HAS_MSK_FALSE = @COIN_HAS_MSK_FALSE@
+COIN_HAS_MSK_TRUE = @COIN_HAS_MSK_TRUE@
+COIN_HAS_NETLIB_FALSE = @COIN_HAS_NETLIB_FALSE@
+COIN_HAS_NETLIB_TRUE = @COIN_HAS_NETLIB_TRUE@
+COIN_HAS_OSITESTS_FALSE = @COIN_HAS_OSITESTS_FALSE@
+COIN_HAS_OSITESTS_TRUE = @COIN_HAS_OSITESTS_TRUE@
 COIN_HAS_READLINE_FALSE = @COIN_HAS_READLINE_FALSE@
 COIN_HAS_READLINE_TRUE = @COIN_HAS_READLINE_TRUE@
-COIN_HAS_SPX_FALSE = @COIN_HAS_SPX_FALSE@
-COIN_HAS_SPX_TRUE = @COIN_HAS_SPX_TRUE@
-COIN_HAS_SYMPHONY_FALSE = @COIN_HAS_SYMPHONY_FALSE@
-COIN_HAS_SYMPHONY_TRUE = @COIN_HAS_SYMPHONY_TRUE@
+COIN_HAS_SAMPLE_FALSE = @COIN_HAS_SAMPLE_FALSE@
+COIN_HAS_SAMPLE_TRUE = @COIN_HAS_SAMPLE_TRUE@
+COIN_HAS_VOL_FALSE = @COIN_HAS_VOL_FALSE@
+COIN_HAS_VOL_TRUE = @COIN_HAS_VOL_TRUE@
 COIN_HAS_XPR_FALSE = @COIN_HAS_XPR_FALSE@
 COIN_HAS_XPR_TRUE = @COIN_HAS_XPR_TRUE@
 COMPILE_FRAC_BRANCHING_FALSE = @COMPILE_FRAC_BRANCHING_FALSE@
@@ -198,17 +214,15 @@ CPLEX_LP_SOLVER_FALSE = @CPLEX_LP_SOLVER_FALSE@
 CPLEX_LP_SOLVER_TRUE = @CPLEX_LP_SOLVER_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
-CPXINCDIR = @CPXINCDIR@
-CPXLIB = @CPXLIB@
+CPX_CFLAGS = @CPX_CFLAGS@
+CPX_DATA = @CPX_DATA@
+CPX_LIBS = @CPX_LIBS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEFS = @CXXDEFS@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
-DATADOCDIR = @DATADOCDIR@
-DATAOBJDIR = @DATAOBJDIR@
-DATASRCDIR = @DATASRCDIR@
 DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
@@ -217,6 +231,9 @@ DO_TESTS_FALSE = @DO_TESTS_FALSE@
 DO_TESTS_TRUE = @DO_TESTS_TRUE@
 DRAWGRAPH_FALSE = @DRAWGRAPH_FALSE@
 DRAWGRAPH_TRUE = @DRAWGRAPH_TRUE@
+DYLP_CFLAGS = @DYLP_CFLAGS@
+DYLP_DATA = @DYLP_DATA@
+DYLP_LIBS = @DYLP_LIBS@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -226,9 +243,9 @@ EXEEXT = @EXEEXT@
 F77 = @F77@
 FADDLIBS = @FADDLIBS@
 FFLAGS = @FFLAGS@
-GLPKINCDIR = @GLPKINCDIR@
-GLPKLIB = @GLPKLIB@
-GLPKOBJDIR = @GLPKOBJDIR@
+GLPK_CFLAGS = @GLPK_CFLAGS@
+GLPK_DATA = @GLPK_DATA@
+GLPK_LIBS = @GLPK_LIBS@
 GLPK_LP_SOLVER_FALSE = @GLPK_LP_SOLVER_FALSE@
 GLPK_LP_SOLVER_TRUE = @GLPK_LP_SOLVER_TRUE@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
@@ -252,18 +269,25 @@ MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
 MASTEREXT = @MASTEREXT@
+MIPLIB3_CFLAGS = @MIPLIB3_CFLAGS@
+MIPLIB3_DATA = @MIPLIB3_DATA@
+MIPLIB3_LIBS = @MIPLIB3_LIBS@
 MPICC = @MPICC@
 MPICXX = @MPICXX@
+MSK_CFLAGS = @MSK_CFLAGS@
+MSK_DATA = @MSK_DATA@
+MSK_LIBS = @MSK_LIBS@
+NETLIB_CFLAGS = @NETLIB_CFLAGS@
+NETLIB_DATA = @NETLIB_DATA@
+NETLIB_LIBS = @NETLIB_LIBS@
 OBJEXT = @OBJEXT@
 OPENMP_FALSE = @OPENMP_FALSE@
 OPENMP_TRUE = @OPENMP_TRUE@
 OPT_CFLAGS = @OPT_CFLAGS@
 OPT_CXXFLAGS = @OPT_CXXFLAGS@
-OSIDOCDIR = @OSIDOCDIR@
-OSIOBJDIR = @OSIOBJDIR@
-OSISRCDIR = @OSISRCDIR@
-OSLINCDIR = @OSLINCDIR@
-OSLLIB = @OSLLIB@
+OSITESTS_CFLAGS = @OSITESTS_CFLAGS@
+OSITESTS_DATA = @OSITESTS_DATA@
+OSITESTS_LIBS = @OSITESTS_LIBS@
 OSL_LP_SOLVER_FALSE = @OSL_LP_SOLVER_FALSE@
 OSL_LP_SOLVER_TRUE = @OSL_LP_SOLVER_TRUE@
 PACKAGE = @PACKAGE@
@@ -273,12 +297,17 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
 PSEUDO_COSTS_FALSE = @PSEUDO_COSTS_FALSE@
 PSEUDO_COSTS_TRUE = @PSEUDO_COSTS_TRUE@
 RANLIB = @RANLIB@
+REQUIREDPACKAGES = @REQUIREDPACKAGES@
 ROOT_NODE_ONLY_FALSE = @ROOT_NODE_ONLY_FALSE@
 ROOT_NODE_ONLY_TRUE = @ROOT_NODE_ONLY_TRUE@
 RPATH_FLAGS = @RPATH_FLAGS@
+SAMPLE_CFLAGS = @SAMPLE_CFLAGS@
+SAMPLE_DATA = @SAMPLE_DATA@
+SAMPLE_LIBS = @SAMPLE_LIBS@
 SENSITIVITY_ANALYSIS_FALSE = @SENSITIVITY_ANALYSIS_FALSE@
 SENSITIVITY_ANALYSIS_TRUE = @SENSITIVITY_ANALYSIS_TRUE@
 SET_MAKE = @SET_MAKE@
@@ -287,8 +316,6 @@ SIGHANDLER_FALSE = @SIGHANDLER_FALSE@
 SIGHANDLER_TRUE = @SIGHANDLER_TRUE@
 SOPLEX_LP_SOLVER_FALSE = @SOPLEX_LP_SOLVER_FALSE@
 SOPLEX_LP_SOLVER_TRUE = @SOPLEX_LP_SOLVER_TRUE@
-SPXINCDIR = @SPXINCDIR@
-SPXLIB = @SPXLIB@
 STATICEXE_FALSE = @STATICEXE_FALSE@
 STATICEXE_TRUE = @STATICEXE_TRUE@
 STATISTICS_FALSE = @STATISTICS_FALSE@
@@ -298,9 +325,6 @@ SYMAPPLDIR = @SYMAPPLDIR@
 SYMDEFS = @SYMDEFS@
 SYMINCDIR = @SYMINCDIR@
 SYMPDEFS = @SYMPDEFS@
-SYMPHONYDOCDIR = @SYMPHONYDOCDIR@
-SYMPHONYOBJDIR = @SYMPHONYOBJDIR@
-SYMPHONYSRCDIR = @SYMPHONYSRCDIR@
 SYMSRCDIR = @SYMSRCDIR@
 SYM_COMPILE_IN_CG_FALSE = @SYM_COMPILE_IN_CG_FALSE@
 SYM_COMPILE_IN_CG_TRUE = @SYM_COMPILE_IN_CG_TRUE@
@@ -326,13 +350,17 @@ USE_CL_TRUE = @USE_CL_TRUE@
 USE_GMPL_FALSE = @USE_GMPL_FALSE@
 USE_GMPL_TRUE = @USE_GMPL_TRUE@
 VERSION = @VERSION@
+VOL_CFLAGS = @VOL_CFLAGS@
+VOL_DATA = @VOL_DATA@
+VOL_LIBS = @VOL_LIBS@
 VPATH_DISTCLEANFILES = @VPATH_DISTCLEANFILES@
 WHATTOMAKEBINS = @WHATTOMAKEBINS@
 WHATTOMAKELIBS = @WHATTOMAKELIBS@
 XPRESS_LP_SOLVER_FALSE = @XPRESS_LP_SOLVER_FALSE@
 XPRESS_LP_SOLVER_TRUE = @XPRESS_LP_SOLVER_TRUE@
-XPRINCDIR = @XPRINCDIR@
-XPRLIB = @XPRLIB@
+XPR_CFLAGS = @XPR_CFLAGS@
+XPR_DATA = @XPR_DATA@
+XPR_LIBS = @XPR_LIBS@
 abs_bin_dir = @abs_bin_dir@
 abs_include_dir = @abs_include_dir@
 abs_lib_dir = @abs_lib_dir@
@@ -345,6 +373,7 @@ ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
+ac_pt_PKG_CONFIG = @ac_pt_PKG_CONFIG@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -405,8 +434,10 @@ EXTRA_DIST = $(am__append_2)
 ########################################################################
 #                  Installation of the addlibs file                    #
 ########################################################################
-addlibsfile = sym_addlibs.txt
-addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
+addlibsdir = $(datadir)/coin/doc/SYMPHONY
+addlibs_DATA = sym_addlibs.txt
+pkgconfiglibdir = $(libdir)/pkgconfig
+pkgconfiglib_DATA = symphony.pc 
 
 ########################################################################
 #                         Maintainer Stuff                             #
@@ -415,7 +446,7 @@ addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
 # Files that are generated and should be cleaned with make distclean
 DISTCLEANFILES = $(am__append_3) $(VPATH_DISTCLEANFILES)
 DocFiles = README AUTHORS LICENSE
-DocInstallDir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
+DocInstallDir = $(datadir)/coin/doc/$(PACKAGE_NAME)
 all: all-recursive
 
 .SUFFIXES:
@@ -487,6 +518,10 @@ Applications/USER/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applicat
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/VRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/VRP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+symphony.pc: $(top_builddir)/config.status $(srcdir)/symphony.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+symphony-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/symphony-uninstalled.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 sym_addlibs.txt: $(top_builddir)/config.status $(srcdir)/sym_addlibs.txt.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 $srcdir/Applications/CNRP/Makefile: $(top_builddir)/config.status Applications/CNRP/Makefile
@@ -517,6 +552,40 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+install-addlibsDATA: $(addlibs_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(addlibsdir)" || $(mkdir_p) "$(DESTDIR)$(addlibsdir)"
+	@list='$(addlibs_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(addlibsDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(addlibsdir)/$$f'"; \
+	  $(addlibsDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(addlibsdir)/$$f"; \
+	done
+
+uninstall-addlibsDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(addlibs_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(addlibsdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(addlibsdir)/$$f"; \
+	done
+install-pkgconfiglibDATA: $(pkgconfiglib_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(pkgconfiglibdir)" || $(mkdir_p) "$(DESTDIR)$(pkgconfiglibdir)"
+	@list='$(pkgconfiglib_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(pkgconfiglibDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(pkgconfiglibdir)/$$f'"; \
+	  $(pkgconfiglibDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(pkgconfiglibdir)/$$f"; \
+	done
+
+uninstall-pkgconfiglibDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(pkgconfiglib_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(pkgconfiglibdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(pkgconfiglibdir)/$$f"; \
+	done
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -653,7 +722,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/Examples $(distdir)/include
+	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/Examples $(distdir)/include $(distdir)/src/OsiSym
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -794,9 +863,12 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile
+all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
+	for dir in "$(DESTDIR)$(addlibsdir)" "$(DESTDIR)$(pkgconfiglibdir)"; do \
+	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
+	done
 install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
@@ -824,13 +896,13 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
 distclean-am: clean-am distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags
+	distclean-libtool distclean-local distclean-tags
 
 dvi: dvi-recursive
 
@@ -842,7 +914,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am:
+install-data-am: install-addlibsDATA install-pkgconfiglibDATA
 
 install-exec-am: install-exec-local
 
@@ -870,60 +942,61 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-local
+uninstall-am: uninstall-addlibsDATA uninstall-info-am uninstall-local \
+	uninstall-pkgconfiglibDATA
 
 uninstall-info: uninstall-info-recursive
 
 .PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am am--refresh check \
-	check-am clean clean-generic clean-libtool clean-recursive \
-	ctags ctags-recursive dist dist-all dist-bzip2 dist-gzip \
-	dist-shar dist-tarZ dist-zip distcheck distclean \
+	check-am clean clean-generic clean-libtool clean-local \
+	clean-recursive ctags ctags-recursive dist dist-all dist-bzip2 \
+	dist-gzip dist-shar dist-tarZ dist-zip distcheck distclean \
 	distclean-generic distclean-hdr distclean-libtool \
-	distclean-recursive distclean-tags distcleancheck distdir \
-	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-exec-local install-info \
-	install-info-am install-man install-strip installcheck \
+	distclean-local distclean-recursive distclean-tags \
+	distcleancheck distdir distuninstallcheck dvi dvi-am html \
+	html-am info info-am install install-addlibsDATA install-am \
+	install-data install-data-am install-exec install-exec-am \
+	install-exec-local install-info install-info-am install-man \
+	install-pkgconfiglibDATA install-strip installcheck \
 	installcheck-am installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic maintainer-clean-recursive \
 	mostlyclean mostlyclean-generic mostlyclean-libtool \
 	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-info-am uninstall-local
+	uninstall uninstall-addlibsDATA uninstall-am uninstall-info-am \
+	uninstall-local uninstall-pkgconfiglibDATA
 
 
 ########################################################################
 #                           Extra Targets                              #
 ########################################################################
 
- test: all
+test: all
 	cd test; $(MAKE) test
 
- unitTest: test
+unitTest: test
 
- fulltest: all
+fulltest: all
 	cd test; $(MAKE) fulltest
 
- ptest: all
+ptest: all
 	cd test; $(MAKE) ptest
 
- punitTest: ptest
+punitTest: ptest
 
- pfulltest: all
+pfulltest: all
 	cd test; $(MAKE) pfulltest
 
- clean-local:
+clean-local:
 	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
 
- distclean-local:
+distclean-local:
 	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
 
- .PHONY: test unitTest ptest punitTest
-
 install-exec-local: install-doc
-	$(install_sh_DATA) $(addlibsfile) $(DESTDIR)$(addlibsdir)/$(addlibsfile)
 
 uninstall-local: uninstall-doc
-	rm -f $(DESTDIR)$(addlibsdir)/$(addlibsfile)
+
+.PHONY: test unitTest ptest punitTest
 
 install-doc: $(DocFiles)
 	test -z "$(DocInstallDir)" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)"
