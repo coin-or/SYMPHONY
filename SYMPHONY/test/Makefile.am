@@ -48,7 +48,7 @@ endif
 
 # Add include files
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)` \
-	-I`$(CYGPATH_W) $(SYMSRCDIR)/src/OsiSym`
+	-I`$(CYGPATH_W) $(SYMSRCDIR)/OsiSym`
 
 AM_CPPFLAGS += -DCOIN_HAS_SYMPHONY
 

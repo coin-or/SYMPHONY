@@ -457,7 +457,7 @@ test_srcdir = $(OSISRCDIR)/test
 
 # Add include files
 AM_CPPFLAGS = $(OSITESTS_CFLAGS) -I`$(CYGPATH_W) $(SYMINCDIR)` \
-	-I`$(CYGPATH_W) $(SYMSRCDIR)/src/OsiSym` -DCOIN_HAS_SYMPHONY \
+	-I`$(CYGPATH_W) $(SYMSRCDIR)/OsiSym` -DCOIN_HAS_SYMPHONY \
 	$(am__append_2) $(am__append_4) $(am__append_6) \
 	$(am__append_8) $(am__append_9) $(am__append_11)
 SYMCPPFLAGS = $(AM_CPPFLAGS) $(SYMDEFS)

@@ -72,10 +72,10 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfiglibdir)" \
-	"$(DESTDIR)$(includecoindir)"
-libLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(lib_LTLIBRARIES)
+am__installdirs = "$(DESTDIR)$(coinlibdir)" \
+	"$(DESTDIR)$(pkgconfiglibdir)" "$(DESTDIR)$(includecoindir)"
+coinlibLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(coinlib_LTLIBRARIES)
 libOsiSym_la_LIBADD =
 am_libOsiSym_la_OBJECTS = OsiSymSolverInterface.lo SymWarmStart.lo
 libOsiSym_la_OBJECTS = $(am_libOsiSym_la_OBJECTS)
@@ -386,7 +386,8 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Name of the library compiled in this directory.
-lib_LTLIBRARIES = libOsiSym.la
+coinlibdir = ${libdir}/coin
+coinlib_LTLIBRARIES = libOsiSym.la
 
 # List all source files for this library, including headers
 libOsiSym_la_SOURCES = \
@@ -402,7 +403,7 @@ libOsiSym_la_LDFLAGS = $(LT_LDFLAGS)
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
 # "top_srcdir" refers to the basic directory for the main package that is
 # being compiled.
-AM_CPPFLAGS = $(COINDEPEND_CFLAGS) -I`$(CYGPATH_W) $(srcdir)/..`
+AM_CPPFLAGS = $(COINDEPEND_CFLAGS) -I`$(CYGPATH_W) $(srcdir)/../../include`
 #AM_CPPFLAGS = \
 #	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 #	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
@@ -418,7 +419,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'install/coin'
+# and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
 	OsiSymSolverInterface.hpp \
@@ -464,35 +465,35 @@ osi-sym.pc: $(top_builddir)/config.status $(srcdir)/osi-sym.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 osi-sym-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/osi-sym-uninstalled.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+install-coinlibLTLIBRARIES: $(coinlib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	test -z "$(coinlibdir)" || $(mkdir_p) "$(DESTDIR)$(coinlibdir)"
+	@list='$(coinlib_LTLIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
 	    f=$(am__strip_dir) \
-	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
-	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
+	    echo " $(LIBTOOL) --mode=install $(coinlibLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(coinlibdir)/$$f'"; \
+	    $(LIBTOOL) --mode=install $(coinlibLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(coinlibdir)/$$f"; \
 	  else :; fi; \
 	done
 
-uninstall-libLTLIBRARIES:
+uninstall-coinlibLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	@set -x; list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	@set -x; list='$(coinlib_LTLIBRARIES)'; for p in $$list; do \
 	  p=$(am__strip_dir) \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
-	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(coinlibdir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(coinlibdir)/$$p"; \
 	done
 
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+clean-coinlibLTLIBRARIES:
+	-test -z "$(coinlib_LTLIBRARIES)" || rm -f $(coinlib_LTLIBRARIES)
+	@list='$(coinlib_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
 libOsiSym.la: $(libOsiSym_la_OBJECTS) $(libOsiSym_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libOsiSym_la_LDFLAGS) $(libOsiSym_la_OBJECTS) $(libOsiSym_la_LIBADD) $(LIBS)
+	$(CXXLINK) -rpath $(coinlibdir) $(libOsiSym_la_LDFLAGS) $(libOsiSym_la_OBJECTS) $(libOsiSym_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -647,7 +648,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(LTLIBRARIES) $(DATA) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfiglibdir)" "$(DESTDIR)$(includecoindir)"; do \
+	for dir in "$(DESTDIR)$(coinlibdir)" "$(DESTDIR)$(pkgconfiglibdir)" "$(DESTDIR)$(includecoindir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -676,7 +677,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
+clean-am: clean-coinlibLTLIBRARIES clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -695,9 +696,10 @@ info: info-am
 
 info-am:
 
-install-data-am: install-includecoinHEADERS install-pkgconfiglibDATA
+install-data-am: install-coinlibLTLIBRARIES install-includecoinHEADERS \
+	install-pkgconfiglibDATA
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am:
 
 install-info: install-info-am
 
@@ -723,22 +725,24 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-includecoinHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES uninstall-pkgconfiglibDATA
+uninstall-am: uninstall-coinlibLTLIBRARIES \
+	uninstall-includecoinHEADERS uninstall-info-am \
+	uninstall-pkgconfiglibDATA
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libLTLIBRARIES clean-libtool ctags distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-includecoinHEADERS install-info \
-	install-info-am install-libLTLIBRARIES install-man \
+.PHONY: CTAGS GTAGS all all-am check check-am clean \
+	clean-coinlibLTLIBRARIES clean-generic clean-libtool ctags \
+	distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am \
+	install-coinlibLTLIBRARIES install-data install-data-am \
+	install-exec install-exec-am install-includecoinHEADERS \
+	install-info install-info-am install-man \
 	install-pkgconfiglibDATA install-strip installcheck \
 	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-includecoinHEADERS \
-	uninstall-info-am uninstall-libLTLIBRARIES \
+	tags uninstall uninstall-am uninstall-coinlibLTLIBRARIES \
+	uninstall-includecoinHEADERS uninstall-info-am \
 	uninstall-pkgconfiglibDATA
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

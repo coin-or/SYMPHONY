@@ -23,7 +23,8 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Name of the library compiled in this directory.
-lib_LTLIBRARIES = libOsiSym.la
+coinlibdir = ${libdir}/coin
+coinlib_LTLIBRARIES = libOsiSym.la
 
 # List all source files for this library, including headers
 libOsiSym_la_SOURCES = \
@@ -38,7 +39,7 @@ libOsiSym_la_LDFLAGS = $(LT_LDFLAGS)
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
 # "top_srcdir" refers to the basic directory for the main package that is
 # being compiled.
-AM_CPPFLAGS = $(COINDEPEND_CFLAGS) -I`$(CYGPATH_W) $(srcdir)/..`
+AM_CPPFLAGS = $(COINDEPEND_CFLAGS) -I`$(CYGPATH_W) $(srcdir)/../../include`
 #AM_CPPFLAGS = \
 #	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
 #	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
@@ -54,7 +55,7 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'install/coin'
+# and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
 	OsiSymSolverInterface.hpp \
