@@ -1,0 +1,10 @@
+prefix=@prefix@
+libdir=@ABSBUILDDIR@/src
+includedir=@abs_source_dir@/src
+
+Name: SYMPHONY
+Description: SYMPHONY MILP Solver Framework
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lSym @ADDLIBS@
+Cflags: -I${includedir} -I@ABSBUILDDIR@/inc
+Requires: @REQUIREDPACKAGES@
