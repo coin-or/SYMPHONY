@@ -766,6 +766,63 @@ This continues until the number of candidates is reduced to
 \ptt{strong\_branching\_cand\_num\_min} and then that number of candidates
 is used in all lower levels of the tree.
 
+\item [\ptt{strong\_branching\_high\_low\_weight} -- double (0.8).]
+\sindex[p]{strong\_branching\_high\_low\_weight}
+This parameter is used to calculate the score of each branching candidate. The
+candidate with the highest score is then selected for branching. Let $z_i^+,
+z_i^-$ be the estimated change in objective function value when we branch on
+the candidate $i$. Then the score of candidate $i$ is $s_i =
+\alpha\times\min\{z_i^+, z_i^-\} + (1-\alpha)\times\max\{z_i^+,z_i^-\}$, where
+$\alpha$ is the value of \ptt{strong\_branching\_high\_low\_weight}. This
+value should always lie in the interval $[0,1]$.
+
+\item [\ptt{use\_hot\_starts} -- boolean ({\tt TRUE}).]
+Determines if the LP solver is asked to make special arrangements for doing
+dual-simplex iterations when bounds on a variable are changed for strong
+branching. Some LP solvers provide such options so that strong branching can
+be performed much faster than the regular dual-simplex procedure.
+
+\item[\ptt{should\_use\_rel\_br} -- boolean ({\tt TRUE}).] 
+\sindex[p]{should\_use\_rel\_br}
+Determines if reliability braching is used to determine branching candidates
+or not. This parameter is set to {\tt FALSE} if OPENMP is used. When this
+branching rule is disabled, strong branching is used to select a candidate.
+
+%   lp_par->rel_br_override_max_solves = 200;
+%   lp_par->rel_br_chain_backtrack = 5;
+%   lp_par->rel_br_min_imp = 0.0133;
+%   lp_par->rel_br_max_imp = 0.30;
+
+\item[\ptt{rel\_br\_override\_default} -- boolean ({\tt TRUE}).]
+\sindex[p]{\LPP!rel\_br\_override\_default}
+If reliability branching is enabled and this paramter is set to {\tt TRUE} then the
+policy of selecting branching candidates is automatically adjusted on the
+basis of bounds on solution value and the time elapsed. If this parameter is
+set to {\tt FALSE}, the policy is based on the values of the following three
+parameters.
+
+\item[\ptt{rel\_br\_threshold} -- integer (8).] 
+\sindex[p]{\LPP!rel\_br\_threshold}
+It is assumed that the score obtained by branching on a given variable these many
+times is reliable for estimating the pseudocosts of this variable in the rest
+of the branch-and-bound algorithm. In other words, if reliability branching is
+enabled, strong branching is used on a variable at most
+\ptt{rel\_br\_threshold} many times.
+
+\item[\ptt{rel\_br\_max\_solves} -- integer (20).] 
+\sindex[p]{\LPP!rel\_br\_max\_solves}
+If reliability branching is enabled, this parameter determines the maximum
+number of strong branching LPs that are solved in each node. If some branching
+candidates have reliable estimates, the number of LPs can be less than
+the value of this parameter.
+
+\item[\ptt{rel\_br\_cand\_threshold} -- integer (10).] 
+\sindex[p]{\LPP!rel\_br\_cand\_threshold}
+If reliability branching is enabled, then strong branching is stopped if the
+last \ptt{rel\_br\_cand\_threshold} LPs did not give a better improvement in
+the lower bound.
+
+
 \item[\ptt{is\_feasible\_default} -- integer ({\tt TEST\_INTEGRALITY}\{1\}).]
 \sindex[p]{\LPP!is\_feasible\_default}
 Determines the default test to be used to determine feasibility. This
@@ -884,6 +941,64 @@ library.
 \item[\ptt{generate\_cgl\_lift\_and\_project\_cuts} -- boolean ({\tt FALSE}).] \sindex[p]{\LPP!generate\_cgl\_lift\_and\_project\_cuts}
 Whether or not to generate lift-and-project cuts using COIN's cut generation 
 library. 
+
+\label{fp_enabled}
+\item[\ptt{fp\_enabled} -- integer ({\tt SYM\_FEAS\_PUMP\_DEFAULT}\{1\}).] 
+\sindex[p]{\LP!fp\_enabled}
+Determines the overall policy of using the feasibility pump heuristic to find
+feasible solutions. {\tt SYM\_FEAS\_PUMP\_DEFAULT}\{1\} indicates that the
+decision to use the heuristic is determined on the basis of current values of
+lower bound, upper bound, the time used etc., based on some preset rules. {\tt
+SYM\_FEAS\_PUMP\_REPEATED}\{2\} indicates that the heuristic will be used
+every few iterations until the problem is solved. The frequency can be
+adjusted through the \ptt{fp\_frequency} parameter.  {\tt
+SYM\_FEAS\_PUMP\_TILL\_SOL}\{3\} indicates that the heuristic is used only
+until the first feasible solution is found. {\tt
+SYM\_FEAS\_PUMP\_DISABLE}\{-1\} indicates that the heuristic is not used.
+
+\item[\ptt{fp\_frequency} -- integer (10).] 
+\sindex[p]{\LP!fp\_frequency}
+Determines the number of LPs that are solved before which the feasibility pump
+heuristic is called again. This parameter is used only if the parameter
+\ptt{fp\_enabled} is set to {\tt SYM\_FEAS\_PUMP\_REPEATED}\{2\}. Otherwise,
+the frequency is determined automatically based on some preset rules. 
+
+\item[\ptt{fp\_max\_cycles} -- integer (100).] 
+\sindex[p]{\LP!fp\_max\_cycles}
+Determines the maximum number of LPs that can be solved in a call to the
+feasibility pump heuristic. A higher number might be helpful in finding a
+better feasible solution but may result in more time spent in the heuristic.
+
+\item[\ptt{fp\_time\_limit} -- double (50).] 
+\sindex[p]{\LP!fp\_time\_limit}
+If a feasible solution has been found, this parameter determines the time in
+seconds that can be spent on the feasibility pump heuristic. If a solution has
+not been found yet, the parameter \ptt{fp\_max\_initial\_time} is used.
+
+\item[\ptt{fp\_max\_initial\_time} -- double (100).] 
+\sindex[p]{\LP!fp\_max\_initial\_time}
+If a feasible solution has not been found, this parameter determines the time in
+seconds that can be spent on the feasibility pump heuristic. If a solution has
+been found, the parameter \ptt{fp\_time\_limit} is used.
+
+\item[\ptt{fp\_min\_gap} -- double (0.5).] 
+\sindex[p]{\LP!fp\_min\_gap}
+If the relative (\%) gap between the lower and the upper bounds falls below the
+value of this parameter, feasibility pump is not called.
+
+\item[\ptt{fp\_flip\_fraction} -- double (0.1).] 
+\sindex[p]{\LP!fp\_flip\_fraction}
+When the feasibility pump gets stuck in a cycle, this fraction of binary
+variables are flipped. The variables are selected randomly. Increasing the
+value of this parameter may result in the pump getting stuck fewer number of
+times, but the time to solve LPs after flipping may increase substantially.
+
+\item[\ptt{fp\_poor\_sol\_lim\_fac} -- integer (10).] 
+\sindex[p]{\LP!fp\_poor\_sol\_lim\_fac}
+Sometimes the feasibility pump keeps generating solutions that have high
+objective function values. When the number of such solutions becomes more than
+\ptt{fp\_poor\_sol\_lim\_fac} times the number of ``good'' solutions, the pump
+is disabled.
 
 \end{description}
 \subsection{Cut Generator Parameters}
