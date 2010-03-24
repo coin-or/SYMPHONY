@@ -19,6 +19,14 @@ http://www.coin-or.org/SYMPHONY/
 WHAT'S NEW
 ==========
 
+Release 5.2.3:
+
+1. Minor bug fixes
+
+2. Documentation updated
+
+3. Support for connection to VRPH added to VRP application
+
 Release 5.2.2:
 
 1. Minor bug fixes
