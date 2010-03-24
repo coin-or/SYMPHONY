@@ -158,6 +158,116 @@ The tolerance to be used to differentiate the gamma values if binary search
 is used during the bicriteria solution procedure. A value greater than zero
 will cause the binary search to be activated.
 
+\item[\ptt{prep\_level} -- integer({\tt 5}).]
+\sindex[p]{\MP!prep\_level}
+Determines the level of preprocessing that should be done on the current MILP
+instance. A level of less than $0$ means that no preprocessing will be done.
+At level $2$ basic presolve routines are used. At higher levels more advanced
+routines are deployed. At level $5$, valid implications are derived.
+
+\item[\ptt{prep\_dive\_level} -- integer({\tt 5}).]
+\sindex[p]{\MP!prep\_dive\_level}
+When a variable has been modified by preprocessing, then these changes can be
+used to improve other variables and constraints in the instance as well. This
+parameter controls how many times can we recursively try to improve the
+instance if a change is made.
+
+\item[\ptt{prep\_impl\_dive\_level} -- integer({\tt 0}).]
+\sindex[p]{\MP!prep\_impl\_dive\_level}
+In some advanced preprocessing routines, a variable or constraint is modified
+to check what implications can be derived from that change. When such an
+implication is derived, it can recursively lead to more implications. This
+parameter controls how many levels of recursion are allowed.
+
+\item[\ptt{prep\_impl\_limit} -- integer({\tt 50}).]
+\sindex[p]{\MP!prep\_impl\_limit}
+Determines the maximum number of implications that can be derived from
+preprocessing.
+
+\item[\ptt{prep\_do\_probing} -- integer({\tt 1}).]
+\sindex[p]{\MP!prep\_do\_probing}
+Determines if probing is used while preprocessing. Probing is not yet
+implemented and this parameter does not have any effect.
+
+\item[\ptt{prep\_verbosity} -- integer({\tt 1}).]
+\sindex[p]{\MP!prep\_verbosity}
+Determines the verbosity of messages from the preprocessing stage. Higher
+levels will produce more verbose messages.
+
+\item[\ptt{prep\_reduce\_mip} -- boolean ({\tt 1}).]
+\sindex[p]{\MP!prep\_reduce\_mip}
+If some variables and constraints have been eliminated in preprocessing and if 
+\ptt{prep\_reduce\_mip} is $1$, then the memory allocated for these deleted
+variables and constraints is freed. Otherwise, these are retained in the
+instance but are never used.
+
+\item[\ptt{prep\_probing\_verbosity} -- integer({\tt 0}).]
+\sindex[p]{\MP!prep\_probing\_verbosity}
+Determines the verbosity of messages from probing stage. Probing is not yet
+implemented and this parameter does not have any effect.
+
+\item[\ptt{prep\_probing\_level} -- integer({\tt 1}).]
+\sindex[p]{\MP!prep\_probing\_level}
+Determines the maximum level of probing that is carried out before
+preprocessing is stopped. Probing is not yet
+implemented and this parameter does not have any effect.
+
+\item[\ptt{prep\_display\_stats} -- boolean ({\tt 0}).]
+\sindex[p]{\MP!prep\_display\_stats}
+Determines if statistics on how many of each type of changes were made in the
+preprocessing stage are displayed ($1$) or not ($0$).
+
+\item[\ptt{keep\_row\_ordered} -- integer({\tt 1}).]
+\sindex[p]{\MP!keep\_row\_ordered}
+When the value of this parameter is {\tt 1}, a row ordered matrix is also
+retained for use after the preprocessing stage. This capability is not yet
+implemented and this parameter does not have any effect.
+
+\item[\ptt{prep\_do\_sr} -- boolean ({\tt 0}).]
+\sindex[p]{\MP!prep\_do\_sr}
+When the value of this parameter is {\tt 1}, additional preprocessing is
+performed by solving an LP with one constraint. This procedure is not
+thoroughly tested.
+
+\item[\ptt{max\_sr\_cnt} -- integer({\tt 5}).]
+\sindex[p]{\MP!max\_sr\_cnt}
+This parameter controls the number of single-constraint LPs that are solved
+for each constraint in the preprocessing stage. This procedure is not
+thoroughly tested.
+
+\item[\ptt{max\_aggr\_row\_cnt} -- integer({\tt 0}).]
+\sindex[p]{\MP!max\_aggr\_row\_cnt}
+This parameter is not used and has no effect.
+
+\item[\ptt{prep\_iter\_limit} -- integer({\tt 10}).]
+\sindex[p]{\MP!prep\_iter\_limit}
+Determines the maximum number of times preprocessing can be done on an
+instance. If an instance has been modified by preprocessing, then the new
+problem can be preprocessed again to get an even better formulation. This
+parameter puts a limit on the number of times such preprocessing can be done.
+
+\item[\ptt{write\_mps} -- boolean ({\tt 0}).]
+\sindex[p]{\MP!write\_mps}
+Determines if an MPS file be written after all preprocessing has been
+performed. This can be used for debugging or if the user wants to save the
+preprocessed instance.
+
+\item[\ptt{write\_lp} -- boolean ({\tt 0}).]
+\sindex[p]{\MP!write\_lp}
+Determines if an LP file be written after all preprocessing has been
+performed. This can be used for debugging or if the user wants to save the
+preprocessed instance.
+
+\item[\ptt{prep\_time\_limit} -- integer({\tt 50}).]
+\sindex[p]{\MP!prep\_time\_limit}
+Determines the maximum time in seconds that can be spent in preprocessing.
+
+   %double            etol; 
+   %double            single_row_rlx_ratio;
+   %char              do_aggregate_row_rlx; 
+   %double            max_aggr_row_ratio;   
+   %int               keep_track; 
+
 \end{description}
 
 \subsection{Draw Graph parameters}
