@@ -485,6 +485,8 @@ int sym_set_defaults(sym_environment *env)
    prep_par->keep_row_ordered = 1;
    prep_par->keep_track = 0;
    prep_par->time_limit = 50;
+   prep_par->write_mps = 0;
+   prep_par->write_lp = 0;
 
    return(termcode);
 }
