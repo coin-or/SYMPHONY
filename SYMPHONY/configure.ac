@@ -70,6 +70,7 @@ AC_COIN_DEBUG_COMPILE(SYMPHONY)
 AC_COIN_PROG_CXX
 #AC_LIBTOOL_LANG_CXX_CONFIG
 AC_LANG_PUSH(C++)
+
 # Initialize automake and libtool
 AC_COIN_INIT_AUTO_TOOLS
 
@@ -94,6 +95,96 @@ AC_COIN_HAS_MODULE(OsiTests,   [osi-unittests],   [required=0])
 AC_COIN_HAS_MODULE(Sample,     [coindatasample],  [required=0])
 AC_COIN_HAS_MODULE(Netlib,     [coindatanetlib],  [required=0])
 AC_COIN_HAS_MODULE(Miplib3,    [coindatamiplib3], [required=0])
+
+# fallbacks for dependencies if no pkg-config is available
+if test "$coin_has_coindepend" != yes ; then
+  AC_COIN_HAS_PROJECT(CoinUtils)
+  AC_COIN_HAS_PROJECT(Osi)
+  if test $coin_has_coinutils != notGiven && test $coin_has_coinutils != skipping ; then
+    COINDEPEND_CFLAGS="-I`${CYGPATH_W} ${COINUTILSSRCDIR}/src` -I`${CYGPATH_W} ${COINUTILSOBJDIR}/inc`"
+    COINDEPEND_LIBS="${COINUTILSOBJDIR}/src/libCoinUtils.la `cat ${COINUTILSOBJDIR}/coinutils_addlibs.txt`"
+  else
+    AC_MSG_ERROR("Required package CoinUtils unavailable.")
+  fi
+  if test $coin_has_osi != notGiven && test $coin_has_osi != skipping ; then
+    COINDEPEND_CFLAGS="${COINDEPEND_CFLAGS} -I`${CYGPATH_W} ${OSISRCDIR}/src` -I`${CYGPATH_W} ${OSIOBJDIR}/inc`"
+    COINDEPEND_LIBS="${COINDEPEND_LIBS} ${OSIOBJDIR}/src/libOsi.la `cat ${OSIOBJDIR}/osi_addlibs.txt`"
+  else
+    AC_MSG_ERROR("Required package Osi unavailable.")
+  fi
+  coin_has_coindepend=yes
+  AC_DEFINE(COIN_HAS_COINDEPEND,[1],[Define to 1 if the CoinDepend module is available])
+else
+  # to please configure
+  AM_CONDITIONAL(COIN_HAS_COINUTILS, [test 0 = 1])
+  AM_CONDITIONAL(COIN_HAS_OSI,       [test 0 = 1])
+fi
+
+if test "$coin_has_cgl" != yes ; then
+  AC_COIN_HAS_PROJECT(Cgl)
+
+  if test $coin_has_cgl != notGiven && test $coin_has_cgl != skipping ; then
+    CGL_CFLAGS="-I`${CYGPATH_W} ${CGLSRCDIR}/src` -I`${CYGPATH_W} ${CGLOBJDIR}/inc` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglAllDifferent` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglClique` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglDuplicateRow` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglFlowCover` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglGomory` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglKnapsackCover` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglLandP` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglLiftAndProject` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglMixedIntegerRounding` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglMixedIntegerRounding2` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglOddHole` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglPreProcess` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglProbing` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglRedSplit` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglResidualCapacity` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglSimpleRounding` -I`${CYGPATH_W} ${CGLSRCDIR}/src/CglTwomir`"
+    CGL_LIBS="${CGLOBJDIR}/src/libCgl.la `cat ${CGLOBJDIR}/cgl_addlibs.txt`"
+  fi
+  coin_has_cgl=yes
+  AC_DEFINE(COIN_HAS_COINDEPEND,[1],[Define to 1 if the CoinDepend module is available])
+else
+  AM_CONDITIONAL(COIN_HAS_CGL,       [test 0 = 1])
+fi
+
+if test "$coin_has_clp" != yes ; then
+  AC_COIN_HAS_PROJECT(Clp)
+  if test $coin_has_clp != notGiven && test $coin_has_clp != skipping ; then
+    CLP_CFLAGS="-I`${CYGPATH_W} ${CLPSRCDIR}/src` -I`${CYGPATH_W} ${CLPSRCDIR}/src/OsiClp` -I`${CYGPATH_W} ${CLPOBJDIR}/inc`"
+    CLP_LIBS="${CLPOBJDIR}/src/libClp.la ${CLPOBJDIR}/src/OsiClp/libOsiClp.la `cat ${CLPOBJDIR}/clp_addlibs.txt`"
+    AC_DEFINE(COIN_HAS_CLP,[1],[Define to 1 if the Clp module is available])
+  fi
+fi
+
+if test "$coin_has_dylp" != yes ; then
+  AC_COIN_HAS_PROJECT(DyLP)
+  if test $coin_has_dylp != notGiven && test $coin_has_dylp != skipping ; then
+    DYLP_CFLAGS="-I`${CYGPATH_W} ${DYLPSRCDIR}/src` -I`${CYGPATH_W} ${DYLPSRCDIR}/src/OsiClp` -I`${CYGPATH_W} ${DYLPOBJDIR}/inc`"
+    DYLP_LIBS="${DYLPOBJDIR}/src/libClp.la ${DYLPOBJDIR}/src/OsiClp/libOsiClp.la `cat ${DYLPOBJDIR}/clp_addlibs.txt`"
+    AC_DEFINE(COIN_HAS_DYLP,[1],[Define to 1 if the Clp module is available])
+  fi
+fi
+
+if test "$coin_has_vol" != yes ; then
+  AC_COIN_HAS_PROJECT(Vol)
+  if test $coin_has_vol != notGiven && test $coin_has_vol != skipping ; then
+    VOL_CFLAGS="-I`${CYGPATH_W} ${VOLSRCDIR}/src` -I`${CYGPATH_W} ${VOLSRCDIR}/src/OsiClp` -I`${CYGPATH_W} ${VOLOBJDIR}/inc`"
+    VOL_LIBS="${VOLOBJDIR}/src/libClp.la ${VOLOBJDIR}/src/OsiClp/libOsiClp.la `cat ${VOLOBJDIR}/clp_addlibs.txt`"
+    AC_DEFINE(COIN_HAS_VOL,[1],[Define to 1 if the Clp module is available])
+  fi
+fi
+
+# fallback for Glpk if no pkg-config available
+if test "$coin_has_glpk" != yes ; then
+  coin_glpkobjdir=../ThirdParty/Glpk
+
+  # if ThirdParty/Glpk is available and configured, then a coinglpk-uninstalled.pc file should have been created
+  if test -r $coin_glpkobjdir/coinglpk-uninstalled.pc ; then
+    # read Glpk CFLAGS and LIBS from coinglpk-uninstalled.pc file
+    # add CYGPATH_W cludge into include flags
+    # replace -L${libdir} by absolute path to GLPK build directory in linker flags
+    [GLPK_CFLAGS=`sed -n -e 's/Cflags://' -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/gp' $coin_glpkobjdir/coinglpk-uninstalled.pc`]
+    GLPK_LIBS=`sed -n -e 's/Libs://' -e 's/-L\${libdir}//p' $coin_glpkobjdir/coinglpk-uninstalled.pc`
+    GLPK_LIBS="-L`cd $coin_glpkobjdir; pwd` $GLPK_LIBS"
+
+    ADDLIBS="$ADDLIBS $GLPK_LIBS"
+    REQUIREDPACKAGES="$REQUIREDPACKAGES coinglpk"
+
+    coin_has_glpk=yes
+    AC_DEFINE([COIN_HAS_GLPK],[1],[Define to 1 if the Glpk module is available])
+  fi
+
+  AM_CONDITIONAL([COIN_HAS_GLPK],[test $coin_has_glpk = yes])
+
+  AC_MSG_CHECKING([whether ThirdParty/Glpk is available and configured])
+  AC_MSG_RESULT([$coin_has_glpk])
+fi
 
 #############################################################################
 #                            Third party solvers                            #

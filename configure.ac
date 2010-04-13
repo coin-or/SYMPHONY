@@ -76,6 +76,7 @@ AC_COIN_MAIN_PACKAGEDIR(Clp)
 AC_COIN_MAIN_PACKAGEDIR(DyLP)
 AC_COIN_MAIN_PACKAGEDIR(Vol)
 AC_COIN_MAIN_PACKAGEDIR(Cbc)
+AC_COIN_MAIN_PACKAGEDIR(SYMPHONY)
 
 #############################################################################
 #                            Third party solvers                            #
@@ -115,13 +116,6 @@ done
 
 
 AM_CONDITIONAL(ADD_GLPK, [test $use_tp_glpk = true])
-
-
-#############################################################################
-#                            Check SYMPHONY                                 #
-#############################################################################
-
-AC_COIN_MAIN_SUBDIRS(SYMPHONY)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #

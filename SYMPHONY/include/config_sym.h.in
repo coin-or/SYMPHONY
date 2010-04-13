@@ -1,6 +1,6 @@
 /* include/config_sym.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if the Cgl module is available */
+/* Define to 1 if the Cgl package is used */
 #undef COIN_HAS_CGL
 
 /* Define to 1 if the Clp module is available */
@@ -9,10 +9,13 @@
 /* Define to 1 if the CoinDepend module is available */
 #undef COIN_HAS_COINDEPEND
 
+/* Define to 1 if the CoinUtils package is used */
+#undef COIN_HAS_COINUTILS
+
 /* Define to 1 if the Cpx module is available */
 #undef COIN_HAS_CPX
 
-/* Define to 1 if the DyLP module is available */
+/* Define to 1 if the Clp module is available */
 #undef COIN_HAS_DYLP
 
 /* Define to 1 if the Glpk module is available */
@@ -27,6 +30,9 @@
 /* Define to 1 if the Netlib module is available */
 #undef COIN_HAS_NETLIB
 
+/* Define to 1 if the Osi package is used */
+#undef COIN_HAS_OSI
+
 /* Define to 1 if the OsiTests module is available */
 #undef COIN_HAS_OSITESTS
 
@@ -36,7 +42,7 @@
 /* Define to 1 if the Sample module is available */
 #undef COIN_HAS_SAMPLE
 
-/* Define to 1 if the Vol module is available */
+/* Define to 1 if the Clp module is available */
 #undef COIN_HAS_VOL
 
 /* Define to 1 if the Xpr module is available */

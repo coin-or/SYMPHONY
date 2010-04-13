@@ -1190,6 +1190,10 @@ Optional Packages:
   --with-cbc-lib linker flags for using project Cbc
   --with-cbc-incdir directory with header files for using project Cbc
   --with-cbc-datadir directory with data files for using project Cbc
+  --with-symphony-lib linker flags for using project SYMPHONY
+  --with-symphony-incdir directory with header files for using project
+                          SYMPHONY
+  --with-symphony-datadir directory with data files for using project SYMPHONY
   --with-lp-solver        specify the LP solver you want SYMPHONY to use in
                           small letters(default=clp)
 
@@ -4239,7 +4243,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:4242:" \
+echo "$as_me:4246:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6498,7 +6502,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6501 "configure"' > conftest.$ac_ext
+  echo '#line 6505 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8462,11 +8466,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8465: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8469: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8469: \$? = $ac_status" >&5
+   echo "$as_me:8473: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8730,11 +8734,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8733: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8737: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8737: \$? = $ac_status" >&5
+   echo "$as_me:8741: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8834,11 +8838,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8837: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8841: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8841: \$? = $ac_status" >&5
+   echo "$as_me:8845: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11179,7 +11183,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11182 "configure"
+#line 11186 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11279,7 +11283,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11282 "configure"
+#line 11286 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13623,11 +13627,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13626: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13630: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13630: \$? = $ac_status" >&5
+   echo "$as_me:13634: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13727,11 +13731,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13730: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13734: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13734: \$? = $ac_status" >&5
+   echo "$as_me:13738: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15297,11 +15301,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15300: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15304: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15304: \$? = $ac_status" >&5
+   echo "$as_me:15308: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15401,11 +15405,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15404: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15408: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15408: \$? = $ac_status" >&5
+   echo "$as_me:15412: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17608,11 +17612,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17611: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17615: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17615: \$? = $ac_status" >&5
+   echo "$as_me:17619: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17876,11 +17880,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17879: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17883: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17883: \$? = $ac_status" >&5
+   echo "$as_me:17887: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17980,11 +17984,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17983: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17987: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17987: \$? = $ac_status" >&5
+   echo "$as_me:17991: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -22585,6 +22589,136 @@ echo "${ECHO_T}no" >&6
 fi
 
 
+echo "$as_me:$LINENO: checking whether project SYMPHONY is available" >&5
+echo $ECHO_N "checking whether project SYMPHONY is available... $ECHO_C" >&6
+
+coin_has_symphony=notGiven
+coin_have_project_dir=no
+
+# check if user wants to skip project in any case
+
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = "SYMPHONY"; then
+      coin_has_symphony=skipping
+    fi
+    if test $dir = "/SYMPHONY"; then
+      coin_has_symphony=skipping
+    fi
+  done
+fi
+
+if test $coin_has_symphony != skipping; then
+  if test $PACKAGE_TARNAME = symphony; then
+    coin_has_symphony=.
+    coin_have_project_dir=yes
+  fi
+
+
+# Check whether --with-m4_tolower(SYMPHONY)-lib or --without-m4_tolower(SYMPHONY)-lib was given.
+if test "${with_symphony_lib+set}" = set; then
+  withval="$with_symphony_lib"
+  coin_has_symphony=installed
+fi;
+
+
+# Check whether --with-m4_tolower(SYMPHONY)-incdir or --without-m4_tolower(SYMPHONY)-incdir was given.
+if test "${with_symphony_incdir+set}" = set; then
+  withval="$with_symphony_incdir"
+  coin_has_symphony=installed
+fi;
+
+
+# Check whether --with-m4_tolower(SYMPHONY)-datadir or --without-m4_tolower(SYMPHONY)-datadir was given.
+if test "${with_symphony_datadir+set}" = set; then
+  withval="$with_symphony_datadir"
+  coin_has_symphony=installed
+fi;
+fi
+
+if test $coin_has_symphony = notGiven; then
+  #only if pkg-config is available:
+  #see if user gives directory where project might be installed: assemble search path for pkg-config
+  if test -n "$PKG_CONFIG" ; then
+    coin_save_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
+
+    # let's assume that when installing into $prefix, then the user may have installed some other coin projects there before, so it's worth to have a look into there
+    if test -d "$prefix"; then
+      PKG_CONFIG_PATH="$prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
+    fi
+
+
+# Check whether --with-coin-instdir or --without-coin-instdir was given.
+if test "${with_coin_instdir+set}" = set; then
+  withval="$with_coin_instdir"
+  if test -d "$withval"; then : ; else
+         { { echo "$as_me:$LINENO: error: argument for --with-coin-instdir not a directory" >&5
+echo "$as_me: error: argument for --with-coin-instdir not a directory" >&2;}
+   { (exit 1); exit 1; }; }
+       fi
+       PKG_CONFIG_PATH="$withval/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+fi;
+
+    # let pkgconfig check if the project is already installed somewhere
+    # need to export variable to be sure that the following pkg-config call gets these values
+    export PKG_CONFIG_PATH
+
+if test -n "$PKG_CONFIG" ; then
+  if $PKG_CONFIG --exists "symphony"; then
+    SYMPHONY_VERSION=`$PKG_CONFIG --modversion "symphony" 2>/dev/null`
+    coin_has_symphony="$SYMPHONY_VERSION"
+  else
+    SYMPHONY_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "symphony"`
+
+  fi
+else
+  { { echo "$as_me:$LINENO: error: \"Cannot check for existance of module SYMPHONY without pkg-config\"" >&5
+echo "$as_me: error: \"Cannot check for existance of module SYMPHONY without pkg-config\"" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+    PKG_CONFIG_PATH="$coin_save_PKG_CONFIG_PATH"
+  fi
+fi
+
+# if not found yet, check if project is available in present directory
+if test "$coin_has_symphony" = notGiven; then
+  if test -d $srcdir//SYMPHONY; then
+     coin_have_project_dir=yes
+
+    if test $coin_have_project_dir = yes; then
+      coin_has_symphony=/SYMPHONY
+    fi
+  fi
+fi
+
+echo "$as_me:$LINENO: result: $coin_has_symphony" >&5
+echo "${ECHO_T}$coin_has_symphony" >&6
+
+echo "$as_me:$LINENO: checking whether project SYMPHONY need to be configured" >&5
+echo $ECHO_N "checking whether project SYMPHONY need to be configured... $ECHO_C" >&6
+if test "$coin_have_project_dir" = yes ; then
+
+  if test -r $srcdir//SYMPHONY/configure; then
+    coin_subdirs="$coin_subdirs SYMPHONY"
+    echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+
+subdirs="$subdirs SYMPHONY"
+
+  else
+    echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+  fi
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+
 #############################################################################
 #                            Third party solvers                            #
 #############################################################################
@@ -22646,50 +22780,6 @@ else
   ADD_GLPK_TRUE='#'
   ADD_GLPK_FALSE=
 fi
-
-
-
-#############################################################################
-#                            Check SYMPHONY                                 #
-#############################################################################
-
-
-
-echo "$as_me:$LINENO: checking whether directory SYMPHONY is available" >&5
-echo $ECHO_N "checking whether directory SYMPHONY is available... $ECHO_C" >&6
-                coin_skip=no
-                if test x"$COIN_SKIP_PROJECTS" != x; then
-                  for dir in $COIN_SKIP_PROJECTS; do
-                    if test $dir = SYMPHONY; then
-                      coin_skip=yes
-                    fi
-                  done
-                fi
-                if test $coin_skip = yes; then
-                  echo "$as_me:$LINENO: result: skipping" >&5
-echo "${ECHO_T}skipping" >&6
-                elif test -r $srcdir/SYMPHONY/configure; then
-                  coin_subdirs="$coin_subdirs SYMPHONY"
-                  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-
-
-subdirs="$subdirs SYMPHONY"
-
-                else
-                  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-                fi
-
-
-
-
-
-
-
-
-
-
 
 
 ##############################################################################
