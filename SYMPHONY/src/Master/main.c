@@ -190,8 +190,7 @@ int main(int argc, char **argv)
      double finish_time = 0.0, dbl_value = 0;
 
      version();
-     printf("***** WELCOME TO SYMPHONY INTERACTIVE MIP SOLVER ******\n\n"
-	    "Please type 'help'/'?' to see the main commands!\n\n");
+     printf("Please type 'help'/'?' to see a list of commands\n\n");
 
      sym_set_int_param(env, "verbosity", -1);
 

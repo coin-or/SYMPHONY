@@ -85,12 +85,19 @@ void usage(void)
 void version(void)
 {
    printf("\n");
-   printf("*******************************************************\n");
-   printf("*   This is SYMPHONY Version 5.2.3                    *\n");
-   printf("*   Copyright 2000-2010 Ted Ralphs and others         *\n");
-   printf("*   All Rights Reserved.                              *\n");
-   printf("*   Distributed under the Common Public License 1.0   *\n");
-   printf("*******************************************************\n");
+   printf("==  Welcome to the SYMPHONY MILP Solver \n");
+   printf("==  Copyright 2000-2010 Ted Ralphs and others \n");
+   printf("==  All Rights Reserved. \n");
+   printf("==  Distributed under the Common Public License 1.0 \n");
+   if (strcmp(SYMPHONY_VERSION, "trunk")){
+      printf("==  Version: %s \n", SYMPHONY_VERSION);
+   }else{
+      printf("==  Version: Trunk (unstable) \n");
+   }
+   printf("==  Build Date: %s \n", __DATE__);
+#ifdef SYMPHONY_SVN_REV
+   printf("==  Revision Number: %s \n", SYMPHONY_SVN_REV);
+#endif
    printf("\n");
 }
 

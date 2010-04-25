@@ -15,6 +15,8 @@
 #ifndef _SYM_API_H
 #define _SYM_API_H
 
+#include "SymConfig.h"
+
 #define COMPILING_FOR_MASTER
 
 #ifdef PROTO
