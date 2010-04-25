@@ -2566,6 +2566,7 @@ SYMPDEFS = @SYMPDEFS@
 SYMPHONYDOCDIR = @SYMPHONYDOCDIR@
 SYMPHONYOBJDIR = @SYMPHONYOBJDIR@
 SYMPHONYSRCDIR = @SYMPHONYSRCDIR@
+SYMPHONY_SVN_REV = @SYMPHONY_SVN_REV@
 SYMSRCDIR = @SYMSRCDIR@
 SYM_COMPILE_IN_CG_FALSE = @SYM_COMPILE_IN_CG_FALSE@
 SYM_COMPILE_IN_CG_TRUE = @SYM_COMPILE_IN_CG_TRUE@
@@ -2630,6 +2631,7 @@ exec_prefix = @exec_prefix@
 have_autoconf = @have_autoconf@
 have_automake = @have_automake@
 have_svn = @have_svn@
+have_svnversion = @have_svnversion@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -2691,7 +2693,7 @@ SYMHEADERS = ../include/sym_constants.h ../include/sym_macros.h \
 	../include/sym_prep.h ../include/sym_prep_params.h \
 	$(am__append_1)
 
-#Add SymConfig.h even though it is not used - for COIN compability
+#Add SymConfig.h
 SYMINCFILES = ../include/SymConfig.h $(SYMHEADERS)
 SYM_MASTER_SRC = Master/master.c Master/master_wrapper.c Master/master_io.c \
 	Master/master_func.c Master/master_prep.c Master/master_prep_base.c Master/master_prep_sr.c 
@@ -2800,14 +2802,14 @@ MAIN_SRC = $(MASTER_MAIN_SRC)
 # "top_srcdir" refers to the basic directory for the main package that is
 # being compiled.
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(SYMINCDIR)` -I`$(CYGPATH_W) \
-	$(CLPSRCDIR)/src` -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` $(am__append_17) \
-	$(am__append_18) $(am__append_20) $(am__append_22) \
-	$(am__append_23) $(am__append_25) $(am__append_27) \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglClique` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglDuplicateRow` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglFlowCover` -I`$(CYGPATH_W) \
+	$(SYMPHONYOBJDIR)/include` -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` -I`$(CYGPATH_W) \
+	$(CLPOBJDIR)/inc` $(am__append_17) $(am__append_18) \
+	$(am__append_20) $(am__append_22) $(am__append_23) \
+	$(am__append_25) $(am__append_27) -I`$(CYGPATH_W) \
+	$(CGLSRCDIR)/src` -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
+	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglGomory` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglKnapsackCover` -I`$(CYGPATH_W) \
 	$(CGLSRCDIR)/src/CglLiftAndProject` -I`$(CYGPATH_W) \
@@ -3083,8 +3085,6 @@ libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 
 # Here list all the header files that are required by a user of the library,
 # and that therefore should be installed in 'install/coin'
-# Although SYMPHONY is not using configuration defs file config.sym, we 
-# add it for now for COIN compatibility.  
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
 	../include/config_sym.h \

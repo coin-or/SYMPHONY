@@ -22,7 +22,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([SYMPHONY],[5.2-devel],[coin-symphony@list.coin-or.org])
+AC_INIT([SYMPHONY],[trunk],[coin-symphony@list.coin-or.org])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
@@ -32,7 +32,7 @@ AC_COPYRIGHT([
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2009 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2010 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Common Public License. Please see     */
 /* accompanying file for terms.                                              */
@@ -61,7 +61,7 @@ AC_CANONICAL_BUILD
 # the source root directory contains definition of where to find those
 # externals.  The following macro ensures that those externals are
 # retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT
+AC_COIN_PROJECTDIR_INIT(SYMPHONY)
 
 # Check if user wants to produce debugging code
 AC_COIN_DEBUG_COMPILE(SYMPHONY)
