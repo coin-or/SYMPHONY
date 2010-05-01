@@ -72,7 +72,6 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/../config.sub $(srcdir)/../install-sh \
 	$(srcdir)/../ltmain.sh $(srcdir)/../missing \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/sym_addlibs.txt.in \
 	$(srcdir)/symphony-uninstalled.pc.in $(srcdir)/symphony.pc.in \
 	$(top_srcdir)/Applications/CNRP/Makefile.in \
 	$(top_srcdir)/Applications/MATCH/Makefile.in \
@@ -83,7 +82,8 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/Applications/USER/Makefile.in \
 	$(top_srcdir)/Applications/VRP/Makefile.in \
 	$(top_srcdir)/Examples/Makefile.in $(top_srcdir)/configure \
-	$(top_srcdir)/include/config_sym.h.in AUTHORS
+	$(top_srcdir)/include/config_sym.h.in \
+	$(top_srcdir)/src/OsiSym/osi-sym-uninstalled.pc.in AUTHORS
 @HAVE_EXTERNALS_TRUE@am__append_2 = Externals
 @HAVE_EXTERNALS_TRUE@am__append_3 = .Externals-stamp
 subdir = .
@@ -101,7 +101,7 @@ CONFIG_CLEAN_FILES = Examples/Makefile Applications/CNRP/Makefile \
 	Applications/MPP/Makefile Applications/SPP/Makefile \
 	Applications/SPP+CUTS/Makefile Applications/USER/Makefile \
 	Applications/VRP/Makefile symphony.pc symphony-uninstalled.pc \
-	sym_addlibs.txt $srcdir/Applications/CNRP/Makefile \
+	osi-sym-uninstalled.pc $srcdir/Applications/CNRP/Makefile \
 	$srcdir/Applications/MATCH/Makefile \
 	$srcdir/Applications/MCKP/Makefile \
 	$srcdir/Applications/MPP/Makefile \
@@ -164,18 +164,12 @@ CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CDEFS = @CDEFS@
 CFLAGS = @CFLAGS@
-CGLDOCDIR = @CGLDOCDIR@
-CGLOBJDIR = @CGLOBJDIR@
-CGLSRCDIR = @CGLSRCDIR@
 CGL_CFLAGS = @CGL_CFLAGS@
 CGL_DATA = @CGL_DATA@
 CGL_LIBS = @CGL_LIBS@
 CHECK_CUT_VALIDITY_FALSE = @CHECK_CUT_VALIDITY_FALSE@
 CHECK_CUT_VALIDITY_TRUE = @CHECK_CUT_VALIDITY_TRUE@
 CLLCFLAGS = @CLLCFLAGS@
-CLPDOCDIR = @CLPDOCDIR@
-CLPOBJDIR = @CLPOBJDIR@
-CLPSRCDIR = @CLPSRCDIR@
 CLP_CFLAGS = @CLP_CFLAGS@
 CLP_DATA = @CLP_DATA@
 CLP_LIBS = @CLP_LIBS@
@@ -184,9 +178,6 @@ CLP_LP_SOLVER_TRUE = @CLP_LP_SOLVER_TRUE@
 COINDEPEND_CFLAGS = @COINDEPEND_CFLAGS@
 COINDEPEND_DATA = @COINDEPEND_DATA@
 COINDEPEND_LIBS = @COINDEPEND_LIBS@
-COINUTILSDOCDIR = @COINUTILSDOCDIR@
-COINUTILSOBJDIR = @COINUTILSOBJDIR@
-COINUTILSSRCDIR = @COINUTILSSRCDIR@
 COIN_HAS_CGL_FALSE = @COIN_HAS_CGL_FALSE@
 COIN_HAS_CGL_TRUE = @COIN_HAS_CGL_TRUE@
 COIN_HAS_CLP = @COIN_HAS_CLP@
@@ -194,8 +185,6 @@ COIN_HAS_CLP_FALSE = @COIN_HAS_CLP_FALSE@
 COIN_HAS_CLP_TRUE = @COIN_HAS_CLP_TRUE@
 COIN_HAS_COINDEPEND_FALSE = @COIN_HAS_COINDEPEND_FALSE@
 COIN_HAS_COINDEPEND_TRUE = @COIN_HAS_COINDEPEND_TRUE@
-COIN_HAS_COINUTILS_FALSE = @COIN_HAS_COINUTILS_FALSE@
-COIN_HAS_COINUTILS_TRUE = @COIN_HAS_COINUTILS_TRUE@
 COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
 COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@
 COIN_HAS_DYLP_FALSE = @COIN_HAS_DYLP_FALSE@
@@ -210,8 +199,8 @@ COIN_HAS_NETLIB_FALSE = @COIN_HAS_NETLIB_FALSE@
 COIN_HAS_NETLIB_TRUE = @COIN_HAS_NETLIB_TRUE@
 COIN_HAS_OSITESTS_FALSE = @COIN_HAS_OSITESTS_FALSE@
 COIN_HAS_OSITESTS_TRUE = @COIN_HAS_OSITESTS_TRUE@
-COIN_HAS_OSI_FALSE = @COIN_HAS_OSI_FALSE@
-COIN_HAS_OSI_TRUE = @COIN_HAS_OSI_TRUE@
+COIN_HAS_PKGCONFIG_FALSE = @COIN_HAS_PKGCONFIG_FALSE@
+COIN_HAS_PKGCONFIG_TRUE = @COIN_HAS_PKGCONFIG_TRUE@
 COIN_HAS_READLINE_FALSE = @COIN_HAS_READLINE_FALSE@
 COIN_HAS_READLINE_TRUE = @COIN_HAS_READLINE_TRUE@
 COIN_HAS_SAMPLE_FALSE = @COIN_HAS_SAMPLE_FALSE@
@@ -220,6 +209,7 @@ COIN_HAS_VOL_FALSE = @COIN_HAS_VOL_FALSE@
 COIN_HAS_VOL_TRUE = @COIN_HAS_VOL_TRUE@
 COIN_HAS_XPR_FALSE = @COIN_HAS_XPR_FALSE@
 COIN_HAS_XPR_TRUE = @COIN_HAS_XPR_TRUE@
+COIN_PKG_CONFIG_PATH = @COIN_PKG_CONFIG_PATH@
 COMPILE_FRAC_BRANCHING_FALSE = @COMPILE_FRAC_BRANCHING_FALSE@
 COMPILE_FRAC_BRANCHING_TRUE = @COMPILE_FRAC_BRANCHING_TRUE@
 CPEXT = @CPEXT@
@@ -244,9 +234,6 @@ DO_TESTS_FALSE = @DO_TESTS_FALSE@
 DO_TESTS_TRUE = @DO_TESTS_TRUE@
 DRAWGRAPH_FALSE = @DRAWGRAPH_FALSE@
 DRAWGRAPH_TRUE = @DRAWGRAPH_TRUE@
-DYLPDOCDIR = @DYLPDOCDIR@
-DYLPOBJDIR = @DYLPOBJDIR@
-DYLPSRCDIR = @DYLPSRCDIR@
 DYLP_CFLAGS = @DYLP_CFLAGS@
 DYLP_DATA = @DYLP_DATA@
 DYLP_LIBS = @DYLP_LIBS@
@@ -301,9 +288,6 @@ OPENMP_FALSE = @OPENMP_FALSE@
 OPENMP_TRUE = @OPENMP_TRUE@
 OPT_CFLAGS = @OPT_CFLAGS@
 OPT_CXXFLAGS = @OPT_CXXFLAGS@
-OSIDOCDIR = @OSIDOCDIR@
-OSIOBJDIR = @OSIOBJDIR@
-OSISRCDIR = @OSISRCDIR@
 OSITESTS_CFLAGS = @OSITESTS_CFLAGS@
 OSITESTS_DATA = @OSITESTS_DATA@
 OSITESTS_LIBS = @OSITESTS_LIBS@
@@ -369,9 +353,6 @@ USE_CL_TRUE = @USE_CL_TRUE@
 USE_GMPL_FALSE = @USE_GMPL_FALSE@
 USE_GMPL_TRUE = @USE_GMPL_TRUE@
 VERSION = @VERSION@
-VOLDOCDIR = @VOLDOCDIR@
-VOLOBJDIR = @VOLOBJDIR@
-VOLSRCDIR = @VOLSRCDIR@
 VOL_CFLAGS = @VOL_CFLAGS@
 VOL_DATA = @VOL_DATA@
 VOL_LIBS = @VOL_LIBS@
@@ -456,8 +437,8 @@ EXTRA_DIST = $(am__append_2)
 ########################################################################
 #                  Installation of the addlibs file                    #
 ########################################################################
-addlibsdir = $(datadir)/coin/doc/SYMPHONY
-addlibs_DATA = sym_addlibs.txt
+@COIN_HAS_PKGCONFIG_TRUE@addlibsdir = $(datadir)/coin/doc/SYMPHONY
+@COIN_HAS_PKGCONFIG_TRUE@addlibs_DATA = sym_addlibs.txt
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = symphony.pc 
 
@@ -544,7 +525,7 @@ symphony.pc: $(top_builddir)/config.status $(srcdir)/symphony.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 symphony-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/symphony-uninstalled.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-sym_addlibs.txt: $(top_builddir)/config.status $(srcdir)/sym_addlibs.txt.in
+osi-sym-uninstalled.pc: $(top_builddir)/config.status $(top_srcdir)/src/OsiSym/osi-sym-uninstalled.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 $srcdir/Applications/CNRP/Makefile: $(top_builddir)/config.status Applications/CNRP/Makefile
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -1019,6 +1000,9 @@ install-exec-local: install-doc
 uninstall-local: uninstall-doc
 
 .PHONY: test unitTest ptest punitTest
+
+@COIN_HAS_PKGCONFIG_TRUE@sym_addlibs.txt : symphony.pc
+@COIN_HAS_PKGCONFIG_TRUE@	PKG_CONFIG_PATH=.:@COIN_PKG_CONFIG_PATH@ $(PKG_CONFIG) --libs symphony > sym_addlibs.txt
 
 install-doc: $(DocFiles)
 	test -z "$(DocInstallDir)" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)"

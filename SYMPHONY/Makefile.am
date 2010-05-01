@@ -78,8 +78,13 @@ uninstall-local: uninstall-doc
 #                  Installation of the addlibs file                    #
 ########################################################################
 
+if COIN_HAS_PKGCONFIG
 addlibsdir = $(datadir)/coin/doc/SYMPHONY
 addlibs_DATA = sym_addlibs.txt
+
+sym_addlibs.txt : symphony.pc
+	PKG_CONFIG_PATH=.:@COIN_PKG_CONFIG_PATH@ $(PKG_CONFIG) --libs symphony > sym_addlibs.txt
+endif
 
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = symphony.pc 
