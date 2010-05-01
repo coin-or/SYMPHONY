@@ -93,6 +93,8 @@ pkgconfiglib_DATA = symphony.pc
 #                         Maintainer Stuff                             #
 ########################################################################
 
+CLEANFILES = sym_addlibs.txt
+
 # Files that are generated and should be cleaned with make distclean
 DISTCLEANFILES =
 
