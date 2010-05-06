@@ -1117,6 +1117,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		  feasible[i] ? VBC_FEAS_SOL_FOUND :
 		  ((dive != DO_NOT_DIVE && *keep == i) ?
 		   VBC_ACTIVE_NODE : VBC_CAND_NODE));
+            fclose(f);
 	 }
       } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
 	 FILE *f;
