@@ -692,7 +692,11 @@ int sym_solve(sym_environment *env)
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
 
-   termcode = sym_presolve(env);   
+   if (!env->par.multi_criteria){
+       termcode = sym_presolve(env);
+   }else{
+       env->par.prep_par.level = 0;
+   }
 
    if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED ||
       termcode == PREP_SOLVED || termcode == PREP_NUMERIC_ERROR ||
@@ -831,7 +835,8 @@ int sym_solve(sym_environment *env)
     * TODO: find if granularity could be 0.1 or 0.2 or ... instead of just
     *       1.0, 2.0, ...
     */
-   if (env->mip && env->mip->obj && env->par.tm_par.granularity<=0.000001) {
+   if (env->mip && env->mip->obj && env->par.tm_par.granularity<=0.000001
+       && !env->par.multi_criteria) {
       for (int i=0;i<env->mip->n;i++) {
          double coeff = env->mip->obj[i];
          if (fabs(coeff)>0.000001) {

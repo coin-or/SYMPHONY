@@ -44,7 +44,7 @@ int main(int argc, char **argv)
    sym_parse_command_line(env, argc, argv);   
    sym_load_problem(env);
 
-   sym_set_obj2_coeff(env, 1, 1);
+   sym_set_obj2_coeff(env, 1, -1);
 
    sym_mc_solve(env);
 
