@@ -25,7 +25,7 @@ int main(int argc, char **argv)
   si.parseCommandLine(argc, argv);
   si.loadProblem();
 
-  si.setObj2Coeff(1, 1);
+  si.setObj2Coeff(1, -1);
 
   si.multiCriteriaBranchAndBound();
 

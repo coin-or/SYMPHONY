@@ -24,6 +24,7 @@
 #include "sym_lp_params.h"
 #include "sym_master.h"
 #include "sym_master_u.h"
+#include "SymConfig.h"
 #undef SHOULD_SHOW_MEMORY_USAGE
 
 /*===========================================================================*/
