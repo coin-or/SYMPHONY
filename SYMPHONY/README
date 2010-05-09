@@ -1,4 +1,4 @@
-SYMPHONY Version 5.2.0 README
+SYMPHONY Version 5.2.4 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Common Public License
@@ -18,6 +18,12 @@ http://www.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
+
+Release 5.2.4:
+
+1. Fixes to enable bicriteria solver to work again.
+
+2. Documentation updated
 
 Release 5.2.3:
 

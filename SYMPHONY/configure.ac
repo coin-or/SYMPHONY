@@ -22,7 +22,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([SYMPHONY],[5.2],[symphony@list.coin-or.org])
+AC_INIT([SYMPHONY],[5.2.4],[symphony@list.coin-or.org])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
