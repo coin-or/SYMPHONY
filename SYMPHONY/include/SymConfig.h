@@ -93,7 +93,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #ifndef SYMPHONY_VERSION
-#define SYMPHONY_VERSION "5.2.4"
+#define SYMPHONY_VERSION "5.2"
 #endif
 
 #endif /*__SYMPHONY_CONFIG_H__*/
