@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 
    sym_environment *env = sym_open_environment();
 
-   version();
+   sym_version();
 
    sym_parse_command_line(env, argc, argv);
 

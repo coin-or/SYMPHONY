@@ -50,7 +50,7 @@ int main(int argc, char **argv)
    sym_environment *env = sym_open_environment();
 
    /* Print version info */
-   version();
+   sym_version();
    
    /* Parse the command line arguments */
    sym_parse_command_line(env, argc, argv);

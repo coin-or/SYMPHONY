@@ -64,7 +64,7 @@ int main(int argc, char **argv)
    int termcode;
    sym_environment *env = sym_open_environment();
 
-   version();
+   sym_version();
 
    if (!env){
       printf("Error initializing environement\n");

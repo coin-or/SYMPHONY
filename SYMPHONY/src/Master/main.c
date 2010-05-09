@@ -150,7 +150,7 @@ int main(int argc, char **argv)
       sym_parse_command_line(env, argc, argv);
 
       if (env->par.verbosity >= 0){
-	 version();
+	 sym_version();
       }
       
       if (env->par.test){
@@ -189,7 +189,7 @@ int main(int argc, char **argv)
      double objval = 0.0, initial_time = 0.0, start_time = 0.0;
      double finish_time = 0.0, dbl_value = 0;
 
-     version();
+     sym_version();
      printf("Please type 'help'/'?' to see a list of commands\n\n");
 
      sym_set_int_param(env, "verbosity", -1);

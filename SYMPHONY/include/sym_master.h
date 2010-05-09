@@ -84,7 +84,6 @@ typedef struct SYM_ENVIRONMENT{
 /*===========================================================================*/
 
 void usage PROTO((void));
-void version PROTO((void));
 int parse_command_line PROTO((sym_environment *env, int argc, char **argv));
 void read_string PROTO((char *target, char *line, int maxlen));
 void print_statistics PROTO((node_times *tim, problem_stat *stat, 

@@ -48,7 +48,7 @@ int main(int argc, char **argv)
    sym_environment *env = sym_open_environment();
 
    /* Print version info */
-   version();
+   sym_version();
    
    /* Create the data structure for storing the problem instance.*/
    user_problem *prob = (user_problem *)calloc(1, sizeof(user_problem));

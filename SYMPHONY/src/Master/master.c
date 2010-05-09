@@ -23,6 +23,7 @@
 #endif
 
 #include "symphony.h"
+#include "SymConfig.h"
 #include "sym_proccomm.h"
 #include "sym_timemeas.h"
 #include "sym_messages.h"
@@ -59,6 +60,28 @@
 /*===========================================================================*/
 /*===========================================================================*/
 
+void sym_version(void)
+{
+   printf("\n");
+   printf("==  Welcome to the SYMPHONY MILP Solver \n");
+   printf("==  Copyright 2000-2010 Ted Ralphs and others \n");
+   printf("==  All Rights Reserved. \n");
+   printf("==  Distributed under the Common Public License 1.0 \n");
+   if (strcmp(SYMPHONY_VERSION, "trunk")){
+      printf("==  Version: %s \n", SYMPHONY_VERSION);
+   }else{
+      printf("==  Version: Trunk (unstable) \n");
+   }
+   printf("==  Build Date: %s \n", __DATE__);
+#ifdef SYMPHONY_SVN_REV
+   printf("==  Revision Number: %s \n", SYMPHONY_SVN_REV);
+#endif
+   printf("\n");
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 sym_environment *sym_open_environment()
 {
    sym_environment *env;
@@ -84,7 +107,7 @@ sym_environment *sym_open_environment()
 #endif
    
 #if 0
-   version();
+   sym_version();
 #endif
    
    if (initialize_u(env) == FUNCTION_TERMINATED_NORMALLY){
