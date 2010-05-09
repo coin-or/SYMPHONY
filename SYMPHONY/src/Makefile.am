@@ -745,7 +745,6 @@ rename_obj:
 # and that therefore should be installed in 'install/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
-	../include/config_sym.h \
 	../include/symphony.h
 #	$(SYMHEADERS)
 
@@ -757,9 +756,6 @@ includecoin_HEADERS = \
 ConfigHeader = SymConfig.h
 
 install-exec-local:
-	echo "#ifndef HAVE_CONFIG_H" >bla
-	echo "#define HAVE_CONFIG_H" >>bla
-	echo "#endif" >> bla
 	cat $(top_srcdir)/include/$(ConfigHeader) >> bla
 	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
 	rm -f bla
