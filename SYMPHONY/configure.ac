@@ -86,7 +86,7 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_HAS_MODULE(CoinDepend, [coinutils = split osi])
+AC_COIN_HAS_MODULE(CoinDepend, [coinutils = trunk osi])
 if test $coin_has_coindepend != yes ; then
   #if we have to use the fallback routines, then obviously it will not find CoinUtils dependencies
   #thus, we check whether ThirdParty/Blas, ThirdParty/Lapack, and ThirdParty/Glpk have been setup and
