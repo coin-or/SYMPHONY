@@ -212,7 +212,8 @@ test: unitTest$(EXEEXT)
 	if test x"$(DIRNETLIB)" != x; then \
 		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
 	fi;
-	./unitTest$(EXEEXT) $$NETLIBARG -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
+	./unitTest$(EXEEXT) $$NETLIBARG -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA) | sed -e 's/\\\\/\\\\\\\\/g'`
+	
 #-T $(DATAOBJDIR)/miplib3 \
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib
