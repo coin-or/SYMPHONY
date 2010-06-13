@@ -78,7 +78,7 @@ LTLIBRARIES = $(coinlib_LTLIBRARIES)
 libOsiSym_la_LIBADD =
 am_libOsiSym_la_OBJECTS = OsiSymSolverInterface.lo SymWarmStart.lo
 libOsiSym_la_OBJECTS = $(am_libOsiSym_la_OBJECTS)
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

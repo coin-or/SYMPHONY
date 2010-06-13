@@ -21162,7 +21162,7 @@ if test -n "$PKG_CONFIG" ; then
      coin_has_coindepend=yes
         echo "$as_me:$LINENO: result: yes: $COINDEPEND_VERSIONS" >&5
 echo "${ECHO_T}yes: $COINDEPEND_VERSIONS" >&6
-        REQUIREDPACKAGES="$REQUIREDPACKAGES coinutils = trunk osi"
+        REQUIREDPACKAGES="coinutils = trunk osi $REQUIREDPACKAGES"
 
 
   else
@@ -21465,7 +21465,7 @@ if test $coin_has_coinutils != "skipping" ; then
     COINUTILS_DATA=`sed -n -e 's/datadir=//gp' ../CoinUtils/coinutils-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $COINUTILS_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES coinutils"
+       REQUIREDPACKAGES="coinutils $REQUIREDPACKAGES"
 
 
 
@@ -21529,7 +21529,7 @@ if test $coin_has_osi != "skipping" ; then
     OSI_DATA=`sed -n -e 's/datadir=//gp' ../Osi/osi-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $OSI_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES osi"
+       REQUIREDPACKAGES="osi $REQUIREDPACKAGES"
 
 
 
@@ -21658,7 +21658,7 @@ if test -n "$PKG_CONFIG" ; then
      coin_has_cgl=yes
         echo "$as_me:$LINENO: result: yes: $CGL_VERSIONS" >&5
 echo "${ECHO_T}yes: $CGL_VERSIONS" >&6
-        REQUIREDPACKAGES="$REQUIREDPACKAGES cgl"
+        REQUIREDPACKAGES="cgl $REQUIREDPACKAGES"
 
 
   else
@@ -21723,7 +21723,7 @@ if test $coin_has_cgl != "skipping" ; then
     CGL_DATA=`sed -n -e 's/datadir=//gp' ../Cgl/cgl-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $CGL_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES cgl"
+       REQUIREDPACKAGES="cgl $REQUIREDPACKAGES"
 
 
 
@@ -21888,7 +21888,7 @@ if test -n "$PKG_CONFIG" ; then
      coin_has_clp=yes
         echo "$as_me:$LINENO: result: yes: $CLP_VERSIONS" >&5
 echo "${ECHO_T}yes: $CLP_VERSIONS" >&6
-        REQUIREDPACKAGES="$REQUIREDPACKAGES osi-clp"
+        REQUIREDPACKAGES="osi-clp $REQUIREDPACKAGES"
 
 
   else
@@ -22004,7 +22004,7 @@ if test $coin_has_clp != "skipping" ; then
     CLP_DATA=`sed -n -e 's/datadir=//gp' ../Clp/clp-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $CLP_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES clp"
+       REQUIREDPACKAGES="clp $REQUIREDPACKAGES"
 
 
 
@@ -22085,7 +22085,7 @@ if test $coin_has_osiclp != "skipping" ; then
     OSICLP_DATA=`sed -n -e 's/datadir=//gp' ../Clp/osi-clp-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $OSICLP_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES osi-clp"
+       REQUIREDPACKAGES="osi-clp $REQUIREDPACKAGES"
 
 
 
@@ -22193,7 +22193,7 @@ if test -n "$PKG_CONFIG" ; then
      coin_has_dylp=yes
         echo "$as_me:$LINENO: result: yes: $DYLP_VERSIONS" >&5
 echo "${ECHO_T}yes: $DYLP_VERSIONS" >&6
-        REQUIREDPACKAGES="$REQUIREDPACKAGES osi-dylp"
+        REQUIREDPACKAGES="osi-dylp $REQUIREDPACKAGES"
 
 
   else
@@ -22309,7 +22309,7 @@ if test $coin_has_dylp != "skipping" ; then
     DYLP_DATA=`sed -n -e 's/datadir=//gp' ../DyLP/dylp-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $DYLP_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES dylp"
+       REQUIREDPACKAGES="dylp $REQUIREDPACKAGES"
 
 
 
@@ -22390,7 +22390,7 @@ if test $coin_has_osidylp != "skipping" ; then
     OSIDYLP_DATA=`sed -n -e 's/datadir=//gp' ../DyLP/osi-dylp-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $OSIDYLP_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES osi-dylp"
+       REQUIREDPACKAGES="osi-dylp $REQUIREDPACKAGES"
 
 
 
@@ -22498,7 +22498,7 @@ if test -n "$PKG_CONFIG" ; then
      coin_has_vol=yes
         echo "$as_me:$LINENO: result: yes: $VOL_VERSIONS" >&5
 echo "${ECHO_T}yes: $VOL_VERSIONS" >&6
-        REQUIREDPACKAGES="$REQUIREDPACKAGES osi-vol"
+        REQUIREDPACKAGES="osi-vol $REQUIREDPACKAGES"
 
 
   else
@@ -22614,7 +22614,7 @@ if test $coin_has_vol != "skipping" ; then
     VOL_DATA=`sed -n -e 's/datadir=//gp' ../Vol/vol-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $VOL_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES vol"
+       REQUIREDPACKAGES="vol $REQUIREDPACKAGES"
 
 
 
@@ -22695,7 +22695,7 @@ if test $coin_has_osivol != "skipping" ; then
     OSIVOL_DATA=`sed -n -e 's/datadir=//gp' ../Vol/osi-vol-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $OSIVOL_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES osi-vol"
+       REQUIREDPACKAGES="osi-vol $REQUIREDPACKAGES"
 
 
 
@@ -23717,7 +23717,7 @@ if test -n "$PKG_CONFIG" ; then
      coin_has_cpx=yes
         echo "$as_me:$LINENO: result: yes: $CPX_VERSIONS" >&5
 echo "${ECHO_T}yes: $CPX_VERSIONS" >&6
-        REQUIREDPACKAGES="$REQUIREDPACKAGES osi-cplex"
+        REQUIREDPACKAGES="osi-cplex $REQUIREDPACKAGES"
 
 
   else
@@ -23782,7 +23782,7 @@ if test $coin_has_cpx != "skipping" ; then
     CPX_DATA=`sed -n -e 's/datadir=//gp' ../Osi/osi-cplex-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $CPX_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES osi-cplex"
+       REQUIREDPACKAGES="osi-cplex $REQUIREDPACKAGES"
 
 
 
@@ -23946,7 +23946,7 @@ if test -n "$PKG_CONFIG" ; then
      coin_has_glpk=yes
         echo "$as_me:$LINENO: result: yes: $GLPK_VERSIONS" >&5
 echo "${ECHO_T}yes: $GLPK_VERSIONS" >&6
-        REQUIREDPACKAGES="$REQUIREDPACKAGES osi-glpk"
+        REQUIREDPACKAGES="osi-glpk $REQUIREDPACKAGES"
 
 
   else
@@ -24011,7 +24011,7 @@ if test $coin_has_glpk != "skipping" ; then
     GLPK_DATA=`sed -n -e 's/datadir=//gp' ../Osi/osi-glpk-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $GLPK_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES osi-glpk"
+       REQUIREDPACKAGES="osi-glpk $REQUIREDPACKAGES"
 
 
 
@@ -24176,7 +24176,7 @@ if test -n "$PKG_CONFIG" ; then
      coin_has_msk=yes
         echo "$as_me:$LINENO: result: yes: $MSK_VERSIONS" >&5
 echo "${ECHO_T}yes: $MSK_VERSIONS" >&6
-        REQUIREDPACKAGES="$REQUIREDPACKAGES osi-mosek"
+        REQUIREDPACKAGES="osi-mosek $REQUIREDPACKAGES"
 
 
   else
@@ -24241,7 +24241,7 @@ if test $coin_has_msk != "skipping" ; then
     MSK_DATA=`sed -n -e 's/datadir=//gp' ../Osi/osi-mosek-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $MSK_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES osi-mosek"
+       REQUIREDPACKAGES="osi-mosek $REQUIREDPACKAGES"
 
 
 
@@ -24406,7 +24406,7 @@ if test -n "$PKG_CONFIG" ; then
      coin_has_xpr=yes
         echo "$as_me:$LINENO: result: yes: $XPR_VERSIONS" >&5
 echo "${ECHO_T}yes: $XPR_VERSIONS" >&6
-        REQUIREDPACKAGES="$REQUIREDPACKAGES osi-xpress"
+        REQUIREDPACKAGES="osi-xpress $REQUIREDPACKAGES"
 
 
   else
@@ -24471,7 +24471,7 @@ if test $coin_has_xpr != "skipping" ; then
     XPR_DATA=`sed -n -e 's/datadir=//gp' ../Osi/osi-xpress-uninstalled.pc`
 
     ADDLIBS="$ADDLIBS $XPR_LIBS"
-       REQUIREDPACKAGES="$REQUIREDPACKAGES osi-xpress"
+       REQUIREDPACKAGES="osi-xpress $REQUIREDPACKAGES"
 
 
 

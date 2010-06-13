@@ -160,7 +160,7 @@ am_unitTest_OBJECTS = unitTest-OsiSolverInterfaceTest.$(OBJEXT) \
 	unitTest-unitTestSym.$(OBJEXT)
 unitTest_OBJECTS = $(am_unitTest_OBJECTS)
 unitTest_DEPENDENCIES = $(am__DEPENDENCIES_8) $(am__DEPENDENCIES_12)
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

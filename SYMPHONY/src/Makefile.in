@@ -2362,7 +2362,7 @@ am_symphony_tm_lp_cg_cp_OBJECTS =
 symphony_tm_lp_cg_cp_OBJECTS = $(am_symphony_tm_lp_cg_cp_OBJECTS)
 symphony_tm_lp_cg_cp_DEPENDENCIES = libSym_tm$(TMEXT).la \
 	$(am__DEPENDENCIES_10)
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
