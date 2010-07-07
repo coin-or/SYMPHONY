@@ -22,6 +22,9 @@ EXE = $(MASTERNAME)@EXEEXT@
 
 SYMAPPLNAME = MCKP
 
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
+
 # CHANGEME: Additional sources
 ADDSOURCES =
 
@@ -31,28 +34,17 @@ ADDLIBS =
 # CHANGEME: Additional flags for compilation (e.g., include flags)
 ADDINCFLAGS = 
 
-
 # Directory with COIN header files
 COININCDIR = @abs_include_dir@/coin
 
 # Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@
-
-# Directoy with SYMPHONY header files 
-SYMINCDIR = @SYMINCDIR@
-
-# Directoy with SYMPHONY library
-SYMLIBDIR = @SYMSRCDIR@
+COINLIBDIR = @abs_lib_dir@/coin
 
 # Directory with Application files
 SYMAPPLDIR = @SYMSRCDIR@/../Applications/$(SYMAPPLNAME)
 
-#Directory for LP solver
-GLPKINCDIR = @GLPKINCDIR@
-CPXINCDIR = @CPXINCDIR@
-OSLINCDIR = @OSLINCDIR@
-SPXINCDIR = @SPXINCDIR@
-XPRINCDIR = @XPRINCDIR@
+# Directory for application obj files
+SYMAPPLOBJDIR = src
 
 ##########################################################################
 #  Usually, you don't have to change anything below.  Note that if you   #
@@ -86,7 +78,7 @@ USER_CG_OBJS =
 USER_CP_OBJS =
 USER_TM_OBJS =
 
-ALL_OBJS = $(USER_MASTER_OBJS)
+ALL_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(USER_MASTER_OBJS))
 
 PUSER_MASTER_OBJS = $(addsuffix o, $(USER_MASTER_OBJS))
 PUSER_LP_OBJS = $(addsuffix o, $(USER_LP_OBJS))
@@ -107,64 +99,50 @@ CXXFLAGS = @CXXFLAGS@
 CXXLINKFLAGS = @RPATH_FLAGS@
 
 #Include files
-INCL =  -I$(SYMAPPLDIR)/include -I`$(CYGPATH_W) $(COININCDIR)` \
-	-I`$(CYGPATH_W) $(SYMINCDIR)`
+INCL =  -I`$(CYGPATH_W) $(SYMAPPLDIR)/include` \
+        -I`$(CYGPATH_W) @SYMINCDIR@` \
+        -I`$(CYGPATH_W) $(COININCDIR)` \
 
 # Libraries necessary to link
-LIBS = -L$(COINLIBDIR) #-L$(SYMLIBDIR)
+LIBS = -L`$(CYGPATH_W) $(COINLIBDIR)` \
+       -L`$(CYGPATH_W) $(COINLIBDIR)/ThirdParty` \
+       @COINDEPEND_LIBS@
 
 ifeq ($(USE_CGL_CUTS),TRUE)
-LIBS += -lCgl `cat @CGLDOCDIR@/cgl_addlibs.txt`
+LIBS += @CGL_LIBS@
 ADDINCFLAGS += -DUSE_CGL_CUTS
 endif
 
 ifeq ($(CLP_LP_SOLVER),TRUE)
-LIBS += -lOsiClp -lClp `cat @CLPDOCDIR@/clp_addlibs.txt`
+LIBS += @CLP_LIBS@
 ADDINCFLAGS += -D__OSI_CLP__
 endif
 
 ifeq ($(GLPK_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
-LIBS += -lOsiGlpk #-lglpk
+LIBS += @GLPK_LIBS@
 ADDINCFLAGS += -D__OSI_GLPK__
 else
 ifeq ($(USE_GMPL), TRUE)
-INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
 ADDINCFLAGS += -DUSE_GLPMPL
 endif
 endif
 
 ifeq ($(CPLEX_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
-LIBS += -lOsiCpx #-lcplex
+LIBS += @CPX_LIBS@
 ADDINCFLAGS += -D__OSI_CPLEX__
 endif
 
-ifeq ($(OSL_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(OSLINCDIR)`
-LIBS += -lOsiOsl #-losl
-ADDINCFLAGS += -D__OSI_OSL__
-endif
-
 ifeq ($(SOPLEX_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(SPXINCDIR)`
-LIBS += -lOsiSpx #-l
+LIBS += @SOPLEX_LIBS@
 ADDINCFLAGS += -D__OSI_SOPLEX__
 endif
 
 ifeq ($(XPRESS_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(XPRINCDIR)`
-LIBS += -lOsiXpr #-l
+LIBS += @XPR_LIBS@
 ADDINCFLAGS += -D__OSI_XPRESS__
 endif
 
 ADDLIBS += @ADDLIBS@
-
-LIBS += -lOsi -lCoinUtils `cat @OSIDOCDIR@/osi_addlibs.txt` \
-	`cat @COINUTILSDOCDIR@/coinutils_addlibs.txt` $(ADDLIBS)
-
-# The following is necessary under cygwin, if native compilers are used
-CYGPATH_W = @CYGPATH_W@
 
 WHATTOMAKE = $(EXE)
 
@@ -197,17 +175,22 @@ PSYMLIBS = -L$(PVM_ROOT)/lib/@ARCH@ -lgpvm3 -lpvm3 $(LIBS)
 
 all: $(APPL_PARALLEL) $(WHATTOMAKE)
 
-.c.o:
+$(SYMAPPLOBJDIR)/%.o : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
 
-.c.obj:
+$(SYMAPPLOBJDIR)/%.obj : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
 
-.c.oo:
+$(SYMAPPLOBJDIR)/%.oo : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
 	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
 
-.c.objo:
-	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
+$(SYMAPPLOBJDIR)/%.objo : %.c
+	mkdir -p $(SYMAPPLOBJDIR)
+	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
+
 
 $(EXE): $(ALL_OBJS)
 	bla=;\

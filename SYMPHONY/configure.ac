@@ -70,6 +70,7 @@ AC_COIN_DEBUG_COMPILE(SYMPHONY)
 AC_COIN_PROG_CXX
 #AC_LIBTOOL_LANG_CXX_CONFIG
 AC_LANG_PUSH(C++)
+
 # Initialize automake and libtool
 AC_COIN_INIT_AUTO_TOOLS
 
@@ -84,22 +85,84 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 #############################################################################
 #                              COIN components                              #
 #############################################################################
-AC_COIN_HAS_PROJECT(SYMPHONY)
-AC_COIN_HAS_PROJECT(CoinUtils)
-AC_COIN_HAS_PROJECT(Data)
-AC_COIN_HAS_PROJECT(Clp)
-AC_COIN_HAS_PROJECT(Osi)
-AC_COIN_HAS_PROJECT(Cgl)
+
+AC_COIN_HAS_MODULE(CoinDepend, [coinutils = trunk osi])
+if test $coin_has_coindepend != yes ; then
+  #if we have to use the fallback routines, then obviously it will not find CoinUtils dependencies
+  #thus, we check whether ThirdParty/Blas, ThirdParty/Lapack, and ThirdParty/Glpk have been setup and
+  #assume that if present then they are dependencies of CoinUtils
+  AC_COIN_HAS_MODULE_FALLBACK(Blas,      [coinblas],   [../ThirdParty/Blas],   [required=0 dodefine=0 doconditional=0])
+  AC_COIN_HAS_MODULE_FALLBACK(Lapack,    [coinlapack], [../ThirdParty/Lapack], [required=0 dodefine=0 doconditional=0])
+  AC_COIN_HAS_MODULE_FALLBACK(Glpk,      [coinglpk],   [../ThirdParty/Glpk],   [required=0 dodefine=0 doconditional=0])
+  AC_COIN_HAS_MODULE_FALLBACK(CoinUtils, [coinutils],  [../CoinUtils],         [dodefine=0 doconditional=0])
+  AC_COIN_HAS_MODULE_FALLBACK(Osi,       [osi],        [../Osi],               [dodefine=0 doconditional=0])
+  COINDEPEND_LIBS="$COINUTILS_LIBS $BLAS_LIBS $LAPACK_LIBS $GLPK_LIBS $OSI_LIBS"
+  COINDEPEND_CFLAGS="$COINUTILS_CFLAGS $GLPK_CFLAGS $OSI_CFLAGS"
+  if test "${coin_has_coinutils}${coin_has_osi}" = yesyes ; then
+    coin_has_coindepend=yes
+    AC_DEFINE(m4_toupper(COIN_HAS_COINDEPEND),[1],[Define to 1 if the COINDEPEND module is available])
+    AM_CONDITIONAL(COIN_HAS_COINDEPEND, [test $coin_has_coindepend = yes])
+  fi
+fi
+#Stefan: are they required?
+#if test $coin_has_coindepend != yes ; then
+#  AC_MSG_ERROR([Required package CoinUtils or Osi not available.])
+#fi
+
+AC_COIN_HAS_MODULE(Cgl, [cgl], [], [../Cgl])
+
+AC_COIN_HAS_MODULE(Clp, [osi-clp])
+if test $coin_has_clp != yes ; then
+  # OsiClp depends on Clp
+  # so if Clp is there, then we assume that also OsiClp will be there and add the corresponding flags to the Clp flags
+  AC_COIN_HAS_MODULE_FALLBACK(Clp, [clp], [../Clp])
+  if test $coin_has_clp = yes ; then
+    AC_COIN_HAS_MODULE_FALLBACK(OsiClp, [osi-clp], [../Clp], [dodefine=0 doconditional=0])
+    CLP_CFLAGS="$CLP_CFLAGS $OSICLP_CFLAGS"
+    CLP_LIBS="$CLP_LIBS $OSICLP_LIBS"
+  fi
+fi
+
+AC_COIN_HAS_MODULE(DyLP, [osi-dylp])
+if test $coin_has_dylp != yes ; then
+  # OsiDyLP depends on DyLP
+  # so if DyLP is there, then we assume that also OsiDyLP will be there and add the corresponding flags to the DyLP flags
+  AC_COIN_HAS_MODULE_FALLBACK(DyLP, [dylp], [../DyLP])
+  if test $coin_has_dylp = yes ; then
+    AC_COIN_HAS_MODULE_FALLBACK(OsiDyLP, [osi-dylp], [../DyLP], [dodefine=0 doconditional=0])
+    DYLP_CFLAGS="$DYLP_CFLAGS $OSIDYLP_CFLAGS"
+    DYLP_LIBS="$DYLP_LIBS $OSIDYLP_LIBS"
+  fi
+fi
+
+AC_COIN_HAS_MODULE(Vol, [osi-vol])
+if test $coin_has_vol != yes ; then
+  # OsiVol depends on Vol
+  # so if Vol is there, then we assume that also OsiVol will be there and add the corresponding flags to the Vol flags
+  AC_COIN_HAS_MODULE_FALLBACK(Vol, [vol], [../Vol])
+  if test $coin_has_vol = yes ; then
+    AC_COIN_HAS_MODULE_FALLBACK(OsiVol, [osi-vol], [../Vol], [dodefine=0 doconditional=0])
+    VOL_CFLAGS="$VOL_CFLAGS $OSIVOL_CFLAGS"
+    VOL_LIBS="$VOL_LIBS $OSIVOL_LIBS"
+  fi
+fi
+
+AC_COIN_HAS_MODULE(OsiTests, [osi-unittests],   [required=0], [../Osi])
+AC_COIN_HAS_MODULE(Sample,   [coindatasample],  [required=0], [../Data/Sample])
+AC_COIN_HAS_MODULE(Netlib,   [coindatanetlib],  [required=0], [../Data/Netlib])
+AC_COIN_HAS_MODULE(Miplib3,  [coindatamiplib3], [required=0], [../Data/Miplib3])
+
 #############################################################################
 #                            Third party solvers                            #
 #############################################################################
 
-# Check which third party solvers are available ToDo!
-AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
-AC_COIN_HAS_GLPK(Glpk)
-AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
-AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
-AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSinit])
+# Check which third party solvers are available
+AC_COIN_HAS_MODULE(Cpx,  [osi-cplex],  [], [../Osi])
+AC_COIN_HAS_MODULE(Glpk, [osi-glpk],   [], [../Osi])   # Stefan: rename this module to OsiGlpk ?
+#AC_COIN_HAS_MODULE(Grb,  [osi-gurobi], [], [../Osi])
+AC_COIN_HAS_MODULE(Msk,  [osi-mosek],  [], [../Osi])
+#AC_COIN_HAS_MODULE(Spx,  [osi-soplex], [], [../Osi])
+AC_COIN_HAS_MODULE(Xpr,  [osi-xpress], [], [../Osi])
 
 #############################################################################
 #                      Check for the LP solver                              #
@@ -119,9 +182,7 @@ found_package=true
 case $sym_lp_solver in 
    clp)
     AC_MSG_RESULT(Clp) 
-#    AC_COIN_HAS_PROJECT(Clp)
-     if [test $coin_has_clp = unavailable ||
-                test $coin_has_clp = skipping]; then
+     if [test $coin_has_clp = unavailable || test $coin_has_clp = skipping]; then
          found_package=false
       fi
    ;;
@@ -166,7 +227,7 @@ fi
 
 AM_CONDITIONAL(CLP_LP_SOLVER,[test $sym_lp_solver = clp &&
 test $coin_has_clp != unavailable &&
-                test $coin_has_clp != skipping])
+test $coin_has_clp != skipping])
 AM_CONDITIONAL(GLPK_LP_SOLVER,[test $sym_lp_solver = glpk &&
 test $coin_has_glpk = true])
 AM_CONDITIONAL(OSL_LP_SOLVER,[test $sym_lp_solver = osl &&
@@ -860,6 +921,7 @@ AM_CONDITIONAL(USE_CL, [test $sym_use_cl = true])
 # configuration header file)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+		 src/OsiSym/Makefile
                  test/Makefile
 		 Examples/Makefile
                  Applications/CNRP/Makefile
@@ -870,7 +932,10 @@ AC_CONFIG_FILES([Makefile
 		 Applications/SPP+CUTS/Makefile
 		 Applications/USER/Makefile
 		 Applications/VRP/Makefile
-                 sym_addlibs.txt])
+		 symphony.pc
+		 symphony-uninstalled.pc
+		 src/OsiSym/osi-sym.pc
+		 osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in])
 
 if test `cd $srcdir; pwd` != `pwd`; then 
 AC_CONFIG_FILES([

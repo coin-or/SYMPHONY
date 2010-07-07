@@ -61,34 +61,33 @@ AC_COIN_CREATE_LIBTOOL
 
 
 #############################################################################
-#                  Third party packages from COIN repos.                    #
-#############################################################################
-
-AC_COIN_THIRDPARTY_SUBDIRS([Glpk],[ThirdParty/Glpk],[glpk/src/glplpx01.c])
-AC_COIN_THIRDPARTY_SUBDIRS([Blas],[ThirdParty/Blas],[daxpy.f])
-AC_COIN_THIRDPARTY_SUBDIRS([Lapack],[ThirdParty/Lapack],[LAPACK/SRC/dlarf.f])
-
-#############################################################################
 #                  Check which subprojects are there                        #
 #############################################################################
 
-AC_COIN_MAIN_SUBDIRS(CoinUtils)
-AC_COIN_MAIN_SUBDIRS(Data/Sample)
-AC_COIN_MAIN_SUBDIRS(Data/Netlib)
-AC_COIN_MAIN_SUBDIRS(Osi)
-AC_COIN_MAIN_SUBDIRS(Cgl)
-AC_COIN_MAIN_SUBDIRS(Clp)
+AC_COIN_MAIN_PACKAGEDIR(Blas,ThirdParty,daxpy.f,coinblas)
+AC_COIN_MAIN_PACKAGEDIR(Lapack,ThirdParty,[LAPACK/SRC/dlarf.f],coinlapack)
+AC_COIN_MAIN_PACKAGEDIR(Glpk, ThirdParty,[glpk/src/glplpx01.c],coinglpk)
+AC_COIN_MAIN_PACKAGEDIR(Sample,Data,,coindatasample)
+AC_COIN_MAIN_PACKAGEDIR(miblib3,Data,,coindatamiplib3)
+AC_COIN_MAIN_PACKAGEDIR(CoinUtils)
+AC_COIN_MAIN_PACKAGEDIR(Osi)
+AC_COIN_MAIN_PACKAGEDIR(Clp)
+AC_COIN_MAIN_PACKAGEDIR(Cgl)
+AC_COIN_MAIN_PACKAGEDIR(DyLP)
+AC_COIN_MAIN_PACKAGEDIR(Vol)
+AC_COIN_MAIN_PACKAGEDIR(Cbc)
+AC_COIN_MAIN_PACKAGEDIR(SYMPHONY)
 
 #############################################################################
 #                            Third party solvers                            #
 #############################################################################
 
 # Check which third party solvers are available ToDo!
-AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
-AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h],[glp_lpx_simplex])
-AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
-AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
-AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
+#AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
+#AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h],[glp_lpx_simplex])
+#AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
+#AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
+#AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
 
 #############################################################################
 #                      Check for the LP solver                              #
@@ -117,13 +116,6 @@ done
 
 
 AM_CONDITIONAL(ADD_GLPK, [test $use_tp_glpk = true])
-
-
-#############################################################################
-#                            Check SYMPHONY                                 #
-#############################################################################
-
-AC_COIN_MAIN_SUBDIRS(SYMPHONY)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #

@@ -24,89 +24,88 @@ AUTOMAKE_OPTIONS = foreign
 
 test_srcdir = $(OSISRCDIR)/test
 
-AM_CPPFLAGS =
+AM_CPPFLAGS = $(OSITESTS_CFLAGS)
 SYMCPPFLAGS =
 SYMPCPPFLAGS =
 APPLCPPFLAGS =
 SYMPALLLDADD =
-LDADD =
+LDADD = $(OSITESTS_LIBS)
 ALLLDADD =
 
 LIBS =
 SYMLIB = 
 SYMPLIB = 
 
-ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
-	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
+#ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
+#	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 
 if USE_CGL_CUTS
-LDADD += $(CGLOBJDIR)/src/libCgl.la
-ADDLIBS += \
-	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+#LDADD += $(CGLOBJDIR)/src/libCgl.la
+#ADDLIBS += \
+#	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
+LDADD += $(CGL_LIBS)
 endif
 
 # Add include files
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSym` \
-	-I`$(CYGPATH_W) $(SYMPHONYOBJDIR)/include`
+	       -I`$(CYGPATH_W) $(SYMSRCDIR)/OsiSym`
 
 AM_CPPFLAGS += -DCOIN_HAS_SYMPHONY
 
 # List all additionally required solver and Osi libraries
 
 if CLP_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
-  LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(CLPOBJDIR)/src/libClp.la
-  ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
-  AM_CPPFLAGS += -D__OSI_CLP__
+#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
+#	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
+#  LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+#	$(CLPOBJDIR)/src/libClp.la
+#  ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
+  AM_CPPFLAGS += $(CLP_CFLAGS) -D__OSI_CLP__
+  LDADD += $(CLP_LIBS)
 endif
 
 if CPLEX_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-  AM_CPPFLAGS += -D__OSI_CPLEX__
+#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
+#  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+  AM_CPPFLAGS += $(CPX_CFLAGS) -D__OSI_CPLEX__
+  LDADD += $(CPX_LIBS)
 endif
 
 if GLPK_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
-  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
-  AM_CPPFLAGS += -D__OSI_GLPK__
+#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
+#  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
+  AM_CPPFLAGS += $(GLPK_LIBS) -D__OSI_GLPK__
+  LDADD += $(GLPK_LIBS)
 else 
 if USE_GMPL
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
+  AM_CPPFLAGS += $(GLPK_CFLAGS)
 endif
-endif
-
-if OSL_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(OSLINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiOsl`
-  LDADD += $(OSIOBJDIR)/src/OsiOsl/libOsiOsl.la
-  AM_CPPFLAGS += -D__OSI_OSL__
 endif
 
 if SOPLEX_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
-  LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
-AM_CPPFLAGS += -D__OSI_SPX__
+#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)` \
+#       -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
+#  LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
+  AM_CPPFLAGS += $(SPX_CFLAGS) -D__OSI_SOPLEX__
+  LDADD += $(SPX_LIBS)
 endif
 
 if XPRESS_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
-  LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
-  AM_CPPFLAGS += -D__OSI_XPRESS__
+#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)` \
+#       -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
+#  LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
+  AM_CPPFLAGS += $(XPR_CFLAGS) -D__OSI_XPRESS__
+  LDADD += $(XPR_LIBS)
 endif
 
-LDADD += $(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la
+#LDADD += $(OSIOBJDIR)/src/libOsi.la \
+#	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 
-LDADD += $(OSIOBJDIR)/src/OsiSym/libOsiSym.la
+#LDADD += $(OSIOBJDIR)/src/OsiSym/libOsiSym.la
 
 ########################################################################
 #                            Additional flags                          #
@@ -116,26 +115,26 @@ LDADD += $(OSIOBJDIR)/src/OsiSym/libOsiSym.la
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
 # "top_srcdir" refers to the basic directory for the main package that is
 # being compiled.
-AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglSimpleRounding` \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
-	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc`
+#AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglSimpleRounding` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
+#	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
+#	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc`
 
 ########################################################################
 #                            Additional Definitions                    #
@@ -143,7 +142,7 @@ AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
 
 ALLLDADD += $(LDADD) $(ADDLIBS)
 SYMCPPFLAGS += $(AM_CPPFLAGS) $(SYMDEFS)
-SYMLIB += $(SYMPHONYOBJDIR)/src/libSym.la
+SYMLIB += ../src/libSym.la ../src/OsiSym/libOsiSym.la
 
 SYMPCPPFLAGS += $(AM_CPPFLAGS) $(SYMPDEFS)
 SYMPALLLDADD += $(ALLLDADD)
@@ -152,7 +151,7 @@ if SYM_PARALLEL
 SYMPCPPFLAGS += -I`$(CYGPATH_W) $(PVM_ROOT)/include`
 SYMPALLLDADD += -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
 	-lgpvm3 -lpvm3
-SYMPLIB += $(SYMPHONYOBJDIR)/src/libSym$(MASTEREXT).la
+SYMPLIB += ../src/libSym$(MASTEREXT).la ../src/OsiSym/libOsiSym.la
 else
 SYMPLIB += $(SYMLIB)
 endif
@@ -183,30 +182,22 @@ endif
 noinst_PROGRAMS = unitTest punitTest
 
 unitTest_SOURCES = \
-	$(test_srcdir)/OsiColCutTest.cpp \
-	$(test_srcdir)/OsiCutsTest.cpp \
-	$(test_srcdir)/OsiRowCutDebuggerTest.cpp \
-	$(test_srcdir)/OsiRowCutTest.cpp \
 	OsiSolverInterfaceTest.cpp \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
 punitTest_SOURCES = \
-	$(test_srcdir)/OsiColCutTest.cpp \
-	$(test_srcdir)/OsiCutsTest.cpp \
-	$(test_srcdir)/OsiRowCutDebuggerTest.cpp \
-	$(test_srcdir)/OsiRowCutTest.cpp \
 	OsiSolverInterfaceTest.cpp \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
-unitTest_DEPENDENCIES = $(TestLDADD) $(SYMLIB)
+#unitTest_DEPENDENCIES = $(TestLDADD) $(SYMLIB)
 unitTest_CPPFLAGS = $(SYMCPPFLAGS)
 unitTest_LDADD = $(SYMLIB) $(ALLLDADD)
 unitTest_LDFLAGS = -rpath $(libdir)
 unitTest_LINK = $(TestLINK)
 
-punitTest_DEPENDENCIES = $(LDADD) $(SYMPLIB)
+#punitTest_DEPENDENCIES = $(LDADD) $(SYMPLIB)
 punitTest_CPPFLAGS = $(SYMPCPPFLAGS)
 punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD)
 punitTest_LDFLAGS = -rpath $(libdir)
@@ -221,7 +212,8 @@ test: unitTest$(EXEEXT)
 	if test x"$(DIRNETLIB)" != x; then \
 		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
 	fi;
-	./unitTest$(EXEEXT) $$NETLIBARG
+	./unitTest$(EXEEXT) $$NETLIBARG -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA) | sed -e 's/\\\\/\\\\\\\\/g'`
+	
 #-T $(DATAOBJDIR)/miplib3 \
 #	-mpsDir=$(DATASRCDIR)/Sample \
 #	-netlibDir=$(DATAOBJDIR)/Netlib

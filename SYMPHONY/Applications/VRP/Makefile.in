@@ -22,6 +22,9 @@ EXE = $(MASTERNAME)@EXEEXT@
 
 SYMAPPLNAME = VRP
 
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
+
 # CHANGEME: Additional sources
 # - Names of your additional source files without any extensions
 ADDSOURCES =
@@ -36,26 +39,13 @@ ADDINCFLAGS =
 COININCDIR = @abs_include_dir@/coin
 
 # Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@
-
-# Directoy with SYMPHONY header files 
-SYMLIBDIR = @SYMSRCDIR@
-
-# Directoy with SYMPHONY library
-SYMINCDIR = @SYMINCDIR@
+COINLIBDIR = @abs_lib_dir@/coin
 
 # Directory with Application files
 SYMAPPLDIR = @SYMSRCDIR@/../Applications/$(SYMAPPLNAME)
 
 # Directory for application obj files
-SYMAPPLOBJDIR =./src
-
-#Directory for LP solver
-GLPKINCDIR = @GLPKINCDIR@
-CPXINCDIR = @CPXINCDIR@
-OSLINCDIR = @OSLINCDIR@
-SPXINCDIR = @SPXINCDIR@
-XPRINCDIR = @XPRINCDIR@
+SYMAPPLOBJDIR = src
 
 # CHANGEME: Additional options
 
@@ -229,64 +219,50 @@ CXXFLAGS = @CXXFLAGS@
 CXXLINKFLAGS = @RPATH_FLAGS@
 
 #Include files
-INCL =  -I$(SYMAPPLDIR)/include -I`$(CYGPATH_W) $(COININCDIR)` \
-	-I`$(CYGPATH_W) $(SYMINCDIR)`
+INCL =  -I`$(CYGPATH_W) $(SYMAPPLDIR)/include` \
+        -I`$(CYGPATH_W) @SYMINCDIR@` \
+        -I`$(CYGPATH_W) $(COININCDIR)` \
 
 # Libraries necessary to link
-LIBS = -L$(COINLIBDIR) -L$(SYMLIBDIR)
+LIBS = -L`$(CYGPATH_W) $(COINLIBDIR)` \
+       -L`$(CYGPATH_W) $(COINLIBDIR)/ThirdParty` \
+       @COINDEPEND_LIBS@
 
 ifeq ($(USE_CGL_CUTS),TRUE)
-LIBS += -lCgl `cat @CGLDOCDIR@/cgl_addlibs.txt`
+LIBS += @CGL_LIBS@
 ADDINCFLAGS += -DUSE_CGL_CUTS
 endif
 
 ifeq ($(CLP_LP_SOLVER),TRUE)
-LIBS += -lOsiClp -lClp `cat @CLPDOCDIR@/clp_addlibs.txt`
+LIBS += @CLP_LIBS@
 ADDINCFLAGS += -D__OSI_CLP__
 endif
 
 ifeq ($(GLPK_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
-LIBS += -lOsiGlpk #-lglpk
+LIBS += @GLPK_LIBS@
 ADDINCFLAGS += -D__OSI_GLPK__
 else
 ifeq ($(USE_GMPL), TRUE)
-INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
 ADDINCFLAGS += -DUSE_GLPMPL
 endif
 endif
 
 ifeq ($(CPLEX_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
-LIBS += -lOsiCpx #-lcplex
+LIBS += @CPX_LIBS@
 ADDINCFLAGS += -D__OSI_CPLEX__
 endif
 
-ifeq ($(OSL_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(OSLINCDIR)`
-LIBS += -lOsiOsl #-losl
-ADDINCFLAGS += -D__OSI_OSL__
-endif
-
 ifeq ($(SOPLEX_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(SPXINCDIR)`
-LIBS += -lOsiSpx #-l
+LIBS += @SOPLEX_LIBS@
 ADDINCFLAGS += -D__OSI_SOPLEX__
 endif
 
 ifeq ($(XPRESS_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(XPRINCDIR)`
-LIBS += -lOsiXpr #-l
+LIBS += @XPR_LIBS@
 ADDINCFLAGS += -D__OSI_XPRESS__
 endif
 
 ADDLIBS += @ADDLIBS@
-
-LIBS += -lOsi -lCoinUtils `cat @OSIDOCDIR@/osi_addlibs.txt` \
-	`cat @COINUTILSDOCDIR@/coinutils_addlibs.txt` $(ADDLIBS)
-
-# The following is necessary under cygwin, if native compilers are used
-CYGPATH_W = @CYGPATH_W@
 
 WHATTOMAKE = $(EXE)
 

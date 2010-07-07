@@ -1,39 +1,45 @@
 /* include/config_sym.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if the Cgl package is used */
+/* Define to 1 if the Cgl module is available */
 #undef COIN_HAS_CGL
 
-/* Define to 1 if the Clp package is used */
+/* Define to 1 if the Clp module is available */
 #undef COIN_HAS_CLP
 
-/* Define to 1 if the CoinUtils package is used */
-#undef COIN_HAS_COINUTILS
+/* Define to 1 if the COINDEPEND module is available */
+#undef COIN_HAS_COINDEPEND
 
-/* Define to 1 if the Cplex package is available */
+/* Define to 1 if the Cpx module is available */
 #undef COIN_HAS_CPX
 
-/* Define to 1 if the Data package is used */
-#undef COIN_HAS_DATA
+/* Define to 1 if the DyLP module is available */
+#undef COIN_HAS_DYLP
 
-/* Define to 1 if Glpk package is available */
+/* Define to 1 if the Glpk module is available */
 #undef COIN_HAS_GLPK
 
-/* Define to 1 if the Osi package is used */
-#undef COIN_HAS_OSI
+/* Define to 1 if the Miplib3 module is available */
+#undef COIN_HAS_MIPLIB3
 
-/* Define to 1 if the Osl package is available */
-#undef COIN_HAS_OSL
+/* Define to 1 if the Msk module is available */
+#undef COIN_HAS_MSK
+
+/* Define to 1 if the Netlib module is available */
+#undef COIN_HAS_NETLIB
+
+/* Define to 1 if the OsiTests module is available */
+#undef COIN_HAS_OSITESTS
 
 /* Define to 1 if readline is available */
 #undef COIN_HAS_READLINE
 
-/* Define to 1 if the Soplex package is available */
-#undef COIN_HAS_SPX
+/* Define to 1 if the Sample module is available */
+#undef COIN_HAS_SAMPLE
 
-/* Define to 1 if the SYMPHONY package is used */
-#undef COIN_HAS_SYMPHONY
+/* Define to 1 if the Vol module is available */
+#undef COIN_HAS_VOL
 
-/* Define to 1 if the Xpress package is available */
+/* Define to 1 if the Xpr module is available */
 #undef COIN_HAS_XPR
 
 /* Define to the debug sanity check level (0 is no test) */

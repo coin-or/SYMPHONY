@@ -6,8 +6,9 @@
 # Laci Ladanyi (ladanyi@us.ibm.com).                                        #
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
+# Modified by tkr July 6, 2010                                              #
 #                                                                           #
-# (c) Copyright 2006 Lehigh University. All Rights Reserved.                #
+# (c) Copyright 2006-2010 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Common Public License. Please see     #
 # accompanying file for terms.                                              #
@@ -15,6 +16,9 @@
 #===========================================================================#
 
 # $Id: Makefile.in 726 2006-04-17 04:16:00Z andreasw $
+
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
 
 EXAMPLES = milp milp2 bicriteria sensitivity \
 	warm_start1 warm_start2 warm_start3
@@ -35,23 +39,10 @@ endif
 COININCDIR = @abs_include_dir@/coin
 
 # Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@
-
-# Directoy with SYMPHONY header files 
-#SYMINCDIR = @SYMINCDIR@
-
-# Directoy with SYMPHONY library
-#SYMLIBDIR = @SYMSRCDIR@
+COINLIBDIR = @abs_lib_dir@/coin
 
 # Directory with Application files
 SYMEXDIR = @SYMSRCDIR@/../Examples
-
-#Directory for LP solver
-GLPKINCDIR = @GLPKINCDIR@
-CPXINCDIR = @CPXINCDIR@
-OSLINCDIR = @OSLINCDIR@
-SPXINCDIR = @SPXINCDIR@
-XPRINCDIR = @XPRINCDIR@
 
 ##########################################################################
 #  Usually, you don't have to change anything below.  Note that if you   #
@@ -75,86 +66,60 @@ WHATTOMAKE = $(addsuffix @EXEEXT@, $(EXAMPLES))
 CXX = @CXX@
 
 # C++ Compiler options
-CXXFLAGS = @CXXFLAGS@
+CXXFLAGS = @CXXFLAGS@ -I`$(CYGPATH_W) $(COININCDIR)`
 
 # additional C++ Compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-#Include files
-INCL =  -I`$(CYGPATH_W) $(COININCDIR)`
-
 # Libraries necessary to link
-LIBS = 
+LIBS = -L`$(CYGPATH_W) $(COINLIBDIR)` \
+       -L`$(CYGPATH_W) $(COINLIBDIR)/ThirdParty` \
+       @COINDEPEND_LIBS@
 
 # Additional flags
 ADDINCFLAGS =
 
 ifeq ($(USE_CGL_CUTS),TRUE)
-LIBS += -lCgl `cat @CGLDOCDIR@/cgl_addlibs.txt`
-#ADDINCFLAGS += -DUSE_CGL_CUTS
+LIBS += @CGL_LIBS@
 endif
 
 ifeq ($(CLP_LP_SOLVER),TRUE)
-LIBS += -lOsiClp -lClp `cat @CLPDOCDIR@/clp_addlibs.txt`
-#ADDINCFLAGS += -D__OSI_CLP__
+LIBS += @CLP_LIBS@
 endif
 
 ifeq ($(GLPK_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
-LIBS += -lOsiGlpk #-lglpk
-#ADDINCFLAGS += -D__OSI_GLPK__
-else
-ifeq ($(USE_GMPL), TRUE)
-INCL += -I`$(CYGPATH_W) $(GLPKINCDIR)`
-#ADDINCFLAGS += -DUSE_GLPMPL
-endif
+LIBS += @GLPK_LIBS@
 endif
 
 ifeq ($(CPLEX_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
-LIBS += -lOsiCpx #-lcplex
-#ADDINCFLAGS += -D__OSI_CPLEX__
+LIBS += @CPX_LIBS@
 endif
 
 ifeq ($(OSL_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(OSLINCDIR)`
-LIBS += -lOsiOsl #-losl
-#ADDINCFLAGS += -D__OSI_OSL__
+LIBS += @OSI_LIBS@
 endif
 
 ifeq ($(SOPLEX_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(SPXINCDIR)`
-LIBS += -lOsiSpx #-l
-#ADDINCFLAGS += -D__OSI_SOPLEX__
+LIBS += @SOPLEX_LIBS@
 endif
 
 ifeq ($(XPRESS_LP_SOLVER),TRUE)
-INCL += -I`$(CYGPATH_W) $(XPRINCDIR)`
-LIBS += -lOsiXpr #-l
-#ADDINCFLAGS += -D__OSI_XPRESS__
+LIBS += @XPR_LIBS@
 endif
 
 ADDLIBS += @ADDLIBS@
 
-LIBS += -lOsi -lCoinUtils `cat @OSIDOCDIR@/osi_addlibs.txt` \
-	`cat @COINUTILSDOCDIR@/coinutils_addlibs.txt` $(ADDLIBS)
-
-# The following is necessary under cygwin, if native compilers are used
-CYGPATH_W = @CYGPATH_W@
-
-SYMLIBS = -L$(COINLIBDIR) #-L$(SYMLIBDIR)
-
 ifeq ($(USE_OSI_INTERFACE),TRUE)
-SYMLIBS += -lOsiSym
+LIBS += -lOsiSym
 ADDINCFLAGS += -DUSE_OSI_INTERFACE
 endif
 
-SYMLIBS += -lSym $(LIBS) 
+LIBS += -lSym 
 
 all: $(WHATTOMAKE)
 
 %: %.c
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) $(INCL) $(ADDINCFLAGS) $< -o $@ $(SYMLIBS)
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) $(ADDINCFLAGS) $< -o $@ $(LIBS)
 
 clean:
 	rm -rf $(WHATTOMAKE)
