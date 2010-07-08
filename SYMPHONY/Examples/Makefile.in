@@ -74,7 +74,7 @@ CXXLINKFLAGS = @RPATH_FLAGS@
 # Libraries necessary to link
 LIBS = -L`$(CYGPATH_W) $(COINLIBDIR)` \
        -L`$(CYGPATH_W) $(COINLIBDIR)/ThirdParty` \
-       @COINDEPEND_LIBS@
+       -lSym @COINDEPEND_LIBS@
 
 # Additional flags
 ADDINCFLAGS =
@@ -95,14 +95,6 @@ ifeq ($(CPLEX_LP_SOLVER),TRUE)
 LIBS += @CPX_LIBS@
 endif
 
-ifeq ($(OSL_LP_SOLVER),TRUE)
-LIBS += @OSI_LIBS@
-endif
-
-ifeq ($(SOPLEX_LP_SOLVER),TRUE)
-LIBS += @SOPLEX_LIBS@
-endif
-
 ifeq ($(XPRESS_LP_SOLVER),TRUE)
 LIBS += @XPR_LIBS@
 endif
@@ -114,11 +106,9 @@ LIBS += -lOsiSym
 ADDINCFLAGS += -DUSE_OSI_INTERFACE
 endif
 
-LIBS += -lSym 
-
 all: $(WHATTOMAKE)
 
-%: %.c
+%@EXEEXT@: %.c
 	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) $(ADDINCFLAGS) $< -o $@ $(LIBS)
 
 clean:
