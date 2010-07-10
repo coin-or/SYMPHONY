@@ -231,10 +231,10 @@ PCPPFLAGS =
 APPLCPPFLAGS =
 APPLPCPPFLAGS =
 ALLLDADD =
-PALLLDADD =
+PLDADD =
 #ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
 #	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
-LDADD = $(COINDEPEND_LIBS) $(ADDLIBS)
+LDADD = 
 AM_CPPFLAGS = $(COINDEPEND_CFLAGS) -I`$(CYGPATH_W) $(SYMINCDIR)` \
               -I`$(CYGPATH_W) $(ABSBUILDDIR)/include`
 
@@ -298,6 +298,8 @@ if XPRESS_LP_SOLVER
   AM_CPPFLAGS += $(XPR_CFLAGS) -D__OSI_XPRESS__
   LDADD += $(XPR_LIBS)
 endif
+
+LDADD += $(COINDEPEND_LIBS)
 
 #LDADD += $(OSIOBJDIR)/src/libOsi.la \
 #	$(COINUTILSOBJDIR)/src/libCoinUtils.la
@@ -393,12 +395,11 @@ if SIGHANDLER
 AM_CPPFLAGS += -DSIGHANDLER
 endif
 
-ALLLDADD += $(LDADD) $(ADDLIBS)
 SYMCPPFLAGS += $(AM_CPPFLAGS) $(SYMDEFS)
 
 if SYM_PARALLEL
 PCPPFLAGS += $(AM_CPPFLAGS) $(SYMPDEFS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-PALLLDADD += $(ALLLDADD) -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
+PLDADD += $(LDADD) -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
 	-lgpvm3 -lpvm3
 APPLPCPPFLAGS += $(PCPPFLAGS) -DUSE_SYM_APPLICATION
 endif
@@ -430,12 +431,10 @@ LINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 endif
 
 SYMLINK =
-SYMLDADD = $(LDADD)
 if USE_CL
 SYMLINK += cp -f main.$(OBJEXT) symphony-main.$(OBJEXT); $(LIBTOOL) \
 	--tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SYMLDADD += main.$(OBJEXT) 
 else
 SYMLINK += $(LINK)
 endif
@@ -543,98 +542,98 @@ bin_PROGRAMS = $(WHATTOMAKEBINS)
 symphony_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_DEPENDENCIES = $(SYMLDADD) libSym.la
 symphony_CPPFLAGS = $(SYMCPPFLAGS)
-symphony_LDADD = libSym.la $(ALLLDADD)
+symphony_LDADD = libSym.la $(LDADD) $(ADDLIBS)
 symphony_LDFLAGS = -rpath $(libdir)
 symphony_LINK = $(SYMLINK)
 
 symphony_m_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_m_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
+symphony_m_LDADD = libSym$(MASTEREXT).la $(PLDADD)
 symphony_m_LDFLAGS = -rpath $(libdir)
 
 symphony_m_tm_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_m_tm_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
+symphony_m_tm_LDADD = libSym$(MASTEREXT).la $(PLDADD)
 symphony_m_tm_LDFLAGS = -rpath $(libdir)
 
 symphony_m_tm_lp_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_m_tm_lp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_lp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
+symphony_m_tm_lp_LDADD = libSym$(MASTEREXT).la $(PLDADD)
 symphony_m_tm_lp_LDFLAGS = -rpath $(libdir)
 
 symphony_m_tm_cp_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_m_tm_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_cp_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_cp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
+symphony_m_tm_cp_LDADD = libSym$(MASTEREXT).la $(PLDADD)
 symphony_m_tm_cp_LDFLAGS = -rpath $(libdir)
 
 symphony_m_tm_lp_cg_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_m_tm_lp_cg_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_cg_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_lp_cg_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
+symphony_m_tm_lp_cg_LDADD = libSym$(MASTEREXT).la $(PLDADD)
 symphony_m_tm_lp_cg_LDFLAGS = -rpath $(libdir)
 
 symphony_m_tm_lp_cg_cp_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_m_tm_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym$(MASTEREXT).la
 symphony_m_tm_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
-symphony_m_tm_lp_cg_cp_LDADD = libSym$(MASTEREXT).la $(PALLLDADD)
+symphony_m_tm_lp_cg_cp_LDADD = libSym$(MASTEREXT).la $(PLDADD)
 symphony_m_tm_lp_cg_cp_LDFLAGS = -rpath $(libdir)
 
 symphony_tm_SOURCES =
 #symphony_tm_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_LDADD = libSym_tm$(TMEXT).la $(PALLLDADD)
+symphony_tm_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
 symphony_tm_LDFLAGS = -rpath $(libdir)
 
 symphony_tm_lp_SOURCES =
 #symphony_tm_lp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_lp_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_lp_LDADD = libSym_tm$(TMEXT).la $(PALLLDADD)
+symphony_tm_lp_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
 symphony_tm_lp_LDFLAGS = -rpath $(libdir)
 
 symphony_tm_cp_SOURCES =
 #symphony_tm_cp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_cp_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_cp_LDADD = libSym_tm$(TMEXT).la $(PALLLDADD)
+symphony_tm_cp_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
 symphony_tm_cp_LDFLAGS = -rpath $(libdir)
 
 symphony_tm_lp_cg_SOURCES =
 #symphony_tm_lp_cg_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_lp_cg_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_lp_cg_LDADD = libSym_tm$(TMEXT).la $(PALLLDADD)
+symphony_tm_lp_cg_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
 symphony_tm_lp_cg_LDFLAGS = -rpath $(libdir)
 
 symphony_tm_lp_cg_cp_SOURCES =
 #symphony_tm_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym_tm$(TMEXT).la
 symphony_tm_lp_cg_cp_CPPFLAGS = $(PCPPFLAGS)
-symphony_tm_lp_cg_cp_LDADD = libSym_tm$(TMEXT).la $(PALLLDADD)
+symphony_tm_lp_cg_cp_LDADD = libSym_tm$(TMEXT).la $(PLDADD)
 symphony_tm_lp_cg_cp_LDFLAGS = -rpath $(libdir)
 
 symphony_cp_SOURCES =
 #symphony_cp_DEPENDENCIES = $(LDADD) libSym_cp.la
 symphony_cp_CPPFLAGS = $(PCPPFLAGS)
-symphony_cp_LDADD = libSym_cp.la $(PALLLDADD)
+symphony_cp_LDADD = libSym_cp.la $(PLDADD)
 symphony_cp_LDFLAGS = -rpath $(libdir)
 
 symphony_lp_SOURCES =
 #symphony_lp_DEPENDENCIES = $(LDADD) 
 symphony_lp_CPPFLAGS = $(PCPPFLAGS)
-symphony_lp_LDADD = libSym_lp$(LPEXT).la $(PALLLDADD)
+symphony_lp_LDADD = libSym_lp$(LPEXT).la $(PLDADD)
 symphony_lp_LDFLAGS = -rpath $(libdir)
 
 symphony_lp_cg_SOURCES =
 #symphony_lp_cg_DEPENDENCIES = $(LDADD) libSym_lp$(LPEXT).la 
 symphony_lp_cg__CPPFLAGS = $(PCPPFLAGS)
-symphony_lp_cg_LDADD = libSym_lp$(LPEXT).la $(PALLLDADD)
+symphony_lp_cg_LDADD = libSym_lp$(LPEXT).la $(PLDADD)
 symphony_lp_cg_LDFLAGS = -rpath $(libdir)
 
 symphony_lp_cg_cp_SOURCES =
 #symphony_lp_cg_cp_DEPENDENCIES = $(LDADD) libSym_lp$(LPEXT).la
 symphony_lp_cg_cp__CPPFLAGS = $(PCPPFLAGS)
-symphony_lp_cg_cp_LDADD = libSym_lp$(LPEXT).la $(PALLLDADD)
+symphony_lp_cg_cp_LDADD = libSym_lp$(LPEXT).la $(PLDADD)
 symphony_lp_cg_cp_LDFLAGS = -rpath $(libdir)
 
 

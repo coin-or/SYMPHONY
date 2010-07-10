@@ -86,40 +86,17 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_HAS_MODULE(CoinDepend, [coinutils = trunk osi])
-if test $coin_has_coindepend != yes ; then
-  #if we have to use the fallback routines, then obviously it will not find CoinUtils dependencies
-  #thus, we check whether ThirdParty/Blas, ThirdParty/Lapack, and ThirdParty/Glpk have been setup and
-  #assume that if present then they are dependencies of CoinUtils
-  AC_COIN_HAS_MODULE_FALLBACK(Blas,      [coinblas],   [../ThirdParty/Blas],   [required=0 dodefine=0 doconditional=0])
-  AC_COIN_HAS_MODULE_FALLBACK(Lapack,    [coinlapack], [../ThirdParty/Lapack], [required=0 dodefine=0 doconditional=0])
-  AC_COIN_HAS_MODULE_FALLBACK(Glpk,      [coinglpk],   [../ThirdParty/Glpk],   [required=0 dodefine=0 doconditional=0])
-  AC_COIN_HAS_MODULE_FALLBACK(CoinUtils, [coinutils],  [../CoinUtils],         [dodefine=0 doconditional=0])
-  AC_COIN_HAS_MODULE_FALLBACK(Osi,       [osi],        [../Osi],               [dodefine=0 doconditional=0])
-  COINDEPEND_LIBS="$COINUTILS_LIBS $BLAS_LIBS $LAPACK_LIBS $GLPK_LIBS $OSI_LIBS"
-  COINDEPEND_CFLAGS="$COINUTILS_CFLAGS $GLPK_CFLAGS $OSI_CFLAGS"
-  if test "${coin_has_coinutils}${coin_has_osi}" = yesyes ; then
-    coin_has_coindepend=yes
-    AC_DEFINE(m4_toupper(COIN_HAS_COINDEPEND),[1],[Define to 1 if the COINDEPEND module is available])
-    AM_CONDITIONAL(COIN_HAS_COINDEPEND, [test $coin_has_coindepend = yes])
-  fi
-fi
-#Stefan: are they required?
-#if test $coin_has_coindepend != yes ; then
-#  AC_MSG_ERROR([Required package CoinUtils or Osi not available.])
-#fi
-
 AC_COIN_HAS_MODULE(Cgl, [cgl], [], [../Cgl])
 
 AC_COIN_HAS_MODULE(Clp, [osi-clp])
 if test $coin_has_clp != yes ; then
   # OsiClp depends on Clp
   # so if Clp is there, then we assume that also OsiClp will be there and add the corresponding flags to the Clp flags
+  AC_COIN_HAS_MODULE_FALLBACK(OsiClp, [osi-clp], [../Clp], [dodefine=0 doconditional=0])
   AC_COIN_HAS_MODULE_FALLBACK(Clp, [clp], [../Clp])
   if test $coin_has_clp = yes ; then
-    AC_COIN_HAS_MODULE_FALLBACK(OsiClp, [osi-clp], [../Clp], [dodefine=0 doconditional=0])
-    CLP_CFLAGS="$CLP_CFLAGS $OSICLP_CFLAGS"
-    CLP_LIBS="$CLP_LIBS $OSICLP_LIBS"
+    CLP_CFLAGS="$OSICLP_CFLAGS $CLP_CFLAGS"
+    CLP_LIBS="$OSICLP_LIBS $CLP_LIBS"
   fi
 fi
 
@@ -130,8 +107,8 @@ if test $coin_has_dylp != yes ; then
   AC_COIN_HAS_MODULE_FALLBACK(DyLP, [dylp], [../DyLP])
   if test $coin_has_dylp = yes ; then
     AC_COIN_HAS_MODULE_FALLBACK(OsiDyLP, [osi-dylp], [../DyLP], [dodefine=0 doconditional=0])
-    DYLP_CFLAGS="$DYLP_CFLAGS $OSIDYLP_CFLAGS"
-    DYLP_LIBS="$DYLP_LIBS $OSIDYLP_LIBS"
+    DYLP_CFLAGS="$OSIDYLP_CFLAGS $DYLP_CFLAGS"
+    DYLP_LIBS="$OSIDYLP_LIBS $DYLP_LIBS"
   fi
 fi
 
@@ -142,8 +119,8 @@ if test $coin_has_vol != yes ; then
   AC_COIN_HAS_MODULE_FALLBACK(Vol, [vol], [../Vol])
   if test $coin_has_vol = yes ; then
     AC_COIN_HAS_MODULE_FALLBACK(OsiVol, [osi-vol], [../Vol], [dodefine=0 doconditional=0])
-    VOL_CFLAGS="$VOL_CFLAGS $OSIVOL_CFLAGS"
-    VOL_LIBS="$VOL_LIBS $OSIVOL_LIBS"
+    VOL_CFLAGS="$OSIVOL_CFLAGS $VOL_CFLAGS"
+    VOL_LIBS="$OSIVOL_LIBS $VOL_LIBS"
   fi
 fi
 
@@ -151,6 +128,29 @@ AC_COIN_HAS_MODULE(OsiTests, [osi-unittests],   [required=0], [../Osi])
 AC_COIN_HAS_MODULE(Sample,   [coindatasample],  [required=0], [../Data/Sample])
 AC_COIN_HAS_MODULE(Netlib,   [coindatanetlib],  [required=0], [../Data/Netlib])
 AC_COIN_HAS_MODULE(Miplib3,  [coindatamiplib3], [required=0], [../Data/Miplib3])
+
+AC_COIN_HAS_MODULE(CoinDepend, [coinutils = trunk osi])
+if test $coin_has_coindepend != yes ; then
+  #if we have to use the fallback routines, then obviously it will not find CoinUtils dependencies
+  #thus, we check whether ThirdParty/Blas, ThirdParty/Lapack, and ThirdParty/Glpk have been setup and
+  #assume that if present then they are dependencies of CoinUtils
+  AC_COIN_HAS_MODULE_FALLBACK(Blas,      [coinblas],   [../ThirdParty/Blas],   [required=0 dodefine=0 doconditional=0])
+  AC_COIN_HAS_MODULE_FALLBACK(Lapack,    [coinlapack], [../ThirdParty/Lapack], [required=0 dodefine=0 doconditional=0])
+  AC_COIN_HAS_MODULE_FALLBACK(Glpk,      [coinglpk],   [../ThirdParty/Glpk],   [required=0 dodefine=0 doconditional=0])
+  AC_COIN_HAS_MODULE_FALLBACK(Osi,       [osi],        [../Osi],               [dodefine=0 doconditional=0])
+  AC_COIN_HAS_MODULE_FALLBACK(CoinUtils, [coinutils],  [../CoinUtils],         [dodefine=0 doconditional=0])
+  COINDEPEND_LIBS="$OSI_LIBS $COINUTILS_LIBS $BLAS_LIBS $LAPACK_LIBS $GLPK_LIBS"
+  COINDEPEND_CFLAGS="$OSI_CFLAGS $COINUTILS_CFLAGS $GLPK_CFLAGS"
+  if test "${coin_has_coinutils}${coin_has_osi}" = yesyes ; then
+    coin_has_coindepend=yes
+    AC_DEFINE(m4_toupper(COIN_HAS_COINDEPEND),[1],[Define to 1 if the COINDEPEND module is available])
+    AM_CONDITIONAL(COIN_HAS_COINDEPEND, [test $coin_has_coindepend = yes])
+  fi
+fi
+#Stefan: are they required?
+#if test $coin_has_coindepend != yes ; then
+#  AC_MSG_ERROR([Required package CoinUtils or Osi not available.])
+#fi
 
 #############################################################################
 #                            Third party solvers                            #
