@@ -20471,7 +20471,7 @@ if test $enable_shared = yes; then
     *-linux-*)
       if test "$GXX" = "yes"; then
         RPATH_FLAGS=
-        for dir in $abs_lib_dir $abs_lib_dir/ThirdParty; do
+        for dir in $abs_lib_dir/coin $abs_lib_dir/coin/ThirdParty; do
           RPATH_FLAGS="$RPATH_FLAGS -Wl,--rpath -Wl,$dir"
         done
       fi ;;
@@ -20488,7 +20488,7 @@ if test $enable_shared = yes; then
         RPATH_FLAGS=nothing ;;
     *-*-solaris*)
         RPATH_FLAGS=
-        for dir in $abs_lib_dir $abs_lib_dir/ThirdParty; do
+        for dir in $abs_lib_dir/coin $abs_lib_dir/coin/ThirdParty; do
           RPATH_FLAGS="$RPATH_FLAGS -R$dir"
         done
   esac
@@ -21112,7 +21112,7 @@ if test "${with_cgl_lib+set}" = set; then
   withval="$with_cgl_lib"
   coin_has_cgl=yes
        CGL_LIBS="$withval"
-       ADDLIBS="$ADDLIBS $withval"
+       ADDLIBS="$withval $ADDLIBS"
 
 fi;
 
@@ -21226,7 +21226,7 @@ if test $coin_has_cgl != "skipping" ; then
     fi
     CGL_DATA=`sed -n -e 's/datadir=//gp' ../Cgl/cgl-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $CGL_LIBS"
+    ADDLIBS="$CGL_LIBS $ADDLIBS"
        REQUIREDPACKAGES="cgl $REQUIREDPACKAGES"
 
 
@@ -21342,7 +21342,7 @@ if test "${with_clp_lib+set}" = set; then
   withval="$with_clp_lib"
   coin_has_clp=yes
        CLP_LIBS="$withval"
-       ADDLIBS="$ADDLIBS $withval"
+       ADDLIBS="$withval $ADDLIBS"
 
 fi;
 
@@ -21507,7 +21507,7 @@ if test $coin_has_osiclp != "skipping" ; then
     fi
     OSICLP_DATA=`sed -n -e 's/datadir=//gp' ../Clp/osi-clp-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $OSICLP_LIBS"
+    ADDLIBS="$OSICLP_LIBS $ADDLIBS"
        REQUIREDPACKAGES="osi-clp $REQUIREDPACKAGES"
 
 
@@ -21571,7 +21571,7 @@ if test $coin_has_clp != "skipping" ; then
     fi
     CLP_DATA=`sed -n -e 's/datadir=//gp' ../Clp/clp-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $CLP_LIBS"
+    ADDLIBS="$CLP_LIBS $ADDLIBS"
        REQUIREDPACKAGES="clp $REQUIREDPACKAGES"
 
 
@@ -21647,7 +21647,7 @@ if test "${with_dylp_lib+set}" = set; then
   withval="$with_dylp_lib"
   coin_has_dylp=yes
        DYLP_LIBS="$withval"
-       ADDLIBS="$ADDLIBS $withval"
+       ADDLIBS="$withval $ADDLIBS"
 
 fi;
 
@@ -21812,7 +21812,7 @@ if test $coin_has_dylp != "skipping" ; then
     fi
     DYLP_DATA=`sed -n -e 's/datadir=//gp' ../DyLP/dylp-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $DYLP_LIBS"
+    ADDLIBS="$DYLP_LIBS $ADDLIBS"
        REQUIREDPACKAGES="dylp $REQUIREDPACKAGES"
 
 
@@ -21893,7 +21893,7 @@ if test $coin_has_osidylp != "skipping" ; then
     fi
     OSIDYLP_DATA=`sed -n -e 's/datadir=//gp' ../DyLP/osi-dylp-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $OSIDYLP_LIBS"
+    ADDLIBS="$OSIDYLP_LIBS $ADDLIBS"
        REQUIREDPACKAGES="osi-dylp $REQUIREDPACKAGES"
 
 
@@ -21952,7 +21952,7 @@ if test "${with_vol_lib+set}" = set; then
   withval="$with_vol_lib"
   coin_has_vol=yes
        VOL_LIBS="$withval"
-       ADDLIBS="$ADDLIBS $withval"
+       ADDLIBS="$withval $ADDLIBS"
 
 fi;
 
@@ -22117,7 +22117,7 @@ if test $coin_has_vol != "skipping" ; then
     fi
     VOL_DATA=`sed -n -e 's/datadir=//gp' ../Vol/vol-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $VOL_LIBS"
+    ADDLIBS="$VOL_LIBS $ADDLIBS"
        REQUIREDPACKAGES="vol $REQUIREDPACKAGES"
 
 
@@ -22198,7 +22198,7 @@ if test $coin_has_osivol != "skipping" ; then
     fi
     OSIVOL_DATA=`sed -n -e 's/datadir=//gp' ../Vol/osi-vol-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $OSIVOL_LIBS"
+    ADDLIBS="$OSIVOL_LIBS $ADDLIBS"
        REQUIREDPACKAGES="osi-vol $REQUIREDPACKAGES"
 
 
@@ -23166,7 +23166,7 @@ if test "${with_coindepend_lib+set}" = set; then
   withval="$with_coindepend_lib"
   coin_has_coindepend=yes
        COINDEPEND_LIBS="$withval"
-       ADDLIBS="$ADDLIBS $withval"
+       ADDLIBS="$withval $ADDLIBS"
 
 fi;
 
@@ -23518,7 +23518,7 @@ if test $coin_has_osi != "skipping" ; then
     fi
     OSI_DATA=`sed -n -e 's/datadir=//gp' ../Osi/osi-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $OSI_LIBS"
+    ADDLIBS="$OSI_LIBS $ADDLIBS"
        REQUIREDPACKAGES="osi $REQUIREDPACKAGES"
 
 
@@ -23582,7 +23582,7 @@ if test $coin_has_coinutils != "skipping" ; then
     fi
     COINUTILS_DATA=`sed -n -e 's/datadir=//gp' ../CoinUtils/coinutils-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $COINUTILS_LIBS"
+    ADDLIBS="$COINUTILS_LIBS $ADDLIBS"
        REQUIREDPACKAGES="coinutils $REQUIREDPACKAGES"
 
 
@@ -23667,7 +23667,7 @@ if test "${with_cpx_lib+set}" = set; then
   withval="$with_cpx_lib"
   coin_has_cpx=yes
        CPX_LIBS="$withval"
-       ADDLIBS="$ADDLIBS $withval"
+       ADDLIBS="$withval $ADDLIBS"
 
 fi;
 
@@ -23781,7 +23781,7 @@ if test $coin_has_cpx != "skipping" ; then
     fi
     CPX_DATA=`sed -n -e 's/datadir=//gp' ../Osi/osi-cplex-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $CPX_LIBS"
+    ADDLIBS="$CPX_LIBS $ADDLIBS"
        REQUIREDPACKAGES="osi-cplex $REQUIREDPACKAGES"
 
 
@@ -23896,7 +23896,7 @@ if test "${with_glpk_lib+set}" = set; then
   withval="$with_glpk_lib"
   coin_has_glpk=yes
        GLPK_LIBS="$withval"
-       ADDLIBS="$ADDLIBS $withval"
+       ADDLIBS="$withval $ADDLIBS"
 
 fi;
 
@@ -24010,7 +24010,7 @@ if test $coin_has_glpk != "skipping" ; then
     fi
     GLPK_DATA=`sed -n -e 's/datadir=//gp' ../Osi/osi-glpk-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $GLPK_LIBS"
+    ADDLIBS="$GLPK_LIBS $ADDLIBS"
        REQUIREDPACKAGES="osi-glpk $REQUIREDPACKAGES"
 
 
@@ -24126,7 +24126,7 @@ if test "${with_msk_lib+set}" = set; then
   withval="$with_msk_lib"
   coin_has_msk=yes
        MSK_LIBS="$withval"
-       ADDLIBS="$ADDLIBS $withval"
+       ADDLIBS="$withval $ADDLIBS"
 
 fi;
 
@@ -24240,7 +24240,7 @@ if test $coin_has_msk != "skipping" ; then
     fi
     MSK_DATA=`sed -n -e 's/datadir=//gp' ../Osi/osi-mosek-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $MSK_LIBS"
+    ADDLIBS="$MSK_LIBS $ADDLIBS"
        REQUIREDPACKAGES="osi-mosek $REQUIREDPACKAGES"
 
 
@@ -24356,7 +24356,7 @@ if test "${with_xpr_lib+set}" = set; then
   withval="$with_xpr_lib"
   coin_has_xpr=yes
        XPR_LIBS="$withval"
-       ADDLIBS="$ADDLIBS $withval"
+       ADDLIBS="$withval $ADDLIBS"
 
 fi;
 
@@ -24470,7 +24470,7 @@ if test $coin_has_xpr != "skipping" ; then
     fi
     XPR_DATA=`sed -n -e 's/datadir=//gp' ../Osi/osi-xpress-uninstalled.pc`
 
-    ADDLIBS="$ADDLIBS $XPR_LIBS"
+    ADDLIBS="$XPR_LIBS $ADDLIBS"
        REQUIREDPACKAGES="osi-xpress $REQUIREDPACKAGES"
 
 
