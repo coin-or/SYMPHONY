@@ -86,7 +86,7 @@ addlibsdir = $(DESTDIR)$(datadir)/coin/doc/SYMPHONY
 	
 install-data-hook:
 	@$(mkdir_p) "$(addlibsdir)"
-	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ PKG_CONFIG_DISABLE_UNINSTALLED= \
+	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ \
 	$(PKG_CONFIG) --libs symphony > $(addlibsdir)/sym_addlibs.txt
 endif
 
