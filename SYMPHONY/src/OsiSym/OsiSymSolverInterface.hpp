@@ -396,7 +396,8 @@ public:
           it is the client's responsibility to free the double pointers in the
           vector using delete[].
       */
-      virtual std::vector<double*> getDualRays(int maxNumRays) const{
+      virtual std::vector<double*> getDualRays(int maxNumRays,
+					       bool fullRay = false) const{
        throw CoinError("Error: Function not implemented",
 		       "getDualRays", "OsiSymSolverInterface");
     }
