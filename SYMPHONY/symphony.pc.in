@@ -6,6 +6,6 @@ includedir=@includedir@/coin
 Name: SYMPHONY
 Description: SYMPHONY MILP Solver Framework
 Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lSym @PCADDLIBS@
+Libs: -L${libdir} -lSym @SYMPHONYLIB_PCLIBS@
 Cflags: -I${includedir}
-Requires: @REQUIREDPACKAGES@
+Requires: @SYMPHONYLIB_PCREQUIRES@

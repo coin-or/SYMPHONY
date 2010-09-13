@@ -234,12 +234,11 @@ ALLLDADD =
 PLDADD =
 #ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
 #	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
-LDADD = 
+LDADD = $(SYMPHONYLIB_LIBS)
 AM_CPPFLAGS = $(COINDEPEND_CFLAGS) -I`$(CYGPATH_W) $(SYMINCDIR)` \
               -I`$(CYGPATH_W) $(ABSBUILDDIR)/include`
 
 if USE_CGL_CUTS
-LDADD += $(CGL_LIBS)
 AM_CPPFLAGS += $(CGL_CFLAGS)
 #ADDLIBS += \
 #	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
@@ -259,7 +258,6 @@ endif
 #  ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
 if CLP_LP_SOLVER
   AM_CPPFLAGS += $(CLP_CFLAGS) -D__OSI_CLP__
-  LDADD += $(CLP_LIBS)
 endif
 
 if CPLEX_LP_SOLVER
@@ -267,7 +265,6 @@ if CPLEX_LP_SOLVER
 #	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
 #  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
   AM_CPPFLAGS += $(CPX_CFLAGS) -D__OSI_CPLEX__
-  LDADD += $(CPX_LIBS)
 endif
 
 if GLPK_LP_SOLVER
@@ -275,7 +272,6 @@ if GLPK_LP_SOLVER
 #	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
 #  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
   AM_CPPFLAGS += $(GLPK_CFLAGS) -D__OSI_GLPK__
-  LDADD += $(GLPK_LIBS)
 else 
 if USE_GMPL
 #  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
@@ -288,7 +284,6 @@ if SOPLEX_LP_SOLVER
 #	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
 #  LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
   AM_CPPFLAGS += $(SPX_CFLAGS) -D__OSI_SOPLEX__
-  LDADD += $(SPX_LIBS)
 endif
 
 if XPRESS_LP_SOLVER
@@ -296,10 +291,7 @@ if XPRESS_LP_SOLVER
 #	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
 #  LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
   AM_CPPFLAGS += $(XPR_CFLAGS) -D__OSI_XPRESS__
-  LDADD += $(XPR_LIBS)
 endif
-
-LDADD += $(COINDEPEND_LIBS)
 
 #LDADD += $(OSIOBJDIR)/src/libOsi.la \
 #	$(COINUTILSOBJDIR)/src/libCoinUtils.la

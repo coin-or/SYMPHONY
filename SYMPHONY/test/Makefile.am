@@ -29,7 +29,7 @@ SYMCPPFLAGS =
 SYMPCPPFLAGS =
 APPLCPPFLAGS =
 SYMPALLLDADD =
-LDADD = $(OSITESTS_LIBS)
+LDADD = $(OSITESTS_LIBS) $(SYMPHONYLIB_LIBS)
 ALLLDADD =
 
 LIBS =
@@ -43,7 +43,7 @@ if USE_CGL_CUTS
 #LDADD += $(CGLOBJDIR)/src/libCgl.la
 #ADDLIBS += \
 #	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
-LDADD += $(CGL_LIBS)
+#LDADD += $(CGL_LIBS)
 endif
 
 # Add include files
@@ -62,7 +62,7 @@ if CLP_LP_SOLVER
 #	$(CLPOBJDIR)/src/libClp.la
 #  ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
   AM_CPPFLAGS += $(CLP_CFLAGS) -D__OSI_CLP__
-  LDADD += $(CLP_LIBS)
+#  LDADD += $(CLP_LIBS)
 endif
 
 if CPLEX_LP_SOLVER
@@ -70,15 +70,15 @@ if CPLEX_LP_SOLVER
 #	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
 #  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
   AM_CPPFLAGS += $(CPX_CFLAGS) -D__OSI_CPLEX__
-  LDADD += $(CPX_LIBS)
+#  LDADD += $(CPX_LIBS)
 endif
 
 if GLPK_LP_SOLVER
 #  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)` \
 #	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
 #  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
-  AM_CPPFLAGS += $(GLPK_LIBS) -D__OSI_GLPK__
-  LDADD += $(GLPK_LIBS)
+  AM_CPPFLAGS += $(GLPK_CFLAGS) -D__OSI_GLPK__
+#  LDADD += $(GLPK_LIBS)
 else 
 if USE_GMPL
 #  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
@@ -91,7 +91,7 @@ if SOPLEX_LP_SOLVER
 #       -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
 #  LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
   AM_CPPFLAGS += $(SPX_CFLAGS) -D__OSI_SOPLEX__
-  LDADD += $(SPX_LIBS)
+#  LDADD += $(SPX_LIBS)
 endif
 
 if XPRESS_LP_SOLVER
@@ -99,7 +99,7 @@ if XPRESS_LP_SOLVER
 #       -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
 #  LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
   AM_CPPFLAGS += $(XPR_CFLAGS) -D__OSI_XPRESS__
-  LDADD += $(XPR_LIBS)
+#  LDADD += $(XPR_LIBS)
 endif
 
 #LDADD += $(OSIOBJDIR)/src/libOsi.la \
@@ -140,7 +140,7 @@ endif
 #                            Additional Definitions                    #
 ########################################################################
 
-ALLLDADD += $(LDADD) $(ADDLIBS)
+ALLLDADD += $(LDADD)
 SYMCPPFLAGS += $(AM_CPPFLAGS) $(SYMDEFS)
 SYMLIB += ../src/libSym.la ../src/OsiSym/libOsiSym.la
 

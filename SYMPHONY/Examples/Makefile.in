@@ -74,32 +74,10 @@ CXXLINKFLAGS = @RPATH_FLAGS@
 # Libraries necessary to link
 LIBS = -L`$(CYGPATH_W) $(COINLIBDIR)` \
        -L`$(CYGPATH_W) $(COINLIBDIR)/ThirdParty` \
-       -lSym @COINDEPEND_LIBS@
+       -lSym @SYMPHONYLIB_LIBS@
 
 # Additional flags
 ADDINCFLAGS =
-
-ifeq ($(USE_CGL_CUTS),TRUE)
-LIBS += @CGL_LIBS@
-endif
-
-ifeq ($(CLP_LP_SOLVER),TRUE)
-LIBS += @CLP_LIBS@
-endif
-
-ifeq ($(GLPK_LP_SOLVER),TRUE)
-LIBS += @GLPK_LIBS@
-endif
-
-ifeq ($(CPLEX_LP_SOLVER),TRUE)
-LIBS += @CPX_LIBS@
-endif
-
-ifeq ($(XPRESS_LP_SOLVER),TRUE)
-LIBS += @XPR_LIBS@
-endif
-
-ADDLIBS += @ADDLIBS@
 
 ifeq ($(USE_OSI_INTERFACE),TRUE)
 LIBS += -lOsiSym

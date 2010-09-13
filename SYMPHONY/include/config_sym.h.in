@@ -1,45 +1,45 @@
 /* include/config_sym.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if the Cgl module is available */
+/* Define to 1 if the Cgl package is available */
 #undef COIN_HAS_CGL
 
-/* Define to 1 if the Clp module is available */
+/* Define to 1 if the Clp package is available */
 #undef COIN_HAS_CLP
 
-/* Define to 1 if the CoinDepend module is available */
+/* Define to 1 if the CoinDepend package is available */
 #undef COIN_HAS_COINDEPEND
 
-/* Define to 1 if the Cpx module is available */
+/* Define to 1 if the Cpx package is available */
 #undef COIN_HAS_CPX
 
-/* Define to 1 if the DyLP module is available */
+/* Define to 1 if the DyLP package is available */
 #undef COIN_HAS_DYLP
 
-/* Define to 1 if the Glpk module is available */
+/* Define to 1 if the Glpk package is available */
 #undef COIN_HAS_GLPK
 
-/* Define to 1 if the Miplib3 module is available */
+/* Define to 1 if the Miplib3 package is available */
 #undef COIN_HAS_MIPLIB3
 
-/* Define to 1 if the Msk module is available */
+/* Define to 1 if the Msk package is available */
 #undef COIN_HAS_MSK
 
-/* Define to 1 if the Netlib module is available */
+/* Define to 1 if the Netlib package is available */
 #undef COIN_HAS_NETLIB
 
-/* Define to 1 if the OsiTests module is available */
+/* Define to 1 if the OsiTests package is available */
 #undef COIN_HAS_OSITESTS
 
 /* Define to 1 if readline is available */
 #undef COIN_HAS_READLINE
 
-/* Define to 1 if the Sample module is available */
+/* Define to 1 if the Sample package is available */
 #undef COIN_HAS_SAMPLE
 
-/* Define to 1 if the Vol module is available */
+/* Define to 1 if the Vol package is available */
 #undef COIN_HAS_VOL
 
-/* Define to 1 if the Xpr module is available */
+/* Define to 1 if the Xpr package is available */
 #undef COIN_HAS_XPR
 
 /* Define to the debug sanity check level (0 is no test) */

@@ -5,6 +5,6 @@ includedir=@abs_source_dir@/src
 Name: SYMPHONY
 Description: SYMPHONY MILP Solver Framework
 Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lSym @PCADDLIBS@
+Libs: -L${libdir} -lSym @SYMPHONYLIB_PCLIBS@
 Cflags: -I${includedir} -I@ABSBUILDDIR@/inc
-Requires: @REQUIREDPACKAGES@
+Requires: @SYMPHONYLIB_PCREQUIRES@
