@@ -14,6 +14,8 @@
 /*                                                                           */
 /*===========================================================================*/
 
+#include <cstdio>
+
 #ifdef USE_OSI_INTERFACE
 
 #include "OsiSymSolverInterface.hpp"
