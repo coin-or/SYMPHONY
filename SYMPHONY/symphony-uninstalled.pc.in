@@ -1,6 +1,6 @@
 prefix=@prefix@
 libdir=@ABSBUILDDIR@/src
-includedir=@abs_source_dir@/src
+includedir=@abs_source_dir@/include
 
 Name: SYMPHONY
 Description: SYMPHONY MILP Solver Framework
