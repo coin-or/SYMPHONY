@@ -86,32 +86,32 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_HAS_PACKAGE(CoinDepend, [coinutils = trunk osi], [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(CoinDepend, [coinutils = trunk osi = trunk], [SymphonyLib])
 if test $coin_has_coindepend != yes ; then
   AC_MSG_ERROR([Required package CoinUtils or Osi not available.])
 fi
 
-AC_COIN_HAS_PACKAGE(Clp,  [osi-clp],  [SymphonyLib])
-AC_COIN_HAS_PACKAGE(DyLP, [osi-dylp], [SymphonyLib])
-AC_COIN_HAS_PACKAGE(Vol,  [osi-vol],  [SymphonyLib])
-AC_COIN_HAS_PACKAGE(Cgl,  [cgl],      [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(Clp,  [osi-clp],  [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(DyLP, [osi-dylp], [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(Vol,  [osi-vol],  [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(Cgl,  [cgl],      [SymphonyLib])
 
-AC_COIN_HAS_PACKAGE(OsiTests, [osi-unittests])
-AC_COIN_HAS_PACKAGE(Sample,   [coindatasample])
-AC_COIN_HAS_PACKAGE(Netlib,   [coindatanetlib])
-AC_COIN_HAS_PACKAGE(Miplib3,  [coindatamiplib3])
+AC_COIN_CHECK_PACKAGE(OsiTests, [osi-unittests])
+AC_COIN_CHECK_PACKAGE(Sample,   [coindatasample])
+AC_COIN_CHECK_PACKAGE(Netlib,   [coindatanetlib])
+AC_COIN_CHECK_PACKAGE(Miplib3,  [coindatamiplib3])
 
 #############################################################################
 #                            Third party solvers                            #
 #############################################################################
 
 # Check which third party solvers are available
-AC_COIN_HAS_PACKAGE(Cpx,  [osi-cplex],  [SymphonyLib])
-AC_COIN_HAS_PACKAGE(Glpk, [osi-glpk],   [SymphonyLib]) 
-#AC_COIN_HAS_PACKAGE(Grb,  [osi-gurobi], [SymphonyLib])
-AC_COIN_HAS_PACKAGE(Msk,  [osi-mosek],  [SymphonyLib])
-#AC_COIN_HAS_PACKAGE(Spx,  [osi-soplex], [SymphonyLib])
-AC_COIN_HAS_PACKAGE(Xpr,  [osi-xpress], [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(Glpk, [osi-glpk],   [SymphonyLib]) 
+#AC_COIN_CHECK_PACKAGE(Grb,  [osi-gurobi], [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(Msk,  [osi-mosek],  [SymphonyLib])
+#AC_COIN_CHECK_PACKAGE(Spx,  [osi-soplex], [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(Xpr,  [osi-xpress], [SymphonyLib])
 
 #############################################################################
 #                      Check for the LP solver                              #
