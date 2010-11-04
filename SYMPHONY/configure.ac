@@ -86,7 +86,7 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(CoinDepend, [coinutils = trunk osi = trunk], [SymphonyLib])
+AC_COIN_CHECK_PACKAGE(CoinDepend, [coinutils osi], [SymphonyLib])
 if test $coin_has_coindepend != yes ; then
   AC_MSG_ERROR([Required package CoinUtils or Osi not available.])
 fi
