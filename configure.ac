@@ -22,7 +22,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([SYMPHONY],[trunk],[symphony@lists.coin-or.org])
+AC_INIT([SYMPHONY],[trunk],[https://projects.coin-or.org/svn/SYMPHONY/newticket])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
@@ -59,7 +59,6 @@ AC_PREFIX_DEFAULT([`pwd`])
 # Initialize automake
 AC_COIN_CREATE_LIBTOOL
 
-
 #############################################################################
 #                  Check which subprojects are there                        #
 #############################################################################
@@ -75,19 +74,7 @@ AC_COIN_MAIN_PACKAGEDIR(Clp)
 AC_COIN_MAIN_PACKAGEDIR(Cgl)
 AC_COIN_MAIN_PACKAGEDIR(DyLP)
 AC_COIN_MAIN_PACKAGEDIR(Vol)
-AC_COIN_MAIN_PACKAGEDIR(Cbc)
 AC_COIN_MAIN_PACKAGEDIR(SYMPHONY)
-
-#############################################################################
-#                            Third party solvers                            #
-#############################################################################
-
-# Check which third party solvers are available ToDo!
-#AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
-#AC_COIN_HAS_USER_LIBRARY([Glpk],[GLPK],[glpk.h],[glp_lpx_simplex])
-#AC_COIN_HAS_USER_LIBRARY([Osl],[OSL],[ekk_c_api.h],[ekk_simplex])
-#AC_COIN_HAS_USER_LIBRARY([Soplex],[SPX],[spxsolver.h]) # ToDo
-#AC_COIN_HAS_USER_LIBRARY([Xpress],[XPR],[xprs.h],[XPRSsetintcontrol])
 
 #############################################################################
 #                      Check for the LP solver                              #

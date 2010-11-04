@@ -29,18 +29,6 @@ EXTRA_DIST =
 
 SUBDIRS = $(subdirs)
 
-#if ADD_GLPK
-#   SUBDIRS += ThirdParty/Glpk
-#endif
-
-#SUBDIRS += CoinUtils Data/Sample Data/miplib3 Data/Netlib Osi Cgl 
-
-#if ADD_CLP
-#   SUBDIRS += Clp
-#endif 
-
-#SUBDIRS += SYMPHONY
-
 ########################################################################
 #                           Extra Targets                              #
 ########################################################################

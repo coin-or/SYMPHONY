@@ -25118,18 +25118,6 @@ fi
 #                      Check for the LP solver                              #
 #############################################################################
 
-# ???????????????
-
-
-if false; then
-  COIN_HAS_CLP_TRUE=
-  COIN_HAS_CLP_FALSE='#'
-else
-  COIN_HAS_CLP_TRUE='#'
-  COIN_HAS_CLP_FALSE=
-fi
-
-
 echo "$as_me:$LINENO: checking for SYMPHONY default solver" >&5
 echo $ECHO_N "checking for SYMPHONY default solver... $ECHO_C" >&6
 
@@ -26804,13 +26792,6 @@ if test -z "${COIN_HAS_XPR_TRUE}" && test -z "${COIN_HAS_XPR_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_XPR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"COIN_HAS_XPR\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${COIN_HAS_CLP_TRUE}" && test -z "${COIN_HAS_CLP_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_CLP\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"COIN_HAS_CLP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi

@@ -117,9 +117,6 @@ AC_COIN_CHECK_PACKAGE(Xpr,  [osi-xpress], [SymphonyLib])
 #                      Check for the LP solver                              #
 #############################################################################
 
-# ???????????????
-AM_CONDITIONAL(COIN_HAS_CLP, false)
-
 AC_MSG_CHECKING([for SYMPHONY default solver])
 AC_ARG_WITH([lp-solver],
 [AC_HELP_STRING([--with-lp-solver@<:@=lpsolver@:>@],
