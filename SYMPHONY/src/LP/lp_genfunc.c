@@ -2507,25 +2507,24 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
    }
    */
    max_cut_length = p->par.max_cut_length; 
-   //if(p->bc_index < 1) p->par.max_cut_length = (int)(p->lp_data->n/2.0);
    p->par.tried_long_cuts = TRUE;
    if (p->par.tried_long_cuts == TRUE) {
       repeat_with_long = FALSE;
    }
 
    i = 0; 
-   if(p->bc_index > 0 && p->mip->mip_inf && p->mip->mip_inf->c_num > 0) i = -1;
+   //if(p->bc_index > 0 && p->mip->mip_inf && p->mip->mip_inf->c_num > 0) i = -1;
    
    for (; i<CGL_NUM_GENERATORS; i++) {
      //p->par.max_cut_length = 2*p->par.best_violation_length[i];
       //printf("c_l: %i %i \n", i, p->par.max_cut_length);
-      if(i > -1) generate_cgl_cut_of_type(p, i, &cutlist, &was_tried);      
+      if(i > -1) generate_cgl_cut_of_type(p, i, &cutlist, &was_tried);	 
       //if(cutlist.sizeRowCuts() > 0){
       check_and_add_cgl_cuts(p, i, cuts, num_cuts, bound_changes, &cutlist, 
 			     send_to_pool);
       
       should_stop_adding_cgl_cuts(p, i, &should_stop);
-      if(i < 0 && *num_cuts > 0) should_stop = TRUE;
+      if(i < 0 && num_cuts > 0) should_stop = TRUE;
       //}
       if (should_stop == TRUE) {
          break;
@@ -3213,9 +3212,9 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       accepted_cnt++; 
       //j++;
 #ifdef COMPILE_IN_LP
-      if(p->bc_index < 1 && p->mip->mip_inf){// && ( generator == CGL_PROBING_GENERATOR || 
-	 // generator == CGL_CLIQUE_GENERATOR ||
-	 //				 generator == CGL_KNAPSACK_GENERATOR)){	 
+      if(p->bc_index < 1 && p->mip->mip_inf && ( generator == CGL_PROBING_GENERATOR || 
+						 generator == CGL_CLIQUE_GENERATOR ||
+						 generator == CGL_KNAPSACK_GENERATOR)){	 
 	 add_cut_to_mip_inf(p, num_elements, indices, elements, rhs, row_cut.sense());	 
       }      
 #endif
@@ -3223,8 +3222,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 
    int * rc_ind; 
    int rc_cnt = 0; 
-   if (p->bc_index > 0 && p->mip->mip_inf && p->mip->mip_inf->c_num && generator < 0){
-      //generator == CGL_NUM_GENERATORS - 1){
+   if (p->bc_index > 0 && p->mip->mip_inf && p->mip->mip_inf->c_num && generator == CGL_NUM_GENERATORS - 1){
       //generator < 0){// || generator == CGL_NUM_GENERATORS - 1){ /* first try root cuts, if don't work then iterate */
 
       //if(accepted_cnt > 0){

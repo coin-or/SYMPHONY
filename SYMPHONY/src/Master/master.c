@@ -275,7 +275,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->mat_row_compress_ratio = .00001;
    lp_par->tailoff_gap_backsteps = 2;
    lp_par->tailoff_gap_frac = .99;
-   lp_par->tailoff_obj_backsteps = 3;
+   lp_par->tailoff_obj_backsteps = 2;
    lp_par->tailoff_obj_frac = .75;
    lp_par->tailoff_absolute = 0.0001;
    lp_par->tailoff_max_no_iterative_impr_iters_root = 3;
@@ -320,8 +320,8 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.probing_is_expensive = FALSE;
    lp_par->cgl.probing_root_max_look = 100;
 
-   lp_par->cgl.gomory_max_depth = 500;
-   lp_par->cgl.probing_max_depth = 100;
+   lp_par->cgl.gomory_max_depth = 200;
+   lp_par->cgl.probing_max_depth = 40;
    lp_par->cgl.flowcover_max_depth = 50;
    lp_par->cgl.twomir_max_depth = 50;
    lp_par->cgl.clique_max_depth = 50;
@@ -357,8 +357,8 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.use_chain_strategy = TRUE;
    lp_par->cgl.chain_status = CGL_CHAIN_START;
    lp_par->cgl.max_chain_backtrack = 1;
-   lp_par->cgl.max_chain_trial_num = 10;
-   lp_par->cgl.chain_trial_freq = 2;
+   lp_par->cgl.max_chain_trial_num = 20;
+   lp_par->cgl.chain_trial_freq = 3;
    lp_par->cgl.chain_weighted_gap = 9.333e-6;
    lp_par->cgl.chain_br_weighted_gap = 0.000933; 
    
@@ -436,11 +436,11 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fr_enabled   = TRUE;
    lp_par->fr_frequency   = 10;
    lp_par->fr_first_feas_enabled = TRUE;
-   lp_par->fr_max_int_fixed_ratio = 0.95;
+   lp_par->fr_max_int_fixed_ratio = 0.85;
    lp_par->fr_min_int_fixed_ratio = 0.1;
-   lp_par->fr_max_c_fixed_ratio = 0.6;
+   lp_par->fr_max_c_fixed_ratio = 0.2;
    lp_par->fr_min_c_fixed_ratio = 0.1;
-   lp_par->fr_incr_ratio = 0.1; 
+   lp_par->fr_incr_ratio = 0.01; 
    lp_par->fr_min_gap = 5.0;
 
    lp_par->rs_mode_enabled = tm_par->rs_mode_enabled; 
@@ -448,9 +448,9 @@ int sym_set_defaults(sym_environment *env)
    
    /* rins search */
    lp_par->rs_enabled   = TRUE;
-   lp_par->rs_min_int_fixed_ratio = 0.7;
-   lp_par->fr_min_c_fixed_ratio = 0.5;
-   lp_par->rs_min_gap = 4.0;
+   lp_par->rs_min_int_fixed_ratio = 0.80;
+   lp_par->fr_min_c_fixed_ratio = 0.20;
+   lp_par->rs_min_gap = 5.0;
 
    /* diving search */
    lp_par->ds_enabled = TRUE;
@@ -474,7 +474,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->ds_solve_ip = FALSE;
    lp_par->ds_solve_ip_col_ratio = 0.2;
    lp_par->ds_solve_ip_min_gap = 0.1;    /* % gap */
-   lp_par->ds_min_gap = 2.5;    
+   lp_par->ds_min_gap = 0.5;    
 
    /* local search */
    lp_par->ls_enabled = TRUE;
