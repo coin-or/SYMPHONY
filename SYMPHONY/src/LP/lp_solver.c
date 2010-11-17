@@ -140,7 +140,12 @@ void free_mip_desc(MIPdesc *mip)
    }
 
    if(mip->mip_inf){
-      
+      FREE(mip->mip_inf->c_ind);
+      FREE(mip->mip_inf->c_val);
+      FREE(mip->mip_inf->c_beg);
+      FREE(mip->mip_inf->c_sense);
+      FREE(mip->mip_inf->c_rhs);
+      FREE(mip->mip_inf->c_tmp);
       FREE(mip->mip_inf->rows);
       FREE(mip->mip_inf->cols);
       FREE(mip->mip_inf);

@@ -90,7 +90,7 @@ int lp_initialize(lp_prob *p, int master_tid)
    
    if (p->par.tailoff_gap_backsteps > 0 ||
        p->par.tailoff_obj_backsteps > 1){
-      i = MAX(p->par.tailoff_gap_backsteps, p->par.tailoff_obj_backsteps);
+      i = MAX(5, MAX(p->par.tailoff_gap_backsteps, p->par.tailoff_obj_backsteps));
       p->obj_history = (double *) malloc((i + 1) * DSIZE);
       for (j = 0; j <= i; j++){
 	 p->obj_history[j] = -DBL_MAX;
@@ -1238,7 +1238,7 @@ int check_tailoff(lp_prob *p)
       tailoff_obj_frac *= 1.133;
    }
 
-   if((1.0*(p->lp_data->m - p->mip->m/p->mip->m)) > 0.2 && p->tm->stat.analyzed < 1000){
+   if((p->lp_data->m - p->mip->m)/(1.0*p->mip->m) < 0.2 && p->tm->stat.analyzed < 1000){
       //tailoff_gap_frac *= 1.0091;
       //tailoff_obj_frac /= 7.333; 
       gap_backsteps = 4;
@@ -3040,7 +3040,8 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
                 violation, *matval, total_time, cut_time;
    double       *random_hash = lp_data->random_hash;
    const double lpetol = lp_data->lpetol;
-   const double etol1000 = lpetol * 1000;
+   const double etol10 = lpetol * 10;
+   const double etol100 = lpetol * 100;
    const double *x     = lp_data->x;
    OsiRowCut    row_cut;
    var_desc     **vars = lp_data->vars;
@@ -3144,8 +3145,8 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       
       /* check quality */
       if (num_elements>0) {
-         if ( (max_coeff > 0 && min_coeff/max_coeff < etol1000)||
-	      (min_coeff > 0 && min_coeff < etol1000) ) {
+         if ( (max_coeff > 0 && min_coeff/max_coeff < etol100)||
+	      (min_coeff > 0 && min_coeff < etol10) ) {
             PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));
 	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
 	    num_poor_quality++;

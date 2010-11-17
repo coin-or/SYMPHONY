@@ -5117,6 +5117,12 @@ int prep_cleanup_desc(PREPdesc *P)
    mip->nz = col_nz;
    mip->obj_offset = mip->mip_inf->sum_obj_offset + obj_offset;     
    mip->fixed_n = fixed_nz;
+
+   if(fixed_nz < 1) {      
+      FREE(mip->fixed_ind);
+      FREE(mip->fixed_val);
+   }
+
    
    termcode = prep_initialize_mipinfo(P);
    if(PREP_QUIT(termcode)){
@@ -5627,7 +5633,9 @@ int prep_merge_solution(MIPdesc *orig_mip, MIPdesc *prep_mip, lp_sol * sol)
       }
    }
    sol->xlength = nz_cnt; 
-
+   
+   FREE(proj_sol);
+   
    return 0;
    
 }
