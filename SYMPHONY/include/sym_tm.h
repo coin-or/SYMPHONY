@@ -120,9 +120,17 @@ typedef struct TM_PROB{
    double         *pcost_up;
    int            *br_rel_down;
    int            *br_rel_up;
+   int            *br_inf_down;
+   int            *br_inf_up;
    int            *br_rel_cand_list;
    int            *br_rel_down_min_level;
    int            *br_rel_up_min_level;
+   int            *br_frac_cnt;
+
+   double         *var_rank;
+   int            *var_rank_num;
+   double         *root_lp;
+   
    
    /* some temporary stuff */
    bc_node      ***rpath;
@@ -152,7 +160,7 @@ void calculate_widths PROTO((bc_node *node, int *widths));
 int start_node PROTO((tm_prob *tm, int thread_num));
 bc_node *del_best_node PROTO((tm_prob *tm));
 void insert_new_node PROTO((tm_prob *tm, bc_node *new_node));
-int node_compar PROTO((int rule, bc_node *node0, bc_node *node1));
+int node_compar PROTO((tm_prob * tm, int rule, bc_node *node0, bc_node *node1));
 int assign_pool PROTO((tm_prob *tm, int oldpool, process_set *pools,
 		       int *active_nodes_per_pool, int *nodes_per_pool));
 int generate_children PROTO((tm_prob *tm, bc_node *node, branch_obj *bobj,

@@ -391,6 +391,17 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
 	 modify_list(&not_fixed, &path[i]->desc.not_fixed);
    }
 
+
+
+   if(lp[thread_num]->frac_var_cnt == NULL){
+     lp[thread_num]->frac_var_cnt = (int*)calloc(ISIZE,tm->bvarnum + extravar.size);      
+   }else{
+     memset(lp[thread_num]->frac_var_cnt, 0, ISIZE*(tm->bvarnum + extravar.size));
+   }
+
+   int * frac_var_cnt = lp[thread_num]->frac_var_cnt;
+   int cuts_trial_num = 0;
+
    bounds_change_desc *bnd_change = NULL;
    for (bpath = branch_path, i = 0; i < level; i++, bpath++){
       for (j = path[i]->bobj.child_num - 1; j >= 0; j--)
@@ -403,7 +414,9 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
       bpath->rhs = bobj->rhs[j];
       bpath->range = bobj->range[j];
       bpath->branch = bobj->branch[j];
-
+      bpath->sos_cnt = bobj->sos_cnt[j];
+      bpath->sos_ind = bobj->sos_ind[j];
+      
       /* copy changes in variable bounds from each node above this node */
       merge_bound_changes(&bnd_change, path[i]->desc.bnd_change);
       /*
@@ -413,6 +426,13 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
          printf("parent %d is null\n",path[i]->bc_index);
       }
       */
+      //if(path[i]->desc.frac_vars){
+      //	for(int k = 0; k < path[i]->desc.frac_cnt; k++){
+      //	  frac_var_cnt[path[i]->desc.frac_vars[k]]++;
+      //	}
+      //}
+      
+      if(path[i]->cuts_forced) cuts_trial_num++;
    }
    /*
    if (bnd_change->num_changes==0) {
@@ -476,6 +496,8 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
    lp[thread_num]->lp_data->objval = node->lower_bound;
    lp[thread_num]->colgen_strategy = colgen_strat;
    lp[thread_num]->desc->bnd_change = bnd_change;
+
+   lp[thread_num]->lp_stat.chain_cuts_trial_num = cuts_trial_num; 
 
    if (level > 1) {
       lp[thread_num]->lp_stat.num_cut_iters_in_path =
@@ -908,6 +930,8 @@ void process_branching_info(tm_prob *tm, bc_node *node)
    bobj->rhs = (double *) malloc(bobj->child_num * DSIZE);
    bobj->range = (double *) malloc(bobj->child_num * DSIZE);
    bobj->branch = (int *) malloc(bobj->child_num * ISIZE);
+   bobj->sos_cnt = (int *) malloc(bobj->child_num * ISIZE);
+   bobj->sos_ind = (int **) malloc(bobj->child_num * sizeof(int*));
 #endif
    receive_char_array(bobj->sense, bobj->child_num);
    receive_dbl_array(bobj->rhs, bobj->child_num);
@@ -1243,7 +1267,16 @@ int receive_lp_timing(tm_prob *tm)
 	       tm->comp_times.pricing          += tim.pricing;
 	       tm->comp_times.strong_branching += tim.strong_branching;
 	       tm->comp_times.fp               += tim.fp;
+	       tm->comp_times.rh               += tim.rh;
+	       tm->comp_times.ls               += tim.ls;
+	       tm->comp_times.ds               += tim.ds;
+	       tm->comp_times.fr               += tim.fr;
+	       tm->comp_times.rs               += tim.rs;
 	       tm->comp_times.primal_heur      += tim.primal_heur;
+
+	       for(i = 0; i <  DIVING_HEURS_CNT; i++){
+		 tm->comp_times.ds_type[i] += tim.ds_type[i];
+	       }  
 
 	       tm->comp_times.wall_clock_lp    += tim.wall_clock_lp;
 	       tm->comp_times.ramp_up_lp       += tim.ramp_up_lp;
@@ -1272,11 +1305,16 @@ int receive_lp_timing(tm_prob *tm)
 
 	       receive_char_array((char *)&lp_stat, sizeof(lp_stat_desc));
                tm->lp_stat.lp_calls             += lp_stat.lp_calls;
+               tm->lp_stat.lp_node_calls             += lp_stat.lp_node_calls;
                tm->lp_stat.str_br_lp_calls      += lp_stat.str_br_lp_calls;
                tm->lp_stat.lp_sols              += lp_stat.lp_sols;
+               tm->lp_stat.ip_sols              += lp_stat.ip_sols;
                tm->lp_stat.str_br_bnd_changes   += lp_stat.str_br_bnd_changes;
                tm->lp_stat.str_br_nodes_pruned  += lp_stat.str_br_nodes_pruned;
-
+	       tm->lp_stat.prep_bnd_changes     += lp_stat.prep_bnd_changes; 
+               tm->lp_stat.prep_nodes_pruned    += lp_stat.prep_nodes_pruned;
+	       tm->lp_stat.lp_iter_num          += lp_stat.lp_iter_num; 
+	       
                tm->lp_stat.cuts_generated        += lp_stat.cuts_generated;
                tm->lp_stat.gomory_cuts           += lp_stat.gomory_cuts;
                tm->lp_stat.knapsack_cuts         += lp_stat.knapsack_cuts;
@@ -1332,9 +1370,41 @@ int receive_lp_timing(tm_prob *tm)
                tm->lp_stat.fp_calls              += lp_stat.fp_calls;
                tm->lp_stat.fp_lp_calls           += lp_stat.fp_lp_calls;
                tm->lp_stat.fp_num_sols           += lp_stat.fp_num_sols;
+	       tm->lp_stat.fp_num_iter           += lp_stat.fp_num_iter;
+	       tm->lp_stat.fp_last_call_ind       = lp_stat.fp_last_call_ind;
 
+               tm->lp_stat.rh_calls              += lp_stat.rh_calls;
+               tm->lp_stat.rh_num_sols           += lp_stat.rh_num_sols;
+	       tm->lp_stat.rh_last_call_ind       = lp_stat.rh_last_call_ind;
+
+               tm->lp_stat.ls_calls              += lp_stat.ls_calls;
+               tm->lp_stat.ls_num_sols           += lp_stat.ls_num_sols;
+	       tm->lp_stat.ls_last_call_ind       = lp_stat.ls_last_call_ind;
+
+               tm->lp_stat.ds_calls              += lp_stat.ds_calls;
+               tm->lp_stat.ds_num_sols           += lp_stat.ds_num_sols;
+               tm->lp_stat.ds_num_iter           += lp_stat.ds_num_iter;
+	       tm->lp_stat.ds_last_call_ind       = lp_stat.ds_last_call_ind;
+	       
+               tm->lp_stat.fr_calls              += lp_stat.fr_calls;
+               tm->lp_stat.fr_num_sols           += lp_stat.fr_num_sols;
+	       tm->lp_stat.fr_last_call_ind       = lp_stat.fr_last_call_ind;
+	       tm->lp_stat.fr_analyzed_nodes     += lp_stat.fr_analyzed_nodes; 
+	       tm->lp_stat.fr_last_sol_call       = lp_stat.fr_last_sol_call; 
+
+               tm->lp_stat.rs_calls              += lp_stat.rs_calls;
+               tm->lp_stat.rs_num_sols           += lp_stat.rs_num_sols;
+	       tm->lp_stat.rs_last_call_ind       = lp_stat.rs_last_call_ind;
+	       tm->lp_stat.rs_analyzed_nodes     += lp_stat.rs_analyzed_nodes; 
+	       tm->lp_stat.rs_last_sol_call       = lp_stat.rs_last_sol_call; 
+	       
+	       for(i = 0; i <  DIVING_HEURS_CNT; i++){
+		 tm->lp_stat.ds_type_calls[i] += lp_stat.ds_type_calls[i];
+		 tm->lp_stat.ds_type_num_sols[i] += lp_stat.ds_type_num_sols[i];
+		 tm->lp_stat.ds_type_num_iter[i] += lp_stat.ds_type_num_iter[i];
+	       }  
+	      
 	       break;
-
 	     default:
 	       printf("Unknown message type %i\n\n", msgtag);
 	       break;

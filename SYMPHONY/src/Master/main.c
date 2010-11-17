@@ -150,7 +150,7 @@ int main(int argc, char **argv)
       sym_parse_command_line(env, argc, argv);
 
       if (env->par.verbosity >= 0){
-	 sym_version();
+	 version();
       }
       
       if (env->par.test){
@@ -189,8 +189,9 @@ int main(int argc, char **argv)
      double objval = 0.0, initial_time = 0.0, start_time = 0.0;
      double finish_time = 0.0, dbl_value = 0;
 
-     sym_version();
-     printf("Please type 'help'/'?' to see a list of commands\n\n");
+     version();
+     printf("***** WELCOME TO SYMPHONY INTERACTIVE MIP SOLVER ******\n\n"
+	    "Please type 'help'/'?' to see the main commands!\n\n");
 
      sym_set_int_param(env, "verbosity", -1);
 
@@ -429,7 +430,7 @@ int main(int argc, char **argv)
 				env->warm_start->ub, env->warm_start->lb, 
 				initial_time, start_time, finish_time,
 				env->mip->obj_offset, env->mip->obj_sense,
-				env->warm_start->has_ub,NULL);
+				env->warm_start->has_ub,NULL, 0);
 	       printf("\n");	       
 	     }
 	     strcpy(args[1], "");	       

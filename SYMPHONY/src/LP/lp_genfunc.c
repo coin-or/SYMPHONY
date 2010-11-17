@@ -213,7 +213,7 @@ int fathom_branch(lp_prob *p)
    LPdata *lp_data = p->lp_data;
    node_times *comp_times = &p->comp_times;
    char first_in_loop = TRUE;
-   int iterd, termcode;
+   int iterd, termcode, feas_status; 
    int cuts = 0, no_more_cuts_count;
    int num_errors = 0;
    int cut_term = 0;
@@ -222,13 +222,13 @@ int fathom_branch(lp_prob *p)
 #ifdef DO_TESTS
    double oldobjval = lp_data->objval;
 #endif
-
+   double now, then2, timeout2; 
+#ifdef COMPILE_IN_LP
+   then2 = wall_clock(NULL);
+   timeout2 = 2;
+#endif   
    check_ub(p);
    p->iter_num = p->node_iter_num = 0;
-
-   if(p->bc_level > 0){
-      update_cut_parameters(p);
-   }   
    
    // TODO: replace check_bounds with a better preprocessor
    termcode = LP_OPTIMAL; // just to initialize
@@ -267,14 +267,15 @@ int fathom_branch(lp_prob *p)
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
       p->bound_changes_in_iter = 0;
-      if (p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
-               p->bc_level < 1)) {
+      if ((p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
+			       p->bc_level < 1))) {
          if (p->bc_level < 1) {
             PRINT(verbosity, -1, ("solving root lp relaxation\n"));
          }
          termcode = initial_lp_solve(lp_data, &iterd);
       } else {
-         termcode = dual_simplex(lp_data, &iterd);
+	 termcode = dual_simplex(lp_data, &iterd);
+         //termcode = initial_lp_solve(lp_data, &iterd);
       }
       if (p->bc_index < 1 && p->iter_num < 2) {
 	 p->root_objval = lp_data->objval;
@@ -283,7 +284,15 @@ int fathom_branch(lp_prob *p)
          }
       }
       p->lp_stat.lp_calls++;
+      p->lp_stat.lp_node_calls++;
+      //p->lp_stat.lp_iter_num += iterd; 
+
+#ifdef COMPILE_IN_LP
+      p->tm->lp_stat.lp_iter_num += iterd;
+#endif
+
       p->lp_stat.lp_total_iter_num += iterd;
+
       if(iterd > p->lp_stat.lp_max_iter_num){
 	 p->lp_stat.lp_max_iter_num = iterd;
       }
@@ -299,6 +308,34 @@ int fathom_branch(lp_prob *p)
       get_slacks(lp_data);
       get_x(lp_data);
 
+      if(p->bc_level > 0 && p->node_iter_num < 2 && termcode == LP_OPTIMAL){
+	 p->lp_stat.node_cuts_tried = 0;
+	 p->lp_stat.node_cuts_forced = 0;
+	 //update_solve_parameters(p);
+	 update_cut_parameters(p);
+      }else if(p->bc_level < 1){
+	 p->lp_stat.node_cuts_tried = TRUE; 
+      }
+      
+#if 1
+      if(p->par.use_sos_branching && p->mip->opt_sol){
+	 double *opt_sol = p->mip->opt_sol;
+	 double ub, lb;
+	 int is_feas = TRUE;
+	 for(int i = 0; i < lp_data->n; i++){
+	    get_lb(lp_data, i, &lb);
+	    get_ub(lp_data, i, &ub);
+	    if(opt_sol[i] < lb - lp_data->lpetol || opt_sol[i] > ub + lp_data->lpetol){
+	       is_feas = FALSE;
+	       break;
+	    }
+	 }
+	 if(is_feas){
+	    printf("bc_ind %i termcode %i\n", p->bc_index, termcode);
+	 }
+      }
+#endif
+      
       /* display the current solution */
       if (p->mip->obj_sense == SYM_MAXIMIZE){
          if (termcode == LP_OPTIMAL &&
@@ -400,8 +437,10 @@ int fathom_branch(lp_prob *p)
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
-      if (is_feasible_u(p, FALSE, FALSE) == IP_FEASIBLE){
-	 cuts = -1;
+      feas_status = is_feasible_u(p, FALSE, FALSE);
+      if (feas_status == IP_FEASIBLE ||
+	  (feas_status == IP_HEUR_FEASIBLE && p->par.find_first_feasible)){
+	cuts = -1;
       }else{
 	 /*------------------------------------------------------------------*\
 	  * send the current solution to the cut generator, and also to the
@@ -441,7 +480,7 @@ int fathom_branch(lp_prob *p)
 	 \*------------------------------------------------------------------*/
 
 #ifdef USE_SYM_APPLICATION
-            if ((cut_term = receive_cuts(p, first_in_loop,
+	    if ((cut_term = receive_cuts(p, first_in_loop,
                         no_more_cuts_count)) >=0 ){
                cuts += cut_term;
             }else{
@@ -480,9 +519,6 @@ int fathom_branch(lp_prob *p)
 	 }
       }else{
 	 PRINT(verbosity, 2, ("... %i violated cuts were added\n", cuts));
-#ifdef COMPILE_IN_LP
-	 p->tm->active_nodes[p->proc_index]->cuts_tried = TRUE;
-#endif
       }
       
       comp_times->lp += used_time(&p->tt);
@@ -498,7 +534,16 @@ int fathom_branch(lp_prob *p)
 	    printf("*************************************************\n\n");
 	 }
 	 p->node_iter_num = 0;
-	 update_cut_parameters(p);
+
+#ifdef COMPILE_IN_LP
+	 now = wall_clock(NULL);
+	 if (now - then2 > timeout2){
+	    if(verbosity >= -1 ){
+	       print_tree_status(p->tm);
+	    }
+	    then2 = now;
+	 }
+#endif
 	 /*
          printf("node = %d\n", p->bc_index);
          printf("cut iters = %d\n", p->lp_stat.num_cut_iters_in_path);
@@ -530,6 +575,13 @@ int fathom_branch(lp_prob *p)
 
        case FEAS_SOL_FOUND:
          PRINT(verbosity,2,("solution found before branching\n"));
+	 if(p->par.find_first_feasible){
+	   if(fathom(p, TRUE)){  //send in true for interrupted node
+	     return(FUNCTION_TERMINATED_NORMALLY);
+	   }else{
+	     return(FUNCTION_TERMINATED_ABNORMALLY);
+	   }
+	 }
        default: /* the return value is the number of cuts added */
 	 if (verbosity > 2){
 	    printf("Continue with this node.");
@@ -547,27 +599,44 @@ int fathom_branch(lp_prob *p)
       comp_times->strong_branching += used_time(&p->tt);
 
       check_ub(p);
-      first_in_loop = FALSE;
-
+      first_in_loop = FALSE;      
+      
 #ifdef COMPILE_IN_LP
-      if (p->tm->par.time_limit >= 0.0 &&
-	  wall_clock(NULL) - p->tm->start_time >= p->tm->par.time_limit){
+      char gap_limit_reached = FALSE;
+      if(p->has_ub && p->tm->par.gap_limit >= 0.0 && 
+	 (p->tm->samephase_candnum > 1 || p->tm->active_node_num > 1)){
+	 find_tree_lb(p->tm);	
+	 if (d_gap(p->ub, MIN(p->tm->lb, lp_data->objval), p->mip->obj_offset, p->mip->obj_sense) <= p->tm->par.gap_limit){
+	    gap_limit_reached = TRUE;
+	 }
+      }
+      //if(p->par.rs_mode_enabled)
+      //	 printf("tm-lp-iter %i %i \n", p->tm->lp_stat.lp_iter_num, p->tm->par.rs_lp_iter_limit);
+      if(p->par.rs_mode_enabled && p->tm->lp_stat.lp_iter_num > p->par.rs_lp_iter_limit){	 
+	 gap_limit_reached = TRUE;
+      }
+
+      if (gap_limit_reached || 
+	  (p->tm->par.time_limit >= 0.0 &&
+	   wall_clock(NULL) - p->tm->start_time >= p->tm->par.time_limit)){
+	 if (fathom(p, TRUE)){
+	    return(FUNCTION_TERMINATED_NORMALLY);
+	 }else{
+	    return(FUNCTION_TERMINATED_ABNORMALLY);
+	 }
+      } 
 #else
       if (p->par.time_limit >= 0.0 &&
 	  wall_clock(NULL) - p->start_time >= p->par.time_limit){
-#if 0
-      to unconfuse vi
-      }
-#endif
-#endif
          if (fathom(p, TRUE)){
 	    return(FUNCTION_TERMINATED_NORMALLY);
 	 }else{
 	    return(FUNCTION_TERMINATED_ABNORMALLY);
 	 }
       }
+#endif
    }
-
+   
    comp_times->lp += used_time(&p->tt);
 
    return(FUNCTION_TERMINATED_NORMALLY);
@@ -585,6 +654,9 @@ int fathom(lp_prob *p, int primal_feasible)
    int new_vars;
    int colgen = p->colgen_strategy & COLGEN__FATHOM;
    int termcode = p->lp_data->termcode;
+
+   if(p->branch_dir == 'L') p->br_inf_down[p->branch_var]++;
+   else p->br_inf_up[p->branch_var]++;   
    
    if (p->lp_data->nf_status == NF_CHECK_NOTHING){
       PRINT(p->par.verbosity, 1,
@@ -1152,11 +1224,29 @@ int check_tailoff(lp_prob *p)
    int obj_backsteps = p->par.tailoff_obj_backsteps;
    double *obj_hist = p->obj_history;
    double tailoff_obj_frac = p->par.tailoff_obj_frac;
-   
+   double tailoff_gap_frac = p->par.tailoff_gap_frac; 
+  
    int i;
    double sum, ub;
    int maxsteps = MAX(gap_backsteps, obj_backsteps);
 
+   if(p->bc_index < 1){
+      tailoff_gap_frac *= 1.0091;
+      tailoff_obj_frac /= 7.333; 
+   }else{
+      tailoff_gap_frac *= 0.877;
+      tailoff_obj_frac *= 1.133;
+   }
+
+   if((1.0*(p->lp_data->m - p->mip->m/p->mip->m)) > 0.2 && p->tm->stat.analyzed < 1000){
+      //tailoff_gap_frac *= 1.0091;
+      //tailoff_obj_frac /= 7.333; 
+      gap_backsteps = 4;
+      obj_backsteps = 5;
+   }
+   
+   //if(p->tm->stat.analyzed > 1000 && p->node_iter_num > 1) return TRUE;
+   
    p->has_tailoff = TRUE;
    if (gap_backsteps >= 1 || obj_backsteps >= 2) {
       
@@ -1194,7 +1284,8 @@ int check_tailoff(lp_prob *p)
 	       p->obj_no_impr_iters--;
 	    }
 	 }
-
+	 if(p->iter_num > 1 && p->par.verbosity > -1)
+	    //printf("w-iter - obj_gap - no_iter : %i %f %i\n", weighted_iter, obj_gap, p->obj_no_impr_iters);
 	 
 	 if(weighted_iter <= 400){
 	    if (p->obj_no_impr_iters > 
@@ -1239,10 +1330,11 @@ int check_tailoff(lp_prob *p)
 	 for (i = 1, sum = 0; i <= gap_backsteps; i++) {
 	    sum += (ub - obj_hist[i-1]) / (ub - obj_hist[i]);
 	 }
-	 if (sum / gap_backsteps > p->par.tailoff_gap_frac) {
+	 //printf("tailoff-gap: %f %f\n", sum/gap_backsteps, tailoff_gap_frac);
+	 if (sum / gap_backsteps > tailoff_gap_frac) {
 	    PRINT(p->par.verbosity, 3, ("Branching because of tailoff in gap!\n"));
 	    return(TRUE); /* there is tailoff */
-	 }
+	 }	 
       }
 
       /* if we want objective value based tailoff:
@@ -1256,6 +1348,7 @@ int check_tailoff(lp_prob *p)
 	       sum += obj_backsteps;
 	    }
 	 }
+	 //printf("tailoff-obj-gap: %f %f\n", sum/(obj_backsteps-1), tailoff_obj_frac);	 
 	 if (sum / (obj_backsteps - 1) < tailoff_obj_frac){
 	    PRINT(p->par.verbosity, 3, ("Branching because of tailoff in "
 					"objective function!\n"));
@@ -1272,9 +1365,10 @@ int check_tailoff(lp_prob *p)
 	    obj_hist[0] - obj_hist[1] < p->par.tailoff_absolute){
 	 PRINT(p->par.verbosity, 3, ("Branching because of tailoff in "
 				     "value of objective function!\n"));
+	 //printf("tailoff-absolute: %f %f\n", obj_hist[0] - obj_hist[1], p->par.tailoff_absolute);
 	 return(TRUE);
       }
-
+      //printf("tailoff-absolute: %f %f\n", obj_hist[0] - obj_hist[1], p->par.tailoff_absolute);
    } else {
       /* Both gap_backsteps and obj_backsteps are too small to procede with
          check_tailoff. The user asks for tailoff (since we came to this
@@ -1318,6 +1412,7 @@ void lp_close(lp_prob *p)
 #else
 #pragma omp critical (timing_update)
 {
+   int i;
    p->tm->comp_times.communication    += p->comp_times.communication;
    p->tm->comp_times.lp               += p->comp_times.lp;
    p->tm->comp_times.lp_setup         += p->comp_times.lp_setup;
@@ -1326,7 +1421,16 @@ void lp_close(lp_prob *p)
    p->tm->comp_times.pricing          += p->comp_times.pricing;
    p->tm->comp_times.strong_branching += p->comp_times.strong_branching;
    p->tm->comp_times.fp               += p->comp_times.fp;
+   p->tm->comp_times.rh               += p->comp_times.rh;
+   p->tm->comp_times.ls               += p->comp_times.ls;
+   p->tm->comp_times.ds               += p->comp_times.ds;
+   p->tm->comp_times.fr               += p->comp_times.fr;
+   p->tm->comp_times.rs               += p->comp_times.rs;
    p->tm->comp_times.primal_heur      += p->comp_times.primal_heur;
+
+   for(i = 0; i <  DIVING_HEURS_CNT; i++){
+     p->tm->comp_times.ds_type[i] += p->comp_times.ds_type[i];
+   }  
 
    p->tm->comp_times.cuts             += p->comp_times.cuts;
    p->tm->comp_times.gomory_cuts      += p->comp_times.gomory_cuts;
@@ -1346,11 +1450,16 @@ void lp_close(lp_prob *p)
       p->comp_times.dupes_and_bad_coeffs_in_cuts;
 
    p->tm->lp_stat.lp_calls                += p->lp_stat.lp_calls;
+   p->tm->lp_stat.lp_node_calls           += p->lp_stat.lp_node_calls;
    p->tm->lp_stat.str_br_lp_calls         += p->lp_stat.str_br_lp_calls;
    p->tm->lp_stat.lp_sols                 += p->lp_stat.lp_sols;
+   p->tm->lp_stat.ip_sols                 += p->lp_stat.ip_sols;
    p->tm->lp_stat.str_br_bnd_changes      += p->lp_stat.str_br_bnd_changes;
-   p->tm->lp_stat.str_br_nodes_pruned   += p->lp_stat.str_br_nodes_pruned;
-
+   p->tm->lp_stat.str_br_nodes_pruned     += p->lp_stat.str_br_nodes_pruned;
+   p->tm->lp_stat.prep_bnd_changes        += p->lp_stat.prep_bnd_changes; 
+   p->tm->lp_stat.prep_nodes_pruned       += p->lp_stat.prep_nodes_pruned;
+   p->tm->lp_stat.lp_iter_num             += p->lp_stat.lp_iter_num;
+   
    p->tm->lp_stat.cuts_generated          += p->lp_stat.cuts_generated;
    p->tm->lp_stat.gomory_cuts             += p->lp_stat.gomory_cuts;
    p->tm->lp_stat.knapsack_cuts           += p->lp_stat.knapsack_cuts;
@@ -1403,13 +1512,46 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.fp_calls                += p->lp_stat.fp_calls;
    p->tm->lp_stat.fp_lp_calls             += p->lp_stat.fp_lp_calls;
    p->tm->lp_stat.fp_num_sols             += p->lp_stat.fp_num_sols;
-}
+   p->tm->lp_stat.fp_num_iter             += p->lp_stat.fp_num_iter;
+   p->tm->lp_stat.fp_last_call_ind         = p->lp_stat.fp_last_call_ind;
+
+   p->tm->lp_stat.rh_calls                += p->lp_stat.rh_calls;
+   p->tm->lp_stat.rh_num_sols             += p->lp_stat.rh_num_sols;
+   p->tm->lp_stat.rh_last_call_ind         = p->lp_stat.rh_last_call_ind;
+
+   p->tm->lp_stat.ls_calls                += p->lp_stat.ls_calls;
+   p->tm->lp_stat.ls_num_sols             += p->lp_stat.ls_num_sols;
+   p->tm->lp_stat.ls_last_call_ind         = p->lp_stat.ls_last_call_ind;
+
+   p->tm->lp_stat.ds_calls                += p->lp_stat.ds_calls;
+   p->tm->lp_stat.ds_num_sols             += p->lp_stat.ds_num_sols;
+   p->tm->lp_stat.ds_num_iter             += p->lp_stat.ds_num_iter;
+   p->tm->lp_stat.ds_last_call_ind         = p->lp_stat.ds_last_call_ind;
+
+   p->tm->lp_stat.fr_calls                += p->lp_stat.fr_calls;
+   p->tm->lp_stat.fr_num_sols             += p->lp_stat.fr_num_sols;
+   p->tm->lp_stat.fr_last_call_ind         = p->lp_stat.fr_last_call_ind;
+   p->tm->lp_stat.fr_analyzed_nodes       += p->lp_stat.fr_analyzed_nodes; 
+   p->tm->lp_stat.fr_last_sol_call         = p->lp_stat.fr_last_sol_call; 
+
+   p->tm->lp_stat.rs_calls                += p->lp_stat.rs_calls;
+   p->tm->lp_stat.rs_num_sols             += p->lp_stat.rs_num_sols;
+   p->tm->lp_stat.rs_last_call_ind         = p->lp_stat.rs_last_call_ind;
+   p->tm->lp_stat.rs_analyzed_nodes       += p->lp_stat.rs_analyzed_nodes; 
+   p->tm->lp_stat.rs_last_sol_call         = p->lp_stat.rs_last_sol_call; 
+
+   for(i = 0; i <  DIVING_HEURS_CNT; i++){
+     p->tm->lp_stat.ds_type_calls[i] += p->lp_stat.ds_type_calls[i];
+     p->tm->lp_stat.ds_type_num_sols[i] += p->lp_stat.ds_type_num_sols[i];
+     p->tm->lp_stat.ds_type_num_iter[i] += p->lp_stat.ds_type_num_iter[i];     
+   }
+ }
 #endif
 #ifdef COMPILE_IN_CG
-   cg_close(p->cgp);
+ cg_close(p->cgp);
 #endif
 #ifndef COMPILE_IN_TM
-   free_lp(p);
+ free_lp(p);
 #endif
 }
 
@@ -1518,6 +1660,60 @@ int str_br_bound_changes(lp_prob *p, int num_bnd_changes, double *bnd_val,
 }
 
 /*===========================================================================*/
+
+int update_solve_parameters(lp_prob *p)
+{
+  /* check if feasibility problem */
+
+  LPdata *lp_data = p->lp_data; 
+  var_desc **vars = lp_data->vars; 
+  int i, n = lp_data->n;
+  double ub, lb, obj, etol = 1e-12; 
+  //int obj_coeff_cnt = 0;
+  double *x = lp_data->x;
+
+  for(i = 0; i < n; i++){
+    ub = vars[i]->ub;
+    lb = vars[i]->lb; 
+    get_objcoef(lp_data, i, &obj);
+    
+    if(ub > lb + lp_data->lpetol && 
+       (obj > etol || obj < -etol)){
+      if(x[i] < ub - etol || x[i] > lb + etol){
+	break;//obj_coeff_cnt++;
+      }       
+    }
+  }
+
+  //if(obj_coeff_cnt < 1){
+  if(i >= n){
+    //printf("obj disabled %i\n", p->bc_index);
+    p->par.disable_obj = TRUE;
+  }
+  else 
+    p->par.disable_obj = FALSE; 
+  
+  p->par.no_impr_in_obj = FALSE; 
+
+#ifdef COMPILE_IN_LP  
+  bc_node * node = p->tm->active_nodes[p->proc_index];
+  int backtrack = 0;
+  etol = 100*p->lp_data->lpetol;
+  while(node->parent){
+    if(node->parent->start_objval > node->start_objval - etol){
+      backtrack++;
+    }else break;    
+    if(backtrack > 4) { 
+      p->par.no_impr_in_obj = TRUE; 
+      break; 
+    }
+    node = node->parent;
+  }
+#endif
+
+  return 0;
+}
+/*===========================================================================*/
 /* this function is called after root node has been processed. we update
  * frequency of cut generation for different cuts depending upon how many cuts
  * were generated and how much time was used
@@ -1530,63 +1726,278 @@ int update_cut_parameters(lp_prob *p)
    cgl_params   *par      = &(p->par.cgl);
    cgl_params   *data_par = &(p->lp_data->cgl);
 
-
 #ifdef COMPILE_IN_LP   
+
+   //if(p->par.disable_obj && (p->bc_level > 10)){
+   //   data_par->chain_status = CGL_CHAIN_STOP;
+   // }
+
    if(data_par->use_chain_strategy){
 
       int init_chain_trial_freq = p->par.cgl.chain_trial_freq;
 
-      if(p->bc_level <= 5){
-	 init_chain_trial_freq = MAX(1, (int)(0.2*init_chain_trial_freq));
-      }else if(p->bc_level <= 20){
-	 init_chain_trial_freq = MAX(2, (int)(0.2*init_chain_trial_freq));
+      //if(p->bc_level <= 5){
+      //	 init_chain_trial_freq = MAX(1, (int)(0.2*init_chain_trial_freq));
+      //}else if(p->bc_level <= 20){
+      //	 init_chain_trial_freq = MAX(2, (int)(0.2*init_chain_trial_freq));
+      //}
+#if 1
+      //if(data_par->chain_status == CGL_CHAIN_START){
+      //	 printf("%i NEW_CHAIN\n", p->bc_index);	 
+      // }
+
+      double dual_gap = 100.0;
+      if(p->has_ub){
+	dual_gap = d_gap(p->ub, p->lp_data->objval, p->mip->obj_offset, p->mip->obj_sense);
+      }
+
+      //if(dual_gap < 0.05) data_par->chain_status = CGL_CHAIN_STOP;
+      if(dual_gap < 0.25) data_par->chain_status = CGL_CHAIN_STOP;
+#endif
+
+#if 1
+      
+      //if(data_par->chain_status != CGL_CHAIN_START && !p->has_ub) data_par->chain_status = CGL_CHAIN_STOP;
+
+      if(data_par->chain_status == CGL_CHAIN_START){
+	 data_par->max_chain_trial_num = p->par.cgl.max_chain_trial_num - 
+	    p->lp_stat.chain_cuts_trial_num;	 
+	 if(data_par->max_chain_trial_num < 0) data_par->chain_status = CGL_CHAIN_STOP;
+      }
+
+      //if(p->tm->stat.analyzed > 5000){
+      //	 data_par->chain_status = CGL_CHAIN_STOP;
+      //}	 
+      
+      double b_prog, cut_prog = 0.0;
+      char cuts_tried = FALSE;
+      double start_objval, end_objval; 
+      double act_cut_ratio = (1.0*(p->lp_data->m - p->mip->m))/(p->mip->m);      
+      //printf("act-cut %f\n", act_cut_ratio);
+      if(data_par->chain_status != CGL_CHAIN_STOP){
+	 bc_node * node = p->tm->active_nodes[p->proc_index];
+	 //int backtrack = 1;// weight = 0, total_weight = 0;
+	 //int chain_cut_backtrack = 0;
+	 
+	 data_par->chain_check_index = node->bc_index;
+	 b_prog = p->lp_data->objval;
+	 node = node->parent;	
+	 b_prog -= node->end_objval;	 
+	 cuts_tried = node->cuts_tried; 
+	 if(cuts_tried){
+	    cut_prog = (node->end_objval - node->start_objval);///node->iter_num;
+	 }	    
+	 start_objval = node->start_objval;
+	 end_objval = node->end_objval;
       }
       
       /* TODO: Have these for each cut separately */
       if(data_par->chain_status == CGL_CHAIN_START ||      
 	 data_par->chain_status == CGL_CHAIN_CONTINUE ||
 	 data_par->chain_status == CGL_CHAIN_CHECK){
-	 /* here, we are at the top of the chain, or keep generating
-	    due to improvement or we just passed a check_point after
-	    paused for a while*/      
+	   /* here, we are at the top of the chain, or keep generating
+	      due to improvement or we just passed a check_point after
+	      paused for a while*/
+	 if(cuts_tried){
+	    if(b_prog >= 4*cut_prog || fabs(cut_prog/(start_objval + 1e-4)) < data_par->chain_weighted_gap ||
+	       act_cut_ratio > 0.2){
+	       if(data_par->max_chain_trial_num >= 0){
+		  data_par->chain_status = CGL_CHAIN_PAUSE;
+		  data_par->chain_trial_freq = init_chain_trial_freq;
+	       }else{
+		  data_par->chain_status = CGL_CHAIN_STOP;
+	       }
+	    }else{
+	       data_par->chain_status = CGL_CHAIN_CONTINUE;
+	       //data_par->max_chain_trial_num = p->par.cgl.max_chain_trial_num;
+	    }
+	 }else{
+	    if(fabs(b_prog/(end_objval + 1e-4)) < 10*par->chain_br_weighted_gap || act_cut_ratio < 0.05){
+	       //data_par->max_chain_trial_num--;
+	       data_par->chain_status = CGL_CHAIN_CHECK;
+	    }else{
+	       data_par->chain_status = CGL_CHAIN_PAUSE;
+	       data_par->chain_trial_freq = init_chain_trial_freq;
+	    }
+	 }
+      }else if(data_par->chain_status == CGL_CHAIN_PAUSE){
+	 if(fabs(b_prog/(end_objval + 1e-4)) < 10*par->chain_br_weighted_gap){
+	    data_par->chain_trial_freq--;
+	    if(data_par->chain_trial_freq <= 0){
+	       data_par->max_chain_trial_num--;
+	       data_par->chain_trial_freq = init_chain_trial_freq;
+	       data_par->chain_status = CGL_CHAIN_CHECK;
+	       data_par->chain_check_index =
+		  p->tm->active_nodes[p->proc_index]->bc_index;
+	    }
+	 }
+      }//else{	
+      //	printf("error in update_cut_params.. %i \n", data_par->chain_status);
+      //}      
+      
+      //   }
+#if 0
+      if(data_par->chain_status == CGL_CHAIN_START){
+	 printf("%i CGL-START\n", p->bc_index);	 
+      }else if(data_par->chain_status == CGL_CHAIN_CHECK){
+	 printf("\t%i CGL-CHECK\n", p->bc_index);	 
+      }else if(data_par->chain_status == CGL_CHAIN_STOP){
+	 printf("\t%i CGL-STOP\n", p->bc_index);	 
+      }else if(data_par->chain_status == CGL_CHAIN_PAUSE){
+	 printf("\t%i CGL-PAUSE\n", p->bc_index);
+      }else if(data_par->chain_status == CGL_CHAIN_CONTINUE){
+	 printf("\t%i CGL-CONT\n", p->bc_index);	 
+      }else {
+	 printf("\t%i CGL-ELSE\n", p->bc_index);	 
+      }
+#endif
+#endif
 
-	    bc_node * node = p->tm->active_nodes[p->proc_index];
-	    double weighted_gap = 0.0;
-	    int backtrack = 1;// weight = 0, total_weight = 0;
-	    int chain_cut_backtrack = 0;
-	    char first_found = FALSE;
-	    if(data_par->chain_status == CGL_CHAIN_START){
-	       
-	       /* find the first predecessor node where we generated cuts and
-		  see if it helped us there */
-	       
+#if 0
+      
+      //if(data_par->chain_status != CGL_CHAIN_START && !p->has_ub) data_par->chain_status = CGL_CHAIN_STOP;
+
+      if(data_par->chain_status == CGL_CHAIN_START){
+	 data_par->max_chain_trial_num = p->par.cgl.max_chain_trial_num - 
+	    p->lp_stat.chain_cuts_trial_num;	 
+	 if(data_par->max_chain_trial_num < 0) data_par->chain_status = CGL_CHAIN_STOP;
+      }
+
+      double b_prog, cut_prog = 0.0;
+      char cuts_tried = FALSE;
+      double start_objval, end_objval; 
+      
+      if(data_par->chain_status != CGL_CHAIN_STOP){
+	 bc_node * node = p->tm->active_nodes[p->proc_index];
+	 //int backtrack = 1;// weight = 0, total_weight = 0;
+	 //int chain_cut_backtrack = 0;
+	 
+	 data_par->chain_check_index = node->bc_index;
+	 b_prog = p->lp_data->objval;
+	 node = node->parent;	
+	 b_prog -= node->end_objval;	 
+	 cuts_tried = node->cuts_tried; 
+	 if(cuts_tried){
+	    cut_prog = (node->end_objval - node->start_objval)/node->iter_num;
+	 }	    
+	 start_objval = node->start_objval;
+	 end_objval = node->end_objval;
+      }
+      
+      /* TODO: Have these for each cut separately */
+      if(data_par->chain_status == CGL_CHAIN_START ||      
+	 data_par->chain_status == CGL_CHAIN_CONTINUE ||
+	 data_par->chain_status == CGL_CHAIN_CHECK){
+	   /* here, we are at the top of the chain, or keep generating
+	      due to improvement or we just passed a check_point after
+	      paused for a while*/
+
+	if(cuts_tried){
+	   if(b_prog >= 4*cut_prog || fabs(cut_prog/(start_objval + 1e-4)) < data_par->chain_weighted_gap){
+	      if(data_par->max_chain_trial_num >= 0){
+		 data_par->chain_status = CGL_CHAIN_PAUSE;
+		 data_par->chain_trial_freq = init_chain_trial_freq;
+	      }else{
+		 data_par->chain_status = CGL_CHAIN_STOP;
+	      }
+	   }else{
+	      data_par->chain_status = CGL_CHAIN_CONTINUE;
+	      //data_par->max_chain_trial_num = p->par.cgl.max_chain_trial_num;
+	   }
+	}else{
+	   if(fabs(b_prog/(end_objval + 1e-4)) < par->chain_br_weighted_gap){
+	      data_par->max_chain_trial_num--;
+	      data_par->chain_status = CGL_CHAIN_CHECK;
+	   }else{
+	      data_par->chain_status = CGL_CHAIN_PAUSE;
+	      data_par->chain_trial_freq = init_chain_trial_freq;
+	   }
+	}
+      }else if(data_par->chain_status == CGL_CHAIN_PAUSE){
+	 if(fabs(b_prog/(end_objval + 1e-4)) < par->chain_br_weighted_gap){
+	    data_par->chain_trial_freq--;
+	    if(data_par->chain_trial_freq <= 0){
+	       data_par->max_chain_trial_num--;
+	       data_par->chain_trial_freq = init_chain_trial_freq;
+	       data_par->chain_status = CGL_CHAIN_CHECK;
+	       data_par->chain_check_index =
+		  p->tm->active_nodes[p->proc_index]->bc_index;
+	    }
+	 }
+      }//else{	
+      //	printf("error in update_cut_params.. %i \n", data_par->chain_status);
+      //}      
+      
+      //   }
+      if(data_par->chain_status == CGL_CHAIN_START){
+	 printf("%i CGL-START\n", p->bc_index);	 
+      }else if(data_par->chain_status == CGL_CHAIN_CHECK){
+	 printf("\t%i CGL-CHECK\n", p->bc_index);	 
+      }else if(data_par->chain_status == CGL_CHAIN_STOP){
+	 printf("\t%i CGL-STOP\n", p->bc_index);	 
+      }else if(data_par->chain_status == CGL_CHAIN_PAUSE){
+	 printf("\t%i CGL-PAUSE\n", p->bc_index);
+      }else if(data_par->chain_status == CGL_CHAIN_CONTINUE){
+	 printf("\t%i CGL-CONT\n", p->bc_index);	 
+      }else {
+	 printf("\t%i CGL-ELSE\n", p->bc_index);	 
+      }
+#endif      
+
+#if 0
+      if(data_par->chain_status == CGL_CHAIN_START ||
+         data_par->chain_status == CGL_CHAIN_CONTINUE ||
+	 data_par->chain_status == CGL_CHAIN_CHECK){
+ 	     /* here, we are at the top of the chain, or keep generating
+		due to improvement or we just passed a check_point after
+		paused for a while*/
+	
+ 	     bc_node * node = p->tm->active_nodes[p->proc_index];
+	     double weighted_gap = 0.0;
+	     double c_gap = 0.0, b_gap = 0.0;
+	     int backtrack = 1;// weight = 0, total_weight = 0;
+	     int chain_cut_backtrack = 0;
+	     char first_found = FALSE;	     
+
+	     /* find the first predecessor node where we generated cuts and
+		see if it helped us there */
+	     
+	     if(data_par->chain_status == CGL_CHAIN_START){	    
 	       data_par->chain_check_index = node->bc_index;
 	       node = node->parent;
+
 	       while(node){
 		  if(node->cuts_tried){
 		     if(node->start_objval < node->end_objval){ 
 			weighted_gap +=
 			   fabs(node->end_objval/node->start_objval - 1.0);
+			c_gap = node->end_objval - node->start_objval;
+                        b_gap -= node->end_objval;
 		     }
 		     if(chain_cut_backtrack++ >= p->par.cgl.max_chain_backtrack) break;
 		     if(!first_found) first_found = TRUE;
 		     //break;
 		  }else{
 		     //backtrack++;
+  		     b_gap = node->start_objval;
 		     node = node->parent;
 		  }
 		  if(!first_found) backtrack++;
 	       }
 	    }else{
+	       b_gap = node->lower_bound;
 	       node = node->parent;
 	       while(node){
 		  if(node->start_objval < node->end_objval){
 		     weighted_gap +=
 			fabs(node->end_objval/node->start_objval - 1.0);
+		     c_gap = node->end_objval - node->start_objval;
+		     b_gap -= node->end_objval;
 		     //break;
 		     if(node->bc_index == data_par->chain_check_index){
 			break;
 		     }else{
+		        b_gap = node->start_objval;
 			node = node->parent;	       
 		     }
 		  }else{
@@ -1594,7 +2005,10 @@ int update_cut_parameters(lp_prob *p)
 		  }
 	       }
 	    }	       
+
 	    if(weighted_gap < data_par->chain_weighted_gap){
+	      //data_par->chain_status = CGL_CHAIN_STOP; 
+	    //if(c_gap < b_gap){
 	       if(data_par->chain_status == CGL_CHAIN_START  &&
 		  backtrack > init_chain_trial_freq){
 		  if(p->mip->mip_inf && p->mip->mip_inf->cont_var_num <= 0){
@@ -1631,8 +2045,19 @@ int update_cut_parameters(lp_prob *p)
 	       p->tm->active_nodes[p->proc_index]->bc_index;
 	 }
       }
+#endif
+      
+      if(data_par->chain_status == CGL_CHAIN_CHECK || 
+	 data_par->chain_status == CGL_CHAIN_CONTINUE){
+	 p->lp_stat.node_cuts_tried = TRUE;
+	 //p->tm->active_nodes[p->proc_index]->cuts_tried = TRUE;
+	 if(data_par->chain_status == CGL_CHAIN_CHECK){
+	    //p->lp_stat.chain_cuts_trial_num++;
+	    p->lp_stat.node_cuts_forced = TRUE; 
+	 }
+      }
    }
-
+   
 #endif
 
    /* probing cuts */
@@ -1965,10 +2390,14 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 	 	 
 	 //printf("sos_ratio %f \t", bin_sos_ratio);
 	 //printf("cont_bin_ratio %f\n", cont_ratio);
-	 if(p->mip->mip_inf->sos_bin_row_ratio > 0.6){
+	 //if(p->mip->mip_inf->sos_bin_row_ratio > 0.6){
+	 //  p->par.max_cut_length *= 2;
+	 //}
+	 if(p->mip->mip_inf->sos_bin_row_ratio > 0.6 &&
+	    p->mip->mip_inf->sos_bin_row_ratio < 0.9){
 	    p->par.max_cut_length *= 2;
 	 }
-	
+	 
 	 if(p->mip->mip_inf->max_row_ratio < 0.01 &&
 	    p->mip->mip_inf->prob_type != BIN_CONT_TYPE){
 	    p->par.cgl.chain_trial_freq = (int)1.5*p->par.cgl.chain_trial_freq;
@@ -1982,9 +2411,11 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 	    if(p->mip->mip_inf->prob_type == BINARY_TYPE ||
 	       p->mip->mip_inf->prob_type == BIN_CONT_TYPE){
 	       if(p->mip->mip_inf->max_row_ratio < 0.05){
-		  max_const_size = 2*max_const_size;
+		  max_const_size = 4*max_const_size;
+		  //max_const_size = 5*max_const_size;
 	       }else {
-		  max_const_size = 3*max_const_size;
+		  max_const_size = 5*max_const_size;
+		  //max_const_size = 10*max_const_size;
 	       }
 	    }else{
 	       if(p->mip->mip_inf->max_row_ratio < 0.01){
@@ -1998,7 +2429,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
 	       MIN(MAX(p->mip->mip_inf->max_row_size,
 		       MIN(((int)(1.0133 * p->mip->mip_inf->mat_density *
 				  (p->mip->m + 1)* p->mip->n) -
-			    p->mip->nz + row_den) + 5,
+			    p->mip->nz + row_den) + 6,
 			   max_const_size)),
 		   p->par.max_cut_length);
 
@@ -2033,23 +2464,76 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
       //  printf("max_cut_length %i\n", p->par.max_cut_length);
    }
 #endif
+   if(p->bc_level < 1 && p->iter_num < 2){   
+   //if(p->node_iter_num < 2){
+     //printf("INITIAL %i \n", p->par.max_cut_length);
+     //p->par.max_cut_length = p->mip->n; //p->mip->mip_inf->max_row_size + 
+     //(int)(1.0*p->mip->n/10);     
+     for (i=0; i<CGL_NUM_GENERATORS; i++) {
+       p->par.best_violation[i] = 0.0;
+       p->par.best_violation_length[i] = p->par.max_cut_length;
+     }
+     //p->par.best_violation_length = p->par.max_cut_length;     
+     if(p->par.verbosity > 0){
+       printf("c-length - max_row - max-col - dens: %i - %i - %i - %f\n", p->par.max_cut_length, 
+	      p->mip->mip_inf->max_row_size, p->mip->mip_inf->max_col_size, 
+	      p->mip->mip_inf->mat_density);
+     }
+   }
+   //p->par.max_cut_length = 0;
+   //if(p->bc_level < 1 && p->iter_num < 3){   
+   // p->par.max_cut_length = p->par.best_violation_length;
+   //}
+   //printf("c-length - max_row - avg: %i - %i - %f\n", p->par.max_cut_length, 
+   //  p->mip->mip_inf->max_row_size, p->mip->mip_inf->mat_density);
    
-   max_cut_length = p->par.max_cut_length;
+   //p->par.max_cut_length = 50;
+   /*
+   int lrow_num = 0, lcol_num = 0;
+   int avg_rs = p->mip->nz/p->mip->m;
+   int avg_cs = p->mip->nz/p->mip->n;
+   for(int i = 0; i < p->mip->n; i++){
+     int a_size = p->mip->matbeg[i+1] - p->mip->matbeg[i];
+     if(a_size > avg_cs) lcol_num++;
+   }
+   for(int i = 0; i < p->mip->m; i++){
+     int a_size = p->mip->row_matbeg[i+1] - p->mip->row_matbeg[i];
+     if(a_size > avg_rs) lrow_num++;
+   }
+
+   if(p->par.verbosity > 0){
+     printf("avg-rs - lrs -- avg-cs - lcs: %i %i %i %i\n", 
+	    avg_rs, lrow_num, avg_cs, lcol_num);
+   }
+   */
+   max_cut_length = p->par.max_cut_length; 
+   //if(p->bc_index < 1) p->par.max_cut_length = (int)(p->lp_data->n/2.0);
+   p->par.tried_long_cuts = TRUE;
    if (p->par.tried_long_cuts == TRUE) {
       repeat_with_long = FALSE;
    }
-   for (i=0; i<CGL_NUM_GENERATORS; i++) {
-      generate_cgl_cut_of_type(p, i, &cutlist, &was_tried);
+
+   i = 0; 
+   if(p->bc_index > 0 && p->mip->mip_inf && p->mip->mip_inf->c_num > 0) i = -1;
+   
+   for (; i<CGL_NUM_GENERATORS; i++) {
+     //p->par.max_cut_length = 2*p->par.best_violation_length[i];
+      //printf("c_l: %i %i \n", i, p->par.max_cut_length);
+      if(i > -1) generate_cgl_cut_of_type(p, i, &cutlist, &was_tried);      
+      //if(cutlist.sizeRowCuts() > 0){
       check_and_add_cgl_cuts(p, i, cuts, num_cuts, bound_changes, &cutlist, 
-            send_to_pool);
+			     send_to_pool);
+      
       should_stop_adding_cgl_cuts(p, i, &should_stop);
+      if(i < 0 && *num_cuts > 0) should_stop = TRUE;
+      //}
       if (should_stop == TRUE) {
          break;
       }
       if (i==CGL_NUM_GENERATORS-1 && p->bc_index < 1 && *num_cuts < 1 && 
             repeat_with_long == TRUE) {
          p->par.max_cut_length = 1000;
-         i = 0;
+         i = -1;
          repeat_with_long = FALSE;
          p->par.tried_long_cuts = TRUE;
       }
@@ -2446,7 +2930,7 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
        {
 	  double mark_time = 0;
 	  CglProbing *probing = new CglProbing;
-         should_use_cgl_generator(p, &should_generate, i, (void *)probing);
+	  should_use_cgl_generator(p, &should_generate, i, (void *)probing);
          if (should_generate == TRUE) {
             probing->generateCuts(*(p->lp_data->si), cutlist);
             *was_tried = TRUE;
@@ -2544,16 +3028,16 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
 /*===========================================================================*/
 #ifdef USE_CGL_CUTS
 int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts, 
-      int *num_cuts, int *bound_changes, OsiCuts *cutlist, int send_to_pool) 
+			   int *num_cuts, int *bound_changes, OsiCuts *cutlist, int send_to_pool) 
 {
-   int          i, j, k, num_row_cuts, *is_deleted, num_elements,
+   int          i, j, k, num_row_cuts, *is_deleted, *accepted_ind = NULL, num_elements,
       *indices, discard_cut, num_poor_quality = 0, num_unviolated = 0,
-      num_duplicate = 0, *cut_size, *matind; 
+      num_duplicate = 0, *cut_size = NULL, *matind; 
    int    max_elements = p->par.max_cut_length, 
       verbosity = p->par.verbosity;
    LPdata       *lp_data = p->lp_data;
    int          *tmp_matind = lp_data->tmp.i1;
-   double       *hashes, *elements, rhs, max_coeff, min_coeff, hash_value, 
+   double       *hashes = NULL, *elements, rhs, max_coeff, min_coeff, hash_value, 
                 violation, *matval, total_time, cut_time;
    double       *random_hash = lp_data->random_hash;
    const double lpetol = lp_data->lpetol;
@@ -2563,6 +3047,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    var_desc     **vars = lp_data->vars;
    const int    is_userind_in_order = p->par.is_userind_in_order;
    cut_data     *sym_cut;
+   int update_cut_length = FALSE;
    
    /* two times is necessary */
    cut_time     = used_time(&total_time);
@@ -2570,39 +3055,61 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 
    num_row_cuts = cutlist->sizeRowCuts();
 
-   hashes       = (double *) malloc(num_row_cuts*DSIZE);
-   is_deleted   = (int *) calloc(num_row_cuts, ISIZE);
-   cut_size     = (int *) calloc(num_row_cuts, ISIZE);
+   //if(num_row_cuts > 0){
+   // hashes       = (double *) malloc(num_row_cuts*DSIZE);
+   //is_deleted   = (int *) calloc(num_row_cuts, ISIZE);
+   // accepted_ind =   (int *) malloc(num_row_cuts* ISIZE);
+   // cut_size     = (int *) calloc(num_row_cuts, ISIZE);
+   //}
+   
+   if(lp_data->hashes_num < num_row_cuts + *num_cuts){
+      lp_data->hashes_num = 5000 + (num_row_cuts + *num_cuts); 
+      lp_data->hashes = (double *)malloc(DSIZE*lp_data->hashes_num);
+   }
 
-   j = 0;
+   if(lp_data->accepted_num < num_row_cuts){
+      lp_data->accepted_num = 5000 + num_row_cuts;
+      lp_data->accepted_ind = (int *)malloc(ISIZE*lp_data->accepted_num);
+   }
+
+   hashes = lp_data->hashes;
+   accepted_ind = lp_data->accepted_ind;   
+   
+   int accepted_cnt = 0; 
+   //j = 0;
 
    for (i=0; i<num_row_cuts; i++) {
       /* check for violation, duplicacy, quality of coefficients, length */
       row_cut = cutlist->rowCut(i);
       num_elements = row_cut.row().getNumElements();
-      cut_size[i] = num_elements;
+      //cut_size[accepted_cnt] = num_elements;
       indices = const_cast<int *> (row_cut.row().getIndices());
       elements = const_cast<double *> (row_cut.row().getElements());
       rhs = row_cut.rhs();
       discard_cut = FALSE;
       max_coeff = 0;
       min_coeff = DBL_MAX;
-
+      
       if (verbosity>10) {
          row_cut.print();
       }
+
       if (num_elements > max_elements){
          PRINT(verbosity,5,("Threw out cut because its length %d is too "
                   "high.\n\n\n", num_elements));
          num_poor_quality++;
-         is_deleted[i] = TRUE;
+         //is_deleted[i] = TRUE;
          continue;
       }
-
+      
       /* hash value, min, max, violation */
       hash_value = 0;
       violation = 0;
+      int is_int = TRUE; 
       for (int el_num=0; el_num<num_elements; el_num++) {
+	 
+	 if(!(lp_data->vars[indices[el_num]]->is_int)) is_int = FALSE; 
+
 	 // printf("%f\n", elements[el_num]);
          if (fabs(elements[el_num])>max_coeff) {
             max_coeff = fabs(elements[el_num]);
@@ -2614,7 +3121,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
          hash_value += elements[el_num]*random_hash[tmp_matind[el_num]];
          violation += elements[el_num]*x[tmp_matind[el_num]];
       }
-      hashes[i] = hash_value;
+      //hashes[*num_cuts + accepted_cnt] = hash_value;
       /* see rhs as well */
       if (fabs(rhs) > lpetol) {
          if (fabs(rhs) < min_coeff) { 
@@ -2635,45 +3142,48 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
          violation = fabs(rhs - violation);
          break;
       }
-
-      /* check violation */
-      if (violation < lpetol){// && generator != CGL_PROBING_GENERATOR) {	 
-         PRINT(verbosity,5,("violation = %f. Threw out cut.\n", 
-                  violation));
-         num_unviolated++;
-         is_deleted[i] = TRUE;
-         continue;
-      }
-    
+      
       /* check quality */
       if (num_elements>0) {
          if ( (max_coeff > 0 && min_coeff/max_coeff < etol1000)||
-               (min_coeff > 0 && min_coeff < etol1000) ) {
+	      (min_coeff > 0 && min_coeff < etol1000) ) {
             PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));
 	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
 	    num_poor_quality++;
-	    is_deleted[i] = TRUE;
+	    //is_deleted[i] = TRUE;
 	    continue;
          }
       }
-
+      
+      /* check violation */
+      //if ((!is_int && violation < lpetol) || (is_int && violation < 100*lpetol)){// && generator != CGL_PROBING_GENERATOR) {
+      if (violation < 100*lpetol){
+         PRINT(verbosity,5,("violation = %f. Threw out cut.\n", 
+			    violation));
+         num_unviolated++;
+         //is_deleted[i] = TRUE;
+         continue;
+      }//else printf("violation - %f \n", violation);
+      
       /* check for duplicates */
       if (num_elements>0) {
-         for (k=i-1; k>-1; k--) {
-            if (is_deleted[k] == TRUE) {
-               continue;
-            }
-            if (cut_size[k] != num_elements || 
-                  fabs(hashes[k]-hash_value) > lpetol) {
+	 int c_ind; 
+         for (k=accepted_cnt + *num_cuts-1; k>-1; k--) {
+            //if (is_deleted[k] == TRUE) {
+	    //  continue;
+            //}
+	    //c_ind = accepted_ind[k];	    
+            if (//cut_size[c_ind] != num_elements || 
+		fabs(hashes[k]-hash_value) > lpetol) {
                continue;
             } else {
                break;
             }
          }
          if (k>-1) {
-            PRINT(verbosity,5,("cut #%d is same as cut #%d\n", i, k));
+            PRINT(verbosity,5,("cut #%d is same as cut #%d\n", i, c_ind));
             num_duplicate++;
-            is_deleted[i] = TRUE;
+            //is_deleted[i] = TRUE;
             continue;
          }
       }
@@ -2681,43 +3191,163 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       /* check if sense is 'R' */
       if (row_cut.sense()=='R') {
          PRINT(verbosity,5,("cut #%d has a range. thrown out.\n", i));
-         is_deleted[i] = TRUE;
+         //is_deleted[i] = TRUE;
          continue;
+      }
+
+      if(p->par.best_violation[generator] < lpetol){
+	 update_cut_length = TRUE;
+      }
+	 
+      if(update_cut_length){
+	if(violation > p->par.best_violation[generator]){
+	  //printf("%i - %f\n", generator, violation);
+	  p->par.best_violation[generator] = violation;
+	  p->par.best_violation_length[generator] = 4*num_elements;
+	}
       }
 
       /* cut is accepted. congratulations. */
-      j++;
+      hashes[*num_cuts + accepted_cnt] = hash_value; 
+      accepted_ind[accepted_cnt] = i;
+      accepted_cnt++; 
+      //j++;
+#ifdef COMPILE_IN_LP
+      if(p->bc_index < 1 && p->mip->mip_inf){// && ( generator == CGL_PROBING_GENERATOR || 
+	 // generator == CGL_CLIQUE_GENERATOR ||
+	 //				 generator == CGL_KNAPSACK_GENERATOR)){	 
+	 add_cut_to_mip_inf(p, num_elements, indices, elements, rhs, row_cut.sense());	 
+      }      
+#endif
    }
 
-   /* copy the accepted cuts */
-   if (*cuts){
-      *cuts = (cut_data **)realloc(*cuts, (*num_cuts+j)*sizeof(cut_data *));
-   }else{
-      *cuts = (cut_data **)malloc(j*sizeof(cut_data *));
-   }
-   k = *num_cuts;
+   int * rc_ind; 
+   int rc_cnt = 0; 
+   if (p->bc_index > 0 && p->mip->mip_inf && p->mip->mip_inf->c_num && generator < 0){
+      //generator == CGL_NUM_GENERATORS - 1){
+      //generator < 0){// || generator == CGL_NUM_GENERATORS - 1){ /* first try root cuts, if don't work then iterate */
 
-   int p_cnt = 0;
-   
-   for (i=0; i<num_row_cuts; i++) {
-      if (is_deleted[i] == TRUE) {
-         continue;
+      //if(accepted_cnt > 0){
+	 //for (k = 0, i=0; i<accepted_cnt; i++) {
+	 // if (is_deleted[i] == TRUE) {
+	 //    continue;
+	 // }
+	 //hashes[k] = hashes[i];
+	 // k++;
+	 //}
+	 //if(accepted_cnt != k){
+	 // printf("error in root cut addition\n");
+	 // k = 0;
+	 //}else{
+      // qsort_di(hashes, accepted_ind, accepted_cnt);
+      //}
+      //}
+
+      MIPinfo * mip_inf = p->mip->mip_inf; 
+      rc_ind = mip_inf->c_tmp;
+      int c_num = mip_inf->c_num;
+      int is_identical; 
+      /* check only for hash value and violation */
+      for(int t_num = 0; t_num < c_num; t_num++){
+	 num_elements = mip_inf->c_beg[t_num + 1] - mip_inf->c_beg[t_num];
+	 elements = mip_inf->c_val + mip_inf->c_beg[t_num]; 
+	 indices = mip_inf->c_ind + mip_inf->c_beg[t_num]; 
+	 rhs = mip_inf->c_rhs[t_num];
+	 hash_value = 0.0; 
+	 violation = 0.0;
+	 is_identical = FALSE;
+	 
+	 for (int el_num=0; el_num<num_elements; el_num++) {
+	    tmp_matind[el_num] = vars[indices[el_num]]->userind;
+	    if(*num_cuts + accepted_cnt > 0) hash_value += elements[el_num]*random_hash[tmp_matind[el_num]];
+	    violation += elements[el_num]*x[tmp_matind[el_num]];
+	 }
+
+	 switch (mip_inf->c_sense[t_num]) {
+	  case 'L':
+	    violation -= rhs;
+	    break;
+	  case 'G':
+	    violation = rhs - violation;
+	    break;
+	  case 'E':
+	    violation = fabs(rhs - violation);
+	    break;
+	 }
+
+	 if (violation < 100*lpetol){
+	    continue;
+	 }
+
+	 for(k = 0; k < accepted_cnt + *num_cuts; k++){
+	    if (fabs(hashes[k]-hash_value) < lpetol) {		
+	       is_identical = TRUE; 
+	       break;
+	    }
+	 }
+
+	 if (is_identical){
+	    continue;
+	 }	 
+
+	 rc_ind[rc_cnt] = t_num;
+	 rc_cnt++;
       }
-      row_cut = cutlist->rowCut(i);
-      rhs = row_cut.rhs();
-      num_elements = row_cut.row().getNumElements();
-      //PRINT(verbosity, -1,("length = %d \n", num_elements));
-      indices = const_cast<int *> (row_cut.row().getIndices());
-      elements = const_cast<double *> (row_cut.row().getElements());
+   }   
+
+   //if(rc_cnt > 0) printf("root cuts added %i %i\n", p->bc_index, rc_cnt);
+   
+   int new_cut_num = accepted_cnt + rc_cnt;   
+   
+   /* copy the accepted cuts */
+   if(new_cut_num > 0){
+      if (*cuts){
+	 *cuts = (cut_data **)realloc(*cuts, (*num_cuts+new_cut_num)*sizeof(cut_data *));
+      }else{
+	 *cuts = (cut_data **)malloc(new_cut_num*sizeof(cut_data *));
+      }
+   }
+   
+   k = *num_cuts;
+   
+   int p_cnt = 0;
+   int ind = 0; 
+   char sense; double range;
+   
+   //for (i=0; i<num_row_cuts + rc_cnt; i++) {
+   for (i=0; i<new_cut_num; i++) {
+      if (i < accepted_cnt){
+	 //if(is_deleted[i] == TRUE) {
+	 //  continue;
+	 //}
+	 ind = accepted_ind[i]; 
+	 row_cut = cutlist->rowCut(ind);
+	 num_elements = row_cut.row().getNumElements();
+	 //PRINT(verbosity, -1,("length = %d \n", num_elements));
+	 indices = const_cast<int *> (row_cut.row().getIndices());
+	 elements = const_cast<double *> (row_cut.row().getElements());
+	 rhs = row_cut.rhs();
+	 sense = row_cut.sense();
+	 range = row_cut.range();
+      }else{
+	 ind = rc_ind[i - accepted_cnt];
+	 num_elements = p->mip->mip_inf->c_beg[ind + 1] -
+	    p->mip->mip_inf->c_beg[ind]; 
+	 indices = p->mip->mip_inf->c_ind + p->mip->mip_inf->c_beg[ind];
+	 elements = p->mip->mip_inf->c_val + p->mip->mip_inf->c_beg[ind];
+	 rhs = p->mip->mip_inf->c_rhs[ind];
+	 sense = p->mip->mip_inf->c_sense[ind];
+	 range = 0;//sense = p->mip->mip_inf->c_sense[c_ind];
+      }
       (*cuts)[k] =  (cut_data *) calloc(1, sizeof(cut_data));
       sym_cut    = (*cuts)[k];
       sym_cut->type = EXPLICIT_ROW;
       sym_cut->rhs = rhs;
-      sym_cut->range = row_cut.range();
+      sym_cut->range = range;
       //sym_cut->size = (num_elements * (int)((ISIZE + DSIZE) + DSIZE));
       sym_cut->size = (DSIZE + num_elements * (int)((ISIZE + DSIZE)));
       sym_cut->coef = (char *) malloc (sym_cut->size);
-      sym_cut->sense = row_cut.sense();
+      sym_cut->sense = sense;
       ((double *) (sym_cut->coef))[0] = 0; // otherwise valgrind complains.
       ((int *) (sym_cut->coef))[0] = num_elements;
 
@@ -2743,15 +3373,16 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 
 #ifdef COMPILE_IN_LP      
       if(p->bc_level < 1 && p->mip->mip_inf && (generator == CGL_PROBING_GENERATOR ||
-						generator == CGL_CLIQUE_GENERATOR)){
-
+						generator == CGL_CLIQUE_GENERATOR ||
+						generator == CGL_KNAPSACK_GENERATOR)){
+	 
 	 double sos_ratio = 1.0*p->mip->mip_inf->binary_sos_row_num/(p->mip->m + 1);
 	 
 	 if( ((sos_ratio >= 0.9 && p->iter_num < 2) ||
 	      (sos_ratio > 0.1 && sos_ratio < 0.9 && p->mip->mip_inf->prob_type == BINARY_TYPE) ||
 	      (sos_ratio > 0.5 && sos_ratio < 0.9 && p->mip->mip_inf->prob_type == BIN_CONT_TYPE)) && 
-	     p->node_iter_num < 5 && p_cnt < 50 && cut_size[i] > 2){
-	    sym_cut->deletable = FALSE;
+	     p->node_iter_num < 5 && p_cnt < 50){// && cut_size[i] > 2){
+	   //sym_cut->deletable = FALSE;
 	    p_cnt++;
 	 }
       }
@@ -2769,9 +3400,10 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       cutlist->eraseRowCut(0);
    }
 
-   FREE(hashes);
-   FREE(is_deleted);
-   FREE(cut_size);
+   //FREE(hashes);
+   //FREE(is_deleted);
+   //FREE(accepted_ind);
+   //FREE(cut_size);
 
    /* update statistics */
    p->lp_stat.num_duplicate_cuts += num_duplicate;
@@ -2833,6 +3465,67 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    return 0;
 }
 #endif
+/*===========================================================================*/
+int add_cut_to_mip_inf(lp_prob *p, int cut_n, int *cut_ind, double *cut_val, double cut_rhs, char cut_sense){
+
+   MIPinfo *mip_inf = p->mip->mip_inf; 
+   int alloc_size = mip_inf->c_alloc_size; 
+   int alloc_num = mip_inf->c_alloc_num; 
+   //int t_nz = 0;//mip_inf->c_nz; 
+   if(alloc_size < 1){
+      alloc_size = MAX(100*cut_n, (int)(100.0*p->lp_data->nz/p->lp_data->m));
+      alloc_num = 1000;
+      
+      mip_inf->c_ind = (int *)malloc(ISIZE*alloc_size);
+      mip_inf->c_beg = (int *)malloc(ISIZE*(alloc_num + 1));
+      mip_inf->c_val = (double *)malloc(DSIZE*alloc_size);
+      mip_inf->c_sense = (char *)malloc(CSIZE*alloc_num);
+      mip_inf->c_rhs = (double *)malloc(DSIZE*alloc_num);	    
+      mip_inf->c_tmp = (int *)malloc(ISIZE*alloc_num);
+      
+      mip_inf->c_alloc_size = alloc_size;
+      mip_inf->c_alloc_num = alloc_num; 
+      mip_inf->c_beg[0] = 0;
+   }else{      
+      if(alloc_size < mip_inf->c_beg[mip_inf->c_num] + cut_n){
+	 alloc_size += MAX(10*cut_n, (int)(10.0*p->lp_data->nz/p->lp_data->m));
+	 mip_inf->c_ind = (int *)realloc(mip_inf->c_ind, ISIZE*alloc_size);	       
+	 mip_inf->c_val = (double *)realloc(mip_inf->c_val, DSIZE*alloc_size);
+	 mip_inf->c_alloc_size = alloc_size;
+      }
+      if(mip_inf->c_num >= alloc_num){
+	 alloc_num += 1000;
+	 mip_inf->c_beg = (int *)realloc(mip_inf->c_beg, ISIZE*(alloc_num + 1));
+	 mip_inf->c_sense = (char *)realloc(mip_inf->c_sense, CSIZE*alloc_num);
+	 mip_inf->c_rhs = (double *)realloc(mip_inf->c_rhs, DSIZE*alloc_num);
+	 mip_inf->c_tmp = (int *)realloc(mip_inf->c_tmp, ISIZE*alloc_num);
+	       
+	 mip_inf->c_alloc_num = alloc_num; 
+      }
+   }
+
+   int *t_ind = mip_inf->c_ind;
+   double *t_var = mip_inf->c_val;
+   int *t_beg = mip_inf->c_beg;
+   char *t_sense = mip_inf->c_sense;
+   double *t_rhs = mip_inf->c_rhs; 
+   int t_num = mip_inf->c_num;
+   //t_num++;
+   
+   for (int el_num=0, t_loc = t_beg[t_num]; el_num<cut_n; el_num++, t_loc++) {
+      t_ind[t_loc] = cut_ind[el_num];
+      t_var[t_loc] = cut_val[el_num];
+   }      
+
+   t_beg[t_num + 1] = t_beg[t_num] + cut_n;   
+   t_sense[t_num] = cut_sense;
+   t_rhs[t_num] = cut_rhs;
+   //t_num++;
+   (mip_inf->c_num)++;   
+      
+   return 0;
+}
+
 /*===========================================================================*/
 #ifdef USE_CGL_CUTS
 int add_col_cuts(lp_prob *p, OsiCuts *cutlist, int *bound_changes)
@@ -2905,6 +3598,11 @@ int update_pcost(lp_prob *p)
    double oldobjval = p->tm->active_nodes[p->proc_index]->lower_bound;
    double oldx =  parent->bobj.value;
    double *x;
+
+   if(parent->bobj.type == SOS1_IMPLICIT){
+      return 0;
+   }
+   
    get_x(p->lp_data);
    x = p->lp_data->x;
    if (parent->children[0]->bc_index != p->bc_index) {

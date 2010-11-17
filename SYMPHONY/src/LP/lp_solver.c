@@ -56,7 +56,10 @@ void free_lp_arrays(LPdata *lp_data)
    FREE(lp_data->dualsol);
    FREE(lp_data->slacks);
    FREE(lp_data->random_hash);
+   FREE(lp_data->hashes);
+   FREE(lp_data->accepted_ind);
    FREE(lp_data->heur_solution);
+   FREE(lp_data->col_solution);
 #ifdef __CPLEX__
    FREE(lp_data->lb);
    FREE(lp_data->ub);
@@ -118,8 +121,19 @@ void free_mip_desc(MIPdesc *mip)
    }
 #endif
    
-   FREE(mip->fixed_val);
-   FREE(mip->fixed_ind);
+   if(mip->fixed_n){
+      FREE(mip->fixed_val);
+      FREE(mip->fixed_ind);
+   }
+
+   if(mip->subs_n){
+      FREE(mip->subs_ind);
+      FREE(mip->subs_aval);
+      FREE(mip->subs_rhs);
+      FREE(mip->subs_rbeg);
+      FREE(mip->subs_rind);
+      FREE(mip->subs_rval);
+   }
    
    if(mip->cru_vars_num){
       FREE(mip->cru_vars);
@@ -185,6 +199,8 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
          lp_data->random_hash = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->heur_solution);
          lp_data->heur_solution = (double *) malloc(lp_data->maxn * DSIZE);
+         FREE(lp_data->col_solution);
+         lp_data->col_solution = (double *) malloc(lp_data->maxn * DSIZE);
 #ifdef __CPLEX__
 	 FREE(lp_data->lb);
 	 lp_data->lb = (double *) malloc(lp_data->maxn * DSIZE);
@@ -202,6 +218,8 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
                                          lp_data->maxn * DSIZE);
          lp_data->heur_solution = (double *) realloc((char *)
                lp_data->heur_solution, lp_data->maxn * DSIZE);
+         lp_data->col_solution = (double *) realloc((char *)
+               lp_data->col_solution, lp_data->maxn * DSIZE);
 #ifdef __CPLEX__
 	 lp_data->lb = (double *) realloc((char *)lp_data->lb,
 					  lp_data->maxn * DSIZE);
@@ -224,15 +242,15 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
       FREE(tmp->c);
       FREE(tmp->i1);
       FREE(tmp->d);
-      tmp->c = (char *) malloc(CSIZE * maxmax);
-      tmp->i1 = (int *) malloc(ISIZE * MAX(3*maxm, 2*maxn + 1));
-      tmp->d = (double *) malloc(DSIZE * 2 * maxmax);
+      tmp->c = (char *) malloc(CSIZE * 4 * maxmax);
+      tmp->i1 = (int *) malloc(ISIZE * MAX(4*maxm, 4*maxn + 1));
+      tmp->d = (double *) malloc(DSIZE * 4 * maxmax);
       /* These have to be resized only if maxm changes */
       if (resize_m){
 	 FREE(tmp->i2);
 	 FREE(tmp->p1);
 	 FREE(tmp->p2);
-	 tmp->i2 = (int *) malloc(maxm * ISIZE);
+	 tmp->i2 = (int *) malloc(2*maxmax * ISIZE);
 	 tmp->p1 = (void **) malloc(maxm * sizeof(void *));
 	 tmp->p2 = (void **) malloc(maxm * sizeof(void *));
       }
@@ -2315,8 +2333,11 @@ void open_lp_solver(LPdata *lp_data)
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
    lp_data->si->setupForRepeatedUse();
-   //lp_data->si->setupForRepeatedUse(2,0);
+   //lp_data->si->setupForRepeatedUse(3,0);
    //lp_data->si->getModelPtr()->setFactorizationFrequency(200);
+   //lp_data->si->getModelPtr()->setSparseFactorization(true);
+   //lp_data->si->getModelPtr()->setSpecialOptions(524288);   
+   
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
 #else   
@@ -2441,9 +2462,12 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
 {
-   int i, start, size;
+   int i;// start, size;
    OsiXSolverInterface  *si = lp_data->si;
-   
+   double *rlb = lp_data->tmp.d + rcnt; 
+   double *rub = lp_data->tmp.d + 2*rcnt; 
+   const double infinity = si->getInfinity();
+
    /*
    for (i = 0; i < rcnt; i++){
       CoinPackedVector new_row;
@@ -2453,14 +2477,42 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
       si->addRow(new_row, sense[i], rhs[i], 0);
    }
    */
-
+#if 0
    for (i = 0; i < rcnt; i++){
       start = rmatbeg[i];
       size = rmatbeg[i+1] - start;
       CoinPackedVector new_row(size, &rmatind[start], &rmatval[start], FALSE);
       si->addRow(new_row, sense[i], rhs[i], 0);
    }
+#else
+   /* convert sense to bound */
+   for(i = 0; i < rcnt; i++){
+     switch (sense[i]){
+       printf("%c \n", sense[i]);
+     case 'E':
+       rlb[i] = rub[i] = rhs[i];
+       break;
+     case 'L':
+       rlb[i] = -infinity;
+       rub[i] = rhs[i];
+       break;
+     case 'G':
+       rlb[i] = rhs[i];
+       rub[i] = infinity;
+       break;
+     case 'R': // we should not have this case 
+       rlb[i] = -infinity;
+       rub[i] = rhs[i];
+       break;
+     case 'N':
+       rlb[i] = -infinity;
+       rub[i] = infinity;
+       break;
+     }
+   }
 
+   si->addRows(rcnt, rmatbeg, rmatind, rmatval, rlb, rub);
+#endif
    lp_data->m += rcnt;
    lp_data->nz += nzcnt;
    lp_data->lp_is_modified=LP_HAS_BEEN_MODIFIED;

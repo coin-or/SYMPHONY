@@ -43,6 +43,7 @@ extern long random PROTO((void));
 #include "sym_timemeas.h"
 #include "sym_pack_cut.h"
 #include "sym_pack_array.h"
+#include "sym_qsort.h"
 #ifdef COMPILE_IN_LP
 #include "sym_lp.h"
 #endif
@@ -319,7 +320,7 @@ int solve(tm_prob *tm)
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
-   double timeout2 = 30, timeout3 = tm->par.logging_interval, timeout4 = 10;
+   double timeout2 = 2, timeout3 = tm->par.logging_interval, timeout4 = 10;
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
@@ -355,9 +356,12 @@ int solve(tm_prob *tm)
 		(wall_clock(NULL) - start_time < tm->par.time_limit) : TRUE) &&
 		(tm->par.node_limit >= 0 ?
 		tm->stat.analyzed < tm->par.node_limit : TRUE) &&
-		((tm->has_ub && (tm->par.gap_limit >= 0.0)) ?
-		 fabs(100*(tm->ub-tm->lb)/tm->ub) > tm->par.gap_limit : TRUE)
-		&& !(tm->par.find_first_feasible && tm->has_ub) && c_count <= 0){
+		((tm->has_ub && (tm->stat.analyzed > 0 && tm->par.gap_limit >= 0.0)) ?
+		 d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) > tm->par.gap_limit : TRUE)
+		&& !(tm->par.find_first_feasible && tm->has_ub && 
+		     tm->lp_stat.ip_sols > 0) &&
+		!(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit) &&
+		c_count <= 0){
 #pragma omp critical (tree_update)
 	    i = tm->samephase_candnum > 0 ? start_node(tm, thread_num) :
 	                                    NEW_NODE__NONE;
@@ -466,7 +470,7 @@ int solve(tm_prob *tm)
 	    break;
 	 }
 
-	 if (tm->par.find_first_feasible && tm->has_ub){
+	 if (tm->par.find_first_feasible && tm->has_ub && tm->lp_stat.ip_sols){
 	    termcode = TM_FINISHED;
 	    break;
 	 }
@@ -478,7 +482,7 @@ int solve(tm_prob *tm)
 
 	 if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
             find_tree_lb(tm);
-	    if (fabs(100*(tm->ub-tm->lb)/tm->ub) <= tm->par.gap_limit){
+	    if (d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) <= tm->par.gap_limit){
 	       if (tm->lb < tm->ub){
 		  termcode = TM_TARGET_GAP_ACHIEVED;
 	       }else{
@@ -487,6 +491,14 @@ int solve(tm_prob *tm)
 	       break;
 	    }
 	 }
+	 
+	 //if(tm->par.rs_mode_enabled)
+	 // printf("tm-lp-iter %i %i \n", tm->lp_stat.lp_iter_num, tm->par.rs_lp_iter_limit);
+	 if(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit){
+	    termcode = TM_TARGET_GAP_ACHIEVED;
+	    break;
+	 }
+	 
 	 if (i == NEW_NODE__NONE && tm->active_node_num == 0)
 	    break;
 
@@ -651,7 +663,7 @@ void print_tree_status(tm_prob *tm)
    elapsed_time = wall_clock(NULL) - tm->start_time;
 
 #endif
-   
+
 #ifdef SHOULD_SHOW_MEMORY_USAGE
    pid = getpid();
    //printf("process id = %d\n",pid);
@@ -668,46 +680,116 @@ void print_tree_status(tm_prob *tm)
    if (tm->stat.max_vsize<vsize_in_mb) {
       tm->stat.max_vsize = vsize_in_mb;
    }
-   printf("memory: %.2f MB ", vsize_in_mb);
 #endif
 
-   printf("done: %i ", tm->stat.analyzed-tm->active_node_num);
-   printf("left: %i ", tm->samephase_candnum+tm->active_node_num);
-   if (tm->has_ub) {
-      if (tm->obj_sense == SYM_MAXIMIZE){
+   if (tm->par.output_mode > 0) {
+     if (tm->stat.print_stats_cnt < 1 || tm->par.verbosity > 0) {
+       printf("%7s ","Time");     
+#ifdef SHOULD_SHOW_MEMORY_USAGE 
+       printf("%9s ","Mem(MB)");
+#endif
+       printf("%10s ","Done");
+       printf("%10s ","Left");
+       if (tm->obj_sense == SYM_MAXIMIZE) {
+	 printf("%19s ","UB");
+	 printf("%19s ","LB");
+       } else{
+	 printf("%19s ","LB");
+	 printf("%19s ","UB");	 
+       }
+       printf("%7s ","Gap");
+       printf("\n");
+     }
+     (tm->stat.print_stats_cnt)++;
+     printf("%7i ", (int)(elapsed_time));
+#ifdef SHOULD_SHOW_MEMORY_USAGE 
+     printf("%9.2f ", vsize_in_mb);
+#endif
+     printf("%10i ", tm->stat.analyzed-tm->active_node_num);
+     printf("%10i ", tm->samephase_candnum+tm->active_node_num);     
+     find_tree_lb(tm);
+     if (tm->lb > -SYM_INFINITY) {
+       if (tm->obj_sense == SYM_MAXIMIZE) {
+	 obj_ub = -tm->lb + tm->obj_offset;
+	 printf("%19.2f ", obj_ub);
+       } else {
+	 obj_lb = tm->lb + tm->obj_offset;
+	 printf("%19.2f ", obj_lb);
+       }
+     } else {
+       if (tm->obj_sense == SYM_MAXIMIZE) {  
+	 printf("%19s ","");
+       } else {
+	 printf("%19s ","");
+       }
+     }
+
+     if (tm->has_ub) {
+       if (tm->obj_sense == SYM_MAXIMIZE) {
+         obj_lb = -tm->ub + tm->obj_offset;
+	 printf("%19.2f ", obj_lb);
+       } else {
+         obj_ub = tm->ub + tm->obj_offset;
+	 printf("%19.2f ", obj_ub);
+       }
+     } else {
+       if (tm->obj_sense == SYM_MAXIMIZE) {
+	 printf("%19s ","");
+       } else {
+	 printf("%19s ","");
+       }
+     }
+
+     if (tm->has_ub && tm->ub && tm->lb > -SYM_INFINITY){
+       printf("%7.2f ", fabs(100*(obj_ub-obj_lb)/obj_ub));
+     } else {
+       printf("%9s ","");
+     }   
+     printf("\n");
+   } else {     
+#ifdef SHOULD_SHOW_MEMORY_USAGE
+     printf("memory: %.2f MB ", vsize_in_mb);
+#endif
+     printf("done: %i ", tm->stat.analyzed-tm->active_node_num);
+     printf("left: %i ", tm->samephase_candnum+tm->active_node_num);
+     if (tm->has_ub) {
+       if (tm->obj_sense == SYM_MAXIMIZE) {
          obj_lb = -tm->ub + tm->obj_offset;
 	 printf("lb: %.2f ", obj_lb);
-      }else{
+       }else {
          obj_ub = tm->ub + tm->obj_offset;
-	 printf("ub: %.2f ", obj_ub);
-      }
-   } else {
-      if (tm->obj_sense == SYM_MAXIMIZE){
+	 printf("ub: %.2f ", obj_ub);	 
+       }
+     } else {
+       if (tm->obj_sense == SYM_MAXIMIZE) {
 	 printf("lb: ?? ");
-      }else{
-	 printf("ub: ?? ");
-      }
-   }
-   find_tree_lb(tm);
-   if(tm->lb > -SYM_INFINITY){
-      if (tm->obj_sense == SYM_MAXIMIZE){
+       }else {
+	 printf("ub: ?? ");	 
+       }
+     }
+     find_tree_lb(tm);
+     if (tm->lb > -SYM_INFINITY) {
+       if (tm->obj_sense == SYM_MAXIMIZE) {
 	 obj_ub = -tm->lb + tm->obj_offset;
 	 printf("ub: %.2f ", obj_ub);
-      }else{
+       } else {
 	 obj_lb = tm->lb + tm->obj_offset;
 	 printf("lb: %.2f ", obj_lb);
-      }
-   }else{
-      if (tm->obj_sense == SYM_MAXIMIZE){
+       }
+     } else {
+       if (tm->obj_sense == SYM_MAXIMIZE) {
 	 printf("ub: ?? ");
-      }else{
+       } else {
 	 printf("lb: ?? ");
-      }
+       }
+     }
+     if (tm->has_ub && tm->ub && tm->lb > -SYM_INFINITY) {
+       printf("gap: %.2f ", fabs(100*(obj_ub-obj_lb)/obj_ub));
+     }
+     printf("time: %i\n", (int)(elapsed_time));
    }
-   if (tm->has_ub && tm->ub && tm->lb > -SYM_INFINITY){
-      printf("gap: %.2f ", fabs(100*(obj_ub-obj_lb)/obj_ub));
-   }
-   printf("time: %i\n", (int)(elapsed_time));
+
+
 #if 0
    printf("Estimated nodes remaining:         %i\n", num_nodes_estimate);
    printf("Estimated time remaining:          %i\n",
@@ -732,6 +814,7 @@ void print_tree_status(tm_prob *tm)
    FREE(widths);
    FREE(gamma);
 #endif
+
 }
 
 /*===========================================================================*/
@@ -798,6 +881,18 @@ int start_node(tm_prob *tm, int thread_num)
 	     }
 	     best_node->node_status = NODE_STATUS__PRUNED;
 	     best_node->feasibility_status = OVER_UB_PRUNED;
+
+	     if(best_node->parent){
+	       for(int i = 0; i < best_node->parent->bobj.child_num; i++){
+		 if(best_node->parent->children[i] == best_node){
+		   if(best_node->parent->bobj.sense[i] == 'L'){
+		     tm->br_inf_down[best_node->parent->bobj.name]++;
+		   }else{
+		     tm->br_inf_up[best_node->parent->bobj.name]++;		     
+		   }
+		 }
+	       }
+	     }
 	 
 	     if (tm->par.verbosity > 0){
 		printf("++++++++++++++++++++++++++++++++++++++++++++++++++\n");
@@ -902,9 +997,9 @@ bc_node *del_best_node(tm_prob *tm)
 
    pos = 1;
    while ((ch=2*pos) < size){
-      if (node_compar(rule, list[ch], list[ch+1]))
+      if (node_compar(tm, rule, list[ch], list[ch+1]))
 	 ch++;
-      if (node_compar(rule, list[ch], temp)){
+      if (node_compar(tm, rule, list[ch], temp)){
 	 list[pos] = temp;
 	 return(best_node);
       }
@@ -912,7 +1007,7 @@ bc_node *del_best_node(tm_prob *tm)
       pos = ch;
    }
    if (ch == size){
-      if (node_compar(rule, temp, list[ch])){
+      if (node_compar(tm, rule, temp, list[ch])){
 	 list[pos] = list[ch];
 	 pos = ch;
       }
@@ -945,7 +1040,7 @@ void insert_new_node(tm_prob *tm, bc_node *node)
    list = tm->samephase_cand;
 
    while ((ch=pos>>1) != 0){
-      if (node_compar(rule, list[ch], node)){
+      if (node_compar(tm, rule, list[ch], node)){
 	 list[pos] = list[ch];
 	 pos = ch;
       }else{
@@ -962,11 +1057,72 @@ void insert_new_node(tm_prob *tm, bc_node *node)
  * Nodes are ordered differently depending on what the comparison rule is
 \*===========================================================================*/
 
-int node_compar(int rule, bc_node *node0, bc_node *node1)
+int node_compar(tm_prob *tm, int rule, bc_node *node0, bc_node *node1)
 {
+
+   int ret_ind = 0;
+
+   double n0_rhs, n1_rhs;
+   int n0_ind, n1_ind;
+   n1_ind = node1->parent->bobj.name;
+   n0_ind = node0->parent->bobj.name;
+   double n0_frac, n1_frac; 
+   if(node0->parent->children[0] == node0){
+      n0_rhs = node0->parent->bobj.rhs[0];
+   }else{
+      n0_rhs = node0->parent->bobj.rhs[1];
+   }
+
+   if(node1->parent->children[0] == node1){
+      n1_rhs = node1->parent->bobj.rhs[0];
+   }else{
+      n1_rhs = node1->parent->bobj.rhs[1];
+   }
+
+   n0_frac = fabs(node0->parent->bobj.value - n0_rhs);
+   n1_frac = fabs(node1->parent->bobj.value - n1_rhs);
+   
+   int n0_eff = MAX(tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n0_ind].col_size,
+		    tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n0_ind].sos_num);
+   int n1_eff = MAX(tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n1_ind].col_size,
+		    tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n1_ind].sos_num);
+
+   /* solves acc3 without swap 
+      if(node1->lower_bound < node0->lower_bound - 1e-4) ret_ind = 1;
+      else if (node1->lower_bound < node0->lower_bound + 1e-4) {
+	 if(node1->bc_level > node0->bc_level) ret_ind = 1;
+      }
+      //return(node1->lower_bound < node0->lower_bound ? 1:0);
+      return ret_ind;
+   */
+
    switch(rule){
-    case LOWEST_LP_FIRST:
-      return(node1->lower_bound < node0->lower_bound ? 1:0);
+    case LOWEST_LP_FIRST:      
+      if(node1->lower_bound < node0->lower_bound - 1e-4) ret_ind = 1;
+      else if (node1->lower_bound < node0->lower_bound + 1e-4) {
+	 if(node1->bc_level > node0->bc_level) ret_ind = 1;
+	 else if(node1->bc_level == node0->bc_level)
+	    if(node1->frac_cnt < node0->frac_cnt) ret_ind = 1;
+	 //if(tm->has_ub){
+	 // if(node1->bc_level > node0->bc_level) ret_ind = 1;
+	 // else if(node1->bc_level == node0->bc_level)
+	 //    if(node1->frac_cnt < node0->frac_cnt) ret_ind = 1;
+	 //}else
+	 //  if(node1->frac_cnt < node0->frac_cnt) ret_ind = 1;
+	 //  else if(node1->frac_cnt == node0->frac_cnt) 
+	 //     if (node1->bc_level > node0->bc_level) ret_ind = 1;
+      }
+      //return(node1->lower_bound < node0->lower_bound ? 1:0);
+      return ret_ind;
+      //switch(rule){
+      //case LOWEST_LP_FIRST:
+      //if(node1->lower_bound < node0->lower_bound - 1e-4)
+      //	 return 1;
+      //else if(node1->lower_bound < node0->lower_bound + 1e-4)
+      // if(node1->bc_level < node0->bc_level) return 1;
+      // else return 0;
+      //else return 0;
+      // return(node1->lower_bound < node0->lower_bound ? 1:0);
     case HIGHEST_LP_FIRST:
       return(node1->lower_bound > node0->lower_bound ? 1:0);
     case BREADTH_FIRST_SEARCH:
@@ -1098,6 +1254,8 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       child->bc_index = tm->stat.tree_size++;
       child->bc_level = node->bc_level + 1;
       child->lower_bound = objval[i];
+      child->frac_cnt = node->frac_cnt; 
+      child->frac_avg = node->frac_avg; 
 #ifdef COMPILE_IN_LP
       child->update_pc = bobj->is_est[i] ? TRUE : FALSE;
 #endif
@@ -1117,7 +1275,6 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		  feasible[i] ? VBC_FEAS_SOL_FOUND :
 		  ((dive != DO_NOT_DIVE && *keep == i) ?
 		   VBC_ACTIVE_NODE : VBC_CAND_NODE));
-            fclose(f);
 	 }
       } else if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
 	 FILE *f;
@@ -1467,14 +1624,57 @@ char shall_we_dive(tm_prob *tm, double objval)
    if (tm->par.node_limit >= 0 && tm->stat.analyzed >= tm->par.node_limit){
       return(FALSE);
    }
-   
-   if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
+
+   double d_threshold = tm->par.diving_threshold;
+   double dual_gap = 100.00;
+
+   if (tm->samephase_candnum > 0 || tm->active_node_num > 1) {
       find_tree_lb(tm);
-      if (100*(tm->ub-tm->lb)/(fabs(tm->ub)+etol) <= tm->par.gap_limit){
+   }else{
+      tm->lb = objval;
+   }
+
+   if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
+      double tm_dual_gap = d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense);
+      if (tm_dual_gap <= tm->par.gap_limit){
 	 return(FALSE);
       }
    }
    
+   if(tm->has_ub){
+      dual_gap = d_gap(tm->ub, objval, tm->obj_offset, tm->obj_sense);
+   }
+   
+   if(dual_gap < 100.00){
+     //d_threshold = 0.1;
+     //if(dual_gap > 50.0) d_threshold *= etol*etol;
+     //else if(dual_gap > 10.0) d_threshold *= etol;
+     //else if(dual_gap > 5.0) d_threshold *= 0.01;//etol;
+     //else if(dual_gap > 1.0) d_threshold *= 0.1;
+     //     else if(dual_gap > 1.0) d_threshold *= etol;
+     //if(dual_gap > 5.0) d_threshold *= etol*etol;
+     //else if(dual_gap > 1.0) d_threshold *= etol;
+      //if(dual_gap > 5.0) d_threshold *= etol*etol;
+      //else if(dual_gap > 1.0) d_threshold *= etol;
+      //if(dual_gap > 0.20) d_threshold *= etol*etol;
+      //else if(dual_gap > 0.10) d_threshold *= etol;
+      //if(dual_gap < 10.00){
+      //	 if(dual_gap > 5.00) d_threshold *= etol*etol;
+      //	 else if(dual_gap > 1.00) d_threshold *= etol;
+      //}//else{
+      // d_threshold = 0.01;
+      // }
+      //d_threshold = dual_gap*1e-4; 
+      
+      //if(dual_gap > 20.0) d_threshold *= 2;//MIN(10.0, d_threshold/
+      //else if(dual_gap < 5.0) d_threshold *= etol;
+      d_threshold *=etol*etol;
+      //if(tm->stat.analyzed < 5000) d_threshold *=etol*etol;
+      //else d_threshold = 0.001;
+   }else{
+     d_threshold = 100.0; 
+   }
+
    rand_num = ((double)(RANDOM()))/((double)(MAXINT));
    if (tm->par.unconditional_dive_frac > 1 - rand_num){
       dive = CHECK_BEFORE_DIVE;
@@ -1505,12 +1705,12 @@ char shall_we_dive(tm_prob *tm, double objval)
 	    break;
 	 }
          if (fabs(average_lb) < etol) {
-            average_lb = (average_lb > 0) ? etol : -etol;
+            average_lb = (average_lb >= 0) ? etol : -etol;
             if (fabs(objval) < etol) {
-               objval = (objval > 0) ? etol : -etol;
+               objval = (objval >= 0) ? etol : -etol;
             }
          }
-	 if (fabs((objval/average_lb)-1) > tm->par.diving_threshold){
+	 if (fabs((objval/average_lb)-1) > d_threshold){
 	    dive = DO_NOT_DIVE;
 	    tm->stat.diving_halts++;
 	 }else{
@@ -1532,9 +1732,9 @@ char shall_we_dive(tm_prob *tm, double objval)
 	    break;
 	 }
 	 if (tm->has_ub)
-	    cutoff = tm->par.diving_threshold*(tm->ub - average_lb);
+	    cutoff = d_threshold*(tm->ub - average_lb);
 	 else
-	    cutoff = (1 + tm->par.diving_threshold)*average_lb;
+	    cutoff = fabs((1 + d_threshold)*average_lb);
 	 if (objval > average_lb + cutoff){
 	    dive = DO_NOT_DIVE;
 	    tm->stat.diving_halts++;
@@ -1684,6 +1884,10 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	       bobj->rhs[i] = bobj->rhs[new_child_num];
 	       bobj->range[i] = bobj->range[new_child_num];
 	       bobj->branch[i] = bobj->branch[new_child_num];
+	       bobj->sos_cnt[i] = bobj->sos_cnt[new_child_num];
+	       int *swap_si = bobj->sos_ind[i];
+	       bobj->sos_ind[i] = bobj->sos_ind[new_child_num];
+	       bobj->sos_ind[new_child_num] = swap_si;
 	    }
 	 }
       }
@@ -1791,7 +1995,7 @@ int add_cut_to_list(tm_prob *tm, cut_data *cut)
 void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 		    int bc_index, char branching, int feasible){
    bc_node *node, *temp, **list;
-   int rule, pos, prev_pos, last, i;
+   int rule, pos, prev_pos, last, i, j;
 
    tm->has_ub = TRUE;
    tm->ub = new_ub;
@@ -1859,11 +2063,22 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
       node = list[i];
       if (tm->has_ub &&
 	  node->lower_bound >= tm->ub-tm->par.granularity){
+	 if(node->parent){
+	   for(j = 0; j < node->parent->bobj.child_num; j++){
+	     if(node->parent->children[j] == node){
+	       if(node->parent->bobj.sense[j] == 'L'){
+		 tm->br_inf_down[node->parent->bobj.name]++;
+	       }else{
+		 tm->br_inf_up[node->parent->bobj.name]++;
+	       }
+	     }
+	   }
+	 }
 	 if (i != last){
 	    list[i] = list[last];
 	    for (prev_pos = i, pos = i/2; pos >= 1;
 		 prev_pos = pos, pos /= 2){
-	       if (node_compar(rule, list[pos], list[prev_pos])){
+	       if (node_compar(tm, rule, list[pos], list[prev_pos])){
 		  temp = list[prev_pos];
 		  list[prev_pos] = list[pos];
 		  list[pos] = temp;
@@ -2587,7 +2802,7 @@ int tasks_before_phase_two(tm_prob *tm)
                        tm->ub, tm->lb, 0,
 		       tm->start_time, wall_clock(NULL),
 		       tm->obj_offset,
-		       tm->obj_sense, tm->has_ub,NULL);
+		       tm->obj_sense, tm->has_ub,NULL, tm->par.output_mode);
    }
 #else
    /* Report to the master all kind of statistics */
@@ -3344,6 +3559,10 @@ void free_tm(tm_prob *tm)
       FREE(tm->br_rel_down_min_level);
       FREE(tm->br_rel_up_min_level);
    }
+   FREE(tm->br_inf_down);
+   FREE(tm->br_inf_up);
+   FREE(tm->var_rank);
+   FREE(tm->root_lp);
    
    FREE(tm);
 }
@@ -3372,12 +3591,20 @@ void free_tree_node(bc_node *n)
    FREE(n->duals);
 #endif
    FREE(n->children);
+
+   for(int i=0; i < n->bobj.child_num; i++){
+      FREE(n->bobj.sos_ind[i]);
+   }
+
 #ifndef MAX_CHILDREN_NUM
    FREE(n->bobj.sense);
    FREE(n->bobj.rhs);
    FREE(n->bobj.range);
    FREE(n->bobj.branch);
+   FREE(n->bobj.sos_cnt);
+   FREE(n->bobj.sos_ind);
 #endif
+
    FREE(n->bobj.solutions); //added by asm4
 
    FREE(n->desc.uind.list);
@@ -3391,6 +3618,9 @@ void free_tree_node(bc_node *n)
       FREE(n->desc.bnd_change->value);
       FREE(n->desc.bnd_change);
    }
+
+   if(n->desc.frac_vars) FREE(n->desc.frac_vars);
+
    FREE(n);
 }
 
@@ -3563,7 +3793,7 @@ int find_tree_lb(tm_prob *tm)
 
    if (tm->samephase_candnum > 0 || tm->active_node_num > 0) {
       if (tm->par.node_selection_rule == LOWEST_LP_FIRST) {
-         lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
+	lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
       } else {
          samephase_cand = tm->samephase_cand;
          for (int i = tm->samephase_candnum; i >= 1; i--){

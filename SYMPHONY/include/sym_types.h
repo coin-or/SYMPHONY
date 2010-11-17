@@ -28,6 +28,7 @@
 #endif
 
 #include "sym_proto.h"
+#include "sym_constants.h" 
 
 typedef struct LP_SOL{
    int            lp;          /* the tid of the lp process asssociated with
@@ -141,6 +142,8 @@ typedef struct BRANCH_DESC{
    double         rhs;
    double         range;
    int            branch;
+   int            sos_cnt;
+   int           *sos_ind;
 }branch_desc;
 
 typedef struct ARRAY_DESC{
@@ -199,6 +202,9 @@ typedef struct NODE_DESC{
    /* Any additional info the user might want to pass */
    int           desc_size;
    char         *desc;
+
+   int           frac_cnt;
+   int          *frac_vars;
 }node_desc;
 
 typedef struct BRANCH_OBJ{
@@ -214,18 +220,21 @@ typedef struct BRANCH_OBJ{
 #endif
    double        value;        /* for evaluating pcost */
 
-   /*========================================================================*\
+   /*========================================================================* \
     * Description of the children.
     * All of them are natural for branching cuts.
     * For branching variables they should be interpreted as if we were adding
     * a cut with a single variable on the left hand side
    \*========================================================================*/
+   /* regarding implicit sos1 branching */
 
 #ifdef MAX_CHILDREN_NUM
    char          sense[MAX_CHILDREN_NUM];
    double        rhs[MAX_CHILDREN_NUM];
    double        range[MAX_CHILDREN_NUM];
    int           branch[MAX_CHILDREN_NUM];
+   int           sos_cnt[MAX_CHILDREN_NUM];
+   int          *sos_ind[MAX_CHILDREN_NUM];
 #ifdef COMPILE_FRAC_BRANCHING
    int           frac_num[MAX_CHILDREN_NUM];
    int          *frac_ind[MAX_CHILDREN_NUM];
@@ -236,6 +245,8 @@ typedef struct BRANCH_OBJ{
    double       *rhs;
    double       *range;
    int          *branch;
+   int          *sos_cnt;
+   int          **sos_ind;
 #ifdef COMPILE_FRAC_BRANCHING
    int          *frac_num;
    int         **frac_ind;
@@ -322,6 +333,12 @@ typedef struct NODE_TIMES{
    double        dupes_and_bad_coeffs_in_cuts;
 
    double        fp;                            /* feasibility pump */
+   double        ls;                            /* local search */
+   double        ds;                            /* diving search */
+   double        ds_type[DIVING_HEURS_CNT];
+   double        rh;                            /* rounding */
+   double        fr;                            /* fix-and-relax */
+   double        rs;                            /* rins */
    double        primal_heur;                   /* all primal heuristics */
 }node_times;
 
@@ -347,6 +364,7 @@ typedef struct PROB_TIMES{
 typedef struct BC_NODE{
    int        bc_index;     /* the identifier of the node */
    int        bc_level;     /* the level in the tree of the node */
+   int        iter_num;     /* cuts/cgl iteration number */
    
    int        lp;           /* the tid of the lp processing the node */
    int        cg;           /* the tid of the cut generator serving the node */
@@ -387,12 +405,15 @@ typedef struct BC_NODE{
    double      start_objval;
    double      end_objval;
    char        cuts_tried;
+   char        cuts_forced;
    int         num_str_br_cands_in_path;
    double      avg_br_obj_impr_in_path;
    char        used_str;
    int         t_cnt;
    
    int         num_fp_calls_in_path;
+   int         frac_cnt;
+   double      frac_avg; 
 }bc_node;
 
 /*===========================================================================*\
@@ -422,14 +443,18 @@ typedef struct PROBLEM_STAT{
    int         nf_status;          /* nf_status of the root node after
 				      repricing */
    double      max_vsize;
+   int         print_stats_cnt; 
 }problem_stat;
 
 /*===========================================================================*/
 
 typedef struct LP_STAT{
    /* LP solver */
-   int         lp_calls;
+   int         lp_calls; /* total lp_calls */
+   int         lp_node_calls; /* total lp_calls in node processing */
    int         lp_sols;
+   int         ip_sols;
+   int         lp_iter_num; 
    int         lp_total_iter_num; /* number of total simplex iterations */
    int         lp_max_iter_num; /* max of lps' simplex iterations */
    int         str_br_lp_calls; /* no of calls from strong branching */
@@ -437,6 +462,9 @@ typedef struct LP_STAT{
    int         str_br_nodes_pruned; /* no of nodes pruned by strong br */
    int         str_br_total_iter_num; /* number of total simplex iterations by
 					 strong br*/
+   int         prep_bnd_changes; 
+   int         prep_nodes_pruned;
+   
    int         rel_br_full_solve_num;
    int         rel_br_pc_up_num;
    int         rel_br_up_update;
@@ -497,6 +525,41 @@ typedef struct LP_STAT{
    int         fp_num_sols;
    int         fp_poor_sols;
    int         fp_lp_total_iter_num;
+   int         fp_num_iter;
+   int         fp_last_call_ind;  
+
+   /* rounding heuristic*/
+   int         rh_calls;
+   int         rh_num_sols;
+   int         rh_last_call_ind;
+ 
+   /* local search */
+   int         ls_calls;
+   int         ls_num_sols;
+   int         ls_last_call_ind;
+
+   /* diving  */
+   int         ds_calls;
+   int         ds_num_sols;
+   int         ds_type_calls[DIVING_HEURS_CNT];
+   int         ds_type_num_sols[DIVING_HEURS_CNT];
+   int         ds_type_num_iter[DIVING_HEURS_CNT];
+   int         ds_num_iter;
+   int         ds_last_call_ind; 
+ 
+   /* fix-and-relax */
+   int         fr_calls;
+   int         fr_num_sols;
+   int         fr_last_call_ind;
+   int         fr_analyzed_nodes;
+   int         fr_last_sol_call;
+
+   /* rins search */
+   int         rs_calls;
+   int         rs_num_sols;
+   int         rs_last_call_ind;
+   int         rs_analyzed_nodes;
+   int         rs_last_sol_call;
 
    /* usage of different tools in process chain: fp, cuts, strong branching */
    int         num_cut_iters_in_path;
@@ -509,6 +572,9 @@ typedef struct LP_STAT{
    double      avg_br_obj_impr_in_path;
 
    int         num_fp_calls_in_path;
+   int         chain_cuts_trial_num;
+   int         node_cuts_tried;
+   int         node_cuts_forced;
 }lp_stat_desc;
 
 
@@ -560,6 +626,7 @@ typedef struct IMPLIST{
 /* Data structure to keep relevant info of a column */
 /*===========================================================================*/
 typedef struct COLINFO{
+   int rank; 
    int coef_type; /* all integer, all binary, fractional
 			 - considering the type of coefficients*/
    int sign_type; /* same below */
@@ -582,6 +649,7 @@ typedef struct COLINFO{
 		     */
    int sos_num;      /* #of sos rows that this var appears in */
    int col_size;     /* col size */
+   int nz;           /* sum of row_sizes this var appears in */  
    int fix_row_ind; /* state which row caused to fix this variable during
 		       basic preprocessor */
 		    
@@ -633,7 +701,9 @@ typedef struct ROWINFO{
    int bin_var_num; /*not fixed binary variables */
    int cont_var_num; /*not fixed continuous variables */
    int frac_coef_num; /* not fixed, frac coeffs on this row */   
-
+   int row_coef_bin_cnt;
+   int row_sign_pos_cnt;
+   
    char is_redundant; 
    char is_updated;
    char vars_checked;
@@ -681,9 +751,26 @@ typedef struct MIPINFO{
    double col_density;
    double sos_bin_row_ratio;
    double bin_row_ratio;
-   
+  
+   int    e_row_num; 
+   int    l_row_num; 
+   int    g_row_num; 
+   int    r_row_num; 
+  
    ROWinfo *rows;
-   COLinfo *cols;
+   COLinfo *cols;  
+
+   int c_alloc_size;
+   int c_alloc_num;
+   int *c_ind;
+   double *c_val;
+   int *c_beg;
+   char *c_sense;
+   double *c_rhs;
+   int c_num;
+   int c_nz;
+   int *c_tmp;
+   
 }MIPinfo; 
 
 /*===========================================================================*/
@@ -739,6 +826,16 @@ typedef struct MIPDESC{
    int       *fixed_ind;    /* fixed vars to nonzero vals */
    double    *fixed_val; 
 
+   int        subs_n;
+   int       *subs_ind;
+   double    *subs_aval;
+   double    *subs_rhs; 
+
+   int        subs_alloc_size; 
+   int       *subs_rbeg;
+   int       *subs_rind;
+   double    *subs_rval;
+   
 /* Only to be allocated and used by SYMPHONY */
 
    int       *col_lengths;   
@@ -764,7 +861,7 @@ typedef struct MIPDESC{
    MIPinfo   *mip_inf; 
    
    //  MIPdiff *mip_diff;
-
+   double * opt_sol;   
 }MIPdesc;
 
 /*===========================================================================*\

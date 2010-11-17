@@ -278,6 +278,7 @@
 /*----------------- possible types of branching objects ---------------------*/
 #define BRANCHING_VARIABLE          0
 #define BRANCHING_CUT               1
+#define SOS1_IMPLICIT               2
 
 /*------------ possible return values of select_candidates_u() --------------*/
 #define DO_BRANCH                   0
@@ -558,3 +559,26 @@
 #define ALL_NEG_VEC              2
 
 #endif
+
+/*--------------- types used for diving heuristic -------------------------*/
+#define VLENGTH_FIX_DIVING       0
+#define GUIDED_FIX_DIVING        1
+#define CROSSOVER_FIX_DIVING     2
+#define EUC_FIX_DIVING           3
+#define RANK_FIX_DIVING          4
+#define FRAC_FIX_DIVING          5
+#define VLENGTH_DIVING           6
+#define GUIDED_DIVING            7
+#define CROSSOVER_DIVING         8
+#define EUC_DIVING               9
+#define RANK_DIVING              10
+#define FRAC_DIVING              11
+#define DIVING_HEURS_CNT         12
+#define ROOT_DIVING              20
+#define COEFF_DIVING             21
+#define PC_DIVING                22
+
+/*--------------- types used for diving heuristic -------------------------*/
+#define FR_SEARCH                0
+#define RINS_SEARCH              1 
+

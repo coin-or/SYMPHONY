@@ -25,5 +25,5 @@ void qsort_ii(int *bot, int *bota, int nmemb);
 void qsort_di(double *botd, int *boti, int nmemb);
 /* TODO: replace with some function from CoinUtils */
 int sym_gcd(int i1, int i2);
-
+double d_gap(double obj_ub, double obj_lb, double obj_offset, char obj_sense);
 #endif

@@ -51,7 +51,9 @@ int sym_presolve(sym_environment *env)
    }
 
    P->params = env->par.prep_par;
-   
+   P->has_ub = env->has_ub;
+   P->ub = env->ub;
+
    if (P->mip){
       termcode = prep_solve_desc(P);
    }

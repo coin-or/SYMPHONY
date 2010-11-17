@@ -188,7 +188,6 @@ typedef struct SYM_ENVIRONMENT sym_environment;
 /*===================== Interface functions (master.c) ======================*/
 /*===========================================================================*/
 
-void sym_version PROTO((void));
 sym_environment *sym_open_environment PROTO((void));
 int sym_set_defaults PROTO((sym_environment *env));
 int sym_parse_command_line PROTO((sym_environment *env, int argc, 

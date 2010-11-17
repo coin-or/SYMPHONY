@@ -102,7 +102,8 @@ typedef struct PREP_STATS
    int bounds_integerized;
    int vars_aggregated;
    int vars_integerized;
-
+   int vars_substituted;
+   
    /* regarding coeffs changes and bounds tightening */
    int coeffs_changed;
    char *nz_coeff_changed; 
@@ -187,6 +188,9 @@ typedef struct PREPDesc
    MIPdesc * orig_mip;
    prep_stats stats; 
    prep_params params;
+
+   int has_ub;
+   double ub; 
 
    /* for logical fixing */
    int impl_limit; 
@@ -311,6 +315,13 @@ int prep_deleted_row_update_info(MIPdesc *mip, int row_ind);
 /* try to find duplicate rows and columns */
 int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows, 
 				    char check_cols);
+/* try to substitute cols */
+int prep_substitute_cols(PREPdesc *P);
+
+int prep_update_single_row_attributes(ROWinfo *rows, int row_ind, double a_val,
+				      double obj, double c_lb, double c_ub,
+				      int is_int, int var_type, double etol,
+				      int entry_loc);
 /* utility functions */
 void prep_sos_fill_var_cnt(PREPdesc *P);
 void prep_sos_fill_row(ROWinfo *row, int alloc_size, int size,
@@ -329,6 +340,8 @@ int prep_declare_coef_change(int row_ind, int col_ind,
 			     char *name, double a_val, 
 			     double rhs);
 int prep_report(PREPdesc *P, int termcode);
+
+int prep_merge_solution(MIPdesc *orig_mip, MIPdesc *prep_mip, lp_sol * sol);
 
 /* implications - under development*/
 int prep_add_to_impl_list(IMPlist *list, int ind, int fix_type, 

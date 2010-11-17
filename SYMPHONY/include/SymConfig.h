@@ -1,3 +1,6 @@
+#ifndef HAVE_CONFIG_H
+#define HAVE_CONFIG_H
+#endif
 /*
  * Include file for the configuration of SYMPHONY.
  *
@@ -16,9 +19,6 @@
  * setting by editing this file here.
  *
  */
-
-#ifndef __SYMPHONY_CONFIG_H__
-#define __SYMPHONY_CONFIG_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config_sym.h"
@@ -92,8 +92,4 @@
 
 #endif /* HAVE_CONFIG_H */
 
-#ifndef SYMPHONY_VERSION
-#define SYMPHONY_VERSION "trunk"
-#endif
-
-#endif /*__SYMPHONY_CONFIG_H__*/
+#endif /*__HAVE_COINUTILS_CONFIG_H__*/
