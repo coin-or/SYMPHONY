@@ -1,0 +1,427 @@
+SYMPHONY Version 5.2.0 README
+=============================
+
+Welcome to SYMPHONY. SYMPHONY is distributed under the Common Public License
+Version 1.0 and is freely redistributable. All source code and documentation
+is Copyright 2000-2009 by Ted Ralphs and others. This README may be
+redistributed freely.
+
+DOCUMENTATION
+=============
+
+If you have downloaded a source distribution, full documentation is available
+in the SYMPHONY/Doc/ subdirectory. If you have downloaded a binary
+distribution, the manual should be located in the man/ subdirectory. HTML
+or PDF versions of the manual can also be viewed at:
+
+http://www.coin-or.org/SYMPHONY/
+
+WHAT'S NEW
+==========
+
+Release 5.2.0:
+
+1. SYMPHONY has a preprocessor now.
+
+2. Feasibility pump primal heuristic implemented.
+
+3. Reliability branching is now the default branching strategy.
+
+4. Several new statistics now part of default output.
+
+5. Correct setting of granularity of objective function value by calculating
+   GCD of coefficients.
+
+6. Several changes in management of valid inequalities, quality checks and
+   detection of duplicacy.
+
+7. Minor changes in management of LP solver interface.
+
+8. Several small bug-fixes and improvements.
+
+Release 5.1.10:
+
+1. New dependencies.
+
+Release 5.1.9:
+
+1. New dependencies.
+
+Release 5.1.8:
+
+1. Introduced use of LP hot starting.
+
+2. Improved management of cut generation.
+
+3. Updated externals
+
+4. Minor bug fixes
+
+Release 5.1.7:
+
+1. Minor bug fixes
+
+Release 5.1.6:
+
+1. Only a single header file (symphony.h) needs to be installed and user 
+applications only need to be able to find this one header file.
+
+2. Fixes to MSVC++ project files.
+
+3. Removed dependence on qsortucb routines.
+
+Release 5.1.5:
+
+1. Added support for automatic download and build of Glpk (for reading of GMPL
+files).
+
+2. Minor bugs fixed and compiler warnings eliminated.
+
+3. Updates to MS Visual Studio files.
+
+4. Added short installation verification test.
+
+Release 5.1.4:
+
+1. Added ability to read files in LP format.
+
+2. Additional configuration options.
+
+3. Support for new classes of cutting planes.
+
+4. Improved algorithm control mechanism.
+
+5. Improved output format and additional output options.
+
+6. Improved signal handling.
+
+7. Shared memory parallel version tested with OpenMP in Linux and Windows.
+
+8. Added release configuration to MSVC++ build files.
+
+9. Improved warm starting.
+
+10. Fixes for configuration with SoPlex and Xpress.
+
+11. Fixed configuration on PowerPC architectures.
+
+Release 5.1.3:
+
+1. Support for building static executables in Unix-like environments.
+
+2. Improved signal-catching behavior in Unix-like environments.
+
+3. Updated documentation.
+
+Release 5.1.2:
+
+1. Update of externals.
+
+2. Updated documentation.
+
+Release 5.1.1:
+
+1. Fixes for building in the Solaris operating system.
+
+2. Fixes for using the GNU autotools to build with the cl compiler.
+
+2. Fixes for sym.mak file in order to allow building with MSVC++ nmake utility.
+
+4. Fixes for building the unit test in the MSVC++ IDE.
+
+5. Updated documentation
+
+Release 5.1.0:
+
+1. SYMPHONY now has an interactive optimizer that can be used through a
+command shell. In both the sequential and parallel configurations, the user
+can set parameters, load and solve instances interactively, and display
+results and statistics (see below).
+
+2. SYMPHONY now supports automatic configuration using the new COIN-OR build
+system and the GNU autotools.Using autotools utilities, it is now possible to
+build SYMPHONY in most operating systems and with most common compilers
+compilers without user intervention.
+
+3. Both the distributed and shared memory parallel configurations are now
+fully debugged, tested, and supported. The user can now build and execute
+custom SYMPHONY applications in parallel, as well as solving generic MILPs in
+parallel "out of the box."
+
+4. There are now additional options for warm starting. The user can trim the
+warm starting tree before starting to resolve a problem. More specifically,
+the user can decide to initiate warm starting with a predefined partition of
+the final branch-and-cut tree resulting from a previous solution procedure.
+This partition can include either a number of nodes created first during the
+solution procedure or all of the nodes above a given level of the tree.
+
+5. The COIN-OR repository, the current host of SYMPHONY has recently undergone 
+some significant improvements of its own that have resulted in improved 
+services to users. These include: 
+
+-- SYMPHONY has a new development Web site, where users can submit trouble
+  tickets, browse the source code interactively, and get up-to-date
+  information on development. The address of the new site is
+  https://projects.coin-or.org/SYMPHONY.
+
+-- SYMPHONY is now hosted using subversion, a version control system with
+  features vastly improved over CVS, the previous hosting software. This has
+  required some reorganization and renaming of the header files.
+
+-- SYMPHONY is now more tightly integrated with other COIN-OR projects. Due
+  to improved procedures for producing stable releases, it will now be much
+  easier for us to determine the exact version of SYMPHONY and all other COIN
+  projects you are using when you report a bug.
+
+-- SYMPHONY is now distributed with all COIN software needed to build a
+  complete solver. Previously, other COIN softrware packages had to be
+  downloaded and installed separately.
+
+Two features have been deprecated and are no longer supported:
+
+1. The native interfaces to OSL and CPLEX are now deprecated and no longer
+supported. These solvers can be called through the COIN-OR OSI interface.
+
+2. Column generation functionality has also been officially deprecated. For
+now, there are a number of other software packages that offer better
+functionality than SYMPHONY for implementing branch and price algorithms.
+
+CHANGES TO THE USER INTERFACE (FROM SYMPHONY 5.0)
+=================================================
+
+1. There was one minor change to the user callback API from version 5.0 to 5.1.
+The user can now execute a primal heuristic in the user_is_feasible() callback
+and return the solution to SYMPHONY. The API for the user_is_feasible()
+subroutine is now
+
+int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
+		     double *values, int *feasible, double *objval,
+		     char branching, double *heur_solution)
+
+Any feasible solution can be passed (in dense format) through the last
+argument to this function.
+
+2. Several new subroutines were added to the callable library API.
+
+3. The name of the header file containing the SYMPHONY API has been changed
+from "symphony_api.h" to "symphony.h" (though the former has been retained for
+backword compatibility purposes).
+
+******************************************************************************
+*                              INSTALLATION                                  *
+******************************************************************************
+
+If you downloaded a source distribution and would like instructions on
+building SYMPHONY or you downloaded a binary distribution and would like to
+know how to install it, please see the file SYMPHONY-5.1/INSTALL. 
+
+*******************************************************************************
+*                             USING SYMPHONY                                  *
+*******************************************************************************
+
+****************** Using SYMPHONY from the command line **********************
+
+To use SYMPHONY as a generic solver, type the executable name on the command
+line, followed by one or more of the command-line switches. On the
+command-line, there is one required switch---you must specify the location of
+the input file by using "-F 'filename'". This input file is assumed to be in
+MPS format, unless the "-D" switch is also present, in which case the file
+will be assumed to be a GMPL model file with the data file specified after the
+"-D" switch. In LINUX, the following command would solve the instance
+"sample.mps"
+
+symphony -F sample.mps
+
+The remaining switches are used to set SYMPHONY's native parameters on the
+command line. Below is a list of these parameters. This list can also be
+obtained by executng 
+
+symphony -h
+
+Note that all SYMPHONY parameters are denoted by a lowercase letter. Many
+other parameters can be set with the use of a parameter file (specified with
+-f). These parameters are listed in the SYMPHONY user's manual.
+
+	-h: help
+	-a: no cut timeout
+	-d: enable graph drawing
+	-g: use cut generator
+	-r: do repricing in root
+	-t: trim the tree
+	-b: don't perform branch and cut
+	-u ub: use upper bound 'ub'
+	-p procs: allow 'procs' active nodes
+	-n i: use node selection rule 'i'
+	-v i: set verbosity to level 'i'
+	-s cands: use 'cands' candidates for strong branching
+	-c i: use rule 'i' to compare candidates
+	-k i: use rule 'i' to select child
+	-m n: allow a max of 'n' cuts to enter per iteration
+	-e n: allow a max of 'n' cut pools
+	-l n k: load balance level 'n' and iterations 'k'
+	-i n: allow a max of 'n' iterations in presolve
+	-f file: read parameters from parameter file 'file'
+	-j 0/1: whether or not to generate cgl cuts
+	-z n: set diving threshold to 'n'
+
+************ Using the SYMPHONY interactive optimizer ************************
+
+To use SYMPHONY's Interactive shell, run the executable name without any
+command line arguments. Then type "help" or "?" to see a list of available
+commands which are as follows for this version:
+
+	load      : read a problem in mps or ampl format
+	solve     : solve the problem
+	lpsolve   : solve the lp relaxation of the problem
+	set       : set a parameter
+	display   : display optimization results and stats
+	reset     : restart the optimizer
+	help      : show the available commands/params/options	
+
+	quit/exit : leave the optimizer
+
+So, if you want to load and solve an ampl/gmpl file, you will need to type
+"load sample.mod sample.dat" and then "solve". 
+
+************************ Using the callable library **************************
+
+To use SYMPHONY as a generic callable library, compile SYMPHONY as described
+above. The library that is created along with the solver itself can be linked
+to using the API described in the user's manual. For examples of using the
+callable library in this way, see the Examples/ subdirectory.
+
+*******************************************************************************
+*                      DEVELOPING CUSTOM APPLICATIONS                         *
+*******************************************************************************
+
+To customize SYMPHONY by implementing the custom callback functions, simply
+modify the files in the SYMPHONY/Applications/USER/ subdirectory, as described
+in the user's manual and follow the compilation procedures in the file
+SYMPHONY/Applications/USER/README. There are a number of sample applications
+available as examples of how to do this kind of development with SYMPHONY.
+These include solvers for the matching problem, the set partitioning problem
+(simple and advanced versions), the vehicle routing and traveling salesman
+problems, and the mixed postman problem. These applications are distributed as
+separate packages and can be downloaded from http://www.branchandcut.org.
+There is a white paper that guides the user through the development of the
+matching solver.
+
+*******************************************************************************
+*                         CURRENT TESTING STATUS                              *
+*******************************************************************************
+
+SYMPHONY can now be used in a very large number of possible configurations and
+we simply aren't able to test them all. Below is a rough idea of the testing
+status of various configurations to date. If you need a certain configuration,
+I would be happy to help you get it running. Please let me know.
+
+LP INTERFACES
+=============
+
+**The native interfaces for OSL and CPLEX have now been deprecated**
+**Only LP solvers with OSI interfaces are supported**
+
+Well tested: CPLEX, OSL, CLP 
+
+Well tested, but have some stability or other issues: GLPK
+
+Compiled, but not well tested: SPX
+
+TESTED CONFIGURATIONS
+=====================
+
+SEQUENTIAL
+
+Known configurations that build and pass unit test
+
+- gcc 4.1 on LINUX
+- gcc 3.4 on LINUX
+- gcc 3.4.4 on CYGWIN in Windows XP
+- gcc 3.4.4 on CYGWIN in Windows XP (-mno-cygwin)
+- MSVC++ Version 8 compiler in CYGWIN using the autotools 
+- MSVC++ Version 8 IDE
+- MSVC++ nmake Utility with Version 8 compiler
+- gcc 4.0 on Mac OSX 10.4.8
+- gcc 4.1 on Solaris x86
+
+SHARED MEMORY PARLLEL (OpenMP)
+
+Builds and passes unit test with pre-release version of gcc 4.2 and CLP on
+LINUX (earlier versions of GCC do not support OpenMP and cannot be used to
+build a shared-memory version of SYMPHONY)
+
+DISTRIBUTED MEMORY PARALLEL (PVM)
+
+Known configurations that build and pass unit test
+
+- gcc 4.1 on LINUX with PVM
+- gcc 3.4 on LINUX with PVM
+
+APPLICATIONS
+============
+
+SYMPHONY (used as a generic MILP solver): Well tested.
+
+MATCH (matching): Tested, but not very extensively.
+
+MPP (mixed postman problem): Tested, but not very extensively.
+
+VRP (vehicle routing problem): Well tested.
+
+CNRP (capacitates network routing problem): Well tested.
+
+MCKP (multi criteria knapsack problem): Well tested.
+
+SPP (set partitioning problem): Tested, but not very extensively.
+
+SPP+CUTS (set partitioning problem with cutting planes): Tested, but not very 
+extensively.
+
+CUT GENERATORS
+==============
+
+Cut generators are supplied by the Cut Generation Library (CGL). The cut
+generators that are turned on by default have been well tested. Two cut
+generators that are part ofthe CGL are turned off by default because of known
+issues. These are lift and project cuts and the simple rounding cuts. The
+generator for Gomory cuts works well, but has somenumerical issues. We found a
+few cases where the optimal solution was not found when using the Gomory cut
+generator, especially in combination with CPLEX. If the solver is not
+performing as it should, try turning off some of the cut generators to see if
+that fixes the problem. 
+
+EXTERNAL COIN-OR LIBRARIES
+==========================
+
+SYMPHONY 5.1 works with the following stable versions of other COIN-OR 
+libraries 
+
+BuildTools     0.5
+CoinUtils      1.0
+Cgl            0.5
+Clp            1.3
+Osi            0.95
+MsVisualStudio 1.0
+
+*******************************************************************************
+*                                 SUPPORT                                     *
+*******************************************************************************
+
+LIST SERVE
+
+There is a list serve for SYMPHONY users. To subscribe, go to 
+http://list.coin-or.org/mailman/listinfo/coin-symphony 
+
+AUTHORS
+
+SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and Laci Ladanyi
+(ladanyi@us.ibm.com). Menal Guzelsoy (megb@lehigh.edu) and Ashutosh Mahajan
+(asm4@lehigh.edu) have been instrumental in development since version 5.0.
+
+BUG REPORTS
+
+To report a bug please file a ticket at 
+
+https://projects.coin-or.org/SYMPHONY/newticket
+
+Please note the version of SYMPHONY you are using when filing the ticket.
