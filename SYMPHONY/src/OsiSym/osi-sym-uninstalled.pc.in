@@ -5,6 +5,6 @@ includedir=@abs_source_dir@/src/OsiSym
 Name: OsiSym
 Description: COIN-OR Open Solver Interface for SYMPHONY
 Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lOsiSym
-Cflags: -I${includedir}
+Libs: -L@ABSBUILDDIR@/src/OsiSym -lOsiSym
+Cflags: -I@abs_source_dir@/src/OsiSym
 Requires: osi symphony
