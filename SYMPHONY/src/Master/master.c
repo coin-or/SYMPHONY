@@ -74,7 +74,7 @@ void sym_version(void)
    }
    printf("==  Build Date: %s \n", __DATE__);
 #ifdef SYMPHONY_SVN_REV
-   printf("==  Revision Number: %s \n", SYMPHONY_SVN_REV);
+   printf("==  Revision Number: %d \n", SYMPHONY_SVN_REV);
 #endif
    printf("\n");
 }
