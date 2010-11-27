@@ -54,47 +54,18 @@ build_triplet = @build@
 host_triplet = @host@
 
 # List all additionally required solver and Osi libraries
-
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-#	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
-#  LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-#	$(CLPOBJDIR)/src/libClp.la
-#  ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
-@CLP_LP_SOLVER_TRUE@am__append_1 = $(CLP_CFLAGS) -D__OSI_CLP__
-#  LDADD += $(CLP_LIBS)
-
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-#  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-@CPLEX_LP_SOLVER_TRUE@am__append_2 = $(CPX_CFLAGS) -D__OSI_CPLEX__
-#  LDADD += $(CPX_LIBS)
-
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
-#  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
-@GLPK_LP_SOLVER_TRUE@am__append_3 = $(GLPK_CFLAGS) -D__OSI_GLPK__
-#  LDADD += $(GLPK_LIBS)
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
-@GLPK_LP_SOLVER_FALSE@@USE_GMPL_TRUE@am__append_4 = $(GLPK_CFLAGS)
-
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)` \
-#       -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
-#  LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
-@SOPLEX_LP_SOLVER_TRUE@am__append_5 = $(SPX_CFLAGS) -D__OSI_SOPLEX__
-#  LDADD += $(SPX_LIBS)
-
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)` \
-#       -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
-#  LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
-@XPRESS_LP_SOLVER_TRUE@am__append_6 = $(XPR_CFLAGS) -D__OSI_XPRESS__
-@SYM_PARALLEL_TRUE@am__append_7 = -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-@SYM_PARALLEL_TRUE@am__append_8 = -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
+@CLP_LP_SOLVER_TRUE@am__append_1 = -D__OSI_CLP__
+@CPLEX_LP_SOLVER_TRUE@am__append_2 = -D__OSI_CPLEX__
+@GLPK_LP_SOLVER_TRUE@am__append_3 = -D__OSI_GLPK__
+@SOPLEX_LP_SOLVER_TRUE@am__append_4 = -D__OSI_SOPLEX__
+@XPRESS_LP_SOLVER_TRUE@am__append_5 = -D__OSI_XPRESS__
+@SYM_PARALLEL_TRUE@am__append_6 = -I`$(CYGPATH_W) $(PVM_ROOT)/include`
+@SYM_PARALLEL_TRUE@am__append_7 = -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
 @SYM_PARALLEL_TRUE@	-lgpvm3 -lpvm3
 
-@SYM_PARALLEL_TRUE@am__append_9 = ../src/libSym$(MASTEREXT).la ../src/OsiSym/libOsiSym.la
-@SYM_PARALLEL_FALSE@am__append_10 = $(SYMLIB)
-@USE_CL_TRUE@am__append_11 = cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
+@SYM_PARALLEL_TRUE@am__append_8 = ../src/libSym$(MASTEREXT).la ../src/OsiSym/libOsiSym.la
+@SYM_PARALLEL_FALSE@am__append_9 = $(SYMLIB)
+@USE_CL_TRUE@am__append_10 = cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
 @USE_CL_TRUE@	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
 @USE_CL_TRUE@	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
 @USE_CL_TRUE@	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
@@ -105,12 +76,12 @@ host_triplet = @host@
 @USE_CL_TRUE@	--tag=CXX --mode=link $(CXX) $(AM_CFLAGS) $(CCLCFLAGS) \
 @USE_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-@USE_CL_TRUE@am__append_12 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
+@USE_CL_TRUE@am__append_11 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
 @USE_CL_TRUE@	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
 @USE_CL_TRUE@	OsiSolverInterfaceTest.$(OBJEXT) OsiSymSolverInterfaceTest.$(OBJEXT) \
 @USE_CL_TRUE@	 unitTestSym.$(OBJEXT)
 
-@USE_CL_FALSE@am__append_13 = $(CXXLINK)
+@USE_CL_FALSE@am__append_12 = $(CXXLINK)
 noinst_PROGRAMS = unitTest$(EXEEXT) punitTest$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -448,69 +419,28 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 test_srcdir = $(OSISRCDIR)/test
 
-#ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
-#	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
-
-#LDADD += $(CGLOBJDIR)/src/libCgl.la
-#ADDLIBS += \
-#	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
-#LDADD += $(CGL_LIBS)
-
 # Add include files
-AM_CPPFLAGS = $(OSITESTS_CFLAGS) -I`$(CYGPATH_W) $(SYMINCDIR)` \
-	-I`$(CYGPATH_W) $(SYMSRCDIR)/OsiSym` -DCOIN_HAS_SYMPHONY \
-	$(am__append_1) $(am__append_2) $(am__append_3) \
-	$(am__append_4) $(am__append_5) $(am__append_6)
+AM_CPPFLAGS = $(OSITESTS_CFLAGS) $(SYMPHONYLIB_CFLAGS) \
+	-DCOIN_HAS_SYMPHONY $(am__append_1) $(am__append_2) \
+	$(am__append_3) $(am__append_4) $(am__append_5)
 SYMCPPFLAGS = $(AM_CPPFLAGS) $(SYMDEFS)
-SYMPCPPFLAGS = $(AM_CPPFLAGS) $(SYMPDEFS) $(am__append_7)
+SYMPCPPFLAGS = $(AM_CPPFLAGS) $(SYMPDEFS) $(am__append_6)
 APPLCPPFLAGS = 
-SYMPALLLDADD = $(ALLLDADD) $(am__append_8)
+SYMPALLLDADD = $(ALLLDADD) $(am__append_7)
 LDADD = $(OSITESTS_LIBS) $(SYMPHONYLIB_LIBS)
-#  LDADD += $(XPR_LIBS)
-
-#LDADD += $(OSIOBJDIR)/src/libOsi.la \
-#	$(COINUTILSOBJDIR)/src/libCoinUtils.la
-
-#LDADD += $(OSIOBJDIR)/src/OsiSym/libOsiSym.la
-
-########################################################################
-#                            Additional flags                          #
-########################################################################
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows.
-# "top_srcdir" refers to the basic directory for the main package that is
-# being compiled.
-#AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglSimpleRounding` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
-#	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
-#	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc`
 
 ########################################################################
 #                            Additional Definitions                    #
 ########################################################################
 ALLLDADD = $(LDADD)
 SYMLIB = ../src/libSym.la ../src/OsiSym/libOsiSym.la
-SYMPLIB = $(am__append_9) $(am__append_10)
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
-TestLDADD = $(LDADD) $(am__append_12)
-TestLINK = $(am__append_11) $(am__append_13)
+SYMPLIB = $(am__append_8) $(am__append_9)
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/include` \
+		   -I`$(CYGPATH_W) $(top_builddir)/include` \
+		   -I`$(CYGPATH_W) $(top_srcdir)/src/OsiSym`
+
+TestLDADD = $(LDADD) $(am__append_11)
+TestLINK = $(am__append_10) $(am__append_12)
 unitTest_SOURCES = \
 	OsiSolverInterfaceTest.cpp \
 	OsiSymSolverInterfaceTest.cpp \

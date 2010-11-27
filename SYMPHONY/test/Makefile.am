@@ -24,7 +24,7 @@ AUTOMAKE_OPTIONS = foreign
 
 test_srcdir = $(OSISRCDIR)/test
 
-AM_CPPFLAGS = $(OSITESTS_CFLAGS)
+AM_CPPFLAGS = $(OSITESTS_CFLAGS) $(SYMPHONYLIB_CFLAGS)
 SYMCPPFLAGS =
 SYMPCPPFLAGS =
 APPLCPPFLAGS =
@@ -36,105 +36,30 @@ LIBS =
 SYMLIB = 
 SYMPLIB = 
 
-#ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
-#	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
-
-if USE_CGL_CUTS
-#LDADD += $(CGLOBJDIR)/src/libCgl.la
-#ADDLIBS += \
-#	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
-#LDADD += $(CGL_LIBS)
-endif
-
 # Add include files
-AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)` \
-	       -I`$(CYGPATH_W) $(SYMSRCDIR)/OsiSym`
-
 AM_CPPFLAGS += -DCOIN_HAS_SYMPHONY
 
 # List all additionally required solver and Osi libraries
 
 if CLP_LP_SOLVER
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-#	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
-#  LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-#	$(CLPOBJDIR)/src/libClp.la
-#  ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
-  AM_CPPFLAGS += $(CLP_CFLAGS) -D__OSI_CLP__
-#  LDADD += $(CLP_LIBS)
+  AM_CPPFLAGS += -D__OSI_CLP__
 endif
 
 if CPLEX_LP_SOLVER
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-#  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-  AM_CPPFLAGS += $(CPX_CFLAGS) -D__OSI_CPLEX__
-#  LDADD += $(CPX_LIBS)
+  AM_CPPFLAGS += -D__OSI_CPLEX__
 endif
 
 if GLPK_LP_SOLVER
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
-#  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
-  AM_CPPFLAGS += $(GLPK_CFLAGS) -D__OSI_GLPK__
-#  LDADD += $(GLPK_LIBS)
-else 
-if USE_GMPL
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
-  AM_CPPFLAGS += $(GLPK_CFLAGS)
-endif
-endif
+  AM_CPPFLAGS += -D__OSI_GLPK__
+endif 
 
 if SOPLEX_LP_SOLVER
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)` \
-#       -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
-#  LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
-  AM_CPPFLAGS += $(SPX_CFLAGS) -D__OSI_SOPLEX__
-#  LDADD += $(SPX_LIBS)
+  AM_CPPFLAGS += -D__OSI_SOPLEX__
 endif
 
 if XPRESS_LP_SOLVER
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)` \
-#       -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
-#  LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
-  AM_CPPFLAGS += $(XPR_CFLAGS) -D__OSI_XPRESS__
-#  LDADD += $(XPR_LIBS)
+  AM_CPPFLAGS += -D__OSI_XPRESS__
 endif
-
-#LDADD += $(OSIOBJDIR)/src/libOsi.la \
-#	$(COINUTILSOBJDIR)/src/libCoinUtils.la
-
-#LDADD += $(OSIOBJDIR)/src/OsiSym/libOsiSym.la
-
-########################################################################
-#                            Additional flags                          #
-########################################################################
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows.
-# "top_srcdir" refers to the basic directory for the main package that is
-# being compiled.
-#AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglSimpleRounding` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
-#	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
-#	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc`
 
 ########################################################################
 #                            Additional Definitions                    #
@@ -156,7 +81,9 @@ else
 SYMPLIB += $(SYMLIB)
 endif
 
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/include` \
+		   -I`$(CYGPATH_W) $(top_builddir)/include` \
+		   -I`$(CYGPATH_W) $(top_srcdir)/src/OsiSym`
 
 TestLDADD = $(LDADD)
 TestLINK = 

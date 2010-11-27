@@ -871,6 +871,7 @@ AC_CONFIG_FILES([Makefile
 		 src/OsiSym/Makefile
                  test/Makefile
 		 Examples/Makefile
+		 Applications/Makefile.Applications
                  Applications/CNRP/Makefile
 		 Applications/MATCH/Makefile
 		 Applications/MCKP/Makefile

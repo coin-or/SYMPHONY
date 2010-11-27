@@ -75,6 +75,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/Applications/MATCH/Makefile.in \
 	$(top_srcdir)/Applications/MCKP/Makefile.in \
 	$(top_srcdir)/Applications/MPP/Makefile.in \
+	$(top_srcdir)/Applications/Makefile.Applications.in \
 	$(top_srcdir)/Applications/SPP+CUTS/Makefile.in \
 	$(top_srcdir)/Applications/SPP/Makefile.in \
 	$(top_srcdir)/Applications/USER/Makefile.in \
@@ -96,7 +97,8 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/config_sym.h
-CONFIG_CLEAN_FILES = Examples/Makefile Applications/CNRP/Makefile \
+CONFIG_CLEAN_FILES = Examples/Makefile \
+	Applications/Makefile.Applications Applications/CNRP/Makefile \
 	Applications/MATCH/Makefile Applications/MCKP/Makefile \
 	Applications/MPP/Makefile Applications/SPP/Makefile \
 	Applications/SPP+CUTS/Makefile Applications/USER/Makefile \
@@ -510,6 +512,8 @@ distclean-hdr:
 	-rm -f include/config_sym.h include/stamp-h1
 Examples/Makefile: $(top_builddir)/config.status $(top_srcdir)/Examples/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/Makefile.Applications: $(top_builddir)/config.status $(top_srcdir)/Applications/Makefile.Applications.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/CNRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/CNRP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/MATCH/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MATCH/Makefile.in
@@ -713,7 +717,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/BuildTools $(distdir)/Examples $(distdir)/include $(distdir)/src/OsiSym
+	$(mkdir_p) $(distdir)/. $(distdir)/Applications $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/BuildTools $(distdir)/Examples $(distdir)/include $(distdir)/src/OsiSym
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

@@ -232,100 +232,32 @@ APPLCPPFLAGS =
 APPLPCPPFLAGS =
 ALLLDADD =
 PLDADD =
-#ADDLIBS += `cat $(OSIOBJDIR)/osi_addlibs.txt` \
-#	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt`
 LDADD = $(SYMPHONYLIB_LIBS)
-AM_CPPFLAGS = $(COINDEPEND_CFLAGS) -I`$(CYGPATH_W) $(SYMINCDIR)` \
-              -I`$(CYGPATH_W) $(ABSBUILDDIR)/include`
+AM_CPPFLAGS = $(SYMPHONYLIB_CFLAGS)
 
-if USE_CGL_CUTS
-AM_CPPFLAGS += $(CGL_CFLAGS)
-#ADDLIBS += \
-#	`cat $(CGLOBJDIR)/cgl_addlibs.txt`
-endif
-
-# Add include files
-#AM_CPPFLAGS += -I`$(CYGPATH_W) $(SYMINCDIR)`
-
-# List all additionally required solver and Osi libraries
-
-#if CLP_LP_SOLVER
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-#	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
-#  LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-#	$(CLPOBJDIR)/src/libClp.la
-#  ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
 if CLP_LP_SOLVER
-  AM_CPPFLAGS += $(CLP_CFLAGS) -D__OSI_CLP__
+  AM_CPPFLAGS += -D__OSI_CLP__
 endif
 
 if CPLEX_LP_SOLVER
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-#  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-  AM_CPPFLAGS += $(CPX_CFLAGS) -D__OSI_CPLEX__
+  AM_CPPFLAGS += -D__OSI_CPLEX__
 endif
 
 if GLPK_LP_SOLVER
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiGlpk`
-#  LDADD += $(OSIOBJDIR)/src/OsiGlpk/libOsiGlpk.la 
-  AM_CPPFLAGS += $(GLPK_CFLAGS) -D__OSI_GLPK__
+  AM_CPPFLAGS += -D__OSI_GLPK__
 else 
 if USE_GMPL
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(GLPKINCDIR)`
-  AM_CPPFLAGS += $(GLPK_CFLAGS) -DUSE_GLPMPL
+  AM_CPPFLAGS += -DUSE_GLPMPL
 endif
 endif
 
 if SOPLEX_LP_SOLVER
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(SPXINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiSpx`
-#  LDADD += $(OSIOBJDIR)/src/OsiSpx/libOsiSpx.la
-  AM_CPPFLAGS += $(SPX_CFLAGS) -D__OSI_SOPLEX__
+  AM_CPPFLAGS += -D__OSI_SOPLEX__
 endif
 
 if XPRESS_LP_SOLVER
-#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(XPRINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiXpr`
-#  LDADD += $(OSIOBJDIR)/src/OsiXpr/libOsiXpr.la
-  AM_CPPFLAGS += $(XPR_CFLAGS) -D__OSI_XPRESS__
+  AM_CPPFLAGS += -D__OSI_XPRESS__
 endif
-
-#LDADD += $(OSIOBJDIR)/src/libOsi.la \
-#	$(COINUTILSOBJDIR)/src/libCoinUtils.la
-
-########################################################################
-#                            Additional flags                          #
-########################################################################
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows.
-# "top_srcdir" refers to the basic directory for the main package that is
-# being compiled.
-#AM_CPPFLAGS += -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglDuplicateRow` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLiftAndProject` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglLandP` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglPreProcess` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglRedSplit` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglSimpleRounding` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
-#	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(OSIOBJDIR)/inc` \
-#	-I`$(CYGPATH_W) $(CGLOBJDIR)/inc`
-#	-I`$(CYGPATH_W) $(srcdir)/GMPL`
 
 ########################################################################
 #                            Additional Definitions                    #
@@ -346,10 +278,6 @@ endif
 if ROOT_NODE_ONLY
 AM_CPPFLAGS += -DROOT_NODE_ONLY
 endif
-
-#if CCMALLOC
-#AM_CPPFLAGS += 
-#endif
 
 if COMPILE_FRAC_BRANCHING
 AM_CPPFLAGS += -DCOMPILE_FRAC_BRANCHING
@@ -391,14 +319,14 @@ SYMCPPFLAGS += $(AM_CPPFLAGS) $(SYMDEFS)
 
 if SYM_PARALLEL
 PCPPFLAGS += $(AM_CPPFLAGS) $(SYMPDEFS) -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-PLDADD += $(LDADD) -L`$(CYGPATH_W) $(PVM_ROOT)/lib/$(ARCH)` \
-	-lgpvm3 -lpvm3
+PLDADD += $(LDADD) -lgpvm3 -lpvm3
 APPLPCPPFLAGS += $(PCPPFLAGS) -DUSE_SYM_APPLICATION
 endif
 
 APPLCPPFLAGS += $(SYMCPPFLAGS) -DUSE_SYM_APPLICATION
 
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/include` \
+                   -I`$(CYGPATH_W) $(top_builddir)/include`
 
 LT_LDFLAGS += -rpath $(libdir)
 
