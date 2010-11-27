@@ -30,6 +30,9 @@
 /* Define to 1 if the OsiTests package is available */
 #undef COIN_HAS_OSITESTS
 
+/* Define to 1 if the Pvm package is available */
+#undef COIN_HAS_PVM
+
 /* Define to 1 if readline is available */
 #undef COIN_HAS_READLINE
 
@@ -56,9 +59,6 @@
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
-
-/* Define to 1 if you have the <pvm3.h> header file. */
-#undef HAVE_PVM3_H
 
 /* Define to 1 if you have the <readline/readline.h> header file. */
 #undef HAVE_READLINE_READLINE_H

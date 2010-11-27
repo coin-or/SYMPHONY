@@ -596,29 +596,43 @@ dnl AM_CONDITIONAL(SYM_WITH_VRP, [test $sym_appl = vrp])
 #############################################################################
 #                       Parallel configuration                              #
 #############################################################################
-AC_MSG_CHECKING([whether to compile in the parallel configuration])
+
+AC_COIN_CHECK_USER_LIBRARY([Pvm], [PVM], [pvm3.h], [pvm_gettid])
 AC_ARG_WITH([pvm],
 [AC_HELP_STRING([--with-pvm],
-                [compile in parallel architecture (assuming that 
+                [compile in distributed parallel mode (assuming that 
 		pvm is installed and the variable PVM_ROOT is 
 		defined.)])],
-		[sym_parallel=$withval],[sym_parallel=no])
+		[find_pvm=$withval],[find_pvm=no])
 
-pvm_path=no
-
-if test $sym_parallel = no; then 
-    AC_MSG_RESULT(no)
-else
-    AC_MSG_RESULT(yes)
-        AC_COIN_CHECK_HEADER([pvm3.h],[pvm_path=yes])                       
-    if test $pvm_path = no; then 
-        m4_ifvaln([pvm3.h],[AC_CHECK_FILE([$PVM_ROOT/include/pvm3.h],
-                 [pvm_path=yes])],[])
+if test x"$find_pvm" = xyes; then 
+    if test x"$coin_has_pvm" != xyes; then 
+        m4_ifvaln([pvm3.h],
+                  [AC_CHECK_FILE([$PVM_ROOT/include/pvm3.h],
+                  [pvm_header=yes])],
+                  [])
+	m4_ifvaln([pvm_gettid],
+                  [LIBS="-L$PVM_ROOT/lib -lgpvm3 -lpvm3"
+                   pvm_link=no
+                   AC_LANG_PUSH(C)
+                   AC_MSG_CHECKING([whether symbol pvm_gettid is available with PVM])
+                   AC_LINK_IFELSE([AC_LANG_PROGRAM([[]],[[pvm_gettid()]])],
+                                  [AC_MSG_RESULT(yes)
+                                   pvm_link=yes
+                                   break],
+                                  [AC_MSG_RESULT(no)])
+                   AC_LANG_POP(C)])
     fi
 
-    if test $pvm_path = no; then
+    if test x"$pvm_header" != xyes; then
        AC_MSG_ERROR([Cannot find the pvm header files either in system path or 
 in PVM_ROOT path:$PVM_ROOT])
+    fi
+    if test x"$pvm_link" != xyes ; then
+       AC_MSG_ERROR([Cannot find PVM library in system paths or in PVM_ROOT path:$PVM_ROOT])
+    fi
+    if test $pvm_link == yes && test $pvm_header == yes; then
+       coin_has_pvm=yes
     fi
 fi
 
@@ -658,12 +672,12 @@ sym_enable_parallel=false;
 if [test $in_cg = no || test $in_cp = no ||  
    test $in_lp = no || test $in_tm = no]; then
 #   sym_def_pconfig=false;
-   if test $sym_parallel=no; then 
-      AC_MSG_ERROR(First enable parallel configuration: --with-pvm!)
+   if test $coin_has_pvm = no; then 
+      AC_MSG_ERROR(Need PVM to enable distributed parallel execution!)
    fi
    sym_enable_parallel=true;
 else 
-   if test $sym_parallel = yes; then 
+   if test $coin_has_pvm = yes; then 
        in_lp=no
        AM_CONDITIONAL(SYM_COMPILE_IN_LP, false)
        sym_enable_parallel=true;
