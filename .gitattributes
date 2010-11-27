@@ -40,6 +40,7 @@ SYMPHONY/Applications/MPP/Makefile.in -text
 SYMPHONY/Applications/MPP/Makefile.orig -text
 SYMPHONY/Applications/MSVisualStudio/v8/libSymphony.vcproj -text
 SYMPHONY/Applications/MSVisualStudio/v9/libSymphony.vcproj -text
+SYMPHONY/Applications/Makefile.Applications.in -text
 SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v8/spp_with_cuts.sln -text
 SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v8/spp_with_cuts.suo -text
 SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v8/spp_with_cuts.vcproj -text
