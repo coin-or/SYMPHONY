@@ -81,17 +81,19 @@ uninstall-local: uninstall-doc
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = symphony.pc osi-sym.pc
 
-if COIN_HAS_PKGCONFIG
 addlibsdir = $(DESTDIR)$(datadir)/coin/doc/SYMPHONY
 	
 install-data-hook:
 	@$(mkdir_p) "$(addlibsdir)"
+if COIN_HAS_PKGCONFIG
 	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ \
 	$(PKG_CONFIG) --libs symphony > $(addlibsdir)/sym_addlibs.txt
+else
+	echo -L@abs_lib_dir@ -lSym @SYMPHONYLIB_LIBS_INSTALLED@ > $(addlibsdir)/sym_addlibs.txt
+endif
 
 uninstall-hook:
 	rm -f $(addlibsdir)/sym_addlibs.txt
-endif
 
 ########################################################################
 #                         Maintainer Stuff                             #

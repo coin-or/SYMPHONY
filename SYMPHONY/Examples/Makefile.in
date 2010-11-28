@@ -35,12 +35,6 @@ ifeq ($(USE_OSI_INTERFACE),TRUE)
 EXAMPLES += milpOsi milpOsi2
 endif
 
-# Directory with COIN header files
-COININCDIR = @abs_include_dir@/coin
-
-# Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@/coin
-
 # Directory with Application files
 SYMEXDIR = @SYMSRCDIR@/../Examples
 
@@ -66,23 +60,33 @@ WHATTOMAKE = $(addsuffix @EXEEXT@, $(EXAMPLES))
 CXX = @CXX@
 
 # C++ Compiler options
-CXXFLAGS = @CXXFLAGS@ -I`$(CYGPATH_W) $(COININCDIR)`
+CXXFLAGS = @CXXFLAGS@
 
 # additional C++ Compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-# Libraries necessary to link
-LIBS = -L`$(CYGPATH_W) $(COINLIBDIR)` \
-       -L`$(CYGPATH_W) $(COINLIBDIR)/ThirdParty` \
-       -lSym @SYMPHONYLIB_LIBS@
+# Compiler flags (we use the CYGPATH_W variables to allow compilation with Windows compilers)
+@COIN_HAS_PKGCONFIG_TRUE@CXXFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags symphony`
+@COIN_HAS_PKGCONFIG_FALSE@CXXFLAGS += -I`$(CYGPATH_W) @abs_include_dir@/coin`
 
-# Additional flags
+# Additional compiler flags
 ADDINCFLAGS =
 
+LIBS =
+
+# if USE_OSI_INTERFACE is TRUE, make sure -lOsiSym is at the beginning of linker flags
 ifeq ($(USE_OSI_INTERFACE),TRUE)
-LIBS += -lOsiSym
+@COIN_HAS_PKGCONFIG_TRUE@@COIN_CXX_IS_CL_FALSE@LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs osi-sym`
+@COIN_HAS_PKGCONFIG_TRUE@@COIN_CXX_IS_CL_TRUE@LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --msvc-syntax --libs osi-sym`
+@COIN_HAS_PKGCONFIG_FALSE@LIBS += -L@abs_lib_dir@ -lOsiSym
+
 ADDINCFLAGS += -DUSE_OSI_INTERFACE
 endif
+
+# Libraries necessary to link with Symphony
+@COIN_HAS_PKGCONFIG_TRUE@@COIN_CXX_IS_CL_FALSE@LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs symphony`
+@COIN_HAS_PKGCONFIG_TRUE@@COIN_CXX_IS_CL_TRUE@LIBS = /link: `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --msvc-syntax --libs symphony`
+@COIN_HAS_PKGCONFIG_FALSE@LIBS = -L@abs_lib_dir@ -lSym @SYMPHONYLIB_LIBS_INSTALLED@
 
 all: $(WHATTOMAKE)
 
