@@ -26847,7 +26847,7 @@ fi
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-uninstalled.pc src/OsiSym/osi-sym.pc osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
+                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-uninstalled.pc osi-sym.pc:src/OsiSym/osi-sym.pc.in osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
 
 
 if test `cd $srcdir; pwd` != `pwd`; then
@@ -27927,7 +27927,7 @@ do
   "Applications/VRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/VRP/Makefile" ;;
   "symphony.pc" ) CONFIG_FILES="$CONFIG_FILES symphony.pc" ;;
   "symphony-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES symphony-uninstalled.pc" ;;
-  "src/OsiSym/osi-sym.pc" ) CONFIG_FILES="$CONFIG_FILES src/OsiSym/osi-sym.pc" ;;
+  "osi-sym.pc" ) CONFIG_FILES="$CONFIG_FILES osi-sym.pc:src/OsiSym/osi-sym.pc.in" ;;
   "osi-sym-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in" ;;
   "$srcdir/Applications/CNRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/CNRP/Makefile:Applications/CNRP/Makefile" ;;
   "$srcdir/Applications/MATCH/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/MATCH/Makefile:Applications/MATCH/Makefile" ;;

@@ -61,6 +61,3 @@ includecoin_HEADERS = \
 	OsiSymSolverInterface.hpp \
 	OsiSymSolverParameters.hpp \
 	SymWarmStart.hpp
-
-pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = osi-sym.pc

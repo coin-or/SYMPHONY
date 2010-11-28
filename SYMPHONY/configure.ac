@@ -896,7 +896,7 @@ AC_CONFIG_FILES([Makefile
 		 Applications/VRP/Makefile
 		 symphony.pc
 		 symphony-uninstalled.pc
-		 src/OsiSym/osi-sym.pc
+		 osi-sym.pc:src/OsiSym/osi-sym.pc.in
 		 osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in])
 
 if test `cd $srcdir; pwd` != `pwd`; then 

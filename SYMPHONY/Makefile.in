@@ -82,9 +82,9 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/Applications/VRP/Makefile.in \
 	$(top_srcdir)/Examples/Makefile.in $(top_srcdir)/configure \
 	$(top_srcdir)/include/config_sym.h.in \
-	$(top_srcdir)/src/OsiSym/osi-sym-uninstalled.pc.in AUTHORS \
-	compile config.guess config.sub depcomp install-sh ltmain.sh \
-	missing
+	$(top_srcdir)/src/OsiSym/osi-sym-uninstalled.pc.in \
+	$(top_srcdir)/src/OsiSym/osi-sym.pc.in AUTHORS compile \
+	config.guess config.sub depcomp install-sh ltmain.sh missing
 @HAVE_EXTERNALS_TRUE@am__append_2 = Externals
 @HAVE_EXTERNALS_TRUE@am__append_3 = .Externals-stamp
 subdir = .
@@ -103,7 +103,8 @@ CONFIG_CLEAN_FILES = Examples/Makefile \
 	Applications/MPP/Makefile Applications/SPP/Makefile \
 	Applications/SPP+CUTS/Makefile Applications/USER/Makefile \
 	Applications/VRP/Makefile symphony.pc symphony-uninstalled.pc \
-	osi-sym-uninstalled.pc $srcdir/Applications/CNRP/Makefile \
+	osi-sym.pc osi-sym-uninstalled.pc \
+	$srcdir/Applications/CNRP/Makefile \
 	$srcdir/Applications/MATCH/Makefile \
 	$srcdir/Applications/MCKP/Makefile \
 	$srcdir/Applications/MPP/Makefile \
@@ -449,7 +450,7 @@ EXTRA_DIST = $(am__append_2)
 #                  Installation of the addlibs file                    #
 ########################################################################
 pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = symphony.pc 
+pkgconfiglib_DATA = symphony.pc osi-sym.pc
 @COIN_HAS_PKGCONFIG_TRUE@addlibsdir = $(DESTDIR)$(datadir)/coin/doc/SYMPHONY
 
 ########################################################################
@@ -537,6 +538,8 @@ Applications/VRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applicati
 symphony.pc: $(top_builddir)/config.status $(srcdir)/symphony.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 symphony-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/symphony-uninstalled.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+osi-sym.pc: $(top_builddir)/config.status $(top_srcdir)/src/OsiSym/osi-sym.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 osi-sym-uninstalled.pc: $(top_builddir)/config.status $(top_srcdir)/src/OsiSym/osi-sym-uninstalled.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
