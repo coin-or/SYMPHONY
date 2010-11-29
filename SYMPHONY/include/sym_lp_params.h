@@ -277,8 +277,8 @@ typedef struct LP_PARAMS{
    double            fr_min_c_fixed_ratio; 
    double            fr_incr_ratio; 
    double            fr_min_gap; 
-   int               fr_max_nodes; 
-
+   int               fr_max_nodes;
+   
    /* rins search */
    int               rs_enabled; 
    double            rs_min_int_fixed_ratio;
@@ -289,6 +289,13 @@ typedef struct LP_PARAMS{
    /* restricted/rinse search mode */
    int              rs_mode_enabled;
    int              rs_lp_iter_limit;
+
+   /* local branching */
+   int               lb_enabled; 
+   int               lb_frequency; 
+   double            lb_min_gap;
+   int               lb_search_k;
+   int               lb_first_feas_enabled;
    
    /* diving search */
    int               ds_enabled; 

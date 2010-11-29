@@ -83,23 +83,23 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data,
 			    double *colSolution);
 int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char *is_feasible) ;
 int fp_should_call_fp(lp_prob *p, int branching, int *should_call, 
-      char is_last_iter);
+		      char is_last_iter, double t_lb);
 int fp_add_obj_row(LPdata *new_lp_data, int n, const double *obj, double rhs);
 int fp_can_sos_var_fix(lp_prob *p, FPdata *fp_data, int ind, int *filled_row_count);
 int fp_fix_sos_var(lp_prob *p, FPdata *fp_data, int ind);
 
 /* rounding */
 int round_solution PROTO((lp_prob *p, double *solution_value, 
-			  double *betterSolution));
+			  double *betterSolution, double t_lb));
 /* local search */
 int apply_local_search PROTO((lp_prob *p, double *solution_value, 
-			      double *col_solution, double *better_solution, double *dual_gap));
+			      double *col_solution, double *better_solution, double *dual_gap, double t_lb));
 int local_search PROTO((lp_prob *p, double *solution_value, 
-			double *col_solution, double *better_solution));
+			double *col_solution, double *better_solution, double t_lb));
 
 /* diving search */
 int diving_search PROTO((lp_prob *p, double *solutionValue, double *colSolution,
-			 double *betterSolution, char is_last_iter));
+			 double *betterSolution, char is_last_iter, double t_lb));
 int ds_fix_vars PROTO((lp_prob *p, LPdata *diving_lp, double *x, 
 		       int *frac_ind, int frac_cnt, int d_fixed_cnt, int fix_incr_cnt, 
 		       int d_type, double *obj, double *ip_sol, double *x_rank,
@@ -113,10 +113,14 @@ int ds_fix_common_vars PROTO((LPdata * lp_data, var_desc **vars, double *ip_sol,
 /* restricted search */
 
 int restricted_search PROTO((lp_prob *p, double *solution_value, double *colSolution,  
-			    double *betterSolution, int fr_mode));
+			     double *betterSolution, int fr_mode, double t_lb));
 
 int fr_force_feasible(lp_prob *p, char use_base, int *sym_fixed_int_cnt, int *sym_fixed_c_cnt,
 		      char *sym_fixed_type, double *sym_fixed_val, int *max_int_fix, int *max_c_fix);
+
+/* local branching */
+int lbranching_search PROTO((lp_prob *p, double *solution_value, double *colSolution,  
+			     double *betterSolution, double t_lb));
 
 //sym_environment * lp_to_sym PROTO((lp_prob *p, LPdata *lp_data, char use_base));
 sym_environment * lp_to_sym PROTO ((lp_prob *p, LPdata *lp_data, char use_base, int sym_fixed_cnt,

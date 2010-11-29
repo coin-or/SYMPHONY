@@ -452,6 +452,13 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fr_min_c_fixed_ratio = 0.20;
    lp_par->rs_min_gap = 5.0;
 
+   /* local branching */
+   lp_par->lb_enabled   = TRUE;
+   lp_par->lb_frequency   = 10;
+   lp_par->lb_min_gap = 5.0;
+   lp_par->lb_search_k = 5;
+   lp_par->lb_first_feas_enabled = TRUE;   
+   
    /* diving search */
    lp_par->ds_enabled = TRUE;
    lp_par->ds_frequency = 4;
@@ -478,7 +485,7 @@ int sym_set_defaults(sym_environment *env)
 
    /* local search */
    lp_par->ls_enabled = TRUE;
-   lp_par->ls_min_gap = 1.0; 
+   lp_par->ls_min_gap = 0.001; 
    lp_par->ls_frequency = 4;
    lp_par->ls_fix_ratio = 0.1;
 
@@ -768,17 +775,18 @@ int sym_solve(sym_environment *env)
       }else if(termcode == PREP_UNBOUNDED){
 	 return(env->termcode = PREP_UNBOUNDED);
       }else if(termcode == PREP_SOLVED){
-	 env->best_sol.has_sol = TRUE;
-	 env->best_sol.xind = (int *) malloc(ISIZE *
-					     env->prep_mip->fixed_n);
-	 env->best_sol.xval = (double *) malloc(DSIZE *
-						env->prep_mip->fixed_n); 
+	 /* now we initialize sol in preprocessor */
+	 //env->best_sol.has_sol = TRUE;
+	 //env->best_sol.xind = (int *) malloc(ISIZE *
+	 //			     env->prep_mip->fixed_n);
+	 //env->best_sol.xval = (double *) malloc(DSIZE *
+	 //				env->prep_mip->fixed_n); 
 	 
-	 env->best_sol.xlength = env->prep_mip->fixed_n;
-	 memcpy(env->best_sol.xind, env->prep_mip->fixed_ind, ISIZE *
-		env->prep_mip->fixed_n);
-	 memcpy(env->best_sol.xval, env->prep_mip->fixed_val, ISIZE *
-		env->prep_mip->fixed_n);
+	 //env->best_sol.xlength = env->prep_mip->fixed_n;
+	 //memcpy(env->best_sol.xind, env->prep_mip->fixed_ind, ISIZE *
+	 //env->prep_mip->fixed_n);
+	 //memcpy(env->best_sol.xval, env->prep_mip->fixed_val, ISIZE *
+	 //env->prep_mip->fixed_n);
 	 
 	 return(env->termcode = PREP_OPTIMAL_SOLUTION_FOUND);
       }else if(termcode == PREP_NUMERIC_ERROR){
@@ -1234,28 +1242,36 @@ int sym_solve(sym_environment *env)
    if (env->tm->lpp[thread_num]){
       env->par.lp_par.cgl = env->tm->lpp[thread_num]->par.cgl;
       if (env->tm->lpp[thread_num]->best_sol.has_sol){
+	 if(env->orig_mip){
+	    prep_merge_solution(env->orig_mip, env->mip, &(env->tm->lpp[thread_num]->best_sol.xlength), 
+				&(env->tm->lpp[thread_num]->best_sol.xind),
+				&(env->tm->lpp[thread_num]->best_sol.xval));
+	 }
 	 FREE(env->best_sol.xind);
 	 FREE(env->best_sol.xval);
-	 if(env->orig_mip && (env->mip->fixed_n || env->mip->subs_n)){
-	    prep_merge_solution(env->orig_mip, env->mip, &(env->tm->lpp[thread_num]->best_sol));
-	 }
 	 env->best_sol = 
 	    env->tm->lpp[thread_num]->best_sol;
       }else {
-	 if(env->orig_mip && (env->mip->fixed_n || env->mip->subs_n)){
-	    prep_merge_solution(env->orig_mip, env->mip, &(env->best_sol)); 
+	 if(env->best_sol.has_sol){
+	    if(env->orig_mip){
+	       prep_merge_solution(env->orig_mip, env->mip, &(env->best_sol.xlength), 
+				   &(env->best_sol.xind), &(env->best_sol.xval));
+	    }
+	    FREE(env->tm->lpp[thread_num]->best_sol.xind);
+	    FREE(env->tm->lpp[thread_num]->best_sol.xval);
+	    env->tm->lpp[thread_num]->best_sol = env->best_sol;	    
 	 }
-	 env->tm->lpp[thread_num]->best_sol = env->best_sol;	    
       }
    }
 #else
    if (env->tm->best_sol.has_sol){
-     FREE(env->best_sol.xind);
-     FREE(env->best_sol.xval);
-     if(env->orig_mip && (env->mip->fixed_n || env->mip->subs_n)){
-	prep_merge_solution(env->orig_mip, env->mip, &(env->tm->best_sol)); 
-     }     
-     env->best_sol = env->tm->best_sol;
+      if(env->orig_mip){
+	 prep_merge_solution(env->orig_mip, env->mip, &(env->tm->best_sol.xlength), 
+			     &(env->tm->best_sol.xind), &(env->tm->best_sol.xval));
+      }     
+      FREE(env->best_sol.xind);
+      FREE(env->best_sol.xval);
+      env->best_sol = env->tm->best_sol;
    }
 #endif
    

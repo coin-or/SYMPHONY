@@ -809,11 +809,12 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    int cnt, i, termcode;
    var_desc **vars = lp_data->vars;
    char found_better_solution;
+   char force_heur_sol = FALSE; 
    int should_call_fp = FALSE;
    double *x;
    int n = lp_data->n;
    double gran_round;
-   int do_primal_heuristic = FALSE;
+   int do_primal_heuristic = FALSE, check_ls = TRUE; 
    get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
    indices = lp_data->tmp.i1; /* n */
@@ -885,6 +886,13 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    }
 
 #ifdef COMPILE_IN_LP
+
+   double t_lb = p->lp_data->objval;   
+   if((p->tm->samephase_candnum > 1 || p->tm->active_node_num > 1)){      
+      find_tree_lb(p->tm);
+      t_lb = MIN(t_lb, p->tm->lb);
+   } 
+
    if (user_res == TEST_INTEGRALITY && feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE && 
        p->par.do_primal_heuristic && !p->par.multi_criteria){
       
@@ -913,8 +921,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       }
 
       if(p->has_ub){	 
-	 if(p->ub > p->lp_data->objval + lpetol100){
-	    dual_gap = d_gap(p->ub, lp_data->objval, 
+	 if(p->ub > t_lb + lpetol100){
+	    dual_gap = d_gap(p->ub, t_lb, 
 			     p->mip->obj_offset, p->mip->obj_sense);
 	 }else dual_gap = 1e-4;
 	 true_objval = p->ub;	 
@@ -935,35 +943,37 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 
       if(p->par.rounding_enabled && dual_gap > p->par.rounding_min_gap){
        
-	 if (round_solution(p, &true_objval, heur_solution)){	 
+	 if (round_solution(p, &true_objval, heur_solution, t_lb)){	 
 	    feasible = IP_HEUR_FEASIBLE;
 	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	    if(true_objval > p->lp_data->objval + lpetol100){
-	      dual_gap = d_gap(true_objval, p->lp_data->objval, p->mip->obj_offset, 
+	    if(true_objval > t_lb + lpetol100){
+	      dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
 			       p->mip->obj_sense);
 	    }else{
 	      dual_gap = 1e-4;
 	    }
-	    apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap);
+	    apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
+	    check_ls = FALSE; 
 	 }
       }
-
+      
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
 	 p->par.ds_enabled && dual_gap > p->par.ds_min_gap && !branching && 
 	 //(is_last_iter || (!is_last_iter && cnt < 200)) && //p->bc_level < 1 && p->lp_stat.ds_calls < 5)) && 
 	 //((p->bc_level >= 1 && p->lp_stat.ds_last_call_ind != p->bc_index) || 
 	 //(p->bc_level < 1 && p->lp_stat.ds_last_call_ind == p->bc_index)) && 
 	 (p->bc_level % p->par.ds_frequency == 0)){
-	if (diving_search(p, &true_objval, col_sol, heur_solution, is_last_iter)){
+	 if (diving_search(p, &true_objval, col_sol, heur_solution, is_last_iter, t_lb)){
 	  feasible = IP_HEUR_FEASIBLE;
 	  memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	  if(true_objval > p->lp_data->objval + lpetol100){
-	    dual_gap = d_gap(true_objval, p->lp_data->objval, p->mip->obj_offset, 
+	  if(true_objval > t_lb + lpetol100){
+	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
 			     p->mip->obj_sense);
 	  }else{
 	    dual_gap = 1e-4;
 	  }
-	  apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap);
+	  apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
+	  check_ls = FALSE; 
 	}	     
 	//if(p->bc_index < 1 && is_last_iter){
 	// p->lp_stat.ds_last_call_ind = -1; /* we don't want to try diving again at root node */
@@ -971,7 +981,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       }	 
 
       if (user_res == TEST_INTEGRALITY && feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
-	fp_should_call_fp(p,branching,&should_call_fp,is_last_iter); 
+	 fp_should_call_fp(p,branching,&should_call_fp,is_last_iter, t_lb); 
 	if (should_call_fp==TRUE && (!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
 	    ((p->bc_level >= 1 && p->lp_stat.fp_last_call_ind != p->bc_index) ||  
 	     (p->bc_level < 1 && p->lp_stat.fp_calls < 1))){
@@ -986,13 +996,14 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
             feasible    = IP_HEUR_FEASIBLE;
             true_objval = new_obj_val;
 	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
-	    if(true_objval > p->lp_data->objval + lpetol100){
-              dual_gap = d_gap(true_objval, p->lp_data->objval, p->mip->obj_offset,
+	    if(true_objval > t_lb + lpetol100){
+              dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset,
                                p->mip->obj_sense);
             }else{
               dual_gap = 1e-4;
             }
-	    apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap);
+	    apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
+	    check_ls = FALSE; 
 	  }
 	}
       }
@@ -1021,16 +1032,17 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	 (p->tm->stat.analyzed < 10000 ||
 	  (p->tm->stat.analyzed <  100000 && !p->has_ub)) &&  
 	 (p->bc_level < 1 || reg_factor % reg_base == 0)){
-	if(restricted_search (p, &true_objval, col_sol, heur_solution, RINS_SEARCH)){
+	 if(restricted_search (p, &true_objval, col_sol, heur_solution, RINS_SEARCH, t_lb)){
 	  feasible    = IP_HEUR_FEASIBLE;
 	  memcpy(col_sol, heur_solution, DSIZE*lp_data->n);	  
-	  if(true_objval > p->lp_data->objval + lpetol100){
-	    dual_gap = d_gap(true_objval, p->lp_data->objval, p->mip->obj_offset, 
+	  if(true_objval > t_lb + lpetol100){
+	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
 			     p->mip->obj_sense);
 	  }else{
 	    dual_gap = 1e-4;
 	  }
-	  apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap);
+	  apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
+	  check_ls = FALSE; 
 	}
       }
 
@@ -1055,19 +1067,81 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 			      reg_factor % reg_base == 0)) &&
 	 (p->tm->stat.analyzed < 10000 || 
 	  (p->tm->stat.analyzed <  100000 && !p->has_ub))){ 
-	if(restricted_search (p, &true_objval, col_sol, heur_solution, FR_SEARCH)){
+	 if(restricted_search (p, &true_objval, col_sol, heur_solution, FR_SEARCH, t_lb)){
 	  feasible    = IP_HEUR_FEASIBLE;
 	  memcpy(col_sol, heur_solution, DSIZE*lp_data->n); //no need -- 
-	  if(true_objval > p->lp_data->objval + lpetol100){
-	    dual_gap = d_gap(true_objval, p->lp_data->objval, p->mip->obj_offset, 
+	  if(true_objval > t_lb + lpetol100){
+	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
 			     p->mip->obj_sense);
 	  }else{
 	    dual_gap = 1e-4;
 	  }	  
-	  apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap);
+	  apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
+	  check_ls = FALSE; 
 	}
       }
+#if 0
+      double lb_min_gap = p->par.lb_min_gap;
+      
+      if(p->par.lb_enabled && dual_gap > lb_min_gap &&
+	 (feasible == IP_HEUR_FEASIBLE || feasible == IP_FEASIBLE) && 
+	 (p->lp_stat.lb_calls - p->lp_stat.lb_last_sol_call <= 20) && 
+	 (p->bc_level < 1 || reg_factor % reg_base == 0)){
+	 if(lbranching_search (p, &true_objval, col_sol, heur_solution, double t_lb)){
+	    feasible    = IP_HEUR_FEASIBLE;
+	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);	  
+	    if(true_objval > t_lb + lpetol100){
+	       dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+				p->mip->obj_sense);
+	    }else{
+	       dual_gap = 1e-4;
+	    }
+	    /* do local search inside lbranching */
+	    apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
+	 }
+      }
+#endif      
    }
+
+   if(user_res == TEST_INTEGRALITY &&
+      p->par.do_primal_heuristic && (feasible == IP_FEASIBLE || feasible == IP_HEUR_FEASIBLE) &&
+      (p->par.ls_enabled || p->par.lb_enabled) && !p->par.multi_criteria){      
+
+      if(feasible == IP_FEASIBLE){ 
+	 memcpy(col_sol, p->lp_data->x, DSIZE*lp_data->n);
+	 if(true_objval > t_lb + lpetol100){
+	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+			     p->mip->obj_sense);
+	 }else{
+	    dual_gap = 1e-4;
+	 }
+      }
+
+      if(check_ls){
+	 if(apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb)){
+	    if(feasible == IP_FEASIBLE) force_heur_sol = TRUE;
+	 }
+      }
+
+      double lb_min_gap = p->par.lb_min_gap;
+
+      if(p->par.lb_enabled && dual_gap > lb_min_gap){
+	 //(p->lp_stat.lb_calls - p->lp_stat.lb_last_sol_call <= 20) &&
+	 //(p->bc_level < 1 || reg_factor % reg_base == 0)){
+	 if(lbranching_search (p, &true_objval, col_sol, heur_solution, t_lb)){
+	    if(feasible == IP_FEASIBLE) force_heur_sol = TRUE; 
+	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+	    if(true_objval > t_lb + lpetol100){
+	       dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset,
+				p->mip->obj_sense);
+	    }else{
+	       dual_gap = 1e-4;
+	    }
+	    /* do local search inside lbranching */
+	    apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
+	 }
+      } 
+   }   
 
 #endif
    
@@ -1089,7 +1163,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    
    if (feasible == IP_FEASIBLE || feasible == IP_FEASIBLE_BUT_CONTINUE ||
        feasible == IP_HEUR_FEASIBLE){
-      if (feasible == IP_HEUR_FEASIBLE) {
+      if (feasible == IP_HEUR_FEASIBLE || force_heur_sol) {
          cnt = collect_nonzeros(p, heur_solution, indices, values);        
       } else {
          cnt = collect_nonzeros(p, lp_data->x, indices, values);        

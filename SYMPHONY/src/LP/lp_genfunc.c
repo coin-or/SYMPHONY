@@ -1425,6 +1425,7 @@ void lp_close(lp_prob *p)
    p->tm->comp_times.ls               += p->comp_times.ls;
    p->tm->comp_times.ds               += p->comp_times.ds;
    p->tm->comp_times.fr               += p->comp_times.fr;
+   p->tm->comp_times.lb               += p->comp_times.lb;
    p->tm->comp_times.rs               += p->comp_times.rs;
    p->tm->comp_times.primal_heur      += p->comp_times.primal_heur;
 
@@ -1540,6 +1541,12 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.rs_analyzed_nodes       += p->lp_stat.rs_analyzed_nodes; 
    p->tm->lp_stat.rs_last_sol_call         = p->lp_stat.rs_last_sol_call; 
 
+   p->tm->lp_stat.lb_calls                += p->lp_stat.lb_calls;
+   p->tm->lp_stat.lb_num_sols             += p->lp_stat.lb_num_sols;
+   p->tm->lp_stat.lb_last_call_ind         = p->lp_stat.lb_last_call_ind;
+   p->tm->lp_stat.lb_analyzed_nodes       += p->lp_stat.lb_analyzed_nodes; 
+   p->tm->lp_stat.lb_last_sol_call         = p->lp_stat.lb_last_sol_call;
+   
    for(i = 0; i <  DIVING_HEURS_CNT; i++){
      p->tm->lp_stat.ds_type_calls[i] += p->lp_stat.ds_type_calls[i];
      p->tm->lp_stat.ds_type_num_sols[i] += p->lp_stat.ds_type_num_sols[i];
@@ -2803,6 +2810,13 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             break;
          }
 	 gomory->setLimit(max_cut_length);
+	 //if(p->bc_index < 1){
+	 //  gomory->setAway(0.01);
+	 // gomory->setAwayAtRoot(0.01);
+	 //}else{
+	 //  gomory->setAway(0.05);
+	 //  gomory->setAwayAtRoot(0.05);
+	 //}
 	 *should_generate = TRUE;
          p->lp_stat.gomory_calls++;
          break;
@@ -3146,7 +3160,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       /* check quality */
       if (num_elements>0) {
          if ( (max_coeff > 0 && min_coeff/max_coeff < etol100)||
-	      (min_coeff > 0 && min_coeff < etol10) ) {
+	      (min_coeff > 0 && min_coeff < etol100) ) {
             PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));
 	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
 	    num_poor_quality++;

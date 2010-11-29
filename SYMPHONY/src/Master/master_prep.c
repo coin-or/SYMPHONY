@@ -57,8 +57,18 @@ int sym_presolve(sym_environment *env)
    if (P->mip){
       termcode = prep_solve_desc(P);
    }
-   
-   if (termcode > -1 && P->params.reduce_mip){
+
+   if(termcode == PREP_SOLVED){
+      env->best_sol.has_sol = TRUE; 
+      env->best_sol.xlength = P->xlength;
+      FREE(env->best_sol.xind);
+      FREE(env->best_sol.xval);
+      env->best_sol.xind = P->xind;
+      env->best_sol.xval = P->xval;
+      P->xlength = 0;
+      P->xind = 0;
+      P->xval = 0;
+   }else if (termcode > -1 && P->params.reduce_mip){
       prep_update_rootdesc(env);
    }
 
@@ -153,6 +163,10 @@ int prep_solve_desc (PREPdesc * P)
    if (p_level > 2){
       PRINT(verbosity, -2, ("Starting Preprocessing...\n"));
       P->stats.nz_coeff_changed = (char *)calloc(CSIZE ,mip->nz);
+      int max_mn = MAX(mip->n, mip->m);
+      P->tmpi = (int *)malloc(ISIZE*max_mn);
+      P->tmpd = (double *)malloc(DSIZE*max_mn);
+      P->tmpc = (char *)malloc(CSIZE*max_mn);
    }
 
    /* need to fill in the row ordered vars of mip */
@@ -177,6 +191,11 @@ int prep_solve_desc (PREPdesc * P)
      termcode = prep_basic(P);
    }
 
+   if(termcode == PREP_SOLVED){
+      prep_merge_solution(P->orig_mip, P->mip, &(P->xlength), 
+			  &(P->xind), &(P->xval));
+   }
+   
    /* report what we have done */
    if (verbosity > -2){
       prep_report(P, termcode);

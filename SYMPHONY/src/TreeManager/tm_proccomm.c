@@ -1272,6 +1272,7 @@ int receive_lp_timing(tm_prob *tm)
 	       tm->comp_times.ds               += tim.ds;
 	       tm->comp_times.fr               += tim.fr;
 	       tm->comp_times.rs               += tim.rs;
+	       tm->comp_times.lb               += tim.lb;	       
 	       tm->comp_times.primal_heur      += tim.primal_heur;
 
 	       for(i = 0; i <  DIVING_HEURS_CNT; i++){
@@ -1397,7 +1398,13 @@ int receive_lp_timing(tm_prob *tm)
 	       tm->lp_stat.rs_last_call_ind       = lp_stat.rs_last_call_ind;
 	       tm->lp_stat.rs_analyzed_nodes     += lp_stat.rs_analyzed_nodes; 
 	       tm->lp_stat.rs_last_sol_call       = lp_stat.rs_last_sol_call; 
-	       
+
+               tm->lp_stat.lb_calls              += lp_stat.lb_calls;
+               tm->lp_stat.lb_num_sols           += lp_stat.lb_num_sols;
+	       tm->lp_stat.lb_last_call_ind       = lp_stat.lb_last_call_ind;
+	       tm->lp_stat.lb_analyzed_nodes     += lp_stat.lb_analyzed_nodes; 
+	       tm->lp_stat.lb_last_sol_call       = lp_stat.lb_last_sol_call; 	       
+
 	       for(i = 0; i <  DIVING_HEURS_CNT; i++){
 		 tm->lp_stat.ds_type_calls[i] += lp_stat.ds_type_calls[i];
 		 tm->lp_stat.ds_type_num_sols[i] += lp_stat.ds_type_num_sols[i];

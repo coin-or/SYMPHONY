@@ -3103,6 +3103,26 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(lp_par->rs_min_gap);
       return(0);
    }
+   else if (strcmp(key, "lb_enabled") == 0) {
+      READ_INT_PAR(lp_par->lb_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "lb_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->lb_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "lb_frequency") == 0) {
+      READ_INT_PAR(lp_par->lb_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "lb_search_k") == 0) {
+      READ_INT_PAR(lp_par->lb_search_k);
+      return(0);
+   }
+   else if (strcmp(key, "lb_first_feas_enabled") == 0) {
+      READ_INT_PAR(lp_par->lb_first_feas_enabled);
+      return(0);
+   }
    else if (strcmp(key, "ds_enabled") == 0) {
       READ_INT_PAR(lp_par->ds_enabled);
       return(0);

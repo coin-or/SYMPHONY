@@ -339,6 +339,7 @@ typedef struct NODE_TIMES{
    double        rh;                            /* rounding */
    double        fr;                            /* fix-and-relax */
    double        rs;                            /* rins */
+   double        lb;                            /* local branching */
    double        primal_heur;                   /* all primal heuristics */
 }node_times;
 
@@ -552,7 +553,7 @@ typedef struct LP_STAT{
    int         fr_num_sols;
    int         fr_last_call_ind;
    int         fr_analyzed_nodes;
-   int         fr_last_sol_call;
+   int         fr_last_sol_call;   
 
    /* rins search */
    int         rs_calls;
@@ -561,6 +562,13 @@ typedef struct LP_STAT{
    int         rs_analyzed_nodes;
    int         rs_last_sol_call;
 
+   /* local branching */
+   int         lb_calls;
+   int         lb_num_sols;
+   int         lb_last_call_ind;
+   int         lb_analyzed_nodes;
+   int         lb_last_sol_call;
+   
    /* usage of different tools in process chain: fp, cuts, strong branching */
    int         num_cut_iters_in_path;
    int         num_cuts_added_in_path;
@@ -822,11 +830,12 @@ typedef struct MIPDESC{
    int        alloc_m;
    int        alloc_nz;
 
-   int        fixed_n;      /* only used if preprocessor is used */
-   int       *fixed_ind;    /* fixed vars to nonzero vals */
+   int        fixed_zero;   /* only used if preprocessor is used - fixed vars*/
+   int        fixed_n;      /* fixed vars to nonzero vals */
+   int       *fixed_ind;    
    double    *fixed_val; 
 
-   int        subs_n;
+   int        subs_n;       /* only used if preprocessor is used - substitutions*/
    int       *subs_ind;
    double    *subs_aval;
    double    *subs_rhs; 
@@ -835,8 +844,12 @@ typedef struct MIPDESC{
    int       *subs_rbeg;
    int       *subs_rind;
    double    *subs_rval;
+
+   int        aggr_n;      /* only used if preprocessor is used - aggregations*/
+   int       *aggr_ind;
+   int       *aggr_to_ind;
    
-/* Only to be allocated and used by SYMPHONY */
+   /* Only to be allocated and used by SYMPHONY */
 
    int       *col_lengths;   
    int       *row_matbeg;      /* m */  /* a row ordered desc for heuristics */

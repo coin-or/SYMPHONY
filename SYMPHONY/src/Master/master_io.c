@@ -1112,6 +1112,11 @@ void print_statistics(node_times *tim, problem_stat *stat,
 	if (lp_stat->rs_calls > 0)
 	  printf ("%12i %12i ",lp_stat->rs_calls, lp_stat->rs_num_sols);
 	printf ("\n");	
+	printf ("%-22s %10.2f ", "Local Branching", tim->lb);
+	if (lp_stat->lb_calls > 0)
+	  printf ("%12i %12i ",lp_stat->lb_calls, lp_stat->lb_num_sols);
+
+	printf ("\n");	
 	printf ("\n=========================== Cuts ==========================");
 	printf ("\n");
 	printf ("Accepted:                         %d\n",

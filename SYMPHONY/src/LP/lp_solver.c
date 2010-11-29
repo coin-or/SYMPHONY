@@ -126,6 +126,11 @@ void free_mip_desc(MIPdesc *mip)
       FREE(mip->fixed_ind);
    }
 
+   if(mip->aggr_n){
+      FREE(mip->aggr_ind);
+      FREE(mip->aggr_to_ind);
+   }
+   
    if(mip->subs_n){
       FREE(mip->subs_ind);
       FREE(mip->subs_aval);
