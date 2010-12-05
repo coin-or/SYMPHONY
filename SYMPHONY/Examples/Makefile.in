@@ -112,6 +112,8 @@ INCL += $(ADDINCFLAGS)
 all: $(WHATTOMAKE)
 
 %@EXEEXT@: %.c
+	bla=;\
+	for file in $< ; do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
 	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) $(INCL) $< -o $@ $(LIBS)
 
 clean:
