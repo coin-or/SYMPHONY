@@ -17,7 +17,7 @@
 
 #include <stdlib.h>              /* free() is here on AIX ... */
 #include <math.h>
-#include <string.h>
+//#include <string.h>
 
 #include "sym_lp_solver.h"
 #include "sym_constants.h"
@@ -74,6 +74,13 @@ void free_lp_arrays(LPdata *lp_data)
    FREE(lp_data->tmp.cv);
    FREE(lp_data->tmp.iv);
    FREE(lp_data->tmp.dv);
+
+   FREE(lp_data->tmp1.i1);
+   FREE(lp_data->tmp1.d);
+   FREE(lp_data->tmp1.c);
+   FREE(lp_data->tmp2.i1);
+   FREE(lp_data->tmp2.d);
+   FREE(lp_data->tmp2.c);
 }
 
 /*===========================================================================*/
@@ -3168,7 +3175,7 @@ int copy_lp_data(LPdata *lp_data, LPdata *new_data)
    int termcode = FUNCTION_TERMINATED_NORMALLY;
    int n = lp_data->n;
    int m = lp_data->m;
-   double *lb, *ub;
+   //double *lb, *ub;
    OsiXSolverInterface  *si = lp_data->si;
 
    if (!new_data) {
@@ -3183,8 +3190,8 @@ int copy_lp_data(LPdata *lp_data, LPdata *new_data)
    new_data->maxm = lp_data->maxm;
    new_data->maxnz = lp_data->maxnz;
 
-   lb = (double *)malloc(n*DSIZE);
-   ub = (double *)malloc(n*DSIZE);
+   //lb = (double *)malloc(n*DSIZE);
+   //ub = (double *)malloc(n*DSIZE);
 
    open_lp_solver(new_data);
    /* Turn off the OSI messages (There are LOTS of them) */
@@ -3200,12 +3207,13 @@ int copy_lp_data(LPdata *lp_data, LPdata *new_data)
                              );
    /* get_bounds just returns a const pointer to si->ub, si->lb. we need to
     * memcpy because these pointers get changed when addCols is used */
+   /* menal - I don't see where these pointers get changed, so disabling for now */
    get_bounds(new_data);
-   memcpy(lb,new_data->lb,DSIZE*n);
-   memcpy(ub,new_data->ub,DSIZE*n);
+   //memcpy(lb,new_data->lb,DSIZE*n);
+   //memcpy(ub,new_data->ub,DSIZE*n);
 
-   new_data->lb = lb;
-   new_data->ub = ub;
+   //new_data->lb = lb;
+   //new_data->ub = ub;
 
 
    return termcode;
@@ -3462,9 +3470,9 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
-      mip->colname[j] = (char *) malloc(CSIZE * 9);
-      strncpy(mip->colname[j], const_cast<char*>(mps.columnName(j)), 9);
-      mip->colname[j][8] = 0;
+      mip->colname[j] = (char *) malloc(CSIZE * 30);
+      strncpy(mip->colname[j], const_cast<char*>(mps.columnName(j)), 30);
+      mip->colname[j][29] = 0;
    }
 
    if (mip->obj_sense == SYM_MAXIMIZE){
@@ -3537,9 +3545,9 @@ int read_lp(MIPdesc *mip, char *infile, char *probname)
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = lp.isInteger(j);
-      mip->colname[j] = (char *) malloc(CSIZE * 9);
-      strncpy(mip->colname[j], const_cast<char*>(lp.columnName(j)), 9);
-      mip->colname[j][8] = 0;
+      mip->colname[j] = (char *) malloc(CSIZE * 30);
+      strncpy(mip->colname[j], const_cast<char*>(lp.columnName(j)), 30);
+      mip->colname[j][29] = 0;
    }
 
    if (mip->obj_sense == SYM_MAXIMIZE){

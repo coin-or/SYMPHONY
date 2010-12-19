@@ -1422,6 +1422,7 @@ void lp_close(lp_prob *p)
    p->tm->comp_times.strong_branching += p->comp_times.strong_branching;
    p->tm->comp_times.fp               += p->comp_times.fp;
    p->tm->comp_times.rh               += p->comp_times.rh;
+   p->tm->comp_times.sh               += p->comp_times.sh;
    p->tm->comp_times.ls               += p->comp_times.ls;
    p->tm->comp_times.ds               += p->comp_times.ds;
    p->tm->comp_times.fr               += p->comp_times.fr;
@@ -1519,6 +1520,10 @@ void lp_close(lp_prob *p)
    p->tm->lp_stat.rh_calls                += p->lp_stat.rh_calls;
    p->tm->lp_stat.rh_num_sols             += p->lp_stat.rh_num_sols;
    p->tm->lp_stat.rh_last_call_ind         = p->lp_stat.rh_last_call_ind;
+
+   p->tm->lp_stat.sh_calls                += p->lp_stat.sh_calls;
+   p->tm->lp_stat.sh_num_sols             += p->lp_stat.sh_num_sols;
+   p->tm->lp_stat.sh_last_call_ind         = p->lp_stat.sh_last_call_ind;
 
    p->tm->lp_stat.ls_calls                += p->lp_stat.ls_calls;
    p->tm->lp_stat.ls_num_sols             += p->lp_stat.ls_num_sols;
@@ -3055,7 +3060,8 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    double       *random_hash = lp_data->random_hash;
    const double lpetol = lp_data->lpetol;
    const double etol10 = lpetol * 10;
-   const double etol100 = lpetol * 100;
+   //const double etol100 = lpetol * 100;
+   const double etol1000 = lpetol * 1000;
    const double *x     = lp_data->x;
    OsiRowCut    row_cut;
    var_desc     **vars = lp_data->vars;
@@ -3159,8 +3165,8 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       
       /* check quality */
       if (num_elements>0) {
-         if ( (max_coeff > 0 && min_coeff/max_coeff < etol100)||
-	      (min_coeff > 0 && min_coeff < etol100) ) {
+         if ( (max_coeff > 0 && min_coeff/max_coeff < etol1000)||
+	      (min_coeff > 0 && min_coeff < etol1000) ) {
             PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));
 	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
 	    num_poor_quality++;
@@ -3171,7 +3177,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       
       /* check violation */
       //if ((!is_int && violation < lpetol) || (is_int && violation < 100*lpetol)){// && generator != CGL_PROBING_GENERATOR) {
-      if (violation < 100*lpetol){
+      if (violation < etol10){
          PRINT(verbosity,5,("violation = %f. Threw out cut.\n", 
 			    violation));
          num_unviolated++;

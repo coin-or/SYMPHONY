@@ -720,7 +720,7 @@ int display_solution_u(sym_environment *env, int thread_num)
 		   if (sol.xind[i] == env->mip->n){
 		      continue;
 		   }
-		   printf("%8s %10.3f\n", colname[sol.xind[i]],
+		   printf("%-30s %10.3f\n", colname[sol.xind[i]],
 			  sol.xval[i]);
 		}
 		

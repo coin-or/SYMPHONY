@@ -207,7 +207,13 @@ typedef struct LPDATA{
    
    row_data  *rows;      /* maxm */
 
-   temporary  tmp;
+   temporary  tmp;  /* to be used in some heurs and elsewhere */
+
+   int        tmp1_size; 
+   int        tmp2_size; 
+   temporary  tmp1;  /* to be used in recursive heurs */
+   temporary  tmp2;  /* to be used in branching routines */
+
 #ifdef PSEUDO_COSTS
    double     *pseudo_costs_one;
    double     *pseudo_costs_zero;

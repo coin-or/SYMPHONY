@@ -1888,6 +1888,9 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	       int *swap_si = bobj->sos_ind[i];
 	       bobj->sos_ind[i] = bobj->sos_ind[new_child_num];
 	       bobj->sos_ind[new_child_num] = swap_si;
+	       bobj->is_est[i] = bobj->is_est[new_child_num];
+	       bobj->termcode[i] = bobj->termcode[new_child_num];
+	       bobj->iterd[i] = bobj->iterd[new_child_num];
 	    }
 	 }
       }

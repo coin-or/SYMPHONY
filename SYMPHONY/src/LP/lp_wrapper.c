@@ -943,7 +943,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 
       if(p->par.rounding_enabled && dual_gap > p->par.rounding_min_gap){
        
-	 if (round_solution(p, &true_objval, heur_solution, t_lb)){	 
+	 if (round_solution(p, p->lp_data, &true_objval, heur_solution, t_lb)){	 
 	    feasible = IP_HEUR_FEASIBLE;
 	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
 	    if(true_objval > t_lb + lpetol100){
@@ -956,6 +956,22 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	    check_ls = FALSE; 
 	 }
       }
+
+      if(feasible != IP_HEUR_FEASIBLE && p->par.shifting_enabled && dual_gap > p->par.shifting_min_gap){
+	 
+	 if (shift_solution(p, p->lp_data, &true_objval, heur_solution, t_lb)){	 
+	    feasible = IP_HEUR_FEASIBLE;
+	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+	    if(true_objval > t_lb + lpetol100){
+	       dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+				p->mip->obj_sense);
+	    }else{
+	       dual_gap = 1e-4;
+	    }
+	    apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
+	    check_ls = FALSE; 
+	 }
+      }      
       
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
 	 p->par.ds_enabled && dual_gap > p->par.ds_min_gap && !branching && 
@@ -1023,7 +1039,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       if(p->bc_index >= 0) rs_min_gap = p->par.rs_min_gap;
       
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
-	 p->par.rs_enabled && dual_gap > rs_min_gap && !branching && 
+	 p->par.rs_enabled && dual_gap > rs_min_gap && !branching && p->par.rs_dive_level > 0 && 
 	 //((p->bc_level >= 1 && p->lp_stat.rs_last_call_ind != p->bc_index) ||  
 	 // (p->bc_level < 1 && p->lp_stat.rs_calls < 1)) &&  
 	 //(p->bc_level < 1 || feasible != IP_HEUR_FEASIBLE) && 
@@ -1055,7 +1071,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       if(p->bc_index >= 0) fr_min_gap = p->par.fr_min_gap;
       
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
-	 p->par.fr_enabled && dual_gap > fr_min_gap && !branching && 
+	 p->par.fr_enabled && dual_gap > fr_min_gap && !branching && p->par.fr_dive_level > 0 && 
 	 //((p->bc_level >= 1 && p->lp_stat.fr_last_call_ind != p->bc_index) ||  
 	 //(p->bc_level < 1)) && //p->lp_stat.fr_calls < 1)) &&  
 	 //(p->bc_level < 1 || feasible != IP_HEUR_FEASIBLE) && 
@@ -1125,7 +1141,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 
       double lb_min_gap = p->par.lb_min_gap;
 
-      if(p->par.lb_enabled && dual_gap > lb_min_gap){
+      if(p->par.lb_enabled && dual_gap > lb_min_gap && p->par.lb_dive_level > 0){
 	 //(p->lp_stat.lb_calls - p->lp_stat.lb_last_sol_call <= 20) &&
 	 //(p->bc_level < 1 || reg_factor % reg_base == 0)){
 	 if(lbranching_search (p, &true_objval, col_sol, heur_solution, t_lb)){

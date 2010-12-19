@@ -337,6 +337,7 @@ typedef struct NODE_TIMES{
    double        ds;                            /* diving search */
    double        ds_type[DIVING_HEURS_CNT];
    double        rh;                            /* rounding */
+   double        sh;                            /* shifting */
    double        fr;                            /* fix-and-relax */
    double        rs;                            /* rins */
    double        lb;                            /* local branching */
@@ -533,6 +534,11 @@ typedef struct LP_STAT{
    int         rh_calls;
    int         rh_num_sols;
    int         rh_last_call_ind;
+
+   /* shifting heuristic*/
+   int         sh_calls;
+   int         sh_num_sols;
+   int         sh_last_call_ind;
  
    /* local search */
    int         ls_calls;

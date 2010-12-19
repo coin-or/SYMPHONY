@@ -442,7 +442,8 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fr_min_c_fixed_ratio = 0.1;
    lp_par->fr_incr_ratio = 0.01; 
    lp_par->fr_min_gap = 5.0;
-
+   lp_par->fr_dive_level = 2; 
+   
    lp_par->rs_mode_enabled = tm_par->rs_mode_enabled; 
    lp_par->rs_lp_iter_limit = tm_par->rs_lp_iter_limit;
    
@@ -451,13 +452,15 @@ int sym_set_defaults(sym_environment *env)
    lp_par->rs_min_int_fixed_ratio = 0.80;
    lp_par->fr_min_c_fixed_ratio = 0.20;
    lp_par->rs_min_gap = 5.0;
-
+   lp_par->rs_dive_level = 2; 
+   
    /* local branching */
    lp_par->lb_enabled   = TRUE;
    lp_par->lb_frequency   = 10;
    lp_par->lb_min_gap = 5.0;
-   lp_par->lb_search_k = 5;
-   lp_par->lb_first_feas_enabled = TRUE;   
+   lp_par->lb_search_k = 10;
+   lp_par->lb_first_feas_enabled = 0;   
+   lp_par->lb_dive_level = 2; 
    
    /* diving search */
    lp_par->ds_enabled = TRUE;
@@ -485,14 +488,19 @@ int sym_set_defaults(sym_environment *env)
 
    /* local search */
    lp_par->ls_enabled = TRUE;
-   lp_par->ls_min_gap = 0.001; 
+   lp_par->ls_min_gap = 0.00001; 
    lp_par->ls_frequency = 4;
-   lp_par->ls_fix_ratio = 0.1;
+   lp_par->ls_fix_ratio = 0.0;
 
    /* rounding */
    lp_par->rounding_enabled = TRUE;
    lp_par->rounding_min_gap = 0.0001; 
    lp_par->rounding_frequency = 1;
+
+   /* shifting */
+   lp_par->shifting_enabled = TRUE;
+   lp_par->shifting_min_gap = 0.0001; 
+   lp_par->shifting_frequency = 1;
 
    /************************** cut_gen defaults *****************************/
    cg_par->verbosity = 0;

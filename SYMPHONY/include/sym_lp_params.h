@@ -259,7 +259,12 @@ typedef struct LP_PARAMS{
    /* rounding */
    int               rounding_enabled; 
    int               rounding_frequency; 
-   double            rounding_min_gap; 
+   double            rounding_min_gap;
+
+   /* shifting */
+   int               shifting_enabled; 
+   int               shifting_frequency; 
+   double            shifting_min_gap; 
 
    /* local search */
    int               ls_enabled; 
@@ -278,13 +283,15 @@ typedef struct LP_PARAMS{
    double            fr_incr_ratio; 
    double            fr_min_gap; 
    int               fr_max_nodes;
-   
+   int               fr_dive_level;
+
    /* rins search */
    int               rs_enabled; 
    double            rs_min_int_fixed_ratio;
    double            rs_min_c_fixed_ratio;
    double            rs_min_gap;
    int               rs_max_nodes; 
+   int               rs_dive_level; 
 
    /* restricted/rinse search mode */
    int              rs_mode_enabled;
@@ -296,6 +303,7 @@ typedef struct LP_PARAMS{
    double            lb_min_gap;
    int               lb_search_k;
    int               lb_first_feas_enabled;
+   int               lb_dive_level; 
    
    /* diving search */
    int               ds_enabled; 

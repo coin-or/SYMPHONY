@@ -89,7 +89,10 @@ int fp_can_sos_var_fix(lp_prob *p, FPdata *fp_data, int ind, int *filled_row_cou
 int fp_fix_sos_var(lp_prob *p, FPdata *fp_data, int ind);
 
 /* rounding */
-int round_solution PROTO((lp_prob *p, double *solution_value, 
+int round_solution PROTO((lp_prob *p, LPdata *lp_data, double *solution_value, 
+			  double *betterSolution, double t_lb));
+/* shifting */
+int shift_solution PROTO((lp_prob *p, LPdata *lp_data, double *solution_value, 
 			  double *betterSolution, double t_lb));
 /* local search */
 int apply_local_search PROTO((lp_prob *p, double *solution_value, 
@@ -121,6 +124,8 @@ int fr_force_feasible(lp_prob *p, char use_base, int *sym_fixed_int_cnt, int *sy
 /* local branching */
 int lbranching_search PROTO((lp_prob *p, double *solution_value, double *colSolution,  
 			     double *betterSolution, double t_lb));
+
+int resize_tmp1_arrays(LPdata *lp_data, int new_size);
 
 //sym_environment * lp_to_sym PROTO((lp_prob *p, LPdata *lp_data, char use_base));
 sym_environment * lp_to_sym PROTO ((lp_prob *p, LPdata *lp_data, char use_base, int sym_fixed_cnt,

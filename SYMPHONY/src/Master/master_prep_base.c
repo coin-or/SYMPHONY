@@ -1451,11 +1451,12 @@ int prep_substitute_cols(PREPdesc *P)
       -substitute cols with size 1 for now. with size > 1 will require
        to modify the matrix      
    */
-   
+
    int termcode = PREP_UNMODIFIED;
    //return termcode; 
    if(P->mip->mip_inf->e_row_num < 1) return termcode; 
-
+   return 0;
+   
    const double etol = P->params.etol;
  
    int i, j, k, l;
@@ -1501,16 +1502,16 @@ int prep_substitute_cols(PREPdesc *P)
    char substitute_col;
    //int iter_cnt = 0;
    int new_e_rows_cnt = 1, iter_cnt = 0;
+   int row_free_size; 
 
-
-   while(iter_cnt < 3 && new_e_rows_cnt > 0 && !PREP_QUIT(termcode)){
+   while(iter_cnt < 5 && new_e_rows_cnt > 0 && !PREP_QUIT(termcode)){
       iter_cnt++;
       new_e_rows_cnt = 0;      
       for(row_ind = 0; row_ind < m && mip->mip_inf->e_row_num > 0; row_ind++){
 	 //if(rows[row_ind].size == 3) printf("%i\n", iter_cnt++);
-      
-	 if(rows[row_ind].is_redundant || sense[row_ind] != 'E' ||
-	    (rows[row_ind].size - rows[row_ind].fixed_var_num < 2))continue; 
+	 row_free_size = rows[row_ind].size - rows[row_ind].fixed_var_num; 
+	 if(rows[row_ind].is_redundant || //sense[row_ind] != 'E' ||
+	    row_free_size < 2)continue; 
 	 
 	 //(rows[row_ind].is_sos_row && rows[row_ind].size > 2)) continue; 
 	 
@@ -1522,22 +1523,25 @@ int prep_substitute_cols(PREPdesc *P)
 	    col_ind = r_matind[i]; 
 	    a_val = r_matval[i];
 	    
-	    if(cols[col_ind].var_type == 'F' ||
+	    if(cols[col_ind].var_type == 'F' || (a_val < etol && a_val > -etol) || 
+	       !((sense[row_ind] == 'E' && row_free_size == 2) || (cols[col_ind].col_size == 1 && 
+								   (sense[row_ind] == 'E' ||
+								    (sense[row_ind] == 'L' && obj[col_ind]*a_val <= 0.0) ||		 
+								    (sense[row_ind] == 'G' && obj[col_ind]*a_val >= 0.0))))){
 	       //!(rows[row_ind].size == 2 && cols[col_ind].col_size > 1)) {
-	       !((rows[row_ind].size - rows[row_ind].fixed_var_num == 2) ||
-		 cols[col_ind].col_size == 1)) {
+	       //!(row_free_size == 2 || cols[col_ind].col_size == 1)) {		 
 	       //!((rows[row_ind].size == 2) || cols[col_ind].col_size == 1)) {
 	       continue; 
 	    }
-
+	    
 	    if(mip->is_int[col_ind]){
 	       if(rows[row_ind].cont_var_num > 0 ||
 		  rows[row_ind].frac_coef_num > 0 ||
 		  !prep_is_equal(1.0, floor(fabs(a_val) + etol), etol) ||
 		  !prep_is_equal(rhs[row_ind], floor(rhs[row_ind] + etol), etol)) continue;
-	    }else{
-	       if(rows[row_ind].size != 2 && rows[row_ind].cont_var_num > 1) continue; 
-	    }
+	    }//else{
+	    // if(row_free_size != 2 && rows[row_ind].cont_var_num > 1) continue; 
+	    //}
 	    
 	    substitute_col = FALSE; 
 	    if(ub[col_ind] >= INF && lb[col_ind] <= -INF){
@@ -1553,13 +1557,15 @@ int prep_substitute_cols(PREPdesc *P)
 		      (lb[col_ind] <= -INF && a_val < -etol))){
 		     /*get the ub again */
 		     for(j = r_matbeg[row_ind]; j < end_matbeg; j++){
-			if(r_matind[j] != col_ind){
+			if(r_matind[j] != col_ind && cols[r_matind[j]].var_type != 'F'){
 			   if(r_matval[j] > etol) new_ub += r_matval[j]*ub[r_matind[j]];
 			   else new_ub += r_matval[j]*lb[r_matind[j]];
 			}
 		     }
 		     /*debug*/
-		     if(new_ub >= INF) printf("error in substitute var...\n");		  
+		     if(new_ub >= INF){
+			printf("error in substitute var I...\n");		  
+		     }
 		  }else{
 		     new_ub = INF;
 		  }
@@ -1574,13 +1580,15 @@ int prep_substitute_cols(PREPdesc *P)
 		      (lb[col_ind] <= -INF && a_val > -etol))){
 		     /*get the lb again */
 		     for(j = r_matbeg[row_ind]; j < end_matbeg; j++){
-			if(r_matind[j] != col_ind){
+			if(r_matind[j] != col_ind && cols[r_matind[j]].var_type != 'F'){
 			   if(r_matval[j] > etol) new_lb += r_matval[j]*lb[r_matind[j]];
 			   else new_lb += r_matval[j]*ub[r_matind[j]];
 			}
 		     }
 		     /*debug*/
-		     if(new_lb <= -INF) printf("error in substitute var...\n");
+		     if(new_lb <= -INF){
+			printf("error in substitute var II...\n");
+		     }
 		  }else{
 		     new_lb = -INF;
 		  }
@@ -1604,16 +1612,20 @@ int prep_substitute_cols(PREPdesc *P)
 	       }
 	       
 	       if(ub[col_ind] >= INF){
-		  if(lhs_low > lb[col_ind] + 100*etol ||
-		     (lhs_low > lb[col_ind] - etol && rows[row_ind].size < 3)) substitute_col = TRUE; 
+		  //if(lhs_low > lb[col_ind] + 100*etol ||
+		  // (lhs_low > lb[col_ind] - etol && row_free_size < 3)) substitute_col = TRUE;
+		  if(lhs_low > lb[col_ind] - etol) substitute_col = TRUE; 
+		  //(lhs_low > lb[col_ind] - etol && row_free_size < 3)) 
 	       }else if(lb[col_ind] <= -INF){
-		  if(lhs_high < ub[col_ind] - 100*etol ||
-		     (lhs_high < ub[col_ind] + etol && rows[row_ind].size < 3)) substitute_col = TRUE; 
+		  //if(lhs_high < ub[col_ind] - 100*etol ||
+		  // (lhs_high < ub[col_ind] + etol && row_free_size < 3)) substitute_col = TRUE;
+		  if(lhs_high < ub[col_ind] + etol) substitute_col = TRUE;		    
 	       }else{
-		  if((lhs_low > lb[col_ind] + 100*etol &&
-		      lhs_high < ub[col_ind] - 100*etol) ||
-		     (rows[row_ind].size < 3 &&
-		      lhs_low > lb[col_ind] - etol && lhs_high < ub[col_ind] + etol)) substitute_col = TRUE; 
+		  //if((lhs_low > lb[col_ind] + 100*etol &&
+		  //  lhs_high < ub[col_ind] - 100*etol) ||
+		  // (row_free_size < 3 &&
+		  //  lhs_low > lb[col_ind] - etol && lhs_high < ub[col_ind] + etol)) substitute_col = TRUE;
+		  if(lhs_low > lb[col_ind] - etol && lhs_high < ub[col_ind] + etol) substitute_col = TRUE; 
 	       }
 	    }
 	    
@@ -1989,7 +2001,8 @@ int prep_substitute_cols(PREPdesc *P)
 						       (l == r_matbeg[r_ind] ? -1 : ((l < r_matbeg[r_ind + 1] - 1) ? 0 : 1)));
 		  }
 	       }
-	       if(r_ind < row_ind && rows[r_ind].size == 2 && sense[r_ind] == 'E') new_e_rows_cnt++;
+	       if(r_ind < row_ind && (rows[r_ind].size - rows[r_ind].fixed_var_num) == 2 && sense[r_ind] == 'E') new_e_rows_cnt++;
+	       //if(r_ind < row_ind) new_e_rows_cnt++;
 	    }
 	    
 	    termcode = prep_deleted_row_update_info(mip, row_ind);

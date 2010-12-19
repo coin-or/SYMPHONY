@@ -3041,8 +3041,24 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->rounding_frequency);
       return(0);
    }
+   else if (strcmp(key, "shifting_enabled") == 0) {
+      READ_INT_PAR(lp_par->shifting_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "shifting_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->shifting_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "shifting_frequency") == 0) {
+      READ_INT_PAR(lp_par->shifting_frequency);
+      return(0);
+   }
    else if (strcmp(key, "fr_enabled") == 0) {
       READ_INT_PAR(lp_par->fr_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "fr_dive_level") == 0) {
+      READ_INT_PAR(lp_par->fr_dive_level);
       return(0);
    }
    else if (strcmp(key, "fr_frequency") == 0) {
@@ -3091,6 +3107,10 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->rs_enabled);
       return(0);
    }
+   else if (strcmp(key, "rs_dive_level") == 0) {
+      READ_INT_PAR(lp_par->rs_dive_level);
+      return(0);
+   }
    else if (strcmp(key, "rs_min_int_fixed_ratio") == 0) {
       READ_DBL_PAR(lp_par->rs_min_int_fixed_ratio);
       return(0);
@@ -3105,6 +3125,10 @@ int set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "lb_enabled") == 0) {
       READ_INT_PAR(lp_par->lb_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "lb_dive_level") == 0) {
+      READ_INT_PAR(lp_par->lb_dive_level);
       return(0);
    }
    else if (strcmp(key, "lb_min_gap") == 0) {
@@ -3487,11 +3511,11 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	 mip_copy->colname = (char**)calloc(sizeof(char*), mip_copy->n);
 	 
 	 for(i=0; i<mip_copy->n; i++){
-	    /* FIXME! Resctricting col_name to 20 chars! */
+	    /* FIXME! Resctricting col_name to 30 chars! */
 	    if(mip->colname[i]){
-	       mip_copy->colname[i] = (char*)malloc(CSIZE*20);
-	       strncpy(mip_copy->colname[i], mip->colname[i], 20); 
-	       mip_copy->colname[i][19] = 0;
+	       mip_copy->colname[i] = (char*)malloc(CSIZE*30);
+	       strncpy(mip_copy->colname[i], mip->colname[i], 30); 
+	       mip_copy->colname[i][29] = 0;
 	    }
 	 }
       }

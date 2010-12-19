@@ -1027,13 +1027,20 @@ void print_statistics(node_times *tim, problem_stat *stat,
 	printf ("\n");
 	printf ("%22s %10s %12s %12s\n","","Time","#Called", "#Solutions");
 
-	printf ("%-22s %10.2f ", "Rounding", tim->rh);
+	printf ("%-22s %10.2f ", "Rounding I", tim->rh);
 	if (lp_stat->rh_calls > 0)
 	  printf ("%12i %12i ",lp_stat->rh_calls, lp_stat->rh_num_sols);
 	else 
 	  printf ("%12s %12s ","","");
 	printf ("\n");
 
+	printf ("%-22s %10.2f ", "Rounding II", tim->sh);
+	if (lp_stat->sh_calls > 0)
+	   printf ("%12i %12i ",lp_stat->sh_calls, lp_stat->sh_num_sols);
+	else 
+	   printf ("%12s %12s ","","");
+	printf ("\n");
+	
 	printf ("%-22s %10.2f ", "Diving", tim->ds);
 	if (lp_stat->ds_calls > 0) {
 	  printf ("%12i %12i ",lp_stat->ds_calls, lp_stat->ds_num_sols);	  

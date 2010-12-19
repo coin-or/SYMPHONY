@@ -261,9 +261,19 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
       const double lpetol100 = lp_data->lpetol*100;
       double lpetol = lp_data->lpetol;
-      double *bnd_val = (double *)malloc (2*lp_data->n*DSIZE);
-      int *bnd_ind = (int *)malloc (2*lp_data->n*ISIZE);
-      char *bnd_sense = (char *)malloc (2*lp_data->n*CSIZE);
+
+      if(!(lp_data->tmp2_size) || lp_data->tmp2_size < 2*lp_data->n){
+	 FREE(lp_data->tmp2.i1);
+	 FREE(lp_data->tmp2.d);
+	 FREE(lp_data->tmp2.c);
+	 int tmp_size = 2*lp_data->n;
+	 lp_data->tmp2.i1 = (int *)malloc (tmp_size*ISIZE);
+	 lp_data->tmp2.d = (double *)malloc ((tmp_size + lp_data->n)*DSIZE);
+	 lp_data->tmp2.c = (char *)malloc (tmp_size*CSIZE);
+      }
+      double *bnd_val = lp_data->tmp2.d; //(double *)malloc (2*lp_data->n*DSIZE);
+      int *bnd_ind = lp_data->tmp2.i1; //(int *)malloc (2*lp_data->n*ISIZE);
+      char *bnd_sense = lp_data->tmp2.c; //(char *)malloc (2*lp_data->n*CSIZE);
       int *up_violation_cnt = NULL, *down_violation_cnt = NULL, *violation_col_size = NULL;             
       int num_bnd_changes = 0;
       double xval, floorx, ceilx, var_score;
@@ -511,7 +521,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #endif	
       }
 
-      double *x = (double *)malloc (lp_data->n*DSIZE);
+      double *x = lp_data->tmp2.d + 2*(lp_data->n); //(double *)malloc (lp_data->n*DSIZE);
       
       best_var = -1;
       best_var_score = -SYM_INFINITY;
@@ -1778,10 +1788,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #endif
       
       cand_num = 1;
-      FREE(x);
-      FREE(bnd_val);
-      FREE(bnd_ind);
-      FREE(bnd_sense);
+      //FREE(x);
+      //FREE(bnd_val);
+      //FREE(bnd_ind);
+      //FREE(bnd_sense);
       //FREE(up_violation);
       //FREE(down_violation);
       FREE(up_violation_cnt);
