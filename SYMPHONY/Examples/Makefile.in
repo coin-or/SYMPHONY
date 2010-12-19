@@ -35,14 +35,11 @@ ifeq ($(USE_OSI_INTERFACE),TRUE)
 EXAMPLES += milpOsi milpOsi2
 endif
 
-# Directory with COIN header files
-COININCDIR = @abs_include_dir@/coin
-
-# Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@/coin
-
 # Directory with Application files
 SYMEXDIR = @SYMSRCDIR@/../Examples
+
+# Additional compiler flags
+ADDINCFLAGS =
 
 ##########################################################################
 #  Usually, you don't have to change anything below.  Note that if you   #
@@ -57,8 +54,10 @@ OSL_LP_SOLVER = @OSL_LP_SOLVER_TRUE@TRUE
 SOPLEX_LP_SOLVER = @SOPLEX_LP_SOLVER_TRUE@TRUE
 XPRESS_LP_SOLVER = @XPRESS_LP_SOLVER_TRUE@TRUE
 
-VPATH = \
-	$(SYMEXDIR)
+COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
+COIN_CXX_IS_CL = @COIN_CXX_IS_CL_TRUE@TRUE
+
+VPATH = $(SYMEXDIR)
 
 WHATTOMAKE = $(addsuffix @EXEEXT@, $(EXAMPLES))
 
@@ -66,28 +65,56 @@ WHATTOMAKE = $(addsuffix @EXEEXT@, $(EXAMPLES))
 CXX = @CXX@
 
 # C++ Compiler options
-CXXFLAGS = @CXXFLAGS@ -I`$(CYGPATH_W) $(COININCDIR)`
+CXXFLAGS = @CXXFLAGS@
 
 # additional C++ Compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-# Libraries necessary to link
-LIBS = -L`$(CYGPATH_W) $(COINLIBDIR)` \
-       -L`$(CYGPATH_W) $(COINLIBDIR)/ThirdParty` \
-       -lSym @SYMPHONYLIB_LIBS@
-
-# Additional flags
-ADDINCFLAGS =
-
+# if USE_OSI_INTERFACE is TRUE, we use osi-sym to get compiler/linker flags from pkg-config, otherwise we use symphony
 ifeq ($(USE_OSI_INTERFACE),TRUE)
-LIBS += -lOsiSym
-ADDINCFLAGS += -DUSE_OSI_INTERFACE
+  ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
+    INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags osi-sym`
+  else
+    INCL = @SYMPHONYLIB_CFLAGS_INSTALLED@
+  endif
+
+  ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
+    LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs osi-sym`
+  else
+    ifeq ($(COIN_CXX_IS_CL), TRUE)
+      LIBS = /link /libpath:`$(CYGPATH_W) @abs_lib_dir@` libOsiSym.lib libSym.lib @SYMPHONYLIB_LIBS_INSTALLED@
+    else
+      LIBS = -L@abs_lib_dir@ -lOsiSym -lSym @SYMPHONYLIB_LIBS_INSTALLED@
+    endif
+  endif
+
+  CXXFLAGS += -DUSE_OSI_INTERFACE
+
+else
+  ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
+    INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags symphony`
+  else
+    INCL = @SYMPHONYLIB_CFLAGS_INSTALLED@
+  endif
+
+  ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
+    LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs symphony`
+  else
+    ifeq ($(COIN_CXX_IS_CL), TRUE)
+      LIBS = /link /libpath:`$(CYGPATH_W) @abs_lib_dir@` libSym.lib @SYMPHONYLIB_LIBS_INSTALLED@
+    else
+      LIBS = -L@abs_lib_dir@ -lSym @SYMPHONYLIB_LIBS_INSTALLED@
+    endif
+  endif
 endif
+INCL += $(ADDINCFLAGS)
 
 all: $(WHATTOMAKE)
 
 %@EXEEXT@: %.c
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) $(ADDINCFLAGS) $< -o $@ $(LIBS)
+	bla=;\
+	for file in $< ; do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) $(INCL) $$bla -o $@ $(LIBS)
 
 clean:
 	rm -rf $(WHATTOMAKE)

@@ -31,7 +31,6 @@
 #===========================================================================#
 
 
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -56,7 +55,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = src/OsiSym
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/osi-sym.pc.in
+	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
@@ -64,7 +63,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/config_sym.h
-CONFIG_CLEAN_FILES = osi-sym.pc
+CONFIG_CLEAN_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -72,7 +71,7 @@ am__vpath_adj = case $$p in \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(coinlibdir)" \
-	"$(DESTDIR)$(pkgconfiglibdir)" "$(DESTDIR)$(includecoindir)"
+	"$(DESTDIR)$(includecoindir)"
 coinlibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(coinlib_LTLIBRARIES)
 libOsiSym_la_LIBADD =
@@ -98,8 +97,6 @@ LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libOsiSym_la_SOURCES)
 DIST_SOURCES = $(libOsiSym_la_SOURCES)
-pkgconfiglibDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(pkgconfiglib_DATA)
 includecoinHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(includecoin_HEADERS)
 ETAGS = etags
@@ -128,19 +125,35 @@ CCDEPMODE = @CCDEPMODE@
 CDEFS = @CDEFS@
 CFLAGS = @CFLAGS@
 CGL_CFLAGS = @CGL_CFLAGS@
+CGL_CFLAGS_INSTALLED = @CGL_CFLAGS_INSTALLED@
 CGL_DATA = @CGL_DATA@
+CGL_DATA_INSTALLED = @CGL_DATA_INSTALLED@
+CGL_DEPENDENCIES = @CGL_DEPENDENCIES@
 CGL_LIBS = @CGL_LIBS@
+CGL_LIBS_INSTALLED = @CGL_LIBS_INSTALLED@
 CHECK_CUT_VALIDITY_FALSE = @CHECK_CUT_VALIDITY_FALSE@
 CHECK_CUT_VALIDITY_TRUE = @CHECK_CUT_VALIDITY_TRUE@
 CLLCFLAGS = @CLLCFLAGS@
 CLP_CFLAGS = @CLP_CFLAGS@
+CLP_CFLAGS_INSTALLED = @CLP_CFLAGS_INSTALLED@
 CLP_DATA = @CLP_DATA@
+CLP_DATA_INSTALLED = @CLP_DATA_INSTALLED@
+CLP_DEPENDENCIES = @CLP_DEPENDENCIES@
 CLP_LIBS = @CLP_LIBS@
+CLP_LIBS_INSTALLED = @CLP_LIBS_INSTALLED@
 CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
 CLP_LP_SOLVER_TRUE = @CLP_LP_SOLVER_TRUE@
 COINDEPEND_CFLAGS = @COINDEPEND_CFLAGS@
+COINDEPEND_CFLAGS_INSTALLED = @COINDEPEND_CFLAGS_INSTALLED@
 COINDEPEND_DATA = @COINDEPEND_DATA@
+COINDEPEND_DATA_INSTALLED = @COINDEPEND_DATA_INSTALLED@
+COINDEPEND_DEPENDENCIES = @COINDEPEND_DEPENDENCIES@
 COINDEPEND_LIBS = @COINDEPEND_LIBS@
+COINDEPEND_LIBS_INSTALLED = @COINDEPEND_LIBS_INSTALLED@
+COIN_CC_IS_CL_FALSE = @COIN_CC_IS_CL_FALSE@
+COIN_CC_IS_CL_TRUE = @COIN_CC_IS_CL_TRUE@
+COIN_CXX_IS_CL_FALSE = @COIN_CXX_IS_CL_FALSE@
+COIN_CXX_IS_CL_TRUE = @COIN_CXX_IS_CL_TRUE@
 COIN_HAS_CGL_FALSE = @COIN_HAS_CGL_FALSE@
 COIN_HAS_CGL_TRUE = @COIN_HAS_CGL_TRUE@
 COIN_HAS_CLP = @COIN_HAS_CLP@
@@ -164,6 +177,8 @@ COIN_HAS_OSITESTS_FALSE = @COIN_HAS_OSITESTS_FALSE@
 COIN_HAS_OSITESTS_TRUE = @COIN_HAS_OSITESTS_TRUE@
 COIN_HAS_PKGCONFIG_FALSE = @COIN_HAS_PKGCONFIG_FALSE@
 COIN_HAS_PKGCONFIG_TRUE = @COIN_HAS_PKGCONFIG_TRUE@
+COIN_HAS_PVM_FALSE = @COIN_HAS_PVM_FALSE@
+COIN_HAS_PVM_TRUE = @COIN_HAS_PVM_TRUE@
 COIN_HAS_READLINE_FALSE = @COIN_HAS_READLINE_FALSE@
 COIN_HAS_READLINE_TRUE = @COIN_HAS_READLINE_TRUE@
 COIN_HAS_SAMPLE_FALSE = @COIN_HAS_SAMPLE_FALSE@
@@ -182,8 +197,12 @@ CPLEX_LP_SOLVER_TRUE = @CPLEX_LP_SOLVER_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPX_CFLAGS = @CPX_CFLAGS@
+CPX_CFLAGS_INSTALLED = @CPX_CFLAGS_INSTALLED@
 CPX_DATA = @CPX_DATA@
+CPX_DATA_INSTALLED = @CPX_DATA_INSTALLED@
+CPX_DEPENDENCIES = @CPX_DEPENDENCIES@
 CPX_LIBS = @CPX_LIBS@
+CPX_LIBS_INSTALLED = @CPX_LIBS_INSTALLED@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEFS = @CXXDEFS@
@@ -199,8 +218,12 @@ DO_TESTS_TRUE = @DO_TESTS_TRUE@
 DRAWGRAPH_FALSE = @DRAWGRAPH_FALSE@
 DRAWGRAPH_TRUE = @DRAWGRAPH_TRUE@
 DYLP_CFLAGS = @DYLP_CFLAGS@
+DYLP_CFLAGS_INSTALLED = @DYLP_CFLAGS_INSTALLED@
 DYLP_DATA = @DYLP_DATA@
+DYLP_DATA_INSTALLED = @DYLP_DATA_INSTALLED@
+DYLP_DEPENDENCIES = @DYLP_DEPENDENCIES@
 DYLP_LIBS = @DYLP_LIBS@
+DYLP_LIBS_INSTALLED = @DYLP_LIBS_INSTALLED@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -211,8 +234,12 @@ F77 = @F77@
 FADDLIBS = @FADDLIBS@
 FFLAGS = @FFLAGS@
 GLPK_CFLAGS = @GLPK_CFLAGS@
+GLPK_CFLAGS_INSTALLED = @GLPK_CFLAGS_INSTALLED@
 GLPK_DATA = @GLPK_DATA@
+GLPK_DATA_INSTALLED = @GLPK_DATA_INSTALLED@
+GLPK_DEPENDENCIES = @GLPK_DEPENDENCIES@
 GLPK_LIBS = @GLPK_LIBS@
+GLPK_LIBS_INSTALLED = @GLPK_LIBS_INSTALLED@
 GLPK_LP_SOLVER_FALSE = @GLPK_LP_SOLVER_FALSE@
 GLPK_LP_SOLVER_TRUE = @GLPK_LP_SOLVER_TRUE@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
@@ -237,24 +264,40 @@ MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
 MASTEREXT = @MASTEREXT@
 MIPLIB3_CFLAGS = @MIPLIB3_CFLAGS@
+MIPLIB3_CFLAGS_INSTALLED = @MIPLIB3_CFLAGS_INSTALLED@
 MIPLIB3_DATA = @MIPLIB3_DATA@
+MIPLIB3_DATA_INSTALLED = @MIPLIB3_DATA_INSTALLED@
+MIPLIB3_DEPENDENCIES = @MIPLIB3_DEPENDENCIES@
 MIPLIB3_LIBS = @MIPLIB3_LIBS@
+MIPLIB3_LIBS_INSTALLED = @MIPLIB3_LIBS_INSTALLED@
 MPICC = @MPICC@
 MPICXX = @MPICXX@
 MSK_CFLAGS = @MSK_CFLAGS@
+MSK_CFLAGS_INSTALLED = @MSK_CFLAGS_INSTALLED@
 MSK_DATA = @MSK_DATA@
+MSK_DATA_INSTALLED = @MSK_DATA_INSTALLED@
+MSK_DEPENDENCIES = @MSK_DEPENDENCIES@
 MSK_LIBS = @MSK_LIBS@
+MSK_LIBS_INSTALLED = @MSK_LIBS_INSTALLED@
 NETLIB_CFLAGS = @NETLIB_CFLAGS@
+NETLIB_CFLAGS_INSTALLED = @NETLIB_CFLAGS_INSTALLED@
 NETLIB_DATA = @NETLIB_DATA@
+NETLIB_DATA_INSTALLED = @NETLIB_DATA_INSTALLED@
+NETLIB_DEPENDENCIES = @NETLIB_DEPENDENCIES@
 NETLIB_LIBS = @NETLIB_LIBS@
+NETLIB_LIBS_INSTALLED = @NETLIB_LIBS_INSTALLED@
 OBJEXT = @OBJEXT@
 OPENMP_FALSE = @OPENMP_FALSE@
 OPENMP_TRUE = @OPENMP_TRUE@
 OPT_CFLAGS = @OPT_CFLAGS@
 OPT_CXXFLAGS = @OPT_CXXFLAGS@
 OSITESTS_CFLAGS = @OSITESTS_CFLAGS@
+OSITESTS_CFLAGS_INSTALLED = @OSITESTS_CFLAGS_INSTALLED@
 OSITESTS_DATA = @OSITESTS_DATA@
+OSITESTS_DATA_INSTALLED = @OSITESTS_DATA_INSTALLED@
+OSITESTS_DEPENDENCIES = @OSITESTS_DEPENDENCIES@
 OSITESTS_LIBS = @OSITESTS_LIBS@
+OSITESTS_LIBS_INSTALLED = @OSITESTS_LIBS_INSTALLED@
 OSL_LP_SOLVER_FALSE = @OSL_LP_SOLVER_FALSE@
 OSL_LP_SOLVER_TRUE = @OSL_LP_SOLVER_TRUE@
 PACKAGE = @PACKAGE@
@@ -268,13 +311,19 @@ PCADDLIBS = @PCADDLIBS@
 PKG_CONFIG = @PKG_CONFIG@
 PSEUDO_COSTS_FALSE = @PSEUDO_COSTS_FALSE@
 PSEUDO_COSTS_TRUE = @PSEUDO_COSTS_TRUE@
+PVMINCDIR = @PVMINCDIR@
+PVMLIB = @PVMLIB@
 RANLIB = @RANLIB@
 ROOT_NODE_ONLY_FALSE = @ROOT_NODE_ONLY_FALSE@
 ROOT_NODE_ONLY_TRUE = @ROOT_NODE_ONLY_TRUE@
 RPATH_FLAGS = @RPATH_FLAGS@
 SAMPLE_CFLAGS = @SAMPLE_CFLAGS@
+SAMPLE_CFLAGS_INSTALLED = @SAMPLE_CFLAGS_INSTALLED@
 SAMPLE_DATA = @SAMPLE_DATA@
+SAMPLE_DATA_INSTALLED = @SAMPLE_DATA_INSTALLED@
+SAMPLE_DEPENDENCIES = @SAMPLE_DEPENDENCIES@
 SAMPLE_LIBS = @SAMPLE_LIBS@
+SAMPLE_LIBS_INSTALLED = @SAMPLE_LIBS_INSTALLED@
 SENSITIVITY_ANALYSIS_FALSE = @SENSITIVITY_ANALYSIS_FALSE@
 SENSITIVITY_ANALYSIS_TRUE = @SENSITIVITY_ANALYSIS_TRUE@
 SET_MAKE = @SET_MAKE@
@@ -293,7 +342,10 @@ SYMDEFS = @SYMDEFS@
 SYMINCDIR = @SYMINCDIR@
 SYMPDEFS = @SYMPDEFS@
 SYMPHONYLIB_CFLAGS = @SYMPHONYLIB_CFLAGS@
+SYMPHONYLIB_CFLAGS_INSTALLED = @SYMPHONYLIB_CFLAGS_INSTALLED@
+SYMPHONYLIB_DEPENDENCIES = @SYMPHONYLIB_DEPENDENCIES@
 SYMPHONYLIB_LIBS = @SYMPHONYLIB_LIBS@
+SYMPHONYLIB_LIBS_INSTALLED = @SYMPHONYLIB_LIBS_INSTALLED@
 SYMPHONYLIB_PCLIBS = @SYMPHONYLIB_PCLIBS@
 SYMPHONYLIB_PCREQUIRES = @SYMPHONYLIB_PCREQUIRES@
 SYMPHONY_SVN_REV = @SYMPHONY_SVN_REV@
@@ -323,16 +375,24 @@ USE_GMPL_FALSE = @USE_GMPL_FALSE@
 USE_GMPL_TRUE = @USE_GMPL_TRUE@
 VERSION = @VERSION@
 VOL_CFLAGS = @VOL_CFLAGS@
+VOL_CFLAGS_INSTALLED = @VOL_CFLAGS_INSTALLED@
 VOL_DATA = @VOL_DATA@
+VOL_DATA_INSTALLED = @VOL_DATA_INSTALLED@
+VOL_DEPENDENCIES = @VOL_DEPENDENCIES@
 VOL_LIBS = @VOL_LIBS@
+VOL_LIBS_INSTALLED = @VOL_LIBS_INSTALLED@
 VPATH_DISTCLEANFILES = @VPATH_DISTCLEANFILES@
 WHATTOMAKEBINS = @WHATTOMAKEBINS@
 WHATTOMAKELIBS = @WHATTOMAKELIBS@
 XPRESS_LP_SOLVER_FALSE = @XPRESS_LP_SOLVER_FALSE@
 XPRESS_LP_SOLVER_TRUE = @XPRESS_LP_SOLVER_TRUE@
 XPR_CFLAGS = @XPR_CFLAGS@
+XPR_CFLAGS_INSTALLED = @XPR_CFLAGS_INSTALLED@
 XPR_DATA = @XPR_DATA@
+XPR_DATA_INSTALLED = @XPR_DATA_INSTALLED@
+XPR_DEPENDENCIES = @XPR_DEPENDENCIES@
 XPR_LIBS = @XPR_LIBS@
+XPR_LIBS_INSTALLED = @XPR_LIBS_INSTALLED@
 abs_bin_dir = @abs_bin_dir@
 abs_include_dir = @abs_include_dir@
 abs_lib_dir = @abs_lib_dir@
@@ -435,8 +495,6 @@ includecoin_HEADERS = \
 	OsiSymSolverParameters.hpp \
 	SymWarmStart.hpp
 
-pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = osi-sym.pc
 all: all-am
 
 .SUFFIXES:
@@ -470,8 +528,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-osi-sym.pc: $(top_builddir)/config.status $(srcdir)/osi-sym.pc.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-coinlibLTLIBRARIES: $(coinlib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	test -z "$(coinlibdir)" || $(mkdir_p) "$(DESTDIR)$(coinlibdir)"
@@ -541,23 +597,6 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-install-pkgconfiglibDATA: $(pkgconfiglib_DATA)
-	@$(NORMAL_INSTALL)
-	test -z "$(pkgconfiglibdir)" || $(mkdir_p) "$(DESTDIR)$(pkgconfiglibdir)"
-	@list='$(pkgconfiglib_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(pkgconfiglibDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(pkgconfiglibdir)/$$f'"; \
-	  $(pkgconfiglibDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(pkgconfiglibdir)/$$f"; \
-	done
-
-uninstall-pkgconfiglibDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(pkgconfiglib_DATA)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(pkgconfiglibdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(pkgconfiglibdir)/$$f"; \
-	done
 install-includecoinHEADERS: $(includecoin_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(includecoindir)" || $(mkdir_p) "$(DESTDIR)$(includecoindir)"
@@ -653,9 +692,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(DATA) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(coinlibdir)" "$(DESTDIR)$(pkgconfiglibdir)" "$(DESTDIR)$(includecoindir)"; do \
+	for dir in "$(DESTDIR)$(coinlibdir)" "$(DESTDIR)$(includecoindir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -703,8 +742,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-coinlibLTLIBRARIES install-includecoinHEADERS \
-	install-pkgconfiglibDATA
+install-data-am: install-coinlibLTLIBRARIES install-includecoinHEADERS
 
 install-exec-am:
 
@@ -733,8 +771,7 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-coinlibLTLIBRARIES \
-	uninstall-includecoinHEADERS uninstall-info-am \
-	uninstall-pkgconfiglibDATA
+	uninstall-includecoinHEADERS uninstall-info-am
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean \
 	clean-coinlibLTLIBRARIES clean-generic clean-libtool ctags \
@@ -743,14 +780,12 @@ uninstall-am: uninstall-coinlibLTLIBRARIES \
 	html-am info info-am install install-am \
 	install-coinlibLTLIBRARIES install-data install-data-am \
 	install-exec install-exec-am install-includecoinHEADERS \
-	install-info install-info-am install-man \
-	install-pkgconfiglibDATA install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-info install-info-am install-man install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-coinlibLTLIBRARIES \
-	uninstall-includecoinHEADERS uninstall-info-am \
-	uninstall-pkgconfiglibDATA
+	uninstall-includecoinHEADERS uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
