@@ -5,6 +5,7 @@ includedir=@includedir@/coin
 
 Name: OsiSym
 Description: COIN-OR Open Solver Interface for SYMPHONY
+URL: https://projects.coin-or.org/Osi
 Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lOsiSym
 Cflags: -I${includedir}

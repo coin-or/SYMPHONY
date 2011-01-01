@@ -39,7 +39,7 @@ ADDINCFLAGS =
 COININCDIR = @abs_include_dir@/coin
 
 # Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@/coin
+COINLIBDIR = @abs_lib_dir@
 
 # Directory with Application files
 SYMAPPLDIR = @SYMSRCDIR@/../Applications/$(SYMAPPLNAME)
@@ -172,8 +172,6 @@ ifeq ($(XPRESS_LP_SOLVER),TRUE)
 LIBS += @XPR_LIBS@
 ADDINCFLAGS += -D__OSI_XPRESS__
 endif
-
-ADDLIBS += @ADDLIBS@
 
 WHATTOMAKE = $(EXE)
 
