@@ -23,8 +23,7 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 
 # Name of the library compiled in this directory.
-coinlibdir = ${libdir}/coin
-coinlib_LTLIBRARIES = libOsiSym.la
+lib_LTLIBRARIES = libOsiSym.la
 
 # List all source files for this library, including headers
 libOsiSym_la_SOURCES = \

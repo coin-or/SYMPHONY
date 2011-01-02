@@ -379,9 +379,7 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 
 # Name of the library compiled in this directory.  We want it to be installed
 # in the 'lib' directory
-
-coinlibdir = ${libdir}/coin
-coinlib_LTLIBRARIES = $(WHATTOMAKELIBS)
+lib_LTLIBRARIES = $(WHATTOMAKELIBS)
 
 # List all source files for this library, including headers
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
