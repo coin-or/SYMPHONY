@@ -1108,6 +1108,9 @@ Optional Features:
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-gnu-packages   compile with GNU packages (disabled by default)
   --enable-pkg-config     use pkg-config if available (default is yes)
+  --enable-interpackage-dependencies
+                          whether to deduce Makefile dependencies from package
+                          linker flags (default: yes)
   --disable-cgl-cuts      disable generic cut generation
   --enable-sensitivity-analysis
                           compile in the sensitivity analysis features
@@ -5991,7 +5994,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5994 "configure"' > conftest.$ac_ext
+  echo '#line 5997 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7125,7 +7128,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7128:" \
+echo "$as_me:7131:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8192,11 +8195,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8195: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8198: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8199: \$? = $ac_status" >&5
+   echo "$as_me:8202: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8460,11 +8463,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8463: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8466: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8467: \$? = $ac_status" >&5
+   echo "$as_me:8470: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8564,11 +8567,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8567: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8570: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8571: \$? = $ac_status" >&5
+   echo "$as_me:8574: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10909,7 +10912,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10912 "configure"
+#line 10915 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11009,7 +11012,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11012 "configure"
+#line 11015 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13353,11 +13356,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13356: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13359: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13360: \$? = $ac_status" >&5
+   echo "$as_me:13363: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13457,11 +13460,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13460: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13463: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13464: \$? = $ac_status" >&5
+   echo "$as_me:13467: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15027,11 +15030,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15030: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15033: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15034: \$? = $ac_status" >&5
+   echo "$as_me:15037: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15131,11 +15134,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15134: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15137: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15138: \$? = $ac_status" >&5
+   echo "$as_me:15141: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17338,11 +17341,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17341: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17344: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17345: \$? = $ac_status" >&5
+   echo "$as_me:17348: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17606,11 +17609,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17609: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17612: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17613: \$? = $ac_status" >&5
+   echo "$as_me:17616: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17710,11 +17713,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17713: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17716: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17717: \$? = $ac_status" >&5
+   echo "$as_me:17720: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -21166,39 +21169,54 @@ COINDEPEND_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_coindepend != skipping; then
-
 
 # Check whether --with-m4_tolower(CoinDepend)-lib or --without-m4_tolower(CoinDepend)-lib was given.
 if test "${with_coindepend_lib+set}" = set; then
   withval="$with_coindepend_lib"
-  coin_has_coindepend=yes
+  if test "$withval" = no ; then
+       coin_has_coindepend=skipping
+     else
+       coin_has_coindepend=yes
        COINDEPEND_LIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_coindepend != skipping; then
 
 # Check whether --with-m4_tolower(CoinDepend)-incdir or --without-m4_tolower(CoinDepend)-incdir was given.
 if test "${with_coindepend_incdir+set}" = set; then
   withval="$with_coindepend_incdir"
-  coin_has_coindepend=yes
-     COINDEPEND_CFLAGS="-I`${CYGPATH_W} $withval`"
-     SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
-
+  if test "$withval" = no ; then
+       coin_has_coindepend=skipping
+     else
+       coin_has_coindepend=yes
+       COINDEPEND_CFLAGS="-I`${CYGPATH_W} $withval`"
+       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+     fi
 
 fi;
+fi
 
+if test $coin_has_coindepend != skipping; then
 
 # Check whether --with-m4_tolower(CoinDepend)-datadir or --without-m4_tolower(CoinDepend)-datadir was given.
 if test "${with_coindepend_datadir+set}" = set; then
   withval="$with_coindepend_datadir"
-  coin_has_coindepend=yes
-     COINDEPEND_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_coindepend=skipping
+     else
+       coin_has_coindepend=yes
+       COINDEPEND_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -21516,14 +21534,25 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  COINDEPEND_DEPENDENCIES=`echo " $COINDEPEND_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
-    SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+else
+  enable_interpackage_dependencies=yes
+fi;
 
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     COINDEPEND_DEPENDENCIES=`echo " $COINDEPEND_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+       SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$COINDEPEND_CFLAGS" ; then
@@ -21612,39 +21641,54 @@ CLP_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_clp != skipping; then
-
 
 # Check whether --with-m4_tolower(Clp)-lib or --without-m4_tolower(Clp)-lib was given.
 if test "${with_clp_lib+set}" = set; then
   withval="$with_clp_lib"
-  coin_has_clp=yes
+  if test "$withval" = no ; then
+       coin_has_clp=skipping
+     else
+       coin_has_clp=yes
        CLP_LIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_clp != skipping; then
 
 # Check whether --with-m4_tolower(Clp)-incdir or --without-m4_tolower(Clp)-incdir was given.
 if test "${with_clp_incdir+set}" = set; then
   withval="$with_clp_incdir"
-  coin_has_clp=yes
-     CLP_CFLAGS="-I`${CYGPATH_W} $withval`"
-     SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
-
+  if test "$withval" = no ; then
+       coin_has_clp=skipping
+     else
+       coin_has_clp=yes
+       CLP_CFLAGS="-I`${CYGPATH_W} $withval`"
+       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+     fi
 
 fi;
+fi
 
+if test $coin_has_clp != skipping; then
 
 # Check whether --with-m4_tolower(Clp)-datadir or --without-m4_tolower(Clp)-datadir was given.
 if test "${with_clp_datadir+set}" = set; then
   withval="$with_clp_datadir"
-  coin_has_clp=yes
-     CLP_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_clp=skipping
+     else
+       coin_has_clp=yes
+       CLP_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -21962,14 +22006,25 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  CLP_DEPENDENCIES=`echo " $CLP_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
-    SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+else
+  enable_interpackage_dependencies=yes
+fi;
 
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     CLP_DEPENDENCIES=`echo " $CLP_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+       SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$CLP_CFLAGS" ; then
@@ -22052,39 +22107,54 @@ DYLP_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_dylp != skipping; then
-
 
 # Check whether --with-m4_tolower(DyLP)-lib or --without-m4_tolower(DyLP)-lib was given.
 if test "${with_dylp_lib+set}" = set; then
   withval="$with_dylp_lib"
-  coin_has_dylp=yes
+  if test "$withval" = no ; then
+       coin_has_dylp=skipping
+     else
+       coin_has_dylp=yes
        DYLP_LIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_dylp != skipping; then
 
 # Check whether --with-m4_tolower(DyLP)-incdir or --without-m4_tolower(DyLP)-incdir was given.
 if test "${with_dylp_incdir+set}" = set; then
   withval="$with_dylp_incdir"
-  coin_has_dylp=yes
-     DYLP_CFLAGS="-I`${CYGPATH_W} $withval`"
-     SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
-
+  if test "$withval" = no ; then
+       coin_has_dylp=skipping
+     else
+       coin_has_dylp=yes
+       DYLP_CFLAGS="-I`${CYGPATH_W} $withval`"
+       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+     fi
 
 fi;
+fi
 
+if test $coin_has_dylp != skipping; then
 
 # Check whether --with-m4_tolower(DyLP)-datadir or --without-m4_tolower(DyLP)-datadir was given.
 if test "${with_dylp_datadir+set}" = set; then
   withval="$with_dylp_datadir"
-  coin_has_dylp=yes
-     DYLP_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_dylp=skipping
+     else
+       coin_has_dylp=yes
+       DYLP_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -22402,14 +22472,25 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  DYLP_DEPENDENCIES=`echo " $DYLP_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
-    SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+else
+  enable_interpackage_dependencies=yes
+fi;
 
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     DYLP_DEPENDENCIES=`echo " $DYLP_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+       SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$DYLP_CFLAGS" ; then
@@ -22492,39 +22573,54 @@ VOL_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_vol != skipping; then
-
 
 # Check whether --with-m4_tolower(Vol)-lib or --without-m4_tolower(Vol)-lib was given.
 if test "${with_vol_lib+set}" = set; then
   withval="$with_vol_lib"
-  coin_has_vol=yes
+  if test "$withval" = no ; then
+       coin_has_vol=skipping
+     else
+       coin_has_vol=yes
        VOL_LIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_vol != skipping; then
 
 # Check whether --with-m4_tolower(Vol)-incdir or --without-m4_tolower(Vol)-incdir was given.
 if test "${with_vol_incdir+set}" = set; then
   withval="$with_vol_incdir"
-  coin_has_vol=yes
-     VOL_CFLAGS="-I`${CYGPATH_W} $withval`"
-     SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
-
+  if test "$withval" = no ; then
+       coin_has_vol=skipping
+     else
+       coin_has_vol=yes
+       VOL_CFLAGS="-I`${CYGPATH_W} $withval`"
+       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+     fi
 
 fi;
+fi
 
+if test $coin_has_vol != skipping; then
 
 # Check whether --with-m4_tolower(Vol)-datadir or --without-m4_tolower(Vol)-datadir was given.
 if test "${with_vol_datadir+set}" = set; then
   withval="$with_vol_datadir"
-  coin_has_vol=yes
-     VOL_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_vol=skipping
+     else
+       coin_has_vol=yes
+       VOL_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -22842,14 +22938,25 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  VOL_DEPENDENCIES=`echo " $VOL_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
-    SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+else
+  enable_interpackage_dependencies=yes
+fi;
 
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     VOL_DEPENDENCIES=`echo " $VOL_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+       SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$VOL_CFLAGS" ; then
@@ -22932,39 +23039,54 @@ CGL_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_cgl != skipping; then
-
 
 # Check whether --with-m4_tolower(Cgl)-lib or --without-m4_tolower(Cgl)-lib was given.
 if test "${with_cgl_lib+set}" = set; then
   withval="$with_cgl_lib"
-  coin_has_cgl=yes
+  if test "$withval" = no ; then
+       coin_has_cgl=skipping
+     else
+       coin_has_cgl=yes
        CGL_LIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_cgl != skipping; then
 
 # Check whether --with-m4_tolower(Cgl)-incdir or --without-m4_tolower(Cgl)-incdir was given.
 if test "${with_cgl_incdir+set}" = set; then
   withval="$with_cgl_incdir"
-  coin_has_cgl=yes
-     CGL_CFLAGS="-I`${CYGPATH_W} $withval`"
-     SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
-
+  if test "$withval" = no ; then
+       coin_has_cgl=skipping
+     else
+       coin_has_cgl=yes
+       CGL_CFLAGS="-I`${CYGPATH_W} $withval`"
+       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+     fi
 
 fi;
+fi
 
+if test $coin_has_cgl != skipping; then
 
 # Check whether --with-m4_tolower(Cgl)-datadir or --without-m4_tolower(Cgl)-datadir was given.
 if test "${with_cgl_datadir+set}" = set; then
   withval="$with_cgl_datadir"
-  coin_has_cgl=yes
-     CGL_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_cgl=skipping
+     else
+       coin_has_cgl=yes
+       CGL_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -23282,14 +23404,25 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  CGL_DEPENDENCIES=`echo " $CGL_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
-    SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+else
+  enable_interpackage_dependencies=yes
+fi;
 
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     CGL_DEPENDENCIES=`echo " $CGL_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+       SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$CGL_CFLAGS" ; then
@@ -23365,35 +23498,51 @@ OSITESTS_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_ositests != skipping; then
-
 
 # Check whether --with-m4_tolower(OsiTests)-lib or --without-m4_tolower(OsiTests)-lib was given.
 if test "${with_ositests_lib+set}" = set; then
   withval="$with_ositests_lib"
-  coin_has_ositests=yes
+  if test "$withval" = no ; then
+       coin_has_ositests=skipping
+     else
+       coin_has_ositests=yes
        OSITESTS_LIBS="$withval"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_ositests != skipping; then
 
 # Check whether --with-m4_tolower(OsiTests)-incdir or --without-m4_tolower(OsiTests)-incdir was given.
 if test "${with_ositests_incdir+set}" = set; then
   withval="$with_ositests_incdir"
-  coin_has_ositests=yes
-     OSITESTS_CFLAGS="-I`${CYGPATH_W} $withval`"
+  if test "$withval" = no ; then
+       coin_has_ositests=skipping
+     else
+       coin_has_ositests=yes
+       OSITESTS_CFLAGS="-I`${CYGPATH_W} $withval`"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_ositests != skipping; then
 
 # Check whether --with-m4_tolower(OsiTests)-datadir or --without-m4_tolower(OsiTests)-datadir was given.
 if test "${with_ositests_datadir+set}" = set; then
   withval="$with_ositests_datadir"
-  coin_has_ositests=yes
-     OSITESTS_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_ositests=skipping
+     else
+       coin_has_ositests=yes
+       OSITESTS_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -23701,12 +23850,23 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  OSITESTS_DEPENDENCIES=`echo " $OSITESTS_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
+else
+  enable_interpackage_dependencies=yes
+fi;
+
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     OSITESTS_DEPENDENCIES=`echo " $OSITESTS_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$OSITESTS_CFLAGS" ; then
@@ -23774,35 +23934,51 @@ SAMPLE_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_sample != skipping; then
-
 
 # Check whether --with-m4_tolower(Sample)-lib or --without-m4_tolower(Sample)-lib was given.
 if test "${with_sample_lib+set}" = set; then
   withval="$with_sample_lib"
-  coin_has_sample=yes
+  if test "$withval" = no ; then
+       coin_has_sample=skipping
+     else
+       coin_has_sample=yes
        SAMPLE_LIBS="$withval"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_sample != skipping; then
 
 # Check whether --with-m4_tolower(Sample)-incdir or --without-m4_tolower(Sample)-incdir was given.
 if test "${with_sample_incdir+set}" = set; then
   withval="$with_sample_incdir"
-  coin_has_sample=yes
-     SAMPLE_CFLAGS="-I`${CYGPATH_W} $withval`"
+  if test "$withval" = no ; then
+       coin_has_sample=skipping
+     else
+       coin_has_sample=yes
+       SAMPLE_CFLAGS="-I`${CYGPATH_W} $withval`"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_sample != skipping; then
 
 # Check whether --with-m4_tolower(Sample)-datadir or --without-m4_tolower(Sample)-datadir was given.
 if test "${with_sample_datadir+set}" = set; then
   withval="$with_sample_datadir"
-  coin_has_sample=yes
-     SAMPLE_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_sample=skipping
+     else
+       coin_has_sample=yes
+       SAMPLE_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -24110,12 +24286,23 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  SAMPLE_DEPENDENCIES=`echo " $SAMPLE_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
+else
+  enable_interpackage_dependencies=yes
+fi;
+
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     SAMPLE_DEPENDENCIES=`echo " $SAMPLE_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$SAMPLE_CFLAGS" ; then
@@ -24183,35 +24370,51 @@ NETLIB_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_netlib != skipping; then
-
 
 # Check whether --with-m4_tolower(Netlib)-lib or --without-m4_tolower(Netlib)-lib was given.
 if test "${with_netlib_lib+set}" = set; then
   withval="$with_netlib_lib"
-  coin_has_netlib=yes
+  if test "$withval" = no ; then
+       coin_has_netlib=skipping
+     else
+       coin_has_netlib=yes
        NETLIB_LIBS="$withval"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_netlib != skipping; then
 
 # Check whether --with-m4_tolower(Netlib)-incdir or --without-m4_tolower(Netlib)-incdir was given.
 if test "${with_netlib_incdir+set}" = set; then
   withval="$with_netlib_incdir"
-  coin_has_netlib=yes
-     NETLIB_CFLAGS="-I`${CYGPATH_W} $withval`"
+  if test "$withval" = no ; then
+       coin_has_netlib=skipping
+     else
+       coin_has_netlib=yes
+       NETLIB_CFLAGS="-I`${CYGPATH_W} $withval`"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_netlib != skipping; then
 
 # Check whether --with-m4_tolower(Netlib)-datadir or --without-m4_tolower(Netlib)-datadir was given.
 if test "${with_netlib_datadir+set}" = set; then
   withval="$with_netlib_datadir"
-  coin_has_netlib=yes
-     NETLIB_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_netlib=skipping
+     else
+       coin_has_netlib=yes
+       NETLIB_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -24519,12 +24722,23 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  NETLIB_DEPENDENCIES=`echo " $NETLIB_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
+else
+  enable_interpackage_dependencies=yes
+fi;
+
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     NETLIB_DEPENDENCIES=`echo " $NETLIB_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$NETLIB_CFLAGS" ; then
@@ -24592,35 +24806,51 @@ MIPLIB3_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_miplib3 != skipping; then
-
 
 # Check whether --with-m4_tolower(Miplib3)-lib or --without-m4_tolower(Miplib3)-lib was given.
 if test "${with_miplib3_lib+set}" = set; then
   withval="$with_miplib3_lib"
-  coin_has_miplib3=yes
+  if test "$withval" = no ; then
+       coin_has_miplib3=skipping
+     else
+       coin_has_miplib3=yes
        MIPLIB3_LIBS="$withval"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_miplib3 != skipping; then
 
 # Check whether --with-m4_tolower(Miplib3)-incdir or --without-m4_tolower(Miplib3)-incdir was given.
 if test "${with_miplib3_incdir+set}" = set; then
   withval="$with_miplib3_incdir"
-  coin_has_miplib3=yes
-     MIPLIB3_CFLAGS="-I`${CYGPATH_W} $withval`"
+  if test "$withval" = no ; then
+       coin_has_miplib3=skipping
+     else
+       coin_has_miplib3=yes
+       MIPLIB3_CFLAGS="-I`${CYGPATH_W} $withval`"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_miplib3 != skipping; then
 
 # Check whether --with-m4_tolower(Miplib3)-datadir or --without-m4_tolower(Miplib3)-datadir was given.
 if test "${with_miplib3_datadir+set}" = set; then
   withval="$with_miplib3_datadir"
-  coin_has_miplib3=yes
-     MIPLIB3_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_miplib3=skipping
+     else
+       coin_has_miplib3=yes
+       MIPLIB3_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -24928,12 +25158,23 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  MIPLIB3_DEPENDENCIES=`echo " $MIPLIB3_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
+else
+  enable_interpackage_dependencies=yes
+fi;
+
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     MIPLIB3_DEPENDENCIES=`echo " $MIPLIB3_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$MIPLIB3_CFLAGS" ; then
@@ -25015,39 +25256,54 @@ CPX_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_cpx != skipping; then
-
 
 # Check whether --with-m4_tolower(Cpx)-lib or --without-m4_tolower(Cpx)-lib was given.
 if test "${with_cpx_lib+set}" = set; then
   withval="$with_cpx_lib"
-  coin_has_cpx=yes
+  if test "$withval" = no ; then
+       coin_has_cpx=skipping
+     else
+       coin_has_cpx=yes
        CPX_LIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_cpx != skipping; then
 
 # Check whether --with-m4_tolower(Cpx)-incdir or --without-m4_tolower(Cpx)-incdir was given.
 if test "${with_cpx_incdir+set}" = set; then
   withval="$with_cpx_incdir"
-  coin_has_cpx=yes
-     CPX_CFLAGS="-I`${CYGPATH_W} $withval`"
-     SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
-
+  if test "$withval" = no ; then
+       coin_has_cpx=skipping
+     else
+       coin_has_cpx=yes
+       CPX_CFLAGS="-I`${CYGPATH_W} $withval`"
+       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+     fi
 
 fi;
+fi
 
+if test $coin_has_cpx != skipping; then
 
 # Check whether --with-m4_tolower(Cpx)-datadir or --without-m4_tolower(Cpx)-datadir was given.
 if test "${with_cpx_datadir+set}" = set; then
   withval="$with_cpx_datadir"
-  coin_has_cpx=yes
-     CPX_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_cpx=skipping
+     else
+       coin_has_cpx=yes
+       CPX_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -25365,14 +25621,25 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  CPX_DEPENDENCIES=`echo " $CPX_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
-    SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+else
+  enable_interpackage_dependencies=yes
+fi;
 
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     CPX_DEPENDENCIES=`echo " $CPX_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+       SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$CPX_CFLAGS" ; then
@@ -25455,39 +25722,54 @@ GLPK_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_glpk != skipping; then
-
 
 # Check whether --with-m4_tolower(Glpk)-lib or --without-m4_tolower(Glpk)-lib was given.
 if test "${with_glpk_lib+set}" = set; then
   withval="$with_glpk_lib"
-  coin_has_glpk=yes
+  if test "$withval" = no ; then
+       coin_has_glpk=skipping
+     else
+       coin_has_glpk=yes
        GLPK_LIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_glpk != skipping; then
 
 # Check whether --with-m4_tolower(Glpk)-incdir or --without-m4_tolower(Glpk)-incdir was given.
 if test "${with_glpk_incdir+set}" = set; then
   withval="$with_glpk_incdir"
-  coin_has_glpk=yes
-     GLPK_CFLAGS="-I`${CYGPATH_W} $withval`"
-     SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
-
+  if test "$withval" = no ; then
+       coin_has_glpk=skipping
+     else
+       coin_has_glpk=yes
+       GLPK_CFLAGS="-I`${CYGPATH_W} $withval`"
+       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+     fi
 
 fi;
+fi
 
+if test $coin_has_glpk != skipping; then
 
 # Check whether --with-m4_tolower(Glpk)-datadir or --without-m4_tolower(Glpk)-datadir was given.
 if test "${with_glpk_datadir+set}" = set; then
   withval="$with_glpk_datadir"
-  coin_has_glpk=yes
-     GLPK_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_glpk=skipping
+     else
+       coin_has_glpk=yes
+       GLPK_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -25805,14 +26087,25 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  GLPK_DEPENDENCIES=`echo " $GLPK_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
-    SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+else
+  enable_interpackage_dependencies=yes
+fi;
 
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     GLPK_DEPENDENCIES=`echo " $GLPK_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+       SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$GLPK_CFLAGS" ; then
@@ -25896,39 +26189,54 @@ MSK_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_msk != skipping; then
-
 
 # Check whether --with-m4_tolower(Msk)-lib or --without-m4_tolower(Msk)-lib was given.
 if test "${with_msk_lib+set}" = set; then
   withval="$with_msk_lib"
-  coin_has_msk=yes
+  if test "$withval" = no ; then
+       coin_has_msk=skipping
+     else
+       coin_has_msk=yes
        MSK_LIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_msk != skipping; then
 
 # Check whether --with-m4_tolower(Msk)-incdir or --without-m4_tolower(Msk)-incdir was given.
 if test "${with_msk_incdir+set}" = set; then
   withval="$with_msk_incdir"
-  coin_has_msk=yes
-     MSK_CFLAGS="-I`${CYGPATH_W} $withval`"
-     SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
-
+  if test "$withval" = no ; then
+       coin_has_msk=skipping
+     else
+       coin_has_msk=yes
+       MSK_CFLAGS="-I`${CYGPATH_W} $withval`"
+       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+     fi
 
 fi;
+fi
 
+if test $coin_has_msk != skipping; then
 
 # Check whether --with-m4_tolower(Msk)-datadir or --without-m4_tolower(Msk)-datadir was given.
 if test "${with_msk_datadir+set}" = set; then
   withval="$with_msk_datadir"
-  coin_has_msk=yes
-     MSK_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_msk=skipping
+     else
+       coin_has_msk=yes
+       MSK_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -26246,14 +26554,25 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  MSK_DEPENDENCIES=`echo " $MSK_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
-    SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+else
+  enable_interpackage_dependencies=yes
+fi;
 
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     MSK_DEPENDENCIES=`echo " $MSK_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+       SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$MSK_CFLAGS" ; then
@@ -26337,39 +26656,54 @@ XPR_DATA=
 
 
 
-#check if user provided LIBS, CFLAGS, or DATA for module
+#check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_xpr != skipping; then
-
 
 # Check whether --with-m4_tolower(Xpr)-lib or --without-m4_tolower(Xpr)-lib was given.
 if test "${with_xpr_lib+set}" = set; then
   withval="$with_xpr_lib"
-  coin_has_xpr=yes
+  if test "$withval" = no ; then
+       coin_has_xpr=skipping
+     else
+       coin_has_xpr=yes
        XPR_LIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+     fi
 
 fi;
+fi
 
+if test $coin_has_xpr != skipping; then
 
 # Check whether --with-m4_tolower(Xpr)-incdir or --without-m4_tolower(Xpr)-incdir was given.
 if test "${with_xpr_incdir+set}" = set; then
   withval="$with_xpr_incdir"
-  coin_has_xpr=yes
-     XPR_CFLAGS="-I`${CYGPATH_W} $withval`"
-     SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
-
+  if test "$withval" = no ; then
+       coin_has_xpr=skipping
+     else
+       coin_has_xpr=yes
+       XPR_CFLAGS="-I`${CYGPATH_W} $withval`"
+       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+     fi
 
 fi;
+fi
 
+if test $coin_has_xpr != skipping; then
 
 # Check whether --with-m4_tolower(Xpr)-datadir or --without-m4_tolower(Xpr)-datadir was given.
 if test "${with_xpr_datadir+set}" = set; then
   withval="$with_xpr_datadir"
-  coin_has_xpr=yes
-     XPR_DATA="$withval"
+  if test "$withval" = no ; then
+       coin_has_xpr=skipping
+     else
+       coin_has_xpr=yes
+       XPR_DATA="$withval"
+     fi
+
 fi;
 fi
 
@@ -26687,14 +27021,25 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-  # construct dependencies variables from LIBS variables
-  # we add an extra space in LIBS so we can substitute out everything starting with " -"
-  # before, substitute out everything of the form -framework xxx as used on Mac
-  # also substitute out everything of the form `xxx`yyy (may have been added for cygwin/cl)
-  XPR_DEPENDENCIES=`echo " $XPR_LIBS" | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+  # Check whether --enable-interpackage-dependencies or --disable-interpackage-dependencies was given.
+if test "${enable_interpackage_dependencies+set}" = set; then
+  enableval="$enable_interpackage_dependencies"
 
-    SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+else
+  enable_interpackage_dependencies=yes
+fi;
 
+  if test $enable_interpackage_dependencies = yes ; then
+     # construct dependencies variables from LIBS variables
+     # we add an extra space in LIBS so we can substitute out everything starting with " -"
+     # remove everything of the form -framework xxx as used on Mac and mklxxx as used on Windows
+     # then remove everything of the form -xxx
+     # also remove everything of the form `xxx`yyy (may have been added for cygwin/cl)
+     XPR_DEPENDENCIES=`echo " $XPR_LIBS" | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+       SYMPHONYLIB_DEPENDENCIES=`echo " $SYMPHONYLIB_LIBS " | sed -e 's/ mkl[^ ]*//g' -e 's/ -framework  *[^ ]*//g' -e 's/ -[^ ]*//g' -e 's/\`[^\`]*\`[^ ]* //g'`
+
+  fi
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$XPR_CFLAGS" ; then
