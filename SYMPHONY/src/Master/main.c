@@ -671,7 +671,7 @@ int sym_read_line(const char *prompt, char **input)
    
   while(true){
      strcpy(getl, "");
-     printf(prompt);
+     printf("%s",prompt);
      fflush(stdout);
      fgets(getl, MAX_LINE_LENGTH, stdin);
 

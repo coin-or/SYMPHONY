@@ -53,7 +53,7 @@ double used_time(double *T)
    struct rusage x;
 
    (void) getrusage(RUSAGE_SELF, &x);
-   *T = (1e6 * x.ru_utime.tv_sec) + x.ru_utime.tv_usec;
+   *T = ((1e6 * (double) x.ru_utime.tv_sec) + (double)x.ru_utime.tv_usec);
    *T /= 1e6;
    return (*T - oldT);
 
