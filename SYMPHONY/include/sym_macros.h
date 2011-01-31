@@ -35,8 +35,8 @@
 {								             \
    if (!ptr || (oldsize < newsize)){				             \
       FREE(ptr);						             \
-      oldsize = newsize + (int)block_size;                                   \
-      ptr = (ptrtype *) malloc((size_t)(oldsize * sizeof(ptrtype)));	     \
+      oldsize = newsize + (int)(block_size);                                   \
+      ptr = (ptrtype *) malloc((size_t)(oldsize) * sizeof(ptrtype));	     \
    }								             \
 }
 

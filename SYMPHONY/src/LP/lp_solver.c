@@ -154,7 +154,7 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
 
    if (maxm > lp_data->maxm){
       resize_m = TRUE;
-      lp_data->maxm = maxm + (set_max ? 0 : (int)BB_BUNCH);
+      lp_data->maxm = maxm + (set_max ? 0 : (int)(BB_BUNCH));
       if (! do_realloc){
          FREE(lp_data->dualsol);
          lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
@@ -173,7 +173,7 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
    if (maxn > lp_data->maxn){
       // int oldmaxn = MAX(lp_data->maxn, lp_data->n);
       resize_n = TRUE;
-      lp_data->maxn = maxn + (set_max ? 0 : 5 * (int)BB_BUNCH);
+      lp_data->maxn = maxn + (set_max ? 0 : 5 * (int)(BB_BUNCH));
       if (! do_realloc){
          FREE(lp_data->x);
          lp_data->x = (double *) malloc(lp_data->maxn * DSIZE);
@@ -211,7 +211,7 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
       }
    }
    if (maxnz > lp_data->maxnz){
-      lp_data->maxnz = maxnz + (set_max ? 0 : 20 * (int)BB_BUNCH);
+      lp_data->maxnz = maxnz + (set_max ? 0 : 20 * (int)(BB_BUNCH));
    }
 
    /* re(m)alloc the tmp arrays */
