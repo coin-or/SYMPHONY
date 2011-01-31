@@ -420,7 +420,7 @@ bool OsiSymSolverInterface::setSymParam(OsiSymStrParam key,
 {
 
    switch(key){
-   case ' ':
+   // case ' ':
    default: 
       return false;
    }
@@ -648,7 +648,7 @@ bool OsiSymSolverInterface::getSymParam(OsiSymStrParam key,
 {
 
    switch(key){
-    case ' ':
+    // case ' ':
     default:
        return false;
    }
