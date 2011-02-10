@@ -22,8 +22,6 @@ AUTOMAKE_OPTIONS = foreign
 #                         unitTest for Symphony                        #
 ########################################################################
 
-test_srcdir = $(OSISRCDIR)/test
-
 AM_CPPFLAGS = $(OSITESTS_CFLAGS) $(SYMPHONYLIB_CFLAGS)
 SYMCPPFLAGS =
 SYMPCPPFLAGS =
@@ -133,56 +131,51 @@ punitTest_LDFLAGS = -rpath $(libdir)
 
 # We are using the Cbc solver executable to do the unit test
 
+if COIN_HAS_MIPLIB3
+MIPLIBDIR=$(MIPLIB3_DATA)
+else
+MIPLIBDIR = $(top_srcdir)/miplib3
+endif
+
 testFILES = air03 dcmulti egout flugpl khb05250 l152lav \
 	lseu mod010 p0033 p0201 stein27 vpm1
 
 test: unitTest$(EXEEXT)
-	if test x"$(DIRNETLIB)" != x; then \
-		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	if test x"$(NETLIB_DATA)" != x; then \
+		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
 	fi;
 	./unitTest$(EXEEXT) $$NETLIBARG -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA) | sed -e 's/\\\\/\\\\\\\\/g'`
 	
-#-T $(DATAOBJDIR)/miplib3 \
-#	-mpsDir=$(DATASRCDIR)/Sample \
-#	-netlibDir=$(DATAOBJDIR)/Netlib
-
 fulltest: check_files unitTest$(EXEEXT)
-	if test x"$(DIRNETLIB)" != x; then \
-		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	if test x"$(NETLIB_DATA)" != x; then \
+		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
 	fi;
-	./unitTest$(EXEEXT) $$NETLIBARG -T $(DATASRCDIR)/miplib3
-#	-mpsDir=$(DATASRCDIR)/Sample \
-#	-netlibDir=$(DATAOBJDIR)/Netlib
+	./unitTest$(EXEEXT) $$NETLIBARG -T $(MIPLIBDIR)
 
 ptest: punitTest$(EXEEXT)
-	if test x"$(DIRNETLIB)" != x; then \
-		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	if test x"$(NETLIB_DATA)" != x; then \
+		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
 	fi;
 	./punitTest$(EXEEXT) $$NETLIBARG -p 2
-#-T $(DATAOBJDIR)/miplib3 \
-#	-mpsDir=$(DATASRCDIR)/Sample \
-#	-netlibDir=$(DATAOBJDIR)/Netlib
 
 pfulltest: check_files punitTest$(EXEEXT)
-	if test x"$(DIRNETLIB)" != x; then \
-		NETLIBARG="-netlibDir $(DIRNETLIB) -testOsiSolverInterface"; \
+	if test x"$(NETLIB_DATA)" != x; then \
+		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
 	fi;
 	./punitTest$(EXEEXT) $$NETLIBARG -T $(DATAOBJDIR)/miplib3 -p 2
-#	-mpsDir=$(DATASRCDIR)/Sample \
-#	-netlibDir=$(DATAOBJDIR)/Netlib
 
 check_files:
-	  if test -r $(DATASRCDIR)/miplib3; then \
+	  if test -r $(MIPLIBDIR); then \
 	   echo "MIBLIB3 directory found..."; \
 	  else \
-	   echo "Downloading required test files"; \
-	   mkdir $(DATASRCDIR)/miplib3; \
+	   echo "Downloading required test files to $(MIPIBDIR)"; \
+	   mkdir $(MIPLIBDIR); \
 	   for file in $(testFILES); do \
-	       (echo $$file; svn cat https://projects.coin-or.org/svn/Data/stable/1.0/miplib3/$$file.gz >> $(DATASRCDIR)/miplib3/$$file.gz) \
+	       (echo $$file; svn cat https://projects.coin-or.org/svn/Data/stable/1.0/miplib3/$$file.gz >> $(MIPLIBDIR)/$$file.gz) \
 	   done; \
 	  fi; \
 	  echo "Uncompressing files"; \
-	  cd $(DATASRCDIR)/miplib3; \
+	  cd $(MIPLIBDIR); \
 	  for file in $(testFILES); do \
 	   if test -r $$file.gz; then \
 		(gzip -d $$file.gz) \
