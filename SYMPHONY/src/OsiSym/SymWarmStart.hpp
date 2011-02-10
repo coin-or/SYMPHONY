@@ -11,7 +11,7 @@
 /*                                                                           */
 /* The authors of this file are Menal Guzelsoy and Ted Ralphs                */
 /*                                                                           */
-/* This software is licensed under the Common Public License. Please see     */
+/* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/

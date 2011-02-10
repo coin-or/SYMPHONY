@@ -16,9 +16,9 @@
 # /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 # /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 # /*                                                                           */
-# /* (c) Copyright 2000-2010 Ted Ralphs. All Rights Reserved.                  */
+# /* (c) Copyright 2000-2011 Ted Ralphs. All Rights Reserved.                  */
 # /*                                                                           */
-# /* This software is licensed under the Common Public License. Please see     */
+# /* This software is licensed under the Eclipse Public License. Please see    */
 # /* accompanying file for terms.                                              */
 # /*                                                                           */
 # /*===========================================================================*/
@@ -1349,9 +1349,9 @@ gives unlimited permission to copy, distribute and modify it.
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2010 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2011 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
-/* This software is licensed under the Common Public License. Please see     */
+/* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
@@ -21081,9 +21081,9 @@ COIN_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
 # best would actually to use ${libdir}, since .pc files get installed into ${libdir}/pkgconfig,
 # unfortunately, ${libdir} expands to ${exec_prefix}/lib and ${exec_prefix} to ${prefix}...
 if test "x${prefix}" = xNONE ; then
-  COIN_PKG_CONFIG_PATH="${ac_default_prefix}/lib/pkgconfig:${COIN_PKG_CONFIG_PATH}"
+  COIN_PKG_CONFIG_PATH="${ac_default_prefix}/lib/pkgconfig:${ac_default_prefix}/share/pkgconfig:${COIN_PKG_CONFIG_PATH}"
 else
-  COIN_PKG_CONFIG_PATH="${prefix}/lib/pkgconfig:${COIN_PKG_CONFIG_PATH}"
+  COIN_PKG_CONFIG_PATH="${prefix}/lib/pkgconfig:${prefix}/share/pkgconfig:${COIN_PKG_CONFIG_PATH}"
 fi
 
 
@@ -21095,7 +21095,7 @@ if test "${with_coin_instdir+set}" = set; then
 echo "$as_me: error: argument for --with-coin-instdir not a directory" >&2;}
    { (exit 1); exit 1; }; }
    fi
-   COIN_PKG_CONFIG_PATH="$withval/lib/pkgconfig:${COIN_PKG_CONFIG_PATH}"
+   COIN_PKG_CONFIG_PATH="$withval/lib/pkgconfig:$withval/share/pkgconfig:${COIN_PKG_CONFIG_PATH}"
 
 fi;
 
@@ -21184,6 +21184,11 @@ if test "${with_coindepend_lib+set}" = set; then
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         COINDEPEND_LIBS_INSTALLED="$withval"
+         SYMPHONYLIB_LIBS_INSTALLED="$withval $SYMPHONYLIB_LIBS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -21199,7 +21204,12 @@ if test "${with_coindepend_incdir+set}" = set; then
      else
        coin_has_coindepend=yes
        COINDEPEND_CFLAGS="-I`${CYGPATH_W} $withval`"
-       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+       SYMPHONYLIB_CFLAGS="-I`${CYGPATH_W} $withval` $SYMPHONYLIB_CFLAGS"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         COINDEPEND_CFLAGS_INSTALLED="$COINDEPEND_CFLAGS"
+         SYMPHONYLIB_CFLAGS_INSTALLED="$COINDEPEND_CFLAGS $SYMPHONYLIB_CFLAGS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -21215,6 +21225,10 @@ if test "${with_coindepend_datadir+set}" = set; then
      else
        coin_has_coindepend=yes
        COINDEPEND_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         COINDEPEND_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -21656,6 +21670,11 @@ if test "${with_clp_lib+set}" = set; then
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         CLP_LIBS_INSTALLED="$withval"
+         SYMPHONYLIB_LIBS_INSTALLED="$withval $SYMPHONYLIB_LIBS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -21671,7 +21690,12 @@ if test "${with_clp_incdir+set}" = set; then
      else
        coin_has_clp=yes
        CLP_CFLAGS="-I`${CYGPATH_W} $withval`"
-       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+       SYMPHONYLIB_CFLAGS="-I`${CYGPATH_W} $withval` $SYMPHONYLIB_CFLAGS"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         CLP_CFLAGS_INSTALLED="$CLP_CFLAGS"
+         SYMPHONYLIB_CFLAGS_INSTALLED="$CLP_CFLAGS $SYMPHONYLIB_CFLAGS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -21687,6 +21711,10 @@ if test "${with_clp_datadir+set}" = set; then
      else
        coin_has_clp=yes
        CLP_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         CLP_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -22122,6 +22150,11 @@ if test "${with_dylp_lib+set}" = set; then
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         DYLP_LIBS_INSTALLED="$withval"
+         SYMPHONYLIB_LIBS_INSTALLED="$withval $SYMPHONYLIB_LIBS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -22137,7 +22170,12 @@ if test "${with_dylp_incdir+set}" = set; then
      else
        coin_has_dylp=yes
        DYLP_CFLAGS="-I`${CYGPATH_W} $withval`"
-       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+       SYMPHONYLIB_CFLAGS="-I`${CYGPATH_W} $withval` $SYMPHONYLIB_CFLAGS"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         DYLP_CFLAGS_INSTALLED="$DYLP_CFLAGS"
+         SYMPHONYLIB_CFLAGS_INSTALLED="$DYLP_CFLAGS $SYMPHONYLIB_CFLAGS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -22153,6 +22191,10 @@ if test "${with_dylp_datadir+set}" = set; then
      else
        coin_has_dylp=yes
        DYLP_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         DYLP_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -22588,6 +22630,11 @@ if test "${with_vol_lib+set}" = set; then
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         VOL_LIBS_INSTALLED="$withval"
+         SYMPHONYLIB_LIBS_INSTALLED="$withval $SYMPHONYLIB_LIBS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -22603,7 +22650,12 @@ if test "${with_vol_incdir+set}" = set; then
      else
        coin_has_vol=yes
        VOL_CFLAGS="-I`${CYGPATH_W} $withval`"
-       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+       SYMPHONYLIB_CFLAGS="-I`${CYGPATH_W} $withval` $SYMPHONYLIB_CFLAGS"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         VOL_CFLAGS_INSTALLED="$VOL_CFLAGS"
+         SYMPHONYLIB_CFLAGS_INSTALLED="$VOL_CFLAGS $SYMPHONYLIB_CFLAGS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -22619,6 +22671,10 @@ if test "${with_vol_datadir+set}" = set; then
      else
        coin_has_vol=yes
        VOL_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         VOL_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -23054,6 +23110,11 @@ if test "${with_cgl_lib+set}" = set; then
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         CGL_LIBS_INSTALLED="$withval"
+         SYMPHONYLIB_LIBS_INSTALLED="$withval $SYMPHONYLIB_LIBS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -23069,7 +23130,12 @@ if test "${with_cgl_incdir+set}" = set; then
      else
        coin_has_cgl=yes
        CGL_CFLAGS="-I`${CYGPATH_W} $withval`"
-       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+       SYMPHONYLIB_CFLAGS="-I`${CYGPATH_W} $withval` $SYMPHONYLIB_CFLAGS"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         CGL_CFLAGS_INSTALLED="$CGL_CFLAGS"
+         SYMPHONYLIB_CFLAGS_INSTALLED="$CGL_CFLAGS $SYMPHONYLIB_CFLAGS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -23085,6 +23151,10 @@ if test "${with_cgl_datadir+set}" = set; then
      else
        coin_has_cgl=yes
        CGL_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         CGL_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -23510,6 +23580,11 @@ if test "${with_ositests_lib+set}" = set; then
        coin_has_ositests=yes
        OSITESTS_LIBS="$withval"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         OSITESTS_LIBS_INSTALLED="$withval"
+
+       fi
      fi
 
 fi;
@@ -23526,6 +23601,11 @@ if test "${with_ositests_incdir+set}" = set; then
        coin_has_ositests=yes
        OSITESTS_CFLAGS="-I`${CYGPATH_W} $withval`"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         OSITESTS_CFLAGS_INSTALLED="$OSITESTS_CFLAGS"
+
+       fi
      fi
 
 fi;
@@ -23541,6 +23621,10 @@ if test "${with_ositests_datadir+set}" = set; then
      else
        coin_has_ositests=yes
        OSITESTS_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         OSITESTS_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -23946,6 +24030,11 @@ if test "${with_sample_lib+set}" = set; then
        coin_has_sample=yes
        SAMPLE_LIBS="$withval"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         SAMPLE_LIBS_INSTALLED="$withval"
+
+       fi
      fi
 
 fi;
@@ -23962,6 +24051,11 @@ if test "${with_sample_incdir+set}" = set; then
        coin_has_sample=yes
        SAMPLE_CFLAGS="-I`${CYGPATH_W} $withval`"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         SAMPLE_CFLAGS_INSTALLED="$SAMPLE_CFLAGS"
+
+       fi
      fi
 
 fi;
@@ -23977,6 +24071,10 @@ if test "${with_sample_datadir+set}" = set; then
      else
        coin_has_sample=yes
        SAMPLE_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         SAMPLE_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -24382,6 +24480,11 @@ if test "${with_netlib_lib+set}" = set; then
        coin_has_netlib=yes
        NETLIB_LIBS="$withval"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         NETLIB_LIBS_INSTALLED="$withval"
+
+       fi
      fi
 
 fi;
@@ -24398,6 +24501,11 @@ if test "${with_netlib_incdir+set}" = set; then
        coin_has_netlib=yes
        NETLIB_CFLAGS="-I`${CYGPATH_W} $withval`"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         NETLIB_CFLAGS_INSTALLED="$NETLIB_CFLAGS"
+
+       fi
      fi
 
 fi;
@@ -24413,6 +24521,10 @@ if test "${with_netlib_datadir+set}" = set; then
      else
        coin_has_netlib=yes
        NETLIB_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         NETLIB_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -24818,6 +24930,11 @@ if test "${with_miplib3_lib+set}" = set; then
        coin_has_miplib3=yes
        MIPLIB3_LIBS="$withval"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         MIPLIB3_LIBS_INSTALLED="$withval"
+
+       fi
      fi
 
 fi;
@@ -24834,6 +24951,11 @@ if test "${with_miplib3_incdir+set}" = set; then
        coin_has_miplib3=yes
        MIPLIB3_CFLAGS="-I`${CYGPATH_W} $withval`"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         MIPLIB3_CFLAGS_INSTALLED="$MIPLIB3_CFLAGS"
+
+       fi
      fi
 
 fi;
@@ -24849,6 +24971,10 @@ if test "${with_miplib3_datadir+set}" = set; then
      else
        coin_has_miplib3=yes
        MIPLIB3_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         MIPLIB3_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -25271,6 +25397,11 @@ if test "${with_cpx_lib+set}" = set; then
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         CPX_LIBS_INSTALLED="$withval"
+         SYMPHONYLIB_LIBS_INSTALLED="$withval $SYMPHONYLIB_LIBS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -25286,7 +25417,12 @@ if test "${with_cpx_incdir+set}" = set; then
      else
        coin_has_cpx=yes
        CPX_CFLAGS="-I`${CYGPATH_W} $withval`"
-       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+       SYMPHONYLIB_CFLAGS="-I`${CYGPATH_W} $withval` $SYMPHONYLIB_CFLAGS"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         CPX_CFLAGS_INSTALLED="$CPX_CFLAGS"
+         SYMPHONYLIB_CFLAGS_INSTALLED="$CPX_CFLAGS $SYMPHONYLIB_CFLAGS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -25302,6 +25438,10 @@ if test "${with_cpx_datadir+set}" = set; then
      else
        coin_has_cpx=yes
        CPX_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         CPX_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -25737,6 +25877,11 @@ if test "${with_glpk_lib+set}" = set; then
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         GLPK_LIBS_INSTALLED="$withval"
+         SYMPHONYLIB_LIBS_INSTALLED="$withval $SYMPHONYLIB_LIBS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -25752,7 +25897,12 @@ if test "${with_glpk_incdir+set}" = set; then
      else
        coin_has_glpk=yes
        GLPK_CFLAGS="-I`${CYGPATH_W} $withval`"
-       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+       SYMPHONYLIB_CFLAGS="-I`${CYGPATH_W} $withval` $SYMPHONYLIB_CFLAGS"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         GLPK_CFLAGS_INSTALLED="$GLPK_CFLAGS"
+         SYMPHONYLIB_CFLAGS_INSTALLED="$GLPK_CFLAGS $SYMPHONYLIB_CFLAGS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -25768,6 +25918,10 @@ if test "${with_glpk_datadir+set}" = set; then
      else
        coin_has_glpk=yes
        GLPK_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         GLPK_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -26204,6 +26358,11 @@ if test "${with_msk_lib+set}" = set; then
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         MSK_LIBS_INSTALLED="$withval"
+         SYMPHONYLIB_LIBS_INSTALLED="$withval $SYMPHONYLIB_LIBS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -26219,7 +26378,12 @@ if test "${with_msk_incdir+set}" = set; then
      else
        coin_has_msk=yes
        MSK_CFLAGS="-I`${CYGPATH_W} $withval`"
-       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+       SYMPHONYLIB_CFLAGS="-I`${CYGPATH_W} $withval` $SYMPHONYLIB_CFLAGS"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         MSK_CFLAGS_INSTALLED="$MSK_CFLAGS"
+         SYMPHONYLIB_CFLAGS_INSTALLED="$MSK_CFLAGS $SYMPHONYLIB_CFLAGS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -26235,6 +26399,10 @@ if test "${with_msk_datadir+set}" = set; then
      else
        coin_has_msk=yes
        MSK_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         MSK_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;
@@ -26671,6 +26839,11 @@ if test "${with_xpr_lib+set}" = set; then
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
 
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         XPR_LIBS_INSTALLED="$withval"
+         SYMPHONYLIB_LIBS_INSTALLED="$withval $SYMPHONYLIB_LIBS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -26686,7 +26859,12 @@ if test "${with_xpr_incdir+set}" = set; then
      else
        coin_has_xpr=yes
        XPR_CFLAGS="-I`${CYGPATH_W} $withval`"
-       SYMPHONYLIB_CFLAGS="$withval $SYMPHONYLIB_CFLAGS"
+       SYMPHONYLIB_CFLAGS="-I`${CYGPATH_W} $withval` $SYMPHONYLIB_CFLAGS"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         XPR_CFLAGS_INSTALLED="$XPR_CFLAGS"
+         SYMPHONYLIB_CFLAGS_INSTALLED="$XPR_CFLAGS $SYMPHONYLIB_CFLAGS_INSTALLED"
+       fi
      fi
 
 fi;
@@ -26702,6 +26880,10 @@ if test "${with_xpr_datadir+set}" = set; then
      else
        coin_has_xpr=yes
        XPR_DATA="$withval"
+       # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
+       if test -z "$PKG_CONFIG" ; then
+         XPR_DATA_INSTALLED="$withval"
+       fi
      fi
 
 fi;

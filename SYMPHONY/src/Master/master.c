@@ -5,9 +5,9 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2010 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2011 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
-/* This software is licensed under the Common Public License. Please see     */
+/* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
@@ -64,7 +64,7 @@ void sym_version(void)
 {
    printf("\n");
    printf("==  Welcome to the SYMPHONY MILP Solver \n");
-   printf("==  Copyright 2000-2010 Ted Ralphs and others \n");
+   printf("==  Copyright 2000-2011 Ted Ralphs and others \n");
    printf("==  All Rights Reserved. \n");
    printf("==  Distributed under the Common Public License 1.0 \n");
    if (strcmp(SYMPHONY_VERSION, "trunk")){

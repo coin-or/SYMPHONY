@@ -7,9 +7,9 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2010 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2011 Lehigh University. All Rights Reserved.           #
 #                                                                           #
-# This software is licensed under the Common Public License. Please see     #
+# This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
 #                                                                           #
 #===========================================================================#
@@ -32,9 +32,9 @@ AC_COPYRIGHT([
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2010 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2011 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
-/* This software is licensed under the Common Public License. Please see     */
+/* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
