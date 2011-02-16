@@ -2329,7 +2329,7 @@ int shift_solution(lp_prob *p, LPdata *lp_data, double *solutionValue,
 
    /* now, row_act, row_frac_cnt, up_inf_cnt, down_inf_cnt, frac_ind, frac_cnt are filled */
 
-   int shift_limit = 100, shift_cnt = 0;
+   int shift_limit = 20, shift_cnt = 0;
    int col_ind, proc_row_ind, proc_col_ind, proc_col_dir, col_dir;  
    double min_diff, min_frac_diff, diff, proc_col_coeff, proc_new_bound;   
    double score, min_score;
@@ -3750,11 +3750,11 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
    //int search_k = MIN((int)(int_cnt/2.0), p->par.lb_search_k);
    int search_k;
    if(p->bc_index < 1){
-      search_k = MIN(8, (int)(int_cnt/5.0));
+      search_k = MIN(4, (int)(int_cnt/5.0));
    }else if(p->tm->stat.analyzed < 100){
-      search_k = MIN(8, (int)(int_cnt/10.0));
+      search_k = MIN(3, (int)(int_cnt/10.0));
    }else{
-      search_k = MIN(8, (int)(int_cnt/20.0));
+      search_k = MIN(3, (int)(int_cnt/20.0));
    }
 
    //search_k = 5;
@@ -3771,13 +3771,13 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
 			     lb, ub, is_int, obj, NULL, sense, 
 			     rhs, rngval, FALSE);
    
-   int node_limit = 20; 
+   int node_limit = 10; 
    double gap_limit_orig = 1.0;
 
    sym_set_int_param(env, "node_limit", node_limit);
 
-   sym_set_int_param(env, "fr_dive_level", p->par.fr_dive_level - 1);
-   sym_set_int_param(env, "rs_dive_level", p->par.rs_dive_level - 1);
+   sym_set_int_param(env, "fr_dive_level", -1);//p->par.fr_dive_level - 1);
+   sym_set_int_param(env, "rs_dive_level", -1);//p->par.rs_dive_level - 1);
    sym_set_int_param(env, "lb_dive_level", -1);
    sym_set_int_param(env, "fp_enabled", -1);
    sym_set_int_param(env, "ds_guided_enabled", FALSE);
@@ -3787,11 +3787,11 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
    sym_set_int_param(env, "ds_fractional_enabled", FALSE);
    sym_set_int_param(env, "ds_euc_enabled", FALSE);
 
-   sym_set_int_param(env, "probing_max_depth", 5);
+   sym_set_int_param(env, "probing_max_depth", 1);
    sym_set_int_param(env, "gomory_max_depth", 20);
    sym_set_int_param(env, "generate_cgl_flowcover_cuts", 2);
-   sym_set_int_param(env, "clique_max_depth", 5);
-   sym_set_int_param(env, "knapsack_max_depth", 5);
+   sym_set_int_param(env, "clique_max_depth", 1);
+   sym_set_int_param(env, "knapsack_max_depth", 1);
    
    if(p->par.lb_first_feas_enabled){
       sym_set_int_param(env, "find_first_feasible", TRUE);
@@ -3813,17 +3813,20 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
 
    int analyzed_nodes = 0;
    int analyzed_nodes_limit = 100;
-   int search_cnt_limit = 5;
+   int search_cnt_limit = 3;
    int relax_search_cnt = 0;
    int c_ind, nz_ind, relax_search; 
 
-   if(p->lp_stat.lb_calls > 2) search_cnt_limit = 2;
+   if(p->lp_stat.lb_calls > 2) search_cnt_limit = 1;
    
-   while(analyzed_nodes < analyzed_nodes_limit && relax_search_cnt < search_cnt_limit){
+   while(analyzed_nodes < analyzed_nodes_limit &&
+	 relax_search_cnt < search_cnt_limit){
 
       //printf("cnt - k: %i - %i\n", relax_search_cnt, search_k);
       
-      double gap_limit = MIN(gap_limit_orig, (*solutionValue + p->mip->obj_offset)*gap_limit_orig/(*solutionValue - obj_offset));
+      double gap_limit = MIN(gap_limit_orig,
+			     (*solutionValue + p->mip->obj_offset)*
+			     gap_limit_orig/(*solutionValue - obj_offset));
       
       //printf("gap_limit: %f\n", gap_limit);
       
@@ -3848,7 +3851,7 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
 	 sym_get_obj_val(env, solutionValue);
 	 *solutionValue += obj_offset;
 	 is_ip_feasible = TRUE;
-
+	 break;
 	 double dual_gap = d_gap(*solutionValue, t_lb, p->mip->obj_offset,
 				 p->mip->obj_sense);
 	 
@@ -4711,11 +4714,11 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
   sym_set_dbl_param(env, "fp_fix_ratio", 0.5); 
   //sym_set_int_param(env, "use_branching_prep", 1);
   
-  sym_set_int_param(env, "probing_max_depth", 5);
+  sym_set_int_param(env, "probing_max_depth", 1);
   sym_set_int_param(env, "gomory_max_depth", 20);
   sym_set_int_param(env, "generate_cgl_flowcover_cuts", 2);
-  sym_set_int_param(env, "clique_max_depth", 5);
-  sym_set_int_param(env, "knapsack_max_depth", 5);
+  sym_set_int_param(env, "clique_max_depth", 1);
+  sym_set_int_param(env, "knapsack_max_depth", 1);
   sym_set_int_param(env, "rel_br_cand_threshold", 2);
   sym_set_int_param(env, "rel_br_threshold", 2);
   //sym_set_int_param(env, "generate_cgl_probing_cuts", 2);

@@ -357,8 +357,8 @@ int sym_set_defaults(sym_environment *env)
    lp_par->cgl.use_chain_strategy = TRUE;
    lp_par->cgl.chain_status = CGL_CHAIN_START;
    lp_par->cgl.max_chain_backtrack = 1;
-   lp_par->cgl.max_chain_trial_num = 20;
-   lp_par->cgl.chain_trial_freq = 3;
+   lp_par->cgl.max_chain_trial_num = 10;
+   lp_par->cgl.chain_trial_freq = 10;
    lp_par->cgl.chain_weighted_gap = 9.333e-6;
    lp_par->cgl.chain_br_weighted_gap = 0.000933; 
    

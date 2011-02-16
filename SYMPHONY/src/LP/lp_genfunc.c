@@ -274,6 +274,8 @@ int fathom_branch(lp_prob *p)
          }
          termcode = initial_lp_solve(lp_data, &iterd);
       } else {
+	 //if(p->iter_num==122)
+	 //  write_mps(lp_data, "mzzv_err");
 	 termcode = dual_simplex(lp_data, &iterd);
          //termcode = initial_lp_solve(lp_data, &iterd);
       }
@@ -1228,7 +1230,6 @@ int check_tailoff(lp_prob *p)
   
    int i;
    double sum, ub;
-   int maxsteps = MAX(gap_backsteps, obj_backsteps);
 
    if(p->bc_index < 1){
       tailoff_gap_frac *= 1.0091;
@@ -1238,12 +1239,14 @@ int check_tailoff(lp_prob *p)
       tailoff_obj_frac *= 1.133;
    }
 
-   if((p->lp_data->m - p->mip->m)/(1.0*p->mip->m) < 0.2 && p->tm->stat.analyzed < 1000){
+   if((p->lp_data->m - p->mip->m)/(1.0*p->mip->m) < 0.2 && p->tm->stat.analyzed < 100){
       //tailoff_gap_frac *= 1.0091;
       //tailoff_obj_frac /= 7.333; 
       gap_backsteps = 4;
       obj_backsteps = 5;
    }
+
+   int maxsteps = MAX(gap_backsteps, obj_backsteps);
    
    //if(p->tm->stat.analyzed > 1000 && p->node_iter_num > 1) return TRUE;
    
@@ -1349,7 +1352,13 @@ int check_tailoff(lp_prob *p)
 	    }
 	 }
 	 //printf("tailoff-obj-gap: %f %f\n", sum/(obj_backsteps-1), tailoff_obj_frac);	 
-	 if (sum / (obj_backsteps - 1) < tailoff_obj_frac){
+	 double init_obj = obj_hist[MIN(p->node_iter_num-1, maxsteps)];
+	 double prog = 10*p->par.tailoff_absolute; 
+	 if(init_obj > p->lp_data->lpetol || init_obj < -p->lp_data->lpetol){
+	    prog = (obj_hist[0] - init_obj)/(fabs(init_obj));
+	 }
+
+	 if (sum / (obj_backsteps - 1) < tailoff_obj_frac && prog < 5*p->par.tailoff_absolute){
 	    PRINT(p->par.verbosity, 3, ("Branching because of tailoff in "
 					"objective function!\n"));
 	    PRINT(p->par.verbosity, 3, ("sum/n = %f, tailoff_obj_frac = %f\n",sum /
@@ -1361,13 +1370,19 @@ int check_tailoff(lp_prob *p)
       /* Another check. All other checks seem to show that there is no
        * tailoff yet. 
        */
-      if (p->bc_level > 0 && p->node_iter_num>1 && 
-	    obj_hist[0] - obj_hist[1] < p->par.tailoff_absolute){
+      if (p->bc_level > 0 && ((p->node_iter_num > 1 && fabs(obj_hist[0]) > p->lp_data->lpetol) || p->node_iter_num > maxsteps) && 
+	  (obj_hist[0] - obj_hist[1] < p->par.tailoff_absolute)){
 	 PRINT(p->par.verbosity, 3, ("Branching because of tailoff in "
 				     "value of objective function!\n"));
-	 //printf("tailoff-absolute: %f %f\n", obj_hist[0] - obj_hist[1], p->par.tailoff_absolute);
 	 return(TRUE);
       }
+
+      //if(p->bc_level > 0 && p->node_iter_num > maxsteps && init_obj > p->lp_data->lpetol &&
+      // (obj_hist[0] - init_obj)/(fabs(init_obj)) < 5*p->par.tailoff_absolute){
+      // PRINT(p->par.verbosity, 3, ("Branching because of tailoff in "
+      //			     "value of objective function II!\n"));
+      // return(TRUE);	 
+      //}      
       //printf("tailoff-absolute: %f %f\n", obj_hist[0] - obj_hist[1], p->par.tailoff_absolute);
    } else {
       /* Both gap_backsteps and obj_backsteps are too small to procede with
@@ -3060,7 +3075,9 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    double       *random_hash = lp_data->random_hash;
    const double lpetol = lp_data->lpetol;
    const double etol10 = lpetol * 10;
-   //const double etol100 = lpetol * 100;
+   const double etol50 = lpetol * 50;
+   const double etol500 = lpetol * 500;
+   const double etol100 = lpetol * 100;
    const double etol1000 = lpetol * 1000;
    const double *x     = lp_data->x;
    OsiRowCut    row_cut;
@@ -3097,7 +3114,14 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    
    int accepted_cnt = 0; 
    //j = 0;
+   double fabs_value = 0.0; 
 
+   //if(p->bc_level < 10 && (generator == CGL_GOMORY_GENERATOR ||
+   //		   generator == CGL_TWOMIR_GENERATOR)){
+   //  max_elements *= 5; 
+   //}
+   int v_level; 
+   double coeff_ratio; 
    for (i=0; i<num_row_cuts; i++) {
       /* check for violation, duplicacy, quality of coefficients, length */
       row_cut = cutlist->rowCut(i);
@@ -3117,6 +3141,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       if (num_elements > max_elements){
          PRINT(verbosity,5,("Threw out cut because its length %d is too "
                   "high.\n\n\n", num_elements));
+	 //printf("%i %i %i \n", num_elements, max_elements, generator); 
          num_poor_quality++;
          //is_deleted[i] = TRUE;
          continue;
@@ -3131,11 +3156,12 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 	 if(!(lp_data->vars[indices[el_num]]->is_int)) is_int = FALSE; 
 
 	 // printf("%f\n", elements[el_num]);
-         if (fabs(elements[el_num])>max_coeff) {
-            max_coeff = fabs(elements[el_num]);
+	 fabs_value = fabs(elements[el_num]); 
+         if (fabs_value>max_coeff) {
+            max_coeff = fabs_value; 
          }
-         if (fabs(elements[el_num]) < min_coeff) {
-            min_coeff = fabs(elements[el_num]);
+         if (fabs_value < min_coeff) {
+            min_coeff = fabs_value;
          }
          tmp_matind[el_num] = vars[indices[el_num]]->userind;
          hash_value += elements[el_num]*random_hash[tmp_matind[el_num]];
@@ -3143,14 +3169,17 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       }
       //hashes[*num_cuts + accepted_cnt] = hash_value;
       /* see rhs as well */
-      if (fabs(rhs) > lpetol) {
-         if (fabs(rhs) < min_coeff) { 
-            min_coeff = fabs(rhs);
+#if 1
+      fabs_value = fabs(rhs); 
+      if (fabs_value > lpetol) {
+         if (fabs_value < min_coeff) { 
+            min_coeff = fabs_value;
          }
-         if (fabs(rhs) > max_coeff) {
-            max_coeff = fabs(rhs);
+         if (fabs_value > max_coeff) {
+            max_coeff = fabs_value; 
          }
       }
+#endif
       switch (row_cut.sense()) {
        case 'L':
          violation -= rhs;
@@ -3162,10 +3191,11 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
          violation = fabs(rhs - violation);
          break;
       }
-      
+      //v_level = 1; 
+      coeff_ratio = min_coeff/max_coeff; 
       /* check quality */
       if (num_elements>0) {
-         if ( (max_coeff > 0 && min_coeff/max_coeff < etol1000)||
+         if ( (max_coeff > 0 && coeff_ratio < etol1000)||
 	      (min_coeff > 0 && min_coeff < etol1000) ) {
             PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));
 	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
@@ -3173,21 +3203,25 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 	    //is_deleted[i] = TRUE;
 	    continue;
          }
+
+	 //if (max_coeff > 0 && coeff_ratio < etol100) v_level = 100;
+	 //else if (max_coeff > 0 && coeff_ratio < etol1000) v_level = 10;	 
       }
       
       /* check violation */
       //if ((!is_int && violation < lpetol) || (is_int && violation < 100*lpetol)){// && generator != CGL_PROBING_GENERATOR) {
-      if (violation < etol10){
+      if (violation < etol10){//*v_level){
          PRINT(verbosity,5,("violation = %f. Threw out cut.\n", 
 			    violation));
          num_unviolated++;
          //is_deleted[i] = TRUE;
          continue;
       }//else printf("violation - %f \n", violation);
-      
+
+#if 0      
       /* check for duplicates */
       if (num_elements>0) {
-	 int c_ind; 
+	 //int c_ind; 
          for (k=accepted_cnt + *num_cuts-1; k>-1; k--) {
             //if (is_deleted[k] == TRUE) {
 	    //  continue;
@@ -3201,13 +3235,13 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
             }
          }
          if (k>-1) {
-            PRINT(verbosity,5,("cut #%d is same as cut #%d\n", i, c_ind));
+            PRINT(verbosity,5,("cut #%d is same as cut #%d\n", i, k));
             num_duplicate++;
             //is_deleted[i] = TRUE;
             continue;
          }
       }
-
+#endif
       /* check if sense is 'R' */
       if (row_cut.sense()=='R') {
          PRINT(verbosity,5,("cut #%d has a range. thrown out.\n", i));
@@ -3241,7 +3275,40 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 #endif
    }
 
-   int * rc_ind; 
+   /* check for duplicates */
+   hashes += *num_cuts; 
+   qsort_di(hashes, accepted_ind, accepted_cnt);
+   int l_ind, r_ind, c_ind;
+   int move_ratio = num_row_cuts + 100; 
+   for(l_ind = 0; l_ind < accepted_cnt;){
+      c_ind = accepted_ind[l_ind]; 
+      accepted_ind[l_ind] += move_ratio; 
+      for(r_ind = l_ind + 1; r_ind < accepted_cnt; r_ind++){
+	 if(fabs(hashes[l_ind] - hashes[r_ind]) < lpetol){
+            PRINT(verbosity,5,("cut #%i is same as cut #%i\n", c_ind, accepted_ind[r_ind]));
+            num_duplicate++;
+            //is_deleted[i] = TRUE;
+	    r_ind++;
+	 }else{
+	    l_ind = r_ind; 
+	    break;
+	 }
+      }
+      if(r_ind >= accepted_cnt) break; 
+   }
+
+   r_ind = accepted_cnt;
+   accepted_cnt = 0; 
+   for(l_ind = 0; l_ind < r_ind; l_ind++){
+      c_ind = accepted_ind[l_ind] - move_ratio;
+      if(c_ind >= 0){
+	 hashes[accepted_cnt] = hashes[l_ind];
+	 accepted_ind[accepted_cnt++] = c_ind;
+      }
+   }
+   hashes -= *num_cuts; 
+
+   int * rc_ind = 0; 
    int rc_cnt = 0; 
    if (p->bc_index > 0 && p->mip->mip_inf && p->mip->mip_inf->c_num && generator == CGL_NUM_GENERATORS - 1){
       //generator < 0){// || generator == CGL_NUM_GENERATORS - 1){ /* first try root cuts, if don't work then iterate */
@@ -3294,7 +3361,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 	    break;
 	 }
 
-	 if (violation < 100*lpetol){
+	 if (violation < etol100){
 	    continue;
 	 }
 
@@ -3340,6 +3407,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
 	 //  continue;
 	 //}
 	 ind = accepted_ind[i]; 
+	 //if(ind - move_ratio < 0) continue; 
 	 row_cut = cutlist->rowCut(ind);
 	 num_elements = row_cut.row().getNumElements();
 	 //PRINT(verbosity, -1,("length = %d \n", num_elements));

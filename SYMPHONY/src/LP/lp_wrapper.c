@@ -957,8 +957,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	 }
       }
 
-      if(feasible != IP_HEUR_FEASIBLE && p->par.shifting_enabled && dual_gap > p->par.shifting_min_gap){
-	 
+      if(feasible != IP_HEUR_FEASIBLE && p->par.shifting_enabled && dual_gap > p->par.shifting_min_gap && 
+	 p->bc_level % 5 == 0){
 	 if (shift_solution(p, p->lp_data, &true_objval, heur_solution, t_lb)){	 
 	    feasible = IP_HEUR_FEASIBLE;
 	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
