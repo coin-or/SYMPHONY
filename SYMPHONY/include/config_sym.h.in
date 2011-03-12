@@ -111,5 +111,14 @@
 /* Version number of project */
 #undef SYMPHONY_VERSION
 
+/* Major Version number of project */
+#undef SYMPHONY_VERSION_MAJOR
+
+/* Minor Version number of project */
+#undef SYMPHONY_VERSION_MINOR
+
+/* Release Version number of project */
+#undef SYMPHONY_VERSION_RELEASE
+
 /* Version number of package */
 #undef VERSION
