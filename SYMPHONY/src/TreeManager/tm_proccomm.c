@@ -680,6 +680,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 
    if (node_type == INTERRUPTED_NODE){
       n->node_status = NODE_STATUS__INTERRUPTED;
+#pragma omp critical (tree_update)
       insert_new_node(tm, n);
       return;
    }
