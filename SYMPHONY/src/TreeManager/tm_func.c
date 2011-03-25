@@ -893,7 +893,8 @@ bc_node *del_best_node(tm_prob *tm)
    best_node = list[1];
    
    temp = list[1] = list[size];
-   printf("%d %d \n", tm->samephase_candnum = --size, list[tm->samephase_candnum]->bc_index);
+   
+   tm->samephase_candnum = --size;
 
    if (tm->par.verbosity > 10)
       if (tm->samephase_candnum % 10 == 0)
