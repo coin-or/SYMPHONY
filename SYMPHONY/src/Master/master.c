@@ -3750,37 +3750,39 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    }
 
 
-   tmp_ind = (int*)malloc(ISIZE*env->mip->n);
-
-   for (i = 0; i < env->mip->n; i++){
-      if (colsol[i] > lpetol || colsol[i] < - lpetol){
-	 tmp_ind[nz] = i;
-	 nz++;
-      }
-   }
-
-   sol = &(env->best_sol);
-   if(sol->xlength){
-      FREE(sol->xind);
-      FREE(sol->xval);
-   }
-   
-   sol->xlength = nz;
-   sol->objval = 0.0;
-
-   if(nz){
-      sol->xval = (double*)calloc(nz,DSIZE);
-      sol->xind = (int*)malloc(ISIZE*nz);
-      memcpy(sol->xind, tmp_ind, ISIZE*nz);
-      for (i = 0; i < nz; i++){
-	 sol->xval[i] = colsol[tmp_ind[i]];
-	 sol->objval += sol->xval[i] * env->mip->obj[tmp_ind[i]]; 
-      }
-   }
-   
    if (feasible){
       /* now, it is feasible, set the best_sol to colsol */
       //FIXME
+
+      tmp_ind = (int*)malloc(ISIZE*env->mip->n);
+
+      for (i = 0; i < env->mip->n; i++){
+	 if (colsol[i] > lpetol || colsol[i] < - lpetol){
+	    tmp_ind[nz] = i;
+	    nz++;
+	 }
+      }
+
+      sol = &(env->best_sol);
+
+      if(sol->xlength){
+	 FREE(sol->xind);
+	 FREE(sol->xval);
+      }
+   
+      sol->xlength = nz;
+      sol->objval = 0.0;
+
+      if(nz){
+	 sol->has_sol = TRUE;
+	 sol->xval = (double*)calloc(nz,DSIZE);
+	 sol->xind = (int*)malloc(ISIZE*nz);
+	 memcpy(sol->xind, tmp_ind, ISIZE*nz);
+	 for (i = 0; i < nz; i++){
+	    sol->xval[i] = colsol[tmp_ind[i]];
+	    sol->objval += sol->xval[i] * env->mip->obj[tmp_ind[i]]; 
+	 }
+      }
       
       if (env->has_ub_estimate){
 	 if (env->ub_estimate > sol->objval)
@@ -3804,10 +3806,6 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       //      env->best_sol.objval = SYM_INFINITY;
       env->best_sol.objval = 0.0;
    }  
-
-   if (rowAct){
-      FREE(rowAct);
-   }
 
    FREE(tmp_ind);
    
