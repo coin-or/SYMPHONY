@@ -710,6 +710,9 @@ int sym_solve(sym_environment *env)
 
    start_time = wall_clock(NULL);
 
+   double *tmp_sol;
+   lp_sol *best_sol = &(env->best_sol);
+   
 #ifndef USE_SYM_APPLICATION   
 
    /* we send environment in just because we may need to 
@@ -733,16 +736,16 @@ int sym_solve(sym_environment *env)
       }else if(termcode == PREP_UNBOUNDED){
 	 return(env->termcode = PREP_UNBOUNDED);
       }else if(termcode == PREP_SOLVED){
-	 env->best_sol.has_sol = TRUE;
-	 env->best_sol.xind = (int *) malloc(ISIZE *
+	 best_sol->has_sol = TRUE;
+	 best_sol->xind = (int *) malloc(ISIZE *
 					     env->prep_mip->fixed_n);
-	 env->best_sol.xval = (double *) malloc(DSIZE *
+	 best_sol->xval = (double *) malloc(DSIZE *
 						env->prep_mip->fixed_n); 
 	 
-	 env->best_sol.xlength = env->prep_mip->fixed_n;
-	 memcpy(env->best_sol.xind, env->prep_mip->fixed_ind, ISIZE *
+	 best_sol->xlength = env->prep_mip->fixed_n;
+	 memcpy(best_sol->xind, env->prep_mip->fixed_ind, ISIZE *
 		env->prep_mip->fixed_n);
-	 memcpy(env->best_sol.xval, env->prep_mip->fixed_val, ISIZE *
+	 memcpy(best_sol->xval, env->prep_mip->fixed_val, ISIZE *
 		env->prep_mip->fixed_n);
 	 
 	 return(env->termcode = PREP_OPTIMAL_SOLUTION_FOUND);
@@ -937,6 +940,16 @@ int sym_solve(sym_environment *env)
 #endif
 #endif
 
+   // Check stored solution to see if it is still feasible
+
+   if (best_sol->has_sol){
+      tmp_sol = (double *) calloc(env->mip->n, DSIZE);
+      for (i = 0; i < best_sol->xlength; i++){
+	 tmp_sol[best_sol->xind[i]] = best_sol->xval[i];
+      }
+      sym_set_col_solution(env, tmp_sol);
+   }
+   
    //   memset(&(env->best_sol), 0, sizeof(lp_sol));
 
    if (env->warm_start && env->par.tm_par.warm_start){
@@ -954,9 +967,9 @@ int sym_solve(sym_environment *env)
 	 }
 	 tm->has_ub = TRUE;
       }
-      if (env->best_sol.objval < env->warm_start->best_sol.objval){
-	 FREE(env->best_sol.xind);
-	 FREE(env->best_sol.xval);
+      if (best_sol->objval < env->warm_start->best_sol.objval){
+	 FREE(best_sol->xind);
+	 FREE(best_sol->xval);
 	 env->best_sol = env->warm_start->best_sol;
       }
       tm->phase = env->warm_start->phase;
@@ -1184,8 +1197,8 @@ int sym_solve(sym_environment *env)
    if (env->tm->lpp[thread_num]){
       env->par.lp_par.cgl = env->tm->lpp[thread_num]->par.cgl;
       if (env->tm->lpp[thread_num]->best_sol.has_sol){
-	 FREE(env->best_sol.xind);
-	 FREE(env->best_sol.xval);
+	 FREE(best_sol->xind);
+	 FREE(best_sol->xval);
 	 env->best_sol = 
 	    env->tm->lpp[thread_num]->best_sol;
       }else {
@@ -1194,24 +1207,24 @@ int sym_solve(sym_environment *env)
    }
 #else
    if (env->tm->best_sol.has_sol){
-     FREE(env->best_sol.xind);
-     FREE(env->best_sol.xval);
+     FREE(best_sol->xind);
+     FREE(best_sol->xval);
      env->best_sol = env->tm->best_sol;
    }
 #endif
       
-   if (env->best_sol.has_sol) {
+   if (best_sol->has_sol) {
       memcpy(&env->warm_start->best_sol, &env->best_sol, sizeof(lp_sol) *1);
       env->warm_start->best_sol.xind = 0;
       env->warm_start->best_sol.xval = 0;
-      if(env->best_sol.xlength){
-	 env->warm_start->best_sol.xind = (int *) malloc(ISIZE * env->best_sol.xlength);
+      if(best_sol->xlength){
+	 env->warm_start->best_sol.xind = (int *) malloc(ISIZE * best_sol->xlength);
 	 env->warm_start->best_sol.xval = (double *) malloc(DSIZE * 
-							    env->best_sol.xlength);
+							    best_sol->xlength);
 	 memcpy(env->warm_start->best_sol.xind, 
-		env->best_sol.xind, ISIZE * env->best_sol.xlength);
+		best_sol->xind, ISIZE * best_sol->xlength);
 	 memcpy(env->warm_start->best_sol.xval, 
-		env->best_sol.xval, DSIZE * env->best_sol.xlength);	
+		best_sol->xval, DSIZE * best_sol->xlength);	
       }
    }
 
@@ -1249,9 +1262,9 @@ int sym_solve(sym_environment *env)
       because it doesn't know whether a solution was found. This should be
       changed. */
    if (termcode == TM_FINISHED){
-      if (tm->par.find_first_feasible && env->best_sol.has_sol){
+      if (tm->par.find_first_feasible && best_sol->has_sol){
 	 termcode = TM_FOUND_FIRST_FEASIBLE;
-      }else if (env->best_sol.has_sol){
+      }else if (best_sol->has_sol){
 	 termcode = TM_OPTIMAL_SOLUTION_FOUND;
       }else{
 	 termcode = TM_NO_SOLUTION;
@@ -1261,7 +1274,7 @@ int sym_solve(sym_environment *env)
    /* Not sure of the reason for this */
    else if((termcode == TM_ERROR__NUMERICAL_INSTABILITY ||
 	    termcode == SOMETHING_DIED) && 
-	   env->best_sol.xlength ){
+	   best_sol->xlength ){
      termcode = TM_FEASIBLE_SOLUTION_FOUND;
    }
 #endif
