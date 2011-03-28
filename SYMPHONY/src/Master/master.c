@@ -954,9 +954,11 @@ int sym_solve(sym_environment *env)
 	 }
 	 tm->has_ub = TRUE;
       }
-      FREE(env->best_sol.xind);
-      FREE(env->best_sol.xval);
-      env->best_sol = env->warm_start->best_sol;
+      if (env->best_sol.objval < env->warm_start->best_sol.objval){
+	 FREE(env->best_sol.xind);
+	 FREE(env->best_sol.xval);
+	 env->best_sol = env->warm_start->best_sol;
+      }
       tm->phase = env->warm_start->phase;
    }else if (env->warm_start){
       /* Otherwise, free what was saved */
@@ -973,17 +975,6 @@ int sym_solve(sym_environment *env)
 	    }
 	 FREE(env->warm_start->cuts);
       }
-      if(env->best_sol.xlength){
-	 FREE(env->best_sol.xind);
-	 FREE(env->best_sol.xval);
-      }
-      memset(&(env->best_sol), 0, sizeof(lp_sol));
-   }else{
-      if(env->best_sol.xlength){
-	 FREE(env->best_sol.xind);
-	 FREE(env->best_sol.xval);
-      }
-      memset(&(env->best_sol), 0, sizeof(lp_sol));
    }
    /* Now the tree manager owns everything */
    FREE(env->warm_start);
