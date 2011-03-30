@@ -640,6 +640,7 @@ int sym_load_problem(sym_environment *env)
    env->comp_times.readtime = used_time(&t);
 
    env->termcode = TM_NO_SOLUTION;
+   env->mip->is_modified = TRUE; 
 
    return(termcode);
 }
@@ -712,6 +713,14 @@ int sym_solve(sym_environment *env)
 
    double *tmp_sol;
    lp_sol *best_sol = &(env->best_sol);
+
+   if(best_sol->has_sol && env->mip->is_modified){
+      FREE(best_sol->xind);
+      FREE(best_sol->xval);
+      best_sol->has_sol = FALSE;
+   }
+
+   env->mip->is_modified = FALSE;
    
 #ifndef USE_SYM_APPLICATION   
 
@@ -967,7 +976,7 @@ int sym_solve(sym_environment *env)
 	 }
 	 tm->has_ub = TRUE;
       }
-      if (best_sol->objval < env->warm_start->best_sol.objval){
+      if (best_sol->objval > env->warm_start->best_sol.objval){
 	 FREE(best_sol->xind);
 	 FREE(best_sol->xval);
 	 env->best_sol = env->warm_start->best_sol;
@@ -2589,6 +2598,7 @@ int sym_explicit_load_problem(sym_environment *env, int numcols, int numrows,
    env->comp_times.readtime = used_time(&t);
  
    env->termcode = TM_NO_SOLUTION;
+   env->mip->is_modified = TRUE; 
 
    return termcode;
 }
@@ -3771,7 +3781,8 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    
    sol->xlength = nz;
    sol->objval = 0.0;
-
+   sol->has_sol = FALSE;
+   
    if(nz){
       sol->xval = (double*)calloc(nz,DSIZE);
       sol->xind = (int*)malloc(ISIZE*nz);
@@ -3803,7 +3814,7 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
 	 env->has_ub = TRUE;
 	 env->ub = sol->objval;
       }
-
+      sol->has_sol = TRUE; 
    }else{
       //      env->best_sol.objval = SYM_INFINITY;
       env->best_sol.objval = 0.0;
@@ -3814,6 +3825,7 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
    }
 
    FREE(tmp_ind);
+   env->mip->is_modified = FALSE; 
    
    return(FUNCTION_TERMINATED_NORMALLY);      
 }
@@ -4088,7 +4100,8 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
    }
 
    env->mip->new_col_num++;
-   
+   env->mip->is_modified = TRUE; 
+
    return(FUNCTION_TERMINATED_NORMALLY);      
 }
 
@@ -4158,6 +4171,7 @@ int sym_add_row(sym_environment *env, int numelems, int *indices,
 	       sym_add_col(env, 0, NULL, NULL, 0.0, SYM_INFINITY, 0.0, FALSE, 
 			   NULL);
 	    }
+	    env->mip->is_modified = TRUE; 
 	 } 
 
 	 n = env->mip->n;
@@ -4438,6 +4452,8 @@ int sym_delete_cols(sym_environment *env, int num, int * indices)
    env->mip->colname = (char **) realloc(colName, n*sizeof(char *));
 
    free(lengths);
+
+   env->mip->is_modified = TRUE; 
    
    return(FUNCTION_TERMINATED_NORMALLY);      
 

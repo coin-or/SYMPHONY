@@ -757,7 +757,8 @@ typedef struct MIPDESC{
    int        new_col_num; /* used only when new cols added */
    int        cru_vars_num;
    int       *cru_vars; 
-
+   char       is_modified;         
+   
    /* will be evaluated only if preprocessor is used */
    /* it is here to be carried later for further use */
    /* mip info */
