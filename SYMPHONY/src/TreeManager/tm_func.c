@@ -1891,7 +1891,6 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 		   KEEP_ON_DISK_VBC_TOOL)
 #pragma omp critical (write_pruned_node_file)
 		  write_pruned_nodes(tm, node);
-#pragma omp critical (tree_update)
 	       if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
 		  purge_pruned_nodes(tm, node,
 				     VBC_PRUNED_FATHOMED);
