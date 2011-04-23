@@ -889,7 +889,7 @@ bc_node *del_best_node(tm_prob *tm)
 
    if (size == 0)
       return(NULL);
-   
+
    best_node = list[1];
    
    temp = list[1] = list[size];
@@ -1852,61 +1852,64 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
    }
 
    /* Remove nodes that can now be fathomed from the list */
-   rule = tm->par.node_selection_rule;
-   list = tm->samephase_cand;
-   char has_exchanged = FALSE;
-   for (last = i = tm->samephase_candnum; i > 0; i--){
-      has_exchanged = FALSE;
-      node = list[i];
-      if (tm->has_ub &&
-	  node->lower_bound >= tm->ub-tm->par.granularity){
-	 if (i != last){
-	    list[i] = list[last];
-	    for (prev_pos = i, pos = i/2; pos >= 1;
-		 prev_pos = pos, pos /= 2){
-	       if (node_compar(rule, list[pos], list[prev_pos])){
-		  temp = list[prev_pos];
-		  list[prev_pos] = list[pos];
-		  list[pos] = temp;
-		  has_exchanged = TRUE;
-	       }else{
-		  break;
+#pragma omp critical (tree_update)
+   {
+      rule = tm->par.node_selection_rule;
+      list = tm->samephase_cand;
+      char has_exchanged = FALSE;
+      for (last = i = tm->samephase_candnum; i > 0; i--){
+	 has_exchanged = FALSE;
+	 node = list[i];
+	 if (tm->has_ub &&
+	     node->lower_bound >= tm->ub-tm->par.granularity){
+	    if (i != last){
+	       list[i] = list[last];
+	       for (prev_pos = i, pos = i/2; pos >= 1;
+		    prev_pos = pos, pos /= 2){
+		  if (node_compar(rule, list[pos], list[prev_pos])){
+		     temp = list[prev_pos];
+		     list[prev_pos] = list[pos];
+		     list[pos] = temp;
+		     has_exchanged = TRUE;
+		  }else{
+		     break;
+		  }
+	       }
+	    }
+	    tm->samephase_cand[last] = NULL;
+	    last--;
+	    if (tm->par.verbosity > 0){
+	       printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	       printf("+ TM: Pruning NODE %i LEVEL %i after new incumbent.\n",
+		   node->bc_index, node->bc_level);
+	       printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+	    }
+	    if (tm->par.keep_description_of_pruned == DISCARD ||
+		tm->par.keep_description_of_pruned ==
+		KEEP_ON_DISK_VBC_TOOL){
+	       if (tm->par.keep_description_of_pruned ==
+		   KEEP_ON_DISK_VBC_TOOL)
+#pragma omp critical (write_pruned_node_file)
+		  write_pruned_nodes(tm, node);
+#pragma omp critical (tree_update)
+	       if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
+		  purge_pruned_nodes(tm, node,
+				     VBC_PRUNED_FATHOMED);
+	       } else {
+		  purge_pruned_nodes(tm, node, VBC_PRUNED);
 	       }
 	    }
 	 }
-	 tm->samephase_cand[last] = NULL;
-	 last--;
-	 if (tm->par.verbosity > 0){
-	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    printf("+ TM: Pruning NODE %i LEVEL %i after new incumbent.\n",
-		   node->bc_index, node->bc_level);
-	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	 }
-	 if (tm->par.keep_description_of_pruned == DISCARD ||
-	     tm->par.keep_description_of_pruned ==
-	     KEEP_ON_DISK_VBC_TOOL){
-	    if (tm->par.keep_description_of_pruned ==
-		KEEP_ON_DISK_VBC_TOOL)
-#pragma omp critical (write_pruned_node_file)
-	       write_pruned_nodes(tm, node);
-#pragma omp critical (tree_update)
-	    if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
-	       purge_pruned_nodes(tm, node,
-				  VBC_PRUNED_FATHOMED);
-	    } else {
-	       purge_pruned_nodes(tm, node, VBC_PRUNED);
-	    }
+	 if (has_exchanged) {
+	    /*
+	     * if exchanges have taken place, node[i] should be
+	     * checked again for pruning
+	     */
+	    i++;
 	 }
       }
-      if (has_exchanged) {
-	 /*
-	  * if exchanges have taken place, node[i] should be
-	  * checked again for pruning
-	  */
-	 i++;
-      }
+      tm->samephase_candnum = last;
    }
-   tm->samephase_candnum = last;
 }
 
 /*===========================================================================*/
