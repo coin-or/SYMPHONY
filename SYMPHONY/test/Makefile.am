@@ -145,7 +145,7 @@ test: unitTest$(EXEEXT)
 		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
 	fi;
 	./unitTest$(EXEEXT) $$NETLIBARG -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA) | sed -e 's/\\\\/\\\\\\\\/g'`
-	
+
 fulltest: check_files unitTest$(EXEEXT)
 	if test x"$(NETLIB_DATA)" != x; then \
 		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
@@ -162,7 +162,7 @@ pfulltest: check_files punitTest$(EXEEXT)
 	if test x"$(NETLIB_DATA)" != x; then \
 		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
 	fi;
-	./punitTest$(EXEEXT) $$NETLIBARG -T $(DATAOBJDIR)/miplib3 -p 2
+	./punitTest$(EXEEXT) $$NETLIBARG -T $(MIPLIBDIR) -p 2
 
 check_files:
 	  if test -r $(MIPLIBDIR); then \
