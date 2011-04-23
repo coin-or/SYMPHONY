@@ -119,6 +119,19 @@ int main(int argc, char* argv[]){
 	  " x1 = ",solution[1],
 	  " with objective value = ",objective_value);
    
+	
+	printf("RUN AGAIN WITH OPTIMAL SOLUTION as INITIAL SOLUTION \n");
+	int status = sym_set_col_solution(env, solution);
+	if(status ==FUNCTION_TERMINATED_NORMALLY)
+	{
+		printf("FUNCTION TERMINATED NORMALLY\n");
+	}
+	else {
+		printf("FUNCTION TERMINATED ABNORMALLY\n");
+	}
+
+	sym_solve(env);
+	
    //free the memory
    sym_close_environment(env);
 
