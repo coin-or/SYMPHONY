@@ -649,6 +649,7 @@ void send_node_desc(lp_prob *p, int node_type)
    if (node_type == INTERRUPTED_NODE){
       n->node_status = NODE_STATUS__INTERRUPTED;
       n->lower_bound = lp_data->objval;
+#pragma omp critical (tree_update)
       insert_new_node(tm, n);
       if (!repricing)
 	 return;
