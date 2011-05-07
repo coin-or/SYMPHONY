@@ -149,8 +149,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #else
    par->max_active_nodes = 1;
 #endif
-   tm->active_nodes = (bc_node **)
-      malloc(par->max_active_nodes * sizeof(bc_node *));
+   tm->active_nodes = (bc_node **) calloc(par->max_active_nodes, sizeof(bc_node *));
 #ifndef COMPILE_IN_TM
    tm->lpp = (lp_prob **)
       malloc(par->max_active_nodes * sizeof(lp_prob *));
@@ -194,6 +193,7 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 			    par->lp_debug, par->lp_mach_num, par->lp_machs);
 #endif
 
+#pragma omp critical (cut_pool)
    if (!tm->cuts){
       tm->cuts = (cut_data **) malloc(BB_BUNCH * sizeof(cut_data *));
    }
@@ -358,9 +358,13 @@ int solve(tm_prob *tm)
 		((tm->has_ub && (tm->par.gap_limit >= 0.0)) ?
 		 fabs(100*(tm->ub-tm->lb)/tm->ub) > tm->par.gap_limit : TRUE)
 		&& !(tm->par.find_first_feasible && tm->has_ub) && c_count <= 0){
+	    if (tm->samephase_candnum > 0){
 #pragma omp critical (tree_update)
-	    i = tm->samephase_candnum > 0 ? start_node(tm, thread_num) :
-	                                    NEW_NODE__NONE;
+	       i = start_node(tm, thread_num);
+	    }else{
+	       i = NEW_NODE__NONE;
+	    }
+
 	    if (i != NEW_NODE__STARTED)
 	       break;
 
@@ -511,6 +515,14 @@ int solve(tm_prob *tm)
 	 }
 #pragma omp master
 {
+         for (i = 0; i < tm->par.max_active_nodes; i++){
+	    if (tm->active_nodes[i]){
+	       break;
+	    }
+	 }
+	 if (i == tm->par.max_active_nodes){
+	    tm->active_node_num ==0;
+	 }
 	 if (now - then2 > timeout2){
 	    if(tm->par.verbosity >=0 ){
 	       print_tree_status(tm);
@@ -861,12 +873,11 @@ int start_node(tm_prob *tm, int thread_num)
 
 
    /* It's time to put together the node and send it out */
+   tm->active_nodes[lp_ind] = best_node;
    tm->active_node_num++;
    tm->stat.analyzed++;
 
    send_active_node(tm,best_node,tm->par.colgen_strat[tm->phase],thread_num);
-
-   tm->active_nodes[lp_ind] = best_node;
 
    tm->comp_times.start_node += wall_clock(NULL) - time;
 
@@ -1202,7 +1213,6 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL)
 #pragma omp critical (write_pruned_node_file)
 	       write_pruned_nodes(tm, child);
-#pragma omp critical (tree_update)
 	    if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
 	       int vbc_node_pr_reason;
 	       switch (action[i]) {
@@ -1223,8 +1233,10 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
 	       }
 	       */
+#pragma omp critical (tree_update)
 	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
 	    } else {
+#pragma omp critical (tree_update)
 	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
 		     VBC_PRUNED);
 	    }
@@ -1493,6 +1505,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 	 }
        case COMP_BEST_K:
 	 average_lb = 0;
+#pragma omp critical (tree_update) 
 	 for (k = 0, i = MIN(tm->samephase_candnum, tm->par.diving_k);
 	      i > 0; i--)
 	    if (tm->samephase_cand[i]->lower_bound < MAXDOUBLE/2){
@@ -1776,10 +1789,13 @@ void mark_lp_process_free(tm_prob *tm, int lp, int cp)
 
 int add_cut_to_list(tm_prob *tm, cut_data *cut)
 {
-   REALLOC(tm->cuts, cut_data *, tm->allocated_cut_num, tm->cut_num + 1,
-	   (tm->cut_num / tm->stat.created + 5) * BB_BUNCH);
-   cut->name = tm->cut_num;
-   tm->cuts[tm->cut_num++] = cut;
+#pragma omp critical (cut_pool)
+   {
+      REALLOC(tm->cuts, cut_data *, tm->allocated_cut_num, tm->cut_num + 1,
+	      (tm->cut_num / tm->stat.created + 5) * BB_BUNCH);
+      cut->name = tm->cut_num;
+      tm->cuts[tm->cut_num++] = cut;
+   }
    return(cut->name);
 }
 
@@ -3294,6 +3310,7 @@ void free_tm(tm_prob *tm)
 #endif
    
    /* Go over the cuts stored and free them all */
+#pragma omp critical (cut_pool)
    if (cuts){
       for (i = tm->cut_num - 1; i >= 0; i--)
 	 if (cuts[i]){
@@ -3303,9 +3320,12 @@ void free_tm(tm_prob *tm)
       FREE(tm->cuts);
    }
 
-   FREE(tm->tmp.i);
-   FREE(tm->tmp.c);
-   FREE(tm->tmp.d);
+#pragma omp critical (tmp_memory)
+   {
+      FREE(tm->tmp.i);
+      FREE(tm->tmp.c);
+      FREE(tm->tmp.d);
+   }
 
    /*get rid of the added pointers for sens.analysis*/
 

@@ -14,6 +14,9 @@
 
 #define COMPILE_FOR_LP
 
+#ifdef _OPENMP
+#include "omp.h"
+#endif
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
@@ -186,6 +189,9 @@ int process_chain(lp_prob *p)
 #ifdef COMPILE_IN_LP
       p->tm->stat.chains++;
       p->tm->active_node_num--;
+#ifdef _OPENMP
+      p->tm->active_nodes[omp_get_thread_num()] = NULL;
+#endif
       free_node_dependent(p);
 #else
       /* send_lp_is_free()  calls  free_node_dependent() */
