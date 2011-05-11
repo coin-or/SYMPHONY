@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\Osi\src;..\..\..\Osi\src\Osi;..\..\..\Clp\src\OsiClp;..\..\..\Clp\src;..\..\..\CoinUtils\src;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\BuildTools\headers;..\..\include;..\..\src\OsiSym"
+				AdditionalIncludeDirectories="..\..\include;..\..\src\OsiSym;..\..\..\BuildTools\headers;..\..\..\CoinUtils\inc;..\..\..\CoinUtils\src;..\..\..\Osi\src;..\..\..\Osi\src\Osi;..\..\..\Clp\src\OsiClp;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Clp\src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -52,67 +52,6 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\Osi\src;..\..\..\Osi\src\Osi;..\..\..\Clp\src\OsiClp;..\..\..\Clp\src;..\..\..\CoinUtils\src;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\BuildTools\headers;..\..\include;..\..\src\OsiSym"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;"
-				StringPooling="true"
-				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -167,7 +106,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\Osi\src;..\..\..\Osi\src\Osi;..\..\..\Clp\src\OsiClp;..\..\..\Clp\src;..\..\..\CoinUtils\src;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\BuildTools\headers;..\..\include;..\..\src\OsiSym"
+				AdditionalIncludeDirectories="..\..\include;..\..\src\OsiSym;..\..\..\BuildTools\headers;..\..\..\CoinUtils\inc;..\..\..\CoinUtils\src;..\..\..\Osi\src;..\..\..\Osi\src\Osi;..\..\..\Clp\src\OsiClp;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Clp\src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -176,6 +115,67 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="4"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\..\include;..\..\src\OsiSym;..\..\..\BuildTools\headers;..\..\..\CoinUtils\inc;..\..\..\CoinUtils\src;..\..\..\Osi\src;..\..\..\Osi\src\Osi;..\..\..\Clp\src\OsiClp;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Clp\src"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -230,7 +230,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\Osi\src;..\..\..\Osi\src\Osi;..\..\..\Clp\src\OsiClp;..\..\..\Clp\src;..\..\..\CoinUtils\src;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\BuildTools\headers;..\..\include;..\..\src\OsiSym"
+				AdditionalIncludeDirectories="..\..\include;..\..\src\OsiSym;..\..\..\BuildTools\headers;..\..\..\CoinUtils\inc;..\..\..\CoinUtils\src;..\..\..\Osi\src;..\..\..\Osi\src\Osi;..\..\..\Clp\src\OsiClp;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Clp\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;"
 				StringPooling="true"
 				RuntimeLibrary="2"
