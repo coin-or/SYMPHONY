@@ -1,9 +1,9 @@
-SYMPHONY Version 5.3.0 README
+SYMPHONY Version 5.3.4 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Common Public License
 Version 1.0 and is freely redistributable. All source code and documentation
-is Copyright 2000-2010 by Ted Ralphs and others. This README may be
+is Copyright 2000-2011 by Ted Ralphs and others. This README may be
 redistributed freely.
 
 DOCUMENTATION
@@ -14,10 +14,16 @@ in the SYMPHONY/Doc/ subdirectory. If you have downloaded a binary
 distribution, the manual should be located in the man/ subdirectory. HTML
 or PDF versions of the manual can also be viewed at:
 
-http://www.coin-or.org/SYMPHONY/
+https://projects.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
+
+Release 5.3.4:
+
+1. Fixes to parallel (OpenMP) mode (you may still experience occassional crashes).
+2. Fixes so that applications build and run properly.
+3. Minor updates to documentation
 
 Release 5.3.3:
 
