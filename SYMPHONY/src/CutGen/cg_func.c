@@ -163,11 +163,14 @@ cut_data *create_explicit_cut(int nzcnt, int *indices, double *values,
    cut->sense = sense;
    cut->rhs = rhs;
    cut->range = range;
-   cut->size = (int)(ISIZE + nzcnt * (ISIZE + DSIZE));
+   cut->size = (int)(DSIZE + nzcnt * (ISIZE + DSIZE));
    cut->coef = (char *) malloc (cut->size);
+   ((double *) cut->coef)[0] = 0; // otherwise valgrind complains
    ((int *) cut->coef)[0] = nzcnt;
-   memcpy(cut->coef + ISIZE, (char *)indices, nzcnt*ISIZE);
-   memcpy(cut->coef + (nzcnt + 1) * ISIZE, (char *)values, nzcnt * DSIZE);
+   //Here, we have to pad the initial int to avoid misalignment, so we
+   //add DSIZE bytes to get to a double boundary
+   memcpy(cut->coef + DSIZE, (char *)values, nzcnt * DSIZE);
+   memcpy(cut->coef + (nzcnt + 1) * DSIZE, (char *)indices, nzcnt*ISIZE);
    cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
    cut->deletable = TRUE;
    cut->name = send_to_cp ? CUT__SEND_TO_CP : CUT__DO_NOT_SEND_TO_CP;
@@ -188,11 +191,14 @@ int cg_add_explicit_cut(int nzcnt, int *indices, double *values,
    cut->sense = sense;
    cut->rhs = rhs;
    cut->range = range;
-   cut->size = (int)(ISIZE + nzcnt * (ISIZE + DSIZE));
+   cut->size = (int)(DSIZE + nzcnt * (ISIZE + DSIZE));
    cut->coef = (char *) malloc (cut->size);
+   ((double *) cut->coef)[0] = 0; // otherwise valgrind complains.
    ((int *) cut->coef)[0] = nzcnt;
-   memcpy(cut->coef + ISIZE, (char *)indices, nzcnt*ISIZE);
-   memcpy(cut->coef + (nzcnt + 1) * ISIZE, (char *)values, nzcnt * DSIZE);
+   //Here, we have to pad the initial int to avoid misalignment, so we
+   //add DSIZE bytes to get to a double boundary
+   memcpy(cut->coef + DSIZE, (char *)values, nzcnt * DSIZE);
+   memcpy(cut->coef + (nzcnt + 1) * DSIZE, (char *)indices, nzcnt*ISIZE);
    cut->branch = DO_NOT_BRANCH_ON_THIS_ROW;
    cut->deletable = TRUE;
    cut->name = send_to_cp ? CUT__SEND_TO_CP : CUT__DO_NOT_SEND_TO_CP;
