@@ -71,7 +71,7 @@ void delete_dup_edges(small_graph *g)
 	 (void)memcpy((char *)ed0, (char *)ed1, sizeof(edge_data));
       }
    }
-   pos = ((int)ed0 - (int)g->edges)/sizeof(edge_data) + 1;
+   pos = ed0 - g->edges + 1;
    g->allocated_edgenum -= g->edgenum - pos;
    g->edges = (edge_data *) realloc
       ((char *)(g->edges), g->allocated_edgenum * sizeof(edge_data));

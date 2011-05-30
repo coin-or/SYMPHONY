@@ -97,7 +97,6 @@ If you work on this code, please keep these conventions in mind:
 #ifdef COIN_HAS_CBC
 #include "OsiCbcSolverInterface.hpp"
 #endif
-#include "CoinFloatEqual.hpp"
 #include "CoinPackedVector.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "CoinWarmStartBasis.hpp"

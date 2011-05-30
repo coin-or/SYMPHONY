@@ -523,6 +523,7 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
    new_desc->cutind = extrarow;
 
    /* The cuts themselves */
+#pragma omp critical (cut_pool)
    if (extrarow.size > 0){
       new_desc->cuts = (cut_data **)
 	 malloc(extrarow.size*sizeof(cut_data *));
@@ -680,6 +681,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 
    if (node_type == INTERRUPTED_NODE){
       n->node_status = NODE_STATUS__INTERRUPTED;
+#pragma omp critical (tree_update)
       insert_new_node(tm, n);
       return;
    }
@@ -1102,20 +1104,23 @@ void unpack_cut_set(tm_prob *tm, int sender, int cutnum, row_data *rows)
       directly. */
    receive_int_array(&new_cutnum, 1);
 #endif
-   REALLOC(tm->cuts, cut_data *, tm->allocated_cut_num, old_cutnum +
-	   new_cutnum, (old_cutnum / tm->stat.created + 5) * BB_BUNCH);
-   cuts = tm->cuts;
-   REMALLOC(tm->tmp.i, int, tm->tmp.i_size, new_cutnum, BB_BUNCH);
-   itmp = tm->tmp.i;
-   tm->cut_num += new_cutnum;
-   for (i = 0; i < new_cutnum; i++){
+#pragma omp critical (cut_pool)
+   {
+      REALLOC(tm->cuts, cut_data *, tm->allocated_cut_num, old_cutnum +
+	      new_cutnum, (old_cutnum / tm->stat.created + 5) * BB_BUNCH);
+      cuts = tm->cuts;
+      tm->cut_num += new_cutnum;
+      for (i = 0; i < new_cutnum; i++){
 #ifdef COMPILE_IN_LP
-      cuts[(itmp[i] = old_cutnum + i)] = rows[i].cut;
-      cuts[itmp[i]]->name = itmp[i];
+	 cuts[old_cutnum + i] = rows[i].cut;
+	 cuts[old_cutnum + i]->name = old_cutnum + i;
 #else   
-      cuts[(itmp[i] = old_cutnum + i)] = unpack_cut(NULL);
-      cuts[itmp[i]]->name = itmp[i];
+	 REMALLOC(tm->tmp.i, int, tm->tmp.i_size, new_cutnum, BB_BUNCH);
+	 itmp = tm->tmp.i;
+	 cuts[(itmp[i] = old_cutnum + i)] = unpack_cut(NULL);
+	 cuts[itmp[i]]->name = itmp[i];
 #endif
+      }
    }
 #ifndef COMPILE_IN_LP
    if (sender){ /* Do we have to return the names? */
