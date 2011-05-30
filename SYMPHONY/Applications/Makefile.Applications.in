@@ -157,12 +157,22 @@ CFLAGS += -I`$(CYGPATH_W) $(SYMAPPLDIR)/include` \
 	  -I`$(CYGPATH_W) @abs_source_dir@/include`
 
 # Libraries necessary to link
+ifeq ($(SYM_BUILD_APP),FALSE)
 ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
 LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs symphony`
 CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags symphony`
 else
+LIBS += -L@abs_lib_dir@ -lSym @SYMPHONYLIB_LIBS@
+        -I`$(CYGPATH_W) $(COININCDIR)`
+endif
+else
+ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
+LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs symphony-app`
+CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags symphony-app`
+else
 LIBS += -L@abs_lib_dir@ -lSymAppl @SYMPHONYLIB_LIBS@
         -I`$(CYGPATH_W) $(COININCDIR)`
+endif
 endif
 
 WHATTOMAKE = $(EXE)

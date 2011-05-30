@@ -69,8 +69,8 @@ host_triplet = @host@
 @ALWAYS_FALSE@am__append_1 = test
 DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/symphony-uninstalled.pc.in \
-	$(srcdir)/symphony.pc.in \
+	$(srcdir)/Makefile.in $(srcdir)/symphony-app.pc.in \
+	$(srcdir)/symphony-uninstalled.pc.in $(srcdir)/symphony.pc.in \
 	$(top_srcdir)/Applications/CNRP/Makefile.in \
 	$(top_srcdir)/Applications/MATCH/Makefile.in \
 	$(top_srcdir)/Applications/MCKP/Makefile.in \
@@ -102,8 +102,8 @@ CONFIG_CLEAN_FILES = Examples/Makefile \
 	Applications/MATCH/Makefile Applications/MCKP/Makefile \
 	Applications/MPP/Makefile Applications/SPP/Makefile \
 	Applications/SPP+CUTS/Makefile Applications/USER/Makefile \
-	Applications/VRP/Makefile symphony.pc symphony-uninstalled.pc \
-	osi-sym.pc osi-sym-uninstalled.pc \
+	Applications/VRP/Makefile symphony.pc symphony-app.pc \
+	symphony-uninstalled.pc osi-sym.pc osi-sym-uninstalled.pc \
 	$srcdir/Applications/CNRP/Makefile \
 	$srcdir/Applications/MATCH/Makefile \
 	$srcdir/Applications/MCKP/Makefile \
@@ -506,7 +506,7 @@ EXTRA_DIST = $(am__append_2)
 #                  Installation of the addlibs file                    #
 ########################################################################
 pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = symphony.pc osi-sym.pc
+pkgconfiglib_DATA = symphony.pc symphony-app.pc osi-sym.pc
 addlibsdir = $(DESTDIR)$(datadir)/coin/doc/SYMPHONY
 
 ########################################################################
@@ -592,6 +592,8 @@ Applications/USER/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applicat
 Applications/VRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/VRP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 symphony.pc: $(top_builddir)/config.status $(srcdir)/symphony.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+symphony-app.pc: $(top_builddir)/config.status $(srcdir)/symphony-app.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 symphony-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/symphony-uninstalled.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

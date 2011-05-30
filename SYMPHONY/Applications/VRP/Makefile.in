@@ -59,10 +59,9 @@ ifeq ($(DO_CONCORDE_CUTS),TRUE)
 ADDLIBS += -L${HOME}/lib -lconcorde -lqsopt
 ADDINCFLAGS += -I${HOME}/include 
 endif
-
-##########################################################################
-#  Usually, you don't have to change anything below this point.          #
-##########################################################################
+##############################################################################
+#  Usually, you don't have to change anything below this point.          
+##############################################################################
 
 ##############################################################################
 # This section is for listing source file names
