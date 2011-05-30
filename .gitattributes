@@ -128,6 +128,7 @@ SYMPHONY/src/OsiSym/SymWarmStart.cpp -text
 SYMPHONY/src/OsiSym/SymWarmStart.hpp -text
 SYMPHONY/src/OsiSym/osi-sym-uninstalled.pc.in -text
 SYMPHONY/src/OsiSym/osi-sym.pc.in -text
+SYMPHONY/symphony-app.pc.in -text
 SYMPHONY/symphony-uninstalled.pc.in -text
 SYMPHONY/symphony.pc.in -text
 SYMPHONY/test/Makefile.am -text
