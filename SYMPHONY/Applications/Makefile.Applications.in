@@ -61,6 +61,7 @@ TMEXT = @TMEXT@
 ##############################################################################
 
 VPATH = \
+        $(SYMAPPLDIR) \
 	$(SYMAPPLDIR)/src/Common \
 	$(SYMAPPLDIR)/src/DrawGraph \
 	$(SYMAPPLDIR)/src/Master \
