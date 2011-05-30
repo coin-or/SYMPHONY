@@ -7,9 +7,9 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2010 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2011 Lehigh University. All Rights Reserved.           #
 #                                                                           #
-# This software is licensed under the Common Public License. Please see     #
+# This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
 #                                                                           #
 #===========================================================================#
@@ -18,252 +18,36 @@
 
 MASTERNAME = user
 
-EXE = $(MASTERNAME)@EXEEXT@
-
 SYMAPPLNAME = USER
 
-# The following is necessary under cygwin, if native compilers are used
-CYGPATH_W = @CYGPATH_W@
-
 # CHANGEME: Additional sources
-# - Names of your additional source files without any extensions
-ADDSOURCES =
+# - Names of your additional C/C++ source files without any extensions
+ADDFILES =
 
-# CHANGEME: Additional libraries
-ADDLIBS =
+# CHANGEME: Put any additional libraries here.
+LIBS =
 
 # CHANGEME: Additional flags for compilation (e.g., include flags)
-ADDINCFLAGS = 
+CFLAGS = 
 
-# Directory with COIN header files
-COININCDIR = @abs_include_dir@/coin
-
-# Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@/coin
-
-# Directory with Application files
-SYMAPPLDIR = @SYMSRCDIR@/../Applications/$(SYMAPPLNAME)
-
-# Directory for application obj files
-SYMAPPLOBJDIR = src
+# CHANGEME: Additional options specific to MATCH
 
 ##########################################################################
-#  Usually, you don't have to change anything below.  Note that if you   #
-#  change certain compiler options, you might have to recompile the      #
-#  COIN package.                                                         #
+#  Usually, you don't have to change anything below.
 ##########################################################################
 
-SYM_COMPILE_IN_TM = @SYM_COMPILE_IN_TM_TRUE@TRUE
-SYM_COMPILE_IN_LP = @SYM_COMPILE_IN_LP_TRUE@TRUE
-SYM_COMPILE_IN_CP = @SYM_COMPILE_IN_CP_TRUE@TRUE
-SYM_COMPILE_IN_CG = @SYM_COMPILE_IN_CG_TRUE@TRUE
-USE_CGL_CUTS = @USE_CGL_CUTS_TRUE@TRUE
-CLP_LP_SOLVER = @CLP_LP_SOLVER_TRUE@TRUE
-GLPK_LP_SOLVER = @GLPK_LP_SOLVER_TRUE@TRUE
-CPLEX_LP_SOLVER = @CPLEX_LP_SOLVER_TRUE@TRUE
-OSL_LP_SOLVER = @OSL_LP_SOLVER_TRUE@TRUE
-SOPLEX_LP_SOLVER = @SOPLEX_LP_SOLVER_TRUE@TRUE
-XPRESS_LP_SOLVER = @XPRESS_LP_SOLVER_TRUE@TRUE
-SYM_PARALLEL = @SYM_PARALLEL_TRUE@TRUE
-USE_GMPL = @USE_GMPL_TRUE@TRUE
-MASTEREXT = @MASTEREXT@
-LPEXT = @LPEXT@
-TMEXT = @TMEXT@
-ADDOBJS = $(addsuffix .@OBJEXT@, $(ADDSOURCES))
+USER_COMMON_FILES  = 
 
-VPATH = \
-	$(SYMAPPLDIR)/src/Common \
-	$(SYMAPPLDIR)/src/DrawGraph \
-	$(SYMAPPLDIR)/src/Master \
-	$(SYMAPPLDIR)/src/CutPool \
-	$(SYMAPPLDIR)/src/CutGen \
-	$(SYMAPPLDIR)/src/LP
+USER_MASTER_FILES  = user_main user_master
 
-USER_LP_OBJS       = user_lp_branch.@OBJEXT@ user_lp.@OBJEXT@ 
-ifeq ($(SYM_COMPILE_IN_CG),TRUE)
-USER_LP_OBJS      += user_cg.@OBJEXT@
-endif
+USER_TM_FILES      =
 
-USER_TM_OBJS       =
-ifeq ($(SYM_COMPILE_IN_LP),TRUE)
-USER_TM_OBJS      += $(USER_LP_OBJS)
-endif
-ifeq ($(SYM_COMPILE_IN_CP),TRUE)
-USER_TM_OBJS      += user_cp.@OBJEXT@ 
-endif
+USER_LP_FILES      = user_lp_branch user_lp 
 
-USER_MASTER_OBJS   = user_main.@OBJEXT@ \
-	user_master.@OBJEXT@ $(ADDOBJS)
+USER_CG_FILES      = user_cg
 
-ifeq ($(SYM_COMPILE_IN_TM),TRUE)
-USER_MASTER_OBJS  += $(USER_TM_OBJS)
-endif
+USER_CP_FILES      = user_cp
 
-USER_CG_OBJS       = user_cg.@OBJEXT@
+USER_DG_FILES      = user_dg
 
-USER_CP_OBJS       = user_cp.@OBJEXT@
-
-USER_DG_OBJS       = user_dg.@OBJEXT@
-
-ALL_OBJS_B =   user_main.@OBJEXT@ user_master.@OBJEXT@\
-	$(ADDOBJS) user_lp_branch.@OBJEXT@ user_lp.@OBJEXT@ \
-	$(USER_CG_OBJS) $(USER_CP_OBJS) $(USER_DG_OBJS)
-
-ALL_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(ALL_OBJS_B))
-
-PUSER_MASTER_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_MASTER_OBJS)))
-PUSER_LP_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_LP_OBJS)))
-PUSER_CG_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_CG_OBJS)))
-PUSER_CP_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_CP_OBJS)))
-PUSER_TM_OBJS = $(addprefix $(SYMAPPLOBJDIR)/, $(addsuffix o, $(USER_TM_OBJS)))
-
-PALL_OBJS = $(PUSER_MASTER_OBJS) $(PUSER_LP_OBJS) $(PUSER_CP_OBJS) \
-	$(PUSER_TM_OBJS)
-
-# C++ Compiler command
-CXX = @CXX@
-
-# C++ Compiler options
-CXXFLAGS = @CXXFLAGS@
-
-# additional C++ Compiler options for linking
-CXXLINKFLAGS = @RPATH_FLAGS@
-
-#Include files
-INCL =  -I`$(CYGPATH_W) $(SYMAPPLDIR)/include` \
-        -I`$(CYGPATH_W) @SYMINCDIR@` \
-        -I`$(CYGPATH_W) $(COININCDIR)` \
-
-# Libraries necessary to link
-LIBS = -L`$(CYGPATH_W) $(COINLIBDIR)` \
-       -L`$(CYGPATH_W) $(COINLIBDIR)/ThirdParty` \
-       @COINDEPEND_LIBS@
-
-ifeq ($(USE_CGL_CUTS),TRUE)
-LIBS += @CGL_LIBS@
-ADDINCFLAGS += -DUSE_CGL_CUTS
-endif
-
-ifeq ($(CLP_LP_SOLVER),TRUE)
-LIBS += @CLP_LIBS@
-ADDINCFLAGS += -D__OSI_CLP__
-endif
-
-ifeq ($(GLPK_LP_SOLVER),TRUE)
-LIBS += @GLPK_LIBS@
-ADDINCFLAGS += -D__OSI_GLPK__
-else
-ifeq ($(USE_GMPL), TRUE)
-ADDINCFLAGS += -DUSE_GLPMPL
-endif
-endif
-
-ifeq ($(CPLEX_LP_SOLVER),TRUE)
-LIBS += @CPX_LIBS@
-ADDINCFLAGS += -D__OSI_CPLEX__
-endif
-
-ifeq ($(SOPLEX_LP_SOLVER),TRUE)
-LIBS += @SOPLEX_LIBS@
-ADDINCFLAGS += -D__OSI_SOPLEX__
-endif
-
-ifeq ($(XPRESS_LP_SOLVER),TRUE)
-LIBS += @XPR_LIBS@
-ADDINCFLAGS += -D__OSI_XPRESS__
-endif
-
-ADDLIBS += @ADDLIBS@
-
-WHATTOMAKE = $(EXE)
-
-ifeq ($(SYM_PARALLEL),TRUE)
-WHATTOMAKE += $(MASTERNAME)$(MASTEREXT)
-endif
-
-ifneq ($(SYM_COMPILE_IN_LP),TRUE)
-WHATTOMAKE  += $(MASTERNAME)_lp$(LPEXT)
-endif
-
-ifneq ($(SYM_COMPILE_IN_CP),TRUE)
-WHATTOMAKE += $(MASTERNAME)_cp
-endif
-
-ifneq ($(SYM_COMPILE_IN_CG),TRUE)
-WHATTOMAKE += $(MASTERNAME)_cg
-endif
-
-ifneq ($(SYM_COMPILE_IN_TM),TRUE)
-WHATTOMAKE += $(MASTERNAME)_tm$(TMEXT)
-endif
-
-ADDFLAGS += $(ADDINCFLAGS) @SYMDEFS@
-ADDPFLAGS += $(ADDINCFLAGS) @SYMPDEFS@
-
-INCL += -I`$(CYGPATH_W) $(PVM_ROOT)/include`
-SYMLIBS = -lSymAppl $(LIBS) 
-PSYMLIBS = -L$(PVM_ROOT)/lib/@ARCH@ -lgpvm3 -lpvm3 $(LIBS) 
-
-all: $(APPL_PARALLEL) $(WHATTOMAKE)
-
-$(SYMAPPLOBJDIR)/%.o : %.c
-	mkdir -p $(SYMAPPLOBJDIR)
-	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
-
-$(SYMAPPLOBJDIR)/%.obj : %.c
-	mkdir -p $(SYMAPPLOBJDIR)
-	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
-
-$(SYMAPPLOBJDIR)/%.oo : %.c
-	mkdir -p $(SYMAPPLOBJDIR)
-	$(CXX) $(CXXFLAGS) $(INCL) $(ADDPFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
-
-$(SYMAPPLOBJDIR)/%.objo : %.c
-	mkdir -p $(SYMAPPLOBJDIR)
-	$(CXX) $(CXXFLAGS) $(INCL) $(ADDFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
-
-$(EXE): $(ALL_OBJS)
-	bla=;\
-	for file in $(ALL_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
-	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(SYMLIBS)
-
-$(MASTERNAME)$(MASTEREXT) : $(PUSER_MASTER_OBJS)
-	bla=;\
-	for file in $(PUSER_MASTER_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
-	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla \
-	-lSymAppl$(MASTEREXT) $(PSYMLIBS)
-
-$(MASTERNAME)_lp$(LPEXT) : $(PUSER_LP_OBJS)
-	bla=;\
-	for file in $(PUSER_LP_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
-	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla \
-	-lSymAppl_lp$(LPEXT) $(PSYMLIBS)
-
-$(MASTERNAME)_cp : $(PUSER_CP_OBJS)
-	bla=;\
-	for file in $(PUSER_CP_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
-	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
-	-lSymAppl_cp $(PSYMLIBS)
-
-$(MASTERNAME)_cg : $(PUSER_CG_OBJS)
-	bla=;\
-	for file in $(PUSER_CG_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
-	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  $(PSYMLIBS) \
-	-lSymAppl_cg
-
-$(MASTERNAME)_tm$(TMEXT) : $(PUSER_TM_OBJS)
-	bla=;\
-	for file in $(PUSER_TM_OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; \
-	done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla  \
-	-lSymAppl_tm$(TMEXT) $(PSYMLIBS)
-
-.SUFFIXES: .cpp .c .o .obj .oo .objo
-
-clean:
-	rm -rf $(WHATTOMAKE) $(ALL_OBJS) $(PALL_OBJS)
+include ../Makefile.Applications

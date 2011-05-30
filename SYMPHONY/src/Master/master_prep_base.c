@@ -4477,7 +4477,7 @@ int prep_report(PREPdesc *P, int termcode)
 	 break;
        case PREP_SOLVED:
 	 printf("Preprocessing found the optimum:\n");	  	  	 
-	 printf("Solution Cost: %f\n:", 
+	 printf("Solution Cost: %.10f\n:", 
 		mip->obj_sense == SYM_MAXIMIZE ? -(mip->obj_offset) : 
 		mip->obj_offset);
 	 if (mip->colname){ 
@@ -4485,7 +4485,7 @@ int prep_report(PREPdesc *P, int termcode)
 	    printf("Column names and values of nonzeros in the solution\n");
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for (i = 0; i < mip->fixed_n; i++){
-	       printf("%8s %10.3f\n", P->orig_mip->colname[mip->fixed_ind[i]],
+	       printf("%8s %10.10f\n", P->orig_mip->colname[mip->fixed_ind[i]],
 		      mip->fixed_val[i]);
 	    }
 	    printf("\n");
@@ -4494,7 +4494,7 @@ int prep_report(PREPdesc *P, int termcode)
 	    printf("User indices and values of nonzeros in the solution\n");
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for (i = 0; i < mip->fixed_n; i++){
-	       printf("%7d %10.3f\n", mip->fixed_ind[i], mip->fixed_val[i]);
+	       printf("%7d %10.10f\n", mip->fixed_ind[i], mip->fixed_val[i]);
 	    }
 	    printf("\n");
 	 }

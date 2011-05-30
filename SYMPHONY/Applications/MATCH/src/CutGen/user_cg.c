@@ -113,7 +113,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    }
    
 #else
-   /* Here, we show how to use a user-defined cut class with a packed form. IN
+   /* Here, we show how to use a user-defined cut class with a packed form. In
       this case, the packed form is just to store the three nodes that form
       the triangle. See the function user_unpack_cuts() for the code to unpack
       the cut. */

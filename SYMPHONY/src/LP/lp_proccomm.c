@@ -619,7 +619,6 @@ void send_node_desc(lp_prob *p, int node_type)
 	 write_pruned_nodes(tm, n);
       if (tm->par.keep_description_of_pruned == DISCARD ||
 	  tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL){
-#pragma omp critical (tree_update)
 	 if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
 	    int vbc_node_pr_reason;
 	    switch (node_type) {
@@ -635,8 +634,10 @@ void send_node_desc(lp_prob *p, int node_type)
 	     default:
 	       vbc_node_pr_reason = VBC_PRUNED;
 	    }
+#pragma omp critical (tree_update)
 	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
 	 } else {
+#pragma omp critical (tree_update)
 	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
 		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
 	 }

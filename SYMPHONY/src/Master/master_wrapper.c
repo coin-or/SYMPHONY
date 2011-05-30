@@ -684,10 +684,10 @@ int display_solution_u(sym_environment *env, int thread_num)
    
    printf("\nSolution Found: Node %i, Level %i\n", sol.xindex, sol.xlevel);
    if (env->par.multi_criteria){
-      printf("First Objective: %.3f\n", env->obj[0]);
-      printf("Second Objective: %.3f\n", env->obj[1]);
+      printf("First Objective: %.10f\n", env->obj[0]);
+      printf("Second Objective: %.10f\n", env->obj[1]);
    }else{
-      printf("Solution Cost: %.3f\n", env->mip->obj_sense == SYM_MINIMIZE ? 
+      printf("Solution Cost: %.10f\n", env->mip->obj_sense == SYM_MINIMIZE ? 
 	     sol.objval + env->mip->obj_offset : 
 	     -sol.objval + env->mip->obj_offset);
    }
@@ -715,11 +715,11 @@ int display_solution_u(sym_environment *env, int thread_num)
 		   if (sol.xind[i] == env->mip->n){
 		      continue;
 		   }
-		   printf("%8s %10.3f\n", env->mip->colname[sol.xind[i]],
+		   printf("%8s %10.10f\n", env->mip->colname[sol.xind[i]],
 			  sol.xval[i]);
 		}
 		for (i = 0; i < env->mip->fixed_n; i++){
-		   printf("%8s %10.3f\n",
+		   printf("%8s %10.10f\n",
 			  env->orig_mip->colname[env->mip->fixed_ind[i]],
 			  env->mip->fixed_val[i]);
 		}
@@ -734,15 +734,15 @@ int display_solution_u(sym_environment *env, int thread_num)
 		      continue;
 		   }
 		   if(!env->prep_mip){
-		      printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+		      printf("%7d %10.10f\n", sol.xind[i], sol.xval[i]);
 		   }else{
-		      printf("%7d %10.3f\n",
+		      printf("%7d %10.10f\n",
 			     env->prep_mip->orig_ind[sol.xind[i]],
 			     sol.xval[i]);
 		   }
 		}
 		for (i = 0; i < env->mip->fixed_n; i++){
-		   printf("%7d %10.3f\n", env->mip->fixed_ind[i],
+		   printf("%7d %10.10f\n", env->mip->fixed_ind[i],
 			  env->mip->fixed_val[i]);
 		}
 		printf("\n");

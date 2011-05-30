@@ -111,7 +111,7 @@ endif
 USER_COMMON_FILES   = cnrp_macros compute_cost network cnrp_dg_functions
 
 USER_MASTER_FILES   = cnrp_main cnrp_master cnrp_io cnrp_master_functions \
-	             small_graph 
+	              small_graph 
 
 USER_TM_FILES 	   = 
 

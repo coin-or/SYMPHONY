@@ -205,8 +205,8 @@ int check_cut_u(cut_pool *cp, lp_sol *cur_sol, cut_data *cut, int *is_violated,
       
     case EXPLICIT_ROW:
       nzcnt = ((int *) (cut->coef))[0];
-      matind = (int *) (cut->coef + ISIZE);
-      matval = (double *) (cut->coef + (1 + nzcnt) * ISIZE);
+      matval = (double *) (cut->coef + DSIZE);
+      matind = (int *) (cut->coef + (nzcnt+ 1) * DSIZE);
       for (i = 0, j = 0; i < nzcnt && j < varnum; ){
 	 if (matind[i] == indices[j]){
 	    lhs += matval[i++]*values[j++];

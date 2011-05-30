@@ -79,10 +79,10 @@ uninstall-local: uninstall-doc
 ########################################################################
 
 pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = symphony.pc osi-sym.pc
+pkgconfiglib_DATA = symphony.pc symphony-app.pc osi-sym.pc
 
 addlibsdir = $(DESTDIR)$(datadir)/coin/doc/SYMPHONY
-	
+
 install-data-hook:
 	@$(mkdir_p) "$(addlibsdir)"
 if COIN_HAS_PKGCONFIG
