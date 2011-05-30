@@ -521,7 +521,7 @@ int solve(tm_prob *tm)
 	    }
 	 }
 	 if (i == tm->par.max_active_nodes){
-	    tm->active_node_num ==0;
+	    tm->active_node_num = 0;
 	 }
 	 if (now - then2 > timeout2){
 	    if(tm->par.verbosity >=0 ){
