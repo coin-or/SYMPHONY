@@ -669,11 +669,12 @@ includecoin_HEADERS = \
 ConfigHeader = SymConfig.h
 
 install-exec-local:
-	cat $(top_srcdir)/include/$(ConfigHeader) >> bla
+	echo "#ifndef __CONFIG_SYMPHONY_H__" > bla
+	echo "#define __CONFIG_SYMPHONY_H__" >> bla
+	tail -n +3 ../include/config_sym.h >> bla
+	echo "#endif" >> bla
 	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
 	rm -f bla
 
 uninstall-local:
 	rm -f $(DESTDIR)$(includecoindir)/$(ConfigHeader)
-
-

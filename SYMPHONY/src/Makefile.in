@@ -124,7 +124,8 @@ am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/include/config_sym.h
+CONFIG_HEADER = $(top_builddir)/include/config.h \
+	$(top_builddir)/include/config_sym.h
 CONFIG_CLEAN_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -9629,7 +9630,10 @@ rename_obj:
 	mv main.obj symphony-main.obj
 
 install-exec-local:
-	cat $(top_srcdir)/include/$(ConfigHeader) >> bla
+	echo "#ifndef __CONFIG_SYMPHONY_H__" > bla
+	echo "#define __CONFIG_SYMPHONY_H__" >> bla
+	tail -n +3 ../include/config_sym.h >> bla
+	echo "#endif" >> bla
 	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
 	rm -f bla
 

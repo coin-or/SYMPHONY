@@ -914,7 +914,7 @@ AC_CONFIG_FILES([
 fi
 
 # Here put the location and name of the configuration header file
-AC_CONFIG_HEADER([include/config_sym.h])
+AC_CONFIG_HEADER([include/config.h include/config_sym.h])
 
 # Finally, we let configure write all the output...
 AC_COIN_FINALIZE
