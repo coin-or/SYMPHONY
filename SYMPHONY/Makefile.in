@@ -105,15 +105,7 @@ CONFIG_CLEAN_FILES = Examples/Makefile \
 	Applications/MPP/Makefile Applications/SPP/Makefile \
 	Applications/SPP+CUTS/Makefile Applications/USER/Makefile \
 	Applications/VRP/Makefile symphony.pc symphony-app.pc \
-	symphony-uninstalled.pc osi-sym.pc osi-sym-uninstalled.pc \
-	$srcdir/Applications/CNRP/Makefile \
-	$srcdir/Applications/MATCH/Makefile \
-	$srcdir/Applications/MCKP/Makefile \
-	$srcdir/Applications/MPP/Makefile \
-	$srcdir/Applications/SPP/Makefile \
-	$srcdir/Applications/SPP+CUTS/Makefile \
-	$srcdir/Applications/USER/Makefile \
-	$srcdir/Applications/VRP/Makefile $srcdir/Examples/Makefile
+	symphony-uninstalled.pc osi-sym.pc osi-sym-uninstalled.pc
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -612,24 +604,6 @@ symphony-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/symphony-uninst
 osi-sym.pc: $(top_builddir)/config.status $(top_srcdir)/src/OsiSym/osi-sym.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 osi-sym-uninstalled.pc: $(top_builddir)/config.status $(top_srcdir)/src/OsiSym/osi-sym-uninstalled.pc.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-$srcdir/Applications/CNRP/Makefile: $(top_builddir)/config.status Applications/CNRP/Makefile
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-$srcdir/Applications/MATCH/Makefile: $(top_builddir)/config.status Applications/MATCH/Makefile
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-$srcdir/Applications/MCKP/Makefile: $(top_builddir)/config.status Applications/MCKP/Makefile
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-$srcdir/Applications/MPP/Makefile: $(top_builddir)/config.status Applications/MPP/Makefile
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-$srcdir/Applications/SPP/Makefile: $(top_builddir)/config.status Applications/SPP/Makefile
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-$srcdir/Applications/SPP+CUTS/Makefile: $(top_builddir)/config.status Applications/SPP+CUTS/Makefile
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-$srcdir/Applications/USER/Makefile: $(top_builddir)/config.status Applications/USER/Makefile
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-$srcdir/Applications/VRP/Makefile: $(top_builddir)/config.status Applications/VRP/Makefile
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-$srcdir/Examples/Makefile: $(top_builddir)/config.status Examples/Makefile
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:

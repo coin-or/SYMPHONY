@@ -900,19 +900,6 @@ AC_CONFIG_FILES([Makefile
 		 osi-sym.pc:src/OsiSym/osi-sym.pc.in
 		 osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in])
 
-if test `cd $srcdir; pwd` != `pwd`; then 
-AC_CONFIG_FILES([
-   	$srcdir/Applications/CNRP/Makefile:Applications/CNRP/Makefile
-	$srcdir/Applications/MATCH/Makefile:Applications/MATCH/Makefile
-	$srcdir/Applications/MCKP/Makefile:Applications/MCKP/Makefile
-	$srcdir/Applications/MPP/Makefile:Applications/MPP/Makefile
-	$srcdir/Applications/SPP/Makefile:Applications/SPP/Makefile
-	$srcdir/Applications/SPP+CUTS/Makefile:Applications/SPP+CUTS/Makefile
-	$srcdir/Applications/USER/Makefile:Applications/USER/Makefile
-	$srcdir/Applications/VRP/Makefile:Applications/VRP/Makefile
-	$srcdir/Examples/Makefile:Examples/Makefile])
-fi
-
 # Here put the location and name of the configuration header file
 AC_CONFIG_HEADER([include/config.h include/config_sym.h])
 

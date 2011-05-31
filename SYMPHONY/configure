@@ -28668,11 +28668,6 @@ fi
                                                                                                                                                                                               ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc:src/OsiSym/osi-sym.pc.in osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
 
 
-if test `cd $srcdir; pwd` != `pwd`; then
-                                                                                          ac_config_files="$ac_config_files $srcdir/Applications/CNRP/Makefile:Applications/CNRP/Makefile $srcdir/Applications/MATCH/Makefile:Applications/MATCH/Makefile $srcdir/Applications/MCKP/Makefile:Applications/MCKP/Makefile $srcdir/Applications/MPP/Makefile:Applications/MPP/Makefile $srcdir/Applications/SPP/Makefile:Applications/SPP/Makefile $srcdir/Applications/SPP+CUTS/Makefile:Applications/SPP+CUTS/Makefile $srcdir/Applications/USER/Makefile:Applications/USER/Makefile $srcdir/Applications/VRP/Makefile:Applications/VRP/Makefile $srcdir/Examples/Makefile:Examples/Makefile"
-
-fi
-
 # Here put the location and name of the configuration header file
                     ac_config_headers="$ac_config_headers include/config.h include/config_sym.h"
 
@@ -29756,15 +29751,6 @@ do
   "symphony-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES symphony-uninstalled.pc" ;;
   "osi-sym.pc" ) CONFIG_FILES="$CONFIG_FILES osi-sym.pc:src/OsiSym/osi-sym.pc.in" ;;
   "osi-sym-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in" ;;
-  "$srcdir/Applications/CNRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/CNRP/Makefile:Applications/CNRP/Makefile" ;;
-  "$srcdir/Applications/MATCH/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/MATCH/Makefile:Applications/MATCH/Makefile" ;;
-  "$srcdir/Applications/MCKP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/MCKP/Makefile:Applications/MCKP/Makefile" ;;
-  "$srcdir/Applications/MPP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/MPP/Makefile:Applications/MPP/Makefile" ;;
-  "$srcdir/Applications/SPP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/SPP/Makefile:Applications/SPP/Makefile" ;;
-  "$srcdir/Applications/SPP+CUTS/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/SPP+CUTS/Makefile:Applications/SPP+CUTS/Makefile" ;;
-  "$srcdir/Applications/USER/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/USER/Makefile:Applications/USER/Makefile" ;;
-  "$srcdir/Applications/VRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/VRP/Makefile:Applications/VRP/Makefile" ;;
-  "$srcdir/Examples/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Examples/Makefile:Examples/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config.h" ;;
   "include/config_sym.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config_sym.h" ;;
