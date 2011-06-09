@@ -661,20 +661,8 @@ includecoin_HEADERS = \
 	../include/symphony.h
 #	$(SYMHEADERS)
 
-#############################################################################
-# Create the Config.h file that always defines HAVE_CONFIG_H and install it #
-#############################################################################
-
-# You only need to adapt the following line
-ConfigHeader = SymConfig.h
-
 install-exec-local:
-	echo "#ifndef __CONFIG_SYMPHONY_H__" > bla
-	echo "#define __CONFIG_SYMPHONY_H__" >> bla
-	tail -n +3 ../include/config_sym.h >> bla
-	echo "#endif" >> bla
-	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
-	rm -f bla
+	$(install_sh_DATA) ../include/config_sym.h $(DESTDIR)$(includecoindir)/SymConfig.h
 
 uninstall-local:
-	rm -f $(DESTDIR)$(includecoindir)/$(ConfigHeader)
+	rm -f $(DESTDIR)$(includecoindir)/SymConfig.h

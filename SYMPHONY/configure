@@ -1089,7 +1089,9 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-debug          compile all projects with debug options tests
-  --enable-debug-symphony compile this project (SYMPHONY) with debug options
+                          (implies --disable-shared)
+  --enable-debug-symphony compile this project (SYMPHONY) with debug compiler
+                          flags
   --enable-doscompile     Under Cygwin, compile so that executables run under
                           DOS. Set to mingw to use gcc/g++/ld with
                           -mno-cygwin. Set to msvc to use cl/link (or
@@ -1148,6 +1150,7 @@ Optional Packages:
                           include additional configurations [automatic]
   --with-coin-instdir     prefix of installation directory for precompiled
                           COIN packages
+
   --with-coindepend-lib linker flags for using package CoinDepend
   --with-coindepend-incdir
                           directory with header files for using package
@@ -1924,7 +1927,6 @@ if test "${enable_debug_symphony+set}" = set; then
   enableval="$enable_debug_symphony"
   case "${enableval}" in
     yes) coin_debug_compile=true
-         enable_shared=no
          ;;
     no)  coin_debug_compile=false
          ;;
@@ -2918,7 +2920,7 @@ if test x"$CFLAGS" = x; then
       *)
         coin_opt_cflags="-O3"
         coin_add_cflags="-pipe"
-        coin_dbg_cflags="-g"
+        coin_dbg_cflags="-g -O0"
         coin_warn_cflags="-Wimplicit -Wparentheses -Wsequence-point -Wreturn-type -Wcast-qual -Wall -Wno-unknown-pragmas -Wno-long-long"
         case $build in
           *-darwin*)
@@ -3183,6 +3185,11 @@ case "$CFLAGS" in
       esac
     fi ;;
 esac
+
+# add -DPROJECT_BUILD to signal compiler preprocessor which config header file to include
+if test x$COIN_PRJCT != x; then
+  CFLAGS="$CFLAGS -D${COIN_PRJCT}_BUILD"
+fi
 
 # Try if CFLAGS works
 save_CFLAGS="$CFLAGS"
@@ -3845,7 +3852,7 @@ if test x"$CXXFLAGS" = x; then
 # ToDo decide about unroll-loops
         coin_opt_cxxflags="-O3"
         coin_add_cxxflags="-pipe"
-        coin_dbg_cxxflags="-g"
+        coin_dbg_cxxflags="-g -O0"
         coin_warn_cxxflags="-Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion -Wno-unknown-pragmas -Wno-long-long"
         case $build in
           *-darwin*)
@@ -4122,6 +4129,11 @@ case "$CXXFLAGS" in
       esac
     fi ;;
 esac
+
+# add -DPROJECT_BUILD to signal compiler preprocessor which config header file to include
+if test x$COIN_PRJCT != x; then
+  CXXFLAGS="$CXXFLAGS -D${COIN_PRJCT}_BUILD"
+fi
 
 # Try if CXXFLAGS works
 save_CXXFLAGS="$CXXFLAGS"
@@ -6021,7 +6033,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6024 "configure"' > conftest.$ac_ext
+  echo '#line 6036 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7155,7 +7167,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7158:" \
+echo "$as_me:7170:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8222,11 +8234,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8225: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8237: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8229: \$? = $ac_status" >&5
+   echo "$as_me:8241: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8490,11 +8502,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8493: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8505: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8497: \$? = $ac_status" >&5
+   echo "$as_me:8509: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8594,11 +8606,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8597: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8609: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8601: \$? = $ac_status" >&5
+   echo "$as_me:8613: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10939,7 +10951,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10942 "configure"
+#line 10954 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11039,7 +11051,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11042 "configure"
+#line 11054 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13383,11 +13395,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13386: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13398: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13390: \$? = $ac_status" >&5
+   echo "$as_me:13402: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13487,11 +13499,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13490: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13502: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13494: \$? = $ac_status" >&5
+   echo "$as_me:13506: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15057,11 +15069,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15060: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15072: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15064: \$? = $ac_status" >&5
+   echo "$as_me:15076: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15161,11 +15173,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15164: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15176: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15168: \$? = $ac_status" >&5
+   echo "$as_me:15180: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17368,11 +17380,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17371: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17383: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17375: \$? = $ac_status" >&5
+   echo "$as_me:17387: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17636,11 +17648,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17639: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17651: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17643: \$? = $ac_status" >&5
+   echo "$as_me:17655: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17740,11 +17752,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17743: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17755: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17747: \$? = $ac_status" >&5
+   echo "$as_me:17759: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -21181,6 +21193,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_coindepend" != skipping; then
+
+# Check whether --with-m4_tolower(CoinDepend) or --without-m4_tolower(CoinDepend) was given.
+if test "${with_coindepend+set}" = set; then
+  withval="$with_coindepend"
+  if test "$withval" = no ; then
+       coin_has_coindepend=skipping
+     fi
+
+fi;
+fi
+
 COINDEPEND_LIBS=
 COINDEPEND_CFLAGS=
 COINDEPEND_DATA=
@@ -21346,7 +21370,7 @@ COINDEPEND_CFLAGS_INSTALLED=
 COINDEPEND_DATA=
 COINDEPEND_DATA_INSTALLED=
 
-# initial list of dependencies is "coinutils osi", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coinutils osi", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coinutils osi"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -21667,6 +21691,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_clp" != skipping; then
+
+# Check whether --with-m4_tolower(Clp) or --without-m4_tolower(Clp) was given.
+if test "${with_clp+set}" = set; then
+  withval="$with_clp"
+  if test "$withval" = no ; then
+       coin_has_clp=skipping
+     fi
+
+fi;
+fi
+
 CLP_LIBS=
 CLP_CFLAGS=
 CLP_DATA=
@@ -21832,7 +21868,7 @@ CLP_CFLAGS_INSTALLED=
 CLP_DATA=
 CLP_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-clp", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-clp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-clp"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -22147,6 +22183,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_dylp" != skipping; then
+
+# Check whether --with-m4_tolower(DyLP) or --without-m4_tolower(DyLP) was given.
+if test "${with_dylp+set}" = set; then
+  withval="$with_dylp"
+  if test "$withval" = no ; then
+       coin_has_dylp=skipping
+     fi
+
+fi;
+fi
+
 DYLP_LIBS=
 DYLP_CFLAGS=
 DYLP_DATA=
@@ -22312,7 +22360,7 @@ DYLP_CFLAGS_INSTALLED=
 DYLP_DATA=
 DYLP_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-dylp", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-dylp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-dylp"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -22627,6 +22675,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_vol" != skipping; then
+
+# Check whether --with-m4_tolower(Vol) or --without-m4_tolower(Vol) was given.
+if test "${with_vol+set}" = set; then
+  withval="$with_vol"
+  if test "$withval" = no ; then
+       coin_has_vol=skipping
+     fi
+
+fi;
+fi
+
 VOL_LIBS=
 VOL_CFLAGS=
 VOL_DATA=
@@ -22792,7 +22852,7 @@ VOL_CFLAGS_INSTALLED=
 VOL_DATA=
 VOL_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-vol", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-vol", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-vol"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -23107,6 +23167,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_cgl" != skipping; then
+
+# Check whether --with-m4_tolower(Cgl) or --without-m4_tolower(Cgl) was given.
+if test "${with_cgl+set}" = set; then
+  withval="$with_cgl"
+  if test "$withval" = no ; then
+       coin_has_cgl=skipping
+     fi
+
+fi;
+fi
+
 CGL_LIBS=
 CGL_CFLAGS=
 CGL_DATA=
@@ -23272,7 +23344,7 @@ CGL_CFLAGS_INSTALLED=
 CGL_DATA=
 CGL_DATA_INSTALLED=
 
-# initial list of dependencies is "cgl", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "cgl", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="cgl"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -23588,6 +23660,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_ositests" != skipping; then
+
+# Check whether --with-m4_tolower(OsiTests) or --without-m4_tolower(OsiTests) was given.
+if test "${with_ositests+set}" = set; then
+  withval="$with_ositests"
+  if test "$withval" = no ; then
+       coin_has_ositests=skipping
+     fi
+
+fi;
+fi
+
 OSITESTS_LIBS=
 OSITESTS_CFLAGS=
 OSITESTS_DATA=
@@ -23738,7 +23822,7 @@ OSITESTS_CFLAGS_INSTALLED=
 OSITESTS_DATA=
 OSITESTS_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-unittests", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-unittests", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-unittests"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24038,6 +24122,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_sample" != skipping; then
+
+# Check whether --with-m4_tolower(Sample) or --without-m4_tolower(Sample) was given.
+if test "${with_sample+set}" = set; then
+  withval="$with_sample"
+  if test "$withval" = no ; then
+       coin_has_sample=skipping
+     fi
+
+fi;
+fi
+
 SAMPLE_LIBS=
 SAMPLE_CFLAGS=
 SAMPLE_DATA=
@@ -24188,7 +24284,7 @@ SAMPLE_CFLAGS_INSTALLED=
 SAMPLE_DATA=
 SAMPLE_DATA_INSTALLED=
 
-# initial list of dependencies is "coindatasample", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coindatasample", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatasample"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24488,6 +24584,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_netlib" != skipping; then
+
+# Check whether --with-m4_tolower(Netlib) or --without-m4_tolower(Netlib) was given.
+if test "${with_netlib+set}" = set; then
+  withval="$with_netlib"
+  if test "$withval" = no ; then
+       coin_has_netlib=skipping
+     fi
+
+fi;
+fi
+
 NETLIB_LIBS=
 NETLIB_CFLAGS=
 NETLIB_DATA=
@@ -24638,7 +24746,7 @@ NETLIB_CFLAGS_INSTALLED=
 NETLIB_DATA=
 NETLIB_DATA_INSTALLED=
 
-# initial list of dependencies is "coindatanetlib", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coindatanetlib", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatanetlib"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24938,6 +25046,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_miplib3" != skipping; then
+
+# Check whether --with-m4_tolower(Miplib3) or --without-m4_tolower(Miplib3) was given.
+if test "${with_miplib3+set}" = set; then
+  withval="$with_miplib3"
+  if test "$withval" = no ; then
+       coin_has_miplib3=skipping
+     fi
+
+fi;
+fi
+
 MIPLIB3_LIBS=
 MIPLIB3_CFLAGS=
 MIPLIB3_DATA=
@@ -25088,7 +25208,7 @@ MIPLIB3_CFLAGS_INSTALLED=
 MIPLIB3_DATA=
 MIPLIB3_DATA_INSTALLED=
 
-# initial list of dependencies is "coindatamiplib3", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coindatamiplib3", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatamiplib3"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -25394,6 +25514,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_cpx" != skipping; then
+
+# Check whether --with-m4_tolower(Cpx) or --without-m4_tolower(Cpx) was given.
+if test "${with_cpx+set}" = set; then
+  withval="$with_cpx"
+  if test "$withval" = no ; then
+       coin_has_cpx=skipping
+     fi
+
+fi;
+fi
+
 CPX_LIBS=
 CPX_CFLAGS=
 CPX_DATA=
@@ -25559,7 +25691,7 @@ CPX_CFLAGS_INSTALLED=
 CPX_DATA=
 CPX_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-cplex"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -25874,6 +26006,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_glpk" != skipping; then
+
+# Check whether --with-m4_tolower(Glpk) or --without-m4_tolower(Glpk) was given.
+if test "${with_glpk+set}" = set; then
+  withval="$with_glpk"
+  if test "$withval" = no ; then
+       coin_has_glpk=skipping
+     fi
+
+fi;
+fi
+
 GLPK_LIBS=
 GLPK_CFLAGS=
 GLPK_DATA=
@@ -26039,7 +26183,7 @@ GLPK_CFLAGS_INSTALLED=
 GLPK_DATA=
 GLPK_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-glpk", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-glpk", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-glpk"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -26355,6 +26499,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_msk" != skipping; then
+
+# Check whether --with-m4_tolower(Msk) or --without-m4_tolower(Msk) was given.
+if test "${with_msk+set}" = set; then
+  withval="$with_msk"
+  if test "$withval" = no ; then
+       coin_has_msk=skipping
+     fi
+
+fi;
+fi
+
 MSK_LIBS=
 MSK_CFLAGS=
 MSK_DATA=
@@ -26520,7 +26676,7 @@ MSK_CFLAGS_INSTALLED=
 MSK_DATA=
 MSK_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-mosek", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-mosek", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-mosek"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -26836,6 +26992,18 @@ if test x"$COIN_SKIP_PROJECTS" != x; then
   done
 fi
 
+if test "$coin_has_xpr" != skipping; then
+
+# Check whether --with-m4_tolower(Xpr) or --without-m4_tolower(Xpr) was given.
+if test "${with_xpr+set}" = set; then
+  withval="$with_xpr"
+  if test "$withval" = no ; then
+       coin_has_xpr=skipping
+     fi
+
+fi;
+fi
+
 XPR_LIBS=
 XPR_CFLAGS=
 XPR_DATA=
@@ -27001,7 +27169,7 @@ XPR_CFLAGS_INSTALLED=
 XPR_DATA=
 XPR_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-xpress", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-xpress", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-xpress"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it

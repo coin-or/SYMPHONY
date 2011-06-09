@@ -1,5 +1,8 @@
 /* include/config_sym.h.in. */
 
+#ifndef __CONFIG_SYM_H__
+#define __CONFIG_SYM_H__
+
 /* SVN revision number of project */
 #undef SYMPHONY_SVN_REV
 
@@ -15,3 +18,4 @@
 /* Release Version number of project */
 #undef SYMPHONY_VERSION_RELEASE
 
+#endif

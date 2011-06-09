@@ -3077,14 +3077,6 @@ includecoindir = $(includedir)/coin
 includecoin_HEADERS = \
 	../include/symphony.h
 
-#	$(SYMHEADERS)
-
-#############################################################################
-# Create the Config.h file that always defines HAVE_CONFIG_H and install it #
-#############################################################################
-
-# You only need to adapt the following line
-ConfigHeader = SymConfig.h
 all: all-recursive
 
 .SUFFIXES:
@@ -9628,17 +9620,13 @@ uninstall-info: uninstall-info-recursive
 
 rename_obj:
 	mv main.obj symphony-main.obj
+#	$(SYMHEADERS)
 
 install-exec-local:
-	echo "#ifndef __CONFIG_SYMPHONY_H__" > bla
-	echo "#define __CONFIG_SYMPHONY_H__" >> bla
-	tail -n +3 ../include/config_sym.h >> bla
-	echo "#endif" >> bla
-	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
-	rm -f bla
+	$(install_sh_DATA) ../include/config_sym.h $(DESTDIR)$(includecoindir)/SymConfig.h
 
 uninstall-local:
-	rm -f $(DESTDIR)$(includecoindir)/$(ConfigHeader)
+	rm -f $(DESTDIR)$(includecoindir)/SymConfig.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
