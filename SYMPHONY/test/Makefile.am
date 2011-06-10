@@ -120,13 +120,11 @@ punitTest_SOURCES = \
 unitTest_CPPFLAGS = $(SYMCPPFLAGS)
 unitTest_LDADD = $(SYMLIB) $(ALLLDADD)
 unitTest_DEPENDENCIES = $(SYMLIB) $(DEPENDENCIES)
-unitTest_LDFLAGS = -rpath $(libdir)
 unitTest_LINK = $(TestLINK)
 
 punitTest_CPPFLAGS = $(SYMPCPPFLAGS)
 punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD)
 punitTest_DEPENDENCIES = $(SYMPLIB) $(DEPENDENCIES)
-punitTest_LDFLAGS = -rpath $(libdir)
 
 
 # We are using the Cbc solver executable to do the unit test
