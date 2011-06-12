@@ -91,7 +91,6 @@ TestLINK += cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
 	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
 	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
 	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
-	cp -f OsiSolverInterfaceTest.$(OBJEXT) unitTest-OsiSolverInterfaceTest.$(OBJEXT); \
 	cp -f OsiSymSolverInterfaceTest.$(OBJEXT) unitTest-OsiSymSolverInterfaceTest.$(OBJEXT); \
 	cp -f unitTestSym.$(OBJEXT) unitTest-unitTestSym.$(OBJEXT); \
 	$(LIBTOOL) \
@@ -99,8 +98,7 @@ TestLINK += cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 TestLDADD += OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
 	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
-	OsiSolverInterfaceTest.$(OBJEXT) OsiSymSolverInterfaceTest.$(OBJEXT) \
-	 unitTestSym.$(OBJEXT)
+	OsiSymSolverInterfaceTest.$(OBJEXT) unitTestSym.$(OBJEXT)
 else 
 TestLINK += $(CXXLINK)
 endif
@@ -108,77 +106,73 @@ endif
 noinst_PROGRAMS = unitTest punitTest
 
 unitTest_SOURCES = \
-	OsiSolverInterfaceTest.cpp \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
 punitTest_SOURCES = \
-	OsiSolverInterfaceTest.cpp \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
-unitTest_CPPFLAGS = $(SYMCPPFLAGS)
-unitTest_LDADD = $(SYMLIB) $(ALLLDADD)
+unitTest_CPPFLAGS = $(SYMCPPFLAGS) $(OSIUNITTEST_CFLAGS)
+unitTest_LDADD = $(SYMLIB) $(ALLLDADD) $(OSIUNITTEST_LIBS)
 unitTest_DEPENDENCIES = $(SYMLIB) $(DEPENDENCIES)
 unitTest_LINK = $(TestLINK)
 
-punitTest_CPPFLAGS = $(SYMPCPPFLAGS)
-punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD)
+punitTest_CPPFLAGS = $(SYMPCPPFLAGS) $(OSIUNITTEST_CFLAGS)
+punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD) $(OSIUNITTEST_LIBS)
 punitTest_DEPENDENCIES = $(SYMPLIB) $(DEPENDENCIES)
 
 
-# We are using the Cbc solver executable to do the unit test
-
 if COIN_HAS_MIPLIB3
-MIPLIBDIR=$(MIPLIB3_DATA)
+  MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(MIPLIB3_DATA)`
+check_files:
+	  echo "using MIPLIB3 directory $(MIPLIB3_DATA)"
+
 else
-MIPLIBDIR = $(top_srcdir)/miplib3
+  MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(top_srcdir)/miplib3`
+  
+check_files:
+	if test -r $(top_srcdir)/miplib3; then \
+	  echo "MIBLIB3 directory found..."; \
+	else \
+	  echo "Downloading required test files to $(top_srcdir)/miplib3"; \
+	  mkdir $(top_srcdir)/miplib3; \
+	  for file in $(testFILES); do \
+	    (echo $$file; svn cat https://projects.coin-or.org/svn/Data/miplib3/stable/1.2/$$file.gz >> $(top_srcdir)/miplib3/$$file.gz) \
+	  done; \
+	  fi; \
+	  echo "Uncompressing files"; \
+	  cd $(top_srcdir)/miplib3; \
+	  for file in $(testFILES); do \
+	    if test -r $$file.gz; then \
+	      (gzip -d $$file.gz) \
+	    fi \
+	  done
+endif
+
+unittestflags =
+if COIN_HAS_NETLIB
+  unittestflags += -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
+endif
+if COIN_HAS_SAMPLE
+  unittestflags += -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
 endif
 
 testFILES = air03 dcmulti egout flugpl khb05250 l152lav \
 	lseu mod010 p0033 p0201 stein27 vpm1
 
+# by passing -miplib3Dir= we can overwrite using a default miplib3 path which would trigger the MIPLIB tests
 test: unitTest$(EXEEXT)
-	if test x"$(NETLIB_DATA)" != x; then \
-		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
-	fi;
-	./unitTest$(EXEEXT) $$NETLIBARG -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA) | sed -e 's/\\\\/\\\\\\\\/g'`
+	./unitTest$(EXEEXT) -miplib3Dir= $(unittestflags)
 
 fulltest: check_files unitTest$(EXEEXT)
-	if test x"$(NETLIB_DATA)" != x; then \
-		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
-	fi;
-	./unitTest$(EXEEXT) $$NETLIBARG -T $(MIPLIBDIR)
+	./unitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags)
 
 ptest: punitTest$(EXEEXT)
-	if test x"$(NETLIB_DATA)" != x; then \
-		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
-	fi;
-	./punitTest$(EXEEXT) $$NETLIBARG -p 2
+	./punitTest$(EXEEXT) -miplib3Dir= $(unittestflags) -p 2
 
 pfulltest: check_files punitTest$(EXEEXT)
-	if test x"$(NETLIB_DATA)" != x; then \
-		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
-	fi;
-	./punitTest$(EXEEXT) $$NETLIBARG -T $(MIPLIBDIR) -p 2
-
-check_files:
-	  if test -r $(MIPLIBDIR); then \
-	   echo "MIBLIB3 directory found..."; \
-	  else \
-	   echo "Downloading required test files to $(MIPIBDIR)"; \
-	   mkdir $(MIPLIBDIR); \
-	   for file in $(testFILES); do \
-	       (echo $$file; svn cat https://projects.coin-or.org/svn/Data/stable/1.0/miplib3/$$file.gz >> $(MIPLIBDIR)/$$file.gz) \
-	   done; \
-	  fi; \
-	  echo "Uncompressing files"; \
-	  cd $(MIPLIBDIR); \
-	  for file in $(testFILES); do \
-	   if test -r $$file.gz; then \
-		(gzip -d $$file.gz) \
-	   fi \
-	  done
+	./punitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags) -p 2
 
 .PHONY: test ptest fulltest pfulltest check_files
 

@@ -2827,6 +2827,7 @@ STATIC_LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) -all-static\
 
 # Link with g++
 LINK = $(am__append_37) $(am__append_38)
+# the rpath seem to be necessary to have a .lai file created, which is necessary for installing libraries
 SYMLINK = $(am__append_39) $(am__append_40)
 
 ########################################################################

@@ -136,7 +136,6 @@ SYMPHONY/symphony-uninstalled.pc.in -text
 SYMPHONY/symphony.pc.in -text
 SYMPHONY/test/Makefile.am -text
 SYMPHONY/test/Makefile.in -text
-SYMPHONY/test/OsiSolverInterfaceTest.cpp -text
 SYMPHONY/test/OsiSymSolverInterfaceTest.cpp -text
 SYMPHONY/test/unitTestSym.cpp -text
 /compile -text
