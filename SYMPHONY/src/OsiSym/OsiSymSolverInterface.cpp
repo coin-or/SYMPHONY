@@ -17,12 +17,16 @@
 /*===========================================================================*/
 
 #include "OsiSymSolverInterface.hpp"
-#include "CoinMpsIO.hpp"
 
+#include <iostream>
+using namespace std;
+
+#include "CoinMpsIO.hpp"
 #include "OsiCuts.hpp"
 #include "OsiRowCut.hpp"
 #include "OsiColCut.hpp"
 
+#include "symphony.h"
 
 //#############################################################################
 // A couple of helper functions

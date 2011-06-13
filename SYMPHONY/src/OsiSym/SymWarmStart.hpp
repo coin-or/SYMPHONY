@@ -19,12 +19,9 @@
 #ifndef SymWarmStart_H
 #define SymWarmStart_H
 
-#include "CoinHelperFunctions.hpp"
 #include "CoinWarmStart.hpp"
-#include <iostream>
-#include "symphony.h"
 
-using namespace std;
+typedef struct WARM_START_DESC warm_start_desc;
 
 //#############################################################################
 

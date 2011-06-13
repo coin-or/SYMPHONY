@@ -24,6 +24,8 @@
 #include "OsiUnitTests.hpp"
 #include "CoinPackedMatrix.hpp"
 
+#include "symphony.h"
+
 //--------------------------------------------------------------------------
 int OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string & netlibDir )
 {  

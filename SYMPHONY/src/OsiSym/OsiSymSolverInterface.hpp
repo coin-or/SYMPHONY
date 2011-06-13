@@ -22,14 +22,10 @@
 #include "OsiSolverInterface.hpp"
 #include "OsiSymSolverParameters.hpp"
 #include "SymWarmStart.hpp"
-#include "symphony.h"
 
-#include "CoinPackedVector.hpp"
-#include "CoinPackedMatrix.hpp"
-
-#include <iostream>
 #include <string>
-#include <cassert>
+
+typedef struct SYM_ENVIRONMENT sym_environment;
 
 //#############################################################################
 

@@ -18,6 +18,10 @@
 
 #include "SymWarmStart.hpp"
 
+#include <iostream>
+
+#include "symphony.h"
+
 //#############################################################################
 
 SymWarmStart::SymWarmStart(warm_start_desc * ws)
@@ -72,7 +76,7 @@ warm_start_desc * SymWarmStart::getCopyOfWarmStartDesc()
       return(sym_create_copy_warm_start(warmStart_));
    }
    else{
-      cout<<"getWarmStart(): No loaded warm start desc. to return!"<<endl;
+      std::cout<<"getWarmStart(): No loaded warm start desc. to return!"<<std::endl;
       return 0;
    }
 }
