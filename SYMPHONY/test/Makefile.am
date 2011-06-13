@@ -169,10 +169,10 @@ fulltest: check_files unitTest$(EXEEXT)
 	./unitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags)
 
 ptest: punitTest$(EXEEXT)
-	./punitTest$(EXEEXT) -miplib3Dir= $(unittestflags) -p 2
+	./punitTest$(EXEEXT) -miplib3Dir= $(unittestflags)
 
 pfulltest: check_files punitTest$(EXEEXT)
-	./punitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags) -p 2
+	./punitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags)
 
 .PHONY: test ptest fulltest pfulltest check_files
 

@@ -45,7 +45,6 @@ void testingMessage( const char * const msg ) {
 int main (int argc, const char *argv[])
 {
   std::string miplib3Dir;
-  bool exception = false;
   /*
     Start off with various bits of initialisation that don't really belong
     anywhere else.
@@ -68,67 +67,60 @@ int main (int argc, const char *argv[])
     Process command line parameters.
   */
   std::map<std::string,std::string> parms;
-  std::map<std::string,int> ignorekeywords;
-  ignorekeywords["-p"] = 1;
-  if (processParameters(argc,argv,parms,ignorekeywords) == false)
+  if (processParameters(argc,argv,parms) == false)
   { return (1) ; }
 
   std::string mpsDir = parms["-mpsDir"] ;
   std::string netlibDir = parms["-netlibDir"] ;
   miplib3Dir = parms["-miplib3Dir"];
 
-  try {
-    /*
-      Test Osi{Row,Col}Cut routines.
-    */
-    {
-      OsiSymSolverInterface symSi;
-      symSi.setSymParam(OsiSymVerbosity, -1);
-      testingMessage( "Now testing the OsiRowCut class with OsiSymSolverInterface\n\n");
-      OsiRowCutUnitTest(&symSi,mpsDir);
-    }
-    {
-      OsiSymSolverInterface symSi;
-      symSi.setSymParam(OsiSymVerbosity, -1);
-      testingMessage( "Now testing the OsiColCut class with OsiSymSolverInterface\n\n" );
-      OsiColCutUnitTest(&symSi,mpsDir);
-    }
-    {
-      OsiSymSolverInterface symSi;
-      symSi.setSymParam(OsiSymVerbosity, -1);
-      testingMessage( "Now testing the OsiRowCutDebugger class with OsiSymSolverInterface\n\n" );
-      OsiRowCutDebuggerUnitTest(&symSi,mpsDir);
-    }
+  /*
+    Test Osi{Row,Col}Cut routines.
+   */
+  {
+    OsiSymSolverInterface symSi;
+    symSi.setSymParam(OsiSymVerbosity, -1);
+    testingMessage( "Now testing the OsiRowCut class with OsiSymSolverInterface\n\n");
+    OSIUNITTEST_CATCH_ERROR(OsiRowCutUnitTest(&symSi,mpsDir), {}, "symphony", "rowcut unittest");
+  }
+  {
+    OsiSymSolverInterface symSi;
+    symSi.setSymParam(OsiSymVerbosity, -1);
+    testingMessage( "Now testing the OsiColCut class with OsiSymSolverInterface\n\n" );
+    OSIUNITTEST_CATCH_ERROR(OsiColCutUnitTest(&symSi,mpsDir), {}, "symphony", "colcut unittest");
+  }
+  {
+    OsiSymSolverInterface symSi;
+    symSi.setSymParam(OsiSymVerbosity, -1);
+    testingMessage( "Now testing the OsiRowCutDebugger class with OsiSymSolverInterface\n\n" );
+    OSIUNITTEST_CATCH_ERROR(OsiRowCutDebuggerUnitTest(&symSi,mpsDir), {}, "symphony", "rowcut debugger unittest");
+  }
 
-    /*
-      Run the OsiSym class test. This will also call OsiSolverInterfaceCommonUnitTest.
-    */
-    testingMessage( "Now testing OsiSymSolverInterface\n\n" );
-    OsiSymSolverInterfaceUnitTest(mpsDir,netlibDir);
+  /*
+    Run the OsiSym class test. This will also call OsiSolverInterfaceCommonUnitTest.
+   */
+  testingMessage( "Now testing OsiSymSolverInterface\n\n" );
+  OSIUNITTEST_CATCH_ERROR(OsiSymSolverInterfaceUnitTest(mpsDir,netlibDir), {}, "symphony", "Osi unittest");
 
-    /*
-      We have run the specialised unit test.
-      Check now to see if we need to run through the Netlib problems.
-    */
-    if (parms.find("-testOsiSolverInterface") != parms.end())
-    {
-      // Create vector of solver interfaces
-      std::vector<OsiSolverInterface*> vecSi(1, new OsiSymSolverInterface);
+  /*
+    We have run the specialised unit test.
+    Check now to see if we need to run through the Netlib problems.
+   */
+  if (parms.find("-testOsiSolverInterface") != parms.end())
+  {
+    // Create vector of solver interfaces
+    OsiSymSolverInterface* symSi = new OsiSymSolverInterface();
+    symSi->setSymParam(OsiSymVerbosity, -1);
+    std::vector<OsiSolverInterface*> vecSi(1, symSi);
 
-      testingMessage( "Testing OsiSolverInterface on Netlib problems.\n" );
-      OsiSolverInterfaceMpsUnitTest(vecSi,netlibDir);
+    testingMessage( "Testing OsiSolverInterface on Netlib problems.\n" );
+    OSIUNITTEST_CATCH_ERROR(OsiSolverInterfaceMpsUnitTest(vecSi,netlibDir), {}, "symphony", "Netlib unittest");
 
-      delete vecSi[0];
-    }
-    else {
-      testingMessage( "***Skipped Testing of OsiSymSolverInterface on Netlib problems***\n" );
-      testingMessage( "***use -testOsiSolverInterface to run them.***\n" );
-    }
-  } catch (CoinError& error) {
-    std::cout.flush();
-    std::cerr << "Caught CoinError exception: ";
-    error.print(true);
-    exception = true;
+    delete vecSi[0];
+  }
+  else
+  {
+    testingMessage( "***Skipped Testing of OsiSymSolverInterface on Netlib problems, use -testOsiSolverInterface to run them.***\n" );
   }
 #else
   /* a very light version of "parameter processing": check if user call with -miplib3Dir=<dir> */
@@ -138,10 +130,22 @@ int main (int argc, const char *argv[])
 
   if (miplib3Dir.length() > 0) {
     int test_status;
+    int symargc;
+    const char* symargv[5];
     testingMessage( "Testing MIPLIB files\n" );
 
     sym_environment *env = sym_open_environment();
-    sym_parse_command_line(env, argc, const_cast<char**>(argv));
+    /* assemble arguments for symphony: -T miplibdir, and -p 2 if we run the punittest */
+    symargc = 3;
+    symargv[0] = argv[0];
+    symargv[1] = "-T";
+    symargv[2] = miplib3Dir.c_str();
+    if( argv[0][0] == 'p' || argv[0][0] == 'P' ) {
+      symargc = 5;
+      symargv[3] = "-p";
+      symargv[4] = "-2";
+    }
+    sym_parse_command_line(env, symargc, const_cast<char**>(symargv));
     sym_test(env, &test_status);
 
 #ifdef COIN_HAS_OSITESTS
@@ -165,12 +169,10 @@ int main (int argc, const char *argv[])
 
   if (nerrors > nerrors_expected)
     std::cerr << "Tests completed with " << nerrors - nerrors_expected << " unexpected errors." << std::endl ;
-  else if( exception )
-    std::cerr << "Tests completed with exception\n";
   else
     std::cerr << "All tests completed successfully\n";
 
-  return (nerrors - nerrors_expected) + (exception ? 1 : 0);
+  return nerrors - nerrors_expected;
 #else
 
   testingMessage( "All tests completed successfully\n" );
