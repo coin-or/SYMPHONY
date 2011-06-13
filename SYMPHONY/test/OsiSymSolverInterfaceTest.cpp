@@ -20,14 +20,13 @@
 #include "OsiSymSolverInterface.hpp"
 #include "OsiCuts.hpp"
 #include "OsiRowCut.hpp"
-#include "OsiColCut.hpp"
 #include "OsiUnitTests.hpp"
 #include "CoinPackedMatrix.hpp"
 
 #include "symphony.h"
 
 //--------------------------------------------------------------------------
-int OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string & netlibDir )
+void OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string & netlibDir )
 {  
   // Test default constructor
   {
@@ -136,8 +135,8 @@ int OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string
       const double * rl = symSi.getRowLower();
       const double * ru = symSi.getRowUpper();
 
-      OSIUNITTEST_ASSERT_ERROR(nc == 8, return 1, "symphony", "read and copy exmip1");
-      OSIUNITTEST_ASSERT_ERROR(nr == 5, return 1, "symphony", "read and copy exmip1");
+      OSIUNITTEST_ASSERT_ERROR(nc == 8, return, "symphony", "read and copy exmip1");
+      OSIUNITTEST_ASSERT_ERROR(nr == 5, return, "symphony", "read and copy exmip1");
       OSIUNITTEST_ASSERT_ERROR(eq(cl[0],2.5), {}, "symphony", "read and copy exmip1");
       OSIUNITTEST_ASSERT_ERROR(eq(cl[1],0.0), {}, "symphony", "read and copy exmip1");
       OSIUNITTEST_ASSERT_ERROR(eq(cu[1],4.1), {}, "symphony", "read and copy exmip1");
@@ -179,8 +178,8 @@ int OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string
       const OsiSymSolverInterface si(m);
       const CoinPackedMatrix * smP = si.getMatrixByRow();
       
-      OSIUNITTEST_ASSERT_ERROR(smP->getMajorDim()    ==  5, return 1, "symphony", "getMatrixByRow: major dim");
-      OSIUNITTEST_ASSERT_ERROR(smP->getNumElements() == 14, return 1, "symphony", "getMatrixByRow: num elements");
+      OSIUNITTEST_ASSERT_ERROR(smP->getMajorDim()    ==  5, return, "symphony", "getMatrixByRow: major dim");
+      OSIUNITTEST_ASSERT_ERROR(smP->getNumElements() == 14, return, "symphony", "getMatrixByRow: num elements");
 
       CoinRelFltEq eq;
       const double * ev = smP->getElements();
@@ -254,8 +253,8 @@ int OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string
         
         const CoinPackedMatrix * siC1mbr = siC1.getMatrixByRow();
         OSIUNITTEST_ASSERT_ERROR(siC1mbr != NULL, {}, "symphony", "matrix by row");
-        OSIUNITTEST_ASSERT_ERROR(siC1mbr->getMajorDim()    ==  5, return 1, "symphony", "matrix by row: major dim");
-        OSIUNITTEST_ASSERT_ERROR(siC1mbr->getNumElements() == 14, return 1, "symphony", "matrix by row: num elements");
+        OSIUNITTEST_ASSERT_ERROR(siC1mbr->getMajorDim()    ==  5, return, "symphony", "matrix by row: major dim");
+        OSIUNITTEST_ASSERT_ERROR(siC1mbr->getNumElements() == 14, return, "symphony", "matrix by row: num elements");
         
         const double * ev = siC1mbr->getElements();
         OSIUNITTEST_ASSERT_ERROR(eq(ev[ 0], 3.0), {}, "symphony", "matrix by row: elements");
@@ -363,8 +362,8 @@ int OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string
       
       const CoinPackedMatrix * lhsmbr = lhs.getMatrixByRow();
       OSIUNITTEST_ASSERT_ERROR(lhsmbr != NULL, {}, "symphony", "matrix by row after assignment");
-      OSIUNITTEST_ASSERT_ERROR(lhsmbr->getMajorDim()    ==  6, return 1, "symphony", "matrix by row after assignment: major dim");
-      OSIUNITTEST_ASSERT_ERROR(lhsmbr->getNumElements() == 14, return 1, "symphony", "matrix by row after assignment: num elements");
+      OSIUNITTEST_ASSERT_ERROR(lhsmbr->getMajorDim()    ==  6, return, "symphony", "matrix by row after assignment: major dim");
+      OSIUNITTEST_ASSERT_ERROR(lhsmbr->getNumElements() == 14, return, "symphony", "matrix by row after assignment: num elements");
 
       const double * ev = lhsmbr->getElements();
       OSIUNITTEST_ASSERT_ERROR(eq(ev[ 0], 3.0), {}, "symphony", "matrix by row after assignment: elements");
@@ -413,6 +412,4 @@ int OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string
      OsiSymSolverInterface m;
      OsiSolverInterfaceCommonUnitTest(&m, mpsDir,netlibDir);
   }
-
-  return 0;
 }

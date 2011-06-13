@@ -16,26 +16,20 @@
 #include "SymConfig.h"
 
 #include <iostream>
-#include <cstdio>
 
 #ifdef COIN_HAS_OSITESTS
-#include "OsiRowCut.hpp"
-#include "OsiColCut.hpp"
-#include "OsiCuts.hpp"
-#include "OsiRowCutDebugger.hpp"
 #include "OsiUnitTests.hpp"
-#include "CoinError.hpp"
-#include "CoinHelperFunctions.hpp"
-#include "CoinSort.hpp"
 #include "OsiSolverInterface.hpp"
 #include "OsiSymSolverInterface.hpp"
 
 using namespace OsiUnitTest;
 
 #else
+#include <cstring>
+
 void testingMessage( const char * const msg ) {
   std::cout.flush() ;
-  std::cerr <<msg;
+  std::cerr << msg;
 }
 
 #endif
@@ -61,14 +55,12 @@ int main (int argc, const char *argv[])
   WindowsErrorPopupBlocker();
 
 #ifdef COIN_HAS_OSITESTS
-  outcomes.clear();
-
   /*
     Process command line parameters.
   */
   std::map<std::string,std::string> parms;
   if (processParameters(argc,argv,parms) == false)
-  { return (1) ; }
+  { return 1; }
 
   std::string mpsDir = parms["-mpsDir"] ;
   std::string netlibDir = parms["-netlibDir"] ;
@@ -125,7 +117,7 @@ int main (int argc, const char *argv[])
 #else
   /* a very light version of "parameter processing": check if user call with -miplib3Dir=<dir> */
   if( argc >= 2 && strncmp(argv[1], "-miplib3Dir", 11) == 0 )
-    miplib3Dir = argv[1]+11;
+    miplib3Dir = argv[1]+12;
 #endif
 
   if (miplib3Dir.length() > 0) {

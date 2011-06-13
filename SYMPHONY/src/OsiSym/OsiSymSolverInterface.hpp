@@ -51,7 +51,7 @@ typedef struct SYM_ENVIRONMENT sym_environment;
 */
 
 class OsiSymSolverInterface : virtual public OsiSolverInterface {
-   friend int OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
+   friend void OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
    
 public:
    ///@name Solve methods 
@@ -805,11 +805,7 @@ private:
 };
 
 //#############################################################################
-/** A function that tests the methods in the OsiSymSolverInterface class. The
-    only reason for it not to be a member method is that this way it doesn't
-    have to be compiled into the library. And that's a gain, because the
-    library should be compiled with optimization on, but this method should be
-    compiled with debugging. */
-int OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
+/** A function that tests the methods in the OsiSymSolverInterface class. */
+void OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
 
 #endif
