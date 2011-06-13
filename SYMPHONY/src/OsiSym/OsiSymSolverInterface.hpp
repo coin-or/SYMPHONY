@@ -669,13 +669,13 @@ public:
       /// keep all cached data (similar to getMutableLpPtr())
       KEEPCACHED_ALL     = KEEPCACHED_PROBLEM | KEEPCACHED_RESULTS,
       /// free only cached column and LP solution information
-      FREECACHED_COLUMN  = KEEPCACHED_PROBLEM & !KEEPCACHED_COLUMN,
+      FREECACHED_COLUMN  = KEEPCACHED_PROBLEM & ~KEEPCACHED_COLUMN,
       /// free only cached row and LP solution information
-      FREECACHED_ROW     = KEEPCACHED_PROBLEM & !KEEPCACHED_ROW,
+      FREECACHED_ROW     = KEEPCACHED_PROBLEM & ~KEEPCACHED_ROW,
       /// free only cached matrix and LP solution information
-      FREECACHED_MATRIX  = KEEPCACHED_PROBLEM & !KEEPCACHED_MATRIX,
+      FREECACHED_MATRIX  = KEEPCACHED_PROBLEM & ~KEEPCACHED_MATRIX,
       /// free only cached LP solution information
-      FREECACHED_RESULTS = KEEPCACHED_ALL & !KEEPCACHED_RESULTS
+      FREECACHED_RESULTS = KEEPCACHED_ALL & ~KEEPCACHED_RESULTS
    };
    
   ///@name Constructors and destructors
