@@ -759,9 +759,6 @@ private:
   /// free all allocated memory
   void freeAllMemory();
 
-  /// Just for testing purposes
-  void printBounds(); 
-
   /**@name Private member data */
   //@{
    /// The pointer to the SYMPHONY problem environment
