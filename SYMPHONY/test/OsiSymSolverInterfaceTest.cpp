@@ -151,7 +151,7 @@ int OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::string
 
       OSIUNITTEST_ASSERT_ERROR(!eq(cl[3],1.2345), {}, "symphony", "set col lower");
       symSi.setColLower( 3, 1.2345 );
-      OSIUNITTEST_ASSERT_ERROR( eq(cl[3],1.2345), {}, "symphony", "set col lower");
+      OSIUNITTEST_ASSERT_ERROR( eq(symSi.getColLower()[3],1.2345), {}, "symphony", "set col lower");
 
       OSIUNITTEST_ASSERT_ERROR(!eq(symSi.getColUpper()[4],10.2345), {}, "symphony", "set col upper");
       symSi.setColUpper( 4, 10.2345 );
