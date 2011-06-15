@@ -2909,7 +2909,7 @@ if test x"$CFLAGS" = x; then
       *)
         coin_opt_cflags="-O3"
         coin_add_cflags="-pipe"
-        coin_dbg_cflags="-g"
+        coin_dbg_cflags="-g -O0"
         coin_warn_cflags="-Wimplicit -Wparentheses -Wsequence-point -Wreturn-type -Wcast-qual -Wall -Wno-unknown-pragmas"
         case $build in
           *-darwin*)
@@ -3837,8 +3837,8 @@ if test x"$CXXFLAGS" = x; then
 # ToDo decide about unroll-loops
         coin_opt_cxxflags="-O3"
         coin_add_cxxflags="-pipe"
-        coin_dbg_cxxflags="-g"
-        coin_warn_cxxflags="-Wimplicit -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion -Wno-unknown-pragmas"
+        coin_dbg_cxxflags="-g -O0"
+        coin_warn_cxxflags="-Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion -Wno-unknown-pragmas"
         case $build in
           *-darwin*)
             ;;
@@ -21314,7 +21314,7 @@ COINDEPEND_CFLAGS_INSTALLED=
 COINDEPEND_DATA=
 COINDEPEND_DATA_INSTALLED=
 
-# initial list of dependencies is "coinutils osi", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coinutils osi", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coinutils osi"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -21353,7 +21353,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$COINDEPEND_DATA" = x ; then
@@ -21424,9 +21424,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -21469,9 +21472,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -21502,12 +21508,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     COINDEPEND_LIBS=`echo " $COINDEPEND_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    COINDEPEND_LIBS_INSTALLED=`echo " $COINDEPEND_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    COINDEPEND_LIBS_INSTALLED=`echo " $COINDEPEND_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -21787,7 +21793,7 @@ CLP_CFLAGS_INSTALLED=
 CLP_DATA=
 CLP_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-clp", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-clp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-clp"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -21826,7 +21832,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$CLP_DATA" = x ; then
@@ -21897,9 +21903,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -21942,9 +21951,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -21975,12 +21987,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     CLP_LIBS=`echo " $CLP_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    CLP_LIBS_INSTALLED=`echo " $CLP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    CLP_LIBS_INSTALLED=`echo " $CLP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -22254,7 +22266,7 @@ DYLP_CFLAGS_INSTALLED=
 DYLP_DATA=
 DYLP_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-dylp", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-dylp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-dylp"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -22293,7 +22305,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$DYLP_DATA" = x ; then
@@ -22364,9 +22376,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -22409,9 +22424,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -22442,12 +22460,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     DYLP_LIBS=`echo " $DYLP_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    DYLP_LIBS_INSTALLED=`echo " $DYLP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    DYLP_LIBS_INSTALLED=`echo " $DYLP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -22721,7 +22739,7 @@ VOL_CFLAGS_INSTALLED=
 VOL_DATA=
 VOL_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-vol", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-vol", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-vol"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -22760,7 +22778,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$VOL_DATA" = x ; then
@@ -22831,9 +22849,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -22876,9 +22897,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -22909,12 +22933,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     VOL_LIBS=`echo " $VOL_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    VOL_LIBS_INSTALLED=`echo " $VOL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    VOL_LIBS_INSTALLED=`echo " $VOL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -23188,7 +23212,7 @@ CGL_CFLAGS_INSTALLED=
 CGL_DATA=
 CGL_DATA_INSTALLED=
 
-# initial list of dependencies is "cgl", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "cgl", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="cgl"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -23227,7 +23251,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$CGL_DATA" = x ; then
@@ -23298,9 +23322,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -23343,9 +23370,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -23376,12 +23406,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     CGL_LIBS=`echo " $CGL_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    CGL_LIBS_INSTALLED=`echo " $CGL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    CGL_LIBS_INSTALLED=`echo " $CGL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -23634,7 +23664,7 @@ OSITESTS_CFLAGS_INSTALLED=
 OSITESTS_DATA=
 OSITESTS_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-unittests", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-unittests", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-unittests"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -23673,7 +23703,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$OSITESTS_DATA" = x ; then
@@ -23744,9 +23774,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -23789,9 +23822,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -23822,12 +23858,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     OSITESTS_LIBS=`echo " $OSITESTS_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    OSITESTS_LIBS_INSTALLED=`echo " $OSITESTS_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    OSITESTS_LIBS_INSTALLED=`echo " $OSITESTS_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -24064,7 +24100,7 @@ SAMPLE_CFLAGS_INSTALLED=
 SAMPLE_DATA=
 SAMPLE_DATA_INSTALLED=
 
-# initial list of dependencies is "coindatasample", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coindatasample", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatasample"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24103,7 +24139,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$SAMPLE_DATA" = x ; then
@@ -24174,9 +24210,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -24219,9 +24258,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -24252,12 +24294,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     SAMPLE_LIBS=`echo " $SAMPLE_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    SAMPLE_LIBS_INSTALLED=`echo " $SAMPLE_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    SAMPLE_LIBS_INSTALLED=`echo " $SAMPLE_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -24494,7 +24536,7 @@ NETLIB_CFLAGS_INSTALLED=
 NETLIB_DATA=
 NETLIB_DATA_INSTALLED=
 
-# initial list of dependencies is "coindatanetlib", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coindatanetlib", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatanetlib"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24533,7 +24575,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$NETLIB_DATA" = x ; then
@@ -24604,9 +24646,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -24649,9 +24694,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -24682,12 +24730,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     NETLIB_LIBS=`echo " $NETLIB_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    NETLIB_LIBS_INSTALLED=`echo " $NETLIB_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    NETLIB_LIBS_INSTALLED=`echo " $NETLIB_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -24924,7 +24972,7 @@ MIPLIB3_CFLAGS_INSTALLED=
 MIPLIB3_DATA=
 MIPLIB3_DATA_INSTALLED=
 
-# initial list of dependencies is "coindatamiplib3", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coindatamiplib3", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatamiplib3"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24963,7 +25011,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$MIPLIB3_DATA" = x ; then
@@ -25034,9 +25082,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -25079,9 +25130,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -25112,12 +25166,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     MIPLIB3_LIBS=`echo " $MIPLIB3_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    MIPLIB3_LIBS_INSTALLED=`echo " $MIPLIB3_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    MIPLIB3_LIBS_INSTALLED=`echo " $MIPLIB3_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -25382,7 +25436,7 @@ CPX_CFLAGS_INSTALLED=
 CPX_DATA=
 CPX_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-cplex"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -25421,7 +25475,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$CPX_DATA" = x ; then
@@ -25492,9 +25546,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -25537,9 +25594,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -25570,12 +25630,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     CPX_LIBS=`echo " $CPX_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    CPX_LIBS_INSTALLED=`echo " $CPX_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    CPX_LIBS_INSTALLED=`echo " $CPX_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -25849,7 +25909,7 @@ GLPK_CFLAGS_INSTALLED=
 GLPK_DATA=
 GLPK_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-glpk", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-glpk", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-glpk"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -25888,7 +25948,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$GLPK_DATA" = x ; then
@@ -25959,9 +26019,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -26004,9 +26067,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -26037,12 +26103,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     GLPK_LIBS=`echo " $GLPK_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    GLPK_LIBS_INSTALLED=`echo " $GLPK_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    GLPK_LIBS_INSTALLED=`echo " $GLPK_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -26317,7 +26383,7 @@ MSK_CFLAGS_INSTALLED=
 MSK_DATA=
 MSK_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-mosek", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-mosek", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-mosek"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -26356,7 +26422,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$MSK_DATA" = x ; then
@@ -26427,9 +26493,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -26472,9 +26541,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -26505,12 +26577,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     MSK_LIBS=`echo " $MSK_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    MSK_LIBS_INSTALLED=`echo " $MSK_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    MSK_LIBS_INSTALLED=`echo " $MSK_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -26785,7 +26857,7 @@ XPR_CFLAGS_INSTALLED=
 XPR_DATA=
 XPR_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-xpress", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-xpress", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-xpress"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -26824,7 +26896,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$XPR_DATA" = x ; then
@@ -26895,9 +26967,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -26940,9 +27015,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -26973,12 +27051,12 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     XPR_LIBS=`echo " $XPR_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    XPR_LIBS_INSTALLED=`echo " $XPR_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    XPR_LIBS_INSTALLED=`echo " $XPR_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
 
@@ -30730,6 +30808,8 @@ echo "$as_me: error: cannot create directory $dir" >&2;}
     done
   fi
 
+  { echo "$as_me:$LINENO: In case of trouble, first consult the troubleshooting page at https://projects.coin-or.org/BuildTools/wiki/user-troubleshooting" >&5
+echo "$as_me: In case of trouble, first consult the troubleshooting page at https://projects.coin-or.org/BuildTools/wiki/user-troubleshooting" >&6;}
   if test x$coin_projectdir = xyes; then
     { echo "$as_me:$LINENO: Configuration of $PACKAGE_NAME successful" >&5
 echo "$as_me: Configuration of $PACKAGE_NAME successful" >&6;}
