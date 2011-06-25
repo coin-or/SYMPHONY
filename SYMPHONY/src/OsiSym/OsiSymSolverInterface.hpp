@@ -187,10 +187,10 @@ public:
    virtual bool isPrimalObjectiveLimitReached() const;
 
     /// Is the given dual objective limit reached?
-    virtual bool isDualObjectiveLimitReached() const{
-       throw CoinError("Error: Function not implemented",
-		       "isDualObjectiveLimitReached", "OsiSymSolverInterface");
-    }
+    //virtual bool isDualObjectiveLimitReached() const{
+    //   throw CoinError("Error: Function not implemented",
+		//       "isDualObjectiveLimitReached", "OsiSymSolverInterface");
+    //}
     /// Iteration limit reached?
    virtual bool isIterationLimitReached() const;
 
@@ -485,8 +485,7 @@ public:
     */
 
    virtual void setRowPrice(const double * rowprice){
-       throw CoinError("Error: Function not implemented",
-		       "setRowPrice", "OsiSymSolverInterface");
+       std::cerr << "Error: Function not implemented: OsiSymSolverInterface::setRowPrice" << std::endl;
     }
 
     //@}
