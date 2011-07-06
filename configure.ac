@@ -22,7 +22,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([SYMPHONY],[5.3.5],[https://projects.coin-or.org/svn/SYMPHONY/newticket])
+AC_INIT([SYMPHONY],[5.3],[https://projects.coin-or.org/svn/SYMPHONY/newticket])
 
 AC_COPYRIGHT([
 /*===========================================================================*/
