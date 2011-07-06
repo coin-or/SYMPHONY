@@ -1,4 +1,5 @@
-/* include/config_sym.h.in. */
+#ifndef __CONFIG_SYMPHONY_H__
+#define __CONFIG_SYMPHONY_H__
 
 #ifndef __CONFIG_SYM_H__
 #define __CONFIG_SYM_H__

@@ -2696,6 +2696,7 @@ int sym_is_target_gap_achieved(sym_environment *env)
  
    switch(env->termcode){
     case TM_TARGET_GAP_ACHIEVED:
+    case TM_OPTIMAL_SOLUTION_FOUND:
        return(TRUE);
     default:
        break;
@@ -3131,7 +3132,7 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
 
    sol = env->best_sol;
 
-   if (!sol.has_sol || (sol.xlength && (!sol.xind || !sol.xval))){
+   if (!sol.xlength || sol.xlength && (!sol.xind || !sol.xval)){
       if(env->par.verbosity >= 1){
 	 printf("sym_get_col_solution(): There is no solution!\n");
       }
@@ -3141,6 +3142,9 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    else{
+      if (!sol.has_sol){
+	 printf("sym_get_col_solution(): Stored solution may not be feasible!\n");
+      }	 
       memset(colsol, 0, DSIZE*env->mip->n);
       if(sol.xlength){
 	 if(!env->prep_mip){
@@ -3212,10 +3216,8 @@ int sym_get_obj_val(sym_environment *env, double *objval)
 
    if (env->best_sol.has_sol){
       *objval = (env->mip->obj_sense == SYM_MINIMIZE ? env->best_sol.objval :
-		 -env->best_sol.objval) + env->mip->obj_offset + 
-	(env->prep_mip ? (env->mip->obj_sense == SYM_MINIMIZE ? 
-			  env->prep_mip->obj_offset : 
-			  -env->prep_mip->obj_offset) : 0.0);
+		 -env->best_sol.objval) +
+	 (env->prep_mip ? env->prep_mip->obj_offset : env->mip->obj_offset);
    }else{ 
       if(env->par.verbosity >= 1){
 	 printf("sym_get_obj_val(): There is no solution!\n");
