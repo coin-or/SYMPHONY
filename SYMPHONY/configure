@@ -1090,8 +1090,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-debug          compile all projects with debug options tests
                           (implies --disable-shared)
-  --enable-debug-symphony compile this project (SYMPHONY) with debug compiler
-                          flags
+  --enable-debug-symphony compile project SYMPHONY with debug compiler flags
   --enable-doscompile     Under Cygwin, compile so that executables run under
                           DOS. Set to mingw to use gcc/g++/ld with
                           -mno-cygwin. Set to msvc to use cl/link (or
@@ -1109,10 +1108,10 @@ Optional Features:
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-gnu-packages   compile with GNU packages (disabled by default)
-  --enable-pkg-config     use pkg-config if available (default is yes)
-  --enable-interpackage-dependencies
-                          whether to deduce Makefile dependencies from package
-                          linker flags (default: yes)
+  --disable-pkg-config    disable use of pkg-config (if available)
+  --disable-interpackage-dependencies
+                          disables deduction of Makefile dependencies from
+                          package linker flags
   --disable-cgl-cuts      disable generic cut generation
   --enable-sensitivity-analysis
                           compile in the sensitivity analysis features
@@ -1131,8 +1130,7 @@ Optional Features:
                           create a complete static executable
   --disable-signal-handler
                           disable signal handler
-  --enable-pvm-libcheck use disable-pvm-libcheck to skip the link
-                          check at configuration time
+  --disable-pvm-libcheck skip the link check at configuration time
   --enable-openmp         compile in OpenMP features
 
 Optional Packages:
@@ -2920,7 +2918,7 @@ if test x"$CFLAGS" = x; then
       *)
         coin_opt_cflags="-O3"
         coin_add_cflags="-pipe"
-        coin_dbg_cflags="-g"
+        coin_dbg_cflags="-g -O0"
         coin_warn_cflags="-Wimplicit -Wparentheses -Wsequence-point -Wreturn-type -Wcast-qual -Wall -Wno-unknown-pragmas -Wno-long-long"
         case $build in
           *-darwin*)
@@ -3852,7 +3850,7 @@ if test x"$CXXFLAGS" = x; then
 # ToDo decide about unroll-loops
         coin_opt_cxxflags="-O3"
         coin_add_cxxflags="-pipe"
-        coin_dbg_cxxflags="-g"
+        coin_dbg_cxxflags="-g -O0"
         coin_warn_cxxflags="-Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion -Wno-unknown-pragmas -Wno-long-long"
         case $build in
           *-darwin*)
@@ -6033,7 +6031,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6036 "configure"' > conftest.$ac_ext
+  echo '#line 6034 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7167,7 +7165,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7170:" \
+echo "$as_me:7168:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8234,11 +8232,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8237: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8235: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8241: \$? = $ac_status" >&5
+   echo "$as_me:8239: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8502,11 +8500,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8505: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8503: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8509: \$? = $ac_status" >&5
+   echo "$as_me:8507: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8606,11 +8604,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8609: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8607: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8613: \$? = $ac_status" >&5
+   echo "$as_me:8611: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10951,7 +10949,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10954 "configure"
+#line 10952 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11051,7 +11049,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11054 "configure"
+#line 11052 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13395,11 +13393,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13398: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13396: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13402: \$? = $ac_status" >&5
+   echo "$as_me:13400: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13499,11 +13497,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13502: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13500: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13506: \$? = $ac_status" >&5
+   echo "$as_me:13504: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15069,11 +15067,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15072: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15070: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15076: \$? = $ac_status" >&5
+   echo "$as_me:15074: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15173,11 +15171,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15176: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15174: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15180: \$? = $ac_status" >&5
+   echo "$as_me:15178: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17380,11 +17378,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17383: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17381: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17387: \$? = $ac_status" >&5
+   echo "$as_me:17385: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17648,11 +17646,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17651: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17649: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17655: \$? = $ac_status" >&5
+   echo "$as_me:17653: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17752,11 +17750,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17755: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17753: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17759: \$? = $ac_status" >&5
+   echo "$as_me:17757: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -21208,6 +21206,10 @@ fi
 COINDEPEND_LIBS=
 COINDEPEND_CFLAGS=
 COINDEPEND_DATA=
+COINDEPEND_DEPENDENCIES=
+COINDEPEND_PCLIBS=
+COINDEPEND_PCREQUIRES=
+COINDEPEND_DATA=
 
 
 
@@ -21236,6 +21238,7 @@ if test "${with_coindepend_lib+set}" = set; then
      else
        coin_has_coindepend=yes
        COINDEPEND_LIBS="$withval"
+       COINDEPEND_PCLIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
@@ -21304,7 +21307,7 @@ if test $coin_has_coindepend = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "coinutils osi"; then
-    COINDEPEND_VERSIONS="`$PKG_CONFIG --modversion "coinutils osi" 2>/dev/null | tr '\n' ' '`"
+    COINDEPEND_VERSIONS=`$PKG_CONFIG --modversion "coinutils osi" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "coinutils osi" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -21326,6 +21329,7 @@ echo "${ECHO_T}yes: $COINDEPEND_VERSIONS" >&6
         then
           COINDEPEND_LIBS=`echo " $COINDEPEND_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        COINDEPEND_PCREQUIRES="coinutils osi"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in SymphonyLib
 
@@ -21369,8 +21373,10 @@ COINDEPEND_CFLAGS=
 COINDEPEND_CFLAGS_INSTALLED=
 COINDEPEND_DATA=
 COINDEPEND_DATA_INSTALLED=
+COINDEPEND_PCLIBS=
+COINDEPEND_PCREQUIRES=
 
-# initial list of dependencies is "coinutils osi", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coinutils osi", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coinutils osi"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -21409,7 +21415,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$COINDEPEND_DATA" = x ; then
@@ -21480,9 +21486,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -21525,9 +21534,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -21558,14 +21570,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     COINDEPEND_LIBS=`echo " $COINDEPEND_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    COINDEPEND_LIBS_INSTALLED=`echo " $COINDEPEND_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    COINDEPEND_LIBS_INSTALLED=`echo " $COINDEPEND_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  COINDEPEND_PCREQUIRES="coinutils osi"
 
     SYMPHONYLIB_PCREQUIRES="coinutils osi $SYMPHONYLIB_PCREQUIRES"
     SYMPHONYLIB_CFLAGS="$COINDEPEND_CFLAGS $SYMPHONYLIB_CFLAGS"
@@ -21641,9 +21654,13 @@ echo "$as_me: CoinDepend DEPENDENCIES are $COINDEPEND_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: CoinDepend DATA   is  $COINDEPEND_DATA" >&5
 echo "$as_me: CoinDepend DATA   is  $COINDEPEND_DATA" >&6;}
     fi
-    if test -n "$COINDEPEND_CFLAGS" ; then
-      { echo "$as_me:$LINENO: CoinDepend CFLAGS are $COINDEPEND_CFLAGS" >&5
-echo "$as_me: CoinDepend CFLAGS are $COINDEPEND_CFLAGS" >&6;}
+    if test -n "$COINDEPEND_PCLIBS" ; then
+      { echo "$as_me:$LINENO: CoinDepend PCLIBS are $COINDEPEND_PCLIBS" >&5
+echo "$as_me: CoinDepend PCLIBS are $COINDEPEND_PCLIBS" >&6;}
+    fi
+    if test -n "$COINDEPEND_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: CoinDepend PCREQUIRES are $COINDEPEND_PCREQUIRES" >&5
+echo "$as_me: CoinDepend PCREQUIRES are $COINDEPEND_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: SymphonyLib CFLAGS are $SYMPHONYLIB_CFLAGS" >&5
@@ -21706,6 +21723,10 @@ fi
 CLP_LIBS=
 CLP_CFLAGS=
 CLP_DATA=
+CLP_DEPENDENCIES=
+CLP_PCLIBS=
+CLP_PCREQUIRES=
+CLP_DATA=
 
 
 
@@ -21734,6 +21755,7 @@ if test "${with_clp_lib+set}" = set; then
      else
        coin_has_clp=yes
        CLP_LIBS="$withval"
+       CLP_PCLIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
@@ -21802,7 +21824,7 @@ if test $coin_has_clp = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "osi-clp"; then
-    CLP_VERSIONS="`$PKG_CONFIG --modversion "osi-clp" 2>/dev/null | tr '\n' ' '`"
+    CLP_VERSIONS=`$PKG_CONFIG --modversion "osi-clp" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "osi-clp" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -21824,6 +21846,7 @@ echo "${ECHO_T}yes: $CLP_VERSIONS" >&6
         then
           CLP_LIBS=`echo " $CLP_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        CLP_PCREQUIRES="osi-clp"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in SymphonyLib
 
@@ -21867,8 +21890,10 @@ CLP_CFLAGS=
 CLP_CFLAGS_INSTALLED=
 CLP_DATA=
 CLP_DATA_INSTALLED=
+CLP_PCLIBS=
+CLP_PCREQUIRES=
 
-# initial list of dependencies is "osi-clp", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-clp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-clp"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -21907,7 +21932,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$CLP_DATA" = x ; then
@@ -21978,9 +22003,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -22023,9 +22051,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -22056,14 +22087,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     CLP_LIBS=`echo " $CLP_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    CLP_LIBS_INSTALLED=`echo " $CLP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    CLP_LIBS_INSTALLED=`echo " $CLP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  CLP_PCREQUIRES="osi-clp"
 
     SYMPHONYLIB_PCREQUIRES="osi-clp $SYMPHONYLIB_PCREQUIRES"
     SYMPHONYLIB_CFLAGS="$CLP_CFLAGS $SYMPHONYLIB_CFLAGS"
@@ -22139,9 +22171,13 @@ echo "$as_me: Clp DEPENDENCIES are $CLP_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Clp DATA   is  $CLP_DATA" >&5
 echo "$as_me: Clp DATA   is  $CLP_DATA" >&6;}
     fi
-    if test -n "$CLP_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Clp CFLAGS are $CLP_CFLAGS" >&5
-echo "$as_me: Clp CFLAGS are $CLP_CFLAGS" >&6;}
+    if test -n "$CLP_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Clp PCLIBS are $CLP_PCLIBS" >&5
+echo "$as_me: Clp PCLIBS are $CLP_PCLIBS" >&6;}
+    fi
+    if test -n "$CLP_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Clp PCREQUIRES are $CLP_PCREQUIRES" >&5
+echo "$as_me: Clp PCREQUIRES are $CLP_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: SymphonyLib CFLAGS are $SYMPHONYLIB_CFLAGS" >&5
@@ -22198,6 +22234,10 @@ fi
 DYLP_LIBS=
 DYLP_CFLAGS=
 DYLP_DATA=
+DYLP_DEPENDENCIES=
+DYLP_PCLIBS=
+DYLP_PCREQUIRES=
+DYLP_DATA=
 
 
 
@@ -22226,6 +22266,7 @@ if test "${with_dylp_lib+set}" = set; then
      else
        coin_has_dylp=yes
        DYLP_LIBS="$withval"
+       DYLP_PCLIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
@@ -22294,7 +22335,7 @@ if test $coin_has_dylp = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "osi-dylp"; then
-    DYLP_VERSIONS="`$PKG_CONFIG --modversion "osi-dylp" 2>/dev/null | tr '\n' ' '`"
+    DYLP_VERSIONS=`$PKG_CONFIG --modversion "osi-dylp" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "osi-dylp" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -22316,6 +22357,7 @@ echo "${ECHO_T}yes: $DYLP_VERSIONS" >&6
         then
           DYLP_LIBS=`echo " $DYLP_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        DYLP_PCREQUIRES="osi-dylp"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in SymphonyLib
 
@@ -22359,8 +22401,10 @@ DYLP_CFLAGS=
 DYLP_CFLAGS_INSTALLED=
 DYLP_DATA=
 DYLP_DATA_INSTALLED=
+DYLP_PCLIBS=
+DYLP_PCREQUIRES=
 
-# initial list of dependencies is "osi-dylp", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-dylp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-dylp"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -22399,7 +22443,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$DYLP_DATA" = x ; then
@@ -22470,9 +22514,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -22515,9 +22562,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -22548,14 +22598,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     DYLP_LIBS=`echo " $DYLP_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    DYLP_LIBS_INSTALLED=`echo " $DYLP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    DYLP_LIBS_INSTALLED=`echo " $DYLP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  DYLP_PCREQUIRES="osi-dylp"
 
     SYMPHONYLIB_PCREQUIRES="osi-dylp $SYMPHONYLIB_PCREQUIRES"
     SYMPHONYLIB_CFLAGS="$DYLP_CFLAGS $SYMPHONYLIB_CFLAGS"
@@ -22631,9 +22682,13 @@ echo "$as_me: DyLP DEPENDENCIES are $DYLP_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: DyLP DATA   is  $DYLP_DATA" >&5
 echo "$as_me: DyLP DATA   is  $DYLP_DATA" >&6;}
     fi
-    if test -n "$DYLP_CFLAGS" ; then
-      { echo "$as_me:$LINENO: DyLP CFLAGS are $DYLP_CFLAGS" >&5
-echo "$as_me: DyLP CFLAGS are $DYLP_CFLAGS" >&6;}
+    if test -n "$DYLP_PCLIBS" ; then
+      { echo "$as_me:$LINENO: DyLP PCLIBS are $DYLP_PCLIBS" >&5
+echo "$as_me: DyLP PCLIBS are $DYLP_PCLIBS" >&6;}
+    fi
+    if test -n "$DYLP_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: DyLP PCREQUIRES are $DYLP_PCREQUIRES" >&5
+echo "$as_me: DyLP PCREQUIRES are $DYLP_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: SymphonyLib CFLAGS are $SYMPHONYLIB_CFLAGS" >&5
@@ -22690,6 +22745,10 @@ fi
 VOL_LIBS=
 VOL_CFLAGS=
 VOL_DATA=
+VOL_DEPENDENCIES=
+VOL_PCLIBS=
+VOL_PCREQUIRES=
+VOL_DATA=
 
 
 
@@ -22718,6 +22777,7 @@ if test "${with_vol_lib+set}" = set; then
      else
        coin_has_vol=yes
        VOL_LIBS="$withval"
+       VOL_PCLIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
@@ -22786,7 +22846,7 @@ if test $coin_has_vol = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "osi-vol"; then
-    VOL_VERSIONS="`$PKG_CONFIG --modversion "osi-vol" 2>/dev/null | tr '\n' ' '`"
+    VOL_VERSIONS=`$PKG_CONFIG --modversion "osi-vol" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "osi-vol" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -22808,6 +22868,7 @@ echo "${ECHO_T}yes: $VOL_VERSIONS" >&6
         then
           VOL_LIBS=`echo " $VOL_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        VOL_PCREQUIRES="osi-vol"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in SymphonyLib
 
@@ -22851,8 +22912,10 @@ VOL_CFLAGS=
 VOL_CFLAGS_INSTALLED=
 VOL_DATA=
 VOL_DATA_INSTALLED=
+VOL_PCLIBS=
+VOL_PCREQUIRES=
 
-# initial list of dependencies is "osi-vol", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-vol", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-vol"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -22891,7 +22954,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$VOL_DATA" = x ; then
@@ -22962,9 +23025,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -23007,9 +23073,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -23040,14 +23109,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     VOL_LIBS=`echo " $VOL_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    VOL_LIBS_INSTALLED=`echo " $VOL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    VOL_LIBS_INSTALLED=`echo " $VOL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  VOL_PCREQUIRES="osi-vol"
 
     SYMPHONYLIB_PCREQUIRES="osi-vol $SYMPHONYLIB_PCREQUIRES"
     SYMPHONYLIB_CFLAGS="$VOL_CFLAGS $SYMPHONYLIB_CFLAGS"
@@ -23123,9 +23193,13 @@ echo "$as_me: Vol DEPENDENCIES are $VOL_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Vol DATA   is  $VOL_DATA" >&5
 echo "$as_me: Vol DATA   is  $VOL_DATA" >&6;}
     fi
-    if test -n "$VOL_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Vol CFLAGS are $VOL_CFLAGS" >&5
-echo "$as_me: Vol CFLAGS are $VOL_CFLAGS" >&6;}
+    if test -n "$VOL_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Vol PCLIBS are $VOL_PCLIBS" >&5
+echo "$as_me: Vol PCLIBS are $VOL_PCLIBS" >&6;}
+    fi
+    if test -n "$VOL_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Vol PCREQUIRES are $VOL_PCREQUIRES" >&5
+echo "$as_me: Vol PCREQUIRES are $VOL_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: SymphonyLib CFLAGS are $SYMPHONYLIB_CFLAGS" >&5
@@ -23182,6 +23256,10 @@ fi
 CGL_LIBS=
 CGL_CFLAGS=
 CGL_DATA=
+CGL_DEPENDENCIES=
+CGL_PCLIBS=
+CGL_PCREQUIRES=
+CGL_DATA=
 
 
 
@@ -23210,6 +23288,7 @@ if test "${with_cgl_lib+set}" = set; then
      else
        coin_has_cgl=yes
        CGL_LIBS="$withval"
+       CGL_PCLIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
@@ -23278,7 +23357,7 @@ if test $coin_has_cgl = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "cgl"; then
-    CGL_VERSIONS="`$PKG_CONFIG --modversion "cgl" 2>/dev/null | tr '\n' ' '`"
+    CGL_VERSIONS=`$PKG_CONFIG --modversion "cgl" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "cgl" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -23300,6 +23379,7 @@ echo "${ECHO_T}yes: $CGL_VERSIONS" >&6
         then
           CGL_LIBS=`echo " $CGL_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        CGL_PCREQUIRES="cgl"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in SymphonyLib
 
@@ -23343,8 +23423,10 @@ CGL_CFLAGS=
 CGL_CFLAGS_INSTALLED=
 CGL_DATA=
 CGL_DATA_INSTALLED=
+CGL_PCLIBS=
+CGL_PCREQUIRES=
 
-# initial list of dependencies is "cgl", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "cgl", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="cgl"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -23383,7 +23465,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$CGL_DATA" = x ; then
@@ -23454,9 +23536,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -23499,9 +23584,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -23532,14 +23620,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     CGL_LIBS=`echo " $CGL_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    CGL_LIBS_INSTALLED=`echo " $CGL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    CGL_LIBS_INSTALLED=`echo " $CGL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  CGL_PCREQUIRES="cgl"
 
     SYMPHONYLIB_PCREQUIRES="cgl $SYMPHONYLIB_PCREQUIRES"
     SYMPHONYLIB_CFLAGS="$CGL_CFLAGS $SYMPHONYLIB_CFLAGS"
@@ -23615,9 +23704,13 @@ echo "$as_me: Cgl DEPENDENCIES are $CGL_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Cgl DATA   is  $CGL_DATA" >&5
 echo "$as_me: Cgl DATA   is  $CGL_DATA" >&6;}
     fi
-    if test -n "$CGL_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Cgl CFLAGS are $CGL_CFLAGS" >&5
-echo "$as_me: Cgl CFLAGS are $CGL_CFLAGS" >&6;}
+    if test -n "$CGL_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Cgl PCLIBS are $CGL_PCLIBS" >&5
+echo "$as_me: Cgl PCLIBS are $CGL_PCLIBS" >&6;}
+    fi
+    if test -n "$CGL_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Cgl PCREQUIRES are $CGL_PCREQUIRES" >&5
+echo "$as_me: Cgl PCREQUIRES are $CGL_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: SymphonyLib CFLAGS are $SYMPHONYLIB_CFLAGS" >&5
@@ -23675,6 +23768,10 @@ fi
 OSITESTS_LIBS=
 OSITESTS_CFLAGS=
 OSITESTS_DATA=
+OSITESTS_DEPENDENCIES=
+OSITESTS_PCLIBS=
+OSITESTS_PCREQUIRES=
+OSITESTS_DATA=
 
 
 
@@ -23695,6 +23792,7 @@ if test "${with_ositests_lib+set}" = set; then
      else
        coin_has_ositests=yes
        OSITESTS_LIBS="$withval"
+       OSITESTS_PCLIBS="$withval"
 
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
@@ -23760,7 +23858,7 @@ if test $coin_has_ositests = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "osi-unittests"; then
-    OSITESTS_VERSIONS="`$PKG_CONFIG --modversion "osi-unittests" 2>/dev/null | tr '\n' ' '`"
+    OSITESTS_VERSIONS=`$PKG_CONFIG --modversion "osi-unittests" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "osi-unittests" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -23782,6 +23880,7 @@ echo "${ECHO_T}yes: $OSITESTS_VERSIONS" >&6
         then
           OSITESTS_LIBS=`echo " $OSITESTS_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        OSITESTS_PCREQUIRES="osi-unittests"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in
 
@@ -23821,8 +23920,10 @@ OSITESTS_CFLAGS=
 OSITESTS_CFLAGS_INSTALLED=
 OSITESTS_DATA=
 OSITESTS_DATA_INSTALLED=
+OSITESTS_PCLIBS=
+OSITESTS_PCREQUIRES=
 
-# initial list of dependencies is "osi-unittests", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-unittests", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-unittests"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -23861,7 +23962,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$OSITESTS_DATA" = x ; then
@@ -23932,9 +24033,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -23977,9 +24081,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -24010,14 +24117,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     OSITESTS_LIBS=`echo " $OSITESTS_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    OSITESTS_LIBS_INSTALLED=`echo " $OSITESTS_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    OSITESTS_LIBS_INSTALLED=`echo " $OSITESTS_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  OSITESTS_PCREQUIRES="osi-unittests"
 
 
 fi
@@ -24085,9 +24193,13 @@ echo "$as_me: OsiTests DEPENDENCIES are $OSITESTS_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: OsiTests DATA   is  $OSITESTS_DATA" >&5
 echo "$as_me: OsiTests DATA   is  $OSITESTS_DATA" >&6;}
     fi
-    if test -n "$OSITESTS_CFLAGS" ; then
-      { echo "$as_me:$LINENO: OsiTests CFLAGS are $OSITESTS_CFLAGS" >&5
-echo "$as_me: OsiTests CFLAGS are $OSITESTS_CFLAGS" >&6;}
+    if test -n "$OSITESTS_PCLIBS" ; then
+      { echo "$as_me:$LINENO: OsiTests PCLIBS are $OSITESTS_PCLIBS" >&5
+echo "$as_me: OsiTests PCLIBS are $OSITESTS_PCLIBS" >&6;}
+    fi
+    if test -n "$OSITESTS_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: OsiTests PCREQUIRES are $OSITESTS_PCREQUIRES" >&5
+echo "$as_me: OsiTests PCREQUIRES are $OSITESTS_PCREQUIRES" >&6;}
     fi
 
   fi
@@ -24137,6 +24249,10 @@ fi
 SAMPLE_LIBS=
 SAMPLE_CFLAGS=
 SAMPLE_DATA=
+SAMPLE_DEPENDENCIES=
+SAMPLE_PCLIBS=
+SAMPLE_PCREQUIRES=
+SAMPLE_DATA=
 
 
 
@@ -24157,6 +24273,7 @@ if test "${with_sample_lib+set}" = set; then
      else
        coin_has_sample=yes
        SAMPLE_LIBS="$withval"
+       SAMPLE_PCLIBS="$withval"
 
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
@@ -24222,7 +24339,7 @@ if test $coin_has_sample = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "coindatasample"; then
-    SAMPLE_VERSIONS="`$PKG_CONFIG --modversion "coindatasample" 2>/dev/null | tr '\n' ' '`"
+    SAMPLE_VERSIONS=`$PKG_CONFIG --modversion "coindatasample" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "coindatasample" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -24244,6 +24361,7 @@ echo "${ECHO_T}yes: $SAMPLE_VERSIONS" >&6
         then
           SAMPLE_LIBS=`echo " $SAMPLE_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        SAMPLE_PCREQUIRES="coindatasample"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in
 
@@ -24283,8 +24401,10 @@ SAMPLE_CFLAGS=
 SAMPLE_CFLAGS_INSTALLED=
 SAMPLE_DATA=
 SAMPLE_DATA_INSTALLED=
+SAMPLE_PCLIBS=
+SAMPLE_PCREQUIRES=
 
-# initial list of dependencies is "coindatasample", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coindatasample", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatasample"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24323,7 +24443,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$SAMPLE_DATA" = x ; then
@@ -24394,9 +24514,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -24439,9 +24562,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -24472,14 +24598,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     SAMPLE_LIBS=`echo " $SAMPLE_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    SAMPLE_LIBS_INSTALLED=`echo " $SAMPLE_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    SAMPLE_LIBS_INSTALLED=`echo " $SAMPLE_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  SAMPLE_PCREQUIRES="coindatasample"
 
 
 fi
@@ -24547,9 +24674,13 @@ echo "$as_me: Sample DEPENDENCIES are $SAMPLE_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Sample DATA   is  $SAMPLE_DATA" >&5
 echo "$as_me: Sample DATA   is  $SAMPLE_DATA" >&6;}
     fi
-    if test -n "$SAMPLE_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Sample CFLAGS are $SAMPLE_CFLAGS" >&5
-echo "$as_me: Sample CFLAGS are $SAMPLE_CFLAGS" >&6;}
+    if test -n "$SAMPLE_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Sample PCLIBS are $SAMPLE_PCLIBS" >&5
+echo "$as_me: Sample PCLIBS are $SAMPLE_PCLIBS" >&6;}
+    fi
+    if test -n "$SAMPLE_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Sample PCREQUIRES are $SAMPLE_PCREQUIRES" >&5
+echo "$as_me: Sample PCREQUIRES are $SAMPLE_PCREQUIRES" >&6;}
     fi
 
   fi
@@ -24599,6 +24730,10 @@ fi
 NETLIB_LIBS=
 NETLIB_CFLAGS=
 NETLIB_DATA=
+NETLIB_DEPENDENCIES=
+NETLIB_PCLIBS=
+NETLIB_PCREQUIRES=
+NETLIB_DATA=
 
 
 
@@ -24619,6 +24754,7 @@ if test "${with_netlib_lib+set}" = set; then
      else
        coin_has_netlib=yes
        NETLIB_LIBS="$withval"
+       NETLIB_PCLIBS="$withval"
 
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
@@ -24684,7 +24820,7 @@ if test $coin_has_netlib = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "coindatanetlib"; then
-    NETLIB_VERSIONS="`$PKG_CONFIG --modversion "coindatanetlib" 2>/dev/null | tr '\n' ' '`"
+    NETLIB_VERSIONS=`$PKG_CONFIG --modversion "coindatanetlib" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "coindatanetlib" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -24706,6 +24842,7 @@ echo "${ECHO_T}yes: $NETLIB_VERSIONS" >&6
         then
           NETLIB_LIBS=`echo " $NETLIB_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        NETLIB_PCREQUIRES="coindatanetlib"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in
 
@@ -24745,8 +24882,10 @@ NETLIB_CFLAGS=
 NETLIB_CFLAGS_INSTALLED=
 NETLIB_DATA=
 NETLIB_DATA_INSTALLED=
+NETLIB_PCLIBS=
+NETLIB_PCREQUIRES=
 
-# initial list of dependencies is "coindatanetlib", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coindatanetlib", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatanetlib"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24785,7 +24924,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$NETLIB_DATA" = x ; then
@@ -24856,9 +24995,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -24901,9 +25043,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -24934,14 +25079,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     NETLIB_LIBS=`echo " $NETLIB_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    NETLIB_LIBS_INSTALLED=`echo " $NETLIB_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    NETLIB_LIBS_INSTALLED=`echo " $NETLIB_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  NETLIB_PCREQUIRES="coindatanetlib"
 
 
 fi
@@ -25009,9 +25155,13 @@ echo "$as_me: Netlib DEPENDENCIES are $NETLIB_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Netlib DATA   is  $NETLIB_DATA" >&5
 echo "$as_me: Netlib DATA   is  $NETLIB_DATA" >&6;}
     fi
-    if test -n "$NETLIB_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Netlib CFLAGS are $NETLIB_CFLAGS" >&5
-echo "$as_me: Netlib CFLAGS are $NETLIB_CFLAGS" >&6;}
+    if test -n "$NETLIB_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Netlib PCLIBS are $NETLIB_PCLIBS" >&5
+echo "$as_me: Netlib PCLIBS are $NETLIB_PCLIBS" >&6;}
+    fi
+    if test -n "$NETLIB_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Netlib PCREQUIRES are $NETLIB_PCREQUIRES" >&5
+echo "$as_me: Netlib PCREQUIRES are $NETLIB_PCREQUIRES" >&6;}
     fi
 
   fi
@@ -25061,6 +25211,10 @@ fi
 MIPLIB3_LIBS=
 MIPLIB3_CFLAGS=
 MIPLIB3_DATA=
+MIPLIB3_DEPENDENCIES=
+MIPLIB3_PCLIBS=
+MIPLIB3_PCREQUIRES=
+MIPLIB3_DATA=
 
 
 
@@ -25081,6 +25235,7 @@ if test "${with_miplib3_lib+set}" = set; then
      else
        coin_has_miplib3=yes
        MIPLIB3_LIBS="$withval"
+       MIPLIB3_PCLIBS="$withval"
 
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
@@ -25146,7 +25301,7 @@ if test $coin_has_miplib3 = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "coindatamiplib3"; then
-    MIPLIB3_VERSIONS="`$PKG_CONFIG --modversion "coindatamiplib3" 2>/dev/null | tr '\n' ' '`"
+    MIPLIB3_VERSIONS=`$PKG_CONFIG --modversion "coindatamiplib3" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "coindatamiplib3" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -25168,6 +25323,7 @@ echo "${ECHO_T}yes: $MIPLIB3_VERSIONS" >&6
         then
           MIPLIB3_LIBS=`echo " $MIPLIB3_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        MIPLIB3_PCREQUIRES="coindatamiplib3"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in
 
@@ -25207,8 +25363,10 @@ MIPLIB3_CFLAGS=
 MIPLIB3_CFLAGS_INSTALLED=
 MIPLIB3_DATA=
 MIPLIB3_DATA_INSTALLED=
+MIPLIB3_PCLIBS=
+MIPLIB3_PCREQUIRES=
 
-# initial list of dependencies is "coindatamiplib3", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coindatamiplib3", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatamiplib3"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -25247,7 +25405,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$MIPLIB3_DATA" = x ; then
@@ -25318,9 +25476,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -25363,9 +25524,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -25396,14 +25560,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     MIPLIB3_LIBS=`echo " $MIPLIB3_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    MIPLIB3_LIBS_INSTALLED=`echo " $MIPLIB3_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    MIPLIB3_LIBS_INSTALLED=`echo " $MIPLIB3_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  MIPLIB3_PCREQUIRES="coindatamiplib3"
 
 
 fi
@@ -25471,9 +25636,13 @@ echo "$as_me: Miplib3 DEPENDENCIES are $MIPLIB3_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Miplib3 DATA   is  $MIPLIB3_DATA" >&5
 echo "$as_me: Miplib3 DATA   is  $MIPLIB3_DATA" >&6;}
     fi
-    if test -n "$MIPLIB3_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Miplib3 CFLAGS are $MIPLIB3_CFLAGS" >&5
-echo "$as_me: Miplib3 CFLAGS are $MIPLIB3_CFLAGS" >&6;}
+    if test -n "$MIPLIB3_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Miplib3 PCLIBS are $MIPLIB3_PCLIBS" >&5
+echo "$as_me: Miplib3 PCLIBS are $MIPLIB3_PCLIBS" >&6;}
+    fi
+    if test -n "$MIPLIB3_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Miplib3 PCREQUIRES are $MIPLIB3_PCREQUIRES" >&5
+echo "$as_me: Miplib3 PCREQUIRES are $MIPLIB3_PCREQUIRES" >&6;}
     fi
 
   fi
@@ -25529,6 +25698,10 @@ fi
 CPX_LIBS=
 CPX_CFLAGS=
 CPX_DATA=
+CPX_DEPENDENCIES=
+CPX_PCLIBS=
+CPX_PCREQUIRES=
+CPX_DATA=
 
 
 
@@ -25557,6 +25730,7 @@ if test "${with_cpx_lib+set}" = set; then
      else
        coin_has_cpx=yes
        CPX_LIBS="$withval"
+       CPX_PCLIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
@@ -25625,7 +25799,7 @@ if test $coin_has_cpx = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "osi-cplex"; then
-    CPX_VERSIONS="`$PKG_CONFIG --modversion "osi-cplex" 2>/dev/null | tr '\n' ' '`"
+    CPX_VERSIONS=`$PKG_CONFIG --modversion "osi-cplex" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "osi-cplex" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -25647,6 +25821,7 @@ echo "${ECHO_T}yes: $CPX_VERSIONS" >&6
         then
           CPX_LIBS=`echo " $CPX_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        CPX_PCREQUIRES="osi-cplex"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in SymphonyLib
 
@@ -25690,8 +25865,10 @@ CPX_CFLAGS=
 CPX_CFLAGS_INSTALLED=
 CPX_DATA=
 CPX_DATA_INSTALLED=
+CPX_PCLIBS=
+CPX_PCREQUIRES=
 
-# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-cplex"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -25730,7 +25907,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$CPX_DATA" = x ; then
@@ -25801,9 +25978,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -25846,9 +26026,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -25879,14 +26062,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     CPX_LIBS=`echo " $CPX_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    CPX_LIBS_INSTALLED=`echo " $CPX_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    CPX_LIBS_INSTALLED=`echo " $CPX_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  CPX_PCREQUIRES="osi-cplex"
 
     SYMPHONYLIB_PCREQUIRES="osi-cplex $SYMPHONYLIB_PCREQUIRES"
     SYMPHONYLIB_CFLAGS="$CPX_CFLAGS $SYMPHONYLIB_CFLAGS"
@@ -25962,9 +26146,13 @@ echo "$as_me: Cpx DEPENDENCIES are $CPX_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Cpx DATA   is  $CPX_DATA" >&5
 echo "$as_me: Cpx DATA   is  $CPX_DATA" >&6;}
     fi
-    if test -n "$CPX_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Cpx CFLAGS are $CPX_CFLAGS" >&5
-echo "$as_me: Cpx CFLAGS are $CPX_CFLAGS" >&6;}
+    if test -n "$CPX_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Cpx PCLIBS are $CPX_PCLIBS" >&5
+echo "$as_me: Cpx PCLIBS are $CPX_PCLIBS" >&6;}
+    fi
+    if test -n "$CPX_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Cpx PCREQUIRES are $CPX_PCREQUIRES" >&5
+echo "$as_me: Cpx PCREQUIRES are $CPX_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: SymphonyLib CFLAGS are $SYMPHONYLIB_CFLAGS" >&5
@@ -26021,6 +26209,10 @@ fi
 GLPK_LIBS=
 GLPK_CFLAGS=
 GLPK_DATA=
+GLPK_DEPENDENCIES=
+GLPK_PCLIBS=
+GLPK_PCREQUIRES=
+GLPK_DATA=
 
 
 
@@ -26049,6 +26241,7 @@ if test "${with_glpk_lib+set}" = set; then
      else
        coin_has_glpk=yes
        GLPK_LIBS="$withval"
+       GLPK_PCLIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
@@ -26117,7 +26310,7 @@ if test $coin_has_glpk = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "osi-glpk"; then
-    GLPK_VERSIONS="`$PKG_CONFIG --modversion "osi-glpk" 2>/dev/null | tr '\n' ' '`"
+    GLPK_VERSIONS=`$PKG_CONFIG --modversion "osi-glpk" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "osi-glpk" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -26139,6 +26332,7 @@ echo "${ECHO_T}yes: $GLPK_VERSIONS" >&6
         then
           GLPK_LIBS=`echo " $GLPK_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        GLPK_PCREQUIRES="osi-glpk"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in SymphonyLib
 
@@ -26182,8 +26376,10 @@ GLPK_CFLAGS=
 GLPK_CFLAGS_INSTALLED=
 GLPK_DATA=
 GLPK_DATA_INSTALLED=
+GLPK_PCLIBS=
+GLPK_PCREQUIRES=
 
-# initial list of dependencies is "osi-glpk", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-glpk", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-glpk"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -26222,7 +26418,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$GLPK_DATA" = x ; then
@@ -26293,9 +26489,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -26338,9 +26537,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -26371,14 +26573,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     GLPK_LIBS=`echo " $GLPK_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    GLPK_LIBS_INSTALLED=`echo " $GLPK_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    GLPK_LIBS_INSTALLED=`echo " $GLPK_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  GLPK_PCREQUIRES="osi-glpk"
 
     SYMPHONYLIB_PCREQUIRES="osi-glpk $SYMPHONYLIB_PCREQUIRES"
     SYMPHONYLIB_CFLAGS="$GLPK_CFLAGS $SYMPHONYLIB_CFLAGS"
@@ -26454,9 +26657,13 @@ echo "$as_me: Glpk DEPENDENCIES are $GLPK_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Glpk DATA   is  $GLPK_DATA" >&5
 echo "$as_me: Glpk DATA   is  $GLPK_DATA" >&6;}
     fi
-    if test -n "$GLPK_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Glpk CFLAGS are $GLPK_CFLAGS" >&5
-echo "$as_me: Glpk CFLAGS are $GLPK_CFLAGS" >&6;}
+    if test -n "$GLPK_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Glpk PCLIBS are $GLPK_PCLIBS" >&5
+echo "$as_me: Glpk PCLIBS are $GLPK_PCLIBS" >&6;}
+    fi
+    if test -n "$GLPK_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Glpk PCREQUIRES are $GLPK_PCREQUIRES" >&5
+echo "$as_me: Glpk PCREQUIRES are $GLPK_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: SymphonyLib CFLAGS are $SYMPHONYLIB_CFLAGS" >&5
@@ -26514,6 +26721,10 @@ fi
 MSK_LIBS=
 MSK_CFLAGS=
 MSK_DATA=
+MSK_DEPENDENCIES=
+MSK_PCLIBS=
+MSK_PCREQUIRES=
+MSK_DATA=
 
 
 
@@ -26542,6 +26753,7 @@ if test "${with_msk_lib+set}" = set; then
      else
        coin_has_msk=yes
        MSK_LIBS="$withval"
+       MSK_PCLIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
@@ -26610,7 +26822,7 @@ if test $coin_has_msk = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "osi-mosek"; then
-    MSK_VERSIONS="`$PKG_CONFIG --modversion "osi-mosek" 2>/dev/null | tr '\n' ' '`"
+    MSK_VERSIONS=`$PKG_CONFIG --modversion "osi-mosek" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "osi-mosek" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -26632,6 +26844,7 @@ echo "${ECHO_T}yes: $MSK_VERSIONS" >&6
         then
           MSK_LIBS=`echo " $MSK_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        MSK_PCREQUIRES="osi-mosek"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in SymphonyLib
 
@@ -26675,8 +26888,10 @@ MSK_CFLAGS=
 MSK_CFLAGS_INSTALLED=
 MSK_DATA=
 MSK_DATA_INSTALLED=
+MSK_PCLIBS=
+MSK_PCREQUIRES=
 
-# initial list of dependencies is "osi-mosek", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-mosek", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-mosek"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -26715,7 +26930,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$MSK_DATA" = x ; then
@@ -26786,9 +27001,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -26831,9 +27049,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -26864,14 +27085,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     MSK_LIBS=`echo " $MSK_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    MSK_LIBS_INSTALLED=`echo " $MSK_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    MSK_LIBS_INSTALLED=`echo " $MSK_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  MSK_PCREQUIRES="osi-mosek"
 
     SYMPHONYLIB_PCREQUIRES="osi-mosek $SYMPHONYLIB_PCREQUIRES"
     SYMPHONYLIB_CFLAGS="$MSK_CFLAGS $SYMPHONYLIB_CFLAGS"
@@ -26947,9 +27169,13 @@ echo "$as_me: Msk DEPENDENCIES are $MSK_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Msk DATA   is  $MSK_DATA" >&5
 echo "$as_me: Msk DATA   is  $MSK_DATA" >&6;}
     fi
-    if test -n "$MSK_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Msk CFLAGS are $MSK_CFLAGS" >&5
-echo "$as_me: Msk CFLAGS are $MSK_CFLAGS" >&6;}
+    if test -n "$MSK_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Msk PCLIBS are $MSK_PCLIBS" >&5
+echo "$as_me: Msk PCLIBS are $MSK_PCLIBS" >&6;}
+    fi
+    if test -n "$MSK_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Msk PCREQUIRES are $MSK_PCREQUIRES" >&5
+echo "$as_me: Msk PCREQUIRES are $MSK_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: SymphonyLib CFLAGS are $SYMPHONYLIB_CFLAGS" >&5
@@ -27007,6 +27233,10 @@ fi
 XPR_LIBS=
 XPR_CFLAGS=
 XPR_DATA=
+XPR_DEPENDENCIES=
+XPR_PCLIBS=
+XPR_PCREQUIRES=
+XPR_DATA=
 
 
 
@@ -27035,6 +27265,7 @@ if test "${with_xpr_lib+set}" = set; then
      else
        coin_has_xpr=yes
        XPR_LIBS="$withval"
+       XPR_PCLIBS="$withval"
 
          SYMPHONYLIB_PCLIBS="$withval $SYMPHONYLIB_PCLIBS"
          SYMPHONYLIB_LIBS="$withval $SYMPHONYLIB_LIBS"
@@ -27103,7 +27334,7 @@ if test $coin_has_xpr = notGiven; then
 
 if test -n "$PKG_CONFIG" ; then
   if $PKG_CONFIG --exists "osi-xpress"; then
-    XPR_VERSIONS="`$PKG_CONFIG --modversion "osi-xpress" 2>/dev/null | tr '\n' ' '`"
+    XPR_VERSIONS=`$PKG_CONFIG --modversion "osi-xpress" 2>/dev/null | tr '\n' ' '`
      cflags=`$PKG_CONFIG --cflags "osi-xpress" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
@@ -27125,6 +27356,7 @@ echo "${ECHO_T}yes: $XPR_VERSIONS" >&6
         then
           XPR_LIBS=`echo " $XPR_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        XPR_PCREQUIRES="osi-xpress"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in SymphonyLib
 
@@ -27168,8 +27400,10 @@ XPR_CFLAGS=
 XPR_CFLAGS_INSTALLED=
 XPR_DATA=
 XPR_DATA_INSTALLED=
+XPR_PCLIBS=
+XPR_PCREQUIRES=
 
-# initial list of dependencies is "osi-xpress", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-xpress", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-xpress"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -27208,7 +27442,7 @@ echo "$as_me: WARNING: Found $pcfile, but $dir/${proj}.pc is not available. This
 
       # add projrequires to the front of the list of projects that have to be processed next
       # at the same time, remove $proj from this list
-      projtoprocess=${projtoprocess/$proj/$projrequires}
+      projtoprocess=`echo $projtoprocess | sed -e "s/$proj/$projrequires/"`
 
       # read DATA from $pcfile, if _DATA is still empty
       if test "x$XPR_DATA" = x ; then
@@ -27279,9 +27513,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -27324,9 +27561,12 @@ if test "$allproj" != fail ; then
     pcfilemod=`sed -e 's/Libs:\(.*\)$/echo projlibs=\\\\"\1\\\\"/g' -e 's/Cflags:\(.*\)/echo projcflags=\\\\"\1\\\\"/g' -e '/^[a-zA-Z]*:/d' $pcfile`
 
     # set projcflags and projlibs variables by running $pcfilemod
+    # under mingw, the current IFS seem to make the : in the paths of the gfortran libs go away, so we temporarily set IFS back to its default
     projcflags=
     projlibs=
+    IFS="$save_IFS"
     eval `sh -c "$pcfilemod"`
+    IFS=":"
 
     # add CYGPATH_W cludge into include flags and set CFLAGS variable
     if test "${CYGPATH_W}" != "echo"; then
@@ -27357,14 +27597,15 @@ _ACEOF
   # adjust linker flags for (i)cl compiler
   # for the LIBS, we replace everything of the form "/somepath/name.lib" by "`$(CYGPATH_W) /somepath/`name.lib | sed -e s|\|/|g" (where we have to use excessive many \ to get the \ into the command line for cl),
   # for the LIBS_INSTALLED, we replace everything of the form "/somepath/" by "`$(CYGPATH_W) /somepath/`",
-  #    everything of the form "-Lpath" by "/libpath:`$(CYGPATH_W) path`, and
-  #    everything of the form "-lname" by "libname.lib"
+  #    everything of the form "-lname" by "libname.lib", and
+  #    everything of the form "-Lpath" by "-libpath:`$(CYGPATH_W) path`
   if test x$coin_cxx_is_cl = xtrue || test x$coin_cc_is_cl = xtrue ;
   then
     XPR_LIBS=`echo " $XPR_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
-    XPR_LIBS_INSTALLED=`echo " $XPR_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
+    XPR_LIBS_INSTALLED=`echo " $XPR_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
   fi
 
+  XPR_PCREQUIRES="osi-xpress"
 
     SYMPHONYLIB_PCREQUIRES="osi-xpress $SYMPHONYLIB_PCREQUIRES"
     SYMPHONYLIB_CFLAGS="$XPR_CFLAGS $SYMPHONYLIB_CFLAGS"
@@ -27440,9 +27681,13 @@ echo "$as_me: Xpr DEPENDENCIES are $XPR_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Xpr DATA   is  $XPR_DATA" >&5
 echo "$as_me: Xpr DATA   is  $XPR_DATA" >&6;}
     fi
-    if test -n "$XPR_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Xpr CFLAGS are $XPR_CFLAGS" >&5
-echo "$as_me: Xpr CFLAGS are $XPR_CFLAGS" >&6;}
+    if test -n "$XPR_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Xpr PCLIBS are $XPR_PCLIBS" >&5
+echo "$as_me: Xpr PCLIBS are $XPR_PCLIBS" >&6;}
+    fi
+    if test -n "$XPR_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Xpr PCREQUIRES are $XPR_PCREQUIRES" >&5
+echo "$as_me: Xpr PCREQUIRES are $XPR_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: SymphonyLib CFLAGS are $SYMPHONYLIB_CFLAGS" >&5
@@ -28836,13 +29081,8 @@ fi
                                                                                                                                                                                               ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc:src/OsiSym/osi-sym.pc.in osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
 
 
-if test `cd $srcdir; pwd` != `pwd`; then
-                                                                                          ac_config_files="$ac_config_files $srcdir/Applications/CNRP/Makefile:Applications/CNRP/Makefile $srcdir/Applications/MATCH/Makefile:Applications/MATCH/Makefile $srcdir/Applications/MCKP/Makefile:Applications/MCKP/Makefile $srcdir/Applications/MPP/Makefile:Applications/MPP/Makefile $srcdir/Applications/SPP/Makefile:Applications/SPP/Makefile $srcdir/Applications/SPP+CUTS/Makefile:Applications/SPP+CUTS/Makefile $srcdir/Applications/USER/Makefile:Applications/USER/Makefile $srcdir/Applications/VRP/Makefile:Applications/VRP/Makefile $srcdir/Examples/Makefile:Examples/Makefile"
-
-fi
-
 # Here put the location and name of the configuration header file
-          ac_config_headers="$ac_config_headers include/config_sym.h"
+                    ac_config_headers="$ac_config_headers include/config.h include/config_sym.h"
 
 
 # Finally, we let configure write all the output...
@@ -29924,16 +30164,8 @@ do
   "symphony-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES symphony-uninstalled.pc" ;;
   "osi-sym.pc" ) CONFIG_FILES="$CONFIG_FILES osi-sym.pc:src/OsiSym/osi-sym.pc.in" ;;
   "osi-sym-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in" ;;
-  "$srcdir/Applications/CNRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/CNRP/Makefile:Applications/CNRP/Makefile" ;;
-  "$srcdir/Applications/MATCH/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/MATCH/Makefile:Applications/MATCH/Makefile" ;;
-  "$srcdir/Applications/MCKP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/MCKP/Makefile:Applications/MCKP/Makefile" ;;
-  "$srcdir/Applications/MPP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/MPP/Makefile:Applications/MPP/Makefile" ;;
-  "$srcdir/Applications/SPP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/SPP/Makefile:Applications/SPP/Makefile" ;;
-  "$srcdir/Applications/SPP+CUTS/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/SPP+CUTS/Makefile:Applications/SPP+CUTS/Makefile" ;;
-  "$srcdir/Applications/USER/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/USER/Makefile:Applications/USER/Makefile" ;;
-  "$srcdir/Applications/VRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Applications/VRP/Makefile:Applications/VRP/Makefile" ;;
-  "$srcdir/Examples/Makefile" ) CONFIG_FILES="$CONFIG_FILES $srcdir/Examples/Makefile:Examples/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
+  "include/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config.h" ;;
   "include/config_sym.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config_sym.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -31104,6 +31336,8 @@ echo "$as_me: error: cannot create directory $dir" >&2;}
     done
   fi
 
+  { echo "$as_me:$LINENO: In case of trouble, first consult the troubleshooting page at https://projects.coin-or.org/BuildTools/wiki/user-troubleshooting" >&5
+echo "$as_me: In case of trouble, first consult the troubleshooting page at https://projects.coin-or.org/BuildTools/wiki/user-troubleshooting" >&6;}
   if test x$coin_projectdir = xyes; then
     { echo "$as_me:$LINENO: Configuration of $PACKAGE_NAME successful" >&5
 echo "$as_me: Configuration of $PACKAGE_NAME successful" >&6;}

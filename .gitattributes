@@ -101,7 +101,10 @@ SYMPHONY/configure -text
 SYMPHONY/configure.ac -text
 SYMPHONY/depcomp -text
 SYMPHONY/include/SymConfig.h -text
+SYMPHONY/include/config.h.in -text
+SYMPHONY/include/config_default.h -text
 SYMPHONY/include/config_sym.h.in -text
+SYMPHONY/include/config_sym_default.h -text
 SYMPHONY/include/sym_prep.h -text
 SYMPHONY/include/sym_prep_params.h -text
 SYMPHONY/include/sym_primal_heuristics.h -text
@@ -133,7 +136,6 @@ SYMPHONY/symphony-uninstalled.pc.in -text
 SYMPHONY/symphony.pc.in -text
 SYMPHONY/test/Makefile.am -text
 SYMPHONY/test/Makefile.in -text
-SYMPHONY/test/OsiSolverInterfaceTest.cpp -text
 SYMPHONY/test/OsiSymSolverInterfaceTest.cpp -text
 SYMPHONY/test/unitTestSym.cpp -text
 /compile -text

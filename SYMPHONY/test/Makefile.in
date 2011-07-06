@@ -69,7 +69,6 @@ host_triplet = @host@
 @USE_CL_TRUE@	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
 @USE_CL_TRUE@	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
 @USE_CL_TRUE@	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
-@USE_CL_TRUE@	cp -f OsiSolverInterfaceTest.$(OBJEXT) unitTest-OsiSolverInterfaceTest.$(OBJEXT); \
 @USE_CL_TRUE@	cp -f OsiSymSolverInterfaceTest.$(OBJEXT) unitTest-OsiSymSolverInterfaceTest.$(OBJEXT); \
 @USE_CL_TRUE@	cp -f unitTestSym.$(OBJEXT) unitTest-unitTestSym.$(OBJEXT); \
 @USE_CL_TRUE@	$(LIBTOOL) \
@@ -78,11 +77,12 @@ host_triplet = @host@
 
 @USE_CL_TRUE@am__append_11 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
 @USE_CL_TRUE@	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
-@USE_CL_TRUE@	OsiSolverInterfaceTest.$(OBJEXT) OsiSymSolverInterfaceTest.$(OBJEXT) \
-@USE_CL_TRUE@	 unitTestSym.$(OBJEXT)
+@USE_CL_TRUE@	OsiSymSolverInterfaceTest.$(OBJEXT) unitTestSym.$(OBJEXT)
 
 @USE_CL_FALSE@am__append_12 = $(CXXLINK)
 noinst_PROGRAMS = unitTest$(EXEEXT) punitTest$(EXEEXT)
+@COIN_HAS_NETLIB_TRUE@am__append_13 = -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
+@COIN_HAS_SAMPLE_TRUE@am__append_14 = -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -91,11 +91,11 @@ am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/include/config_sym.h
+CONFIG_HEADER = $(top_builddir)/include/config.h \
+	$(top_builddir)/include/config_sym.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_punitTest_OBJECTS = punitTest-OsiSolverInterfaceTest.$(OBJEXT) \
-	punitTest-OsiSymSolverInterfaceTest.$(OBJEXT) \
+am_punitTest_OBJECTS = punitTest-OsiSymSolverInterfaceTest.$(OBJEXT) \
 	punitTest-unitTestSym.$(OBJEXT)
 punitTest_OBJECTS = $(am_punitTest_OBJECTS)
 @SYM_PARALLEL_TRUE@am__DEPENDENCIES_2 = ../src/libSym$(MASTEREXT).la \
@@ -108,8 +108,7 @@ am__DEPENDENCIES_6 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__DEPENDENCIES_7 = $(am__DEPENDENCIES_6)
 @SYM_PARALLEL_TRUE@am__DEPENDENCIES_8 = $(PVM_ROOT)/lib/$(ARCH)`
 am__DEPENDENCIES_9 = $(am__DEPENDENCIES_7) $(am__DEPENDENCIES_8)
-am_unitTest_OBJECTS = unitTest-OsiSolverInterfaceTest.$(OBJEXT) \
-	unitTest-OsiSymSolverInterfaceTest.$(OBJEXT) \
+am_unitTest_OBJECTS = unitTest-OsiSymSolverInterfaceTest.$(OBJEXT) \
 	unitTest-unitTestSym.$(OBJEXT)
 unitTest_OBJECTS = $(am_unitTest_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -500,28 +499,23 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/include` \
 TestLDADD = $(LDADD) $(am__append_11)
 TestLINK = $(am__append_10) $(am__append_12)
 unitTest_SOURCES = \
-	OsiSolverInterfaceTest.cpp \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
 punitTest_SOURCES = \
-	OsiSolverInterfaceTest.cpp \
 	OsiSymSolverInterfaceTest.cpp \
 	unitTestSym.cpp
 
-unitTest_CPPFLAGS = $(SYMCPPFLAGS)
-unitTest_LDADD = $(SYMLIB) $(ALLLDADD)
+unitTest_CPPFLAGS = $(SYMCPPFLAGS) $(OSIUNITTEST_CFLAGS)
+unitTest_LDADD = $(SYMLIB) $(ALLLDADD) $(OSIUNITTEST_LIBS)
 unitTest_DEPENDENCIES = $(SYMLIB) $(DEPENDENCIES)
-unitTest_LDFLAGS = -rpath $(libdir)
 unitTest_LINK = $(TestLINK)
-punitTest_CPPFLAGS = $(SYMPCPPFLAGS)
-punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD)
+punitTest_CPPFLAGS = $(SYMPCPPFLAGS) $(OSIUNITTEST_CFLAGS)
+punitTest_LDADD = $(SYMPLIB) $(SYMPALLLDADD) $(OSIUNITTEST_LIBS)
 punitTest_DEPENDENCIES = $(SYMPLIB) $(DEPENDENCIES)
-punitTest_LDFLAGS = -rpath $(libdir)
-@COIN_HAS_MIPLIB3_FALSE@MIPLIBDIR = $(top_srcdir)/miplib3
-
-# We are using the Cbc solver executable to do the unit test
-@COIN_HAS_MIPLIB3_TRUE@MIPLIBDIR = $(MIPLIB3_DATA)
+@COIN_HAS_MIPLIB3_FALSE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(top_srcdir)/miplib3`
+@COIN_HAS_MIPLIB3_TRUE@MIPLIBDIR = -miplib3Dir=`$(CYGPATH_W) $(MIPLIB3_DATA)`
+unittestflags = $(am__append_13) $(am__append_14)
 testFILES = air03 dcmulti egout flugpl khb05250 l152lav \
 	lseu mod010 p0033 p0201 stein27 vpm1
 
@@ -586,10 +580,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/punitTest-OsiSolverInterfaceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/punitTest-unitTestSym.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unitTest-unitTestSym.Po@am__quote@
 
@@ -613,20 +605,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
-
-punitTest-OsiSolverInterfaceTest.o: OsiSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT punitTest-OsiSolverInterfaceTest.o -MD -MP -MF "$(DEPDIR)/punitTest-OsiSolverInterfaceTest.Tpo" -c -o punitTest-OsiSolverInterfaceTest.o `test -f 'OsiSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSolverInterfaceTest.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/punitTest-OsiSolverInterfaceTest.Tpo" "$(DEPDIR)/punitTest-OsiSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/punitTest-OsiSolverInterfaceTest.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='OsiSolverInterfaceTest.cpp' object='punitTest-OsiSolverInterfaceTest.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o punitTest-OsiSolverInterfaceTest.o `test -f 'OsiSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSolverInterfaceTest.cpp
-
-punitTest-OsiSolverInterfaceTest.obj: OsiSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT punitTest-OsiSolverInterfaceTest.obj -MD -MP -MF "$(DEPDIR)/punitTest-OsiSolverInterfaceTest.Tpo" -c -o punitTest-OsiSolverInterfaceTest.obj `if test -f 'OsiSolverInterfaceTest.cpp'; then $(CYGPATH_W) 'OsiSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/OsiSolverInterfaceTest.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/punitTest-OsiSolverInterfaceTest.Tpo" "$(DEPDIR)/punitTest-OsiSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/punitTest-OsiSolverInterfaceTest.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='OsiSolverInterfaceTest.cpp' object='punitTest-OsiSolverInterfaceTest.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o punitTest-OsiSolverInterfaceTest.obj `if test -f 'OsiSolverInterfaceTest.cpp'; then $(CYGPATH_W) 'OsiSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/OsiSolverInterfaceTest.cpp'; fi`
 
 punitTest-OsiSymSolverInterfaceTest.o: OsiSymSolverInterfaceTest.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT punitTest-OsiSymSolverInterfaceTest.o -MD -MP -MF "$(DEPDIR)/punitTest-OsiSymSolverInterfaceTest.Tpo" -c -o punitTest-OsiSymSolverInterfaceTest.o `test -f 'OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSymSolverInterfaceTest.cpp; \
@@ -655,20 +633,6 @@ punitTest-unitTestSym.obj: unitTestSym.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='unitTestSym.cpp' object='punitTest-unitTestSym.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(punitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o punitTest-unitTestSym.obj `if test -f 'unitTestSym.cpp'; then $(CYGPATH_W) 'unitTestSym.cpp'; else $(CYGPATH_W) '$(srcdir)/unitTestSym.cpp'; fi`
-
-unitTest-OsiSolverInterfaceTest.o: OsiSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSolverInterfaceTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" -c -o unitTest-OsiSolverInterfaceTest.o `test -f 'OsiSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSolverInterfaceTest.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='OsiSolverInterfaceTest.cpp' object='unitTest-OsiSolverInterfaceTest.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSolverInterfaceTest.o `test -f 'OsiSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSolverInterfaceTest.cpp
-
-unitTest-OsiSolverInterfaceTest.obj: OsiSolverInterfaceTest.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSolverInterfaceTest.obj -MD -MP -MF "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" -c -o unitTest-OsiSolverInterfaceTest.obj `if test -f 'OsiSolverInterfaceTest.cpp'; then $(CYGPATH_W) 'OsiSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/OsiSolverInterfaceTest.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo" "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Po"; else rm -f "$(DEPDIR)/unitTest-OsiSolverInterfaceTest.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='OsiSolverInterfaceTest.cpp' object='unitTest-OsiSolverInterfaceTest.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o unitTest-OsiSolverInterfaceTest.obj `if test -f 'OsiSolverInterfaceTest.cpp'; then $(CYGPATH_W) 'OsiSolverInterfaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/OsiSolverInterfaceTest.cpp'; fi`
 
 unitTest-OsiSymSolverInterfaceTest.o: OsiSymSolverInterfaceTest.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unitTest_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT unitTest-OsiSymSolverInterfaceTest.o -MD -MP -MF "$(DEPDIR)/unitTest-OsiSymSolverInterfaceTest.Tpo" -c -o unitTest-OsiSymSolverInterfaceTest.o `test -f 'OsiSymSolverInterfaceTest.cpp' || echo '$(srcdir)/'`OsiSymSolverInterfaceTest.cpp; \
@@ -875,48 +839,39 @@ uninstall-am: uninstall-info-am
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-info-am
 
+@COIN_HAS_MIPLIB3_TRUE@check_files:
+@COIN_HAS_MIPLIB3_TRUE@	  echo "using MIPLIB3 directory $(MIPLIB3_DATA)"
 
+@COIN_HAS_MIPLIB3_FALSE@check_files:
+@COIN_HAS_MIPLIB3_FALSE@	if test -r $(top_srcdir)/miplib3; then \
+@COIN_HAS_MIPLIB3_FALSE@	  echo "MIBLIB3 directory found..."; \
+@COIN_HAS_MIPLIB3_FALSE@	else \
+@COIN_HAS_MIPLIB3_FALSE@	  echo "Downloading required test files to $(top_srcdir)/miplib3"; \
+@COIN_HAS_MIPLIB3_FALSE@	  mkdir $(top_srcdir)/miplib3; \
+@COIN_HAS_MIPLIB3_FALSE@	  for file in $(testFILES); do \
+@COIN_HAS_MIPLIB3_FALSE@	    (echo $$file; svn cat https://projects.coin-or.org/svn/Data/miplib3/stable/1.2/$$file.gz >> $(top_srcdir)/miplib3/$$file.gz) \
+@COIN_HAS_MIPLIB3_FALSE@	  done; \
+@COIN_HAS_MIPLIB3_FALSE@	  fi; \
+@COIN_HAS_MIPLIB3_FALSE@	  echo "Uncompressing files"; \
+@COIN_HAS_MIPLIB3_FALSE@	  cd $(top_srcdir)/miplib3; \
+@COIN_HAS_MIPLIB3_FALSE@	  for file in $(testFILES); do \
+@COIN_HAS_MIPLIB3_FALSE@	    if test -r $$file.gz; then \
+@COIN_HAS_MIPLIB3_FALSE@	      (gzip -d $$file.gz) \
+@COIN_HAS_MIPLIB3_FALSE@	    fi \
+@COIN_HAS_MIPLIB3_FALSE@	  done
+
+# by passing -miplib3Dir= we can overwrite using a default miplib3 path which would trigger the MIPLIB tests
 test: unitTest$(EXEEXT)
-	if test x"$(NETLIB_DATA)" != x; then \
-		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
-	fi;
-	./unitTest$(EXEEXT) $$NETLIBARG -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA) | sed -e 's/\\\\/\\\\\\\\/g'`
+	./unitTest$(EXEEXT) -miplib3Dir= $(unittestflags)
 
 fulltest: check_files unitTest$(EXEEXT)
-	if test x"$(NETLIB_DATA)" != x; then \
-		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
-	fi;
-	./unitTest$(EXEEXT) $$NETLIBARG -T $(MIPLIBDIR)
+	./unitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags)
 
 ptest: punitTest$(EXEEXT)
-	if test x"$(NETLIB_DATA)" != x; then \
-		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
-	fi;
-	./punitTest$(EXEEXT) $$NETLIBARG -p 2
+	./punitTest$(EXEEXT) -miplib3Dir= $(unittestflags)
 
 pfulltest: check_files punitTest$(EXEEXT)
-	if test x"$(NETLIB_DATA)" != x; then \
-		NETLIBARG="-netlibDir $(NETLIB_DATA) -testOsiSolverInterface";\
-	fi;
-	./punitTest$(EXEEXT) $$NETLIBARG -T $(MIPLIBDIR) -p 2
-
-check_files:
-	  if test -r $(MIPLIBDIR); then \
-	   echo "MIBLIB3 directory found..."; \
-	  else \
-	   echo "Downloading required test files to $(MIPIBDIR)"; \
-	   mkdir $(MIPLIBDIR); \
-	   for file in $(testFILES); do \
-	       (echo $$file; svn cat https://projects.coin-or.org/svn/Data/stable/1.0/miplib3/$$file.gz >> $(MIPLIBDIR)/$$file.gz) \
-	   done; \
-	  fi; \
-	  echo "Uncompressing files"; \
-	  cd $(MIPLIBDIR); \
-	  for file in $(testFILES); do \
-	   if test -r $$file.gz; then \
-		(gzip -d $$file.gz) \
-	   fi \
-	  done
+	./punitTest$(EXEEXT) $(MIPLIBDIR) $(unittestflags)
 
 .PHONY: test ptest fulltest pfulltest check_files
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

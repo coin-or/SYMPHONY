@@ -22,14 +22,10 @@
 #include "OsiSolverInterface.hpp"
 #include "OsiSymSolverParameters.hpp"
 #include "SymWarmStart.hpp"
-#include "symphony.h"
 
-#include "CoinPackedVector.hpp"
-#include "CoinPackedMatrix.hpp"
-
-#include <iostream>
 #include <string>
-#include <cassert>
+
+typedef struct SYM_ENVIRONMENT sym_environment;
 
 //#############################################################################
 
@@ -55,7 +51,7 @@
 */
 
 class OsiSymSolverInterface : virtual public OsiSolverInterface {
-   friend int OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
+   friend void OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
    
 public:
    ///@name Solve methods 
@@ -191,10 +187,10 @@ public:
    virtual bool isPrimalObjectiveLimitReached() const;
 
     /// Is the given dual objective limit reached?
-    virtual bool isDualObjectiveLimitReached() const{
-       throw CoinError("Error: Function not implemented",
-		       "isDualObjectiveLimitReached", "OsiSymSolverInterface");
-    }
+    //virtual bool isDualObjectiveLimitReached() const{
+    //   throw CoinError("Error: Function not implemented",
+		//       "isDualObjectiveLimitReached", "OsiSymSolverInterface");
+    //}
     /// Iteration limit reached?
    virtual bool isIterationLimitReached() const;
 
@@ -489,8 +485,7 @@ public:
     */
 
    virtual void setRowPrice(const double * rowprice){
-       throw CoinError("Error: Function not implemented",
-		       "setRowPrice", "OsiSymSolverInterface");
+       std::cerr << "Error: Function not implemented: OsiSymSolverInterface::setRowPrice" << std::endl;
     }
 
     //@}
@@ -673,13 +668,13 @@ public:
       /// keep all cached data (similar to getMutableLpPtr())
       KEEPCACHED_ALL     = KEEPCACHED_PROBLEM | KEEPCACHED_RESULTS,
       /// free only cached column and LP solution information
-      FREECACHED_COLUMN  = KEEPCACHED_PROBLEM & !KEEPCACHED_COLUMN,
+      FREECACHED_COLUMN  = KEEPCACHED_PROBLEM & ~KEEPCACHED_COLUMN,
       /// free only cached row and LP solution information
-      FREECACHED_ROW     = KEEPCACHED_PROBLEM & !KEEPCACHED_ROW,
+      FREECACHED_ROW     = KEEPCACHED_PROBLEM & ~KEEPCACHED_ROW,
       /// free only cached matrix and LP solution information
-      FREECACHED_MATRIX  = KEEPCACHED_PROBLEM & !KEEPCACHED_MATRIX,
+      FREECACHED_MATRIX  = KEEPCACHED_PROBLEM & ~KEEPCACHED_MATRIX,
       /// free only cached LP solution information
-      FREECACHED_RESULTS = KEEPCACHED_ALL & !KEEPCACHED_RESULTS
+      FREECACHED_RESULTS = KEEPCACHED_ALL & ~KEEPCACHED_RESULTS
    };
    
   ///@name Constructors and destructors
@@ -759,9 +754,6 @@ private:
   /// free all allocated memory
   void freeAllMemory();
 
-  /// Just for testing purposes
-  void printBounds(); 
-
   /**@name Private member data */
   //@{
    /// The pointer to the SYMPHONY problem environment
@@ -812,11 +804,7 @@ private:
 };
 
 //#############################################################################
-/** A function that tests the methods in the OsiSymSolverInterface class. The
-    only reason for it not to be a member method is that this way it doesn't
-    have to be compiled into the library. And that's a gain, because the
-    library should be compiled with optimization on, but this method should be
-    compiled with debugging. */
-int OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
+/** A function that tests the methods in the OsiSymSolverInterface class. */
+void OsiSymSolverInterfaceUnitTest(const std::string & mpsDir, const std::string & netlibDir);
 
 #endif
