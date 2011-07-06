@@ -876,9 +876,21 @@ void OsiSymSolverInterface::loadProblem(const CoinPackedMatrix& matrix,
 	 }
       }
    }
+
+   bool rowsen_faked = false;
+   char *fake_rowsen = 0;
+
+   if (!rowsen){
+      fake_rowsen  = new char[numrows];
+      memset(fake_rowsen, 'G', CSIZE*numrows);
+      rowsen_faked = true;
+   }
    
    loadProblem(numcols,numrows, matbeg, matind, matval, collb, colub, obj, 
-	       rowsen, rowrhs, rowrng);
+	       rowsen ? rowsen:fake_rowsen, rowrhs, rowrng);
+
+   if (rowsen_faked)
+      delete[] fake_rowsen;
 
    if(!isColOrdered)
       delete symMatrix;
