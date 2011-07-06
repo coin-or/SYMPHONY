@@ -640,9 +640,12 @@ rename_obj:
 # Here list all the header files that are required by a user of the library,
 # and that therefore should be installed in 'install/coin'
 includecoindir = $(includedir)/coin
-includecoin_HEADERS = \
-	../include/symphony.h
+includecoin_HEADERS = ../include/symphony.h
 #	$(SYMHEADERS)
+
+#######################################################################
+# Create the Config.h file that has all public defines and install it #
+#######################################################################
 
 install-exec-local:
 	$(install_sh_DATA) ../include/config_sym.h $(DESTDIR)$(includecoindir)/SymConfig.h
