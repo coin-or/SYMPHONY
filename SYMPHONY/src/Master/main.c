@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 #include "symphony.h"
 #include "sym_master.h"
 #include "sym_messages.h"
-#ifdef HAS_READLINE
+#if defined(HAS_READLINE) && RL_READLINE_VERSION >= 0x0502
 #include <pwd.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
 
      sym_set_int_param(env, "verbosity", -1);
 
-#ifdef HAS_READLINE
+#if defined(HAS_READLINE) && RL_READLINE_VERSION >= 0x0502
      sym_initialize_readline();
 #endif
      
@@ -218,7 +218,7 @@ int main(int argc, char **argv)
 	   strcpy(args[1], line);
 	 }	 
 
-#ifdef HAS_READLINE
+#if defined(HAS_READLINE) && RL_READLINE_VERSION >= 0x0502
 	 sym_read_tilde(args[1]);	 
 #endif	 	 
 	 if (fopen(args[1], "r") == NULL){
@@ -275,7 +275,7 @@ int main(int argc, char **argv)
 	     strcpy(args[2], line);
 	   }
 
-#ifdef HAS_READLINE
+#if defined(HAS_READLINE) && RL_READLINE_VERSION >= 0x0502
 	   sym_read_tilde(args[2]);	 
 #endif	 	 
 	 
@@ -514,7 +514,7 @@ int main(int argc, char **argv)
 	       strcpy(args[2], line);
 	     }
 
-#ifdef HAS_READLINE
+#if defined(HAS_READLINE) && RL_READLINE_VERSION >= 0x0502
 	     sym_read_tilde(args[2]);	 
 #endif	 	 
 
@@ -689,7 +689,7 @@ int sym_read_line(const char *prompt, char **input)
   }
   *input = getl;
   
-#else
+#elif RL_READLINE_VERSION >= 0x0502
 
   if (*input) FREE(*input);
 
@@ -726,7 +726,7 @@ int sym_free_env(sym_environment *env){
 } 
 /*===========================================================================*\
 \*===========================================================================*/
-#ifdef HAS_READLINE
+#if defined(HAS_READLINE) && RL_READLINE_VERSION >= 0x0502
 
 void sym_initialize_readline()
 {
