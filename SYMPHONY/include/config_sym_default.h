@@ -5,13 +5,13 @@
 /***************************************************************************/
 
 /* Version number of project */
-#undef SYMPHONY_VERSION         "trunk"
+#undef SYMPHONY_VERSION        "5.4"
 
 /* Major Version number of project */
-#undef SYMPHONY_VERSION_MAJOR   9999
+#undef SYMPHONY_VERSION_MAJOR      5
 
 /* Minor Version number of project */
-#undef SYMPHONY_VERSION_MINOR   9999
+#undef SYMPHONY_VERSION_MINOR      4
 
 /* Release Version number of project */
 #undef SYMPHONY_VERSION_RELEASE 9999
