@@ -184,7 +184,7 @@ public:
 		      "isProvenDualInfeasible", "OsiSymSolverInterface");
    }
     /// Is the given primal objective limit reached?
-   virtual bool isPrimalObjectiveLimitReached() const;
+   //virtual bool isPrimalObjectiveLimitReached() const;
 
     /// Is the given dual objective limit reached?
     //virtual bool isDualObjectiveLimitReached() const{

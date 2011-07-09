@@ -1059,15 +1059,15 @@ bool OsiSymSolverInterface::isProvenPrimalInfeasible() const
 /*===========================================================================*/
 /*===========================================================================*/
 
-bool OsiSymSolverInterface::isPrimalObjectiveLimitReached() const
-{
-   if(sym_is_target_gap_achieved(env_)){
-      return true;
-   }
-   else{
-      return false;
-   }
-}
+//bool OsiSymSolverInterface::isPrimalObjectiveLimitReached() const
+//{
+//   if(sym_is_target_gap_achieved(env_)){
+//      return true;
+//   }
+//   else{
+//      return false;
+//   }
+//}
 
 /*===========================================================================*/
 /*===========================================================================*/
