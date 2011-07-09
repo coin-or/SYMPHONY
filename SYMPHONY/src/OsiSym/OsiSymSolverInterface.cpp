@@ -1259,6 +1259,33 @@ const double * OsiSymSolverInterface::getRowUpper() const
    }
 }
 
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+const double * OsiSymSolverInterface::getRowPrice() const
+{
+   if(!rowprice_){
+      rowprice_ = new double[getNumRows()];
+      memset(rowprice_, 0, getNumRows() * sizeof(double));
+   }
+
+   return rowprice_;
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+const double * OsiSymSolverInterface::getReducedCost() const
+{
+   if(!colredcost_){
+      colredcost_ = new double[getNumCols()];
+      memset(colredcost_, 0, getNumCols() * sizeof(double));
+   }
+
+   return colredcost_;
+}
+
 /*===========================================================================*/
 /*===========================================================================*/
   
@@ -1612,6 +1639,18 @@ void OsiSymSolverInterface::setPrimalBound(const double bound)
 /*===========================================================================*/
 /*===========================================================================*/
 
+void OsiSymSolverInterface::setRowPrice(const double * rowprice)
+{
+   if( rowprice_ == NULL )
+   {
+      rowprice_ = new double[getNumRows()];
+   }
+   memcpy(rowprice_, rowprice, getNumRows() * sizeof(double));
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
 void OsiSymSolverInterface::setContinuous(int index)
 {
    sym_set_continuous(env_, index);
@@ -1901,11 +1940,13 @@ void OsiSymSolverInterface::gutsOfConstructor()
 	obj_ = NULL;
 	collower_ = NULL;
 	colupper_ = NULL;
+	colredcost_ = NULL;
 	rowsense_ = NULL;
 	rhs_ = NULL;
 	rowrange_ = NULL;
 	rowlower_ = NULL;
 	rowupper_ = NULL;
+	rowprice_ = NULL;
 	colsol_ = NULL;
 	rowact_ = NULL;
 	matrixByRow_ = NULL;
@@ -1919,11 +1960,13 @@ void OsiSymSolverInterface::gutsOfDestructor()
 	assert( obj_ == NULL );
 	assert( collower_ == NULL );
 	assert( colupper_ == NULL );
+  assert( colredcost_ == NULL );
 	assert( rowsense_ == NULL );
 	assert( rhs_ == NULL );
 	assert( rowrange_ == NULL );
 	assert( rowlower_ == NULL );
 	assert( rowupper_ == NULL );
+	assert( rowprice_ == NULL );
 	assert( colsol_ == NULL );
 	assert( rowact_ == NULL );
 	assert( matrixByRow_ == NULL );
@@ -1939,6 +1982,7 @@ void OsiSymSolverInterface::freeCachedColRim()
    freeCacheDouble(obj_);
    freeCacheDouble(collower_);
    freeCacheDouble(colupper_);
+   freeCacheDouble(colredcost_);
 }
 
 //-----------------------------------------------------------------------------
@@ -1950,6 +1994,7 @@ void OsiSymSolverInterface::freeCachedRowRim()
    freeCacheDouble(rowrange_);
    freeCacheDouble(rowlower_);
    freeCacheDouble(rowupper_);
+   freeCacheDouble(rowprice_);
 }
 
 //-----------------------------------------------------------------------------

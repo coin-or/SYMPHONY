@@ -352,18 +352,10 @@ public:
    virtual const double * getColSolution() const;
   
       /// Get pointer to array[getNumRows()] of dual variable values
-      virtual const double * getRowPrice() const{
-	 //       throw CoinError("Error: Function not implemented",
-	 //       "getRowPrice", "OsiSymSolverInterface");
-	 return (0);
-    }
+      virtual const double * getRowPrice() const;
   
       /// Get a pointer to array[getNumCols()] of reduced costs
-      virtual const double * getReducedCost() const{
-	 //       throw CoinError("Error: Function not implemented",
-	 //       "getReducedCost", "OsiSymSolverInterface");
-	 return (0);
-    }
+      virtual const double * getReducedCost() const;
   
       /** Get pointer to array[getNumRows()] of row activity levels (constraint
   	matrix times the solution vector). */
@@ -484,9 +476,7 @@ public:
 	solution in any way is solver-dependent.
     */
 
-   virtual void setRowPrice(const double * rowprice){
-       std::cerr << "Error: Function not implemented: OsiSymSolverInterface::setRowPrice" << std::endl;
-    }
+   virtual void setRowPrice(const double * rowprice);
 
     //@}
 
@@ -771,7 +761,10 @@ private:
    
    /// Pointer to dense vector of variable lower bounds
    mutable double  *colupper_;
-   
+
+   /// Pointer to dense vector of variable lower bounds
+   mutable double  *colredcost_;
+
    /// Pointer to dense vector of row sense indicators
    mutable char    *rowsense_;
   
@@ -789,6 +782,9 @@ private:
    /// Pointer to dense vector of row upper bounds
    mutable double  *rowupper_;
    
+   /// Pointer to dense vector of row prices
+   mutable double  *rowprice_;
+
    /// Pointer to primal solution vector
    mutable double  *colsol_;
    
