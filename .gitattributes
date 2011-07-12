@@ -78,6 +78,12 @@ SYMPHONY/Examples/milp2.c -text
 SYMPHONY/Examples/milpOsi.c -text
 SYMPHONY/Examples/milpOsi2.c -text
 SYMPHONY/MSVisualStudio/sym.mak -text
+SYMPHONY/MSVisualStudio/v10/libOsiSym.vcxproj -text
+SYMPHONY/MSVisualStudio/v10/libSymphony.vcxproj -text
+SYMPHONY/MSVisualStudio/v10/symphony.sln -text
+SYMPHONY/MSVisualStudio/v10/symphony.suo -text
+SYMPHONY/MSVisualStudio/v10/symphony.vcxproj -text
+SYMPHONY/MSVisualStudio/v10/unitTest.vcxproj -text
 SYMPHONY/MSVisualStudio/v8/libSymphony.vcproj -text
 SYMPHONY/MSVisualStudio/v8/symphony.sln -text
 SYMPHONY/MSVisualStudio/v8/symphony.suo -text
