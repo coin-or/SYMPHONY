@@ -28,6 +28,9 @@
 /* Define to 1 if the Osi package is used */
 #define COIN_HAS_OSI 1
 
+/* Define to 1 if the Osi package is used */
+#define COIN_HAS_OSITESTS 1
+
 /* Define to 1 if the Vol package is used */
 /* #define COIN_HAS_VOL 1 */
 
