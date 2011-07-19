@@ -22,6 +22,23 @@ Release 5.4.0:
 
 1. Change license to EPL.
 
+2. Support for MSVC++ version 10 added.
+
+3. Support for BuildTools version 0.7 to incoorporate recent enhancements, including proper library versioning in Linux, prohibiting installation of private headers, etc.
+
+4. Enhancements to unit testing.
+
+5. Updating externals to new stable versions of dependent projects.
+
+Release 5.3.4:
+
+1. Fixes to the shared memory parallel version (OpenMP). It is now pretty
+stable, though some minor memory conflict conditions may arise (infrequently).
+
+2. Fixes to allow all applications to build and run properly.
+
+3. Updates to documentation.
+
 Release 5.3.3:
 
 1. Fixes to the build system.
