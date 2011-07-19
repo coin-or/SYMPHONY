@@ -6,6 +6,9 @@
 /Makefile.in -text
 /README -text
 SYMPHONY/AUTHORS -text
+SYMPHONY/Applications/CNRP/MSVisualStudio/v10/cnrp.sln -text
+SYMPHONY/Applications/CNRP/MSVisualStudio/v10/cnrp.suo -text
+SYMPHONY/Applications/CNRP/MSVisualStudio/v10/cnrp.vcxproj -text
 SYMPHONY/Applications/CNRP/MSVisualStudio/v8/cnrp.sln -text
 SYMPHONY/Applications/CNRP/MSVisualStudio/v8/cnrp.suo -text
 SYMPHONY/Applications/CNRP/MSVisualStudio/v8/cnrp.vcproj -text
@@ -14,6 +17,9 @@ SYMPHONY/Applications/CNRP/MSVisualStudio/v9/cnrp.suo -text
 SYMPHONY/Applications/CNRP/MSVisualStudio/v9/cnrp.vcproj -text
 SYMPHONY/Applications/CNRP/Makefile.in -text
 SYMPHONY/Applications/CNRP/Makefile.orig -text
+SYMPHONY/Applications/MATCH/MSVisualStudio/v10/match.sln -text
+SYMPHONY/Applications/MATCH/MSVisualStudio/v10/match.suo -text
+SYMPHONY/Applications/MATCH/MSVisualStudio/v10/match.vcxproj -text
 SYMPHONY/Applications/MATCH/MSVisualStudio/v8/match.sln -text
 SYMPHONY/Applications/MATCH/MSVisualStudio/v8/match.suo -text
 SYMPHONY/Applications/MATCH/MSVisualStudio/v8/match.vcproj -text
@@ -22,6 +28,9 @@ SYMPHONY/Applications/MATCH/MSVisualStudio/v9/match.suo -text
 SYMPHONY/Applications/MATCH/MSVisualStudio/v9/match.vcproj -text
 SYMPHONY/Applications/MATCH/Makefile.in -text
 SYMPHONY/Applications/MATCH/Makefile.orig -text
+SYMPHONY/Applications/MCKP/MSVisualStudio/v10/mckp.sln -text
+SYMPHONY/Applications/MCKP/MSVisualStudio/v10/mckp.suo -text
+SYMPHONY/Applications/MCKP/MSVisualStudio/v10/mckp.vcxproj -text
 SYMPHONY/Applications/MCKP/MSVisualStudio/v8/mckp.sln -text
 SYMPHONY/Applications/MCKP/MSVisualStudio/v8/mckp.suo -text
 SYMPHONY/Applications/MCKP/MSVisualStudio/v8/mckp.vcproj -text
@@ -30,6 +39,9 @@ SYMPHONY/Applications/MCKP/MSVisualStudio/v9/mckp.suo -text
 SYMPHONY/Applications/MCKP/MSVisualStudio/v9/mckp.vcproj -text
 SYMPHONY/Applications/MCKP/Makefile.in -text
 SYMPHONY/Applications/MCKP/Makefile.orig -text
+SYMPHONY/Applications/MPP/MSVisualStudio/v10/mpp.sln -text
+SYMPHONY/Applications/MPP/MSVisualStudio/v10/mpp.suo -text
+SYMPHONY/Applications/MPP/MSVisualStudio/v10/mpp.vcxproj -text
 SYMPHONY/Applications/MPP/MSVisualStudio/v8/mpp.sln -text
 SYMPHONY/Applications/MPP/MSVisualStudio/v8/mpp.suo -text
 SYMPHONY/Applications/MPP/MSVisualStudio/v8/mpp.vcproj -text
@@ -38,9 +50,13 @@ SYMPHONY/Applications/MPP/MSVisualStudio/v9/mpp.suo -text
 SYMPHONY/Applications/MPP/MSVisualStudio/v9/mpp.vcproj -text
 SYMPHONY/Applications/MPP/Makefile.in -text
 SYMPHONY/Applications/MPP/Makefile.orig -text
+SYMPHONY/Applications/MSVisualStudio/v10/libSymphony.vcxproj -text
 SYMPHONY/Applications/MSVisualStudio/v8/libSymphony.vcproj -text
 SYMPHONY/Applications/MSVisualStudio/v9/libSymphony.vcproj -text
 SYMPHONY/Applications/Makefile.Applications.in -text
+SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v10/spp_with_cuts.sln -text
+SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v10/spp_with_cuts.suo -text
+SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v10/spp_with_cuts.vcxproj -text
 SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v8/spp_with_cuts.sln -text
 SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v8/spp_with_cuts.suo -text
 SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v8/spp_with_cuts.vcproj -text
@@ -49,6 +65,9 @@ SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v9/spp_with_cuts.suo -text
 SYMPHONY/Applications/SPP+CUTS/MSVisualStudio/v9/spp_with_cuts.vcproj -text
 SYMPHONY/Applications/SPP+CUTS/Makefile.in -text
 SYMPHONY/Applications/SPP+CUTS/Makefile.orig -text
+SYMPHONY/Applications/SPP/MSVisualStudio/v10/spp.sln -text
+SYMPHONY/Applications/SPP/MSVisualStudio/v10/spp.suo -text
+SYMPHONY/Applications/SPP/MSVisualStudio/v10/spp.vcxproj -text
 SYMPHONY/Applications/SPP/MSVisualStudio/v8/spp.sln -text
 SYMPHONY/Applications/SPP/MSVisualStudio/v8/spp.suo -text
 SYMPHONY/Applications/SPP/MSVisualStudio/v8/spp.vcproj -text
@@ -57,6 +76,9 @@ SYMPHONY/Applications/SPP/MSVisualStudio/v9/spp.suo -text
 SYMPHONY/Applications/SPP/MSVisualStudio/v9/spp.vcproj -text
 SYMPHONY/Applications/SPP/Makefile.in -text
 SYMPHONY/Applications/SPP/Makefile.orig -text
+SYMPHONY/Applications/USER/MSVisualStudio/v10/user.sln -text
+SYMPHONY/Applications/USER/MSVisualStudio/v10/user.suo -text
+SYMPHONY/Applications/USER/MSVisualStudio/v10/user.vcxproj -text
 SYMPHONY/Applications/USER/MSVisualStudio/v8/user.sln -text
 SYMPHONY/Applications/USER/MSVisualStudio/v8/user.suo -text
 SYMPHONY/Applications/USER/MSVisualStudio/v8/user.vcproj -text
@@ -65,6 +87,9 @@ SYMPHONY/Applications/USER/MSVisualStudio/v9/user.suo -text
 SYMPHONY/Applications/USER/MSVisualStudio/v9/user.vcproj -text
 SYMPHONY/Applications/USER/Makefile.in -text
 SYMPHONY/Applications/USER/Makefile.orig -text
+SYMPHONY/Applications/VRP/MSVisualStudio/v10/vrp.sln -text
+SYMPHONY/Applications/VRP/MSVisualStudio/v10/vrp.suo -text
+SYMPHONY/Applications/VRP/MSVisualStudio/v10/vrp.vcxproj.user -text
 SYMPHONY/Applications/VRP/MSVisualStudio/v8/vrp.sln -text
 SYMPHONY/Applications/VRP/MSVisualStudio/v8/vrp.suo -text
 SYMPHONY/Applications/VRP/MSVisualStudio/v8/vrp.vcproj -text
