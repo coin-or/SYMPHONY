@@ -101,6 +101,7 @@ These instructions are for use with Microsoft Visual Studio 8. The procedure
 for other version of Visual Studio should be similar. Download and unpack the
 archive \code{symphony-\VER-win32-msvc6.zip}
 \begin{itemize}
+
 \item First, test the executable by opening Windows Explorer and double-click
 on {\color{Brown}\texttt{symphony.exe}} in the {\color{Brown}\texttt{bin}}
 directory in the folder in which the distribution was unpacked. This should
@@ -112,42 +113,10 @@ or \code{?} to see a list of available commands or see Chapter
 along with associated project files in the \code{examples} directory. \\ \\
 \code{milp.c}: This sample code is an implementation of a basic MILP
 solver using SYMPHONY's C callable functions with user defined input (see
-Section \ref{callable_library}). To test the code, either
+Section \ref{callable_library}). To build and test the code, open the SYMPHONY
+MSVC++ solution file and build the project {\color{Brown}\texttt{milp}}, as
+described below in the next section.
 
-\begin{itemize}
-\item open the solution file \code{milp.sln}, choose \code{Build milp.exe}
-and then choose \code{Execute} from the \code{Build} menu, 
-\end{itemize}
-or
-\begin{itemize}
-\item open a command terminal (choose \code{Run} on the Start menu and type
-\code{cmd} in the dialogue box) and type 
-{\color{Brown}
-\begin{verbatim}
- devenv milp.sln /make "all - debug"
- Debug/milp.exe
- \end{verbatim}
-}
-\end{itemize}
-\code{milpOsi.c}: This sample code is an implementation of a basic MILP 
-solver using SYMPHONY's C++ callable functions (through OsiSym interface)
-with user defined input (see Section \ref{OSI}). To test the code, either 
-\begin{itemize}
-\item open the solution file \code{milpOsi.sln}, 
-choose \code{Build milpOsi.exe} and then 
-\code{Execute} commands from the \code{Build} menu, 
-\end{itemize}
-or
-\begin{itemize}
-\item open a command terminal (choose \code{Run} on the Start menu and type
-\code{cmd} in the dialogue box) and type 
-{\color{Brown}
-\begin{verbatim}
- devenv milpOsi.slb /make "all - debug"
- Debug/milpOsi.exe
- \end{verbatim}
-}
-\end{itemize}
 \end{itemize}
 
 % Applications????
@@ -598,37 +567,26 @@ working under Windows.
 \subsubsection{Building in a Windows Terminal}
 \label{using_msdev}
 
-These instructions are for MSVC++ Version 8. Instructions for other versions
-should be similar.
+These instructions are for MSVC++ Version 10. Instructions for other versions
+should be similar, though project files for earlier versions are not well
+maintained. 
 
 \begin{itemize}
 \item Open a command terminal (choose \code{Run} on the Start menu and type
-\code{cmd} in the dialogue box). Go to the \code{MSVisualStudio\bs v8}
+\code{cmd} in the dialogue box). Go to the \code{MSVisualStudio\bs v10}
 directory and type 
 {\color{Brown}
 \begin{verbatim}
- devenv symphony.sln /build all
+ devenv symphony.sln /Build "Win32|Release"
 \end{verbatim}
-}
-This will create both the debug and release versions of SYMPHONY. If you 
-want to compile only one of them, type
-{\color{Brown}
-\begin{verbatim}
- devenv symphony.sln /build "all - debug"
-\end{verbatim}
-}
-or 
-{\color{Brown}
-\begin{verbatim}
- devenv symphony.sln /build "all - release"
-\end{verbatim}
-}
-For each command, the library \code{libSymphony.lib} and the executable 
-\code{symphony} will be created in \code{Debug} and/or \code{Release}
-directories.  The library, together with the header files in 
-\code{SYMPHONY\bs include\bs}, can then be 
-used to call SYMPHONY from any C/C++ code. The API for calling SYMPHONY is 
-described in Section \ref{callable_library}.
+}This will create both the 32-bit release version of SYMPHONY, including the
+library \code{libSymphony.lib} and the executable \code{symphony}. Of course,
+other configurations are suported as well and binaries will be created
+side-by-side in the appropriate directories according to platform and
+configuration selected. The library, together with the header files in
+\code{SYMPHONY\bs include\bs}, can then be used to call SYMPHONY from any
+C/C++ code. The API for calling SYMPHONY is described in Section
+\ref{callable_library}.
 
 \item Test the executable by opening Windows Explorer and double-clicking
 on {\color{Brown}\texttt{symphony.exe}} in the
@@ -640,7 +598,7 @@ a list of available commands or see Chapter
 \item If you modify the source code of SYMPHONY, type 
 {\color{Brown}
 \begin{verbatim}
- devenv symphony.sln /make all /rebuild
+ devenv symphony.sln /Rebuild "Win32|Release"
 \end{verbatim}
 }
 in order to clean and rebuild everything.
@@ -658,40 +616,7 @@ follow the instuctions for building in Unix-like environments (see Section
  ./configure --enable-doscompile=msvc
 \end{verbatim}}
 
-\subsubsection{Building with the NMAKE Utility}
-\label{using_nmake}
-
-\begin{itemize}
-\item Go to \code{MSVisualStudio} directory and edit the \code{sym.mak} 
-makefile to reflect 
-your environment. This involves specifying the LP solver to be used, 
-assigning some variables and  setting various paths. Only minor edits 
-should be required. An explanation of what has to be set is contained in the 
-comments in the makefile.  Note that, you have to first create the COIN 
-libraries \ptt{Cgl}, \ptt{Clp}, \ptt{Osi}, \ptt{OsiClp} and \ptt{CoinUtils}.
-
-\item Once configuration is done, open a command line terminal and type 
-{\color{Brown}
-\begin{verbatim}
- nmake sym.mak
-\end{verbatim}
-}
-This will make the SYMPHONY library \code{libSymphony.lib} and the executable 
-\code{symphony} in \code{Debug} directory. The library, together with the 
-header files in \code{SYMPHONY\bs include\bs}, can then be used to call 
-SYMPHONY from any C/C++ code. The API for calling SYMPHONY is described in 
-Section \ref{callable_library}.
-
-\item Test the executable by opening Windows Explorer and double-clicking
-on {\color{Brown}\texttt{symphony.exe}} in the
-{\color{Brown}\texttt{Debug\bs}} subdirectory. This should open a Window in
-which the interactive solver will appear. Type \code{help} or \code{?} to see
-a list of available commands or see Chapter \ref{API-overview} for
-instructions on using the interactive solver.
-
-\end{itemize}
-
-\subsection{Building SYMPHONY Applications}
+\subsubsection{Building SYMPHONY Applications}
 \label{build_appl_msvc}
 
 As mentioned above, there are a number of sample applications available as
@@ -714,7 +639,7 @@ be similar. All of the following commands should be executed in the
 \code{SYMPHONY-\VER\bs Applications\bs XXX\bs MSVisualStudio\bs v8} directory,
 where \code{XXX} is the name of the application to be built.
 
-\subsubsection{Building With the MSVC++ IDE}
+\paragraph{Building With the MSVC++ IDE}
 
 \begin{itemize}
 
@@ -747,25 +672,11 @@ and bound solver.
 \code{cmd} in the dialogue box) and type
 {\color{Brown}
 \begin{verbatim}
- devenv xxx.sln /make all
+ devenv xxx.sln /Build "Win32|Release"
 \end{verbatim}
-} where \code{xxx} is the name of the application. This will create both the
-debug and release versions of the application executable. If you want to
-compile only one of them, type 
-{\color{Brown}
-\begin{verbatim}
- devenv xxx.sln /make "all - debug"
-\end{verbatim}
-}
-or 
-{\color{Brown}
-\begin{verbatim}
- devenv xxx.sln /make "all - release"
-\end{verbatim}
-}
-For each command, the executable \code{user} will be created in 
-\code{Debug\bs} and/or \code{Release\bs}
-directories. 
+} 
+where \code{xxx} is the name of the application. This will create the
+release version of the application executable, as above. 
 
 \item To test the executable, type 
 {\color{Brown}
@@ -776,34 +687,25 @@ directories.
 \item If the source files for the application are modified, type 
 {\color{Brown}
 \begin{verbatim}
- devenv user.sln /make all /rebuild
+ devenv user.sln /Rebuild "Win32|Release"
 \end{verbatim}
 }
 in order to clean and rebuild everything.
 \end{itemize} 
 
-\subsubsection{Using the NMAKE Utility}
+\paragraph{Building with the MSVC++ compiler in CYGWIN}
 
-\begin{itemize}
-\item 
-Edit the file \code{xxx.mak}, where \code{xxx} is the name of the application,
-to reflect your environment. Only minor edits should be required. An
-explanation of what has to be set is contained in the comments in the
-\code{xxx.mak} file. Also, see the related parts of Section \ref{using_nmake}
-above.
+It is possible to build applications using an automated build of SYMPHONY
+with the MSVC++ compiler \code{cl} using the GNU autotools in the CYGWIN
+environment. To do so, follow the instuctions for building in Unix-like
+environments (see Section \ref{getting_started_unix}), except when
+configuring, use the command
 
-\item Once configuration is done, type 
 {\color{Brown}
 \begin{verbatim}
-  nmake /f xxx.mak
-\end{verbatim}
-}
-The executable \code{xxx.exe} will be created in the \code{Debug/} directory.
-\item To test the executable, type 
-{\color{Brown}
-\begin{verbatim}
- Debug\xxx.exe -F ..\..\sample.xxx
-\end{verbatim}
-}
-\end{itemize}
+ ./configure --enable-doscompile=msvc
+\end{verbatim}}
 
+Afterwards, you can build the individual applications using the ``make''
+command, as usual in a Unix-like environment except that thecompiler used will
+be \code{cl}.
