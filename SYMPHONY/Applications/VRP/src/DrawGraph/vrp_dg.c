@@ -16,6 +16,7 @@
 /* system include files */
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 
 /* SYMPHONY include files */
 #include "sym_constants.h"
