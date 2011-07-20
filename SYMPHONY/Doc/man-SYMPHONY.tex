@@ -106,25 +106,12 @@ MSVisualStudio \bs v8} directory.
 \item Open a command line terminal and type
 {\color{Brown}
 \begin{verbatim}
- devenv user.sln /make all
+ devenv user.sln /Build "Win32|Release"
 \end{verbatim}
-}
-This will create both the debug and release versions of USER application. 
-If you want to compile only one of them, type
-{\color{Brown}
-\begin{verbatim}
- devenv user.sln /make "all - debug"
-\end{verbatim}
-}
-or 
-{\color{Brown}
-\begin{verbatim}
- devenv user.sln /make "all - release"
-\end{verbatim}
-}
-For each command, the executable \code{user} will be created in 
-\code{Debug} and/or \code{Release}
-directories. 
+} 
+This will create both the release version of the USER application, including
+the executable \code{user} and the SYMPHONY library needed for linking with
+applications.
 
 \item To test the executable, type 
 {\color{Brown}
@@ -140,35 +127,6 @@ directories.
 }
 in order to clean and rebuild everything.
 \end{itemize} 
-
-\subsubsection{Using the NMAKE Utility}
-
-\begin{itemize}
-\item 
-Edit the file \code{user.mak} to reflect your environment. 
-Only minor edits should be required. An explanation of 
-what has to be set is contained in the comments in the makefile. 
-This basically 
-requires the same routines that one needs to walk through in 
-\code{SYMPHONY}'s makefile. 
-See the related parts of \ref{using_nmake} section 
-of \code{SYMPHONY} above.
-
-\item Once configuration is done, type 
-{\color{Brown}
-\begin{verbatim}
-  nmake /f user.mak
-\end{verbatim}
-}
-The executable \code{user.exe} will be created under the 
-\code{Debug} directory.
-\item To test the executable, type 
-{\color{Brown}
-\begin{verbatim}
- Debug\user.exe -F ..\..\sample.user
-\end{verbatim}
-}
-\end{itemize}
 
 \subsubsection{Using the MSVC++ IDE}
 
