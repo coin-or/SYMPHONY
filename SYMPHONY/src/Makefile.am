@@ -638,7 +638,7 @@ rename_obj:
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'install/coin'
+# and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = ../include/symphony.h
 #	$(SYMHEADERS)
