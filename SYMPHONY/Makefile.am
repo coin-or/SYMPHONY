@@ -90,7 +90,7 @@ if COIN_HAS_PKGCONFIG
 	$(PKG_CONFIG) --libs symphony > $(addlibsdir)/sym_addlibs.txt
 else
 if COIN_CXX_IS_CL
-	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libSym.lib @SYMPHONYLIB_LIBS_INSTALLED@" > $(addlibsdir)/sym_addlibs_cpp.txt
+	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libSym.lib @SYMPHONYLIB_LIBS_INSTALLED@" > $(addlibsdir)/sym_addlibs.txt
 else
 	echo -L@abs_lib_dir@ -lSym @SYMPHONYLIB_LIBS_INSTALLED@ > $(addlibsdir)/sym_addlibs.txt
 endif
