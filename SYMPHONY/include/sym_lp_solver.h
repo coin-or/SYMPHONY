@@ -129,7 +129,7 @@ typedef OsiGlpkSolverInterface OsiXSolverInterface;
 #ifdef USE_GLPMPL
 extern "C"
 {
-   #include "glpmpl.h"
+   #include "glpk.h"
 }
 #endif
 
