@@ -3337,46 +3337,51 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    mip->n  = mps.getNumCols();
    mip->nz = mps.getNumElements();
    
-   mip->obj    = (double *) malloc(DSIZE * mip->n);
-   mip->obj1   = (double *) calloc(mip->n, DSIZE);
-   mip->obj2   = (double *) calloc(mip->n, DSIZE);
-   mip->rhs    = (double *) malloc(DSIZE * mip->m);
-   mip->sense  = (char *)   malloc(CSIZE * mip->m);
-   mip->rngval = (double *) malloc(DSIZE * mip->m);
-   mip->ub     = (double *) malloc(DSIZE * mip->n);
-   mip->lb     = (double *) malloc(DSIZE * mip->n);
-   mip->is_int = (char *)   calloc(CSIZE, mip->n);
+   const CoinPackedMatrix * matrixByCol= mps.getMatrixByCol();
+
+   if (mip->n){
+      mip->obj    = (double *) malloc(DSIZE * mip->n);
+      mip->obj1   = (double *) calloc(mip->n, DSIZE);
+      mip->obj2   = (double *) calloc(mip->n, DSIZE);
+      mip->ub     = (double *) malloc(DSIZE * mip->n);
+      mip->lb     = (double *) malloc(DSIZE * mip->n);
+      mip->is_int = (char *)   calloc(CSIZE, mip->n);
+      memcpy(mip->obj, const_cast <double *> (mps.getObjCoefficients()),
+	     DSIZE * mip->n); 
+      memcpy(mip->ub, const_cast <double *> (mps.getColUpper()),
+	     DSIZE * mip->n); 
+      memcpy(mip->lb, const_cast <double *> (mps.getColLower()),
+	     DSIZE * mip->n); 
    
-   memcpy(mip->obj, const_cast <double *> (mps.getObjCoefficients()),
-	  DSIZE * mip->n); 
-   memcpy(mip->rhs, const_cast <double *> (mps.getRightHandSide()),
-	  DSIZE * mip->m); 
-   memcpy(mip->sense, const_cast <char *> (mps.getRowSense()),
-	  CSIZE * mip->m); 
-   memcpy(mip->rngval, const_cast <double *> (mps.getRowRange()),
-	  DSIZE * mip->m); 
-   memcpy(mip->ub, const_cast <double *> (mps.getColUpper()),
-	  DSIZE * mip->n); 
-   memcpy(mip->lb, const_cast <double *> (mps.getColLower()),
-	  DSIZE * mip->n); 
+      mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
+      memcpy(mip->matbeg, const_cast<int *>(matrixByCol->getVectorStarts()),
+	     ISIZE * (mip->n + 1));
+   
+      mip->colname = (char **) malloc(sizeof(char *) * mip->n);  
+   }
+   if (mip->m){
+      mip->rhs    = (double *) malloc(DSIZE * mip->m);
+      mip->sense  = (char *)   malloc(CSIZE * mip->m);
+      mip->rngval = (double *) malloc(DSIZE * mip->m);
+      memcpy(mip->rhs, const_cast <double *> (mps.getRightHandSide()),
+	     DSIZE * mip->m); 
+      memcpy(mip->sense, const_cast <char *> (mps.getRowSense()),
+	     CSIZE * mip->m); 
+      memcpy(mip->rngval, const_cast <double *> (mps.getRowRange()),
+	     DSIZE * mip->m); 
+   }
    
    //user defined matind, matval, matbeg--fill as column ordered
    
-   const CoinPackedMatrix * matrixByCol= mps.getMatrixByCol();
+   if (mip->nz){
+      mip->matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
+      mip->matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
    
-   mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
-   memcpy(mip->matbeg, const_cast<int *>(matrixByCol->getVectorStarts()),
-	  ISIZE * (mip->n + 1));
-   
-   mip->matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
-   mip->matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
-   
-   memcpy(mip->matval, const_cast<double *> (matrixByCol->getElements()),
-	  DSIZE * mip->matbeg[mip->n]);  
-   memcpy(mip->matind, const_cast<int *> (matrixByCol->getIndices()), 
-	  ISIZE * mip->matbeg[mip->n]);  
-
-   mip->colname = (char **) malloc(sizeof(char *) * mip->n);  
+      memcpy(mip->matval, const_cast<double *> (matrixByCol->getElements()),
+	     DSIZE * mip->matbeg[mip->n]);  
+      memcpy(mip->matind, const_cast<int *> (matrixByCol->getIndices()), 
+	     ISIZE * mip->matbeg[mip->n]);
+   }
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
