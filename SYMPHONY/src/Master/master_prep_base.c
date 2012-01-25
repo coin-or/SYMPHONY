@@ -1335,12 +1335,12 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
       FREE(col_fix_val);
 
       FREE(col_sum);
-      FREE(col_factor);
+      FREE(row_factor);
       FREE(c_loc);
    }
    if (check_rows){
       FREE(row_sum);
-      FREE(row_factor);
+      FREE(col_factor);
       FREE(r_loc);
    }
    
