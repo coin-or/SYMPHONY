@@ -2546,15 +2546,18 @@ int analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
   int i;
   char new_solution = FALSE;
   int continue_with_node = FALSE;
+  bool has_artificial = false;
   
   for (i = 0; i < length; i++){
      if (indices[i] == p->mip->n){
+	has_artificial = true;
 	continue;
      }
      obj[0] += p->mip->obj1[indices[i]]*values[i];
      obj[1] += p->mip->obj2[indices[i]]*values[i];
   }
-
+  if (has_artificial) length--;
+  
   if (p->has_mc_ub && *true_objval-p->par.mc_rho*(obj[0]+obj[1]) >
       p->mc_ub + etol + MAX(0, MIN(p->par.mc_gamma, p->par.mc_tau))){
      return(FALSE);
