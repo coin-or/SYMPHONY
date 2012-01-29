@@ -2619,6 +2619,12 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
 
+   else if (strcmp(key, "generate_cgl_redsplit_cuts") == 0 ||
+	    strcmp(key, "LP_generate_cgl_redsplit_cuts") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts);
+      return(0);
+   }
+
    else if (strcmp(key, "generate_cgl_knapsack_cuts") == 0 ||
 	    strcmp(key, "LP_generate_cgl_knapsack_cuts") == 0){
       READ_INT_PAR(lp_par->cgl.generate_cgl_knapsack_cuts);
@@ -2688,6 +2694,12 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "generate_cgl_gomory_cuts_freq") == 0 ||
 	    strcmp(key, "LP_generate_cgl_gomory_cuts_freq") == 0){
       READ_INT_PAR(lp_par->cgl.generate_cgl_gomory_cuts_freq);
+      return(0);
+   }
+
+   else if (strcmp(key, "generate_cgl_redsplit_cuts_freq") == 0 ||
+	    strcmp(key, "LP_generate_cgl_redsplit_cuts_freq") == 0){
+      READ_INT_PAR(lp_par->cgl.generate_cgl_landp_cuts_freq);
       return(0);
    }
 
