@@ -13,7 +13,6 @@
 /* accompanying file for terms.                                              */
 /*                                                                           */
 /*===========================================================================*/
-/* last modified: June 09, menal*/
 
 #include <memory.h>
 #include <string.h>
@@ -4545,7 +4544,7 @@ int prep_report(PREPdesc *P, int termcode)
      report_input = TRUE;
    }
    
-   if(report_input){
+   if (report_input && P->params.verbosity >= 0){
      printf("Problem has \n"
 	    "\t %i constraints \n"
 	    "\t %i variables \n"
