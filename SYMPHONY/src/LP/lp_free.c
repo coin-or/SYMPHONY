@@ -280,6 +280,8 @@ void free_lp(lp_prob *p)
       FREE(p->slack_cuts);
    }
    FREE(p->obj_history);
+   if(p->frac_var_cnt) FREE(p->frac_var_cnt);
+
    FREE(p);
 }
 

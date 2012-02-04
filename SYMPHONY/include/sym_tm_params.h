@@ -78,9 +78,11 @@ typedef struct TM_PARAMS{
    double      gap_limit;
    int         node_limit;
    int         find_first_feasible;
-
-   int         sensitivity_analysis;
+   int         rs_mode_enabled;
+   int         rs_lp_iter_limit;
    
+   int         sensitivity_analysis;
+   int         output_mode;
 }tm_params;
 
 #endif

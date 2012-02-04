@@ -742,7 +742,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
                       lp_stat_desc *lp_stat, double ub,
 		      double lb, double initial_time, double start_time,
 		      double finish_time, double obj_offset, char obj_sense, 
-		      int has_ub, sp_desc *solpool)
+		      int has_ub, sp_desc *solpool, int output_mode)
 {
    double gap = 0.0;
 
@@ -831,125 +831,386 @@ void print_statistics(node_times *tim, problem_stat *stat,
    if (lp_stat) {
       printf ("\n======================= LP Solver =========================");
       printf ("\n");
-      printf ("Number of times LP solver called:               "
+      printf ("Number of times LP solver called:                 "
               "%i\n",lp_stat->lp_calls);
-      printf ("Number of calls from feasibility pump:          "
+      printf ("Number of calls from feasibility pump:            "
               "%i\n",lp_stat->fp_lp_calls);
-      printf ("Number of calls from strong branching:          "
+      printf ("Number of calls from strong branching:            "
               "%i\n",lp_stat->str_br_lp_calls);
-      printf ("Number of solutions found by LP solve:          "
+      printf ("Number of solutions found by LP solve:            "
               "%i\n",lp_stat->lp_sols);
-      printf ("Number of bounds changed by strong branching:   "
+      printf ("Number of bounds changed by strong branching:     "
               "%i\n",lp_stat->str_br_bnd_changes);
-      printf ("Number of nodes pruned by strong branching:     "
+      printf ("Number of nodes pruned by strong branching:       "
               "%i\n",lp_stat->str_br_nodes_pruned);
-
-      printf ("\n==================== Feasibility Pump =====================");
-      printf ("\n");
-      printf ("Number of times feasibility pump called:        ");
-      printf("%i\n", lp_stat->fp_calls);
-      printf ("Number of solutions found by feasibility pump:  ");
-      printf("%i\n", lp_stat->fp_num_sols);
-      printf ("Time spent in feasibility pump:                 %.2f\n", 
-            tim->fp); 
-
-      printf ("\n=========================== Cuts ==========================");
-      printf ("\n");
-      printf ("total cuts accepted:                   %d\n",
-            lp_stat->cuts_generated);
-      printf ("total cuts added to LPs:               %d\n",
-            lp_stat->cuts_added_to_lps);
-      printf ("total cuts deleted from LPs:           %d\n",
-            lp_stat->cuts_deleted_from_lps);
-      printf ("total gomory cuts generated:           %d\n",
-            lp_stat->gomory_cuts);
-      printf ("total knapsack cuts generated:         %d\n",
-            lp_stat->knapsack_cuts);
-      printf ("total oddhole cuts generated:          %d\n",
-            lp_stat->oddhole_cuts);
-      printf ("total clique cuts generated:           %d\n",
-            lp_stat->clique_cuts);
-      printf ("total probing cuts generated:          %d\n",
-            lp_stat->probing_cuts);
-      printf ("total mir cuts generated:              %d\n",
-            lp_stat->mir_cuts);
-      printf ("total twomir cuts generated:           %d\n",
-            lp_stat->twomir_cuts);
-      printf ("total flow and cover cuts generated:   %d\n",
-            lp_stat->flowcover_cuts);
-      printf ("total rounding cuts generated:         %d\n",
-            lp_stat->rounding_cuts);
-      printf ("total lift and project cuts generated: %d\n",
-            lp_stat->lift_and_project_cuts);
-      printf ("total landp cuts generated:            %d\n",
-            lp_stat->landp_cuts);
-     
-      printf ("\n");
-
-      printf ("cuts removed because of bad coeffs:    %d\n",
-            lp_stat->num_poor_cuts);
-      printf ("cuts removed because of duplicacy:     %d\n",
-            lp_stat->num_duplicate_cuts);
-      printf ("insufficiently violated cuts:          %d\n",
-            lp_stat->num_unviolated_cuts);
+      printf ("Number of bounds changed by branching presolver:  "
+              "%i\n",lp_stat->prep_bnd_changes);
+      printf ("Number of nodes pruned by branching presolver:    "
+              "%i\n",lp_stat->prep_nodes_pruned);
       
-      printf ("\n");
+      if (output_mode < 1) {
 
-      printf ("cuts in root:                          %d\n",
-            lp_stat->cuts_root);
-      printf ("gomory cuts in root:                   %d\n",
-            lp_stat->gomory_cuts_root);
-      printf ("knapsack cuts in root:                 %d\n",
-            lp_stat->knapsack_cuts_root);
-      printf ("oddhole cuts in root:                  %d\n",
-            lp_stat->oddhole_cuts_root);
-      printf ("clique cuts in root:                   %d\n",
-            lp_stat->clique_cuts_root);
-      printf ("probing cuts in root:                  %d\n",
-            lp_stat->probing_cuts_root);
-      printf ("mir cuts in root:                      %d\n",
-            lp_stat->mir_cuts_root);
-      printf ("twomir cuts in root:                   %d\n",
-            lp_stat->twomir_cuts_root);
-      printf ("flow and cover cuts in root:           %d\n",
-            lp_stat->flowcover_cuts_root);
-      printf ("rounding cuts in root:                 %d\n",
-            lp_stat->rounding_cuts_root);
-      printf ("lift and project cuts in root:         %d\n",
-            lp_stat->lift_and_project_cuts_root);
-      printf ("landp cuts in root:                    %d\n",
-            lp_stat->landp_cuts_root);
-     
-      printf ("\n");
+	 printf ("\n==================== Rounding =============================");
+	 printf ("\n");
+	 printf ("Number of rounding heuristic called:                  ");
+	 printf("%i\n", lp_stat->rh_calls);
+	 printf ("Number of solutions found by rounding:                ");
+	 printf("%i\n", lp_stat->rh_num_sols);
+	 printf ("Time spent in rounding heuristic:                     %.2f\n", 
+		 tim->rh); 
+	 
+	 printf ("\n==================== Diving Search =======================");
+	 printf ("\n");
+	 printf ("Number of times diving search heuristic called:       ");
+	 printf("%i\n", lp_stat->ds_calls);
+	 int i;
+	 printf ("Number of solutions found by diving search:           ");
+	 printf("%i\n", lp_stat->ds_num_sols);
+	 printf ("Time spent in diving search:                         %.2f\n", 
+		 tim->ds); 
+	 printf("td-");
+	 for(i = 0; i < DIVING_HEURS_CNT; i++){
+	   printf("t%i: %i\t", i,lp_stat->ds_type_calls[i]);
+	 }      
+	 printf("\n");
+	 printf("sf-");
+	 for(i = 0; i < DIVING_HEURS_CNT; i++){
+	   printf("t%i: %i\t", i,lp_stat->ds_type_num_sols[i]);
+	 }      
+	 printf("\n");
+	 printf("ts-");      
+	 for(i = 0; i < DIVING_HEURS_CNT; i++){
+	   printf("t%i: %f\t", i,tim->ds_type[i]);
+	 }      
+	 printf("\n");
+	 printf ("\n==================== Feasibility Pump =====================");
+	 printf ("\n");
+	 printf ("Number of times feasibility pump called:              ");
+	 printf("%i\n", lp_stat->fp_calls);
+	 printf ("Number of solutions found by feasibility pump:        ");
+	 printf("%i\n", lp_stat->fp_num_sols);
+	 printf ("Time spent in feasibility pump:                       %.2f\n", 
+		 tim->fp); 
+	 
+	 printf ("\n==================== Local Search =========================");
+	 printf ("\n");
+	 printf ("Number of times local search heuristic called:        ");
+	 printf("%i\n", lp_stat->ls_calls);
+	 printf ("Number of solutions found by local search:            ");
+	 printf("%i\n", lp_stat->ls_num_sols);
+	 printf ("Time spent in local search:                           %.2f\n", 
+		tim->ls); 
+	 
+	 printf ("\n==================== Fix-and-Relax ========================");
+	 printf ("\n");
+	 printf ("Number of times fix-and-relax heuristic called:       ");
+	 printf("%i\n", lp_stat->fr_calls);
+	 printf ("Number of solutions found by fix-and-relax:           ");
+	 printf("%i\n", lp_stat->fr_num_sols);
+	 printf ("Time spent in fix-and-relax:                          %.2f\n", 
+		 tim->fr); 
       
-      printf ("time in cut generation: %.2f\n", tim->cuts);
-      printf ("time in gomory cuts in %d calls: %.2f\n", 
-            lp_stat->gomory_calls, tim->gomory_cuts);
-      printf ("time in knapsack cuts in %d calls: %.2f\n",
-            lp_stat->knapsack_calls, tim->knapsack_cuts);
-      printf ("time in oddhole cuts in %d calls: %.2f\n", 
-            lp_stat->oddhole_calls, tim->oddhole_cuts);
-      printf ("time in clique cuts in %d calls: %.2f\n", 
-            lp_stat->clique_calls, tim->clique_cuts);
-      printf ("time in probing cuts in %d calls: %.2f\n", 
-            lp_stat->probing_calls, tim->probing_cuts);
-      printf ("time in mir cuts in %d calls: %.2f\n", 
-            lp_stat->mir_calls, tim->mir_cuts);
-      printf ("time in twomir cuts in %d calls: %.2f\n", 
-            lp_stat->twomir_calls, tim->twomir_cuts);
-      printf ("time in flow and cover cuts in %d calls: %.2f\n",
-            lp_stat->flowcover_calls, tim->flowcover_cuts);
-      printf ("time in rounding cuts in %d calls: %.2f\n",
-            lp_stat->rounding_calls, tim->rounding_cuts);
-      printf ("time in lift and project cuts in %d calls: %.2f\n",
-            lp_stat->lift_and_project_calls, tim->lift_and_project_cuts);
-      printf ("time in landp cuts in %d calls: %.2f\n", 
-            lp_stat->landp_calls, tim->landp_cuts);
-      printf ("time in redsplit cuts in %d calls: %.2f\n", 
-            lp_stat->redsplit_calls, tim->redsplit_cuts);
-      printf ("time in checking quality and adding: %.2f\n", 
-            tim->dupes_and_bad_coeffs_in_cuts);
-     
+	 printf ("\n=========================== Cuts ==========================");
+	 printf ("\n");
+	 printf ("total cuts accepted:                   %d\n",
+		 lp_stat->cuts_generated);
+	 printf ("total cuts added to LPs:               %d\n",
+		 lp_stat->cuts_added_to_lps);
+	 printf ("total cuts deleted from LPs:           %d\n",
+		 lp_stat->cuts_deleted_from_lps);
+	 printf ("total gomory cuts generated:           %d\n",
+		 lp_stat->gomory_cuts);
+	 printf ("total knapsack cuts generated:         %d\n",
+		 lp_stat->knapsack_cuts);
+	 printf ("total oddhole cuts generated:          %d\n",
+		 lp_stat->oddhole_cuts);
+	 printf ("total clique cuts generated:           %d\n",
+		 lp_stat->clique_cuts);
+	 printf ("total probing cuts generated:          %d\n",
+		 lp_stat->probing_cuts);
+	 printf ("total mir cuts generated:              %d\n",
+		 lp_stat->mir_cuts);
+	 printf ("total twomir cuts generated:           %d\n",
+		 lp_stat->twomir_cuts);
+	 printf ("total flow and cover cuts generated:   %d\n",
+		 lp_stat->flowcover_cuts);
+	 printf ("total rounding cuts generated:         %d\n",
+		 lp_stat->rounding_cuts);
+	 printf ("total lift and project cuts generated: %d\n",
+		 lp_stat->lift_and_project_cuts);
+	 printf ("total landp cuts generated:            %d\n",
+		 lp_stat->landp_cuts);
+	 
+	 printf ("\n");
+	 
+	 printf ("cuts removed because of bad coeffs:    %d\n",
+		 lp_stat->num_poor_cuts);
+	 printf ("cuts removed because of duplicacy:     %d\n",
+		 lp_stat->num_duplicate_cuts);
+	 printf ("insufficiently violated cuts:          %d\n",
+		 lp_stat->num_unviolated_cuts);
+	 
+	 printf ("\n");
+	 
+	 printf ("cuts in root:                          %d\n",
+		 lp_stat->cuts_root);
+	 printf ("gomory cuts in root:                   %d\n",
+		 lp_stat->gomory_cuts_root);
+	 printf ("knapsack cuts in root:                 %d\n",
+		 lp_stat->knapsack_cuts_root);
+	 printf ("oddhole cuts in root:                  %d\n",
+		 lp_stat->oddhole_cuts_root);
+	 printf ("clique cuts in root:                   %d\n",
+		 lp_stat->clique_cuts_root);
+	 printf ("probing cuts in root:                  %d\n",
+		 lp_stat->probing_cuts_root);
+	 printf ("mir cuts in root:                      %d\n",
+		 lp_stat->mir_cuts_root);
+	 printf ("twomir cuts in root:                   %d\n",
+		 lp_stat->twomir_cuts_root);
+	 printf ("flow and cover cuts in root:           %d\n",
+		 lp_stat->flowcover_cuts_root);
+	 printf ("rounding cuts in root:                 %d\n",
+		 lp_stat->rounding_cuts_root);
+	 printf ("lift and project cuts in root:         %d\n",
+		 lp_stat->lift_and_project_cuts_root);
+	 printf ("landp cuts in root:                    %d\n",
+		 lp_stat->landp_cuts_root);
+	 
+	 printf ("\n");
+	 
+	 printf ("time in cut generation: %.2f\n", tim->cuts);
+	 printf ("time in gomory cuts in %d calls: %.2f\n", 
+		 lp_stat->gomory_calls, tim->gomory_cuts);
+	 printf ("time in knapsack cuts in %d calls: %.2f\n",
+		 lp_stat->knapsack_calls, tim->knapsack_cuts);
+	 printf ("time in oddhole cuts in %d calls: %.2f\n", 
+		 lp_stat->oddhole_calls, tim->oddhole_cuts);
+	 printf ("time in clique cuts in %d calls: %.2f\n", 
+		 lp_stat->clique_calls, tim->clique_cuts);
+	 printf ("time in probing cuts in %d calls: %.2f\n", 
+		 lp_stat->probing_calls, tim->probing_cuts);
+	 printf ("time in mir cuts in %d calls: %.2f\n", 
+		 lp_stat->mir_calls, tim->mir_cuts);
+	 printf ("time in twomir cuts in %d calls: %.2f\n", 
+		 lp_stat->twomir_calls, tim->twomir_cuts);
+	 printf ("time in flow and cover cuts in %d calls: %.2f\n",
+		 lp_stat->flowcover_calls, tim->flowcover_cuts);
+	 printf ("time in rounding cuts in %d calls: %.2f\n",
+		 lp_stat->rounding_calls, tim->rounding_cuts);
+	 printf ("time in lift and project cuts in %d calls: %.2f\n",
+		 lp_stat->lift_and_project_calls, tim->lift_and_project_cuts);
+	 printf ("time in landp cuts in %d calls: %.2f\n", 
+		 lp_stat->landp_calls, tim->landp_cuts);
+	 printf ("time in redsplit cuts in %d calls: %.2f\n", 
+		 lp_stat->redsplit_calls, tim->redsplit_cuts);
+	 printf ("time in checking quality and adding: %.2f\n", 
+		 tim->dupes_and_bad_coeffs_in_cuts);
+	 
+
+      } else{
+	printf ("\n==================== Primal Heuristics ====================");	
+	printf ("\n");
+	printf ("%22s %10s %12s %12s\n","","Time","#Called", "#Solutions");
+
+	printf ("%-22s %10.2f ", "Rounding I", tim->rh);
+	if (lp_stat->rh_calls > 0)
+	  printf ("%12i %12i ",lp_stat->rh_calls, lp_stat->rh_num_sols);
+	else 
+	  printf ("%12s %12s ","","");
+	printf ("\n");
+
+	printf ("%-22s %10.2f ", "Rounding II", tim->sh);
+	if (lp_stat->sh_calls > 0)
+	   printf ("%12i %12i ",lp_stat->sh_calls, lp_stat->sh_num_sols);
+	else 
+	   printf ("%12s %12s ","","");
+	printf ("\n");
+	
+	printf ("%-22s %10.2f ", "Diving", tim->ds);
+	if (lp_stat->ds_calls > 0) {
+	  printf ("%12i %12i ",lp_stat->ds_calls, lp_stat->ds_num_sols);	  
+	  printf ("\n");	
+	  for(int i = 0; i < DIVING_HEURS_CNT; i++){
+	    switch(i){
+	    case FRAC_FIX_DIVING: 
+	      printf ("%5s%-17s ", "","FracF_");
+	      break;
+	    case FRAC_DIVING: 
+	      printf ("%5s%-17s ", "","Frac_");
+	      break;
+	    case VLENGTH_FIX_DIVING:
+	      printf ("%5s%-17s ", "","VecLF_");
+	      break;  
+	    case VLENGTH_DIVING:
+	      printf ("%5s%-17s ", "","VecL_");
+	      break;  
+	    case EUC_FIX_DIVING:
+	      printf ("%5s%-17s ", "","EucF_");
+	      break;  
+	    case EUC_DIVING:
+	      printf ("%5s%-17s ", "","Euc_");
+	      break;  
+	    case GUIDED_FIX_DIVING:
+	      printf ("%5s%-17s ", "","GuidedF_");
+	      break;  
+	    case GUIDED_DIVING:
+	      printf ("%5s%-17s ", "","Guided_");
+	      break;  
+	    case CROSSOVER_FIX_DIVING:
+	      printf ("%5s%-17s ", "","COverF_");
+	      break;  
+	    case CROSSOVER_DIVING:
+	      printf ("%5s%-17s ", "","COver_");
+	      break;  
+	    case RANK_FIX_DIVING:
+	      printf ("%5s%-17s ", "","RankF_");
+	      break;  
+	    case RANK_DIVING:
+	      printf ("%5s%-17s ", "","Rank_");
+	      break;  
+	    case COEFF_DIVING:
+	      printf ("%5s%-17s ", "","Coeff_");
+	      break;  
+	    case PC_DIVING:
+	      printf ("%5s%-17s ", "","PseudoC_");
+	      break;  
+	    default:
+	      break;
+	    }
+	    printf("%10.2f ", tim->ds_type[i]);
+	    if (lp_stat->ds_type_calls[i] > 0)
+	      printf ("%12i %12i %12i",lp_stat->ds_type_calls[i], 
+		      lp_stat->ds_type_num_sols[i], lp_stat->ds_type_num_iter[i]);
+	    printf ("\n");
+	  }
+	} else {
+	  printf ("\n");	
+	}	
+
+	printf ("%-22s %10.2f ", "Feasibility Pump", tim->fp);
+	if (lp_stat->fp_calls > 0)
+	  printf ("%12i %12i %12i",lp_stat->fp_calls, lp_stat->fp_num_sols, lp_stat->fp_num_iter);
+	printf ("\n");	
+
+	printf ("%-22s %10.2f ", "Local Search", tim->ls);
+	if (lp_stat->ls_calls > 0)
+	  printf ("%12i %12i ",lp_stat->ls_calls, lp_stat->ls_num_sols);
+	printf ("\n");	
+	printf ("%-22s %10.2f ", "Restricted Search", tim->fr);
+	if (lp_stat->fr_calls > 0)
+	  printf ("%12i %12i ",lp_stat->fr_calls, lp_stat->fr_num_sols);
+	printf ("\n");	
+	printf ("%-22s %10.2f ", "Rins Search", tim->rs);
+	if (lp_stat->rs_calls > 0)
+	  printf ("%12i %12i ",lp_stat->rs_calls, lp_stat->rs_num_sols);
+	printf ("\n");	
+	printf ("%-22s %10.2f ", "Local Branching", tim->lb);
+	if (lp_stat->lb_calls > 0)
+	  printf ("%12i %12i ",lp_stat->lb_calls, lp_stat->lb_num_sols);
+
+	printf ("\n");	
+	printf ("\n=========================== Cuts ==========================");
+	printf ("\n");
+	printf ("Accepted:                         %d\n",
+		lp_stat->cuts_generated);
+	printf ("Added to LPs:                     %d\n",
+		lp_stat->cuts_added_to_lps);
+	printf ("Deleted from LPs:                 %d\n",
+		lp_stat->cuts_deleted_from_lps);
+	printf ("Removed because of bad coeffs:    %d\n",
+		lp_stat->num_poor_cuts);
+	printf ("Removed because of duplicacy:     %d\n",
+		lp_stat->num_duplicate_cuts);
+	printf ("Insufficiently violated:          %d\n",
+		lp_stat->num_unviolated_cuts);	
+	printf ("In root:                          %d\n",
+		lp_stat->cuts_root);
+	printf ("\n");	
+
+	printf ("Time in cut generation:              %.2f\n", tim->cuts);	
+	printf ("Time in checking quality and adding: %.2f\n", 
+		tim->dupes_and_bad_coeffs_in_cuts);
+
+	printf ("\n");	
+	printf ("%15s %7s %11s %11s %11s\n","","Time", "#Called", "In Root", "Total");
+
+	printf ("%-15s %7.2f ","Gomory",tim->gomory_cuts); 
+	if(lp_stat->gomory_calls)
+	  printf ("%11i %11i %11i ", lp_stat->gomory_calls, lp_stat->gomory_cuts_root, 
+		  lp_stat->gomory_cuts);
+	printf ("\n");		
+
+	printf ("%-15s %7.2f ","Knapsack",tim->knapsack_cuts); 
+	if(lp_stat->knapsack_calls)
+	  printf ("%11i %11i %11i ", lp_stat->knapsack_calls, 
+		  lp_stat->knapsack_cuts_root, lp_stat->knapsack_cuts);		  
+	printf ("\n");		
+
+	printf ("%-15s %7.2f ","Clique",tim->clique_cuts); 
+	if(lp_stat->clique_calls)
+	  printf ("%11i %11i %11i ", lp_stat->clique_calls, lp_stat->clique_cuts_root, 
+		  lp_stat->clique_cuts);
+	printf ("\n");		
+
+	printf ("%-15s %7.2f ","Probing",tim->probing_cuts); 
+	if(lp_stat->probing_calls)
+	  printf ("%11i %11i %11i ", lp_stat->probing_calls, lp_stat->probing_cuts_root, 
+		  lp_stat->probing_cuts);
+	printf ("\n");		
+
+	printf ("%-15s %7.2f ","Flowcover",tim->flowcover_cuts); 
+	if(lp_stat->flowcover_calls)
+	  printf ("%11i %11i %11i ", lp_stat->flowcover_calls, 
+		  lp_stat->flowcover_cuts_root, lp_stat->flowcover_cuts);
+	printf ("\n");		
+
+	printf ("%-15s %7.2f ","Twomir",tim->twomir_cuts); 
+	if(lp_stat->twomir_calls)
+	  printf ("%11i %11i %11i ", lp_stat->twomir_calls, lp_stat->twomir_cuts_root, 
+		  lp_stat->twomir_cuts);
+	printf ("\n");		
+
+	printf ("%-15s %7.2f ","Oddhole",tim->oddhole_cuts); 
+	if(lp_stat->oddhole_calls)
+	  printf ("%11i %11i %11i ", lp_stat->oddhole_calls, lp_stat->oddhole_cuts_root, 
+		  lp_stat->oddhole_cuts);
+	printf ("\n");		
+
+
+	printf ("%-15s %7.2f ","Mir",tim->mir_cuts); 
+	if(lp_stat->mir_calls)
+	  printf ("%11i %11i %11i ", lp_stat->mir_calls, lp_stat->mir_cuts_root, 
+		  lp_stat->mir_cuts);
+	printf ("\n");		
+
+
+	printf ("%-15s %7.2f ","Rounding",tim->rounding_cuts); 
+	if(lp_stat->rounding_calls)
+	  printf ("%11i %11i %11i ", lp_stat->rounding_calls, 
+		  lp_stat->rounding_cuts_root, lp_stat->rounding_cuts);		  
+	printf ("\n");		
+
+	printf ("%-15s %7.2f ","LandP-I",tim->lift_and_project_cuts); 
+	if(lp_stat->lift_and_project_calls)
+	  printf ("%11i %11i %11i ", lp_stat->lift_and_project_calls, 
+		  lp_stat->lift_and_project_cuts_root, 
+		  lp_stat->lift_and_project_cuts);
+	printf ("\n");		
+
+	printf ("%-15s %7.2f ","LandP-II",tim->landp_cuts); 
+	if(lp_stat->landp_calls)
+	  printf ("%11i %11i %11i ", lp_stat->landp_calls, lp_stat->landp_cuts_root, 
+		  lp_stat->landp_cuts);
+	printf ("\n");		
+
+	printf ("%-15s %7.2f ","Redsplit",tim->redsplit_cuts); 
+	if(lp_stat->redsplit_calls)
+	  printf ("%11i %11i %11i ", lp_stat->redsplit_calls, 
+		  lp_stat->redsplit_cuts_root, lp_stat->redsplit_cuts);		  
+	printf ("\n");	
+	printf ("\n===========================================================");
+      }
    }
    if (has_ub){
      gap = fabs(100*(ub-lb)/ub);

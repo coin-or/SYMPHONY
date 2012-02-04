@@ -24,9 +24,9 @@ int main(int argc, char **argv)
    sym_parse_command_line(env, argc, argv);
    
    sym_load_problem(env);
-   
-   sym_solve(env);
 
+   sym_solve(env);
+   
    sym_close_environment(env);
    
    return(0);

@@ -155,6 +155,8 @@ typedef struct LP_PROB{
    double         *pcost_up;
    int            *br_rel_down;
    int            *br_rel_up;
+   int            *br_inf_down;
+   int            *br_inf_up;
    int            *br_rel_cand_list;
    char            str_br_check;
    int            *br_rel_down_min_level;
@@ -163,6 +165,16 @@ typedef struct LP_PROB{
    int             str_check_trial;
    int             str_check_freq;
    int             str_check_cnt;
+
+   int             var_rank_cnt;
+   double         *var_rank;
+   double         *root_lp;
+  
+   int            *frac_var_cnt; 
+  
+   int             branch_var; 
+   char            branch_dir;
+
 }lp_prob;
 
 /*===========================================================================*/
@@ -181,10 +193,6 @@ int collect_nonzeros PROTO((lp_prob *p, double *x, int *tind, double *tx));
 int collect_fractions PROTO((lp_prob *p, double *x, int *tind, double *tx));
 node_desc *create_explicit_node_desc PROTO((lp_prob *p));
 int check_tailoff PROTO((lp_prob *p));
-int round_solution PROTO((lp_prob *p, double *solution_value, 
-			  double *betterSolution));
-int local_search PROTO((lp_prob *p, double *solution_value, 
-			double *col_solution, double *better_solution));
 void lp_exit PROTO((lp_prob *p));
 void lp_close PROTO((lp_prob *p));
 int generate_cgl_cuts_new PROTO((lp_prob *p, int *num_cuts, cut_data ***cuts, 
@@ -196,6 +204,7 @@ int generate_cgl_cut_of_type PROTO((lp_prob *p, int i, OsiCuts *cutlist_p,
 int check_and_add_cgl_cuts PROTO((lp_prob *p, int i, cut_data ***cuts, int *num_cuts, int *bound_changes, OsiCuts *cutlist, int send_to_pool));
 int should_stop_adding_cgl_cuts PROTO((lp_prob *p, int i, int *should_stop));
 int add_col_cuts PROTO((lp_prob *p, OsiCuts *cutlist, int *bound_changes));
+int add_cut_to_mip_inf PROTO((lp_prob *p, int cut_n, int *cut_ind, double *cut_val, double cut_rhs, char cut_sense));
 int update_pcost PROTO ((lp_prob *p));
 int str_br_bound_changes PROTO((lp_prob *p, int num_bnd_changes, 
          double *bnd_val, int *bnd_ind, char *bnd_sense));
@@ -248,10 +257,20 @@ int should_continue_strong_branching PROTO((lp_prob *p, int i, int cand_num,
                                      int *should_continue));
 int strong_branch(lp_prob *p, int branch_var, double lb, double ub, 
 		  double new_lb, double new_ub, double *obj, int should_use_hot_starts, 
-                  int *termstatus, int *iterd);
+                  int *termstatus, int *iterd, int sos_cnt, int *sos_ind);
 int branch PROTO((lp_prob *p, int cuts));
 int col_gen_before_branch PROTO((lp_prob *p, int *new_vars));
 
+int prep_tighten_bounds PROTO((LPdata *lp_data, int *num_changes, double *bnd_val, int *bnd_ind,
+			       char *bnd_sense, double *row_ub, double *row_lb, char *cand_fixed));
+int prep_row_violated PROTO((double row_lb, double row_ub, double si_row_lb, double si_row_ub, 
+			     double aval, double old_col_lb, double old_col_ub,
+			     double new_col_lb, double new_col_ub, double lpetol,
+			     double inf));
+int prep_col_fixable PROTO((double xval, double aval, double c_lb, double c_ub,
+			    double row_lb, double row_ub, double si_row_lb, double si_row_ub, 
+			    double *col_fixed_lb, double *col_fixed_ub, double etol,
+			    double inf));
 /*----------- Generic selection rules to be used by the user ----------------*/
 
 void branch_close_to_half PROTO((lp_prob *p, int max_cand_num, int *cand_num,
@@ -288,6 +307,7 @@ void send_lp_is_free PROTO((lp_prob *p));
 void send_cuts_to_pool PROTO((lp_prob *p, int eff_cnt_limit));
 int add_bound_changes_to_desc PROTO((node_desc *new_tm_desc, lp_prob *p));
 int update_cut_parameters(lp_prob *p);
+int update_solve_parameters(lp_prob *p);
 
 /*===========================================================================*/
 /*======================= Freeing things (lp_free.c) ========================*/

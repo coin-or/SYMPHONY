@@ -89,6 +89,7 @@ typedef struct CGL_PARAMS{
    int               chain_trial_freq;
    int               chain_check_index;
    double            chain_weighted_gap;
+   double            chain_br_weighted_gap;   
 }cgl_params;
 
 typedef struct LP_PARAMS{
@@ -97,6 +98,7 @@ typedef struct LP_PARAMS{
    int               use_cg;
    int               set_obj_upper_lim;
    int               do_primal_heuristic;
+   int               find_first_feasible;
    double            time_limit;
 
    int               lp_data_mip_is_copied;
@@ -172,6 +174,9 @@ typedef struct LP_PARAMS{
    int               max_cut_length;
    int               tried_long_cuts;
 
+   int               best_violation_length[CGL_NUM_GENERATORS];
+   double            best_violation[CGL_NUM_GENERATORS];
+
    /* Reduced cost and logical fixing parameters */
    int               do_reduced_cost_fixing;
    double            gap_as_ub_frac;
@@ -218,9 +223,12 @@ typedef struct LP_PARAMS{
    int               rel_br_max_solves; /* stop after these many LP-solve calls
                                            regardless of improvement */
 
+   int               use_branching_prep; 
    int               compare_candidates_default;
    int               select_child_default;
    int               pack_lp_solution_default;
+   int               use_sos_branching;
+   int               sos_branching_max_level; 
 
    /* Multi-criteria parameters */
    int               multi_criteria;
@@ -232,6 +240,10 @@ typedef struct LP_PARAMS{
 
    int               sensitivity_analysis;
 
+
+   int               disable_obj; 
+   int               no_impr_in_obj; 
+
    /* feasibility pump parameters */
    int               fp_enabled;
    int               fp_frequency;
@@ -242,6 +254,80 @@ typedef struct LP_PARAMS{
    double            fp_flip_fraction;
    double            fp_max_initial_time;
    double            fp_min_gap;
+   double            fp_fix_ratio;  
+
+   /* rounding */
+   int               rounding_enabled; 
+   int               rounding_frequency; 
+   double            rounding_min_gap;
+
+   /* shifting */
+   int               shifting_enabled; 
+   int               shifting_frequency; 
+   double            shifting_min_gap; 
+
+   /* local search */
+   int               ls_enabled; 
+   int               ls_frequency; 
+   double            ls_min_gap; 
+   double            ls_fix_ratio;
+      
+  /* restricted search */
+   int               fr_enabled; 
+   int               fr_frequency; 
+   int               fr_first_feas_enabled; 
+   double            fr_max_int_fixed_ratio; 
+   double            fr_min_int_fixed_ratio;
+   double            fr_max_c_fixed_ratio; 
+   double            fr_min_c_fixed_ratio; 
+   double            fr_incr_ratio; 
+   double            fr_min_gap; 
+   int               fr_max_nodes;
+   int               fr_dive_level;
+
+   /* rins search */
+   int               rs_enabled; 
+   double            rs_min_int_fixed_ratio;
+   double            rs_min_c_fixed_ratio;
+   double            rs_min_gap;
+   int               rs_max_nodes; 
+   int               rs_dive_level; 
+
+   /* restricted/rinse search mode */
+   int              rs_mode_enabled;
+   int              rs_lp_iter_limit;
+
+   /* local branching */
+   int               lb_enabled; 
+   int               lb_frequency; 
+   double            lb_min_gap;
+   int               lb_search_k;
+   int               lb_first_feas_enabled;
+   int               lb_dive_level; 
+   
+   /* diving search */
+   int               ds_enabled; 
+   int               ds_frequency; 
+   int               ds_fractional_enabled; 
+   int               ds_fractional_fix_enabled; 
+   int               ds_vlength_enabled; 
+   int               ds_vlength_fix_enabled; 
+   int               ds_euc_enabled; 
+   int               ds_euc_fix_enabled; 
+   int               ds_guided_enabled; 
+   int               ds_guided_fix_enabled; 
+   int               ds_crossover_enabled; 
+   int               ds_crossover_fix_enabled; 
+   int               ds_root_enabled; 
+   int               ds_coeff_enabled; 
+   int               ds_pc_enabled; 
+   int               ds_rank_enabled; 
+   int               ds_rank_fix_enabled; 
+   double            ds_incr_ratio; 
+   int               ds_solve_ip;
+   double            ds_solve_ip_col_ratio;  
+   double            ds_solve_ip_min_gap;  
+   double            ds_min_gap;  
 
    /* to avoid nested for loops, check if userind's are in order */
    int               is_userind_in_order;

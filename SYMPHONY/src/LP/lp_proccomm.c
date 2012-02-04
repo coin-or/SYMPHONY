@@ -550,7 +550,9 @@ void send_node_desc(lp_prob *p, int node_type)
       p->lp_stat.num_str_br_cands_in_path;
    n->num_fp_calls_in_path =
       p->lp_stat.num_fp_calls_in_path;   
-
+   n->iter_num = p->node_iter_num;
+   n->cuts_tried = p->lp_stat.node_cuts_tried;
+   n->cuts_forced = p->lp_stat.node_cuts_forced; 
 #else
    int s_bufid;
    char ch;

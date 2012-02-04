@@ -17,7 +17,7 @@
 
 #include <stdlib.h>              /* free() is here on AIX ... */
 #include <math.h>
-#include <string.h>
+//#include <string.h>
 
 #include "sym_lp_solver.h"
 #include "sym_constants.h"
@@ -56,7 +56,10 @@ void free_lp_arrays(LPdata *lp_data)
    FREE(lp_data->dualsol);
    FREE(lp_data->slacks);
    FREE(lp_data->random_hash);
+   FREE(lp_data->hashes);
+   FREE(lp_data->accepted_ind);
    FREE(lp_data->heur_solution);
+   FREE(lp_data->col_solution);
 #ifdef __CPLEX__
    FREE(lp_data->lb);
    FREE(lp_data->ub);
@@ -71,6 +74,13 @@ void free_lp_arrays(LPdata *lp_data)
    FREE(lp_data->tmp.cv);
    FREE(lp_data->tmp.iv);
    FREE(lp_data->tmp.dv);
+
+   FREE(lp_data->tmp1.i1);
+   FREE(lp_data->tmp1.d);
+   FREE(lp_data->tmp1.c);
+   FREE(lp_data->tmp2.i1);
+   FREE(lp_data->tmp2.d);
+   FREE(lp_data->tmp2.c);
 }
 
 /*===========================================================================*/
@@ -118,15 +128,36 @@ void free_mip_desc(MIPdesc *mip)
    }
 #endif
    
-   FREE(mip->fixed_val);
-   FREE(mip->fixed_ind);
+   if(mip->fixed_n){
+      FREE(mip->fixed_val);
+      FREE(mip->fixed_ind);
+   }
+
+   if(mip->aggr_n){
+      FREE(mip->aggr_ind);
+      FREE(mip->aggr_to_ind);
+   }
+   
+   if(mip->subs_n){
+      FREE(mip->subs_ind);
+      FREE(mip->subs_aval);
+      FREE(mip->subs_rhs);
+      FREE(mip->subs_rbeg);
+      FREE(mip->subs_rind);
+      FREE(mip->subs_rval);
+   }
    
    if(mip->cru_vars_num){
       FREE(mip->cru_vars);
    }
 
    if(mip->mip_inf){
-      
+      FREE(mip->mip_inf->c_ind);
+      FREE(mip->mip_inf->c_val);
+      FREE(mip->mip_inf->c_beg);
+      FREE(mip->mip_inf->c_sense);
+      FREE(mip->mip_inf->c_rhs);
+      FREE(mip->mip_inf->c_tmp);
       FREE(mip->mip_inf->rows);
       FREE(mip->mip_inf->cols);
       FREE(mip->mip_inf);
@@ -185,6 +216,8 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
          lp_data->random_hash = (double *) malloc(lp_data->maxn * DSIZE);
          FREE(lp_data->heur_solution);
          lp_data->heur_solution = (double *) malloc(lp_data->maxn * DSIZE);
+         FREE(lp_data->col_solution);
+         lp_data->col_solution = (double *) malloc(lp_data->maxn * DSIZE);
 #ifdef __CPLEX__
 	 FREE(lp_data->lb);
 	 lp_data->lb = (double *) malloc(lp_data->maxn * DSIZE);
@@ -202,6 +235,8 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
                                          lp_data->maxn * DSIZE);
          lp_data->heur_solution = (double *) realloc((char *)
                lp_data->heur_solution, lp_data->maxn * DSIZE);
+         lp_data->col_solution = (double *) realloc((char *)
+               lp_data->col_solution, lp_data->maxn * DSIZE);
 #ifdef __CPLEX__
 	 lp_data->lb = (double *) realloc((char *)lp_data->lb,
 					  lp_data->maxn * DSIZE);
@@ -224,15 +259,15 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
       FREE(tmp->c);
       FREE(tmp->i1);
       FREE(tmp->d);
-      tmp->c = (char *) malloc(CSIZE * maxmax);
-      tmp->i1 = (int *) malloc(ISIZE * MAX(3*maxm, 2*maxn + 1));
-      tmp->d = (double *) malloc(DSIZE * 2 * maxmax);
+      tmp->c = (char *) malloc(CSIZE * 4 * maxmax);
+      tmp->i1 = (int *) malloc(ISIZE * MAX(4*maxm, 4*maxn + 1));
+      tmp->d = (double *) malloc(DSIZE * 4 * maxmax);
       /* These have to be resized only if maxm changes */
       if (resize_m){
 	 FREE(tmp->i2);
 	 FREE(tmp->p1);
 	 FREE(tmp->p2);
-	 tmp->i2 = (int *) malloc(maxm * ISIZE);
+	 tmp->i2 = (int *) malloc(2*maxmax * ISIZE);
 	 tmp->p1 = (void **) malloc(maxm * sizeof(void *));
 	 tmp->p2 = (void **) malloc(maxm * sizeof(void *));
       }
@@ -2295,8 +2330,12 @@ void open_lp_solver(LPdata *lp_data)
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
    lp_data->si->setupForRepeatedUse();
-   //lp_data->si->setupForRepeatedUse(2,0);
+   //lp_data->si->setupForRepeatedUse(3,0);
    //lp_data->si->getModelPtr()->setFactorizationFrequency(200);
+   //lp_data->si->getModelPtr()->setSparseFactorization(true);
+   //lp_data->si->getModelPtr()->setSpecialOptions(524288);
+   //lp_data->si->getModelPtr()->setSpecialOptions(4);   
+   lp_data->si->getModelPtr()->setPerturbation(50);
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
 #else   
@@ -2421,9 +2460,12 @@ void load_basis(LPdata *lp_data, int *cstat, int *rstat)
 void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
 	      char *sense, int *rmatbeg, int *rmatind, double *rmatval)
 {
-   int i, start, size;
+   int i;// start, size;
    OsiXSolverInterface  *si = lp_data->si;
-   
+   double *rlb = lp_data->tmp.d + rcnt; 
+   double *rub = lp_data->tmp.d + 2*rcnt; 
+   const double infinity = si->getInfinity();
+
    /*
    for (i = 0; i < rcnt; i++){
       CoinPackedVector new_row;
@@ -2433,14 +2475,42 @@ void add_rows(LPdata *lp_data, int rcnt, int nzcnt, double *rhs,
       si->addRow(new_row, sense[i], rhs[i], 0);
    }
    */
-
+#if 0
    for (i = 0; i < rcnt; i++){
       start = rmatbeg[i];
       size = rmatbeg[i+1] - start;
       CoinPackedVector new_row(size, &rmatind[start], &rmatval[start], FALSE);
       si->addRow(new_row, sense[i], rhs[i], 0);
    }
+#else
+   /* convert sense to bound */
+   for(i = 0; i < rcnt; i++){
+     switch (sense[i]){
+       printf("%c \n", sense[i]);
+     case 'E':
+       rlb[i] = rub[i] = rhs[i];
+       break;
+     case 'L':
+       rlb[i] = -infinity;
+       rub[i] = rhs[i];
+       break;
+     case 'G':
+       rlb[i] = rhs[i];
+       rub[i] = infinity;
+       break;
+     case 'R': // we should not have this case 
+       rlb[i] = -infinity;
+       rub[i] = rhs[i];
+       break;
+     case 'N':
+       rlb[i] = -infinity;
+       rub[i] = infinity;
+       break;
+     }
+   }
 
+   si->addRows(rcnt, rmatbeg, rmatind, rmatval, rlb, rub);
+#endif
    lp_data->m += rcnt;
    lp_data->nz += nzcnt;
    lp_data->lp_is_modified=LP_HAS_BEEN_MODIFIED;
@@ -2560,8 +2630,13 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    //int term = LP_ABANDONED;
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
-
-    
+   int sp = si->specialOptions();
+   if((sp&2) != 0) sp ^=2; 
+   si->setSpecialOptions(sp);
+   //si->setSpecialOptions(0x80000000);
+   si->getModelPtr()->setPerturbation(50);    
+   //si->getModelPtr()->setFactorizationFrequency(150); 
+   //si->getModelPtr()->setSubstitution(3);    
    si->resolve();
    //si->initialSolve();
    
@@ -3086,7 +3161,7 @@ int copy_lp_data(LPdata *lp_data, LPdata *new_data)
    int termcode = FUNCTION_TERMINATED_NORMALLY;
    int n = lp_data->n;
    int m = lp_data->m;
-   double *lb, *ub;
+   //double *lb, *ub;
    OsiXSolverInterface  *si = lp_data->si;
 
    if (!new_data) {
@@ -3101,8 +3176,8 @@ int copy_lp_data(LPdata *lp_data, LPdata *new_data)
    new_data->maxm = lp_data->maxm;
    new_data->maxnz = lp_data->maxnz;
 
-   lb = (double *)malloc(n*DSIZE);
-   ub = (double *)malloc(n*DSIZE);
+   //lb = (double *)malloc(n*DSIZE);
+   //ub = (double *)malloc(n*DSIZE);
 
    open_lp_solver(new_data);
    /* Turn off the OSI messages (There are LOTS of them) */
@@ -3118,12 +3193,13 @@ int copy_lp_data(LPdata *lp_data, LPdata *new_data)
                              );
    /* get_bounds just returns a const pointer to si->ub, si->lb. we need to
     * memcpy because these pointers get changed when addCols is used */
+   /* menal - I don't see where these pointers get changed, so disabling for now */
    get_bounds(new_data);
-   memcpy(lb,new_data->lb,DSIZE*n);
-   memcpy(ub,new_data->ub,DSIZE*n);
+   //memcpy(lb,new_data->lb,DSIZE*n);
+   //memcpy(ub,new_data->ub,DSIZE*n);
 
-   new_data->lb = lb;
-   new_data->ub = ub;
+   //new_data->lb = lb;
+   //new_data->ub = ub;
 
 
    return termcode;
@@ -3385,9 +3461,9 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
-      mip->colname[j] = (char *) malloc(CSIZE * 9);
-      strncpy(mip->colname[j], const_cast<char*>(mps.columnName(j)), 9);
-      mip->colname[j][8] = 0;
+      mip->colname[j] = (char *) malloc(CSIZE * 30);
+      strncpy(mip->colname[j], const_cast<char*>(mps.columnName(j)), 30);
+      mip->colname[j][29] = 0;
    }
 
    if (mip->obj_sense == SYM_MAXIMIZE){
@@ -3460,9 +3536,9 @@ int read_lp(MIPdesc *mip, char *infile, char *probname)
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = lp.isInteger(j);
-      mip->colname[j] = (char *) malloc(CSIZE * 9);
-      strncpy(mip->colname[j], const_cast<char*>(lp.columnName(j)), 9);
-      mip->colname[j][8] = 0;
+      mip->colname[j] = (char *) malloc(CSIZE * 30);
+      strncpy(mip->colname[j], const_cast<char*>(lp.columnName(j)), 30);
+      mip->colname[j][29] = 0;
    }
 
    if (mip->obj_sense == SYM_MAXIMIZE){

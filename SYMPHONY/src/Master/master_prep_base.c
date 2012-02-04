@@ -25,6 +25,7 @@
 #include "sym_macros.h"
 #include "sym_master.h"
 #include "sym_prep.h"
+#include "sym_qsort.h"
 
 /*===========================================================================*/
 /*
@@ -46,7 +47,7 @@ int prep_basic(PREPdesc *P)
    const int impl_dive_level = params.impl_dive_level;
    const double etol = params.etol;
    const double time_limit = params.time_limit;
-
+   
    int termcode;     /* return status of functions called herein */
    int iter_cnt = 0;
    double a_val, new_bound = 0.0;// min_ub, max_lb; 
@@ -57,7 +58,7 @@ int prep_basic(PREPdesc *P)
 
    char can_impl = FALSE, bin_type = FALSE;
    int old_changes_cnt, changes_diff = 0, new_changes_cnt, init_changes_cnt = 0;
-   int old_others_cnt, new_others_cnt, mark_others_cnt = 0;
+   int old_others_cnt, new_others_cnt, mark_others_cnt = 0, init_others_cnt = 0;
    double start_impl_time, mark_time, impl_time = 0.0;
 
    MIPdesc *mip = P->mip;
@@ -101,6 +102,24 @@ int prep_basic(PREPdesc *P)
    sense = mip->sense;
    rhs = mip->rhs;
 
+   /* quick check row bounds */
+   for (row_ind = 0; row_ind < m; row_ind++){
+     if(sense[row_ind] == 'E'){
+       if(rows[row_ind].ub < rhs[row_ind] - etol ||
+	  rows[row_ind].lb > rhs[row_ind] + etol){
+	 stats->row_infeas_ind = row_ind;
+	 //printf("PI-1\n");
+	 return PREP_INFEAS;
+       }
+     }else if(sense[row_ind] == 'L'){
+       if(rows[row_ind].lb > rhs[row_ind] + etol){
+	 stats->row_infeas_ind = row_ind;
+	 //printf("PI-2\n");
+	 return PREP_INFEAS;
+       }    
+     }
+   }
+
    char need_reset;
    
    /* check if we have binary columns */
@@ -118,8 +137,18 @@ int prep_basic(PREPdesc *P)
       return termcode;
    } 
 
-   init_changes_cnt = stats->vars_fixed + stats->rows_deleted;
+   /* check basic substitutions */
+   if(p_level >= 5){
+      termcode = prep_substitute_cols(P);
+      if (PREP_QUIT(termcode)){
+	 return termcode;
+      }
+   }
 
+   init_changes_cnt = stats->vars_fixed + stats->rows_deleted;
+   init_others_cnt = stats->coeffs_changed + 
+      stats->bounds_tightened;
+   
    /*initialize implications data structure */
    if (p_level >= 5){ /* disabled now */ 
       /* probably doesnt worth it for this version if n or nz is too large */
@@ -406,10 +435,10 @@ int prep_basic(PREPdesc *P)
    
    /* similary deleting columns might have ended up with 0 sized rows,
       eliminate them */
-   if (stats->vars_fixed > 0){
-      for (row_ind = 0; row_ind < m; row_ind++){
-	 if (!rows[row_ind].is_redundant &&  
-	    rows[row_ind].fixed_var_num  >= rows[row_ind].size - 1){
+   if (stats->vars_fixed + mip_inf->fixed_var_num > 0){
+     for (row_ind = 0; row_ind < m; row_ind++){
+        if (!rows[row_ind].is_redundant &&  
+	   rows[row_ind].fixed_var_num  >= rows[row_ind].size - 1){
 	    termcode = prep_check_redundancy(P, row_ind, FALSE, 0.0, 0.0,
 					     FALSE, dive_level);
 	    if (PREP_QUIT(termcode)){
@@ -424,6 +453,12 @@ int prep_basic(PREPdesc *P)
    if (new_changes_cnt > init_changes_cnt){
       termcode = prep_delete_duplicate_rows_cols(P, TRUE, TRUE);
    }
+
+   if(p_level >= 5){
+      if(!PREP_QUIT(termcode) && (new_others_cnt > init_others_cnt || new_changes_cnt > init_changes_cnt)){
+	 termcode = prep_substitute_cols(P);
+      }
+   }
    
 #if 0
    if (verbosity >= 2){
@@ -435,18 +470,21 @@ int prep_basic(PREPdesc *P)
    }
 #endif
    
-   if (new_changes_cnt + stats->coeffs_changed + mip_inf->fixed_var_num > 0){
+   if (!PREP_QUIT(termcode) && new_changes_cnt + stats->coeffs_changed + mip_inf->fixed_var_num > 0){
       termcode = prep_cleanup_desc(P);
+      if(termcode == PREP_SOLVED && P->has_ub){
+	 if(P->ub < (P->mip->obj_sense == SYM_MAXIMIZE) ? -(P->mip->obj_offset) : 
+	    P->mip->obj_offset){
+	    //printf("PI-3\n");
+	    termcode = PREP_INFEAS; 
+	 }
+      }
    }
  
    if (PREP_QUIT(termcode)){
       return termcode;
    }   
 
-   if (P->mip->mip_inf->binary_sos_row_num){
-      prep_sos_fill_var_cnt(P);
-   }
-   
    if (stats->rows_deleted + 
       stats->vars_fixed + 
       stats->bounds_integerized + 
@@ -512,6 +550,10 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
    double *rhs = mip->rhs;
    double *obj = mip->obj;
 
+   rc_dup_desc * prep_rc = (rc_dup_desc *)calloc(sizeof(rc_dup_desc),1);
+   prep_rc->check_rows = check_rows;
+   prep_rc->check_cols = check_cols;
+   
    double *col_sum = NULL, *col_factor = NULL;
    double *row_sum = NULL, *row_factor = NULL;
    int last_lloc, last_rloc, *r_loc = NULL, *c_loc = NULL;
@@ -536,31 +578,31 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 
    /* generate the hash table */
    if (check_rows){
-      col_factor = (double *)malloc(n*DSIZE);
-      row_sum = (double *)calloc(m,DSIZE);
+      col_factor = (prep_rc->col_factor = (double *)malloc(n*DSIZE));
+      row_sum = (prep_rc->row_sum = (double *)calloc(m,DSIZE));
       for (i = 0; i < n; i++){
 	 col_factor[i] = 1 + CoinDrand48();
 	 if (CoinDrand48() < 0.5) col_factor[i] *= -1.0;
       }
       
-      r_loc = (int *)malloc(m*ISIZE);
+      r_loc = (prep_rc->r_loc = (int *)malloc(m*ISIZE));
       memcpy(r_loc, P->user_row_ind, ISIZE*m);
   }
 
    if (check_cols){   
-      col_del_ind = (int *)malloc(n*ISIZE);
-      col_fix_type = (int *)malloc(n*ISIZE);
-      col_fix_val = (double *)malloc(n*DSIZE);
-      col_orig_type = (char *)malloc(n*CSIZE);
-      row_factor = (double *)malloc(m*DSIZE);
-      col_sum = (double *)calloc(n,DSIZE);
+      col_del_ind = (prep_rc->col_del_ind = (int *)malloc(n*ISIZE));
+      col_fix_type = (prep_rc->col_fix_type = (int *)malloc(n*ISIZE));
+      col_fix_val = (prep_rc->col_fix_val = (double *)malloc(n*DSIZE));
+      col_orig_type = (prep_rc->col_orig_type = (char *)malloc(n*CSIZE));
+      row_factor = (prep_rc->row_factor = (double *)malloc(m*DSIZE));
+      col_sum = (prep_rc->col_sum = (double *)calloc(n,DSIZE));
 
       for (i = 0; i < m; i++){
 	 row_factor[i] = 1 + CoinDrand48();
 	 if (CoinDrand48() < 0.5) row_factor[i] *= -1.0; 
       }
 
-      c_loc = (int *)malloc(n*ISIZE);
+      c_loc = (prep_rc->c_loc = (int *)malloc(n*ISIZE));
       memcpy(c_loc, P->user_col_ind, ISIZE*n);
    }
 
@@ -936,6 +978,15 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 		  delete_ind = cr_ind;
 		  delete_val = 0.0;
 		  fix_type = FIX_AGGREGATE;
+
+		  if(!mip->aggr_n){
+		     int agg_size = n - 1; 
+		     mip->aggr_ind = (int*)malloc(ISIZE*agg_size);
+		     mip->aggr_to_ind = (int*)malloc(ISIZE*agg_size);
+		  }
+		  
+		  mip->aggr_to_ind[mip->aggr_n] = cl_ind;
+		  mip->aggr_ind[mip->aggr_n++] = cr_ind; 
 	       } else {
 		  if (bin_type){
 		     /* cant do anything with this pair*/
@@ -966,14 +1017,17 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 		   case 6:
 		   case 10:
 		      stats->col_unbound_ind = cr_ind;
+		      free_rc_dup_desc(prep_rc);
 		      return PREP_UNBOUNDED;
 		   case 7:
 		   case 8:
 		   case 9:
 		      stats->col_unbound_ind = cl_ind;
+		      free_rc_dup_desc(prep_rc);
 		      return PREP_UNBOUNDED;
 		   default:
 		      printf("error in prep_delete_duplicate_row_cols()\n");
+		      free_rc_dup_desc(prep_rc);
 		      return PREP_OTHER_ERROR;
 		  }
 	       }
@@ -1004,6 +1058,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 						   col_fix_type[i], 
 						   TRUE, FALSE);
 	 if (PREP_QUIT(termcode)){
+	    free_rc_dup_desc(prep_rc);
 	    return termcode;
 	 }
       }
@@ -1151,11 +1206,15 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 		     if (sense[row_ind] == 'E'){
 			if (!prep_is_equal(rhs_obj, rhs_row, etol)){
 			   stats->row_infeas_ind = row_ind;
+			   //printf("PI-4\n");
+			   free_rc_dup_desc(prep_rc);
 			   return PREP_INFEAS;
 			}
 		     } else {
 			if (rhs_row < rhs_obj - etol){
 			   stats->row_infeas_ind = obj_ind;
+			   //printf("PI-5\n");
+			   free_rc_dup_desc(prep_rc);
 			   return PREP_INFEAS;
 			}
 		     }
@@ -1165,6 +1224,8 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 		     if (sense[row_ind] == 'E'){
 			if (rhs_row > rhs_obj + etol){
 			   stats->row_infeas_ind = row_ind;
+			   //printf("PI-6\n");
+			   free_rc_dup_desc(prep_rc);
 			   return PREP_INFEAS;
 			}
 			delete_row_ind = obj_ind;
@@ -1205,6 +1266,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 								  FIX_OTHER, 
 								  TRUE, FALSE);
 			if (PREP_QUIT(termcode)){
+			   free_rc_dup_desc(prep_rc);
 			   return termcode;
 			}	       
 			delete_row = TRUE;
@@ -1246,6 +1308,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 							     fix_type, 
 							     TRUE, FALSE);
 			   if (PREP_QUIT(termcode)){
+			      free_rc_dup_desc(prep_rc);
 			      return termcode;
 			   }
 			}
@@ -1291,6 +1354,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 							     fix_type, 
 							     TRUE, FALSE);
 			   if (PREP_QUIT(termcode)){
+			      free_rc_dup_desc(prep_rc);
 			      return termcode;
 			   }
 			}
@@ -1313,6 +1377,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 	       }
 	       termcode = prep_deleted_row_update_info(mip, delete_row_ind);
 	       if (PREP_QUIT(termcode)){
+		  free_rc_dup_desc(prep_rc);
 		  return termcode;
 	       }
 	    }
@@ -1326,7 +1391,9 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 #endif
 
    /* free memory */
- 
+   free_rc_dup_desc(prep_rc);
+   
+#if 0
    if (check_cols){
       FREE(col_orig_type);
       FREE(col_del_ind);
@@ -1342,9 +1409,788 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
       FREE(col_factor);
       FREE(r_loc);
    }
+#endif
    
    return termcode;
 }
+
+/*===========================================================================*/
+/*===========================================================================*/
+void free_rc_dup_desc(rc_dup_desc *prep_rc)
+{
+   if(prep_rc){
+      if(prep_rc->check_cols){
+	 FREE(prep_rc->col_orig_type);
+	 FREE(prep_rc->col_del_ind);
+	 FREE(prep_rc->col_fix_type);
+	 FREE(prep_rc->col_fix_val);
+
+	 FREE(prep_rc->col_sum);
+	 FREE(prep_rc->col_factor);
+	 FREE(prep_rc->c_loc);
+      }
+      
+      if (prep_rc->check_rows){
+	 FREE(prep_rc->row_sum);
+	 FREE(prep_rc->row_factor);
+	 FREE(prep_rc->r_loc);
+      }
+      
+      FREE(prep_rc);
+   }
+}
+/*===========================================================================*/
+/* Here, we substitute cols, if possible */
+/*===========================================================================*/
+int prep_substitute_cols(PREPdesc *P)
+{
+   /* -substitute only when we can reduce the number of rows i.e
+      (new_row_lb - rhs)/coeff > -col_ub and (row_ub - rhs)/coeff < -col_lb
+      
+      -substitute cols with size 1 for now. with size > 1 will require
+       to modify the matrix      
+   */
+
+   int termcode = PREP_UNMODIFIED;
+   //return termcode; 
+   if(P->mip->mip_inf->e_row_num < 1) return termcode; 
+   return 0;
+   
+   const double etol = P->params.etol;
+ 
+   int i, j, k, l;
+   int col_ind, row_ind;
+
+   MIPdesc *mip = P->mip;
+   COLinfo *cols = mip->mip_inf->cols;
+   ROWinfo *rows = mip->mip_inf->rows;
+   prep_stats *stats = &(P->stats);
+   
+   int m = mip->m;
+   int n = mip->n;
+   
+   int *matbeg = mip->matbeg;
+   int *matind = mip->matind;
+   double *matval = mip->matval;
+
+   int *r_matbeg = mip->row_matbeg;
+   int *r_matind = mip->row_matind;
+   double *r_matval = mip->row_matval;
+
+   double *ub = mip->ub, *lb = mip->lb;
+   
+   char *sense = mip->sense;
+   double *rhs = mip->rhs;
+   double *obj = mip->obj;
+
+   //int init_subs = stats->vars_substituted;
+   //int *subs_ind, *subs_row_ind, sub_col_ind; 
+   int sub_col_ind, sub_col_loc; 
+   
+   double a_val, lhs_fixed, lhs_low, lhs_high, lhs_tmp, new_ub, new_lb; 
+   double sub_col_val, new_a_val; 
+
+   char *update_row_type = NULL; 
+   double *update_row_aval = NULL;
+   int *update_row_ind = NULL;
+   int *common_row_ind = NULL;
+   
+   int new_col_size, *new_col_ind = NULL;  
+   double *new_col_val = NULL;
+   
+   char substitute_col;
+   //int iter_cnt = 0;
+   int new_e_rows_cnt = 1, iter_cnt = 0;
+   int row_free_size; 
+
+   while(iter_cnt < 5 && new_e_rows_cnt > 0 && !PREP_QUIT(termcode)){
+      iter_cnt++;
+      new_e_rows_cnt = 0;      
+      for(row_ind = 0; row_ind < m && mip->mip_inf->e_row_num > 0; row_ind++){
+	 //if(rows[row_ind].size == 3) printf("%i\n", iter_cnt++);
+	 row_free_size = rows[row_ind].size - rows[row_ind].fixed_var_num; 
+	 if(rows[row_ind].is_redundant || //sense[row_ind] != 'E' ||
+	    row_free_size < 2)continue; 
+	 
+	 //(rows[row_ind].is_sos_row && rows[row_ind].size > 2)) continue; 
+	 
+	 // check to see if we catch a col that can be substituted     
+	 // and the row would become redundant 
+	 
+	 int end_matbeg = r_matbeg[row_ind + 1];
+	 for(i = r_matbeg[row_ind]; i < end_matbeg; i++){
+	    col_ind = r_matind[i]; 
+	    a_val = r_matval[i];
+	    
+	    if(cols[col_ind].var_type == 'F' || (a_val < etol && a_val > -etol) || 
+	       !((sense[row_ind] == 'E' && row_free_size == 2) || (cols[col_ind].col_size == 1 && 
+								   (sense[row_ind] == 'E' ||
+								    (sense[row_ind] == 'L' && obj[col_ind]*a_val <= 0.0) ||		 
+								    (sense[row_ind] == 'G' && obj[col_ind]*a_val >= 0.0))))){
+	       //!(rows[row_ind].size == 2 && cols[col_ind].col_size > 1)) {
+	       //!(row_free_size == 2 || cols[col_ind].col_size == 1)) {		 
+	       //!((rows[row_ind].size == 2) || cols[col_ind].col_size == 1)) {
+	       continue; 
+	    }
+	    
+	    if(mip->is_int[col_ind]){
+	       if(rows[row_ind].cont_var_num > 0 ||
+		  rows[row_ind].frac_coef_num > 0 ||
+		  !prep_is_equal(1.0, floor(fabs(a_val) + etol), etol) ||
+		  !prep_is_equal(rhs[row_ind], floor(rhs[row_ind] + etol), etol)) continue;
+	    }//else{
+	    // if(row_free_size != 2 && rows[row_ind].cont_var_num > 1) continue; 
+	    //}
+	    
+	    substitute_col = FALSE; 
+	    if(ub[col_ind] >= INF && lb[col_ind] <= -INF){
+	       //easiest case
+	       substitute_col = TRUE;
+	    }else{
+	       /*get new lb and new ub */
+	       new_lb = 0.0;
+	       new_ub = 0.0;
+	       if(rows[row_ind].ub >= INF){
+		  if(rows[row_ind].ub_inf_var_num < 2 &&
+		     ((ub[col_ind] >= INF && a_val > etol) ||
+		      (lb[col_ind] <= -INF && a_val < -etol))){
+		     /*get the ub again */
+		     for(j = r_matbeg[row_ind]; j < end_matbeg; j++){
+			if(r_matind[j] != col_ind && cols[r_matind[j]].var_type != 'F'){
+			   if(r_matval[j] > etol) new_ub += r_matval[j]*ub[r_matind[j]];
+			   else new_ub += r_matval[j]*lb[r_matind[j]];
+			}
+		     }
+		     /*debug*/
+		     if(new_ub >= INF){
+			printf("error in substitute var I...\n");		  
+		     }
+		  }else{
+		     new_ub = INF;
+		  }
+	       }else{
+		  new_ub = rows[row_ind].ub; 
+		  if(a_val > etol) new_ub -= a_val*ub[col_ind];
+		  else new_ub -= a_val*lb[col_ind];
+	       }
+	       if(rows[row_ind].lb <= -INF){
+		  if(rows[row_ind].lb_inf_var_num < 2 &&
+		     ((ub[col_ind] >= INF && a_val < etol) ||
+		      (lb[col_ind] <= -INF && a_val > -etol))){
+		     /*get the lb again */
+		     for(j = r_matbeg[row_ind]; j < end_matbeg; j++){
+			if(r_matind[j] != col_ind && cols[r_matind[j]].var_type != 'F'){
+			   if(r_matval[j] > etol) new_lb += r_matval[j]*lb[r_matind[j]];
+			   else new_lb += r_matval[j]*ub[r_matind[j]];
+			}
+		     }
+		     /*debug*/
+		     if(new_lb <= -INF){
+			printf("error in substitute var II...\n");
+		     }
+		  }else{
+		     new_lb = -INF;
+		  }
+	       }else{
+		  new_lb = rows[row_ind].lb;
+		  if(a_val > etol) new_lb -= a_val*lb[col_ind];
+		  else new_lb -= a_val*ub[col_ind];
+	       }  
+	       
+	       /* now we have new lb and ub, check if we can substitute */
+	       lhs_fixed = rhs[row_ind] - rows[row_ind].fixed_lhs_offset; 
+	       
+	       lhs_high = (lhs_fixed - new_ub)/a_val; 
+	       lhs_tmp = (lhs_fixed - new_lb)/a_val;
+	       
+	       if(lhs_high < lhs_tmp){
+		  lhs_low = lhs_high; 
+		  lhs_high = lhs_tmp; 
+	       }else{
+		  lhs_low = lhs_tmp;
+	       }
+	       
+	       if(ub[col_ind] >= INF){
+		  //if(lhs_low > lb[col_ind] + 100*etol ||
+		  // (lhs_low > lb[col_ind] - etol && row_free_size < 3)) substitute_col = TRUE;
+		  if(lhs_low > lb[col_ind] - etol) substitute_col = TRUE; 
+		  //(lhs_low > lb[col_ind] - etol && row_free_size < 3)) 
+	       }else if(lb[col_ind] <= -INF){
+		  //if(lhs_high < ub[col_ind] - 100*etol ||
+		  // (lhs_high < ub[col_ind] + etol && row_free_size < 3)) substitute_col = TRUE;
+		  if(lhs_high < ub[col_ind] + etol) substitute_col = TRUE;		    
+	       }else{
+		  //if((lhs_low > lb[col_ind] + 100*etol &&
+		  //  lhs_high < ub[col_ind] - 100*etol) ||
+		  // (row_free_size < 3 &&
+		  //  lhs_low > lb[col_ind] - etol && lhs_high < ub[col_ind] + etol)) substitute_col = TRUE;
+		  if(lhs_low > lb[col_ind] - etol && lhs_high < ub[col_ind] + etol) substitute_col = TRUE; 
+	       }
+	    }
+	    
+	    if(!substitute_col) continue; 
+
+	    /* now we have a col that can be substituted by the rest of this row
+	       mark this row as redundant, update obj and keep subs info 
+	    */
+	    //cols[col_ind].var_type = 'F';
+	    //stats->vars_fixed++;
+	    
+	    //termcode = prep_deleted_row_update_info(mip, row_ind);
+	    //stats->rows_deleted++;
+	    
+	    //if (PREP_QUIT(termcode)){
+	    //  return termcode;
+	    //}
+	    
+	    // take care of obj
+	    lhs_fixed = (rhs[row_ind] - rows[row_ind].fixed_lhs_offset)/a_val; 
+	    mip->mip_inf->sum_obj_offset += obj[col_ind]*lhs_fixed;
+	    lb[col_ind]=ub[col_ind] = 0.0;
+	    
+	    for(j = r_matbeg[row_ind]; j < end_matbeg; j++){
+	       if(r_matind[j] != col_ind){
+		  obj[r_matind[j]] += -obj[col_ind]*r_matval[j]/a_val; 
+	       }
+	    }
+	    
+	    // keep track of subs cols	 
+
+	    int row_size = r_matbeg[row_ind + 1] - r_matbeg[row_ind];
+
+	    if(!(mip->subs_ind)){
+	       mip->subs_ind = (int *)malloc(n*ISIZE);
+	       mip->subs_aval = (double *)malloc(n*DSIZE);
+	       mip->subs_rhs = (double *)malloc(n*DSIZE);
+
+	       mip->subs_alloc_size = 5*n; 
+	       mip->subs_rbeg = (int *)malloc((n+1)*ISIZE);
+	       mip->subs_rbeg[0] = 0;
+	       mip->subs_rind = (int *)malloc(mip->subs_alloc_size*ISIZE);
+	       mip->subs_rval = (double *)malloc(mip->subs_alloc_size*DSIZE);	       
+	    }else if((row_size + mip->subs_rbeg[mip->subs_n] - 1) > mip->subs_alloc_size){		     
+	       mip->subs_alloc_size += 5*n;
+	       mip->subs_rind = (int*)realloc((char*)mip->subs_rind, mip->subs_alloc_size * ISIZE);
+	       mip->subs_rval = (double*)realloc((char*)mip->subs_rval, mip->subs_alloc_size * DSIZE);
+	    }
+	    
+	    //subs_ind = mip->subs_ind; 
+	    //subs_row_ind = mip->subs_row_ind;
+
+	    int subs_n = stats->vars_substituted; 
+	    
+	    mip->subs_ind[subs_n] = col_ind;
+	    mip->subs_aval[subs_n] = a_val;
+	    mip->subs_rhs[subs_n] = rhs[row_ind];	    
+
+	    for(k = mip->subs_rbeg[subs_n], l = r_matbeg[row_ind]; l < r_matbeg[row_ind + 1]; l++){
+	       if(r_matind[l] != col_ind){
+		  mip->subs_rind[k] = r_matind[l];
+		  mip->subs_rval[k] = r_matval[l];
+		  k++;
+	       }
+	    }
+	    mip->subs_rbeg[subs_n + 1] = mip->subs_rbeg[subs_n] + row_size - 1;
+	    //subs_row_ind[stats->vars_substituted] = row_ind;
+	    stats->vars_substituted++;
+	    mip->subs_n = stats->vars_substituted;
+	    
+	    if(cols[col_ind].col_size > 1){
+	       sub_col_loc = -1;
+	       for(k = r_matbeg[row_ind]; k < r_matbeg[row_ind + 1]; k++){
+		  if(r_matind[k] != col_ind &&
+		     cols[r_matind[k]].var_type != 'F'){
+		     if(sub_col_loc < 0){
+			sub_col_loc = k;
+		     }else{
+			sub_col_loc = -1;
+			break;
+		     }
+		  }
+	       }
+	       
+	       if(sub_col_loc < 0){
+		  /* something went wrong...*/
+		  printf("error in prep_substitute_cols... iterating anyhow...\n");
+		  continue;
+	       }
+
+	       sub_col_ind = r_matind[sub_col_loc]; 
+	       sub_col_val = r_matval[sub_col_loc];
+
+	       if (P->params.verbosity >= 10 ){
+		  printf("by row: %i - var %i is substituted with var %i\n", row_ind, col_ind, sub_col_ind);
+	       }
+	    }else{
+	       if (P->params.verbosity >= 10 ){
+		  printf("by row: %i - var %i (with col_size = 1) is substituted\n", row_ind, col_ind);
+	       }
+	       cols[col_ind].var_type = 'F';
+	       stats->vars_fixed++;
+	       
+	       termcode = prep_deleted_row_update_info(mip, row_ind);
+	       if (PREP_QUIT(termcode)){
+		  break;
+		  //return termcode;
+	       }
+	       stats->rows_deleted++;
+	       break;
+	    }
+	    
+	    // now the col_size > 1 && row_size == 2. then update the col/row ordered matrices.
+	    
+	    //if(r_matind[r_matbeg[row_ind]] != col_ind){
+	    // sub_col_ind = r_matind[r_matbeg[row_ind]]; 
+	    // sub_col_val = r_matval[r_matbeg[row_ind]];
+	    //}else{
+	    // sub_col_ind = r_matind[r_matbeg[row_ind] + 1];
+	    //  sub_col_val = r_matval[r_matbeg[row_ind] + 1];
+	    //}
+
+	    if(!update_row_type){
+	       update_row_type = (char *)malloc(CSIZE*m);
+	       update_row_aval = (double *)malloc(DSIZE*m);
+	       update_row_ind = (int *)malloc(ISIZE*m);
+	       common_row_ind = (int *)malloc(ISIZE*m);
+	    }
+	    //else memset(is_common_row, 0, CSIZE*m);
+	    
+	    /* get the new column */
+	    new_col_size = 0;
+	    if(!new_col_ind){
+	       new_col_ind = (int *)malloc(ISIZE*m);
+	       new_col_val = (double *)malloc(DSIZE*m);
+	    }
+	    
+	    int update_row_size = 0; 
+	    int common_row_cnt = 0;
+	    for ( k = matbeg[col_ind], l = matbeg[sub_col_ind];;){
+	       if (k < matbeg[col_ind + 1] && 
+		   (l >= matbeg[sub_col_ind + 1] || matind[k] < matind[l])){
+		  //if(!rows[matind[k]].is_redundant){
+		  new_a_val = -matval[k]*sub_col_val/a_val;
+		  //if(new_a_val > etol || new_a_val < -etol){
+		  rhs[matind[k]] -= matval[k]*lhs_fixed; 
+		  new_col_ind[new_col_size] = matind[k];
+		  new_col_val[new_col_size] = new_a_val; 
+		  new_col_size++;
+		  //}
+		  /* can we update row attributes here? */
+		  update_row_type[update_row_size] = 'L';
+		  update_row_ind[update_row_size] = matind[k];
+		  update_row_aval[update_row_size] = new_a_val; 
+		  update_row_size++;
+		  //}
+		  k++;
+	       } else if (l < matbeg[sub_col_ind + 1] && 
+			  (k >= matbeg[col_ind+1] || matind[k] > matind[l])){
+		  //if (!rows[matind[l]].is_redundant){
+		  //update_row_ind[update_row_size] = matind[l];
+		  //update_row_type[update_row_size] = 'R'; 
+		  //update_row_size++;
+		  new_col_ind[new_col_size] = matind[l];
+		  new_col_val[new_col_size] = matval[l];
+		  new_col_size++;		  
+		  //}
+		  //update_row_ind[update_row_size] = matind[l];
+		  //update_row_val[update_row_size] = new_a_val; 
+		  //update_row_size++;
+		  l++;
+	       } else {
+		  //if (!rows[matind[k]].is_redundant){
+		  new_a_val = matval[l] - matval[k]*sub_col_val/a_val;
+		  //if(new_a_val > etol || new_a_val < -etol){
+		  rhs[matind[k]] -= matval[k]*lhs_fixed;
+		  new_col_ind[new_col_size] = matind[k];
+		  new_col_val[new_col_size] = new_a_val;
+		  new_col_size++;
+		  //}
+		  
+		  update_row_type[update_row_size] = 'C'; 
+		  update_row_ind[update_row_size] = matind[k];
+		  update_row_aval[update_row_size] = new_a_val; 
+		  update_row_size++;
+		  //is_common_row[matind[k]] = TRUE;
+		  common_row_ind[common_row_cnt] = matind[k];
+		  common_row_cnt ++;
+		  //}
+		  k++;
+		  l++;
+	       }
+	       if ((k == matbeg[col_ind + 1] && l == matbeg[sub_col_ind + 1])){
+		  break;
+	       }
+	    }
+	    
+	    /* fix col_ind to 0 first */
+	    
+	    
+	    /* substitute new column on col ordered matrix*/
+	    
+	    //if(new_col_size != cols[sub_col_ind].col_size){
+	    int old_col_size = matbeg[sub_col_ind + 1] - matbeg[sub_col_ind]; 
+	    if(new_col_size > old_col_size){
+	       int dec_size = new_col_size - old_col_size; //cols[sub_col_ind].col_size;
+	       /* debug */
+	       if(dec_size != matbeg[col_ind + 1] - matbeg[col_ind] - common_row_cnt){
+		  printf("error in col updating in prep substitute...\n");
+	       }
+	       if(col_ind < sub_col_ind){	       
+		  for(k = 0, l = matbeg[col_ind]; k < common_row_cnt; l++, k++){
+		     matind[l] = common_row_ind[k];
+		     //matval[l] = ? no need to update these 
+		  }
+		  
+		  for(k = col_ind + 1; k < sub_col_ind; k++){
+		     for(l = matbeg[k] ; l < matbeg[k+1]; l++){
+			matind[l - dec_size] = matind[l];
+			matval[l - dec_size] = matval[l];
+		     }
+		     matbeg[k] = matbeg[k] - dec_size;
+		  }
+		  matbeg[sub_col_ind] = matbeg[sub_col_ind] - dec_size; 
+	       }else{
+		  for(k = col_ind - 1; k > sub_col_ind; k--){
+		     for(l = matbeg[k + 1] - 1 ; l >= matbeg[k]; l--){
+		     //for(l = matbeg[k]; l < matbeg[k+1]; l++){
+			matind[l + dec_size] = matind[l];
+			matval[l + dec_size] = matval[l];
+		     }
+		     matbeg[k+1] = matbeg[k+1] + dec_size;
+		  }
+		  matbeg[sub_col_ind+1] = matbeg[sub_col_ind+1] + dec_size; 
+		  
+		  for(k = 0, l = matbeg[col_ind]; k < common_row_cnt; l++, k++){
+		     matind[l] = common_row_ind[k];
+		     //matval[l] = ? no need to update these 
+		  }
+	       }
+	    }
+	    int c_end = matbeg[sub_col_ind] + new_col_size; 
+	    int col_coef_frac_cnt = 0, col_coef_bin_cnt = 0, col_sign_pos_cnt = 0;
+	    new_col_size = 0;
+	    for(k = 0, l= matbeg[sub_col_ind]; l < c_end; k++, l++){
+	       matind[l] = new_col_ind[k];
+	       matval[l] = new_col_val[k];
+	       
+	       /*get new col attributes here */
+	       if(!rows[matind[l]].is_redundant){
+		  new_col_size++;
+		  if(fabs(matval[l]-floor(matval[l]+0.5)) > etol){
+		     col_coef_frac_cnt++;
+		  }else if (fabs(matval[l] - 1.0) < etol ||
+			    fabs(matval[l] + 1.0) < etol) {
+		     col_coef_bin_cnt++;
+		  }
+		  if (matval[l] > 0.0) {
+		     col_sign_pos_cnt++;
+		  }
+	       }
+	    }
+	    cols[sub_col_ind].nz += cols[col_ind].col_size - common_row_cnt;  
+	    cols[sub_col_ind].col_size = new_col_size; 
+	    
+	    int gen_type = 0;
+	    if (col_coef_frac_cnt > 0){
+	       gen_type = FRACTIONAL_VEC;
+	    } else {
+	       if (col_coef_bin_cnt < new_col_size){
+		  gen_type = ALL_INTEGER_VEC;
+	       } else {
+		  gen_type = ALL_BINARY_VEC;
+	       }
+	    }
+	    cols[sub_col_ind].coef_type = gen_type;
+	    
+	    gen_type = 0;
+	    if (col_sign_pos_cnt > 0){
+	       if (col_sign_pos_cnt < new_col_size){
+		  gen_type = MIXED_TYPE_VEC;
+	       } else {
+		  gen_type = ALL_POS_VEC;
+	       }
+	    } else {
+	       gen_type = ALL_NEG_VEC;
+	    }
+	    cols[sub_col_ind].sign_type = gen_type;
+	    
+	    /* done with column */
+	    /*now update the row ordered matrix */
+	    
+	    cols[col_ind].var_type = 'F';
+	    stats->vars_fixed++;
+	    
+	    for(k = 0; k < update_row_size; k++){
+	       int r_ind = update_row_ind[k];
+	       int dec_size = 0;
+	       char found_loc = FALSE; 
+	       if(update_row_type[k] == 'L'){
+		  if(col_ind < sub_col_ind){
+		     for(l = r_matbeg[r_ind]; l < r_matbeg[r_ind + 1]; l++){
+			int c_ind = r_matind[l];
+			//double c_val = r_matval[l];
+			if(c_ind == col_ind){
+			   dec_size = 1;
+			}
+			if(l + dec_size < r_matbeg[r_ind + 1]){		     
+			   if(r_matind[l + dec_size] > sub_col_ind && !found_loc){
+			      r_matind[l] = sub_col_ind;
+			      r_matval[l] = update_row_aval[k];
+			      //break; 
+			      dec_size = 0;
+			      found_loc = TRUE; 
+			   }else{
+			      r_matind[l] = r_matind[l + dec_size];
+			      r_matval[l] = r_matval[l + dec_size];
+			   }
+			}else if(dec_size == 1){
+			   r_matind[l] = sub_col_ind;
+			   r_matval[l] = update_row_aval[k];			
+			}else{
+			   printf("error in row updating in prep substitute...\n");
+			}
+			if(rows[r_ind].is_redundant) continue;
+			int n_c_ind = r_matind[l]; 
+			prep_update_single_row_attributes(rows, r_ind, r_matval[l], 
+							  obj[n_c_ind], lb[n_c_ind], ub[n_c_ind],
+							  mip->is_int[n_c_ind], cols[n_c_ind].var_type, etol,
+							  (l == r_matbeg[r_ind] ? -1 : ((l < r_matbeg[r_ind + 1] - 1) ? 0 : 1)));
+		     }
+		  }else{
+		     for(l = r_matbeg[r_ind + 1] - 1; l >= r_matbeg[r_ind]; l--){
+			int c_ind = r_matind[l];
+			if(c_ind == col_ind){
+			   dec_size = -1;
+			}
+			if(l + dec_size >= r_matbeg[r_ind]){
+			   if(r_matind[l + dec_size] < sub_col_ind && !found_loc){
+			      r_matind[l] = sub_col_ind;
+			      r_matval[l] = update_row_aval[k];
+			      //break;
+			      dec_size = 0;
+			      found_loc = TRUE; 
+			   }else{
+			      r_matind[l] = r_matind[l + dec_size];
+			      r_matval[l] = r_matval[l + dec_size];
+			   }
+			}else if(dec_size == -1){
+			   r_matind[l] = sub_col_ind;
+			   r_matval[l] = update_row_aval[k];
+			}else{
+			   printf("error in row updating in prep substitute...\n");
+			}
+			if(rows[r_ind].is_redundant) continue;
+			int n_c_ind = r_matind[l]; 
+			prep_update_single_row_attributes(rows, r_ind, r_matval[l], 
+							  obj[n_c_ind], lb[n_c_ind], ub[n_c_ind],
+							  mip->is_int[n_c_ind], cols[n_c_ind].var_type, etol,
+							  (l == (r_matbeg[r_ind + 1] - 1)? -1 : ((l > r_matbeg[r_ind]) ? 0 : 1)));
+		     }
+		  }
+	       }else if(update_row_type[k] == 'C' && r_ind != row_ind){
+		  for(l = r_matbeg[r_ind]; l < r_matbeg[r_ind + 1]; l++){
+		     int c_ind = r_matind[l];
+		     if(c_ind == sub_col_ind){
+			r_matval[l] = update_row_aval[k];
+		     }
+		     if(rows[r_ind].is_redundant) continue;
+		     prep_update_single_row_attributes(rows, r_ind, r_matval[l],
+						       obj[c_ind], lb[c_ind], ub[c_ind],
+						       mip->is_int[c_ind], cols[c_ind].var_type, etol,
+						       (l == r_matbeg[r_ind] ? -1 : ((l < r_matbeg[r_ind + 1] - 1) ? 0 : 1)));
+		  }
+	       }
+	       if(r_ind < row_ind && (rows[r_ind].size - rows[r_ind].fixed_var_num) == 2 && sense[r_ind] == 'E') new_e_rows_cnt++;
+	       //if(r_ind < row_ind) new_e_rows_cnt++;
+	    }
+	    
+	    termcode = prep_deleted_row_update_info(mip, row_ind);
+	    if (PREP_QUIT(termcode)){
+	       break;
+	       //return termcode;
+	    }
+	    stats->rows_deleted++;	    
+	    break; 
+	 }
+	 if(PREP_QUIT(termcode)){
+	    break;
+	 }
+      }
+   }
+
+   FREE(update_row_type);
+   FREE(update_row_aval);
+   FREE(update_row_ind);
+   FREE(common_row_ind);
+   FREE(new_col_ind);
+   FREE(new_col_val);
+   
+   //write_mip_desc_lp(mip, "test");
+   //abort();
+   return termcode;
+}
+/*===========================================================================*/
+/*===========================================================================*/
+
+int prep_update_single_row_attributes(ROWinfo *rows, int row_ind, double a_val,
+				      double obj, double c_lb, double c_ub,
+				      int is_int, int var_type, double etol,
+				      int entry_loc)
+{
+
+   /* entry_loc:
+      -1 first entry
+      0
+      1 last entry
+   */
+
+   if(entry_loc < 0){      
+      memset(&(rows[row_ind]), 0, sizeof(ROWinfo));
+   }
+   
+   rows[row_ind].size++;
+
+   if (var_type == 'F'){
+      rows[row_ind].fixed_var_num++;
+      rows[row_ind].fixed_obj_offset += obj*c_ub;
+      rows[row_ind].fixed_lhs_offset += a_val * c_ub;
+   } else if (is_int) {
+      if (var_type == 'B'){
+	 rows[row_ind].bin_var_num++;
+      }
+   } else {
+      rows[row_ind].cont_var_num++;
+   }
+
+   if (var_type != 'F'){
+      if((a_val > etol && c_ub >= INF) ||
+	 (a_val < -etol && c_lb <= -INF))
+	 rows[row_ind].ub_inf_var_num++;   
+      if((a_val > etol && c_lb <= -INF) ||
+	 (a_val < -etol && c_ub >= INF))
+	 rows[row_ind].lb_inf_var_num++;
+   
+      if (fabs(a_val-floor(a_val+0.5)) > etol) {
+	 rows[row_ind].frac_coef_num++;
+      } else if (fabs(a_val - 1.0) < etol ||
+		 fabs(a_val + 1.0) < etol) {
+	 rows[row_ind].row_coef_bin_cnt++;
+      }
+      if (a_val > 0.0) {
+	 rows[row_ind].row_sign_pos_cnt++;
+      }
+   }
+      
+   if (a_val > 0.0) {
+      // rows[row_ind].row_sign_pos_cnt++;
+      if (rows[row_ind].ub < INF) {
+	 if (c_ub >= INF) {
+	    rows[row_ind].ub = INF;
+	 } else {
+	    rows[row_ind].ub += a_val * c_ub;
+	 }
+      }
+      if (rows[row_ind].lb > -INF) {
+	 if (c_lb <= -INF) {
+	    rows[row_ind].lb = -INF;
+	 } else {
+	    rows[row_ind].lb += a_val * c_lb;
+	 }
+      }
+   } else if (a_val < 0.0) {
+      if (rows[row_ind].ub < INF) {
+	 if (c_lb <= -INF) {
+	    rows[row_ind].ub = INF;
+	 } else {
+	    rows[row_ind].ub += a_val * c_lb;
+	 }
+      }
+      if (rows[row_ind].lb > -INF){
+	 if (c_ub >= INF){
+	    rows[row_ind].lb = -INF;
+	 } else {
+	    rows[row_ind].lb += a_val * c_ub;
+	 }
+      }
+   }
+
+   if(entry_loc > 0){
+      int gen_type = 0;
+      if (rows[row_ind].cont_var_num > 0 ){
+	 if (rows[row_ind].bin_var_num > 0){
+	    if ( rows[row_ind].cont_var_num + rows[row_ind].bin_var_num + 
+		rows[row_ind].fixed_var_num 
+		>= rows[row_ind].size){
+	       gen_type = BIN_CONT_TYPE;
+	    } else {
+	       gen_type = ALL_MIXED_TYPE;
+	    }
+	 } else {
+	    if (rows[row_ind].cont_var_num + rows[row_ind].fixed_var_num < rows[row_ind].size){
+	       gen_type = INT_CONT_TYPE;
+	    } else {
+	       gen_type = CONTINUOUS_TYPE;
+	    }
+	 }
+      } else {
+	 if (rows[row_ind].bin_var_num > 0){
+	    if (rows[row_ind].bin_var_num + rows[row_ind].fixed_var_num < rows[row_ind].size){
+	       gen_type = BIN_INT_TYPE;
+	    } else {
+	       gen_type = BINARY_TYPE;
+	    }
+	 } else {
+	    gen_type = INTEGER_TYPE;
+	 }
+      }
+      
+      rows[row_ind].type = gen_type;
+      gen_type = 0;
+      
+      int row_unbounded_cnt = rows[row_ind].lb_inf_var_num +
+	 rows[row_ind].ub_inf_var_num;
+
+      if (row_unbounded_cnt == 0){
+	 gen_type = ALL_BOUNDED_ROW;
+      } else if (row_unbounded_cnt + rows[row_ind].fixed_var_num < rows[row_ind].size){
+	 gen_type = MIXED_BOUNDED_ROW;
+      } else {
+	 gen_type = OPEN_ROW;
+      }
+
+      rows[row_ind].bound_type = gen_type;
+      gen_type = 0;
+
+      if (rows[row_ind].frac_coef_num > 0){
+	 gen_type = FRACTIONAL_VEC;
+      } else {
+	 if (rows[row_ind].row_coef_bin_cnt +  rows[row_ind].fixed_var_num < rows[row_ind].size){
+	    gen_type = ALL_INTEGER_VEC;
+	 } else {
+	    gen_type = ALL_BINARY_VEC;
+	 }
+      }
+
+      rows[row_ind].coef_type = gen_type;
+      gen_type = 0;
+      
+      if (rows[row_ind].row_sign_pos_cnt > 0){
+	 if (rows[row_ind].row_sign_pos_cnt + rows[row_ind].fixed_var_num < rows[row_ind].size){
+	    gen_type = MIXED_TYPE_VEC;
+	 } else {
+	    gen_type = ALL_POS_VEC;
+	 }
+      } else {
+	 gen_type = ALL_NEG_VEC;
+      }
+
+      rows[row_ind].sign_type = gen_type;      
+   }
+
+   return 0;
+   
+}
+
 
 /*===========================================================================*/
 /*===========================================================================*/
@@ -1495,8 +2341,15 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
    double *obj = mip->obj;
 
    char is_int = mip->is_int[col_ind];
-   char sense = mip->sense[row_ind];
-   double rhs = mip->rhs[row_ind];
+
+   char sense = 'R'; //mip->sense[row_ind];
+   double rhs = 0.0; //mip->rhs[row_ind];
+
+   if(row_ind > -1){
+     sense = mip->sense[row_ind];
+     rhs = mip->rhs[row_ind];
+   }
+
    double a_val = maj_matval[a_loc];
    
    char fix_to_lb, fix_to_ub, improve_coef;
@@ -1514,11 +2367,11 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
    
    if (cols[col_ind].var_type != 'U' &&
       cols[col_ind].var_type != 'L'){
-      if (cols[col_ind].col_size <= 1){
-	 if (obj[col_ind] >= 0.0 && ( (sense == 'G' && a_val < -etol) || 
-				     (sense == 'L' && a_val > etol) ||
-				     (cols[col_ind].col_size == 0) ) ){ 
-	   if (lb[col_ind] <= -INF){
+     if (cols[col_ind].col_size <= 1){
+        if (obj[col_ind] >= 0.0 && ( (cols[col_ind].col_size == 0) || 
+				     (sense == 'G' && a_val < -etol) || 
+				     (sense == 'L' && a_val > etol)) ){ 
+	  if (lb[col_ind] <= -INF){
 	      if(obj[col_ind] > coeff_etol){
 		 stats->col_unbound_ind = col_ind;
 	         return PREP_UNBOUNDED;
@@ -1531,9 +2384,9 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 		  fix_type = FIX_OTHER;	    
 	       }
  	   }
-	 } else if (obj[col_ind] <= 0.0 && ( (sense == 'G' && a_val > etol) || 
-					   (sense == 'L' && a_val < -etol) || 
-					   (cols[col_ind].col_size == 0)) ){
+	 } else if (obj[col_ind] <= 0.0 && ( (cols[col_ind].col_size == 0) || 
+					     (sense == 'G' && a_val > etol) || 
+					     (sense == 'L' && a_val < -etol))){					  
 	   if (ub[col_ind] >= INF){
 	      if(obj[col_ind] < -coeff_etol){
 	         stats->col_unbound_ind = col_ind;
@@ -1557,6 +2410,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
    if (termcode == PREP_UNMODIFIED){
       /* continue */
       /* firt case: it is a binary variable */
+
       if (cols[col_ind].var_type == 'B'){
 	 
 	 /* see if we can fix this variable */
@@ -1659,6 +2513,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 		if (fix_to_lb && fix_to_ub){
 		   stats->col_infeas_ind = col_ind;
 		   stats->row_infeas_ind = row_ind;
+		   //printf("PI-7\n");
 		   return PREP_INFEAS;
 		}
 		break;
@@ -1752,6 +2607,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 		if (fix_to_lb && fix_to_ub){
 		   stats->col_infeas_ind = col_ind;
 		   stats->row_infeas_ind = row_ind;
+		   //printf("PI-8\n");
 		   return PREP_INFEAS;
 		}
 		break;
@@ -1877,6 +2733,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 							 IMPROVE_LB,
 							 TRUE, TRUE);
 	       if (termcode == PREP_INFEAS){
+		  //printf("PI-9\n");
 		  printf("infeasibility detected!\n");
 		  /*then this column is fixable to its lower bound! */
 		  new_bound = 0.0;
@@ -1904,6 +2761,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 							 TRUE, TRUE);
 	       
 	       if (termcode == PREP_INFEAS){
+		  //printf("PI-10\n");
 		  printf("infeasibility detected!\n");
 		  /*then this column is fixable to its lower bound! */
 		  new_bound = 1.0;
@@ -2188,6 +3046,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 	       if (!impl_mode){
 		  stats->col_infeas_ind = col_ind;
 	       }
+	       //printf("PI-11\n");
 	       termcode = PREP_INFEAS;
 	       can_iterate = FALSE;
 	       break;
@@ -2238,6 +3097,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 		  stats->col_infeas_ind = col_ind;
 		  stats->row_infeas_ind = row_ind;
 		}
+		//printf("PI-12\n");
 		termcode = PREP_INFEAS;
 		can_iterate = FALSE;
 		break;
@@ -2253,6 +3113,7 @@ int prep_modified_cols_update_info(PREPdesc *P, int col_cnt, int *col_start,
 		  stats->col_infeas_ind = col_ind;
 		  stats->row_infeas_ind = row_ind;
 		}
+		//printf("PI-13\n");
 		termcode = PREP_INFEAS;
 		can_iterate = FALSE;
 		break;
@@ -2743,6 +3604,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 	       rows[row_ind].fixed_lhs_offset < 
 	       rhs - mip->rngval[row_ind] - etol))){
 	   stats->row_infeas_ind = row_ind;
+	   //printf("PI-14\n");
 	   return PREP_INFEAS;
 	 }
 	 termcode = PREP_MODIFIED;
@@ -2762,6 +3624,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 			new_bound < c_lb[col_ind] - etol){
 			stats->col_infeas_ind = col_ind;
 			stats->row_infeas_ind = row_ind;
+			//printf("PI-15\n");
 			return PREP_INFEAS;
 		     }
 		     if (cols[col_ind].var_type != 'C'){
@@ -2771,6 +3634,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 			   new_bound <= rnd_ceil - etol){
 			   stats->col_infeas_ind = col_ind;
 			   stats->row_infeas_ind = row_ind;
+			   //printf("PI-16\n");
 			   return PREP_INFEAS;
 			} else {
 			   if (new_bound < rnd_floor + etol){
@@ -2788,6 +3652,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 			   if (new_bound > c_ub[col_ind] + etol){
 			      stats->col_infeas_ind = col_ind;
 			      stats->row_infeas_ind = row_ind;
+			      //printf("PI-17\n");
 			      return PREP_INFEAS;
 			   }
 			   if (new_bound > c_lb[col_ind] + etol ){
@@ -2801,6 +3666,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 			   if (new_bound < c_lb[col_ind] - etol){
 			      stats->col_infeas_ind = col_ind; 
 			      stats->row_infeas_ind = row_ind;
+			      //printf("PI-18\n");
 			      return PREP_INFEAS;
 			   }
 			   if (new_bound < c_ub[col_ind] - etol){
@@ -2818,6 +3684,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 			   if (new_bound < c_lb[col_ind] - etol){
 			      stats->col_infeas_ind = col_ind;
 			      stats->row_infeas_ind = row_ind;
+			      //printf("PI-19\n");
 			      return PREP_INFEAS;
 			   }
 			   if (obj[col_ind] >= 0.0){
@@ -2837,6 +3704,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 			   if (new_bound > c_ub[col_ind] + etol){
 			      stats->col_infeas_ind = col_ind;
 			      stats->row_infeas_ind = row_ind;
+			      //printf("PI-20\n");
 			      return PREP_INFEAS;
 			   }
 			   if (obj[col_ind] <= 0.0){
@@ -2867,12 +3735,14 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 					  etol)){
 			   stats->col_infeas_ind = col_ind;
 			   stats->row_infeas_ind = row_ind;
+			   //printf("PI-21\n");
 			   return PREP_INFEAS;
 			}
 		     } else { /* sense is 'L' */
 			if (rows[row_ind].fixed_lhs_offset > rhs + etol){
 			   stats->col_infeas_ind = col_ind;
 			   stats->row_infeas_ind = row_ind;
+			   //printf("PI-22\n");
 			   return PREP_INFEAS;
 			}
 			
@@ -2939,6 +3809,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 	 if (lb > ub + etol){
 	    stats->row_infeas_ind = row_ind;
 	    /* debug, can this happen? */
+	    //printf("PI-23\n");
 	    return PREP_INFEAS;
 	 } else if (lb > ub - etol){
 	    fixed_row = TRUE;
@@ -2946,11 +3817,13 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 	    /* check infeasibility here */
 	    if (lb > rhs + etol){
 	       stats->row_infeas_ind = row_ind;
+	       //printf("PI-24\n");
 	       return PREP_INFEAS;
 	    }
 	    if (sense == 'E'){
 	       if (ub < rhs - etol){
 		  stats->row_infeas_ind = row_ind;
+		  //printf("PI-25\n");
 		  return PREP_INFEAS;
 	       }
 	    }
@@ -2962,6 +3835,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 		if (lb > rhs + etol){
 		   stats->row_infeas_ind = row_ind;
 		   /* prob infeasible */
+		   //printf("PI-26\n");
 		   return PREP_INFEAS;
 		}
 		if (ub < rhs - etol){ 
@@ -2977,6 +3851,7 @@ int prep_check_redundancy(PREPdesc *P, int row_ind,
 		   ub < rhs - etol){
 		   /* prob infeasible */
 		   stats->row_infeas_ind = row_ind;
+		   //printf("PI-27\n");
 		   return PREP_INFEAS;
 		}
 		if (prep_is_equal(lb, rhs, etol*1e-5)){
@@ -3136,6 +4011,12 @@ int prep_deleted_row_update_info(MIPdesc *mip, int row_ind)
 	 }
       }
    }
+   char sense = mip->sense[row_ind];
+   if(sense == 'E') mip->mip_inf->e_row_num--;
+   else if(sense == 'L') mip->mip_inf->l_row_num--;
+   else if(sense == 'G') mip->mip_inf->g_row_num--;
+   else mip->mip_inf->r_row_num--;
+
    return 0;
 }
 /*===========================================================================*/
@@ -3147,17 +4028,19 @@ int prep_initialize_mipinfo(PREPdesc *P)
    double coef_val, fixed_obj_offset;  
    int row_ind, cont_var_cnt = 0, bin_var_cnt = 0, fixed_var_cnt = 0;   
    int  row_unbounded_cnt, max_row_size, max_col_size, bin_var_nz_cnt = 0;
-   int * row_coef_bin_cnt = NULL, *row_sign_pos_cnt = NULL, bin_row_cnt;
+   int bin_row_cnt; //* row_coef_bin_cnt = NULL, *row_sign_pos_cnt = NULL, bin_row_cnt;
    char is_binary, is_bounded, unbounded_below, unbounded_above;
    int gen_type; /* 0 fractional, 1 integer, 2 binary */
-   int col_size, col_coef_bin_cnt, col_coef_frac_cnt, col_sign_pos_cnt; 
+   int col_size, col_coef_bin_cnt, col_coef_frac_cnt, 
+     col_sign_pos_cnt; 
    int *rows_integerized_var_ind = NULL, integerizable_var_num;
    char is_opt_val_integral = TRUE;
    int is_col_all_neg; /* if we convert all constraints to 'L' */
    int is_col_all_pos; /* if we convert all constraints to 'L' */
    int obj_size; /* number of nonzeros in objective function */
    int bin_sos_row_cnt = 0, bin_cont_row_cnt, cont_row_cnt = 0;
-   
+   int e_row_cnt = 0, l_row_cnt = 0, g_row_cnt = 0, r_row_cnt = 0;
+
    MIPdesc *mip = P->mip;
    prep_stats *stats = &(P->stats);
    prep_params params = P->params;
@@ -3186,7 +4069,8 @@ int prep_initialize_mipinfo(PREPdesc *P)
        return PREP_SOLVED;
      }
    }
-   
+
+
    int n = mip->n;
    int m = mip->m;
    int * matbeg = mip->matbeg;
@@ -3200,20 +4084,29 @@ int prep_initialize_mipinfo(PREPdesc *P)
    double *rhs = mip->rhs;
    //   char obj_sense = env->mip->obj_sense;
 
-   MIPinfo *mip_inf = (MIPinfo *)calloc (1, sizeof(MIPinfo));
+   if (mip->mip_inf){
+      FREE(mip->mip_inf->rows);
+      FREE(mip->mip_inf->cols);
+      FREE(mip->mip_inf);
+   }
+   
+   MIPinfo *mip_inf = (mip->mip_inf = (MIPinfo *)calloc (1, sizeof(MIPinfo)));
    COLinfo *cols = NULL;
    ROWinfo *rows = NULL;
 
    if (m > 0){
       rows = (ROWinfo *)calloc(m, sizeof(ROWinfo));   
-      row_coef_bin_cnt = (int *)calloc(ISIZE,m);
-      row_sign_pos_cnt = (int *)calloc(ISIZE,m);
-      rows_integerized_var_ind = (int *)malloc(ISIZE*m);
+      //row_coef_bin_cnt = (int *)calloc(ISIZE,m);
+      //row_sign_pos_cnt = (int *)calloc(ISIZE,m);
+      rows_integerized_var_ind = P->tmpi; //(int *)malloc(ISIZE*m);
    }
    if (n > 0){
       cols = (COLinfo *)calloc(n, sizeof(COLinfo));           
    }
 
+   mip_inf->rows = rows;
+   mip_inf->cols = cols;      
+   
    /* 
       Number of continuous variables that will always have an integer value in
       a solution. For now, we check rows with only one cont var 
@@ -3240,6 +4133,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
       if (lb[i] >= ub[i] + etol && p_level > 2) {
 	 stats->col_infeas_ind = i;
          /* fixme: who will free the above allocs? */
+	 //printf("PI-28\n");
 	 return(PREP_INFEAS);
       }
       
@@ -3331,19 +4225,26 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	 }
 
 	 /* for coef types */
-	 if (fabs(coef_val-floor(coef_val+0.5)) > coeff_etol) {
-	    rows[row_ind].frac_coef_num++;
-	    col_coef_frac_cnt++;
-	 } else if (fabs(coef_val - 1.0) < coeff_etol ||
-	            fabs(coef_val + 1.0) < coeff_etol) {	       
-            row_coef_bin_cnt[row_ind]++;
-            col_coef_bin_cnt++;
-         }
+	 if (cols[i].var_type != 'F'){
+	    if (fabs(coef_val-floor(coef_val+0.5)) > coeff_etol) {
+	       rows[row_ind].frac_coef_num++;
+	       col_coef_frac_cnt++;
+	    } else if (fabs(coef_val - 1.0) < coeff_etol ||
+		       fabs(coef_val + 1.0) < coeff_etol) {	       
+	       rows[row_ind].row_coef_bin_cnt++;
+	       col_coef_bin_cnt++;
+	    }
+
+	    if (coef_val > 0.0) {
+	       rows[row_ind].row_sign_pos_cnt++;
+	       col_sign_pos_cnt++;
+	    }
+	 }
 
 	 /* for sign types and update bounds */
 	 if (coef_val > 0.0) {
-	    row_sign_pos_cnt[row_ind]++;
-	    col_sign_pos_cnt++;
+	    //rows[row_ind].row_sign_pos_cnt++;
+	    //col_sign_pos_cnt++;
 	    if (rows[row_ind].ub < INF) {
 	       if (ub[i] >= INF) {
 		  rows[row_ind].ub = INF;
@@ -3503,6 +4404,11 @@ int prep_initialize_mipinfo(PREPdesc *P)
    bin_cont_row_cnt = 0;
    
    for (j = 0; j < m; j++){
+
+      if(sense[j] == 'E') e_row_cnt++;
+      else if(sense[j] == 'L') l_row_cnt++;
+      else if(sense[j] == 'G') g_row_cnt++;
+      else r_row_cnt++;
       
       if (rows[j].size > max_row_size){
 	 max_row_size = rows[j].size;
@@ -3561,7 +4467,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
       if (rows[j].frac_coef_num > 0){
 	 gen_type = FRACTIONAL_VEC;
       } else {
-	 if (row_coef_bin_cnt[j] +  rows[j].fixed_var_num < rows[j].size){
+	 if (rows[j].row_coef_bin_cnt +  rows[j].fixed_var_num < rows[j].size){
 	    gen_type = ALL_INTEGER_VEC;
 	 } else {
 	    gen_type = ALL_BINARY_VEC;
@@ -3571,8 +4477,8 @@ int prep_initialize_mipinfo(PREPdesc *P)
       rows[j].coef_type = gen_type;
       gen_type = 0;
       
-      if (row_sign_pos_cnt[j] > 0){
-	 if (row_sign_pos_cnt[j] + rows[j].fixed_var_num < rows[j].size){
+      if (rows[j].row_sign_pos_cnt > 0){
+	 if (rows[j].row_sign_pos_cnt + rows[j].fixed_var_num < rows[j].size){
 	    gen_type = MIXED_TYPE_VEC;
 	 } else {
 	    gen_type = ALL_POS_VEC;
@@ -3584,7 +4490,9 @@ int prep_initialize_mipinfo(PREPdesc *P)
       rows[j].sign_type = gen_type;      
 
 
-      if (rows[j].coef_type == ALL_BINARY_VEC &&
+      if ((rows[j].type == BINARY_TYPE || rows[j].type == INTEGER_TYPE ||
+	   rows[j].type == BIN_INT_TYPE) &&
+	  rows[j].coef_type == ALL_BINARY_VEC &&
 	 ((rows[j].sign_type == ALL_POS_VEC &&
 	   (sense[j] == 'E' || sense[j] == 'L') &&
 	   rhs[j] > 0 && rhs[j] < 2.0) ||
@@ -3594,7 +4502,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	 rows[j].is_sos_row = TRUE;
 	 bin_sos_row_cnt++;
       }
-
+#if 0
       /* work on integerizable vars */      
   
       if (sense[j] == 'E' && rows[j].cont_var_num == 1 && 
@@ -3606,9 +4514,15 @@ int prep_initialize_mipinfo(PREPdesc *P)
 	    integerizable_var_num++;
 	 }
       }
-      
+#endif      
       rows[j].sr_ub = rows[j].ub;
       rows[j].sr_lb = rows[j].lb;
+
+      /* get col_nz */
+
+      for (i = mip->row_matbeg[j]; i < mip->row_matbeg[j+1]; i++) {
+	cols[mip->row_matind[i]].nz += rows[j].size;
+      }
    }
 
   /* work on obj */
@@ -3681,6 +4595,11 @@ int prep_initialize_mipinfo(PREPdesc *P)
    mip_inf->binary_sos_row_num = bin_sos_row_cnt;
    mip_inf->cont_row_num = cont_row_cnt;
    mip_inf->bin_cont_row_num = bin_cont_row_cnt;
+   mip_inf->e_row_num = e_row_cnt; 
+   mip_inf->l_row_num = l_row_cnt; 
+   mip_inf->g_row_num = g_row_cnt; 
+   mip_inf->r_row_num = r_row_cnt; 
+   
 
    mip_inf->sos_bin_row_ratio = 1.0*bin_sos_row_cnt/(bin_row_cnt +1);
    mip_inf->bin_row_ratio = 1.0*bin_row_cnt/(m +1);
@@ -3705,20 +4624,17 @@ int prep_initialize_mipinfo(PREPdesc *P)
       mip_inf->col_bin_den_mean =
 	 (int)2*mip_inf->col_bin_den * max_row_size/
 	 (mip_inf->col_bin_den + max_col_size) + 1;
-
-
    }
 
-   mip_inf->rows = rows;
-   mip_inf->cols = cols;
+   //mip_inf->rows = rows;
+   //mip_inf->cols = cols;
+   
+   //mip->mip_inf = mip_inf;  
 
-   if (mip->mip_inf){
-      FREE(mip->mip_inf->rows);
-      FREE(mip->mip_inf->cols);
-      FREE(mip->mip_inf);
+   if (bin_sos_row_cnt){
+      prep_sos_fill_var_cnt(P);
    }
 
-   mip->mip_inf = mip_inf;  
    /*
    double mat_den = (1.0)* mip->nz/(mip->m * mip->n + 1);
    double int_den = (1.0*(mip->n-mip->mip_inf->cont_var_num))/(mip->n + 1);
@@ -3737,9 +4653,9 @@ int prep_initialize_mipinfo(PREPdesc *P)
    }
    */
    
-   FREE(row_coef_bin_cnt);
-   FREE(row_sign_pos_cnt);
-   FREE(rows_integerized_var_ind);
+   //FREE(row_coef_bin_cnt);
+   //FREE(row_sign_pos_cnt);
+   //FREE(rows_integerized_var_ind);
 
    return(PREP_MODIFIED); 
 }
@@ -3966,6 +4882,7 @@ int prep_fill_row_ordered(PREPdesc *P)
 
    /* get matrix, change 'G' rows to 'L'*/
    for (i = 0; i < n; i++){
+      qsort_id(&(matind[matbeg[i]]), &(matval[matbeg[i]]), matbeg[i+1] - matbeg[i]);
       for (j = matbeg[i]; j < matbeg[i+1]; j++){
 	 row_ind = matind[j];
 	 elem_ind = r_matbeg[row_ind];
@@ -3995,13 +4912,13 @@ int prep_fill_row_ordered(PREPdesc *P)
 int prep_cleanup_desc(PREPdesc *P)
 { 
    
-   int i, j, col_nz, col_num, row_num, fixed_nz, *fixed_ind, *o_ind;
+   int i, j, col_nz, col_num, row_num, fixed_nz, fixed_zero, *fixed_ind, *o_ind;
    int row_ind, elem_ind, *matind, *matbeg, *r_matind, *r_matbeg, *r_lengths; 
    double *ub, *lb, *matval, *r_matval, *obj, *rhs, *rngval, *fixed_val;
    double obj_offset, debug_offset;
-   int new_del_cnt, *c_lengths, binary_var_nz, binary_var_num, bin_row_cnt,
-      cont_row_cnt, bin_cont_row_cnt;
-   int sos_row_cnt;
+   int new_del_cnt, *c_lengths;// binary_var_nz, binary_var_num, bin_row_cnt,
+   //cont_row_cnt, bin_cont_row_cnt;
+   //int sos_row_cnt;
    int termcode = PREP_UNMODIFIED;
 
    MIPdesc *mip = P->mip;
@@ -4027,7 +4944,7 @@ int prep_cleanup_desc(PREPdesc *P)
    //int keep_row_ordered = params.keep_row_ordered;
    //int reduce_mip = params.reduce_mip;
 
-   int max_row_size, max_col_size;
+   //int max_row_size, max_col_size;
    int old_start, *row_new_inds = NULL;
    int fixed_num = stats->vars_fixed + mip->mip_inf->fixed_var_num;
 
@@ -4047,6 +4964,7 @@ int prep_cleanup_desc(PREPdesc *P)
    }   
    
    fixed_nz = 0;
+   fixed_zero = 0; 
    fixed_ind = mip->fixed_ind = (int *)malloc(n*ISIZE);
    fixed_val = mip->fixed_val = (double *)malloc(n*DSIZE);
    o_ind = mip->orig_ind;
@@ -4060,6 +4978,8 @@ int prep_cleanup_desc(PREPdesc *P)
 	       if (!prep_is_equal(mip->ub[i], 0.0, etol)){
 		  fixed_ind[fixed_nz] = i;
 		  fixed_val[fixed_nz++] = mip->ub[i];
+	       }else{
+		  fixed_zero++;
 	       }
 	    } else {
 	       if (obj[i] > 0.0){
@@ -4071,6 +4991,8 @@ int prep_cleanup_desc(PREPdesc *P)
 			fixed_ind[fixed_nz] = i;
 			fixed_val[fixed_nz++] = mip->lb[i];
 			obj_offset += obj[i]*mip->lb[i];
+		     }else{
+			fixed_zero++;
 		     }
 		  }
 	       } else if (obj[i] < 0.0){
@@ -4082,6 +5004,8 @@ int prep_cleanup_desc(PREPdesc *P)
 			fixed_ind[fixed_nz] = i;
 			fixed_val[fixed_nz++] = mip->ub[i];
 			obj_offset += obj[i]*mip->ub[i];			
+		     }else{
+			fixed_zero++;
 		     }
 		  }
 	       }
@@ -4090,6 +5014,7 @@ int prep_cleanup_desc(PREPdesc *P)
 
 	 if(termcode == PREP_UNMODIFIED){
 	   mip->fixed_n = fixed_nz;
+	   mip->fixed_zero = fixed_zero; 
 	   mip->obj_offset = mip->mip_inf->sum_obj_offset + obj_offset;     
 	   return PREP_SOLVED;
 	 }else{
@@ -4102,7 +5027,8 @@ int prep_cleanup_desc(PREPdesc *P)
       return termcode;
    }
 
-   row_new_inds = (int *)calloc(m,ISIZE);
+   row_new_inds = P->tmpi; //(int *)calloc(m,ISIZE);
+   memset(row_new_inds, 0, ISIZE*m);
    
    mip->alloc_n = n;
    mip->alloc_m = m;
@@ -4113,8 +5039,8 @@ int prep_cleanup_desc(PREPdesc *P)
    matbeg = mip->matbeg;
 
    colnames = mip->colname;
-   binary_var_nz = 0;
-   binary_var_num = 0;
+   //binary_var_nz = 0;
+   //binary_var_num = 0;
  
    /* first get new row indices */
    
@@ -4124,7 +5050,10 @@ int prep_cleanup_desc(PREPdesc *P)
       if (!(rows[i].is_redundant)){
 	 row_new_inds[i] = row_num;
 	 row_num++;
-      }
+      }//else{
+      // printf("rows-%i\n", i);
+      //}
+      
       rows[i].size = 0; /* might have zero matval vals that we want 
 			   to exclude, so we will re-evaluate */
    }
@@ -4169,6 +5098,8 @@ int prep_cleanup_desc(PREPdesc *P)
 	    }
 	    if (!prep_is_equal(fixed_val[fixed_nz], 0.0, etol)){
 	       fixed_ind[fixed_nz++] = i;
+	    }else{
+	       fixed_zero++;
 	    }
 	    stats->vars_fixed++;
 	 } else {
@@ -4196,10 +5127,10 @@ int prep_cleanup_desc(PREPdesc *P)
 	    /* ---------- */
 	 }
 
-	 if (cols[i].var_type == 'B'){
-	    binary_var_num++;
-	    binary_var_nz += matbeg[col_num] - matbeg[col_num -1];
-	 }
+	 //if (cols[i].var_type == 'B'){
+	 //  binary_var_num++;
+	 //  binary_var_nz += matbeg[col_num] - matbeg[col_num -1];
+	 //}
       } else {
 	 
 	 /* debug */
@@ -4214,9 +5145,12 @@ int prep_cleanup_desc(PREPdesc *P)
 	 debug_offset += obj[i]*ub[i];
 	 old_start = matbeg[i+1];
 	 if (!prep_is_equal(ub[i], 0.0, etol)){
+	 //if (prep_is_equal(ub[i], lb[i], etol)){
 	    fixed_ind[fixed_nz] = i;
 	    fixed_val[fixed_nz++] = ub[i];
-	 }	    
+	 }else{
+	    fixed_zero++;
+	 }
       }
    }
       
@@ -4267,7 +5201,7 @@ int prep_cleanup_desc(PREPdesc *P)
       r_lengths[i] = rows[i].size;
       r_matbeg[i+1] = r_matbeg[i] + 
 	 rows[i].size;
-      rows[i].bin_var_num = 0;
+      //rows[i].bin_var_num = 0;
    }
    
    /* debug */
@@ -4277,7 +5211,7 @@ int prep_cleanup_desc(PREPdesc *P)
    }
    
    /* */
-   max_row_size = max_col_size = 0;
+   //max_row_size = max_col_size = 0;
    
    for (i = 0; i < col_num; i++){
       for (j = matbeg[i]; j < matbeg[i+1]; j++){
@@ -4288,16 +5222,41 @@ int prep_cleanup_desc(PREPdesc *P)
 	 r_matval[elem_ind] = matval[j];
 	 r_matbeg[row_ind] = elem_ind + 1;
 	
-	 if (cols[i].var_type == 'B'){
-	    rows[row_ind].bin_var_num++;
-	 }
+	 // if (cols[i].var_type == 'B'){
+	 //  rows[row_ind].bin_var_num++;
+	 //}
       }
       c_lengths[i] = matbeg[i+1] - matbeg[i];
-       if (max_col_size < c_lengths[i]){
-	  max_col_size = c_lengths[i];
-       }
+      //if (max_col_size < c_lengths[i]){
+      //	  max_col_size = c_lengths[i];
+      // }
    }
 
+   for (i = 0; i < row_num; i++){
+      r_matbeg[i] -= r_lengths[i];
+   }
+
+   mip->n = col_num;
+   mip->m = row_num;
+   mip->nz = col_nz;
+   mip->obj_offset = mip->mip_inf->sum_obj_offset + obj_offset;     
+   mip->fixed_n = fixed_nz;
+   mip->fixed_zero = fixed_zero;
+   
+   if(fixed_nz < 1) {      
+      FREE(mip->fixed_ind);
+      FREE(mip->fixed_val);
+   }
+
+   
+   termcode = prep_initialize_mipinfo(P);
+   if(PREP_QUIT(termcode)){
+      return termcode;
+   }
+   
+   //printf("n - c: %i %i\n", col_num, mip->mip_inf->cont_var_num);
+   
+#if 0   
    bin_row_cnt = 0;
    cont_row_cnt = 0;
    bin_cont_row_cnt = 0;
@@ -4325,11 +5284,6 @@ int prep_cleanup_desc(PREPdesc *P)
 
    MIPinfo * mip_inf = mip->mip_inf;
    
-   mip->n = col_num;
-   mip->m = row_num;
-   mip->nz = col_nz;
-   mip->obj_offset = mip_inf->sum_obj_offset + obj_offset;     
-   mip->fixed_n = fixed_nz;
    mip_inf->binary_var_num = binary_var_num;
    mip_inf->binary_var_nz = binary_var_nz;
    mip_inf->max_row_size = max_row_size;
@@ -4370,8 +5324,10 @@ int prep_cleanup_desc(PREPdesc *P)
 	 (int)2*mip_inf->col_bin_den * max_row_size/
 	 (mip_inf->col_bin_den + max_col_size) + 1;
    }
+#endif
 
-   FREE(row_new_inds);
+   
+   //FREE(row_new_inds);
 
    if (mip->n <= 0 || mip->m <= 0){
       return PREP_SOLVED;
@@ -4483,18 +5439,27 @@ int prep_report(PREPdesc *P, int termcode)
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    printf("Column names and values of nonzeros in the solution\n");
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    for (i = 0; i < mip->fixed_n; i++){
-	       printf("%8s %10.10f\n", P->orig_mip->colname[mip->fixed_ind[i]],
-		      mip->fixed_val[i]);
+	    for(i = 0; i < P->xlength; i++){
+	       printf("%8s %10.3f\n", P->orig_mip->colname[P->xind[i]],
+		      P->xval[i]);
 	    }
+
+	    //for (i = 0; i < mip->fixed_n; i++){
+	    // printf("%8s %10.3f\n", P->orig_mip->colname[mip->fixed_ind[i]],
+	    //      mip->fixed_val[i]);
+	    //}
 	    printf("\n");
 	 } else {
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    printf("User indices and values of nonzeros in the solution\n");
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	    for (i = 0; i < mip->fixed_n; i++){
-	       printf("%7d %10.10f\n", mip->fixed_ind[i], mip->fixed_val[i]);
+	    for(i = 0; i < P->xlength; i++){
+	       printf("%7d %10.3f\n", P->xind[i], P->xval[i]);
 	    }
+
+	    //for (i = 0; i < mip->fixed_n; i++){
+	    //  printf("%7d %10.3f\n", mip->fixed_ind[i], mip->fixed_val[i]);
+	    //}
 	    printf("\n");
 	 }
 	 break;	  
@@ -4530,6 +5495,10 @@ int prep_report(PREPdesc *P, int termcode)
 	    if (stats.vars_aggregated > 0){
 	       printf("\t variables aggregated: %i\n",
 		      stats.vars_aggregated);
+	    }
+	    if (stats.vars_substituted > 0){
+	       printf("\t variables substituted: %i\n",
+		      stats.vars_substituted);
 	    }
 	    if (stats.vars_integerized > 0){
 	       printf("\t variables integerized: %i\n",
@@ -4587,7 +5556,7 @@ void prep_sos_fill_var_cnt(PREPdesc *P)
    int sos_row_size = (n >> 3) + 1;
    
    int i, j, k;
-   char * sos_final = (char *)malloc(CSIZE*sos_row_size);
+   char * sos_final = P->tmpc; //(char *)malloc(CSIZE*sos_row_size);
    int sos_cnt = 0;
    
    int *matbeg = P->mip->matbeg;
@@ -4599,7 +5568,7 @@ void prep_sos_fill_var_cnt(PREPdesc *P)
    for (i = 0; i < m; i++){
       if (rows[i].is_sos_row){
 	 prep_sos_fill_row(&rows[i], n, r_matbeg[i+1] - r_matbeg[i],
-			   &r_matind[i]);
+			   &r_matind[r_matbeg[i]]);
       }
    }
 	    
@@ -4633,7 +5602,7 @@ void prep_sos_fill_var_cnt(PREPdesc *P)
       }
    }
    
-   FREE(sos_final);   
+   //FREE(sos_final);   
    
 }
 /*===========================================================================*/
@@ -4667,9 +5636,155 @@ void free_prep_desc(PREPdesc *P)
       FREE(P->user_col_ind);
       FREE(P->user_row_ind);
       FREE(P->stats.nz_coeff_changed);
+      FREE(P->tmpi);
+      FREE(P->tmpd);
+      FREE(P->tmpc);
+
+      FREE(P->xind);
+      FREE(P->xval);
+      
       FREE(P);
    }   
 }
+/*===========================================================================*/
+/* merge the preprocessed vars with the current solution
+   note that old solution is replaced with the new solution */
+/*===========================================================================*/
+
+int prep_merge_solution(MIPdesc *orig_mip, MIPdesc *prep_mip, int *sol_xlength,
+			int **sol_xind, double **sol_xval)
+{
+   if(//!sol->has_sol || 
+      !(prep_mip->fixed_n || prep_mip->subs_n || prep_mip->fixed_zero)) return 0;      
+
+   int n = orig_mip->n;
+   
+   int fixed_n = prep_mip->fixed_n, *fixed_ind = prep_mip->fixed_ind;   
+   int aggr_n = prep_mip->aggr_n; 
+   double *fixed_val = prep_mip->fixed_val; 
+   int subs_n = prep_mip->subs_n;
+   double etol = 1e-7; /* this really should be the lp-etol */ 
+   double *proj_sol = (double *)calloc(DSIZE,n);
+   int *orig_ind = prep_mip->orig_ind; 
+   int i, j; 
+
+   int xlength = *sol_xlength;
+   int *xind  = *sol_xind;
+   double *xval = *sol_xval;
+   
+   for(i = 0; i < xlength; i++){
+      proj_sol[orig_ind[xind[i]]] = xval[i];
+   }
+
+   for(i = 0; i < fixed_n; i++){
+      proj_sol[fixed_ind[i]] = fixed_val[i];
+   }
+
+   if(subs_n > 0){
+      int sub_ind, r_beg, r_end; 
+      double sub_aval, sub_rhs, lhs; 
+      
+      for(i = subs_n - 1; i >= 0; i--){
+	 sub_ind = prep_mip->subs_ind[i];
+	 sub_aval = prep_mip->subs_aval[i];
+	 sub_rhs = prep_mip->subs_rhs[i];
+	 lhs = 0.0; 
+	 r_beg = prep_mip->subs_rbeg[i];
+	 r_end = prep_mip->subs_rbeg[i+1];
+	 for(j = r_beg; j < r_end; j++){
+	    lhs += proj_sol[prep_mip->subs_rind[j]]*prep_mip->subs_rval[j];
+	 }
+
+	 proj_sol[sub_ind] = (sub_rhs - lhs)/sub_aval;
+      }
+   }
+
+   if(aggr_n > 0){
+      int *aggr_ind = prep_mip->aggr_ind;
+      int *aggr_to_ind = prep_mip->aggr_to_ind; 
+      
+      double *orig_ub = orig_mip->ub;
+      double *orig_lb = orig_mip->lb;
+
+      int f_ind;
+      int to_ind;
+      double letol = 100*etol;
+      double avail_diff; 
+      for(i = 0; i < aggr_n; i++){
+	 to_ind = aggr_to_ind[i];
+	 f_ind = aggr_ind[i]; 
+	 avail_diff = 0.0;
+	 if(orig_ub[to_ind] < INF){
+	    if(proj_sol[to_ind] > orig_ub[to_ind] + etol){
+	       if(orig_ub[f_ind] >= INF || proj_sol[f_ind] > etol || proj_sol[f_ind] < -etol){
+		  //orig_ub[f_ind] > proj_sol[to_ind] + etol){
+		  printf("solution merge error - aggregation - exiting \n");
+		  exit(0);		  
+	       }
+
+	       avail_diff = MIN(proj_sol[to_ind] - orig_ub[to_ind], orig_ub[f_ind]);
+
+	       if(orig_mip->is_int[to_ind] || orig_mip->is_int[f_ind]){
+		  avail_diff = floor(avail_diff + letol); 
+	       }
+
+	       proj_sol[to_ind] -= avail_diff;
+	       proj_sol[f_ind] = avail_diff;
+	    }
+	 }
+	 if(orig_lb[to_ind] > -INF){
+	    if(proj_sol[to_ind] < orig_lb[to_ind] - etol){
+	       if(orig_lb[f_ind] <= -INF || proj_sol[f_ind] > etol || proj_sol[f_ind] < -etol){
+		  //orig_lb[f_ind] < proj_sol[to_ind] - etol){
+		  printf("solution merge error - aggregation - exiting \n");
+		  exit(0);		  
+	       }
+
+	       avail_diff = MAX(proj_sol[to_ind] - orig_lb[to_ind], orig_lb[f_ind]);
+
+	       if(orig_mip->is_int[to_ind] || orig_mip->is_int[f_ind]){
+		  avail_diff = ceil(avail_diff - letol); 
+	       }
+
+	       proj_sol[to_ind] -= avail_diff;
+	       proj_sol[f_ind] = avail_diff;
+
+	    }
+	 }
+      }
+   }
+
+   if(xval) 
+      FREE(xval);
+   if(xind)
+      FREE(xind);
+
+   xval = (double *)malloc(DSIZE*n);
+   xind = (int *)malloc(ISIZE*n);
+   int nz_cnt = 0;
+   for(i = 0; i < n; i++){
+      if(proj_sol[i] > etol || proj_sol[i] < -etol){
+	 xval[nz_cnt] = proj_sol[i];
+	 xind[nz_cnt] = i;
+	 nz_cnt++;
+      }
+   }
+   //sol->xlength = nz_cnt; 
+   *sol_xlength = nz_cnt;
+   *sol_xind = xind;
+   *sol_xval = xval;   
+   
+   //if(!sol_check_feasible(orig_mip, proj_sol, 1e-5)){
+   // printf("solution merge error - exiting...\n");
+   // exit(0);
+   //}
+   
+   FREE(proj_sol);
+   
+   return 0;
+   
+}
+
 /*===========================================================================*/
 /*===========================================================================*/
 
@@ -4692,3 +5807,133 @@ void free_imp_list(IMPlist **list)
 
 /*===========================================================================*/
 /*===========================================================================*/
+
+int prep_check_feasible(MIPdesc *mip, double *sol, double etol)
+{
+
+   int is_feasible = TRUE;
+   //double etol = lp_data->lpetol;
+   double check_obj = 0.0;
+   int i, j, row_ind;
+   double coeff;
+
+   int n = mip->n;
+   int m = mip->m;
+   double *row_act = (double*)calloc(DSIZE,m);
+   etol = 1e-5;
+   
+   for(i = 0; i < n; i++){
+      if(sol[i] > mip->ub[i] + etol ||
+	 sol[i] < mip->lb[i] - etol){
+	 printf("check_feasible - error col bounds: col %i - sol %f - lb %f  - ub %f \n",
+		i, sol[i], mip->lb[i], mip->ub[i]);
+	 is_feasible = FALSE;
+	 break;
+      }
+
+      if(mip->is_int[i] &&
+	 (floor(sol[i] + etol) > sol[i] + etol ||
+	  floor(sol[i] + etol) < sol[i] - etol)){
+	 printf("check_feasible - error col integrality: col %i - sol %f - lb %f  - ub %f \n",
+		i, sol[i], mip->lb[i], mip->ub[i]);
+	 is_feasible = FALSE;
+	 break;
+      }
+
+      
+      check_obj += sol[i]*mip->obj[i];
+      for(j = mip->matbeg[i]; j < mip->matbeg[i+1]; j++){
+	 row_ind = mip->matind[j];
+	 coeff = mip->matval[j];
+	 row_act[row_ind] += coeff*sol[i];
+      }
+   }
+
+   //if(is_feasible){
+   // if(check_obj > sol_obj + etol || check_obj < sol_obj - etol){
+   // printf("check_feasible - error obj: check_obj %f - sol_obj %f\n", check_obj, sol_obj);
+   // is_feasible = FALSE;
+   // 
+   //}
+   //}
+   
+   if(is_feasible){
+      //double letol = 100*etol;
+      double letol = 100*etol; 
+      for(i = 0; i < mip->m; i++){
+	 if(mip->sense[i] == 'E'){
+	    if(row_act[i] > mip->rhs[i] + letol ||
+	       row_act[i] < mip->rhs[i] - letol){
+	       is_feasible = FALSE;
+	    }
+	 }
+	 else if(mip->sense[i] == 'L'){
+	    if(row_act[i] > mip->rhs[i] + letol){
+	       is_feasible = FALSE;
+	    }
+	 }else if(mip->sense[i] == 'G'){
+	    if(row_act[i] < mip->rhs[i] - letol){
+	       is_feasible = FALSE;
+	    }
+	 }else if(mip->sense[i] == 'R'){
+	    if(row_act[i] > mip->rhs[i] + letol ||
+	       row_act[i] < mip->rhs[i] - mip->rngval[i] - letol){
+	       is_feasible = FALSE;
+	    }
+	 }else{
+	    printf("check_feasible - shouldn't come here...\n");
+	    is_feasible = FALSE;
+	 }
+	 if(!is_feasible){
+
+	    printf("check_feasible - error row act: row %i - row_act %f - sense %c - rhs %f\n", i, row_act[i], mip->sense[i],
+		   mip->rhs[i]);//, row_act[i] - mip->rhs[i]);
+
+#if 1 // for debugging 	    
+	    int nz = mip->nz;
+	    double *r_matval = (double *)malloc(nz*DSIZE);
+	    int *r_matind = (int *)malloc(nz*ISIZE);
+	    int *r_matbeg = (int *)malloc((m+1)*ISIZE);
+	    int *r_lengths = (int *)calloc(m,ISIZE);
+	    int elem_ind; 
+	    /* first get row legths */
+	    for (i = 0; i < n; i++){
+	       for (j = mip->matbeg[i]; j < mip->matbeg[i+1]; j++){
+		  r_lengths[mip->matind[j]]++;
+	       }
+	    }
+
+	    r_matbeg[0] = 0;
+
+	    /* fill in matbegs */
+	    for (i = 0; i < m; i++){
+	       r_matbeg[i + 1] = r_matbeg[i] + r_lengths[i];
+	    }
+	    
+	    for (i = 0; i < n; i++){	       
+	       for (j = mip->matbeg[i]; j < mip->matbeg[i+1]; j++){
+		  row_ind = mip->matind[j];
+		  elem_ind = r_matbeg[row_ind];
+		  r_matind[elem_ind] = i;
+		  r_matval[elem_ind] = mip->matval[j];
+		  r_matbeg[row_ind] = elem_ind + 1;
+	       }
+	    }
+
+	    for (i = 0; i < m; i++){
+	       r_matbeg[i] -= r_lengths[i];
+	    }
+
+	    FREE(r_matbeg);
+	    FREE(r_matind);
+	    FREE(r_matval);
+	    FREE(r_lengths);	    
+#endif
+	    break;
+	 }
+      }
+   }
+   FREE(row_act);
+   
+   return is_feasible;
+}

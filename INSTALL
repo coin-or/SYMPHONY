@@ -1,4 +1,4 @@
-BUILDING AND INSTALLING SYMPHONY Version 5.1.4
+BUILDING AND INSTALLING SYMPHONY Version 5.4.0
 ==============================================
 
 The following are brief instructions that should be sufficient to install
@@ -33,7 +33,7 @@ subversion because it makes it easier to obtain updates. In a Unix-like
 environment (such as Linux or CYGWIN), the following command may be used to
 obtain SYMPHONY from source using SVN in most cases:
 
-  svn co https://projects.coin-or.org/svn/SYMPHONY/stable/5.1 SYMPHONY-5.1
+  svn co https://projects.coin-or.org/svn/SYMPHONY/stable/5.4 SYMPHONY-5.4
 
 Alternatively, you can download release versions of the source code 
 from  the download page of COIN-OR:
@@ -246,18 +246,18 @@ version has some limitations. Detailed timing information is not currently
 provided. Support is only provided for running in sequential mode at this
 time.
 
-First, obtain the source code by downloading from
-\url{https://www.coin-or.org/Tarballs/SYMPHONY/}. Unpack the archive to create
-the directory \code{SYMPHONY-\VER\bs}. You now have three options.
-You can either build using the MSVC++ IDE, build on the
-command-line with MSVC++ executable, or use the NMAKE utility. 
+First, obtain the source code as described above. Unpack the archive to create
+the directory SYMPHONY-5.4.0. You now have three options. You can
+either build using the MSVC++ IDE, build on the command-line with MSVC++
+executable, or use the NMAKE utility.
 
 ******************** Building With the MSVC++ IDE ****************************
 
-These instructions are for MSVC++ Version 8. Instructions for other versions
+These instructions are for MSVC++ Version 10. Instructions for other versions
 should be similar.
 
-1. Go to 'Win32/v8' directory and open the solution file 'symphony.sln'. 
+1. Go to 'SYMPHONY/MSVisualStudio/v10' directory and open the solution file
+'symphony.sln'.
 
 2. Note that there are a number of additional preprocessor definitions that
 control the functionality of SYMPHONY. These definitions are described in
@@ -292,42 +292,39 @@ LP solvers.
 
 ***************** Building in a Windows Terminal ***************************
 
-These instructions are for MSVC++ Version 8. Instructions for other versions
+These instructions are for MSVC++ Version 10. Instructions for other versions
 should be similar.
 
-1. Open a command line terminal. Go to 'Win32/v6' directory and type 
+1. Open a command line terminal. Go to 'SYMPHONY/MSVisualStudio/v10' directory
+and type
 
-   devenv symphony.sln /build all    
+   devenv symphony.sln /Build "Debug|Win32"    
 
-This will create both the debug and release versions of SYMPHONY. If you 
-want to compile only one of them, type 
- 
-   devenv symphony.sln /build "all - debug" 
+This will create the 32-bit debug version of SYMPHONY. You can build 64-bit with
 
-or 
+   devenv symphony.sln /Build "Debug|x64"    
 
-   devenv symphony.sln /build "all - release" 
-
-For each command, the library 'libSymphony.lib' and the executable 
-'symphony' will be created in 'Debug' and/or 'Release' directories.  The 
-library, together with the header files in 'SYMPHONY\include\', can then be 
-used to call SYMPHONY from any C/C++ code. The API for calling SYMPHONY is 
+For each command, the library 'libSymphony.lib' and the executable 'symphony'
+will be created in directories acrrding to platform and configuration. The
+library, together with the header files in 'SYMPHONY\include\', can then be
+used to call SYMPHONY from any C/C++ code. The API for calling SYMPHONY is
 described in the user's manual.
 
 2. To test the executable, type 
 
-   Debug/symphony.exe -F ..\..\SYMPHONY\Datasets\sample.mps
+   symphony.exe -F ..\..\SYMPHONY\Datasets\sample.mps
 
-If you want to use the interactive optimizer, simply type  
+In the appropriate directory. If you want to use the interactive optimizer,
+simply type
 
-   Debug/symphony.exe
+   symphony.exe
 
 and then type "help" or "?" to see a list of available commands.
  
 
 3. If SYMPHONY is modified, type 
 
-   devenv symphony.sln /rebuild all 
+   devenv symphony.sln /Rebuild "Debug|Win32" 
 
 in order to clean and rebuild everything. 
 
@@ -342,7 +339,9 @@ configuring, use the command
 
 ******************** Building With the NMAKE Utility **************************
 
-1.  Go to 'Win32' directory and edit the 'sym.mak' makefile to reflect 
+Note: the sym.make file is no longer maintained.
+
+1.  Go to 'MSVisualStudio' directory and edit the 'sym.mak' makefile to reflect 
 your environment. This involves specifying the LP solver to be used, 
 assigning some variables and  setting various paths. Only minor edits 
 should be required. An explanation of what has to be set is contained in the 

@@ -178,7 +178,7 @@ int check_row_effectiveness(lp_prob *p)
       
       row = rows + (i = now_ineff[j]);
 
-      if(p->bc_level > 100 && !(row->deletable))row->deletable = TRUE;
+      //if(p->bc_level > 100 && !(row->deletable))row->deletable = TRUE;
 
       if (!row->free && row->deletable){
 	 row->free = TRUE;
@@ -271,9 +271,7 @@ void add_row_set(lp_prob *p, waiting_row **wrows, int length)
 {
    int i;
    row_data *row;
-
    add_waiting_rows(p, wrows, length);
-
    row = p->lp_data->rows + (p->lp_data->m - length);
 
    for (i=0; i<length; i++, row++){
@@ -283,7 +281,6 @@ void add_row_set(lp_prob *p, waiting_row **wrows, int length)
       row->deletable = wrows[i]->cut->deletable;
       wrows[i]->cut = NULL;
    }
-
    free_waiting_rows(wrows, length);
 }
    
@@ -385,9 +382,7 @@ void add_waiting_rows(lp_prob *p, waiting_row **wrows, int add_row_num)
 
    for (nzcnt=0, i=add_row_num-1; i>=0; i--)
       nzcnt += wrows[i]->nzcnt;
-
    size_lp_arrays(lp_data, TRUE, FALSE, add_row_num, 0, nzcnt);
-
    sense = lp_data->tmp.c; /* m */
    rhs = lp_data->tmp.d; /* m */
    REMALLOC(lp_data->tmp.dv, double, lp_data->tmp.dv_size, nzcnt, 
@@ -396,7 +391,6 @@ void add_waiting_rows(lp_prob *p, waiting_row **wrows, int add_row_num)
    rmatbeg = lp_data->tmp.i1;
    REMALLOC(lp_data->tmp.iv, int, lp_data->tmp.iv_size, nzcnt, 5*(int)BB_BUNCH);
    rmatind = lp_data->tmp.iv;
-
    *rmatbeg = 0;
    for (i = 0; i < add_row_num; i++){
       wrow = wrows[i];
@@ -406,9 +400,7 @@ void add_waiting_rows(lp_prob *p, waiting_row **wrows, int add_row_num)
       memcpy(rmatval + rmatbeg[i], wrow->matval, wrow->nzcnt * DSIZE);
       rmatbeg[i+1] = rmatbeg[i] + wrow->nzcnt;
    }
-
    add_rows(lp_data, add_row_num, nzcnt, rhs, sense, rmatbeg, rmatind,rmatval);
-
    for (i = add_row_num - 1; i >= 0; i--){
       if (sense[i] == 'R')
 	 change_range(lp_data, lp_data->m+i, wrows[i]->cut->range);

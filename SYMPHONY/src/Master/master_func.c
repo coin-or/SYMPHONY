@@ -2271,6 +2271,7 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "find_first_feasible") == 0 ||
 	    strcmp(key, "TM_find_first_feasible") == 0){
       READ_INT_PAR(tm_par->find_first_feasible);
+      lp_par->find_first_feasible = tm_par->find_first_feasible;
       return(0);
    }
    else if (strcmp(key, "sensitivity_analysis") == 0 ||
@@ -2289,6 +2290,10 @@ int set_param(sym_environment *env, char *line)
       printf("         enabled. You must rebuild SYMPHONY with these\n");
       printf("         features enabled in order to use them.\n\n");
 #endif
+      return(0);
+   }else if (strcmp(key, "output_mode") == 0 ||
+	    strcmp(key, "TM_output_mode") == 0){
+      READ_INT_PAR(tm_par->output_mode);
       return(0);
    }
 
@@ -2829,6 +2834,12 @@ int set_param(sym_environment *env, char *line)
       return(0);
    }
 
+   else if (strcmp(key, "chain_br_weighted_gap") == 0 ||
+	    strcmp(key, "LP_chain_br_weighted_gap") == 0){
+      READ_DBL_PAR(lp_par->cgl.chain_br_weighted_gap);
+      return(0);
+   }
+
    else if (strcmp(key, "max_presolve_iter") == 0 ||
 	    strcmp(key, "LP_max_presolve_iter") == 0){
       READ_INT_PAR(lp_par->max_presolve_iter);
@@ -2906,12 +2917,24 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->should_use_rel_br);
       return(0);
    }
+   else if (strcmp(key,"use_branching_prep") == 0) {
+      READ_INT_PAR(lp_par->use_branching_prep);
+      return(0);
+   }
    else if (strcmp(key,"rel_br_threshold") == 0) {
       READ_INT_PAR(lp_par->rel_br_threshold);
       return(0);
    }
    else if (strcmp(key,"rel_br_cand_threshold") == 0) {
       READ_INT_PAR(lp_par->rel_br_cand_threshold);
+      return(0);
+   }
+   else if (strcmp(key,"use_sos_branching") == 0) {
+      READ_INT_PAR(lp_par->use_sos_branching);
+      return(0);
+   }
+   else if (strcmp(key,"sos_branching_max_level") == 0) {
+      READ_INT_PAR(lp_par->sos_branching_max_level);
       return(0);
    }
    else if (strcmp(key, "compare_candidates_default") == 0 ||
@@ -2998,7 +3021,232 @@ int set_param(sym_environment *env, char *line)
       READ_DBL_PAR(lp_par->fp_min_gap);
       return(0);
    }
-
+   else if (strcmp(key, "fp_fix_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fp_fix_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "ls_enabled") == 0) {
+      READ_INT_PAR(lp_par->ls_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ls_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->ls_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "ls_frequency") == 0) {
+      READ_INT_PAR(lp_par->ls_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "ls_fix_ratio") == 0) {
+      READ_DBL_PAR(lp_par->ls_fix_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "rounding_enabled") == 0) {
+      READ_INT_PAR(lp_par->rounding_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "rounding_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->rounding_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "rounding_frequency") == 0) {
+      READ_INT_PAR(lp_par->rounding_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "shifting_enabled") == 0) {
+      READ_INT_PAR(lp_par->shifting_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "shifting_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->shifting_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "shifting_frequency") == 0) {
+      READ_INT_PAR(lp_par->shifting_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "fr_enabled") == 0) {
+      READ_INT_PAR(lp_par->fr_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "fr_dive_level") == 0) {
+      READ_INT_PAR(lp_par->fr_dive_level);
+      return(0);
+   }
+   else if (strcmp(key, "fr_frequency") == 0) {
+      READ_INT_PAR(lp_par->fr_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "fr_first_feas_enabled") == 0) {
+      READ_INT_PAR(lp_par->fr_first_feas_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "fr_max_int_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fr_max_int_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "fr_min_int_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fr_min_int_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "fr_max_c_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fr_max_c_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "fr_min_c_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fr_min_c_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "fr_incr_ratio") == 0) {
+      READ_DBL_PAR(lp_par->fr_incr_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "rs_mode_enabled") == 0) {
+      READ_INT_PAR(lp_par->rs_mode_enabled);
+      tm_par->rs_mode_enabled = lp_par->rs_mode_enabled;
+      return(0);
+   }
+   else if (strcmp(key, "rs_lp_iter_limit") == 0){
+      READ_INT_PAR(lp_par->rs_lp_iter_limit);
+      tm_par->rs_lp_iter_limit = lp_par->rs_lp_iter_limit; 
+      return(0);
+   }
+   else if (strcmp(key, "fr_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->fr_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "rs_enabled") == 0) {
+      READ_INT_PAR(lp_par->rs_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "rs_dive_level") == 0) {
+      READ_INT_PAR(lp_par->rs_dive_level);
+      return(0);
+   }
+   else if (strcmp(key, "rs_min_int_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->rs_min_int_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "rs_min_c_fixed_ratio") == 0) {
+      READ_DBL_PAR(lp_par->rs_min_c_fixed_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "rs_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->rs_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "lb_enabled") == 0) {
+      READ_INT_PAR(lp_par->lb_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "lb_dive_level") == 0) {
+      READ_INT_PAR(lp_par->lb_dive_level);
+      return(0);
+   }
+   else if (strcmp(key, "lb_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->lb_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "lb_frequency") == 0) {
+      READ_INT_PAR(lp_par->lb_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "lb_search_k") == 0) {
+      READ_INT_PAR(lp_par->lb_search_k);
+      return(0);
+   }
+   else if (strcmp(key, "lb_first_feas_enabled") == 0) {
+      READ_INT_PAR(lp_par->lb_first_feas_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_frequency") == 0) {
+      READ_INT_PAR(lp_par->ds_frequency);
+      return(0);
+   }
+   else if (strcmp(key, "ds_fractional_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_fractional_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_fractional_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_fractional_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_vlength_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_vlength_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_vlength_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_vlength_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_euc_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_euc_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_euc_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_euc_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_guided_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_guided_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_guided_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_guided_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_crossover_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_crossover_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_crossover_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_crossover_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_root_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_root_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_coeff_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_coeff_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_pc_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_pc_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_rank_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_rank_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_rank_fix_enabled") == 0) {
+      READ_INT_PAR(lp_par->ds_rank_fix_enabled);
+      return(0);
+   }
+   else if (strcmp(key, "ds_incr_ratio") == 0) {
+      READ_DBL_PAR(lp_par->ds_incr_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "ds_solve_ip") == 0) {
+      READ_INT_PAR(lp_par->ds_solve_ip);
+      return(0);
+   }
+   else if (strcmp(key, "ds_solve_ip_col_ratio") == 0) {
+      READ_DBL_PAR(lp_par->ds_solve_ip_col_ratio);
+      return(0);
+   }
+   else if (strcmp(key, "ds_solve_ip_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->ds_solve_ip_min_gap);
+      return(0);
+   }
+   else if (strcmp(key, "ds_min_gap") == 0) {
+      READ_DBL_PAR(lp_par->ds_min_gap);
+      return(0);
+   }
    /***********************************************************************
     ***                     cut_gen parameters                          ***
     ***********************************************************************/
@@ -3275,11 +3523,11 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	 mip_copy->colname = (char**)calloc(sizeof(char*), mip_copy->n);
 	 
 	 for(i=0; i<mip_copy->n; i++){
-	    /* FIXME! Resctricting col_name to 20 chars! */
+	    /* FIXME! Resctricting col_name to 30 chars! */
 	    if(mip->colname[i]){
-	       mip_copy->colname[i] = (char*)malloc(CSIZE*20);
-	       strncpy(mip_copy->colname[i], mip->colname[i], 20); 
-	       mip_copy->colname[i][19] = 0;
+	       mip_copy->colname[i] = (char*)malloc(CSIZE*30);
+	       strncpy(mip_copy->colname[i], mip->colname[i], 30); 
+	       mip_copy->colname[i][29] = 0;
 	    }
 	 }
       }

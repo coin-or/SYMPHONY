@@ -102,7 +102,8 @@ typedef struct PREP_STATS
    int bounds_integerized;
    int vars_aggregated;
    int vars_integerized;
-
+   int vars_substituted;
+   
    /* regarding coeffs changes and bounds tightening */
    int coeffs_changed;
    char *nz_coeff_changed; 
@@ -188,6 +189,9 @@ typedef struct PREPDesc
    prep_stats stats; 
    prep_params params;
 
+   int has_ub;
+   double ub; 
+
    /* for logical fixing */
    int impl_limit; 
    //int impl_var_cnt; /* fixed ones */
@@ -223,6 +227,17 @@ typedef struct PREPDesc
    double impl_array_time;
    double impl_cols_time;
    double impl_rows_time;
+
+   /* keep sol if prep solve the problem */
+   int      xlength;
+   int     *xind;
+   double  *xval;
+   
+   /* temp arrays*/
+   int    *tmpi; /* size max(n,m) */
+   double *tmpd;
+   char   *tmpc; 
+
 }PREPdesc;
 
 /*===========================================================================*/
@@ -239,6 +254,27 @@ typedef struct PREP_ENVIRONMENT{
    prep_params params;
    int termcode;
 }prep_environment;
+
+/*===========================================================================*/
+/* Helper data structures */
+/* -to be used while searching duplicate rows and cols*/
+typedef struct RC_DUP_DESC{
+   int check_rows;
+   int check_cols;
+
+   char *col_orig_type;
+   int *col_del_ind;
+   int *col_fix_type;
+   double *col_fix_val;
+
+   double *col_sum;
+   double *col_factor;
+   int *c_loc;
+
+   double *row_sum;
+   double *row_factor;
+   int *r_loc;
+}rc_dup_desc;
 
 /*===========================================================================*/
 
@@ -311,6 +347,13 @@ int prep_deleted_row_update_info(MIPdesc *mip, int row_ind);
 /* try to find duplicate rows and columns */
 int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows, 
 				    char check_cols);
+/* try to substitute cols */
+int prep_substitute_cols(PREPdesc *P);
+
+int prep_update_single_row_attributes(ROWinfo *rows, int row_ind, double a_val,
+				      double obj, double c_lb, double c_ub,
+				      int is_int, int var_type, double etol,
+				      int entry_loc);
 /* utility functions */
 void prep_sos_fill_var_cnt(PREPdesc *P);
 void prep_sos_fill_row(ROWinfo *row, int alloc_size, int size,
@@ -330,6 +373,11 @@ int prep_declare_coef_change(int row_ind, int col_ind,
 			     double rhs);
 int prep_report(PREPdesc *P, int termcode);
 
+int prep_merge_solution(MIPdesc *orig_mip, MIPdesc *prep_mip, int *sol_xlength,
+			int **sol_xind, double **sol_xval);
+
+int prep_check_feasible(MIPdesc *mip, double *sol, double etol);
+   
 /* implications - under development*/
 int prep_add_to_impl_list(IMPlist *list, int ind, int fix_type, 
 			  double val);
@@ -379,6 +427,7 @@ int sr_solve_open_prob(PREPdesc *P, SRdesc *sr, int obj_ind,
 		       int *r_matind, double *r_matval, COLinfo *cols, 
 		       double *ub, double *lb, double etol);
 
+void free_rc_dup_desc(rc_dup_desc *prep_desc);
 void free_prep_desc(PREPdesc *P);
 void free_sr_desc(SRdesc *sr);
 void free_imp_list(IMPlist **list);

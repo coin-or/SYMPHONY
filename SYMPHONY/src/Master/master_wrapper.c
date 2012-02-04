@@ -708,27 +708,57 @@ int display_solution_u(sym_environment *env, int thread_num)
        case USER_DEFAULT:
 	  if (sol.xlength){
 	     if (env->mip->colname){ 
-		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-		printf("Column names and values of nonzeros in the solution\n");
-		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++");
+		printf("\n");
+		printf("Column names and values of nonzeros in the solution");
+		printf("\n");
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++");
+		printf("\n");
+
+		char **colname;
+		if(env->orig_mip) colname = env->orig_mip->colname;
+		else colname = env->mip->colname;
+		
 		for (i = 0; i < sol.xlength; i++){
 		   if (sol.xind[i] == env->mip->n){
 		      continue;
 		   }
-		   printf("%8s %10.10f\n", env->mip->colname[sol.xind[i]],
+		   printf("%-30s %10.3f\n", colname[sol.xind[i]],
 			  sol.xval[i]);
 		}
+		
+		/*
+		for (i = 0; i < sol.xlength; i++){
+		   if (sol.xind[i] == env->mip->n){
+		      continue;
+		   }
+		   printf("%8s %10.3f\n", env->mip->colname[sol.xind[i]],
+			  sol.xval[i]);
+		}
+
 		for (i = 0; i < env->mip->fixed_n; i++){
 		   printf("%8s %10.10f\n",
 			  env->orig_mip->colname[env->mip->fixed_ind[i]],
 			  env->mip->fixed_val[i]);
 		}
-		
+		*/
 		printf("\n");
 	     }else{
-		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-		printf("User indices and values of nonzeros in the solution\n");
-		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++");
+		printf("\n");
+		printf("User indices and values of nonzeros in the solution");
+		printf("\n");
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++");
+		printf("\n");
+
+		for (i = 0; i < sol.xlength; i++){
+		   if (sol.xind[i] == env->mip->n){
+		      continue;
+		   }
+		   printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+		}
+		
+		/*
 		for (i = 0; i < sol.xlength; i++){
 		   if (sol.xind[i] == env->mip->n){
 		      continue;
@@ -745,7 +775,11 @@ int display_solution_u(sym_environment *env, int thread_num)
 		   printf("%7d %10.10f\n", env->mip->fixed_ind[i],
 			  env->mip->fixed_val[i]);
 		}
+		*/
+		
 		printf("\n");
+
+
 	     }
 	     
 	     return(FUNCTION_TERMINATED_NORMALLY);

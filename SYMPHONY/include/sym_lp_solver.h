@@ -182,7 +182,13 @@ typedef struct LPDATA{
    int        maxnz;       /* space is allocated for this many nonzeros */
    double    *random_hash;
    double    *heur_solution; /* space for heur solution */
+   double    *col_solution; /* space for old ip solution - used for heuristics*/
 
+   double    *hashes; /* per iter */
+   int        hashes_num; 
+   int       *accepted_ind;
+   int        accepted_num;
+   
    char       ordering;    /* COLIND_AND_USERIND_ORDERED, COLIND_ORDERED or
 			      USERIND_ORDERED */
    var_desc **vars;        /* maxn */ /* BB */
@@ -201,13 +207,21 @@ typedef struct LPDATA{
    
    row_data  *rows;      /* maxm */
 
-   temporary  tmp;
+   temporary  tmp;  /* to be used in some heurs and elsewhere */
+
+   int        tmp1_size; 
+   int        tmp2_size; 
+   temporary  tmp1;  /* to be used in recursive heurs */
+   temporary  tmp2;  /* to be used in branching routines */
+
 #ifdef PSEUDO_COSTS
    double     *pseudo_costs_one;
    double     *pseudo_costs_zero;
 #endif
    int         lp_count;
    cgl_params  cgl;
+
+   int        *frac_var_cnt;
 
 }LPdata;
 
