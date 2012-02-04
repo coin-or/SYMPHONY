@@ -164,15 +164,19 @@ int user_free_cg(void **user)
 #endif
 /*___END_EXPERIMENTAL_SECTION___*/
 #pragma omp master
-   FREE(vrp->demand);
-   FREE(vrp->edges);
-   FREE(vrp->in_set);
-   FREE(vrp->ref);
-   FREE(vrp->new_demand);
-   FREE(vrp->cut_val);
-   FREE(vrp->cut_list);
+   {
+#if 0
+      FREE(vrp->demand);
+      FREE(vrp->edges);
+      FREE(vrp->in_set);
+      FREE(vrp->ref);
+      FREE(vrp->new_demand);
+      FREE(vrp->cut_val);
+      FREE(vrp->cut_list);
    
-   FREE(*user);
+      FREE(*user);
+#endif
+   }
 
    return(USER_SUCCESS);
 }

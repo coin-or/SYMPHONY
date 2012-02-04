@@ -976,10 +976,12 @@ int user_free_lp(void **user)
 #ifndef COMPILE_IN_CG
    FREE(vrp->demand);
 #endif
+#if 0
    FREE(vrp->costs);
    FREE(vrp->edges);
    FREE(vrp->cur_sol);
    FREE(vrp);
+#endif
    return(USER_SUCCESS);
 }
 

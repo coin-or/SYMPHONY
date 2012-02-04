@@ -597,7 +597,8 @@ int user_send_cg_data(void *user, void **user_cg)
    vrp_cg->par = vrp->cg_par;
    vrp_cg->numroutes = vrp->numroutes;
    vertnum = vrp_cg->vertnum = vrp->vertnum;
-   vrp_cg->demand = vrp->demand;
+   vrp_cg->demand = (int *) malloc(vrp->vertnum*sizeof(int));
+   memcpy(vrp_cg->demand, vrp->demand, vrp->vertnum*sizeof(int));
    vrp_cg->capacity = vrp->capacity;
    vrp_cg->dg_id = vrp->dg_id;
    
