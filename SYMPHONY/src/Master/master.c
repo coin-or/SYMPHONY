@@ -1400,8 +1400,10 @@ int sym_solve(sym_environment *env)
       printf("\n****************************************************\n");
       if (termcode == TM_OPTIMAL_SOLUTION_FOUND){
 	 printf(  "* Optimal Solution Found                           *\n");
-      }else if (termcode == TM_NO_SOLUTION || termcode == TM_UNBOUNDED){
-	 printf(  "* Branch and Cut Finished                          *\n");
+      }else if (termcode == TM_UNBOUNDED){
+	 printf(  "* Relaxation Unbounded                             *\n");
+      }else if (termcode == TM_NO_SOLUTION){
+	 printf(  "* Problem Infeasible                               *\n");
       }else if (termcode == TM_TIME_LIMIT_EXCEEDED){
 	 printf(  "* Time Limit Reached                               *\n");
       }else if (termcode == TM_NODE_LIMIT_EXCEEDED){
