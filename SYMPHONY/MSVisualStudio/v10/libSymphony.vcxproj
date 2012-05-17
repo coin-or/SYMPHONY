@@ -26,21 +26,25 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v90</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -48,39 +52,37 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+    <Import Project="..\..\..\BuildTools\MSVisualStudio\v10\Common.props" />
+    <Import Project="..\..\..\BuildTools\MSVisualStudio\v10\Release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+    <Import Project="..\..\..\BuildTools\MSVisualStudio\v10\Common.props" />
+    <Import Project="..\..\..\BuildTools\MSVisualStudio\v10\Debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+    <Import Project="..\..\..\BuildTools\MSVisualStudio\v10\Common.props" />
+    <Import Project="..\..\..\BuildTools\MSVisualStudio\v10\Release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+    <Import Project="..\..\..\BuildTools\MSVisualStudio\v10\Common.props" />
+    <Import Project="..\..\..\BuildTools\MSVisualStudio\v10\Debug.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\include;..\..\..\BuildTools\headers;..\..\..\CoinUtils\inc;..\..\..\CoinUtils\src;..\..\..\Osi\src\Osi;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Clp\src;..\..\..\Clp\src\OsiClp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SYMPHONY_BUILD;WIN32;_DEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
       <WarningLevel>Level2</WarningLevel>
@@ -104,12 +106,10 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\include;..\..\..\BuildTools\headers;..\..\..\CoinUtils\inc;..\..\..\CoinUtils\src;..\..\..\Osi\src\Osi;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Clp\src;..\..\..\Clp\src\OsiClp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SYMPHONY_BUILD;WIN32;_DEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
       <WarningLevel>Level2</WarningLevel>
@@ -131,13 +131,11 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\..\include;..\..\..\BuildTools\headers;..\..\..\CoinUtils\inc;..\..\..\CoinUtils\src;..\..\..\Osi\src\Osi;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Clp\src;..\..\..\Clp\src\OsiClp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SYMPHONY_BUILD;WIN32;NDEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level2</WarningLevel>
@@ -163,13 +161,12 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\..\include;..\..\..\BuildTools\headers;..\..\..\CoinUtils\inc;..\..\..\CoinUtils\src;..\..\..\Osi\src\Osi;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Clp\src;..\..\..\Clp\src\OsiClp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SYMPHONY_BUILD;WIN32;NDEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level2</WarningLevel>
