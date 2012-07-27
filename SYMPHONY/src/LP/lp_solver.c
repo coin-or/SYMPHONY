@@ -345,7 +345,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    indices = (int *) malloc(ISIZE * (mip->n + 1));
    values = (double *) malloc(DSIZE * (mip->n + 1));
 
-   if (glp_get_obj_dir(prob) == GLP_MAX){
+   if (glp_get_obj_dir(prob) == GLP_MIN){
       mip->obj_sense = SYM_MINIMIZE;
       for (int i = 0; i < mip->n; i++){
 	 mip->obj[i] = glp_get_obj_coef(prob, i+1);
@@ -358,7 +358,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    }
    mip->obj_offset = glp_get_obj_coef(prob, 0);
    
-   for(i = 0; i < mip->m + 1; i++){      
+   for(i = 1; i < mip->m + 1; i++){      
       mip->nz += glp_get_mat_row(prob, i+1, NULL, NULL); 
    }
 
@@ -375,7 +375,7 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 
    matbeg[0] = 0;
    nonzeros = 0;
-   for(i = 0, k = 0; i < mip->m; i++){
+   for(i = 1, k = 0; i < mip->m + 1; i++){
       /* read the nonzeros in row i+1 */     
       length = glp_get_mat_row(prob, i+1, indices, values); 
       /* get the row bounds. we use k instead of i since we have the obj 
