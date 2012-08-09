@@ -27806,8 +27806,7 @@ fi
 
 
 if test $sym_lp_solver = clp &&
-test $coin_has_clp != unavailable &&
-test $coin_has_clp != skipping; then
+test $coin_has_clp = yes; then
   CLP_LP_SOLVER_TRUE=
   CLP_LP_SOLVER_FALSE='#'
 else
@@ -27818,7 +27817,7 @@ fi
 
 
 if test $sym_lp_solver = glpk &&
-test $coin_has_glpk = true; then
+test $coin_has_glpk = yes; then
   GLPK_LP_SOLVER_TRUE=
   GLPK_LP_SOLVER_FALSE='#'
 else
@@ -27829,7 +27828,7 @@ fi
 
 
 if test $sym_lp_solver = osl &&
-test $coin_has_osl = true; then
+test $coin_has_osl = yes; then
   OSL_LP_SOLVER_TRUE=
   OSL_LP_SOLVER_FALSE='#'
 else
@@ -27839,8 +27838,8 @@ fi
 
 
 
-if test $sym_lp_solver = cplex&&
-test $coin_has_cpx = true; then
+if test $sym_lp_solver = cplex &&
+test $coin_has_cpx = yes; then
   CPLEX_LP_SOLVER_TRUE=
   CPLEX_LP_SOLVER_FALSE='#'
 else
@@ -27851,7 +27850,7 @@ fi
 
 
 if test $sym_lp_solver = soplex &&
-test $coin_has_spx = true; then
+test $coin_has_spx = yes; then
   SOPLEX_LP_SOLVER_TRUE=
   SOPLEX_LP_SOLVER_FALSE='#'
 else
@@ -27862,7 +27861,7 @@ fi
 
 
 if test $sym_lp_solver = xpress &&
-test $coin_has_xpr = true; then
+test $coin_has_xpr = yes; then
   XPRESS_LP_SOLVER_TRUE=
   XPRESS_LP_SOLVER_FALSE='#'
 else

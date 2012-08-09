@@ -428,14 +428,18 @@ int fp_initialize_lp_solver(lp_prob *p, LPdata *new_lp_data, FPdata *fp_data,
   
    /* used because we can not call si directly */
    copy_lp_data(lp_data,new_lp_data);
+#ifdef __OSI_CLP__
    new_lp_data->si->setupForRepeatedUse(3,0); 
-
+#endif
+   
 #ifdef COMPILE_IN_LP
    if(p->mip->matbeg){
      double mat_den = (1.0)*p->mip->nz/(p->mip->m * p->mip->n + 1);
+#ifdef __OSI_CLP__
      if(p->mip->nz > 1e5 && mat_den > 0.01){
        new_lp_data->si->setupForRepeatedUse(0,0); 
      }
+#endif
    }
 #endif
 

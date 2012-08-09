@@ -173,18 +173,17 @@ if test $found_package = false; then
 fi
 
 AM_CONDITIONAL(CLP_LP_SOLVER,[test $sym_lp_solver = clp &&
-test $coin_has_clp != unavailable &&
-test $coin_has_clp != skipping])
+test $coin_has_clp = yes])
 AM_CONDITIONAL(GLPK_LP_SOLVER,[test $sym_lp_solver = glpk &&
-test $coin_has_glpk = true])
+test $coin_has_glpk = yes])
 AM_CONDITIONAL(OSL_LP_SOLVER,[test $sym_lp_solver = osl &&
-test $coin_has_osl = true])
-AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $sym_lp_solver = cplex&&
-test $coin_has_cpx = true])
+test $coin_has_osl = yes])
+AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $sym_lp_solver = cplex &&
+test $coin_has_cpx = yes])
 AM_CONDITIONAL(SOPLEX_LP_SOLVER,[test $sym_lp_solver = soplex &&
-test $coin_has_spx = true])
+test $coin_has_spx = yes])
 AM_CONDITIONAL(XPRESS_LP_SOLVER,[test $sym_lp_solver = xpress &&
-test $coin_has_xpr = true])
+test $coin_has_xpr = yes])
 
 #############################################################################
 #                       Add the options                                     #
