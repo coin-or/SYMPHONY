@@ -4,10 +4,12 @@
 #if defined(_MSC_VER) || defined (__MNO_CYGWIN)
 #include <time.h>
 
+#ifndef __MINGW64__
 struct timeval {
     long    tv_sec;         /* seconds */
     long    tv_usec;        /* and microseconds */
 };
+#endif
 
 struct rusage {
        struct timeval   ru_utime;   /* user time used */
