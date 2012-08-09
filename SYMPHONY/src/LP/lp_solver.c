@@ -2294,9 +2294,11 @@ void open_lp_solver(LPdata *lp_data)
    /* Turn off the OSL messages (There are LOTS of them) */
    lp_data->si->setHintParam(OsiDoReducePrint);
    lp_data->si->messageHandler()->setLogLevel(0);
+#ifdef __OSI_CLP__
    lp_data->si->setupForRepeatedUse();
    //lp_data->si->setupForRepeatedUse(2,0);
    //lp_data->si->getModelPtr()->setFactorizationFrequency(200);
+#endif
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
 #else   
@@ -2561,7 +2563,15 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
 
-    
+#ifdef __OSI_CLP__
+   int sp = si->specialOptions();
+   if((sp&2) != 0) sp ^=2; 
+   si->setSpecialOptions(sp);
+   //si->setSpecialOptions(0x80000000);
+   si->getModelPtr()->setPerturbation(50);    
+   //si->getModelPtr()->setFactorizationFrequency(150); 
+   //si->getModelPtr()->setSubstitution(3);
+#endif
    si->resolve();
    //si->initialSolve();
    
