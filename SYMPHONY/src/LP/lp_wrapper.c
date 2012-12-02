@@ -900,23 +900,10 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	 true_objval = SYM_INFINITY;
       }
       
-      //if((is_last_iter || branching)){// && p->bc_level <= 20){
-	 
       p->var_rank_cnt++;
       for(i = 0; i < n; i++){
 
 	 p->var_rank[i] += (fabs(x[i] - floor(x[i] + lpetol100)) > lpetol100 ? 1.0 : 0.0);
-	 
-	 //p->var_rank[i] += x[i];
-	 //	  if(fabs(x[i] - floor(x[i] + lpetol100)) > lpetol100){// && 
-	 //	    p->var_rank[i] = (p->var_rank[i] * (p->lp_stat.lp_node_calls - 1) +
-	 //		      (x[i] - floorx))/(p->lp_stat.lp_node_calls);
-	 //	  }
-	 
-	 //double floorx = floor(x[i]);
-	 // if(fabs(x[i] - floor(x[i] + lpetol100)) > lpetol100){// && 
-	 //  p->var_rank[i] += (x[i] - floorx);
-	 // }
 	 
       }
 
@@ -975,9 +962,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
 	 p->par.ds_enabled && dual_gap > p->par.ds_min_gap && !branching && 
-	 //(is_last_iter || (!is_last_iter && cnt < 200)) && //p->bc_level < 1 && p->lp_stat.ds_calls < 5)) && 
-	 //((p->bc_level >= 1 && p->lp_stat.ds_last_call_ind != p->bc_index) || 
-	 //(p->bc_level < 1 && p->lp_stat.ds_last_call_ind == p->bc_index)) && 
 	 (p->bc_level % p->par.ds_frequency == 0)){
 	 if (diving_search(p, &true_objval, col_sol, heur_solution, is_last_iter, t_lb)){
 	  feasible = IP_HEUR_FEASIBLE;
@@ -991,9 +975,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	  apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
 	  check_ls = FALSE; 
 	}	     
-	//if(p->bc_index < 1 && is_last_iter){
-	// p->lp_stat.ds_last_call_ind = -1; /* we don't want to try diving again at root node */
-	//}
       }	 
 
       if (user_res == TEST_INTEGRALITY && feasible != IP_FEASIBLE && feasible != IP_HEUR_FEASIBLE) {
@@ -1040,9 +1021,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
 	 p->par.rs_enabled && dual_gap > rs_min_gap && !branching && p->par.rs_dive_level > 0 && 
-	 //((p->bc_level >= 1 && p->lp_stat.rs_last_call_ind != p->bc_index) ||  
-	 // (p->bc_level < 1 && p->lp_stat.rs_calls < 1)) &&  
-	 //(p->bc_level < 1 || feasible != IP_HEUR_FEASIBLE) && 
 	 is_last_iter && 
 	 (p->lp_stat.rs_calls - p->lp_stat.rs_last_sol_call <= 20) && 
 	 (p->tm->stat.analyzed < 10000 ||
@@ -1062,27 +1040,17 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	}
       }
 
-      //if(is_last_iter){
-      //	printf("CHECK %i %i %f %f %f\n", p->bc_level, p->tm->stat.analyzed, dual_gap, 
-      //	       p->has_ub? p->ub : 0.0, p->lp_data->objval);
-      //}
-
       double fr_min_gap = 0.5;
       if(p->bc_index >= 0) fr_min_gap = p->par.fr_min_gap;
       
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
 	 p->par.fr_enabled && dual_gap > fr_min_gap && !branching && p->par.fr_dive_level > 0 && 
-	 //((p->bc_level >= 1 && p->lp_stat.fr_last_call_ind != p->bc_index) ||  
-	 //(p->bc_level < 1)) && //p->lp_stat.fr_calls < 1)) &&  
-	 //(p->bc_level < 1 || feasible != IP_HEUR_FEASIBLE) && 
-	 is_last_iter && //p->bc_level < 50 && 
+	 is_last_iter && //p->bc_level < 50 &&
 	 (p->lp_stat.fr_calls - p->lp_stat.fr_last_sol_call <= 20) && 
-	 (p->bc_level < 1 || (//p->tm->stat.analyzed/100.0 < 1 && 
-			      //p->bc_level <= 3*p->par.fr_frequency && 
-			      //p->tm->stat.analyzed < 500 && 
-			      reg_factor % reg_base == 0)) &&
+	 (p->bc_level < 1 || (reg_factor % reg_base == 0)) &&
 	 (p->tm->stat.analyzed < 10000 || 
 	  (p->tm->stat.analyzed <  100000 && !p->has_ub))){ 
+
 	 if(restricted_search (p, &true_objval, col_sol, heur_solution, FR_SEARCH, t_lb)){
 	  feasible    = IP_HEUR_FEASIBLE;
 	  memcpy(col_sol, heur_solution, DSIZE*lp_data->n); //no need -- 
@@ -1096,27 +1064,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	  check_ls = FALSE; 
 	}
       }
-#if 0
-      double lb_min_gap = p->par.lb_min_gap;
-      
-      if(p->par.lb_enabled && dual_gap > lb_min_gap &&
-	 (feasible == IP_HEUR_FEASIBLE || feasible == IP_FEASIBLE) && 
-	 (p->lp_stat.lb_calls - p->lp_stat.lb_last_sol_call <= 20) && 
-	 (p->bc_level < 1 || reg_factor % reg_base == 0)){
-	 if(lbranching_search (p, &true_objval, col_sol, heur_solution, double t_lb)){
-	    feasible    = IP_HEUR_FEASIBLE;
-	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);	  
-	    if(true_objval > t_lb + lpetol100){
-	       dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
-				p->mip->obj_sense);
-	    }else{
-	       dual_gap = 1e-4;
-	    }
-	    /* do local search inside lbranching */
-	    apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
-	 }
-      }
-#endif      
    }
 
    if(user_res == TEST_INTEGRALITY &&
@@ -1142,8 +1089,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       double lb_min_gap = p->par.lb_min_gap;
 
       if(p->par.lb_enabled && dual_gap > lb_min_gap && p->par.lb_dive_level > 0){
-	 //(p->lp_stat.lb_calls - p->lp_stat.lb_last_sol_call <= 20) &&
-	 //(p->bc_level < 1 || reg_factor % reg_base == 0)){
 	 if(lbranching_search (p, &true_objval, col_sol, heur_solution, t_lb)){
 	    if(feasible == IP_FEASIBLE) force_heur_sol = TRUE; 
 	    memcpy(col_sol, heur_solution, DSIZE*lp_data->n);

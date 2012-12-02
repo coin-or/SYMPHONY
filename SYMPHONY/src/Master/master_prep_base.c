@@ -4631,7 +4631,7 @@ int prep_initialize_mipinfo(PREPdesc *P)
    
    //mip->mip_inf = mip_inf;  
 
-   if (bin_sos_row_cnt){
+   if (p_level > 2 && bin_sos_row_cnt){
       prep_sos_fill_var_cnt(P);
    }
 

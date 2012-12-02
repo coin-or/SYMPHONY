@@ -1080,8 +1080,10 @@ void print_statistics(node_times *tim, problem_stat *stat,
 	    }
 	    printf("%10.2f ", tim->ds_type[i]);
 	    if (lp_stat->ds_type_calls[i] > 0)
-	      printf ("%12i %12i %12i",lp_stat->ds_type_calls[i], 
-		      lp_stat->ds_type_num_sols[i], lp_stat->ds_type_num_iter[i]);
+	       printf ("%12i %12i",lp_stat->ds_type_calls[i], 
+		      lp_stat->ds_type_num_sols[i]);
+	    //printf ("%12i %12i %12i",lp_stat->ds_type_calls[i], 
+	    //lp_stat->ds_type_num_sols[i], lp_stat->ds_type_num_iter[i]);
 	    printf ("\n");
 	  }
 	} else {
@@ -1090,7 +1092,8 @@ void print_statistics(node_times *tim, problem_stat *stat,
 
 	printf ("%-22s %10.2f ", "Feasibility Pump", tim->fp);
 	if (lp_stat->fp_calls > 0)
-	  printf ("%12i %12i %12i",lp_stat->fp_calls, lp_stat->fp_num_sols, lp_stat->fp_num_iter);
+	   // printf ("%12i %12i %12i",lp_stat->fp_calls, lp_stat->fp_num_sols, lp_stat->fp_num_iter);
+	   printf ("%12i %12i",lp_stat->fp_calls, lp_stat->fp_num_sols);
 	printf ("\n");	
 
 	printf ("%-22s %10.2f ", "Local Search", tim->ls);
