@@ -73,6 +73,7 @@ void OSL_check_error PROTO((const char *erring_func));
 #endif
 
 #ifdef __OSI_CPLEX__
+#include "cplex.h"
 #include "OsiCpxSolverInterface.hpp"
 typedef OsiCpxSolverInterface OsiXSolverInterface;
 #endif
