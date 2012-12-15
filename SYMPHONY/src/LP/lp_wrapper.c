@@ -962,7 +962,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
 	 p->par.ds_enabled && dual_gap > p->par.ds_min_gap && !branching && 
-	 (p->bc_level % p->par.ds_frequency == 0)){
+	 (p->bc_level % p->par.ds_frequency == 0) && is_last_iter ){// && p->bc_level < 1){
 	 if (diving_search(p, &true_objval, col_sol, heur_solution, is_last_iter, t_lb)){
 	  feasible = IP_HEUR_FEASIBLE;
 	  memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
@@ -1045,7 +1045,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       
       if((!p->par.disable_obj || (p->par.disable_obj && p->bc_level < 10)) && 
 	 p->par.fr_enabled && dual_gap > fr_min_gap && !branching && p->par.fr_dive_level > 0 && 
-	 is_last_iter && //p->bc_level < 50 &&
+	 is_last_iter && //p->bc_level < 1 &&
 	 (p->lp_stat.fr_calls - p->lp_stat.fr_last_sol_call <= 20) && 
 	 (p->bc_level < 1 || (reg_factor % reg_base == 0)) &&
 	 (p->tm->stat.analyzed < 10000 || 

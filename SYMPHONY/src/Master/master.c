@@ -444,7 +444,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->sos_branching_max_level = 10;
 
    /* feasibility pump */
-   lp_par->fp_enabled          = SYM_FEAS_PUMP_DEFAULT;
+   lp_par->fp_enabled          = SYM_FEAS_PUMP_DISABLE;//SYM_FEAS_PUMP_DEFAULT;
    lp_par->fp_max_cycles       = 100;
    lp_par->fp_time_limit       = 50;
    lp_par->fp_display_interval = 10;
@@ -459,12 +459,12 @@ int sym_set_defaults(sym_environment *env)
    lp_par->fr_enabled   = TRUE;
    lp_par->fr_frequency   = 10;
    lp_par->fr_first_feas_enabled = TRUE;
-   lp_par->fr_max_int_fixed_ratio = 0.85;
-   lp_par->fr_min_int_fixed_ratio = 0.1;
-   lp_par->fr_max_c_fixed_ratio = 0.2;
-   lp_par->fr_min_c_fixed_ratio = 0.1;
-   lp_par->fr_incr_ratio = 0.01; 
-   lp_par->fr_min_gap = 5.0;
+   lp_par->fr_max_int_fixed_ratio = 0.95;
+   lp_par->fr_min_int_fixed_ratio = 0.80;
+   lp_par->fr_max_c_fixed_ratio = 0.0;
+   lp_par->fr_min_c_fixed_ratio = 0.0;
+   lp_par->fr_incr_ratio = 0.03; 
+   lp_par->fr_min_gap = 1.0;
    lp_par->fr_dive_level = 2; 
    
    lp_par->rs_mode_enabled = tm_par->rs_mode_enabled; 
@@ -472,15 +472,15 @@ int sym_set_defaults(sym_environment *env)
    
    /* rins search */
    lp_par->rs_enabled   = TRUE;
-   lp_par->rs_min_int_fixed_ratio = 0.80;
-   lp_par->fr_min_c_fixed_ratio = 0.20;
-   lp_par->rs_min_gap = 5.0;
+   lp_par->rs_min_int_fixed_ratio = 0.90;
+   lp_par->fr_min_c_fixed_ratio = 0.0;
+   lp_par->rs_min_gap = 1.0;
    lp_par->rs_dive_level = 2; 
    
    /* local branching */
    lp_par->lb_enabled   = TRUE;
    lp_par->lb_frequency   = 10;
-   lp_par->lb_min_gap = 5.0;
+   lp_par->lb_min_gap = 1.0;
    lp_par->lb_search_k = 10;
    lp_par->lb_first_feas_enabled = 0;   
    lp_par->lb_dive_level = 2; 
@@ -586,7 +586,7 @@ int sym_set_defaults(sym_environment *env)
    prep_par->max_aggr_row_ratio = 0.1;
    prep_par->keep_row_ordered = 1;
    prep_par->keep_track = 0;
-   prep_par->time_limit = 50;
+   prep_par->time_limit = 500;
 
    return(termcode);
 }
@@ -3236,7 +3236,7 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
 
    sol = env->best_sol;
 
-   if (!sol.xlength || sol.xlength && (!sol.xind || !sol.xval)){
+   if (!sol.xlength || (sol.xlength && (!sol.xind || !sol.xval))){
       if(env->par.verbosity >= 1){
 	 printf("sym_get_col_solution(): There is no solution!\n");
       }

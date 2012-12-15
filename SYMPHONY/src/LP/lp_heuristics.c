@@ -1097,6 +1097,8 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
   //double etol = lp_data->lpetol; 
   //double etol100 = etol*100;
   int n = lp_data->n;
+  int m = lp_data->m;
+  int nz = lp_data->nz; 
   int has_ub = FALSE;
   double ub, lb, obj_ub = 0;
   int d_cnt = 0; 
@@ -1110,9 +1112,17 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
   }else if((has_ub = p->has_ub)) obj_ub = p->ub;
 
   double dual_gap = 100;
+  
+  lp_iter_limit = (p->lp_stat.lp_total_iter_num/(p->lp_stat.lp_calls -
+						 p->lp_stat.str_br_lp_calls -
+						 p->lp_stat.fp_lp_calls + 1) + 1);
 
-  if(has_ub){
-    dual_gap = d_gap(obj_ub, t_lb, 
+  if (nz > 1e6 || lp_iter_limit > 5e3 || p->tm->stat.analyzed > 1) return FALSE;
+
+  
+  if(has_ub){// || nz > 1.5e5){
+     //return FALSE; //only call ds when has_ub = false 
+     dual_gap = d_gap(obj_ub, t_lb, 
 		     p->mip->obj_offset, p->mip->obj_sense);
   }
 
@@ -1194,7 +1204,7 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
       if(check_fix && 
 	 (p->lp_stat.ds_type_num_sols[d_type] > 0 ||
 	  p->lp_stat.ds_type_calls[d_type] < 5*d_factor))
-        diving_type[d_cnt++] = d_type;
+	 diving_type[d_cnt++] = d_type;
       break;
     case EUC_FIX_DIVING:
     case RANK_FIX_DIVING:
@@ -1317,7 +1327,7 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
 
   //int remaining_iter_limit;
   //lp_iter_limit = MAX(10*frac_ip_cnt, 10*(int)(1.0*1000000000/lp_data->nz));
-  if(p->bc_index < 1 && is_last_iter) {
+  if(p->bc_index < 1 && is_last_iter && m*n < 1e7) {
     lp_iter_limit *= 5; //100000;
     allowed_iter_num = 2000;
     //max_allowed_iter_num = 1000;
@@ -1327,19 +1337,19 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
     allowed_iter_num = 1000;
     d_fixed_limit = 5*fix_incr_cnt;
     dive_depth_limit = 100;
-    no_impr_cnt_limit = 5; 
-    no_prog_cnt_limit = 5; 
-    no_better_cnt_limit = 5;
-    no_impr_cnt_limit2 = 5; 
+    no_impr_cnt_limit = 2; //5
+    no_prog_cnt_limit = 2; 
+    no_better_cnt_limit = 2;
+    no_impr_cnt_limit2 = 2; 
   }
 
   if(p->par.rs_mode_enabled){     
      allowed_iter_num = 200;     
      dive_depth_limit = 20;
-     no_impr_cnt_limit = 3; 
-     no_prog_cnt_limit = 3; 
-     no_better_cnt_limit = 3;
-     no_impr_cnt_limit2 = 3;
+     no_impr_cnt_limit = 2; //3
+     no_prog_cnt_limit = 2; 
+     no_better_cnt_limit = 2;
+     no_impr_cnt_limit2 = 2;
   }
   
   //lp_iter_limit = MAX(0, ((int)(2.5*1e9/lp_data->nz) - p->lp_stat.ds_num_iter));  
@@ -1367,7 +1377,7 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
 
      if(k == ignore_type) continue; 
 
-     d_type = diving_type[k];
+     d_type = diving_type[d_cnt - k - 1];
      //printf("DIVING - %i\n", d_type);
      mark_time = wall_clock(NULL);
      tot_lp_iter = 0;
@@ -1484,14 +1494,14 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
 	   if(frac_ip_cnt >=
 	      init_frac_ip_cnt -
 	      (int)(0.7*fix_incr_cnt*dive_depth)) no_impr_cnt++;
-	   if(frac_ip_cnt < min_frac_ip_cnt){
-	      min_frac_ip_cnt = frac_ip_cnt;
+	   if(frac_ip_cnt < min_frac_ip_cnt - 5){
+	      min_frac_ip_cnt = frac_ip_cnt - 5;
 	      no_impr_cnt2 = 0;
 	   }else{
 	      no_impr_cnt2++;
 	   }
 	   
-	   if(frac_ip_cnt > prev_frac_ip_cnt - fix_incr_cnt) no_prog_cnt++;	 
+	   if(frac_ip_cnt > prev_frac_ip_cnt - 4*fix_incr_cnt) no_prog_cnt++;	 
 	   if(dive_depth % 3 == 0){
 	      int d_times = (int)(1.0*dive_depth/3);
 	      if(init_frac_ip_cnt - frac_ip_cnt < d_times * better_expected_cnt)
@@ -3470,7 +3480,7 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
       }
    }
 
-   if(int_cnt < 10) return is_ip_feasible; 
+   if(int_cnt < 10 || int_cnt > 1e4 || nz > 1e6) return is_ip_feasible; 
    
    //double *p_obj = p_mip->obj; 
 
@@ -3620,11 +3630,11 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
       sym_set_int_param(env, "find_first_feasible", TRUE);
    }
    
-   sym_set_int_param(env, "verbosity", -2);
+   sym_set_int_param(env, "verbosity", -5);
    //sym_set_int_param(env, "fr_enabled", 0);
    //sym_set_int_param(env, "lb_enabled", 0);
-   //sym_set_int_param(env, "prep_level", 0);
-
+   sym_set_int_param(env, "prep_level", 0);
+   sym_set_int_param(env, "generate_cgl_cuts", 0);
    //sym_write_lp(env, "lb_test");
 
    int analyzed_nodes = 0;
@@ -3667,7 +3677,10 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
 	 sym_get_obj_val(env, solutionValue);
 	 *solutionValue += obj_offset;
 	 is_ip_feasible = TRUE;
+
+	 //break here---
 	 break;
+
 	 double dual_gap = d_gap(*solutionValue, t_lb, p->mip->obj_offset,
 				 p->mip->obj_sense);
 	 
@@ -3696,7 +3709,8 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
 
 	 if(env->warm_start){
 	    analyzed_nodes += env->warm_start->stat.analyzed;
-	    if(analyzed_nodes > analyzed_nodes_limit) analyzed_nodes_limit = analyzed_nodes + 100; 
+	    if(analyzed_nodes > analyzed_nodes_limit)
+	       analyzed_nodes_limit = analyzed_nodes + 100; 
 	 }
 	 //final_try = FALSE;
 	 if(!prep_check_feasible(p->mip, betterSolution, 10*p->lp_data->lpetol)){
@@ -3705,8 +3719,7 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
 	    return 0; 
 	 }
       }else{
-
-
+	 
 	 if(termcode == TM_NODE_LIMIT_EXCEEDED){
 	    search_k -= (int)(floor(search_k/2.0));
 	 }else{
@@ -3716,6 +3729,8 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
 
 	 if(env->warm_start){
 	    analyzed_nodes += env->warm_start->stat.analyzed;
+	    if(analyzed_nodes > analyzed_nodes_limit)
+	       break; 
 	 }
 
 	 if(search_k > 2 && search_k < MIN(20, (int)(int_cnt/2.0))){
@@ -3803,18 +3818,19 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
 
   double dual_gap = 100.0;
   if(p->has_ub || *solutionValue < SYM_INFINITY/2){
-    has_ub = TRUE;
-    obj_ub = *solutionValue;
-    dual_gap = d_gap(obj_ub, t_lb, p->mip->obj_offset,
-		     p->mip->obj_sense);
+     //if(fr_mode == FR_SEARCH) return FALSE; 
+     has_ub = TRUE;
+     obj_ub = *solutionValue;
+     dual_gap = d_gap(obj_ub, t_lb, p->mip->obj_offset,
+		      p->mip->obj_sense);
   }else if(fr_mode == RINS_SEARCH) return false; 
 
   if(p->bc_index > 1){
     if((fr_mode == FR_SEARCH && (p->lp_stat.fr_analyzed_nodes > p->par.fr_max_nodes)) ||
        (fr_mode == RINS_SEARCH && (p->lp_stat.rs_analyzed_nodes > p->par.rs_max_nodes))){
       if((fr_mode == FR_SEARCH && p->lp_stat.fr_calls > 10) || 
-	 (fr_mode == RINS_SEARCH && p->lp_stat.rs_calls > 10) || 
-	 (has_ub && dual_gap < 5.0)){
+	 (fr_mode == RINS_SEARCH && p->lp_stat.rs_calls > 20) || 
+	 (has_ub && dual_gap < 1.0)){
 	return FALSE;       
       }
     }
@@ -4420,7 +4436,7 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
      
   int is_ip_feasible = FALSE;
 
-  sym_set_int_param(env, "verbosity", -2);
+  sym_set_int_param(env, "verbosity", -5);
   //sym_set_int_param(env, "out_mode", 1);
   //sym_set_int_param(env, "fr_enabled", FALSE);
   sym_set_int_param(env, "fr_dive_level", -1);//p->par.fr_dive_level - 1);
@@ -4430,6 +4446,7 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
   sym_set_int_param(env, "lb_dive_level", p->par.lb_dive_level - 1);
   sym_set_dbl_param(env, "ds_min_gap", 5.0);
   sym_set_int_param(env, "ds_frequency", 10000);
+  //sym_set_int_param(env, "prep_level", 0);
   //sym_set_dbl_param(env, "ls_min_gap", 0.0001);
 
   sym_set_int_param(env, "ds_guided_enabled", FALSE);
@@ -4443,7 +4460,7 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
   //sym_set_int_param(env, "use_branching_prep", 1);
   
   sym_set_int_param(env, "probing_max_depth", 1);
-  sym_set_int_param(env, "gomory_max_depth", 20);
+  sym_set_int_param(env, "gomory_max_depth", 1);
   sym_set_int_param(env, "generate_cgl_flowcover_cuts", 2);
   sym_set_int_param(env, "clique_max_depth", 1);
   sym_set_int_param(env, "knapsack_max_depth", 1);
@@ -4455,11 +4472,11 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
   //sym_set_int_param(env, "generate_cgl_flowcover_cuts", 2);
   //sym_set_int_param(env, "generate_cgl_clique_cuts", 2);
   //sym_set_int_param(env, "generate_cgl_knapsack_cuts", 2);
-  //sym_set_int_param(env, "generate_cgl_cuts", 0);
-  // sym_set_int_param(env, "prep_level", 0);
+  sym_set_int_param(env, "generate_cgl_cuts", 0);
+  sym_set_int_param(env, "prep_level", 0);
   //sym_set_int_param(env, "reduce_mip", 0);
   sym_set_int_param(env, "min_root_cut_rounds", 6); 
-  sym_set_int_param(env, "max_cut_num_per_iter_root", 50); 
+  sym_set_int_param(env, "max_cut_num_per_iter_root", 10); 
   //sym_set_int_param(env, "use_branching_prep", 1); 
 
   //if(fr_mode == FR_SEARCH){
@@ -4488,9 +4505,9 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
   }
 
   if(fr_mode == FR_SEARCH && p->lp_stat.fr_calls < 1) 
-    p->par.fr_max_nodes = 100*node_limit; 
+    p->par.fr_max_nodes = 10*node_limit; 
   if(fr_mode == RINS_SEARCH && p->lp_stat.rs_calls < 1) 
-    p->par.rs_max_nodes = 100*node_limit; 
+    p->par.rs_max_nodes = 10*node_limit; 
 
   if(first_feas_enabled){
      sym_set_int_param(env, "find_first_feasible", TRUE);

@@ -152,7 +152,7 @@ int prep_basic(PREPdesc *P)
    /*initialize implications data structure */
    if (p_level >= 5){ /* disabled now */ 
       /* probably doesnt worth it for this version if n or nz is too large */
-      if (p_level >= 10 || (n < 1e4 && nz < 1e5)){
+      if (p_level >= 10 || (n < 5e4 && nz < 1e6)){
 	 if (bin_type){	 
 	    /* for now, just between binary variables */
 	    P->impl_rows = (ROWinfo *)malloc(sizeof(ROWinfo)*m); 
@@ -180,6 +180,11 @@ int prep_basic(PREPdesc *P)
    /* main preprocessing loop */
    old_changes_cnt = new_changes_cnt = 0;
    old_others_cnt = new_others_cnt = 0;
+
+   int tot_impl_cnt = 0, impl_cnt = 0; 
+   int impl_tried = 0;
+   int can_impl_iter = TRUE; 
+
    while(iter_cnt < iter_cnt_limit){
       
       iter_cnt++;
@@ -192,6 +197,11 @@ int prep_basic(PREPdesc *P)
       
       /*=====================================================================*/
       /*=====================================================================*/
+
+      if (iter_cnt > 1 && tot_impl_cnt <= (int)(0.05*impl_tried)) {
+	 can_impl_iter = FALSE; 
+      }
+      impl_cnt = 0;
       
       for (col_ind = 0; col_ind < n; col_ind++){
 	 if (cols[col_ind].var_type == 'F'){
@@ -199,13 +209,14 @@ int prep_basic(PREPdesc *P)
 	 }
 	 /* can we fix it? first check implications */	 
 	 /* disabled now */
-	 if (can_impl && impl_time < time_limit){
+	 if (can_impl && can_impl_iter && impl_time < time_limit){
 	    if (cols[col_ind].var_type == 'B' && 
 	       P->impl_vars[col_ind] && (iter_cnt < 2 ||
 					 (iter_cnt > 1 &&
 					  changes_diff > 0))){
 	       /* fist copy initial info */
 	       /* do once for each variable */
+	       impl_tried++; 
 	       start_impl_time = wall_clock(NULL);
 	       fix_type = FIX_NO_BOUND;
 
@@ -243,6 +254,7 @@ int prep_basic(PREPdesc *P)
 		  P->list = 0;
 		  if (termcode == PREP_INFEAS){		  
 		     /*then this column is fixable to its lower bound! */
+		     impl_cnt++; 
 		     new_bound = 0.0;
 		     fix_type = FIX_BINARY;
 		  }
@@ -277,6 +289,7 @@ int prep_basic(PREPdesc *P)
 		  P->impl_cols[col_ind].llist = 0;
 		  P->list = 0;		  
 		  if (termcode == PREP_INFEAS){
+		     impl_cnt++; 
 		     new_bound = 1.0;
 		     fix_type = FIX_BINARY;
 		  }
@@ -305,8 +318,23 @@ int prep_basic(PREPdesc *P)
 		  }
 		  continue;
 	       }
+
+	       
+	       if (impl_tried % 500 == 0){
+		  //printf("iter: %i - impl_tried: %i - impl_cnt: %i\n", iter_cnt,
+		  //	 impl_tried, impl_cnt);
+		  if (impl_cnt < 25) {
+		     can_impl_iter = FALSE; 
+		  } else {
+		     tot_impl_cnt += impl_cnt; 
+		     //impl_tried = 0;
+		     impl_cnt = 0; 
+		     
+		  }
+	       }
+	       
 	    }
-	 }
+	 }	 
 
 	 /* couldnt fix it, continue */
 	 /* for each coefficient, and the corresponding row and column

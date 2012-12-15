@@ -160,7 +160,7 @@ int prep_solve_desc (PREPdesc * P)
    double start_time = wall_clock(NULL);
 
    /* Start with Basic Preprocessing */
-   if (p_level > 2){
+   if (p_level >= 0){
       PRINT(verbosity, -2, ("Starting Preprocessing...\n"));
       P->stats.nz_coeff_changed = (char *)calloc(CSIZE ,mip->nz);
       int max_mn = MAX(mip->n, mip->m);
