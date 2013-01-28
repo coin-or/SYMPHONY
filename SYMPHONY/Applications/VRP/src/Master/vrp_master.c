@@ -16,6 +16,7 @@
 /* system include files */
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 /* SYMPHONY include files */
 /*__BEGIN_EXPERIMENTAL_SECTION__*/
