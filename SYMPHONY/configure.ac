@@ -1,4 +1,4 @@
-#===========================================================================#
+3B#===========================================================================#
 #                                                                           #
 # This file is part of the SYMPHONY MILP Solver Framework.                  #
 #                                                                           #
@@ -899,30 +899,30 @@ AC_CONFIG_FILES([Makefile
 		 osi-sym.pc:src/OsiSym/osi-sym.pc.in
 		 osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in])
 
-AC_COIN_VPATH_LINK([Applications/INSTALL,
-                    Applications/CNRP/README,
-                    Applications/CNRP/INSTALL,
-                    Applications/CNRP/sample.cnrp,
-                    Applications/MATCH/README,
-                    Applications/MATCH/INSTALL,
-                    Applications/MATCH/sample.mat,
-                    Applications/MCKP/README,
-                    Applications/MCKP/INSTALL,
-                    Applications/MCKP/sample.mckp,
-                    Applications/MPP/README,
-                    Applications/MPP/INSTALL,
-                    Applications/MPP/sample.mpp,
-                    Applications/SPP/README,
-                    Applications/SPP/INSTALL,
-                    Applications/SPP/sample.spp,
-                    ApplicationsSPP+CUTS/README,
-                    Applications/SPP+CUTS/INSTALL,
-                    Applications/SPP+CUTS/sample.spp,
-                    Applications/USER/README,
-                    Applications/USER/INSTALL,
-                    Applications/USER/sample.mps,
-                    Applications/VRP/README,
-                    Applications/VRP/INSTALL,
+AC_COIN_VPATH_LINK([Applications/INSTALL
+                    Applications/CNRP/README
+                    Applications/CNRP/INSTALL
+                    Applications/CNRP/sample.cnrp
+                    Applications/MATCH/README
+                    Applications/MATCH/INSTALL
+                    Applications/MATCH/sample.mat
+                    Applications/MCKP/README
+                    Applications/MCKP/INSTALL
+                    Applications/MCKP/sample.mckp
+                    Applications/MPP/README
+                    Applications/MPP/INSTALL
+                    Applications/MPP/sample.mpp
+                    Applications/SPP/README
+                    Applications/SPP/INSTALL
+                    Applications/SPP/sample.spp
+                    Applications/SPP+CUTS/README
+                    Applications/SPP+CUTS/INSTALL
+                    Applications/SPP+CUTS/sample.spp
+                    Applications/USER/README
+                    Applications/USER/INSTALL
+                    Applications/USER/sample.mps
+                    Applications/VRP/README
+                    Applications/VRP/INSTALL
                     Applications/VRP/sample.vrp])
 
 # Here put the location and name of the configuration header file
