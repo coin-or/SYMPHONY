@@ -1,4 +1,4 @@
-[BSYMPHONY VRP-5.4 APPLICATION INSTALLATION
+SYMPHONY 5.4 APPLICATION INSTALLATION
 ==========================================
 
 This file contains instructions on building all of the SYMPHONY Applications.
@@ -55,7 +55,7 @@ shouldn't need to make any modifications. Then, type
 
    make
 
-The executable "vrp" should be successfully made here. 
+The executable "xxx" should be successfully made here. 
 
 4. Test the application using the sample file included with the distribution
 according to the instructions in the individual INSTALL files. To specify the
@@ -122,17 +122,17 @@ file name, use the "-F" command-line option, i.e., type something like
    xxx_m$(EXT) -F sample.xxx
 
 *******************************************************************************
-*            COMPILING THE SYMPHONY VRP APPLICATION (Windows)                *
+*            BUILDING APPLICATIONS in MS Windows                              *
 *******************************************************************************
 
-Here is a sketch outline of how to compile the SYMPHONY VRP
-application in Microsoft Windows. For information on developing your own
-applications, please see the quick start guide below or the detailed
-explanation in the user's manual. Direct support is provided for compilation
-under MS Visual Studio 10. Compilation for other compilers should also be
-possible. Note that the Windows version has some limitations. Detailed timing
-information is not currently provided.  Support is only provided for running
-in sequential mode at this time.
+Here is a sketch outline of how to compile SYMPHONY applications in Microsoft
+Windows. For information on developing your own applications, please see the
+quick start guide below or the detailed explanation in the user's manual.
+Direct support is provided for compilation under MS Visual Studio 10.
+Compilation for other compilers should also be possible. Note that the Windows
+version has some limitations. Detailed timing information is not currently
+provided. Support is only provided for running in sequential mode at this
+time.
 
 First, download SYMPHONY and unpack the archive if it is required. You now
 have three options. Follow the instructions for building SYMPHONY in the
