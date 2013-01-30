@@ -262,6 +262,7 @@ void get_binvcol PROTO((LPdata *lp_data, int j, double *col));
 void get_binvrow PROTO((LPdata *lp_data, int i, double *row));
 void get_basis PROTO((LPdata *lp_data, int *cstat, int *rstat));
 void set_obj_upper_lim PROTO((LPdata *lp_data, double lim));
+void set_timelim PROTO((LPdata *lp_data, double timelim));
 void set_itlim PROTO((LPdata *lp_data, int itlim));
 void set_itlim_hotstart PROTO((LPdata *lp_data, int itlim));
 void get_column PROTO((LPdata *lp_data, int j,
