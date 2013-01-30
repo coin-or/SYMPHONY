@@ -224,6 +224,8 @@ int fathom_branch(lp_prob *p)
    int num_errors = 0;
    int cut_term = 0;
    double obj_before_cuts = 0;
+   double timeleft = 0.0;
+   int iterleft = 0; 
    const int verbosity = p->par.verbosity;
 #ifdef DO_TESTS
    double oldobjval = lp_data->objval;
@@ -265,6 +267,41 @@ int fathom_branch(lp_prob *p)
 	 }
       }
 
+#ifdef COMPILE_IN_LP
+      
+      //set time limit here      
+
+      if (p->tm->par.time_limit >= 0.0 &&
+	  (timeleft = p->tm->par.time_limit - wall_clock(NULL) + p->tm->start_time) <= 0.0) { 
+         if (fathom(p, TRUE)){  //send in true for interrupted node
+	    return(FUNCTION_TERMINATED_NORMALLY);
+	 }else{
+	    return(FUNCTION_TERMINATED_ABNORMALLY);
+	 }
+      }
+      
+      if (timeleft > 0.0){
+	 set_timelim(lp_data, timeleft);
+      }
+
+
+      // set itlim here if we are in restricted search heuristic
+
+      if(p->tm->par.rs_mode_enabled &&
+	 (iterleft = p->tm->par.rs_lp_iter_limit - p->tm->lp_stat.lp_iter_num) <= 0) {
+         if (fathom(p, TRUE)){  //send in true for interrupted node
+	    return(FUNCTION_TERMINATED_NORMALLY);
+	 }else{
+	    return(FUNCTION_TERMINATED_ABNORMALLY);
+	 }
+      }
+
+      if (iterleft > 0){
+	 set_itlim(lp_data, iterleft); 
+      }      
+
+#endif
+      
       p->iter_num++;
       p->node_iter_num++;
       lp_data->lp_count++;
@@ -273,6 +310,7 @@ int fathom_branch(lp_prob *p)
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
       p->bound_changes_in_iter = 0;
+
       if ((p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
 			       p->bc_level < 1))) {
          if (p->bc_level < 1) {
@@ -280,10 +318,7 @@ int fathom_branch(lp_prob *p)
          }
          termcode = initial_lp_solve(lp_data, &iterd);
       } else {
-	 //if(p->iter_num==122)
-	 //  write_mps(lp_data, "mzzv_err");
 	 termcode = dual_simplex(lp_data, &iterd);
-         //termcode = initial_lp_solve(lp_data, &iterd);
       }
       if (p->bc_index < 1 && p->iter_num < 2) {
 	 p->root_objval = lp_data->objval;
@@ -293,7 +328,6 @@ int fathom_branch(lp_prob *p)
       }
       p->lp_stat.lp_calls++;
       p->lp_stat.lp_node_calls++;
-      //p->lp_stat.lp_iter_num += iterd; 
 
 #ifdef COMPILE_IN_LP
       p->tm->lp_stat.lp_iter_num += iterd;
@@ -365,6 +399,13 @@ int fathom_branch(lp_prob *p)
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
 	 return(ERROR__DUAL_INFEASIBLE);
        case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
+	 /* now, we set time limit - solver returns the same termcode with itlim */
+	 /* also, we might set iter limit if we are in search heuristics */
+	 if (fathom(p, TRUE)){  //send in true for interrupted node
+	    return(FUNCTION_TERMINATED_NORMALLY);
+	 }else{
+	    return(FUNCTION_TERMINATED_ABNORMALLY);
+	 }
        case LP_ABANDONED:
 	 printf("####### Unexpected termcode: %i \n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
@@ -675,6 +716,7 @@ int fathom(lp_prob *p, int primal_feasible)
 	    send_node_desc(p, FEASIBLE_PRUNED);
 	    break;
 	  case LP_OPTIMAL:
+	  case LP_D_ITLIM: 
 	    send_node_desc(p, INTERRUPTED_NODE);
 	    break;
 	  default:

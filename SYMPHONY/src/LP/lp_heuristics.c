@@ -3462,7 +3462,17 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
    int nz = p_mip->nz;
 
    total_time = used_time(&total_time);   
+   double timeleft = 0;
 
+#ifdef COMPILE_IN_LP
+   
+   if (p->tm->par.time_limit >= 0.0 &&
+       (timeleft = p->tm->par.time_limit - wall_clock(NULL) + p->tm->start_time) <= 0.0) {
+      return is_ip_feasible; 
+   }
+
+#endif
+   
    if(p->mip->mip_inf){
       if(p->mip->n - p->mip->mip_inf->cont_var_num < 10)return is_ip_feasible;
    }
@@ -3631,10 +3641,20 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
    }
    
    sym_set_int_param(env, "verbosity", -5);
+   if (timeleft > 0.0) {
+      sym_set_dbl_param(env, "time_limit", timeleft);
+   }   
    //sym_set_int_param(env, "fr_enabled", 0);
    //sym_set_int_param(env, "lb_enabled", 0);
    sym_set_int_param(env, "prep_level", 0);
    sym_set_int_param(env, "generate_cgl_cuts", 0);
+   sym_set_int_param(env, "rs_mode_enabled", TRUE);
+   if(p->bc_level < 1){
+     sym_set_int_param(env, "rs_lp_iter_limit", (int)(5e8/tot_nz));
+  }else{
+     sym_set_int_param(env, "rs_lp_iter_limit", MIN(2000, (int)(2.0*1e8/tot_nz)));
+  }
+
    //sym_write_lp(env, "lb_test");
 
    int analyzed_nodes = 0;
@@ -3719,8 +3739,11 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
 	    return 0; 
 	 }
       }else{
+
+	 if(termcode == TM_TIME_LIMIT_EXCEEDED) break;
 	 
-	 if(termcode == TM_NODE_LIMIT_EXCEEDED){
+	 if(termcode == TM_NODE_LIMIT_EXCEEDED ||
+	    termcode == TM_TARGET_GAP_ACHIEVED){
 	    search_k -= (int)(floor(search_k/2.0));
 	 }else{
 	    relax_search_cnt++; 
@@ -3773,6 +3796,7 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
   int verbosity = p->par.verbosity;
   
   double total_time = 0; 
+  double timeleft = 0.0; 
   double max_int_fixed_ratio = p->par.fr_max_int_fixed_ratio;
   double min_int_fixed_ratio = p->par.fr_min_int_fixed_ratio;
   double max_c_fixed_ratio = p->par.fr_max_c_fixed_ratio;
@@ -3782,6 +3806,14 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
 
   total_time = used_time(&total_time);
 
+#ifdef COMPILE_IN_LP
+  if (p->tm->par.time_limit >= 0.0 &&
+      (timeleft = p->tm->par.time_limit - wall_clock(NULL) + p->tm->start_time) <= 0.0) {
+     return FALSE; 
+   }
+#endif
+
+  
   if(fr_mode == RINS_SEARCH){
     max_int_fixed_ratio = p->par.rs_min_int_fixed_ratio;
     max_c_fixed_ratio = p->par.rs_min_c_fixed_ratio;
@@ -4437,11 +4469,14 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
   int is_ip_feasible = FALSE;
 
   sym_set_int_param(env, "verbosity", -5);
+  if (timeleft > 0.0) {
+     sym_set_dbl_param(env, "time_limit", timeleft);
+  }
   //sym_set_int_param(env, "out_mode", 1);
   //sym_set_int_param(env, "fr_enabled", FALSE);
   sym_set_int_param(env, "fr_dive_level", -1);//p->par.fr_dive_level - 1);
   sym_set_int_param(env, "fp_enabled", -1);
-  //sym_set_int_param(env, "rs_enabled", FALSE);
+  //sym_set_int_param(env, "rs_enabled", TRUE);
   sym_set_int_param(env, "rs_dive_level", -1);//p->par.rs_dive_level - 1);
   sym_set_int_param(env, "lb_dive_level", p->par.lb_dive_level - 1);
   sym_set_dbl_param(env, "ds_min_gap", 5.0);
@@ -4499,7 +4534,7 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
   sym_set_dbl_param(env, "gap_limit", real_gap_limit); 
   sym_set_int_param(env, "rs_mode_enabled", TRUE);
   if(p->bc_level < 1){
-     sym_set_int_param(env, "rs_lp_iter_limit", (int)(1e9/unfix_nz));
+     sym_set_int_param(env, "rs_lp_iter_limit", (int)(5e8/unfix_nz));
   }else{
      sym_set_int_param(env, "rs_lp_iter_limit", MIN(2000, (int)(2.0*1e8/unfix_nz)));
   }
@@ -4618,7 +4653,9 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
 	break;
      }else {
 	//printf("unfix_cnt - max_cnt: %i %i\n", unfix_int_cnt, max_int_fix);	
-	if(unfix_nz > 1e5) break;
+	if(unfix_nz > 5e4) break;
+	if(termcode == TM_NODE_LIMIT_EXCEEDED || termcode == TM_TARGET_GAP_ACHIEVED ||
+	   termcode == TM_TIME_LIMIT_EXCEEDED) break; 
 	if(fr_mode == FR_SEARCH && termcode != TM_NODE_LIMIT_EXCEEDED && termcode != TM_TARGET_GAP_ACHIEVED && 
 	   !search_extended){
 	   if(!env->warm_start || env->warm_start->stat.analyzed < 2){

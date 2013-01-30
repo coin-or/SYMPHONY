@@ -2833,6 +2833,18 @@ void set_obj_upper_lim(LPdata *lp_data, double lim)
 
 /*===========================================================================*/
 
+void set_timelim(LPdata *lp_data, double timelim)
+{
+
+#ifdef __OSI_CLP__
+   
+   ClpDblParam key = ClpMaxSeconds;   
+   lp_data->si->getModelPtr()->setDblParam(key, timelim);
+
+#endif
+   
+}
+
 /*===========================================================================*\
  * Set an upper limit on the number of iterations. If itlim < 0 then set
  * it to the maximum.
