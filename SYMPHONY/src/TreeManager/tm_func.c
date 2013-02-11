@@ -440,7 +440,7 @@ int solve(tm_prob *tm)
             now = wall_clock(NULL);
 	    if (now - then2 > timeout2){
 	       if(tm->par.verbosity >= -1 ){
-		  print_tree_status(tm);
+		  print_tree_status(tm, FALSE, 0.0);
 	       }
 	       then2 = now;
 	    }
@@ -537,7 +537,7 @@ int solve(tm_prob *tm)
 	 }
 	 if (now - then2 > timeout2){
 	    if(tm->par.verbosity >=0 ){
-	       print_tree_status(tm);
+	       print_tree_status(tm, FALSE, 0.0);
 	    }
 	    then2 = now;
 	 }
@@ -604,7 +604,7 @@ void write_log_files(tm_prob *tm)
  * Prints out the current size of the tree and the gap                      *
 \*==========================================================================*/
 
-void print_tree_status(tm_prob *tm)
+void print_tree_status(tm_prob *tm, int is_diving, double diving_obj)
 {
    double elapsed_time;
    double obj_ub = SYM_INFINITY, obj_lb = -SYM_INFINITY;
@@ -720,6 +720,9 @@ void print_tree_status(tm_prob *tm)
      printf("%10i ", tm->stat.analyzed-tm->active_node_num);
      printf("%10i ", tm->samephase_candnum+tm->active_node_num);     
      find_tree_lb(tm);
+     if (is_diving) {
+	tm->lb = MIN(tm->lb, diving_obj); 
+     }
      if (tm->lb > -SYM_INFINITY) {
        if (tm->obj_sense == SYM_MAXIMIZE) {
 	 obj_ub = -tm->lb + tm->obj_offset;
@@ -780,6 +783,9 @@ void print_tree_status(tm_prob *tm)
        }
      }
      find_tree_lb(tm);
+     if (is_diving) {
+	tm->lb = MIN(tm->lb, diving_obj); 
+     }
      if (tm->lb > -SYM_INFINITY) {
        if (tm->obj_sense == SYM_MAXIMIZE) {
 	 obj_ub = -tm->lb + tm->obj_offset;
@@ -1659,35 +1665,13 @@ char shall_we_dive(tm_prob *tm, double objval)
    }
    
    if(dual_gap < 100.00){
-     //d_threshold = 0.1;
-     //if(dual_gap > 50.0) d_threshold *= etol*etol;
-     //else if(dual_gap > 10.0) d_threshold *= etol;
-     //else if(dual_gap > 5.0) d_threshold *= 0.01;//etol;
-     //else if(dual_gap > 1.0) d_threshold *= 0.1;
-     //     else if(dual_gap > 1.0) d_threshold *= etol;
-     //if(dual_gap > 5.0) d_threshold *= etol*etol;
-     //else if(dual_gap > 1.0) d_threshold *= etol;
-      //if(dual_gap > 5.0) d_threshold *= etol*etol;
-      //else if(dual_gap > 1.0) d_threshold *= etol;
-      //if(dual_gap > 0.20) d_threshold *= etol*etol;
-      //else if(dual_gap > 0.10) d_threshold *= etol;
-      //if(dual_gap < 10.00){
-      //	 if(dual_gap > 5.00) d_threshold *= etol*etol;
-      //	 else if(dual_gap > 1.00) d_threshold *= etol;
-      //}//else{
-      // d_threshold = 0.01;
-      // }
-      //d_threshold = dual_gap*1e-4; 
-      
-      //if(dual_gap > 20.0) d_threshold *= 2;//MIN(10.0, d_threshold/
-      //else if(dual_gap < 5.0) d_threshold *= etol;
       d_threshold *=etol*etol;
-      //if(tm->stat.analyzed < 5000) d_threshold *=etol*etol;
-      //else d_threshold = 0.001;
    }else{
-     d_threshold = 100.0; 
+      d_threshold = 0.5; 
    }
 
+   d_threshold = MIN(d_threshold, 0.5);
+   
    rand_num = ((double)(RANDOM()))/((double)(MAXINT));
    if (tm->par.unconditional_dive_frac > 1 - rand_num){
       dive = CHECK_BEFORE_DIVE;

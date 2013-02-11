@@ -2055,7 +2055,7 @@ int shift_solution(lp_prob *p, LPdata *lp_data, double *solutionValue,
    int m = p->mip->m;
    int nz = p->mip->nz;
    
-   double etol = 10*lp_data->lpetol;
+   double etol = lp_data->lpetol;
    
    int tmp_size = MAX(4*n, 4*m);
    if(!lp_data->tmp1_size || tmp_size > lp_data->tmp1_size){      
@@ -2459,7 +2459,7 @@ int shift_solution(lp_prob *p, LPdata *lp_data, double *solutionValue,
       }
       p->lp_stat.sh_num_sols++;
 
-      if(!prep_check_feasible(p->mip, betterSolution, 10*p->lp_data->lpetol)){
+      if(!prep_check_feasible(p->mip, betterSolution, p->lp_data->lpetol)){
 	 //printf("SH - feasibility error... exiting\n");
 	 return 0; 
       }
@@ -3540,10 +3540,10 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
 	 col_sol = floor(colSolution[i] + 100*etol); 
 	 
 	 //if(p_mip->ub[i] - p_mip->lb[i] > 1.0 + 0.001){
-	 if(colSolution[i] > p_mip->ub[i] - 10*etol){
+	 if(colSolution[i] > p_mip->ub[i] - etol){
 	    moved_bd  = col_sol - 1.0;
 	    add_srow_offset = TRUE; 
-	 }else if(colSolution[i] < p_mip->lb[i] + 10*etol){
+	 }else if(colSolution[i] < p_mip->lb[i] + etol){
 	    moved_bd = col_sol;	       
 	 }else{
 	    if(obj[i] > 0.0){
@@ -3733,7 +3733,7 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
 	       analyzed_nodes_limit = analyzed_nodes + 100; 
 	 }
 	 //final_try = FALSE;
-	 if(!prep_check_feasible(p->mip, betterSolution, 10*p->lp_data->lpetol)){
+	 if(!prep_check_feasible(p->mip, betterSolution, p->lp_data->lpetol)){
 	    //printf("LB - feasibility error... exiting\n");
 	    //exit(0);
 	    return 0; 
@@ -4227,7 +4227,7 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
 	   new_lb = lb[ind];
 	   new_ub = bd;
 	}else{
-	   bd = floor(x[ind] + 100*etol);
+	   bd = floor(x[ind] + etol);
 	   //sym_fixed_offset += obj[ind]*bd; 
 	   sym_fixed_type[ind] = 'F';
 	   sym_fixed_val[ind] = bd;
@@ -4312,7 +4312,7 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
      double bd; 
      if(direction[ind] == 'F'){
        if(!fix_all_z || lb[ind] > etol || ub[ind] < -etol){
-	  bd = floor(x[ind] + 100*etol);
+	  bd = floor(x[ind] + etol);
 	 if(x[ind] < lb[ind] + etol) bd = lb[ind]; 
 	 else bd = ub[ind];
 	 //sym_set_col_lower(env, ind, bd);
@@ -4639,7 +4639,7 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
 	imp_sol_found_cnt++;      
 	//p->lp_stat.fr_num_sols++;
 	is_ip_feasible = TRUE;
-	if(!prep_check_feasible(p->mip, betterSolution, 10*p->lp_data->lpetol)){
+	if(!prep_check_feasible(p->mip, betterSolution, p->lp_data->lpetol)){
 #if 0
 	   if(fr_mode == FR_SEARCH){
 	      printf("FR - feasibility error... exiting\n");

@@ -175,6 +175,14 @@ typedef struct LP_PROB{
    int             branch_var; 
    char            branch_dir;
 
+   double          cgl_init_obj;
+   int             cgl_chain_stop;
+   int             cgl_chain_stop_cnt;
+   int             cgl_chain_pause_cnt;
+
+   double          cgl_impr;
+   int             cgl_impr_cnt; 
+
 }lp_prob;
 
 /*===========================================================================*/
@@ -191,6 +199,7 @@ int repricing PROTO((lp_prob *p));
 int bfind PROTO((int key, int *table, int size));
 int collect_nonzeros PROTO((lp_prob *p, double *x, int *tind, double *tx));
 int collect_fractions PROTO((lp_prob *p, double *x, int *tind, double *tx));
+int collect_int_fractions PROTO((lp_prob *p, double *x, int *tind, double *tx, int *int_cnt));
 node_desc *create_explicit_node_desc PROTO((lp_prob *p));
 int check_tailoff PROTO((lp_prob *p));
 void lp_exit PROTO((lp_prob *p));

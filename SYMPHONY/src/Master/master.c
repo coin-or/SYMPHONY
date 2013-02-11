@@ -5562,7 +5562,7 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    }
    else if (strcmp(key, "generate_cgl_redsplit_cuts_freq") == 0 ||
 	    strcmp(key, "LP_generate_cgl_redsplit_cuts_freq") == 0){
-      *value = lp_par->cgl.generate_cgl_gomory_cuts_freq;
+      *value = lp_par->cgl.generate_cgl_redsplit_cuts_freq;
       return(0);
    }
    else if (strcmp(key, "generate_cgl_knapsack_cuts_freq") == 0 ||
