@@ -279,7 +279,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       int full_solves = 0, down_is_est, up_is_est, best_down_is_est, best_up_is_est, 
           max_solves_since_impr = p->par.rel_br_cand_threshold, 
           stop_solving = FALSE, both_children_inf = FALSE, rel_up, 
-          rel_down, solves_since_impr = 0;
+	 rel_down, solves_since_impr = 0, best_one_child_inf = FALSE;
       int max_solves = p->par.rel_br_max_solves;
       double alpha = p->par.strong_branching_high_low_weight;
       double one_m_alpha = 1.0 - alpha;
@@ -795,6 +795,14 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 rel_down = br_rel_down[branch_var];
          rel_up = br_rel_up[branch_var];
 
+	 // ignore the small violations
+	 if (best_can != NULL){
+	    if (xval - floorx < 0.1 ||
+		ceilx - xval < 0.1){
+	       continue;
+	    }
+	 }
+	 
 	 if (cand_num < 2 || str_br_iter_limit || 
 	     ((rel_down > rel_threshold && 
 	       bc_level > strong_br_min_level) &&
@@ -896,18 +904,23 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	   break;
          }
 
-         if ((down_obj > SYM_INFINITY/10 || up_obj > SYM_INFINITY/10) && best_can != NULL) {	   
-	   continue;
+         if ((down_obj > SYM_INFINITY/10 || up_obj > SYM_INFINITY/10)) {
+	    var_score = MIN(down_obj, up_obj);
+	    if(best_can != NULL) {	   
+	       continue; 
+	    }else{
+	       best_one_child_inf = TRUE; 
+	    }
+	 } else {
+	    if (down_obj < up_obj) {
+	       low = down_obj;
+	       high = up_obj;
+	    } else {
+	       low = up_obj;
+	       high = down_obj;
+	    }
+	    var_score = alpha * low + one_m_alpha * high;
 	 }
-
-         if (down_obj < up_obj) {
-            low = down_obj;
-            high = up_obj;
-         } else {
-            low = up_obj;
-            high = down_obj;
-         }
-	 var_score = alpha * low + one_m_alpha * high;
 	 
 	 double violation_cnt_diff = 0;
 	 int inf_cnt_diff = 0;
@@ -991,16 +1004,20 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	   }
 	 }
 
-	 if(best_can == NULL || better_cand_found){
+	 if(best_can == NULL || better_cand_found || best_one_child_inf){
 	    //printf("here - %i\n", p->bc_index);
-	   if ( var_score > best_var_score + prog_ratio &&(down_is_est != TRUE ||
+	    if ( var_score > best_var_score + prog_ratio &&(down_is_est != TRUE ||
 							   up_is_est != TRUE)) {
-		solves_since_impr = 0;
+	      solves_since_impr = 0;
 		if(best_can!= NULL){
 		   p->lp_stat.rel_br_impr_num++;
 		}
-	     }
+	   }
 
+	    if(best_can != NULL && best_one_child_inf) {
+	       best_one_child_inf = FALSE; 
+	    }
+	   
 	    if(down_is_est && up_is_est) best_is_est = TRUE; 
 	    else best_is_est = FALSE; 
 

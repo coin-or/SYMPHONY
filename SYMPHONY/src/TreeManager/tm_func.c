@@ -1708,7 +1708,9 @@ char shall_we_dive(tm_prob *tm, double objval)
                objval = (objval >= 0) ? etol : -etol;
             }
          }
-	 if (fabs((objval/average_lb)-1) > d_threshold){
+	 cutoff = fabs((d_threshold)*average_lb);
+	 if (objval > average_lb + cutoff){
+	    //if (fabs((objval/average_lb)-1) > d_threshold){
 	    dive = DO_NOT_DIVE;
 	    tm->stat.diving_halts++;
 	 }else{
@@ -1732,7 +1734,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 	 if (tm->has_ub)
 	    cutoff = d_threshold*(tm->ub - average_lb);
 	 else
-	    cutoff = fabs((1 + d_threshold)*average_lb);
+	    cutoff = fabs((d_threshold)*average_lb);
 	 if (objval > average_lb + cutoff){
 	    dive = DO_NOT_DIVE;
 	    tm->stat.diving_halts++;
