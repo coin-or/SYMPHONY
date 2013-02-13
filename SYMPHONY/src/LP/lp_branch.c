@@ -256,7 +256,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    st_time     = used_time(&total_time);
    total_iters = 0;
 
-
    if (should_use_rel_br==TRUE) {
 
       const double lpetol100 = lp_data->lpetol*100;
@@ -280,7 +279,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       int full_solves = 0, down_is_est, up_is_est, best_down_is_est, best_up_is_est, 
           max_solves_since_impr = p->par.rel_br_cand_threshold, 
           stop_solving = FALSE, both_children_inf = FALSE, rel_up, 
-          rel_down, solves_since_impr = 0;
+	 rel_down, solves_since_impr = 0, best_one_child_inf = FALSE;
       int max_solves = p->par.rel_br_max_solves;
       double alpha = p->par.strong_branching_high_low_weight;
       double one_m_alpha = 1.0 - alpha;
@@ -751,7 +750,40 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       //rel_threshold,
       //strong_br_min_level, max_presolve_iter);
       //printf("first cand: %i \n", p->br_rel_cand_list[0]);
+
+      int str_br_iter_limit = FALSE;
+      double str_br_factor = MAX(10.0, 3.2e6/(1.0*lp_data->m));
+      int str_br_cnt_limit = (int)(lp_data->n*str_br_factor);
+
+      if (1.0*p->lp_stat.str_br_total_iter_num > str_br_cnt_limit) str_br_iter_limit = TRUE; 
+
+      int node_factor = (int)(p->tm->stat.analyzed/50.0);
+      double int_factor = 0.5; 
+      if (p->mip->mip_inf){
+	 int int_var_num = p->mip->n - p->mip->mip_inf->binary_var_num - p->mip->mip_inf->cont_var_num;
+	 if (int_var_num < 1 && p->mip->mip_inf->binary_var_num < 500) {
+	    int_factor = 0.1; 
+	 }
+      }
       
+      double init_ratio = MIN(int_factor*((int)((1.0*lp_data->nz)/1e4) + 1), 2.0);      
+      
+      if (p->bc_index > 0 && p->lp_stat.str_br_lp_calls > 0) {
+	 double str_lp_factor = MAX(0.1, init_ratio - node_factor*0.1);
+	 int str_iter = p->lp_stat.str_br_total_iter_num;
+	 int lp_iter = p->lp_stat.lp_total_iter_num + str_iter;  
+	 //printf("str_ratio: %.2f\n", (1.0*str_iter)/lp_iter);
+	 //printf("str_iter: %i - lp_iter: %i - node_factor: %i - str_ratio: %.2f\n",
+	 //	str_iter, lp_iter, node_factor, ((1.0*str_iter)/lp_iter));
+	 if (((1.0*str_iter)/lp_iter) > str_lp_factor) {
+	    str_br_iter_limit = TRUE;
+	 }
+      }
+
+      if (p->tm->stat.analyzed > 5e5 || p->lp_stat.str_br_total_iter_num > 5e5) {
+	 str_br_iter_limit = TRUE;      
+      }
+
       for (i=0; i<cand_num; i++) {
 	//printf("cand - %i \n", i);
 	 branch_var = p->br_rel_cand_list[i];
@@ -759,11 +791,19 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          ub = vars[branch_var]->new_ub;
          xval = x[branch_var];
 	 floorx = floor(xval);
-         ceilx = ceil(xval);
-         rel_down = br_rel_down[branch_var];
+	 ceilx = ceil(xval);	 
+	 rel_down = br_rel_down[branch_var];
          rel_up = br_rel_up[branch_var];
 
-	 if (cand_num < 2 || 
+	 // ignore the small violations
+	 if (best_can != NULL){
+	    if (xval - floorx < 0.1 ||
+		ceilx - xval < 0.1){
+	       continue;
+	    }
+	 }
+	 
+	 if (cand_num < 2 || str_br_iter_limit || 
 	     ((rel_down > rel_threshold && 
 	       bc_level > strong_br_min_level) &&
 	      (i > check_level || (i < check_level + 1 && !check_first ))) || 
@@ -810,7 +850,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    p->lp_stat.rel_br_full_solve_num++;
          }
 
-	 if (cand_num < 2 || 
+	 if (cand_num < 2 || str_br_iter_limit ||
 	     ((rel_up > rel_threshold &&
 	       bc_level > strong_br_min_level) &&
 	      (i > check_level || (i < check_level + 1 && !check_first ))) ||
@@ -846,12 +886,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       p->br_inf_up[branch_var]++;
             } else {
               // update pcost
-               pcost_up[branch_var] = (pcost_up[branch_var]*
+	       pcost_up[branch_var] = (pcost_up[branch_var]*
 	         rel_up + (up_obj - oldobjval)/(ceilx-xval))/ 
 	         (rel_up + 1);
                br_rel_up[branch_var]++;
 	       p->lp_stat.rel_br_up_update++;
-            }
+	    }
             full_solves++;
             solves_since_impr++;
 	    p->lp_stat.rel_br_full_solve_num++;
@@ -864,18 +904,23 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	   break;
          }
 
-         if ((down_obj > SYM_INFINITY/10 || up_obj > SYM_INFINITY/10) && best_can != NULL) {	   
-	   continue;
+         if ((down_obj > SYM_INFINITY/10 || up_obj > SYM_INFINITY/10)) {
+	    var_score = MIN(down_obj, up_obj);
+	    if(best_can != NULL) {	   
+	       continue; 
+	    }else{
+	       best_one_child_inf = TRUE; 
+	    }
+	 } else {
+	    if (down_obj < up_obj) {
+	       low = down_obj;
+	       high = up_obj;
+	    } else {
+	       low = up_obj;
+	       high = down_obj;
+	    }
+	    var_score = alpha * low + one_m_alpha * high;
 	 }
-
-         if (down_obj < up_obj) {
-            low = down_obj;
-            high = up_obj;
-         } else {
-            low = up_obj;
-            high = down_obj;
-         }
-	 var_score = alpha * low + one_m_alpha * high;
 	 
 	 double violation_cnt_diff = 0;
 	 int inf_cnt_diff = 0;
@@ -958,18 +1003,21 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	      better_cand_found = TRUE; 
 	   }
 	 }
-	 
-	 
-	 if(best_can == NULL || better_cand_found){
+
+	 if(best_can == NULL || better_cand_found || best_one_child_inf){
 	    //printf("here - %i\n", p->bc_index);
-	   if ( var_score > best_var_score + prog_ratio &&(down_is_est != TRUE ||
+	    if ( var_score > best_var_score + prog_ratio &&(down_is_est != TRUE ||
 							   up_is_est != TRUE)) {
-		solves_since_impr = 0;
+	      solves_since_impr = 0;
 		if(best_can!= NULL){
 		   p->lp_stat.rel_br_impr_num++;
 		}
-	     }
+	   }
 
+	    if(best_can != NULL && best_one_child_inf) {
+	       best_one_child_inf = FALSE; 
+	    }
+	   
 	    if(down_is_est && up_is_est) best_is_est = TRUE; 
 	    else best_is_est = FALSE; 
 
@@ -1376,7 +1424,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 FREE(r_ind);
 	 FREE(sos_row);
       }
-      
       
       cand_num = 1;
       FREE(up_violation_cnt);
@@ -2136,7 +2183,8 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
 {
    LPdata *lp_data = p->lp_data;
    double *x = lp_data->x;
-   double lpetol100 = lp_data->lpetol*100, lpetol1 = 1 - lpetol100;
+   //double lpetol100 = lp_data->lpetol*100, lpetol1 = 1 - lpetol100;
+   double lpetol100 = lp_data->lpetol, lpetol1 = 1 - lpetol100;
    int *xind = lp_data->tmp.i1; /* n */
    double fracx, *xval = lp_data->tmp.d; /* n */
    branch_obj *cand;
@@ -2464,7 +2512,7 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
    p->lp_stat.str_br_lp_calls++;
    p->lp_stat.str_br_total_iter_num += *iterd;
    p->lp_stat.num_str_br_cands_in_path++;
-
+   
    if(sos_cnt < 1){
       change_lbub(lp_data, branch_var, lb, ub);
    }else{

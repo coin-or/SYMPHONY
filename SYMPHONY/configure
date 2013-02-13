@@ -29095,6 +29095,52 @@ fi
                                                                                                                                                                                               ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc:src/OsiSym/osi-sym.pc.in osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
 
 
+
+echo "$as_me:$LINENO: checking whether this is a VPATH configuration" >&5
+echo $ECHO_N "checking whether this is a VPATH configuration... $ECHO_C" >&6
+if test `cd $srcdir; pwd` != `pwd`; then
+  coin_vpath_config=yes;
+else
+  coin_vpath_config=no;
+fi
+echo "$as_me:$LINENO: result: $coin_vpath_config" >&5
+echo "${ECHO_T}$coin_vpath_config" >&6
+
+
+
+# Allow for newlines in the parameter
+if test $coin_vpath_config = yes; then
+  cvl_tmp="Applications/INSTALL
+                    Applications/CNRP/README
+                    Applications/CNRP/INSTALL
+                    Applications/CNRP/sample.cnrp
+                    Applications/MATCH/README
+                    Applications/MATCH/INSTALL
+                    Applications/MATCH/sample.mat
+                    Applications/MCKP/README
+                    Applications/MCKP/INSTALL
+                    Applications/MCKP/sample.mckp
+                    Applications/MPP/README
+                    Applications/MPP/INSTALL
+                    Applications/MPP/sample.mpp
+                    Applications/SPP/README
+                    Applications/SPP/INSTALL
+                    Applications/SPP/sample.spp
+                    Applications/SPP+CUTS/README
+                    Applications/SPP+CUTS/INSTALL
+                    Applications/SPP+CUTS/sample.spp
+                    Applications/USER/README
+                    Applications/USER/INSTALL
+                    Applications/USER/sample.mps
+                    Applications/VRP/README
+                    Applications/VRP/INSTALL
+                    Applications/VRP/sample.vrp"
+  for file in $cvl_tmp ; do
+    coin_vpath_link_files="$coin_vpath_link_files $file"
+  done
+fi
+
+
 # Here put the location and name of the configuration header file
                     ac_config_headers="$ac_config_headers include/config.h include/config_sym.h"
 

@@ -224,6 +224,8 @@ int fathom_branch(lp_prob *p)
    int num_errors = 0;
    int cut_term = 0;
    double obj_before_cuts = 0;
+   double timeleft = 0.0;
+   int iterleft = 0;
    const int verbosity = p->par.verbosity;
 #ifdef DO_TESTS
    double oldobjval = lp_data->objval;
@@ -265,6 +267,41 @@ int fathom_branch(lp_prob *p)
 	 }
       }
 
+#ifdef COMPILE_IN_LP
+      
+      //set time limit here      
+
+      if (p->tm->par.time_limit >= 0.0 &&
+	  (timeleft = p->tm->par.time_limit - wall_clock(NULL) + p->tm->start_time) <= 0.0) { 
+         if (fathom(p, TRUE)){  //send in true for interrupted node
+	    return(FUNCTION_TERMINATED_NORMALLY);
+	 }else{
+	    return(FUNCTION_TERMINATED_ABNORMALLY);
+	 }
+      }
+      
+      if (timeleft > 0.0){
+	 set_timelim(lp_data, timeleft);
+      }
+
+
+      // set itlim here if we are in restricted search heuristic
+
+      if(p->tm->par.rs_mode_enabled &&
+	 (iterleft = p->tm->par.rs_lp_iter_limit - p->tm->lp_stat.lp_iter_num) <= 0) {
+         if (fathom(p, TRUE)){  //send in true for interrupted node
+	    return(FUNCTION_TERMINATED_NORMALLY);
+	 }else{
+	    return(FUNCTION_TERMINATED_ABNORMALLY);
+	 }
+      }
+
+      if (iterleft > 0){
+	 set_itlim(lp_data, iterleft); 
+      }      
+
+#endif
+      
       p->iter_num++;
       p->node_iter_num++;
       lp_data->lp_count++;
@@ -273,17 +310,15 @@ int fathom_branch(lp_prob *p)
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
       p->bound_changes_in_iter = 0;
+
       if ((p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
 			       p->bc_level < 1))) {
          if (p->bc_level < 1) {
             PRINT(verbosity, -1, ("solving root lp relaxation\n"));
          }
-         termcode = initial_lp_solve(lp_data, &iterd);
+         termcode = initial_lp_solve(lp_data, &iterd);	 
       } else {
-	 //if(p->iter_num==122)
-	 //  write_mps(lp_data, "mzzv_err");
 	 termcode = dual_simplex(lp_data, &iterd);
-         //termcode = initial_lp_solve(lp_data, &iterd);
       }
       if (p->bc_index < 1 && p->iter_num < 2) {
 	 p->root_objval = lp_data->objval;
@@ -293,7 +328,6 @@ int fathom_branch(lp_prob *p)
       }
       p->lp_stat.lp_calls++;
       p->lp_stat.lp_node_calls++;
-      //p->lp_stat.lp_iter_num += iterd; 
 
 #ifdef COMPILE_IN_LP
       p->tm->lp_stat.lp_iter_num += iterd;
@@ -323,6 +357,9 @@ int fathom_branch(lp_prob *p)
 	 update_cut_parameters(p);
       }else if(p->bc_level < 1){
 	 p->lp_stat.node_cuts_tried = TRUE; 
+	 if (p->node_iter_num) {
+	    p->cgl_init_obj = lp_data->objval; 
+	 }
       }
       
 #if 1
@@ -365,6 +402,13 @@ int fathom_branch(lp_prob *p)
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
 	 return(ERROR__DUAL_INFEASIBLE);
        case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
+	 /* now, we set time limit - solver returns the same termcode with itlim */
+	 /* also, we might set iter limit if we are in search heuristics */
+	 if (fathom(p, TRUE)){  //send in true for interrupted node
+	    return(FUNCTION_TERMINATED_NORMALLY);
+	 }else{
+	    return(FUNCTION_TERMINATED_ABNORMALLY);
+	 }
        case LP_ABANDONED:
 	 printf("####### Unexpected termcode: %i \n", termcode);
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
@@ -547,7 +591,7 @@ int fathom_branch(lp_prob *p)
 	 now = wall_clock(NULL);
 	 if (now - then2 > timeout2){
 	    if(verbosity >= -1 ){
-	       print_tree_status(p->tm);
+	       print_tree_status(p->tm, TRUE, obj_before_cuts);
 	    }
 	    then2 = now;
 	 }
@@ -675,6 +719,7 @@ int fathom(lp_prob *p, int primal_feasible)
 	    send_node_desc(p, FEASIBLE_PRUNED);
 	    break;
 	  case LP_OPTIMAL:
+	  case LP_D_ITLIM: 
 	    send_node_desc(p, INTERRUPTED_NODE);
 	    break;
 	  default:
@@ -1049,6 +1094,29 @@ int collect_fractions(lp_prob *p, double *x, int *tind, double *tx)
 
 /*===========================================================================*/
 
+int collect_int_fractions(lp_prob *p, double *x, int *tind, double *tx, int *int_cnt)
+{
+   var_desc **vars = p->lp_data->vars;
+   int n = p->lp_data->n;
+   int i, cnt = 0, i_cnt = 0;
+   double lpetol = p->lp_data->lpetol, xi;
+
+   for (i = 0; i < n; i++){
+      if (vars[i]->is_int){
+	 i_cnt++;
+	 xi = x[i];
+	 if (xi - floor(xi) > lpetol && ceil(xi) - xi > lpetol){
+	    tind[cnt] = vars[i]->userind;
+	    tx[cnt++] = x[i];
+	 }
+      }
+   }
+   *int_cnt = i_cnt; 
+   return(cnt);
+}
+
+/*===========================================================================*/
+
 node_desc *create_explicit_node_desc(lp_prob *p)
 {
    LPdata *lp_data = p->lp_data;
@@ -1293,7 +1361,7 @@ int check_tailoff(lp_prob *p)
 	       p->obj_no_impr_iters--;
 	    }
 	 }
-	 if(p->iter_num > 1 && p->par.verbosity > -1)
+	 //if(p->iter_num > 1 && p->par.verbosity > -1)
 	    //printf("w-iter - obj_gap - no_iter : %i %f %i\n", weighted_iter, obj_gap, p->obj_no_impr_iters);
 	 
 	 if(weighted_iter <= 400){
@@ -1764,7 +1832,7 @@ int update_cut_parameters(lp_prob *p)
    if(data_par->use_chain_strategy){
 
       int init_chain_trial_freq = p->par.cgl.chain_trial_freq;
-
+ 
 #if 0
       double dual_gap = 100.0;
       if(p->has_ub){
@@ -1772,15 +1840,18 @@ int update_cut_parameters(lp_prob *p)
       }
 
       if(dual_gap < 0.25) data_par->chain_status = CGL_CHAIN_STOP;
-#endif
 
-#if 1
+#endif
       
+      
+#if 1      
 
       if(data_par->chain_status == CGL_CHAIN_START){
 	 data_par->max_chain_trial_num = p->par.cgl.max_chain_trial_num - 
 	    p->lp_stat.chain_cuts_trial_num;	 
-	 if(data_par->max_chain_trial_num < 0) data_par->chain_status = CGL_CHAIN_STOP;
+	 if(data_par->max_chain_trial_num < 0) {
+	    data_par->chain_status = CGL_CHAIN_STOP;
+	 }
       }
 
       double b_prog, cut_prog = 0.0;
@@ -1811,8 +1882,8 @@ int update_cut_parameters(lp_prob *p)
 	      due to improvement or we just passed a check_point after
 	      paused for a while*/
 	 if(cuts_tried){
-	    if(b_prog >= 4*cut_prog || fabs(cut_prog/(start_objval + 1e-4)) < data_par->chain_weighted_gap ||
-	       act_cut_ratio > 0.2){
+	    if((b_prog >= 4*cut_prog || fabs(cut_prog/(start_objval + 1e-4)) < data_par->chain_weighted_gap ||
+		act_cut_ratio > 0.2)){
 	       if(data_par->max_chain_trial_num >= 0){
 		  data_par->chain_status = CGL_CHAIN_PAUSE;
 		  data_par->chain_trial_freq = init_chain_trial_freq;
@@ -1883,7 +1954,7 @@ int update_cut_parameters(lp_prob *p)
 #ifdef COMPILE_IN_LP      
       if(data_par->use_chain_strategy){
 	 if(p->bc_level > 0 && p->tm->lp_stat.probing_calls +
-	    p->lp_stat.probing_calls > 50 &&
+	    p->lp_stat.probing_calls > 100 &&
 	    p->tm->lp_stat.probing_cuts + p->lp_stat.probing_cuts < 10){
 	    data_par->generate_cgl_probing_cuts = DO_NOT_GENERATE;
 	 }else{	 
@@ -2138,6 +2209,11 @@ int update_cut_parameters(lp_prob *p)
    if (data_par->generate_cgl_gomory_cuts == GENERATE_DEFAULT) {
 #ifdef COMPILE_IN_LP
       if(data_par->use_chain_strategy){
+
+	 //printf("gomory_nz: %.2f\n", p->gomory_nz);
+	 if (p->lp_stat.gomory_nz > 5e6){
+	    data_par->generate_cgl_gomory_cuts = DO_NOT_GENERATE;
+	 }
 	 if(p->bc_level > 0 && p->tm->lp_stat.gomory_calls + p->lp_stat.gomory_calls > 200 &&
 	    p->tm->lp_stat.gomory_cuts + p->lp_stat.gomory_cuts < 10){
 	    data_par->generate_cgl_gomory_cuts = DO_NOT_GENERATE;
@@ -2284,7 +2360,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
    if (p->par.tried_long_cuts == TRUE) {
       repeat_with_long = FALSE;
    }
-
+   
    i = 0; 
 
    for (; i<CGL_NUM_GENERATORS; i++) {
@@ -2308,6 +2384,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
          p->par.tried_long_cuts = TRUE;
       }
    }
+
    p->par.max_cut_length = max_cut_length;
 
    add_col_cuts(p, &cutlist, bound_changes);
@@ -2574,13 +2651,10 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             break;
          }
 	 gomory->setLimit(max_cut_length);
-	 //if(p->bc_index < 1){
-	 //  gomory->setAway(0.01);
-	 // gomory->setAwayAtRoot(0.01);
-	 //}else{
-	 //  gomory->setAway(0.05);
-	 //  gomory->setAwayAtRoot(0.05);
-	 //}
+	 if(p->bc_index < 1) {
+	    gomory->setAway(100*p->lp_data->lpetol);
+	 }
+	 //gomory->setAwayAtRoot(100*p->lp_data->lpetol);
 	 *should_generate = TRUE;
          p->lp_stat.gomory_calls++;
          break;
@@ -2748,8 +2822,8 @@ int generate_cgl_cut_of_type(lp_prob *p, int i, OsiCuts *cutlist_p,
          CglGomory *gomory = new CglGomory;
          should_use_cgl_generator(p, &should_generate, i, (void *)gomory);
          if (should_generate == TRUE) {
-            gomory->generateCuts(*(p->lp_data->si), cutlist);
-            *was_tried = TRUE;
+	    gomory->generateCuts(*(p->lp_data->si), cutlist);
+	    *was_tried = TRUE;	    
          }
          delete gomory;
          cut_time     = used_time(&total_time);
@@ -2976,6 +3050,11 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       hashes[*num_cuts + accepted_cnt] = hash_value; 
       accepted_ind[accepted_cnt] = i;
       accepted_cnt++; 
+
+      if (generator == CGL_GOMORY_GENERATOR){
+	 p->lp_stat.gomory_nz += num_elements; 
+      }
+
       //j++;
 #ifdef COMPILE_IN_LP
       if(p->bc_index < 1 && p->mip->mip_inf && ( generator == CGL_PROBING_GENERATOR || 

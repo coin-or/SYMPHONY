@@ -509,6 +509,7 @@ typedef struct LP_STAT{
    int         cuts_deleted_from_lps;
 
    int         gomory_calls;
+   int         gomory_nz; 
    int         knapsack_calls;
    int         oddhole_calls;
    int         clique_calls;
@@ -784,6 +785,7 @@ typedef struct MIPINFO{
    int c_num;
    int c_nz;
    int *c_tmp;
+   int prob_num;
    
 }MIPinfo; 
 

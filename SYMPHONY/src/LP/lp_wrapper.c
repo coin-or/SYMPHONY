@@ -802,7 +802,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    double true_objval = p->lp_data->objval;
    LPdata *lp_data = p->lp_data;
    double lpetol = lp_data->lpetol;
-   double lpetol100 = lpetol*100, lpetol1 = 1 - lpetol100;
+   //double lpetol100 = lpetol*100, lpetol1 = 1 - lpetol100;
+   double lpetol100 = lpetol, lpetol1 = 1 - lpetol100;
    int *indices;
    double *values, valuesi, *heur_solution = NULL, *col_sol = NULL, 
           new_obj_val;

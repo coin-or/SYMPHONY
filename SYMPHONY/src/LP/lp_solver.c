@@ -2337,6 +2337,8 @@ void open_lp_solver(LPdata *lp_data)
    //lp_data->si->getModelPtr()->setSpecialOptions(524288);
    //lp_data->si->getModelPtr()->setSpecialOptions(4);   
    lp_data->si->getModelPtr()->setPerturbation(50);
+   //set cleanup param if unscaled primal is infeasible
+   lp_data->si->setCleanupScaling(1);
 #endif
 #ifdef __OSI_GLPK__
    lp_data->lpetol = 1e-07; /* glpk doesn't return the value of this param */ 
@@ -2832,6 +2834,18 @@ void set_obj_upper_lim(LPdata *lp_data, double lim)
 }
 
 /*===========================================================================*/
+
+void set_timelim(LPdata *lp_data, double timelim)
+{
+
+#ifdef __OSI_CLP__
+   
+   ClpDblParam key = ClpMaxSeconds;   
+   lp_data->si->getModelPtr()->setDblParam(key, timelim);
+
+#endif
+   
+}
 
 /*===========================================================================*\
  * Set an upper limit on the number of iterations. If itlim < 0 then set
