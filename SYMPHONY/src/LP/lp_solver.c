@@ -22,6 +22,7 @@
 #include "sym_lp_solver.h"
 #include "sym_constants.h"
 #include "sym_macros.h"
+#include "sym_qsort.h"
 
 #ifdef PRINT
 #undef PRINT
@@ -3491,7 +3492,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    }
     
    mip->obj_offset = -mps.objectiveOffset();
-
+   
    return(errors);
 }
 

@@ -305,7 +305,7 @@ int fathom_branch(lp_prob *p)
       p->iter_num++;
       p->node_iter_num++;
       lp_data->lp_count++;
-
+      
       PRINT(verbosity, 2,
 	    ("\n\n**** Starting iteration %i ****\n\n", p->iter_num));
 
@@ -439,8 +439,9 @@ int fathom_branch(lp_prob *p)
 	    sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
 	    write_mps(lp_data, name);
 #endif
-	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity)
-		   || termcode == LP_D_OBJLIM){
+	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity +
+		    p->lp_data->lpetol) || 
+		   termcode == LP_D_OBJLIM){
 	    PRINT(verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
 #ifdef COMPILE_IN_LP
@@ -772,11 +773,13 @@ int fathom(lp_prob *p, int primal_feasible)
 	 return(FALSE);
       }
       /* Now we know that we have total dual feasibility */
-      if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity) ||
+      if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity +
+	   p->lp_data->lpetol) ||
 	  termcode == LP_D_OBJLIM || termcode == LP_OPT_FEASIBLE){
 	 /* fathomable */
 	 if (termcode == LP_D_OBJLIM ||
-	     (p->has_ub && lp_data->objval > p->ub - p->par.granularity)){
+	     (p->has_ub && lp_data->objval > p->ub - p->par.granularity +
+	      p->lp_data->lpetol)){
 	    PRINT(p->par.verbosity, 1,
 		  ("Fathoming node (discovered tdf & high cost)\n\n"));
 	 }else{
@@ -906,7 +909,8 @@ int repricing(lp_prob *p)
        case LP_OPTIMAL:
 	 if (termcode == LP_D_UNBOUNDED){
 	    PRINT(p->par.verbosity, 1, ("Feasibility lost -- "));
-	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity)
+	 }else if ((p->has_ub && lp_data->objval > p->ub - p->par.granularity +
+		    p->lp_data->lpetol)
 		   || termcode == LP_D_OBJLIM){
 	    PRINT(p->par.verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
@@ -1319,7 +1323,7 @@ int check_tailoff(lp_prob *p)
       gap_backsteps = 4;
       obj_backsteps = 5;
    }
-
+   
    int maxsteps = MAX(gap_backsteps, obj_backsteps);
    
    //if(p->tm->stat.analyzed > 1000 && p->node_iter_num > 1) return TRUE;
@@ -1845,7 +1849,7 @@ int update_cut_parameters(lp_prob *p)
       
       
 #if 1      
-
+      
       if(data_par->chain_status == CGL_CHAIN_START){
 	 data_par->max_chain_trial_num = p->par.cgl.max_chain_trial_num - 
 	    p->lp_stat.chain_cuts_trial_num;	 
@@ -2651,9 +2655,9 @@ int should_use_cgl_generator(lp_prob *p, int *should_generate,
             break;
          }
 	 gomory->setLimit(max_cut_length);
-	 if(p->bc_index < 1) {
-	    gomory->setAway(100*p->lp_data->lpetol);
-	 }
+	 //if(p->bc_index < 1) {
+	 //  gomory->setAway(100*p->lp_data->lpetol);
+	 //}
 	 //gomory->setAwayAtRoot(100*p->lp_data->lpetol);
 	 *should_generate = TRUE;
          p->lp_stat.gomory_calls++;

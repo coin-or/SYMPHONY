@@ -198,7 +198,7 @@ int sym_set_defaults(sym_environment *env)
    env->par.test = FALSE;
    /************************** treemanager defaults **************************/
    tm_par->verbosity = 0;
-   tm_par->granularity = 0.000001;
+   tm_par->granularity = 1e-7;
    strcpy(tm_par->lp_exe, "symphony_lp");
 #ifdef COMPILE_IN_CG
    strcat(tm_par->lp_exe, "_cg");
@@ -943,18 +943,18 @@ int sym_solve(sym_environment *env)
     * TODO: find if granularity could be 0.1 or 0.2 or ... instead of just
     *       1.0, 2.0, ...
     */
-   if (env->mip && env->mip->obj && env->par.tm_par.granularity<=0.000001) {
+   if (env->mip && env->mip->obj && env->par.tm_par.granularity<=1e-7) {
       for (int i=0;i<env->mip->n;i++) {
          double coeff = env->mip->obj[i];
-         if (fabs(coeff)>0.000001) {
+         if (fabs(coeff)> 1e-7) {
             if (env->mip->is_int[i]) {
-               if (fabs(floor(coeff+0.5)-coeff)<0.000001) {
+               if (fabs(floor(coeff+0.5)-coeff)< 1e-7) {
                   granularity = sym_gcd(granularity,(int)floor(coeff+0.5));
                } else {
                   granularity = 0;
                   break;
                }
-            } else if (env->mip->ub[i]-env->mip->lb[i]>0.000001) {
+            } else if (env->mip->ub[i]-env->mip->lb[i]>1e-7) {
                granularity=0;
                break;
             } 
@@ -965,7 +965,7 @@ int sym_solve(sym_environment *env)
        * epsilon
        */
       env->par.tm_par.granularity = env->par.lp_par.granularity = 
-         fabs((double)granularity-0.000001);
+         fabs((double)granularity - 1e-7);
    }
    PRINT(env->par.verbosity, 0, ("granularity set at %f\n",
             env->par.tm_par.granularity));
