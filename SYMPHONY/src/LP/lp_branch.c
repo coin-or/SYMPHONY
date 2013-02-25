@@ -1583,7 +1583,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                p->lp_stat.str_br_lp_calls++;
 	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
                can->objval[j] = lp_data->objval;
-               get_x(lp_data);
+               //get_x(lp_data);
 
 #ifdef SENSITIVITY_ANALYSIS
                if (p->par.sensitivity_analysis){      
@@ -1650,7 +1650,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #ifdef COMPILE_FRAC_BRANCHING
                else{
                   if (can->termcode[j] != LP_ABANDONED){
-                     get_x(lp_data);
+                     //get_x(lp_data);
                   }
                }
                if (can->termcode[j] != LP_ABANDONED){
@@ -1689,7 +1689,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                can->objval[j] = lp_data->objval;
 
 
-               get_x(lp_data);
+               //get_x(lp_data);
 
 #ifdef SENSITIVITY_ANALYSIS
                if (p->par.sensitivity_analysis){      
@@ -1739,7 +1739,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #ifdef COMPILE_FRAC_BRANCHING
                else{
                   if (can->termcode[j] != LP_ABANDONED)
-                     get_x(lp_data);
+                     //get_x(lp_data);
                }
                if (can->termcode[j] != LP_ABANDONED){
                   xind = lp_data->tmp.i1; /* n */

@@ -346,9 +346,9 @@ int fathom_branch(lp_prob *p)
 #endif
       
       /* Get relevant data */
-      get_dj_pi(lp_data);
-      get_slacks(lp_data);
-      get_x(lp_data);
+      //get_dj_pi(lp_data);
+      //get_slacks(lp_data);
+      //get_x(lp_data);
 
       if(p->bc_level > 0 && p->node_iter_num < 2 && termcode == LP_OPTIMAL){
 	 p->lp_stat.node_cuts_tried = 0;
@@ -3466,7 +3466,7 @@ int update_pcost(lp_prob *p)
       return 0;
    }
    
-   get_x(p->lp_data);
+   //get_x(p->lp_data);
    x = p->lp_data->x;
    if (parent->children[0]->bc_index != p->bc_index) {
       sense = (sense == 'L') ? 'G' : 'L';
