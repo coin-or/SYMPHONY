@@ -816,7 +816,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    int n = lp_data->n;
    double gran_round;
    int do_primal_heuristic = FALSE, check_ls = TRUE; 
-   get_x(lp_data); /* maybe just fractional -- parameter ??? */
+   //get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
    indices = lp_data->tmp.i1; /* n */
    values = lp_data->tmp.d; /* n */
@@ -1488,16 +1488,19 @@ int select_candidates_u(lp_prob *p, int *cuts, int *new_vars,
       return(DO_NOT_BRANCH);
 
    p->comp_times.strong_branching += used_time(&p->tt);
+
    {
       /* it seems we are going to branch. Before doing that, we should invoke
        * heuristics. */
-      double oldobj = (p->has_ub ? p->ub : SYM_INFINITY);
-      int feas_status = is_feasible_u(p, FALSE, TRUE);
-      p->comp_times.primal_heur += used_time(&p->tt);
-      if (feas_status == IP_FEASIBLE || (feas_status==IP_HEUR_FEASIBLE &&
-					 p->ub < oldobj - lp_data->lpetol)){// && //){
-	  //					 *cuts > 0)){
-         return(DO_NOT_BRANCH__FEAS_SOL);
+      if (p->bc_index < 1) {
+	 double oldobj = (p->has_ub ? p->ub : SYM_INFINITY);
+	 int feas_status = is_feasible_u(p, FALSE, TRUE);
+	 p->comp_times.primal_heur += used_time(&p->tt);
+	 if (feas_status == IP_FEASIBLE || (feas_status==IP_HEUR_FEASIBLE &&
+					    p->ub < oldobj - lp_data->lpetol)){// && //){
+	    //					 *cuts > 0)){
+	    return(DO_NOT_BRANCH__FEAS_SOL);
+	 }
       }
    }
 

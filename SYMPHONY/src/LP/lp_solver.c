@@ -22,6 +22,7 @@
 #include "sym_lp_solver.h"
 #include "sym_constants.h"
 #include "sym_macros.h"
+#include "sym_qsort.h"
 
 #ifdef PRINT
 #undef PRINT
@@ -2581,10 +2582,10 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    
    if (si->isProvenDualInfeasible())
       term = LP_D_INFEASIBLE;
-   else if (si->isDualObjectiveLimitReached())
-      term = LP_D_OBJLIM;
    else if (si->isProvenPrimalInfeasible())
       term = LP_D_UNBOUNDED;
+   else if (si->isDualObjectiveLimitReached())
+      term = LP_D_OBJLIM;
    else if (si->isProvenOptimal())
       term = LP_OPTIMAL;
    else if (si->isIterationLimitReached())
@@ -2605,6 +2606,15 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       *iterd = si->getIterationCount();
       
       lp_data->objval = si->getObjValue();
+
+      /* Get relevant data */
+      if (lp_data->dualsol && lp_data->dj) {
+	 get_dj_pi(lp_data);
+      }
+      if (lp_data->slacks && term == LP_OPTIMAL) {
+	 get_slacks(lp_data);
+      }
+      get_x(lp_data);
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }
@@ -2631,7 +2641,6 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 int dual_simplex(LPdata *lp_data, int *iterd)
 {
    
-   //int term = LP_ABANDONED;
    int term = 0;
    OsiXSolverInterface  *si = lp_data->si;
 #ifdef __OSI_CLP__
@@ -2644,14 +2653,13 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    //si->getModelPtr()->setSubstitution(3);
 #endif
    si->resolve();
-   //si->initialSolve();
    
    if (si->isProvenDualInfeasible())
       term = LP_D_INFEASIBLE;
-   else if (si->isDualObjectiveLimitReached())
-      term = LP_D_OBJLIM;
    else if (si->isProvenPrimalInfeasible())
       term = LP_D_UNBOUNDED;
+   else if (si->isDualObjectiveLimitReached())
+      term = LP_D_OBJLIM;
    else if (si->isProvenOptimal())
       term = LP_OPTIMAL;
    else if (si->isIterationLimitReached())
@@ -2672,6 +2680,16 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       *iterd = si->getIterationCount();
       
       lp_data->objval = si->getObjValue();
+
+      /* Get relevant data */
+      if (lp_data->dualsol && lp_data->dj) {
+	 get_dj_pi(lp_data);
+      }
+      if (lp_data->slacks && term == LP_OPTIMAL) {
+	 get_slacks(lp_data);
+      }
+      
+      get_x(lp_data);
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
@@ -2704,10 +2722,10 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
    
    if (si->isProvenDualInfeasible())
       term = LP_D_INFEASIBLE;
-   else if (si->isDualObjectiveLimitReached())
-      term = LP_D_OBJLIM;
    else if (si->isProvenPrimalInfeasible())
       term = LP_D_UNBOUNDED;
+   else if (si->isDualObjectiveLimitReached())
+      term = LP_D_OBJLIM;
    else if (si->isProvenOptimal())
       term = LP_OPTIMAL;
    else if (si->isIterationLimitReached())
@@ -2727,6 +2745,16 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
       *iterd = si->getIterationCount();
       
       lp_data->objval = si->getObjValue();
+
+      /* Get relevant data */
+      if (lp_data->dualsol && lp_data->dj) {
+	 get_dj_pi(lp_data);
+      }
+      if (lp_data->slacks && term == LP_OPTIMAL) {
+	 get_slacks(lp_data);
+      }
+      
+      get_x(lp_data);
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
@@ -2828,9 +2856,16 @@ void get_basis(LPdata *lp_data, int *cstat, int *rstat)
 
 void set_obj_upper_lim(LPdata *lp_data, double lim)
 {
+
+#ifndef __OSI_CPLEX__
    OsiDblParam key = OsiDualObjectiveLimit;
-   
+
    retval = lp_data->si->setDblParam(key, lim);
+#else
+
+   CPXsetdblparam(lp_data->si->getEnvironmentPtr(), CPX_PARAM_OBJULIM, lim);
+
+#endif
 }
 
 /*===========================================================================*/
@@ -3491,7 +3526,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
    }
     
    mip->obj_offset = -mps.objectiveOffset();
-
+   
    return(errors);
 }
 

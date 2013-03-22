@@ -2524,7 +2524,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 		   } else {
 		      new_lb = rows[row_ind].lb + a_val;		   
 		   }
-		   if (new_lb > rhs){
+		   if (new_lb > rhs + etol){
 		      fix_to_lb = TRUE;
 		   }
 		}
@@ -2534,7 +2534,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 		   } else {
 		      new_ub = rows[row_ind].ub - a_val;
 		   }
-		   if (new_ub < rhs){
+		   if (new_ub < rhs - etol){
 		      fix_to_ub = TRUE;
 		   }
 		}
@@ -2556,7 +2556,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 		   } else {
 		      new_lb = rows[row_ind].lb - a_val; 	 	     
 		   }
-		   if (new_lb > rhs)
+		   if (new_lb > rhs + etol)
 		      fix_to_ub = TRUE;
 		}
 		if (!fix_to_ub && check_improve && !impl_mode){
@@ -2618,7 +2618,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 		   } else {
 		      new_lb = rows[row_ind].lb - a_val; 	 	     
 		   }
-		   if (new_lb > rhs){
+		   if (new_lb > rhs + etol){
 		      fix_to_ub = TRUE;
 		   }
 		}
@@ -2628,7 +2628,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 		   } else {
 		      new_ub = rows[row_ind].ub + a_val;	 
 		   }
-		   if (new_ub < rhs){
+		   if (new_ub < rhs - etol){
 		      fix_to_lb = TRUE;
 		   }
 		}
@@ -2874,7 +2874,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 		     new_bound = prep_rnd_integral(new_bound, etol, RND_FLOOR);
 		  }	       
 		  
-		  if (new_bound < ub[col_ind]){
+		  if (new_bound < ub[col_ind] - etol){
 		     termcode = PREP_MODIFIED;
 		     fix_type = IMPROVE_UB;
 		  }
@@ -2922,7 +2922,7 @@ int prep_improve_variable(PREPdesc *P, int col_ind, int row_ind, int a_loc,
 		     new_bound = prep_rnd_integral(new_bound, etol, RND_CEIL);
 		  }	       
 		  
-		  if (new_bound > lb[col_ind]){
+		  if (new_bound > lb[col_ind] + etol){
 		     termcode = PREP_MODIFIED;
 		     fix_type = IMPROVE_LB;
 		  }

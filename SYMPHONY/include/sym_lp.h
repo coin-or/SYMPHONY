@@ -182,7 +182,7 @@ typedef struct LP_PROB{
 
    double          cgl_impr;
    int             cgl_impr_cnt; 
-
+   int             is_diving; 
 }lp_prob;
 
 /*===========================================================================*/

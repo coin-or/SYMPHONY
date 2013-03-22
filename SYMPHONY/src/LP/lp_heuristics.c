@@ -741,7 +741,7 @@ int fp_solve_lp(LPdata *lp_data, FPdata *fp_data, char* is_feasible)
       return FUNCTION_TERMINATED_ABNORMALLY;
    }
 
-   get_x(lp_data);
+   //get_x(lp_data);
 
    delta_x = 0;
    memcpy(x_lp,lp_data_x,DSIZE*n0);
@@ -1454,7 +1454,7 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
 		 //continue;
 		 abandon_lp = TRUE;
 	      }else{
-		 if(fixed_cnt < 2 && !other_tried){
+		 if(fixed_cnt < 2 && !other_tried && false){
 		    double bd = (min_dir == 'L' ? ceil(x[min_ind] - lp_data->lpetol) : floor(x[min_ind] + lp_data->lpetol));
 		    diving_lp->si->setColLower(min_ind, bd);
 		    diving_lp->si->setColUpper(min_ind, bd);
@@ -1485,7 +1485,7 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
 	
 	if(d_fixed_cnt < 1){
 	   tot_lp_iter += iter_cnt; 
-	   get_x(diving_lp);
+	   //get_x(diving_lp);
 	   x = diving_lp->x;
 	   
 	   prev_frac_ip_cnt = frac_ip_cnt; 
@@ -2080,7 +2080,7 @@ int shift_solution(lp_prob *p, LPdata *lp_data, double *solutionValue,
    total_time = used_time(&total_time);
 
    
-   get_x(lp_data);
+   //get_x(lp_data);
    x = lp_data->x;
    double new_obj = 0.0;//lp_data->objval;
    
@@ -2521,7 +2521,7 @@ int round_solution(lp_prob *p, LPdata *lp_data, double *solutionValue,
    }
    
    //get_bounds(lp_data);
-   get_x(lp_data);
+   //get_x(lp_data);
    
    //lower = lp_data->lb;
    //upper = lp_data->ub;

@@ -618,8 +618,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       strong_br_min_level = 1;
 	       //cand_num = 1;
 	    }
+	    //printf("max_level: %i\n", max_level);
 	 }
-
+	 
 	 max_solves = MIN(p->par.rel_br_override_max_solves, max_solves);
 	 
 	 double rel_limit = 0.05;
@@ -784,6 +785,18 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 str_br_iter_limit = TRUE;      
       }
 
+      double frac_avg = 0.0;
+      double frac_tol = 1e-5; 
+      for (i=0; i<cand_num; i++) {
+	 xval = x[p->br_rel_cand_list[i]];
+	 frac_avg += MIN(xval - floor(xval), ceil(xval) - xval);
+      }
+      frac_avg = frac_avg/cand_num;
+      if (frac_avg < 1e-2) {
+	 frac_tol = 1e-2; 
+      }
+      //printf("frac_avg - %f \n", frac_avg);
+
       for (i=0; i<cand_num; i++) {
 	//printf("cand - %i \n", i);
 	 branch_var = p->br_rel_cand_list[i];
@@ -797,8 +810,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
 	 // ignore the small violations
 	 if (best_can != NULL){
-	    if (xval - floorx < 0.1 ||
-		ceilx - xval < 0.1){
+	    if (xval - floorx < frac_tol ||
+		ceilx - xval < frac_tol){
+	       //printf("xval: %f\n", xval);
 	       continue;
 	    }
 	 }
@@ -845,8 +859,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                br_rel_down[branch_var]++;
 	       p->lp_stat.rel_br_down_update++;
             }
-            full_solves++;
-            solves_since_impr++;
+	    full_solves++;
+	    solves_since_impr++;
 	    p->lp_stat.rel_br_full_solve_num++;
          }
 
@@ -892,10 +906,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                br_rel_up[branch_var]++;
 	       p->lp_stat.rel_br_up_update++;
 	    }
-            full_solves++;
-            solves_since_impr++;
+	    full_solves++;
+	    solves_since_impr++;
 	    p->lp_stat.rel_br_full_solve_num++;
-         }
+	 }
 
          if (down_obj > SYM_INFINITY/10 && up_obj > SYM_INFINITY/10) {
 	    //printf("d u %f %f\n", down_obj, up_obj);
@@ -1569,7 +1583,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                p->lp_stat.str_br_lp_calls++;
 	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
                can->objval[j] = lp_data->objval;
-               get_x(lp_data);
+               //get_x(lp_data);
 
 #ifdef SENSITIVITY_ANALYSIS
                if (p->par.sensitivity_analysis){      
@@ -1636,7 +1650,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #ifdef COMPILE_FRAC_BRANCHING
                else{
                   if (can->termcode[j] != LP_ABANDONED){
-                     get_x(lp_data);
+                     //get_x(lp_data);
                   }
                }
                if (can->termcode[j] != LP_ABANDONED){
@@ -1675,7 +1689,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                can->objval[j] = lp_data->objval;
 
 
-               get_x(lp_data);
+               //get_x(lp_data);
 
 #ifdef SENSITIVITY_ANALYSIS
                if (p->par.sensitivity_analysis){      
@@ -1725,7 +1739,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #ifdef COMPILE_FRAC_BRANCHING
                else{
                   if (can->termcode[j] != LP_ABANDONED)
-                     get_x(lp_data);
+                     //get_x(lp_data);
                }
                if (can->termcode[j] != LP_ABANDONED){
                   xind = lp_data->tmp.i1; /* n */
