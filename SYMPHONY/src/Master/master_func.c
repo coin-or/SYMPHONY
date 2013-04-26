@@ -7,7 +7,7 @@
 /*                                                                           */
 /* This file was developed by Menal Guzelsoy for the SYMPHONY OSI interface. */
 /*                                                                           */
-/* (c) Copyright 2000-2011 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
