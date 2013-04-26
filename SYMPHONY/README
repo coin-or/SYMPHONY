@@ -1,9 +1,9 @@
-SYMPHONY Version 5.4.0 README
+SYMPHONY Version 5.5.0 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
-2000-2011 by Ted Ralphs and others. This README may be redistributed freely.
+2000-2013 by Ted Ralphs and others. This README may be redistributed freely.
 
 DOCUMENTATION
 =============
@@ -17,6 +17,47 @@ http://www.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
+
+Release 5.4.7:
+
+1. Updates to documentation
+
+Release 5.5.0:
+
+1. Improvements to preprocessing
+2. Improvements to heuristics
+3. Improvements to MSVC++ support
+4. Bug fixes
+5. Significant performance gains 
+
+Release 5.4.6:
+1. More fixes to allow use of CPLEX as LP solver
+2. Fixes to interface with GMPL
+
+Release 5.4.5:
+
+1. Fixes to allow use of CPLEX as LP solver
+2. Fixes to interface with GMPL
+
+Release 5.4.4:
+
+1. Fixes for build system
+2. Other minor fixes
+
+Release 5.4.3:
+
+1. Updates to documentation.
+2. Fix to allow box-constrained integer programs.
+3. Fix for GMPL integration
+4. Fix for readline versions
+
+Release 5.4.2:
+
+1. Updates to MSVC++ version 10 files
+
+Release 5.4.1
+
+1. Addition of MSVC++ version 9 files
 
 Release 5.4.0:
 
