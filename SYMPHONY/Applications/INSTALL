@@ -1,10 +1,10 @@
-SYMPHONY 5.4 APPLICATION INSTALLATION
+SYMPHONY 5.5 APPLICATION INSTALLATION
 ==========================================
 
 This file contains instructions on building all of the SYMPHONY Applications.
 Specific instructions for each particular application are in the individual 
-INSTALL files. These instructions are for SYMPHONY 5.4.0, but should work
-for other versions 5.4.* as well.
+INSTALL files. These instructions are for SYMPHONY 5.5.0, but should work
+for other versions 5.5.* as well.
 
 ******************************************************************************
 *     Building in Unix-like environments (UNIX/LINUX/CYGWIN/MINGW/OSX)       *
@@ -21,7 +21,7 @@ obtain updates. In a Unix-like environment (such as Linux or CYGWIN),
 the following command may be used to obtain SYMPHONY from 
 source using SVN in most cases:
 
-   svn checkout https://projects.coin-or.org/svn/SYMPHONY/releases/5.4.0 SYMPHONY-5.4.0
+   svn checkout https://projects.coin-or.org/svn/SYMPHONY/releases/5.5.0 SYMPHONY-5.5.0
 
 The alternative way is to get a daily snapshot of the source code as a tarball 
 from  the download page of COIN-OR:
@@ -30,13 +30,13 @@ from  the download page of COIN-OR:
 
 2. If the code is obtained as a tarball, unpack the distribution with 
 
-   tar -xzf SYMPHONY-5.4.0.tgz
+   tar -xzf SYMPHONY-5.5.0.tgz
 
 3. In order to compile SYMPHONY's applications, you must first compile the 
 application specific library. Type
 
    cd 
-   cd SYMPHONY-5.4.0
+   cd SYMPHONY-5.5.0
    ./configure --with-application
    make
    make install
