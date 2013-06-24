@@ -647,7 +647,13 @@ includecoin_HEADERS = ../include/symphony.h
 # Create the Config.h file that has all public defines and install it #
 #######################################################################
 
+INSTALL_MANIFEST=
+if USE_CL
+INSTALL_MANIFEST += mt -manifest symphony.exe.manifest -outputresource:symphony.exe;1
+endif
+
 install-exec-local:
+	$(INSTALL_MANIFEST)
 	$(install_sh_DATA) ../include/config_sym.h $(DESTDIR)$(includecoindir)/SymConfig.h
 
 uninstall-local:

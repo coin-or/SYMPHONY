@@ -115,6 +115,7 @@ EXTRA_PROGRAMS = symphony$(EXEEXT) symphony_m$(EXEEXT) \
 	symphony_tm_cp$(EXEEXT) symphony_tm_lp$(EXEEXT) \
 	symphony_tm_lp_cg$(EXEEXT) symphony_tm_lp_cg_cp$(EXEEXT)
 bin_PROGRAMS = $(am__EXEEXT_1)
+@USE_CL_TRUE@am__append_41 = mt -manifest symphony.exe.manifest -outputresource:symphony.exe;1
 subdir = src
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -2634,10 +2635,10 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_PKG_CONFIG = @ac_ct_PKG_CONFIG@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
-ac_pt_PKG_CONFIG = @ac_pt_PKG_CONFIG@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -3060,6 +3061,12 @@ libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 # and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = ../include/symphony.h
+#	$(SYMHEADERS)
+
+#######################################################################
+# Create the Config.h file that has all public defines and install it #
+#######################################################################
+INSTALL_MANIFEST = $(am__append_41)
 all: all-recursive
 
 .SUFFIXES:
@@ -9603,13 +9610,9 @@ uninstall-info: uninstall-info-recursive
 
 rename_obj:
 	mv main.obj symphony-main.obj
-#	$(SYMHEADERS)
-
-#######################################################################
-# Create the Config.h file that has all public defines and install it #
-#######################################################################
 
 install-exec-local:
+	$(INSTALL_MANIFEST)
 	$(install_sh_DATA) ../include/config_sym.h $(DESTDIR)$(includecoindir)/SymConfig.h
 
 uninstall-local:
