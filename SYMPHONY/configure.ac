@@ -851,7 +851,6 @@ case "$CXX" in
   cl* | *\cl* | */cl*)
      CLLCFLAGS=$CXXFLAGS
      CXXFLAGS="$CXXFLAGS -TP"
-     sym_use_cl=true
   ;;
   g++* | *\g++* | */g++*)
      if test $sym_openmp = true; then
@@ -875,7 +874,6 @@ CFLAGS=$CXXFLAGS
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(CLLCFLAGS)
-AM_CONDITIONAL(USE_CL, [test $sym_use_cl = true])
 
 # Here list all the files that configure should create (except for the
 # configuration header file)

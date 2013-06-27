@@ -54,7 +54,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@USE_CL_TRUE@am__append_1 = ../include/sym_win32_time.h
+@COIN_CXX_IS_CL_TRUE@am__append_1 = ../include/sym_win32_time.h
 @PSEUDO_COSTS_TRUE@am__append_2 = LP/lp_pseudo_branch.c
 @PSEUDO_COSTS_FALSE@am__append_3 = LP/lp_branch.c
 @SYM_COMPILE_IN_LP_TRUE@am__append_4 = LP/lp_solver.c LP/lp_varfunc.c \
@@ -101,11 +101,11 @@ host_triplet = @host@
 @STATICEXE_FALSE@am__append_38 = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 @STATICEXE_FALSE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@ -rpath $(libdir)
 
-@USE_CL_TRUE@am__append_39 = cp -f main.$(OBJEXT) symphony-main.$(OBJEXT); $(LIBTOOL) \
-@USE_CL_TRUE@	--tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
-@USE_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+@COIN_CXX_IS_CL_TRUE@am__append_39 = cp -f main.$(OBJEXT) symphony-main.$(OBJEXT); $(LIBTOOL) \
+@COIN_CXX_IS_CL_TRUE@	--tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
+@COIN_CXX_IS_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-@USE_CL_FALSE@am__append_40 = $(LINK)
+@COIN_CXX_IS_CL_FALSE@am__append_40 = $(LINK)
 EXTRA_PROGRAMS = symphony$(EXEEXT) symphony_m$(EXEEXT) \
 	symphony_m_tm$(EXEEXT) symphony_m_tm_lp$(EXEEXT) \
 	symphony_m_tm_cp$(EXEEXT) symphony_m_tm_lp_cg$(EXEEXT) \
@@ -115,7 +115,6 @@ EXTRA_PROGRAMS = symphony$(EXEEXT) symphony_m$(EXEEXT) \
 	symphony_tm_cp$(EXEEXT) symphony_tm_lp$(EXEEXT) \
 	symphony_tm_lp_cg$(EXEEXT) symphony_tm_lp_cg_cp$(EXEEXT)
 bin_PROGRAMS = $(am__EXEEXT_1)
-@USE_CL_TRUE@am__append_41 = mt -manifest symphony.exe.manifest -outputresource:symphony.exe;1
 subdir = src
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -2602,8 +2601,6 @@ TRACE_PATH_FALSE = @TRACE_PATH_FALSE@
 TRACE_PATH_TRUE = @TRACE_PATH_TRUE@
 USE_CGL_CUTS_FALSE = @USE_CGL_CUTS_FALSE@
 USE_CGL_CUTS_TRUE = @USE_CGL_CUTS_TRUE@
-USE_CL_FALSE = @USE_CL_FALSE@
-USE_CL_TRUE = @USE_CL_TRUE@
 USE_GMPL_FALSE = @USE_GMPL_FALSE@
 USE_GMPL_TRUE = @USE_GMPL_TRUE@
 VERSION = @VERSION@
@@ -3061,12 +3058,6 @@ libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 # and that therefore should be installed in 'include/coin'
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = ../include/symphony.h
-#	$(SYMHEADERS)
-
-#######################################################################
-# Create the Config.h file that has all public defines and install it #
-#######################################################################
-INSTALL_MANIFEST = $(am__append_41)
 all: all-recursive
 
 .SUFFIXES:
@@ -9550,6 +9541,8 @@ install-data-am: install-includecoinHEADERS
 
 install-exec-am: install-binPROGRAMS install-exec-local \
 	install-libLTLIBRARIES
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 
 install-info: install-info-recursive
 
@@ -9587,13 +9580,14 @@ uninstall-info: uninstall-info-recursive
 	distclean-recursive distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-binPROGRAMS \
 	install-data install-data-am install-exec install-exec-am \
-	install-exec-local install-includecoinHEADERS install-info \
-	install-info-am install-libLTLIBRARIES install-man \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	maintainer-clean-recursive mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool mostlyclean-recursive \
-	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
+	install-exec-hook install-exec-local \
+	install-includecoinHEADERS install-info install-info-am \
+	install-libLTLIBRARIES install-man install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-includecoinHEADERS \
 	uninstall-info-am uninstall-libLTLIBRARIES uninstall-local
 
@@ -9610,9 +9604,22 @@ uninstall-info: uninstall-info-recursive
 
 rename_obj:
 	mv main.obj symphony-main.obj
+#	$(SYMHEADERS)
+
+########################################################################
+#                     Installing manifest (MSVC++)                     #
+########################################################################
+
+install-exec-hook:
+	test -s symphony.exe.manifest && \
+	mt -manifest symphony.exe.manifest -outputresource:symphony.exe;\
+	cp symphony.exe $(bindir)/symphony.exe
+
+#######################################################################
+# Create the Config.h file that has all public defines and install it #
+#######################################################################
 
 install-exec-local:
-	$(INSTALL_MANIFEST)
 	$(install_sh_DATA) ../include/config_sym.h $(DESTDIR)$(includecoindir)/SymConfig.h
 
 uninstall-local:
