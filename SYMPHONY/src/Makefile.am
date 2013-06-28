@@ -62,7 +62,7 @@ SYMHEADERS = \
 	../include/sym_prep.h  \
 	../include/sym_prep_params.h
 
-if USE_CL
+if COIN_CXX_IS_CL
  SYMHEADERS += ../include/sym_win32_time.h
 endif
 
@@ -351,7 +351,7 @@ LINK += $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 endif
 
 SYMLINK =
-if USE_CL
+if COIN_CXX_IS_CL
 SYMLINK += cp -f main.$(OBJEXT) symphony-main.$(OBJEXT); $(LIBTOOL) \
 	--tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CCLCFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -642,6 +642,17 @@ rename_obj:
 includecoindir = $(includedir)/coin
 includecoin_HEADERS = ../include/symphony.h
 #	$(SYMHEADERS)
+
+########################################################################
+#                     Installing manifest (MSVC++)                     #
+########################################################################
+
+if COIN_CXX_IS_CL
+install-exec-hook:
+	test -s symphony.exe.manifest && \
+	mt -manifest symphony.exe.manifest -outputresource:symphony.exe;\
+	cp symphony.exe $(bindir)/symphony.exe
+endif
 
 #######################################################################
 # Create the Config.h file that has all public defines and install it #

@@ -65,21 +65,21 @@ host_triplet = @host@
 
 @SYM_PARALLEL_TRUE@am__append_8 = ../src/libSym$(MASTEREXT).la ../src/OsiSym/libOsiSym.la
 @SYM_PARALLEL_FALSE@am__append_9 = $(SYMLIB)
-@USE_CL_TRUE@am__append_10 = cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
-@USE_CL_TRUE@	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
-@USE_CL_TRUE@	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
-@USE_CL_TRUE@	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
-@USE_CL_TRUE@	cp -f OsiSymSolverInterfaceTest.$(OBJEXT) unitTest-OsiSymSolverInterfaceTest.$(OBJEXT); \
-@USE_CL_TRUE@	cp -f unitTestSym.$(OBJEXT) unitTest-unitTestSym.$(OBJEXT); \
-@USE_CL_TRUE@	$(LIBTOOL) \
-@USE_CL_TRUE@	--tag=CXX --mode=link $(CXX) $(AM_CFLAGS) $(CCLCFLAGS) \
-@USE_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+@COIN_CXX_IS_CL_TRUE@am__append_10 = cp -f OsiColCutTest.$(OBJEXT) unitTest-OsiColCutTest.$(OBJEXT); \
+@COIN_CXX_IS_CL_TRUE@	cp -f OsiCutsTest.$(OBJEXT)  unitTest-OsiCutsTest.$(OBJEXT); \
+@COIN_CXX_IS_CL_TRUE@	cp -f OsiRowCutDebuggerTest.$(OBJEXT) unitTest-OsiRowCutDebuggerTest.$(OBJEXT); \
+@COIN_CXX_IS_CL_TRUE@	cp -f OsiRowCutTest.$(OBJEXT) unitTest-OsiRowCutTest.$(OBJEXT); \
+@COIN_CXX_IS_CL_TRUE@	cp -f OsiSymSolverInterfaceTest.$(OBJEXT) unitTest-OsiSymSolverInterfaceTest.$(OBJEXT); \
+@COIN_CXX_IS_CL_TRUE@	cp -f unitTestSym.$(OBJEXT) unitTest-unitTestSym.$(OBJEXT); \
+@COIN_CXX_IS_CL_TRUE@	$(LIBTOOL) \
+@COIN_CXX_IS_CL_TRUE@	--tag=CXX --mode=link $(CXX) $(AM_CFLAGS) $(CCLCFLAGS) \
+@COIN_CXX_IS_CL_TRUE@	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-@USE_CL_TRUE@am__append_11 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
-@USE_CL_TRUE@	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
-@USE_CL_TRUE@	OsiSymSolverInterfaceTest.$(OBJEXT) unitTestSym.$(OBJEXT)
+@COIN_CXX_IS_CL_TRUE@am__append_11 = OsiColCutTest.$(OBJEXT) OsiCutsTest.$(OBJEXT) \
+@COIN_CXX_IS_CL_TRUE@	OsiRowCutDebuggerTest.$(OBJEXT) OsiRowCutTest.$(OBJEXT) \
+@COIN_CXX_IS_CL_TRUE@	OsiSymSolverInterfaceTest.$(OBJEXT) unitTestSym.$(OBJEXT)
 
-@USE_CL_FALSE@am__append_12 = $(CXXLINK)
+@COIN_CXX_IS_CL_FALSE@am__append_12 = $(CXXLINK)
 noinst_PROGRAMS = unitTest$(EXEEXT) punitTest$(EXEEXT)
 @COIN_HAS_NETLIB_TRUE@am__append_13 = -netlibDir=`$(CYGPATH_W) $(NETLIB_DATA)` -testOsiSolverInterface
 @COIN_HAS_SAMPLE_TRUE@am__append_14 = -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
@@ -390,8 +390,6 @@ TRACE_PATH_FALSE = @TRACE_PATH_FALSE@
 TRACE_PATH_TRUE = @TRACE_PATH_TRUE@
 USE_CGL_CUTS_FALSE = @USE_CGL_CUTS_FALSE@
 USE_CGL_CUTS_TRUE = @USE_CGL_CUTS_TRUE@
-USE_CL_FALSE = @USE_CL_FALSE@
-USE_CL_TRUE = @USE_CL_TRUE@
 USE_GMPL_FALSE = @USE_GMPL_FALSE@
 USE_GMPL_TRUE = @USE_GMPL_TRUE@
 VERSION = @VERSION@
