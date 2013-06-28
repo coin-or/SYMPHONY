@@ -647,12 +647,12 @@ includecoin_HEADERS = ../include/symphony.h
 #                     Installing manifest (MSVC++)                     #
 ########################################################################
 
+if COIN_CXX_IS_CL
 install-exec-hook:
-	if COIN_CXX_IS_CL
-		test -s symphony.exe.manifest && \
-		mt -manifest symphony.exe.manifest -outputresource:symphony.exe;\
-		cp symphony.exe $(bindir)/symphony.exe
-	endif
+	test -s symphony.exe.manifest && \
+	mt -manifest symphony.exe.manifest -outputresource:symphony.exe;\
+	cp symphony.exe $(bindir)/symphony.exe
+endif
 
 #######################################################################
 # Create the Config.h file that has all public defines and install it #
