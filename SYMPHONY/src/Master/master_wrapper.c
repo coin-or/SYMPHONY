@@ -644,13 +644,23 @@ int send_cp_data_u(sym_environment *env, int sender)
 
 int display_solution_u(sym_environment *env, int thread_num)
 {
-   int user_res, i;
+   int user_res, i, n; 
    lp_sol sol;
-
+   char **colname;
+   
    memset(&sol, 0, sizeof(lp_sol));
    
    sol.xlength = 0;
 
+
+   if (env->orig_mip) {
+      colname = env->orig_mip->colname;
+      n = env->orig_mip->n; 
+   } else {
+      colname = env->mip->colname;
+      n = env->mip->n; 
+   }
+   
    if (env->par.verbosity < -1){
        return(FUNCTION_TERMINATED_NORMALLY);
    }     
@@ -715,33 +725,14 @@ int display_solution_u(sym_environment *env, int thread_num)
 		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++");
 		printf("\n");
 
-		char **colname;
-		if(env->orig_mip) colname = env->orig_mip->colname;
-		else colname = env->mip->colname;
-		
 		for (i = 0; i < sol.xlength; i++){
-		   if (sol.xind[i] == env->mip->n){
+		   if (sol.xind[i] >= n){
 		      continue;
 		   }
 		   printf("%-30s %10.3f\n", colname[sol.xind[i]],
 			  sol.xval[i]);
 		}
 		
-		/*
-		for (i = 0; i < sol.xlength; i++){
-		   if (sol.xind[i] == env->mip->n){
-		      continue;
-		   }
-		   printf("%8s %10.3f\n", env->mip->colname[sol.xind[i]],
-			  sol.xval[i]);
-		}
-
-		for (i = 0; i < env->mip->fixed_n; i++){
-		   printf("%8s %10.10f\n",
-			  env->orig_mip->colname[env->mip->fixed_ind[i]],
-			  env->mip->fixed_val[i]);
-		}
-		*/
 		printf("\n");
 	     }else{
 		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -752,34 +743,13 @@ int display_solution_u(sym_environment *env, int thread_num)
 		printf("\n");
 
 		for (i = 0; i < sol.xlength; i++){
-		   if (sol.xind[i] == env->mip->n){
+		   if (sol.xind[i] >= n){
 		      continue;
 		   }
 		   printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
 		}
 		
-		/*
-		for (i = 0; i < sol.xlength; i++){
-		   if (sol.xind[i] == env->mip->n){
-		      continue;
-		   }
-		   if(!env->prep_mip){
-		      printf("%7d %10.10f\n", sol.xind[i], sol.xval[i]);
-		   }else{
-		      printf("%7d %10.10f\n",
-			     env->prep_mip->orig_ind[sol.xind[i]],
-			     sol.xval[i]);
-		   }
-		}
-		for (i = 0; i < env->mip->fixed_n; i++){
-		   printf("%7d %10.10f\n", env->mip->fixed_ind[i],
-			  env->mip->fixed_val[i]);
-		}
-		*/
-		
 		printf("\n");
-
-
 	     }
 	     
 	     return(FUNCTION_TERMINATED_NORMALLY);
