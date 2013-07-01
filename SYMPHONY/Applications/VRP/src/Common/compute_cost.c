@@ -61,11 +61,11 @@ int compute_icost(distances *dist, int va, int vb)
 		     if (cost < fabs(dy)) cost = (int) fabs(dy);
 		     if (cost < fabs(dz)) cost = (int) fabs(dz);
 		     break;
-      case _MAN_2D : cost = (int) floor( dx+dy+0.5 );
-		     break;
+      case _MAN_2D : cost = (int) floor( abs(dx)+abs(dy)+0.5 );
+	             break;
       case _MAN_3D : dz = dist->coordz[va] - dist->coordz[vb];
-		     cost = (int) floor( dx+dy+dz+0.5 );
-		     break;
+                     cost = (int) floor( abs(dx)+abs(dy)+abs(dz)+0.5 );
+                     break;
       case _CEIL_2D : cost = (int)ceil( sqrt( dx*dx + dy*dy ) + 0.5);
 		      break;
       case _ATT     : cost = (int)( sqrt( (dx*dx + dy*dy ) / 10 ) + 1);
