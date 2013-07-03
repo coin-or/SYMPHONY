@@ -480,7 +480,8 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 
    const double etol = P->params.etol;
    const int verbosity = P->params.verbosity;
- 
+   int p_level = P->params.level;
+    
    int i, j, k, l, delete_ind, l_ind, r_ind, cr_ind, cl_ind;
    int obj_ind, col_ind, row_ind, end, obj_size, row_size, delete_row_ind;
    char can_iterate, in_conflict, delete_row; 
@@ -901,7 +902,7 @@ int prep_delete_duplicate_rows_cols(PREPdesc *P, char check_rows,
 	    } else {
 	       /* so not binary or are not in conflict */
 	       /*check if we can aggregate first*/
-	       if (dup_type == 0){
+	       if (dup_type == 0 && p_level > 5){
 		  /* same obj, same col */
 		  /* just merge it to the one on the left and 
 		     make the one on the right invisible
