@@ -478,7 +478,11 @@ int sym_set_defaults(sym_environment *env)
    lp_par->rs_dive_level = 2; 
    
    /* local branching */
+#ifdef USE_SYM_APPLICATION
+   lp_par->lb_enabled   = FALSE;
+#else
    lp_par->lb_enabled   = TRUE;
+#endif   
    lp_par->lb_frequency   = 10;
    lp_par->lb_min_gap = 1.0;
    lp_par->lb_search_k = 10;
