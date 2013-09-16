@@ -15,8 +15,8 @@
 #ifndef _PROTO_H
 #define _PROTO_H
 
-#define MAX_FILE_NAME_LENGTH  80
-#define MACH_NAME_LENGTH      80
+#define MAX_FILE_NAME_LENGTH 255
+#define MACH_NAME_LENGTH     255
 #define MAX_LINE_LENGTH      255
 
 
