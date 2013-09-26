@@ -481,7 +481,7 @@ AM_CONDITIONAL(SIGHANDLER, [test $sym_sig_catch = true])
 SYMDEFS='-DHAS_RANDOM -DHAS_SRANDOM -D__NONE__'
 
 ARCH=
-case $build in
+case $host in
   *-cygwin*) 
        if test "$enable_doscompile" = mingw; then 
            SYMDEFS="$SYMDEFS -D__MNO_CYGWIN" 
