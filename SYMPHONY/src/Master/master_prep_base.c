@@ -4878,7 +4878,14 @@ int prep_fill_row_ordered(PREPdesc *P)
    sense = mip->sense;
 
    /* allocate space for different arrays */
-
+   if (mip->row_matval) FREE(mip->row_matval);
+   if (mip->row_matind) FREE(mip->row_matind);
+   if (mip->row_matbeg) FREE(mip->row_matbeg);
+   if (mip->row_lengths) FREE(mip->row_lengths);
+   if (mip->orig_sense) FREE(mip->orig_sense);
+   if (mip->orig_ind) FREE(mip->orig_ind);
+   if (mip->col_lengths) FREE(mip->col_lengths);
+   
    r_matval = (mip->row_matval = (double *)malloc(nz*DSIZE)); 
    r_matind = (mip->row_matind = (int *)malloc(nz*ISIZE)); 
    r_matbeg = (mip->row_matbeg = (int *)malloc((m+1)*ISIZE));

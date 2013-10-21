@@ -167,14 +167,14 @@ int main(int argc, char **argv)
 	 if ((termcode = sym_load_problem(env)) < 0){
 	    printf("\nFatal errors encountered. Exiting with code %i.\n",
 		   termcode);
-	    printf("See sym_return_values.h for meaning of code.\n\n");
+	    printf("See symphony.h for meaning of code.\n\n");
 	    exit(termcode);
 	 }
 	 
 	 if ((termcode = sym_find_initial_bounds(env)) < 0){
 	    printf("\nFatal errors encountered. Exiting with code %i.\n",
 		   termcode);
-	    printf("See sym_return_values.h for meaning of code.\n\n");
+	    printf("See symphony.h for meaning of code.\n\n");
 	    exit(termcode);
 	 }
 	 printf("\n");
