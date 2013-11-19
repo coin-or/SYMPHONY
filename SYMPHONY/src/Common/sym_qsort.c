@@ -13,6 +13,11 @@
 /*===========================================================================*/
 
 #include <math.h>
+#ifdef __clang__
+#if __clang_major__ >= 5
+#include <cstdlib>
+#endif
+#endif
 
 #include "symphony.h" 
 #include "CoinSort.hpp"
