@@ -125,7 +125,7 @@ pkgconfiglibDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(pkgconfiglib_DATA)
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = src test
+DIST_SUBDIRS = src src/OsiSym test
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -247,6 +247,8 @@ DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DEPENDENCY_LINKING_FALSE = @DEPENDENCY_LINKING_FALSE@
+DEPENDENCY_LINKING_TRUE = @DEPENDENCY_LINKING_TRUE@
 DO_TESTS_FALSE = @DO_TESTS_FALSE@
 DO_TESTS_TRUE = @DO_TESTS_TRUE@
 DRAWGRAPH_FALSE = @DRAWGRAPH_FALSE@
@@ -483,7 +485,9 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 #                          Subdirectories                              #
 ########################################################################
-SUBDIRS = src $(am__append_1)
+
+# Don't do src/OsiSym recursively, since src/OsiSym/libOsiSym depends on src/libSym
+SUBDIRS = src src/OsiSym $(am__append_1)
 
 ########################################################################
 #             Additional files to be included in tarball               #
