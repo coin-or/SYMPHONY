@@ -14,7 +14,6 @@
 
 #include <math.h>
 #include <cstdlib>
-#endif
 
 #include "symphony.h" 
 #include "CoinSort.hpp"
