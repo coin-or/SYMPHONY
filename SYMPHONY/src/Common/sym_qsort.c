@@ -13,6 +13,7 @@
 /*===========================================================================*/
 
 #include <math.h>
+#include <cstdlib>
 
 #include "symphony.h" 
 #include "CoinSort.hpp"
