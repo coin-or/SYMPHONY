@@ -527,14 +527,8 @@ case $host in
             ;;
        esac
        ;;
-  *-sgi-*)
-       SYMDEFS="$SYMDEFS -D__" ;; 
-  *-hp-*)
-       SYMDEFS="$SYMDEFS -D__" ;; 
-  *-ibm-*)
-       SYMDEFS="$SYMDEFS -D__" ;; 
   *)
-       AC_MSG_ERROR([Unknown OS]) ;;
+       SYMDEFS="$SYMDEFS -D__UNKNOWN_OS" ;; 
 esac
 
 #############################################################################
