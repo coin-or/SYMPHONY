@@ -24,6 +24,9 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = src
 
+# Don't do src/OsiSym recursively, since src/OsiSym/libOsiSym depends on src/libSym
+SUBDIRS += src/OsiSym
+
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
 # included in the tarball

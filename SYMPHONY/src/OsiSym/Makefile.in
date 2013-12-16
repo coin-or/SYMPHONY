@@ -74,7 +74,9 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includecoindir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libOsiSym_la_LIBADD =
+am__DEPENDENCIES_1 =
+@DEPENDENCY_LINKING_TRUE@libOsiSym_la_DEPENDENCIES =  \
+@DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1) ../libSym.la
 am_libOsiSym_la_OBJECTS = OsiSymSolverInterface.lo SymWarmStart.lo
 libOsiSym_la_OBJECTS = $(am_libOsiSym_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -460,6 +462,9 @@ libOsiSym_la_SOURCES = \
 	OsiSymSolverParameters.hpp \
 	SymWarmStart.cpp SymWarmStart.hpp
 
+
+# List all additionally required libraries
+@DEPENDENCY_LINKING_TRUE@libOsiSym_la_LIBADD = $(SYMPHONYLIB_LIBS) ../libSym.la
 
 # This is for libtool (on Windows)
 libOsiSym_la_LDFLAGS = $(LT_LDFLAGS)

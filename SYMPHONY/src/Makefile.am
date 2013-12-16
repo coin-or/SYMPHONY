@@ -18,8 +18,6 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = OsiSym
-
 ##############################################################################
 ##############################################################################
 # Global source files
@@ -441,6 +439,11 @@ libSym_tm_lp_la_LDFLAGS = $(LT_LDFLAGS)
 libSym_tm_lp_cg_la_LDFLAGS = $(LT_LDFLAGS)
 libSym_tm_lp_cg_cp_la_LDFLAGS = $(LT_LDFLAGS)
 libSym_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
+
+# List all additionally required libraries
+if DEPENDENCY_LINKING
+libSym_la_LIBADD = $(SYMPHONYLIB_LIBS)
+endif
 
 ########################################################################
 #                        symphony program                              #

@@ -31,6 +31,11 @@ libOsiSym_la_SOURCES = \
 	OsiSymSolverParameters.hpp \
 	SymWarmStart.cpp SymWarmStart.hpp
 
+# List all additionally required libraries
+if DEPENDENCY_LINKING
+libOsiSym_la_LIBADD = $(SYMPHONYLIB_LIBS) ../libSym.la
+endif
+
 # This is for libtool (on Windows)
 libOsiSym_la_LDFLAGS = $(LT_LDFLAGS)
 
