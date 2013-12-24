@@ -1040,6 +1040,7 @@ int sym_solve(sym_environment *env)
 	 tmp_sol[best_sol->xind[i]] = best_sol->xval[i];
       }
       sym_set_col_solution(env, tmp_sol);
+      FREE(tmp_sol);
    }
    
    //   memset(&(env->best_sol), 0, sizeof(lp_sol));
