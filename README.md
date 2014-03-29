@@ -3,7 +3,7 @@ SYMPHONY Version 5.5.7 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
-2000-2013 by Ted Ralphs and others. This README may be redistributed freely.
+2000-2014 by Ted Ralphs and others. This README may be redistributed freely.
 
 DOCUMENTATION
 =============
