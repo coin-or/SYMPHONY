@@ -1457,7 +1457,7 @@ int write_node(bc_node *node, FILE*f)
       fprintf(f," PARENT_INDEX    : -1\n");
    }
 
-   fprintf(f, "CHILDREN:        %i %i %i\n", (int)node->bobj.type,
+   fprintf(f, " CHILDREN        : %i %i %i\n", (int)node->bobj.type,
            node->bobj.name, node->bobj.child_num);
    for (i = 0; i < node->bobj.child_num; i++){
       fprintf(f, "%i %c %f %f %i\n", node->children[i]->bc_index,
