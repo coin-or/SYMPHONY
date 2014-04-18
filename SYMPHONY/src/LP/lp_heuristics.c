@@ -2509,6 +2509,7 @@ int round_solution(lp_prob *p, LPdata *lp_data, double *solutionValue,
    double *solution, *objective;
    double direction = p->mip->obj_sense == SYM_MINIMIZE ? 1: -1 ;
    double newSolutionValue = direction*lp_data->objval;
+   double solAcceptTol = MAX(granularity - primalTolerance, 100*primalTolerance);
    double *element, *elementByRow;
    int * integerVariable, row_ind, elem_ind;
    int *row, *column, *columnStart, *rowStart, *columnLength, *rowLength;
@@ -2815,7 +2816,7 @@ int round_solution(lp_prob *p, LPdata *lp_data, double *solutionValue,
 	    }
 	 }
       }
-      if (newSolutionValue < *solutionValue - granularity + primalTolerance) {
+      if (newSolutionValue < *solutionValue - solAcceptTol) {
 	 // paranoid check
 	 memset(rowActivity,0,numberRows*sizeof(double));
 	 for (i=0;i<numberColumns;i++) {
