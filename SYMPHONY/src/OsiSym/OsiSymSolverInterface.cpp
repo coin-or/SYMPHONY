@@ -105,6 +105,21 @@ void OsiSymSolverInterface::resolve()
 
 /*===========================================================================*/
 /*===========================================================================*/
+//Anahita
+double** OsiSymSolverInterface::getDualPruned(double** dual_pieces,
+					      int MAX_ALLOWABLE_NUM_PIECES)
+{
+   int num_pieces;
+   if (!sym_get_dual_pruned(env_, dual_pieces, &num_pieces, 
+			    MAX_ALLOWABLE_NUM_PIECES)){
+      return (dual_pieces);
+   } else {
+      return (NULL);
+   }
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
 
 double OsiSymSolverInterface::getLbForNewRhs(int cnt, int *index, 
 						  double * value)

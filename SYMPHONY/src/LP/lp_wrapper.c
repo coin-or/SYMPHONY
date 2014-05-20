@@ -1678,7 +1678,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
        case LP_OPT_FEASIBLE:
        case LP_D_UNBOUNDED:
        case LP_D_OBJLIM:
-	 can->objval[i] = MAXDOUBLE / 2;
+	 //can->objval[i] = MAXDOUBLE / 2; //Anahita
 	 break;
        case LP_D_ITLIM:
 	 can->objval[i] = MAX(can->objval[i], oldobjval);

@@ -969,7 +969,7 @@ int sym_solve(sym_environment *env)
        * epsilon
        */
       env->par.tm_par.granularity = env->par.lp_par.granularity = 
-         fabs((double)granularity - 1e-7);
+         1e-7;//fabs((double)granularity - 1e-7); //Anahita
    }
    PRINT(env->par.verbosity, 0, ("granularity set at %f\n",
             env->par.tm_par.granularity));
@@ -4974,8 +4974,7 @@ int sym_set_warm_start (sym_environment *env, warm_start_desc *ws)
       printf("sym_set_warm_start():The warm_start desc. is empty!\n");
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
-   
-   warm_start_desc * ws_copy = create_copy_warm_start(ws);
+   warm_start_desc * ws_copy = create_copy_warm_start(ws);   
    sym_delete_warm_start(env->warm_start);
    env->warm_start = ws_copy;
    
@@ -6226,6 +6225,65 @@ int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
       return(FUNCTION_TERMINATED_NORMALLY);	 
    }
 #endif
+#else
+   printf("sym_get_lb_for_new_rhs():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+   return(FUNCTION_TERMINATED_ABNORMALLY);
+#endif
+ }
+
+/*===========================================================================*/
+/*===========================================================================*/
+//Anahita
+int sym_get_dual_pruned(sym_environment *env, double ** dual_pieces,
+			int* num_pieces,
+			int MAX_ALLOWABLE_NUM_PIECES)
+{
+#ifdef SENSITIVITY_ANALYSIS
+/* #ifdef U */
+/*    printf("sym_get_lb_for_new_rhs():\n"); */
+/*    printf("SYMPHONY can not do sensitivity analysis when cuts are present, for now!\n");  */
+/*    return(FUNCTION_TERMINATED_ABNORMALLY); */
+/* #else */
+   if (!env || !env->mip || 
+      !env->par.tm_par.sensitivity_analysis){ 
+      printf("sym_get_lb_for_new_rhs():\n");
+      printf("Trying to read an empty problem, an empty problem description"); 
+      printf(" or tree nodes were not kept in memory!\n");
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
+   else{
+      if (!env->warm_start){
+	 printf("sym_get_lb_for_new_rhs():\n");
+	 printf("No available warm start data to do sens. analysis. \n");
+	 return(FUNCTION_TERMINATED_ABNORMALLY);
+      }
+      else{
+	 /* check if we only have the root node, then no need to call 
+	    recursive algorithm */
+	 int i; 
+	 *num_pieces = 0;
+	 if(!env->warm_start->rootnode->children) {
+	    //set number of pieces to 1
+	    *num_pieces = 1;
+	    //allocate memory for the single piece
+	    dual_pieces[0] = (double*) malloc ((1 + env->mip->m) * sizeof(double));
+	    //set the objective
+	    dual_pieces[0][0] =  env->warm_start->rootnode->lower_bound;
+	    for(i=0; i<env->mip->m; i++){ 
+	       dual_pieces[0][i+1]=
+		  env->warm_start->rootnode->duals[i];
+	    }	    
+	  } else { 
+	    get_dual_pruned(env->warm_start->rootnode, env->mip,
+			       dual_pieces, num_pieces,
+			       MAX_ALLOWABLE_NUM_PIECES);
+	     }
+      }
+      return(FUNCTION_TERMINATED_NORMALLY);	 
+   }
+   //#endif
 #else
    printf("sym_get_lb_for_new_rhs():\n");
    printf("Sensitivity analysis features are not enabled.\n"); 

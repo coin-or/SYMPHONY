@@ -436,7 +436,8 @@ int solve(tm_prob *tm)
 	    }
 #endif
 #pragma omp master
-{	    
+	    {	    //added by Anahita
+	       find_tree_lb(tm);
             now = wall_clock(NULL);
 	    if (now - then2 > timeout2){
 	       if(tm->par.verbosity >= -1 ){
@@ -1490,8 +1491,8 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 
 
 #ifdef SENSITIVITY_ANALYSIS
-      if (tm->par.sensitivity_analysis && 
-	  action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
+      if (tm->par.sensitivity_analysis){// &&//Anahita 
+	 // action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
 	 child->duals = bobj->duals[i];
 	 bobj->duals[i] = 0;
       }
@@ -1512,7 +1513,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 
 	 if(tm->par.keep_description_of_pruned == KEEP_IN_MEMORY){
 	 
-	    child->feasibility_status = OVER_UB_PRUNED;	   
+	    child->feasibility_status = OVER_UB_PRUNED;
 	    
 	    if (feasible[i]){
 	       child->sol_size = bobj->sol_sizes[i];
@@ -1522,10 +1523,10 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	       bobj->solutions[i] = 0;
 	       child->feasibility_status = FEASIBLE_PRUNED;	   	    
 	    }
-
-	    if (action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
-	       child->feasibility_status = INFEASIBLE_PRUNED;
-	    }
+	    //Anahita to keep status of over_ub 
+	    //if (action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
+	    //  child->feasibility_status = INFEASIBLE_PRUNED;
+	    //}
 	 }
 
 #ifdef TRACE_PATH
@@ -3616,8 +3617,8 @@ void free_tree_node(bc_node *n)
    FREE(n->bobj.sos_cnt);
    FREE(n->bobj.sos_ind);
 #endif
-
-   FREE(n->bobj.solutions); //added by asm4
+   // Anahita
+   //   FREE(n->bobj.solutions); //added by asm4
 
    FREE(n->desc.uind.list);
    free_basis(&n->desc.basis);

@@ -295,6 +295,12 @@ int sym_get_int_param PROTO((sym_environment *env, const char *key, int *value))
 int sym_get_dbl_param PROTO((sym_environment *env, const char *key, double *value));
 int sym_get_str_param PROTO((sym_environment *env, const char *key, char **value));
 
+//Anahita
+int sym_get_dual_pruned PROTO((sym_environment *env,
+			       double** dual_pieces, int* num_pieces,
+			       int MAX_ALLOWABLE_NUM_PIECES));
+
+
 int sym_get_lb_for_new_rhs PROTO((sym_environment *env, int cnt, 
 				  int *new_rhs_ind, double *new_rhs_val,
 				  double *lb_for_new_rhs));

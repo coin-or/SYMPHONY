@@ -1456,8 +1456,7 @@ int write_node(bc_node *node, FILE*f)
    else{
       fprintf(f," PARENT_INDEX    : -1\n");
    }
-
-   fprintf(f, " CHILDREN        : %i %i %i\n", (int)node->bobj.type,
+   fprintf(f, " CHILDREN        : %i %i %i\n", (int)node->bobj.type, 
            node->bobj.name, node->bobj.child_num);
    for (i = 0; i < node->bobj.child_num; i++){
       fprintf(f, "%i %c %f %f %i\n", node->children[i]->bc_index,
@@ -3793,6 +3792,88 @@ sym_environment *create_copy_environment (sym_environment *env)
    
    return(env_copy);
 }   
+/*===========================================================================*/
+/*===========================================================================*/
+//Anahita
+void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
+			    double ** dual_pieces, int *cur_piece_no,
+			    int MAX_ALLOWABLE_NUM_PIECES))
+{
+#ifdef SENSITIVITY_ANALYSIS
+   int i, j, retval;
+   bc_node * child;
+
+   if(root){   
+      //this is an inermediate node, do nothing immediately,
+      //dive to children
+     
+
+      for(i = 0; i < root->bobj.child_num; i++){
+
+	 child = root->children[i];
+	 
+	 if(child->node_status == NODE_STATUS__PRUNED){
+	    if (*cur_piece_no >  MAX_ALLOWABLE_NUM_PIECES){
+	       printf("MAX_ALLOWABLE_NUM_PIECES reached...terminating..\n");
+	       exit(1);
+	    }
+	    if(child->feasibility_status == FEASIBLE_PRUNED ||
+	       child->feasibility_status == OVER_UB_PRUNED ||
+	       child->feasibility_status == PRUNED_HAS_CAN_SOLUTION
+	       ){
+	       
+	       //if pruned node is int feasible or it is
+	       //over UB pruned, get the dual info
+	       
+	       //allocate memory for dual_pieces
+	       dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
+	       
+	       //write dual info
+	       dual_pieces[*cur_piece_no] [0] = child->lower_bound;
+	       for (j = 0; j < mip->m; j++){
+		  dual_pieces[*cur_piece_no][j+1] = child->duals[j];
+	       }
+	       //increment
+	       (*cur_piece_no)++;
+	    }			    
+	    
+	    else if (child->feasibility_status == INFEASIBLE_PRUNED){
+	       //printf("Oops, infeasible node\n");
+	       //exit(1);
+	       //if pruned by IP infeasibility, then write the parent info
+	       
+	       //allocate memory for dual_pieces
+	       /* dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double)); */
+
+	       /* //write dual info */
+	       /* dual_pieces[*cur_piece_no] [0] = root->lower_bound; */
+	       /* for (j = 0; j < mip->m; j++){ */
+	       /* 	  dual_pieces[*cur_piece_no][j+1] = root->duals[j]; */
+	       /* } */
+	       /* //increment */
+	       /* (*cur_piece_no)++; */
+
+	    }
+	    else {
+	       printf("get_dual_pruned(): Unknown error!\n");
+	       exit(1);
+	    } 	 
+	 } //if not pruned, recurse 
+	 else {
+	    get_dual_pruned(child, mip, dual_pieces, cur_piece_no,
+			    MAX_ALLOWABLE_NUM_PIECES); 
+	 }
+	 
+      }//child loop
+
+   } //if root end
+
+#else
+   printf("get_dual_pruned():\n");
+   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Please rebuild SYMPHONY with these features enabled\n");
+#endif
+} 
 
 /*===========================================================================*/
 /*===========================================================================*/

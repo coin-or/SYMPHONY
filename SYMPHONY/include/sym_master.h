@@ -148,6 +148,10 @@ warm_start_desc *create_copy_warm_start PROTO((warm_start_desc * ws));
 MIPdesc *create_copy_mip_desc PROTO((MIPdesc *mip));
 sym_environment *create_copy_environment PROTO((sym_environment *env));
 
+//Anahita
+void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
+			       double ** dual_pieces, int *num_pieces,
+			       int MAX_ALLOWABLE_NUM_PIECES));
 double get_lb_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt, 
 				 int *ind, double *val));
 double get_ub_for_new_rhs PROTO((bc_node *root, MIPdesc *mip, int cnt, 

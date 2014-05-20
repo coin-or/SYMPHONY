@@ -425,7 +425,17 @@ int fathom_branch(lp_prob *p)
 	    return(ERROR__NUMERICAL_INSTABILITY);
 	 }
 
-       case LP_D_UNBOUNDED: /* the primal problem is infeasible */
+       case LP_D_UNBOUNDED: //the primal problem is infeasible 
+       /* 	  {char aname[50] = ""; //Anahita */
+       /* 	    printf("####### LP dual unbounded\n"); */
+       /* 	    sprintf(aname, "matrix.%i.%i", p->bc_index, p->iter_num); */
+       /* 	    write_mps(lp_data, aname); */
+       /* 	    //	    write_lp(lp_data, aAname); */
+       /* 	  }  */
+	 
+
+
+
        case LP_D_OBJLIM:
        case LP_OPTIMAL:
 	 if (num_errors == 1){
@@ -2901,6 +2911,7 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
    //const double etol500 = lpetol * 500;
    const double etol100 = lpetol * 100;
    const double etol1000 = lpetol * 1000;
+   const double etol100000 = lpetol * 100000; //Anahita
    const double *x     = lp_data->x;
    OsiRowCut    row_cut;
    var_desc     **vars = lp_data->vars;
@@ -3011,25 +3022,25 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       }
       //v_level = 1; 
       coeff_ratio = min_coeff/max_coeff; 
-      /* check quality */
-      if (num_elements>0) {
-         if ( (max_coeff > 0 && coeff_ratio < etol1000)||
-	      (min_coeff > 0 && min_coeff < etol1000) ) {
-            PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));
-	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
-	    num_poor_quality++;
-	    //is_deleted[i] = TRUE;
-	    continue;
-         }
-      }
-      
-      if (violation < etol10){//*v_level){
-         PRINT(verbosity,5,("violation = %f. Threw out cut.\n", 
-			    violation));
-         num_unviolated++;
-         //is_deleted[i] = TRUE;
-         continue;
-      }//else printf("violation - %f \n", violation);
+      /* check quality */ //commented out by Anahita
+      /* if (num_elements>0) { */
+      /*    if ( (max_coeff > 0 && coeff_ratio < etol100000)|| //changed by Anahita */
+      /* 	      (min_coeff > 0 && min_coeff < etol100000) ) { */
+      /*       PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n")); */
+      /* 	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000); */
+      /* 	    num_poor_quality++; */
+      /* 	    //is_deleted[i] = TRUE; */
+      /* 	    continue; */
+      /*    } */
+      /* } */
+      //Anahita
+      /* if (violation < etol10){//\*v_level){ */
+      /*    PRINT(verbosity,5,("violation = %f. Threw out cut.\n",  */
+      /* 			    violation)); */
+      /*    num_unviolated++; */
+      /*    //is_deleted[i] = TRUE; */
+      /*    continue; */
+      /* }//else printf("violation - %f \n", violation); */
 
       /* check if sense is 'R' */
       if (row_cut.sense()=='R') {

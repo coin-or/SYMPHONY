@@ -190,11 +190,19 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
       if (! do_realloc){
          FREE(lp_data->dualsol);
          lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+	 //Anahita
+         /* FREE(lp_data->raysol); */
+         /* lp_data->raysol = (double *) malloc(lp_data->maxm * DSIZE); */
+
 	 FREE(lp_data->slacks);
 	 lp_data->slacks  = (double *) malloc(lp_data->maxm * DSIZE);
      }else{
          lp_data->dualsol = (double *) realloc((char *)lp_data->dualsol,
                                                lp_data->maxm * DSIZE);
+	 //Anahita
+	 /* lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
+	    lp_data->maxm * DSIZE); */
+
 	 lp_data->slacks  = (double *) realloc((void *)lp_data->slacks,
 					       lp_data->maxm * DSIZE);
       }
@@ -2614,6 +2622,12 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       if (lp_data->slacks && term == LP_OPTIMAL) {
 	 get_slacks(lp_data);
       }
+
+      //Anahita
+      /* if (term == LP_D_UNBOUNDED) { */
+      /* 	 get_dual_ray(lp_data); */
+      /* } */
+
       get_x(lp_data);
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
@@ -4342,6 +4356,7 @@ int check_cuts(OsiCuts &cutlist, LPdata *lp_data, int bc_level, int
       const double *x = lp_data->x;
       const double lpetol = lp_data->lpetol;
       const double etol1000 = lpetol*1000;
+      const double etol1100000 = lpetol*1000; //Anahita
       double *matval;
       int *matind;
          
@@ -4423,22 +4438,22 @@ int check_cuts(OsiCuts &cutlist, LPdata *lp_data, int bc_level, int
 	 PRINT(verbosity,5,("generate_cgl_cuts: Number of Coefficients = "
                   "%d\tMax = %f, Min = %f\n",num_elements,max_coeff, 
                   min_coeff));
-   
-         if (violation < lpetol) {
-            num_unviolated_cuts++;
-            discard_cut = TRUE;
-            PRINT(verbosity,5,("violation = %f. Threw out cut.\n\n", 
-                     violation));
-         }
-
-	 if (discard_cut != TRUE && num_elements>0) {
-	    if ( (max_coeff > 0 && min_coeff/max_coeff < etol1000)||
-	         (min_coeff > 0 && min_coeff < etol1000) ) {
-               num_discarded_cuts++;
-	       discard_cut = TRUE;
-               PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n\n"));
-	    }
-	 }
+	 //Anahita
+         /* if (violation < lpetol) { */
+         /*    num_unviolated_cuts++; */
+         /*    discard_cut = TRUE; */
+         /*    PRINT(verbosity,5,("violation = %f. Threw out cut.\n\n",  */
+         /*             violation)); */
+         /* } */
+	 //Anahita
+	 /* if (discard_cut != TRUE && num_elements>0) { //changed by Anahita */
+	 /*    if ( (max_coeff > 0 && min_coeff/max_coeff < etol100000)|| */
+	 /*         (min_coeff > 0 && min_coeff < etol100000) ) { */
+         /*       num_discarded_cuts++; */
+	 /*       discard_cut = TRUE; */
+         /*       PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n\n")); */
+	 /*    } */
+	 /* } */
 	 if (discard_cut==TRUE) {
             is_deleted[i] = TRUE;
             continue;
