@@ -180,14 +180,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
     case DO_NOT_BRANCH:
       if (cand_num)
 	 *cuts += add_violated_slacks(p, cand_num, candidates);
-#ifdef DO_TESTS
-      if (*cuts == 0 && new_vars == 0){
-	 printf("Error! Told not to branch, but there are no new cuts or ");
-	 printf("variables!\n");
-	 *candidate = NULL;
-	 return(ERROR__NO_BRANCHING_CANDIDATE);
-      }
-#endif
       /* Free the candidates */
       if (candidates){
 	 for (i=0; i<cand_num; i++){

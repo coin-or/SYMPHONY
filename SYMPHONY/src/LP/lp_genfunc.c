@@ -657,6 +657,13 @@ int fathom_branch(lp_prob *p)
             }
 	    printf("\n\n");
 	 }
+#ifdef DO_TESTS
+	 if (cuts == 0 && p->bound_changes_in_iter == 0){
+	    printf("Error! Told not to branch, but there are no new cuts or ");
+	    printf("bound changes!\n");
+	    return(ERROR__NO_BRANCHING_CANDIDATE);
+	 }
+#endif
 	 break;
       }
       comp_times->strong_branching += used_time(&p->tt);
