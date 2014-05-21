@@ -227,9 +227,6 @@ int fathom_branch(lp_prob *p)
    double timeleft = 0.0;
    int iterleft = 0;
    const int verbosity = p->par.verbosity;
-#ifdef DO_TESTS
-   double oldobjval = lp_data->objval;
-#endif
    double now, then2, timeout2; 
 #ifdef COMPILE_IN_LP
    then2 = wall_clock(NULL);
@@ -338,12 +335,6 @@ int fathom_branch(lp_prob *p)
       if(iterd > p->lp_stat.lp_max_iter_num){
 	 p->lp_stat.lp_max_iter_num = iterd;
       }
-#ifdef DO_TESTS
-      if (lp_data->objval < oldobjval - .01){
-	 printf ("#####Error: LP objective value decrease from %.3f to %.3f\n",
-		 oldobjval, lp_data->objval);
-      }
-#endif
       
       /* Get relevant data */
       //get_dj_pi(lp_data);
