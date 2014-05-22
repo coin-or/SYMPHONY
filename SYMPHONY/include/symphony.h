@@ -183,6 +183,7 @@
 typedef struct MIPDESC MIPdesc;
 typedef struct WARM_START_DESC warm_start_desc;
 typedef struct SYM_ENVIRONMENT sym_environment;
+typedef struct CUT_POOL cut_pool;
 
 /*===========================================================================*/
 /*===================== Interface functions (master.c) ======================*/
@@ -210,6 +211,7 @@ int sym_warm_solve PROTO((sym_environment *env));
 int sym_mc_solve PROTO((sym_environment *env));
 
 int sym_create_permanent_cut_pools PROTO((sym_environment *env, int *cp_num));
+cut_pool **sym_get_permanent_cut_pools PROTO((sym_environment *env));
 int sym_close_environment PROTO((sym_environment *env));
 int sym_explicit_load_problem PROTO((sym_environment *env, int numcols, 
 				     int numrows, int *start, int *index, 
@@ -322,5 +324,5 @@ MIPdesc *sym_get_presolved_mip_desc PROTO((sym_environment *env));
 sym_environment * sym_create_copy_environment PROTO((sym_environment *env));
 
 int sym_test PROTO((sym_environment *env, int *test_status));
-
+  
 #endif
