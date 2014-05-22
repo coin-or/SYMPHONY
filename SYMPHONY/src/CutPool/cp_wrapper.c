@@ -223,11 +223,13 @@ int check_cut_u(cut_pool *cp, lp_sol *cur_sol, cut_data *cut, int *is_violated,
 	 
 	 *is_violated = (lhs < cut->rhs - etol);
 	 *quality = cut->rhs - lhs;
+	 break;
 
        case 'L':
 	 
 	 *is_violated = (lhs > cut->rhs + etol);
 	 *quality = lhs - cut->rhs;
+	 break;
 
        case 'R':
 
@@ -242,6 +244,7 @@ int check_cut_u(cut_pool *cp, lp_sol *cur_sol, cut_data *cut, int *is_violated,
 	    *quality = lhs > cut->rhs + etol ? lhs - cut->rhs :
 	       cut->rhs + cut->range - lhs;
 	 }
+	 break;
       }
       return(0);
       
