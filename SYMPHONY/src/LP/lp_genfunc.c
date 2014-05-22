@@ -492,8 +492,9 @@ int fathom_branch(lp_prob *p)
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
       feas_status = is_feasible_u(p, FALSE, FALSE);
-      if (feas_status == IP_FEASIBLE ||
-	  (feas_status == IP_HEUR_FEASIBLE && p->par.find_first_feasible)){
+      //if (feas_status == IP_FEASIBLE ||
+      //  (feas_status == IP_HEUR_FEASIBLE && p->par.find_first_feasible)){
+      if (0){
 	cuts = -1;
       }else{
 	 /*------------------------------------------------------------------*\
@@ -553,7 +554,10 @@ int fathom_branch(lp_prob *p)
       }
 
       comp_times->lp += used_time(&p->tt);
-      if (cuts < 0){ /* i.e. feasible solution is found */
+      if (cuts == 0 && (feas_status == IP_FEASIBLE ||
+			(feas_status == IP_HEUR_FEASIBLE &&
+			 p->par.find_first_feasible))){ /* i.e. feasible solution
+							   is found */
 	 if (fathom(p, TRUE)){
 	    return(FUNCTION_TERMINATED_NORMALLY);
 	 }else{
