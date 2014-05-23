@@ -3838,13 +3838,13 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 	    }			    
 	    
 	    else if (child->feasibility_status == INFEASIBLE_PRUNED){
-	       //printf("Oops, infeasible node\n");
+	       printf("Infeasible node...Examining rays\n");
 	       //exit(1);
 	       //if pruned by IP infeasibility, then write the parent info
 	       
 	       //allocate memory for dual_pieces
 	       /* dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double)); */
-
+	       
 	       /* //write dual info */
 	       /* dual_pieces[*cur_piece_no] [0] = root->lower_bound; */
 	       /* for (j = 0; j < mip->m; j++){ */

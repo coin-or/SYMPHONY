@@ -3026,18 +3026,26 @@ void get_dual_ray(LPdata *lp_data)
    
    //   double* ray = (double*) malloc (lp_data->m * DSIZE *
    //sizeof(double));
-   double* ray = vRays[1];
-
-   int i;
-
-   // Check that the ray is not all zeros
-   for (i = 0; i < lp_data->m ; i++){
-      if (fabs(ray[i]) > 1e-5) break ;
-   }
-
-   assert(i < lp_data->m);
    
-   memcpy(lp_data->raysol, ray, lp_data->m * DSIZE);
+   if (vRays[0]){
+      double* ray = vRays[0];
+      printf("Actually found a ray.\n");
+      sleep(1);
+      int i;
+
+      // Check that the ray is not all zeros
+      for (i = 0; i < lp_data->m ; i++){
+	 if (fabs(ray[i]) > 1e-5) break ;
+      }
+      //temp
+      assert(i < lp_data->m);
+      memcpy(lp_data->raysol, ray, lp_data->m * DSIZE);
+      
+   }else{
+      double* ray = NULL;
+      printf("dual unbd reported but ray is NULL.\n");
+      sleep(1);
+   }
 }
 
 /*===========================================================================*/
