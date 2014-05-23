@@ -191,18 +191,18 @@ void size_lp_arrays(LPdata *lp_data, char do_realloc, char set_max,
          FREE(lp_data->dualsol);
          lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
 	 //Anahita
-         /* FREE(lp_data->raysol); */
-         /* lp_data->raysol = (double *) malloc(lp_data->maxm * DSIZE); */
-
+         FREE(lp_data->raysol);
+         lp_data->raysol = (double *) malloc(lp_data->maxm * DSIZE);
+	 //
 	 FREE(lp_data->slacks);
 	 lp_data->slacks  = (double *) malloc(lp_data->maxm * DSIZE);
      }else{
          lp_data->dualsol = (double *) realloc((char *)lp_data->dualsol,
                                                lp_data->maxm * DSIZE);
 	 //Anahita
-	 /* lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
-	    lp_data->maxm * DSIZE); */
-
+	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
+	    lp_data->maxm * DSIZE);
+	 //
 	 lp_data->slacks  = (double *) realloc((void *)lp_data->slacks,
 					       lp_data->maxm * DSIZE);
       }
@@ -2616,7 +2616,10 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       lp_data->objval = si->getObjValue();
 
       /* Get relevant data */
+
+
       if (lp_data->dualsol && lp_data->dj) {
+
 	 get_dj_pi(lp_data);
       }
       if (lp_data->slacks && term == LP_OPTIMAL) {
@@ -2624,10 +2627,10 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       }
 
       //Anahita
-      /* if (term == LP_D_UNBOUNDED) { */
-      /* 	 get_dual_ray(lp_data); */
-      /* } */
-
+      if (term == LP_D_UNBOUNDED) {
+      	 get_dual_ray(lp_data);
+      }
+      //
       get_x(lp_data);
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
@@ -3007,8 +3010,37 @@ void get_dj_pi(LPdata *lp_data)
 	  lp_data->n * DSIZE);
 }
 
-/*===========================================================================*/
 
+
+/*=Anahita==========================================================*/
+
+void get_dual_ray(LPdata *lp_data)
+{
+   std::vector<double*> vRays;
+   vRays = lp_data->si->getDualRays(1,0);
+
+   //check that there is at least one ray
+   int raysReturned = static_cast<unsigned int>(vRays.size()) ;
+   printf("Number of rays returned is %d.\n", raysReturned);
+   assert (raysReturned == 1);
+   
+   //   double* ray = (double*) malloc (lp_data->m * DSIZE *
+   //sizeof(double));
+   double* ray = vRays[1];
+
+   int i;
+
+   // Check that the ray is not all zeros
+   for (i = 0; i < lp_data->m ; i++){
+      if (fabs(ray[i]) > 1e-5) break ;
+   }
+
+   assert(i < lp_data->m);
+   
+   memcpy(lp_data->raysol, ray, lp_data->m * DSIZE);
+}
+
+/*===========================================================================*/
 void get_slacks(LPdata *lp_data)
 {
    int m = lp_data->m, i = 0;
