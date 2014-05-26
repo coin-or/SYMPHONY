@@ -276,8 +276,11 @@ typedef struct BRANCH_OBJ{
    int          *sol_sizes;
    int         **sol_inds;
    double      **solutions;
+
 #ifdef SENSITIVITY_ANALYSIS   
    double      **duals;
+   //Anahita
+   double      **rays;
 #endif
    
 }branch_obj;
@@ -390,7 +393,9 @@ typedef struct BC_NODE{
    int       *sol_ind;
    double    *sol;
 #ifdef SENSITIVITY_ANALYSIS
-   double    *duals;
+   double    *duals;   
+      //Anahita
+   double    *rays;
    double     C_LP;
    double     B_IP;
 #endif

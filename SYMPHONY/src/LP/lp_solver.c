@@ -55,6 +55,8 @@ void free_lp_arrays(LPdata *lp_data)
    FREE(lp_data->x);
    FREE(lp_data->dj);
    FREE(lp_data->dualsol);
+   //Anahita
+   FREE(lp_data->raysol);
    FREE(lp_data->slacks);
    FREE(lp_data->random_hash);
    FREE(lp_data->hashes);
@@ -2705,8 +2707,8 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       if (term == LP_D_UNBOUNDED) {
 	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
 	    lp_data->maxm * DSIZE);
-
-	 get_dual_ray(lp_data);
+	 lp_data->raysol = 0;
+	 //get_dual_ray(lp_data);
       }
       //
 
@@ -3033,8 +3035,6 @@ void get_dual_ray(LPdata *lp_data)
    
    if (vRays[0]){
       double* ray = vRays[0];
-      printf("Actually found a ray...returning the ray.\n");
-      sleep(1);
       int i;
 
       // Check that the ray is not all zeros
@@ -3047,8 +3047,6 @@ void get_dual_ray(LPdata *lp_data)
       
    }else{
       double* ray = NULL;
-      printf("Dual unbd reported b/c of bound.. returning duals.\n");
-      sleep(1);
    }
 }
 

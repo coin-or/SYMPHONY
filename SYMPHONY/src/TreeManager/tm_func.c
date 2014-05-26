@@ -1483,7 +1483,13 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	 // action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
 	 child->duals = bobj->duals[i];
 	 bobj->duals[i] = 0;
+	 //Anahita
+	 if (bobj->rays){
+	    child->rays = bobj->rays[i];
+	    bobj->rays[i] = 0;
+	 }
       }
+      
 #endif
 
       if (child->node_status != NODE_STATUS__PRUNED && feasible[i]){
@@ -3589,6 +3595,8 @@ void free_tree_node(bc_node *n)
    FREE(n->sol);
    FREE(n->sol_ind);
 #ifdef SENSITIVITY_ANALYSIS
+   FREE(n->duals);
+   //Anahita
    FREE(n->duals);
 #endif
    FREE(n->children);

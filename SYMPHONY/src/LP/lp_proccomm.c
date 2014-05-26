@@ -567,6 +567,16 @@ void send_node_desc(lp_prob *p, int node_type)
 	 n->duals = (double *) malloc (DSIZE * p->base.cutnum);
 	 memcpy(n->duals, lp_data->dualsol, DSIZE*p->base.cutnum);
       }
+      //Anahita
+      if (tm->par.sensitivity_analysis && (node_type == INFEASIBLE_PRUNED)){
+	 if (n->rays){
+	    FREE(n->rays);
+	 }
+	 n->rays = (double *) malloc (DSIZE * p->base.cutnum);
+	 if (lp_data->raysol){
+	    memcpy(n->rays, lp_data->raysol, DSIZE*p->base.cutnum);
+	 }
+      }
 #endif	 
 
 #ifdef COMPILE_IN_LP
@@ -1010,6 +1020,9 @@ void send_node_desc(lp_prob *p, int node_type)
       send_dbl_array(lp_data->x, p->desc->uind.size);
       //send_int_array(&p->base.cutnum, 1);
       send_dbl_array(lp_data->dualsol, p->base.cutnum);
+      //Anahita
+      if (lp_data->raysol)
+      send_dbl_array(lp_data->raysol, p->base.cutnum);
    }
 #endif
    if ((node_type == INFEASIBLE_PRUNED || node_type == OVER_UB_PRUNED ||

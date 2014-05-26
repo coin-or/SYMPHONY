@@ -1499,8 +1499,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #ifdef SENSITIVITY_ANALYSIS
          if (p->tm->par.sensitivity_analysis){      
             can->duals = (double **) calloc(maxnum, sizeof(double *));
+	    //Anahita
+	    can->rays = (double **) calloc(maxnum, sizeof(double *));
          }else{
-            can->duals = NULL;	 
+            can->duals = NULL;
+	    can->rays = NULL; //Anahita	 
          }
 #endif
 #ifdef COMPILE_FRAC_BRANCHING
@@ -1520,8 +1523,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 #ifdef SENSITIVITY_ANALYSIS
          if (p->par.sensitivity_analysis){      
             can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
+	    //Anahita
+	    can->rays = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
          }else{
-            can->duals = NULL;	 
+	    //Anahita
+            can->duals = NULL;
+	    can->rays = NULL;	 
          }
 #endif
 #endif
@@ -1582,7 +1589,14 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   get_dj_pi(lp_data);
                   can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
                   memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
-               }
+
+		  //Anahita
+		  get_dual_ray(lp_data);
+		  if (lp_data->raysol){
+		     can->rays[j] = (double *) malloc (DSIZE*p->base.cutnum);
+		     memcpy(can->rays[j], lp_data->raysol, DSIZE*p->base.cutnum);
+		  }
+	       }
 #endif
 
                if (can->termcode[j] == LP_OPTIMAL){
@@ -1688,7 +1702,15 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   get_dj_pi(lp_data);
                   can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
                   memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
-               }
+		  //Anahita
+		  get_dual_ray(lp_data);
+		  if (lp_data->raysol)
+		     {
+			can->rays[j] = (double *) malloc (DSIZE*p->base.cutnum);
+			memcpy(can->rays[j], lp_data->raysol, DSIZE*p->base.cutnum);
+		     }
+			
+	       }
 #endif
 
                if (can->termcode[j] == LP_OPTIMAL){

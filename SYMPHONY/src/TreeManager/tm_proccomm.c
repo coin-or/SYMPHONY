@@ -628,12 +628,18 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
       if (n->sol){
 	 FREE(n->sol);
 	 FREE(n->duals);
+	 FREE(n->rays); //Anahita
       }
       receive_int_array(&n->sol_size, 1);
       n->sol = (double *) malloc (DSIZE * n->sol_size);
       receive_dbl_array(n->sol, n->sol_size);
       n->duals = (double *) malloc (DSIZE * tm->bcutnum);
+      n->rays = (double *) malloc (DSIZE * tm->bcutnum); //Anahita
       receive_dbl_array(n->duals, tm->bcutnum);
+      //Anahita
+      if (n->rays){
+	 receive_dbl_array(n->rays, tm->bcutnum);
+      }
    }
 #endif
    receive_char_array(&repricing, 1);

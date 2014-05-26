@@ -3838,39 +3838,50 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 	    
 	    else if (child->feasibility_status == INFEASIBLE_PRUNED){
 	       printf("Infeasible node...Examining rays/duals\n");
-	       //sleep(2);
-	       //check if the node was pruned by dual bound exceed
+	       //sleep(2);//check if the node was pruned by dual bound exceed
 
+	       if (child->duals && child->rays){
+		  printf("HUH! Both duals and rays\n");
+	       }
+	       if (child->duals && !child->rays){
+		  printf("HUH! Just duals\n");
+	       }
+	       if (!child->duals && child->rays){
+		  printf("HUH! Just rays\n");
+	       }
+
+		       
+		       
+	       
+	       
 	       if (child->duals){
 	       	  printf("Infeasible node reported: duals bound reached.\n");
 	       	  dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
-	       
+		  
 	       	  //write dual info
 	       	  dual_pieces[*cur_piece_no] [0] = child->lower_bound;
 	       	  for (j = 0; j < mip->m; j++){
-	       	  dual_pieces[*cur_piece_no][j+1] = child->duals[j];
+		     dual_pieces[*cur_piece_no][j+1] = child->duals[j];
 	       	  }
 	       	  //increment
 	       	  (*cur_piece_no)++;
 	       }else{
-	       	  printf("Infeasible node reported: now should have a ray.\n");
-	       	  // sleep(2);
-	       }
-	       
-	       //if pruned by IP infeasibility, then write the parent info
-	       
-	       //allocate memory for dual_pieces
-	       /* dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double)); */
-	       
-	       /* //write dual info */
-	       /* dual_pieces[*cur_piece_no] [0] = root->lower_bound; */
-	       /* for (j = 0; j < mip->m; j++){ */
-	       /* 	  dual_pieces[*cur_piece_no][j+1] = root->duals[j]; */
-	       /* } */
-	       /* //increment */
-	       /* (*cur_piece_no)++; */
-
-	    }
+	       	
+		  if (!child->rays){
+		     printf("Should have a ray, but CLP did not return one.\n");
+		     exit(1);
+		  }
+		  printf("Writing the ray...\n");
+		  dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
+		  //write ray info
+		  dual_pieces[*cur_piece_no] [0] = child->lower_bound;
+		  for (j = 0; j < mip->m; j++){
+		     dual_pieces[*cur_piece_no][j+1] = child->rays[j];
+		  }
+		     //increment
+		     (*cur_piece_no)++;
+	       } 
+	    }//end of infeasible nodes
 	    else { //status unknown
 	       printf("get_dual_pruned(): Unknown error!\n");
 	       exit(1);
@@ -3880,9 +3891,7 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 	    get_dual_pruned(child, mip, dual_pieces, cur_piece_no,
 			    MAX_ALLOWABLE_NUM_PIECES); 
 	 }
-	 
       }//child loop
-
    } //if root end
 
 #else
