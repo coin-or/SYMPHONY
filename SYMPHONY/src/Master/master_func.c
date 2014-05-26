@@ -3428,7 +3428,6 @@ warm_start_desc *create_copy_warm_start(warm_start_desc *ws)
    ws_copy->rootnode = (bc_node*)calloc(1,sizeof(bc_node));	 
    copy_tree(ws_copy->rootnode, ws->rootnode);
 
-
    if(ws->best_sol.xlength){
       ws_copy->best_sol.xind = (int*) malloc (ISIZE * ws->best_sol.xlength);
       ws_copy->best_sol.xval = (double*) malloc (DSIZE * ws->best_sol.xlength);
@@ -3838,8 +3837,26 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 	    }			    
 	    
 	    else if (child->feasibility_status == INFEASIBLE_PRUNED){
-	       printf("Infeasible node...Examining rays\n");
-	       //exit(1);
+	       printf("Infeasible node...Examining rays/duals\n");
+	       //sleep(2);
+	       //check if the node was pruned by dual bound exceed
+
+	       if (child->duals){
+	       	  printf("Infeasible node reported: duals bound reached.\n");
+	       	  dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
+	       
+	       	  //write dual info
+	       	  dual_pieces[*cur_piece_no] [0] = child->lower_bound;
+	       	  for (j = 0; j < mip->m; j++){
+	       	  dual_pieces[*cur_piece_no][j+1] = child->duals[j];
+	       	  }
+	       	  //increment
+	       	  (*cur_piece_no)++;
+	       }else{
+	       	  printf("Infeasible node reported: now should have a ray.\n");
+	       	  // sleep(2);
+	       }
+	       
 	       //if pruned by IP infeasibility, then write the parent info
 	       
 	       //allocate memory for dual_pieces
@@ -3854,7 +3871,7 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 	       /* (*cur_piece_no)++; */
 
 	    }
-	    else {
+	    else { //status unknown
 	       printf("get_dual_pruned(): Unknown error!\n");
 	       exit(1);
 	    } 	 

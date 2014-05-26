@@ -2626,11 +2626,6 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
 	 get_slacks(lp_data);
       }
 
-      //Anahita
-      if (term == LP_D_UNBOUNDED) {
-      	 get_dual_ray(lp_data);
-      }
-      //
       get_x(lp_data);
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
@@ -2705,6 +2700,16 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       if (lp_data->slacks && term == LP_OPTIMAL) {
 	 get_slacks(lp_data);
       }
+      
+      //Anahita
+      if (term == LP_D_UNBOUNDED) {
+	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
+	    lp_data->maxm * DSIZE);
+
+	 get_dual_ray(lp_data);
+      }
+      //
+
       
       get_x(lp_data);
       
@@ -3021,7 +3026,6 @@ void get_dual_ray(LPdata *lp_data)
 
    //check that there is at least one ray
    int raysReturned = static_cast<unsigned int>(vRays.size()) ;
-   printf("Number of rays returned is %d.\n", raysReturned);
    assert (raysReturned == 1);
    
    //   double* ray = (double*) malloc (lp_data->m * DSIZE *
@@ -3029,7 +3033,7 @@ void get_dual_ray(LPdata *lp_data)
    
    if (vRays[0]){
       double* ray = vRays[0];
-      printf("Actually found a ray.\n");
+      printf("Actually found a ray...returning the ray.\n");
       sleep(1);
       int i;
 
@@ -3043,7 +3047,7 @@ void get_dual_ray(LPdata *lp_data)
       
    }else{
       double* ray = NULL;
-      printf("dual unbd reported but ray is NULL.\n");
+      printf("Dual unbd reported b/c of bound.. returning duals.\n");
       sleep(1);
    }
 }
