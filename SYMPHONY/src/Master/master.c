@@ -1022,6 +1022,7 @@ int sym_solve(sym_environment *env)
 #ifdef COMPILE_IN_CP
    if (env->cp && env->par.use_permanent_cut_pools){
       tm->cpp = env->cp;
+      tm->par.keep_cut_pools = TRUE;
    }else{
       CALL_WRAPPER_FUNCTION( send_cp_data_u(env, 0) );
    }

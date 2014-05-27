@@ -83,6 +83,7 @@ typedef struct TM_PARAMS{
    
    int         sensitivity_analysis;
    int         output_mode;
+   int         keep_cut_pools;
 }tm_params;
 
 #endif
