@@ -491,7 +491,7 @@ int fathom_branch(lp_prob *p)
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
       /* is_feasible_u() fills up lp_data->x, too!! */
-      feas_status = is_feasible_u(p, FALSE, FALSE);
+      //feas_status = is_feasible_u(p, FALSE, FALSE);
       //if (feas_status == IP_FEASIBLE ||
       //  (feas_status == IP_HEUR_FEASIBLE && p->par.find_first_feasible)){
       if (0){
@@ -554,6 +554,12 @@ int fathom_branch(lp_prob *p)
       }
 
       comp_times->lp += used_time(&p->tt);
+      if (cuts == 0){
+	 feas_status = is_feasible_u(p, FALSE, FALSE);
+      }else{
+	 feas_status == IP_INFEASIBLE;
+      }
+
       if (cuts == 0 && (feas_status == IP_FEASIBLE ||
 			(feas_status == IP_HEUR_FEASIBLE &&
 			 p->par.find_first_feasible))){ /* i.e. feasible solution
