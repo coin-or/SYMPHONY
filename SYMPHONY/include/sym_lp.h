@@ -367,7 +367,7 @@ int generate_column_u PROTO((lp_prob *p, int lpcutnum, cut_data **cuts,
 			     double *obj, double *ub, double *lb));
 void print_stat_on_cuts_added_u PROTO((lp_prob *p, int added_rows));
 void purge_waiting_rows_u PROTO((lp_prob *p));
-int generate_cuts_in_lp_u PROTO((lp_prob *p));
+int generate_cuts_in_lp_u PROTO((lp_prob *p, double *x));
 int analyze_multicriteria_solution PROTO((lp_prob *p, int *indices,
 					   double *values, int length,
 					   double *true_objval, double etol,

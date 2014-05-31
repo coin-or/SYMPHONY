@@ -308,6 +308,9 @@ int fathom_branch(lp_prob *p)
 
       p->bound_changes_in_iter = 0;
 
+      //char name[50] = "";
+      //sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
+      //write_mps(lp_data, name);
       if ((p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
 			       p->bc_level < 1))) {
          if (p->bc_level < 1) {
@@ -315,7 +318,7 @@ int fathom_branch(lp_prob *p)
          }
          termcode = initial_lp_solve(lp_data, &iterd);	 
       } else {
-	 termcode = dual_simplex(lp_data, &iterd);
+	 termcode = initial_lp_solve(lp_data, &iterd);
       }
       if (p->bc_index < 1 && p->iter_num < 2) {
 	 p->root_objval = lp_data->objval;
@@ -490,11 +493,9 @@ int fathom_branch(lp_prob *p)
 
       /* If come to here, the termcode must have been OPTIMAL and the
        * cost cannot be too high. */
-      /* is_feasible_u() fills up lp_data->x, too!! */
-      //feas_status = is_feasible_u(p, FALSE, FALSE);
-      //if (feas_status == IP_FEASIBLE ||
-      //  (feas_status == IP_HEUR_FEASIBLE && p->par.find_first_feasible)){
-      if (0){
+      feas_status = is_feasible_u(p, FALSE, FALSE);
+      if (feas_status == IP_FEASIBLE ||
+	  (feas_status == IP_HEUR_FEASIBLE && p->par.find_first_feasible)){
 	cuts = -1;
       }else{
 	 /*------------------------------------------------------------------*\
@@ -554,15 +555,17 @@ int fathom_branch(lp_prob *p)
       }
 
       comp_times->lp += used_time(&p->tt);
+#if 0
       if (cuts == 0){
 	 feas_status = is_feasible_u(p, FALSE, FALSE);
       }else{
 	 feas_status == IP_INFEASIBLE;
       }
-
-      if (cuts == 0 && (feas_status == IP_FEASIBLE ||
-			(feas_status == IP_HEUR_FEASIBLE &&
-			 p->par.find_first_feasible))){ /* i.e. feasible solution
+#endif
+      
+      if (feas_status == IP_FEASIBLE ||
+	  (feas_status == IP_HEUR_FEASIBLE &&
+	   p->par.find_first_feasible)){ /* i.e. feasible solution
 							   is found */
 	 if (fathom(p, TRUE)){
 	    return(FUNCTION_TERMINATED_NORMALLY);
