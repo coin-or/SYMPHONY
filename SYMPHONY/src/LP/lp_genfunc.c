@@ -536,21 +536,21 @@ int fathom_branch(lp_prob *p)
 	 \*------------------------------------------------------------------*/
 
 #ifdef USE_SYM_APPLICATION
-	    if ((cut_term = receive_cuts(p, first_in_loop,
-                        no_more_cuts_count)) >=0 ){
-               cuts += cut_term;
-            }else{
-               return(ERROR__USER);
-            }
+	 if ((cut_term = receive_cuts(p, first_in_loop,
+				      no_more_cuts_count)) >=0 ){
+	    cuts += cut_term;
+	 }else{
+	    return(ERROR__USER);
+	 }
 #else
-         if (!check_tailoff(p)) {
-            if ((cut_term = receive_cuts(p, first_in_loop,
-                        no_more_cuts_count)) >=0 ){
+	 if (!check_tailoff(p) || p->tm->cpp[p->cut_pool]->cuts_to_add > 0) {
+	    if ((cut_term = receive_cuts(p, first_in_loop,
+					 no_more_cuts_count)) >=0 ){
                cuts += cut_term;
             }else{
                return(ERROR__USER);
             }
-         }
+	 }
 #endif
       }
 

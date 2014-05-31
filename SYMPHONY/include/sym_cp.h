@@ -106,8 +106,8 @@ void cut_pool_receive_cuts PROTO((cut_pool *cp, int bc_level));
 int receive_cp_data_u PROTO((cut_pool *cp));
 int receive_lp_solution_cp_u PROTO((cut_pool *cp));
 void free_cut_pool_u PROTO((cut_pool *cp));
-int check_cuts_u PROTO((cut_pool *cp, lp_sol *cur_sol));
+int check_cuts_u PROTO((cut_pool *cp, lp_sol *cur_sol, double *x));
 int check_cut_u PROTO((cut_pool *cp, lp_sol *cur_sol, cut_data *cut,
-		       int *is_violated, double *quality));
+		       int *is_violated, double *quality, double *x));
 
 #endif

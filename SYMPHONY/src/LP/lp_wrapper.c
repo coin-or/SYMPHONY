@@ -1175,9 +1175,11 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	 cur_sol->xiter_num = p->iter_num;
 	 cur_sol->objval = true_objval;
 	 cur_sol->xlength = cnt;
-	 cp_new_row_num = check_cuts_u(cp, cur_sol);
-	 free_cuts(cp->cuts_to_add, cp->cuts_to_add_num);
-	 cp->cuts_to_add_num = 0;
+	 if (feasible == IP_HEUR_FEASIBLE || force_heur_sol) {
+	    cp_new_row_num = check_cuts_u(cp, cur_sol, heur_solution);
+	 } else {
+	    cp_new_row_num = check_cuts_u(cp, cur_sol, lp_data->x);
+	 }
       }
 #endif
       if (cp_new_row_num){
@@ -2542,7 +2544,11 @@ int generate_cuts_in_lp_u(lp_prob *p, double *x)
 	 cur_sol->lp = 0;
 #pragma omp critical(cut_pool)
 	 if (cp){
-	    cp_new_row_num = check_cuts_u(cp, cur_sol);
+	    if (cp->cuts_to_add_num == 0){
+	       cp_new_row_num = check_cuts_u(cp, cur_sol, lp_data->x);
+	    }else{
+	       cp_new_row_num = cp->cuts_to_add_num;
+	    }
 	    if (++cp->reorder_count % 10 == 0){
 	       delete_duplicate_cuts(cp);
 	       order_cuts_by_quality(cp);
