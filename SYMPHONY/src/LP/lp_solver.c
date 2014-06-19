@@ -2623,12 +2623,42 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       if (lp_data->dualsol && lp_data->dj) {
 
 	 get_dj_pi(lp_data);
+	 
+      }else{ //Anahita
+      	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
+      	 get_dj_pi(lp_data);
       }
+      
       if (lp_data->slacks && term == LP_OPTIMAL) {
 	 get_slacks(lp_data);
       }
 
+      
+
+      
+      //Anahita
+      if (term == LP_D_UNBOUNDED) {
+	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
+	    lp_data->maxm * DSIZE);
+
+	 get_dual_farkas_ray(lp_data);
+      }
+      //
+      
       get_x(lp_data);
+
+      //Anahita
+      int t;
+      double intercept = 0;
+      
+      for (t=0; t < lp_data->n; t++){
+	 intercept += lp_data->x[t]* lp_data->dj[t];
+      }
+
+      lp_data->intcpt = intercept;
+
+
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }
@@ -2695,25 +2725,48 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       
       lp_data->objval = si->getObjValue();
 
-      /* Get relevant data */
+
+      // Get relevant data
       if (lp_data->dualsol && lp_data->dj) {
-	 get_dj_pi(lp_data);
+      	 get_dj_pi(lp_data);
+      }else{ //Anahita
+      	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
+      	 get_dj_pi(lp_data);
       }
-      if (lp_data->slacks && term == LP_OPTIMAL) {
-	 get_slacks(lp_data);
-      }
+
       
+      if (lp_data->slacks && term == LP_OPTIMAL) {
+      	 get_slacks(lp_data);
+      }
       //Anahita
       if (term == LP_D_UNBOUNDED) {
 	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
 	    lp_data->maxm * DSIZE);
-	 lp_data->raysol = 0;
-	 //get_dual_ray(lp_data);
+
+	 get_dual_farkas_ray(lp_data);
       }
       //
 
       
       get_x(lp_data);
+
+      //Anahita
+      int t;
+      double intercept = 0;
+      
+      for (t=0; t < lp_data->n; t++){
+	 intercept += lp_data->x[t]* lp_data->dj[t];
+      }
+
+      lp_data->intcpt = intercept;
+
+      
+
+
+
+
+
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
@@ -3041,8 +3094,8 @@ void get_dual_ray(LPdata *lp_data)
       for (i = 0; i < lp_data->m ; i++){
 	 if (fabs(ray[i]) > 1e-5) break ;
       }
-      //temp
-      assert(i < lp_data->m);
+      //temp: this assert would fail when cuts exist
+      //assert(i < lp_data->m);
       memcpy(lp_data->raysol, ray, lp_data->m * DSIZE);
       
    }else{
@@ -3050,6 +3103,40 @@ void get_dual_ray(LPdata *lp_data)
    }
 }
 
+
+
+/*=Anahita==========================================================*/
+
+void get_dual_farkas_ray(LPdata *lp_data)
+{
+   std::vector<double*> vRays;
+   vRays = lp_data->si->getDualFarkasRays(1);
+
+   //check that there is at least one ray
+   int raysReturned = static_cast<unsigned int>(vRays.size()) ;
+   assert (raysReturned == 1);
+   
+   //   double* ray = (double*) malloc (lp_data->m * DSIZE *
+   //sizeof(double));
+   
+   if (vRays[0]){
+      double* ray = vRays[0];
+      int i;
+
+      // Check that the ray is not all zeros
+      for (i = 0; i < lp_data->m ; i++){
+	 if (fabs(ray[i]) > 1e-5) break ;
+      }
+      //temp
+      //  assert(i < lp_data->m);
+      memcpy(lp_data->raysol, ray, lp_data->m * DSIZE);
+      
+   }else{
+      double* ray = NULL;
+   }
+}
+
+/*========
 /*===========================================================================*/
 void get_slacks(LPdata *lp_data)
 {

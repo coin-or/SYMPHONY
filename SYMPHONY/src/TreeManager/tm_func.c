@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /*                                                                           */
-/* This file is part of the SYMPHONY MILP Solver Framework.                  */
+/* This file is part of the SYMPHOY MILP Solver Framework.                  */
 /*                                                                           */
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
@@ -402,7 +402,8 @@ int solve(tm_prob *tm)
 	      tm->par.node_selection_rule = LOWEST_LP_FIRST;
 	    }
 
-	    switch(process_chain(tm->lpp[thread_num])){
+
+   switch(process_chain(tm->lpp[thread_num])){
 	       
 	     case FUNCTION_TERMINATED_NORMALLY:
 	       break;
@@ -1477,7 +1478,8 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       desc->desc = node->desc.desc;
       desc->nf_status = node->desc.nf_status;
 
-
+      //Anahita
+      child->intcpt = bobj->intcpt[i];
 #ifdef SENSITIVITY_ANALYSIS
       if (tm->par.sensitivity_analysis){// &&//Anahita 
 	 // action[i] != PRUNE_THIS_CHILD_INFEASIBLE){

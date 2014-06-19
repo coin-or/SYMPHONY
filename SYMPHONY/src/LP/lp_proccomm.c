@@ -576,9 +576,18 @@ void send_node_desc(lp_prob *p, int node_type)
 	 if (lp_data->raysol){
 	    memcpy(n->rays, lp_data->raysol, DSIZE*p->base.cutnum);
 	 }
+	 
+	 if (n->duals){
+	    FREE(n->duals);
+	 }
+	 n->duals = (double *) malloc (DSIZE * p->base.cutnum);
+	 memcpy(n->duals, lp_data->dualsol, DSIZE*p->base.cutnum);
       }
 #endif	 
-
+      //Anahita
+      n->intcpt = lp_data->intcpt;
+      n->lower_bound = lp_data->objval;
+      
 #ifdef COMPILE_IN_LP
    int *indices;
    double *values;
@@ -668,7 +677,8 @@ void send_node_desc(lp_prob *p, int node_type)
 	 return;
    }
 
-   if (!repricing || n->node_status != NODE_STATUS__PRUNED){
+   if ((!repricing || n->node_status != NODE_STATUS__PRUNED)
+       && node_type != INFEASIBLE_PRUNED){ //Anahita
 
       n->lower_bound = lp_data->objval;
 

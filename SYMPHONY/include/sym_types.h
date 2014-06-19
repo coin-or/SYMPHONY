@@ -259,6 +259,9 @@ typedef struct BRANCH_OBJ{
 
 #ifdef MAX_CHILDREN_NUM
    double        objval[MAX_CHILDREN_NUM];   /* arrays of size 'number' */
+   //Anahita
+   double        intcpt[MAX_CHILDREN_NUM];
+
    int           termcode[MAX_CHILDREN_NUM];
    int           iterd[MAX_CHILDREN_NUM];
    int           feasible[MAX_CHILDREN_NUM];
@@ -266,6 +269,9 @@ typedef struct BRANCH_OBJ{
 
 #else
    double       *objval;   /* arrays of size 'number' */
+  //Anahita
+   double      intcpt[2]; 
+
    int          *termcode;
    int          *iterd;
    int          *feasible;
@@ -282,7 +288,6 @@ typedef struct BRANCH_OBJ{
    //Anahita
    double      **rays;
 #endif
-   
 }branch_obj;
 
 /*===========================================================================*/
@@ -396,6 +401,8 @@ typedef struct BC_NODE{
    double    *duals;   
       //Anahita
    double    *rays;
+   double      intcpt;
+
    double     C_LP;
    double     B_IP;
 #endif

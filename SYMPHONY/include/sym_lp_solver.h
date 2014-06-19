@@ -204,6 +204,7 @@ typedef struct LPDATA{
    double    *dualsol;     /* maxm */ /* BB */
    //Anahita
    double    *raysol;
+   double    intcpt;
    //
    double    *slacks;      /* maxm */
    double    *ub;
@@ -277,8 +278,11 @@ int get_proof_of_infeas PROTO((LPdata *lp_data, int *infind));
 void get_x PROTO((LPdata *lp_data));
 void get_dj_pi PROTO((LPdata *lp_data));
 
-//Anahita temp
+//Anahita
 void get_dual_ray PROTO((LPdata *lp_data));
+
+//Anahita
+void get_dual_farkas_ray PROTO((LPdata *lp_data));
 
 
 void get_slacks PROTO((LPdata *lp_data));

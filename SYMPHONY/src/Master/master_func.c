@@ -3845,42 +3845,28 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 	       }
 	       if (child->duals && !child->rays){
 		  printf("HUH! Just duals\n");
+		  exit(1);
 	       }
 	       if (!child->duals && child->rays){
 		  printf("HUH! Just rays\n");
+		  exit(1);
 	       }
 
+	       //Combine the solutions
 		       
-		       
+	       double Lambda = 999999;
+
+	       dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
 	       
+	       //write dual info
+	       dual_pieces[*cur_piece_no] [0] = child->lower_bound;
+	       for (j = 0; j < mip->m; j++){
+		  dual_pieces[*cur_piece_no][j+1] = child->duals[j] + Lambda*
+		     child->rays[i];
+	       }
+	       //increment
+	       (*cur_piece_no)++;
 	       
-	       if (child->duals){
-	       	  printf("Infeasible node reported: duals bound reached.\n");
-	       	  dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
-		  
-	       	  //write dual info
-	       	  dual_pieces[*cur_piece_no] [0] = child->lower_bound;
-	       	  for (j = 0; j < mip->m; j++){
-		     dual_pieces[*cur_piece_no][j+1] = child->duals[j];
-	       	  }
-	       	  //increment
-	       	  (*cur_piece_no)++;
-	       }else{
-	       	
-		  if (!child->rays){
-		     printf("Should have a ray, but CLP did not return one.\n");
-		     exit(1);
-		  }
-		  printf("Writing the ray...\n");
-		  dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
-		  //write ray info
-		  dual_pieces[*cur_piece_no] [0] = child->lower_bound;
-		  for (j = 0; j < mip->m; j++){
-		     dual_pieces[*cur_piece_no][j+1] = child->rays[j];
-		  }
-		     //increment
-		     (*cur_piece_no)++;
-	       } 
 	    }//end of infeasible nodes
 	    else { //status unknown
 	       printf("get_dual_pruned(): Unknown error!\n");
@@ -3893,7 +3879,7 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 	 }
       }//child loop
    } //if root end
-
+   
 #else
    printf("get_dual_pruned():\n");
    printf("Sensitivity analysis features are not enabled.\n"); 

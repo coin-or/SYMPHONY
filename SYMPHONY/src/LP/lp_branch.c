@@ -1520,6 +1520,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   sizeof(int *));	
             can->sol_sizes = (int *) calloc(MAX_CHILDREN_NUM, ISIZE);	
          }
+
 #ifdef SENSITIVITY_ANALYSIS
          if (p->par.sensitivity_analysis){      
             can->duals = (double **) calloc (MAX_CHILDREN_NUM, sizeof(double *));
@@ -1583,7 +1584,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
                can->objval[j] = lp_data->objval;
                //get_x(lp_data);
+	       //Anahita
+	       can->intcpt[j] = lp_data->intcpt;
 
+	       
 #ifdef SENSITIVITY_ANALYSIS
                if (p->par.sensitivity_analysis){      
                   get_dj_pi(lp_data);
@@ -1591,10 +1595,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
 
 		  //Anahita
-		  get_dual_ray(lp_data);
-		  if (lp_data->raysol){
-		     can->rays[j] = (double *) malloc (DSIZE*p->base.cutnum);
-		     memcpy(can->rays[j], lp_data->raysol, DSIZE*p->base.cutnum);
+		  if (can->termcode[j] == LP_D_UNBOUNDED){ 
+		     get_dual_farkas_ray(lp_data);
+		     if (lp_data->raysol){
+			can->rays[j] = (double *) malloc (DSIZE*p->base.cutnum);
+			memcpy(can->rays[j], lp_data->raysol, DSIZE*p->base.cutnum);
+		     }
 		  }
 	       }
 #endif
@@ -1694,7 +1700,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
                can->objval[j] = lp_data->objval;
 
-
+	       //Anahita
+	       can->intcpt[j] = lp_data->intcpt;
                //get_x(lp_data);
 
 #ifdef SENSITIVITY_ANALYSIS
@@ -1702,14 +1709,15 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   get_dj_pi(lp_data);
                   can->duals[j] = (double *) malloc (DSIZE*p->base.cutnum);
                   memcpy(can->duals[j], lp_data->dualsol, DSIZE*p->base.cutnum);
+
 		  //Anahita
-		  get_dual_ray(lp_data);
-		  if (lp_data->raysol)
-		     {
+		  if (can->termcode[j] == LP_D_UNBOUNDED){ 
+		     get_dual_farkas_ray(lp_data);
+		     if (lp_data->raysol){
 			can->rays[j] = (double *) malloc (DSIZE*p->base.cutnum);
 			memcpy(can->rays[j], lp_data->raysol, DSIZE*p->base.cutnum);
 		     }
-			
+		  }
 	       }
 #endif
 
