@@ -3828,7 +3828,7 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 	       dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
 	       
 	       //write dual info
-	       dual_pieces[*cur_piece_no] [0] = child->lower_bound;
+	       dual_pieces[*cur_piece_no] [0] = child->intcpt;
 	       for (j = 0; j < mip->m; j++){
 		  dual_pieces[*cur_piece_no][j+1] = child->duals[j];
 	       }
@@ -3854,18 +3854,32 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 
 	       //Combine the solutions
 		       
-	       double Lambda = 999999;
+	       double Lambda = 1;
 
 	       dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
 	       
-	       //write dual info
-	       dual_pieces[*cur_piece_no] [0] = child->lower_bound;
+	       dual_pieces[*cur_piece_no] [0] = Lambda*child->intcpt;
 	       for (j = 0; j < mip->m; j++){
-		  dual_pieces[*cur_piece_no][j+1] = child->duals[j] + Lambda*
-		     child->rays[i];
+	       	  dual_pieces[*cur_piece_no][j+1] = 99999*Lambda*child->rays[j];
 	       }
 	       //increment
 	       (*cur_piece_no)++;
+
+	       
+	       /* //write dual+ray info */
+	       /* /\* here child-duals has the dual info */
+	       /* 	  and child-lowerbound is the dual obj-->first we get the */
+	       /* 	  intercept of the duals. Later we will work on rays *\/ */
+	       /* child->lower_bound; */
+
+	       /* /\* */
+	       /* 	  child-incpt has the reduced cost info that is the variable bounds*their */
+	       /* 	  duals, with rays *\/ */
+	       /* dual_pieces[*cur_piece_no] [0] = child->lower_bound; */
+	       /* for (j = 0; j < mip->m; j++){ */
+	       /* 	  dual_pieces[*cur_piece_no][j+1] = child->duals[j] + Lambda* */
+	       /* 	     child->rays[i]; */
+	       /* } */
 	       
 	    }//end of infeasible nodes
 	    else { //status unknown

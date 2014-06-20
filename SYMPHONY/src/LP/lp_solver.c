@@ -2826,12 +2826,39 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
       /* Get relevant data */
       if (lp_data->dualsol && lp_data->dj) {
 	 get_dj_pi(lp_data);
+
+       }else{ //Anahita
+      	 lp_data->dualsol = (double *) malloc(lp_data->maxm * DSIZE);
+      	 lp_data->dj = (double *) malloc(lp_data->maxn * DSIZE);
+      	 get_dj_pi(lp_data);
       }
+
       if (lp_data->slacks && term == LP_OPTIMAL) {
 	 get_slacks(lp_data);
       }
+
+      //Anahita
+      if (term == LP_D_UNBOUNDED) {
+	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
+	    lp_data->maxm * DSIZE);
+
+	 get_dual_farkas_ray(lp_data);
+      }
+      //
+
       
       get_x(lp_data);
+
+      //Anahita
+      int t;
+      double intercept = 0;
+      
+      for (t=0; t < lp_data->n; t++){
+	 intercept += lp_data->x[t]* lp_data->dj[t];
+      }
+
+      lp_data->intcpt = intercept;
+
       
       lp_data->lp_is_modified = LP_HAS_NOT_BEEN_MODIFIED;
    }   
