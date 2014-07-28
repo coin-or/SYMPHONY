@@ -2605,8 +2605,9 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
 		     &(&(*cp_cut)->cut)->sense, &matbeg, matind, matval);
 	 }
       }
+      size_lp_arrays(lp_data, TRUE, FALSE, 0, 0, 0);
    }
-   int *which = (int *) malloc((lp_data->m - orig_row_num)*ISIZE);
+   int *which = lp_data->tmp.i1;
    for (ind_i = orig_row_num; ind_i < lp_data->m; ind_i++){
       which[ind_i - orig_row_num] = ind_i;
    }
