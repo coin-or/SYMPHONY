@@ -20,6 +20,9 @@
  * default. See below for the usage.
 \*===========================================================================*/
 
+#ifdef _OPENMP
+#include "omp.h"
+#endif
 
 #ifdef USE_OSI_INTERFACE
 
@@ -34,6 +37,11 @@ int main(int argc, char **argv)
    /* Parse the command line */
    si.parseCommandLine(argc, argv);
    
+#ifdef _OPENMP
+   omp_set_dynamic(FALSE);
+   omp_set_num_threads(si->env_->par.tm_par.max_active_nodes);
+#endif
+      
    /* Read in the problem */
    si.loadProblem();
 
@@ -148,12 +156,16 @@ int main(int argc, char **argv)
 
    sym_environment *env = sym_open_environment();
    int termcode;
-
    
    if (argc > 1){
    
       sym_parse_command_line(env, argc, argv);
 
+#ifdef _OPENMP
+      omp_set_dynamic(FALSE);
+      omp_set_num_threads(env->par.tm_par.max_active_nodes);
+#endif
+      
       if (env->par.verbosity >= 0){
 	 sym_version();
       }

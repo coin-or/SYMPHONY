@@ -144,12 +144,6 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    SRANDOM(par->random_seed);
 
 #ifdef COMPILE_IN_LP
-#ifdef _OPENMP
-   omp_set_dynamic(FALSE);
-   omp_set_num_threads(par->max_active_nodes);
-#else
-   par->max_active_nodes = 1;
-#endif
    tm->active_nodes = (bc_node **) calloc(par->max_active_nodes, sizeof(bc_node *));
 #ifndef COMPILE_IN_TM
    tm->lpp = (lp_prob **)

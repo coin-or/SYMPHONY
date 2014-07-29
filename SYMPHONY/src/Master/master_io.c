@@ -460,11 +460,13 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
-#if !defined(COMPILE_IN_LP) || defined _OPENMP
 	       tm_par->max_active_nodes = tmpi;
-#else
-	       printf("\nWarning: Trying to use multiple processors with ");
-	       printf("sequential build...\n");
+#if defined(COMPILE_IN_LP) && !defined _OPENMP
+	       if (tm_par->max_active_nodes > 1){
+		  printf("\nWarning: Trying to use multiple processors with ");
+		  printf("sequential build...\n");
+		  tm_par->max_active_nodes = 1;
+	       }
 #endif
 	    }
 	 }else{

@@ -2098,11 +2098,13 @@ int set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "max_active_nodes") == 0 ||
 	    strcmp(key, "TM_max_active_nodes") == 0){
-#if !defined(COMPILE_IN_LP) || defined _OPENMP
       READ_INT_PAR(tm_par->max_active_nodes);
-#else
-      printf("\nWarning: Trying to use multiple processors with ");
-      printf("sequential build...\n");
+#if defined(COMPILE_IN_LP) && !defined _OPENMP
+      if (tm_par->max_active_nodes > 1){
+	 printf("\nWarning: Trying to use multiple processors with ");
+	 printf("sequential build...\n");
+	 tm_par->max_active_nodes = 1;
+      }
 #endif
       return(0);
    }

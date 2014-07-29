@@ -15,9 +15,6 @@
 #include <stdlib.h>          /* malloc() is defined here in AIX ... */
 #include <stdio.h>
 #include <string.h>
-#ifdef _OPENMP
-#include "omp.h"
-#endif
 
 #include "sym_qsort.h"
 #include "sym_messages.h"
@@ -459,12 +456,6 @@ int send_lp_data_u(sym_environment *env, int sender)
    int i;
    tm_prob *tm = env->tm;
    tm->par.max_active_nodes = env->par.tm_par.max_active_nodes;
-#ifdef _OPENMP
-   omp_set_dynamic(FALSE);
-   omp_set_num_threads(tm->par.max_active_nodes);
-#else
-   tm->par.max_active_nodes = 1;
-#endif
 
    tm->lpp = (lp_prob **) malloc(tm->par.max_active_nodes * sizeof(lp_prob *));
 
