@@ -260,11 +260,11 @@ int create_subproblem_u(lp_prob *p)
       userind[i] = vars[i]->userind;
       if (userind[i]!=i) {
          p->par.is_userind_in_order = FALSE;
-	 printf("K1\n");
       }
    }
+   /*This is always violated for multi_crtieria due to the addition of the
+     artificial variable. It's probably not needed...*/
    if (lp_data->n != p_mip->n) {
-     printf("K2\n");
       p->par.is_userind_in_order = FALSE;
    }
    
@@ -596,7 +596,7 @@ int create_subproblem_u(lp_prob *p)
    //lp_data->frac_var_cnt = p->frac_var_cnt; 
 
    if(p->tm->root_lp == NULL){
-     p->root_lp = (double *)calloc(p->mip->n, DSIZE);
+     p->root_lp = (double *)calloc(p->mip->n+1, DSIZE);
      p->tm->root_lp = p->root_lp;
     }else{
      p->root_lp = p->tm->root_lp;
