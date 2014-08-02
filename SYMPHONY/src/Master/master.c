@@ -264,7 +264,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->should_warmstart_chain = TRUE; /* see header file for description */
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
 #ifdef COMPILE_IN_LP
-   lp_par->should_reuse_lp = TRUE; /* see header file for description */
+   lp_par->should_reuse_lp = FALSE; /* see header file for description */
 #endif
 #ifdef _OPENMP
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
