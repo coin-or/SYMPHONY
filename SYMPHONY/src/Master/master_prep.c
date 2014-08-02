@@ -118,8 +118,6 @@ int prep_update_rootdesc(sym_environment *env)
    int i, user_size = env->rootdesc->uind.size;// uind = 0;
    int *user_ind = env->rootdesc->uind.list;
    
-   env->base->cutnum = env->mip->m;
-
    if (user_size == env->mip->n){
       return PREP_UNMODIFIED;
    } else {
@@ -128,8 +126,14 @@ int prep_update_rootdesc(sym_environment *env)
       }
    }
    
+   env->base->cutnum = env->mip->m;
    env->rootdesc->uind.size = env->mip->n;
    
+   if (env->par.multi_criteria && !env->par.lp_par.mc_find_supported_solutions){
+      env->base->cutnum += 2;
+      env->rootdesc->uind.size++;
+   }
+
    return PREP_MODIFIED;
 }
 
