@@ -2175,7 +2175,7 @@ int set_param(sym_environment *env, char *line)
       if (value[0]){
 	 tm_par->keep_description_of_pruned = 
 	   lp_par->keep_description_of_pruned = KEEP_IN_MEMORY;
-         lp_par->should_reuse_lp = FALSE; //by asm4
+         //lp_par->should_reuse_lp = FALSE; //by asm4
          return(0);
    } else
 	 tm_par->keep_description_of_pruned = 
@@ -2334,6 +2334,11 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "should_warmstart_chain") == 0 ||
 	    strcmp(key, "LP_should_warmstart_chain") == 0){
       READ_INT_PAR(lp_par->should_warmstart_chain);
+      return(0);
+   }
+   else if (strcmp(key, "should_reuse_lp") == 0 ||
+	    strcmp(key, "LP_should_reuse_lp") == 0){
+      READ_INT_PAR(lp_par->should_reuse_lp);
       return(0);
    }
    else if (strcmp(key, "try_to_recover_from_error") == 0 ||
