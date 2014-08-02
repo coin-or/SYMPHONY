@@ -239,6 +239,7 @@ int fathom_branch(lp_prob *p)
    termcode = LP_OPTIMAL; // just to initialize
    check_bounds(p, &termcode);
    if (termcode == LP_D_UNBOUNDED) {
+      PRINT(verbosity, 1, ("Feasibility lost -- "));
       if (fathom(p, FALSE)) {
          comp_times->communication += used_time(&p->tt);
          return(FUNCTION_TERMINATED_NORMALLY);
