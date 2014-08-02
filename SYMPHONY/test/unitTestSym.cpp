@@ -17,6 +17,10 @@
 
 #include <iostream>
 
+#ifdef _OPENMP
+#include "omp.h"
+#endif
+
 #ifdef COIN_HAS_OSITESTS
 #include "OsiUnitTests.hpp"
 #include "OsiSolverInterface.hpp"
@@ -38,6 +42,11 @@ void testingMessage( const char * const msg ) {
 
 int main (int argc, const char *argv[])
 {
+#ifdef _OPENMP
+   omp_set_dynamic(FALSE);
+   omp_set_num_threads(1);
+#endif
+
   std::string miplib3Dir;
   /*
     Start off with various bits of initialisation that don't really belong
