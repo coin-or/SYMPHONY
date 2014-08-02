@@ -190,7 +190,11 @@ int main(int argc, char **argv)
 	    exit(termcode);
 	 }
 	 printf("\n");
-	 sym_solve(env);
+	 if (env->mip->obj2 != NULL){
+	    sym_mc_solve(env);
+	 } else {
+	    sym_solve(env);
+	 }
       }
    
    } else{
@@ -323,14 +327,22 @@ int main(int argc, char **argv)
 	 if(strcmp(args[0], "solve") == 0){
 	   start_time = wall_clock(NULL);
 	   printf("\n");
-	   termcode = sym_solve(env);
+	   if (env->mip->obj2 != NULL){
+	      termcode = sym_mc_solve(env);
+	   } else {
+	      termcode = sym_solve(env);
+	   }
 	   finish_time = wall_clock(NULL);
 	 } else {
 	   is_int = env->mip->is_int;
 	   env->mip->is_int  = (char *)   calloc(CSIZE, env->mip->n);
 	   start_time = wall_clock(NULL);
 	   printf("\n");
-	   termcode = sym_solve(env);
+	   if (env->mip->obj2 != NULL){
+	      termcode = sym_mc_solve(env);
+	   } else {
+	      termcode = sym_solve(env);
+	   }
 	   finish_time = wall_clock(NULL);
 	   env->mip->is_int = is_int;
 	   is_int = 0;

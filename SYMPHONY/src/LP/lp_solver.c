@@ -340,8 +340,8 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 
    /*get mip->nz and mip->obj*/
    mip->obj    = (double *) calloc(DSIZE, mip->n);
-   mip->obj1   = (double *) calloc(DSIZE, mip->n);
-   mip->obj2   = (double *) calloc(DSIZE, mip->n);
+   mip->obj1   = NULL;
+   mip->obj2   = NULL;
    
    indices = (int *) malloc(ISIZE * (mip->n + 1));
    values = (double *) malloc(DSIZE * (mip->n + 1));
@@ -465,12 +465,9 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
    matrixByCol.reverseOrdering();
 
 
-   memcpy(mip->matbeg, const_cast<int *>(matrixByCol.getVectorStarts()),
-	  ISIZE * (mip->n + 1));   
-   memcpy(mip->matval, const_cast<double *> (matrixByCol.getElements()),
-	  DSIZE * mip->nz);  
-   memcpy(mip->matind, const_cast<int *> (matrixByCol.getIndices()), 
-	  ISIZE * mip->nz);  
+   memcpy(mip->matbeg, matrixByCol.getVectorStarts(), ISIZE * (mip->n + 1));   
+   memcpy(mip->matval, matrixByCol.getElements(), DSIZE * mip->nz);  
+   memcpy(mip->matind, matrixByCol.getIndices(), ISIZE * mip->nz);  
 #endif
 
    /* what if the user doesn't have COIN, is that possible?:) */
@@ -1440,7 +1437,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 
 /*===========================================================================*/
 
-int read_mps(MIPdesc *desc, char *infile, char *probname)
+int read_mps(MIPdesc *desc, char *infile, char *probname, int verbosity)
 {
    printf("\nMps-format file can be read only through OSI interface.\n");
 
@@ -1449,7 +1446,7 @@ int read_mps(MIPdesc *desc, char *infile, char *probname)
 
 /*===========================================================================*/
 
-int read_lp(MIPdesc *desc, char *infile, char *probname)
+int read_lp(MIPdesc *desc, char *infile, char *probname, int verbosity)
 {
    printf("\nLP-format file can be read only through OSI interface.\n");
 
@@ -2257,7 +2254,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 
 /*===========================================================================*/
 
-int read_mps(MIPdesc *desc, char *infile, char *probname)
+int read_mps(MIPdesc *desc, char *infile, char *probname, int verbosity)
 {
    printf("\nMps-format file can be read only through OSI interface.\n");
 
@@ -2266,7 +2263,7 @@ int read_mps(MIPdesc *desc, char *infile, char *probname)
 
 /*===========================================================================*/
 
-int read_lp(MIPdesc *desc, char *infile, char *probname)
+int read_lp(MIPdesc *desc, char *infile, char *probname, int verbosity)
 {
    printf("\nLP-format file can be read only through OSI interface.\n");
 
@@ -2620,7 +2617,7 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    }
    else{
       lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
-      printf("OSI Abandoned calculation: Code %i \n\n", term);
+      printf("Unexpected return code from OSI: %i \n\n", term);
    }
    
    /*
@@ -2979,18 +2976,15 @@ int get_proof_of_infeas(LPdata *lp_data, int *infind)
 
 void get_x(LPdata *lp_data)
 {
-   memcpy(lp_data->x, const_cast<double *>(lp_data->si->getColSolution()),
-	  lp_data->n * DSIZE);
+   memcpy(lp_data->x, lp_data->si->getColSolution(), lp_data->n * DSIZE);
 }
 
 /*===========================================================================*/
 
 void get_dj_pi(LPdata *lp_data)
 {
-   memcpy(lp_data->dualsol, const_cast<double *>(lp_data->si->getRowPrice()),
-	  lp_data->m * DSIZE);
-   memcpy(lp_data->dj, const_cast<double *>(lp_data->si->getReducedCost()),
-	  lp_data->n * DSIZE);
+   memcpy(lp_data->dualsol, lp_data->si->getRowPrice(), lp_data->m * DSIZE);
+   memcpy(lp_data->dj, lp_data->si->getReducedCost(), lp_data->n * DSIZE);
 }
 
 /*===========================================================================*/
@@ -3153,15 +3147,15 @@ void get_lb(LPdata *lp_data, int j, double *lb)
 
 void get_bounds(LPdata *lp_data)
 {
-   lp_data->ub = const_cast<double *>(lp_data->si->getColUpper());
    lp_data->lb = const_cast<double *>(lp_data->si->getColLower());
+   lp_data->ub = const_cast<double *>(lp_data->si->getColUpper());
 }
 
 /*===========================================================================*/
 
 void get_objcoef(LPdata *lp_data, int j, double *objcoef)
 {
-   *objcoef=lp_data->si->getObjCoefficients()[j];
+   *objcoef = lp_data->si->getObjCoefficients()[j];
 }
 
 /*===========================================================================*/
@@ -3408,7 +3402,7 @@ void constrain_row_set(LPdata *lp_data, int length, int *index)
 
 /*===========================================================================*/
 
-int read_mps(MIPdesc *mip, char *infile, char *probname)
+int read_mps(MIPdesc *mip, char *infile, char *probname, int versbotiy)
 {
    int j, errors;
    CoinMpsIO mps;
@@ -3460,7 +3454,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
       return(errors);
    }
    
-   strncpy(probname, const_cast<char *>(mps.getProblemName()), 80);
+   strncpy(probname, mps.getProblemName(), 80);
    
    mip->m  = mps.getNumRows();
    mip->n  = mps.getNumCols();
@@ -3470,21 +3464,17 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
 
    if (mip->n){
       mip->obj    = (double *) malloc(DSIZE * mip->n);
-      mip->obj1   = (double *) calloc(mip->n, DSIZE);
-      mip->obj2   = (double *) calloc(mip->n, DSIZE);
+      mip->obj1   = NULL;
+      mip->obj2   = NULL;
       mip->ub     = (double *) malloc(DSIZE * mip->n);
       mip->lb     = (double *) malloc(DSIZE * mip->n);
       mip->is_int = (char *)   calloc(CSIZE, mip->n);
-      memcpy(mip->obj, const_cast <double *> (mps.getObjCoefficients()),
-	     DSIZE * mip->n); 
-      memcpy(mip->ub, const_cast <double *> (mps.getColUpper()),
-	     DSIZE * mip->n); 
-      memcpy(mip->lb, const_cast <double *> (mps.getColLower()),
-	     DSIZE * mip->n); 
+      memcpy(mip->obj, mps.getObjCoefficients(), DSIZE * mip->n); 
+      memcpy(mip->ub, mps.getColUpper(), DSIZE * mip->n); 
+      memcpy(mip->lb, mps.getColLower(), DSIZE * mip->n); 
    
       mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
-      memcpy(mip->matbeg, const_cast<int *>(matrixByCol->getVectorStarts()),
-	     ISIZE * (mip->n + 1));
+      memcpy(mip->matbeg, matrixByCol->getVectorStarts(), ISIZE * (mip->n + 1));
    
       mip->colname = (char **) malloc(sizeof(char *) * mip->n);  
    }
@@ -3492,12 +3482,9 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
       mip->rhs    = (double *) malloc(DSIZE * mip->m);
       mip->sense  = (char *)   malloc(CSIZE * mip->m);
       mip->rngval = (double *) malloc(DSIZE * mip->m);
-      memcpy(mip->rhs, const_cast <double *> (mps.getRightHandSide()),
-	     DSIZE * mip->m); 
-      memcpy(mip->sense, const_cast <char *> (mps.getRowSense()),
-	     CSIZE * mip->m); 
-      memcpy(mip->rngval, const_cast <double *> (mps.getRowRange()),
-	     DSIZE * mip->m); 
+      memcpy(mip->rhs, mps.getRightHandSide(), DSIZE * mip->m); 
+      memcpy(mip->sense, mps.getRowSense(), CSIZE * mip->m); 
+      memcpy(mip->rngval, mps.getRowRange(), DSIZE * mip->m); 
    }
    
    //user defined matind, matval, matbeg--fill as column ordered
@@ -3506,16 +3493,14 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
       mip->matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
       mip->matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
    
-      memcpy(mip->matval, const_cast<double *> (matrixByCol->getElements()),
-	     DSIZE * mip->matbeg[mip->n]);  
-      memcpy(mip->matind, const_cast<int *> (matrixByCol->getIndices()), 
-	     ISIZE * mip->matbeg[mip->n]);
+      memcpy(mip->matval, matrixByCol->getElements(), DSIZE * mip->matbeg[mip->n]);  
+      memcpy(mip->matind, matrixByCol->getIndices(), ISIZE * mip->matbeg[mip->n]);
    }
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
       mip->colname[j] = (char *) malloc(CSIZE * 30);
-      strncpy(mip->colname[j], const_cast<char*>(mps.columnName(j)), 30);
+      strncpy(mip->colname[j], mps.columnName(j), 30);
       mip->colname[j][29] = 0;
    }
 
@@ -3532,7 +3517,7 @@ int read_mps(MIPdesc *mip, char *infile, char *probname)
 
 /*===========================================================================*/
 
-int read_lp(MIPdesc *mip, char *infile, char *probname)
+int read_lp(MIPdesc *mip, char *infile, char *probname, int verbosity)
 {
 
    int j;
@@ -3540,57 +3525,61 @@ int read_lp(MIPdesc *mip, char *infile, char *probname)
 
    lp.readLp(infile);
    
-   strncpy(probname, const_cast<char *>(lp.getProblemName()), 80);
+   strncpy(probname, lp.getProblemName(), 80);
    
    mip->m  = lp.getNumRows();
    mip->n  = lp.getNumCols();
    mip->nz = lp.getNumElements();
    
    mip->obj    = (double *) malloc(DSIZE * mip->n);
-   mip->obj1   = (double *) calloc(mip->n, DSIZE);
-   mip->obj2   = (double *) calloc(mip->n, DSIZE);
+   mip->obj1   = NULL;
+   mip->obj2   = NULL;
    mip->rhs    = (double *) malloc(DSIZE * mip->m);
    mip->sense  = (char *)   malloc(CSIZE * mip->m);
    mip->rngval = (double *) malloc(DSIZE * mip->m);
    mip->ub     = (double *) malloc(DSIZE * mip->n);
    mip->lb     = (double *) malloc(DSIZE * mip->n);
    mip->is_int = (char *)   calloc(CSIZE, mip->n);
-   
-   memcpy(mip->obj, const_cast <double *> (lp.getObjCoefficients()),
-	  DSIZE * mip->n); 
-   memcpy(mip->rhs, const_cast <double *> (lp.getRightHandSide()),
-	  DSIZE * mip->m); 
-   memcpy(mip->sense, const_cast <char *> (lp.getRowSense()),
-	  CSIZE * mip->m); 
-   memcpy(mip->rngval, const_cast <double *> (lp.getRowRange()),
-	  DSIZE * mip->m); 
-   memcpy(mip->ub, const_cast <double *> (lp.getColUpper()),
-	  DSIZE * mip->n); 
-   memcpy(mip->lb, const_cast <double *> (lp.getColLower()),
-	  DSIZE * mip->n); 
+
+   if (lp.getNumObjectives() >= 2){
+      mip->obj1   = (double *) calloc(mip->n, DSIZE);
+      mip->obj2   = (double *) calloc(mip->n, DSIZE);
+      memcpy(mip->obj, lp.getObjCoefficients(0), DSIZE * mip->n); 
+      memcpy(mip->obj1, lp.getObjCoefficients(0), DSIZE * mip->n); 
+      memcpy(mip->obj2, lp.getObjCoefficients(1), DSIZE * mip->n);
+      if (lp.getNumObjectives() > 2){
+         PRINT(verbosity, 2, ("Ignoring extra objectives...\n\n"));
+      }
+   }
+   else{
+      memcpy(mip->obj, lp.getObjCoefficients(), DSIZE * mip->n);
+   }
+      
+   memcpy(mip->rhs, lp.getRightHandSide(), DSIZE * mip->m); 
+   memcpy(mip->sense, lp.getRowSense(), CSIZE * mip->m); 
+   memcpy(mip->rngval, lp.getRowRange(), DSIZE * mip->m); 
+   memcpy(mip->ub, lp.getColUpper(), DSIZE * mip->n); 
+   memcpy(mip->lb, lp.getColLower(), DSIZE * mip->n); 
    
    //user defined matind, matval, matbeg--fill as column ordered
    
    const CoinPackedMatrix * matrixByCol= lp.getMatrixByCol();
    
    mip->matbeg = (int *) malloc(ISIZE * (mip->n + 1));
-   memcpy(mip->matbeg, const_cast<int *>(matrixByCol->getVectorStarts()),
-	  ISIZE * (mip->n + 1));
+   memcpy(mip->matbeg, matrixByCol->getVectorStarts(), ISIZE * (mip->n + 1));
    
    mip->matval = (double *) malloc(DSIZE*mip->matbeg[mip->n]);
    mip->matind = (int *)    malloc(ISIZE*mip->matbeg[mip->n]);
    
-   memcpy(mip->matval, const_cast<double *> (matrixByCol->getElements()),
-	  DSIZE * mip->matbeg[mip->n]);  
-   memcpy(mip->matind, const_cast<int *> (matrixByCol->getIndices()), 
-	  ISIZE * mip->matbeg[mip->n]);  
+   memcpy(mip->matval, matrixByCol->getElements(), DSIZE * mip->matbeg[mip->n]);  
+   memcpy(mip->matind, matrixByCol->getIndices(), ISIZE * mip->matbeg[mip->n]);  
 
    mip->colname = (char **) malloc(sizeof(char *) * mip->n); 
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = lp.isInteger(j);
       mip->colname[j] = (char *) malloc(CSIZE * 30);
-      strncpy(mip->colname[j], const_cast<char*>(lp.columnName(j)), 30);
+      strncpy(mip->colname[j], lp.columnName(j), 30);
       mip->colname[j][29] = 0;
    }
 
@@ -4331,8 +4320,8 @@ int check_cuts(OsiCuts &cutlist, LPdata *lp_data, int bc_level, int
       int *is_deleted = (int *) calloc(cutlist.sizeRowCuts(), ISIZE);
       double *hashes  = (double *) malloc(cutlist.sizeRowCuts()* DSIZE);
       int num_elements, num_elements2;
-      int *indices, *indices2;
-      double *elements, *elements2;
+      const int *indices, *indices2;
+      const double *elements, *elements2;
       double min_coeff, max_coeff;
       int discard_cut, is_duplicate;
       double rhs, rhs2;
@@ -4355,8 +4344,8 @@ int check_cuts(OsiCuts &cutlist, LPdata *lp_data, int bc_level, int
       for (i = 0, j = *num_cuts; i < cutlist.sizeRowCuts(); i++){
          cut = cutlist.rowCut(i);
          num_elements = cut.row().getNumElements();
-         indices = const_cast<int *> (cut.row().getIndices());
-         elements = const_cast<double *> (cut.row().getElements());
+         indices = cut.row().getIndices();
+         elements = cut.row().getElements();
          rhs = cut.rhs();
          discard_cut = FALSE;
          max_coeff = 0;

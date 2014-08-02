@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 
   si.initialSolve();
   ws = si.getWarmStart();
-  si.setSymParam(OsiSymNodeLimit, -1);
+  si.setSymParam(OsiSymNodeLimit, 1000);
 
   si.resolve();
 
@@ -61,12 +61,12 @@ int main(int argc, char **argv)
    sym_load_problem(env);
 
    sym_set_int_param(env, "keep_warm_start", TRUE);
-   sym_set_int_param(env, "node_limit", 100);
-
+   sym_set_int_param(env, "node_limit", -1);
+   sym_set_int_param(env, "do_reduced_cost_fixing", 0);
    sym_solve(env);
    ws = sym_get_warm_start(env, true);
 
-   sym_set_int_param(env, "node_limit", -1);
+   sym_set_int_param(env, "node_limit", 1000);
 
    sym_warm_solve(env);
 

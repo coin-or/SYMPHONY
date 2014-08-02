@@ -1786,13 +1786,8 @@ int sym_mc_solve(sym_environment *env)
    double compare_sol_tol, ub = 0.0;
    int binary_search = FALSE;
    
-   for (i = 0; i < env->mip->n; i++){
-      if (env->mip->obj2[i] != 0){
-	 break;
-      }
-   }
-   if (i == env->mip->n){
-      printf("Second objective function is identically zero.\n");
+   if (env->mip->obj2 == NULL){
+      printf("Second objective function is not set.\n");
       printf("Switching to standard branch and bound.\n\n");
       return(sym_solve(env));
    }
@@ -3446,6 +3441,12 @@ int sym_set_obj2_coeff(sym_environment *env, int index, double value)
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
+   if (env->mip->obj1 == NULL){
+      env->mip->obj1 = (double *) malloc(env->mip->n*DSIZE);
+      memcpy(env->mip->obj1, env->mip->obj, DSIZE * env->mip->n); 
+      env->mip->obj2 = (double *) calloc(env->mip->n, DSIZE);
+   }
+   
    if (env->mip->obj_sense == SYM_MAXIMIZE){
       env->mip->obj2[index] = -value;
    }else{

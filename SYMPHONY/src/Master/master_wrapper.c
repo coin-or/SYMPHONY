@@ -166,14 +166,14 @@ int io_u(sym_environment *env)
       }
       if (strcmp(env->par.datafile, "") == 0){
 	 if (env->par.file_type == LP_FORMAT){
-	    err = read_lp(env->mip, env->par.infile, env->probname);
+	    err = read_lp(env->mip, env->par.infile, env->probname, env->par.verbosity);
 	    env->par.file_type = MPS_FORMAT;
 	    if (err != 0){
 	       printf("\nErrors in reading LP file\n");
 	       return (ERROR__READING_LP_FILE);
 	    }
 	 }else {
-	    err = read_mps(env->mip, env->par.infile, env->probname);
+	    err = read_mps(env->mip, env->par.infile, env->probname, env->par.verbosity);
 	    if (err != 0){
 	       printf("\nErrors in reading mps file\n");
 	       return (ERROR__READING_MPS_FILE);
