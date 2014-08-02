@@ -234,6 +234,9 @@ bool OsiSymSolverInterface::setSymParam(OsiSymIntParam key, int value)
 
    switch(key){
       
+    case OsiSymMaxActiveNodes:
+       keyVal = "max_active_nodes";
+       break;
     case OsiSymVerbosity:
        keyVal = "verbosity";
        break;
