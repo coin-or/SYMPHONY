@@ -155,7 +155,7 @@ int prep_solve_desc (PREPdesc * P)
    int verbosity = params.verbosity;
    int p_level = params.level;
 
-   if (p_level <= 0) {
+   if (p_level < 0) {
      /* preprocessing is not carried out. mipinfo data structures are still
       * filled up */
      PRINT(verbosity, -1, ("Skipping Preprocessor\n"));
