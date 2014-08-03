@@ -1100,11 +1100,6 @@ int node_compar(tm_prob *tm, int rule, bc_node *node0, bc_node *node1)
    n0_frac = fabs(node0->parent->bobj.value - n0_rhs);
    n1_frac = fabs(node1->parent->bobj.value - n1_rhs);
    
-   int n0_eff = MAX(tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n0_ind].col_size,
-		    tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n0_ind].sos_num);
-   int n1_eff = MAX(tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n1_ind].col_size,
-		    tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n1_ind].sos_num);
-
    /* solves acc3 without swap 
       if(node1->lower_bound < node0->lower_bound - 1e-4) ret_ind = 1;
       else if (node1->lower_bound < node0->lower_bound + 1e-4) {
@@ -1888,9 +1883,11 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	       int *swap_si = bobj->sos_ind[i];
 	       bobj->sos_ind[i] = bobj->sos_ind[new_child_num];
 	       bobj->sos_ind[new_child_num] = swap_si;
+#ifdef COMPILE_IN_LP
 	       bobj->is_est[i] = bobj->is_est[new_child_num];
 	       bobj->termcode[i] = bobj->termcode[new_child_num];
 	       bobj->iterd[i] = bobj->iterd[new_child_num];
+#endif
 	    }
 	 }
       }

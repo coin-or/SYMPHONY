@@ -27,7 +27,9 @@
 #include "sym_macros.h"
 #include "sym_types.h"
 #include "sym_lp_solver.h"
+#ifdef COMPILE_IN_LP
 #include "sym_primal_heuristics.h"
+#endif
 #include "sym_qsort.h"
 #ifdef USE_CGL_CUTS
 #include "sym_cg.h"
@@ -918,7 +920,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       
       do_primal_heuristic = TRUE;
    }
-   
+
+#ifdef COMPILE_IN_LP
    if(do_primal_heuristic){
       /* try rounding first */
 
@@ -1066,7 +1069,8 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	}
       }
    }
-
+#endif
+   
    if(user_res == TEST_INTEGRALITY &&
       p->par.do_primal_heuristic && (feasible == IP_FEASIBLE || feasible == IP_HEUR_FEASIBLE) &&
       (p->par.ls_enabled || p->par.lb_enabled) && !p->par.multi_criteria){      
@@ -1158,7 +1162,9 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       }
       p->has_ub = TRUE;
       p->ub = true_objval;
+#ifdef COMPILE_IN_LP
       p->tm->lp_stat.ip_sols++;
+#endif
       if (p->par.set_obj_upper_lim) {
 	 set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity + lpetol);
       }

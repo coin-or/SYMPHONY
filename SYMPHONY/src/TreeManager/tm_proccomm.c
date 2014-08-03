@@ -391,8 +391,7 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
 	 modify_list(&not_fixed, &path[i]->desc.not_fixed);
    }
 
-
-
+#ifdef COMPILE_IN_LP
    if(lp[thread_num]->frac_var_cnt == NULL){
      lp[thread_num]->frac_var_cnt = (int*)calloc(ISIZE,tm->bvarnum + extravar.size);      
    }else{
@@ -400,6 +399,9 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
    }
 
    int * frac_var_cnt = lp[thread_num]->frac_var_cnt;
+#else
+   int * frac_var_cnt = 0;
+#endif   
    int cuts_trial_num = 0;
 
    bounds_change_desc *bnd_change = NULL;

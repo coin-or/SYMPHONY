@@ -2025,21 +2025,6 @@ echo "$as_me: error: --enable-msvc option makes sense only under Cygwin or MinGW
   fi
 
 
- case $build in
-  *-mingw*)
-    if test "${LD+set}" = set; then :; else
-      LD=link
-    fi
-    ;;
- esac
- if test $enable_msvc = yes ; then
-   if test "x${LD+set}" = xset; then :; else
-     LD=link
-   fi
- fi
-
-
-
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3260,20 +3245,7 @@ fi
 case "$CC" in
   clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
-
- case $build in
-  *-mingw*)
-    if test "${LD+set}" = set; then :; else
-      LD=link
-    fi
-    ;;
- esac
- if test $enable_msvc = yes ; then
-   if test "x${LD+set}" = xset; then :; else
-     LD=link
-   fi
- fi
-
+    LD=link
     ;;
 esac
 
@@ -4149,24 +4121,11 @@ echo "$as_me: Will use MPI C++ compiler $MPICXX" >&6;}
   CXX="$MPICXX"
 fi
 
-# correct the LD variable in a mingw build with MS or intel compiler
+# correct the LD variable in a build with MS or intel compiler
 case "$CXX" in
   clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
-
- case $build in
-  *-mingw*)
-    if test "${LD+set}" = set; then :; else
-      LD=link
-    fi
-    ;;
- esac
- if test $enable_msvc = yes ; then
-   if test "x${LD+set}" = xset; then :; else
-     LD=link
-   fi
- fi
-
+    LD=link
     ;;
 esac
 
@@ -5953,7 +5912,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5956 "configure"' > conftest.$ac_ext
+  echo '#line 5915 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7087,7 +7046,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7090:" \
+echo "$as_me:7049:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8154,11 +8113,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8157: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8116: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8161: \$? = $ac_status" >&5
+   echo "$as_me:8120: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8422,11 +8381,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8425: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8384: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8429: \$? = $ac_status" >&5
+   echo "$as_me:8388: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8526,11 +8485,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8529: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8488: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8533: \$? = $ac_status" >&5
+   echo "$as_me:8492: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10871,7 +10830,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10874 "configure"
+#line 10833 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10971,7 +10930,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10974 "configure"
+#line 10933 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13315,11 +13274,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13318: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13277: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13322: \$? = $ac_status" >&5
+   echo "$as_me:13281: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13419,11 +13378,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13422: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13381: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13426: \$? = $ac_status" >&5
+   echo "$as_me:13385: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14989,11 +14948,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14992: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14951: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14996: \$? = $ac_status" >&5
+   echo "$as_me:14955: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15093,11 +15052,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15096: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15055: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15100: \$? = $ac_status" >&5
+   echo "$as_me:15059: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17300,11 +17259,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17303: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17262: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17307: \$? = $ac_status" >&5
+   echo "$as_me:17266: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17568,11 +17527,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17571: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17530: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17575: \$? = $ac_status" >&5
+   echo "$as_me:17534: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17672,11 +17631,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17675: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17634: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17679: \$? = $ac_status" >&5
+   echo "$as_me:17638: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -21157,7 +21116,6 @@ COINDEPEND_DATA=
 COINDEPEND_DEPENDENCIES=
 COINDEPEND_PCLIBS=
 COINDEPEND_PCREQUIRES=
-COINDEPEND_DATA=
 
 
 
@@ -21674,7 +21632,6 @@ CLP_DATA=
 CLP_DEPENDENCIES=
 CLP_PCLIBS=
 CLP_PCREQUIRES=
-CLP_DATA=
 
 
 
@@ -22185,7 +22142,6 @@ DYLP_DATA=
 DYLP_DEPENDENCIES=
 DYLP_PCLIBS=
 DYLP_PCREQUIRES=
-DYLP_DATA=
 
 
 
@@ -22696,7 +22652,6 @@ VOL_DATA=
 VOL_DEPENDENCIES=
 VOL_PCLIBS=
 VOL_PCREQUIRES=
-VOL_DATA=
 
 
 
@@ -23207,7 +23162,6 @@ CGL_DATA=
 CGL_DEPENDENCIES=
 CGL_PCLIBS=
 CGL_PCREQUIRES=
-CGL_DATA=
 
 
 
@@ -23719,7 +23673,6 @@ OSITESTS_DATA=
 OSITESTS_DEPENDENCIES=
 OSITESTS_PCLIBS=
 OSITESTS_PCREQUIRES=
-OSITESTS_DATA=
 
 
 
@@ -24200,7 +24153,6 @@ SAMPLE_DATA=
 SAMPLE_DEPENDENCIES=
 SAMPLE_PCLIBS=
 SAMPLE_PCREQUIRES=
-SAMPLE_DATA=
 
 
 
@@ -24681,7 +24633,6 @@ NETLIB_DATA=
 NETLIB_DEPENDENCIES=
 NETLIB_PCLIBS=
 NETLIB_PCREQUIRES=
-NETLIB_DATA=
 
 
 
@@ -25162,7 +25113,6 @@ MIPLIB3_DATA=
 MIPLIB3_DEPENDENCIES=
 MIPLIB3_PCLIBS=
 MIPLIB3_PCREQUIRES=
-MIPLIB3_DATA=
 
 
 
@@ -25649,7 +25599,6 @@ CPX_DATA=
 CPX_DEPENDENCIES=
 CPX_PCLIBS=
 CPX_PCREQUIRES=
-CPX_DATA=
 
 
 
@@ -26160,7 +26109,6 @@ GLPK_DATA=
 GLPK_DEPENDENCIES=
 GLPK_PCLIBS=
 GLPK_PCREQUIRES=
-GLPK_DATA=
 
 
 
@@ -26672,7 +26620,6 @@ MSK_DATA=
 MSK_DEPENDENCIES=
 MSK_PCLIBS=
 MSK_PCREQUIRES=
-MSK_DATA=
 
 
 
@@ -27184,7 +27131,6 @@ XPR_DATA=
 XPR_DEPENDENCIES=
 XPR_PCLIBS=
 XPR_PCREQUIRES=
-XPR_DATA=
 
 
 
@@ -28838,51 +28784,49 @@ WHATTOMAKEBINS=
 
 if test $sym_enable_parallel = true; then
    SYMPDEFS="$SYMPDEFS -D__PVM__"
-if test $in_cg = no; then
-   WHATTOMAKELIBS=libSym_cg.la
-	if test $sym_appl = yes ; then
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cg.la"
-	fi
-   WHATTOMAKEBINS="symphony_cg$EXEEXT"
-fi
-if test $in_cp = no; then
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
-	if test $sym_appl = yes ; then
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cp.la"
-	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp$EXEEXT"
-fi
-if test $in_lp = no; then
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
-	if test $sym_appl = yes ; then
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_lp$LPEXT.la"
-	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT$EXEEXT"
-fi
-if test $in_tm = no; then
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
-	if test $sym_appl = yes ; then
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_tm$TMEXT.la"
-	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT$EXEEXT"
-fi
-  MASTEREXT="_m$MASTEREXT"
-  WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
-  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
-  if test $sym_appl = yes ; then
-     WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
-  fi
+   if test $in_cg = no; then
+      WHATTOMAKELIBS=libSym_cg.la
+      if test $sym_appl = yes ; then
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cg.la"
+      fi
+      WHATTOMAKEBINS="symphony_cg$EXEEXT"
+      fi
+   if test $in_cp = no; then
+      WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
+      if test $sym_appl = yes ; then
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cp.la"
+      fi
+      WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp$EXEEXT"
+   fi
+   if test $in_lp = no; then
+      WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
+      if test $sym_appl = yes ; then
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_lp$LPEXT.la"
+      fi
+      WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT$EXEEXT"
+   fi
+   if test $in_tm = no; then
+      WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
+      if test $sym_appl = yes ; then
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_tm$TMEXT.la"
+      fi
+      WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT$EXEEXT"
+    fi
+    MASTEREXT="_m$MASTEREXT"
+    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
+    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
+    if test $sym_appl = yes ; then
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
+    fi
 else
-  MASTEREXT="_m"
+    MASTEREXT="_m"
+    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
+    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
+
+    if test $sym_appl = yes ; then
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+    fi
 fi
-
-  WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
-  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
-
-  if test $sym_appl = yes ; then
-     WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
-  fi
-
 
 
 
