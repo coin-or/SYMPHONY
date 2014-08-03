@@ -1316,7 +1316,11 @@ int check_tailoff(lp_prob *p)
       tailoff_obj_frac *= 1.133;
    }
 
-   if((p->lp_data->m - p->mip->m)/(1.0*p->mip->m) < 0.2 && p->tm->stat.analyzed < 100){
+   if((p->lp_data->m - p->mip->m)/(1.0*p->mip->m) < 0.2
+#ifdef COMPILE_IN_LP
+      && p->tm->stat.analyzed < 100
+#endif
+      ){
       //tailoff_gap_frac *= 1.0091;
       //tailoff_obj_frac /= 7.333; 
       gap_backsteps = 4;

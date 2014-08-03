@@ -712,51 +712,49 @@ WHATTOMAKEBINS=
 
 if test $sym_enable_parallel = true; then
    SYMPDEFS="$SYMPDEFS -D__PVM__"
-if test $in_cg = no; then 
-   WHATTOMAKELIBS=libSym_cg.la
-	if test $sym_appl = yes ; then 
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cg.la"
-	fi
-   WHATTOMAKEBINS="symphony_cg$EXEEXT"
-fi 
-if test $in_cp = no; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
-	if test $sym_appl = yes ; then 
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cp.la"
-	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp$EXEEXT"
-fi 
-if test $in_lp = no; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
-	if test $sym_appl = yes ; then 
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_lp$LPEXT.la"
-	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT$EXEEXT"
-fi 
-if test $in_tm = no; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
-	if test $sym_appl = yes ; then 
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_tm$TMEXT.la"
-	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT$EXEEXT"
-fi 
-  MASTEREXT="_m$MASTEREXT"
-  WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
-  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
-  if test $sym_appl = yes ; then 
-     WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
-  fi
+   if test $in_cg = no; then 
+      WHATTOMAKELIBS=libSym_cg.la
+      if test $sym_appl = yes ; then 
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cg.la"
+      fi
+      WHATTOMAKEBINS="symphony_cg$EXEEXT"
+      fi 
+   if test $in_cp = no; then 
+      WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
+      if test $sym_appl = yes ; then 
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cp.la"
+      fi
+      WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp$EXEEXT"
+   fi 
+   if test $in_lp = no; then 
+      WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
+      if test $sym_appl = yes ; then 
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_lp$LPEXT.la"
+      fi
+      WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT$EXEEXT"
+   fi 
+   if test $in_tm = no; then 
+      WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
+      if test $sym_appl = yes ; then 
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_tm$TMEXT.la"
+      fi
+      WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT$EXEEXT"
+    fi 
+    MASTEREXT="_m$MASTEREXT"
+    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
+    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
+    if test $sym_appl = yes ; then 
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
+    fi
 else
-  MASTEREXT="_m"
+    MASTEREXT="_m"
+    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
+    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
+
+    if test $sym_appl = yes ; then 
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+    fi
 fi
-
-  WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
-  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
-
-  if test $sym_appl = yes ; then 
-     WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
-  fi
-
 
 AC_SUBST(WHATTOMAKELIBS)
 AC_SUBST(WHATTOMAKEBINS)

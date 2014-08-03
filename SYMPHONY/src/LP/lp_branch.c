@@ -750,7 +750,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
       if (1.0*p->lp_stat.str_br_total_iter_num > str_br_cnt_limit) str_br_iter_limit = TRUE; 
 
+#ifdef COMPILE_IN_LP
       int node_factor = (int)(p->tm->stat.analyzed/50.0);
+#else
+      int node_factor = 0;
+#endif
       double int_factor = 0.5; 
       if (p->mip->mip_inf){
 	 int int_var_num = p->mip->n - p->mip->mip_inf->binary_var_num - p->mip->mip_inf->cont_var_num;
@@ -773,7 +777,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 }
       }
 
-      if (p->tm->stat.analyzed > 5e5 || p->lp_stat.str_br_total_iter_num > 5e5) {
+      if (
+#ifdef COMPILE_IN_LP
+	  p->tm->stat.analyzed > 5e5 ||
+#endif
+	  p->lp_stat.str_br_total_iter_num > 5e5) {
 	 str_br_iter_limit = TRUE;      
       }
 
@@ -2223,9 +2231,11 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
       *cand_num = cnt;
    }
 
+#ifdef COMPILE_IN_LP
    p->tm->active_nodes[p->proc_index]->frac_cnt = cnt; 
    p->tm->active_nodes[p->proc_index]->frac_avg = frac_avg; 
-
+#endif
+   
    if (should_use_rel_br == TRUE) {
       *candidates = (branch_obj **) malloc(1 * sizeof(branch_obj *));
       cand = (*candidates)[0] = (branch_obj *) calloc(1, sizeof(branch_obj) );
