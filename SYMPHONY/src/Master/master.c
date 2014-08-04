@@ -422,9 +422,6 @@ int sym_set_defaults(sym_environment *env)
 #ifdef COMPILE_IN_LP
    lp_par->should_use_rel_br = TRUE; 
 #endif
-#ifdef _OPENMP
-   lp_par->should_use_rel_br = FALSE; 
-#endif
    lp_par->rel_br_override_default = TRUE;
    lp_par->rel_br_override_max_solves = 200;
    lp_par->rel_br_chain_backtrack = 5;
@@ -790,6 +787,12 @@ int sym_solve(sym_environment *env)
    node_desc *rootdesc = env->rootdesc;
    base_desc *base = env->base;
 
+#ifdef _OPENMP
+   if (env->par.tm_par.max_active_nodes > 1){
+      env->par.lp_par.should_use_rel_br = FALSE;
+   }
+#endif
+   
    start_time = wall_clock(NULL);
 
    double *tmp_sol;
@@ -2085,6 +2088,7 @@ int sym_mc_solve(sym_environment *env)
       printf("***************************************************\n\n");
       
       env->obj[0] = env->obj[1] = 0.0;
+      env->best_sol.has_sol = FALSE;
    
       if (env->par.lp_par.mc_find_supported_solutions){
 	 
