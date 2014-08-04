@@ -371,5 +371,5 @@ int generate_cuts_in_lp_u PROTO((lp_prob *p));
 int analyze_multicriteria_solution PROTO((lp_prob *p, int *indices,
 					   double *values, int length,
 					   double *true_objval, double etol,
-					   char branching));
+					  char branching, int feasible));
 #endif

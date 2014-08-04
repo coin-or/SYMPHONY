@@ -1111,18 +1111,19 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 
 #endif
    
-   if (feasible == IP_FEASIBLE && p->par.multi_criteria){
-      cnt = collect_nonzeros(p, lp_data->x, indices, values);
+   if ((feasible == IP_FEASIBLE || feasible == IP_HEUR_FEASIBLE)
+       && p->par.multi_criteria){
+      if (feasible == IP_HEUR_FEASIBLE || force_heur_sol) {
+         cnt = collect_nonzeros(p, heur_solution, indices, values);        
+      } else {
+         cnt = collect_nonzeros(p, lp_data->x, indices, values);        
+      }
       if (analyze_multicriteria_solution(p, indices, values, cnt,
-					 &true_objval, lpetol, branching) > 0){
-	 if(feasible == IP_FEASIBLE){
-	    if (p->par.mc_add_optimality_cuts || branching){
+					 &true_objval, lpetol, branching,
+					 feasible) > 0){
+	 if(feasible == IP_FEASIBLE &&
+	    (p->par.mc_add_optimality_cuts || branching)){
 	       feasible = IP_FEASIBLE_BUT_CONTINUE;
-	    }else{
-	       feasible = IP_FEASIBLE;
-	    }
-	 }else{
-	    feasible = IP_FEASIBLE;
 	 }
       }
    }
@@ -2740,8 +2741,9 @@ void free_prob_dependent_u(lp_prob *p)
 /*===========================================================================*/
 
 int analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
-				    int length, double *true_objval,
-				    double etol, char branching)
+				   int length, double *true_objval,
+				   double etol, char branching,
+				   int feasible)
 {
   double obj[2] = {0.0, 0.0};
   int i;
@@ -2770,13 +2772,17 @@ int analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 			      (obj[0] >= p->obj[0] - etol
 			       && obj[1] < p->obj[1] - etol))){
 	    if (p->par.verbosity >= 1){
-	       printf("\nBetter Solution Found:\n");
-	       if(p->mip->obj_sense == SYM_MAXIMIZE){
-		  printf("First Objective Cost: %.1f\n", -obj[0]);
-		  printf("Second Objective Cost: %.1f\n", -obj[1]);
+	       if (feasible == IP_HEUR_FEASIBLE){
+		  printf("\n****** Better Solution Found (Heuristic):\n");
 	       }else{
-		  printf("First Objective Cost: %.1f\n", obj[0]);
-		  printf("Second Objective Cost: %.1f\n", obj[1]);
+		  printf("\n****** Better Solution Found:\n");
+	       }
+	       if(p->mip->obj_sense == SYM_MAXIMIZE){
+		  printf("****** First Objective Cost: %.1f\n", -obj[0]);
+		  printf("****** Second Objective Cost: %.1f\n\n", -obj[1]);
+	       }else{
+		  printf("****** First Objective Cost: %.1f\n", obj[0]);
+		  printf("****** Second Objective Cost: %.1f\n\n", obj[1]);
 	       }
 	    }
 	    p->obj[1] = obj[1];
@@ -2808,13 +2814,17 @@ int analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 			      (obj[1] >= p->obj[1] - etol
 			       && obj[0] < p->obj[0] - etol))){
 	   if (p->par.verbosity >= 1){
-	      printf("\nBetter Solution Found:\n");
-	      if(p->mip->obj_sense == SYM_MAXIMIZE){
-		 printf("First Objective Cost: %.1f\n", -obj[0]);
-		 printf("Second Objective Cost: %.1f\n", -obj[1]);
+	      if (feasible == IP_HEUR_FEASIBLE){
+		 printf("\n****** Better Solution Found (Heuristic):\n");
 	      }else{
-		 printf("First Objective Cost: %.1f\n", obj[0]);
-		 printf("Second Objective Cost: %.1f\n", obj[1]);
+		 printf("\n****** Better Solution Found:\n");
+	      }
+	      if(p->mip->obj_sense == SYM_MAXIMIZE){
+		 printf("****** First Objective Cost: %.1f\n", -obj[0]);
+		 printf("****** Second Objective Cost: %.1f\n\n", -obj[1]);
+	      }else{
+		 printf("****** First Objective Cost: %.1f\n", obj[0]);
+		 printf("****** Second Objective Cost: %.1f\n\n", obj[1]);
 	      }
 	   }
 	   p->obj[1] = obj[1];
@@ -2849,13 +2859,17 @@ int analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
 	 (obj[1] < p->obj[1] - etol &&
 	  obj[0] < p->obj[0] + etol + MIN(p->par.mc_gamma, p->par.mc_tau))){
 	if (p->par.verbosity >= 1){
-	   printf("\nBetter Solution Found:\n");
-	   if(p->mip->obj_sense == SYM_MAXIMIZE){
-	      printf("First Objective Cost: %.1f\n", -obj[0]);
-	      printf("Second Objective Cost: %.1f\n", -obj[1]);
+	   if (feasible == IP_HEUR_FEASIBLE){
+	      printf("\n****** Better Solution Found (Heuristic):\n");
 	   }else{
-	      printf("First Objective Cost: %.1f\n", obj[0]);
-	      printf("Second Objective Cost: %.1f\n", obj[1]);
+	      printf("\n****** Better Solution Found:\n");
+	   }
+	   if(p->mip->obj_sense == SYM_MAXIMIZE){
+	      printf("****** First Objective Cost: %.1f\n", -obj[0]);
+	      printf("****** Second Objective Cost: %.1f\n\n", -obj[1]);
+	   }else{
+	      printf("****** First Objective Cost: %.1f\n", obj[0]);
+	      printf("****** Second Objective Cost: %.1f\n\n", obj[1]);
 	   }
 	}
 	p->obj[1] = obj[1];
