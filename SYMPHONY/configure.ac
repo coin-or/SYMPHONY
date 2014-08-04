@@ -779,7 +779,7 @@ AC_ARG_ENABLE([openmp],
    *) AC_MSG_ERROR(Bad value ${enableval} for --enable-openmp)
    ;;
 esac],
-[sym_openmp=false])
+[sym_openmp=true])
 
 if test $sym_openmp = true; then 
    AC_MSG_CHECKING([G++ version])

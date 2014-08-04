@@ -28846,7 +28846,7 @@ echo "$as_me: error: Bad value ${enableval} for --enable-openmp" >&2;}
    ;;
 esac
 else
-  sym_openmp=false
+  sym_openmp=true
 fi;
 
 if test $sym_openmp = true; then
