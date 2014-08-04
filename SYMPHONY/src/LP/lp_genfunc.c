@@ -168,7 +168,7 @@ int process_chain(lp_prob *p)
    }
    
    if (p->colgen_strategy & COLGEN_REPRICING){
-      if (p->par.verbosity > 0){
+      if (p->par.verbosity > 1){
 	 printf("****************************************************\n");
 	 printf("* Now repricing NODE %i LEVEL %i\n",
 		p->bc_index, p->bc_level);
@@ -177,7 +177,7 @@ int process_chain(lp_prob *p)
       termcode = repricing(p);
       free_node_dependent(p);
    }else{
-      if (p->par.verbosity > 0){
+      if (p->par.verbosity > 1){
 	 printf("****************************************************\n");
 	 printf("* Now processing NODE %i LEVEL %i (from TM)\n",
 		p->bc_index, p->bc_level);
@@ -572,7 +572,7 @@ int fathom_branch(lp_prob *p)
 
        case NEW_NODE:
 #ifndef ROOT_NODE_ONLY
-	 if (verbosity > 0){
+	 if (verbosity > 1){
 	    printf("*************************************************\n");
 	    printf("* Now processing NODE %i LEVEL %i\n",
 		   p->bc_index, p->bc_level);
@@ -2355,7 +2355,7 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
        p->par.best_violation_length[i] = p->par.max_cut_length;
      }
      //p->par.best_violation_length = p->par.max_cut_length;     
-     if(p->par.verbosity > 0){
+     if(p->par.verbosity > 1){
        printf("c-length - max_row - max-col - dens: %i - %i - %i - %f\n", p->par.max_cut_length, 
 	      p->mip->mip_inf->max_row_size, p->mip->mip_inf->max_col_size, 
 	      p->mip->mip_inf->mat_density);

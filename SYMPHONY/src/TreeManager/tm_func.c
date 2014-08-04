@@ -386,7 +386,7 @@ int solve(tm_prob *tm)
 	    }
 #ifdef COMPILE_IN_LP
 #ifdef _OPENMP
-	    if (tm->par.verbosity > 0)
+	    if (tm->par.verbosity > 1)
 	       printf("Thread %i now processing node %i\n", thread_num,
 		      tm->lpp[thread_num]->bc_index);
 #endif
@@ -689,7 +689,7 @@ void print_tree_status(tm_prob *tm, int is_diving, double diving_obj)
 #endif
 
    if (tm->par.output_mode > 0) {
-     if (tm->stat.print_stats_cnt < 1 || tm->par.verbosity > 0) {
+     if (tm->stat.print_stats_cnt < 1 || tm->par.verbosity > 1) {
        printf("%7s ","Time");     
 #ifdef SHOULD_SHOW_MEMORY_USAGE 
        printf("%9s ","Mem(MB)");
@@ -906,7 +906,7 @@ int start_node(tm_prob *tm, int thread_num)
 	       }
 	     }
 	 
-	     if (tm->par.verbosity > 0){
+	     if (tm->par.verbosity > 1){
 		printf("++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 		printf("+ TM: Pruning NODE %i LEVEL %i instead of sending it.\n",
 		       best_node->bc_index, best_node->bc_level);
@@ -1338,7 +1338,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #else /*We only want to process the root node in this case - discard others*/
       if (TRUE){	 
 #endif
-	 if (tm->par.verbosity > 0){
+	 if (tm->par.verbosity > 1){
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    printf("+ TM: Pruning NODE %i LEVEL %i while generating it.\n",
 		   child->bc_index, child->bc_level);
@@ -2077,7 +2077,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	    }
 	    tm->samephase_cand[last] = NULL;
 	    last--;
-	    if (tm->par.verbosity > 0){
+	    if (tm->par.verbosity > 1){
 	       printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	       printf("+ TM: Pruning NODE %i LEVEL %i after new incumbent.\n",
 		      node->bc_index, node->bc_level);
