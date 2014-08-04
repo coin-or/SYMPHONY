@@ -1,3 +1,4 @@
+
 /*===========================================================================*/
 /*                                                                           */
 /* This file is part of the SYMPHONY MILP Solver Framework.                  */
@@ -159,8 +160,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    int max_presolve_iter = 5;
    const int bc_level = p->bc_level;
    int strong_br_min_level = p->par.strong_br_min_level;
- 
-   /*------------------------------------------------------------------------*\
+
+   used_time(&total_time);
+
+   /*---------------------------------------------------------------------* \
     * First we call select_candidates_u() to select candidates. It can
     * -- return with DO_BRANCH and a bunch of candidates, or
     * -- return with DO_NOT_BRANCH along with a bunch of violated cuts
@@ -1877,7 +1880,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
                &should_continue);
          if (should_continue==FALSE) {
-            PRINT(p->par.verbosity, 0, 
+            PRINT(p->par.verbosity, 2, 
                   ("too much time in strong branching, breaking\n"));
             break;
          }
@@ -2420,7 +2423,6 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
    *should_continue = TRUE;
    int min_cands;
    int verbosity = p->par.verbosity;
-   //verbosity = 20;
    if (p->bc_level<1) {
       allowed_time = 20*p->comp_times.lp/p->iter_num;
       //allowed_iter = 20*p->lp_stat.lp_total_iter_num/(p->iter_num + 1);
