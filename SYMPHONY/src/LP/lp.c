@@ -41,7 +41,7 @@ int main(void)
    struct timeval timeout = {10, 0};
    char first_node_rec = FALSE;
    int termcode;
-   
+
    p = (lp_prob *) calloc(1, sizeof(lp_prob));
 
    p->start_time = wall_clock(NULL);

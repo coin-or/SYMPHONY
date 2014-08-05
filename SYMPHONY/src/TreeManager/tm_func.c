@@ -2050,6 +2050,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	 node = list[i];
 	 if (tm->has_ub &&
 	     node->lower_bound >= tm->ub-tm->par.granularity){
+#ifdef COMPILE_IN_LP
 	    if(node->parent){
 	       for(j = 0; j < node->parent->bobj.child_num; j++){
 		  if(node->parent->children[j] == node){
@@ -2061,6 +2062,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 		  }
 	       }
 	    }
+#endif
 	    if (i != last){
 	       list[i] = list[last];
 	       for (prev_pos = i, pos = i/2; pos >= 1;
