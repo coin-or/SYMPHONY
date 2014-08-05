@@ -708,8 +708,13 @@ int fathom(lp_prob *p, int primal_feasible)
    int colgen = p->colgen_strategy & COLGEN__FATHOM;
    int termcode = p->lp_data->termcode;
 
-   if(p->branch_dir == 'L') p->br_inf_down[p->branch_var]++;
-   else p->br_inf_up[p->branch_var]++;   
+#ifdef COMPILE_IN_LP
+   if(p->branch_dir == 'L'){
+      p->br_inf_down[p->branch_var]++;
+   }else{
+      p->br_inf_up[p->branch_var]++;   
+   }
+#endif
    
    if (p->lp_data->nf_status == NF_CHECK_NOTHING){
       PRINT(p->par.verbosity, 1,
@@ -2355,12 +2360,14 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
        p->par.best_violation[i] = 0.0;
        p->par.best_violation_length[i] = p->par.max_cut_length;
      }
-     //p->par.best_violation_length = p->par.max_cut_length;     
+     //p->par.best_violation_length = p->par.max_cut_length;
+#ifdef COMPILE_IN_LP
      if(p->par.verbosity > 0){
        printf("c-length - max_row - max-col - dens: %i - %i - %i - %f\n", p->par.max_cut_length, 
 	      p->mip->mip_inf->max_row_size, p->mip->mip_inf->max_col_size, 
 	      p->mip->mip_inf->mat_density);
      }
+#endif
    }
 
    max_cut_length = p->par.max_cut_length; 

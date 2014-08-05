@@ -884,11 +884,11 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       break;
    }
 
+#ifdef COMPILE_IN_LP
+
    if(p->bc_index < 1 && p->lp_stat.lp_calls < 2){
      memcpy(p->root_lp, x, DSIZE*n);
    }
-
-#ifdef COMPILE_IN_LP
 
    double t_lb = p->lp_data->objval;   
    if((p->tm->samephase_candnum > 1 || p->tm->active_node_num > 1)){      
