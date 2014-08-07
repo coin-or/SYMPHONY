@@ -18,6 +18,42 @@ http://www.coin-or.org/SYMPHONY/
 WHAT'S NEW
 ==========
 
+Release 5.5.7
+
+1. More updates to build harness
+
+Release 5.5.6
+
+1. More updates to build harness
+
+Release 5.5.5
+
+1. More updates to build harness
+
+Release 5.5.4
+
+1. Fix memory leak
+2. Delete superfluous header file
+3. More updates to build harness
+
+Release 5.5.3
+
+1. More updates to build harness
+
+Release 5.5.2
+
+1. Fix problems with Visual Studio project files
+2. Update to build tools
+
+Release 5.5.1
+
+1. Fix bug that caused all user applications to crash
+
+Release 5.4.8:
+
+1. Updates to MSVC++ files (applications now use property sheets and VRP app file is fixed).
+2. Other fixes for build tools.
+
 Release 5.4.7:
 
 1. Updates to documentation
@@ -31,6 +67,7 @@ Release 5.5.0:
 5. Significant performance gains 
 
 Release 5.4.6:
+
 1. More fixes to allow use of CPLEX as LP solver
 2. Fixes to interface with GMPL
 

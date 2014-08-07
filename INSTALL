@@ -1,5 +1,5 @@
-BUILDING AND INSTALLING SYMPHONY Version 5.4.0
-==============================================
+BUILDING AND INSTALLING SYMPHONY Version 5.5
+============================================
 
 The following are brief instructions that should be sufficient to install
 SYMPHONY with default configuration settings in most cases. For more detailed
@@ -33,7 +33,7 @@ subversion because it makes it easier to obtain updates. In a Unix-like
 environment (such as Linux or CYGWIN), the following command may be used to
 obtain SYMPHONY from source using SVN in most cases:
 
-  svn co https://projects.coin-or.org/svn/SYMPHONY/stable/5.4 SYMPHONY-5.4
+  svn co https://projects.coin-or.org/svn/SYMPHONY/stable/5.5 SYMPHONY-5.5
 
 Alternatively, you can download release versions of the source code 
 from  the download page of COIN-OR:
