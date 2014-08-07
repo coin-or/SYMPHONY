@@ -1365,6 +1365,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL)
 #pragma omp critical (write_pruned_node_file)
 	       write_pruned_nodes(tm, child);
+#pragma omp critical (tree_update)
 	    if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
 	       int vbc_node_pr_reason;
 	       switch (action[i]) {
@@ -1385,10 +1386,8 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
 	       }
 	       */
-#pragma omp critical (tree_update)
 	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
 	    } else {
-#pragma omp critical (tree_update)
 	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
 		     VBC_PRUNED);
 	    }
@@ -2090,7 +2089,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 		KEEP_ON_DISK_VBC_TOOL){
 	       if (tm->par.keep_description_of_pruned ==
 		   KEEP_ON_DISK_VBC_TOOL)
-#pragma omp critical (write_pruned_node_file)
+#pragma omp_critical (write_pruned_node_file)
 		  write_pruned_nodes(tm, node);
 	       if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
 		  purge_pruned_nodes(tm, node,
@@ -3784,6 +3783,7 @@ int find_tree_lb(tm_prob *tm)
    double lb = MAXDOUBLE;
    bc_node **samephase_cand;
 
+#pragma omp critical (tree_update)
    if (tm->samephase_candnum > 0 || tm->active_node_num > 0) {
       if (tm->par.node_selection_rule == LOWEST_LP_FIRST) {
 	lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */

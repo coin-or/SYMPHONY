@@ -921,7 +921,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       do_primal_heuristic = TRUE;
    }
 
-#ifdef COMPILE_IN_LP
    if(do_primal_heuristic){
       /* try rounding first */
 
@@ -1069,7 +1068,6 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 	}
       }
    }
-#endif
    
    if(user_res == TEST_INTEGRALITY &&
       p->par.do_primal_heuristic && (feasible == IP_FEASIBLE || feasible == IP_HEUR_FEASIBLE) &&
