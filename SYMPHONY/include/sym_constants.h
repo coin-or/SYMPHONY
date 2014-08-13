@@ -132,7 +132,8 @@
 #define LP_D_OBJLIM                  4
 #define LP_OPT_FEASIBLE              5
 #define LP_OPT_FEASIBLE_BUT_CONTINUE 6
-#define LP_ABANDONED                 7
+#define LP_TIME_LIMIT                7
+#define LP_ABANDONED                 8
 
 #define MOVE_TO_LB               0
 #define MOVE_TO_UB               1
