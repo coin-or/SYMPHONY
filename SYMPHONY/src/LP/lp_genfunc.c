@@ -162,7 +162,6 @@ int process_chain(lp_prob *p)
 
    p->last_gap = 0.0;
    p->dive = CHECK_BEFORE_DIVE;
-
    if (p->has_ub && p->par.set_obj_upper_lim) {
       set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity + 
             p->lp_data->lpetol);
@@ -231,7 +230,7 @@ int fathom_branch(lp_prob *p)
    double now, then2, timeout2; 
 #ifdef COMPILE_IN_LP
    then2 = wall_clock(NULL);
-   timeout2 = p->tm->par.status_interval;
+   timeout2 = 2;
 #endif   
    check_ub(p);
    p->iter_num = p->node_iter_num = 0;
@@ -253,11 +252,7 @@ int fathom_branch(lp_prob *p)
     * are found
    \*------------------------------------------------------------------------*/
 
-#ifdef COMPILE_IN_LP
-   while (p->tm->termcode == TM_UNFINISHED){
-#else
    while (TRUE){
-#endif
       if (p->par.branch_on_cuts && p->slack_cut_num > 0){
 	 switch (p->par.discard_slack_cuts){
 	  case DISCARD_SLACKS_WHEN_STARTING_NEW_NODE:
@@ -316,8 +311,8 @@ int fathom_branch(lp_prob *p)
 
       if ((p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
 			       p->bc_level < 1))) {
-         if (p->bc_index == 0) {
-            PRINT(verbosity, 0, ("solving root lp relaxation\n"));
+         if (p->bc_level < 1) {
+            PRINT(verbosity, -1, ("solving root lp relaxation\n"));
          }
          termcode = initial_lp_solve(lp_data, &iterd);	 
       } else {
@@ -382,7 +377,7 @@ int fathom_branch(lp_prob *p)
       if (p->mip->obj_sense == SYM_MAXIMIZE){
          if (termcode == LP_OPTIMAL &&
 	     ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2)) {
-            PRINT(verbosity, 0, ("The LP value is: %.3f [%i,%i]\n\n",
+            PRINT(verbosity, -1, ("The LP value is: %.3f [%i,%i]\n\n",
                                    -lp_data->objval + p->mip->obj_offset,
                                    termcode, iterd));
          }
@@ -390,7 +385,7 @@ int fathom_branch(lp_prob *p)
       }else{
          if (termcode == LP_OPTIMAL &&
 	     ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2)) {
-            PRINT(verbosity, 0, ("The LP value is: %.3f [%i,%i]\n\n",
+            PRINT(verbosity, -1, ("The LP value is: %.3f [%i,%i]\n\n",
                                    lp_data->objval+ p->mip->obj_offset,
                                    termcode, iterd));
          }
@@ -399,7 +394,6 @@ int fathom_branch(lp_prob *p)
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
 	 return(ERROR__DUAL_INFEASIBLE);
        case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
-       case LP_TIME_LIMIT:
 	 /* now, we set time limit - solver returns the same termcode with itlim */
 	 /* also, we might set iter limit if we are in search heuristics */
 	 if (fathom(p, TRUE)){  //send in true for interrupted node
@@ -587,16 +581,13 @@ int fathom_branch(lp_prob *p)
 	 p->node_iter_num = 0;
 
 #ifdef COMPILE_IN_LP
-#pragma omp master
-{
 	 now = wall_clock(NULL);
 	 if (now - then2 > timeout2){
 	    if(verbosity >= -1 ){
-	       print_tree_status(p->tm);
+	       print_tree_status(p->tm, TRUE, obj_before_cuts);
 	    }
 	    then2 = now;
 	 }
- }
 #endif
 	 /*
          printf("node = %d\n", p->bc_index);
@@ -708,7 +699,7 @@ int fathom_branch(lp_prob *p)
 /* fathom() returns true if it has really fathomed the node, false otherwise
    (i.e., if it had added few variables) */
 
-int fathom(lp_prob *p, int interrupted_node)
+int fathom(lp_prob *p, int primal_feasible)
 {
    LPdata *lp_data = p->lp_data;
    our_col_set *new_cols = NULL;
@@ -727,14 +718,13 @@ int fathom(lp_prob *p, int interrupted_node)
    if (p->lp_data->nf_status == NF_CHECK_NOTHING){
       PRINT(p->par.verbosity, 1,
 	    ("fathoming node (no more cols to check)\n\n"));
-      if (interrupted_node){
+      if (primal_feasible){
 	 switch (termcode){
 	  case LP_OPT_FEASIBLE:
 	    send_node_desc(p, FEASIBLE_PRUNED);
 	    break;
 	  case LP_OPTIMAL:
-	  case LP_D_ITLIM:
-	  case LP_TIME_LIMIT:
+	  case LP_D_ITLIM: 
 	    send_node_desc(p, INTERRUPTED_NODE);
 	    break;
 	  default:
@@ -759,7 +749,7 @@ int fathom(lp_prob *p, int interrupted_node)
 
     case FATHOM__DO_NOT_GENERATE_COLS__SEND:
       PRINT(p->par.verbosity, 1, ("Sending node for pricing\n\n"));
-      send_node_desc(p, interrupted_node ? OVER_UB_HOLD_FOR_NEXT_PHASE :
+      send_node_desc(p, primal_feasible ? OVER_UB_HOLD_FOR_NEXT_PHASE :
 		     INFEASIBLE_HOLD_FOR_NEXT_PHASE);
       return(TRUE);
 
@@ -769,7 +759,7 @@ int fathom(lp_prob *p, int interrupted_node)
       if (! p->has_ub){
 	 PRINT(p->par.verbosity, 1,
 	       ("\nCan't generate cols before sending (no UB)\n"));
-	 send_node_desc(p, interrupted_node ? OVER_UB_HOLD_FOR_NEXT_PHASE :
+	 send_node_desc(p, primal_feasible ? OVER_UB_HOLD_FOR_NEXT_PHASE :
 			INFEASIBLE_HOLD_FOR_NEXT_PHASE);
 	 return(TRUE);
       }
