@@ -62,6 +62,7 @@ typedef struct TM_PARAMS{
    double      warm_start_node_ratio;
    int         logging;
    int         logging_interval;
+   int         status_interval;
    int         cp_logging;
    char        pruned_node_file_name[MAX_FILE_NAME_LENGTH +1];
    char        warm_start_tree_file_name[MAX_FILE_NAME_LENGTH +1];
@@ -83,6 +84,8 @@ typedef struct TM_PARAMS{
    
    int         sensitivity_analysis;
    int         output_mode;
+
+   int         tighten_root_bounds;
 }tm_params;
 
 #endif
