@@ -191,6 +191,7 @@ int process_chain(lp_prob *p)
       p->tm->stat.chains++;
       p->tm->active_node_num--;
 #ifdef _OPENMP
+#pragma omp critical (tree_update)
       p->tm->active_nodes[omp_get_thread_num()] = NULL;
 #endif
       free_node_dependent(p);
@@ -708,7 +709,7 @@ int fathom_branch(lp_prob *p)
 /* fathom() returns true if it has really fathomed the node, false otherwise
    (i.e., if it had added few variables) */
 
-int fathom(lp_prob *p, int interrupted_node)
+int fathom(lp_prob *p, int primal_feasible)
 {
    LPdata *lp_data = p->lp_data;
    our_col_set *new_cols = NULL;
@@ -727,12 +728,14 @@ int fathom(lp_prob *p, int interrupted_node)
    if (p->lp_data->nf_status == NF_CHECK_NOTHING){
       PRINT(p->par.verbosity, 1,
 	    ("fathoming node (no more cols to check)\n\n"));
-      if (interrupted_node){
+      if (primal_feasible){
 	 switch (termcode){
 	  case LP_OPT_FEASIBLE:
 	    send_node_desc(p, FEASIBLE_PRUNED);
 	    break;
 	  case LP_OPTIMAL:
+	    send_node_desc(p, OVER_UB_PRUNED);
+	    break;
 	  case LP_D_ITLIM:
 	  case LP_TIME_LIMIT:
 	    send_node_desc(p, INTERRUPTED_NODE);
@@ -759,7 +762,7 @@ int fathom(lp_prob *p, int interrupted_node)
 
     case FATHOM__DO_NOT_GENERATE_COLS__SEND:
       PRINT(p->par.verbosity, 1, ("Sending node for pricing\n\n"));
-      send_node_desc(p, interrupted_node ? OVER_UB_HOLD_FOR_NEXT_PHASE :
+      send_node_desc(p, primal_feasible ? OVER_UB_HOLD_FOR_NEXT_PHASE :
 		     INFEASIBLE_HOLD_FOR_NEXT_PHASE);
       return(TRUE);
 
@@ -769,7 +772,7 @@ int fathom(lp_prob *p, int interrupted_node)
       if (! p->has_ub){
 	 PRINT(p->par.verbosity, 1,
 	       ("\nCan't generate cols before sending (no UB)\n"));
-	 send_node_desc(p, interrupted_node ? OVER_UB_HOLD_FOR_NEXT_PHASE :
+	 send_node_desc(p, primal_feasible ? OVER_UB_HOLD_FOR_NEXT_PHASE :
 			INFEASIBLE_HOLD_FOR_NEXT_PHASE);
 	 return(TRUE);
       }

@@ -517,11 +517,9 @@ int solve(tm_prob *tm)
 	    tm->termcode = SOMETHING_DIED;
 	 }
 
-#if 0
          if (i == NEW_NODE__NONE && tm->active_node_num == 0){
 	    break;
 	 }
-#endif
 	 
 #ifndef COMPILE_IN_LP
 	 struct timeval timeout = {5, 0};
@@ -874,7 +872,7 @@ int start_node(tm_prob *tm, int thread_num)
    double time;
 
    if (tm->termcode != TM_UNFINISHED){
-      return NEW_NODE__NONE;
+      return NEW_NODE__STOP;
    }
 
    time = wall_clock(NULL);
