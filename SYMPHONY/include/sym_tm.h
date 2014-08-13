@@ -65,6 +65,7 @@ typedef struct TM_PROB{
    double          obj_offset; /* constant to be added to the objective value*/
    char            obj_sense;  /* objective sense*/
    double          ub_estimate;
+   int             termcode;
    process_set     lp;
    process_set     cg;
    process_set     cp;
@@ -155,7 +156,7 @@ typedef struct TM_PROB{
 int tm_initialize PROTO((tm_prob *tm, base_desc *base,
 			 node_desc *root_desc));
 int solve PROTO((tm_prob *tm));
-void print_tree_status PROTO((tm_prob *tm, int is_diving, double diving_obj));
+void print_tree_status PROTO((tm_prob *tm));
 void calculate_widths PROTO((bc_node *node, int *widths));
 int start_node PROTO((tm_prob *tm, int thread_num));
 bc_node *del_best_node PROTO((tm_prob *tm));
@@ -244,4 +245,5 @@ int receive_lp_timing PROTO((tm_prob *tm));
 void sym_catch_c PROTO((int num));
 int merge_bound_changes PROTO((bounds_change_desc **bnd_change_ptr, 
                                bounds_change_desc  *p_bnd_change));
+int tighten_root_bounds PROTO((tm_prob *p));
 #endif
