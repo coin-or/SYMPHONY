@@ -2217,6 +2217,11 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(tm_par->logging_interval);
       return(0);
    }
+   else if (strcmp(key, "status_interval") == 0 ||
+	    strcmp(key, "TM_status_interval") == 0){
+      READ_INT_PAR(tm_par->status_interval);
+      return(0);
+   }
    else if (strcmp(key, "logging") == 0 ||
 	    strcmp(key, "TM_logging") == 0){
       READ_INT_PAR(tm_par->logging);
@@ -2296,6 +2301,11 @@ int set_param(sym_environment *env, char *line)
    }else if (strcmp(key, "output_mode") == 0 ||
 	    strcmp(key, "TM_output_mode") == 0){
       READ_INT_PAR(tm_par->output_mode);
+      return(0);
+   }else if (strcmp(key, "tighten_root_bounds") == 0 ||
+	    strcmp(key, "TM_tighten_root_bounds") == 0){
+      READ_INT_PAR(tm_par->find_first_feasible);
+      lp_par->find_first_feasible = tm_par->find_first_feasible;
       return(0);
    }
 
@@ -3532,9 +3542,9 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	 for(i=0; i<mip_copy->n; i++){
 	    /* FIXME! Resctricting col_name to 30 chars! */
 	    if(mip->colname[i]){
-	       mip_copy->colname[i] = (char*)malloc(CSIZE*30);
-	       strncpy(mip_copy->colname[i], mip->colname[i], 30); 
-	       mip_copy->colname[i][29] = 0;
+	       mip_copy->colname[i] = (char*)malloc(CSIZE*MAX_NAME_SIZE);
+	       strncpy(mip_copy->colname[i], mip->colname[i], MAX_NAME_SIZE); 
+	       mip_copy->colname[i][MAX_NAME_SIZE-1] = 0;
 	    }
 	 }
       }

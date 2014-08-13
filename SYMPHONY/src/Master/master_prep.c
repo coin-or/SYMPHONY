@@ -464,9 +464,9 @@ int prep_read_mps(prep_environment *prep, char *infile)
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
-      mip->colname[j] = (char *) malloc(CSIZE * 9);
-      strncpy(mip->colname[j], const_cast<char*>(mps.columnName(j)), 9);
-      mip->colname[j][8] = 0;
+      mip->colname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(mip->colname[j], const_cast<char*>(mps.columnName(j)), MAX_NAME_SIZE);
+      mip->colname[j][MAX_NAME_SIZE-1] = 0;
    }
 
 #if 0
@@ -546,9 +546,9 @@ int prep_read_lp(prep_environment *prep, char *infile)
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = lp.isInteger(j);
-      mip->colname[j] = (char *) malloc(CSIZE * 9);
-      strncpy(mip->colname[j], const_cast<char*>(lp.columnName(j)), 9);
-      mip->colname[j][8] = 0;
+      mip->colname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(mip->colname[j], const_cast<char*>(lp.columnName(j)), MAX_NAME_SIZE);
+      mip->colname[j][MAX_NAME_SIZE-1] = 0;
    }
 
 #if 0

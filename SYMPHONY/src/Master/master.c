@@ -234,6 +234,7 @@ int sym_set_defaults(sym_environment *env)
 
    tm_par->logging = NO_LOGGING;
    tm_par->logging_interval = 1800;
+   tm_par->status_interval = 5;
    tm_par->vbc_emulation = NO_VBC_EMULATION;
    tm_par->price_in_root = FALSE;
    tm_par->trim_search_tree = FALSE;
@@ -252,6 +253,7 @@ int sym_set_defaults(sym_environment *env)
    tm_par->rs_lp_iter_limit = 1000000;
    tm_par->output_mode = 1;
 
+   tm_par->tighten_root_bounds = TRUE;
    /************************** lp defaults ***********************************/
    lp_par->verbosity = 0;
    lp_par->granularity = tm_par->granularity;
@@ -4043,9 +4045,9 @@ int sym_set_col_names(sym_environment * env, char **colname)
    
    for (j = 0; j < env->mip->n; j++){
       if(colname[j]){
-	 env->mip->colname[j] = (char *) malloc(CSIZE * 21); 
-	 strncpy(env->mip->colname[j], colname[j], 20);
-	 env->mip->colname[j][20] = 0;
+	 env->mip->colname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE); 
+	 strncpy(env->mip->colname[j], colname[j], MAX_NAME_SIZE);
+	 env->mip->colname[j][MAX_NAME_SIZE-1] = 0;
       }
    }      
 
@@ -4185,18 +4187,18 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
 	 if(env->mip->colname){	 
 	    for (i = 0; i < n; i++){
 	       if(env->mip->colname[i]){
-		  colName[i] = (char *) malloc(CSIZE * 21); 
-		  strncpy(colName[i], env->mip->colname[i],21);
-		  colName[i][20] = 0;
+		  colName[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE); 
+		  strncpy(colName[i], env->mip->colname[i], MAX_NAME_SIZE);
+		  colName[i][MAX_NAME_SIZE-1] = 0;
 		  FREE(env->mip->colname[i]);
 	       }
 	    }
 	 }
 
 	 if(name){
-	    colName[n] = (char *) malloc(CSIZE * 21); 	
-	    strncpy(colName[n], name, 21);
-	    colName[n][20] = 0;
+	    colName[n] = (char *) malloc(CSIZE * MAX_NAME_SIZE); 	
+	    strncpy(colName[n], name, MAX_NAME_SIZE);
+	    colName[n][MAX_NAME_SIZE-1] = 0;
 	 }
 
 	 FREE(env->mip->colname);
@@ -5275,6 +5277,11 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
       *value = tm_par->logging_interval;
       return(0);
    }
+   else if (strcmp(key, "status_interval") == 0 ||
+	    strcmp(key, "TM_status_interval") == 0){
+      *value = tm_par->status_interval;
+      return(0);
+   }
    else if (strcmp(key, "logging") == 0 ||
 	    strcmp(key, "TM_logging") == 0){
       *value = tm_par->logging;
@@ -5314,6 +5321,14 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    else if (strcmp(key, "sensitivity_analysis") == 0 ||
 	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
       *value = tm_par->sensitivity_analysis;
+      return(0);
+   }else if (strcmp(key, "output_mode") == 0 ||
+	    strcmp(key, "TM_output_mode") == 0){
+      *value = tm_par->output_mode;
+      return(0);
+   }else if (strcmp(key, "tighten_root_bounds") == 0 ||
+	    strcmp(key, "TM_tighten_root_bounds") == 0){
+      *value = tm_par->tighten_root_bounds;
       return(0);
    }
      

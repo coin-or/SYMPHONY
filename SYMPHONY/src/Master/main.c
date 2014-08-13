@@ -421,7 +421,7 @@ int main(int argc, char **argv)
 			 printf("Nonzero column names and values in the solution\n");
 			 printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
 			 for(j = 0; j<env->best_sol.xlength; j++){		      
-			    printf("%8s %10.3f\n", 
+			    printf("%8s %10.10f\n", 
 				   env->mip->colname[env->best_sol.xind[j]],
 				   env->best_sol.xval[j]);
 			 }
@@ -431,7 +431,7 @@ int main(int argc, char **argv)
 			 printf("User indices and values in the solution\n");
 			 printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
 			 for(j = 0; j<env->best_sol.xlength; j++){		      
-			    printf("%7d %10.3f\n", env->best_sol.xind[j], 
+			    printf("%7d %10.10f\n", env->best_sol.xind[j], 
 				   env->best_sol.xval[j]);
 			 }			    
 			 printf("\n");

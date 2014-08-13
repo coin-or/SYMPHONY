@@ -720,7 +720,7 @@ int display_solution_u(sym_environment *env, int thread_num)
 		   if (sol.xind[i] >= n){
 		      continue;
 		   }
-		   printf("%-30s %10.3f\n", colname[sol.xind[i]],
+		   printf("%-50s %10.10f\n", colname[sol.xind[i]],
 			  sol.xval[i]);
 		}
 		
@@ -737,7 +737,7 @@ int display_solution_u(sym_environment *env, int thread_num)
 		   if (sol.xind[i] >= n){
 		      continue;
 		   }
-		   printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+		   printf("%7d %10.10f\n", sol.xind[i], sol.xval[i]);
 		}
 		
 		printf("\n");

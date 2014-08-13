@@ -5475,7 +5475,7 @@ int prep_report(PREPdesc *P, int termcode)
 	    printf("Column names and values of nonzeros in the solution\n");
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for(i = 0; i < P->xlength; i++){
-	       printf("%8s %10.3f\n", P->orig_mip->colname[P->xind[i]],
+	       printf("%-50s %10.10f\n", P->orig_mip->colname[P->xind[i]],
 		      P->xval[i]);
 	    }
 
@@ -5489,7 +5489,7 @@ int prep_report(PREPdesc *P, int termcode)
 	    printf("User indices and values of nonzeros in the solution\n");
 	    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    for(i = 0; i < P->xlength; i++){
-	       printf("%7d %10.3f\n", P->xind[i], P->xval[i]);
+	       printf("%7d %10.10f\n", P->xind[i], P->xval[i]);
 	    }
 
 	    //for (i = 0; i < mip->fixed_n; i++){
