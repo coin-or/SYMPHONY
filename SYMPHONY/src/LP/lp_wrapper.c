@@ -19,6 +19,8 @@
 #include <memory.h>
 #include <math.h>
 
+#include "omp.h"
+
 #include "sym_lp.h"
 #include "sym_master.h" 
 #include "sym_proccomm.h"
@@ -129,9 +131,9 @@ int receive_lp_data_u(lp_prob *p)
       if (has_colnames){
 	 mip->colname = (char **) malloc(sizeof(char *) * mip->n);   
 	 for (i = 0; i < mip->n; i++){
-	    mip->colname[i] = (char *) malloc(CSIZE * 9);
-	    receive_char_array(mip->colname[i], 8);
-	    mip->colname[i][8] = 0;
+	    mip->colname[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+	    receive_char_array(mip->colname[i], MAX_NAME_SIZE);
+	    mip->colname[i][MAX_NAME_SIZE-1] = 0;
 	 }
       }
    }
@@ -1144,6 +1146,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
           */
          true_objval = floor(true_objval+0.5);
       }
+
       /* Send the solution value to the treemanager */
       if (p->has_ub && true_objval >= p->ub - p->par.granularity){
 	 if (!p->par.multi_criteria){
@@ -1191,10 +1194,10 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 		  ("****** After Calling Heuristics !\n"));
 	 }
 	 if (p->mip->obj_sense == SYM_MAXIMIZE){
-	    PRINT(p->par.verbosity, 1, ("****** Cost: %f\n\n", -true_objval
+	    PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", -true_objval
 					+ p->mip->obj_offset));
 	 }else{
-	    PRINT(p->par.verbosity, 1, ("****** Cost: %f\n\n", true_objval
+	    PRINT(p->par.verbosity, 0, ("****** Cost: %f\n\n", true_objval
 					+ p->mip->obj_offset));
 	 }
       }
@@ -1203,10 +1206,12 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
       {
 	 install_new_ub(p->tm, p->ub, p->proc_index, p->bc_index, branching,
 			feasible);
-	 if (p->bc_index>0) {
-	    tighten_root_bounds(p);
-	 }
       }
+#if 0
+      if (p->bc_index>0) {
+	 tighten_root_bounds(p);
+      }
+#endif
       if (!p->par.multi_criteria){
 	 display_lp_solution_u(p, DISP_FEAS_SOLUTION);
       }
@@ -1351,7 +1356,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for (i = 0; i < number; i++){
 	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
-	    printf("%8s %10.7f\n", p->mip->colname[xind[i]], xval[i]);
+	    printf("%-50s %10.7f\n", p->mip->colname[xind[i]], xval[i]);
 	 }
 	 printf("\n");
       }else{
@@ -1385,7 +1390,7 @@ void display_lp_solution_u(lp_prob *p, int which_sol)
 	    if (xind[i] == p->mip->n) continue; /* For multi-criteria */
 	    tmpd = xval[i];
 	    if ((tmpd > floor(tmpd)+lpetol) && (tmpd < ceil(tmpd)-lpetol)){
-	       printf("%8s %10.7f\n", p->mip->colname[xind[i]], tmpd);
+	       printf("%-50s %10.7f\n", p->mip->colname[xind[i]], tmpd);
 	    }
 	 }
 	 printf("\n");
@@ -2943,3 +2948,4 @@ int analyze_multicriteria_solution(lp_prob *p, int *indices, double *values,
   return(continue_with_node);
 
 }
+
