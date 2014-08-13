@@ -445,9 +445,9 @@ int read_gmpl(MIPdesc *mip, char *modelfile, char *datafile, char *probname)
 
       }
 
-      mip->colname[j] = (char *) malloc(CSIZE * 255); 
-      strncpy(mip->colname[j], glp_get_col_name(prob, j+1), 255);
-      mip->colname[j][254] = 0;  /* ??? */
+      mip->colname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE); 
+      strncpy(mip->colname[j], glp_get_col_name(prob, j+1), MAX_NAME_SIZE);
+      mip->colname[j][MAX_NAME_SIZE-1] = 0;  /* ??? */
    }
 
    /*load the definitions to a CoinPackedMatrix as row ordered and get the 
@@ -2589,6 +2589,10 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       term = LP_D_ITLIM;
    else if (si->isAbandoned())
       term = LP_ABANDONED;
+   else
+      // Osi doesn't have a check for time limit or a way of setting it
+      // This is the only posibility left.
+      term = LP_TIME_LIMIT;
    
    /* if(term == D_UNBOUNDED){
       retval=si->getIntParam(OsiMaxNumIteration, itlim); 
@@ -2872,7 +2876,7 @@ void set_timelim(LPdata *lp_data, double timelim)
 
 #ifdef __OSI_CLP__
    
-   ClpDblParam key = ClpMaxSeconds;   
+   ClpDblParam key = ClpMaxWallSeconds;   
    lp_data->si->getModelPtr()->setDblParam(key, timelim);
 
 #endif
@@ -3499,9 +3503,9 @@ int read_mps(MIPdesc *mip, char *infile, char *probname, int versbotiy)
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = mps.isInteger(j);
-      mip->colname[j] = (char *) malloc(CSIZE * 30);
-      strncpy(mip->colname[j], mps.columnName(j), 30);
-      mip->colname[j][29] = 0;
+      mip->colname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(mip->colname[j], mps.columnName(j), MAX_NAME_SIZE);
+      mip->colname[j][MAX_NAME_SIZE-1] = 0;
    }
 
    if (mip->obj_sense == SYM_MAXIMIZE){
@@ -3578,9 +3582,9 @@ int read_lp(MIPdesc *mip, char *infile, char *probname, int verbosity)
 
    for (j = 0; j < mip->n; j++){
       mip->is_int[j] = lp.isInteger(j);
-      mip->colname[j] = (char *) malloc(CSIZE * 30);
-      strncpy(mip->colname[j], lp.columnName(j), 30);
-      mip->colname[j][29] = 0;
+      mip->colname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE);
+      strncpy(mip->colname[j], lp.columnName(j), MAX_NAME_SIZE);
+      mip->colname[j][MAX_NAME_SIZE-1] = 0;
    }
 
    if (mip->obj_sense == SYM_MAXIMIZE){
