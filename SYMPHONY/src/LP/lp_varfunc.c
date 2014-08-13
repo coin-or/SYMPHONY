@@ -259,7 +259,9 @@ void tighten_bounds(lp_prob *p)
        * cuts. whenever ub is updated, we can come back and update bounds in
        * the root
        */
-      save_root_reduced_costs(p); 
+      if (p->tm->par.tighten_root_bounds){
+	 save_root_reduced_costs(p);
+      }
    }
 #endif
 
@@ -1130,6 +1132,7 @@ int save_root_reduced_costs(lp_prob *p)
 }
 
 /*===========================================================================*/
+#if 0
 int tighten_root_bounds(lp_prob *p)
 {
    /* 
@@ -1269,6 +1272,7 @@ int tighten_root_bounds(lp_prob *p)
    FREE(new_ind);
    return 0;
 }
+#endif
 #endif
 /*===========================================================================*/
 /*===========================================================================*/
