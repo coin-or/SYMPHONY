@@ -457,7 +457,7 @@ int solve(tm_prob *tm)
 #endif
 	 }
 
-	 if (tm->termcode != TM_UNFINISHED && tm->termcode != TM_INTERRUPTED){
+	 if (tm->termcode != TM_UNFINISHED){
 	    break;
 	 }
 	 
@@ -467,48 +467,43 @@ int solve(tm_prob *tm)
 	    tm->termcode = TM_SIGNAL_CAUGHT;
 	    c_count = 0;
 	 }
-
-	 if ((tm->termcode == TM_UNFINISHED || tm->termcode == TM_INTERRUPTED) &&
-	     tm->par.time_limit >= 0.0 &&
-	     wall_clock(NULL) - start_time > tm->par.time_limit &&
-	     tm->termcode != TM_FINISHED){
-	    tm->termcode = TM_TIME_LIMIT_EXCEEDED;
-	 }
-
-	 if ((tm->termcode == TM_UNFINISHED || tm->termcode == TM_INTERRUPTED) &&
-	     tm->par.node_limit >= 0 && tm->stat.analyzed >= 
-	     tm->par.node_limit && tm->termcode != TM_FINISHED){
-	    if (tm->active_node_num + tm->samephase_candnum > 0){
-	       tm->termcode = TM_NODE_LIMIT_EXCEEDED;
-	    }else{
-	       tm->termcode = TM_FINISHED;
-	    }
-	 }
-
-	 if ((tm->termcode == TM_UNFINISHED || tm->termcode == TM_INTERRUPTED) &&
-	     tm->par.find_first_feasible && tm->has_ub && tm->lp_stat.ip_sols){
-	    tm->termcode = TM_FINISHED;
-	 }
-
-	 if ((tm->termcode == TM_UNFINISHED || tm->termcode == TM_INTERRUPTED) &&
-	     tm->has_ub && (tm->par.gap_limit >= 0.0)){
-            find_tree_lb(tm);
-	    if (d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) <= tm->par.gap_limit){
-	       if (tm->lb < tm->ub){
-		  tm->termcode = TM_TARGET_GAP_ACHIEVED;
+ }
+#pragma omp critical (setting_status)
+ {
+         if (tm->termcode == TM_UNFINISHED){
+	    if (tm->par.time_limit >= 0.0 &&
+		wall_clock(NULL) - start_time > tm->par.time_limit){
+	       tm->termcode = TM_TIME_LIMIT_EXCEEDED;
+	    }else if (tm->par.node_limit >= 0 &&
+		      tm->stat.analyzed >= tm->par.node_limit){
+	       if (tm->active_node_num + tm->samephase_candnum > 0){
+		  tm->termcode = TM_NODE_LIMIT_EXCEEDED;
 	       }else{
 		  tm->termcode = TM_FINISHED;
 	       }
+	    }else if (tm->par.find_first_feasible && tm->has_ub && tm->lp_stat.ip_sols){
+	       tm->termcode = TM_FINISHED;
+	    }else if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
+	       find_tree_lb(tm);
+	       if (d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) <= tm->par.gap_limit){
+		  if (tm->lb < tm->ub){
+		     tm->termcode = TM_TARGET_GAP_ACHIEVED;
+		  }else{
+		     tm->termcode = TM_FINISHED;
+		  }
+	       }
 	    }
 	 }
-         //if(tm->par.rs_mode_enabled)
+#if 0
+	    //if(tm->par.rs_mode_enabled)
 	 // printf("tm-lp-iter %i %i \n", tm->lp_stat.lp_iter_num, tm->par.rs_lp_iter_limit);
 	 if(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit){
 	    tm->termcode = TM_TARGET_GAP_ACHIEVED;
 	 }
+#endif
 }
 
-         if (tm->termcode != TM_UNFINISHED && tm->termcode != TM_INTERRUPTED){
+         if (tm->termcode != TM_UNFINISHED){
 	    break;
 	 }
 	 
@@ -569,7 +564,7 @@ int solve(tm_prob *tm)
       }
       if (tm->nextphase_candnum == 0)
 	 break;
-      if (tm->termcode != TM_UNFINISHED && tm->termcode == TM_INTERRUPTED)
+      if (tm->termcode != TM_UNFINISHED)
 	 break;
    }
    find_tree_lb(tm);
@@ -1064,9 +1059,12 @@ void insert_new_node(tm_prob *tm, bc_node *node)
    int rule = tm->par.node_selection_rule;
 
 #pragma omp critical (setting_status)
-   if (node->node_status == NODE_STATUS__INTERRUPTED &&
-       tm->termcode == TM_UNFINISHED){
-      tm->termcode = TM_INTERRUPTED;
+   if (tm->termcode == TM_UNFINISHED){
+      if (node->node_status == NODE_STATUS__TIME_LIMIT){
+	 tm->termcode = TM_TIME_LIMIT_EXCEEDED;
+      }else if (node->node_status == NODE_STATUS__ITERATION_LIMIT){
+	 tm->termcode = TM_ITERATION_LIMIT_EXCEEDED;
+      }
    }
   
    tm->samephase_candnum = pos = ++size;

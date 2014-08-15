@@ -399,7 +399,7 @@ int fathom_branch(lp_prob *p)
       switch (termcode){
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
 	 return(ERROR__DUAL_INFEASIBLE);
-       case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
+       case LP_D_ITLIM:
        case LP_TIME_LIMIT:
 	 /* now, we set time limit - solver returns the same termcode with itlim */
 	 /* also, we might set iter limit if we are in search heuristics */
@@ -737,8 +737,10 @@ int fathom(lp_prob *p, int primal_feasible)
 	    send_node_desc(p, OVER_UB_PRUNED);
 	    break;
 	  case LP_D_ITLIM:
+	    send_node_desc(p, ITERATION_LIMIT);
+	    break;
 	  case LP_TIME_LIMIT:
-	    send_node_desc(p, INTERRUPTED_NODE);
+	    send_node_desc(p, TIME_LIMIT);
 	    break;
 	  default:
 	    send_node_desc(p, OVER_UB_PRUNED);

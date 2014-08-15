@@ -703,13 +703,15 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    }
 #endif
 
-   if (node_type == INTERRUPTED_NODE){
-      n->node_status = NODE_STATUS__INTERRUPTED;
+   if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
+      n->node_status = (node_type == TIME_LIMIT ?
+			NODE_STATUS__TIME_LIMIT:NODE_STATUS__ITERATION_LIMIT);
 #pragma omp critical (tree_update)
       insert_new_node(tm, n);
-      return;
+      if (!repricing)
+	 return;
    }
-   
+
    newdesc = (node_desc *) calloc(1, sizeof(node_desc));
    /* Unpack the new description */
    receive_int_array(&newdesc->nf_status, 1);

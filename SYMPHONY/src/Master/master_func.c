@@ -543,7 +543,8 @@ int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num, int *cu
       check_trim_tree(env, root, cut_num, cuts_ind, change_type);
       
       if (root->node_status == NODE_STATUS__PRUNED || 
-	  root->node_status == NODE_STATUS__INTERRUPTED || 
+	  root->node_status == NODE_STATUS__TIME_LIMIT || 
+	  root->node_status == NODE_STATUS__ITERATION_LIMIT || 
 	  root->feasibility_status == PRUNED_HAS_CAN_SOLUTION || 
 	  root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
 	 if(change_type == OBJ_COEFF_CHANGED || change_type == RHS_CHANGED || 

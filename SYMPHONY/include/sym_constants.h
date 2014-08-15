@@ -42,14 +42,15 @@
 #define NO_DATA_STORED           2
 
 /*----------------- possible stati of a node in the search tree -------------*/
-#define NODE_STATUS__CANDIDATE    0
-#define NODE_STATUS__BRANCHED_ON  1
-#define NODE_STATUS__HELD         2
-#define NODE_STATUS__ROOT         3
-#define NODE_STATUS__PRUNED       4
-#define NODE_STATUS__INTERRUPTED  5
-#define NODE_STATUS__WARM_STARTED 6
-#define NODE_STATUS__WSPRUNED     7
+#define NODE_STATUS__CANDIDATE         0
+#define NODE_STATUS__BRANCHED_ON       1
+#define NODE_STATUS__HELD              2
+#define NODE_STATUS__ROOT              3
+#define NODE_STATUS__PRUNED            4
+#define NODE_STATUS__TIME_LIMIT        5
+#define NODE_STATUS__ITERATION_LIMIT   6
+#define NODE_STATUS__WARM_STARTED      7
+#define NODE_STATUS__WSPRUNED          8
 /*------------------------------ not_fixed stati ----------------------------*/
 #define NF_CHECK_ALL             0x00
 #define NF_CHECK_AFTER_LAST      0x01
@@ -70,12 +71,13 @@
 #define FEASIBLE_PRUNED                 5
 #define OVER_UB_PRUNED                  6
 #define DISCARDED_NODE                  7
-#define INTERRUPTED_NODE                8
-#define REPRICED_NODE                   9
-#define MC_FEASIBLE_PRUNED              10
+#define TIME_LIMIT                      8
+#define ITERATION_LIMIT                 9
+#define REPRICED_NODE                   10
+#define MC_FEASIBLE_PRUNED              11
 /*to be used when warm_started*/
-#define PRUNED_HAS_CAN_SOLUTION        11
-#define NOT_PRUNED_HAS_CAN_SOLUTION    12
+#define PRUNED_HAS_CAN_SOLUTION        12
+#define NOT_PRUNED_HAS_CAN_SOLUTION    13
 
 /*------------------- possible node types for VBC Tool ----------------------*/
 #define VBC_INTERIOR_NODE       1 /*Dark Red*/ 
