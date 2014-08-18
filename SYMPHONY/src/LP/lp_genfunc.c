@@ -192,7 +192,7 @@ int process_chain(lp_prob *p)
       p->tm->active_node_num--;
 #ifdef _OPENMP
 #pragma omp critical (tree_update)
-      p->tm->active_nodes[omp_get_thread_num()] = NULL;
+      p->tm->active_nodes[p->proc_index] = NULL;
 #endif
       free_node_dependent(p);
 #else
@@ -444,6 +444,7 @@ int fathom_branch(lp_prob *p)
 	    PRINT(verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
 #ifdef COMPILE_IN_LP
+	    p->tm->active_nodes[p->proc_index]->lower_bound = lp_data->objval;
             if (p->node_iter_num < 2 && p->bc_index > 0 && 
                   p->par.should_use_rel_br) {
                update_pcost(p);
