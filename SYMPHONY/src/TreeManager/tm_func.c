@@ -166,8 +166,10 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 		termcodes[i], i); 
       }
       tm->lpp[i]->tm = tm;
+      tm->lpp[i]->proc_index = omp_get_thread_num();
    }
-   tm->lp.free_num = par->max_active_nodes;
+   //The master thread isn't used unless there is only one thread
+   tm->lp.free_num = MAX(par->max_active_nodes-1, 1);
    for (i = 0; i < par->max_active_nodes; i++){
       if (termcodes[i] < 0){
 	 int tmp = termcodes[i];
@@ -329,27 +331,28 @@ int solve(tm_prob *tm)
 	    tm->termcode = TM_FINISHED; /* Continue normally */
 	 }
       }
-      then  = wall_clock(NULL);
-      then2 = wall_clock(NULL);
-      then3 = wall_clock(NULL);
 #pragma omp parallel default(shared) private(now, then2, then3)
 {
 #ifdef _OPENMP
-   int i, ret, thread_num = omp_get_thread_num();
+      int i, ret, thread_num = omp_get_thread_num();
 #else
-   int i, ret, thread_num = 0;
+      int i, ret, thread_num = 0;
 #endif
-      while (tm->active_node_num > 0 || tm->samephase_candnum > 0){
+      then  = wall_clock(NULL);
+      then2 = wall_clock(NULL);
+      then3 = wall_clock(NULL);
+      while (tm->termcode == TM_UNFINISHED){
 	 /*------------------------------------------------------------------*\
 	  * while there are nodes being processed or while there are nodes
 	  * waiting to be processed, continue to execute this loop
 	 \*------------------------------------------------------------------*/
 	 i = NEW_NODE__STARTED;
-	 while (tm->lp.free_num > 0 && (tm->par.time_limit >= 0.0 ?
+	 while (tm->lp.free_num > 0
+		&& (tm->par.time_limit >= 0.0 ?
 		(wall_clock(NULL) - start_time < tm->par.time_limit) : TRUE) &&
 		(tm->par.node_limit >= 0 ?
-		tm->stat.analyzed < tm->par.node_limit : TRUE) &&
-		((tm->has_ub && (tm->stat.analyzed > 0 && tm->par.gap_limit >= 0.0)) ?
+		tm->stat.analyzed < tm->par.node_limit : TRUE)
+		&& ((tm->has_ub && (tm->stat.analyzed > 0 && tm->par.gap_limit >= 0.0)) ?
 		 d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) > tm->par.gap_limit : TRUE)
 		&& !(tm->par.find_first_feasible && tm->has_ub && 
 		     tm->lp_stat.ip_sols > 0) &&
@@ -404,6 +407,12 @@ int solve(tm_prob *tm)
 	    }
 
 }
+#pragma omp master
+	    if(tm->par.node_selection_rule == DEPTH_FIRST_THEN_BEST_FIRST &&
+	       tm->has_ub){
+	      tm->par.node_selection_rule = LOWEST_LP_FIRST;
+	    }
+
 	    if (i != NEW_NODE__STARTED)
 	       break;
 
@@ -413,12 +422,6 @@ int solve(tm_prob *tm)
 	       printf("Thread %i now processing node %i\n", thread_num,
 		      tm->lpp[thread_num]->bc_index);
 #endif
-
-#pragma omp master
-	    if(tm->par.node_selection_rule == DEPTH_FIRST_THEN_BEST_FIRST &&
-	       tm->has_ub){
-	      tm->par.node_selection_rule = LOWEST_LP_FIRST;
-	    }
 
 	    ret = process_chain(tm->lpp[thread_num]); 
 #pragma omp critical (setting_termcode)
@@ -494,13 +497,9 @@ int solve(tm_prob *tm)
 	       }
 	    }
 	 }
-#if 0
-	    //if(tm->par.rs_mode_enabled)
-	 // printf("tm-lp-iter %i %i \n", tm->lp_stat.lp_iter_num, tm->par.rs_lp_iter_limit);
-	 if(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit){
-	    tm->termcode = TM_TARGET_GAP_ACHIEVED;
+	 if (tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit){
+	    tm->termcode = TM_ITERATION_LIMIT_EXCEEDED;
 	 }
-#endif
 }
 
          if (tm->termcode != TM_UNFINISHED){
@@ -512,7 +511,9 @@ int solve(tm_prob *tm)
 	    tm->termcode = SOMETHING_DIED;
 	 }
 
-         if (i == NEW_NODE__NONE && tm->active_node_num == 0){
+         if (tm->samephase_candnum + tm->active_node_num == 0 &&
+	     tm->stat.analyzed > 0){
+	    tm->termcode = TM_FINISHED;
 	    break;
 	 }
 	 
@@ -559,11 +560,14 @@ int solve(tm_prob *tm)
 
       if(tm->termcode == TM_UNBOUNDED) break;
 
-      if (tm->samephase_candnum + tm->active_node_num == 0){
+      if (tm->samephase_candnum + tm->active_node_num == 0 &&
+	  tm->stat.analyzed > 0){
 	 tm->termcode = TM_FINISHED;
       }
+
       if (tm->nextphase_candnum == 0)
 	 break;
+
       if (tm->termcode != TM_UNFINISHED)
 	 break;
    }
@@ -3843,8 +3847,7 @@ int find_tree_lb(tm_prob *tm)
 #ifdef COMPILE_IN_LP
       for (int i = tm->par.max_active_nodes - 1; i >= 0; i--){
 	 if (tm->active_nodes[i]){
-	    lb = MIN(lb, MAX(tm->lpp[i]->lp_data->objval,
-			     tm->active_nodes[i]->lower_bound));
+	    lb = MIN(lb, tm->active_nodes[i]->lower_bound);
 	 }
       }
 #endif
