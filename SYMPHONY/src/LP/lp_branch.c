@@ -522,7 +522,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    int backtrack = 0;
 
 	    bc_node *node = p->tm->active_nodes[p->proc_index];	    
-	    node = p->tm->active_nodes[p->proc_index];      
 	    if(p->bc_level >= 1){   
 	       while(node->parent){
 		  if(node->start_objval > node->parent->end_objval){
@@ -1470,6 +1469,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
        * and only variable bounds are changed then, hot-starts should be faster
        */
       
+#ifdef __OSI_CLP__
+      lp_data->si->setupForRepeatedUse(2,0);
+#endif
       if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
 	 should_use_hot_starts = TRUE;
       } else {
@@ -1488,11 +1490,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    max_presolve_iter = 5;
 	 }
 	 if(should_use_hot_starts){
-	   set_itlim_hotstart(lp_data, max_presolve_iter);
+	    set_itlim_hotstart(lp_data, max_presolve_iter);
 	 }
 	 set_itlim(lp_data, max_presolve_iter);
       }
-      
+
       for (i=0; i<cand_num; i++){
          can = candidates[i];
 
@@ -1877,12 +1879,15 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             break;
          }
          st_time += used_time(&total_time);
-         should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
-               &should_continue);
-         if (should_continue==FALSE) {
-            PRINT(p->par.verbosity, 2, 
-                  ("too much time in strong branching, breaking\n"));
-            break;
+
+         if (p->par.limit_strong_branching_time){
+	    should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
+					     &should_continue);
+	    if (should_continue==FALSE) {
+	       PRINT(p->par.verbosity, 2, 
+		     ("too much time in strong branching, breaking\n"));
+	       break;
+	    }
          }
       }
    }
