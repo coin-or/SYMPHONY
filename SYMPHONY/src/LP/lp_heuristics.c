@@ -4899,7 +4899,7 @@ int fr_force_feasible(lp_prob *p, char use_base, int *sym_fixed_int_cnt, int *sy
 	       if(row_lb[new_r_ind] > -inf){
 		  if(coeff >= 0.0 && lb[c_ind] > -inf){
 		     row_lb[new_r_ind] += coeff*(lb[c_ind] - old_lb);
-		  }else if(coeff < 0.0 && ub[i] < inf){
+		  }else if(coeff < 0.0 && ub[c_ind] < inf){
 		     row_lb[new_r_ind] += coeff*(ub[c_ind] - old_ub);
 		  }else{
 		     row_lb[new_r_ind] = -inf;
