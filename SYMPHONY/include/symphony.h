@@ -51,7 +51,7 @@
 #define TM_OPTIMAL_SOLUTION_FOUND         227
 #define TM_TIME_LIMIT_EXCEEDED            228
 #define TM_NODE_LIMIT_EXCEEDED            229
-#define TM_ITERATION_LIMIT_EXCEEDED       229
+#define TM_ITERATION_LIMIT_EXCEEDED       230
 #define TM_TARGET_GAP_ACHIEVED            231
 #define TM_FOUND_FIRST_FEASIBLE           232
 #define TM_FINISHED                       233
