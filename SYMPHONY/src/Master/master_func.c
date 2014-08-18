@@ -2917,6 +2917,10 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->strong_br_all_candidates_level);
       return(0);
    }
+   else if (strcmp(key, "limit_strong_branching_time") == 0) {
+      READ_INT_PAR(lp_par->limit_strong_branching_time);
+      return(0);
+   }
    else if (strcmp(key,"strong_branching_red_ratio") == 0 ||
 	    strcmp(key,"LP_strong_branching_red_ratio") == 0){
       READ_DBL_PAR(lp_par->strong_branching_red_ratio);

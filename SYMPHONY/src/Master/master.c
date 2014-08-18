@@ -418,6 +418,7 @@ int sym_set_defaults(sym_environment *env)
 
    lp_par->strong_br_min_level = 4; 
    lp_par->strong_br_all_candidates_level = 6;
+   lp_par->limit_strong_branching_time = TRUE;
    lp_par->use_hot_starts = TRUE;
    lp_par->should_use_rel_br = FALSE;
    lp_par->use_branching_prep = FALSE; 
@@ -5700,6 +5701,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    }
    else if (strcmp(key, "strong_br_all_candidates_level") == 0) {
       *value = lp_par->strong_br_all_candidates_level;
+      return(0);
+   }
+   else if (strcmp(key, "limit_strong_branching_time") == 0) {
+      *value = lp_par->limit_strong_branching_time;
       return(0);
    }
    else if (strcmp(key,"use_hot_starts") == 0) {
