@@ -1459,7 +1459,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          if (should_use_hot_starts && unmark_hs){
             unmark_hotstart(lp_data);
             set_itlim_hotstart(lp_data, -1);
-         } 
+         }else{
+	    load_basis(lp_data, rstat, cstat);
+	 }
          set_itlim(lp_data, -1); //both limits should be set for hotstarts
          return (DO_NOT_BRANCH__FATHOMED);
       }
@@ -1904,8 +1906,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
    if (should_use_hot_starts && unmark_hs) {
       unmark_hotstart(lp_data);
+      set_itlim_hotstart(lp_data, -1);
+   }else{
+      load_basis(lp_data, cstat, rstat);
    }
-
+   set_itlim(lp_data, -1);
+	    
 #if 0
    if (best_can->type == CANDIDATE_VARIABLE &&
        vars[best_can->position]->lb == vars[best_can->position]->ub){

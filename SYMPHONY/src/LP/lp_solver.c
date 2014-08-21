@@ -2706,7 +2706,7 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    else{
       lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
 #ifdef __OSI_CLP__
-      if (si->getModelPtr()->secondaryStatus() == 10)
+      if (si->getModelPtr()->secondaryStatus() != 10)
 #endif
       printf("OSI Abandoned calculation: Code %i \n\n", term);
    }
