@@ -2594,6 +2594,13 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
       // This is the only posibility left.
       term = LP_TIME_LIMIT;
    
+#ifdef __OSI_CLP__
+   /* If max iterations and had switched to primal, bound is no good */
+   if (si->getModelPtr()->secondaryStatus() == 10){
+      term = LP_ABANDONED;
+   }
+#endif
+   
    /* if(term == D_UNBOUNDED){
       retval=si->getIntParam(OsiMaxNumIteration, itlim); 
       CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() 
@@ -2621,7 +2628,10 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
    }
    else{
       lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
-      printf("Unexpected return code from OSI: %i \n\n", term);
+#ifdef __OSI_CLP__
+      if (si->getModelPtr()->secondaryStatus() != 10)
+#endif
+      printf("OSI Abandoned calculation: Code %i \n\n", term);
    }
    
    /*
@@ -2667,6 +2677,17 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       term = LP_D_ITLIM;
    else if (si->isAbandoned())
       term = LP_ABANDONED;
+   else
+      // Osi doesn't have a check for time limit or a way of setting it
+      // This is the only posibility left.
+      term = LP_TIME_LIMIT;
+
+#ifdef __OSI_CLP__
+   /* If max iterations and had switched to primal, bound is no good */
+   if (si->getModelPtr()->secondaryStatus() == 10){
+      term = LP_ABANDONED;
+   }
+#endif
    
    /* if(term == D_UNBOUNDED){
       retval=si->getIntParam(OsiMaxNumIteration, itlim); 
@@ -2696,6 +2717,9 @@ int dual_simplex(LPdata *lp_data, int *iterd)
    }   
    else{
       lp_data->lp_is_modified = LP_HAS_BEEN_ABANDONED;
+#ifdef __OSI_CLP__
+      if (si->getModelPtr()->secondaryStatus() == 10)
+#endif
       printf("OSI Abandoned calculation: Code %i \n\n", term);
    }
    
