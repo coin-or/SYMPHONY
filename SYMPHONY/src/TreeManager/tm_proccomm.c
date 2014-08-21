@@ -625,6 +625,8 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    double old_lower_bound  = n->lower_bound;
 #endif
 
+   tm->stat.analyzed++;
+
 #ifdef SENSITIVITY_ANALYSIS
    if (tm->par.sensitivity_analysis){
       if (n->sol){
@@ -984,7 +986,6 @@ void process_branching_info(tm_prob *tm, bc_node *node)
 	 /* update the info which node is processed by that lp process */
 	 tm->active_nodes[find_process_index(&tm->lp, node->lp)] =
 	    node->children[keep];
-	 tm->stat.analyzed++;
       }
       send_msg(lp, LP__DIVING_INFO);
    }

@@ -518,7 +518,8 @@ void send_node_desc(lp_prob *p, int node_type)
    bc_node *n = repricing ? (bc_node *) calloc(1, sizeof(bc_node)) :
       tm->active_nodes[p->proc_index];
    node_desc *tm_desc = &n->desc;   
-
+   p->tm->stat.analyzed++;
+   
    if (p->bc_level > 0) {
       n->num_cut_iters_in_path =
          p->lp_stat.num_cut_iters_in_path;
@@ -1493,7 +1494,6 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 	 }
 	 node->children[*keep]->cg = node->cg;	 
 	 tm->active_nodes[p->proc_index] = node->children[*keep];
-	 tm->stat.analyzed++;
 	 PRINT(p->par.verbosity, 1, ("Decided to dive...\n"));
       }else{
 	 PRINT(p->par.verbosity, 1, ("Decided not to dive...\n"));

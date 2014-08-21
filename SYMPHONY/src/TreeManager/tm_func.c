@@ -992,7 +992,6 @@ int start_node(tm_prob *tm, int thread_num)
    /* It's time to put together the node and send it out */
    tm->active_nodes[lp_ind] = best_node;
    tm->active_node_num++;
-   tm->stat.analyzed++;
 
    send_active_node(tm,best_node,tm->par.colgen_strat[tm->phase],thread_num);
 
