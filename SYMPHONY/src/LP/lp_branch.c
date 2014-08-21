@@ -251,6 +251,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    st_time     = used_time(&total_time);
    total_iters = 0;
 
+   int *cstat = lp_data->tmp.i1;
+   int *rstat = lp_data->tmp.i2;
+      
    if (should_use_rel_br==TRUE) {
 
       const double lpetol100 = lp_data->lpetol*100;
@@ -712,6 +715,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	
 	if (should_use_hot_starts) {
 	  mark_hotstart(lp_data);
+	}else{
+	  get_basis(lp_data, cstat, rstat);
 	}
       }
 
@@ -1481,6 +1486,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       /* Set the iteration limit */
       if (should_use_hot_starts) {
 	 mark_hotstart(lp_data);
+      }else{
+	 get_basis(lp_data, cstat, rstat);
       }
       
       if (p->par.max_presolve_iter > 0) {
@@ -1581,6 +1588,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                   can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
                   total_iters+=*(can->iterd+j);
                } else {
+		  load_basis(lp_data, cstat, rstat);
                   can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
                   total_iters+=*(can->iterd+j);
                }
@@ -2486,7 +2494,9 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
 {
    int status = 0;
    LPdata *lp_data = p->lp_data;
-   
+   int *cstat = lp_data->tmp.i1;
+   int *rstat = lp_data->tmp.i2;
+
    // TODO: LP_ABANDONED
    /* change the lb and ub */
    if(sos_cnt < 1){
@@ -2501,6 +2511,7 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
    if (should_use_hot_starts) {
       *termstatus = solve_hotstart(lp_data, iterd);
    } else {
+      load_basis(lp_data, cstat, rstat);
       *termstatus = dual_simplex(lp_data, iterd);
    }
    
