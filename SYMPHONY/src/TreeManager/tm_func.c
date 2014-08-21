@@ -735,7 +735,7 @@ void print_tree_status(tm_prob *tm)
 #ifdef SHOULD_SHOW_MEMORY_USAGE 
      printf("%9.2f ", vsize_in_mb);
 #endif
-     printf("%10i ", tm->stat.analyzed-tm->active_node_num);
+     printf("%10i ", tm->stat.analyzed);
      printf("%10i ", tm->samephase_candnum+tm->active_node_num);     
      find_tree_lb(tm);
      if (tm->lb > -SYM_INFINITY) {
@@ -780,7 +780,7 @@ void print_tree_status(tm_prob *tm)
 #ifdef SHOULD_SHOW_MEMORY_USAGE
      printf("memory: %.2f MB ", vsize_in_mb);
 #endif
-     printf("done: %i ", tm->stat.analyzed-tm->active_node_num);
+     printf("done: %i ", tm->stat.analyzed);
      printf("left: %i ", tm->samephase_candnum+tm->active_node_num);
      if (tm->has_ub) {
        if (tm->obj_sense == SYM_MAXIMIZE) {
