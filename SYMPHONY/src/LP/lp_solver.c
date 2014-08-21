@@ -2577,35 +2577,29 @@ int initial_lp_solve (LPdata *lp_data, int *iterd)
     
    si->initialSolve();
    
-   if (si->isProvenDualInfeasible())
+   if (si->isProvenDualInfeasible()){
       term = LP_D_INFEASIBLE;
-   else if (si->isProvenPrimalInfeasible())
+   }else if (si->isProvenPrimalInfeasible()){
       term = LP_D_UNBOUNDED;
-   else if (si->isDualObjectiveLimitReached())
+   }else if (si->isDualObjectiveLimitReached()){
       term = LP_D_OBJLIM;
-   else if (si->isProvenOptimal())
+   }else if (si->isProvenOptimal()){
       term = LP_OPTIMAL;
-   else if (si->isIterationLimitReached())
+   }else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
-   else if (si->isAbandoned())
+#ifdef __OSI_CLP__
+      /* If max iterations and had switched to primal, bound is no good */
+      if (si->getModelPtr()->secondaryStatus() == 10){
+	 term = LP_ABANDONED;
+      }
+#endif
+   }else if (si->isAbandoned()){
       term = LP_ABANDONED;
-   else
+   }else{
       // Osi doesn't have a check for time limit or a way of setting it
       // This is the only posibility left.
       term = LP_TIME_LIMIT;
-   
-#ifdef __OSI_CLP__
-   /* If max iterations and had switched to primal, bound is no good */
-   if (si->getModelPtr()->secondaryStatus() == 10){
-      term = LP_ABANDONED;
    }
-#endif
-   
-   /* if(term == D_UNBOUNDED){
-      retval=si->getIntParam(OsiMaxNumIteration, itlim); 
-      CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() 
-      }
-   */
    
    lp_data->termcode = term;
    
@@ -2665,35 +2659,29 @@ int dual_simplex(LPdata *lp_data, int *iterd)
 #endif
    si->resolve();
    
-   if (si->isProvenDualInfeasible())
+   if (si->isProvenDualInfeasible()){
       term = LP_D_INFEASIBLE;
-   else if (si->isProvenPrimalInfeasible())
+   }else if (si->isProvenPrimalInfeasible()){
       term = LP_D_UNBOUNDED;
-   else if (si->isDualObjectiveLimitReached())
+   }else if (si->isDualObjectiveLimitReached()){
       term = LP_D_OBJLIM;
-   else if (si->isProvenOptimal())
+   }else if (si->isProvenOptimal()){
       term = LP_OPTIMAL;
-   else if (si->isIterationLimitReached())
+   }else if (si->isIterationLimitReached()){
       term = LP_D_ITLIM;
-   else if (si->isAbandoned())
+#ifdef __OSI_CLP__
+      /* If max iterations and had switched to primal, bound is no good */
+      if (si->getModelPtr()->secondaryStatus() == 10){
+	 term = LP_ABANDONED;
+      }
+#endif
+   }else if (si->isAbandoned()){
       term = LP_ABANDONED;
-   else
+   }else{
       // Osi doesn't have a check for time limit or a way of setting it
       // This is the only posibility left.
       term = LP_TIME_LIMIT;
-
-#ifdef __OSI_CLP__
-   /* If max iterations and had switched to primal, bound is no good */
-   if (si->getModelPtr()->secondaryStatus() == 10){
-      term = LP_ABANDONED;
    }
-#endif
-   
-   /* if(term == D_UNBOUNDED){
-      retval=si->getIntParam(OsiMaxNumIteration, itlim); 
-      CAN NOT GET DEFAULT, MIN VALUES in OSI of CPXinfointparam() 
-      }
-   */
    
    lp_data->termcode = term;
    
