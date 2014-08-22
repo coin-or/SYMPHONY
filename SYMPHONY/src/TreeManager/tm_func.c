@@ -84,7 +84,6 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #endif
    int s_bufid;
 #endif
-   int *termcodes = NULL;
 #if !defined(_MSC_VER) && !defined(__MNO_CYGWIN) && defined(SIGHANDLER)
    signal(SIGINT, sym_catch_c);    
 #endif   
@@ -97,13 +96,13 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    tm->bpath =
       (branch_desc **) calloc(par->max_active_nodes, sizeof(branch_desc *));
    tm->bpath_size = (int *) calloc(par->max_active_nodes, sizeof(int));
-   termcodes = (int *) calloc(par->max_active_nodes, sizeof(int));
+   tm->termcodes = (int *) calloc(par->max_active_nodes, sizeof(int));
 #else
    tm->rpath = (bc_node ***) calloc(1, sizeof(bc_node **));
    tm->rpath_size = (int *) calloc(1, sizeof(int));
    tm->bpath = (branch_desc **) calloc(1, sizeof(branch_desc *));
    tm->bpath_size = (int *) calloc(1, sizeof(int));
-   termcodes = (int *) calloc(1, sizeof(int));
+   tm->termcodes = (int *) calloc(1, sizeof(int));
 #endif
    
    /*------------------------------------------------------------------------*\
@@ -161,9 +160,9 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #endif
 #pragma omp parallel for shared(tm)
    for (i = 0; i < par->max_active_nodes; i++){
-      if ((termcodes[i] = lp_initialize(tm->lpp[i], 0)) < 0){
+      if ((tm->termcodes[i] = lp_initialize(tm->lpp[i], 0)) < 0){
 	 printf("LP initialization failed with error code %i in thread %i\n\n",
-		termcodes[i], i); 
+		tm->termcodes[i], i); 
       }
       tm->lpp[i]->tm = tm;
       tm->lpp[i]->proc_index = omp_get_thread_num();
@@ -171,10 +170,8 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    //The master thread isn't used unless there is only one thread
    tm->lp.free_num = MAX(par->max_active_nodes-1, 1);
    for (i = 0; i < par->max_active_nodes; i++){
-      if (termcodes[i] < 0){
-	 int tmp = termcodes[i];
-	 FREE(termcodes);
-	 return(tmp);
+      if (tm->termcodes[i] < 0){
+	 return(tm->termcodes[i]);
       }
    }
 #else
@@ -245,7 +242,6 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
     * Receive the root node and send out initial data to the LP processes
    \*------------------------------------------------------------------------*/
    
-   FREE(termcodes);
    if (tm->par.warm_start){
       if (!tm->rootnode){
 	 if (!(f = fopen(tm->par.warm_start_tree_file_name, "r"))){
@@ -338,6 +334,7 @@ int solve(tm_prob *tm)
 #else
       int i, ret, thread_num = 0;
 #endif
+      tm->termcodes[thread_num] = TM_UNFINISHED;
       then  = wall_clock(NULL);
       then2 = wall_clock(NULL);
       then3 = wall_clock(NULL);
@@ -424,35 +421,42 @@ int solve(tm_prob *tm)
 #endif
 
 	    ret = process_chain(tm->lpp[thread_num]); 
-#pragma omp critical (setting_termcode)
+
 	    switch(ret){
 
 	     case FUNCTION_TERMINATED_NORMALLY:
 	       break;
 	       
 	     case ERROR__NO_BRANCHING_CANDIDATE:
+#pragma omp critical (setting_termcode)
 	       tm->termcode = TM_ERROR__NO_BRANCHING_CANDIDATE;
 	       break;
 	       
 	     case ERROR__ILLEGAL_RETURN_CODE:
+#pragma omp critical (setting_termcode)
 	       tm->termcode = TM_ERROR__ILLEGAL_RETURN_CODE;
 	       break;
 	       
 	     case ERROR__NUMERICAL_INSTABILITY:
+#pragma omp critical (setting_termcode)
 	       tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
 	       break;
 	       
 	     case ERROR__COMM_ERROR:
+#pragma omp critical (setting_termcode)
 	       tm->termcode = TM_ERROR__COMM_ERROR;
 	       
 	     case ERROR__USER:
+#pragma omp critical (setting_termcode)
 	       tm->termcode = TM_ERROR__USER;
 	       break;
 
 	     case ERROR__DUAL_INFEASIBLE:
 	       if(tm->lpp[thread_num]->bc_index < 1 ) {		  
+#pragma omp critical (setting_termcode)
 		  tm->termcode = TM_UNBOUNDED;
 	       }else{
+#pragma omp critical (setting_termcode)
 		  tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
 	       }
 	       break;	       
@@ -470,50 +474,53 @@ int solve(tm_prob *tm)
 	    tm->termcode = TM_SIGNAL_CAUGHT;
 	    c_count = 0;
 	 }
- }
-#pragma omp critical (setting_status)
- {
-         if (tm->termcode == TM_UNFINISHED){
-	    if (tm->par.time_limit >= 0.0 &&
-		wall_clock(NULL) - start_time > tm->par.time_limit){
-	       tm->termcode = TM_TIME_LIMIT_EXCEEDED;
-	    }else if (tm->par.node_limit >= 0 &&
-		      tm->stat.analyzed >= tm->par.node_limit){
-	       if (tm->active_node_num + tm->samephase_candnum > 0){
-		  tm->termcode = TM_NODE_LIMIT_EXCEEDED;
+}
+
+         if (tm->par.time_limit >= 0.0 &&
+	     wall_clock(NULL) - start_time > tm->par.time_limit){
+	    tm->termcodes[thread_num] = TM_TIME_LIMIT_EXCEEDED;
+	 }else if (tm->par.node_limit >= 0 &&
+		   tm->stat.analyzed >= tm->par.node_limit){
+	    if (tm->active_node_num + tm->samephase_candnum > 0){
+	       tm->termcode = tm->termcodes[thread_num] = TM_NODE_LIMIT_EXCEEDED;
+	    }else{
+	       tm->termcodes[thread_num] = TM_FINISHED;
+	    }
+	 }else if (tm->par.find_first_feasible && tm->has_ub && tm->lp_stat.ip_sols){
+	    tm->termcodes[thread_num] = TM_FINISHED;
+	 }else if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
+	    find_tree_lb(tm);
+	    if (d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) <= tm->par.gap_limit){
+	       if (tm->lb < tm->ub){
+		  tm->termcodes[thread_num] = TM_TARGET_GAP_ACHIEVED;
 	       }else{
-		  tm->termcode = TM_FINISHED;
-	       }
-	    }else if (tm->par.find_first_feasible && tm->has_ub && tm->lp_stat.ip_sols){
-	       tm->termcode = TM_FINISHED;
-	    }else if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
-	       find_tree_lb(tm);
-	       if (d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) <= tm->par.gap_limit){
-		  if (tm->lb < tm->ub){
-		     tm->termcode = TM_TARGET_GAP_ACHIEVED;
-		  }else{
-		     tm->termcode = TM_FINISHED;
-		  }
+		  tm->termcodes[thread_num] = TM_FINISHED;
 	       }
 	    }
 	 }
 	 if (tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit){
-	    tm->termcode = TM_ITERATION_LIMIT_EXCEEDED;
+	    tm->termcodes[thread_num] = TM_ITERATION_LIMIT_EXCEEDED;
 	 }
-}
+
+         if (tm->termcodes[thread_num] != TM_UNFINISHED){
+#pragma omp critical (setting_status)
+	    tm->termcode = tm->termcodes[thread_num];
+	    break;
+	 }
 
          if (tm->termcode != TM_UNFINISHED){
+	    tm->termcodes[thread_num] = tm->termcode;
 	    break;
 	 }
 	 
-#pragma omp critical (setting_termcode)
 	 if (i == NEW_NODE__ERROR){
-	    tm->termcode = SOMETHING_DIED;
+#pragma omp critical (setting_status)
+	    tm->termcode = tm->termcodes[thread_num] = SOMETHING_DIED;
 	 }
 
-         if (tm->samephase_candnum + tm->active_node_num == 0 &&
+         if (tm->samephase_candnum == 0 && tm->active_node_num == 0 &&
 	     tm->stat.analyzed > 0){
-	    tm->termcode = TM_FINISHED;
+	    tm->termcodes[thread_num] = TM_FINISHED;
 	    break;
 	 }
 	 
@@ -558,11 +565,30 @@ int solve(tm_prob *tm)
       }
 }
 
-      if(tm->termcode == TM_UNBOUNDED) break;
+      if (tm->termcode == TM_UNBOUNDED){
+	 break;
+      }
 
-      if (tm->samephase_candnum + tm->active_node_num == 0 &&
+      if (tm->samephase_candnum == 0 && tm->active_node_num == 0 &&
 	  tm->stat.analyzed > 0){
-	 tm->termcode = TM_FINISHED;
+	 int ii = tm->par.max_active_nodes;
+        for (ii = 1; ii < tm->par.max_active_nodes; ii++){
+	   if (tm->termcodes[ii]  == TM_UNFINISHED){
+	      break;
+	   }
+	}
+	if (ii == tm->par.max_active_nodes){
+#pragma omp critical (setting_termcode)
+	   tm->termcode = TM_FINISHED;
+	}else{
+	   if (now - then2 > timeout2){
+	      if(tm->par.verbosity >=0 ){
+		 printf("Waiting for all threads to exit...");
+		 print_tree_status(tm);
+	      }
+	      then2 = now;
+	   }
+	}
       }
 
       if (tm->nextphase_candnum == 0)
@@ -719,7 +745,12 @@ void print_tree_status(tm_prob *tm)
        printf("%9s ","Mem(MB)");
 #endif
        printf("%10s ","Done");
-       printf("%10s ","Left");
+#ifdef _OPENMP
+       if (tm->par.max_active_nodes > 1){
+	  printf("%10s ","Active");
+       }
+#endif
+       printf("%10s ","Queued");
        if (tm->obj_sense == SYM_MAXIMIZE) {
 	 printf("%19s ","UB");
 	 printf("%19s ","LB");
@@ -736,7 +767,12 @@ void print_tree_status(tm_prob *tm)
      printf("%9.2f ", vsize_in_mb);
 #endif
      printf("%10i ", tm->stat.analyzed);
-     printf("%10i ", tm->samephase_candnum+tm->active_node_num);     
+#ifdef _OPENMP
+     if (tm->par.max_active_nodes > 1){
+	printf("%10i ", tm->active_node_num);
+     }
+#endif
+     printf("%10i ", tm->samephase_candnum);     
      find_tree_lb(tm);
      if (tm->lb > -SYM_INFINITY) {
        if (tm->obj_sense == SYM_MAXIMIZE) {
@@ -1057,19 +1093,24 @@ bc_node *del_best_node(tm_prob *tm)
 
 void insert_new_node(tm_prob *tm, bc_node *node)
 {
+   if (tm->termcode == TM_UNFINISHED){
+      if (node->node_status == NODE_STATUS__TIME_LIMIT){
+#pragma omp critical (setting_termcode)
+	 tm->termcode = TM_TIME_LIMIT_EXCEEDED;
+	 tm->termcodes[omp_get_thread_num()] = TM_TIME_LIMIT_EXCEEDED;
+      }else if (node->node_status == NODE_STATUS__ITERATION_LIMIT){
+#pragma omp critical (setting_termcode)
+	 tm->termcode = TM_ITERATION_LIMIT_EXCEEDED;
+	 tm->termcodes[omp_get_thread_num()] = TM_ITERATION_LIMIT_EXCEEDED;
+      }
+   }
+  
+#pragma omp critical (tree_update)
+{
    int pos, ch, size = tm->samephase_candnum;
    bc_node **list;
    int rule = tm->par.node_selection_rule;
 
-#pragma omp critical (setting_status)
-   if (tm->termcode == TM_UNFINISHED){
-      if (node->node_status == NODE_STATUS__TIME_LIMIT){
-	 tm->termcode = TM_TIME_LIMIT_EXCEEDED;
-      }else if (node->node_status == NODE_STATUS__ITERATION_LIMIT){
-	 tm->termcode = TM_ITERATION_LIMIT_EXCEEDED;
-      }
-   }
-  
    tm->samephase_candnum = pos = ++size;
 
    if (tm->par.verbosity > 10)
@@ -1090,6 +1131,8 @@ void insert_new_node(tm_prob *tm, bc_node *node)
       }
    }
    list[pos] = node;
+} /* End critical Region */
+
 }
 
 /*===========================================================================*/
@@ -1608,7 +1651,6 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       }else{
 	 /* it will be processed in this phase (==> insert it if not kept) */
 	 if (*keep != i || dive == DO_NOT_DIVE){
-#pragma omp critical (tree_update)
 	    insert_new_node(tm, child);
 	    np_cp++;
 	    np_sp++;
@@ -3220,7 +3262,6 @@ int read_node(tm_prob *tm, bc_node *node, FILE *f, int **children)
       break;
     case NODE_STATUS__WARM_STARTED:
     case NODE_STATUS__CANDIDATE:
-#pragma omp critical (tree_update)
       insert_new_node(tm, node);
       break;
    }
@@ -3531,6 +3572,7 @@ void free_tm(tm_prob *tm)
    FREE(tm->active_nodes);
    FREE(tm->samephase_cand);
    FREE(tm->nextphase_cand);
+   FREE(tm->termcodes);
 
 #ifndef COMPILE_IN_TM
    /* Go over the tree and free the nodes */

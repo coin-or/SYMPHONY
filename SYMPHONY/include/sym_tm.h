@@ -66,6 +66,7 @@ typedef struct TM_PROB{
    char            obj_sense;  /* objective sense*/
    double          ub_estimate;
    int             termcode;
+   int            *termcodes;
    process_set     lp;
    process_set     cg;
    process_set     cp;

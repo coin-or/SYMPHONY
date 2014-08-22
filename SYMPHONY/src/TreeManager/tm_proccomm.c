@@ -708,7 +708,6 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
       n->node_status = (node_type == TIME_LIMIT ?
 			NODE_STATUS__TIME_LIMIT:NODE_STATUS__ITERATION_LIMIT);
-#pragma omp critical (tree_update)
       insert_new_node(tm, n);
       if (!repricing)
 	 return;

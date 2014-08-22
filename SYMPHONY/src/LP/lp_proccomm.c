@@ -654,7 +654,6 @@ void send_node_desc(lp_prob *p, int node_type)
       n->node_status = (node_type == TIME_LIMIT ?
 			NODE_STATUS__TIME_LIMIT:NODE_STATUS__ITERATION_LIMIT);
       n->lower_bound = lp_data->objval;
-#pragma omp critical (tree_update)
       insert_new_node(tm, n);
       if (!repricing)
 	 return;
@@ -853,7 +852,6 @@ void send_node_desc(lp_prob *p, int node_type)
 	    n->parent = NULL;
 	    */
 	 n->node_status = NODE_STATUS__ROOT;
-#pragma omp critical (tree_update)
 	 insert_new_node(tm, n);
 	 break;
       }
