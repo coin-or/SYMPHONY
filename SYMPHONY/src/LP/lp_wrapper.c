@@ -487,6 +487,7 @@ int create_subproblem_u(lp_prob *p)
    rhs = lp_data_mip->rhs;
    rngval = lp_data_mip->rngval;
    sense = lp_data_mip->sense;
+   assert(bcutnum == p->mip->m);
    for (i = bcutnum - 1; i >= 0; i--){
       row = rows + i;
       cut = row->cut;
@@ -894,7 +895,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 
    double t_lb = p->lp_data->objval;   
    if((p->tm->samephase_candnum > 1 || p->tm->active_node_num > 1)){      
-      find_tree_lb(p->tm);
+      //find_tree_lb(p->tm);
       t_lb = MIN(t_lb, p->tm->lb);
    } 
 
