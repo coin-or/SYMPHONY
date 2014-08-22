@@ -253,6 +253,8 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
    int *cstat = lp_data->tmp.i1;
    int *rstat = lp_data->tmp.i2;
+
+   get_basis(lp_data, cstat, rstat);
       
    if (should_use_rel_br==TRUE) {
 
@@ -715,8 +717,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	
 	if (should_use_hot_starts) {
 	  mark_hotstart(lp_data);
-	}else{
-	  get_basis(lp_data, cstat, rstat);
 	}
       }
 
@@ -1488,8 +1488,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
       /* Set the iteration limit */
       if (should_use_hot_starts) {
 	 mark_hotstart(lp_data);
-      }else{
-	 get_basis(lp_data, cstat, rstat);
       }
       
       if (p->par.max_presolve_iter > 0) {
