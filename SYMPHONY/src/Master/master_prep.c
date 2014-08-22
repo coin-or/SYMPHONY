@@ -118,9 +118,7 @@ int prep_update_rootdesc(sym_environment *env)
    int i, user_size = env->rootdesc->uind.size;// uind = 0;
    int *user_ind = env->rootdesc->uind.list;
    
-   if (user_size == env->mip->n){
-      return PREP_UNMODIFIED;
-   } else {
+   if (user_size != env->mip->n){
       for (i = 0; i < env->mip->n; i++){
 	 user_ind[i] = i;
       }

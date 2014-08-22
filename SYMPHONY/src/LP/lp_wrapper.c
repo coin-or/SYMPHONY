@@ -894,7 +894,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    }
 
    double t_lb = p->lp_data->objval;   
-   if((p->tm->samephase_candnum > 1 || p->tm->active_node_num > 1)){      
+   if(p->tm->stat.analyzed > 1){      
       //find_tree_lb(p->tm);
       t_lb = MIN(t_lb, p->tm->lb);
    } 
