@@ -409,25 +409,31 @@ int fathom_branch(lp_prob *p)
 	    return(FUNCTION_TERMINATED_ABNORMALLY);
 	 }
        case LP_ABANDONED:
-	 printf("####### Unexpected termcode: %i \n", termcode);
+	 if (!p->tm->par.rs_mode_enabled){
+	    printf("####### Unexpected termcode: %i \n", termcode);
+	 }
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
-	    printf("####### Trying to recover by resolving from scratch...\n");
+	    if (!p->tm->par.rs_mode_enabled){
+	       printf("####### Trying to recover by resolving from scratch...\n");
+	    }
 	    continue;
 	 }else{
-	    char name[50] = "";
-	    printf("####### Recovery failed. %s%s",
-		   "LP solver is having numerical difficulties :(.\n",
-		   "####### Dumping current LP to MPS file and exiting.\n\n");
-	    sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
-	    write_mps(lp_data, name);
+	    if (!p->tm->par.rs_mode_enabled){   
+	       char name[50] = "";
+	       printf("####### Recovery failed. %s%s",
+		      "LP solver is having numerical difficulties :(.\n",
+		      "####### Dumping current LP to MPS file and exiting.\n\n");
+	       sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
+	       write_mps(lp_data, name);
+	    }
 	    return(ERROR__NUMERICAL_INSTABILITY);
 	 }
 
        case LP_D_UNBOUNDED: /* the primal problem is infeasible */
        case LP_D_OBJLIM:
        case LP_OPTIMAL:
-	 if (num_errors == 1){
+	 if (num_errors == 1 && !p->tm->par.rs_mode_enabled){
 	    printf("####### Recovery succeeded! Continuing with node...\n\n");
 	    num_errors = 0;
 	 }
@@ -668,8 +674,8 @@ int fathom_branch(lp_prob *p)
       char gap_limit_reached = FALSE;
       if(p->has_ub && p->tm->par.gap_limit >= 0.0 && 
 	 (p->tm->samephase_candnum > 1 || p->tm->active_node_num > 1)){
-	 find_tree_lb(p->tm);	
-	 if (d_gap(p->ub, MIN(p->tm->lb, lp_data->objval), p->mip->obj_offset, p->mip->obj_sense) <= p->tm->par.gap_limit){
+	 //find_tree_lb(p->tm);	
+	 if (d_gap(p->tm->ub, MIN(p->tm->lb, lp_data->objval), p->mip->obj_offset, p->mip->obj_sense) <= p->tm->par.gap_limit){
 	    gap_limit_reached = TRUE;
 	 }
       }
