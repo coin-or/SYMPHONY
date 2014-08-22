@@ -4528,8 +4528,11 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
     gap_limit = MAX(2.5, MIN(dual_gap/4, 10.0));
     if(c_num) gap_limit = MAX(4.0, MIN(dual_gap/2, 10.0));
   }
-  
-  double real_gap_limit = MIN(gap_limit, (obj_ub + p->mip->obj_offset)*gap_limit/(obj_ub - sym_fixed_offset));
+
+  double real_gap_limit = gap_limit;
+  if (p->has_ub || *solutionValue < SYM_INFINITY/2){
+     real_gap_limit = MIN(gap_limit, (obj_ub + p->mip->obj_offset)*gap_limit/(obj_ub - sym_fixed_offset));
+  }
   
   sym_set_int_param(env, "node_limit", node_limit);
   sym_set_dbl_param(env, "gap_limit", real_gap_limit); 
