@@ -1864,9 +1864,9 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	 break;
        case VBC_PRUNED_FATHOMED:
 	 sprintf(reason,"%s","fathomed");
-	 sprintf(reason,"%s %i %i",reason, node->bc_index+1,
-		 node->parent->bc_index+1);
+	 sprintf(reason,"%s %i",reason, node->bc_index+1);
 	 if (node->bc_index>0) {
+	    sprintf(reason," %i", node->parent->bc_index+1);
 	    if (node->parent->children[0]==node) {
 	       branch_dir = node->parent->bobj.sense[0];
 	       /*branch_dir = 'L';*/
@@ -1877,6 +1877,8 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	    if (branch_dir == 'G') {
 	       branch_dir = 'R';
 	    }
+	 }else{
+	    sprintf(reason," 0");
 	 }
 	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
 	 break;
