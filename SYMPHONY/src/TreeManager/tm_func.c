@@ -165,7 +165,11 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 		tm->termcodes[i], i); 
       }
       tm->lpp[i]->tm = tm;
+#ifdef _OPENMP
       tm->lpp[i]->proc_index = omp_get_thread_num();
+#else
+      tm->lpp[i]->proc_index = 0;
+#endif
    }
    //The master thread isn't used unless there is only one thread
    tm->lp.free_num = MAX(par->max_active_nodes-1, 1);
@@ -424,35 +428,35 @@ int solve(tm_prob *tm)
 	       break;
 	       
 	     case ERROR__NO_BRANCHING_CANDIDATE:
-#pragma omp critical (setting_termcode)
+#pragma omp atomic write
 	       tm->termcode = TM_ERROR__NO_BRANCHING_CANDIDATE;
 	       break;
 	       
 	     case ERROR__ILLEGAL_RETURN_CODE:
-#pragma omp critical (setting_termcode)
+#pragma omp atomic write
 	       tm->termcode = TM_ERROR__ILLEGAL_RETURN_CODE;
 	       break;
 	       
 	     case ERROR__NUMERICAL_INSTABILITY:
-#pragma omp critical (setting_termcode)
+#pragma omp atomic write
 	       tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
 	       break;
 	       
 	     case ERROR__COMM_ERROR:
-#pragma omp critical (setting_termcode)
+#pragma omp atomic write
 	       tm->termcode = TM_ERROR__COMM_ERROR;
 	       
 	     case ERROR__USER:
-#pragma omp critical (setting_termcode)
+#pragma omp atomic write
 	       tm->termcode = TM_ERROR__USER;
 	       break;
 
 	     case ERROR__DUAL_INFEASIBLE:
 	       if(tm->lpp[thread_num]->bc_index < 1 ) {		  
-#pragma omp critical (setting_termcode)
+#pragma omp atomic write
 		  tm->termcode = TM_UNBOUNDED;
 	       }else{
-#pragma omp critical (setting_termcode)
+#pragma omp atomic write
 		  tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
 	       }
 	       break;	       
@@ -499,7 +503,7 @@ int solve(tm_prob *tm)
 	 }
 
          if (tm->termcodes[thread_num] != TM_UNFINISHED){
-#pragma omp critical (setting_status)
+#pragma omp atomic write
 	    tm->termcode = tm->termcodes[thread_num];
 	    break;
 	 }
@@ -510,7 +514,7 @@ int solve(tm_prob *tm)
 	 }
 	 
 	 if (i == NEW_NODE__ERROR){
-#pragma omp critical (setting_status)
+#pragma omp atomic write
 	    tm->termcode = tm->termcodes[thread_num] = SOMETHING_DIED;
 	 }
 
@@ -574,7 +578,7 @@ int solve(tm_prob *tm)
 	   }
 	}
 	if (ii == tm->par.max_active_nodes){
-#pragma omp critical (setting_termcode)
+#pragma omp atomic write
 	   tm->termcode = TM_FINISHED;
 	}else{
 	   if (now - then2 > timeout2){
@@ -1098,13 +1102,21 @@ void insert_new_node(tm_prob *tm, bc_node *node)
 {
    if (tm->termcode == TM_UNFINISHED){
       if (node->node_status == NODE_STATUS__TIME_LIMIT){
-#pragma omp critical (setting_termcode)
+#pragma omp atomic write
 	 tm->termcode = TM_TIME_LIMIT_EXCEEDED;
+#ifdef _OPENMP
 	 tm->termcodes[omp_get_thread_num()] = TM_TIME_LIMIT_EXCEEDED;
+#else
+	 tm->termcodes[0] = TM_TIME_LIMIT_EXCEEDED;
+#endif
       }else if (node->node_status == NODE_STATUS__ITERATION_LIMIT){
-#pragma omp critical (setting_termcode)
+#pragma omp atomic write
 	 tm->termcode = TM_ITERATION_LIMIT_EXCEEDED;
+#ifdef _OPENMP
 	 tm->termcodes[omp_get_thread_num()] = TM_ITERATION_LIMIT_EXCEEDED;
+#else
+	 tm->termcodes[0] = TM_ITERATION_LIMIT_EXCEEDED;
+#endif
       }
    }
   
@@ -1831,9 +1843,9 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
       switch (category) {
        case VBC_PRUNED_INFEASIBLE:
 	 sprintf(reason,"%s","infeasible");
-	 sprintf(reason,"%s %i %i",reason, node->bc_index+1,
-	       node->parent->bc_index+1);
+	 sprintf(reason,"%s %i",reason, node->bc_index+1);
 	 if (node->bc_index>0) {
+	    sprintf(reason," %i", node->parent->bc_index+1);
 	    if (node->parent->children[0]==node) {
 	       branch_dir = node->parent->bobj.sense[0];
 	       /*branch_dir = 'L';*/
@@ -1844,7 +1856,10 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	    if (branch_dir == 'G') {
 	       branch_dir = 'R';
 	    }
+	 }else{
+	    sprintf(reason," 0");
 	 }
+	    
 	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
 	 break;
        case VBC_PRUNED_FATHOMED:
