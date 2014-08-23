@@ -188,7 +188,9 @@ int process_chain(lp_prob *p)
       termcode = fathom_branch(p);
 
 #ifdef COMPILE_IN_LP
+#pragma omp atomic
       p->tm->stat.chains++;
+#pragma omp atomic
       p->tm->active_node_num--;
 #ifdef _OPENMP
 #pragma omp critical (tree_update)
@@ -334,6 +336,7 @@ int fathom_branch(lp_prob *p)
       p->lp_stat.lp_node_calls++;
 
 #ifdef COMPILE_IN_LP
+#pragma omp atomic
       p->tm->lp_stat.lp_iter_num += iterd;
 #endif
 

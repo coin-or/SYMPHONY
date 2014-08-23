@@ -355,11 +355,7 @@ int solve(tm_prob *tm)
 		     tm->lp_stat.ip_sols > 0) &&
 		!(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit) &&
 		c_count <= 0){
-	    if (tm->samephase_candnum > 0
-		&& (thread_num != 0 ||
-		    tm->par.max_active_nodes == 1)
-		){
-#pragma omp critical (tree_update)
+	    if (tm->samephase_candnum > 0 && (thread_num != 0 || tm->par.max_active_nodes == 1)){
 	       i = start_node(tm, thread_num);
 	    }else{
 	       i = NEW_NODE__NONE;
@@ -921,7 +917,9 @@ int start_node(tm_prob *tm, int thread_num)
 
    get_next = TRUE;
    while (get_next){
-      if ((best_node = del_best_node(tm)) == NULL)
+#pragma omp critical (tree_update)
+      best_node = del_best_node(tm);
+      if (best_node == NULL)
 	 return(NEW_NODE__NONE);
 
       if (best_node->node_status == NODE_STATUS__WARM_STARTED){
@@ -986,6 +984,7 @@ int start_node(tm_prob *tm, int thread_num)
 		   purge_pruned_nodes(tm, best_node, VBC_PRUNED);
 		}
 #else
+#pragma omp critical (tree_update)
 		   purge_pruned_nodes(tm, best_node, VBC_PRUNED);
 #endif
 	     }
@@ -999,10 +998,12 @@ int start_node(tm_prob *tm, int thread_num)
 
        default:
 	 /* i.e., phase == 0 and nf_status != NF_CHECK_NOTHING */
+#pragma omp critical (tree_update)
 	  if (!(tm->par.colgen_strat[0] & FATHOM__GENERATE_COLS__RESOLVE)){
 	     REALLOC(tm->nextphase_cand, bc_node *, tm->nextphase_cand_size,
 		     tm->nextphase_candnum+1, BB_BUNCH);
-	     tm->nextphase_cand[tm->nextphase_candnum++] = best_node;
+	     tm->nextphase_candnum++;
+	     tm->nextphase_cand[tm->nextphase_candnum] = best_node;
 	  }else{
 	     get_next = FALSE;
 	  }
@@ -1027,10 +1028,12 @@ int start_node(tm_prob *tm, int thread_num)
 
    /* It's time to put together the node and send it out */
    tm->active_nodes[lp_ind] = best_node;
+#pragma omp atomic
    tm->active_node_num++;
 
    send_active_node(tm,best_node,tm->par.colgen_strat[tm->phase],thread_num);
 
+#pragma omp atomic
    tm->comp_times.start_node += wall_clock(NULL) - time;
 
    return(NEW_NODE__STARTED);
