@@ -19,7 +19,9 @@
 #include <memory.h>
 #include <math.h>
 
+#ifdef _OPENMP
 #include "omp.h"
+#endif
 
 #include "sym_lp.h"
 #include "sym_master.h" 
