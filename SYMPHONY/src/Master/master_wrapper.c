@@ -543,7 +543,7 @@ int send_lp_data_u(sym_environment *env, int sender)
 	 has_colnames = TRUE;
 	 send_char_array(&has_colnames, 1);
 	 for (i = 0; i < mip->n; i++){
-	    send_char_array(mip->colname[i], 8);
+	    send_char_array(mip->colname[i], MAX_NAME_SIZE);
 	 }
       }else{
 	 send_char_array(&has_colnames, 1);

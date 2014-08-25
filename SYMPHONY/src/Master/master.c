@@ -6422,14 +6422,22 @@ int sym_test(sym_environment *env, int *test_status)
 {
 
   int termcode = 0, verbosity;
-  int i, file_num = 12;
-  char mps_files[12][MAX_FILE_NAME_LENGTH +1] = {
-    "air03", "dcmulti", "egout", "flugpl", "khb05250", "l152lav", 
-    "lseu", "mod010", "p0033", "p0201", "stein27", "vpm1" };
+  int i, file_num = 45;
+  char mps_files[45][MAX_FILE_NAME_LENGTH +1] = {
+     "air03", "air04", "air05", "bell3a", "blend2", "cap6000", "dcmulti", "dsbmip",
+     "egout", "enigma", "fiber", "fixnet6", "flugpl", "gen", "gesa2", "gesa2_o",
+     "gesa3", "gesa3_o", "gt2", "khb05250", "l152lav", "lseu", "misc03", "misc06",
+     "misc07", "mitre", "mod008", "mod010", "mod011", "nw04", "p0033", "p0201",
+     "p0282", "p0548", "p2756", "pp08a", "pp08aCUTS", "qnet1", "qnet1_o", "rentacar",
+     "rgn", "stein27", "stein45", "vpm1", "vpm2" };
   
-  double sol[12] = {340160, 188182, 568.101, 1201500,
-			  106940226, 4722, 1120, 6548, 
-			  3089, 7615, 18, 20};
+  double sol[45] = {340160, 56137, 26374, 878430.316, 7.599, -2451377, 188182,
+		    -305.198, 568.10, 0, 405935.18, 3983, 1201500, 112313.363,
+		    25779856.371, 25779856.371, 27991042.647, 27991042.647, 21166,
+		    106940226, 4722, 1120, 3360, 12850.86, 2810, 115155, 307,
+		    6548, -54558535, 16862, 3089, 7615, 258411, 8691, 3124, 7350,
+		    7350, 16029.693, 16029.693, 30356760.98, 82.20, 30, 18, 20,
+		    13.75};
 
   char *mps_dir = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
   char *infile = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));

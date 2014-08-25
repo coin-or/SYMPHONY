@@ -428,35 +428,35 @@ int solve(tm_prob *tm)
 	       break;
 	       
 	     case ERROR__NO_BRANCHING_CANDIDATE:
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 	       tm->termcode = TM_ERROR__NO_BRANCHING_CANDIDATE;
 	       break;
 	       
 	     case ERROR__ILLEGAL_RETURN_CODE:
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 	       tm->termcode = TM_ERROR__ILLEGAL_RETURN_CODE;
 	       break;
 	       
 	     case ERROR__NUMERICAL_INSTABILITY:
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 	       tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
 	       break;
 	       
 	     case ERROR__COMM_ERROR:
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 	       tm->termcode = TM_ERROR__COMM_ERROR;
 	       
 	     case ERROR__USER:
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 	       tm->termcode = TM_ERROR__USER;
 	       break;
 
 	     case ERROR__DUAL_INFEASIBLE:
 	       if(tm->lpp[thread_num]->bc_index < 1 ) {		  
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 		  tm->termcode = TM_UNBOUNDED;
 	       }else{
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 		  tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
 	       }
 	       break;	       
@@ -503,7 +503,7 @@ int solve(tm_prob *tm)
 	 }
 
          if (tm->termcodes[thread_num] != TM_UNFINISHED){
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 	    tm->termcode = tm->termcodes[thread_num];
 	    break;
 	 }
@@ -514,7 +514,7 @@ int solve(tm_prob *tm)
 	 }
 	 
 	 if (i == NEW_NODE__ERROR){
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 	    tm->termcode = tm->termcodes[thread_num] = SOMETHING_DIED;
 	 }
 
@@ -578,7 +578,7 @@ int solve(tm_prob *tm)
 	   }
 	}
 	if (ii == tm->par.max_active_nodes){
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 	   tm->termcode = TM_FINISHED;
 	}else{
 	   if (now - then2 > timeout2){
@@ -1032,12 +1032,12 @@ int start_node(tm_prob *tm, int thread_num)
 
    /* It's time to put together the node and send it out */
    tm->active_nodes[lp_ind] = best_node;
-#pragma omp atomic
+OPENMP_ATOMIC_UPDATE
    tm->active_node_num++;
 
    send_active_node(tm,best_node,tm->par.colgen_strat[tm->phase],thread_num);
 
-#pragma omp atomic
+OPENMP_ATOMIC_UPDATE
    tm->comp_times.start_node += wall_clock(NULL) - time;
 
    return(NEW_NODE__STARTED);
@@ -1102,7 +1102,7 @@ void insert_new_node(tm_prob *tm, bc_node *node)
 {
    if (tm->termcode == TM_UNFINISHED){
       if (node->node_status == NODE_STATUS__TIME_LIMIT){
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 	 tm->termcode = TM_TIME_LIMIT_EXCEEDED;
 #ifdef _OPENMP
 	 tm->termcodes[omp_get_thread_num()] = TM_TIME_LIMIT_EXCEEDED;
@@ -1110,7 +1110,7 @@ void insert_new_node(tm_prob *tm, bc_node *node)
 	 tm->termcodes[0] = TM_TIME_LIMIT_EXCEEDED;
 #endif
       }else if (node->node_status == NODE_STATUS__ITERATION_LIMIT){
-#pragma omp atomic write
+OPENMP_ATOMIC_WRITE
 	 tm->termcode = TM_ITERATION_LIMIT_EXCEEDED;
 #ifdef _OPENMP
 	 tm->termcodes[omp_get_thread_num()] = TM_ITERATION_LIMIT_EXCEEDED;
@@ -2081,10 +2081,12 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
    }else{
       changed_bound = FALSE;
    }
+#ifdef COMPILE_IN_LP
    for (i = 0; i < tm->par.max_active_nodes; i ++){
       tm->lpp[i]->has_ub = tm->has_ub;
       tm->lpp[i]->ub = tm->ub;
    }
+#endif
 }
    if (!changed_bound){
       return;
