@@ -779,22 +779,31 @@ AC_ARG_ENABLE([openmp],
    *) AC_MSG_ERROR(Bad value ${enableval} for --enable-openmp)
    ;;
 esac],
-[sym_openmp=true])
+[sym_openmp=auto])
 
-if test $sym_openmp = true; then 
-   AC_MSG_CHECKING([G++ version])
-   fopenmp_version=4.2
-   gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
-   get_gcc_version=`$CXX -dumpversion`
-   gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
-   major_gcc_version=`echo ${gcc_version:0:3}`
-   AC_MSG_RESULT([$get_gcc_version])
-   if test ${major_gcc_version} -lt ${gcc_required_version}; then
-       AC_MSG_ERROR(OpenMP feautures are supported by G++ 4.2.0 or higher.)
-   SYMPDEFS="$SYMPDEFS -D_OPENMP"
-   SYMDEFS="$SYMDEFS -D_OPENMP"
-   fi
-fi      
+if test $sym_openmp = auto; then 
+   case "$CXX" in
+     clang*) 
+       AC_MSG_ERROR(Apple clang does not support OpenMP.)
+       sym_openmp = false
+       ;;
+     cl* | *\cl* | */cl*)
+       sym_openmp = true
+       ;;
+     gcc*)
+	AC_MSG_CHECKING([Checking whether GCC supports OpenMP])
+   	fopenmp_version=4.2
+   	gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
+   	get_gcc_version=`$CXX -dumpversion`
+   	gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
+   	major_gcc_version=`echo ${gcc_version:0:3}`
+   	AC_MSG_RESULT([$get_gcc_version])
+   	if test ${major_gcc_version} -lt ${gcc_required_version}; then
+       	   AC_MSG_ERROR(OpenMP feautures are supported by G++ 4.2.0 or higher.)
+        fi
+        ;;
+   esac
+fi
 
 AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
 
@@ -840,9 +849,17 @@ SYMAPPLDIR=`pwd`/Applications
 sym_use_cl=false
 CLLCFLAGS=
 case "$CXX" in
+  clang*) 
+     if test $sym_openmp = true; then
+         CXXFLAGS="$CXXFLAGS -fopenmp"
+     fi
+  ;; 
   cl* | *\cl* | */cl*)
      CLLCFLAGS=$CXXFLAGS
      CXXFLAGS="$CXXFLAGS -TP"
+     if test $sym_openmp = true; then
+         CXXFLAGS="$CXXFLAGS /openmp"
+     fi
   ;;
   g++* | *\g++* | */g++*)
      if test $sym_openmp = true; then
