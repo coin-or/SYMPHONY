@@ -1,4 +1,4 @@
-SYMPHONY Version 5.5.7 README
+SYMPHONY Version 5.6.0 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
@@ -17,6 +17,14 @@ http://www.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
+
+Release 5.6.0
+
+1. Major re-design of shared memory parallel mode for increased efficiency and stability.
+
+2. Fixes for distributed memory parallel version (PVM)
+
+3. Fixes for bicriteria version
 
 Release 5.5.7
 

@@ -21,6 +21,9 @@
 #ifdef __PVM__
 #include <pvmtev.h>
 #endif
+#ifdef _OPENMP
+#include "omp.h"
+#endif
 
 #include "symphony.h"
 #include "SymConfig.h"
@@ -208,7 +211,7 @@ int sym_set_defaults(sym_environment *env)
    tm_par->lp_debug = 0;
    tm_par->cg_debug = 0;
    tm_par->cp_debug = 0;
-   tm_par->max_active_nodes = 1;
+   tm_par->max_active_nodes = -1;
    tm_par->max_cp_num = 1;
    tm_par->lp_mach_num = 0;
    tm_par->lp_machs = NULL;
@@ -791,6 +794,19 @@ int sym_solve(sym_environment *env)
    base_desc *base = env->base;
 
 #ifdef _OPENMP
+   if (env->par.tm_par.max_active_nodes < 1){
+      if (!env->par.tm_par.rs_mode_enabled){
+	 env->par.tm_par.max_active_nodes = omp_get_num_procs();
+	 printf("Automatically setting number of threads to %d\n\n",
+		env->par.tm_par.max_active_nodes);
+      }else{
+	 env->par.tm_par.max_active_nodes = 1;
+      }
+   }
+   if (!env->par.tm_par.rs_mode_enabled){
+      omp_set_dynamic(FALSE);
+      omp_set_num_threads(env->par.tm_par.max_active_nodes);
+   }
    if (env->par.tm_par.max_active_nodes > 1){
       env->par.lp_par.should_use_rel_br = FALSE;
    }
