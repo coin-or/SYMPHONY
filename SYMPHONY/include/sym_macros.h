@@ -224,32 +224,4 @@ if ((termcode = f) < 0)                                                    \
 			 (1 << ((i) & BITS_PER_BYTE_LESS_ONE)))
 #endif
 
-#ifndef _MSC_VER
-#if _OPENMP >= 201107
-#define OPENMP_ATOMIC_WRITE _Pragma("omp atomic write")
-#else
-#define OPENMP_ATOMIC_WRITE _Pragma("omp critical (atomic_write)")
-#endif
-#else
-#if _OPENMP >= 201107
-#define OPENMP_ATOMIC_WRITE __pragma("omp atomic write")
-#else
-#define OPENMP_ATOMIC_WRITE __pragma("omp critical (atomic_write)")
-#endif
-#endif
-
-#ifndef _MSC_VER
-#if _OPENMP >= 201107
-#define OPENMP_ATOMIC_UPDATE _Pragma("omp atomic update")
-#else
-#define OPENMP_ATOMIC_UPDATE _Pragma("omp atomic")
-#endif
-#else
-#if _OPENMP >= 201107
-#define OPENMP_ATOMIC_UPDATE __pragma("omp atomic update")
-#else
-#define OPENMP_ATOMIC_UPDATE __pragma("omp atomic")
-#endif
-#endif
-
 #endif

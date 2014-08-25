@@ -42,8 +42,6 @@ int main(void)
    char first_node_rec = FALSE;
    int termcode;
 
-   sleep(30);
-   
    p = (lp_prob *) calloc(1, sizeof(lp_prob));
 
    p->start_time = wall_clock(NULL);

@@ -188,9 +188,9 @@ int process_chain(lp_prob *p)
       termcode = fathom_branch(p);
 
 #ifdef COMPILE_IN_LP
-OPENMP_ATOMIC_UPDATE
+#pragma omp atomic
       p->tm->stat.chains++;
-OPENMP_ATOMIC_UPDATE
+#pragma omp atomic
       p->tm->active_node_num--;
 #ifdef _OPENMP
 #pragma omp critical (tree_update)
@@ -231,10 +231,8 @@ int fathom_branch(lp_prob *p)
    double timeleft = 0.0;
    int iterleft = 0;
    const int verbosity = p->par.verbosity;
-   double now, then2, timeout2;
-   int rs_mode_enabled = FALSE;
+   double now, then2, timeout2; 
 #ifdef COMPILE_IN_LP
-   rs_mode_enabled = p->tm->par.rs_mode_enabled; 
    then2 = wall_clock(NULL);
    timeout2 = p->tm->par.status_interval;
 #endif   
@@ -295,7 +293,7 @@ int fathom_branch(lp_prob *p)
 
       // set itlim here if we are in restricted search heuristic
 
-      if(rs_mode_enabled &&
+      if(p->tm->par.rs_mode_enabled &&
 	 (iterleft = p->tm->par.rs_lp_iter_limit - p->tm->lp_stat.lp_iter_num) <= 0) {
          if (fathom(p, TRUE)){  //send in true for interrupted node
 	    return(FUNCTION_TERMINATED_NORMALLY);
@@ -338,7 +336,7 @@ int fathom_branch(lp_prob *p)
       p->lp_stat.lp_node_calls++;
 
 #ifdef COMPILE_IN_LP
-OPENMP_ATOMIC_UPDATE
+#pragma omp atomic
       p->tm->lp_stat.lp_iter_num += iterd;
 #endif
 
@@ -414,17 +412,17 @@ OPENMP_ATOMIC_UPDATE
 	    return(FUNCTION_TERMINATED_ABNORMALLY);
 	 }
        case LP_ABANDONED:
-	 if (!rs_mode_enabled){
+	 if (!p->tm->par.rs_mode_enabled){
 	    printf("####### Unexpected termcode: %i \n", termcode);
 	 }
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
-	    if (!rs_mode_enabled){
+	    if (!p->tm->par.rs_mode_enabled){
 	       printf("####### Trying to recover by resolving from scratch...\n");
 	    }
 	    continue;
 	 }else{
-	    if (!rs_mode_enabled){   
+	    if (!p->tm->par.rs_mode_enabled){   
 	       char name[50] = "";
 	       printf("####### Recovery failed. %s%s",
 		      "LP solver is having numerical difficulties :(.\n",
@@ -438,7 +436,7 @@ OPENMP_ATOMIC_UPDATE
        case LP_D_UNBOUNDED: /* the primal problem is infeasible */
        case LP_D_OBJLIM:
        case LP_OPTIMAL:
-	 if (num_errors == 1 && !rs_mode_enabled){
+	 if (num_errors == 1 && !p->tm->par.rs_mode_enabled){
 	    printf("####### Recovery succeeded! Continuing with node...\n\n");
 	    num_errors = 0;
 	 }

@@ -158,12 +158,8 @@ if COIN_HAS_SAMPLE
   unittestflags += -mpsDir=`$(CYGPATH_W) $(SAMPLE_DATA)`
 endif
 
-testFILES = air03 air04 air05 bell3a blend2 cap6000 dcmulti dsbmip \
-     egout enigma fiber fixnet6 flugpl gen gesa2 gesa2_o \
-     gesa3 gesa3_o gt2 khb05250 l152lav lseu misc03 misc06 \
-     misc07 mitre mod008 mod010 mod011 nw04 p0033 p0201 \
-     p0282 p0548 p2756 pp08a pp08aCUTS qnet1 qnet1_o rentacar \
-     rgn stein27 stein45 vpm1 vpm2
+testFILES = air03 dcmulti egout flugpl khb05250 l152lav \
+	lseu mod010 p0033 p0201 stein27 vpm1
 
 # by passing -miplib3Dir= we can overwrite using a default miplib3 path which would trigger the MIPLIB tests
 test: unitTest$(EXEEXT)

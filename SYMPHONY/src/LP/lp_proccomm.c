@@ -1040,7 +1040,7 @@ void send_node_desc(lp_prob *p, int node_type)
    ch = (char) node_type;
    send_char_array(&ch, 1);
    send_dbl_array(&lp_data->objval, 1);
-   if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
+   if (node_type == INTERRUPTED_NODE){
       send_msg(p->tree_manager, LP__NODE_DESCRIPTION);
       freebuf(s_bufid);
       return;
