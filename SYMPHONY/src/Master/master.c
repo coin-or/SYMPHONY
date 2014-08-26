@@ -793,24 +793,28 @@ int sym_solve(sym_environment *env)
    node_desc *rootdesc = env->rootdesc;
    base_desc *base = env->base;
 
-#ifdef _OPENMP
-   if (env->par.tm_par.max_active_nodes < 1){
+   if (env->par.tm_par.max_active_nodes < 0){
       if (!env->par.tm_par.rs_mode_enabled){
+#ifdef _OPENMP
 	 env->par.tm_par.max_active_nodes = omp_get_num_procs();
 	 printf("Automatically setting number of threads to %d\n\n",
 		env->par.tm_par.max_active_nodes);
+#else
+	 env->par.tm_par.max_active_nodes = 1;
+#endif
       }else{
 	 env->par.tm_par.max_active_nodes = 1;
       }
    }
+#ifdef _OPENMP
    if (!env->par.tm_par.rs_mode_enabled){
       omp_set_dynamic(FALSE);
       omp_set_num_threads(env->par.tm_par.max_active_nodes);
    }
+#endif
    if (env->par.tm_par.max_active_nodes > 1){
       env->par.lp_par.should_use_rel_br = FALSE;
    }
-#endif
    
    start_time = wall_clock(NULL);
 
