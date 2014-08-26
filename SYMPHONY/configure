@@ -28851,19 +28851,21 @@ else
 fi;
 
 if test $sym_openmp = auto; then
+   echo "$as_me:$LINENO: checking Checking whether compiler supports OpenMP" >&5
+echo $ECHO_N "checking Checking whether compiler supports OpenMP... $ECHO_C" >&6
    case "$CXX" in
      clang*)
-       { { echo "$as_me:$LINENO: error: Apple clang does not support OpenMP." >&5
-echo "$as_me: error: Apple clang does not support OpenMP." >&2;}
-   { (exit 1); exit 1; }; }
-       sym_openmp = false
+       echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+       sym_openmp=false
        ;;
      cl* | *\cl* | */cl*)
-       sym_openmp = true
+       echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+       sym_openmp=true
        ;;
      gcc*)
-	echo "$as_me:$LINENO: checking Checking whether GCC supports OpenMP" >&5
-echo $ECHO_N "checking Checking whether GCC supports OpenMP... $ECHO_C" >&6
+        sym_openmp = true
    	fopenmp_version=4.2
    	gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
    	get_gcc_version=`$CXX -dumpversion`
@@ -28872,10 +28874,14 @@ echo $ECHO_N "checking Checking whether GCC supports OpenMP... $ECHO_C" >&6
    	echo "$as_me:$LINENO: result: $get_gcc_version" >&5
 echo "${ECHO_T}$get_gcc_version" >&6
    	if test ${major_gcc_version} -lt ${gcc_required_version}; then
-       	   { { echo "$as_me:$LINENO: error: OpenMP feautures are supported by G++ 4.2.0 or higher." >&5
-echo "$as_me: error: OpenMP feautures are supported by G++ 4.2.0 or higher." >&2;}
-   { (exit 1); exit 1; }; }
-        fi
+       	   echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+           sym_openmp=false
+        else
+       	   echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+           sym_openmp=true
+	fi
         ;;
    esac
 fi
