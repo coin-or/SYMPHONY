@@ -69,7 +69,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\include;..\..\..\BuildTools\headers;..\..\..\CoinUtils\inc;..\..\..\CoinUtils\src;..\..\..\Osi\src\Osi;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Clp\src;..\..\..\Clp\src\OsiClp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SYMPHONY_BUILD;WIN32;_DEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <OpenMPSupport>false</OpenMPSupport>
+      <OpenMPSupport>true</OpenMPSupport>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
@@ -91,7 +91,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\include;..\..\..\BuildTools\headers;..\..\..\CoinUtils\inc;..\..\..\CoinUtils\src;..\..\..\Osi\src\Osi;..\..\..\Cgl\src;..\..\..\Cgl\src\CglClique;..\..\..\Cgl\src\CglFlowCover;..\..\..\Cgl\src\CglGomory;..\..\..\Cgl\src\CglKnapsackCover;..\..\..\Cgl\src\CglLandP;..\..\..\Cgl\src\CglLiftAndProject;..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\Cgl\src\CglOddHole;..\..\..\Cgl\src\CglProbing;..\..\..\Cgl\src\CglRedSplit;..\..\..\Cgl\src\CglSimpleRounding;..\..\..\Cgl\src\CglTwomir;..\..\..\Clp\src;..\..\..\Clp\src\OsiClp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SYMPHONY_BUILD;WIN32;_DEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <OpenMPSupport>false</OpenMPSupport>
+      <OpenMPSupport>true</OpenMPSupport>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
@@ -112,6 +112,7 @@
       <PreprocessorDefinitions>SYMPHONY_BUILD;WIN32;NDEBUG;_CONSOLE;INTEL;COMPILE_IN_CG;COMPILE_IN_CP;COMPILE_IN_LP;COMPILE_IN_TM;__OSI_CLP__;USE_CGL_CUTS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>
       </DebugInformationFormat>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -136,6 +137,7 @@
       <DebugInformationFormat>
       </DebugInformationFormat>
       <CompileAs>CompileAsCpp</CompileAs>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
