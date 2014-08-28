@@ -687,7 +687,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
 	 } else {
 	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+			       VBC_FEAS_SOL_FOUND : VBC_PRUNED);
 	 }
       }
       return;
@@ -888,10 +888,9 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	       vbc_node_pr_reason = VBC_PRUNED;
 	    }
 	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
-	 }
-	 else {
+	 } else {
 	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+			       VBC_FEAS_SOL_FOUND : VBC_PRUNED);
 	 }
       }
    }
