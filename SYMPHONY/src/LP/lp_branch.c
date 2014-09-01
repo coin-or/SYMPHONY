@@ -208,7 +208,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    p->comp_times.strong_branching += used_time(&p->tt);
 #pragma omp critical(cut_pool)
    send_cuts_to_pool(p, -1);
-   send_node_desc(p, NODE_BRANCHED_ON);
    p->comp_times.communication += used_time(&p->tt);
 
    /* Add all the branching cuts */
@@ -311,6 +310,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    *candidate = NULL;
 	    p->lp_stat.prep_nodes_pruned++;
 	    set_itlim(lp_data, -1); //both limits should be set for hotstarts
+	    p->comp_times.strong_branching += used_time(&p->tt);
+	    send_node_desc(p, INFEASIBLE_PRUNED);
+	    p->comp_times.communication += used_time(&p->tt);
 	    return (DO_NOT_BRANCH__FATHOMED);
 	 }else if(num_bnd_changes > 0){
 	    p->lp_stat.prep_bnd_changes += num_bnd_changes; 
@@ -1463,6 +1465,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    load_basis(lp_data, rstat, cstat);
 	 }
          set_itlim(lp_data, -1); //both limits should be set for hotstarts
+	 p->comp_times.strong_branching += used_time(&p->tt);
+	 send_node_desc(p, INFEASIBLE_PRUNED);
+	 p->comp_times.communication += used_time(&p->tt);
          return (DO_NOT_BRANCH__FATHOMED);
       }
 
@@ -1978,6 +1983,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
    *candidate = best_can;
    
+   p->comp_times.strong_branching += used_time(&p->tt);
+   send_node_desc(p, NODE_BRANCHED_ON);
+   p->comp_times.communication += used_time(&p->tt);
    return(DO_BRANCH);
 }
 
