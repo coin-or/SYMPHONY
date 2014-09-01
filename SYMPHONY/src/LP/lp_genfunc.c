@@ -190,12 +190,13 @@ int process_chain(lp_prob *p)
 #ifdef COMPILE_IN_LP
 OPENMP_ATOMIC_UPDATE
       p->tm->stat.chains++;
+#pragma omp critical (tree_update)
+{
 OPENMP_ATOMIC_UPDATE
       p->tm->active_node_num--;
-#ifdef _OPENMP
-#pragma omp critical (tree_update)
+      //This should be unnecessary, as it is also done in purge_pruned_nodes 
       p->tm->active_nodes[p->proc_index] = NULL;
-#endif
+}
       free_node_dependent(p);
 #else
       /* send_lp_is_free()  calls  free_node_dependent() */

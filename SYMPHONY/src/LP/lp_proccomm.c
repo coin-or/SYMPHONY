@@ -638,11 +638,13 @@ void send_node_desc(lp_prob *p, int node_type)
 	       vbc_node_pr_reason = VBC_PRUNED;
 	    }
 #pragma omp critical (tree_update)
+	    //This is the active node, so don't delete it yet
 	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
 	 } else {
 #pragma omp critical (tree_update)
+	    //This is the active node, so don't delete it yet
 	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+			       VBC_FEAS_SOL_FOUND : VBC_PRUNED);
 	 }
 
 	 if (!repricing)
@@ -996,10 +998,12 @@ void send_node_desc(lp_prob *p, int node_type)
 	     default:
 	       vbc_node_pr_reason = VBC_PRUNED;
 	    }
+	    //This is the active node, so don't delete it yet
 	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
 	 } else {
+	    //This is the active node, so don't delete it yet
 	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+			       VBC_FEAS_SOL_FOUND : VBC_PRUNED);
 	 }
       }
    }

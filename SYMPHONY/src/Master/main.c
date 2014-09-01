@@ -120,6 +120,10 @@ COMMAND parameter_commands[] = {
   { "gap_limit" },
   { "param_file" },
   { "do_primal_heuristic" },
+  { "should_use_rel_br" },
+  { "prep_level" },
+  { "tighten_root_bounds" },
+  { "limit_strong_branching_time" },
   { "back" },
   { "quit" },
   { "exit" },
@@ -667,6 +671,10 @@ int sym_help(const char *line)
 	   "gap_limit                          : set the target gap between the lower and upper bound\n"
            "param_file                         : read parameters from a parameter file\n"
 	   "do_primal_heuristic                : whether or not to use primal heuristics\n\n"
+	   "should_use_rel_br                  : whether or not to use relativity branching\n\n"
+	   "prep_level                         : pre-processing level\n\n"
+	   "tighten_root_bounds                : whether to tighten root bounds \n\n"
+	   "limit_strong_branching_time        : whether to limit time spent in strong branching \n\n"
 	   "back                               : leave this menu\n"
 	   "quit/exit                          : leave the optimizer\n\n");
 					    

@@ -782,7 +782,7 @@ esac],
 [sym_openmp=auto])
 
 if test $sym_openmp = auto; then 
-   AC_MSG_CHECKING([Checking whether compiler supports OpenMP])
+   AC_MSG_CHECKING([whether compiler supports OpenMP])
    case "$CXX" in
      clang*) 
        AC_MSG_RESULT([no])
@@ -792,14 +792,14 @@ if test $sym_openmp = auto; then
        AC_MSG_RESULT([yes])
        sym_openmp=true
        ;;
-     gcc*)
-        sym_openmp = true
+     g++*)
+        sym_openmp=true
    	fopenmp_version=4.2
    	gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
    	get_gcc_version=`$CXX -dumpversion`
    	gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
    	major_gcc_version=`echo ${gcc_version:0:3}`
-   	AC_MSG_RESULT([$get_gcc_version])
+   	#AC_MSG_RESULT([$get_gcc_version])
    	if test ${major_gcc_version} -lt ${gcc_required_version}; then
        	   AC_MSG_RESULT([no])
            sym_openmp=false

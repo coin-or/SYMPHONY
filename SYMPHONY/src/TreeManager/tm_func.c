@@ -989,7 +989,7 @@ int start_node(tm_prob *tm, int thread_num)
 		}
 #else
 #pragma omp critical (tree_update)
-		   purge_pruned_nodes(tm, best_node, VBC_PRUNED);
+		purge_pruned_nodes(tm, best_node, VBC_PRUNED);
 #endif
 	     }
 	     break;
@@ -1477,7 +1477,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
 	    } else {
 	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
-		     VBC_PRUNED);
+				  VBC_PRUNED);
 	    }
 
 	    if (--child_num == 0){
@@ -1633,7 +1633,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
 	    } else {
 	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
-		     VBC_PRUNED);
+				  VBC_PRUNED);
 	    }
 
 	    if (--child_num == 0){
@@ -1823,7 +1823,7 @@ char shall_we_dive(tm_prob *tm, double objval)
  * of other nodes that are no longer needed.
 \*===========================================================================*/
 
-int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
+ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 {
    int i, new_child_num;
    branch_obj *bobj = &node->parent->bobj;
@@ -1967,6 +1967,23 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
    }
 
    free_tree_node(node);
+#ifdef COMPILE_IN_LP
+#ifdef _OPENMP
+   int thread_num = omp_get_thread_num();
+#else
+   in thread_num = 0;
+#endif
+   if (node == tm->active_nodes[thread_num]){
+      // We have to remove this node from the list now, since
+      // it might otherwise be referenced in find_tree_lb
+      // before it is finally removed in fathom_node
+      tm->active_nodes[thread_num] = NULL;
+      // For some reason, this seems to cause problems,
+      // even though you would think it should be done here.
+      //OPENMP_ATOMIC_UPDATE
+      //tm->active_node_num--;
+   }
+#endif
    return(1);
 }
 
@@ -2200,8 +2217,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 #pragma omp_critical (write_pruned_node_file)
 		  write_pruned_nodes(tm, node);
 	       if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
-		  purge_pruned_nodes(tm, node,
-				     VBC_PRUNED_FATHOMED);
+		  purge_pruned_nodes(tm, node, VBC_PRUNED_FATHOMED);
 	       } else {
 		  purge_pruned_nodes(tm, node, VBC_PRUNED);
 	       }
