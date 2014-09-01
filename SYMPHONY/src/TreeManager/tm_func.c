@@ -1971,7 +1971,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 #ifdef _OPENMP
    int thread_num = omp_get_thread_num();
 #else
-   in thread_num = 0;
+   int thread_num = 0;
 #endif
    if (node == tm->active_nodes[thread_num]){
       // We have to remove this node from the list now, since
