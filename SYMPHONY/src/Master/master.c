@@ -3175,8 +3175,7 @@ int sym_get_obj_sense(sym_environment *env, int *sense)
 
 int sym_is_continuous(sym_environment *env, int index, int *value)
 {
-   if (!env->mip || index < 0 || index > env->mip->n || !env->mip->n ||
-       !env->mip->is_int){
+   if (!env->mip || index < 0 || index >= env->mip->n || !env->mip->is_int){
       if(env->par.verbosity >= 1){
 	 printf("sym_is_continuous():There is no loaded mip description or\n");
 	 printf("index is out of range or no column description!\n");
@@ -3421,8 +3420,7 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
 
    int i;
 
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
-       !env->mip->obj){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->obj){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_obj_coeff():There is no loaded mip description or\n");
 	 printf("index is out of range or no column description!\n");
@@ -3459,8 +3457,7 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
 int sym_set_obj2_coeff(sym_environment *env, int index, double value)
 {
 
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
-       !env->mip->obj2){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->obj2){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_obj_coeff():There is no loaded mip description or\n");
 	 printf("index is out of range or no column description!\n");
@@ -3490,8 +3487,7 @@ int sym_set_col_lower(sym_environment *env, int index, double value)
 {
    int i;
 
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 ||
-       !env->mip->lb){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->lb){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_col_lower():There is no loaded mip description or\n");
 	 printf("index is out of range or no column description!\n");
@@ -3525,8 +3521,7 @@ int sym_set_col_upper(sym_environment *env, int index, double value)
 {
    int i;
 
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 ||
-       !env->mip->ub){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->ub){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_col_upper():There is no loaded mip description!\n");
 	 printf("index is out of range or no column description!\n");
@@ -3562,8 +3557,7 @@ int sym_set_row_lower(sym_environment *env, int index, double value)
    char   sense;
    int i;
 
-   if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
-       !env->mip->rhs){
+   if (!env->mip || index >= env->mip->m || index < 0 || !env->mip->rhs){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_row_lower():There is no loaded mip description or\n");
 	 printf("index is out of range or no row description!\n");
@@ -3656,8 +3650,7 @@ int sym_set_row_upper(sym_environment *env, int index, double value)
    char   sense;
    int i;
 
-   if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
-       !env->mip->rhs){
+   if (!env->mip || index >= env->mip->m || index < 0 || !env->mip->rhs){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_row_upper():There is no loaded mip description or\n");
 	 printf("index is out of range or no row description!\n");
@@ -3756,8 +3749,7 @@ int sym_set_row_type(sym_environment *env, int index, char rowsense,
 
    int i;
 
-   if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
-       !env->mip->rhs){
+   if (!env->mip || index >= env->mip->m || index < 0 || !env->mip->rhs){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_row_type():There is no loaded mip description or\n");
 	 printf("index is out of range or no row description!\n");
@@ -4004,8 +3996,7 @@ int sym_set_primal_bound(sym_environment *env, double bound)
 
 int sym_set_continuous(sym_environment *env, int index)
 {
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
-       !env->mip->is_int){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->is_int){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_continuous():There is no loaded mip description or\n");
 	 printf("index is out of range or no row description!\n");
@@ -4024,8 +4015,7 @@ int sym_set_continuous(sym_environment *env, int index)
 int sym_set_integer(sym_environment *env, int index)
 {
 
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
-       !env->mip->is_int){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->is_int){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_integer():There is no loaded mip description or\n");
 	 printf("index is out of range or no row description!\n");
@@ -6497,8 +6487,6 @@ int sym_test(sym_environment *env, int *test_status)
       strcpy(env->par.infile, "");
       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
     }
-    sym_set_defaults (env);
-    sym_set_int_param(env, "verbosity", -10);
 
     strcpy(infile, "");
     if (dirsep == '/')
