@@ -50,11 +50,12 @@ void usage(void)
 	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 #ifndef USE_SYM_APPLICATION
-	  "\t%s\n\t%s\n\t%s\n\t%s\n\t\n\n",
+	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t\n\n",
 	  "-F model: model should be read in from file 'model'",
 	  "          (MPS format is assumed unless -D is also present)",
 	  "-L model: LP format model should be read in from file 'model'",
 	  "-D data: model is in AMPL format and data is in file 'data'",
+	  "-T dir: run test with MIPLIB3 models",
 #else
 	  "\n\n",
 #endif	  

@@ -1842,10 +1842,10 @@ char shall_we_dive(tm_prob *tm, double objval)
    if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
       switch (category) {
        case VBC_PRUNED_INFEASIBLE:
-	 sprintf(reason,"%s","infeasible");
-	 sprintf(reason,"%s %i",reason, node->bc_index+1);
+	 sprintf(reason, "%s", "infeasible");
+	 sprintf(reason,"%s %i", reason, node->bc_index+1);
 	 if (node->bc_index>0) {
-	    sprintf(reason," %i", node->parent->bc_index+1);
+	    sprintf(reason, "%s %i", reason, node->parent->bc_index+1);
 	    if (node->parent->children[0]==node) {
 	       branch_dir = node->parent->bobj.sense[0];
 	       /*branch_dir = 'L';*/
@@ -1863,10 +1863,10 @@ char shall_we_dive(tm_prob *tm, double objval)
 	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
 	 break;
        case VBC_PRUNED_FATHOMED:
-	 sprintf(reason,"%s","fathomed");
-	 sprintf(reason,"%s %i",reason, node->bc_index+1);
+	 sprintf(reason, "%s", "fathomed");
+	 sprintf(reason, "%s %i", reason, node->bc_index+1);
 	 if (node->bc_index>0) {
-	    sprintf(reason," %i", node->parent->bc_index+1);
+	    sprintf(reason,"%s %i", reason, node->parent->bc_index+1);
 	    if (node->parent->children[0]==node) {
 	       branch_dir = node->parent->bobj.sense[0];
 	       /*branch_dir = 'L';*/
@@ -1971,7 +1971,7 @@ char shall_we_dive(tm_prob *tm, double objval)
 #ifdef _OPENMP
    int thread_num = omp_get_thread_num();
 #else
-   in thread_num = 0;
+   int thread_num = 0;
 #endif
    if (node == tm->active_nodes[thread_num]){
       // We have to remove this node from the list now, since
