@@ -543,6 +543,7 @@ OPENMP_ATOMIC_WRITE
 	    }
 	    then = now;
 	 }
+#if 0
          for (i = 0; i < tm->par.max_active_nodes; i++){
 	    if (tm->active_nodes[i]){
 	       break;
@@ -551,6 +552,7 @@ OPENMP_ATOMIC_WRITE
 	 if (i == tm->par.max_active_nodes){
 	    tm->active_node_num = 0;
 	 }
+#endif
 	 if (now - then2 > timeout2){
 	    if(tm->par.verbosity >=0 ){
 	       print_tree_status(tm);
