@@ -481,28 +481,27 @@ SEQUENTIAL
 
 Known configurations that build and pass unit test
 
-- gcc 4.1 on LINUX
-- gcc 3.4 on LINUX
-- gcc 3.4.4 on CYGWIN in Windows XP
-- gcc 3.4.4 on CYGWIN in Windows XP (-mno-cygwin)
-- MSVC++ Version 8 compiler in CYGWIN using the autotools 
-- MSVC++ Version 8 IDE
-- MSVC++ nmake Utility with Version 8 compiler
-- gcc 4.0 on Mac OSX 10.4.8
-- gcc 4.1 on Solaris x86
+- gcc 4.* on LINUX
+- gcc 4.* on CYGWIN in Windows XP
+- MSVC++ Version 9-11 compiler in CYGWIN using the autotools 
+- MSVC++ Version 9-11 IDE
+- gcc 4.* on Mac OSX 10.*
+- clang on Mac OS X 10.9
 
 SHARED MEMORY PARLLEL (OpenMP)
 
-Builds and passes unit test with pre-release version of gcc 4.2 and CLP on
+Builds and passes unit test with versions of gcc >= 4.2 and CLP on
 LINUX (earlier versions of GCC do not support OpenMP and cannot be used to
 build a shared-memory version of SYMPHONY)
+
+Builds and passes unit test with MSVC++ Version 9.
 
 DISTRIBUTED MEMORY PARALLEL (PVM)
 
 Known configurations that build and pass unit test
 
-- gcc 4.1 on LINUX with PVM
-- gcc 3.4 on LINUX with PVM
+- PVM 3.4 with gcc 4.* on LINUX
+
 
 APPLICATIONS
 ============
