@@ -137,8 +137,12 @@ SYMPHONY/include/sym_qsort.h -text
 SYMPHONY/install-sh -text
 SYMPHONY/ltmain.sh -text
 SYMPHONY/missing -text
+SYMPHONY/scripts/pprof.awk -text
+SYMPHONY/scripts/pprof.py -text
+SYMPHONY/scripts/pprof_solved.awk -text
 SYMPHONY/scripts/publish2 -text
 SYMPHONY/scripts/report.py -text
+SYMPHONY/scripts/speedup.awk -text
 SYMPHONY/src/Common/sym_qsort.c -text
 SYMPHONY/src/LP/lp_heuristics.c -text
 SYMPHONY/src/LP/lp_sp.c -text
