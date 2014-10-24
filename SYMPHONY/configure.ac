@@ -605,7 +605,7 @@ if test x"$find_pvm" = xyes; then
                   [pvm_header=yes])],
                   [])
 	m4_ifvaln([pvm_gettid],
-                  [LIBS="-L$PVM_ROOT/lib -lgpvm3 -lpvm3"
+                  [LIBS="-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3"
                    pvm_link=no
                    AC_LANG_PUSH(C)
                    AC_MSG_CHECKING([whether symbol pvm_gettid is available with PVM])
