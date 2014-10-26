@@ -196,6 +196,16 @@ ALL_CP 	+= $(PROCCOMM_SRC)
 ALL_CP 	+= $(PACKCUT_SRC)
 
 MAIN_SRC = $(MASTER_MAIN_SRC)
+
+USER_APPL_DIR = ../Applications/USER/src/
+
+USER_APPL_STUBS_SRC = $(USER_APPL_DIR)/Master/user_master.c \
+	$(USER_APPL_DIR)/LP/user_lp.c \
+	$(USER_APPL_DIR)/LP/user_lp_branch.c \
+	$(USER_APPL_DIR)/CutGen/user_cg.c \
+	$(USER_APPL_DIR)/CutPool/user_cp.c \
+	$(USER_APPL_DIR)/DrawGraph/user_dg.c
+
 ##############################################################################
 #  Extensions and filenames for various configurations
 ##############################################################################
@@ -333,6 +343,10 @@ APPLCPPFLAGS += $(SYMCPPFLAGS) -DUSE_SYM_APPLICATION
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/include` \
                    -I`$(CYGPATH_W) $(top_builddir)/include`
 
+if DEPENDENCY_LINKING
+DEFAULT_INCLUDES += -I`$(CYGPATH_W) $(top_srcdir)/Applications/USER/include`
+endif
+
 ########################################################################
 ########################################################################
 
@@ -376,13 +390,13 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 	libSymAppl_tm_cp.la libSymAppl_tm_lp_cg.la libSymAppl_tm_lp_cg_cp.la \
 	libSymAppl_m_tm.la libSymAppl_m_tm_lp.la libSymAppl_m_tm_cp.la \
 	libSymAppl_m_tm_lp_cg.la libSymAppl_m_tm_lp_cg_cp.la \
-	libSymAppl_cp.la libSym_m.la libSymAppl_m.la
+	libSymAppl_cp.la libSym_m.la libSymAppl_m.la libSymApplStubs.la
 #$(WHATTOMAKELIBS) $(WHATTOMAKEBINS)
 #if !SYM_PARALLEL
 
 # Name of the library compiled in this directory.  We want it to be installed
 # in the 'lib' directory
-lib_LTLIBRARIES = $(WHATTOMAKELIBS)
+lib_LTLIBRARIES = $(WHATTOINSTALLLIBS)
 
 # List all source files for this library, including headers
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
@@ -563,6 +577,16 @@ symphony_lp_cg_cp__CPPFLAGS = $(PCPPFLAGS)
 symphony_lp_cg_cp_LDADD = libSym_lp$(LPEXT).la $(PLDADD)
 symphony_lp_cg_cp_DEPENDENCIES = libSym_lp$(LPEXT).la $(DEPENDENCIES)
 
+########################################################################
+#     A Dummy Library with Stubs for User Callbacks                    #
+#       (We need this to do dependency linking)                        #
+########################################################################
+
+libSymApplStubs_la_SOURCES = $(SYMINCFILES) $(USER_APPL_DIR)/include/user.h \
+	                     $(USER_APPL_STUBS_SRC)
+libSymApplStubs_lp_la_LINK = $(STATIC_LINK)
+libSymApplStubs_la_LDFLAGS = $(LT_LDFLAGS) 
+libSymApplStubs_la_CPPFLAGS = $(APPLCPPFLAGS) 
 
 ########################################################################
 #                Application Library                                   #    
@@ -628,6 +652,11 @@ libSymAppl_tm_lp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
+
+# List all additionally required libraries
+if DEPENDENCY_LINKING
+libSymAppl_la_LIBADD = $(SYMPHONYLIB_LIBS) libSymApplStubs.la
+endif
 
 ########################################################################
 #                Other stuff                                           #    
