@@ -605,7 +605,7 @@ if test x"$find_pvm" = xyes; then
                   [pvm_header=yes])],
                   [])
 	m4_ifvaln([pvm_gettid],
-                  [LIBS="-L$PVM_ROOT/lib -lgpvm3 -lpvm3"
+                  [LIBS="-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3"
                    pvm_link=no
                    AC_LANG_PUSH(C)
                    AC_MSG_CHECKING([whether symbol pvm_gettid is available with PVM])
@@ -708,6 +708,7 @@ if test $in_tm = yes; then
 fi 
 
 WHATTOMAKELIBS=
+WHATTOINSTALLLIBS=
 WHATTOMAKEBINS=
 
 if test $sym_enable_parallel = true; then
@@ -743,20 +744,31 @@ if test $sym_enable_parallel = true; then
     MASTEREXT="_m$MASTEREXT"
     WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
     WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
+    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
     if test $sym_appl = yes ; then 
        WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
+       WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl$MASTEREXT.la"
+       if test $dependency_linking = yes ; then
+       	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
+       fi
     fi
 else
     MASTEREXT="_m"
     WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
     WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
+    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 
     if test $sym_appl = yes ; then 
        WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+       WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
+       if test $dependency_linking = yes ; then
+       	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
+       fi
     fi
 fi
 
 AC_SUBST(WHATTOMAKELIBS)
+AC_SUBST(WHATTOINSTALLLIBS)
 AC_SUBST(WHATTOMAKEBINS)
 AC_SUBST(LPEXT)
 AC_SUBST(CPEXT)
