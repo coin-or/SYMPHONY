@@ -231,9 +231,9 @@ int sym_set_defaults(sym_environment *env)
 
    tm_par->warm_start = FALSE;
    tm_par->warm_start_node_ratio = 0.0;
-   tm_par->warm_start_node_limit = (int)SYM_INFINITY;      
+   tm_par->warm_start_node_limit = MAXINT;      
    tm_par->warm_start_node_level_ratio = 0.0; 
-   tm_par->warm_start_node_level = (int)SYM_INFINITY;
+   tm_par->warm_start_node_level = MAXINT;
 
    tm_par->logging = NO_LOGGING;
    tm_par->logging_interval = 1800;
@@ -423,11 +423,8 @@ int sym_set_defaults(sym_environment *env)
    lp_par->strong_br_all_candidates_level = 6;
    lp_par->limit_strong_branching_time = TRUE;
    lp_par->use_hot_starts = TRUE;
-   lp_par->should_use_rel_br = FALSE;
    lp_par->use_branching_prep = FALSE; 
-#ifdef COMPILE_IN_LP
-   lp_par->should_use_rel_br = TRUE; 
-#endif
+   lp_par->should_use_rel_br = -1; 
    lp_par->rel_br_override_default = TRUE;
    lp_par->rel_br_override_max_solves = 200;
    lp_par->rel_br_chain_backtrack = 5;
@@ -812,8 +809,15 @@ int sym_solve(sym_environment *env)
       omp_set_num_threads(env->par.tm_par.max_active_nodes);
    }
 #endif
-   if (env->par.tm_par.max_active_nodes > 1){
+   if (env->par.lp_par.should_use_rel_br == -1){
       env->par.lp_par.should_use_rel_br = FALSE;
+#if 0
+      if (env->par.tm_par.max_active_nodes > 2){
+	 env->par.lp_par.should_use_rel_br = FALSE;
+      }else{
+	 env->par.lp_par.should_use_rel_br = TRUE;
+      }
+#endif
    }
    
    start_time = wall_clock(NULL);
@@ -6483,9 +6487,9 @@ int sym_test(sym_environment *env, int *test_status)
   for(i = 0; i<file_num; i++){
 
     if(env->mip->n){
-      free_master_u(env);
-      strcpy(env->par.infile, "");
-      env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+       free_master_u(env);
+       strcpy(env->par.infile, "");
+       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
     }
 
     strcpy(infile, "");

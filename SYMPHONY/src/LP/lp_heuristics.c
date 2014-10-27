@@ -1409,8 +1409,7 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
 	
 	if(dive_depth > dive_depth_limit/2){	  
 	   fix_incr_cnt =(int)(1.0*(frac_ip_cnt - d_fixed_cnt)/
-			       (dive_depth_limit > (dive_depth ? dive_depth_limit - dive_depth : 1)));
-	   if(fix_incr_cnt < 1) fix_incr_cnt = 1;
+			       MAX(dive_depth_limit - dive_depth, 1));
 	}
 	
 	if(dive_depth > dive_depth_limit && lp_iter_limit - tot_lp_iter < 2*iter_cnt){

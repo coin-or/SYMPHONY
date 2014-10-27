@@ -501,8 +501,8 @@ int prep_basic(PREPdesc *P)
    if (!PREP_QUIT(termcode) && new_changes_cnt + stats->coeffs_changed + mip_inf->fixed_var_num > 0){
       termcode = prep_cleanup_desc(P);
       if(termcode == PREP_SOLVED && P->has_ub){
-	 if(P->ub < (P->mip->obj_sense == SYM_MAXIMIZE) ? -(P->mip->obj_offset) : 
-	    P->mip->obj_offset){
+	 if(P->ub < ((P->mip->obj_sense == SYM_MAXIMIZE) ? -(P->mip->obj_offset) : 
+		     P->mip->obj_offset)){
 	    //printf("PI-3\n");
 	    termcode = PREP_INFEAS; 
 	 }
