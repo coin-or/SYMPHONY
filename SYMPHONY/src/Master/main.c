@@ -671,7 +671,7 @@ int sym_help(const char *line)
 	   "gap_limit                          : set the target gap between the lower and upper bound\n"
            "param_file                         : read parameters from a parameter file\n"
 	   "do_primal_heuristic                : whether or not to use primal heuristics\n\n"
-	   "should_use_rel_br                  : whether or not to use relativity branching\n\n"
+	   "should_use_rel_br                  : whether or not to use reliability branching\n\n"
 	   "prep_level                         : pre-processing level\n\n"
 	   "tighten_root_bounds                : whether to tighten root bounds \n\n"
 	   "limit_strong_branching_time        : whether to limit time spent in strong branching \n\n"
