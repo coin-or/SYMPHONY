@@ -331,7 +331,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 }
 
 	
-	 if(p->par.use_branching_prep){//use_violation){
+	 if(p->par.use_branching_prep){//use_violation){ //}
 	    up_violation_cnt = (int *)calloc (lp_data->n,ISIZE);
 	    down_violation_cnt = (int *)calloc (lp_data->n,ISIZE);
 	    violation_col_size = (int *)calloc(lp_data->n, ISIZE);
@@ -513,7 +513,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       if(p->mip->mip_inf->bin_var_ratio > 0.05){
 		  strong_br_min_level = (int)strong_br_min_level/2;
 	       }
-	    }else{// if(p->mip->mip_inf->max_row_ratio < 0.01){	       
+	    }else{// if(p->mip->mip_inf->max_row_ratio < 0.01){ //}	       
 	       max_solves = MIN(2*max_solves, 2*cand_num);
 	       if(p->mip->mip_inf->sos_bin_row_ratio > 0.05){
 		  //  max_solves = MIN(2*max_solves, 2*cand_num);
@@ -658,7 +658,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       for (i=0; i<cand_num; i++) {
 		  branch_var = p->br_rel_cand_list[i];
 		  //printf("%i %i\n", branch_var, p->mip->mip_inf->cols[branch_var].sos_num);
-		  //if(p->mip->mip_inf->cols[branch_var].sos_num > 0.1*p->mip->n){
+		  //if(p->mip->mip_inf->cols[branch_var].sos_num > 0.1*p->mip->n){ //}
 		  if(p->mip->mip_inf->cols[branch_var].sos_num >= (1.0*p->mip->nz)/(p->mip->m + 1)){
 		     sos_tot_var[sos_cnt] = -p->mip->mip_inf->cols[branch_var].sos_num;
 		     sos_ind[sos_cnt] = i;
@@ -688,8 +688,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       }	       
 	    }
 	 }
-
-	 	 
       }
 
       /* order by inf status */	 
@@ -1061,7 +1059,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		best_can->termcode[1] = down_status;
 		// added by asm4 because  hot starts dont generate a reliable 
 		// bound.
-		//if (should_use_hot_starts && down_status==LP_D_ITLIM) { 
+		//if (should_use_hot_starts && down_status==LP_D_ITLIM) {
 		//  down_is_est = TRUE;
 		//  best_can->objval[0] = oldobjval;
 		//}
@@ -1177,7 +1175,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 }
 	 set_itlim(lp_data, max_presolve_iter);
 
-	 //p->mip->mip_inf->cols[best_var].sos_num > 0){
+	 //p->mip->mip_inf->cols[best_var].sos_num > 0){ //}
 	 int *l_ind = NULL, *r_ind = NULL;
 	 
 	 int col_num = lp_data->n;
