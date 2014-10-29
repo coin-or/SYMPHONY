@@ -2538,6 +2538,7 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
             is_feasible_u(p, TRUE, TRUE);
          } else {
 	    *obj = SYM_INFINITY;
+            *termstatus = LP_D_OBJLIM;
 	    if(sos_cnt < 1){
 	       p->lp_stat.str_br_bnd_changes++;
 	    }
