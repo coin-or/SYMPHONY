@@ -2527,11 +2527,11 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
       }
    } else {
      *obj = lp_data->objval;
-     if(lp_data->objval < *obj - lp_data->lpetol){
-       //printf("dual_simplex error: %i %i\n", p->bc_index, branch_var);       
-     }else{
-      *obj = lp_data->objval;
-     }
+     // if(lp_data->objval < *obj - lp_data->lpetol){
+     //   printf("dual_simplex error: %i %i\n", p->bc_index, branch_var);       
+     // }else{
+     //  *obj = lp_data->objval;
+     // }
 
       if (*termstatus == LP_OPTIMAL) {
          if (!p->has_ub || *obj < p->ub - p->par.granularity + lp_data->lpetol) {
