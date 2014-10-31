@@ -28,7 +28,9 @@ Release 5.6.2
 
 4. Bug fix for reliability branching. 
 
-5. Updates to externals to fix bugs in dependent projects.
+5. Bug fix for addition of column cuts
+
+6. Updates to externals to fix bugs in dependent projects.
 
 Release 5.6.1
 
