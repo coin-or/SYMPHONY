@@ -155,31 +155,38 @@ if you want to save disk space.
 
 === SHARED MEMORY PARALLEL ===
 
-  1. To compile a shared memory version of SYMPHONY using the autotools,
-  simply use an OpenMP compliant compiler. Version 5.5 should work with any
-  gcc compiler older then 4.2 by configuring with
+ 1. To compile a shared memory version of SYMPHONY, simply use an OpenMP compliant
+ compiler. Version \VER\  builds with OpenMP support enabled automatically when
+ the compiler provides it. This should be the case for all recent versions of
+ gcc and recent Microsoft compilers. Clang on OS X does not support OpenMP,
+ though it is possible to build a version that does yourself. You can manually
+ enable or disable OpenMP support with configure options by doing, e.g.,
 
  {{{./configure --enable-openmp}}}
 
-Note that this will be the default starting with release 5.6.0 when building
-with the gcc compiler, so it will then be technically unnecessary to add this
-option, though it never hurts. In the Microsoft Visual Studio, enable OpenMP
-support in the properties for the SYMPHONY projects (it doesn't need to be
-enabled for the dependent projects). In a future version, this will also be
-made the default.
+ In the Microsoft Visual Studio, enable OpenMP
+ support in the properties for the SYMPHONY projects (it doesn't need to be
+ enabled for the dependent projects). In a future version, this will also be
+ made the default.
 
  2. Follow the instructions above for building and testing.
 
- 3. To invoke SYMPHONY from the command-line with multiple threads, specify
- the number of threads with the '-p' option, i.e.,
+ 3. To invoke SYMPHONY from the command-line with multiple threads, specify the
+ number of \emph{additional} worker threads with the \code{-p} option, i.e.,
+ invoking SYMPHONY with 
 
-{{{bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps}}}
+ {{{bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps}}}
 
-Note that when more than 1 thread is used, the first thread is the "master"
-thread and only prints out periodic status messages, as well as doing some
-bookkeeping work. Therefore, it is recommended to always use at least two
-threads. Starting in version 5.6.0, the number of threads used will be
-automatically set equal to the number of available cores.
+ will utilize two worker threads to process subproblems in parallel.
+ When more than 1 thread is used, the first thread is the ``master''
+ thread and only prints out periodic status messages, as well as doing some
+ bookkeeping work. Therefore, it is recommended to always use at least one
+ worker thread (\code{-p 1}}). Starting in version 5.6.0, the number of
+ threads used is automatically set equal to the number of available cores if no
+ option is specified. For a fully sequential run with just one thread, invoke
+ SYMPHONY with 
+
+ {{{bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps}}}
 
 === DISTRIBUTED PARALLEL ===
 
