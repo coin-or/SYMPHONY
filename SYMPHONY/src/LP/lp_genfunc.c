@@ -3436,9 +3436,11 @@ int add_col_cuts(lp_prob *p, OsiCuts *cutlist, int *bound_changes)
    const int verbosity = p->par.verbosity;
    int *indices;
    double *elements;
+   double newb;
    int num_col_cuts;
    LPdata       *lp_data = p->lp_data;
    var_desc **vars = lp_data->vars;
+   const double big_bound = 1e25;
 
    num_col_cuts = cutlist->sizeColCuts();
    for (i=0; i<num_col_cuts; i++) {
@@ -3449,20 +3451,30 @@ int add_col_cuts(lp_prob *p, OsiCuts *cutlist, int *bound_changes)
       indices  = const_cast<int *>(col_cut.lbs().getIndices());
       elements = const_cast<double *>(col_cut.lbs().getElements());
       for (j=0;j<col_cut.lbs().getNumElements();j++) {
-         if (vars[indices[j]]->new_lb < elements[j]) {
-            vars[indices[j]]->new_lb = elements[j];
-            change_lbub(lp_data, indices[j], elements[j], 
-                  vars[indices[j]]->new_ub);
+         newb = elements[j];
+         if (newb > big_bound) {
+            newb = big_bound;
+         } else if (newb < -big_bound) {
+            newb = -big_bound;
+         }
+         if (vars[indices[j]]->new_lb < newb) {
+            vars[indices[j]]->new_lb = newb;
+            change_lbub(lp_data, indices[j], newb, vars[indices[j]]->new_ub);
             (*bound_changes)++;
          }
       }
       indices  = const_cast<int *>(col_cut.ubs().getIndices());
       elements = const_cast<double *>(col_cut.ubs().getElements());
       for (j=0;j<col_cut.ubs().getNumElements();j++) {
-         if (vars[indices[j]]->new_ub > elements[j]) {
-            vars[indices[j]]->new_ub = elements[j];
-            change_lbub(lp_data, indices[j], vars[indices[j]]->new_lb,
-                  elements[j]);
+         newb = elements[j];
+         if (newb > big_bound) {
+            newb = big_bound;
+         } else if (newb < -big_bound) {
+            newb = -big_bound;
+         }
+         if (vars[indices[j]]->new_ub > newb) {
+            vars[indices[j]]->new_ub = newb;
+            change_lbub(lp_data, indices[j], vars[indices[j]]->new_lb, newb);
             (*bound_changes)++;
          }
       }
