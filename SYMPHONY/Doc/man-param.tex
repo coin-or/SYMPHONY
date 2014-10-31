@@ -1028,41 +1028,54 @@ Note that, to use CGL cuts, OSI interface has to be used and moreover the
 corresponding flags have to be set during installation. See the makefile for 
 more details.
 
-\item[\ptt{generate\_cgl\_gomory\_cuts} -- boolean ({\tt TRUE}).] 
+\item[\ptt{generate\_cgl\_gomory\_cuts} -- integer ({\tt GENERATE\_DEFAULT}).] 
 \sindex[p]{\LPP!generate\_cgl\_gomory\_cuts}
-Whether or not to generate Gomory cuts using COIN's cut generation library. 
-
-\item[\ptt{generate\_cgl\_knapsack\_cuts} -- boolean ({\tt TRUE}).] 
+\item[\ptt{generate\_cgl\_knapsack\_cuts} -- integer ({\tt GENERATE\_DEFAULT}).] 
 \sindex[p]{\LPP!generate\_cgl\_knapsack\_cuts}
-Whether or not to generate knapsack cover cuts using COIN's cut generation 
-library. 
-
-\item[\ptt{generate\_cgl\_oddhole\_cuts} -- boolean ({\tt TRUE}).] 
-\sindex[p]{\LPP!generate\_cgl\_oddhole\_cuts}
-Whether or not to generate generalized odd hole cuts using COIN's cut 
-generation library. 
-
-\item[\ptt{generate\_cgl\_probing\_cuts} -- boolean ({\tt TRUE}).] 
-\sindex[p]{\LPP!generate\_cgl\_probing\_cuts}
-Whether or not to generate probing cuts using COIN's cut generation library. 
-
-\item[\ptt{generate\_cgl\_clique\_cuts} -- boolean ({\tt TRUE}).] 
+\item[\ptt{generate\_cgl\_twomir\_cuts} -- integer ({\tt GENERATE\_ONLY\_IN\_ROOT}).] 
+\sindex[p]{\LPP!generate\_cgl\_twomir\_cuts}
+\item[\ptt{generate\_cgl\_clique\_cuts} -- integer ({\tt GENERATE\_DEFAULT}).] 
 \sindex[p]{\LPP!generate\_cgl\_clique\_cuts}
-Whether or not to generate clique cuts using COIN's cut generation library. 
+\item[\ptt{generate\_cgl\_oddhole\_cuts} -- integer ({\tt DO\_NOT\_GENERATE}).] 
+\sindex[p]{\LPP!generate\_cgl\_oddhole\_cuts}
+\item[\ptt{generate\_cgl\_flowcover\_cuts} -- integer ({\tt GENERATE\_DEFAULT}).] 
+\sindex[p]{\LPP!generate\_cgl\_flowcover\_cuts}
+\ \\ \ \\
+This set of parameters is for controlling when certain classes of cuts are to
+be generated. It can take on the values enumerated below (see values
+in \texttt{symphony.h}).
+\begin{itemize}
+\item DO\_NOT\_GENERATE (-1): Do not generate cuts of this class.
+\item GENERATE\_DEFAULT (0): Use SYMPHONY's automatic tuning for generation of
+this class of cuts.
+\item GENERATE\_IF\_IN\_ROOT (1): Generate these cuts in the tree only if at
+least one violated cut is generated in the root node.    
+\item GENERATE\_ONLY\_IN\_ROOT (2): Generate these cuts only in the root node.
+\item GENERATE\_ALWAYS (3): Generate these cuts every time cut generation is
+done. 
+\item GENERATE\_PERIODICALLY (4): Generate these cuts every $n^{\textrm th}$
+time the cut generator is called, where $n$ is set by the parameter
+\texttt{generate\_cgl\_xxx\_cuts\_freq}.
+\end{itemize}
+See \url{https://projects.coin-or.org/Cgl} for a description of these
+classes and others that could be added.
 
-\item[\ptt{generate\_cgl\_flow\_and\_cover\_cuts} -- boolean ({\tt FALSE}).] 
-\sindex[p]{\LPP!generate\_cgl\_flow\_and\_cover\_cuts}
-Whether or not to generate flow and cover cuts using COIN's cut generation 
-library. 
-
-\item[\ptt{generate\_cgl\_rounding\_cuts} -- boolean ({\tt FALSE}).] 
-\sindex[p]{\LPP!generate\_cgl\_rounding\_cuts}
-Whether or not to generate simple rounding cuts using COIN's cut generation 
-library. 
-
-\item[\ptt{generate\_cgl\_lift\_and\_project\_cuts} -- boolean ({\tt FALSE}).] \sindex[p]{\LPP!generate\_cgl\_lift\_and\_project\_cuts}
-Whether or not to generate lift-and-project cuts using COIN's cut generation 
-library. 
+\item[\ptt{generate\_cgl\_gomory\_cuts\_freq} -- integer (5).] 
+\sindex[p]{\LPP!generate\_cgl\_gomory\_cuts\_freq}
+\item[\ptt{generate\_cgl\_knapsack\_cuts\_freq} -- integer (5).] 
+\sindex[p]{\LPP!generate\_cgl\_knapsack\_cuts\_freq}
+\item[\ptt{generate\_cgl\_twomir\_cuts\_freq} -- integer (5).] 
+\sindex[p]{\LPP!generate\_cgl\_twomir\_cuts\_freq}
+\item[\ptt{generate\_cgl\_clique\_cuts\_freq} -- integer (5).] 
+\sindex[p]{\LPP!generate\_cgl\_clique\_cuts\_freq}
+\item[\ptt{generate\_cgl\_oddhole\_cuts\_freq} -- integer (5).] 
+\sindex[p]{\LPP!generate\_cgl\_oddhole\_cuts\_freq}
+\item[\ptt{generate\_cgl\_flowcover\_cuts\_freq} -- integer (5).] 
+\sindex[p]{\LPP!generate\_cgl\_flowcover\_cuts\_freq}
+\ \\ \ \\
+The frequency with which to generate cuts if the
+parameter \texttt{cgl\_generate\_xxx\_cuts} for the
+corresponding class is set to \texttt{GENERATE\_PERIODICALLY}.
 
 \label{fp_enabled}
 \item[\ptt{fp\_enabled} -- integer ({\tt SYM\_FEAS\_PUMP\_DEFAULT}\{1\}).] 

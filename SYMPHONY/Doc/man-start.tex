@@ -362,25 +362,41 @@ callable library or solve generic MILP problems through the executable.
 \paragraph{Shared-memory architectures.}
 
 To compile a shared memory version of SYMPHONY, simply use an OpenMP compliant
-compiler. Version \VER\  has been tested with gcc 4.2, and should build by
-configuring with
+compiler. Version \VER\  builds with OpenMP support enabled automatically when
+the compiler provides it. This should be the case for all recent versions of
+gcc and recent Microsoft compilers. Clang on OS X does not support OpenMP,
+though it is possible to build a version that does yourself. You can manually
+enable or disable OpenMP support with configure options by doing, e.g.,
 {\color{Brown}
 \begin{verbatim}
  ./configure --enable-openmp
 \end{verbatim}
 } 
+In the Microsoft Visual Studio, enable OpenMP
+support in the properties for the SYMPHONY projects (it doesn't need to be
+enabled for the dependent projects). In a future version, this will also be
+made the default.
+
 After configuring, follow the earlier instructions for building and testing.
 To invoke SYMPHONY from the command-line with multiple threads, specify the
-number of threads with the \code{-p} option, i.e., {\color{Brown}
+number of \emph{additional} worker threads with the \code{-p} option, i.e., 
+invoking SYMPHONY with {\color{Brown}
 \begin{verbatim}
  bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps
 \end{verbatim}
 }
-Note that when more than 1 thread is used, the first thread is the ``master''
+will utilize two worker threads to process subproblems in parallel. 
+When more than 1 thread is used, the first thread is the ``master''
 thread and only prints out periodic status messages, as well as doing some
-bookkeeping work. Therefore, it is recommended to always use at least two
-threads. Starting in version 5.6.0, the number of threads used will be
-automatically set equal to the number of available cores.
+bookkeeping work. Therefore, it is recommended to always use at least one
+worker thread (\code{-p 1}). Starting in version 5.6.0, the number of
+threads used is automatically set equal to the number of available cores if no
+option is specified. For a fully sequential run with just one thread, invoke
+SYMPHONY with {\color{Brown}
+\begin{verbatim}
+ bin/symphony -p 2 -F SYMPHONY/Datasets/sample.mps
+\end{verbatim}
+}
 
 \paragraph{Distributed-memory architectures}
 \label{distributed-build}
