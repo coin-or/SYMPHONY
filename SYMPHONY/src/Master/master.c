@@ -810,14 +810,11 @@ int sym_solve(sym_environment *env)
    }
 #endif
    if (env->par.lp_par.should_use_rel_br == -1){
-      env->par.lp_par.should_use_rel_br = FALSE;
-#if 0
       if (env->par.tm_par.max_active_nodes > 2){
 	 env->par.lp_par.should_use_rel_br = FALSE;
       }else{
 	 env->par.lp_par.should_use_rel_br = TRUE;
       }
-#endif
    }
    
    start_time = wall_clock(NULL);
@@ -6432,7 +6429,7 @@ int sym_get_ub_for_new_obj(sym_environment *env, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_test(sym_environment *env, int *test_status)
+int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
 {
 
   int termcode = 0, verbosity;
@@ -6486,12 +6483,18 @@ int sym_test(sym_environment *env, int *test_status)
 
   for(i = 0; i<file_num; i++){
 
+#if 0
     if(env->mip->n){
        free_master_u(env);
        strcpy(env->par.infile, "");
        env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
     }
-
+#endif
+    
+    sym_close_environment(env);
+    env = sym_open_environment();
+    sym_parse_command_line(env, argc, argv);
+    
     strcpy(infile, "");
     if (dirsep == '/')
        sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);

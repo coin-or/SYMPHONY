@@ -166,7 +166,7 @@ int main(int argc, char **argv)
       
       if (env->par.test){
 
-	 sym_test(env, &termcode);
+	 sym_test(env, argc, argv, &termcode);
 	 
       }else{
 	 
