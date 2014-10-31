@@ -13,6 +13,7 @@
 /*===========================================================================*/
 
 #include "CoinPragma.hpp"
+#include "CoinHelperFunctions.hpp"
 #include "SymConfig.h"
 
 #include <iostream>
@@ -132,15 +133,15 @@ int main (int argc, const char *argv[])
   if (miplib3Dir.length() > 0) {
     int test_status;
     int symargc;
-    const char* symargv[7];
+    char* symargv[7];
     testingMessage( "Testing MIPLIB files\n" );
 
     sym_environment *env = sym_open_environment();
     /* assemble arguments for symphony: -T miplibdir, and -p 2 if we run the punittest */
     symargc = 5;
-    symargv[0] = argv[0];
+    symargv[0] = CoinStrdup(argv[0]);
     symargv[1] = "-T";
-    symargv[2] = miplib3Dir.c_str();
+    symargv[2] = CoinStrdup(miplib3Dir.c_str());
     if( argv[0][0] == 'p' || argv[0][0] == 'P' ) {
        symargv[3] = "-p";
        symargv[4] = "2";
@@ -148,9 +149,9 @@ int main (int argc, const char *argv[])
        symargv[3] = "-p";
        symargv[4] = "0";
     }
-    sym_parse_command_line(env, symargc, const_cast<char**>(symargv));
+    //sym_parse_command_line(env, symargc, const_cast<char**>(symargv));
     sym_set_int_param(env, "verbosity", -10);
-    sym_test(env, &test_status);
+    sym_test(env, symargc, symargv, &test_status);
 
 #ifdef COIN_HAS_OSITESTS
     OSIUNITTEST_ASSERT_WARNING(test_status == 0, {}, "symphony", "testing MIPLIB");
