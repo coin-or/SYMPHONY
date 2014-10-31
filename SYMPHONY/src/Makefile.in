@@ -203,9 +203,6 @@ am__objects_17 = $(am__objects_4) $(am__objects_5) $(am__objects_9) \
 	$(am__objects_16)
 am_libSym_la_OBJECTS = $(am__objects_3) $(am__objects_17)
 libSym_la_OBJECTS = $(am_libSym_la_OBJECTS)
-@DEPENDENCY_LINKING_TRUE@libSymAppl_la_DEPENDENCIES =  \
-@DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1) \
-@DEPENDENCY_LINKING_TRUE@	libSymApplStubs.la
 am__libSymAppl_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_constants.h ../include/sym_macros.h \
 	../include/sym_types.h ../include/sym_cg.h \
@@ -3046,17 +3043,6 @@ symphony_lp_cg_cp_LDADD = libSym_lp$(LPEXT).la $(PLDADD)
 symphony_lp_cg_cp_DEPENDENCIES = libSym_lp$(LPEXT).la $(DEPENDENCIES)
 
 ########################################################################
-#     A Dummy Library with Stubs for User Callbacks                    #
-#       (We need this to do dependency linking)                        #
-########################################################################
-libSymApplStubs_la_SOURCES = $(SYMINCFILES) $(USER_APPL_DIR)/include/user.h \
-	                     $(USER_APPL_STUBS_SRC)
-
-libSymApplStubs_lp_la_LINK = $(STATIC_LINK)
-libSymApplStubs_la_LDFLAGS = $(LT_LDFLAGS) 
-libSymApplStubs_la_CPPFLAGS = $(APPLCPPFLAGS) 
-
-########################################################################
 #                Application Library                                   #    
 ########################################################################
 libSymAppl_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
@@ -3118,7 +3104,19 @@ libSymAppl_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 
 # List all additionally required libraries
-@DEPENDENCY_LINKING_TRUE@libSymAppl_la_LIBADD = $(SYMPHONYLIB_LIBS) libSymApplStubs.la
+@DEPENDENCY_LINKING_TRUE@libSymAppl_la_DEPENDENCIES = libSymApplStubs.la
+@DEPENDENCY_LINKING_TRUE@libSymAppl_la_LIBADD = $(SYMPHONYLIB_LIBS)
+
+########################################################################
+#     A Dummy Library with Stubs for User Callbacks                    #
+#       (We need this to do dependency linking)                        #
+########################################################################
+libSymApplStubs_la_SOURCES = $(SYMINCFILES) $(USER_APPL_DIR)/include/user.h \
+	                     $(USER_APPL_STUBS_SRC)
+
+libSymApplStubs_lp_la_LINK = $(STATIC_LINK)
+libSymApplStubs_la_LDFLAGS = $(LT_LDFLAGS) 
+libSymApplStubs_la_CPPFLAGS = $(APPLCPPFLAGS) 
 
 ########################################################################
 #                Headers that need to be installed                     #

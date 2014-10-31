@@ -63,7 +63,7 @@ void usage(void)
 	  "-f file: read parameters from parameter file 'file'",
 	  "-d: stop at first feasible solution",
 	  "-a 0/1: whether to use primal heuristics",
-	  "-b 0/1: whether to use relativity branching",
+	  "-b 0/1: whether to use reliability branching",
 	  "-s cands: use at most 'cands' candidates for strong branching",
 	  "-l 0/1: whether to impose a limit on strong branching time",
 	  "-q 0/1: whether or not to tighten root bounds",

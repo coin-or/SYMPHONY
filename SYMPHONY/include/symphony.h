@@ -318,6 +318,7 @@ MIPdesc *sym_create_copy_mip_desc PROTO((sym_environment *env));
 MIPdesc *sym_get_presolved_mip_desc PROTO((sym_environment *env));
 sym_environment * sym_create_copy_environment PROTO((sym_environment *env));
 
-int sym_test PROTO((sym_environment *env, int *test_status));
+int sym_test PROTO((sym_environment *env, int argc, char **argv,
+		    int *test_status));
 
 #endif
