@@ -1019,6 +1019,8 @@ int sym_solve(sym_environment *env)
    if ((tm->has_ub = env->has_ub)){
      env->ub -= env->mip->obj_offset;
      tm->ub = env->ub;
+   } else {
+     env->ub = - (MAXDOUBLE / 2);
    }
    if ((tm->has_ub_estimate = env->has_ub_estimate)){
      env->ub_estimate -= env->mip->obj_offset;
