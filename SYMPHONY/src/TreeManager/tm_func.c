@@ -334,9 +334,9 @@ int solve(tm_prob *tm)
 #pragma omp parallel default(shared) private(now, then2, then3)
 {
 #ifdef _OPENMP
-      int i, ret, thread_num = omp_get_thread_num(), iii;
+      int i, ret, thread_num = omp_get_thread_num(), scand_num;
 #else
-      int i, ret, thread_num = 0;
+      int i, ret, thread_num = 0, scand_num;
 #endif
       tm->termcodes[thread_num] = TM_UNFINISHED;
       then  = wall_clock(NULL);
@@ -361,9 +361,9 @@ int solve(tm_prob *tm)
 		c_count <= 0){
 #pragma omp critical (tree_update)
             {
-            iii = tm->samephase_candnum;
+            scand_num = tm->samephase_candnum;
             }
-	    if (iii > 0 && (thread_num != 0 || tm->par.max_active_nodes == 1)){
+	    if (scand_num > 0 && (thread_num != 0 || tm->par.max_active_nodes == 1)){
 	       i = start_node(tm, thread_num);
 	    }else{
 	       i = NEW_NODE__NONE;
