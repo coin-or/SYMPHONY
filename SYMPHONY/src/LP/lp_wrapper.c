@@ -892,7 +892,7 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 #ifdef COMPILE_IN_LP
 
    if(p->bc_index < 1 && p->lp_stat.lp_calls < 2){
-     memcpy(p->root_lp, x, DSIZE*n);
+     memcpy(p->root_lp, lp_data->x, DSIZE*n);
    }
 
    double t_lb = p->lp_data->objval;   
