@@ -42,18 +42,19 @@ switch is also present, the file will be assumed to be a GMPL model file with
 the data file specified after the "-D" switch. In LINUX, the following command
 would solve the instance "sample.mps"
 
-symphony -F sample.mps
+```symphony -F sample.mps```
 
 The remaining switches are used to set SYMPHONY's native parameters on the
 command line. Below is a list of these parameters. This list can also be
 obtained by executng 
 
-symphony -h
+```symphony -h```
 
 Note that all SYMPHONY parameters are denoted by a lowercase letter. Many
 other parameters can be set with the use of a parameter file (specified with
 -f). These parameters are listed in the SYMPHONY user's manual.
 
+```
 symphony [ -FL file ] [ -f parameter_file_name ]
         [ -hd ] [-a 0/1] [-b 0/1 ] [-s cands] [-l 0/1] [ -q 0/1 ] [ -r 0/1]
         [-j 0/1 ] [ -e n ] [ -i iters ] [ -t time ] [ -g gap ] [ -n nodes ]
@@ -89,13 +90,15 @@ symphony [ -FL file ] [ -f parameter_file_name ]
         -m max: allow a max of 'max' cuts to enter per iteration
         -z n: set diving threshold to 'n'
         -o file: output vbc-like tree information to file 'file'
-
+		```
+		
 ************ Using the SYMPHONY interactive optimizer ************************
 
 To use SYMPHONY's Interactive shell, run the executable name without any
 command line arguments. Then type "help" or "?" to see a list of available
 commands which are as follows for this version:
 
+```
 	load      : read a problem in mps or ampl format
 	solve     : solve the problem
 	lpsolve   : solve the lp relaxation of the problem
@@ -105,7 +108,8 @@ commands which are as follows for this version:
 	help      : show the available commands/params/options	
 
 	quit/exit : leave the optimizer
-
+```
+	
 So, if you want to load and solve an ampl/gmpl file, you will need to type
 "load sample.mod sample.dat" and then "solve". 
 
