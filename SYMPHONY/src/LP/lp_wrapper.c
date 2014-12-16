@@ -822,7 +822,9 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
    double *x;
    int n = lp_data->n;
    double gran_round;
-   int do_primal_heuristic = FALSE, check_ls = TRUE; 
+   int do_primal_heuristic = FALSE, check_ls = TRUE;
+   double t_lb = p->lp_data->objval;   
+
    //get_x(lp_data); /* maybe just fractional -- parameter ??? */
 
    indices = lp_data->tmp.i1; /* n */
@@ -848,6 +850,17 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
     case USER_SUCCESS:
     case USER_AND_PP:
     case USER_NO_PP:
+      if (feasible == IP_HEUR_FEASIBLE){
+	 memcpy(col_sol, heur_solution, DSIZE*lp_data->n);
+	 if(true_objval > t_lb + lpetol100){
+	    dual_gap = d_gap(true_objval, t_lb, p->mip->obj_offset, 
+			     p->mip->obj_sense);
+	 }else{
+	    dual_gap = 1e-4;
+	 }
+	 apply_local_search(p, &true_objval, col_sol, heur_solution, &dual_gap, t_lb);
+	 check_ls = FALSE;
+      }
       break;
     case USER_DEFAULT: /* set the default */
       user_res = TEST_INTEGRALITY;
@@ -892,10 +905,9 @@ int is_feasible_u(lp_prob *p, char branching, char is_last_iter)
 #ifdef COMPILE_IN_LP
 
    if(p->bc_index < 1 && p->lp_stat.lp_calls < 2){
-     memcpy(p->root_lp, x, DSIZE*n);
+     memcpy(p->root_lp, lp_data->x, DSIZE*n);
    }
 
-   double t_lb = p->lp_data->objval;   
    if(p->tm->stat.analyzed > 1){      
       //find_tree_lb(p->tm);
       t_lb = MIN(t_lb, p->tm->lb);

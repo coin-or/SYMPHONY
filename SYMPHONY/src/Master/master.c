@@ -831,8 +831,6 @@ int sym_solve(sym_environment *env)
 
    env->mip->is_modified = FALSE;
    
-#ifndef USE_SYM_APPLICATION   
-
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
 
@@ -875,8 +873,6 @@ int sym_solve(sym_environment *env)
 	 env->prep_mip = 0;
       }
    }
-
-#endif
 
    if (env->par.verbosity >= -1){
       printf("Solving...\n\n");
