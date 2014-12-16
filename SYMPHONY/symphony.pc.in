@@ -8,5 +8,5 @@ Description: SYMPHONY MILP Solver Framework
 URL: https://projects.coin-or.org/SYMPHONY
 Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lSym @SYMPHONYLIB_PCLIBS@
-Cflags: -I${includedir}
+Cflags: -I${includedir} @SYM_OPENMP_FLAGS@
 Requires: @SYMPHONYLIB_PCREQUIRES@
