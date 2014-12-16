@@ -644,7 +644,7 @@ libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 
 # List all additionally required libraries
 if DEPENDENCY_LINKING
-libSymAppl_la_LIBADD = -L./.libs libSymApplStubs.la $(SYMPHONYLIB_LIBS)
+libSymAppl_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS)
 endif
 
 ########################################################################
