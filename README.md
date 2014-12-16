@@ -1,4 +1,4 @@
-SYMPHONY Version 5.5.7 README
+SYMPHONY Version 5.6.4 README
 =============================
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
@@ -17,6 +17,96 @@ http://www.coin-or.org/SYMPHONY/
 
 WHAT'S NEW
 ==========
+
+Release 5.6.4:
+
+1. Fix to pkgconfig file to add flags for OpenMP.
+
+2. Fixes for documentation.
+
+3. More fixes for dependency linking.
+
+Release 5.6.3:
+
+1. Fixes to applications to allow some preprocessing, which is needed for
+some primal heuristics to work.
+
+2. Fixes to preprocessor settings so that the minimal amount of preprocessing
+is always done.
+
+3. Fixes to some methods so they still work preprely even when preprocessing is
+not done.
+
+4. Fixes to pre-processor for applications that construct the LP relaxation 
+algorithmically. 
+
+5. Fix to pkgconfig file for applications.
+
+6. Fix for dependency linking.
+
+7. Other small bug fixes.
+
+Release 5.6.2:
+
+1. Updates and fixes to manual and documentation files.
+
+2. Fixes for configuring with PVM.
+
+3. Fixes to allow dependency linking with the application library. 
+
+4. Bug fix for reliability branching. 
+
+5. Bug fix for addition of column cuts
+
+6. Updates to externals to fix bugs in dependent projects.
+
+Release 5.6.1:
+
+1. Small fixes for OpenMP
+
+Release 5.6.0:
+
+1. Major re-design of shared memory parallel mode for increased efficiency and stability.
+
+2. Fixes for distributed memory parallel version (PVM)
+
+3. Fixes for bicriteria version
+
+Release 5.5.7:
+
+1. More updates to build harness
+
+Release 5.5.6:
+
+1. More updates to build harness
+
+Release 5.5.5:
+
+1. More updates to build harness
+
+Release 5.5.4:
+
+1. Fix memory leak
+2. Delete superfluous header file
+3. More updates to build harness
+
+Release 5.5.3:
+
+1. More updates to build harness
+
+Release 5.5.2:
+
+1. Fix problems with Visual Studio project files
+2. Update to build tools
+
+Release 5.5.1:
+
+1. Fix bug that caused all user applications to crash
+
+Release 5.4.8:
+
+1. Updates to MSVC++ files (applications now use property sheets and VRP app file is fixed).
+2. Other fixes for build tools.
 
 Release 5.4.7:
 

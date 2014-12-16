@@ -794,8 +794,9 @@ int sym_solve(sym_environment *env)
       if (!env->par.tm_par.rs_mode_enabled){
 #ifdef _OPENMP
 	 env->par.tm_par.max_active_nodes = omp_get_num_procs();
-	 printf("Automatically setting number of threads to %d\n\n",
-		env->par.tm_par.max_active_nodes);
+	 PRINT(env->par.verbosity, -1,
+	       ("Automatically setting number of threads to %d\n\n",
+		env->par.tm_par.max_active_nodes));
 #else
 	 env->par.tm_par.max_active_nodes = 1;
 #endif
