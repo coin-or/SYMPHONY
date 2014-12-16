@@ -744,7 +744,6 @@ if test $sym_enable_parallel = true; then
     MASTEREXT="_m$MASTEREXT"
     WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
     WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
-    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
     if test $sym_appl = yes ; then 
        WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
        WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl$MASTEREXT.la"
@@ -752,6 +751,7 @@ if test $sym_enable_parallel = true; then
        	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
        fi
     fi
+    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 else
     MASTEREXT="_m"
     WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
@@ -765,6 +765,7 @@ else
        	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
        fi
     fi
+    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 fi
 
 AC_SUBST(WHATTOMAKELIBS)
@@ -824,6 +825,12 @@ if test $sym_openmp = auto; then
 fi
 
 AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
+AC_SUBST(SYM_OPENMP_FLAGS)
+if test $sym_openmp = true; then
+  SYM_OPENMP_FLAGS=-fopenmp
+else
+  SYM_OPENMP_FLAGS= 
+fi
 
 #############################################################################
 #                       Other third party software                          #
