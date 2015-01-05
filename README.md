@@ -1,4 +1,4 @@
-# SYMPHONY Version 5.6.4 README
+# SYMPHONY Version 5.6.5 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
@@ -227,6 +227,11 @@ https://projects.coin-or.org/SYMPHONY/newticket
 Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## WHAT'S NEW
+
+Release 5.6.5:
+
+1. Added explicit dependence on libgomp, which is needed for linking with 
+compilers that don't supprt OpenMP (clang on OS X)
 
 Release 5.6.4:
 
