@@ -142,6 +142,7 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 @DEPENDENCY_LINKING_TRUE@libSym_la_DEPENDENCIES =  \
+@DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1) \
 @DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1)
 am__libSym_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_constants.h ../include/sym_macros.h \
@@ -205,6 +206,7 @@ am_libSym_la_OBJECTS = $(am__objects_3) $(am__objects_17)
 libSym_la_OBJECTS = $(am_libSym_la_OBJECTS)
 @DEPENDENCY_LINKING_TRUE@libSymAppl_la_DEPENDENCIES =  \
 @DEPENDENCY_LINKING_TRUE@	libSymApplStubs.la \
+@DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1) \
 @DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1)
 am__libSymAppl_la_SOURCES_DIST = ../include/SymConfig.h \
 	../include/sym_constants.h ../include/sym_macros.h \
@@ -2636,6 +2638,7 @@ SYM_COMPILE_IN_LP_TRUE = @SYM_COMPILE_IN_LP_TRUE@
 SYM_COMPILE_IN_TM_FALSE = @SYM_COMPILE_IN_TM_FALSE@
 SYM_COMPILE_IN_TM_TRUE = @SYM_COMPILE_IN_TM_TRUE@
 SYM_OPENMP_FLAGS = @SYM_OPENMP_FLAGS@
+SYM_OPENMP_LIBS = @SYM_OPENMP_LIBS@
 SYM_PARALLEL_FALSE = @SYM_PARALLEL_FALSE@
 SYM_PARALLEL_TRUE = @SYM_PARALLEL_TRUE@
 SYM_WITH_APPL_FALSE = @SYM_WITH_APPL_FALSE@
@@ -2963,7 +2966,7 @@ libSym_tm_lp_cg_cp_la_LDFLAGS = $(LT_LDFLAGS)
 libSym_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
 
 # List all additionally required libraries
-@DEPENDENCY_LINKING_TRUE@libSym_la_LIBADD = $(SYMPHONYLIB_LIBS)
+@DEPENDENCY_LINKING_TRUE@libSym_la_LIBADD = $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
 symphony_SOURCES = $(MAIN_SRC) symphony.h
 #symphony_DEPENDENCIES = $(SYMLDADD) libSym.la
 symphony_CPPFLAGS = $(SYMCPPFLAGS)
@@ -3108,7 +3111,7 @@ libSymAppl_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 
 # List all additionally required libraries
-@DEPENDENCY_LINKING_TRUE@libSymAppl_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS)
+@DEPENDENCY_LINKING_TRUE@libSymAppl_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
 
 ########################################################################
 #     A Dummy Library with Stubs for User Callbacks                    #

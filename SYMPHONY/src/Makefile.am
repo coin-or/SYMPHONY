@@ -462,7 +462,7 @@ libSym_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
 
 # List all additionally required libraries
 if DEPENDENCY_LINKING
-libSym_la_LIBADD = $(SYMPHONYLIB_LIBS)
+libSym_la_LIBADD = $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
 endif
 
 ########################################################################
@@ -644,7 +644,7 @@ libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 
 # List all additionally required libraries
 if DEPENDENCY_LINKING
-libSymAppl_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS)
+libSymAppl_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
 endif
 
 ########################################################################

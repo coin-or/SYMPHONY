@@ -826,10 +826,13 @@ fi
 
 AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
 AC_SUBST(SYM_OPENMP_FLAGS)
+AC_SUBST(SYM_OPENMP_LIBS)
 if test $sym_openmp = true; then
   SYM_OPENMP_FLAGS=-fopenmp
+  SYM_OPENMP_LIBS=-lgomp
 else
   SYM_OPENMP_FLAGS= 
+  SYM_OPENMP_LIBS=
 fi
 
 #############################################################################
