@@ -834,7 +834,7 @@ int sym_solve(sym_environment *env)
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
 
-   termcode = sym_presolve(env);   
+   termcode = sym_presolve(env);
 
    if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED ||
       termcode == PREP_SOLVED || termcode == PREP_NUMERIC_ERROR ||
@@ -1819,6 +1819,7 @@ int sym_mc_solve(sym_environment *env)
    }
 
    sym_set_int_param(env, "multi_criteria", TRUE);
+   env->par.prep_par.level = 0;
    memcpy((char *)env->mip->obj1, (char *)env->mip->obj, DSIZE*env->mip->n);
    if (!env->par.lp_par.mc_find_supported_solutions){
       env->base->cutnum += 2;

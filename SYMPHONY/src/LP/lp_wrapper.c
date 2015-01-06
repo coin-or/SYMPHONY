@@ -489,7 +489,11 @@ int create_subproblem_u(lp_prob *p)
    rhs = lp_data_mip->rhs;
    rngval = lp_data_mip->rngval;
    sense = lp_data_mip->sense;
-   assert(bcutnum == p->mip->m);
+   if (p->par.multi_criteria){
+      assert(bcutnum == p->mip->m+2);
+   }else{
+      assert(bcutnum == p->mip->m);
+   }
    for (i = bcutnum - 1; i >= 0; i--){
       row = rows + i;
       cut = row->cut;

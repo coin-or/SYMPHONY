@@ -39,6 +39,10 @@ int sym_presolve(sym_environment *env)
       FREE(env->prep_mip);
    }
 
+   if (env->par.multi_criteria){
+      p_level = env->par.prep_par.level = 0;
+   }
+
    /* 
     * if preprocessing level > 2, then create a copy. otherwise change the
     * existing data.
