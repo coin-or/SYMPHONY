@@ -1,4 +1,4 @@
-# SYMPHONY Version 5.6.5 README
+# SYMPHONY Version 5.6.6 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
@@ -227,6 +227,10 @@ https://projects.coin-or.org/SYMPHONY/newticket
 Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## WHAT'S NEW
+
+Release 5.6.6:
+
+1. Disabling pre-processor for multicriteria instances.
 
 Release 5.6.5:
 
