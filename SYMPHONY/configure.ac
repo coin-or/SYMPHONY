@@ -846,6 +846,7 @@ SYMAPPLDIR=`pwd`/Applications
 sym_use_cl=false
 CLLCFLAGS=
 case "$CXX" in
+  clang* | *\clang*) ;;
   cl* | *\cl* | */cl*)
      CLLCFLAGS=$CXXFLAGS
      CXXFLAGS="$CXXFLAGS -TP"
