@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -204,6 +204,7 @@ typedef struct LP_PARAMS{
    int               use_hot_starts;
    int               strong_br_all_candidates_level;
    int               strong_br_min_level;
+   int               limit_strong_branching_time;
    int               user_set_strong_branching_cand_num;
    int               user_set_max_presolve_iter;
    int               should_use_rel_br;

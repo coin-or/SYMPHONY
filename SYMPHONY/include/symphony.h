@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2005-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2005-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -51,15 +51,16 @@
 #define TM_OPTIMAL_SOLUTION_FOUND         227
 #define TM_TIME_LIMIT_EXCEEDED            228
 #define TM_NODE_LIMIT_EXCEEDED            229
-#define TM_TARGET_GAP_ACHIEVED            230
-#define TM_FOUND_FIRST_FEASIBLE           231
-#define TM_FINISHED                       232
-#define TM_UNFINISHED                     233
-#define TM_FEASIBLE_SOLUTION_FOUND        234
-#define TM_SIGNAL_CAUGHT                  235
-#define TM_UNBOUNDED                      236
-#define PREP_OPTIMAL_SOLUTION_FOUND       237
-#define PREP_NO_SOLUTION                  238
+#define TM_ITERATION_LIMIT_EXCEEDED       230
+#define TM_TARGET_GAP_ACHIEVED            231
+#define TM_FOUND_FIRST_FEASIBLE           232
+#define TM_FINISHED                       233
+#define TM_UNFINISHED                     234
+#define TM_FEASIBLE_SOLUTION_FOUND        235
+#define TM_SIGNAL_CAUGHT                  236
+#define TM_UNBOUNDED                      237
+#define PREP_OPTIMAL_SOLUTION_FOUND       238
+#define PREP_NO_SOLUTION                  239
 #define TM_ERROR__NO_BRANCHING_CANDIDATE -250
 #define TM_ERROR__ILLEGAL_RETURN_CODE    -251
 #define TM_ERROR__NUMERICAL_INSTABILITY  -252
@@ -119,6 +120,8 @@
 
 #define SYM_MINIMIZE                 0
 #define SYM_MAXIMIZE                 1 
+
+#define MAX_NAME_SIZE                255
 
 /*--------------------- return values for user-written functions ------------*/
 #define USER_ERROR              -5
@@ -323,6 +326,7 @@ MIPdesc *sym_create_copy_mip_desc PROTO((sym_environment *env));
 MIPdesc *sym_get_presolved_mip_desc PROTO((sym_environment *env));
 sym_environment * sym_create_copy_environment PROTO((sym_environment *env));
 
-int sym_test PROTO((sym_environment *env, int *test_status));
+int sym_test PROTO((sym_environment *env, int argc, char **argv,
+		    int *test_status));
   
 #endif

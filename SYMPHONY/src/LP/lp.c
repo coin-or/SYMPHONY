@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -41,7 +41,7 @@ int main(void)
    struct timeval timeout = {10, 0};
    char first_node_rec = FALSE;
    int termcode;
-   
+
    p = (lp_prob *) calloc(1, sizeof(lp_prob));
 
    p->start_time = wall_clock(NULL);

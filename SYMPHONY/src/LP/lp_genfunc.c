@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -162,13 +162,14 @@ int process_chain(lp_prob *p)
 
    p->last_gap = 0.0;
    p->dive = CHECK_BEFORE_DIVE;
+
    if (p->has_ub && p->par.set_obj_upper_lim) {
       set_obj_upper_lim(p->lp_data, p->ub - p->par.granularity + 
             p->lp_data->lpetol);
    }
    
    if (p->colgen_strategy & COLGEN_REPRICING){
-      if (p->par.verbosity > 0){
+      if (p->par.verbosity > 1){
 	 printf("****************************************************\n");
 	 printf("* Now repricing NODE %i LEVEL %i\n",
 		p->bc_index, p->bc_level);
@@ -177,7 +178,7 @@ int process_chain(lp_prob *p)
       termcode = repricing(p);
       free_node_dependent(p);
    }else{
-      if (p->par.verbosity > 0){
+      if (p->par.verbosity > 1){
 	 printf("****************************************************\n");
 	 printf("* Now processing NODE %i LEVEL %i (from TM)\n",
 		p->bc_index, p->bc_level);
@@ -187,11 +188,15 @@ int process_chain(lp_prob *p)
       termcode = fathom_branch(p);
 
 #ifdef COMPILE_IN_LP
+OPENMP_ATOMIC_UPDATE
       p->tm->stat.chains++;
+#pragma omp critical (tree_update)
+{
+OPENMP_ATOMIC_UPDATE
       p->tm->active_node_num--;
-#ifdef _OPENMP
-      p->tm->active_nodes[omp_get_thread_num()] = NULL;
-#endif
+      //This should be unnecessary, as it is also done in purge_pruned_nodes 
+      p->tm->active_nodes[p->proc_index] = NULL;
+}
       free_node_dependent(p);
 #else
       /* send_lp_is_free()  calls  free_node_dependent() */
@@ -227,10 +232,12 @@ int fathom_branch(lp_prob *p)
    double timeleft = 0.0;
    int iterleft = 0;
    const int verbosity = p->par.verbosity;
-   double now, then2, timeout2; 
+   double now, then2, timeout2;
+   int rs_mode_enabled = FALSE;
 #ifdef COMPILE_IN_LP
+   rs_mode_enabled = p->tm->par.rs_mode_enabled; 
    then2 = wall_clock(NULL);
-   timeout2 = 2;
+   timeout2 = p->tm->par.status_interval;
 #endif   
    check_ub(p);
    p->iter_num = p->node_iter_num = 0;
@@ -239,6 +246,7 @@ int fathom_branch(lp_prob *p)
    termcode = LP_OPTIMAL; // just to initialize
    check_bounds(p, &termcode);
    if (termcode == LP_D_UNBOUNDED) {
+      PRINT(verbosity, 1, ("Feasibility lost -- "));
       if (fathom(p, FALSE)) {
          comp_times->communication += used_time(&p->tt);
          return(FUNCTION_TERMINATED_NORMALLY);
@@ -251,7 +259,11 @@ int fathom_branch(lp_prob *p)
     * are found
    \*------------------------------------------------------------------------*/
 
+#ifdef COMPILE_IN_LP
+   while (p->tm->termcode == TM_UNFINISHED){
+#else
    while (TRUE){
+#endif
       if (p->par.branch_on_cuts && p->slack_cut_num > 0){
 	 switch (p->par.discard_slack_cuts){
 	  case DISCARD_SLACKS_WHEN_STARTING_NEW_NODE:
@@ -284,7 +296,7 @@ int fathom_branch(lp_prob *p)
 
       // set itlim here if we are in restricted search heuristic
 
-      if(p->tm->par.rs_mode_enabled &&
+      if(rs_mode_enabled &&
 	 (iterleft = p->tm->par.rs_lp_iter_limit - p->tm->lp_stat.lp_iter_num) <= 0) {
          if (fathom(p, TRUE)){  //send in true for interrupted node
 	    return(FUNCTION_TERMINATED_NORMALLY);
@@ -313,8 +325,8 @@ int fathom_branch(lp_prob *p)
       //write_mps(lp_data, name);
       if ((p->iter_num < 2 && (p->par.should_warmstart_chain == FALSE || 
 			       p->bc_level < 1))) {
-         if (p->bc_level < 1) {
-            PRINT(verbosity, -1, ("solving root lp relaxation\n"));
+         if (p->bc_index == 0) {
+            PRINT(verbosity, 0, ("solving root lp relaxation\n"));
          }
          termcode = initial_lp_solve(lp_data, &iterd);	 
       } else {
@@ -330,6 +342,7 @@ int fathom_branch(lp_prob *p)
       p->lp_stat.lp_node_calls++;
 
 #ifdef COMPILE_IN_LP
+OPENMP_ATOMIC_UPDATE
       p->tm->lp_stat.lp_iter_num += iterd;
 #endif
 
@@ -379,7 +392,7 @@ int fathom_branch(lp_prob *p)
       if (p->mip->obj_sense == SYM_MAXIMIZE){
          if (termcode == LP_OPTIMAL &&
 	     ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2)) {
-            PRINT(verbosity, -1, ("The LP value is: %.3f [%i,%i]\n\n",
+            PRINT(verbosity, 0, ("The LP value is: %.3f [%i,%i]\n\n",
                                    -lp_data->objval + p->mip->obj_offset,
                                    termcode, iterd));
          }
@@ -387,7 +400,7 @@ int fathom_branch(lp_prob *p)
       }else{
          if (termcode == LP_OPTIMAL &&
 	     ((p->bc_level < 1 && p->iter_num == 1) || verbosity > 2)) {
-            PRINT(verbosity, -1, ("The LP value is: %.3f [%i,%i]\n\n",
+            PRINT(verbosity, 0, ("The LP value is: %.3f [%i,%i]\n\n",
                                    lp_data->objval+ p->mip->obj_offset,
                                    termcode, iterd));
          }
@@ -395,7 +408,8 @@ int fathom_branch(lp_prob *p)
       switch (termcode){
        case LP_D_INFEASIBLE: /* this is impossible (?) as of now */
 	 return(ERROR__DUAL_INFEASIBLE);
-       case LP_D_ITLIM:      /* impossible, since itlim is set to infinity */
+       case LP_D_ITLIM:
+       case LP_TIME_LIMIT:
 	 /* now, we set time limit - solver returns the same termcode with itlim */
 	 /* also, we might set iter limit if we are in search heuristics */
 	 if (fathom(p, TRUE)){  //send in true for interrupted node
@@ -404,18 +418,24 @@ int fathom_branch(lp_prob *p)
 	    return(FUNCTION_TERMINATED_ABNORMALLY);
 	 }
        case LP_ABANDONED:
-	 printf("####### Unexpected termcode: %i \n", termcode);
+	 if (!rs_mode_enabled){
+	    printf("####### Unexpected termcode: %i \n", termcode);
+	 }
 	 if (p->par.try_to_recover_from_error && (++num_errors == 1)){
 	    /* Try to resolve it from scratch */
-	    printf("####### Trying to recover by resolving from scratch...\n");
+	    if (!rs_mode_enabled){
+	       printf("####### Trying to recover by resolving from scratch...\n");
+	    }
 	    continue;
 	 }else{
-	    char name[50] = "";
-	    printf("####### Recovery failed. %s%s",
-		   "LP solver is having numerical difficulties :(.\n",
-		   "####### Dumping current LP to MPS file and exiting.\n\n");
-	    sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
-	    write_mps(lp_data, name);
+	    if (!rs_mode_enabled){   
+	       char name[50] = "";
+	       printf("####### Recovery failed. %s%s",
+		      "LP solver is having numerical difficulties :(.\n",
+		      "####### Dumping current LP to MPS file and exiting.\n\n");
+	       sprintf(name, "matrix.%i.%i", p->bc_index, p->iter_num);
+	       write_mps(lp_data, name);
+	    }
 	    return(ERROR__NUMERICAL_INSTABILITY);
 	 }
 
@@ -432,7 +452,7 @@ int fathom_branch(lp_prob *p)
 
        case LP_D_OBJLIM:
        case LP_OPTIMAL:
-	 if (num_errors == 1){
+	 if (num_errors == 1 && !rs_mode_enabled){
 	    printf("####### Recovery succeeded! Continuing with node...\n\n");
 	    num_errors = 0;
 	 }
@@ -449,6 +469,7 @@ int fathom_branch(lp_prob *p)
 	    PRINT(verbosity, 1, ("Terminating due to high cost -- "));
 	 }else{ /* optimal and not too high cost */
 #ifdef COMPILE_IN_LP
+	    p->tm->active_nodes[p->proc_index]->lower_bound = lp_data->objval;
             if (p->node_iter_num < 2 && p->bc_index > 0 && 
                   p->par.should_use_rel_br) {
                update_pcost(p);
@@ -594,7 +615,7 @@ int fathom_branch(lp_prob *p)
 
        case NEW_NODE:
 #ifndef ROOT_NODE_ONLY
-	 if (verbosity > 0){
+	 if (verbosity > 1){
 	    printf("*************************************************\n");
 	    printf("* Now processing NODE %i LEVEL %i\n",
 		   p->bc_index, p->bc_level);
@@ -603,13 +624,16 @@ int fathom_branch(lp_prob *p)
 	 p->node_iter_num = 0;
 
 #ifdef COMPILE_IN_LP
+#pragma omp master
+{
 	 now = wall_clock(NULL);
 	 if (now - then2 > timeout2){
 	    if(verbosity >= -1 ){
-	       print_tree_status(p->tm, TRUE, obj_before_cuts);
+	       print_tree_status(p->tm);
 	    }
 	    then2 = now;
 	 }
+ }
 #endif
 	 /*
          printf("node = %d\n", p->bc_index);
@@ -679,8 +703,8 @@ int fathom_branch(lp_prob *p)
       char gap_limit_reached = FALSE;
       if(p->has_ub && p->tm->par.gap_limit >= 0.0 && 
 	 (p->tm->samephase_candnum > 1 || p->tm->active_node_num > 1)){
-	 find_tree_lb(p->tm);	
-	 if (d_gap(p->ub, MIN(p->tm->lb, lp_data->objval), p->mip->obj_offset, p->mip->obj_sense) <= p->tm->par.gap_limit){
+	 //find_tree_lb(p->tm);	
+	 if (d_gap(p->tm->ub, MIN(p->tm->lb, lp_data->objval), p->mip->obj_offset, p->mip->obj_sense) <= p->tm->par.gap_limit){
 	    gap_limit_reached = TRUE;
 	 }
       }
@@ -729,8 +753,13 @@ int fathom(lp_prob *p, int primal_feasible)
    int colgen = p->colgen_strategy & COLGEN__FATHOM;
    int termcode = p->lp_data->termcode;
 
-   if(p->branch_dir == 'L') p->br_inf_down[p->branch_var]++;
-   else p->br_inf_up[p->branch_var]++;   
+#ifdef COMPILE_IN_LP
+   if(p->branch_dir == 'L'){
+      p->br_inf_down[p->branch_var]++;
+   }else{
+      p->br_inf_up[p->branch_var]++;   
+   }
+#endif
    
    if (p->lp_data->nf_status == NF_CHECK_NOTHING){
       PRINT(p->par.verbosity, 1,
@@ -741,8 +770,13 @@ int fathom(lp_prob *p, int primal_feasible)
 	    send_node_desc(p, FEASIBLE_PRUNED);
 	    break;
 	  case LP_OPTIMAL:
-	  case LP_D_ITLIM: 
-	    send_node_desc(p, INTERRUPTED_NODE);
+	    send_node_desc(p, OVER_UB_PRUNED);
+	    break;
+	  case LP_D_ITLIM:
+	    send_node_desc(p, ITERATION_LIMIT);
+	    break;
+	  case LP_TIME_LIMIT:
+	    send_node_desc(p, TIME_LIMIT);
 	    break;
 	  default:
 	    send_node_desc(p, OVER_UB_PRUNED);
@@ -1338,7 +1372,11 @@ int check_tailoff(lp_prob *p)
       tailoff_obj_frac *= 1.133;
    }
 
-   if((p->lp_data->m - p->mip->m)/(1.0*p->mip->m) < 0.2 && p->tm->stat.analyzed < 100){
+   if((p->lp_data->m - p->mip->m)/(1.0*p->mip->m) < 0.2
+#ifdef COMPILE_IN_LP
+      && p->tm->stat.analyzed < 100
+#endif
+      ){
       //tailoff_gap_frac *= 1.0091;
       //tailoff_obj_frac /= 7.333; 
       gap_backsteps = 4;
@@ -2372,12 +2410,14 @@ int generate_cgl_cuts_new(lp_prob *p, int *num_cuts, cut_data ***cuts,
        p->par.best_violation[i] = 0.0;
        p->par.best_violation_length[i] = p->par.max_cut_length;
      }
-     //p->par.best_violation_length = p->par.max_cut_length;     
-     if(p->par.verbosity > 0){
+     //p->par.best_violation_length = p->par.max_cut_length;
+#ifdef COMPILE_IN_LP
+     if(p->par.verbosity > 1){
        printf("c-length - max_row - max-col - dens: %i - %i - %i - %f\n", p->par.max_cut_length, 
 	      p->mip->mip_inf->max_row_size, p->mip->mip_inf->max_col_size, 
 	      p->mip->mip_inf->mat_density);
      }
+#endif
    }
 
    max_cut_length = p->par.max_cut_length; 
@@ -3420,9 +3460,11 @@ int add_col_cuts(lp_prob *p, OsiCuts *cutlist, int *bound_changes)
    const int verbosity = p->par.verbosity;
    int *indices;
    double *elements;
+   double newb;
    int num_col_cuts;
    LPdata       *lp_data = p->lp_data;
    var_desc **vars = lp_data->vars;
+   const double big_bound = 1e25;
 
    num_col_cuts = cutlist->sizeColCuts();
    for (i=0; i<num_col_cuts; i++) {
@@ -3433,20 +3475,30 @@ int add_col_cuts(lp_prob *p, OsiCuts *cutlist, int *bound_changes)
       indices  = const_cast<int *>(col_cut.lbs().getIndices());
       elements = const_cast<double *>(col_cut.lbs().getElements());
       for (j=0;j<col_cut.lbs().getNumElements();j++) {
-         if (vars[indices[j]]->new_lb < elements[j]) {
-            vars[indices[j]]->new_lb = elements[j];
-            change_lbub(lp_data, indices[j], elements[j], 
-                  vars[indices[j]]->new_ub);
+         newb = elements[j];
+         if (newb > big_bound) {
+            newb = big_bound;
+         } else if (newb < -big_bound) {
+            newb = -big_bound;
+         }
+         if (vars[indices[j]]->new_lb < newb) {
+            vars[indices[j]]->new_lb = newb;
+            change_lbub(lp_data, indices[j], newb, vars[indices[j]]->new_ub);
             (*bound_changes)++;
          }
       }
       indices  = const_cast<int *>(col_cut.ubs().getIndices());
       elements = const_cast<double *>(col_cut.ubs().getElements());
       for (j=0;j<col_cut.ubs().getNumElements();j++) {
-         if (vars[indices[j]]->new_ub > elements[j]) {
-            vars[indices[j]]->new_ub = elements[j];
-            change_lbub(lp_data, indices[j], vars[indices[j]]->new_lb,
-                  elements[j]);
+         newb = elements[j];
+         if (newb > big_bound) {
+            newb = big_bound;
+         } else if (newb < -big_bound) {
+            newb = -big_bound;
+         }
+         if (vars[indices[j]]->new_ub > newb) {
+            vars[indices[j]]->new_ub = newb;
+            change_lbub(lp_data, indices[j], vars[indices[j]]->new_lb, newb);
             (*bound_changes)++;
          }
       }

@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -20,6 +20,9 @@
 #include <math.h>
 #ifdef __PVM__
 #include <pvmtev.h>
+#endif
+#ifdef _OPENMP
+#include "omp.h"
 #endif
 
 #include "symphony.h"
@@ -64,7 +67,7 @@ void sym_version(void)
 {
    printf("\n");
    printf("==  Welcome to the SYMPHONY MILP Solver \n");
-   printf("==  Copyright 2000-2013 Ted Ralphs and others \n");
+   printf("==  Copyright 2000-2014 Ted Ralphs and others \n");
    printf("==  All Rights Reserved. \n");
    printf("==  Distributed under the Eclipse Public License 1.0 \n");
    if (strcmp(SYMPHONY_VERSION, "trunk")){
@@ -208,7 +211,7 @@ int sym_set_defaults(sym_environment *env)
    tm_par->lp_debug = 0;
    tm_par->cg_debug = 0;
    tm_par->cp_debug = 0;
-   tm_par->max_active_nodes = 1;
+   tm_par->max_active_nodes = -1;
    tm_par->max_cp_num = 1;
    tm_par->lp_mach_num = 0;
    tm_par->lp_machs = NULL;
@@ -228,12 +231,13 @@ int sym_set_defaults(sym_environment *env)
 
    tm_par->warm_start = FALSE;
    tm_par->warm_start_node_ratio = 0.0;
-   tm_par->warm_start_node_limit = (int)SYM_INFINITY;      
+   tm_par->warm_start_node_limit = MAXINT;      
    tm_par->warm_start_node_level_ratio = 0.0; 
-   tm_par->warm_start_node_level = (int)SYM_INFINITY;
+   tm_par->warm_start_node_level = MAXINT;
 
    tm_par->logging = NO_LOGGING;
    tm_par->logging_interval = 1800;
+   tm_par->status_interval = 5;
    tm_par->vbc_emulation = NO_VBC_EMULATION;
    tm_par->price_in_root = FALSE;
    tm_par->trim_search_tree = FALSE;
@@ -252,6 +256,7 @@ int sym_set_defaults(sym_environment *env)
    tm_par->rs_lp_iter_limit = 1000000;
    tm_par->output_mode = 1;
 
+   tm_par->tighten_root_bounds = TRUE;
    /************************** lp defaults ***********************************/
    lp_par->verbosity = 0;
    lp_par->granularity = tm_par->granularity;
@@ -264,7 +269,7 @@ int sym_set_defaults(sym_environment *env)
    lp_par->should_warmstart_chain = TRUE; /* see header file for description */
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
 #ifdef COMPILE_IN_LP
-   lp_par->should_reuse_lp = TRUE; /* see header file for description */
+   lp_par->should_reuse_lp = FALSE; /* see header file for description */
 #endif
 #ifdef _OPENMP
    lp_par->should_reuse_lp = FALSE; /* see header file for description */
@@ -416,15 +421,10 @@ int sym_set_defaults(sym_environment *env)
 
    lp_par->strong_br_min_level = 4; 
    lp_par->strong_br_all_candidates_level = 6;
+   lp_par->limit_strong_branching_time = TRUE;
    lp_par->use_hot_starts = TRUE;
-   lp_par->should_use_rel_br = FALSE;
    lp_par->use_branching_prep = FALSE; 
-#ifdef COMPILE_IN_LP
-   lp_par->should_use_rel_br = TRUE; 
-#endif
-#ifdef _OPENMP
-   lp_par->should_use_rel_br = FALSE; 
-#endif
+   lp_par->should_use_rel_br = -1; 
    lp_par->rel_br_override_default = TRUE;
    lp_par->rel_br_override_max_solves = 200;
    lp_par->rel_br_chain_backtrack = 5;
@@ -790,6 +790,34 @@ int sym_solve(sym_environment *env)
    node_desc *rootdesc = env->rootdesc;
    base_desc *base = env->base;
 
+   if (env->par.tm_par.max_active_nodes < 0){
+      if (!env->par.tm_par.rs_mode_enabled){
+#ifdef _OPENMP
+	 env->par.tm_par.max_active_nodes = omp_get_num_procs();
+	 PRINT(env->par.verbosity, -1,
+	       ("Automatically setting number of threads to %d\n\n",
+		env->par.tm_par.max_active_nodes));
+#else
+	 env->par.tm_par.max_active_nodes = 1;
+#endif
+      }else{
+	 env->par.tm_par.max_active_nodes = 1;
+      }
+   }
+#ifdef _OPENMP
+   if (!env->par.tm_par.rs_mode_enabled){
+      omp_set_dynamic(FALSE);
+      omp_set_num_threads(env->par.tm_par.max_active_nodes);
+   }
+#endif
+   if (env->par.lp_par.should_use_rel_br == -1){
+      if (env->par.tm_par.max_active_nodes > 2){
+	 env->par.lp_par.should_use_rel_br = FALSE;
+      }else{
+	 env->par.lp_par.should_use_rel_br = TRUE;
+      }
+   }
+   
    start_time = wall_clock(NULL);
 
    double *tmp_sol;
@@ -803,12 +831,10 @@ int sym_solve(sym_environment *env)
 
    env->mip->is_modified = FALSE;
    
-#ifndef USE_SYM_APPLICATION   
-
    /* we send environment in just because we may need to 
       update rootdesc and so...*/
 
-   termcode = sym_presolve(env);   
+   termcode = sym_presolve(env);
 
    if(termcode == PREP_INFEAS || termcode == PREP_UNBOUNDED ||
       termcode == PREP_SOLVED || termcode == PREP_NUMERIC_ERROR ||
@@ -847,8 +873,6 @@ int sym_solve(sym_environment *env)
 	 env->prep_mip = 0;
       }
    }
-
-#endif
 
    if (env->par.verbosity >= -1){
       printf("Solving...\n\n");
@@ -992,6 +1016,8 @@ int sym_solve(sym_environment *env)
    if ((tm->has_ub = env->has_ub)){
      env->ub -= env->mip->obj_offset;
      tm->ub = env->ub;
+   } else {
+     env->ub = - (MAXDOUBLE / 2);
    }
    if ((tm->has_ub_estimate = env->has_ub_estimate)){
      env->ub_estimate -= env->mip->obj_offset;
@@ -1787,18 +1813,14 @@ int sym_mc_solve(sym_environment *env)
    double compare_sol_tol, ub = 0.0;
    int binary_search = FALSE;
    
-   for (i = 0; i < env->mip->n; i++){
-      if (env->mip->obj2[i] != 0){
-	 break;
-      }
-   }
-   if (i == env->mip->n){
-      printf("Second objective function is identically zero.\n");
+   if (env->mip->obj2 == NULL){
+      printf("Second objective function is not set.\n");
       printf("Switching to standard branch and bound.\n\n");
       return(sym_solve(env));
    }
 
    sym_set_int_param(env, "multi_criteria", TRUE);
+   env->par.prep_par.level = 0;
    memcpy((char *)env->mip->obj1, (char *)env->mip->obj, DSIZE*env->mip->n);
    if (!env->par.lp_par.mc_find_supported_solutions){
       env->base->cutnum += 2;
@@ -2091,6 +2113,7 @@ int sym_mc_solve(sym_environment *env)
       printf("***************************************************\n\n");
       
       env->obj[0] = env->obj[1] = 0.0;
+      env->best_sol.has_sol = FALSE;
    
       if (env->par.lp_par.mc_find_supported_solutions){
 	 
@@ -3162,8 +3185,7 @@ int sym_get_obj_sense(sym_environment *env, int *sense)
 
 int sym_is_continuous(sym_environment *env, int index, int *value)
 {
-   if (!env->mip || index < 0 || index > env->mip->n || !env->mip->n ||
-       !env->mip->is_int){
+   if (!env->mip || index < 0 || index >= env->mip->n || !env->mip->is_int){
       if(env->par.verbosity >= 1){
 	 printf("sym_is_continuous():There is no loaded mip description or\n");
 	 printf("index is out of range or no column description!\n");
@@ -3250,18 +3272,17 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
 
    sol = env->best_sol;
 
-   if (!sol.xlength || (sol.xlength && (!sol.xind || !sol.xval))){
+   if (sol.xlength && (!sol.xind || !sol.xval)){
       if(env->par.verbosity >= 1){
-	 printf("sym_get_col_solution(): There is no solution!\n");
+	 printf("sym_get_col_solution(): Something is wrong!\n");
       }
       if(env->mip->n){
 	 memcpy(colsol, env->mip->lb, DSIZE*env->mip->n);
       }
       return(FUNCTION_TERMINATED_ABNORMALLY);
-   }
-   else{
+   }else{
       if (!sol.has_sol){
-	 printf("sym_get_col_solution(): Stored solution may not be feasible!\n");
+	 printf("sym_get_col_solution(): No solution has been stored!\n");
       }	 
       memset(colsol, 0, DSIZE*env->mip->n);
 
@@ -3408,8 +3429,7 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
 
    int i;
 
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
-       !env->mip->obj){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->obj){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_obj_coeff():There is no loaded mip description or\n");
 	 printf("index is out of range or no column description!\n");
@@ -3446,8 +3466,7 @@ int sym_set_obj_coeff(sym_environment *env, int index, double value)
 int sym_set_obj2_coeff(sym_environment *env, int index, double value)
 {
 
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
-       !env->mip->obj2){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->obj2){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_obj_coeff():There is no loaded mip description or\n");
 	 printf("index is out of range or no column description!\n");
@@ -3455,6 +3474,12 @@ int sym_set_obj2_coeff(sym_environment *env, int index, double value)
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
 
+   if (env->mip->obj1 == NULL){
+      env->mip->obj1 = (double *) malloc(env->mip->n*DSIZE);
+      memcpy(env->mip->obj1, env->mip->obj, DSIZE * env->mip->n); 
+      env->mip->obj2 = (double *) calloc(env->mip->n, DSIZE);
+   }
+   
    if (env->mip->obj_sense == SYM_MAXIMIZE){
       env->mip->obj2[index] = -value;
    }else{
@@ -3471,8 +3496,7 @@ int sym_set_col_lower(sym_environment *env, int index, double value)
 {
    int i;
 
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 ||
-       !env->mip->lb){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->lb){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_col_lower():There is no loaded mip description or\n");
 	 printf("index is out of range or no column description!\n");
@@ -3506,8 +3530,7 @@ int sym_set_col_upper(sym_environment *env, int index, double value)
 {
    int i;
 
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 ||
-       !env->mip->ub){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->ub){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_col_upper():There is no loaded mip description!\n");
 	 printf("index is out of range or no column description!\n");
@@ -3543,8 +3566,7 @@ int sym_set_row_lower(sym_environment *env, int index, double value)
    char   sense;
    int i;
 
-   if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
-       !env->mip->rhs){
+   if (!env->mip || index >= env->mip->m || index < 0 || !env->mip->rhs){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_row_lower():There is no loaded mip description or\n");
 	 printf("index is out of range or no row description!\n");
@@ -3637,8 +3659,7 @@ int sym_set_row_upper(sym_environment *env, int index, double value)
    char   sense;
    int i;
 
-   if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
-       !env->mip->rhs){
+   if (!env->mip || index >= env->mip->m || index < 0 || !env->mip->rhs){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_row_upper():There is no loaded mip description or\n");
 	 printf("index is out of range or no row description!\n");
@@ -3737,8 +3758,7 @@ int sym_set_row_type(sym_environment *env, int index, char rowsense,
 
    int i;
 
-   if (!env->mip || !env->mip->m || index > env->mip->m || index < 0 ||
-       !env->mip->rhs){
+   if (!env->mip || index >= env->mip->m || index < 0 || !env->mip->rhs){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_row_type():There is no loaded mip description or\n");
 	 printf("index is out of range or no row description!\n");
@@ -3985,8 +4005,7 @@ int sym_set_primal_bound(sym_environment *env, double bound)
 
 int sym_set_continuous(sym_environment *env, int index)
 {
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
-       !env->mip->is_int){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->is_int){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_continuous():There is no loaded mip description or\n");
 	 printf("index is out of range or no row description!\n");
@@ -4005,8 +4024,7 @@ int sym_set_continuous(sym_environment *env, int index)
 int sym_set_integer(sym_environment *env, int index)
 {
 
-   if (!env->mip || !env->mip->n || index > env->mip->n || index < 0 || 
-       !env->mip->is_int){
+   if (!env->mip || index >= env->mip->n || index < 0 || !env->mip->is_int){
       if(env->par.verbosity >= 1){
 	 printf("sym_set_integer():There is no loaded mip description or\n");
 	 printf("index is out of range or no row description!\n");
@@ -4047,9 +4065,9 @@ int sym_set_col_names(sym_environment * env, char **colname)
    
    for (j = 0; j < env->mip->n; j++){
       if(colname[j]){
-	 env->mip->colname[j] = (char *) malloc(CSIZE * 21); 
-	 strncpy(env->mip->colname[j], colname[j], 20);
-	 env->mip->colname[j][20] = 0;
+	 env->mip->colname[j] = (char *) malloc(CSIZE * MAX_NAME_SIZE); 
+	 strncpy(env->mip->colname[j], colname[j], MAX_NAME_SIZE);
+	 env->mip->colname[j][MAX_NAME_SIZE-1] = 0;
       }
    }      
 
@@ -4059,11 +4077,13 @@ int sym_set_col_names(sym_environment * env, char **colname)
 /*===========================================================================*/
 
 int sym_add_col(sym_environment *env, int numelems, int *indices, 
-			double *elements, double collb, double colub,
-			double obj, char is_int, char *name)
+		double *elements, double collb, double colub,
+		double obj, char is_int, char *name)
 {
    int i, k, n, m, nz, *matBeg, *matInd;
-   double *matVal, *colLb, *colUb, *objN, *obj1N, *obj2N;
+   double *matVal, *colLb, *colUb, *objN;
+   double *obj1N = NULL;
+   double *obj2N = NULL;
    char *isInt, **colName;
    int * user_indices, *user_size;
 
@@ -4109,16 +4129,24 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
       colLb = (double*) malloc(DSIZE*(n+1));
       colUb = (double*) malloc(DSIZE*(n+1));
       objN = (double*) malloc(DSIZE*(n+1));
-      obj1N = (double*) calloc(DSIZE, (n+1));
-      obj2N = (double*) calloc(DSIZE, (n+1));
+      if (env->mip->obj1){
+	 obj1N = (double*) calloc(DSIZE, (n+1));
+      }
+      if (env->mip->obj2){
+	 obj2N = (double*) calloc(DSIZE, (n+1));
+      }
       isInt = (char*) calloc(CSIZE, (n+1));
 
       if(n){
 	 memcpy(colLb, env->mip->lb, DSIZE*n);
 	 memcpy(colUb, env->mip->ub, DSIZE*n);
 	 memcpy(objN, env->mip->obj, DSIZE*n);
-	 memcpy(obj1N, env->mip->obj1, DSIZE*n);
-	 memcpy(obj2N, env->mip->obj2, DSIZE*n);
+	 if (env->mip->obj1){
+	    memcpy(obj1N, env->mip->obj1, DSIZE*n);
+	 }
+	 if (env->mip->obj2){
+	    memcpy(obj2N, env->mip->obj2, DSIZE*n);
+	 }
 	 memcpy(isInt, env->mip->is_int, CSIZE*n);
       }
 
@@ -4159,6 +4187,12 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
       colLb[n] = collb;
       colUb[n] = colub;
       objN[n] = obj;
+      if (obj1N) {
+	 obj1N[n] = obj;
+      }
+      if (obj2N) {
+	 obj2N[n] = 0;
+      }
       isInt[n] = is_int;
 
       if(n){
@@ -4189,18 +4223,18 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
 	 if(env->mip->colname){	 
 	    for (i = 0; i < n; i++){
 	       if(env->mip->colname[i]){
-		  colName[i] = (char *) malloc(CSIZE * 21); 
-		  strncpy(colName[i], env->mip->colname[i],21);
-		  colName[i][20] = 0;
+		  colName[i] = (char *) malloc(CSIZE * MAX_NAME_SIZE); 
+		  strncpy(colName[i], env->mip->colname[i], MAX_NAME_SIZE);
+		  colName[i][MAX_NAME_SIZE-1] = 0;
 		  FREE(env->mip->colname[i]);
 	       }
 	    }
 	 }
 
 	 if(name){
-	    colName[n] = (char *) malloc(CSIZE * 21); 	
-	    strncpy(colName[n], name, 21);
-	    colName[n][20] = 0;
+	    colName[n] = (char *) malloc(CSIZE * MAX_NAME_SIZE); 	
+	    strncpy(colName[n], name, MAX_NAME_SIZE);
+	    colName[n][MAX_NAME_SIZE-1] = 0;
 	 }
 
 	 FREE(env->mip->colname);
@@ -5278,6 +5312,11 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
       *value = tm_par->logging_interval;
       return(0);
    }
+   else if (strcmp(key, "status_interval") == 0 ||
+	    strcmp(key, "TM_status_interval") == 0){
+      *value = tm_par->status_interval;
+      return(0);
+   }
    else if (strcmp(key, "logging") == 0 ||
 	    strcmp(key, "TM_logging") == 0){
       *value = tm_par->logging;
@@ -5317,6 +5356,14 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    else if (strcmp(key, "sensitivity_analysis") == 0 ||
 	    strcmp(key, "TM_sensitivity_analysis") == 0 ){
       *value = tm_par->sensitivity_analysis;
+      return(0);
+   }else if (strcmp(key, "output_mode") == 0 ||
+	    strcmp(key, "TM_output_mode") == 0){
+      *value = tm_par->output_mode;
+      return(0);
+   }else if (strcmp(key, "tighten_root_bounds") == 0 ||
+	    strcmp(key, "TM_tighten_root_bounds") == 0){
+      *value = tm_par->tighten_root_bounds;
       return(0);
    }
      
@@ -5688,6 +5735,10 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
    }
    else if (strcmp(key, "strong_br_all_candidates_level") == 0) {
       *value = lp_par->strong_br_all_candidates_level;
+      return(0);
+   }
+   else if (strcmp(key, "limit_strong_branching_time") == 0) {
+      *value = lp_par->limit_strong_branching_time;
       return(0);
    }
    else if (strcmp(key,"use_hot_starts") == 0) {
@@ -6460,18 +6511,26 @@ int sym_get_ub_for_new_obj(sym_environment *env, int cnt,
 /*===========================================================================*/
 /*===========================================================================*/
 
-int sym_test(sym_environment *env, int *test_status)
+int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
 {
 
   int termcode = 0, verbosity;
-  int i, file_num = 12;
-  char mps_files[12][MAX_FILE_NAME_LENGTH +1] = {
-    "air03", "dcmulti", "egout", "flugpl", "khb05250", "l152lav", 
-    "lseu", "mod010", "p0033", "p0201", "stein27", "vpm1" };
+  int i, file_num = 45;
+  char mps_files[45][MAX_FILE_NAME_LENGTH +1] = {
+     "air03", "air04", "air05", "bell3a", "blend2", "cap6000", "dcmulti", "dsbmip",
+     "egout", "enigma", "fiber", "fixnet6", "flugpl", "gen", "gesa2", "gesa2_o",
+     "gesa3", "gesa3_o", "gt2", "khb05250", "l152lav", "lseu", "misc03", "misc06",
+     "misc07", "mitre", "mod008", "mod010", "mod011", "nw04", "p0033", "p0201",
+     "p0282", "p0548", "p2756", "pp08a", "pp08aCUTS", "qnet1", "qnet1_o", "rentacar",
+     "rgn", "stein27", "stein45", "vpm1", "vpm2" };
   
-  double sol[12] = {340160, 188182, 568.101, 1201500,
-			  106940226, 4722, 1120, 6548, 
-			  3089, 7615, 18, 20};
+  double sol[45] = {340160, 56137, 26374, 878430.316, 7.599, -2451377, 188182,
+		    -305.198, 568.10, 0, 405935.18, 3983, 1201500, 112313.363,
+		    25779856.371, 25779856.371, 27991042.647, 27991042.647, 21166,
+		    106940226, 4722, 1120, 3360, 12850.86, 2810, 115155, 307,
+		    6548, -54558535, 16862, 3089, 7615, 258411, 8691, 3124, 7350,
+		    7350, 16029.693, 16029.693, 30356760.98, 82.20, 18, 30, 20,
+		    13.75};
 
   char *mps_dir = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
   char *infile = (char*)malloc(CSIZE*(MAX_FILE_NAME_LENGTH+1));
@@ -6506,14 +6565,18 @@ int sym_test(sym_environment *env, int *test_status)
 
   for(i = 0; i<file_num; i++){
 
+#if 0
     if(env->mip->n){
-      free_master_u(env);
-      strcpy(env->par.infile, "");
-      env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
+       free_master_u(env);
+       strcpy(env->par.infile, "");
+       env->mip = (MIPdesc *) calloc(1, sizeof(MIPdesc));
     }
-    sym_set_defaults (env);
-    sym_set_int_param(env, "verbosity", -10);
-
+#endif
+    
+    sym_close_environment(env);
+    env = sym_open_environment();
+    sym_parse_command_line(env, argc, argv);
+    
     strcpy(infile, "");
     if (dirsep == '/')
        sprintf(infile, "%s%s%s", mps_dir, "/", mps_files[i]);

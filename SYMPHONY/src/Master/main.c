@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -20,6 +20,9 @@
  * default. See below for the usage.
 \*===========================================================================*/
 
+#ifdef _OPENMP
+#include "omp.h"
+#endif
 
 #ifdef USE_OSI_INTERFACE
 
@@ -117,6 +120,10 @@ COMMAND parameter_commands[] = {
   { "gap_limit" },
   { "param_file" },
   { "do_primal_heuristic" },
+  { "should_use_rel_br" },
+  { "prep_level" },
+  { "tighten_root_bounds" },
+  { "limit_strong_branching_time" },
   { "back" },
   { "quit" },
   { "exit" },
@@ -148,7 +155,6 @@ int main(int argc, char **argv)
 
    sym_environment *env = sym_open_environment();
    int termcode;
-
    
    if (argc > 1){
    
@@ -160,7 +166,7 @@ int main(int argc, char **argv)
       
       if (env->par.test){
 
-	 sym_test(env, &termcode);
+	 sym_test(env, argc, argv, &termcode);
 	 
       }else{
 	 
@@ -178,7 +184,11 @@ int main(int argc, char **argv)
 	    exit(termcode);
 	 }
 	 printf("\n");
-	 sym_solve(env);
+	 if (env->mip->obj2 != NULL){
+	    sym_mc_solve(env);
+	 } else {
+	    sym_solve(env);
+	 }
       }
    
    } else{
@@ -311,14 +321,22 @@ int main(int argc, char **argv)
 	 if(strcmp(args[0], "solve") == 0){
 	   start_time = wall_clock(NULL);
 	   printf("\n");
-	   termcode = sym_solve(env);
+	   if (env->mip->obj2 != NULL){
+	      termcode = sym_mc_solve(env);
+	   } else {
+	      termcode = sym_solve(env);
+	   }
 	   finish_time = wall_clock(NULL);
 	 } else {
 	   is_int = env->mip->is_int;
 	   env->mip->is_int  = (char *)   calloc(CSIZE, env->mip->n);
 	   start_time = wall_clock(NULL);
 	   printf("\n");
-	   termcode = sym_solve(env);
+	   if (env->mip->obj2 != NULL){
+	      termcode = sym_mc_solve(env);
+	   } else {
+	      termcode = sym_solve(env);
+	   }
 	   finish_time = wall_clock(NULL);
 	   env->mip->is_int = is_int;
 	   is_int = 0;
@@ -397,7 +415,7 @@ int main(int argc, char **argv)
 			 printf("Nonzero column names and values in the solution\n");
 			 printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
 			 for(j = 0; j<env->best_sol.xlength; j++){		      
-			    printf("%8s %10.3f\n", 
+			    printf("%8s %10.10f\n", 
 				   env->mip->colname[env->best_sol.xind[j]],
 				   env->best_sol.xval[j]);
 			 }
@@ -407,7 +425,7 @@ int main(int argc, char **argv)
 			 printf("User indices and values in the solution\n");
 			 printf("+++++++++++++++++++++++++++++++++++++++++++++++\n");
 			 for(j = 0; j<env->best_sol.xlength; j++){		      
-			    printf("%7d %10.3f\n", env->best_sol.xind[j], 
+			    printf("%7d %10.10f\n", env->best_sol.xind[j], 
 				   env->best_sol.xval[j]);
 			 }			    
 			 printf("\n");
@@ -653,6 +671,10 @@ int sym_help(const char *line)
 	   "gap_limit                          : set the target gap between the lower and upper bound\n"
            "param_file                         : read parameters from a parameter file\n"
 	   "do_primal_heuristic                : whether or not to use primal heuristics\n\n"
+	   "should_use_rel_br                  : whether or not to use reliability branching\n\n"
+	   "prep_level                         : pre-processing level\n\n"
+	   "tighten_root_bounds                : whether to tighten root bounds \n\n"
+	   "limit_strong_branching_time        : whether to limit time spent in strong branching \n\n"
 	   "back                               : leave this menu\n"
 	   "quit/exit                          : leave the optimizer\n\n");
 					    

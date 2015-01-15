@@ -7,7 +7,7 @@
 /*                                                                           */
 /* The author of this file is Ashutosh Mahajan                               */
 /*                                                                           */
-/* (c) Copyright 2006-2013 Lehigh University. All Rights Reserved.           */
+/* (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -1409,8 +1409,7 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
 	
 	if(dive_depth > dive_depth_limit/2){	  
 	   fix_incr_cnt =(int)(1.0*(frac_ip_cnt - d_fixed_cnt)/
-			       (dive_depth_limit > (dive_depth ? dive_depth_limit - dive_depth : 1)));
-	   if(fix_incr_cnt < 1) fix_incr_cnt = 1;
+			       MAX(dive_depth_limit - dive_depth, 1));
 	}
 	
 	if(dive_depth > dive_depth_limit && lp_iter_limit - tot_lp_iter < 2*iter_cnt){
@@ -4528,8 +4527,11 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
     gap_limit = MAX(2.5, MIN(dual_gap/4, 10.0));
     if(c_num) gap_limit = MAX(4.0, MIN(dual_gap/2, 10.0));
   }
-  
-  double real_gap_limit = MIN(gap_limit, (obj_ub + p->mip->obj_offset)*gap_limit/(obj_ub - sym_fixed_offset));
+
+  double real_gap_limit = gap_limit;
+  if (p->has_ub || *solutionValue < SYM_INFINITY/2){
+     real_gap_limit = MIN(gap_limit, (obj_ub + p->mip->obj_offset)*gap_limit/(obj_ub - sym_fixed_offset));
+  }
   
   sym_set_int_param(env, "node_limit", node_limit);
   sym_set_dbl_param(env, "gap_limit", real_gap_limit); 
@@ -4899,7 +4901,7 @@ int fr_force_feasible(lp_prob *p, char use_base, int *sym_fixed_int_cnt, int *sy
 	       if(row_lb[new_r_ind] > -inf){
 		  if(coeff >= 0.0 && lb[c_ind] > -inf){
 		     row_lb[new_r_ind] += coeff*(lb[c_ind] - old_lb);
-		  }else if(coeff < 0.0 && ub[i] < inf){
+		  }else if(coeff < 0.0 && ub[c_ind] < inf){
 		     row_lb[new_r_ind] += coeff*(ub[c_ind] - old_ub);
 		  }else{
 		     row_lb[new_r_ind] = -inf;

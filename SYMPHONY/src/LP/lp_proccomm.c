@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -518,7 +518,8 @@ void send_node_desc(lp_prob *p, int node_type)
    bc_node *n = repricing ? (bc_node *) calloc(1, sizeof(bc_node)) :
       tm->active_nodes[p->proc_index];
    node_desc *tm_desc = &n->desc;   
-
+   p->tm->stat.analyzed++;
+   
    if (p->bc_level > 0) {
       n->num_cut_iters_in_path =
          p->lp_stat.num_cut_iters_in_path;
@@ -656,11 +657,13 @@ void send_node_desc(lp_prob *p, int node_type)
 	       vbc_node_pr_reason = VBC_PRUNED;
 	    }
 #pragma omp critical (tree_update)
+	    //This is the active node, so don't delete it yet
 	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
 	 } else {
 #pragma omp critical (tree_update)
+	    //This is the active node, so don't delete it yet
 	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+			       VBC_FEAS_SOL_FOUND : VBC_PRUNED);
 	 }
 
 	 if (!repricing)
@@ -668,10 +671,10 @@ void send_node_desc(lp_prob *p, int node_type)
       }
    }
 
-   if (node_type == INTERRUPTED_NODE){
-      n->node_status = NODE_STATUS__INTERRUPTED;
+   if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
+      n->node_status = (node_type == TIME_LIMIT ?
+			NODE_STATUS__TIME_LIMIT:NODE_STATUS__ITERATION_LIMIT);
       n->lower_bound = lp_data->objval;
-#pragma omp critical (tree_update)
       insert_new_node(tm, n);
       if (!repricing)
 	 return;
@@ -871,7 +874,6 @@ void send_node_desc(lp_prob *p, int node_type)
 	    n->parent = NULL;
 	    */
 	 n->node_status = NODE_STATUS__ROOT;
-#pragma omp critical (tree_update)
 	 insert_new_node(tm, n);
 	 break;
       }
@@ -1016,10 +1018,12 @@ void send_node_desc(lp_prob *p, int node_type)
 	     default:
 	       vbc_node_pr_reason = VBC_PRUNED;
 	    }
+	    //This is the active node, so don't delete it yet
 	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
 	 } else {
+	    //This is the active node, so don't delete it yet
 	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+			       VBC_FEAS_SOL_FOUND : VBC_PRUNED);
 	 }
       }
    }
@@ -1063,7 +1067,7 @@ void send_node_desc(lp_prob *p, int node_type)
    ch = (char) node_type;
    send_char_array(&ch, 1);
    send_dbl_array(&lp_data->objval, 1);
-   if (node_type == INTERRUPTED_NODE){
+   if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
       send_msg(p->tree_manager, LP__NODE_DESCRIPTION);
       freebuf(s_bufid);
       return;
@@ -1515,7 +1519,6 @@ void send_branching_info(lp_prob *p, branch_obj *can, char *action, int *keep)
 	 }
 	 node->children[*keep]->cg = node->cg;	 
 	 tm->active_nodes[p->proc_index] = node->children[*keep];
-	 tm->stat.analyzed++;
 	 PRINT(p->par.verbosity, 1, ("Decided to dive...\n"));
       }else{
 	 PRINT(p->par.verbosity, 1, ("Decided not to dive...\n"));

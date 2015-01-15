@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -222,6 +222,34 @@ if ((termcode = f) < 0)                                                    \
 #   endif
 #   define setbit(a, i) ((a)[(i) >> LOG_OF_BITS_PER_BYTE] |= \
 			 (1 << ((i) & BITS_PER_BYTE_LESS_ONE)))
+#endif
+
+#ifndef _MSC_VER
+#if _OPENMP >= 201107
+#define OPENMP_ATOMIC_WRITE _Pragma("omp atomic write")
+#else
+#define OPENMP_ATOMIC_WRITE _Pragma("omp critical (atomic_write)")
+#endif
+#else
+#if _OPENMP >= 201107
+#define OPENMP_ATOMIC_WRITE __pragma("omp atomic write")
+#else
+#define OPENMP_ATOMIC_WRITE __pragma("omp critical (atomic_write)")
+#endif
+#endif
+
+#ifndef _MSC_VER
+#if _OPENMP >= 201107
+#define OPENMP_ATOMIC_UPDATE _Pragma("omp atomic update")
+#else
+#define OPENMP_ATOMIC_UPDATE _Pragma("omp atomic")
+#endif
+#else
+#if _OPENMP >= 201107
+#define OPENMP_ATOMIC_UPDATE __pragma("omp atomic update")
+#else
+#define OPENMP_ATOMIC_UPDATE __pragma("omp atomic")
+#endif
 #endif
 
 #endif

@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2013 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
@@ -87,7 +87,10 @@ TM_SRC          = TreeManager/treemanager.c TreeManager/tm_func.c \
 endif
 
 SYM_LP_SRC = LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c LP/lp_heuristics.c LP/lp_sp.c
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp_free.c LP/lp_sp.c
+if SYM_COMPILE_IN_LP
+SYM_LP_SRC += LP/lp_heuristics.c
+endif
 if PSEUDO_COSTS
 SYM_LP_SRC += LP/lp_pseudo_branch.c
 else
@@ -121,7 +124,10 @@ MASTER_SRC     += $(TM_SRC)
 endif
 
 LP_SRC		= LP/lp_solver.c LP/lp_varfunc.c LP/lp_rowfunc.c \
-	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_heuristics.c LP/lp_sp.c
+	LP/lp_genfunc.c LP/lp_proccomm.c LP/lp_wrapper.c LP/lp.c LP/lp_free.c LP/lp_sp.c
+if SYM_COMPILE_IN_LP
+LP_SRC += LP/lp_heuristics.c
+endif
 if PSEUDO_COSTS
 LP_SRC         += LP/lp_pseudo_branch.c
 else
@@ -190,6 +196,16 @@ ALL_CP 	+= $(PROCCOMM_SRC)
 ALL_CP 	+= $(PACKCUT_SRC)
 
 MAIN_SRC = $(MASTER_MAIN_SRC)
+
+USER_APPL_DIR = ../Applications/USER/src/
+
+USER_APPL_STUBS_SRC = $(USER_APPL_DIR)/Master/user_master.c \
+	$(USER_APPL_DIR)/LP/user_lp.c \
+	$(USER_APPL_DIR)/LP/user_lp_branch.c \
+	$(USER_APPL_DIR)/CutGen/user_cg.c \
+	$(USER_APPL_DIR)/CutPool/user_cp.c \
+	$(USER_APPL_DIR)/DrawGraph/user_dg.c
+
 ##############################################################################
 #  Extensions and filenames for various configurations
 ##############################################################################
@@ -327,6 +343,10 @@ APPLCPPFLAGS += $(SYMCPPFLAGS) -DUSE_SYM_APPLICATION
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/include` \
                    -I`$(CYGPATH_W) $(top_builddir)/include`
 
+if DEPENDENCY_LINKING
+DEFAULT_INCLUDES += -I`$(CYGPATH_W) $(top_srcdir)/Applications/USER/include`
+endif
+
 ########################################################################
 ########################################################################
 
@@ -370,13 +390,13 @@ EXTRA_LTLIBRARIES = libSym.la libSym_cg.la libSym_lp.la libSym_lp_cg.la \
 	libSymAppl_tm_cp.la libSymAppl_tm_lp_cg.la libSymAppl_tm_lp_cg_cp.la \
 	libSymAppl_m_tm.la libSymAppl_m_tm_lp.la libSymAppl_m_tm_cp.la \
 	libSymAppl_m_tm_lp_cg.la libSymAppl_m_tm_lp_cg_cp.la \
-	libSymAppl_cp.la libSym_m.la libSymAppl_m.la
+	libSymAppl_cp.la libSym_m.la libSymAppl_m.la libSymApplStubs.la
 #$(WHATTOMAKELIBS) $(WHATTOMAKEBINS)
 #if !SYM_PARALLEL
 
 # Name of the library compiled in this directory.  We want it to be installed
 # in the 'lib' directory
-lib_LTLIBRARIES = $(WHATTOMAKELIBS)
+lib_LTLIBRARIES = $(WHATTOINSTALLLIBS)
 
 # List all source files for this library, including headers
 libSym_la_SOURCES = $(SYMINCFILES) $(ALL_SYM_MASTER)
@@ -442,7 +462,7 @@ libSym_tm_cp_la_LDFLAGS = $(LT_LDFLAGS)
 
 # List all additionally required libraries
 if DEPENDENCY_LINKING
-libSym_la_LIBADD = $(SYMPHONYLIB_LIBS)
+libSym_la_LIBADD = $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
 endif
 
 ########################################################################
@@ -557,7 +577,6 @@ symphony_lp_cg_cp__CPPFLAGS = $(PCPPFLAGS)
 symphony_lp_cg_cp_LDADD = libSym_lp$(LPEXT).la $(PLDADD)
 symphony_lp_cg_cp_DEPENDENCIES = libSym_lp$(LPEXT).la $(DEPENDENCIES)
 
-
 ########################################################################
 #                Application Library                                   #    
 ########################################################################
@@ -622,6 +641,22 @@ libSymAppl_tm_lp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_lp_cg_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_lp_cg_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
 libSymAppl_tm_cp_la_CPPFLAGS = $(APPLPCPPFLAGS)
+
+# List all additionally required libraries
+if DEPENDENCY_LINKING
+libSymAppl_la_LIBADD = libSymApplStubs.la $(SYMPHONYLIB_LIBS) $(SYM_OPENMP_LIBS)
+endif
+
+########################################################################
+#     A Dummy Library with Stubs for User Callbacks                    #
+#       (We need this to do dependency linking)                        #
+########################################################################
+
+libSymApplStubs_la_SOURCES = $(SYMINCFILES) $(USER_APPL_DIR)/include/user.h \
+	                     $(USER_APPL_STUBS_SRC)
+libSymApplStubs_lp_la_LINK = $(STATIC_LINK)
+libSymApplStubs_la_LDFLAGS = $(LT_LDFLAGS) 
+libSymApplStubs_la_CPPFLAGS = $(APPLCPPFLAGS) 
 
 ########################################################################
 #                Other stuff                                           #    

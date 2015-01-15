@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -84,7 +84,6 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #endif
    int s_bufid;
 #endif
-   int *termcodes = NULL;
 #if !defined(_MSC_VER) && !defined(__MNO_CYGWIN) && defined(SIGHANDLER)
    signal(SIGINT, sym_catch_c);    
 #endif   
@@ -97,13 +96,13 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    tm->bpath =
       (branch_desc **) calloc(par->max_active_nodes, sizeof(branch_desc *));
    tm->bpath_size = (int *) calloc(par->max_active_nodes, sizeof(int));
-   termcodes = (int *) calloc(par->max_active_nodes, sizeof(int));
+   tm->termcodes = (int *) calloc(par->max_active_nodes, sizeof(int));
 #else
    tm->rpath = (bc_node ***) calloc(1, sizeof(bc_node **));
    tm->rpath_size = (int *) calloc(1, sizeof(int));
    tm->bpath = (branch_desc **) calloc(1, sizeof(branch_desc *));
    tm->bpath_size = (int *) calloc(1, sizeof(int));
-   termcodes = (int *) calloc(1, sizeof(int));
+   tm->termcodes = (int *) calloc(1, sizeof(int));
 #endif
    
    /*------------------------------------------------------------------------*\
@@ -144,12 +143,6 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
    SRANDOM(par->random_seed);
 
 #ifdef COMPILE_IN_LP
-#ifdef _OPENMP
-   omp_set_dynamic(FALSE);
-   omp_set_num_threads(par->max_active_nodes);
-#else
-   par->max_active_nodes = 1;
-#endif
    tm->active_nodes = (bc_node **) calloc(par->max_active_nodes, sizeof(bc_node *));
 #ifndef COMPILE_IN_TM
    tm->lpp = (lp_prob **)
@@ -167,18 +160,22 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
 #endif
 #pragma omp parallel for shared(tm)
    for (i = 0; i < par->max_active_nodes; i++){
-      if ((termcodes[i] = lp_initialize(tm->lpp[i], 0)) < 0){
+      if ((tm->termcodes[i] = lp_initialize(tm->lpp[i], 0)) < 0){
 	 printf("LP initialization failed with error code %i in thread %i\n\n",
-		termcodes[i], i); 
+		tm->termcodes[i], i); 
       }
       tm->lpp[i]->tm = tm;
+#ifdef _OPENMP
+      tm->lpp[i]->proc_index = omp_get_thread_num();
+#else
+      tm->lpp[i]->proc_index = 0;
+#endif
    }
-   tm->lp.free_num = par->max_active_nodes;
+   //The master thread isn't used unless there is only one thread
+   tm->lp.free_num = MAX(par->max_active_nodes-1, 1);
    for (i = 0; i < par->max_active_nodes; i++){
-      if (termcodes[i] < 0){
-	 int tmp = termcodes[i];
-	 FREE(termcodes);
-	 return(tmp);
+      if (tm->termcodes[i] < 0){
+	 return(tm->termcodes[i]);
       }
    }
 #else
@@ -249,7 +246,6 @@ int tm_initialize(tm_prob *tm, base_desc *base, node_desc *rootdesc)
     * Receive the root node and send out initial data to the LP processes
    \*------------------------------------------------------------------------*/
    
-   FREE(termcodes);
    if (tm->par.warm_start){
       if (!tm->rootnode){
 	 if (!(f = fopen(tm->par.warm_start_tree_file_name, "r"))){
@@ -315,12 +311,11 @@ int solve(tm_prob *tm)
 #ifndef COMPILE_IN_LP
    int r_bufid;
 #endif
-   int termcode = 0;
    double start_time = tm->start_time;
    double no_work_start, ramp_up_tm = 0, ramp_down_time = 0;
    char ramp_down = FALSE, ramp_up = TRUE;
    double then, then2, then3, now;
-   double timeout2 = 2, timeout3 = tm->par.logging_interval, timeout4 = 10;
+   double timeout2 = tm->par.status_interval, timeout3 = tm->par.logging_interval, timeout4 = 10;
 
    /*------------------------------------------------------------------------*\
     * The Main Loop
@@ -328,50 +323,71 @@ int solve(tm_prob *tm)
 
    no_work_start = wall_clock(NULL);
 
-   termcode = TM_UNFINISHED;
+   tm->termcode = TM_UNFINISHED;
    for (; tm->phase <= 1; tm->phase++){
       if (tm->phase == 1 && !tm->par.warm_start){
-	 if ((termcode = tasks_before_phase_two(tm)) ==
+	 if ((tm->termcode = tasks_before_phase_two(tm)) ==
 	     FUNCTION_TERMINATED_NORMALLY){
-	    termcode = TM_FINISHED; /* Continue normally */
+	    tm->termcode = TM_FINISHED; /* Continue normally */
 	 }
       }
+#pragma omp parallel default(shared) private(now, then2, then3)
+{
+#ifdef _OPENMP
+      int i, ret, thread_num = omp_get_thread_num(), scand_num;
+#else
+      int i, ret, thread_num = 0, scand_num;
+#endif
+      tm->termcodes[thread_num] = TM_UNFINISHED;
       then  = wall_clock(NULL);
       then2 = wall_clock(NULL);
       then3 = wall_clock(NULL);
-#pragma omp parallel default(shared)
-{
-#ifdef _OPENMP
-      int i, thread_num = omp_get_thread_num();
-#else
-      int i, thread_num = 0;
-#endif
-      while (tm->active_node_num > 0 || tm->samephase_candnum > 0){
+      while (tm->termcode == TM_UNFINISHED){
 	 /*------------------------------------------------------------------*\
 	  * while there are nodes being processed or while there are nodes
 	  * waiting to be processed, continue to execute this loop
 	 \*------------------------------------------------------------------*/
 	 i = NEW_NODE__STARTED;
-	 while (tm->lp.free_num > 0 && (tm->par.time_limit >= 0.0 ?
+	 while (tm->lp.free_num > 0
+		&& (tm->par.time_limit >= 0.0 ?
 		(wall_clock(NULL) - start_time < tm->par.time_limit) : TRUE) &&
 		(tm->par.node_limit >= 0 ?
-		tm->stat.analyzed < tm->par.node_limit : TRUE) &&
-		((tm->has_ub && (tm->stat.analyzed > 0 && tm->par.gap_limit >= 0.0)) ?
+		tm->stat.analyzed < tm->par.node_limit : TRUE)
+		&& ((tm->has_ub && (tm->stat.analyzed > 0 && tm->par.gap_limit >= 0.0)) ?
 		 d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) > tm->par.gap_limit : TRUE)
 		&& !(tm->par.find_first_feasible && tm->has_ub && 
 		     tm->lp_stat.ip_sols > 0) &&
 		!(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit) &&
 		c_count <= 0){
-	    if (tm->samephase_candnum > 0){
 #pragma omp critical (tree_update)
+            {
+            scand_num = tm->samephase_candnum;
+            }
+	    if (scand_num > 0 && (thread_num != 0 || tm->par.max_active_nodes == 1)){
 	       i = start_node(tm, thread_num);
 	    }else{
 	       i = NEW_NODE__NONE;
 	    }
-
-	    if (i != NEW_NODE__STARTED)
-	       break;
-
+#pragma omp master
+{
+   //printf("Master entering omp master thread %d\n", thread_num); 
+            now = wall_clock(NULL);
+	    if (tm->stat.analyzed>tm->active_node_num &&
+		tm->has_ub && tm->par.tighten_root_bounds){
+	       tighten_root_bounds(tm);
+	    }
+	    //printf("%f %f %f\n", now, then2, timeout2); 
+	    if (now - then2 > timeout2){
+	       if(tm->par.verbosity >= -1 ){
+		  print_tree_status(tm);
+	       }
+	       then2 = now;
+	    }
+	    if (now - then3 > timeout3){
+	       write_log_files(tm);
+	       then3 = now;
+	    }
+ 
 	    if (ramp_up){
 	       ramp_up_tm += (wall_clock(NULL) -
 				no_work_start) * (tm->lp.free_num + 1);
@@ -390,145 +406,148 @@ int solve(tm_prob *tm)
 	       ramp_down = TRUE;
 	       no_work_start = wall_clock(NULL);
 	    }
-#ifdef COMPILE_IN_LP
-#ifdef _OPENMP
-	    if (tm->par.verbosity > 0)
-	       printf("Thread %i now processing node %i\n", thread_num,
-		      tm->lpp[thread_num]->bc_index);
-#endif
 
+}
+#pragma omp master
 	    if(tm->par.node_selection_rule == DEPTH_FIRST_THEN_BEST_FIRST &&
 	       tm->has_ub){
 	      tm->par.node_selection_rule = LOWEST_LP_FIRST;
 	    }
 
+	    if (i != NEW_NODE__STARTED)
+	       break;
 
-   switch(process_chain(tm->lpp[thread_num])){
-	       
+#ifdef COMPILE_IN_LP
+#ifdef _OPENMP
+	    if (tm->par.verbosity > 1)
+	       printf("Thread %i now processing node %i\n", thread_num,
+		      tm->lpp[thread_num]->bc_index);
+#endif
+
+	    ret = process_chain(tm->lpp[thread_num]); 
+
+	    switch(ret){
+
 	     case FUNCTION_TERMINATED_NORMALLY:
 	       break;
 	       
 	     case ERROR__NO_BRANCHING_CANDIDATE:
-	       termcode = TM_ERROR__NO_BRANCHING_CANDIDATE;
+OPENMP_ATOMIC_WRITE
+	       tm->termcode = TM_ERROR__NO_BRANCHING_CANDIDATE;
 	       break;
 	       
 	     case ERROR__ILLEGAL_RETURN_CODE:
-	       termcode = TM_ERROR__ILLEGAL_RETURN_CODE;
+OPENMP_ATOMIC_WRITE
+	       tm->termcode = TM_ERROR__ILLEGAL_RETURN_CODE;
 	       break;
 	       
 	     case ERROR__NUMERICAL_INSTABILITY:
-	       termcode = TM_ERROR__NUMERICAL_INSTABILITY;
+OPENMP_ATOMIC_WRITE
+	       tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
 	       break;
 	       
 	     case ERROR__COMM_ERROR:
-	       termcode = TM_ERROR__COMM_ERROR;
+OPENMP_ATOMIC_WRITE
+	       tm->termcode = TM_ERROR__COMM_ERROR;
 	       
 	     case ERROR__USER:
-	       termcode = TM_ERROR__USER;
+OPENMP_ATOMIC_WRITE
+	       tm->termcode = TM_ERROR__USER;
 	       break;
 
 	     case ERROR__DUAL_INFEASIBLE:
 	       if(tm->lpp[thread_num]->bc_index < 1 ) {		  
-		  termcode = TM_UNBOUNDED;
+OPENMP_ATOMIC_WRITE
+		  tm->termcode = TM_UNBOUNDED;
 	       }else{
-		  termcode = TM_ERROR__NUMERICAL_INSTABILITY;
+OPENMP_ATOMIC_WRITE
+		  tm->termcode = TM_ERROR__NUMERICAL_INSTABILITY;
 	       }
 	       break;	       
 	    }
 #endif
-#pragma omp master
-	    {	    //added by Anahita
-	       find_tree_lb(tm);
-            now = wall_clock(NULL);
-	    if (now - then2 > timeout2){
-	       if(tm->par.verbosity >= -1 ){
-		  print_tree_status(tm, FALSE, 0.0);
-	       }
-	       then2 = now;
-	    }
-	    if (now - then3 > timeout3){
-	       write_log_files(tm);
-	       then3 = now;
-	    }
-}
 	 }
 
-	 if (c_count > 0){
-	    termcode = TM_SIGNAL_CAUGHT;
-	    c_count = 0;
+	 if (tm->termcode != TM_UNFINISHED){
 	    break;
 	 }
 	 
-	 if (tm->par.time_limit >= 0.0 &&
-	     wall_clock(NULL) - start_time > tm->par.time_limit &&
-	     termcode != TM_FINISHED){
-	    termcode = TM_TIME_LIMIT_EXCEEDED;
-	    break;
+#pragma omp master
+{
+	 if (c_count > 0){
+	    tm->termcode = TM_SIGNAL_CAUGHT;
+	    c_count = 0;
 	 }
+}
 
-	 if (tm->par.node_limit >= 0 && tm->stat.analyzed >= 
-	     tm->par.node_limit && termcode != TM_FINISHED){
+         if (tm->par.time_limit >= 0.0 &&
+	     wall_clock(NULL) - start_time > tm->par.time_limit){
+	    tm->termcodes[thread_num] = TM_TIME_LIMIT_EXCEEDED;
+	 }else if (tm->par.node_limit >= 0 &&
+		   tm->stat.analyzed >= tm->par.node_limit){
 	    if (tm->active_node_num + tm->samephase_candnum > 0){
-	       termcode = TM_NODE_LIMIT_EXCEEDED;
+	       tm->termcode = tm->termcodes[thread_num] = TM_NODE_LIMIT_EXCEEDED;
 	    }else{
-	       termcode = TM_FINISHED;
+	       tm->termcodes[thread_num] = TM_FINISHED;
 	    }
-	    break;
-	 }
-
-	 if (tm->par.find_first_feasible && tm->has_ub && tm->lp_stat.ip_sols){
-	    termcode = TM_FINISHED;
-	    break;
-	 }
-
-	 if (i == NEW_NODE__ERROR){
-	    termcode = SOMETHING_DIED;
-	    break;
-	 }
-
-	 if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
-            find_tree_lb(tm);
+	 }else if (tm->par.find_first_feasible && tm->has_ub && tm->lp_stat.ip_sols){
+	    tm->termcodes[thread_num] = TM_FINISHED;
+	 }else if (tm->has_ub && (tm->par.gap_limit >= 0.0)){
+	    find_tree_lb(tm);
 	    if (d_gap(tm->ub, tm->lb, tm->obj_offset, tm->obj_sense) <= tm->par.gap_limit){
 	       if (tm->lb < tm->ub){
-		  termcode = TM_TARGET_GAP_ACHIEVED;
+		  tm->termcodes[thread_num] = TM_TARGET_GAP_ACHIEVED;
 	       }else{
-		  termcode = TM_FINISHED;
+		  tm->termcodes[thread_num] = TM_FINISHED;
 	       }
-	       break;
 	    }
 	 }
-	 
-	 //if(tm->par.rs_mode_enabled)
-	 // printf("tm-lp-iter %i %i \n", tm->lp_stat.lp_iter_num, tm->par.rs_lp_iter_limit);
-	 if(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit){
-	    termcode = TM_TARGET_GAP_ACHIEVED;
+	 if (tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit){
+	    tm->termcodes[thread_num] = TM_ITERATION_LIMIT_EXCEEDED;
+	 }
+
+         if (tm->termcodes[thread_num] != TM_UNFINISHED){
+OPENMP_ATOMIC_WRITE
+	    tm->termcode = tm->termcodes[thread_num];
+	    break;
+	 }
+
+         if (tm->termcode != TM_UNFINISHED){
+	    tm->termcodes[thread_num] = tm->termcode;
 	    break;
 	 }
 	 
-	 if (i == NEW_NODE__NONE && tm->active_node_num == 0)
+	 if (i == NEW_NODE__ERROR){
+OPENMP_ATOMIC_WRITE
+	    tm->termcode = tm->termcodes[thread_num] = SOMETHING_DIED;
+	 }
+
+         if (tm->samephase_candnum == 0 && tm->active_node_num == 0 &&
+	     tm->stat.analyzed > 0){
+	    tm->termcodes[thread_num] = TM_FINISHED;
 	    break;
-
+	 }
+	 
 #ifndef COMPILE_IN_LP
-
 	 struct timeval timeout = {5, 0};
 	 r_bufid = treceive_msg(ANYONE, ANYTHING, &timeout);
 	 if (r_bufid && !process_messages(tm, r_bufid)){
             find_tree_lb(tm);
-	    termcode = SOMETHING_DIED;
+	    tm->termcode = SOMETHING_DIED;
 	    break;
 	 }
 #endif
+#pragma omp master
+{	    
 	 now = wall_clock(NULL);
 	 if (now - then > timeout4){
 	    if (!processes_alive(tm)){
                find_tree_lb(tm);
-               termcode = SOMETHING_DIED;
-	       break;
+               tm->termcode = SOMETHING_DIED;
 	    }
 	    then = now;
 	 }
-#pragma omp master
-{
+#if 0
          for (i = 0; i < tm->par.max_active_nodes; i++){
 	    if (tm->active_nodes[i]){
 	       break;
@@ -537,9 +556,10 @@ int solve(tm_prob *tm)
 	 if (i == tm->par.max_active_nodes){
 	    tm->active_node_num = 0;
 	 }
+#endif
 	 if (now - then2 > timeout2){
 	    if(tm->par.verbosity >=0 ){
-	       print_tree_status(tm, FALSE, 0.0);
+	       print_tree_status(tm);
 	    }
 	    then2 = now;
 	 }
@@ -547,18 +567,40 @@ int solve(tm_prob *tm)
 	    write_log_files(tm);
 	    then3 = now;
 	 }
-}
+} // pragma
       }
-}
+} // pragma
 
-      if(termcode == TM_UNBOUNDED) break;
-
-      if (tm->samephase_candnum + tm->active_node_num == 0){
-	 termcode = TM_FINISHED;
+      if (tm->termcode == TM_UNBOUNDED){
+	 break;
       }
+
+      if (tm->samephase_candnum == 0 && tm->active_node_num == 0 &&
+	  tm->stat.analyzed > 0){
+	 int ii = tm->par.max_active_nodes;
+        for (ii = 1; ii < tm->par.max_active_nodes; ii++){
+	   if (tm->termcodes[ii]  == TM_UNFINISHED){
+	      break;
+	   }
+	}
+	if (ii == tm->par.max_active_nodes){
+OPENMP_ATOMIC_WRITE
+	   tm->termcode = TM_FINISHED;
+	}else{
+	   if (now - then2 > timeout2){
+	      if(tm->par.verbosity >=0 ){
+		 printf("Waiting for all threads to exit...");
+		 print_tree_status(tm);
+	      }
+	      then2 = now;
+	   }
+	}
+      }
+
       if (tm->nextphase_candnum == 0)
 	 break;
-      if (termcode != TM_UNFINISHED)
+
+      if (tm->termcode != TM_UNFINISHED)
 	 break;
    }
    find_tree_lb(tm);
@@ -566,7 +608,7 @@ int solve(tm_prob *tm)
    tm->comp_times.ramp_down_time = ramp_down_time;
    write_log_files(tm);
 
-   return(termcode);
+   return(tm->termcode);
 }
 
 /*===========================================================================*/
@@ -606,7 +648,7 @@ void write_log_files(tm_prob *tm)
  * Prints out the current size of the tree and the gap                      *
 \*==========================================================================*/
 
-void print_tree_status(tm_prob *tm, int is_diving, double diving_obj)
+void print_tree_status(tm_prob *tm)
 {
    double elapsed_time;
    double obj_ub = SYM_INFINITY, obj_lb = -SYM_INFINITY;
@@ -696,14 +738,25 @@ void print_tree_status(tm_prob *tm, int is_diving, double diving_obj)
    }
 #endif
 
+#ifdef _OPENMP
+   int thread_num = omp_get_thread_num();
+#else
+   int thread_num = 0;
+#endif
+
    if (tm->par.output_mode > 0) {
-     if (tm->stat.print_stats_cnt < 1 || tm->par.verbosity > 0) {
+     if (tm->stat.print_stats_cnt < 1 || tm->par.verbosity > 1) {
        printf("%7s ","Time");     
 #ifdef SHOULD_SHOW_MEMORY_USAGE 
        printf("%9s ","Mem(MB)");
 #endif
        printf("%10s ","Done");
-       printf("%10s ","Left");
+#ifdef _OPENMP
+       if (tm->par.max_active_nodes > 1){
+	  printf("%10s ","Active");
+       }
+#endif
+       printf("%10s ","Queued");
        if (tm->obj_sense == SYM_MAXIMIZE) {
 	 printf("%19s ","UB");
 	 printf("%19s ","LB");
@@ -719,12 +772,14 @@ void print_tree_status(tm_prob *tm, int is_diving, double diving_obj)
 #ifdef SHOULD_SHOW_MEMORY_USAGE 
      printf("%9.2f ", vsize_in_mb);
 #endif
-     printf("%10i ", tm->stat.analyzed-tm->active_node_num);
-     printf("%10i ", tm->samephase_candnum+tm->active_node_num);     
-     find_tree_lb(tm);
-     if (is_diving) {
-	tm->lb = MIN(tm->lb, diving_obj); 
+     printf("%10i ", tm->stat.analyzed);
+#ifdef _OPENMP
+     if (tm->par.max_active_nodes > 1){
+	printf("%10i ", tm->active_node_num);
      }
+#endif
+     printf("%10i ", tm->samephase_candnum);     
+     find_tree_lb(tm);
      if (tm->lb > -SYM_INFINITY) {
        if (tm->obj_sense == SYM_MAXIMIZE) {
 	 obj_ub = -tm->lb + tm->obj_offset;
@@ -767,7 +822,7 @@ void print_tree_status(tm_prob *tm, int is_diving, double diving_obj)
 #ifdef SHOULD_SHOW_MEMORY_USAGE
      printf("memory: %.2f MB ", vsize_in_mb);
 #endif
-     printf("done: %i ", tm->stat.analyzed-tm->active_node_num);
+     printf("done: %i ", tm->stat.analyzed);
      printf("left: %i ", tm->samephase_candnum+tm->active_node_num);
      if (tm->has_ub) {
        if (tm->obj_sense == SYM_MAXIMIZE) {
@@ -785,9 +840,6 @@ void print_tree_status(tm_prob *tm, int is_diving, double diving_obj)
        }
      }
      find_tree_lb(tm);
-     if (is_diving) {
-	tm->lb = MIN(tm->lb, diving_obj); 
-     }
      if (tm->lb > -SYM_INFINITY) {
        if (tm->obj_sense == SYM_MAXIMIZE) {
 	 obj_ub = -tm->lb + tm->obj_offset;
@@ -860,6 +912,10 @@ int start_node(tm_prob *tm, int thread_num)
    bc_node *best_node = NULL;
    double time;
 
+   if (tm->termcode != TM_UNFINISHED){
+      return NEW_NODE__STOP;
+   }
+
    time = wall_clock(NULL);
    
    /*------------------------------------------------------------------------*\
@@ -871,7 +927,9 @@ int start_node(tm_prob *tm, int thread_num)
 
    get_next = TRUE;
    while (get_next){
-      if ((best_node = del_best_node(tm)) == NULL)
+#pragma omp critical (tree_update)
+      best_node = del_best_node(tm);
+      if (best_node == NULL)
 	 return(NEW_NODE__NONE);
 
       if (best_node->node_status == NODE_STATUS__WARM_STARTED){
@@ -914,7 +972,7 @@ int start_node(tm_prob *tm, int thread_num)
 	       }
 	     }
 	 
-	     if (tm->par.verbosity > 0){
+	     if (tm->par.verbosity > 1){
 		printf("++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 		printf("+ TM: Pruning NODE %i LEVEL %i instead of sending it.\n",
 		       best_node->bc_index, best_node->bc_level);
@@ -936,7 +994,8 @@ int start_node(tm_prob *tm, int thread_num)
 		   purge_pruned_nodes(tm, best_node, VBC_PRUNED);
 		}
 #else
-		   purge_pruned_nodes(tm, best_node, VBC_PRUNED);
+#pragma omp critical (tree_update)
+		purge_pruned_nodes(tm, best_node, VBC_PRUNED);
 #endif
 	     }
 	     break;
@@ -949,10 +1008,12 @@ int start_node(tm_prob *tm, int thread_num)
 
        default:
 	 /* i.e., phase == 0 and nf_status != NF_CHECK_NOTHING */
+#pragma omp critical (tree_update)
 	  if (!(tm->par.colgen_strat[0] & FATHOM__GENERATE_COLS__RESOLVE)){
 	     REALLOC(tm->nextphase_cand, bc_node *, tm->nextphase_cand_size,
 		     tm->nextphase_candnum+1, BB_BUNCH);
-	     tm->nextphase_cand[tm->nextphase_candnum++] = best_node;
+	     tm->nextphase_candnum++;
+	     tm->nextphase_cand[tm->nextphase_candnum] = best_node;
 	  }else{
 	     get_next = FALSE;
 	  }
@@ -977,11 +1038,12 @@ int start_node(tm_prob *tm, int thread_num)
 
    /* It's time to put together the node and send it out */
    tm->active_nodes[lp_ind] = best_node;
+OPENMP_ATOMIC_UPDATE
    tm->active_node_num++;
-   tm->stat.analyzed++;
 
    send_active_node(tm,best_node,tm->par.colgen_strat[tm->phase],thread_num);
 
+OPENMP_ATOMIC_UPDATE
    tm->comp_times.start_node += wall_clock(NULL) - time;
 
    return(NEW_NODE__STARTED);
@@ -1044,10 +1106,32 @@ bc_node *del_best_node(tm_prob *tm)
 
 void insert_new_node(tm_prob *tm, bc_node *node)
 {
+   if (tm->termcode == TM_UNFINISHED){
+      if (node->node_status == NODE_STATUS__TIME_LIMIT){
+OPENMP_ATOMIC_WRITE
+	 tm->termcode = TM_TIME_LIMIT_EXCEEDED;
+#ifdef _OPENMP
+	 tm->termcodes[omp_get_thread_num()] = TM_TIME_LIMIT_EXCEEDED;
+#else
+	 tm->termcodes[0] = TM_TIME_LIMIT_EXCEEDED;
+#endif
+      }else if (node->node_status == NODE_STATUS__ITERATION_LIMIT){
+OPENMP_ATOMIC_WRITE
+	 tm->termcode = TM_ITERATION_LIMIT_EXCEEDED;
+#ifdef _OPENMP
+	 tm->termcodes[omp_get_thread_num()] = TM_ITERATION_LIMIT_EXCEEDED;
+#else
+	 tm->termcodes[0] = TM_ITERATION_LIMIT_EXCEEDED;
+#endif
+      }
+   }
+  
+#pragma omp critical (tree_update)
+{
    int pos, ch, size = tm->samephase_candnum;
    bc_node **list;
    int rule = tm->par.node_selection_rule;
-  
+
    tm->samephase_candnum = pos = ++size;
 
    if (tm->par.verbosity > 10)
@@ -1068,6 +1152,8 @@ void insert_new_node(tm_prob *tm, bc_node *node)
       }
    }
    list[pos] = node;
+} /* End critical Region */
+
 }
 
 /*===========================================================================*/
@@ -1102,11 +1188,6 @@ int node_compar(tm_prob *tm, int rule, bc_node *node0, bc_node *node1)
    n0_frac = fabs(node0->parent->bobj.value - n0_rhs);
    n1_frac = fabs(node1->parent->bobj.value - n1_rhs);
    
-   int n0_eff = MAX(tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n0_ind].col_size,
-		    tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n0_ind].sos_num);
-   int n1_eff = MAX(tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n1_ind].col_size,
-		    tm->lpp[tm->opt_thread_num]->mip->mip_inf->cols[n1_ind].sos_num);
-
    /* solves acc3 without swap 
       if(node1->lower_bound < node0->lower_bound - 1e-4) ret_ind = 1;
       else if (node1->lower_bound < node0->lower_bound + 1e-4) {
@@ -1351,7 +1432,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 #else /*We only want to process the root node in this case - discard others*/
       if (TRUE){	 
 #endif
-	 if (tm->par.verbosity > 0){
+	 if (tm->par.verbosity > 1){
 	    printf("++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	    printf("+ TM: Pruning NODE %i LEVEL %i while generating it.\n",
 		   child->bc_index, child->bc_level);
@@ -1378,6 +1459,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	    if (tm->par.keep_description_of_pruned == KEEP_ON_DISK_VBC_TOOL)
 #pragma omp critical (write_pruned_node_file)
 	       write_pruned_nodes(tm, child);
+#pragma omp critical (tree_update)
 	    if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
 	       int vbc_node_pr_reason;
 	       switch (action[i]) {
@@ -1398,12 +1480,10 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 		  vbc_node_pr_reason = VBC_FEAS_SOL_FOUND;
 	       }
 	       */
-#pragma omp critical (tree_update)
 	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
 	    } else {
-#pragma omp critical (tree_update)
 	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
-		     VBC_PRUNED);
+				  VBC_PRUNED);
 	    }
 
 	    if (--child_num == 0){
@@ -1566,7 +1646,7 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	       purge_pruned_nodes(tm, child, vbc_node_pr_reason);
 	    } else {
 	       purge_pruned_nodes(tm, child, feasible[i] ? VBC_FEAS_SOL_FOUND :
-		     VBC_PRUNED);
+				  VBC_PRUNED);
 	    }
 
 	    if (--child_num == 0){
@@ -1599,7 +1679,6 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       }else{
 	 /* it will be processed in this phase (==> insert it if not kept) */
 	 if (*keep != i || dive == DO_NOT_DIVE){
-#pragma omp critical (tree_update)
 	    insert_new_node(tm, child);
 	    np_cp++;
 	    np_sp++;
@@ -1757,7 +1836,7 @@ char shall_we_dive(tm_prob *tm, double objval)
  * of other nodes that are no longer needed.
 \*===========================================================================*/
 
-int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
+ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 {
    int i, new_child_num;
    branch_obj *bobj = &node->parent->bobj;
@@ -1776,10 +1855,10 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
    if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
       switch (category) {
        case VBC_PRUNED_INFEASIBLE:
-	 sprintf(reason,"%s","infeasible");
-	 sprintf(reason,"%s %i %i",reason, node->bc_index+1,
-	       node->parent->bc_index+1);
+	 sprintf(reason, "%s", "infeasible");
+	 sprintf(reason,"%s %i", reason, node->bc_index+1);
 	 if (node->bc_index>0) {
+	    sprintf(reason, "%s %i", reason, node->parent->bc_index+1);
 	    if (node->parent->children[0]==node) {
 	       branch_dir = node->parent->bobj.sense[0];
 	       /*branch_dir = 'L';*/
@@ -1790,14 +1869,17 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	    if (branch_dir == 'G') {
 	       branch_dir = 'R';
 	    }
+	 }else{
+	    sprintf(reason," 0");
 	 }
+	    
 	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
 	 break;
        case VBC_PRUNED_FATHOMED:
-	 sprintf(reason,"%s","fathomed");
-	 sprintf(reason,"%s %i %i",reason, node->bc_index+1,
-		 node->parent->bc_index+1);
+	 sprintf(reason, "%s", "fathomed");
+	 sprintf(reason, "%s %i", reason, node->bc_index+1);
 	 if (node->bc_index>0) {
+	    sprintf(reason,"%s %i", reason, node->parent->bc_index+1);
 	    if (node->parent->children[0]==node) {
 	       branch_dir = node->parent->bobj.sense[0];
 	       /*branch_dir = 'L';*/
@@ -1808,6 +1890,8 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	    if (branch_dir == 'G') {
 	       branch_dir = 'R';
 	    }
+	 }else{
+	    sprintf(reason," 0");
 	 }
 	 sprintf(reason,"%s %c %s", reason, branch_dir, "\n");
 	 break;
@@ -1885,15 +1969,34 @@ int purge_pruned_nodes(tm_prob *tm, bc_node *node, int category)
 	       int *swap_si = bobj->sos_ind[i];
 	       bobj->sos_ind[i] = bobj->sos_ind[new_child_num];
 	       bobj->sos_ind[new_child_num] = swap_si;
+#ifdef COMPILE_IN_LP
 	       bobj->is_est[i] = bobj->is_est[new_child_num];
 	       bobj->termcode[i] = bobj->termcode[new_child_num];
 	       bobj->iterd[i] = bobj->iterd[new_child_num];
+#endif
 	    }
 	 }
       }
    }
 
    free_tree_node(node);
+#ifdef COMPILE_IN_LP
+#ifdef _OPENMP
+   int thread_num = omp_get_thread_num();
+#else
+   int thread_num = 0;
+#endif
+   if (node == tm->active_nodes[thread_num]){
+      // We have to remove this node from the list now, since
+      // it might otherwise be referenced in find_tree_lb
+      // before it is finally removed in fathom_node
+      tm->active_nodes[thread_num] = NULL;
+      // For some reason, this seems to cause problems,
+      // even though you would think it should be done here.
+      //OPENMP_ATOMIC_UPDATE
+      //tm->active_node_num--;
+   }
+#endif
    return(1);
 }
 
@@ -1999,9 +2102,25 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 		    int bc_index, char branching, int feasible){
    bc_node *node, *temp, **list;
    int rule, pos, prev_pos, last, i, j;
-
-   tm->has_ub = TRUE;
-   tm->ub = new_ub;
+   int changed_bound = TRUE;
+   
+{
+   if (!tm->has_ub || (tm->has_ub && new_ub < tm->ub)){
+      tm->has_ub = TRUE;
+      tm->ub = new_ub;
+   }else{
+      changed_bound = FALSE;
+   }
+#ifdef COMPILE_IN_LP
+   for (i = 0; i < tm->par.max_active_nodes; i ++){
+      tm->lpp[i]->has_ub = tm->has_ub;
+      tm->lpp[i]->ub = tm->ub;
+   }
+#endif
+}
+   if (!changed_bound){
+      return;
+   }
 #ifdef COMPILE_IN_LP
    tm->opt_thread_num = opt_thread_num;
 #endif
@@ -2068,6 +2187,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	 node = list[i];
 	 if (tm->has_ub &&
 	     node->lower_bound >= tm->ub-tm->par.granularity){
+#ifdef COMPILE_IN_LP
 	    if(node->parent){
 	       for(j = 0; j < node->parent->bobj.child_num; j++){
 		  if(node->parent->children[j] == node){
@@ -2079,6 +2199,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 		  }
 	       }
 	    }
+#endif
 	    if (i != last){
 	       list[i] = list[last];
 	       for (prev_pos = i, pos = i/2; pos >= 1;
@@ -2095,7 +2216,7 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 	    }
 	    tm->samephase_cand[last] = NULL;
 	    last--;
-	    if (tm->par.verbosity > 0){
+	    if (tm->par.verbosity > 1){
 	       printf("+++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	       printf("+ TM: Pruning NODE %i LEVEL %i after new incumbent.\n",
 		      node->bc_index, node->bc_level);
@@ -2106,11 +2227,10 @@ void install_new_ub(tm_prob *tm, double new_ub, int opt_thread_num,
 		KEEP_ON_DISK_VBC_TOOL){
 	       if (tm->par.keep_description_of_pruned ==
 		   KEEP_ON_DISK_VBC_TOOL)
-#pragma omp critical (write_pruned_node_file)
+#pragma omp_critical (write_pruned_node_file)
 		  write_pruned_nodes(tm, node);
 	       if (tm->par.vbc_emulation == VBC_EMULATION_FILE_NEW) {
-		  purge_pruned_nodes(tm, node,
-				     VBC_PRUNED_FATHOMED);
+		  purge_pruned_nodes(tm, node, VBC_PRUNED_FATHOMED);
 	       } else {
 		  purge_pruned_nodes(tm, node, VBC_PRUNED);
 	       }
@@ -3193,7 +3313,6 @@ int read_node(tm_prob *tm, bc_node *node, FILE *f, int **children)
       break;
     case NODE_STATUS__WARM_STARTED:
     case NODE_STATUS__CANDIDATE:
-#pragma omp critical (tree_update)
       insert_new_node(tm, node);
       break;
    }
@@ -3504,6 +3623,7 @@ void free_tm(tm_prob *tm)
    FREE(tm->active_nodes);
    FREE(tm->samephase_cand);
    FREE(tm->nextphase_cand);
+   FREE(tm->termcodes);
 
 #ifndef COMPILE_IN_TM
    /* Go over the tree and free the nodes */
@@ -3765,6 +3885,7 @@ int tm_close(tm_prob *tm, int termcode)
    
 /*===========================================================================*/
 /*===========================================================================*/
+
 #if !defined(_MSC_VER) && !defined(__MNO_CYGWIN) && defined(SIGHANDLER)
 void sym_catch_c(int num)
 {
@@ -3798,27 +3919,38 @@ void sym_catch_c(int num)
 
 }
 #endif
+
 /*===========================================================================*/
 /*
  * Find the lowerbound of the current branch-and-cut tree and save it in
  * tm->lb
  */
+
 int find_tree_lb(tm_prob *tm)
 {
    double lb = MAXDOUBLE;
    bc_node **samephase_cand;
 
+#pragma omp critical (tree_update)
+{
    if (tm->samephase_candnum > 0 || tm->active_node_num > 0) {
-      if (tm->par.node_selection_rule == LOWEST_LP_FIRST) {
-	lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
-      } else {
-         samephase_cand = tm->samephase_cand;
-         for (int i = tm->samephase_candnum; i >= 1; i--){
-            if (samephase_cand[i]->lower_bound < lb) {
-               lb = samephase_cand[i]->lower_bound;
-            }
-         }
+      if (tm->samephase_candnum > 0){
+	 if (tm->par.node_selection_rule == LOWEST_LP_FIRST) {
+	    lb = tm->samephase_cand[1]->lower_bound; /* [0] is a dummy */
+	 } else {
+	    samephase_cand = tm->samephase_cand;
+	    for (int i = tm->samephase_candnum; i >= 1; i--){
+	       lb = MIN(lb, samephase_cand[i]->lower_bound);
+	    }
+	 }
       }
+#ifdef COMPILE_IN_LP
+      for (int i = tm->par.max_active_nodes - 1; i >= 0; i--){
+	 if (tm->active_nodes[i]){
+	    lb = MIN(lb, tm->active_nodes[i]->lower_bound);
+	 }
+      }
+#endif
    } else {
       /* there are no more nodes left. */
       lb = tm->ub;
@@ -3829,6 +3961,167 @@ int find_tree_lb(tm_prob *tm)
    }
    */
    tm->lb = lb;
+ }
    return 0;
 }
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int tighten_root_bounds(tm_prob *tm)
+{
+   /* 
+    * using the reduced costs that are saved from the root node, try to
+    * improve variable bounds.
+    * should be called whenever ub is updated.
+    * change only bounds for root. not for the current node. the bounds for
+    * current node are updated in tighten_bounds()
+    */
+   int                  i, j, k, l;
+   rc_desc             *rc = tm->reduced_costs;
+   double               gap, max_change;
+   double              *dj, *lb, *ub;
+   int                 *saved_ind;
+   int                  cnt, total_changes = 0;
+   int                 *ind;
+   double              *bd;
+   char                *lu;
+#ifdef COMPILE_IN_LP
+   double               lpetol = tm->lpp[0]->lp_data->lpetol;
+#else
+   double               lpetol = 9.9999999999999995e-07;
+#endif
+   bounds_change_desc  *bnd_change;
+   int                 *new_ind;
+   int                  num_new_bounds;
+   int                  verbosity = tm->par.verbosity;
+   int                 *oldindex;
+   double              *oldvalue;
+   char                *oldlu;
+
+   if (!rc) {
+      return 0;
+   }
+
+   if (!tm->has_ub) {
+      PRINT(verbosity, -1, ("tighten_root_bounds: cant tighten bounds if ub "
+            "does not exist!\n"));
+      return 0;
+   }
+
+   int max_length = 0;
+   for (i=0; i<rc->num_rcs;i++) {
+      max_length = MAX(max_length, rc->cnt[i]);
+   }
+
+   REMALLOC(tm->tmp.c, char, tm->tmp.c_size, max_length, BB_BUNCH);
+   REMALLOC(tm->tmp.i, int, tm->tmp.i_size, max_length, BB_BUNCH);
+   REMALLOC(tm->tmp.d, double, tm->tmp.d_size, max_length, BB_BUNCH);
+   ind = tm->tmp.i;
+   bd = tm->tmp.d;
+   lu = tm->tmp.c;
+   new_ind = (int *)malloc(max_length*ISIZE);
+   
+   for (i=0; i<rc->num_rcs;i++) {
+      gap = tm->ub - rc->obj[i] - tm->par.granularity;
+      if (gap <= lpetol) {
+         continue;
+      }
+      saved_ind = rc->indices[i];
+      dj  = rc->values[i];
+      lb = rc->lb[i];
+      ub = rc->ub[i];
+      cnt = 0;
+      for (j=0; j<rc->cnt[i]; j++) {
+         max_change = gap/dj[j];
+         if (max_change > 0 && max_change < ub[j]-lb[j]){
+            ind[cnt] = saved_ind[j];
+            lu[cnt] = 'U';
+            bd[cnt++] = floor(lb[j] + max_change);
+         }else if (max_change < 0 && max_change > lb[j] - ub[j]){
+            ind[cnt] = saved_ind[j];
+            lu[cnt] = 'L';
+            bd[cnt++] = ceil(ub[j] + max_change);
+         }
+      }
+      PRINT(verbosity, 5, ("tighten_root_bounds: tightening %d "
+               "bounds in root\n", cnt));
+      if (cnt == 0) {
+         continue;
+      }
+      /* add these changes to root node */
+      if (tm->rootnode->desc.bnd_change) {
+         bnd_change = tm->rootnode->desc.bnd_change;
+      } else {
+         tm->rootnode->desc.bnd_change = bnd_change = 
+            (bounds_change_desc *)calloc(1,sizeof(bounds_change_desc));
+      }
+      if (bnd_change->num_changes>0) {
+         /* 
+          * update existing changes and store the new ones in a separate array
+          */
+         num_new_bounds=0;
+         oldvalue = bnd_change->value;
+         oldindex = bnd_change->index;
+         oldlu    = bnd_change->lbub;
+         for (k=0; k<cnt; k++) {
+            for (j=0; j<bnd_change->num_changes; j++) {
+               if (oldindex[j]==ind[k] && oldlu[j]==lu[k]){
+                  if (lu[k]=='L' && oldvalue[j]<bd[k]) {
+                     oldvalue[j]=bd[k];
+                     total_changes++;
+                  } else if (lu[k]=='U' && oldvalue[j]>bd[k]) {
+                     oldvalue[j]=bd[k];
+                     total_changes++;
+                  }
+                  break;
+               }
+            }
+            if (j>=bnd_change->num_changes) {
+               new_ind[num_new_bounds] = k;
+               num_new_bounds++;
+            }
+         }
+         /* those changes that dint already have an entry and stored now */
+         if (num_new_bounds) {
+            int new_cnt = num_new_bounds+bnd_change->num_changes;
+            bnd_change->index = (int *)realloc(bnd_change->index,
+                  ISIZE*new_cnt);
+            bnd_change->lbub  = (char *)realloc(bnd_change->lbub,
+                  CSIZE*new_cnt);
+            bnd_change->value = (double *)realloc(bnd_change->value,
+                  DSIZE*new_cnt);
+            oldvalue = bnd_change->value;
+            oldindex = bnd_change->index;
+            oldlu    = bnd_change->lbub;
+            l = bnd_change->num_changes;
+            for (j=0; j<num_new_bounds; j++) {
+               total_changes++;
+               k = new_ind[j]; 
+               oldindex[l] = ind[k];
+               oldlu[l]    = lu[k];
+               oldvalue[l] = bd[k];
+               bnd_change->num_changes++;
+               l++;
+            }
+         }
+      } else {
+         bnd_change->index = (int *)malloc(cnt*ISIZE);
+         bnd_change->lbub  = (char *)malloc(cnt*CSIZE);
+         bnd_change->value = (double *)malloc(cnt*DSIZE);
+         bnd_change->index = (int *) memcpy(bnd_change->index, ind, ISIZE*cnt);
+         bnd_change->lbub  = (char *) memcpy(bnd_change->lbub, lu, CSIZE*cnt);
+         bnd_change->value = (double *) memcpy(bnd_change->value, bd, 
+               DSIZE*cnt);
+         bnd_change->num_changes = cnt;
+      }
+   }
+   if (verbosity>5 && tm->rootnode->desc.bnd_change!=NULL) {
+      printf("tighten_root_bounds: root now has %d changes\n",
+            tm->rootnode->desc.bnd_change->num_changes);
+   }
+   FREE(new_ind);
+   return 0;
+}
+
 /*===========================================================================*/

@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2006-2013 Lehigh University. All Rights Reserved.           */
+/* (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -13,9 +13,14 @@
 /*===========================================================================*/
 
 #include "CoinPragma.hpp"
+#include "CoinHelperFunctions.hpp"
 #include "SymConfig.h"
 
 #include <iostream>
+
+#ifdef _OPENMP
+#include "omp.h"
+#endif
 
 #ifdef COIN_HAS_OSITESTS
 #include "OsiUnitTests.hpp"
@@ -38,6 +43,11 @@ void testingMessage( const char * const msg ) {
 
 int main (int argc, const char *argv[])
 {
+#ifdef _OPENMP
+   omp_set_dynamic(FALSE);
+   omp_set_num_threads(1);
+#endif
+
   std::string miplib3Dir;
   /*
     Start off with various bits of initialisation that don't really belong
@@ -123,22 +133,25 @@ int main (int argc, const char *argv[])
   if (miplib3Dir.length() > 0) {
     int test_status;
     int symargc;
-    const char* symargv[5];
+    char* symargv[7];
     testingMessage( "Testing MIPLIB files\n" );
 
     sym_environment *env = sym_open_environment();
     /* assemble arguments for symphony: -T miplibdir, and -p 2 if we run the punittest */
-    symargc = 3;
-    symargv[0] = argv[0];
+    symargc = 5;
+    symargv[0] = CoinStrdup(argv[0]);
     symargv[1] = "-T";
-    symargv[2] = miplib3Dir.c_str();
+    symargv[2] = CoinStrdup(miplib3Dir.c_str());
     if( argv[0][0] == 'p' || argv[0][0] == 'P' ) {
-      symargc = 5;
-      symargv[3] = "-p";
-      symargv[4] = "-2";
+       symargv[3] = "-p";
+       symargv[4] = "2";
+    }else{
+       symargv[3] = "-p";
+       symargv[4] = "0";
     }
-    sym_parse_command_line(env, symargc, const_cast<char**>(symargv));
-    sym_test(env, &test_status);
+    //sym_parse_command_line(env, symargc, const_cast<char**>(symargv));
+    sym_set_int_param(env, "verbosity", -10);
+    sym_test(env, symargc, symargv, &test_status);
 
 #ifdef COIN_HAS_OSITESTS
     OSIUNITTEST_ASSERT_WARNING(test_status == 0, {}, "symphony", "testing MIPLIB");

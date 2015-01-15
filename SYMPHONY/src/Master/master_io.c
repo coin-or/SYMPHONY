@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -36,47 +36,59 @@
 
 void usage(void)
 {
+#ifdef USE_SYM_APPLICATION
    printf("Generic switches:\n\n");
-   printf("master [ -hagrtbd ] [ -u ub ] [ -p procs ] [ -n rule ]\n\t"
-	  "[ -v level ] [ -s cands ] [ -c rule ] [ -k rule ] \n\t"
-	  "[ -m max ] [ -l pools ] [ -i iters ] "
-	  "[ -f parameter_file_name ] [-j 0/1] \n\t"
-	  "[-o tree_out_file]"
+   printf("app_name [ -f parameter_file_name ] \n\t"
+#else
+   printf("symphony [ -FL file ] [ -f parameter_file_name ] \n\t"
+#endif
+	  "[ -hd ] [-a 0/1] [-b 0/1 ] [-s cands] [-l 0/1] [ -q 0/1 ] [ -r 0/1]\n\t"
+	  "[-j 0/1 ] [ -e n ] [ -i iters ] [ -t time ] [ -g gap ] [ -n nodes ]\n\t"
+          "[ -u ub ] [ -p procs ] [ -k rule ] [ -v level ] [ -c rule ]\n\t"
+	  "[ -m max ] [ -z n ] [-o tree_out_file]\n\t"
 	  "\n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
 	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
-	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
-	  "-h: help",
-	  "-a: no cut timeout",
-	  "-d: enable graph drawing",
-	  "-g: use cut generator",
-	  "-r: do repricing in root",
-	  "-b: don't perform branch and cut",
-	  "-t time: set wallclock time limit to 'time'",
-	  "-u ub: use upper bound 'ub'",
-	  "-p procs: allow 'procs' active nodes",
-	  "-n i: use node selection rule 'i'",
-	  "-v i: set verbosity to level 'i'",
-	  "-s cands: use 'cands' candidates for strong branching",
-	  "-c i: use rule 'i' to compare candidates",
-	  "-k i: use rule 'i' to select child",
-	  "-m n: allow a max of 'n' cuts to enter per iteration",
-	  "-e n: allow a max of 'n' cut pools",
-	  "-l n k: load balance level 'n' and iterations 'k'",
-	  "-i n: allow a max of 'n' iterations in presolve",
-	  "-f file: read parameters from parameter file 'file'",
-	  "-j 0/1: whether or not to generate cgl cuts",
-	  "-z n: set diving threshold to 'n'",
-	  "-o file: output vbc-like tree information to file 'file'");
-   printf("Solver-specific switches:\n\n");
-#ifdef USE_SYM_APPLICATION
-   user_usage();
-#else
-   printf("master [ -H ] [ -FL file ] \n\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\n",
-	  "-H: help (solver-specific switches)",
+	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n"
+#ifndef USE_SYM_APPLICATION
+	  "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t\n\n",
 	  "-F model: model should be read in from file 'model'",
 	  "          (MPS format is assumed unless -D is also present)",
 	  "-L model: LP format model should be read in from file 'model'",
-	  "-D data: model is in AMPL format and data is in file 'data'");
+	  "-D data: model is in AMPL format and data is in file 'data'",
+	  "-T dir: run test with MIPLIB3 models",
+#else
+	  "\n\n",
+#endif	  
+	  "-h: help",
+	  "-f file: read parameters from parameter file 'file'",
+	  "-d: stop at first feasible solution",
+	  "-a 0/1: whether to use primal heuristics",
+	  "-b 0/1: whether to use reliability branching",
+	  "-s cands: use at most 'cands' candidates for strong branching",
+	  "-l 0/1: whether to impose a limit on strong branching time",
+	  "-q 0/1: whether or not to tighten root bounds",
+	  "-r 0/1: whether or not to do reduced cost tightening",
+	  "-j 0/1: whether or not to generate cgl cuts",
+	  "-e n: set pre-processing level to 'n'",
+	  "-i iters: allow a max of 'iters' iterations in presolve",
+	  "-t time: set wallclock time limit to 'time'",
+	  "-g gap: set gap limit to 'gap'",
+	  "-n nodes: set node limit to 'nodes'",
+	  "-u ub: use initial upper bound 'ub'",
+	  "-p procs: allow 'procs' additional threads or processors",
+	  "-k i: use node selection rule 'i'",
+	  "-v n: set verbosity to level 'n'",
+	  "-c i: use rule 'i' to compare candidates",
+	  "-m max: allow a max of 'max' cuts to enter per iteration",
+	  "-z n: set diving threshold to 'n'",
+	  "-o file: output vbc-like tree information to file 'file'");
+#ifdef USE_SYM_APPLICATION
+   printf("Application-specific switches:\n\n");
+   printf("app_name [ -H ] [ -F file ] \n\n\t%s\n\t%s\n\t\n\n",
+	  "-H: help (solver-specific switches)",
+	  "-F model: model should be read in from file 'model'");
+   user_usage();
+#else
 #endif   
 }
 
@@ -95,6 +107,7 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
    lp_params *lp_par = &env->par.lp_par;
    cg_params *cg_par = &env->par.cg_par;
    cp_params *cp_par = &env->par.cp_par;
+   prep_params *prep_par = &env->par.prep_par;
    //dg_params *dg_par = &env->par.dg_par;
 
    if (argc < 2){
@@ -409,19 +422,72 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 #endif 
 	  exit(0);
        case 'a':
-	 lp_par->first_lp.first_cut_time_out = 0;
-	 lp_par->first_lp.all_cuts_time_out = 0;
-	 lp_par->later_lp.first_cut_time_out = 0;
-	 lp_par->later_lp.all_cuts_time_out = 0;
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%i", &tmpi)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	       lp_par->do_primal_heuristic = tmpi;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'd':
-	 env->par.do_draw_graph = TRUE;
+	 lp_par->find_first_feasible = TRUE;
+	 break;
+       case 'e':
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%i", &tmpi)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	       prep_par->level = tmpi;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'g':
-	 lp_par->use_cg = tm_par->use_cg = TRUE;
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%lf", &tmpd)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	       tm_par->gap_limit = tmpd;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
+	 break;
+       case 'q':
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%i", &tmpi)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	       lp_par->do_reduced_cost_fixing = tmpi;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'r':
-	 tm_par->price_in_root = TRUE;
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%i", &tmpi)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	       tm_par->tighten_root_bounds = tmpi;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 't':
 	 if (i < argc - 1){
@@ -437,7 +503,17 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	 }
 	 break;
        case 'b':
-	 env->par.do_branch_and_cut = FALSE;
+	 if (i < argc - 1){
+	    if (!sscanf(argv[i+1], "%i", &tmpi)){
+	       printf("Warning: Missing argument to command-line switch -%c\n",
+		      c);
+	    }else{
+	       i++;
+	       lp_par->should_use_rel_br = tmpi;
+	    }
+	 }else{
+	    printf("Warning: Missing argument to command-line switch -%c\n",c);
+	 }
 	 break;
        case 'u':
 	 if (i < argc - 1){
@@ -460,11 +536,16 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
-#if !defined(COMPILE_IN_LP) || defined _OPENMP
-	       tm_par->max_active_nodes = tmpi;
+#if defined(COMPILE_IN_LP)
+#ifdef _OPENMP
+	       tm_par->max_active_nodes = tmpi + 1;
 #else
-	       printf("\nWarning: Trying to use multiple processors with ");
-	       printf("sequential build...\n");
+	       if (tmpi > 1){
+		  printf("\nWarning: Trying to use multiple processors with ");
+		  printf("sequential build...\n");
+		  tm_par->max_active_nodes = 1;
+	       }
+#endif
 #endif
 	    }
 	 }else{
@@ -478,7 +559,7 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
-	       tm_par->node_selection_rule = tmpi;
+	       tm_par->node_limit = tmpi;
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
@@ -533,7 +614,7 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
-	       lp_par->select_child_default = tmpi;
+	       tm_par->node_selection_rule = tmpi;
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
@@ -552,19 +633,6 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
 	 }
 	 break;
-       case 'e':
-	 if (i < argc - 1){
-	    if (!sscanf(argv[i+1], "%i", &tmpi)){
-	       printf("Warning: Missing argument to command-line switch -%c\n",
-		      c);
-	    }else{
-	       i++;
-	       tm_par->max_cp_num = tmpi;
-	    }
-	 }else{
-	    printf("Warning: Missing argument to command-line switch -%c\n",c);
-	 }
-	 break;
        case 'l':
 	 if (i < argc - 1){
 	    if (!sscanf(argv[i+1], "%i", &tmpi)){
@@ -572,23 +640,11 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		      c);
 	    }else{
 	       i++;
-	       lp_par->load_balance_level = tmpi;
+	       lp_par->limit_strong_branching_time = tmpi;
 	    }
 	 }else{
 	    printf("Warning: Missing argument to command-line switch -%c\n",c);
 	 }
-	 if (i < argc - 1){
-	    if (!sscanf(argv[i+1], "%i", &tmpi)){
-	       printf("Warning: Missing argument to command-line switch -%c\n",
-		      c);
-	    }else{
-	       i++;
-	       lp_par->load_balance_iterations = tmpi;
-	    }
-	 }else{
-	    printf("Warning: Missing argument to command-line switch -%c\n",c);
-	 }
-	 break;
        case 'i':
 	 if (i < argc - 1){
 	    if (!sscanf(argv[i+1], "%i", &tmpi)){

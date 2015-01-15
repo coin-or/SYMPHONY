@@ -7,7 +7,7 @@
 /*                                                                           */
 /* This file was developed by Menal Guzelsoy for the SYMPHONY OSI interface. */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -543,7 +543,8 @@ int update_tree_bound(sym_environment *env, bc_node *root, int *cut_num, int *cu
       check_trim_tree(env, root, cut_num, cuts_ind, change_type);
       
       if (root->node_status == NODE_STATUS__PRUNED || 
-	  root->node_status == NODE_STATUS__INTERRUPTED || 
+	  root->node_status == NODE_STATUS__TIME_LIMIT || 
+	  root->node_status == NODE_STATUS__ITERATION_LIMIT || 
 	  root->feasibility_status == PRUNED_HAS_CAN_SOLUTION || 
 	  root->feasibility_status == NOT_PRUNED_HAS_CAN_SOLUTION){
 	 if(change_type == OBJ_COEFF_CHANGED || change_type == RHS_CHANGED || 
@@ -2097,11 +2098,13 @@ int set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "max_active_nodes") == 0 ||
 	    strcmp(key, "TM_max_active_nodes") == 0){
-#if !defined(COMPILE_IN_LP) || defined _OPENMP
       READ_INT_PAR(tm_par->max_active_nodes);
-#else
-      printf("\nWarning: Trying to use multiple processors with ");
-      printf("sequential build...\n");
+#if defined(COMPILE_IN_LP) && !defined _OPENMP
+      if (tm_par->max_active_nodes > 1){
+	 printf("\nWarning: Trying to use multiple processors with ");
+	 printf("sequential build...\n");
+	 tm_par->max_active_nodes = 1;
+      }
 #endif
       return(0);
    }
@@ -2172,7 +2175,7 @@ int set_param(sym_environment *env, char *line)
       if (value[0]){
 	 tm_par->keep_description_of_pruned = 
 	   lp_par->keep_description_of_pruned = KEEP_IN_MEMORY;
-         lp_par->should_reuse_lp = FALSE; //by asm4
+         //lp_par->should_reuse_lp = FALSE; //by asm4
          return(0);
    } else
 	 tm_par->keep_description_of_pruned = 
@@ -2212,6 +2215,11 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "logging_interval") == 0 ||
 	    strcmp(key, "TM_logging_interval") == 0){
       READ_INT_PAR(tm_par->logging_interval);
+      return(0);
+   }
+   else if (strcmp(key, "status_interval") == 0 ||
+	    strcmp(key, "TM_status_interval") == 0){
+      READ_INT_PAR(tm_par->status_interval);
       return(0);
    }
    else if (strcmp(key, "logging") == 0 ||
@@ -2294,6 +2302,11 @@ int set_param(sym_environment *env, char *line)
 	    strcmp(key, "TM_output_mode") == 0){
       READ_INT_PAR(tm_par->output_mode);
       return(0);
+   }else if (strcmp(key, "tighten_root_bounds") == 0 ||
+	    strcmp(key, "TM_tighten_root_bounds") == 0){
+      READ_INT_PAR(tm_par->find_first_feasible);
+      lp_par->find_first_feasible = tm_par->find_first_feasible;
+      return(0);
    }
 
    /***********************************************************************
@@ -2331,6 +2344,11 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "should_warmstart_chain") == 0 ||
 	    strcmp(key, "LP_should_warmstart_chain") == 0){
       READ_INT_PAR(lp_par->should_warmstart_chain);
+      return(0);
+   }
+   else if (strcmp(key, "should_reuse_lp") == 0 ||
+	    strcmp(key, "LP_should_reuse_lp") == 0){
+      READ_INT_PAR(lp_par->should_reuse_lp);
       return(0);
    }
    else if (strcmp(key, "try_to_recover_from_error") == 0 ||
@@ -2896,6 +2914,10 @@ int set_param(sym_environment *env, char *line)
    }
    else if (strcmp(key, "strong_br_all_candidates_level") == 0) {
       READ_INT_PAR(lp_par->strong_br_all_candidates_level);
+      return(0);
+   }
+   else if (strcmp(key, "limit_strong_branching_time") == 0) {
+      READ_INT_PAR(lp_par->limit_strong_branching_time);
       return(0);
    }
    else if (strcmp(key,"strong_branching_red_ratio") == 0 ||
@@ -3523,9 +3545,9 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	 for(i=0; i<mip_copy->n; i++){
 	    /* FIXME! Resctricting col_name to 30 chars! */
 	    if(mip->colname[i]){
-	       mip_copy->colname[i] = (char*)malloc(CSIZE*30);
-	       strncpy(mip_copy->colname[i], mip->colname[i], 30); 
-	       mip_copy->colname[i][29] = 0;
+	       mip_copy->colname[i] = (char*)malloc(CSIZE*MAX_NAME_SIZE);
+	       strncpy(mip_copy->colname[i], mip->colname[i], MAX_NAME_SIZE); 
+	       mip_copy->colname[i][MAX_NAME_SIZE-1] = 0;
 	    }
 	 }
       }

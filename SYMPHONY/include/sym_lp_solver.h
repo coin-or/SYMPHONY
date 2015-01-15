@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -310,8 +310,8 @@ int delete_cols PROTO((LPdata *lp_data, int delnum, int *delstat));
 void release_var PROTO((LPdata *lp_data, int j, int where_to_move));
 void free_row_set PROTO((LPdata *lp_data, int length, int *index));
 void constrain_row_set PROTO((LPdata *lp_data, int length, int *index));
-int read_mps PROTO((MIPdesc *mip, char *infile, char *probname));
-int read_lp PROTO((MIPdesc *mip, char *infile, char *probname));
+int read_mps PROTO((MIPdesc *mip, char *infile, char *probname, int verbosity));
+int read_lp PROTO((MIPdesc *mip, char *infile, char *probname, int verbosity));
 void write_mps PROTO((LPdata *lp_data, char *fname));
 void write_mip_desc_mps PROTO((MIPdesc *mip, char *fname));
 void write_mip_desc_lp PROTO((MIPdesc *mip, char *fname));

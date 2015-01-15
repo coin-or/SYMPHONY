@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -15,9 +15,6 @@
 #include <stdlib.h>          /* malloc() is defined here in AIX ... */
 #include <stdio.h>
 #include <string.h>
-#ifdef _OPENMP
-#include "omp.h"
-#endif
 
 #include "sym_qsort.h"
 #include "sym_messages.h"
@@ -169,14 +166,14 @@ int io_u(sym_environment *env)
       }
       if (strcmp(env->par.datafile, "") == 0){
 	 if (env->par.file_type == LP_FORMAT){
-	    err = read_lp(env->mip, env->par.infile, env->probname);
+	    err = read_lp(env->mip, env->par.infile, env->probname, env->par.verbosity);
 	    env->par.file_type = MPS_FORMAT;
 	    if (err != 0){
 	       printf("\nErrors in reading LP file\n");
 	       return (ERROR__READING_LP_FILE);
 	    }
 	 }else {
-	    err = read_mps(env->mip, env->par.infile, env->probname);
+	    err = read_mps(env->mip, env->par.infile, env->probname, env->par.verbosity);
 	    if (err != 0){
 	       printf("\nErrors in reading mps file\n");
 	       return (ERROR__READING_MPS_FILE);
@@ -459,12 +456,6 @@ int send_lp_data_u(sym_environment *env, int sender)
    int i;
    tm_prob *tm = env->tm;
    tm->par.max_active_nodes = env->par.tm_par.max_active_nodes;
-#ifdef _OPENMP
-   omp_set_dynamic(FALSE);
-   omp_set_num_threads(tm->par.max_active_nodes);
-#else
-   tm->par.max_active_nodes = 1;
-#endif
 
    tm->lpp = (lp_prob **) malloc(tm->par.max_active_nodes * sizeof(lp_prob *));
 
@@ -476,9 +467,8 @@ int send_lp_data_u(sym_environment *env, int sender)
 
       if ((tm->lpp[i]->has_ub = env->has_ub)){
 	 tm->lpp[i]->ub = env->ub;
-      }else{
-	 env->ub = - (MAXDOUBLE / 2);
       }
+      
       if (env->par.multi_criteria){
 	 if ((tm->lpp[i]->has_mc_ub = env->has_mc_ub)){
 	    tm->lpp[i]->mc_ub = env->mc_ub;
@@ -552,7 +542,7 @@ int send_lp_data_u(sym_environment *env, int sender)
 	 has_colnames = TRUE;
 	 send_char_array(&has_colnames, 1);
 	 for (i = 0; i < mip->n; i++){
-	    send_char_array(mip->colname[i], 8);
+	    send_char_array(mip->colname[i], MAX_NAME_SIZE);
 	 }
       }else{
 	 send_char_array(&has_colnames, 1);
@@ -729,7 +719,7 @@ int display_solution_u(sym_environment *env, int thread_num)
 		   if (sol.xind[i] >= n){
 		      continue;
 		   }
-		   printf("%-30s %10.3f\n", colname[sol.xind[i]],
+		   printf("%-50s %10.10f\n", colname[sol.xind[i]],
 			  sol.xval[i]);
 		}
 		
@@ -746,7 +736,7 @@ int display_solution_u(sym_environment *env, int thread_num)
 		   if (sol.xind[i] >= n){
 		      continue;
 		   }
-		   printf("%7d %10.3f\n", sol.xind[i], sol.xval[i]);
+		   printf("%7d %10.10f\n", sol.xind[i], sol.xval[i]);
 		}
 		
 		printf("\n");

@@ -1,3 +1,4 @@
+
 /*===========================================================================*/
 /*                                                                           */
 /* This file is part of the SYMPHONY MILP Solver Framework.                  */
@@ -5,7 +6,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -160,8 +161,10 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    int max_presolve_iter = 5;
    const int bc_level = p->bc_level;
    int strong_br_min_level = p->par.strong_br_min_level;
- 
-   /*------------------------------------------------------------------------*\
+
+   used_time(&total_time);
+
+   /*---------------------------------------------------------------------* \
     * First we call select_candidates_u() to select candidates. It can
     * -- return with DO_BRANCH and a bunch of candidates, or
     * -- return with DO_NOT_BRANCH along with a bunch of violated cuts
@@ -206,7 +209,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    p->comp_times.strong_branching += used_time(&p->tt);
 #pragma omp critical(cut_pool)
    send_cuts_to_pool(p, -1);
-   send_node_desc(p, NODE_BRANCHED_ON);
    p->comp_times.communication += used_time(&p->tt);
 
    /* Add all the branching cuts */
@@ -249,6 +251,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
    st_time     = used_time(&total_time);
    total_iters = 0;
 
+   int *cstat = lp_data->tmp.i1;
+   int *rstat = lp_data->tmp.i2;
+
+   get_basis(lp_data, cstat, rstat);
+      
    if (should_use_rel_br==TRUE) {
 
       const double lpetol100 = lp_data->lpetol*100;
@@ -325,7 +332,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 }
 
 	
-	 if(p->par.use_branching_prep){//use_violation){
+	 if(p->par.use_branching_prep){//use_violation){ //}
 	    up_violation_cnt = (int *)calloc (lp_data->n,ISIZE);
 	    down_violation_cnt = (int *)calloc (lp_data->n,ISIZE);
 	    violation_col_size = (int *)calloc(lp_data->n, ISIZE);
@@ -507,7 +514,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       if(p->mip->mip_inf->bin_var_ratio > 0.05){
 		  strong_br_min_level = (int)strong_br_min_level/2;
 	       }
-	    }else{// if(p->mip->mip_inf->max_row_ratio < 0.01){	       
+	    }else{// if(p->mip->mip_inf->max_row_ratio < 0.01){ //}	       
 	       max_solves = MIN(2*max_solves, 2*cand_num);
 	       if(p->mip->mip_inf->sos_bin_row_ratio > 0.05){
 		  //  max_solves = MIN(2*max_solves, 2*cand_num);
@@ -520,7 +527,6 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    int backtrack = 0;
 
 	    bc_node *node = p->tm->active_nodes[p->proc_index];	    
-	    node = p->tm->active_nodes[p->proc_index];      
 	    if(p->bc_level >= 1){   
 	       while(node->parent){
 		  if(node->start_objval > node->parent->end_objval){
@@ -653,7 +659,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       for (i=0; i<cand_num; i++) {
 		  branch_var = p->br_rel_cand_list[i];
 		  //printf("%i %i\n", branch_var, p->mip->mip_inf->cols[branch_var].sos_num);
-		  //if(p->mip->mip_inf->cols[branch_var].sos_num > 0.1*p->mip->n){
+		  //if(p->mip->mip_inf->cols[branch_var].sos_num > 0.1*p->mip->n){ //}
 		  if(p->mip->mip_inf->cols[branch_var].sos_num >= (1.0*p->mip->nz)/(p->mip->m + 1)){
 		     sos_tot_var[sos_cnt] = -p->mip->mip_inf->cols[branch_var].sos_num;
 		     sos_ind[sos_cnt] = i;
@@ -683,20 +689,20 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       }	       
 	    }
 	 }
-
-	 	 
       }
 
       /* order by inf status */	 
 
       update_solve_parameters(p);
 
-      if(1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) < 0.2 || 
-      	 1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) > 0.8){
-	 if(p->bc_level <= 10){
-	    max_solves *= 3;
-	    max_solves_since_impr *= 2;
-	    rel_threshold *=2;
+      if (p->mip->mip_inf){
+	 if(1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) < 0.2 || 
+	    1.0*p->mip->mip_inf->cont_var_num/(p->mip->n + 1) > 0.8){
+	    if(p->bc_level <= 10){
+	       max_solves *= 3;
+	       max_solves_since_impr *= 2;
+	       rel_threshold *=2;
+	    }
 	 }
       }
       
@@ -751,7 +757,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
       if (1.0*p->lp_stat.str_br_total_iter_num > str_br_cnt_limit) str_br_iter_limit = TRUE; 
 
+#ifdef COMPILE_IN_LP
       int node_factor = (int)(p->tm->stat.analyzed/50.0);
+#else
+      int node_factor = 0;
+#endif
       double int_factor = 0.5; 
       if (p->mip->mip_inf){
 	 int int_var_num = p->mip->n - p->mip->mip_inf->binary_var_num - p->mip->mip_inf->cont_var_num;
@@ -774,7 +784,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 }
       }
 
-      if (p->tm->stat.analyzed > 5e5 || p->lp_stat.str_br_total_iter_num > 5e5) {
+      if (
+#ifdef COMPILE_IN_LP
+	  p->tm->stat.analyzed > 5e5 ||
+#endif
+	  p->lp_stat.str_br_total_iter_num > 5e5) {
 	 str_br_iter_limit = TRUE;      
       }
 
@@ -953,14 +967,16 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	      violation_cnt_diff = cand_v - best_v;	      
 	   }
 
-	   if(p->mip->mip_inf)
-	     sos_diff = p->mip->mip_inf->cols[branch_var].sos_num - 
-	       p->mip->mip_inf->cols[best_var].sos_num;
+	   if(p->mip->mip_inf){
+	      sos_diff = p->mip->mip_inf->cols[branch_var].sos_num - 
+		 p->mip->mip_inf->cols[best_var].sos_num;
 
-	    //frac_cnt_diff = frac_cnt[branch_var] - frac_cnt[best_var];
-	    frac_cnt_diff = (int)(p->var_rank[branch_var] - p->var_rank[best_var]);
-	    nz_diff = p->mip->mip_inf->cols[branch_var].nz -
-	       p->mip->mip_inf->cols[best_var].nz;
+	      //frac_cnt_diff = frac_cnt[branch_var] - frac_cnt[best_var];
+	      frac_cnt_diff = (int)(p->var_rank[branch_var] -
+				    p->var_rank[best_var]);
+	      nz_diff = p->mip->mip_inf->cols[branch_var].nz -
+		 p->mip->mip_inf->cols[best_var].nz;
+	   }
 	 }
 	 
 	 int tot_var_score = 0; 
@@ -1048,7 +1064,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		best_can->termcode[1] = down_status;
 		// added by asm4 because  hot starts dont generate a reliable 
 		// bound.
-		//if (should_use_hot_starts && down_status==LP_D_ITLIM) { 
+		//if (should_use_hot_starts && down_status==LP_D_ITLIM) {
 		//  down_is_est = TRUE;
 		//  best_can->objval[0] = oldobjval;
 		//}
@@ -1164,7 +1180,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	 }
 	 set_itlim(lp_data, max_presolve_iter);
 
-	 //p->mip->mip_inf->cols[best_var].sos_num > 0){
+	 //p->mip->mip_inf->cols[best_var].sos_num > 0){ //}
 	 int *l_ind = NULL, *r_ind = NULL;
 	 
 	 int col_num = lp_data->n;
@@ -1445,7 +1461,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
          if (should_use_hot_starts && unmark_hs){
             unmark_hotstart(lp_data);
             set_itlim_hotstart(lp_data, -1);
-         } 
+         }else{
+	    load_basis(lp_data, rstat, cstat);
+	 }
          set_itlim(lp_data, -1); //both limits should be set for hotstarts
          return (DO_NOT_BRANCH__FATHOMED);
       }
@@ -1460,6 +1478,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
        * and only variable bounds are changed then, hot-starts should be faster
        */
       
+#ifdef __OSI_CLP__
+      lp_data->si->setupForRepeatedUse(2,0);
+#endif
       if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
 	 should_use_hot_starts = TRUE;
       } else {
@@ -1478,11 +1499,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	    max_presolve_iter = 5;
 	 }
 	 if(should_use_hot_starts){
-	   set_itlim_hotstart(lp_data, max_presolve_iter);
+	    set_itlim_hotstart(lp_data, max_presolve_iter);
 	 }
 	 set_itlim(lp_data, max_presolve_iter);
       }
-      
+
       for (i=0; i<cand_num; i++){
          can = candidates[i];
 
@@ -1580,10 +1601,11 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 	       cut_pool *cp = p->tm->cpp[p->cut_pool];
 	       cp_cut_data **cp_cut;
 	       while (keep_going){
-		  if (should_use_hot_starts && iter_num == 0) {
+		  if (should_use_hot_starts) {
 		     can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
 		     total_iters+=*(can->iterd+j);
 		  } else {
+		     load_basis(lp_data, cstat, rstat);
 		     can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
 		     total_iters+=*(can->iterd+j);
 		  }
@@ -1939,12 +1961,15 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
             break;
          }
          st_time += used_time(&total_time);
-         should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
-               &should_continue);
-         if (should_continue==FALSE) {
-            PRINT(p->par.verbosity, 0, 
-                  ("too much time in strong branching, breaking\n"));
-            break;
+
+         if (p->par.limit_strong_branching_time){
+	    should_continue_strong_branching(p,i,cand_num,st_time,total_iters,
+					     &should_continue);
+	    if (should_continue==FALSE) {
+	       PRINT(p->par.verbosity, 2, 
+		     ("too much time in strong branching, breaking\n"));
+	       break;
+	    }
          }
       }
    }
@@ -1953,8 +1978,12 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
    if (should_use_hot_starts && unmark_hs) {
       unmark_hotstart(lp_data);
+      set_itlim_hotstart(lp_data, -1);
+   }else{
+      load_basis(lp_data, cstat, rstat);
    }
-
+   set_itlim(lp_data, -1);
+	    
 #if 0
    if (best_can->type == CANDIDATE_VARIABLE &&
        vars[best_can->position]->lb == vars[best_can->position]->ub){
@@ -2023,6 +2052,9 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 
    *candidate = best_can;
    
+   p->comp_times.strong_branching += used_time(&p->tt);
+   send_node_desc(p, NODE_BRANCHED_ON);
+   p->comp_times.communication += used_time(&p->tt);
    return(DO_BRANCH);
 }
 
@@ -2296,9 +2328,11 @@ void branch_close_to_half(lp_prob *p, int max_cand_num, int *cand_num,
       *cand_num = cnt;
    }
 
+#ifdef COMPILE_IN_LP
    p->tm->active_nodes[p->proc_index]->frac_cnt = cnt; 
    p->tm->active_nodes[p->proc_index]->frac_avg = frac_avg; 
-
+#endif
+   
    if (should_use_rel_br == TRUE) {
       *candidates = (branch_obj **) malloc(1 * sizeof(branch_obj *));
       cand = (*candidates)[0] = (branch_obj *) calloc(1, sizeof(branch_obj) );
@@ -2483,7 +2517,6 @@ int should_continue_strong_branching(lp_prob *p, int i, int cand_num,
    *should_continue = TRUE;
    int min_cands;
    int verbosity = p->par.verbosity;
-   //verbosity = 20;
    if (p->bc_level<1) {
       allowed_time = 20*p->comp_times.lp/p->iter_num;
       //allowed_iter = 20*p->lp_stat.lp_total_iter_num/(p->iter_num + 1);
@@ -2542,7 +2575,9 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
 {
    int status = 0;
    LPdata *lp_data = p->lp_data;
-   
+   int *cstat = lp_data->tmp.i1;
+   int *rstat = lp_data->tmp.i2;
+
    // TODO: LP_ABANDONED
    /* change the lb and ub */
    if(sos_cnt < 1){
@@ -2619,6 +2654,7 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
    if (should_use_hot_starts) {
       *termstatus = solve_hotstart(lp_data, iterd);
    } else {
+      load_basis(lp_data, cstat, rstat);
       *termstatus = dual_simplex(lp_data, iterd);
    }
 #endif
@@ -2631,17 +2667,18 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
       }
    } else {
      *obj = lp_data->objval;
-     if(lp_data->objval < *obj - lp_data->lpetol){
-       //printf("dual_simplex error: %i %i\n", p->bc_index, branch_var);       
-     }else{
-      *obj = lp_data->objval;
-     }
+     // if(lp_data->objval < *obj - lp_data->lpetol){
+     //   printf("dual_simplex error: %i %i\n", p->bc_index, branch_var);       
+     // }else{
+     //  *obj = lp_data->objval;
+     // }
 
       if (*termstatus == LP_OPTIMAL) {
          if (!p->has_ub || *obj < p->ub - p->par.granularity + lp_data->lpetol) {
             is_feasible_u(p, TRUE, TRUE);
          } else {
 	    *obj = SYM_INFINITY;
+            *termstatus = LP_D_OBJLIM;
 	    if(sos_cnt < 1){
 	       p->lp_stat.str_br_bnd_changes++;
 	    }

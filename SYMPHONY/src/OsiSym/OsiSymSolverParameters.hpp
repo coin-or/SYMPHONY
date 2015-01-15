@@ -21,6 +21,7 @@
 
 enum OsiSymIntParam {
    /** This controls the level of output */
+   OsiSymMaxActiveNodes,
    OsiSymVerbosity,
    OsiSymNodeLimit,
    OsiSymFindFirstFeasible,

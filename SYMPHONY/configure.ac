@@ -7,7 +7,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2013 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
@@ -32,7 +32,7 @@ AC_COPYRIGHT([
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -605,7 +605,7 @@ if test x"$find_pvm" = xyes; then
                   [pvm_header=yes])],
                   [])
 	m4_ifvaln([pvm_gettid],
-                  [LIBS="-L$PVM_ROOT/lib -lgpvm3 -lpvm3"
+                  [LIBS="-L$PVM_ROOT/lib/$PVM_ARCH -lgpvm3 -lpvm3"
                    pvm_link=no
                    AC_LANG_PUSH(C)
                    AC_MSG_CHECKING([whether symbol pvm_gettid is available with PVM])
@@ -708,57 +708,68 @@ if test $in_tm = yes; then
 fi 
 
 WHATTOMAKELIBS=
+WHATTOINSTALLLIBS=
 WHATTOMAKEBINS=
 
 if test $sym_enable_parallel = true; then
    SYMPDEFS="$SYMPDEFS -D__PVM__"
-if test $in_cg = no; then 
-   WHATTOMAKELIBS=libSym_cg.la
-	if test $sym_appl = yes ; then 
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cg.la"
-	fi
-   WHATTOMAKEBINS="symphony_cg$EXEEXT"
-fi 
-if test $in_cp = no; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
-	if test $sym_appl = yes ; then 
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cp.la"
-	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp$EXEEXT"
-fi 
-if test $in_lp = no; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
-	if test $sym_appl = yes ; then 
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_lp$LPEXT.la"
-	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT$EXEEXT"
-fi 
-if test $in_tm = no; then 
-   WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
-	if test $sym_appl = yes ; then 
-	   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_tm$TMEXT.la"
-	fi
-   WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT$EXEEXT"
-fi 
-  MASTEREXT="_m$MASTEREXT"
-  WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
-  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
-  if test $sym_appl = yes ; then 
-     WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
-  fi
+   if test $in_cg = no; then 
+      WHATTOMAKELIBS=libSym_cg.la
+      if test $sym_appl = yes ; then 
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cg.la"
+      fi
+      WHATTOMAKEBINS="symphony_cg$EXEEXT"
+      fi 
+   if test $in_cp = no; then 
+      WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_cp.la"
+      if test $sym_appl = yes ; then 
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_cp.la"
+      fi
+      WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_cp$EXEEXT"
+   fi 
+   if test $in_lp = no; then 
+      WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_lp$LPEXT.la"
+      if test $sym_appl = yes ; then 
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_lp$LPEXT.la"
+      fi
+      WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_lp$LPEXT$EXEEXT"
+   fi 
+   if test $in_tm = no; then 
+      WHATTOMAKELIBS="$WHATTOMAKELIBS libSym_tm$TMEXT.la"
+      if test $sym_appl = yes ; then 
+      	 WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl_tm$TMEXT.la"
+      fi
+      WHATTOMAKEBINS="$WHATTOMAKEBINS symphony_tm$TMEXT$EXEEXT"
+    fi 
+    MASTEREXT="_m$MASTEREXT"
+    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym$MASTEREXT.la"
+    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$MASTEREXT$EXEEXT"
+    if test $sym_appl = yes ; then 
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl$MASTEREXT.la"
+       WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl$MASTEREXT.la"
+       if test $dependency_linking = yes ; then
+       	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
+       fi
+    fi
+    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 else
-  MASTEREXT="_m"
+    MASTEREXT="_m"
+    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
+    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
+    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
+
+    if test $sym_appl = yes ; then 
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+       WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
+       if test $dependency_linking = yes ; then
+       	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
+       fi
+    fi
+    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 fi
 
-  WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
-  WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
-
-  if test $sym_appl = yes ; then 
-     WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
-  fi
-
-
 AC_SUBST(WHATTOMAKELIBS)
+AC_SUBST(WHATTOINSTALLLIBS)
 AC_SUBST(WHATTOMAKEBINS)
 AC_SUBST(LPEXT)
 AC_SUBST(CPEXT)
@@ -781,24 +792,48 @@ AC_ARG_ENABLE([openmp],
    *) AC_MSG_ERROR(Bad value ${enableval} for --enable-openmp)
    ;;
 esac],
-[sym_openmp=false])
+[sym_openmp=auto])
 
-if test $sym_openmp = true; then 
-   AC_MSG_CHECKING([G++ version])
-   fopenmp_version=4.2
-   gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
-   get_gcc_version=`$CXX -dumpversion`
-   gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
-   major_gcc_version=`echo ${gcc_version:0:3}`
-   AC_MSG_RESULT([$get_gcc_version])
-   if test ${major_gcc_version} -lt ${gcc_required_version}; then
-       AC_MSG_ERROR(OpenMP feautures are supported by G++ 4.2.0 or higher.)
-   SYMPDEFS="$SYMPDEFS -D_OPENMP"
-   SYMDEFS="$SYMDEFS -D_OPENMP"
-   fi
-fi      
+if test $sym_openmp = auto; then 
+   AC_MSG_CHECKING([whether compiler supports OpenMP])
+   case "$CXX" in
+     clang*) 
+       AC_MSG_RESULT([no])
+       sym_openmp=false
+       ;;
+     cl* | *\cl* | */cl*)
+       AC_MSG_RESULT([yes])
+       sym_openmp=true
+       ;;
+     g++*)
+        sym_openmp=true
+   	fopenmp_version=4.2
+   	gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
+   	get_gcc_version=`$CXX -dumpversion`
+   	gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
+   	major_gcc_version=`echo ${gcc_version:0:3}`
+   	#AC_MSG_RESULT([$get_gcc_version])
+   	if test ${major_gcc_version} -lt ${gcc_required_version}; then
+       	   AC_MSG_RESULT([no])
+           sym_openmp=false
+        else
+       	   AC_MSG_RESULT([yes])
+           sym_openmp=true
+	fi
+        ;;
+   esac
+fi
 
 AM_CONDITIONAL(OPENMP, [test $sym_openmp = true])
+AC_SUBST(SYM_OPENMP_FLAGS)
+AC_SUBST(SYM_OPENMP_LIBS)
+if test $sym_openmp = true; then
+  SYM_OPENMP_FLAGS=-fopenmp
+  SYM_OPENMP_LIBS=-lgomp
+else
+  SYM_OPENMP_FLAGS= 
+  SYM_OPENMP_LIBS=
+fi
 
 #############################################################################
 #                       Other third party software                          #
@@ -842,9 +877,17 @@ SYMAPPLDIR=`pwd`/Applications
 sym_use_cl=false
 CLLCFLAGS=
 case "$CXX" in
+  clang*) 
+     if test $sym_openmp = true; then
+         CXXFLAGS="$CXXFLAGS -fopenmp"
+     fi
+  ;; 
   cl* | *\cl* | */cl*)
      CLLCFLAGS=$CXXFLAGS
      CXXFLAGS="$CXXFLAGS -TP"
+     if test $sym_openmp = true; then
+         CXXFLAGS="$CXXFLAGS /openmp"
+     fi
   ;;
   g++* | *\g++* | */g++*)
      if test $sym_openmp = true; then

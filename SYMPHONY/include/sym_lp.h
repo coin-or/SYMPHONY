@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -227,7 +227,7 @@ void colind_sort_extra PROTO((lp_prob *p));
 void userind_sort_extra PROTO((lp_prob *p));
 void tighten_bounds PROTO((lp_prob *p));
 int save_root_reduced_costs(lp_prob *p);
-int tighten_root_bounds(lp_prob *p);
+//int tighten_root_bounds(lp_prob *p);
 our_col_set *price_all_vars PROTO((lp_prob *p));
 int restore_lp_feasibility PROTO((lp_prob *p, our_col_set *new_cols));
 void userind_sort_extra PROTO((lp_prob *p));
@@ -371,5 +371,5 @@ int generate_cuts_in_lp_u PROTO((lp_prob *p, double *x));
 int analyze_multicriteria_solution PROTO((lp_prob *p, int *indices,
 					   double *values, int length,
 					   double *true_objval, double etol,
-					   char branching));
+					  char branching, int feasible));
 #endif

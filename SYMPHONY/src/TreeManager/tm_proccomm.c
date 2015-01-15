@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -391,8 +391,7 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
 	 modify_list(&not_fixed, &path[i]->desc.not_fixed);
    }
 
-
-
+#ifdef COMPILE_IN_LP
    if(lp[thread_num]->frac_var_cnt == NULL){
      lp[thread_num]->frac_var_cnt = (int*)calloc(ISIZE,tm->bvarnum + extravar.size);      
    }else{
@@ -400,6 +399,9 @@ void send_active_node(tm_prob *tm, bc_node *node, int colgen_strat,
    }
 
    int * frac_var_cnt = lp[thread_num]->frac_var_cnt;
+#else
+   int * frac_var_cnt = 0;
+#endif   
    int cuts_trial_num = 0;
 
    bounds_change_desc *bnd_change = NULL;
@@ -623,6 +625,8 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    double old_lower_bound  = n->lower_bound;
 #endif
 
+   tm->stat.analyzed++;
+
 #ifdef SENSITIVITY_ANALYSIS
    if (tm->par.sensitivity_analysis){
       if (n->sol){
@@ -689,7 +693,7 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
 	 } else {
 	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+			       VBC_FEAS_SOL_FOUND : VBC_PRUNED);
 	 }
       }
       return;
@@ -707,13 +711,14 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
    }
 #endif
 
-   if (node_type == INTERRUPTED_NODE){
-      n->node_status = NODE_STATUS__INTERRUPTED;
-#pragma omp critical (tree_update)
+   if (node_type == TIME_LIMIT || node_type == ITERATION_LIMIT){
+      n->node_status = (node_type == TIME_LIMIT ?
+			NODE_STATUS__TIME_LIMIT:NODE_STATUS__ITERATION_LIMIT);
       insert_new_node(tm, n);
-      return;
+      if (!repricing)
+	 return;
    }
-   
+
    newdesc = (node_desc *) calloc(1, sizeof(node_desc));
    /* Unpack the new description */
    receive_int_array(&newdesc->nf_status, 1);
@@ -889,10 +894,9 @@ void receive_node_desc(tm_prob *tm, bc_node *n)
 	       vbc_node_pr_reason = VBC_PRUNED;
 	    }
 	    purge_pruned_nodes(tm, n, vbc_node_pr_reason);
-	 }
-	 else {
+	 } else {
 	    purge_pruned_nodes(tm, n, node_type == FEASIBLE_PRUNED ?
-		  VBC_FEAS_SOL_FOUND : VBC_PRUNED);
+			       VBC_FEAS_SOL_FOUND : VBC_PRUNED);
 	 }
       }
    }
@@ -986,7 +990,6 @@ void process_branching_info(tm_prob *tm, bc_node *node)
 	 /* update the info which node is processed by that lp process */
 	 tm->active_nodes[find_process_index(&tm->lp, node->lp)] =
 	    node->children[keep];
-	 tm->stat.analyzed++;
       }
       send_msg(lp, LP__DIVING_INFO);
    }

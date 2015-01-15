@@ -23,7 +23,7 @@
 #                                                                           #
 # The author of this file is Menal Guzelsoy                                 #
 #                                                                           #
-# (c) Copyright 2006-2013 Lehigh University. All Rights Reserved.           #
+# (c) Copyright 2006-2014 Lehigh University. All Rights Reserved.           #
 #                                                                           #
 # This software is licensed under the Eclipse Public License. Please see    #
 # accompanying file for terms.                                              #
@@ -392,6 +392,8 @@ SYM_COMPILE_IN_LP_FALSE = @SYM_COMPILE_IN_LP_FALSE@
 SYM_COMPILE_IN_LP_TRUE = @SYM_COMPILE_IN_LP_TRUE@
 SYM_COMPILE_IN_TM_FALSE = @SYM_COMPILE_IN_TM_FALSE@
 SYM_COMPILE_IN_TM_TRUE = @SYM_COMPILE_IN_TM_TRUE@
+SYM_OPENMP_FLAGS = @SYM_OPENMP_FLAGS@
+SYM_OPENMP_LIBS = @SYM_OPENMP_LIBS@
 SYM_PARALLEL_FALSE = @SYM_PARALLEL_FALSE@
 SYM_PARALLEL_TRUE = @SYM_PARALLEL_TRUE@
 SYM_WITH_APPL_FALSE = @SYM_WITH_APPL_FALSE@
@@ -414,6 +416,7 @@ VOL_DEPENDENCIES = @VOL_DEPENDENCIES@
 VOL_LIBS = @VOL_LIBS@
 VOL_LIBS_INSTALLED = @VOL_LIBS_INSTALLED@
 VPATH_DISTCLEANFILES = @VPATH_DISTCLEANFILES@
+WHATTOINSTALLLIBS = @WHATTOINSTALLLIBS@
 WHATTOMAKEBINS = @WHATTOMAKEBINS@
 WHATTOMAKELIBS = @WHATTOMAKELIBS@
 XPRESS_LP_SOLVER_FALSE = @XPRESS_LP_SOLVER_FALSE@

@@ -5,7 +5,7 @@
 /* SYMPHONY was jointly developed by Ted Ralphs (ted@lehigh.edu) and         */
 /* Laci Ladanyi (ladanyi@us.ibm.com).                                        */
 /*                                                                           */
-/* (c) Copyright 2000-2013 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -42,14 +42,15 @@
 #define NO_DATA_STORED           2
 
 /*----------------- possible stati of a node in the search tree -------------*/
-#define NODE_STATUS__CANDIDATE    0
-#define NODE_STATUS__BRANCHED_ON  1
-#define NODE_STATUS__HELD         2
-#define NODE_STATUS__ROOT         3
-#define NODE_STATUS__PRUNED       4
-#define NODE_STATUS__INTERRUPTED  5
-#define NODE_STATUS__WARM_STARTED 6
-#define NODE_STATUS__WSPRUNED     7
+#define NODE_STATUS__CANDIDATE         0
+#define NODE_STATUS__BRANCHED_ON       1
+#define NODE_STATUS__HELD              2
+#define NODE_STATUS__ROOT              3
+#define NODE_STATUS__PRUNED            4
+#define NODE_STATUS__TIME_LIMIT        5
+#define NODE_STATUS__ITERATION_LIMIT   6
+#define NODE_STATUS__WARM_STARTED      7
+#define NODE_STATUS__WSPRUNED          8
 /*------------------------------ not_fixed stati ----------------------------*/
 #define NF_CHECK_ALL             0x00
 #define NF_CHECK_AFTER_LAST      0x01
@@ -70,12 +71,13 @@
 #define FEASIBLE_PRUNED                 5
 #define OVER_UB_PRUNED                  6
 #define DISCARDED_NODE                  7
-#define INTERRUPTED_NODE                8
-#define REPRICED_NODE                   9
-#define MC_FEASIBLE_PRUNED              10
+#define TIME_LIMIT                      8
+#define ITERATION_LIMIT                 9
+#define REPRICED_NODE                   10
+#define MC_FEASIBLE_PRUNED              11
 /*to be used when warm_started*/
-#define PRUNED_HAS_CAN_SOLUTION        11
-#define NOT_PRUNED_HAS_CAN_SOLUTION    12
+#define PRUNED_HAS_CAN_SOLUTION        12
+#define NOT_PRUNED_HAS_CAN_SOLUTION    13
 
 /*------------------- possible node types for VBC Tool ----------------------*/
 #define VBC_INTERIOR_NODE       1 /*Dark Red*/ 
@@ -132,7 +134,8 @@
 #define LP_D_OBJLIM                  4
 #define LP_OPT_FEASIBLE              5
 #define LP_OPT_FEASIBLE_BUT_CONTINUE 6
-#define LP_ABANDONED                 7
+#define LP_TIME_LIMIT                7
+#define LP_ABANDONED                 8
 
 #define MOVE_TO_LB               0
 #define MOVE_TO_UB               1
@@ -452,6 +455,7 @@
 #define NEW_NODE__NONE          -1
 #define NEW_NODE__STARTED       -2
 #define NEW_NODE__ERROR         -3
+#define NEW_NODE__STOP          -4
 
 /*****************************************************************************
  *****************************************************************************
