@@ -3263,18 +3263,17 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
 
    sol = env->best_sol;
 
-   if (!sol.xlength || (sol.xlength && (!sol.xind || !sol.xval))){
+   if (sol.xlength && (!sol.xind || !sol.xval)){
       if(env->par.verbosity >= 1){
-	 printf("sym_get_col_solution(): There is no solution!\n");
+	 printf("sym_get_col_solution(): Something is wrong!\n");
       }
       if(env->mip->n){
 	 memcpy(colsol, env->mip->lb, DSIZE*env->mip->n);
       }
       return(FUNCTION_TERMINATED_ABNORMALLY);
-   }
-   else{
+   }else{
       if (!sol.has_sol){
-	 printf("sym_get_col_solution(): Stored solution may not be feasible!\n");
+	 printf("sym_get_col_solution(): No solution has been stored!\n");
       }	 
       memset(colsol, 0, DSIZE*env->mip->n);
 
@@ -4069,11 +4068,13 @@ int sym_set_col_names(sym_environment * env, char **colname)
 /*===========================================================================*/
 
 int sym_add_col(sym_environment *env, int numelems, int *indices, 
-			double *elements, double collb, double colub,
-			double obj, char is_int, char *name)
+		double *elements, double collb, double colub,
+		double obj, char is_int, char *name)
 {
    int i, k, n, m, nz, *matBeg, *matInd;
-   double *matVal, *colLb, *colUb, *objN, *obj1N, *obj2N;
+   double *matVal, *colLb, *colUb, *objN;
+   double *obj1N = NULL;
+   double *obj2N = NULL;
    char *isInt, **colName;
    int * user_indices, *user_size;
 
@@ -4119,16 +4120,24 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
       colLb = (double*) malloc(DSIZE*(n+1));
       colUb = (double*) malloc(DSIZE*(n+1));
       objN = (double*) malloc(DSIZE*(n+1));
-      obj1N = (double*) calloc(DSIZE, (n+1));
-      obj2N = (double*) calloc(DSIZE, (n+1));
+      if (env->mip->obj1){
+	 obj1N = (double*) calloc(DSIZE, (n+1));
+      }
+      if (env->mip->obj2){
+	 obj2N = (double*) calloc(DSIZE, (n+1));
+      }
       isInt = (char*) calloc(CSIZE, (n+1));
 
       if(n){
 	 memcpy(colLb, env->mip->lb, DSIZE*n);
 	 memcpy(colUb, env->mip->ub, DSIZE*n);
 	 memcpy(objN, env->mip->obj, DSIZE*n);
-	 memcpy(obj1N, env->mip->obj1, DSIZE*n);
-	 memcpy(obj2N, env->mip->obj2, DSIZE*n);
+	 if (env->mip->obj1){
+	    memcpy(obj1N, env->mip->obj1, DSIZE*n);
+	 }
+	 if (env->mip->obj2){
+	    memcpy(obj2N, env->mip->obj2, DSIZE*n);
+	 }
 	 memcpy(isInt, env->mip->is_int, CSIZE*n);
       }
 
@@ -4169,6 +4178,12 @@ int sym_add_col(sym_environment *env, int numelems, int *indices,
       colLb[n] = collb;
       colUb[n] = colub;
       objN[n] = obj;
+      if (obj1N) {
+	 obj1N[n] = obj;
+      }
+      if (obj2N) {
+	 obj2N[n] = 0;
+      }
       isInt[n] = is_int;
 
       if(n){
