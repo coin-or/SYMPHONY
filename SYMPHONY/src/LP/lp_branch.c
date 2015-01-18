@@ -1594,58 +1594,74 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                }
                check_ub(p);
                /* The original basis is in lp_data->lpbas */
-	       bool keep_going = TRUE;
-	       int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
-	       int real_nzcnt, matbeg = 0, ind = 0;
-	       double quality, *tmp_matval, *matval;
-	       cut_pool *cp = p->tm->cpp[p->cut_pool];
-	       cp_cut_data **cp_cut;
-	       while (keep_going){
-		  if (should_use_hot_starts) {
-		     can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
-		     total_iters+=*(can->iterd+j);
-		  } else {
-		     load_basis(lp_data, cstat, rstat);
-		     can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
-		     total_iters+=*(can->iterd+j);
-		  }
-		  iter_num++;
-		  keep_going = FALSE;
-		  for (ind = 0, cp_cut = cp->cuts; ind < cp->cut_num;
-		       ind++, cp_cut++){
-		     check_cut_u(cp, NULL, &(*cp_cut)->cut, &violated,
-				 &quality, lp_data->x);
-		     if (violated){
-			keep_going = TRUE;
-			real_nzcnt = 0;
-			nzcnt = ((int *) ((&(*cp_cut)->cut)->coef))[0];
-			tmp_matval = (double *) ((&(*cp_cut)->cut)->coef + DSIZE);
-			tmp_matind =
-			   (int *) ((&(*cp_cut)->cut)->coef + (nzcnt + 1)*DSIZE);
-			matval = (double *) malloc(nzcnt * DSIZE);
-			matind = (int *) malloc(nzcnt * ISIZE);
-			if (p->par.is_userind_in_order) {
-			   memcpy(matind, tmp_matind, nzcnt*ISIZE);
-			   memcpy(matval, tmp_matval, nzcnt*DSIZE);
-			   real_nzcnt = nzcnt;
-			} else {
-			   for (j = 0; j < lp_data->n; j++){
-			      for (k = 0; k < nzcnt; k++){
-				 if (tmp_matind[k] == lp_data->vars[j]->userind){
-				    matind[real_nzcnt]   = j;
-				    matval[real_nzcnt++] = tmp_matval[k];
+	       if (should_use_hot_starts) {
+		  can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
+		  total_iters+=*(can->iterd+j);
+		  
+	       } else {
+		  can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+		  total_iters+=*(can->iterd+j);
+		  
+	       }
+               p->lp_stat.lp_calls++; 
+	       
+
+
+	       if (0){
+		     
+		  bool keep_going = TRUE;
+		  int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
+		  int real_nzcnt, matbeg = 0, ind = 0;
+		  double quality, *tmp_matval, *matval;
+		  cut_pool *cp = p->tm->cpp[p->cut_pool];
+		  cp_cut_data **cp_cut;
+		  while (keep_going){
+		     if (should_use_hot_starts) {
+			can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
+			total_iters+=*(can->iterd+j);
+		     } else {
+			load_basis(lp_data, cstat, rstat);
+			can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+			total_iters+=*(can->iterd+j);
+		     }
+		     iter_num++;
+		     keep_going = FALSE;
+		     for (ind = 0, cp_cut = cp->cuts; ind < cp->cut_num;
+			  ind++, cp_cut++){
+			check_cut_u(cp, NULL, &(*cp_cut)->cut, &violated,
+				    &quality, lp_data->x);
+			if (violated){
+			   keep_going = TRUE;
+			   real_nzcnt = 0;
+			   nzcnt = ((int *) ((&(*cp_cut)->cut)->coef))[0];
+			   tmp_matval = (double *) ((&(*cp_cut)->cut)->coef + DSIZE);
+			   tmp_matind =
+			      (int *) ((&(*cp_cut)->cut)->coef + (nzcnt + 1)*DSIZE);
+			   matval = (double *) malloc(nzcnt * DSIZE);
+			   matind = (int *) malloc(nzcnt * ISIZE);
+			   if (p->par.is_userind_in_order) {
+			      memcpy(matind, tmp_matind, nzcnt*ISIZE);
+			      memcpy(matval, tmp_matval, nzcnt*DSIZE);
+			      real_nzcnt = nzcnt;
+			   } else {
+			      for (j = 0; j < lp_data->n; j++){
+				 for (k = 0; k < nzcnt; k++){
+				    if (tmp_matind[k] == lp_data->vars[j]->userind){
+				       matind[real_nzcnt]   = j;
+				       matval[real_nzcnt++] = tmp_matval[k];
+				    }
 				 }
 			      }
 			   }
+			   add_rows(lp_data, 1, real_nzcnt,
+				    &(&(*cp_cut)->cut)->rhs,
+				    &(&(*cp_cut)->cut)->sense,
+				    &matbeg, matind, matval);
 			}
-			add_rows(lp_data, 1, real_nzcnt,
-				 &(&(*cp_cut)->cut)->rhs,
-				 &(&(*cp_cut)->cut)->sense,
-				 &matbeg, matind, matval);
 		     }
 		  }
+		  p->lp_stat.lp_calls++;
 	       }
-	       p->lp_stat.lp_calls++;
                p->lp_stat.str_br_lp_calls++;
 	       p->lp_stat.str_br_total_iter_num += *(can->iterd+j);
                can->objval[j] = lp_data->objval;
@@ -2589,75 +2605,76 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
    }
 
    //   if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
-   bool keep_going = TRUE;
-   int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
-   int orig_row_num = lp_data->m;
-   int real_nzcnt, matbeg = 0, ind_i = 0, ind_j = 0, ind_k = 0;
-   double quality, *tmp_matval, *matval;
-   cut_pool *cp = p->tm->cpp[p->cut_pool];
-   cp_cut_data **cp_cut;
-   while (keep_going && iter_num < 1 &&
-	  (!p->has_ub ||
-	   (p->has_ub &&
-	    lp_data->objval < p->ub - p->par.granularity + lp_data->lpetol))){
-      if (should_use_hot_starts && iter_num == 0) {
-	 *termstatus = solve_hotstart(lp_data, iterd);
-	 //total_iters+=*iterd;
-      } else {
-	 *termstatus = dual_simplex(lp_data, iterd);
-	 //total_iters+=*iterd;
-      }
-      iter_num++;
-      keep_going = FALSE;
-      for (ind_i = 0, cp_cut = cp->cuts; ind_i < cp->cut_num;
-	   ind_i++, cp_cut++){
-	 check_cut_u(cp, NULL, &(*cp_cut)->cut, &violated,
-		     &quality, lp_data->x);
-	 if (violated){
-	    keep_going = TRUE;
-	    real_nzcnt = 0;
-	    nzcnt = ((int *) ((&(*cp_cut)->cut)->coef))[0];
-	    tmp_matval = (double *) ((&(*cp_cut)->cut)->coef + DSIZE);
-	    tmp_matind =
-	       (int *) ((&(*cp_cut)->cut)->coef + (nzcnt + 1)*DSIZE);
-	    matval = (double *) malloc(nzcnt * DSIZE);
-	    matind = (int *) malloc(nzcnt * ISIZE);
-	    if (p->par.is_userind_in_order) {
-	       memcpy(matind, tmp_matind, nzcnt*ISIZE);
-	       memcpy(matval, tmp_matval, nzcnt*DSIZE);
-	       real_nzcnt = nzcnt;
-	    } else {
-	       for (ind_j = 0; ind_j < lp_data->n; ind_j++){
-		  for (ind_k = 0; ind_k < nzcnt; ind_k++){
-		     if (tmp_matind[ind_k] == lp_data->vars[ind_j]->userind){
-			matind[real_nzcnt]   = ind_j;
-			matval[real_nzcnt++] = tmp_matval[ind_k];
+   if (0){
+      bool keep_going = TRUE;
+      int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
+      int orig_row_num = lp_data->m;
+      int real_nzcnt, matbeg = 0, ind_i = 0, ind_j = 0, ind_k = 0;
+      double quality, *tmp_matval, *matval;
+      cut_pool *cp = p->tm->cpp[p->cut_pool];
+      cp_cut_data **cp_cut;
+      while (keep_going && iter_num < 1 &&
+	     (!p->has_ub ||
+	      (p->has_ub &&
+	       lp_data->objval < p->ub - p->par.granularity + lp_data->lpetol))){
+	 if (should_use_hot_starts && iter_num == 0) {
+	    *termstatus = solve_hotstart(lp_data, iterd);
+	    //total_iters+=*iterd;
+	 } else {
+	    *termstatus = dual_simplex(lp_data, iterd);
+	    //total_iters+=*iterd;
+	 }
+	 iter_num++;
+	 keep_going = FALSE;
+	 for (ind_i = 0, cp_cut = cp->cuts; ind_i < cp->cut_num;
+	      ind_i++, cp_cut++){
+	    check_cut_u(cp, NULL, &(*cp_cut)->cut, &violated,
+			&quality, lp_data->x);
+	    if (violated){
+	       keep_going = TRUE;
+	       real_nzcnt = 0;
+	       nzcnt = ((int *) ((&(*cp_cut)->cut)->coef))[0];
+	       tmp_matval = (double *) ((&(*cp_cut)->cut)->coef + DSIZE);
+	       tmp_matind =
+		  (int *) ((&(*cp_cut)->cut)->coef + (nzcnt + 1)*DSIZE);
+	       matval = (double *) malloc(nzcnt * DSIZE);
+	       matind = (int *) malloc(nzcnt * ISIZE);
+	       if (p->par.is_userind_in_order) {
+		  memcpy(matind, tmp_matind, nzcnt*ISIZE);
+		  memcpy(matval, tmp_matval, nzcnt*DSIZE);
+		  real_nzcnt = nzcnt;
+	       } else {
+		  for (ind_j = 0; ind_j < lp_data->n; ind_j++){
+		     for (ind_k = 0; ind_k < nzcnt; ind_k++){
+			if (tmp_matind[ind_k] == lp_data->vars[ind_j]->userind){
+			   matind[real_nzcnt]   = ind_j;
+			   matval[real_nzcnt++] = tmp_matval[ind_k];
+			}
 		     }
 		  }
 	       }
+	       add_rows(lp_data, 1, real_nzcnt, &(&(*cp_cut)->cut)->rhs,
+			&(&(*cp_cut)->cut)->sense, &matbeg, matind, matval);
 	    }
-	    add_rows(lp_data, 1, real_nzcnt, &(&(*cp_cut)->cut)->rhs,
-		     &(&(*cp_cut)->cut)->sense, &matbeg, matind, matval);
 	 }
+	 size_lp_arrays(lp_data, TRUE, FALSE, 0, 0, 0);
       }
-      size_lp_arrays(lp_data, TRUE, FALSE, 0, 0, 0);
+      int *which = lp_data->tmp.i1;
+      for (ind_i = orig_row_num; ind_i < lp_data->m; ind_i++){
+	 which[ind_i - orig_row_num] = ind_i;
+      }
+      lp_data->si->deleteRows(lp_data->m - orig_row_num, which);
+      lp_data->nz = lp_data->si->getNumElements();
+      lp_data->m -= (lp_data->m - orig_row_num);
    }
-   int *which = lp_data->tmp.i1;
-   for (ind_i = orig_row_num; ind_i < lp_data->m; ind_i++){
-      which[ind_i - orig_row_num] = ind_i;
-   }
-   lp_data->si->deleteRows(lp_data->m - orig_row_num, which);
-   lp_data->nz = lp_data->si->getNumElements();
-   lp_data->m -= (lp_data->m - orig_row_num);
-   
-#if 0
+   //#if 0
    if (should_use_hot_starts) {
       *termstatus = solve_hotstart(lp_data, iterd);
    } else {
-      load_basis(lp_data, cstat, rstat);
+      // load_basis(lp_data, cstat, rstat);
       *termstatus = dual_simplex(lp_data, iterd);
    }
-#endif
+   //#endif
    
    if (*termstatus == LP_D_INFEASIBLE || *termstatus == LP_D_OBJLIM || 
          *termstatus == LP_D_UNBOUNDED) {

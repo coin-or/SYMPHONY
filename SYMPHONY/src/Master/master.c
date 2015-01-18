@@ -258,6 +258,7 @@ int sym_set_defaults(sym_environment *env)
 
    tm_par->tighten_root_bounds = TRUE;
    /************************** lp defaults ***********************************/
+   lp_par->cuts_strong_branch = 0; //Anahita
    lp_par->verbosity = 0;
    lp_par->granularity = tm_par->granularity;
    lp_par->use_cg = tm_par->use_cg;
@@ -5505,9 +5506,16 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
       *value = lp_par->base_constraints_always_effective;
       return(0);
    }
+   
    else if (strcmp(key, "branch_on_cuts") == 0 ||
 	    strcmp(key, "LP_branch_on_cuts") == 0){
       *value = lp_par->branch_on_cuts;
+      return(0);
+   }
+   //Anahita
+   else if (strcmp(key, "cuts_strong_branch") == 0 ||
+	    strcmp(key, "LP_cuts_strong_branch") == 0){
+      *value = lp_par->cuts_strong_branch;
       return(0);
    }
    else if (strcmp(key, "discard_slack_cuts") == 0 ||

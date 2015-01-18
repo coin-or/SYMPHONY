@@ -332,6 +332,9 @@ typedef struct LP_PARAMS{
 
    /* to avoid nested for loops, check if userind's are in order */
    int               is_userind_in_order;
+
+   int               cuts_strong_branch; //Anahita
+
 }lp_params;
 
 #endif

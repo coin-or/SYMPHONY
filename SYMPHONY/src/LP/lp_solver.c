@@ -2751,8 +2751,8 @@ int dual_simplex(LPdata *lp_data, int *iterd)
       }
       //Anahita
       if (term == LP_D_UNBOUNDED) {
-	 //lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
-	 //   lp_data->maxm * DSIZE);
+	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
+	    lp_data->maxm * DSIZE);
 
 	 get_dual_farkas_ray(lp_data);
       }
@@ -2852,8 +2852,8 @@ int solve_hotstart(LPdata *lp_data, int *iterd)
 
       //Anahita
       if (term == LP_D_UNBOUNDED) {
-	 //lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
-	 //   lp_data->maxm * DSIZE);
+	 lp_data->raysol = (double *) realloc((char *)lp_data->raysol,
+	    lp_data->maxm * DSIZE);
 
 	 get_dual_farkas_ray(lp_data);
       }
@@ -3148,7 +3148,6 @@ void get_dual_farkas_ray(LPdata *lp_data)
 {
    std::vector<double*> vRays;
    vRays = lp_data->si->getDualFarkasRays(1);
-   //vRays = lp_data->si->getDualRays(1, 0);
 
    //check that there is at least one ray
    int raysReturned = static_cast<unsigned int>(vRays.size()) ;
@@ -3174,6 +3173,7 @@ void get_dual_farkas_ray(LPdata *lp_data)
    }
 }
 
+/*========
 /*===========================================================================*/
 void get_slacks(LPdata *lp_data)
 {

@@ -2507,6 +2507,13 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->branch_on_cuts);
       return(0);
    }
+   //Anahita
+   else if (strcmp(key, "cuts_strong_branch") == 0 ||
+	    strcmp(key, "LP_cuts_strong_branch") == 0){
+      READ_INT_PAR(lp_par->cuts_strong_branch);
+      return(0);
+   }
+
    else if (strcmp(key, "discard_slack_cuts") == 0 ||
 	    strcmp(key, "LP_discard_slack_cuts") == 0){
       READ_INT_PAR(lp_par->discard_slack_cuts);
@@ -3849,8 +3856,9 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
 	       //allocate memory for dual_pieces
 	       dual_pieces [*cur_piece_no] = (double*) malloc ((1+mip->m) * sizeof(double));
 	       
-	       //write dual info
-	       dual_pieces[*cur_piece_no] [0] = child->intcpt;
+	       //write dual info ***CHECK***
+	       dual_pieces[*cur_piece_no] [0] = child->intcpt; //buildCpx
+	       //dual_pieces[*cur_piece_no] [0] = child->lower_bound;//buildCpx-3
 	       for (j = 0; j < mip->m; j++){
 		  dual_pieces[*cur_piece_no][j+1] = child->duals[j];
 	       }
