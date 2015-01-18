@@ -6474,6 +6474,9 @@ int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
   char* buf = 0;
   
   *test_status = 0;
+
+  sym_parse_command_line(env, argc, argv);
+  
   verbosity = sym_get_int_param(env, "verbosity", &verbosity);
 
   while (true) {
