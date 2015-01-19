@@ -1594,20 +1594,19 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                }
                check_ub(p);
                /* The original basis is in lp_data->lpbas */
-	       if (should_use_hot_starts) {
-		  can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
-		  total_iters+=*(can->iterd+j);
-		  
-	       } else {
-		  can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
-		  total_iters+=*(can->iterd+j);
-		  
+	       if (!p->par.cuts_strong_branch){
+		  if (should_use_hot_starts) {
+		     can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
+		     total_iters+=*(can->iterd+j);
+		     
+		  } else {
+		     can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
+		     total_iters+=*(can->iterd+j);
+		     
+		  }
+		  p->lp_stat.lp_calls++; 
 	       }
-               p->lp_stat.lp_calls++; 
-	       
-
-
-	       if (0){
+	       else{
 		     
 		  bool keep_going = TRUE;
 		  int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
@@ -2604,8 +2603,8 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
       }
    }
 
-   //   if (p->par.use_hot_starts && !p->par.branch_on_cuts) {
-   if (0){
+   if (p->par.cuts_strong_branch) {
+   
       bool keep_going = TRUE;
       int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;
       int orig_row_num = lp_data->m;
@@ -2667,14 +2666,14 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
       lp_data->nz = lp_data->si->getNumElements();
       lp_data->m -= (lp_data->m - orig_row_num);
    }
-   //#if 0
-   if (should_use_hot_starts) {
-      *termstatus = solve_hotstart(lp_data, iterd);
-   } else {
-      // load_basis(lp_data, cstat, rstat);
-      *termstatus = dual_simplex(lp_data, iterd);
+   else{
+      if (should_use_hot_starts) {
+	 *termstatus = solve_hotstart(lp_data, iterd);
+      } else {
+	 // load_basis(lp_data, cstat, rstat);
+	 *termstatus = dual_simplex(lp_data, iterd);
+      }
    }
-   //#endif
    
    if (*termstatus == LP_D_INFEASIBLE || *termstatus == LP_D_OBJLIM || 
          *termstatus == LP_D_UNBOUNDED) {
