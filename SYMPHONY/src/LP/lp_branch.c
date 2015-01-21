@@ -1600,6 +1600,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
 		     total_iters+=*(can->iterd+j);
 		     
 		  } else {
+		     load_basis(lp_data, cstat, rstat);
 		     can->termcode[j] = dual_simplex(lp_data, can->iterd+j);
 		     total_iters+=*(can->iterd+j);
 		     
@@ -2670,7 +2671,7 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
       if (should_use_hot_starts) {
 	 *termstatus = solve_hotstart(lp_data, iterd);
       } else {
-	 // load_basis(lp_data, cstat, rstat);
+	 load_basis(lp_data, cstat, rstat);
 	 *termstatus = dual_simplex(lp_data, iterd);
       }
    }

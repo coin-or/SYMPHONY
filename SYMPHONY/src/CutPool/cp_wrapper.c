@@ -195,27 +195,41 @@ int check_cuts_u(cut_pool *cp, lp_sol *cur_sol, double *x)
 int check_cut_u(cut_pool *cp, lp_sol *cur_sol, cut_data *cut, int *is_violated,
 		double *quality, double *x)
 {
-   int varnum = 0, nzcnt;
-   int *indices = NULL, *matind;
-   double *values = NULL, *matval;
-   double lhs = 0, etol = 0;
-   int i, j;
+   /* int varnum = 0, nzcnt; */
+   /* int *indices = NULL, *matind; */
+   /* double *values = NULL, *matval; */
+   /* double lhs = 0, etol = 0; */
+   /* int i, j; */
    
-   if (cur_sol){
-      varnum = cur_sol->xlength;
-      indices = cur_sol->xind;
-      values = cur_sol->xval;
-      etol = cur_sol->lpetol;
-   }
+   /* if (cur_sol){ */
+   /*    varnum = cur_sol->xlength; */
+   /*    indices = cur_sol->xind; */
+   /*    values = cur_sol->xval; */
+   /*    etol = cur_sol->lpetol; */
+   /* } */
 
+   int varnum = cur_sol->xlength, nzcnt;
+   int *indices = cur_sol->xind, *matind;
+   double *values = cur_sol->xval, *matval;
+   double lhs = 0, etol = cur_sol->lpetol; 
+   int i,j;
    switch (cut->type){
       
     case EXPLICIT_ROW:
       nzcnt = ((int *) (cut->coef))[0];
       matval = (double *) (cut->coef + DSIZE);
       matind = (int *) (cut->coef + (nzcnt+ 1) * DSIZE);
-      for (lhs=0, j = nzcnt-1; j>=0; j--){
-	 lhs += matval[j] * x[matind[j]];
+      /* for (lhs=0, j = nzcnt-1; j>=0; j--){ */
+      /* 	 lhs += matval[j] * x[matind[j]]; */
+      /* } */
+      for (i = 0, j = 0; i < nzcnt && j < varnum; ){
+	 if (matind[i] == indices[j]){
+	    lhs += matval[i++]*values[j++];
+	 }else if (matind[i] < indices[j]){
+	    i++;
+	 }else if (matind[i] > indices[j]){
+	    j++;
+	 }
       }
       
       switch (cut->sense){

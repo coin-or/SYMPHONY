@@ -330,7 +330,8 @@ int fathom_branch(lp_prob *p)
          }
          termcode = initial_lp_solve(lp_data, &iterd);	 
       } else {
-	 termcode = initial_lp_solve(lp_data, &iterd);
+	 //termcode = initial_lp_solve(lp_data, &iterd);
+	 termcode = dual_simplex(lp_data, &iterd);
       }
       if (p->bc_index < 1 && p->iter_num < 2) {
 	 p->root_objval = lp_data->objval;
@@ -555,39 +556,27 @@ OPENMP_ATOMIC_UPDATE
 	 /*------------------------------------------------------------------*\
 	  * receive the cuts from the cut generator and the cut pool
 	 \*------------------------------------------------------------------*/
-
 #ifdef USE_SYM_APPLICATION
-	 if ((cut_term = receive_cuts(p, first_in_loop,
-				      no_more_cuts_count)) >=0 ){
-	    cuts += cut_term;
-	 }else{
-	    return(ERROR__USER);
-	 }
-#else
-	 if (!check_tailoff(p) || p->tm->cpp[p->cut_pool]->cuts_to_add > 0) {
 	    if ((cut_term = receive_cuts(p, first_in_loop,
-					 no_more_cuts_count)) >=0 ){
+                        no_more_cuts_count)) >=0 ){
                cuts += cut_term;
             }else{
                return(ERROR__USER);
             }
-	 }
+#else
+         if (!check_tailoff(p)) {
+            if ((cut_term = receive_cuts(p, first_in_loop,
+                        no_more_cuts_count)) >=0 ){
+               cuts += cut_term;
+            }else{
+               return(ERROR__USER);
+            }
+         }
 #endif
       }
 
       comp_times->lp += used_time(&p->tt);
-#if 0
-      if (cuts == 0){
-	 feas_status = is_feasible_u(p, FALSE, FALSE);
-      }else{
-	 feas_status == IP_INFEASIBLE;
-      }
-#endif
-      
-      if (feas_status == IP_FEASIBLE ||
-	  (feas_status == IP_HEUR_FEASIBLE &&
-	   p->par.find_first_feasible)){ /* i.e. feasible solution
-							   is found */
+      if (cuts < 0){ /* i.e. feasible solution is found */
 	 if (fathom(p, TRUE)){
 	    return(FUNCTION_TERMINATED_NORMALLY);
 	 }else{
@@ -596,6 +585,7 @@ OPENMP_ATOMIC_UPDATE
 	    continue;
 	 }
       }
+
 
       PRINT(verbosity, 2,
 	    ("\nIn iteration %i, before calling branch()\n", p->iter_num));
