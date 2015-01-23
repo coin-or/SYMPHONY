@@ -146,9 +146,10 @@ void OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::strin
       OSIUNITTEST_ASSERT_ERROR(eq(ru[1],2.1), {}, "symphony", "read and copy exmip1");
       OSIUNITTEST_ASSERT_ERROR(eq(ru[4],15.), {}, "symphony", "read and copy exmip1");
 
+      symSi.branchAndBound();
       const double * cs = symSi.getColSolution();
       OSIUNITTEST_ASSERT_ERROR(eq(cs[0],2.5), {}, "symphony", "read and copy exmip1");
-      OSIUNITTEST_ASSERT_ERROR(eq(cs[7],0.0), {}, "symphony", "read and copy exmip1");
+      OSIUNITTEST_ASSERT_ERROR(eq(cs[6],0.0), {}, "symphony", "read and copy exmip1");
 
       OSIUNITTEST_ASSERT_ERROR(!eq(cl[3],1.2345), {}, "symphony", "set col lower");
       symSi.setColLower( 3, 1.2345 );

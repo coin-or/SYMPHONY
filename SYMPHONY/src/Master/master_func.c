@@ -3524,7 +3524,6 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
       mip->cru_vars = 0;
       mip->orig_sense = 0;
       mip->orig_ind = 0;
-#if 0
       if (mip->row_matbeg){
 	 mip_copy->row_matbeg  = (int *) malloc(ISIZE * (mip_copy->m + 1));
 	 mip_copy->row_matind = (int *)    malloc(ISIZE*mip_copy->nz);
@@ -3539,7 +3538,6 @@ MIPdesc *create_copy_mip_desc(MIPdesc * mip)
 	 memcpy(mip_copy->row_lengths, mip->row_lengths, ISIZE*mip_copy->m);
 	 memcpy(mip_copy->col_lengths, mip->col_lengths, ISIZE * mip_copy->n);
       }
-#endif
       
       if (mip->colname){
 	 mip_copy->colname = (char**)calloc(sizeof(char*), mip_copy->n);
@@ -3657,8 +3655,12 @@ sym_environment *create_copy_environment (sym_environment *env)
       //free_mip_desc(env_copy->mip);
       if(env->prep_mip){
 	 env_copy->prep_mip = create_copy_mip_desc(env->prep_mip);
-	 env_copy->orig_mip = create_copy_mip_desc(env->orig_mip);
-	 env_copy->mip = env_copy->orig_mip;
+	 if (env->orig_mip){
+	    env_copy->orig_mip = create_copy_mip_desc(env->orig_mip);
+	    env_copy->mip = env_copy->orig_mip;
+	 }else{
+	    env_copy->mip = create_copy_mip_desc(env->mip);
+	 }
       }else{
 	 env_copy->mip = create_copy_mip_desc(env->mip);
 	 env_copy->prep_mip = env_copy->orig_mip = 0;

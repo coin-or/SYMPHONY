@@ -1063,9 +1063,21 @@ int sym_solve(sym_environment *env)
    if (best_sol->has_sol){
       tmp_sol = (double *) calloc(env->mip->n, DSIZE);
       for (i = 0; i < best_sol->xlength; i++){
+	 if (best_sol->xind[i] >= env->mip->n){
+	    //The stored solution has the wrong dimension
+	    //This seems to happen in the Osi unit test
+	    break;
+	 }
 	 tmp_sol[best_sol->xind[i]] = best_sol->xval[i];
       }
-      sym_set_col_solution(env, tmp_sol);
+      if (i == best_sol->xlength){
+	 sym_set_col_solution(env, tmp_sol);
+      }else{
+	 best_sol->has_sol = FALSE;
+	 FREE(best_sol->xind);
+	 FREE(best_sol->xval);
+	 best_sol->xlength = 0;
+      }
       FREE(tmp_sol);
    }
    
@@ -3274,6 +3286,7 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
    }else{
       if (!sol.has_sol){
 	 printf("sym_get_col_solution(): No solution has been stored!\n");
+	 return(FUNCTION_TERMINATED_ABNORMALLY);
       }	 
       memset(colsol, 0, DSIZE*env->mip->n);
 
@@ -3326,7 +3339,9 @@ int sym_get_row_activity(sym_environment *env, double *rowact)
 
    colsol = (double *)malloc(DSIZE*env->mip->n);
 
-   sym_get_col_solution(env, colsol);
+   if (sym_get_col_solution(env, colsol) == FUNCTION_TERMINATED_ABNORMALLY){
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
    
    matbeg = env->mip->matbeg;
    matval = env->mip->matval;
@@ -3901,7 +3916,6 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       }
    }
 
-
    tmp_ind = (int*)malloc(ISIZE*env->mip->n);
 
    for (i = 0; i < env->mip->n; i++){
@@ -3962,10 +3976,10 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
       FREE(rowAct);
    }
 
-   FREE(tmp_ind);
-   env->mip->is_modified = FALSE; 
+   //env->mip->is_modified = FALSE; 
    
-   return(FUNCTION_TERMINATED_NORMALLY);      
+   return(feasible ? FUNCTION_TERMINATED_NORMALLY:
+	  FUNCTION_TERMINATED_ABNORMALLY);      
 }
 
 /*===========================================================================*/
