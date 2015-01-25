@@ -3083,6 +3083,26 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       /*    continue; */
       /* }//else printf("violation - %f \n", violation); */
 
+      if (num_elements>0) {
+         if ( (max_coeff > 0 && coeff_ratio < etol1000)||
+	      (min_coeff > 0 && min_coeff < etol1000) ) {
+            PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));
+	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
+	    num_poor_quality++;
+	    //is_deleted[i] = TRUE;
+	    continue;
+         }
+      }
+      
+      if (violation < etol10){//*v_level){
+         PRINT(verbosity,5,("violation = %f. Threw out cut.\n", 
+			    violation));
+         num_unviolated++;
+         //is_deleted[i] = TRUE;
+         continue;
+      }//else printf("violation - %f \n", violation);
+      
+      
       /* check if sense is 'R' */
       if (row_cut.sense()=='R') {
          PRINT(verbosity,5,("cut #%d has a range. thrown out.\n", i));

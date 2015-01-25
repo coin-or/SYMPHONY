@@ -1791,7 +1791,7 @@ int compare_candidates_u(lp_prob *p, double oldobjval,
        case LP_OPT_FEASIBLE:
        case LP_D_UNBOUNDED:
        case LP_D_OBJLIM:
-	 //can->objval[i] = MAXDOUBLE / 2; //Anahita
+	 can->objval[i] = MAXDOUBLE / 2; //Commented out by Anahita
 	 break;
        case LP_D_ITLIM:
 	 can->objval[i] = MAX(can->objval[i], oldobjval);
@@ -2513,9 +2513,10 @@ int generate_column_u(lp_prob *p, int lpcutnum, cut_data **cuts,
 
 /*===========================================================================*/
 
-int generate_cuts_in_lp_u(lp_prob *p, double *x)
+int generate_cuts_in_lp_u(lp_prob *p, double *xx)
 {
    LPdata *lp_data = p->lp_data;
+   double *x = lp_data->x;
    int user_res, new_row_num = 0;
    waiting_row **new_rows = NULL;
    char deleted_cut;
@@ -2612,11 +2613,12 @@ int generate_cuts_in_lp_u(lp_prob *p, double *x)
 	 cur_sol->lp = 0;
 #pragma omp critical(cut_pool)
 	 if (cp){
-	    if (cp->cuts_to_add_num == 0){
-	       cp_new_row_num = check_cuts_u(cp, cur_sol, lp_data->x);
-	    }else{
-	       cp_new_row_num = cp->cuts_to_add_num;
-	    }
+	 /*    if (cp->cuts_to_add_num == 0){ */
+	 /*       cp_new_row_num = check_cuts_u(cp, cur_sol, lp_data->x); */
+	 /*    }else{ */
+	 /*       cp_new_row_num = cp->cuts_to_add_num; */
+	 /*    } */
+	    cp_new_row_num = check_cuts_u(cp, cur_sol, lp_data->x);
 	    if (++cp->reorder_count % 10 == 0){
 	       delete_duplicate_cuts(cp);
 	       order_cuts_by_quality(cp);

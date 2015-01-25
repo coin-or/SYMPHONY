@@ -994,7 +994,7 @@ int sym_solve(sym_environment *env)
        * epsilon
        */
       env->par.tm_par.granularity = env->par.lp_par.granularity = 
-         1e-7;//fabs((double)granularity - 1e-7); //Anahita
+         fabs((double)granularity - 1e-7); //Anahita
    }
    PRINT(env->par.verbosity, 0, ("granularity set at %f\n",
             env->par.tm_par.granularity));
@@ -6549,6 +6549,7 @@ int sym_test(sym_environment *env, int argc, char **argv, int *test_status)
   char* buf = 0;
   
   *test_status = 0;
+  sym_parse_command_line(env, argc, argv);
   verbosity = sym_get_int_param(env, "verbosity", &verbosity);
 
   while (true) {

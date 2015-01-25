@@ -1594,7 +1594,7 @@ int select_branching_object(lp_prob *p, int *cuts, branch_obj **candidate)
                }
                check_ub(p);
                /* The original basis is in lp_data->lpbas */
-	       if (!p->par.cuts_strong_branch){
+	       if (1){//!p->par.cuts_strong_branch){
 		  if (should_use_hot_starts) {
 		     can->termcode[j] = solve_hotstart(lp_data, can->iterd+j);
 		     total_iters+=*(can->iterd+j);
@@ -2604,7 +2604,7 @@ int strong_branch(lp_prob *p, int branch_var, double lb, double ub,
       }
    }
 
-   if (p->par.cuts_strong_branch) {
+   if (0){//p->par.cuts_strong_branch) {
    
       bool keep_going = TRUE;
       int iter_num = 0, violated, *tmp_matind, *matind, nzcnt;

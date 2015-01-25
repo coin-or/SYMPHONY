@@ -4600,21 +4600,21 @@ int check_cuts(OsiCuts &cutlist, LPdata *lp_data, int bc_level, int
                   "%d\tMax = %f, Min = %f\n",num_elements,max_coeff, 
                   min_coeff));
 	 //Anahita
-         /* if (violation < lpetol) { */
-         /*    num_unviolated_cuts++; */
-         /*    discard_cut = TRUE; */
-         /*    PRINT(verbosity,5,("violation = %f. Threw out cut.\n\n",  */
-         /*             violation)); */
-         /* } */
-	 //Anahita
-	 /* if (discard_cut != TRUE && num_elements>0) { //changed by Anahita */
-	 /*    if ( (max_coeff > 0 && min_coeff/max_coeff < etol100000)|| */
-	 /*         (min_coeff > 0 && min_coeff < etol100000) ) { */
-         /*       num_discarded_cuts++; */
-	 /*       discard_cut = TRUE; */
-         /*       PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n\n")); */
-	 /*    } */
-	 /* } */
+         if (violation < lpetol) {
+            num_unviolated_cuts++;
+            discard_cut = TRUE;
+            PRINT(verbosity,5,("violation = %f. Threw out cut.\n\n",
+                     violation));
+         }
+
+	 if (discard_cut != TRUE && num_elements>0) { //changed by Anahita
+	    if ( (max_coeff > 0 && min_coeff/max_coeff < etol1000)||
+	         (min_coeff > 0 && min_coeff < etol1000) ) {
+               num_discarded_cuts++;
+	       discard_cut = TRUE;
+               PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n\n"));
+	    }
+	 }
 	 if (discard_cut==TRUE) {
             is_deleted[i] = TRUE;
             continue;
