@@ -810,6 +810,9 @@ int sym_solve(sym_environment *env)
       omp_set_num_threads(env->par.tm_par.max_active_nodes);
    }
 #endif
+#ifdef __PVM__
+   env->par.lp_par.should_use_rel_br = FALSE;
+#else
    if (env->par.lp_par.should_use_rel_br == -1){
       if (env->par.tm_par.max_active_nodes > 2){
 	 env->par.lp_par.should_use_rel_br = FALSE;
@@ -817,7 +820,8 @@ int sym_solve(sym_environment *env)
 	 env->par.lp_par.should_use_rel_br = TRUE;
       }
    }
-   
+#endif
+
    start_time = wall_clock(NULL);
 
    double *tmp_sol;
