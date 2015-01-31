@@ -28882,6 +28882,15 @@ else
   sym_openmp=auto
 fi;
 
+if test $sym_enable_parallel = true; then
+   if test $sym_openmp = true; then
+      { { echo "$as_me:$LINENO: error: Cannot use both PVM and OpenMP simultaneously: Disabling OpenMP" >&5
+echo "$as_me: error: Cannot use both PVM and OpenMP simultaneously: Disabling OpenMP" >&2;}
+   { (exit 1); exit 1; }; }
+   fi
+   sym_openmp=false
+fi
+
 if test $sym_openmp = auto; then
    echo "$as_me:$LINENO: checking whether compiler supports OpenMP" >&5
 echo $ECHO_N "checking whether compiler supports OpenMP... $ECHO_C" >&6

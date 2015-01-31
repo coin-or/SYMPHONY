@@ -787,6 +787,13 @@ AC_ARG_ENABLE([openmp],
 esac],
 [sym_openmp=auto])
 
+if test $sym_enable_parallel = true; then
+   if test $sym_openmp = true; then
+      AC_MSG_ERROR(Cannot use both PVM and OpenMP simultaneously: Disabling OpenMP)
+   fi
+   sym_openmp=false
+fi
+
 if test $sym_openmp = auto; then 
    AC_MSG_CHECKING([whether compiler supports OpenMP])
    case "$CXX" in
