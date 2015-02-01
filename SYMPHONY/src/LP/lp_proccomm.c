@@ -680,8 +680,8 @@ void send_node_desc(lp_prob *p, int node_type)
 	 return;
    }
 
-   if ((!repricing || n->node_status != NODE_STATUS__PRUNED)){
-       //&& node_type != INFEASIBLE_PRUNED){ //Anahita
+   if ((!repricing || n->node_status != NODE_STATUS__PRUNED)
+       && node_type != INFEASIBLE_PRUNED){ //Anahita
 
       n->lower_bound = lp_data->objval;
 

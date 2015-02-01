@@ -4607,7 +4607,7 @@ int check_cuts(OsiCuts &cutlist, LPdata *lp_data, int bc_level, int
                      violation));
          }
 
-	 if (discard_cut != TRUE && num_elements>0) { //changed by Anahita
+	 if (discard_cut != TRUE && num_elements>0) {
 	    if ( (max_coeff > 0 && min_coeff/max_coeff < etol1000)||
 	         (min_coeff > 0 && min_coeff < etol1000) ) {
                num_discarded_cuts++;

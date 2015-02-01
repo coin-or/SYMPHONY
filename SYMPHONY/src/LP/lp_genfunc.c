@@ -564,7 +564,8 @@ OPENMP_ATOMIC_UPDATE
                return(ERROR__USER);
             }
 #else
-         if (!check_tailoff(p)) {
+	    if (!check_tailoff(p) || (p->par.cuts_strong_branch &&
+				      p->tm->cpp[p->cut_pool]->cuts_to_add > 0)) {
             if ((cut_term = receive_cuts(p, first_in_loop,
                         no_more_cuts_count)) >=0 ){
                cuts += cut_term;
@@ -3063,40 +3064,25 @@ int check_and_add_cgl_cuts(lp_prob *p, int generator, cut_data ***cuts,
       }
       //v_level = 1; 
       coeff_ratio = min_coeff/max_coeff; 
-      /* check quality */ //commented out by Anahita
-      /* if (num_elements>0) { */
-      /*    if ( (max_coeff > 0 && coeff_ratio < etol100000)|| //changed by Anahita */
-      /* 	      (min_coeff > 0 && min_coeff < etol100000) ) { */
-      /*       PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n")); */
-      /* 	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000); */
-      /* 	    num_poor_quality++; */
-      /* 	    //is_deleted[i] = TRUE; */
-      /* 	    continue; */
-      /*    } */
-      /* } */
-      //Anahita
-      /* if (violation < etol10){//\*v_level){ */
-      /*    PRINT(verbosity,5,("violation = %f. Threw out cut.\n",  */
-      /* 			    violation)); */
-      /*    num_unviolated++; */
-      /*    //is_deleted[i] = TRUE; */
-      /*    continue; */
-      /* }//else printf("violation - %f \n", violation); */
+      /* check quality */ //Anahita
+      // critical to performance
+      bool bad_small_coeff_cond = min_coeff > 0 && min_coeff < etol1000;
+      bool bad_coeff_ratio_cond = max_coeff > 0 && coeff_ratio < etol1000;
 
       if (num_elements>0) {
-         if ( (max_coeff > 0 && coeff_ratio < etol1000)||
-	      (min_coeff > 0 && min_coeff < etol1000) ) {
+         if ( (bad_coeff_ratio_cond)||
+      	      (bad_small_coeff_cond) ) {
             PRINT(verbosity,5,("Threw out cut because of bad coeffs.\n"));
-	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
-	    num_poor_quality++;
-	    //is_deleted[i] = TRUE;
-	    continue;
+      	    //printf("%f %f %f\n\n", min_coeff, max_coeff, etol1000);
+      	    num_poor_quality++;
+      	    //is_deleted[i] = TRUE;
+      	    continue;
          }
       }
       
       if (violation < etol10){//*v_level){
-         PRINT(verbosity,5,("violation = %f. Threw out cut.\n", 
-			    violation));
+         PRINT(verbosity,5,("violation = %f. Threw out cut.\n",
+      			    violation));
          num_unviolated++;
          //is_deleted[i] = TRUE;
          continue;

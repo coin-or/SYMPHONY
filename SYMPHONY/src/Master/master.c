@@ -259,6 +259,7 @@ int sym_set_defaults(sym_environment *env)
    tm_par->tighten_root_bounds = TRUE;
    /************************** lp defaults ***********************************/
    lp_par->cuts_strong_branch = 0; //Anahita
+   lp_par->is_recourse_prob = 0; //Anahita
    lp_par->verbosity = 0;
    lp_par->granularity = tm_par->granularity;
    lp_par->use_cg = tm_par->use_cg;
@@ -5518,6 +5519,11 @@ int sym_get_int_param(sym_environment *env, const char *key, int *value)
       *value = lp_par->cuts_strong_branch;
       return(0);
    }
+   else if (strcmp(key, "is_recourse_prob") == 0 ||
+	    strcmp(key, "LP_is_recourse_prob") == 0){
+      *value = lp_par->is_recourse_prob;
+      return(0);
+   }
    else if (strcmp(key, "discard_slack_cuts") == 0 ||
 	    strcmp(key, "LP_discard_slack_cuts") == 0){
       *value = lp_par->discard_slack_cuts;
@@ -6295,7 +6301,7 @@ int sym_get_lb_for_new_rhs(sym_environment *env, int cnt, int *new_rhs_ind,
 #endif
 #else
    printf("sym_get_lb_for_new_rhs():\n");
-   printf("Sensitivity analysis features are not enabled.\n"); 
+   printf("Sensitivity analysis features are not enabled.\n");
    printf("Please rebuild SYMPHONY with these features enabled\n");
    return(FUNCTION_TERMINATED_ABNORMALLY);
 #endif

@@ -335,6 +335,7 @@ typedef struct LP_PARAMS{
 
    int               cuts_strong_branch; //Anahita
 
+   int               is_recourse_prob; //Anahita
 }lp_params;
 
 #endif

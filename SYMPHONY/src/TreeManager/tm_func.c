@@ -1561,8 +1561,8 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
       //Anahita
       child->intcpt = bobj->intcpt[i];
 #ifdef SENSITIVITY_ANALYSIS
-      if (tm->par.sensitivity_analysis && //){// &&//Anahita 
-	 action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
+      if (tm->par.sensitivity_analysis){ //&& //Anahita 
+	  //action[i] != PRUNE_THIS_CHILD_INFEASIBLE){
 	 child->duals = bobj->duals[i];
 	 bobj->duals[i] = 0;
 	 //Anahita
@@ -1600,7 +1600,8 @@ int generate_children(tm_prob *tm, bc_node *node, branch_obj *bobj,
 	       child->feasibility_status = FEASIBLE_PRUNED;	   	    
 	    }
 	    //Anahita to keep status of over_ub 
-	    if (action[i] == PRUNE_THIS_CHILD_INFEASIBLE){
+	    if ((action[i] == PRUNE_THIS_CHILD_INFEASIBLE) &&
+		(!tm->par.sensitivity_analysis)){
 	      child->feasibility_status = INFEASIBLE_PRUNED;
 	    }
 	 }
@@ -3010,7 +3011,7 @@ int trim_subtree(tm_prob *tm, bc_node *n)
       FREE(n->bobj.range);
       FREE(n->bobj.branch);
 #endif
-      //FREE(n->bobj.solutions); //added by asm4
+      FREE(n->bobj.solutions); //added by asm4
    }else{
       /* try to trim every child */
       for (i = n->bobj.child_num - 1; i >= 0; i--)
@@ -3736,7 +3737,7 @@ void free_tree_node(bc_node *n)
    FREE(n->bobj.sos_ind);
 #endif
    // Anahita
-   FREE(n->bobj.solutions); //added by asm4
+   //FREE(n->bobj.solutions); //added by asm4
 
    FREE(n->desc.uind.list);
    free_basis(&n->desc.basis);
@@ -3820,20 +3821,16 @@ int tm_close(tm_prob *tm, int termcode)
       for (i = 0; i < tm->par.max_cp_num; i++){
 	 tm->comp_times.cut_pool += tm->cpp[i]->cut_pool_time;
 	 tm->stat.cuts_in_pool += tm->cpp[i]->cut_num;
-      /* 	 if (!tm->par.keep_cut_pools){ */
-      /* 	    tm->cpp[i]->msgtag = YOU_CAN_DIE; */
-      /* 	    cp_close(tm->cpp[i]); */
-      /* 	 }else{ */
-      /* 	    tm->cpp[i]->cut_pool_time = 0; */
-      /* 	 } */
-      /* } */
-      /* if (!tm->par.keep_cut_pools){ */
-      /* 	 FREE(tm->cpp); */
-      /* } */
-	 tm->cpp[i]->msgtag = YOU_CAN_DIE;
-	 cp_close(tm->cpp[i]);
+      	 if (!tm->par.keep_cut_pools){
+      	    tm->cpp[i]->msgtag = YOU_CAN_DIE;
+      	    cp_close(tm->cpp[i]);
+      	 }else{
+      	    tm->cpp[i]->cut_pool_time = 0;
+      	 }
       }
-      FREE(tm->cpp); 
+      if (!tm->par.keep_cut_pools){
+      	 FREE(tm->cpp);
+      }
    }
 #else
    for (i = 0; i < tm->par.max_cp_num;){

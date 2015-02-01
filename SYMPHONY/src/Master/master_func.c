@@ -2513,6 +2513,11 @@ int set_param(sym_environment *env, char *line)
       READ_INT_PAR(lp_par->cuts_strong_branch);
       return(0);
    }
+   else if (strcmp(key, "is_recourse_prob") == 0 ||
+	    strcmp(key, "LP_is_recourse_prob") == 0){
+      READ_INT_PAR(lp_par->is_recourse_prob);
+      return(0);
+   }
 
    else if (strcmp(key, "discard_slack_cuts") == 0 ||
 	    strcmp(key, "LP_discard_slack_cuts") == 0){
