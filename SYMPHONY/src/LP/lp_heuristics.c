@@ -26,6 +26,17 @@
 #include "sym_prep.h"
 #include "sym_macros.h"
 #include "sym_master.h"
+
+//This is a bit of a hack to let heuristics run in distrivuted parallel mode
+//Some parameters depend on how many nodes have been analyzed so far.
+//We are using the current node index as a rought proxy for this.
+//I would be surprised if this makes much difference.
+#ifdef COMPILE_IN_LP
+#define NUM_NODES p->tm->stat.analyzed
+#else
+#define NUM_NODES p->bc_index
+#endif
+
 /*===========================================================================*/
 /*===========================================================================*\
  * This file contains heuristics to find an integral solution after an LP
@@ -79,12 +90,12 @@ int feasibility_pump (lp_prob *p, char *found_better_solution, double &solution_
    int lp_iter_limit = 1e5;
 
    if(p->bc_index > 0){
-     int reg_limit = MAX(1e4, (int)(((int)(1.0*p->tm->stat.analyzed/100) + 1)*1e8/lp_data->nz));
+     int reg_limit = MAX(1e4, (int)(((int)(1.0*NUM_NODES/100) + 1)*1e8/lp_data->nz));
      lp_iter_limit = reg_limit - p->lp_stat.fp_num_iter;
    }
 
    if(lp_iter_limit < 0){
-     if(p->has_ub || solution_value < SYM_INFINITY/2 || p->tm->stat.analyzed > 100) 
+     if(p->has_ub || solution_value < SYM_INFINITY/2 || NUM_NODES > 100) 
        return termcode;     
      lp_iter_limit = p->lp_stat.fp_num_iter/p->lp_stat.fp_calls;
    }
@@ -1023,7 +1034,7 @@ int fp_should_call_fp(lp_prob *p, int branching, int *should_call,
 
    int fp_freq_base = p->bc_level;
 #ifdef COMPILE_IN_LP
-   //   fp_freq_base = p->tm->stat.analyzed - 1;
+   //   fp_freq_base = NUM_NODES - 1;
 #endif
 
    int orig_fp_freq = p->par.fp_frequency;
@@ -1055,14 +1066,14 @@ int fp_should_call_fp(lp_prob *p, int branching, int *should_call,
       *should_call = FALSE;
    }else if (!should_call){
       if(p->bc_level > 0 && !p->has_ub && 
-	 (p->lp_stat.fp_calls <= 3 || p->tm->stat.analyzed >= 100)){
+	 (p->lp_stat.fp_calls <= 3 || NUM_NODES >= 100)){
 	if(p->lp_stat.fp_calls <= 3){
 	  *should_call = TRUE;
 	}else{
-	  if(p->tm->stat.analyzed%p->par.fp_frequency == 0 && p->tm->stat.analyzed <= 1000){
+	  if(NUM_NODES%p->par.fp_frequency == 0 && NUM_NODES <= 1000){
 	    *should_call = TRUE;
-	    if((p->tm->stat.analyzed - 
-		(int)(1.0*p->tm->stat.analyzed/100)*100)/p->par.fp_frequency <= 1){
+	    if((NUM_NODES - 
+		(int)(1.0*NUM_NODES/100)*100)/p->par.fp_frequency <= 1){
 	      p->par.fp_max_initial_time += 20; 
 	    }
 	  }
@@ -1117,7 +1128,7 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
 						 p->lp_stat.str_br_lp_calls -
 						 p->lp_stat.fp_lp_calls + 1) + 1);
 
-  if (nz > 1e6 || lp_iter_limit > 5e3 || p->tm->stat.analyzed > 1) return FALSE;
+  if (nz > 1e6 || lp_iter_limit > 5e3 || NUM_NODES > 1) return FALSE;
 
   
   if(has_ub){// || nz > 1.5e5){
@@ -1127,8 +1138,8 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
   }
 
   int reg_limit;
-  if(p->tm->stat.analyzed < 500){
-    reg_limit = MAX(1e4, (int)(((int)(1.0*p->tm->stat.analyzed/100) + 1)*1e8/lp_data->nz));
+  if(NUM_NODES < 500){
+    reg_limit = MAX(1e4, (int)(((int)(1.0*NUM_NODES/100) + 1)*1e8/lp_data->nz));
   }else{
     reg_limit = MAX(1e4, (int)(0.5e9/lp_data->nz));
   }
@@ -1208,7 +1219,7 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
       break;
     case EUC_FIX_DIVING:
     case RANK_FIX_DIVING:
-      if(!check_fix || p->tm->stat.analyzed < 10 || p->par.rs_mode_enabled) break;
+      if(!check_fix || NUM_NODES < 10 || p->par.rs_mode_enabled) break;
     case FRAC_FIX_DIVING:
       if(check_fix && 
 	 (p->lp_stat.ds_type_num_sols[d_type] > 0 ||
@@ -1225,7 +1236,7 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
       break;
     case EUC_DIVING:
     case RANK_DIVING:
-      if(!check_init || p->tm->stat.analyzed < 5) break;
+      if(!check_init || NUM_NODES < 5) break;
     case FRAC_DIVING:
       if(check_init && 
 	 (p->lp_stat.ds_type_num_sols[d_type] > 0 ||
@@ -1246,8 +1257,8 @@ int diving_search(lp_prob *p, double *solutionValue, double *colSolution,
 
   //if(p->bc_level > 0){// &&
      //(init_frac_ip_cnt > 200 || p->mip->mip_inf->prob_type == BINARY_TYPE)){
-  //  if(!((has_ub && p->tm->stat.analyzed < 501) ||  
-  //  (!has_ub && p->tm->stat.analyzed < 1001)))
+  //  if(!((has_ub && NUM_NODES < 501) ||  
+  //  (!has_ub && NUM_NODES < 1001)))
   //return FALSE;
   //}
   for (i = 0; i < n; i++){
@@ -1726,7 +1737,11 @@ int ds_fix_vars(lp_prob *p, LPdata *diving_lp, double *x,
    double x_obj, val, etol = p->lp_data->lpetol;
    // double x_rank_1257;
    // double x_rank_1006;
+#ifdef COMPILE_IN_LP
    sp_desc *sp = p->tm->sp;
+#else
+   sp_desc *sp = NULL;
+#endif
    sp_solution *sol;
 
    int *x_dir_cnt = p->lp_data->tmp.i2 + n;
@@ -3597,7 +3612,7 @@ int lbranching_search(lp_prob *p, double *solutionValue, double *colSolution,
    int search_k;
    if(p->bc_index < 1){
       search_k = MIN(4, (int)(int_cnt/5.0));
-   }else if(p->tm->stat.analyzed < 100){
+   }else if(NUM_NODES < 100){
       search_k = MIN(3, (int)(int_cnt/10.0));
    }else{
       search_k = MIN(3, (int)(int_cnt/20.0));
@@ -3881,7 +3896,11 @@ int restricted_search(lp_prob *p, double *solutionValue, double *colSolution,
       x_diff[i] = DBL_MAX;
     }  
   
-    sp_desc *sp = p->tm->sp;  
+#ifdef COMPILE_IN_LP
+    sp_desc *sp = p->tm->sp;
+#else
+    sp_desc *sp = NULL;
+#endif
     if(sp && sp->num_solutions > 1){	    
       feas_sol_cnt += sp->num_solutions;
       sp_solution *sol;

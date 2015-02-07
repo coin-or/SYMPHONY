@@ -467,9 +467,8 @@ int send_lp_data_u(sym_environment *env, int sender)
 
       if ((tm->lpp[i]->has_ub = env->has_ub)){
 	 tm->lpp[i]->ub = env->ub;
-      }else{
-	 env->ub = - (MAXDOUBLE / 2);
       }
+      
       if (env->par.multi_criteria){
 	 if ((tm->lpp[i]->has_mc_ub = env->has_mc_ub)){
 	    tm->lpp[i]->mc_ub = env->mc_ub;

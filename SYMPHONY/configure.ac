@@ -707,9 +707,16 @@ if test $in_tm = yes; then
   MASTEREXT="_tm$TMEXT"
 fi 
 
-WHATTOMAKELIBS=
-WHATTOINSTALLLIBS=
-WHATTOMAKEBINS=
+WHATTOMAKELIBS="libSym.la"
+WHATTOMAKEBINS="symphony$EXEEXT"
+if test $sym_appl = yes ; then 
+   WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
+   WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
+   if test $dependency_linking = yes ; then
+       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
+   fi
+fi
+WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 
 if test $sym_enable_parallel = true; then
    SYMPDEFS="$SYMPDEFS -D__PVM__"
@@ -752,20 +759,6 @@ if test $sym_enable_parallel = true; then
        fi
     fi
     WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
-else
-    MASTEREXT="_m"
-    WHATTOMAKELIBS="$WHATTOMAKELIBS libSym.la"
-    WHATTOMAKEBINS="$WHATTOMAKEBINS symphony$EXEEXT"
-    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
-
-    if test $sym_appl = yes ; then 
-       WHATTOMAKELIBS="$WHATTOMAKELIBS libSymAppl.la"
-       WHATTOINSTALLLIBS="$WHATTOINSTALLLIBS libSymAppl.la"
-       if test $dependency_linking = yes ; then
-       	  WHATTOMAKELIBS="$WHATTOMAKELIBS libSymApplStubs.la"
-       fi
-    fi
-    WHATTOINSTALLLIBS="$WHATTOMAKELIBS"
 fi
 
 AC_SUBST(WHATTOMAKELIBS)
@@ -793,6 +786,13 @@ AC_ARG_ENABLE([openmp],
    ;;
 esac],
 [sym_openmp=auto])
+
+if test $sym_enable_parallel = true; then
+   if test $sym_openmp = true; then
+      AC_MSG_ERROR(Cannot use both PVM and OpenMP simultaneously: Disabling OpenMP)
+   fi
+   sym_openmp=false
+fi
 
 if test $sym_openmp = auto; then 
    AC_MSG_CHECKING([whether compiler supports OpenMP])

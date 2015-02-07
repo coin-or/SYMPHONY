@@ -334,9 +334,9 @@ int solve(tm_prob *tm)
 #pragma omp parallel default(shared) private(now, then2, then3)
 {
 #ifdef _OPENMP
-      int i, ret, thread_num = omp_get_thread_num();
+      int i, ret, thread_num = omp_get_thread_num(), scand_num;
 #else
-      int i, ret, thread_num = 0;
+      int i, ret, thread_num = 0, scand_num;
 #endif
       tm->termcodes[thread_num] = TM_UNFINISHED;
       then  = wall_clock(NULL);
@@ -359,7 +359,11 @@ int solve(tm_prob *tm)
 		     tm->lp_stat.ip_sols > 0) &&
 		!(tm->par.rs_mode_enabled && tm->lp_stat.lp_iter_num > tm->par.rs_lp_iter_limit) &&
 		c_count <= 0){
-	    if (tm->samephase_candnum > 0 && (thread_num != 0 || tm->par.max_active_nodes == 1)){
+#pragma omp critical (tree_update)
+            {
+            scand_num = tm->samephase_candnum;
+            }
+	    if (scand_num > 0 && (thread_num != 0 || tm->par.max_active_nodes == 1)){
 	       i = start_node(tm, thread_num);
 	    }else{
 	       i = NEW_NODE__NONE;
@@ -563,9 +567,9 @@ OPENMP_ATOMIC_WRITE
 	    write_log_files(tm);
 	    then3 = now;
 	 }
-}
+} // pragma
       }
-}
+} // pragma
 
       if (tm->termcode == TM_UNBOUNDED){
 	 break;
