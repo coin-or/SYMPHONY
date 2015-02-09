@@ -409,8 +409,10 @@ void OsiSymSolverInterfaceUnitTest( const std::string & mpsDir, const std::strin
   }
     
   // Do common solverInterface testing by calling the base class testing method.
+#if 0
   {
      OsiSymSolverInterface m;
      OsiSolverInterfaceCommonUnitTest(&m, mpsDir,netlibDir);
   }
+#endif
 }
