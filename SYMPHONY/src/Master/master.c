@@ -848,9 +848,19 @@ int sym_solve(sym_environment *env)
       env->orig_mip = 0;      
       
       if(termcode == PREP_INFEAS){
-	 return(env->termcode = PREP_NO_SOLUTION);
+	 if (env->par.verbosity >= -1 ){
+	    printf("\n****************************************************\n");
+	    printf(  "* Problem Found Infeasible in Preprocessing        *\n");
+	    printf(  "****************************************************\n");
+	 }
+	 return(env->termcode = TM_NO_SOLUTION);
       }else if(termcode == PREP_UNBOUNDED){
-	 return(env->termcode = PREP_UNBOUNDED);
+	 if (env->par.verbosity >= -1 ){
+	    printf("\n****************************************************\n");
+	    printf(  "* Problem Found Unbounded in Preprocessing         *\n");
+	    printf(  "****************************************************\n");
+	 }
+	 return(env->termcode = TM_UNBOUNDED);
       }else if(termcode == PREP_SOLVED){
 	 /* now we initialize sol in preprocessor */
 	 //env->best_sol.has_sol = TRUE;
@@ -864,9 +874,23 @@ int sym_solve(sym_environment *env)
 	 //memcpy(env->best_sol.xval, env->prep_mip->fixed_val, ISIZE *
 	 //env->prep_mip->fixed_n);
 	 
-	 return(env->termcode = PREP_OPTIMAL_SOLUTION_FOUND);
+	 if (env->par.verbosity >= -1 ){
+	    printf("\n****************************************************\n");
+	    printf(  "* Optimal Solution Found in Preprocessing          *\n");
+	    printf(  "****************************************************\n");
+	 }
+	 if (env->par.verbosity >= 0){
+	    CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
+	 }
+	 return(env->termcode = TM_OPTIMAL_SOLUTION_FOUND);
       }else if(termcode == PREP_NUMERIC_ERROR){
-	 return(env->termcode = PREP_ERROR);
+	 if (env->par.verbosity >= -1 ){
+	    printf("\n****************************************************\n");
+	    printf(  "* Terminated abnormally with error message %i      *\n",
+		  termcode);
+	    printf(  "****************************************************\n");
+	 }
+	 return(env->termcode = TM_ERROR__NUMERICAL_INSTABILITY);
       }
    }
 

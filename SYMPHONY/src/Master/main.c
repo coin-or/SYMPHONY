@@ -375,11 +375,13 @@ int main(int argc, char **argv)
 		int display = TRUE;
 		switch(env->termcode){
 		 case TM_NO_SOLUTION:
-		    printf("Error in displaying solution! \n"
-			   "The problem is either infeasible or "
-			   "has not been solved yet!\n");
-		    display = FALSE;
-		    break;
+		   printf("Problem was found infeasible!\n");
+		   display = FALSE;
+		   break;
+		 case TM_UNBOUNDED:
+		   printf("Problem was found to be unbounded!\n");
+		   display = FALSE;
+		   break;
 		 case TM_NODE_LIMIT_EXCEEDED:		    
 		    printf("Node limit reached!\n");		    
 		    break;
@@ -453,14 +455,20 @@ int main(int argc, char **argv)
 	       initial_time += env->comp_times.lb_overhead + 
 		 env->comp_times.lb_heurtime;
 	       
-	       print_statistics(&(env->warm_start->comp_times), 
-				&(env->warm_start->stat),
-                                NULL,
-				env->warm_start->ub, env->warm_start->lb, 
-				initial_time, start_time, finish_time,
-				env->mip->obj_offset, env->mip->obj_sense,
-				env->warm_start->has_ub,NULL, 0);
-	       printf("\n");	       
+	       if (env->warm_start){
+		  print_statistics(&(env->warm_start->comp_times), 
+				   &(env->warm_start->stat),
+				   NULL,
+				   env->warm_start->ub, env->warm_start->lb, 
+				   initial_time, start_time, finish_time,
+				   env->mip->obj_offset, env->mip->obj_sense,
+				   env->warm_start->has_ub,NULL, 0);
+		  printf("\n");
+	       }else{
+		  printf("No statistics! Either the solution process"
+			 "terminated in preprocessing or\n"
+			 "the problem has not been solved yet!\n");
+	       }
 	     }
 	     strcpy(args[1], "");	       
 	   } else if (strcmp(args[1], "parameter") == 0){

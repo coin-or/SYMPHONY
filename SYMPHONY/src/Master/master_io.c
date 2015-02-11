@@ -811,79 +811,83 @@ void print_statistics(node_times *tim, problem_stat *stat,
    };
 #endif
 
-   initial_time += tim->communication;
-   initial_time += tim->lp;
-   initial_time += tim->lp_setup;
-   initial_time += tim->separation;
-   initial_time += tim->fixing;
-   initial_time += tim->pricing;
-   initial_time += tim->strong_branching;
-   initial_time += tim->cut_pool;
-   initial_time += tim->primal_heur;
+   if (tim){
+      initial_time += tim->communication;
+      initial_time += tim->lp;
+      initial_time += tim->lp_setup;
+      initial_time += tim->separation;
+      initial_time += tim->fixing;
+      initial_time += tim->pricing;
+      initial_time += tim->strong_branching;
+      initial_time += tim->cut_pool;
+      initial_time += tim->primal_heur;
 #if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
-   printf("======================= CP Timing ===========================\n");
-   printf("  Cut Pool                  %.3f\n", tim->cut_pool);
+      printf("======================= CP Timing ===========================\n");
+      printf("  Cut Pool                  %.3f\n", tim->cut_pool);
 #endif
-   printf("====================== LP/CG Timing =========================\n");
+      printf("====================== LP/CG Timing =========================\n");
 #if !defined(_MSC_VER)  /* FIXME: CPU timing doesn't work in Windows */
-   printf("  LP Solution Time          %.3f\n", tim->lp);
-   printf("  LP Setup Time             %.3f\n", tim->lp_setup);
-   printf("  Variable Fixing           %.3f\n", tim->fixing);
-   printf("  Pricing                   %.3f\n", tim->pricing);
-   printf("  Strong Branching          %.3f\n", tim->strong_branching);
-   printf("  Separation                %.3f\n", tim->separation); 
-   printf("  Primal Heuristics         %.3f\n", tim->primal_heur); 
-   printf("  Communication             %.3f\n", tim->communication);
+      printf("  LP Solution Time          %.3f\n", tim->lp);
+      printf("  LP Setup Time             %.3f\n", tim->lp_setup);
+      printf("  Variable Fixing           %.3f\n", tim->fixing);
+      printf("  Pricing                   %.3f\n", tim->pricing);
+      printf("  Strong Branching          %.3f\n", tim->strong_branching);
+      printf("  Separation                %.3f\n", tim->separation); 
+      printf("  Primal Heuristics         %.3f\n", tim->primal_heur); 
+      printf("  Communication             %.3f\n", tim->communication);
 #ifndef COMPILE_IN_LP
-   printf("=================== Parallel Overhead ======================\n");
-   printf("  Communication         %.3f\n", tim->communication);
-   printf("  Ramp Up Time (TM)     %.3f\n", tim->ramp_up_tm);
-   printf("  Ramp Up Time (LP)     %.3f\n", tim->ramp_up_lp);
-   printf("  Ramp Down Time        %.3f\n", tim->ramp_down_time);
-   printf("  Idle Time (Node Pack) %.3f\n", tim->start_node);
-   printf("  Idle Time (Nodes)     %.3f\n", tim->idle_node);
-   printf("  Idle Time (Names)     %.3f\n", tim->idle_names);
-   printf("  Idle Time (Diving)    %.3f\n", tim->idle_diving);
-   printf("  Idle Time (Cuts)      %.3f\n", tim->idle_cuts);
+      printf("=================== Parallel Overhead ======================\n");
+      printf("  Communication         %.3f\n", tim->communication);
+      printf("  Ramp Up Time (TM)     %.3f\n", tim->ramp_up_tm);
+      printf("  Ramp Up Time (LP)     %.3f\n", tim->ramp_up_lp);
+      printf("  Ramp Down Time        %.3f\n", tim->ramp_down_time);
+      printf("  Idle Time (Node Pack) %.3f\n", tim->start_node);
+      printf("  Idle Time (Nodes)     %.3f\n", tim->idle_node);
+      printf("  Idle Time (Names)     %.3f\n", tim->idle_names);
+      printf("  Idle Time (Diving)    %.3f\n", tim->idle_diving);
+      printf("  Idle Time (Cuts)      %.3f\n", tim->idle_cuts);
 #endif
+   }
    printf("  Total User Time              %.3f\n", initial_time);
 #endif
    printf("  Total Wallclock Time         %.3f\n\n", finish_time -
 	  start_time);
-   printf("====================== Statistics =========================\n");
-   printf("Number of created nodes :       %i\n", stat->created);
-   printf("Number of analyzed nodes:       %i\n", stat->analyzed);
-   printf("Depth of tree:                  %i\n", stat->max_depth);
-   printf("Size of the tree:               %i\n", stat->tree_size);
-   if (solpool) {
-      printf("Number of solutions found:      %i\n", solpool->total_num_sols_found);
-      printf("Number of solutions in pool:    %i\n", solpool->num_solutions);
-   }
+   if (stat){
+      printf("====================== Statistics =========================\n");
+      printf("Number of created nodes :       %i\n", stat->created);
+      printf("Number of analyzed nodes:       %i\n", stat->analyzed);
+      printf("Depth of tree:                  %i\n", stat->max_depth);
+      printf("Size of the tree:               %i\n", stat->tree_size);
+      if (solpool) {
+	 printf("Number of solutions found:      %i\n", solpool->total_num_sols_found);
+	 printf("Number of solutions in pool:    %i\n", solpool->num_solutions);
+      }
 #ifdef SHOULD_SHOW_MEMORY_USAGE
-   printf("Virtual memory used (MB):       %.2f\n", stat->max_vsize);
+      printf("Virtual memory used (MB):       %.2f\n", stat->max_vsize);
 #endif
-
+      
 #if 0
-   printf("Leaves before trimming:         %i\n",
-	  stat->leaves_before_trimming);
-   printf("Leaves after trimming:          %i\n", stat->leaves_after_trimming);
-   printf("Repriced root's nf_status:      %s\n",
-	  nfstatus[(int)stat->nf_status].str);
-   printf("Not fixed variable num:         %i\n", stat->vars_not_priced);
+      printf("Leaves before trimming:         %i\n",
+	     stat->leaves_before_trimming);
+      printf("Leaves after trimming:          %i\n", stat->leaves_after_trimming);
+      printf("Repriced root's nf_status:      %s\n",
+	     nfstatus[(int)stat->nf_status].str);
+      printf("Not fixed variable num:         %i\n", stat->vars_not_priced);
 #endif
-   printf("Number of Chains:               %i\n", stat->chains);
-   printf("Number of Diving Halts:         %i\n", stat->diving_halts);
-   printf("Number of cuts in cut pool:     %i\n", stat->cuts_in_pool);
-   if (stat->root_lb > -MAXDOUBLE){
-      if (obj_sense == SYM_MAXIMIZE){
-	 printf("Upper Bound in Root:            %.3f\n",
-		-stat->root_lb + obj_offset);
-      }else{
-	 printf("Lower Bound in Root:            %.3f\n",
-		stat->root_lb + obj_offset);
+      printf("Number of Chains:               %i\n", stat->chains);
+      printf("Number of Diving Halts:         %i\n", stat->diving_halts);
+      printf("Number of cuts in cut pool:     %i\n", stat->cuts_in_pool);
+      if (stat->root_lb > -MAXDOUBLE){
+	 if (obj_sense == SYM_MAXIMIZE){
+	    printf("Upper Bound in Root:            %.3f\n",
+		   -stat->root_lb + obj_offset);
+	 }else{
+	    printf("Lower Bound in Root:            %.3f\n",
+		   stat->root_lb + obj_offset);
+	 }
       }
    }
-
+   
    if (lp_stat) {
       printf ("\n======================= LP Solver =========================");
       printf ("\n");
@@ -905,7 +909,7 @@ void print_statistics(node_times *tim, problem_stat *stat,
               "%i\n",lp_stat->prep_nodes_pruned);
       
       if (output_mode < 1) {
-
+	 
 	 printf ("\n==================== Rounding =============================");
 	 printf ("\n");
 	 printf ("Number of rounding heuristic called:                  ");
