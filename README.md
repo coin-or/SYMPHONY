@@ -1,10 +1,10 @@
-# SYMPHONY Version 5.6.6 README
+# SYMPHONY Version 5.6.8 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
 2000-2014 by Ted Ralphs and others. This README may be redistributed freely.
 
-#DOCUMENTATION
+# DOCUMENTATION
 
 If you have downloaded a source distribution, LaTex source for the full documentation is available in the SYMPHONY/Doc/ subdirectory. Quick start guides and pointers to other on-line documentation can be found at the project Wiki:
 
@@ -226,391 +226,400 @@ https://projects.coin-or.org/SYMPHONY/newticket
 
 Please note the version of SYMPHONY you are using when filing the ticket.
 
-## WHAT'S NEW
+## CHANGELOG
 
-Release 5.6.6:
+# Release 5.6.7
+  * Fix to dependency linking.
+  * Fix for installation with {{{DESTDIR}}}
 
-1. Disabling pre-processor for multicriteria instances.
+# Release 5.6.7
+  * Fixes to distributed parallel (PVM) version.
+  * Enable primal heuristics in distributed version.
+  * Update externals to most recent stables.
+  * Make dependency linking default.
 
-Release 5.6.5:
+# Release 5.6.6:
 
-1. Added explicit dependence on libgomp, which is needed for linking with 
+ * Disabling pre-processor for multicriteria instances.
+
+# Release 5.6.5:
+
+ * Added explicit dependence on libgomp, which is needed for linking with 
 compilers that don't supprt OpenMP (clang on OS X)
 
-Release 5.6.4:
+# Release 5.6.4:
 
-1. Fix to pkgconfig file to add flags for OpenMP.
+ * Fix to pkgconfig file to add flags for OpenMP.
 
-2. Fixes for documentation.
+ * Fixes for documentation.
 
-3. More fixes for dependency linking.
+ *  More fixes for dependency linking.
 
-Release 5.6.3:
+# Release 5.6.3:
 
-1. Fixes to applications to allow some preprocessing, which is needed for
+ * Fixes to applications to allow some preprocessing, which is needed for
 some primal heuristics to work.
 
-2. Fixes to preprocessor settings so that the minimal amount of preprocessing
+ * Fixes to preprocessor settings so that the minimal amount of preprocessing
 is always done.
 
-3. Fixes to some methods so they still work preprely even when preprocessing is
+ *  Fixes to some methods so they still work preprely even when preprocessing is
 not done.
 
-4. Fixes to pre-processor for applications that construct the LP relaxation 
+ *  Fixes to pre-processor for applications that construct the LP relaxation 
 algorithmically. 
 
-5. Fix to pkgconfig file for applications.
+ * Fix to pkgconfig file for applications.
 
-6. Fix for dependency linking.
+ * Fix for dependency linking.
 
-7. Other small bug fixes.
+ * Other small bug fixes.
 
-Release 5.6.2:
+# Release 5.6.2:
 
-1. Updates and fixes to manual and documentation files.
+ * Updates and fixes to manual and documentation files.
 
-2. Fixes for configuring with PVM.
+ * Fixes for configuring with PVM.
 
-3. Fixes to allow dependency linking with the application library. 
+ *  Fixes to allow dependency linking with the application library. 
 
-4. Bug fix for reliability branching. 
+ *  Bug fix for reliability branching. 
 
-5. Bug fix for addition of column cuts
+ * Bug fix for addition of column cuts
 
-6. Updates to externals to fix bugs in dependent projects.
+ * Updates to externals to fix bugs in dependent projects.
 
-Release 5.6.1:
+# Release 5.6.1:
 
-1. Small fixes for OpenMP
+ * Small fixes for OpenMP
 
-Release 5.6.0:
+# Release 5.6.0:
 
-1. Major re-design of shared memory parallel mode for increased efficiency and stability.
+ * Major re-design of shared memory parallel mode for increased efficiency and stability.
 
-2. Fixes for distributed memory parallel version (PVM)
+ * Fixes for distributed memory parallel version (PVM)
 
-3. Fixes for bicriteria version
+ *  Fixes for bicriteria version
 
-Release 5.5.7:
+# Release 5.5.7:
 
-1. More updates to build harness
+ * More updates to build harness
 
-Release 5.5.6:
+# Release 5.5.6:
 
-1. More updates to build harness
+ * More updates to build harness
 
-Release 5.5.5:
+# Release 5.5.5:
 
-1. More updates to build harness
+ * More updates to build harness
 
-Release 5.5.4:
+# Release 5.5.4:
 
-1. Fix memory leak
-2. Delete superfluous header file
-3. More updates to build harness
+ * Fix memory leak
+ * Delete superfluous header file
+ *  More updates to build harness
 
-Release 5.5.3:
+# Release 5.5.3:
 
-1. More updates to build harness
+ * More updates to build harness
 
-Release 5.5.2:
+# Release 5.5.2:
 
-1. Fix problems with Visual Studio project files
-2. Update to build tools
+ * Fix problems with Visual Studio project files
+ * Update to build tools
 
-Release 5.5.1:
+# Release 5.5.1:
 
-1. Fix bug that caused all user applications to crash
+ * Fix bug that caused all user applications to crash
 
-Release 5.4.8:
+# Release 5. * 8:
 
-1. Updates to MSVC++ files (applications now use property sheets and VRP app file is fixed).
-2. Other fixes for build tools.
+ * Updates to MSVC++ files (applications now use property sheets and VRP app file is fixed).
+ * Other fixes for build tools.
 
-Release 5.4.7:
+# Release 5. * 7:
 
-1. Updates to documentation
+ * Updates to documentation
 
-Release 5.5.0:
+# Release 5.5.0:
 
-1. Improvements to preprocessing
-2. Improvements to heuristics
-3. Improvements to MSVC++ support
-4. Bug fixes
-5. Significant performance gains 
+ * Improvements to preprocessing
+ * Improvements to heuristics
+ * Improvements to MSVC++ support
+ * Bug fixes
+ * Significant performance gains 
 
-Release 5.4.6:
-1. More fixes to allow use of CPLEX as LP solver
-2. Fixes to interface with GMPL
+# Release 5.4.6:
+ * More fixes to allow use of CPLEX as LP solver
+ * Fixes to interface with GMPL
 
-Release 5.4.5:
+# Release 5.4.5:
 
-1. Fixes to allow use of CPLEX as LP solver
-2. Fixes to interface with GMPL
+ * Fixes to allow use of CPLEX as LP solver
+ * Fixes to interface with GMPL
 
-Release 5.4.4:
+# Release 5.4.4:
 
-1. Fixes for build system
-2. Other minor fixes
+ * Fixes for build system
+ * Other minor fixes
 
-Release 5.4.3:
+# Release 5.4.3:
 
-1. Updates to documentation.
-2. Fix to allow box-constrained integer programs.
-3. Fix for GMPL integration
-4. Fix for readline versions
+ * Updates to documentation.
+ * Fix to allow box-constrained integer programs.
+ *  Fix for GMPL integration
+ *  Fix for readline versions
 
-Release 5.4.2:
+# Release 5.4.2:
 
-1. Updates to MSVC++ version 10 files
+ * Updates to MSVC++ version 10 files
 
-Release 5.4.1
+# Release 5.4.1
 
-1. Addition of MSVC++ version 9 files
+ * Addition of MSVC++ version 9 files
 
-Release 5.4.0:
+# Release 5.4.0:
 
-1. Change license to EPL.
+ * Change license to EPL.
 
-2. Support for MSVC++ version 10 added.
+ * Support for MSVC++ version 10 added.
 
-3. Support for BuildTools version 0.7 to incoorporate recent enhancements, including proper library versioning in Linux, prohibiting installation of private headers, etc.
+ *  Support for BuildTools version 0.7 to incoorporate recent enhancements, including proper library versioning in Linux, prohibiting installation of private headers, etc.
 
-4. Enhancements to unit testing.
+ *  Enhancements to unit testing.
 
-5. Updating externals to new stable versions of dependent projects.
+ * Updating externals to new stable versions of dependent projects.
 
-Release 5.3.4:
+# Release 5.3.4:
 
-1. Fixes to the shared memory parallel version (OpenMP). It is now pretty
+ * Fixes to the shared memory parallel version (OpenMP). It is now pretty
 stable, though some minor memory conflict conditions may arise (infrequently).
 
-2. Fixes to allow all applications to build and run properly.
+ * Fixes to allow all applications to build and run properly.
 
-3. Updates to documentation.
+ *  Updates to documentation.
 
-Release 5.3.3:
+# Release 5.3.3:
 
-1. Fixes to the build system.
+ * Fixes to the build system.
 
-Release 5.3.2:
+# Release 5.3.2:
 
-1. Fixes to the build system.
+ * Fixes to the build system.
 
-Release 5.3.1:
+# Release 5.3.1:
 
-1. Fixes to the build system.
+ * Fixes to the build system.
 
-Release 5.3.0:
+# Release 5.3.0:
 
-1. Major changes to the build system to allow buinding against installed
+ * Major changes to the build system to allow buinding against installed
 binaries, provide pkg-config support, etc.
 
-Release 5.2.4:
+# Release 5.2.4:
 
-1. Fixes to restore functionality of the bicriteria solution capability.
+ * Fixes to restore functionality of the bicriteria solution capability.
 
-2. Fixes to examples.
+ * Fixes to examples.
 
-Release 5.2.3:
+# Release 5.2.3:
 
-1. Updates to manual.
+ * Updates to manual.
 
-2. Added hooks to enable the use of VRPH (https://projects.coin-or.org/VRPH) within the VRP solver.
+ * Added hooks to enable the use of VRPH (https://projects.coin-or.org/VRPH) within the VRP solver.
 
-Release 5.2.2:
+# Release 5.2.2:
 
-1. Bug fix release.
+ * Bug fix release.
 
-Release 5.2.1: 
+# Release 5.2.1: 
 
-1. Bug fix release.
+ * Bug fix release.
 
-Release 5.2.0:
+# Release 5.2.0:
 
-1. SYMPHONY has a preprocessor now.
+ * SYMPHONY has a preprocessor now.
 
-2. Feasibility pump primal heuristic implemented.
+ * Feasibility pump primal heuristic implemented.
 
-3. Reliability branching is now the default branching strategy.
+ *  Reliability branching is now the default branching strategy.
 
-4. Several new statistics now part of default output.
+ *  Several new statistics now part of default output.
 
-5. Correct setting of granularity of objective function value by calculating
+ * Correct setting of granularity of objective function value by calculating
    GCD of coefficients.
 
-6. Several changes in management of valid inequalities, quality checks and
+ * Several changes in management of valid inequalities, quality checks and
    detection of duplicacy.
 
-7. Minor changes in management of LP solver interface.
+ * Minor changes in management of LP solver interface.
 
-8. Several small bug-fixes and improvements.
+ * Several small bug-fixes and improvements.
 
-Release 5.1.10:
+# Release 5.1.10:
 
-1. New dependencies.
+ * New dependencies.
 
-Release 5.1.9:
+# Release 5.1.9:
 
-1. New dependencies.
+ * New dependencies.
 
-Release 5.1.8:
+# Release 5.1.8:
 
-1. Introduced use of LP hot starting.
+ * Introduced use of LP hot starting.
 
-2. Improved management of cut generation.
+ * Improved management of cut generation.
 
-3. Updated externals
+ *  Updated externals
 
-4. Minor bug fixes
+ *  Minor bug fixes
 
-Release 5.1.7:
+# Release 5.1.7:
 
-1. Minor bug fixes
+ * Minor bug fixes
 
-Release 5.1.6:
+# Release 5.1.6:
 
-1. Only a single header file (symphony.h) needs to be installed and user 
+ * Only a single header file (symphony.h) needs to be installed and user 
 applications only need to be able to find this one header file.
 
-2. Fixes to MSVC++ project files.
+ * Fixes to MSVC++ project files.
 
-3. Removed dependence on qsortucb routines.
+ *  Removed dependence on qsortucb routines.
 
-Release 5.1.5:
+# Release 5.1.5:
 
-1. Added support for automatic download and build of Glpk (for reading of GMPL
+ * Added support for automatic download and build of Glpk (for reading of GMPL
 files).
 
-2. Minor bugs fixed and compiler warnings eliminated.
+ * Minor bugs fixed and compiler warnings eliminated.
 
-3. Updates to MS Visual Studio files.
+ *  Updates to MS Visual Studio files.
 
-4. Added short installation verification test.
+ *  Added short installation verification test.
 
-Release 5.1.4:
+# Release 5.1.4:
 
-1. Added ability to read files in LP format.
+ * Added ability to read files in LP format.
 
-2. Additional configuration options.
+ * Additional configuration options.
 
-3. Support for new classes of cutting planes.
+ *  Support for new classes of cutting planes.
 
-4. Improved algorithm control mechanism.
+ *  Improved algorithm control mechanism.
 
-5. Improved output format and additional output options.
+ * Improved output format and additional output options.
 
-6. Improved signal handling.
+ * Improved signal handling.
 
-7. Shared memory parallel version tested with OpenMP in Linux and Windows.
+ * Shared memory parallel version tested with OpenMP in Linux and Windows.
 
-8. Added release configuration to MSVC++ build files.
+ * Added release configuration to MSVC++ build files.
 
-9. Improved warm starting.
+ * Improved warm starting.
 
-10. Fixes for configuration with SoPlex and Xpress.
+ * Fixes for configuration with SoPlex and Xpress.
 
-11. Fixed configuration on PowerPC architectures.
+ * Fixed configuration on PowerPC architectures.
 
-Release 5.1.3:
+# Release 5.1.3:
 
-1. Support for building static executables in Unix-like environments.
+ * Support for building static executables in Unix-like environments.
 
-2. Improved signal-catching behavior in Unix-like environments.
+ * Improved signal-catching behavior in Unix-like environments.
 
-3. Updated documentation.
+ *  Updated documentation.
 
-Release 5.1.2:
+# Release 5.1.2:
 
-1. Update of externals.
+ * Update of externals.
 
-2. Updated documentation.
+ * Updated documentation.
 
-Release 5.1.1:
+# Release 5.1.1:
 
-1. Fixes for building in the Solaris operating system.
+ * Fixes for building in the Solaris operating system.
 
-2. Fixes for using the GNU autotools to build with the cl compiler.
+ * Fixes for using the GNU autotools to build with the cl compiler.
 
-2. Fixes for sym.mak file in order to allow building with MSVC++ nmake utility.
+ * Fixes for sym.mak file in order to allow building with MSVC++ nmake utility.
 
-4. Fixes for building the unit test in the MSVC++ IDE.
+ *  Fixes for building the unit test in the MSVC++ IDE.
 
-5. Updated documentation
+ * Updated documentation
 
-Release 5.1.0:
+# Release 5.1.0:
 
-1. SYMPHONY now has an interactive optimizer that can be used through a
+ * SYMPHONY now has an interactive optimizer that can be used through a
 command shell. In both the sequential and parallel configurations, the user
 can set parameters, load and solve instances interactively, and display
 results and statistics (see below).
 
-2. SYMPHONY now supports automatic configuration using the new COIN-OR build
+ * SYMPHONY now supports automatic configuration using the new COIN-OR build
 system and the GNU autotools.Using autotools utilities, it is now possible to
 build SYMPHONY in most operating systems and with most common compilers
 compilers without user intervention.
 
-3. Both the distributed and shared memory parallel configurations are now
+ * Both the distributed and shared memory parallel configurations are now
 fully debugged, tested, and supported. The user can now build and execute
 custom SYMPHONY applications in parallel, as well as solving generic MILPs in
 parallel "out of the box."
 
-4. There are now additional options for warm starting. The user can trim the
+ * There are now additional options for warm starting. The user can trim the
 warm starting tree before starting to resolve a problem. More specifically,
 the user can decide to initiate warm starting with a predefined partition of
 the final branch-and-cut tree resulting from a previous solution procedure.
 This partition can include either a number of nodes created first during the
 solution procedure or all of the nodes above a given level of the tree.
 
-5. The COIN-OR repository, the current host of SYMPHONY has recently undergone 
+ * The COIN-OR repository, the current host of SYMPHONY has recently undergone 
 some significant improvements of its own that have resulted in improved 
 services to users. These include: 
 
--- SYMPHONY has a new development Web site, where users can submit trouble
-  tickets, browse the source code interactively, and get up-to-date
-  information on development. The address of the new site is
-  https://projects.coin-or.org/SYMPHONY.
+   * SYMPHONY has a new development Web site, where users can submit trouble
+     tickets, browse the source code interactively, and get up-to-date
+     information on development. The address of the new site is
+     https://projects.coin-or.org/SYMPHONY.
 
--- SYMPHONY is now hosted using subversion, a version control system with
-  features vastly improved over CVS, the previous hosting software. This has
-  required some reorganization and renaming of the header files.
+   * SYMPHONY is now hosted using subversion, a version control system with
+     features vastly improved over CVS, the previous hosting software. This
+     has required some reorganization and renaming of the header files.
 
--- SYMPHONY is now more tightly integrated with other COIN-OR projects. Due
-  to improved procedures for producing stable releases, it will now be much
-  easier for us to determine the exact version of SYMPHONY and all other COIN
-  projects you are using when you report a bug.
+   * SYMPHONY is now more tightly integrated with other COIN-OR projects. Due
+     to improved procedures for producing stable releases, it will now be much
+     easier for us to determine the exact version of SYMPHONY and all other
+     COIN projects you are using when you report a bug.
 
--- SYMPHONY is now distributed with all COIN software needed to build a
-  complete solver. Previously, other COIN softrware packages had to be
-  downloaded and installed separately.
+   * SYMPHONY is now distributed with all COIN software needed to build a
+     complete solver. Previously, other COIN softrware packages had to be
+     downloaded and installed separately.
 
-Two features have been deprecated and are no longer supported:
+ * Two features have been deprecated and are no longer supported:
 
-1. The native interfaces to OSL and CPLEX are now deprecated and no longer
+   * The native interfaces to OSL and CPLEX are now deprecated and no longer
 supported. These solvers can be called through the COIN-OR OSI interface.
 
-2. Column generation functionality has also been officially deprecated. For
-now, there are a number of other software packages that offer better
-functionality than SYMPHONY for implementing branch and price algorithms.
+   * Column generation functionality has also been officially deprecated. For
+     now, there are a number of other software packages that offer better
+     functionality than SYMPHONY for implementing branch and price algorithms.
 
-CHANGES TO THE USER INTERFACE (FROM SYMPHONY 5.0)
-=================================================
+ * CHANGES TO THE USER INTERFACE (FROM SYMPHONY 5.0)
 
-1. There was one minor change to the user callback API from version 5.0 to 5.1.
-The user can now execute a primal heuristic in the user_is_feasible() callback
-and return the solution to SYMPHONY. The API for the user_is_feasible()
-subroutine is now
+   * There was one minor change to the user callback API from version 5.0 to
+     5.1. The user can now execute a primal heuristic in the
+     user_is_feasible() callback and return the solution to SYMPHONY. The API
+     for the user_is_feasible() subroutine is now
+```
+     int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
+		          double *values, int *feasible, double *objval,
+		          char branching, double *heur_solution)
+```
+     Any feasible solution can be passed (in dense format) through the last
+     argument to this function.
 
-int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
-		     double *values, int *feasible, double *objval,
-		     char branching, double *heur_solution)
+   * Several new subroutines were added to the callable library API.
 
-Any feasible solution can be passed (in dense format) through the last
-argument to this function.
-
-2. Several new subroutines were added to the callable library API.
-
-3. The name of the header file containing the SYMPHONY API has been changed
-from "symphony_api.h" to "symphony.h" (though the former has been retained for
-backword compatibility purposes).
+   * The name of the header file containing the SYMPHONY API has been changed
+     from ```symphony_api.h``` to ```symphony.h``` (though the former has been
+     retained for backword compatibility purposes).
 
