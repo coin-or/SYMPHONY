@@ -230,7 +230,7 @@ Please note the version of SYMPHONY you are using when filing the ticket.
 
 ### Release 5.6.7
   * Fix to dependency linking.
-  * Fix for installation with {{{DESTDIR}}}
+  * Fix for installation with ```DESTDIR```
 
 ### Release 5.6.7
   * Fixes to distributed parallel (PVM) version.
