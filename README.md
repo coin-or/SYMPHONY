@@ -332,12 +332,12 @@ algorithmically.
 
  * Fix bug that caused all user applications to crash
 
-### Release 5. * 8:
+### Release 5.4.8:
 
  * Updates to MSVC++ files (applications now use property sheets and VRP app file is fixed).
  * Other fixes for build tools.
 
-### Release 5. * 7:
+### Release 5.4.7:
 
  * Updates to documentation
 
@@ -609,13 +609,13 @@ supported. These solvers can be called through the COIN-OR OSI interface.
      5.1. The user can now execute a primal heuristic in the
      user_is_feasible() callback and return the solution to SYMPHONY. The API
      for the user_is_feasible() subroutine is now
-```
+     ```C
      int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 		          double *values, int *feasible, double *objval,
 		          char branching, double *heur_solution)
-```
-     Any feasible solution can be passed (in dense format) through the last
-     argument to this function.
+     ```
+Any feasible solution can be passed (in dense format) through the last
+argument to this function.
 
    * Several new subroutines were added to the callable library API.
 
