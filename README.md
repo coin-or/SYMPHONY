@@ -228,26 +228,26 @@ Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## CHANGELOG
 
-# Release 5.6.7
+### Release 5.6.7
   * Fix to dependency linking.
   * Fix for installation with {{{DESTDIR}}}
 
-# Release 5.6.7
+### Release 5.6.7
   * Fixes to distributed parallel (PVM) version.
   * Enable primal heuristics in distributed version.
   * Update externals to most recent stables.
   * Make dependency linking default.
 
-# Release 5.6.6:
+### Release 5.6.6:
 
  * Disabling pre-processor for multicriteria instances.
 
-# Release 5.6.5:
+### Release 5.6.5:
 
  * Added explicit dependence on libgomp, which is needed for linking with 
 compilers that don't supprt OpenMP (clang on OS X)
 
-# Release 5.6.4:
+### Release 5.6.4:
 
  * Fix to pkgconfig file to add flags for OpenMP.
 
@@ -255,7 +255,7 @@ compilers that don't supprt OpenMP (clang on OS X)
 
  *  More fixes for dependency linking.
 
-# Release 5.6.3:
+### Release 5.6.3:
 
  * Fixes to applications to allow some preprocessing, which is needed for
 some primal heuristics to work.
@@ -275,7 +275,7 @@ algorithmically.
 
  * Other small bug fixes.
 
-# Release 5.6.2:
+### Release 5.6.2:
 
  * Updates and fixes to manual and documentation files.
 
@@ -289,11 +289,11 @@ algorithmically.
 
  * Updates to externals to fix bugs in dependent projects.
 
-# Release 5.6.1:
+### Release 5.6.1:
 
  * Small fixes for OpenMP
 
-# Release 5.6.0:
+### Release 5.6.0:
 
  * Major re-design of shared memory parallel mode for increased efficiency and stability.
 
@@ -301,47 +301,47 @@ algorithmically.
 
  *  Fixes for bicriteria version
 
-# Release 5.5.7:
+### Release 5.5.7:
 
  * More updates to build harness
 
-# Release 5.5.6:
+### Release 5.5.6:
 
  * More updates to build harness
 
-# Release 5.5.5:
+### Release 5.5.5:
 
  * More updates to build harness
 
-# Release 5.5.4:
+### Release 5.5.4:
 
  * Fix memory leak
  * Delete superfluous header file
  *  More updates to build harness
 
-# Release 5.5.3:
+### Release 5.5.3:
 
  * More updates to build harness
 
-# Release 5.5.2:
+### Release 5.5.2:
 
  * Fix problems with Visual Studio project files
  * Update to build tools
 
-# Release 5.5.1:
+### Release 5.5.1:
 
  * Fix bug that caused all user applications to crash
 
-# Release 5. * 8:
+### Release 5. * 8:
 
  * Updates to MSVC++ files (applications now use property sheets and VRP app file is fixed).
  * Other fixes for build tools.
 
-# Release 5. * 7:
+### Release 5. * 7:
 
  * Updates to documentation
 
-# Release 5.5.0:
+### Release 5.5.0:
 
  * Improvements to preprocessing
  * Improvements to heuristics
@@ -349,36 +349,36 @@ algorithmically.
  * Bug fixes
  * Significant performance gains 
 
-# Release 5.4.6:
+### Release 5.4.6:
  * More fixes to allow use of CPLEX as LP solver
  * Fixes to interface with GMPL
 
-# Release 5.4.5:
+### Release 5.4.5:
 
  * Fixes to allow use of CPLEX as LP solver
  * Fixes to interface with GMPL
 
-# Release 5.4.4:
+### Release 5.4.4:
 
  * Fixes for build system
  * Other minor fixes
 
-# Release 5.4.3:
+### Release 5.4.3:
 
  * Updates to documentation.
  * Fix to allow box-constrained integer programs.
  *  Fix for GMPL integration
  *  Fix for readline versions
 
-# Release 5.4.2:
+### Release 5.4.2:
 
  * Updates to MSVC++ version 10 files
 
-# Release 5.4.1
+### Release 5.4.1
 
  * Addition of MSVC++ version 9 files
 
-# Release 5.4.0:
+### Release 5.4.0:
 
  * Change license to EPL.
 
@@ -390,7 +390,7 @@ algorithmically.
 
  * Updating externals to new stable versions of dependent projects.
 
-# Release 5.3.4:
+### Release 5.3.4:
 
  * Fixes to the shared memory parallel version (OpenMP). It is now pretty
 stable, though some minor memory conflict conditions may arise (infrequently).
@@ -399,44 +399,44 @@ stable, though some minor memory conflict conditions may arise (infrequently).
 
  *  Updates to documentation.
 
-# Release 5.3.3:
+### Release 5.3.3:
 
  * Fixes to the build system.
 
-# Release 5.3.2:
+### Release 5.3.2:
 
  * Fixes to the build system.
 
-# Release 5.3.1:
+### Release 5.3.1:
 
  * Fixes to the build system.
 
-# Release 5.3.0:
+### Release 5.3.0:
 
  * Major changes to the build system to allow buinding against installed
 binaries, provide pkg-config support, etc.
 
-# Release 5.2.4:
+### Release 5.2.4:
 
  * Fixes to restore functionality of the bicriteria solution capability.
 
  * Fixes to examples.
 
-# Release 5.2.3:
+### Release 5.2.3:
 
  * Updates to manual.
 
  * Added hooks to enable the use of VRPH (https://projects.coin-or.org/VRPH) within the VRP solver.
 
-# Release 5.2.2:
+### Release 5.2.2:
 
  * Bug fix release.
 
-# Release 5.2.1: 
+### Release 5.2.1: 
 
  * Bug fix release.
 
-# Release 5.2.0:
+### Release 5.2.0:
 
  * SYMPHONY has a preprocessor now.
 
@@ -456,15 +456,15 @@ binaries, provide pkg-config support, etc.
 
  * Several small bug-fixes and improvements.
 
-# Release 5.1.10:
+### Release 5.1.10:
 
  * New dependencies.
 
-# Release 5.1.9:
+### Release 5.1.9:
 
  * New dependencies.
 
-# Release 5.1.8:
+### Release 5.1.8:
 
  * Introduced use of LP hot starting.
 
@@ -474,11 +474,11 @@ binaries, provide pkg-config support, etc.
 
  *  Minor bug fixes
 
-# Release 5.1.7:
+### Release 5.1.7:
 
  * Minor bug fixes
 
-# Release 5.1.6:
+### Release 5.1.6:
 
  * Only a single header file (symphony.h) needs to be installed and user 
 applications only need to be able to find this one header file.
@@ -487,7 +487,7 @@ applications only need to be able to find this one header file.
 
  *  Removed dependence on qsortucb routines.
 
-# Release 5.1.5:
+### Release 5.1.5:
 
  * Added support for automatic download and build of Glpk (for reading of GMPL
 files).
@@ -498,7 +498,7 @@ files).
 
  *  Added short installation verification test.
 
-# Release 5.1.4:
+### Release 5.1.4:
 
  * Added ability to read files in LP format.
 
@@ -522,7 +522,7 @@ files).
 
  * Fixed configuration on PowerPC architectures.
 
-# Release 5.1.3:
+### Release 5.1.3:
 
  * Support for building static executables in Unix-like environments.
 
@@ -530,13 +530,13 @@ files).
 
  *  Updated documentation.
 
-# Release 5.1.2:
+### Release 5.1.2:
 
  * Update of externals.
 
  * Updated documentation.
 
-# Release 5.1.1:
+### Release 5.1.1:
 
  * Fixes for building in the Solaris operating system.
 
@@ -548,7 +548,7 @@ files).
 
  * Updated documentation
 
-# Release 5.1.0:
+### Release 5.1.0:
 
  * SYMPHONY now has an interactive optimizer that can be used through a
 command shell. In both the sequential and parallel configurations, the user
