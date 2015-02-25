@@ -74,6 +74,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/Applications/CNRP/Makefile.in \
 	$(top_srcdir)/Applications/MATCH/Makefile.in \
 	$(top_srcdir)/Applications/MCKP/Makefile.in \
+	$(top_srcdir)/Applications/MISOCO/Makefile.in \
 	$(top_srcdir)/Applications/MPP/Makefile.in \
 	$(top_srcdir)/Applications/Makefile.Applications.in \
 	$(top_srcdir)/Applications/SPP+CUTS/Makefile.in \
@@ -102,10 +103,11 @@ CONFIG_HEADER = $(top_builddir)/include/config.h \
 CONFIG_CLEAN_FILES = Examples/Makefile \
 	Applications/Makefile.Applications Applications/CNRP/Makefile \
 	Applications/MATCH/Makefile Applications/MCKP/Makefile \
-	Applications/MPP/Makefile Applications/SPP/Makefile \
-	Applications/SPP+CUTS/Makefile Applications/USER/Makefile \
-	Applications/VRP/Makefile symphony.pc symphony-app.pc \
-	symphony-uninstalled.pc osi-sym.pc osi-sym-uninstalled.pc
+	Applications/MISOCO/Makefile Applications/MPP/Makefile \
+	Applications/SPP/Makefile Applications/SPP+CUTS/Makefile \
+	Applications/USER/Makefile Applications/VRP/Makefile \
+	symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc \
+	osi-sym-uninstalled.pc
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -590,6 +592,8 @@ Applications/MATCH/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applica
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/MCKP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MCKP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+Applications/MISOCO/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MISOCO/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/MPP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/MPP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 Applications/SPP/Makefile: $(top_builddir)/config.status $(top_srcdir)/Applications/SPP/Makefile.in
@@ -773,7 +777,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/Applications $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/BuildTools $(distdir)/Examples $(distdir)/include $(distdir)/src/OsiSym
+	$(mkdir_p) $(distdir)/. $(distdir)/Applications $(distdir)/Applications/CNRP $(distdir)/Applications/MATCH $(distdir)/Applications/MCKP $(distdir)/Applications/MISOCO $(distdir)/Applications/MPP $(distdir)/Applications/SPP $(distdir)/Applications/SPP+CUTS $(distdir)/Applications/USER $(distdir)/Applications/VRP $(distdir)/BuildTools $(distdir)/Examples $(distdir)/include $(distdir)/src/OsiSym
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
