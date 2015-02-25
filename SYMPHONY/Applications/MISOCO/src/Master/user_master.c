@@ -37,10 +37,10 @@
 #endif
 
 /*===========================================================================*\
- * This file contains stubs for the user-written functions for the master 
+ * This file contains stubs for the user-written functions for the master
  * process. The primary function that has to be filled in here is user_io(),
  * where the data for the instance is read in and the user data structure
- * that stores the instance data filled out (this data structure is defined 
+ * that stores the instance data filled out (this data structure is defined
  * in user.h). Other than that, the default routines should work fine.
 \*===========================================================================*/
 
@@ -62,7 +62,7 @@ void user_usage(void){
 /*===========================================================================*/
 
 /*===========================================================================*\
- * Initialize user-defined data structures. This basically consists of 
+ * Initialize user-defined data structures. This basically consists of
  * allocating the memory. If you are using the default data structure,
  * nothing needs to be changed here.
 \*===========================================================================*/
@@ -80,12 +80,19 @@ int user_initialize(void **user)
 /*===========================================================================*/
 
 /*===========================================================================*\
- * Parse the user options and read in parameters from the parameter file 
+ * Parse the user options and read in parameters from the parameter file
  * given on the command line
 \*===========================================================================*/
 
 int user_readparams(void *user, char *filename, int argc, char **argv)
 {
+   FILE *f;
+   char line[50], key[50], value[50], c, tmp;
+   int i;
+
+   /* This gives you access to the user data structure*/
+   user_problem *prob = (user_problem *) user;
+   user_parameters *par = &(prob->par);
    /* This code is just a template for customization. Uncomment to use.*/
 #if 0
    FILE *f;
@@ -100,22 +107,22 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 	 printf("SYMPHONY: file %s can't be opened\n", filename);
 	 return(USER_ERROR); /*error check for existence of parameter file*/
       }
-      
-      /* Here you can read in the parameter settings from the file. See the 
+
+      /* Here you can read in the parameter settings from the file. See the
 	 function bc_readparams() for an example of how this is done. */
       while(NULL != fgets(line, MAX_LINE_LENGTH, f)){  /*read in parameters*/
 	 strcpy(key, "");
 	 sscanf(line, "%s%s", key, value);
-	 
+
 	 if (strcmp(key, "input_file") == 0){
 	    par->infile[MAX_FILE_NAME_LENGTH] = 0;
 	    strncpy(par->infile, value, MAX_FILE_NAME_LENGTH);
 	 }
-      }      
-      
+      }
+
       fclose(f);
    }
-
+#endif
    /* Here you can parse the command line for options. By convention, the
       users options should be capital letters */
 
@@ -133,16 +140,14 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 	 break;
       };
    }
-#endif
-   
-   return(USER_DEFAULT);
+   return(USER_SUCCESS);
 }
 
 /*===========================================================================*/
 
 /*===========================================================================*\
  * Read in the data file, whose name was given in the parameter file.
- * This file contains instance data. Right now, this function is set up to 
+ * This file contains instance data. Right now, this function is set up to
  * read in just the number of columns and number of rows from the file.
  * Add more data as needed to describe the instance and set up the LP
  * relaxation.
@@ -150,7 +155,6 @@ int user_readparams(void *user, char *filename, int argc, char **argv)
 
 int user_io(void *user)
 {
-   /* This code is just a template for customization. Uncomment to use.*/
 #if 0
    /* This gives you access to the user data structure. */
    user_problem *prob = (user_problem *) user;
@@ -164,7 +168,7 @@ int user_io(void *user)
       printf("\nMpp I/O: No problem data file specified\n\n");
       exit(1);
    }
-   
+
    if ((f = fopen(infile, "r")) == NULL){
       printf("Readparams: file %s can't be opened\n", infile);
       exit(1); /*error check for existence of parameter file*/
@@ -185,10 +189,10 @@ int user_io(void *user)
 
    fclose(f);
 #endif
-   
+
    return(USER_DEFAULT);
 }
-   
+
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -262,7 +266,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
    *extravarnum = prob->colnum;
 
 #if 0
-   /* This code is not really needed because this is the default, so it is 
+   /* This code is not really needed because this is the default, so it is
       commented out and left for illustration. */
 
    /* Put all the variables in the extra set */
@@ -271,7 +275,7 @@ int user_initialize_root_node(void *user, int *basevarnum, int **basevars,
      vars[i] = i;
    }
 #endif
-   
+
    /* Set the number of rows in the initial formulation */
    *basecutnum = prob->rownum;
 
@@ -320,7 +324,7 @@ int user_send_lp_data(void *user, void **user_lp)
       not running separately. The easiest thing to do here is just to use the
       same user data structure in both the master and the LP. Then this
       subroutine would simply consist of the line
-      
+
       *user_lp = user;
 
       Otherwise, this code should be virtually
@@ -356,8 +360,8 @@ int user_send_cg_data(void *user, void **user_cg)
    /* This is is the case when we are copying data directly because
       the CG is not running separately. The easiest thing to do here is just
       to use the same user data structure in both the master and the cut
-      generator. Then this subroutine would simply consist of 
-      
+      generator. Then this subroutine would simply consist of
+
       *user_cg = user;
 
       Otherwise, this code should be virtually
@@ -399,8 +403,8 @@ int user_send_cp_data(void *user, void **user_cp)
    /* This is is the case when we are copying data directly because
       the CP is not running separately. The easiest thing to do here is just
       to use the same user data structure in both the master and the cut
-      pool. Then this subroutine would simply consist of 
-      
+      pool. Then this subroutine would simply consist of
+
       *user_cp = user;
 
       Otherwise, this code should be virtually
@@ -450,7 +454,7 @@ int user_display_solution(void *user, double lpetol, int varnum, int *indices,
 {
    return(USER_DEFAULT);
 }
-   
+
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -464,7 +468,7 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 
 #endif
    return(USER_DEFAULT);
-}   
+}
 
 /*===========================================================================*/
 
@@ -475,9 +479,14 @@ int user_send_feas_sol(void *user, int *feas_sol_size, int **feas_sol)
 int user_free_master(void **user)
 {
    user_problem *prob = (user_problem *) (*user);
-
-   FREE(prob);
-
+   int i;
+   for (i=0; i<prob->num_cones; ++i) {
+     free(prob->cone_members[i]);
+   }
+   free(prob->cone_type);
+   free(prob->cone_size);
+   free(prob->cone_members);
+   free(prob);
    return(USER_SUCCESS);
 }
 /*===========================================================================*/
@@ -486,8 +495,8 @@ int user_free_master(void **user)
  * This function is used to lift the user created cuts during warm starting *
 /*===========================================================================*/
 
-int user_ws_update_cuts (void *user, int *size, char **coef, double * rhs, 
-			 char *sense, char type, int new_col_num, 
+int user_ws_update_cuts (void *user, int *size, char **coef, double * rhs,
+			 char *sense, char type, int new_col_num,
 			 int change_type)
 {
    return(USER_DEFAULT);
