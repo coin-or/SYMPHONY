@@ -23,6 +23,8 @@
 /* User include files */
 #include "user.h"
 
+double cone_feasibility(int type, int size, int * members);
+
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -32,7 +34,7 @@
 /*===========================================================================*\
  * Here is where the user must receive all of the data sent from
  * user_send_lp_data() and set up data structures. Note that this function is
- * only called if one of COMPILE_IN_LP or COMPILE_IN_TM is FALSE. For 
+ * only called if one of COMPILE_IN_LP or COMPILE_IN_TM is FALSE. For
  * sequential computation, nothing is needed here.
 \*===========================================================================*/
 
@@ -45,33 +47,68 @@ int user_receive_lp_data(void **user)
 
 /*===========================================================================*\
  * Here is where the user must create the initial LP relaxation for
- * each search node. Basically, this involves constructing the base matrix in 
- * column ordered format. See the documentation for an explanation of how to 
+ * each search node. Basically, this involves constructing the base matrix in
+ * column ordered format. See the documentation for an explanation of how to
  * fill out this function.
 \*===========================================================================*/
 
-int user_create_subproblem(void *user, int *indices, MIPdesc *mip, 
+int user_create_subproblem(void *user, int *indices, MIPdesc *mip,
 			   int *maxn, int *maxm, int *maxnz)
 {
    user_problem *prob = (user_problem *) user;
 
    return(USER_DEFAULT);
-}      
+}
 
 
 /*===========================================================================*/
 
 /*===========================================================================*\
- * This function takes an LP solution and checks it for feasibility. By 
- * default, SYMPHONY checks for integrality. If any integral solution for your 
+ * This function takes an LP solution and checks it for feasibility. By
+ * default, SYMPHONY checks for integrality. If any integral solution for your
  * problem is feasible, then nothing needs to be done here.
 \*===========================================================================*/
 
 int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
 		     double *values, int *feasible, double *objval,
-		     char branching, double *heur_solution)
-{
-   return(USER_DEFAULT);
+		     char branching, double *heur_solution) {
+  //todo(aykut) fill this
+  user_problem *prob = (user_problem *) user;
+  int num_cones = prob->num_cones;
+  int * type = prob->cone_type;
+  int * size = prob->cone_size;
+  int ** members = prob->cone_members;
+  // check feasibility of conic constraints
+  int i;
+  double feas;
+  for (i=0; i<num_cones; ++i) {
+    feas = cone_feasibility(type[i], size[i], members[i]);
+    if (feas<-1e-5)
+      return IP_INFEASIBLE;
+  }
+  return IP_FEASIBLE;
+}
+
+double cone_feasibility(int type, int size, int * members) {
+  int i;
+  double feas = 0.0;
+  if (type==0) {
+    double term1 = members[0];
+    double term2 = 0.0;
+    for (i=1; i<size; ++i) {
+      term2 += members[i]*members[i];
+    }
+    feas = term1 - sqrt(term2);
+  }
+  else {
+    double term1 = 2.0*members[0]*members[1];
+    double term2 = 0.0;
+    for (i=2; i<size; ++i) {
+      term2 += members[i]*members[i];
+    }
+    feas = term1 - term2;
+  }
+  return feas;
 }
 
 /*===========================================================================*/
@@ -140,19 +177,19 @@ int user_unpack_cuts(void *user, int from, int type, int varnum,
    /* This code is just here as a template for customization. Uncomment to use.*/
 #if 0
    int j;
-   
+
    user_problem *prob = (user_problem *) user;
 
    *new_row_num = 0;
    for (j = 0; j < cutnum; j++){
       switch (cuts[j]->type){
-	 
+
        default:
 	 printf("Unrecognized cut type!\n");
       }
    }
 #endif
-   
+
    return(USER_DEFAULT);
 }
 
