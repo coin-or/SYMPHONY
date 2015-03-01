@@ -1503,14 +1503,13 @@ const double * OsiSymSolverInterface::getColSolution() const
 const double * OsiSymSolverInterface::getRowActivity() const
 {
    
+   if(!rowact_){
+      rowact_ = new double[getNumRows()];
+   }
    if (sym_get_row_activity(env_, rowact_) == FUNCTION_TERMINATED_ABNORMALLY){
       //This means SYMPHONY has no stored solution, so we use the cached one
       //This is a bit silly and just required to pass unit test
       if (colsol_){
-	 if(!rowact_){
-	    rowact_ = new double[getNumRows()];
-	 }
-
 	 int m = getNumRows();
 	 int n = getNumCols();
 	 int nz = getNumElements();

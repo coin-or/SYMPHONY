@@ -1749,6 +1749,12 @@ int add_bound_changes_to_desc(node_desc *desc, lp_prob *p)
          }
       }
    } else {
+      if (desc->bnd_change) {
+         FREE(desc->bnd_change->index);
+         FREE(desc->bnd_change->lbub);
+         FREE(desc->bnd_change->value);
+         FREE(desc->bnd_change);
+      }
       desc->bnd_change = NULL;
    }
 #endif
