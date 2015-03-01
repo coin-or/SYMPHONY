@@ -3368,6 +3368,7 @@ int sym_get_row_activity(sym_environment *env, double *rowact)
    colsol = (double *)malloc(DSIZE*env->mip->n);
 
    if (sym_get_col_solution(env, colsol) == FUNCTION_TERMINATED_ABNORMALLY){
+      FREE(colsol);
       return(FUNCTION_TERMINATED_ABNORMALLY);
    }
    
@@ -3382,6 +3383,8 @@ int sym_get_row_activity(sym_environment *env, double *rowact)
 	 rowact[matind[j]] += matval[j] * colsol[i];
       }
    }
+
+   FREE(colsol);
 
    return (FUNCTION_TERMINATED_NORMALLY);
 
@@ -3972,6 +3975,8 @@ int sym_set_col_solution(sym_environment *env, double * colsol)
 	 sol->objval += sol->xval[i] * env->mip->obj[tmp_ind[i]]; 
       }
    }
+
+   FREE(tmp_ind);
    
    if (feasible){
       /* now, it is feasible, set the best_sol to colsol */
