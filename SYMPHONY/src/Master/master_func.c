@@ -7,7 +7,7 @@
 /*                                                                           */
 /* This file was developed by Menal Guzelsoy for the SYMPHONY OSI interface. */
 /*                                                                           */
-/* (c) Copyright 2000-2014 Ted Ralphs. All Rights Reserved.                  */
+/* (c) Copyright 2000-2015 Ted Ralphs. All Rights Reserved.                  */
 /*                                                                           */
 /* This software is licensed under the Eclipse Public License. Please see    */
 /* accompanying file for terms.                                              */
@@ -2170,6 +2170,7 @@ int set_param(sym_environment *env, char *line)
    else if (strcmp(key, "keep_description_of_pruned") == 0 ||
 	    strcmp(key, "TM_keep_description_of_pruned") == 0){
       READ_INT_PAR(tm_par->keep_description_of_pruned);
+      lp_par->keep_description_of_pruned = tm_par->keep_description_of_pruned;
       return(0);
    }
    else if(strcmp(key, "keep_warm_start") == 0){
