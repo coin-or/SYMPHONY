@@ -112,6 +112,7 @@ SYMPHONY/Applications/VRP/Makefile.in -text
 SYMPHONY/Applications/VRP/Makefile.orig -text
 SYMPHONY/Examples/Makefile.in -text
 SYMPHONY/Examples/milp2.c -text
+SYMPHONY/Examples/milp3.c -text
 SYMPHONY/Examples/milpOsi.c -text
 SYMPHONY/Examples/milpOsi2.c -text
 SYMPHONY/MSVisualStudio/sym.mak -text
