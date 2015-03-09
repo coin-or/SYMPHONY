@@ -253,6 +253,9 @@ int sym_is_integer PROTO((sym_environment *env, int index, char *value));
 double sym_get_infinity PROTO(());
 
 int sym_get_col_solution PROTO((sym_environment *env, double *colsol));
+int sym_get_sp_size PROTO((sym_environment *env, int *size));
+int sym_get_sp_solution PROTO((sym_environment *env, int index,
+			       double *colsol, double *objval));
 int sym_get_row_activity PROTO((sym_environment *env, double *rowact));
 int sym_get_obj_val PROTO((sym_environment *env, double *objval));
 int sym_get_primal_bound PROTO((sym_environment *env, double *ub));

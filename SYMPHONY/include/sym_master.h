@@ -76,6 +76,8 @@ typedef struct SYM_ENVIRONMENT{
 #ifdef COMPILE_IN_CP
    cut_pool       **cp;
 #endif
+   /* solution pool */
+   sp_desc  *sp;
 #endif
 }sym_environment;
 

@@ -1520,36 +1520,39 @@ int sym_solve(sym_environment *env)
    env->termcode = termcode;
 
 #ifdef COMPILE_IN_TM
-      if (tm->lb > env->lb) env->lb = tm->lb;
-      if(env->par.verbosity >=0 ) {
-	 print_statistics(&(tm->comp_times), &(tm->stat), 
-                          &(tm->lp_stat),
-                          tm->ub, env->lb,
-			  total_time, start_time, wall_clock(NULL),
-			  env->mip->obj_offset, env->mip->obj_sense,
-			  tm->has_ub, tm->sp, tm->par.output_mode);
-      }
-      temp = termcode;
+   if (tm->lb > env->lb) env->lb = tm->lb;
+   if(env->par.verbosity >=0 ) {
+      print_statistics(&(tm->comp_times), &(tm->stat), 
+		       &(tm->lp_stat),
+		       tm->ub, env->lb,
+		       total_time, start_time, wall_clock(NULL),
+		       env->mip->obj_offset, env->mip->obj_sense,
+		       tm->has_ub, tm->sp, tm->par.output_mode);
+   }
+   temp = termcode;
 #ifdef COMPILE_IN_LP
-      sp_free_sp(tm->sp);
-      FREE(tm->sp);
+   if (env->sp){
+      sp_free_sp(env->sp);
+      FREE(env->sp);
+   }
+   env->sp = tm->sp;
 #endif
-
-      if(env->par.verbosity >=-1 ) {
+   
+   if(env->par.verbosity >=-1 ) {
 #ifdef COMPILE_IN_LP
-	 CALL_WRAPPER_FUNCTION( display_solution_u(env, env->tm->opt_thread_num) );
+      CALL_WRAPPER_FUNCTION( display_solution_u(env, env->tm->opt_thread_num) );
 #else
-	 CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
+      CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
 #endif
-      }
+   }
 #else
-      if(env->par.verbosity >=0 ) {
-	 print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 
-                          NULL,
-			  env->ub, env->lb, 0, start_time, wall_clock(NULL), 
-			  env->mip->obj_offset, env->mip->obj_sense, 
-                          env->has_ub, NULL, 0);
-	 CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
+   if(env->par.verbosity >=0 ) {
+      print_statistics(&(env->comp_times.bc_time), &(env->warm_start->stat), 
+		       NULL,
+		       env->ub, env->lb, 0, start_time, wall_clock(NULL), 
+		       env->mip->obj_offset, env->mip->obj_sense, 
+		       env->has_ub, NULL, 0);
+      CALL_WRAPPER_FUNCTION( display_solution_u(env, 0) );
       }
 #endif
    termcode = temp;
@@ -2890,7 +2893,6 @@ int sym_get_status(sym_environment *env)
 
 int sym_get_num_cols(sym_environment *env, int *numcols)
 {
-
    if (!env->mip){
       if(env->par.verbosity >= 1){
 	 printf("sym_get_num_cols():There is no loaded mip description!\n");
@@ -3318,7 +3320,7 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
       }	 
       memset(colsol, 0, DSIZE*env->mip->n);
 
-      for( i = 0; i<sol.xlength; i++){
+      for (i = 0; i < sol.xlength; i++){
 	 colsol[sol.xind[i]] = sol.xval[i];
       }
       
@@ -3342,6 +3344,43 @@ int sym_get_col_solution(sym_environment *env, double *colsol)
    }
 
    return(FUNCTION_TERMINATED_NORMALLY);
+}
+
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_sp_size(sym_environment *env, int *size)
+{
+   if (env->sp){
+      *size = env->sp->num_solutions;
+   }else{
+      printf("sym_get_sp_size(): Warning: No solution pool!\n");
+   }
+   return(FUNCTION_TERMINATED_NORMALLY);
+}
+   
+/*===========================================================================*/
+/*===========================================================================*/
+
+int sym_get_sp_solution(sym_environment *env, int index, double *colsol,
+			double *objval)
+{
+   int i;
+   sp_solution *sol;
+
+   if (env->sp && index >= 0 && index <= env->sp->num_solutions){
+      sol = env->sp->solutions[index];
+      memset(colsol, 0, DSIZE*env->mip->n);
+      for (i = 0; i < sol->xlength; i++){
+	 colsol[sol->xind[i]] = sol->xval[i];
+      }
+      *objval = sol->objval;
+      return(FUNCTION_TERMINATED_NORMALLY);
+   }else{
+      printf("sym_get_sp_solution(): No solution pool or");
+      printf("index out of bounds!\n"); 
+      return(FUNCTION_TERMINATED_ABNORMALLY);
+   }
 }
 
 /*===========================================================================*/

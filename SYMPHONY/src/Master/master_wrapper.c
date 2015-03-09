@@ -25,6 +25,7 @@
 #include "sym_master.h"
 #include "sym_master_u.h"
 #include "sym_lp_solver.h"
+#include "sym_primal_heuristics.h"
 #ifdef COMPILE_IN_TM
 #include "sym_lp.h"
 #endif
@@ -834,7 +835,11 @@ int free_master_u(sym_environment *env)
    }
 #endif
 #endif
-      
+   if (env->sp){
+      sp_free_sp(env->sp);
+      FREE(env->sp);
+   }
+   
    return(FUNCTION_TERMINATED_NORMALLY);   
 }
 
