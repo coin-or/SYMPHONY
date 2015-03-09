@@ -3844,19 +3844,27 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
       for(i = 0; i < root->bobj.child_num; i++){
 
 	 child = root->children[i];
-
+	 
+	 
+	 //temp
+	 bool leaf_node = 1;
+	 if (child->children){
+	    leaf_node = 0;
+	 }
+	 printf ("level %d, child->node_status is %d and child->feasibility_status is %d.\n", child->bc_index, child->node_status, child->feasibility_status);
+	 
 	  if (child->node_status == NODE_STATUS__ITERATION_LIMIT){
 	       printf("This child is pruned because of iteration limit");
 	    }
-	 
-	 if(child->node_status == NODE_STATUS__PRUNED){
+	  //end temp
+	 if(child->node_status == NODE_STATUS__PRUNED || leaf_node){
 	    if (*cur_piece_no >  MAX_ALLOWABLE_NUM_PIECES){
 	       printf("MAX_ALLOWABLE_NUM_PIECES reached...terminating..\n");
 	       exit(1);
 	    }
 	    if(child->feasibility_status == FEASIBLE_PRUNED ||
 	       child->feasibility_status == OVER_UB_PRUNED ||
-	       child->feasibility_status == PRUNED_HAS_CAN_SOLUTION
+	       child->feasibility_status == PRUNED_HAS_CAN_SOLUTION || leaf_node
 	       ){
 	       
 	       //if pruned node is int feasible or it is
