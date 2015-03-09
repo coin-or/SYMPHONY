@@ -31,9 +31,9 @@
 #include "sym_macros.h"
 #include "sym_types.h"
 #include "sym_lp_solver.h"
-#ifdef COMPILE_IN_LP
+//#ifdef COMPILE_IN_LP
 #include "sym_primal_heuristics.h"
-#endif
+//#endif
 #include "sym_qsort.h"
 #ifdef USE_CGL_CUTS
 #include "sym_cg.h"

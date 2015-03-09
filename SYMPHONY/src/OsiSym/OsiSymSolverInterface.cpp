@@ -1504,20 +1504,57 @@ const double * OsiSymSolverInterface::getColSolution() const
 
 /*===========================================================================*/
 /*===========================================================================*/
-
-const double * OsiSymSolverInterface::getRowActivity() const
+const double * OsiSymSolverInterface::getRowActivity() const   
 {
-   
    if(!rowact_){
       rowact_ = new double[getNumRows()];
    }
+   if (sym_get_row_activity(env_, rowact_) == FUNCTION_TERMINATED_ABNORMALLY){
+      //This means SYMPHONY has no stored solution, so we use the cached one
+      //This is a bit silly and just required to pass unit test
+      if (colsol_){
+	 int m = getNumRows();
+	 int n = getNumCols();
+	 int nz = getNumElements();
 
-   if(!sym_get_row_activity(env_, rowact_)){
+	 int *matbeg = new int[n + 1];
+	 int *matind = new int[nz];
+	 double *matval = new double[nz];
+   
+	 sym_get_matrix(env_, &nz, matbeg, matind, matval);
+
+	 memset(rowact_, 0, DSIZE*m);
+   
+	 for(int i = 0; i < n; i++){
+	    for(int j = matbeg[i]; j < matbeg[i+1]; j++){
+	       rowact_[matind[j]] += matval[j] * colsol_[i];
+	    }
+	 }
+	 delete[] matbeg;
+	 delete[] matind;
+	 delete[] matval;
+	 return (rowact_);
+      }else{
+	 return (0);
+      }
+   }else{
       return (rowact_);
-   } else {
-      return (0);
    }
 }
+//old version
+
+// {
+   
+//    if(!rowact_){
+//       rowact_ = new double[getNumRows()];
+//    }
+
+//    if(!sym_get_row_activity(env_, rowact_)){
+//       return (rowact_);
+//    } else {
+//       return (0);
+//    }
+// }
 
 /*===========================================================================*/
 /*===========================================================================*/

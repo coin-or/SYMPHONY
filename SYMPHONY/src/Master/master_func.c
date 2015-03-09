@@ -3844,6 +3844,10 @@ void get_dual_pruned PROTO((bc_node *root, MIPdesc *mip,
       for(i = 0; i < root->bobj.child_num; i++){
 
 	 child = root->children[i];
+
+	  if (child->node_status == NODE_STATUS__ITERATION_LIMIT){
+	       printf("This child is pruned because of iteration limit");
+	    }
 	 
 	 if(child->node_status == NODE_STATUS__PRUNED){
 	    if (*cur_piece_no >  MAX_ALLOWABLE_NUM_PIECES){
