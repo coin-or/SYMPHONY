@@ -245,6 +245,12 @@ Please note the version of SYMPHONY you are using when filing the ticket.
 WHAT'S NEW
 ==========
 
+# Release 5.6.9
+  * Fixed memory leak
+  * Fixed double free when nodes are retained in memory after pruning
+  * Added ability to access solution pool after solve to retrieve additional suboptimal solutions. 
+  * Updates to documentation
+
 # Release 5.6.7
   * Fix to dependency linking.
   * Fix for installation with ```DESTDIR```

@@ -1,8 +1,8 @@
-# SYMPHONY Version 5.6.8 README
+# SYMPHONY Version 5.6.9 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
-2000-2014 by Ted Ralphs and others. This README may be redistributed freely.
+2000-2015 by Ted Ralphs and others. This README may be redistributed freely.
 
 # DOCUMENTATION
 
@@ -228,7 +228,13 @@ Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## CHANGELOG
 
-### Release 5.6.7
+### Release 5.6.9
+  * Fixed memory leak
+  * Fixed double free when nodes are retained in memory after pruning
+  * Added ability to access solution pool after solve to retrieve additional suboptimal solutions.
+  * Updates to documentation 
+
+### Release 5.6.8
   * Fix to dependency linking.
   * Fix for installation with ```DESTDIR```
 
