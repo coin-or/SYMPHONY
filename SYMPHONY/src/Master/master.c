@@ -1536,6 +1536,14 @@ int sym_solve(sym_environment *env)
       FREE(env->sp);
    }
    env->sp = tm->sp;
+   if(env->orig_mip){
+      for (i = 0; i < env->sp->num_solutions; i++){
+	 prep_merge_solution(env->orig_mip, env->mip,
+			     &(env->sp->solutions[i]->xlength), 
+			     &(env->sp->solutions[i]->xind),
+			     &(env->sp->solutions[i]->xval));
+	 }
+   }
 #endif
    
    if(env->par.verbosity >=-1 ) {
