@@ -29025,7 +29025,7 @@ CFLAGS=$CXXFLAGS
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc:src/OsiSym/osi-sym.pc.in osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
+                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile src/Makefile src/OsiSym/Makefile test/Makefile Examples/Makefile Applications/Makefile.Applications Applications/CNRP/Makefile Applications/MATCH/Makefile Applications/MCKP/Makefile Applications/MISOCO/Makefile Applications/MPP/Makefile Applications/SPP/Makefile Applications/SPP+CUTS/Makefile Applications/USER/Makefile Applications/VRP/Makefile symphony.pc symphony-app.pc symphony-uninstalled.pc osi-sym.pc:src/OsiSym/osi-sym.pc.in osi-sym-uninstalled.pc:src/OsiSym/osi-sym-uninstalled.pc.in"
 
 
 
@@ -29053,6 +29053,8 @@ if test $coin_vpath_config = yes; then
                     Applications/MCKP/README
                     Applications/MCKP/INSTALL
                     Applications/MCKP/sample.mckp
+                    Applications/MISOCO/README
+                    Applications/MISOCO/INSTALL
                     Applications/MPP/README
                     Applications/MPP/INSTALL
                     Applications/MPP/sample.mpp
@@ -30147,6 +30149,7 @@ do
   "Applications/CNRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/CNRP/Makefile" ;;
   "Applications/MATCH/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MATCH/Makefile" ;;
   "Applications/MCKP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MCKP/Makefile" ;;
+  "Applications/MISOCO/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MISOCO/Makefile" ;;
   "Applications/MPP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/MPP/Makefile" ;;
   "Applications/SPP/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/SPP/Makefile" ;;
   "Applications/SPP+CUTS/Makefile" ) CONFIG_FILES="$CONFIG_FILES Applications/SPP+CUTS/Makefile" ;;
