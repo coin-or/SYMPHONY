@@ -3580,6 +3580,7 @@ sym_environment *create_copy_environment (sym_environment *env)
    cp_cut_data *cp_cut;
    cut_data *cut;
 #endif
+   sp_desc *sp;
    
    if (!env){
       printf("create_copy_sym_environment(): The given problem is empty!\n");
@@ -3649,6 +3650,31 @@ sym_environment *create_copy_environment (sym_environment *env)
       memcpy(sol->xval, env->best_sol.xval, DSIZE*sol->xlength);
    }
 
+   /*========================================================================*/
+
+   /* Copy solution pool */
+
+   if (env->sp){
+      sp = env_copy->sp = (sp_desc *) malloc (sizeof(sp_desc));
+      memcpy (sp, env->sp, sizeof(sp_desc));
+      sp->solutions =
+	 (sp_solution **) calloc (sp->max_solutions, sizeof(sp_solution *));
+      for (i = 0; i < sp->num_solutions; i ++){
+	 sp->solutions[i] = (sp_solution *) malloc(sizeof(sp_solution));
+	 sp->solutions[i]->xlength = env->sp->solutions[i]->xlength;
+	 if (sp->solutions[i]->xlength){
+	    sp->solutions[i]->xind =
+	       (int *)malloc(ISIZE * sp->solutions[i]->xlength);
+	    sp->solutions[i]->xval =
+	       (double *)malloc(DSIZE * sp->solutions[i]->xlength);
+	    memcpy(sp->solutions[i]->xind, env->sp->solutions[i]->xind,
+		   ISIZE*sp->solutions[i]->xlength);
+	    memcpy(sp->solutions[i]->xval, env->sp->solutions[i]->xval,
+		   DSIZE*sp->solutions[i]->xlength);
+	 }
+      }   
+   }
+   
    /*========================================================================*/
 
    /* copy mip */
