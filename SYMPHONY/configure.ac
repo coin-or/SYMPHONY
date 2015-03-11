@@ -923,7 +923,6 @@ AC_CONFIG_FILES([Makefile
                  Applications/CNRP/Makefile
 		 Applications/MATCH/Makefile
 		 Applications/MCKP/Makefile
-		 Applications/MISOCO/Makefile
 		 Applications/MPP/Makefile
 		 Applications/SPP/Makefile
 		 Applications/SPP+CUTS/Makefile
@@ -945,8 +944,6 @@ AC_COIN_VPATH_LINK([Applications/INSTALL
                     Applications/MCKP/README
                     Applications/MCKP/INSTALL
                     Applications/MCKP/sample.mckp
-                    Applications/MISOCO/README
-                    Applications/MISOCO/INSTALL
                     Applications/MPP/README
                     Applications/MPP/INSTALL
                     Applications/MPP/sample.mpp
