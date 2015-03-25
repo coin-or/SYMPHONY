@@ -29,8 +29,8 @@ typedef struct USER_PARAMETERS {
 \*---------------------------------------------------------------------------*/
 
 typedef struct USER_PROBLEM {
-  int              colnum; /* Number of rows in base matrix */
-  int              rownum; /* Number of columns in base matrix */
+  int              colnum; /* Number of columns in base matrix */
+  int              rownum; /* Number of rows in base matrix */
   user_parameters  par;    /* Parameters */
   // number of cones
   int num_cones;

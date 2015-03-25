@@ -81,12 +81,15 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
   // check feasibility of conic constraints
   int i;
   double feas;
+  *feasible = IP_FEASIBLE;
   for (i=0; i<num_cones; ++i) {
     feas = cone_feasibility(type[i], size[i], members[i]);
-    if (feas<-1e-5)
-      return IP_INFEASIBLE;
+    if (feas<-1e-5) {
+      *feasible = IP_INFEASIBLE;
+      return USER_SUCCESS;
+    }
   }
-  return IP_FEASIBLE;
+  return USER_SUCCESS;
 }
 
 double cone_feasibility(int type, int size, int * members) {

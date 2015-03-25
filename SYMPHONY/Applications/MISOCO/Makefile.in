@@ -16,9 +16,9 @@
 
 # $Id: Makefile.in 726 2006-04-17 04:16:00Z andreasw $
 
-MASTERNAME = user
+MASTERNAME = misoco
 
-SYMAPPLNAME = USER
+SYMAPPLNAME = MISOCO
 
 # CHANGEME: Additional sources
 # - Names of your additional C/C++ source files without any extensions
@@ -28,7 +28,7 @@ ADDFILES =
 LIBS =
 
 # CHANGEME: Additional flags for compilation (e.g., include flags)
-CFLAGS = 
+CFLAGS =
 
 # CHANGEME: Additional options specific to MATCH
 
@@ -36,13 +36,13 @@ CFLAGS =
 #  Usually, you don't have to change anything below.
 ##########################################################################
 
-USER_COMMON_FILES  = 
+USER_COMMON_FILES  =
 
 USER_MASTER_FILES  = user_main user_master
 
 USER_TM_FILES      =
 
-USER_LP_FILES      = user_lp_branch user_lp 
+USER_LP_FILES      = user_lp_branch user_lp
 
 USER_CG_FILES      = user_cg
 

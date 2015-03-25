@@ -171,6 +171,8 @@ int user_load_problem(sym_environment *env, user_problem *prob) {
   m  = mps.getNumRows();
   n  = mps.getNumCols();
   nz = mps.getNumElements();
+  prob->rownum = m;
+  prob->colnum = n;
   const CoinPackedMatrix * matrixByCol = mps.getMatrixByCol();
   if (n) {
      obj    = (double *) malloc(DSIZE * n);

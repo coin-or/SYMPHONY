@@ -20,6 +20,23 @@
 /* User include files */
 #include "user.h"
 
+/* C STL */
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+#include <math.h>
+
+#define CONIC_APPROX_CUT 1001
+
+
+#define TOL 1e-5
+
+int separate_lorentz_cone(int size, double * sol, double * coef);
+int separate_rotated_cone(int size, double * sol, double * coef);
+void simple_separation(int size, double * p, double * coef);
+double lorentz_cone_feasibility(int size, double const * point);
+double rotated_cone_feasibility(int size, double const * point);
+
 /*===========================================================================*/
 
 /*===========================================================================*\
@@ -66,39 +83,114 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 		   double ub, double etol, int *num_cuts, int *alloc_cuts,
 		   cut_data ***cuts) {
    user_problem *prob = (user_problem *) user;
-   /* Fill in cut generation here if desired */
    int i;
-   //int n = prob->si->getNumCols();
+   int j;
    int num_cones = prob->num_cones;
    int * cone_type = prob->cone_type;
    int * cone_size = prob->cone_size;
    int ** cone_members = prob->cone_members;
-   //double * sol = calloc(n, sizeof(double));
-   /* // fill sol */
-   /* for (i=0; i<varnum; ++i) */
-   /* double * par_sol; */
-   /* for (i=0; i<num_cones; ++i) { */
-   /*   // fill par_sol */
-   /*   if (cone_type[i]==0) { */
-   /*     separate_lorentz_cone(); */
-   /*   } */
-   /*   else if (cone_type[i]==1) { */
-   /*     separate_rotated_cone(); */
-   /*   } */
-   /*   else { */
-   /*     fprintf(stderr, "Unknown cone type!\n"); */
-   /*     return (USER__ERROR); */
-   /*   } */
-   /*   // free par_sol */
-   /*   free(par_sol); */
-   /* } */
+   int n = prob->colnum;
+   int m = prob->rownum;
+   double * sol = (double *) calloc(n, sizeof(double));
+   /* cut_data * new_cut = NULL; */
+   double * coef;
+   int res;
+   // cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
+   // fill sol using values and indices
+   for (i=0; i<varnum; ++i) {
+     sol[indices[i]] = values[i];
+   }
+   double * par_sol;
+   for (i=0; i<num_cones; ++i) {
+     /* new_cut = (cut_data *) calloc(1, sizeof(cut_data)); */
+     /* new_cut->size = cone_size[i]; */
+     /* new_cut->rhs = 0.0; */
+     /* new_cut->range = ; */
+     /* new_cut->type = CONIC_APPROX_CUT; */
+     /* new_cut->sense = 'G'; */
+     /* new_cut->deletable = ; */
+     /* new_cut->branch = ; */
+     /* new_cut->name = -2; */
+     // fill par_sol
+     coef = (double *) calloc(cone_size[i], sizeof(double));
+     par_sol = (double *) calloc(cone_size[i], sizeof(double));
+     for (j=0; j<cone_size[i]; j++) {
+       par_sol[j] = sol[cone_members[i][j]];
+     }
+     if (cone_type[i]==0) {
+       res = separate_lorentz_cone(cone_size[i], par_sol, coef);
+     }
+     else if (cone_type[i]==1) {
+       res = separate_rotated_cone(cone_size[i], par_sol, coef);
+     }
+     else {
+       fprintf(stderr, "Unknown cone type!\n");
+       free(par_sol);
+       return (USER_ERROR);
+     }
+     if (res==0) {
+       // add cut
+       /* cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts); */
+       fprintf(stdout, "Cone %d is infeasible. Generating cut.\n", i);
+       cg_add_explicit_cut(cone_size[i], cone_members[i], coef, 0.0, 0, 'G',
+			   TRUE, num_cuts, alloc_cuts, cuts);
+     }
+     // free par_sol
+     free(par_sol);
+     /* free(new_cut); */
+     free(coef);
+   }
    // add cut to the model
-   //free(sol);
+   free(sol);
    return(USER_SUCCESS);
 }
 
 // returns 0 if point is not epsilon feasible, nonzero otherwise
-/* int separate_lorentz_cone() { */
+// fills cut->coef
+int separate_lorentz_cone(int size, double * sol, double * coef) {
+  double feas = lorentz_cone_feasibility(size, sol);
+  if (feas>-TOL)
+    return 1;
+  double * p = (double *) calloc(size, sizeof(double));
+  for (int i=0; i<size; ++i) {
+    p[i] = sol[i];
+  }
+  // 2. compute point on cone and coefficient from the point
+  simple_separation(size, p, coef);
+  // closest_point_separation(p, coef);
+  // check if we actually cut the point
+  double term1 = 0.0;
+  int i;
+  for (i=0; i<size; ++i) {
+    term1 += coef[i]*sol[i];
+  }
+  if (term1> TOL) {
+    fprintf(stderr, "Generated plane does not cut point.\n");
+    assert(0);
+  }
+  // point is not feasible, add cut to cuts and return false
+  // rhs is allways 0.0
+  free(p);
+  return 0;
+}
+
+void simple_separation(int size, double * p, double * coef) {
+  // update p[0]
+  int i;
+  double term1 = 0.0;
+  for (i=1; i<size; ++i) {
+    term1 += p[i]*p[i];
+  }
+  p[0] = sqrt(term1);
+  // coef array, [2p1, -2p2, -2p3, ... -2pn]
+  coef[0] = 2.0*p[0];
+  for (i=1; i<size; ++i) {
+    coef[i] = -2.0*p[i];
+  }
+}
+
+// fills cut->coef
+int separate_rotated_cone(int size, double * sol, double * coef) {
 /*   double feas = feasibility(point); */
 /*   if (feas>-options()->get_dbl_option(TOL)) */
 /*     return 1; */
@@ -123,38 +215,37 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
 /*   cut = new CoinPackedVector(size_, members_, coef); */
 /*   delete[] coef; */
 /*   delete[] p; */
-/*   return 0; */
-/* } */
+  return 0;
+}
 
-/* int separate_rotated_cone() { */
-/*   double feas = feasibility(point); */
-/*   if (feas>-options()->get_dbl_option(TOL)) */
-/*     return 1; */
-/*   // coef array, [2x1, -2x2, -2x3, ... -2xn] */
-/*   double * coef = new double[size_]; */
-/*   double * p = new double[size_]; */
-/*   for (int i=0; i<size_; ++i) { */
-/*     p[i] = point[members_[i]]; */
-/*   } */
-/*   // 2. compute point on cone and coefficient from the point */
-/*   simple_separation(p, coef); */
-/*   // closest_point_separation(p, coef); */
-/*   // check if we actually cut the point */
-/*   double term1 = std::inner_product(coef, coef+size_, p, 0.0); */
-/*   if (term1< -options()->get_dbl_option(TOL)) { */
-/*     std::cerr << "Generated plane does not cut point." << std::endl; */
-/*     throw std::exception(); */
-/*   } */
-/*   // point is not feasible, add cut to cuts_ and return false */
-/*   // index is cone_members */
-/*   // rhs is allways 0.0 */
-/*   cut = new CoinPackedVector(size_, members_, coef); */
-/*   delete[] coef; */
-/*   delete[] p; */
-/*   return 0; */
-/* } */
+// return the feasibility of point
+// for Lorentz cones; x1-|x_2:n| or 2x1x2-|x_3:n|^2
+double lorentz_cone_feasibility(int size, double const * point) {
+  int i;
+  double const * p = point;
+  double feas;
+  double term1 = p[0];
+  double term2 = 0.0;
+  for (i=1; i<size; ++i) {
+    term2+=p[i]*p[i];
+  }
+  term2 = sqrt(term2);
+  feas = term1-term2;
+  return feas;
+}
 
-
+double rotated_cone_feasibility(int size, double const * point) {
+  int i;
+  double const * p = point;
+  double feas;
+  double term1 = 2.0*p[0]*p[1];
+  double term2 = 0.0;
+  for (i=2; i<size; ++i) {
+    term2+=p[i]*p[i];
+  }
+  feas = term1-term2;
+  return feas;
+}
 /*===========================================================================*/
 
 /*===========================================================================*\
