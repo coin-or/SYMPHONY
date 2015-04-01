@@ -207,6 +207,7 @@ int user_load_problem(sym_environment *env, user_problem *prob) {
      strncpy(colname[j], mps.columnName(j), MAX_NAME_SIZE);
      colname[j][MAX_NAME_SIZE-1] = 0;
   }
+  prob->is_int = is_int;
   // the following is not relevant here, since all mps problems are
   // in minimization
   /* if (obj_sense == SYM_MAXIMIZE){ */

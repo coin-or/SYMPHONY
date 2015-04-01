@@ -91,15 +91,11 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
    int ** cone_members = prob->cone_members;
    int n = prob->colnum;
    int m = prob->rownum;
-   double * sol = (double *) calloc(n, sizeof(double));
    /* cut_data * new_cut = NULL; */
    double * coef;
    int res;
    // cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts);
    // fill sol using values and indices
-   for (i=0; i<varnum; ++i) {
-     sol[indices[i]] = values[i];
-   }
    double * par_sol;
    for (i=0; i<num_cones; ++i) {
      /* new_cut = (cut_data *) calloc(1, sizeof(cut_data)); */
@@ -115,7 +111,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
      coef = (double *) calloc(cone_size[i], sizeof(double));
      par_sol = (double *) calloc(cone_size[i], sizeof(double));
      for (j=0; j<cone_size[i]; j++) {
-       par_sol[j] = sol[cone_members[i][j]];
+       par_sol[j] = prob->curr_solution[cone_members[i][j]];
      }
      if (cone_type[i]==0) {
        res = separate_lorentz_cone(cone_size[i], par_sol, coef);
@@ -131,7 +127,7 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
      if (res==0) {
        // add cut
        /* cg_send_cut(new_cut, num_cuts, alloc_cuts, cuts); */
-       fprintf(stdout, "Cone %d is infeasible. Generating cut.\n", i);
+       // fprintf(stdout, "Cone %d is infeasible. Generating cut.\n", i);
        cg_add_explicit_cut(cone_size[i], cone_members[i], coef, 0.0, 0, 'G',
 			   TRUE, num_cuts, alloc_cuts, cuts);
      }
@@ -140,8 +136,6 @@ int user_find_cuts(void *user, int varnum, int iter_num, int level,
      /* free(new_cut); */
      free(coef);
    }
-   // add cut to the model
-   free(sol);
    return(USER_SUCCESS);
 }
 

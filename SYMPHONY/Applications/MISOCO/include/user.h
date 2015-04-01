@@ -38,6 +38,8 @@ typedef struct USER_PROBLEM {
   int * cone_type;
   int * cone_size;
   int ** cone_members;
+  char * is_int;
+  double * curr_solution;
 } user_problem;
 
 #endif

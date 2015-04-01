@@ -14,6 +14,7 @@
 
 /* system include files */
 #include <stdio.h>
+#include <math.h>
 
 /* SYMPHONY include files */
 #include "sym_constants.h"
@@ -23,7 +24,11 @@
 /* User include files */
 #include "user.h"
 
-double cone_feasibility(int type, int size, int * members);
+#define TOL 1e-5
+double cone_feasibility(int type, int size, int * members, double * sol);
+int integer_feasibility(void *user, double lpetol, int varnum, int *indices,
+			double *values, int *feasible, double *objval,
+			char branching, double *heur_solution);
 
 /*===========================================================================*/
 
@@ -82,32 +87,65 @@ int user_is_feasible(void *user, double lpetol, int varnum, int *indices,
   int i;
   double feas;
   *feasible = IP_FEASIBLE;
+  // allocate solution
+  free(prob->curr_solution);
+  int colnum = prob->colnum;
+  prob->curr_solution = (double *) calloc(colnum, sizeof(double));
+  for (i=0; i<varnum; ++i) {
+    prob->curr_solution[indices[i]] = values[i];
+  }
   for (i=0; i<num_cones; ++i) {
-    feas = cone_feasibility(type[i], size[i], members[i]);
-    if (feas<-1e-5) {
+    feas = cone_feasibility(type[i], size[i], members[i], prob->curr_solution);
+    if (feas<-TOL) {
       *feasible = IP_INFEASIBLE;
       return USER_SUCCESS;
+      //break;
     }
   }
+  // check integrality
+  int integrality;
+  // returns true if feasible
+  integrality = integer_feasibility(user, lpetol, varnum, indices, values,
+				    feasible, objval, branching,
+				    heur_solution);
+  if (!integrality)
+    *feasible = IP_INFEASIBLE;
   return USER_SUCCESS;
 }
 
-double cone_feasibility(int type, int size, int * members) {
+// returns true if feasible
+int integer_feasibility(void *user, double lpetol, int varnum, int *indices,
+		     double *values, int *feasible, double *objval,
+		     char branching, double *heur_solution) {
+  int i;
+  user_problem *prob = (user_problem *) user;
+  for (i=0; i<varnum; ++i) {
+    if (prob->is_int[indices[i]]) {
+      double floor_i = floor(values[i]);
+      double ceil_i = floor_i + 1;
+      if (((values[i]-floor_i)>TOL) && ((ceil_i-values[i])>TOL))
+	return 0;
+    }
+  }
+  return 1;
+}
+
+double cone_feasibility(int type, int size, int * members, double * sol) {
   int i;
   double feas = 0.0;
   if (type==0) {
-    double term1 = members[0];
+    double term1 = sol[members[0]];
     double term2 = 0.0;
     for (i=1; i<size; ++i) {
-      term2 += members[i]*members[i];
+      term2 += sol[members[i]]*sol[members[i]];
     }
     feas = term1 - sqrt(term2);
   }
   else {
-    double term1 = 2.0*members[0]*members[1];
+    double term1 = 2.0*sol[members[0]]*sol[members[1]];
     double term2 = 0.0;
     for (i=2; i<size; ++i) {
-      term2 += members[i]*members[i];
+      term2 += sol[members[i]]*sol[members[i]];
     }
     feas = term1 - term2;
   }
