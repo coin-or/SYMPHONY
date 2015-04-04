@@ -1,4 +1,4 @@
-# SYMPHONY Version 5.6.9 README
+# SYMPHONY Version 5.6.10 README
 
 Welcome to SYMPHONY. SYMPHONY is distributed under the Eclipse Public License
 and is freely redistributable. All source code and documentation is Copyright
@@ -227,6 +227,11 @@ https://projects.coin-or.org/SYMPHONY/newticket
 Please note the version of SYMPHONY you are using when filing the ticket.
 
 ## CHANGELOG
+
+### Release 5.6.10
+  * Fixed bug with using more the 1 process in PVM
+  * Print to stderr on ctrl-c
+  * Fixed double free with prep level < 1
 
 ### Release 5.6.9
   * Fixed memory leak
