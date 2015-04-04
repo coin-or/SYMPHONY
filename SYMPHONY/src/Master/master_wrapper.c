@@ -776,21 +776,24 @@ int process_own_messages_u(sym_environment *env, int msgtag)
 int free_master_u(sym_environment *env)
 {
    int i;
-
+   MIPdesc *tmp;
+   
 #ifdef USE_SYM_APPLICATION
    CALL_USER_FUNCTION( user_free_master(&env->user) );
 #endif
    FREE(env->best_sol.xind);
    FREE(env->best_sol.xval);
    
-   if (env->mip){
+   if (tmp = env->mip){
       free_mip_desc(env->mip);
       FREE(env->mip);
    }
 
-   if(env->prep_mip){
+   if(env->prep_mip && env->prep_mip != tmp){
       free_mip_desc(env->prep_mip);
       FREE(env->prep_mip);
+   }else{ //We made a copy, so don't free it again
+      env->prep_mip = NULL;
    }
    
    if (env->rootdesc){
@@ -834,11 +837,13 @@ int free_master_u(sym_environment *env)
       FREE(env->cp);
    }
 #endif
-#endif
+#ifdef COMPILE_IN_LP
    if (env->sp){
       sp_free_sp(env->sp);
       FREE(env->sp);
    }
+#endif
+#endif
    
    return(FUNCTION_TERMINATED_NORMALLY);   
 }

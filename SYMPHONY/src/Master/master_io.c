@@ -546,6 +546,8 @@ int parse_command_line(sym_environment *env, int argc, char **argv)
 		  tm_par->max_active_nodes = 1;
 	       }
 #endif
+#else
+	       tm_par->max_active_nodes = tmpi;
 #endif
 	    }
 	 }else{
