@@ -837,11 +837,13 @@ int free_master_u(sym_environment *env)
       FREE(env->cp);
    }
 #endif
-#endif
+#ifdef COMPILE_IN_LP
    if (env->sp){
       sp_free_sp(env->sp);
       FREE(env->sp);
    }
+#endif
+#endif
    
    return(FUNCTION_TERMINATED_NORMALLY);   
 }

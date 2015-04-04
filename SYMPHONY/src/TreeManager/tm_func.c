@@ -363,7 +363,11 @@ int solve(tm_prob *tm)
             {
             scand_num = tm->samephase_candnum;
             }
-	    if (scand_num > 0 && (thread_num != 0 || tm->par.max_active_nodes == 1)){
+	    if (scand_num > 0
+#ifndef __PVM__
+		&& (thread_num != 0 || tm->par.max_active_nodes == 1)
+#endif
+		){
 	       i = start_node(tm, thread_num);
 	    }else{
 	       i = NEW_NODE__NONE;
