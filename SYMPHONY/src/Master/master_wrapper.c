@@ -789,7 +789,7 @@ int free_master_u(sym_environment *env)
       FREE(env->mip);
    }
 
-   if(env->prep_mip != tmp){
+   if(env->prep_mip && env->prep_mip != tmp){
       free_mip_desc(env->prep_mip);
       FREE(env->prep_mip);
    }else{ //We made a copy, so don't free it again
